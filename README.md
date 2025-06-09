@@ -235,6 +235,22 @@ For example:
 Re-running "copy_playlist" or "load_liked" in the event that it fails should be safe, it
 will not duplicate entries on the playlist.
 
+## Testing
+
+To verify that the migration scripts work correctly you can run the unit tests
+included in this repository. The tests use sample playlist data so they work
+completely offline. Inside a virtual environment, install the dependencies and
+run `pytest`:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+PYTHONPATH=. pytest -q
+```
+
+If everything is set up properly you should see `5 passed`.
+
 ### Searching for YTMusic Tracks
 
 This is mostly for debugging, but there is a command to search for tracks in YTMusic:
