@@ -269,6 +269,13 @@ Run the script with:
 bash scripts/conda_transfer_example.sh
 ```
 
+### Interactive Notebook Example
+
+For an executable walkthrough of these steps, open the Jupyter
+notebook located at `notebooks/spotify_to_youtube.ipynb`. Each
+cell contains one of the commands from the workflow so you can run
+them interactively in a terminal-enabled environment.
+
 ### Searching for YTMusic Tracks
 
 This is mostly for debugging, but there is a command to search for tracks in YTMusic:
