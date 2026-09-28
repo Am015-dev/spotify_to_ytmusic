@@ -74,3 +74,14 @@ Sources: search-result excerpts only; every official rulebook PDF was blocked by
 - If a player disconnects, the computer takes over their seat; if they rejoin with the same account, they get it back. **The host must keep the page open.** Guests need Contributor or Editor access to the artifact (Viewers can watch but not act).
 - Not available in the GitHub Pages build (no room service there): single-player, pass-and-play and computer-only games still work.
 - **Hard skill:** a two-stage dice lookahead replaced the one-step keep search, but in testing it wasn't measurably stronger: about 55–59% wins against Normal, the same as the old Hard. A probabilistic stay/yield model also lost to the old rule (52% vs 58%), so the old rule stays (`HYOLD=true`, yield margin `HYB=1.5`, the best of 0.8 / 1.5 / 2.2).
+
+## v7: host migration and phone layout
+
+- **Host migration:**
+  - Each state packet now carries the full game, including the deck order. A packet sent when no choice or resolution is in progress is marked *safe*, and every guest keeps the last safe one.
+  - If the host leaves the room, or no packet arrives for 15 s, the seated player with the lowest seat number becomes host. They restore the last safe state, so a roll in progress may be replayed, and start an *epoch* one higher. Guests follow the higher epoch.
+  - A returning old host sees the higher epoch and steps down. A returning player whose seat went to the computer gets it back automatically.
+  - Trade-off: a guest with browser dev tools could read the deck order.
+- **Phones (≤700 px):**
+  - The header is one scrollable row, the 3D stage is taller, and the camera widens in portrait.
+  - A docked bottom bar shows the step, the dice (tap to keep), the "if you resolve now" preview and the main buttons. Pop-ups open as bottom sheets.

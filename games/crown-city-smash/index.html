@@ -199,6 +199,31 @@ table.stats tr.win{background:var(--yellow);color:#1a1320}
 .emotes .btn{font-size:1.1rem;padding:.1rem .45rem;flex:0 0 auto}
 .pop.emote{font-size:3rem;-webkit-text-stroke:0;text-shadow:none}
 
+/* v7: phones */
+#dock{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--card);color:var(--ink);border-top:4px solid #1a1320;box-shadow:0 -4px 0 rgba(26,19,32,.18);padding:.4rem 12px calc(.45rem + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:.35rem}
+#dock .dk-t{font:1.05rem/1.1 Bangers,Impact,sans-serif;letter-spacing:.04em;color:var(--red)}
+#dock .dk-t span{font:800 .8rem Nunito,sans-serif;color:var(--muted,#7b6c80)}
+#dock .dk-d{display:flex;gap:.5rem;overflow-x:auto;padding:4px 4px 6px}
+#dock .dk-d .die{flex:0 0 auto;width:46px;height:46px}
+#dock .dk-d .die svg{width:32px;height:32px}
+#dock .dk-a{display:flex;gap:.4rem}
+#dock .dk-a .btn{flex:1 1 0;min-height:48px;padding:.3rem .4rem;font-size:.95rem}
+#dock .dk-a .btn small{display:block;font-size:.7rem}
+@media (max-width:700px){
+  header{flex-wrap:nowrap;overflow-x:auto;gap:.4rem;padding:.4rem 12px;scrollbar-width:none;position:sticky;top:0;z-index:30}
+  header::-webkit-scrollbar{display:none}
+  header h1{font-size:1.45rem;white-space:nowrap;flex:0 0 auto}
+  header .btn{flex:0 0 auto;padding:.25rem .5rem;font-size:.85rem}
+  header .spacer{display:none}
+  body.docked #dicewrap{display:none}
+  .wrap{padding:.5rem 12px}
+  .stage{border-width:3px;border-radius:12px}
+  .dlg{padding:.8rem .9rem;max-height:86vh}
+  #modal{padding:10px;align-items:flex-end}
+  .btn{min-height:40px}
+}
+#dock .dk-p{font-size:.8rem;font-weight:800;line-height:1.2}
+
 </style>
 </head>
 <body>
@@ -863,7 +888,7 @@ function aiBuyStep(p){
   if(!G.aiSwept&&p.en>=8&&maxv<-2){G.aiSwept=true;sweep();return}
   endTurn()}
 function aiStep(){
-  if(!G||G.winner||UI.choice||UI.busy)return;const p=cur();if(p.human)return;
+  if(!G||G.winner||UI.choice||UI.busy)return;if(typeof NET!=='undefined'&&NET.on&&NET.role==='client')return;const p=cur();if(p.human)return;
   if(G.phase==='roll')aiRollStep(p);else if(G.phase==='buy')aiBuyStep(p)}
 function schedule(){if(!G||G.winner||UI.choice||UI.busy||UI.info||UI.rules||UI.pending||UI.paused)return;if(typeof NET!=='undefined'&&(NET.role==='client'&&NET.on))return;if(!['roll','buy'].includes(G.phase)||isHuman(G.active))return;
   UI.pending=true;setTimeout(()=>{UI.pending=false;aiStep()},ANIM?(G.phase==='roll'&&!G.aiMarked?AIDELAY*1.1:AIDELAY):0)}
@@ -1206,7 +1231,7 @@ function init3D(){
   V3.on=true;document.body.classList.add('three');
   V3.clock=new THREE.Clock();requestAnimationFrame(loop3D);
   return true}
-function resize3D(){const el=V3.r.domElement.parentElement;const w=el.clientWidth,h=Math.round(w*(window.innerWidth<700?0.78:0.62));el.style.height=h+'px';V3.r.setSize(w,h,false);V3.r.domElement.style.width=w+'px';V3.r.domElement.style.height=h+'px';V3.cam.aspect=w/h;
+function resize3D(){const el=V3.r.domElement.parentElement;const w=el.clientWidth,h=Math.round(w*(window.innerWidth<700?0.92:0.62));el.style.height=h+'px';V3.r.setSize(w,h,false);V3.r.domElement.style.width=w+'px';V3.r.domElement.style.height=h+'px';V3.cam.aspect=w/h;V3.cam.fov=w/h<1.3?52:38;
   V3.cam.fov=w/h<1.4?54:42;V3.cam.updateProjectionMatrix()}
 // ---- textures ----
 function canvasTex(w,h,draw,rep){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');draw(x,w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;if(rep){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep[0],rep[1])}t.anisotropy=4;return t}
@@ -1536,7 +1561,7 @@ function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getEle
 </script>
 <script>
 // ---------- online multiplayer (room capability). The host runs the game; everyone else sends actions. ----------
-const NET={on:false,role:null,code:'',room:null,lobby:null,user:null,uid:null,peer:null,mySeat:-1,seq:0,applied:0,last:0,timer:null,parts:{},hostPeer:null,names:{},peers:[],inLobby:false,err:'',conn:false,ready:false,busy:false};
+const NET={on:false,role:null,code:'',room:null,lobby:null,user:null,uid:null,peer:null,mySeat:-1,seq:0,applied:0,last:0,timer:null,parts:{},hostPeer:null,names:{},peers:[],inLobby:false,err:'',conn:false,ready:false,busy:false,ep:0,safe:null,lastRx:0,dead:[],expect:null};
 const EMOTES=['😂','😱','👏','😡','🔥','💤'];
 async function netInit(){try{if(!window.claude||!window.claude.use){NET.ready=true;render();return}const [room,user]=await Promise.all([window.claude.use('room'),window.claude.use('user')]);NET.lobby=room;NET.user=user;if(user)NET.uid=await user.id();NET.ready=true;render()}catch(e){NET.ready=true}}
 netInit();
@@ -1549,7 +1574,7 @@ async function netJoin(role,code){
   code=String(code||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,10);if(!code){NET.err='Type the invite code first.';render();return}
   NET.busy=true;render();
   try{if(NET.room){try{await NET.room.leave()}catch(e){}}NET.room=await NET.lobby.join('ccs-'+code)}catch(e){NET.busy=false;NET.err='Could not join the game room ('+(e&&e.code||'error')+').';render();return}
-  NET.busy=false;NET.code=code;NET.role=role;NET.on=true;NET.inLobby=true;NET.mySeat=-1;NET.hostPeer=null;NET.parts={};NET.applied=0;
+  NET.busy=false;NET.code=code;NET.role=role;NET.on=true;NET.inLobby=true;NET.mySeat=-1;NET.hostPeer=null;NET.parts={};NET.applied=0;NET.ep=0;NET.safe=null;NET.lastRx=0;NET.dead=[];NET.expect=null;
   if(role==='client')G=null;
   NET.room.presence({role,uid:NET.uid||null,mon:UI.mon,v:1}).catch(()=>{});
   NET.room.on('st',onNetState);NET.room.on('act',onNetAct);NET.room.on('emo',onNetEmo);
@@ -1557,7 +1582,7 @@ async function netJoin(role,code){
     if(isHost()&&G){ch.left.forEach(l=>{const s=G.pl.find(p=>p.peer===l.peer&&p.human);if(s){s.human=false;s.away=true;lg(s.i,`${mname(s)}'s player left: the computer takes over.`)}});
       ch.joined.forEach(j=>{if(j.isMe)return;const uid=j.by||(j.presence&&j.presence.uid);const s=uid&&G.pl.find(p=>p.away&&p.uid===uid);if(s){s.peer=j.peer;s.human=true;s.away=false;lg(s.i,`${mname(s)}'s player is back!`)}});
       if(ch.joined.length||ch.left.length){netPush(true);refresh()}}
-    if(isClient()&&NET.hostPeer&&ch.left.some(p=>p.peer===NET.hostPeer))NET.err='The host left, so the game has stopped.';
+    if(isClient()&&NET.hostPeer&&ch.left.some(p=>p.peer===NET.hostPeer)){if(G&&!G.winner&&!NET.inLobby)netMigrate(NET.hostPeer);else if(!G||NET.inLobby)NET.err='The host closed the room.'}
     netNames();render()});
   NET.room.onConnection(c=>{NET.conn=c;render()});
   UI.info=false;UI.rules=false;render()}
@@ -1578,31 +1603,56 @@ async function unpackStr(s){const u=unb64(s.slice(1));if(s[0]==='z'){const ds=ne
 function netPush(force){if(!isHost()||!NET.room)return;const now=Date.now();
   if(!force&&now-NET.last<300){if(!NET.timer)NET.timer=setTimeout(()=>{NET.timer=null;netPush(true)},310);return}
   NET.last=now;const seq=++NET.seq;
-  let body;if(G){const g=JSON.parse(JSON.stringify(G));g.log=g.log.slice(0,14);g.deckN=g.deck.length;g.deck=[];g.disc=[];g.curseDeck=[];
+  let body;if(G){const g=JSON.parse(JSON.stringify(G));g.log=g.log.slice(0,14);
     const c=UI.choice;const pend=c&&c.who!==undefined&&G.pl[c.who]&&G.pl[c.who].peer&&G.pl[c.who].peer!==NET.peer?{title:c.title,text:c.text,options:c.options,who:c.who,dice:!!c.dice,cancel:!!c.cancel}:null;
     const pw=c&&c.who!==undefined?c.who:-1;
-    body={code:NET.code,g,fx:UI.fx,banner:UI.banner,pend,pw}}else body={code:NET.code,lobby:true};
+    const safe=['roll','buy'].includes(G.phase)&&!c&&!UI.busy;
+    body={code:NET.code,ep:NET.ep,g,fx:UI.fx,banner:UI.banner,pend,pw,safe}}else body={code:NET.code,ep:NET.ep,lobby:true};
   packStr(JSON.stringify(body)).then(z=>{const CH=3200,n=Math.ceil(z.length/CH);for(let i=0;i<n;i++)NET.room&&NET.room.emit('st',{s:seq,i,n,d:z.slice(i*CH,(i+1)*CH)}).catch(()=>{})})}
 setInterval(()=>{if(isHost())netPush(true)},3000);
-let netWon=null;setInterval(()=>{if(isHost()&&G&&G.winner&&netWon!==G.gid){netWon=G.gid;[400,1200,2500].forEach(t=>setTimeout(()=>netPush(true),t))}},300);
-function onNetState(msg){if(!isClient()||msg.isMe)return;const d=msg.data;if(!d||typeof d.d!=='string'||!(d.n>0&&d.n<40)||!(d.i>=0&&d.i<d.n))return;
-  if(NET.hostPeer&&msg.peer!==NET.hostPeer)return;
+let netWon=null;setInterval(()=>{if(isHost()&&G&&G.winner&&netWon!==G.gid){netWon=G.gid;[400,1200,2500,5000,8000].forEach(t=>setTimeout(()=>netPush(true),t))}},300);
+function onNetState(msg){if(!NET.on||msg.isMe)return;const d=msg.data;if(!d||typeof d.d!=='string'||!(d.n>0&&d.n<40)||!(d.i>=0&&d.i<d.n))return;
+  if(NET.dead.includes(msg.peer))return;
   const k=msg.peer+':'+d.s;const P2=NET.parts[k]=NET.parts[k]||{n:d.n,got:0,c:[]};if(P2.c[d.i]===undefined){P2.c[d.i]=d.d;P2.got++}
-  if(P2.got<P2.n)return;delete NET.parts[k];Object.keys(NET.parts).forEach(x=>{if(+x.split(':')[1]<d.s)delete NET.parts[x]});
-  if(d.s<=NET.applied&&msg.peer===NET.hostPeer)return;
-  unpackStr(P2.c.join('')).then(txt=>{const o=JSON.parse(txt);if(o.code!==NET.code)return;if(!NET.hostPeer)NET.hostPeer=msg.peer;if(msg.peer!==NET.hostPeer||d.s<=NET.applied)return;NET.applied=d.s;applyNet(o)}).catch(()=>{})}
+  if(P2.got<P2.n)return;delete NET.parts[k];Object.keys(NET.parts).forEach(x=>{const [pp,ss]=x.split(':');if(pp===msg.peer&&+ss<d.s)delete NET.parts[x]});
+  unpackStr(P2.c.join('')).then(txt=>{const o=JSON.parse(txt);if(o.code!==NET.code)return;const ep=o.ep|0;
+    // only a seated player may take over as host (or anyone, before we have a game)
+    const seated=!G||G.pl.some(p=>p.peer===msg.peer);
+    if(isHost()){if(!seated||!(ep>NET.ep||(ep===NET.ep&&msg.peer<NET.peer)))return;
+      NET.role='client';UI.choice=null;UI.busy=false;NET.hostPeer=msg.peer;NET.ep=ep;NET.applied=d.s;lg(-1,'Another player is running the game now.');NET.room.presence({role:'client'}).catch(()=>{})}
+    else{if(!NET.hostPeer||(ep>NET.ep&&seated)){if(NET.hostPeer&&NET.hostPeer!==msg.peer)NET.applied=0;NET.hostPeer=msg.peer;NET.ep=Math.max(NET.ep,ep);NET.expect=null}
+      if(msg.peer!==NET.hostPeer||ep<NET.ep||d.s<=NET.applied)return;NET.applied=d.s}
+    NET.lastRx=Date.now();if(o.safe&&o.g)NET.safe=JSON.stringify(o.g);applyNet(o)}).catch(()=>{})}
+// ---- host migration: if the host leaves, the seated player with the lowest seat number takes over from the last safe state ----
+function netMigrate(gone){if(!isClient()||!G||G.winner)return;if(gone&&!NET.dead.includes(gone))NET.dead.push(gone);
+  const here=new Set(NET.peers.map(p=>p.peer));
+  const cand=G.pl.filter(p=>p.human&&p.peer&&!NET.dead.includes(p.peer)&&(here.has(p.peer)||p.peer===NET.peer));
+  const next=cand[0];NET.lastRx=Date.now();
+  if(!next){NET.err='The host left and nobody can take over.';render();return}
+  if(next.peer!==NET.peer){NET.expect=next.peer;UI.banner=`The host left. ${esc(pname(next)||mname(next))} is taking over…`;render();return}
+  let g=null;try{g=JSON.parse(NET.safe||'null')}catch(e){}if(!g)g=G;G=g;
+  G.pl.forEach(p=>{if(p.human&&p.peer!==NET.peer&&(NET.dead.includes(p.peer)||!here.has(p.peer))){p.human=false;p.away=true}});
+  if(!['roll','buy'].includes(G.phase)){G.phase='roll';G.step=1}
+  NET.role='host';NET.ep++;NET.hostPeer=NET.peer;NET.expect=null;NET.mySeat=G.pl.findIndex(p=>p.peer===NET.peer);
+  UI.choice=null;UI.busy=false;UI.pending=false;UI.fx={};UI.banner='';NET.err='';
+  lg(-1,`The host left. ${pname(G.pl[NET.mySeat])||mname(G.pl[NET.mySeat])}'s page is running the game now.`);
+  NET.room.presence({role:'host'}).catch(()=>{});netPush(true);refresh()}
+setInterval(()=>{if(!isClient()||!G||G.winner||NET.inLobby||!NET.lastRx)return;if(Date.now()-NET.lastRx>15000)netMigrate(NET.expect||NET.hostPeer)},1000);
 function applyNet(o){if(o.lobby||!o.g){if(G){G=null;NET.inLobby=true;render()}return}
-  const prevFx=UI.fx||{},prevRoll=G?G.rollId:-1,prevWin=G&&G.winner;G=o.g;G.deck=new Array(G.deckN||0).fill('x');
+  const prevFx=UI.fx||{},prevRoll=G?G.rollId:-1,prevWin=G&&G.winner;G=o.g;if(!Array.isArray(G.deck))G.deck=[];
   NET.mySeat=G.pl.findIndex(p=>p.peer===NET.peer);NET.inLobby=false;UI.info=false;
   const fxn=o.fx||{};for(const k in fxn){const a=fxn[k]||[],b=prevFx[k]||[];const from=a.length<b.length?0:b.length;if(a.length<b.length&&typeof V3!=='undefined')V3.fxSeen[k]=0;
     for(let j=from;j<a.length;j++){if(typeof SND!=='undefined'&&G.pl[k])SND.pitch=[1,.8,1.15,.7,1.3,.9,1.05,.85,1.2][G.pl[k].m]||1;fxSound(a[j].t,a[j].c)}}
   if(G.rollId!==prevRoll)snd('dice');
   if(G.pl[G.active]&&G.active===NET.mySeat&&G.phase==='roll'&&G.rollId!==prevRoll&&G.rolls===2+has(G.pl[G.active],'brain')+exRerolls(G.pl[G.active]))snd('turn');
+  if(NET.mySeat>=0&&G.pl[NET.mySeat].away&&NET.room&&Date.now()-(NET.hiT||0)>2500){NET.hiT=Date.now();NET.room.emit('act',{act:'hi'}).catch(()=>{})}
   UI.fx=fxn;UI.banner=o.banner||'';NET.pw=o.pw;UI.choice=o.pend&&o.pend.who===NET.mySeat?Object.assign({},o.pend,{net:true}):null;
   netNames();render()}
 // client -> host
 function netSend(ds){if(!NET.room)return;const d={};['act','die','card','opt'].forEach(k=>{if(ds[k]!==undefined)d[k]=String(ds[k]).slice(0,24)});NET.room.emit('act',d).catch(()=>{});snd('click')}
-function onNetAct(msg){if(!isHost()||!G||msg.isMe)return;const seat=G.pl.findIndex(p=>p.peer===msg.peer&&p.human);if(seat<0)return;const d=msg.data||{};const ds={};
+function onNetAct(msg){if(!isHost()||!G||msg.isMe)return;let seat=G.pl.findIndex(p=>p.peer===msg.peer&&p.human);
+  if(seat<0){const s=G.pl.find(p=>p.away&&(p.peer===msg.peer||(msg.by&&p.uid===msg.by)));if(!s)return;s.peer=msg.peer;s.human=true;s.away=false;NET.dead=NET.dead.filter(x=>x!==msg.peer);lg(s.i,`${mname(s)}'s player is back!`);netPush(true);refresh();return}
+  if(msg.data&&msg.data.act==='hi')return;const d=msg.data||{};const ds={};
   if(typeof d.act==='string')ds.act=d.act.slice(0,24);if(d.die!==undefined)ds.die=String(parseInt(d.die,10)||0);if(d.card!==undefined)ds.card=String(parseInt(d.card,10)||0);if(d.opt!==undefined)ds.opt=String(d.opt).slice(0,24);
   gameAct(ds,seat);netPush()}
 // emotes
@@ -1746,7 +1796,7 @@ function rulesHTML(){return `<div class="dlg rules" role="dialog" aria-modal="tr
   <li><b>Evolutions</b> (optional): when you resolve three or more hearts, draw an evolution card for your monster. Play it on your turn. Some are permanent.</li>
   <li><b>Trial</b> mixes the 24 new cards into the classic deck. <b>Experience</b> uses only the new cards.</li></ul>
   <h3>More expansions (switch them on at the start)</h3><ul>${EXPS.filter(e=>e.k!=='evo').map(e=>`<li><b>${esc(e.n)}</b>: ${esc(e.d)}</li>`).join('')}</ul>
-  <h3>Online play</h3><p class="small">On the start screen press <b>Host a game</b> and share the invite code. Friends open this same page (share it with them as Contributors or Editors first), type the code and press <b>Join a game</b>. The host's page runs the game, so it must stay open. Empty seats are filled with computer monsters, and if someone drops out the computer takes over their monster until they come back.</p>
+  <h3>Online play</h3><p class="small">On the start screen press <b>Host a game</b> and share the invite code. Friends open this same page (share it with them as Contributors or Editors first), type the code and press <b>Join a game</b>. The host's page runs the game. If the host leaves, the player in the lowest seat takes over automatically from the last calm moment (at worst, the current roll is replayed). Empty seats are filled with computer monsters, and if someone drops out the computer takes over their monster until they come back.</p>
   <h3>Keyboard shortcuts</h3><p class="small"><b>R</b> reroll · <b>Space</b> resolve / end turn · <b>1–8</b> keep a die · <b>H</b> suggest dice · <b>P</b> pause the computer</p>
   <h3>Winning</h3><p>Reach <b>20 stars</b> and survive your turn, or be the last monster standing. If everyone falls at once, nobody wins.</p>
   <h3>Left out of this version</h3><p class="small">Ten advanced classic cards that need tokens or peeking at the deck, and the Wickedness tiles, which need a separate expansion.</p>
@@ -1767,7 +1817,22 @@ function renderTour(){document.querySelectorAll('.hl').forEach(e=>e.classList.re
   el.innerHTML=`<h3>Tour ${UI.coach+1} of ${TOURSTEPS.length}: ${esc(st.t)}</h3><p class="small">${esc(st.b)}</p><div class="acts"><button class="btn" data-tour="prev" ${UI.coach===0?'disabled':''}>Back</button><button class="btn primary" data-tour="next">${UI.coach===TOURSTEPS.length-1?'Start playing':'Next'}</button><button class="btn" data-tour="skip">Skip tour</button></div>`;
   const tg=document.querySelector(st.el);if(tg)tg.classList.add('hl')}
 
-function render(){if(isHost())netPush();if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal()}
+function render(){if(isHost())netPush();if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal();renderDock()}
+// phones: a docked bar at the bottom mirrors the current step, the dice and the main buttons, so nothing needs scrolling
+const PHONE=window.matchMedia?window.matchMedia('(max-width:700px)'):{matches:false};
+function renderDock(){let d=document.getElementById('dock');
+  const on=PHONE.matches&&G&&!UI.info&&!(NET.on&&NET.inLobby);
+  if(!on){if(d)d.remove();document.body.classList.remove('docked');document.body.style.paddingBottom='';return}
+  if(!d){d=document.createElement('div');d.id='dock';d.setAttribute('aria-label','Current step and actions');document.body.appendChild(d)}
+  const pr=document.getElementById('prompt'),dc=document.getElementById('dice'),pv=document.getElementById('preview');
+  const head=pr&&pr.querySelector('.head'),acts=pr&&pr.querySelector('.acts');
+  const mine=humanTurn();const who=G.pl[G.active];
+  const title=G.winner?'Game over':mine?(head?head.textContent:'Your turn'):`${mname(who)} is ${G.phase==='buy'?'shopping':'rolling'}…`;
+  const btns=mine&&acts?[...acts.querySelectorAll('button[data-act]')].filter(b=>!/^(hint|tour)$/.test(b.dataset.act)).slice(0,3).map(b=>b.outerHTML).join(''):'';
+  const dice=dc&&G.phase!=='buy'?dc.innerHTML:'';
+  d.innerHTML=`<div class="dk-t">${esc(title)}${mine&&G.phase==='roll'&&G.rolls>=0?` <span>· ${G.rolls} reroll${G.rolls===1?'':'s'} left</span>`:''}</div>${dice?`<div class="dk-d">${dice}</div>`:''}${mine&&dice&&pv&&pv.textContent.trim()?`<div class="dk-p">${esc(pv.textContent.trim())}</div>`:''}${btns?`<div class="dk-a">${btns}</div>`:''}`;
+  document.body.classList.add('docked');document.body.style.paddingBottom=(d.offsetHeight+12)+'px'}
+if(PHONE.addEventListener)PHONE.addEventListener('change',()=>{render();if(typeof resize3D==='function'&&V3.on)resize3D()});
 const SPEEDS=[['slow',1300],['normal',650],['fast',260]];
 function setSpeed(k){UI.speed=k;AIDELAY=SPEEDS[k][1];const b=document.getElementById('speedbtn');if(b)b.textContent='⏩ '+SPEEDS[k][0][0].toUpperCase()+SPEEDS[k][0].slice(1);try{localStorage.setItem('ccs_speed',k)}catch(e){}}
 
