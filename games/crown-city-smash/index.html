@@ -174,6 +174,20 @@ body.three #banner{top:12px}
 
 @media (max-width:1560px){header .sub{display:none}}
 header .btn{padding:.3rem .65rem}
+/* v5: expansions + UX */
+.exps{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.4rem;margin:.2rem 0 .5rem}
+.ex{border:2.5px solid #1a1320;border-radius:10px;background:#fffdf5;color:#1a1320;text-align:left;padding:.3rem .5rem;box-shadow:2px 2px 0 var(--shadow)}
+.ex b{display:block;font-size:.86rem}.ex small{display:block;font-size:.72rem;color:#5b4d60;line-height:1.2}
+.ex.on{background:#d9f5e3;border-color:#1f9d5c}
+.btn.mini{padding:.05rem .45rem;font-size:.75rem;margin-left:.3rem}
+.die.sugg{outline:3px dashed #3a86ff;outline-offset:2px}
+.die.sp-b{background:linear-gradient(160deg,#ffd0d0,#ff8f8f)}.die.sp-b.kept{background:linear-gradient(160deg,#fff4a8,#ffd23f)}
+.die.sp-f{background:linear-gradient(160deg,#fff2c4,#f4c95d)}.die.sp-f.kept{background:linear-gradient(160deg,#fff4a8,#ffd23f)}
+.mc.K{background:#efe3ff}.mc.K b{color:#6a2fc2}.mc.T b{color:#b35c00}.mc.W b{color:#b0306f}.mc.B{background:#ffe0e0}.mc.B b{color:#c1121f}
+table.stats{width:100%;border-collapse:collapse;font-size:.86rem;margin:.4rem 0}
+table.stats th,table.stats td{border-bottom:2px solid #1a1320;padding:.25rem .3rem;text-align:center}
+table.stats td:first-child,table.stats th:first-child{text-align:left}
+table.stats tr.win{background:var(--yellow);color:#1a1320}
 
 </style>
 </head>
@@ -185,6 +199,8 @@ header .btn{padding:.3rem .65rem}
   <button class="btn" data-a="snd" id="sndbtn">🔊 Sound</button>
   <button class="btn" data-a="mus" id="musbtn">🎵 Music: off</button>
   <button class="btn" data-a="speed" id="speedbtn">Speed: normal</button>
+  <button class="btn" data-a="pause" id="pausebtn">⏸ Pause</button>
+  <button class="btn" data-a="hints" id="hintbtn">💡 Hints: on</button>
   <button class="btn" data-a="tour">Tour</button>
   <button class="btn" data-a="rules">Rules</button>
   <button class="btn" data-a="new">New game</button>
@@ -208,7 +224,7 @@ header .btn{padding:.3rem .65rem}
 </div>
 <div id="modal" class="hidden"></div>
 <script>
-var ANIM=1, AIDELAY=650, DEFN=4, DEFX='trial', DEFEVO=true, YA=3, YB=0, MBT=8;
+var ANIM=1, AIDELAY=650, DEFN=4, DEFX='trial', DEFEVO=true, YA=3, YB=0, MBT=8, DEFLV='normal', LVMIX=null, DEFEX=null;
 const SAVE='ccs_save2', TOUR='ccs_tour2';
 const FACES=['1','2','3','E','C','H'];
 const MONS=[
@@ -327,7 +343,7 @@ const EVOS=[
  [['Thorn Volley','blast2'],['Night Hunt','pvenom'],['Root Down','pheal'],['Echolocation','reroll'],['Bramble Nest','pcity'],['Mind Bite','mb']]];
 const base=id=>id.split('#')[0];
 let G=null;
-const UI={choice:null,roll:null,pick:null,busy:false,info:true,coach:-1,fx:{},banner:'',pending:false,n:DEFN,mon:0,xp:DEFX,evo:DEFEVO,rollAnim:0,speed:1};
+const UI={choice:null,roll:null,pick:null,busy:false,info:true,coach:-1,fx:{},banner:'',pending:false,n:DEFN,mon:0,xp:DEFX,evo:DEFEVO,rollAnim:0,speed:1,ex:{},lvl:'normal',hints:true,paused:false,stats:false};
 
 // ---------- helpers ----------
 const rnd=n=>Math.floor(Math.random()*n);
@@ -344,20 +360,20 @@ const where=i=>G.city===i?'Downtown':G.bay===i?'the Harbor':'the suburbs';
 const alive=()=>G.pl.filter(p=>p.alive);
 const isHuman=i=>G.pl[i].human;
 const mname=p=>MONS[p.m].n;
-const costOf=(p,id)=>Math.max(0,CARDS[base(id)].c-has(p,'cosmic'));
+const costOf=(p,id)=>Math.max(0,CARDS[base(id)].c-has(p,'cosmic')+(typeof exCost==='function'&&G&&G.ex?exCost(p):0));
 const immune=p=>has(p,'m_foil')||has(p,'pmind');
 function lg(s,t){G.log.unshift({s,t});if(G.log.length>400)G.log.length=400}
-function fx(i,t,c){(UI.fx[i]=UI.fx[i]||[]).push({t,c});fxSound(t,c)}
-function fxSound(t,c){if(typeof sfx!=='function')return;if(/K\.O\./.test(t))sfx('ko');else if(/mindbug|bugged/i.test(t))sfx('mindbug');else if(/EVOLVE|HATCH/.test(t))sfx('evolve');else if(t==='YIELD')sfx('whoosh');else if(c==='hurt'){sfx('hurt');if(parseInt(t.slice(1))>=3)sfx('roar')}else if(c==='heal')sfx('heal');else if(c==='star')sfx('star');else if(c==='energy')sfx('energy')}
+function fx(i,t,c){(UI.fx[i]=UI.fx[i]||[]).push({t,c});if(typeof SND!=='undefined'&&G&&G.pl[i])SND.pitch=[1,.8,1.15,.7,1.3,.9,1.05,.85,1.2][G.pl[i].m]||1;fxSound(t,c)}
+function fxSound(t,c){if(typeof sfx!=='function')return;if(/K\.O\./.test(t))sfx('ko');else if(/mindbug|bugged/i.test(t))sfx('mindbug');else if(/EVOLVE|HATCH/.test(t))sfx('evolve');else if(t==='YIELD')sfx('whoosh');else if(c==='hurt'){sfx('hurt');if(parseInt(t.slice(1))>=2)sfx('roar')}else if(c==='heal')sfx('heal');else if(c==='star')sfx('star');else if(c==='energy')sfx('energy')}
 function snd(n){if(typeof sfx==='function')sfx(n)}
-function gainVP(p,n){if(n<=0)return;p.vp+=n;fx(p.i,'+'+n+'★','star')}
+function gainVP(p,n){if(n<=0)return;p.vp+=n;if(p.stats)p.stats.stars+=n;fx(p.i,'+'+n+'★','star')}
 function loseVP(p,n){const d=Math.min(p.vp,n);p.vp-=d;if(d)fx(p.i,'-'+d+'★','star')}
 function gainE(p,n){if(n<=0)return;n+=has(p,'kidfan');p.en+=n;fx(p.i,'+'+n+'⚡','energy')}
 function heal(p,n){const d=Math.max(0,Math.min(n,maxhp(p)-p.hp));p.hp+=d;if(d)fx(p.i,'+'+d+'♥','heal');return d}
 function gainMB(p,n){p.mb+=n;fx(p.i,'+'+n+' mindbug','star')}
 function neighbours(i){const n=G.pl.length;let l=null,r=null;
   for(let k=1;k<n;k++){const j=(i+k)%n;if(G.pl[j].alive){r=j;break}}for(let k=1;k<n;k++){const j=(i-k+n)%n;if(G.pl[j].alive){l=j;break}}return [...new Set([l,r].filter(x=>x!==null&&x!==i))]}
-function countsOf(dice){const c={'1':0,'2':0,'3':0,E:0,C:0,H:0};dice.forEach(d=>c[d.f]++);return c}
+function countsOf(dice){const c={'1':0,'2':0,'3':0,E:0,C:0,H:0};dice.forEach(d=>{const f=d.f;if(f==='C2')c.C+=2;else if(f==='E2')c.E+=2;else if(f in c)c[f]++});return c}
 const counts=()=>countsOf(G.dice);
 function draw(){if(!G.deck.length){G.deck=shuffle(G.disc);G.disc=[]}return G.deck.pop()||null}
 function refill(){for(let k=0;k<3;k++)if(!G.market[k])G.market[k]=draw();G.market=G.market.filter(Boolean)}
@@ -369,17 +385,19 @@ function newGame(mode,n,mon){
   const pool=[0,1,2,3,4,5,6,7,8].filter(m=>xp!=='base'||m<6);
   const others=shuffle(pool.filter(m=>m!==mon));
   const mons=mode==='solo'?[mon,...others]:shuffle(pool.slice());
-  const pl=[];for(let i=0;i<n;i++)pl.push({i,m:mons[i],hp:10,vp:0,en:0,mb:xp==='base'?0:1,cards:[],evo:[],hand:[],edeck:[],alive:true,human:mode==='hot',tok:{}});
+  const lvl=UI.lvl||DEFLV;const pl=[];for(let i=0;i<n;i++)pl.push({i,m:mons[i],hp:10,vp:0,en:0,mb:xp==='base'?0:1,cards:[],evo:[],hand:[],edeck:[],alive:true,human:mode==='hot',tok:{},lvl:LVMIX?LVMIX[i%LVMIX.length]:lvl,cult:0,wk:0});
   if(mode==='solo'){const seat=rnd(n);const hm=pl[0].m;pl[0].m=pl[seat].m;pl[seat].m=hm;pl[seat].human=true}
   pl.forEach(p=>p.edeck=shuffle([0,1,2,3,4,5]));
   const deck=xp==='exp'?MBDECK.slice():xp==='trial'?[...BASEDECK,...MBDECK]:BASEDECK.slice();
-  G={gid:Math.random(),mode,n,xp,evoOn,pl,city:-1,bay:-1,bayOn:n>=5,deck:shuffle(deck),disc:[],market:[],dice:[],rolls:0,phase:'start',active:0,turn:1,tid:0,log:[],winner:null,winText:'',tf:{},less:0,rollId:0,step:1};
-  refill();UI.choice=null;UI.roll=null;UI.pick=null;UI.busy=false;UI.info=false;UI.fx={};UI.banner='';
+  const ex=Object.assign({},DEFEX||UI.ex||{});ex.evo=evoOn;
+  G={gid:Math.random(),ex,mode,n,xp,evoOn,pl,city:-1,bay:-1,bayOn:n>=5,deck:shuffle(deck),disc:[],market:[],dice:[],rolls:0,phase:'start',active:0,turn:1,tid:0,log:[],winner:null,winText:'',tf:{},less:0,rollId:0,step:1};
+  refill();UI.choice=null;UI.roll=null;UI.pick=null;UI.busy=false;UI.info=false;UI.fx={};UI.banner='';UI.stats=false;clearTimeout(UI.statsT);
   lg(-1,`A new rampage begins with ${n} monsters: ${pl.map(mname).join(', ')}.`);
   if(xp!=='base')lg(-1,`Mindbug ${xp==='exp'?'Experience (only the new cards)':'Trial (new cards mixed in)'}: every monster starts with 1 Mindbug token.`);
   if(evoOn)lg(-1,'Evolutions are on: resolve three hearts to draw an evolution card.');
   if(G.bayOn)lg(-1,'With 5 or more monsters, the Harbor is open as a second city space.');
-  startTurn();
+  const on=EXPS.filter(e=>e.k!=='evo'&&ex[e.k]).map(e=>e.n);if(on.length)lg(-1,'Expansions: '+on.join(', ')+'.');
+  exSetup(()=>startTurn());
 }
 
 // ---------- asking (humans get a modal, computers answer at once) ----------
@@ -400,13 +418,15 @@ function startTurn(){
     ()=>{
       if(inTokyo(p.i)){const b=2+has(p,'street');gainVP(p,b);lg(p.i,`${mname(p)} starts in ${where(p.i)} and gains ${b} stars.`)}
       if(has(p,'pen'))gainE(p,has(p,'pen'));
+      exStartTurn(p);
       if(checkWin(false)){refresh();return}
+      if(!p.alive){endTurn();return}
       const nd=Math.max(1,6+has(p,'skull')-G.less);G.less=0;
-      G.dice=[];for(let k=0;k<nd;k++)G.dice.push({f:FACES[rnd(6)],k:false,x:k>=6});
-      G.rolls=2+has(p,'brain');G.rollId++;G.phase='roll';G.aiMarked=false;snd('dice');if(p.human)setTimeout(()=>snd('turn'),650);
+      G.dice=[];for(let k=0;k<nd;k++)G.dice.push({f:FACES[rnd(6)],k:false,x:k>=6});G.dice.push(...exDice(p));
+      G.rolls=Math.max(0,2+has(p,'brain')+exRerolls(p));G.rollId++;G.phase='roll';G.aiMarked=false;snd('dice');if(p.human)setTimeout(()=>snd('turn'),650);
       lg(p.i,`${mname(p)} rolls ${nd} dice.`);refresh()});
 }
-function reroll(){G.dice.forEach(d=>{if(!d.k)d.f=FACES[rnd(6)]});G.rollId++;UI.banner='';snd('dice')}
+function reroll(){G.dice.forEach(d=>{if(!d.k)d.f=faceOf(d)});G.rollId++;UI.banner='';snd('dice')}
 function doReroll(kind){const p=cur();
   if(kind==='mind'){p.en-=1}else if(kind==='smoke'){p.tok.smoke--;if(p.tok.smoke<=0){discardCard(p,'smoke');lg(p.i,`${mname(p)} uses its last puff of smoke.`)}}
   else if(kind==='lurker'){G.dice.forEach(d=>{d.k=d.f!=='3'});reroll();G.dice.forEach(d=>d.k=false);lg(p.i,`${mname(p)} lurks and rerolls its 3s.`);refresh();return}
@@ -448,19 +468,20 @@ function scoreDice(p,dice){const c=countsOf(dice);let vp=0,en=0,hl=0,dmg=0,kill=
   const val=vp*1.6+en*0.6+hl*(p.hp<=5?1:0.5)+dmg*targets.length*0.7+(kill?5:0)+(c.H>=3&&G.evoOn?2:0);
   return {vp,en,hl,dmg,kill,targets,val,text:parts.length?parts.join(', '):'nothing useful'}}
 function doResolve(p){
-  const roller=cur();const bug=p.i!==roller.i;const c=counts();const out=[];const inT=inTokyo(p.i);
+  const roller=cur();const bug=p.i!==roller.i;const c=counts();const out=[];exPreResolve(p,roller,out);const inT=inTokyo(p.i);const hurt=[];
   let q2=false;const echo=bug?0:(G.tf.echo?2:0);
-  for(const f of ['1','2','3']){const n=c[f];if(n>=3){let v=(+f)+(n-3)+echo;if(f==='1'&&has(p,'gourmand'))v+=2*has(p,'gourmand');gainVP(p,v);out.push(`${v}★ from ${n}×${f}`);if(f==='2')q2=true;if(f==='1'&&!bug)G.tf.ones=true}}
+  for(const f of ['1','2','3']){const n=c[f];if(n>=3){let v=(+f)+(n-3)+echo+exSet(p,f,n);if(f==='1'&&has(p,'gourmand'))v+=2*has(p,'gourmand');gainVP(p,v);out.push(`${v}★ from ${n}×${f}`);if(f==='2')q2=true;if(f==='1'&&!bug)G.tf.ones=true}}
   if(has(p,'omni')&&c['1']&&c['2']&&c['3']){gainVP(p,2);out.push('2★ munching 1-2-3')}
   if(has(p,'spree')&&FACES.every(f=>c[f])){gainVP(p,9);out.push('9★ wrecking spree')}
   if(c.E){gainE(p,c.E);out.push(`${c.E+has(p,'kidfan')}⚡`)}
-  if(c.H){if(inT)out.push('hearts wasted in the city');else{const d=heal(p,c.H+has(p,'regrow')+has(p,'pheal'));if(d)out.push(`healed ${d}♥`)}}
+  if(c.H&&has(p,'c_witch')&&inT)gainE(p,c.H);
+  if(c.H){if(exHealBlocked())out.push('the sandstorm blocks healing');else if(inT&&!exHealInCity())out.push('hearts wasted in the city');else{const d=heal(p,c.H+has(p,'regrow')+has(p,'pheal'));if(d){out.push(`healed ${d}♥`);if(p.tok.berserk){p.tok.berserk=false;lg(p.i,`${mname(p)} calms down (no longer berserk).`)}}}}
   if(c.H>=3&&G.evoOn&&drawEvo(p))out.push('draws an evolution');
   // smash
   const tf=bug?{}:G.tf;
   let amt=c.C*(tf.frenzy?2:1);const claws=c.C>0;
   if(claws){amt+=has(p,'barbed');if(inT)amt+=has(p,'street')+has(p,'tunnel')+has(p,'pclaw');if(q2&&has(p,'quills'))amt+=2}
-  amt+=has(p,'acid');
+  amt+=has(p,'acid');if(amt>0)amt+=exSmashBonus(p,c);
   const hitList=[];G.sneak=!!tf.sneak;
   if(amt>0){
     let tg=has(p,'nova')||tf.hunt?alive().filter(q=>q.i!==p.i):inT?alive().filter(q=>!inTokyo(q.i)&&q.i!==p.i):alive().filter(q=>inTokyo(q.i)&&q.i!==p.i);
@@ -468,7 +489,7 @@ function doResolve(p){
     if(claws&&has(p,'m_ambush')&&!inT){const o=alive().filter(q=>q.i!==p.i&&!inTokyo(q.i)&&!tg.includes(q)).sort((a,b)=>b.vp-a.vp)[0];if(o)extra[o.i]=(extra[o.i]||0)+1}
     const all=new Set([...tg.map(q=>q.i),...Object.keys(extra).map(Number)]);
     const venom=claws&&(tf.venom?2:(has(p,'m_stinger')||has(p,'pvenom'))?1:0);
-    for(const j of all){const q=P(j);const a=(tg.includes(q)?amt:0)+(extra[j]||0);const lost=damage(q,a,p);
+    for(const j of all){const q=P(j);const a=(tg.includes(q)?amt:0)+(extra[j]||0);const lost=damage(q,a,p);exOnHit(p,q,lost,claws);if(claws&&lost>0)hurt.push(q);
       if(venom&&lost>0&&q.hp>0&&q.hp<=venom&&!(tf.venom?false:q.hp!==1)){q.hp=0;fx(q.i,'VENOM!','hurt');lg(p.i,`${mname(p)}'s venom finishes off ${mname(q)}!`)}
       if(tg.includes(q)&&inTokyo(j))hitList.push({j,lost})}
     if(all.size){snd('smash');out.push(`smashes ${[...all].map(j=>mname(P(j))).join(', ')} for ${amt}`);lg(p.i,`${mname(p)} smashes ${[...all].map(j=>mname(P(j))+' (−'+(tg.map(q=>q.i).includes(j)?amt:0)+(extra[j]?'+'+extra[j]:'')+')').join(', ')}.`);if(claws&&has(p,'alpha'))gainVP(p,has(p,'alpha'))}
@@ -493,10 +514,11 @@ function doResolve(p){
       if(!G.winner&&bug&&p.alive&&yielders.length&&!inTokyo(p.i))takeSpot(p,yielders);
       if(!G.winner&&roller.alive)enterStep(roller,bug?[]:yielders);
       deaths();
-      UI.busy=false;
+      const fin=()=>{deaths();UI.busy=false;
       if(G.winner){refresh();return}
       if(!roller.alive){endTurn();return}
-      G.phase='buy';G.step=4;G.aiSwept=false;refresh()})
+      G.phase='buy';G.step=4;G.aiSwept=false;refresh()};
+      if(G.winner||!p.alive)fin();else exAfterResolve(p,c,hurt,fin)})
 }
 function takeSpot(p,yielders){let spot=null;if(G.city===-1)spot='city';else if(G.bayOn&&G.bay===-1)spot='bay';if(!spot)return;
   if(spot==='city')G.city=p.i;else G.bay=p.i;snd('stomp');gainVP(p,1+has(p,'penter'));lg(p.i,`${mname(p)} storms into ${where(p.i)} (+${1+has(p,'penter')} star).`);
@@ -509,10 +531,11 @@ function drawEvo(p){if(!p.edeck.length)return false;const j=p.edeck.pop();p.hand
 // apply damage; returns hearts actually lost
 function damage(q,a,src,card){
   if(a<=0||!q.alive)return 0;
+  if(src&&src.i!==q.i&&has(src,'c_devil'))a+=1;
   const sneak=G.sneak&&src;
   if(!sneak&&q.tok.shield&&src&&src.i===G.active&&q.i!==src.i){fx(q.i,'wings!','heal');return 0}
   if(!sneak&&q.tok.tough){q.tok.tough=false;fx(q.i,'TOUGH!','heal');lg(q.i,`${mname(q)} shrugs off the hit (Tough).`);return 0}
-  if(!sneak&&(has(q,'m_chitin')||has(q,'ptough'))&&q.tok.tt!==G.tid){q.tok.tt=G.tid;a-=1;if(a<=0){fx(q.i,'tough','heal');return 0}}
+  if(!sneak&&(has(q,'m_chitin')||has(q,'ptough')||has(q,'w_hide'))&&q.tok.tt!==G.tid){q.tok.tt=G.tid;a-=1;if(a<=0){fx(q.i,'tough','heal');return 0}}
   if(!sneak&&a===1&&has(q,'plated')){fx(q.i,'blocked','heal');return 0}
   if(!sneak&&has(q,'chameleon')){let saved=0;for(let k=0;k<a;k++)if(rnd(6)===5)saved++;if(saved){a-=saved;fx(q.i,'dodged '+saved,'heal')}if(a<=0)return 0}
   q.hp-=a;fx(q.i,'-'+a+'♥','hurt');
@@ -524,10 +547,12 @@ function deaths(){
     while(q.hp<=0&&has(q,'mend')&&q.en>=2){q.en-=2;q.hp++;fx(q.i,'mend!','heal')}
     if(q.hp<=0&&has(q,'m_goo')){useCons(q,q.cards.findIndex(c=>base(c)==='m_goo'),true)}
     if(q.hp>0){lg(q.i,`${mname(q)} patches itself up and survives!`);continue}
+    if(exDeath(q))continue;if(G.winner)return;
     if(G.city===q.i)G.city=-1;if(G.bay===q.i)G.bay=-1;
-    if(has(q,'egg')){G.disc.push(...q.cards);q.cards=[];q.vp=0;q.hp=10;q.tok={};lg(q.i,`${mname(q)} falls, but a new ${mname(q)} hatches from the Egg Clutch with 10 hearts and no stars!`);fx(q.i,'HATCH!','heal');continue}
-    q.alive=false;q.hp=0;G.disc.push(...q.cards);q.cards=[];q.en=0;q.hand=[];
-    lg(q.i,`${mname(q)} is knocked out!`);fx(q.i,'K.O.','hurt');
+    if(has(q,'egg')){G.disc.push(...q.cards.filter(c=>CARDS[base(c)].t!=='W'));q.cards=[];q.vp=0;q.hp=10;q.tok={};lg(q.i,`${mname(q)} falls, but a new ${mname(q)} hatches from the Egg Clutch with 10 hearts and no stars!`);fx(q.i,'HATCH!','heal');continue}
+    q.alive=false;q.hp=0;G.disc.push(...q.cards.filter(c=>CARDS[base(c)].t!=='W'));q.cards=[];q.en=0;q.hand=[];q.cult=0;
+    if(G.tower)G.tower=G.tower.map(o=>o===q.i?-1:o);
+    lg(q.i,`${mname(q)} is knocked out!`);fx(q.i,'K.O.','hurt');exOnKO(q);
     for(const r of alive())if(has(r,'carrion')){gainVP(r,3*has(r,'carrion'));lg(r.i,`${mname(r)} feasts on the wreckage (+3 stars).`)}
   }
   if(G.bayOn&&alive().length<=4){G.bayOn=false;lg(-1,'Only four monsters remain: the Harbor closes.');
@@ -537,7 +562,8 @@ function checkWin(final){
   if(G.winner)return true;const a=alive();
   if(a.length===0){G.winner='draw';G.winText='Everyone falls: the city wins, nobody is crowned.';G.phase='over';lg(-1,G.winText);return true}
   if(a.length===1){G.winner='P'+(a[0].i+1);G.winText=`Last standing: ${mname(a[0])} is the only monster left and takes the crown!`;G.phase='over';lg(a[0].i,G.winText);return true}
-  if(final){const w=a.filter(p=>p.vp>=20);if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=`20 stars: ${mname(w[0])} reaches ${w[0].vp} stars and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
+  const tw=exWin(final);if(tw!==null){G.winner='P'+(tw+1);G.winText=`Tokyo Tower: ${mname(P(tw))} owns the whole Tower and rules the city!`;G.phase='over';lg(tw,G.winText);return true}
+  if(final){const w=a.filter(p=>p.vp>=winAt(p));if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=winAt(w[0])<20?`Space Suit: ${mname(w[0])} reaches ${w[0].vp} stars (the Space Suit only needs 17) and is crowned!`:`20 stars: ${mname(w[0])} reaches ${w[0].vp} stars and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
   return false}
 
 // ---------- buying ----------
@@ -546,7 +572,8 @@ function buy(k){const p=cur();const id=G.market[k];if(!id||!canBuy(p,k))return;c
   p.en-=costOf(p,id);G.market[k]=null;refill();snd('buy');lg(p.i,`${mname(p)} buys “${C.n}”.`);
   if(has(p,'news'))gainVP(p,has(p,'news'));
   UI.banner=`<b>${esc(mname(p))}</b> buys ${esc(C.n)}`;
-  if(C.t==='K'||C.t==='C'){p.cards.push(id);if(b==='growth')heal(p,2);if(b==='smoke')p.tok.smoke=3;if(b==='m_hive')gainMB(p,1)}
+  if(p.stats)p.stats.cards++;
+  if(C.t==='K'||C.t==='C'||C.t==='U'){p.cards.push(id);if(b==='growth')heal(p,2);if(b==='smoke')p.tok.smoke=3;if(b==='m_hive')gainMB(p,1)}
   else{G.disc.push(id);playDiscard(p,b,()=>{deaths();after()});return}
   deaths();after();
   function after(){if(G.winner){refresh();return}if(!p.alive){endTurn();return}
@@ -629,24 +656,28 @@ function endTurn(){
 
 // ---------- die changing cards ----------
 function changeDie(kind){const p=cur();
-  const opts=G.dice.map((d,k)=>({k:String(k),l:`Die ${k+1}: ${fname(d.f)}`}));
+  const opts=G.dice.map((d,k)=>({k:String(k),l:`Die ${k+1}: ${fname(d.f)}`,t:d.t})).filter(o=>!o.t);
   UI.choice={title:CARDS[kind].n,text:'Pick the die to change.',options:opts,cancel:true,who:p.i,cb:k=>{
     const d=G.dice[+k];
     if(kind==='pack'){d.f='1';G.tf.culler=true;lg(p.i,`${mname(p)} turns a die into a 1 (Pack Hunter).`);refresh();return}
     UI.choice={title:CARDS[kind].n,text:'Pick the new face.',options:FACES.map(f=>({k:f,l:fname(f)})),cancel:true,who:p.i,cb:f=>{
       d.f=f;if(kind==='rubber'){p.en-=2}else discardCard(p,'twist');lg(p.i,`${mname(p)} bends a die into ${fname(f)} (${CARDS[kind].n}).`);refresh()}};render()}};render()}
-const fname=f=>({'1':'1','2':'2','3':'3',E:'energy',C:'claw',H:'heart'}[f]);
+const fname=f=>({'1':'1','2':'2','3':'3',E:'energy',C:'claw',H:'heart',C2:'double claw',E2:'double energy',O:'ouch',FE:'eye of fate',FW:'water',FS:'snake',FA:'ankh'}[f]||f);
 
 // ---------- computer players ----------
 function tokyoThreat(p){return alive().filter(q=>q.i!==p.i&&!inTokyo(q.i)).length}
 function aiWings(q,act){if(q.en<2)return false;const hitsMe=has(act,'nova')||(inTokyo(q.i)!==inTokyo(act.i));return hitsMe&&q.hp<=4}
 function aiYield(q,lost){
   if(q.hp<=0)return true;
+  if(q.lvl==='easy')return q.hp<=5?Math.random()<.7:Math.random()<.15;
+  if(q.lvl==='hard'){const th=alive().filter(r=>r.i!==q.i&&!inTokyo(r.i)).length*1.25;if(q.vp+2+has(q,'street')>=winAt(q)&&q.hp>th+.5)return false;if(has(q,'vjets')&&q.hp<=7)return true;return q.hp<th+HYB}
   const threat=tokyoThreat(q);
   if(q.vp>=18&&q.hp>Math.min(4,threat+1))return false;
   if(has(q,'vjets')&&q.hp<=7)return true;
   return q.hp<=Math.max(YA,threat+YB)}
 function aiMindbug(q,roller){if(q.mb<=0)return false;
+  if(q.lvl==='easy')return scoreDice(q,G.dice).val>10&&Math.random()<.5;
+  if(q.lvl==='hard'){const mv=evalDice(q,G.dice),tv=evalDice(roller,G.dice);if(q.vp+scoreDice(q,G.dice).vp>=winAt(q))return true;if(tv>=35)return true;return mv+tv*.7>=(q.mb>1?7:9.5)-(G.turn>=6?1.5:0)}
   const mine=scoreDice(q,G.dice),theirs=scoreDice(roller,G.dice);
   if(q.vp+mine.vp>=20)return true;
   if(roller.vp+theirs.vp>=20&&theirs.vp>0)return true;
@@ -671,17 +702,44 @@ function aiMark(p){
   if(pairs.length&&!(pairs[0]==='1'&&!has(p,'gourmand')&&c.C+c.E>=3))keepNum[pairs[0]]=true;
   if(has(p,'omni')&&c['1']&&c['2']&&c['3']){keepNum['1']=keepNum['2']=keepNum['3']=true}
   const needVP=20-p.vp;let hk=0;
+  if(exOn('tower')&&inT&&c['1']>=2)keepNum['1']=true;
   G.dice.forEach(d=>{let k=false;
+    if(d.t==='b'){d.k=d.f!=='O';return}
+    if(d.t==='f'){d.k=d.f==='FA'||d.f==='FW'||(d.f==='FE'&&curseBad(p));return}
     if(d.f in keepNum)k=true;
     else if(d.f==='E')k=!(hw>=3&&!inT);
     else if(d.f==='C')k=claws&&needVP>3||inT;
     else if(d.f==='H'){k=hk<hw;if(k)hk++}
     d.k=k})}
+function curseBad(p){return exOn('curse')&&['k_sand','k_ecl','k_toll','k_frog','k_judge'].includes(G.curse)}
+function aiMarkLvl(p){if(p.lvl==='hard'&&!ANIM_FASTTEST)aiMarkHard(p);else{aiMark(p);if(p.lvl==='easy')G.dice.forEach(d=>{if(Math.random()<.3)d.k=!d.k})}}
+var ANIM_FASTTEST=false, HYB=1.5, HEW=0.75;
+function evalDice(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const nc=countsOf(dice.filter(d=>!d.t));const inT=inTokyo(p.i);
+  const need=winAt(p)-p.vp;let v=s.vp*(1.5+(p.vp>=12?0.9:0));if(s.vp>0&&s.vp>=need)v+=40;
+  v+=s.en*HEW;if(!inT||exHealInCity())v+=s.hl*(p.hp<=3?1.8:p.hp<=6?0.9:0.25);
+  if(s.dmg&&s.targets.length){v+=s.dmg*s.targets.length*0.8;for(const q of s.targets)if(q.hp<=s.dmg)v+=(alive().length<=2?60:6)+q.vp*0.2;
+    if(!inT)v+=p.hp>=7?1.5:(p.hp<=4?-2.5:0)}
+  if(c.H>=3&&G.evoOn&&p.edeck.length)v+=2.2;
+  if(exOn('cult')&&Object.values(nc).some(x=>x>=4))v+=2.5;
+  if(exOn('bers')&&!p.tok.berserk&&c.C>=4)v+=2;
+  if(exOn('tower')&&inT&&nc['1']>=4)v+=6;
+  if(exOn('wick')){if(c['1']>=3)v+=2.2;if(c['2']>=3)v+=1.1}
+  const fd=dice.find(d=>d.t==='f');if(fd){if(fd.f==='FS')v-=2;if(fd.f==='FA')v+=2}
+  v-=dice.filter(d=>d.f==='O').length*(p.hp<=2?20:1.2);
+  return v}
+function aiMarkHard(p){const dice=G.dice,n=dice.length,R=G.rolls,S=n>7?12:20;let best=-1e9,bm=(1<<n)-1;
+  for(let m=0;m<(1<<n);m++){const unk=[];for(let k=0;k<n;k++)if(!(m>>k&1))unk.push(k);
+    if(!unk.length){const v=evalDice(p,dice)+0.3;if(v>best){best=v;bm=m}continue}
+    let tot=0;for(let t=0;t<S;t++){const d1=dice.map(d=>({f:d.f,t:d.t}));unk.forEach(k=>d1[k].f=faceOf(d1[k]));let v=evalDice(p,d1);
+      if(R>=2){const d2=dice.map(d=>({f:d.f,t:d.t}));unk.forEach(k=>d2[k].f=faceOf(d2[k]));v=Math.max(v,evalDice(p,d2))}tot+=v}
+    const avg=tot/S;if(avg>best){best=avg;bm=m}}
+  dice.forEach((d,k)=>d.k=!!(bm>>k&1))}
 function aiRollStep(p){
-  if(!G.aiMarked){aiMark(p);G.aiMarked=true;refresh();return}
+  if(!G.aiMarked){aiMarkLvl(p);G.aiMarked=true;refresh();return}
   G.aiMarked=false;
   const unkept=G.dice.some(d=>!d.k);
   if(unkept&&G.rolls>0){doReroll('roll');return}
+  if(unkept&&p.cult>0&&!G.tf.cr&&p.lvl!=='easy'&&G.dice.filter(d=>!d.k).length>=2){G.tf.cr=1;G.aiMarked=false;useCult(p,'r');return}
   const ev=p.hand.findIndex(e=>evoKey(e)==='reroll');if(unkept&&ev>=0&&G.dice.filter(d=>!d.k).length>=2){playEvo(p,ev);return}
   const ld=p.cards.findIndex(c=>base(c)==='m_loaded');if(unkept&&ld>=0&&G.dice.filter(d=>!d.k).length>=3){useCons(p,ld);return}
   if(unkept&&has(p,'smoke')&&p.tok.smoke>0&&G.dice.filter(d=>!d.k).length>=2){doReroll('smoke');return}
@@ -741,7 +799,8 @@ function aiBuyStep(p){
     if(b==='m_goo'&&p.hp<=5&&consUsable(p,k)){useCons(p,k);return}
     if(b==='m_tough'&&inTokyo(p.i)&&!p.tok.tough&&consUsable(p,k)){useCons(p,k);return}
     if(b==='m_portal'&&consUsable(p,k)&&((inTokyo(p.i)&&p.hp<=4)||(!inTokyo(p.i)&&p.hp>=8&&G.city>=0&&G.bay!==p.i))){useCons(p,k);return}}
-  let best=-1,bv=-0.5;G.market.forEach((id,k)=>{if(!canBuy(p,k))return;const v=cardValue(p,id);if(v>bv){bv=v;best=k}});
+  if(p.cult&&p.hp<=4&&p.lvl!=='easy'){useCult(p,'h');return}
+  let best=-1,bv=p.lvl==='hard'?-0.2:-0.5;G.market.forEach((id,k)=>{if(!canBuy(p,k))return;const v=cardValue(p,id)+(p.lvl==='easy'?Math.random()*6-3:0);if(v>bv){bv=v;best=k}});
   if(best>=0){buy(best);return}
   const maxv=Math.max(-99,...G.market.map(id=>cardValue(p,id)));
   if(!G.aiSwept&&p.en>=8&&maxv<-2){G.aiSwept=true;sweep();return}
@@ -749,7 +808,7 @@ function aiBuyStep(p){
 function aiStep(){
   if(!G||G.winner||UI.choice||UI.busy)return;const p=cur();if(p.human)return;
   if(G.phase==='roll')aiRollStep(p);else if(G.phase==='buy')aiBuyStep(p)}
-function schedule(){if(!G||G.winner||UI.choice||UI.busy||UI.info||UI.rules||UI.pending)return;if(!['roll','buy'].includes(G.phase)||isHuman(G.active))return;
+function schedule(){if(!G||G.winner||UI.choice||UI.busy||UI.info||UI.rules||UI.pending||UI.paused)return;if(!['roll','buy'].includes(G.phase)||isHuman(G.active))return;
   UI.pending=true;setTimeout(()=>{UI.pending=false;aiStep()},ANIM?(G.phase==='roll'&&!G.aiMarked?AIDELAY*1.1:AIDELAY):0)}
 function refresh(){render();save();schedule()}
 function save(){try{if(G)localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}
@@ -769,6 +828,13 @@ function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"f
 // ---------- art ----------
 const INK='#1a1320';
 function faceSVG(f){const s=`stroke="${INK}" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"`;
+  if(f==='C2')return `<svg viewBox="0 0 60 60"><g fill="none" ${s} stroke-width="6"><path d="M10 12 C16 22 16 36 8 48"/><path d="M22 8 C28 20 28 36 20 50"/></g><g fill="none" stroke="#e63946" stroke-width="2.5"><path d="M10 12 C16 22 16 36 8 48"/><path d="M22 8 C28 20 28 36 20 50"/></g><text x="44" y="42" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="26" fill="#e63946" stroke="${INK}" stroke-width="1.5">×2</text></svg>`;
+  if(f==='E2')return `<svg viewBox="0 0 60 60"><path d="M26 4 L8 30 H20 L16 52 L38 22 H25 Z" fill="#2ec27e" ${s} stroke-width="4"/><text x="46" y="42" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="26" fill="#2ec27e" stroke="${INK}" stroke-width="1.5">×2</text></svg>`;
+  if(f==='O')return `<svg viewBox="0 0 60 60"><path d="M30 6 L36 22 L54 20 L40 32 L50 50 L30 40 L10 50 L20 32 L6 20 L24 22 Z" fill="#ff8c42" ${s} stroke-width="3.5"/><text x="30" y="36" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="14" fill="${INK}">OUCH</text></svg>`;
+  if(f==='FE')return `<svg viewBox="0 0 60 60"><path d="M6 30 C18 12 42 12 54 30 C42 48 18 48 6 30 Z" fill="#fff" ${s} stroke-width="4"/><circle cx="30" cy="30" r="9" fill="#3a86ff" ${s} stroke-width="3"/><path d="M22 44 L18 56 M30 46 L30 56" ${s} stroke-width="3"/></svg>`;
+  if(f==='FW')return `<svg viewBox="0 0 60 60"><path d="M6 24 Q16 14 26 24 T46 24 T56 24 M6 38 Q16 28 26 38 T46 38 T56 38" fill="none" stroke="#3a86ff" stroke-width="6" stroke-linecap="round"/></svg>`;
+  if(f==='FS')return `<svg viewBox="0 0 60 60"><path d="M12 48 C4 38 22 34 30 38 C40 42 54 36 46 26 C40 18 24 26 22 16 C20 8 34 6 40 10" fill="none" stroke="#1a1320" stroke-width="9" stroke-linecap="round"/><path d="M12 48 C4 38 22 34 30 38 C40 42 54 36 46 26 C40 18 24 26 22 16 C20 8 34 6 40 10" fill="none" stroke="#7ee04c" stroke-width="5" stroke-linecap="round"/><circle cx="40" cy="10" r="3" fill="#e63946"/></svg>`;
+  if(f==='FA')return `<svg viewBox="0 0 60 60"><ellipse cx="30" cy="16" rx="9" ry="11" fill="none" stroke="#f4a300" stroke-width="7"/><path d="M30 26 V56 M14 30 H46" stroke="#f4a300" stroke-width="8" stroke-linecap="round"/><ellipse cx="30" cy="16" rx="9" ry="11" fill="none" stroke="${INK}" stroke-width="2"/></svg>`;
   if('123'.includes(f))return `<svg viewBox="0 0 60 60"><text x="30" y="47" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="46" fill="${INK}">${f}</text><text x="30" y="47" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="46" fill="#ffd23f" transform="translate(-2,-2)">${f}</text><text x="30" y="47" text-anchor="middle" font-family="Bangers,Impact,sans-serif" font-size="46" fill="none" stroke="${INK}" stroke-width="2" transform="translate(-2,-2)">${f}</text></svg>`;
   if(f==='E')return `<svg viewBox="0 0 60 60"><path d="M36 4 L14 34 H28 L22 56 L48 22 H33 Z" fill="${INK}" transform="translate(2,2)"/><path d="M34 4 L12 34 H27 L22 56 L48 22 H32 Z" fill="#2ec27e" ${s}/><path d="M30 10 L20 26" stroke="#b9ffd8" stroke-width="3" stroke-linecap="round"/></svg>`;
   if(f==='H')return `<svg viewBox="0 0 60 60"><path d="M30 52 C8 36 4 24 10 15 C16 6 27 8 30 17 C33 8 44 6 50 15 C56 24 52 36 30 52 Z" fill="#e63946" ${s}/><path d="M15 18 C17 13 22 12 25 15" fill="none" stroke="#ffc2c7" stroke-width="3.5" stroke-linecap="round"/></svg>`;
@@ -919,6 +985,146 @@ function renderMap(){const svg=document.getElementById('map');if(!G){svg.innerHT
 
 </script>
 <script>
+// ---------- more expansions: cultists, tower, berserk, wickedness, costumes, curses ----------
+const EXPS=[
+ {k:'evo',n:'Power Up! Evolutions',d:'Resolve three hearts to draw an evolution card for your monster.'},
+ {k:'cult',n:'Cultists (Cthulhu pack)',d:'Roll four identical faces to gain a cultist. Spend one any time on your turn for a heart, an energy or an extra reroll.'},
+ {k:'tower',n:'Tokyo Tower (King Kong pack)',d:'In the city, resolve four 1s to climb a level of the Tower. Levels give hearts and energy each turn. Own all three to win!'},
+ {k:'bers',n:'Berserk (Cybertooth pack)',d:'Resolve four claws to go berserk and roll a wild extra die. Healing with hearts calms you down.'},
+ {k:'wick',n:'Wickedness gauge (Dark Edition)',d:'Three 1s give 2 wickedness, three 2s give 1. Reach 3, 6 and 10 to pick a wicked power.'},
+ {k:'cost',n:'Costumes (Halloween)',d:'Everyone starts in a costume with a power. Smash a monster with 3+ claws to buy its costume off its back.'},
+ {k:'curse',n:'Curses (Anubis pack)',d:'A curse changes the rules for everyone. The Die of Fate can swap it, punish you or bless you.'}];
+const exOn=k=>!!(G&&G.ex&&G.ex[k]);
+// wickedness tiles (original names and text)
+const WTILES={
+ w_grudge:{n:'Grudge',lv:3,t:'W',v:4,x:'When your claws hit a monster with more stars than you, steal 1 star from it.'},
+ w_last:{n:'Last Roar',lv:3,t:'W',v:3,x:'If you are knocked out with 16 or more stars, you win instead.'},
+ w_barbs:{n:'Barbs',lv:3,t:'W',v:5,x:'When you smash with 2 or more claws, deal 1 extra damage.'},
+ w_spite:{n:'Spite',lv:3,t:'W',v:3,x:'Whenever claws make you lose hearts, gain 1 energy.'},
+ w_tireless:{n:'Tireless',lv:6,t:'W',v:6,x:'You get one extra reroll each turn.'},
+ w_hide:{n:'Iron Hide',lv:6,t:'W',v:5,x:'The first time you lose hearts each turn, lose 1 fewer.'},
+ w_hunger:{n:'Endless Hunger',lv:6,t:'W',v:5,x:'Heal 1 at the start of your turn, even in the city.'},
+ w_greed:{n:'Greed',lv:6,t:'W',v:4,x:'Gain 1 energy at the start of your turn.'},
+ w_doom:{n:'Doom Aura',lv:10,t:'W',v:8,x:'At the start of your turn, every other monster loses 1 heart.'},
+ w_crown:{n:'Tyrant’s Crown',lv:10,t:'W',v:8,x:'Gain 3 stars now, and 1 star at the start of each of your turns.'}};
+// costumes (original names and text)
+const COSTUMES={
+ c_space:{n:'Space Suit',c:5,t:'U',v:7,x:'You win with 17 stars instead of 20.'},
+ c_pirate:{n:'Pirate Hat',c:4,t:'U',v:4,x:'Take 1 energy from each monster your claws damage.'},
+ c_vamp:{n:'Vampire Cape',c:4,t:'U',v:4,x:'Heal 1 on any turn your claws damage a monster, even in the city.'},
+ c_devil:{n:'Devil Horns',c:5,t:'U',v:6,x:'You deal 1 extra damage whenever you damage a monster.'},
+ c_ghost:{n:'Ghost Sheet',c:3,t:'U',v:3,x:'After claws cost you hearts and you survive, heal 1.'},
+ c_cheer:{n:'Pom-Poms',c:3,t:'U',v:3,x:'Gain 1 energy whenever another monster smashes someone with claws.'},
+ c_zombie:{n:'Zombie Makeup',c:4,t:'U',v:4,x:'When you would be knocked out, stay at 1 heart instead and lose this costume.'},
+ c_witch:{n:'Witch Hat',c:3,t:'U',v:3,x:'Your hearts give 1 energy each while you are in the city.'},
+ c_tiara:{n:'Royal Tiara',c:5,t:'U',v:5,x:'Gain 1 star at the start of your turn if you are outside the city.'},
+ c_robber:{n:'Robber Mask',c:4,t:'U',v:4,x:'Once per turn, when your claws damage a monster, steal 1 star from it.'},
+ c_clown:{n:'Clown Nose',c:3,t:'U',v:3,x:'If your final dice include a 1, a 2 and a 3, gain 2 stars and 2 energy.'},
+ c_alien:{n:'Alien Antennae',c:3,t:'U',v:4,x:'Power cards cost you 1 energy less.'}};
+Object.assign(CARDS,WTILES,COSTUMES);
+// curses (original names and text). eff = rule while in play; snake/ankh = Die of Fate results for the roller
+const CURSES={
+ k_sand:{n:'Sandstorm',x:'Heart dice heal nobody.',s:'Lose 1 heart.',a:'Heal 2 hearts.'},
+ k_gold:{n:'Golden Age',x:'Every three-of-a-kind scores 1 extra star.',s:'Lose 1 star.',a:'Gain 2 stars.'},
+ k_frog:{n:'Plague of Frogs',x:'Every monster loses 1 energy at the start of its turn.',s:'Lose 2 energy.',a:'Gain 3 energy.'},
+ k_pyr:{n:'Pyramid Power',x:'Monsters starting their turn in the city gain 1 extra star.',s:'Every monster in the city loses 2 hearts.',a:'Gain 1 star.'},
+ k_ecl:{n:'Eclipse',x:'Everyone gets one reroll fewer.',s:'Lose 1 heart.',a:'Gain 1 energy and heal 1.'},
+ k_scar:{n:'Scarab Swarm',x:'Every smash deals 1 extra damage.',s:'Lose 2 hearts.',a:'Heal 2 hearts.'},
+ k_toll:{n:'Mummy’s Toll',x:'Power cards cost 1 energy more.',s:'Lose 2 energy.',a:'Gain 2 energy.'},
+ k_nile:{n:'Nile Flood',x:'Heart dice heal even inside the city.',s:'Every monster in the city loses 1 heart.',a:'Heal 1 heart.'},
+ k_judge:{n:'Judgement',x:'At the start of your turn, if you have the most stars, lose 1 star.',s:'Lose 1 star.',a:'Gain 1 star.'},
+ k_dead:{n:'Book of the Dead',x:'Whenever a monster is knocked out, every other monster heals 2.',s:'Lose 1 heart.',a:'Heal 1 heart.'}};
+const BFACES=['C2','E2','O','C','C','E'];   // berserk die (guess at the exact faces)
+const FFACES=['FE','FW','FS','FA'];        // Die of Fate: eye, water, snake, ankh
+const curseOn=k=>exOn('curse')&&G.curse===k;
+function faceOf(d){return d.t==='b'?BFACES[rnd(6)]:d.t==='f'?FFACES[rnd(4)]:FACES[rnd(6)]}
+function exSetup(done){
+  G.tower=[-1,-1,-1];G.pl.forEach(p=>{p.cult=0;p.wk=0;p.stats={dmg:0,stars:0,cards:0,city:0,kos:0}});
+  G.wtiles={3:Object.keys(WTILES).filter(k=>WTILES[k].lv===3),6:Object.keys(WTILES).filter(k=>WTILES[k].lv===6),10:Object.keys(WTILES).filter(k=>WTILES[k].lv===10)};
+  if(exOn('curse')){G.curseDeck=shuffle(Object.keys(CURSES));G.curse=G.curseDeck.pop();lg(-1,`Curse in play: ${CURSES[G.curse].n}: ${CURSES[G.curse].x}`)}
+  if(!exOn('cost')){done();return}
+  const pool=shuffle(Object.keys(COSTUMES));
+  seq(G.pl.slice(),(p,next)=>{const two=[pool.pop(),pool.pop()];
+    ask(p.i,'Pick your costume',`${mname(p)}, choose the costume you start the game in. The other goes into the power card deck.`,two.map(k=>({k,l:COSTUMES[k].n,d:COSTUMES[k].x})),
+      ()=>two.sort((a,b)=>COSTUMES[b].v-COSTUMES[a].v)[0],k=>{p.cards.push(k);G.deck.push(two.find(x=>x!==k));lg(p.i,`${mname(p)} dresses up as ${COSTUMES[k].n}.`);next()},{nocancel:true})},
+    ()=>{G.deck.push(...pool);shuffle(G.deck);done()})}
+function exStartTurn(p){
+  if(exOn('tower')){const lv=G.tower.filter(o=>o===p.i).length;const t0=G.tower[0]===p.i,t1=G.tower[1]===p.i;
+    let h=(t0?1:0)+(t1?1:0),e=t1?1:0;if(h){p.hp=Math.min(maxhp(p),p.hp+h);fx(p.i,'+'+h+'♥','heal')}if(e)gainE(p,e);if(h||e)lg(p.i,`${mname(p)} draws power from the Tokyo Tower.`)}
+  if(has(p,'w_hunger')){p.hp=Math.min(maxhp(p),p.hp+1);fx(p.i,'+1♥','heal')}
+  if(has(p,'w_greed'))gainE(p,1);
+  if(has(p,'w_crown'))gainVP(p,1);
+  if(has(p,'w_doom')){alive().forEach(q=>{if(q.i!==p.i)damage(q,1,p,true)});lg(p.i,`${mname(p)}'s Doom Aura hurts everyone.`);deaths()}
+  if(has(p,'c_tiara')&&!inTokyo(p.i))gainVP(p,1);
+  if(curseOn('k_frog'))alive().forEach(q=>{if(q.i===p.i&&q.en>0){q.en--;fx(q.i,'-1⚡','energy')}});
+  if(curseOn('k_pyr')&&inTokyo(p.i))gainVP(p,1);
+  if(curseOn('k_judge')&&alive().every(q=>q.i===p.i||q.vp<p.vp)&&p.vp>0){loseVP(p,1);lg(p.i,`Judgement: ${mname(p)} leads and loses a star.`)}
+  if(inTokyo(p.i)&&p.stats)p.stats.city++}
+function exDice(p){const x=[];if(exOn('bers')&&p.tok.berserk)x.push({f:BFACES[rnd(6)],k:false,x:true,t:'b'});if(exOn('curse'))x.push({f:FFACES[rnd(4)],k:false,x:true,t:'f'});return x}
+function exRerolls(p){return has(p,'w_tireless')-(curseOn('k_ecl')?1:0)}
+// Die of Fate and ouch, resolved before everything else
+function exPreResolve(p,roller,out){
+  if(p!==roller)return;
+  const fd=G.dice.find(d=>d.t==='f');
+  if(fd&&exOn('curse')){const K=CURSES[G.curse];
+    if(fd.f==='FE'){if(!G.curseDeck.length)G.curseDeck=shuffle(Object.keys(CURSES).filter(k=>k!==G.curse));G.curse=G.curseDeck.pop();out.push(`new curse: ${CURSES[G.curse].n}`);lg(-1,`The Eye of Fate opens: the curse becomes ${CURSES[G.curse].n}: ${CURSES[G.curse].x}`);fx(p.i,'NEW CURSE','star')}
+    else if(fd.f==='FS'){out.push(`snake: ${K.s.toLowerCase()}`);fateEffect(p,G.curse,false);fx(p.i,'SNAKE!','hurt')}
+    else if(fd.f==='FA'){out.push(`ankh: ${K.a.toLowerCase()}`);fateEffect(p,G.curse,true);fx(p.i,'ANKH!','heal')}}
+  const od=G.dice.filter(d=>d.t==='b'&&d.f==='O').length;if(od){damage(p,od,null,true);out.push('ouch!')}}
+function fateEffect(p,k,good){const h=n=>{p.hp=Math.min(maxhp(p),p.hp+n);fx(p.i,'+'+n+'♥','heal')};
+  const city=()=>alive().filter(q=>inTokyo(q.i));
+  if(good)({k_sand:()=>h(2),k_gold:()=>gainVP(p,2),k_frog:()=>gainE(p,3),k_pyr:()=>gainVP(p,1),k_ecl:()=>{gainE(p,1);h(1)},k_scar:()=>h(2),k_toll:()=>gainE(p,2),k_nile:()=>h(1),k_judge:()=>gainVP(p,1),k_dead:()=>h(1)})[k]();
+  else({k_sand:()=>damage(p,1,null,true),k_gold:()=>loseVP(p,1),k_frog:()=>{const d=Math.min(2,p.en);p.en-=d},k_pyr:()=>city().forEach(q=>damage(q,2,null,true)),k_ecl:()=>damage(p,1,null,true),k_scar:()=>damage(p,2,null,true),k_toll:()=>{const d=Math.min(2,p.en);p.en-=d},k_nile:()=>city().forEach(q=>damage(q,1,null,true)),k_judge:()=>loseVP(p,1),k_dead:()=>damage(p,1,null,true)})[k]()}
+// bonus stars and wickedness from number sets
+function exSet(p,f,n){let v=0;if(curseOn('k_gold'))v++;
+  if(exOn('wick')&&(f==='1'||f==='2')){const before=p.wk;p.wk+=f==='1'?2:1;fx(p.i,'+'+(f==='1'?2:1)+' wicked','star');G.tf.wkFrom=G.tf.wkFrom===undefined?before:Math.min(G.tf.wkFrom,before)}
+  return v}
+function exHealBlocked(){return curseOn('k_sand')}
+function exHealInCity(){return curseOn('k_nile')}
+function exSmashBonus(p,c){let a=0;if(c.C>=2&&has(p,'w_barbs'))a++;if(curseOn('k_scar'))a++;return a}
+function exOnHit(p,q,lost,claws){if(!claws||lost<=0)return;
+  if(p.stats)p.stats.dmg+=lost;
+  if(has(p,'c_pirate')&&q.en>0){q.en--;p.en++;fx(p.i,'+1⚡','energy')}
+  if(has(p,'c_robber')&&!G.tf.robbed&&q.vp>0){G.tf.robbed=1;loseVP(q,1);gainVP(p,1)}
+  if(has(p,'w_grudge')&&q.vp>p.vp){loseVP(q,1);gainVP(p,1)}
+  if(has(p,'c_vamp')&&!G.tf.vamp){G.tf.vamp=1;if(p.hp<maxhp(p)){p.hp++;fx(p.i,'+1♥','heal')}}
+  if(has(q,'w_spite'))gainE(q,1);
+  if(has(q,'c_ghost')&&q.hp>0&&q.hp<maxhp(q)){q.hp++;fx(q.i,'+1♥','heal')}
+  alive().forEach(r=>{if(r.i!==p.i&&has(r,'c_cheer')&&!G.tf['ch'+r.i]){G.tf['ch'+r.i]=1;gainE(r,1)}})}
+// after the dice: cultists, berserk, tower, costume theft, wicked powers
+function exAfterResolve(p,c,hurt,done){const nc=countsOf(G.dice.filter(d=>!d.t));
+  if(exOn('cult')&&Object.values(nc).some(v=>v>=4)){p.cult++;fx(p.i,'+1 cultist','star');lg(p.i,`${mname(p)} rolls four of a kind and gains a cultist.`)}
+  if(exOn('bers')&&!p.tok.berserk&&c.C>=4){p.tok.berserk=true;fx(p.i,'BERSERK!','hurt');lg(p.i,`${mname(p)} goes BERSERK and will roll the berserk die!`)}
+  if(has(p,'c_clown')&&c['1']&&c['2']&&c['3']){gainVP(p,2);gainE(p,2)}
+  if(exOn('tower')&&inTokyo(p.i)&&nc['1']>=4){const lv=G.tower.findIndex(o=>o!==p.i);if(lv>=0){const old=G.tower[lv];G.tower[lv]=p.i;fx(p.i,'TOWER '+(lv+1)+'!','star');snd('stomp');lg(p.i,`${mname(p)} climbs the Tokyo Tower: level ${lv+1}${old>=0?' (taken from '+mname(P(old))+')':''}!`)}}
+  const steps=[];
+  if(exOn('cost')&&c.C>=3){for(const q of hurt){const cs=q.cards.filter(id=>CARDS[base(id)].t==='U');for(const id of cs)steps.push({q,id})}}
+  if(exOn('wick')&&G.tf.wkFrom!==undefined){for(const lv of [3,6,10])if(G.tf.wkFrom<lv&&p.wk>=lv&&G.wtiles[lv].length)steps.push({lv})}
+  G.tf.wkFrom=undefined;
+  seq(steps,(s,next)=>{
+    if(s.id){const C=COSTUMES[base(s.id)];if(p.en<C.c||!s.q.cards.includes(s.id)){next();return}
+      ask(p.i,'Steal a costume?',`Your claws ripped into ${mname(s.q)}. Pay ${C.c} energy to take its ${C.n}? (${C.x}) You have ${p.en} energy.`,[{k:'y',l:`Take the ${C.n} (${C.c} ⚡)`},{k:'n',l:'Leave it'}],
+        ()=>cardValue(p,s.id)>-1?'y':'n',k=>{if(k==='y'){p.en-=C.c;s.q.cards.splice(s.q.cards.indexOf(s.id),1);p.cards.push(s.id);lg(p.i,`${mname(p)} steals ${mname(s.q)}'s ${C.n}!`);fx(p.i,'COSTUME!','star')}next()})}
+    else{const opts=G.wtiles[s.lv];
+      ask(p.i,`Wickedness ${s.lv}!`,`${mname(p)} is getting wicked. Choose a power:`,opts.map(k=>({k,l:WTILES[k].n,d:WTILES[k].x})),
+        ()=>opts.slice().sort((a,b)=>WTILES[b].v-WTILES[a].v)[0],k=>{G.wtiles[s.lv]=opts.filter(x=>x!==k);p.cards.push(k);if(k==='w_crown')gainVP(p,3);lg(p.i,`${mname(p)} gains the wicked power ${WTILES[k].n}.`);fx(p.i,'WICKED!','hurt');next()},{nocancel:true})}},
+    done)}
+function exDeath(q){
+  if(has(q,'c_zombie')){q.hp=1;q.cards.splice(q.cards.findIndex(c=>base(c)==='c_zombie'),1);G.disc.push('c_zombie');fx(q.i,'ZOMBIE!','heal');lg(q.i,`${mname(q)} refuses to die (Zombie Makeup)!`);return true}
+  while(q.hp<=0&&q.cult>0){q.cult--;q.hp++;fx(q.i,'cultist!','heal')}
+  if(q.hp>0){lg(q.i,`${mname(q)}'s cultists drag it back to its feet.`);return true}
+  if(has(q,'w_last')&&q.vp>=16&&!G.winner){G.winner='P'+(q.i+1);G.winText=`Last roar: ${mname(q)} is knocked out with ${q.vp} stars and wins anyway!`;G.phase='over';lg(q.i,G.winText);return false}
+  return false}
+function exOnKO(q){if(curseOn('k_dead'))alive().forEach(r=>{r.hp=Math.min(maxhp(r),r.hp+2);fx(r.i,'+2♥','heal')});const a=cur();if(a&&a.stats&&a!==q)a.stats.kos++}
+const winAt=p=>has(p,'c_space')?17:20;
+function exWin(final){if(!exOn('tower')||!final)return null;const o=G.tower[0];if(o>=0&&G.tower.every(x=>x===o)&&P(o).alive)return o;return null}
+function exCost(p){return (curseOn('k_toll')?1:0)-has(p,'c_alien')}
+function useCult(p,kind){if(!p.cult)return;p.cult--;
+  if(kind==='h'){p.hp=Math.min(maxhp(p),p.hp+1);fx(p.i,'+1♥','heal')}else if(kind==='e')gainE(p,1);else G.rolls++;
+  lg(p.i,`${mname(p)} sacrifices a cultist for ${kind==='h'?'a heart':kind==='e'?'energy':'an extra reroll'}.`);refresh()}
+
+</script>
+<script>
 // ---------- 3D arena (Three.js). Falls back to the SVG board when WebGL is missing. ----------
 const MS=1.85;const V3={on:false,t:0,mons:[],dice:[],parts:[],gid:null,rollId:-1,fxSeen:{},shake:0,tags:[]};
 function init3D(){
@@ -948,9 +1154,17 @@ function resize3D(){const el=V3.r.domElement.parentElement;const w=el.clientWidt
 // ---- textures ----
 function canvasTex(w,h,draw,rep){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');draw(x,w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;if(rep){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep[0],rep[1])}t.anisotropy=4;return t}
 function gradTex(cols,stops){return canvasTex(4,256,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);cols.forEach((c,k)=>g.addColorStop(stops[k],c));x.fillStyle=g;x.fillRect(0,0,w,h)})}
-function faceTex(f,kept){return canvasTex(128,128,(x)=>{x.fillStyle=kept?'#ffd23f':'#fffaf0';x.fillRect(0,0,128,128);
+function faceTex(f,kept,tp){return canvasTex(128,128,(x)=>{x.fillStyle=kept?'#ffd23f':tp==='b'?'#ffb3b3':tp==='f'?'#ffe7a3':'#fffaf0';x.fillRect(0,0,128,128);
   x.strokeStyle='#1a1320';x.lineWidth=10;x.strokeRect(5,5,118,118);x.lineJoin='round';x.lineCap='round';
   if('123'.includes(f)){x.font='bold 92px Bangers, Impact, sans-serif';x.textAlign='center';x.textBaseline='middle';x.lineWidth=10;x.strokeText(f,64,70);x.fillStyle=kept?'#fff':'#ffd23f';x.fillText(f,64,70);x.lineWidth=3;x.strokeText(f,64,70)}
+  else if(f==='C2'||f==='E2'||f==='O'||f[0]==='F'){x.textAlign='center';x.textBaseline='middle';x.lineWidth=7;
+    if(f==='C2'){x.lineWidth=12;[[26,22,34,64,22,104],[56,16,64,62,50,110]].forEach(([a,b,c,d,e,g])=>{x.strokeStyle='#1a1320';x.beginPath();x.moveTo(a,b);x.quadraticCurveTo(c,d,e,g);x.stroke()});x.font='bold 50px Bangers, Impact, sans-serif';x.fillStyle='#e63946';x.lineWidth=4;x.strokeText('×2',94,70);x.fillText('×2',94,70)}
+    else if(f==='E2'){x.beginPath();x.moveTo(54,10);x.lineTo(18,66);x.lineTo(42,66);x.lineTo(34,116);x.lineTo(76,48);x.lineTo(52,48);x.closePath();x.fillStyle='#2ec27e';x.fill();x.stroke();x.font='bold 50px Bangers, Impact, sans-serif';x.lineWidth=4;x.strokeText('×2',96,72);x.fillText('×2',96,72)}
+    else if(f==='O'){x.beginPath();for(let k=0;k<16;k++){const a=k*Math.PI/8,r=k%2?30:56;x.lineTo(64+Math.cos(a)*r,64+Math.sin(a)*r)}x.closePath();x.fillStyle='#ff8c42';x.fill();x.stroke();x.fillStyle='#1a1320';x.font='bold 30px Bangers, Impact, sans-serif';x.fillText('OUCH',64,66)}
+    else if(f==='FE'){x.beginPath();x.moveTo(12,64);x.quadraticCurveTo(64,14,116,64);x.quadraticCurveTo(64,114,12,64);x.fillStyle='#fff';x.fill();x.stroke();x.beginPath();x.arc(64,64,18,0,7);x.fillStyle='#3a86ff';x.fill();x.stroke()}
+    else if(f==='FW'){x.strokeStyle='#3a86ff';x.lineWidth=12;[48,80].forEach(y=>{x.beginPath();x.moveTo(14,y);for(let i=0;i<4;i++)x.quadraticCurveTo(28+i*26,y-18,40+i*26,y);x.stroke()})}
+    else if(f==='FS'){x.lineWidth=18;x.beginPath();x.moveTo(24,104);x.bezierCurveTo(0,70,70,80,80,70);x.bezierCurveTo(110,50,40,40,70,18);x.stroke();x.strokeStyle='#7ee04c';x.lineWidth=10;x.stroke()}
+    else if(f==='FA'){x.strokeStyle='#1a1320';x.lineWidth=20;x.beginPath();x.ellipse(64,34,16,20,0,0,7);x.moveTo(64,54);x.lineTo(64,118);x.moveTo(30,62);x.lineTo(98,62);x.stroke();x.strokeStyle='#f4a300';x.lineWidth=12;x.beginPath();x.ellipse(64,34,16,20,0,0,7);x.moveTo(64,54);x.lineTo(64,118);x.moveTo(30,62);x.lineTo(98,62);x.stroke()}}
   else if(f==='E'){x.beginPath();x.moveTo(74,12);x.lineTo(30,72);x.lineTo(60,72);x.lineTo(50,116);x.lineTo(100,48);x.lineTo(70,48);x.closePath();x.fillStyle='#2ec27e';x.fill();x.lineWidth=7;x.stroke()}
   else if(f==='H'){x.beginPath();x.moveTo(64,110);x.bezierCurveTo(14,76,8,48,22,32);x.bezierCurveTo(36,16,58,20,64,40);x.bezierCurveTo(70,20,92,16,106,32);x.bezierCurveTo(120,48,114,76,64,110);x.fillStyle='#e63946';x.fill();x.lineWidth=7;x.stroke()}
   else{x.lineWidth=14;[[30,20,40,66,26,108],[62,14,72,62,58,114],[94,20,104,66,90,108]].forEach(([a,b,c,d,e,g])=>{x.strokeStyle='#1a1320';x.beginPath();x.moveTo(a,b);x.quadraticCurveTo(c,d,e,g);x.stroke()});
@@ -1013,8 +1227,15 @@ function buildWorld(){const sc=V3.scene;
   // dice tray
   V3.tray=new THREE.Group();V3.tray.position.set(0,.3,12.6);sc.add(V3.tray);
   V3.traySpot=mesh(new THREE.CircleGeometry(4.6,40),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.18}),0,.01,0,V3.tray,true);V3.traySpot.rotation.x=-Math.PI/2;
-  V3.faceMats={};FACES.forEach(f=>{V3.faceMats[f]=T(0xffffff,{map:faceTex(f,false)});V3.faceMats[f+'k']=T(0xffffff,{map:faceTex(f,true),emissive:0x332200})});
+  V3.faceMats={};Object.entries(DIEFACES).forEach(([tp,list])=>[...new Set(list)].forEach(f=>{V3.faceMats[tp+f]=T(0xffffff,{map:faceTex(f,false,tp)});V3.faceMats[tp+f+'k']=T(0xffffff,{map:faceTex(f,true,tp),emissive:0x332200})}));
   V3.activeRing=mesh(new THREE.TorusGeometry(2.1,.1,8,40),new THREE.MeshBasicMaterial({color:0xffd23f}),0,.3,0,sc,true);V3.activeRing.rotation.x=Math.PI/2;
+  // Tokyo Tower (King Kong pack)
+  const tw=new THREE.Group();tw.position.set(-13.5,.25,-10.5);tw.scale.setScalar(.85);sc.add(tw);V3.tower=tw;V3.tsegs=[];
+  [[2.2,1.6,3],[1.6,1.0,2.6],[1.0,.25,2.8]].forEach(([r0,r1,h],k)=>{const y=[0,3,5.6][k];const m=mesh(new THREE.CylinderGeometry(r1,r0,h,6,1),T(0x888888),0,y+h/2,0,tw);
+    const lat=mesh(new THREE.TorusGeometry(r0*.95,.08,6,6),new THREE.MeshBasicMaterial({color:0x1a1320}),0,y+.05,0,tw,true);lat.rotation.x=Math.PI/2;V3.tsegs.push(m)});
+  mesh(new THREE.SphereGeometry(.25,10,8),new THREE.MeshBasicMaterial({color:0xff3355}),0,8.6,0,tw,true);outline(tw,1.04);
+  V3.tsign=sprite(signTex('TOKYO TOWER','#ffd23f','#1a1320'),0,10.2,0,4.4,1.1,tw);tw.visible=false;
+  V3.csign=sprite(signTex('CURSE','#9b5de5','#ffffff'),0,12.6,-9,6.4,1.6);V3.csign.visible=false;V3.curseShown=null;
   V3.icons={star:iconTex('star'),heart:iconTex('heart'),bolt:iconTex('bolt'),brain:iconTex('brain'),fire:iconTex('fire'),puff:iconTex('puff')};
 }
 function sprite(tex,x,y,z,w,h,parent){const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));s.position.set(x,y,z);s.scale.set(w,h,1);(parent||V3.scene).add(s);return s}
@@ -1105,12 +1326,17 @@ function sync3D(){if(!V3.on)return;
   for(const k in V3.fxSeen)if(!UI.fx[k])V3.fxSeen[k]=0;
   // dice
   if(G.rollId!==V3.rollId||V3.dice.length!==G.dice.length){rollDice3D(V3.dice.length!==G.dice.length);V3.rollId=G.rollId}
-  V3.dice.forEach((d,k)=>{const gd=G.dice[k];if(!gd)return;if(d.shown!==gd.f+(gd.k?'k':'')&&d.t>=1){setDieFace(d,gd)}});
+  V3.dice.forEach((d,k)=>{const gd=G.dice[k];if(!gd)return;if(d.shown!==(gd.t||'n')+gd.f+(gd.k?'k':'')&&d.t>=1){setDieFace(d,gd)}});
   // tags
   const hum=G.pl.find(q=>q.human);
   [...tags.children].forEach((el,k)=>{const p=G.pl[k];el.className=`tag ${k===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'} ${inTokyo(p.i)?'city':''}`;
     el.style.setProperty('--mc',MONS[p.m].c);
-    el.innerHTML=`<b>${inTokyo(p.i)?'👑 ':''}${esc(mname(p))}${p.human&&G.mode==='solo'?' <i>you</i>':''}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e">⚡${p.en}</em>${mbOn()?`<em class="m">🧠${p.mb}</em>`:''}</span>`:'<span>K.O.</span>'}`});
+    el.innerHTML=`<b>${inTokyo(p.i)?'👑 ':''}${esc(mname(p))}${p.human&&G.mode==='solo'?' <i>you</i>':''}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e">⚡${p.en}</em>${mbOn()?`<em class="m">🧠${p.mb}</em>`:''}${exIcons(p)?`<em>${exIcons(p)}</em>`:''}</span>`:'<span>K.O.</span>'}`});
+  V3.tower.visible=exOn('tower');if(exOn('tower'))G.tower.forEach((o,l)=>{const m=V3.tsegs[l].material;m.color.set(o>=0?MONS[P(o).m].c:'#8a8190');m.emissive.set(o>=0?0x331100:0x000000)});
+  V3.csign.visible=exOn('curse');if(exOn('curse')&&V3.curseShown!==G.curse){V3.curseShown=G.curse;V3.csign.material.map=signTex(CURSES[G.curse].n.toUpperCase(),'#9b5de5','#ffffff');V3.csign.material.needsUpdate=true}
+  G.pl.forEach((p,k)=>{const o=V3.mons[k];o.berserk=!!(p.tok&&p.tok.berserk&&p.alive);const n=p.alive?(p.cult||0):0;o.cults=o.cults||[];
+    while(o.cults.length<n){const c=mesh(new THREE.SphereGeometry(.28,10,8),new THREE.MeshBasicMaterial({color:0xb57bff}),0,0,0,V3.scene,true);o.cults.push(c)}
+    while(o.cults.length>n)V3.scene.remove(o.cults.pop())});
   const hud=document.getElementById('hud');const a=cur();
   hud.innerHTML=G.winner?`<b>🏆 ${esc(G.winText)}</b>`:`<b>ROUND ${G.turn}</b> · ${esc(mname(a))} ${['','is rolling','resolves','enters the city','is shopping','ends its turn'][G.step]||''}${G.phase==='roll'?` · ${G.rolls} reroll${G.rolls===1?'':'s'} left`:''}`;
   V3.hsign.material.map=V3.harbor.userData.open===G.bayOn?V3.hsign.material.map:(V3.harbor.userData.open=G.bayOn,G.bayOn?signTex('HARBOR','#3a86ff','#ffffff'):signTex('CLOSED','#8aa6b5','#ffffff'));
@@ -1127,23 +1353,24 @@ function popLabel(v,text,c){const st=document.getElementById('stage');const p=v.
 function spawn(kind,at,n,speed){for(let i=0;i<n;i++){const s=sprite(V3.icons[kind],at.x,at.y,at.z,.55,.55);const a=Math.random()*Math.PI*2;
   V3.parts.push({s,v:new THREE.Vector3(Math.cos(a)*speed*(.5+Math.random()),2+Math.random()*3*speed,Math.sin(a)*speed*(.5+Math.random())),life:1+Math.random()*.5,max:1.4,grow:kind==='puff'||kind==='fire'})}}
 // ---- dice ----
+const DIEFACES={n:['1','2','3','E','C','H'],b:['C2','E2','O','C','C','E'],f:['FE','FW','FS','FA','FE','FW']};
 const FACEIDX={'1':0,'2':1,'3':2,E:3,C:4,H:5};
 function clearDice(){V3.dice.forEach(d=>V3.tray.remove(d.m));V3.dice=[]}
 function dieMats(face){const order=['1','2','3','E','C','H'];return order.map(f=>V3.faceMats[f])}
-function upQuat(f){const q=new THREE.Quaternion();const E=new THREE.Euler();
-  switch(FACEIDX[f]){case 0:E.set(0,0,Math.PI/2);break;case 1:E.set(0,0,-Math.PI/2);break;case 2:E.set(0,0,0);break;case 3:E.set(Math.PI,0,0);break;case 4:E.set(-Math.PI/2,0,0);break;default:E.set(Math.PI/2,0,0)}
+function upQuat(f,tp){const q=new THREE.Quaternion();const E=new THREE.Euler();
+  switch(DIEFACES[tp||'n'].indexOf(f)){case 0:E.set(0,0,Math.PI/2);break;case 1:E.set(0,0,-Math.PI/2);break;case 2:E.set(0,0,0);break;case 3:E.set(Math.PI,0,0);break;case 4:E.set(-Math.PI/2,0,0);break;default:E.set(Math.PI/2,0,0)}
   q.setFromEuler(E);return new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),.62).multiply(q)}
 function rollDice3D(rebuild){const n=G.dice.length;if(rebuild){clearDice();
     for(let k=0;k<n;k++){const m=new THREE.Mesh(new THREE.BoxGeometry(1.05,1.05,1.05),dieMats());m.castShadow=true;const ol=new THREE.Mesh(m.geometry,V3.olMat);ol.scale.setScalar(1.08);m.add(ol);V3.tray.add(m);V3.dice.push({m,t:1,k:k})}}
   const cols=n>6?4:3;
   V3.dice.forEach((d,k)=>{const gd=G.dice[k];const home=new THREE.Vector3(((k%(n>6?4:6))-((n>6?4:Math.min(n,6))-1)/2)*1.45,.52,Math.floor(k/(n>6?4:6))*1.35-(n>6?.6:0));d.home=home;
-    const spin=!gd.k||rebuild;d.final=upQuat(gd.f);
+    const spin=!gd.k||rebuild;d.final=upQuat(gd.f,gd.t);
     const src=V3.mons[G.active]?V3.mons[G.active].g.position.clone().sub(V3.tray.position):new THREE.Vector3(0,0,-6);
     if(spin){d.t=0;d.start=new THREE.Vector3(src.x+(Math.random()-.5)*1.5,src.y+3+Math.random()*1.5,src.z+(Math.random()-.5)*1.5);d.axis=new THREE.Vector3(Math.random(),Math.random(),Math.random()).normalize();d.spins=6+Math.random()*6;d.dur=.7+Math.random()*.35}
     else{d.t=1;d.m.position.copy(home)}
     setDieFace(d,gd,!spin)})}
-function setDieFace(d,gd,now){const mats=['1','2','3','E','C','H'].map(f=>V3.faceMats[f+(gd.k?'k':'')]);d.m.material=mats;d.shown=gd.f+(gd.k?'k':'');
-  if(now||d.t>=1){d.final=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),d.yaw||0).multiply(upQuat(gd.f))}}
+function setDieFace(d,gd,now){const tp=gd.t||'n';const mats=DIEFACES[tp].map(f=>V3.faceMats[tp+f+(gd.k?'k':'')]);d.m.material=mats;d.shown=tp+gd.f+(gd.k?'k':'');
+  if(now||d.t>=1){d.final=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),d.yaw||0).multiply(upQuat(gd.f,gd.t))}}
 function onClick3D(ev){if(!G||!humanTurn()||G.phase!=='roll'||UI.choice)return;const r=ev.target.getBoundingClientRect();
   const v=new THREE.Vector2((ev.clientX-r.left)/r.width*2-1,-(ev.clientY-r.top)/r.height*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(v,V3.cam);
   const hit=rc.intersectObjects(V3.dice.map(d=>d.m),false)[0];if(hit){const k=V3.dice.findIndex(d=>d.m===hit.object);if(k>=0){G.dice[k].k=!G.dice[k].k;render()}return}
@@ -1159,6 +1386,8 @@ function loop3D(){requestAnimationFrame(loop3D);const dt=Math.min(.12,V3.clock.g
     else{const tgt=V3.cam.position;const want=Math.atan2(tgt.x-g.position.x,tgt.z-g.position.z)*.8;g.rotation.y+=(want-g.rotation.y)*.1}
     if(o.shakeT>0){o.shakeT-=dt;g.position.x+=Math.sin(t*60)*.03}
     if(o.flash>0){o.flash-=dt*2;o.mats.forEach(m=>{m.emissive.setRGB(Math.max(0,o.flash),0,0)})}
+    else if(o.berserk){const r=.25+Math.sin(t*8)*.2;o.mats.forEach(m=>m.emissive.setRGB(r,0,0));o.wasB=1}else if(o.wasB){o.wasB=0;o.mats.forEach(m=>m.emissive.setRGB(0,0,0))}
+    if(o.cults)o.cults.forEach((c,j)=>{const a=t*1.6+j*Math.PI*2/o.cults.length;c.position.set(g.position.x+Math.cos(a)*2.6,g.position.y+2.4+Math.sin(t*3+j)*.3,g.position.z+Math.sin(a)*2.6)});
     const A=o.anim;if(A.tent)A.tent.forEach((x,j)=>{x.rotation.x=Math.sin(t*3+j)*.08;x.rotation.z=Math.cos(t*2.5+j)*.08});
     if(A.wings)A.wings.forEach((w,j)=>{w.rotation.y=(j?-1:1)*Math.sin(t*(act?9:4))*.5});if(A.claws)A.claws.forEach((c,j)=>c.rotation.z=Math.sin(t*3+j*2)*.25);
     if(A.bulb)A.bulb.material.color.setHSL(.14,1,.5+Math.sin(t*6)*.2);if(A.bolt)A.bolt.rotation.y=Math.sin(t*2)*.4;if(A.lid)A.lid.rotation.x=-.25-Math.abs(Math.sin(t*1.5))*.15});
@@ -1190,12 +1419,12 @@ function loop3D(){requestAnimationFrame(loop3D);const dt=Math.min(.12,V3.clock.g
 </script>
 <script>
 // ---------- sound: every effect is synthesized live with Web Audio (no files) ----------
-const SND={ctx:null,on:true,music:false,vol:.7,last:{},nb:null,beat:0,mTimer:null};
-try{SND.on=localStorage.getItem('ccs_snd')!=='0';SND.music=localStorage.getItem('ccs_mus')==='1'}catch(e){}
+const SND={ctx:null,on:true,music:true,pitch:1,vol:.7,last:{},nb:null,beat:0,mTimer:null};
+try{SND.on=localStorage.getItem('ccs_snd')!=='0';SND.music=localStorage.getItem('ccs_mus')!=='0'}catch(e){}
 function audioInit(){if(SND.ctx)return true;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
   try{const c=SND.ctx=new AC();const comp=c.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=4;comp.connect(c.destination);
     SND.master=c.createGain();SND.master.gain.value=SND.on?SND.vol:0;SND.master.connect(comp);
-    SND.fxBus=c.createGain();SND.fxBus.connect(SND.master);SND.musBus=c.createGain();SND.musBus.gain.value=.22;SND.musBus.connect(SND.master);
+    SND.fxBus=c.createGain();SND.fxBus.connect(SND.master);SND.musBus=c.createGain();SND.musBus.gain.value=.3;SND.musBus.connect(SND.master);
     const len=c.sampleRate*1.5,b=c.createBuffer(1,len,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;SND.nb=b;
     if(SND.music)musicStart();return true}catch(e){SND.ctx=null;return false}}
 document.addEventListener('pointerdown',()=>{if(audioInit()&&SND.ctx.state==='suspended')SND.ctx.resume()},{capture:true});
@@ -1217,12 +1446,12 @@ function sfx(name){if(!SND.on||!SND.ctx||SND.ctx.state!=='running')return;const 
   case 'clack':noise(.05,{f:2200,q:5,v:.2});tone(700,.04,{type:'triangle',v:.1});break;
   case 'smash':thump(0,.9);noise(.45,{ft:'lowpass',f:1400,fto:200,v:.45});tone(90,.5,{type:'sawtooth',to:45,v:.18,lp:600});break;
   case 'hurt':tone(260,.32,{type:'sawtooth',to:110,v:.22,lp:1200,vib:30,vibAmt:25});noise(.15,{f:900,q:1.5,v:.18});break;
-  case 'roar':tone(150,.7,{type:'sawtooth',to:80,v:.3,lp:900,vib:22,vibAmt:18});tone(152,.7,{type:'square',to:78,v:.08,lp:700});noise(.6,{f:600,fto:300,q:.8,v:.2});break;
+  case 'roar':{const k=SND.pitch||1;tone(170*k,.9,{type:'sawtooth',to:70*k,v:.65,lp:1100,vib:24,vibAmt:22*k,a:.03});tone(172*k,.9,{type:'square',to:68*k,v:.22,lp:800,a:.03});tone(85*k,.9,{type:'sawtooth',to:40*k,v:.45,lp:400,a:.04});noise(.8,{f:700*k,fto:250,q:.7,v:.45,a:.03});break}
   case 'heal':[523,659,784,1047].forEach((f,k)=>tone(f,.28,{type:'sine',v:.16,at:k*.07}));break;
   case 'star':tone(988,.09,{type:'square',v:.1,lp:4000});tone(1319,.3,{type:'square',v:.1,lp:4000,at:.08});break;
   case 'energy':tone(220,.18,{type:'sawtooth',to:1600,v:.12,lp:3000});tone(880,.12,{type:'sine',to:1760,v:.1,at:.08});break;
   case 'whoosh':noise(.5,{f:3000,fto:250,q:1.2,v:.3,a:.08});break;
-  case 'stomp':thump(0,.9);thump(.22,.7);[392,523,659].forEach((f,k)=>tone(f,.35,{type:'sawtooth',v:.1,lp:1800,at:.3+k*.09}));break;
+  case 'stomp':thump(0,.9);thump(.22,.7);SND.last.roar=0;setTimeout(()=>sfx('roar'),250);[392,523,659].forEach((f,k)=>tone(f,.35,{type:'sawtooth',v:.1,lp:1800,at:.3+k*.09}));break;
   case 'ko':tone(420,1.1,{type:'sawtooth',to:55,v:.25,lp:1400,vib:7,vibAmt:30});thump(.9,.9);noise(.7,{ft:'lowpass',f:900,fto:150,v:.35,at:.85});break;
   case 'mindbug':tone(600,.9,{type:'sine',v:.18,vib:9,vibAmt:120});tone(905,.9,{type:'triangle',v:.08,vib:6,vibAmt:90,det:12});tone(300,.9,{type:'sine',to:200,v:.1});break;
   case 'evolve':tone(300,.6,{type:'triangle',to:1500,v:.14});[1319,1568,1976,2637].forEach((f,k)=>tone(f,.18,{type:'sine',v:.08,at:.35+k*.06}));break;
@@ -1284,11 +1513,13 @@ function renderPanel(){
   if(humanTurn()){
     if(has(p,'mend'))acts+=btn('mend','Quick Mend',p.en<2||p.hp>=maxhp(p),'2 ⚡ → heal 1');
     p.cards.forEach((id,k)=>{const C=CARDS[base(id)];if(C.t==='C')acts+=btn('use:'+k,`Use ${esc(C.n)}`,!consUsable(p,k),C.kw?C.kw+' · consumable':'consumable','cons')});
-    p.hand.forEach((e,k)=>acts+=btn('evo:'+k,`🧬 ${esc(evoName(e))}`,!evoUsable(p,k),EVOFX[evoKey(e)].x,'evo'))}
+    p.hand.forEach((e,k)=>acts+=btn('evo:'+k,`🧬 ${esc(evoName(e))}`,!evoUsable(p,k),EVOFX[evoKey(e)].x,'evo'));
+    if(p.cult&&(G.phase==='roll'||G.phase==='buy')){acts+=btn('cult:h',`🕯 Cultist → heart`,p.hp>=maxhp(p),`${p.cult} cultist${p.cult>1?'s':''}`,'cons')+btn('cult:e','🕯 Cultist → energy','',`${p.cult} left`,'cons');if(G.phase==='roll')acts+=btn('cult:r','🕯 Cultist → reroll','','one extra reroll','cons')}}
   pr.innerHTML=`${G.winner?'':stepBar()}<div class="who" style="color:${MONS[p.m].c};-webkit-text-stroke:1.2px #1a1320">${who}${humanTurn()?' · your turn':''}</div>${head?`<div class="head">${head}</div>`:''}<div class="msg">${msg}</div><div class="acts">${acts}</div>`;
   const canClick=humanTurn()&&G.phase==='roll';
   const spin=UI.rollAnim!==G.rollId&&ANIM;UI.rollAnim=G.rollId;
-  di.innerHTML=G.dice.map((d,k)=>`<button class="die ${d.k?'kept':''} ${d.x?'extra':''} ${spin&&!d.k?'spin':''}" data-die="${k}" ${canClick?'':'disabled'} aria-label="${fname(d.f)}${d.k?' (kept)':''}">${faceSVG(d.f)}</button>`).join('')||'<span class="muted small">No dice rolled yet.</span>';
+  const sug=canClick&&UI.hints&&G.rolls>0?suggestMask(p):null;
+  di.innerHTML=G.dice.map((d,k)=>`<button class="die ${d.k?'kept':''} ${d.x?'extra':''} ${d.t?'sp-'+d.t:''} ${sug&&sug[k]&&!d.k?'sugg':''} ${spin&&!d.k?'spin':''}" title="${fname(d.f)}${d.t==='b'?' (berserk die)':d.t==='f'?' (Die of Fate)':''}" data-die="${k}" ${canClick?'':'disabled'} aria-label="${fname(d.f)}${d.k?' (kept)':''}">${faceSVG(d.f)}</button>`).join('')||'<span class="muted small">No dice rolled yet.</span>';
   ro.innerHTML=G.phase==='roll'?`Rerolls left: ${Array.from({length:Math.max(G.rolls,2+has(p,'brain'))},(_,k)=>`<span class="pip ${k<G.rolls?'':'used'}"></span>`).join('')}`:'<span class="muted small">Dice resolved.</span>';
   pv.innerHTML=G.phase==='roll'&&G.dice.length?`<b>${humanTurn()?'If you resolve now':'These dice give'}:</b> ${esc(scoreDice(p,G.dice).text)}.`:'';
   const buyOK=humanTurn()&&G.phase==='buy';const sg=buyOK?suggestCard(p):-1;
@@ -1298,12 +1529,17 @@ function renderPanel(){
   const list=[...who2.cards.map(id=>{const C=CARDS[base(id)];return `<div class="mc ${C.t}"><b>${esc(C.n)}</b>${C.t==='C'?' <i>consumable</i>':''}${base(id)==='smoke'?` (${who2.tok.smoke} puffs)`:''}<br>${esc(C.x)}</div>`}),
     ...who2.evo.map(e=>`<div class="mc E"><b>🧬 ${esc(evoName(e))}</b> <i>evolution</i><br>${esc(EVOFX[evoKey(e)].x)}</div>`),
     ...who2.hand.map(e=>`<div class="mc E hand"><b>🧬 ${esc(evoName(e))}</b> <i>in hand, play on your turn</i><br>${esc(EVOFX[evoKey(e)].x)}</div>`)];
+  if(exOn('curse'))list.unshift(`<div class="mc K"><b>𓂀 Curse: ${esc(CURSES[G.curse].n)}</b><br>${esc(CURSES[G.curse].x)}<br><i>Snake: ${esc(CURSES[G.curse].s)} Ankh: ${esc(CURSES[G.curse].a)}</i></div>`);
+  if(exOn('tower'))list.unshift(`<div class="mc T"><b>🗼 Tokyo Tower levels: ${G.tower.map((o,l)=>`${l+1}: ${o<0?'free':esc(mname(P(o)))}`).join(' · ')}</b><br>In the city, resolve four 1s to climb. Own all three to win.</div>`);
+  if(exOn('wick'))list.unshift(`<div class="mc W"><b>😈 Wickedness: ${who2.wk}</b> (powers at 3, 6 and 10)</div>`);
+  if(exOn('bers')&&who2.tok.berserk)list.unshift(`<div class="mc B"><b>😡 BERSERK!</b><br>You roll the berserk die. Heal with hearts to calm down.</div>`);
+  if(exOn('cult'))list.unshift(`<div class="mc M"><b>🕯 Cultists: ${who2.cult}</b><br>Four identical faces gain one. Spend one on your turn for a heart, an energy or a reroll.</div>`);
   if(mbOn())list.unshift(`<div class="mc M"><b>🧠 Mindbug tokens: ${who2.mb}</b><br>When another monster finishes rolling, you may spend one to resolve its dice as yours.</div>`);
   document.getElementById('mine').innerHTML=list.length?list.join(''):'<span class="muted small">No cards yet. Buy them with energy after rolling.</span>';
   const L=document.getElementById('log');L.innerHTML=G.log.slice(0,80).map(l=>`<li class="${l.s>=0&&G.pl[l.s]&&G.pl[l.s].human&&G.mode==='solo'?'me':''}">${esc(l.t)}</li>`).join('');
 }
 function renderScore(){const el=document.getElementById('score');if(!G){el.innerHTML='';return}
-  el.innerHTML=G.pl.map(p=>`<div class="sc ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}"><b style="background:${MONS[p.m].c}">${esc(mname(p))}${p.human&&G.mode==='solo'?' (you)':''}</b><span>♥${p.hp} ★${p.vp} ⚡${p.en}${mbOn()?' 🧠'+p.mb:''}${inTokyo(p.i)?' · city':''}${p.alive?'':' · KO'}</span></div>`).join('')}
+  el.innerHTML=G.pl.map(p=>`<div class="sc ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}"><b style="background:${MONS[p.m].c}">${esc(mname(p))}${p.human&&G.mode==='solo'?' (you)':''}</b><span>♥${p.hp} ★${p.vp} ⚡${p.en}${mbOn()?' 🧠'+p.mb:''}${exIcons(p)}${inTokyo(p.i)?' · city':''}${p.alive?'':' · KO'}</span></div>`).join('')}
 function renderLegend(){document.getElementById('legend').innerHTML=[
   ['1','Three 1s score 1 star; each extra 1 adds 1 more.'],['2','Three 2s score 2 stars, +1 per extra.'],['3','Three 3s score 3 stars, +1 per extra.'],
   ['E','Energy: 1 each. Spend it on power cards.'],['C','Claw: 1 damage each. From the city you hit everyone outside; from outside you hit the city.'],['H','Heart: heal 1 each (not while in the city). Three hearts also draw an evolution when evolutions are on.']]
@@ -1313,8 +1549,9 @@ function renderLegend(){document.getElementById('legend').innerHTML=[
 function renderModal(){const m=document.getElementById('modal');
   if(UI.info){m.classList.remove('hidden');m.innerHTML=startScreen();return}
   if(UI.rules){m.classList.remove('hidden');m.innerHTML=rulesHTML();return}
+  if(UI.stats&&G&&G.winner){m.classList.remove('hidden');m.innerHTML=statsHTML();return}
   if(UI.choice){const c=UI.choice;m.classList.remove('hidden');
-    const dice=c.dice&&G?`<div class="mdice">${G.dice.map(d=>`<span class="die sm">${faceSVG(d.f)}</span>`).join('')}</div>`:'';
+    const dice=c.dice&&G?`<div class="mdice">${G.dice.map(d=>`<span class="die sm ${d.t?'sp-'+d.t:''}">${faceSVG(d.f)}</span>`).join('')}</div>`:'';
     m.innerHTML=`<div class="dlg" role="dialog" aria-modal="true"><h2>${esc(c.title)}</h2>${G&&c.who!==undefined&&G.mode==='hot'?`<p class="pass">📱 Pass the device to <b>${esc(mname(P(c.who)))}</b>: this one is for you.</p>`:''}<p>${esc(c.text)}</p>${dice}<div class="acts">${c.options.map(o=>`<button class="btn ${/Recommended\./.test(o.d||'')?'primary':''}" data-opt="${esc(o.k)}">${esc(o.l)}${o.d?`<small>${esc(o.d)}</small>`:''}</button>`).join('')}${c.cancel?'<button class="btn" data-opt="x">Close</button>':''}</div></div>`;return}
   m.classList.add('hidden');m.innerHTML=''}
 function startScreen(){const saved=load();const xp=UI.xp;
@@ -1323,7 +1560,9 @@ function startScreen(){const saved=load();const xp=UI.xp;
    <p>Giant monsters brawl for the city. On your turn: <b>1</b> roll the dice, <b>2</b> resolve them, <b>3</b> enter the city if it's empty, <b>4</b> buy power cards, <b>5</b> end your turn. First to <b>20 stars</b>, or the <b>last monster standing</b>, wins.</p>
    <div class="row"><b>Game:</b>${[['base','Base game'],['trial','Mindbug Trial'],['exp','Mindbug Experience']].map(([k,l])=>`<button class="btn ${xp===k?'on':''}" data-xp="${k}">${l}</button>`).join('')}</div>
    <p class="small muted" style="margin:.1rem 0 .3rem">${xp==='base'?'The classic game.':xp==='trial'?'Adds Mindbug tokens, 3 new monsters and 24 new cards shuffled into the classic deck. Recommended.':'Mindbug tokens and 3 new monsters, playing with only the 24 new cards.'}</p>
-   <div class="row"><b>Evolutions:</b><button class="btn ${UI.evo?'on':''}" data-evo="1">On</button><button class="btn ${UI.evo?'':'on'}" data-evo="0">Off</button><span class="small muted">Resolve three hearts to draw an evolution card for your monster.</span></div>
+   <p style="margin:.35rem 0 .15rem"><b>Expansions</b> <span class="small muted">(tap to switch on or off)</span> <button class="btn mini" data-preset="none">None</button><button class="btn mini" data-preset="all">All</button></p>
+   <div class="exps">${EXPS.map(e=>{const on=e.k==='evo'?UI.evo:!!UI.ex[e.k];return `<button class="ex ${on?'on':''}" data-exk="${e.k}"><b>${on?'✔':'＋'} ${esc(e.n)}</b><small>${esc(e.d)}</small></button>`}).join('')}</div>
+   <div class="row"><b>Computer skill:</b>${[['easy','Easy'],['normal','Normal'],['hard','Hard']].map(([k,l])=>`<button class="btn ${UI.lvl===k?'on':''}" data-lvl="${k}">${l}</button>`).join('')}<span class="small muted">${UI.lvl==='hard'?'Thinks ahead about every reroll.':UI.lvl==='easy'?'Makes mistakes. Good for learning.':'A solid, fair opponent.'}</span></div>
    <div class="row"><b>Monsters:</b>${[2,3,4,5,6].map(k=>`<button class="btn ${UI.n===k?'on':''}" data-n="${k}">${k}</button>`).join('')}<span class="small muted">The Harbor opens with 5–6.</span></div>
    <p style="margin:.4rem 0 .2rem"><b>Your monster</b> (for the game against the computer):</p>
    <div class="monpick">${pool.map(k=>`<button class="${UI.mon===k?'on':''}" data-mon="${k}" title="${esc(MONS[k].d)}"><svg viewBox="-66 -70 132 136">${monArt(k)}</svg><span>${esc(MONS[k].n)}${MONS[k].x?' 🧠':''}</span></button>`).join('')}</div>
@@ -1345,6 +1584,8 @@ function rulesHTML(){return `<div class="dlg rules" role="dialog" aria-modal="tr
   <li><b>Keywords</b>: <b>Hunter</b> hits more monsters, <b>Sneaky</b> ignores defences, <b>Venomous</b> finishes off badly hurt monsters, <b>Frenzy</b> doubles claw damage, and <b>Tough</b> blocks a hit.</li>
   <li><b>Evolutions</b> (optional): when you resolve three or more hearts, draw an evolution card for your monster. Play it on your turn. Some are permanent.</li>
   <li><b>Trial</b> mixes the 24 new cards into the classic deck. <b>Experience</b> uses only the new cards.</li></ul>
+  <h3>More expansions (switch them on at the start)</h3><ul>${EXPS.filter(e=>e.k!=='evo').map(e=>`<li><b>${esc(e.n)}</b>: ${esc(e.d)}</li>`).join('')}</ul>
+  <h3>Keyboard shortcuts</h3><p class="small"><b>R</b> reroll · <b>Space</b> resolve / end turn · <b>1–8</b> keep a die · <b>H</b> suggest dice · <b>P</b> pause the computer</p>
   <h3>Winning</h3><p>Reach <b>20 stars</b> and survive your turn, or be the last monster standing. If everyone falls at once, nobody wins.</p>
   <h3>Left out of this version</h3><p class="small">Ten advanced classic cards that need tokens or peeking at the deck, and the Wickedness tiles, which need a separate expansion.</p>
   <div class="acts"><button class="btn primary" data-a="closerules">Got it</button></div></div>`}
@@ -1352,7 +1593,7 @@ function rulesHTML(){return `<div class="dlg rules" role="dialog" aria-modal="tr
 // ---------- tour ----------
 const TOURSTEPS=[
  {el:'#prompt',t:'Start here',b:'This box always tells you what to do next. The 1–5 bar at the top shows where you are in your turn: Roll, Resolve, City, Buy, End.'},
- {el:'#dicewrap',t:'The dice',b:'Tap dice to keep them (they turn yellow), then press Reroll. The line under the dice shows what you would get if you resolved now. Stuck? Press “Suggest dice”.'},
+ {el:'#dicewrap',t:'The dice',b:'Tap dice to keep them (they turn yellow), then press Reroll. The line under the dice shows what you would get if you resolved now. Dice with a blue dashed outline are the ones we suggest keeping (switch this off with 💡 Hints). Keys: R rerolls, Space resolves, 1–8 keep dice.'},
  {el:'#map',t:'The city',b:'Monsters fight over Downtown (and the Harbor with 5–6 players). Being there scores stars every turn, but everyone else hits you and you cannot heal.'},
  {el:'#map',t:'The monsters',b:'Each plate shows hearts (red), stars (gold, first to 20 wins) and energy (green). The pink brain is your Mindbug tokens. The glowing plate is whoever is taking a turn.'},
  {el:'#marketwrap',t:'Power cards',b:'After resolving, spend energy on cards. A suggested card gets a ribbon. Consumables wait in your hand until you press “Use”.'},
@@ -1364,23 +1605,26 @@ function renderTour(){document.querySelectorAll('.hl').forEach(e=>e.classList.re
   el.innerHTML=`<h3>Tour ${UI.coach+1} of ${TOURSTEPS.length}: ${esc(st.t)}</h3><p class="small">${esc(st.b)}</p><div class="acts"><button class="btn" data-tour="prev" ${UI.coach===0?'disabled':''}>Back</button><button class="btn primary" data-tour="next">${UI.coach===TOURSTEPS.length-1?'Start playing':'Next'}</button><button class="btn" data-tour="skip">Skip tour</button></div>`;
   const tg=document.querySelector(st.el);if(tg)tg.classList.add('hl')}
 
-function render(){if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win')}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal()}
+function render(){if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal()}
 const SPEEDS=[['slow',1300],['normal',650],['fast',260]];
 function setSpeed(k){UI.speed=k;AIDELAY=SPEEDS[k][1];const b=document.getElementById('speedbtn');if(b)b.textContent='Speed: '+SPEEDS[k][0];try{localStorage.setItem('ccs_speed',k)}catch(e){}}
 
 // ---------- events ----------
 document.addEventListener('click',e=>{
-  const t=e.target.closest('[data-a],[data-act],[data-die],[data-card],[data-opt],[data-start],[data-tour],[data-n],[data-mon],[data-xp],[data-evo],g.seat');if(!t)return;
+  const t=e.target.closest('[data-a],[data-act],[data-die],[data-card],[data-opt],[data-start],[data-tour],[data-n],[data-mon],[data-xp],[data-evo],[data-exk],[data-lvl],[data-preset],g.seat');if(!t)return;
   const ds=t.dataset;if(t.tagName==='BUTTON'&&!t.disabled&&!ds.a)snd('click');
   if(ds.n){UI.n=+ds.n;render();return}
   if(ds.mon!==undefined){UI.mon=+ds.mon;render();return}
   if(ds.xp){UI.xp=ds.xp;render();return}
   if(ds.evo!==undefined){UI.evo=ds.evo==='1';render();return}
+  if(ds.exk){if(ds.exk==='evo')UI.evo=!UI.evo;else UI.ex[ds.exk]=!UI.ex[ds.exk];saveSetup();render();return}
+  if(ds.preset){const on=ds.preset==='all';UI.evo=on;EXPS.forEach(x=>{if(x.k!=='evo')UI.ex[x.k]=on});saveSetup();render();return}
+  if(ds.lvl){UI.lvl=ds.lvl;saveSetup();render();return}
   if(ds.start){const k=ds.start;UI.info=false;
     if(k==='load'){G=load();if(!G.gid)G.gid=Math.random();UI.choice=null;UI.busy=false;UI.fx={};if(G.phase==='resolve'||G.phase==='start'){G.phase='roll';G.step=1}refresh()}
     else{newGame(k);let toured=false;try{toured=!!localStorage.getItem(TOUR);localStorage.setItem(TOUR,'1')}catch(x){}if(k==='solo'&&!toured)startTour()}return}
   if(ds.tour){if(ds.tour==='next')UI.coach=UI.coach>=TOURSTEPS.length-1?-1:UI.coach+1;else if(ds.tour==='prev')UI.coach=Math.max(0,UI.coach-1);else UI.coach=-1;renderTour();return}
-  if(ds.a){if(ds.a==='new'){UI.info=true;UI.choice=null;render()}else if(ds.a==='rules'){UI.rules=true;render()}else if(ds.a==='closerules'){UI.rules=false;render();schedule()}else if(ds.a==='tour')startTour();else if(ds.a==='speed')setSpeed((UI.speed+1)%3);else if(ds.a==='snd')toggleSound();else if(ds.a==='mus')toggleMusic();return}
+  if(ds.a){if(ds.a==='new'){UI.info=true;UI.choice=null;render()}else if(ds.a==='rules'){UI.rules=true;render()}else if(ds.a==='closerules'){UI.rules=false;render();schedule()}else if(ds.a==='tour')startTour();else if(ds.a==='speed')setSpeed((UI.speed+1)%3);else if(ds.a==='snd')toggleSound();else if(ds.a==='pause'){UI.paused=!UI.paused;const b=document.getElementById('pausebtn');if(b)b.textContent=UI.paused?'▶ Resume':'⏸ Pause';render();schedule()}else if(ds.a==='closestats'){UI.stats=false;render()}else if(ds.a==='hints'){UI.hints=!UI.hints;const b=document.getElementById('hintbtn');if(b)b.textContent='💡 Hints: '+(UI.hints?'on':'off');render()}else if(ds.a==='mus')toggleMusic();return}
   if(ds.opt!==undefined){const c=UI.choice;if(!c)return;UI.choice=null;if(ds.opt==='x'){refresh();return}c.cb(ds.opt);if(!UI.choice)refresh();return}
   if(t.classList.contains('seat')&&G){seatInfo(+ds.seat);return}
   if(false){const p=null,hidden=0;
@@ -1392,12 +1636,13 @@ document.addEventListener('click',e=>{
   const p=cur();
   if(ds.card!==undefined&&G.phase==='buy'){buy(+ds.card);return}
   const act=ds.act||'';
+  if(act.startsWith('cult:')){useCult(p,act.slice(5));return}
   if(act.startsWith('use:')){const k=+act.slice(4);if(consUsable(p,k))useCons(p,k);return}
   if(act.startsWith('evo:')){const k=+act.slice(4);if(evoUsable(p,k))playEvo(p,k);return}
   switch(act){
     case 'reroll':if(G.rolls>0)doReroll('roll');break;
     case 'resolve':if(G.phase==='roll')resolve();break;
-    case 'hint':aiMark(p);UI.banner='💡 Suggested dice are marked in yellow. Reroll the rest, or change anything you like.';render();break;
+    case 'hint':aiMarkHard(p);UI.banner='💡 Suggested dice are marked in yellow. Reroll the rest, or change anything you like.';render();break;
     case 'mind':if(p.en>=1)doReroll('mind');break;
     case 'smoke':doReroll('smoke');break;
     case 'lurker':doReroll('lurker');break;
@@ -1406,7 +1651,20 @@ document.addEventListener('click',e=>{
     case 'mend':mend();break;
     case 'end':if(G.phase==='buy')endTurn();break;
   }});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.rules){UI.rules=false;render()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.rules){UI.rules=false;render();return}
+  if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
+  if(e.key==='p'||e.key==='P'){document.querySelector('[data-a="pause"]')?.click();return}
+  if(!G||G.winner||UI.choice||UI.info||UI.rules||!humanTurn())return;const click=sel=>{const b=document.querySelector(sel);if(b&&!b.disabled){b.click();e.preventDefault()}};
+  if(G.phase==='roll'){if(e.key==='r'||e.key==='R')click('[data-act="reroll"]');else if(e.key===' '||e.key==='Enter')click('[data-act="resolve"]');else if(e.key==='h'||e.key==='H')click('[data-act="hint"]');else if(/^[1-9]$/.test(e.key))click(`[data-die="${+e.key-1}"]`)}
+  else if(G.phase==='buy'&&(e.key===' '||e.key==='Enter'||e.key==='e'||e.key==='E'))click('[data-act="end"]')});
+function saveSetup(){try{localStorage.setItem('ccs_setup',JSON.stringify({ex:UI.ex,evo:UI.evo,lvl:UI.lvl,xp:UI.xp,n:UI.n,mon:UI.mon}))}catch(e){}}
+try{const st=JSON.parse(localStorage.getItem('ccs_setup')||'null');if(st){Object.assign(UI.ex,st.ex||{});if(st.evo!==undefined)UI.evo=st.evo;if(st.lvl)UI.lvl=st.lvl}}catch(e){}
+function suggestMask(p){const key=G.rollId+':'+G.rolls+':'+G.dice.map(d=>d.f).join('');if(UI.sugKey===key)return UI.sugMask;const saved=G.dice.map(d=>d.k);aiMarkHard(p);const m=G.dice.map(d=>d.k);G.dice.forEach((d,k)=>d.k=saved[k]);UI.sugKey=key;UI.sugMask=m;return m}
+function exIcons(p){let s='';if(exOn('cult')&&p.cult)s+=' 🕯'+p.cult;if(exOn('wick'))s+=' 😈'+p.wk;if(exOn('tower')){const t=G.tower.filter(o=>o===p.i).length;if(t)s+=' 🗼'+t}if(p.tok&&p.tok.berserk)s+=' 😡';return s}
+function statsHTML(){const rows=G.pl.map(p=>{const s=p.stats||{};return `<tr class="${'P'+(p.i+1)===G.winner?'win':''}"><td><b style="color:${MONS[p.m].c};-webkit-text-stroke:.6px #1a1320">${esc(mname(p))}</b>${p.human&&G.mode==='solo'?' (you)':''}</td><td>${p.alive?'♥'+p.hp:'K.O.'}</td><td>★${p.vp}</td><td>${s.dmg||0}</td><td>${s.kos||0}</td><td>${s.cards||0}</td><td>${s.city||0}</td></tr>`}).join('');
+  return `<div class="dlg" role="dialog" aria-modal="true"><h2>🏆 Game over</h2><p><b>${esc(G.winText)}</b></p><p class="small muted">Round ${G.turn}.</p>
+  <table class="stats"><tr><th>Monster</th><th>Hearts</th><th>Stars</th><th>Claw damage</th><th>K.O.s</th><th>Cards</th><th>Turns in city</th></tr>${rows}</table>
+  <div class="acts"><button class="btn primary" data-a="new">Play again</button><button class="btn" data-a="closestats">Look at the city</button></div></div>`}
 try{const sp=localStorage.getItem('ccs_speed');if(sp!==null)setSpeed(+sp)}catch(e){}
 function seatInfo(k){if(!G||UI.choice||UI.info)return;const p=P(k);const hidden=G.mode==='solo'&&!p.human;
   UI.choice={title:mname(p),text:`${MONS[p.m].d}. ${p.alive?`${p.hp}/${maxhp(p)} hearts, ${p.vp} stars, ${p.en} energy${mbOn()?`, ${p.mb} Mindbug token${p.mb===1?'':'s'}`:''}, in ${where(p.i)}.`:'Knocked out.'} Cards: ${p.cards.length?p.cards.map(c=>CARDS[base(c)].n+' ('+CARDS[base(c)].x+')').join(' · '):'none'}.${p.evo.length?' Evolutions: '+p.evo.map(e=>evoName(e)+' ('+EVOFX[evoKey(e)].x+')').join(' · ')+'.':''}${p.hand.length?` ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand${hidden?' (hidden)':': '+p.hand.map(evoName).join(', ')}.`:''}`,options:[],cancel:true};render()}

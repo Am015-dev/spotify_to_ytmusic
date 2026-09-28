@@ -52,3 +52,18 @@ Sources: the BGG, IELLO, review and wiki pages were all blocked by the network p
 - The three new monsters (Cortexa, Clampede, Bramblebat) are original hybrid monsters filling the role of the expansion's Mindbug-universe monsters.
 - Mindbug timing: once the roller finishes rolling, other monsters are offered the Mindbug in clockwise order, and only one can Mindbug per turn. The Mindbugger takes any spot a yielding monster leaves. The roller then still does its own Enter City step and buy step.
 - Cut: the 3 Wickedness tiles, which need the Wickedness Gauge from another expansion.
+
+# v5: more expansions (selectable at setup)
+
+Sources: search-result excerpts only; every official rulebook PDF was blocked by the network proxy.
+
+- **Cultists (Cthulhu pack)**, confirmed: after resolving, four identical faces gain a cultist. Discard one at any time for 1 heart, 1 energy or 1 extra reroll. Guess: cultists also save you automatically when you would be knocked out.
+- **Tokyo Tower (King Kong pack)**, confirmed: a monster in Tokyo that rolls four 1s claims a level. The bottom level gives +1 heart at the start of your turn; the middle gives +1 heart and +1 energy; the bonuses stack. Owning all three wins. Guesses: you claim the lowest level you don't own, taking it from its owner if needed; the win is checked at the end of your turn.
+- **Berserk (Cybertooth pack)**, confirmed: resolving four claws puts you in Berserk mode. While berserk you roll the berserk die (it has an Ouch face that costs you 1 heart), and healing ends Berserk. Guess: the exact faces (2 claws, 2 energy, Ouch, claw, claw, energy).
+- **Wickedness gauge (Dark Edition)**, confirmed: three 1s give 2 wickedness and three 2s give 1. Reaching 3, 6 or 10 lets you pick a tile at that level (4, 4 and 2 tiles). The tile names and effects are original designs.
+- **Costumes (Halloween)**, confirmed: deal 2 costumes to each player; each keeps 1 and the rest are shuffled into the deck. Rolling 3+ claws lets you buy the costumes of monsters you damaged by paying their cost. The 12 costume effects are original designs.
+- **Curses (Anubis pack)**, confirmed: one curse is in play at a time, and the Die of Fate is rolled and resolved first (Eye = new curse, Water = nothing, Snake = bad, Ankh = good). The 10 curses are original designs; the Golden Scarab is cut.
+
+# Computer skill
+- Easy: the Normal logic with random mistakes. Normal: rule-based. Hard: tries every keep and simulates the rerolls to pick the best one; it also yields more carefully and uses Mindbug more carefully.
+- Head to head over 120 games: Hard won 59% against Normal (2 of each, seats alternating). In separate 4-player games, Easy won 15% against Normal (2 of each).
