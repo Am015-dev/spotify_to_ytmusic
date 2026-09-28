@@ -232,14 +232,309 @@ function defaultSquad(f){return f===0?CORE_DUEL[0]:CORE_DUEL[1]}
 const SIZES=[
   {k:'core',n:'Core duel',d:'1 heavy fighter vs 2 light fighters',squad:(f,ex)=>f===0?CORE_DUEL[0].map(e=>({p:e.p,u:e.u.slice()})):f===1?CORE_DUEL[1].map(e=>({p:e.p,u:[]})):randomSquad(f,36,ex,n=>rnd(n))},
   {k:'sk60',n:'Skirmish 60',d:'random 60-point squadrons',squad:(f,ex)=>randomSquad(f,60,ex,n=>rnd(n))},
-  {k:'std',n:'Standard 100',d:'random 100-point squadrons',squad:(f,ex)=>randomSquad(f,100,ex,n=>rnd(n))}];
-const RULES_HTML=`<p>Each round has four steps. The step bar shows where you are.</p>
+  {k:'std',n:'Standard 100',d:'random 100-point squadrons',squad:(f,ex)=>randomSquad(f,100,ex,n=>rnd(n))},
+  {k:'custom',n:'Custom squads',d:'build both squadrons yourself (100 points)',squad:(f,ex)=>randomSquad(f,100,ex,n=>rnd(n))}];
+var RULES_HTML=`<p>Each round has four steps. The step bar shows where you are.</p>
 <h3>1. Plan</h3><p>Secretly choose a maneuver for every ship on its dial. White is normal, <b>green</b> is easy (clears a stress token), <b>red</b> is hard (gives a stress token). A stressed ship can't fly red maneuvers or take actions.</p>
 <h3>2. Move</h3><p>Ships reveal and fly their maneuvers from the <b>lowest pilot skill up</b>, so skilled pilots react to what they see. After moving, each ship takes one action: focus, evade, target lock, barrel roll or boost. Bumping into a ship stops you short and skips your action; flying through an asteroid rolls a damage die and skips your action; leaving the battlefield destroys you.</p>
 <h3>3. Combat</h3><p>From the <b>highest pilot skill down</b>, each ship may attack one enemy in its firing arc at range 1-3. Roll attack dice equal to the weapon value (+1 at range 1); the defender rolls agility (+1 at range 3 or when an asteroid is in the way). Focus turns focus results into hits or evades; a target lock lets you reroll. Each evade cancels a hit (hits before crits). Damage strips shields first, then hull; crits are dealt face up with lasting effects.</p>
 <h3>4. End</h3><p>Unused focus and evade tokens are removed; target locks stay.</p>
 <p>Destroy every enemy ship to win. Pilot skill ties: the side with initiative (fewer squad points) moves and fires first.</p>
 <p><b>Controls:</b> drag the view to orbit, right-drag or two fingers to pan, wheel or pinch to zoom, T for top-down, Enter for the highlighted button, 1-9 for listed choices, S to skip.</p>`;
+
+</script>
+<script>
+// ---------- expansions: waves 1-3 of the 1st edition (numbers exact; names, art and texts original) ----------
+EXPS.push({k:'w1',n:'Wave 1: bombers & prime fighters',d:'Anvil bomber, Talon Prime, more Lancer & Talon pilots; turrets, ion, missiles.'},
+  {k:'w2',n:'Wave 2: interceptors & big ships',d:'Needle, Razor, the Longhaul freighter and the Warden gunship; bombs, crew, turrets, rear arcs.'},
+  {k:'w3',n:'Wave 3: strike craft & shuttles',d:'Keel strike fighter, Kestrel courier, Talon Maul bomber, Herald shuttle; systems, mines.'});
+Object.assign(SHIPS,{
+  anvil:{n:'Anvil assault bomber',model:'bomber',ex:'w1',fac:0,atk:2,agi:1,hull:5,sh:3,acts:['F','TL'],dial:dialFrom([[0,0,0,0,0,0],[0,1,2,1,0,0],[1,1,2,1,1,0],[3,1,1,1,3,0],[0,0,3,0,0,3]])},
+  talonx:{n:'Talon Prime',model:'shard',scale:1.15,ex:'w1',fac:1,atk:2,agi:3,hull:3,sh:2,acts:['F','TL','BR','E'],dial:dialFrom([[0,0,0,0,0,0],[0,2,0,2,0,0],[1,1,2,1,1,0],[1,1,2,1,1,0],[0,0,1,0,0,3],[0,0,1,0,0,0]])},
+  needle:{n:'Needle interceptor',model:'needle',ex:'w2',fac:0,atk:2,agi:3,hull:2,sh:2,acts:['F','TL','BO','E'],dial:dialFrom([[0,0,0,0,0,0],[1,0,0,0,1,0],[2,2,2,2,2,0],[1,1,2,1,1,3],[0,0,2,0,0,0],[0,0,2,0,0,3]])},
+  razor:{n:'Razor interceptor',model:'razor',ex:'w2',fac:1,atk:3,agi:3,hull:3,sh:0,acts:['F','BR','BO','E'],dial:dialFrom([[0,0,0,0,0,0],[1,0,0,0,1,0],[2,2,2,2,2,0],[1,1,2,1,1,3],[0,0,2,0,0,0],[0,0,1,0,0,3]])},
+  hauler:{n:'Longhaul freighter',model:'freighter',ex:'w2',fac:0,base:'L',arc:'T',atk:3,agi:1,hull:8,sh:5,acts:['F','TL'],title:1,dial:dialFrom([[0,0,0,0,0,0],[1,2,2,2,1,0],[1,1,2,1,1,0],[0,1,1,1,0,3],[0,0,1,0,0,3]])},
+  warden:{n:'Warden gunship',model:'gunship',ex:'w2',fac:1,base:'L',arc:'A',atk:3,agi:2,hull:6,sh:4,acts:['F','TL','E'],title:1,dial:dialFrom([[0,0,0,0,0,0],[0,2,2,2,0,0],[1,1,2,1,1,0],[1,1,1,1,1,3],[0,0,1,0,0,3]])},
+  keel:{n:'Keel strike fighter',model:'wedge',ex:'w3',fac:0,atk:3,agi:1,hull:3,sh:5,acts:['F','TL','BR'],dial:dialFrom([[0,0,0,0,0,0],[3,2,2,2,3,0],[1,1,2,1,1,3],[0,3,1,3,0,0],[0,0,3,0,0,0]])},
+  kestrel:{n:'Kestrel courier',model:'hawk',ex:'w3',fac:0,atk:1,agi:2,hull:4,sh:1,acts:['F','TL'],title:1,dial:dialFrom([[0,0,0,0,0],[0,2,2,2,0],[1,1,2,1,1],[0,3,1,3,0],[0,0,3,0,0]])},
+  maul:{n:'Talon Maul bomber',model:'maul',ex:'w3',fac:1,atk:2,agi:2,hull:6,sh:0,acts:['F','TL','BR'],dial:dialFrom([[0,0,0,0,0,0],[0,1,2,1,0,0],[3,2,2,2,3,0],[1,1,2,1,1,0],[0,0,1,0,0,0],[0,0,0,0,0,3]])},
+  herald:{n:'Herald shuttle',model:'shuttle',ex:'w3',fac:1,base:'L',atk:3,agi:1,hull:5,sh:5,acts:['F','TL'],title:1,dial:dialFrom([[0,0,3,0,0],[0,2,2,2,0],[3,1,2,1,3],[0,3,1,3,0]])}});
+SHIPS.lancer.fac=0;SHIPS.talon.fac=1;
+Object.assign(PILOTS,{
+  wren:{n:'Wren Talvo',ship:'lancer',ex:'w1',ps:9,pts:29,u:['T','Tp','M'],uniq:1,ab:'wedge',t:'When attacking, reduce the defender\'s agility by 1 (minimum 0).'},
+  garrick:{n:'Garrick Dray',ship:'lancer',ex:'w1',ps:6,pts:26,u:['Tp','M'],uniq:1,ab:'garven',t:'After you spend a focus token, you may pass it to another friendly ship at range 1-2 instead of discarding it.'},
+  ironsq:{n:'Iron Squadron Pilot',ship:'anvil',ps:4,pts:20,u:['Tu','Tp','Tp','M']},
+  brannoc:{n:'Brannoc Dale',ship:'anvil',ps:6,pts:23,u:['Tu','Tp','Tp','M'],uniq:1,ab:'dutch',t:'After you acquire a target lock, another friendly ship at range 1-2 may acquire one too.'},
+  horace:{n:'Horace Venn',ship:'anvil',ps:8,pts:25,u:['Tu','Tp','Tp','M'],uniq:1,ab:'horton',t:'When attacking at range 2-3, you may reroll any of your blank results.'},
+  rustsq:{n:'Rust Squadron Pilot',ship:'anvil',ps:2,pts:18,u:['Tu','Tp','Tp','M']},
+  gutter:{n:'"Gutter"',ship:'talon',ex:'w1',ps:5,pts:15,u:[],uniq:1,ab:'gundark',t:'When attacking at range 1, you may change 1 of your hit results to a crit.'},
+  shiv:{n:'"Shiv"',ship:'talon',ex:'w1',ps:6,pts:16,u:[],uniq:1,ab:'backstab',t:'When attacking from outside the defender\'s firing arc, roll 1 additional attack die.'},
+  wailer:{n:'"Wailer"',ship:'talon',ex:'w1',ps:8,pts:18,u:['T'],uniq:1,ab:'howl',t:'When another friendly ship at range 1 attacks with its primary weapon, it may reroll 1 attack die.'},
+  varn:{n:'Varn Kessik',ship:'talonx',ps:7,pts:27,u:['T','Ms'],uniq:1,ab:'maarek',t:'When your attack deals a faceup damage card, draw 3 instead, deal the one you choose and discard the others.'},
+  galesq:{n:'Gale Squadron Pilot',ship:'talonx',ps:2,pts:21,u:['Ms']},
+  squallsq:{n:'Squall Squadron Pilot',ship:'talonx',ps:4,pts:23,u:['Ms']},
+  castigan:{n:'Lord Castigan',ship:'talonx',ps:9,pts:29,u:['T','Ms'],uniq:1,ab:'vader',t:'During your action step you may take 2 actions.'},
+  tamsin:{n:'Tamsin Coe',ship:'needle',ps:8,pts:26,u:['T','Ms'],uniq:1,ab:'tycho',t:'You may take actions even while you have stress tokens.'},
+  arlo:{n:'Arlo Crane',ship:'needle',ps:6,pts:23,u:['Ms'],uniq:1,ab:'arvel',t:'You may attack an enemy ship in your firing arc that you are touching.'},
+  jadesq:{n:'Jade Squadron Pilot',ship:'needle',ps:3,pts:19,u:['T','Ms']},
+  testfl:{n:'Test Flight Pilot',ship:'needle',ps:1,pts:17,u:['Ms']},
+  primew:{n:'Prime Wing Pilot',ship:'razor',ps:1,pts:18,u:[]},
+  vengsq:{n:'Vengeance Squadron Pilot',ship:'razor',ps:3,pts:20,u:[]},
+  fangsq:{n:'Fang Squadron Pilot',ship:'razor',ps:4,pts:21,u:['T']},
+  grudge:{n:'"Grudge"',ship:'razor',ps:5,pts:23,u:[],uniq:1,ab:'felswrath',t:'When your damage reaches your hull, you are not destroyed until the end of the combat phase.'},
+  tarn:{n:'Tarn Vessor',ship:'razor',ps:7,pts:25,u:['T'],uniq:1,ab:'turr',t:'After you attack, you may take a free boost or barrel roll action.'},
+  sorin:{n:'Sorin Vael',ship:'razor',ps:9,pts:27,u:['T'],uniq:1,ab:'soontir',t:'When you receive a stress token, you may also take a focus token.'},
+  fringe:{n:'Fringe Runner',ship:'hauler',ps:1,pts:27,u:['C','C'],ov:{atk:2,agi:1,hull:6,sh:4}},
+  grawl:{n:'Grawl',ship:'hauler',ps:5,pts:42,u:['T','Ms','C','C'],uniq:1,ab:'chewie',t:'When you are dealt a faceup damage card, flip it facedown at once without resolving it.'},
+  lark:{n:'Lark Castellan',ship:'hauler',ps:7,pts:44,u:['T','Ms','C','C'],uniq:1,ab:'lando',t:'After you fly a green maneuver, another friendly ship at range 1 may take 1 free action from its action bar.'},
+  jax:{n:'Jax Harrow',ship:'hauler',ps:9,pts:46,u:['T','Ms','C','C'],uniq:1,ab:'han',t:'When attacking, you may reroll all of your dice (you must reroll as many as possible).'},
+  kira:{n:'Kira Scald',ship:'warden',ps:7,pts:38,u:['T','Ca','Bo','C','Ms'],uniq:1,ab:'kath',t:'When attacking, the defender receives 1 stress token if it cancels at least 1 crit.'},
+  bram:{n:'Bram Voss',ship:'warden',ps:8,pts:39,u:['T','Ca','Bo','C','Ms'],uniq:1,ab:'boba',t:'When you reveal a bank maneuver, you may switch to the other bank of the same speed.'},
+  krell:{n:'Krell Tavish',ship:'warden',ps:5,pts:36,u:['Ca','Bo','C','Ms'],uniq:1,ab:'krassis',t:'When attacking with a secondary weapon, you may reroll 1 attack die.'},
+  tracker:{n:'Bounty Tracker',ship:'warden',ps:3,pts:33,u:['Ca','Bo','C','Ms']},
+  oren:{n:'Oren Vask',ship:'keel',ps:8,pts:31,u:['T','Sy','Ca','Tp','Tp'],uniq:1,ab:'tennumb',t:'When attacking, 1 of your crit results cannot be cancelled by defense dice.'},
+  iveth:{n:'Iveth Sarn',ship:'keel',ps:6,pts:28,u:['T','Sy','Ca','Tp','Tp'],uniq:1,ab:'ibtisam',t:'When attacking or defending with at least 1 stress token, you may reroll 1 of your dice.'},
+  dirksq:{n:'Dirk Squadron Pilot',ship:'keel',ps:4,pts:24,u:['Sy','Ca','Tp','Tp']},
+  azuresq:{n:'Azure Squadron Pilot',ship:'keel',ps:2,pts:22,u:['Sy','Ca','Tp','Tp']},
+  operative:{n:'Compact Operative',ship:'kestrel',ps:2,pts:16,u:['Tu','C']},
+  quill:{n:'Quill Marren',ship:'kestrel',ps:4,pts:19,u:['Tu','C'],uniq:1,ab:'roark',t:'At the start of combat, another friendly ship at range 1-3 counts as pilot skill 12 until the phase ends.'},
+  kellan:{n:'Kellan Stroud',ship:'kestrel',ps:6,pts:21,u:['T','Tu','C'],uniq:1,ab:'kyle',t:'At the start of combat, you may pass 1 of your focus tokens to another friendly ship at range 1-3.'},
+  juno:{n:'Juno Arlen',ship:'kestrel',ps:8,pts:25,u:['T','Tu','C'],uniq:1,ab:'jan',t:'When another friendly ship at range 1-3 attacks, if you have no stress, you may take 1 to give it 1 extra attack die.'},
+  cleaver:{n:'Cleaver Squadron Pilot',ship:'maul',ps:2,pts:16,u:['Tp','Tp','Ms','Ms','Bo']},
+  hammer:{n:'Hammer Squadron Pilot',ship:'maul',ps:4,pts:18,u:['Tp','Tp','Ms','Ms','Bo']},
+  joren:{n:'Captain Joren',ship:'maul',ps:6,pts:22,u:['T','Tp','Tp','Ms','Ms','Bo'],uniq:1,ab:'jonus',t:'When another friendly ship at range 1 attacks with a secondary weapon, it may reroll up to 2 attack dice.'},
+  rhane:{n:'Major Rhane',ship:'maul',ps:7,pts:26,u:['T','Tp','Tp','Ms','Ms','Bo'],uniq:1,ab:'rhymer',t:'When attacking with a secondary weapon, you may stretch its range by 1 (within range 1-3).'},
+  kade:{n:'Captain Kade',ship:'herald',ps:8,pts:27,u:['Sy','Ca','C','C'],uniq:1,ab:'kagi',t:'When an enemy ship acquires a target lock, it must lock onto you if it can.'},
+  varek:{n:'Colonel Varek',ship:'herald',ps:6,pts:26,u:['Sy','Ca','C','C'],uniq:1,ab:'jendon',t:'At the start of combat, you may hand your target lock to a friendly ship at range 1 that has none.'},
+  orrin:{n:'Captain Orrin',ship:'herald',ps:4,pts:24,u:['Sy','Ca','C','C'],uniq:1,ab:'yorr',t:'When another friendly ship at range 1-2 would receive a stress token, if you have 2 or fewer, you may take it instead.'},
+  omega:{n:'Omega Group Pilot',ship:'herald',ps:2,pts:21,u:['Sy','Ca','C','C']}});
+// every ship may carry one modification; ships with a title card get a title slot
+for(const k in PILOTS){const P=PILOTS[k];if(!P.u.includes('Mo'))P.u.push('Mo');if(SHIPS[P.ship].title&&!P.u.includes('Ti'))P.u.push('Ti');if(!P.ex&&SHIPS[P.ship].ex)P.ex=SHIPS[P.ship].ex}
+Object.assign(SLOTN,{Mo:'Modification',Ti:'Title'});
+const WPN=(atk,r,o)=>Object.assign({atk,r},o||{});
+Object.assign(UPGRADES,{
+  u_ionturret:{n:'Ion Pulse Turret',slot:'Tu',pts:5,ex:'w1',t:'Attack 3, range 1-2, any direction. On a hit the target suffers 1 damage and gets an ion token; then cancel all dice.',wpn:WPN(3,[1,2],{arc:'T',ion:1})},
+  u_assist:{n:'Mech "Pilot-Assist"',slot:'M',pts:1,ex:'w1',t:'All your speed 1 and 2 maneuvers count as green.',green12:1},
+  u_patch:{n:'Mech "Patch"',slot:'M',pts:3,uniq:1,ex:'w1',t:'Action: roll 1 defense die. On an evade or focus, discard 1 of your facedown damage cards.'},
+  u_relock:{n:'Mech "Relock"',slot:'M',pts:2,uniq:1,ex:'w1',t:'After you spend a target lock, roll 1 defense die: on an evade, lock the same ship again (not usable in this attack).'},
+  u_scrap:{n:'Mech "Scrapper"',slot:'M',pts:1,ex:'w1',t:'In the end phase, you may flip 1 of your faceup Ship-trait damage cards facedown.'},
+  u_pack:{n:'Pack Tactics',slot:'T',pts:2,ex:'w1',t:'At the start of combat, a friendly ship at range 1 counts as having your pilot skill until the phase ends.'},
+  u_lead:{n:'Wing Leader',slot:'T',pts:2,uniq:1,ex:'w1',t:'Action: a ship at range 1-2 with lower pilot skill may take 1 free action.'},
+  u_snap:{n:'Snap Roll',slot:'T',pts:2,ex:'w1',t:'Action: a free barrel roll (take a stress token if barrel roll is not on your action bar); then remove 1 enemy lock from you.'},
+  u_shock:{n:'Shock Missiles',slot:'Ms',pts:4,ex:'w1',t:'Attack (target lock): spend your lock and discard this card. Attack 4, range 2-3. You may change 1 blank result to a hit.',wpn:WPN(4,[2,3],{need:'TL',spend:'TL',discard:1,b2h:1})},
+  u_swarmm:{n:'Swarm Missiles',slot:'Ms',pts:4,ex:'w1',t:'Attack (target lock): spend your lock and discard this card. Attack 3, range 1-2, twice.',wpn:WPN(3,[1,2],{need:'TL',spend:'TL',discard:1,twice:1})},
+  u_hairpin:{n:'Hairpin',slot:'T',pts:3,ex:'w2',t:'Action: fly a white turn 1 left or right, then take a stress token. Without boost on your action bar, also roll 2 attack dice and suffer any hits.'},
+  u_slip:{n:'Slippery',slot:'T',pts:2,ex:'w2',t:'When defending, if you have no stress, take 1 stress token to make the attacker reroll 1 attack die.'},
+  u_seeker:{n:'Seeker Missiles',slot:'Ms',pts:5,ex:'w2',t:'Attack (target lock): discard this card (keep the lock). Attack 4, range 2-3. The defender cannot spend evade tokens.',wpn:WPN(4,[2,3],{need:'TL',discard:1,noEvade:1})},
+  u_redline:{n:'Redline',slot:'T',pts:3,ex:'w2',t:'Once per round, after an action you may take 1 free action from your action bar, then take a stress token.'},
+  u_snapeye:{n:'Snapshot Eye',slot:'T',pts:1,ex:'w2',small:1,t:'Weapons that need a target lock can use focus instead: spend a focus token where you would spend a lock.'},
+  u_allin:{n:'All-In',slot:'T',pts:4,ex:'w2',t:'Action: until the end of the round, +1 primary weapon value and -1 agility.'},
+  u_tailgun:{n:'Tail Gunner',slot:'C',pts:5,ex:'w2',t:'After an attack that does not hit, you may at once attack with your primary weapon. You cannot attack again this round.'},
+  u_ionlance:{n:'Ion Lance',slot:'Ca',pts:3,ex:'w2',t:'Attack 3, range 1-3. On a hit the defender suffers 1 damage and gets an ion token; then cancel all dice.',wpn:WPN(3,[1,3],{ion:1})},
+  u_beam:{n:'Heavy Beam Cannon',slot:'Ca',pts:7,ex:'w2',t:'Attack 4, range 2-3. Right after rolling, all your crits become hits.',wpn:WPN(4,[2,3],{c2h:1})},
+  u_quake:{n:'Quake Charges',slot:'Bo',pts:2,ex:'w2',t:'When you reveal your dial, you may discard this card to drop a quake charge. It detonates at the end of activation: every ship at range 1 suffers 1 damage.',bomb:'quake'},
+  u_hired:{n:'Hired Copilot',slot:'C',pts:2,ex:'w2',t:'When attacking at range 3, you may change 1 hit result to a crit.'},
+  u_burst:{n:'Burst Missiles',slot:'Ms',pts:5,ex:'w2',t:'Attack (target lock): spend your lock and discard this card. Attack 4, range 2-3. On a hit, every other ship at range 1 of the defender suffers 1 damage.',wpn:WPN(4,[2,3],{need:'TL',spend:'TL',discard:1,splash:1})},
+  u_oldinst:{n:'Old Instincts',slot:'T',pts:1,ex:'w2',t:'Your pilot skill is 2 higher.',psUp:2},
+  u_mines:{n:'Contact Mines',slot:'Bo',pts:3,ex:'w2',t:'Action: discard this card to drop a contact mine. When a ship\'s base or template overlaps it, it detonates: that ship rolls 3 attack dice and suffers every hit and crit.'},
+  u_fct:{n:'Fire-Control Tech',slot:'C',pts:3,ex:'w2',t:'You may keep 2 target locks (one per enemy). When you lock on, you may lock 2 different ships.'},
+  u_heat:{n:'Take the Heat',slot:'T',pts:1,ex:'w2',t:'When a friendly ship at range 1 is hit, you may suffer 1 of its uncancelled crits instead.'},
+  u_rook:{n:'Sable Rook',slot:'C',pts:7,uniq:1,fac:0,ex:'w2',t:'After an attack that does not hit, you may at once attack with your primary weapon, changing 1 focus to a hit. You cannot attack again this round.'},
+  u_nib:{n:'Copilot Nib',slot:'C',pts:1,uniq:1,fac:0,ex:'w2',t:'All your straight maneuvers count as green.',greenS:1},
+  u_brakk:{n:'Brakk',slot:'C',pts:4,uniq:1,fac:0,ex:'w2',t:'When you are dealt a damage card, you may discard it and recover 1 shield; then discard Brakk.'},
+  u_hplasma:{n:'Heavy Plasma Torpedoes',slot:'Tp',pts:6,ex:'w3',t:'Attack (target lock): spend your lock and discard this card. Attack 5, range 1. You may change up to 3 blank results to focus.',wpn:WPN(5,[1,1],{need:'TL',spend:'TL',discard:1,b2f:3})},
+  u_rapid:{n:'Rapid Blaster',slot:'Ca',pts:5,ex:'w3',t:'Attack 3, range 1. Your hits cannot be cancelled by defense dice (the defender may cancel crits first).',wpn:WPN(3,[1,1],{hard:1})},
+  u_track:{n:'Tracking Computer',slot:'Sy',pts:2,ex:'w3',t:'After you attack, you may acquire a target lock on the defender.'},
+  u_twin:{n:'Twin Blaster Turret',slot:'Tu',pts:4,ex:'w3',t:'Attack (focus): spend 1 focus token. Attack 3, range 1-2, any direction.',wpn:WPN(3,[1,2],{arc:'T',need:'F',spend:'F'})},
+  u_scout:{n:'Scout Specialist',slot:'C',pts:3,ex:'w3',t:'When you take a focus action, take 1 extra focus token.'},
+  u_sab:{n:'Saboteur',slot:'C',pts:2,ex:'w3',t:'Action: pick an enemy at range 1 and roll 1 attack die. On a hit or crit, flip one of its random facedown damage cards faceup and resolve it.'},
+  u_spot:{n:'Spotter',slot:'C',pts:1,ex:'w3',t:'At the start of activation, look at the chosen maneuver of 1 enemy ship at range 1-2.'},
+  u_pbomb:{n:'Plasma Bombs',slot:'Bo',pts:5,ex:'w3',t:'When you reveal your dial, you may discard this card to drop a plasma bomb. It detonates at the end of activation: every ship at range 1 is dealt 1 faceup damage card.',bomb:'plasma'},
+  u_adren:{n:'Adrenaline',slot:'T',pts:1,ex:'w3',t:'When you reveal a red maneuver, you may discard this card to treat it as white this activation.'},
+  u_early:{n:'Early Warning Sensors',slot:'Sy',pts:3,ex:'w3',t:'Just before you reveal your maneuver, you may take 1 free action; if you do, skip your action step this round.'},
+  u_jam:{n:'Jamming Array',slot:'Sy',pts:4,ex:'w3',t:'When defending, you may change 1 of the attacker\'s hits into a focus. The attacker cannot reroll that die.'},
+  u_vell:{n:'Inquisitor Vell',slot:'C',pts:3,uniq:1,fac:1,ex:'w3',t:'After you attack an enemy ship, you may suffer 2 damage to deal it 1 critical damage.'},
+  u_captive:{n:'Captive Informant',slot:'C',pts:3,uniq:1,fac:1,ex:'w3',t:'Once per round, the first ship to declare you as a target receives 1 stress token.'},
+  u_instr:{n:'Flight Instructor',slot:'C',pts:4,ex:'w3',t:'When defending, you may reroll 1 focus result; against an attacker with pilot skill 2 or lower, you may reroll 1 blank instead.'},
+  u_nav:{n:'Navigator',slot:'C',pts:3,ex:'w3',t:'When you reveal a maneuver, you may switch to another maneuver with the same bearing (no red while stressed).'},
+  t_warden:{n:'Iron Warden',slot:'Ti',pts:0,ex:'w2',ship:'warden',uniq:1,t:'Your upgrade bar gains a torpedo slot.',addSlot:'Tp'},
+  t_lucky:{n:'Lucky Streak',slot:'Ti',pts:1,ex:'w2',ship:'hauler',uniq:1,t:'Your action bar gains evade.',addAct:'E'},
+  t_kite:{n:'Rusted Kite',slot:'Ti',pts:3,ex:'w3',ship:'kestrel',uniq:1,t:'In the end phase, do not remove your unused focus tokens.'},
+  t_writ:{n:'Writ of Passage',slot:'Ti',pts:3,ex:'w3',ship:'herald',uniq:1,t:'When you acquire a target lock, you may lock any enemy ship on the battlefield.'},
+  m_stealth:{n:'Stealth Device',slot:'Mo',pts:3,ex:'w2',t:'+1 agility. If an attack hits you, discard this card.'},
+  m_shield:{n:'Shield Upgrade',slot:'Mo',pts:4,ex:'w2',t:'+1 shield value.',onAdd:s=>{s.sh++;s.shMax++}},
+  m_engine:{n:'Engine Upgrade',slot:'Mo',pts:4,ex:'w2',t:'Your action bar gains boost.',addAct:'BO'},
+  m_apl:{n:'Anti-Pursuit Lasers',slot:'Mo',pts:2,ex:'w3',large:1,t:'After an enemy maneuver makes it overlap you, roll 1 attack die: on a hit or crit, that ship suffers 1 damage.'}});
+// restrictions: title to its ship, size-limited cards, faction crew
+const _upFor=upgradesFor;
+upgradesFor=function(pk,ex){const P=PILOTS[pk],T=SHIPS[P.ship],fac=T.fac;const slots=P.u.slice();
+  return Object.keys(UPGRADES).filter(k=>{const U=UPGRADES[k];return (slots.includes(U.slot)||(U.slot==='Tp'&&false))&&(!U.ex||(ex&&ex[U.ex]))&&(!U.ship||U.ship===P.ship)&&(U.fac==null||U.fac===fac)&&(!U.small||T.base!=='L')&&(!U.large||T.base==='L')})};
+// ---------- rules hooks ----------
+const up=(s,id)=>s.ups.some(u=>u.id===id&&!u.gone);
+const upT=(s,id)=>up(s,id)&&!(UPGRADES[id].slot==='T'&&crit(s,'wounded'));// talents are ignored by a wounded pilot
+const within=(a,b,r)=>baseDist(a,B(a),b,B(b))<=r*RANGE;
+function friendsOf(s){return alive().filter(o=>o.side===s.side&&o!==s)}
+function exPS(s){return (upT(s,'u_oldinst')?2:0)}
+function exExtraBar(s){const out=[];s.ups.forEach(u=>{const U=UPGRADES[u.id];if(U&&U.addAct&&!u.gone)out.push(U.addAct)});return out}
+function exAgility(s){return (up(s,'m_stealth')?1:0)-(s.flags.allin?1:0)}
+function exPrimary(s){return s.flags.allin?1:0}
+function exColor(s,m){if(!m)return m;let c=m.c;if(up(s,'u_assist')&&m.s<=2&&m.s>0)c='g';if(up(s,'u_nib')&&m.t==='S')c='g';if(s.flags.adren&&c==='r')c='w';return c===m.c?m:Object.assign({},m,{c})}
+function exCanActStressed(s){return pilotHas(s,'tycho')}
+function isIonized(s){return s.base==='L'?s.ion>=2:s.ion>=1}// large ships need 2 ion tokens [R15]
+// stress: every token goes through here so "receive stress" abilities trigger
+function addStress(s,n,why){n=n||1;for(let i=0;i<n;i++){const y=friendsOf(s).find(o=>pilotHas(o,'yorr')&&o.stress<=2&&within(o,s,2));const t=y||s;t.stress++;if(y)lg(y.side,`${sname(y)} takes the stress token for ${sname(s)}.`);
+    if(pilotHas(t,'soontir')){t.focus++;lg(t.side,`${sname(t)} turns the pressure into focus.`)}}fx('stress',{id:s.id})}
+// ---- reveal chain: optional choices at reveal time, asked of humans and decided for computers ----
+function exReveal(s,m,stage,cont){stage=stage||0;const human=isHuman(s.side);
+  const ask=(key,title,text,opts)=>{if(human){G.q={side:s.side,key,title,text,opts,ctx:{id:s.id,m,stage}};G.phase='ask';refresh();return true}return false};
+  // 0: early warning sensors
+  if(stage===0&&up(s,'u_early')&&!s.stress&&!crit(s,'noact')){if(ask('early','Early Warning Sensors',`Take a free action before revealing? (You then skip your action step.)`,[{k:'y',l:'Yes, act first'},{k:'n',l:'No'}]))return;
+    if(aiWantsEarly(s)){s.flags.pre=true;G.phase='action';G.preCtx={id:s.id,m};refresh();schedule();return}}
+  if(stage<=1&&s.ups.some(u=>!u.gone&&UPGRADES[u.id].bomb)){const u=s.ups.find(u=>!u.gone&&UPGRADES[u.id].bomb);const U=UPGRADES[u.id];
+    if(ask('bomb',U.n,`Drop a ${U.bomb==='quake'?'quake charge':'plasma bomb'} behind you? It detonates at the end of activation, hitting every ship at range 1.`,[{k:'y',l:'Drop it'},{k:'n',l:'Keep it'}]))return;
+    if(aiWantsBomb(s))dropBomb(s,u)}
+  if(stage<=2&&pilotHas(s,'boba')&&m.t==='B'){const other=dialOf(s).find(x=>x.t==='B'&&x.s===m.s&&x.d===-m.d);if(other){if(ask('boba',`${s.name}: switch banks?`,`You revealed ${mText(m)}. Switch to ${mText(other)}?`,[{k:'n',l:'Keep '+mText(m)},{k:'y',l:'Switch to '+mText(other)}]))return;
+      if(aiBetter(s,other,m))m=other}}
+  if(stage<=3&&up(s,'u_nav')){const opts=dialOf(s).filter(x=>x!==m&&x.t===m.t&&x.d===m.d&&!(s.stress&&x.c==='r'));if(opts.length){if(ask('nav','Navigator',`Switch ${mText(m)} to another maneuver with the same bearing?`,[{k:'-',l:'Keep '+mText(m)}].concat(opts.map(x=>({k:dialOf(s).indexOf(x)+'',l:mText(x)+(x.c==='r'?' (red)':x.c==='g'?' (green)':'')})))))return;
+      const b=opts.concat([m]).map(x=>({x,v:aiValue(s,x)})).sort((a,b)=>b.v-a.v)[0];m=b.x}}
+  if(stage<=4&&up(s,'u_adren')&&exColor(s,m).c==='r'){if(ask('adren','Adrenaline',`Discard Adrenaline to fly the red ${mText(m)} as white?`,[{k:'y',l:'Yes'},{k:'n',l:'No'}]))return;
+    if(s.stress||aiValue(s,m)>0){useUp(s,'u_adren');s.flags.adren=true}}
+  cont(m)}
+function resolveAsk(k){const q=G.q;mark('ask:'+q.key+':'+k);G.q=null;const s=ship(q.ctx.id);let m=q.ctx.m;G.phase='activate';
+  if(q.key==='early'){if(k==='y'){s.flags.pre=true;G.phase='action';G.preCtx={id:s.id,m};refresh();return}exReveal(s,m,1,mm=>proceedMove(s,mm));return}
+  if(q.key==='bomb'){if(k==='y')dropBomb(s,s.ups.find(u=>!u.gone&&UPGRADES[u.id].bomb));exReveal(s,m,2,mm=>proceedMove(s,mm));return}
+  if(q.key==='boba'){if(k==='y')m=dialOf(s).find(x=>x.t==='B'&&x.s===m.s&&x.d===-m.d);exReveal(s,m,3,mm=>proceedMove(s,mm));return}
+  if(q.key==='nav'){if(k!=='-')m=dialOf(s)[+k];exReveal(s,m,4,mm=>proceedMove(s,mm));return}
+  if(q.key==='adren'){if(k==='y'){useUp(s,'u_adren');s.flags.adren=true}exReveal(s,m,5,mm=>proceedMove(s,mm));return}
+  if(q.key==='vell'){const d=ship(q.ctx.d);if(k==='y'){lg(s.side,`${sname(s)}'s crew trades 2 damage for a critical on ${sname(d)}.`);dealDamage(s,2,0,null);if(d.alive)dealDamage(d,0,1,s)}afterAttackDone(s);return}
+  if(q.key==='heat'){const h=ship(q.ctx.h);const r=q.ctx.r;if(k==='y'){r.crits--;lg(h.side,`${sname(h)} takes the heat: 1 crit meant for ${sname(ship(q.ctx.d))}.`);dealDamage(h,0,1,ship(q.ctx.a))}finishDamage(q.ctx.a,q.ctx.d,r);return}}
+function aiValue(s,m){const enemyPoses=enemiesOf(s).map(e=>[e,[{x:e.x,y:e.y,h:e.h}]]);return scorePose(s,finalPose(s,B(s),m),m,enemyPoses,[],{noise:0})}
+function aiBetter(s,a,b){return aiValue(s,a)>aiValue(s,b)+.3}
+function aiWantsEarly(s){return false}// computers keep their action for after the move
+function aiWantsBomb(s){return enemiesOf(s).some(e=>within(e,s,2))}
+function useUp(s,id){const u=s.ups.find(u=>u.id===id&&!u.gone);if(u)u.gone=true}
+// ---- bombs and mines ----
+function dropBomb(s,u){const U=UPGRADES[u.id];mark('bomb:'+u.id);u.gone=true;const b=B(s);const p=sub(s,mul(fwd(s.h),b/2+GEO.straight/2+8));const t={id:'b'+(G.bombs.length+Math.random().toString(36).slice(2,6)),k:U.bomb,x:p.x,y:p.y,by:s.side};
+  G.bombs.push(t);lg(s.side,`${sname(s)} drops a ${U.bomb==='quake'?'quake charge':U.bomb==='plasma'?'plasma bomb':'contact mine'}.`);fx('bomb',{b:t.id})}
+const BOMB_R=12;
+function bombPoly(t){const out=[];for(let i=0;i<8;i++){const a=i/8*2*Math.PI;out.push(V(t.x+Math.cos(a)*BOMB_R,t.y+Math.sin(a)*BOMB_R))}return out}
+function detonateBombs(){for(const t of G.bombs.filter(t=>t.k==='quake'||t.k==='plasma')){lg(t.by,`The ${t.k==='quake'?'quake charge':'plasma bomb'} detonates!`);fx('blast',{x:t.x,y:t.y});
+    for(const s of alive()){const d=Math.max(0,polyPointDist(t,corners(s,B(s)))-BOMB_R);if(d<=RANGE){if(t.k==='quake'){lg(s.side,`${sname(s)} is shaken: 1 damage.`);dealDamage(s,1,0,null)}else{lg(s.side,`${sname(s)} is seared: a faceup damage card.`);dealDamage(s,0,1,null)}}}}
+  G.bombs=G.bombs.filter(t=>t.k==='mine')}
+function checkMines(s,tp){for(const t of G.bombs.filter(t=>t.k==='mine')){const P=bombPoly(t);const hit=polyOverlap(corners(s,B(s)),P)||tp.some(p=>polyPointDist(p,P)<=TPL_W/2);
+    if(hit&&s.alive){const d=rollN(ATK_FACES,3);lg(s.side,`${sname(s)} triggers a contact mine: ${diceText(d)}.`);fx('blast',{x:t.x,y:t.y});G.bombs=G.bombs.filter(x=>x!==t);dealDamage(s,cnt(d,'hit'),cnt(d,'crit'),null)}}}
+// ---- after a maneuver ----
+function exAfterMove(s,m,bumpedInto,tp){checkMines(s,tp);
+  if(bumpedInto&&bumpedInto.side!==s.side&&up(bumpedInto,'m_apl')&&s.alive){const f=ATK_FACES[rnd(8)];lg(bumpedInto.side,`${sname(bumpedInto)}'s anti-pursuit lasers fire: ${f}.`);if(f==='hit'||f==='crit')dealDamage(s,1,0,bumpedInto)}
+  if(exColor(s,m).c==='g'&&pilotHas(s,'lando')){const f=friendsOf(s).find(o=>within(o,s,1)&&!o.stress&&SHIPS[o.type].acts.includes('F'));if(f){f.focus++;lg(s.side,`${sname(s)} calls a free focus for ${sname(f)}.`)}}
+  s.flags.adren=false}
+// ---- actions ----
+function exActions(s,out){const bar=SHIPS[s.type].acts;
+  if(up(s,'u_patch')&&s.dmg.some(x=>!x.up))out.push({a:'PA',l:'Mech "Patch": repair',d:UPGRADES.u_patch.t});
+  if(upT(s,'u_lead')){const t=friendsOf(s).filter(o=>within(o,s,2)&&psOf(o)<psOf(s)&&!o.stress);if(t.length)out.push({a:'SL',l:'Wing Leader',d:UPGRADES.u_lead.t,targets:t.map(o=>o.id)})}
+  if(upT(s,'u_snap')){const o=rollOptions(s,true);if(o.length)out.push({a:'EH',l:'Snap Roll',d:UPGRADES.u_snap.t,opts:o})}
+  if(upT(s,'u_hairpin')){const o=[-1,1].map(d=>({m:{s:1,t:'T',d,c:'w'}})).filter(o=>!offBoard(finalPose(s,B(s),o.m),B(s)));if(o.length)out.push({a:'DD',l:'Hairpin',d:UPGRADES.u_hairpin.t,opts:o})}
+  if(upT(s,'u_allin')&&!s.flags.allin)out.push({a:'EX',l:'All-In',d:UPGRADES.u_allin.t});
+  if(up(s,'u_mines'))out.push({a:'PM',l:'Drop a contact mine',d:UPGRADES.u_mines.t});
+  if(up(s,'u_sab')){const t=enemiesOf(s).filter(o=>within(o,s,1)&&o.dmg.some(x=>!x.up));if(t.length)out.push({a:'SB',l:'Sabotage',d:UPGRADES.u_sab.t,targets:t.map(o=>o.id)})}}
+function exDoAction(s,act,arg){
+  if(act==='PA'){const f=DEF_FACES[rnd(8)];const i=s.dmg.findIndex(x=>!x.up);const ok=(f==='evade'||f==='focus')&&i>=0;if(ok)G.disc.push(s.dmg.splice(i,1)[0].c);lg(s.side,`${sname(s)}'s mech patches the hull (${f}): ${ok?'1 damage repaired':'no luck'}.`);return true}
+  if(act==='SL'){const t=ship(arg);if(!t)return false;t.focus++;lg(s.side,`${sname(s)} orders ${sname(t)}: it takes a free focus.`);return true}
+  if(act==='EH'){const o=rollOptions(s,true)[arg];if(!o)return false;const from={x:s.x,y:s.y,h:s.h};Object.assign(s,{x:o.p.x,y:o.p.y});if(!SHIPS[s.type].acts.includes('BR'))addStress(s);
+    const e=enemiesOf(s).find(e=>e.tl===s.id||e.tl2===s.id);if(e){if(e.tl===s.id)e.tl=null;else e.tl2=null;lg(s.side,`${sname(s)} shakes ${sname(e)}'s lock.`)}lg(s.side,`${sname(s)} snap-rolls.`);fx('move',{id:s.id,path:[from,{x:s.x,y:s.y,h:s.h}],dur:ANIM?420:0,roll:true});return true}
+  if(act==='DD'){const o=[-1,1].map(d=>({s:1,t:'T',d,c:'w'}))[arg];if(!o)return false;lg(s.side,`${sname(s)} pulls a hairpin turn.`);s.flags.hairpin=true;
+    executeMove(s,o,()=>{addStress(s);if(!SHIPS[s.type].acts.includes('BO')&&s.alive){const d=rollN(ATK_FACES,2);lg(s.side,`${sname(s)} strains its frame: ${diceText(d)}.`);dealDamage(s,cnt(d,'hit'),cnt(d,'crit'),null)}});return true}
+  if(act==='EX'){s.flags.allin=true;lg(s.side,`${sname(s)} goes all-in: +1 attack, -1 agility this round.`);return true}
+  if(act==='PM'){dropBomb(s,s.ups.find(u=>u.id==='u_mines'&&!u.gone));G.bombs[G.bombs.length-1].k='mine';return true}
+  if(act==='SB'){const t=ship(arg);if(!t)return false;const f=ATK_FACES[rnd(8)];lg(s.side,`${sname(s)} sabotages ${sname(t)} (${f}).`);if(f==='hit'||f==='crit'){const down=t.dmg.filter(x=>!x.up);const x=down[rnd(down.length)];if(x){x.up=true;x.r=G.round;lg(t.side,`${sname(t)}: ${DAMAGE[x.c].n} flips faceup.`);critNow(t,x);if(t.alive&&hullDmg(t)>=t.hull)destroy(t,`${sname(t)} is destroyed!`)}}return true}
+  return false}
+function exFreeAction(s,act){if(act==='skip'||act.startsWith('RP')&&false)return false;
+  if(pilotHas(s,'vader')&&!s.flags.second){s.flags.second=true;lg(s.side,`${sname(s)} takes a second action.`);return true}
+  // Redline: offer one more action from the action bar; the stress is only taken if that action is used
+  if(upT(s,'u_redline')&&!s.flags.redline&&!crit(s,'noact')){s.flags.redline=true;if(!isHuman(s.side)&&!aiWantsRedline(s))return false;s.flags.redlining=true;return true}
+  return false}
+function aiWantsRedline(s){return enemiesOf(s).some(e=>within(e,s,3))}
+// ---- start of combat ----
+function exStartCombat(){for(const s of alive()){if(upT(s,'u_pack'))mark('pack?')}for(const s of alive()){s.flags.psT=null}
+  for(const s of alive()){
+    if(pilotHas(s,'roark')){const f=friendsOf(s).filter(o=>within(o,s,3)).sort((a,b)=>psOf(a)-psOf(b))[0];if(f){f.flags.psT=12;lg(s.side,`${sname(s)} vectors ${sname(f)}: pilot skill 12 this phase.`)}}
+    if(upT(s,'u_pack')){const f=friendsOf(s).filter(o=>within(o,s,1)&&psOf(o)<psOf(s))[0];if(f){f.flags.psT=psOf(s);lg(s.side,`${sname(s)} lends ${sname(f)} its pilot skill.`)}}
+    if(pilotHas(s,'kyle')&&s.focus>0){const f=friendsOf(s).filter(o=>within(o,s,3)&&!o.focus)[0];if(f){s.focus--;f.focus++;lg(s.side,`${sname(s)} passes a focus to ${sname(f)}.`)}}
+    if(pilotHas(s,'jendon')&&s.tl){const f=friendsOf(s).filter(o=>within(o,s,1)&&!o.tl)[0];if(f){f.tl=s.tl;s.tl=null;lg(s.side,`${sname(s)} hands its lock to ${sname(f)}.`)}}}}
+// ---- weapons and dice ----
+function exWeaponNeedOK(s,w,o){if(w.need==='TL'&&(s.tl===o.id||s.tl2===o.id))return true;if(w.need==='TL'&&upT(s,'u_snapeye')&&s.focus>0)return true;if(w.need==='F'&&s.focus>0)return true;return !w.need}
+function exRange(s,w){if(w.k!=='P'&&pilotHas(s,'rhymer'))return [Math.max(1,w.rmin-1),Math.min(3,w.rmax+1)];return [w.rmin,w.rmax]}
+function exTouchOK(s,o){return pilotHas(s,'arvel')}
+function exAtkBonus(s,d,w,t){let n=0;if(pilotHas(s,'backstab')&&!arcReach(d,B(d),s,B(s),d.arc))n++;
+  const jan=friendsOf(s).find(o=>pilotHas(o,'jan')&&!o.stress&&within(o,s,3));if(jan){addStress(jan);n++;lg(jan.side,`${sname(jan)} feeds ${sname(s)} targeting data: +1 attack die.`)}
+  if(up(d,'u_captive')&&!d.flags.captive){d.flags.captive=true;addStress(s);lg(d.side,`${sname(d)}'s informant rattles ${sname(s)}: 1 stress.`)}
+  return n}
+function exDefBonus(d,A){const s=ship(A.a);return (pilotHas(s,'wedge')?-1:0)}
+// defender modifies the attack dice first (1e order) [R11]
+function exDAMods(){const A=G.atk,d=ship(A.d),s=ship(A.a),out=[];if(upT(d,'u_slip')&&!d.stress&&!A.used.includes('slip')&&A.dice.some(f=>f==='hit'||f==='crit'))out.push({k:'slip',l:'Slippery: force a reroll',d:'Take 1 stress; the attacker rerolls its best die.'});
+  if(up(d,'u_jam')&&!A.used.includes('jam')&&cnt(A.dice,'hit'))out.push({k:'jam',l:'Jamming Array',d:'Change 1 of the attacker\'s hits into a focus.'});return out}
+function exApplyDAMod(k){mark('damod:'+k);const A=G.atk,d=ship(A.d);if(k==='slip'){A.used.push('slip');addStress(d);const i=A.dice.indexOf('crit')>=0?A.dice.indexOf('crit'):A.dice.indexOf('hit');A.dice[i]=ATK_FACES[rnd(8)];lg(d.side,`${sname(d)} slips away: the attacker rerolls one die (${diceText(A.dice)}).`)}
+  if(k==='jam'){A.used.push('jam');const i=A.dice.indexOf('hit');A.dice[i]='focus';A.jammed=i;lg(d.side,`${sname(d)} jams one hit: ${diceText(A.dice)}.`)}}
+function exAMods(out){const A=G.atk,s=ship(A.a),d=ship(A.d);const hex=pilotHas(d,'curse');const U=A.w!=='P'?UPGRADES[s.ups[A.ups].id].wpn:{};const blanks=cnt(A.dice,'blank');
+  if(!hex&&pilotHas(s,'horton')&&A.rg>=2&&blanks&&!A.used.includes('horton'))out.push({k:'horton',l:`${s.name}: reroll blanks`,d:'Reroll all your blank results.'});
+  if(!hex&&pilotHas(s,'han')&&!A.used.includes('han'))out.push({k:'han',l:`${s.name}: reroll everything`,d:'Reroll all of your attack dice.'});
+  const how=friendsOf(s).find(o=>pilotHas(o,'howl')&&within(o,s,1));if(!hex&&how&&A.w==='P'&&!A.used.includes('howl')&&A.dice.some(f=>f==='blank'||f==='focus'))out.push({k:'howl',l:`${how.name}: reroll 1 die`,d:'Reroll 1 blank or focus result.'});
+  const jon=friendsOf(s).find(o=>pilotHas(o,'jonus')&&within(o,s,1));if(!hex&&jon&&A.w!=='P'&&!A.used.includes('jonus'))out.push({k:'jonus',l:`${jon.name}: reroll up to 2`,d:'Reroll up to 2 blank or focus results.'});
+  if(!hex&&pilotHas(s,'krassis')&&A.w!=='P'&&!A.used.includes('krassis'))out.push({k:'krassis',l:`${s.name}: reroll 1 die`,d:'Reroll 1 blank or focus result.'});
+  if(!hex&&pilotHas(s,'ibtisam')&&s.stress&&!A.used.includes('ibt'))out.push({k:'ibt',l:`${s.name}: reroll 1 die`,d:'While stressed, reroll 1 die.'});
+  if(pilotHas(s,'gundark')&&A.rg===1&&cnt(A.dice,'hit')&&!A.used.includes('gundark'))out.push({k:'gundark',l:`${s.name}: hit → crit`,d:'Change 1 hit to a crit.'});
+  if(up(s,'u_hired')&&A.rg===3&&cnt(A.dice,'hit')&&!A.used.includes('hired'))out.push({k:'hired',l:'Hired Copilot: hit → crit',d:'Change 1 hit to a crit.'});
+  if(U.b2h&&blanks&&!A.used.includes('b2h'))out.push({k:'b2h',l:'Shock Missiles: blank → hit',d:'Change 1 blank to a hit.'});
+  if(U.b2f&&blanks&&!A.used.includes('b2f'))out.push({k:'b2f',l:'Heavy torpedo: blanks → focus',d:'Change up to 3 blanks to focus.'});
+  if(s.flags.gunnerFocus&&A.w==='P'&&cnt(A.dice,'focus')&&!A.used.includes('rook'))out.push({k:'rook',l:'Sable Rook: focus → hit',d:'Change 1 focus to a hit.'})}
+function rerollIdx(A,n,filter){let k=0;A.dice=A.dice.map((f,i)=>k<n&&filter(f,i)?(k++,ATK_FACES[rnd(8)]):f)}
+function exApplyAMod(k){const A=G.atk,s=ship(A.a);const bad=(f,i)=>(f==='blank'||f==='focus')&&i!==A.jammed;A.used.push(k);
+  if(k==='horton')rerollIdx(A,99,(f,i)=>f==='blank'&&i!==A.jammed);
+  else if(k==='han')rerollIdx(A,99,(f,i)=>i!==A.jammed);
+  else if(k==='howl'||k==='krassis'||k==='ibt')rerollIdx(A,1,bad);
+  else if(k==='jonus')rerollIdx(A,2,bad);
+  else if(k==='gundark'||k==='hired'){const i=A.dice.indexOf('hit');A.dice[i]='crit'}
+  else if(k==='b2h'){const i=A.dice.indexOf('blank');A.dice[i]='hit'}
+  else if(k==='b2f'){let n=3;A.dice=A.dice.map(f=>f==='blank'&&n>0?(n--,'focus'):f)}
+  else if(k==='rook'){const i=A.dice.indexOf('focus');A.dice[i]='hit';s.flags.gunnerFocus=false}
+  else return false;lg(s.side,`${sname(s)} modifies the attack: ${diceText(A.dice)}.`);return true}
+function exDMods(out){const A=G.atk,d=ship(A.d),s=ship(A.a);
+  if(up(d,'u_instr')&&!A.used.includes('instr')&&(cnt(A.def,'focus')||(psOf(s)<=2&&cnt(A.def,'blank'))))out.push({k:'instr',l:'Flight Instructor: reroll 1',d:'Reroll 1 focus (or a blank against pilot skill 2 or lower).'});
+  if(pilotHas(d,'ibtisam')&&d.stress&&!A.used.includes('ibtd')&&A.def.some(f=>f!=='evade'))out.push({k:'ibtd',l:`${d.name}: reroll 1 die`,d:'While stressed, reroll 1 die.'})}
+function exApplyDMod(k){const A=G.atk,d=ship(A.d),s=ship(A.a);A.used.push(k);
+  if(k==='instr'){const i=psOf(s)<=2&&A.def.indexOf('blank')>=0?A.def.indexOf('blank'):A.def.indexOf('focus');if(i>=0)A.def[i]=DEF_FACES[rnd(8)]}
+  else if(k==='ibtd'){const i=A.def.findIndex(f=>f!=='evade');if(i>=0)A.def[i]=DEF_FACES[rnd(8)]}else return false;lg(d.side,`${sname(d)} rerolls a defense die: ${diceText(A.def)}.`);return true}
+// how many hits get through, with uncancellable results [R11]
+function exPreview(A){const s=ship(A.a),U=A.w!=='P'?UPGRADES[s.ups[A.ups].id].wpn:{};let hits=cnt(A.dice,'hit'),crits=cnt(A.dice,'crit'),ev=cnt(A.def||[],'evade');
+  if(U.hard){const c=Math.min(ev,crits);crits-=c;ev-=c;return {hits,crits}}
+  let lockC=pilotHas(s,'tennumb')&&crits?1:0;crits-=lockC;const c1=Math.min(ev,hits);hits-=c1;ev-=c1;const cancelled=Math.min(ev,crits);crits-=cancelled;A.critCancelled=cancelled>0;return {hits,crits:crits+lockC}}
+// after the damage of an attack
+function exAfterAttack(s,d,A,r){const U=A.w!=='P'?UPGRADES[s.ups[A.ups].id].wpn:{};const hit=r.hits+r.crits>0;
+  if(pilotHas(s,'kath')&&A.critCancelled&&d.alive){addStress(d);lg(s.side,`${sname(s)} rattles ${sname(d)}: 1 stress.`)}
+  if(U.splash&&hit)for(const o of alive().filter(o=>o!==d&&within(o,d,1))){lg(o.side,`${sname(o)} is caught in the missile burst: 1 damage.`);dealDamage(o,1,0,s)}
+  if(hit&&up(d,'m_stealth')){useUp(d,'m_stealth');lg(d.side,`${sname(d)}'s stealth device burns out.`)}
+  if(up(s,'u_track')&&d.alive&&!s.tl){mark('track');s.tl=d.id;lg(s.side,`${sname(s)}'s tracking computer locks ${sname(d)}.`)}
+  if(A.spentTL&&up(s,'u_relock')&&d.alive){const f=DEF_FACES[rnd(8)];if(f==='evade'){s.tl=d.id;lg(s.side,`${sname(s)}'s mech relocks ${sname(d)}.`)}}
+  if(U.twice&&!A.second&&d.alive){mark('twice');return 'again'}
+  if(!hit&&!s.flags.gunned&&(up(s,'u_tailgun')||up(s,'u_rook'))&&d.alive){s.flags.gunned=true;mark('gunner');return 'gunner'}
+  if(pilotHas(s,'turr')){const o=rollOptions(s).concat([]);const bo=SHIPS[s.type].acts.includes('BO')?boostOptions(s):[];
+    const best=(o.map(x=>x.p).concat(bo.map(x=>x.p))).map(p=>({p,v:enemiesOf(s).reduce((t,e)=>t-threatTo(e,e,s,p),0)})).sort((a,b)=>b.v-a.v)[0];
+    if(best&&best.v>enemiesOf(s).reduce((t,e)=>t-threatTo(e,e,s,s),0)+.2){const from={x:s.x,y:s.y,h:s.h};Object.assign(s,{x:best.p.x,y:best.p.y,h:normA(best.p.h)});lg(s.side,`${sname(s)} slips away after firing.`);fx('move',{id:s.id,path:[from,{x:s.x,y:s.y,h:s.h}],dur:ANIM?420:0,roll:true})}}
+  if(up(s,'u_vell')&&d.alive&&s.alive){if(isHuman(s.side)){G.q={side:s.side,key:'vell',title:'Inquisitor Vell',text:`Suffer 2 damage to deal ${d.name} 1 critical damage?`,opts:[{k:'y',l:'Do it'},{k:'n',l:'No'}],ctx:{id:s.id,d:d.id}};G.phase='ask';return 'ask'}
+    if(remaining(s)>4&&remaining(d)<=3){lg(s.side,`${sname(s)}'s crew trades 2 damage for a critical on ${sname(d)}.`);dealDamage(s,2,0,null);if(d.alive)dealDamage(d,0,1,s)}}
+  return null}
+// a faceup card is about to be dealt: return false to keep it facedown
+function exFaceup(d,src){if(pilotHas(d,'chewie')){lg(d.side,`${sname(d)} shrugs it off: the card goes facedown.`);return false}return true}
+function exDealCard(d,src){if(up(d,'u_brakk')){mark('brakk');useUp(d,'u_brakk');if(d.sh<d.shMax)d.sh++;lg(d.side,`${sname(d)}'s copilot Brakk patches it up: the damage card is discarded and a shield recovered.`);return false}return true}
+function exChooseCrit(src,d){if(src&&pilotHas(src,'maarek')){const three=[drawDamage(),drawDamage(),drawDamage()];const rank=c=>({direct:5,cockpit:4,blinded:3,weak:3,engine:2,frame:2,fire:2,noact:2,wounded:2}[DAMAGE[c].k]||1);three.sort((a,b)=>rank(b)-rank(a));G.disc.push(three[1],three[2]);lg(src.side,`${sname(src)} picks the worst of 3 damage cards.`);return three[0]}return null}
+function exKeepFocus(s){return up(s,'t_kite')}
+function exEndPhase(s){if(up(s,'u_scrap')){const x=s.dmg.find(x=>x.up&&DAMAGE[x.c].tr==='Ship');if(x){mark('scrap');x.up=false;lg(s.side,`${sname(s)}'s mech flips ${DAMAGE[x.c].n} facedown.`)}}s.flags.allin=false;s.flags.second=false;s.flags.redline=false;s.flags.gunned=false;s.flags.captive=false;s.flags.psT=null}
+function exDelayDeath(s){return pilotHas(s,'felswrath')&&G.phase!=='end'}
+function exLockTargets(s,list){const kagi=list.filter(o=>pilotHas(ship(o),'kagi'));if(kagi.length)return kagi;if(up(s,'t_writ'))return enemiesOf(s).map(o=>o.id);return list}
+function exAfterLock(s,t){if(pilotHas(s,'dutch')){const f=friendsOf(s).find(o=>within(o,s,2)&&!o.tl&&!o.stress);if(f){f.tl=t.id;lg(s.side,`${sname(f)} shares ${sname(s)}'s lock on ${sname(t)}.`)}}
+  if(up(s,'u_fct')&&!s.tl2){const o=enemiesOf(s).find(o=>o!==t&&within(o,s,3));if(o){s.tl2=o.id;lg(s.side,`${sname(s)}'s fire-control tech also locks ${sname(o)}.`)}}}
+function exFocusSpent(s){if(pilotHas(s,'garven')){const f=friendsOf(s).find(o=>within(o,s,2));if(f){f.focus++;lg(s.side,`${sname(s)} passes the spent focus to ${sname(f)}.`)}}}
+RULES_HTML+=`<h3>Expansions (waves 1-3)</h3><p><b>Turrets</b> fire in any direction; the <b>Warden gunship</b> also fires backwards. <b>Ion</b> hits deal 1 damage and an ion token: an ionised ship drifts a white straight 1 next round (large ships need 2 tokens). <b>Bombs</b> drop behind a ship and blow up at the end of movement, hitting everything at range 1; <b>mines</b> go off when a ship touches them. Some upgrades let the <b>defender tamper with the attack dice</b> before the attacker modifies them. The <b>Herald shuttle</b> can come to a full stop. Build your own squadron with <b>Custom squads</b> on the start screen (100 points; unique names once).</p>`;
 
 </script>
 <script>
@@ -254,6 +549,7 @@ function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[
 const ATK_FACES=['hit','hit','hit','crit','focus','focus','blank','blank'];// [R1]
 const DEF_FACES=['evade','evade','evade','focus','focus','blank','blank','blank'];// [R2]
 function lg(side,t){G.log.unshift({s:side,t});if(G.log.length>300)G.log.length=300;if(typeof announce==='function')announce(t)}
+function mark(k){if(G)(G.fired=G.fired||{})[k]=(G.fired[k]||0)+1}
 function fx(k,d){UI.fx.push(Object.assign({k,t:Date.now()},d||{}));if(UI.fx.length>60)UI.fx.shift()}
 const ship=id=>G.ships.find(s=>s.id===id);
 const alive=()=>G.ships.filter(s=>s.alive);
@@ -268,15 +564,15 @@ const ab=s=>crit(s,'wounded')?null:PILOTS[s.pilot].ab;// a wounded pilot's abili
 const pilotHas=(s,k)=>ab(s)===k;
 const talentOn=(s,id)=>hasUp(s,id)&&!crit(s,'wounded');
 function hullDmg(s){return s.dmg.reduce((a,x)=>a+(x.up&&DAMAGE[x.c].k==='direct'?2:1),0)}
-function agility(s){return Math.max(0,s.agi-(crit(s,'frame')?1:0)+(s.flags.juke?1:0))}
-function primary(s){return Math.max(0,s.atk-(crit(s,'weak')?1:0))}
-function psOf(s){return s.dmg.some(x=>x.up&&DAMAGE[x.c].k==='cockpit'&&x.r<G.round)?0:s.ps}
+function agility(s){return Math.max(0,s.agi-(crit(s,'frame')?1:0)+(s.flags.juke?1:0)+exAgility(s))}
+function primary(s){return Math.max(0,s.atk-(crit(s,'weak')?1:0)+exPrimary(s))}
+function psOf(s){if(s.flags.psT!=null&&(G.phase==='combat'||G.phase==='target'||G.phase==='amod'||G.phase==='dmod'||G.phase==='damod'))return s.flags.psT;return s.dmg.some(x=>x.up&&DAMAGE[x.c].k==='cockpit'&&x.r<G.round)?0:s.ps+exPS(s)}
 // ---- setup ----
 function newGame(opts){if(typeof opts==='string'){const m=opts;opts={players:m==='ai'?[{human:false},{human:false}]:m==='hot'?[{human:true},{human:true}]:[{human:true},{human:false}]};if(typeof DEFSIZE!=='undefined'&&DEFSIZE){const z=SIZES.find(z=>z.k===DEFSIZE);if(z)opts.sizeK=z.k}}
   opts=opts||{};const seed=opts.seed!=null?opts.seed:DEFSEED!=null?DEFSEED:Math.floor(Math.random()*4294967296);
   G={v:1,seed,rng:seed>>>0,round:0,turn:0,phase:'setup',step:0,log:[],ships:[],rocks:[],deck:[],disc:[],winner:null,winText:'',
     fac:opts.fac||[0,1],players:(opts.players||[{human:true,lvl:'normal'},{human:false,lvl:'normal'}]).map(p=>Object.assign({human:false,lvl:'normal'},p)),
-    ex:opts.ex||DEFEX||{},mission:opts.mission||'dogfight',init:0,order:[],oi:0,cur:null,touch:[],moves:[],pts:[0,0],stats:{}};
+    ex:opts.ex||DEFEX||{},mission:opts.mission||'dogfight',init:0,bombs:[],q:null,order:[],oi:0,cur:null,touch:[],moves:[],pts:[0,0],stats:{}};
   if(LVMIX)G.players.forEach((p,k)=>{p.lvl=LVMIX[k%LVMIX.length];p.human=false});
   G.deck=shuffle(buildDamageDeck());
   const z=opts.sizeK&&SIZES.find(z=>z.k===opts.sizeK);const squads=opts.squads||(z?[z.squad(G.fac[0],G.ex),z.squad(G.fac[1],G.ex)]:[defaultSquad(G.fac[0]),defaultSquad(G.fac[1])]);
@@ -287,7 +583,7 @@ function newGame(opts){if(typeof opts==='string'){const m=opts;opts={players:m==
   UI.choice=null;UI.busy=false;UI.info=false;UI.sel=null;UI.fx=[];UI.banner='';
   startRound()}
 function addShip(side,e){const P=PILOTS[e.p],T=SHIPS[P.ship];const id='s'+(G.ships.length+1);
-  const s={id,side,pilot:e.p,type:P.ship,name:P.n,ps:P.ps,atk:T.atk,agi:T.agi,hull:T.hull,sh:T.sh,shMax:T.sh,base:T.base||'S',arc:T.arc||'F',
+  const O=P.ov||{};const s={id,side,pilot:e.p,type:P.ship,name:P.n,ps:P.ps,atk:O.atk!=null?O.atk:T.atk,agi:O.agi!=null?O.agi:T.agi,hull:O.hull||T.hull,sh:O.sh!=null?O.sh:T.sh,shMax:O.sh!=null?O.sh:T.sh,base:T.base||'S',arc:T.arc||'F',
     x:0,y:0,h:0,dmg:[],crits:[],stress:0,focus:0,evade:0,ion:0,tl:null,dial:null,alive:true,ups:(e.u||[]).map(u=>({id:u,gone:false,used:0})),
     flags:{},bumped:false,rockHit:false,fired:false,moved:false,cost:pilotCost(e)};
   for(const u of s.ups){const U=UPGRADES[u.id];if(U&&U.onAdd)U.onAdd(s)}
@@ -300,7 +596,7 @@ function deploy(){for(const side of [0,1]){const mine=G.ships.filter(s=>s.side==
   mine.forEach((s,k)=>{const x=MAT/2+(k-(n-1)/2)*Math.min(170,(MAT-160)/Math.max(1,n));const y=side===0?45+B(s)/2:MAT-45-B(s)/2;Object.assign(s,{x,y,h:side===0?Math.PI/2:-Math.PI/2})})}}
 // ---- round flow ----
 function startRound(){if(G.winner)return;G.round++;G.turn=G.round;G.phase='plan';G.step=1;G.touch=[];
-  for(const s of alive()){s.dial=null;s.bumped=false;s.rockHit=false;s.fired=false;s.moved=false;s.acted=false;s.flags.noAtk=false;s.flags.juke=false;s.flags.dead=false;s.flags.bonus=0}
+  for(const s of alive()){s.dial=null;s.bumped=false;s.rockHit=false;s.fired=false;s.moved=false;s.acted=false;s.flags.noAtk=false;s.flags.juke=false;s.flags.dead=false;s.flags.bonus=0;s.flags.skipAct=false;s.flags.pre=false;s.flags.adren=false}
   lg(-1,`Round ${G.round}: set your maneuver dials.`);
   for(const k of [0,1])if(!isHuman(k)&&!(typeof NET!=='undefined'&&NET.on&&NET.role==='client'))aiPlan(k);
   if([0,1].every(planDone)){refresh();beginActivationLater();return}
@@ -315,79 +611,90 @@ function nextActivation(){if(G.winner)return;
   if(G.oi>=G.order.length){beginCombat();return}
   const s=ship(G.order[G.oi]);G.cur=s.id;revealAndMove(s)}
 function dialOf(s){return SHIPS[s.type].dial}
-function revealAndMove(s){let m=dialOf(s)[s.dial];
-  if(s.ion>0){m={s:1,t:'S',d:0,c:'w'};lg(s.side,`${sname(s)} is ionised and drifts straight 1.`);s.ion=0;s.flags.ionMove=true}
-  else if(s.stress>0&&m.c==='r'){// [R4] a stressed ship can't fly red; its opponent picks a white maneuver instead
-    const wh=dialOf(s).map((x,i)=>({x,i})).filter(o=>o.x.c!=='r');const pick=wh.length?aiPickForcedWhite(s,wh):null;
+function revealAndMove(s){let m=exColor(s,dialOf(s)[s.dial]);
+  if(isIonized(s)){m={s:1,t:'S',d:0,c:'w'};lg(s.side,`${sname(s)} is ionised and drifts straight 1.`);s.ion=0;s.flags.ionMove=true;proceedMove(s,m);return}
+  else if(s.ion>0)s.ion=0;// a large ship with a single ion token shrugs it off at reveal [R15]
+  if(s.stress>0&&m.c==='r'){// [R4] a stressed ship can't fly red; its opponent picks a white maneuver instead
+    const wh=dialOf(s).map((x,i)=>({x:exColor(s,x),i})).filter(o=>o.x.c!=='r');const pick=wh.length?aiPickForcedWhite(s,wh):null;
     lg(s.side,`${sname(s)} is stressed and can't fly the red ${mText(m)}; the opponent picks ${pick?mText(pick.x):'nothing'} instead.`);if(pick)m=pick.x}
   if(crit(s,'engine')&&m.t==='T')m=Object.assign({},m,{c:'r'});// engine stutter: turns count as red
-  s.rev=m;executeMove(s,m,()=>afterMove(s,m))}
-function mText(m){return m.t==='S'?`straight ${m.s}`:m.t==='K'?`K-turn ${m.s}`:`${m.t==='B'?'bank':'turn'} ${m.d<0?'left':'right'} ${m.s}`}
+  exReveal(s,m,0,mm=>proceedMove(s,mm))}
+function proceedMove(s,m){m=exColor(s,m);if(crit(s,'engine')&&m.t==='T')m=Object.assign({},m,{c:'r'});s.rev=m;G.phase='activate';executeMove(s,m,()=>afterMove(s,m))}
+function mText(m){return m.s===0?'full stop':m.t==='S'?`straight ${m.s}`:m.t==='K'?`K-turn ${m.s}`:`${m.t==='B'?'bank':'turn'} ${m.d<0?'left':'right'} ${m.s}`}
 // move with overlap back-up, obstacle and edge checks [R5][R6][R7]
-function executeMove(s,m,done){const b=B(s),p0={x:s.x,y:s.y,h:s.h},L=tplLen(m),total=b+L;let q=total,fin=finalPose(p0,b,m),bumpedInto=null;
+function executeMove(s,m,done){const b=B(s),p0={x:s.x,y:s.y,h:s.h},L=m.s===0?0:tplLen(m),total=m.s===0?0:b+L;let q=total,fin=m.s===0?Object.assign({},p0):finalPose(p0,b,m),bumpedInto=null;
   const others=alive().filter(o=>o!==s);
   const overl=p=>others.find(o=>polyOverlap(corners(p,b),corners(o,B(o))));
   let hit=overl(fin);
-  if(hit){while(q>0){q-=2;const p=poseAt(p0,b,m,q);const o=overl(p);if(!o){fin=Object.assign({},p);bumpedInto=hit;break}hit=o}if(q<=0){fin=Object.assign({},p0);bumpedInto=hit}}
-  const path=[];for(let u=0;u<=Math.min(q,total)+1e-6;u+=Math.max(4,Math.min(q,total)/24))path.push(poseAt(p0,b,m,Math.min(u,q)));path.push(fin);
+  if(hit){while(q>0){q=Math.max(0,q-2);const p=poseAt(p0,b,m,q);const o=overl(p);if(!o){fin=Object.assign({},p);bumpedInto=hit;break}hit=o;if(q===0)break}if(q<=0){q=0;fin=Object.assign({},p0);bumpedInto=hit}}
+  const path=[Object.assign({},p0)];for(let u=4;u<=Math.min(q,total)+1e-6;u+=Math.max(4,Math.min(q,total)/24))path.push(poseAt(p0,b,m,Math.min(u,q)));path.push(fin);// always at least start and end
   s.x=fin.x;s.y=fin.y;s.h=normA(fin.h);s.moved=true;G.moves.push({id:s.id,m,bump:!!bumpedInto});
   fx('move',{id:s.id,path,m,dur:ANIM?Math.min(1100,450+L*3):0});
   if(bumpedInto){s.bumped=true;G.touch.push([s.id,bumpedInto.id]);lg(s.side,`${sname(s)} bumps into ${sname(bumpedInto)} and skips its action.`);fx('bump',{id:s.id})}
   if(offBoard(s,b)){destroy(s,`${sname(s)} flies off the battlefield and is lost.`);done();return}
   // obstacles: the template or the final base overlapping a rock [R7]
-  const tp=tplPoints(p0,b,m,4),baseP=corners(s,b);const touched=[];
+  const tp=m.s===0?[]:tplPoints(p0,b,m,4),baseP=corners(s,b);const touched=[];
   for(const o of G.rocks){const R=rockPoly(o);const on=polyOverlap(baseP,R);const thru=!on&&tp.some(p=>polyPointDist(p,R)<=TPL_W/2);if(on||thru)touched.push({o,on,d:len(sub(o,p0))})}
   touched.sort((a,b)=>a.d-b.d);// resolve the asteroid nearest the start first; one die per asteroid [R7]
   for(const t of touched){if(!s.alive)break;s.rockHit=true;const f=ATK_FACES[rnd(8)];lg(s.side,`${sname(s)} ${t.on?'lands on':'flies through'} an asteroid: rolls ${f}.`);fx('rock',{id:s.id,f});
     if(f==='hit')dealDamage(s,1,0,null);else if(f==='crit')dealDamage(s,0,1,null);if(t.on)s.flags.noAtk=true}
   if((bumpedInto||touched.length)&&crit(s,'stunned')&&s.alive){lg(s.side,`${sname(s)}'s concussed pilot takes 1 damage from the jolt.`);dealDamage(s,1,0,null)}
+  if(s.alive)exAfterMove(s,m,bumpedInto,tp);
   done()}
 function afterMove(s,m){if(!s.alive){G.oi++;refresh();nextActivationLater();return}
-  if(m.c==='r'&&!s.flags.ionMove){s.stress++;lg(s.side,`${sname(s)} flies a red maneuver and takes a stress token.`);fx('stress',{id:s.id});
+  if(m.c==='r'&&!s.flags.ionMove){addStress(s);lg(s.side,`${sname(s)} flies a red maneuver and takes a stress token.`);
     if(crit(s,'breach')){const f=ATK_FACES[rnd(8)];lg(s.side,`${sname(s)}'s hull breach strains: rolls ${f}.`);if(f==='hit')dealDamage(s,1,0,null);if(!s.alive){endActivation(s);return}}}
   if(m.c==='g'&&!s.flags.ionMove){if(s.stress>0){s.stress--;lg(s.side,`${sname(s)} flies a green maneuver and clears a stress token.`)}
     if(hasUp(s,'u_tinker')&&s.sh<s.shMax){s.sh++;lg(s.side,`${sname(s)}'s mech "Tinker" restores a shield.`);fx('shield',{id:s.id,n:0})}
     if(pilotHas(s,'nbeast')&&!s.stress&&!crit(s,'noact')){s.focus++;lg(s.side,`${sname(s)} takes a free focus after its green maneuver.`);fx('token',{id:s.id,k2:'focus'})}}
   s.flags.ionMove=false;
-  if(s.bumped||s.rockHit||s.stress>0||crit(s,'noact')){if(s.stress>0&&!s.bumped&&!s.rockHit)lg(s.side,`${sname(s)} is stressed and can't take an action.`);endActivation(s);return}
+  if(s.flags.skipAct){endActivation(s);return}
+  const stressed=s.stress>0&&!exCanActStressed(s);
+  if(s.bumped||s.rockHit||stressed||(crit(s,'noact')&&!actionsFor(s).length)){if(stressed&&!s.bumped&&!s.rockHit)lg(s.side,`${sname(s)} is stressed and can't take an action.`);endActivation(s);return}
   G.phase='action';refresh();
   if(!isHuman(s.side))schedule()}
-function endActivation(s){s.acted=true;s.flags.done=[];G.phase='activate';G.oi++;refresh();nextActivationLater()}
+function endActivation(s){if(s.flags.pre){s.flags.pre=false;s.flags.skipAct=true;s.flags.done=[];const c=G.preCtx;G.preCtx=null;G.phase='activate';exReveal(s,c.m,1,mm=>proceedMove(s,mm));return}
+  s.acted=true;s.flags.done=[];s.flags.redlining=false;G.phase='activate';G.oi++;refresh();nextActivationLater()}
 function nextActivationLater(){if(!ANIM)nextActivation();else setTimeout(()=>{if(G)nextActivation()},Math.max(350,AIDELAY*.6))}
 // ---- actions [R8] ----
-function actionsFor(s){const T=SHIPS[s.type],out=[];const acts=crit(s,'noact')?[]:T.acts.filter(a=>!(s.flags.done||[]).includes(a));
+function actionsFor(s){const T=SHIPS[s.type],out=[];const acts=crit(s,'noact')?[]:T.acts.concat(exExtraBar(s)).filter((a,i,arr)=>arr.indexOf(a)===i&&!(s.flags.done||[]).includes(a));
   s.ups.forEach((u,i)=>{const U=UPGRADES[u.id];if(U&&U.act&&!u.gone&&!(U.slot==='T'&&crit(s,'wounded'))&&!(s.flags.done||[]).includes(U.act))out.push({a:U.act,l:U.actL,d:U.t,up:i})});
   s.dmg.forEach((x,i)=>{if(x.up&&DAMAGE[x.c].fix&&!(s.flags.done||[]).includes('RP'+i))out.push({a:'RP'+i,l:'Repair: '+DAMAGE[x.c].n,d:DAMAGE[x.c].t})});
+  if(s.flags.redlining)out.length=0;// a redline action must come from the action bar
+  if(!s.flags.redlining){const ex=[];exActions(s,ex);ex.forEach(a=>{if(!(s.flags.done||[]).includes(a.a))out.push(a)})}
   for(const a of acts){if(a==='F')out.push({a:'F',l:'Focus',d:'Take a focus token: change all your focus results to hits when attacking, or to evades when defending.'});
     if(a==='E')out.push({a:'E',l:'Evade',d:'Take an evade token: add one evade result when defending.'});
-    if(a==='TL'){const t=enemiesOf(s).filter(o=>rangeOf(baseDist(s,B(s),o,B(o)))<=3);if(t.length)out.push({a:'TL',l:'Target lock',d:'Lock an enemy within range 1-3: when attacking it, reroll any attack dice.',targets:t.map(o=>o.id)})}
+    if(a==='TL'){const t=exLockTargets(s,enemiesOf(s).filter(o=>rangeOf(baseDist(s,B(s),o,B(o)))<=3).map(o=>o.id)).map(ship);if(t.length)out.push({a:'TL',l:'Target lock',d:'Lock an enemy within range 1-3: when attacking it, reroll any attack dice.',targets:t.map(o=>o.id)})}
     if(a==='BR'){const opts=rollOptions(s);if(opts.length)out.push({a:'BR',l:'Barrel roll',d:'Slide sideways one template.',opts})}
     if(a==='BO'){const opts=boostOptions(s);if(opts.length)out.push({a:'BO',l:'Boost',d:'Surge forward a straight 1 or bank 1.',opts})}}
   return out}
 function poseFree(s,p){const b=B(s);if(offBoard(p,b))return false;if(alive().some(o=>o!==s&&polyOverlap(corners(p,b),corners(o,B(o)))))return false;
   if(G.rocks.some(o=>polyOverlap(corners(p,b),rockPoly(o))))return false;return true}
-function rollOptions(s){const out=[];if(s.base==='L'&&!SHIPS[s.type].largeRoll)return out;for(const dir of [-1,1])for(const sh of [1,0,-1]){const p=rollPose(s,B(s),dir,sh);if(poseFree(s,p))out.push({dir,sh,p})}return out}
+function rollOptions(s,free){const out=[];if(s.base==='L'&&!SHIPS[s.type].largeRoll)return out;for(const dir of [-1,1])for(const sh of [1,0,-1]){const p=rollPose(s,B(s),dir,sh);if(poseFree(s,p))out.push({dir,sh,p})}return out}
 function boostOptions(s){const out=[];for(const m of [{s:1,t:'S',d:0},{s:1,t:'B',d:-1},{s:1,t:'B',d:1}]){const p=finalPose(s,B(s),m);const tp=tplPoints(s,B(s),m,4);
   if(poseFree(s,p)&&!G.rocks.some(o=>{const R=rockPoly(o);return tp.some(q=>polyPointDist(q,R)<=TPL_W/2)}))out.push({m,p})}return out}
 function doAction(s,act,arg){if(G.phase!=='action'||G.cur!==s.id)return false;
   if(act==='skip'){lg(s.side,`${sname(s)} holds its course.`)}
-  else if(act==='F'){s.focus++;lg(s.side,`${sname(s)} focuses.`);fx('token',{id:s.id,k:'focus'})}
+  else if(act==='F'){s.focus+=hasUp(s,'u_scout')?2:1;lg(s.side,`${sname(s)} focuses.`);fx('token',{id:s.id,k2:'focus'})}
   else if(act==='E'){s.evade++;lg(s.side,`${sname(s)} readies an evade.`);fx('token',{id:s.id,k:'evade'})}
-  else if(act==='TL'){const t=ship(arg);if(!t)return false;s.tl=t.id;lg(s.side,`${sname(s)} locks onto ${sname(t)}.`);fx('lock',{id:s.id,to:t.id})}
+  else if(act==='TL'){const t=ship(arg);if(!t)return false;s.tl=t.id;lg(s.side,`${sname(s)} locks onto ${sname(t)}.`);fx('lock',{id:s.id,to:t.id});exAfterLock(s,t)}
   else if(act==='BR'){const o=rollOptions(s)[arg];if(!o)return false;const from={x:s.x,y:s.y,h:s.h};Object.assign(s,{x:o.p.x,y:o.p.y});lg(s.side,`${sname(s)} barrel rolls ${o.dir<0?'left':'right'}.`);fx('move',{id:s.id,path:[from,{x:s.x,y:s.y,h:s.h}],dur:ANIM?420:0,roll:true})}
   else if(act==='BO'){const o=boostOptions(s)[arg];if(!o)return false;const from={x:s.x,y:s.y,h:s.h};Object.assign(s,{x:o.p.x,y:o.p.y,h:normA(o.p.h)});lg(s.side,`${sname(s)} boosts.`);fx('move',{id:s.id,path:[from,{x:s.x,y:s.y,h:s.h}],dur:ANIM?420:0})}
   else if(act==='JK'){s.flags.juke=true;lg(s.side,`${sname(s)}'s mech boosts its agility this round.`);fx('token',{id:s.id,k2:'evade'})}
   else if(act==='MK'){s.flags.dead=true;lg(s.side,`${sname(s)} takes a deadshot focus.`);fx('token',{id:s.id,k2:'focus'})}
   else if(act.startsWith('RP')){const x=s.dmg[+act.slice(2)];if(!x||!x.up)return false;const D=DAMAGE[x.c];const f=ATK_FACES[rnd(8)];const ok=D.fix==='any'||(D.fix==='hit'&&f==='hit')||(D.fix==='hitcrit'&&(f==='hit'||f==='crit'));
     if(ok)x.up=false;lg(s.side,`${sname(s)} tries to repair ${D.n}${D.fix==='any'?'':` (rolls ${f})`}: ${ok?'fixed, the card is flipped facedown':'no luck'}.`)}
-  else return false;
-  (s.flags.done=s.flags.done||[]).push(act);
+  else if(!exDoAction(s,act,arg))return false;
+  mark('act:'+act.replace(/\d+$/,''));(s.flags.done=s.flags.done||[]).push(act);
+  if(s.flags.redlining&&act!=='skip'){s.flags.redlining=false;addStress(s);mark('redline');lg(s.side,`${sname(s)} redlines: a second action for a stress token.`);endActivation(s);return true}
+  if(s.flags.redlining&&act==='skip')s.flags.redlining=false;
+  if(!s.alive){endActivation(s);return true}
   // pilots and upgrades that grant a free action after the first (e.g. [P] "Veteran instincts" style) are handled in data hooks
   const bonus=freeActionHook(s,act);if(bonus){refresh();if(!isHuman(s.side))schedule();return true}
   endActivation(s);return true}
-function freeActionHook(s,act){if(typeof exFreeAction==='function'&&act!=='skip'&&exFreeAction(s,act))return true;return false}
+function freeActionHook(s,act){if(act==='skip'||s.flags.pre)return false;if(exFreeAction(s,act)&&actionsFor(s).length)return true;return false}
 // ---- combat [R10] ----
-function beginCombat(){for(const s of alive())if(crit(s,'fire')){const f=ATK_FACES[rnd(8)];lg(s.side,`${sname(s)}'s cockpit fire flares: rolls ${f}.`);if(f==='hit')dealDamage(s,1,0,null)}if(G.winner)return;
+function beginCombat(){detonateBombs();if(checkWin())return;exStartCombat();for(const s of alive())if(crit(s,'fire')){const f=ATK_FACES[rnd(8)];lg(s.side,`${sname(s)}'s cockpit fire flares: rolls ${f}.`);if(f==='hit')dealDamage(s,1,0,null)}if(G.winner)return;
   G.phase='combat';G.step=3;G.order=psOrder(false).map(s=>s.id);G.oi=0;G.pendingDeath=[];lg(-1,'Combat: ships fire from highest pilot skill down.');nextAttacker()}
 function nextAttacker(){if(G.winner)return;
   while(G.oi<G.order.length){const s=ship(G.order[G.oi]);const psNow=psOf(s);
@@ -399,11 +706,11 @@ function flushDeaths(){const nextPS=G.oi<G.order.length?psOf(ship(G.order[G.oi])
 // every weapon this ship could fire now, with its legal targets
 function weaponsFor(s){if(s.flags.noAtk||crit(s,'noatk'))return [];const out=[];
   const prim={k:'P',n:'Primary weapon',atk:primary(s),rmin:1,rmax:3,arc:s.arc,bonus:true};
-  const list=[prim];s.ups.forEach((u,i)=>{const U=UPGRADES[u.id];if(U&&U.wpn&&!u.gone)list.push({k:'U'+i,n:U.n,atk:U.wpn.atk,rmin:U.wpn.r[0],rmax:U.wpn.r[1],arc:U.wpn.arc||s.arc,need:U.wpn.need,spend:U.wpn.spend,ui:i,bonus:false})});
+  const list=[prim];s.ups.forEach((u,i)=>{const U=UPGRADES[u.id];if(U&&U.wpn&&!u.gone){const w={k:'U'+i,n:U.n,atk:U.wpn.atk,rmin:U.wpn.r[0],rmax:U.wpn.r[1],arc:U.wpn.arc||(s.arc==='T'?'F':s.arc),need:U.wpn.need,spend:U.wpn.spend,ui:i,bonus:false};const r=exRange(s,w);w.rmin=r[0];w.rmax=r[1];list.push(w)}});
   const cand=[];
-  for(const w of list){const t=[];for(const o of enemiesOf(s)){if(G.touch.some(p=>(p[0]===s.id&&p[1]===o.id)||(p[1]===s.id&&p[0]===o.id)))continue;// touching ships can't attack each other [R5]
+  for(const w of list){const t=[];for(const o of enemiesOf(s)){if(G.touch.some(p=>(p[0]===s.id&&p[1]===o.id)||(p[1]===s.id&&p[0]===o.id))&&!exTouchOK(s,o))continue;// touching ships can't attack each other [R5]
       const r=arcReach(s,B(s),o,B(o),w.arc);if(!r)continue;const rg=rangeOf(r.d);if(rg<w.rmin||rg>w.rmax)continue;
-      if(w.need==='TL'&&s.tl!==o.id)continue;if(w.need==='F'&&!s.focus)continue;
+      if(!(G.again&&w.ui!=null)&&!exWeaponNeedOK(s,w,o))continue;
       const obstructed=G.rocks.some(q=>segHitsPoly(r.q,r.p,rockPoly(q)));t.push({id:o.id,rg,obstructed,p:r.p,q:r.q})}
     // a guardian pilot (Brink): friends at range 1 of it can't be attacked if the attacker could attack the guardian instead
     const guard=t.filter(x=>pilotHas(ship(x.id),'biggs'));const ft=t.filter(x=>!guard.some(g=>g.id!==x.id&&ship(g.id).side===ship(x.id).side&&baseDist(ship(g.id),B(ship(g.id)),ship(x.id),B(ship(x.id)))<=RANGE));
@@ -412,70 +719,85 @@ function weaponsFor(s){if(s.flags.noAtk||crit(s,'noatk'))return [];const out=[];
 function declare(s,wk,tid){if(G.phase!=='target'||G.cur!==s.id)return false;
   if(wk==='skip'){s.fired=true;lg(s.side,`${sname(s)} holds fire.`);G.oi++;G.phase='combat';refresh();nextAttackerLater();return true}
   const w=weaponsFor(s).find(x=>x.k===wk);const t=w&&w.targets.find(x=>x.id===tid);if(!t)return false;
-  s.fired=true;const d=ship(tid);
-  if(w.spend==='TL'){s.tl=null}if(w.ui!=null&&UPGRADES[s.ups[w.ui].id].wpn.discard)s.ups[w.ui].gone=true;
-  let nAtk=Math.max(0,w.atk+(w.bonus&&t.rg===1?1:0)+(pilotHas(s,'mauler')&&t.rg===1?1:0)+(s.flags.bonus||0));
+  s.fired=true;const d=ship(tid);mark('wpn:'+w.n);
+  if(w.spend==='TL'&&!G.again){if(s.tl===d.id)s.tl=null;else if(s.tl2===d.id)s.tl2=null;else if(s.focus){s.focus--;lg(s.side,`${sname(s)} spends focus in place of a lock.`)}}if(w.spend==='F'&&s.focus)s.focus--;
+  const WU=w.ui!=null?UPGRADES[s.ups[w.ui].id].wpn:{};if(WU.discard&&(WU.twice?G.again:!G.again))s.ups[w.ui].gone=true;// a two-shot missile is discarded after its second attack
+  let nAtk=Math.max(0,w.atk+(w.bonus&&t.rg===1?1:0)+(pilotHas(s,'mauler')&&t.rg===1?1:0)+(s.flags.bonus||0)+exAtkBonus(s,d,w,t));
   const blind=s.dmg.find(x=>x.up&&DAMAGE[x.c].k==='blinded');if(blind){nAtk=0;blind.up=false;lg(s.side,`${sname(s)} is flash-blinded and rolls no attack dice.`)}
-  G.atk={a:s.id,d:d.id,w:w.k,wn:w.n,rg:t.rg,obs:t.obstructed,bonus:w.bonus,dice:[],def:[],step:'amod',rer:false,spentTL:false,ups:w.ui,used:[]};
-  G.atk.dice=rollN(ATK_FACES,nAtk);lg(s.side,`${sname(s)} fires ${w.k==='P'?'':w.n+' '}at ${sname(d)} (range ${t.rg}${t.obstructed?', obstructed':''}): ${diceText(G.atk.dice)}.`);
-  fx('shot',{a:s.id,d:d.id,p:t.p,q:t.q,w:w.k});G.phase='amod';refresh();if(!isHuman(s.side))schedule();return true}
+  G.atk={a:s.id,d:d.id,w:w.k,wn:w.n,rg:t.rg,obs:t.obstructed,bonus:w.bonus,dice:[],def:[],step:'amod',rer:false,spentTL:w.spend==='TL',ups:w.ui,used:[],ion:!!WU.ion,noEvade:!!WU.noEvade,second:!!G.again,jammed:-1};G.again=false;
+  G.atk.dice=rollN(ATK_FACES,nAtk);if(WU.c2h)G.atk.dice=G.atk.dice.map(f=>f==='crit'?'hit':f);lg(s.side,`${sname(s)} fires ${w.k==='P'?'':w.n+' '}at ${sname(d)} (range ${t.rg}${t.obstructed?', obstructed':''}): ${diceText(G.atk.dice)}.`);
+  fx('shot',{a:s.id,d:d.id,p:t.p,q:t.q,w:w.k,ion:G.atk.ion});
+  if(exDAMods().length){G.phase='damod';refresh();schedule();return true}
+  G.phase='amod';refresh();if(!isHuman(s.side))schedule();return true}
 function nextAttackerLater(){if(!ANIM)nextAttacker();else setTimeout(()=>{if(G)nextAttacker()},Math.max(300,AIDELAY*.5))}
 function rollN(faces,n){const out=[];for(let i=0;i<n;i++)out.push(faces[rnd(8)]);return out}
 const cnt=(d,f)=>d.filter(x=>x===f).length;
 function diceText(d){const o=['crit','hit','evade','focus','blank'].filter(f=>cnt(d,f)).map(f=>cnt(d,f)+' '+f);return o.join(', ')||'no dice'}
 // attacker modification options [R11]
 function atkMods(){const A=G.atk,s=ship(A.a),d=ship(A.d),out=[];const hex=pilotHas(d,'curse');
-  if(!hex&&!A.spentTL&&s.tl===A.d&&(A.w==='P'||!weaponSpendsTL(s,A))){if(A.dice.some(f=>f!=='hit'&&f!=='crit'))out.push({k:'tl',l:'Spend target lock: reroll',d:'Reroll every blank'+(s.focus?'':' and focus')+' result.'})}
+  if(!hex&&!A.spentTL&&(s.tl===A.d||s.tl2===A.d)&&(A.w==='P'||!weaponSpendsTL(s,A))){if(A.dice.some(f=>f!=='hit'&&f!=='crit'))out.push({k:'tl',l:'Spend target lock: reroll',d:'Reroll every blank'+(s.focus?'':' and focus')+' result.'})}
   if(A.w!=='P'&&UPGRADES[s.ups[A.ups].id].wpn.f2c&&!A.used.includes('f2c')&&cnt(A.dice,'focus'))out.push({k:'f2c',l:'Torpedo: focus → crit',d:'Change 1 focus result to a crit.'});
   if(s.flags.dead&&!A.used.includes('dead')&&cnt(A.dice,'focus'))out.push({k:'dead',l:'Deadshot focus',d:'Change 1 focus to a crit and the other focus results to hits.'});
   if(!hex&&s.focus>0&&cnt(A.dice,'focus'))out.push({k:'focus',l:'Spend focus',d:`Turn ${cnt(A.dice,'focus')} focus into hits.`});
-  s.ups.forEach((u,i)=>{const U=UPGRADES[u.id];if(U&&U.amod&&!u.gone&&U.amod.can(s,A))out.push({k:'u'+i,l:U.n,d:U.amod.d})});
-  const P=PILOTS[s.pilot];if(P.amod&&P.amod.can(s,A))out.push({k:'pilot',l:P.n+"'s ability",d:P.amod.d});
+  exAMods(out);
   return out}
 function weaponSpendsTL(s,A){return A.w!=='P'&&UPGRADES[s.ups[A.ups].id].wpn.spend==='TL'}
-function applyAtkMod(k){const A=G.atk,s=ship(A.a);
-  if(k==='tl'){A.spentTL=true;s.tl=null;A.dice=A.dice.map(f=>f==='blank'||(f==='focus'&&!s.focus)?ATK_FACES[rnd(8)]:f);lg(s.side,`${sname(s)} spends its lock and rerolls: ${diceText(A.dice)}.`)}
-  else if(k==='focus'){s.focus--;A.dice=A.dice.map(f=>f==='focus'?'hit':f);lg(s.side,`${sname(s)} spends focus: ${diceText(A.dice)}.`)}
+function applyAtkMod(k){const A=G.atk,s=ship(A.a);mark('amod:'+k);
+  if(k==='tl'){A.spentTL=true;if(s.tl===A.d)s.tl=null;else s.tl2=null;A.dice=A.dice.map((f,i)=>(f==='blank'||(f==='focus'&&!s.focus))&&i!==A.jammed?ATK_FACES[rnd(8)]:f);lg(s.side,`${sname(s)} spends its lock and rerolls: ${diceText(A.dice)}.`)}
+  else if(k==='focus'){s.focus--;A.dice=A.dice.map(f=>f==='focus'?'hit':f);lg(s.side,`${sname(s)} spends focus: ${diceText(A.dice)}.`);exFocusSpent(s)}
   else if(k==='f2c'){A.used.push('f2c');const i=A.dice.indexOf('focus');if(i>=0)A.dice[i]='crit';lg(s.side,`${sname(s)} primes the torpedo: ${diceText(A.dice)}.`)}
   else if(k==='dead'){A.used.push('dead');let one=false;A.dice=A.dice.map(f=>f==='focus'?(one?'hit':(one=true,'crit')):f);lg(s.side,`${sname(s)} takes the deadshot: ${diceText(A.dice)}.`)}
-  else if(k==='pilot'){PILOTS[s.pilot].amod.apply(s,A)}
-  else if(k[0]==='u'){const u=s.ups[+k.slice(1)];UPGRADES[u.id].amod.apply(s,A,u)}
+  else exApplyAMod(k);
   fx('mod',{id:s.id});refresh()}
-function atkDone(){const A=G.atk,d=ship(A.d);const n=Math.max(0,agility(d)+(A.bonus&&A.rg===3?1:0)+(A.obs?1:0)-(A.noDef||0));
+function damodDone(){G.phase='amod';refresh();schedule()}
+function applyDAMod(k){exApplyDAMod(k);fx('mod',{id:G.atk.d});if(!exDAMods().length)damodDone();else{refresh();schedule()}}
+function atkDone(){const A=G.atk,d=ship(A.d);const n=Math.max(0,agility(d)+(A.bonus&&A.rg===3?1:0)+(A.obs?1:0)-(A.noDef||0)+exDefBonus(d,A));
   A.def=rollN(DEF_FACES,n);A.step='dmod';lg(d.side,`${sname(d)} rolls ${n} defense ${n===1?'die':'dice'}: ${diceText(A.def)}.`);G.phase='dmod';refresh();if(!isHuman(d.side))schedule()}
 function defMods(){const A=G.atk,d=ship(A.d),out=[];if(d.focus>0&&cnt(A.def,'focus'))out.push({k:'focus',l:'Spend focus',d:`Turn ${cnt(A.def,'focus')} focus into evades.`});
-  if(d.evade>0)out.push({k:'evade',l:'Spend evade token',d:'Add one evade result.'});
+  if(d.evade>0&&!A.noEvade)out.push({k:'evade',l:'Spend evade token',d:'Add one evade result.'});
   if(pilotHas(d,'luke')&&!A.used.includes('luke')&&cnt(A.def,'focus')&&!(d.focus>0&&false))out.push({k:'luke',l:`${d.name}: focus → evade`,d:'Change 1 of your focus results to an evade (free).'});
-  const P=PILOTS[d.pilot];if(P.dmod&&P.dmod.can(d,A))out.push({k:'pilot',l:P.n+"'s ability",d:P.dmod.d});
-  d.ups.forEach((u,i)=>{const U=UPGRADES[u.id];if(U&&U.dmod&&!u.gone&&U.dmod.can(d,A))out.push({k:'u'+i,l:U.n,d:U.dmod.d})});return out}
-function applyDefMod(k){const A=G.atk,d=ship(A.d);
-  if(k==='focus'){d.focus--;A.def=A.def.map(f=>f==='focus'?'evade':f);lg(d.side,`${sname(d)} spends focus: ${diceText(A.def)}.`)}
+  exDMods(out);return out}
+function applyDefMod(k){const A=G.atk,d=ship(A.d);mark('dmod:'+k);
+  if(k==='focus'){d.focus--;A.def=A.def.map(f=>f==='focus'?'evade':f);lg(d.side,`${sname(d)} spends focus: ${diceText(A.def)}.`);exFocusSpent(d)}
   else if(k==='evade'){d.evade--;A.def.push('evade');lg(d.side,`${sname(d)} spends an evade token.`)}
   else if(k==='luke'){A.used.push('luke');const i=A.def.indexOf('focus');if(i>=0)A.def[i]='evade';lg(d.side,`${sname(d)} jinks: ${diceText(A.def)}.`)}
-  else if(k==='pilot')PILOTS[d.pilot].dmod.apply(d,A);else if(k[0]==='u'){const u=d.ups[+k.slice(1)];UPGRADES[u.id].dmod.apply(d,A,u)}
+  else exApplyDMod(k);
   fx('mod',{id:d.id});refresh()}
 // what the attack would do right now (for the live preview)
-function preview(A){let hits=cnt(A.dice,'hit'),crits=cnt(A.dice,'crit');let ev=cnt(A.def||[],'evade');const c1=Math.min(ev,hits);hits-=c1;ev-=c1;crits-=Math.min(ev,crits);return {hits,crits}}
+function preview(A){if(typeof exPreview==='function')return exPreview(A);let hits=cnt(A.dice,'hit'),crits=cnt(A.dice,'crit');let ev=cnt(A.def||[],'evade');const c1=Math.min(ev,hits);hits-=c1;ev-=c1;crits-=Math.min(ev,crits);return {hits,crits}}
 function defDone(){const A=G.atk,s=ship(A.a),d=ship(A.d);const r=preview(A);
-  if(A.ion){if(r.hits+r.crits>0){d.ion++;lg(d.side,`${sname(d)} is hit by ion fire.`);dealDamage(d,1,0,s)}else lg(d.side,`${sname(d)} evades the ion blast.`)}
-  else if(r.hits+r.crits===0){lg(d.side,`${sname(d)} evades every shot.`);fx('miss',{id:d.id})}
-  else{lg(s.side,`${sname(s)} hits ${sname(d)}: ${r.hits} damage${r.crits?` and ${r.crits} critical`:''}.`);dealDamage(d,r.hits,r.crits,s)}
+  if(A.ion){if(r.hits+r.crits>0){d.ion++;lg(d.side,`${sname(d)} is hit by ion fire: 1 damage and an ion token.`);dealDamage(d,1,0,s)}else lg(d.side,`${sname(d)} evades the ion blast.`);finishDamage(s.id,d.id,{hits:0,crits:0},r.hits+r.crits===0);return}
+  else if(r.hits+r.crits===0){lg(d.side,`${sname(d)} evades every shot.`);fx('miss',{id:d.id});finishDamage(s.id,d.id,r,true);return}
+  else{const h=r.crits>0&&friendsOf(d).find(o=>upT(o,'u_heat')&&within(o,d,1));
+    if(h&&isHuman(h.side)){G.q={side:h.side,key:'heat',title:'Take the Heat',text:`${d.name} is about to take ${r.crits} crit${r.crits>1?'s':''}. Take 1 of them yourself?`,opts:[{k:'y',l:'Take the heat'},{k:'n',l:'No'}],ctx:{h:h.id,d:d.id,a:s.id,r:{hits:r.hits,crits:r.crits}}};G.phase='ask';refresh();return}
+    if(h&&remaining(h)>remaining(d)){r.crits--;lg(h.side,`${sname(h)} takes the heat: 1 crit meant for ${sname(d)}.`);dealDamage(h,0,1,s)}
+    finishDamage(s.id,d.id,r);return}
+  finishDamage(s.id,d.id,r,true)}
+function finishDamage(aid,did,r,missed){const s=ship(aid),d=ship(did),A=G.atk;
+  if(!missed&&r.hits+r.crits>0){lg(s.side,`${sname(s)} hits ${sname(d)}: ${r.hits} damage${r.crits?` and ${r.crits} critical`:''}.`);dealDamage(d,r.hits,r.crits,s)}
   G.stats[s.id]=G.stats[s.id]||{shots:0,dmg:0};G.stats[s.id].shots++;G.stats[s.id].dmg+=r.hits+r.crits;
-  if(A.after)A.after(s,d);
-  G.atk=null;G.phase='combat';G.oi++;refresh();checkWin();nextAttackerLater()}
+  const next=exAfterAttack(s,d,A,missed?{hits:0,crits:0}:r);if(next==='ask'){refresh();return}
+  if(next==='again'||next==='gunner'){const wk=next==='again'?A.w:'P';G.atk=null;const w=weaponsFor(s).find(x=>x.k===wk&&x.targets.some(t=>t.id===d.id));
+    if(w||next==='again'){G.again=next==='again';s.fired=false;G.phase='target';G.cur=s.id;if(next==='gunner')s.flags.gunnerFocus=hasUp(s,'u_rook');
+      const r2=declareForced(s,wk,d.id);if(r2)return}}
+  afterAttackDone(s)}
+function declareForced(s,wk,tid){G.phase='target';G.cur=s.id;const w=weaponsFor(s).find(x=>x.k===wk);if(w&&w.targets.some(t=>t.id===tid)){lg(s.side,`${sname(s)} fires again!`);return declare(s,wk,tid)}if(wk!=='P'){const ww=weaponsFor(s).find(x=>x.k===wk);}return false}
+function afterAttackDone(s){G.atk=null;G.phase='combat';s.fired=true;G.oi++;refresh();checkWin();nextAttackerLater()}
 // damage: shields first, then cards; crits face up [R12]
 function dealDamage(d,hits,crits,src){if(!d.alive&&d.flags.dyingPS==null)return;
   let sh=Math.min(d.sh,hits+crits);const shH=Math.min(sh,hits);hits-=shH;sh-=shH;const shC=Math.min(sh,crits);crits-=shC;d.sh-=shH+shC;
   if(shH+shC)fx('shield',{id:d.id,n:shH+shC});
-  for(let i=0;i<hits;i++)d.dmg.push({c:drawDamage(),up:false});
-  for(let i=0;i<crits;i++){const c=drawDamage();const D=DAMAGE[c];
+  for(let i=0;i<hits;i++){const c=drawDamage();if(!exDealCard(d,src)){G.disc.push(c);continue}d.dmg.push({c,up:false})}
+  for(let i=0;i<crits;i++){const c=exChooseCrit(src,d)||drawDamage();const D=DAMAGE[c];if(!exDealCard(d,src)){G.disc.push(c);continue}
+    if(!exFaceup(d,src)){d.dmg.push({c,up:false});continue}
     if(D.tr==='Pilot'&&talentOn(d,'u_will')){G.disc.push(c);lg(d.side,`${sname(d)}'s iron will shrugs off ${D.n}.`);continue}
     const x={c,up:true,r:G.round};d.dmg.push(x);lg(d.side,`${sname(d)} suffers a critical hit: ${D.n}. ${D.t}`);fx('crit',{id:d.id,c});critNow(d,x)}
   if(hits+crits)fx('hull',{id:d.id,n:hits+crits});
+  if(hullDmg(d)>=d.hull&&d.alive&&exDelayDeath(d)){if(!d.flags.doomed){d.flags.doomed=true;lg(d.side,`${sname(d)} is crippled but keeps fighting until the end of combat!`)}return}
   if(hullDmg(d)>=d.hull&&d.alive){const same=G.phase!=='plan'&&G.phase!=='activate'&&G.phase!=='action'&&src&&psOf(src)===psOf(d);destroy(d,`${sname(d)} is destroyed!`,same)}}
 function critNow(d,x){const k=DAMAGE[x.c].k;
   if(k==='minor'){x.up=false;const f=ATK_FACES[rnd(8)];lg(d.side,`${sname(d)}: secondary blast rolls ${f}.`);if(f==='hit')dealDamage(d,1,0,null)}
-  else if(k==='thrust'){x.up=false;d.stress++;fx('stress',{id:d.id})}
+  else if(k==='thrust'){x.up=false;addStress(d)}
   else if(k==='munitions'){x.up=false;const u=d.ups.find(u=>!u.gone&&UPGRADES[u.id].wpn);if(u){u.gone=true;lg(d.side,`${sname(d)} loses its ${UPGRADES[u.id].n}.`)}}}
 function drawDamage(){if(!G.deck.length){G.deck=shuffle(G.disc);G.disc=[]}if(!G.deck.length)G.deck=shuffle(buildDamageDeck());return G.deck.pop()}
 function destroy(s,text,simultaneous){s.alive=false;if(simultaneous&&!s.fired)s.flags.dyingPS=psOf(s);lg(s.side,text);fx('boom',{id:s.id});if(!simultaneous)checkWin()}
@@ -485,19 +807,22 @@ function checkWin(){if(G.winner)return true;const a=[0,1].map(k=>G.ships.some(s=
   G.phase='over';G.step=5;lg(-1,G.winText);return true}
 function missionCheck(){if(G.round>=(G.ex.roundCap||40)){const sc=[0,1].map(k=>G.ships.filter(s=>s.side!==k&&!s.alive).reduce((a,s)=>a+s.cost,0));const w=sc[0]===sc[1]?-1:sc[0]>sc[1]?0:1;
     G.winner=w<0?'draw':'P'+(w+1);G.winText=w<0?'Time: a draw on points destroyed.':`Time: ${sideName(w)} wins on points destroyed (${sc[w]} to ${sc[1-w]}).`;G.phase='over';G.step=5;lg(-1,G.winText);return true}return false}
-function endPhase(){G.phase='end';G.step=4;for(const s of alive()){s.focus=0;s.evade=0;s.flags.juke=false;s.flags.dead=false;// [R13] unused focus/evade tokens are removed; target locks stay
+function endPhase(){G.phase='end';G.step=4;for(const s of alive())if(s.flags.doomed&&hullDmg(s)>=s.hull)destroy(s,`${sname(s)} finally breaks apart.`);if(checkWin()){refresh();return}
+  for(const s of alive()){if(!exKeepFocus(s))s.focus=0;s.evade=0;s.flags.juke=false;s.flags.dead=false;exEndPhase(s);// [R13] unused focus/evade tokens are removed; target locks stay
     for(const x of s.dmg)if(x.up){const D=DAMAGE[x.c];if(D.end)D.end(s)}}
   if(!checkWin()){lg(-1,`End of round ${G.round}.`);if(ANIM)setTimeout(()=>{if(G&&!G.winner)startRound()},AIDELAY*.8);else startRound()}refresh()}
 // ---- one entry point for every player action: UI clicks, 3D clicks, keys, network, tests ----
 function validMoves(side){if(!G||G.winner)return [];const out=[];
   if(G.phase==='plan'){for(const s of alive().filter(x=>x.side===side&&x.dial==null))dialOf(s).forEach((m,i)=>out.push({act:'dial',ship:s.id,m:i}));return out}
+  if(G.phase==='ask'){if(G.q&&G.q.side===side)G.q.opts.forEach(o=>out.push({act:'ask',k:o.k}));return out}
+  if(G.phase==='damod'){if(G.atk&&ship(G.atk.d).side===side){exDAMods().forEach(m=>out.push({act:'damod',k:m.k}));out.push({act:'damod',k:'done'})}return out}
   if(G.phase==='dmod'){if(G.atk&&ship(G.atk.d).side===side){defMods().forEach(m=>out.push({act:'dmod',k:m.k}));out.push({act:'dmod',k:'done'})}return out}
   const s=G.cur&&ship(G.cur);if(!s||s.side!==side)return [];
   if(G.phase==='action'){for(const a of actionsFor(s)){if(a.targets)a.targets.forEach(t=>out.push({act:'action',a:a.a,arg:t}));else if(a.opts)a.opts.forEach((o,i)=>out.push({act:'action',a:a.a,arg:i}));else out.push({act:'action',a:a.a})}out.push({act:'action',a:'skip'})}
   if(G.phase==='target'){for(const w of weaponsFor(s))for(const t of w.targets)out.push({act:'fire',w:w.k,t:t.id});out.push({act:'fire',w:'skip'})}
   if(G.phase==='amod'){atkMods().forEach(m=>out.push({act:'amod',k:m.k}));out.push({act:'amod',k:'done'})}
   return out}
-function sideToAct(){if(!G||G.winner)return -1;if(G.phase==='plan'){const k=[0,1].find(k=>!planDone(k));return k==null?-1:k}if(G.phase==='dmod')return ship(G.atk.d).side;const s=G.cur&&ship(G.cur);return s&&['action','target','amod'].includes(G.phase)?s.side:-1}
+function sideToAct(){if(!G||G.winner)return -1;if(G.phase==='plan'){const k=[0,1].find(k=>!planDone(k));return k==null?-1:k}if(G.phase==='ask')return G.q?G.q.side:-1;if(G.phase==='dmod'||G.phase==='damod')return ship(G.atk.d).side;const s=G.cur&&ship(G.cur);return s&&['action','target','amod'].includes(G.phase)?s.side:-1}
 function performMove(mv,side){if(side==null)side=sideToAct();if(!G)return {success:false,error:'no game: call newGame() first'};
   if(G.winner)return {success:false,error:'the game is over'};
   const ok=validMoves(side).some(v=>JSON.stringify(v)===JSON.stringify(mv));
@@ -507,6 +832,8 @@ function performMove(mv,side){if(side==null)side=sideToAct();if(!G)return {succe
   else if(mv.act==='fire')declare(ship(G.cur),mv.w,mv.t);
   else if(mv.act==='amod'){if(mv.k==='done')atkDone();else applyAtkMod(mv.k)}
   else if(mv.act==='dmod'){if(mv.k==='done')defDone();else applyDefMod(mv.k)}
+  else if(mv.act==='damod'){if(mv.k==='done')damodDone();else applyDAMod(mv.k)}
+  else if(mv.act==='ask')resolveAsk(mv.k);
   return {success:true,state:render_game_to_text(side)}}
 // what one side may see: enemy dials stay hidden until revealed
 function getPlayerView(g,side){const v=JSON.parse(JSON.stringify(g));v.ships.forEach(s=>{if(s.side!==side&&g.phase==='plan'&&s.dial!=null)s.dial='set'});v.deck=v.deck.length;v.rng=null;return v}
@@ -516,11 +843,11 @@ function render_game_to_text(side){if(!G)return '{}';if(side==null)side=0;const 
 // rules that must always hold (called by the test scripts every tick)
 function checkInvariants(){if(!G)return [];const bad=[];
   for(const s of G.ships){if(s.sh<0||s.sh>s.shMax)bad.push(`${s.id} shields ${s.sh}`);if(s.stress<0||s.focus<0||s.evade<0)bad.push(`${s.id} negative tokens`);
-    if(s.alive&&hullDmg(s)>=s.hull)bad.push(`${s.id} alive with ${hullDmg(s)} damage`);if(s.alive&&offBoard(s,B(s)))bad.push(`${s.id} alive off the board`)}
+    if(s.alive&&!s.flags.doomed&&hullDmg(s)>=s.hull)bad.push(`${s.id} alive with ${hullDmg(s)} damage`);if(s.alive&&offBoard(s,B(s)))bad.push(`${s.id} alive off the board`)}
   const al=alive();for(let i=0;i<al.length;i++)for(let j=i+1;j<al.length;j++)if(polyOverlap(corners(al[i],B(al[i])),corners(al[j],B(al[j]))))bad.push(`${al[i].id} overlaps ${al[j].id}`);
   const n=G.deck.length+G.disc.length+G.ships.reduce((a,s)=>a+s.dmg.length,0);if(n%DAMAGE_TOTAL!==0&&n<DAMAGE_TOTAL)bad.push(`damage cards lost: ${n}/${DAMAGE_TOTAL}`);
   if(G.round>(G.ex.roundCap||40)+1)bad.push('game did not end');
-  if(!G.winner&&sideToAct()<0&&['plan','action','target','amod','dmod'].includes(G.phase))bad.push(`no side can act in phase ${G.phase}`);
+  if(!G.winner&&sideToAct()<0&&['plan','action','target','amod','dmod','damod','ask'].includes(G.phase))bad.push(`no side can act in phase ${G.phase}`);
   return bad}
 
 </script>
@@ -544,7 +871,7 @@ function scorePose(s,p,m,enemyPoses,friends,lv){let sc=0;const b=B(s);
   else{const tp=tplPoints(s,b,m,6);if(G.rocks.some(o=>{const R=rockPoly(o);return tp.some(q=>polyPointDist(q,R)<=TPL_W/2)}))sc-=4.5}
   for(const f of friends)if(polyOverlap(corners(p,b),corners(f.p,B(f.s))))sc-=f.now?7:4;// wingmen still sitting where we'll end, or ending there first
   if(m.c==='r')sc-=s.stress?8:1.6;if(m.c==='g'&&s.stress)sc+=1.8;if(m.t==='K'&&!s.stress)sc+=.4;
-  const ed=Math.min(p.x,p.y,MAT-p.x,MAT-p.y);if(ed<70)sc-=(70-ed)/14;
+  const ed=Math.min(p.x,p.y,MAT-p.x,MAT-p.y),lim=b/2+50;if(ed<lim)sc-=(lim-ed)/12;// big bases need more room from the edge
   let off=0,def=0,near=1e9;
   for(const [e,poses] of enemyPoses){let o=0,d=0;for(const ep of poses){o+=threatTo(s,p,e,ep)*(1+1.4/Math.max(1,remaining(e)));d+=threatTo(e,ep,s,p);near=Math.min(near,len(sub(ep,p)))}off+=o/poses.length;def+=d/poses.length}
   // reward shots, fear return fire less than we value our own; flanking (a shot with no return fire) is the ideal
@@ -569,11 +896,14 @@ function aiAction(s){const acts=actionsFor(s);if(!acts.length)return ['skip'];co
   const here={x:s.x,y:s.y,h:s.h};const shots=enemiesOf(s).filter(e=>{const r=arcReach(s,B(s),e,B(e),s.arc);return r&&rangeOf(r.d)<=3});
   const threats=enemiesOf(s).filter(e=>threatTo(e,e,s,here)>0);
   // a barrel roll or boost that turns no-shot into a shot, or dodges out of danger
-  const moveActs=acts.filter(a=>a.a==='BR'||a.a==='BO');let bestMove=null,bm=0;
+  const moveActs=acts.filter(a=>a.a==='BR'||a.a==='BO'||a.a==='EH'||a.a==='DD').map(a=>a.a==='DD'?Object.assign({},a,{opts:a.opts.map(o=>({p:finalPose(s,B(s),o.m)}))}):a);let bestMove=null,bm=0;
   for(const a of moveActs)a.opts.forEach((o,i)=>{const p=o.p;let gain=0;for(const e of enemiesOf(s)){gain+=threatTo(s,p,e,e)*2-threatTo(e,e,s,p)*1.5}
-    const base=enemiesOf(s).reduce((t,e)=>t+threatTo(s,here,e,e)*2-threatTo(e,e,s,here)*1.5,0);if(gain-base>bm+.3){bm=gain-base;bestMove=[a.a,i]}});
+    const base=enemiesOf(s).reduce((t,e)=>t+threatTo(s,here,e,e)*2-threatTo(e,e,s,here)*1.5,0);const pen=a.a==='DD'?(SHIPS[s.type].acts.includes('BO')?.6:1.6):(a.a==='EH'&&!SHIPS[s.type].acts.includes('BR')?.6:0);if(gain-base-pen>bm+.3){bm=gain-base-pen;bestMove=[a.a,i]}});
   if(bestMove&&(!shots.length||bm>1.2))return bestMove;
   const has=k=>acts.find(a=>a.a===k);
+  const special=acts.find(a=>['PA','EX','SL'].includes(a.a));if(special&&special.a==='EX'&&shots.length)return ['EX'];if(special&&special.a==='SL')return ['SL',special.targets[0]];if(special&&special.a==='PA'&&!shots.length)return ['PA'];
+  if(acts.find(a=>a.a==='PM')&&enemiesOf(s).some(e=>within(e,s,2)))return ['PM'];
+  const sab=acts.find(a=>a.a==='SB');if(sab&&!shots.length)return ['SB',sab.targets[0]];
   if(shots.length&&has('F'))return ['F'];
   if(has('TL')){const w=s.ups.some(u=>UPGRADES[u.id]&&UPGRADES[u.id].wpn&&UPGRADES[u.id].wpn.need==='TL'&&!u.gone);const t=has('TL').targets.map(ship).sort((a,b)=>remaining(a)-remaining(b));if(w||(!shots.length&&!threats.length))return ['TL',t[0].id]}
   if(threats.length&&has('E'))return ['E'];if(has('F'))return ['F'];if(has('E'))return ['E'];if(has('TL'))return ['TL',has('TL').targets[0]];return ['skip']}
@@ -582,9 +912,9 @@ function aiTarget(s){const ws=weaponsFor(s);if(!ws.length)return ['skip'];let be
     let v=expDmg(n,m,s.focus>0||s.tl===d.id,d.focus>0)+(d.evade?-.5:0);if(v>=remaining(d))v+=3;v*=1+d.cost/60;if(w.k!=='P')v-=.4;// keep one-shot weapons for good shots
     if(v>bv){bv=v;best=[w.k,t.id]}}
   return best||['skip']}
-function aiAmod(){const A=G.atk,s=ship(A.a);const mods=atkMods();const tl=mods.find(m=>m.k==='tl');if(tl&&A.dice.some(f=>f==='blank'||(f==='focus'&&!s.focus)))return 'tl';
+function aiAmod(){const A=G.atk,s=ship(A.a);const mods=atkMods();const pre=mods.find(m=>['horton','howl','jonus','krassis','ibt','gundark','hired','b2h','b2f','rook'].includes(m.k));if(pre)return pre.k;if(mods.find(m=>m.k==='han')&&cnt(A.dice,'hit')+cnt(A.dice,'crit')<A.dice.length/3)return 'han';const tl=mods.find(m=>m.k==='tl');if(tl&&A.dice.some(f=>f==='blank'||(f==='focus'&&!s.focus)))return 'tl';
   for(const m of mods)if(m.k!=='tl'&&m.k!=='focus'&&m.k!=='done')return m.k;if(mods.find(m=>m.k==='focus'))return 'focus';return 'done'}
-function aiDmod(){const A=G.atk,d=ship(A.d);const mods=defMods();const r=preview(A);if(r.hits+r.crits===0)return 'done';
+function aiDmod(){const A=G.atk,d=ship(A.d);const mods=defMods();const r=preview(A);if(r.hits+r.crits===0)return 'done';const pre=mods.find(m=>m.k==='instr'||m.k==='ibtd'||m.k==='luke');if(pre)return pre.k;
   if(mods.find(m=>m.k==='pilot'))return 'pilot';for(const m of mods)if(m.k[0]==='u')return m.k;
   const needF=cnt(A.def,'focus'),incoming=r.hits+r.crits;
   if(mods.find(m=>m.k==='focus')&&(d.fired||incoming>=1))return 'focus';if(mods.find(m=>m.k==='evade'))return 'evade';return 'done'}
@@ -594,7 +924,9 @@ function aiStep(){if(!G||G.winner||UI.paused)return;if(typeof NET!=='undefined'&
   if(G.phase==='action'){const [a,arg]=aiAction(s);doAction(s,a,arg)}
   else if(G.phase==='target'){const [w,t]=aiTarget(s);declare(s,w,t)}
   else if(G.phase==='amod'){const k2=aiAmod();if(k2==='done')atkDone();else{applyAtkMod(k2);schedule()}}
-  else if(G.phase==='dmod'){const k2=aiDmod();if(k2==='done')defDone();else{applyDefMod(k2);schedule()}}}
+  else if(G.phase==='dmod'){const k2=aiDmod();if(k2==='done')defDone();else{applyDefMod(k2);schedule()}}
+  else if(G.phase==='damod'){const m=exDAMods()[0];if(m&&(m.k==='jam'||(m.k==='slip'&&cnt(G.atk.dice,'crit')+cnt(G.atk.dice,'hit')>=2)))applyDAMod(m.k);else damodDone()}
+  else if(G.phase==='ask'){resolveAsk(G.q.opts[G.q.opts.length-1].k)}}
 function schedule(){if(!G||G.winner||UI.pending||UI.paused)return;const k=sideToAct();if(k<0||isHuman(k))return;UI.pending=true;
   setTimeout(()=>{UI.pending=false;aiStep()},ANIM?(G.phase==='amod'||G.phase==='dmod'?AIDELAY*.7:AIDELAY):0)}
 
@@ -725,12 +1057,18 @@ const MODELS={
     for(const sd of [-1,1]){const w=new THREE.Mesh(new THREE.BoxGeometry(2,.2,1.6),mat(c.trim));w.position.set(-1.6,0,sd*2.1);g.add(w);const e=eng(c.eng,1.6);e.position.set(-3,0,sd*1);g.add(e)}return g},
   shuttle(c){const g=new THREE.Group(),hull=mat(c.hull);const b=new THREE.Mesh(new THREE.BoxGeometry(4.4,1.3,1.8),hull);g.add(b);const top=new THREE.Mesh(new THREE.BoxGeometry(.2,3,3.6),mat(c.trim));top.position.set(-.8,1.8,0);top.rotation.z=.2;g.add(top);
     for(const sd of [-1,1]){const w=new THREE.Mesh(new THREE.BoxGeometry(.2,2.4,2.6),mat(c.trim));w.position.set(-.8,-.2,sd*1.6);w.rotation.x=sd*.9;g.add(w)}const e=eng(c.eng,1.8);e.position.set(-2.4,0,0);g.add(e);return g},
+  // Armada interceptor: the arrowhead with long forward-raked razor wings
+  razor(c){const g=MODELS.shard(c);for(const sd of [-1,1]){const w=new THREE.Mesh(new THREE.BoxGeometry(2.4,.06,.5),mat(c.trim,{emissive:c.trim,emissiveIntensity:.3}));w.position.set(.2,.2,sd*1.2);w.rotation.y=sd*.55;g.add(w)}g.scale.set(1.05,1,1.1);return g},
+  // Armada bomber: a stout double hull with ordnance pods
+  maul(c){const g=MODELS.shard(c);g.scale.set(1.1,1.3,1.25);for(const sd of [-1,1]){const pod=new THREE.Mesh(new THREE.CylinderGeometry(.28,.28,2.2,10),mat(0x3a3f4a));pod.rotation.z=Math.PI/2;pod.position.set(-.2,-.25,sd*.95);g.add(pod)}return g},
   wedge(c){const g=new THREE.Group(),hull=mat(c.hull);const w=new THREE.Mesh(new THREE.BoxGeometry(.9,.5,4.8),hull);g.add(w);const nose=new THREE.Mesh(new THREE.ConeGeometry(.5,2.4,8),mat(c.trim));nose.rotation.z=-Math.PI/2;nose.position.x=1.2;g.add(nose);
     const e=eng(c.eng,1.1);e.position.set(-.6,0,1.8);g.add(e);const e2=eng(c.eng,1.1);e2.position.set(-.6,0,-1.8);g.add(e2);return g}};
 const FACCOL=[{hull:0xe9dfcc,trim:0xe8732a,eng:0xffa24f,base:'#f08a3a'},{hull:0x5a6272,trim:0xc2203a,eng:0xff4f6a,base:'#e0304a'},{hull:0x8a7a52,trim:0x3fc28a,eng:0x7dffb0,base:'#39c27f'}];
 function baseTex(side,big){const col=FACCOL[side].base;return canvasTex(256,256,(x,w,h)=>{x.fillStyle='rgba(12,10,30,.88)';x.fillRect(0,0,w,h);x.strokeStyle=col;x.lineWidth=10;x.strokeRect(5,5,w-10,h-10);
   x.fillStyle=col;x.globalAlpha=.25;x.beginPath();x.moveTo(w/2,h/2);x.lineTo(w,0);x.lineTo(w,h);x.closePath();x.fill();x.globalAlpha=1;// front arc (the model faces +x)
   x.lineWidth=5;x.beginPath();x.moveTo(w/2,h/2);x.lineTo(w,0);x.moveTo(w/2,h/2);x.lineTo(w,h);x.stroke();x.fillStyle='#fff';x.beginPath();x.moveTo(w-24,h/2-14);x.lineTo(w-8,h/2);x.lineTo(w-24,h/2+14);x.fill()})}
+function bombMesh(t){const g=new THREE.Group();const core=new THREE.Mesh(new THREE.IcosahedronGeometry(1,0),mat(t.k==='mine'?0x444a55:0x553322,{emissive:t.k==='mine'?0x113355:0x551100,emissiveIntensity:.8}));core.position.y=.9;g.add(core);
+  const l=glow(t.k==='mine'?0x66ccff:0xff7733,3,.8);l.position.y=.9;g.add(l);g.position.copy(W(t.x,t.y));g.userData.bomb=t.id;return g}
 function shipMesh(s){const g=new THREE.Group();const b=S3(B(s));
   const base=new THREE.Mesh(new THREE.BoxGeometry(b,.3,b),[0,1,2,3,4,5].map(i=>i===2?new THREE.MeshBasicMaterial({map:baseTex(s.side,s.base==='L'),transparent:true}):new THREE.MeshBasicMaterial({color:0x111122})));base.position.y=.15;g.add(base);
   const peg=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,3.2,8),new THREE.MeshBasicMaterial({color:0x99aaff,transparent:true,opacity:.35}));peg.position.y=1.8;g.add(peg);
@@ -745,12 +1083,14 @@ function rockMesh(o){const geo=new THREE.IcosahedronGeometry(S3(o.r)*1.05,2);con
 function sync3D(){if(!V3.on||!G)return;
   if(V3.gid!==G.seed+':'+G.ships.length){V3.gid=G.seed+':'+G.ships.length;for(const k in V3.ships)V3.root.remove(V3.ships[k]);V3.ships={};V3.rocks.forEach(r=>V3.root.remove(r));V3.rocks=[];V3.anim={};
     for(const o of G.rocks){const m=rockMesh(o);V3.root.add(m);V3.rocks.push(m)}}
+  V3.bombs=V3.bombs||{};const live=new Set((G.bombs||[]).map(t=>t.id));for(const id in V3.bombs)if(!live.has(id)){V3.root.remove(V3.bombs[id]);delete V3.bombs[id]}
+  for(const t of (G.bombs||[]))if(!V3.bombs[t.id]){V3.bombs[t.id]=bombMesh(t);V3.root.add(V3.bombs[t.id])}
   for(const s of G.ships){let m=V3.ships[s.id];if(!m){m=V3.ships[s.id]=shipMesh(s);V3.root.add(m);m.position.copy(W(s.x,s.y));m.rotation.y=s.h}
     m.visible=s.alive||(V3.anim[s.id]&&V3.anim[s.id].boom)||false;if(!V3.anim[s.id]){m.position.copy(W(s.x,s.y));m.rotation.y=s.h}}
   drainFx();drawGuides();tags3D()}
 function drainFx(){while(UI.fx.length){const f=UI.fx.shift();const m=V3.ships[f.id];
     if(f.k==='move'&&m){V3.anim[f.id]={path:f.path,t0:performance.now(),dur:Math.max(1,f.dur)};sfx(f.roll?'roll':'engine')}
-    else if(f.k==='shot'){const a=V3.ships[f.a],d=V3.ships[f.d];if(a&&d)bolt(a,d,f.w);}
+    else if(f.k==='shot'){const a=V3.ships[f.a],d=V3.ships[f.d];if(a&&d)bolt(a,d,f.ion?'I':f.w);}
     else if(f.k==='shield'&&m){m.userData.shield.material.opacity=.55;sfx('shield')}
     else if(f.k==='hull'&&m){sparks(m.position,0xffb060,18);V3.shake=Math.max(V3.shake,.5);sfx('hull');pop(m,'-'+f.n,'hurt')}
     else if(f.k==='crit'&&m){sparks(m.position,0xff4020,36);V3.shake=1;sfx('crit');pop(m,'CRIT!','crit')}
@@ -760,10 +1100,12 @@ function drainFx(){while(UI.fx.length){const f=UI.fx.shift();const m=V3.ships[f.
     else if(f.k==='lock'){sfx('lock');const d=V3.ships[f.to];if(d)pop(d,'LOCKED','lock')}
     else if(f.k==='stress'&&m){pop(m,'STRESS','hurt');sfx('stress')}
     else if(f.k==='rock'&&m){sfx('rock');sparks(m.position,0xaa8866,20)}
-    else if(f.k==='bump'&&m){pop(m,'BUMP','hurt');sfx('rock')}}}
-function bolt(a,d,w){const from=a.position.clone().add(new THREE.Vector3(0,3.6,0)),to=d.position.clone().add(new THREE.Vector3(0,3.6,0));const col=w==='P'?(a.userData.mdl&&G.ships.find(s=>V3.ships[s.id]===a).side===0?0xff8a3a:0xff3050):0x66ddff;
+    else if(f.k==='bump'&&m){pop(m,'BUMP','hurt');sfx('rock')}
+    else if(f.k==='blast'){const p=W(f.x,f.y,1);sparks(p,0xffa040,50);const fl=glow(0xffd090,20,1);fl.position.copy(p);V3.fxRoot.add(fl);V3.fxq.push({o:fl,t0:performance.now(),dur:800,kind:'flash'});V3.shake=1.4;sfx('boom')}
+    else if(f.k==='bomb'){sfx('token')}}}
+function bolt(a,d,w){const from=a.position.clone().add(new THREE.Vector3(0,3.6,0)),to=d.position.clone().add(new THREE.Vector3(0,3.6,0));const col=w==='I'?0x66ccff:w==='P'?(G.ships.find(s=>V3.ships[s.id]===a).side===0?0xff8a3a:0xff3050):0xffe070;
   for(let i=0;i<(w==='P'?3:1);i++){const b=new THREE.Mesh(new THREE.CylinderGeometry(.08,.08,2.2,6),new THREE.MeshBasicMaterial({color:col}));const gl=glow(col,2.2,.9);b.add(gl);V3.fxRoot.add(b);
-    V3.fxq.push({o:b,t0:performance.now()+i*110,dur:260,from,to,kind:'bolt'})}sfx(w==='P'?'laser':'torp')}
+    V3.fxq.push({o:b,t0:performance.now()+i*110,dur:260,from,to,kind:'bolt'})}sfx(w==='P'?'laser':w==='I'?'ion':'torp')}
 function sparks(pos,col,n){for(let i=0;i<n;i++){const g=glow(col,.9+Math.random()*.9,1);g.position.copy(pos).add(new THREE.Vector3(0,3.6,0));V3.fxRoot.add(g);V3.fxq.push({o:g,t0:performance.now(),dur:600+Math.random()*500,v:new THREE.Vector3((Math.random()-.5)*14,(Math.random()-.2)*10,(Math.random()-.5)*14),kind:'spark'})}}
 function boom(m){V3.anim[G.ships.find(s=>V3.ships[s.id]===m).id]={boom:true,t0:performance.now(),dur:1200};sparks(m.position,0xffc070,60);sparks(m.position,0xff4020,40);const f=glow(0xffe0a0,16,1);f.position.copy(m.position).add(new THREE.Vector3(0,3.6,0));V3.fxRoot.add(f);V3.fxq.push({o:f,t0:performance.now(),dur:700,kind:'flash'});V3.shake=1.6}
 function pop(m,text,cls){const el=document.createElement('div');el.className='pop '+cls;el.textContent=text;document.getElementById('tags').appendChild(el);const v=m.position.clone().add(new THREE.Vector3(0,6,0));el._v=v;el.style.setProperty('--dx',(Math.random()*40-20)+'px');setTimeout(()=>el.remove(),1500);placeEl(el,v)}
@@ -806,7 +1148,8 @@ const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 function loop3D(now){requestAnimationFrame(loop3D);if(!V3.on)return;const dt=Math.min(.05,(now-V3.clock)/1000);V3.clock=now;V3.t+=dt;const reduce=matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   for(const id in V3.ships){const m=V3.ships[id],a=V3.anim[id];const s=ship(id);
     if(a&&a.boom){const k=(now-a.t0)/a.dur;m.userData.mdl.scale.multiplyScalar(.96);m.userData.mdl.rotation.x+=dt*6;if(k>=1){m.visible=false;delete V3.anim[id]}continue}
-    if(a&&a.path){const k=Math.min(1,(now-a.t0)/a.dur),u=ease(k)*(a.path.length-1),i=Math.min(a.path.length-2,Math.floor(u)),f=u-i,p=a.path[i],q=a.path[i+1]||p;
+    if(a&&a.path&&a.path.length<2){delete V3.anim[id]}
+    else if(a&&a.path){const k=Math.min(1,(now-a.t0)/a.dur),u=ease(k)*(a.path.length-1),i=Math.min(a.path.length-2,Math.floor(u)),f=u-i,p=a.path[i],q=a.path[i+1]||p;
       m.position.copy(W(p.x+(q.x-p.x)*f,p.y+(q.y-p.y)*f));let dh=normA(q.h-p.h);m.rotation.y=p.h+dh*f;if(m.userData.mdl)m.userData.mdl.rotation.x=-dh*2*Math.sin(k*Math.PI);if(k>=1){delete V3.anim[id];if(s){m.position.copy(W(s.x,s.y));m.rotation.y=s.h}}}
     if(m.userData.mdl&&!reduce)m.userData.mdl.position.y=3.6+Math.sin(V3.t*1.4+m.userData.bob)*.2;
     const sh=m.userData.shield;if(sh.material.opacity>0)sh.material.opacity=Math.max(0,sh.material.opacity-dt*1.2)}
@@ -873,12 +1216,15 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
       <div class="acts"><button class="btn primary" data-a="lock" ${mine.every(x=>UI.draft[x.id]!=null)?'':'disabled'}>Lock in dials</button><button class="btn" data-a="autodial">Use suggestions</button></div>`}}
   else if(G.phase==='action'){const s=ship(G.cur);if(!me)h=`<p class="head">${esc(s.name)} is choosing an action…</p>`;else{const acts=actionsFor(s);
       h=`<p class="head">${esc(s.name)} · Step 2 · Take one action</p><p>You flew <b>${mText(s.rev)}</b>. Pick one action (hover to preview it), or skip.</p><div class="acts col">`+
-      acts.map(a=>a.targets?a.targets.map(t=>`<button class="btn" data-act="action" data-a2="TL" data-arg="${t}" title="${esc(a.d)}">⌖ Lock onto ${esc(ship(t).name)}</button>`).join(''):a.opts?a.opts.map((o,i)=>`<button class="btn" data-act="action" data-a2="${a.a}" data-arg="${i}" data-hov="${a.a}:${i}">${a.a==='BR'?`⇆ Barrel roll ${o.dir<0?'left':'right'}${o.sh? (o.sh>0?' (forward)':' (back)'):''}`:`⇑ Boost ${o.m.t==='S'?'straight':o.m.d<0?'left':'right'}`}</button>`).join(''):`<button class="btn" data-act="action" data-a2="${a.a}" title="${esc(a.d)}">${a.a==='F'?'◉':'✦'} ${a.l}<small>${esc(a.d)}</small></button>`).join('')+
+      acts.map(a=>a.targets?a.targets.map(t=>`<button class="btn" data-act="action" data-a2="${a.a}" data-arg="${t}" title="${esc(a.d)}">${a.a==='TL'?'⌖ Lock onto':a.a==='SL'?'📣 '+esc(a.l)+':':a.a==='SB'?'🧨 Sabotage':esc(a.l)} ${esc(ship(t).name)}</button>`).join(''):a.opts?a.opts.map((o,i)=>`<button class="btn" data-act="action" data-a2="${a.a}" data-arg="${i}" data-hov="${a.a}:${i}">${a.a==='BR'||a.a==='EH'?`⇆ ${a.a==='EH'?'Snap roll':'Barrel roll'} ${o.dir<0?'left':'right'}${o.sh? (o.sh>0?' (forward)':' (back)'):''}`:a.a==='DD'?`↩ Hairpin turn ${o.m.d<0?'left':'right'}`:`⇑ Boost ${o.m.t==='S'?'straight':o.m.d<0?'left':'right'}`}</button>`).join(''):`<button class="btn" data-act="action" data-a2="${a.a}" title="${esc(a.d)}">${a.a==='F'?'◉':'✦'} ${a.l}<small>${esc(a.d)}</small></button>`).join('')+
       `<button class="btn ghost" data-act="action" data-a2="skip">Skip action</button></div>`}}
   else if(G.phase==='target'){const s=ship(G.cur);if(!me)h=`<p class="head">${esc(s.name)} is lining up a shot…</p>`;else{const ws=weaponsFor(s);
       h=`<p class="head">${esc(s.name)} · Step 3 · Attack</p><p>Choose a target in your arc (tap it in the view or below). Range 1 adds an attack die; range 3 or an asteroid in the way gives the defender an extra die.</p><div class="acts col">`+
       ws.map(w=>w.targets.map(t=>{const d=ship(t.id);const n=w.atk+(w.bonus&&t.rg===1?1:0),m=agility(d)+(w.bonus&&t.rg===3?1:0)+(t.obstructed?1:0);return `<button class="btn" data-act="fire" data-w="${w.k}" data-t="${t.id}">🎯 ${esc(w.n)} → ${esc(d.name)}<small>range ${t.rg}${t.obstructed?' · obstructed':''} · ${n} attack vs ${m} defense · ≈${expDmg(n,m,s.focus>0||s.tl===d.id,d.focus>0).toFixed(1)} damage</small></button>`}).join('')).join('')+
       `<button class="btn ghost" data-act="fire" data-w="skip">Hold fire</button></div>`}}
+  else if(G.phase==='ask'&&G.q){const q=G.q;if(!humanTurn())h=`<p class="head">Waiting for ${esc(sideName(q.side))}…</p>`;else h=`<p class="head">${esc(q.title)}</p><p>${esc(q.text)}</p><div class="acts col">${q.opts.map((o,i)=>`<button class="btn ${i===0?'primary':''}" data-act="ask" data-k="${esc(o.k)}">${esc(o.l)}</button>`).join('')}</div>`}
+  else if(G.phase==='damod'){const A=G.atk,a=ship(A.a),d=ship(A.d);h=`<p class="head">${esc(a.name)} → ${esc(d.name)}</p><div class="dice">${A.dice.map(f=>die(f,'atk')).join('')}</div><p class="preview">The defender may tamper with the attack dice first.</p>`;
+    if(humanTurn())h+=`<div class="acts col">${exDAMods().map(m=>`<button class="btn" data-act="damod" data-k="${m.k}">${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="damod" data-k="done">Let the attack stand</button></div>`;else h+=`<p class="small muted">${esc(d.name)} is reacting…</p>`}
   else if(G.phase==='amod'||G.phase==='dmod'){const A=G.atk,a=ship(A.a),d=ship(A.d);const r=preview(A);const mine=(G.phase==='amod'&&humanTurn())||(G.phase==='dmod'&&humanTurn());
     h=`<p class="head">${esc(a.name)} → ${esc(d.name)}</p><div class="dice">${A.dice.map(f=>die(f,'atk')).join('')}</div>${A.step==='dmod'?`<div class="dice">${A.def.map(f=>die(f,'def')).join('')}</div>`:''}
       <p class="preview">Right now: <b>${r.hits} hit${r.hits===1?'':'s'}</b>${r.crits?`, <b>${r.crits} crit${r.crits>1?'s':''}</b>`:''}${A.step==='amod'?' before the defense roll':' get through'}.</p>`;
@@ -892,11 +1238,11 @@ function renderRoster(){const el=$('roster');if(!el||!G)return;el.innerHTML=[0,1
   G.ships.filter(s=>s.side===k).map(s=>{const T=SHIPS[s.type];const hp=s.hull-hullDmg(s);return `<div class="card ${s.alive?'':'dead'} ${G.cur===s.id?'on':''}" data-sel="${s.id}"><b>${esc(s.name)}</b> <span class="muted">${esc(T.n)}</span>
     <div class="stats"><span class="ps" title="pilot skill">${s.ps}</span><span class="a" title="attack">${s.atk}</span><span class="g" title="agility">${s.agi}</span><span class="h" title="hull">${hp}/${s.hull}</span><span class="s" title="shields">${s.sh}/${s.shMax}</span></div>
     ${PILOTS[s.pilot].t?`<p class="ab">${esc(PILOTS[s.pilot].t)}</p>`:''}${s.ups.length?`<p class="ups">${s.ups.map(u=>`<span class="${u.gone?'gone':''}" title="${esc(UPGRADES[u.id].t)}">${esc(UPGRADES[u.id].n)}</span>`).join('')}</p>`:''}
-    ${s.dmg.filter(x=>x.up).map(x=>`<p class="crit" title="${esc(DAMAGE[x.c].t)}">✸ ${esc(DAMAGE[x.c].n)}</p>`).join('')}</div>`}).join('')+'</div>').join('')}
+    ${s.dmg.filter(x=>x.up).map(x=>`<p class="crit" title="${esc(DAMAGE[x.c].t)}">✸ ${esc(DAMAGE[x.c].n)}</p>`).join('')}${s.alive&&(s.stress||s.ion||s.focus||s.evade||s.tl)?`<p class="small">${s.stress?`<span class="warn">stress ${s.stress}</span> `:''}${s.ion?`ion ${s.ion} `:''}${s.focus?`focus ${s.focus} `:''}${s.evade?`evade ${s.evade} `:''}${s.tl?`lock → ${esc(ship(s.tl)?ship(s.tl).name:'')}`:''}</p>`:''}</div>`}).join('')+'</div>').join('')}
 function renderLog(){const el=$('log');if(el&&G)el.innerHTML=G.log.slice(0,40).map(l=>`<li class="s${l.s}">${esc(l.t)}</li>`).join('')}
 // ---- modals: start screen, pass-the-device, rules, stats ----
 function renderModal(){const el=$('modal');let h='';
-  if(UI.info)h=startHTML();else if(UI.rules)h=rulesHTML();else if(UI.stats&&G)h=statsHTML();
+  if(UI.build!=null)h=builderHTML();else if(UI.info)h=startHTML();else if(UI.rules)h=rulesHTML();else if(UI.stats&&G)h=statsHTML();
   else if(G&&G.phase==='plan'&&UI.pass!=null&&UI.pass!==planSide()&&planSide()>=0&&bothHuman())h=`<div class="dlg pass"><h2>Pass the device to ${esc(sideName(planSide()))}</h2><p>The other side's dials are hidden. Only ${esc(sideName(planSide()))} should look now.</p><div class="acts"><button class="btn primary" data-a="passok">I'm ${esc(sideName(planSide()))}: show my ships</button></div></div>`;
   el.innerHTML=h;el.classList.toggle('hidden',!h)}
 const bothHuman=()=>G&&isHuman(0)&&isHuman(1);
@@ -906,6 +1252,7 @@ function startHTML(){const saved=load();return `<div class="dlg start" role="dia
   <h3>Battle size</h3><div class="row">${SIZES.map(z=>`<button class="btn ${UI.size===z.k?'on':''}" data-size="${z.k}">${esc(z.n)}<small>${esc(z.d)}</small></button>`).join('')}</div>
   <h3>Computer skill</h3><div class="row">${['easy','normal','hard'].map(l=>`<button class="btn ${UI.lvl===l?'on':''}" data-lvl="${l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join('')}</div>
   ${EXPS.length?`<h3>Expansions</h3><div class="exps">${EXPS.map(e=>`<button class="ex ${UI.ex[e.k]?'on':''}" data-exk="${e.k}"><b>${UI.ex[e.k]?'✓ ':''}${esc(e.n)}</b><small>${esc(e.d)}</small></button>`).join('')}</div>`:''}
+  ${UI.size==='custom'?`<div class="row">${[0,1].map(k=>{const sq=UI.squads&&UI.squads[k];return `<button class="btn" data-a="build" data-k="${k}">✎ ${k?'Opponent':'Your'} squad<small>${sq&&sq.length?`${sq.length} ships · ${squadCost(sq)} pts`:'not built yet (random)'}</small></button>`}).join('')}</div>`:''}
   <div class="acts"><button class="btn primary" data-start="${UI.mode}">Launch</button>${saved?'<button class="btn" data-start="load">Continue saved battle</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
 function rulesHTML(){return `<div class="dlg rules"><h2>How to play</h2>${RULES_HTML}<div class="acts"><button class="btn primary" data-a="close">Close</button></div></div>`}
 function statsHTML(){const rows=G.ships.map(s=>{const st=G.stats[s.id]||{shots:0,dmg:0};return `<tr class="${s.alive?'':'dead'}"><td>${esc(s.name)}</td><td>${esc(sideName(s.side))}</td><td>${st.shots}</td><td>${st.dmg}</td><td>${s.alive?`${s.hull-s.dmg.length}/${s.hull}`:'destroyed'}</td></tr>`}).join('');
@@ -927,9 +1274,11 @@ function render2D(){const svg=$('map');if(!svg||!G)return;const Y=y=>MAT-y;let h
 // ---- input: every action goes through gameAct(ds, side) ----
 function uiAct(ds){if(typeof isClient==='function'&&isClient()){netSend(ds);return}gameAct(ds,sideToAct())}
 function gameAct(ds,side){if(!G)return;
+  if(ds.act==='ask'){performMove({act:'ask',k:ds.k},side);return}
+  if(ds.act==='damod'){performMove({act:'damod',k:ds.k},side);return}
   if(ds.ship&&!ds.act){const s=ship(ds.ship);if(!s)return;if(G.phase==='target'&&humanTurn()){const s2=ship(G.cur);const w=weaponsFor(s2).find(w=>w.k==='P'&&w.targets.some(t=>t.id===s.id))||weaponsFor(s2).find(w=>w.targets.some(t=>t.id===s.id));if(w){performMove({act:'fire',w:w.k,t:s.id},side);return}}
     UI.sel=s.id;render();return}
-  if(ds.act==='action'){const mv={act:'action',a:ds.a2};if(ds.arg!=null)mv.arg=ds.a2==='TL'?ds.arg:+ds.arg;UI.hoverAct=null;performMove(mv,side)}
+  if(ds.act==='action'){const mv={act:'action',a:ds.a2};if(ds.arg!=null)mv.arg=['TL','SL','SB'].includes(ds.a2)?ds.arg:+ds.arg;UI.hoverAct=null;performMove(mv,side)}
   else if(ds.act==='fire'){performMove(ds.w==='skip'?{act:'fire',w:'skip'}:{act:'fire',w:ds.w,t:ds.t},side)}
   else if(ds.act==='amod'||ds.act==='dmod'){performMove({act:ds.act,k:ds.k},side)}
   else if(ds.act==='dials'){for(const id in ds.dials){const s=ship(id);if(s&&s.side===side&&s.dial==null)performMove({act:'dial',ship:id,m:ds.dials[id]},side)}}}
@@ -942,6 +1291,10 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
   if(ds.a==='lock'){const ps=planSide();const dials={};alive().filter(s=>s.side===ps).forEach(s=>dials[s.id]=UI.draft[s.id]);UI.pass=null;sfx('token');uiAct({act:'dials',dials});if(G&&G.phase==='plan'&&planSide()>=0)UI.pass=ps;render();return}
   if(ds.a==='autodial'){alive().filter(s=>s.side===planSide()).forEach(s=>UI.draft[s.id]=suggestDial(s));render();return}
   if(ds.a==='passok'){UI.pass=planSide();render();return}
+  if(ds.a==='build'){UI.squads=UI.squads||[[],[]];UI.build=+ds.k;render();return}
+  if(ds.a==='bdone'){UI.build=null;render();return}
+  if(ds.a==='bclear'){UI.squads[UI.build]=[];saveSquads();render();return}
+  if(ds.a==='brand'){UI.squads[UI.build]=randomSquad(UI.fac[UI.build],100,UI.ex).map(e=>({p:e.p,u:e.u.slice()}));saveSquads();render();return}
   if(ds.a==='rules'){UI.rules=true;render();return}if(ds.a==='close'){UI.rules=false;UI.stats=false;render();return}
   if(ds.a==='stats'){UI.stats=true;render();return}if(ds.a==='new'){UI.info=true;UI.stats=false;render();return}
   if(ds.a==='snd'){toggleSound();return}if(ds.a==='mus'){toggleMusic();return}if(ds.a==='top'){UI.top=!UI.top;camView(UI.top?'top':'tilt');return}
@@ -961,8 +1314,25 @@ document.addEventListener('keydown',e=>{if(e.target&&/INPUT|SELECT|TEXTAREA/.tes
 function startGame(mode){UI.info=false;UI.stats=false;UI.draft={};UI.pass=null;UI.sel=null;UI.sugCache=null;
   if(mode==='load'){const g=load();if(g){G=g;if(!['plan','over'].includes(G.phase)){G.phase='plan';G.step=1;alive().forEach(s=>s.dial=null);G.atk=null}refresh();return}}
   UI.mode=mode;const players=mode==='solo'?[{human:true},{human:false,lvl:UI.lvl}]:mode==='hot'?[{human:true},{human:true}]:[{human:false,lvl:UI.lvl},{human:false,lvl:UI.lvl}];
-  newGame({fac:UI.fac.slice(),players,sizeK:UI.size,squads:UI.squads||null,ex:Object.assign({},UI.ex)});
+  const custom=UI.size==='custom'&&UI.squads?UI.squads.map((sq,k)=>sq&&sq.length&&sq.every(e=>PILOTS[e.p]&&factionPilots(UI.fac[k],UI.ex).includes(e.p))&&squadCost(sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})))<=100?sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})):null):null;
+  const squads=custom&&(custom[0]||custom[1])?[custom[0]||randomSquad(UI.fac[0],100,UI.ex),custom[1]||randomSquad(UI.fac[1],100,UI.ex)]:null;
+  newGame({fac:UI.fac.slice(),players,sizeK:UI.size,squads,ex:Object.assign({},UI.ex)});
   if(bothHuman())UI.pass=0;camView('tilt')}
+// ---- squad builder: add pilots, pick upgrades per slot, live points and unique checks ----
+try{const q=JSON.parse(localStorage.getItem('na_squads')||'null');if(q)UI.squads=q}catch(e){}
+function slotsOf(e){const P=PILOTS[e.p];const out=P.u.slice();(e.u||[]).forEach(u=>{const U=UPGRADES[u];if(U&&U.addSlot)out.push(U.addSlot)});return out}
+function usedNames(sq,skip){const n=new Set();sq.forEach((e,i)=>{if(PILOTS[e.p].uniq&&i!==skip)n.add(PILOTS[e.p].n);(e.u||[]).forEach(u=>{if(u&&UPGRADES[u].uniq)n.add(UPGRADES[u].n)})});return n}
+function builderHTML(){const k=UI.build,f=UI.fac[k],sq=UI.squads[k];const cost=squadCost(sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})));const used=usedNames(sq);
+  const byShip={};factionPilots(f,UI.ex).forEach(pk=>{(byShip[PILOTS[pk].ship]=byShip[PILOTS[pk].ship]||[]).push(pk)});
+  const list=sq.map((e,i)=>{const P=PILOTS[e.p];const slots=slotsOf(e);return `<div class="card"><b>${esc(P.n)}</b> <span class="muted">${esc(SHIPS[P.ship].n)} · PS ${P.ps} · ${pilotCost({p:e.p,u:e.u.filter(Boolean)})} pts</span> <button class="btn ghost" data-bdel="${i}" aria-label="Remove">✕</button>
+    <div class="row">${slots.map((sl,j)=>{const opts=upgradesFor(e.p,UI.ex).filter(u=>UPGRADES[u].slot===sl);if(!opts.length)return '';return `<label class="small">${esc(SLOTN[sl]||sl)} <select data-bslot="${i}:${j}"><option value="">none</option>${opts.map(u=>`<option value="${u}" ${e.u[j]===u?'selected':''} ${UPGRADES[u].uniq&&used.has(UPGRADES[u].n)&&e.u[j]!==u?'disabled':''}>${esc(UPGRADES[u].n)} (${UPGRADES[u].pts})</option>`).join('')}</select></label>`}).join('')}</div></div>`}).join('')||'<p class="muted">No ships yet: add pilots below.</p>';
+  return `<div class="dlg" role="dialog" aria-modal="true"><h2>${esc(FACTIONS[f].n)} squadron</h2><p><b class="${cost>100?'bad':''}">${cost} / 100 points</b>${cost>100?' · over the limit!':''}</p>${list}
+   <h3>Add a pilot</h3>${Object.keys(byShip).map(t=>`<p class="small"><b>${esc(SHIPS[t].n)}</b><br>${byShip[t].sort((a,b)=>PILOTS[b].ps-PILOTS[a].ps).map(pk=>`<button class="btn tab" data-badd="${pk}" ${PILOTS[pk].uniq&&used.has(PILOTS[pk].n)?'disabled':''} title="${esc(PILOTS[pk].t||'No special ability')}">${esc(PILOTS[pk].n)} ${PILOTS[pk].ps}·${PILOTS[pk].pts}</button>`).join(' ')}</p>`).join('')}
+   <div class="acts"><button class="btn primary" data-a="bdone" ${cost>100||!sq.length?'disabled':''}>Done</button><button class="btn" data-a="brand">Randomize</button><button class="btn" data-a="bclear">Clear</button></div></div>`}
+function saveSquads(){try{localStorage.setItem('na_squads',JSON.stringify(UI.squads))}catch(e){}}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-badd],[data-bdel]');if(!t||UI.build==null)return;const sq=UI.squads[UI.build];
+  if(t.dataset.badd){sq.push({p:t.dataset.badd,u:[]})}else sq.splice(+t.dataset.bdel,1);saveSquads();render()});
+document.addEventListener('change',e=>{const b=e.target.dataset.bslot;if(!b||UI.build==null)return;const [i,j]=b.split(':').map(Number);const en=UI.squads[UI.build][i];en.u[j]=e.target.value||null;saveSquads();render()});
 const SAVE='na_save';
 function save(){try{if(G&&!(typeof NET!=='undefined'&&NET.on)&&G.phase==='plan')localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}
 function load(){try{const s=localStorage.getItem(SAVE);return s?JSON.parse(s):null}catch(e){return null}}

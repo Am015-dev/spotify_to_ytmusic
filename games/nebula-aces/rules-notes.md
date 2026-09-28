@@ -96,8 +96,42 @@ The official FFG PDFs and BoardGameGeek were blocked by the network proxy, so th
   - **Core duel:** the core-set learning battle, Kael Varro with torpedoes and Tinker (36 points) against "Knifepoint" and a Slate pilot (30 points).
   - **Skirmish 60** and **Standard 100:** random legal squadrons, with each unique name used at most once.
 
+## Expansions: waves 1–3 (toggle on the start screen) [confirmed numbers; names, texts and ship designs are original]
+
+**Ships (10 new classes; first-edition stats and dials):**
+- **Wave 1:** Anvil assault bomber (2/1/5/3; focus, target lock) and Talon Prime (2/3/3/2; focus, target lock, barrel roll, evade). More Lancer and Talon pilots.
+- **Wave 2:**
+  - Needle interceptor (2/3/2/2; boost, evade).
+  - Razor interceptor (3/3/3/0; barrel roll, boost, evade).
+  - Longhaul freighter: large base, **360° primary turret**, 3/1/8/5. The generic pilot has 2/1/6/4.
+  - Warden gunship: large base, **front and rear arcs**, 3/2/6/4.
+- **Wave 3:**
+  - Keel strike fighter (3/1/3/5).
+  - Kestrel courier (1/2/4/1; a 5-column dial with no K-turn).
+  - Talon Maul bomber (2/2/6/0).
+  - Herald shuttle: large base, 3/1/5/5, with a red **full stop** (speed 0) maneuver.
+
+**Pilots:** 47 more, 57 in all, each with its first-edition pilot skill, cost and ability.
+
+**Upgrades:** 57 in all. They include:
+- turrets, cannons, torpedoes and missiles (including the two-shot, splash, ion and uncancellable-hit weapons);
+- quake charges, plasma bombs and contact mines;
+- crew, systems, talents, mechs, 4 ship titles and 4 modifications.
+
+Every ship has 1 modification slot; ships with a title card also get a title slot.
+
+**Rules that come with them:**
+- **Ion:** an ionised ship flies a white straight 1 instead of its dial. A large ship needs 2 ion tokens [R15].
+- **Turrets and rear arcs** use the 1e arc shapes. **Large bases:** 80 mm, same templates, no barrel roll.
+- **Bombs:** dropped behind the ship with the straight-1 template. Quake charges and plasma bombs detonate at the end of activation (range 1). A contact mine detonates when a base or template touches it (3 attack dice).
+- **Defender first:** the defender may modify the attack dice before the attacker does (1e order), for the jamming array and Slippery.
+- **Your choices:** optional reveal-time effects (bomb drops, the gunship pilot's bank switch, Navigator, Adrenaline, early warning sensors), Take the Heat and Inquisitor Vell are **asked** of human players. The computer decides them for its own ships.
+- **[H] Automated choices:** where an ability needs a choice the rules give no other time for, the engine picks for everyone. That covers which friendly ship gets a passed focus, lock, pilot-skill boost or free action, and which card the "choose 1 of 3" pilot deals.
+
+**Squad builder:** choose "Custom squads" to build both sides (100 points, unique names once, slots per pilot, title slots added by titles), or randomize. Lists are remembered in the browser.
+
 ## Not in this version
-- The core-set scenario missions, a manual squad builder, the defender's attack-dice modifications (none exist in the core set), and online play. The first two are planned with the expansions.
+- The core-set scenario missions, waves 4+ (the Void Syndicate faction, cloaking, epic ships), and online play.
 
 ## Computer players and balance (headless self-play)
 - **Planning:** dials are secret, so each computer ship scores every maneuver on its dial against sampled guesses of the enemy's maneuvers. The score weighs expected damage dealt against damage received, plus penalties for asteroids, bumps, the board edge and stress.
@@ -107,5 +141,8 @@ The official FFG PDFs and BoardGameGeek were blocked by the network proxy, so th
 - **Tuning:** the planning weights were tuned with the gauntlet. Lowering the "fear of return fire" weight from 1.25 to 0.8, scaled down for tougher ships, stopped heavy fighters running from swarms.
 - **Core duel, Normal vs Normal:** 30–30 over 60 games. Average length is about 9–10 rounds (2–20).
 - **Standard 100 (random squadrons), Normal vs Normal:** the Iron Armada won 37–23 (62%) over 60 games. Its swarms of about 7 light fighters beat 4 heavy fighters, consistent with early-1e experience, where light-fighter swarms were strong. I kept the numbers faithful rather than tune the rules.
-- **Hard vs Normal (core duel):** Hard won 43 of 60 games (72%, 95% interval 60–83%). The SPRT was at LLR 2.84 against a bound of 2.94, so "stronger" is not yet statistically confirmed.
+- **Hard vs Normal (core duel, current weights):** Hard scored 66 wins to 54 over 120 games (55%, 95% interval 46–64%). The SPRT says "keep playing", so **Hard is not proven stronger than Normal**.
+  - An earlier build showed 72%, but the later fix to Normal's timidity closed most of that gap. The two sets of results can't be pooled.
+- **All expansions, Standard 100, Normal vs Normal:** Compact 26 wins, Armada 34 (43/57%) over 60 games; about 10–14 rounds per game. Ships left the mat about 0.7 times a game, mostly through legal forced moves (ion drift, and the opponent picking a stressed ship's maneuver).
+- **Expansion coverage:** every expansion pilot and upgrade was forced into computer battles (2–3 each) with 0 errors. The effect counters show the weapons, bombs, mines, turrets, ion, dice modifiers, Redline, Snap Roll, Sabotage and the gunners all firing. A few rarely come up (Hairpin, the range-1 torpedo, Pack Tactics).
 - **Tests:** 0 errors and 0 invariant violations across all gauntlet runs. The random clicker played solo and hot-seat games at both sizes (0 rejected moves), and full animated games ran in Chromium at desktop and phone size.
