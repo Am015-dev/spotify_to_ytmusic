@@ -34,3 +34,21 @@ All base-game cards except the cuts listed below, with the FAQ rulings: Fire Bre
 - Guess: Drop from High Altitude gives +2 VP plus the normal +1 for entering. If both Tokyo spaces are full, you choose who leaves.
 - Guess: a monster in the Bay moves up to City when City empties at its Enter step.
 - First player: seat 1, with seats shuffled at setup, instead of a claw roll-off.
+
+# v2: King of Tokyo: Mindbug expansion
+
+Sources: the BGG, IELLO, review and wiki pages were all blocked by the network proxy. What follows was confirmed through search-result excerpts: the product listing, a BRDGMZ rules summary, BGA news, and the TechRaptor, Card Gamer and Big Boss Battle reviews.
+
+## Confirmed
+- Each player starts with 1 Mindbug token, placed face up in front of them. At the end of an opponent's roll, you may declare a Mindbug and resolve their dice as if they were your own. They then continue their turn.
+- New card type, Consumable: bought, then discarded later to trigger its effect. It uses the Mindbug keywords Hunter, Sneaky/Stealthy, Venomous/Poisonous, Tough and Frenzy/Fury.
+- There are 24 new power cards and 3 new monsters (plus a fourth listed monster), each with an Evolution set.
+- Evolutions follow the Power Up! rule: resolve 3+ hearts to draw an evolution card for your monster (you draw even while in Tokyo).
+- Two modes: Mindbug Trial shuffles the 24 new cards into the base deck; Mindbug Experience uses only the 24 new cards.
+
+## Guessed or original (the card texts could not be read)
+- All 24 new card effects are original designs built on the confirmed features. The keywords are translated to dice-game terms: Hunter = hit more monsters, Sneaky = ignore defences, Venomous = finish off badly hurt monsters, Frenzy = double claw damage, Tough = block a hit.
+- Evolution cards: 6 original evolutions for each of the 9 monsters. Instant ones are played on your turn; permanent ones stay in play.
+- The three new monsters (Cortexa, Clampede, Bramblebat) are original hybrid monsters filling the role of the expansion's Mindbug-universe monsters.
+- Mindbug timing: once the roller finishes rolling, other monsters are offered the Mindbug in clockwise order, and only one can Mindbug per turn. The Mindbugger takes any spot a yielding monster leaves. The roller then still does its own Enter City step and buy step.
+- Cut: the 3 Wickedness tiles, which need the Wickedness Gauge from another expansion.
