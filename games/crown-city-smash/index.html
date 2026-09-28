@@ -189,6 +189,16 @@ table.stats th,table.stats td{border-bottom:2px solid #1a1320;padding:.25rem .3r
 table.stats td:first-child,table.stats th:first-child{text-align:left}
 table.stats tr.win{background:var(--yellow);color:#1a1320}
 
+/* v6: online */
+.online{border:2.5px dashed #1a1320;border-radius:12px;padding:.45rem .6rem;margin:.6rem 0;background:#eef6ff;color:#1a1320}
+.online input{border:2.5px solid #1a1320;border-radius:10px;padding:.3rem .5rem;font:inherit;width:9rem;text-transform:lowercase;background:#fff;color:#1a1320}
+.code{font:1.8rem/1 Bangers,Impact,sans-serif;letter-spacing:.2em;background:var(--yellow);color:#1a1320;padding:.1rem .5rem;border:2.5px solid #1a1320;border-radius:8px}
+.plist{margin:.2rem 0 .4rem;padding-left:1.2rem}.plist li{margin:.1rem 0}
+.warn{background:#ffe0e0;color:#8a1020;border:2px solid #c1121f;border-radius:8px;padding:.3rem .5rem}
+.emotes{display:flex;gap:.25rem;flex-wrap:wrap;width:100%;margin-top:.2rem}
+.emotes .btn{font-size:1.1rem;padding:.1rem .45rem;flex:0 0 auto}
+.pop.emote{font-size:3rem;-webkit-text-stroke:0;text-shadow:none}
+
 </style>
 </head>
 <body>
@@ -196,11 +206,11 @@ table.stats tr.win{background:var(--yellow);color:#1a1320}
   <h1>Crown City Smash</h1>
   <span class="sub">Roll, smash and stomp your way to 20 stars</span>
   <span class="spacer"></span>
-  <button class="btn" data-a="snd" id="sndbtn">🔊 Sound</button>
-  <button class="btn" data-a="mus" id="musbtn">🎵 Music: off</button>
-  <button class="btn" data-a="speed" id="speedbtn">Speed: normal</button>
-  <button class="btn" data-a="pause" id="pausebtn">⏸ Pause</button>
-  <button class="btn" data-a="hints" id="hintbtn">💡 Hints: on</button>
+  <button class="btn" data-a="snd" id="sndbtn" title="Sound effects">🔊</button>
+  <button class="btn" data-a="mus" id="musbtn" title="Background music">🎵 On</button>
+  <button class="btn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ Normal</button>
+  <button class="btn" data-a="pause" id="pausebtn" title="Pause the computer (P)">⏸</button>
+  <button class="btn" data-a="hints" id="hintbtn" title="Dice hints">💡 On</button>
   <button class="btn" data-a="tour">Tour</button>
   <button class="btn" data-a="rules">Rules</button>
   <button class="btn" data-a="new">New game</button>
@@ -387,6 +397,10 @@ function newGame(mode,n,mon){
   const mons=mode==='solo'?[mon,...others]:shuffle(pool.slice());
   const lvl=UI.lvl||DEFLV;const pl=[];for(let i=0;i<n;i++)pl.push({i,m:mons[i],hp:10,vp:0,en:0,mb:xp==='base'?0:1,cards:[],evo:[],hand:[],edeck:[],alive:true,human:mode==='hot',tok:{},lvl:LVMIX?LVMIX[i%LVMIX.length]:lvl,cult:0,wk:0});
   if(mode==='solo'){const seat=rnd(n);const hm=pl[0].m;pl[0].m=pl[seat].m;pl[seat].m=hm;pl[seat].human=true}
+  if(mode==='net'){const used=new Set();const desc=NET.seats.slice(0,n).map(h=>{let m=h.mon;if(!(Number.isInteger(m)&&pool.includes(m))||used.has(m))m=null;if(m!==null)used.add(m);return Object.assign({},h,{m})});
+    const free=shuffle(pool.filter(m=>!used.has(m)));desc.forEach(h=>{if(h.m===null)h.m=free.pop()});
+    const all=[...desc,...Array.from({length:n-desc.length},()=>({m:free.pop(),peer:null}))];shuffle(all);
+    all.forEach((h,i)=>Object.assign(pl[i],{m:h.m,human:!!h.peer,peer:h.peer||null,uid:h.uid||null}))}
   pl.forEach(p=>p.edeck=shuffle([0,1,2,3,4,5]));
   const deck=xp==='exp'?MBDECK.slice():xp==='trial'?[...BASEDECK,...MBDECK]:BASEDECK.slice();
   const ex=Object.assign({},DEFEX||UI.ex||{});ex.evo=evoOn;
@@ -670,14 +684,20 @@ function aiWings(q,act){if(q.en<2)return false;const hitsMe=has(act,'nova')||(in
 function aiYield(q,lost){
   if(q.hp<=0)return true;
   if(q.lvl==='easy')return q.hp<=5?Math.random()<.7:Math.random()<.15;
-  if(q.lvl==='hard'){const th=alive().filter(r=>r.i!==q.i&&!inTokyo(r.i)).length*1.25;if(q.vp+2+has(q,'street')>=winAt(q)&&q.hp>th+.5)return false;if(has(q,'vjets')&&q.hp<=7)return true;return q.hp<th+HYB}
+  if(q.lvl==='hard'&&!HYOLD){const pd=pDeath(q);if(q.vp+2+has(q,'street')>=winAt(q))return pd>PDW;if(has(q,'vjets')&&q.hp<=7)return true;return pd>PDY}
+  if((q.lvl==='hard'||q.lvl==='hard0')){const th=alive().filter(r=>r.i!==q.i&&!inTokyo(r.i)).length*1.25;if(q.vp+2+has(q,'street')>=winAt(q)&&q.hp>th+.5)return false;if(has(q,'vjets')&&q.hp<=7)return true;return q.hp<th+HYB}
   const threat=tokyoThreat(q);
   if(q.vp>=18&&q.hp>Math.min(4,threat+1))return false;
   if(has(q,'vjets')&&q.hp<=7)return true;
   return q.hp<=Math.max(YA,threat+YB)}
+var PDY=0.2,PDW=0.55,PCL=0.24,HYOLD=true;
+// chance that q is knocked out before its next turn if it stays in the city
+function pDeath(q){const A=alive().filter(r=>r.i!==q.i&&!inTokyo(r.i));let n=0,bonus=0;A.forEach(r=>{n+=6+has(r,'skull');bonus+=has(r,'barbed')+has(r,'acid')+(has(r,'nova')?0:0)});
+  const hp=q.hp+(has(q,'plated')?.5:0)+(q.tok.tough?2:0);const need=Math.ceil(hp-bonus*.6);if(need<=0)return 1;
+  let pr=0,c=1,pk=Math.pow(1-PCL,n);for(let k=0;k<=n;k++){if(k>=need)pr+=pk;pk=pk*(n-k)/(k+1)*PCL/(1-PCL)}return Math.min(1,pr)}
 function aiMindbug(q,roller){if(q.mb<=0)return false;
   if(q.lvl==='easy')return scoreDice(q,G.dice).val>10&&Math.random()<.5;
-  if(q.lvl==='hard'){const mv=evalDice(q,G.dice),tv=evalDice(roller,G.dice);if(q.vp+scoreDice(q,G.dice).vp>=winAt(q))return true;if(tv>=35)return true;return mv+tv*.7>=(q.mb>1?7:9.5)-(G.turn>=6?1.5:0)}
+  if((q.lvl==='hard'||q.lvl==='hard0')){const mv=evalDice(q,G.dice),tv=evalDice(roller,G.dice);if(q.vp+scoreDice(q,G.dice).vp>=winAt(q))return true;if(tv>=35)return true;return mv+tv*.7>=(q.mb>1?7:9.5)-(G.turn>=6?1.5:0)}
   const mine=scoreDice(q,G.dice),theirs=scoreDice(roller,G.dice);
   if(q.vp+mine.vp>=20)return true;
   if(roller.vp+theirs.vp>=20&&theirs.vp>0)return true;
@@ -712,9 +732,46 @@ function aiMark(p){
     else if(d.f==='H'){k=hk<hw;if(k)hk++}
     d.k=k})}
 function curseBad(p){return exOn('curse')&&['k_sand','k_ecl','k_toll','k_frog','k_judge'].includes(G.curse)}
-function aiMarkLvl(p){if(p.lvl==='hard'&&!ANIM_FASTTEST)aiMarkHard(p);else{aiMark(p);if(p.lvl==='easy')G.dice.forEach(d=>{if(Math.random()<.3)d.k=!d.k})}}
+function aiMarkLvl(p){if(p.lvl==='hard0')aiMarkHard0(p);else if(p.lvl==='hard'&&!ANIM_FASTTEST)aiMarkHard(p);else{aiMark(p);if(p.lvl==='easy')G.dice.forEach(d=>{if(Math.random()<.3)d.k=!d.k})}}
 var ANIM_FASTTEST=false, HYB=1.5, HEW=0.75;
 function evalDice(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const nc=countsOf(dice.filter(d=>!d.t));const inT=inTokyo(p.i);
+  const need=winAt(p)-p.vp;const others=alive().filter(q=>q.i!==p.i);const lead=others.reduce((a,q)=>q.vp>a.vp?q:a,{vp:-1});
+  let v=s.vp*(1.5+(p.vp>=12?0.9:0)+(need<=4?1.2:0));if(s.vp>0&&s.vp>=need)v+=60;
+  // energy: worth more when it unlocks a strong card
+  let ev=HEW;if(s.en){const bc=hardCardCost(p);if(bc&&p.en<bc&&p.en+s.en>=bc)ev+=0.45}
+  v+=s.en*ev;
+  if(!inT||exHealInCity())v+=s.hl*(p.hp<=3?2:p.hp<=6?1:0.25);
+  if(s.dmg&&s.targets.length){for(const q of s.targets){let w=0.8;if(q.vp>=15)w+=0.9;if(q===lead&&lead.vp>=12)w+=0.4;v+=s.dmg*w;
+      if(q.hp<=s.dmg)v+=(others.length<=1?80:6)+q.vp*0.35+(q.vp>=16?12:0)}
+    if(!inT){const occ=s.targets.filter(q=>inTokyo(q.i));const mayEnter=occ.some(q=>q.hp-s.dmg<=Math.max(YA,3));v+=mayEnter?(p.hp>=7?2:(p.hp<=4?-3.5:0)):0}}
+  if(!inT&&G.city===-1)v+=p.hp>=6?0:(p.hp<=3?-1.5:0);
+  if(c.H>=3&&G.evoOn&&p.edeck.length)v+=2.2;
+  if(exOn('cult')&&Object.values(nc).some(x=>x>=4))v+=2.5;
+  if(exOn('bers')&&!p.tok.berserk&&c.C>=4)v+=2;
+  if(exOn('tower')&&inT&&nc['1']>=4)v+=G.tower.filter(o=>o===p.i).length>=2?90:7;
+  if(exOn('wick')){if(c['1']>=3)v+=2.2;if(c['2']>=3)v+=1.1}
+  const fd=dice.find(d=>d.t==='f');if(fd){if(fd.f==='FS')v-=2;if(fd.f==='FA')v+=2}
+  v-=dice.filter(d=>d.f==='O').length*(p.hp<=2?20:1.2);
+  return v}
+let HC={k:null,c:0};
+function hardCardCost(p){const key=p.i+':'+G.market.join()+':'+p.en;if(HC.k!==key){const b=G.market.map(id=>({c:costOf(p,id),v:cardValue(p,id)+costOf(p,id)})).filter(x=>x.v>=x.c+1).sort((a,b)=>a.c-b.c)[0];HC={k:key,c:b?b.c:0}}return HC.c}
+// second-stage policy for the lookahead: what would we keep on the last reroll? (cheap one-step search)
+function bestFinal(p,dice,S){const n=dice.length;let best=-1e9;
+  for(let m=0;m<(1<<n);m++){const unk=[];for(let k=0;k<n;k++)if(!(m>>k&1))unk.push(k);
+    if(!unk.length){const v=evalDice(p,dice);if(v>best)best=v;continue}
+    if(unk.length>4&&m!==0)continue; // prune: keep at most the useful masks
+    let tot=0;for(let t=0;t<S;t++){const d1=dice.map(d=>({f:d.f,t:d.t}));unk.forEach(k=>d1[k].f=faceOf(d1[k]));tot+=evalDice(p,d1)}
+    const a=tot/S;if(a>best)best=a}
+  return best}
+function aiMarkHard(p){const dice=G.dice,n=dice.length,R=G.rolls,S=n>7?10:16;let best=-1e9,bm=(1<<n)-1;
+  for(let m=0;m<(1<<n);m++){const unk=[];for(let k=0;k<n;k++)if(!(m>>k&1))unk.push(k);
+    if(!unk.length){const v=evalDice(p,dice)+0.3;if(v>best){best=v;bm=m}continue}
+    let tot=0;const S1=R>=2?6:S;
+    for(let t=0;t<S1;t++){const d1=dice.map(d=>({f:d.f,t:d.t}));unk.forEach(k=>d1[k].f=faceOf(d1[k]));
+      tot+=R>=2?bestFinal(p,d1,4):evalDice(p,d1)}
+    const avg=tot/S1;if(avg>best){best=avg;bm=m}}
+  dice.forEach((d,k)=>d.k=!!(bm>>k&1))}
+function evalDice0(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const nc=countsOf(dice.filter(d=>!d.t));const inT=inTokyo(p.i);
   const need=winAt(p)-p.vp;let v=s.vp*(1.5+(p.vp>=12?0.9:0));if(s.vp>0&&s.vp>=need)v+=40;
   v+=s.en*HEW;if(!inT||exHealInCity())v+=s.hl*(p.hp<=3?1.8:p.hp<=6?0.9:0.25);
   if(s.dmg&&s.targets.length){v+=s.dmg*s.targets.length*0.8;for(const q of s.targets)if(q.hp<=s.dmg)v+=(alive().length<=2?60:6)+q.vp*0.2;
@@ -727,11 +784,11 @@ function evalDice(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const
   const fd=dice.find(d=>d.t==='f');if(fd){if(fd.f==='FS')v-=2;if(fd.f==='FA')v+=2}
   v-=dice.filter(d=>d.f==='O').length*(p.hp<=2?20:1.2);
   return v}
-function aiMarkHard(p){const dice=G.dice,n=dice.length,R=G.rolls,S=n>7?12:20;let best=-1e9,bm=(1<<n)-1;
+function aiMarkHard0(p){const dice=G.dice,n=dice.length,R=G.rolls,S=n>7?12:20;let best=-1e9,bm=(1<<n)-1;
   for(let m=0;m<(1<<n);m++){const unk=[];for(let k=0;k<n;k++)if(!(m>>k&1))unk.push(k);
-    if(!unk.length){const v=evalDice(p,dice)+0.3;if(v>best){best=v;bm=m}continue}
-    let tot=0;for(let t=0;t<S;t++){const d1=dice.map(d=>({f:d.f,t:d.t}));unk.forEach(k=>d1[k].f=faceOf(d1[k]));let v=evalDice(p,d1);
-      if(R>=2){const d2=dice.map(d=>({f:d.f,t:d.t}));unk.forEach(k=>d2[k].f=faceOf(d2[k]));v=Math.max(v,evalDice(p,d2))}tot+=v}
+    if(!unk.length){const v=evalDice0(p,dice)+0.3;if(v>best){best=v;bm=m}continue}
+    let tot=0;for(let t=0;t<S;t++){const d1=dice.map(d=>({f:d.f,t:d.t}));unk.forEach(k=>d1[k].f=faceOf(d1[k]));let v=evalDice0(p,d1);
+      if(R>=2){const d2=dice.map(d=>({f:d.f,t:d.t}));unk.forEach(k=>d2[k].f=faceOf(d2[k]));v=Math.max(v,evalDice0(p,d2))}tot+=v}
     const avg=tot/S;if(avg>best){best=avg;bm=m}}
   dice.forEach((d,k)=>d.k=!!(bm>>k&1))}
 function aiRollStep(p){
@@ -800,7 +857,7 @@ function aiBuyStep(p){
     if(b==='m_tough'&&inTokyo(p.i)&&!p.tok.tough&&consUsable(p,k)){useCons(p,k);return}
     if(b==='m_portal'&&consUsable(p,k)&&((inTokyo(p.i)&&p.hp<=4)||(!inTokyo(p.i)&&p.hp>=8&&G.city>=0&&G.bay!==p.i))){useCons(p,k);return}}
   if(p.cult&&p.hp<=4&&p.lvl!=='easy'){useCult(p,'h');return}
-  let best=-1,bv=p.lvl==='hard'?-0.2:-0.5;G.market.forEach((id,k)=>{if(!canBuy(p,k))return;const v=cardValue(p,id)+(p.lvl==='easy'?Math.random()*6-3:0);if(v>bv){bv=v;best=k}});
+  let best=-1,bv=(p.lvl==='hard'||p.lvl==='hard0')?-0.2:-0.5;G.market.forEach((id,k)=>{if(!canBuy(p,k))return;const v=cardValue(p,id)+(p.lvl==='easy'?Math.random()*6-3:0);if(v>bv){bv=v;best=k}});
   if(best>=0){buy(best);return}
   const maxv=Math.max(-99,...G.market.map(id=>cardValue(p,id)));
   if(!G.aiSwept&&p.en>=8&&maxv<-2){G.aiSwept=true;sweep();return}
@@ -808,10 +865,10 @@ function aiBuyStep(p){
 function aiStep(){
   if(!G||G.winner||UI.choice||UI.busy)return;const p=cur();if(p.human)return;
   if(G.phase==='roll')aiRollStep(p);else if(G.phase==='buy')aiBuyStep(p)}
-function schedule(){if(!G||G.winner||UI.choice||UI.busy||UI.info||UI.rules||UI.pending||UI.paused)return;if(!['roll','buy'].includes(G.phase)||isHuman(G.active))return;
+function schedule(){if(!G||G.winner||UI.choice||UI.busy||UI.info||UI.rules||UI.pending||UI.paused)return;if(typeof NET!=='undefined'&&(NET.role==='client'&&NET.on))return;if(!['roll','buy'].includes(G.phase)||isHuman(G.active))return;
   UI.pending=true;setTimeout(()=>{UI.pending=false;aiStep()},ANIM?(G.phase==='roll'&&!G.aiMarked?AIDELAY*1.1:AIDELAY):0)}
 function refresh(){render();save();schedule()}
-function save(){try{if(G)localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}
+function save(){try{if(G&&!(typeof NET!=='undefined'&&NET.on))localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}
 function load(){try{const s=localStorage.getItem(SAVE);return s?JSON.parse(s):null}catch(e){return null}}
 </script>
 <script>
@@ -1331,7 +1388,7 @@ function sync3D(){if(!V3.on)return;
   const hum=G.pl.find(q=>q.human);
   [...tags.children].forEach((el,k)=>{const p=G.pl[k];el.className=`tag ${k===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'} ${inTokyo(p.i)?'city':''}`;
     el.style.setProperty('--mc',MONS[p.m].c);
-    el.innerHTML=`<b>${inTokyo(p.i)?'👑 ':''}${esc(mname(p))}${p.human&&G.mode==='solo'?' <i>you</i>':''}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e">⚡${p.en}</em>${mbOn()?`<em class="m">🧠${p.mb}</em>`:''}${exIcons(p)?`<em>${exIcons(p)}</em>`:''}</span>`:'<span>K.O.</span>'}`});
+    el.innerHTML=`<b>${inTokyo(p.i)?'👑 ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${NET.on&&pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e">⚡${p.en}</em>${mbOn()?`<em class="m">🧠${p.mb}</em>`:''}${exIcons(p)?`<em>${exIcons(p)}</em>`:''}</span>`:'<span>K.O.</span>'}`});
   V3.tower.visible=exOn('tower');if(exOn('tower'))G.tower.forEach((o,l)=>{const m=V3.tsegs[l].material;m.color.set(o>=0?MONS[P(o).m].c:'#8a8190');m.emissive.set(o>=0?0x331100:0x000000)});
   V3.csign.visible=exOn('curse');if(exOn('curse')&&V3.curseShown!==G.curse){V3.curseShown=G.curse;V3.csign.material.map=signTex(CURSES[G.curse].n.toUpperCase(),'#9b5de5','#ffffff');V3.csign.material.needsUpdate=true}
   G.pl.forEach((p,k)=>{const o=V3.mons[k];o.berserk=!!(p.tok&&p.tok.berserk&&p.alive);const n=p.alive?(p.cult||0):0;o.cults=o.cults||[];
@@ -1371,9 +1428,9 @@ function rollDice3D(rebuild){const n=G.dice.length;if(rebuild){clearDice();
     setDieFace(d,gd,!spin)})}
 function setDieFace(d,gd,now){const tp=gd.t||'n';const mats=DIEFACES[tp].map(f=>V3.faceMats[tp+f+(gd.k?'k':'')]);d.m.material=mats;d.shown=tp+gd.f+(gd.k?'k':'');
   if(now||d.t>=1){d.final=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),d.yaw||0).multiply(upQuat(gd.f,gd.t))}}
-function onClick3D(ev){if(!G||!humanTurn()||G.phase!=='roll'||UI.choice)return;const r=ev.target.getBoundingClientRect();
+function onClick3D(ev){if(!G||G.phase!=='roll'||UI.choice)return;const myTurn=humanTurn();const r=ev.target.getBoundingClientRect();
   const v=new THREE.Vector2((ev.clientX-r.left)/r.width*2-1,-(ev.clientY-r.top)/r.height*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(v,V3.cam);
-  const hit=rc.intersectObjects(V3.dice.map(d=>d.m),false)[0];if(hit){const k=V3.dice.findIndex(d=>d.m===hit.object);if(k>=0){G.dice[k].k=!G.dice[k].k;render()}return}
+  const hit=myTurn&&rc.intersectObjects(V3.dice.map(d=>d.m),false)[0];if(hit){const k=V3.dice.findIndex(d=>d.m===hit.object);if(k>=0)uiAct({die:String(k)});return}
   const mh=rc.intersectObjects(V3.mons.map(o=>o.g),true)[0];if(mh){const k=V3.mons.findIndex(o=>{let x=mh.object;while(x){if(x===o.g)return true;x=x.parent}return false});if(k>=0)seatInfo(k)}}
 // ---- animation loop ----
 function loop3D(){requestAnimationFrame(loop3D);const dt=Math.min(.12,V3.clock.getDelta());V3.t+=dt;const t=V3.t;
@@ -1474,12 +1531,110 @@ function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;const ste
     SND.nextT+=step;SND.beat++}}
 function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('ccs_snd',SND.on?'1':'0')}catch(e){}audioInit();if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
 function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('ccs_mus',SND.music?'1':'0')}catch(e){}if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
-function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.textContent=SND.on?'🔊 Sound':'🔇 Sound';if(b)b.textContent=SND.music?'🎵 Music: on':'🎵 Music: off'}
+function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.textContent=SND.on?'🔊':'🔇';if(b)b.textContent=SND.music?'🎵 On':'🎵 Off'}
+
+</script>
+<script>
+// ---------- online multiplayer (room capability). The host runs the game; everyone else sends actions. ----------
+const NET={on:false,role:null,code:'',room:null,lobby:null,user:null,uid:null,peer:null,mySeat:-1,seq:0,applied:0,last:0,timer:null,parts:{},hostPeer:null,names:{},peers:[],inLobby:false,err:'',conn:false,ready:false,busy:false};
+const EMOTES=['😂','😱','👏','😡','🔥','💤'];
+async function netInit(){try{if(!window.claude||!window.claude.use){NET.ready=true;render();return}const [room,user]=await Promise.all([window.claude.use('room'),window.claude.use('user')]);NET.lobby=room;NET.user=user;if(user)NET.uid=await user.id();NET.ready=true;render()}catch(e){NET.ready=true}}
+netInit();
+const netAvail=()=>!!NET.lobby;
+const isClient=()=>NET.on&&NET.role==='client';
+const isHost=()=>NET.on&&NET.role==='host';
+function newCode(){const a='abcdefghjkmnpqrstuvwxyz23456789';let s='';for(let i=0;i<5;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
+async function netJoin(role,code){
+  if(NET.busy)return;NET.err='';
+  code=String(code||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,10);if(!code){NET.err='Type the invite code first.';render();return}
+  NET.busy=true;render();
+  try{if(NET.room){try{await NET.room.leave()}catch(e){}}NET.room=await NET.lobby.join('ccs-'+code)}catch(e){NET.busy=false;NET.err='Could not join the game room ('+(e&&e.code||'error')+').';render();return}
+  NET.busy=false;NET.code=code;NET.role=role;NET.on=true;NET.inLobby=true;NET.mySeat=-1;NET.hostPeer=null;NET.parts={};NET.applied=0;
+  if(role==='client')G=null;
+  NET.room.presence({role,uid:NET.uid||null,mon:UI.mon,v:1}).catch(()=>{});
+  NET.room.on('st',onNetState);NET.room.on('act',onNetAct);NET.room.on('emo',onNetEmo);
+  NET.room.onPeers(ch=>{NET.peers=ch.peers;const me=ch.peers.find(p=>p.isMe&&p.sameTab);if(me)NET.peer=me.peer;
+    if(isHost()&&G){ch.left.forEach(l=>{const s=G.pl.find(p=>p.peer===l.peer&&p.human);if(s){s.human=false;s.away=true;lg(s.i,`${mname(s)}'s player left: the computer takes over.`)}});
+      ch.joined.forEach(j=>{if(j.isMe)return;const uid=j.by||(j.presence&&j.presence.uid);const s=uid&&G.pl.find(p=>p.away&&p.uid===uid);if(s){s.peer=j.peer;s.human=true;s.away=false;lg(s.i,`${mname(s)}'s player is back!`)}});
+      if(ch.joined.length||ch.left.length){netPush(true);refresh()}}
+    if(isClient()&&NET.hostPeer&&ch.left.some(p=>p.peer===NET.hostPeer))NET.err='The host left, so the game has stopped.';
+    netNames();render()});
+  NET.room.onConnection(c=>{NET.conn=c;render()});
+  UI.info=false;UI.rules=false;render()}
+async function netLeave(){try{if(NET.room)await NET.room.leave()}catch(e){}Object.assign(NET,{on:false,role:null,room:null,inLobby:false,mySeat:-1,hostPeer:null,err:''});G=null;UI.info=true;render()}
+async function netNames(){if(!NET.user)return;const ids=[...new Set([...NET.peers.map(p=>p.by||(p.presence&&p.presence.uid)),...(G?G.pl.map(p=>p.uid):[])].filter(Boolean))];if(!ids.length)return;
+  try{const ps=await NET.user.profiles(ids);let ch=false;for(const id of ids){const n=ps[id]&&ps[id].name||'';if(NET.names[id]!==n){NET.names[id]=n;ch=true}}if(ch)render()}catch(e){}}
+function pname(p){if(!p||!p.uid)return '';return NET.names[p.uid]||''}
+function peerName(pr){const uid=pr.by||(pr.presence&&pr.presence.uid);return (uid&&NET.names[uid])||(pr.isMe?'You':'Player')}
+// host: start a game with everyone in the room
+function netStart(){if(!isHost())return;const hum=NET.peers.filter(p=>p.kind==='viewer').slice(0,6).map(p=>({peer:p.peer,uid:p.by||(p.presence&&p.presence.uid)||null,mon:p.presence&&Number.isInteger(p.presence.mon)?p.presence.mon:null}));
+  if(!hum.some(h=>h.peer===NET.peer))hum.unshift({peer:NET.peer,uid:NET.uid,mon:UI.mon});
+  NET.seats=hum;newGame('net',Math.min(6,Math.max(UI.n,hum.length)));NET.inLobby=false;NET.mySeat=G.pl.findIndex(p=>p.peer===NET.peer);netPush(true)}
+// ---- state packets (compressed, chunked: a room message carries at most 4 KiB) ----
+function b64(u8){let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s)}
+function unb64(s){const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+async function packStr(s){if(window.CompressionStream){try{const cs=new CompressionStream('deflate-raw');const w=cs.writable.getWriter();w.write(new TextEncoder().encode(s));w.close();return 'z'+b64(new Uint8Array(await new Response(cs.readable).arrayBuffer()))}catch(e){}}return 'j'+b64(new TextEncoder().encode(s))}
+async function unpackStr(s){const u=unb64(s.slice(1));if(s[0]==='z'){const ds=new DecompressionStream('deflate-raw');const w=ds.writable.getWriter();w.write(u);w.close();return await new Response(ds.readable).text()}return new TextDecoder().decode(u)}
+function netPush(force){if(!isHost()||!NET.room)return;const now=Date.now();
+  if(!force&&now-NET.last<300){if(!NET.timer)NET.timer=setTimeout(()=>{NET.timer=null;netPush(true)},310);return}
+  NET.last=now;const seq=++NET.seq;
+  let body;if(G){const g=JSON.parse(JSON.stringify(G));g.log=g.log.slice(0,14);g.deckN=g.deck.length;g.deck=[];g.disc=[];g.curseDeck=[];
+    const c=UI.choice;const pend=c&&c.who!==undefined&&G.pl[c.who]&&G.pl[c.who].peer&&G.pl[c.who].peer!==NET.peer?{title:c.title,text:c.text,options:c.options,who:c.who,dice:!!c.dice,cancel:!!c.cancel}:null;
+    const pw=c&&c.who!==undefined?c.who:-1;
+    body={code:NET.code,g,fx:UI.fx,banner:UI.banner,pend,pw}}else body={code:NET.code,lobby:true};
+  packStr(JSON.stringify(body)).then(z=>{const CH=3200,n=Math.ceil(z.length/CH);for(let i=0;i<n;i++)NET.room&&NET.room.emit('st',{s:seq,i,n,d:z.slice(i*CH,(i+1)*CH)}).catch(()=>{})})}
+setInterval(()=>{if(isHost())netPush(true)},3000);
+let netWon=null;setInterval(()=>{if(isHost()&&G&&G.winner&&netWon!==G.gid){netWon=G.gid;[400,1200,2500].forEach(t=>setTimeout(()=>netPush(true),t))}},300);
+function onNetState(msg){if(!isClient()||msg.isMe)return;const d=msg.data;if(!d||typeof d.d!=='string'||!(d.n>0&&d.n<40)||!(d.i>=0&&d.i<d.n))return;
+  if(NET.hostPeer&&msg.peer!==NET.hostPeer)return;
+  const k=msg.peer+':'+d.s;const P2=NET.parts[k]=NET.parts[k]||{n:d.n,got:0,c:[]};if(P2.c[d.i]===undefined){P2.c[d.i]=d.d;P2.got++}
+  if(P2.got<P2.n)return;delete NET.parts[k];Object.keys(NET.parts).forEach(x=>{if(+x.split(':')[1]<d.s)delete NET.parts[x]});
+  if(d.s<=NET.applied&&msg.peer===NET.hostPeer)return;
+  unpackStr(P2.c.join('')).then(txt=>{const o=JSON.parse(txt);if(o.code!==NET.code)return;if(!NET.hostPeer)NET.hostPeer=msg.peer;if(msg.peer!==NET.hostPeer||d.s<=NET.applied)return;NET.applied=d.s;applyNet(o)}).catch(()=>{})}
+function applyNet(o){if(o.lobby||!o.g){if(G){G=null;NET.inLobby=true;render()}return}
+  const prevFx=UI.fx||{},prevRoll=G?G.rollId:-1,prevWin=G&&G.winner;G=o.g;G.deck=new Array(G.deckN||0).fill('x');
+  NET.mySeat=G.pl.findIndex(p=>p.peer===NET.peer);NET.inLobby=false;UI.info=false;
+  const fxn=o.fx||{};for(const k in fxn){const a=fxn[k]||[],b=prevFx[k]||[];const from=a.length<b.length?0:b.length;if(a.length<b.length&&typeof V3!=='undefined')V3.fxSeen[k]=0;
+    for(let j=from;j<a.length;j++){if(typeof SND!=='undefined'&&G.pl[k])SND.pitch=[1,.8,1.15,.7,1.3,.9,1.05,.85,1.2][G.pl[k].m]||1;fxSound(a[j].t,a[j].c)}}
+  if(G.rollId!==prevRoll)snd('dice');
+  if(G.pl[G.active]&&G.active===NET.mySeat&&G.phase==='roll'&&G.rollId!==prevRoll&&G.rolls===2+has(G.pl[G.active],'brain')+exRerolls(G.pl[G.active]))snd('turn');
+  UI.fx=fxn;UI.banner=o.banner||'';NET.pw=o.pw;UI.choice=o.pend&&o.pend.who===NET.mySeat?Object.assign({},o.pend,{net:true}):null;
+  netNames();render()}
+// client -> host
+function netSend(ds){if(!NET.room)return;const d={};['act','die','card','opt'].forEach(k=>{if(ds[k]!==undefined)d[k]=String(ds[k]).slice(0,24)});NET.room.emit('act',d).catch(()=>{});snd('click')}
+function onNetAct(msg){if(!isHost()||!G||msg.isMe)return;const seat=G.pl.findIndex(p=>p.peer===msg.peer&&p.human);if(seat<0)return;const d=msg.data||{};const ds={};
+  if(typeof d.act==='string')ds.act=d.act.slice(0,24);if(d.die!==undefined)ds.die=String(parseInt(d.die,10)||0);if(d.card!==undefined)ds.card=String(parseInt(d.card,10)||0);if(d.opt!==undefined)ds.opt=String(d.opt).slice(0,24);
+  gameAct(ds,seat);netPush()}
+// emotes
+function sendEmote(e){if(!NET.room||!EMOTES.includes(e))return;NET.room.emit('emo',{e}).catch(()=>{})}
+function onNetEmo(msg){const e=msg.data&&msg.data.e;if(!EMOTES.includes(e)||!G)return;const seat=G.pl.findIndex(p=>p.peer===msg.peer);if(seat<0)return;
+  if(typeof V3!=='undefined'&&V3.on&&V3.mons[seat])popLabel(V3.mons[seat].g.position.clone().add(new THREE.Vector3(0,6.2,0)),e,'emote');
+  else{UI.banner=`${esc(mname(G.pl[seat]))} ${e}`;renderPanel()}}
+function lobbyHTML(){const host=isHost();const ps=NET.peers.filter(p=>p.kind==='viewer');
+  const rows=ps.map(p=>{const pr=p.presence||{};const m=Number.isInteger(pr.mon)?MONS[pr.mon]:null;return `<li><b>${esc(peerName(p))}</b>${p.isMe&&p.sameTab?' (you)':''}${pr.role==='host'?' · host':''}${p.guest?' · guest':''}${m?` · wants ${esc(m.n)}`:''}</li>`}).join('')||'<li class="muted">Connecting…</li>';
+  const exs=EXPS.filter(e=>e.k==='evo'?UI.evo:UI.ex[e.k]).map(e=>e.n).join(', ')||'none';
+  return `<div class="dlg start" role="dialog" aria-modal="true"><h2>🌐 Online game</h2>
+   <p>Invite code: <b class="code">${esc(NET.code)}</b> <span class="small muted">Friends open this same page, press <b>Join a game</b> and type the code.</span></p>
+   ${NET.err?`<p class="warn">${esc(NET.err)}</p>`:''}${NET.conn===false&&NET.on?'<p class="small muted">Connecting to the room…</p>':''}
+   <h3 style="margin:.4rem 0 .2rem">Players here (${ps.length})</h3><ul class="plist">${rows}</ul>
+   <p style="margin:.4rem 0 .2rem"><b>Your monster</b> (if two players pick the same one, one gets a random monster):</p>
+   <div class="monpick">${MONS.map((M,k)=>k).filter(k=>UI.xp!=='base'||k<6).map(k=>`<button class="${UI.mon===k?'on':''}" data-mon="${k}"><svg viewBox="-66 -70 132 136">${monArt(k)}</svg><span>${esc(MONS[k].n)}</span></button>`).join('')}</div>
+   ${host?`<p class="small">Game: <b>${UI.xp==='base'?'Base game':UI.xp==='trial'?'Mindbug Trial':'Mindbug Experience'}</b> · Expansions: <b>${esc(exs)}</b> · Seats: <b>${Math.min(6,Math.max(UI.n,ps.length))}</b> (empty seats go to <b>${UI.lvl}</b> computer monsters). Change these on the start screen before hosting.</p>
+     <div class="acts"><button class="btn primary" data-a="netstart" ${ps.length<1?'disabled':''}>Start the game with ${ps.length} player${ps.length===1?'':'s'}</button><button class="btn" data-a="netleave">Close the room</button></div>`
+   :`<p class="tip">Waiting for the host to start the game…</p><div class="acts"><button class="btn" data-a="netleave">Leave</button></div>`}</div>`}
+function onlineBlock(){if(!NET.ready)return '<p class="small muted">Checking online play…</p>';
+  if(!netAvail())return '<p class="small muted">🌐 Online play works when this page is opened on claude.ai by people signed in and given access to it.</p>';
+  return `<div class="online"><b>🌐 Play online with friends</b><span class="small muted"> Share this page with them first (as Contributors or Editors).</span>
+    <div class="row"><button class="btn" data-a="nethost">Host a game</button><input id="joincode" placeholder="invite code" maxlength="10" autocomplete="off" value="${esc(UI.joinCode||'')}"><button class="btn" data-a="netjoin">Join a game</button></div>${NET.err&&!NET.on?`<p class="warn">${esc(NET.err)}</p>`:''}</div>`}
+
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='joincode')UI.joinCode=e.target.value});
+document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='joincode'&&e.key==='Enter'){e.preventDefault();netJoin('client',e.target.value)}});
 
 </script>
 <script>
 // ---------- panel ----------
-function humanTurn(){return G&&!G.winner&&isHuman(G.active)}
+function humanTurn(){return G&&!G.winner&&isHuman(G.active)&&(!NET.on||G.active===NET.mySeat)}
+function uiAct(ds){if(isClient()){netSend(ds);return}gameAct(ds,NET.on?NET.mySeat:undefined)}
 const STEPS=['Roll','Resolve','City','Buy','End'];
 function stepBar(){const s=G.step||1;return `<div class="steps">${STEPS.map((t,k)=>`<span class="st ${k+1<s?'done':''} ${k+1===s?'on':''}"><b>${k+1}</b>${t}</span>`).join('')}</div>`}
 function suggestCard(p){let best=-1,bv=-0.5;G.market.forEach((id,k)=>{if(!canBuy(p,k))return;const v=cardValue(p,id);if(v>bv){bv=v;best=k}});return best}
@@ -1515,6 +1670,10 @@ function renderPanel(){
     p.cards.forEach((id,k)=>{const C=CARDS[base(id)];if(C.t==='C')acts+=btn('use:'+k,`Use ${esc(C.n)}`,!consUsable(p,k),C.kw?C.kw+' · consumable':'consumable','cons')});
     p.hand.forEach((e,k)=>acts+=btn('evo:'+k,`🧬 ${esc(evoName(e))}`,!evoUsable(p,k),EVOFX[evoKey(e)].x,'evo'));
     if(p.cult&&(G.phase==='roll'||G.phase==='buy')){acts+=btn('cult:h',`🕯 Cultist → heart`,p.hp>=maxhp(p),`${p.cult} cultist${p.cult>1?'s':''}`,'cons')+btn('cult:e','🕯 Cultist → energy','',`${p.cult} left`,'cons');if(G.phase==='roll')acts+=btn('cult:r','🕯 Cultist → reroll','','one extra reroll','cons')}}
+  if(NET.on&&!G.winner){const w=isHost()?(UI.choice&&UI.choice.who!==undefined?UI.choice.who:-1):(NET.pw===undefined?-1:NET.pw);
+    if(w>=0&&w!==NET.mySeat&&G.pl[w])msg+=`<div class="tip">⏳ Waiting for <b>${esc(pname(G.pl[w])||mname(G.pl[w]))}</b> (${esc(mname(G.pl[w]))}) to decide…</div>`;
+    if(!humanTurn()&&G.pl[G.active].human&&G.active!==NET.mySeat)msg+=`<div class="small muted">It's ${esc(pname(G.pl[G.active])||'another player')}'s turn.</div>`;
+    acts+=`<div class="emotes">${EMOTES.map(e=>`<button class="btn mini" data-emo="${e}" aria-label="send ${e}">${e}</button>`).join('')}</div>`}
   pr.innerHTML=`${G.winner?'':stepBar()}<div class="who" style="color:${MONS[p.m].c};-webkit-text-stroke:1.2px #1a1320">${who}${humanTurn()?' · your turn':''}</div>${head?`<div class="head">${head}</div>`:''}<div class="msg">${msg}</div><div class="acts">${acts}</div>`;
   const canClick=humanTurn()&&G.phase==='roll';
   const spin=UI.rollAnim!==G.rollId&&ANIM;UI.rollAnim=G.rollId;
@@ -1547,10 +1706,12 @@ function renderLegend(){document.getElementById('legend').innerHTML=[
 
 // ---------- modal ----------
 function renderModal(){const m=document.getElementById('modal');
+  if(NET.on&&NET.inLobby){m.classList.remove('hidden');m.innerHTML=lobbyHTML();return}
   if(UI.info){m.classList.remove('hidden');m.innerHTML=startScreen();return}
+  if(UI.peek){m.classList.remove('hidden');m.innerHTML=`<div class="dlg" role="dialog" aria-modal="true"><h2>${esc(UI.peek.title)}</h2><p>${esc(UI.peek.text)}</p><div class="acts"><button class="btn" data-a="closepeek">Close</button></div></div>`;return}
   if(UI.rules){m.classList.remove('hidden');m.innerHTML=rulesHTML();return}
   if(UI.stats&&G&&G.winner){m.classList.remove('hidden');m.innerHTML=statsHTML();return}
-  if(UI.choice){const c=UI.choice;m.classList.remove('hidden');
+  if(UI.choice&&!(NET.on&&c0Remote())){const c=UI.choice;m.classList.remove('hidden');
     const dice=c.dice&&G?`<div class="mdice">${G.dice.map(d=>`<span class="die sm ${d.t?'sp-'+d.t:''}">${faceSVG(d.f)}</span>`).join('')}</div>`:'';
     m.innerHTML=`<div class="dlg" role="dialog" aria-modal="true"><h2>${esc(c.title)}</h2>${G&&c.who!==undefined&&G.mode==='hot'?`<p class="pass">📱 Pass the device to <b>${esc(mname(P(c.who)))}</b>: this one is for you.</p>`:''}<p>${esc(c.text)}</p>${dice}<div class="acts">${c.options.map(o=>`<button class="btn ${/Recommended\./.test(o.d||'')?'primary':''}" data-opt="${esc(o.k)}">${esc(o.l)}${o.d?`<small>${esc(o.d)}</small>`:''}</button>`).join('')}${c.cancel?'<button class="btn" data-opt="x">Close</button>':''}</div></div>`;return}
   m.classList.add('hidden');m.innerHTML=''}
@@ -1571,7 +1732,7 @@ function startScreen(){const saved=load();const xp=UI.xp;
     <button class="btn" data-start="hot">Everyone on one screen<small>${UI.n} players take turns on this device.</small></button>
     <button class="btn" data-start="ai">Watch the computer play<small>A quick way to see the rules in action.</small></button>
     ${saved&&!saved.winner&&saved.pl?`<button class="btn" data-start="load">Continue saved game<small>Round ${saved.turn}, ${saved.pl.length} monsters</small></button>`:''}
-   </div><p class="small muted">The names, card text and art are original, for copyright reasons. The rules follow the published rulebook.</p></div>`}
+   </div>${onlineBlock()}<p class="small muted">The names, card text and art are original, for copyright reasons. The rules follow the published rulebook.</p></div>`}
 function rulesHTML(){return `<div class="dlg rules" role="dialog" aria-modal="true"><h2>How to play</h2>
   <h3>Your turn in 5 steps</h3><ol><li><b>Roll</b> all dice. Keep any dice you like and reroll the rest, up to twice. You can reroll dice you kept earlier.</li>
   <li><b>Resolve</b>: three of a kind of 1, 2 or 3 scores that many stars, and each extra matching die adds 1. Energy gives 1 each. Hearts heal 1 each, but only outside the city (max 10). Claws smash.</li>
@@ -1585,6 +1746,7 @@ function rulesHTML(){return `<div class="dlg rules" role="dialog" aria-modal="tr
   <li><b>Evolutions</b> (optional): when you resolve three or more hearts, draw an evolution card for your monster. Play it on your turn. Some are permanent.</li>
   <li><b>Trial</b> mixes the 24 new cards into the classic deck. <b>Experience</b> uses only the new cards.</li></ul>
   <h3>More expansions (switch them on at the start)</h3><ul>${EXPS.filter(e=>e.k!=='evo').map(e=>`<li><b>${esc(e.n)}</b>: ${esc(e.d)}</li>`).join('')}</ul>
+  <h3>Online play</h3><p class="small">On the start screen press <b>Host a game</b> and share the invite code. Friends open this same page (share it with them as Contributors or Editors first), type the code and press <b>Join a game</b>. The host's page runs the game, so it must stay open. Empty seats are filled with computer monsters, and if someone drops out the computer takes over their monster until they come back.</p>
   <h3>Keyboard shortcuts</h3><p class="small"><b>R</b> reroll · <b>Space</b> resolve / end turn · <b>1–8</b> keep a die · <b>H</b> suggest dice · <b>P</b> pause the computer</p>
   <h3>Winning</h3><p>Reach <b>20 stars</b> and survive your turn, or be the last monster standing. If everyone falls at once, nobody wins.</p>
   <h3>Left out of this version</h3><p class="small">Ten advanced classic cards that need tokens or peeking at the deck, and the Wickedness tiles, which need a separate expansion.</p>
@@ -1605,16 +1767,16 @@ function renderTour(){document.querySelectorAll('.hl').forEach(e=>e.classList.re
   el.innerHTML=`<h3>Tour ${UI.coach+1} of ${TOURSTEPS.length}: ${esc(st.t)}</h3><p class="small">${esc(st.b)}</p><div class="acts"><button class="btn" data-tour="prev" ${UI.coach===0?'disabled':''}>Back</button><button class="btn primary" data-tour="next">${UI.coach===TOURSTEPS.length-1?'Start playing':'Next'}</button><button class="btn" data-tour="skip">Skip tour</button></div>`;
   const tg=document.querySelector(st.el);if(tg)tg.classList.add('hl')}
 
-function render(){if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal()}
+function render(){if(isHost())netPush();if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal()}
 const SPEEDS=[['slow',1300],['normal',650],['fast',260]];
-function setSpeed(k){UI.speed=k;AIDELAY=SPEEDS[k][1];const b=document.getElementById('speedbtn');if(b)b.textContent='Speed: '+SPEEDS[k][0];try{localStorage.setItem('ccs_speed',k)}catch(e){}}
+function setSpeed(k){UI.speed=k;AIDELAY=SPEEDS[k][1];const b=document.getElementById('speedbtn');if(b)b.textContent='⏩ '+SPEEDS[k][0][0].toUpperCase()+SPEEDS[k][0].slice(1);try{localStorage.setItem('ccs_speed',k)}catch(e){}}
 
 // ---------- events ----------
 document.addEventListener('click',e=>{
-  const t=e.target.closest('[data-a],[data-act],[data-die],[data-card],[data-opt],[data-start],[data-tour],[data-n],[data-mon],[data-xp],[data-evo],[data-exk],[data-lvl],[data-preset],g.seat');if(!t)return;
+  const t=e.target.closest('[data-emo],[data-a],[data-act],[data-die],[data-card],[data-opt],[data-start],[data-tour],[data-n],[data-mon],[data-xp],[data-evo],[data-exk],[data-lvl],[data-preset],g.seat');if(!t)return;
   const ds=t.dataset;if(t.tagName==='BUTTON'&&!t.disabled&&!ds.a)snd('click');
   if(ds.n){UI.n=+ds.n;render();return}
-  if(ds.mon!==undefined){UI.mon=+ds.mon;render();return}
+  if(ds.mon!==undefined){UI.mon=+ds.mon;if(NET.on&&NET.room)NET.room.presence({mon:UI.mon}).catch(()=>{});render();return}
   if(ds.xp){UI.xp=ds.xp;render();return}
   if(ds.evo!==undefined){UI.evo=ds.evo==='1';render();return}
   if(ds.exk){if(ds.exk==='evo')UI.evo=!UI.evo;else UI.ex[ds.exk]=!UI.ex[ds.exk];saveSetup();render();return}
@@ -1624,14 +1786,21 @@ document.addEventListener('click',e=>{
     if(k==='load'){G=load();if(!G.gid)G.gid=Math.random();UI.choice=null;UI.busy=false;UI.fx={};if(G.phase==='resolve'||G.phase==='start'){G.phase='roll';G.step=1}refresh()}
     else{newGame(k);let toured=false;try{toured=!!localStorage.getItem(TOUR);localStorage.setItem(TOUR,'1')}catch(x){}if(k==='solo'&&!toured)startTour()}return}
   if(ds.tour){if(ds.tour==='next')UI.coach=UI.coach>=TOURSTEPS.length-1?-1:UI.coach+1;else if(ds.tour==='prev')UI.coach=Math.max(0,UI.coach-1);else UI.coach=-1;renderTour();return}
-  if(ds.a){if(ds.a==='new'){UI.info=true;UI.choice=null;render()}else if(ds.a==='rules'){UI.rules=true;render()}else if(ds.a==='closerules'){UI.rules=false;render();schedule()}else if(ds.a==='tour')startTour();else if(ds.a==='speed')setSpeed((UI.speed+1)%3);else if(ds.a==='snd')toggleSound();else if(ds.a==='pause'){UI.paused=!UI.paused;const b=document.getElementById('pausebtn');if(b)b.textContent=UI.paused?'▶ Resume':'⏸ Pause';render();schedule()}else if(ds.a==='closestats'){UI.stats=false;render()}else if(ds.a==='hints'){UI.hints=!UI.hints;const b=document.getElementById('hintbtn');if(b)b.textContent='💡 Hints: '+(UI.hints?'on':'off');render()}else if(ds.a==='mus')toggleMusic();return}
-  if(ds.opt!==undefined){const c=UI.choice;if(!c)return;UI.choice=null;if(ds.opt==='x'){refresh();return}c.cb(ds.opt);if(!UI.choice)refresh();return}
+  if(ds.emo){sendEmote(ds.emo);return}
+  if(ds.a){if(ds.a==='nethost'){netJoin('host',newCode());return}if(ds.a==='netjoin'){const v=(document.getElementById('joincode')||{}).value;netJoin('client',v);return}if(ds.a==='netstart'){netStart();return}if(ds.a==='netleave'){netLeave();return}if(ds.a==='closepeek'){UI.peek=null;render();return}
+    if(ds.a==='new'&&NET.on){UI.stats=false;if(isHost()){G=null;NET.inLobby=true;netPush(true)}else NET.inLobby=true;render();return}
+    if(ds.a==='new'){UI.info=true;UI.choice=null;render()}else if(ds.a==='rules'){UI.rules=true;render()}else if(ds.a==='closerules'){UI.rules=false;render();schedule()}else if(ds.a==='tour')startTour();else if(ds.a==='speed')setSpeed((UI.speed+1)%3);else if(ds.a==='snd')toggleSound();else if(ds.a==='pause'){UI.paused=!UI.paused;const b=document.getElementById('pausebtn');if(b)b.textContent=UI.paused?'▶ Resume':'⏸';render();schedule()}else if(ds.a==='closestats'){UI.stats=false;render()}else if(ds.a==='hints'){UI.hints=!UI.hints;const b=document.getElementById('hintbtn');if(b)b.textContent='💡 '+(UI.hints?'On':'Off');render()}else if(ds.a==='mus')toggleMusic();return}
   if(t.classList.contains('seat')&&G){seatInfo(+ds.seat);return}
+  if(ds.act==='again'&&NET.on){t.dataset.a='new';document.querySelector('[data-a="new"]')&&0;UI.stats=false;if(isHost()){G=null;NET.inLobby=true;netPush(true)}else NET.inLobby=true;render();return}
+  uiAct({act:ds.act,die:ds.die,card:ds.card,opt:ds.opt});});
+function c0Remote(){const c=UI.choice;return c&&!c.net&&c.who!==undefined&&c.who!==NET.mySeat}
+function gameAct(ds,seat){
+  if(ds.opt!==undefined){const c=UI.choice;if(!c)return;if(NET.on&&c.who!==undefined&&c.who!==seat)return;if(ds.opt==='x'&&!c.cancel)return;UI.choice=null;if(ds.opt==='x'){refresh();return}c.cb(ds.opt);if(!UI.choice)refresh();return}
   if(false){const p=null,hidden=0;
     UI.choice={title:mname(p),text:`${MONS[p.m].d}. ${p.alive?`${p.hp}/${maxhp(p)} hearts, ${p.vp} stars, ${p.en} energy${mbOn()?`, ${p.mb} Mindbug token${p.mb===1?'':'s'}`:''}, in ${where(p.i)}.`:'Knocked out.'} Cards: ${p.cards.length?p.cards.map(c=>CARDS[base(c)].n+' ('+CARDS[base(c)].x+')').join(' · '):'none'}.${p.evo.length?' Evolutions: '+p.evo.map(e=>evoName(e)+' ('+EVOFX[evoKey(e)].x+')').join(' · ')+'.':''}${p.hand.length?` ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand${hidden?' (hidden)':': '+p.hand.map(evoName).join(', ')}.`:''}`,options:[],cancel:true};render();return}
   if(!G||G.winner&&ds.act!=='again')return;
   if(ds.act==='again'){UI.info=true;render();return}
-  if(!humanTurn()||UI.choice||UI.busy)return;
+  if(!(isHuman(G.active)&&(!NET.on||G.active===seat))||UI.choice||UI.busy)return;
   if(ds.die!==undefined&&G.phase==='roll'){const d=G.dice[+ds.die];d.k=!d.k;render();return}
   const p=cur();
   if(ds.card!==undefined&&G.phase==='buy'){buy(+ds.card);return}
@@ -1650,7 +1819,7 @@ document.addEventListener('click',e=>{
     case 'sweep':sweep();break;
     case 'mend':mend();break;
     case 'end':if(G.phase==='buy')endTurn();break;
-  }});
+  }}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.rules){UI.rules=false;render();return}
   if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
   if(e.key==='p'||e.key==='P'){document.querySelector('[data-a="pause"]')?.click();return}
@@ -1659,15 +1828,15 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.rules){UI.rules=
   else if(G.phase==='buy'&&(e.key===' '||e.key==='Enter'||e.key==='e'||e.key==='E'))click('[data-act="end"]')});
 function saveSetup(){try{localStorage.setItem('ccs_setup',JSON.stringify({ex:UI.ex,evo:UI.evo,lvl:UI.lvl,xp:UI.xp,n:UI.n,mon:UI.mon}))}catch(e){}}
 try{const st=JSON.parse(localStorage.getItem('ccs_setup')||'null');if(st){Object.assign(UI.ex,st.ex||{});if(st.evo!==undefined)UI.evo=st.evo;if(st.lvl)UI.lvl=st.lvl}}catch(e){}
-function suggestMask(p){const key=G.rollId+':'+G.rolls+':'+G.dice.map(d=>d.f).join('');if(UI.sugKey===key)return UI.sugMask;const saved=G.dice.map(d=>d.k);aiMarkHard(p);const m=G.dice.map(d=>d.k);G.dice.forEach((d,k)=>d.k=saved[k]);UI.sugKey=key;UI.sugMask=m;return m}
+function suggestMask(p){const key=G.rollId+':'+G.rolls+':'+G.dice.map(d=>d.f).join('');if(UI.sugKey===key)return UI.sugMask;const saved=G.dice.map(d=>d.k);aiMarkHard0(p);const m=G.dice.map(d=>d.k);G.dice.forEach((d,k)=>d.k=saved[k]);UI.sugKey=key;UI.sugMask=m;return m}
 function exIcons(p){let s='';if(exOn('cult')&&p.cult)s+=' 🕯'+p.cult;if(exOn('wick'))s+=' 😈'+p.wk;if(exOn('tower')){const t=G.tower.filter(o=>o===p.i).length;if(t)s+=' 🗼'+t}if(p.tok&&p.tok.berserk)s+=' 😡';return s}
 function statsHTML(){const rows=G.pl.map(p=>{const s=p.stats||{};return `<tr class="${'P'+(p.i+1)===G.winner?'win':''}"><td><b style="color:${MONS[p.m].c};-webkit-text-stroke:.6px #1a1320">${esc(mname(p))}</b>${p.human&&G.mode==='solo'?' (you)':''}</td><td>${p.alive?'♥'+p.hp:'K.O.'}</td><td>★${p.vp}</td><td>${s.dmg||0}</td><td>${s.kos||0}</td><td>${s.cards||0}</td><td>${s.city||0}</td></tr>`}).join('');
   return `<div class="dlg" role="dialog" aria-modal="true"><h2>🏆 Game over</h2><p><b>${esc(G.winText)}</b></p><p class="small muted">Round ${G.turn}.</p>
   <table class="stats"><tr><th>Monster</th><th>Hearts</th><th>Stars</th><th>Claw damage</th><th>K.O.s</th><th>Cards</th><th>Turns in city</th></tr>${rows}</table>
   <div class="acts"><button class="btn primary" data-a="new">Play again</button><button class="btn" data-a="closestats">Look at the city</button></div></div>`}
 try{const sp=localStorage.getItem('ccs_speed');if(sp!==null)setSpeed(+sp)}catch(e){}
-function seatInfo(k){if(!G||UI.choice||UI.info)return;const p=P(k);const hidden=G.mode==='solo'&&!p.human;
-  UI.choice={title:mname(p),text:`${MONS[p.m].d}. ${p.alive?`${p.hp}/${maxhp(p)} hearts, ${p.vp} stars, ${p.en} energy${mbOn()?`, ${p.mb} Mindbug token${p.mb===1?'':'s'}`:''}, in ${where(p.i)}.`:'Knocked out.'} Cards: ${p.cards.length?p.cards.map(c=>CARDS[base(c)].n+' ('+CARDS[base(c)].x+')').join(' · '):'none'}.${p.evo.length?' Evolutions: '+p.evo.map(e=>evoName(e)+' ('+EVOFX[evoKey(e)].x+')').join(' · ')+'.':''}${p.hand.length?` ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand${hidden?' (hidden)':': '+p.hand.map(evoName).join(', ')}.`:''}`,options:[],cancel:true};render()}
+function seatInfo(k){if(!G||UI.info)return;const p=P(k);const hidden=(G.mode==='solo'||G.mode==='net')&&!(NET.on?k===NET.mySeat:p.human);
+  UI.peek={title:mname(p)+(pname(p)?' ('+pname(p)+')':''),text:`${MONS[p.m].d}. ${p.alive?`${p.hp}/${maxhp(p)} hearts, ${p.vp} stars, ${p.en} energy${mbOn()?`, ${p.mb} Mindbug token${p.mb===1?'':'s'}`:''}, in ${where(p.i)}.`:'Knocked out.'} Cards: ${p.cards.length?p.cards.map(c=>CARDS[base(c)].n+' ('+CARDS[base(c)].x+')').join(' · '):'none'}.${p.evo.length?' Evolutions: '+p.evo.map(e=>evoName(e)+' ('+EVOFX[evoKey(e)].x+')').join(' · ')+'.':''}${p.hand.length?` ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand${hidden?' (hidden)':': '+p.hand.map(evoName).join(', ')}.`:''}`,options:[],cancel:true};render()}
 try{init3D()}catch(e){console.warn('3D off',e);V3.on=false;document.body.classList.remove('three')}
 if(typeof soundBtns==='function')soundBtns();
 renderLegend();render();

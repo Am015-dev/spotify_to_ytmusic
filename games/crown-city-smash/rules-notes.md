@@ -67,3 +67,10 @@ Sources: search-result excerpts only; every official rulebook PDF was blocked by
 # Computer skill
 - Easy: the Normal logic with random mistakes. Normal: rule-based. Hard: tries every keep and simulates the rerolls to pick the best one; it also yields more carefully and uses Mindbug more carefully.
 - Head to head over 120 games: Hard won 59% against Normal (2 of each, seats alternating). In separate 4-player games, Easy won 15% against Normal (2 of each).
+
+## v6: online multiplayer and Hard tuning
+
+- **Online play** (claude.ai only). It uses the artifact `room` + `user` capabilities. The host's page runs the game engine and broadcasts compressed game state; guests send their clicks as actions, and the host checks each action belongs to that player's seat before applying it. Invite codes join a named room (`ccs-<code>`). Empty seats are filled by the computer.
+- If a player disconnects, the computer takes over their seat; if they rejoin with the same account, they get it back. **The host must keep the page open.** Guests need Contributor or Editor access to the artifact (Viewers can watch but not act).
+- Not available in the GitHub Pages build (no room service there): single-player, pass-and-play and computer-only games still work.
+- **Hard skill:** a two-stage dice lookahead replaced the one-step keep search, but in testing it wasn't measurably stronger: about 55–59% wins against Normal, the same as the old Hard. A probabilistic stay/yield model also lost to the old rule (52% vs 58%), so the old rule stays (`HYOLD=true`, yield margin `HYB=1.5`, the best of 0.8 / 1.5 / 2.2).
