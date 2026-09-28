@@ -2,23 +2,152 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Browser Board Games</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Game Night Shelf</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rammetto+One&family=Chivo:wght@400;600;800&family=Chivo+Mono:wght@500&display=swap">
 <style>
-:root{--bg:#0d0b22;--ink:#ecebff;--muted:#a3a0cc;--card:#1a173d;--line:#3a3580;--gold:#ffc86b}
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f3ff;--ink:#17133a;--muted:#5d5890;--card:#fff;--line:#d3ccf5}}
-:root[data-theme="dark"]{--bg:#0d0b22;--ink:#ecebff;--muted:#a3a0cc;--card:#1a173d;--line:#3a3580}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
-main{max-width:760px;margin:0 auto;padding:2rem 16px}
-h1{margin:0 0 .3rem}p{color:var(--muted)}
-a.card{display:block;border:1.5px solid var(--line);border-radius:14px;padding:1rem 1.2rem;margin:1rem 0;background:var(--card);color:inherit;text-decoration:none}
-a.card:hover{border-color:var(--gold)}a.card b{font-size:1.2rem}
+/* Layout: a walnut shelf under lamp light; each game is a box standing on the shelf, flipping open into a full-screen table when played. */
+:root{
+  --wood:#1d1411; --wood2:#2b1d17; --plank:#5a3a26; --paper:#f1e6d0; --ink:#f4ead8; --muted:#bca78c;
+  --brass:#e0a948; --line:#4a3326; --shadow:rgba(0,0,0,.55);
+  --display:"Rammetto One","Arial Black",Impact,sans-serif; --body:"Chivo",system-ui,sans-serif; --mono:"Chivo Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--wood:#efe3cc;--wood2:#e4d3b4;--plank:#a4744b;--ink:#2a1a10;--muted:#6d5640;--brass:#9c6412;--line:#d2bb95;--shadow:rgba(80,50,20,.28);color-scheme:light}}
+:root[data-theme="light"]{--wood:#efe3cc;--wood2:#e4d3b4;--plank:#a4744b;--ink:#2a1a10;--muted:#6d5640;--brass:#9c6412;--line:#d2bb95;--shadow:rgba(80,50,20,.28);color-scheme:light}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:radial-gradient(120% 70% at 50% -10%,var(--wood2),var(--wood) 70%);background-color:var(--wood);color:var(--ink);font:16px/1.55 var(--body)}
+.page{max-width:1080px;margin:0 auto;padding-inline:16px;padding-block:28px 40px}
+header.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px}
+h1{font:400 clamp(1.9rem,5vw,3rem)/1 var(--display);margin:0;letter-spacing:.01em;text-wrap:balance}
+.lede{color:var(--muted);max-width:60ch;margin:.5rem 0 0}
+.tally{font:500 .8rem var(--mono);color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.shelf{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:34px 30px;position:relative;padding-bottom:22px}
+.shelf::after{content:"";position:absolute;left:-8px;right:-8px;bottom:0;height:18px;border-radius:3px;background:linear-gradient(var(--plank),color-mix(in srgb,var(--plank) 60%,#000));box-shadow:0 14px 24px var(--shadow)}
+.box{position:relative;display:grid;grid-template-rows:auto 1fr;border-radius:6px;overflow:hidden;background:var(--paper);color:#241810;box-shadow:0 18px 30px var(--shadow),inset 0 0 0 1px rgba(0,0,0,.15);transform-origin:50% 100%;transition:transform .25s ease,box-shadow .25s ease;min-width:0}
+.box:hover{transform:translateY(-6px) rotate(-.4deg);box-shadow:0 26px 40px var(--shadow)}
+.cover{position:relative;aspect-ratio:16/9;max-width:100%}
+.cover canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cover .ttl{position:absolute;left:18px;right:18px;bottom:14px;margin:0;font:400 clamp(1.6rem,4.4vw,2.4rem)/1 var(--display);color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.45),0 0 18px rgba(0,0,0,.5);text-wrap:balance}
+.cover .ribbon{position:absolute;top:12px;right:12px;font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;background:rgba(0,0,0,.55);color:#fff;padding:4px 8px;border-radius:3px}
+.info{padding:16px 18px 18px;display:grid;gap:12px;align-content:start}
+.info p{margin:0;color:#4b3726}
+.stats{display:flex;flex-wrap:wrap;gap:0;border:1.5px solid #3a2718;border-radius:4px;overflow:hidden;font-variant-numeric:tabular-nums}
+.stats div{flex:1 1 0;min-width:74px;padding:6px 10px;border-left:1.5px solid #3a2718;display:grid}
+.stats div:first-child{border-left:0}
+.stats b{font:800 1.05rem var(--body)}
+.stats span{font:500 .66rem var(--mono);text-transform:uppercase;letter-spacing:.08em;color:#6b5238}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font:600 .75rem var(--body);padding:3px 9px;border-radius:99px;background:#e2d2b3;color:#3a2718}
+.based{font:500 .72rem var(--mono);color:#7a6149;letter-spacing:.03em}
+.acts{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{font:800 .95rem var(--body);border:0;border-radius:4px;padding:10px 18px;cursor:pointer;text-decoration:none;display:inline-flex;gap:8px;align-items:center}
+.play{background:#241810;color:#f6ecd9}
+.play:hover{background:#000}
+.alt{background:transparent;color:#3a2718;box-shadow:inset 0 0 0 1.5px #3a2718}
+.alt:hover{background:#e2d2b3}
+.btn:focus-visible,.bar button:focus-visible,.bar a:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.last{font:600 .78rem var(--body);color:#8a4b12}
+footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
+/* player overlay */
+#table{position:fixed;inset:0;z-index:10;display:grid;grid-template-rows:auto 1fr;background:#000}
+#table .bar{display:flex;gap:10px;align-items:center;padding:8px 12px;padding-top:calc(8px + env(safe-area-inset-top,0px));background:var(--wood);border-bottom:1px solid var(--line)}
+#table .bar strong{font:400 1rem var(--display);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#table .bar button,#table .bar a{font:700 .85rem var(--body);background:transparent;color:var(--ink);border:1.5px solid var(--line);border-radius:4px;padding:6px 12px;cursor:pointer;text-decoration:none}
+#table .bar button:hover,#table .bar a:hover{border-color:var(--brass)}
+#table iframe{width:100%;height:100%;border:0;background:#0b0a1a;display:block}
+#table.opening{animation:open .35s ease-out}
+@keyframes open{from{clip-path:inset(40% 30% 40% 30% round 12px);opacity:.4}to{clip-path:inset(0 0 0 0);opacity:1}}
+@media (prefers-reduced-motion:reduce){.box,.box:hover{transition:none;transform:none}#table.opening{animation:none}}
+@media (max-width:480px){.stats div{min-width:64px;padding:6px 8px}.btn{padding:10px 14px}}
 </style>
+
 </head>
-<body><main>
-<h1>Browser board games</h1>
-<p>Single-file adaptations with original names and art, computer opponents and hot-seat play.</p>
-<a class="card" href="crown-city-smash/"><b>Crown City Smash</b><br>Giant-monster dice brawl with 3D kaiju, Mindbug and six more expansions.</a>
-<a class="card" href="nebula-aces/"><b>Nebula Aces</b><br>Tactical starfighter dogfight: plan secret maneuvers, then fly and fire.</a>
-</main></body>
+<body>
+<div class="page">
+  <header class="top">
+    <div>
+      <h1>Game Night Shelf</h1>
+      <p class="lede">Pick a box and play it here in the browser, against the computer or with friends passing the device. Both games use original names and art.</p>
+    </div>
+    <div class="tally" id="tally">2 games on the shelf</div>
+  </header>
+
+  <section class="shelf" id="shelf" aria-label="Games"></section>
+
+  <footer>Each game keeps its own save, sound and difficulty settings. Online play with friends in other places runs in the standalone Crown City Smash page, where the multiplayer rooms are set up.</footer>
+</div>
+
+<div id="table" hidden>
+  <div class="bar">
+    <button type="button" id="back" aria-label="Back to the shelf">← Shelf</button>
+    <strong id="tname">Game</strong>
+    <a id="solo" href="#" target="_blank" rel="noopener">Open on its own</a>
+  </div>
+  <iframe id="frame" title="Game" allow="fullscreen; autoplay"></iframe>
+</div>
+
+<script>
+const GAMES=[
+  {id:'crown',name:'Crown City Smash',src:'crown-city-smash/index.html',ribbon:'Dice brawl',
+   blurb:'Giant monsters roll dice to stomp, heal, charge up and buy power cards. Hold the city for stars and try to be the last monster standing, or the first to 20 stars.',
+   stats:[['2–6','players'],['30','minutes'],['8+','ages'],['3D','table']],
+   chips:['Vs computer · 3 levels','Hot-seat','Online rooms','Power Up evolutions','Halloween','Cultists','Tower','Anubis','Berserk','Wickedness','Mindbug'],
+   based:'Plays like King of Tokyo (2011)',paint:paintCrown},
+  {id:'nebula',name:'Nebula Aces',src:'nebula-aces/index.html',ribbon:'Starfighter duel',
+   blurb:'Set secret maneuver dials, fly your squadron along real templates, then roll attack and defence dice. Build a 100-point squad or fly the learning duel.',
+   stats:[['1–2','players'],['45','minutes'],['12+','ages'],['914','mm mat']],
+   chips:['Vs computer · 3 levels','Hot-seat','Squad builder','Waves 1–3','Large ships','Bombs & mines','Ion & turrets'],
+   based:'Plays like the X-Wing Miniatures Game, 1st edition (2012)',paint:paintNebula}
+];
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+function paintCrown(c){const x=c.getContext('2d'),w=c.width,h=c.height;
+  let g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#2a0f3d');g.addColorStop(.55,'#c2412a');g.addColorStop(1,'#ffb347');x.fillStyle=g;x.fillRect(0,0,w,h);
+  x.fillStyle='rgba(255,235,180,.9)';x.beginPath();x.arc(w*.72,h*.36,h*.16,0,7);x.fill();
+  const r=seed(7);
+  x.fillStyle='#1a0b1f';for(let i=0;i<34;i++){const bw=w*(.03+r()*.05),bh=h*(.18+r()*.38),bx=i/34*w*1.05-10;x.fillRect(bx,h-bh,bw,bh);
+    x.fillStyle='rgba(255,210,120,.55)';for(let k=0;k<6;k++)if(r()<.5)x.fillRect(bx+bw*.2+r()*bw*.5,h-bh+10+r()*bh*.7,3,4);x.fillStyle='#1a0b1f'}
+  /* kaiju silhouette */
+  x.save();x.translate(w*.33,h*.98);x.scale(h/300,h/300);x.fillStyle='#0d0610';x.beginPath();
+  x.moveTo(-90,0);x.lineTo(-70,-90);x.quadraticCurveTo(-80,-150,-40,-190);x.lineTo(-30,-235);x.quadraticCurveTo(0,-265,30,-240);x.lineTo(55,-225);x.lineTo(40,-205);x.lineTo(20,-200);
+  x.quadraticCurveTo(40,-160,70,-150);x.lineTo(95,-170);x.lineTo(92,-140);x.lineTo(60,-120);x.quadraticCurveTo(50,-60,70,0);x.closePath();x.fill();
+  for(let i=0;i<5;i++){x.beginPath();x.moveTo(-60+i*6,-110-i*25);x.lineTo(-85+i*4,-120-i*28);x.lineTo(-55+i*6,-130-i*25);x.fill()}
+  x.fillStyle='#ffe07a';x.beginPath();x.arc(28,-232,4,0,7);x.fill();x.restore();
+  x.strokeStyle='rgba(255,240,160,.8)';x.lineWidth=3;x.beginPath();x.moveTo(w*.33+h*.1,h*.2);x.lineTo(w*.92,h*.08);x.stroke();
+  x.fillStyle='rgba(0,0,0,.35)';x.fillRect(0,h*.72,w,h*.28)}
+function paintNebula(c){const x=c.getContext('2d'),w=c.width,h=c.height;x.fillStyle='#05060f';x.fillRect(0,0,w,h);
+  const r=seed(3);
+  for(const [cx,cy,rad,col] of [[.25,.35,.55,'rgba(80,60,200,.55)'],[.7,.6,.5,'rgba(200,70,140,.45)'],[.55,.25,.35,'rgba(40,160,200,.35)']]){const g=x.createRadialGradient(w*cx,h*cy,0,w*cx,h*cy,w*rad);g.addColorStop(0,col);g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,w,h)}
+  for(let i=0;i<260;i++){x.fillStyle=`rgba(255,255,255,${.3+r()*.7})`;const s=r()<.08?2:1;x.fillRect(r()*w,r()*h,s,s)}
+  function fighter(px,py,sc,rot,col){x.save();x.translate(px,py);x.rotate(rot);x.scale(sc,sc);x.fillStyle=col;x.beginPath();x.moveTo(40,0);x.lineTo(-10,-8);x.lineTo(-24,-30);x.lineTo(-30,-30);x.lineTo(-22,-6);x.lineTo(-28,0);x.lineTo(-22,6);x.lineTo(-30,30);x.lineTo(-24,30);x.lineTo(-10,8);x.closePath();x.fill();
+    x.fillStyle='#7fe0ff';x.beginPath();x.arc(-26,0,4,0,7);x.fill();x.restore()}
+  x.strokeStyle='rgba(255,90,90,.9)';x.lineWidth=2.5;x.beginPath();x.moveTo(w*.34,h*.52);x.lineTo(w*.7,h*.3);x.moveTo(w*.34,h*.56);x.lineTo(w*.69,h*.34);x.stroke();
+  fighter(w*.3,h*.56,h/150,-.5,'#d9dde8');fighter(w*.74,h*.28,h/260,2.6,'#8a8fa6');fighter(w*.84,h*.42,h/320,2.8,'#8a8fa6');
+  x.fillStyle='rgba(0,0,0,.35)';x.fillRect(0,h*.72,w,h*.28)}
+function seed(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
+
+const shelf=document.getElementById('shelf');const lastId=store.get('shelf_last');
+for(const g of GAMES){const el=document.createElement('article');el.className='box';el.innerHTML=`
+  <div class="cover"><canvas width="800" height="450" aria-hidden="true"></canvas><span class="ribbon">${g.ribbon}</span><h2 class="ttl">${g.name}</h2></div>
+  <div class="info"><p>${g.blurb}</p>
+    <div class="stats">${g.stats.map(s=>`<div><b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div>
+    <div class="chips">${g.chips.map(c=>`<span>${c}</span>`).join('')}</div>
+    <div class="based">${g.based}</div>
+    <div class="acts"><button type="button" class="btn play" id="play-${g.id}">▶ Play</button><a class="btn alt" href="${g.src}" target="_blank" rel="noopener">New tab</a>${lastId===g.id?'<span class="last">Played last</span>':''}</div></div>`;
+  shelf.appendChild(el);g.paint(el.querySelector('canvas'));el.querySelector('.play').onclick=()=>openGame(g)}
+
+const table=document.getElementById('table'),frame=document.getElementById('frame');
+function openGame(g){store.set('shelf_last',g.id);document.getElementById('tname').textContent=g.name;document.getElementById('solo').href=g.src;
+  frame.title=g.name;frame.src=g.src;table.hidden=false;table.classList.remove('opening');void table.offsetWidth;table.classList.add('opening');document.body.style.overflow='hidden';
+  try{history.replaceState(null,'','#'+g.id)}catch(e){}frame.focus()}
+function closeGame(){table.hidden=true;frame.src='about:blank';document.body.style.overflow='';try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+  document.querySelector('.last')?.remove();const id=store.get('shelf_last');const b=document.getElementById('play-'+id);if(b){b.parentNode.insertAdjacentHTML('beforeend','<span class="last">Played last</span>');b.focus()}}
+document.getElementById('back').onclick=closeGame;
+addEventListener('keydown',e=>{if(e.key==='Escape'&&!table.hidden)closeGame()});
+const start=GAMES.find(g=>'#'+g.id===location.hash);if(start)openGame(start);
+</script>
+</body>
 </html>
