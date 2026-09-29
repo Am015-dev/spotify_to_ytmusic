@@ -49,6 +49,8 @@ h1{font:400 clamp(1.9rem,5vw,3rem)/1 var(--display);margin:0;letter-spacing:.01e
 .play:hover{background:#000}
 .alt{background:transparent;color:#3a2718;box-shadow:inset 0 0 0 1.5px #3a2718}
 .alt:hover{background:#e2d2b3}
+.ref{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--muted)}
+.ref:hover{box-shadow:inset 0 0 0 1.5px var(--brass)}
 .btn:focus-visible,.bar button:focus-visible,.bar a:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
 .last{font:600 .78rem var(--body);color:#8a4b12}
 footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
@@ -71,9 +73,9 @@ footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
   <header class="top">
     <div>
       <h1>Game Night Shelf</h1>
-      <p class="lede">Pick a box and play it here in the browser, against the computer or with friends passing the device. Every game uses original names and art.</p>
+      <p class="lede">Pick a box and play it here in the browser, against the computer or with friends passing the device. Every game uses original names and art, and the reference lists every card and token.</p>
     </div>
-    <div class="tally" id="tally">3 games on the shelf</div>
+    <div style="display:grid;gap:8px;justify-items:end"><button type="button" class="btn ref" id="refbtn" data-ref="">📖 Card &amp; token reference</button><div class="tally" id="tally">3 games on the shelf</div></div>
   </header>
 
   <section class="shelf" id="shelf" aria-label="Games"></section>
@@ -158,16 +160,17 @@ for(const g of GAMES){const el=document.createElement('article');el.className='b
     <div class="stats">${g.stats.map(s=>`<div><b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div>
     <div class="chips">${g.chips.map(c=>`<span>${c}</span>`).join('')}</div>
     <div class="based">${g.based}</div>
-    <div class="acts"><button type="button" class="btn play" id="play-${g.id}">▶ Play</button><a class="btn alt" href="${g.src}" target="_blank" rel="noopener">New tab</a>${lastId===g.id?'<span class="last">Played last</span>':''}</div></div>`;
+    <div class="acts"><button type="button" class="btn play" id="play-${g.id}">▶ Play</button><a class="btn alt" href="${g.src}" target="_blank" rel="noopener">New tab</a><button type="button" class="btn alt" data-ref="${g.id==='doorkick'?'doorkick':g.id==='nebula'?'nebula':'crown'}">Card list</button>${lastId===g.id?'<span class="last">Played last</span>':''}</div></div>`;
   shelf.appendChild(el);g.paint(el.querySelector('canvas'));el.querySelector('.play').onclick=()=>openGame(g)}
 
 const table=document.getElementById('table'),frame=document.getElementById('frame');
-function openGame(g){store.set('shelf_last',g.id);document.getElementById('tname').textContent=g.name;document.getElementById('solo').href=g.src;
+function openGame(g){if(g.id!=='ref')store.set('shelf_last',g.id);document.getElementById('tname').textContent=g.name;document.getElementById('solo').href=g.src;
   frame.title=g.name;frame.src=g.src;table.hidden=false;table.classList.remove('opening');void table.offsetWidth;table.classList.add('opening');document.body.style.overflow='hidden';
   try{history.replaceState(null,'','#'+g.id)}catch(e){}frame.focus()}
 function closeGame(){table.hidden=true;frame.src='about:blank';document.body.style.overflow='';try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
   document.querySelector('.last')?.remove();const id=store.get('shelf_last');const b=document.getElementById('play-'+id);if(b){b.parentNode.insertAdjacentHTML('beforeend','<span class="last">Played last</span>');b.focus()}}
 document.getElementById('back').onclick=closeGame;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-ref]');if(!b)return;openGame({id:'ref',name:'Card & token reference',src:'reference.html'+(b.dataset.ref?'#'+b.dataset.ref:'')})});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!table.hidden)closeGame()});
 const start=GAMES.find(g=>'#'+g.id===location.hash);if(start)openGame(start);
 </script>
