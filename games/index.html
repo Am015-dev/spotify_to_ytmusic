@@ -64,8 +64,9 @@ footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
 #table.opening{animation:open .35s ease-out}
 @keyframes open{from{clip-path:inset(40% 30% 40% 30% round 12px);opacity:.4}to{clip-path:inset(0 0 0 0);opacity:1}}
 @media (prefers-reduced-motion:reduce){.box,.box:hover{transition:none;transform:none}#table.opening{animation:none}}
-@media (min-width:1560px){.shelf{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (min-width:1560px){.box:last-child:nth-child(3n+1){grid-column:1/-1;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:none}.box:last-child:nth-child(3n+1) .cover{aspect-ratio:auto;height:100%;min-height:280px}}
+@media (min-width:1560px){.shelf{grid-template-columns:repeat(6,minmax(0,1fr))}.box{grid-column:span 2}
+  .box:nth-last-child(2):nth-child(3n+1),.box:last-child:nth-child(3n+2){grid-column:span 3}
+  .box:last-child:nth-child(3n+1){grid-column:1/-1;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:none}.box:last-child:nth-child(3n+1) .cover{aspect-ratio:auto;height:100%;min-height:300px}}
 /* an odd card out spans the row, cover beside its text, so no card sits alone next to a gap */
 @media (min-width:681px) and (max-width:1559px){.box:last-child:nth-child(odd){grid-column:1/-1;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:none}.box:last-child:nth-child(odd) .cover{aspect-ratio:auto;height:100%;min-height:280px}}
 @media (max-width:680px){.shelf{grid-template-columns:minmax(0,1fr)}}
@@ -80,7 +81,7 @@ footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
       <h1>Game Night Shelf</h1>
       <p class="lede">Pick a box and play it here in the browser, against the computer or with friends passing the device. Every game uses original names and art, and the reference lists every card and token.</p>
     </div>
-    <div style="display:grid;gap:8px;justify-items:end"><button type="button" class="btn ref" id="refbtn" data-ref="">📖 Card &amp; token reference</button><div class="tally" id="tally">7 games on the shelf</div></div>
+    <div style="display:grid;gap:8px;justify-items:end"><button type="button" class="btn ref" id="refbtn" data-ref="">📖 Card &amp; token reference</button><div class="tally" id="tally">8 games on the shelf</div></div>
   </header>
 
   <section class="shelf" id="shelf" aria-label="Games"></section>
@@ -217,6 +218,27 @@ function paintGlaze(c){const x=c.getContext('2d'),w=c.width,h=c.height;let g=x.c
     if((r+k)%3){x.strokeStyle='rgba(255,255,255,.7)';x.lineWidth=2;x.beginPath();x.arc(px+S/2,py+S/2,S*.28,0,7);x.stroke();x.beginPath();x.moveTo(px+S*.2,py+S/2);x.lineTo(px+S*.8,py+S/2);x.moveTo(px+S/2,py+S*.2);x.lineTo(px+S/2,py+S*.8);x.stroke()}}
   x.fillStyle='rgba(255,240,200,.95)';x.beginPath();x.arc(w*.88,h*.16,h*.09,0,7);x.fill();
   x.fillStyle='rgba(0,0,0,.28)';x.fillRect(0,h*.72,w,h*.28)}
+function paintOverdrive(c){const x=c.getContext('2d'),w=c.width,h=c.height;
+  let g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#050312');g.addColorStop(.5,'#1a0b34');g.addColorStop(.62,'#54175a');g.addColorStop(1,'#0b0714');x.fillStyle=g;x.fillRect(0,0,w,h);
+  const r=seed(31),vx=w*.52,vy=h*.52,win=['#ffd9a0','#9fe8ff','#ff8ad0'];
+  /* street canyon of lit towers either side of the vanishing point */
+  for(const side of[-1,1])for(let i=0;i<9;i++){const d=1-i/9,bx=vx+side*(w*.06+d*d*w*.5),bw=w*(.03+d*.16),top=vy-h*(.12+d*.55+r()*.12),bot=vy+h*.02*d;const x0=side<0?bx-bw:bx;
+    x.fillStyle=i%2?'#0e0b1c':'#120e24';x.fillRect(x0,top,bw,h-top);for(let yy=top+6;yy<h*.8;yy+=6+d*8)for(let xx=x0+3;xx<x0+bw-4;xx+=5+d*8)if(r()<.38){x.globalAlpha=.4+r()*.6;x.fillStyle=win[Math.floor(r()*3)];x.fillRect(xx,yy,2+d*4,2+d*4);x.globalAlpha=1}}
+  /* start gantry */x.fillStyle='#1c1428';x.fillRect(vx-w*.2,vy-h*.2,w*.4,h*.035);x.fillStyle='#ffc23d';x.font=`700 ${Math.round(h*.028)}px sans-serif`;x.textAlign='center';x.fillText('START · ZIEL',vx,vy-h*.173);x.textAlign='start';
+  /* road with neon barriers converging */
+  x.fillStyle='#0d0a14';x.beginPath();x.moveTo(vx-6,vy);x.lineTo(vx+6,vy);x.lineTo(w*1.05,h);x.lineTo(-w*.05,h);x.fill();
+  for(const[side,col]of[[-1,'#ff2d95'],[1,'#22e4ff']]){const gg=x.createLinearGradient(0,vy,0,h);gg.addColorStop(0,col+'00');gg.addColorStop(1,col+'cc');x.fillStyle=gg;x.beginPath();x.moveTo(vx+side*6,vy);x.lineTo(vx+side*6,vy-3);x.lineTo(vx+side*w*.62,h*.82);x.lineTo(vx+side*w*.58,h);x.lineTo(vx+side*w*.55,h);x.fill();
+    x.strokeStyle=col;x.lineWidth=3;x.shadowColor=col;x.shadowBlur=16;x.beginPath();x.moveTo(vx+side*6,vy-2);x.lineTo(vx+side*w*.62,h*.82);x.stroke();x.shadowBlur=0}
+  x.strokeStyle='rgba(230,230,255,.35)';x.lineWidth=2;x.setLineDash([14,18]);for(const f of[-.18,.18]){x.beginPath();x.moveTo(vx,vy);x.lineTo(vx+f*w*1.1,h);x.stroke()}x.setLineDash([]);
+  /* hover craft from behind, gold with engine glow */
+  x.save();x.translate(w*.5,h*.8);const s=h/300;x.scale(s,s);
+  const gl=x.createRadialGradient(0,26,0,0,26,120);gl.addColorStop(0,'rgba(255,216,74,.55)');gl.addColorStop(1,'rgba(255,216,74,0)');x.fillStyle=gl;x.fillRect(-140,-40,280,160);
+  x.fillStyle='#b88a0a';x.beginPath();x.moveTo(-95,18);x.lineTo(-60,-8);x.lineTo(-18,-22);x.lineTo(18,-22);x.lineTo(60,-8);x.lineTo(95,18);x.lineTo(70,28);x.lineTo(-70,28);x.closePath();x.fill();
+  x.fillStyle='#1b1c3a';x.fillRect(-12,-20,24,40);x.fillStyle='#2a3a66';x.beginPath();x.ellipse(0,-20,22,12,0,Math.PI,0);x.fill();
+  for(const ex of[-52,52]){x.fillStyle='#1b1c3a';x.beginPath();x.arc(ex,12,17,0,7);x.fill();x.fillStyle='#ffe07a';x.shadowColor='#ffd84a';x.shadowBlur=24;x.beginPath();x.arc(ex,12,10,0,7);x.fill();x.shadowBlur=0}
+  x.restore();
+  /* rain */x.strokeStyle='rgba(170,190,255,.28)';x.lineWidth=1;x.beginPath();for(let i=0;i<160;i++){const px=r()*w,py=r()*h;x.moveTo(px,py);x.lineTo(px-3,py+14)}x.stroke();
+  x.fillStyle='rgba(0,0,0,.35)';x.fillRect(0,h*.72,w,h*.28)}
 function seed(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
 
 document.getElementById('tally').textContent=GAMES.length+' games on the shelf';
