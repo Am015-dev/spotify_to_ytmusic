@@ -147,6 +147,44 @@ table.stats{width:100%;border-collapse:collapse}table.stats td,table.stats th{bo
 @media (max-width:700px){.tag{font-size:.6rem;padding:0 4px}.tag b{font-size:.64rem;max-width:84px;overflow:hidden;text-overflow:ellipsis}.gx-bar h1{font-size:1rem}.gx-bar .btn{font-size:.82rem;padding:.25rem .5rem}.dlg{max-height:calc(100dvh - 20px)}#modal{align-items:flex-end;padding:10px}}
 @media (prefers-reduced-motion:reduce){.pop{animation-duration:.01s}}
 .stats b{font-weight:inherit}.stats b.chg{color:#ffd76a;text-decoration:underline dotted}
+
+/* ---- guidance layer ---- */
+.gx-gear{display:none}.gx-more{display:contents}
+@media (max-width:999px){.gx-gear{display:inline-flex}.gx-more{display:none;position:fixed;top:calc(var(--gx-bar-h) + 4px);right:8px;z-index:45;flex-direction:column;gap:6px;background:var(--panel);border:2px solid var(--gold);border-radius:12px;padding:8px;box-shadow:0 12px 40px #000}.gx-more.open{display:flex}.gx-more .btn{width:100%}}
+@media (max-width:700px){.gx-bar .btn[data-gx]{font-size:.78rem;padding:.25rem .45rem}.gx-bar h1{font-size:.92rem;margin-right:.2rem}}
+.legend{align-self:center;background:rgba(12,10,34,.78);border:1px solid var(--line);border-radius:8px;padding:2px 7px;font-size:.72rem;color:#dcdaf5;max-width:min(560px,calc(100vw - 110px));line-height:1.35}
+.legend b{font-weight:800;margin-left:4px}.legend .ps{color:var(--gold)}.legend .h{color:#ffd0a0}.legend .sh{color:#7fd4ff}.legend .f{color:#9f9}.legend .e{color:#8ef}.legend .sx{color:var(--bad)}.legend .l{color:#ff9}
+body.flat .legend,body.flat .lgbtn{display:none!important}
+.lgbtn{display:none}@media (max-width:700px){.legend{font-size:.66rem;padding:2px 6px;display:none}.legend.open{display:block}.lgbtn{display:inline-flex}}
+.stats span i{font-style:normal;font-weight:600;font-size:.7rem;opacity:.85}
+.stats span.pulse{animation:npulse 1.1s ease-in-out 2;box-shadow:0 0 0 2px #ffd76a}
+@keyframes npulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
+@media (prefers-reduced-motion:reduce){.stats span.pulse{animation:none}}
+.dlegend{font-size:.74rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:.2rem .45rem;align-items:center;margin:.1rem 0 .25rem}.dlegend .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:2px}.sw.g{background:#4be08a}.sw.w{background:#f3f3ff}.sw.r{background:#ff5a5a}
+#coach{display:flex;flex-direction:column;gap:.4rem}#coach:empty{display:none}
+.coach,.adv,.recap,.result,.brief{border-radius:10px;padding:.4rem .55rem;font-size:.86rem;line-height:1.35}
+.coach{background:rgba(127,212,255,.1);border:1.5px solid #7fd4ff}.coach .cn,.recap .cn{display:inline-flex;width:1.35em;height:1.35em;border-radius:50%;background:#7fd4ff;color:#07203a;font-weight:800;align-items:center;justify-content:center;font-size:.8rem;margin-right:.2rem}
+.linkb{background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit;font-size:.78rem;padding:0 .2rem;min-height:24px}
+.adv{background:rgba(255,200,107,.12);border:1.5px solid var(--gold);position:relative;padding-right:2.2rem}.adv .gx-x{position:absolute;right:2px;top:0;font-size:1.3rem;min-height:30px;min-width:30px;color:var(--ink)}
+.recap{background:var(--panel2);border:1.5px solid var(--line)}.recap.coach{border-color:#7fd4ff}.recap h3{margin:0 0 .2rem;font-size:.88rem;color:var(--gold)}.recap ul{margin:.1rem 0;padding-left:1.1rem}.recap li{margin:.1rem 0}.recap .acts{margin-top:.25rem}
+.btn.sm{min-height:34px;padding:.2rem .6rem;font-size:.82rem}
+.result{background:var(--panel2);border-left:4px solid var(--muted)}.result.hurt{border-left-color:var(--bad)}.result.good{border-left-color:var(--good)}.result .crit{color:#ff8a8a;margin-top:.15rem}
+.brief{background:linear-gradient(180deg,rgba(255,200,107,.1),transparent);border:1.5px solid var(--gold)}.brief h3{margin:0 0 .2rem;font-size:.88rem;color:var(--gold)}.brief p{margin:.2rem 0}
+#radio:empty{display:none}#radio{color:#cfe6ff;font-style:italic}#radio b{font-style:normal}#radio .f0{color:var(--c0)}#radio .f1{color:var(--c1)}#radio .f2{color:var(--c2)}
+.na-adv{min-height:32px;padding:2px 8px;font-size:.8rem;color:var(--ink);flex:0 0 auto}
+.btn.big{font-size:1rem;padding:.55rem .9rem}.acts.grid .btn.rec{box-shadow:0 0 0 3px rgba(255,200,107,.6)}.acts.grid .btn.rec::after{content:"★";font-size:.7rem;margin-left:2px}
+.btn.rep{border-color:#ff8a8a}
+.launchbar{display:flex;align-items:center;gap:.8rem;justify-content:space-between;position:sticky;top:-1rem;background:var(--panel);padding:.2rem 0;z-index:2}.launchbar .btn{font-size:1.05rem;padding:.5rem 1.2rem}
+@media (max-width:700px){.launchbar h1{font-size:1.45rem;white-space:nowrap}.launchbar .btn{white-space:nowrap;padding:.45rem .8rem}.gx-bar{gap:4px;padding-left:6px;padding-right:6px}}
+label small.bio{display:block;color:var(--muted);font-size:.74rem;max-width:230px}
+.debrief ul{padding-left:1.1rem}.debrief li{margin:.25rem 0}.debrief .hook{background:rgba(127,212,255,.1);border:1px dashed #7fd4ff;border-radius:8px;padding:.35rem .55rem}.debrief details{margin:.4rem 0}
+.tag.coach{border-color:var(--gold);background:rgba(60,40,10,.9);color:#ffe7b0;font-weight:700;transform:translate(-50%,-50%);white-space:normal;text-align:center;max-width:160px}.tag.coach small{font-weight:400}
+.roster .bio{margin:.1rem 0}
+#recap:empty{display:none}
+@media (max-width:999px){.gx-dock-body>#prompt{order:2}.gx-dock-body>#coach{order:3}.gx-dock-body>#radio{order:4}.gx-dock-body>#lastlog{order:5}.na-recap .gx-dock{max-height:56dvh}.recap li{margin:0}.recap{font-size:.8rem}}
+/* phone planning: the sheet shrinks to the dial and Lock */
+.na-plan #steps,.na-plan #shipcard,.na-plan #lastlog,.na-plan #radio,.na-plan details.how2,.na-plan .dialinfo .dname{display:none}
+@media (min-width:701px) and (max-width:999px){.dialinfo .tip{display:block!important;font-size:.8rem}}
 </style>
 </head>
 <body>
@@ -156,26 +194,32 @@ table.stats{width:100%;border-collapse:collapse}table.stats td,table.stats th{bo
   <button class="btn gx-tb" data-gx="d-squads" aria-expanded="false" title="Every ship's card: stats, upgrades, damage">🛩 Squads</button>
   <button class="btn gx-tb" data-gx="d-log" aria-expanded="false" title="Battle log">📜 Log</button>
   <button class="btn" data-a="rules">❔ Rules</button>
-  <button class="btn" data-a="new">✦ New</button>
   <span class="gx-sp"></span>
+  <button class="btn gx-gear" data-a="menu" aria-expanded="false" aria-controls="more" aria-label="More controls">⚙</button>
+  <div class="gx-more" id="more">
+  <button class="btn" data-a="new">✦ New</button>
   <button class="btn" data-a="snd" id="sndbtn" aria-label="Sound">🔊</button>
   <button class="btn" data-a="mus" id="musbtn" aria-label="Music">🎵 On</button>
   <button class="btn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ normal</button>
-  <button class="btn" data-a="pause" id="pausebtn" title="Pause the computer (P)" aria-label="Pause the computer">⏸</button>
+  <button class="btn" data-a="pause" id="pausebtn" title="Pause the computer (P)" aria-label="Pause the computer"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="9.4" y="2" width="3.6" height="12" rx="1" fill="currentColor"/></svg></button>
   <button class="btn" data-a="hints" id="hintbtn" title="Suggested maneuvers">💡 On</button>
+  </div>
 </header>
 <div class="gx-main">
   <main class="gx-board" id="board">
     <div id="stage" class="stage"><canvas id="c3" aria-label="The battlefield in 3D"></canvas><div id="tags"></div>
-      <div class="viewbar"><button class="btn" data-a="top" title="Top-down or tilted view (T)" aria-label="Switch view: top-down or tilted">⬒ View</button></div></div>
+      <div class="viewbar"><button class="btn" data-a="top" title="Top-down or tilted view (T)" aria-label="Switch view: top-down or tilted">⬒ View</button><button class="btn lgbtn" data-a="legend" aria-label="What the tag symbols mean">ⓘ Tags</button><div class="legend" aria-label="Name tag legend"><b class="ps">8</b> skill <b class="h">◆</b> hull <b class="sh">◈</b> shields <b class="f">◉</b> focus <b class="e">✦</b> evade <b class="sx">!1</b> stress <b class="l">⌖</b> lock ▣ dial set</div></div></div>
     <svg id="map" viewBox="0 0 914 914" role="img" aria-label="The battlefield from above"></svg>
   </main>
   <aside class="gx-dock" aria-label="What to do now">
-    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Nebula Aces</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">⇥</button></div>
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Nebula Aces</span><button class="gx-ibtn na-adv" data-a="advise" aria-expanded="false" title="What should I do now, and why?">🧭 Advice</button><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">⇥</button></div>
     <div class="gx-dock-body">
       <div id="steps" class="steps"></div>
+      <div id="recap"></div>
+      <div id="coach"></div>
       <div id="shipcard"></div>
       <div id="prompt" aria-live="off"></div>
+      <div id="radio" class="small"></div>
       <div id="lastlog" class="small muted"></div>
     </div>
   </aside>
@@ -1408,7 +1452,7 @@ function myPlanShip(s){return G.phase==='plan'&&isHuman(s.side)&&s.side===planSi
 // ---- labels ----
 function tags3D(){const box=document.getElementById('tags');if(!box)return;for(const s of G.ships){let el=V3.labels[s.id];if(!el){el=V3.labels[s.id]=document.createElement('div');el.className='tag s'+s.side;box.appendChild(el)}
     if(!s.alive){el.style.display='none';continue}const hp=s.hull-hullDmg(s);
-    el.innerHTML=`<b>${esc(s.name)}</b><span><em class="ps">${psOf(s)}</em> <em class="h">◆${hp}</em>${s.shMax?` <em class="sh">◈${s.sh}</em>`:''}${s.stress?` <em class="st">!${s.stress}</em>`:''}${s.focus?' <em class="f">◉</em>':''}${s.evade?' <em class="e">✦</em>':''}${[s.tl,s.tl2].filter(x=>x&&ship(x)).map(x=>` <em class="l">⌖${esc(ship(x).name.split(' ')[0])}</em>`).join('')}${s.ion?' <em class="io">ion</em>':''}${G.phase==='plan'&&s.dial!=null?' <em class="dl">▣</em>':''}</span>`;
+    el.title=s.name;el.innerHTML=`<b>${esc(typeof shortName==='function'?shortName(s):s.name)}</b><span><em class="ps">${psOf(s)}</em> <em class="h">◆${hp}</em>${s.shMax?` <em class="sh">◈${s.sh}</em>`:''}${s.stress?` <em class="st">!${s.stress}</em>`:''}${s.focus?' <em class="f">◉</em>':''}${s.evade?' <em class="e">✦</em>':''}${[s.tl,s.tl2].filter(x=>x&&ship(x)).map(x=>` <em class="l">⌖${esc(ship(x).name.split(' ')[0])}</em>`).join('')}${s.ion?' <em class="io">ion</em>':''}${G.phase==='plan'&&s.dial!=null?' <em class="dl">▣</em>':''}</span>`;
     el.classList.toggle('on',G.cur===s.id&&G.phase!=='plan');el.classList.toggle('sel',UI.sel===s.id)}}
 // ---- camera: drag to orbit, right-drag or two fingers to pan, wheel/pinch to zoom ----
 function bindCamera(cv){const P={};cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);P[e.pointerId]={x:e.clientX,y:e.clientY,b:e.button,x0:e.clientX,y0:e.clientY,t:performance.now()}});
@@ -1452,7 +1496,10 @@ function loop3D(now){requestAnimationFrame(loop3D);if(!V3.on)return;const dt=Mat
   const C=V3.cam;V3.shake=reduce?0:Math.max(0,V3.shake-dt*2);const sx=(Math.random()-.5)*V3.shake,sy=(Math.random()-.5)*V3.shake;
   placeCam(sx,sy);
   V3.r.render(V3.scene,V3.camera);
-  for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive)placeEl(el,m.position.clone().add(new THREE.Vector3(0,8.4,0)))}
+  const L=[];for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive){placeEl(el,m.position.clone().add(new THREE.Vector3(0,8.4,0)));if(el.style.display!=='none')L.push({el,x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight})}}
+  // name tags that would collide stack upwards instead of overlapping
+  L.sort((a,b)=>b.y-a.y);const done=[];for(const t of L){for(let g=0;g<6;g++){const q=done.find(q=>Math.abs(t.x-q.x)<(t.w+q.w)/2+2&&t.y-t.h<q.y+2&&q.y-q.h<t.y+2);if(!q)break;t.y=q.y-q.h-2}t.y=Math.max(t.h,t.y);t.el.style.top=t.y+'px';done.push(t)}
+  const ct=document.getElementById('coachtag');if(ct&&ct._v)placeEl(ct,ct._v);
   document.querySelectorAll('#tags .pop').forEach(el=>el._v&&placeEl(el,el._v))}
 
 </script>
@@ -1486,6 +1533,225 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+// ---------- story and guidance texts: bios, briefing, radio chatter, sorties, crit explanations (no rules here) ----------
+const FACTION_BIO=['Tough, shielded ships flown by veterans.','Swarms of fast, unshielded fighters.','Hired guns in patched-up ships: unpredictable.'];
+const SHIP_BIO={lancer:'a sturdy, shielded Lancer heavy fighter',talon:'a fast Talon light fighter with no shields',anvil:'a slow, armoured Anvil bomber',talonx:'a shielded Talon Prime',
+  needle:'a nimble Needle interceptor',razor:'a hard-hitting Razor interceptor',hauler:'a big Longhaul freighter with a turret',warden:'a Warden gunship with a rear arc',
+  keel:'a heavily shielded Keel strike fighter',kestrel:'a Kestrel courier with a turret',maul:'a Talon Maul bomber loaded with ordnance',herald:'a heavy Herald shuttle'};
+const PILOT_BIO={kael:'veteran Lancer pilot who slips shots at the last second',brink:'loyal wingman who draws fire away from friends',knife:'fast, fragile, deadly up close',
+  hex:'a jinx: attackers can’t use focus or rerolls against her',nightjar:'rides green lines and turns them into focus',wren:'squadron ace whose shots strip an enemy’s agility',
+  garrick:'shares his focus with nearby wingmates',brannoc:'bomber lead who shares his target locks',horace:'patient gunner who rerolls blanks at long range',
+  gutter:'brawler who turns hits into crits up close',shiv:'a knife in the back: an extra die from outside your arc',wailer:'screaming wing leader; friends near him reroll a die',
+  varn:'picks the cruellest damage card for his victims',castigan:'the Armada’s dark lord, who takes two actions every turn',tamsin:'unflappable: keeps acting while stressed',
+  arlo:'close-quarters daredevil who shoots even when touching',grudge:'too angry to die before combat ends',tarn:'shoots, then slips away with a free roll or boost',
+  sorin:'the Armada’s top ace: stress only sharpens his focus',grawl:'hulking captain who shrugs off crits',lark:'smooth talker who hands out free actions',
+  jax:'smuggler with nothing to lose: rerolls everything',kira:'hunter whose crits leave her prey stressed',bram:'bounty hunter who switches banks at the last moment',
+  krell:'gunship brute with a steady cannon hand',oren:'strike pilot whose crits always land',iveth:'thrives under pressure: rerolls while stressed',
+  quill:'courier who lets a friend shoot first',kellan:'passes his focus to a friend in need',juno:'takes stress so a friend rolls an extra die',
+  joren:'bomber captain who guides his wing’s missiles',rhane:'missile expert who stretches every range',kade:'draws every enemy lock onto himself',
+  varek:'hands his lock to a nearby wingmate',orrin:'soaks up stress for his squadron'};
+function pilotBio(s){return PILOT_BIO[s.pilot]||SHIP_BIO[s.type]||''}
+// short names for tags and chatter: "Knifepoint", "Slate #1", "Varro"
+function shortName(s){const raw=s.name.replace(/"/g,'');if(/Squadron|Pilot|Wing|Group|Runner|Operative|Tracker/.test(raw)){const same=G.ships.filter(o=>o.side===s.side&&o.name===s.name);return raw.split(' ')[0]+(same.length>1?' #'+(same.indexOf(s)+1):'')}
+  return raw.length<=12?raw:raw.split(' ')[0]}
+function callSign(s){const raw=s.name.replace(/"/g,'');if(/"/.test(s.name))return raw;if(/Squadron|Pilot|Wing|Group|Runner|Operative|Tracker/.test(raw))return raw.split(' ')[0]+' '+(shortName(s).split('#')[1]||'Lead');const w=raw.split(' ');return w[w.length-1]}
+// what a faceup damage card does, in plain words, for the ship that has it
+function critPlain(c,s){const D=DAMAGE[c];const fix=D.fix==='any'?' Your action can put it out.':D.fix==='hit'?' Action: roll 1 die, a hit repairs it.':D.fix==='hitcrit'?' Action: roll 1 die, a hit or crit repairs it.':'';
+  const m={weak:`attack is now ${primary(s)} until repaired.`,frame:`agility is now ${agility(s)} until repaired.`,noact:'no actions from the action bar until repaired.',direct:'counts as 2 hull damage.',
+    fire:'rolls a die for damage at the start of each combat phase.',cockpit:'pilot skill counts as 0 from next round.',engine:'every turn counts as a red maneuver.',blinded:'the next attack rolls no dice.',
+    wounded:'the pilot ability no longer works.',breach:'rolls a die for damage after each red move.',stunned:'takes 1 damage after any bump or asteroid hit.'}[D.k];
+  return (m?m:D.t)+(m?fix:'')}
+const NUMW=['no','one','two','three','four','five','six','seven','eight'];
+function groupText(ships){const by={};ships.forEach(s=>{by[s.type]=(by[s.type]||0)+1});return Object.keys(by).map(t=>`${NUMW[by[t]]||by[t]} ${SHIPS[t].n.replace(/ (light|heavy) fighter$/,' $1 fighter')}${by[t]>1?'s':''}`).join(' and ')}
+// ---- sorties: a light campaign for the Free Compact against the Iron Armada ----
+const SORTIES=[
+  {sector:'Sector Nebula-7',title:'Convoy escort',win:'Convoy saved.',lose:'The convoy is lost.',size:'core',hook:'Next sortie: the Armada sends a bomber.'},
+  {sector:'The Ashfall Belt',title:'Bomber intercept',win:'Bomber down: the convoy slips through.',lose:'The bomber got through to the convoy.',ex:{w3:true},
+    sq:[[{p:'kael',u:['u_plasma','u_tinker']}],[{p:'hammer',u:[]},{p:'slate',u:[]}]],hook:'Next sortie: Knifepoint’s wingmates want revenge.',
+    text:'A Talon Maul bomber is inbound for the convoy with an escort. It is slow and tough: stay out of its front arc and wear it down.'},
+  {sector:'Veil Station',title:'Ambush at the station',win:'Ambush broken.',lose:'The station falls to the ambush.',
+    sq:[[{p:'kael',u:['u_plasma','u_tinker']},{p:'ember',u:[]}],[{p:'hex',u:[]},{p:'nightjar',u:[]},{p:'onyx',u:[]},{p:'drill',u:[]}]],hook:'Next sortie: Lord Castigan takes the field himself.',
+    text:'Four Armada fighters wait in the station’s shadow. You have a wingman this time: fly together so they can’t gang up on one of you.'},
+  {sector:'The Crown Rift',title:'The dark lord',win:'Castigan retreats. The Compact holds the Rift.',lose:'Castigan holds the Rift.',ex:{w1:true},
+    sq:[[{p:'kael',u:['u_plasma','u_tinker']},{p:'wren',u:[]}],[{p:'castigan',u:[]},{p:'wailer',u:[]},{p:'slate',u:[]}]],hook:'Campaign complete! Replay any sortie, or try a Standard 100 battle.',
+    text:'Lord Castigan leads in person: two actions every turn. Focus your fire on his wingmen first, or on him if you catch him at range 1.'}];
+function campaign(){try{return JSON.parse(localStorage.getItem('na_camp')||'null')||{i:0,won:0}}catch(e){return {i:0,won:0}}}
+function saveCampaign(c){try{localStorage.setItem('na_camp',JSON.stringify(c))}catch(e){}}
+// the side the single human plays (solo mode), else -1
+function soloSide(){if(!G)return -1;const h=[0,1].filter(k=>G.players[k].human);return h.length===1?h[0]:-1}
+function briefingHTML(){const me=soloSide()>=0?soloSide():0,fo=1-me;const mine=G.ships.filter(s=>s.side===me),foe=G.ships.filter(s=>s.side===fo);const so=G.sortie!=null?SORTIES[G.sortie]:null;
+  const lead=mine.slice().sort((a,b)=>b.ps-a.ps)[0],boss=foe.slice().sort((a,b)=>(PILOTS[b.pilot].uniq?1:0)-(PILOTS[a.pilot].uniq?1:0)||b.ps-a.ps)[0];
+  const F=k=>FACTIONS[G.fac[k]].n;
+  let t=`${so?so.sector:'Sector Nebula-7'}. The ${F(fo)} patrol has found the ${F(me)}’s supply route. `;
+  t+=mine.length===1?`${esc(lead.name)}, ${pilotBio(lead)}, is the only fighter between ${groupText(foe)} and the convoy. `:`${mine.map(s=>esc(s.name)).join(', ')} stand between ${groupText(foe)} and the convoy. `;
+  t+=`${esc(boss.name)} leads them: ${pilotBio(boss)}.`;
+  if(so&&so.text)t+=' '+so.text;
+  return `<div class="brief"><h3>📡 Mission briefing${so?` · Sortie ${G.sortie+1}: ${esc(so.title)}`:''}</h3><p>${t}</p><p class="small"><b>Win:</b> destroy every enemy ship. You fly ${mine.length===1?'1 ship':mine.length+' ships'} (orange tags at the bottom edge); the enemy starts at the top.</p></div>`}
+// ---- radio chatter for the key beats (shown in the dock, never in the battle log) ----
+const CHAT={
+  fire:[[`Got you in my sights, {t}!`,`Stay on target…`,`Lining up… firing!`,`{t}, you're mine.`],[`Got you in my sights, {t}!`,`Target acquired. Firing.`,`For the Armada!`,`Hold still, {t}.`],[`Nothing personal, {t}.`,`Payday!`]],
+  shields:[`Shields holding… barely.`,`Shields took that one.`],shieldsdown:[`Shields are down!`,`I've lost my shields!`],
+  hull:[`I'm hit! Hull damage!`,`That hurt. Still flying.`],crit:[`Critical hit: {c}!`,`Something's burning… {c}!`],
+  miss:[`Too slow!`,`Missed me!`,`Not today.`],boom:[`{v} is going down!`,`Scratch one!`,`{v} is gone!`],lost:[`We lost {v}!`,`{v}! No!`],
+  bump:[`Watch it! Pulling up!`,`Collision alert!`],stress:[`Pulling hard… that one strained the engines.`],rock:[`Rocks! I clipped a rock!`],
+  round:[[`Stay sharp, everyone.`,`Keep your turns tight.`,`Convoy's counting on us.`],[`Slate Squadron, break left!`,`Box them in!`,`Close the net.`],[`Spread out.`]]};
+const pickLine=a=>a[Math.floor(Math.random()*a.length)];
+
+</script>
+<script>
+// ---------- guidance layer (interface only, no rules): coach moments, advisor, round recap, attack result cards, radio chatter, auto-setup ----------
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+try{UI.coachDone=JSON.parse(localStorage.getItem('na_coach')||'{}')||{}}catch(e){}
+Object.assign(UI,{ev:{},evG:null,results:[],kills:[],taken:{},radio:null,coachOn:null,advOpen:false,recapSeen:0,statLast:{},statChg:{},statG:null,autoSetup:false,pendAtk:null});
+function resetGuide(){Object.assign(UI,{ev:{},evG:G,results:[],kills:[],taken:{},radio:null,coachOn:null,recapSeen:0,pendAtk:null})}
+// ---- every log line also feeds the recap and the radio (the battle log itself is unchanged, apart from one plainer phrase) ----
+const _lg0=lg;lg=function(side,t){t=String(t).replace(/ jinks: /,' uses its pilot ability (1 focus → evade): ');_lg0(side,t);try{if(G)noteLog(side,t)}catch(e){}};
+function noteLog(side,t){if(UI.evG!==G)resetGuide();const r=G.round;const L=(UI.ev[r]=UI.ev[r]||[]);L.push({s:side,t});if(L.length>120)L.shift();
+  const P=UI.pendAtk;if(P){const d=ship(P.d);const m=d&&t.startsWith(d.name+' suffers a critical hit: ')&&t.slice(d.name.length+26).split('.')[0];if(m){const c=Object.keys(DAMAGE).find(k=>DAMAGE[k].n===m);if(c)P.crits.push(c)}}
+  radioFor(side,t);
+  // the battle can end where the rules code does not redraw (a cockpit fire at the start of combat): redraw once
+  if(G.winner&&t===G.winText&&(isHuman(0)||isHuman(1)))setTimeout(()=>{try{render()}catch(e){}},0)}
+const byName=(n,side)=>G.ships.find(s=>s.name===n&&(side==null||side<0||s.side===side));
+function say(s,lines,vars){if(!s)return;let t=pickLine(lines);for(const k in vars||{})t=t.split('{'+k+'}').join(vars[k]);UI.radio={who:shortName(s),side:s.side,t,r:G.round}}
+function radioFor(side,t){let m;
+  if(/ fires (.*)at /.test(t)&&G.atk){const a=ship(G.atk.a),d=ship(G.atk.d);if(a&&d)say(a,CHAT.fire[G.fac[a.side]]||CHAT.fire[0],{t:callSign(d)});return}
+  if(m=t.match(/^(.+) is destroyed!/)){const v=byName(m[1],side);if(!v)return;const me=soloSide();const friend=alive().find(o=>o.side===v.side),foe=alive().find(o=>o.side!==v.side);
+    if(me>=0&&v.side===me&&friend)say(friend,CHAT.lost,{v:callSign(v)});else if(foe)say(foe,CHAT.boom,{v:callSign(v)});return}
+  if(m=t.match(/^(.+) bumps into /)){say(byName(m[1],side),CHAT.bump);return}
+  if(m=t.match(/^(.+) suffers a critical hit: ([^.]+)\./)){say(byName(m[1],side),CHAT.crit,{c:m[2]});return}
+  if(m=t.match(/^(.+) evades every shot/)){say(byName(m[1],side),CHAT.miss);return}
+  if(m=t.match(/^(.+) (flies through|lands on) an asteroid/)){say(byName(m[1],side),CHAT.rock);return}
+  if(m=t.match(/^(.+) flies a red maneuver/)){if(Math.random()<.4)say(byName(m[1],side),CHAT.stress);return}
+  if(/^Round \d+:/.test(t)&&G.round>=2){const al=alive();if(al.length){const s=al[Math.floor(Math.random()*al.length)];say(s,CHAT.round[G.fac[s.side]]||CHAT.round[0])}}}
+// ---- attack result cards: snapshot the defender when the defense is final, compare when the attack is over ----
+// (no engine function is wrapped here: the rules code runs whole rounds on one call stack when animations are off)
+function attackWatch(){if(!G)return;const A=G.atk;const P=UI.pendAtk;if(P&&P.A!==A)finishAtk();
+  if(A&&G.phase==='dmod'&&(!UI.pendAtk||UI.pendAtk.A!==A)){const d=ship(A.d);if(d)UI.pendAtk={A,a:A.a,d:A.d,rg:A.rg,r:G.round,sh0:d.sh,hp0:d.hull-hullDmg(d),crits:[],rolled:cnt(A.dice,'hit')+cnt(A.dice,'crit')}}}
+function finishAtk(){const P=UI.pendAtk;if(!P||!G)return;UI.pendAtk=null;const a=ship(P.a),d=ship(P.d);if(!a||!d)return;
+  const hp1=d.alive?d.hull-hullDmg(d):0,sh1=d.sh,dmg=Math.max(0,P.sh0-sh1)+Math.max(0,P.hp0-hp1);
+  UI.taken[d.id]=(UI.taken[d.id]||0)+dmg;if(!d.alive)UI.kills.push({by:a.id,v:d.id,r:P.r,rg:P.rg});
+  const R={rolled:P.rolled,a:a.id,d:d.id,dmg,sh0:P.sh0,sh1,hp0:P.hp0,hp1,crits:P.crits,dead:!d.alive,r:P.r,rg:P.rg,t:Date.now()};UI.results.unshift(R);if(UI.results.length>40)UI.results.length=40;
+  if(d.alive&&dmg&&!P.crits.length)say(d,sh1>0?CHAT.shields:P.sh0>0?CHAT.shieldsdown:CHAT.hull)}
+function resultHTML(R,plain){const a=ship(R.a),d=ship(R.d);if(!a||!d)return '';const me=soloSide();const you=d.side===me,yours=a.side===me;
+  const an=yours?`You (${esc(a.name)})`:esc(a.name),dn=you?`you (${esc(d.name)})`:esc(d.name);
+  let h=`<b>${an}</b> ${R.dmg||R.crits.length?(yours?'hit':'hits'):(yours?'missed':'misses')} <b>${dn}</b>`;
+  if(R.dmg){const parts=[];if(R.sh0!==R.sh1)parts.push(`shields ${R.sh0} → ${R.sh1}`);if(R.hp0!==R.hp1)parts.push(`hull ${R.hp0} → ${R.hp1}`);h+=`: <b>${R.dmg} damage</b>${parts.length?' ('+parts.join(', ')+')':''}.`}
+  else h+=R.rolled===0?': no hits rolled.':': every hit was cancelled by evade results.';
+  if(plain)return h+(R.crits.length?' Crit: '+R.crits.map(c=>DAMAGE[c].n).join(', ')+'.':'')+(R.dead?' Destroyed!':'');
+  for(const c of R.crits)h+=`<div class="crit">✸ CRIT <b>${esc(DAMAGE[c].n)}</b>: ${you?'your ':esc(d.name)+'’s '}${esc(critPlain(c,d))}</div>`;
+  if(R.dead)h+=`<div class="bad"><b>${you?'You are':esc(d.name)+' is'} destroyed!</b></div>`;
+  return `<div class="result ${you?'hurt':yours?'good':''}">${h}</div>`}
+// ---- stat changes pulse for a moment ----
+function trackStats(){if(!G)return;if(UI.statG!==G){UI.statLast={};UI.statChg={};UI.statG=G}const now=Date.now();
+  for(const s of G.ships){const v={ps:psOf(s),a:primary(s),g:agility(s),h:s.alive?s.hull-hullDmg(s):0,s:s.sh};const o=UI.statLast[s.id];if(o)for(const k in v)if(v[k]!==o[k])(UI.statChg[s.id]=UI.statChg[s.id]||{})[k]=now;UI.statLast[s.id]=v}}
+const pulse=(s,k)=>{const c=UI.statChg[s.id];return c&&c[k]&&Date.now()-c[k]<2600?' pulse':''};
+// ---- recommended setup spots (the highlighted default) and auto-placement ----
+function recOpt(q){if(q.key==='rock'){let best=q.opts[0],bv=1e9;for(const o of q.opts){const m=/^([A-E])([1-5])$/.exec(o.l);if(!m)continue;const v=Math.abs('ABCDE'.indexOf(m[1])-2)+Math.abs(+m[2]-4)*1.2;if(v<bv){bv=v;best=o}}
+    return {o:best,why:'in their half, where it blocks their approach and not yours'}}
+  if(q.key==='deploy'){let best=q.opts[0],bv=1e9;for(const o of q.opts){const n=+String(o.l).slice(5);const v=Math.abs(n-5);if(v<bv){bv=v;best=o}}return {o:best,why:best.l==='Spot 5'?'the centre: start central so you can turn either way':'the free spot nearest the centre, so you can turn either way'}}
+  return {o:q.opts[0],why:''}}
+// Auto-place answers every remaining setup question of the human side at once, with the recommended spot
+function autoPlaceAll(){let guard=0;while(G&&G.round<1&&!G.winner&&G.phase==='ask'&&G.q&&['rock','deploy'].includes(G.q.key)&&humanTurn()&&guard++<40){const kid=G.q.kid;uiAct({act:'ask',k:recOpt(G.q).o.k});if(G.q&&G.q.kid===kid)break}render()}
+// ---- suggestion with its reason and its cost ----
+function sugInfo(s,i){const m0=dialOf(s)[i],m=exColor(s,m0),b=B(s),p=finalPose(s,b,m0);const en=enemiesOf(s);
+  const mine=en.map(e=>{const r=arcReach(p,b,e,B(e),s.arc);return r&&rangeOf(r.d)<=3?{e,rg:rangeOf(r.d)}:null}).filter(Boolean).sort((x,y)=>x.rg-y.rg);
+  const theirs=en.filter(e=>{const q=arcReach(e,B(e),p,b,e.arc);return q&&rangeOf(q.d)<=3});
+  const d0=Math.min(...en.map(e=>baseDist(s,b,e,B(e)))),d1=Math.min(...en.map(e=>baseDist(p,b,e,B(e))));let why;
+  if(mine.length&&!theirs.length)why=`puts ${esc(mine[0].e.name)} in your arc at range ${mine[0].rg} while you stay out of its arc`;
+  else if(mine.length)why=`lines up a shot on ${esc(mine[0].e.name)} at range ${mine[0].rg} (it may shoot back)`;
+  else if(!theirs.length)why=d1<d0-20&&rangeOf(d1)>=3?'closes in but stays out of their arcs: they must come to you':'stays out of their arcs: they must come to you';
+  else why='the best of the moves left, though you may end up in an enemy arc';
+  why+=' (if they stayed put)';
+  const clip=tplPoints(s,b,m0,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2));
+  const cost=m.c==='r'?'Cost: red = a stress token, so no action this turn and no red moves until a green one clears it.':m.c==='g'?(s.stress?'Bonus: green clears your stress.':'Cost: none (green is an easy move).'):'Cost: none (white).';
+  return {why,cost:cost+(clip?' Risk: it clips an asteroid (damage roll, no action).':'')}}
+function saferAlt(s){const c=UI.sugCache;if(!c||!c.sc)return null;let best=-1,bv=-1e9;dialOf(s).forEach((m,i)=>{if(exColor(s,m).c==='r'||(s.stress&&false))return;if(c.sc[i]>bv){bv=c.sc[i];best=i}});return best>=0?best:null}
+// ---- coach moments for the first round ----
+const COACH={dial:{n:1,t:'<b>Pick where your ship will fly.</b> Hover or tap a maneuver on the dial to see its ghost on the mat (the dashed one is the suggestion), then press <b>Lock in dials</b>. The enemy picks at the same time, in secret.'},
+  action:{n:2,t:'<b>Take one action.</b> Focus turns your ◉ results into hits when you attack, or into evades when you are shot. It is the safe default.'},
+  attack:{n:3,t:'<b>Only enemies inside the yellow wedge (your arc) can be shot.</b> Closer is better: range 1 adds an attack die, range 3 adds a defense die.'},
+  end:{n:4,t:'<b>That was one round:</b> Plan → Move (lowest skill first) → Combat (highest skill first) → End. Here is what happened:'}};
+const tourOff=()=>LS.get('na_tour')==='1';
+function coachKey(){if(tourOff()||!G||G.winner||UI.info)return null;if(G.phase==='plan'&&planSide()>=0)return G.round>=2?'end':'dial';if(!humanTurn())return null;
+  if(G.phase==='action')return 'action';if(G.phase==='target')return 'attack';return null}
+function coachStep(){const k=coachKey();if(UI.coachOn&&UI.coachOn!==k){UI.coachDone[UI.coachOn]=1;LS.set('na_coach',JSON.stringify(UI.coachDone));if(['dial','action','attack','end'].every(x=>UI.coachDone[x]))LS.set('na_tour','1')}
+  UI.coachOn=k&&!UI.coachDone[k]?k:null;return UI.coachOn}
+function coachTag(){let el=document.getElementById('coachtag');const on=UI.coachOn==='attack'&&typeof V3!=='undefined'&&V3.on&&G&&G.cur&&ship(G.cur);
+  if(!on){if(el)el.remove();return}const s=ship(G.cur);if(!el){el=document.createElement('div');el.id='coachtag';el.className='tag coach';const t=$('tags');if(!t)return;t.appendChild(el)}
+  el.innerHTML='your arc ▼<br><small>shoot only inside this wedge</small>';const f=fwd(s.h);el._v=W(s.x+f.x*RANGE*1.7,s.y+f.y*RANGE*1.7,1);placeEl(el,el._v)}
+// ---- end-of-round recap ----
+function recapItems(R){const me=soloSide()>=0?soloSide():planSide();const ev=UI.ev[R]||[];const out=[];const isMine=n=>G.ships.some(s=>s.name===n&&s.side===me);
+  for(const e of ev){let m;const t=e.t;
+    if(m=t.match(/^(.+) bumps into (.+) and skips its action\./)){const a=e.s===me,b=isMine(m[2])&&!a;out.push(`💥 ${a?`You (${esc(m[1])}) bumped into ${esc(m[2])}`:b?`${esc(m[1])} bumped into you (${esc(m[2])})`:`${esc(m[1])} bumped into ${esc(m[2])}`}. The ship that bumps skips its action, and ships touching each other can't fire at each other.${a?' <i>Tip: plan a longer or sideways move.</i>':''}`)}
+    else if((m=t.match(/^(.+) is stressed and can't take an action/))&&e.s===me)out.push(`😵 You (${esc(m[1])}) were stressed from a red move, so no action. Fly a green move to clear it.`);
+    else if((m=t.match(/^(.+) flies a red maneuver and takes a stress/))&&e.s===me)out.push(`❗ ${esc(m[1])} flew a red move and took stress: no action this turn, and no red moves until a green one clears it.`);
+    else if((m=t.match(/^(.+) flies a green maneuver and clears/))&&e.s===me)out.push(`✅ ${esc(m[1])} cleared its stress with a green move.`);
+    else if(m=t.match(/^(.+) (flies through|lands on) an asteroid/))out.push(`🪨 ${esc(m[1])} ${m[2]==='lands on'?'landed on':'flew through'} an asteroid: a damage roll and no action${m[2]==='lands on'?', and no shooting this round':''}.`);
+    else if(m=t.match(/^(.+) is stressed and can't fly the red/))out.push(`🔁 ${esc(m[1])} revealed a red move while stressed, so the other side picked a white one for it.`);
+    else if(m=t.match(/^(.+) flies off the battlefield/))out.push(`🚫 ${esc(m[1])} flew off the battlefield and was destroyed.`)}
+  const res=UI.results.filter(r=>r.r===R).reverse();res.forEach(r=>out.push('🎯 '+resultHTML(r,true)));
+  if(!res.length)out.push('No shots were fired: nobody had an enemy inside its arc at range 1-3.');
+  for(const s of alive().filter(s=>s.side===me&&s.stress))out.push(`<span class="warn">Now: ${esc(s.name)} is stressed: no red moves and no action; a green move clears it.</span>`);
+  return out}
+function recapHTML(){const R=G.round-1;const items=recapItems(R);const tour=UI.coachOn==='end';
+  return `<div class="recap ${tour?'coach':''}"><h3>${tour?'<span class="cn">4</span> Coach · ':''}Round ${R} recap</h3>${tour?`<p class="small">${COACH.end.t}</p>`:''}<ul>${items.slice(0,7).map(x=>`<li>${x}</li>`).join('')}</ul>
+    <div class="acts"><button class="btn sm" data-a="recapok">Got it</button><button class="btn ghost sm" data-a="recapoff">Don't show again</button></div></div>`}
+// ---- the advisor: what should I do now, and why ----
+function advice(){if(!G)return {say:'Press Launch.',why:'The defaults are a good first battle; the first round is guided.'};if(G.winner)return {say:'The battle is over.',why:'Read the debrief, then fly the next sortie.'};
+  const P=G.phase;
+  if(P==='ask'&&G.q&&humanTurn()){const q=G.q;
+    if(q.key==='rock')return {say:'Put rocks where they block their approach, not yours.',why:`The middle of their half (★ ${recOpt(q).o.l}) is good. Or just press Auto-place: in a first game it doesn't matter much. Flying through a rock damages you; shooting past one gives the defender +1 die.`};
+    if(q.key==='deploy'){const s=G.ships.find(x=>q.title==='Deploy '+x.name&&x.flags.unplaced)||G.ships.find(x=>x.flags.unplaced&&x.side===q.side);const ps=s?psOf(s):0;const eps=G.ships.filter(x=>x.side!==q.side).map(psOf);
+      const cmp=ps>Math.max(...eps)?`, higher than theirs, so you move last (you can react to them) and shoot first.`:ps<Math.min(...eps)?`, lower than theirs, so you move first and shoot last: keep your distance until you can line up a shot.`:', about the same as theirs.';
+      return {say:`Start near the centre (★ ${recOpt(q).o.l}) so you can turn either way.`,why:`Your pilot skill is ${ps}${cmp}`}}
+    if(q.key==='forced')return {say:'Pick the move that leaves their ship worst placed.',why:'Far from you, or pointing away from you, so it can\'t shoot next round.'};
+    if(q.key==='dice')return {say:'Tick your blank dice (and ◉ if you have no focus to spend), then Confirm.',why:'Rerolled dice can come up hits or crits; each die can only be rerolled once.'};
+    if(q.key==='init')return {say:'Take initiative.',why:'On pilot-skill ties you move and fire first, and you win if both last ships die together.'};
+    return {say:esc(q.title)+': an optional card choice.',why:'Read the question: the highlighted button is the usual pick, and "No" keeps the card for later.'}}
+  if(P==='plan'&&planSide()>=0&&UI.sel&&ship(UI.sel)){const s=ship(UI.sel);const en=enemiesOf(s);if(!en.length)return {say:'No enemies left.',why:''};
+    const ds=en.map(e=>({e,d:baseDist(s,B(s),e,B(e))})).sort((a,b)=>a.d-b.d);const near=ds[0].e,rg=rangeOf(ds[0].d);let say,why;
+    if(s.stress){say="You're stressed: no red moves and no action.";why='Fly a green move (straight 1-2, gentle banks) to clear it.'}
+    else if(rg>=4){say="They're out of range.";why='Close in with a straight 3-4, or bank to stay outside their arcs: they must come to you.'}
+    else{say=`${esc(near.name)} is at range ${rg}.`;why=`Everyone rolls +1 attack die at range 1${pilotHas(near,'mauler')?`, and ${esc(near.name)} one more`:''}. Stay at range 2, or line up so it's in your arc but you're not in its arc.`}
+    const bumped=(UI.ev[G.round-1]||[]).some(e=>e.t.startsWith(s.name+' bumps into'));if(bumped)why='You bumped last round: no action, and touching ships can\'t fire. Pick a shorter or sideways move this time. '+why;
+    const rp=s.dmg.find(x=>x.up&&DAMAGE[x.c].fix);if(rp)why+=` After your crit (${DAMAGE[rp.c].n}): ${critPlain(rp.c,s)}`;
+    const sg=suggestDial(s),si=sugInfo(s,sg);why+=` <br>💡 ${mText(dialOf(s)[sg])}: ${si.why}. ${si.cost}`;return {say,why}}
+  if(!humanTurn())return {say:'Wait: the computer is acting.',why:'Watch the mat. The result cards and the radio tell you what happened.'};
+  const s=G.cur&&ship(G.cur);
+  if(P==='action'&&s){const acts=actionsFor(s);const rp=acts.find(a=>/^RP\d/.test(a.a));
+    if(rp){const x=s.dmg[+rp.a.slice(2)];return {say:`Repair ${DAMAGE[x.c].n}.`,why:critPlain(x.c,s)+' Fixing it is usually worth more than one focus.'}}
+    const inArc=enemiesOf(s).filter(e=>{const r=arcReach(s,B(s),e,B(e),s.arc);return r&&rangeOf(r.d)<=3});const theirs=enemiesOf(s).filter(e=>{const q=arcReach(e,B(e),s,B(s),e.arc);return q&&rangeOf(q.d)<=3});
+    const has=a=>acts.some(x=>x.a===a);
+    if(!inArc.length&&theirs.length&&has('E'))return {say:'Evade.',why:`You're in ${esc(theirs[0].name)}'s arc with no shot of your own: an evade token cancels one hit. Focus works too and is more flexible.`};
+    if(has('F'))return {say:inArc.length?`Focus: ${esc(inArc[0].name)} is in your arc.`:'Focus.',why:'Focus turns your ◉ results into hits now, or into evades if you\'re shot. Target lock only if you\'ll surely shoot that ship (it lets you reroll).'};
+    return {say:'Take the first action listed.',why:'Hover each one to preview it.'}}
+  if(P==='target'&&s){const opts=[];for(const w of weaponsFor(s))for(const t of w.targets){const d=ship(t.id);const sd=shotDice(s,w,t,d);opts.push({d,w,t,n:sd.atk,m:sd.def,e:expDmg(sd.atk,sd.def,s.focus>0||s.tl===d.id,d.focus>0)})}
+    opts.sort((a,b)=>b.e-a.e);if(!opts.length)return {say:'Hold fire.',why:'Nobody is inside your arc.'};const o=opts[0];const other=opts.find(x=>x.d!==o.d);
+    return {say:`Shoot ${esc(o.d.name)}${o.w.k!=='P'?' with '+esc(o.w.n):''}.`,why:`Range ${o.t.rg} gives you ${o.n} dice vs ${o.m} (≈${o.e.toFixed(1)} damage).${other?` ${esc(other.d.name)} is only ≈${other.e.toFixed(1)}.`:''}`}}
+  const A=G.atk;
+  if(P==='amod'&&A){const ms=atkMods();const f=ms.find(m=>m.k==='focus'),tl=ms.find(m=>m.k==='tl');const hc=cnt(A.dice,'hit')+cnt(A.dice,'crit'),fc=cnt(A.dice,'focus');
+    if(tl&&cnt(A.dice,'blank')+(!f?fc:0)>0)return {say:'Spend your target lock: reroll your blanks.',why:'Rerolled dice can come up hits. You lose the lock after this attack.'};
+    if(f)return {say:'Spend focus.',why:`Your ◉ ${fc>1?'become hits':'becomes a hit'}: ${hc+fc} hit${hc+fc===1?'':'s'} before they roll.`};
+    if(ms.length)return {say:esc(ms[0].l)+'.',why:esc(ms[0].d)};return {say:'Press Done.',why:'Nothing left to improve: the defender rolls next.'}}
+  if(P==='dmod'&&A){const ms=defMods();const r=preview(A);if(r.hits+r.crits===0)return {say:'Press Done.',why:'Every hit is already cancelled: keep your tokens.'};
+    const l=ms.find(m=>m.k==='luke'),f=ms.find(m=>m.k==='focus'),ev=ms.find(m=>m.k==='evade');
+    if(l)return {say:'Use your pilot ability.',why:'Change 1 ◉ to an evade for free. Every evade cancels a hit.'};
+    if(f)return {say:'Spend focus.',why:'Your ◉ become evades; every evade cancels a hit.'};if(ev)return {say:'Spend your evade token.',why:'+1 evade cancels one more hit.'};
+    if(ms.length)return {say:esc(ms[0].l)+'.',why:esc(ms[0].d)};return {say:'Press Done.',why:`${r.hits+r.crits} will get through: shields absorb damage first, then the hull.`}}
+  if(P==='damod')return {say:'Tamper with their dice.',why:'Using it can cancel their best die; it is usually worth it.'};
+  return {say:'Follow the highlighted button.',why:''}}
+// ---- the guidance box in the dock ----
+function renderCoach(){const el=$('coach');if(!el)return;if(!G||UI.info){el.innerHTML='';const rc=$('recap');if(rc)rc.innerHTML='';return}let h='';const k=coachStep();
+  if(UI.advOpen){const a=advice();h+=`<div class="adv" role="status"><button class="gx-x" data-a="advise" aria-label="Close advice">×</button><b>🧭 ${a.say}</b> ${a.why}</div>`}
+  if(G.round===0&&!G.winner)h+=briefingHTML();
+  if(k&&k!=='end')h+=`<div class="coach"><span class="cn">${COACH[k].n}</span> ${COACH[k].t} <button class="linkb" data-a="tourskip">Skip tips</button></div>`;
+  const showRecap=G.phase==='plan'&&planSide()>=0&&G.round>=2&&UI.recapSeen<G.round-1&&(k==='end'||LS.get('na_recap')!=='off');const rc=$('recap');if(rc)rc.innerHTML=showRecap?recapHTML():'';if(GX&&GX.app)GX.app.classList.toggle('na-recap',showRecap);
+  if(showRecap);else if(G.round>=1&&!G.winner&&G.phase!=='plan'){const rs=UI.results.filter(r=>r.r===G.round&&Date.now()-r.t<60000).slice(0,2);if(rs.length)h+=rs.map(r=>resultHTML(r)).join('')}
+  el.innerHTML=h;coachTag();
+  const rd=$('radio');if(rd){const r=UI.radio;rd.innerHTML=r&&G.round-r.r<=1&&!G.winner?`📻 <b class="f${G.fac[r.side]}">${esc(r.who)}</b> “${esc(r.t)}”`:''}}
+
+</script>
+<script>
 // ---------- interface ----------
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1498,8 +1764,8 @@ function planSide(){if(!G||G.phase!=='plan')return -1;for(const k of [0,1])if(is
 function humanTurn(){const k=sideToAct();return k>=0&&isHuman(k)&&(typeof NET==='undefined'||!NET.on||k===NET.mySide)}
 function refresh(){render();schedule()}
 function render(){if(typeof isHost==='function'&&isHost())netPush();
-  if(G&&G.winner&&UI.wonSnd!==G.seed){UI.wonSnd=G.seed;sfx('win');if(ANIM)setTimeout(()=>{UI.stats=true;render()},2200)}
-  if(V3.on)sync3D();else render2D();renderSteps();renderPrompt();renderShipCard();renderRoster();renderLog();renderModal();renderDock()}
+  if(G&&G.winner&&UI.wonSnd!==G.seed){UI.wonSnd=G.seed;sfx('win');if(G.sortie!=null&&soloSide()===0&&G.winner==='P1'){const c=campaign();c.i=Math.max(c.i,Math.min(SORTIES.length,G.sortie+1));c.won++;saveCampaign(c)}if(ANIM)setTimeout(()=>{UI.stats=true;render()},2200)}
+  attackWatch();trackStats();if(V3.on)sync3D();else render2D();renderSteps();renderPrompt();renderShipCard();renderRoster();renderLog();renderModal();renderDock();renderCoach()}
 // ---- step bar ----
 const STEPS=[['Plan','set dials'],['Move','low → high'],['Combat','high → low'],['End','clear tokens']];
 function renderSteps(){const el=$('steps');if(!el)return;const cur=G?G.step:0;el.innerHTML=STEPS.map((s,i)=>`<span class="st ${i+1<cur?'done':''} ${i+1===cur?'on':''}"><b>${i+1}</b>${s[0]}<i>${s[1]}</i></span>`).join('')}
@@ -1512,36 +1778,37 @@ function dialGrid(s,sug){const d=dialOf(s);const pick=UI.draft[s.id];let h='<tab
     if(any)h+=`<tr><th>${sp}</th>${row}</tr>`}
   return h+'</tbody></table>'}
 function suggestDial(s){if(UI.sugCache&&UI.sugCache.k===G.round+s.id)return UI.sugCache.v;const lv={samples:6,noise:0,look:0};
-  const save=G.rng;const enemyPoses=enemiesOf(s).map(e=>[e,enemyGuess(e,lv.samples)]);let best=0,bv=-1e9;dialOf(s).forEach((m,i)=>{const v=scorePose(s,finalPose(s,B(s),m),m,enemyPoses,[],lv);if(v>bv){bv=v;best=i}});G.rng=save;
-  UI.sugCache={k:G.round+s.id,v:best};return best}
+  const save=G.rng;const enemyPoses=enemiesOf(s).map(e=>[e,enemyGuess(e,lv.samples)]);let best=0,bv=-1e9;const sc=[];dialOf(s).forEach((m,i)=>{const v=scorePose(s,finalPose(s,B(s),m),m,enemyPoses,[],lv);sc[i]=v;if(v>bv){bv=v;best=i}});G.rng=save;
+  UI.sugCache={k:G.round+s.id,v:best,sc};return best}
 function poseReport(s,m){const p=finalPose(s,B(s),m);const b=B(s);const bits=[];if(offBoard(p,b))return '<b class="bad">Flies off the battlefield: the ship would be destroyed!</b>';
-  if(G.rocks.some(o=>polyOverlap(corners(p,b),rockPoly(o))))bits.push('<b class="bad">lands on an asteroid</b>');
-  else if(tplPoints(s,b,m,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2)))bits.push('<b class="bad">clips an asteroid</b>');
+  if(G.rocks.some(o=>polyOverlap(corners(p,b),rockPoly(o))))bits.push('<b class="bad">lands on an asteroid (damage roll, no action, no shot)</b>');
+  else if(tplPoints(s,b,m,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2)))bits.push('<b class="bad">clips an asteroid (damage roll, no action)</b>');
   for(const e of enemiesOf(s)){const r=arcReach(p,b,e,B(e),s.arc);if(r&&rangeOf(r.d)<=3)bits.push(`${esc(e.name)} in your arc at range ${rangeOf(r.d)}`);const q=arcReach(e,B(e),p,b,e.arc);if(q&&rangeOf(q.d)<=3)bits.push(`<span class="warn">you'd be in ${esc(e.name)}'s arc (range ${rangeOf(q.d)})</span>`)}
-  if(m.c==='r')bits.push('red: you take a stress token');if(m.c==='g'&&s.stress)bits.push('green: clears a stress token');
+  if(m.c==='r')bits.push('red: you take a stress token (no action this turn)');if(m.c==='g'&&s.stress)bits.push('green: clears a stress token');
   return 'If enemies stayed put: '+(bits.join(' · ')||'no enemies in reach')}
 // ---- prompt: always one sentence of what to do, then the buttons ----
 function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='';return}
-  if(G.winner){el.innerHTML=`<h2>${esc(G.winText)}</h2><div class="acts"><button class="btn primary" data-a="stats">Battle report</button><button class="btn" data-a="new">New battle</button></div>`;return}
+  if(G.winner){el.innerHTML=`<h2>${esc(G.winText)}</h2><div class="acts"><button class="btn primary" data-a="stats">Debrief</button>${nextSortieBtn()}<button class="btn" data-a="new">New battle</button></div>`;return}
   const k=sideToAct(),me=humanTurn();let h='';
   if(G.phase==='plan'){const ps=planSide();
     if(ps<0){h=`<p class="head">Waiting for the other pilots to set their dials…</p>`}
     else{const mine=alive().filter(s=>s.side===ps);if(!UI.sel||!mine.find(s=>s.id===UI.sel))UI.sel=mine.find(s=>UI.draft[s.id]==null)?.id||mine[0].id;const s=ship(UI.sel);
       const sug=suggestDial(s),di=UI.hoverDial!=null?UI.hoverDial:UI.draft[s.id];
-      h=`<p class="head">${esc(sideName(ps))} · Step 1 · Plan</p><details class="how2" ${G.round===1&&!NARROW.matches?'open':''}><summary>How to plan</summary><ol class="how"><li>Pick a ship below (or tap it on the mat), then choose its maneuver on the dial.</li><li>Hover or tap a maneuver to see its template and where the ship ends.</li><li>When every ship has a dial, press <b>Lock in dials</b>. The enemy can't see them.</li></ol></details>
+      h=`<p class="head">${bothHuman()?esc(sideName(ps)):'Your ships'} · Step 1 · Plan</p><details class="how2" ${G.round===1&&!NARROW.matches&&!(coachKey()==='dial'&&!UI.coachDone.dial)?'open':''}><summary>How to plan</summary><ol class="how"><li>Pick a ship below (or tap it on the mat), then choose its maneuver on the dial.</li><li>Hover or tap a maneuver to see its template and where the ship ends.</li><li>When every ship has a dial, press <b>Lock in dials</b>. The enemy can't see them.</li></ol></details>
       ${mine.length>1?`<div class="shipTabs">${mine.map(x=>`<button class="btn tab ${x.id===UI.sel?'on':''}" data-sel="${x.id}">${esc(x.name)} ${UI.draft[x.id]!=null?'✓':''}</button>`).join('')}</div>`:''}
-      <div class="dialwrap">${dialGrid(s,sug)}<div class="dialinfo"><b>${esc(s.name)}</b> · pilot skill ${psOf(s)}${s.stress?` · <span class="warn">stressed: no red maneuvers</span>`:''}
-      <p class="small">${di!=null?`<b>${mText(dialOf(s)[di])}</b>: ${poseReport(s,dialOf(s)[di])}`:'Choose a maneuver.'}</p>${UI.hints?`<p class="tip">💡 Suggested: <b>${mText(dialOf(s)[sug])}</b> (dashed outline).</p>`:''}</div></div>
+      <div class="dlegend" aria-label="Dial colours"><span class="sw g"></span>green = easy (clears stress) <span class="sw w"></span>white = normal <span class="sw r"></span>red = hard (stress)</div><div class="dialwrap">${dialGrid(s,sug)}<div class="dialinfo"><span class="dname"><b>${esc(s.name)}</b> · pilot skill ${psOf(s)}</span>${s.stress?` · <span class="warn">stressed: no red maneuvers</span>`:''}
+      <p class="small">${di!=null?`<b>${mText(dialOf(s)[di])}</b>: ${poseReport(s,dialOf(s)[di])}`:'Choose a maneuver.'}</p>${UI.hints?sugTip(s,sug):''}</div></div>
       <div class="acts main"><button class="btn primary" data-a="lock" ${mine.every(x=>UI.draft[x.id]!=null)?'':'disabled'}>Lock in dials</button><button class="btn" data-a="autodial">Use suggestions</button></div>`}}
   else if(G.phase==='action'){const s=ship(G.cur);if(!me)h=`<p class="head">${esc(s.name)} is choosing an action…</p>`;else{const acts=actionsFor(s);
       h=`<p class="head">${esc(s.name)} · Step 2 · Take one action</p><p>You flew <b>${mText(s.rev)}</b>. Pick one action (hover to preview it), or skip.</p><div class="acts col">`+
-      actOpts(s,acts).map((o,i)=>{const a=acts.find(x=>x.a===o.a);return o.arg!=null?`<button class="btn" data-act="action" data-a2="${o.a}" data-arg="${esc(o.arg)}" ${o.p?`data-hov="${o.a}:${o.arg}"`:''} title="${esc(a.d||'')}">${esc(o.l)}</button>`:`<button class="btn" data-act="action" data-a2="${o.a}" title="${esc(a.d||'')}">${o.a==='F'?'◉':'✦'} ${esc(o.l)}<small>${esc(a.d||'')}</small></button>`}).join('')+
+      actOpts(s,acts).sort((x,y)=>(/^RP\d/.test(y.a)?1:0)-(/^RP\d/.test(x.a)?1:0)).map((o,i)=>{const a=acts.find(x=>x.a===o.a);if(/^RP\d/.test(o.a)){const x=s.dmg[+o.a.slice(2)],D=DAMAGE[x.c];return `<button class="btn rep" data-act="action" data-a2="${o.a}" title="${esc(D.t)}">🔧 Repair ${esc(D.n)}<small>${D.fix==='any'?'Always works':`Roll 1 attack die: ${D.fix==='hit'?'a hit':'a hit or crit'} fixes it`}. Right now: ${esc(critPlain(x.c,s))}</small></button>`}
+        return o.arg!=null?`<button class="btn" data-act="action" data-a2="${o.a}" data-arg="${esc(o.arg)}" ${o.p?`data-hov="${o.a}:${o.arg}"`:''} title="${esc(a.d||'')}">${o.a==='TL'?'⌖ ':''}${esc(o.l)}${o.a==='TL'?'<small>Target lock: later you may reroll any attack dice against this ship.</small>':''}</button>`:`<button class="btn" data-act="action" data-a2="${o.a}" title="${esc(a.d||'')}">${o.a==='F'?'◉':'✦'} ${esc(o.l)}<small>${esc(a.d||'')}</small></button>`}).join('')+
       `<button class="btn ghost" data-act="action" data-a2="skip">Skip action</button></div>`}}
   else if(G.phase==='target'){const s=ship(G.cur);if(!me)h=`<p class="head">${esc(s.name)} is lining up a shot…</p>`;else{const ws=weaponsFor(s);
-      h=`<p class="head">${esc(s.name)} · Step 3 · Attack</p><p>${G.bonus?'Bonus attack (primary weapon only). ':''}Choose a target in your arc (tap it in the view or below). Range 1 adds an attack die; range 3 or an asteroid in the way gives the defender an extra die.</p><div class="acts col">`+
-      ws.map(w=>w.targets.map(t=>{const d=ship(t.id);const sd=shotDice(s,w,t,d),n=sd.atk,m=sd.def;return `<button class="btn" data-act="fire" data-w="${w.k}" data-t="${t.id}">🎯 ${esc(w.n)} → ${esc(d.name)}<small>range ${t.rg}${t.obstructed?' · obstructed':''} · ${n} attack vs ${m} defense · ≈${expDmg(n,m,s.focus>0||s.tl===d.id,d.focus>0).toFixed(1)} damage</small></button>`}).join('')).join('')+
+      h=`<p class="head">${esc(s.name)} · Step 3 · Attack</p><p>${G.bonus?'Bonus attack (primary weapon only). ':''}Choose a target inside your arc, the yellow wedge (tap it in the view or below). Range 1 adds an attack die; range 3 or an asteroid in the way gives the defender an extra die.</p><div class="acts col">`+
+      ws.map(w=>w.targets.map(t=>{const d=ship(t.id);const sd=shotDice(s,w,t,d),n=sd.atk,m=sd.def;return `<button class="btn" data-act="fire" data-w="${w.k}" data-t="${t.id}">🎯 ${esc(w.n)} → ${esc(d.name)}<small>range ${t.rg}${t.obstructed?' · obstructed by a rock: +1 defense die':''} · ${n} attack vs ${m} defense · ≈${expDmg(n,m,s.focus>0||s.tl===d.id,d.focus>0).toFixed(1)} damage</small></button>`}).join('')).join('')+
       `<button class="btn ghost" data-act="fire" data-w="skip">Hold fire</button></div>`}}
-  else if(G.phase==='ask'&&G.q){const q=G.q;if(!humanTurn())h=`<p class="head">Waiting for ${esc(sideName(q.side))}…</p>`;else{const A=G.atk;h=`<p class="head">${esc(q.title)}</p><p>${q.key==='rock'?'Tap an outlined spot on the mat, or pick it below: columns A-E from your left, rows 1-5 from your edge. Asteroids stay beyond range 2 of every edge and beyond range 1 of each other.':esc(q.text)}</p>${A&&['dice','pay','jan','heat','brakk','maarek','garven','munitions'].includes(q.key)?`<div class="dice">${A.dice.map(f=>die(f,'atk')).join('')}</div>${A.def&&A.def.length?`<div class="dice">${A.def.map(f=>die(f,'def')).join('')}</div>`:''}`:''}${askButtons(q)}`}}
+  else if(G.phase==='ask'&&G.q){const q=G.q;if(!humanTurn())h=`<p class="head">Waiting for ${esc(sideName(q.side))}…</p>`;else{const A=G.atk;h=`<p class="head">${esc(q.title)}</p>${q.key==='rock'||q.key==='deploy'?setupText(q):`<p>${esc(q.text)}</p>`}${A&&['dice','pay','jan','heat','brakk','maarek','garven','munitions'].includes(q.key)?`<div class="dice">${A.dice.map(f=>die(f,'atk')).join('')}</div>${A.def&&A.def.length?`<div class="dice">${A.def.map(f=>die(f,'def')).join('')}</div>`:''}`:''}${askButtons(q)}`}}
   else if(G.phase==='damod'){const A=G.atk,a=ship(A.a),d=ship(A.d);h=`<p class="head">${esc(a.name)} → ${esc(d.name)}</p><div class="dice">${A.dice.map(f=>die(f,'atk')).join('')}</div><p class="preview">The defender may tamper with the attack dice first.</p>`;
     if(humanTurn())h+=`<div class="acts col">${exDAMods().map(m=>`<button class="btn" data-act="damod" data-k="${m.k}">${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="damod" data-k="done">Let the attack stand</button></div>`;else h+=`<p class="small muted">${esc(d.name)} is reacting…</p>`}
   else if(G.phase==='amod'||G.phase==='dmod'){const A=G.atk,a=ship(A.a),d=ship(A.d);const r=preview(A);const mine=(G.phase==='amod'&&humanTurn())||(G.phase==='dmod'&&humanTurn());
@@ -1551,12 +1818,18 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
     else h+=`<p class="small muted">${G.phase==='amod'?esc(a.name)+' is modifying its attack…':esc(d.name)+' is defending…'}</p>`}
   else h=`<p class="head">${G.phase==='combat'?'Combat…':G.phase==='activate'?'Ships are moving…':G.phase==='setup'?'Setting up the battlefield…':'…'}</p>`;
   el.innerHTML=h}
+function sugTip(s,sug){const m=dialOf(s)[sug];const si=sugInfo(s,sug);let h=`<p class="tip">💡 <b>${mText(m)}</b> (dashed outline): ${si.why}. <span class="${exColor(s,m).c==='r'?'warn':''}">${si.cost}</span>`;
+  if(exColor(s,m).c==='r'){const alt=saferAlt(s);if(alt!=null&&alt!==sug)h+=` Safer: <b>${mText(dialOf(s)[alt])}</b> (${exColor(s,dialOf(s)[alt]).c==='g'?'green':'white'}).`}return h+'</p>'}
+function setupText(q){const r=recOpt(q);const rock=q.key==='rock';
+  return `<div class="acts"><button class="btn primary big" data-a="autoplace">✨ Auto-place (recommended)<small>Places your ${rock?'asteroids and ship':'ships'} in sensible spots. In a first game it doesn't matter much.</small></button></div>
+  ${rock?'<p class="small">Asteroids: flying through one damages you and skips your action; shooting past one gives the defender +1 die.</p>':''}
+  <p class="small muted"><b>Or place ${rock?'it':'it'} yourself:</b> tap an outlined spot on the mat, or pick one below (${rock?'columns A-E from your left, rows 1-5 from your edge':'spots 1-9 along your edge, left to right'}). ★ <b>${esc(r.o.l)}</b> is suggested: ${r.why}.</p>`}
 // long lists of short choices (asteroid spots A1…E5 and the like) become a compact grid; the spots are laid out like the mat
-function askButtons(q){const pri=(o,i)=>(q.opts.some(x=>x.pri)?o.pri:i===0)?'primary':'';const short=q.opts.length>6&&q.opts.every(o=>String(o.l).length<=14);
+function askButtons(q){const rk=(q.key==='rock'||q.key==='deploy')?recOpt(q).o.k:null;const pri=(o,i)=>rk?(o.k===rk?'primary rec':''):(q.opts.some(x=>x.pri)?o.pri:i===0)?'primary':'';const short=q.opts.length>6&&q.opts.every(o=>String(o.l).length<=14);
   const btn=(o,i,st)=>`<button class="btn ${pri(o,i)}" data-act="ask" data-k="${esc(o.k)}" ${o.p?`data-hov="Q:${i}"`:''} ${st?`style="${st}"`:''} aria-label="${esc(o.l)}">${esc(o.l)}</button>`;
   if(q.key==='rock'&&q.opts.every(o=>/^[A-E][1-5]$/.test(o.l))){let h=`<div class="acts grid" role="group" aria-label="Asteroid spots">`;
     h+=q.opts.map((o,i)=>btn(o,i,`grid-column:${'ABCDE'.indexOf(o.l[0])+1};grid-row:${6-(+o.l[1])}`)).join('');return h+'</div>'}
-  if(q.key==='deploy'&&q.opts.every(o=>/^Spot [1-9]$/.test(o.l)))return `<p class="small muted">Tap an outlined spot on the mat, or its number (your edge, left to right):</p><div class="acts grid g9" role="group" aria-label="Deployment spots">${q.opts.map((o,i)=>`<button class="btn ${pri(o,i)}" data-act="ask" data-k="${esc(o.k)}" data-hov="Q:${i}" style="grid-column:${o.l.slice(5)}" aria-label="${esc(o.l)}">${o.l.slice(5)}</button>`).join('')}</div>`;
+  if(q.key==='deploy'&&q.opts.every(o=>/^Spot [1-9]$/.test(o.l)))return `<div class="acts grid g9" role="group" aria-label="Deployment spots">${q.opts.map((o,i)=>`<button class="btn ${pri(o,i)}" data-act="ask" data-k="${esc(o.k)}" data-hov="Q:${i}" style="grid-column:${o.l.slice(5)}" aria-label="${esc(o.l)}">${o.l.slice(5)}</button>`).join('')}</div>`;
   if(short)return `<div class="acts tiles">${q.opts.map((o,i)=>btn(o,i)).join('')}</div>`;
   return `<div class="acts col">${q.opts.map((o,i)=>btn(o,i)).join('')}</div>`}
 // tapping the mat picks the nearest outlined spot of the current question (asteroid spots, placements)
@@ -1564,24 +1837,24 @@ function matPick(x,y){if(!G||G.phase!=='ask'||!G.q||!humanTurn())return;let best
   if(best&&bd<=(best.b||40)/2+25){sfx('click');uiAct({act:'ask',k:best.k})}}
 function die(f,k){const ic={hit:'✹',crit:'✸',focus:'◉',blank:'',evade:'✦'}[f];return `<span class="die ${k} ${f}" aria-label="${f}">${ic}<i>${f}</i></span>`}
 // ---- roster: ship cards ----
-function renderRoster(){const el=$('roster');if(!el||!G)return;el.innerHTML=[0,1].map(k=>`<div class="fac f${FACTIONS[G.fac[k]].col}"><h3>${esc(sideName(k))}${G.init===k?' <i title="initiative">★</i>':''}</h3>`+
+function renderRoster(){const el=$('roster');if(!el||!G)return;const me=soloSide();el.innerHTML=[0,1].map(k=>`<div class="fac f${FACTIONS[G.fac[k]].col}"><h3>${me<0?'':k===me?'Your ships · ':'Enemy · '}${esc(sideName(k))}${G.init===k?' <i title="initiative: wins pilot-skill ties">★ initiative</i>':''}</h3><p class="small muted">${esc(FACTION_BIO[G.fac[k]]||'')}</p>`+
   G.ships.filter(s=>s.side===k).map(s=>{const T=SHIPS[s.type];const hp=s.hull-hullDmg(s);const ps=psOf(s),at=primary(s),ag=agility(s);const cur=(v,b)=>v!==b?` class="chg" title="base ${b}"`:'';
     const tok=shipTokens(s);
     return `<div class="card ${s.alive?'':'dead'} ${G.cur===s.id?'on':''}" data-sel="${s.id}"><b>${esc(s.name)}</b> <span class="muted">${esc(T.n)}</span>
     <div class="stats">${statSpans(s)}</div>
-    ${PILOTS[s.pilot].t?`<p class="ab">${esc(PILOTS[s.pilot].t)}</p>`:''}${s.ups.length?`<p class="ups">${s.ups.map(u=>`<span class="${u.gone?'gone':''}" title="${esc(UPGRADES[u.id].t)}">${esc(UPGRADES[u.id].n)}</span>`).join('')}</p>`:''}
-    ${s.dmg.filter(x=>x.up).map(x=>`<p class="crit" title="${esc(DAMAGE[x.c].t)}">✸ ${esc(DAMAGE[x.c].n)}</p>`).join('')}${s.alive&&s.dmg.some(x=>!x.up)?`<p class="small muted">${s.dmg.filter(x=>!x.up).length} facedown damage</p>`:''}${s.alive&&tok?`<p class="small">${tok}</p>`:''}</div>`}).join('')+'</div>').join('')}
-function statSpans(s){const hp=s.hull-hullDmg(s);const ps=psOf(s),at=primary(s),ag=agility(s);const cur=(v,b)=>v!==b?` class="chg" title="base ${b}"`:'';
-  return `<span class="ps" title="pilot skill"><b${cur(ps,s.ps)}>${ps}</b></span><span class="a" title="primary attack"><b${cur(at,s.atk)}>${at}</b></span><span class="g" title="agility"><b${cur(ag,s.agi)}>${ag}</b></span><span class="h" title="hull left">${s.alive?hp:0}/${s.hull}</span><span class="s" title="shields">${s.sh}/${s.shMax}</span>`}
+    <p class="bio small muted">${esc(pilotBio(s))}</p>${PILOTS[s.pilot].t?`<p class="ab">${esc(PILOTS[s.pilot].t)}</p>`:''}${s.ups.length?`<p class="ups">${s.ups.map(u=>`<span class="${u.gone?'gone':''}" title="${esc(UPGRADES[u.id].t)}">${esc(UPGRADES[u.id].n)}</span>`).join('')}</p>`:''}
+    ${s.dmg.filter(x=>x.up).map(x=>`<p class="crit" title="${esc(DAMAGE[x.c].t)}">✸ ${esc(DAMAGE[x.c].n)}: ${esc(critPlain(x.c,s))}</p>`).join('')}${s.alive&&s.dmg.some(x=>!x.up)?`<p class="small muted">${s.dmg.filter(x=>!x.up).length} hull damage</p>`:''}${s.alive&&tok?`<p class="small">${tok}</p>`:''}</div>`}).join('')+'</div>').join('')}
+function statSpans(s,short){const hp=s.hull-hullDmg(s);const ps=psOf(s),at=primary(s),ag=agility(s);const cur=(v,b)=>v!==b?` class="chg" title="base ${b}"`:'';const L=short?['PS','Atk','Agi','Hull','Shd']:['Skill','Attack','Agility','Hull','Shields'];
+  return `<span class="ps${pulse(s,'ps')}" title="pilot skill: higher skill moves later and shoots first"><i>${L[0]}</i> <b${cur(ps,s.ps)}>${ps}</b></span><span class="a${pulse(s,'a')}" title="primary attack: attack dice rolled"><i>${L[1]}</i> <b${cur(at,s.atk)}>${at}</b></span><span class="g${pulse(s,'g')}" title="agility: defense dice rolled"><i>${L[2]}</i> <b${cur(ag,s.agi)}>${ag}</b></span><span class="h${pulse(s,'h')}" title="hull left"><i>${L[3]}</i> ${s.alive?hp:0}/${s.hull}</span><span class="s${pulse(s,'s')}" title="shields left: they soak damage before the hull"><i>${L[4]}</i> ${s.sh}/${s.shMax}</span>`}
 function shipTokens(s){const locks=[s.tl,s.tl2].filter(Boolean).map(id=>ship(id)).filter(Boolean);const onMe=G.ships.filter(o=>o.alive&&(o.tl===s.id||o.tl2===s.id));
-    return [s.stress?`<span class="warn">stress ${s.stress}</span>`:'',s.ion?`ion ${s.ion}`:'',s.focus?`focus ${s.focus}`:'',s.evade?`evade ${s.evade}`:'',locks.length?`lock → ${locks.map(o=>esc(o.name)).join(', ')}`:'',onMe.length?`locked by ${onMe.map(o=>esc(o.name)).join(', ')}`:'',
+    return [s.stress?`<span class="warn">stress ${s.stress} (no red moves, no actions)</span>`:'',s.ion?`ion ${s.ion}`:'',s.focus?`focus ${s.focus}`:'',s.evade?`evade ${s.evade}`:'',locks.length?`lock → ${locks.map(o=>esc(o.name)).join(', ')}`:'',onMe.length?`locked by ${onMe.map(o=>esc(o.name)).join(', ')}`:'',
       s.flags.juke?'+1 agility (mech)':'',s.flags.allin?'all-in (+1 attack, −1 agility)':'',s.flags.dead?'deadshot ready':'',s.flags.psT!=null&&G.inCombat?`pilot skill ${s.flags.psT} this phase`:'',s.flags.doomed?'<span class="warn">crippled</span>':''].filter(Boolean).join(' · ')}
 // the ship that matters right now (selected while planning, the active ship, or attacker and defender) stays visible in the dock
 function focusShips(){if(!G||G.winner)return [];const A=G.atk;if(A&&['amod','dmod','damod','ask','target'].includes(G.phase)&&A.a&&A.d&&ship(A.a)&&ship(A.d)&&G.phase!=='target')return [ship(A.a),ship(A.d)];
   if(G.phase==='plan'){const ps=planSide();const s=ps>=0&&UI.sel&&ship(UI.sel);return s?[s]:[]}const c=G.cur&&ship(G.cur);if(c)return [c];const s=UI.sel&&ship(UI.sel);return s?[s]:[]}
 function renderShipCard(){const el=$('shipcard');if(!el)return;const ss=focusShips();if(!ss.length){el.innerHTML='';return}
   const one=s=>{const tok=s.alive?shipTokens(s):'destroyed';const crit=s.dmg.filter(x=>x.up).map(x=>`<span class="crit" title="${esc(DAMAGE[x.c].t)}">✸ ${esc(DAMAGE[x.c].n)}</span>`).join(' ');
-    return `<b class="nm" style="color:var(--c${FACTIONS[G.fac[s.side]].col})" title="${esc(PILOTS[s.pilot].t||'')}">${esc(s.name)}</b> <span class="muted small tp">${esc(SHIPS[s.type].n)}</span><div class="row2"><span class="stats">${statSpans(s)}</span></div>${tok||crit?`<div class="small">${[tok,crit].filter(Boolean).join(' · ')}</div>`:''}`};
+    return `<b class="nm" style="color:var(--c${FACTIONS[G.fac[s.side]].col})" title="${esc(PILOTS[s.pilot].t||'')}">${esc(s.name)}</b> <span class="muted small tp">${esc(SHIPS[s.type].n)}</span><div class="row2"><span class="stats">${statSpans(s,G.round>2||ss.length===2)}</span></div>${tok||crit?`<div class="small">${[tok,crit].filter(Boolean).join(' · ')}</div>`:''}`};
   el.innerHTML=ss.length===2?`<div class="shipc two" aria-label="Attacker and defender"><div>${one(ss[0])}</div><div>${one(ss[1])}</div></div>`:`<div class="shipc" aria-label="Selected ship"><button class="btn ghost more" data-gx="d-squads" title="All ship cards">🛩 All</button>${one(ss[0])}</div>`}
 function renderLog(){const el=$('log');if(el&&G)el.innerHTML=G.log.slice(0,300).map(l=>`<li class="s${l.s}">${esc(l.t)}</li>`).join('');const ll=$('lastlog');if(ll)ll.innerHTML=G?G.log.slice(0,2).map(l=>`<div class="s${l.s}" title="${esc(l.t)}">${esc(l.t)}</div>`).join(''):''}
 // ---- modals: start screen, pass-the-device, rules, stats ----
@@ -1591,22 +1864,38 @@ function renderModal(){const el=$('modal');let h='';
   else if(G&&G.phase==='plan'&&UI.pass!=null&&UI.pass!==planSide()&&planSide()>=0&&bothHuman())h=`<div class="dlg pass"><h2>Pass the device to ${esc(sideName(planSide()))}</h2><p>The other side's dials are hidden. Only ${esc(sideName(planSide()))} should look now.</p><div class="acts"><button class="btn primary" data-a="passok">I'm ${esc(sideName(planSide()))}: show my ships</button></div></div>`;
   el.innerHTML=h;el.classList.toggle('hidden',!h)}
 const bothHuman=()=>G&&isHuman(0)&&isHuman(1);
-function startHTML(){const saved=load();return `<div class="dlg start" role="dialog" aria-modal="true"><h1>Nebula Aces</h1><p class="lead">A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.</p>
+function startHTML(){const saved=load();const camp=campaign();const campOK=UI.fac[0]===0&&UI.fac[1]===1;return `<div class="dlg start" role="dialog" aria-modal="true"><div class="launchbar"><h1>Nebula Aces</h1><button class="btn primary" data-start="${UI.mode}">Launch ▶</button></div><p class="lead">A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.</p>
+  <p class="small">First time? Just press <b>Launch</b>: the defaults are a good first battle and the first round is guided. Everything below is optional.</p>
+  ${campOK&&UI.mode==='solo'&&camp.i>0&&camp.i<SORTIES.length?`<div class="row"><button class="btn" data-a="sortie" data-k="${camp.i}">▶ Continue the campaign<small>Sortie ${camp.i+1}: ${esc(SORTIES[camp.i].title)}</small></button></div>`:''}
   <h3>Mode</h3><div class="row">${[['solo','Me vs computer'],['hot','Two players, one screen'],['ai','Watch the computer']].map(([k,l])=>`<button class="btn ${UI.mode===k?'on':''}" data-mode="${k}">${l}</button>`).join('')}</div>
-  <h3>Factions</h3><div class="row">${[0,1].map(k=>`<label>${k?'Opponent':'You'}: <select data-fac="${k}">${FACTIONS.map((f,i)=>`<option value="${i}" ${UI.fac[k]===i?'selected':''} ${f.ex&&!UI.ex[f.ex]?'disabled':''}>${esc(f.n)}</option>`).join('')}</select></label>`).join(' ')}</div>
+  <h3>Factions</h3><div class="row">${[0,1].map(k=>`<label>${k?'Opponent':'You'}: <select data-fac="${k}">${FACTIONS.map((f,i)=>`<option value="${i}" ${UI.fac[k]===i?'selected':''} ${f.ex&&!UI.ex[f.ex]?'disabled':''}>${esc(f.n)}</option>`).join('')}</select><small class="bio">${esc(FACTION_BIO[UI.fac[k]]||'')}</small></label>`).join(' ')}</div>
   <h3>Battle size</h3><div class="row">${SIZES.map(z=>`<button class="btn ${UI.size===z.k?'on':''}" data-size="${z.k}">${esc(z.n)}<small>${esc(z.d)}</small></button>`).join('')}</div>
   <h3>Computer skill</h3><div class="row">${['easy','normal','hard'].map(l=>`<button class="btn ${UI.lvl===l?'on':''}" data-lvl="${l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join('')}</div>
   ${EXPS.length?`<h3>Expansions</h3><div class="exps">${EXPS.map(e=>`<button class="ex ${UI.ex[e.k]?'on':''}" data-exk="${e.k}"><b>${UI.ex[e.k]?'✓ ':''}${esc(e.n)}</b><small>${esc(e.d)}</small></button>`).join('')}</div>`:''}
   ${UI.size==='custom'?`<div class="row">${[0,1].map(k=>{const sq=UI.squads&&UI.squads[k];return `<button class="btn" data-a="build" data-k="${k}">✎ ${k?'Opponent':'Your'} squad<small>${sq&&sq.length?`${sq.length} ships · ${squadCost(sq)} pts`:'not built yet (random)'}</small></button>`}).join('')}</div>`:''}
   <div class="acts"><button class="btn primary" data-start="${UI.mode}">Launch</button>${saved?'<button class="btn" data-start="load">Continue saved battle</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
 function rulesHTML(){return `<div class="dlg rules"><h2>How to play</h2>${RULES_HTML}<div class="acts"><button class="btn primary" data-a="close">Close</button></div></div>`}
-function statsHTML(){const rows=G.ships.map(s=>{const st=G.stats[s.id]||{shots:0,dmg:0};return `<tr class="${s.alive?'':'dead'}"><td>${esc(s.name)}</td><td>${esc(sideName(s.side))}</td><td>${st.shots}</td><td>${st.dmg}</td><td>${s.alive?`${s.hull-hullDmg(s)}/${s.hull}`:'destroyed'}</td></tr>`}).join('');
-  return `<div class="dlg"><h2>${esc(G.winText)}</h2><p>${G.round} rounds.</p><table class="stats"><tr><th>Ship</th><th>Side</th><th>Shots</th><th>Damage dealt</th><th>Hull</th></tr>${rows}</table><div class="acts"><button class="btn primary" data-a="new">New battle</button><button class="btn" data-a="close">Look at the field</button></div></div>`}
+function nextSortieBtn(){if(!G||G.sortie==null||soloSide()!==0)return '';const won=G.winner==='P1';const i=won?G.sortie+1:G.sortie;
+  if(won&&i>=SORTIES.length)return '';return `<button class="btn" data-a="sortie" data-k="${i}">${won?'Next sortie ▶':'Fly it again ↻'}<small>${won?esc(SORTIES[i].title):esc(SORTIES[G.sortie].title)}</small></button>`}
+function debriefHTML(){finishAtk();const me=soloSide();const so=G.sortie!=null?SORTIES[G.sortie]:null;const won=me>=0&&G.winner==='P'+(me+1);const lost=me>=0&&G.winner&&G.winner!=='draw'&&!won;
+  const head=me<0?esc(G.winText):won?(so?so.win:'Victory.'):lost?(so?so.lose:'Defeat.'):'A draw.';const lines=[];
+  const sides=me<0?[0,1]:[me];for(const k of sides)for(const s of G.ships.filter(x=>x.side===k)){const t=UI.taken[s.id]||0;const ks=UI.kills.filter(x=>x.by===s.id).map(x=>`downed ${esc(ship(x.v).name)} in round ${x.r} with a range-${x.rg} run`);
+    const by=UI.kills.find(x=>x.v===s.id);lines.push(`<b>${esc(s.name)}</b> took ${t} hit${t===1?'':'s'}${ks.length?' and '+ks.join(' and '):''}${s.alive?`, and came home with ${s.hull-hullDmg(s)}/${s.hull} hull.`:by?`, then was shot down by ${esc(ship(by.by).name)} in round ${by.r}.`:lostHow(s)}`)}
+  const foeLost=G.ships.filter(s=>me>=0&&s.side!==me&&!s.alive&&!UI.kills.some(x=>x.v===s.id));foeLost.forEach(s=>lines.push(`${esc(s.name)}${lostHow(s).replace(/^, (then )?/,' ')}`));
+  const hook=so?(won?so.hook:'Regroup and fly this sortie again.'):'Next sortie: pick a bigger battle size, or switch sides.';
+  return `<div class="dlg debrief"><h2>${head}</h2><p class="muted">${esc(G.winText)} ${G.round} round${G.round===1?'':'s'}.</p><ul>${lines.map(l=>`<li>${l}</li>`).join('')}</ul>
+    <p class="hook">📡 ${esc(hook)}</p><details><summary>Full battle report</summary>${statsTable()}</details>
+    <div class="acts">${nextSortieBtn().replace('class="btn"','class="btn primary"')}<button class="btn ${nextSortieBtn()?'':'primary'}" data-a="new">New battle</button><button class="btn" data-a="close">Look at the field</button></div></div>`}
+function lostHow(s){const all=[].concat(...Object.values(UI.ev||{}));if(all.some(e=>e.t.startsWith(s.name+' flies off')))return ', then flew off the battlefield and was lost. Watch the edges: a move that ends off the mat destroys you.';return ', and was lost to asteroid or crit damage.'}
+function statsTable(){const rows=G.ships.map(s=>{const st=G.stats[s.id]||{shots:0,dmg:0};return `<tr class="${s.alive?'':'dead'}"><td>${esc(s.name)}</td><td>${esc(sideName(s.side))}</td><td>${st.shots}</td><td>${st.dmg}</td><td>${s.alive?`${s.hull-hullDmg(s)}/${s.hull}`:'destroyed'}</td></tr>`}).join('');
+  return `<table class="stats"><tr><th>Ship</th><th>Side</th><th>Shots</th><th>Damage dealt</th><th>Hull</th></tr>${rows}</table>`}
+function statsHTML(){return debriefHTML()}
 // ---- dock (shell): its title always says what is happening; a new human decision re-opens it ----
 const NARROW=window.matchMedia?window.matchMedia('(max-width:999px)'):{matches:false};
 const PHONE=window.matchMedia?window.matchMedia('(max-width:700px)'):{matches:false};
 function renderDock(){const t=$('docktitle');if(!t)return;const pr=$('prompt');const head=pr&&pr.querySelector('.head,h2');
-  t.textContent=!G?'Nebula Aces':G.winner?'Battle over':`Round ${G.round} · ${head?head.textContent:STEPS[(G.step||1)-1][0]}`;
+  t.textContent=!G?'Nebula Aces':G.winner?'Battle over':`${G.round===0?'Setup':'Round '+G.round} · ${head?head.textContent:STEPS[(G.step||1)-1][0]}`;
+  if(GX&&GX.app)GX.app.classList.toggle('na-plan',!!(PHONE.matches&&G&&!G.winner&&G.phase==='plan'&&planSide()>=0&&!UI.info));
   const need=G&&!G.winner&&!UI.info&&(planSide()>=0||humanTurn());const sig=need?[G.round,G.phase,G.cur,G.q&&G.q.kid,G.atk&&G.atk.step].join('|'):'';
   if(sig&&sig!==UI.needSig&&typeof GX!=='undefined'&&GX.app){GX.showDock();const b=document.querySelector('.gx-dock-body');if(b&&G.phase!=='plan')b.scrollTop=0}UI.needSig=sig}
 if(PHONE.addEventListener)PHONE.addEventListener('change',()=>{render();if(V3.on)resize3D()});
@@ -1629,6 +1918,9 @@ function gameAct(ds,side){if(!G)return;
   else if(ds.act==='fire'){performMove(ds.w==='skip'?{act:'fire',w:'skip'}:{act:'fire',w:ds.w,t:ds.t},side)}
   else if(ds.act==='amod'||ds.act==='dmod'){performMove({act:ds.act,k:ds.k},side)}
   else if(ds.act==='dials'){for(const id in ds.dials){const s=ship(id);if(s&&s.side===side&&s.dial==null)performMove({act:'dial',ship:id,m:ds.dials[id]},side)}}}
+const ICON_PAUSE='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="9.4" y="2" width="3.6" height="12" rx="1" fill="currentColor"/></svg>',ICON_PLAY='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 2l10 6-10 6z" fill="currentColor"/></svg>';
+function toggleMenu(open){const m=$('more'),b=document.querySelector('[data-a="menu"]');if(!m)return;const on=open!=null?open:!m.classList.contains('open');m.classList.toggle('open',on);if(b)b.setAttribute('aria-expanded',String(on))}
+document.addEventListener('click',e=>{const m=$('more');if(m&&m.classList.contains('open')&&!e.target.closest('[data-a="menu"]')&&(!e.target.closest('#more')||e.target.closest('button')))setTimeout(()=>toggleMenu(false),0)},true);
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-act],[data-dial],[data-sel],[data-start],[data-mode],[data-size],[data-lvl],[data-exk],[data-ship]');if(!t)return;const ds=t.dataset;if(t.disabled)return;sfx('click');
   if(ds.mode){UI.mode=ds.mode;render();return}if(ds.size){UI.size=ds.size;saveSetup();render();return}if(ds.lvl){UI.lvl=ds.lvl;saveSetup();render();return}
   if(ds.exk){UI.ex[ds.exk]=!UI.ex[ds.exk];FACTIONS.forEach((f,i)=>{if(f.ex&&!UI.ex[f.ex]&&UI.fac.includes(i))UI.fac=UI.fac.map(x=>x===i?(i===UI.fac[0]?0:1):x)});saveSetup();render();return}
@@ -1646,7 +1938,14 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
   if(ds.a==='stats'){UI.stats=true;render();return}if(ds.a==='new'){UI.info=true;UI.stats=false;render();return}
   if(ds.a==='snd'){toggleSound();return}if(ds.a==='mus'){toggleMusic();return}if(ds.a==='top'){UI.top=!UI.top;camView(UI.top?'top':'tilt');return}
   if(ds.a==='hints'){UI.hints=!UI.hints;$('hintbtn').textContent=UI.hints?'💡 On':'💡 Off';render();return}
-  if(ds.a==='pause'){UI.paused=!UI.paused;$('pausebtn').textContent=UI.paused?'▶':'⏸';if(!UI.paused)schedule();return}
+  if(ds.a==='pause'){UI.paused=!UI.paused;$('pausebtn').innerHTML=UI.paused?ICON_PLAY:ICON_PAUSE;$('pausebtn').setAttribute('aria-label',UI.paused?'Resume the computer':'Pause the computer');if(!UI.paused)schedule();return}
+  if(ds.a==='menu'){toggleMenu();return}
+  if(ds.a==='legend'){const l=document.querySelector('.legend');if(l)l.classList.toggle('open');return}
+  if(ds.a==='autoplace'){autoPlaceAll();return}
+  if(ds.a==='advise'){UI.advOpen=!UI.advOpen;const b=document.querySelector('.na-adv');if(b)b.setAttribute('aria-expanded',String(UI.advOpen));render();return}
+  if(ds.a==='recapok'){UI.recapSeen=G.round-1;render();return}if(ds.a==='recapoff'){UI.recapSeen=G.round-1;LS.set('na_recap','off');render();return}
+  if(ds.a==='tourskip'){LS.set('na_tour','1');UI.coachOn=null;render();return}
+  if(ds.a==='sortie'){startGame('solo',+ds.k);return}
   if(ds.a==='speed'){const s=['slow','normal','fast'];UI.speed=s[(s.indexOf(UI.speed||'normal')+1)%3];AIDELAY={slow:1100,normal:600,fast:220}[UI.speed];$('speedbtn').textContent='⏩ '+UI.speed;return}
   if(ds.act){uiAct(Object.assign({},ds));return}
   if(ds.ship){uiAct({ship:ds.ship})}});
@@ -1658,13 +1957,15 @@ document.addEventListener('keydown',e=>{if(e.target&&/INPUT|SELECT|TEXTAREA/.tes
   if(!G||G.winner||!humanTurn())return;const click=sel=>{const b=document.querySelector(sel);if(b&&!b.disabled){b.click();e.preventDefault()}};
   if(e.key==='Enter')click('#prompt .btn.primary');else if(e.key==='s'||e.key==='S')click('#prompt [data-a2="skip"],#prompt [data-w="skip"]');
   else if(/^[1-9]$/.test(e.key))click(`#prompt .acts button:nth-of-type(${e.key})`)});
-function startGame(mode){UI.info=false;UI.stats=false;UI.draft={};UI.pass=null;UI.sel=null;UI.sugCache=null;
+function startGame(mode,sortie){UI.info=false;UI.stats=false;UI.draft={};UI.pass=null;UI.sel=null;UI.sugCache=null;UI.autoSetup=false;UI.advOpen=false;
   if(mode==='load'){const g=load();if(g){G=g;if(!['plan','over'].includes(G.phase)){G.phase='plan';G.step=1;alive().forEach(s=>s.dial=null);G.atk=null}refresh();return}}
   UI.mode=mode;const players=mode==='solo'?[{human:true},{human:false,lvl:UI.lvl}]:mode==='hot'?[{human:true},{human:true}]:[{human:false,lvl:UI.lvl},{human:false,lvl:UI.lvl}];
   const custom=UI.size==='custom'&&UI.squads?UI.squads.map((sq,k)=>sq&&sq.length&&sq.every(e=>PILOTS[e.p]&&factionPilots(UI.fac[k],UI.ex).includes(e.p))&&squadCost(sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})))<=100?sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})):null):null;
   const squads=custom&&(custom[0]||custom[1])?[custom[0]||randomSquad(UI.fac[0],100,UI.ex),custom[1]||randomSquad(UI.fac[1],100,UI.ex)]:null;
-  newGame({fac:UI.fac.slice(),players,sizeK:UI.size,squads,ex:Object.assign({},UI.ex)});
-  if(bothHuman())UI.pass=0;camView('tilt')}
+  if(sortie!=null&&SORTIES[sortie]){const so=SORTIES[sortie];UI.mode='solo';
+    newGame({fac:[0,1],players:[{human:true},{human:false,lvl:UI.lvl}],sizeK:so.size||'core',squads:so.sq?so.sq.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))):null,ex:Object.assign({},UI.ex,so.ex||{})});G.sortie=sortie}
+  else{newGame({fac:UI.fac.slice(),players,sizeK:UI.size,squads,ex:Object.assign({},UI.ex)});if(mode==='solo'&&UI.fac[0]===0&&UI.fac[1]===1&&UI.size==='core'&&!squads)G.sortie=0}
+  resetGuide();if(bothHuman())UI.pass=0;camView('tilt');render()}
 // ---- squad builder: add pilots, pick upgrades per slot, live points and unique checks ----
 try{const q=JSON.parse(localStorage.getItem('na_squads')||'null');if(q)UI.squads=q}catch(e){}
 function slotsOf(e){const P=PILOTS[e.p];const out=P.u.slice();(e.u||[]).forEach(u=>{const U=UPGRADES[u];if(U&&U.addSlot)out.push(U.addSlot)});return out}
