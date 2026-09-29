@@ -65,6 +65,7 @@ footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
 @keyframes open{from{clip-path:inset(40% 30% 40% 30% round 12px);opacity:.4}to{clip-path:inset(0 0 0 0);opacity:1}}
 @media (prefers-reduced-motion:reduce){.box,.box:hover{transition:none;transform:none}#table.opening{animation:none}}
 @media (min-width:1560px){.shelf{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (min-width:1560px){.box:last-child:nth-child(3n+1){grid-column:1/-1;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:none}.box:last-child:nth-child(3n+1) .cover{aspect-ratio:auto;height:100%;min-height:280px}}
 /* an odd card out spans the row, cover beside its text, so no card sits alone next to a gap */
 @media (min-width:681px) and (max-width:1559px){.box:last-child:nth-child(odd){grid-column:1/-1;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:none}.box:last-child:nth-child(odd) .cover{aspect-ratio:auto;height:100%;min-height:280px}}
 @media (max-width:680px){.shelf{grid-template-columns:minmax(0,1fr)}}
@@ -79,7 +80,7 @@ footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
       <h1>Game Night Shelf</h1>
       <p class="lede">Pick a box and play it here in the browser, against the computer or with friends passing the device. Every game uses original names and art, and the reference lists every card and token.</p>
     </div>
-    <div style="display:grid;gap:8px;justify-items:end"><button type="button" class="btn ref" id="refbtn" data-ref="">📖 Card &amp; token reference</button><div class="tally" id="tally">6 games on the shelf</div></div>
+    <div style="display:grid;gap:8px;justify-items:end"><button type="button" class="btn ref" id="refbtn" data-ref="">📖 Card &amp; token reference</button><div class="tally" id="tally">7 games on the shelf</div></div>
   </header>
 
   <section class="shelf" id="shelf" aria-label="Games"></section>
@@ -122,7 +123,12 @@ const GAMES=[
    blurb:'Bid for turn order, then sweep the five tribes across a sunlit sultanate. Claim tiles with your camels, summon djinns and corner the bazaar. Every move is a small puzzle.',
    stats:[['2–5','players'],['60','minutes'],['13+','ages'],['3D','bazaar']],
    chips:['Vs computer · 3 levels','Hot-seat','28 djinns','The Crafters','Wonder Cities','Cutpurses','Promo djinns'],
-   based:'Plays like Five Tribes: The Djinns of Naqala (2014)',paint:paintSands}
+   based:'Plays like Five Tribes: The Djinns of Naqala (2014)',paint:paintSands},
+  {id:'sunglaze',name:'Sunglaze',src:'sunglaze/index.html',ribbon:'Tile drafting',
+   blurb:'Draft glazed tiles from the kilns and set them into the Sun King\'s courtyard mosaic. Every pick leaves something for your rivals, and every broken tile costs you.',
+   stats:[['2–4','players'],['40','minutes'],['8+','ages'],['100','tiles']],
+   chips:['Vs computer · 3 levels','Hot-seat','Guided first game','Unmarked mosaic','Prism tiles'],
+   based:'Plays like Azul (2017)',paint:paintGlaze}
 ];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
@@ -205,6 +211,12 @@ function paintMainhattan(c){const x=c.getContext('2d'),w=c.width,h=c.height;
   x.fillStyle='#19e3ff';x.beginPath();x.moveTo(12,-2);x.lineTo(4,-8);x.lineTo(-6,-7);x.lineTo(-4,-1);x.closePath();x.fill();x.fillStyle='#ff2d95';x.fillRect(-16,8,26,2);x.restore();
   x.fillStyle='#ff3dbb';for(const [bx,by] of [[.52,.33],[.56,.45],[.6,.38]]){x.beginPath();x.arc(w*bx,h*by,4,0,7);x.fill()}
   x.fillStyle='rgba(0,0,0,.35)';x.fillRect(0,h*.72,w,h*.28)}
+function paintGlaze(c){const x=c.getContext('2d'),w=c.width,h=c.height;let g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#f7e3b5');g.addColorStop(1,'#e2a064');x.fillStyle=g;x.fillRect(0,0,w,h);
+  const cols=['#1f5fb5','#f0b429','#c0392b','#22252b','#dff1f7'];const S=Math.min(w,h)/7.2;const ox=w*.5-S*2.5,oy=h*.14;
+  for(let r=0;r<5;r++)for(let k=0;k<5;k++){const col=cols[(k-r+5)%5];const px=ox+k*S*1.05,py=oy+r*S*1.05;x.fillStyle='rgba(0,0,0,.18)';x.fillRect(px+3,py+4,S,S);x.fillStyle=(r+k)%3?col:'rgba(255,255,255,.35)';x.fillRect(px,py,S,S);
+    if((r+k)%3){x.strokeStyle='rgba(255,255,255,.7)';x.lineWidth=2;x.beginPath();x.arc(px+S/2,py+S/2,S*.28,0,7);x.stroke();x.beginPath();x.moveTo(px+S*.2,py+S/2);x.lineTo(px+S*.8,py+S/2);x.moveTo(px+S/2,py+S*.2);x.lineTo(px+S/2,py+S*.8);x.stroke()}}
+  x.fillStyle='rgba(255,240,200,.95)';x.beginPath();x.arc(w*.88,h*.16,h*.09,0,7);x.fill();
+  x.fillStyle='rgba(0,0,0,.28)';x.fillRect(0,h*.72,w,h*.28)}
 function seed(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
 
 document.getElementById('tally').textContent=GAMES.length+' games on the shelf';
