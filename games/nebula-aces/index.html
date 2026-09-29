@@ -7,29 +7,90 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Exo+2:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
+/* ===== Board-first shell (shared by every game on the shelf) =====
+   The page never scrolls. The board fills what the bar and the dock leave; the dock is in flow (never over the board);
+   everything else opens in a closable popup (drawer). Games theme it with the --gx-* variables. */
+:root{--gx-bar-h:48px;--gx-dock-w:clamp(300px,30vw,420px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
+html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+.gx-app{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--gx-bg)}
+.gx-bar{min-height:var(--gx-bar-h);display:flex;align-items:center;gap:6px;padding:4px 10px;padding-top:calc(4px + env(safe-area-inset-top,0px));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;position:relative;z-index:6}
+.gx-bar::-webkit-scrollbar{display:none}
+.gx-bar .gx-sp{flex:1 0 8px}
+.gx-main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) var(--gx-dock-w);position:relative}
+.gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0}
+.gx-board{position:relative;min-width:0;min-height:0;overflow:hidden}
+.gx-dock{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.gx-dock-head{display:flex;align-items:center;gap:6px;padding:6px 8px 4px;flex:0 0 auto}
+.gx-dock-head .gx-dt{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gx-dock-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.gx-app.gx-dock-min .gx-dock{visibility:hidden}
+
+.gx-ibtn{appearance:none;border:1px solid var(--gx-line);background:rgba(255,255,255,.08);color:inherit;border-radius:10px;min-width:40px;min-height:40px;padding:4px 10px;display:inline-flex;gap:6px;align-items:center;justify-content:center;cursor:pointer;font:inherit;white-space:nowrap}
+.gx-ibtn:focus-visible,.gx-drawer button:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
+.gx-ibtn .gx-n{font-size:.72rem;opacity:.8}
+.gx-ibtn.gx-reopen{position:absolute;right:10px;top:10px;z-index:5;display:none}
+.gx-app.gx-dock-min .gx-ibtn.gx-reopen{display:inline-flex}
+/* popups */
+.gx-scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .18s}
+.gx-scrim.on{opacity:1;pointer-events:auto}
+.gx-drawer{position:fixed;z-index:41;top:calc(var(--gx-bar-h) + 8px + env(safe-area-inset-top,0px));right:8px;bottom:8px;width:min(520px,calc(100vw - 16px));display:flex;flex-direction:column;background:var(--gx-panel);color:var(--gx-ink);border-radius:var(--gx-radius);box-shadow:var(--gx-shadow);transform:translateX(calc(100% + 16px));transition:transform .22s ease;visibility:hidden}
+.gx-drawer.on{transform:none;visibility:visible}
+.gx-drawer.wide{width:min(980px,calc(100vw - 16px))}
+.gx-drawer-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--gx-line);flex:0 0 auto}
+.gx-drawer-head h2{margin:0;font-size:1.15rem;flex:1;min-width:0}
+.gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:40px;min-height:40px;border-radius:10px}
+.gx-drawer-body{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
+/* narrow screens: the dock becomes a sheet under the board (still in flow), the drawers slide up from the bottom */
+@media (max-width:999px){
+  .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
+  .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr)}
+  .gx-dock{max-height:var(--gx-sheet-h,46dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-app.gx-sheet-full .gx-dock{max-height:78dvh}
+  .gx-app.gx-dock-min .gx-dock{visibility:visible;max-height:none}
+  .gx-app.gx-dock-min .gx-dock-body{display:none}
+  .gx-reopen{display:none!important}
+  .gx-grab{display:block;width:44px;height:5px;border-radius:3px;background:currentColor;opacity:.35;margin:0 auto}
+  .gx-drawer{top:auto;left:0;right:0;bottom:0;width:auto;max-height:88dvh;height:88dvh;border-radius:var(--gx-radius) var(--gx-radius) 0 0;transform:translateY(100%);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-drawer.wide{width:auto}
+  .gx-hide-narrow{display:none!important}
+}
+@media (min-width:1000px){.gx-grab{display:none}}
+@media (prefers-reduced-motion:reduce){.gx-drawer,.gx-scrim{transition:none}}
+
+</style>
+<style>
 :root{--bg:#07061a;--panel:#141233;--panel2:#1c1944;--ink:#ecebff;--muted:#a3a0cc;--line:#39357a;--gold:#ffc86b;--c0:#f08a3a;--c1:#e0304a;--c2:#39c27f;--good:#56e39a;--bad:#ff5a6a;--white:#f3f3ff;--red:#ff4a4a;--green:#4aff8a;--shadow:rgba(0,0,0,.45);--radius:12px}
 /* dark-first: the battlefield is deep space, so the interface stays dark unless the page is explicitly set to light */
 :root[data-theme="light"]{--bg:#f4f1ff;--panel:#ffffff;--panel2:#efeaff;--ink:#17133a;--muted:#5d5890;--line:#c9c2f0;--shadow:rgba(40,20,90,.15)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#07061a;--panel:#141233;--panel2:#1c1944;--ink:#ecebff;--muted:#a3a0cc;--line:#39357a}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 30% 0%,#2a1450 0%,var(--bg) 55%) fixed,var(--bg);color:var(--ink);font:15px/1.4 "Exo 2",system-ui,sans-serif;min-height:100vh}
+body{margin:0;background:radial-gradient(ellipse at 30% 0%,#2a1450 0%,var(--bg) 55%) fixed,var(--bg);color:var(--ink);font:15px/1.4 "Exo 2",system-ui,sans-serif}
 h1,h2,h3,.head{font-family:Orbitron,"Exo 2",sans-serif;letter-spacing:.04em}
-header{display:flex;align-items:center;gap:.5rem;padding:.5rem 16px;background:linear-gradient(90deg,#1a1240,#2c1452);border-bottom:2px solid var(--gold);position:sticky;top:0;z-index:30;overflow-x:auto;scrollbar-width:none}
-header::-webkit-scrollbar{display:none}
-header h1{margin:0 .6rem 0 0;font-size:1.35rem;color:var(--gold);white-space:nowrap;text-shadow:0 0 12px rgba(255,200,107,.5)}
+.gx-bar{background:linear-gradient(90deg,#1a1240,#2c1452);border-bottom:2px solid var(--gold);gap:.45rem}
+.gx-bar h1{margin:0 .6rem 0 0;font-size:1.35rem;color:var(--gold);white-space:nowrap;text-shadow:0 0 12px rgba(255,200,107,.5)}
 .btn{font:600 .92rem "Exo 2",sans-serif;color:var(--ink);background:var(--panel2);border:1.5px solid var(--line);border-radius:10px;padding:.42rem .75rem;cursor:pointer;min-height:40px;text-align:left}
 .btn:hover:not([disabled]){border-color:var(--gold)}.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .btn[disabled]{opacity:.45;cursor:not-allowed}.btn small{display:block;font-weight:400;color:var(--muted);font-size:.78rem}
 .btn.primary{background:linear-gradient(180deg,#ffcf7a,#f0a340);color:#1b1030;border-color:#ffdca0}.btn.primary small{color:#3a2a10}
 .btn.on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.35) inset}.btn.ghost{background:transparent}
-header .btn{flex:0 0 auto;padding:.3rem .6rem;min-height:36px}
-.wrap>*{min-width:0}.stage canvas{width:100%!important}
-.wrap{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:14px;padding:12px 16px;max-width:1500px;margin:0 auto}
-@media (max-width:1020px){.wrap{grid-template-columns:1fr}}
-.stage{position:relative;border:2px solid var(--line);border-radius:var(--radius);overflow:hidden;background:#05040f;box-shadow:0 8px 30px var(--shadow)}
-.stage canvas{display:block;touch-action:none;cursor:grab}
-body.flat .stage{display:none}#map{display:none;width:100%;border-radius:var(--radius);border:2px solid var(--line)}body.flat #map{display:block}
+.gx-bar .btn{flex:0 0 auto;padding:.3rem .6rem;min-height:40px;white-space:nowrap}
+/* board-first shell, themed with the game's own colours */
+:root{--gx-bar-h:52px;--gx-dock-w:clamp(320px,30vw,420px);--gx-bg:var(--bg);--gx-bar:#1a1240;--gx-panel:var(--panel);--gx-ink:var(--ink);--gx-line:var(--line);--gx-accent:var(--gold);--gx-shadow:0 20px 60px #000;--gx-radius:14px;--gx-sheet-h:46dvh}
+.gx-app{background:radial-gradient(ellipse at 30% 0%,#2a1450 0%,var(--bg) 55%),var(--bg);color:var(--ink)}
+.gx-board{background:#05040f}
+.gx-dock{background:var(--panel);border-left:2px solid var(--line);color:var(--ink)}
+.gx-dock-head{border-bottom:1px solid var(--line);font-family:Orbitron,"Exo 2",sans-serif;color:var(--gold);font-size:.9rem;letter-spacing:.03em}
+.gx-dock-head .gx-ibtn{color:var(--ink)}
+.gx-dock-body{padding:.55rem .75rem .8rem;display:flex;flex-direction:column;gap:.5rem}
+.gx-ibtn{border-color:var(--line)}
+.gx-drawer{border:2px solid var(--gold)}.gx-drawer-head h2{color:var(--gold);font-size:1.05rem}
+#roster,#log,#bbody{display:none}.gx-drawer #roster{display:grid}.gx-drawer #log{display:block}.gx-drawer #bbody{display:block}
+.gx-ibtn.gx-reopen{top:auto;bottom:10px;right:10px;background:rgba(20,18,50,.85);color:var(--ink)}
+@media (max-width:999px){.gx-dock{border-left:0;border-top:2px solid var(--gold);box-shadow:0 -6px 24px rgba(0,0,0,.5)}.gx-grab{color:var(--muted)}}
+.stage{position:absolute;inset:0;overflow:hidden;background:#05040f}
+.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+body.flat .stage{display:none}#map{display:none;position:absolute;inset:0;width:100%;height:100%}body.flat #map{display:block}
 #tags{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 .tag{position:absolute;transform:translate(-50%,-100%);background:rgba(12,10,34,.82);border:1.5px solid var(--c0);border-radius:8px;padding:1px 6px;font-size:.74rem;white-space:nowrap;color:#fff;text-align:center}
 .tag.s1{border-color:var(--c1)}.tag b{display:block;font-size:.78rem}.tag span em{font-style:normal;margin-right:2px}.tag .ps{color:var(--gold)}.tag .h{color:#ffd0a0}.tag .sh{color:#7fd4ff}.tag .st{color:var(--bad)}.tag .f{color:#9f9}.tag .e{color:#8ef}.tag .l{color:#ff9}.tag .io{color:#6cf}
@@ -37,16 +98,15 @@ body.flat .stage{display:none}#map{display:none;width:100%;border-radius:var(--r
 .pop{position:absolute;transform:translate(-50%,-50%);font:800 1.3rem Orbitron,"Exo 2",system-ui,sans-serif;pointer-events:none;animation:popup 1.4s ease-out forwards;text-shadow:0 0 8px #000,0 2px 0 #000}
 .pop.hurt{color:#ff8a60}.pop.crit{color:#ff3a3a;font-size:1.6rem}.pop.miss{color:#9fe}.pop.tok{color:#b6ffb0}.pop.lock{color:#ffee70}
 @keyframes popup{0%{opacity:0;transform:translate(-50%,-30%) scale(.5)}15%{opacity:1;transform:translate(-50%,-60%) scale(1.15)}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),-230%)}}
-.viewbar{position:absolute;right:8px;top:8px;display:flex;gap:6px}.viewbar .btn{min-height:34px;padding:.2rem .5rem;background:rgba(20,18,50,.8)}
-.side{display:flex;flex-direction:column;gap:12px;min-width:0}
+.viewbar{position:absolute;left:6px;top:6px;display:flex;gap:6px;z-index:2}.viewbar .btn{min-height:40px;padding:.2rem .55rem;background:rgba(20,18,50,.8);font-size:.85rem}
 .box{background:var(--panel);border:1.5px solid var(--line);border-radius:var(--radius);padding:.7rem .85rem;box-shadow:0 4px 16px var(--shadow)}
 .box h3{margin:.1rem 0 .5rem;font-size:.95rem;color:var(--gold)}
-.steps{display:flex;gap:4px;margin:0 0 .6rem}.st{flex:1;text-align:center;border:1.5px solid var(--line);border-radius:8px;padding:.2rem 0;font-size:.74rem;color:var(--muted)}
+.steps{display:flex;gap:4px;margin:0}.st{flex:1;text-align:center;border:1.5px solid var(--line);border-radius:8px;padding:.2rem 0;font-size:.74rem;color:var(--muted)}
 .st b{display:block;font:800 1rem Orbitron,"Exo 2",system-ui,sans-serif}.st i{display:block;font-style:normal;font-size:.66rem}.st.on{border-color:var(--gold);color:var(--ink);background:rgba(255,200,107,.12)}.st.done b::after{content:" ✓"}
 .head{font-size:1rem;color:var(--gold);margin:.2rem 0 .3rem}.how{margin:.2rem 0 .5rem;padding-left:1.2rem}.tip{background:rgba(255,200,107,.1);border:1px dashed var(--gold);border-radius:8px;padding:.3rem .5rem;font-size:.86rem}
 .small{font-size:.85rem}.muted{color:var(--muted)}.warn{color:#ffb070}.bad{color:var(--bad)}
 .acts{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.5rem}.acts.col{flex-direction:column}.acts.col .btn{width:100%}
-.shipTabs{display:flex;gap:.3rem;flex-wrap:wrap;margin:.3rem 0}.tab{padding:.25rem .5rem;min-height:34px}
+.shipTabs{display:flex;gap:.3rem;flex-wrap:wrap;margin:.3rem 0}.tab{padding:.25rem .5rem;min-height:40px}
 .dialwrap{display:flex;gap:.7rem;align-items:flex-start;flex-wrap:wrap}.dialinfo{flex:1;min-width:150px}
 table.dial{border-collapse:separate;border-spacing:3px}table.dial th{font:800 .8rem Orbitron,"Exo 2",system-ui,sans-serif;color:var(--muted);padding-right:2px}
 .mv{width:44px;height:44px;border-radius:9px;border:2px solid transparent;font:800 1.15rem "Exo 2";cursor:pointer;position:relative;padding:0}
@@ -56,53 +116,75 @@ table.dial{border-collapse:separate;border-spacing:3px}table.dial th{font:800 .8
 .dice{display:flex;gap:6px;flex-wrap:wrap;margin:.3rem 0}.die{width:46px;height:46px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;position:relative}
 .die i{font:600 .55rem "Exo 2";font-style:normal;text-transform:uppercase;opacity:.85}.die.atk{background:#7a1020;color:#fff;border:2px solid #ff5a6a}.die.def{background:#0f5a32;color:#fff;border:2px solid #4be08a}
 .die.blank{opacity:.55}.preview{background:var(--panel2);border-radius:8px;padding:.35rem .55rem}
+.shipc{border:1.5px solid var(--line);border-radius:10px;padding:.3rem .5rem;background:var(--panel2);font-size:.84rem}.shipc .stats{display:inline}.shipc b.nm{font-size:.92rem}.shipc .vs{color:var(--muted);margin:0 .3rem}
+.shipc .row2{margin-top:.15rem}.shipc .more{float:right;min-height:30px;padding:0 .45rem;font-size:.75rem}.shipc.two{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;padding:0;border:0;background:none}.shipc.two>div{border:1.5px solid var(--line);border-radius:10px;padding:.3rem .45rem;background:var(--panel2);min-width:0}
+.acts.grid{display:grid;grid-template-columns:repeat(5,minmax(40px,1fr));gap:4px}.acts.grid .btn{text-align:center;padding:0;min-height:40px;font-size:.85rem}.acts.grid .gl{font-size:.7rem;color:var(--muted);text-align:center;align-self:center}
+.acts.grid.g9{grid-template-columns:repeat(9,minmax(0,1fr))}.acts.grid.g9 .btn{min-width:0}
+.acts.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:4px}.acts.tiles .btn{text-align:center;font-size:.82rem;padding:.2rem .3rem}
+.acts.main{position:sticky;bottom:-.8rem;background:var(--panel);padding:.35rem 0 .5rem;margin-bottom:-.5rem;z-index:1}
+#lastlog{border-top:1px solid var(--line);padding-top:.35rem}#lastlog div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#lastlog .s0{color:#ffc79a}#lastlog .s1{color:#ff9aa6}
+#prompt .head{margin-top:0}#prompt p{margin:.25rem 0}#prompt h2{margin:.2rem 0;font-size:1.1rem}
+@media (max-width:999px){.gx-dock-body{gap:.35rem;padding:.4rem .6rem .7rem}.st{padding:.1rem 0;font-size:.72rem}.st b{display:inline;font-size:.8rem;margin-right:.25rem}.st i{display:none}
+  #prompt>.head:first-child{display:none}.shipc .tp{display:none}.shipc{font-size:.8rem}.dice .die{width:38px;height:38px;font-size:1.05rem}#prompt .btn small{font-size:.72rem}
+  #lastlog div+div{display:none}.acts{margin-top:.35rem}.acts.col{gap:.3rem}.dialinfo .tip{display:none}}
+.bld h3{margin:.8rem 0 .3rem;font-size:.9rem;color:var(--muted)}.bld .card{cursor:default}
+details.how2 summary{cursor:pointer;color:var(--muted);font-size:.84rem;min-height:28px}
 .roster{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media (max-width:560px){.roster{grid-template-columns:1fr}}
 .fac h3{margin:.1rem 0 .4rem}.fac.f0 h3{color:var(--c0)}.fac.f1 h3{color:var(--c1)}.fac.f2 h3{color:var(--c2)}
 .card{border:1.5px solid var(--line);border-radius:10px;padding:.35rem .5rem;margin-bottom:.4rem;background:var(--panel2);cursor:pointer}.card.on{border-color:var(--gold)}.card.dead{opacity:.45;text-decoration:line-through}
 .stats span{display:inline-block;min-width:2.2em;text-align:center;border-radius:6px;margin-right:3px;font-weight:800;font-size:.82rem;padding:0 .2rem}
 .stats .ps{background:#5a4a10;color:#ffe08a}.stats .a{background:#6a1020;color:#ff9aa0}.stats .g{background:#0e4a2a;color:#9fffc0}.stats .h{background:#4a3a20;color:#ffd6a0}.stats .s{background:#103a5a;color:#9fdcff}
 .ab,.ups,.crit{margin:.2rem 0 0;font-size:.78rem}.ups span{display:inline-block;background:rgba(127,212,255,.12);border-radius:5px;padding:0 .3rem;margin:1px}.ups .gone{text-decoration:line-through;opacity:.5}.crit{color:#ff8a8a}
-#log{margin:0;padding-left:0;list-style:none;max-height:260px;overflow:auto;font-size:.84rem}#log li{margin:.1rem 0;padding-left:.6rem;border-left:2px solid var(--line)}#log li:first-child{border-left-color:var(--gold)}#log .s0{color:#ffc79a}#log .s1{color:#ff9aa6}
+#log{margin:0;padding-left:0;list-style:none;font-size:.86rem}#log li{margin:.1rem 0;padding-left:.6rem;border-left:2px solid var(--line)}#log li:first-child{border-left-color:var(--gold)}#log .s0{color:#ffc79a}#log .s1{color:#ff9aa6}
 #modal{position:fixed;inset:0;background:rgba(5,4,20,.72);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}#modal.hidden{display:none}
-.dlg{background:var(--panel);border:2px solid var(--gold);border-radius:16px;max-width:720px;width:100%;max-height:92vh;overflow:auto;padding:1rem 1.2rem;box-shadow:0 20px 60px #000}
+.dlg{background:var(--panel);border:2px solid var(--gold);border-radius:16px;max-width:720px;width:100%;max-height:calc(100dvh - 32px);overflow:auto;padding:1rem 1.2rem;box-shadow:0 20px 60px #000}
 .dlg h1{margin:.1rem 0;color:var(--gold);font-size:2rem;text-shadow:0 0 18px rgba(255,200,107,.5)}.dlg h3{margin:.8rem 0 .3rem;font-size:.9rem;color:var(--muted)}.lead{font-size:1.02rem}
 .row{display:flex;gap:.4rem;flex-wrap:wrap}.row select{font:inherit;background:var(--panel2);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:.35rem}
 .exps{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.4rem}.ex{text-align:left;background:var(--panel2);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:.35rem .5rem;cursor:pointer}.ex.on{border-color:var(--good)}.ex small{display:block;color:var(--muted);font-size:.74rem}
 table.stats{width:100%;border-collapse:collapse}table.stats td,table.stats th{border-bottom:1px solid var(--line);padding:.25rem;text-align:left}table.stats tr.dead{opacity:.6}
 .rules h3{color:var(--gold)}.rules p,.rules li{font-size:.92rem}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-#dock{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--panel);border-top:2px solid var(--gold);padding:.4rem 12px calc(.45rem + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:.3rem}
-#dock .dice{margin:0}#dock .die{width:38px;height:38px;font-size:1.05rem}#dock .preview{font-size:.82rem;padding:.2rem .4rem}
-#dock .dk-t{font:800 .85rem Orbitron,"Exo 2",system-ui,sans-serif;color:var(--gold)}#dock .dk-a{display:flex;gap:.35rem}#dock .dk-a .btn{flex:1;min-height:46px;font-size:.85rem}#dock .dk-a .btn small{display:none}#dock .dialinfo{display:none}
-@media (max-width:700px){.tag{font-size:.6rem;padding:0 4px}.tag b{font-size:.64rem;max-width:84px;overflow:hidden;text-overflow:ellipsis}header h1{font-size:1.05rem}.wrap{padding:8px 12px}body.docked #prompt .acts{display:none}.dlg{max-height:86vh}#modal{align-items:flex-end;padding:10px}}
+@media (max-width:700px){.tag{font-size:.6rem;padding:0 4px}.tag b{font-size:.64rem;max-width:84px;overflow:hidden;text-overflow:ellipsis}.gx-bar h1{font-size:1rem}.gx-bar .btn{font-size:.82rem;padding:.25rem .5rem}.dlg{max-height:calc(100dvh - 20px)}#modal{align-items:flex-end;padding:10px}}
 @media (prefers-reduced-motion:reduce){.pop{animation-duration:.01s}}
 .stats b{font-weight:inherit}.stats b.chg{color:#ffd76a;text-decoration:underline dotted}
-#dock .dk-a{flex-wrap:wrap;max-height:42vh;overflow-y:auto}#dock .dk-a .btn{flex:1 1 40%}
 </style>
 </head>
 <body>
-<header>
+<div class="gx-app">
+<header class="gx-bar">
   <h1>Nebula Aces</h1>
+  <button class="btn gx-tb" data-gx="d-squads" aria-expanded="false" title="Every ship's card: stats, upgrades, damage">🛩 Squads</button>
+  <button class="btn gx-tb" data-gx="d-log" aria-expanded="false" title="Battle log">📜 Log</button>
+  <button class="btn" data-a="rules">❔ Rules</button>
+  <button class="btn" data-a="new">✦ New</button>
+  <span class="gx-sp"></span>
   <button class="btn" data-a="snd" id="sndbtn" aria-label="Sound">🔊</button>
   <button class="btn" data-a="mus" id="musbtn" aria-label="Music">🎵 On</button>
   <button class="btn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ normal</button>
-  <button class="btn" data-a="pause" id="pausebtn" title="Pause the computer (P)">⏸</button>
+  <button class="btn" data-a="pause" id="pausebtn" title="Pause the computer (P)" aria-label="Pause the computer">⏸</button>
   <button class="btn" data-a="hints" id="hintbtn" title="Suggested maneuvers">💡 On</button>
-  <button class="btn" data-a="rules">Rules</button>
-  <button class="btn" data-a="new">New battle</button>
 </header>
-<div class="wrap">
-  <div class="board">
+<div class="gx-main">
+  <main class="gx-board" id="board">
     <div id="stage" class="stage"><canvas id="c3" aria-label="The battlefield in 3D"></canvas><div id="tags"></div>
-      <div class="viewbar"><button class="btn" data-a="top" title="Top-down or tilted view (T)">⬒ View</button></div></div>
+      <div class="viewbar"><button class="btn" data-a="top" title="Top-down or tilted view (T)" aria-label="Switch view: top-down or tilted">⬒ View</button></div></div>
     <svg id="map" viewBox="0 0 914 914" role="img" aria-label="The battlefield from above"></svg>
-    <div id="roster" class="roster box" style="margin-top:12px"></div>
-  </div>
-  <div class="side">
-    <div class="box"><div id="steps" class="steps"></div><div id="prompt" aria-live="off"></div></div>
-    <div class="box"><h3>Battle log</h3><ol id="log"></ol></div>
-  </div>
+  </main>
+  <aside class="gx-dock" aria-label="What to do now">
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Nebula Aces</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">⇥</button></div>
+    <div class="gx-dock-body">
+      <div id="steps" class="steps"></div>
+      <div id="shipcard"></div>
+      <div id="prompt" aria-live="off"></div>
+      <div id="lastlog" class="small muted"></div>
+    </div>
+  </aside>
+  <button class="gx-ibtn gx-reopen" data-gx="dock">☰ Panel</button>
 </div>
+</div>
+<div id="roster" class="roster"></div>
+<ol id="log"></ol>
+<div id="bbody"></div>
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="modal" class="hidden"></div>
 <script>
@@ -1187,7 +1269,7 @@ function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getEle
 </script>
 <script>
 // ---------- 3D battlefield (Three.js r158). 1 unit = 10 mm. The scene only mirrors G; it never owns game state. ----------
-const V3={on:false,ships:{},rocks:[],ghosts:[],fxq:[],shake:0,t:0,cam:{yaw:0,pitch:.98,dist:122,tx:45.7,tz:51},drag:null,labels:{}};
+const V3={on:false,ships:{},rocks:[],ghosts:[],fxq:[],shake:0,t:0,cam:{yaw:0,pitch:.98,dist:122,tx:45.7,tz:51},drag:null,labels:{},view:'tilt',fitDist:122};
 const S3=v=>v/10;// mm -> units
 function init3D(){const cv=document.getElementById('c3');if(!cv||typeof THREE==='undefined'||!window.WebGLRenderingContext)return false;
   try{const r=V3.r=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});r.setPixelRatio(Math.min(2,window.devicePixelRatio||1));r.shadowMap.enabled=false;r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.15}catch(e){return false}
@@ -1196,7 +1278,7 @@ function init3D(){const cv=document.getElementById('c3');if(!cv||typeof THREE===
   const rim=new THREE.DirectionalLight(0x6a8cff,1.2);rim.position.set(80,40,-60);sc.add(rim);
   sc.add(skyDome());sc.add(starField());sc.add(nebulaSprites());sc.add(V3.mat=playMat());
   V3.root=new THREE.Group();sc.add(V3.root);V3.fxRoot=new THREE.Group();sc.add(V3.fxRoot);V3.guide=new THREE.Group();sc.add(V3.guide);
-  bindCamera(cv);window.addEventListener('resize',resize3D);resize3D();V3.on=true;document.body.classList.add('three');V3.clock=performance.now();requestAnimationFrame(loop3D);return true}
+  bindCamera(cv);window.addEventListener('resize',resize3D);if(typeof GX!=='undefined'&&GX.onResize)GX.onResize(()=>resize3D());resize3D();V3.on=true;document.body.classList.add('three');V3.clock=performance.now();requestAnimationFrame(loop3D);return true}
 function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');draw(x,w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return t}
 function skyDome(){const t=canvasTex(2048,1024,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#05030f');g.addColorStop(.5,'#120a2a');g.addColorStop(1,'#04020a');x.fillStyle=g;x.fillRect(0,0,w,h);
     const blobs=[['rgba(255,90,140,.28)',.22,.42,.34],['rgba(90,140,255,.25)',.62,.35,.4],['rgba(255,170,80,.18)',.8,.6,.25],['rgba(140,80,255,.22)',.42,.62,.3]];
@@ -1331,15 +1413,27 @@ function tags3D(){const box=document.getElementById('tags');if(!box)return;for(c
 // ---- camera: drag to orbit, right-drag or two fingers to pan, wheel/pinch to zoom ----
 function bindCamera(cv){const P={};cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);P[e.pointerId]={x:e.clientX,y:e.clientY,b:e.button,x0:e.clientX,y0:e.clientY,t:performance.now()}});
   cv.addEventListener('pointermove',e=>{const p=P[e.pointerId];if(!p)return;const ids=Object.keys(P);const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;const C=V3.cam;
-    if(ids.length===2){const o=P[ids.find(i=>i!=e.pointerId)];const d0=Math.hypot(p.x-dx-o.x,p.y-dy-o.y),d1=Math.hypot(p.x-o.x,p.y-o.y);C.dist=Math.max(35,Math.min(220,C.dist*d0/Math.max(1,d1)));panBy(dx/2,dy/2);return}
+    if(ids.length===2){const o=P[ids.find(i=>i!=e.pointerId)];const d0=Math.hypot(p.x-dx-o.x,p.y-dy-o.y),d1=Math.hypot(p.x-o.x,p.y-o.y);C.dist=Math.max(35,Math.min(maxDist(),C.dist*d0/Math.max(1,d1)));panBy(dx/2,dy/2);return}
     if(p.b===2||e.shiftKey)panBy(dx,dy);else{C.yaw-=dx*.005;C.pitch=Math.max(.25,Math.min(1.45,C.pitch+dy*.004))}});
   const up=e=>{const p=P[e.pointerId];delete P[e.pointerId];if(p&&Math.hypot(e.clientX-p.x0,e.clientY-p.y0)<6&&performance.now()-p.t<500)onClick3D(e)};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',e=>delete P[e.pointerId]);
-  cv.addEventListener('wheel',e=>{e.preventDefault();V3.cam.dist=Math.max(35,Math.min(220,V3.cam.dist*(1+Math.sign(e.deltaY)*.1)))},{passive:false});cv.addEventListener('contextmenu',e=>e.preventDefault())}
+  cv.addEventListener('wheel',e=>{e.preventDefault();V3.cam.dist=Math.max(35,Math.min(maxDist(),V3.cam.dist*(1+Math.sign(e.deltaY)*.1)))},{passive:false});cv.addEventListener('contextmenu',e=>e.preventDefault())}
 function panBy(dx,dy){const C=V3.cam,k=C.dist/900;C.tx-=(Math.cos(C.yaw)*dx+Math.sin(C.yaw)*dy)*k*1.2;C.tz-=(-Math.sin(C.yaw)*dx+Math.cos(C.yaw)*dy)*k*1.2;C.tx=Math.max(-10,Math.min(100,C.tx));C.tz=Math.max(-10,Math.min(100,C.tz))}
-function camView(k){const C=V3.cam;if(k==='top')Object.assign(C,{pitch:1.45,dist:125,tx:45.7,tz:45.7,yaw:0});else Object.assign(C,{pitch:.98,dist:(window.innerWidth<700?132:122),tx:45.7,tz:51,yaw:0})}
+const maxDist=()=>Math.max(220,V3.fitDist*1.6);
+// place the camera from the orbit state (C) and optional shake
+function placeCam(sx,sy){const C=V3.cam;V3.camera.position.set(C.tx+Math.sin(C.yaw)*Math.cos(C.pitch)*C.dist+(sx||0),Math.sin(C.pitch)*C.dist+(sy||0),C.tz+Math.cos(C.yaw)*Math.cos(C.pitch)*C.dist);V3.camera.lookAt(C.tx,0,C.tz)}
+// fit the camera so the whole 91.4 x 91.4 mat (plus the height of the ships' name plates) fills the board at any aspect ratio
+function fitCam(k){if(!V3.camera)return;const C=V3.cam,cam=V3.camera,top=k==='top';const asp=V3.camera.aspect||1.6;Object.assign(C,{yaw:0,pitch:top?1.45:.98+Math.max(0,Math.min(1,(1.45-asp)/.5))*.22,tx:45.7,tz:45.7,dist:C.dist||122});
+  const pts=[];for(const x of [0,91.4])for(const z of [0,91.4])for(const y of (top?[0]:[0,9]))pts.push(new THREE.Vector3(x,y,z));const lim=.95;
+  for(let it=0;it<60;it++){placeCam();cam.updateMatrixWorld();let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const p of pts){const q=p.clone().project(cam);a=Math.min(a,q.x);b=Math.max(b,q.x);c=Math.min(c,q.y);d=Math.max(d,q.y)}
+    const ext=Math.max((b-a)/2,(d-c)/2)/lim;C.dist*=1+(ext-1)*.8;C.tz-=(c+d)/2*25;C.tx+=(a+b)/2*25;if(Math.abs(ext-1)<.002&&Math.abs(c+d)<.004)break}
+  V3.fitDist=C.dist}
+function camView(k){V3.view=k;if(typeof UI!=='undefined')UI.top=k==='top';fitCam(k)}
 function onClick3D(e){const c=V3.r.domElement,r=c.getBoundingClientRect();const m=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(m,V3.camera);
-  const picks=Object.values(V3.ships).filter(g=>g.visible).map(g=>g.userData.pick);const h=rc.intersectObjects(picks)[0];if(h&&typeof uiAct==='function')uiAct({ship:h.object.userData.ship})}
-function resize3D(){if(!V3.r)return;const el=V3.r.domElement.parentElement;const w=el.clientWidth;const h=Math.round(w*(window.innerWidth<700?1.02:0.62));el.style.height=h+'px';V3.r.setSize(w,h,false);V3.r.domElement.style.width=w+'px';V3.r.domElement.style.height=h+'px';V3.camera.aspect=w/h;V3.camera.fov=w/h<1.3?58:42;V3.camera.updateProjectionMatrix()}
+  const picks=Object.values(V3.ships).filter(g=>g.visible).map(g=>g.userData.pick);const h=rc.intersectObjects(picks)[0];if(h&&typeof uiAct==='function'){uiAct({ship:h.object.userData.ship});return}
+  const pt=new THREE.Vector3();if(typeof matPick==='function'&&rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),pt))matPick(pt.x*10,MAT-pt.z*10)}
+// the canvas fills the whole board (width AND height); the camera is refitted to the new aspect ratio
+function resize3D(){if(!V3.r)return;const el=V3.r.domElement.parentElement;const w=Math.max(1,el.clientWidth),h=Math.max(1,el.clientHeight);if(w===V3.w&&h===V3.h)return;V3.w=w;V3.h=h;
+  V3.r.setSize(w,h,false);V3.camera.aspect=w/h;V3.camera.fov=w/h<1?50:42;V3.camera.updateProjectionMatrix();fitCam(V3.view);placeCam();V3.r.render(V3.scene,V3.camera)}// draw at once: a resized canvas is blank until the next frame
 const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 function loop3D(now){requestAnimationFrame(loop3D);if(!V3.on)return;const dt=Math.min(.05,(now-V3.clock)/1000);V3.clock=now;V3.t+=dt;const reduce=matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
   for(const id in V3.ships){const m=V3.ships[id],a=V3.anim[id];const s=ship(id);
@@ -1356,10 +1450,39 @@ function loop3D(now){requestAnimationFrame(loop3D);if(!V3.on)return;const dt=Mat
     else if(f.kind==='flash'){f.o.scale.setScalar(16*(1+k*1.5));f.o.material.opacity=Math.max(0,1-k)}
     if(k>=1){V3.fxRoot.remove(f.o);V3.fxq.splice(i,1)}}
   const C=V3.cam;V3.shake=reduce?0:Math.max(0,V3.shake-dt*2);const sx=(Math.random()-.5)*V3.shake,sy=(Math.random()-.5)*V3.shake;
-  V3.camera.position.set(C.tx+Math.sin(C.yaw)*Math.cos(C.pitch)*C.dist+sx,Math.sin(C.pitch)*C.dist+sy,C.tz+Math.cos(C.yaw)*Math.cos(C.pitch)*C.dist);V3.camera.lookAt(C.tx,0,C.tz);
+  placeCam(sx,sy);
   V3.r.render(V3.scene,V3.camera);
   for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive)placeEl(el,m.position.clone().add(new THREE.Vector3(0,8.4,0)))}
   document.querySelectorAll('#tags .pop').forEach(el=>el._v&&placeEl(el,el._v))}
+
+</script>
+<script>
+// ===== Board-first shell: dock toggle, sheet sizing, closable popups (drawers) =====
+const GX={key:'gx',open:null,
+  init(o){this.key=o&&o.key||'gx';document.documentElement.classList.add('gx');const app=document.querySelector('.gx-app');this.app=app;
+    let min=false;try{min=localStorage.getItem(this.key+'_dockmin')==='1'}catch(e){}if(min)app.classList.add('gx-dock-min');
+    if(!document.querySelector('.gx-scrim')){const s=document.createElement('div');s.className='gx-scrim';s.addEventListener('click',()=>this.close());document.body.appendChild(s);this.scrim=s}
+    document.addEventListener('click',e=>{const t=e.target.closest('[data-gx]');if(!t)return;const a=t.dataset.gx;
+      if(a==='dock')this.toggleDock();else if(a==='sheet')this.cycleSheet();else if(a==='close')this.close();else this.toggle(a)});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&this.open){this.close();e.stopImmediatePropagation()}},true);
+    // resize hook for boards
+    const b=document.querySelector('.gx-board');if(b&&window.ResizeObserver)new ResizeObserver(()=>{for(const f of this._rs)try{f(b.clientWidth,b.clientHeight)}catch(e){}}).observe(b)},
+  _rs:[],onResize(f){this._rs.push(f)},
+  boardSize(){const b=document.querySelector('.gx-board');return b?{w:b.clientWidth,h:b.clientHeight}:{w:innerWidth,h:innerHeight}},
+  toggleDock(force){const min=force!=null?!force:!this.app.classList.contains('gx-dock-min');this.app.classList.toggle('gx-dock-min',min);this.app.classList.remove('gx-sheet-full');try{localStorage.setItem(this.key+'_dockmin',min?'1':'0')}catch(e){}},
+  // phone sheet: min -> normal -> full -> min
+  cycleSheet(){const a=this.app;if(a.classList.contains('gx-dock-min')){this.toggleDock(true)}else if(!a.classList.contains('gx-sheet-full'))a.classList.add('gx-sheet-full');else{a.classList.remove('gx-sheet-full');this.toggleDock(false)}},
+  showDock(){if(this.app&&this.app.classList.contains('gx-dock-min'))this.toggleDock(true)},
+  toggle(id){if(this.open===id)this.close();else this.show(id)},
+  show(id){const d=document.getElementById(id);if(!d)return;if(this.open&&this.open!==id){const o=document.getElementById(this.open);if(o)o.classList.remove('on')}
+    this.open=id;d.classList.add('on');this.scrim&&this.scrim.classList.add('on');this._back=document.activeElement;
+    for(const b of document.querySelectorAll('[data-gx="'+id+'"]'))b.setAttribute('aria-expanded','true');
+    const f=d.querySelector('.gx-x');if(f)f.focus({preventScroll:true});if(this.onShow)this.onShow(id)},
+  close(){if(!this.open)return;const id=this.open;const d=document.getElementById(this.open);if(d)d.classList.remove('on');for(const b of document.querySelectorAll('[data-gx="'+this.open+'"]'))b.setAttribute('aria-expanded','false');this.open=null;this.scrim&&this.scrim.classList.remove('on');if(this._back&&this._back.focus)this._back.focus({preventScroll:true});if(this.onClose)this.onClose(id)},
+  // build a drawer shell around a body element: <div class=gx-drawer id><head><h2>title</h2><button.gx-x></head><body/></div>
+  drawer(id,title,bodyEl,wide){let d=document.getElementById(id);if(!d){d=document.createElement('section');d.id=id;d.className='gx-drawer'+(wide?' wide':'');d.setAttribute('role','dialog');d.setAttribute('aria-label',title);
+      d.innerHTML=`<div class="gx-drawer-head"><h2></h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"></div>`;document.body.appendChild(d)}
+    d.querySelector('h2').textContent=title;if(bodyEl){const b=d.querySelector('.gx-drawer-body');if(bodyEl.parentNode!==b){b.innerHTML='';b.appendChild(bodyEl)}}return d}};
 
 </script>
 <script>
@@ -1376,7 +1499,7 @@ function humanTurn(){const k=sideToAct();return k>=0&&isHuman(k)&&(typeof NET===
 function refresh(){render();schedule()}
 function render(){if(typeof isHost==='function'&&isHost())netPush();
   if(G&&G.winner&&UI.wonSnd!==G.seed){UI.wonSnd=G.seed;sfx('win');if(ANIM)setTimeout(()=>{UI.stats=true;render()},2200)}
-  if(V3.on)sync3D();else render2D();renderSteps();renderPrompt();renderRoster();renderLog();renderModal();renderDock()}
+  if(V3.on)sync3D();else render2D();renderSteps();renderPrompt();renderShipCard();renderRoster();renderLog();renderModal();renderDock()}
 // ---- step bar ----
 const STEPS=[['Plan','set dials'],['Move','low → high'],['Combat','high → low'],['End','clear tokens']];
 function renderSteps(){const el=$('steps');if(!el)return;const cur=G?G.step:0;el.innerHTML=STEPS.map((s,i)=>`<span class="st ${i+1<cur?'done':''} ${i+1===cur?'on':''}"><b>${i+1}</b>${s[0]}<i>${s[1]}</i></span>`).join('')}
@@ -1405,11 +1528,11 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
     if(ps<0){h=`<p class="head">Waiting for the other pilots to set their dials…</p>`}
     else{const mine=alive().filter(s=>s.side===ps);if(!UI.sel||!mine.find(s=>s.id===UI.sel))UI.sel=mine.find(s=>UI.draft[s.id]==null)?.id||mine[0].id;const s=ship(UI.sel);
       const sug=suggestDial(s),di=UI.hoverDial!=null?UI.hoverDial:UI.draft[s.id];
-      h=`<p class="head">${esc(sideName(ps))} · Step 1 · Plan</p><ol class="how"><li>Pick a ship below, then choose its maneuver on the dial.</li><li>Hover or tap a maneuver to see its template and where the ship ends.</li><li>When every ship has a dial, press <b>Lock in dials</b>. The enemy can't see them.</li></ol>
-      <div class="shipTabs">${mine.map(x=>`<button class="btn tab ${x.id===UI.sel?'on':''}" data-sel="${x.id}">${esc(x.name)} ${UI.draft[x.id]!=null?'✓':''}</button>`).join('')}</div>
+      h=`<p class="head">${esc(sideName(ps))} · Step 1 · Plan</p><details class="how2" ${G.round===1&&!NARROW.matches?'open':''}><summary>How to plan</summary><ol class="how"><li>Pick a ship below (or tap it on the mat), then choose its maneuver on the dial.</li><li>Hover or tap a maneuver to see its template and where the ship ends.</li><li>When every ship has a dial, press <b>Lock in dials</b>. The enemy can't see them.</li></ol></details>
+      ${mine.length>1?`<div class="shipTabs">${mine.map(x=>`<button class="btn tab ${x.id===UI.sel?'on':''}" data-sel="${x.id}">${esc(x.name)} ${UI.draft[x.id]!=null?'✓':''}</button>`).join('')}</div>`:''}
       <div class="dialwrap">${dialGrid(s,sug)}<div class="dialinfo"><b>${esc(s.name)}</b> · pilot skill ${psOf(s)}${s.stress?` · <span class="warn">stressed: no red maneuvers</span>`:''}
       <p class="small">${di!=null?`<b>${mText(dialOf(s)[di])}</b>: ${poseReport(s,dialOf(s)[di])}`:'Choose a maneuver.'}</p>${UI.hints?`<p class="tip">💡 Suggested: <b>${mText(dialOf(s)[sug])}</b> (dashed outline).</p>`:''}</div></div>
-      <div class="acts"><button class="btn primary" data-a="lock" ${mine.every(x=>UI.draft[x.id]!=null)?'':'disabled'}>Lock in dials</button><button class="btn" data-a="autodial">Use suggestions</button></div>`}}
+      <div class="acts main"><button class="btn primary" data-a="lock" ${mine.every(x=>UI.draft[x.id]!=null)?'':'disabled'}>Lock in dials</button><button class="btn" data-a="autodial">Use suggestions</button></div>`}}
   else if(G.phase==='action'){const s=ship(G.cur);if(!me)h=`<p class="head">${esc(s.name)} is choosing an action…</p>`;else{const acts=actionsFor(s);
       h=`<p class="head">${esc(s.name)} · Step 2 · Take one action</p><p>You flew <b>${mText(s.rev)}</b>. Pick one action (hover to preview it), or skip.</p><div class="acts col">`+
       actOpts(s,acts).map((o,i)=>{const a=acts.find(x=>x.a===o.a);return o.arg!=null?`<button class="btn" data-act="action" data-a2="${o.a}" data-arg="${esc(o.arg)}" ${o.p?`data-hov="${o.a}:${o.arg}"`:''} title="${esc(a.d||'')}">${esc(o.l)}</button>`:`<button class="btn" data-act="action" data-a2="${o.a}" title="${esc(a.d||'')}">${o.a==='F'?'◉':'✦'} ${esc(o.l)}<small>${esc(a.d||'')}</small></button>`}).join('')+
@@ -1418,7 +1541,7 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
       h=`<p class="head">${esc(s.name)} · Step 3 · Attack</p><p>${G.bonus?'Bonus attack (primary weapon only). ':''}Choose a target in your arc (tap it in the view or below). Range 1 adds an attack die; range 3 or an asteroid in the way gives the defender an extra die.</p><div class="acts col">`+
       ws.map(w=>w.targets.map(t=>{const d=ship(t.id);const sd=shotDice(s,w,t,d),n=sd.atk,m=sd.def;return `<button class="btn" data-act="fire" data-w="${w.k}" data-t="${t.id}">🎯 ${esc(w.n)} → ${esc(d.name)}<small>range ${t.rg}${t.obstructed?' · obstructed':''} · ${n} attack vs ${m} defense · ≈${expDmg(n,m,s.focus>0||s.tl===d.id,d.focus>0).toFixed(1)} damage</small></button>`}).join('')).join('')+
       `<button class="btn ghost" data-act="fire" data-w="skip">Hold fire</button></div>`}}
-  else if(G.phase==='ask'&&G.q){const q=G.q;if(!humanTurn())h=`<p class="head">Waiting for ${esc(sideName(q.side))}…</p>`;else{const A=G.atk;h=`<p class="head">${esc(q.title)}</p><p>${esc(q.text)}</p>${A&&['dice','pay','jan','heat','brakk','maarek','garven','munitions'].includes(q.key)?`<div class="dice">${A.dice.map(f=>die(f,'atk')).join('')}</div>${A.def&&A.def.length?`<div class="dice">${A.def.map(f=>die(f,'def')).join('')}</div>`:''}`:''}<div class="acts col">${q.opts.map((o,i)=>`<button class="btn ${(q.opts.some(x=>x.pri)?o.pri:i===0)?'primary':''}" data-act="ask" data-k="${esc(o.k)}" ${o.p?`data-hov="Q:${i}"`:''}>${esc(o.l)}</button>`).join('')}</div>`}}
+  else if(G.phase==='ask'&&G.q){const q=G.q;if(!humanTurn())h=`<p class="head">Waiting for ${esc(sideName(q.side))}…</p>`;else{const A=G.atk;h=`<p class="head">${esc(q.title)}</p><p>${q.key==='rock'?'Tap an outlined spot on the mat, or pick it below: columns A-E from your left, rows 1-5 from your edge. Asteroids stay beyond range 2 of every edge and beyond range 1 of each other.':esc(q.text)}</p>${A&&['dice','pay','jan','heat','brakk','maarek','garven','munitions'].includes(q.key)?`<div class="dice">${A.dice.map(f=>die(f,'atk')).join('')}</div>${A.def&&A.def.length?`<div class="dice">${A.def.map(f=>die(f,'def')).join('')}</div>`:''}`:''}${askButtons(q)}`}}
   else if(G.phase==='damod'){const A=G.atk,a=ship(A.a),d=ship(A.d);h=`<p class="head">${esc(a.name)} → ${esc(d.name)}</p><div class="dice">${A.dice.map(f=>die(f,'atk')).join('')}</div><p class="preview">The defender may tamper with the attack dice first.</p>`;
     if(humanTurn())h+=`<div class="acts col">${exDAMods().map(m=>`<button class="btn" data-act="damod" data-k="${m.k}">${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="damod" data-k="done">Let the attack stand</button></div>`;else h+=`<p class="small muted">${esc(d.name)} is reacting…</p>`}
   else if(G.phase==='amod'||G.phase==='dmod'){const A=G.atk,a=ship(A.a),d=ship(A.d);const r=preview(A);const mine=(G.phase==='amod'&&humanTurn())||(G.phase==='dmod'&&humanTurn());
@@ -1428,21 +1551,43 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
     else h+=`<p class="small muted">${G.phase==='amod'?esc(a.name)+' is modifying its attack…':esc(d.name)+' is defending…'}</p>`}
   else h=`<p class="head">${G.phase==='combat'?'Combat…':G.phase==='activate'?'Ships are moving…':G.phase==='setup'?'Setting up the battlefield…':'…'}</p>`;
   el.innerHTML=h}
+// long lists of short choices (asteroid spots A1…E5 and the like) become a compact grid; the spots are laid out like the mat
+function askButtons(q){const pri=(o,i)=>(q.opts.some(x=>x.pri)?o.pri:i===0)?'primary':'';const short=q.opts.length>6&&q.opts.every(o=>String(o.l).length<=14);
+  const btn=(o,i,st)=>`<button class="btn ${pri(o,i)}" data-act="ask" data-k="${esc(o.k)}" ${o.p?`data-hov="Q:${i}"`:''} ${st?`style="${st}"`:''} aria-label="${esc(o.l)}">${esc(o.l)}</button>`;
+  if(q.key==='rock'&&q.opts.every(o=>/^[A-E][1-5]$/.test(o.l))){let h=`<div class="acts grid" role="group" aria-label="Asteroid spots">`;
+    h+=q.opts.map((o,i)=>btn(o,i,`grid-column:${'ABCDE'.indexOf(o.l[0])+1};grid-row:${6-(+o.l[1])}`)).join('');return h+'</div>'}
+  if(q.key==='deploy'&&q.opts.every(o=>/^Spot [1-9]$/.test(o.l)))return `<p class="small muted">Tap an outlined spot on the mat, or its number (your edge, left to right):</p><div class="acts grid g9" role="group" aria-label="Deployment spots">${q.opts.map((o,i)=>`<button class="btn ${pri(o,i)}" data-act="ask" data-k="${esc(o.k)}" data-hov="Q:${i}" style="grid-column:${o.l.slice(5)}" aria-label="${esc(o.l)}">${o.l.slice(5)}</button>`).join('')}</div>`;
+  if(short)return `<div class="acts tiles">${q.opts.map((o,i)=>btn(o,i)).join('')}</div>`;
+  return `<div class="acts col">${q.opts.map((o,i)=>btn(o,i)).join('')}</div>`}
+// tapping the mat picks the nearest outlined spot of the current question (asteroid spots, placements)
+function matPick(x,y){if(!G||G.phase!=='ask'||!G.q||!humanTurn())return;let best=null,bd=1e9;for(const o of G.q.opts){if(!o.p)continue;const d=Math.hypot(o.p.x-x,o.p.y-y);if(d<bd){bd=d;best=o}}
+  if(best&&bd<=(best.b||40)/2+25){sfx('click');uiAct({act:'ask',k:best.k})}}
 function die(f,k){const ic={hit:'✹',crit:'✸',focus:'◉',blank:'',evade:'✦'}[f];return `<span class="die ${k} ${f}" aria-label="${f}">${ic}<i>${f}</i></span>`}
 // ---- roster: ship cards ----
 function renderRoster(){const el=$('roster');if(!el||!G)return;el.innerHTML=[0,1].map(k=>`<div class="fac f${FACTIONS[G.fac[k]].col}"><h3>${esc(sideName(k))}${G.init===k?' <i title="initiative">★</i>':''}</h3>`+
   G.ships.filter(s=>s.side===k).map(s=>{const T=SHIPS[s.type];const hp=s.hull-hullDmg(s);const ps=psOf(s),at=primary(s),ag=agility(s);const cur=(v,b)=>v!==b?` class="chg" title="base ${b}"`:'';
-    const locks=[s.tl,s.tl2].filter(Boolean).map(id=>ship(id)).filter(Boolean);const onMe=G.ships.filter(o=>o.alive&&(o.tl===s.id||o.tl2===s.id));
-    const tok=[s.stress?`<span class="warn">stress ${s.stress}</span>`:'',s.ion?`ion ${s.ion}`:'',s.focus?`focus ${s.focus}`:'',s.evade?`evade ${s.evade}`:'',locks.length?`lock → ${locks.map(o=>esc(o.name)).join(', ')}`:'',onMe.length?`locked by ${onMe.map(o=>esc(o.name)).join(', ')}`:'',
-      s.flags.juke?'+1 agility (mech)':'',s.flags.allin?'all-in (+1 attack, −1 agility)':'',s.flags.dead?'deadshot ready':'',s.flags.psT!=null&&G.inCombat?`pilot skill ${s.flags.psT} this phase`:'',s.flags.doomed?'<span class="warn">crippled</span>':''].filter(Boolean).join(' · ');
+    const tok=shipTokens(s);
     return `<div class="card ${s.alive?'':'dead'} ${G.cur===s.id?'on':''}" data-sel="${s.id}"><b>${esc(s.name)}</b> <span class="muted">${esc(T.n)}</span>
-    <div class="stats"><span class="ps" title="pilot skill"><b${cur(ps,s.ps)}>${ps}</b></span><span class="a" title="primary attack"><b${cur(at,s.atk)}>${at}</b></span><span class="g" title="agility"><b${cur(ag,s.agi)}>${ag}</b></span><span class="h" title="hull left">${s.alive?hp:0}/${s.hull}</span><span class="s" title="shields">${s.sh}/${s.shMax}</span></div>
+    <div class="stats">${statSpans(s)}</div>
     ${PILOTS[s.pilot].t?`<p class="ab">${esc(PILOTS[s.pilot].t)}</p>`:''}${s.ups.length?`<p class="ups">${s.ups.map(u=>`<span class="${u.gone?'gone':''}" title="${esc(UPGRADES[u.id].t)}">${esc(UPGRADES[u.id].n)}</span>`).join('')}</p>`:''}
     ${s.dmg.filter(x=>x.up).map(x=>`<p class="crit" title="${esc(DAMAGE[x.c].t)}">✸ ${esc(DAMAGE[x.c].n)}</p>`).join('')}${s.alive&&s.dmg.some(x=>!x.up)?`<p class="small muted">${s.dmg.filter(x=>!x.up).length} facedown damage</p>`:''}${s.alive&&tok?`<p class="small">${tok}</p>`:''}</div>`}).join('')+'</div>').join('')}
-function renderLog(){const el=$('log');if(el&&G)el.innerHTML=G.log.slice(0,40).map(l=>`<li class="s${l.s}">${esc(l.t)}</li>`).join('')}
+function statSpans(s){const hp=s.hull-hullDmg(s);const ps=psOf(s),at=primary(s),ag=agility(s);const cur=(v,b)=>v!==b?` class="chg" title="base ${b}"`:'';
+  return `<span class="ps" title="pilot skill"><b${cur(ps,s.ps)}>${ps}</b></span><span class="a" title="primary attack"><b${cur(at,s.atk)}>${at}</b></span><span class="g" title="agility"><b${cur(ag,s.agi)}>${ag}</b></span><span class="h" title="hull left">${s.alive?hp:0}/${s.hull}</span><span class="s" title="shields">${s.sh}/${s.shMax}</span>`}
+function shipTokens(s){const locks=[s.tl,s.tl2].filter(Boolean).map(id=>ship(id)).filter(Boolean);const onMe=G.ships.filter(o=>o.alive&&(o.tl===s.id||o.tl2===s.id));
+    return [s.stress?`<span class="warn">stress ${s.stress}</span>`:'',s.ion?`ion ${s.ion}`:'',s.focus?`focus ${s.focus}`:'',s.evade?`evade ${s.evade}`:'',locks.length?`lock → ${locks.map(o=>esc(o.name)).join(', ')}`:'',onMe.length?`locked by ${onMe.map(o=>esc(o.name)).join(', ')}`:'',
+      s.flags.juke?'+1 agility (mech)':'',s.flags.allin?'all-in (+1 attack, −1 agility)':'',s.flags.dead?'deadshot ready':'',s.flags.psT!=null&&G.inCombat?`pilot skill ${s.flags.psT} this phase`:'',s.flags.doomed?'<span class="warn">crippled</span>':''].filter(Boolean).join(' · ')}
+// the ship that matters right now (selected while planning, the active ship, or attacker and defender) stays visible in the dock
+function focusShips(){if(!G||G.winner)return [];const A=G.atk;if(A&&['amod','dmod','damod','ask','target'].includes(G.phase)&&A.a&&A.d&&ship(A.a)&&ship(A.d)&&G.phase!=='target')return [ship(A.a),ship(A.d)];
+  if(G.phase==='plan'){const ps=planSide();const s=ps>=0&&UI.sel&&ship(UI.sel);return s?[s]:[]}const c=G.cur&&ship(G.cur);if(c)return [c];const s=UI.sel&&ship(UI.sel);return s?[s]:[]}
+function renderShipCard(){const el=$('shipcard');if(!el)return;const ss=focusShips();if(!ss.length){el.innerHTML='';return}
+  const one=s=>{const tok=s.alive?shipTokens(s):'destroyed';const crit=s.dmg.filter(x=>x.up).map(x=>`<span class="crit" title="${esc(DAMAGE[x.c].t)}">✸ ${esc(DAMAGE[x.c].n)}</span>`).join(' ');
+    return `<b class="nm" style="color:var(--c${FACTIONS[G.fac[s.side]].col})" title="${esc(PILOTS[s.pilot].t||'')}">${esc(s.name)}</b> <span class="muted small tp">${esc(SHIPS[s.type].n)}</span><div class="row2"><span class="stats">${statSpans(s)}</span></div>${tok||crit?`<div class="small">${[tok,crit].filter(Boolean).join(' · ')}</div>`:''}`};
+  el.innerHTML=ss.length===2?`<div class="shipc two" aria-label="Attacker and defender"><div>${one(ss[0])}</div><div>${one(ss[1])}</div></div>`:`<div class="shipc" aria-label="Selected ship"><button class="btn ghost more" data-gx="d-squads" title="All ship cards">🛩 All</button>${one(ss[0])}</div>`}
+function renderLog(){const el=$('log');if(el&&G)el.innerHTML=G.log.slice(0,300).map(l=>`<li class="s${l.s}">${esc(l.t)}</li>`).join('');const ll=$('lastlog');if(ll)ll.innerHTML=G?G.log.slice(0,2).map(l=>`<div class="s${l.s}" title="${esc(l.t)}">${esc(l.t)}</div>`).join(''):''}
 // ---- modals: start screen, pass-the-device, rules, stats ----
 function renderModal(){const el=$('modal');let h='';
-  if(UI.build!=null)h=builderHTML();else if(UI.info)h=startHTML();else if(UI.rules)h=rulesHTML();else if(UI.stats&&G)h=statsHTML();
+  if(typeof GX!=='undefined'&&GX.app){if(UI.build!=null){const d=GX.drawer('d-build','✎ '+FACTIONS[UI.fac[UI.build]].n+' squadron',$('bbody'),true);$('bbody').innerHTML=builderHTML();if(GX.open!=='d-build')GX.show('d-build')}else if(GX.open==='d-build')GX.close()}
+  if(UI.build!=null){if(!(typeof GX!=='undefined'&&GX.app))h=`<div class="dlg">${builderHTML()}</div>`}else if(UI.rules)h=rulesHTML();else if(UI.info)h=startHTML();else if(UI.stats&&G)h=statsHTML();
   else if(G&&G.phase==='plan'&&UI.pass!=null&&UI.pass!==planSide()&&planSide()>=0&&bothHuman())h=`<div class="dlg pass"><h2>Pass the device to ${esc(sideName(planSide()))}</h2><p>The other side's dials are hidden. Only ${esc(sideName(planSide()))} should look now.</p><div class="acts"><button class="btn primary" data-a="passok">I'm ${esc(sideName(planSide()))}: show my ships</button></div></div>`;
   el.innerHTML=h;el.classList.toggle('hidden',!h)}
 const bothHuman=()=>G&&isHuman(0)&&isHuman(1);
@@ -1457,12 +1602,13 @@ function startHTML(){const saved=load();return `<div class="dlg start" role="dia
 function rulesHTML(){return `<div class="dlg rules"><h2>How to play</h2>${RULES_HTML}<div class="acts"><button class="btn primary" data-a="close">Close</button></div></div>`}
 function statsHTML(){const rows=G.ships.map(s=>{const st=G.stats[s.id]||{shots:0,dmg:0};return `<tr class="${s.alive?'':'dead'}"><td>${esc(s.name)}</td><td>${esc(sideName(s.side))}</td><td>${st.shots}</td><td>${st.dmg}</td><td>${s.alive?`${s.hull-hullDmg(s)}/${s.hull}`:'destroyed'}</td></tr>`}).join('');
   return `<div class="dlg"><h2>${esc(G.winText)}</h2><p>${G.round} rounds.</p><table class="stats"><tr><th>Ship</th><th>Side</th><th>Shots</th><th>Damage dealt</th><th>Hull</th></tr>${rows}</table><div class="acts"><button class="btn primary" data-a="new">New battle</button><button class="btn" data-a="close">Look at the field</button></div></div>`}
-// ---- phone dock: the current step and its main buttons stay under your thumb ----
+// ---- dock (shell): its title always says what is happening; a new human decision re-opens it ----
+const NARROW=window.matchMedia?window.matchMedia('(max-width:999px)'):{matches:false};
 const PHONE=window.matchMedia?window.matchMedia('(max-width:700px)'):{matches:false};
-function renderDock(){let d=$('dock');const on=PHONE.matches&&G&&!UI.info&&!G.winner;if(!on){if(d)d.remove();document.body.style.paddingBottom='';return}
-  if(!d){d=document.createElement('div');d.id='dock';document.body.appendChild(d)}const pr=$('prompt');const head=pr.querySelector('.head');const btns=[...pr.querySelectorAll('.acts button')].slice(0,G.phase==='ask'?12:4).map(b=>b.outerHTML).join('');
-  const dice=(G.phase==='amod'||G.phase==='dmod')?[...pr.querySelectorAll('.dice,.preview')].map(x=>x.outerHTML).join(''):'';
-  d.innerHTML=`<div class="dk-t">${head?esc(head.textContent):''}</div>${G.phase==='plan'&&planSide()>=0?`<div class="dk-d">${pr.querySelector('.dial')?pr.querySelector('.dialwrap').outerHTML:''}</div>`:''}${dice}<div class="dk-a">${btns}</div>`;document.body.style.paddingBottom=(d.offsetHeight+10)+'px'}
+function renderDock(){const t=$('docktitle');if(!t)return;const pr=$('prompt');const head=pr&&pr.querySelector('.head,h2');
+  t.textContent=!G?'Nebula Aces':G.winner?'Battle over':`Round ${G.round} · ${head?head.textContent:STEPS[(G.step||1)-1][0]}`;
+  const need=G&&!G.winner&&!UI.info&&(planSide()>=0||humanTurn());const sig=need?[G.round,G.phase,G.cur,G.q&&G.q.kid,G.atk&&G.atk.step].join('|'):'';
+  if(sig&&sig!==UI.needSig&&typeof GX!=='undefined'&&GX.app){GX.showDock();const b=document.querySelector('.gx-dock-body');if(b&&G.phase!=='plan')b.scrollTop=0}UI.needSig=sig}
 if(PHONE.addEventListener)PHONE.addEventListener('change',()=>{render();if(V3.on)resize3D()});
 // ---- 2D fallback (no WebGL): a top-down SVG of the field ----
 function render2D(){const svg=$('map');if(!svg||!G)return;const Y=y=>MAT-y;let h=`<rect width="${MAT}" height="${MAT}" fill="#0c0a22"/>`;
@@ -1527,7 +1673,7 @@ function builderHTML(){const k=UI.build,f=UI.fac[k],sq=UI.squads[k];const cost=s
   const byShip={};factionPilots(f,UI.ex).forEach(pk=>{(byShip[PILOTS[pk].ship]=byShip[PILOTS[pk].ship]||[]).push(pk)});
   const list=sq.map((e,i)=>{const P=PILOTS[e.p];const slots=slotsOf(e);return `<div class="card"><b>${esc(P.n)}</b> <span class="muted">${esc(SHIPS[P.ship].n)} · PS ${P.ps} · ${pilotCost({p:e.p,u:e.u.filter(Boolean)})} pts</span> <button class="btn ghost" data-bdel="${i}" aria-label="Remove">✕</button>
     <div class="row">${slots.map((sl,j)=>{const opts=upgradesFor(e.p,UI.ex).filter(u=>UPGRADES[u].slot===sl);if(!opts.length)return '';return `<label class="small">${esc(SLOTN[sl]||sl)} <select data-bslot="${i}:${j}"><option value="">none</option>${opts.map(u=>`<option value="${u}" ${e.u[j]===u?'selected':''} ${UPGRADES[u].uniq&&used.has(uname(UPGRADES[u]))&&e.u[j]!==u?'disabled':''}>${esc(UPGRADES[u].n)} (${UPGRADES[u].pts})</option>`).join('')}</select></label>`}).join('')}</div></div>`}).join('')||'<p class="muted">No ships yet: add pilots below.</p>';
-  return `<div class="dlg" role="dialog" aria-modal="true"><h2>${esc(FACTIONS[f].n)} squadron</h2><p><b class="${cost>100?'bad':''}">${cost} / 100 points</b>${cost>100?' · over the limit!':''}</p>${list}
+  return `<div class="bld"><p><b class="${cost>100?'bad':''}">${cost} / 100 points</b>${cost>100?' · over the limit!':''}</p>${list}
    <h3>Add a pilot</h3>${Object.keys(byShip).map(t=>`<p class="small"><b>${esc(SHIPS[t].n)}</b><br>${byShip[t].sort((a,b)=>PILOTS[b].ps-PILOTS[a].ps).map(pk=>`<button class="btn tab" data-badd="${pk}" ${PILOTS[pk].uniq&&used.has(uname(PILOTS[pk]))?'disabled':''} title="${esc(PILOTS[pk].t||'No special ability')}">${esc(PILOTS[pk].n)} ${PILOTS[pk].ps}·${PILOTS[pk].pts}</button>`).join(' ')}</p>`).join('')}
    <div class="acts"><button class="btn primary" data-a="bdone" ${cost>100||!sq.length?'disabled':''}>Done</button><button class="btn" data-a="brand">Randomize</button><button class="btn" data-a="bclear">Clear</button></div></div>`}
 function saveSquads(){try{localStorage.setItem('na_squads',JSON.stringify(UI.squads))}catch(e){}}
@@ -1538,6 +1684,8 @@ const SAVE='na_save';
 function save(){try{if(G&&!(typeof NET!=='undefined'&&NET.on)&&G.phase==='plan')localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}
 function load(){try{const s=localStorage.getItem(SAVE);const g=s?JSON.parse(s):null;return g&&g.v===2?g:null}catch(e){return null}}// saves from older rules versions are ignored
 const _refresh=refresh;refresh=function(){_refresh();save()};
+if(typeof GX!=='undefined'){GX.init({key:'na'});GX.drawer('d-squads','Squads',$('roster'),true);GX.drawer('d-log','Battle log',$('log'));GX.drawer('d-build','Squad builder',$('bbody'),true);
+  GX.onClose=id=>{if(id==='d-build'&&UI.build!=null){UI.build=null;render()}}}
 render();
 window.addEventListener('load',()=>{soundBtns();if(!init3D())document.body.classList.add('flat');render()});
 

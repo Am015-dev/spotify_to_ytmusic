@@ -224,38 +224,203 @@ table.stats tr.win{background:var(--yellow);color:#1a1320}
 }
 #dock .dk-p{font-size:.8rem;font-weight:800;line-height:1.2}
 
+/* ===== Board-first shell (shared by every game on the shelf) =====
+   The page never scrolls. The board fills what the bar and the dock leave; the dock is in flow (never over the board);
+   everything else opens in a closable popup (drawer). Games theme it with the --gx-* variables. */
+:root{--gx-bar-h:48px;--gx-dock-w:clamp(300px,30vw,420px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
+html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+.gx-app{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--gx-bg)}
+.gx-bar{min-height:var(--gx-bar-h);display:flex;align-items:center;gap:6px;padding:4px 10px;padding-top:calc(4px + env(safe-area-inset-top,0px));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;position:relative;z-index:6}
+.gx-bar::-webkit-scrollbar{display:none}
+.gx-bar .gx-sp{flex:1 0 8px}
+.gx-main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) var(--gx-dock-w);position:relative}
+.gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0}
+.gx-board{position:relative;min-width:0;min-height:0;overflow:hidden}
+.gx-dock{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.gx-dock-head{display:flex;align-items:center;gap:6px;padding:6px 8px 4px;flex:0 0 auto}
+.gx-dock-head .gx-dt{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gx-dock-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.gx-app.gx-dock-min .gx-dock{visibility:hidden}
+
+.gx-ibtn{appearance:none;border:1px solid var(--gx-line);background:rgba(255,255,255,.08);color:inherit;border-radius:10px;min-width:40px;min-height:40px;padding:4px 10px;display:inline-flex;gap:6px;align-items:center;justify-content:center;cursor:pointer;font:inherit;white-space:nowrap}
+.gx-ibtn:focus-visible,.gx-drawer button:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
+.gx-ibtn .gx-n{font-size:.72rem;opacity:.8}
+.gx-ibtn.gx-reopen{position:absolute;right:10px;top:10px;z-index:5;display:none}
+.gx-app.gx-dock-min .gx-ibtn.gx-reopen{display:inline-flex}
+/* popups */
+.gx-scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .18s}
+.gx-scrim.on{opacity:1;pointer-events:auto}
+.gx-drawer{position:fixed;z-index:41;top:calc(var(--gx-bar-h) + 8px + env(safe-area-inset-top,0px));right:8px;bottom:8px;width:min(520px,calc(100vw - 16px));display:flex;flex-direction:column;background:var(--gx-panel);color:var(--gx-ink);border-radius:var(--gx-radius);box-shadow:var(--gx-shadow);transform:translateX(calc(100% + 16px));transition:transform .22s ease;visibility:hidden}
+.gx-drawer.on{transform:none;visibility:visible}
+.gx-drawer.wide{width:min(980px,calc(100vw - 16px))}
+.gx-drawer-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--gx-line);flex:0 0 auto}
+.gx-drawer-head h2{margin:0;font-size:1.15rem;flex:1;min-width:0}
+.gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:40px;min-height:40px;border-radius:10px}
+.gx-drawer-body{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
+/* narrow screens: the dock becomes a sheet under the board (still in flow), the drawers slide up from the bottom */
+@media (max-width:999px){
+  .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
+  .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr)}
+  .gx-dock{max-height:var(--gx-sheet-h,46dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-app.gx-sheet-full .gx-dock{max-height:78dvh}
+  .gx-app.gx-dock-min .gx-dock{visibility:visible;max-height:none}
+  .gx-app.gx-dock-min .gx-dock-body{display:none}
+  .gx-reopen{display:none!important}
+  .gx-grab{display:block;width:44px;height:5px;border-radius:3px;background:currentColor;opacity:.35;margin:0 auto}
+  .gx-drawer{top:auto;left:0;right:0;bottom:0;width:auto;max-height:88dvh;height:88dvh;border-radius:var(--gx-radius) var(--gx-radius) 0 0;transform:translateY(100%);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-drawer.wide{width:auto}
+  .gx-hide-narrow{display:none!important}
+}
+@media (min-width:1000px){.gx-grab{display:none}}
+@media (prefers-reduced-motion:reduce){.gx-drawer,.gx-scrim{transition:none}}
+
+/* ===== v9: board-first layout (shared gx shell, themed for Crown City Smash) ===== */
+:root{--gx-bar-h:56px;--gx-dock-w:clamp(330px,30vw,420px);--gx-bg:var(--paper);--gx-bar:var(--red);--gx-panel:var(--card);--gx-ink:var(--ink);--gx-line:#1a1320;--gx-accent:var(--blue);--gx-shadow:8px 8px 0 #1a1320;--gx-radius:16px;--gx-sheet-h:46dvh}
+html.gx body{background-color:var(--paper)}
+.gx-app{background:transparent}
+/* top bar */
+header.gx-bar{background:var(--red);color:#fff;border-bottom:4px solid #1a1320;flex-wrap:nowrap;gap:6px;padding:4px 10px}
+header.gx-bar h1{font-size:1.75rem;white-space:nowrap;flex:0 0 auto;margin:0 .4rem 0 0}
+header.gx-bar .gx-ibtn.btn{flex:0 0 auto;background:#fff;color:#1a1320;border:3px solid #1a1320;box-shadow:2px 2px 0 #1a1320;padding:.2rem .55rem;font-size:.9rem;border-radius:10px}
+header.gx-bar .gx-ibtn[aria-expanded="true"]{background:var(--yellow)}
+/* board */
+.gx-board{background:#2b1055}
+.gx-board .stage{position:absolute;inset:0;width:auto;border:0;border-radius:0;box-shadow:none;display:none}
+body.three .gx-board .stage{display:block}
+.gx-board .stage canvas{position:absolute;left:0;top:0;width:100%;height:100%}
+.gx-board #map{position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:0;box-shadow:none}
+/* the one corner chip on the board */
+#hud{left:8px;bottom:8px;max-width:min(62%,420px);font-size:.8rem;padding:.2rem .55rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hud:empty{display:none}
+/* dock */
+.gx-dock{background:var(--paper);color:var(--ink);border-left:4px solid #1a1320}
+.gx-dock-head{border-bottom:3px solid #1a1320;background:var(--card);min-height:52px}
+.gx-dock-head .gx-dt{font:1.25rem/1.1 Bangers,Impact,sans-serif;letter-spacing:.04em;color:var(--red)}
+.gx-dock-head .gx-ibtn{border:3px solid #1a1320;background:var(--card);box-shadow:2px 2px 0 #1a1320;font-weight:900}
+.gx-dock-body{padding:10px 12px 14px;display:flex;flex-direction:column;gap:.7rem}
+.gx-dock-body>*{flex:0 0 auto}
+.gx-dock .box{box-shadow:4px 4px 0 var(--shadow);padding:.6rem .7rem}
+#banner{position:static;transform:none;max-width:none;left:auto;top:auto;padding:.3rem .6rem;font-size:.9rem;box-shadow:3px 3px 0 #1a1320;text-align:left;transition:none}
+#banner:empty{display:none}
+body.three #banner{top:auto}
+#prompt .who{font-size:1.45rem}
+#prompt .head{font-size:1.15rem}
+#ptop .steps{margin-bottom:.35rem}
+#dicewrap{margin:.35rem 0 .1rem}
+#dicewrap:empty,#dicewrap.off{display:none}
+#dice{min-height:0}
+#pacts:empty{display:none}
+#pmsg{margin-top:.45rem}
+#pmsg:empty{display:none}
+#pmsg .how{margin:.1rem 0 .2rem}
+/* a pending decision: the question sits on top and the rest waits */
+#choice{border-color:var(--red);border-width:4px}
+#choice h2{margin:0 0 .3rem;font-size:1.55rem;line-height:1;color:var(--red)}
+#choice p{margin:.2rem 0 .35rem}
+#choice .acts{flex-direction:column}
+#choice .acts .btn{text-align:left}
+.gx-dock.choosing #prompt #pacts,.gx-dock.choosing #buymini{opacity:.45;pointer-events:none}
+/* compact market in the dock (buy step) */
+#buymini{margin-top:.6rem;border-top:2.5px dashed #1a1320;padding-top:.45rem}
+#buymini h3{display:flex;align-items:center;gap:.4rem;font-size:1.25rem;margin:0 0 .35rem}
+#buymini h3 .btn{margin-left:auto;font:900 .8rem Nunito,sans-serif;padding:.15rem .5rem;min-height:36px}
+.bm{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:.15rem .5rem;align-items:center;border:2.5px solid #1a1320;border-radius:10px;background:#fffdf5;color:#1a1320;padding:.3rem .4rem;margin:.3rem 0}
+.bm.sugg{outline:3px solid var(--yellow);outline-offset:1px}
+.bm .cost{width:30px;height:30px;border-radius:50%;background:var(--energy);border:2.5px solid #1a1320;color:#fff;display:flex;align-items:center;justify-content:center;font:1.1rem/1 Bangers,Impact,sans-serif}
+.bm .nm{font:1.02rem/1.05 Bangers,Impact,sans-serif;letter-spacing:.03em}
+.bm .nm i{font:italic 700 .68rem Nunito,sans-serif;color:#7b6c80;margin-left:.2rem;letter-spacing:0}
+.bm p{grid-column:1/-1;margin:0;font-size:.78rem;line-height:1.25}
+.bm .btn{padding:.15rem .6rem;min-height:40px;font-size:.85rem}
+#youbox{font-size:.86rem}
+#youbox b.t{font:1.1rem/1 Bangers,Impact,sans-serif;font-weight:400;letter-spacing:.04em}
+#youbox .btn{padding:.1rem .5rem;font-size:.8rem;min-height:36px;margin-left:.3rem}
+/* popups (drawers) */
+.gx-drawer{border:4px solid #1a1320;box-shadow:8px 8px 0 #1a1320}
+.gx-drawer-head{border-bottom:3px solid #1a1320}
+.gx-drawer-head h2{font-size:1.6rem;line-height:1;color:var(--red)}
+.gx-drawer #log{max-height:none;font-size:.9rem}
+.gx-drawer .market{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+.gx-drawer .rules h3{margin:.8rem 0 .2rem}
+.gx-drawer h3{font-size:1.35rem;color:var(--purple);margin:.9rem 0 .3rem}
+.gx-drawer .score{display:flex;flex-direction:column;gap:.6rem;margin:0}
+.mon{border:3px solid #1a1320;border-radius:12px;background:#fffdf5;color:#1a1320;overflow:hidden;box-shadow:3px 3px 0 var(--shadow)}
+.mon>b{display:flex;gap:.4rem;align-items:center;padding:.2rem .5rem;font:1.15rem/1.1 Bangers,Impact,sans-serif;font-weight:400;letter-spacing:.04em;border-bottom:2.5px solid #1a1320}
+.mon>b i{font:italic 800 .75rem Nunito,sans-serif;background:#1a1320;color:#ffd23f;padding:0 .3rem;border-radius:4px}
+.mon .st2{padding:.25rem .5rem;font-weight:900}
+.mon .mine{padding:0 .5rem .5rem}
+.mon.on{outline:4px solid var(--yellow);outline-offset:2px}.mon.ko{opacity:.55}
+.mon.flash{animation:monflash 1.2s ease-out}
+@keyframes monflash{0%{outline:6px solid var(--blue)}100%{outline:6px solid transparent}}
+/* modal dialogs that stay (start screen, lobby, game over) fit the viewport */
+#modal{z-index:60}
+.dlg{max-height:calc(100dvh - 32px)}
+/* the old phone bottom bar is replaced by the dock */
+#dock{display:none!important}
+@media (max-width:999px){
+  .gx-dock{border-left:0;border-top:4px solid #1a1320}
+  .gx-dock-head{min-height:46px;padding:4px 8px}
+  .gx-grab{flex:0 0 44px;height:40px;background:none;opacity:1;position:relative;cursor:pointer;margin:0}
+  .gx-grab::before{content:"";position:absolute;left:0;right:0;top:50%;height:5px;margin-top:-2px;border-radius:3px;background:#1a1320;opacity:.45}
+}
+@media (max-width:700px){
+  header.gx-bar{padding:4px 8px}
+  header.gx-bar h1{font-size:1.3rem}
+  header.gx-bar .gx-ibtn.btn{font-size:.82rem;padding:.15rem .45rem}
+  .gx-dock-body{padding:8px 10px 12px;gap:.55rem}
+  #prompt .who{font-size:1.2rem}
+  #prompt .head{font-size:1rem}
+  #prompt .how{font-size:.85rem}
+  .tip{font-size:.82rem}
+  .st{min-width:44px;font-size:.68rem}.st b{font-size:.9rem}
+  .die{width:44px;height:44px}.die svg{width:30px;height:30px}
+  #hud{font-size:.66rem}
+  .dlg{max-height:calc(100dvh - 20px)}
+}
+
 </style>
 </head>
 <body>
-<header>
+<div class="gx-app">
+<header class="gx-bar">
   <h1>Crown City Smash</h1>
-  <span class="sub">Roll, smash and stomp your way to 20 stars</span>
-  <span class="spacer"></span>
-  <button class="btn" data-a="snd" id="sndbtn" title="Sound effects">🔊</button>
-  <button class="btn" data-a="mus" id="musbtn" title="Background music">🎵 On</button>
-  <button class="btn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ Normal</button>
-  <button class="btn" data-a="pause" id="pausebtn" title="Pause the computer (P)">⏸</button>
-  <button class="btn" data-a="hints" id="hintbtn" title="Dice hints">💡 On</button>
-  <button class="btn" data-a="tour">Tour</button>
-  <button class="btn" data-a="rules">Rules</button>
-  <button class="btn" data-a="new">New game</button>
+  <span class="gx-sp"></span>
+  <button class="gx-ibtn btn" data-gx="dr-market" title="Power cards for sale">🃏 Cards</button>
+  <button class="gx-ibtn btn" data-gx="dr-mine" id="minebtn" title="Your cards, evolutions and tokens">🎴 Yours</button>
+  <button class="gx-ibtn btn" data-gx="dr-mons" title="Every monster's cards and stats">👾 Monsters</button>
+  <button class="gx-ibtn btn" data-gx="dr-log" title="City chronicle (game log)">📜 Log</button>
+  <button class="gx-ibtn btn" data-gx="dr-rules" title="How to play and the dice faces">❓ Rules</button>
+  <button class="gx-ibtn btn" data-a="tour" title="Show the tour again">🧭 Tour</button>
+  <button class="gx-ibtn btn" data-a="snd" id="sndbtn" title="Sound effects">🔊</button>
+  <button class="gx-ibtn btn" data-a="mus" id="musbtn" title="Background music">🎵 On</button>
+  <button class="gx-ibtn btn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ Normal</button>
+  <button class="gx-ibtn btn" data-a="pause" id="pausebtn" title="Pause the computer (P)">⏸</button>
+  <button class="gx-ibtn btn" data-a="hints" id="hintbtn" title="Dice hints">💡 On</button>
+  <button class="gx-ibtn btn" data-a="new" title="New game">🆕 New</button>
 </header>
-<div class="wrap">
-  <div class="board">
+<div class="gx-main">
+  <main class="gx-board" aria-label="The city arena">
     <div id="stage" class="stage"><canvas id="c3"></canvas><div id="tags"></div><div id="hud"></div></div>
     <svg id="map" viewBox="0 0 1000 640" role="img" aria-label="The city arena and the monsters"></svg>
-    <div id="banner"></div>
-    <div id="score" class="score"></div>
-  </div>
-  <div class="side">
-    <div id="coach" class="box hidden"></div>
-    <div id="prompt" class="box"></div>
-    <div id="dicewrap" class="box"><h3>Dice</h3><div id="dice" class="dicebox"></div><div id="rolls" class="rolls"></div><div id="preview" class="preview"></div></div>
-    <div id="marketwrap" class="box"><h3>Power cards for sale</h3><div id="market" class="market"></div></div>
-    <div id="minewrap" class="box"><h3 id="minettl">Your cards</h3><div id="mine" class="mine"></div></div>
-    <div id="legendwrap" class="box"><h3>Dice faces</h3><div id="legend" class="legend"></div></div>
-    <div id="logwrap" class="box"><h3>City chronicle</h3><ol id="log"></ol></div>
-  </div>
+  </main>
+  <aside class="gx-dock" aria-label="Current step and actions">
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Crown City Smash</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">⇥</button></div>
+    <div class="gx-dock-body" id="dockbody">
+      <div id="banner" aria-live="polite"></div>
+      <div id="coach" class="box hidden"></div>
+      <div id="choice" class="box hidden" role="group" aria-live="assertive"></div>
+      <div id="prompt" class="box"><div id="ptop"></div><div id="dicewrap"><div id="dice" class="dicebox"></div><div id="rolls" class="rolls"></div><div id="preview" class="preview"></div></div><div id="pacts" class="acts"></div><div id="buymini" class="hidden"></div><div id="pmsg" class="msg"></div></div>
+      <div id="youbox" class="box hidden"></div>
+    </div>
+  </aside>
+  <button class="gx-ibtn btn gx-reopen" data-gx="dock">☰ Panel</button>
+</div>
+</div>
+<div id="drawers" hidden>
+  <div id="marketwrap"><div id="market" class="market"></div></div>
+  <div id="minewrap"><div id="mine" class="mine"></div></div>
+  <div id="monswrap"><div id="score" class="score"></div></div>
+  <div id="logwrap"><ol id="log"></ol></div>
+  <div id="ruleswrap"><div id="rulesbody" class="rules"></div><h3>Dice faces</h3><div id="legend" class="legend"></div></div>
 </div>
 <div id="modal" class="hidden"></div>
 <script>
@@ -272,6 +437,35 @@ const MONS=[
  {n:'Cortexa',c:'#ff8fc7',d:'Brain-bug mastermind from beyond the portal',x:1},
  {n:'Clampede',c:'#3cc9b0',d:'Clam-headed centipede that crawled out of a portal',x:1},
  {n:'Bramblebat',c:'#9ad35a',d:'Thorny bat-bush hybrid with a taste for neon',x:1}];
+</script>
+<script>
+// ===== Board-first shell: dock toggle, sheet sizing, closable popups (drawers) =====
+const GX={key:'gx',open:null,
+  init(o){this.key=o&&o.key||'gx';document.documentElement.classList.add('gx');const app=document.querySelector('.gx-app');this.app=app;
+    let min=false;try{min=localStorage.getItem(this.key+'_dockmin')==='1'}catch(e){}if(min)app.classList.add('gx-dock-min');
+    if(!document.querySelector('.gx-scrim')){const s=document.createElement('div');s.className='gx-scrim';s.addEventListener('click',()=>this.close());document.body.appendChild(s);this.scrim=s}
+    document.addEventListener('click',e=>{const t=e.target.closest('[data-gx]');if(!t)return;const a=t.dataset.gx;
+      if(a==='dock')this.toggleDock();else if(a==='sheet')this.cycleSheet();else if(a==='close')this.close();else this.toggle(a)});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&this.open){this.close();e.stopImmediatePropagation()}},true);
+    // resize hook for boards
+    const b=document.querySelector('.gx-board');if(b&&window.ResizeObserver)new ResizeObserver(()=>{for(const f of this._rs)try{f(b.clientWidth,b.clientHeight)}catch(e){}}).observe(b)},
+  _rs:[],onResize(f){this._rs.push(f)},
+  boardSize(){const b=document.querySelector('.gx-board');return b?{w:b.clientWidth,h:b.clientHeight}:{w:innerWidth,h:innerHeight}},
+  toggleDock(force){const min=force!=null?!force:!this.app.classList.contains('gx-dock-min');this.app.classList.toggle('gx-dock-min',min);this.app.classList.remove('gx-sheet-full');try{localStorage.setItem(this.key+'_dockmin',min?'1':'0')}catch(e){}},
+  // phone sheet: min -> normal -> full -> min
+  cycleSheet(){const a=this.app;if(a.classList.contains('gx-dock-min')){this.toggleDock(true)}else if(!a.classList.contains('gx-sheet-full'))a.classList.add('gx-sheet-full');else{a.classList.remove('gx-sheet-full');this.toggleDock(false)}},
+  showDock(){if(this.app&&this.app.classList.contains('gx-dock-min'))this.toggleDock(true)},
+  toggle(id){if(this.open===id)this.close();else this.show(id)},
+  show(id){const d=document.getElementById(id);if(!d)return;if(this.open&&this.open!==id){const o=document.getElementById(this.open);if(o)o.classList.remove('on')}
+    this.open=id;d.classList.add('on');this.scrim&&this.scrim.classList.add('on');this._back=document.activeElement;
+    for(const b of document.querySelectorAll('[data-gx="'+id+'"]'))b.setAttribute('aria-expanded','true');
+    const f=d.querySelector('.gx-x');if(f)f.focus({preventScroll:true});if(this.onShow)this.onShow(id)},
+  close(){if(!this.open)return;const id=this.open;const d=document.getElementById(this.open);if(d)d.classList.remove('on');for(const b of document.querySelectorAll('[data-gx="'+this.open+'"]'))b.setAttribute('aria-expanded','false');this.open=null;this.scrim&&this.scrim.classList.remove('on');if(this._back&&this._back.focus)this._back.focus({preventScroll:true});if(this.onClose)this.onClose(id)},
+  // build a drawer shell around a body element: <div class=gx-drawer id><head><h2>title</h2><button.gx-x></head><body/></div>
+  drawer(id,title,bodyEl,wide){let d=document.getElementById(id);if(!d){d=document.createElement('section');d.id=id;d.className='gx-drawer'+(wide?' wide':'');d.setAttribute('role','dialog');d.setAttribute('aria-label',title);
+      d.innerHTML=`<div class="gx-drawer-head"><h2></h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"></div>`;document.body.appendChild(d)}
+    d.querySelector('h2').textContent=title;if(bodyEl){const b=d.querySelector('.gx-drawer-body');if(bodyEl.parentNode!==b){b.innerHTML='';b.appendChild(bodyEl)}}return d}};
+
 </script>
 <script>
 /* ---------- card data. Names and wording are original; cost, type and effect follow the published cards (see audit-inventory.md). ---------- */
@@ -1827,8 +2021,28 @@ function init3D(){
   V3.on=true;document.body.classList.add('three');
   V3.clock=new THREE.Clock();requestAnimationFrame(loop3D);
   return true}
-function resize3D(){const el=V3.r.domElement.parentElement;const w=el.clientWidth,h=Math.round(w*(window.innerWidth<700?0.92:0.62));el.style.height=h+'px';V3.r.setSize(w,h,false);V3.r.domElement.style.width=w+'px';V3.r.domElement.style.height=h+'px';V3.cam.aspect=w/h;V3.cam.fov=w/h<1.3?52:38;
-  V3.cam.fov=w/h<1.4?54:42;V3.cam.updateProjectionMatrix()}
+// The canvas fills the whole board (width AND height); the camera backs off until the full arena fits that aspect ratio.
+const CAMOFF=new THREE.Vector3(0,15,25.1);
+function fitPoints(){if(V3.fitPts)return V3.fitPts;const pts=[];
+  for(let k=0;k<24;k++){const a=k/24*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*11.8,.25,Math.sin(a)*11.8))}
+  // seats and the name plates above them (plates are ~1.6 units tall over the head)
+  for(const n of [2,4,6])for(let k=0;k<n;k++){const v=seatPos(k,n);for(const dx of [-2.3,2.3])pts.push(v.clone().setY(8.2).setX(v.x+dx),v.clone().setY(1).setX(v.x+dx))}
+  pts.push(new THREE.Vector3(0,8.3,0),new THREE.Vector3(12.5,8,-6.5));
+  // harbor basin, signs, dice tray
+  [[17.3,-10.8],[17.3,-2.2],[7.7,-10.8]].forEach(([x,z])=>pts.push(new THREE.Vector3(x,.3,z)));
+  pts.push(new THREE.Vector3(-2.8,10.1,-4.2),new THREE.Vector3(2.8,10.1,-4.2));
+  [[-4.6,12.6],[4.6,12.6],[0,17.2],[-3.3,15.9],[3.3,15.9]].forEach(([x,z])=>pts.push(new THREE.Vector3(x,.3,z)));
+  return V3.fitPts=pts}
+function fitCamera(asp){const cam=V3.cam;const pts=fitPoints();const tall=asp<1.05;cam.fov=tall?50:asp<1.4?44:40;cam.aspect=asp;cam.updateProjectionMatrix();
+  // portrait boards look down more steeply (the arena gets taller on screen) and aim a bit right, towards the Harbor
+  const t=Math.max(0,Math.min(1,(1.3-asp)/.6));V3.camOff=new THREE.Vector3(0,15+t*6,25.1-t*6.5);V3.look.set(t*1.6,2,2.4-t*.8);
+  const off=V3.camOff,mx=tall?.94:.9,my=.9,v=new THREE.Vector3();
+  const ok=()=>{cam.lookAt(V3.look);cam.updateMatrixWorld();for(const p of pts){v.copy(p).project(cam);if(Math.abs(v.x)>mx||Math.abs(v.y)>my||v.z>1)return false}return true};
+  const fits=k=>{for(const sw of [1.2,-1.2]){cam.position.copy(V3.look).addScaledVector(off,k);cam.position.x+=sw;if(!ok())return false}return true};
+  let lo=.5,hi=4;for(let i=0;i<22;i++){const m=(lo+hi)/2;if(fits(m))hi=m;else lo=m}V3.camK=hi;
+  const d=off.length()*hi;V3.scene.fog.near=Math.max(38,d+8);V3.scene.fog.far=Math.max(90,d+60)}
+function resize3D(){const el=V3.r.domElement.parentElement;const w=Math.max(1,el.clientWidth),h=Math.max(1,el.clientHeight);
+  V3.r.setSize(w,h,false);V3.r.domElement.style.width=w+'px';V3.r.domElement.style.height=h+'px';fitCamera(w/h)}
 // ---- textures ----
 function canvasTex(w,h,draw,rep){const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');draw(x,w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;if(rep){t.wrapS=t.wrapT=THREE.RepeatWrapping;t.repeat.set(rep[0],rep[1])}t.anisotropy=4;return t}
 function gradTex(cols,stops){return canvasTex(4,256,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);cols.forEach((c,k)=>g.addColorStop(stops[k],c));x.fillStyle=g;x.fillRect(0,0,w,h)})}
@@ -2086,7 +2300,7 @@ function loop3D(){requestAnimationFrame(loop3D);const dt=Math.min(.12,V3.clock.g
   // camera
   const cam=V3.cam;const sway=Math.sin(t*.25)*1.2;V3.shake=Math.max(0,V3.shake-dt*1.8);
   const wi=G.winner&&G.winner!=='draw'?V3.mons[+G.winner.slice(1)-1]:null;V3.zoom=Math.max(0,Math.min(1,(V3.zoom||0)+(wi?dt*.6:-dt*2)));
-  const base=new THREE.Vector3(sway,17,27.5),look=V3.look.clone();
+  const base=V3.look.clone().addScaledVector(V3.camOff||CAMOFF,V3.camK||1);base.x+=sway;const look=V3.look.clone();
   if(wi&&V3.zoom>0){const wp=wi.g.position;const e=V3.zoom*V3.zoom*(3-2*V3.zoom);base.lerp(new THREE.Vector3(wp.x*.6,wp.y+8,wp.z+13),e);look.lerp(new THREE.Vector3(wp.x,wp.y+3,wp.z),e)}
   cam.position.set(base.x+(Math.random()-.5)*V3.shake*.5,base.y+(Math.random()-.5)*V3.shake*.5,base.z);cam.lookAt(look);
   V3.r.render(V3.scene,cam);
@@ -2285,9 +2499,9 @@ const STEPS=['Roll','Resolve','City','Buy','End'];
 function stepBar(){const s=G.step||1;return `<div class="steps">${STEPS.map((t,k)=>`<span class="st ${k+1<s?'done':''} ${k+1===s?'on':''}"><b>${k+1}</b>${t}</span>`).join('')}</div>`}
 function suggestCard(p){let best=-1,bv=-0.5;G.market.forEach((id,k)=>{if(!canBuy(p,k))return;const v=cardValue(p,id);if(v>bv){bv=v;best=k}});return best}
 function renderPanel(){
-  const pr=document.getElementById('prompt');const di=document.getElementById('dice'),ro=document.getElementById('rolls'),pv=document.getElementById('preview');
+  const pt=document.getElementById('ptop'),pa=document.getElementById('pacts'),pm=document.getElementById('pmsg');const di=document.getElementById('dice'),ro=document.getElementById('rolls'),pv=document.getElementById('preview');
   document.getElementById('banner').innerHTML=G?UI.banner:'';
-  if(!G){pr.innerHTML='';di.innerHTML='';ro.innerHTML='';pv.innerHTML='';return}
+  if(!G){pt.innerHTML='';pa.innerHTML='';pm.innerHTML='';di.innerHTML='';ro.innerHTML='';pv.innerHTML='';document.getElementById('buymini').classList.add('hidden');document.getElementById('youbox').classList.add('hidden');document.getElementById('docktitle').textContent='Crown City Smash';return}
   const p=cur();let who=esc(mname(p)),head='',msg='',acts='';
   const btn=(a,l,dis,sm,cls)=>`<button class="btn ${cls||''}" data-act="${a}" ${dis?'disabled':''}>${l}${sm?`<small>${sm}</small>`:''}</button>`;
   const me=G.mode==='solo'?G.pl.find(q=>q.human):null;
@@ -2311,7 +2525,10 @@ function renderPanel(){
     if(w>=0&&w!==NET.mySeat&&G.pl[w])msg+=`<div class="tip">⏳ Waiting for <b>${esc(pname(G.pl[w])||mname(G.pl[w]))}</b> (${esc(mname(G.pl[w]))}) to decide…</div>`;
     if(!humanTurn()&&G.pl[G.active].human&&G.active!==NET.mySeat)msg+=`<div class="small muted">It's ${esc(pname(G.pl[G.active])||'another player')}'s turn.</div>`;
     acts+=`<div class="emotes">${EMOTES.map(e=>`<button class="btn mini" data-emo="${e}" aria-label="send ${e}">${e}</button>`).join('')}</div>`}
-  pr.innerHTML=`${G.winner?'':stepBar()}<div class="who" style="color:${MONS[p.m].c};-webkit-text-stroke:1.2px #1a1320">${who}${humanTurn()?' · your turn':''}</div>${head?`<div class="head">${head}</div>`:''}<div class="msg">${msg}</div><div class="acts">${acts}</div>`;
+  pt.innerHTML=`${G.winner?'':stepBar()}<div class="who" style="color:${MONS[p.m].c};-webkit-text-stroke:1.2px #1a1320">${who}${humanTurn()?' · your turn':''}</div>${head?`<div class="head">${head}</div>`:''}`;
+  pa.innerHTML=acts;pm.innerHTML=msg;
+  document.getElementById('docktitle').textContent=G.winner?'Game over':`Round ${G.turn} · ${mname(p)}${humanTurn()?' (you)':''} · ${STEPS[(G.step||1)-1]}`;
+  document.getElementById('dicewrap').classList.toggle('off',G.phase==='buy'||!G.dice.length&&G.phase!=='roll');
   const canClick=humanTurn()&&G.phase==='roll';
   const spin=UI.rollAnim!==G.rollId&&ANIM;UI.rollAnim=G.rollId;
   const sug=canClick&&UI.hints&&G.rolls>0?suggestMask(p):null;
@@ -2320,8 +2537,8 @@ function renderPanel(){
   pv.innerHTML=G.phase==='roll'&&G.dice.length?`<b>${humanTurn()?'If you resolve now':'These dice give'}:</b> ${esc(scoreDice(p,G.dice).text)}.`:'';
   const buyPh=humanTurn()&&G.phase==="buy";const sg=buyPh?suggestCard(p):-1;
   document.getElementById('market').innerHTML=G.market.map((id,k)=>{const C=CARDS[base(id)];const c=costOf(p,id);return `<div class="pc ${C.t} ${k===sg?'sugg':''}"><div class="hd"><span class="cost">${c}</span><span class="nm">${esc(C.n)}</span>${cardIcon(id)}</div><span class="ty">${C.t==='K'?'KEEP':C.t==='C'?'CONSUMABLE':C.t==='U'?'COSTUME':'USE NOW'}${C.kw?' · '+C.kw.toUpperCase():''}</span><p>${esc(C.x)}</p>${buyPh?`<button class="btn buy ${canBuy(p,k)?'primary':''}" data-card="${k}" ${canBuy(p,k)?'':'disabled'}>${canBuy(p,k)?'Buy':buyOK(p,id)?'Need '+c+' ⚡':'Not allowed'}</button>`:''}</div>`}).join('')+`<p class="small muted" style="grid-column:1/-1;margin:.2rem 0 0">${G.deck.length} cards in the deck. <b>Keep</b> cards stay with you. <b>Use now</b> cards happen at once. <b>Consumables</b> wait until you use them.</p>`;
+  renderBuyMini(p,buyPh,sg);
   const who2=me||p;
-  document.getElementById('minettl').textContent=me?`Your cards (${mname(me)})`:`${mname(who2)}'s cards`;
   const tk=who2.tok||{};const list=[...who2.cards.map(id=>{const C=CARDS[base(id)];const b=base(id);return `<div class="mc ${C.t}"><b>${esc(C.n)}</b>${C.t==='C'?` <i>consumable · ${esc(C.kw)}</i>`:''}${b==='smoke'?` (${tk.smoke} puffs)`:''}${b==='cell'?` (${tk.cell} energy on it)`:''}${b==='mimic'&&tk.mim?` (copying ${esc(CN(tk.mim.id))})`:''}${(tk.ufo||[]).includes(id)?' 🛸':''}<br>${esc(C.x)}</div>`}),
     ...who2.evo.map(e=>`<div class="mc E"><b>🧬 ${esc(evoName(e))}</b> <i>${EVO[e].t==='P'?'permanent':'temporary'} evolution in play</i>${e===18&&tk.icy?` (copying ${esc(evoName(tk.icy.e))})`:''}${e===24?` (${tk.adapt} tokens)`:''}<br>${esc(evoText(e))}</div>`),
     ...(who2===me||!me||G.mode==='hot'||G.mode==='ai'?who2.hand.map(e=>`<div class="mc E hand"><b>🧬 ${esc(evoName(e))}</b> <i>in hand (${EVO[e].t==='P'?'permanent':'temporary'}${EVO[e].kw?', '+EVO[e].kw:''})</i><br>${esc(evoText(e))}</div>`):[])];
@@ -2334,10 +2551,26 @@ function renderPanel(){
   if(exOn('cult'))list.unshift(`<div class="mc M"><b>🕯 Cultists: ${who2.cult}</b><br>Four of a kind gains one (per face). Spend one on your turn for a heart, an energy or a reroll.</div>`);
   if(mbOn())list.unshift(`<div class="mc M"><b>🧠 Mindbug tokens: ${who2.mb}</b><br>When another monster finishes rolling, spend one to resolve its dice as yours and take its Enter and Buy steps; it then rolls again.</div>`);
   document.getElementById('mine').innerHTML=list.length?list.join(''):'<span class="muted small">No cards yet. Buy them with energy after rolling.</span>';
+  const dm=document.getElementById('dr-mine');if(dm)dm.querySelector('h2').textContent=me?`Your cards (${mname(me)})`:`${mname(who2)}'s cards`;
+  const yb=document.getElementById('youbox');yb.classList.remove('hidden');
+  yb.innerHTML=`<b class="t" style="color:${MONS[who2.m].c};-webkit-text-stroke:.8px #1a1320">${esc(mname(who2))}</b> ${me?'(you)':''} <b>♥${who2.hp} ★${who2.vp} ⚡${who2.en}${mbOn()?' 🧠'+who2.mb:''}</b>${exIcons(who2)} · ${who2.cards.length} card${who2.cards.length===1?'':'s'}${who2.evo.length||who2.hand.length?` · 🧬 ${who2.evo.length} in play, ${who2.hand.length} in hand`:''}<button class="btn" data-gx="dr-mine">🎴 Details</button>`;
   const L=document.getElementById('log');L.innerHTML=G.log.slice(0,80).map(l=>`<li class="${l.s>=0&&G.pl[l.s]&&G.pl[l.s].human&&G.mode==='solo'?'me':''}">${esc(l.t)}</li>`).join('');
 }
-function renderScore(){const el=document.getElementById('score');if(!G){el.innerHTML='';return}
-  el.innerHTML=G.pl.map(p=>`<div class="sc ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}"><b style="background:${MONS[p.m].c}">${esc(mname(p))}${p.human&&G.mode==='solo'?' (you)':''}</b><span>♥${p.hp} ★${p.vp} ⚡${p.en}${mbOn()?' 🧠'+p.mb:''}${exIcons(p)}${inTokyo(p.i)?' · city':''}${p.alive?'':' · KO'}</span></div>`).join('')}
+function renderBuyMini(p,buyPh,sg){const el=document.getElementById('buymini');
+  if(!G||G.winner||G.phase!=='buy'||!G.market.length){el.classList.add('hidden');el.innerHTML='';return}el.classList.remove('hidden');
+  el.innerHTML=`<h3>Cards for sale <button class="btn" data-gx="dr-market">🃏 Full view</button></h3>`+G.market.map((id,k)=>{const C=CARDS[base(id)];const c=costOf(p,id);
+    return `<div class="bm ${C.t} ${k===sg?'sugg':''}"><span class="cost">${c}</span><span class="nm">${esc(C.n)}<i>${C.t==='K'?'keep':C.t==='C'?'consumable':C.t==='U'?'costume':'use now'}${C.kw?' · '+esc(C.kw):''}</i></span>${buyPh?`<button class="btn ${canBuy(p,k)?'primary':''}" data-card="${k}" ${canBuy(p,k)?'':'disabled'} aria-label="Buy ${esc(C.n)}">${canBuy(p,k)?'Buy':buyOK(p,id)?'Need '+c+' ⚡':'Not allowed'}</button>`:'<span></span>'}<p>${esc(C.x)}</p></div>`}).join('')}
+// every monster's details (popup); the plates on the board show the short version
+function monDetail(p){const k=p.i;const hidden=(G.mode==='solo'||G.mode==='net')&&!(NET.on?k===NET.mySeat:p.human);
+  const cards=p.cards.map(id=>{const C=CARDS[base(id)];return `<div class="mc ${C.t}"><b>${esc(C.n)}</b>${C.t==='C'?` <i>consumable · ${esc(C.kw)}</i>`:''}<br>${esc(C.x)}</div>`});
+  const evo=p.evo.map(e=>`<div class="mc E"><b>🧬 ${esc(evoName(e))}</b> <i>evolution in play</i><br>${esc(evoText(e))}</div>`);
+  const hand=p.hand.length?(hidden?[`<div class="mc E hand"><b>🧬 ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand</b> <i>hidden</i></div>`]:p.hand.map(e=>`<div class="mc E hand"><b>🧬 ${esc(evoName(e))}</b> <i>in hand</i><br>${esc(evoText(e))}</div>`)):[];
+  const all=[...cards,...evo,...hand];
+  return `<div class="mon ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}" id="mon-${k}"><b style="background:${MONS[p.m].c}">${inTokyo(p.i)?'👑 ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>
+    <div class="st2">${p.alive?`♥${p.hp}/${maxhp(p)} ★${p.vp} ⚡${p.en}${mbOn()?' 🧠'+p.mb:''}${exIcons(p)} · ${esc(where(p.i))}`:'Knocked out'}</div>
+    <div class="small muted" style="padding:0 .5rem .3rem">${esc(MONS[p.m].d)}</div><div class="mine">${all.length?all.join(''):'<span class="muted small">No cards.</span>'}</div></div>`}
+function renderScore(){const el=document.getElementById('score');if(!G){el.innerHTML='<p class="muted">No game yet.</p>';return}
+  el.innerHTML=G.pl.map(monDetail).join('')}
 function renderLegend(){document.getElementById('legend').innerHTML=[
   ['1','Three 1s score 1 star; each extra 1 adds 1 more.'],['2','Three 2s score 2 stars, +1 per extra.'],['3','Three 3s score 3 stars, +1 per extra.'],
   ['E','Energy: 1 each. Spend it on power cards.'],['C','Claw: 1 damage each. From the city you hit everyone outside; from outside you hit the city.'],['H','Heart: heal 1 each (not while in the city). Three hearts also draw an evolution when evolutions are on.']]
@@ -2347,13 +2580,17 @@ function renderLegend(){document.getElementById('legend').innerHTML=[
 function renderModal(){const m=document.getElementById('modal');
   if(NET.on&&NET.inLobby){m.classList.remove('hidden');m.innerHTML=lobbyHTML();return}
   if(UI.info){m.classList.remove('hidden');m.innerHTML=startScreen();return}
-  if(UI.peek){m.classList.remove('hidden');m.innerHTML=`<div class="dlg" role="dialog" aria-modal="true"><h2>${esc(UI.peek.title)}</h2><p>${esc(UI.peek.text)}</p><div class="acts"><button class="btn" data-a="closepeek">Close</button></div></div>`;return}
-  if(UI.rules){m.classList.remove('hidden');m.innerHTML=rulesHTML();return}
+  renderChoice(!(UI.stats&&G&&G.winner));
   if(UI.stats&&G&&G.winner){m.classList.remove('hidden');m.innerHTML=statsHTML();return}
-  if(UI.choice&&!(NET.on&&c0Remote())){const c=UI.choice;m.classList.remove('hidden');
-    const dice=c.dice&&G?`<div class="mdice">${G.dice.map(d=>`<span class="die sm ${d.t?'sp-'+d.t:''}">${faceSVG(d.f)}</span>`).join('')}</div>`:'';
-    m.innerHTML=`<div class="dlg" role="dialog" aria-modal="true"><h2>${esc(c.title)}</h2>${G&&c.who!==undefined&&G.mode==='hot'?`<p class="pass">📱 Pass the device to <b>${esc(mname(P(c.who)))}</b>: this one is for you.</p>`:''}<p>${esc(c.text)}</p>${dice}<div class="acts">${c.options.map(o=>`<button class="btn ${/Recommended\./.test(o.d||'')?'primary':''}" data-opt="${esc(o.k)}">${esc(o.l)}${o.d?`<small>${esc(o.d)}</small>`:''}</button>`).join('')}${c.cancel?'<button class="btn" data-opt="x">Close</button>':''}</div></div>`;return}
   m.classList.add('hidden');m.innerHTML=''}
+// in-game questions live in the dock (never over the arena)
+function renderChoice(on){const el=document.getElementById('choice'),dk=document.querySelector('.gx-dock');
+  const c=on&&UI.choice&&!(NET.on&&c0Remote())&&!UI.info&&!(NET.on&&NET.inLobby)?UI.choice:null;
+  if(!c){el.classList.add('hidden');el.innerHTML='';if(dk)dk.classList.remove('choosing');UI.choiceShown=null;return}
+  const dice=c.dice&&G?`<div class="mdice">${G.dice.map(d=>`<span class="die sm ${d.t?'sp-'+d.t:''}">${faceSVG(d.f)}</span>`).join('')}</div>`:'';
+  el.classList.remove('hidden');if(dk)dk.classList.add('choosing');el.setAttribute('aria-label',c.title);
+  el.innerHTML=`<h2>${esc(c.title)}</h2>${G&&c.who!==undefined&&G.mode==='hot'?`<p class="pass">📱 Pass the device to <b>${esc(mname(P(c.who)))}</b>: this one is for you.</p>`:''}<p>${esc(c.text)}</p>${dice}<div class="acts">${c.options.map(o=>`<button class="btn ${/Recommended\./.test(o.d||'')?'primary':''}" data-opt="${esc(o.k)}">${esc(o.l)}${o.d?`<small>${esc(o.d)}</small>`:''}</button>`).join('')}${c.cancel?'<button class="btn" data-opt="x">Close</button>':''}</div>`;
+  const key=c.title+'|'+c.text;if(UI.choiceShown!==key){UI.choiceShown=key;if(window.GX&&GX.app){GX.showDock();if(GX.open)GX.close()}const b=document.getElementById('dockbody');if(b)b.scrollTop=0;const f=el.querySelector('button');if(f&&document.activeElement&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName))try{f.focus({preventScroll:true})}catch(e){}}}
 function startScreen(){const saved=load();const xp=UI.xp;
   const pool=MONS.map((M,k)=>k).filter(k=>xp!=='base'||k<6);if(!pool.includes(UI.mon))UI.mon=0;
   return `<div class="dlg start" role="dialog" aria-modal="true"><h2>Crown City Smash</h2>
@@ -2372,7 +2609,7 @@ function startScreen(){const saved=load();const xp=UI.xp;
     <button class="btn" data-start="ai">Watch the computer play<small>A quick way to see the rules in action.</small></button>
     ${saved&&!saved.winner&&saved.pl?`<button class="btn" data-start="load">Continue saved game<small>Round ${saved.turn}, ${saved.pl.length} monsters</small></button>`:''}
    </div>${onlineBlock()}<p class="small muted">The names, card text and art are original, for copyright reasons. The rules follow the published rulebook.</p></div>`}
-function rulesHTML(){return `<div class="dlg rules" role="dialog" aria-modal="true"><h2>How to play</h2>
+function rulesHTML(){return `<div>
   <h3>Your turn in 5 steps</h3><ol><li><b>Roll</b> all dice. Keep any dice you like and reroll the rest, up to twice. You can reroll dice you kept earlier.</li>
   <li><b>Resolve</b>: three of a kind of 1, 2 or 3 scores that many stars, and each extra matching die adds 1. Energy gives 1 each. Hearts heal 1 each, but only outside the city (max 10). Claws smash.</li>
   <li><b>City</b>: from the city (Downtown or the Harbor) your claws hit every monster outside. From outside, they hit every monster in the city. When smashed by dice, a city monster may <b>yield</b>. It still takes the damage, and the smasher moves in. If Downtown is empty, you must move in (+1 star). With 5–6 monsters, if Downtown is taken and the Harbor is empty, you move into the Harbor.</li>
@@ -2389,39 +2626,25 @@ function rulesHTML(){return `<div class="dlg rules" role="dialog" aria-modal="tr
   <h3>Keyboard shortcuts</h3><p class="small"><b>R</b> reroll · <b>Space</b> resolve / end turn · <b>1–8</b> keep a die · <b>H</b> suggest dice · <b>P</b> pause the computer</p>
   <h3>Winning</h3><p>Reach <b>20 stars</b> and survive your turn, or be the last monster standing. If everyone falls at once, nobody wins.</p>
   <h3>About this version</h3><p class="small">All 66 classic cards, the 24 Mindbug cards, 72 evolutions, 12 costumes, 24 curses and 10 wickedness tiles follow the published cards, with new names and wording. See the notes shipped with the game for the few interpretations.</p>
-  <div class="acts"><button class="btn primary" data-a="closerules">Got it</button></div></div>`}
+  <div class="acts"><button class="btn primary" data-gx="close">Got it</button></div></div>`}
 
 // ---------- tour ----------
 const TOURSTEPS=[
- {el:'#prompt',t:'Start here',b:'This box always tells you what to do next. The 1–5 bar at the top shows where you are in your turn: Roll, Resolve, City, Buy, End.'},
+ {el:'#prompt',t:'Start here',b:'This panel always tells you what to do next. The 1–5 bar at the top shows where you are in your turn: Roll, Resolve, City, Buy, End. Questions (like picking an evolution) also appear here.'},
  {el:'#dicewrap',t:'The dice',b:'Tap dice to keep them (they turn yellow), then press Reroll. The line under the dice shows what you would get if you resolved now. Dice with a blue dashed outline are the ones we suggest keeping (switch this off with 💡 Hints). Keys: R rerolls, Space resolves, 1–8 keep dice.'},
- {el:'#map',t:'The city',b:'Monsters fight over Downtown (and the Harbor with 5–6 players). Being there scores stars every turn, but everyone else hits you and you cannot heal.'},
- {el:'#map',t:'The monsters',b:'Each plate shows hearts (red), stars (gold, first to 20 wins) and energy (green). The pink brain is your Mindbug tokens. The glowing plate is whoever is taking a turn.'},
- {el:'#marketwrap',t:'Power cards',b:'After resolving, spend energy on cards. A suggested card gets a ribbon. Consumables wait with you until their keyword moment: you get a pop-up when you can use one.'},
- {el:'#minewrap',t:'Your cards and tokens',b:'Your cards, evolutions and Mindbug tokens are listed here. When a monster finishes rolling a great set of dice, you will be asked if you want to Mindbug it.'},
- {el:'#logwrap',t:'Chronicle',b:'Everything that happened, newest first. Good luck, monster!'}];
+ {el:'#stage',t:'The city',b:'Monsters fight over Downtown (and the Harbor with 5–6 players). Being there scores stars every turn, but everyone else hits you and you cannot heal.'},
+ {el:'[data-gx="dr-mons"]',t:'The monsters',b:'Each plate shows hearts (red), stars (gold, first to 20 wins) and energy (green). The pink brain is your Mindbug tokens. The glowing plate is whoever is taking a turn. Tap a monster, or 👾 Monsters in the top bar, to see its cards.'},
+ {el:'[data-gx="dr-market"]',t:'Power cards',b:'After resolving, the cards for sale appear in this panel: spend energy on them. 🃏 Cards in the top bar shows them any time. A suggested card gets a ribbon. Consumables wait with you until their keyword moment: you get a pop-up when you can use one.'},
+ {el:'[data-gx="dr-mine"]',t:'Your cards and tokens',b:'A summary sits at the bottom of this panel; 🎴 Yours lists your cards, evolutions and Mindbug tokens. When a monster finishes rolling a great set of dice, you will be asked if you want to Mindbug it.'},
+ {el:'[data-gx="dr-log"]',t:'Chronicle',b:'📜 Log shows everything that happened, newest first. ❓ Rules explains the dice faces. Good luck, monster!'}];
 function startTour(){UI.coach=0;renderTour()}
 function renderTour(){document.querySelectorAll('.hl').forEach(e=>e.classList.remove('hl'));const el=document.getElementById('coach');
   if(UI.coach<0){el.classList.add('hidden');return}const st=TOURSTEPS[UI.coach];el.classList.remove('hidden');
   el.innerHTML=`<h3>Tour ${UI.coach+1} of ${TOURSTEPS.length}: ${esc(st.t)}</h3><p class="small">${esc(st.b)}</p><div class="acts"><button class="btn" data-tour="prev" ${UI.coach===0?'disabled':''}>Back</button><button class="btn primary" data-tour="next">${UI.coach===TOURSTEPS.length-1?'Start playing':'Next'}</button><button class="btn" data-tour="skip">Skip tour</button></div>`;
-  const tg=document.querySelector(st.el);if(tg)tg.classList.add('hl')}
+  const tg=document.querySelector(st.el);if(tg&&tg.id!=='stage')tg.classList.add('hl');if(window.GX&&GX.app)GX.showDock();const b=document.getElementById('dockbody');if(b)b.scrollTop=0}
 
-function render(){if(isHost())netPush();if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal();renderDock()}
-// phones: a docked bar at the bottom mirrors the current step, the dice and the main buttons, so nothing needs scrolling
-const PHONE=window.matchMedia?window.matchMedia('(max-width:700px)'):{matches:false};
-function renderDock(){let d=document.getElementById('dock');
-  const on=PHONE.matches&&G&&!UI.info&&!(NET.on&&NET.inLobby);
-  if(!on){if(d)d.remove();document.body.classList.remove('docked');document.body.style.paddingBottom='';return}
-  if(!d){d=document.createElement('div');d.id='dock';d.setAttribute('aria-label','Current step and actions');document.body.appendChild(d)}
-  const pr=document.getElementById('prompt'),dc=document.getElementById('dice'),pv=document.getElementById('preview');
-  const head=pr&&pr.querySelector('.head'),acts=pr&&pr.querySelector('.acts');
-  const mine=humanTurn();const who=G.pl[G.active];
-  const title=G.winner?'Game over':mine?(head?head.textContent:'Your turn'):`${mname(who)} is ${G.phase==='buy'?'shopping':'rolling'}…`;
-  const btns=mine&&acts?[...acts.querySelectorAll('button[data-act]')].filter(b=>!/^(hint|tour)$/.test(b.dataset.act)).slice(0,3).map(b=>b.outerHTML).join(''):'';
-  const dice=dc&&G.phase!=='buy'?dc.innerHTML:'';
-  d.innerHTML=`<div class="dk-t">${esc(title)}${mine&&G.phase==='roll'&&G.rolls>=0?` <span>· ${G.rolls} reroll${G.rolls===1?'':'s'} left</span>`:''}</div>${dice?`<div class="dk-d">${dice}</div>`:''}${mine&&dice&&pv&&pv.textContent.trim()?`<div class="dk-p">${esc(pv.textContent.trim())}</div>`:''}${btns?`<div class="dk-a">${btns}</div>`:''}`;
-  document.body.classList.add('docked');document.body.style.paddingBottom=(d.offsetHeight+12)+'px'}
-if(PHONE.addEventListener)PHONE.addEventListener('change',()=>{render();if(typeof resize3D==='function'&&V3.on)resize3D()});
+function render(){if(isHost())netPush();if(G&&G.winner&&UI.wonSnd!==G.gid){UI.wonSnd=G.gid;snd('win');if(ANIM){UI.statsT=setTimeout(()=>{UI.stats=true;render()},2600)}}if(V3.on)sync3D();else renderMap();renderScore();renderPanel();renderModal();
+  if(window.GX&&GX.app&&G&&!G.winner&&!UI.info&&humanTurn()&&UI.dockTurn!==G.tid+':'+G.active){UI.dockTurn=G.tid+':'+G.active;GX.showDock()}}
 const SPEEDS=[['slow',1300],['normal',650],['fast',260]];
 function setSpeed(k){UI.speed=k;AIDELAY=SPEEDS[k][1];const b=document.getElementById('speedbtn');if(b)b.textContent='⏩ '+SPEEDS[k][0][0].toUpperCase()+SPEEDS[k][0].slice(1);try{localStorage.setItem('ccs_speed',k)}catch(e){}}
 
@@ -2441,9 +2664,9 @@ document.addEventListener('click',e=>{
     else{newGame(k);let toured=false;try{toured=!!localStorage.getItem(TOUR);localStorage.setItem(TOUR,'1')}catch(x){}if(k==='solo'&&!toured)startTour()}return}
   if(ds.tour){if(ds.tour==='next')UI.coach=UI.coach>=TOURSTEPS.length-1?-1:UI.coach+1;else if(ds.tour==='prev')UI.coach=Math.max(0,UI.coach-1);else UI.coach=-1;renderTour();return}
   if(ds.emo){sendEmote(ds.emo);return}
-  if(ds.a){if(ds.a==='nethost'){netJoin('host',newCode());return}if(ds.a==='netjoin'){const v=(document.getElementById('joincode')||{}).value;netJoin('client',v);return}if(ds.a==='netstart'){netStart();return}if(ds.a==='netleave'){netLeave();return}if(ds.a==='closepeek'){UI.peek=null;render();return}
+  if(ds.a){if(ds.a==='nethost'){netJoin('host',newCode());return}if(ds.a==='netjoin'){const v=(document.getElementById('joincode')||{}).value;netJoin('client',v);return}if(ds.a==='netstart'){netStart();return}if(ds.a==='netleave'){netLeave();return}
     if(ds.a==='new'&&NET.on){UI.stats=false;if(isHost()){G=null;NET.inLobby=true;netPush(true)}else NET.inLobby=true;render();return}
-    if(ds.a==='new'){UI.info=true;UI.choice=null;render()}else if(ds.a==='rules'){UI.rules=true;render()}else if(ds.a==='closerules'){UI.rules=false;render();schedule()}else if(ds.a==='tour')startTour();else if(ds.a==='speed')setSpeed((UI.speed+1)%3);else if(ds.a==='snd')toggleSound();else if(ds.a==='pause'){UI.paused=!UI.paused;const b=document.getElementById('pausebtn');if(b)b.textContent=UI.paused?'▶ Resume':'⏸';render();schedule()}else if(ds.a==='closestats'){UI.stats=false;render()}else if(ds.a==='hints'){UI.hints=!UI.hints;const b=document.getElementById('hintbtn');if(b)b.textContent='💡 '+(UI.hints?'On':'Off');render()}else if(ds.a==='mus')toggleMusic();return}
+    if(ds.a==='new'){UI.info=true;UI.choice=null;render()}else if(ds.a==='rules'){GX.show('dr-rules')}else if(ds.a==='tour')startTour();else if(ds.a==='speed')setSpeed((UI.speed+1)%3);else if(ds.a==='snd')toggleSound();else if(ds.a==='pause'){UI.paused=!UI.paused;const b=document.getElementById('pausebtn');if(b)b.textContent=UI.paused?'▶ Resume':'⏸';render();schedule()}else if(ds.a==='closestats'){UI.stats=false;render()}else if(ds.a==='hints'){UI.hints=!UI.hints;const b=document.getElementById('hintbtn');if(b)b.textContent='💡 '+(UI.hints?'On':'Off');render()}else if(ds.a==='mus')toggleMusic();return}
   if(t.classList.contains('seat')&&G){seatInfo(+ds.seat);return}
   if(ds.act==='again'&&NET.on){t.dataset.a='new';document.querySelector('[data-a="new"]')&&0;UI.stats=false;if(isHost()){G=null;NET.inLobby=true;netPush(true)}else NET.inLobby=true;render();return}
   uiAct({act:ds.act,die:ds.die,card:ds.card,opt:ds.opt});});
@@ -2467,7 +2690,7 @@ function gameAct(ds,seat){
     case 'end':if(G.phase==='buy')endTurn();break;
     default:if(act&&actionsFor(p).some(a=>a.a===act&&!a.dis))doAct(p,act);
   }}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.rules){UI.rules=false;render();return}
+document.addEventListener('keydown',e=>{
   if(e.target&&/INPUT|TEXTAREA/.test(e.target.tagName))return;
   if(e.key==='p'||e.key==='P'){document.querySelector('[data-a="pause"]')?.click();return}
   if(!G||G.winner||UI.choice||UI.info||UI.rules||!humanTurn())return;const click=sel=>{const b=document.querySelector(sel);if(b&&!b.disabled){b.click();e.preventDefault()}};
@@ -2482,8 +2705,18 @@ function statsHTML(){const rows=G.pl.map(p=>{const s=p.stats||{};return `<tr cla
   <table class="stats"><tr><th>Monster</th><th>Hearts</th><th>Stars</th><th>Claw damage</th><th>K.O.s</th><th>Cards</th><th>Turns in city</th></tr>${rows}</table>
   <div class="acts"><button class="btn primary" data-a="new">Play again</button><button class="btn" data-a="closestats">Look at the city</button></div></div>`}
 try{const sp=localStorage.getItem('ccs_speed');if(sp!==null)setSpeed(+sp)}catch(e){}
-function seatInfo(k){if(!G||UI.info)return;const p=P(k);const hidden=(G.mode==='solo'||G.mode==='net')&&!(NET.on?k===NET.mySeat:p.human);
-  UI.peek={title:mname(p)+(pname(p)?' ('+pname(p)+')':''),text:`${MONS[p.m].d}. ${p.alive?`${p.hp}/${maxhp(p)} hearts, ${p.vp} stars, ${p.en} energy${mbOn()?`, ${p.mb} Mindbug token${p.mb===1?'':'s'}`:''}, in ${where(p.i)}.`:'Knocked out.'} Cards: ${p.cards.length?p.cards.map(c=>CARDS[base(c)].n+' ('+CARDS[base(c)].x+')').join(' · '):'none'}.${p.evo.length?' Evolutions in play: '+p.evo.map(e=>evoName(e)+' ('+evoText(e)+')').join(' · ')+'.':''}${p.hand.length?` ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand${hidden?' (hidden)':': '+p.hand.map(evoName).join(', ')}.`:''}`,options:[],cancel:true};render()}
+function seatInfo(k){if(!G||UI.info)return;renderScore();GX.show('dr-mons');const el=document.getElementById('mon-'+k);if(el){el.scrollIntoView({block:'nearest'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}}
+// ---------- board-first shell: popups for everything that is not "what to do now" ----------
+GX.init({key:'ccs'});
+GX.drawer('dr-market','Power cards for sale',document.getElementById('marketwrap'),true);
+GX.drawer('dr-mine','Your cards',document.getElementById('minewrap'));
+GX.drawer('dr-mons','Monsters',document.getElementById('monswrap'));
+GX.drawer('dr-log','City chronicle',document.getElementById('logwrap'));
+GX.drawer('dr-rules','How to play',document.getElementById('ruleswrap'),true);
+document.getElementById('rulesbody').innerHTML=rulesHTML();
+// reading the rules pauses the computer, as the old rules dialog did
+GX.onShow=id=>{const was=UI.rules;UI.rules=id==='dr-rules';if(was&&!UI.rules&&typeof schedule==='function')schedule()};
+GX.onClose=id=>{if(id==='dr-rules'){UI.rules=false;if(typeof schedule==='function')schedule()}};
 try{init3D()}catch(e){console.warn('3D off',e);V3.on=false;document.body.classList.remove('three')}
 if(typeof soundBtns==='function')soundBtns();
 renderLegend();render();
