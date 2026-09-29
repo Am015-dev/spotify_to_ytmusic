@@ -81,7 +81,7 @@ footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
       <h1>Game Night Shelf</h1>
       <p class="lede">Pick a box and play it here in the browser, against the computer or with friends passing the device. Every game uses original names and art, and the reference lists every card and token.</p>
     </div>
-    <div style="display:grid;gap:8px;justify-items:end"><button type="button" class="btn ref" id="refbtn" data-ref="">📖 Card &amp; token reference</button><div class="tally" id="tally">8 games on the shelf</div></div>
+    <div style="display:grid;gap:8px;justify-items:end"><button type="button" class="btn ref" id="refbtn" data-ref="">📖 Card &amp; token reference</button><div class="tally" id="tally">9 games on the shelf</div></div>
   </header>
 
   <section class="shelf" id="shelf" aria-label="Games"></section>
@@ -129,7 +129,12 @@ const GAMES=[
    blurb:'Draft glazed tiles from the kilns and set them into the Sun King\'s courtyard mosaic. Every pick leaves something for your rivals, and every broken tile costs you.',
    stats:[['2–4','players'],['40','minutes'],['8+','ages'],['100','tiles']],
    chips:['Vs computer · 3 levels','Hot-seat','Guided first game','Unmarked mosaic','Prism tiles'],
-   based:'Plays like Azul (2017)',paint:paintGlaze}
+   based:'Plays like Azul (2017)',paint:paintGlaze},
+  {id:'rampart',name:'Rampart & Vine',src:'rampart-and-vine/index.html',ribbon:'Tile laying',
+   blurb:'Draw a tile, lay it where it fits and grow a sunlit Provence valley of walled towns, roads, rivers and priories. Place followers to claim them, and farmers to profit from the fields.',
+   stats:[['2–6','players'],['45','minutes'],['7+','ages'],['138','tiles']],
+   chips:['Vs computer · 3 levels','Hot-seat','Guided first game','The Riverlands','Taverns & Basilicas','Merchants & Masons'],
+   based:'Plays like Carcassonne (2000)',paint:paintRampart}
 ];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
@@ -239,6 +244,15 @@ function paintOverdrive(c){const x=c.getContext('2d'),w=c.width,h=c.height;
   x.restore();
   /* rain */x.strokeStyle='rgba(170,190,255,.28)';x.lineWidth=1;x.beginPath();for(let i=0;i<160;i++){const px=r()*w,py=r()*h;x.moveTo(px,py);x.lineTo(px-3,py+14)}x.stroke();
   x.fillStyle='rgba(0,0,0,.35)';x.fillRect(0,h*.72,w,h*.28)}
+function paintRampart(c){const x=c.getContext('2d'),w=c.width,h=c.height;let g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#f6d9a2');g.addColorStop(.45,'#e9b983');g.addColorStop(1,'#8aa55a');x.fillStyle=g;x.fillRect(0,0,w,h);
+  x.fillStyle='rgba(255,244,210,.9)';x.beginPath();x.arc(w*.82,h*.2,h*.1,0,7);x.fill();
+  x.fillStyle='#9fb86a';x.beginPath();x.moveTo(0,h*.55);x.quadraticCurveTo(w*.35,h*.42,w*.7,h*.52);x.quadraticCurveTo(w*.85,h*.56,w,h*.5);x.lineTo(w,h);x.lineTo(0,h);x.fill();
+  const r=seed(41);for(let i=0;i<5;i++){x.fillStyle=['#a58bd4','#b99be6','#d8c070'][i%3];const y0=h*(.6+i*.07);x.fillRect(w*(.05+r()*.1),y0,w*(.25+r()*.2),h*.035)}
+  x.fillStyle='#4f9fc4';x.beginPath();x.moveTo(w*.55,h);x.quadraticCurveTo(w*.62,h*.75,w*.78,h*.62);x.lineTo(w*.84,h*.63);x.quadraticCurveTo(w*.7,h*.78,w*.66,h);x.fill();
+  /* walled town on a hill */x.fillStyle='#d9c29a';x.fillRect(w*.3,h*.36,w*.3,h*.14);for(let k=0;k<7;k++){x.fillStyle='#e9d8b4';x.fillRect(w*(.31+k*.04),h*(.28-(k%3)*.03),w*.035,h*.1);x.fillStyle='#c65a33';x.beginPath();x.moveTo(w*(.305+k*.04),h*(.28-(k%3)*.03));x.lineTo(w*(.3275+k*.04),h*(.24-(k%3)*.03));x.lineTo(w*(.35+k*.04),h*(.28-(k%3)*.03));x.fill()}
+  x.fillStyle='#bba27a';for(const tx of [.29,.59])x.fillRect(w*tx,h*.3,w*.03,h*.2);
+  x.fillStyle='#2f4a2a';for(let k=0;k<6;k++){const px=w*(.12+k*.14),py=h*(.5+(k%2)*.04);x.beginPath();x.ellipse(px,py,w*.008,h*.07,0,0,7);x.fill()}
+  x.fillStyle='rgba(0,0,0,.28)';x.fillRect(0,h*.72,w,h*.28)}
 function seed(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
 
 document.getElementById('tally').textContent=GAMES.length+' games on the shelf';
