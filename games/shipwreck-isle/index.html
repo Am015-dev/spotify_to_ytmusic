@@ -91,6 +91,45 @@ table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{border-bottom:1p
 #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:#2a2014;color:#fff4d8;padding:10px 16px;border-radius:10px;z-index:30;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:calc(100% - 32px)}
 #dock{display:none}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* story scenes: a journal page laid over the lower part of the island */
+#story{position:absolute;left:12px;bottom:12px;width:min(580px,calc(100% - 24px));max-height:calc(100% - 110px);overflow:auto;z-index:4;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.55)}
+body.storying .goal{display:none}
+.scene{background:linear-gradient(#f6ecd2,#ead9ae);color:#2a2014;padding:14px 16px 12px;border:1px solid #b99f67;border-radius:14px;animation:pageIn .35s ease-out}
+@keyframes pageIn{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.scene .sk{font:.8rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#8a6a2a}
+.scene h2{font:1.45rem/1.15 var(--title);margin:2px 0 6px;text-wrap:balance}
+.scene .story{font:1.08rem/1.45 var(--serif);font-style:italic;margin:0 0 8px;max-width:62ch}
+.scene.intro .story{font-style:normal;font-size:1.12rem}
+.scard{background:#fffaf0;border:1px solid #c7b183;border-radius:10px;padding:8px 10px;font-size:.9rem;display:grid;gap:4px;margin:6px 0}.scard .bad{color:#9b2f28}
+.goalbox{background:#2a2014;color:#fff4d8;border-radius:10px;padding:8px 10px;margin:6px 0;font-size:.95rem}.goalbox b{color:var(--amber2);margin-right:6px}
+.fore{font-size:.9rem;color:#5b4a2c;margin:4px 0}
+.outs{list-style:none;padding:0;margin:6px 0;display:flex;flex-wrap:wrap;gap:4px}.outs li{font-size:.84rem;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.55);border:1px solid rgba(90,67,32,.18)}
+.outs li.good{background:#e3f0d8;border-color:#9cc28a;color:#244d22}.outs li.bad{background:#f5dcd6;border-color:#d59a8e;color:#7a241d}.outs li.big{font-weight:700}
+.sctl{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}.sctl .btn.ghost{background:transparent;border-color:#b99f67;color:#2a2014}.sctl .btn.on{background:#5a4320;color:#fff4d8}.prog{margin-left:auto;font-size:.8rem;color:#8a6a2a;font-variant-numeric:tabular-nums}
+.bark{margin:6px 0;padding:6px 10px;border-left:4px solid var(--pc);background:rgba(255,255,255,.5);border-radius:0 8px 8px 0;font-size:.95rem}
+.dice3{display:flex;gap:8px;margin:8px 0}.d3{width:74px;height:74px;border-radius:14px;display:grid;place-items:center;align-content:center;gap:2px;border:2px solid;background:#fffaf0;animation:tumble .7s cubic-bezier(.2,.8,.3,1.2) both}.d3 span{font-size:1.6rem;line-height:1}.d3 small{font-size:.66rem;text-align:center;line-height:1.1}
+.d3.good{border-color:#6aa55a;background:#eef6e8}.d3.bad{border-color:#c46a5c;background:#fbeae6}
+@keyframes tumble{0%{transform:translateY(-40px) rotate(-200deg) scale(.5);opacity:0}70%{transform:translateY(4px) rotate(12deg)}100%{transform:none;opacity:1}}
+.qbox{margin-top:8px;padding-top:8px;border-top:1px dashed #b99f67}.qbox h3{font:1.1rem var(--title);margin:0 0 6px}.qwho{display:inline-block;border-left:4px solid var(--pc);padding:0 6px;font-size:.85rem;margin-bottom:4px}
+.why{font-weight:700}
+/* island labels */
+#labels{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+.tl{position:absolute;left:0;top:0;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:1px;padding:3px 7px;border-radius:8px;border:1px solid rgba(0,0,0,.25);background:rgba(255,250,236,.88);color:#2a2014;font:12px/1.15 var(--sans);cursor:pointer;white-space:nowrap;transition:opacity .2s}
+.tl b{font-weight:700;text-transform:capitalize}.tl i{font-style:normal;letter-spacing:1px}.tl u{text-decoration:none}.tl u.gone{opacity:.3;filter:grayscale(1)}.tl em{font-style:normal;font-size:11px;color:#6b4b12}.tl em.camp{color:#2f6d33;font-weight:700}
+.tl.far{background:rgba(20,40,55,.72);color:#dfeaf2;border-color:rgba(255,255,255,.2)}.tl.sel{outline:3px solid var(--amber)}.tl:hover{filter:brightness(1.08)}
+body.storying #labels .tl{pointer-events:none;opacity:.75}
+/* planning table */
+.daycard{background:#2a2014;color:#fff4d8;border-radius:10px;padding:8px 12px;display:grid;gap:2px}.daycard .dk{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--amber2)}.daycard b{font:1.05rem var(--serif)}.daycard .gl{font-size:.85rem;color:#e9dcc0}
+.coach{margin:8px 0;padding:8px 10px;border-radius:10px;background:#fff1cf;border:2px solid #d98a1e;position:relative}.coach .cn{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#9a6a12}.coach p{margin:2px 0 6px}.coach .cb{display:flex;gap:6px}
+.prios{display:grid;gap:6px}.prio{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px;border-radius:10px;background:#fffaf0;border:1px solid #c7b183}.prio .pi{font-size:1.4rem;text-align:center}.prio .pt{display:grid;min-width:0}.prio .pt span{font-size:.82rem;color:#5b4a2c}.prio.done{opacity:.6;background:transparent}.prio.cant .pt span{color:#8a5a2a}.prio small{color:#2f7d3a;font-weight:700}
+.plan{display:grid;gap:4px}.pl{display:grid;grid-template-columns:26px minmax(0,1fr);gap:6px;align-items:start;padding:6px;border-radius:8px;background:rgba(255,236,190,.6)}.pli{font-size:1.1rem;text-align:center}.plp{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:2px;font-size:.84rem}.cost{color:#5b4a2c}
+.cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.cat{display:grid;justify-items:center;gap:1px;padding:8px 4px;border-radius:10px;border:1px solid #c7b183;background:#fffaf0;cursor:pointer;font-size:.8rem;color:#2a2014}.cat span{font-size:1.3rem}.cat small{color:#8a6a2a}.cat.on{background:#5a4320;color:#fff4d8;border-color:#5a4320}.cat.on small{color:#f2d9a8}.cat[aria-disabled]{opacity:.5}
+.catbody{margin-top:6px;padding:6px;border-radius:10px;background:rgba(255,255,255,.45);border:1px solid #c7b183}
+.job{display:flex;gap:8px;align-items:center;padding:6px 4px;border-bottom:1px solid rgba(90,67,32,.12)}.job:last-child{border-bottom:0}.jt{flex:1;min-width:0;display:grid}.jt span{font-size:.8rem;color:#5b4a2c}.jt em{color:#9a5a2a;font-style:normal}.job.no .jt b{opacity:.55}.job.has{background:rgba(255,236,190,.6);border-radius:8px}
+.journal{list-style:none;padding:0;margin:0;display:grid;gap:6px}.journal li{display:grid;gap:2px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.4);font-size:.84rem}.journal li.now{background:#fff1cf;outline:2px solid #d98a1e}.journal span.good{color:#2f6d33}.journal span.bad{color:#9b2f28}
+.waiting{text-align:center;padding:16px 8px}.waiting .big{font-size:2.4rem}
+@media (max-width:560px){#story{position:static;width:auto;max-height:none;margin:8px 0;border-radius:14px}.cats{grid-template-columns:repeat(3,minmax(0,1fr))}.d3{width:62px;height:62px}.tl{font-size:10px;padding:2px 5px}}
 @media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr);padding:8px 16px 90px}#panel{position:static;max-height:none}.pbody{overflow:visible}
   #hud{padding:6px;gap:4px;font-size:.85rem}.hud-r{justify-items:start}#hud{grid-template-columns:1fr}.goal{grid-row:auto}.rtrack span{min-width:19px;height:22px}
   #dock{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:8;gap:8px;align-items:center;padding:8px 16px calc(8px + env(safe-area-inset-bottom,0px));background:rgba(8,17,26,.95);border-top:1px solid var(--line)}#dock span{flex:1;font-size:.82rem;min-width:0}
@@ -113,7 +152,7 @@ table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{border-bottom:1p
 </header>
 <div class="wrap">
   <main class="stage">
-    <div class="view"><canvas id="c3" aria-label="The island, in 3D. Drag to turn it, scroll to zoom, tap a tile to plan there."></canvas><div id="map2d" hidden></div><div id="hud"></div></div>
+    <div class="view"><div id="labels" aria-label="Island tiles"></div><canvas id="c3" aria-label="The island, in 3D. Drag to turn it, scroll to zoom, tap a tile to plan there."></canvas><div id="map2d" hidden></div><div id="hud"></div><div id="story" hidden aria-live="polite"></div></div>
     <div id="step" aria-live="polite"></div>
   </main>
   <aside id="panel"></aside>
@@ -568,11 +607,15 @@ const RULES_HTML=`<h2>How to play</h2>
 // ---------- Shipwreck Isle engine. G is plain JSON; everything that happens runs as frames on G.stk; choices pause on G.q ----------
 var ANIM=1, AIDELAY=500, DEFSEED=null, DEFSCEN='marooned', DEFCHARS=null, LVMIX=null;
 const SAVE='swi_save1';
-let G=null;const UI={fx:[],sel:null,pause:false,speed:1,hints:true,tab:'plan',lastSeat:-1};
+let G=null;const UI={beats:[],shown:-1,fx:[],sel:null,pause:false,speed:1,hints:true,tab:'plan',lastSeat:-1};
 function rnd(n){let t=(G.rng+=0x6D2B79F5);t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return Math.floor(((t^t>>>14)>>>0)/4294967296*n)}
 function setSeed(s){DEFSEED=s>>>0;if(G)G.rng=s>>>0}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
-function lg(t,cls){G.logN=(G.logN||0)+1;G.log.unshift({t,r:G.round,c:cls||''});if(G.log.length>500)G.log.length=500}
+function lg(t,cls){G.logN=(G.logN||0)+1;G.log.unshift({t,r:G.round,c:cls||'',i:G.logN});if(G.log.length>500)G.log.length=500}
+// story beats: scene boundaries the UI plays back one at a time (never part of G, never in simulations)
+function snapG(){return JSON.stringify(G,(k,v)=>k==='log'||k==='stk'?undefined:v)}
+function beat(kind,data){if(UI.sim||typeof document==='undefined')return;const B=UI.beats;const last=B[B.length-1];if(last&&!last.snap)last.snap=snapG();B.push({kind,data:data||{},n0:G.logN||0,round:G.round,phase:G.phase,id:(UI.beatId=(UI.beatId||0)+1)});if(B.length>600){const cut=B.length-600;B.splice(0,cut);UI.shown=Math.max(-1,UI.shown-cut)}}
+function beatSet(o){if(UI.sim||typeof document==='undefined')return;const b=UI.beats[UI.beats.length-1];if(b)Object.assign(b.data,o)}
 function fx(t,x){UI.fx.push({t,x,at:Date.now()+Math.random()});if(UI.fx.length>40)UI.fx.shift()}
 const CARD={};for(const c of [...EVENTS,...WRECKS,...ADVENTURES,...MYSTERIES])CARD[c.k]=c;
 const BEAST={};for(const b of BEASTS){BEAST[b.k]=b}
@@ -608,7 +651,7 @@ function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.ran
   G.beast=shuffle(BEASTS.map(b=>b.k));
   G.discs=shuffle(Object.keys(DISCS).flatMap(k=>Array(DISCS[k].cp).fill(k)));
   const its=shuffle(Object.keys(ITEMS));G.items=its.slice(0,o.items!=null?o.items:2).map(k=>({k,uses:2}));
-  G.first=0;SC().setup&&SC().setup();
+  G.first=0;SC().setup&&SC().setup();UI.beats.length=0;UI.shown=-1;const fl=typeof FLAVOR!=='undefined'&&FLAVOR.scen&&FLAVOR.scen[sk];if(!o.noIntro)(fl&&fl.intro||[S.x]).forEach((p,i,a)=>beat('intro',{page:i,of:a.length,text:p}));
   lg(`Shipwrecked! ${G.chars.map(c=>c.nm).join(', ')}${G.fri?' and Friday':''}${G.dog?' (with the dog)':''} wash up on the beach. Scenario: ${S.n}.`,'big');
   G.stk.push({f:'round'});run();refresh()}
 // ---------- helpers ----------
@@ -836,7 +879,7 @@ FN.mystery=fr=>{const sp=fr.spec;if(fr.stop)return finishMys(fr);
   const k=G.mys.deck.shift();const m=CARD[k];fr.drawn++;
   let ok=(sp[m.type]||0)>(fr.res[m.type]||0);if(!ok&&(m.type==='trap'||m.type==='creature')&&(sp.monOrTrap||0)>(fr.res.monOrTrap||0)){ok=true;fr.res.monOrTrap=(fr.res.monOrTrap||0)+1}else if(ok)fr.res[m.type]=(fr.res[m.type]||0)+1;
   if(!ok){lg(`Mystery: ${m.n} (${m.type}) is put back.`);fr.back=(fr.back||[]).concat(k);push(fr);return}
-  lg(`Mystery: ${m.n} (${m.type}).`,m.type==='treasure'?'good':'bad');fx('mystery');
+  beat('mystery',{card:k});lg(`Mystery: ${m.n} (${m.type}).`,m.type==='treasure'?'good':'bad');fx('mystery');
   if(m.type==='treasure')fr.got.push(k);
   if(m.stop)fr.stop=1;
   const ctx=Object.assign({},fr.ctx,{card:k});push(fr);
@@ -845,7 +888,7 @@ FN.mystery=fr=>{const sp=fr.spec;if(fr.stop)return finishMys(fr);
 function finishMys(fr){if(fr.back){G.mys.deck.push(...fr.back);shuffle(G.mys.deck)}if(G.mysLost){G.mysLost=0;for(const k of fr.got){if(G.kept[k]){delete G.kept[k];lg(`${cname(k)} falls through the trapdoor.`,'bad')}}}}
 // ---------- beast fights ----------
 FN.fight=fr=>{const b=fr.beast;const c=fr.who>=0?P(fr.who):null;
-  if(fr.str==null){fr.str=(b.str||0)+(fr.hunted?G.beastStr:0);if(fr.hunted)G.beastStr=0;G.stats.fights++;fr.boost=0}
+  if(fr.str==null){beat('fight',{beast:b.k||null,name:b.n,who:fr.who,hunted:!!fr.hunted});fr.str=(b.str||0)+(fr.hunted?G.beastStr:0);if(fr.hunted)G.beastStr=0;G.stats.fights++;fr.boost=0}
   const base={beast:b,who:fr.who,ctx:fr.ctx,str:fr.str,boost:fr.boost};
   // temporary weapon boosts the fighter may use once the beast is known
   const boosts=boostOpts(c);const short=fr.str-(G.weapon+fr.boost);
@@ -875,7 +918,7 @@ const SPEC=k=>(SC().specials||{})[k];
 // dice colour an action rolls with (a scenario action borrows the explore dice)
 function dtype(a){return a.type==='special'?(SPEC(a.tgt).dice||null):a.type}
 FR.round=fr=>{push({f:'fn',k:'startRound'},{f:'fn',k:'event'},{f:'fn',k:'morale'},{f:'fn',k:'prod'},{f:'fn',k:'plan'})};
-FN.startRound=fr=>{G.phase='start';G.noMix=false;G.prod={};G.itemsAway=0;G.plan={acts:[],nextId:1,extraBuild:0,thrifty:null,hands:0,used:{}};G.wxEarly=null;
+FN.startRound=fr=>{G.phase='start';beat('dawn',{round:G.round});G.noMix=false;G.prod={};G.itemsAway=0;G.plan={acts:[],nextId:1,extraBuild:0,thrifty:null,hands:0,used:{}};G.wxEarly=null;
   for(const c of G.chars){c.used={};c.only=null;c.noSkills=false;c.pawnMinus=c.pmNext||0;c.pmNext=0;c.rrNow=c.rr||c.rrNext;c.rrNext=0}
   lg(`— Round ${G.round} of ${G.rounds} —`,'round');fx('round');
   // characters who spent the night in the wild come back
@@ -883,7 +926,7 @@ FN.startRound=fr=>{G.phase='start';G.noMix=false;G.prod={};G.itemsAway=0;G.plan=
   if(G.ev.wait){const k=G.ev.wait;G.ev.wait=null;lg(`The waiting ${cname(k)} attacks before dawn!`,'bad');push({f:'fn',k:'fight',beast:Object.assign({},BEAST[k]),who:G.first,ctx:{}})}
   SC().roundStart&&SC().roundStart()};
 FN.event=fr=>{G.phase='event';if(G.round===1)return;drawEvent()};
-function drawEvent(){if(!G.ev.deck.length){lg('The event deck is empty.');return}const k=G.ev.deck.shift();const c=CARD[k];
+function drawEvent(){if(!G.ev.deck.length){lg('The event deck is empty.');return}const k=G.ev.deck.shift();const c=CARD[k];beat('event',{card:k,late:!!(c.deck||c.type)});
   if(c.deck||c.type){ // an adventure or mystery card shuffled in earlier: resolve its event half, then draw again
     lg(`Event: ${c.ev.n} (from ${c.n}).`,'bad');fx('event',k);G.ev.disc.push(k);push({f:'fn',k:'drawEvent'});ops(c.ev.ops,{actor:G.first,card:k,half:'ev'});return}
   lg(`Event: ${c.n}.`,'big');fx('event',k);G.lastEvent=k;
@@ -893,8 +936,8 @@ function drawEvent(){if(!G.ev.deck.length){lg('The event deck is empty.');return
   else if(['build','gather','explore'].includes(c.icon)){G.tok[c.icon].adv=1;lg(`A "?" marker goes on the ${TNAME[c.icon].toLowerCase()} action.`)}}
 FN.drawEvent=fr=>drawEvent();
 FN.placeThreat=fr=>{const old=G.ev.threat[0];G.ev.threat[0]=G.ev.threat[1];G.ev.threat[1]=fr.card;
-  if(old){lg(`${cname(old)} was never dealt with: ${CARD[old].th.n.toLowerCase()} is too late.`,'bad');G.ev.disc.push(old);ops(CARD[old].te,{actor:G.first,card:old,half:'te',pay:living().map(c=>c.i)})}};
-FN.morale=fr=>{G.phase='morale';const c=firstC();const m=G.morale;
+  if(old){beat('threat',{card:old});lg(`${cname(old)} was never dealt with: ${CARD[old].th.n.toLowerCase()} is too late.`,'bad');G.ev.disc.push(old);ops(CARD[old].te,{actor:G.first,card:old,half:'te',pay:living().map(c=>c.i)})}};
+FN.morale=fr=>{G.phase='morale';beat('morning');const c=firstC();const m=G.morale;
   if(G.chars.length===1&&m<3)morale(1);const mm=G.morale;
   if(mm<0)loseDet(c,-mm,'low morale');else if(mm===1||mm===2)gainDet(c,mm);else if(mm===3){if(c.w&&(!c.human||true)){const o=[{l:'Gain 2 determination',ops:[['det','first',2]]},{l:'Heal 1 wound',ops:[['heal','first',1]]}];ask(c.i,'Morale is high!',o,{kind:'morale'})}else gainDet(c,2)}
   if(has('diary'))gainDet(c,1);if(has('drums'))gainDet(c,2)};
@@ -905,7 +948,7 @@ FN.prod=fr=>{G.phase='prod';const t=campTile();const m=G.map[G.camp.pos];if(G.pr
   if(G.prod.nofood)food=0;if(G.prod.nowood)wd=0;if(G.prod.plusWoodNoFood){wd++;food=0}if(G.prod.minusFood)food=Math.max(0,food-1);if(G.prod.half){food=Math.floor(food/2);wd=Math.floor(wd/2)}
   if(has('pit')){const f=DICE['build-wound'][rnd(6)];if(f==='wound'){food+=2;lg('The pit traps something: +2 food.','good')}}
   lg(`Production: +${food} food, +${wd} wood.`);G.res.food+=food;G.res.wood+=wd;fx('res','food')};
-FN.plan=fr=>{G.phase='plan';if(G.items.some(i=>i.k==='stormglass'&&i.uses>0)&&false){}
+FN.plan=fr=>{G.phase='plan';beat('plan');if(G.items.some(i=>i.k==='stormglass'&&i.uses>0)&&false){}
   lg('Plan the day: place every pawn on an action.','step');SC().prePlan&&SC().prePlan()};
 // ---------- planning: actions and pawns ----------
 function pawnsOf(c){if(c.npc)return c.dead?0:1;return c.dead||c.out?0:Math.max(1,2-(c.pawnMinus||0))}
@@ -989,12 +1032,12 @@ function pawnWhy(pid,a){const p=pawnInfo(pid);if(!p)return 'no such pawn';if(pla
 // ---------- plan moves (validated) ----------
 function addAct(type,tgt,alt,pay){const a={id:G.plan.nextId++,type,tgt,alt:alt||0,pw:[],pay:pay||'wood'};G.plan.acts.push(a);return a}
 // ---------- resolving the actions ----------
-FN.go=fr=>{G.phase='act';lg('The castaways set off.','step');
+FN.go=fr=>{G.phase='act';beat('go');lg('The castaways set off.','step');
   const order=[];for(const t of ['threat','hunt','build','gather','explore','special','tmap','camp','rest'])for(const a of G.plan.acts)if(a.type===t)order.push(a.id);
   push(...order.map(id=>({f:'fn',k:'resolve',id})),{f:'fn',k:'endActions'},{f:'fn',k:'weather'},{f:'fn',k:'night'},{f:'fn',k:'endRound'})};
 function actLeader(a){const ps=a.pw.map(pawnInfo).filter(Boolean);const l=ps.find(p=>p.c!=null);return l?l.c:(ps.find(p=>p.f)?-1:G.first)}
 FN.resolve=fr=>{const a=G.plan.acts.find(x=>x.id===fr.id);if(!a)return;const actor=actLeader(a);const ctx={actor,fut:true,act:a.id,pay:actor>=0?[actor]:[]};
-  const c=actor>=0?P(actor):null;if(c&&c.dead)return;a.done=true;
+  const c=actor>=0?P(actor):null;if(c&&c.dead)return;a.done=true;beat('act',{id:a.id,type:a.type,tgt:a.tgt,label:actLabel(a),actor,pw:a.pw.slice(),pos:a.type==='gather'?a.tgt.pos:a.type==='explore'?a.tgt:a.type==='build'&&a.tgt.k==='cross'?a.tgt.cross:a.type==='special'&&SPEC(a.tgt).pos?SPEC(a.tgt).pos():null});
   // danger markers: a tile with a danger token hurts anyone acting there with no weapon
   const pos=a.type==='gather'?a.tgt.pos:a.type==='explore'?a.tgt:null;
   if(pos!=null&&G.map[pos].tok.beast&&G.weapon<1&&c)wound(c,1,'danger on that tile');
@@ -1018,7 +1061,7 @@ function rollDice(type){return {w:DICE[type+'-wound'][rnd(6)]==='wound',s:DICE[t
 FN.afterRoll=fr=>{const a=G.plan.acts.find(x=>x.id===fr.id);const d=fr.d;const c=fr.actor>=0?P(fr.actor):null;
   // forced reroll of a success (marker on the action space, or a curse on the character)
   const dt=dtype(a);if(d.s&&!fr.forced&&(G.tok[dt].reroll||(c&&c.rrNow))){fr.forced=1;if(G.tok[dt].reroll)delete G.tok[dt].reroll;const s2=DICE[dt+'-success'][rnd(6)]==='success';lg(`A forced reroll of the success die: ${s2?'still a success':'now a failure'}.`,s2?'':'bad');d.s=s2}
-  G.lastRoll={type:dt,d:Object.assign({},d),who:fr.actor,id:(G.lastRoll?G.lastRoll.id:0)+1};fx('dice',a.type);
+  beatSet({dice:Object.assign({},d),dtype:dt});G.lastRoll={type:dt,d:Object.assign({},d),who:fr.actor,id:(G.lastRoll?G.lastRoll.id:0)+1};fx('dice',a.type);
   lg(`${c?c.nm:'Friday'} rolls for ${actLabel(a).toLowerCase()}: ${d.w?'a wound':'no wound'}, ${d.s?'success':'failure'}, ${d.q?'an adventure':'no adventure'}.`);
   // rerolls from skills (once each)
   const opts=[];const sk=c&&!c.noSkills?CHARS[c.k].skills.find(s=>s.reroll===dt):null;
@@ -1059,7 +1102,7 @@ function exploreTile(pos,ctx){const no=G.tileDeck.shift();if(no==null)return;con
   for(let i=0;i<t.disc;i++)drawDisc(ctx);
   if(t.totem)SC().totem&&SC().totem(pos,ctx)}
 FN.adventure=fr=>{const deck=fr.deck;if(!G.adv[deck].length){G.adv[deck]=shuffle(G.advDisc.filter(k=>CARD[k].deck===deck));G.advDisc=G.advDisc.filter(k=>CARD[k].deck!==deck)}const k=G.adv[deck].shift();if(!k)return;const c=CARD[k];
-  lg(`Adventure: ${c.n}.`,'big');fx('adventure',k);G.lastAdv=k;const ctx=Object.assign({},fr.ctx,{card:k});
+  beat('adventure',{card:k,deck});lg(`Adventure: ${c.n}.`,'big');fx('adventure',k);G.lastAdv=k;const ctx=Object.assign({},fr.ctx,{card:k});
   if(c.decide){ask(ctx.actor>=0?ctx.actor:'team',`Adventure: ${c.n}`,[{l:advDecideLabel(c,0),ops:c.decide[0],ctx,frames:[{f:'fn',k:'advDiscard',card:k}]},{l:advDecideLabel(c,1),ops:c.decide[1],ctx,frames:[{f:'fn',k:'advShuffle',card:k}]}],{kind:'adv',card:k,force:1});return}
   if(c.shuffle)push({f:'fn',k:'advShuffle',card:k});else push({f:'fn',k:'advDiscard',card:k});ops(c.ops,ctx)};
 function advDecideLabel(c,i){const o=c.decide[i];if(i===0)return o.length?`${opsText(o)} (then the card is gone)`:'Leave it (discard the card)';return `${opsText(o)||'Keep it'} (the card goes into the event deck: “${c.ev.n}” may strike later)`}
@@ -1072,7 +1115,7 @@ FN.endActions=fr=>{for(const r of RES){if(G.fut[r]){G.res[r]+=G.fut[r];G.fut[r]=
   for(const a of G.plan.acts){if(a.pw.includes('hammer')){const it=G.items.find(i=>i.k==='hammer');if(it)it.uses--}}
   G.items=G.items.filter(i=>i.uses>0);G.plan.acts.forEach(a=>a.done=true);G.phase='actdone';SC().afterActions&&SC().afterActions()};
 // ---------- weather ----------
-FN.weather=fr=>{G.phase='weather';const S=SCENARIOS[G.scen];const dice=(S.wx[G.round]||[]).slice();if(G.wx.animals)dice.push('animals');
+FN.weather=fr=>{G.phase='weather';beat('weather');const S=SCENARIOS[G.scen];const dice=(S.wx[G.round]||[]).slice();if(G.wx.animals)dice.push('animals');
   let rain=G.wx.rain,snow=G.wx.snow;const out=[];const roll=G.wxEarly||{};
   for(const d of new Set(dice)){if(d==='rain'){const f=roll.rain||DICE['weather-rain'][rnd(6)];out.push('rain die: '+f);if(f==='1 rain')rain++;else if(f==='2 rain')rain+=2;else snow++}
     if(d==='snow'){const f=roll.snow||DICE['weather-winter'][rnd(6)];out.push('winter die: '+f);if(f==='1 snow')snow++;else if(f==='2 snow')snow+=2;else rain+=2}
@@ -1102,7 +1145,7 @@ FN.weather2=fr=>{const w=G.wxNow;
   const wf=(SCENARIOS[G.scen].wxFood||{})[G.round];if(wf){lg(`Lean season: ${wf} food must be discarded.`,'bad');const m=pay('food',wf,living(),true);if(m)for(const c of living())wound(c,m,'the lean season')}
   G.wx={rain:0,snow:0,storm:0,animals:0};SC().afterWeather&&SC().afterWeather()};
 // ---------- night ----------
-FN.night=fr=>{G.phase='night';lg('Night falls.','step');fx('night');const eaters=living().filter(c=>!c.out);
+FN.night=fr=>{G.phase='night';beat('night');lg('Night falls.','step');fx('night');const eaters=living().filter(c=>!c.out);
   const need=eaters.length;const have=G.res.food+G.res.pfood;
   if(have>=need){pay('food',need,[],true);lg(`Everyone eats (${need} food).`)}else{const hungry=need-have;pay('food',have,[],true);
     const o=eaters.slice().sort((a,b)=>(CHARS[b.k].die-b.w)-(CHARS[a.k].die-a.w));const starve=o.slice(0,hungry);
@@ -1432,7 +1475,7 @@ function aiPrePlan(forChars){for(let i=G.own.length-1;i>=0;i--){const k=G.own[i]
 // ---------- driving the computer ----------
 let aiTimer=null;
 function allAI(){return !G.chars.some(c=>c.human&&!c.dead)}
-function schedule(){if(aiTimer||!G||G.over||UI.pause)return;if(G.q)return;if(G.phase!=='plan')return;
+function schedule(){if(aiTimer||!G||G.over||UI.pause)return;if(G.q)return;if(typeof storyActive==='function'&&storyActive())return;if(G.phase!=='plan')return;
   const ai=G.chars.filter(c=>!c.human&&!c.dead&&!c.npc).map(c=>c.i);const need=ai.filter(i=>allPawns().some(p=>p.c===i&&!placedIds().has(p.id)));
   if(need.length||allAI()){aiTimer=setTimeout(()=>{aiTimer=null;aiStep()},Math.max(0,AIDELAY/(UI.speed||1)))}}
 function aiStep(){if(!G||G.over||!planOpen())return;const ai=G.chars.filter(c=>!c.human&&!c.dead).map(c=>c.i);
@@ -1463,6 +1506,482 @@ function aiPlanBest(forChars){if(UI.sim||AIPLANS<=1)return aiPlan(forChars);cons
     let t=0;for(let k=0;k<AISIMS;k++)t+=simOnce(js,(G.seed*31+G.round*977+k*7919)>>>0);if(t/AISIMS>bs){bs=t/AISIMS;best=js}}}
   finally{UI.sim=0;AIW.noise=0;UI.fx.length=Math.min(UI.fx.length,fxn)}
   if(best){G=JSON.parse(best)}else{G=JSON.parse(base);aiPlan(forChars)}}
+
+</script>
+<script>
+// ---------- story text: the castaways' journal. Original writing; one short beat per string. ----------
+const FLAVOR={
+ ev:{
+  bicker:{s:'Someone ate the last crab claw. Nobody will admit it. Today everyone insists on working alone.',t:'We sit in a circle and air it all out. The crab claw is forgiven.',x:'The sulking lingers. Nobody quite believes in anybody today.'},
+  grimskies:{s:'The sky turns the colour of old porridge. Rain is coming, and it looks personal.',t:'We lash branches into a windbreak. The wind grumbles and goes round.',x:'The wind swings north and the rain turns to sleet. We should have listened.'},
+  hunch:{s:'Something feels off about the woods today. Our hands hesitate over every basket.',t:'We laugh at our own nerves and get on with it.',x:'The hunch grows into a dread. Every bush looks like trouble now.'},
+  bear:{s:'Great claw marks on the tree by camp. Something big has been poking round our things.',t:'We dig a deep pit and cover it with fronds. Let it come.',x:'The bear raids us in the night. We wake to wreckage and sore spirits.'},
+  ashore:{s:'The tide brings a stranger in, long past helping. It shakes all of us.',t:'We dig a grave above the tideline and say a few kind words.',x:'We leave the stranger where he lies. None of us can look at the beach.'},
+  snapped:{s:'A rotten trunk groans and topples across camp. We all get clipped scrambling clear.',t:'We rope the trunk and haul it off. Good timber, as it turns out.',x:'The dead tree stays across the path, a daily reminder of our bruises.'},
+  jungle:{s:'The jungle roars all night. The beasts out there are hungry and bold.',t:'We bang pots and wave spears until the roaring retreats. One leaves supper behind.',x:'Nobody answers the jungle’s challenge. The beasts grow bolder still.'},
+  scatter:{s:'A gust flings our gear across the clearing. We can’t find a thing today.',t:'We comb the undergrowth and bring every tool home.',x:'Some of our gear is simply gone. The island keeps it.'},
+  weary:{s:'Our bones ache from dawn. Tired bodies burn through food faster.',t:'We pace ourselves and take proper breaks. It pays off.',x:'We push through the tiredness and pay for it in pulled muscles.'},
+  downpour:{s:'The sky opens and a river runs straight through camp. We have to move.',t:'We rebuild at the new site, board by stubborn board.',x:'We make do in the new spot, grumbling.'},
+  chillrain:{s:'A cold, needling rain sets in. Everything we own is damp.',t:'We dig a drain round the camp and the puddles slink away.',x:'The drizzle never lets up. More rain rolls in behind it.'},
+  council:{s:'The camp meeting turns loud. Half our clever plans get thrown out.',t:'We shake hands on one good idea and write it down.',x:'Still arguing. More ideas end up in the fire.'},
+  stripped:{s:'Something has eaten its way through our hunting grounds. The game has fled.',t:'We follow fresh tracks further out and come back with meat.',x:'We tighten our belts and wait for the game to return.'},
+  eyesdark:{s:'Two green eyes watch us from beyond the firelight. They will be back.',t:'We drag a bloody hide into the jungle and lead the beast away.',x:'We leave the watcher be, and it waits for us.'},
+  gloom:{s:'A grey mood settles over camp. Plans feel pointless and hands feel heavy.',t:'We share a proper meal and someone starts to hum.',x:'The gloom thickens. Even the Cook stops making jokes.'},
+  heartless:{s:'Our leader wakes up without a plan. Someone else must step up today.',t:'A little food and a lot of encouragement and we’re back on our feet.',x:'Nobody steps up. The whole camp droops.'},
+  trampled:{s:'Something huge has stampeded through the groves by camp. Nothing is left.',t:'We replant the torn shoots. The groves will come back.',x:'The bare earth stays bare. Another grove is lost.'},
+  campcollapse:{s:'A crack, a groan, and part of our camp comes down around our ears.',t:'We prop it all back up with fresh timber, stronger than before.',x:'Nobody fixes it, and half of what we built just slumps away.'},
+  dryriver:{s:'The river shrinks to a trickle and then to cracked mud.',t:'We dig in the riverbed until cool water seeps up.',x:'The drought spreads. Another stretch of river runs dry.'},
+  tremor:{s:'The ground shudders. Rocks tumble and block the way to a nearby valley.',t:'We shovel through the rubble and reopen the path.',x:'The rubble stays. We find other paths.'},
+  restless:{s:'Nobody slept. Hammers slip and joints come out crooked.',t:'An early night and an afternoon nap work wonders.',x:'Another sleepless night. We are all snapping at each other.'},
+  scuffle:{s:'Crashes in the dark. Something has been fighting over our hunting grounds.',t:'We keep watch with spears, and the night passes quietly.',x:'The beasts grow restless and hungry. We will hear them tonight.'},
+  tempers:{s:'An argument over firewood turns to shoving. Everyone ends up bruised.',t:'We cool off in the sea and apologise, dripping.',x:'The quarrel festers. Nobody feels like trying today.'},
+  brushfire:{s:'Smoke! A brushfire races through the trees we cut our wood from.',t:'We dig a firebreak and the flames die out at its edge.',x:'The fire smoulders on, and the woods keep burning.'},
+  flashflood:{s:'A wall of brown water crashes through camp. We have to choose what to save.',t:'We carve a channel and send the flood off to the sea.',x:'The water chews at the base of our wall until it sags.'},
+  swoop:{s:'A flock of angry birds dive-bombs the camp, tearing at thatch and stakes.',t:'We net their nest and move it somewhere far more scenic.',x:'The birds are back, pecking our camp to pieces.'},
+  muddy:{s:'Everywhere is ankle-deep mud. Every trip to the woods takes twice as long.',t:'We lay planks over the worst of it. Clean feet at last.',x:'The mud spreads. Our favourite spots nearby are trampled to sludge.'},
+  earlyfrost:{s:'We wake to frost on the fronds. The cold has arrived early.',t:'We stuff the walls with dry grass and hides. Snug as mice.',x:'We shiver through it. More snow is on the way.'},
+  heavyskies:{s:'Black clouds pile up over the peaks. A soaking is coming.',t:'We stretch a hide tarp over our stores. Let it pour.',x:'No cover goes up, and the next cloud follows the last.'},
+  rainway:{s:'The birds have gone quiet. That means rain, and plenty of it.',t:'We dig channels round camp to carry the water away.',x:'The rain arrives exactly as promised, and brings a friend.'},
+  pouring:{s:'Rain drums on the roof, then drips through it, then pours.',t:'We patch the roof with fresh boards and stay dry.',x:'The leaks win. Another cloudburst finds its way in.'},
+  risingwater:{s:'The sea creeps higher every hour. Paths inland are turning treacherous.',t:'We build a levee and the water stops at our feet.',x:'The sea sweeps into camp and carries off our stores.'},
+  howls:{s:'Howls in the treetops. Something big has moved into our hunting grounds.',t:'With torches blazing, we steer the hunt away from the worst of it.',x:'The howler comes to us. Our leader must face it.'},
+  spotted:{s:'A spotted cat drops out of a tree and slashes at anyone within reach.',t:'We drive it off with spears and stones.',x:'The cat returns for another go at us.'},
+  mudslide:{s:'The hillside gives way and a river of mud swallows our camp. We move.',t:'We dig a clear path to the new site.',x:'The mud buries our food and wood stores. Nothing grows this round.'},
+  hopeless:{s:'Our leader stares at the sea all morning. They will only potter about camp today.',t:'We point out every small win so far. Hope flickers back.',x:'The despair spreads to all of us.'},
+  voyage:{s:'Someone mentions the ship’s cook’s puddings. Suddenly everyone is homesick.',t:'We tell the best stories from the voyage and laugh until we cry.',x:'The homesickness lingers like a cold.'},
+  messy:{s:'Camp is a disaster of fish bones and wood shavings. Nothing can be found.',t:'We tidy up and sort everything into neat piles.',x:'The mess gets worse, and so do our moods.'},
+  mist:{s:'A thick white mist rolls in. We can barely see our own feet.',t:'We sit tight until it lifts, playing pebble games.',x:'The mist hangs on, and exploring becomes guesswork.'},
+  burstdam:{s:'A natural dam upstream gives way. Driftwood tumbles down; the fish are gone.',t:'We pile rocks and logs until the river calms.',x:'The flood tears through camp and carries off our gear.'},
+  nightraid:{s:'Beasts rush the camp in the dark! Everyone is scratched before we drive them off.',t:'We lie in wait and bring down the leader of the raid.',x:'The raiders scatter into the hills, taking the easy game with them.'},
+  howlnight:{s:'All night the howling circles camp. The beasts out there are getting braver.',t:'We take turns on watch and nothing gets past us.',x:'The beasts test our walls, and a section gives way.'},
+  otters:{s:'Otters! Sleek little thieves have raided our fishing spot.',t:'We chase the otters downstream, splashing and shouting.',x:'The otters come back for seconds.'},
+  badwater:{s:'The water tastes of rust and rot. By noon we all have cramps.',t:'We boil every drop, and whittle a spear while we wait.',x:'We keep drinking it anyway. More cramps.'},
+  cliff:{s:'A ledge crumbles away, cutting off the route to a nearby tile.',t:'We build a rope-and-plank bridge. It’s the proudest thing we’ve made.',x:'The gap stays. We go the long way round.'},
+  stalks:{s:'Fresh prints circle the camp. Something is watching and waiting.',t:'We ring the camp with snares and hear nothing more.',x:'The stalker is hungry and it knows where we sleep.'},
+  hawk:{s:'A hawk has claimed the parrot roost nearest camp. The parrots are gone.',t:'We wave, whoop and throw stones until the hawk leaves.',x:'The hawk scares everything off. The woods feel strange.'},
+  nearby:{s:'Paw prints on every path. Exploring without a weapon now is asking for trouble.',t:'We sweep the woods with spears and flush the predators out.',x:'The predators pick us off before they finally move on.'},
+  pack:{s:'A pack of hunters has claimed our closest hunting ground.',t:'We fight the pack together and win our ground back.',x:'The pack strikes again at another of our food sources.'},
+  swollen:{s:'The river bursts its banks and floods half our fields.',t:'We dig a bypass and the fields drain.',x:'The river swallows our harvest whole.'},
+  drizzle:{s:'A fine, endless drizzle begins. It gets into everything.',t:'We stretch a hide over the stores. Dry socks for once.',x:'The drizzle turns into proper rain.'},
+  starving:{s:'The beasts are starving and it makes them fierce.',t:'We ring the camp with fire. No starving beast will cross it.',x:'A starving beast smashes through our wall.'},
+  hurricane:{s:'Hurricane winds flatten the land next to camp. Every tree is down.',t:'We clear the debris and the land breathes again.',x:'The flattened land will take its time to recover.'},
+  gale:{s:'A howling gale snaps our spears and blows our bows away.',t:'We hunt through the bushes and rescue what weapons we can.',x:'We let the weapons lie where the wind flung them.'},
+  rockfall:{s:'Boulders tumble down the hills and block the passes.',t:'We roll the rocks aside and clear the pass.',x:'More rocks come down. The hills are closed to us.'},
+  losttrail:{s:'The paths we marked have vanished overnight. Where did we go yesterday?',t:'We blaze the trees with bright notches.',x:'Lost and grumpy, we stumble into strange places.'},
+  sleepless:{s:'A night of buzzing insects. Nobody’s hands are steady today.',t:'A long nap in the shade restores our wits.',x:'Groggy and careless, we wander where we shouldn’t.'},
+  sluggish:{s:'Our tools are blunt and our arms are slow. Building eats more wood.',t:'We sharpen every blade on a flat stone.',x:'Blunt tools, wasted wood, another sluggish day.'},
+  smoke:{s:'A column of smoke rises beyond the plains. Nobody wants to walk that way.',t:'We creep over for a look. Just a lightning fire. The plains are safe.',x:'The smoke keeps rising, and the plains stay off-limits.'},
+  battered:{s:'The storm tears at our camp all night. Half our work is in tatters.',t:'We mend every lashing and nail every board back in place.',x:'Nobody mends it, and the next gust takes more.'},
+  squall:{s:'A squall barrels in off the sea, black and furious.',t:'We batten down everything that moves.',x:'The squall kicks our wall in.'},
+  twist:{s:'Everything happens at once. Our troubles all come due together.',t:'We shrug, laugh, and take what comes. Hardship makes us tougher.',x:'The upheaval leaves us drained.'},
+  howlwind:{s:'A fierce wind makes every build a wrestling match.',t:'We tie everything down with rope and knots.',x:'The wind snatches away some of our gear.'},
+  sunny:{s:'A perfect sunny morning. The sea sparkles and nothing is on fire.',t:'We take the day off to swim and bask. Pure joy.',x:'We’re too busy to enjoy it. The sun sets on grumpy faces.'},
+  borers:{s:'Tiny borers are chewing through our woodpile.',t:'We smoke them out with a smouldering fire.',x:'The borers feast on another log.'},
+  strikes:{s:'The island seems to rise against us. Its oldest trouble wakes.',t:'We hold our nerve and weather it together.',x:'The island strikes again, harder.'},
+  lightning:{s:'Lightning splits the forest nearest camp. The trees burn black.',t:'We clear the burnt timber and new shoots spring up.',x:'Another strike hits another grove.'},
+  bitter:{s:'The coldest night yet. We burn our wood or we freeze.',t:'We stack a great pile of fuel for tomorrow.',x:'We shiver until dawn, frostbitten and sore.'},
+  dizzy:{s:'Our leader wakes up dizzy and can only manage half a day.',t:'We make them lie down in the shade with coconut water.',x:'The dizziness spreads. Nobody is at their best.'},
+  feeble:{s:'Our leader wakes up weak as a kitten. Their special tricks are beyond them today.',t:'Stretching, good food, and they’re stronger by the hour.',x:'The weakness hangs on another day.'},
+  winterblues:{s:'Short days and cold nights. The camp is sinking into the winter blues.',t:'A hot supper round the fire brings the smiles back.',x:'The blues deepen. Everyone’s spirit dims.'},
+  balloon:{s:'A torn balloon hangs in a tree, its basket empty. Poor souls.',t:'We search the basket and find something useful inside.',x:'We leave the basket swinging in the tree.'},
+  crates:{s:'Wooden crates bob in the surf, stamped with the ship’s mark.',t:'We wade out and drag them ashore. Food!',x:'The crates drift off with the tide.'},
+  seachest:{s:'A sea chest floats just past the breakers.',t:'We swim out and haul it in. Timber, and maybe a treasure.',x:'The chest bobs away out of reach.'},
+  dinghy:{s:'Our smashed dinghy lies on the rocks. There’s good timber in her yet.',t:'We break her up and carry the boards home.',x:'The waves finish off the dinghy for us.'}
+ },
+ adv:{
+  b_slip:{s:'The hammer slips and lands squarely on the Carpenter’s shin. Ouch.',e:'The leg wound starts to fester. Without medicine it gets ugly.'},
+  b_breakdown:{s:'Halfway through the build, someone just sits down and cries.',e:'A good night’s sleep, and our leader wakes full of fire.'},
+  b_lever:{s:'Our best spear cracks while we use it as a lever.'},
+  b_tool:{s:'Snap! A tool breaks in half mid-swing.'},
+  b_terms:{s:'We admit some plans just won’t work here. They go on the fire.',e:'We stare at the blank sketch-bark. Out of ideas, out of heart.'},
+  b_construct:{s:'The joints fit perfectly. This build feels properly solid.',e:'Our careful work pays off: the walls stand even stronger.'},
+  b_cuthead:{s:'A beam swings round and cracks someone on the head. They see stars, and also an idea.',e:'The headache returns with a vengeance.'},
+  b_dangerous:{s:'This build is risky. Every beam feels ready to fall.'},
+  b_darkclouds:{s:'Dark clouds roll in as we work. Rain is coming.',e:'After the rain, the wet earth packs hard round our stakes.'},
+  b_fast:{s:'Our hands fly today. We could squeeze in one more build.',e:'We rushed it. Something we built comes loose.'},
+  b_fear:{s:'Roars from the jungle. We need bigger, heavier weapons.',e:'Our new weapon designs are hefty, and hungry for timber.'},
+  b_hard:{s:'Back-breaking work. We eat more than we’d planned.'},
+  b_howl:{s:'The bushes by the build site rustle. We keep one eye on them.',e:'It pounces! A beast bursts out of the bushes.'},
+  b_hungry:{s:'A hungry beast noses into the site. Fight it, or feed it and hope?',e:'The hungry visitor returns, and this time it wants more.'},
+  b_hurry:{s:'We could rush this and find treasures in the scrap pile.',e:'A crack runs through the wall we built in a hurry.'},
+  b_laborious:{s:'Every board fights back. This will take longer than planned.'},
+  b_nohope:{s:'Our grand designs crumble. We scrap a pile of ideas.'},
+  b_monkey:{s:'Monkeys watch us build, heads tilted. They look far too interested.',e:'The monkeys return and take our camp apart, piece by piece.'},
+  b_nasty:{s:'A splinter tears a deep gash in an arm.',e:'The gash turns red and angry. Medicine, please.'},
+  b_campbeast:{s:'A beast strolls right into camp. Nothing for it but to fight!',e:'We skin and salt what’s left of the beast. A fine store of meat and hide.'},
+  b_savings:{s:'We have timber left over. Keep it, and hope the build holds?',e:'The corners we cut make the building wobble. Spirits sag.'},
+  b_sting:{s:'A wasp stings someone right in the belly.',e:'The sting brings on the shakes. Without medicine, a half-day lost.'},
+  b_tired:{s:'We’re worn out. Take a rest now and pay for it later?',e:'The lazy afternoon leads to a squabble.'},
+  b_inspect:{s:'We check our tools. A couple look close to giving out.',e:'Snap, clunk. The tools we worried about finally break.'},
+  b_unmotivated:{s:'No energy at all. Push through the pain, or give up for the day?',e:'The tools feel dull in our hands. So do we.'},
+  b_visit:{s:'A sly predator snatches some food while we hammer away.',e:'The prowler comes back at night, hungrier.'},
+  b_weak:{s:'The frame looks shaky. We shrug and carry on.',e:'Crash! Half the roof caves in.'},
+  b_wind:{s:'A gust flattens part of the wall.',e:'We plant a hedge as a windbreak. The wall grows stronger.'},
+  b_bigger:{s:'Our camp feels cramped. We’ll need more room soon.',e:'The camp grows, and so does the bill for timber.'},
+  g_hurricane:{s:'The storm has left plenty of driftwood, though the path is a mess.',e:'The tide washes out the path completely.'},
+  g_end:{s:'We gather the last of it. This spot is picked clean.'},
+  g_eyes:{s:'Eyes in the leaves watch us gather. We work faster.',e:'Our watcher comes calling tonight.'},
+  g_fruit:{s:'A strange purple fruit. It tastes wonderful, then rumbles.',e:'The bellyache hits. Without medicine, a day in the hammock.'},
+  g_furs:{s:'A hollow full of old pelts. Take them, and whatever lives there?',e:'Biting insects from the pelts get into the food stores.'},
+  g_coin:{s:'An old gold coin glints in the dirt. We pocket it.',e:'The coin is cursed! Everything we try goes a little wrong.'},
+  g_mushroom:{s:'A patch of plump mushrooms. Probably edible. Probably.',e:'Very probably not edible. Queasy stomachs all round.'},
+  g_nest:{s:'A nest full of eggs. Breakfast for everyone, if we dare.',e:'The mother bird finds us and tears at our roof.'},
+  g_flock:{s:'A new flock of birds settles nearby. Easy pickings.',e:'The flock moves on, and the spot is empty.'},
+  g_surprise:{s:'A great pile of driftwood! Something about it feels too lucky.',e:'The driftwood was soft and rotten. The roof sags.'},
+  g_path:{s:'Fresh prints cross the gathering path.',e:'Ambushed! The predator we tracked comes for us.'},
+  g_chest:{s:'A buried chest, iron-banded. Dig it up?',e:'Unlucky day. Everyone moves as if through treacle.'},
+  g_shortage:{s:'We take the very last of it. A good haul, but that’s the end.'},
+  g_signs:{s:'Deep claw marks on the trees. A predator has marked its ground.',e:'The predator strikes our food source by camp.'},
+  g_skeleton:{s:'Old bones under a tree, clutching a leather wallet.',e:'The dead man’s notes are grim reading, but hold a clever idea.'},
+  g_spider:{s:'A hairy spider drops onto someone’s neck.',e:'The bite swells up. They can only manage half a day.'},
+  g_bushes:{s:'Something shiny in the brush. Grab it?',e:'We keep brooding on what else might lurk out there.'},
+  g_tracks:{s:'Big paw prints all around the gathering spot. We’ll be careful here.'},
+  g_ankle:{s:'A root catches a foot. The ankle turns with a nasty twist.',e:'The ankle swells. Only light camp work for a while.'},
+  g_effort:{s:'One big heave and we could haul extra timber. Our arms might not thank us.',e:'The arms ache badly after that heroic effort.'},
+  g_find:{s:'A lucky find in the undergrowth!'},
+  g_trouble:{s:'The ground here is treacherous and crumbling. We’ll steer clear for now.'},
+  g_viper:{s:'An adder slides through the grass by our feet. We freeze until it passes.',e:'The adder strikes! Without medicine, the bite is serious.'},
+  g_weather:{s:'The wind shifts. Old sailors know what that means.',e:'The storm arrives, right on cue.'},
+  g_freeze:{s:'The ground is frozen hard. Nothing more will come from here.'},
+  g_winter:{s:'A cold edge on the breeze. Winter is drawing near.',e:'Frost on the ground by morning, and snow in the clouds.'},
+  e_bamboo:{s:'A grove of tall bamboo! Cut it down, if we don’t mind the risk.',e:'The bamboo was brittle. It snaps under the weight.'},
+  e_carcass:{s:'A freshly killed carcass. Meat and hide, if we are brave or foolish.',e:'The meat was bad. Everyone gets sick.'},
+  e_coldwind:{s:'An icy breeze sweeps down from the peaks.',e:'Snow begins to fall across the island.'},
+  e_danger:{s:'Dangerous ground here: bones, prints and a strong musky smell.'},
+  e_empty:{s:'The forest is silent. No birds, no beasts. Unsettling.',e:'The beasts are back, and they are starving.'},
+  e_flu:{s:'Chills and a runny nose. Rest and eat more, or tough it out?',e:'The sore throat spreads. Everyone needs more food tonight.'},
+  e_rain:{s:'Rain clouds gather on the horizon.',e:'The heavy rain arrives, right on schedule.'},
+  e_thicket:{s:'Lost in a thicket, we curl up for the night far from camp. There’s a find nearby.'},
+  e_woods:{s:'We walk in circles for hours. Sore feet, sorer spirits.'},
+  e_lost:{s:'Lost for the night! Somehow the stars cheer us more than camp would.'},
+  e_misstep:{s:'A misstep on a loose rock. The leg twists badly.',e:'The leg swells up. Only light work for a while.'},
+  e_grave:{s:'An old grave, marked with a rough cross. It chills us.',e:'The ghost of a castaway haunts our leader’s dreams.'},
+  e_oldhut:{s:'An abandoned hut. Something lives there still, maybe. Search it?',e:'The hermit’s ghost wails through the night.'},
+  e_puma:{s:'Big cat tracks, very fresh. Hide out for the night or head home?',e:'The big cat attacks the camp!'},
+  e_settle:{s:'The ruins of an old settlement. Rich pickings, and possibly traps.',e:'The settlement carried some old sickness. We all fall ill.'},
+  e_ruinhut:{s:'A tumbledown shack full of old tools. Salvage something?',e:'Nightmares of the shack’s last owner haunt us.'},
+  e_cave:{s:'A hidden cave. Treasures, surely. Something else too, probably.',e:'The beast in the cave wakes up and follows us home.'},
+  e_shrine:{s:'A jungle shrine, carved with strange faces. Leave an offering and take a peek?',e:'The faces follow us in our dreams. Everything goes a bit wrong.'},
+  e_fire:{s:'Scorched earth. A fire has ruined this place.'},
+  e_storm:{s:'A storm brews on the horizon.',e:'The storm hits the island with full force.'},
+  e_surprise:{s:'A blade glints in the sand. Just the thing for a tight spot.'},
+  e_swamp:{s:'A bog sucks at our boots. This place will be slow going.'},
+  e_air:{s:'Something in the air. The island feels watchful.',e:'The island is cursed, and it lets us know.'},
+  e_thorn:{s:'A thorn thicket rakes our arms bloody.',e:'The scratches swell. Without medicine, a day lost.'},
+  e_tiger:{s:'A striped shadow slips between the trees. Hide out tonight, or risk home?',e:'The striped cat has followed us home!'},
+  e_vipers:{s:'A snake nest! One strikes before we can jump back.',e:'A fever sets in. Without medicine, half a day lost.'},
+  e_berries:{s:'Wild berries, sweet and juicy. We eat far too many.',e:'Nausea. Only half a day’s work possible.'},
+  e_dog:{s:'A stray dog snaps at us, then follows at a distance.',e:'The dog is back, eyes pleading. Feed it, or send it off?'},
+  e_wrong:{s:'A wrong turn, and night falls far from camp. We gather wood by starlight.'}
+ },
+ mys:{
+  m_locket:{s:'A locket with a portrait of a smiling stranger. It lifts our spirits.'},
+  m_rapier:{s:'An old duelling sword, still sharp. En garde!'},
+  m_backpack:{s:'A sturdy canvas backpack. We can carry more.'},
+  m_barrel:{s:'A water cask, sealed tight. Fresh water, anywhere.'},
+  m_blankets:{s:'Wool blankets, dry and warm. Perfect for cold nights.'},
+  m_wine:{s:'A bottle of brandy! For medicinal purposes, of course.'},
+  m_boxes:{s:'Sealed tins. Who knows what’s inside? Something useful, surely.'},
+  m_spyglass:{s:'A navigator’s spyglass. We can see what lies ahead.'},
+  m_furcave:{s:'A cave full of old pelts. Warm nights ahead.'},
+  m_bowl:{s:'A ritual bowl. Touching it brings bad luck on our hands.',e:'We perform a little ceremony, and the curse lifts.'},
+  m_compass:{s:'A brass compass. Exploring gets much easier.'},
+  m_crocks:{s:'Clay jars, whole and sound. A ready-made cooking pot.'},
+  m_gold:{s:'A chest of gold. Utterly useless here, but lovely to look at.'},
+  m_hatchet:{s:'A rusty hatchet. Still bites wood nicely.'},
+  m_helmet:{s:'An iron helmet. Dented, but it fits.'},
+  m_herbal:{s:'A pouch of fortune tea. Supposedly lucky.'},
+  m_clothes:{s:'Old coats, musty but warm.'},
+  m_oldmap:{s:'A faded chart of the island. It gives us all heart.'},
+  m_rifle:{s:'An old musket with one good shot left.'},
+  m_amulet:{s:'A warding charm. We feel safer already.'},
+  m_ropes:{s:'A coil of good rope. The camp gets stronger.'},
+  m_saber:{s:'A cutlass! Now we’re properly pirate-y.'},
+  m_tmap:{s:'A pirate’s map, marked with an X. Worth following once.'},
+  m_candles:{s:'A box of candles. We can work late into the night.'},
+  m_hammock:{s:'A rope hammock. Luxury.'},
+  m_blowgun:{s:'A poison dart whistles out of the dark! Tomorrow will be sluggish.'},
+  m_bluntspear:{s:'A spike pit! We fall right into it.'},
+  m_collapse:{s:'Cave-in! We scramble out and don’t go back.'},
+  m_confused:{s:'We lose our bearings in the tunnels. Tomorrow will be clumsy.'},
+  m_net:{s:'A hanging net scoops us up! We spend the night dangling.'},
+  m_spores:{s:'Poison spores puff up from the ground. Without medicine, tonight will hurt.'},
+  m_blade:{s:'A swinging blade scythes out of the wall!'},
+  m_snaretrap:{s:'A snare snaps shut on our weapons and drags them away.'},
+  m_web:{s:'A giant web! We tear free, but it clings.'},
+  m_disease:{s:'A strange fever creeps into our bones. The night will be rough.'},
+  m_scream:{s:'A blood-curdling scream echoes through the ruins. Our nerve shatters.'},
+  m_trapdoor:{s:'A trapdoor! Everything we found tumbles into the dark.'},
+  m_unfortunate:{s:'An ill-fated venture wakes the island’s darkest trouble.'},
+  m_jewel:{s:'Glittering eyes in the darkness. Tonight, they come for us.'},
+  m_bats:{s:'A swarm of bats! Duck and flee, or swat them away?'},
+  m_bite:{s:'Something small and nasty bites and scurries off.'},
+  m_tiger:{s:'An enraged big cat! We must fight it.'},
+  m_bigsnake:{s:'A giant serpent uncoils in the dark. We run and don’t look back.'},
+  m_ape:{s:'A great ape roars and swings at us!',e:'The ape tracks us home and smashes our weapons.'},
+  m_imps:{s:'Cave imps swarm out of the rocks! Fight them off!',e:'The imps have found the camp. They’re back again!'},
+  m_savage:{s:'A wild man leaps out and snatches all our weapons.',e:'The wild man drops something as he flees our hunt.'},
+  m_scorpion:{s:'A scorpion’s sting! Without medicine, it’s bad.'},
+  m_snake:{s:'A rock snake strikes from a crevice!'},
+  m_spiders:{s:'Spiders crawling everywhere. We shudder for hours.'},
+  m_loose:{s:'A beast on the loose chases our game away.'},
+  m_bigape:{s:'A hulking ape watches from the shadows, then vanishes.',e:'The night demon comes to camp. We must fight!'}
+ },
+ beast:{
+  alligator:'Two eyes and a snout break the swamp water. Alligator!',
+  bear:'A bear rears up, twice our height and very annoyed.',
+  birds:'A flock of plump birds. Easy supper, if we’re quiet.',
+  boa:'A boa hangs from a branch, lazily flexing its coils.',
+  chamois:'A chamois leaps from rock to rock, horns lowered.',
+  cheetah:'A cheetah flashes through the grass faster than thought.',
+  fox:'A fox sniffs the air and bares tiny sharp teeth.',
+  goats:'A herd of wild goats, stubborn and horned.',
+  gorilla:'A gorilla beats its chest. Its eyes are very clever.',
+  iguana:'A huge iguana with a whip of a tail. It will leave a mark.',
+  jaguar:'A jaguar drops silently from the canopy.',
+  puma:'A puma crouches on the rocks, tail twitching.',
+  tapir:'A startled tapir snorts and charges.',
+  tiger:'A tiger steps out of the shadows. Everything goes quiet.',
+  'wild-dog':'A wild dog snarls, hackles up, foam on its lips.',
+  'wild-pig':'A wild pig grunts, tusks gleaming. Supper, or trouble.'
+ },
+ scen:{
+  marooned:{title:'The Signal on the Hill',
+   intro:['The storm split our ship like kindling. By dawn, only a handful of us crawled ashore on a strip of wet sand.','We are a Carpenter, a Cook, an Explorer and a Soldier, plus a very soggy dog. Not much of a crew, but a stubborn one.','Somewhere out there, ships still sail these waters. If we can light a fire and build a signal pile high enough, one might spot us.','Summer is short on this island. The rain will come, then worse. We have until the last days of autumn.'],
+   days:{1:'First morning. We count our fingers, our toes, and our blessings.',2:'The beach is ours. The rest of the island is still a mystery.',3:'We are learning the island’s moods. It has many.',4:'The first rains arrive. Time to keep our heads dry.',5:'Wet sand, wet wood, wet socks. Still here.',6:'Half our time is gone. The signal pile must grow.',7:'The air turns cold. The beasts grow hungry.',8:'Snow on the peaks. We huddle and keep building.',9:'Our hands are hard now. So are we.',10:'Any day now, a ship might pass. Is the fire ready?',11:'Every eye watches the horizon.',12:'The last chance. Light it, and pray for a sail.'},
+   win:'A white sail breaks the horizon and turns toward our smoke. We cheer until we’re hoarse, and the dog barks at the waves. We are going home.',
+   lose:'The seasons turned and no ship came. The island keeps us, and our journal ends here.'},
+  hexed:{title:'The Curse of the Hexed Isle',
+   intro:['We washed ashore on an island that feels wrong. The birds don’t sing, and the fog moves against the wind.','Old stones, strange carvings and whispered warnings. Someone cursed this place, and now the curse has caught us too.','The old stories say five crosses, raised on five different corners of the island, will break it.','Winter comes early here. Snow will bite before long. We must hurry.'],
+   days:{1:'The fog lifts a little. We can see the island’s edge.',2:'Carvings on the rocks watch us work.',3:'The fog shifts where we don’t look.',4:'Something whispers from the trees at night.',5:'Halfway there. The curse feels heavier.',6:'The first snow falls, thin and grey.',7:'Cold hands, cold hearts. But we keep going.',8:'The fog swallows paths we walked yesterday.',9:'The curse grows restless. So do we.',10:'The last days. Every cross counts.'},
+   win:'The fifth cross is raised and the fog rolls back into the sea. Birds sing for the first time since we arrived. The island is at peace, and so are we.',
+   lose:'The fog closed in for good, and the curse kept its prize. We should never have landed here.'},
+  stranded:{title:'Ada on the Rock',
+   intro:['The wreck scattered us along the reef. Four of us made it to the beach, but our shipmate Ada did not.','She clings to a spur of rock out beyond the breakers, waving her shawl. We can hear her calling.','We need a raft to reach her, and after that a proper lifeboat to carry us all home.','Every night on the rock, the sea takes more out of Ada. We have no time to waste.'],
+   days:{1:'Ada waves from the rock. We wave back and get to work.',2:'We can hear her singing to keep her spirits up.',3:'The rock looks smaller every day.',4:'Ada’s voice is growing faint.',5:'The beasts have noticed us. Hungry nights ahead.',6:'The sea is rough. Hold on, Ada.',7:'We’re almost ready. Just a little longer.',8:'The last chance. Now or never.'},
+   win:'With Ada safe aboard, our little lifeboat punches through the surf. She won’t stop hugging everyone, the dog included. We’re going home together.',
+   lose:'We were too slow, and the sea took what it wanted. Our journal ends with a name we will never forget.'},
+  settlers:{title:'A Home on the Island',
+   intro:['Nobody is coming. We have made our peace with that.','Instead, we will build a home: a real one, with a roof, a wall, tools and a garden.','And soon there will be little ones to feed. We must be ready.','The island is harsh, but it is ours now. Let’s make something of it.'],
+   days:{1:'The first day of our new life.',2:'We sketch plans in the sand.',3:'The rain comes to test us.',4:'The camp takes shape, board by board.',5:'Snow on the hills. Snug walls matter now.',6:'Halfway there. Keep building.',7:'A baby’s cry! The camp is growing.',8:'Little mouths, big appetites.',9:'Another child joins us.',10:'The cold bites. We keep the fire bright.',11:'A third little one. The camp is full of noise.',12:'The last push. Is our home ready?'},
+   win:'The house stands snug, the walls are strong, and the children sleep soundly. We’re not castaways any more. We’re home.',
+   lose:'We couldn’t keep everyone fed and safe. The settlement failed, and the island claims it back.'}
+ },
+ chars:{
+  carpenter:{bio:'Hands like shovels and a heart of gold; can build anything from anything, given enough grumbling.',hurt:['Mind the thumbs!','Just a splinter. A big one.','Ow, that’s my good arm!'],success:['Solid as oak.','Measure twice, cut once.','Now that’s craftsmanship.'],fail:['Wood’s too green.','Back to the drawing board.','That’s firewood now.'],hungry:['Can’t swing a hammer on an empty stomach.','Is that pot bubbling yet?'],cheer:['We’ll build our way out of this.','Every board is one step closer home.']},
+  cook:{bio:'Plump, cheerful and utterly unflappable; can make soup from seaweed and a joke from anything.',hurt:['That’s going in the soup!','Oof, my apron!','Just a scratch, love.'],success:['Dinner is served!','Bit of salt, bit of luck.','Nobody goes hungry on my watch.'],fail:['Burned it again.','Well, that didn’t rise.','We’ll call it rustic.'],hungry:['Even I’m hungry, and I’ve been tasting.','The pot’s empty. That’s not right.'],cheer:['Nothing a hot meal won’t fix.','Chin up, bellies full!']},
+  explorer:{bio:'All legs and curiosity; would walk into a volcano to see what was inside.',hurt:['Worth it for the view!','I’ve had worse. Probably.','Ouch. Noted on the map.'],success:['Found it!','Another blank on the map filled in.','Look what’s over here!'],fail:['Dead end.','That path went nowhere.','Must’ve gone the wrong way round.'],hungry:['I could eat a map.','Exploring runs on food.'],cheer:['There’s always something round the next corner.','Adventure awaits!']},
+  soldier:{bio:'Stern, steady and secretly soft; keeps watch so everyone else can sleep.',hurt:['Hold the line!','Only a flesh wound.','I’ve had worse on parade.'],success:['Mission complete.','That’s how it’s done.','Target down.'],fail:['Tactical retreat.','Regroup and try again.','Blast it.'],hungry:['An army marches on its stomach.','Rations, please.'],cheer:['Stand fast, all of you.','We’ve survived worse.']},
+  friday:{bio:'A friendly islander who knows every path and laughs at our clumsy ways.',hurt:['Aiee! Careful, friends.','Island bites, but I bite back.','Not so bad.'],success:['Easy, see?','The island likes us today.','Ha! Good work.'],fail:['Hmm. Island says no.','Tomorrow, better.','Even I miss sometimes.']},
+  ada:{bio:'Our quick-witted shipmate, stubborn enough to outlast any rock in the sea.',hurt:['Hurry, please!','I can’t hold on much longer!']}
+ },
+ phase:{
+  dawn:['A new day on the island. The sun climbs over the sea.','Morning comes, bright and damp. We stretch and get up.','Another dawn, another chance. We’re still here.','The birds wake us. Time to see what today brings.'],
+  moraleUp:['Spirits rise! Someone is whistling.','We’re in good heart today.','Laughter round the fire. It helps.'],
+  moraleDown:['Spirits sink. Nobody says much.','A heavy mood hangs over camp.','We’re losing heart.'],
+  prod:['Our camp gives what it can: food and firewood.','Traps and trees yield their small harvest.','The camp’s surroundings feed and fuel us.'],
+  plan:['We gather round the fire and plan the day.','Sticks in the sand: who goes where?','Plans are made, jobs are shared out.'],
+  calm:['Blue skies. A rare kindness.','The weather holds fair today.','Calm and clear. We make the most of it.'],
+  rain:['Rain rattles on the fronds.','Rain again. Everything is soggy.','A steady rain. Keep the fire covered!'],
+  snow:['Snow falls, soft and cold.','Snowflakes on the sand. It’s bitter.','Snow piles up round camp. We need wood.'],
+  storm:['A storm tears across the island!','Thunder, lightning and wind. Hold on!'],
+  animals:['Hungry animals prowl round camp.','Growls at the edge of the firelight.'],
+  nightFed:['Full bellies tonight. We sleep well.','Supper round the fire. Life isn’t so bad.','Everyone eats. Warm and fed.'],
+  nightHungry:['We go to bed hungry.','Empty bellies and a long night.','Not enough food to go round.'],
+  nightOpen:['We sleep under the stars, cold and exposed.','No shelter tonight. The ground is hard.'],
+  nightShelter:['Snug under our own roof.','The shelter keeps the worst of the night out.'],
+  build:['Finished! We step back and admire it.','Another piece of our new life stands complete.','It holds! Well done, everyone.'],
+  gather:['Our baskets come back full.','A good haul from the island.','We carry our harvest home.'],
+  explore:{beach:'Sand, shells and seabirds. The beach opens up before us.',river:'Clear water tumbles over stones. Fish flash in the shallows.',plains:'Wide grassy plains roll away under an open sky.',hills:'Rocky hills rise ahead, covered in scrub and goats.',mountains:'Craggy peaks tower above the clouds.'},
+  exploreFail:['We push into the unknown and find nothing but thorns.','Our trek ends at a dead end. Maybe tomorrow.'],
+  huntWin:['The hunt is a success! Meat tonight.','We bring down the beast. Food and hides!'],
+  huntHurt:['The beast fights back hard.','We win, but not without scars.'],
+  threatDone:['We deal with the trouble. One less worry.','That’s sorted. Back to work.']
+ }
+};
+
+</script>
+<script>
+// ---------- the story player: every scene of the day, one beat at a time, with the island showing that moment ----------
+const FL=()=>typeof FLAVOR!=='undefined'?FLAVOR:{ev:{},adv:{},mys:{},beast:{},scen:{},chars:{},phase:{}};
+const pickL=(arr,seed)=>arr&&arr.length?arr[Math.abs(seed|0)%arr.length]:'';
+UI.auto=false;try{UI.auto=localStorage.getItem('swi_auto')==='1'}catch(e){}
+function beatLines(i){const b=UI.beats[i];if(!b||!G)return[];const nx=UI.beats[i+1];const end=nx?nx.n0:G.logN;return G.log.filter(l=>l.i>b.n0&&l.i<=end).reverse()}
+const MEANINGFUL=l=>l.c!=='step'&&!/^— Round|^Event:|^Adventure:|^Mystery:|^Plan the day|^The castaways set off|^Night falls/.test(l.t);
+function skippable(i){const b=UI.beats[i];const last=i===UI.beats.length-1;
+  if(b.kind==='plan'||b.kind==='go')return !(last&&humanQ());
+  if(b.kind==='morning'&&!beatLines(i).filter(MEANINGFUL).length&&!(last&&humanQ()))return true;
+  return false}
+function humanQ(){return !!(G&&G.q&&P(G.q.who)&&P(G.q.who).human)}
+// index of the beat on screen, or -1 when the story has caught up
+function storyIdx(){if(!G)return -1;let i=UI.shown+1;while(i<UI.beats.length&&skippable(i)){UI.shown=i;i++}
+  if(i<UI.beats.length)return i;if(humanQ())return UI.beats.length-1;return -1}
+function storyActive(){return storyIdx()>=0}
+// the state the island and HUD should show right now
+function viewState(){const i=storyIdx();if(i<0||i>=UI.beats.length-1)return null;const b=UI.beats[i];if(!b.snap)return null;if(!b.obj)b.obj=JSON.parse(b.snap);return b.obj}
+function withView(fn){const s=viewState();if(!s)return fn();const b=UI.beats[storyIdx()];const real=G;G=Object.assign({},s,{log:real.log,stk:[],phase:b.phase==='start'?'event':b.phase,round:b.round});try{return fn()}finally{G=real}}
+function storyNext(){const i=storyIdx();if(i<0)return;if(i===UI.beats.length-1&&humanQ())return;UI.shown=i;UI.seenBeat=null;sfx('click');refresh()}
+function storySkip(){if(humanQ())UI.shown=UI.beats.length-2;else UI.shown=UI.beats.length-1;UI.seenBeat=null;refresh()}
+function charBark(ci,kind,seed){const c=ci!=null&&ci>=0?P(ci):null;if(!c)return '';const f=FL().chars&&FL().chars[c.k];const l=f&&pickL(f[kind],seed);return l?`<div class="bark" style="--pc:${PCOL[c.i%6]}"><b>${esc(c.nm)}:</b> “${esc(l)}”</div>`:''}
+const KIND_ICON={intro:'🏝️',dawn:'🌅',event:'📜',threat:'⚠️',morning:'☀️',act:'🧭',adventure:'❓',mystery:'🗝️',fight:'⚔️',weather:'⛈️',night:'🌙',over:'🏁'};
+const ACT_ICON={threat:'⚠️',hunt:'🏹',build:'🔨',gather:'🧺',explore:'🧭',camp:'🏕️',rest:'😴',special:'⭐',tmap:'🗺️'};
+function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines=beatLines(i).filter(MEANINGFUL);const S=SCENARIOS[G.scen];const fs=(F.scen||{})[G.scen]||{};
+  let kicker='',title='',story='',card='',extra='',icon=KIND_ICON[b.kind]||'📖';
+  switch(b.kind){
+  case 'intro':kicker=`Chapter ${S.no} · ${esc(S.n)}`;title=esc(fs.title||S.n);story=esc(d.text);if(d.page===d.of-1)extra=`<div class="goalbox"><b>Your goal</b> ${esc(S.x)}</div>`;break;
+  case 'dawn':kicker=`Day ${d.round} of ${G.rounds}`;title=esc((fs.days&&fs.days[d.round])||pickL((F.phase||{}).dawn,b.id)||'A new day');{const wx=S.wx[d.round]||[];extra=`<div class="fore">Weather ahead today: ${wx.length?wx.map(x=>({rain:'🌧 rain',snow:'❄️ snow',animals:'🐾 hungry animals'}[x])).join(' · '):'☀️ calm'}</div>`}break;
+  case 'event':case 'threat':{const c=CARD[d.card];const fe=(F.ev||{})[d.card]||(F.adv||{})[d.card]||(F.mys||{})[d.card]||{};
+    if(b.kind==='threat'){kicker='Too late';title=esc(c.th?c.th.n:c.n)+' — we never got to it';story=esc(fe.x||'')}
+    else if(d.late){kicker='It comes back to haunt us';title=esc(c.ev.n);story=esc(fe.e||'')}
+    else{kicker='Something happens';title=esc(c.n);story=esc(fe.s||'');card=c.th?`<div class="scard"><div><b>Now:</b> ${opsText(c.ev)||'nothing yet.'}</div><div><b>It stays as a threat:</b> ${esc(c.th.n)} (${c.th.pw==='1-2'?'1–2':c.th.pw} pawn${c.th.pw===1?'':'s'}${reqText(c.th.req)?', needs '+esc(reqText(c.th.req)):''}) to earn: ${opsText(c.th.rw||c.th.rw2||c.th.rw1)||'peace of mind'}</div><div class="bad"><b>If we ignore it for two days:</b> ${opsText(c.te)||'nothing'}</div></div>`:''}
+    break}
+  case 'morning':{kicker='Morning';title='The camp wakes';const up=lines.some(l=>/Morale \+/.test(l.t)||/gains/.test(l.t)),dn=lines.some(l=>/loses|Morale -/.test(l.t));story=esc(pickL((F.phase||{})[dn?'moraleDown':up?'moraleUp':'prod'],b.id));break}
+  case 'act':{const c=d.actor>=0?P(d.actor):null;icon=ACT_ICON[d.type]||icon;kicker=c?esc(c.nm):'Friday';title=esc(d.label);
+    const ok=lines.some(l=>l.c==='good'||l.c==='big')&&!lines.some(l=>/fails\./.test(l.t));const failed=lines.some(l=>/fails\./.test(l.t));
+    if(d.type==='explore'){const t=lines.find(l=>/New land/.test(l.t));const terr=t&&/tile \d+, (\w+)/.exec(t.t);story=esc(terr?((F.phase||{}).explore||{})[terr[1]]||'':pickL((F.phase||{}).exploreFail,b.id))}
+    else if(d.type==='build')story=esc(failed?'':pickL((F.phase||{}).build,b.id));else if(d.type==='gather')story=esc(failed?'':pickL((F.phase||{}).gather,b.id));else if(d.type==='threat')story=esc(pickL((F.phase||{}).threatDone,b.id));
+    if(d.dice)extra=diceHtml(d.dice,b.id);extra+=charBark(d.actor,lines.some(l=>/wound/.test(l.t)&&l.c==='bad')?'hurt':failed?'fail':'success',b.id);break}
+  case 'adventure':{const c=CARD[d.card];kicker=`Adventure while we ${({build:'build',gather:'gather',explore:'explore'})[d.deck]||'work'}`;title=esc(c.n);story=esc(((F.adv||{})[d.card]||{}).s||'');card=`<div class="scard">${cardText(c)}</div>`;break}
+  case 'mystery':{const c=CARD[d.card];kicker=`Mystery · ${c.type}`;title=esc(c.n);story=esc(((F.mys||{})[d.card]||{}).s||'');card=`<div class="scard">${cardText(c)}</div>`;break}
+  case 'fight':{kicker=d.hunted?'The hunt':'A fight';title=esc(d.name);story=esc(d.beast&&(F.beast||{})[d.beast]||'');const B=d.beast&&BEAST[d.beast];if(B)card=`<div class="scard">Strength <b>${B.str}</b> against our weapon <b>${(viewState()||G).weapon}</b> before the fight. Every point short is a wound; the weapon then loses ${B.wl}. It feeds us ${B.food} food${B.fur?' and '+B.fur+' fur':''}.</div>`;break}
+  case 'weather':{const w=(viewState()||G).lastWx;kicker='Weather';const r=w&&w.rain,s=w&&w.snow;title=r||s?`${r?r+' rain cloud'+(r>1?'s':''):''}${r&&s?' and ':''}${s?s+' snow cloud'+(s>1?'s':''):''}`:'A calm day';story=esc(pickL((F.phase||{})[w&&w.storm?'storm':s?'snow':r?'rain':'calm'],b.id));
+    if(w&&(r||s))extra=`<div class="fore">Roof ${(viewState()||G).camp.roof}: every cloud above it ruins 1 food and 1 wood${s?'; each snow cloud also burns 1 wood for warmth':''}.</div>`;break}
+  case 'night':{kicker='Night';const hungry=lines.some(l=>/hunger/.test(l.t)),open=lines.some(l=>/in the open/.test(l.t));title=hungry?'Empty stomachs':open?'Under the open sky':'Around the fire';story=esc(pickL((F.phase||{})[hungry?'nightHungry':open?'nightOpen':'nightFed'],b.id));break}
+  case 'plan':kicker='Planning';title='Before we set off';break;
+  case 'go':kicker='Setting off';title='Everyone to work';break;
+  case 'over':{const w=G.over&&G.over.win;kicker=w?'The end':'The end';title=w?'Rescued!':'Lost on the island';story=esc(w?fs.win||'':fs.lose||'');extra=`<p class="why">${esc(G.over?G.over.why:'')}</p>`;break}}
+  const chips=lines.slice(0,14).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('');
+  return {icon,kicker,title,story,card,extra,chips}}
+function diceHtml(d,seed){const f=[['wound',d.w,d.w?'🩸':'·','wound','no wound'],['success',d.s,d.s?'✔':'✖','success','failure'],['adventure',d.q,d.q?'❓':'·','adventure','no adventure']];
+  return `<div class="dice3">${f.map(([k,v,g,a,n],j)=>`<div class="d3 ${k} ${k==='success'?(v?'good':'bad'):(v?'bad':'good')}" style="animation-delay:${j*.12}s"><span>${g}</span><small>${v?a:n}</small></div>`).join('')}</div>`}
+function renderStory(){const el=$('#story');if(!el)return;if(!G||UI.modal==='start'){el.hidden=true;document.body.classList.remove('storying');return}const i=storyIdx();document.body.classList.toggle('storying',i>=0);if(i<0){el.hidden=true;el.dataset.id='';if(V3.on)V3.focus=null;return}
+  const b=UI.beats[i];const h=beatHtml(i);const q=i===UI.beats.length-1&&humanQ()?G.q:null;
+  // sound and camera, once per new scene
+  if(UI.seenBeat!==b.id){UI.seenBeat=b.id;beatFx(b)}
+  const who=q&&G.chars.filter(c=>c.human).length>1?`<div class="qwho" style="--pc:${PCOL[q.who%6]}">${esc(P(q.who).nm)} decides</div>`:'';
+  const qd=q&&q.kind==='dice'?diceHtml(q.dice,b.id):'';
+  const body=`<div class="sk">${h.icon} ${h.kicker}</div><h2>${h.title}</h2>${h.story?`<p class="story">${h.story}</p>`:''}${h.card}${h.extra}${h.chips?`<ul class="outs">${h.chips}</ul>`:''}
+    ${q?`<div class="qbox">${who}<h3>${esc(q.title)}</h3>${qd}<div class="opts">${q.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${esc(o.l)}</button>`).join('')}</div></div>`:
+     `<div class="sctl"><button class="btn go" data-a="next" autofocus>${i>=UI.beats.length-1?(G.over?'See how it ended ▶':'Plan the day ▶'):'Next ▶'}</button>${allAI()?'':`<button class="btn ghost ${UI.auto?'on':''}" data-a="auto" title="Play the scenes by themselves">⏵ Auto ${UI.auto?'on':'off'}</button>`}${i<UI.beats.length-2?`<button class="btn ghost" data-a="skip" title="Jump to the next decision">⏭ Skip</button>`:''}<span class="prog">${Math.max(1,i-lastPlanBeat(i))} / ${Math.max(1,UI.beats.length-1-lastPlanBeat(i))}</span></div>`}`;
+  el.hidden=false;if(el.dataset.id!==b.id+':'+(q?q.title:'')+':'+G.logN+':'+UI.auto){el.dataset.id=b.id+':'+(q?q.title:'')+':'+G.logN+':'+UI.auto;el.innerHTML=`<div class="scene ${b.kind}">${body}</div>`;const f=el.querySelector('[autofocus],.opt');if(f&&!UI.noFocus)f.focus({preventScroll:true})}
+  clearTimeout(UI.autoT);if(!q&&(UI.auto||allAI())&&!UI.pause){const n=beatLines(i).length;UI.autoT=setTimeout(storyNext,(1600+Math.min(8,n)*380)/(UI.speed||1))}}
+function lastPlanBeat(i){for(let k=i;k>=0;k--)if(UI.beats[k].kind==='go'||UI.beats[k].kind==='plan')return k;return -1}
+function beatFx(b){const d=b.data;const s={intro:null,dawn:'round',event:'event',threat:'bad',morning:null,adventure:'mystery',mystery:'mystery',fight:'fight',night:'night'}[b.kind];
+  if(s)sfx(s);if(b.kind==='act')sfx(d.dice?'dice':d.type==='build'?'build':d.type==='explore'?'explore':'place');
+  if(b.kind==='weather'){const w=(viewState()||G).lastWx;if(w&&(w.rain||w.snow))sfx('thunder');if(V3.on&&w&&w.rain+w.snow>1)V3.flash=1}
+  if(b.kind==='over')sfx(G.over&&G.over.win?'win':'lose');
+  // camera: fly to where it happens
+  if(V3.on){const pos=d.pos!=null?d.pos:['dawn','morning','weather','night','fight'].includes(b.kind)?G.camp.pos:null;V3.focus=pos!=null&&MAP[pos]?pos:null}}
+
+</script>
+<script>
+// ---------- the advisor: today's priorities in plain words, each with a one-tap "Do it" ----------
+function humanFree(){const hs=new Set(G.chars.filter(c=>c.human).map(c=>c.i));const placed=placedIds();return allPawns().filter(p=>!placed.has(p.id)&&(p.c==null||hs.has(p.c)))}
+function jobPlanned(type,tgt){const key=JSON.stringify(tgt);return G.plan.acts.some(a=>a.type===type&&JSON.stringify(a.tgt)===key)}
+// place pawns for a job: a sure success if the pawns allow it, otherwise the minimum that rolls the dice
+function doJob(type,tgt,alt,lead){if(!planOpen())return 'not planning now';const free=humanFree();const n=actNeed({type,tgt,alt:alt||0,pw:[]});
+  const life=p=>p.c!=null?CHARS[P(p.c).k].die-P(p.c).w:0;
+  const chars=free.filter(p=>p.c!=null&&!P(p.c).npc&&!placeWhy(p.id,type,tgt,alt));
+  let leadP=lead!=null?chars.find(p=>p.c===lead):chars.sort((a,b)=>life(b)-life(a))[0];if(!leadP)leadP=free.find(p=>p.f&&!placeWhy(p.id,type,tgt,alt));
+  if(!leadP)return 'No free castaway can do that.';let e=place(leadP.id,type,tgt,alt);if(e)return e;const act=G.plan.acts.find(x=>x.id===UI.lastAct);
+  let want=n.max-act.pw.length;const add=p=>{if(want<=0||pawnWhy(p.id,act))return;const q=pawnInfo(p.id);if(q.c!=null)act.pw.unshift(p.id);else act.pw.push(p.id);want--};
+  for(const p of humanFree().filter(p=>p.x))add(p);for(const p of humanFree().filter(p=>p.f))add(p);
+  // use a second character pawn only when it turns a gamble into a sure thing (or the job needs it)
+  const needMin=n.need-act.pw.length;for(const p of humanFree().filter(p=>p.c!=null&&!P(p.c).npc).sort((a,b)=>(a.c===leadP.c?-1:1)))if(want>0&&(needMin>0||want<=1))add(p);
+  return null}
+function bestFood(){let best=null,bv=-1;for(const m of G.map){const t=tileAt(m.id);if(!t||m.id===G.camp.pos||dist(G.camp.pos,m.id)>2)continue;for(const s of srcs(m.id)){if(s.ex||s.s==='wood')continue;if(targetWhy('gather',{pos:m.id,i:s.i}))continue;const v=10-dist(G.camp.pos,m.id)*3-(m.tok.beast?2:0);if(v>bv){bv=v;best={pos:m.id,i:s.i}}}}return best}
+function bestWood(){let best=null,bv=-1;for(const m of G.map){const t=tileAt(m.id);if(!t||m.id===G.camp.pos||dist(G.camp.pos,m.id)>2)continue;for(const s of srcs(m.id)){if(s.ex||s.s!=='wood')continue;if(targetWhy('gather',{pos:m.id,i:s.i}))continue;const v=10-dist(G.camp.pos,m.id)*3;if(v>bv){bv=v;best={pos:m.id,i:s.i}}}}return best}
+function bestExplore(){let best=null,bv=-99;for(const m of MAP){if(targetWhy('explore',m.id))continue;const v=-dist(G.camp.pos,m.id)*3+m.adj.filter(p=>G.map[p].tile==null).length;if(v>bv){bv=v;best=m.id}}return best}
+function missingTerrain(k){const I=invReq(k);return I&&I.t&&!explored().has(I.t)?I.t:null}
+function priorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.scen];const add=(p)=>{p.done=p.act?jobPlanned(p.act.type,p.act.tgt):!!p.done;o.push(p)};
+  const need=eatersNeed(),have=food();const planFood=G.plan.acts.filter(a=>a.type==='gather'&&srcs(a.tgt.pos).some(s=>s.i===a.tgt.i&&s.s!=='wood')).length+G.plan.acts.filter(a=>a.type==='hunt').length*2;
+  if(!hasShelter()){const can=afford({id:-1,type:'build',tgt:{k:'shelter'},pw:[],pay:'wood'})||afford({id:-1,type:'build',tgt:{k:'shelter'},pw:[],pay:'fur'});const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];
+    if(can)add({w:90,icon:'🏠',title:'Build a shelter',why:'Without one, every castaway takes a wound each night.',act:{type:'build',tgt:{k:'shelter'}}});
+    else{const wd=bestWood(),ex=bestExplore();add({w:88,icon:'🪵',title:'Collect wood for a shelter',why:`A shelter needs ${tb.wood} wood (you have ${G.res.wood}). Without one, everyone takes a wound each night.${wd?'':' No wood in reach yet: explore.'}`,act:wd?{type:'gather',tgt:wd}:ex!=null?{type:'explore',tgt:ex}:null})}}
+  if(have+planFood<need){const f=bestFood();add({w:95,icon:'🍖',title:'Find food for tonight',why:`${need} food needed tonight, ${have} in store${planFood?`, ${planFood} planned`:''}. Anyone who goes hungry takes 2 wounds. Food spoils overnight, so don't hoard it.`,act:f?{type:'gather',tgt:f}:G.hunt.length&&G.weapon>=2?{type:'hunt',tgt:null}:bestExplore()!=null?{type:'explore',tgt:bestExplore()}:null,cant:f||G.hunt.length&&G.weapon>=2||bestExplore()!=null?null:'no food source in reach'});if(!f&&!(G.hunt.length&&G.weapon>=2))o[o.length-1].why+=' No fish or birds in reach yet: explore to find some.'}
+  const wx=S.wx[G.round]||[];const clouds=wx.filter(x=>x!=='animals').length*1.5+G.wx.rain+G.wx.snow;
+  if(clouds>G.camp.roof&&(hasShelter()||jobPlanned('build',{k:'shelter'})))add({w:80,icon:'☂️',title:'Raise the roof',why:`Weather today (${wx.map(x=>({rain:'rain',snow:'snow',animals:'animals'}[x])).join(', ')}): each cloud above roof ${G.camp.roof} ruins 1 food and 1 wood.`,act:{type:'build',tgt:{k:'roof'}},cant:targetWhy('build',{k:'roof'})});
+  else if(!wx.length&&(S.wx[G.round+1]||[]).length&&G.camp.roof<2)add({w:40,icon:'☂️',title:'Get ready for the weather',why:`Bad weather starts tomorrow. A roof keeps the clouds off your food and wood.`,act:hasShelter()?{type:'build',tgt:{k:'roof'}}:null,cant:hasShelter()?targetWhy('build',{k:'roof'}):'needs a shelter first'});
+  if((S.wx[G.round]||[]).includes('snow')&&G.res.wood<2)add({w:60,icon:'🪵',title:'Wood for the fire',why:'Snow is coming: each snow cloud burns 1 wood for warmth, or everyone freezes.',act:bestWood()?{type:'gather',tgt:bestWood()}:null});
+  if(G.ev.threat[0]&&G.ev.threat[1]){const k=G.ev.threat[0],c=CARD[k];const harm=opsValue(c.te);if(harm<0)add({w:70,icon:'⚠️',title:`Deal with “${c.th.n}”`,why:`It strikes at the next dawn if nobody deals with it: ${opsText(c.te)}`,act:{type:'threat',tgt:0},cant:targetWhy('threat',0)})}
+  for(const g of goalSteps())add(g);
+  for(const c of living()){if(c.npc)continue;const life=CHARS[c.k].die-c.w;if(life<=4)add({w:85,icon:'😴',title:`${c.nm} needs rest`,why:`Only ${life} wound${life>1?'s':''} from death — and if anyone dies, you all lose.`,act:{type:'rest',tgt:null},lead:c.i,done:G.plan.acts.some(a=>a.type==='rest'&&a.pw.some(p=>pawnInfo(p)&&pawnInfo(p).c===c.i))})}
+  if(G.morale<0)add({w:50,icon:'🎶',title:'Lift the mood',why:`Morale ${G.morale}: the first player loses determination every morning. Arranging the camp raises morale.`,act:{type:'camp',tgt:null},done:G.plan.acts.some(a=>a.type==='camp')});
+  if(G.round<=3&&bestExplore()!=null)add({w:45,icon:'🧭',title:'Explore the island',why:'New land brings wood, food, discoveries and the terrain your inventions need.',act:{type:'explore',tgt:bestExplore()}});
+  return o.filter(p=>p.act||p.cant||p.pile).sort((a,b)=>(a.done-b.done)||(b.w-a.w)).slice(0,5)}
+// the next step toward the scenario goal
+function goalSteps(){const o=[];const inv=(k,w,why)=>{const m=missingTerrain(k);if(m){const e=bestExplore();o.push({w,icon:'🧭',title:`Find ${m} for ${invReq(k).n}`,why:`${invReq(k).n} ${why}, but it needs ${m} explored.`,act:e!=null?{type:'explore',tgt:e}:null,cant:e==null?'nothing within reach to explore':null});return}
+  for(const it of invReq(k).it||[])if(!has(it)){inv(it,w-1,`is needed for ${invReq(k).n}`);return}
+  o.push({w,icon:'🔨',title:`Make ${invReq(k).n}`,why:`${invReq(k).n} ${why}.`,act:{type:'build',tgt:{k}},cant:targetWhy('build',{k})||(afford({id:-1,type:'build',tgt:{k},pw:[],pay:'wood'})?null:`needs ${invNeedPlain(invReq(k))}`)})};
+  switch(G.scen){
+  case 'marooned':if(!has('fire'))inv('fire',G.round>=5?75:55,'is half of the rescue signal');{const room=SCEN.marooned.pileRoom();if(room&&G.res.wood-committed().wood>0&&G.round>=5)o.push({w:65,icon:'🔥',title:`Add wood to the signal pile (${G.sc.pile}/15)`,why:'One stage a day: 1, then 2, 3, 4 and 5 wood. It must be full, with Fire, on day 10, 11 or 12.',pile:1,done:false});else if(G.sc.pile<15&&G.round>=4&&!room)o.push({w:30,icon:'🔥',title:'Signal pile: stage done today',why:'Save wood for tomorrow’s stage.',done:true,pile:1})}break;
+  case 'hexed':{const t=G.map.filter(m=>tileAt(m.id)&&!G.sc.crosses.includes(m.id)).sort((a,b)=>(a.fog?1:0)-(b.fog?1:0)||dist(G.camp.pos,a.id)-dist(G.camp.pos,b.id))[0];if(t)o.push({w:G.round>=5?78:58,icon:'✝️',title:`Raise a cross (${G.sc.crosses.length}/5)`,why:`Five crosses on five different tiles break the curse. Each costs 2 wood.`,act:{type:'build',tgt:{k:'cross',cross:t.id}},cant:targetWhy('build',{k:'cross',cross:t.id})||(G.res.wood-committed().wood>=2?null:'needs 2 wood — gather some')});if(G.sc.temple!=null&&!G.sc.templeDone)o.push({w:50,icon:'🛕',title:'Search the dark temple',why:'An explore action there draws mystery cards: up to 3 treasures.',act:{type:'special',tgt:'temple'},cant:targetWhy('special','temple')})}break;
+  case 'stranded':if(!has('jraft'))inv('jraft',88,'lets us row out to Ada');else if(!G.sc.rescued)o.push({w:98,icon:'⛵',title:'Row out and rescue Ada',why:`Ada loses 2 life every night on the rock (${CHARS.ada.die-G.sc.ada} left).`,act:{type:'special',tgt:'ada'},cant:targetWhy('special','ada')});else inv('lifeboat',80,'takes everyone home');break;
+  case 'settlers':{const next=G.sc.goals.filter(k=>!has(k)).sort((a,b)=>(missingTerrain(a)?1:0)-(missingTerrain(b)?1:0))[0];if(next)inv(next,60,'is one of the nine things our settlement needs');if(G.camp.pal<1&&hasShelter())o.push({w:45,icon:'🧱',title:'Build a palisade',why:'The settlement needs a palisade of 1 or more.',act:{type:'build',tgt:{k:'pal'}}});if(G.weapon<1)o.push({w:45,icon:'🗡️',title:'Make a weapon',why:'The settlement needs a weapon of 1 or more.',act:{type:'build',tgt:{k:'weapon'}}})}break}
+  return o}
+// ---------- first-game walkthrough ----------
+UI.tut=0;try{UI.tut=localStorage.getItem('swi_tut')==='done'?99:0}catch(e){}
+function tutHtml(){if(UI.tut>=99||!G||G.round>1||!planOpen()||allAI())return '';
+  const steps=['<b>Each day has two halves.</b> First you plan: every castaway has 2 pawns to give jobs to. Then the day plays out as a story.',
+    '<b>Start with Today’s priorities.</b> They say what matters most right now. Tap <b>Do it</b> on the first one.',
+    '<b>The island is yours to read.</b> Tap a tile or a label to see what you can do there. ❔ spaces can be explored.',
+    '<b>Give every pawn a job</b> (or tap 💡 Suggest for a full plan), then press <b>Start the day</b>.'];
+  const s=Math.min(UI.tut,steps.length-1);return `<div class="coach"><div class="cn">Tip ${s+1} of ${steps.length}</div><p>${steps[s]}</p><div class="cb">${s<steps.length-1?`<button class="btn xs" data-tut="next">Got it</button>`:''}<button class="btn xs ghost" data-tut="off">Hide tips</button></div></div>`}
+function tutAdvance(to){if(UI.tut<99)UI.tut=Math.max(UI.tut,to)}
+function tutDone(){UI.tut=99;try{localStorage.setItem('swi_tut','done')}catch(e){}}
+
+</script>
+<script>
+// ---------- the planning table: priorities, your plan, then jobs by category (one open at a time) ----------
+UI.cat=null;
+const CATS=[['build','🔨','Build'],['gather','🧺','Gather'],['explore','🧭','Explore'],['threat','⚠️','Threats'],['hunt','🏹','Hunt'],['camp','🏕️','Camp & rest'],['special','⭐','Scenario']];
+function planHtml(){
+  if(storyActive())return `<div class="waiting"><div class="big">📖</div><p>The day is being told on the island. Step through it with <b>Next</b> (or Enter), or turn on <b>Auto</b>.</p></div>`+journalHtml();
+  if(!planOpen())return `<p class="muted">${G.over?'The game is over.':'The castaways are busy…'}</p>`+recentHtml();
+  if(allAI())return `<p class="muted">The computer castaways are planning the day.</p>`+recentHtml();
+  const S=SCENARIOS[G.scen];const fs=(FL().scen||{})[G.scen]||{};
+  let h=`<div class="daycard"><div class="dk">Day ${G.round} of ${G.rounds}</div><b>${esc((fs.days&&fs.days[G.round])||S.n)}</b><div class="gl">🎯 ${esc(SC().goal?SC().goal():S.x)}</div></div>`;
+  h+=tutHtml();
+  const pr=priorities();
+  if(pr.length)h+=`<h3>Today’s priorities</h3><div class="prios">${pr.map((p,i)=>`<div class="prio ${p.done?'done':''} ${p.cant&&!p.done?'cant':''}"><div class="pi">${p.done?'✅':p.icon}</div><div class="pt"><b>${esc(p.title)}</b><span>${esc(p.cant&&!p.done?p.why+' ('+p.cant+')':p.why)}</span></div>${p.done?'<small>planned</small>':p.pile?`<button class="btn sm" data-a="pilemax" ${pileWhy(1)?'disabled':''}>Add wood</button>`:p.act&&!p.cant?`<button class="btn sm go" data-do="${i}">Do it</button>`:''}</div>`).join('')}</div>`;
+  const free=humanFree();
+  h+=`<div class="tray"><div class="lbl">${free.length?`${free.filter(p=>p.c!=null).length} castaway pawn${free.filter(p=>p.c!=null).length===1?'':'s'} free${free.some(p=>p.c==null)?' + helpers':''}`:'Every pawn has a job'} <small>${free.length?'· tap one to choose who, then a job':''}</small></div>${free.map(p=>chip(p)).join('')}</div>`;
+  h+=`<h3>Your plan</h3>`+(G.plan.acts.length?`<div class="plan">${G.plan.acts.map(a=>planLine(a)).join('')}</div>`:`<p class="muted small">Nothing planned yet. Use a priority above, a category below, or tap the island.</p>`);
+  if(UI.tileSel!=null)h+=tileFocusHtml(UI.tileSel);
+  h+=`<h3>Add a job</h3><div class="cats">${CATS.filter(([k])=>k!=='special'||Object.keys(SC().specials||{}).length||G.kept.m_tmap).map(([k,ic,n])=>{const c=catCount(k);return `<button class="cat ${UI.cat===k?'on':''}" data-cat="${k}" ${c?'':'aria-disabled="true"'}><span>${ic}</span>${n}<small>${c||'—'}</small></button>`}).join('')}</div>`;
+  if(UI.cat)h+=`<div class="catbody">${catHtml(UI.cat)}</div>`;
+  const pb=planProblems();h+=`<div class="probs">${pb.length?pb.slice(0,3).map(x=>`<div>• ${esc(x)}</div>`).join(''):'<div class="ok">✓ Ready. Press Start the day.</div>'}</div>`;
+  h+=`<label class="chk"><input type="checkbox" data-a="moveask" ${G.moveAsk?'checked':''}> Consider moving the camp tonight</label>`;
+  return h}
+function planLine(a){const n=actNeed(a);const k=a.pw.length;const dt=dtype(a);let chance;
+  if(k<n.need)chance=`<b class="warn">needs ${n.need-k} more</b>`;else if(n.roll&&k<n.max)chance=`<b class="roll" title="With one pawn fewer than sure, the dice decide. A failure gives the leader 2 determination.">🎲 ${Math.round((PSUCC[dt]||.8)*100)}% · may hurt</b>`;else chance='<b class="sure">✔ sure</b>';
+  const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v}${RICON[r]}`).join(' ');
+  const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)?`<button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">${a.pay==='fur'?'🧶 fur':'🪵 wood'}</button>`:'';
+  return `<div class="pl"><span class="pli">${ACT_ICON[a.type]||'•'}</span><div class="plt"><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')} ${chance} ${cost?`<span class="cost">${cost}</span>`:''} ${payT}</div></div></div>`}
+function catCount(k){try{return catRows(k).filter(r=>!r.why).length}catch(e){return 0}}
+// every job in a category: {type,tgt,alt,title,sub,why}
+function catRows(k){const o=[];const add=(type,tgt,title,sub,alt)=>{const why=targetWhy(type,tgt,alt||0,null);o.push({type,tgt,alt:alt||0,title,sub,why:why==='already planned'&&MULTI.includes(type)?null:why})};
+  if(k==='build'){const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];
+    add('build',{k:'shelter'},'🏠 Shelter',`${tb.wood} wood or ${tb.fur} fur · no more wounds for sleeping outside`);add('build',{k:'roof'},'☂️ Roof +1',`${tb.wood+G.cost.roof} wood or ${tb.fur} fur · keeps 1 cloud off`);add('build',{k:'pal'},'🧱 Palisade +1',`${tb.wood+G.cost.pal} wood or ${tb.fur} fur · walls against beasts and storms`);add('build',{k:'weapon'},'🗡️ Weapon +1',`${1+G.cost.weapon} wood · for hunting and fights`);
+    const invs=[...new Set(G.inv.board.concat(Object.keys(SCENARIOS[G.scen].invs||{})).concat(Object.keys(INVENTIONS).filter(x=>INVENTIONS[x].kind==='personal'&&G.chars.some(c=>c.k===INVENTIONS[x].owner&&!c.dead))))].filter(x=>x!=='cross'&&(!has(x)||invReq(x).multi));
+    for(const x of invs){const I=invReq(x);add('build',{k:x},`${I.kind==='scen'?'⭐ ':'💡 '}${I.n}`,`${invNeedPlain(I)} · ${I.x}`)}
+    if(G.scen==='hexed')for(const m of G.map)if(tileAt(m.id)&&!G.sc.crosses.includes(m.id))add('build',{k:'cross',cross:m.id},`✝️ Cross on tile ${tileAt(m.id).no}`,`2 wood · ${tileAt(m.id).terr}${m.fog?' · fog: +1 pawn':''}`)}
+  if(k==='gather')for(const m of G.map){const t=tileAt(m.id);if(!t||m.id===G.camp.pos||dist(G.camp.pos,m.id)>2)continue;for(const s of srcs(m.id)){if(s.ex)continue;const n=actNeed({type:'gather',tgt:{pos:m.id,i:s.i}});add('gather',{pos:m.id,i:s.i},`${s.s==='wood'?'🪵 Wood':s.s==='fish'?'🐟 Fish':'🦜 Birds'} · tile ${t.no} ${t.terr}`,`${n.need} pawn rolls, ${n.max} sure${dist(G.camp.pos,m.id)>=2?' · far':''}${m.tok.beast?' · danger':''}`)}}
+  if(k==='explore')for(const m of MAP){if(G.map[m.id].tile!=null||!m.adj.some(p=>tileAt(p))||dist(G.camp.pos,m.id)>2)continue;const n=actNeed({type:'explore',tgt:m.id});add('explore',m.id,`❔ Unexplored space ${m.id+1}`,`${n.need} pawn rolls, ${n.max} sure${dist(G.camp.pos,m.id)>=2?' · far':''}${G.map[m.id].fog?' · fog':''}`)}
+  if(k==='threat')G.ev.threat.forEach((c0,i)=>{if(!c0)return;const c=CARD[c0];const r=c.th.req||{};const alts=r.alt?r.alt.length:1;for(let al=0;al<alts;al++)add('threat',i,`⚠️ ${c.th.n}`,`${i===0&&G.ev.threat[1]?'strikes at next dawn · ':''}${c.th.pw==='1-2'?'1–2':c.th.pw} pawn${c.th.pw===1?'':'s'}${reqText(alts>1?r.alt[al]:r)?' · needs '+reqText(alts>1?r.alt[al]:r):''} · reward: ${opsText(c.th.rw||c.th.rw2||c.th.rw1)||'peace'} · if ignored: ${opsText(c.te)||'nothing'}`,al)});
+  if(k==='hunt')add('hunt',null,'🏹 Hunt a beast',`2 pawns · ${G.hunt.length} beast${G.hunt.length===1?'':'s'} tracked · weapon ${G.weapon} vs strength: each point short is a wound`);
+  if(k==='camp'){add('camp',null,'🏕️ Arrange the camp',G.np===4?'2 determination or morale +1':'+2 determination and morale +1');add('rest',null,'😴 Rest',has('bed')?'heal 2 and +1 determination':'heal 1 wound')}
+  if(k==='special'){for(const s of Object.keys(SC().specials||{}))add('special',s,`⭐ ${SPEC(s).n}`,specialSub(s));if(G.kept.m_tmap)add('tmap',null,"🗺️ Follow the pirate's map",'2 pawns · 2 mystery cards')}
+  return o}
+function catHtml(k){const rows=catRows(k);const ok=rows.filter(r=>!r.why),no=rows.filter(r=>r.why);
+  const line=r=>{const key=encodeURIComponent(JSON.stringify({type:r.type,tgt:r.tgt,alt:r.alt}));const planned=findActAny(r.type,r.tgt,r.alt);const sel=UI.sel;const pw=sel&&!r.why?placeWhy(sel,r.type,r.tgt,r.alt):null;
+    return `<div class="job ${r.why?'no':''} ${planned?'has':''}"><div class="jt"><b>${esc(r.title)}</b><span>${esc(r.sub)}${r.why?` <em>(${esc(r.why)})</em>`:''}</span></div>${r.why?'':`<button class="btn add" data-place="${key}" ${pw?'disabled':''} title="${esc(pw||'Put '+(sel?pawnLabel(pawnInfo(sel)):'a pawn')+' on this')}">+</button>`}</div>`};
+  return (ok.length?ok.map(line).join(''):'<p class="muted small">Nothing possible here right now.</p>')+(no.length?`<details class="later"><summary>Not possible yet (${no.length})</summary>${no.map(line).join('')}</details>`:'')}
+
+// the day so far, never ahead of the story
+function journalHtml(){const i=storyIdx();if(i<0)return '';const from=Math.max(0,lastPlanBeat(i)+1);const out=[];
+  for(let k=from;k<=i;k++){const b=UI.beats[k];if(skippable(k))continue;const h=beatHtml(k);out.push(`<li class="${k===i?'now':''}"><b>${h.icon} ${h.title}</b>${beatLines(k).filter(MEANINGFUL).slice(0,6).map(l=>`<span class="${l.c}">${esc(l.t)}</span>`).join('')}</li>`)}
+  return `<h3>Journal · today</h3><ol class="journal">${out.join('')}</ol>`}
 
 </script>
 <script>
@@ -1508,7 +2027,7 @@ function buildSea(){const g=new THREE.PlaneGeometry(220,220,90,90);g.rotateX(-Ma
 function shoreGeo(rad){rad=rad||9;const sh=new THREE.Shape();const R=seeded(7);for(let i=0;i<=36;i++){const a=i/36*Math.PI*2,r=rad*(1+(R()-.5)*.12);const x=Math.cos(a)*r,y=Math.sin(a)*r;i?sh.lineTo(x,y):sh.moveTo(x,y)}
   const g=new THREE.ExtrudeGeometry(sh,{depth:1.2,bevelEnabled:false});g.rotateX(-Math.PI/2);g.computeBoundingBox();g.translate(0,-g.boundingBox.max.y,0);return g}
 function fitIsland(){let m=0,cx=0,cz=0;const ts=MAP;for(const t of ts){const p=hexPos(t.q,t.r);cx+=p.x/ts.length;cz+=p.z/ts.length}for(const t of ts){const p=hexPos(t.q,t.r);m=Math.max(m,Math.hypot(p.x-cx,p.z-cz))}
-  const rad=m+HEXR*1.6;V3.isl.geometry.dispose();V3.isl.geometry=shoreGeo(rad);V3.isl.position.set(cx,-.02,cz);V3.reef.scale.setScalar(rad+2.2);V3.reef.position.set(cx,-.25,cz);V3.look.set(cx,0,cz+.6);V3.orbit.d=Math.max(20,rad*2.25);V3.orbit.e=1.0;placeCam();
+  const rad=m+HEXR*1.6;V3.isl.geometry.dispose();V3.isl.geometry=shoreGeo(rad);V3.isl.position.set(cx,-.02,cz);V3.reef.scale.setScalar(rad+2.2);V3.reef.position.set(cx,-.25,cz);V3.look.set(cx,0,cz+.6);V3.center=V3.look.clone();V3.orbit.d=Math.max(20,rad*2.2);V3.d0=V3.orbit.d;V3.orbit.e=1.12;placeCam();
   // stars for the night
   if(!V3.stars){const sp=new Float32Array(600*3);for(let i=0;i<600;i++){const a=Math.random()*Math.PI*2,e=Math.random()*.9+.1,r=120;sp.set([Math.cos(a)*Math.cos(e)*r,Math.sin(e)*r,Math.sin(a)*Math.cos(e)*r],i*3)}const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(sp,3));V3.stars=new THREE.Points(g,new THREE.PointsMaterial({color:0xffffff,size:.8,transparent:true,opacity:0,fog:false}));V3.scene.add(V3.stars)}}
 function buildRain(){const n=1400;const pos=new Float32Array(n*6);for(let i=0;i<n;i++){const x=(Math.random()-.5)*50,y=Math.random()*30,z=(Math.random()-.5)*50;pos.set([x,y,z,x-.15,y-.9,z],i*6)}
@@ -1590,7 +2109,19 @@ function sync3D(){if(!V3.on||!G)return;const sc=V3.scene;if(!V3.layout){V3.layou
   // weather and night: the forecast while planning, the real clouds in the weather phase
   const S=SCENARIOS[G.scen];const dice=S.wx[G.round]||[];const w=G.phase==='weather'&&G.wxNow?G.wxNow:{rain:(dice.includes('rain')?1.2:0)+G.wx.rain,snow:(dice.includes('snow')?1.2:0)+G.wx.snow,storm:G.wx.storm};
   V3.weather.rain=Math.min(1,(w.rain||0)/2);V3.weather.snow=Math.min(1,(w.snow||0)/2);V3.weather.storm=Math.min(1,(w.rain||0)*.25+(w.snow||0)*.25+(w.storm?0.5:0));V3.night=G.phase==='night'||G.over&&!G.over.win?1:0;
-  V3.pickable=UI.pick||null}
+  V3.pickable=UI.pick||null;syncLabels()}
+// ---- floating labels over every tile you can read or act on ----
+const TICON={beach:'🏖️',river:'🏞️',plains:'🌾',hills:'⛰️',mountains:'🏔️'};const SICON={wood:'🪵',fish:'🐟',parrot:'🦜'};
+function syncLabels(){const box=document.getElementById('labels');if(!box)return;V3.lab=V3.lab||{};
+  for(const m of G.map){const t=tileAt(m.id);let h='';const reach=!t&&!m.down&&MAP[m.id].adj.some(p=>tileAt(p));
+    if(t){const cr=G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id);h=`<b>${TICON[t.terr]||''} ${t.terr}</b><i>${t.src.map((s,i)=>`<u class="${m.exh[i]?'gone':''}">${SICON[s]||s}</u>`).join('')}</i>${m.id===G.camp.pos?'<em class="camp">🏕️ camp</em>':''}${t.shelter?'<em>⛰ cave</em>':''}${m.fog?'<em>🌫 fog</em>':''}${cr?'<em>✝️</em>':''}${m.waste?'<em>barren</em>':''}`}
+    else if(reach)h=`<b class="unk">❔ explore</b>${m.fog?'<em>🌫</em>':''}`;
+    let el=V3.lab[m.id];if(!h){if(el)el.hidden=true;continue}
+    if(!el){el=V3.lab[m.id]=document.createElement('button');el.className='tl';el.dataset.tile=m.id;box.appendChild(el)}
+    el.hidden=false;if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h}el.classList.toggle('sel',UI.tileSel===m.id);el.classList.toggle('far',!t)}}
+function placeLabels(){if(!V3.lab)return;const cv=V3.r.domElement;const w=cv.clientWidth,h=cv.clientHeight;const v=new THREE.Vector3();
+  for(const id in V3.lab){const el=V3.lab[id];if(el.hidden)continue;const p=hexPos(MAP[id].q,MAP[id].r);v.set(p.x,HEXH+.2,p.z+HEXR*.55).project(V3.cam);
+    if(v.z>1){el.style.opacity=0;continue}el.style.opacity='';el.style.transform=`translate(${((v.x+1)/2*w).toFixed(1)}px,${((1-v.y)/2*h).toFixed(1)}px) translate(-50%,-50%)`}}
 function tween(obj,k,to,dur){V3.tweens.push({obj,k,from:obj[k],to,t:0,dur})}
 function loop3D(){requestAnimationFrame(loop3D);const dt=Math.min(.05,V3.clock.getDelta());V3.t+=dt;const t=V3.t;
   // sea waves
@@ -1599,6 +2130,9 @@ function loop3D(){requestAnimationFrame(loop3D);const dt=Math.min(.05,V3.clock.g
   // tweens
   V3.tweens=V3.tweens.filter(w=>{w.t+=Math.max(dt,Math.min(.5,V3.clock.elapsedTime-(V3.lastEl||0)));const f=Math.min(1,w.t/w.dur);const e=1-Math.pow(1-f,3);w.obj[w.k]=w.from+(w.to-w.from)*e;return f<1});
   V3.lastEl=V3.clock.elapsedTime;
+  // camera glides to the scene being told, and back to the whole island for planning
+  if(V3.center&&!V3.drag){const f=V3.focus!=null&&MAP[V3.focus]?hexPos(MAP[V3.focus].q,MAP[V3.focus].r).add(new THREE.Vector3(0,0,1.2)):V3.center;const k=Math.min(1,dt*2);if(V3.look.distanceTo(f)>.02||Math.abs(V3.orbit.d-(V3.focus!=null?V3.d0*.72:V3.d0))>.05){V3.look.lerp(f,k);V3.orbit.d+=((V3.focus!=null?V3.d0*.72:V3.d0)-V3.orbit.d)*k;placeCam()}}
+  placeLabels();
   // pawns walk to their spots
   let pi=0;for(const k in V3.pawns){const o=V3.pawns[k];pi++;if(o.userData.to){const moving=o.position.distanceTo(o.userData.to)>.08;o.position.lerp(o.userData.to,Math.min(1,dt*2.5));o.position.y=HEXH/2+(moving?Math.abs(Math.sin(t*9+pi))*.18:Math.abs(Math.sin(t*2+pi))*.03)}}
   for(const id in V3.tiles){const ov=V3.tiles[id].ov;if(ov)for(const c of ov.children){if(c.userData.fog){c.position.x+=Math.sin(t*.6+c.position.z)*dt*.08}if(c.userData.spin)c.rotation.y+=dt*1.5}}
@@ -1687,18 +2221,16 @@ const PHASES=[['event','Event'],['morale','Morale'],['prod','Production'],['plan
 UI.tab='plan';UI.sel=null;UI.tileSel=null;UI.report=null;UI.seenLog=0;UI.fxSeen=0;UI.lastRollId=0;UI.toasts=[];
 function refresh(){if(G){try{if(!G.over)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
   if(!G){return}
-  // a report of what just happened, once the flow stops for the humans
-  const humanTurn=!G.over&&((G.q&&P(G.q.who)&&P(G.q.who).human)||(planOpen()&&!allAI()));
-  const key=G.round+':'+G.phase;const same=G.phase==='plan'&&UI.lastKey===key;UI.lastKey=key;if(same)UI.reportMark=G.logN;
-  if((humanTurn||G.over)&&!allAI()&&!same){const fresh=newLogSince(UI.reportMark);if(UI.reportMark!=null&&fresh.length>2&&!UI.report&&(!G.q||G.phase!=='plan'))UI.report={lines:fresh,title:G.over?'The last day':G.q?'So far today':`Dawn of round ${G.round}`};UI.reportMark=G.logN}
-  if(allAI())UI.reportMark=G.logN;
-  playFx();render();try{sync3D()}catch(e){console.error(e)}schedule()}
+  // the last beat always shows the live state; an ending gets its own scene
+  const B=UI.beats;if(B.length){B[B.length-1].snap=null;B[B.length-1].obj=null}
+  if(G.over&&(!B.length||B[B.length-1].kind!=='over')&&typeof document!=='undefined'){beat('over');UI.overSeen=false}
+  playFx();render();try{withView(()=>sync3D())}catch(e){console.error(e)}schedule()}
 function newLogSince(mark){if(mark==null)return[];const n=G.logN-mark;return G.log.slice(0,Math.max(0,n)).reverse()}
-function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){const m={dice:'dice',wound:'wound',heal:'heal',build:'build',explore:'explore',fight:'fight',event:'event',weather:'thunder',night:'night',round:'round',win:'win',lose:'lose',mystery:'mystery',adventure:'mystery',morale:'good',threat:'good',move:'bad',skill:'good'}[f.t];if(m&&typeof sfx==='function')sfx(m);
-    if(f.t==='weather'&&V3.on)V3.flash=1;if(f.t==='explore'||f.t==='build'||f.t==='wound'||f.t==='fight')UI.bump=f}
+function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){const m={skill:'good'}[f.t];if(m&&typeof sfx==='function')sfx(m);
+    if(f.t==='explore'||f.t==='build'||f.t==='wound'||f.t==='fight')UI.bump=f}
   UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,UI.fx.length-10);UI.fxSeen=UI.fx.length}}
 // ---------- top-level render ----------
-function render(){if(!G){renderModal();return}renderHud();renderStep();renderPanel();renderModal();renderMap2D();
+function render(){if(!G){renderModal();renderStory();return}withView(()=>{renderHud();renderMap2D()});renderStep();renderPanel();renderStory();renderModal();
   const pb=$('#pausebtn');if(pb){pb.hidden=!allAI();pb.textContent=UI.pause?'▶ Resume':'⏸ Pause'}const sb=$('#speedbtn');if(sb)sb.textContent='⏩ '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')}
 function renderHud(){const S=SCENARIOS[G.scen];const el=$('#hud');if(!el)return;const wx=S.wx[G.round]||[];const ph=G.phase==='actdone'?'act':G.phase==='start'?'event':G.phase;
   const dieI={rain:'🌧',snow:'❄️',animals:'🐾'};
@@ -1715,7 +2247,7 @@ function stepText(){if(G.over)return G.over.win?`🏆 ${G.over.why}`:`☠ ${G.ov
   if(planOpen()){if(allAI())return UI.pause?'Paused.':'The computer castaways are planning…';const left=allPawns().filter(p=>p.c!=null&&!P(p.c).dead&&P(p.c).human&&!placedIds().has(p.id)).length;const pr=planProblems();
     return left?`Plan the day: ${left} pawn${left>1?'s':''} still to place. Pick a pawn, then an action${V3.on?' or a tile on the island':''}.`:pr.length?`Almost ready: ${pr[0]}`:'Everyone has a job. Start the day when you are happy with the plan.'}
   return 'The day unfolds…'}
-function renderStep(){const el=$('#step');if(!el)return;const ready=planOpen()&&!allAI()&&!planProblems().length;
+function renderStep(){const el=$('#step');if(!el)return;const st=storyActive();el.hidden=st;const dk0=$('#dock');if(st){if(dk0)dk0.hidden=true;return}const ready=planOpen()&&!allAI()&&!planProblems().length;
   el.innerHTML=`<div class="st-t" id="steptext">${esc(stepText())}</div>${planOpen()&&!allAI()?`<div class="st-b"><button class="btn ghost" data-a="suggest" title="Let the computer suggest a plan (H)">💡 Suggest</button><button class="btn ghost" data-a="clear">Clear</button><button class="btn go ${ready?'':'dim'}" data-a="go" title="Start the day (Enter)">Start the day ▶</button></div>`:''}${G.over?`<div class="st-b"><button class="btn go" data-a="new">New game</button></div>`:''}`;
   const dk=$('#dock');if(dk){dk.hidden=!(planOpen()&&!allAI());dk.innerHTML=`<button class="btn ghost" data-a="suggest">💡</button><span>${esc(stepText())}</span><button class="btn go ${ready?'':'dim'}" data-a="go">Start ▶</button>`}}
 // ---------- side panel ----------
@@ -1726,27 +2258,6 @@ function renderPanel(){const el=$('#panel');if(!el)return;const tabs=[['plan','P
 function pawnLabel(p){if(p.c!=null){const c=P(p.c);return c.nm}if(p.f)return 'Friday';return p.n||'Helper'}
 function chip(p,opt){opt=opt||{};const col=p.c!=null?PCOL[p.c%6]:p.f?'#f3f3f3':'#8d8d8d';const sel=UI.sel===p.id;
   return `<button class="chip ${sel?'sel':''} ${p.c==null?'aux':''} ${opt.placed?'placed':''}" style="--pc:${col}" data-pawn="${p.id}" ${opt.rm?`data-rm="${p.id}"`:''} title="${esc(pawnLabel(p))}${p.x?' (helper: '+p.t.map(t=>TNAME[t]).join(' / ')+')':''}${opt.rm?' — click to take back':''}"><i></i>${esc(pawnLabel(p).split(' ')[0])}${opt.rm?' ×':''}</button>`}
-function planHtml(){if(!planOpen()&&G.phase!=='plan')return `<p class="muted">${G.over?'The game is over.':'The castaways are busy. The plan panel opens at the start of the next action phase.'}</p>`+recentHtml();
-  const placed=placedIds();const all=allPawns();const humanIds=new Set(G.chars.filter(c=>c.human).map(c=>c.i));
-  const mine=all.filter(p=>p.c==null||humanIds.has(p.c));
-  let h=`<div class="tray"><div class="lbl">Pawns <small>(tap one, then an action)</small></div>${mine.filter(p=>!placed.has(p.id)).map(p=>chip(p)).join('')||'<span class="muted">all placed</span>'}</div>`;
-  if(UI.tileSel!=null)h+=tileFocusHtml(UI.tileSel);
-  if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();h+=`<div class="pile">🔥 Signal pile <b>${G.sc.pile}/15</b> ${[1,2,3,4,5].map((n,i)=>`<i class="${G.sc.pile>=PILE_CUM[i]?'full':''}" title="stage ${i+1}: ${n} wood"></i>`).join('')} ${room?`<button class="btn sm" data-a="pile" ${pileWhy(1)?'disabled':''} title="${esc(pileWhy(1)||'Add wood before the actions (one stage a round)')}">+1 wood</button>${room>1?`<button class="btn sm" data-a="pilemax" ${pileWhy(1)?'disabled':''}>+${Math.min(room,Math.max(1,G.res.wood-committed().wood))}</button>`:''}`:`<small>${G.sc.pile>=15?'complete':'stage done this round'}</small>`}</div>`}
-  h+=section('Threats',G.ev.threat.map((k,i)=>{if(!k)return `<div class="row empty">Threat slot ${i+1}: empty</div>`;const c=CARD[k];const r=c.th.req||{};const alts=r.alt?r.alt.length:1;
-    return Array.from({length:alts},(_,al)=>row('threat',i,`${c.th.n} <small>(${esc(c.n)})</small>`,`${i===0&&G.ev.threat[1]?'<b class="warn">slides off at the next event</b> · ':''}${c.th.pw==='1-2'?'1–2':c.th.pw} pawn${c.th.pw===1?'':'s'}${reqText(alts>1?r.alt[al]:r)?' · needs '+reqText(alts>1?r.alt[al]:r):''} · ${opsText(c.th.rw||c.th.rw2||c.th.rw1)||'removes the card'}<br><span class="muted">If ignored: ${opsText(c.te)||'nothing'}</span>`,{alt:al,card:k})).join('')}).join(''));
-  h+=section('Hunt',row('hunt',null,`Hunt a beast`,G.hunt.length?`2 pawns · ${G.hunt.length} beast${G.hunt.length>1?'s':''} in the hunting grounds (unknown) · your weapon ${G.weapon}`:'Explore tiles with animal tracks to fill the hunting grounds'));
-  const blds=[['shelter','Shelter'],['roof','Roof'],['pal','Palisade'],['weapon','Weapon +1']].map(([k,n])=>{const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];const cost=k==='weapon'?`${1+G.cost.weapon} wood`:`${tb.wood+G.cost[k]} wood or ${tb.fur} fur`;return row('build',{k},n,`${cost} · 1 pawn rolls, 2 are sure`)}).join('');
-  const invs=[...new Set(G.inv.board.concat(Object.keys(SCENARIOS[G.scen].invs||{})).concat(Object.keys(INVENTIONS).filter(x=>INVENTIONS[x].kind==='personal'&&G.chars.some(c=>c.k===INVENTIONS[x].owner&&!c.dead))))].filter(k=>k!=='cross'&&(!has(k)||invReq(k).multi));
-  const invRow=k=>{const I=invReq(k);return row('build',{k},`${esc(I.n)}${I.kind==='personal'?' <small>(personal)</small>':I.kind==='scen'?' <small>(scenario)</small>':''}`,`${invNeedText(k)} · ${esc(I.x)}`,{inv:k})};
-  const can=invs.filter(k=>!invWhy(k)||findActAny('build',{k})),cant=invs.filter(k=>invWhy(k)&&!findActAny('build',{k}));
-  h+=section('Build',blds+can.map(invRow).join('')+(G.scen==='hexed'?crossRows():'')+(cant.length?`<details class="later"${UI.openLater?' open':''}><summary data-a="later">Not possible yet (${cant.length}): needs terrain or items</summary>${cant.map(invRow).join('')}</details>`:''));
-  h+=section('Gather',gatherRows()||'<div class="row empty">Explore to find more sources (the camp tile produces by itself).</div>');
-  h+=section('Explore',exploreRows()||'<div class="row empty">Nothing left to explore within reach.</div>');
-  const sp=Object.keys(SC().specials||{});if(sp.length||G.kept.m_tmap)h+=section('Scenario',sp.map(k=>row('special',k,esc(SPEC(k).n),specialSub(k))).join('')+(G.kept.m_tmap?row('tmap',null,"Follow the pirate's map",'2 pawns · draw 2 mystery cards, keep up to 2 treasures'):''));
-  h+=section('Camp',row('camp',null,'Arrange the camp',G.np===4?'2 determination or morale +1':`+2 determination and morale +1${actNeed({type:'camp'}).need>1?' · slowed: needs 2 pawns':''}`)+row('rest',null,'Rest',has('bed')?'heal 2 wounds and +1 determination (bed)':'heal 1 wound'));
-  const pr=planProblems();h+=`<div class="probs">${pr.length?pr.slice(0,4).map(x=>`<div>• ${esc(x)}</div>`).join(''):'<div class="ok">✓ The plan is ready.</div>'}</div>`;
-  h+=`<label class="chk"><input type="checkbox" data-a="moveask" ${G.moveAsk?'checked':''}> Consider moving the camp tonight</label>`;
-  return h}
 function section(t,body){return `<section class="sec"><h3>${t}</h3>${body}</section>`}
 function row(type,tgt,title,sub,o){o=o||{};const a=findActAny(type,tgt,o.alt);const why=targetWhy(type,tgt,o.alt||0,null);const blocked=why&&why!=='already planned';
   const sel=UI.sel;const pwhy=sel?placeWhy(sel,type,tgt,o.alt):null;const n=a?actNeed(a):null;
@@ -1793,9 +2304,7 @@ function recentHtml(){return `<h3>Latest</h3><ol class="log">${G.log.slice(0,12)
 // ---------- modal: questions, reports, start, cards, rules, game over ----------
 function renderModal(){const m=$('#modal');if(!m)return;let h='';
   if(UI.modal==='start')h=startHtml();else if(UI.modal==='cards')h=cardsHtml();else if(UI.modal==='rules')h=`<div class="mbox wide"><button class="x" data-a="close" aria-label="Close">×</button>${RULES_HTML}</div>`;
-  else if(!G)h='';else if(UI.report)h=`<div class="mbox"><h2>${esc(UI.report.title)}</h2><ol class="rep">${UI.report.lines.map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ol><div class="mb"><button class="btn go" data-a="okreport" autofocus>${G.over?'See how it ended':G.q?'Continue':'Plan the day ▶'}</button></div></div>`;
-  else if(G.q&&P(G.q.who)&&P(G.q.who).human)h=questionHtml();
-  else if(G.over&&!UI.overSeen)h=overHtml();
+  else if(!G)h='';else if(G.over&&!UI.overSeen&&!storyActive())h=overHtml();
   m.hidden=!h;if(m.dataset.h!==h){m.innerHTML=h;m.dataset.h=h;const f=m.querySelector('[autofocus]')||m.querySelector('button.opt');if(f)f.focus()}}
 function questionHtml(){const q=G.q;let ctx='';
   if(q.kind==='dice'){const d=q.dice;ctx=`<div class="dice">${die('wound',d.w)}${die('success',d.s)}${die('adventure',d.q)}</div>`}
@@ -1838,17 +2347,20 @@ function renderMap2D(){const el=$('#map2d');if(!el||V3.on){if(el)el.hidden=true;
     const pts=Array.from({length:6},(_,i)=>{const a=Math.PI/3*i+Math.PI/6;return (x+Math.cos(a)*R*.98).toFixed(1)+','+(y+Math.sin(a)*R*.98).toFixed(1)}).join(' ');
     return `<g data-tile="${m.id}" class="hx ${UI.tileSel===m.id?'sel':''}"><polygon points="${pts}" fill="${t?col[t.terr]:g.down?'#333':'#24364a'}" stroke="#0b1520" stroke-width="2"/><text x="${x}" y="${y-6}" text-anchor="middle">${t?t.no+' '+t.terr.slice(0,5):'?'}</text><text x="${x}" y="${y+12}" text-anchor="middle">${m.id===G.camp.pos?'🏕':''}${g.fog?'🌫':''}${G.sc.crosses&&G.sc.crosses.includes(m.id)?'✝':''}${t?t.src.map((s,i)=>g.exh[i]?'▪':s==='wood'?'🪵':'🐟').join(''):''}</text></g>`}).join('')}</svg>`}
 // ---------- input ----------
-function on3DTile(id){UI.tileSel=id;UI.tab='plan';render()}
+function on3DTile(id){if(storyActive())return;UI.tileSel=id;UI.tab='plan';tutAdvance(3);const t=tileAt(id);if(!t&&G.map[id].tile==null)UI.cat=null;render();const f=document.querySelector('.tfocus');if(f&&f.scrollIntoView)f.scrollIntoView({block:'nearest',behavior:'smooth'})}
 function autoPawn(type,tgt,alt){const humans=new Set(G.chars.filter(c=>c.human).map(c=>c.i));const free=allPawns().filter(p=>!placedIds().has(p.id)&&(p.c==null||humans.has(p.c)));const a=findActAny(type,tgt,alt);const hasLead=a&&a.pw.some(q=>{const p=pawnInfo(q);return p&&(p.c!=null||p.f)});
   const order=hasLead?free.filter(p=>p.x).concat(free.filter(p=>p.c!=null),free.filter(p=>p.f)):free.filter(p=>p.c!=null).concat(free.filter(p=>p.f),free.filter(p=>p.x));return order.find(p=>!placeWhy(p.id,type,tgt,alt))}
 function doPlace(type,tgt,alt){let pid=UI.sel;if(!pid){const p=autoPawn(type,tgt,alt);if(!p){toast('No free pawn can do that.');return}pid=p.id}
-  const e=place(pid,type,tgt,alt);if(e){toast(e);return}sfx('place');UI.sel=null;
+  const e=place(pid,type,tgt,alt);if(e){toast(e);return}sfx('place');UI.sel=null;tutAdvance(2);
   // keep the same character selected for their second pawn
   refresh()}
 function toast(t){const el=$('#toast');if(!el)return;el.textContent=t;el.hidden=false;clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,2600);const lv=$('#live');if(lv)lv.textContent=t}
 document.addEventListener('click',e=>{const b=e.target.closest('button,[data-tile],input[type=checkbox],summary');if(!b)return;const d=b.dataset;
   if(d.tab){UI.tab=d.tab;render();return}
   if(d.ans!=null){sfx('click');answer(+d.ans);return}
+  if(d.do!=null){const p=priorities()[+d.do];if(p&&p.act){const r=doJob(p.act.type,p.act.tgt,p.act.alt,p.lead);if(r)toast(r);else{sfx('place');tutAdvance(2)}}refresh();return}
+  if(d.cat){UI.cat=UI.cat===d.cat?null:d.cat;render();return}
+  if(d.tut){if(d.tut==='off')tutDone();else UI.tut++;render();return}
   if(d.place){const o=JSON.parse(decodeURIComponent(d.place));doPlace(o.type,o.tgt,o.alt);return}
   if(d.rm){unplace(d.rm);UI.sel=null;refresh();return}
   if(d.pawn){UI.sel=UI.sel===d.pawn?null:d.pawn;sfx('click');render();return}
@@ -1864,7 +2376,9 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-til
   if(d.diff){const s=UI.setup;s.diff=d.diff;s.items={easy:4,standard:2,hard:1}[d.diff];if(d.diff==='easy'){s.dog=true;s.friday=true}render();return}
   if(d.opt&&b.type==='checkbox'){UI.setup[d.opt]=b.checked;return}
   switch(d.a){
-  case 'go':{const r=startActions();if(r)toast(r);else{sfx('click')}return}
+  case 'go':{const r=startActions();if(r)toast(r);else{sfx('click');if(UI.tut<99&&G.round>1||G.round===1&&UI.tut<99)tutDone()}return}
+  case 'next':storyNext();return;case 'skip':storySkip();return;
+  case 'auto':UI.auto=!UI.auto;try{localStorage.setItem('swi_auto',UI.auto?'1':'0')}catch(e){}render();return;
   case 'suggest':suggestPlan();toast('Suggested plan placed. Change anything you like.');return;
   case 'clear':clearPlan(G.chars.filter(c=>c.human).map(c=>c.i));refresh();return;
   case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const r=pileAdd(SCEN.marooned.pileRoom());if(r)toast(r);return}
@@ -1880,14 +2394,14 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-til
 document.addEventListener('input',e=>{const t=e.target;if(t.dataset.cq!=null){UI.cq=t.value;const m=$('#modal');m.dataset.h='';render();const i=m.querySelector('[data-cq]');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}if(t.dataset.opt==='items')UI.setup.items=+t.value});
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset.opt==='items')UI.setup.items=+t.value});
 document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;if(e.key==='Escape'){if(UI.modal&&G){UI.modal=null;render()}else if(UI.report){UI.report=null;render()}else{UI.sel=null;UI.tileSel=null;render()}}
-  if(!G||UI.modal||UI.report)return;if(e.key==='Enter'&&planOpen()&&!G.q){const r=startActions();if(r)toast(r)}if((e.key==='h'||e.key==='H')&&planOpen())suggestPlan()});
+  if(!G||UI.modal)return;if(storyActive()){if((e.key==='Enter'||e.key===' '||e.key==='ArrowRight')&&!humanQ()){e.preventDefault();storyNext()}return}if(e.key==='Enter'&&planOpen()&&!G.q){const r=startActions();if(r)toast(r)}if((e.key==='h'||e.key==='H')&&planOpen())suggestPlan()});
 // ---------- game start ----------
 UI.setup={scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:false,items:2,diff:'standard'};
 function openStart(){UI.modal='start';UI.overSeen=false;render();const m=$('#modal');m.hidden=false;m.innerHTML=startHtml();m.dataset.h=''}
 function beginGame(){const s=UI.setup;UI.modal=null;UI.report=null;UI.overSeen=false;UI.sel=null;UI.tileSel=null;UI.fx.length=0;UI.fxSeen=0;
   const all=s.chars.every(k=>s.ai[k]);newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff});UI.reportMark=G.logN;V3.layout=null;
   for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};refresh()}
-function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.reportMark=G.logN;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};if(G.scen==='stranded'&&!CHARS.ada)CHARS.ada={n:'Ada',die:11,arrows:[],skills:[],npc:1};refresh()}catch(e){toast('No saved game found.');openStart()}}
+function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.beats.length=0;UI.shown=-1;beat('dawn',{round:G.round});UI.modal=null;UI.reportMark=G.logN;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};if(G.scen==='stranded'&&!CHARS.ada)CHARS.ada={n:'Ada',die:11,arrows:[],skills:[],npc:1};refresh()}catch(e){toast('No saved game found.');openStart()}}
 function boot(){try{init3D()}catch(e){console.error(e)}soundBtns&&soundBtns();openStart()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 

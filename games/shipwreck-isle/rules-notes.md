@@ -73,6 +73,20 @@ These scenarios are not included yet:
    - food spoils (not with the Cellar or Boxes);
    - the first player passes on.
 
+## How the game tells the day
+
+- **Story scenes:** the engine records a scene at every moment of the day: dawn, events, threats, morning, each action with its dice, adventures, mysteries, fights, weather and night.
+  - The page plays them back one at a time, as journal pages over the island.
+  - The island and the resource bar show that moment, not the end of the day. The camera flies to where it happens.
+  - Choices appear inside the scene that caused them.
+- **Story text:** every event, adventure, mystery, beast, scenario day and character has original journal text, in `flavor.js`. The rules text on each card is still generated from its effects.
+- **Planning:**
+  - *Today's priorities* names what matters now (food for tonight, shelter, weather, a threat about to strike, the next step toward the goal, a hurt castaway), with a one-tap *Do it*.
+  - *Your plan* lists each job with its pawns and odds.
+  - *Add a job* groups everything else into categories.
+- **Tiles:** every tile has a label with its terrain, sources and camp. Reachable unexplored spaces are marked ❔.
+- **First game:** four tips walk you through day 1.
+
 ## Interpretations where the sources disagree or are silent
 
 These were researched from the 1st-edition English rulebook, card scans and fan implementations. The official FAQ and the 2nd-edition rulebook could not be downloaded.
@@ -129,5 +143,6 @@ Games usually run to round 6–9 before hunger and weather win. These numbers ar
 | `gauntlet.js` | Headless AI games in every scenario | 0 errors, 0 invariant breaks |
 | `force.js` | Forces every event, adventure and mystery card's effects in 12 game states | 2,520 runs, 0 failures |
 | `rules-test.js` | 24 rule scenarios, including the rulebook's own weather example, hunger, spoilage, pawn needs, costs, threat slides, morale, camp moves, personal inventions, Friday, the signal pile, every scenario's win and loss, solo morale, hunting, save/load | 24 pass |
-| `click.js` | A random clicker plays the real page in jsdom (2D map fallback), through the start screen, planning, every question dialog and every report | 0 errors in 6 games |
+| `click.js` | A random clicker plays the real page in jsdom (2D map fallback), through the start screen, priorities, job categories, every story scene type and every choice | 0 errors in 6 games |
+| `watch.js` | All-computer game with the story on auto-play, to the end | 0 errors |
 | Playwright screenshots | Desktop and phone, including the 3D diorama with fog, crosses, pawns and camp | Checked visually |
