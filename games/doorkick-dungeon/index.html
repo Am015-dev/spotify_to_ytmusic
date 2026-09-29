@@ -7,6 +7,57 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gochi+Hand&family=Patrick+Hand&family=Permanent+Marker&display=swap">
 <style>
+/* ===== Board-first shell (shared by every game on the shelf) =====
+   The page never scrolls. The board fills what the bar and the dock leave; the dock is in flow (never over the board);
+   everything else opens in a closable popup (drawer). Games theme it with the --gx-* variables. */
+:root{--gx-bar-h:48px;--gx-dock-w:clamp(300px,30vw,420px);--gx-bg:#10151c;--gx-bar:#0b1016;--gx-panel:#f4ecd8;--gx-ink:#231a10;--gx-line:rgba(0,0,0,.25);--gx-accent:#e0a948;--gx-shadow:0 20px 60px rgba(0,0,0,.5);--gx-radius:14px}
+html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none}
+.gx-app{position:fixed;inset:0;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--gx-bg)}
+.gx-bar{min-height:var(--gx-bar-h);display:flex;align-items:center;gap:6px;padding:4px 10px;padding-top:calc(4px + env(safe-area-inset-top,0px));overflow-x:auto;overflow-y:hidden;scrollbar-width:none;position:relative;z-index:6}
+.gx-bar::-webkit-scrollbar{display:none}
+.gx-bar .gx-sp{flex:1 0 8px}
+.gx-main{min-height:0;display:grid;grid-template-columns:minmax(0,1fr) var(--gx-dock-w);position:relative}
+.gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr) 0}
+.gx-board{position:relative;min-width:0;min-height:0;overflow:hidden}
+.gx-dock{min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;position:relative}
+.gx-dock-head{display:flex;align-items:center;gap:6px;padding:6px 8px 4px;flex:0 0 auto}
+.gx-dock-head .gx-dt{flex:1;min-width:0;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gx-dock-body{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.gx-app.gx-dock-min .gx-dock{visibility:hidden}
+
+.gx-ibtn{appearance:none;border:1px solid var(--gx-line);background:rgba(255,255,255,.08);color:inherit;border-radius:10px;min-width:40px;min-height:40px;padding:4px 10px;display:inline-flex;gap:6px;align-items:center;justify-content:center;cursor:pointer;font:inherit;white-space:nowrap}
+.gx-ibtn:focus-visible,.gx-drawer button:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
+.gx-ibtn .gx-n{font-size:.72rem;opacity:.8}
+.gx-ibtn.gx-reopen{position:absolute;right:10px;top:10px;z-index:5;display:none}
+.gx-app.gx-dock-min .gx-ibtn.gx-reopen{display:inline-flex}
+/* popups */
+.gx-scrim{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;opacity:0;pointer-events:none;transition:opacity .18s}
+.gx-scrim.on{opacity:1;pointer-events:auto}
+.gx-drawer{position:fixed;z-index:41;top:calc(var(--gx-bar-h) + 8px + env(safe-area-inset-top,0px));right:8px;bottom:8px;width:min(520px,calc(100vw - 16px));display:flex;flex-direction:column;background:var(--gx-panel);color:var(--gx-ink);border-radius:var(--gx-radius);box-shadow:var(--gx-shadow);transform:translateX(calc(100% + 16px));transition:transform .22s ease;visibility:hidden}
+.gx-drawer.on{transform:none;visibility:visible}
+.gx-drawer.wide{width:min(980px,calc(100vw - 16px))}
+.gx-drawer-head{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--gx-line);flex:0 0 auto}
+.gx-drawer-head h2{margin:0;font-size:1.15rem;flex:1;min-width:0}
+.gx-x{appearance:none;border:0;background:transparent;font-size:1.6rem;line-height:1;cursor:pointer;color:inherit;min-width:40px;min-height:40px;border-radius:10px}
+.gx-drawer-body{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;overscroll-behavior:contain}
+/* narrow screens: the dock becomes a sheet under the board (still in flow), the drawers slide up from the bottom */
+@media (max-width:999px){
+  .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
+  .gx-app.gx-dock-min .gx-main{grid-template-columns:minmax(0,1fr)}
+  .gx-dock{max-height:var(--gx-sheet-h,46dvh);border-radius:var(--gx-radius) var(--gx-radius) 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-app.gx-sheet-full .gx-dock{max-height:78dvh}
+  .gx-app.gx-dock-min .gx-dock{visibility:visible;max-height:none}
+  .gx-app.gx-dock-min .gx-dock-body{display:none}
+  .gx-reopen{display:none!important}
+  .gx-grab{display:block;width:44px;height:5px;border-radius:3px;background:currentColor;opacity:.35;margin:0 auto}
+  .gx-drawer{top:auto;left:0;right:0;bottom:0;width:auto;max-height:88dvh;height:88dvh;border-radius:var(--gx-radius) var(--gx-radius) 0 0;transform:translateY(100%);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .gx-drawer.wide{width:auto}
+  .gx-hide-narrow{display:none!important}
+}
+@media (min-width:1000px){.gx-grab{display:none}}
+@media (prefers-reduced-motion:reduce){.gx-drawer,.gx-scrim{transition:none}}
+
+
 /* Layout: a sheet of graph paper on a desk; the dungeon table is tilted in CSS 3D, your hand fans along the bottom, the step coach sits at the side. */
 :root{
   --paper:#fbfaf4; --grid:#cfe3f3; --grid2:#e4eef7; --ink:#2b2233; --muted:#6a6178; --desk:#d9c6a5; --desk2:#c7b08a;
@@ -18,12 +69,27 @@
 :root[data-theme="dark"]{--paper:#1f2230;--grid:#2d3448;--grid2:#262b3c;--ink:#f1eee6;--muted:#aaa3b8;--desk:#14151d;--desk2:#0e0f15;--card:#fffef9;--shadow:rgba(0,0,0,.5);color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html,body{min-height:100%}
-body{margin:0;background:var(--desk);background-image:radial-gradient(circle at 20% 10%,var(--desk2) 0 1px,transparent 1.5px);background-size:9px 9px;color:var(--ink);font:18px/1.35 var(--hand)}
+/* shell theme: the desk is the background, the graph-paper sheet is the panel colour */
+:root{--gx-bg:var(--desk);--gx-bar:var(--paper);--gx-panel:var(--paper);--gx-ink:var(--ink);--gx-line:var(--ink);--gx-accent:#ffd43b;--gx-shadow:6px 8px 0 var(--shadow);--gx-radius:12px;--gx-bar-h:52px;--gx-sheet-h:36dvh}
+body{margin:0;background:var(--desk);color:var(--ink);font:18px/1.35 var(--hand)}
 button{font:inherit;color:inherit}
-header{display:flex;gap:8px;align-items:center;padding:8px 16px;padding-top:calc(8px + env(safe-area-inset-top,0px));background:var(--paper);border-bottom:3px solid var(--ink);position:sticky;top:0;z-index:5;overflow-x:auto;flex-wrap:nowrap}
-header h1{font:400 1.6rem/1 var(--title);margin:0 10px 0 0;white-space:nowrap;transform:rotate(-2deg)}
-header h1 span{color:var(--red)}
+.gx-app{background:var(--desk);background-image:radial-gradient(circle at 20% 10%,var(--desk2) 0 1px,transparent 1.5px);background-size:9px 9px;color:var(--ink)}
+.gx-bar{background:var(--paper);border-bottom:3px solid var(--ink);gap:8px;padding-left:12px;padding-right:12px}
+.gx-bar h1{font:400 1.5rem/1 var(--title);margin:0 6px 0 0;white-space:nowrap;transform:rotate(-2deg);flex:none}
+.gx-bar h1 span{color:var(--red)}
+.gx-ibtn{border:2.5px solid var(--ink);background:var(--paper);color:var(--ink);border-radius:12px 14px 11px 15px/14px 11px 15px 12px;box-shadow:2px 3px 0 var(--ink);flex:none;padding:3px 10px}
+.gx-ibtn:hover{transform:translate(-1px,-1px);box-shadow:3px 4px 0 var(--ink)}
+.gx-ibtn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
+.gx-ibtn[aria-expanded="true"]{background:#ffd43b;color:#2b2233}
+.gx-ibtn:focus-visible,.gx-drawer button:focus-visible{outline:3px dashed var(--blue)}
+.gx-dock{background:var(--paper);border-left:3px solid var(--ink)}
+.gx-dock-head{border-bottom:2px dashed var(--grid);min-height:48px}
+.gx-dock-head .gx-dt{font:400 1.05rem var(--title)}
+.gx-dock-body{padding:8px 12px 12px}
+.gx-drawer{border:3px solid var(--ink);box-shadow:6px 8px 0 var(--shadow)}
+.gx-drawer-head h2{font:400 1.3rem var(--title)}
+.gx-x{color:var(--ink)}
+.gx-reopen{background:var(--paper)}
 .btn{border:2.5px solid var(--ink);background:var(--paper);border-radius:12px 14px 11px 15px/14px 11px 15px 12px;padding:5px 12px;cursor:pointer;white-space:nowrap;box-shadow:2px 3px 0 var(--ink);min-height:40px}
 .btn:hover{transform:translate(-1px,-1px);box-shadow:3px 4px 0 var(--ink)}
 .btn:active{transform:translate(2px,2px);box-shadow:0 0 0 var(--ink)}
@@ -31,41 +97,71 @@ header h1 span{color:var(--red)}
 .btn.danger{background:#ffc9c9;color:#2b2233}
 .btn.good{background:#b2f2bb;color:#2b2233}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:1px 1px 0 var(--ink)}
-.btn:focus-visible,.card:focus-visible{outline:3px dashed var(--blue);outline-offset:3px}
+.btn:focus-visible,.card:focus-visible,.gchip:focus-visible,.opp:focus-visible{outline:3px dashed var(--blue);outline-offset:3px}
 .pulse{animation:pulse 1.4s ease-in-out infinite}@keyframes pulse{50%{box-shadow:2px 3px 0 var(--ink),0 0 0 6px rgba(255,212,59,.45)}}
-.wrap{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;padding:14px 16px;max-width:1500px;margin:0 auto}
-.wrap>*{min-width:0}
 .paper{background:var(--paper);background-image:linear-gradient(var(--grid2) 1px,transparent 1px),linear-gradient(90deg,var(--grid2) 1px,transparent 1px),linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:12px 12px,12px 12px,60px 60px,60px 60px;border:2.5px solid var(--ink);border-radius:6px 10px 8px 12px;box-shadow:4px 6px 0 var(--shadow)}
 .box{padding:10px 12px}
 h2,h3{font-family:var(--title);font-weight:400;margin:.2rem 0 .4rem;text-wrap:balance}
 h3{font-size:1.1rem}
 .small{font-size:.85rem}.muted{color:var(--muted)}
-/* opponents */
-.opps{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
-.opp{padding:8px 10px;position:relative;cursor:pointer}
-.opp.active{outline:4px solid #ffd43b;outline-offset:-2px}
-.opp .lv{font:400 2.1rem/1 var(--title);float:right;color:var(--red)}
-.opp .nm{font-weight:700;display:flex;gap:6px;align-items:center}
 .chip{display:inline-flex;align-items:center;gap:3px;padding:0 7px;border:2px solid var(--ink);border-radius:10px;font-size:.8rem;background:var(--paper);white-space:nowrap}
 .chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+/* ===== the board: rival strip / table / your area, sized to the space the bar and the dock leave ===== */
+.gx-board{display:flex;flex-direction:column;gap:8px;padding:8px 10px 10px;container-type:size}
+/* rivals: one compact strip, tap one for the full view */
+.opps{display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;flex:none;padding:2px 2px 6px;scrollbar-width:thin}
+.opp{flex:1 0 150px;max-width:260px;min-height:48px;padding:3px 10px;cursor:pointer;text-align:left;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:8px;color:var(--ink);font:inherit}
+.opp:hover{transform:translate(-1px,-1px)}
+.opp.active{outline:4px solid #ffd43b;outline-offset:-2px}
+.opp .lv{font:400 1.8rem/1 var(--title);color:var(--red);grid-row:1/3;grid-column:2}
+.opp .nm{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
+.opp .st{font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.15}
 .face{width:30px;height:30px;flex:none}
 /* the table */
-.table{margin-top:12px;perspective:1100px;padding:10px}
-.felt{transform:rotateX(18deg);transform-origin:50% 100%;padding:14px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:start;min-height:280px}
-.pile{display:grid;gap:10px;justify-items:center}
-.pile .stack{width:96px;height:134px;border:2.5px solid var(--ink);border-radius:10px;display:grid;place-items:center;font:400 1rem var(--title);text-align:center;box-shadow:3px 3px 0 var(--ink),6px 6px 0 var(--shadow);position:relative;color:#2b2233}
+.table{flex:1 1 auto;min-height:0;perspective:1100px;container-type:size;--sw:clamp(46px,25cqh,96px)}
+.felt{height:100%;transform:rotateX(10deg);transform-origin:50% 100%;padding:10px 12px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start;overflow:hidden}
+.pile{display:grid;gap:6px;justify-items:center;align-content:start}
+.pile .stack{width:var(--sw);height:calc(var(--sw)*1.4);border:2.5px solid var(--ink);border-radius:10px;display:grid;place-items:center;font:400 clamp(.6rem,calc(var(--sw)*.16),1rem) var(--title);text-align:center;box-shadow:3px 3px 0 var(--ink),6px 6px 0 var(--shadow);position:relative;color:#2b2233;overflow:hidden}
 .pile .stack.door{background:repeating-linear-gradient(45deg,var(--door) 0 10px,#ffd8a8 10px 20px)}
 .pile .stack.treas{background:repeating-linear-gradient(-45deg,var(--treas) 0 10px,#ffec99 10px 20px)}
-.pile .stack .n{position:absolute;bottom:4px;right:8px;font:400 .9rem var(--hand)}
-.pile .lbl{font-size:.8rem;color:var(--muted)}
-.arena{min-height:250px;display:grid;gap:10px;align-content:start}
-.arena .vs{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;font:400 1.4rem var(--title)}
-.score{padding:4px 14px;border:3px solid var(--ink);border-radius:14px;background:var(--paper);font-variant-numeric:tabular-nums}
+.pile .stack .n{position:absolute;bottom:3px;right:7px;font:400 .85rem var(--hand)}
+.pile .lbl{font-size:.75rem;color:var(--muted);white-space:nowrap}
+.pile .card.xs{--w:calc(var(--sw)*.9)}
+.arena{height:100%;min-height:0;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;overflow:auto;--cw:clamp(56px,calc((100cqh - var(--res,110px))/1.42),210px)}
+.arena .vs{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;font:400 1.15rem var(--title)}
+.arena .card{--w:min(var(--cw),calc((100cqw - 2*var(--sw) - 80px)/var(--n,1) - 12px))}
+.arena .mon{display:grid;gap:3px;justify-items:center;min-width:0}
+.score{padding:2px 12px;border:3px solid var(--ink);border-radius:14px;background:var(--paper);font-variant-numeric:tabular-nums}
 .score.win{background:#b2f2bb;color:#2b2233}.score.lose{background:#ffc9c9;color:#2b2233}
-.row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-items:flex-end}
-.empty{font:400 1.3rem var(--note);color:var(--muted);text-align:center;padding:30px 10px}
+.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:flex-end}
+.arena .row.mons{flex-wrap:nowrap}
+.empty{font:400 1.2rem var(--note);color:var(--muted);text-align:center;padding:6px 10px}
+.rollbox{display:flex;align-items:center;gap:10px;justify-content:center}
+.rollbox .dwrap{width:38px;height:38px;flex:none}
+.rollbox .die3{scale:.65;transform-origin:0 0}
+/* your area */
+.mine{flex:none;padding:6px 10px 4px;--hw:clamp(62px,calc(21cqh/1.42),140px);display:grid;gap:4px}
+.mine .top{display:flex;gap:10px;align-items:center;min-width:0;white-space:nowrap}
+.mine .top .who{font:400 1.15rem/1.1 var(--title);overflow:hidden;text-overflow:ellipsis;min-width:0;flex:0 1 auto}
+.mine .top .str{font-size:.9rem;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}
+.mine .lv{font:400 1.7rem/1 var(--title);color:var(--red);flex:none;margin-left:auto}
+.gear{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;align-items:center;padding:2px 2px 4px;scrollbar-width:thin}
+.gear .gl{font-size:.8rem;color:var(--muted);flex:none}
+.gear>.small{white-space:nowrap}
+.gchip{flex:none;min-height:40px;display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border:2px solid #2b2233;border-radius:10px 12px 9px 13px;background:var(--card);color:#2b2233;font:400 .85rem/1.1 var(--hand);cursor:pointer;box-shadow:2px 2px 0 #2b2233;white-space:nowrap}
+.gchip b{color:#e03131;font-weight:400;font-family:var(--title);font-size:.8rem}
+.gchip.door{border-left:6px solid #f76707}.gchip.tr{border-left:6px solid #f59f00}
+.gchip.play{box-shadow:2px 2px 0 #2b2233,0 0 0 3px #ffd43b}
+.gchip.sel{outline:3px solid var(--blue)}
+.gchip.dim{opacity:.55}
+.gchip.eqoff{filter:grayscale(.7);opacity:.75}
+.gchip.curse{background:#e9ecef}
+.hand{display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:14px 6px 6px;align-items:flex-end;scrollbar-width:thin;overscroll-behavior-x:contain}
+.hand .card{--w:var(--hw)}
+.hand .card:nth-child(odd){rotate:-1.5deg}.hand .card:nth-child(even){rotate:1.2deg}
+.hand>.small{height:calc(var(--hw)*1.42);display:flex;align-items:center}
 /* cards */
-.card{--w:124px;width:var(--w);height:calc(var(--w)*1.42);border:2.5px solid #2b2233;border-radius:10px 12px 9px 13px;background:var(--card);color:#2b2233;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;padding:5px 6px;position:relative;cursor:pointer;box-shadow:2px 3px 0 #2b2233;transition:transform .18s ease,box-shadow .18s ease;text-align:left;font:15px/1.1 var(--hand);overflow:hidden;flex:none}
+.card{--w:124px;width:var(--w);height:calc(var(--w)*1.42);border:2.5px solid #2b2233;border-radius:10px 12px 9px 13px;background:var(--card);color:#2b2233;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;padding:5px 6px 12px;position:relative;cursor:pointer;box-shadow:2px 3px 0 #2b2233;transition:transform .18s ease,box-shadow .18s ease;text-align:left;font:15px/1.1 var(--hand);overflow:hidden;flex:none;container-type:inline-size}
 .card:hover{transform:translateY(-8px) rotate(-1deg);box-shadow:4px 8px 0 #2b2233;z-index:3}
 .card.door{background:linear-gradient(var(--card),var(--card)) padding-box;border-top:8px solid #f76707}
 .card.tr{border-top:8px solid #f59f00}
@@ -75,8 +171,10 @@ h3{font-size:1.1rem}
 .card .cx{font-size:.72rem;line-height:1.05;max-height:3.3em;overflow:hidden}
 .card .tag{font:400 .95rem/1 var(--title);color:#e03131;white-space:nowrap}
 .card .gold{position:absolute;bottom:2px;right:5px;font-size:.66rem;color:#8a5a00;background:var(--card);padding-left:3px}
-.card{padding-bottom:12px}
 .card .kind{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:#6a6178;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@container (max-width:104px){.card .cx{display:none}}
+@container (max-width:80px){.card .kind{display:none}.card .cn{font-size:.62rem}.card .tag{font-size:.7rem}.card .gold{font-size:.58rem}}
+@container (max-width:58px){.card .gold{display:none}.card .cn{font-size:.55rem}}
 .card.sel{outline:4px solid var(--blue);transform:translateY(-12px)}
 .card.play{box-shadow:2px 3px 0 #2b2233,0 0 0 4px #ffd43b}
 .card.dim{opacity:.55}
@@ -86,11 +184,6 @@ h3{font-size:1.1rem}
 .card.eqoff{filter:grayscale(.7);opacity:.75}
 .card.fly{animation:fly .5s ease-out}@keyframes fly{from{transform:translateY(-60px) rotate(-8deg) scale(.7);opacity:0}}
 .card.flip{animation:flip .55s ease-out}@keyframes flip{from{transform:rotateY(90deg) scale(1.2)}}
-.hand{display:flex;gap:6px;overflow-x:auto;padding:14px 6px 8px;min-height:200px;align-items:flex-end}
-.hand .card:nth-child(odd){rotate:-1.5deg}.hand .card:nth-child(even){rotate:1.2deg}
-.mine{margin-top:12px}
-.mine .top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
-.mine .lv{font:400 2.6rem/1 var(--title);color:var(--red)}
 .tableau{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0}
 /* dice (CSS 3D cube) */
 .die3{width:58px;height:58px;position:relative;transform-style:preserve-3d;transform:rotateX(-20deg) rotateY(25deg)}
@@ -98,58 +191,119 @@ h3{font-size:1.1rem}
 .die3 i{position:absolute;inset:0;border:2.5px solid #2b2233;border-radius:10px;background:#fff;display:grid;place-items:center;font:400 1.8rem var(--title);color:#2b2233;backface-visibility:hidden}
 .die3 i:nth-child(1){transform:translateZ(29px)}.die3 i:nth-child(2){transform:rotateY(90deg) translateZ(29px)}.die3 i:nth-child(3){transform:rotateY(180deg) translateZ(29px)}
 .die3 i:nth-child(4){transform:rotateY(-90deg) translateZ(29px)}.die3 i:nth-child(5){transform:rotateX(90deg) translateZ(29px)}.die3 i:nth-child(6){transform:rotateX(-90deg) translateZ(29px)}
-/* side panel */
-.steps{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px}
-.steps span{font-size:.8rem;padding:1px 8px;border:2px solid var(--ink);border-radius:10px;background:var(--paper)}
-.steps span.on{background:#ffd43b;color:#2b2233}.steps span.done{opacity:.55}
-#prompt .who{font:400 1.2rem var(--title)}
-#prompt ol{margin:.3rem 0 .5rem;padding-left:1.3rem}
+/* the dock: steps, prompt, actions, latest diary lines */
+.steps{display:flex;gap:4px;flex-wrap:nowrap;margin-bottom:6px;overflow:hidden}
+.steps span{font-size:.8rem;padding:1px 8px;border:2px solid var(--ink);border-radius:10px;background:var(--paper);white-space:nowrap;flex:none}
+.steps span.on{background:#ffd43b;color:#2b2233;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis}.steps span.done{opacity:.55}
+#prompt .who{font:400 1.15rem var(--title)}
+#prompt p{margin:.3rem 0}
+#prompt ol{margin:.2rem 0 .4rem;padding-left:1.3rem}
 .acts{display:flex;flex-wrap:wrap;gap:8px;margin:.4rem 0}
 .tip{background:#fff9db;color:#2b2233;border:2px dashed #f08c00;border-radius:10px;padding:6px 9px;font-size:.9rem;margin:.4rem 0}
+.fightnote{font-size:.85rem;color:var(--muted);margin:.3rem 0}
+.asks{display:grid;gap:6px;margin:.4rem 0;padding:8px;border:2px dashed var(--ink);border-radius:10px}
 .warn{color:var(--red)}
-#log{max-height:320px;overflow:auto;padding-left:1.2rem;margin:0;font-size:.9rem}
-#log li{margin:.1rem 0}
-#log li b{font-weight:700}
+.recent{margin-top:10px;border-top:2px dashed var(--grid);padding-top:6px;display:grid;gap:4px}
+.recent .rl{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.recent .rl h3{margin:0;font-size:.95rem}
+.recent ol{list-style:none;margin:0;padding:0;font-size:.85rem;display:grid;gap:2px}
+.recent li{padding-left:6px;border-left:4px solid var(--muted);line-height:1.2}
+#log{padding-left:1.2rem;margin:0;font-size:.95rem}
+#log li{margin:.15rem 0}
+#dkOppBody .oppfull{padding:8px 10px;margin-bottom:10px}
+#dkOppBody .oppfull.active{outline:4px solid #ffd43b;outline-offset:-2px}
+#dkOppBody .oppfull .lv{font:400 2.1rem/1 var(--title);float:right;color:var(--red)}
+#dkOppBody .nm{font-weight:700}
 .modal{position:fixed;inset:0;background:rgba(20,15,30,.55);display:grid;place-items:center;z-index:20;padding:16px}
-.dlg{max-width:720px;width:100%;max-height:90vh;overflow:auto;padding:16px 18px}
-.dlg .opts{display:grid;gap:8px;margin-top:8px}
-.dlg .opt{text-align:left;display:block;width:100%}
-.dlg .opt small{display:block;color:var(--muted)}
-.dlg .rec{background:#fff3bf;color:#2b2233}
-.dlg .rec::after{content:" ← suggested";font-size:.8rem;color:#8a5a00}
+.modal.opaque{background:var(--desk)}
+.dlg{max-width:720px;width:100%;max-height:calc(100dvh - 32px);overflow:auto;padding:16px 18px;overscroll-behavior:contain}
+.opts{display:grid;gap:8px;margin-top:8px}
+.opt{text-align:left;display:block;width:100%}
+.opt small{display:block;color:var(--muted)}
+.rec{background:#fff3bf!important;color:#2b2233}
+.rec::after{content:" ← suggested";font-size:.8rem;color:#8a5a00}
 .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .seg{display:flex;flex-wrap:wrap;gap:6px}
 .seg .btn.on{background:#a5d8ff;color:#2b2233}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.banner{font:400 1.2rem var(--title);text-align:center;padding:4px;color:var(--red)}
-.pop{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);font:400 2.4rem var(--title);color:var(--red);text-shadow:3px 3px 0 #fff,-2px -2px 0 #fff;z-index:30;pointer-events:none;animation:pop 1.1s ease-out forwards;white-space:nowrap}
-@keyframes pop{0%{transform:translate(-50%,-30%) scale(.4) rotate(-8deg);opacity:0}25%{transform:translate(-50%,-50%) scale(1.15) rotate(-3deg);opacity:1}100%{transform:translate(-50%,-80%) scale(1) rotate(-3deg);opacity:0}}
 .zgrid{display:grid;grid-template-columns:auto minmax(0,1fr);gap:14px;align-items:start}
-.zoom .card{--w:260px;font-size:20px;margin:auto}.zoom .card .cx{max-height:none;font-size:1rem}.zoom .card .cn{font-size:1.2rem}
-@media (max-width:900px){.wrap{grid-template-columns:1fr}.side{order:-1}#log{max-height:160px}}
-@media (max-width:700px){header h1{font-size:1.2rem}.felt{transform:none;grid-template-columns:1fr 1fr;}.felt .arena{grid-column:1/-1;grid-row:2}.pile{grid-auto-flow:row;justify-content:center}.pile .stack{width:70px;height:98px;font-size:.8rem}.card{--w:104px}.card.sm{--w:80px}.table{perspective:none}
-  .zgrid{grid-template-columns:1fr}.zoom .card{--w:200px}
-  .modal{align-items:end;padding:0}.dlg{max-height:86vh;border-radius:14px 14px 0 0}}
+.zoom .card{--w:200px;font-size:18px;margin:auto}.zoom .card .cx{max-height:none;font-size:.95rem}.zoom .card .cn{font-size:1.1rem}
+.zoom .card:hover{transform:none}
+@media (max-width:999px){
+  .gx-dock{border-left:0;border-top:3px solid var(--ink);box-shadow:0 -4px 0 var(--shadow)}
+  .gx-app:not(.gx-dock-min) .gx-dock{height:var(--gx-sheet-h)}
+  .gx-app.gx-sheet-full:not(.gx-dock-min) .gx-dock{height:78dvh}
+  .gx-dock-head{min-height:44px;padding-top:4px}
+  .gx-dock-body{font-size:16px}
+}
+@media (max-width:700px){
+  .gx-bar h1{font-size:1.1rem}.gx-bar .gx-lbl{display:none}
+  .gx-board{padding:6px 6px 6px;gap:6px}
+  .felt{transform:none;padding:6px;gap:6px}.table{perspective:none}
+  .opp{flex-basis:118px;padding:2px 8px;column-gap:4px}.opp .bot{display:none}.opp .lv{font-size:1.4rem}.opp .st{font-size:.75rem}
+  .arena .vs{font-size:.95rem;gap:4px}.score{padding:1px 8px}
+  .mine .top .who{font-size:1rem}.mine .top .str{font-size:.8rem}.mine .lv{font-size:1.35rem}
+  .zgrid{grid-template-columns:1fr}.zoom .card{--w:160px}
+  .modal{align-items:end;padding:0}.dlg{max-height:min(90dvh,calc(100dvh - 8px));border-radius:14px 14px 0 0}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<header>
+<div class="gx-app">
+<header class="gx-bar">
   <h1>Doorkick <span>Dungeon</span></h1>
-  <button class="btn" data-a="snd" id="sndbtn" aria-label="Sound">🔊</button>
-  <button class="btn" data-a="mus" id="musbtn" aria-label="Music">🎵 On</button>
-  <button class="btn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ normal</button>
-  <button class="btn" data-a="pause" id="pausebtn" title="Pause the computer">⏸</button>
-  <button class="btn" data-a="hints" id="hintbtn" title="Suggested moves">💡 On</button>
-  <button class="btn" data-a="rules">Rules</button>
-  <button class="btn" data-a="new">New game</button>
+  <span class="gx-sp"></span>
+  <button class="gx-ibtn" data-gx="dkLog" aria-label="Dungeon diary">📜 <span class="gx-lbl">Diary</span></button>
+  <button class="gx-ibtn" data-gx="dkOpp" aria-label="Rivals: their gear and cards">👥 <span class="gx-lbl">Rivals</span></button>
+  <button class="gx-ibtn" data-gx="dkRules" aria-label="How to play">📖 <span class="gx-lbl">Rules</span></button>
+  <button class="gx-ibtn" data-a="snd" id="sndbtn" aria-label="Sound">🔊</button>
+  <button class="gx-ibtn" data-a="mus" id="musbtn" aria-label="Music">🎵 On</button>
+  <button class="gx-ibtn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ normal</button>
+  <button class="gx-ibtn" data-a="pause" id="pausebtn" title="Pause the computer" aria-label="Pause the computer">⏸</button>
+  <button class="gx-ibtn" data-a="hints" id="hintbtn" title="Suggested moves">💡 On</button>
+  <button class="gx-ibtn" data-a="new">New game</button>
 </header>
-<div class="wrap">
-  <main id="app"></main>
-  <aside id="side" class="side"></aside>
+<div class="gx-main">
+  <main class="gx-board" id="app"></main>
+  <aside class="gx-dock" aria-label="What to do now"><div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Doorkick Dungeon</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">⇥</button></div><div class="gx-dock-body" id="side"></div></aside>
+  <button class="gx-ibtn gx-reopen" data-gx="dock">☰ Panel</button>
 </div>
+</div>
+<div id="dkLogBody"></div>
+<div id="dkOppBody"></div>
+<div id="dkCardBody"></div>
+<div id="dkRulesBody"></div>
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="modal" class="modal" hidden></div>
+<script>
+// ===== Board-first shell: dock toggle, sheet sizing, closable popups (drawers) =====
+const GX={key:'gx',open:null,
+  init(o){this.key=o&&o.key||'gx';document.documentElement.classList.add('gx');const app=document.querySelector('.gx-app');this.app=app;
+    let min=false;try{min=localStorage.getItem(this.key+'_dockmin')==='1'}catch(e){}if(min)app.classList.add('gx-dock-min');
+    if(!document.querySelector('.gx-scrim')){const s=document.createElement('div');s.className='gx-scrim';s.addEventListener('click',()=>this.close());document.body.appendChild(s);this.scrim=s}
+    document.addEventListener('click',e=>{const t=e.target.closest('[data-gx]');if(!t)return;const a=t.dataset.gx;
+      if(a==='dock')this.toggleDock();else if(a==='sheet')this.cycleSheet();else if(a==='close')this.close();else this.toggle(a)});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&this.open){this.close();e.stopImmediatePropagation()}},true);
+    // resize hook for boards
+    const b=document.querySelector('.gx-board');if(b&&window.ResizeObserver)new ResizeObserver(()=>{for(const f of this._rs)try{f(b.clientWidth,b.clientHeight)}catch(e){}}).observe(b)},
+  _rs:[],onResize(f){this._rs.push(f)},
+  boardSize(){const b=document.querySelector('.gx-board');return b?{w:b.clientWidth,h:b.clientHeight}:{w:innerWidth,h:innerHeight}},
+  toggleDock(force){const min=force!=null?!force:!this.app.classList.contains('gx-dock-min');this.app.classList.toggle('gx-dock-min',min);this.app.classList.remove('gx-sheet-full');try{localStorage.setItem(this.key+'_dockmin',min?'1':'0')}catch(e){}},
+  // phone sheet: min -> normal -> full -> min
+  cycleSheet(){const a=this.app;if(a.classList.contains('gx-dock-min')){this.toggleDock(true)}else if(!a.classList.contains('gx-sheet-full'))a.classList.add('gx-sheet-full');else{a.classList.remove('gx-sheet-full');this.toggleDock(false)}},
+  showDock(){if(this.app&&this.app.classList.contains('gx-dock-min'))this.toggleDock(true)},
+  toggle(id){if(this.open===id)this.close();else this.show(id)},
+  show(id){const d=document.getElementById(id);if(!d)return;if(this.open&&this.open!==id){const o=document.getElementById(this.open);if(o)o.classList.remove('on')}
+    this.open=id;d.classList.add('on');this.scrim&&this.scrim.classList.add('on');this._back=document.activeElement;
+    for(const b of document.querySelectorAll('[data-gx="'+id+'"]'))b.setAttribute('aria-expanded','true');
+    const f=d.querySelector('.gx-x');if(f)f.focus({preventScroll:true});if(this.onShow)this.onShow(id)},
+  close(){if(!this.open)return;const id=this.open;const d=document.getElementById(this.open);if(d)d.classList.remove('on');for(const b of document.querySelectorAll('[data-gx="'+this.open+'"]'))b.setAttribute('aria-expanded','false');this.open=null;this.scrim&&this.scrim.classList.remove('on');if(this._back&&this._back.focus)this._back.focus({preventScroll:true});if(this.onClose)this.onClose(id)},
+  // build a drawer shell around a body element: <div class=gx-drawer id><head><h2>title</h2><button.gx-x></head><body/></div>
+  drawer(id,title,bodyEl,wide){let d=document.getElementById(id);if(!d){d=document.createElement('section');d.id=id;d.className='gx-drawer'+(wide?' wide':'');d.setAttribute('role','dialog');d.setAttribute('aria-label',title);
+      d.innerHTML=`<div class="gx-drawer-head"><h2></h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"></div>`;document.body.appendChild(d)}
+    d.querySelector('h2').textContent=title;if(bodyEl){const b=d.querySelector('.gx-drawer-body');if(bodyEl.parentNode!==b){b.innerHTML='';b.appendChild(bodyEl)}}return d}};
+
+</script>
 <script>
 // ---------- the card table: the 168-card base deck (94 door, 74 treasure). Names and texts are original; numbers and effects follow the real cards.
 // ref = id of the real card in cards-base.json (the audit trail). Effects are data (ops) plus a few special keys (sp) the engine knows.
@@ -714,11 +868,11 @@ function nextTurn(){const n=G.pl.length;let i=G.active;do{i=(i+1)%n}while(P(i).g
   if(G.turn>R.MAXTURN&&!G.winner){const b=alive().sort((a,b)=>b.lvl-a.lvl)[0];G.winner='P'+(b.i+1);G.winText=`Time's up: ${b.nm} leads at level ${b.lvl}.`}
   openWindow()}
 function kick(){const p=curPl();const id=drawOne('door');if(id==null){G.phase='after';return}takeKicked(p,id)}
-function takeKicked(p,id){G.kicked=id;const c=cd(id);fx('door',id);
+function takeKicked(p,id,res){const kv=res?'reaches into the discards':'kicks open the door';G.kicked=id;const c=cd(id);fx('door',id);
   if(c.t==='monster'){startCombat(p.i,id,'kick');return}
-  if(c.t==='curse'){lg(p.i,`${p.nm} kicks open the door… a curse!`);G.phase='after';applyCurse(p,id,p.i,true);return}
-  if(c.sp==='divine'){lg(p.i,`${p.nm} kicks open the door…`);G.phase='after';gain(p,id);G.kicked=null;return}
-  lg(p.i,`${p.nm} kicks open the door and finds ${c.n}, which goes to hand.`);p.hand.push(id);G.phase='after'}
+  if(c.t==='curse'){lg(p.i,`${p.nm} ${kv}… a curse!`);G.phase='after';applyCurse(p,id,p.i,true);return}
+  if(c.sp==='divine'){lg(p.i,`${p.nm} ${kv}…`);G.phase='after';gain(p,id);G.kicked=null;return}
+  lg(p.i,`${p.nm} ${res?'takes back':'kicks open the door and finds'} ${c.n}, which goes to hand.`);p.hand.push(id);G.phase='after'}
 function lootRoom(){const p=curPl();const id=drawOne('door');if(id!=null){gain(p,id);lg(p.i,`${p.nm} loots the room and draws a face-down door card.`)}G.phase='post'}
 function endTurn(){const p=curPl();if(p.hand.length>handLimit(p)&&!p.dead){G.phase='charity';return}afterEnd()}
 function afterEnd(){if(G.winner)return;nextTurn()}
@@ -837,7 +991,7 @@ function apply(m,s){const p=P(s);const cb=G.cb;
   switch(m.act){
   case 'ready':G.setupI++;if(G.setupI>=G.setupOrd.length){G.phase='main';lg(G.active,`— ${curPl().nm}'s turn (level ${curPl().lvl}) —`);openWindow()}break;
   case 'kick':kick();break;
-  case 'resurrect':{spend(p,m.card);const id=G.dd.pop();lg(s,`${p.nm} resurrects the top door discard instead of kicking a new door.`);takeKicked(p,id);break}
+  case 'resurrect':{const id=G.dd.pop();spend(p,m.card);lg(s,`${p.nm} resurrects ${cname(id)} from the door discards instead of kicking a new door.`);takeKicked(p,id,1);break}
   case 'loot':lootRoom();break;
   case 'trouble':p.hand.splice(p.hand.indexOf(m.card),1);startCombat(s,m.card,'trouble');break;
   case 'end':endTurn();break;
@@ -1179,53 +1333,78 @@ function cardHTML(id,o){o=o||{};const c=cd(id);const cls=['card',c.d==='door'?'d
   return `<button class="${cls}" data-card="${id}" ${o.attr||''} aria-label="${esc(c.n)}: ${esc(c.x||'')}"><span class="cn">${esc(c.n)}</span><span class="meta"><span class="kind">${kindLabel(c)}</span>${tag?`<span class="tag">${tag}</span>`:''}</span>${svgArt(c,c.k)}<span class="cx">${esc(c.x||'')}</span>${gold?`<span class="gold">${gold}</span>`:''}</button>`}
 // ---- panels ----
 function render(){const root=$('#app');if(!root)return;
-  if(!G){root.innerHTML='';$('#modal').innerHTML=startHTML();$('#modal').hidden=false;return}
+  if(!G){root.innerHTML='';$('#side').innerHTML='<div id="prompt"><p>Set up a game to start.</p></div>';$('#docktitle').textContent='Doorkick Dungeon';$('#modal').innerHTML=startHTML();$('#modal').hidden=false;if(GX.open&&GX.open!=='dkRules')GX.close();return}
   const me=viewSeat();const s=sideToAct();if(UI.sell&&!(me>=0&&validMoves(me).some(m=>m.act==='sell')))UI.sell=null;
+  if(UI.menu&&UI.menu.ask&&!(me>=0&&validMoves(me).some(m=>m.act==='ask')))UI.menu=null;
   // hot-seat: hide the hand while the device passes between human players
   if(G.mode==='hot'&&s>=0&&P(s).human&&UI.lastSeat!==s&&!G.winner){UI.pass=s}
-  root.innerHTML=`${oppsHTML(me)}<div class="table"><div class="felt paper">${pilesHTML()}<div class="arena">${arenaHTML()}</div>${pileR()}</div></div>${mineHTML(me)}`;
-  $('#side').innerHTML=promptHTML(me)+logHTML();
-  let m='';if(UI.pass!=null&&!G.winner)m=passHTML(UI.pass);else if(G.winner)m=endHTML();else if(UI.menu)m=menuHTML(me);else if(UI.zoom!=null)m=zoomHTML();else if(UI.rules)m=rulesHTML();
-  $('#modal').innerHTML=m;$('#modal').hidden=!m;
+  const hs=(root.querySelector('.hand')||{}).scrollLeft||0,os=(root.querySelector('.opps')||{}).scrollLeft||0,gs=(root.querySelector('.gear')||{}).scrollLeft||0;
+  UI.arRes=92;const ar=arenaHTML();
+  root.innerHTML=`${oppsHTML(me)}<div class="table"><div class="felt paper">${pilesHTML()}<div class="arena" aria-label="The table" style="--res:${UI.arRes}px">${ar}</div>${pileR()}</div></div>${mineHTML(me)}`;
+  const hd=root.querySelector('.hand');if(hd)hd.scrollLeft=hs;const od=root.querySelector('.opps');if(od)od.scrollLeft=os;const gd=root.querySelector('.gear');if(gd)gd.scrollLeft=gs;
+  const sd=$('#side'),st=sd.scrollTop;sd.innerHTML=promptHTML(me)+recentHTML();sd.scrollTop=st;
+  $('#docktitle').textContent=dockTitle(me);
+  $('#dkLogBody').innerHTML=logHTML();$('#dkOppBody').innerHTML=oppsFullHTML(me);
+  // card details / card actions: a closable popup
+  const cardOn=(UI.menu&&UI.menu.card!=null)||UI.zoom!=null;
+  if(cardOn&&UI.pass==null&&!G.winner){const cid=UI.menu&&UI.menu.card!=null?UI.menu.card:UI.zoom;$('#dkCardBody').innerHTML=UI.menu&&UI.menu.card!=null?menuHTML(me):zoomHTML();const t=$('#dkCard h2');if(t)t.textContent=cname(cid);if(GX.open!=='dkCard')GX.show('dkCard')}
+  else{if(cardOn){UI.menu=null;UI.zoom=null}if(GX.open==='dkCard')GX.close()}
+  let m='';if(UI.pass!=null&&!G.winner)m=passHTML(UI.pass);else if(G.winner)m=endHTML();
+  if(m&&GX.open)GX.close();
+  $('#modal').innerHTML=m;$('#modal').hidden=!m;$('#modal').classList.toggle('opaque',UI.pass!=null&&!G.winner);
+  // a human decision is pending: make sure the dock is open (once per new decision)
+  const need=me>=0&&s===me&&P(me).human&&!G.winner?JSON.stringify([G.turn,G.phase,G.q&&G.q.kind,G.cb&&G.cb.stage]):'';if(need&&need!==UI.needKey)GX.showDock();UI.needKey=need;
   $('#live').textContent=G.log[0]?G.log[0].t:''}
-function oppsHTML(me){return `<div class="opps">${G.pl.filter(p=>p.i!==me).map(p=>{const act=p.i===G.active;
-  return `<div class="opp paper ${act?'active':''}" data-opp="${p.i}" title="${esc(p.nm)}"><span class="lv" aria-label="level">${p.lvl}</span>
-   <div class="nm"><span style="color:${PCOL[p.i]}">${PSHAPE[p.i]}</span> ${esc(p.nm)} ${p.human?'':'<span class="small muted">(computer'+(p.lv!=='normal'?' · '+p.lv:'')+')</span>'}</div>
-   <div class="small">⚔ ${pStr(p)} · ${p.sex==='m'?'♂':'♀'} · ✋ ${p.hand.length}${p.dead?' · 💀':''}</div>
+function dockTitle(me){const s=sideToAct();if(G.winner)return 'Game over';if(s<0)return 'Turn '+G.turn;const p=P(s);return (s===me&&p.human?'Your move':p.human?p.nm+'’s move':p.nm+' is thinking…')+' · turn '+G.turn}
+function recentHTML(){if(!G||!G.log.length)return '';return `<div class="recent"><div class="rl"><h3>Just happened</h3><button class="btn" data-gx="dkLog" style="min-height:40px;padding:2px 10px;font-size:.85rem">📜 Diary</button></div><ol>${G.log.slice(0,2).map(l=>`<li${l.s>=0?` style="border-left-color:${PCOL[l.s]}"`:''}>${esc(l.t)}</li>`).join('')}</ol></div>`}
+function oppsHTML(me){return `<div class="opps" aria-label="Rivals">${G.pl.filter(p=>p.i!==me).map(p=>{const act=p.i===G.active;
+  return `<button class="opp paper ${act?'active':''}" data-opp="${p.i}" aria-label="${esc(p.nm)}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items${act?', their turn':''}. Tap for details."><span class="nm"><span style="color:${PCOL[p.i]}">${PSHAPE[p.i]}</span> ${esc(p.nm)}${p.human?'':' <span class="small muted bot">🤖</span>'}</span><span class="lv" aria-hidden="true">${p.lvl}</span>
+   <span class="st" aria-hidden="true">⚔${pStr(p)} ✋${p.hand.length} 🎒${p.eq.length}${p.curse.length?' ☁'+p.curse.length:''}${p.dead?' 💀':''}</span></button>`}).join('')}</div>`}
+function oppsFullHTML(me){const ps=G.pl.filter(p=>p.i!==me);const f=UI.oppView;ps.sort((a,b)=>(b.i===f)-(a.i===f));if(!ps.length)return '<p class="muted">No rivals.</p>';
+  return ps.map(p=>{const act=p.i===G.active;return `<div class="oppfull paper ${act?'active':''}"><span class="lv" aria-label="level">${p.lvl}</span>
+   <div class="nm"><span style="color:${PCOL[p.i]}">${PSHAPE[p.i]}</span> ${esc(p.nm)} ${p.human?'':'<span class="small muted">(computer'+(p.lv!=='normal'?' · '+p.lv:'')+')</span>'}${act?' <span class="chip" style="background:#ffd43b;color:#2b2233">their turn</span>':''}</div>
+   <div class="small">⚔ strength ${pStr(p)} (level ${p.lvl} + items ${itemBonus(p)}) · ${p.sex==='m'?'♂':'♀'} · ✋ ${p.hand.length} card${p.hand.length===1?'':'s'} in hand (secret)${p.dead?' · 💀 dead':''}</div>
    <div class="chips">${races(p).concat(classes(p)).map(r=>`<span class="chip">${esc(TRAITNAME[r]||r)}</span>`).join('')}${p.curse.map(id=>`<span class="chip" style="background:#e9ecef;color:#2b2233">☁ ${esc(cname(id))}</span>`).join('')}</div>
-   <div class="tableau">${p.eq.map(e=>cardHTML(e.id,{size:'xs',cls:e.on?'':'eqoff'})).join('')}</div></div>`}).join('')}</div>`}
+   <div class="tableau">${p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>cardHTML(id,{size:'xs'})).join('')}${p.eq.map(e=>cardHTML(e.id,{size:'xs',cls:e.on?'':'eqoff'})).join('')||'<span class="small muted">No items yet.</span>'}</div></div>`}).join('')}
 function pilesHTML(){const dk=G.door.length,tk=G.tr.length;const ld=G.dd[G.dd.length-1],lt=G.td[G.td.length-1];
   return `<div class="pile pl"><div class="stack door" aria-label="Door deck">DOOR<span class="n">${dk}</span></div><span class="lbl">discard: ${G.dd.length}</span>${ld!=null?cardHTML(ld,{size:'xs'}):''}</div>`
   }
-function pileR(){const tk=G.tr.length,lt=G.td[G.td.length-1];return `<div class="pile pr"><div class="stack treas" aria-label="Treasure deck">TREASURE<span class="n">${tk}</span></div><span class="lbl">discard: ${G.td.length}</span>${lt!=null?cardHTML(lt,{size:'xs'}):''}${rollHTML()}</div>`}
+function pileR(){const tk=G.tr.length,lt=G.td[G.td.length-1];return `<div class="pile pr"><div class="stack treas" aria-label="Treasure deck">TREASURE<span class="n">${tk}</span></div><span class="lbl">discard: ${G.td.length}</span>${lt!=null?cardHTML(lt,{size:'xs'}):''}</div>`}
 function arenaHTML(){const cb=G.cb;
-  if(!cb){if(G.kicked!=null&&G.phase!=='main'){const c=cd(G.kicked);return `<div class="empty">The door opened on…</div><div class="row">${cardHTML(G.kicked,{cls:'flip'})}</div><div class="empty small">${c.t==='curse'?'A curse! It takes effect at once.':'It went into '+esc(curPl().nm)+'’s hand.'}</div>`}
-    return `<div class="empty">${G.phase==='setup'?'Everyone sets up: play races, classes and items from your hand.':G.phase==='window'?'Before '+esc(curPl().nm)+' kicks the door, others may play curses or level-ups.':`${esc(curPl().nm)} stands before a closed door…`}</div>`}
+  if(!cb){if(G.kicked!=null&&G.phase!=='main'){const c=cd(G.kicked);UI.arRes=110;return `<div class="empty">The door opened on…</div><div class="row">${cardHTML(G.kicked,{cls:animOnce(G.kicked,'flip')})}</div><div class="empty small">${c.t==='curse'?'A curse! It takes effect at once.':'It went into '+esc(curPl().nm)+'’s hand.'}</div>${rollHTML()}`}
+    return `<div class="empty">${G.phase==='setup'?'Everyone sets up: play races, classes and items from your hand.':G.phase==='window'?'Before '+esc(curPl().nm)+' kicks the door, others may play curses or level-ups.':`${esc(curPl().nm)} stands before a closed door…`}</div>${rollHTML()}`}
   const a=sideStr(cb),b=monStr(cb),win=winning(cb);
-  const f=P(cb.who),h=cb.help>=0?P(cb.help):null;
+  const f=P(cb.who),h=cb.help>=0?P(cb.help):null;const chips=[];
+  cb.killed.forEach(k=>chips.push(`<span class="chip">${esc(k.def.n)}${k.kill?' (killed)':' (gone, treasure kept)'}</span>`));
+  if(cb.mons.some(m=>m.enh.length))UI.arRes+=46;
+  cb.os.forEach(o=>chips.push(`<span class="chip">${esc(cname(o.id))} (${o.side==='p'?'heroes':'monsters'})</span>`));
   return `<div class="vs"><span class="score ${win?'win':'lose'}">${esc(f.nm)}${h?' + '+esc(h.nm):''}: ${a}</span><span>vs</span><span class="score ${win?'lose':'win'}">Monsters: ${b}</span></div>
-   <div class="row">${cb.mons.map((m,j)=>`<div style="display:grid;gap:4px;justify-items:center">${cardHTML(m.like!=null?m.like:m.id,{cls:'fly'})}<span class="small">${m.like!=null?'the date · ':''}strength ${mStr(m,cb)}</span><div class="row">${m.enh.map(e=>cardHTML(e,{size:'xs'})).join('')}</div></div>`).join('')}</div>
-   ${cb.killed.length?`<div class="row small">Dealt with: ${cb.killed.map(k=>`<span class="chip">${esc(k.def.n)}${k.kill?' (killed)':' (gone, treasure kept)'}</span>`).join(' ')}</div>`:''}
-   ${cb.os.length?`<div class="row small">Played: ${cb.os.map(o=>`<span class="chip">${esc(cname(o.id))} (${o.side==='p'?'heroes':'monsters'})</span>`).join(' ')}</div>`:''}
-   <div class="small muted" style="text-align:center">${esc(f.nm)} ${win?'is winning.':'is losing.'}${fighters(cb).some(x=>isCls(x,'warrior'))?' (warriors win ties)':''}${special(cb,'lvlonly')?' Levels only in this fight!':''}${special(cb,'bonusonly')?' Bonuses only: levels don\u2019t count!':''} Strength is level + worn items + one-shots${h?' + the helper':''}.</div>`}
+   <div class="row mons" style="--n:${cb.mons.length}">${cb.mons.map((m,j)=>`<div class="mon">${cardHTML(m.like!=null?m.like:m.id,{cls:animOnce(m.like!=null?m.like:m.id,'fly')})}<span class="small">${m.like!=null?'the date · ':''}strength ${mStr(m,cb)}</span>${m.enh.length?`<div class="row" style="gap:4px">${m.enh.map(e=>{const c=cd(e);return `<button class="gchip door" data-card="${e}" aria-label="${esc(c.n)}: ${esc(c.x||'')}">${esc(c.n)} <b>${c.b>0?'+':''}${c.b}</b></button>`}).join('')}</div>`:''}</div>`).join('')}</div>
+   ${chips.length?(UI.arRes+=30,`<div class="row small" style="gap:4px">${chips.join('')}</div>`):''}${rollHTML()}`}
+// entry animations play once per card per turn, not on every re-render (opening a popup re-renders the table)
+function animOnce(id,c){const k=c+id+':'+G.turn;UI.anim1=UI.anim1||{};if(UI.anim1[k])return '';UI.anim1[k]=1;return c}
+function fightNote(cb){const f=P(cb.who),h=cb.help>=0?P(cb.help):null,win=winning(cb);return `<div class="fightnote">${esc(f.nm)} ${win?'is winning.':'is losing.'}${fighters(cb).some(x=>isCls(x,'warrior'))?' (warriors win ties)':''}${special(cb,'lvlonly')?' <b class="warn">Levels only in this fight!</b>':''}${special(cb,'bonusonly')?' <b class="warn">Bonuses only: levels don’t count!</b>':''} Strength is level + worn items + one-shots${h?' + the helper':''}.</div>`}
 function rollHTML(){const r=G.lastRoll;if(!r||(G.cb==null&&G.phase!=='post'))return '';const faces=[r.v,1,6,3,4,2];
-  const anim=UI.rolled!==r.id;UI.rolled=r.id;return `<div aria-label="Last roll" style="display:grid;justify-items:center;gap:6px;margin-top:8px"><div class="die3 ${anim?'roll':''}">${faces.map(v=>`<i>${v}</i>`).join('')}</div><span class="small">${esc(P(r.who).nm)}: ${r.v}${r.mod?'+'+r.mod:''} ${r.ok?'✓':'✗'} (need ${r.need})</span></div>`}
-function mineHTML(me){if(me<0||!G.pl[me])return `<div class="mine paper box"><div class="empty">Watching the computer play. Press Pause to stop at any moment.</div></div>`;
+  const anim=UI.rolled!==r.id;UI.rolled=r.id;UI.arRes+=46;return `<div class="rollbox" aria-label="Last roll"><div class="dwrap"><div class="die3 ${anim?'roll':''}">${faces.map(v=>`<i>${v}</i>`).join('')}</div></div><span class="small">${esc(P(r.who).nm)}: ${r.v}${r.mod?(r.mod>0?'+':'')+r.mod:''} ${r.ok?'✓':'✗'} (need ${r.need})</span></div>`}
+function gchipHTML(id,cls){const c=cd(id);const ic=c.t==='race'?'🧬':c.t==='class'?'🎓':c.t==='curse'?'☁':c.slot==='head'?'🪖':c.slot==='foot'?'👢':c.slot==='armor'?'🛡':c.hands?'🗡':c.t==='item'?'🎒':'✦';
+  return `<button class="gchip ${c.d==='door'?'door':'tr'} ${c.t==='curse'?'curse ':''}${cls||''}" data-card="${id}" aria-label="${esc(c.n)}: ${esc(c.x||'')}${/eqoff/.test(cls||'')?' (carried, not worn)':''}"><span aria-hidden="true">${ic}</span>${esc(c.n)}${c.t==='item'&&c.b?` <b>+${c.b}</b>`:''}</button>`}
+function mineHTML(me){if(me<0||!G.pl[me])return `<div class="mine paper box"><div class="empty">Watching the computer play. Press ⏸ to pause at any moment; tap a rival for their cards.</div></div>`;
   const p=P(me);const vm=myMoves(me);const playable=new Set(vm.filter(m=>m.card!==undefined).map(m=>m.card));const sellSet=UI.sell?new Set(UI.sell):null;const selc=id=>sellSet?(sellSet.has(id)?'sel ':sellable(p).includes(id)?'play ':'dim '):'';const sug=UI.hints&&p.human?aiSuggest(me):null;
-  return `<div class="mine paper box"><div class="top"><div><h2 style="margin:0">${esc(p.nm)} <span class="small muted">${p.sex==='m'?'♂':'♀'} · ${races(p).concat(classes(p)).map(r=>TRAITNAME[r]||r).join(' · ')}</span></h2>
-    <div class="small">Combat strength <b>${pStr(p)}</b> (level ${p.lvl} + items ${itemBonus(p)}${p.sexPen?' -5 next fight':''}) · hand ${p.hand.length}/${handLimit(p)}${p.hire!=null?' · has a Porter':''}${p.dead?' · 💀 dead until the next turn':''}</div></div><span class="lv">Lv ${p.lvl}</span></div>
-    <h3>In play <span class="small muted">(tap to wear, take off or sell)</span></h3><div class="tableau">${p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).map(id=>cardHTML(id,{size:'sm'})).join('')}${p.hire!=null?cardHTML(p.hire,{size:'sm'}):''}${p.eq.map(e=>cardHTML(e.id,{size:'sm',cls:(e.on?'':'eqoff ')+(sellSet?selc(e.id):playable.has(e.id)?'play':'')})).join('')}${p.curse.map(id=>cardHTML(id,{size:'sm'})).join('')||''}${!p.eq.length&&!p.race.length&&!p.cls.length?'<span class="small muted">Nothing yet. Items you play from your hand appear here.</span>':''}</div>
-    <h3>Your hand</h3><div class="hand">${sellSet?sellBar(p):''}${p.hand.map(id=>cardHTML(id,{cls:sellSet?selc(id):(playable.has(id)?'play ':'')+(sug&&(sug.card===id||(sug.cards&&String(sug.cards).split(',').map(Number).includes(id)))?'sug':'')})).join('')||'<span class="small muted">No cards.</span>'}</div></div>`}
-function sellBar(p){const ids=UI.sell;const v=sellValue(p,ids);const lv=Math.min(R.WIN-1-p.lvl,Math.floor(v/R.SELL));return `<div class="tip" style="flex:none;max-width:220px"><b>Selling:</b> ${ids.length} card${ids.length===1?'':'s'}, ${v} gold${isRace(p,'halfling')&&!p.halfT?' (Halfling double on the priciest)':''}. ${v>=R.SELL?`That buys ${lv} level${lv===1?'':'s'}.`:`Need ${R.SELL}.`}<div class="acts"><button class="btn primary" data-mv='${esc(JSON.stringify({act:'sell',cards:ids.join(',')}))}' ${v>=R.SELL?'':'disabled'}>Sell</button><button class="btn" data-a="sellx">Cancel</button></div></div>`}
+  const gear=p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).map(id=>gchipHTML(id,'')).join('')+(p.hire!=null?gchipHTML(p.hire,''):'')+p.eq.map(e=>gchipHTML(e.id,(e.on?'':'eqoff ')+(sellSet?selc(e.id):playable.has(e.id)?'play':''))).join('')+p.curse.map(id=>gchipHTML(id,'')).join('');
+  return `<section class="mine paper" aria-label="You"><div class="top"><span class="who"><span style="color:${PCOL[p.i]}">${PSHAPE[p.i]}</span> ${esc(p.nm)} <span class="small muted">${p.sex==='m'?'♂':'♀'}${races(p).concat(classes(p)).map(r=>' · '+(TRAITNAME[r]||r)).join('')}</span></span>
+    <span class="str">⚔ <b>${pStr(p)}</b> <span class="muted">(lv ${p.lvl} + items ${itemBonus(p)}${p.sexPen?' -5 next fight':''})</span> · ✋ ${p.hand.length}/${handLimit(p)}${p.hire!=null?' · Porter':''}${p.dead?' · 💀 dead until next turn':''}</span><span class="lv">Lv ${p.lvl}</span></div>
+    <div class="gear" aria-label="In play: tap to wear, take off or sell"><span class="gl">In play:</span>${gear||'<span class="small muted">nothing yet: items you play from your hand appear here.</span>'}</div>
+    <div class="hand" aria-label="Your hand">${p.hand.map(id=>cardHTML(id,{cls:sellSet?selc(id):(playable.has(id)?'play ':'')+(sug&&(sug.card===id||(sug.cards&&String(sug.cards).split(',').map(Number).includes(id)))?'sug':'')})).join('')||'<span class="small muted">No cards.</span>'}</div></section>`}
+function sellBar(p){const ids=UI.sell;const v=sellValue(p,ids);const lv=Math.min(R.WIN-1-p.lvl,Math.floor(v/R.SELL));return `<div class="tip"><b>Selling:</b> tap cards in your hand or in play to pick them.<br> ${ids.length} card${ids.length===1?'':'s'}, ${v} gold${isRace(p,'halfling')&&!p.halfT?' (Halfling double on the priciest)':''}. ${v>=R.SELL?`That buys ${lv} level${lv===1?'':'s'}.`:`Need ${R.SELL}.`}<div class="acts"><button class="btn primary" data-mv='${esc(JSON.stringify({act:'sell',cards:ids.join(',')}))}' ${v>=R.SELL?'':'disabled'}>Sell</button><button class="btn" data-a="sellx">Cancel</button></div></div>`}
 function myMoves(me){if(!G||me<0)return[];if(!P(me).human)return[];return validMoves(me)}
 function aiSuggest(me){try{if(sideToAct()!==me)return null;const m=aiMove(me);return m}catch(e){return null}}
 const STEPS=[['main','Get ready'],['kick','Kick the door'],['combat','Fight or flee'],['after','Trouble or loot'],['post','Tidy up'],['charity','Charity']];
 function stepIdx(){const ph=G.phase;return ph==='setup'||ph==='window'||ph==='main'?0:ph==='combat'?2:ph==='after'?3:ph==='post'?4:ph==='charity'?5:0}
 function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me>=0&&s===me&&P(me).human;const vm=mine?validMoves(me):[];const si=stepIdx();
-  let h=`<div class="paper box" id="prompt"><div class="steps">${STEPS.map((x,i)=>`<span class="${i===si?'on':i<si?'done':''}">${i+1} ${x[1]}</span>`).join('')}</div>`;
+  let h=`<div id="prompt"><div class="steps" aria-label="Turn step ${si+1} of ${STEPS.length}: ${STEPS[si][1]}">${STEPS.map((x,i)=>`<span class="${i===si?'on':i<si?'done':''}" title="${x[1]}">${i+1}${i===si?' '+x[1]:''}</span>`).join('')}</div>`;
   if(!p){return h+'</div>'}
   h+=`<div class="who"><span style="color:${PCOL[p.i]}">${PSHAPE[p.i]}</span> ${esc(p.nm)}${mine?' · your move':''}</div>`;
-  if(!mine){h+=`<p>${P(s).human?'Waiting for '+esc(p.nm)+'…':esc(p.nm)+' is thinking…'}</p>${actsHTML([],me)}</div>`;return h}
+  if(!mine){h+=`<p>${P(s).human?'Waiting for '+esc(p.nm)+'…':esc(p.nm)+' is thinking…'}</p>${G.cb?fightNote(G.cb):''}${actsHTML([],me)}</div>`;return h}
   const cb=G.cb;const by=a=>vm.filter(m=>m.act===a);const btn=(m,label,cl)=>`<button class="btn ${cl||''}" data-mv='${esc(JSON.stringify(m))}'>${label}</button>`;
   let say='',ol=[],tip='',acts='';
   if(G.q){const q=G.q;
@@ -1250,13 +1429,13 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
       tip=monTips(cb)}
     else{say=`${esc(P(cb.who).nm)} is fighting (${sideStr(cb)} vs ${monStr(cb)}). Anything to play?`;ol=['Tap a monster boost or one-shot in your hand to change the fight,','or let it be.'];acts=btn({act:'pass'},'Let it be','primary')+abilityBtns(vm)}
     break}}
-  h+=`<p>${say}</p>${ol.length?`<ol>${ol.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}${tip?`<div class="tip">${tip}</div>`:''}<div class="acts">${acts}</div>${actsHTML(vm,me)}</div>`;return h}
+  h+=`${UI.sell&&me>=0?sellBar(P(me)):''}${UI.menu&&UI.menu.ask?askHTML(me):''}<p>${say}</p>${acts?`<div class="acts">${acts}</div>`:''}${ol.length?`<ol>${ol.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}${G.cb?fightNote(G.cb):''}${tip?`<div class="tip">${tip}</div>`:''}${actsHTML(vm,me)}</div>`;return h}
 function sellBtn(vm){return vm.some(m=>m.act==='sell')?`<button class="btn" data-a="sellmode">💰 Sell items</button>`:''}
 function monTips(cb){const t=[];for(const m of cb.mons){const c=mdef(m);t.push(`<b>${esc(c.n)}</b>: ${esc(c.x||'')} <i>Bad Stuff: ${esc(c.badt||'lose a level')}</i>`)}return t.join('<br>')}
 function abilityBtns(vm){const k=new Set(vm.map(m=>m.act));let h='';const b=m=>`<button class="btn" data-mv='${esc(JSON.stringify(m))}'>${moveLabel(m)}</button>`;vm.filter(m=>['skip','shoo','charm','bribe'].includes(m.act)).forEach(m=>h+=b(m));
   const pw=['berserk','turn','flight','backstab'].filter(a=>k.has(a));if(pw.length)h+=`<span class="small muted">Class power: tap a card in your hand to ${pw.map(a=>({berserk:'go berserk',turn:'turn undead',flight:'cast flight',backstab:'backstab'})[a]).join(' or ')}.</span>`;return h}
 function actsHTML(vm,me){return ''}
-function logHTML(){return `<div class="paper box"><h3>Dungeon diary</h3><ol id="log" reversed>${G.log.slice(0,60).map(l=>`<li${l.s>=0?` style="border-left:4px solid ${PCOL[l.s]};padding-left:4px;list-style:none;margin-left:-1rem"`:' style="list-style:none;margin-left:-1rem"'}>${esc(l.t)}</li>`).join('')}</ol></div>`}
+function logHTML(){return `<ol id="log" reversed>${G.log.slice(0,200).map(l=>`<li${l.s>=0?` style="border-left:4px solid ${PCOL[l.s]};padding-left:6px;list-style:none;margin-left:-1rem"`:' style="list-style:none;margin-left:-1rem"'}>${esc(l.t)}</li>`).join('')}</ol>`}
 // ---- card menu: everything this card can do right now ----
 function cardMoves(me,id){return myMoves(me).filter(m=>m.card===id)}
 function moveLabel(m){const c=m.card!=null?cd(m.card):null;switch(m.act){
@@ -1270,13 +1449,14 @@ function moveLabel(m){const c=m.card!=null?cd(m.card):null;switch(m.act){
   case 'drop':return c.t==='race'||c.t==='class'?'Discard this '+(c.t==='race'?'race':'class'):'Let the Porter go';case 'resurrect':return 'Discard this and take the top door discard instead of kicking';case 'join':return 'Add it to the fight (undead join undead)';
   case 'skip':return `Walk past ${esc(mdef(G.cb.mons[m.tgt]).n)}`;case 'shoo':return `Shoo off ${esc(mdef(G.cb.mons[m.tgt]).n)} (Cleric)`;case 'charm':return `✨ Charm ${esc(mdef(G.cb.mons[m.tgt]).n)} (discard your whole hand)`;case 'bribe':return `Bribe the Sniffer with ${esc(c.n)}`;case 'use':return 'Use '+esc(c.n);
   default:return m.act}}
-function menuHTML(me){const u=UI.menu;if(u.ask){const cb=G.cb;const opts=validMoves(me).filter(m=>m.act==='ask');const who=[...new Set(opts.map(m=>m.tgt))];
-    return `<div class="dlg paper"><h2>Ask for help</h2><p>Pick a helper and how many of the ${cbTreasure(cb)} treasures you offer. They add their strength (${who.map(i=>esc(P(i).nm)+' '+pStr(P(i))).join(', ')}).</p><div class="opts">${who.map(i=>`<div><b>${esc(P(i).nm)}</b> (strength ${pStr(P(i))}${pStr(P(i))+sideStr(cb)>monStr(cb)?', enough to win':''}) <div class="acts">${opts.filter(m=>m.tgt===i).map(m=>`<button class="btn" data-mv='${esc(JSON.stringify(m))}'>offer ${m.opt}</button>`).join('')}</div></div>`).join('')}</div><div class="acts"><button class="btn" data-a="close">Cancel</button></div></div>`}
+function askHTML(me){const cb=G.cb;const opts=validMoves(me).filter(m=>m.act==='ask');const who=[...new Set(opts.map(m=>m.tgt))];
+    return `<div class="asks" role="group" aria-label="Ask for help"><b>Ask for help</b><span class="small">Pick a helper and how many of the ${cbTreasure(cb)} treasures you offer. They add their strength.</span>${who.map(i=>`<div><b>${esc(P(i).nm)}</b> <span class="small">(strength ${pStr(P(i))}${pStr(P(i))+sideStr(cb)>monStr(cb)?', enough to win':''})</span><div class="acts" style="margin:.2rem 0">${opts.filter(m=>m.tgt===i).map(m=>`<button class="btn" data-mv='${esc(JSON.stringify(m))}'>offer ${m.opt}</button>`).join('')}</div></div>`).join('')}<div><button class="btn" data-a="close">Cancel</button></div></div>`}
+function menuHTML(me){const u=UI.menu;
   const id=u.card;const ms=cardMoves(me,id);const c=cd(id);const sug=UI.hints?aiSuggest(me):null;
-  return `<div class="dlg paper zoom"><div class="zgrid">${cardHTML(id)}<div><h2>${esc(c.n)}</h2><p>${esc(c.x||'')}</p>${c.t==='monster'?`<p class="small">Level ${c.lvl} · ${c.tr} treasure${c.tr===1?'':'s'}${(c.lv||1)>1?` · ${c.lv} levels`:''}<br>Bad Stuff: ${esc(c.badt||'lose a level')}</p>`:''}${c.t==='item'?`<p class="small">${kindLabel(c)} · +${c.b||0} · ${c.g||0} gold${c.req?` · ${[].concat(c.req).map(r=>r[0]==='!'?'not '+(TRAITNAME[r.slice(1)]||r.slice(1)):(TRAITNAME[r]||r)+' only').join(', ')}`:''}</p>`:''}
+  return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"'})}<div><p>${esc(c.x||'')}</p>${c.t==='monster'?`<p class="small">Level ${c.lvl} · ${c.tr} treasure${c.tr===1?'':'s'}${(c.lv||1)>1?` · ${c.lv} levels`:''}<br>Bad Stuff: ${esc(c.badt||'lose a level')}</p>`:''}${c.t==='item'?`<p class="small">${kindLabel(c)} · +${c.b||0} · ${c.g||0} gold${c.req?` · ${[].concat(c.req).map(r=>r[0]==='!'?'not '+(TRAITNAME[r.slice(1)]||r.slice(1)):(TRAITNAME[r]||r)+' only').join(', ')}`:''}</p>`:''}
     <div class="opts">${ms.map(m=>`<button class="btn opt ${sug&&mvKey(sug)===mvKey(m)?'rec':''}" data-mv='${esc(JSON.stringify(m))}'>${moveLabel(m)}</button>`).join('')||'<p class="small muted">You can\'t use this card right now.</p>'}</div>
     <div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
-function zoomHTML(){const id=UI.zoom;const c=cd(id);return `<div class="dlg paper zoom"><div class="zgrid">${cardHTML(id)}<div><h2>${esc(c.n)}</h2><p>${esc(c.x||'')}</p>${c.badt?`<p>Bad Stuff: ${esc(c.badt)}</p>`:''}<div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
+function zoomHTML(){const id=UI.zoom;const c=cd(id);return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"'})}<div><p class="small muted">${kindLabel(c)}</p><p>${esc(c.x||'')}</p>${c.badt?`<p>Bad Stuff: ${esc(c.badt)}</p>`:''}<div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h2>Pass the device to ${esc(P(s).nm)}</h2><p>Everyone else, look away: ${esc(P(s).nm)}'s hand is secret.</p><button class="btn primary" data-a="iam">I'm ${esc(P(s).nm)}: show my cards</button></div>`}
 function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);return `<div class="dlg paper"><h2>🏆 ${esc(G.winText)}</h2><table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${esc(p.nm)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
 function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
@@ -1286,19 +1466,19 @@ function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.ge
    <h3>Computer skill</h3><div class="seg">${['easy','normal','hard'].map(k=>`<button class="btn ${(UI.lvl||'normal')===k?'on':''}" data-set="lvl" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>
    <h3>Expansions</h3><div class="grid2">${EXPS.map(e=>`<button class="btn ${DEFEX[e.k]?'on':''}" data-set="ex" data-v="${e.k}" title="${esc(e.d)}"><b>${esc(e.n)}</b><br><span class="small">${esc(e.d)}</span></button>`).join('')||'<span class="small muted">The base game.</span>'}</div>
    <div class="acts" style="margin-top:12px"><button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>${saved?'<button class="btn" data-a="load">Continue saved game</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
-function rulesHTML(){return `<div class="dlg paper"><h2>How to play</h2>${RULES_HTML}<div class="acts"><button class="btn" data-a="close">Close</button></div></div>`}
+function rulesHTML(){return RULES_HTML}
 // ---- input ----
 function uiAct(m){const me=viewSeat();const s=m.seat!=null?m.seat:me;UI.menu=null;if(m.act==='sell')UI.sell=null;const ok=gameAct(m,s);if(!ok)render()}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-a],[data-card],[data-start],[data-set],[data-opp]');if(!t)return;
   if(t.dataset.mv){uiAct(JSON.parse(t.dataset.mv));return}
   const a=t.dataset.a;
-  if(a==='close'){UI.menu=null;UI.zoom=null;UI.rules=false;render();return}
+  if(a==='close'){UI.menu=null;UI.zoom=null;UI.rules=false;if(GX.open==='dkCard')GX.close();render();return}
   if(a==='askmenu'){UI.menu={ask:true};render();return}
   if(a==='sellmode'){UI.sell=[];render();return}
   if(a==='sellx'){UI.sell=null;render();return}
   if(a==='iam'){UI.lastSeat=UI.pass;UI.pass=null;render();return}
-  if(a==='rules'){UI.rules=true;if(!G){$('#modal').innerHTML=rulesHTML();return}render();return}
-  if(a==='new'){G=null;UI.info=true;render();return}
+  if(a==='rules'){GX.show('dkRules');return}
+  if(a==='new'){G=null;UI.info=true;UI.menu=null;UI.zoom=null;UI.sell=null;GX.close();render();return}
   if(a==='load'){try{G=JSON.parse(localStorage.getItem(SAVE));UI.pass=null;UI.lastSeat=-1;refresh()}catch(e){G=null;render()}return}
   if(a==='pause'){UI.pause=!UI.pause;$('#pausebtn').textContent=UI.pause?'▶':'⏸';if(!UI.pause)schedule();return}
   if(a==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed',UI.speed)}catch(e){};$('#speedbtn').textContent='⏩ '+(UI.speed<1?'slow':UI.speed>1?'fast':'normal');return}
@@ -1306,20 +1486,30 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='snd'&&typeof toggleSound==='function'){toggleSound();return}
   if(a==='mus'&&typeof toggleMusic==='function'){toggleMusic();return}
   if(t.dataset.set){const k=t.dataset.set,v=t.dataset.v;if(k==='n')UI.n=+v;else if(k==='mode')UI.mode=v;else if(k==='lvl')UI.lvl=v;else if(k==='ex'){DEFEX[v]=!DEFEX[v];try{localStorage.setItem('dkd_ex',JSON.stringify(DEFEX))}catch(e){}}render();return}
+  if(t.dataset.opp!=null&&t.dataset.card===undefined){UI.oppView=+t.dataset.opp;render();GX.show('dkOpp');const d=$('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0;return}
   if(t.dataset.start){UI.pass=null;UI.lastSeat=-1;newGame(t.dataset.start,UI.n||DEFN);return}
   if(t.dataset.card!==undefined&&G){const id=+t.dataset.card;const me=viewSeat();
-    if(t.closest('.dlg')){return}
+    if(t.closest('.dlg')||t.closest('#dkCard')){return}
     if(UI.sell){if(me>=0&&sellable(P(me)).includes(id)){const i=UI.sell.indexOf(id);if(i>=0)UI.sell.splice(i,1);else UI.sell.push(id);render()}return}
     const ms=cardMoves(me,id);
     if(ms.length===1&&['give','toss','equip','unequip'].includes(ms[0].act)){uiAct(ms[0]);return}
     if(ms.length){UI.menu={card:id};render();return}UI.zoom=id;render();return}
 });
 document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key==='Escape'){UI.menu=null;UI.zoom=null;UI.rules=false;if(G)render();return}
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('span[data-gx]')){e.preventDefault();e.target.click();return}
+  if(GX.open)return;
   if(!G||G.winner)return;const me=viewSeat();if(sideToAct()!==me)return;const vm=validMoves(me);const f=a=>vm.find(m=>m.act===a);
   const k=e.key.toLowerCase();const m=k==='k'?f('kick'):k==='l'?f('loot'):k==='e'?f('end'):k==='f'?f('fight'):k==='r'?f('run'):k===' '||k==='enter'?(f('kick')||f('fight')||f('pass')||f('end')||f('ready')||f('loot')):null;
   if(m&&!UI.menu&&UI.pass==null){e.preventDefault();uiAct(m)}});
 function humanTurn(){if(!G||G.winner)return false;const s=sideToAct();return s>=0&&P(s).human}
 try{const ex=JSON.parse(localStorage.getItem('dkd_ex')||'null');if(ex)Object.assign(DEFEX,ex)}catch(e){}
+// ---- board-first shell: popups for the diary, rivals, card details and rules ----
+GX.init({key:'dkd'});
+GX.drawer('dkLog','Dungeon diary',$('#dkLogBody'));
+GX.drawer('dkOpp','Rivals: gear and cards',$('#dkOppBody'),true);
+GX.drawer('dkCard','Card',$('#dkCardBody'));
+GX.drawer('dkRules','How to play',$('#dkRulesBody'),true);$('#dkRulesBody').innerHTML=rulesHTML();
+GX.onClose=id=>{if(id==='dkCard'&&((UI.menu&&UI.menu.card!=null)||UI.zoom!=null)){UI.menu=null;UI.zoom=null;if(G)render()}};
 render();
 
 </script>
