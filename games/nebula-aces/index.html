@@ -125,7 +125,7 @@ table.dial{border-collapse:separate;border-spacing:3px}table.dial th{font:800 .8
 #lastlog{border-top:1px solid var(--line);padding-top:.35rem}#lastlog div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#lastlog .s0{color:#ffc79a}#lastlog .s1{color:#ff9aa6}
 #prompt .head{margin-top:0}#prompt p{margin:.25rem 0}#prompt h2{margin:.2rem 0;font-size:1.1rem}
 @media (max-width:999px){.gx-dock-body{gap:.35rem;padding:.4rem .6rem .7rem}.st{padding:.1rem 0;font-size:.72rem}.st b{display:inline;font-size:.8rem;margin-right:.25rem}.st i{display:none}
-  #prompt>.head:first-child{display:none}.shipc .tp{display:none}.shipc{font-size:.8rem}.dice .die{width:38px;height:38px;font-size:1.05rem}#prompt .btn small{font-size:.72rem}
+  .shipc .tp{display:none}.shipc{font-size:.8rem}.dice .die{width:38px;height:38px;font-size:1.05rem}#prompt .btn small{font-size:.72rem}
   #lastlog div+div{display:none}.acts{margin-top:.35rem}.acts.col{gap:.3rem}.dialinfo .tip{display:none}}
 .bld h3{margin:.8rem 0 .3rem;font-size:.9rem;color:var(--muted)}.bld .card{cursor:default}
 details.how2 summary{cursor:pointer;color:var(--muted);font-size:.84rem;min-height:28px}
@@ -181,10 +181,53 @@ label small.bio{display:block;color:var(--muted);font-size:.74rem;max-width:230p
 .tag.coach{border-color:var(--gold);background:rgba(60,40,10,.9);color:#ffe7b0;font-weight:700;transform:translate(-50%,-50%);white-space:normal;text-align:center;max-width:160px}.tag.coach small{font-weight:400}
 .roster .bio{margin:.1rem 0}
 #recap:empty{display:none}
-@media (max-width:999px){.gx-dock-body>#prompt{order:2}.gx-dock-body>#coach{order:3}.gx-dock-body>#radio{order:4}.gx-dock-body>#lastlog{order:5}.na-recap .gx-dock{max-height:56dvh}.recap li{margin:0}.recap{font-size:.8rem}}
+@media (max-width:999px){.na-sum .gx-dock{max-height:60dvh}}
 /* phone planning: the sheet shrinks to the dial and Lock */
-.na-plan #steps,.na-plan #shipcard,.na-plan #lastlog,.na-plan #radio,.na-plan details.how2,.na-plan .dialinfo .dname{display:none}
+.na-plan .qwhy,.na-plan #shipcard,.na-plan #lastlog,.na-plan #radio,.na-plan details.how2,.na-plan .dialinfo .dname{display:none}
 @media (min-width:701px) and (max-width:999px){.dialinfo .tip{display:block!important;font-size:.8rem}}
+
+/* ---- round flow: roadmap, queue, step boxes ---- */
+.gx-dock-top{flex:0 0 auto;padding:.35rem .6rem .35rem;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:.3rem;background:rgba(0,0,0,.12)}
+.gx-dock-top:has(#queue:empty) #steps:empty{display:none}
+.road{display:flex;gap:3px;align-items:stretch}
+.road .rn{font:800 .78rem Orbitron,"Exo 2",system-ui,sans-serif;color:var(--gold);display:flex;align-items:center;justify-content:center;padding:0 .3rem;white-space:nowrap;border:1.5px solid var(--gold);border-radius:8px;background:rgba(255,200,107,.1)}
+.road .ph{flex:1 1 0;min-width:0;border:1.5px solid var(--line);border-radius:8px;background:transparent;color:var(--muted);padding:.12rem .1rem;font:600 .74rem "Exo 2",system-ui,sans-serif;cursor:pointer;text-align:center;min-height:38px;line-height:1.15}
+.road .ph b{display:block;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.road .ph i{display:block;font-style:normal;font-size:.64rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.road .ph.next{opacity:.55}.road .ph.done{color:var(--good);border-color:rgba(86,227,154,.45)}.road .ph.on{border-color:var(--gold);background:rgba(255,200,107,.2);color:var(--ink);box-shadow:0 0 0 2px rgba(255,200,107,.25)}
+.road .ph:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+.roadinfo{margin:0;font-size:.8rem;background:var(--panel2);border-radius:8px;padding:.25rem .5rem}.roadinfo .linkb{float:right}
+.queue:empty{display:none}.qrow{display:flex;flex-wrap:wrap;gap:3px;align-items:center}.qrow::-webkit-scrollbar{display:none}
+.ql{font-size:.7rem;color:var(--muted);white-space:nowrap;margin-right:2px}.qa{color:var(--muted);font-size:.8rem}
+.qc{flex:0 0 auto;border:1.5px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--ink);padding:.08rem .4rem;font:600 .74rem "Exo 2",system-ui,sans-serif;cursor:pointer;text-align:left;min-height:34px;line-height:1.15}
+.qc b{display:block;white-space:nowrap}.qd{display:none}.qc i{display:block;font-style:normal;font-size:.64rem;color:var(--muted);white-space:nowrap}
+.qc.f0 b{color:#ffc79a}.qc.f1 b{color:#ff9aa6}.qc.f2 b{color:#9fe0b8}.qc.cur{border-color:var(--gold);background:rgba(255,200,107,.2);box-shadow:0 0 0 2px rgba(255,200,107,.35)}.qc.cur i{color:var(--ink)}
+.qc.done{opacity:.6}.qc.dead{opacity:.4;text-decoration:line-through}.qc.me{border-style:solid;border-width:2px}
+.qwhy{margin:0;font-size:.72rem;color:var(--muted);line-height:1.3}
+#notice{display:flex;flex-direction:column;gap:.3rem}#notice:empty{display:none}
+.note{background:rgba(127,212,255,.08);border:1.5px solid #7fd4ff;border-radius:10px;padding:.35rem .55rem;font-size:.86rem;line-height:1.35}.note.lost{background:rgba(255,176,112,.1);border-color:#ffb070}.note i{display:block;color:var(--muted);margin-top:.15rem}
+.nowbox{border:1.5px solid var(--gold);border-radius:12px;padding:.45rem .6rem .5rem;background:linear-gradient(180deg,rgba(255,200,107,.08),transparent 60%)}.nowbox:empty{display:none}
+#prompt .head{font-size:.92rem;margin:0 0 .25rem}.now-t{font-size:.88rem}
+ol.sub{display:flex;flex-wrap:wrap;gap:3px;list-style:none;margin:.1rem 0 .3rem;padding:0;counter-reset:sub}ol.sub li{counter-increment:sub;font-size:.72rem;border:1px solid var(--line);border-radius:999px;padding:.05rem .45rem;color:var(--muted)}
+ol.sub li::before{content:counter(sub) ". "}ol.sub li.done{color:var(--good);border-color:rgba(86,227,154,.45)}ol.sub li.done::before{content:""}ol.sub li.on{color:#1b1030;background:var(--gold);border-color:var(--gold);font-weight:700}
+.recbox{background:rgba(127,212,255,.1);border:1.5px dashed #7fd4ff;border-radius:10px;padding:.3rem .5rem;font-size:.84rem;margin:.3rem 0}.recbox .rk{color:#7fd4ff;font-weight:800}.recbox .btn{margin-left:.3rem;vertical-align:middle}
+.cw{font-weight:700;border-radius:5px;padding:0 .25rem}.cw.g{background:rgba(75,224,138,.2);color:#8ff5b8}.cw.w{background:rgba(243,243,255,.14);color:#fff}.cw.r{background:rgba(255,90,90,.2);color:#ff9a9a}
+table.dial thead th{font:600 .58rem "Exo 2",system-ui,sans-serif;color:var(--muted);text-align:center;line-height:1.05;padding:0 0 1px;vertical-align:bottom;max-width:46px}table.dial thead th.sp{text-align:right}
+.mv .rs{position:absolute;left:2px;top:0;font-style:normal;font-size:.62rem;color:#0a4f7a}
+.btn.rec{border-color:#7fd4ff;box-shadow:0 0 0 2px rgba(127,212,255,.35)}
+.drow{margin:.15rem 0}.drow .dl{display:block;font-size:.74rem;color:var(--muted)}.dleg{font-size:.72rem;color:var(--muted);margin:.35rem 0 0}
+.sumgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:.3rem 0}.sumgrid div{background:var(--panel2);border-radius:8px;padding:.2rem .3rem;text-align:center}.sumgrid b{display:block;font:800 1.2rem Orbitron,"Exo 2",system-ui,sans-serif;color:var(--good)}.sumgrid .hurt b{color:var(--bad)}.sumgrid span{font-size:.7rem;color:var(--muted)}
+#prompt h4{margin:.4rem 0 .1rem;font-size:.78rem;color:var(--gold);text-transform:uppercase;letter-spacing:.05em}.sumlist{margin:.1rem 0;padding-left:1.1rem;font-size:.84rem}.sumlist li{margin:.12rem 0}.sumlist.tips li{color:#cfe6ff}
+.tag.tgt{border-color:#ff5566;box-shadow:0 0 0 3px rgba(255,85,102,.55)}.tag .tgl{display:block;font-style:normal;color:#ffb0b8;font-size:.62rem}
+.na-guide{min-height:32px;padding:2px 8px;font-size:.8rem;color:var(--ink);flex:0 0 auto}.na-guide b{color:var(--gold)}
+@media (max-width:999px){.gx-dock-top{padding:.3rem .5rem}.road .ph{min-height:34px}.road .ph i{font-size:.6rem}}
+@media (max-width:700px){.gx-dock-head .gx-dt{display:none}.gx-dock-head{justify-content:flex-end}.gx-dock-head .gx-grab{margin-right:auto;margin-left:calc(50% - 60px)}.road .rn{font-size:.7rem;padding:0 .2rem}.road .ph{font-size:.68rem}
+  .mv{width:40px;height:40px}.qwhy{font-size:.68rem}.now-t{font-size:.84rem}}
+
+@media (max-width:700px){.gx-dock-head{padding:3px 6px}.gx-dock-head .gx-ibtn{min-height:34px;padding:2px 7px}.gx-dock-top{gap:.2rem;padding:.25rem .45rem}
+  .qwhy{display:none}.qrow{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.qrow::-webkit-scrollbar{display:none}.qc{min-height:30px;padding:.02rem .35rem}.ql em{font-style:normal}
+  .na-plan .gx-dock,.na-dec .gx-dock{max-height:56dvh}.na-plan #prompt ol.sub{display:none}.road .ph{min-height:32px}}
+.ql em{font-style:normal;color:var(--gold)}
+@media (max-width:700px){.ql .qt{display:none}.ql em{text-transform:capitalize}.qrow{flex-wrap:wrap;overflow:visible}.qc{display:inline-flex;gap:4px;align-items:baseline;min-height:28px}.qc b,.qc i{display:inline}.qc i{font-size:.72rem;color:var(--gold)}.qs,.qx,.qy,.qa{display:none}.ql{font-size:.64rem}.qc.me{border-color:var(--c0)}.qd{display:inline;color:var(--good)}.qc.me{box-shadow:inset 0 -2px 0 var(--c0)}}
 </style>
 </head>
 <body>
@@ -212,13 +255,17 @@ label small.bio{display:block;color:var(--muted);font-size:.74rem;max-width:230p
     <svg id="map" viewBox="0 0 914 914" role="img" aria-label="The battlefield from above"></svg>
   </main>
   <aside class="gx-dock" aria-label="What to do now">
-    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Nebula Aces</span><button class="gx-ibtn na-adv" data-a="advise" aria-expanded="false" title="What should I do now, and why?">🧭 Advice</button><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">⇥</button></div>
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Nebula Aces</span><button class="gx-ibtn na-guide" data-a="guide" aria-pressed="true">📘 Guide</button><button class="gx-ibtn na-adv" data-a="advise" aria-expanded="false" title="What should I do now, and why?">🧭 Advice</button><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">⇥</button></div>
+    <div class="gx-dock-top">
+      <div id="steps" class="roadmap"></div>
+      <div id="queue" class="queue"></div>
+    </div>
     <div class="gx-dock-body">
-      <div id="steps" class="steps"></div>
+      <div id="prompt" class="nowbox" aria-live="off"></div>
+      <div id="notice"></div>
       <div id="recap"></div>
       <div id="coach"></div>
       <div id="shipcard"></div>
-      <div id="prompt" aria-live="off"></div>
       <div id="radio" class="small"></div>
       <div id="lastlog" class="small muted"></div>
     </div>
@@ -1441,9 +1488,10 @@ function arcFan(s,arc,rmax,col){const g=new THREE.Group();const b=B(s);for(let r
     const shp=new THREE.BufferGeometry();const v=[];for(let i=1;i<pts.length-1;i++)v.push(pts[0].x,pts[0].y,pts[0].z,pts[i].x,pts[i].y,pts[i].z,pts[i+1].x,pts[i+1].y,pts[i+1].z);shp.setAttribute('position',new THREE.Float32BufferAttribute(v,3));
     g.add(new THREE.Mesh(shp,new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:.07+.05*(4-r),side:THREE.DoubleSide,depthWrite:false})))}return g}
 function drawGuides(){clearGuides();if(!G)return;const sel=UI.sel&&ship(UI.sel);
-  if(G.phase==='plan'&&sel&&sel.alive&&myPlanShip(sel)){const b=B(sel);const show=UI.hoverDial!=null?[UI.hoverDial]:sel.dial!=null&&sel.dial!=='set'?[sel.dial]:[];
+  if(G.phase==='plan'&&sel&&sel.alive&&myPlanShip(sel)&&!(typeof sumPending==='function'&&sumPending())){const b=B(sel);const show=UI.hoverDial!=null?[UI.hoverDial]:UI.draft&&UI.draft[sel.id]!=null?[UI.draft[sel.id]]:sel.dial!=null&&sel.dial!=='set'?[sel.dial]:[];
     dialOf(sel).forEach((m,i)=>{if(show.length&&!show.includes(i))return;const col=m.c==='r'?0xff4a4a:m.c==='g'?0x4aff8a:0xffffff;const tp=tplPoints(sel,b,m,4);V3.guide.add(ribbon(tp,col,show.length?.55:.12));
-      const fp=finalPose(sel,b,m);V3.guide.add(outline(fp,b,col,show.length?.95:.25))})}
+      const fp=finalPose(sel,b,m);V3.guide.add(outline(fp,b,col,show.length?.95:.25))});
+    if(!show.length&&UI.hints&&typeof suggestDial==='function'){const sg=suggestDial(sel);V3.guide.add(outline(finalPose(sel,b,dialOf(sel)[sg]),b,0x7fd4ff,.95))}}
   if(sel&&sel.alive&&(G.phase==='target'||G.phase==='action'||UI.showArcs))V3.guide.add(arcFan(sel,sel.arc,3,sel.side===0?0xffa24f:0xff4f6a));
   if(G.phase==='action'&&sel&&G.cur===sel.id&&UI.hoverAct){const a=actionsFor(sel).find(x=>x.a===UI.hoverAct.a);if(a&&a.opts)a.opts.forEach((o,i)=>{if(UI.hoverAct.i!=null&&UI.hoverAct.i!==i)return;V3.guide.add(outline(o.p,B(sel),0x66ddff,.9))})}
   if(G.phase==='ask'&&G.q)G.q.opts.forEach((o,i)=>{if(!o.p)return;const on=UI.hoverAct&&UI.hoverAct.a==='Q'&&UI.hoverAct.i===i;V3.guide.add(outline(o.p,o.b||40,0x66ddff,on?.95:.35))});
@@ -1453,7 +1501,8 @@ function myPlanShip(s){return G.phase==='plan'&&isHuman(s.side)&&s.side===planSi
 function tags3D(){const box=document.getElementById('tags');if(!box)return;for(const s of G.ships){let el=V3.labels[s.id];if(!el){el=V3.labels[s.id]=document.createElement('div');el.className='tag s'+s.side;box.appendChild(el)}
     if(!s.alive){el.style.display='none';continue}const hp=s.hull-hullDmg(s);
     el.title=s.name;el.innerHTML=`<b>${esc(typeof shortName==='function'?shortName(s):s.name)}</b><span><em class="ps">${psOf(s)}</em> <em class="h">◆${hp}</em>${s.shMax?` <em class="sh">◈${s.sh}</em>`:''}${s.stress?` <em class="st">!${s.stress}</em>`:''}${s.focus?' <em class="f">◉</em>':''}${s.evade?' <em class="e">✦</em>':''}${[s.tl,s.tl2].filter(x=>x&&ship(x)).map(x=>` <em class="l">⌖${esc(ship(x).name.split(' ')[0])}</em>`).join('')}${s.ion?' <em class="io">ion</em>':''}${G.phase==='plan'&&s.dial!=null?' <em class="dl">▣</em>':''}</span>`;
-    el.classList.toggle('on',G.cur===s.id&&G.phase!=='plan');el.classList.toggle('sel',UI.sel===s.id)}}
+    el.classList.toggle('on',G.cur===s.id&&G.phase!=='plan');el.classList.toggle('sel',UI.sel===s.id);
+    const tg=G.phase==='target'&&G.cur&&typeof humanTurn==='function'&&humanTurn()&&weaponsFor(ship(G.cur)).some(w=>w.targets.some(t=>t.id===s.id));el.classList.toggle('tgt',!!tg);if(tg)el.insertAdjacentHTML('beforeend','<em class="tgl">can be shot</em>')}}
 // ---- camera: drag to orbit, right-drag or two fingers to pan, wheel/pinch to zoom ----
 function bindCamera(cv){const P={};cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);P[e.pointerId]={x:e.clientX,y:e.clientY,b:e.button,x0:e.clientX,y0:e.clientY,t:performance.now()}});
   cv.addEventListener('pointermove',e=>{const p=P[e.pointerId];if(!p)return;const ids=Object.keys(P);const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;const C=V3.cam;
@@ -1630,7 +1679,7 @@ function attackWatch(){if(!G)return;const A=G.atk;const P=UI.pendAtk;if(P&&P.A!=
 function finishAtk(){const P=UI.pendAtk;if(!P||!G)return;UI.pendAtk=null;const a=ship(P.a),d=ship(P.d);if(!a||!d)return;
   const hp1=d.alive?d.hull-hullDmg(d):0,sh1=d.sh,dmg=Math.max(0,P.sh0-sh1)+Math.max(0,P.hp0-hp1);
   UI.taken[d.id]=(UI.taken[d.id]||0)+dmg;if(!d.alive)UI.kills.push({by:a.id,v:d.id,r:P.r,rg:P.rg});
-  const R={rolled:P.rolled,a:a.id,d:d.id,dmg,sh0:P.sh0,sh1,hp0:P.hp0,hp1,crits:P.crits,dead:!d.alive,r:P.r,rg:P.rg,t:Date.now()};UI.results.unshift(R);if(UI.results.length>40)UI.results.length=40;
+  const R={dice:(P.A.dice||[]).slice(),def:(P.A.def||[]).slice(),rolled:P.rolled,a:a.id,d:d.id,dmg,sh0:P.sh0,sh1,hp0:P.hp0,hp1,crits:P.crits,dead:!d.alive,r:P.r,rg:P.rg,t:Date.now()};UI.results.unshift(R);if(UI.results.length>40)UI.results.length=40;
   if(d.alive&&dmg&&!P.crits.length)say(d,sh1>0?CHAT.shields:P.sh0>0?CHAT.shieldsdown:CHAT.hull)}
 function resultHTML(R,plain){const a=ship(R.a),d=ship(R.d);if(!a||!d)return '';const me=soloSide();const you=d.side===me,yours=a.side===me;
   const an=yours?`You (${esc(a.name)})`:esc(a.name),dn=you?`you (${esc(d.name)})`:esc(d.name);
@@ -1661,7 +1710,7 @@ function sugInfo(s,i){const m0=dialOf(s)[i],m=exColor(s,m0),b=B(s),p=finalPose(s
   else if(mine.length)why=`lines up a shot on ${esc(mine[0].e.name)} at range ${mine[0].rg} (it may shoot back)`;
   else if(!theirs.length)why=d1<d0-20&&rangeOf(d1)>=3?'closes in but stays out of their arcs: they must come to you':'stays out of their arcs: they must come to you';
   else why='the best of the moves left, though you may end up in an enemy arc';
-  why+=' (if they stayed put)';
+  why+=', if they stay where they are';
   const clip=tplPoints(s,b,m0,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2));
   const cost=m.c==='r'?'Cost: red = a stress token, so no action this turn and no red moves until a green one clears it.':m.c==='g'?(s.stress?'Bonus: green clears your stress.':'Cost: none (green is an easy move).'):'Cost: none (white).';
   return {why,cost:cost+(clip?' Risk: it clips an asteroid (damage roll, no action).':'')}}
@@ -1676,7 +1725,7 @@ function coachKey(){if(tourOff()||!G||G.winner||UI.info)return null;if(G.phase==
   if(G.phase==='action')return 'action';if(G.phase==='target')return 'attack';return null}
 function coachStep(){const k=coachKey();if(UI.coachOn&&UI.coachOn!==k){UI.coachDone[UI.coachOn]=1;LS.set('na_coach',JSON.stringify(UI.coachDone));if(['dial','action','attack','end'].every(x=>UI.coachDone[x]))LS.set('na_tour','1')}
   UI.coachOn=k&&!UI.coachDone[k]?k:null;return UI.coachOn}
-function coachTag(){let el=document.getElementById('coachtag');const on=UI.coachOn==='attack'&&typeof V3!=='undefined'&&V3.on&&G&&G.cur&&ship(G.cur);
+function coachTag(){let el=document.getElementById('coachtag');const on=typeof guided==='function'&&guided()&&G&&G.phase==='target'&&humanTurn()&&typeof V3!=='undefined'&&V3.on&&G.cur&&ship(G.cur);
   if(!on){if(el)el.remove();return}const s=ship(G.cur);if(!el){el=document.createElement('div');el.id='coachtag';el.className='tag coach';const t=$('tags');if(!t)return;t.appendChild(el)}
   el.innerHTML='your arc ▼<br><small>shoot only inside this wedge</small>';const f=fwd(s.h);el._v=W(s.x+f.x*RANGE*1.7,s.y+f.y*RANGE*1.7,1);placeEl(el,el._v)}
 // ---- end-of-round recap ----
@@ -1741,14 +1790,227 @@ function advice(){if(!G)return {say:'Press Launch.',why:'The defaults are a good
   if(P==='damod')return {say:'Tamper with their dice.',why:'Using it can cancel their best die; it is usually worth it.'};
   return {say:'Follow the highlighted button.',why:''}}
 // ---- the guidance box in the dock ----
-function renderCoach(){const el=$('coach');if(!el)return;if(!G||UI.info){el.innerHTML='';const rc=$('recap');if(rc)rc.innerHTML='';return}let h='';const k=coachStep();
+function renderCoach(){const el=$('coach');if(!el)return;const rc=$('recap');if(rc)rc.innerHTML='';if(!G||UI.info){el.innerHTML='';return}let h='';
   if(UI.advOpen){const a=advice();h+=`<div class="adv" role="status"><button class="gx-x" data-a="advise" aria-label="Close advice">×</button><b>🧭 ${a.say}</b> ${a.why}</div>`}
   if(G.round===0&&!G.winner)h+=briefingHTML();
-  if(k&&k!=='end')h+=`<div class="coach"><span class="cn">${COACH[k].n}</span> ${COACH[k].t} <button class="linkb" data-a="tourskip">Skip tips</button></div>`;
-  const showRecap=G.phase==='plan'&&planSide()>=0&&G.round>=2&&UI.recapSeen<G.round-1&&(k==='end'||LS.get('na_recap')!=='off');const rc=$('recap');if(rc)rc.innerHTML=showRecap?recapHTML():'';if(GX&&GX.app)GX.app.classList.toggle('na-recap',showRecap);
-  if(showRecap);else if(G.round>=1&&!G.winner&&G.phase!=='plan'){const rs=UI.results.filter(r=>r.r===G.round&&Date.now()-r.t<60000).slice(0,2);if(rs.length)h+=rs.map(r=>resultHTML(r)).join('')}
   el.innerHTML=h;coachTag();
-  const rd=$('radio');if(rd){const r=UI.radio;rd.innerHTML=r&&G.round-r.r<=1&&!G.winner?`📻 <b class="f${G.fac[r.side]}">${esc(r.who)}</b> “${esc(r.t)}”`:''}}
+  const rd=$('radio');if(rd){const r=UI.radio;rd.innerHTML=r&&G.round-r.r<=1&&!G.winner?`📻 Radio · <b class="f${G.fac[r.side]}">${esc(r.who)}</b>: “${esc(r.t)}”`:''}}
+
+</script>
+<script>
+// ---------- round flow (interface only, no rules): roadmap, turn-order queue, step boxes, notices, guided pauses, end-of-round summary ----------
+Object.assign(UI,{notes:{},flowG:null,sumSeen:0,roadInfo:null,hold:null,holdK:[],resSeen:0,draftR:null});
+const PHASES=[
+  {n:'Planning',sub:'set dials',t:'<b>Planning:</b> every pilot secretly picks one maneuver on its dial. Nobody moves yet.'},
+  {n:'Activation',sub:'move + act',t:'<b>Activation:</b> one ship at a time reveals its dial and moves, <b>lowest pilot skill first</b>. After moving, each ship takes one action.'},
+  {n:'Combat',sub:'shoot',t:'<b>Combat:</b> one ship at a time may shoot an enemy inside its arc at range 1-3, <b>highest pilot skill first</b>.'},
+  {n:'End',sub:'summary',t:'<b>End:</b> unused focus and evade tokens are removed (target locks and stress stay). Then the next round starts.'}];
+function flowReset(){Object.assign(UI,{notes:{},flowG:G,sumSeen:G&&G.round>=2?G.round-1:0,roadInfo:null,hold:null,holdK:[],resSeen:0,draftR:null})}
+function flowSync(){if(G&&UI.flowG!==G)flowReset()}
+// ---- guidance level: "full" explains every step, "light" keeps one line. Auto = full for the first round of the first battle ----
+const guideMode=()=>LS.get('na_guide')||'auto';
+function guided(){const m=guideMode();if(m==='full')return true;if(m==='light')return false;return !tourOff()&&(!G||roundShown()<=1)}
+function guideBtn(){const b=document.querySelector('.na-guide');if(b){const on=guided();b.innerHTML=`📘 Guide: <b>${on?'full':'light'}</b>`;b.setAttribute('aria-pressed',String(on));b.title=on?'Step-by-step help is on. Tap for short help only.':'Short help. Tap for step-by-step help.'}}
+// ---- where we are: the summary of round N shows at the start of round N+1, before any dial is set ----
+function sumPending(){return !!(G&&!G.winner&&G.phase==='plan'&&planSide()>=0&&G.round>=2&&UI.sumSeen<G.round-1&&!UI.info)}
+function roundShown(){return G?(sumPending()?G.round-1:G.round):0}
+function stepShown(){if(!G)return 0;if(G.winner)return 5;if(G.round===0)return 0;if(sumPending())return 4;return G.phase==='plan'?1:Math.min(4,G.step||1)}
+const mine=s=>s&&isHuman(s.side)&&(typeof NET==='undefined'||!NET.on||s.side===NET.mySide);
+const nm=s=>esc(s.name);
+const youTag=s=>mine(s)&&soloSide()>=0?' (you)':'';
+// ---- the roadmap strip ----
+function renderRoad(){const el=$('steps');if(!el)return;if(!G){el.innerHTML='';return}const st=stepShown(),R=roundShown();
+  let h=`<div class="road" role="list" aria-label="Round roadmap"><span class="rn">${G.round===0?'Setup':G.winner?'Over':'Round '+R}</span>`;
+  PHASES.forEach((p,i)=>{const k=i+1;const cls=G.winner||k<st?'done':k===st?'on':'next';
+    h+=`<button class="ph ${cls}" data-road="${i}" role="listitem" aria-current="${k===st?'step':'false'}" aria-expanded="${UI.roadInfo===i}"><b>${p.n}</b><i>${cls==='done'?'✓ done':cls==='on'?'● now':p.sub}</i></button>`});
+  h+='</div>';
+  const info=UI.roadInfo!=null?PHASES[UI.roadInfo].t:G.round===0?'<b>Setup:</b> place the asteroids and the ships, then round 1 starts. Every round has the same 4 phases.':'';
+  if(info)h+=`<p class="roadinfo">${info}${UI.roadInfo!=null?' <button class="linkb" data-road="x" aria-label="Close explanation">✕</button>':''}</p>`;
+  el.innerHTML=h}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-road]');if(!t)return;const v=t.dataset.road;UI.roadInfo=v==='x'||UI.roadInfo===+v?null:+v;renderRoad()});
+// ---- the turn-order queue ----
+function queueData(){if(!G||G.round===0||G.winner||sumPending())return null;const st=G.step;
+  if(G.phase==='plan'){const ps=planSide();const ord=psOrder(true);return {title:'Move order',rule:'lowest skill first',ids:ord.map(s=>s.id),cur:null,
+    tag:s=>s.side===ps?(UI.draft[s.id]!=null?'dial ✓':'dial ?'):isHuman(s.side)?'':s.dial!=null?'dial set':'',
+    why:'Everyone plans at the same time, in secret. Then ships move in this order: <b>lowest pilot skill first</b>'+tieText(ord)+'.'}}
+  if(!G.order)return null;const ids=G.order;const cur=G.oi<ids.length?ids[G.oi]:null;const R=G.round;const N=UI.notes[R]||[];
+  if(st===2)return {title:'Activation order',rule:'lowest skill first',ids,cur,done:i=>i<G.oi,
+    tag:(s,i)=>{const n=N.find(x=>x.id===s.id&&x.lost);return n?'no action':i<G.oi?'moved ✓':i===G.oi?'now':''},
+    why:'Lowest pilot skill moves first, so the best pilots move last and can react'+tieText(ids.map(ship))+'.'};
+  if(st===3)return {title:'Combat order',rule:'highest skill first',ids,cur,done:i=>i<G.oi,
+    tag:(s,i)=>{if(!s.alive)return 'destroyed';const n=N.find(x=>x.id===s.id&&x.kind==='noshot');return n?'no shot':i<G.oi?(s.fired?'fired ✓':'done'):i===G.oi?'now':''},
+    why:'Highest pilot skill shoots first. A ship destroyed by a higher-skill pilot never gets to shoot'+tieText(ids.map(ship))+'.'};
+  return null}
+function tieText(list){const ps=list.filter(Boolean).map(psOf);const tie=ps.some((v,i)=>ps.indexOf(v)!==i);return tie?` (a tie goes to the side with initiative: ${esc(sideName(G.init))})`:''}
+function renderQueue(){const el=$('queue');if(!el)return;const q=queueData();if(!q){el.innerHTML='';return}
+  el.innerHTML=`<div class="qrow" role="list" aria-label="${q.title}"><span class="ql"><span class="qt">${q.title} </span><em>(${q.rule})</em>:</span>${q.ids.map((id,i)=>{const s=ship(id);if(!s)return '';const t=q.tag(s,i);
+    return `<button class="qc f${FACTIONS[G.fac[s.side]].col} ${id===q.cur?'cur':''} ${q.done&&q.done(i)?'done':''} ${s.alive?'':'dead'} ${mine(s)?'me':''}" data-sel="${id}" role="listitem" title="${nm(s)}: pilot skill ${psOf(s)}"><b>${esc(shortName(s))}${mine(s)&&soloSide()>=0?'<span class="qy"> (you)</span>':''}</b><i><span class="qs">skill </span>${psOf(s)}${t?`<span class="qx"> · ${t}</span>`:''}${/✓/.test(t)?'<span class="qd"> ✓</span>':''}</i></button>`}).join('<span class="qa" aria-hidden="true">›</span>')}</div><p class="qwhy">${q.why}</p>`;
+}
+// ---- notices: lost actions, no shot, rocks, forced moves (from the battle log; the log itself is unchanged) ----
+function addNote(n){flowSync();const R=G.round;const L=(UI.notes[R]=UI.notes[R]||[]);if(L.some(x=>x.id===n.id&&x.kind===n.kind))return null;n.r=R;n.t0=Date.now();L.push(n);
+  const s=ship(n.id);if(n.hold&&s&&mine(s)&&guided()&&ANIM&&!G.winner&&!UI.hold)UI.hold={kind:'note',n};return n}
+const _lgF=lg;lg=function(side,t){_lgF(side,t);try{if(G)flowLog(side,t)}catch(e){}};
+function flowLog(side,t){let m;const by=n=>byName(n,side);
+  if(m=t.match(/^(.+) bumps into (.+) and skips its action\./)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'bump',lost:true,hold:true,t:`<b>${nm(s)}${youTag(s)} bumped into ${esc(m[2])}: action lost.</b> Why: its move ended on top of ${esc(m[2])}, so it stopped short and skips its action. Ships that touch can't shoot each other this round.`,tip:'Next time pick a shorter, longer or sideways move so the bases do not overlap.'});return}
+  if(m=t.match(/^(.+) is stressed and can't take an action/)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'stressed',lost:true,hold:true,t:`<b>${nm(s)}${youTag(s)} is stressed: action lost.</b> Why: a ship with a stress token (from a red move) can't take actions.`,tip:'Fly a green move (straight or gentle bank) to clear the stress.'});return}
+  if(m=t.match(/^(.+) (flies through|lands on) an asteroid: rolls (\w+)/)){const s=by(m[1]);if(!s)return;const on=m[2]==='lands on',f=m[3];
+    addNote({id:s.id,kind:'rock',lost:true,hold:true,t:`<b>${nm(s)}${youTag(s)} ${on?'landed on':'flew through'} an asteroid: action lost.</b> It rolled a damage die: <b>${f}</b> (${f==='hit'?'1 damage':f==='crit'?'1 damage and a damage card':'no damage'})${on?', and a ship sitting on an asteroid can\'t shoot this round':''}.`,tip:'Check the ghost before you lock: a template that touches a rock costs your action.'});return}
+  if(m=t.match(/^(.+) flies a red maneuver and takes a stress/)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'red',t:`${nm(s)}${youTag(s)} flew a red move and got a <b>stress token</b>: no action while stressed, and no red moves until a green move clears it.`});return}
+  if(m=t.match(/^(.+) flies a green maneuver and clears/)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'green',t:`${nm(s)}${youTag(s)} flew a green move and cleared a stress token.`});return}
+  if(m=t.match(/^(.+) is stressed and can't fly the red (.+?); (.+) picks (.+) instead/)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'forced',hold:true,t:`<b>${nm(s)}${youTag(s)} was stressed and could not fly its red ${esc(m[2])}.</b> The other side picked ${esc(m[4])} for it instead. Stressed ships can't fly red moves.`});return}
+  if(m=t.match(/^(.+) flies off the battlefield/)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'off',hold:true,t:`<b>${nm(s)}${youTag(s)} flew off the battlefield and is lost.</b> A move that ends outside the mat destroys the ship.`});return}
+  if(m=t.match(/^(.+) is ionised and drifts/)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'ion',lost:true,t:`${nm(s)}${youTag(s)} was ionised: it drifted straight 1 instead of its dial and gets no action.`});return}}
+// why a ship has no legal target (read-only, the same checks weaponsFor makes)
+function whyNot(s,e){if(s.flags.noAtk)return 'it is sitting on an asteroid, so it can\'t attack this round';
+  const dc=s.dmg.find(x=>x.up&&DAMAGE[x.c].k==='noatk');if(dc)return `its damage card ${esc(DAMAGE[dc.c].n)} stops it attacking`;
+  if(G.touch.some(p=>(p[0]===s.id&&p[1]===e.id)||(p[1]===s.id&&p[0]===e.id))&&!exTouchOK(s,e))return `touching ${nm(s)} (ships in contact can't shoot each other)`;
+  const r=arcReach(s,B(s),e,B(e),s.arc);if(!r){const rr=rangeOf(baseDist(s,B(s),e,B(e)));return rr<=3?`outside the firing arc (it is at range ${rr}, but not in front)`:'outside the firing arc and too far'}
+  const rg=rangeOf(r.d);if(rg>3)return 'too far: range 4 or more (weapons reach range 1-3)';
+  return 'protected: a guardian pilot next to it draws the fire'}
+function noShotText(s){const en=enemiesOf(s);const why=en.length?en.map(e=>`${nm(e)} is ${whyNot(s,e)}`).join('; '):'no enemies left';
+  return `<b>${nm(s)}${youTag(s)} can't shoot this round.</b> ${s.flags.noAtk?'It is sitting on an asteroid, so it can\'t attack.':why.charAt(0).toUpperCase()+why.slice(1)+'.'}`}
+// combat skips ships without a target without a word: note them (and pause in guided mode) before the skip happens
+const _nextAttacker=nextAttacker;nextAttacker=function(){let pause=false;
+  try{if(G&&!G.winner&&G.order){for(let i=G.oi;i<G.order.length;i++){const s=ship(G.order[i]);if(!s)continue;const psNow=psOf(s);
+      if((s.alive||s.flags.dyingPS===psNow)&&!s.fired&&weaponsFor(s).length)break;
+      if(s.alive&&!s.fired){const n=addNote({id:s.id,kind:'noshot',t:noShotText(s),tip:'Plan a move that ends with an enemy in front of you, at range 1-3.'});if(n&&mine(s)&&guided()&&ANIM&&!UI.hold){UI.hold={kind:'note',n};pause=true}}}}}catch(e){}
+  if(pause){UI.holdK.push(()=>_nextAttacker());refresh();return}return _nextAttacker()};
+// guided pauses: the engine's own "later" steps wait while a pause box is up (the computer waits too)
+for(const f of ['nextActivationLater','nextAttackerLater']){const o=window[f];if(typeof o!=='function')continue;window[f]=function(){const a=arguments;if(UI.hold&&ANIM&&G&&!G.winner){UI.holdK.push(()=>o.apply(null,a));return}return o.apply(null,a)}}
+const _schedF=schedule;schedule=function(){if(UI.hold&&G&&!G.winner)return;return _schedF()};
+function releaseHold(){UI.hold=null;const ks=UI.holdK.splice(0);render();for(const k of ks)try{k()}catch(e){console.error(e)}schedule()}
+// a finished attack that involved a human ship: in guided mode it pauses on the result
+function flowWatch(){flowSync();if(!G)return;if(G.winner&&UI.hold){UI.hold=null;UI.holdK=[]}const R=UI.results[0];
+  if(R&&R.t>UI.resSeen){UI.resSeen=R.t;const a=ship(R.a),d=ship(R.d);if(guided()&&ANIM&&!G.winner&&!UI.hold&&(mine(a)||mine(d)))UI.hold={kind:'res',R}}
+  if(G.phase!=='plan'&&UI.draftR!==G.round)UI.draftR=null;if(G.phase==='plan'&&UI.draftR!==G.round){UI.draft={};UI.draftR=G.round}}
+function holdHTML(){const H=UI.hold;const g=guided();let h='';
+  if(H.kind==='res'){const R=H.R;const a=ship(R.a),d=ship(R.d);h+=`<p class="head">Combat · attack result</p>${stepList(['Choose a target','Roll and modify dice','Result'],2)}${resultHTML(R)}${R.dice?`<div class="drow"><span class="dl">Attack dice · ${esc(shortName(a))}</span><div class="dice">${R.dice.map(f=>die(f,'atk')).join('')||'<i class="muted small">none</i>'}</div></div><div class="drow"><span class="dl">Defence dice · ${esc(shortName(d))}</span><div class="dice">${R.def.map(f=>die(f,'def')).join('')||'<i class="muted small">none</i>'}</div></div>`:''}`;
+    if(g)h+=`<p class="small">${R.dmg?'Damage goes to the <b>shields</b> first, then the <b>hull</b>. A ship with 0 hull is destroyed.':'Each ✦ evade result cancels one hit, so nothing got through.'}${R.crits.length?' A crit also deals a <b>damage card</b> face up, with a lasting effect.':''}</p>`}
+  else{const n=H.n;const s=ship(n.id);h+=`<p class="head">${n.kind==='noshot'?'Combat':'Activation'} · ${s?esc(shortName(s)):''}</p><div class="note ${n.lost||n.kind==='noshot'?'lost':''}">${n.t}${n.tip?` <i>${n.tip}</i>`:''}</div>`}
+  return h+`<div class="acts main"><button class="btn primary" data-a="hold">Continue ▶<small>${nextText()}</small></button></div>`}
+function nextText(){if(!G||!G.order)return '';const st=G.step;const N=UI.notes[G.round]||[];const nx=G.order.slice(Math.max(0,G.oi)).map(ship).find(s=>s&&s.alive&&s.id!==(UI.hold&&UI.hold.n&&UI.hold.n.id)&&!(st===3&&N.some(x=>x.id===s.id&&x.kind==='noshot')));
+  if(st===2)return nx?`Next: ${nm(nx)} moves`:'Next: combat';if(st===3)return nx?`Next: ${nm(nx)} may shoot`:'Next: end of the round';return ''}
+function stepList(ls,cur){return `<ol class="sub" aria-label="Steps">${ls.map((l,i)=>`<li class="${i<cur?'done':i===cur?'on':''}">${i<cur?'✓ ':''}${l}</li>`).join('')}</ol>`}
+// the latest notices of this round (non-blocking), and the last attack result
+function renderNotice(){const el=$('notice');if(!el)return;if(!G||G.winner||UI.info||sumPending()||(UI.hold&&!humanTurn()&&planSide()<0)){el.innerHTML='';return}let h='';
+  const N=(UI.notes[G.round]||[]).filter(n=>!['green'].includes(n.kind)&&Date.now()-n.t0<90000&&!(UI.hold&&UI.hold.n===n));
+  const pick=N.filter(n=>mine(ship(n.id))).concat(N.filter(n=>!mine(ship(n.id))&&['bump','rock','off','noshot'].includes(n.kind))).slice(-2);
+  h+=pick.map(n=>`<div class="note small ${n.lost||n.kind==='noshot'?'lost':''}">${n.t}</div>`).join('');
+  if(G.phase!=='plan'){const R=UI.results.find(r=>r.r===G.round&&Date.now()-r.t<45000);if(R&&!(UI.hold&&UI.hold.R===R))h+=resultHTML(R)}
+  el.innerHTML=h}
+// ---- step boxes for each decision ----
+const MVW={T:'Turn',B:'Bank',S:'Straight',K:'K-turn'};
+function mvWords(m){return m.s===0?'Full stop':m.t==='S'?`Straight ${m.s}`:m.t==='K'?`K-turn ${m.s} (turn around)`:`${MVW[m.t]} ${m.d<0?'left':'right'} ${m.s}`}
+const colWords=c=>c==='g'?'green = easy, clears a stress token':c==='r'?'red = hard, gives a stress token (no action while stressed)':'white = normal';
+function rockHits(s,m){const key=[G.round,s.id,s.x,s.y,s.h,m.s,m.t,m.d||0].join('|');const C=UI.rhC=(UI.rhC&&UI.rhC.g===G)?UI.rhC:{g:G,v:{}};if(key in C.v)return C.v[key];return C.v[key]=rockHits0(s,m)}
+function rockHits0(s,m){const b=B(s),p=finalPose(s,b,m);if(G.rocks.some(o=>polyOverlap(corners(p,b),rockPoly(o))))return 2;return tplPoints(s,b,m,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2))?1:0}
+function recBox(s,sug){if(!UI.hints)return '';const m=dialOf(s)[sug],c=exColor(s,m).c;const si=sugInfo(s,sug);
+  const bad=dialOf(s).filter((x,i)=>i!==sug&&rockHits(s,x)).length;const rock=bad&&!rockHits(s,m)?` It also avoids the asteroids that ${bad} other move${bad>1?'s':''} would hit.`:'';
+  let alt='';if(c==='r'){const a=saferAlt(s);if(a!=null&&a!==sug)alt=` Safer: <b>${mvWords(dialOf(s)[a])}</b>.`}
+  return `<div class="recbox"><span class="rk">★ Recommended</span> <b>${mvWords(m)}</b> <span class="cw ${c}">${c==='g'?'green':c==='r'?'red':'white'}</span>: ${si.why}.${rock} <span class="${c==='r'?'warn':'muted'}">${si.cost}</span>${alt}
+    ${UI.draft[s.id]===sug?'':`<button class="btn sm" data-dial="${sug}" data-ship="${s.id}">Use it</button>`}</div>`}
+function planHTML(ps){const my=alive().filter(s=>s.side===ps);if(!UI.sel||!my.find(s=>s.id===UI.sel))UI.sel=(my.find(s=>UI.draft[s.id]==null)||my[0]).id;const s=ship(UI.sel);
+  const idx=my.indexOf(s),nset=my.filter(x=>UI.draft[x.id]!=null).length,all=nset===my.length,g=guided();const sug=suggestDial(s);
+  const di=UI.hoverDial!=null?UI.hoverDial:UI.draft[s.id];const ord=psOrder(true);
+  const title=all?`Planning · all ${my.length>1?my.length+' dials':'dials'} set: lock them in`:`Planning · ship ${idx+1} of ${my.length}: choose a maneuver`;
+  let h=`<p class="head">${title}</p>${stepList(my.map((x,i)=>`${esc(shortName(x))}${my.length>1?'':': pick a move'}`).concat(['Lock in']),all?my.length:idx)}`;
+  if(g)h+=`<p class="now-t">${all?`Press <b>Lock in dials</b>. Then <b>Activation</b> starts: ships reveal their dials and move one by one, lowest pilot skill first (${ord.map(x=>esc(shortName(x))+' '+psOf(x)).join(' → ')}).`
+    :`Tap a maneuver on <b>${nm(s)}</b>'s dial below. A ghost appears on the board where the ship would end.`}</p>`;
+  else h+=`<p class="now-t">${all?'Press <b>Lock in dials</b>.':`Choose ${nm(s)}'s maneuver.`}</p>`;
+  if(my.length>1)h+=`<div class="shipTabs">${my.map((x,i)=>`<button class="btn tab ${x.id===UI.sel?'on':''}" data-sel="${x.id}">Ship ${i+1}: ${esc(shortName(x))} ${UI.draft[x.id]!=null?'✓':''}</button>`).join('')}</div>`;
+  if(s.stress)h+=`<p class="warn small"><b>${nm(s)} is stressed:</b> red moves are blocked, and it gets no action this round unless a green move clears the stress first.</p>`;
+  h+=`<div class="dlegend" aria-label="Dial colours"><span class="sw g"></span>green = easy (clears stress) <span class="sw w"></span>white = normal <span class="sw r"></span>red = hard (gives stress)</div>`;
+  h+=`<div class="dialwrap">${dialGrid(s,sug)}<div class="dialinfo"><span class="dname"><b>${nm(s)}</b> · pilot skill ${psOf(s)}${s.rev&&G.round>1?` · last round: ${mvWords(s.rev)}`:''}</span>
+    <p class="small mvread">${di!=null?moveRead(s,di):g?'Tap (or hover) a maneuver to see where it goes. The number is the speed, the arrow the direction.':'Choose a maneuver.'}</p></div></div>`;
+  h+=recBox(s,sug);if(g&&!all)h+=`<p class="small muted">The enemy is choosing too, in secret, so it may not stay where it is. Nobody moves until every dial is locked.</p>`;
+  h+=`<div class="acts main"><button class="btn primary" data-a="lock" ${all?'':'disabled'}>Lock in dials${all?'':`<small>${my.length-nset} ship${my.length-nset>1?'s':''} still need${my.length-nset>1?'':'s'} a maneuver</small>`}</button><button class="btn" data-a="autodial">Use recommended${my.length>1?' for all':''}</button></div>`;
+  return h}
+function moveRead(s,i){const m=dialOf(s)[i],c=exColor(s,m).c;return `<b>${mvWords(m)}</b> · <span class="cw ${c}">${colWords(c)}</span><br>${poseReport(s,m)}`}
+function inArcOf(s,p){const b=B(s);p=p||s;return enemiesOf(s).map(e=>{const r=arcReach(p,b,e,B(e),s.arc);return r&&rangeOf(r.d)<=3?{e,rg:rangeOf(r.d)}:null}).filter(Boolean).sort((a,b)=>a.rg-b.rg)}
+function arcsOnMe(s,p){const b=B(s);p=p||s;return enemiesOf(s).map(e=>{const q=arcReach(e,B(e),p,b,e.arc);return q&&rangeOf(q.d)<=3?{e,rg:rangeOf(q.d)}:null}).filter(Boolean).sort((a,b)=>a.rg-b.rg)}
+function actNow(s,o,a){const mi=inArcOf(s),th=arcsOnMe(s);
+  if(o.a==='F')return mi.length?`Now: ${nm(mi[0].e)} is in your arc at range ${mi[0].rg}. When you shoot, every ◉ focus result becomes a hit (or an evade if you are shot).`:`Now: nobody is in your arc to shoot, but focus still turns ◉ results into evades if you are shot.`;
+  if(o.a==='E')return th.length?`Now: you are in ${nm(th[0].e)}'s arc (range ${th[0].rg}). The evade token cancels one of its hits.`:'Now: no enemy has you in its arc, so it may go unused (it is removed at the end of the round).';
+  if(o.a==='TL'){const t=ship(o.arg);if(!t)return '';const rg=rangeOf(baseDist(s,B(s),t,B(t)));const ina=mi.some(x=>x.e===t);return `Lock ${nm(t)} (range ${rg}): when you attack it you may reroll any attack dice. The lock stays until you use it.${ina?'':' It is not in your arc right now.'}`}
+  if(o.p&&/^(BR|BO|EH|DD)$/.test(o.a)){const mi2=inArcOf(s,o.p),th2=arcsOnMe(s,o.p);return `${o.a==='BO'?'Surge forward':o.a==='DD'?'Turn hard':'Slide sideways'} (hover to see the ghost). Ends ${mi2.length?`with ${nm(mi2[0].e)} in your arc at range ${mi2[0].rg}`:'with nobody in your arc'}${th2.length?`, in ${nm(th2[0].e)}'s arc`:', outside every enemy arc'}.`}
+  return a&&a.d?a.d:''}
+function recAct(s){const acts=actionsFor(s);if(acts.some(a=>/^RP\d/.test(a.a)))return acts.find(a=>/^RP\d/.test(a.a)).a;const mi=inArcOf(s),th=arcsOnMe(s);const has=x=>acts.some(a=>a.a===x);
+  if(!mi.length&&th.length&&has('E'))return 'E';if(has('F'))return 'F';if(has('E'))return 'E';return null}
+function actionHTML(s){const acts=actionsFor(s);const g=guided();const rec=recAct(s);const ord=G.order||[];const i=ord.indexOf(s.id);
+  let h=`<p class="head">Activation · ${esc(shortName(s))}: choose one action</p>${stepList([`Reveal and move: ${s.rev?mvWords(s.rev):'moved'}`,'Choose one action'],1)}`;
+  if(g)h+=`<p class="now-t"><b>${nm(s)}</b> moved ${i===ord.length-1?'last':'now'}: ships move from lowest to highest pilot skill, and its skill is ${psOf(s)}. After moving it may take <b>one action</b>. Each button says what it does right now; ★ is recommended.</p>`;
+  else h+=`<p class="now-t">You flew <b>${s.rev?mvWords(s.rev):''}</b>. Take one action.</p>`;
+  h+='<div class="acts col">'+actOpts(s,acts).sort((x,y)=>(/^RP\d/.test(y.a)?1:0)-(/^RP\d/.test(x.a)?1:0)).map(o=>{const a=acts.find(x=>x.a===o.a);const r=o.a===rec&&(o.a!=='TL')?' rec':'';
+    if(/^RP\d/.test(o.a)){const x=s.dmg[+o.a.slice(2)],D=DAMAGE[x.c];return `<button class="btn rep${r}" data-act="action" data-a2="${o.a}" title="${esc(D.t)}">${r?'★ ':''}🔧 Repair ${esc(D.n)}<small>${D.fix==='any'?'Always works':`Roll 1 attack die: ${D.fix==='hit'?'a hit':'a hit or crit'} fixes it`}. Right now: ${esc(critPlain(x.c,s))}</small></button>`}
+    const lab=o.a==='F'?'◉ Focus':o.a==='E'?'✦ Evade':o.a==='TL'?'⌖ '+esc(o.l):esc(o.l);
+    return `<button class="btn${r}" data-act="action" data-a2="${o.a}" ${o.arg!=null?`data-arg="${esc(o.arg)}"`:''} ${o.p?`data-hov="${o.a}:${o.arg}"`:''} title="${esc(a&&a.d||'')}">${r?'★ ':''}${lab}<small>${actNow(s,o,a)}</small></button>`}).join('')+
+    `<button class="btn ghost" data-act="action" data-a2="skip">Skip action<small>Take nothing this time.</small></button></div>`;
+  return h}
+function targetHTML(s){const g=guided();const ws=weaponsFor(s);const opts=[];for(const w of ws)for(const t of w.targets){const d=ship(t.id);const sd=shotDice(s,w,t,d);opts.push({w,t,d,n:sd.atk,m:sd.def,e:expDmg(sd.atk,sd.def,s.focus>0||s.tl===d.id,d.focus>0)})}
+  const best=opts.slice().sort((a,b)=>b.e-a.e)[0];const ord=G.order||[];
+  let h=`<p class="head">Combat · ${esc(shortName(s))}: choose a target</p>${stepList(['Choose a target','Roll and modify dice','Result'],0)}`;
+  if(g)h+=`<p class="now-t"><b>${nm(s)}</b> shoots ${ord.indexOf(s.id)===0?'first':'now'}: ships shoot from highest to lowest pilot skill (its skill is ${psOf(s)}). You may shoot <b>one</b> enemy inside your arc (the yellow wedge) at range 1-3; the valid targets are marked on the board. Range 1: +1 attack die. Range 3 or a rock in the way: +1 defence die.</p>`;
+  else h+=`<p class="now-t">Pick a target${G.bonus?' (bonus attack, primary weapon only)':''}.</p>`;
+  h+='<div class="acts col">'+opts.map(o=>`<button class="btn${o===best?' rec':''}" data-act="fire" data-w="${o.w.k}" data-t="${o.t.id}">${o===best?'★ ':''}🎯 Shoot ${nm(o.d)}${o.w.k!=='P'?' with '+esc(o.w.n):''}<small>range ${o.t.rg}${o.t.obstructed?' · a rock is in the way: +1 defence die':''} · you roll ${o.n} attack ${o.n===1?'die':'dice'}, it rolls ${o.m} defence · expected ≈${o.e.toFixed(1)} damage</small></button>`).join('');
+  const cant=enemiesOf(s).filter(e=>!opts.some(o=>o.d===e));
+  h+=`<button class="btn ghost" data-act="fire" data-w="skip">Hold fire<small>Skip this attack.</small></button></div>`;
+  if(cant.length)h+=`<p class="small muted">Can't shoot: ${cant.map(e=>`${nm(e)} is ${whyNot(s,e)}`).join('; ')}.</p>`;
+  return h}
+const DLEG='<p class="dleg">✹ hit = 1 damage · ✸ crit = 1 damage + a damage card · ◉ focus = a hit (or evade) only if you spend a focus token · ✦ evade = cancels 1 hit · blank = nothing</p>';
+function diceRows(A){const a=ship(A.a),d=ship(A.d);return `<div class="drow"><span class="dl">Attack dice · ${esc(shortName(a))} rolled ${A.dice.length}</span><div class="dice">${A.dice.map(f=>die(f,'atk')).join('')||'<i class="muted small">none</i>'}</div></div>`+
+  (A.step==='dmod'?`<div class="drow"><span class="dl">Defence dice · ${esc(shortName(d))} rolled ${A.def.length}</span><div class="dice">${A.def.map(f=>die(f,'def')).join('')||'<i class="muted small">none</i>'}</div></div>`:'')}
+function diceHead(A){const a=ship(A.a),d=ship(A.d);const def=G.phase==='dmod'||G.phase==='damod';const iDef=humanTurn()&&def&&mine(d)&&!mine(a);
+  const title=iDef?`Combat · you are shot: ${esc(shortName(a))} → ${esc(shortName(d))}`:`Combat · ${esc(shortName(a))} attacks ${esc(shortName(d))}`;
+  const g=guided();let t='';
+  if(humanTurn()&&g){if(G.phase==='amod')t='Your attack dice are rolled. Spend a token to improve them, then press <b>Done</b>: the defender rolls next.';
+    else if(G.phase==='dmod')t='The defence dice are rolled. Each ✦ evade cancels one hit. Spend a token to add evades, then press <b>Done</b> to take the damage that is left.';
+    else if(G.phase==='damod')t='Before the attack is final, you may tamper with the attacker\'s dice.'}
+  return `<p class="head">${title}</p>${stepList(['Choose a target',G.phase==='amod'?'Attack dice: modify':'Defence dice: modify','Result'],1)}${t?`<p class="now-t">${t}</p>`:''}`}
+// the "nothing to do right now" box: who is acting and when it is your turn
+function watchHTML(){const s=G.cur&&ship(G.cur);const st=G.step;let t='',sub='';
+  if(G.phase==='plan')return `<p class="head">Planning · waiting for the other pilots</p><p class="now-t">They are setting their dials in secret.</p>`;
+  if(s&&st===2){t=`Activation · ${esc(shortName(s))} (skill ${psOf(s)}) ${G.phase==='action'?'takes an action':'reveals and moves'}`;sub=s.rev&&s.moved?`It revealed <b>${mvWords(s.rev)}</b>.`:'It reveals its dial and moves.'}
+  else if(s&&st===3){const A=G.atk;t=A?`Combat · ${esc(shortName(ship(A.a)))} attacks ${esc(shortName(ship(A.d)))}`:`Combat · ${esc(shortName(s))} (skill ${psOf(s)}) is choosing a target`}
+  else t=G.phase==='combat'?'Combat…':G.phase==='activate'?'Activation…':G.phase==='end'?'End of the round…':'…';
+  const ord=G.order||[];const next=ord.slice(G.oi+1).map(ship).find(x=>x&&x.alive&&mine(x));
+  if(next&&(st===2||st===3))sub+=` ${sub?'':''}Your ${nm(next)} ${st===2?'moves':'shoots'} after ${ord.slice(G.oi,ord.indexOf(next.id)).length} more ship${ord.slice(G.oi,ord.indexOf(next.id)).length>1?'s':''}.`;
+  if(G.atk&&st===3&&G.phase==='amod'){const A=G.atk;sub+=' '+diceRows(A)}
+  if(guided())sub+=' <span class="muted">Nothing to do: watch the board until it is your turn.</span>';
+  return `<p class="head">${t}</p><p class="now-t">${sub}</p>`}
+// ---- the end-of-round summary (it shows at the start of the next round, before any dial is set) ----
+function summaryHTML(){const R=G.round-1,me=soloSide()>=0?soloSide():planSide();const g=guided();
+  const res=UI.results.filter(r=>r.r===R).reverse();const side=id=>{const s=ship(id);return s?s.side:-1};
+  const dealt=res.filter(r=>side(r.a)===me).reduce((a,r)=>a+r.dmg,0),taken=res.filter(r=>side(r.d)===me).reduce((a,r)=>a+r.dmg,0);
+  const my=G.ships.filter(s=>s.side===me);const stress=my.filter(s=>s.alive).reduce((a,s)=>a+s.stress,0);
+  let h=`<p class="head">Round ${R} summary</p>`;
+  if(g)h+=`<p class="now-t">That was one full round: <b>Planning</b> (secret dials) → <b>Activation</b> (move and act, lowest skill first) → <b>Combat</b> (shoot, highest skill first) → <b>End</b>. Every round works the same way.</p>`;
+  h+=`<div class="sumgrid"><div><b>${dealt}</b><span>damage dealt</span></div><div class="${taken?'hurt':''}"><b>${taken}</b><span>damage taken</span></div><div class="${stress?'hurt':''}"><b>${stress}</b><span>stress on your ship${my.length>1?'s':''}</span></div></div>`;
+  const ev=[];for(const r of res)ev.push('🎯 '+resultHTML(r,true));
+  for(const n of (UI.notes[R]||[]))if(n.kind!=='red'||!(UI.notes[R]||[]).some(x=>x.id===n.id&&x.kind==='stressed'))ev.push((n.lost||n.kind==='noshot'?'⚠ ':'')+n.t);
+  if(!res.length)ev.push('No shots were fired this round.');
+  h+=`<h4>What happened</h4><ul class="sumlist">${ev.slice(0,8).map(x=>`<li>${x}</li>`).join('')}</ul>`;
+  h+=`<h4>Your ship${my.length>1?'s':''} now</h4><ul class="sumlist">${my.map(s=>s.alive?`<li><b>${nm(s)}</b>: hull ${s.hull-hullDmg(s)}/${s.hull} · shields ${s.sh}/${s.shMax}${s.stress?` · <span class="warn">stress ${s.stress}</span>`:''}${s.dmg.filter(x=>x.up).map(x=>` · <span class="crit">${esc(DAMAGE[x.c].n)}: ${esc(critPlain(x.c,s))}</span>`).join('')}</li>`:`<li class="muted"><b>${nm(s)}</b>: destroyed</li>`).join('')}</ul>`;
+  const tips=watchTips(me,R);if(tips.length)h+=`<h4>Watch next round</h4><ul class="sumlist tips">${tips.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+  if(g)h+=`<p class="small muted">End phase: unused focus and evade tokens were removed. Target locks and stress stay.</p>`;
+  return h+`<div class="acts main"><button class="btn primary" data-a="nextround">Continue to Round ${G.round} ▶<small>Planning: set your dial${my.filter(s=>s.alive).length>1?'s':''}</small></button></div>`}
+function watchTips(me,R){const out=[];for(const s of alive().filter(x=>x.side===me)){const b=B(s);const en=enemiesOf(s);if(!en.length)continue;
+    if(s.stress){out.push(`${nm(s)} is stressed: pick a <b>green</b> move to clear it. Red moves are blocked and it gets no action while stressed.`)}
+    const mi=inArcOf(s),th=arcsOnMe(s);const near=en.map(e=>({e,rg:rangeOf(baseDist(s,b,e,B(e)))})).sort((a,c)=>a.rg-c.rg)[0];
+    if(th.length&&!mi.length)out.push(`${nm(th[0].e)} has ${nm(s)} in its arc at range ${th[0].rg}: turn, or move out of that wedge.`);
+    else if(mi.length)out.push(`${nm(mi[0].e)} is in ${nm(s)}'s arc at range ${mi[0].rg}: a short move can keep it there${th.length?' (but it can shoot back)':''}.`);
+    else if(near.rg>=4)out.push(`The enemy is far away (range 4 or more): close in with a fast straight, or bank and let them come to you.`);
+    const edge=Math.min(s.x,s.y,MAT-s.x,MAT-s.y);if(edge<RANGE*1.1)out.push(`${nm(s)} is close to the edge: a fast move could fly off the mat, which destroys the ship.`);
+    if(s.dmg.some(x=>x.up&&DAMAGE[x.c].fix))out.push(`${nm(s)} can try to repair its damage card as its action.`)}
+  if((UI.notes[R]||[]).some(n=>n.kind==='bump'&&mine(ship(n.id))))out.push('You bumped last round: pick a move whose ghost does not overlap another ship.');
+  return out.slice(0,3)}
+// ---- one render step for the new parts ----
+function renderFlow(){flowSync();renderRoad();renderQueue();renderNotice();guideBtn();
+  if(typeof GX!=='undefined'&&GX.app){GX.app.classList.toggle('na-sum',sumPending());GX.app.classList.toggle('na-dec',!!(G&&!G.winner&&!UI.info&&G.phase!=='plan'&&(humanTurn()||UI.hold)))}}
+document.addEventListener('keydown',e=>{if(e.key!=='Enter'||!G||!UI.hold||humanTurn()||(e.target&&/INPUT|SELECT|TEXTAREA|BUTTON/.test(e.target.tagName)))return;const b=document.querySelector('#prompt [data-a="hold"]');if(b){b.click();e.preventDefault()}});
+// the recommended dice modification (the same reasoning as the advisor)
+function recMod(){const A=G.atk;if(!A)return null;
+  if(G.phase==='amod'){const ms=atkMods();const f=ms.find(m=>m.k==='focus'),tl=ms.find(m=>m.k==='tl');const fc=cnt(A.dice,'focus');if(tl&&cnt(A.dice,'blank')+(!f?fc:0)>0)return 'tl';if(f&&fc)return 'focus';return ms.length?null:'done'}
+  if(G.phase==='dmod'){const r=preview(A);if(r.hits+r.crits===0)return 'done';const ms=defMods();for(const k of ['luke','focus','evade'])if(ms.some(m=>m.k===k))return k;return ms.length?null:'done'}return null}
 
 </script>
 <script>
@@ -1765,16 +2027,17 @@ function humanTurn(){const k=sideToAct();return k>=0&&isHuman(k)&&(typeof NET===
 function refresh(){render();schedule()}
 function render(){if(typeof isHost==='function'&&isHost())netPush();
   if(G&&G.winner&&UI.wonSnd!==G.seed){UI.wonSnd=G.seed;sfx('win');if(G.sortie!=null&&soloSide()===0&&G.winner==='P1'){const c=campaign();c.i=Math.max(c.i,Math.min(SORTIES.length,G.sortie+1));c.won++;saveCampaign(c)}if(ANIM)setTimeout(()=>{UI.stats=true;render()},2200)}
-  attackWatch();trackStats();if(V3.on)sync3D();else render2D();renderSteps();renderPrompt();renderShipCard();renderRoster();renderLog();renderModal();renderDock();renderCoach()}
+  attackWatch();flowWatch();trackStats();if(V3.on)sync3D();else render2D();renderFlow();renderPrompt();renderShipCard();renderRoster();renderLog();renderModal();renderDock();renderCoach()}
 // ---- step bar ----
-const STEPS=[['Plan','set dials'],['Move','low → high'],['Combat','high → low'],['End','clear tokens']];
-function renderSteps(){const el=$('steps');if(!el)return;const cur=G?G.step:0;el.innerHTML=STEPS.map((s,i)=>`<span class="st ${i+1<cur?'done':''} ${i+1===cur?'on':''}"><b>${i+1}</b>${s[0]}<i>${s[1]}</i></span>`).join('')}
+function renderSteps(){renderRoad()}
 // ---- dial picker ----
 const COLS=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,'⤺']];
-function dialGrid(s,sug){const d=dialOf(s);const pick=UI.draft[s.id];let h='<table class="dial" role="grid" aria-label="Maneuver dial"><tbody>';
+const COLW=['Turn left','Bank left','Straight','Bank right','Turn right','K-turn'];
+function dialGrid(s,sug){const d=dialOf(s);const pick=UI.draft[s.id];const has=COLS.map(([t,dd])=>d.some(m=>m.t===t&&(m.d||0)===dd&&m.s>0));
+  let h=`<table class="dial" role="grid" aria-label="Maneuver dial: rows are speeds, columns are directions"><thead><tr><th class="sp">speed</th>${COLS.map((c,i)=>`<th class="cw">${has[i]?COLW[i]:''}</th>`).join('')}</tr></thead><tbody>`;
   for(let sp=5;sp>=1;sp--){let row='';let any=false;for(const [t,dd,ic] of COLS){const i=d.findIndex(m=>m.s===sp&&m.t===t&&(m.d||0)===dd);
       if(i<0){row+='<td></td>';continue}any=true;const m=exColor(s,d[i]);const bad=m.c==='r'&&s.stress;
-      row+=`<td><button class="mv ${m.c} ${pick===i?'on':''} ${sug===i&&UI.hints?'sugg':''}" data-dial="${i}" data-ship="${s.id}" ${bad?'title="Stressed ships cannot fly red maneuvers"':''} aria-label="${mText(m)}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}">${ic}<small>${sp}</small></button></td>`}
+      row+=`<td><button class="mv ${m.c} ${pick===i?'on':''} ${sug===i&&UI.hints?'sugg':''}" data-dial="${i}" data-ship="${s.id}" title="${bad?'Stressed ships cannot fly red maneuvers':mvWords(m)+' · '+colWords(m.c)}" aria-label="${mvWords(m)}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i&&UI.hints?', recommended':''}">${ic}<small>${sp}</small>${sug===i&&UI.hints?'<em class="rs">★</em>':''}</button></td>`}
     if(any)h+=`<tr><th>${sp}</th>${row}</tr>`}
   return h+'</tbody></table>'}
 function suggestDial(s){if(UI.sugCache&&UI.sugCache.k===G.round+s.id)return UI.sugCache.v;const lv={samples:6,noise:0,look:0};
@@ -1789,34 +2052,21 @@ function poseReport(s,m){const p=finalPose(s,B(s),m);const b=B(s);const bits=[];
 // ---- prompt: always one sentence of what to do, then the buttons ----
 function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='';return}
   if(G.winner){el.innerHTML=`<h2>${esc(G.winText)}</h2><div class="acts"><button class="btn primary" data-a="stats">Debrief</button>${nextSortieBtn()}<button class="btn" data-a="new">New battle</button></div>`;return}
-  const k=sideToAct(),me=humanTurn();let h='';
-  if(G.phase==='plan'){const ps=planSide();
-    if(ps<0){h=`<p class="head">Waiting for the other pilots to set their dials…</p>`}
-    else{const mine=alive().filter(s=>s.side===ps);if(!UI.sel||!mine.find(s=>s.id===UI.sel))UI.sel=mine.find(s=>UI.draft[s.id]==null)?.id||mine[0].id;const s=ship(UI.sel);
-      const sug=suggestDial(s),di=UI.hoverDial!=null?UI.hoverDial:UI.draft[s.id];
-      h=`<p class="head">${bothHuman()?esc(sideName(ps)):'Your ships'} · Step 1 · Plan</p><details class="how2" ${G.round===1&&!NARROW.matches&&!(coachKey()==='dial'&&!UI.coachDone.dial)?'open':''}><summary>How to plan</summary><ol class="how"><li>Pick a ship below (or tap it on the mat), then choose its maneuver on the dial.</li><li>Hover or tap a maneuver to see its template and where the ship ends.</li><li>When every ship has a dial, press <b>Lock in dials</b>. The enemy can't see them.</li></ol></details>
-      ${mine.length>1?`<div class="shipTabs">${mine.map(x=>`<button class="btn tab ${x.id===UI.sel?'on':''}" data-sel="${x.id}">${esc(x.name)} ${UI.draft[x.id]!=null?'✓':''}</button>`).join('')}</div>`:''}
-      <div class="dlegend" aria-label="Dial colours"><span class="sw g"></span>green = easy (clears stress) <span class="sw w"></span>white = normal <span class="sw r"></span>red = hard (stress)</div><div class="dialwrap">${dialGrid(s,sug)}<div class="dialinfo"><span class="dname"><b>${esc(s.name)}</b> · pilot skill ${psOf(s)}</span>${s.stress?` · <span class="warn">stressed: no red maneuvers</span>`:''}
-      <p class="small">${di!=null?`<b>${mText(dialOf(s)[di])}</b>: ${poseReport(s,dialOf(s)[di])}`:'Choose a maneuver.'}</p>${UI.hints?sugTip(s,sug):''}</div></div>
-      <div class="acts main"><button class="btn primary" data-a="lock" ${mine.every(x=>UI.draft[x.id]!=null)?'':'disabled'}>Lock in dials</button><button class="btn" data-a="autodial">Use suggestions</button></div>`}}
-  else if(G.phase==='action'){const s=ship(G.cur);if(!me)h=`<p class="head">${esc(s.name)} is choosing an action…</p>`;else{const acts=actionsFor(s);
-      h=`<p class="head">${esc(s.name)} · Step 2 · Take one action</p><p>You flew <b>${mText(s.rev)}</b>. Pick one action (hover to preview it), or skip.</p><div class="acts col">`+
-      actOpts(s,acts).sort((x,y)=>(/^RP\d/.test(y.a)?1:0)-(/^RP\d/.test(x.a)?1:0)).map((o,i)=>{const a=acts.find(x=>x.a===o.a);if(/^RP\d/.test(o.a)){const x=s.dmg[+o.a.slice(2)],D=DAMAGE[x.c];return `<button class="btn rep" data-act="action" data-a2="${o.a}" title="${esc(D.t)}">🔧 Repair ${esc(D.n)}<small>${D.fix==='any'?'Always works':`Roll 1 attack die: ${D.fix==='hit'?'a hit':'a hit or crit'} fixes it`}. Right now: ${esc(critPlain(x.c,s))}</small></button>`}
-        return o.arg!=null?`<button class="btn" data-act="action" data-a2="${o.a}" data-arg="${esc(o.arg)}" ${o.p?`data-hov="${o.a}:${o.arg}"`:''} title="${esc(a.d||'')}">${o.a==='TL'?'⌖ ':''}${esc(o.l)}${o.a==='TL'?'<small>Target lock: later you may reroll any attack dice against this ship.</small>':''}</button>`:`<button class="btn" data-act="action" data-a2="${o.a}" title="${esc(a.d||'')}">${o.a==='F'?'◉':'✦'} ${esc(o.l)}<small>${esc(a.d||'')}</small></button>`}).join('')+
-      `<button class="btn ghost" data-act="action" data-a2="skip">Skip action</button></div>`}}
-  else if(G.phase==='target'){const s=ship(G.cur);if(!me)h=`<p class="head">${esc(s.name)} is lining up a shot…</p>`;else{const ws=weaponsFor(s);
-      h=`<p class="head">${esc(s.name)} · Step 3 · Attack</p><p>${G.bonus?'Bonus attack (primary weapon only). ':''}Choose a target inside your arc, the yellow wedge (tap it in the view or below). Range 1 adds an attack die; range 3 or an asteroid in the way gives the defender an extra die.</p><div class="acts col">`+
-      ws.map(w=>w.targets.map(t=>{const d=ship(t.id);const sd=shotDice(s,w,t,d),n=sd.atk,m=sd.def;return `<button class="btn" data-act="fire" data-w="${w.k}" data-t="${t.id}">🎯 ${esc(w.n)} → ${esc(d.name)}<small>range ${t.rg}${t.obstructed?' · obstructed by a rock: +1 defense die':''} · ${n} attack vs ${m} defense · ≈${expDmg(n,m,s.focus>0||s.tl===d.id,d.focus>0).toFixed(1)} damage</small></button>`}).join('')).join('')+
-      `<button class="btn ghost" data-act="fire" data-w="skip">Hold fire</button></div>`}}
-  else if(G.phase==='ask'&&G.q){const q=G.q;if(!humanTurn())h=`<p class="head">Waiting for ${esc(sideName(q.side))}…</p>`;else{const A=G.atk;h=`<p class="head">${esc(q.title)}</p>${q.key==='rock'||q.key==='deploy'?setupText(q):`<p>${esc(q.text)}</p>`}${A&&['dice','pay','jan','heat','brakk','maarek','garven','munitions'].includes(q.key)?`<div class="dice">${A.dice.map(f=>die(f,'atk')).join('')}</div>${A.def&&A.def.length?`<div class="dice">${A.def.map(f=>die(f,'def')).join('')}</div>`:''}`:''}${askButtons(q)}`}}
-  else if(G.phase==='damod'){const A=G.atk,a=ship(A.a),d=ship(A.d);h=`<p class="head">${esc(a.name)} → ${esc(d.name)}</p><div class="dice">${A.dice.map(f=>die(f,'atk')).join('')}</div><p class="preview">The defender may tamper with the attack dice first.</p>`;
+  if(sumPending()){el.innerHTML=summaryHTML();return}
+  if(UI.hold){if(humanTurn()||planSide()>=0){const ks=UI.holdK.splice(0);UI.hold=null;if(ks.length)setTimeout(()=>{for(const k of ks)k()},0)}else{el.innerHTML=holdHTML();return}}
+  const me=humanTurn();let h='';
+  if(G.phase==='plan'){const ps=planSide();h=ps<0?watchHTML():planHTML(ps)}
+  else if(G.phase==='action'){h=me?actionHTML(ship(G.cur)):watchHTML()}
+  else if(G.phase==='target'){h=me?targetHTML(ship(G.cur)):watchHTML()}
+  else if(G.phase==='ask'&&G.q){const q=G.q;if(!humanTurn())h=`<p class="head">Waiting for ${esc(sideName(q.side))}…</p>`;else{const A=G.atk;h=`<p class="head">${esc(q.title)}</p>${q.key==='rock'||q.key==='deploy'?setupText(q):`<p>${esc(q.text)}</p>`}${A&&['dice','pay','jan','heat','brakk','maarek','garven','munitions'].includes(q.key)?diceRows(A):''}${askButtons(q)}`}}
+  else if(G.phase==='damod'){const A=G.atk,d=ship(A.d);h=diceHead(A)+diceRows(A)+`<p class="preview">The defender may tamper with the attack dice first.</p>`;
     if(humanTurn())h+=`<div class="acts col">${exDAMods().map(m=>`<button class="btn" data-act="damod" data-k="${m.k}">${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="damod" data-k="done">Let the attack stand</button></div>`;else h+=`<p class="small muted">${esc(d.name)} is reacting…</p>`}
-  else if(G.phase==='amod'||G.phase==='dmod'){const A=G.atk,a=ship(A.a),d=ship(A.d);const r=preview(A);const mine=(G.phase==='amod'&&humanTurn())||(G.phase==='dmod'&&humanTurn());
-    h=`<p class="head">${esc(a.name)} → ${esc(d.name)}</p><div class="dice">${A.dice.map(f=>die(f,'atk')).join('')}</div>${A.step==='dmod'?`<div class="dice">${A.def.map(f=>die(f,'def')).join('')}</div>`:''}
-      <p class="preview">Right now: <b>${r.hits} hit${r.hits===1?'':'s'}</b>${r.crits?`, <b>${r.crits} crit${r.crits>1?'s':''}</b>`:''}${A.step==='amod'?' before the defense roll':' get through'}.</p>`;
-    if(mine){const mods=G.phase==='amod'?atkMods():defMods();h+=`<div class="acts col">${mods.map(m=>`<button class="btn" data-act="${G.phase}" data-k="${m.k}">${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Done: defender rolls':'Done: resolve damage'}</button></div>`}
-    else h+=`<p class="small muted">${G.phase==='amod'?esc(a.name)+' is modifying its attack…':esc(d.name)+' is defending…'}</p>`}
-  else h=`<p class="head">${G.phase==='combat'?'Combat…':G.phase==='activate'?'Ships are moving…':G.phase==='setup'?'Setting up the battlefield…':'…'}</p>`;
+  else if(G.phase==='amod'||G.phase==='dmod'){const A=G.atk,a=ship(A.a),d=ship(A.d);const r=preview(A);const rk=me?recMod():null;
+    h=diceHead(A)+diceRows(A)+`<p class="preview">Right now: <b>${r.hits} hit${r.hits===1?'':'s'}</b>${r.crits?`, <b>${r.crits} crit${r.crits>1?'s':''}</b>`:''}${A.step==='amod'?' before the defence roll':(r.hits+r.crits===1?' gets through':' get through')}${A.step==='amod'?'':` (${r.hits+r.crits?`${esc(shortName(d))} loses ${r.hits+r.crits} shield${r.hits+r.crits===1?'':'s'} or hull`:'no damage'})`}.</p>`;
+    if(me){const mods=G.phase==='amod'?atkMods():defMods();h+=`<div class="acts col">${mods.map(m=>`<button class="btn${m.k===rk?' rec':''}" data-act="${G.phase}" data-k="${m.k}">${m.k===rk?'★ ':''}${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Done: the defender rolls':'Done: take the damage'}${rk==='done'?'<small>★ recommended: nothing left to improve</small>':''}</button></div>`}
+    else h+=`<p class="small muted">${G.phase==='amod'?esc(a.name)+' is modifying its attack…':esc(d.name)+' is defending…'}</p>`;
+    h+=DLEG}
+  else h=watchHTML();
   el.innerHTML=h}
 function sugTip(s,sug){const m=dialOf(s)[sug];const si=sugInfo(s,sug);let h=`<p class="tip">💡 <b>${mText(m)}</b> (dashed outline): ${si.why}. <span class="${exColor(s,m).c==='r'?'warn':''}">${si.cost}</span>`;
   if(exColor(s,m).c==='r'){const alt=saferAlt(s);if(alt!=null&&alt!==sug)h+=` Safer: <b>${mText(dialOf(s)[alt])}</b> (${exColor(s,dialOf(s)[alt]).c==='g'?'green':'white'}).`}return h+'</p>'}
@@ -1894,10 +2144,10 @@ function statsHTML(){return debriefHTML()}
 const NARROW=window.matchMedia?window.matchMedia('(max-width:999px)'):{matches:false};
 const PHONE=window.matchMedia?window.matchMedia('(max-width:700px)'):{matches:false};
 function renderDock(){const t=$('docktitle');if(!t)return;const pr=$('prompt');const head=pr&&pr.querySelector('.head,h2');
-  t.textContent=!G?'Nebula Aces':G.winner?'Battle over':`${G.round===0?'Setup':'Round '+G.round} · ${head?head.textContent:STEPS[(G.step||1)-1][0]}`;
+  t.textContent=!G?'Nebula Aces':G.winner?'Battle over':G.round===0?'Setup · '+(head?head.textContent:''):`Round ${roundShown()} · ${['','Planning','Activation','Combat','End'][stepShown()]||''}`;
   if(GX&&GX.app)GX.app.classList.toggle('na-plan',!!(PHONE.matches&&G&&!G.winner&&G.phase==='plan'&&planSide()>=0&&!UI.info));
-  const need=G&&!G.winner&&!UI.info&&(planSide()>=0||humanTurn());const sig=need?[G.round,G.phase,G.cur,G.q&&G.q.kid,G.atk&&G.atk.step].join('|'):'';
-  if(sig&&sig!==UI.needSig&&typeof GX!=='undefined'&&GX.app){GX.showDock();const b=document.querySelector('.gx-dock-body');if(b&&G.phase!=='plan')b.scrollTop=0}UI.needSig=sig}
+  const need=G&&!G.winner&&!UI.info&&(planSide()>=0||humanTurn()||!!UI.hold);const sig=need?[G.round,G.phase,G.cur,G.q&&G.q.kid,G.atk&&G.atk.step,!!UI.hold,sumPending()].join('|'):'';
+  if(sig&&sig!==UI.needSig&&typeof GX!=='undefined'&&GX.app){GX.showDock();const b=document.querySelector('.gx-dock-body');if(b)b.scrollTop=0}UI.needSig=sig}
 if(PHONE.addEventListener)PHONE.addEventListener('change',()=>{render();if(V3.on)resize3D()});
 // ---- 2D fallback (no WebGL): a top-down SVG of the field ----
 function render2D(){const svg=$('map');if(!svg||!G)return;const Y=y=>MAT-y;let h=`<rect width="${MAT}" height="${MAT}" fill="#0c0a22"/>`;
@@ -1943,6 +2193,9 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
   if(ds.a==='legend'){const l=document.querySelector('.legend');if(l)l.classList.toggle('open');return}
   if(ds.a==='autoplace'){autoPlaceAll();return}
   if(ds.a==='advise'){UI.advOpen=!UI.advOpen;const b=document.querySelector('.na-adv');if(b)b.setAttribute('aria-expanded',String(UI.advOpen));render();return}
+  if(ds.a==='nextround'){UI.sumSeen=G.round-1;if(guideMode()==='auto'&&!tourOff())LS.set('na_tour','1');UI.roadInfo=null;render();return}
+  if(ds.a==='hold'){releaseHold();return}
+  if(ds.a==='guide'){LS.set('na_guide',guided()?'light':'full');render();return}
   if(ds.a==='recapok'){UI.recapSeen=G.round-1;render();return}if(ds.a==='recapoff'){UI.recapSeen=G.round-1;LS.set('na_recap','off');render();return}
   if(ds.a==='tourskip'){LS.set('na_tour','1');UI.coachOn=null;render();return}
   if(ds.a==='sortie'){startGame('solo',+ds.k);return}
@@ -1950,7 +2203,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
   if(ds.act){uiAct(Object.assign({},ds));return}
   if(ds.ship){uiAct({ship:ds.ship})}});
 document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-dial],[data-hov]');const nd=t&&t.dataset.dial!=null?+t.dataset.dial:null;const nh=t&&t.dataset.hov?{a:t.dataset.hov.split(':')[0],i:+t.dataset.hov.split(':')[1]}:null;
-  if(nd!==UI.hoverDial||JSON.stringify(nh)!==JSON.stringify(UI.hoverAct)){UI.hoverDial=nd;UI.hoverAct=nh;if(V3.on)drawGuides();else render2D();const info=document.querySelector('.dialinfo .small');if(info&&G&&G.phase==='plan'&&nd!=null){const s=ship(UI.sel);info.innerHTML=`<b>${mText(dialOf(s)[nd])}</b>: ${poseReport(s,dialOf(s)[nd])}`}}});
+  if(nd!==UI.hoverDial||JSON.stringify(nh)!==JSON.stringify(UI.hoverAct)){UI.hoverDial=nd;UI.hoverAct=nh;if(V3.on)drawGuides();else render2D();const info=document.querySelector('.dialinfo .mvread');if(info&&G&&G.phase==='plan'&&UI.sel&&ship(UI.sel)){const s=ship(UI.sel);const di=nd!=null?nd:UI.draft[s.id];if(di!=null)info.innerHTML=moveRead(s,di)}}});
 document.addEventListener('change',e=>{if(e.target.dataset.fac!=null){UI.fac[+e.target.dataset.fac]=+e.target.value;saveSetup()}});
 document.addEventListener('keydown',e=>{if(e.target&&/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;if(e.key==='Escape'){UI.rules=false;UI.stats=false;render();return}
   if(e.key==='p'||e.key==='P'){$('pausebtn').click();return}if(e.key==='t'||e.key==='T'){document.querySelector('[data-a="top"]').click();return}
