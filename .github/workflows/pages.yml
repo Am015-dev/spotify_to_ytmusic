@@ -2,7 +2,7 @@ name: Deploy games to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main, alex/brave-carson-rbpmlk]
     paths: ["games/**", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
