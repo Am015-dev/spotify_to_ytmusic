@@ -648,8 +648,10 @@ const GX={key:'gx',open:null,
     try{if(H.beforeTest)H.beforeTest()}catch(e){}closeCard();
     const L=H.levels.slice(),orig=curLevel(),res=[];testing=true;idle(false);startLoop();testT0=now();testLen=L.length*2000;pillShow('Testing speed… keep still');note('test start');
     try{for(let i=0;i<L.length;i++){const l=L[i];pillShow('Testing speed · '+levelName(l)+' ('+(i+1)+'/'+L.length+')');set(l,'test');
-        await frames(2);const t0=now();await wait(300);collect=[];await wait(Math.max(900,2000-(now()-t0)));const st=stats(collect);collect=null;
-        res.push({level:l,fps:+st.fps.toFixed(1),avg:+st.avg.toFixed(1),p95:+st.p95.toFixed(1),work:st.work>=0?+st.work.toFixed(1):null})}}
+        await frames(2);const t0=now();await wait(300);collect=[];const c0=now();await wait(Math.max(900,2000-(now()-t0)));const st=stats(collect),span=now()-c0;collect=null;
+        // no frame finished inside the window (frames slower than ~1.7 s): count the whole window as one frame, so this level can never look fast
+        if(!st.n)res.push({level:l,fps:+(1000/span).toFixed(1),avg:Math.round(span),p95:Math.round(span),work:null});
+        else res.push({level:l,fps:+st.fps.toFixed(1),avg:+st.avg.toFixed(1),p95:+st.p95.toFixed(1),work:st.work>=0?+st.work.toFixed(1):null})}}
     finally{collect=null;try{if(H.orbit)H.orbit(null)}catch(e){}if(orig!=null)set(orig,'restore');testing=false;pillHide();hitch()}
     const out={game:H.game,results:res,recommended:recommend(res)};PerfHUD.lastTest=out;note('test done '+out.recommended);cardShow(out);return out}
   function gpuName(){try{let gl=H.renderer&&H.renderer.getContext&&H.renderer.getContext(),tmp=null;
