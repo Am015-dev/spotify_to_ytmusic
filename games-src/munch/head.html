@@ -43,7 +43,7 @@ button{font:inherit;color:inherit}
 .gx-bar h1 span{background:linear-gradient(#ffb0a0,#e0503c 45%,#8a1a12 55%,#ff8a6a);-webkit-background-clip:text;background-clip:text;color:transparent}
 .gx-ibtn{border:1px solid #0d0603;background:linear-gradient(#5a3620,#3a2011 60%,#2a160b);color:var(--cream);border-radius:10px;box-shadow:inset 0 0 0 1px rgba(226,180,87,.55),inset 0 1px 0 rgba(255,230,180,.3),0 2px 0 #0d0603,0 3px 0 rgba(0,0,0,0.32);flex:none;padding:3px 11px;font-weight:600;text-shadow:0 1px 0 #000;transition:transform .12s ease,box-shadow .12s ease,filter .12s}
 .gx-ibtn .ic{width:1.2em;height:1.2em;color:var(--brass)}
-.gx-ibtn:hover{transform:translateY(-1px);filter:brightness(1.18);box-shadow:inset 0 0 0 1px rgba(255,210,120,.8),inset 0 1px 0 rgba(255,230,180,.4),0 3px 0 #0d0603,0 6px 0 rgba(0,0,0,0.35)}
+.gx-ibtn:hover{filter:brightness(1.18);box-shadow:inset 0 0 0 1px rgba(255,210,120,.8),inset 0 1px 0 rgba(255,230,180,.4),0 3px 0 #0d0603,0 6px 0 rgba(0,0,0,0.35)}
 .gx-ibtn:active{transform:translateY(1px);box-shadow:inset 0 0 0 1px rgba(226,180,87,.5),0 0 0 #000}
 .gx-ibtn[aria-expanded="true"]{background:linear-gradient(#f7d983,#d59a32 55%,#9a6620);color:#2b1a10;text-shadow:0 1px 0 rgba(255,240,200,.6)}
 .gx-ibtn[aria-expanded="true"] .ic{color:#4a2a08}
@@ -63,7 +63,7 @@ button{font:inherit;color:inherit}
 /* buttons: parchment, gold-lacquer primary, crimson and emerald lacquer */
 .btn{--b1:#fbf2dc;--b2:#e8d3a4;--b3:#c9a86c;border:1px solid #3a2213;background:linear-gradient(var(--b1),var(--b2) 60%,var(--b3));color:var(--ink);border-radius:9px;padding:5px 13px;cursor:pointer;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -2px 0 rgba(90,50,10,.25),0 2px 0 #3a2213,0 4px 0 rgba(40,20,5,0.21);min-height:40px;font-weight:600;transition:transform .12s ease,box-shadow .12s ease,filter .12s;display:inline-flex;align-items:center;gap:6px}
 .btn .ic{width:1.15em;height:1.15em}
-.btn:hover{transform:translateY(-1px);filter:brightness(1.05) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 -2px 0 rgba(90,50,10,.25),0 3px 0 #3a2213,0 7px 0 rgba(40,20,5,0.24)}
+.btn:hover{filter:brightness(1.05) saturate(1.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 -2px 0 rgba(90,50,10,.25),0 3px 0 #3a2213,0 7px 0 rgba(40,20,5,0.24)}
 .btn:active{transform:translateY(2px);box-shadow:0 0 0 #3a2213}
 .btn.primary{--b1:#fff0b8;--b2:#f0bf4c;--b3:#b87818;color:#2b1405;font-weight:800;text-shadow:0 1px 0 rgba(255,245,210,.7);border-color:#4a2a06}
 .btn.danger{--b1:#f08070;--b2:#c0392b;--b3:#7a1a12;color:#fff4e8;text-shadow:0 1px 0 rgba(0,0,0,.5);border-color:#3a0a06}
@@ -86,7 +86,7 @@ h3{font-size:1.02rem}
 /* rivals: tooled leather plaques */
 .opp{flex:1 0 150px;max-width:270px;min-height:48px;padding:4px 10px 4px 12px;cursor:pointer;text-align:left;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;column-gap:8px;font:inherit;color:var(--cream);transition:transform .15s ease,box-shadow .15s ease}
 .opp.paper{background:radial-gradient(120% 120% at 20% 0%,rgba(255,200,140,.18),transparent 55%),var(--tex-leather),linear-gradient(#5a2d18,#34170a);border:1px solid #120704;border-radius:10px;box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),inset 0 0 0 4px rgba(226,180,87,.35),0 4px 0 rgba(0,0,0,0.35)}
-.opp:hover{transform:translateY(-2px);box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),inset 0 0 0 4px rgba(255,210,120,.7),0 8px 0 rgba(0,0,0,0.39)}
+.opp:hover{box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),inset 0 0 0 4px rgba(255,210,120,.7),0 8px 0 rgba(0,0,0,0.39)}
 .opp.active{outline:0;box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),inset 0 0 0 4px #ffd76a,0 0 0 2px #ffd76a,0 0 0 6px rgba(255,190,70,0.33)}
 .opp .lv{font:800 1.7rem/1 var(--title);color:#ffd76a;text-shadow:0 2px 0 #000;grid-row:1/3;grid-column:2;display:flex;align-items:baseline}
 .opp .nm{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;text-shadow:0 1px 0 #000}
@@ -168,7 +168,7 @@ h3{font-size:1.02rem}
 .gear>.small{white-space:nowrap}
 /* gear tokens: brass-edged plaques */
 .gchip{flex:none;min-height:40px;display:inline-flex;align-items:center;gap:5px;padding:2px 10px 2px 7px;border:1px solid #1a0d06;border-radius:9px;background:linear-gradient(#fbf2dc,#e3cc98);color:var(--ink);font:600 .84rem/1.1 var(--hand);cursor:pointer;white-space:nowrap;box-shadow:inset 0 1px 0 #fff9,inset 0 0 0 1px rgba(226,180,87,.6),0 2px 0 #1a0d06,0 3px 0 rgba(0,0,0,0.28);transition:transform .12s ease,box-shadow .12s}
-.gchip:hover{transform:translateY(-2px)}
+.gchip:hover{filter:brightness(1.06)}
 .gchip .ic{color:#8a5a14;width:1.15em;height:1.15em}
 .gchip b{color:var(--red);font-weight:800;font-family:var(--title);font-size:.82rem}
 .gchip.door{box-shadow:inset 3px 0 0 #a3231b,inset 0 1px 0 #fff9,0 2px 0 #1a0d06,0 3px 0 rgba(0,0,0,0.28)}.gchip.tr{box-shadow:inset 3px 0 0 #c08a1a,inset 0 1px 0 #fff9,0 2px 0 #1a0d06,0 3px 0 rgba(0,0,0,0.28)}
@@ -191,6 +191,10 @@ h3{font-size:1.02rem}
 .card::before{content:"";position:absolute;inset:calc(var(--w)*.014);border-radius:calc(var(--w)*.055);pointer-events:none;border:1px solid rgba(255,236,180,.55)}
 .card:hover{transform:translateY(calc(var(--w)*-.1)) scale(1.05);z-index:3;background-position:-30% 0,0 0;box-shadow:0 0 0 1px rgba(20,8,2,.85),0 12px 18px rgba(0,0,0,.5)}
 .hand .card:hover{rotate:0deg;translate:0 0}
+/* buttons, rival plaques and gear chips no longer lift on hover: a 1-2 px lift moves the hit box off a still pointer at the edge, hover flips every frame and the table repaints non-stop (on Low the "Let it be" button never stopped jittering) */
+/* hover hit zone: the lifted card keeps covering its resting spot, so a still pointer near an edge cannot flip hover on and off every frame (that loop repainted the table non-stop) */
+.card>.hit{position:absolute;left:-8%;right:-8%;top:0;bottom:0;pointer-events:none}
+.card:hover>.hit{pointer-events:auto;bottom:calc(var(--w)*-.26 - 12px)}
 /* type accents */
 .t-monster{--acc:#b3261e;--acc2:#e0503c;--acc3:#5a0c08}.t-curse{--acc:#5b2a86;--acc2:#8a5ac8;--acc3:#2a0e46}.t-race{--acc:#1d7466;--acc2:#3aa28c;--acc3:#0a3a32}
 .t-class{--acc:#2a5a9e;--acc2:#4f86cc;--acc3:#0e2a52}.t-item{--acc:#8a5a14;--acc2:#c89232;--acc3:#402606}.t-oneshot{--acc:#1f7a3e;--acc2:#44a860;--acc3:#0a3a1a}
@@ -335,6 +339,8 @@ h3{font-size:1.02rem}
 .recent li.quote{font-style:italic}
 .menu{display:grid;gap:8px}.menu .btn{text-align:left}
 .dk-narrow{display:none!important}
+/* the menu (sound, speed, hints, graphics, Show speed / Test speed, new game) is always there; below 1280px its items leave the bar, which used to overflow and scroll at 768-1279px */
+@media (max-width:1279px){.dk-wide{display:none!important}}
 .intro{margin:.3rem 0}.cast{margin:.1rem 0 .4rem;padding-left:1.2rem;font-size:.92rem}
 .recap{margin:.3rem 0 .6rem}.recap p{margin:.25rem 0}
 .end.won h2{color:var(--good)}
@@ -357,6 +363,8 @@ html.baked[data-gfx="high"] .felt::before{display:block;background:radial-gradie
 /* embers over the table (High only) */
 .embers{position:absolute;pointer-events:none;z-index:3}
 [data-gfx="low"] .card,[data-gfx="low"] .btn,[data-gfx="low"] .gx-ibtn{transition:none}
+/* Medium: only the composited lift animates; the shadow and the foil sweep (both repaint every frame) snap instead */
+[data-gfx="medium"] .card{transition:transform .22s cubic-bezier(.2,.9,.3,1.2)}
 
 [data-gfx="low"] .pulse{animation:none}
 @media (max-width:999px){

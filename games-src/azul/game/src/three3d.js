@@ -7,13 +7,14 @@ const V3={on:false,t:0,tiles:{},halos:[],ghosts:[],hits:[],boards:{},kilns:[],L:
 const CP=1.08,TSZ=.94,TD=.26,BW=12.4,BH=9.4,KR=1.45;
 // ---------- graphics quality: auto (medium on phones/small screens, high on desktop), high, medium, low ----------
 const GFX_KEY='sgz_gfx';
+const PH=typeof PerfHUD!=='undefined'?PerfHUD:null;
 function gfxAuto(){let coarse=false;try{coarse=matchMedia('(pointer:coarse)').matches}catch(e){}return (Math.min(innerWidth,innerHeight)<700||coarse)?'medium':'high'}
 function gfxLoadPref(){let v=null;try{v=localStorage.getItem(GFX_KEY)}catch(e){}return ['auto','high','medium','low'].includes(v)?v:'auto'}
-function gfxSetPref(v){V3.qPref=v;try{localStorage.setItem(GFX_KEY,v)}catch(e){}V3.autoDown=0;applyQuality(v==='auto'?gfxAuto():v)}
+function gfxSetPref(v){V3.qPref=v;try{localStorage.setItem(GFX_KEY,v)}catch(e){}applyQuality(v==='auto'?gfxAuto():v)}
 function gfxCycle(){const o=['auto','high','medium','low'];gfxSetPref(o[(o.indexOf(V3.qPref)+1)%o.length])}
 function gfxLabel(){const n={high:'High',medium:'Medium',low:'Low'};return V3.qPref==='auto'?'Auto · '+n[V3.q]:n[V3.q]}
 function applyQuality(q){V3.q=q;if(typeof gfxBtn==='function')try{gfxBtn()}catch(e){}if(!V3.r)return;const r=V3.r;const dpr=window.devicePixelRatio||1;
-  r.setPixelRatio(Math.min(q==='high'?2:q==='medium'?1.5:1,dpr));
+  const want=Math.min(q==='high'?2:q==='medium'?1.5:1,dpr);r.setPixelRatio(PH?PH.pixelRatio(want):want);
   const sh=q!=='low';const ms=q==='high'?2048:1024;
   if(V3.sun.shadow.mapSize.x!==ms){V3.sun.shadow.mapSize.set(ms,ms);if(V3.sun.shadow.map){V3.sun.shadow.map.dispose();V3.sun.shadow.map=null}}
   if(r.shadowMap.enabled!==sh){r.shadowMap.enabled=sh;for(const m of V3.mats)m.needsUpdate=true}
@@ -21,10 +22,7 @@ function applyQuality(q){V3.q=q;if(typeof gfxBtn==='function')try{gfxBtn()}catch
   // Low: no clearcoat/iridescence layers (the physical shader drops those branches)
   for(const m of V3.envMats||[])if(m.isMeshPhysicalMaterial){if(m.userData.cc==null){m.userData.cc=m.clearcoat;m.userData.ir=m.iridescence}m.clearcoat=q==='low'?0:m.userData.cc;m.iridescence=q==='low'?0:m.userData.ir}
   const env=q==='low'?null:V3.envTex;for(const m of V3.envMats||[])if(m.envMap!==env){m.envMap=env;m.needsUpdate=true}V3.hemi.intensity=q==='low'?.75:.45;
-  V3.fw=null;resize3D();V3.dirty=3}
-// frames dropping badly (under ~24 fps) for 3 seconds in Auto steps down one level
-function frameWatch(dt){if(V3.qPref!=='auto'||V3.q==='low')return;if(document.hidden){V3.fw=null;return}const w=V3.fw||(V3.fw={t:0,bad:0});w.t+=dt;if(dt>1/24)w.bad+=dt;
-  if(w.t>=3){const down=w.bad/w.t>.8;V3.fw=null;if(down){V3.autoDown=(V3.autoDown||0)+1;applyQuality(V3.q==='high'?'medium':'low')}}}
+  resize3D();V3.dirty=3}
 // ---------- procedural texture kit ----------
 function rng(seed){let a=seed>>>0||1;return()=>{a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
 function vnoise(seed,gw){const R=rng(seed),g=new Float32Array(gw*gw);for(let i=0;i<g.length;i++)g[i]=R();
@@ -159,7 +157,7 @@ function initPost(){const r=V3.r;if(!r.capabilities.isWebGL2)return;try{
   V3.canPost=true}catch(e){console.warn('post off',e);V3.canPost=false}}
 function sizePost(){if(!V3.rt)return;const pr=V3.r.getPixelRatio();const w=Math.max(4,Math.round(V3.W*pr)),h=Math.max(4,Math.round(V3.H*pr));const R=V3.rt;R.s.setSize(w,h);R.a.setSize(w>>1,h>>1);R.b.setSize(w>>1,h>>1);R.c.setSize(w>>2,h>>2);R.d.setSize(w>>2,h>>2);V3.mComp.uniforms.uRes.value.set(w,h)}
 function pass(m,to){V3.fsQ.material=m;V3.r.setRenderTarget(to);V3.r.render(V3.fsS,V3.fsC)}
-function drawFrame3D(){const r=V3.r;if(!V3.post){r.setRenderTarget(null);r.render(V3.scene,V3.cam);return}const R=V3.rt;
+function drawFrame3D(){const r=V3.r;r.info.autoReset=false;r.info.reset();if(!V3.post){r.setRenderTarget(null);r.render(V3.scene,V3.cam);return}const R=V3.rt;
   r.setRenderTarget(R.s);r.render(V3.scene,V3.cam);
   V3.mBright.uniforms.tIn.value=R.s.texture;pass(V3.mBright,R.a);const B=V3.mBlur.uniforms;
   B.tIn.value=R.a.texture;B.uDir.value.set(1/R.a.width,0);pass(V3.mBlur,R.b);B.tIn.value=R.b.texture;B.uDir.value.set(0,1/R.a.height);pass(V3.mBlur,R.a);
@@ -204,7 +202,19 @@ function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return fa
   new ResizeObserver(()=>resize3D()).observe(cv.parentElement);V3.on=true;document.body.classList.add('three');V3.clock=new THREE.Clock();
   V3.qPref=gfxLoadPref();applyQuality(V3.qPref==='auto'?gfxAuto():V3.qPref);
   try{document.fonts&&document.fonts.ready.then(()=>{V3.fontOK=1;if(G&&V3.L){sync3D(true)}})}catch(e){}
-  requestAnimationFrame(loop3D);return true}
+  perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
+// PerfHUD: overlay, speed test, auto step-down/up and the idle saver (see perf/INTEGRATE.md). The table draws only on change, so idle is 'demand'.
+function perfHooks(){if(!PH)return;
+  PH.register({game:'Sunglaze',renderer:V3.r,levels:['high','medium','low'],names:{high:'High',medium:'Medium',low:'Low'},anchor:'.gx-board',corner:'tr',idleMode:'demand',
+    getLevel:()=>V3.q,isAuto:()=>V3.qPref==='auto',autoTop:()=>gfxAuto(),
+    // auto, test and restore changes are not saved; Apply on the result card is a choice by hand (saved, never auto-changed)
+    setLevel:(l,w)=>w==='apply'?gfxSetPref(l):applyQuality(l),
+    basePR:()=>Math.min(V3.q==='high'?2:V3.q==='medium'?1.5:1,window.devicePixelRatio||1),
+    onPixelRatio:v=>{V3.r.setPixelRatio(v);resize3D()},
+    orbit:t=>{if(t==null){if(V3.orb0){V3.orbit={a:V3.orb0.a,e:V3.orb0.e};V3.orb0=null;fitCam()}return}if(!V3.orb0)V3.orb0={a:V3.orbit.a,e:V3.orbit.e};
+      V3.orbit.a=Math.max(-.6,Math.min(.6,V3.orb0.a+Math.sin(t*Math.PI*2)*.45));V3.orbit.e=Math.max(.8,Math.min(1.45,V3.orb0.e-.12*Math.sin(t*Math.PI)));fitCam()},
+    isAnimating:()=>!!V3.busy,
+    beforeTest:()=>{if(typeof GX!=='undefined'&&GX.close)try{GX.close()}catch(e){}}})}
 function paintRunner(x,S){x.fillStyle='#223a6e';x.fillRect(0,0,S,S);const R=rng(4);for(let i=0;i<S;i+=2){x.fillStyle=`rgba(0,0,20,${.05+R()*.08})`;x.fillRect(i,0,1,S);x.fillStyle=`rgba(200,210,255,${.02+R()*.04})`;x.fillRect(0,i,S,1)}
   // embroidered borders: ivory and saffron bands, a running meander, little stars
   for(const [o,w,c] of [[10,6,'#e9dcc0'],[20,3,'#e0a53a'],[S-16,6,'#e9dcc0'],[S-23,3,'#e0a53a']]){x.fillStyle=c;x.fillRect(0,o,S,w);x.fillRect(o,0,w,S)}
@@ -260,10 +270,10 @@ function slotPos(sl){const L=V3.L;const a=sl.split('_');const t=a[0][0];const n=
   if(t==='l')return {x:b.x-.45-.54-k*CP,z:b.z-3.2+.54+r*CP,y:.14,s:1};
   if(t==='w')return {x:b.x+.45+.54+k*CP,z:b.z-3.2+.54+r*CP,y:.14,s:1};
   if(t==='x')return {x:b.x-5.31+r*CP,z:b.z+3.09,y:.14,s:1};return null}
-function resize3D(){if(!V3.r)return;const el=V3.r.domElement.parentElement;const w=Math.max(50,el.clientWidth),h=Math.max(50,el.clientHeight);V3.r.setSize(w,h,false);V3.dirty=3;V3.r.domElement.style.width='100%';V3.r.domElement.style.height='100%';V3.cam.aspect=w/h;V3.cam.updateProjectionMatrix();V3.W=w;V3.H=h;sizePost();relayout()}
+function resize3D(){if(!V3.r)return;const el=V3.r.domElement.parentElement;const w=Math.max(50,el.clientWidth),h=Math.max(50,el.clientHeight);V3.r.setSize(w,h,false);V3.dirty=3;if(PH)PH.wake();V3.r.domElement.style.width='100%';V3.r.domElement.style.height='100%';V3.cam.aspect=w/h;V3.cam.updateProjectionMatrix();V3.W=w;V3.H=h;sizePost();relayout()}
 function relayout(){if(V3.on&&!G){V3.L=computeLayout(V3.W||800,V3.H||600);if(!V3.lkey){V3.lkey='idle';buildStatic()}fitCam();return}if(!V3.on||!G)return;const L=computeLayout(V3.W||800,V3.H||600);const key=L.name+JSON.stringify(L.boards.map(b=>[b.p,b.x,b.z]))+G.fac.length;V3.L=L;if(key!==V3.lkey){V3.lkey=key;buildStatic()}fitCam();sync3D(true)}
 // camera: binary-search the distance so the whole layout (with tile height) fits, then centre it
-function fitCam(){const L=V3.L;if(!L)return;V3.dirty=3;let b=L.box;const zb=V3.zoomBoard&&L.name==='focus'&&L.bp[V3.zoomBoard.p];if(zb)b={x0:zb.x-BW/2-.3,x1:zb.x+BW/2+.3,z0:zb.z-BH/2-(V3.zoomBoard.ring?L.ring.out*2+1.2:.3),z1:zb.z+BH/2+.3};const pts=[];for(const x of [b.x0,b.x1])for(const z of [b.z0,b.z1])for(const y of [0,.6])pts.push(new THREE.Vector3(x,y,z));
+function fitCam(){const L=V3.L;if(!L)return;V3.dirty=3;if(PH)PH.wake();let b=L.box;const zb=V3.zoomBoard&&L.name==='focus'&&L.bp[V3.zoomBoard.p];if(zb)b={x0:zb.x-BW/2-.3,x1:zb.x+BW/2+.3,z0:zb.z-BH/2-(V3.zoomBoard.ring?L.ring.out*2+1.2:.3),z1:zb.z+BH/2+.3};const pts=[];for(const x of [b.x0,b.x1])for(const z of [b.z0,b.z1])for(const y of [0,.6])pts.push(new THREE.Vector3(x,y,z));
   const o=V3.orbit;const dir=new THREE.Vector3(Math.sin(o.a)*Math.cos(o.e),Math.sin(o.e),Math.cos(o.a)*Math.cos(o.e));const look=new THREE.Vector3((b.x0+b.x1)/2,0,(b.z0+b.z1)/2);
   const test=d=>{V3.cam.position.copy(look).addScaledVector(dir,d);V3.cam.lookAt(look);V3.cam.updateMatrixWorld();let mx=0,my0=1,my1=-1;for(const p of pts){const v=p.clone().project(V3.cam);mx=Math.max(mx,Math.abs(v.x));my0=Math.min(my0,v.y);my1=Math.max(my1,v.y)}return {mx,my0,my1}};
   for(let it=0;it<3;it++){let lo=5,hi=400;for(let k=0;k<30;k++){const d=(lo+hi)/2;const r=test(d);const fits=r.mx<=.97&&r.my1<=.97&&r.my0>=-.97&&(r.my1-r.my0)<=1.94;if(fits)hi=d;else lo=d}
@@ -404,7 +414,7 @@ function wantTiles(){const w=[];G.fac.forEach((a,i)=>a.forEach((t,k)=>w.push({sl
 V3.tseq=0;
 function tileObj(k){const n=V3.tseq++;const m=new THREE.Mesh(V3.tgeo,V3.tmat[k][n%3]);m.castShadow=true;m.receiveShadow=true;const b=new THREE.Mesh(V3.blobGeo,V3.blobMat);b.position.y=.004;b.renderOrder=-1;m.add(b);V3.scene.add(m);
   return {m,k,b,jr:(((n*7919)%100)/100-.5)*.06}}
-function sync3D(fast){if(!V3.on||!G||!V3.L)return;V3.dirty=3;for(const pi in V3.boards)paintBoard(V3.boards[pi].tex,+pi);
+function sync3D(fast){if(!V3.on||!G||!V3.L)return;V3.dirty=3;if(PH)PH.wake();for(const pi in V3.boards)paintBoard(V3.boards[pi].tex,+pi);
   const lk=G.bag.length+'|'+G.lid.length;if(V3.lblKey!==lk){V3.lblKey=lk;setLabel(V3.bagLbl,`clay sack · ${G.bag.length}`);setLabel(V3.lidLbl,`shard box · ${G.lid.length}`)}
   const sn=Math.min(V3.shards?V3.shards.length:0,Math.ceil(G.lid.length/2));if(V3.shardN!==sn){V3.shardN=sn;V3.shards.forEach((m,i)=>m.visible=i<sn)}
   const want=wantTiles();const have=V3.tiles;const next={};const pend=[];const now=V3.t;const anim=ANIM&&!fast;
@@ -429,7 +439,7 @@ function initFx(){const N=360;const g=new THREE.BufferGeometry();const F=V3.fx={
 function burst(x,y,z,n,col,kind){const F=V3.fx;const c=new THREE.Color(col);for(let k=0;k<n;k++){const i=F.i;F.i=(F.i+1)%F.N;const a=Math.random()*Math.PI*2;const sp=kind==='dust'?.8+Math.random()*1.2:1.2+Math.random()*1.8;
     F.pos[i*3]=x+Math.cos(a)*.3;F.pos[i*3+1]=y+.1;F.pos[i*3+2]=z+Math.sin(a)*.3;F.vel[i*3]=Math.cos(a)*sp;F.vel[i*3+1]=kind==='dust'?.4+Math.random()*.6:1.4+Math.random()*2;F.vel[i*3+2]=Math.sin(a)*sp;
     const w=kind==='spark'&&Math.random()<.4;F.rgb[i*3]=w?1.4:c.r*1.6;F.rgb[i*3+1]=w?1.3:c.g*1.6;F.rgb[i*3+2]=w?1.1:c.b*1.6;F.grav[i]=kind==='dust'?-.6:1.2;F.max[i]=F.life[i]=kind==='dust'?.6+Math.random()*.3:.7+Math.random()*.5}
-  V3.fxBusy=V3.t+1.4}
+  V3.fxBusy=V3.t+1.4;if(PH)PH.wake()}
 function tickFx(dt){const F=V3.fx;if(!F||V3.t>(V3.fxBusy||0)+.1)return false;for(let i=0;i<F.N;i++){if(F.life[i]<=0){F.col[i*4+3]=0;continue}F.life[i]-=dt;const u=Math.max(0,F.life[i]/F.max[i]);
     F.vel[i*3]*=1-dt*2.5;F.vel[i*3+2]*=1-dt*2.5;F.vel[i*3+1]-=F.grav[i]*dt*2;F.pos[i*3]+=F.vel[i*3]*dt;F.pos[i*3+1]+=F.vel[i*3+1]*dt;F.pos[i*3+2]+=F.vel[i*3+2]*dt;
     F.col[i*4]=F.rgb[i*3];F.col[i*4+1]=F.rgb[i*3+1];F.col[i*4+2]=F.rgb[i*3+2];F.col[i*4+3]=u*u}
@@ -453,7 +463,7 @@ const HALO_FS=`uniform vec3 uCol;uniform float uOp;uniform vec2 uSize;uniform fl
 function haloMesh(w,d,col,circle,y){const pad=.35;const u={uCol:{value:new THREE.Color(col).multiplyScalar(1.7)},uOp:{value:1},uSize:{value:new THREE.Vector2(w,d)},uR:{value:.12},uShape:{value:circle?1:0},uPad:{value:pad}};
   const m=new THREE.Mesh(new THREE.PlaneGeometry(w+2*pad,d+2*pad),new THREE.ShaderMaterial({uniforms:u,vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:HALO_FS,transparent:true,depthWrite:false}));
   m.rotation.x=-Math.PI/2;m.position.y=y;m.renderOrder=5;return m}
-function syncHighlights(){const sc=V3.scene;V3.dirty=3;for(const h of V3.halos){sc.remove(h);h.geometry.dispose();h.material.dispose()}V3.halos=[];for(const g of V3.ghosts)sc.remove(g);V3.ghosts=[];for(const o of Object.values(V3.tiles))o.lift=0;
+function syncHighlights(){const sc=V3.scene;V3.dirty=3;if(PH)PH.wake();for(const h of V3.halos){sc.remove(h);h.geometry.dispose();h.material.dispose()}V3.halos=[];for(const g of V3.ghosts)sc.remove(g);V3.ghosts=[];for(const o of Object.values(V3.tiles))o.lift=0;
   const H=UI.hl||{};const add=(x,z,w,d,col,ring,y)=>{const m=haloMesh(w,d,col||0xffc43a,ring,y||.3);m.position.x=x;m.position.z=z;sc.add(m);V3.halos.push(m);return m};
   for(const s of H.src||[]){if(s.src<0){const D=(V3.L.ring.cr+.2)*2;add(0,0,D,D,s.col||0xff9a1a,1,.14)}else{const K=V3.L.kilns[s.src];if(K)add(K.x,K.z,3.3,3.3,s.col||0xff9a1a,1,.31)}}
   for(const sl of H.tiles||[]){const o=V3.tiles[sl];if(o){o.lift=1;const p=slotPos(sl);add(p.x,p.z,.98*(p.s||1),.98*(p.s||1),0xffe070,0,p.y+.02)}}
@@ -462,9 +472,9 @@ function syncHighlights(){const sc=V3.scene;V3.dirty=3;for(const h of V3.halos){
   for(const g of H.ghost||[]){const p=slotPos(g.sl);if(!p)continue;const m=new THREE.Mesh(V3.tgeo,V3.gmat[g.k]);m.position.set(p.x,p.y+.02,p.z);m.scale.setScalar(p.s||1);sc.add(m);V3.ghosts.push(m);if(g.bad){const r=add(p.x,p.z,.95,.95,0xff3a2a,0,.46);r.userData.fixed=.95}}}
 // ---------- the frame loop: renders only while something moves (plus a gentle idle on High) ----------
 const ease=u=>u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2;
-function loop3D(){requestAnimationFrame(loop3D);const dt=Math.min(1,V3.clock.getDelta());V3.t+=dt;const t=V3.t;frameWatch(dt);
+function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);const dt=Math.min(1,V3.clock.getDelta());V3.t+=dt;const t=V3.t;
   const tl=Object.values(V3.tiles);const fxOn=V3.t<(V3.fxBusy||0)+.1;
-  const busy=V3.dirty>0||V3.drag||fxOn||V3.pops.length||tl.some(o=>o.go||o.lift||o.land)||(V3.dying&&V3.dying.length)||(V3.camTo&&V3.camNow&&V3.camNow.pos.distanceTo(V3.camTo.pos)>.01)||V3.sunTok.position.distanceTo(V3.sunTok.userData.pos)>.005;
+  const busy=V3.dirty>0||V3.drag||fxOn||V3.pops.length||tl.some(o=>o.go||o.lift||o.land)||(V3.dying&&V3.dying.length)||(V3.camTo&&V3.camNow&&V3.camNow.pos.distanceTo(V3.camTo.pos)>.01)||V3.sunTok.position.distanceTo(V3.sunTok.userData.pos)>.005||!!(PH&&PH.testing);V3.busy=!!busy;
   V3.avg=(V3.avg||.016)*.95+dt*.05;if(!busy){const gap=V3.halos.length?.08:(V3.q==='high'&&V3.avg<1/40?1/24:1e9);if(t-(V3.lastR||0)<gap)return}const rdt=Math.min(.1,t-(V3.lastR||t));V3.lastR=t;if(V3.dirty>0)V3.dirty--;
   const move=o=>{const g=o.go;if(!g)return true;if(t<g.t0)return false;const u=g.dur?Math.max(0,Math.min(1,(t-g.t0)/g.dur)):1;const e=ease(u);
     o.m.position.lerpVectors(g.from,g.to,e);o.m.position.y+=Math.sin(Math.PI*u)*g.arc;o.m.rotation.y=(o.jr||0)+(g.arc?(1-e)*Math.PI*.5:0);o.m.rotation.x=g.arc?Math.sin(Math.PI*u)*.3:0;o.m.scale.setScalar(g.s0+(g.s1-g.s0)*e);

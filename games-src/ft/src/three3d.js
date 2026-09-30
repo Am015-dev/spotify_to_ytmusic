@@ -7,12 +7,13 @@ const TS=2.2,TH=.34,GAP=.12;       // tile size, tile height, gap
 const MCOL={vizier:0xf0b72a,elder:0xf3eee2,merchant:0x3a9a48,builder:0x2c62c6,assassin:0xc9312a,artisan:0x8d50c8,thief:0x2a2b30};
 const PCOL3=[0x2b2b33,0x119e98,0xff4fa3,0x8b5a2b,0x6d7b8d];
 // ---- graphics quality: auto (default) / high / medium / low, remembered in localStorage ----
-const GFX={pref:'auto',q:'high',bad:0,ema:1/60,cool:0};
-function gfxAuto(){const small=Math.min(innerWidth,innerHeight)<700||(window.matchMedia&&matchMedia('(pointer:coarse)').matches);return small?'medium':'high'}
+const GFX={pref:'auto',q:'high'};
+const PH=typeof PerfHUD!=='undefined'?PerfHUD:null;
+function gfxAuto(){if(V3.soft)return 'low';const small=Math.min(innerWidth,innerHeight)<700||(window.matchMedia&&matchMedia('(pointer:coarse)').matches);return small?'medium':'high'}
 try{GFX.pref=localStorage.getItem('soq_gfx')||'auto'}catch(e){}if(!['auto','high','medium','low'].includes(GFX.pref))GFX.pref='auto';
-function setGfx(pref){GFX.pref=pref;try{localStorage.setItem('soq_gfx',pref)}catch(e){}GFX.q=pref==='auto'?gfxAuto():pref;GFX.bad=0;GFX.slow=false;GFX.ema=1/60;if(V3.on)applyQ()}
+function setGfx(pref){GFX.pref=pref;try{localStorage.setItem('soq_gfx',pref)}catch(e){}GFX.q=pref==='auto'?gfxAuto():pref;if(V3.on)applyQ()}
 function gfxLabel(){return {high:'High',medium:'Medium',low:'Low'}[GFX.q]||GFX.q}
-function applyQ(){const q=GFX.q,r=V3.r;V3.q=q;const dpr=window.devicePixelRatio||1;r.setPixelRatio(q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):GFX.slow?.6:1);
+function applyQ(){const q=GFX.q,r=V3.r;V3.q=q;const dpr=window.devicePixelRatio||1;const want=q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1;r.setPixelRatio(PH?PH.pixelRatio(want):want);
   const sh=q!=='low';const size=q==='high'?2048:1024;if(r.shadowMap.enabled!==sh||V3.sun.shadow.mapSize.x!==size||V3.lastQ!==q){r.shadowMap.enabled=sh;r.shadowMap.type=q==='high'?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;V3.sun.castShadow=sh;V3.sun.shadow.mapSize.set(size,size);if(V3.sun.shadow.map){V3.sun.shadow.map.dispose();V3.sun.shadow.map=null}
     // Low: no environment reflections (cheaper shading), brighter fill instead, no light-pool overlay (CSS vignette does it)
     V3.hemi.intensity=q==='low'?1.2:.85;if(V3.pool)V3.pool.visible=q!=='low';V3.scene.traverse(o=>{if(o.material)for(const m of [].concat(o.material))m.needsUpdate=true})}V3.lastQ=q;swapMats();
@@ -37,7 +38,9 @@ function tex(c,o){const t=new THREE.CanvasTexture(c);o=o||{};if(o.srgb!==false)t
 const STD=(o)=>new THREE.MeshStandardMaterial(o);const PHYS=(o)=>new THREE.MeshPhysicalMaterial(o);
 function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return false;const cv=document.getElementById('c3');if(!cv)return false;
   let r;try{r=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});if(!r.getContext())return false}catch(e){return false}
-  V3.r=r;r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.0;r.shadowMap.type=THREE.PCFSoftShadowMap;V3.aniso=Math.min(8,r.capabilities.getMaxAnisotropy());
+  V3.r=r;try{const gl=r.getContext(),x=gl.getExtension('WEBGL_debug_renderer_info');V3.soft=/swiftshader|llvmpipe|softpipe|software/i.test(String(gl.getParameter(x?x.UNMASKED_RENDERER_WEBGL:gl.RENDERER)))}catch(e){}
+  // a software renderer (no GPU) starts on Low in Auto; PerfHUD then lowers the resolution if it is still slow
+  r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.0;r.shadowMap.type=THREE.PCFSoftShadowMap;V3.aniso=Math.min(8,r.capabilities.getMaxAnisotropy());
   GFX.q=GFX.pref==='auto'?gfxAuto():GFX.pref;
   const sc=V3.scene=new THREE.Scene();sc.background=new THREE.Color(0x3a2415);sc.fog=new THREE.FogExp2(0x3a2415,.018);
   V3.cam=new THREE.PerspectiveCamera(36,1.6,.5,220);V3.look=new THREE.Vector3(0,0,0);V3.orbit={a:0,e:1.0,d:24};V3.cur={a:0,e:1.0,d:24};placeCam();
@@ -53,7 +56,18 @@ function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return fa
   cv.addEventListener('pointermove',e=>{V3.hover=pickTile(e)});cv.addEventListener('pointerleave',()=>{V3.hover=null});
   cv.addEventListener('wheel',e=>{e.preventDefault();V3.zoom=Math.max(.6,Math.min(1.6,(V3.zoom||1)+e.deltaY*.001));fitDist()},{passive:false});
   buildPieces();buildPlinth();V3.on=true;document.body.classList.add('three');applyQ();new ResizeObserver(()=>resize3D()).observe(cv.parentElement);resize3D(true);
-  document.addEventListener('visibilitychange',()=>{V3.wasHidden=true});V3.clock=new THREE.Clock();requestAnimationFrame(loop3D);return true}
+  V3.clock=new THREE.Clock();perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
+// PerfHUD: overlay, speed test, auto step-down/up and the idle-frame saver (see perf/INTEGRATE.md)
+function perfHooks(){if(!PH)return;
+  PH.register({game:'Sands of Qamar',renderer:V3.r,levels:['high','medium','low'],names:{high:'High',medium:'Medium',low:'Low'},anchor:'.gx-board',corner:'bl',
+    getLevel:()=>GFX.q,isAuto:()=>GFX.pref==='auto',autoTop:()=>gfxAuto(),
+    // auto, test and restore changes are not saved; Apply on the result card is a choice by hand (saved, never auto-changed)
+    setLevel:(l,w)=>{if(w==='apply')setGfx(l);else{GFX.q=l;applyQ()}if(typeof renderSettings==='function')renderSettings()},
+    basePR:()=>{const d=window.devicePixelRatio||1;return GFX.q==='high'?Math.min(2,d):GFX.q==='medium'?Math.min(1.5,d):1},
+    onPixelRatio:v=>{V3.r.setPixelRatio(v);resize3D(false)},
+    orbit:t=>{if(t==null){if(V3.orb0){Object.assign(V3.orbit,V3.orb0);V3.orb0=null}return}if(!V3.orb0)V3.orb0={a:V3.orbit.a,e:V3.orbit.e};V3.orbit.a=V3.orb0.a+Math.sin(t*Math.PI*2)*.9;V3.orbit.e=Math.max(.55,Math.min(1.45,V3.orb0.e-.18*Math.sin(t*Math.PI)))},
+    isAnimating:()=>!!V3.busy,
+    beforeTest:()=>{if(typeof GX!=='undefined'&&GX.close)try{GX.close()}catch(e){}}})}
 function BW(){return G&&G.W||6}function BH(){return G&&G.H||5}
 // ---- studio environment for reflections: warm sky dome, bright sun softbox, cool window ----
 function buildEnv(){const es=new THREE.Scene();const geo=new THREE.SphereGeometry(50,32,16);const col=[];const p=geo.attributes.position;const top=new THREE.Color(0xffd9a8),hor=new THREE.Color(0xfff1d8),gnd=new THREE.Color(0x5a3620),c=new THREE.Color();
@@ -183,7 +197,7 @@ function rockMesh(R,h){const g=new THREE.IcosahedronGeometry(1,1);const p=g.attr
   for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i);const f=.8+hsh(x,y,z)*.4;const yy=y>0?y*h*f:y*.12;const tp=1-Math.max(0,y)*.3;p.setXYZ(i,x*f*.46*tp,yy+.02,z*f*.4*tp);
     c.copy(lo).lerp(hi,Math.min(1,Math.max(0,y)*.9+hsh(z,x,y)*.25));col.push(c.r,c.g,c.b)}g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));g.computeVertexNormals();const m=new THREE.Mesh(g,V3.M.rock);m.castShadow=m.receiveShadow=true;return m}
 // ---- sync the scene with G (read-only) ----
-function sync3D(){if(!V3.on||!G||!G.board)return;V3.dirty=true;const sc=V3.scene;
+function sync3D(){if(!V3.on||!G||!G.board)return;if(PH)PH.wake();V3.dirty=true;const sc=V3.scene;
   G.board.forEach((t,i)=>{let o=V3.tiles[i];const key=t.k+t.v+(t.blue?1:0)+(t.gone?'x':'');
     if(!o||o.key!==key){if(o)sc.remove(o.g);const g=t.gone?new THREE.Group():tileMesh(t,i);g.position.copy(tilePos(i));sc.add(g);o=V3.tiles[i]={g,key,deco:null,dk:'',was:{camel:t.camel,tent:t.tent,palm:t.palm||0,pal:t.pal||0}}}
     o.g.userData.id=i;
@@ -202,9 +216,9 @@ function sync3D(){if(!V3.on||!G||!G.board)return;V3.dirty=true;const sc=V3.scene
   syncStacks();V3.pick=UI.pick||[];V3.faint=UI.pickFaint||[];const bk=JSON.stringify(UI.badges||null);if(V3.bk!==bk){V3.bk=bk;showBadges3D(UI.badges)}
   swapMats();scorePops()}
 // score pops: when a player's total rises, a "+N" rises from the tile where the action happened
-function scorePops(){if(typeof scoreOf!=='function')return;let tot;try{tot=G.pl.map(p=>scoreOf(p).total)}catch(e){return}const prev=V3.scores;V3.scores=tot;if(!prev||prev.length!==tot.length||GFX.slow)return;
+function scorePops(){if(typeof scoreOf!=='function')return;let tot;try{tot=G.pl.map(p=>scoreOf(p).total)}catch(e){return}const prev=V3.scores;V3.scores=tot;if(!prev||prev.length!==tot.length)return;
   const at=G.act&&G.act.tile!=null?G.act.tile:null;if(at==null||tot.filter((v,i)=>v>prev[i]).length!==1)return;tot.forEach((v,i)=>{const d=v-prev[i];if(d>0){const col='#'+PCOL3[i%5].toString(16).padStart(6,'0');const sp=badgeSprite([{t:'+'+d}],{fill:col,fill2:'#1a0f08'},1.2);const p=tilePos(at);sp.position.set(p.x,TH+1.1,p.z);V3.scene.add(sp);V3.fx.push({o:sp,t:0,dur:1.8,vy:.7,pop:1});burst(p,'spark',10)}})}
-function animIn(o,kind,i){if(GFX.slow)return;o.userData.anim={kind,t:-(Math.random()*.08),base:o.position.clone(),tile:i};V3.anims.push(o);if(kind==='pop'){o.userData.s0=o.scale.x;o.scale.setScalar(.001)}}
+function animIn(o,kind,i){o.userData.anim={kind,t:-(Math.random()*.08),base:o.position.clone(),tile:i};V3.anims.push(o);if(kind==='pop'){o.userData.s0=o.scale.x;o.scale.setScalar(.001)}}
 // meeples: drawn as one instanced mesh of turned pawns; each keeps its own position, arcs to its target and lands with a bounce
 function syncStacks(){const want={};
   G.board.forEach((t,i)=>{(t.m||[]).forEach((c,k)=>{want['b'+i+'_'+k]={c,i,k,n:t.m.length}})});
@@ -223,7 +237,7 @@ const FXCFG={spark:()=>({map:V3.T.spark,color:0xffe6a0,transparent:true,depthWri
 function fxSprite(kind){const pool=V3.fxPool[kind]||(V3.fxPool[kind]=[]);const sp=pool.pop()||new THREE.Sprite(new THREE.SpriteMaterial(FXCFG[kind]()));sp.userData.kind=kind;V3.scene.add(sp);return sp}
 // keep one tiny sprite of each kind drawn at all times (hidden under the table) so their programs stay compiled
 function fxKeepers(){for(const k in FXCFG){const sp=new THREE.Sprite(new THREE.SpriteMaterial(FXCFG[k]()));sp.scale.setScalar(.001);sp.position.set(0,-3,0);sp.frustumCulled=false;V3.scene.add(sp)}}
-function burst(p,kind,n){if(!V3.on||GFX.slow)return;if(V3.q==='low')n=Math.ceil(n/2);if(V3.fx.length>140)return;for(let k=0;k<n;k++){const sp=fxSprite(kind);sp.material.opacity=kind==='spark'?1:.7;
+function burst(p,kind,n){if(!V3.on)return;if(V3.q==='low')n=Math.ceil(n/2);if(V3.fx.length>140)return;for(let k=0;k<n;k++){const sp=fxSprite(kind);sp.material.opacity=kind==='spark'?1:.7;
   const a=Math.random()*Math.PI*2,sp0=kind==='spark'?.6+Math.random()*.8:.5+Math.random()*.4;sp.position.set(p.x+Math.cos(a)*.1,(p.y||TH)+.08+(kind==='spark'?.3:0),p.z+Math.sin(a)*.1);const s=kind==='spark'?.22+Math.random()*.2:.18;sp.scale.set(s,s,1);
   V3.fx.push({o:sp,t:0,dur:kind==='spark'?.9+Math.random()*.5:.65,vx:Math.cos(a)*sp0,vz:Math.sin(a)*sp0,vy:kind==='spark'?1.2+Math.random():.25,grow:kind==='spark'?-.1:1.8,s})}}
 function stepFx(dt){for(let k=V3.fx.length-1;k>=0;k--){const f=V3.fx[k];f.t+=dt;const u=f.t/f.dur;const o=f.o;
@@ -232,7 +246,7 @@ function stepFx(dt){for(let k=V3.fx.length-1;k>=0;k--){const f=V3.fx[k];f.t+=dt;
     if(u>=1){V3.scene.remove(o);if(f.pop){o.material.map.dispose();o.material.dispose()}else V3.fxPool[o.userData.kind].push(o);V3.fx.splice(k,1)}}}
 const _m4=new THREE.Matrix4(),_q=new THREE.Quaternion(),_e=new THREE.Euler(),_s=new THREE.Vector3(),_v=new THREE.Vector3();
 function stepPieces(dt,t){let n=0;const P=V3.pawns,B=V3.pblobs;
-  for(const id in V3.stacks){const s=V3.stacks[id];const pos=s.g.position;if(GFX.slow&&s.to){pos.copy(s.to);s.arc=null;s.sq=null}
+  for(const id in V3.stacks){const s=V3.stacks[id];const pos=s.g.position;
     if(s.to&&(!s.arc||!s.arc.to.equals(s.to))&&pos.distanceTo(s.to)>.02){const d=pos.distanceTo(s.to);s.arc={from:pos.clone(),to:s.to.clone(),t:-(s.delay||0),dur:.34+Math.min(.3,d*.05),h:Math.min(1.2,.35+d*.12)};s.delay=0}
     if(s.arc){const a=s.arc;a.t+=dt;if(a.t>=0){const k=Math.min(1,a.t/a.dur),e=ease(k);pos.lerpVectors(a.from,a.to,e);pos.y+=Math.sin(Math.PI*k)*a.h;if(k>=1){s.arc=null;pos.copy(a.to);if(!s.hand){s.sq=0;if(Math.random()<.5||V3.q!=='low')burst(pos,'dust',3)}}}}
     let sq=0;if(s.sq!=null){s.sq+=dt;const u=s.sq/.32;if(u>=1)s.sq=null;else sq=Math.sin(u*Math.PI)*.16*(1-u)}
@@ -243,14 +257,12 @@ function stepAnims(dt){for(let k=V3.anims.length-1;k>=0;k--){const o=V3.anims[k]
     if(a.kind==='drop'){const e=u<.7?Math.pow(u/.7,2):1;o.position.y=a.base.y+(1-e)*1.6+(u>.7?Math.sin((u-.7)/.3*Math.PI)*.12*(1-u):0);if(u>=.7&&!a.hit){a.hit=1;const p=tilePos(a.tile);burst(new THREE.Vector3(p.x+o.position.x,TH,p.z+o.position.z),'dust',6);burst(new THREE.Vector3(p.x+o.position.x,TH,p.z+o.position.z),'spark',8)}}
     else{const e=u<1?1+Math.sin(u*Math.PI*1.5)*(1-u)*.35:1;o.scale.setScalar(Math.max(.001,o.userData.s0*Math.min(1,u*2.2)*e));if(!a.hit&&u>.2){a.hit=1;const p=tilePos(a.tile);burst(new THREE.Vector3(p.x+o.position.x,TH,p.z+o.position.z),'spark',7)}}
     if(u>=1){o.position.y=a.base.y;if(a.kind==='pop')o.scale.setScalar(o.userData.s0||1);delete o.userData.anim;V3.anims.splice(k,1)}}}
-function loop3D(){requestAnimationFrame(loop3D);const raw=V3.clock.getDelta();V3.hidGap=V3.wasHidden;V3.wasHidden=false;const dt=Math.min(GFX.slow?.5:.05,raw);V3.t+=dt;const t=V3.t;
-  // auto quality: if frames stay slow for 3 seconds, step down one level (only when the player left it on Auto)
-  if(V3.clock.elapsedTime>2&&!V3.hidGap&&V3.rendered){GFX.ema=GFX.ema*.9+Math.min(raw,1)*.1;GFX.slow=GFX.q==='low'&&(GFX.slow||GFX.ema>.12);if(GFX.slow!==!!V3.wasSlow){V3.wasSlow=GFX.slow;applyQ()}if(GFX.pref==='auto'&&GFX.q!=='low'&&GFX.ema>1/26){GFX.bad+=Math.min(raw,2);GFX.slowN=raw>.5?(GFX.slowN||0)+1:0;if(GFX.bad>3||GFX.slowN>=2){GFX.slowN=0;GFX.q=GFX.q==='high'?'medium':'low';GFX.bad=0;applyQ()}}else GFX.bad=Math.max(0,GFX.bad-raw)}
+function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);const raw=V3.clock.getDelta();const dt=Math.min(.05,raw);V3.t+=dt;const t=V3.t;
   // camera eases to its target orbit
   const c=V3.cur,o=V3.orbit,k=1-Math.exp(-dt*(V3.drag?16:6));c.a+=(o.a-c.a)*k;c.e+=(o.e-c.e)*k;c.d+=(o.d-c.d)*k;placeCam();
   stepPieces(dt,t);stepAnims(dt);stepFx(dt);
-  for(const id in V3.tiles){const o=V3.tiles[id];const i=+id;const hot=V3.pick.includes(i);const hv=V3.hover===i&&hot;const top=o.g.userData.top;
-    const lt=hv?.07:0;const l=(V3.lift[i]||0)+(lt-(V3.lift[i]||0))*Math.min(1,dt*12);V3.lift[i]=l;o.g.position.y=l;
+  let lifting=false;for(const id in V3.tiles){const o=V3.tiles[id];const i=+id;const hot=V3.pick.includes(i);const hv=V3.hover===i&&hot;const top=o.g.userData.top;
+    const lt=hv?.07:0;const l=(V3.lift[i]||0)+(lt-(V3.lift[i]||0))*Math.min(1,dt*12);if(Math.abs(lt-l)>.002)lifting=true;V3.lift[i]=l;o.g.position.y=l;
     if(top){const em=hv?.26:hot?.1+.06*Math.sin(t*3):0;if(Math.abs((o.em||0)-em)>.004){o.em=em;top.emissive.setRGB(em*1.0,em*.62,em*.2)}}
     const hl=o.g.userData.hl;const faint=!hot&&V3.faint&&V3.faint.includes(i);if(hl){hl.visible=hot||faint;if(faint){hl.material.opacity=.13;hl.material.color.setHex(0xffe2a0)}if(hot){hl.material.opacity=.6+.35*Math.abs(Math.sin(t*3));hl.material.color.setHex(hv?0xffffff:0xffc93a)}}
     if(o.deco)o.deco.traverse(x=>{if(x.userData.sway!=null)x.rotation.z=Math.sin(t*1.3+x.userData.sway)*.05;if(x.userData.flag!=null){x.rotation.y=Math.sin(t*3+x.userData.flag)*.35}})}
@@ -258,10 +270,10 @@ function loop3D(){requestAnimationFrame(loop3D);const raw=V3.clock.getDelta();V3
   if(V3.flame){const f=1+Math.sin(t*13)*.08+Math.sin(t*7.3)*.06;V3.flame.scale.set(.5*f,.75*f,1);V3.flameCore.scale.set(1,2*f,1)}
   if(V3.motes&&V3.motes.visible){V3.motes.rotation.y=t*.01;V3.motes.position.y=Math.sin(t*.3)*.2}
   if(V3.pathG)for(const c of V3.pathG.children){if(c.userData.pulse){const k=1+.12*Math.sin(t*4);c.scale.set(k,k,k)}if(c.userData.step!=null){c.material.opacity=.5+.5*Math.max(0,Math.sin(t*4-c.userData.step*.7))}}
-  // very slow devices (Low and still under ~3 fps): draw only when something changed, so the page stays responsive
-  const busy=V3.dirty||V3.drag||V3.fx.length||V3.anims.length||V3.moving||Math.abs(o.a-c.a)+Math.abs(o.e-c.e)+Math.abs(o.d-c.d)>.002||V3.hover!==V3.lastHover;
-  const since=V3.clock.elapsedTime-(V3.lastR||0);if(GFX.slow&&!V3.drag&&(since<1||(!busy&&since<2))){V3.rendered=false;return}
-  V3.dirty=false;V3.lastHover=V3.hover;V3.lastR=V3.clock.elapsedTime;V3.rendered=true;
+  // PerfHUD's idle saver slows the loop to 10 fps only while none of this moves (ambient sway, water and flame keep going at 10 fps)
+  const busy=V3.dirty||V3.drag||V3.fx.length||V3.anims.length||V3.moving||lifting||Math.abs(o.a-c.a)+Math.abs(o.e-c.e)+Math.abs(o.d-c.d)>.002||V3.hover!==V3.lastHover;
+  V3.busy=!!busy||!!(PH&&PH.testing);
+  V3.dirty=false;V3.lastHover=V3.hover;V3.lastR=V3.clock.elapsedTime;V3.rendered=true;V3.r.info.autoReset=false;V3.r.info.reset();
   if(V3.post)renderPost();else{V3.r.setRenderTarget(null);V3.r.render(V3.scene,V3.cam)}}
 // ---- post-processing (High): MSAA HDR scene -> bright pass -> 2-level blur -> bloom + ACES + vignette + warm grade ----
 const FSV='varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}';

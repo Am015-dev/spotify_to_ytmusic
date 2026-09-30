@@ -15,6 +15,7 @@
   <button class="btn" data-a="pause" id="pausebtn" title="Pause the computer (P)" aria-label="Pause the computer"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="9.4" y="2" width="3.6" height="12" rx="1" fill="currentColor"/></svg></button>
   <button class="btn" data-a="hints" id="hintbtn" title="Suggested maneuvers">💡 On</button>
   <button class="btn" data-a="gfx" id="gfxbtn" title="Graphics quality">Graphics</button>
+  <button type="button" class="btn" data-perfhud="show" aria-pressed="false" title="Show the frame-rate overlay (F9)">Show speed</button><button type="button" class="btn" data-perfhud="test" title="Measure each graphics level and suggest one">Test speed</button>
   </div>
 </header>
 <div class="gx-main">
@@ -47,6 +48,9 @@
 <div id="bbody"></div>
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="modal" class="hidden"></div>
+<script src="perfhud.js"></script>
+<script src="gameaudio.js"></script>
+<script src="audio-data.js"></script>
 <script src="three.min.js"></script>
 <script src="geo.js"></script>
 <script src="data.js"></script>

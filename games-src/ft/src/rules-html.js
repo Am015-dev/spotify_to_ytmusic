@@ -40,4 +40,15 @@ const RULES_HTML=`<div class="rules">
 <li><b>Promo djinns</b>: three extra djinns join the deck.</li>
 </ul>
 <p class="muted small">Tip: tap the glowing tiles on the board. The panel on the right always says what the game is waiting for; the card list explains every djinn, tile, good and token.</p>
+<h3>Credits</h3>
+<section class="credits-audio">
+<h4>Audio</h4>
+<p>With thanks to these public-domain (CC0) creators:</p>
+<ul>
+<li>Music: &ldquo;Desert Loop&rdquo; by iamoneabe (<a href="https://opengameart.org/content/desert-loop" target="_blank" rel="noopener">OpenGameArt</a>, CC0)</li>
+<li>Sound effects: Casino Audio, Digital Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio, UI Audio by <a href="https://kenney.nl" target="_blank" rel="noopener">Kenney</a> (CC0)</li>
+</ul>
+<p class="muted small">All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</p>
+</section>
+<p class="muted small">Names, card text and art are original.</p>
 </div>`;

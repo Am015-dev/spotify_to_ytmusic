@@ -14,6 +14,18 @@ function gfxLabel(){const b=document.getElementById('gfxbtn');if(!b)return;const
   b.innerHTML=`${GFX_ICON}<span>${p==='auto'?'Auto · '+cap(cur):cap(p)}${V3.on&&p!=='auto'&&cur!==p?' → '+cap(cur):''}</span>`;b.title='Graphics quality (tap to change): High = bloom and soft shadows, Low = fastest';b.setAttribute('aria-label','Graphics quality: '+(p==='auto'?'auto, '+cur:p))}
 function cycleGfx(){const order=['auto','high','medium','low'];const n=order[(order.indexOf(gfxPref())+1)%order.length];try{localStorage.setItem(GFXKEY,n)}catch(e){}
   if(V3.on){V3.pinned=n!=='auto';setQuality(n==='auto'?gfxAuto():n)}gfxLabel()}
+const PH=typeof PerfHUD!=='undefined'?PerfHUD:null;
+// ---- PerfHUD hooks: the shared speed overlay, speed test, auto step-down and idle saver (perfhud.js) ----
+function perfHooks(){if(!PH)return;
+  PH.register({game:'Nebula Aces',renderer:V3.r,levels:['high','medium','low'],names:{high:'High',medium:'Medium',low:'Low'},anchor:'#stage',corner:'tl',
+    getLevel:()=>V3.q,isAuto:()=>!V3.pinned&&gfxPref()==='auto',autoTop:()=>gfxAuto(),
+    // auto, test and restore changes are not saved; Apply on the result card is a choice by hand (saved, then never auto-changed)
+    setLevel:(l,w)=>{if(w==='apply'){try{localStorage.setItem(GFXKEY,l)}catch(e){}V3.pinned=true}setQuality(l)},
+    basePR:()=>{const d=window.devicePixelRatio||1;return V3.q==='high'?Math.min(2,d):V3.q==='medium'?Math.min(1.5,d):1},
+    onPixelRatio:v=>{V3.r.setPixelRatio(v);V3.w=0;resize3D()},
+    orbit:t=>{if(t==null){if(V3.orb0!=null){V3.cam.yaw=V3.orb0;V3.orb0=null;V3.ez=null}return}if(V3.orb0==null)V3.orb0=V3.cam.yaw;V3.ez=null;V3.cam.yaw=V3.orb0+Math.sin(t*Math.PI*2)*.6},
+    isAnimating:()=>V3.busy,
+    beforeTest:()=>{if(typeof toggleMenu==='function')toggleMenu(false)}})}
 function urlGfx(){try{const m=/[?&]gfx=(high|medium|low)/.exec(location.search||'');return m?m[1]:null}catch(e){return null}}
 function init3D(){const cv=document.getElementById('c3');if(!cv||typeof THREE==='undefined'||!window.WebGLRenderingContext||/jsdom/i.test(navigator.userAgent||''))return false;
   let r;try{r=V3.r=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});if(!r.getContext())return false}catch(e){return false}
@@ -35,17 +47,17 @@ function init3D(){const cv=document.getElementById('c3');if(!cv||typeof THREE===
   const u=urlGfx();V3.pinned=!!u||gfxPref()!=='auto';const p=gfxPref();setQuality(u||(p==='auto'?gfxAuto():p));
   resize3D();V3.on=true;document.body.classList.add('three');V3.clock=performance.now();gfxLabel();
   setTimeout(()=>{try{makePortraits()}catch(e){console.warn('portraits off',e)}},300);
-  requestAnimationFrame(loop3D);return true}
+  perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
 // ---- quality levels ----
 function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=V3.r;V3.q=q;const dpr=window.devicePixelRatio||1;
-  r.setPixelRatio(q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1);
+  {const want=q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1;r.setPixelRatio(PH?PH.pixelRatio(want):want)}
   const sh=q!=='low',ms=q==='high'?2048:1024,st=q==='high'?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;
   if(r.shadowMap.enabled!==sh||V3.key.shadow.mapSize.x!==ms||r.shadowMap.type!==st){r.shadowMap.enabled=sh;r.shadowMap.type=st;V3.key.castShadow=sh;V3.key.shadow.mapSize.set(ms,ms);if(V3.key.shadow.map){V3.key.shadow.map.dispose();V3.key.shadow.map=null}
     V3.scene.traverse(o=>{if(o.material)[].concat(o.material).forEach(m=>m.needsUpdate=true)})}
   V3.post=q==='high'&&r.capabilities.isWebGL2;if(!V3.post&&V3.P)disposePost();
   if(V3.gas)V3.gas.children.forEach((s,i)=>s.visible=q==='high'||(q==='medium'&&i%2===0));const lo=q==='low';V3.scene.environment=lo?null:V3.env||null;V3.scene.children.forEach(o=>{if(o.isPoints)o.geometry.setDrawRange(0,lo?Math.ceil(o.userData.n/3):o.userData.n)});if(V3.plate){V3.plate.material.transparent=!lo;V3.plate.material.opacity=lo?1:.86;V3.plate.material.needsUpdate=true}V3.hemi.intensity=lo?1.5:.9;if(V3.atm)V3.atm.visible=!lo;if(V3.moon)V3.moon.visible=!lo;V3.rocks.forEach(r=>{if(r.userData.pebbles)r.userData.pebbles.visible=!lo});if(V3.starsNear)V3.starsNear.visible=q!=='low';
-  V3.perf={t:0,n:0,skip:2.5};V3.w=0;if(r.domElement.parentElement)resize3D();gfxLabel()}
-function stepDown(){if(V3.pinned)return;const n={high:'medium',medium:'low'}[V3.q];if(!n)return;console.info('[gfx] frame rate low, stepping down to',n);setQuality(n)}
+  if(PH)PH.hitch();V3.w=0;if(r.domElement.parentElement)resize3D();gfxLabel()}
+// the frame-rate watchdog and stepDown() now live in PerfHUD (p95 over 2 s, see perfhud.js)
 // ---- small procedural helpers ----
 function rng(seed){let s=seed>>>0||1;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
 const HASH=(()=>{const p=new Uint8Array(512);const R=rng(1337);const a=[...Array(256).keys()];for(let i=255;i>0;i--){const j=Math.floor(R()*(i+1));[a[i],a[j]]=[a[j],a[i]]}for(let i=0;i<512;i++)p[i]=a[i&255];return p})();
@@ -363,8 +375,10 @@ function rockMesh(o,idx){const seed=Math.round(o.x*7+o.y*13)+idx*101;const geo=r
   // a ring of pebbles orbiting each rock (one instanced mesh)
   const pg=rockGeo(1,seed+7,1,null);const n=12;const pb=new THREE.InstancedMesh(pg,rockMat(),n);pb.castShadow=true;const rr=rng(seed+3);pb.userData.p=[];
   for(let i=0;i<n;i++){pb.userData.p.push({a:rr()*6.28,d:S3(o.r)*(1.25+rr()*.6),y:(rr()-.5)*1.8,s:.12+rr()*.32,sp:(.05+rr()*.12)*(rr()<.5?-1:1),rx:rr()*6,ry:rr()*6})}m.userData.pebbles=pb;return m}
+// the engine hum (GA sample 'engine_loop') plays while any ship flies a maneuver; one copy at most, faded in and out
+function engineBed(on){if(on===!!V3.engOn)return;V3.engOn=on;if(typeof sndEngine==='function')sndEngine(on)}
 // ---- sync the scene with G ----
-function sync3D(){if(!V3.on||!G)return;
+function sync3D(){if(!V3.on||!G)return;if(PH)PH.wake();
   if(V3.gid!==G.seed+':'+G.ships.length+':'+G.rocks.length){V3.gid=G.seed+':'+G.ships.length+':'+G.rocks.length;for(const k in V3.ships)V3.root.remove(V3.ships[k]);V3.ships={};V3.rocks.forEach(r=>{V3.root.remove(r);V3.root.remove(r.userData.pebbles)});V3.rocks=[];V3.anim={};V3.later=[];setMatColors();
     G.rocks.forEach((o,i)=>{const m=rockMesh(o,i);V3.root.add(m);m.userData.pebbles.visible=V3.q!=='low';V3.root.add(m.userData.pebbles);V3.rocks.push(m)})}
   V3.bombs=V3.bombs||{};const live=new Set((G.bombs||[]).map(t=>t.id));for(const id in V3.bombs)if(!live.has(id)){V3.root.remove(V3.bombs[id]);delete V3.bombs[id]}
@@ -517,7 +531,7 @@ function sizePost(){const P=V3.P;if(!P)return;const s=V3.r.getDrawingBufferSize(
   P.lv.forEach((L,i)=>{const d=2<<i;L.a.setSize(Math.max(2,w/d|0),Math.max(2,h/d|0));L.b.setSize(Math.max(2,w/d|0),Math.max(2,h/d|0))})}
 function disposePost(){const P=V3.P;if(!P)return;P.rt.dispose();P.lv.forEach(L=>{L.a.dispose();L.b.dispose()});[P.bright,P.blur,P.comp].forEach(m=>m.dispose());V3.P=null}
 function pass(mat,target){const P=V3.P;P.quad.material=mat;V3.r.setRenderTarget(target);V3.r.render(P.scene,P.cam)}
-function renderFrame(){const r=V3.r,cam=V3.camera;if(!V3.post){r.setRenderTarget(null);r.render(V3.scene,cam);return}
+function renderFrame(){const r=V3.r,cam=V3.camera;r.info.autoReset=false;r.info.reset();/* PerfHUD reads draws and triangles for the whole frame */if(!V3.post){r.setRenderTarget(null);r.render(V3.scene,cam);return}
   if(!V3.P)makePost();sizePost();const P=V3.P;r.setRenderTarget(P.rt);r.render(V3.scene,cam);let src=P.rt.texture,sw=P.w,sh=P.h;
   P.lv.forEach((L,i)=>{const w=L.a.width,h=L.a.height;if(i===0){P.bright.uniforms.t.value=src;P.bright.uniforms.px.value.set(1/sw,1/sh);pass(P.bright,L.a);src=L.a.texture}
     P.blur.uniforms.t.value=src;P.blur.uniforms.dir.value.set(1/w,0);pass(P.blur,L.b);P.blur.uniforms.t.value=L.b.texture;P.blur.uniforms.dir.value.set(0,1/h);pass(P.blur,L.a);src=L.a.texture});
@@ -573,15 +587,14 @@ function shipArt(s){const k=s&&V3.art?V3.art[s.type+':'+FACTIONS[G.fac[s.side]].
 // ---- animation loop ----
 const ease=t=>t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;
 const _v=new THREE.Vector3(),_m4=new THREE.Matrix4(),_q=new THREE.Quaternion(),_e=new THREE.Euler(),_s=new THREE.Vector3();
-function loop3D(now){requestAnimationFrame(loop3D);if(!V3.on)return;V3.frames++;const raw=(now-V3.clock)/1000;const dt=Math.min(.05,raw);V3.clock=now;V3.t+=dt;const t=V3.t;const reduce=reduceMotion();
-  if(V3.perf&&!document.hidden&&raw<1){const pf=V3.perf;if(pf.skip>0)pf.skip-=raw;else{pf.t+=raw;pf.n++;if(pf.t>=3){const fps=pf.n/pf.t;pf.t=0;pf.n=0;V3.fps=fps;if(fps<24)stepDown()}}}
+function loop3D(now){(PH?PH.raf:requestAnimationFrame)(loop3D);if(!V3.on)return;V3.frames++;const raw=(now-V3.clock)/1000;const dt=Math.min(.05,raw);V3.clock=now;V3.t+=dt;const t=V3.t;const reduce=reduceMotion();
   if(V3.tU)V3.tU.value=t;if(V3.gridMat)V3.gridMat.uniforms.t.value=t;(V3.starMats||[]).forEach(m=>{m.uniforms.t.value=t;m.uniforms.px.value=V3.r.getPixelRatio()});
   if(V3.gas&&!reduce)V3.gas.children.forEach(s=>s.material.rotation+=s.userData.spin*dt);if(V3.planet)V3.planet.rotation.y+=dt*.004;
   for(let i=V3.later.length-1;i>=0;i--){if(now>=V3.later[i].t){const f=V3.later[i].fn;V3.later.splice(i,1);try{f()}catch(e){}}}
-  const cur=G&&G.cur,sel=typeof UI!=='undefined'?UI.sel:null;
+  const cur=G&&G.cur,sel=typeof UI!=='undefined'?UI.sel:null;let nMove=0,easing=false;
   for(const id in V3.ships){const m=V3.ships[id],a=V3.anim[id];const s=ship(id);const U=m.userData;
     if(a&&a.boom){if(now<a.t0)continue;const k=(now-a.t0)/a.dur;U.mdl.scale.multiplyScalar(.95);U.mdl.rotation.x+=dt*6;U.mdl.rotation.z+=dt*3;if(k>.25)U.mdl.visible=false;if(k>=1){m.visible=false;delete V3.anim[id]}continue}
-    let moving=false;
+    let moving=false;if(a&&a.path)nMove++;
     if(a&&a.path&&a.path.length<2){delete V3.anim[id]}
     else if(a&&a.path){moving=true;const k=Math.min(1,(now-a.t0)/a.dur),u=ease(k)*(a.path.length-1),i=Math.min(a.path.length-2,Math.floor(u)),f=u-i,p=a.path[i],q=a.path[i+1]||p;
       m.position.copy(W(p.x+(q.x-p.x)*f,p.y+(q.y-p.y)*f));let dh=normA(q.h-p.h);m.rotation.y=p.h+dh*f;if(U.mdl)U.mdl.rotation.x=-dh*2*Math.sin(k*Math.PI);
@@ -591,8 +604,8 @@ function loop3D(now){requestAnimationFrame(loop3D);if(!V3.on)return;V3.frames++;
     const boost=moving?1.6:1;if(U.mdl&&U.mdl.userData.eng)U.mdl.userData.eng.forEach(e=>{const fl=reduce?1:.88+.12*Math.sin(t*37+e.ph)+.06*Math.sin(t*71+e.ph*2);e.pl.scale.set(boost*fl,1,1);e.s.material.opacity=(V3.post?.3:.6)*fl;e.s2.material.opacity=(V3.post?.35:.6)*fl});
     if(U.mdl&&U.mdl.userData.lamps)U.mdl.userData.lamps.forEach(l=>{if(l.blink)l.s.material.opacity=reduce?.7:(Math.sin(t*3+l.ph*2)>.6?1:.18)});
     // selection / active glow on the base rim
-    const want=cur===id&&G.phase!=='plan'?1:sel===id?.7:0;U.sel+=(want-U.sel)*Math.min(1,dt*8);U.rim.material.opacity=.4+U.sel*(.5+(reduce?0:.25*Math.sin(t*5)));U.rim.scale.setScalar(1+U.sel*.06);
-    const u=U.shield.material.uniforms;if(u.amp.value>0){u.amp.value=Math.max(0,u.amp.value-dt*.9/(V3.slowmo||1));u.t.value=t}U.shield.visible=u.amp.value>.002}
+    const want=cur===id&&G.phase!=='plan'?1:sel===id?.7:0;U.sel+=(want-U.sel)*Math.min(1,dt*8);if(Math.abs(want-U.sel)>.01||U.land>0)easing=true;U.rim.material.opacity=.4+U.sel*(.5+(reduce?0:.25*Math.sin(t*5)));U.rim.scale.setScalar(1+U.sel*.06);
+    const u=U.shield.material.uniforms;if(u.amp.value>0){easing=true;u.amp.value=Math.max(0,u.amp.value-dt*.9/(V3.slowmo||1));u.t.value=t}U.shield.visible=u.amp.value>.002}
   V3.rocks.forEach(r=>{const U=r.userData;if(!reduce){r.rotation.y=Math.sin(t*.05+U.ph)*.06;r.rotation.x=Math.sin(t*.07+U.ph)*.04;r.position.y=U.y0+Math.sin(t*.4+U.ph)*.15}
     const pb=U.pebbles;if(pb){pb.userData.p.forEach((p,i)=>{if(!reduce)p.a+=p.sp*dt;_v.set(r.position.x+Math.cos(p.a)*p.d,r.position.y+p.y,r.position.z+Math.sin(p.a)*p.d);_e.set(p.rx+t*p.sp,p.ry+t*p.sp*.7,0);_q.setFromEuler(_e);_s.setScalar(p.s);_m4.compose(_v,_q,_s);pb.setMatrixAt(i,_m4)});pb.instanceMatrix.needsUpdate=true}});
   for(const id in (V3.bombs||{})){const b=V3.bombs[id];if(b.userData.lamp)b.userData.lamp.material.opacity=.5+.4*Math.sin(t*4);b.children[0].rotation.y+=dt*.5}
@@ -611,6 +624,10 @@ function loop3D(now){requestAnimationFrame(loop3D);if(!V3.on)return;V3.frames++;
   else if(V3.ez){const e=V3.ez,k=Math.min(1,(now-e.t0)/e.dur),q=ease(k);const C={};for(const n of ['yaw','pitch','dist','tx','tz'])C[n]=e.from[n]+(V3.cam[n]-e.from[n])*q;placeCam(sx,sy,C);if(k>=1)V3.ez=null}
   else placeCam(sx,sy);
   renderFrame();
+  // what the player should see smoothly: ship moves, bolts and explosions, delayed hits, camera glides and drags, shake, flash, the speed test
+  const anyAnim=Object.keys(V3.anim).length>0;
+  V3.busy=!!(anyAnim||easing||V3.fxq.length||V3.later.length||V3.ez||V3.drag||V3.shake>0||V3.flashT>0||PH&&PH.testing);
+  engineBed(nMove>0);
   const L=[];for(const s of (G?G.ships:[])){const el=V3.labels[s.id],m=V3.ships[s.id];if(el&&m&&s.alive){placeEl(el,m.position.clone().add(new THREE.Vector3(0,8.4,0)));if(el.style.display!=='none')L.push({el,x:parseFloat(el.style.left),y:parseFloat(el.style.top),w:el.offsetWidth,h:el.offsetHeight})}}
   // name tags that would collide stack upwards instead of overlapping
   L.sort((a,b)=>b.y-a.y);const done=[];for(const t of L){for(let g=0;g<6;g++){const q=done.find(q=>Math.abs(t.x-q.x)<(t.w+q.w)/2+2&&t.y-t.h<q.y+2&&q.y-q.h<t.y+2);if(!q)break;t.y=q.y-q.h-2}t.y=Math.max(t.h,t.y);t.el.style.top=t.y+'px';done.push(t)}

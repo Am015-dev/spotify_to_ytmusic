@@ -23,4 +23,21 @@ const RULES_HTML=`<h2>How to play</h2>
 <p>Each character has a life track. Some spaces carry a morale-down arrow: filling one lowers morale. Anything you are forced to pay but can't costs 1 wound per missing unit. Determination pays for skills (once each a round). Resting, the Pot, the Fireplace and a few cards heal.</p>
 <h3>Scenarios</h3>
 <p><b>1. Marooned</b> (12 rounds): build Fire and a 15-wood signal pile (stages of 1–5 wood, one stage a round, added before the actions); have both in round 10, 11 or 12. <b>2. The Hexed Isle</b> (10 rounds): raise a Cross on five different tiles; book cards bring fog (+1 pawn, terrain hidden); the first totem is a temple to search, the second hurts, later ones bring fog. <b>3. Stranded Friend</b> (8 rounds): build the Rescue Raft, row out to rescue Ada before her wounds kill her, then build the Lifeboat. <b>6. Settlers</b> (12 rounds): shelter, roof, palisade and weapon at 1 or more plus all 9 dealt inventions; children arrive in rounds 7, 9 and 11 and must be fed.</p>
-<p class="muted small">Names, card text and art in this game are original. Its rules and numbers follow a published co-operative survival board game. Details that the sources left open are listed in the game's rules notes.</p>`;
+<p class="muted small">Names, card text and art in this game are original. Its rules and numbers follow a published co-operative survival board game. Details that the sources left open are listed in the game's rules notes.</p>
+<section class="credits-audio">
+<h3>Credits</h3>
+<p>Names, card text and art are original.</p>
+<h4>Audio</h4>
+<p>With thanks to these public-domain (CC0) creators:</p>
+<ul>
+<li>Music: &ldquo;Seaside Village&rdquo; by KarateStudios (<a href="https://opengameart.org/content/seaside-village">OpenGameArt</a>, CC0)</li>
+<li>Music: &ldquo;Storm Chasers&rdquo; by Eldritch Grim (<a href="https://opengameart.org/content/storm-chasers">OpenGameArt</a>, CC0)</li>
+<li>Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio, UI Audio by <a href="https://kenney.nl">Kenney</a> (CC0)</li>
+<li>Sound effects: &ldquo;100 CC0 SFX #2&rdquo; by rubberduck (<a href="https://opengameart.org/content/100-cc0-sfx-2">OpenGameArt</a>, CC0)</li>
+<li>Sound effects: &ldquo;30 CC0 SFX loops&rdquo; by rubberduck (<a href="https://opengameart.org/content/30-cc0-sfx-loops">OpenGameArt</a>, CC0)</li>
+<li>Sound effects: &ldquo;40 CC0 water / splash / slime SFX&rdquo; by rubberduck (<a href="https://opengameart.org/content/40-cc0-water-splash-slime-sfx">OpenGameArt</a>, CC0)</li>
+<li>Sound effects: &ldquo;Fire Crackling&rdquo; by AntumDeluge (<a href="https://opengameart.org/content/fire-crackling">OpenGameArt</a>, CC0)</li>
+<li>Sound effects: &ldquo;Mild Wind Background Noise&rdquo; by Bashar3A (<a href="https://opengameart.org/content/mild-wind-background-noise">OpenGameArt</a>, CC0)</li>
+</ul>
+<p><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p>
+</section>`;

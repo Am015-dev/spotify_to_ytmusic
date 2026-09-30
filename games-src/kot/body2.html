@@ -41,6 +41,8 @@
     <button class="btn mrow" data-a="snd" id="sndbtn">🔊</button>
     <button class="btn mrow" data-a="mus" id="musbtn">🎵 On</button>
     <button class="btn mrow" data-a="gfx" id="gfxbtn">Graphics<small>High: bloom and soft shadows. Low: fastest (tap to change)</small></button>
+    <button type="button" class="btn mrow" data-perfhud="show" aria-pressed="false">Show speed</button>
+    <button type="button" class="btn mrow" data-perfhud="test">Test speed</button>
     <button class="btn mrow" data-a="new">🆕 New game<small>Back to the start screen</small></button>
   </div></div>
   <div id="ruleswrap"><div id="rulesbody" class="rules"></div><h3>Dice faces</h3><div id="legend" class="legend"></div></div>
@@ -62,6 +64,7 @@ const MONS=[
  {n:'Bramblebat',c:'#9ad35a',d:'Thorny bat-bush hybrid with a taste for neon',x:1}];
 </script>
 <script src="shell.js"></script>
+<script src="perfhud.js"></script>
 <script src="data.js"></script>
 <script src="engine.js"></script>
 <script src="ai.js"></script>
@@ -69,6 +72,8 @@ const MONS=[
 <script src="art.js"></script>
 <script src="exp.js"></script>
 <script src="three3d.js"></script>
+<script src="gameaudio.js"></script>
+<script src="audio-data.js"></script>
 <script src="sound.js"></script>
 <script src="net.js"></script>
 <script src="story.js"></script>

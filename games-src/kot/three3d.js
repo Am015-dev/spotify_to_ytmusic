@@ -4,13 +4,14 @@
 const MS=1.85;const V3={on:false,t:0,mons:[],dice:[],parts:[],gid:null,rollId:-1,fxSeen:{},shake:0,tags:[],q:'high',pinned:false};
 // ---- graphics quality (High / Medium / Low), stored in localStorage; Auto picks Medium on phones and small screens ----
 const GFXKEY='ccs_gfx';
+const PH=typeof PerfHUD!=='undefined'?PerfHUD:null;
 function gfxPref(){try{return localStorage.getItem(GFXKEY)||'auto'}catch(e){return 'auto'}}
 function gfxAuto(){if(V3.soft)return 'low';const w=Math.min(window.innerWidth||1366,(window.screen&&screen.width)||9999);return (w<820||/Mobi|Android|iPhone|iPad/i.test(navigator.userAgent||''))?'medium':'high'}
 function gfxLabel(){const b=document.getElementById('gfxbtn');if(!b)return;const p=gfxPref();const cur=V3.on?V3.q:(p==='auto'?gfxAuto():p);const cap=s=>s[0].toUpperCase()+s.slice(1);
   b.innerHTML=`${GFX_ICON} Graphics: ${p==='auto'?'Auto ('+cap(cur)+')':cap(p)}${V3.on&&p!=='auto'&&cur!==p?' → '+cap(cur):''}<small>High: bloom and soft shadows. Low: fastest (tap to change)</small>`}
 const GFX_ICON='<svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><rect x="2" y="3" width="16" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 17h6M10 14v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 11l3-3 2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 function cycleGfx(){const order=['auto','high','medium','low'];const n=order[(order.indexOf(gfxPref())+1)%order.length];try{localStorage.setItem(GFXKEY,n)}catch(e){}
-  if(V3.on)setQuality(n==='auto'?gfxAuto():n);gfxLabel()}
+  if(PH)PH.hitch();if(V3.on)setQuality(n==='auto'?gfxAuto():n);gfxLabel()}
 function urlGfx(){try{const m=/[?&]gfx=(high|medium|low)/.exec(location.search||'');return m?m[1]:null}catch(e){return null}}
 function init3D(){
   if(!window.THREE||/jsdom/i.test(navigator.userAgent))return false;
@@ -37,22 +38,33 @@ function init3D(){
   V3.on=true;document.body.classList.add('three');gfxLabel();
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{try{makeFaceMats();V3.dice.forEach((d,k)=>{if(G&&G.dice[k])setDieFace(d,G.dice[k],true)});refreshSigns()}catch(e){}});
   if(!V3.soft||V3.pinned)setTimeout(makePortraits,1200);
-  V3.clock=new THREE.Clock();requestAnimationFrame(loop3D);
+  V3.clock=new THREE.Clock();perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);
   return true}
+// ---------- PerfHUD hooks: the shared speed overlay, speed test, auto step-down and idle saver (perfhud.js) ----------
+function perfHooks(){if(!PH)return;
+  PH.register({game:'Crown City Smash',renderer:V3.r,levels:['high','medium','low'],names:{high:'High',medium:'Medium',low:'Low'},anchor:'.gx-board',corner:'tr',
+    getLevel:()=>V3.q,isAuto:()=>!V3.pinned&&gfxPref()==='auto',autoTop:()=>gfxAuto(),
+    // auto, test and restore changes are not saved; Apply on the result card is a choice by hand (saved, never auto-changed)
+    setLevel:(l,w)=>{if(w==='apply'){try{localStorage.setItem(GFXKEY,l)}catch(e){}}setQuality(l)},
+    basePR:()=>{const d=window.devicePixelRatio||1;return V3.q==='high'?Math.min(2,d):V3.q==='medium'?Math.min(1.5,d):1},
+    onPixelRatio:v=>{V3.r.setPixelRatio(v);resize3D()},
+    // the test swings the camera slowly around the arena; the loop eases towards V3.orbA, and null puts it back
+    orbit:t=>{V3.orbA=t==null?0:Math.sin(t*Math.PI*2)*.45},
+    isAnimating:()=>!!V3.busy,
+    beforeTest:()=>{try{if(window.GX&&GX.open)GX.close()}catch(e){}}})}
 // ---- quality levels ----
 function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=V3.r;const was=V3.q;V3.q=q;
-  const dpr=window.devicePixelRatio||1;r.setPixelRatio(q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1);
+  const dpr=window.devicePixelRatio||1;{const want=q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1;r.setPixelRatio(PH?PH.pixelRatio(want):want)}
   const sh=q!=='low';const ms=q==='high'?2048:1024;
   if(r.shadowMap.enabled!==sh||(V3.sun.shadow.mapSize.x!==ms)){r.shadowMap.enabled=sh;V3.sun.castShadow=sh;V3.sun.shadow.mapSize.set(ms,ms);if(V3.sun.shadow.map){V3.sun.shadow.map.dispose();V3.sun.shadow.map=null}
     V3.scene.traverse(o=>{if(o.material)[].concat(o.material).forEach(m=>m.needsUpdate=true)})}
   applyEnv(V3.scene);if(V3.faceMats)Object.values(V3.faceMats).forEach(envMat);
   V3.post=q==='high'&&r.capabilities.isWebGL2;if(!V3.post&&V3.P){disposePost()}
-  V3.perf={t:0,n:0,skip:2.5};if(V3.r.domElement.parentElement)resize3D();gfxLabel()}
+  if(V3.r.domElement.parentElement)resize3D();gfxLabel()}
 // image-based lighting: every PBR material on High, only the hero pieces (figures, dice, brass, water) on Medium, none on Low
 function envMat(m){if(!m||!(m.isMeshStandardMaterial)||!V3.env)return;const want=V3.q==='high'||(V3.q==='medium'&&m.userData.hero)?V3.env:null;if(m.envMap!==want){m.envMap=want;m.needsUpdate=true}}
 function applyEnv(root){root.traverse(o=>{if(o.material)[].concat(o.material).forEach(envMat)})}
 function hero(m){m.userData.hero=true;return m}
-function stepDown(){if(V3.pinned)return;const n={high:'medium',medium:'low'}[V3.q];if(!n)return;console.info('[gfx] frame rate low, stepping down to',n);setQuality(n)}
 // The canvas fills the whole board (width AND height); the camera backs off until the full arena fits that aspect ratio.
 const CAMOFF=new THREE.Vector3(0,15,25.1);
 function fitPoints(){if(V3.fitPts)return V3.fitPts;const pts=[];
@@ -503,7 +515,7 @@ function lavaTex(){if(V3.tex.lava)return V3.tex.lava;V3.tex.lava=canvasTex(256,2
 function seatPos(k,n){const span=n<=2?.5:n<=3?.8:n<=4?1.0:1.2;const a=Math.PI*(n<=1?.5:(.5-span/2+span*k/(n-1)));return new THREE.Vector3(-Math.cos(a)*10.8,.25,.2+Math.sin(a)*7.4)}
 function targetOf(p,k){if(G.city===p.i)return new THREE.Vector3(0,1.1,0);if(G.bay===p.i)return new THREE.Vector3(12.5,.7,-6.5);return seatPos(k,G.pl.length)}
 // ---- sync with the game state ----
-function sync3D(){if(!V3.on)return;
+function sync3D(){if(!V3.on)return;if(PH)PH.wake();
   const tags=document.getElementById('tags');
   if(!G){V3.mons.forEach(o=>V3.scene.remove(o.g));V3.mons=[];tags.innerHTML='';clearDice();return}
   if(V3.gid!==G.gid||V3.mons.length!==G.pl.length){V3.mons.forEach(o=>V3.scene.remove(o.g));V3.gid=G.gid;V3.fxSeen={};
@@ -589,7 +601,7 @@ function sizePost(){const P=V3.P;if(!P)return;const r=V3.r;const s=r.getDrawingB
   P.lv.forEach((L,i)=>{const d=2<<i;L.a.setSize(Math.max(2,w/d|0),Math.max(2,h/d|0));L.b.setSize(Math.max(2,w/d|0),Math.max(2,h/d|0))})}
 function disposePost(){const P=V3.P;if(!P)return;P.rt.dispose();P.lv.forEach(L=>{L.a.dispose();L.b.dispose()});[P.bright,P.blur,P.comp].forEach(m=>m.dispose());V3.P=null}
 function pass(mat,target){const P=V3.P;P.quad.material=mat;V3.r.setRenderTarget(target);V3.r.render(P.scene,P.cam)}
-function renderFrame(cam){const r=V3.r;if(!V3.post){r.setRenderTarget(null);r.render(V3.scene,cam);return}
+function renderFrame(cam){const r=V3.r;r.info.autoReset=false;r.info.reset();/* PerfHUD reads draws and triangles for the whole frame */if(!V3.post){r.setRenderTarget(null);r.render(V3.scene,cam);return}
   if(!V3.P)makePost();sizePost();const P=V3.P;
   r.setRenderTarget(P.rt);r.render(V3.scene,cam);
   let src=P.rt.texture,sw=P.w,sh=P.h;
@@ -598,15 +610,17 @@ function renderFrame(cam){const r=V3.r;if(!V3.post){r.setRenderTarget(null);r.re
     P.blur.uniforms.t.value=src;P.blur.uniforms.dir.value.set(1/w,0);pass(P.blur,L.b);P.blur.uniforms.t.value=L.b.texture;P.blur.uniforms.dir.value.set(0,1/h);pass(P.blur,L.a);src=L.a.texture});
   const u=P.comp.uniforms;u.tS.value=P.rt.texture;u.b0.value=P.lv[0].a.texture;u.b1.value=P.lv[1].a.texture;u.b2.value=P.lv[2].a.texture;u.time.value=(V3.t*60)%100;pass(P.comp,null)}
 // ---- animation loop ----
-const _v=new THREE.Vector3(),_red=new THREE.Color(1,.1,.05),_ko=new THREE.Color(0x8a8190);
-function loop3D(){requestAnimationFrame(loop3D);V3.frames=(V3.frames||0)+1;const raw=V3.clock.getDelta();const dt=Math.min(.12,raw);V3.t+=dt;const t=V3.t;
-  // adaptive quality: sustained low frame rate for 3 seconds steps one level down
-  if(V3.perf&&!document.hidden){const pf=V3.perf;if(pf.skip>0)pf.skip-=raw;else{pf.t+=raw;pf.n++;if(pf.t>=3){const fps=pf.n/pf.t;pf.t=0;pf.n=0;V3.fps=fps;if(fps<24)stepDown()}}}
+const _up=new THREE.Vector3(0,1,0),_v=new THREE.Vector3(),_red=new THREE.Color(1,.1,.05),_ko=new THREE.Color(0x8a8190);
+function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);V3.frames=(V3.frames||0)+1;const raw=V3.clock.getDelta();const dt=Math.min(.12,raw);V3.t+=dt;const t=V3.t;
+  // the frame-time watch and step-down now live in PerfHUD (p95 over 2 s); PerfHUD.raf also throttles this loop to 10 fps when idle.
+  // V3.busy: something the player should see move smoothly (hops, K.O. falls, hits, dice, particles, camera glides, the speed test)
+  let busy=!!(PH&&PH.testing)||V3.parts.length>0||V3.shake>.001;
   if(V3.dome)V3.dome.material.uniforms.t.value=t;
   if(V3.wn){V3.wn.offset.set(t*.02,t*.013)}
-  if(!G){animWorld(dt,t);renderFrame(V3.cam);return}
+  if(!G){V3.busy=busy;animWorld(dt,t);renderFrame(V3.cam);return}
   // monsters
   V3.mons.forEach((o,k)=>{const p=G.pl[k];if(!p)return;const g=o.g;const act=k===G.active&&!G.winner;
+    if(o.hop!==undefined||o.land>0||o.shakeT>0||o.flash>0||(o.ko!==undefined&&o.ko<1))busy=true;
     if(o.hop!==undefined){o.hop=Math.min(1,o.hop+dt/.85);const e=o.hop;const ee=e<.5?2*e*e:1-Math.pow(-2*e+2,2)/2;g.position.lerpVectors(o.from,o.to,ee);g.position.y+=Math.sin(Math.PI*e)*4.2;o.land=0;
       if(e>=1){o.hop=undefined;o.land=1;V3.shake=Math.min(1,V3.shake+.25);spawn('puff',g.position.clone().add(new THREE.Vector3(0,.3,0)),7,1.2)}}
     let sq=0;if(o.land>0){o.land=Math.max(0,o.land-dt*3.2);sq=Math.sin(o.land*Math.PI)*.12}
@@ -624,10 +638,11 @@ function loop3D(){requestAnimationFrame(loop3D);V3.frames=(V3.frames||0)+1;const
   const co=G.city>=0?V3.mons[G.city]:null;V3.crown.visible=!!co;if(co){V3.crown.position.set(co.g.position.x,co.g.position.y+5.8+Math.sin(t*2)*.12,co.g.position.z);V3.crown.rotation.y=t}
   // dice
   V3.dice.forEach((d,k)=>{if(!d.home)return;const gd=G.dice[k];
+    if(d.t<1||d.pulse>0)busy=true;
     if(d.t<1){d.t=Math.min(1,d.t+dt/d.dur);const e=d.t;const bounce=Math.abs(Math.sin(e*Math.PI*2.5))*(1-e)*1.6;
       d.m.position.lerpVectors(d.start,d.home,1-Math.pow(1-e,3));d.m.position.y=d.home.y+(1-e)*(d.start.y-d.home.y)*(1-e)+bounce;
       const sp=new THREE.Quaternion().setFromAxisAngle(d.axis,d.spins*(1-e)*(1-e));d.m.quaternion.copy(d.final).multiply(sp);if(d.t>=1){snd('clack');d.m.quaternion.copy(d.final);if(gd)setDieFace(d,gd);spawn('puff',d.m.position.clone().add(V3.tray.position).setY(.5),2,.25)}}
-    else{const hov=V3.hover===k;const up=gd&&gd.k?.35+Math.sin(t*4)*.05:hov?.14:0;d.lift=(d.lift||0)+(up-(d.lift||0))*Math.min(1,dt*12);d.m.position.set(d.home.x,d.home.y+d.lift,d.home.z);d.m.quaternion.slerp(d.final,.2)}
+    else{const hov=V3.hover===k;const up=gd&&gd.k?.35+Math.sin(t*4)*.05:hov?.14:0;if(!(gd&&gd.k)&&Math.abs(up-(d.lift||0))>.004)busy=true;d.lift=(d.lift||0)+(up-(d.lift||0))*Math.min(1,dt*12);d.m.position.set(d.home.x,d.home.y+d.lift,d.home.z);d.m.quaternion.slerp(d.final,.2)}
     if(d.pulse>0)d.pulse=Math.max(0,d.pulse-dt*3);const s=1+(d.pulse||0)*.12+(V3.hover===k?.04:0);d.m.scale.setScalar(s);
     if(d.blob){d.blob.position.set(d.m.position.x,.02,d.m.position.z);const hgt=Math.max(0,d.m.position.y-.52);d.blob.material.opacity=.6/(1+hgt*1.2);d.blob.scale.setScalar(1+hgt*.25)}});
   // particles
@@ -637,10 +652,10 @@ function loop3D(){requestAnimationFrame(loop3D);V3.frames=(V3.frames||0)+1;const
   // camera: eased towards the framed position, gentle sway, shake on hits, a slow push-in on the winner
   const cam=V3.cam;const sway=Math.sin(t*.25)*1.2;V3.shake=Math.max(0,V3.shake-dt*1.8);
   const wi=G.winner&&G.winner!=='draw'?V3.mons[+G.winner.slice(1)-1]:null;V3.zoom=Math.max(0,Math.min(1,(V3.zoom||0)+(wi?dt*.6:-dt*2)));
-  const base=V3.look.clone().addScaledVector(V3.camOff||CAMOFF,V3.camK||1);base.x+=sway;const look=V3.look.clone();
+  const base=V3.look.clone().addScaledVector(V3.camOff||CAMOFF,V3.camK||1);if(V3.orbA){base.sub(V3.look).applyAxisAngle(_up,V3.orbA).add(V3.look)}base.x+=sway;const look=V3.look.clone();
   if(wi&&V3.zoom>0){const wp=wi.g.position;const e=V3.zoom*V3.zoom*(3-2*V3.zoom);base.lerp(new THREE.Vector3(wp.x*.6,wp.y+8,wp.z+13),e);look.lerp(new THREE.Vector3(wp.x,wp.y+3,wp.z),e)}
   if(V3.debugCam){base.copy(V3.debugCam.pos);look.copy(V3.debugCam.look)}
-  if(!V3.camP||V3.debugCam){V3.camP=base.clone();V3.camL=look.clone()}else{const k=1-Math.exp(-dt*5);V3.camP.lerp(base,k);V3.camL.lerp(look,k)}
+  if(!V3.camP||V3.debugCam){V3.camP=base.clone();V3.camL=look.clone()}else{const k=1-Math.exp(-dt*5);if(V3.camP.distanceToSquared(base)>.02||V3.camL.distanceToSquared(look)>.02||(wi&&V3.zoom<1))busy=true;V3.camP.lerp(base,k);V3.camL.lerp(look,k)}V3.busy=busy;
   cam.position.set(V3.camP.x+(Math.random()-.5)*V3.shake*.5,V3.camP.y+(Math.random()-.5)*V3.shake*.5,V3.camP.z);cam.lookAt(V3.camL);
   renderFrame(cam);
   // name tags follow monsters

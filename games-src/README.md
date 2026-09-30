@@ -58,6 +58,20 @@ Run them from each game's folder unless noted, and read the header of each scrip
 - **Sunglaze** (`azul/game/`): `gauntlet.js` (or `run_gauntlet.sh`), `cover.js`, `click.js`, `lay.js`.
 - **Rampart & Vine** (`carc/game/`): `graph_test.js`, `geo_test.js`, `gauntlet.js`, `cover.js`, `click.js`, `lay.js`.
 
+## Shared audio and speed tool
+
+- **`audio/gameaudio.js`:** the playback module every game inlines. It decodes lazily on the first gesture and falls back to the game's synthesized sounds.
+- **`audio/<game>/audio-data.js`:** each game's CC0 or CC-BY sound effects and music as base64 MP3. Each folder also has a `MAP.md` (event to sample) and a `credits.html`.
+- **Licence log:** `audio/ASSETS.md` for every audio file, with snapshots of the licence pages in `audio/licence-snapshots/`. `audio/tools/` rebuilds the bundles, but needs the raw downloads, which are not committed.
+- **Swapping a sound:** edit `SND_MAP` at the top of that game's `sound.js`. `s:null` goes back to the synth, and `vol` sets the level.
+- **`perf/perfhud.js`:** the speed tool. It provides:
+  - the overlay (`?fps=1` or F9);
+  - Test speed and Copy report;
+  - automatic quality step-down and step-up;
+  - the idle battery saver.
+  
+  `perf/INTEGRATE.md` explains how to add it to a game.
+
 ## The shelf and the reference page
 
 - **Shelf:** `suite/src.html` is the source of the Game Night Shelf.

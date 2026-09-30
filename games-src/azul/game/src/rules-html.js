@@ -14,7 +14,20 @@ const RULES_HTML=`<div class="rules">
 <h3>Variant · Unmarked mosaic</h3><p>Everyone uses a plain grey mosaic. When a rack is full you choose any empty space in that row, but no glaze may appear twice in any row or any column. If a full rack has no legal space, all of its tiles fall to breakage.</p>
 <h3>Variant · Prism tiles (promo)</h3><p>With 2 players take out 1 tile of each glaze and add 5 prism tiles; with 3 or 4 take out 2 of each and add 10. You may take all the prisms from a kiln or the courtyard, and if you do you may also take all the tiles of one other glaze from the same place; everything goes on one rack. A rack may hold one glaze plus prisms. When a rack with a prism is full, a prism is the tile that goes to the mosaic (on that glaze's space; a rack of only prisms may go to any empty space in the row). A prism blocks that glaze in its row and counts for rows and columns, but never for the +10 full-glaze bonus.</p>
 <h3>Not included</h3><p>The Crystal Mosaic boards (C and D sides) are left out: we could not confirm where their coloured spaces sit. The Special Factories promo is left out too: its factory powers are not documented in any source we could reach.</p>
-<p class="small muted">Names, text and art are original for copyright reasons; the rules follow the published game.</p></div>`;
+<h3>Credits</h3>
+<section class="credits-audio">
+<h4>Audio</h4>
+<p>Used under Creative Commons Attribution:</p>
+<ul>
+<li>Music: &ldquo;Morning&rdquo; by <a href="https://incompetech.com" target="_blank" rel="noopener">Kevin MacLeod</a> (incompetech.com), source <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2300003" target="_blank" rel="noopener">incompetech.com</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons: By Attribution 4.0</a>. Modified: cut to a 114 s seamless loop, loudness-normalised, re-encoded to MP3.<br><small>&quot;Morning&quot; Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/</small></li>
+</ul>
+<p>With thanks to these public-domain (CC0) creators:</p>
+<ul>
+<li>Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, UI Audio by <a href="https://kenney.nl" target="_blank" rel="noopener">Kenney</a> (CC0)</li>
+</ul>
+<p class="small muted">All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</p>
+</section>
+<p class="small muted">Names, card text and art are original; the rules follow the published game.</p></div>`;
 // the reference list: every tile, token and table, with counts (also dumped for the shared reference page)
 const REF=[
   ...[0,1,2,3,4].map(k=>({s:'Tiles',n:TNAME[k],tags:['glazed tile','base game'],t:`One of the five glazes. On the printed mosaic it sits on the diagonal that starts at row 1, column ${WALLCOL(k,0)+1}. With prism tiles: 19 (2 players) or 18 (3–4 players).`,c:20})),

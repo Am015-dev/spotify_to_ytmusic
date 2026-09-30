@@ -92,7 +92,7 @@ body{background:#4a2e1c}
 .gx-bar h1{color:#ffe0a6;text-shadow:0 1px 0 #3a200f,0 0 12px rgba(255,200,110,.25);display:flex;align-items:center;gap:8px}
 .gx-bar h1::before{content:"";width:22px;height:22px;flex:0 0 auto;border-radius:5px;background:linear-gradient(135deg,#9fb452 0 48%,#d9c092 48% 60%,#9fb452 60%),#9fb452;box-shadow:0 0 0 1.5px #e7c27a,0 2px 3px rgba(0,0,0,.4) ;transform:rotate(-6deg)}
 .gx-bar .gx-ibtn{background:linear-gradient(180deg,rgba(255,226,180,.16),rgba(255,226,180,.04));border:1px solid rgba(255,214,150,.26);box-shadow:0 1px 0 rgba(255,235,200,.16) inset,0 1px 2px rgba(0,0,0,.35);color:#fdeccc;transition:transform .12s var(--ease),background .15s,border-color .15s,box-shadow .15s}
-.gx-bar .gx-ibtn:hover{background:linear-gradient(180deg,rgba(255,226,180,.28),rgba(255,226,180,.1));border-color:rgba(255,220,160,.55);transform:translateY(-1px)}
+/* hover never moves a hit box (a lift can flicker hover on and off under a still pointer) */.gx-bar .gx-ibtn:hover{background:linear-gradient(180deg,rgba(255,226,180,.28),rgba(255,226,180,.1));border-color:rgba(255,220,160,.55)}
 .gx-bar .gx-ibtn:active{transform:translateY(1px);box-shadow:0 1px 3px rgba(0,0,0,.45) inset}
 .gx-bar .gx-ibtn.on,.gx-bar .gx-ibtn[aria-pressed="true"]{background:linear-gradient(180deg,rgba(255,210,120,.42),rgba(230,160,60,.22));border-color:#ffd99a;box-shadow:0 0 0 1px rgba(255,210,130,.25),0 0 10px rgba(255,190,90,.25)}
 .gx-bar .gx-ibtn[aria-expanded="true"]{background:rgba(255,215,140,.3);border-color:#ffd99a}
@@ -108,7 +108,7 @@ body{background:#4a2e1c}
 .gx-scrim{background:radial-gradient(ellipse at center,rgba(40,22,8,.3),rgba(30,15,5,.6))}
 #chip{background:linear-gradient(180deg,rgba(60,38,22,.86),rgba(38,24,14,.86));border:1px solid rgba(255,214,150,.3);box-shadow:0 2px 8px rgba(0,0,0,.3),0 1px 0 rgba(255,230,190,.15) inset;display:flex;align-items:center;gap:5px}
 .btn{background:linear-gradient(180deg,#fffdf7,#f4e8d0);border:1px solid #d6bf94;box-shadow:var(--sh1);transition:transform .12s var(--ease),box-shadow .15s,background .15s,border-color .15s;display:inline-flex;align-items:center;gap:6px}
-.btn:hover{background:linear-gradient(180deg,#fffefa,#f8ecd4);border-color:#c9a86e;transform:translateY(-1px);box-shadow:0 1px 0 #fff inset,0 3px 8px rgba(90,55,20,.18)}
+.btn:hover{background:linear-gradient(180deg,#fffefa,#f8ecd4);border-color:#c9a86e;box-shadow:0 1px 0 #fff inset,0 3px 8px rgba(90,55,20,.18)}
 .btn:active{transform:translateY(1px);box-shadow:0 1px 3px rgba(90,55,20,.25) inset}
 .btn.go{background:linear-gradient(180deg,#d4744a,#b2502e 60%,#9c4326);border-color:#833619;color:#fff8ec;text-shadow:0 1px 0 rgba(80,25,5,.5);box-shadow:0 1px 0 rgba(255,210,170,.5) inset,0 2px 6px rgba(140,55,20,.35)}
 .btn.go:hover{background:linear-gradient(180deg,#dc7f53,#b95733 60%,#a0472a)}
@@ -120,7 +120,7 @@ body{background:#4a2e1c}
 .stat{background:linear-gradient(90deg,rgba(255,255,255,.75),rgba(255,255,255,.45));box-shadow:0 1px 2px rgba(90,55,20,.08)}.stat.cur{background:#fff;box-shadow:0 0 0 2px var(--pc) inset,0 2px 8px rgba(90,55,20,.14)}
 .stat .ic{width:1.05em;height:1.05em;opacity:.85}.stat>span{display:inline-flex;align-items:center;gap:2px}
 .tcard{border-radius:9px}.tthumb{box-shadow:0 0 0 2px #6b4f35,0 0 0 3px #d9bf8c,0 3px 6px rgba(60,30,10,.35);filter:none;background:#6b4f35}
-.hc{background:linear-gradient(#fffdf8,#f6ecd8);box-shadow:var(--sh1);transition:transform .12s,border-color .15s;display:inline-flex;align-items:center;gap:5px}.hc:hover{transform:translateY(-1px)}.hc.on{background:linear-gradient(#fff1dc,#ffe0bd)}
+.hc{background:linear-gradient(#fffdf8,#f6ecd8);box-shadow:var(--sh1);transition:transform .12s,border-color .15s;display:inline-flex;align-items:center;gap:5px}.hc.on{background:linear-gradient(#fff1dc,#ffe0bd)}
 .coach{background:linear-gradient(180deg,#f3f7e6,#e6eed0);border-color:#a9b872;box-shadow:0 1px 0 #fff8 inset}.advice{background:linear-gradient(180deg,#effdff,#dcf4f8)}
 .recap{background:linear-gradient(180deg,#f7f1ff,#ece2fb)}.recap.mine{background:linear-gradient(180deg,#f0f9ea,#e1f0d8)}
 .story{box-shadow:0 1px 0 #fff8 inset,0 2px 6px rgba(150,100,20,.12)}
@@ -130,7 +130,7 @@ body{background:#4a2e1c}
 .mbox{background:var(--noise),linear-gradient(180deg,#fdf8ec,#f4e6c8);border:1px solid #c99a4a;box-shadow:0 0 0 4px rgba(255,248,230,.55) inset,0 0 0 5px #d8b36a inset,0 30px 70px rgba(40,20,5,.55);animation:mpop .32s var(--ease)}
 .mbox h2{letter-spacing:.02em;text-shadow:0 1px 0 #fff}
 @keyframes mpop{from{opacity:0;transform:translateY(10px) scale(.975)}to{opacity:1;transform:none}}
-.seg button{background:linear-gradient(#fffdf8,#f3e6cc);box-shadow:var(--sh1);transition:transform .12s}.seg button:hover{transform:translateY(-1px)}.seg button.on{background:linear-gradient(#d4744a,#a9492a);color:#fff;border-color:#833619}
+.seg button{background:linear-gradient(#fffdf8,#f3e6cc);box-shadow:var(--sh1);transition:transform .12s}.seg button.on{background:linear-gradient(#d4744a,#a9492a);color:#fff;border-color:#833619}
 @media (prefers-reduced-motion:reduce){.mbox{animation:none}.btn,.gx-ibtn,.hc{transition:none}}
 </style>
 </head>

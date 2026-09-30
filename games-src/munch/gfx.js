@@ -4,12 +4,13 @@ const GFX=(function(){
   const HAS_DOM=typeof document!=='undefined';
   const JSDOM=typeof navigator!=='undefined'&&/jsdom/i.test(navigator.userAgent||'');
   const LV=['low','medium','high'],NAME={low:'Low',medium:'Medium',high:'High'};
+  const PH=typeof PerfHUD!=='undefined'?PerfHUD:null,RAF=f=>PH?PH.raf(f):requestAnimationFrame(f);
   let level='high',auto=true,embersOn=false;
   const reduce=()=>{try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}};
   function autoPick(){let small=false;try{small=Math.min(innerWidth,innerHeight)<700||matchMedia('(pointer:coarse)').matches}catch(e){}return small?'medium':'high'}
   function load(){let v=null;try{v=localStorage.getItem('dkd_gfx')}catch(e){}if(LV.includes(v)){auto=false;return v}auto=true;return autoPick()}
   function apply(v){level=v;if(HAS_DOM)document.documentElement.dataset.gfx=v;setEmbers(v==='high')}
-  function set(v,persist){if(!LV.includes(v))return;if(persist){auto=false;try{localStorage.setItem('dkd_gfx',v)}catch(e){}}apply(v);if(typeof syncGfxBtn==='function')syncGfxBtn()}
+  function set(v,persist){if(!LV.includes(v))return;if(persist){auto=false;try{localStorage.setItem('dkd_gfx',v)}catch(e){}if(PH)PH.hitch()}apply(v);if(typeof syncGfxBtn==='function')syncGfxBtn()}
   function cycle(){set(LV[(LV.indexOf(level)+2)%3],true)}
   // ---- procedural textures (periodic value noise, so the tiles repeat without seams) ----
   function noise(seed,px,py){const p=new Uint8Array(512);let s=seed>>>0;for(let i=0;i<256;i++)p[i]=i;for(let i=255;i>0;i--){s=Math.imul(s^s>>>15,2246822507)+i>>>0;const j=s%(i+1);const t=p[i];p[i]=p[j];p[j]=t}for(let i=0;i<256;i++)p[i+256]=p[i];
@@ -58,7 +59,7 @@ const GFX=(function(){
   // ---- embers drifting up through the candle light (High only) ----
   let cv=null,ctx=null,parts=[],raf=0,lastE=0;
   function setEmbers(on){embersOn=on&&!JSDOM&&HAS_DOM&&!reduce();if(!HAS_DOM)return;
-    if(!embersOn){if(cv){cv.remove();cv=null}return}
+    if(!embersOn){if(cv){cv.remove();cv=null}return}if(!raf&&!JSDOM&&typeof requestAnimationFrame==='function')raf=RAF(frame);
     if(!cv){const host=document.querySelector('.gx-main');if(!host)return;cv=document.createElement('canvas');cv.className='embers';cv.setAttribute('aria-hidden','true');host.appendChild(cv);ctx=cv.getContext('2d');if(!ctx){cv.remove();cv=null;embersOn=false;return}sizeEmbers()}}
   function sizeEmbers(){if(!cv)return;const b=document.querySelector('.gx-board');if(!b)return;const r=b.getBoundingClientRect(),hr=cv.parentNode.getBoundingClientRect();const dpr=Math.min(2,devicePixelRatio||1);
     cv.style.left=(r.left-hr.left)+'px';cv.style.top=(r.top-hr.top)+'px';cv.style.width=r.width+'px';cv.style.height=r.height+'px';cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}
@@ -68,16 +69,17 @@ const GFX=(function(){
     for(const p of parts){p.l+=dt;p.x+=(p.vx+Math.sin(p.l*1.3+p.ph)*6)*dt;p.y+=p.vy*dt;const a=Math.sin(Math.min(1,p.l/p.m)*Math.PI)*.55;
       const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*4);g.addColorStop(0,`rgba(255,214,140,${a})`);g.addColorStop(1,'rgba(255,140,40,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(p.x,p.y,p.r*4,0,6.283);ctx.fill()}
     parts=parts.filter(p=>p.l<p.m&&p.y>-10)}
-  // ---- frame watchdog: if frames drop badly for 3 seconds, step down one level ----
-  let lastT=0,slowSince=0,started=0,busyAt=0;
-  function frame(t){raf=requestAnimationFrame(frame);if(!started)started=t;const dt=t-lastT;lastT=t;
-    if(embersOn)stepEmbers(t);
-    if(level==='low'||t-started<6000||t-busyAt<2500||document.hidden){slowSince=0;return}
-    if(dt>45){if(!slowSince)slowSince=t;else if(t-slowSince>3000){slowSince=0;set(LV[LV.indexOf(level)-1],false);if(typeof syncMenu==='function')try{syncMenu()}catch(e){}}}
-    else if(dt<34)slowSince=0}
+  // ---- embers loop (High only). The frame watchdog and step-down are PerfHUD's standard controller now (see register below) ----
+  function frame(t){if(!embersOn){raf=0;return}raf=RAF(frame);stepEmbers(t)}
+  // PerfHUD: FPS-only stats (no renderer); Apply on the speed-test card is a choice by hand; auto changes are not saved
+  function perf(){if(!PH)return;PH.register({game:'Doorkick Dungeon',levels:['high','medium','low'],names:NAME,anchor:'.felt',corner:'bl',
+    getLevel:()=>level,isAuto:()=>auto,autoTop:()=>autoPick(),setLevel:(l,why)=>{set(l,why==='apply');if(typeof syncMenu==='function')try{syncMenu()}catch(e){}},
+    // something is animating = a card flight, deal or clash is running (the endless CSS loops and the embers do not count)
+    isAnimating:()=>{try{return document.getAnimations().some(a=>a.playState==='running'&&isFinite(a.effect.getComputedTiming().endTime))}catch(e){return false}},
+    beforeTest:()=>{try{if(typeof GX!=='undefined'&&GX.close)GX.close()}catch(e){}}});PH.hitch(6000)}  // load: textures bake and card art is flattened in the first seconds
   // ---- card motion: a played card flies from the hand to where it lands; new cards are dealt from the deck ----
   function motion(){return HAS_DOM&&!JSDOM&&level!=='low'&&!reduce()&&typeof Element!=='undefined'&&typeof Element.prototype.animate==='function'&&(typeof ANIM==='undefined'||ANIM)}
-  function snap(root){try{busyAt=performance.now()}catch(e){}if(!motion()||!root)return null;const m=new Map();root.querySelectorAll('.hand [data-card]').forEach(e=>{const r=e.getBoundingClientRect();if(r.width)m.set(e.dataset.card,{r,h:e.outerHTML})});
+  function snap(root){if(PH)PH.wake();if(!motion()||!root)return null;const m=new Map();root.querySelectorAll('.hand [data-card]').forEach(e=>{const r=e.getBoundingClientRect();if(r.width)m.set(e.dataset.card,{r,h:e.outerHTML})});
     const decks={};root.querySelectorAll('.pile .stack').forEach(s=>{decks[s.classList.contains('door')?'door':'tr']=s.getBoundingClientRect()});return {m,decks,started:!!root.querySelector('.hand')}}
   function after(root,s){if(!s||!motion()||!root)return;const host=document.querySelector('.gx-main');if(!host)return;const hr=host.getBoundingClientRect();
     const now=new Set();let k=0;
@@ -101,7 +103,7 @@ const GFX=(function(){
       const f=document.createElement('span');f.className='fxdelta '+(d>0?'up':'dn');f.textContent=(d>0?'+':'−')+Math.abs(d);s.appendChild(f);setTimeout(()=>f.remove(),1150)};
     pop('.score.hero',a-prev.a);pop('.score.mons',b-prev.b)}
   function init(){if(!HAS_DOM)return;textures();apply(load());
-    if(!JSDOM&&typeof requestAnimationFrame==='function')raf=requestAnimationFrame(frame);
+    perf();
     try{addEventListener('resize',()=>{sizeEmbers();if(auto){const v=autoPick();if(v!==level&&!(v==='high'&&level!=='high'))apply(v)}})}catch(e){}
     if(typeof GX!=='undefined'&&GX.onResize)GX.onResize(()=>sizeEmbers())}
-  return {init,set,cycle,snap,after,clash,motion,get level(){return level},name:()=>NAME[level],sizeEmbers}})();
+  return {init,set,cycle,snap,after,clash,motion,get level(){return level},get auto(){return auto},name:()=>NAME[level],sizeEmbers}})();

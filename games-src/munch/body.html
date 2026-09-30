@@ -13,7 +13,7 @@
   <button class="gx-ibtn dk-wide" data-a="hints" id="hintbtn" title="Suggested moves"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-hint"/></svg> On</button>
   <button class="gx-ibtn dk-wide" data-a="gfx" id="gfxbtn" title="Graphics quality (High / Medium / Low)" aria-label="Graphics quality"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-gem"/></svg> High</button>
   <button class="gx-ibtn dk-wide" data-a="new">New game</button>
-  <button class="gx-ibtn dk-narrow" data-gx="dkMenu" aria-label="Menu: sound, speed, hints, graphics, new game"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg></button>
+  <button class="gx-ibtn dk-menub" data-gx="dkMenu" aria-label="Menu: sound, speed, hints, graphics, speed test, new game" title="Menu (and Show speed / Test speed)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg></button>
 </header>
 <div class="gx-main">
   <main class="gx-board" id="app"></main>
@@ -29,12 +29,15 @@
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="modal" class="modal" hidden></div>
 <script src="shell.js"></script>
+<script src="perfhud.js"></script>
 <script src="cards.js"></script>
 <script src="rules-html.js"></script>
 <script src="art.js"></script>
 <script src="gfx.js"></script>
 <script src="engine.js"></script>
 <script src="ai.js"></script>
+<script src="gameaudio.js"></script>
+<script src="audio-data.js"></script>
 <script src="sound.js"></script>
 <script src="coach.js"></script>
 <script src="ui.js"></script>

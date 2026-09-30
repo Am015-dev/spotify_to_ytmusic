@@ -9,7 +9,7 @@ function refresh(){if(UI.recBusy)return;if(G){try{if(!G.over)localStorage.setIte
   // the last beat always shows the live state; an ending gets its own scene
   const B=UI.beats;if(B.length){B[B.length-1].snap=null;B[B.length-1].obj=null}
   if(G.over&&(!B.length||B[B.length-1].kind!=='over')&&typeof document!=='undefined'){beat('over');UI.overSeen=false}
-  playFx();render();try{withView(()=>sync3D())}catch(e){console.error(e)}schedule()}
+  playFx();render();try{withView(()=>sync3D())}catch(e){console.error(e)}try{if(typeof audioMood==='function')audioMood()}catch(e){}schedule()}
 function newLogSince(mark){if(mark==null)return[];const n=G.logN-mark;return G.log.slice(0,Math.max(0,n)).reverse()}
 function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){const m={skill:'good'}[f.t];if(m&&typeof sfx==='function')sfx(m);
     if(f.t==='explore'||f.t==='build'||f.t==='wound'||f.t==='fight')UI.bump=f}
@@ -24,7 +24,13 @@ function svgi(n){return ICON[n]?`<svg class="ic" viewBox="0 0 24 24" aria-hidden
 function paintIcons(){document.querySelectorAll('[data-ico]').forEach(el=>{if(!el.querySelector(':scope>.ic'))el.insertAdjacentHTML('afterbegin',svgi(el.dataset.ico))})}
 function setBtn(el,ic,txt){if(!el)return;const h=svgi(ic)+(txt?`<span>${txt}</span>`:'');if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h}}
 function gfxBtn(){setBtn(document.getElementById('gfxbtn'),'gfx',typeof gfxLabel==='function'?gfxLabel():'Graphics')}
-function onGfxChange(){gfxBtn()}
+function onGfxChange(){gfxBtn();if(!$('#gfxpop').hidden)renderGfx()}
+// the Graphics popover: Auto / High / Medium / Low, plus PerfHUD's Show speed and Test speed
+function renderGfx(){const p=$('#gfxpop');const cur=typeof V3!=='undefined'?V3.pref:'auto';const q=(k,n)=>`<button class="gx-ibtn" data-a="gfxq" data-q="${k}" aria-pressed="${cur===k}">${n}</button>`;
+  p.innerHTML=`<h3>Graphics</h3><div class="gq">${q('auto','Auto')}${q('high','High')}${q('med','Med')}${q('low','Low')}</div><small>${typeof gfxLabel==='function'?'Now: '+gfxLabel()+'. ':''}Auto steps down on a slow device.</small><h3>Speed</h3>${typeof PerfHUD!=='undefined'?PerfHUD.buttonsHTML('gx-ibtn'):''}`}
+function openGfx(){const p=$('#gfxpop'),b=$('#gfxbtn');renderGfx();p.hidden=false;if(b)b.setAttribute('aria-expanded','true');let r=b&&b.getBoundingClientRect();if(!r||!r.width)r={left:innerWidth-8,right:innerWidth-8,bottom:56};
+  const w=p.offsetWidth;p.style.left=Math.max(8,Math.min(innerWidth-w-8,r.right-w))+'px';p.style.top=Math.round(r.bottom+6)+'px'}
+function closeGfx(){const p=$('#gfxpop');if(p&&!p.hidden){p.hidden=true;const b=$('#gfxbtn');if(b)b.setAttribute('aria-expanded','false')}}
 // ---------- top-level render ----------
 function render(){if(!G){renderModal();renderStory();renderRoadmap();return}msgCheck();wizSync();renderRoadmap();withView(()=>{renderHud();renderMap2D()});renderStep();renderPanel();renderStory();renderModal();
   const pb=$('#pausebtn');if(pb){pb.hidden=!allAI();pb.textContent=UI.pause?'▶ Resume':'⏸ Pause'}setBtn($('#speedbtn'),'fast',({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'));gfxBtn()}
@@ -193,6 +199,7 @@ function tryStart(force){if(!planOpen())return;if(!force){const red=uncoveredRed
 function pulsePos(p){if(UI.hoverPos===p)return;UI.hoverPos=p;try{if(V3.lab)for(const id in V3.lab)V3.lab[id].classList.toggle('pulse',+id===p);if(!V3.on)withView(()=>renderMap2D())}catch(e){}}
 document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closest('.gx-dock [data-pos]');if(pr){pulsePos(+pr.dataset.pos);clearTimeout(UI.pt);UI.pt=setTimeout(()=>pulsePos(null),2500)}
   if(!e.target.closest('#moremenu,[data-a=menu]'))closeMenu();
+  if(!e.target.closest('#gfxpop,[data-a=gfx]'))closeGfx();
   const b=e.target.closest('button,[data-tile],input[type=checkbox],summary');if(!b)return;const d=b.dataset;
   if(d.tab){UI.tab=d.tab;render();return}
   if(d.ans!=null){sfx('click');answer(+d.ans);return}
@@ -243,11 +250,12 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'rulesstart':UI.modal=null;$('#modal').hidden=true;$('#modal').dataset.h='';GX.show('rulesd');UI.backToStart=!G;return;
   case 'cards':GX.show('cardsd');renderCards();return;case 'rules':GX.show('rulesd');return;case 'close':UI.modal=G?null:'start';if(!G)$('#modal').dataset.h='';render();return;
   case 'snd':toggleSound();return;case 'mus':toggleMusic();return;
-  case 'gfx':{const o=['auto','high','med','low'];setGfx(o[(o.indexOf(V3.pref)+1)%4]);gfxBtn();return}
+  case 'gfx':if($('#gfxpop').hidden)openGfx();else closeGfx();return;
+  case 'gfxq':setGfx(d.q);gfxBtn();renderGfx();return;
   case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?0.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return}});
 document.addEventListener('input',e=>{const t=e.target;if(t.dataset.cq!=null){UI.cq=t.value;const pos=t.selectionStart;renderCards();const i=$('#cardsbody [data-cq]');if(i){i.focus();i.setSelectionRange(pos,pos)}}if(t.dataset.opt==='items')UI.setup.items=+t.value});
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset.opt==='items')UI.setup.items=+t.value});
-document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;if(e.key==='Escape'){if(UI.modal&&G){UI.modal=null;render()}else if(UI.report){UI.report=null;render()}else{UI.sel=null;UI.tileSel=null;render()}}
+document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;if(e.key==='Escape'){if(!$('#gfxpop').hidden){closeGfx();return}if(UI.modal&&G){UI.modal=null;render()}else if(UI.report){UI.report=null;render()}else{UI.sel=null;UI.tileSel=null;render()}}
   if(!G||UI.modal)return;if(storyActive()){if((e.key==='Enter'||e.key===' '||e.key==='ArrowRight')&&!humanQ()){e.preventDefault();storyNext()}return}if(e.key==='Enter'&&planOpen()&&!G.q&&!allAI()){if(e.target.closest&&e.target.closest('button'))return;if(pstep()<4){setPStep(pstep()+1);render()}else tryStart(!!UI.confirm||uncoveredRed().length>0)}if((e.key==='h'||e.key==='H')&&planOpen()){suggestPlan();setPStep(3);render()}});
 // hovering or tapping a job pulses its place on the map
 document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.closest('.gx-dock [data-pos]');pulsePos(t?+t.dataset.pos:null)});

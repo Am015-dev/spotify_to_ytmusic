@@ -1,6 +1,23 @@
-// ---------- sound: every effect is synthesized with Web Audio (no files) ----------
+// ---------- sound: recorded samples (gameaudio.js + audio-data.js, see ASSETS.md) with the synthesized Web Audio sounds below as the fallback ----------
+// One line per event: s = sample name in GA_DATA (null = use the synth), vol = sample gain (1 = as normalised; 1.4 is about +3 dB).
+// To swap or mute one sound later, change only its line here.
+const SND_MAP={
+  laser:{s:'laser',vol:.7},   ion:{s:'ion',vol:.75},     torp:{s:'torp',vol:.85},
+  engine:{s:'engine',vol:.7}, roll:{s:'roll',vol:.75},   shield:{s:'shield',vol:.7},
+  hull:{s:'hull',vol:.85},    crit:{s:'crit',vol:.9},    boom:{s:'boom',vol:1},
+  miss:{s:'miss',vol:.8},     dice:{s:'dice',vol:1.5},   token:{s:'token',vol:1.4},
+  lock:{s:'lock',vol:.6},     stress:{s:'stress',vol:.6},rock:{s:'rock',vol:.85},
+  turn:{s:'turn',vol:.6},     win:{s:'win',vol:.9},      click:{s:'click',vol:.5},
+  engine_loop:{s:'engine_loop',vol:.3}   // quiet hum while ships fly a maneuver (no synth version)
+};
+const MUSIC_MAP={main:'main'};           // null = the synthesized groove
 const SND={ctx:null,on:true,music:true,vol:.7,last:{},nb:null,beat:0,mTimer:null};
 try{SND.on=localStorage.getItem('na_snd')!=='0';SND.music=localStorage.getItem('na_mus')!=='0'}catch(e){}
+// GA decodes the samples on the first user gesture; until then (or with no Web Audio, as in jsdom) GA.has() is false and the synth plays
+const GAOK=typeof GA!=='undefined'&&typeof GA_DATA!=='undefined';
+if(GAOK){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'na',musVol:.45});GA.setSfx(SND.on);GA.setMusic(SND.music)}
+function gaMusic(){return GAOK&&MUSIC_MAP.main&&GA.names().indexOf(MUSIC_MAP.main)>=0&&(GA.state().failed||[]).indexOf(MUSIC_MAP.main)<0}
+function sndEngine(on){if(!GAOK)return;const m=SND_MAP.engine_loop;if(on&&SND.on&&m&&m.s&&GA.has(m.s))GA.loop(m.s,{vol:m.vol,fade:.35});else GA.stopLoop((m&&m.s)||'engine_loop',{fade:.7})}
 function audioInit(){if(SND.ctx)return true;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
   try{const c=SND.ctx=new AC();const comp=c.createDynamicsCompressor();comp.threshold.value=-16;comp.ratio.value=4;comp.connect(c.destination);
     SND.master=c.createGain();SND.master.gain.value=SND.on?SND.vol:0;SND.master.connect(comp);
@@ -19,7 +36,9 @@ function tone(f,dur,o){o=o||{};const c=SND.ctx,t=c.currentTime+(o.at||0);const o
 function noise(dur,o){o=o||{};const c=SND.ctx,t=c.currentTime+(o.at||0);const s=c.createBufferSource();s.buffer=SND.nb;s.playbackRate.value=o.rate||1;
   const fl=c.createBiquadFilter();fl.type=o.ft||'bandpass';fl.frequency.setValueAtTime(o.f||2000,t);if(o.fto)fl.frequency.exponentialRampToValueAtTime(o.fto,t+dur);fl.Q.value=o.q||1;
   const g=c.createGain();s.connect(fl);fl.connect(g);g.connect(o.bus||SND.fxBus);env(g,t,o.a||.004,o.v||.3,dur);s.start(t,Math.random());s.stop(t+dur+.05)}
-function sfx(name,k){if(!SND.on||!SND.ctx||SND.ctx.state!=='running')return;const now=performance.now();if(now-(SND.last[name]||0)<(name==='click'?30:70))return;SND.last[name]=now;k=k||1;
+function sfx(name,k){if(!SND.on)return;
+  const m=SND_MAP[name];if(GAOK&&m&&m.s&&GA.has(m.s)){GA.play(m.s,{vol:m.vol,rate:k&&k!==1?k:1,cooldown:name==='click'?30:70,duck:m.duck});return}
+  if(!SND.ctx||SND.ctx.state!=='running')return;const now=performance.now();if(now-(SND.last[name]||0)<(name==='click'?30:70))return;SND.last[name]=now;k=k||1;
   try{switch(name){
   case 'laser':for(let i=0;i<2;i++)tone(1400*k,.16,{type:'sawtooth',to:180*k,v:.22,lp:5000,at:i*.09});break;
   case 'ion':tone(300,.5,{type:'square',to:900,v:.14,lp:2500});noise(.4,{f:3000,q:4,v:.12});break;
@@ -40,17 +59,17 @@ function sfx(name,k){if(!SND.on||!SND.ctx||SND.ctx.state!=='running')return;cons
   case 'win':[392,523,659,784,659,784,1047].forEach((f,i)=>{tone(f,i===6?1.2:.22,{type:'sawtooth',v:.09,lp:2800,at:i*.16});tone(f/2,i===6?1.2:.22,{type:'triangle',v:.1,at:i*.16})});break;
   case 'click':tone(1200,.03,{type:'triangle',v:.05});break;
   }}catch(e){}}
-// music: slow minor pads over a pulsing bass, through reverb
-function musicStart(){if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,150)}
-function musicStop(){clearInterval(SND.mTimer);SND.mTimer=null}
+// music: the recorded track via GA; if it fails to decode, the synth groove below plays instead (slow minor pads over a pulsing bass, through reverb)
+function musicStart(){if(gaMusic()){GA.music(MUSIC_MAP.main,{fade:2});clearTimeout(SND.gaChk);SND.gaChk=setTimeout(()=>{if(SND.music&&!gaMusic())musicStart()},5000);return}if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,150)}
+function musicStop(){clearInterval(SND.mTimer);SND.mTimer=null;if(GAOK)GA.music(null)}
 const CHORDS=[[110,164.8,220,261.6],[98,146.8,196,246.9],[87.3,130.8,174.6,220],[98,146.8,196,233.1]];
-function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;const step=60/84/2;
+function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;if(gaMusic()){clearInterval(SND.mTimer);SND.mTimer=null;GA.music(MUSIC_MAP.main);return}const step=60/84/2;
   while(SND.nextT<c.currentTime+.4){const k=SND.beat%32,at=SND.nextT-c.currentTime,ch=CHORDS[Math.floor(SND.beat/32)%4];
     if(k===0)ch.forEach((f,i)=>tone(f*2,step*31,{type:'sawtooth',v:.035,lp:900,a:1.2,at,bus:SND.rev,det:i*4}));
     if(k%4===0)tone(ch[0]/2,step*1.8,{type:'triangle',v:.28,at,bus:SND.musBus,lp:400});
     if(k%8===6)noise(.08,{f:9000,q:1,v:.05,at,bus:SND.musBus});
     if(k%16===10)tone(ch[3]*2,step*3,{type:'sine',v:.05,at,bus:SND.rev});
     SND.nextT+=step;SND.beat++}}
-function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('na_snd',SND.on?'1':'0')}catch(e){}audioInit();if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
-function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('na_mus',SND.music?'1':'0')}catch(e){}if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
+function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('na_snd',SND.on?'1':'0')}catch(e){}if(GAOK){GA.setSfx(SND.on);if(SND.on&&typeof V3!=='undefined'&&V3.engOn)sndEngine(true)}audioInit();if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
+function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('na_mus',SND.music?'1':'0')}catch(e){}if(GAOK)GA.setMusic(SND.music);if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
 function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.textContent=SND.on?'🔊':'🔇';if(b)b.textContent=SND.music?'🎵 On':'🎵 Off'}

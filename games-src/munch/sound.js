@@ -1,5 +1,23 @@
-// ---------- sound: every effect is synthesized live with Web Audio (no files) ----------
-const SND={ctx:null,on:true,music:true,pitch:1,vol:.7,last:{},nb:null,beat:0,mTimer:null};
+// ---------- sound: recorded samples (GA, gameaudio.js) with every effect also synthesized live as the fallback ----------
+// One table for every event: s = sample name in GA_DATA (null = use the synth), vol = gain for that sample,
+// pitch = follow SND.pitch (the roar of bigger monsters), duck = dip the music (roar, door, level, death, win, smash duck by default).
+const SND_MAP={
+  dice:{s:'dice',vol:1.4},       // short tap: +3 dB
+  clack:{s:'clack',vol:1.5},     // short tap: +3.5 dB
+  smash:{s:'smash',vol:.9},
+  hurt:{s:'hurt',vol:.8},
+  roar:{s:'roar',vol:.9,pitch:true},
+  door:{s:'door',vol:.85},
+  level:{s:'level',vol:.7},
+  bad:{s:'bad',vol:.6},
+  death:{s:'death',vol:.8},
+  curse:{s:'curse',vol:.7,duck:true},
+  whoosh:{s:'whoosh',vol:.6},
+  turn:{s:'turn',vol:.45},       // plays every turn: kept low
+  win:{s:'win',vol:.85},
+  click:{s:'click',vol:.35},     // UI click: kept quiet
+};
+const SND={ctx:null,on:true,music:true,pitch:1,vol:.7,last:{},nb:null,beat:0,mTimer:null,fired:{}};
 try{SND.on=localStorage.getItem('dkd_snd')!=='0';SND.music=localStorage.getItem('dkd_mus')!=='0'}catch(e){}
 function audioInit(){if(SND.ctx)return true;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return false;
   try{const c=SND.ctx=new AC();const comp=c.createDynamicsCompressor();comp.threshold.value=-14;comp.ratio.value=4;comp.connect(c.destination);
@@ -19,7 +37,10 @@ function noise(dur,o){o=o||{};const c=SND.ctx,t=c.currentTime+(o.at||0);const s=
   const fl=c.createBiquadFilter();fl.type=o.ft||'bandpass';fl.frequency.setValueAtTime(o.f||2000,t);if(o.fto)fl.frequency.exponentialRampToValueAtTime(o.fto,t+dur);fl.Q.value=o.q||1;
   const g=c.createGain();s.connect(fl);fl.connect(g);g.connect(o.bus||SND.fxBus);env(g,t,o.a||.004,o.v||.3,dur);s.start(t,Math.random());s.stop(t+dur+.05)}
 const thump=(at,v)=>{tone(120,.35,{to:38,v:v||.7,at});noise(.18,{ft:'lowpass',f:500,v:(v||.7)*.5,at})};
-function sfx(name){if(!SND.on||!SND.ctx||SND.ctx.state!=='running')return;const now=performance.now();if(now-(SND.last[name]||0)<(name==='click'?30:90))return;SND.last[name]=now;
+function sfx(name){if(!SND.on)return;const m=SND_MAP[name];
+  if(m&&m.s&&window.GA&&GA.has(m.s)){const now=performance.now();if(now-(SND.last[name]||0)<(name==='click'?30:90))return;SND.last[name]=now;
+    SND.fired[name]='sample';GA.play(m.s,{vol:m.vol,rate:m.pitch?(SND.pitch||1):1,duck:m.duck});return}
+  if(!SND.ctx||SND.ctx.state!=='running')return;SND.fired[name]='synth';const now=performance.now();if(now-(SND.last[name]||0)<(name==='click'?30:90))return;SND.last[name]=now;
   try{switch(name){
   case 'dice':for(let k=0;k<9;k++){const at=k*.045+Math.random()*.03;noise(.04,{f:2500+Math.random()*2500,q:6,v:.22,at});tone(500+Math.random()*400,.03,{type:'triangle',v:.08,at})}
     for(let k=0;k<5;k++)noise(.05,{f:1800+Math.random()*1200,q:4,v:.16,at:.45+k*.07+Math.random()*.03});break;
@@ -38,10 +59,12 @@ function sfx(name){if(!SND.on||!SND.ctx||SND.ctx.state!=='running')return;const 
   case 'click':tone(1200,.03,{type:'triangle',v:.05});break;
   }}catch(e){}}
 // light background groove (optional)
-function musicStart(){if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,120)}
-function musicStop(){clearInterval(SND.mTimer);SND.mTimer=null}
+function musicStart(){if(window.GA)GA.music('main',{fade:1.5});if(!SND.ctx||SND.mTimer)return;SND.nextT=SND.ctx.currentTime+.1;SND.mTimer=setInterval(musicTick,120)}
+function musicStop(){if(window.GA)GA.music(null);clearInterval(SND.mTimer);SND.mTimer=null}
+// the recorded track owns the music unless it failed to decode: then the synth groove below plays instead
+function gaMusicOk(){if(!window.GA)return false;const s=GA.state();return !!(s&&s.audio&&s.failed.indexOf('main')<0)}
 const BASS=[73.4,0,110,0,98,0,87.3,82.4,73.4,0,110,0,130.8,123.5,110,98];
-function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;const step=60/124/2;
+function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;const step=60/124/2;if(gaMusicOk()){SND.nextT=c.currentTime+.1;return}
   while(SND.nextT<c.currentTime+.3){const k=SND.beat%16,at=SND.nextT-c.currentTime;
     if(BASS[k])tone(BASS[k],step*.8,{type:'triangle',v:.4,at,bus:SND.musBus});if(k%8===4)tone(BASS[k]*4||440,step*.5,{type:'square',v:.05,lp:2000,at,bus:SND.musBus});
     if(k%4===0){tone(110,.2,{to:40,v:.6,at,bus:SND.musBus})}
@@ -49,6 +72,8 @@ function musicTick(){const c=SND.ctx;if(!c||c.state!=='running')return;const ste
     noise(.03,{f:8000,q:1,v:k%2?.08:.14,at,bus:SND.musBus});
     if(k===0&&SND.beat%64===0)[220,261.6,329.6].forEach(f=>tone(f,step*14,{type:'triangle',v:.05,at,bus:SND.musBus,a:.4}));
     SND.nextT+=step;SND.beat++}}
-function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('dkd_snd',SND.on?'1':'0')}catch(e){}audioInit();if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
-function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('dkd_mus',SND.music?'1':'0')}catch(e){}if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
+function toggleSound(){SND.on=!SND.on;try{localStorage.setItem('dkd_snd',SND.on?'1':'0')}catch(e){}audioInit();if(window.GA)GA.setSfx(SND.on);if(SND.master)SND.master.gain.value=SND.on?SND.vol:0;if(SND.on)sfx('click');soundBtns()}
+function toggleMusic(){SND.music=!SND.music;try{localStorage.setItem('dkd_mus',SND.music?'1':'0')}catch(e){}if(window.GA)GA.setMusic(SND.music);if(SND.music){audioInit();musicStart()}else musicStop();soundBtns()}
 function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');const I=typeof ic==='function'?ic:(n=>'');if(a)a.innerHTML=I(SND.on?'sound':'mute');if(b)b.innerHTML=I('music')+(SND.music?' On':' Off')}
+// recorded audio: shares the synth's AudioContext, which is only created on the first gesture, so nothing plays before a click
+if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'dkd',ctx:()=>{audioInit();return SND.ctx}});GA.setSfx(SND.on);GA.setMusic(SND.music)}

@@ -34,7 +34,7 @@ header .sub{font-weight:800;opacity:.95}
 header .spacer{flex:1}
 header .btn{background:#fff;color:#1a1320}
 .btn{border:3px solid #1a1320;background:var(--card);padding:.38rem .85rem;border-radius:10px;box-shadow:3px 3px 0 var(--shadow);font-weight:900;line-height:1.2;transition:transform .08s}
-.btn:hover:not([disabled]){transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--shadow)}
+.btn:hover:not([disabled]){box-shadow:4px 4px 0 var(--shadow)}/* no hover lift: a moving hit box flickers :hover under a still pointer (PerfHUD hover check) */
 .btn:active:not([disabled]){transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}
 .btn.primary{background:var(--yellow);color:#1a1320}
 .btn.danger{background:var(--red);color:#fff}

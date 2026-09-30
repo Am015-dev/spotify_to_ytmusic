@@ -1,19 +1,22 @@
 // ---------- Rampart & Vine in 3D (Three.js r158): printed cardboard tiles and wooden figures on a sunlit farmhouse table.
 // The scene only mirrors G and UI; it never owns game state. Everything here is guarded: jsdom (no WebGL) never calls init3D past the first line.
 const V3={on:false,t:0,tiles:{},protos:{},figs:{},tweens:[],pops:[],fx:[],marks:null,ghost:null,spots:null,look:null,dist:14,tilt:1.02,dirty:true,lastK:null,
-  q:'high',pref:'auto',lockQ:false,slowT:0,okT:0,uTime:{value:0}};
+  q:'high',pref:'auto',uTime:{value:0}};
 const TS=2,TH=.16,U=TS/100;
 const PCOL=['#c8372d','#2d62b8','#e2ae22','#3b8a45','#34323b','#a064c0'];
 const PCOL3=PCOL.map(c=>parseInt(c.slice(1),16));
 // ---------- graphics quality: High (post, 2k soft shadows), Medium (1k shadows, no post), Low (no shadows, no post, no idle animation) ----------
 const GFX={high:{pr:2,sh:2048,post:true,anim:true,nm:'High'},med:{pr:1.5,sh:1024,post:false,anim:true,nm:'Medium'},low:{pr:1,sh:0,post:false,anim:false,nm:'Low'}};
 const GFXQ=['high','med','low'];
-function gfxAuto(){let small=false;try{small=Math.min(innerWidth,innerHeight)<600||(matchMedia('(pointer:coarse)').matches&&Math.max(innerWidth,innerHeight)<1200)}catch(e){}return small?'med':'high'}
+// a software GPU (SwiftShader, llvmpipe) starts on Low: its frames there take seconds, too few for PerfHUD's 2 s window to measure
+function gfxAuto(){if(V3.soft)return 'low';let small=false;try{small=Math.min(innerWidth,innerHeight)<600||(matchMedia('(pointer:coarse)').matches&&Math.max(innerWidth,innerHeight)<1200)}catch(e){}return small?'med':'high'}
 function gfxPref(){try{const v=localStorage.getItem('rv_gfx');return GFX[v]?v:'auto'}catch(e){return 'auto'}}
 V3.pref=gfxPref();
-function setGfx(v){V3.pref=GFX[v]?v:'auto';try{localStorage.setItem('rv_gfx',V3.pref)}catch(e){}V3.lockQ=false;V3.prMul=1;applyQ(V3.pref==='auto'?gfxAuto():V3.pref)}
-function applyQ(q){V3.q=GFX[q]?q:'high';V3.slowT=0;V3.okT=0;if(!V3.r)return;const c=GFX[V3.q],r=V3.r;
-  r.setPixelRatio(Math.min(c.pr,window.devicePixelRatio||1)*(V3.prMul||1));
+const PH=typeof PerfHUD!=='undefined'?PerfHUD:null;
+// setGfx saves a choice by hand (PerfHUD then never changes the level or the resolution); applyQ only applies a level
+function setGfx(v){V3.pref=GFX[v]?v:'auto';try{localStorage.setItem('rv_gfx',V3.pref)}catch(e){}if(PH)PH.hitch();applyQ(V3.pref==='auto'?gfxAuto():V3.pref)}
+function applyQ(q){V3.q=GFX[q]?q:'high';if(!V3.r)return;const c=GFX[V3.q],r=V3.r;
+  {const want=Math.min(c.pr,window.devicePixelRatio||1);r.setPixelRatio(PH?PH.pixelRatio(want):want)}
   const sh=c.sh>0;if(r.shadowMap.enabled!==sh){r.shadowMap.enabled=sh;V3.scene.traverse(o=>{if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.needsUpdate=true)})}
   V3.sun.castShadow=sh;if(sh&&V3.sun.shadow.mapSize.x!==c.sh){V3.sun.shadow.mapSize.set(c.sh,c.sh);if(V3.sun.shadow.map){V3.sun.shadow.map.dispose();V3.sun.shadow.map=null}}
   lowMats(V3.q==='low');if(c.post&&!V3.post)V3.post=makePost();resize3D();V3.dirty=true;if(typeof onGfxChange==='function')onGfxChange()}
@@ -21,11 +24,21 @@ function applyQ(q){V3.q=GFX[q]?q:'high';V3.slowT=0;V3.okT=0;if(!V3.r)return;cons
 function lowMats(low){if(V3.lowM===low)return;V3.lowM=low;const sc=V3.scene;sc.environment=low?null:V3.env;V3.hemi.intensity=low?1.05:.55;if(V3.tableM){V3.tableM.bumpMap=low?null:V3.tableM.map}
   const txs=new Set();const fix=m=>{if(m.userData.top)m.normalMap=low?null:linenNormal();for(const k of ['map','bumpMap','normalMap'])if(m[k])txs.add(m[k]);m.needsUpdate=true};sc.traverse(o=>{if(o.material)[].concat(o.material).forEach(fix)});for(const k in V3.protos)V3.protos[k].traverse(o=>{if(o.material)[].concat(o.material).forEach(fix)});if(V3.tableM)txs.add(V3.tableM.map);
   txs.forEach(t=>{const a=low?1:(V3.aniso||1);if(t.anisotropy!==a){t.anisotropy=a;t.needsUpdate=true}})}
-// frames dropping badly for 3 s: step down one level (then, on Low, lower the resolution)
-function stepDown(){const i=GFXQ.indexOf(V3.q);if(i<GFXQ.length-1){applyQ(GFXQ[i+1]);return}const pr=V3.r.getPixelRatio();if(pr>.55){V3.prMul=(V3.prMul||1)*.75;V3.r.setPixelRatio(Math.max(.5,pr*.75));resize3D()}V3.slowT=0}
+// ---------- PerfHUD hooks: the shared speed overlay, speed test, auto step-down and idle saver (perfhud.js); it replaces the old frame watch and stepDown() ----------
+function perfHooks(){if(!PH)return;
+  PH.register({game:'Rampart & Vine',renderer:V3.r,levels:GFXQ.slice(),names:{high:'High',med:'Medium',low:'Low'},anchor:'.gx-board',corner:'tl',
+    getLevel:()=>V3.q,isAuto:()=>V3.pref==='auto',autoTop:()=>gfxAuto(),
+    // auto, test and restore changes are not saved; Apply on the result card is a choice by hand (saved, never auto-changed)
+    setLevel:(l,w)=>{if(w==='apply')setGfx(l);else applyQ(l);if(typeof renderSettings==='function'&&typeof GX!=='undefined'&&GX.open==='setd')renderSettings()},
+    basePR:()=>Math.min(GFX[V3.q].pr,window.devicePixelRatio||1),onPixelRatio:v=>{V3.r.setPixelRatio(v);resize3D();V3.dirty=true},
+    orbit:t=>{if(t==null){if(V3.orb0){V3.look.copy(V3.orb0.l);V3.tilt=V3.orb0.tilt;V3.orb0=null;placeCam()}return}
+      if(!V3.orb0){V3.orb0={l:V3.look.clone(),tilt:V3.tilt};V3.camTo=null}const a=t*Math.PI*2;V3.look.set(V3.orb0.l.x+Math.sin(a)*1.6,V3.orb0.l.y,V3.orb0.l.z+(1-Math.cos(a))*.9);V3.tilt=V3.orb0.tilt-.08*Math.sin(t*Math.PI);placeCam()},
+    isAnimating:()=>V3.busy,
+    beforeTest:()=>{if(typeof GX!=='undefined'&&GX.open)GX.close()}})}
 function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return false;const cv=document.getElementById('c3');if(!cv)return false;
   let r;try{r=new THREE.WebGLRenderer({canvas:cv,antialias:true,powerPreference:'high-performance'});if(!r.getContext())return false}catch(e){return false}
   V3.r=r;r.shadowMap.enabled=true;r.shadowMap.type=THREE.PCFSoftShadowMap;r.outputColorSpace=THREE.SRGBColorSpace;r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=.94;
+  try{const gl=r.getContext(),ext=gl.getExtension('WEBGL_debug_renderer_info');V3.soft=/swiftshader|llvmpipe|software|softpipe/i.test(String(ext?gl.getParameter(ext.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER)))}catch(e){}
   V3.aniso=Math.min(8,r.capabilities.getMaxAnisotropy());V3.texS=gfxAuto()==='high'?512:384;
   const sc=V3.scene=new THREE.Scene();
   const sky=document.createElement('canvas');sky.width=4;sky.height=256;const x=sky.getContext('2d');const gr=x.createLinearGradient(0,0,0,256);gr.addColorStop(0,'#a9c9dc');gr.addColorStop(.5,'#f3dfbb');gr.addColorStop(1,'#d9b484');x.fillStyle=gr;x.fillRect(0,0,4,256);
@@ -51,7 +64,7 @@ function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return fa
   cv.addEventListener('pointerleave',()=>{if(V3.hover){V3.hover=null;V3.dirty=true}});
   cv.addEventListener('wheel',e=>{e.preventDefault();V3.userMoved=true;const to=clampDist((V3.camTo?V3.camTo.dist:V3.dist)*(1+Math.sign(e.deltaY)*.14));V3.camTo={look:(V3.camTo?V3.camTo.look:V3.look).clone(),dist:to,t:0}},{passive:false});
   V3.on=true;applyQ(V3.pref==='auto'?gfxAuto():V3.pref);
-  new ResizeObserver(resize3D).observe(cv.parentElement);resize3D();document.body.classList.add('three');V3.clock=new THREE.Clock();requestAnimationFrame(loop3D);return true}
+  new ResizeObserver(resize3D).observe(cv.parentElement);resize3D();document.body.classList.add('three');V3.clock=new THREE.Clock();perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
 function pinchD(m){const a=[...m.values()];return a.length<2?0:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}
 function clampDist(d){return Math.max(4.5,Math.min(120,d))}
 function seeded(s){s=s>>>0||1;return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
@@ -112,7 +125,7 @@ void main(){vec3 c=texture2D(t,vUv).rgb+texture2D(b,vUv).rgb*bk;c=aces(c);
     const hw=1/P.a.width,hh=1/P.a.height;for(const k of [1,2.2]){P.blur.uniforms.t.value=P.a.texture;P.blur.uniforms.d.value.set(hw*k,0);P.pass(P.blur,P.b);P.blur.uniforms.t.value=P.b.texture;P.blur.uniforms.d.value.set(0,hh*k);P.pass(P.blur,P.a)}
     P.fin.uniforms.t.value=P.rt.texture;P.fin.uniforms.b.value=P.a.texture;P.fin.uniforms.ex.value=r.toneMappingExposure;P.pass(P.fin,null)};
   return P}
-function draw(){const r=V3.r;if(GFX[V3.q].post&&V3.post){V3.post.render()}else{r.setRenderTarget(null);r.render(V3.scene,V3.cam)}}
+function draw(){const r=V3.r;r.info.autoReset=false;r.info.reset();/* PerfHUD reads draws and triangles for the whole frame */if(GFX[V3.q].post&&V3.post){V3.post.render()}else{r.setRenderTarget(null);r.render(V3.scene,V3.cam)}}
 V3.draw=draw;
 // ---------- the table: honey oak planks, waxed, with a pool of light that follows the view ----------
 function makeTable(){const S=1024,c=cvs(S),x=c.getContext('2d');const R=seeded(31);const rows=4,ph=S/rows;
@@ -378,7 +391,7 @@ function sparkle(pos,col,n){if(!V3.on||!ANIM)return;for(let i=0;i<n;i++){const s
 // ---------- overlays: legal squares, ghost tile, follower spots ----------
 function glowMat(col,op,edge){return new THREE.MeshBasicMaterial({map:glowTex(edge),color:col,transparent:true,opacity:op==null?1:op,depthWrite:false})}
 function glowGeo(){return gq('glowG',()=>{const g=new THREE.PlaneGeometry(TS*1.02,TS*1.02);g.rotateX(-Math.PI/2);return g})}
-function sync3D(){if(!V3.on||!G)return;const sc=V3.scene;
+function sync3D(){if(!V3.on||!G)return;if(PH)PH.wake();const sc=V3.scene;
   // tiles
   for(const k in V3.tiles)if(!G.tiles[k]||V3.tiles[k].t!==G.tiles[k].t||V3.tiles[k].r!==G.tiles[k].r){sc.remove(V3.tiles[k].g);delete V3.tiles[k]}
   for(const k of G.order){if(V3.tiles[k])continue;const T=G.tiles[k];const [x,y]=unkey(k);const g=tileObj(T.t,T.r,true);g.position.copy(cellWorld(x,y));const j=g.userData.j||[0,0];g.position.x+=j[0];g.position.z+=j[1];sc.add(g);V3.tiles[k]={g,t:T.t,r:T.r};
@@ -414,11 +427,9 @@ function scorePop(text,col,pos){if(!V3.on)return;const c=cvs(256,128);const x=c.
   const g=x.createLinearGradient(0,-44,0,44);g.addColorStop(0,'#fff6df');g.addColorStop(1,'#ecd3a0');x.fillStyle=g;x.strokeStyle=col;x.lineWidth=7;x.beginPath();x.roundRect?x.roundRect(-78,-40,156,80,40):x.rect(-78,-40,156,80);x.shadowColor='rgba(40,20,5,.5)';x.shadowBlur=10;x.shadowOffsetY=4;x.fill();x.shadowColor='transparent';x.stroke();
   x.font='bold 58px "Marcellus SC",Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#3a2414';x.fillText(text,0,4);
   const tx=tex(c,true);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,transparent:true,depthTest:false}));s.scale.set(.01,.005,1);s.position.copy(pos);s.position.y+=.7;s.renderOrder=10;V3.scene.add(s);V3.pops.push({s,t:0});sparkle(pos,col,14)}
-function loop3D(){requestAnimationFrame(loop3D);const now=performance.now();
-  // frame-time watch: 3 s of bad frames (while we are actually drawing every frame) steps the quality down
-  if(V3.justDrew&&V3.prevTick){const iv=now-V3.prevTick;V3.ivE=V3.ivE==null?iv:V3.ivE*.8+iv*.2;if(!V3.lockQ){if(iv>70){V3.slowT+=iv;V3.okT=0}else{V3.okT+=iv;if(V3.okT>1500)V3.slowT=0}if(V3.slowT>3000)stepDown()}}
-  V3.prevTick=now;V3.justDrew=false;
-  const dt=Math.min(.05,V3.clock.getDelta());V3.t+=dt;const t=V3.t;let active=V3.dirty;
+function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);
+  // the frame-time watch and step-down now live in PerfHUD (p95 over 2 s); PerfHUD.raf also throttles this loop to 10 fps when idle
+  const dt=Math.min(.05,V3.clock.getDelta());V3.t+=dt;const t=V3.t;const testing=!!(PH&&PH.testing);let active=V3.dirty||testing;V3.busy=!!(V3.camTo||V3.tweens.length||V3.pops.length||V3.fx.length||V3.drag||testing);
   if(V3.camTo){const c=V3.camTo;c.t+=dt*2.2;const k=Math.min(1,c.t);const a=1-Math.pow(.0009,dt);V3.look.lerp(c.look,Math.max(a,k*.3));V3.dist+=(c.dist-V3.dist)*Math.max(a,k*.3);if(k>=1&&V3.look.distanceTo(c.look)<.01&&Math.abs(V3.dist-c.dist)<.01){V3.look.copy(c.look);V3.dist=c.dist;V3.camTo=null}placeCam();active=true}
   for(const tw of V3.tweens){tw.t+=dt;const k=Math.min(1,tw.t/tw.dur);tw.fn(k);if(k>=1&&tw.done)tw.done();active=true}
   V3.tweens=V3.tweens.filter(tw=>tw.t<tw.dur);
@@ -433,7 +444,6 @@ function loop3D(){requestAnimationFrame(loop3D);const now=performance.now();
   if(!active&&!idleAnim&&V3.idle>0.5&&!(performance.now()<(V3.keepUntil||0))&&!!covered===!!V3.wasCov)return;V3.idle=active?0:(V3.idle||0)+dt;
   // keep the page responsive: idle life (water, trees) at ~24 fps, motion at full rate, only occasional frames while a popup or the start screen covers the map
   if(covered!==V3.wasCov){V3.wasCov=covered;V3.keepUntil=performance.now()+1200}const gap=performance.now()<(V3.keepUntil||0)?0:covered?.5:active?(V3.q==='low'?.033:0):.042;
-  // a very slow GPU (software rendering): leave the device as much idle time as a frame takes, so taps and the panel stay responsive
-  const slowG=V3.ivE>90?V3.ivE/1000:0;if(V3.t-(V3.lastR||0)<Math.max(gap,slowG)&&(!V3.dirty||slowG))return;
-  V3.uTime.value=V3.t;V3.lastR=V3.t;V3.dirty=false;draw();V3.justDrew=true}
-function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].g);V3.tiles={};for(const k in V3.figs)V3.scene.remove(V3.figs[k]);V3.figs={};if(V3.lastM)V3.scene.remove(V3.lastM);V3.lastK=null;V3.osig='';V3.bulk=true;V3.fitted=false;fitAll(true)}
+  if(!testing&&V3.t-(V3.lastR||0)<gap&&!V3.dirty)return;
+  V3.uTime.value=V3.t;V3.lastR=V3.t;V3.dirty=false;draw()}
+function resetScene(){if(!V3.on)return;if(PH)PH.hitch();for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].g);V3.tiles={};for(const k in V3.figs)V3.scene.remove(V3.figs[k]);V3.figs={};if(V3.lastM)V3.scene.remove(V3.lastM);V3.lastK=null;V3.osig='';V3.bulk=true;V3.fitted=false;fitAll(true)}
