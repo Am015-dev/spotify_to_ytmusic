@@ -25,6 +25,9 @@ h1{font:400 clamp(1.9rem,5vw,3rem)/1 var(--display);margin:0;letter-spacing:.01e
 .box:hover{transform:translateY(-6px) rotate(-.4deg);box-shadow:0 26px 40px var(--shadow)}
 .cover{position:relative;aspect-ratio:16/9;max-width:100%}
 .cover canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.cover.photo::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.62),rgba(0,0,0,0) 48%)}
+.cover .ttl,.cover .ribbon{z-index:1}
 .cover .ttl{position:absolute;left:18px;right:18px;bottom:14px;margin:0;font:400 clamp(1.6rem,4.4vw,2.4rem)/1 var(--display);color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.45),0 0 18px rgba(0,0,0,.5);text-wrap:balance}
 .cover .ribbon{position:absolute;top:12px;right:12px;font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;background:rgba(0,0,0,.55);color:#fff;padding:4px 8px;border-radius:3px}
 .info{padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px}
@@ -93,37 +96,37 @@ footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
 
 <script>
 const GAMES=[
-  {id:'crown',name:'Crown City Smash',src:'crown-city-smash/index.html',ribbon:'Dice brawl',
+  {id:'crown',cover:'covers/crown.jpg',name:'Crown City Smash',src:'crown-city-smash/index.html',ribbon:'Dice brawl',
    blurb:'Giant monsters roll dice to stomp, heal, charge up and buy power cards. Hold the city for stars and try to be the last monster standing, or the first to 20 stars.',
    stats:[['2–6','players'],['30','minutes'],['8+','ages'],['3D','table']],
    chips:['Vs computer · 3 levels','Hot-seat','Online rooms','Power Up evolutions','Halloween','Cultists','Tower','Anubis','Berserk','Wickedness','Mindbug'],
    based:'Plays like King of Tokyo (2011)',paint:paintCrown},
-  {id:'nebula',name:'Nebula Aces',src:'nebula-aces/index.html',ribbon:'Starfighter duel',
+  {id:'nebula',cover:'covers/nebula.jpg',name:'Nebula Aces',src:'nebula-aces/index.html',ribbon:'Starfighter duel',
    blurb:'Set secret maneuver dials, fly your squadron along real templates, then roll attack and defence dice. Build a 100-point squad or fly the learning duel.',
    stats:[['1–2','players'],['45','minutes'],['12+','ages'],['914','mm mat']],
    chips:['Vs computer · 3 levels','Hot-seat','Squad builder','Waves 1–3','Large ships','Bombs & mines','Ion & turrets'],
    based:'Plays like the X-Wing Miniatures Game, 1st edition (2012)',paint:paintNebula},
-  {id:'doorkick',name:'Doorkick Dungeon',src:'doorkick-dungeon/index.html',ribbon:'Card brawl',
+  {id:'doorkick',cover:'covers/doorkick.jpg',name:'Doorkick Dungeon',src:'doorkick-dungeon/index.html',ribbon:'Card brawl',
    blurb:'Kick open doors, fight ridiculous monsters, grab the loot and stab your friends in the back. First hero to level 10 wins, but only by killing a monster.',
    stats:[['3–6','players'],['60','minutes'],['10+','ages'],['168','cards']],
    chips:['Vs computer · 3 levels','Hot-seat','Every base card','Races & classes','Curses','Helping & bribes'],
    based:'Plays like Munchkin (2001)',paint:paintDoor},
-  {id:'shipwreck',name:'Shipwreck Isle',src:'shipwreck-isle/index.html',ribbon:'Co-op survival',
+  {id:'shipwreck',cover:'covers/shipwreck.jpg',name:'Shipwreck Isle',src:'shipwreck-isle/index.html',ribbon:'Co-op survival',
    blurb:'Wash up on a storm-lashed island. Plan every day together: build a shelter, explore, hunt and invent, then hold out against rain, snow and hunger until your scenario goal is done.',
    stats:[['1–4','players'],['90','minutes'],['12+','ages'],['3D','island']],
    chips:['Co-op','Hot-seat','Computer teammates','4 scenarios','Every base card','Friday & the dog','3 difficulties'],
    based:'Plays like Robinson Crusoe: Adventures on the Cursed Island (2012)',paint:paintIsle},
-  {id:'sands',name:'Sands of Qamar',src:'sands-of-qamar/index.html',ribbon:'Bazaar tactics',
+  {id:'sands',cover:'covers/sands.jpg',name:'Sands of Qamar',src:'sands-of-qamar/index.html',ribbon:'Bazaar tactics',
    blurb:'Bid for turn order, then sweep the five tribes across a sunlit sultanate. Claim tiles with your camels, summon djinns and corner the bazaar. Every move is a small puzzle.',
    stats:[['2–5','players'],['60','minutes'],['13+','ages'],['3D','bazaar']],
    chips:['Vs computer · 3 levels','Hot-seat','28 djinns','The Crafters','Wonder Cities','Cutpurses','Promo djinns'],
    based:'Plays like Five Tribes: The Djinns of Naqala (2014)',paint:paintSands},
-  {id:'sunglaze',name:'Sunglaze',src:'sunglaze/index.html',ribbon:'Tile drafting',
+  {id:'sunglaze',cover:'covers/sunglaze.jpg',name:'Sunglaze',src:'sunglaze/index.html',ribbon:'Tile drafting',
    blurb:'Draft glazed tiles from the kilns and set them into the Sun King\'s courtyard mosaic. Every pick leaves something for your rivals, and every broken tile costs you.',
    stats:[['2–4','players'],['40','minutes'],['8+','ages'],['100','tiles']],
    chips:['Vs computer · 3 levels','Hot-seat','Guided first game','Unmarked mosaic','Prism tiles'],
    based:'Plays like Azul (2017)',paint:paintGlaze},
-  {id:'rampart',name:'Rampart & Vine',src:'rampart-and-vine/index.html',ribbon:'Tile laying',
+  {id:'rampart',cover:'covers/rampart.jpg',name:'Rampart & Vine',src:'rampart-and-vine/index.html',ribbon:'Tile laying',
    blurb:'Draw a tile, lay it where it fits and grow a sunlit Provence valley of walled towns, roads, rivers and priories. Place followers to claim them, and farmers to profit from the fields.',
    stats:[['2–6','players'],['45','minutes'],['7+','ages'],['138','tiles']],
    chips:['Vs computer · 3 levels','Hot-seat','Guided first game','The Riverlands','Taverns & Basilicas','Merchants & Masons'],
@@ -136,7 +139,7 @@ const GAMES=[
   {id:'overdrive',name:'Mainhattan Overdrive',src:'mainhattan-overdrive/index.html',ribbon:'Hover racing',ref:false,
    blurb:'Anti-gravity racing across four Frankfurt circuits, from the Bankenviertel canyon to the Fraport runway where jets land over your head. Race in neon night, dawn, storm or fog, and play a career, Zone survival, three-lives Arena, ghost duels and a new daily challenge.',
    stats:[['1','player'],['2–4','minutes'],['10+','ages'],['4','circuits']],
-   chips:['4 circuits + mirror','4 weathers','Crash cam & wrecks','Baustelle smash','6-event career','Zone survival','Arena · 3 lives','Ghost duel','Daily challenge','Traffic & near misses','Takedowns','Gamepad & touch','Settings'],
+   chips:['4 circuits + mirror','4 weathers','Crash cam & wrecks','Baustelle smash','6-event career','Zone survival','Arena · 3 lives','Demolition derby','Crash Junction','Aftertouch','Ghost duel','Daily challenge','Traffic & near misses','Takedowns','Gamepad & touch','Settings'],
    based:'Anti-gravity racer in the style of Aether',paint:paintOverdrive}
 ];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
@@ -261,13 +264,13 @@ function seed(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
 document.getElementById('tally').textContent=GAMES.length+' games on the shelf';
 const shelf=document.getElementById('shelf');const lastId=store.get('shelf_last');
 for(const g of GAMES){const el=document.createElement('article');el.className='box';el.innerHTML=`
-  <div class="cover"><canvas width="800" height="450" aria-hidden="true"></canvas><span class="ribbon">${g.ribbon}</span><h2 class="ttl">${g.name}</h2></div>
+  <div class="cover${g.cover?' photo':''}">${g.cover?`<img src="${g.cover}" alt="" loading="lazy" decoding="async">`:'<canvas width="800" height="450" aria-hidden="true"></canvas>'}<span class="ribbon">${g.ribbon}</span><h2 class="ttl">${g.name}</h2></div>
   <div class="info"><p>${g.blurb}</p>
     <div class="stats">${g.stats.map(s=>`<div><b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div>
     <div class="chips">${g.chips.map(c=>`<span>${c}</span>`).join('')}</div>
     <div class="based">${g.based}</div>
     <div class="acts"><button type="button" class="btn play" id="play-${g.id}">▶ Play</button><a class="btn alt" href="${g.src}" target="_blank" rel="noopener">New tab</a>${g.ref===false?'':`<button type="button" class="btn alt" data-ref="${g.id}">Card list</button>`}${lastId===g.id?'<span class="last">Played last</span>':''}</div></div>`;
-  shelf.appendChild(el);g.paint(el.querySelector('canvas'));el.querySelector('.play').onclick=()=>openGame(g)}
+  shelf.appendChild(el);if(!g.cover)g.paint(el.querySelector('canvas'));el.querySelector('.play').onclick=()=>openGame(g)}
 
 const table=document.getElementById('table'),frame=document.getElementById('frame');
 function openGame(g){if(g.id!=='ref')store.set('shelf_last',g.id);document.getElementById('tname').textContent=g.name;document.getElementById('solo').href=g.src;
