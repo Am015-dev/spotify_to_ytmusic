@@ -276,6 +276,66 @@ body.storying #hud .rtrack,body.storying #hud .fc{display:none}
 .ctl2{display:inline-flex;border:2px solid #5a4320;border-radius:9px;overflow:hidden;justify-self:start}.ctl2 button{appearance:none;border:0;background:#fffaf0;color:#5a4320;font:600 .8rem var(--sans);padding:5px 10px;min-height:32px;cursor:pointer}.ctl2 button.on{background:#5a4320;color:#fff4d8}
 .cp .sks{display:grid;gap:1px;font-size:.74rem;color:#5b4a2c}.cp .sks i{font-style:normal;font-weight:700;color:#3b2c14}
 .over-why{text-align:left;background:#fff7e3;border-radius:10px;padding:8px 12px;margin:8px 0}.over-why li{margin:2px 0}
+
+/* ---- planned rounds: the day roadmap, phase cards, the plan wizard, the day summary ---- */
+.roadmap{flex:0 0 auto;padding:4px 8px 6px;border-bottom:1px solid rgba(90,67,32,.25);background:rgba(255,250,236,.6)}
+.rm-h{display:flex;justify-content:space-between;gap:8px;font-size:.8rem;color:#5a4320;margin:0 2px 3px}.rm-h b{font-family:var(--title);font-weight:400;font-size:.95rem;color:#2a2014}
+.rm-l{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;position:relative}
+.rm-l li{min-width:0;position:relative}.rm-l li+li::before{content:"";position:absolute;left:-50%;right:50%;top:11px;height:2px;background:#cdb88a;z-index:0}
+.rm-p{appearance:none;border:0;background:transparent;color:#2a2014;width:100%;display:grid;justify-items:center;gap:1px;padding:1px 0 2px;cursor:pointer;font:600 .66rem/1.1 var(--sans);position:relative;z-index:1;border-radius:6px;min-height:36px}
+.rm-p i{font-style:normal;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:#e9dcb8;border:2px solid #cdb88a;font:700 .72rem var(--sans)}
+.rm-p span{max-width:100%;overflow:hidden;text-overflow:clip;white-space:nowrap;font-size:.6rem;letter-spacing:-.01em}
+.rm-p.done i{background:#6f9a4f;border-color:#57803b;color:#fff}.rm-p.done span{color:#4b6b3a}
+.rm-p.now i{background:var(--amber);border-color:#a8691a;color:#2b1a05;box-shadow:0 0 0 3px rgba(242,179,90,.45)}.rm-p.now span{font-weight:800}
+.rm-p.next{opacity:.5}.rm-p.open{background:rgba(242,179,90,.25)}
+.rm-tip{margin-top:4px;font-size:.8rem;background:#2a2014;color:#fff4d8;border-radius:8px;padding:5px 8px;display:flex;gap:6px;align-items:flex-start}.rm-tip b{color:var(--amber2)}.rm-tip .btn{margin-left:auto;min-height:24px;padding:0 6px;color:#fff4d8;border-color:#8a6a2a;background:transparent}
+.gx-dock-body{display:flex;flex-direction:column}#story{order:1}#panel{order:2}#hud{order:3;margin:8px 0 0}
+.phead{background:#2a2014;color:#fff4d8;border-radius:10px;padding:7px 10px;margin:-2px -4px 10px}.phead p{margin:3px 0;font-size:.9rem}.phead b{color:var(--amber2)}
+.ph-n{font:700 .78rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--amber2)}
+.phead .qk{color:#e9dcb8;font-size:.8rem;margin-top:4px}
+label.qk{display:flex;gap:6px;align-items:flex-start;font-size:.82rem}
+.result{background:#fffaf0;border:1px solid #c7b183;border-radius:10px;padding:6px 10px;margin:6px 0}.result>b{font:1rem var(--title)}.result ul{margin:2px 0 0;padding-left:18px}.result li{margin:1px 0;font-size:.92rem}.result p{margin:2px 0}
+.result .bad,.chg .bad,.tmr .bad{color:#9b2f28}.result .good,.chg .good{color:#2f6d33}
+.jobhd{font:600 .85rem var(--sans);color:#5a4320;margin:4px 0}
+.outcome{font-weight:700;margin:4px 0}.outcome.good{color:#2f6d33}.outcome.bad{color:#9b2f28}
+.golist{margin:4px 0 6px;padding-left:22px}.golist li{margin:2px 0}.golist small{color:#6b5530}
+em.sure,em.roll{font-style:normal;font-size:.75rem;padding:0 6px;border-radius:99px;margin-left:4px}em.sure{background:#d9ecd0;color:#2f6d33}em.roll{background:#fbe3c4;color:#8a4a0a}
+.dsum h4,.wz h4{font:1rem var(--title);margin:10px 0 4px;color:#5a4320}.chg,.tmr{margin:0;padding-left:18px}.chg li,.tmr li{margin:2px 0}
+.top1{margin-top:10px;background:#2a2014;color:#fff4d8;border-radius:10px;padding:8px 10px;display:grid;gap:2px}.top1 .rk{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--amber2)}.top1 b{font:1.1rem var(--serif)}.top1 span{font-size:.88rem}
+.qbox .qk{font:700 .75rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#8a4a0a}
+.wz-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:0 0 8px}
+.wz-s{appearance:none;border:1px solid #c7b183;background:#fffaf0;border-radius:8px;padding:3px 4px;display:grid;justify-items:center;gap:1px;cursor:pointer;color:#2a2014;font:600 .68rem/1.1 var(--sans);min-height:40px}
+.wz-s i{font-style:normal;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:#e9dcb8;font-size:.7rem}.wz-s span{text-align:center}
+.wz-s.done{opacity:.75}.wz-s.done i{background:#6f9a4f;color:#fff}.wz-s.now{background:#2a2014;color:#fff4d8;border-color:#2a2014}.wz-s.now i{background:var(--amber);color:#2b1a05}
+.wz-h{font:700 .75rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#8a6a2a}.wz-t{font:1.3rem var(--title);margin:0 0 4px;border:0!important}
+.wz-p{margin:4px 0 8px;font-size:.92rem}
+.needs{display:grid;gap:4px}.nd{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 8px;padding:5px 8px;border-radius:8px;border-left:5px solid #6f9a4f;background:#f3f7ee}
+.nd.bad{border-left-color:#c0392b;background:#fff0ec}.nd b{font-size:.92rem}.nd .v{font-weight:800;font-variant-numeric:tabular-nums}.nd small{grid-column:1/-1;font-size:.78rem;color:#5b4a2c}
+.thr{display:grid;gap:1px;padding:6px 8px;border-radius:8px;background:#fff7e3;border:1px solid #d8b56a;margin:4px 0}.thr.hot{border:2px solid #c0392b;background:#fff0ec}.thr span{font-size:.85rem}.thr small{font-size:.78rem;color:#5b4a2c}
+.plist{margin:0;padding-left:20px}.plist li{margin:3px 0}.plist li b{display:block;font-size:.92rem}.plist li span{font-size:.8rem;color:#5b4a2c}.plist li.red b{color:#8e1f14}
+.morn{font-size:.85rem;background:#fffaf0;border-radius:8px;padding:5px 8px;margin-bottom:8px}.morn ul{margin:2px 0 0;padding-left:18px}.morn .bad{color:#9b2f28}.morn .good{color:#2f6d33}
+.pawnrow{display:flex;flex-wrap:wrap;gap:4px;margin:2px 0 8px}
+.pw{appearance:none;border:1px solid #c7b183;background:#fffaf0;border-radius:8px;padding:3px 7px 3px 5px;display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:5px;align-items:center;cursor:pointer;color:#2a2014;max-width:100%;min-height:36px;text-align:left}
+.pw i{grid-row:span 2;width:14px;height:14px;border-radius:50%;background:var(--pc)}.pw span{font:700 .8rem var(--sans)}.pw small{font-size:.68rem;color:#6b5530;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pw.on{outline:3px solid #d98a1e;background:#fff1cf}.pw.set small{color:#2f6d33}
+.curp{border-left:6px solid var(--pc);background:rgba(255,255,255,.55);border-radius:0 10px 10px 0;padding:6px 10px;margin-bottom:8px;display:grid}.curp .cp-n{font:700 .75rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#8a6a2a}.curp b{font:1.15rem var(--title)}.curp small{font-size:.8rem;color:#5b4a2c}
+.rec{border:2px solid #d98a1e;background:#fff7e3;border-radius:10px;padding:8px 10px;display:grid;gap:3px;margin-bottom:8px}.rec .rk{font:700 .72rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#8a4a0a}.rec b{font-size:1.05rem}.rec span{font-size:.85rem}.rec .sure{color:#2f6d33;font-weight:700}.rec .roll{color:#8a4a0a;font-weight:700}
+.rb{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.rb .btn.ghost,.wz .btn.ghost{background:#fffaf0;border-color:#b99f67;color:#2a2014}
+.qpick{display:flex;flex-wrap:wrap;gap:4px}.qpick .btn{background:#fffaf0;border-color:#b99f67;color:#2a2014;white-space:normal;text-align:left}
+.hint{font-size:.8rem;color:#5b4a2c;background:#fff7e3;border-radius:8px;padding:5px 8px;margin:8px 0}
+.alldone{background:#e7f2df;border:1px solid #9cb58a;border-radius:10px;padding:8px 10px;margin-bottom:8px}
+.sofar{margin-top:6px}.sofar summary{cursor:pointer;font-weight:700;font-size:.9rem;padding:4px 0}
+.review{display:grid;gap:6px}.rv{display:grid;grid-template-columns:24px minmax(0,1fr);gap:6px;padding:6px 8px;border-radius:10px;background:#fffaf0;border:1px solid #c7b183}
+.rv-n{width:22px;height:22px;border-radius:50%;background:#2a2014;color:#fff4d8;display:grid;place-items:center;font:700 .75rem var(--sans)}.rv small{display:block;font-size:.78rem;color:#5b4a2c}.rv small.why{color:#6b4b12}.rsk{font-size:.85rem;margin:2px 0}.rsk small{display:inline;color:#6b4b12}
+.rsk .sure{color:#2f6d33}.rsk .roll{color:#8a4a0a}.rsk .warn{color:#9b2f28}
+.notcov{font-size:.85rem;margin:8px 0;padding:5px 8px;border-radius:8px;background:#fff7e3}.notcov .red{color:#8e1f14;font-weight:700}
+.checks{list-style:none;margin:4px 0;padding:0;display:grid;gap:2px}.checks li{font-size:.9rem;padding:3px 8px;border-radius:6px}.checks .ok{background:#e7f2df;color:#2f5d25}.checks .bad{background:#fff0ec;color:#8e1f14;font-weight:700}.checks .meh{background:#f6efdd;color:#5b4a2c}
+.probs.warn2{border:2px solid #c0392b;background:#fff0ec;color:#8e1f14;border-radius:8px;padding:6px 8px;font-weight:600}
+#step .btn.go.dim{opacity:.75}
+#step .st-b{grid-template-columns:auto auto minmax(0,1fr)}#step .st-b .btn{min-width:0;overflow:hidden;text-overflow:ellipsis;padding:6px 9px}
+@media (max-width:420px){.rm-p span{font-size:.55rem}.rm-p i{width:20px;height:20px}.rm-l li+li::before{top:10px}.wz-s{font-size:.6rem}}
+.morn .big{font-size:inherit;font-weight:700}
+@media (max-width:560px){.wz-s{min-height:30px;padding:2px}.wz-s:not(.now) span{display:none}.wz-s.now{grid-template-columns:auto auto;gap:4px;align-items:center}.wz-steps{grid-template-columns:auto auto auto auto;justify-content:start}.wz-t{font-size:1.1rem}.pw small{max-width:80px}}
 </style>
 </head>
 <body>
@@ -300,7 +360,7 @@ body.storying #hud .rtrack,body.storying #hud .fc{display:none}
   <main class="gx-board"><div class="view"><div id="labels" aria-label="Island tiles"></div><canvas id="c3" aria-label="The island, in 3D. Drag to turn it, scroll to zoom, tap a tile to plan there."></canvas><div id="map2d" hidden></div><div id="chip" aria-hidden="true"></div></div></main>
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Plan the day</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel" id="sheetbtn">↕</button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel">⇥</button></div>
-    <div id="dockmsg" hidden role="status"></div><div class="gx-dock-body"><div id="hud"></div><div id="story" hidden aria-live="polite"></div><div id="panel"></div></div>
+    <nav id="roadmap" class="roadmap" hidden aria-label="Where you are in the day"></nav><div id="dockmsg" hidden role="status"></div><div class="gx-dock-body"><div id="hud"></div><div id="story" hidden aria-live="polite"></div><div id="panel"></div></div>
     <div id="step" aria-live="polite"></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock">☰ Panel</button>
@@ -1121,7 +1181,7 @@ FN.morale=fr=>{G.phase='morale';beat('morning');const c=firstC();const m=G.moral
   if(G.chars.length===1&&m<3)morale(1);const mm=G.morale;
   if(mm<0)loseDet(c,-mm,'low morale');else if(mm===1||mm===2)gainDet(c,mm);else if(mm===3){if(c.w&&(!c.human||true)){const o=[{l:'Gain 2 determination',ops:[['det','first',2]]},{l:'Heal 1 wound',ops:[['heal','first',1]]}];ask(c.i,'Morale is high!',o,{kind:'morale'})}else gainDet(c,2)}
   if(has('diary'))gainDet(c,1);if(has('drums'))gainDet(c,2)};
-FN.prod=fr=>{G.phase='prod';const t=campTile();const m=G.map[G.camp.pos];if(G.prod.skip||!t||m.fog){lg('No production this round.','bad');return}
+FN.prod=fr=>{G.phase='prod';beat('prod');const t=campTile();const m=G.map[G.camp.pos];if(G.prod.skip||!t||m.fog){lg('No production this round.','bad');return}
   let food=0,wd=0;t.src.forEach((s,i)=>{if(m.exh[i])return;if(s==='wood')wd++;else food++});
   if(m.tok.c_food)food++;if(m.tok.c_food2)food++;if(m.tok.food&&!t.src.some(s=>s!=='wood')&&!m.exh[9])food++;if(m.tok.c_wood&&t.src.includes('wood'))wd++;
   if(G.shortcut!=null&&tileAt(G.shortcut)){const st=tileAt(G.shortcut);const j=st.src.findIndex((s,i)=>!G.map[G.shortcut].exh[i]);if(j>=0){if(st.src[j]==='wood')wd++;else food++}}
@@ -1212,7 +1272,7 @@ function pawnWhy(pid,a){const p=pawnInfo(pid);if(!p)return 'no such pawn';if(pla
 // ---------- plan moves (validated) ----------
 function addAct(type,tgt,alt,pay){const a={id:G.plan.nextId++,type,tgt,alt:alt||0,pw:[],pay:pay||'wood'};G.plan.acts.push(a);return a}
 // ---------- resolving the actions ----------
-FN.go=fr=>{G.phase='act';beat('go');lg('The castaways set off.','step');
+FN.go=fr=>{G.phase='act';beat('go',{n:G.plan.acts.length});lg('The castaways set off.','step');
   const order=[];for(const t of ['threat','hunt','build','gather','explore','special','tmap','camp','rest'])for(const a of G.plan.acts)if(a.type===t)order.push(a.id);
   push(...order.map(id=>({f:'fn',k:'resolve',id})),{f:'fn',k:'endActions'},{f:'fn',k:'weather'},{f:'fn',k:'night'},{f:'fn',k:'endRound'})};
 function actLeader(a){const ps=a.pw.map(pawnInfo).filter(Boolean);const l=ps.find(p=>p.c!=null);return l?l.c:(ps.find(p=>p.f)?-1:G.first)}
@@ -1370,7 +1430,7 @@ FN.night4=fr=>{if(G.over)return;SC().night&&SC().night();if(G.over)return;
   G.night.pot=0;G.night.fire=0;G.night.barrel=0};
 FN.endRound=fr=>{if(G.over)return;SC().endRound&&SC().endRound();if(G.over)return;
   if(G.round>=G.rounds){G.over={win:false,why:G.scen==='marooned'?'Time ran out: no ship came.':'Time ran out.'};lg('The last round ends without rescue.','bad');fx('lose');return}
-  G.round++;if(G.chars.length>1)passFirst();G.stk.push({f:'round'})};
+  beat('daysum',{round:G.round});G.round++;if(G.chars.length>1)passFirst();G.stk.push({f:'round'})};
 // ---------- invariants and test hooks ----------
 function checkInvariants(){if(!G)return[];const v=[];for(const r of RES){if(G.res[r]<0)v.push(`${r} negative`);if(G.fut[r]<0)v.push(`future ${r} negative`)}
   if(G.camp.roof<0||G.camp.pal<0||G.weapon<0)v.push('track negative');if(G.morale<-3||G.morale>3)v.push('morale out of range');
@@ -1993,9 +2053,10 @@ const pickL=(arr,seed)=>arr&&arr.length?arr[Math.abs(seed|0)%arr.length]:'';
 UI.auto=false;try{UI.auto=localStorage.getItem('swi_auto')==='1'}catch(e){}
 function beatLines(i){const b=UI.beats[i];if(!b||!G)return[];const nx=UI.beats[i+1];const end=nx?nx.n0:G.logN;return G.log.filter(l=>l.i>b.n0&&l.i<=end).reverse()}
 const MEANINGFUL=l=>l.c!=='step'&&!/^— Round|^Event:|^Adventure:|^Mystery:|^Plan the day|^The castaways set off|^Night falls/.test(l.t);
-function skippable(i){const b=UI.beats[i];const last=i===UI.beats.length-1;
-  if(b.kind==='plan'||b.kind==='go')return !(last&&humanQ());
-  if(b.kind==='morning'&&!beatLines(i).filter(MEANINGFUL).length&&!(last&&humanQ()))return true;
+function skippable(i){const b=UI.beats[i];const last=i===UI.beats.length-1;if(last&&humanQ())return false;
+  if(b.kind==='plan')return true;
+  // "quick days": from day 2 the automatic steps and the actions opener are left out (their results show in the day summary)
+  if(quickOn(b.round)&&['morning','prod','weather','go'].includes(b.kind))return true;
   return false}
 function humanQ(){return !!(G&&G.q&&P(G.q.who)&&P(G.q.who).human)}
 // index of the beat on screen, or -1 when the story has caught up
@@ -2008,7 +2069,7 @@ function withView(fn){const s=viewState();if(!s)return fn();const b=UI.beats[sto
 function storyNext(){const i=storyIdx();if(i<0)return;if(i===UI.beats.length-1&&humanQ())return;UI.shown=i;UI.seenBeat=null;sfx('click');refresh()}
 function storySkip(){if(humanQ())UI.shown=UI.beats.length-2;else UI.shown=UI.beats.length-1;UI.seenBeat=null;refresh()}
 function charBark(ci,kind,seed){const c=ci!=null&&ci>=0?P(ci):null;if(!c)return '';const f=FL().chars&&FL().chars[c.k];const l=f&&pickL(f[kind],seed);return l?`<div class="bark" style="--pc:${PCOL[c.i%6]}"><b>${esc(c.nm)}:</b> “${esc(l)}”</div>`:''}
-const KIND_ICON={finds:'🎒',intro:'🏝️',dawn:'🌅',event:'📜',threat:'⚠️',morning:'☀️',act:'🧭',adventure:'❓',mystery:'🗝️',fight:'⚔️',weather:'⛈️',night:'🌙',over:'🏁'};
+const KIND_ICON={prod:'🧺',daysum:'📋',go:'🧭',finds:'🎒',intro:'🏝️',dawn:'🌅',event:'📜',threat:'⚠️',morning:'☀️',act:'🧭',adventure:'❓',mystery:'🗝️',fight:'⚔️',weather:'⛈️',night:'🌙',over:'🏁'};
 const ACT_ICON={threat:'⚠️',hunt:'🏹',build:'🔨',gather:'🧺',explore:'🧭',camp:'🏕️',rest:'😴',special:'⭐',tmap:'🗺️'};
 function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines=beatLines(i).filter(MEANINGFUL);const S=SCENARIOS[G.scen];const fs=(F.scen||{})[G.scen]||{};
   let kicker='',title='',story='',card='',extra='',icon=KIND_ICON[b.kind]||'📖';
@@ -2020,12 +2081,17 @@ function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines
     else if(d.late){kicker='It comes back to haunt us';title=esc(c.ev.n);story=esc(fe.e||'')}
     else{kicker='Something happens';title=esc(c.n);story=esc(fe.s||'');card=c.th?`<div class="scard"><div><b>Now:</b> ${opsText(c.ev)||'nothing yet.'}</div><div><b>It stays as a threat:</b> ${esc(c.th.n)} (${c.th.pw==='1-2'?'1–2':c.th.pw} pawn${c.th.pw===1?'':'s'}${reqText(c.th.req)?', needs '+esc(reqText(c.th.req)):''}) to earn: ${opsText(c.th.rw||c.th.rw2||c.th.rw1)||'peace of mind'}</div><div class="bad"><b>If we ignore it for two days:</b> ${opsText(c.te)||'nothing'}</div></div>`:''}
     break}
-  case 'morning':{kicker='Morning';title='The camp wakes';const up=lines.some(l=>/Morale \+/.test(l.t)||/gains/.test(l.t)),dn=lines.some(l=>/loses|Morale -/.test(l.t));story=esc(pickL((F.phase||{})[dn?'moraleDown':up?'moraleUp':'prod'],b.id));break}
+  case 'morning':{kicker='Morning';title='The camp wakes';const up=lines.some(l=>/Morale \+/.test(l.t)||/gains/.test(l.t)),dn=lines.some(l=>/loses|Morale -/.test(l.t));story=esc(pickL((F.phase||{})[dn?'moraleDown':up?'moraleUp':'prod'],b.id));
+    if(!lines.length){const m=(beatState(i)||G).morale;extra=`<p class="rs">Morale is ${m>0?'+'+m:m}: ${m===0?'nothing changes today':m>0?'the first player gains determination':'the first player loses determination'}.</p>`}break}
+  case 'prod':{kicker='Morning';title='What the camp gives';story=esc(pickL((F.phase||{}).prod,b.id));break}
+  case 'daysum':{const s=daySumHtml(i);kicker=s.kicker;title=s.title;card=s.body;break}
   case 'act':{const c=d.actor>=0?P(d.actor):null;icon=ACT_ICON[d.type]||icon;kicker=c?esc(c.nm):'Friday';title=esc(d.label);
     const ok=lines.some(l=>l.c==='good'||l.c==='big')&&!lines.some(l=>/fails\./.test(l.t));const failed=lines.some(l=>/fails\./.test(l.t));
     if(d.type==='explore'){const t=lines.find(l=>/New land/.test(l.t));const terr=t&&/place \d+: (\w+)/.exec(t.t);story=esc(terr?((F.phase||{}).explore||{})[terr[1]]||'':pickL((F.phase||{}).exploreFail,b.id));if(terr&&terr[1]==='mountains'&&G.scen==='marooned')story+=' From the peak we can see the shipping lane: this is where a signal fire could be seen.'}
     else if(d.type==='build')story=esc(failed?'':pickL((F.phase||{}).build,b.id));else if(d.type==='gather')story=esc(failed?'':pickL((F.phase||{}).gather,b.id));else if(d.type==='threat')story=esc(((F.ev||{})[d.card]||{}).t||pickL((F.phase||{}).threatDone,b.id));
-    if(d.dice)extra=diceHtml(d.dice,b.id);extra+=charBark(d.actor,lines.some(l=>/wound/.test(l.t)&&l.c==='bad')?'hurt':failed?'fail':'success',b.id);break}
+    {const k0=jobNo(i);const res=failed?'<div class="outcome bad">Result: it failed.</div>':ok?'<div class="outcome good">Result: it worked.</div>':'';
+     extra=`<div class="jobhd">${k0?`Job ${k0.k} of ${k0.n} · `:''}${d.dice?'Too few pawns to be sure: the dice were rolled.':'Enough pawns: certain, no dice.'}</div>`+(d.dice?diceHtml(d.dice,b.id):'')+res}
+    extra+=charBark(d.actor,lines.some(l=>/wound/.test(l.t)&&l.c==='bad')?'hurt':failed?'fail':'success',b.id);break}
   case 'adventure':{const c=CARD[d.card];kicker=`Adventure while we ${({build:'build',gather:'gather',explore:'explore'})[d.deck]||'work'}`;title=esc(c.n);story=esc(((F.adv||{})[d.card]||{}).s||'');card=`<div class="scard">${cardText(c)}</div>`;break}
   case 'mystery':{const c=CARD[d.card];kicker=`Mystery · ${c.type}`;title=esc(c.n);story=esc(((F.mys||{})[d.card]||{}).s||'');card=`<div class="scard">${cardText(c)}</div>`;break}
   case 'fight':{kicker=d.hunted?'The hunt':'A fight';title=esc(String(d.name||'').replace(/^./,x=>x.toUpperCase()));story=esc(d.beast&&(F.beast||{})[d.beast]||'');const B=d.beast&&BEAST[d.beast];if(B)card=`<div class="scard">Strength <b>${B.str}</b> against our weapon <b>${(viewState()||G).weapon}</b> before the fight. Every point short is a wound; the weapon then loses ${B.wl}. It feeds us ${B.food} food${B.fur?' and '+B.fur+' fur':''}.</div>`;break}
@@ -2034,7 +2100,7 @@ function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines
   case 'night':{kicker='Night';const hungry=lines.some(l=>/hunger/.test(l.t)),open=lines.some(l=>/in the open/.test(l.t));const fire=has('fire');title=hungry?'Empty stomachs':open?'Under the open sky':fire?'Around the fire':'Huddled under the shelter';story=esc(pickL((F.phase||{})[hungry?'nightHungry':open?'nightOpen':fire?'nightFire':'nightFed'],b.id));break}
   case 'plan':kicker='Planning';title='Before we set off';break;
   case 'finds':kicker='Evening';title='Back at camp';story='We unpack what the day brought in.';break;
-  case 'go':kicker='Setting off';title='Everyone to work';break;
+  case 'go':{kicker='Setting off';title='Everyone to work';const st=beatState(i);extra=withState(st,()=>`<ol class="golist">${st.plan.acts.slice().sort((x,y)=>ORDER_T.indexOf(x.type)-ORDER_T.indexOf(y.type)).map(a=>{const n=actNeed(a);const sure=!n.roll||a.pw.length>=n.max;return `<li><b>${esc(actLabel(a))}</b> <small>${esc(pawnGroup(a.pw))}</small> ${sure?'<em class="sure">certain</em>':'<em class="roll">rolls dice</em>'}</li>`}).join('')}</ol>`);break}
   case 'over':{const w=G.over&&G.over.win;kicker=w?'The end':'The end';title=w?'Rescued!':'Lost on the island';story=esc(endLine());extra=`<p class="why">${esc(G.over?G.over.why:'')}</p>`;break}}
   const chips=lines.slice(0,14).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('');
   return {icon,kicker,title,story,card,extra,chips}}
@@ -2046,9 +2112,13 @@ function renderStory(){const el=$('#story');if(!el)return;if(!G||UI.modal==='sta
   if(UI.seenBeat!==b.id){UI.seenBeat=b.id;beatFx(b);UI.toTop=1}
   const who=q&&G.chars.filter(c=>c.human).length>1?`<div class="qwho" style="--pc:${PCOL[q.who%6]}">${esc(P(q.who).nm)} decides</div>`:'';
   const qd=q&&q.kind==='dice'?diceHtml(q.dice,b.id):'';
-  const body=`<div class="sk">${h.icon} ${h.kicker}</div><h2>${h.title}</h2>${h.story?`<p class="story">${h.story}</p>`:''}${h.card}${h.extra}${h.chips?`<ul class="outs">${h.chips}</ul>`:''}
-    ${q?`<div class="qbox">${who}<h3>${esc(q.title)}</h3>${qd}<div class="opts">${q.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${esc(o.l)}</button>`).join('')}</div></div>`:
-     `<div class="sctl"><button class="btn go" data-a="next" autofocus>${i>=UI.beats.length-1?(G.over?'See how it ended ▶':'Plan the day ▶'):'Next ▶'}</button>${allAI()?'':`<button class="btn ghost ${UI.auto?'on':''}" data-a="auto" title="Play the scenes by themselves">⏵ Auto ${UI.auto?'on':'off'}</button>`}${i<UI.beats.length-2?`<button class="btn ghost" data-a="skip" title="Jump to the next decision">⏭ Skip</button>`:''}<span class="prog">${Math.max(1,i-lastPlanBeat(i))} / ${Math.max(1,UI.beats.length-1-lastPlanBeat(i))}</span></div>`}`;
+  const pk=beatPhase(b);const auto=AUTO_PH.includes(pk)&&b.kind!=='daysum';const res=beatLines(i).filter(MEANINGFUL).slice(0,14);
+  const outs=auto?`<div class="result"><b>Result</b>${res.length?`<ul>${res.map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ul>`:`<p>Nothing happened.</p>`}</div>`:h.chips?`<ul class="outs">${h.chips}</ul>`:'';
+  const last=i>=UI.beats.length-1;const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';const jn=b.kind==='act'?jobNo(i):null;
+  const qk=b.kind==='daysum'?`<label class="chk qk"><input type="checkbox" data-a="quick" ${UI.quick?'checked':''}> Quick days: from day 2, skip the automatic steps (Morale, Production, Weather)</label>`:'';
+  const body=`${phaseHeadHtml(i)}<div class="sk">${h.icon} ${h.kicker}</div><h2>${h.title}</h2>${h.story?`<p class="story">${h.story}</p>`:''}${h.card}${h.extra}${outs}${qk}
+    ${q?`<div class="qbox">${who}<div class="qk">Your choice</div><h3>${esc(q.title)}</h3>${qd}<div class="opts">${q.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${esc(o.l)}</button>`).join('')}</div></div>`:
+     `<div class="sctl"><button class="btn go" data-a="next" autofocus>${nextL}</button>${allAI()?'':`<button class="btn ghost ${UI.auto?'on':''}" data-a="auto" title="Play the scenes by themselves, one after another">▶▶ Play by itself: ${UI.auto?'on':'off'}</button>`}${i<UI.beats.length-2?`<button class="btn ghost" data-a="skip" title="Jump straight to your next decision (everything is still in the Log)">Skip to my next choice</button>`:''}${jn?`<span class="prog">Job ${jn.k} of ${jn.n}</span>`:''}</div>`}`;
   el.hidden=false;if(el.dataset.id!==b.id+':'+(q?q.title:'')+':'+G.logN+':'+UI.auto){el.dataset.id=b.id+':'+(q?q.title:'')+':'+G.logN+':'+UI.auto;el.innerHTML=`<div class="scene ${b.kind}">${body}</div>`;const f=el.querySelector('[autofocus],.opt');if(f&&!UI.noFocus)f.focus({preventScroll:true})}
   if(UI.toTop){UI.toTop=0;const bd=document.querySelector('.gx-dock-body');if(bd)bd.scrollTop=0}
   clearTimeout(UI.autoT);if(!q&&(UI.auto||allAI())&&!UI.pause){const n=beatLines(i).length;UI.autoT=setTimeout(storyNext,(1600+Math.min(8,n)*380)/(UI.speed||1))}}
@@ -2084,6 +2154,104 @@ function endLine(){const fs=(FL().scen||{})[G.scen]||{};if(!G.over)return '';if(
   if(/cut off/.test(w))return 'The ground gives way beneath the camp. Everything we built slides into the dark, and the journal ends here.';
   if(/Time ran out/.test(w))return G.scen==='marooned'?(has('fire')?`The last day passes. The pile never reached the top (${G.sc.pile} of 15), and the ships sailed by without seeing us.`:`The last day passes. Without a fire nobody saw our pile (${G.sc.pile} of 15), and the ships sailed by.`):fs.lose||'';
   return fs.lose||''}
+
+</script>
+<script>
+// ---------- the round, planned: a roadmap of the 7 steps of a day, a card that opens each step, and the end-of-day summary ----------
+// Presentation only: nothing here changes the rules. It reads G (or the story's snapshot of G) and UI.
+const PH7=[
+  {k:'event',n:'Event',tip:'A new event card is turned over. It can hurt you now, and it stays as a threat you can deal with later.',
+    what:'An event card is turned over. It may do something right away, and then it waits as a threat. Ignored threats strike two days later.',dec:'Nothing yet. You can deal with a threat when you plan.'},
+  {k:'morale',n:'Morale',tip:'Good morale gives the first player determination (used for skills). Bad morale takes it away.',
+    what:'The camp’s mood is checked. Above 0 the first player (★) gains that much determination; below 0 they lose it.',dec:'Nothing. This step runs by itself.'},
+  {k:'prod',n:'Production',tip:'The place where your camp stands gives you its food and wood.',
+    what:'The place where your camp stands gives you its food and wood for today.',dec:'Nothing. This step runs by itself.'},
+  {k:'plan',n:'Plan',tip:'You give every pawn a job for the day. This is the step where you choose.',
+    what:'You give every pawn a job for the day, in 4 small steps.',dec:'Everything: who does which job.'},
+  {k:'act',n:'Actions',tip:'The jobs are done one at a time. Certain jobs always work; the others roll dice.',
+    what:'Your jobs are done one at a time, in this order. A job with enough pawns is certain. A job with fewer pawns rolls 3 dice: it can fail, hurt, or start an adventure.',dec:'Only if a card asks you something.'},
+  {k:'weather',n:'Weather',tip:'Rain and snow clouds hit the camp. Each level of roof keeps one cloud off.',
+    what:'The weather dice are rolled. Every cloud above your roof ruins 1 food and 1 wood (or costs a wound if you have none).',dec:'Nothing. This step runs by itself.'},
+  {k:'night',n:'Night',tip:'Everyone eats 1 food and sleeps. Without a shelter each castaway loses 1 life.',
+    what:'Everyone eats 1 food. Anyone left hungry loses 2 life. Without a shelter everyone loses 1 life. Fresh food spoils.',dec:'Nothing, unless you can treat the wounded.'}];
+const PHI=k=>PH7.findIndex(p=>p.k===k);
+const AUTO_PH=['morale','prod','weather','night'];
+UI.quick=false;try{UI.quick=localStorage.getItem('swi_quick')==='1'}catch(e){}
+function quickOn(r){return !!UI.quick&&r>=2}
+function setQuick(v){UI.quick=!!v;try{localStorage.setItem('swi_quick',v?'1':'0')}catch(e){}}
+function phaseKey(ph){return {start:'event',event:'event',morale:'morale',prod:'prod',plan:'plan',act:'act',actdone:'act',weather:'weather',night:'night'}[ph]||'event'}
+function beatPhase(b){return b.kind==='daysum'?'done':b.kind==='intro'?null:b.kind==='over'?'over':phaseKey(b.phase)}
+// where the player is right now: the scene on screen, else the live game
+function flowNow(){if(!G)return null;const i=storyIdx();if(i>=0){const b=UI.beats[i];if(b.kind==='intro')return {round:0,k:null};if(b.kind==='daysum')return {round:b.data.round,k:'done'};return {round:b.round,k:beatPhase(b)}}
+  if(G.over)return {round:G.round,k:'over'};return {round:G.round,k:phaseKey(G.phase)}}
+function roadmapHtml(){const f=flowNow();if(!f)return '';const idx=PHI(f.k);const all=f.k==='done'||f.k==='over';
+  if(UI.phxAt!==f.k+f.round){UI.phxAt=f.k+f.round;UI.phx=null}
+  const right=f.k===null?'The shipwreck':f.k==='over'?'Game over':f.k==='done'?'Day done':`Step ${idx+1} of 7`;
+  const items=PH7.map((p,i)=>{const st=all||i<idx?'done':i===idx?'now':'next';return `<li><button class="rm-p ${st} ${UI.phx===p.k?'open':''}" data-phx="${p.k}" aria-current="${st==='now'?'step':'false'}" title="${esc(p.n)}: ${esc(p.tip)}"><i>${st==='done'?'✓':i+1}</i><span>${p.n}</span></button></li>`}).join('');
+  const tp=UI.phx&&PH7[PHI(UI.phx)];
+  return `<div class="rm-h"><b>${f.round?`Day ${f.round} of ${G.rounds}`:'Before day 1'}</b><span>${right}${idx>=0&&!all?' · '+PH7[idx].n:''}</span></div><ol class="rm-l" aria-label="The 7 steps of a day">${items}</ol>${tp?`<div class="rm-tip" role="note"><b>${tp.n}:</b> ${esc(tp.tip)} <button class="btn xs ghost" data-phx="${tp.k}" aria-label="Close">✕</button></div>`:''}`}
+function renderRoadmap(){const el=$('#roadmap');if(!el)return;const h=G&&UI.modal!=='start'?roadmapHtml():'';el.hidden=!h;if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}}
+// the card that opens a step of the day (shown on the first scene of that step)
+function phaseHeadHtml(i){const b=UI.beats[i];const k=beatPhase(b);const ix=PHI(k);if(ix<0)return '';const prev=UI.beats[i-1];
+  const first=!prev||prev.round!==b.round||beatPhase(prev)!==k;if(!first)return '';const p=PH7[ix];const short=quickOn(b.round);
+  let what=p.what;if(k==='event'&&b.round===1)what='There is no event card on the first day. From day 2 a new card is turned over every morning.';
+  if(k==='act'){const n=(b.data&&b.data.n)||0;if(n)what=`Your ${n} job${n>1?'s are':' is'} done one at a time. `+p.what.replace(/^Your jobs are done one at a time, in this order\. /,'')}
+  const qk=AUTO_PH.includes(k)&&k!=='night'?`<label class="chk qk"><input type="checkbox" data-a="quick" ${UI.quick?'checked':''}> From day 2, skip the automatic steps (Morale, Production, Weather). Their results still show in the day summary.</label>`:'';
+  return `<div class="phead ${AUTO_PH.includes(k)?'auto':''}"><div class="ph-n">Step ${ix+1} of 7 · ${p.n}</div>${short?'':`<p><b>What happens:</b> ${esc(what)}</p><p><b>You decide:</b> ${esc(p.dec)}</p>`}${short?'':qk}</div>`}
+// ---------- snapshots: the state at a scene ----------
+function beatState(k){const b=UI.beats[k];if(!b)return null;if(k>=UI.beats.length-1||!b.snap)return G;if(!b.obj)b.obj=JSON.parse(b.snap);return b.obj}
+function withState(s,fn){if(!s||s===G)return fn();const real=G;G=Object.assign({},s,{log:real.log,stk:[]});try{return fn()}finally{G=real}}
+const lifeOf=(g,c)=>c.dead?0:CHARS[c.k].die-c.w;
+// ---------- end of the day: what changed, what comes tomorrow, the one thing to do first ----------
+function daySumData(i){const b=UI.beats[i];const r=b.data.round;let k0=-1;for(let k=i-1;k>=0;k--){const x=UI.beats[k];if(x.round!==r)break;if(x.kind==='plan'||x.kind==='go'){k0=k;if(x.kind==='plan')break}}
+  const A=k0>=0?beatState(k0):null;const B=beatState(i);return {r,A,B}}
+function daySumHtml(i){const {r,A,B}=daySumData(i);const S=SCENARIOS[G.scen];const ch=[];
+  if(A&&B){const nm={food:'Food',pfood:'Dry food',wood:'Wood',fur:'Fur'};for(const k of ['food','pfood','wood','fur']){const a=A.res[k]+(A.fut&&A.fut[k]||0),z=B.res[k];if(a!==z)ch.push({t:`${nm[k]}: ${a} → ${z}`,c:z>a?'good':'bad'})}
+    B.chars.forEach((c,j)=>{const o=A.chars[j];if(!o||c.npc&&G.scen!=='stranded')return;const la=lifeOf(A,o),lz=lifeOf(B,c);if(c.dead&&!o.dead)ch.push({t:`${c.nm} died`,c:'bad'});else if(la!==lz)ch.push({t:`${c.nm}: ${la} → ${lz} life`,c:lz>la?'good':'bad'})});
+    if(A.fri&&B.fri&&A.fri.w!==B.fri.w)ch.push({t:`Friday: ${FRIDAY.die-A.fri.w} → ${Math.max(0,FRIDAY.die-B.fri.w)} life`,c:B.fri.w>A.fri.w?'bad':'good'});
+    if(A.morale!==B.morale)ch.push({t:`Morale: ${A.morale} → ${B.morale}`,c:B.morale>A.morale?'good':'bad'});
+    const sa=withState(A,()=>hasShelter()),sz=withState(B,()=>hasShelter());if(sa!==sz)ch.push({t:sz?'Shelter built':'Shelter lost',c:sz?'good':'bad'});
+    for(const [k,n] of [['roof','Roof'],['pal','Palisade']])if(A.camp[k]!==B.camp[k])ch.push({t:`${n}: ${A.camp[k]} → ${B.camp[k]}`,c:B.camp[k]>A.camp[k]?'good':'bad'});
+    if(A.weapon!==B.weapon)ch.push({t:`Weapon: ${A.weapon} → ${B.weapon}`,c:B.weapon>A.weapon?'good':'bad'});
+    for(const k of Object.keys(B.inv.built))if(!A.inv.built[k])ch.push({t:`Made: ${withState(B,()=>invReq(k).n)}`,c:'good'});
+    const ea=A.map.filter(m=>m.tile!=null).length,ez=B.map.filter(m=>m.tile!=null).length;if(ez>ea)ch.push({t:`Explored ${ez-ea} new place${ez-ea>1?'s':''}`,c:'good'});
+    if(G.scen==='marooned'&&A.sc.pile!==B.sc.pile)ch.push({t:`Signal pile: ${A.sc.pile} → ${B.sc.pile} of 15 wood`,c:'good'});
+    if(G.scen==='hexed'&&A.sc.crosses.length!==B.sc.crosses.length)ch.push({t:`Crosses: ${A.sc.crosses.length} → ${B.sc.crosses.length} of 5`,c:'good'})}
+  const tm=withState(B,()=>tomorrowInfo(r));
+  return {kicker:`End of day ${r} of ${G.rounds}`,title:'How the day went',
+    body:`<div class="dsum">${!A?'':`<h4>What changed today</h4>`+(ch.length?`<ul class="chg">${ch.map(x=>`<li class="${x.c}">${esc(x.t)}</li>`).join('')}</ul>`:'<p class="muted small">Nothing changed.</p>')}
+      <h4>Coming tomorrow (day ${r+1})</h4><ul class="tmr">${tm.lines.map(l=>`<li class="${l.c||''}">${esc(l.t)}</li>`).join('')}</ul>
+      <div class="top1"><div class="rk">Most important tomorrow</div><b>${esc(tm.top.t)}</b><span>${esc(tm.top.why)}</span></div></div>`}}
+// run inside withState(state at the end of day r)
+function tomorrowInfo(r){const S=SCENARIOS[G.scen];const L=[];const n=r+1;const dieN={rain:'rain die',snow:'winter die',animals:'hungry-animals die'};
+  if(n>G.rounds)return {lines:[{t:'This was the last day.'}],top:{t:'—',why:''}};
+  const wx=S.wx[n]||[];L.push({t:wx.length?`Weather tomorrow night: ${wx.map(d=>dieN[d]).join(', ')} (your roof is ${G.camp.roof}).`:'Weather tomorrow night: calm, unless a card adds clouds.',c:wx.length>G.camp.roof?'bad':''});
+  const eaters=living().filter(c=>!c.out).length;const t=campTile();const pf=t?t.src.filter((s,i)=>s!=='wood'&&!G.map[G.camp.pos].exh[i]).length:0;const have=food();
+  L.push({t:`Food: ${eaters} needed tomorrow night. You have ${have}${pf?`, and the camp gives about ${pf} in the morning`:''}.`,c:have+pf<eaters?'bad':''});
+  if(G.ev.wait){const B2=BEAST[G.ev.wait];L.push({t:`At dawn a ${B2.n} attacks: strength ${B2.str} against your weapon ${G.weapon}.`,c:B2.str>G.weapon?'bad':''})}
+  const t0=G.ev.threat[0],t1=G.ev.threat[1];
+  if(!hasShelter())L.push({t:'No shelter yet: everyone loses 1 life every night until you build one.',c:'bad'});
+  if(t0)L.push({t:`At dawn “${CARD[t0].th.n}” strikes, because nobody dealt with it: ${opsText(CARD[t0].te)||'nothing much'}.`,c:'bad'});
+  if(t1)L.push({t:`“${CARD[t1].th.n}” can still be dealt with tomorrow. If not, it strikes the morning after.`});
+  if(n>=2)L.push({t:'A new event card is turned over in the morning.'});
+  // the one priority
+  let top=null;const nd=living().filter(c=>!c.npc&&lifeOf(G,c)<=3).sort((a,b)=>lifeOf(G,a)-lifeOf(G,b))[0];
+  const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];
+  if(nd)top={t:`Rest the ${nd.nm}`,why:`Only ${lifeOf(G,nd)} life left. Resting heals 1. If anyone dies, you all lose.`};
+  else if(have+pf<eaters)top={t:'Find food',why:`You need ${eaters} food tomorrow night and can count on only ${have+pf}. Hungry castaways lose 2 life each.`};
+  else if(!hasShelter())top={t:G.res.wood>=tb.wood?'Build a shelter':'Collect wood for a shelter',why:`A shelter costs ${tb.wood} wood (you have ${G.res.wood}). Without one everyone loses 1 life every night.`};
+  else if(G.ev.wait&&BEAST[G.ev.wait].str>G.weapon)top={t:'Make a better weapon',why:'A beast attacks at dawn. Every point it is stronger than your weapon is a wound.'};
+  else if(wx.filter(d=>d!=='animals').length>G.camp.roof)top={t:'Raise the roof',why:`Tomorrow brings ${wx.filter(d=>d!=='animals').length} weather dice and your roof is ${G.camp.roof}. Every cloud above it ruins food and wood.`};
+  else if(t1&&opsValue(CARD[t1].te)<0)top={t:`Deal with “${CARD[t1].th.n}”`,why:`If it is still there the morning after, it strikes: ${opsText(CARD[t1].te)}.`};
+  else top={t:'Work toward the goal',why:SC().goal?SC().goal():S.x};
+  return {lines:L,top}}
+// ---------- the morning so far (for plan step 1) ----------
+function morningLines(){const out=[];for(let k=UI.beats.length-1;k>=0;k--){const b=UI.beats[k];if(b.round!==G.round)break;if(['dawn','event','threat','morning','prod','fight','adventure','mystery'].includes(b.kind))out.unshift(...beatLines(k).filter(MEANINGFUL).map(l=>l))}
+  const ev=G.lastEvent&&G.round>1?G.log.find(l=>/^Event:/.test(l.t)&&l.r===G.round):null;
+  return (ev?[{t:ev.t,c:'big'}]:[]).concat(out).slice(0,7)}
+const ORDER_T=['threat','hunt','build','gather','explore','special','tmap','camp','rest'];
+// "Job 2 of 4" for an action scene
+function jobNo(i){const b=UI.beats[i];let k=0,g=-1;for(let j=i;j>=0;j--){const x=UI.beats[j];if(x.round!==b.round)break;if(x.kind==='act')k++;if(x.kind==='go'){g=j;break}}if(g<0)return null;const n=UI.beats[g].data.n||0;return n?{k,n}:null}
 
 </script>
 <script>
@@ -2193,7 +2361,9 @@ function allPriorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.
   if(G.round<=3&&bestExplore()!=null)add({w:45,icon:'🧭',title:'Explore the island',why:'New land brings wood, food, discoveries and the terrain your inventions need.',act:{type:'explore',tgt:bestExplore()},done:G.plan.acts.some(a=>a.type==='explore')});
   return o.filter(p=>p.act||p.cant||p.pile||p.info)}
 // the list shown in the panel: not-done first by weight, each checked against the plan and the free pawns
-function priorities(){if(!planOpen())return[];const all=allPriorities().sort((a,b)=>(!!a.done-!!b.done)||(b.w-a.w));const open=all.filter(p=>!p.done).slice(0,5);const keep=[];
+// the same game state always gives the same list: keep it while nothing changes (the panel asks several times per render)
+function priorities(){if(!planOpen())return[];const key=planSig()+'|'+G.logN+'|'+JSON.stringify(G.res)+'|'+G.chars.map(c=>c.w+':'+c.det).join(',')+'|'+G.morale+'|'+G.camp.roof+'|'+G.weapon;if(UI.prioMemo&&UI.prioMemo.key===key&&UI.prioMemo.G===G)return UI.prioMemo.v.slice();const v=prioritiesRaw();UI.prioMemo={key,v,G};return v.slice()}
+function prioritiesRaw(){const all=allPriorities().sort((a,b)=>(!!a.done-!!b.done)||(b.w-a.w));const open=all.filter(p=>!p.done).slice(0,5);const keep=[];
   for(const p of all)if(p.done&&p.act)keep.push(p.act);
   for(const p of open){if(!p.act||p.cant)continue;const r=jobCheck(p,keep);if(r.ok)p.can=true;else if(r.move)p.move=r.move;else p.cant=r.why.replace(/\.$/,'');keep.push(p.act)}
   return open.concat(all.filter(p=>p.done))}
@@ -2221,11 +2391,12 @@ function goalSteps(){const o=[];const inv=(k,w,why)=>{const m=missingTerrain(k);
 // the red priorities that are still open and could be fixed: Start the day asks first
 function uncoveredRed(){return priorities().filter(p=>p.red&&!p.done&&(p.can||p.move))}
 // ---------- 💡 Suggest: the priorities in order, then the computer's best plan for the pawns left ----------
-function suggestPlan(){if(!planOpen())return '';const hs=G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i);clearPlan(hs);const lines=[];
+// keep: plan only the free pawns (the recommendation in plan step 2); otherwise start from an empty human plan
+function suggestCore(keep){const hs=G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i);if(!keep)clearPlan(hs);const lines=[];const whyBy={};
   const who=id=>{const p=pawnInfo(id);return p?pawnLabel(p):'?'};
-  const note=(before,why)=>{for(const a of G.plan.acts){const ids=a.pw.filter(id=>{const p=pawnInfo(id);return !before.has(id)&&p&&(p.c==null||P(p.c).human)});if(ids.length)lines.push(`${pawnGroup(ids)} → ${actLabel(a)}${why?' ('+why+')':''}`)}};
+  const note=(before,why)=>{for(const a of G.plan.acts){const ids=a.pw.filter(id=>{const p=pawnInfo(id);return !before.has(id)&&p&&(p.c==null||P(p.c).human)});if(ids.length){lines.push(`${pawnGroup(ids)} → ${actLabel(a)}${why?' ('+why+')':''}`);const k=JSON.stringify([a.type,a.tgt]);if(why&&!whyBy[k])whyBy[k]=why}}};
   // 1. the hard rule
-  for(const c of living().filter(c=>c.human&&nearDeath(c)&&!restPlanned(c.i))){const p=humanFree().find(p=>p.c===c.i);if(p&&!place(p.id,'rest',null))lines.push(`${c.nm} → Rest (${lifeLeft(c)} life left)`)}
+  for(const c of living().filter(c=>c.human&&nearDeath(c)&&!restPlanned(c.i))){const p=humanFree().find(p=>p.c===c.i);if(p&&!place(p.id,'rest',null)){lines.push(`${c.nm} → Rest (${lifeLeft(c)} life left)`);whyBy[JSON.stringify(['rest',null])]=`${c.nm} has only ${lifeLeft(c)} life left`}}
   // 2. every open priority, most important first
   for(let g=0;g<10;g++){if(!humanFree().some(p=>p.c!=null))break;const pr=priorities().filter(p=>!p.done&&p.act&&p.can&&p.w>=(typeof ADVMINW!=='undefined'?ADVMINW:0));if(!pr.length)break;let did=false;
     for(const p of pr){const before=placedIds();if(!doJob(p.act.type,p.act.tgt,p.act.alt,p.lead)){note(before,p.title.replace(/\s*\(.*\)$/,''));did=true;break}}if(!did)break}
@@ -2234,8 +2405,19 @@ function suggestPlan(){if(!planOpen())return '';const hs=G.chars.filter(c=>c.hum
   const also=G.log.filter(l=>l.i>mark&&(l.c==='step'||/signal pile/.test(l.t))).reverse().map(l=>l.t.replace(/\.$/,''));if(also.length)lines.push('Also: '+also.join('; '));
   // safety net: the rules for the advisor must hold (checked by adv-test.js)
   for(const c of living())if(c.human&&nearDeath(c)&&!restPlanned(c.i)){const p=humanFree().find(q=>q.c===c.i)||allPawns().find(q=>q.c===c.i);if(p&&!placeWhy(p.id,'rest',null)||p&&placedIds().has(p.id)){const snap=JSON.stringify(G.plan);unplace(p.id);if(place(p.id,'rest',null))G.plan=JSON.parse(snap)}}
-  if(!planLegal()){clearPlan(hs);aiPlan(hs.concat(G.chars.filter(c=>c.npc).map(c=>c.i)))}
-  refresh();return lines.join('\n')}
+  if(!planLegal()&&!keep){clearPlan(hs);aiPlan(hs.concat(G.chars.filter(c=>c.npc).map(c=>c.i)))}
+  return {lines,why:whyBy}}
+function suggestPlan(){if(!planOpen())return '';const r=suggestCore(false);UI.sugWhy=r.why;refresh();return r.lines.join('\n')}
+// plan step 2: the job the advisor would give each free pawn, worked out on a copy of the game (the real plan is untouched)
+// The advice stays the same while you follow it; it is worked out again only when the plan leaves it (or resources change).
+function recValid(r){if(!r||r.round!==G.round||r.res!==JSON.stringify(G.res)||r.logN!==G.logN)return false;const now={};for(const a of G.plan.acts)for(const id of a.pw)now[id]=JSON.stringify([a.type,a.tgt]);
+  for(const id in r.bkey)if(now[id]!==r.bkey[id])return false;for(const id in now){if(id in r.bkey)continue;const m=r.map[id];if(!m||JSON.stringify([m.type,m.tgt])!==now[id])return false}return true}
+function recPlan(){if(!planOpen())return {map:{}};if(recValid(UI.rec))return UI.rec;if(UI.recBusy)return {map:{}};const bkey={};for(const a of G.plan.acts)for(const id of a.pw)bkey[id]=JSON.stringify([a.type,a.tgt]);const res0=JSON.stringify(G.res),log0=G.logN;
+  const save=JSON.stringify(G),fx=UI.fx.length,la=UI.lastAct,mate=UI.mate,sw=UI.sugWhy;const before=placedIds();const map={};UI.recBusy=1;
+  try{const r=suggestCore(true);for(const a of G.plan.acts){const n=actNeed(a);const k=a.pw.length;const key=JSON.stringify([a.type,a.tgt]);const dt=dtype(a);
+      for(const id of a.pw)if(!before.has(id))map[id]={type:a.type,tgt:a.tgt,alt:a.alt||0,label:actLabel(a),why:r.why[key]||'',sure:!n.roll||k>=n.max,k,with:a.pw.filter(x=>x!==id).map(x=>{const p=pawnInfo(x);return p?pawnLabel(p):'?'}),odds:n.roll&&k<n.max&&dt&&typeof diceOdds==='function'?diceOdds(dt):null}}}
+  catch(e){console.error(e)}finally{G=JSON.parse(save);UI.fx.length=Math.min(UI.fx.length,fx);UI.lastAct=la;UI.mate=mate;UI.sugWhy=sw;UI.recBusy=0}
+  UI.rec={round:G.round,res:res0,logN:log0,bkey,map};return UI.rec}
 // ---------- first-game walkthrough ----------
 UI.tut=0;try{UI.tut=localStorage.getItem('swi_tut')==='done'?99:0}catch(e){}
 function tutHtml(){if(UI.tut>=99||!G||G.round>1||!planOpen()||allAI())return '';
@@ -2254,24 +2436,84 @@ function tutDone(){UI.tut=99;try{localStorage.setItem('swi_tut','done')}catch(e)
 UI.cat=null;
 const CATS=[['build','🔨','Build'],['gather','🧺','Gather'],['explore','🧭','Explore'],['threat','⚠️','Threats'],['hunt','🏹','Hunt'],['camp','🏕️','Camp & rest'],['special','⭐','Scenario']];
 function planHtml(){
-  if(storyActive())return `<div class="waiting"><div class="big">📖</div><p>The day is being told on the island. Step through it with <b>Next</b> (or Enter), or turn on <b>Auto</b>.</p></div>`+journalHtml();
+  if(storyActive())return `<div class="waiting"><div class="big">📖</div><p>The day is being told on the island. Step through it with <b>Continue</b> (or Enter), or turn on <b>Play by itself</b>.</p></div>`+journalHtml();
   if(!planOpen())return `<p class="muted">${G.over?'The game is over.':'The castaways are busy…'}</p>`+recentHtml();
   if(allAI())return `<p class="muted">The computer castaways are planning the day.</p>`+recentHtml();
-  const S=SCENARIOS[G.scen];const fs=(FL().scen||{})[G.scen]||{};
-  const dayc=`<div class="daycard"><div class="dk">Day ${G.round} of ${G.rounds}</div><b>${esc((fs.days&&fs.days[G.round])||S.n)}</b><div class="gl">🎯 ${esc(SC().goal?SC().goal():S.x)}</div></div>`;
-  let h=tutHtml();
-  const pr=priorities();const pOpen=pr.filter(p=>!p.done),pDone=pr.filter(p=>p.done&&!p.info);
-  if(pr.length)h+=`<h3>Today’s priorities <small class="muted">most urgent first</small></h3><div class="prios">${pOpen.map(p=>prioHtml(p,pr.indexOf(p))).join('')}${pDone.length?`<div class="pdone">✅ <b>Planned:</b> ${pDone.map(p=>esc(p.title)).join(' · ')}</div>`:''}${pr.filter(p=>p.done&&p.info).map(p=>`<div class="pdone">${p.icon} ${esc(p.title)}</div>`).join('')}</div>`;
+  const st=pstep();const titles=['What today needs','Give each pawn a job','Check the risks','Start the day'];
+  const bar=`<div class="wz-steps" aria-label="Planning: step ${st} of 4">${titles.map((t,k)=>`<button class="wz-s ${k+1<st?'done':k+1===st?'now':''}" data-pgo="${k+1}" ${k+1===st?'aria-current="step"':''}><i>${k+1<st?'✓':k+1}</i><span>${t}</span></button>`).join('')}</div>`;
+  const head=`<h3 class="wz-t">${st}. ${titles[st-1]}</h3>`;
+  const body=st===1?wzNeeds():st===2?wzAssign():st===3?wzReview():wzConfirm();
+  return `<div class="wz">${bar}${head}${body}</div>`}
+// ---------- plan step state ----------
+UI.ps={round:0,step:1,skip:[],pick:false};
+function pstep(){if(!G)return 1;if(UI.ps.round!==G.round){UI.ps={round:G.round,step:1,skip:[],pick:false};UI.sugWhy={}}return UI.ps.step}
+function resetPlanSteps(){UI.ps={round:0,step:1,skip:[],pick:false};UI.rec=null;UI.sugWhy={}}
+function setPStep(n){pstep();UI.ps.step=Math.max(1,Math.min(4,n));UI.ps.pick=false;if(UI.ps.step!==2)UI.sel=null;UI.toTop=1}
+// the pawns you plan for, in order: your castaways' pawns, then the helpers (Friday, the dog, ...)
+function wizPawns(){const hs=new Set(G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i));const all=allPawns().filter(p=>p.c!=null?hs.has(p.c):true);return all.filter(p=>p.c!=null).concat(all.filter(p=>p.c==null))}
+function curPawn(){const placed=placedIds();const free=wizPawns().filter(p=>!placed.has(p.id)&&!UI.ps.skip.includes(p.id));if(UI.sel&&free.some(p=>p.id===UI.sel))return pawnInfo(UI.sel);return free.find(p=>p.c!=null)||free[0]||null}
+function pawnNice(p){if(p.c==null)return pawnLabel(p);const c=P(p.c);const n=pawnsOf(c);return n>1?`${c.nm} (${p.id.endsWith('_0')?'1st':'2nd'} pawn)`:c.nm}
+function riskWords(a){const n=actNeed(a);const k=a.pw.length;if(k<n.need)return `<b class="warn">Not enough pawns: needs ${n.need-k} more</b>`;
+  if(n.roll&&k<n.max){const dt=dtype(a);const o=dt?diceOdds(dt):{s:80,w:1,q:3};return `<b class="roll">Rolls the dice: ${o.s}% chance it works, ${o.w} in 6 chance of a wound.</b> <small>Add 1 more pawn to make it certain.</small>`}
+  return `<b class="sure">Certain: enough pawns, no dice.</b>`}
+// ---------- step 1: what today needs ----------
+function wzNeeds(){const need=eatersNeed(),have=food(),planF=plannedFood();const cl=clouds();const S=SCENARIOS[G.scen];const dieN={rain:'rain die',snow:'winter die',animals:'hungry-animals die'};
+  const row=(ok,label,val,note)=>`<div class="nd ${ok?'ok':'bad'}"><b>${label}</b><span class="v">${val}</span><small>${note}</small></div>`;
+  const low=living().filter(c=>!c.npc).sort((a,b)=>lifeLeft(a)-lifeLeft(b))[0];
+  let h=`<p class="wz-p">Before you give out jobs, look at what the camp needs today. Red means trouble tonight.</p>`;
+  const ml=morningLines();if(ml.length)h+=`<div class="morn"><b>This morning:</b><ul>${ml.map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ul></div>`;
+  h+=`<div class="needs">`+row(have+planF>=need,'Food for tonight',`${have+planF} of ${need}`,`Everyone eats 1 food at night. Hungry: 2 wounds each.${planF?` (${planF} of it is planned.)`:''}`)
+    +row(hasShelter(),'Shelter',hasShelter()?'yes':'none',hasShelter()?'Keeps you from sleeping in the open.':'Tonight everyone loses 1 life without one.')
+    +row(cl.est<=G.camp.roof,'Roof',`${G.camp.roof}`,`Weather tonight: ${cl.dice.length?cl.dice.map(d=>dieN[d]).join(', '):'calm'}${G.wx.rain?` +${G.wx.rain} rain`:''}${G.wx.snow?` +${G.wx.snow} snow`:''}${G.wx.storm?' + a storm':''}. Each cloud above the roof ruins 1 food and 1 wood.`)
+    +row(!G.ev.wait||BEAST[G.ev.wait].str<=G.weapon,'Weapon',`${G.weapon}`,G.ev.wait?`A ${BEAST[G.ev.wait].n} (strength ${BEAST[G.ev.wait].str}) attacks at dawn.`:'Used when you hunt or a beast attacks.')
+    +(low?row(lifeLeft(low)>3,'Lowest life',`${esc(low.nm)} ${lifeLeft(low)}`,lifeLeft(low)<=3?'Close to death: this castaway should rest.':'If anyone dies, you all lose.'):'')+`</div>`;
+  const th=G.ev.threat.map((k,i)=>{if(!k)return '';const c=CARD[k];const r=c.th.req||{};const rq=reqText(r);return `<div class="thr ${i===0?'hot':''}"><b>Threat: ${esc(c.th.n)}</b><span>${i===0?'Strikes at the next dawn unless you deal with it today.':'Strikes in two days. You can deal with it today or tomorrow.'}</span><small>To deal with it: ${c.th.pw==='1-2'?'1 or 2':c.th.pw} pawn${c.th.pw===1?'':'s'}${rq?', needs '+esc(rq):''}. Reward: ${opsText(c.th.rw||c.th.rw2||c.th.rw1)||'none'}. If ignored: ${opsText(c.te)||'nothing'}.</small></div>`}).join('');
+  h+=th?`<h4>Threat cards</h4>${th}`:`<p class="muted small">No threat cards on the board.</p>`;
+  const pr=priorities().filter(p=>!p.done&&!p.info);if(pr.length)h+=`<h4>What matters most today</h4><ol class="plist">${pr.map(p=>`<li class="${p.red?'red':''}" ${posAttr(p.act)}><b>${esc(p.title)}</b><span>${esc(p.why)}</span></li>`).join('')}</ol>`;
   const mates=mateHtml();if(mates)h+=mates;
-  const free=humanFree();
-  h+=`<div class="tray"><div class="lbl">${free.length?`${free.filter(p=>p.c!=null).length} castaway pawn${free.filter(p=>p.c!=null).length===1?'':'s'} free${free.some(p=>p.c==null)?' + helpers':''}`:'Every pawn has a job'} <small>${free.length?'· tap one to choose who, then a job':''}</small></div>${free.map(p=>chip(p)).join('')}</div>`;
-  h+=`<h3>Your plan</h3>`+(G.plan.acts.length?`<div class="plan">${G.plan.acts.map(a=>planLine(a)).join('')}</div>`:`<p class="muted small">Nothing planned yet. Use a priority above, a category below, or tap the island.</p>`);
-  if(UI.tileSel!=null)h+=tileFocusHtml(UI.tileSel);
-  h+=dayc;
-  h+=`<h3>Add a job</h3><div class="cats">${CATS.filter(([k])=>k!=='special'||Object.keys(SC().specials||{}).length||G.kept.m_tmap).map(([k,ic,n])=>{const c=catCount(k);return `<button class="cat ${UI.cat===k?'on':''}" data-cat="${k}" ${c?'':'aria-disabled="true"'}><span>${ic}</span>${n}<small>${c||'—'}</small></button>`}).join('')}</div>`;
-  if(UI.cat)h+=`<div class="catbody">${catHtml(UI.cat)}</div>`;
-  const pb=planProblems();h+=`<div class="probs">${pb.length?pb.slice(0,3).map(x=>`<div>• ${esc(x)}</div>`).join(''):'<div class="ok">✓ Ready. Press Start the day.</div>'}</div>`;
-  h+=`<label class="chk"><input type="checkbox" data-a="moveask" ${G.moveAsk?'checked':''}> Consider moving the camp tonight</label>`;
+  h+=`<div class="daycard"><div class="dk">Your goal</div><b>${esc(SC().goal?SC().goal():S.x)}</b></div>`;
+  return h}
+// ---------- step 2: one pawn at a time ----------
+function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=curPawn();
+  const row=`<div class="pawnrow">${list.map((p,k)=>{const a=G.plan.acts.find(x=>x.pw.includes(p.id));const on=cur&&cur.id===p.id;const col=p.c!=null?PCOL[p.c%6]:p.f?'#f3f3f3':'#8d8d8d';
+    return `<button class="pw ${on?'on':''} ${a?'set':''}" style="--pc:${col}" data-pawn="${p.id}" title="${esc(pawnNice(p))}${a?': '+esc(actLabel(a)):''}"><i></i><span>${k+1}. ${esc(pawnLabel(p).split(' ')[0])}</span><small>${a?'✓ '+esc(actLabel(a).replace(/^Threat: /,'')):UI.ps.skip.includes(p.id)?'no job':'…'}</small></button>`}).join('')}</div>`;
+  let h='';
+  if(!cur){h+=row+`<div class="alldone">✓ Every pawn has a job. Press <b>Next</b> to check the risks, or tap a pawn above to change its job.</div>`;return h+planSoFar()}
+  UI.sel=cur.id;const k=list.findIndex(p=>p.id===cur.id)+1;const rec=recPlan().map[cur.id];
+  h+=`<div class="curp" style="--pc:${cur.c!=null?PCOL[cur.c%6]:'#9a9a9a'}"><div class="cp-n">Pawn ${k} of ${list.length}</div><b>${esc(pawnNice(cur))}</b>${cur.c!=null?`<small>${lifeLeft(P(cur.c))} life left</small>`:`<small>${cur.f?'A helper: works alone or with you. Never needs food or shelter.':'A helper: '+(cur.t||[]).map(t=>TNAME[t]).join(' / ')+' only.'}</small>`}</div>`;
+  if(rec&&!placeWhy(cur.id,rec.type,rec.tgt,rec.alt)){const risk=rec.sure?`Certain${rec.with.length?` (with ${esc(rec.with.join(' + '))})`:''}: no dice.`:rec.odds?`Rolls the dice: ${rec.odds.s}% chance it works${rec.with.length?` (with ${esc(rec.with.join(' + '))})`:''}.`:'Rolls the dice.';
+    h+=`<div class="rec"><div class="rk">Recommended job</div><b>${esc(rec.label)}</b><span>${rec.why?'Why: '+esc(rec.why)+'.':'Why: a good use of a spare pawn today.'}</span><span class="${rec.sure?'sure':'roll'}">${risk}</span>
+      <div class="rb"><button class="btn go" data-a="rec">✔ Give ${esc(pawnLabel(cur).split(' ')[0])} this job</button><button class="btn ghost" data-a="pick" aria-expanded="${UI.ps.pick}">${UI.ps.pick?'Hide other jobs':'Choose another job'}</button></div></div>`}
+  else{UI.ps.pick=true;h+=`<p class="wz-p">Pick a job for ${esc(pawnLabel(cur))} below, or tap a place on the island.</p>`}
+  h+=row;
+  if(cur.c==null)h+=`<button class="btn xs ghost" data-a="pskip">Leave ${esc(pawnLabel(cur))} without a job today</button>`;
+  if(UI.ps.pick){const quick=priorities().filter(p=>!p.done&&p.act&&!placeWhy(cur.id,p.act.type,p.act.tgt,p.act.alt));
+    if(quick.length)h+=`<h4>Today’s needs ${esc(pawnLabel(cur).split(' ')[0])} can help with</h4><div class="qpick">${quick.map(p=>`<button class="btn sm" data-pq="${priorities().indexOf(p)}" ${posAttr(p.act)}>${esc(p.title)}</button>`).join('')}</div>`;
+    if(UI.tileSel!=null)h+=tileFocusHtml(UI.tileSel);
+    h+=`<h4>All jobs</h4><div class="cats">${CATS.filter(([kk])=>kk!=='special'||Object.keys(SC().specials||{}).length||G.kept.m_tmap).map(([kk,ic,n])=>{const c=catCount(kk);return `<button class="cat ${UI.cat===kk?'on':''}" data-cat="${kk}" ${c?'':'aria-disabled="true"'}><span>${ic}</span>${n}<small>${c?c+' possible':'none now'}</small></button>`}).join('')}</div>`;
+    if(UI.cat)h+=`<div class="catbody">${catHtml(UI.cat)}</div>`}
+  h+=`<p class="hint">One pawn on a job rolls the dice: it can fail or hurt. A second pawn on the same job makes it certain. Places two steps from camp need one more pawn.</p>`;
+  return h+planSoFar()}
+function planSoFar(){if(!G.plan.acts.length)return '';return `<details class="sofar" ${UI.ps.sofar?'open':''}><summary data-a="sofar">The plan so far (${G.plan.acts.length} job${G.plan.acts.length>1?'s':''})</summary><div class="plan">${G.plan.acts.map(a=>planLine(a)).join('')}</div></details>`}
+// ---------- step 3: every job with its risk ----------
+function wzReview(){let h=`<p class="wz-p">Each job shows its risk. <b>Certain</b> jobs always work. Jobs that <b>roll the dice</b> can fail or cost a wound. Tap a pawn’s name to take it off a job.</p>`;
+  if(!G.plan.acts.length)return h+`<p class="muted">Nothing planned yet. Go back to step 2, or press 💡 Plan it for me.</p>`;
+  const W=UI.sugWhy||{};
+  h+=`<div class="review">${G.plan.acts.slice().sort((x,y)=>ORDER_T.indexOf(x.type)-ORDER_T.indexOf(y.type)).map((a,k)=>{const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v} ${RNAME[r]}`).join(' + ');const why=W[JSON.stringify([a.type,a.tgt])];
+    const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)?` <button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">pay with ${a.pay==='fur'?'fur':'wood'}</button>`:'';
+    return `<div class="rv" ${posAttr(a)}><div class="rv-n">${k+1}</div><div><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')}</div><div class="rsk">${riskWords(a)}</div>${cost?`<small>Costs ${cost}.${payT}</small>`:''}${why?`<small class="why">Why: ${esc(why)}.</small>`:''}</div></div>`}).join('')}</div>`;
+  const pb=planProblems();if(pb.length)h+=`<div class="probs">${pb.slice(0,4).map(x=>`<div>• ${esc(x)}</div>`).join('')}</div>`;
+  const open=priorities().filter(p=>!p.done&&!p.info&&p.act);if(open.length)h+=`<div class="notcov"><b>Not covered today:</b> ${open.map(p=>`<span class="${p.red?'red':''}">${esc(p.title)}</span>`).join(' · ')}</div>`;
+  h+=`<div class="rb"><button class="btn xs ghost" data-a="clear">Clear my plan</button></div><label class="chk"><input type="checkbox" data-a="moveask" ${G.moveAsk?'checked':''}> Ask me tonight whether to move the camp</label>`;
+  return h}
+// ---------- step 4: confirm ----------
+function wzConfirm(){const acts=G.plan.acts;const roll=acts.filter(a=>{const n=actNeed(a);return n.roll&&a.pw.length<n.max}).length;const pb=planProblems();const red=uncoveredRed();
+  const pr=priorities().filter(p=>!p.info||p.done);
+  let h=`<p class="wz-p">${acts.length} job${acts.length===1?'':'s'}: ${acts.length-roll} certain, ${roll} roll${roll===1?'s':''} the dice.</p>`;
+  h+=`<ul class="checks">${pr.map(p=>`<li class="${p.done?'ok':p.red?'bad':'meh'}">${p.done?'✓':p.red?'✗':'–'} ${esc(p.title)}</li>`).join('')}</ul>`;
+  if(pb.length)h+=`<div class="probs">${pb.slice(0,3).map(x=>`<div>• ${esc(x)}</div>`).join('')}<div>Go back to step 2 to fix this.</div></div>`;
+  if(red.length)h+=`<div class="probs warn2">${red.map(p=>esc(p.confirm||('⚠ '+p.title+' is not covered.'))).join('<br>')}<div>You can still start, or press 💡 Plan it for me.</div></div>`;
+  h+=`<p class="wz-p">When you start, the day plays out one step at a time: <b>Actions</b> (job by job), then <b>Weather</b>, then <b>Night</b>. The plan can’t be changed after that.</p>`;
   return h}
 function posOf(act){if(!act)return null;if(act.type==='gather')return act.tgt.pos;if(act.type==='explore')return act.tgt;if(act.type==='build'&&act.tgt&&act.tgt.cross!=null)return act.tgt.cross;return null}
 const posAttr=act=>{const p=posOf(act);return p!=null?`data-pos="${p}"`:''};
@@ -2554,7 +2796,7 @@ const PCOL=['#e0625c','#4f8fe6','#57b36a','#e8ad45','#a57ce0','#9a9a9a'];
 const RICON={food:'🍖',pfood:'🥫',wood:'🪵',fur:'🧶'};
 const PHASES=[['event','Event'],['morale','Morale'],['prod','Production'],['plan','Plan'],['act','Actions'],['weather','Weather'],['night','Night']];
 UI.tab='plan';UI.sel=null;UI.tileSel=null;UI.report=null;UI.seenLog=0;UI.fxSeen=0;UI.lastRollId=0;UI.toasts=[];
-function refresh(){if(G){try{if(!G.over)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
+function refresh(){if(UI.recBusy)return;if(G){try{if(!G.over)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
   if(!G){return}
   // the last beat always shows the live state; an ending gets its own scene
   const B=UI.beats;if(B.length){B[B.length-1].snap=null;B[B.length-1].obj=null}
@@ -2565,7 +2807,7 @@ function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){const m={skill:'good'}[
     if(f.t==='explore'||f.t==='build'||f.t==='wound'||f.t==='fight')UI.bump=f}
   UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,UI.fx.length-10);UI.fxSeen=UI.fx.length}}
 // ---------- top-level render ----------
-function render(){if(!G){renderModal();renderStory();return}msgCheck();withView(()=>{renderHud();renderMap2D()});renderStep();renderPanel();renderStory();renderModal();
+function render(){if(!G){renderModal();renderStory();renderRoadmap();return}msgCheck();wizSync();renderRoadmap();withView(()=>{renderHud();renderMap2D()});renderStep();renderPanel();renderStory();renderModal();
   const pb=$('#pausebtn');if(pb){pb.hidden=!allAI();pb.textContent=UI.pause?'▶ Resume':'⏸ Pause'}const sb=$('#speedbtn');if(sb)sb.textContent='⏩ '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')}
 const RLAB={food:'food',pfood:'dry food',wood:'wood',fur:'fur'};
 const RTIP={food:'🍖 Food: each castaway eats 1 at night; what is left spoils overnight',pfood:'🥫 Dry food: eaten like food, but it never spoils',wood:'🪵 Wood: pays for building, the roof and palisade, and warmth in snow',fur:'🧶 Fur: can pay for the shelter, roof or palisade instead of wood'};
@@ -2579,7 +2821,7 @@ function renderHud(){const S=SCENARIOS[G.scen];const el=$('#hud');if(!el)return;
    <div class="hud-r">
     <div class="res">${['food','pfood','wood','fur'].map(r=>`<span class="hk" title="${RTIP[r]}${G.fut[r]?' (+'+G.fut[r]+' arriving)':''}">${RICON[r]} <b>${G.res[r]}</b>${G.fut[r]?`<small>+${G.fut[r]}</small>`:''}<em>${RLAB[r]}</em></span>`).join('')}</div>
     <div class="trk"><span class="hk" title="Shelter: without one everyone takes a wound each night">${hasShelter()?'🏠':'⛺'}<b>${hasShelter()?'✓':'✗'}</b><em>shelter</em></span><span class="hk" title="Roof: each level keeps one weather cloud off your food and wood">☂ <b>${G.camp.roof}</b><em>roof</em></span><span class="hk" title="Palisade: each level soaks up one storm or beast hit on the camp">🧱 <b>${G.camp.pal}</b><em>palisade</em></span><span class="hk" title="Weapon: against beasts; every point a beast is stronger is a wound">🗡 <b>${G.weapon}</b><em>weapon</em></span><span class="hk mor" title="Morale (−3 to +3): below 0 the first player loses that much ✊ determination each morning; above 0 they gain it"><span class="mt">${[-3,-2,-1,0,1,2,3].map(v=>`<i class="${v===G.morale?'on':''} ${v<0?'neg':v>0?'pos':''}">${v>0?'+'+v:v}</i>`).join('')}</span><em>morale</em></span></div>
-    <div class="lives" aria-label="Life of each castaway">${lives}</div>
+    <div class="lives" aria-label="Life of each castaway">${lives}</div><div class="rleg">❤ life left · ✊ determination (pays for skills) · ★ first player</div>
     <div class="fc" title="Weather dice rolled tonight, plus clouds added by event cards">${wx.length||G.wx.rain||G.wx.snow||G.wx.storm?`Weather tonight: ${wx.map(d=>dieI[d]+' '+dieN[d]).join(', ')}${G.wx.rain?' +🌧'.repeat(G.wx.rain):''}${G.wx.snow?' +❄️'.repeat(G.wx.snow):''}${G.wx.storm?' +⛈ storm':''}${G.wxEarly?` <b>(${Object.values(G.wxEarly).join(', ')})</b>`:''}`:'Weather tonight: calm'}</div></div>
    <div class="goal">${esc(S.n)}: ${esc(SC().goal?SC().goal():'')}</div>`}
 function stepText(){if(G.over)return G.over.win?`🏆 ${G.over.why}`:`☠ ${G.over.why}`;
@@ -2587,17 +2829,24 @@ function stepText(){if(G.over)return G.over.win?`🏆 ${G.over.why}`:`☠ ${G.ov
   if(planOpen()){if(allAI())return UI.pause?'Paused.':'The computer castaways are planning…';const left=allPawns().filter(p=>p.c!=null&&!P(p.c).dead&&P(p.c).human&&!placedIds().has(p.id)).length;const pr=planProblems();
     return left?`Plan the day: ${left} pawn${left>1?'s':''} still to place. Pick a pawn, then an action${V3.on?' or a tile on the island':''}.`:pr.length?`Almost ready: ${pr[0]}`:'Everyone has a job. Start the day when you are happy with the plan.'}
   return 'The day unfolds…'}
-function renderStep(){const el=$('#step');if(!el)return;const st=storyActive();el.hidden=st;const dk0=$('#dock');if(st){if(dk0)dk0.hidden=true;return}const ready=planOpen()&&!allAI()&&!planProblems().length;
+function wizSync(){if(planOpen()&&!allAI()){pstep();if(UI.ps.step!==2&&UI.sel&&!UI.tileSel)UI.sel=null}}
+function stepFoot(){const st=pstep();const cur=st===2?curPawn():null;const list=st===2?wizPawns():[];const red=st===4?uncoveredRed():[];const pb=planProblems();
+  const sug=`<button class="btn ghost" data-a="suggest" title="Give every pawn a job following today’s needs (H). You can change anything.">💡 Plan for me</button>`;
+  const back=st>1?`<button class="btn ghost" data-a="pback">◀ Back</button>`:`<button class="btn ghost" data-a="clear" title="Take all your pawns off their jobs">Clear</button>`;
+  const txt=st===1?'Step 1 of 4: read what today needs, then give out jobs.':st===2?(cur?`Step 2 of 4 · Pawn ${list.findIndex(p=>p.id===cur.id)+1} of ${list.length}: ${pawnNice(cur)}. Take the recommended job or choose another.`:'Step 2 of 4: every pawn has a job.'):st===3?'Step 3 of 4: check the risk of each job.':pb.length?`Step 4 of 4: not ready yet. ${pb[0]}`:red.length?'Step 4 of 4: something urgent is not covered.':'Step 4 of 4: all set. Start the day!';
+  const next=st===1?`<button class="btn go" data-a="pnext" title="Step 2: give each pawn a job">Next: jobs ▶</button>`:st===2?`<button class="btn go ${cur&&cur.c!=null?'dim':''}" data-a="pnext" title="Step 3: check the risk of each job">Next: check ▶</button>`:st===3?`<button class="btn go ${pb.length?'dim':''}" data-a="pnext" title="Step 4: start the day">Next: start ▶</button>`:
+    `<button class="btn go ${pb.length?'dim':''}" data-a="go" ${red.length?'data-force="1"':''} title="Start the day (Enter)">${red.length?'Start anyway ▶':'Start day ▶'}</button>`;
+  return `<div class="st-t" id="steptext">${esc(txt)}</div><div class="st-b">${back}${sug}${next}</div>`}
+function renderStep(){const el=$('#step');if(!el)return;const st=storyActive();el.hidden=st;if(st)return;
   const cf=UI.confirm&&planOpen()&&!allAI();
-  el.innerHTML=cf?`<div class="st-t confirm" id="steptext" role="alert">${esc(UI.confirm)} Start anyway?</div><div class="st-b"><button class="btn ghost" data-a="suggest" title="Fill the priorities for me">💡 Suggest</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`:
-  `<div class="st-t" id="steptext">${esc(stepText())}</div>${planOpen()&&!allAI()?`<div class="st-b"><button class="btn ghost" data-a="suggest" title="Fill today’s priorities in order, then let the computer plan the rest (H)">💡 Suggest</button><button class="btn ghost" data-a="clear">Clear</button><button class="btn go ${ready?'':'dim'}" data-a="go" title="Start the day (Enter)">Start the day ▶</button></div>`:''}${G.over?`<div class="st-b"><button class="btn go" data-a="new">New game</button></div>`:''}`;
-  const dk=$('#dock');if(dk){dk.hidden=!(planOpen()&&!allAI());dk.innerHTML=`<button class="btn ghost" data-a="suggest">💡</button><span>${esc(stepText())}</span><button class="btn go ${ready?'':'dim'}" data-a="go">Start ▶</button>`}}
+  el.innerHTML=cf?`<div class="st-t confirm" id="steptext" role="alert">${esc(UI.confirm)} Start anyway?</div><div class="st-b"><button class="btn ghost" data-a="suggest" title="Fill the priorities for me">💡 Plan it for me</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`:
+  planOpen()&&!allAI()?stepFoot():`<div class="st-t" id="steptext">${esc(stepText())}</div>${G.over?`<div class="st-b"><button class="btn go" data-a="new">New game</button></div>`:''}`}
 // ---------- side panel ----------
-function renderPanel(){const el=$('#panel');if(!el)return;el.innerHTML=`<div class="pbody">${planHtml()}</div>`;
+function renderPanel(){const el=$('#panel');if(!el)return;el.innerHTML=`<div class="pbody">${planHtml()}</div>`;if(UI.toTop&&!storyActive()){UI.toTop=0;const bd=document.querySelector('.gx-dock-body');if(bd)bd.scrollTop=0}
   // popups render only while open
   if(GX.open==='campd')keepScroll('#campbody',()=>campHtml());if(GX.open==='logd')keepScroll('#logbody',()=>logHtml());
   if(GX.open==='cardsd'&&$('#cardsbody').dataset.v!==(UI.ctab||'')+'|'+(UI.cq||''))renderCards();
-  const st=storyActive(),q=humanQ();const dt=$('#dockt');if(dt)dt.textContent=G.over&&!st?'Game over':st?(q&&storyIdx()===UI.beats.length-1?'Your decision':`Day ${UI.beats[storyIdx()].round} · the story`):planOpen()&&!allAI()?`Plan day ${G.round}`:'The day unfolds';
+  const st=storyActive(),q=humanQ();const dt=$('#dockt');if(dt){const f=flowNow();const ph=f&&PHI(f.k)>=0?PH7[PHI(f.k)].n:'';dt.textContent=G.over&&!st?'Game over':st?(q&&storyIdx()===UI.beats.length-1?'Your decision':f.k==='done'?`Day ${f.round} is over`:f.k==null?'The shipwreck':`Day ${f.round} · ${ph}`):planOpen()&&!allAI()?`Plan day ${G.round} · step ${pstep()} of 4`:'The day unfolds'}
   const ch=$('#chip');if(ch)withView(()=>{ch.textContent=`Day ${G.round}/${G.rounds} · ${({start:'dawn',event:'event',morale:'morning',prod:'morning',plan:'planning',act:'actions',actdone:'actions',weather:'weather',night:'night'})[G.phase]||G.phase}`});
   // a new decision or a new story always brings the panel back
   const need=(q?'q'+G.q.title+G.logN:'')+(st?'s'+UI.beats.length:'');if(need&&need!==UI.lastNeed){UI.lastNeed=need;GX.showDock()}}
@@ -2708,17 +2957,18 @@ function renderMap2D(){const el=$('#map2d');if(!el||V3.on){if(el)el.hidden=true;
     const pts=Array.from({length:6},(_,i)=>{const a=Math.PI/3*i+Math.PI/6;return (x+Math.cos(a)*R*.98).toFixed(1)+','+(y+Math.sin(a)*R*.98).toFixed(1)}).join(' ');
     return `<g data-tile="${m.id}" class="hx ${UI.tileSel===m.id?'sel':''} ${UI.hoverPos===m.id?'pulse':''}"><polygon points="${pts}" fill="${t?col[t.terr]:g.down?'#333':'#24364a'}" stroke="#0b1520" stroke-width="2"/><text x="${x}" y="${y-6}" text-anchor="middle">${t?(m.id+1)+' '+t.terr.slice(0,5):'❔'+(m.id+1)}</text><text x="${x}" y="${y+12}" text-anchor="middle">${m.id===G.camp.pos?'🏕':''}${g.fog?'🌫':''}${G.sc.crosses&&G.sc.crosses.includes(m.id)?'✝':''}${t?t.src.map((s,i)=>g.exh[i]?'▪':s==='wood'?'🪵':'🐟').join(''):''}</text></g>`}).join('')}</svg>`}
 // ---------- input ----------
-function on3DTile(id){if(storyActive())return;UI.tileSel=id;UI.tab='plan';tutAdvance(3);const t=tileAt(id);if(!t&&G.map[id].tile==null)UI.cat=null;render();const f=document.querySelector('.tfocus');if(f&&f.scrollIntoView)f.scrollIntoView({block:'nearest',behavior:'smooth'})}
+function on3DTile(id){if(storyActive())return;if(planOpen()&&!allAI()&&pstep()!==2){setPStep(2);UI.ps.pick=true}UI.tileSel=id;UI.tab='plan';tutAdvance(3);const t=tileAt(id);if(!t&&G.map[id].tile==null)UI.cat=null;render();const f=document.querySelector('.tfocus');if(f&&f.scrollIntoView)f.scrollIntoView({block:'nearest',behavior:'smooth'})}
 function autoPawn(type,tgt,alt){const humans=new Set(G.chars.filter(c=>c.human).map(c=>c.i));const free=allPawns().filter(p=>!placedIds().has(p.id)&&(p.c==null||humans.has(p.c)));const a=findActAny(type,tgt,alt);const hasLead=a&&a.pw.some(q=>{const p=pawnInfo(q);return p&&(p.c!=null||p.f)});
   const order=hasLead?free.filter(p=>p.x).concat(free.filter(p=>p.c!=null),free.filter(p=>p.f)):free.filter(p=>p.c!=null).concat(free.filter(p=>p.f),free.filter(p=>p.x));return order.find(p=>!placeWhy(p.id,type,tgt,alt))}
 function doPlace(type,tgt,alt){let pid=UI.sel;if(!pid){const p=autoPawn(type,tgt,alt);if(!p){toast('No free pawn can do that.');return}pid=p.id}
-  const e=place(pid,type,tgt,alt);if(e){toast(e);return}sfx('place');UI.sel=null;tutAdvance(2);
+  const e=place(pid,type,tgt,alt);if(e){toast(e);return}sfx('place');UI.sel=null;tutAdvance(2);wizPlaced();
   // keep the same character selected for their second pawn
   refresh()}
 // the dock message: stays until the plan changes (or a few seconds for plain notes)
 function toast(t,ms,keep){const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;UI.msgSig=G?planSig():'';UI.msgKeep=!!keep;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>{el.hidden=true},ms||3600);const lv=$('#live');if(lv)lv.textContent=t}
 function msgCheck(){const el=$('#dockmsg');if(!el||el.hidden||!G)return;if(UI.msgSig!==planSig()&&!UI.msgKeep)el.hidden=true;if(UI.confirmSig&&UI.confirmSig!==planSig())UI.confirm=null}
 // Start the day: first ask when a red priority is still open
+function wizPlaced(){if(planOpen()&&!allAI()&&pstep()===2&&!curPawn())setPStep(3)}
 function tryStart(force){if(!planOpen())return;if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();renderStep();GX.showDock();return}}
   UI.confirm=null;const r=startActions();if(r)toast(r);else{sfx('click');if(UI.tut<99)tutDone()}}
 function pulsePos(p){if(UI.hoverPos===p)return;UI.hoverPos=p;try{if(V3.lab)for(const id in V3.lab)V3.lab[id].classList.toggle('pulse',+id===p);if(!V3.on)withView(()=>renderMap2D())}catch(e){}}
@@ -2730,9 +2980,13 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   if(d.do!=null){const p=priorities()[+d.do];if(p&&p.act){const before=placedIds();const r=p.can?doJob(p.act.type,p.act.tgt,p.act.alt,p.lead):p.move?applyMove(p):(p.cant||'Not possible now.');
       if(r)toast(r);else{sfx('place');tutAdvance(2);const who=[];for(const a of G.plan.acts){const ids=a.pw.filter(id=>!before.has(id));if(ids.length)who.push(`${pawnGroup(ids)} → ${actLabel(a)}`)}refresh();toast('Planned: '+who.join(' · ')+(p.move?` (${p.move.nm} left “${p.move.label}”)`:''),4000);return}}refresh();return}
   if(d.cat){UI.cat=UI.cat===d.cat?null:d.cat;render();return}
+  if(d.phx){UI.phx=UI.phx===d.phx?null:d.phx;renderRoadmap();return}
+  if(d.pgo){setPStep(+d.pgo);render();return}
+  if(d.pq!=null){const p=priorities()[+d.pq];const cur=curPawn();if(p&&p.act&&cur){const e=place(cur.id,p.act.type,p.act.tgt,p.act.alt);if(e)toast(e);else{sfx('place');UI.sugWhy[JSON.stringify([p.act.type,p.act.tgt])]=p.title;UI.sel=null;wizPlaced();refresh()}}return}
   if(d.tut){if(d.tut==='off')tutDone();else UI.tut++;render();return}
   if(d.place){const o=JSON.parse(decodeURIComponent(d.place));doPlace(o.type,o.tgt,o.alt);return}
   if(d.rm){unplace(d.rm);UI.sel=null;refresh();return}
+  if(d.pawn&&b.closest('.pawnrow')&&placedIds().has(d.pawn)&&planOpen()){unplace(d.pawn);UI.sel=d.pawn;UI.ps.pick=true;refresh();return}
   if(d.pawn){UI.sel=UI.sel===d.pawn?null:d.pawn;sfx('click');render();return}
   if(d.pay){const a=G.plan.acts.find(x=>x.id===+d.pay);setPay(a.id,a.pay==='wood'?'fur':'wood');refresh();return}
   if(d.skill){const [ci,k]=d.skill.split(':');const r=useSkill(+ci,k);if(r)toast(r);return}
@@ -2750,7 +3004,14 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'goback':UI.confirm=null;render();return;
   case 'next':storyNext();return;case 'skip':storySkip();return;
   case 'auto':UI.auto=!UI.auto;try{localStorage.setItem('swi_auto',UI.auto?'1':'0')}catch(e){}render();return;
-  case 'suggest':{const m=suggestPlan();toast('💡 Suggested plan (change anything you like):\n'+(m||'Nothing to add.'),12000);return}
+  case 'suggest':{const m=suggestPlan();setPStep(3);toast(m?'💡 Every pawn has a job now. Check the risk of each one below, and change anything you like.':'💡 Nothing to add.',6000);render();return}
+  case 'pnext':setPStep(pstep()+1);render();return;case 'pback':setPStep(pstep()-1);render();return;
+  case 'pick':UI.ps.pick=!UI.ps.pick;render();return;
+  case 'pskip':{const c=curPawn();if(c&&c.c==null)UI.ps.skip.push(c.id);UI.sel=null;wizPlaced();render();return}
+  case 'rec':{const c=curPawn();const r=c&&recPlan().map[c.id];if(!r){toast('No job to recommend: choose one below.');UI.ps.pick=true;render();return}const e=place(c.id,r.type,r.tgt,r.alt);if(e){toast(e);UI.ps.pick=true;render();return}
+    sfx('place');if(r.why)UI.sugWhy[JSON.stringify([r.type,r.tgt])]=r.why;UI.sel=null;wizPlaced();refresh();return}
+  case 'quick':setQuick(b.checked);render();return;
+  case 'sofar':e.preventDefault();UI.ps.sofar=!UI.ps.sofar;render();return;
   case 'retry':retryGame(d.easy==='1');return;case 'menu':toggleMenu();return;
   case 'clear':clearPlan(G.chars.filter(c=>c.human).map(c=>c.i));refresh();return;
   case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const r=pileAdd(SCEN.marooned.pileRoom());if(r)toast(r);return}
@@ -2767,17 +3028,17 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
 document.addEventListener('input',e=>{const t=e.target;if(t.dataset.cq!=null){UI.cq=t.value;const pos=t.selectionStart;renderCards();const i=$('#cardsbody [data-cq]');if(i){i.focus();i.setSelectionRange(pos,pos)}}if(t.dataset.opt==='items')UI.setup.items=+t.value});
 document.addEventListener('change',e=>{const t=e.target;if(t.dataset.opt==='items')UI.setup.items=+t.value});
 document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;if(e.key==='Escape'){if(UI.modal&&G){UI.modal=null;render()}else if(UI.report){UI.report=null;render()}else{UI.sel=null;UI.tileSel=null;render()}}
-  if(!G||UI.modal)return;if(storyActive()){if((e.key==='Enter'||e.key===' '||e.key==='ArrowRight')&&!humanQ()){e.preventDefault();storyNext()}return}if(e.key==='Enter'&&planOpen()&&!G.q){tryStart(!!UI.confirm)}if((e.key==='h'||e.key==='H')&&planOpen()){const m=suggestPlan();toast('💡 Suggested plan:\n'+m,12000)}});
+  if(!G||UI.modal)return;if(storyActive()){if((e.key==='Enter'||e.key===' '||e.key==='ArrowRight')&&!humanQ()){e.preventDefault();storyNext()}return}if(e.key==='Enter'&&planOpen()&&!G.q&&!allAI()){if(e.target.closest&&e.target.closest('button'))return;if(pstep()<4){setPStep(pstep()+1);render()}else tryStart(!!UI.confirm||uncoveredRed().length>0)}if((e.key==='h'||e.key==='H')&&planOpen()){suggestPlan();setPStep(3);render()}});
 // hovering or tapping a job pulses its place on the map
 document.addEventListener('mouseover',e=>{const t=e.target.closest&&e.target.closest('.gx-dock [data-pos]');pulsePos(t?+t.dataset.pos:null)});
 document.addEventListener('focusin',e=>{const t=e.target.closest&&e.target.closest('.gx-dock [data-pos]');if(t)pulsePos(+t.dataset.pos)});
 // ---------- game start ----------
 UI.setup={scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:false,items:2,diff:'standard'};
 function openStart(){UI.modal='start';UI.overSeen=false;render();const m=$('#modal');m.hidden=false;m.innerHTML=startHtml();m.dataset.h=''}
-function beginGame(){const s=UI.setup;UI.modal=null;UI.report=null;UI.overSeen=false;UI.sel=null;UI.tileSel=null;UI.fx.length=0;UI.fxSeen=0;
+function beginGame(){const s=UI.setup;resetPlanSteps();UI.modal=null;UI.report=null;UI.overSeen=false;UI.sel=null;UI.tileSel=null;UI.fx.length=0;UI.fxSeen=0;
   const all=s.chars.every(k=>s.ai[k]);newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff});UI.reportMark=G.logN;V3.layout=null;
   for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};refresh()}
-function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.beats.length=0;UI.shown=-1;beat('dawn',{round:G.round});UI.modal=null;UI.reportMark=G.logN;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};if(G.scen==='stranded'&&!CHARS.ada)CHARS.ada={n:'Ada',die:11,arrows:[],skills:[],npc:1};refresh()}catch(e){toast('No saved game found.');openStart()}}
+function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;resetPlanSteps();UI.beats.length=0;UI.shown=-1;beat('dawn',{round:G.round});UI.modal=null;UI.reportMark=G.logN;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};if(G.scen==='stranded'&&!CHARS.ada)CHARS.ada={n:'Ada',die:11,arrows:[],skills:[],npc:1};refresh()}catch(e){toast('No saved game found.');openStart()}}
 function boot(){GX.init({key:'swi'});GX.onClose=id=>{if(id==='rulesd'&&UI.backToStart){UI.backToStart=false;openStart()}};GX.onShow=id=>{if(!G&&id!=='rulesd'&&id!=='cardsd'){GX.close();return}if(id==='cardsd')renderCards();if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(G)render()};try{init3D()}catch(e){console.error(e)}soundBtns&&soundBtns();openStart()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 
