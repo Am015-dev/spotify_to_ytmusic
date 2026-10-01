@@ -284,6 +284,7 @@ function doDual(seat,m){const tool=m.tool||null,two=m.two||null;const vals=[m.v]
   G.stats.dual++;const T=m.ks.map(k=>G.st[m.st].w[k]);const owner=ownerOf(m.st);
   const tn=tool==='dd'?'Twin Probe':tool==='eq3'||tool==='pt3'?'Triple Probe':tool==='eq5'?'Full Scan':'';
   lg(`${SP(seat).nm} points at ${T.length>1?T.length+' wires':'a wire'} of ${SP(owner).nm} and says "${vals.map(VN).join(' or ')}"${tn?' ('+tn+(two?' + Two-Value':'')+')':two?' (Two-Value Probe)':''}.`);
+  if((tool||two)&&hasRule(G.mission,'redTriple')&&T.some(sl=>isRed(sl.id))){explode(`${SP(seat).nm}'s probe pointed at a red wire (equipment cannot choose reds)`);return}
   const match=T.filter(sl=>vals.includes(cv(sl.id)));
   const ctx={seat,st:m.st,us:T.map(x=>x.u),vals,v:m.v,tool,two,own:m.own,ownFlip:m.own==='flip',fu:m.fu};
   if(match.length){if(match.length>1){ask(owner,'pickMatch',`${SP(seat).nm} hit: choose which matching wire to cut`,match.map(sl=>({l:`Cut slot ${G.st[m.st].w.indexOf(sl)+1}`,h:'dualHit',d:Object.assign({u:sl.u},ctx)})));return}
@@ -432,7 +433,7 @@ function doEq(seat,m){const E=EQUIP[m.id];useEq(m.id);lg(`${SP(seat).nm} uses ${
   case 'eq1111':{const t=G.st[m.ts].w.splice(m.tk,1)[0];const from=ownerOf(m.ts);const k=insertSlot(m.s,t);lg(`${SP(seat).nm} hooks a wire from ${SP(from).nm} into stand ${m.s+1}, slot ${k+1}.`);dropStaleAnn(m.ts);dropStaleAnn(m.s);break}}}
 function doItem(seat,m){useItem(seat);lg(`${SP(seat).nm} uses ${ITEMS[m.k].n}.`,'eq');if(m.k==='sweep')sweep(m.v,seat);else startSwap(seat,m.s,m.k2,m.to)}
 // a Sweep: every stand answers yes/no for uncut blue wires of v (X wires ignored)
-function sweep(v,by){const res=G.st.map(s=>({st:s.i,yes:s.w.some(x=>!x.cut&&!x.x&&WIRES[x.id].c==='b'&&cv(x.id)===v)?1:0,us:s.w.filter(x=>!x.cut&&!x.x).map(x=>x.u)}));
+function sweep(v,by){const res=G.st.map(s=>({st:s.i,yes:s.w.some(x=>!x.cut&&!x.x&&!x.flip&&WIRES[x.id].c==='b'&&cv(x.id)===v)?1:0,us:s.w.filter(x=>!x.cut&&!x.x&&!x.flip).map(x=>x.u)}));
   G.ann.push({k:'sweep',by,v,res,turn:G.turn});lg(`Sweep for ${v}: ${res.map(r=>`${SP(ownerOf(r.st)).nm}${standsOf(ownerOf(r.st)).length>1?' (stand '+(r.st+1)+')':''} ${r.yes?'yes':'no'}`).join(', ')}.`)}
 function dropStaleAnn(si){for(const a of G.ann)if(a.k==='side'&&a.st===si)a.stale=1}
 // sorted insert: before the first sorted wire with a higher sort value (X / flipped wires stay at the ends)
@@ -441,7 +442,7 @@ function insertSlot(si,sl){const w=G.st[si].w;let lo=0,hi=w.length;while(lo<hi&&
 function startSwap(seat,s,k,to){const give=G.st[s].w[k];const opts=uncutOf(to).filter(x=>!x.sl.x&&!x.sl.flip).map(x=>({l:`Give stand ${x.s+1} slot ${x.k+1}`,h:'swapBack',d:{seat,to,gu:give.u,ru:x.sl.u}}));
   ask(to,'swapPick',`${SP(seat).nm} offers a wire trade: pick one of yours to hand over`,opts)}
 QH.swapBack=d=>{const g=findU(d.gu),r=findU(d.ru);const gs=g.s,rs=r.s;G.st[gs].w.splice(g.k,1);const r2=findU(d.ru);G.st[r2.s].w.splice(r2.k,1);
-  if(G.mission===24){g.sl.tok=[];r.sl.tok=[]}
+  if(G.tokFam==='cnt'){g.sl.tok=[];r.sl.tok=[]}
   const k1=insertSlot(rs,g.sl),k2=insertSlot(gs,r.sl);G.marks=G.marks.filter(x=>![g.sl.u,r.sl.u].includes(x.a)&&![g.sl.u,r.sl.u].includes(x.b));
   dropStaleAnn(gs);dropStaleAnn(rs);lg(`${SP(d.seat).nm} and ${SP(d.to).nm} trade wires: in at stand ${rs+1} slot ${k1+1} and stand ${gs+1} slot ${k2+1}.`)};
 // ===================== mission rule handlers =====================
@@ -472,7 +473,7 @@ function multiSlots(m){return m.tg.map(t=>G.st[t.s].w[t.k])}
 function doMulti(seat,m,want,label,onFail){const S=multiSlots(m);lg(`${SP(seat).nm} points at ${S.length} wires and calls them all ${label}.`);
   if(S.every(sl=>cv(sl.id)===want)){for(const sl of S)cutSlot(sl);lg(`All ${S.length} are ${label}!`,'good');afterCut({seat,v:want,n:S.length,kind:'special',ok:1});if(!G.over&&!G.q)endAction();else if(!G.over)G.tfx.endAfterQ=1;return true}
   if(onFail==='explode'||S.some(sl=>isRed(sl.id))&&want!=='R'){explode(`${SP(seat).nm}'s ${label} call was wrong`);return false}
-  for(const t of m.tg){const sl=G.st[t.s].w[t.k];if(!sl.not.includes(want))sl.not.push(want);if(!sl.cut&&cv(sl.id)!==want&&!isRed(sl.id))putTok(t.s,sl,trueTok(t.s,sl,want))}
+  for(const t of m.tg){const sl=G.st[t.s].w[t.k];if(cv(sl.id)!==want&&!sl.not.includes(want))sl.not.push(want);if(!sl.cut&&!isRed(sl.id)&&!sl.tok.length)putTok(t.s,sl,trueTok(t.s,sl,want))}
   advance(1,`wrong ${label} call`,{miss:1});if(G.over)return false;afterMiss({seat,v:want,kind:'special'});endAction();return false}
 // ---------- 9, 16: the cut order ----------
 RH.gate={setup(r){G.ms.gate={vals:shuffle(NUMS.slice()).slice(0,r.cards),at:0,req:r.req};lg(`Cut order: ${G.ms.gate.vals.join(', ')} (${r.req} of each before the next).`)},
@@ -536,7 +537,7 @@ RH.special4={setup(r){const v=1+rnd(12);G.ms.sp4={v,done:0,reward:r.reward};if(r
   round(r){if(G.ms.sp4.done)return;if(r.reward==='eqDeck'){if(G.eqDeck.length){const id=G.eqDeck.shift();G.eqOut.push(id);lg(`End of round: ${EQUIP[id].n} burns from the pile.`,'bad')}}
     else if(G.ms.sp4.deck.length){G.ms.sp4.box.push(G.ms.sp4.deck.shift());lg('End of round: a number card burns.','bad')}},
   pub(){const s=G.ms.sp4;return {v:s.v,done:s.done,pile:G.eqDeck.length,deck:s.deck?s.deck.length:0}}};
-AG.numInfo=d=>{const vals=[...new Set(SP(d.seat).cards)].filter(v=>G.tokSup[v]>0);if(!vals.length)return;ask(d.seat,'numInfo','Place one info token for a value on your cards',vals.map(v=>({l:`Token ${v}`,h:'numInfo',d:{seat:d.seat,v}})))};
+AG.numInfo=d=>{const held=heldVals(d.seat);const vals=[...new Set(SP(d.seat).cards)].filter(v=>G.tokSup[v]>0&&held[v]);if(!vals.length)return;ask(d.seat,'numInfo','Place one info token for a value on your cards',vals.map(v=>({l:`Token ${v}`,h:'numInfo',d:{seat:d.seat,v}})))};
 QH.numInfo=d=>{placeTruthful(d.seat,d.v,1)};
 // ---------- 25, 44, 49, 63: no talking (the interface has no chat; nothing to enforce) ----------
 RH.speech={offMoves(r,seat){if(r.what!=='all'||G.q||G.phase!=='turn'||!hasWires(seat))return [];const last=G.ann.filter(a=>a.k==='needOx'&&a.seat===seat).pop();if(last&&last.turn>=G.turn-G.np+1)return [];return [{a:'signal'}]},acts:['signal'],
@@ -573,7 +574,7 @@ function busRushDone(){const b=G.ms.bus;b.rush=0;b.lock=0;b.disc.push(...b.tg);b
 function busPhase(i){const b=G.ms.bus;const P=SCRIPTS.m30.phases;const ph=P[i];const prev=b.tg[0];const hit=prev!=null&&cutCount(prev)>=2;
   switch(ph.check){
   case 'dialIfMissed':if(!hit)advance(1,'missed the target');break;
-  case 'eqIfMissed':if(!hit){const e=G.eq.filter(x=>x.st==='ready'&&!x.down).sort((a,c)=>(EQUIP[a.id].v==='Y'?0:EQUIP[a.id].v)-(EQUIP[c.id].v==='Y'?0:EQUIP[c.id].v))[0];if(e){e.st='used';lg(`${EQUIP[e.id].n} is lost.`,'bad')}}break;
+  case 'eqIfMissed':if(!hit){const e=G.eq.filter(x=>(x.st==='ready'||x.st==='locked')&&!x.down).sort((a,c)=>(EQUIP[a.id].v==='Y'?0:EQUIP[a.id].v)-(EQUIP[c.id].v==='Y'?0:EQUIP[c.id].v))[0];if(e){e.st='used';lg(`${EQUIP[e.id].n} is lost.`,'bad')}}break;
   case 'yellowCountIfHit':if(hit)for(const s of G.seats){const n=uncutOf(s.i).filter(x=>!x.sl.flip&&cv(x.sl.id)==='Y').length;G.ann.push({k:'ycount',seat:s.i,n,turn:G.turn});lg(`${s.nm} holds ${n} yellow.`)}break;
   case 'holdIfHit':if(hit){const v=drawNum(b);if(v!=null){b.disc.push(v);const yes=heldVals(G.cur)[v]?1:0;G.ann.push({k:'holds',seat:G.cur,v,yes,turn:G.turn});lg(`${SP(G.cur).nm} draws ${v}: ${yes?'holds it':'does not hold it'}.`)}}break;
   case 'finishIfHit':if(hit){const s=allSlots().filter(x=>!x.sl.cut&&cv(x.sl.id)===prev);for(const x of s)cutSlot(x.sl);if(s.length){lg(`Bonus: the remaining ${prev}s are cut.`,'good');afterCut({seat:G.cur,v:prev,n:s.length,kind:'mass',ok:1})}}break;
@@ -595,8 +596,8 @@ RH.persCon={setup(r){G.ms.pc={pool:[],fl:shuffle(CON_IDS.filter(c=>'FGHIJKL'.inc
   legalX(r,m,seat){return r.swap&&SP(seat).con&&G.ms.pc.fl.length&&G.phase==='turn'&&G.step==='act'?'':'not available'},
   doX(r,m,seat){const old=SP(seat).con;G.ms.pc.disc.push(old);SP(seat).con=G.ms.pc.fl.shift();lg(`${SP(seat).nm} trades restriction ${old} for ${SP(seat).con} (${CONSTRAINTS[SP(seat).con].n}).`);advance(1,'restriction swap')},
   pub(){return {table:G.ms.pc.table,pool:G.ms.pc.pool,fl:G.ms.pc.fl.length}}};
-AG.draftCon=d=>{let pool=G.ms.pc.pool.slice();if(G.np===2){const other=G.seats.find(s=>s.i!==d.seat&&s.con);if(other){const bad={A:'B',B:'A',C:'D',D:'C'}[other.con];pool=pool.filter(c=>c!==bad)}}
-  ask(d.seat,'draftCon','Pick your restriction card',pool.map(c=>({l:`${c}: ${CONSTRAINTS[c].n} - ${CONSTRAINTS[c].text}`,h:'draftCon',d:{seat:d.seat,c}})))};
+AG.draftCon=d=>{let pool=G.ms.pc.pool.slice();let warn=null;if(G.np===2){const other=G.seats.find(s=>s.i!==d.seat&&s.con);if(other)warn={A:'B',B:'A',C:'D',D:'C'}[other.con]}
+  ask(d.seat,'draftCon','Pick your restriction card',pool.map(c=>({l:`${c}: ${CONSTRAINTS[c].n} - ${CONSTRAINTS[c].text}${c===warn?' (the rules advise against this pairing)':''}`,h:'draftCon',d:{seat:d.seat,c}})))};
 QH.draftCon=d=>{SP(d.seat).con=d.c;G.ms.pc.pool.splice(G.ms.pc.pool.indexOf(d.c),1);lg(`${SP(d.seat).nm} takes restriction ${d.c} (${CONSTRAINTS[d.c].n}).`)};
 function withoutCons(seat,fn){const p=SP(seat);const a=p.conDown,g=G.ms.gcon;p.conDown=1;G.ms.gcon=null;const r=fn();p.conDown=a;G.ms.gcon=g;return r}
 function dropIfBlocked(seat){const p=SP(seat);if(!p.con||p.conDown)return;const G0=G.step;G.step='act';const ok=mainMoves(seat,true).length>0;const free=ok?true:withoutCons(seat,()=>mainMoves(seat,true).length>0);G.step=G0;
@@ -693,8 +694,9 @@ RH.oxygen={setup(r){const np=G.np;G.ms.ox={res:0,v:r.variant};
   legalCut(r,seat,m,vals){if(G.tfx.noOx)return '';if(!RH.oxygen.canPay(r,seat,m.v))return 'not enough oxygen';if(r.variant==='gift'&&m.a==='dual'||r.variant==='gift'&&m.a==='solo'){if(m.oxTo==null||!SP(m.oxTo)||m.oxTo===seat)return 'name the crewmate who gets your oxygen'}return ''},
   dualParams(r,seat,m){if(r.variant!=='gift'||(m.a!=='dual'&&m.a!=='solo'))return null;const to=G.seats.filter(q=>q.i!==seat).sort((a,b)=>a.ox-b.ox)[0];return {oxTo:to.i}},
   pay(r,seat,v,m){const c=oxCost(r,v);if(r.variant==='shared'){G.ms.ox.res-=c;SP(seat).ox+=c}else if(r.variant==='gift'){SP(seat).ox-=c;SP(m.oxTo).ox+=c}else{SP(seat).ox-=c;G.ms.ox.res+=c}lg(`${SP(seat).nm} spends ${c} oxygen.`)},
-  start(r,seat){if(r.variant==='shared'&&seat===G.captain){G.ms.ox.res=2*G.np;G.seats.forEach(s=>s.ox=0)}if(r.variant==='bundle'&&seat===G.captain&&G.round>1&&G.ms.ox.res){SP(seat).ox+=G.ms.ox.res;lg(`${SP(seat).nm} collects ${G.ms.ox.res} oxygen from the reserve.`);G.ms.ox.res=0}},
-  stuck(r,seat){G.tfx.noOx=1;const free=mainMoves(seat,true).length>0;G.tfx.noOx=0;if(!free)return false;skipTurn('not enough oxygen',1);return true},
+  round(r){if(r.variant==='shared'){G.ms.ox.res=2*G.np;G.seats.forEach(s=>s.ox=0);lg('The reserve is refilled: all oxygen is back in the middle.')}
+    if(r.variant==='bundle'&&G.ms.ox.res){const to=clockFrom(G.captain).find(q=>hasWires(q));if(to!=null){SP(to).ox+=G.ms.ox.res;lg(`${SP(to).nm} collects ${G.ms.ox.res} oxygen from the reserve.`);G.ms.ox.res=0}}},
+  stuck(r,seat){G.tfx.noOx=1;const free=mainMoves(seat,true).length>0;G.tfx.noOx=0;if(!free)return false;if(eqOK(seat,'eq9')&&ask(seat,'stuckDamper','You cannot pay: use the Damper to ignore the fuse step?',[{l:'Use the Damper (no step)',h:'stuckDamper',d:{seat,use:1}},{l:'Skip and burn a step',h:'stuckDamper',d:{seat,use:0}}]))return true;skipTurn('not enough oxygen',1);return true},
   moves(r,seat){return r.variant==='shared'||r.variant==='gift'?[{a:'pass',pass:1}]:[]},acts:['pass'],
   legalX(r,m,seat){return G.step==='act'&&seat===G.actor&&!G.tfx.acted&&(r.variant==='shared'||r.variant==='gift')?'':'you may not pass'},
   doX(r,m,seat){G.tfx.acted=1;G.hist.push({seat,kind:'skip',turn:G.turn});lg(`${SP(seat).nm} passes.`);if(G.tfx.damper)lg('The Damper cancels the step.');else advance(1,'passing');if(!G.over){G.step='end';schedEnd()}},
@@ -702,6 +704,7 @@ RH.oxygen={setup(r){const np=G.np;G.ms.ox={res:0,v:r.variant};
     if(r.variant==='gift')for(const s of G.seats)if(!hasWires(s.i)&&s.ox){G.ms.ox.lost=(G.ms.ox.lost||0)+s.ox;s.ox=0}},
   valid(r){if(r.variant!=='depth')return;for(const s of clockFrom(G.captain))if(G.ms.ox.res>0){G.ms.ox.res--;SP(s).ox++}lg('Fresh air: everyone takes one oxygen from the reserve (while it lasts).')},
   pub(r){return {res:G.ms.ox.res,v:r.variant,seats:G.seats.map(s=>s.ox)}}};
+QH.stuckDamper=d=>{if(d.use){useEq('eq9');lg('The Damper cancels the step.','good');skipTurn('not enough oxygen',0)}else skipTurn('not enough oxygen',1)};
 // ---------- 45: volunteers ----------
 RH.volunteer={setup(){G.ms.vol={deck:shuffle(NUMS.slice()),disc:[],v:null,who:null}},noForced(){return true},
   start(r,seat){const s=G.ms.vol;s.who=null;const v=drawNum(s);if(v==null){for(const q of G.seats){const u=uncutOf(q.i);if(u.length&&u.every(x=>isRed(x.sl.id))){for(const x of u)cutSlot(x.sl);lg(`${q.nm} reveals their reds.`)}}G.tfx.skip=1;checkWin();if(!G.over&&!G.seats.some(q=>hasWires(q.i)&&uncutOf(q.i).some(x=>!isRed(x.sl.id))))explode('no number card is left to call');return}s.v=v;s.disc.push(v);lg(`${SP(G.captain).nm} turns up ${v}: who calls it?`);G.tfx.wait=1;G.step='snip'},

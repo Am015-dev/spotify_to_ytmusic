@@ -46,24 +46,24 @@ function paintIcons(root){for(const el of (root||document).querySelectorAll('[da
 // ---------- seats and views ----------
 function humans(){return G?G.seats.filter(q=>q.human).map(q=>q.i):[]}
 function isHuman(s){return !!(G&&G.seats[s]&&G.seats[s].human)}
-function modeOf(){const h=humans().length;return h===0?'watch':h===1?'solo':'hot'}
+function modeOf(){if(NET.on)return NET.mySeat>=0?'solo':'watch';const h=humans().length;return h===0?'watch':h===1?'solo':'hot'}
 function nm(s){return G&&G.seats[s]?G.seats[s].nm:'?'}
 // who must decide next (question owner, actor, or a claimer)
 function decider(){if(!G||G.over)return -1;return sideToAct()}
 // hot-seat: the device must change hands when a human other than the holder must decide
-function passTo(){if(modeOf()!=='hot'||!G||G.over)return -1;if(UI.offSeat!=null)return UI.offSeat===UI.holder?-1:UI.offSeat;const s=decider();
+function passTo(){if(NET.on||modeOf()!=='hot'||!G||G.over)return -1;if(UI.offSeat!=null)return UI.offSeat===UI.holder?-1:UI.offSeat;const s=decider();
   if(s>=0&&isHuman(s)&&s!==UI.holder)return s;
   if(s<0&&(G.step==='claim'||G.step==='snip')){const h=humans();if(UI.holder<0&&h.length)return h[0]}
   if(UI.holder<0){const h=humans();return h.length?h[0]:-1}return -1}
 // the seat whose eyes the page shows: solo = the human, hot-seat = the holder (none while passing), watch = nobody
-function viewer(){const m=modeOf();if(m==='watch')return -1;if(m==='solo')return humans()[0];if(passTo()>=0)return -1;return UI.holder}
+function viewer(){if(NET.on)return NET.mySeat;const m=modeOf();if(m==='watch')return -1;if(m==='solo')return humans()[0];if(passTo()>=0)return -1;return UI.holder}
 // the seat at the bottom of the table
-function kitMe(){const v=viewer();if(v>=0)return v;const p=passTo();if(p>=0)return p;const h=humans();return h.length?h[0]:0}
+function kitMe(){if(NET.on&&NET.mySeat<0)return 0;const v=viewer();if(v>=0)return v;const p=passTo();if(p>=0)return p;const h=humans();return h.length?h[0]:0}
 // a spectator view (watch mode with x-ray, or the neutral hot-seat view with every hidden wire turned away)
 function spectatorView(xray){const K=knowledge(kitMe());
   for(const st of K.stands){st.mine=false;const S=G.st[st.i];st.slots.forEach((x,k)=>{const sl=S.w[k];if(xray){x.v=cv(sl.id);x.s=WIRES[sl.id].s;x.c=WIRES[sl.id].c}else if(!x.cut){x.v=null;x.s=null;x.c=null}})}
   K.seat=-1;K.legal=null;K.q=G.q?{who:G.q.who,kind:G.q.kind}:null;K.off=[];if(!xray)for(const q of K.seats){q.cards=G.mission===65?q.cards:null;if(q.con&&G.ms.mole)q.con='?'}return K}
-function view(){const v=viewer();if(v>=0)return knowledge(v);return spectatorView(modeOf()==='watch'&&UI.xray)}
+function view(){const v=viewer();if(v>=0)return knowledge(v);return spectatorView(modeOf()==='watch'&&UI.xray&&!NET.on)}
 function posOf(s){return G.pos[s]}
 function seatStands(seat){return standsOf(seat).slice().sort((a,b)=>a-b)}
 function wireName(si,k,V){const own=ownerOf(si);const ss=seatStands(own);const two=ss.length>1;const who=V&&own===V.seat?'your':nm(own)+'\'s';return `${who} wire ${LET(k)}${two?' (stand '+(ss.indexOf(si)+1)+')':''}`}
@@ -74,6 +74,7 @@ function act(m,seat){if(!G||G.over)return {success:false,error:'no game'};if(sea
   if(!isHuman(seat))return {success:false,error:'not a human seat'};
   if(typeof window.NET_INTERCEPT==='function'){const r=window.NET_INTERCEPT(m,seat);if(r)return r}
   const err=legal(m,seat);if(err){toast(err);sfx('buzzer');return {success:false,error:err}}
+  if(isClient()){if(seat!==NET.mySeat||(NET.pend===G.logN&&Date.now()-NET.pendT<2500))return {success:false,error:'wait'};NET.pend=G.logN;NET.pendT=Date.now();UI.sel=null;sfx('click');netSend(m);refresh();return {success:true,sent:1}}
   UI.sel=null;UI.offSeat=null;UI.lastActor=seat;sfx('click');return applyMove(m,seat)}
 function applyMove(m,seat){const r=performMove(m,seat);if(!r.success){console.error('move rejected: '+r.error+' '+JSON.stringify(m));refresh()}return r}
 // ---------- snapshots: what changed since the last refresh (drives sounds, effects and the result banner) ----------
@@ -117,11 +118,11 @@ function refresh(){if(!G||!UI.started)return;try{if(window.PerfHUD)PerfHUD.wake(
   syncBoard(V);renderDock(V);renderOpenDrawer();audioMood(V);
   const need=humanNeeded();if(need)GX.showDock();
   if(need&&need!==UI.lastNeed){UI.lastNeed=need;if(ANIM)sfx('turn')}if(!need)UI.lastNeed=null;
-  schedule()}
+  schedule();netAfter()}
 function humanNeeded(){if(!G||G.over)return null;const p=passTo();if(p>=0)return 'pass'+p;const v=viewer();if(v<0)return null;const s=decider();if(s===v)return 'me'+G.turn+':'+(G.q?G.q.kind:G.step);return null}
-function saveNow(){try{if(G&&!G.over&&humans().length)localStorage.setItem(SAVE,JSON.stringify({G,ui:{holder:UI.holder,help:UI.help,tut:UI.tut,rt:UI.rt}}));else if(G&&G.over)localStorage.removeItem(SAVE)}catch(e){}}
+function saveNow(){if(NET.on)return;try{if(G&&!G.over&&humans().length)localStorage.setItem(SAVE,JSON.stringify({G,ui:{holder:UI.holder,help:UI.help,tut:UI.tut,rt:UI.rt}}));else if(G&&G.over)localStorage.removeItem(SAVE)}catch(e){}}
 // ---------- the computer crew ----------
-function schedule(){if(UI.aiT||!G||G.over||UI.pause||!UI.started)return;
+function schedule(){if(isClient()||UI.aiT||!G||G.over||UI.pause||!UI.started)return;
   if(UI.sel&&UI.sel.off)return;                 // a human is choosing an any-time card: wait
   const s=decider();const open=G.step==='claim'||G.step==='snip';
   if(s>=0&&isHuman(s)&&!open){if(UI.offChecked!==G.logN){UI.offChecked=G.logN;const st=aiStep();if(st&&!isHuman(st.seat))UI.aiT=setTimeout(()=>{UI.aiT=null;if(G&&!G.over&&!UI.pause&&!legal(st.m,st.seat))applyMove(st.m,st.seat)},ANIM?AIDELAY/UI.speed:0)}return}
@@ -136,11 +137,11 @@ function clockLeft(K){const ms=K.ms;if(ms.timer)return {left:ms.timer.show,real:
   if(ms.bus){const e=ms.bus.finalEnd!=null?ms.bus.finalEnd:ms.bus.ends;return e!=null?{left:Math.max(0,e-K.clock),real:Math.max(0,e-K.clock),label:ms.bus.finalEnd!=null?'Final dash':'Target'}:null}
   if(ms.bunker&&ms.bunker.ends!=null)return {left:Math.max(0,ms.bunker.ends-K.clock),real:Math.max(0,ms.bunker.ends-K.clock),label:'Objective'};
   if(ms.circus&&ms.circus.next!=null)return {left:Math.max(0,ms.circus.next-K.clock),real:999,label:'Next act'};return null}
-function clockRunning(){return timedJob()&&UI.started&&!UI.pause&&G&&!G.over&&G.phase==='turn'&&!G.q&&passTo()<0&&Date.now()>=UI.holdUntil&&!(document.hidden)}
+function clockRunning(){return !isClient()&&timedJob()&&UI.started&&!UI.pause&&G&&!G.over&&G.phase==='turn'&&!G.q&&passTo()<0&&Date.now()>=UI.holdUntil&&!(document.hidden)}
 function clockTick(){if(!clockRunning()){UI.clockAcc=0;sndLoop('clock_loop',false);return}
   UI.clockAcc+=.25*UI.tickRate;sndLoop('clock_loop',SND.on&&!!ANIM);if(UI.clockAcc>=1){const n=Math.floor(UI.clockAcc);UI.clockAcc-=n;tick(n)}}
 const fmt=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
-function togglePause(){UI.pause=!UI.pause;if(!UI.pause){clearTimeout(UI.aiT);UI.aiT=null}toast(UI.pause?'Paused: the clock and the computer crew wait.':'Play resumes.');refresh()}
+function togglePause(){if(isClient()){toast('Only the host can pause the job.');return}UI.pause=!UI.pause;if(!UI.pause){clearTimeout(UI.aiT);UI.aiT=null}toast(UI.pause?'Paused: the clock and the computer crew wait.':'Play resumes.');refresh()}
 // ---------- music mood ----------
 function audioMood(V){if(!G||G.over)return;const c=timedJob()?clockLeft(V):null;const low=(G.dial!=null&&G.dial<=1)||(G.ms.rf&&G.ms.rf.at>=10)||(c&&c.real<30);musicMood(low?'tension':'main')}
 // ---------- the board (SFKit: 3D, or its 2D fallback) ----------
@@ -153,7 +154,7 @@ function uOf(id){const m=/u(\d+)$/.exec(String(id));return m?+m[1]:null}
 function kitReset(){UI.gameN=(UI.gameN||0)+1;try{const S=SFKit._K.st.stands;for(const key of Object.keys(S)){const a=key.split(':').map(Number);SFKit.setStand(a[0],a[1],[]);delete S[key]}SFKit.highlight([])}catch(e){}UI.kitSig={}}
 function kitCall(key,sig,fn){if(UI.kitSig[key]===sig)return;UI.kitSig[key]=sig;try{fn()}catch(e){console.error(e)}}
 function syncBoard(V){if(!window.SFKit)return;const np=G.np;const me=kitMe();const myPos=posOf(me);
-  const names=[];for(const q of G.seats)names[G.pos[q.i]]=q.i===V.seat?(modeOf()==='solo'?'You':q.nm+' (you)'):q.nm;
+  const names=[];for(const q of G.seats)names[G.pos[q.i]]=q.i===V.seat?(modeOf()==='solo'&&!NET.on?'You':q.nm+' (you)'):q.nm;
   kitCall('players',JSON.stringify([np,myPos,names,posOf(G.captain)]),()=>SFKit.setPlayers(np,myPos,{names,captain:posOf(G.captain)}));
   for(let p=0;p<np;p++){const seat=G.pos.indexOf(p);const ss=V.stands.filter(st=>posOf(st.owner)===p).map(st=>st.i).sort((a,b)=>a-b);
     ss.forEach((si,j)=>{const tiles=V.stands[si].slots.map(tileOf);kitCall('st'+p+':'+j,JSON.stringify(tiles),()=>SFKit.setStand(p,j,tiles))})}
@@ -367,10 +368,11 @@ function annText(a,V){switch(a.k){case 'sweep':return `Sweep for ${a.v}: `+a.res
 function overHTML(V){const w=G.over.win;const [title,tip]=w?['Every wire is safe.','']:lossHelp(G.over.why);const st=G.stats||{};const n=G.mission;const next=n<66?n+1:null;
   return `<div class="card over ${w?'win':'lose'}"><h3>${w?'DEFUSED!':'BOOM!'}</h3><p><b>${esc(w?G.winText:title)}</b></p>${w?'':`<p class="why"><b>Why it failed:</b> ${esc(G.over.why)}. ${esc(tip)}</p>`}
   <div class="statgrid"><div><b>${G.turn}</b>turns</div><div><b>${G.dial!=null?G.dial:'-'}</b>fuse left</div><div><b>${st.miss||0}</b>misses</div><div><b>${st.dualOk||0}/${st.dual||0}</b>dual hits</div><div><b>${st.solo||0}</b>solo cuts</div><div><b>${st.eqUse||0}</b>gear used</div></div>
-  <div class="row">${w&&next?`<button class="btn go" data-a="next">${ico('fwd')}Next job: ${next}</button>`:''}<button class="btn ${w?'':'go'}" data-a="again">${ico('flip')}Play job ${n} again</button><button class="btn" data-a="board">${ico('target')}Mission board</button></div></div>`}
+  ${isClient()?'<p class="hint">Waiting for the host to pick the next job.</p>':`<div class="row">${w&&next?`<button class="btn go" data-a="next">${ico('fwd')}Next job: ${next}</button>`:''}<button class="btn ${w?'':'go'}" data-a="again">${ico('flip')}Play job ${n} again</button><button class="btn" data-a="board">${ico('target')}Mission board</button></div>`}</div>`}
 function toast(t){const el=$('#res');if(!el)return;el._h=null;const d=document.createElement('div');d.className='res info';d.innerHTML=`<p>${esc(t)}</p>`;el.innerHTML='';el.appendChild(d);$('#live').textContent=t;GX.showDock()}
 // ---------- dock clicks ----------
 document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b||b.disabled)return;const a=b.dataset.a;const V=UI.V;
+  if(netClick(a))return;
   switch(a){
   case 'take':UI.holder=+b.dataset.seat;UI.sel=null;sfx('click');refresh();return;
   case 'pause':togglePause();return;
@@ -438,7 +440,7 @@ function renderSettings(){const g=gfxState();const on3=window.SFKit&&SFKit._K&&S
   <div><div class="lbl">Graphics ${on3?`(now: ${esc(g.active)})`:'(2D board: no WebGL here)'}</div><div class="row">${['auto','high','medium','low'].map(q=>`<button class="btn small${g.pref===q?' on':''}" data-a="gfx" data-v="${q}" ${on3?'':'disabled'}>${q[0].toUpperCase()+q.slice(1)}</button>`).join('')}</div>
    <p class="tiny">Auto picks Low on a software graphics driver and steps down by itself if frames drop.</p><div id="perfslot">${window.PerfHUD&&PerfHUD.buttonsHTML?PerfHUD.buttonsHTML('btn small'):''}</div></div>
   <div><div class="lbl">Help</div><div class="row"><button class="btn small${UI.help?' on':''}" data-a="help">${ico('bulb')}Suggested move ${UI.help?'on':'off'}</button><button class="btn small${UI.coach?' on':''}" data-a="coachon">${ico('info')}Guide ${UI.coach?'on':'off'}</button></div></div>
-  <div><div class="lbl">Game</div><div class="row">${G&&!G.over?`<button class="btn small" data-a="pause">${ico(UI.pause?'play':'pause')}${UI.pause?'Resume':'Pause'}</button><button class="btn small" data-a="restart">${ico('flip')}Restart this job</button>`:''}<button class="btn small" data-a="newgame">${ico('target')}Mission board</button><button class="btn small" data-gx="credd">${ico('info')}Credits</button></div></div></div>`}
+  <div><div class="lbl">Game</div><div class="row">${isClient()?`<button class="btn small" data-a="netleave">${ico('back')}Leave the online game</button>`:`${G&&!G.over?`<button class="btn small" data-a="pause">${ico(UI.pause?'play':'pause')}${UI.pause?'Resume':'Pause'}</button><button class="btn small" data-a="restart">${ico('flip')}Restart this job</button>`:''}<button class="btn small" data-a="newgame">${ico('target')}Mission board</button>`}<button class="btn small" data-gx="credd">${ico('info')}Credits</button></div></div></div>`}
 // ---------- drawers ----------
 function renderOpenDrawer(){const id=GX.open;if(!id||!G)return;if(id==='logd')renderLog();else if(id==='missiond')renderMission();else if(id==='geard')renderGear();else if(id==='knowd')renderKnow();else if(id==='setd')renderSettings()}
 function renderLog(){const V=UI.V||view();$('#logbody').innerHTML=G?`<div class="loglist">${G.log.map(l=>`<div class="lg-${l.c||'n'}">${esc(nice(l.t,V))}</div>`).join('')}</div>`:'<p>No job yet.</p>'}
@@ -515,34 +517,36 @@ function recordResult(){if(!humans().length)return;const c=camp();const n=G.miss
 function defaultSetup(){const s=lsGet('sf_setup',null);const d={job:1,np:3,seats:['human','ai','ai','ai','ai'],lv:'normal',chars:[],names:DEFNAMES.slice(),help:true};if(s)Object.assign(d,s,{helpTouched:0},{names:(s.names||DEFNAMES).slice()});fixSetup(d);return d}
 function fixSetup(s){s=s||UI.setup;const M=MISSIONS[s.job];if(!M.pl.includes(s.np))s.np=M.pl.find(x=>x>=s.np)||M.pl[M.pl.length-1];if(!s.helpTouched)s.help=s.job<=3;const ok=allowedChars(s.job,s.np);s.chars=s.chars||[];for(let i=0;i<5;i++)if(s.chars[i]&&!ok.includes(s.chars[i]))s.chars[i]='';return s}
 function preset(v){const s=UI.setup;if(v==='solo')s.seats=['human','ai','ai','ai','ai'];if(v==='hot')s.seats=['human','human','human','human','human'];if(v==='watch')s.seats=['ai','ai','ai','ai','ai'];renderStart()}
-function showStart(){clearTimeout(UI.aiT);UI.aiT=null;UI.setup=UI.setup||defaultSetup();sndLoop('hum',true);musicStop(.8);$('#start').hidden=false;renderStart();sndLoop('clock_loop',false)}
+function showStart(){if(isClient()){hideStart();return}clearTimeout(UI.aiT);UI.aiT=null;UI.setup=UI.setup||defaultSetup();sndLoop('hum',true);musicStop(.8);$('#start').hidden=false;renderStart();sndLoop('clock_loop',false)}
 function hideStart(){$('#start').hidden=true;sndLoop('hum',false)}
 function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=camp();const saved=savedGame();
   let jobs='';for(const [a,b,label] of BOXES){jobs+=`<div class="box">${esc(label)}</div><div class="jobs">`;for(let k=a;k<=b;k++){const j=c.jobs[k];const lk=!unlocked(k);
       jobs+=`<button class="jt${j&&j.w?' done':''}${lk?' locked':''}${k===n?' sel':''}" data-a="job" data-n="${k}" aria-pressed="${k===n}" title="${esc(MISSIONS[k].nm)}${lk?' (not unlocked yet, still playable)':''}"><b>${k}</b><span>${esc(MISSIONS[k].nm)}</span>${j&&j.w?'<i>✓</i>':lk?'<i>🔒</i>':''}${MISSIONS[k].audio||hasRule(k,'timer')?'<i class="t">⏱</i>':''}</button>`}jobs+='</div>'}
   const j=c.jobs[n];const chips=ruleChips(n);const ok=allowedChars(n,s.np);
-  const seats=[];for(let i=0;i<s.np;i++)seats.push(`<div class="seat" style="--sc:${SEATC[i]}"><span class="dot"></span><span class="nm"><input data-nm="${i}" value="${esc(s.names[i])}" aria-label="Name of seat ${i+1}" maxlength="14" style="width:7.5em;font:800 .9rem var(--fb);border:2px solid var(--ink);border-radius:8px;padding:3px 5px;background:#fff7e8"><select data-ch="${i}" aria-label="Crew card for seat ${i+1}"><option value="">Crew: random</option>${ok.map(id=>`<option value="${id}"${s.chars[i]===id?' selected':''}>${esc(CHARS[id].n)} (${esc(ITEMS[CHARS[id].item].n)})</option>`).join('')}</select></span><button class="btn small${s.seats[i]==='human'?' on':''}" data-a="seatkind" data-i="${i}">${s.seats[i]==='human'?ico('user')+'Human':ico('robot')+'Computer'}</button></div>`);
+  const onl=isHost(),nOnl=onl?Math.min(s.np,NET.peers.length||1):0;const seats=[];for(let i=0;i<s.np;i++)seats.push(`<div class="seat" style="--sc:${SEATC[i]}"><span class="dot"></span><span class="nm">${onl&&i<nOnl?`<b>${esc(netPlan(s).names&&netPlan(s).names[i]||'Player')}</b>`:`<input data-nm="${i}" value="${esc(s.names[i])}" aria-label="Name of seat ${i+1}" maxlength="14" style="width:7.5em;font:800 .9rem var(--fb);border:2px solid var(--ink);border-radius:8px;padding:3px 5px;background:#fff7e8">`}<select data-ch="${i}" aria-label="Crew card for seat ${i+1}"><option value="">Crew: random</option>${ok.map(id=>`<option value="${id}"${s.chars[i]===id?' selected':''}>${esc(CHARS[id].n)} (${esc(ITEMS[CHARS[id].item].n)})</option>`).join('')}</select></span>${onl?`<span class="tag${i<nOnl?' b':''}">${i<nOnl?ico('user')+'Online player':ico('robot')+'Computer'}</span>`:`<button class="btn small${s.seats[i]==='human'?' on':''}" data-a="seatkind" data-i="${i}">${s.seats[i]==='human'?ico('user')+'Human':ico('robot')+'Computer'}</button>`}</div>`);
   const nh=s.seats.slice(0,s.np).filter(x=>x==='human').length;
   $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">${ICO.bomb}</svg><div><h1>Short Fuse</h1><p>A cartoon demolition crew defuses rigged charges together. 2-5 players, 66 jobs.</p></div><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back to the job</button>':''}</div>
   <div class="st-body"><div class="pane"><div class="quick"><button class="btn blue" data-a="tutorial">${ico('info')}Guided first game<small>Job 1 with a coach</small></button>${saved?`<button class="btn go" data-a="resume">${ico('play')}Continue<small>Job ${saved.G.mission}, turn ${saved.G.turn}</small></button>`:`<button class="btn" data-a="preset" data-v="solo">${ico('user')}Me + computers<small>one human seat</small></button>`}<button class="btn" data-a="preset" data-v="${saved?'solo':'hot'}">${ico(saved?'user':'swap')}${saved?'Me + computers':'Hot-seat'}<small>${saved?'one human seat':'pass the device'}</small></button></div>
-    <h2>${ico('map')} Mission board</h2><p class="tiny">Win a job to unlock the next. Every job can still be played at any time. ✓ = defused, ⏱ = timed.</p>${jobs}</div>
+    ${onlineBlock()}<h2>${ico('map')} Mission board</h2><p class="tiny">Win a job to unlock the next. Every job can still be played at any time. ✓ = defused, ⏱ = timed.</p>${jobs}</div>
    <div class="pane"><div class="brief"><div class="bt"><b>${n}</b><h3>${esc(M.nm)}</h3></div><p class="flav">${esc(BRIEFS[n]||'')}</p>
     <div class="tags"><span class="tag b">${mixHTML(n,s.np)}</span><span class="tag">${ico('fuse')}Fuse ${fuseStart(n,s.np)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?`<span class="tag t">${ico('clock')}Timed</span>`:''}<span class="tag">${M.pl[0]}-${M.pl[M.pl.length-1]} players</span>${j&&j.w?`<span class="tag e">${ico('check')}Defused ${j.w}×${j.best&&j.best.left!=null?', best: '+j.best.left+' fuse left':''}</span>`:j&&j.p?`<span class="tag r">Tried ${j.p}×</span>`:''}</div>
     <p class="tiny">${esc(M.text)}</p>${chips.map(c=>`<span class="tag" style="margin:2px 2px 0 0">${ico(c[0])}${esc(c[1])}</span>`).join('')}</div>
     <div class="setup"><div><div class="lbl">Crew size</div><div class="seg">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div></div>
-    <div><div class="lbl">Seats</div><div class="seg" style="margin-bottom:4px"><button class="btn small" data-a="preset" data-v="solo">Me + computers</button><button class="btn small" data-a="preset" data-v="hot">All human (hot-seat)</button><button class="btn small" data-a="preset" data-v="watch">Watch the computer</button></div>${seats.join('')}</div>
+    <div><div class="lbl">Seats</div>${onl?`<p class="tiny">Online: seats go to the players in the lobby in join order; the rest are played by the computer.</p>`:`<div class="seg" style="margin-bottom:4px"><button class="btn small" data-a="preset" data-v="solo">Me + computers</button><button class="btn small" data-a="preset" data-v="hot">All human (hot-seat)</button><button class="btn small" data-a="preset" data-v="watch">Watch the computer</button></div>`}${seats.join('')}</div>
     <div><div class="lbl">Computer level</div><div class="seg">${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div></div>
-    ${nh?`<button class="chk btn small${s.help?' on':''}" data-a="helpset">${ico('bulb')}"What we know" suggestions ${s.help?'on':'off'}</button>`:''}
-    <button class="btn go wide" data-a="start">${ico('play')}${nh===0?'Watch job '+n:nh===1?'Start job '+n:'Start job '+n+' (hot-seat, '+nh+' humans)'}</button></div></div></div>`;paintIcons($('#start'))}
+    ${nh||onl?`<button class="chk btn small${s.help?' on':''}" data-a="helpset">${ico('bulb')}"What we know" suggestions ${s.help?'on':'off'}</button>`:''}
+    <button class="btn go wide" data-a="start">${ico('play')}${onl?'Start job '+n+' online ('+nOnl+' player'+(nOnl>1?'s':'')+')':nh===0?'Watch job '+n:nh===1?'Start job '+n:'Start job '+n+' (hot-seat, '+nh+' humans)'}</button></div></div></div>`;paintIcons($('#start'))}
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}
 function realtimeJob(n){const M=MISSIONS[n];return !!(M.audio||hasRule(n,'timer'))}
-function startJob(s){s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names,help:s.help});UI.lastSetup=s;
+function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats=plan.seats;s.names=plan.names;fixSetup(s)}
+  if(!plan)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names,help:s.help});UI.lastSetup=s;
   const seats=s.seats.slice(0,s.np);const chars={};let any=0;for(let i=0;i<s.np;i++)if(s.chars[i]){chars[i]=s.chars[i];any=1}
   UI.rt=realtimeJob(s.job);UI.started=false;clearTimeout(UI.aiT);UI.aiT=null;UI.sel=null;UI.res=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.kitSig={};UI.wwk=null;UI.lastPrompt=null;UI.pause=false;UI.dockSig=null;
   UI.help=s.help!==false;UI.tut=s.tutorial?{done:{}}:(s.job<=3&&UI.coach?{done:{hello:1,stand:1}}:null);if(s.tutorial)UI.coach=true;
   const o={np:s.np,mission:s.job,seats,level:s.lv,names:s.names.slice(0,s.np),realtime:UI.rt};if(any){try{const ch=[];for(let i=0;i<s.np;i++)ch[i]=chars[i]||null;o.chars=ch}catch(e){}}if(s.captain!=null&&s.captain<s.np)o.captain=s.captain;if(s.seed!=null)o.seed=s.seed;
-  kitReset();UI.started=true;hideStart();try{newGame(o)}catch(e){try{delete o.chars;newGame(o)}catch(e2){console.error(e2);UI.started=false;showStart();return}}
-  if(humans().length===1)UI.holder=humans()[0];
+  kitReset();UI.started=true;hideStart();NET.starting=true;try{try{newGame(o)}catch(e){try{delete o.chars;newGame(o)}catch(e2){console.error(e2);UI.started=false;showStart();return}}
+  if(plan)netBound(plan)}finally{NET.starting=false}
+  if(humans().length===1&&!NET.on)UI.holder=humans()[0];
   UI.prev=snap();try{if(window.PerfHUD)PerfHUD.hitch()}catch(e){}if(SND.gesture)musicStart();else SND.wantMusic=1;refresh()}
 function startTutorial(){const s=Object.assign(defaultSetup(),{job:1,np:3,seats:['human','ai','ai'],lv:'easy',help:true,tutorial:true,chars:[]});UI.setup=s;startJob(s)}
 function resumeSaved(){const s=savedGame();if(!s)return;kitReset();G=s.G;UI.holder=s.ui.holder;UI.help=s.ui.help;UI.tut=s.ui.tut;UI.rt=!!s.ui.rt;UI.started=true;UI.prev=snap();UI.kitSig={};UI.sel=null;UI.res=null;UI.dockSig=null;UI.campDone=0;hideStart();if(SND.gesture)musicStart();refresh()}
@@ -568,5 +572,5 @@ function boot(){GX.init({key:'sf'});paintIcons();loadSettings();window.SF_SOFTGP
   GX.onShow=id=>{sfx('open');if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML+'<h3>Credits</h3><p>Names, card text and art are original. <button class="btn small" data-gx="credd">Full credits</button></p>';if(id==='refd')renderRef();if(id==='setd')renderSettings();if(G)renderOpenDrawer();else if(id==='logd'||id==='missiond'||id==='geard'||id==='knowd')$('#'+id+' .gx-drawer-body').innerHTML='<p>Start a job first.</p>'};
   GX.onClose=()=>sfx('close');
   setInterval(clockTick,250);setInterval(()=>{if(G&&UI.started&&timedJob()&&!G.over){const p=$('#timerpill');if(p&&UI.V){const c=clockLeft(knowledge(Math.max(0,UI.V.seat)));if(c)p.lastChild.textContent=` ${c.label} ${fmt(c.left)}${UI.pause?' ⏸':''}`}}},1000);
-  showStart()}
+  netInit();showStart();if(UI.netOpen)netRender()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();

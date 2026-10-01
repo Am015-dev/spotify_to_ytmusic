@@ -16,7 +16,7 @@
   <main class="gx-board" id="board" aria-label="The table"><canvas id="c3" aria-label="The demolition table in 3D. Tap a glowing wire to pick it."></canvas><div id="fb" hidden aria-label="The table"></div><div id="chip" aria-hidden="true"></div></main>
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Short Fuse</span><button class="gx-ibtn" data-a="pause" id="pausebtn" aria-label="Pause" title="Pause / resume" hidden></button><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel" id="sheetbtn">↕</button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel">⇥</button></div>
-    <div class="gx-dock-body" id="dockbody"><nav id="road" class="road" aria-label="Turn order"></nav><div id="stat" class="stat"></div><div id="res" aria-live="polite"></div><div id="coach"></div><div id="main" aria-live="polite"></div><div id="tip"></div><div id="logmini" class="logmini"></div></div>
+    <div class="gx-dock-body" id="dockbody"><div id="netst" class="netst" hidden></div><nav id="road" class="road" aria-label="Turn order"></nav><div id="stat" class="stat"></div><div id="res" aria-live="polite"></div><div id="coach"></div><div id="main" aria-live="polite"></div><div id="tip"></div><div id="logmini" class="logmini"></div></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock">☰ Panel</button>
 </div>
@@ -30,18 +30,23 @@
 <section class="gx-drawer" id="setd" role="dialog" aria-label="Settings"><div class="gx-drawer-head"><h2 data-ico="menu">Settings</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="setbody"></div></section>
 <section class="gx-drawer" id="credd" role="dialog" aria-label="Credits"><div class="gx-drawer-head"><h2 data-ico="info">Credits</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="credbody"><h3>Short Fuse</h3><p>A browser version of a co-operative deduction game about defusing bombs. Game rules and numbers follow the published game. <b>Names, card text and art are original</b>: every picture, card and token is drawn in code, and every text is our own.</p><p>Fonts: Lilita One and Nunito (Google Fonts, SIL Open Font License). 3D: three.js (MIT).</p><!--CREDITS--></div></section>
 <div id="start" role="dialog" aria-label="Start a job" hidden></div>
+<div id="netbox" hidden></div>
 <div id="live" class="sr" aria-live="polite"></div>
 <script src="shell.js"></script>
 <script src="perfhud.js"></script>
+<script src="trystero.min.js"></script>
+<script src="netroom.js"></script>
 <script src="three.min.js"></script>
 <script src="kit.js"></script>
 <script src="data.js"></script>
 <script src="engine.js"></script>
 <script src="ai.js"></script>
+<script src="netstrip.js"></script>
 <script src="texts.js"></script>
 <script src="gameaudio.js"></script>
 <script src="audio-data.js"></script>
 <script src="sound.js"></script>
+<script src="net.js"></script>
 <script src="ui.js"></script>
 </body>
 </html>

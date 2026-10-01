@@ -83,7 +83,7 @@ const RULE_DOC={
  xWire:['x','X wires','Unsorted wires marked X at the far right; gear and tools cannot touch them.'],
  yellowGift:['gift','Yellow gift','When the first two yellows go, everyone gives a token to the left.'],
  special4:['four','All four at once','The shown number goes only by pointing at all four of its wires at once.'],
- speech:['mute','No talking','No numbers out loud. Here the page only lets you talk through the rules anyway.'],
+ speech:['mute','No talking','Big Ears (job 25): no numbers out loud. Deep Dive, Bottle Post and Unsinkable (44, 49, 63): no talking at all, only a thumbs-up for "I need oxygen". The page lets you talk through the rules anyway.'],
  declare:['cards','Called numbers','Each turn turn over a number card and cut exactly that value.'],
  yellowDraft:['gift','Token draft','When the first yellows go, everyone takes a token and places it truthfully.'],
  butterfingers:['user','Butterfingers','The foreman has no tools or gear and a missed dual cut is a boom.'],
@@ -140,7 +140,7 @@ const TUTORIAL=[
  {id:'know',t:'What we know',p:'The bulb button opens the full table of what every wire could be. Use it whenever you are unsure.'}];
 // how to play: in the order a player meets things
 const RULES_HTML=`
-<h3>The goal</h3><p>A villain has wired a bomb. Your crew of 2 to 5 defuses it <b>together</b>: you win when <b>every wire on every stand is cut</b>. You lose if the fuse burns down, if anyone points at a red wire, or if the job's own special rule says so.</p>
+<h3>The goal</h3><p>A villain has wired a bomb. Your crew of 2 to 5 defuses it <b>together</b>: you win when <b>every wire on every stand is cut or revealed</b>. You lose if the fuse burns down, if anyone points at a red wire, or if the job's own special rule says so.</p>
 <h3>How a round goes</h3><ol>
 <li><b>Setup.</b> Each player gets a stand of wires, sorted from low to high. With 2 players each has two stands; with 3, the foreman has two. Your wires face you: you never see a crewmate's wires and they never see yours.</li>
 <li><b>Opening tokens.</b> Starting with the foreman, everyone places one info token in front of one of their own blue wires, showing its number.</li>
@@ -163,7 +163,7 @@ const RULES_HTML=`
 <h3>No free talk</h3><p>You may not tell crewmates what you hold. The page enforces that: the only ways to share are the moves themselves, the tokens and the answers the rules ask for.</p>
 <h3>The fuse</h3><p>It starts with one step per player (some jobs start lower) and can never go above 6. A miss burns one step; at zero the bomb explodes.</p>
 <h3>Equipment</h3><p>From job 3, one gear card per player lies on the board, locked. Each card unlocks the moment two wires of its number are cut (double cards: all four). It then works once. "Any time" cards may be used even when it is not your turn (not in the middle of a question). "Your turn" cards are part of your action. Open <b>Gear</b> to read them all.</p>
-<h3>Crew cards and personal tools</h3><p>Everyone has a crew card with a personal tool, usually a <b>Twin Probe</b>: once per job, point at two wires on one crewmate stand and say a number; it works if either matches. From job 31 new crew members bring other tools.</p>
+<h3>Crew cards and personal tools</h3><p>Everyone has a crew card with a personal tool, usually a <b>Twin Probe</b>: once per job, point at two wires on one crewmate stand and say a number; it works if either matches (one red plus one other: no explosion and the token goes on the other wire; both red: boom). From job 31 new crew members bring other tools.</p>
 <h3>Special jobs</h3><p>From job 9 most jobs add a twist: an order to follow, a timer, restrictions, robots, oxygen... The <b>Job</b> button opens the job card with every special rule as a picture and a line of text.</p>
 <h3>On this page</h3><ul><li>The <b>dock</b> (right, or under the board on a phone) always says what the game is waiting for, with a button for every option.</li>
 <li>Tap a <b>glowing wire</b> on the table to pick it, then tap the value, then the big button.</li>

@@ -13,7 +13,7 @@
 //   (49), who can still play after the hand-over (65), solo cuts kept in reserve (26, 47, 65), robot brakes kept (53), flipped wires taken
 //   off a crewmate before they must gamble (64), one-shot probes saved for worse turns, the Damper kept for forced gambles, opening tokens
 //   where the table cannot tell the value, public sure cuts left for crewmates, a small bonus for informative targets; 200 samples.
-const AILV={easy:{S:16,noise:.6,tools:.3,think:0,forget:1,sloppy:.9,ch:1},normal:{S:60,noise:.04,tools:1,think:1,ch:1},hard:{S:200,noise:0,tools:1,think:2,ch:1,info:.04}};
+const AILV={easy:{S:16,noise:.6,tools:.3,think:0,forget:1,sloppy:.9,ch:1},normal:{S:60,noise:.04,tools:1,think:1,ch:1},hard:{S:200,noise:0,tools:1,think:2,ch:1,info:.12}};
 let AISALT=12345,AICHAINS=0;function setAiSeed(s){AISALT=s>>>0}function setAiChains(n){AICHAINS=n}
 function mkRng(seed){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
 function kHash(K){let h=AISALT^(K.seat*2654435761);const mix=x=>{h=Math.imul(h^x,2246822519)>>>0;h^=h>>>13};mix(K.turn);mix(K.hist.length);mix(K.ann.length);mix(K.q?K.q.opts?K.q.opts.length:1:0);mix(K.legal?K.legal.plain.length:0);mix(Math.round(K.clock));return h>>>0}
@@ -60,6 +60,12 @@ function buildModel(K,forget){const M={bad:0,W:[],T:[],hid:[],ref:{},bins:[],glo
   for(const a of forget?[]:K.ann){if(a.k==='sweep')for(const r of a.res){const refs=r.us.map(u=>byU[u]).filter(Boolean);M.glob.push({k:'sweep',refs,code:a.v,yes:r.yes})}
     else if(a.k==='holds')M.glob.push({k:a.yes?'has':'none',refs:a.yes?seatSlots(a.seat):hidOf(a.seat),code:CODE(a.v)});
     else if(a.k==='holdsNone')for(const v of a.vals)M.glob.push({k:'none',refs:hidOf(a.seat),code:CODE(v)})}
+  // a missed call proves the caller holds that value (a call needs a matching wire): while the caller has cut none of it, one of the
+  // caller's hidden wires still is that value (not when wires can change hands)
+  if(!forget&&!(K.eq&&K.eq.some&&K.eq.some(e=>e.st==='used'&&(e.id==='eq2'||e.id==='eq1111')))&&!K.seats.some(q=>q.chUsed&&q.ch==='ch_new2')&&!K.rules.includes('juggle')){const seen={};
+    for(const h of K.hist){if(h.kind!=='dual'||h.ok||h.seat===K.seat||h.v==null||h.v==='R')continue;const key=h.seat+':'+h.v;if(seen[key])continue;seen[key]=1;const c=CODE(h.v);
+      let cutIt=false;for(const st of K.stands)if(st.owner===h.seat)for(const x of st.slots)if(x.cut&&x.v!=null&&CODE(x.v)===c)cutIt=true;
+      const refs=hidOf(h.seat);if(!cutIt&&refs.length)M.glob.push({k:'has',refs,code:c})}}
   for(const st of K.stands)for(const t of st.side){if(t.mean==='none')M.glob.push({k:'none',refs:hidOf(st.owner),code:CODE(t.v)});else if(t.mean==='has')M.glob.push({k:'has',refs:st.slots.map((y,j)=>R(st.i,j)),code:CODE(t.v)})}
   if(K.rules.includes('flip'))for(const q of K.seats){const fl=[];for(const st of K.stands)if(st.owner===q.i)st.slots.forEach((x,k)=>{if(x.flip)fl.push(R(st.i,k))});if(fl.length===2)M.glob.push({k:'le',a:fl[0],b:fl[1]})}
   const dealt=(K.ms.redTriple&&K.ms.redTriple.dealt)||(K.ms.tripwire&&K.ms.tripwire.dealt)||(K.ms.yellowTrio&&K.ms.yellowTrio.dealt);
@@ -137,7 +143,7 @@ const BOOM=1000;
 function fuseLeft(K){if(K.dial!=null)return K.dial;if(K.ms.robotFuse)return Math.max(1,Math.floor((12-K.ms.robotFuse.at)/2));return 9}
 function missSteps(K){let s=1;const me=K.seats[K.seat];const cons=[me.con&&me.con!=='?'&&!me.conDown?me.con:null,K.ms.globCon&&K.ms.globCon.con].filter(Boolean);if(cons.includes('L'))s=2;return s}
 function missCost(K,extra){if(K.tfx.damper)return 0;const me=K.seats[K.seat];if(K.ms.rookie&&me.role==='rookie')return BOOM;if(K.rules.includes('butterfingers')&&K.seat===K.captain)return BOOM;
-  const f=fuseLeft(K)-(missSteps(K)+(extra||0));if(K.ms.robotFuse)return f<=0?BOOM:1.5+4/(f+.5);if(f<=0)return BOOM;return 1.2+4/(f+.5)}
+  const f=fuseLeft(K)-(missSteps(K)+(extra||0));if(K.ms.robotFuse)return f<=0?BOOM:1.5+4/(f+.5);if(f<=0)return BOOM;return (1.2+4/(f+.5))*1.6}
 function redCost(K){return K.tfx.damper?0:BOOM}
 function heldCounts(K){const o={};for(const st of K.stands)if(st.mine)for(const x of st.slots)if(!x.cut&&x.v!=null&&!x.flip)o[x.v]=(o[x.v]||0)+1;return o}
 function bonusFor(K,v){let b=0;const ms=K.ms;
@@ -246,7 +252,7 @@ function mainDecision(K,rnd,L){const lg2=K.legal;const held=heldCounts(K);const 
   for(const m of lg2.flip){let p=pFlipOwn(K,Z,m);const pt=pAt(Z,m.st,m.ks[0],CODE(m.v));if(p*pt>.985&&!(flipSure(m)&&(L.think<1||certainCheck(K,m.st,m.ks[0],CODE(m.v),rnd,L))))p=.5;const pp=p*pt;cand.push({m,ev:pp*1.2-(1-pp)*BOOM,p:pp,why:`own flipped wire and target both ${VN(m.v)}: ${Math.round(pp*100)}%`})}
   // probes
   const T=lg2.tools;const best1=cand.reduce((a,c)=>Math.max(a,c.p),0);
-  if(best1<.97&&(T.dd||T.eq3||T.pt3||T.eq5||T.eq10||T.pt10)&&rnd()<L.tools)probeCands(K,Z,cand,T,held,mc,rcst,rnd,L);
+  if(best1<.995&&(T.dd||T.eq3||T.pt3||T.eq5||T.eq10||T.pt10)&&rnd()<L.tools)probeCands(K,Z,cand,T,held,mc,rcst,rnd,L);
   for(const m of lg2.special){const c=specialCand(K,Z,m,rnd);if(c)cand.push(c)}
   for(const m of lg2.other){const c=otherCand(K,Z,m,mc,rnd,L);if(c)cand.push(c)}
   // hard: what a cut teaches the table. Hit or miss, the pointed wire's value becomes public (cut, or a token), so a target whose
@@ -291,7 +297,7 @@ function bestCalc(K,v){const up=K.ms.math.up;let best=null,bs=-1;const formable=
 function pFlipOwn(K,Z,m){for(const st of K.stands)if(st.mine)for(let k=0;k<st.slots.length;k++){const x=st.slots[k];if(x.flip&&!x.cut&&x.u===m.fu)return pAt(Z,st.i,k,CODE(m.v))}return 0}
 function probeCands(K,Z,cand,T,held,mc,rcst,rnd,L){
   // hard: a one-shot probe is worth more later, when single cuts are worse: early in the job it has to buy more safety to be spent
-  let spend=0;if(L.think>=2&&L.spend!==0){let n=0,u=0;for(const st of K.stands)for(const x of st.slots){n++;if(!x.cut)u++}spend=.45*u/Math.max(1,n)}const byStand={};for(const m of K.legal.plain){if(m.v==='Y')continue;const x=K.stands[m.st].slots[m.ks[0]];if(x.x||x.flip)continue;(byStand[m.st+':'+m.v]=byStand[m.st+':'+m.v]||[]).push(m)}
+  let spend=0;if(L.think>=2&&L.spend!==0){let n=0,u=0;for(const st of K.stands)for(const x of st.slots){n++;if(!x.cut)u++}spend=.15*u/Math.max(1,n)}const byStand={};for(const m of K.legal.plain){if(m.v==='Y')continue;const x=K.stands[m.st].slots[m.ks[0]];if(x.x||x.flip)continue;(byStand[m.st+':'+m.v]=byStand[m.st+':'+m.v]||[]).push(m)}
   const base=m=>{const o=Object.assign({},m);delete o.ks;return o};
   for(const key in byStand){const ms=byStand[key];const st=ms[0].st,v=ms[0].v;const code=CODE(v);const ranked=ms.map(m=>({m,p:pAt(Z,st,m.ks[0],code)})).sort((a,b)=>b.p-a.p);const top=ranked.slice(0,5);
     const evOf=(ks,tool,cost)=>{const cells=ks.map(k=>[st,k]);const ph=pJoint(Z,cells,vs=>vs.some(c=>c===code));const pr=pJoint(Z,cells,vs=>vs.every(c=>c===14));

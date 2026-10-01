@@ -141,3 +141,30 @@ No audio. Each runs from `G.clock` (seconds of play) with on-screen prompts in o
 23. **No-progress guard.** Four full rounds in a row without any cut, card or tool use end the job as a loss. Without it some positions (everyone blocked by a restriction the foreman keeps, job 32) could run forever.
 24. **Job 41**: once only the active player's own snare wire (plus reds) is left and nobody else holds wires, nobody can ever point at it, so the job is lost.
 25. **Flipped wires (38, 56, 64)**: a dual or solo cut "with my flipped wire" names which flipped wire it means (`fu`), as a player would point at it. In job 64 every player knows their left flipped wire is the lower one (the crew told them where to put it), and the AI uses that.
+
+## Rules-audit fixes (see RULES-AUDIT.md; each has a `FIX ...` test in rules-test.js)
+
+Fixed (wrong / missing)
+- 1 Jobs 44/63 oxygen: the reset (44) and collection (63) now happen in the `round` hook, i.e. when the turn order passes the foreman's seat, whether or not the foreman still has wires. For 63 the reserve goes to the first seat clockwise from the foreman that still has wires.
+- 2 Job 39: the post-action number token is only offered for values the seat still holds uncut; otherwise it is skipped silently (FAQ: a card for a value you do not hold is ignored).
+- 3 Job 13: equipment/probes cannot choose reds. Choice made: a Twin/Triple Probe or Full Scan whose selection contains a red is a **boom** (no pre-check, so legality never leaks which wire is red). The AI does not know this and may blow up with probes in job 13.
+- 4 Jobs 24/40: Handsets discard the count token on both traded wires (`G.tokFam==='cnt'`).
+- 5 Job 30: the "lose equipment" penalty takes the smallest-valued visible card, locked or ready (used cards are gone); the yellow card counts as lowest. A lost locked card can never be unlocked.
+- 6 Jobs 38/56/64: the Sweep ignores flipped wires (the owner cannot see them).
+- 7 Job 48 (and the 66 lever): a failed three-yellow call puts a token on every pointed non-red wire (a yellow gets the yellow token), burns exactly one step, and never marks a real yellow "not yellow". A red among the three still explodes (cutting a red always does; the card is silent).
+- 11 Job 31 (2 players): the draft no longer forbids A+B / C+D; the option is labelled "(the rules advise against this pairing)".
+- 15 Job 44 Damper: with no oxygen to pay in jobs 54/63 (forced skip) a player holding a ready Stabilizer is asked whether to use it to cancel the step. In 44/49 the voluntary pass already honours it (and a player who cannot pay simply passes). The "pretend cut in zone 1" is not implemented: the FAQ gives no cost or effect and the Damper pass already gives the free turn.
+
+Ambiguous: reading chosen (no code change unless stated)
+- 8 Job 18: keep the borrowed "lacks" penalty (tag a wire, one step); the FAQ says the designated player is chosen freely, so the radar answers do not restrict the choice.
+- 9 Jobs 56/64: a miss on a teammate's flipped wire costs 2 (the card's +1 for touching it plus the normal miss step); the card text puts the +1 on "if they do" cut one, so both costs apply.
+- 10 Challenge 10: one end wire per side (the drawing shows one boxed wire per end).
+- 12 Challenges 2/7 with fewer players: consecutive turns by the same player count (the card is otherwise unmeetable at 2-3 players).
+- 13 Rewind may reach the purple segment in all jobs: the dial art has it on every dial.
+- 14 Extra loss rules (no legal cut; four idle rounds) are kept as a safety net; they are listed in the notes above, not as printed rules.
+- 16 Job 54: reserve of 30 tokens and transfers of 1-2 tokens kept (card silent).
+- 17 Job 12: the Hidden Compartment cards are not covered later (setup only).
+- 18 Job 11: the fake-red blue value gets no validation token and is not counted by the Sweep.
+- 19 Vaporiser: skips yellow, tokens on the board and finished values.
+- 20 Forced reveal with an unseen flipped red: kept automatic (FAQ: reveal "when all remaining wires are red" is mandatory); the extra information is accepted.
+- 21 Public memory (Sweep answers, miss facts, history) is a digital convenience, not a rule; no recall rule is enforced.
