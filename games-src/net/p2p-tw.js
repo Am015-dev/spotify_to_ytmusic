@@ -10,7 +10,7 @@ async function page(ctx,label,hash){const p=await ctx.newPage();p.setDefaultTime
   await p.goto('https://gns.test/?2d'+(hash||''),{waitUntil:'domcontentloaded',timeout:120000});
   await p.waitForFunction(()=>typeof NET!=='undefined'&&NET.ready&&typeof UI!=='undefined'&&UI.setup,null,{timeout:120000,polling:300});return {p,ctx,label,errs}}
 async function ctxNew(){const c=await b.newContext({viewport:{width:1100,height:760}});
-  await c.addInitScript(port=>{window.NETROOM_RELAYS=['ws://127.0.0.1:'+port];window.NETROOM_ICE=[];window.NET_TRACE=1;try{localStorage.setItem('tw_set',JSON.stringify({speed:1,anim:false}))}catch(e){}},PORT);
+  await c.addInitScript(([port,CANIM_ON])=>{window.NETROOM_RELAYS=['ws://127.0.0.1:'+port];window.NETROOM_ICE=[];window.NET_TRACE=1;window.CANIM=CANIM_ON;try{localStorage.setItem('tw_set',JSON.stringify({speed:window.CANIM?30:1,anim:!!window.CANIM}))}catch(e){}},[PORT,process.env.CANIM==='1']);
   await c.route('**/*',r=>{const u=r.request().url();if(u.startsWith('https://gns.test/'))return r.fulfill({body:html,contentType:'text/html; charset=utf-8'});return r.abort()});return c}
 async function setup(ncl,opt){const H=await page(await ctxNew(),'host');const C=[];for(let i=0;i<ncl;i++)C.push(await page(await ctxNew(),'c'+(i+1)));
   console.log('host',JSON.stringify(await H.p.evaluate(()=>({avail:netAvail(),trystero:typeof Trystero}))));
@@ -24,18 +24,18 @@ async function setup(ncl,opt){const H=await page(await ctxNew(),'host');const C=
 const startHost=H=>H.p.evaluate(()=>document.querySelector('[data-a=netstart]').click());
 // one random click through the page's own buttons / board squares (a port of click.js's clicker, for the page's own seat only)
 const tick=()=>{if(!G||G.over||!UI.started||UI.busy)return 0;const d=document,R=Math.random,rnd=a=>a[Math.floor(R()*a.length)],q=s=>[...d.querySelectorAll(s)].filter(b=>!b.disabled),click=el=>{el.dispatchEvent(new MouseEvent('click',{bubbles:true}));return 1};
-  const qs=q('#main [data-a=q]');if(qs.length){const lg=G.q&&G.q.opts&&G.q.opts.find(o=>o.d&&o.d.x!=null&&(o.h==='dGateAt'||o.h==='dReloc'));if(lg&&R()<.3){const t=d.querySelector(`#fb [data-c="${lg.d.x}"][data-r="${lg.d.y}"]`);if(t)return click(t)}return click(rnd(qs))}
-  const sm=q('#main [data-a=startmark]');if(sm.length)return click(rnd(sm));
+  const qs=q('#dockbody [data-a=q]');if(qs.length){const lg=G.q&&G.q.opts&&G.q.opts.find(o=>o.d&&o.d.x!=null&&(o.h==='dGateAt'||o.h==='dReloc'));if(lg&&R()<.3){const t=d.querySelector(`#fb [data-c="${lg.d.x}"][data-r="${lg.d.y}"]`);if(t)return click(t)}return click(rnd(qs))}
+  const sm=q('#dockbody [data-a=startmark]');if(sm.length)return click(rnd(sm));
   const main=d.getElementById('main');
-  if(q('#main [data-a=place],#main [data-a=cannon],#main [data-a=gate],#main [data-a=pass],#main [data-a=card]').length){
-    const sg=q('#main [data-a=sugg]');if(sg.length&&R()<.5)return click(sg[0]);
-    const tg=q('#main [data-a=target]');if(tg.length&&R()<.3)return click(rnd(tg));
-    const cs=q('#main [data-a=cannon]');if(cs.length&&R()<.6)return click(rnd(cs));
-    const gt=q('#main [data-a=gate]');if(gt.length&&R()<.4)return click(rnd(gt));
-    const ps=q('#main [data-a=pass]');if(ps.length)return click(ps[0]);
-    if(R()<.25){const cd=q('#main [data-a=card]');if(cd.length)return click(rnd(cd))}
-    if(R()<.25){const rb=q('#main [data-a=rot]');if(rb.length)return click(rnd(rb))}
-    const pb=q('#main [data-a=place]');if(pb.length){if(R()<.15){const f=UI.fronts&&UI.fronts[0];if(f!=null){const S=G.ships[f];const t=d.querySelector(`#fb [data-c="${S.x}"][data-r="${S.y}"]`);if(t)return click(t)}}return click(pb[0])}}
+  if(q('#dockbody [data-a=place],#dockbody [data-a=cannon],#dockbody [data-a=gate],#dockbody [data-a=pass],#dockbody [data-a=card]').length){
+    const sg=q('#dockbody [data-a=sugg]');if(sg.length&&R()<.5)return click(sg[0]);
+    const tg=q('#dockbody [data-a=target]');if(tg.length&&R()<.3)return click(rnd(tg));
+    const cs=q('#dockbody [data-a=cannon]');if(cs.length&&R()<.6)return click(rnd(cs));
+    const gt=q('#dockbody [data-a=gate]');if(gt.length&&R()<.4)return click(rnd(gt));
+    const ps=q('#dockbody [data-a=pass]');if(ps.length)return click(ps[0]);
+    if(R()<.25){const cd=q('#dockbody [data-a=card]');if(cd.length)return click(rnd(cd))}
+    if(R()<.25){const rb=q('#dockbody [data-a=rot]');if(rb.length)return click(rnd(rb))}
+    const pb=q('#dockbody [data-a=place]');if(pb.length){if(R()<.15){const f=UI.fronts&&UI.fronts[0];if(f!=null){const S=G.ships[f];const t=d.querySelector(`#fb [data-c="${S.x}"][data-r="${S.y}"]`);if(t)return click(t)}}return click(pb[0])}}
   return 0};
 // ---- hidden-information checks. Truth = the host's real G; a page may only hold what its own seat may see ----
 const hostTruth=()=>({hands:G.hands.map(h=>h.slice()),deck:G.deck.slice(),mdeck:G.mdeck.slice(),rng:G.rng,seed:G.seed,pool:G.pool.slice(),limbo:G.limbo,gid:G.gid,q:G.q&&{who:G.q.who,kind:G.q.kind}});
@@ -68,7 +68,7 @@ async function play(P,H,secs,hook){let clicks=0,remoteClicks=0,checks=0;const vi
     if(g.k!==lastK){lastK=g.k;lastT=Date.now()}else if(Date.now()-lastT>40000){lastT=Date.now();const v=await Promise.all(P.filter(x=>!x.dead).map(x=>x.p.evaluate(()=>({seat:NET.mySeat,k:G&&G.logN+'/'+sideToAct(),main:document.getElementById('main').textContent.slice(0,80),rx:NET.rx,bad:NET.bad,badE:NET.badE,rej:NET.rejected,peers:NET.peers.length,busy:UI.busy,q:NET.queue&&NET.queue.length})).catch(e=>String(e))));console.log('STALL?',JSON.stringify(g),JSON.stringify(v))}
     // interrupts: the endangered seat's own page (and only that page) is asked
     if(g.q&&g.q.kind==='doom'){const key=dbg.game+'/'+g.k;if(!dbg.qWho[key]){dbg.qWho[key]=1;dbg.interrupts++;if(g.q.who!==g.q.cur&&g.q.human){dbg.remoteInterrupts++;if(g.q.who===g.q.seat)dbg.hostInterrupts=(dbg.hostInterrupts||0)+1;
-        await sleep(900);const owner=P.find(x=>!x.dead&&x!==H&&x.seat===g.q.who);const seen=await Promise.all(P.filter(x=>!x.dead).map(x=>x.p.evaluate(()=>({seat:NET.mySeat,doom:!!document.querySelector('#main [data-qkind=doom]'),btn:document.querySelectorAll('#main [data-a=q]').length,q:G.q&&G.q.kind})).catch(()=>null)));
+        await sleep(900);const owner=P.find(x=>!x.dead&&x!==H&&x.seat===g.q.who);const seen=await Promise.all(P.filter(x=>!x.dead).map(x=>x.p.evaluate(()=>({seat:NET.mySeat,doom:!!document.querySelector('#dockbody [data-qkind=doom]'),btn:document.querySelectorAll('#dockbody [data-a=q]').length,q:G.q&&G.q.kind})).catch(()=>null)));
         for(const s of seen)if(s&&s.q==='doom'){if(s.seat===g.q.who){if(s.doom&&s.btn)dbg.ownerSawDoom++}else if(s.btn)dbg.leak++}}}}
     if(hook&&global.HOOK_FIRST)await hook(g,n);
     for(const x of P){if(x.dead||global.FREEZE===x||global.FREEZE===1)continue;const k=await x.p.evaluate(tick).catch(e=>{x.errs.push(x.label+' tick '+e.message);return 0});clicks+=k;if(x!==H)remoteClicks+=k}
@@ -128,6 +128,13 @@ else if(SC==='shots'){const SH=__dirname+'/../tots/game/shots';try{fs.mkdirSync(
         const lay=await C[0].p.evaluate(()=>({sw:document.documentElement.scrollWidth,vw:innerWidth,seat:NET.mySeat,cur:sideToAct()}));console.log('client layout',w,JSON.stringify(lay));
         await C[0].p.screenshot({path:`${SH}/net_client_${w}x${h}_${shot}.png`});await H.p.screenshot({path:`${SH}/net_host_${w}x${h}_${shot}.png`})}shot++}});
   console.log('errors',JSON.stringify([H,...C].flatMap(x=>x.errs).slice(0,10)))}
+else if(SC==='idle'){const {H,C}=await setup(1,{np:3,exp:{wave:1},anim:1});const P=[H,...C];await H.p.evaluate(()=>{NET.ttLimit=3});await startHost(H);for(const x of P)await seatOf(x);
+  const hasBtn=await H.p.evaluate(()=>{UI.netOpen=true;netRender();return document.querySelectorAll('#netbox [data-a=nettt]').length});
+  let info={},shot=false;for(let k=0;k<100;k++){await sleep(700);info=await H.p.evaluate(()=>({auto:NET.autoTurn,turn:G.turn,over:!!G.over}));
+    if(!shot){const b=await C[0].p.evaluate(()=>UI.busy&&UI.mph&&UI.mph.shown>0).catch(()=>false);if(b){shot=true;await C[0].p.screenshot({path:__dirname+'/../tots/game/shots/nc/net_client_anim.png'})}}if((info.auto>=4&&shot)||info.over)break}
+  const cl=await C[0].p.evaluate(()=>({played:NET.played||0,ev:NET.playedEv||0,strip:document.getElementById('netst').textContent,turn:G.turn,tt:NET.ttSec}));
+  await C[0].p.screenshot({path:__dirname+'/../tots/game/shots/nc/net_client_idle.png'});
+  const errs=P.reduce((n,x)=>n+x.errs.length,0);res.push({tag:'idle timer + client replay',agree:info.auto>=2&&cl.played>0&&cl.tt===3&&hasBtn===4&&/s left|timer/.test(cl.strip),nErrors:errs,errs:P.flatMap(x=>x.errs).slice(0,3),info,cl,hasBtn,shot})}
 else if(SC==='hostleft'){const {H,C}=await setup(1,{np:3});const P=[H,...C];await startHost(H);
   await play(P,H,200,async g=>{if(g.turn>=3)throw 'stop'}).catch(e=>{if(e!=='stop')throw e});
   await H.p.close();H.dead=true;let msg='';for(let k=0;k<120&&!msg;k++){await sleep(300);msg=await C[0].p.evaluate(()=>NET.hostGone?NET.err:'')}

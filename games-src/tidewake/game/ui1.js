@@ -30,10 +30,16 @@ function installRecorders(){
   const _pg=putGate;putGate=function(x,y){_pg(x,y);rec({t:'gate',x,y})};
   const _dt=destroyTile;destroyTile=function(x,y){const had=!!cellAt(G,x,y);_dt(x,y);if(had)rec({t:'destroy',x,y})};
   const _rm=removeMon;removeMon=function(id,why){const m=monById(id)||(G.arr&&G.arr.id===id?G.arr:null);rec({t:'rmon',id,why,k:m?m.k:'L',x:m?m.x:null,y:m?m.y:null,by:UI.actor});_rm(id,why)};
-  const _el=eliminate;eliminate=function(seat,why,bonus){const s=G.ships[seat];const was=s.alive?{x:s.x,y:s.y,e:s.e,on:s.on?s.on.slice():null}:null;_el(seat,why,bonus);if(was)rec({t:'sink',seat,why,pos:was})};
+  const _el=eliminate;eliminate=function(seat,why,bonus){const s=G.ships[seat];const was=s.alive?{x:s.x,y:s.y,e:s.e,on:s.on?s.on.slice():null}:null;_el(seat,why,bonus);if(was){let at=null;const si=UI.sailInfo&&UI.sailInfo[seat];
+    if(si&&si.stop&&/edge|ran into/.test(why))at=si.stop;else if(was.on)at=[was.on[0]-2.5,was.on[1]-2.5];else if(was.x!=null){try{const w=TWKit.portWorld(was.x,was.y,was.e);at=[w[0],w[1]]}catch(e){at=[was.x-2.5,was.y-2.5]}}
+    rec({t:'sink',seat,why,pos:was,at,cur:G.cur,actor:UI.actor,turn:G.turn,key:seat+':'+why+':'+G.logN,key0:G.turn+':'+(was.on?was.on.join(','):was.x+','+was.y+','+was.e)})}};
   const _ws=waveSlot;waveSlot=function(s){const w=G.wave;const old=w?{x:w.x,y:w.y,r:w.r}:null;const r=_ws(s);if(r&&old)rec({t:'wave',from:old,off:!G.wave,to:G.wave?{x:G.wave.x,y:G.wave.y,r:G.wave.r,n:G.wave.n}:null});return r};
   const _ap=applyRes;applyRes=function(seat,r,o){const s=G.ships[seat];const x=s.x,y=s.y,e=s.e;_ap(seat,r,o);if(x==null)return;
     const steps=[];let ce=e;for(const p of r.path){const cell=cellAt(G,p[0],p[1]);if(!cell)break;const q=exitPort(cell,ce);steps.push({c:p[0],r:p[1],from:ce,to:q});ce=MATE[q]}
+    let stop=null;const last=steps[steps.length-1];
+    if(r.st==='edge'&&last){const w=TWKit.portWorld(last.c,last.r,last.to),dd=DIR[last.to>>1];stop=[w[0]+dd[0]*.4,w[1]+dd[1]*.4]}
+    else if(r.st==='mon'){const m=monById(r.id)||(G.arr&&G.arr.id===r.id?G.arr:null);if(m)stop=[m.x-2.5,m.y-2.5]}
+    (UI.sailInfo=UI.sailInfo||{})[seat]={st:r.st,stop};
     rec({t:'sail',seat,st:r.st,steps,mon:r.id!=null?r.id:null,end:s.x!=null?{x:s.x,y:s.y,e:s.e}:null})};
   const _sp=AG.spawn;AG.spawn=function(d){const w0=G.wave;_sp(d);if(G.wave&&G.wave!==w0)rec({t:'wavenew',x:G.wave.x,y:G.wave.y,r:G.wave.r})};
 }

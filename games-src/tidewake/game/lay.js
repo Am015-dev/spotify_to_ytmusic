@@ -28,18 +28,18 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(TWO?'_2d':'');const ctx=await b.newCo
     if(r.out||r.cov||!r.hostInside){bad++;log(tag,'BOARD NOT WHOLE/UNCOVERED',JSON.stringify(r))}return r};
   const dockOn=async tag=>{const r=await p.evaluate(()=>{const d=document.querySelector('.gx-dock');const R=d.getBoundingClientRect();const m=document.querySelector('#main');const M=m.getBoundingClientRect();return {vis:getComputedStyle(d).visibility,in:R.top<innerHeight-30&&R.bottom>30&&R.left<innerWidth-30&&R.width>100,mainh:M.height>10,txt:m.textContent.length>3}});if(r.vis!=='visible'||!r.in||!r.txt){bad++;log(tag,'DOCK HIDDEN/EMPTY',JSON.stringify(r))}};
   const shot=async n=>{await p.screenshot({path:path.join(OUT,`L_${t}_${n}.png`)})};
-  const waitHuman=async()=>{for(let k=0;k<80;k++){const s=await p.evaluate(()=>{const d=sideToAct();return !!G.over||(d>=0&&G.seats[d].human&&!UI.busy&&!document.querySelector('#main [data-a=take]'))});if(s)break;await p.waitForTimeout(300)}await p.waitForTimeout(300)};
+  const waitHuman=async()=>{for(let k=0;k<80;k++){const s=await p.evaluate(()=>{const d=sideToAct();return !!G.over||(d>=0&&G.seats[d].human&&!UI.busy&&!document.querySelector('#dockbody [data-a=take]'))});if(s)break;await p.waitForTimeout(300)}await p.waitForTimeout(300)};
   // 1. start screen
   await scroll('start');await shot('0start');
   // 2. guided game: start mark, then a turn
   await p.click('[data-a=guided]');await p.waitForTimeout(1500);await waitHuman();await scroll('setup');const c1=await whole('setup');await dockOn('setup');await shot('1setup');
-  await p.click('#main [data-a=startmark]:not([disabled])');await p.waitForTimeout(800);await waitHuman();await scroll('turn');const c2=await whole('turn');await dockOn('turn');await shot('2turn');
-  const rb=await p.$('#main [data-a=rot]');if(rb){await rb.click();await p.waitForTimeout(300);await shot('3rotated')}
+  await p.click('#dockbody [data-a=startmark]:not([disabled])');await p.waitForTimeout(800);await waitHuman();await scroll('turn');const c2=await whole('turn');await dockOn('turn');await shot('2turn');
+  const rb=await p.$('#dockbody [data-a=rot]');if(rb){await rb.click();await p.waitForTimeout(300);await shot('3rotated')}
   // 3. play turns through the real buttons (rotate until the Place button is enabled)
   let turns=0;for(let k=0;k<60&&turns<4;k++){await waitHuman();const st=await p.evaluate(()=>({over:!!G.over,q:!!G.q,sm:G.phase==='setup'}));if(st.over)break;
-    if(st.q){const q=await p.$('#main [data-a=q]');if(q)await q.click()}
-    else{let pb=await p.$('#main [data-a=place]:not([disabled])');for(let i=0;i<4&&!pb;i++){const r2=await p.$('#main [data-a=rot][data-d="1"]');if(r2)await r2.click();await p.waitForTimeout(150);pb=await p.$('#main [data-a=place]:not([disabled])')}
-      if(pb){if(!shot.g){shot.g=1;await shot('4ghost');await whole('ghost')}await dockOn('decision '+k);await pb.click();turns++;await p.waitForTimeout(500);if(turns===2)await shot('5anim')}else{const pa=await p.$('#main [data-a=pass],#main [data-a=cannon],#main [data-a=gate]');if(pa)await pa.click()}}
+    if(st.q){const q=await p.$('#dockbody [data-a=q]');if(q)await q.click()}
+    else{let pb=await p.$('#dockbody [data-a=place]:not([disabled])');for(let i=0;i<4&&!pb;i++){const r2=await p.$('#dockbody [data-a=rot][data-d="1"]');if(r2)await r2.click();await p.waitForTimeout(150);pb=await p.$('#dockbody [data-a=place]:not([disabled])')}
+      if(pb){if(!shot.g){shot.g=1;await shot('4ghost');await whole('ghost')}await dockOn('decision '+k);await pb.click();turns++;await p.waitForTimeout(500);if(turns===2)await shot('5anim')}else{const pa=await p.$('#dockbody [data-a=pass],#dockbody [data-a=cannon],#dockbody [data-a=gate]');if(pa)await pa.click()}}
     await p.waitForTimeout(400)}
   await waitHuman();await scroll('later');await whole('later');await shot('6later');
   // 3b. reload: the saved game is offered and resumes
@@ -53,7 +53,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(TWO?'_2d':'');const ctx=await b.newCo
   await p.evaluate(()=>GX.toggleDock(false));await p.waitForTimeout(500);await whole('dock min');await shot('8dockmin');await p.evaluate(()=>GX.toggleDock(true));await p.waitForTimeout(300);
   // 6. hot-seat pass screen
   await p.evaluate(()=>{showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=hot]');await p.click('[data-a=np][data-v="3"]');await p.click('#startbtn');await p.waitForTimeout(1200);
-  await scroll('pass');await whole('pass');await dockOn('pass');await shot('9pass');await p.click('#main [data-a=take]');await p.waitForTimeout(500);await shot('9pass_taken');
+  await scroll('pass');await whole('pass');await dockOn('pass');await shot('9pass');await p.click('#dockbody [data-a=take]');await p.waitForTimeout(500);await shot('9pass_taken');
   // 7. a busy 8-captain game with every expansion: ships on every edge, leviathans, gate, wave, maelstrom
   await p.evaluate(()=>{showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=watch]');await p.click('[data-a=np][data-v="8"]');
   for(const k of['rift','wave','maelstrom','cannon']){await p.evaluate(k=>{const c=document.querySelector(`[data-a=exp][data-k=${k}]`);if(!c.checked){c.checked=true;c.dispatchEvent(new Event('change',{bubbles:true}))}},k)}

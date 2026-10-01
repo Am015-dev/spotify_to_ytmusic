@@ -20,9 +20,9 @@ function boot(){GX.init({key:'tw'});const st=lsGet('tw_set',{});if(st.speed)UI.s
   else{let down=null;cv.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY}});
     cv.addEventListener('webglcontextlost',e=>{e.preventDefault();window.TW_LOST=(window.TW_LOST||0)+1;console.warn('WebGL context lost: switching to the 2D chart');setTimeout(()=>{try{TWKit._K.loopOn=false;TWKit.init(cv,{fallback:fb,force2D:true});on2d();KS={tiles:{},mons:{},ships:{},gates:{},mael:{},wave:null,hold:{}};kitSync();render()}catch(x){console.error(x)}},0)},false);
     cv.addEventListener('click',e=>{if(down&&Math.abs(e.clientX-down.x)+Math.abs(e.clientY-down.y)>8)return;onPick(TWKit.pick(e.clientX,e.clientY))});perfHooks()}
-  GX.onResize((w,h)=>{try{frame(w,h);TWKit.resize(w,h);TWKit.setView({immediate:true});TWKit.renderOnce()}catch(e){}});{const b=GX.boardSize();try{TWKit.resize(b.w,b.h)}catch(e){}}
+  const tiltFor=(w,h)=>w<700?82:(w/h<.8?76:61);GX.onResize((w,h)=>{try{frame(w,h);TWKit.resize(w,h);TWKit.setView({tilt:tiltFor(w,h),immediate:true});TWKit.renderOnce()}catch(e){}});{const b=GX.boardSize();try{TWKit.resize(b.w,b.h);TWKit.setView({tilt:tiltFor(b.w,b.h),immediate:true})}catch(e){}}
   $('#rulesbody').innerHTML=RULES_HTML;
   GX.onShow=id=>{sfx('open');if(id==='piecesd'&&!$('#piecesbody').firstChild)$('#piecesbody').innerHTML=piecesHTML();renderOpenDrawer()};GX.onClose=()=>sfx('close');
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!GX.open&&G&&UI.started&&UI.confirm){UI.confirm=null;renderCoach()}});
-  netInit();showStart()}
+  netInit();showStart();OV.raf=requestAnimationFrame(ovLoop)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();

@@ -9,7 +9,8 @@
 // the options, and the host's timer (qTimerSync in ui4.js) answers for a seat that does not decide in time.
 const NET={on:false,role:null,code:'',room:null,lobby:null,uid:null,peer:null,mySeat:-1,seq:0,last:0,timer:null,parts:{},hostPeer:null,peers:[],
   err:'',busy:false,ready:false,lastRx:0,gid:null,myName:'',copied:false,opt:null,hostGone:false,starting:false,remote:0,rejected:0,sent:0,rx:0,
-  seatPeer:[],seatUid:[],pend:-1,pendT:0,conn:null,lastSt:'',trace:null,applied:0,fromNet:0,queue:[],autoDecl:0};
+  seatPeer:[],seatUid:[],pend:-1,pendT:0,conn:null,lastSt:'',trace:null,applied:0,fromNet:0,queue:[],autoDecl:0,
+  evLog:[],evId:0,evPlayed:0,later:null,ttLimit:0,ttKey:null,ttT0:0,ttLeft:null,ttSeat:-1,ttEnd:0,ttSec:0,autoTurn:0};
 const isClient=()=>NET.on&&NET.role==='client';
 const isHost=()=>NET.on&&NET.role==='host';
 const netAvail=()=>!!NET.lobby;
@@ -53,13 +54,13 @@ function lobbyPlayers(){if(isClient()&&NET.opt&&Array.isArray(NET.opt.pl))return
 function netPlan(s){const hum=NET.peers.slice(0,8).map(p=>({peer:p.peer,uid:p.isMe?NET.uid:(p.by||null),nm:cleanName(p.isMe?NET.myName:(p.presence&&p.presence.name))}));
   if(!hum.some(h=>h.peer===NET.peer))hum.unshift({peer:NET.peer,uid:NET.uid,nm:cleanName(NET.myName)});
   if(s.variant==='solo'||s.variant==='easysolo')return {err:'Solo games are for one captain. Pick Standard or Teams for online play.'};
-  const np=Math.min(8,Math.max(s.np,hum.length,s.variant==='teams'?4:2));
+  let np=Math.min(8,Math.max(s.np,hum.length,s.variant==='teams'?4:2));if(s.variant==='teams'&&np%2)np=np<8?np+1:np-1;
   if(hum.length>np)return {err:'This setup has room for '+np+' captains.'};
   return {np,hum}}
 function lobbyOpt(){const s=UI.setup||defaultSetup();const p=netPlan(s);
-  return {np:p.np||s.np,vr:s.variant||'',lv:(s.seats.find((x,i)=>i>=(p.hum?p.hum.length:1))||{}).lv||'normal',err:p.err||'',nh:p.hum?p.hum.length:1,pl:lobbyPlayers().map(x=>({nm:x.nm,by:x.by,host:x.host,seat:x.seat,idx:x.idx}))}}
+  return {tt:NET.ttSec||NET.ttLimit||0,np:p.np||s.np,vr:s.variant||'',lv:(s.seats.find((x,i)=>i>=(p.hum?p.hum.length:1))||{}).lv||'normal',err:p.err||'',nh:p.hum?p.hum.length:1,pl:lobbyPlayers().map(x=>({nm:x.nm,by:x.by,host:x.host,seat:x.seat,idx:x.idx}))}}
 // host: called by startGame right after newGame; binds the humans to the seats
-function netBound(plan){NET.seatPeer=plan.hum.map(h=>h.peer);NET.seatUid=plan.hum.map(h=>h.uid);G.gid=NetRoom.newCode()+Date.now().toString(36);NET.gid=G.gid;NET.mySeat=NET.seatPeer.indexOf(NET.peer);G.seats.forEach(q=>{q.away=false});NET.pend=-1;NET.queue=[]}
+function netBound(plan){NET.seatPeer=plan.hum.map(h=>h.peer);NET.seatUid=plan.hum.map(h=>h.uid);G.gid=NetRoom.newCode()+Date.now().toString(36);NET.gid=G.gid;NET.mySeat=NET.seatPeer.indexOf(NET.peer);G.seats.forEach(q=>{q.away=false});NET.pend=-1;NET.queue=[];NET.evLog=[];NET.ttKey=null}
 // ---- state packets: JSON, deflate-compressed, cut into chunks ----
 function b64(u8){let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s)}
 function unb64(s){const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
@@ -68,11 +69,12 @@ async function unpackStr(s){const u=unb64(s.slice(1));if(s[0]==='z'){const ds=ne
 function sendPacked(room,target,body,seq){packStr(JSON.stringify(body)).then(z=>{const CH=3200,n=Math.ceil(z.length/CH);for(let i=0;i<n;i++){const d={s:seq,i,n,d:z.slice(i*CH,(i+1)*CH)};(target?room.sendTo(target,'st',d):room.emit('st',d)).catch(()=>{})}})}
 function netPush(force){if(!isHost()||!NET.room||NET.starting)return;const now=Date.now();
   if(!force&&now-NET.last<300){if(!NET.timer)NET.timer=setTimeout(()=>{NET.timer=null;netPush(true)},310);return}
-  NET.last=now;const seq=++NET.seq;const room=NET.room;const opt=lobbyOpt();
+  NET.last=now;const seq=++NET.seq;const room=NET.room;const opt=lobbyOpt();ttTick();
+  const ev=NET.evLog.filter(b=>now-b.ts<12000).map(b=>({id:b.id,e:b.e}));const tt=NET.ttLimit>0?{s:NET.ttLimit,seat:NET.ttSeat,left:NET.ttLeft}:null;
   if(!G||!UI.started){sendPacked(room,null,{code:NET.code,lobby:true,opt},seq);return}
   // every peer gets ITS OWN stripped copy: nobody receives another seat's hand, the pile, the leviathan deck order or the seed
   for(const p of NET.peers){if(p.isMe)continue;const seat=NET.seatPeer.indexOf(p.peer);
-    sendPacked(room,p.peer,{code:NET.code,gid:G.gid,seat,cols:UI.cols.slice(0,8),opt,g:netStrip(G,seat)},seq)}}
+    sendPacked(room,p.peer,{code:NET.code,gid:G.gid,seat,cols:UI.cols.slice(0,8),opt,evid:NET.evId,ev,tt,g:netStrip(G,seat)},seq)}}
 setInterval(()=>{if(isHost())netPush(true)},3000);
 // the end of every render(): the host pushes the new state
 function netAfter(){if(!NET.on)return;netDock();if(isHost())netPush()}
@@ -86,13 +88,55 @@ function onNetState(msg){NET.rx++;if(!NET.on||msg.isMe||!isClient())return;const
 function validState(g){return g&&typeof g==='object'&&Array.isArray(g.ships)&&Array.isArray(g.seats)&&g.seats.length>=2&&g.seats.length<=8&&Array.isArray(g.log)&&Array.isArray(g.bd)&&g.bd.length===BW*BW&&Array.isArray(g.hands)&&g.hands.length===g.seats.length&&g.ships.length===g.seats.length&&Array.isArray(g.order)&&Array.isArray(g.mons)&&Array.isArray(g.deck)&&typeof g.gid==='string'}
 function applyNet(o){
   if(o.lobby||!o.g){NET.opt=o.opt&&typeof o.opt==='object'?o.opt:NET.opt;if(G||UI.started){netIdle();hideStart();idleDock()}NET.gid=null;netRender();return}
+  if(UI.busy&&G&&o.g&&o.g.gid===NET.gid){NET.later=o;return}   // an animation of the last state is still playing: take the newest state afterwards
   if(!validState(o.g))return;const g=o.g;const fresh=g.gid!==NET.gid;const prevN=G&&!fresh?G.logN:g.logN;NET.opt=o.opt&&typeof o.opt==='object'?o.opt:NET.opt;
   G=g;NET.mySeat=Number.isInteger(o.seat)&&o.seat>=0&&o.seat<g.seats.length?o.seat:-1;
-  if(fresh){NET.gid=g.gid;clearTimeout(UI.tm);UI.gen++;UI.busy=false;UI.cols=Array.isArray(o.cols)?o.cols.slice(0,8).map(x=>Number.isInteger(x)&&x>=0&&x<8?x:0):g.seats.map((_,i)=>i);
-    G.seats.forEach((x,i)=>{SHIP_NAMES[i]=cleanName(x.nm)||SHIP_NAMES[i]});UI.sel=null;UI.res=null;UI.hint=false;UI.confirm=null;UI.lastKey='';UI.qKey=null;UI.overSeen=0;UI.holder=-1;UI.pause=false;UI.guided=false;UI.trig={};
+  NET.ttSec=o.tt&&Number.isInteger(o.tt.s)&&o.tt.s>0&&o.tt.s<=600?o.tt.s:0;
+  if(o.tt&&NET.ttSec&&Number.isInteger(o.tt.seat)&&typeof o.tt.left==='number'&&isFinite(o.tt.left)){NET.ttSeat=o.tt.seat;NET.ttEnd=Date.now()+Math.max(0,Math.min(600,o.tt.left))*1000}else{NET.ttSeat=-1;NET.ttEnd=0}
+  let evs=[];
+  if(fresh){NET.gid=g.gid;NET.evPlayed=Number.isInteger(o.evid)?o.evid:0;clearTimeout(UI.tm);UI.gen++;UI.busy=false;UI.cols=Array.isArray(o.cols)?o.cols.slice(0,8).map(x=>Number.isInteger(x)&&x>=0&&x<8?x:0):g.seats.map((_,i)=>i);
+    G.seats.forEach((x,i)=>{SHIP_NAMES[i]=cleanName(x.nm)||SHIP_NAMES[i]});UI.sel=null;UI.res=null;UI.hint=false;UI.confirm=null;UI.lastKey='';UI.qKey=null;UI.overSeen=0;UI.holder=-1;UI.pause=false;UI.guided=false;UI.trig={};UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;
     kitReset();UI.started=true;hideStart();GX.close();UI.netOpen=false;SND.mood='calm';try{sndLoop('sea_loop',true)}catch(e){}if(SND.gesture)musicStart();else SND.wantMusic=1}
-  if(NET.pend>=0&&G.logN!==NET.pend)NET.pend=-1;netRender();kitSync();render();overCheck();
+  else if(Array.isArray(o.ev)){const bs=o.ev.filter(b=>b&&Number.isInteger(b.id)&&b.id>NET.evPlayed&&Array.isArray(b.e)).sort((a,b)=>a.id-b.id).slice(0,10);
+    for(const b of bs){for(const e of b.e.slice(0,400)){const c=cleanEv(e);if(c)evs.push(c)}NET.evPlayed=b.id}if(evs.length>1500)evs=evs.slice(-1500)}
+  if(NET.pend>=0&&G.logN!==NET.pend)NET.pend=-1;netRender();
+  if(evs.length&&ANIM&&UI.started&&!fresh){netPlay(evs);return}
+  for(const e of evs)if(e.t==='sink')sunkAdd(e);
+  kitSync();render();overCheck();
   if(!fresh&&G.logN>prevN){const nw=G.log.filter(e=>e.i>prevN).reverse();if(nw.length){const e=nw[nw.length-1];say(String(e.t).slice(0,200),e.c==='bad'?'bad':'')}}}
+// the host's events of the last moves, replayed on this page (the state G is already the final one; the kit still shows the old board)
+function netPlay(evs){NET.played=(NET.played||0)+1;NET.playedEv=(NET.playedEv||0)+evs.length;const gen=UI.gen;const mp=mphBuild(evs);if(mp)UI.mph=mp;UI.busy=true;UI.stepNow=0;render();
+  playEvents(evs,gen).then(()=>{if(UI.gen!==gen)return;UI.busy=false;UI.res=null;if(UI.mph){UI.mph.roll=false;UI.mph.shown=UI.mph.lines.length}KS.hold={};for(const e of evs)if(e.t==='sink')sunkAdd(e);kitSync();render();overCheck();
+    if(NET.later){const o=NET.later;NET.later=null;applyNet(o)}})}
+// host: remember this move's events for the clients (they only get state snapshots otherwise)
+function netEvents(evs){try{const e=JSON.parse(JSON.stringify(evs.filter(x=>x&&x.t)));NET.evLog.push({id:++NET.evId,ts:Date.now(),e});if(NET.evLog.length>8)NET.evLog.shift()}catch(x){}}
+// events come from another browser: copy only known fields with plain values
+function cleanEv(e){if(!e||typeof e!=='object')return null;const t=e.t,I=(v,a,b)=>Number.isInteger(v)&&v>=a&&v<=b?v:null,Sx=v=>String(v==null?'':v).slice(0,200);
+  const sq=v=>Array.isArray(v)&&I(v[0],0,5)!=null&&I(v[1],0,5)!=null?[v[0],v[1]]:null,pt=v=>Array.isArray(v)&&typeof v[0]==='number'&&typeof v[1]==='number'&&isFinite(v[0])&&isFinite(v[1])&&Math.abs(v[0])<20&&Math.abs(v[1])<20?[v[0],v[1]]:null;
+  const st=I(e.seat,0,7);
+  switch(t){
+  case 'log':return {t,text:Sx(e.text),c:Sx(e.c).slice(0,8)};
+  case 'turn':return st==null?null:{t,seat:st,n:I(e.n,0,99999)||0};
+  case 'dice':{if(!Array.isArray(e.d)||e.d.length!==2)return null;const a=I(e.d[0],1,6),b=I(e.d[1],1,6);return a&&b&&st!=null?{t,d:[a,b],seat:st}:null}
+  case 'monact':{const id=I(e.id,0,15),die=I(e.die,1,6);return id==null||die==null?null:{t,id,die,r:I(e.r,0,3),turned:!!e.turned}}
+  case 'arrive':{const id=I(e.id,0,15),x=I(e.x,0,5),y=I(e.y,0,5);return id==null||x==null||y==null?null:{t,id,k:e.k==='M'?'M':'L',x,y,r:I(e.r,0,3)||0,spawn:!!e.spawn,from:sq(e.from),tile:!!e.tile,other:null}}
+  case 'place':{const c=Array.isArray(e.card)&&I(e.card[0],0,60)!=null&&I(e.card[1],0,3)!=null?[e.card[0],e.card[1]]:null,x=I(e.x,0,5),y=I(e.y,0,5);return c&&x!=null&&y!=null?{t,seat:st,x,y,card:c}:null}
+  case 'sail':{if(st==null||!Array.isArray(e.steps))return null;const steps=[];for(const s of e.steps.slice(0,60)){const c=I(s&&s.c,0,5),r=I(s&&s.r,0,5),f=I(s&&s.from,0,7),to=I(s&&s.to,0,7);if(c==null||r==null||f==null||to==null)return null;steps.push({c,r,from:f,to})}
+    return {t,seat:st,st:Sx(e.st).slice(0,6),steps,mon:I(e.mon,0,15),end:null}}
+  case 'warp':{const to=sq(e.to);return st==null||!to?null:{t,seat:st,from:sq(e.from),to}}
+  case 'gate':case 'destroy':{const x=I(e.x,0,5),y=I(e.y,0,5);return x==null||y==null?null:{t,x,y}}
+  case 'rmon':{const id=I(e.id,0,15);return id==null?null:{t,id,why:Sx(e.why).slice(0,12),k:e.k==='M'?'M':'L',x:I(e.x,0,5),y:I(e.y,0,5),by:I(e.by,0,7)}}
+  case 'sink':{if(st==null)return null;const p=e.pos&&typeof e.pos==='object'?{x:I(e.pos.x,0,5),y:I(e.pos.y,0,5),e:I(e.pos.e,0,7),on:sq(e.pos.on)}:null;
+    return {t,seat:st,why:Sx(e.why),pos:p,at:pt(e.at),cur:I(e.cur,0,7)==null?0:e.cur,actor:I(e.actor,0,7),turn:I(e.turn,0,99999)||0,key:Sx(e.key).slice(0,80),key0:Sx(e.key0).slice(0,80)}}
+  case 'wavenew':{const x=I(e.x,0,5),y=I(e.y,0,5),r=I(e.r,0,3);return x==null||y==null||r==null?null:{t,x,y,r}}
+  case 'wave':{const f=e.from&&I(e.from.x,-1,6)!=null&&I(e.from.y,-1,6)!=null?{x:e.from.x,y:e.from.y,r:I(e.from.r,0,3)||0}:null,to=e.to&&I(e.to.x,0,5)!=null&&I(e.to.y,0,5)!=null&&I(e.to.r,0,3)!=null?{x:e.to.x,y:e.to.y,r:e.to.r,n:I(e.to.n,0,99)||0}:null;return {t,from:f,off:!!e.off,to}}}
+  return null}
+// ---- the optional turn timer (host setting, default off): an idle human is replaced for that one move by the computer ----
+function ttTick(){if(!isHost()||!G||!UI.started||G.over||NET.ttLimit<=0){NET.ttKey=null;NET.ttLeft=null;NET.ttSeat=-1;return}
+  const d=sideToAct();if(UI.busy||UI.pause||d<0||!G.seats[d].human||G.q){NET.ttKey=null;NET.ttLeft=null;NET.ttSeat=-1;return}
+  const key=G.logN+':'+d+':'+G.phase;if(NET.ttKey!==key){NET.ttKey=key;NET.ttT0=Date.now()}NET.ttSeat=d;const left=NET.ttLimit-(Date.now()-NET.ttT0)/1000;NET.ttLeft=Math.max(0,left);
+  if(left<=0&&!NET.queue.length){NET.ttKey=null;let m=null;try{m=aiMove(d,'hard')}catch(e){}if(m){NET.autoTurn++;say('Time is up: the computer played for '+nm(d)+'.','bad');actAs(m,d)}}}
+setInterval(()=>{try{if(NET.on){ttTick();netDock()}}catch(e){console.error(e)}},500);
 // ---- client -> host ----
 function netSend(m){if(!NET.room||!NET.hostPeer)return false;NET.sent++;NET.room.sendTo(NET.hostPeer,'act',{m}).catch(()=>{});return true}
 function onNetRej(msg){if(!isClient()||msg.peer!==NET.hostPeer)return;const e=msg.data&&typeof msg.data.e==='string'?msg.data.e.slice(0,200):'';NET.pend=-1;if(e&&G)say(e,'bad')}
@@ -131,7 +175,10 @@ function netStatus(){const n=NET.peers.length;
   if(n<=1)return 'Looking for players...';return `${n} players connected`}
 function netDock(){const el=$('#netst');if(!el)return;if(!NET.on||!G){el.hidden=true;return}el.hidden=false;
   const q=NET.mySeat>=0&&G.seats[NET.mySeat]?G.seats[NET.mySeat]:null;
-  el.innerHTML=`<span>Room <b>${esc(NET.code)}</b>${q?` · you are <b>${esc(q.nm)}</b>`:' · watching'}${isHost()?' · you host':''} · <span class="nst">${netStatus()}</span></span><button class="btn small" data-a="netopen">Lobby</button><button class="btn small" data-a="netleave">Leave</button>`}
+  let tt='';const lim=isHost()?NET.ttLimit:NET.ttSec;if(lim>0&&!G.over){const sd=isHost()?NET.ttSeat:NET.ttSeat,left=isHost()?(NET.ttLeft==null?null:Math.ceil(NET.ttLeft)):(NET.ttEnd?Math.max(0,Math.ceil((NET.ttEnd-Date.now())/1000)):null);
+    if(sd>=0&&left!=null&&G.seats[sd])tt=` · <span class="tt${left<=10?' low':''}">${sd===NET.mySeat?'Your turn':esc(nm(sd))+"'s turn"}: <b>${left} s</b> left</span>`;else tt=` · turn timer ${lim} s`}
+  const h=`<span>Room <b>${esc(NET.code)}</b>${q?` · you are <b>${esc(q.nm)}</b>`:' · watching'}${isHost()?' · you host':''} · <span class="nst">${netStatus()}</span>${tt}</span><button class="btn small" data-a="netopen">Lobby</button><button class="btn small" data-a="netleave">Leave</button>`;
+  if(el._h!==h){el._h=h;el.innerHTML=h}}
 // what the dock shows when another online captain has to decide (their tiles are never drawn)
 function netWaitHTML(d,vs){const q=G.q&&G.q.who===d;return `<div class="prompt"><h4>${dot(d)} ${esc(nm(d))} ${q?'must decide quickly':'is deciding'}...</h4><p class="tiny">${q?'An interrupt: they have a few seconds, then the computer answers for them.':'Waiting for their move.'}</p></div>`+handStrip(vs,false)}
 function lobbyHTML(){const host=isHost();const ps=lobbyPlayers();const o=host?lobbyOpt():(NET.opt||null);
@@ -145,6 +192,7 @@ function lobbyHTML(){const host=isHost();const ps=lobbyPlayers();const o=host?lo
    <p class="tiny">Friends open the link, or choose Play online and type the code. Nobody can see another captain's tiles.</p>
    <p class="small nst">${netStatus()}</p>
    <h3>Captains (${ps.length})</h3><ul class="plist">${rows}</ul>${opts}
+   ${host?`<p class="small"><b>Idle-turn timer</b> (host setting): ${[[0,'Off'],[30,'30 s'],[60,'60 s'],[90,'90 s']].map(([v,l])=>`<button class="btn small${NET.ttLimit===v?' on':''}" data-a="nettt" data-v="${v}">${l}</button>`).join(' ')}<br><span class="tiny">When a captain does nothing for this long on their own turn, the computer plays that one move. Default: off.</span></p>`:(o&&o.tt?`<p class="small">Turn timer: ${o.tt} s per move (an idle turn is played by the computer).</p>`:'')}
    ${host?`<div class="acts"><button class="btn pri" data-a="netstart"${ok?'':' disabled'}>${G&&!G.over?'Start a new game':'Set sail'}</button><button class="btn" data-a="netchange">Change setup</button><button class="btn" data-a="netleave">Close the room</button></div>`
    :`<p class="tiny">${NET.hostGone?'':G&&!G.over?'The host can start a new game from here.':'Waiting for the host to set sail...'}</p><div class="acts"><button class="btn" data-a="netleave">${NET.hostGone?'Back to the start':'Leave'}</button></div>`}</div>`}
 function onlineInner(){let h='';
@@ -164,13 +212,13 @@ function netCopy(){const t=NetRoom.inviteLink(NET.code);const sel=()=>{const i=d
   try{navigator.clipboard.writeText(t).then(done,sel)}catch(e){sel()}}
 function netClose(){UI.netOpen=false;netRender()}
 // returns true when the click was an online-play button (or one a client may not use)
-function netClick(a){switch(a){
+function netClick(a,t){switch(a){
   case 'nethost':{const i=document.getElementById('netname');if(i&&typeof NetRoom!=='undefined')NET.myName=NetRoom.setName(i.value);netJoin('host',NetRoom.newCode());return true}
   case 'netjoin':{const i=document.getElementById('netname');if(i&&typeof NetRoom!=='undefined')NET.myName=NetRoom.setName(i.value);netJoin('client',(document.getElementById('joincode')||{}).value);return true}
   case 'netstart':{if(!isHost())return true;UI.netOpen=false;UI.setup=UI.setup||defaultSetup();netRender();const s=JSON.parse(JSON.stringify(UI.setup));lsSet('tw_setup',UI.setup);startGame(s);return true}
   case 'netchange':{UI.netOpen=false;if(G&&UI.started)showStart();netRender();return true}
   case 'netleave':netLeave();return true;case 'netcopy':netCopy();return true;
-  case 'netclose':netClose();return true;case 'netopen':if(GX.open)GX.close();UI.netOpen=true;netRender();return true;
+  case 'nettt':{if(isHost()&&t&&t.dataset){NET.ttLimit=[0,30,60,90].includes(+t.dataset.v)?+t.dataset.v:0;NET.ttKey=null;netRender();netPush(true)}return true}case 'netclose':netClose();return true;case 'netopen':if(GX.open)GX.close();UI.netOpen=true;netRender();return true;
   case 'again':case 'newgame':case 'restart':case 'tonew':case 'pause':case 'guided':case 'cont':if(isClient()){return true}return false}return false}
 document.addEventListener('input',e=>{const t=e.target;if(!t)return;if(t.id==='joincode')UI.joinCode=t.value;if(t.id==='netname'&&typeof NetRoom!=='undefined'){NET.myName=NetRoom.setName(t.value)}});
 document.addEventListener('keydown',e=>{const t=e.target;if(t&&t.id==='joincode'&&e.key==='Enter'){e.preventDefault();netClick('netjoin');return}

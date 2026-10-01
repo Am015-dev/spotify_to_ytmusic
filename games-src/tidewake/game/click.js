@@ -45,8 +45,8 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
     for(const el of d.querySelectorAll('[data-owner][data-up="1"]')){const own=+el.getAttribute('data-owner');const vs=w.eval('viewSeat()');if(own!==vs){hidden++;if(errs.length<6)errs.push('HIDDEN hand of '+own+' face up for viewer '+vs)}
       if(hot&&own!==holder){hidden++;if(errs.length<6)errs.push('HIDDEN hand of '+own+' face up, holder '+holder)}}
     if(!humans.length||humans.length>=1){for(const el of d.querySelectorAll('[data-crewhand][data-up="1"]'))if(humans.length){hidden++;errs.push('HIDDEN crew hand face up')}}
-    if(hot&&!w.eval('UI.busy')){const dd=w.eval('sideToAct()');if(dd>=0&&G.seats[dd].human&&holder!==dd&&d.querySelector('#main [data-hand]')){hidden++;errs.push('hand shown before the pass screen was taken')}}
-    if(G.over){clearInterval(iv);const ov=d.querySelector('#main [data-over]');if(!ov)errs.push('no game-over card');else seen.add('over');
+    if(hot&&!w.eval('UI.busy')){const dd=w.eval('sideToAct()');if(dd>=0&&G.seats[dd].human&&holder!==dd&&d.querySelector('#dockbody [data-hand]')){hidden++;errs.push('hand shown before the pass screen was taken')}}
+    if(G.over){clearInterval(iv);const ov=d.querySelector('#dockbody [data-over]');if(!ov)errs.push('no game-over card');else seen.add('over');
       const again=d.querySelector('[data-a=again]');if(cf.replay===undefined&&again&&!replayed&&R()<.3){replayed=1;seen.add('again');click(again);const g2=w.eval('G');if(!g2||g2.over||g2.turn>1)errs.push('replay did not start');go();return}
       res({cf,over:G.over,turns:G.turn,errs,seen,clicks,hidden,mism,secs:Math.round((Date.now()-t0)/1000)});w.close();return}
     const q=s=>[...d.querySelectorAll(s)].filter(b=>!b.disabled);const r=R();
@@ -57,24 +57,24 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
       if(st.tiles.length!==tiles||st.leviathans.length!==levs||st.ships.length!==al){mm++;if(mm>=4){mism++;if(errs.length<6)errs.push(`MIRROR tiles ${st.tiles.length}/${tiles} levs ${st.leviathans.length}/${levs} ships ${st.ships.length}/${al} kit=${JSON.stringify(st.ships.map(x=>x.id+':'+x.c+','+x.r))} G=${JSON.stringify(G.ships.map(s=>[s.i,s.alive,s.x,s.y,s.on,s.tp]))} q=${G.q&&G.q.kind} KS=${JSON.stringify(w.eval('KS.ships'))}`)}}else mm=0}
     if(r<.03){const c=q('#coach [data-a=coachok]');if(c.length){click(c[0]);seen.add('coach');return}}
     if(r<.035){const c=q('#coach [data-a=guidetoggle]');if(c.length){click(c[0]);const y=q('#coach [data-a=guideyes],#coach [data-a=guideno]');if(y.length){click(rnd(y));seen.add('guide-toggle')}return}}
-    const take=q('#main [data-a=take]');if(take.length){click(take[0]);clicks++;seen.add('pass-screen');return}
-    const qs=q('#main [data-a=q]');if(qs.length){seen.add('q:'+w.eval('G.q&&G.q.kind'));const tiles=[...d.querySelectorAll('#fb [data-c]')];if(R()<.3&&w.eval('UI.fronts===null||true')){const lg=w.eval('(G.q.opts.find(o=>o.d&&o.d.x!=null&&(o.h==="dGateAt"||o.h==="dReloc"))||{}).d||null');if(lg){const t=d.querySelector(`#fb [data-c="${lg.x}"][data-r="${lg.y}"]`);if(t){click(t);clicks++;seen.add('q-by-square');return}}}click(rnd(qs));clicks++;return}
-    const sm=q('#main [data-a=startmark]');if(sm.length){click(rnd(sm));clicks++;seen.add('startmark');return}
+    const take=q('#dockbody [data-a=take]');if(take.length){click(take[0]);clicks++;seen.add('pass-screen');return}
+    const qs=q('#dockbody [data-a=q]');if(qs.length){seen.add('q:'+w.eval('G.q&&G.q.kind'));const tiles=[...d.querySelectorAll('#fb [data-c]')];if(R()<.3&&w.eval('UI.fronts===null||true')){const lg=w.eval('(G.q.opts.find(o=>o.d&&o.d.x!=null&&(o.h==="dGateAt"||o.h==="dReloc"))||{}).d||null');if(lg){const t=d.querySelector(`#fb [data-c="${lg.x}"][data-r="${lg.y}"]`);if(t){click(t);clicks++;seen.add('q-by-square');return}}}click(rnd(qs));clicks++;return}
+    const sm=q('#dockbody [data-a=startmark]');if(sm.length){click(rnd(sm));clicks++;seen.add('startmark');return}
     const main=d.getElementById('main');
-    if(q('#main [data-a=place],#main [data-a=cannon],#main [data-a=gate],#main [data-a=pass],#main [data-a=card]').length||main.querySelector('[data-a=place]')){
-      const sg=q('#main [data-a=sugg]');if(sg.length&&R()<(cf.careful||.6)){click(sg[0]);seen.add('sugg');return}
-      const hint=q('#main [data-a=hint]');if(hint.length&&R()<.1){click(hint[0]);seen.add('hint');return}
-      const tg=q('#main [data-a=target]');if(tg.length&&R()<.3){click(rnd(tg));seen.add('target');return}
-      const cs=q('#main [data-a=cannon]');if(cs.length&&R()<.6){click(rnd(cs));seen.add('cannon');clicks++;return}
-      const gt=q('#main [data-a=gate]');if(gt.length&&R()<.4){click(rnd(gt));seen.add('gate');clicks++;return}
-      const ps=q('#main [data-a=pass]');if(ps.length){click(ps[0]);seen.add('pass');clicks++;return}
-      if(R()<.25){const cd=q('#main [data-a=card]');if(cd.length){click(rnd(cd));seen.add('card');return}}
-      if(R()<.25){const rb=q('#main [data-a=rot]');if(rb.length){click(rnd(rb));seen.add('rot');return}}
+    if(q('#dockbody [data-a=place],#dockbody [data-a=cannon],#dockbody [data-a=gate],#dockbody [data-a=pass],#dockbody [data-a=card]').length||main.querySelector('[data-a=place]')){
+      const sg=q('#dockbody [data-a=sugg]');if(sg.length&&R()<(cf.careful||.6)){click(sg[0]);seen.add('sugg');return}
+      const hint=q('#dockbody [data-a=hint]');if(hint.length&&R()<.1){click(hint[0]);seen.add('hint');return}
+      const tg=q('#dockbody [data-a=target]');if(tg.length&&R()<.3){click(rnd(tg));seen.add('target');return}
+      const cs=q('#dockbody [data-a=cannon]');if(cs.length&&R()<.6){click(rnd(cs));seen.add('cannon');clicks++;return}
+      const gt=q('#dockbody [data-a=gate]');if(gt.length&&R()<.4){click(rnd(gt));seen.add('gate');clicks++;return}
+      const ps=q('#dockbody [data-a=pass]');if(ps.length){click(ps[0]);seen.add('pass');clicks++;return}
+      if(R()<.25){const cd=q('#dockbody [data-a=card]');if(cd.length){click(rnd(cd));seen.add('card');return}}
+      if(R()<.25){const rb=q('#dockbody [data-a=rot]');if(rb.length){click(rnd(rb));seen.add('rot');return}}
       if(R()<.15){const k=rnd(['1','2','3','r','q']);d.dispatchEvent(new w.KeyboardEvent('keydown',{key:k,bubbles:true}));seen.add('key');return}
-      const pb=q('#main [data-a=place]');if(pb.length){if(R()<.15){const f=w.eval('UI.fronts&&UI.fronts[0]');if(f!=null){const sq=w.eval(`(()=>{const S=G.ships[${f}];return [S.x,S.y]})()`);const t=d.querySelector(`#fb [data-c="${sq[0]}"][data-r="${sq[1]}"]`);if(t){click(t);seen.add('square-place');clicks++;return}}}
+      const pb=q('#dockbody [data-a=place]');if(pb.length){if(R()<.15){const f=w.eval('UI.fronts&&UI.fronts[0]');if(f!=null){const sq=w.eval(`(()=>{const S=G.ships[${f}];return [S.x,S.y]})()`);const t=d.querySelector(`#fb [data-c="${sq[0]}"][data-r="${sq[1]}"]`);if(t){click(t);seen.add('square-place');clicks++;return}}}
         click(pb[0]);clicks++;seen.add('place');return}
-      const rb=q('#main [data-a=rot]');if(rb.length){click(rnd(rb));return}
-      const cd=q('#main [data-a=card]');if(cd.length){click(rnd(cd));return}}
+      const rb=q('#dockbody [data-a=rot]');if(rb.length){click(rnd(rb));return}
+      const cd=q('#dockbody [data-a=card]');if(cd.length){click(rnd(cd));return}}
     const sig=JSON.stringify([G.logN,G.turn,G.step,!!G.q,w.eval('JSON.stringify(UI.sel)'),w.eval('UI.busy'),w.eval('UI.holder')]);if(sig===last)stall++;else{stall=0;last=sig}
     const inv=w.eval('checkInvariants()');if(inv.length&&errs.length<5)errs.push('INV '+inv[0]);
     if(stall>3000||Date.now()-t0>200000){errs.push('STALL step '+G.step+' phase '+G.phase+' q='+(G.q&&G.q.kind)+' side='+w.eval('sideToAct()')+' busy='+w.eval('UI.busy')+' main='+main.textContent.slice(0,160));clearInterval(iv);res({cf,over:G.over,errs,seen,clicks});w.close()}
