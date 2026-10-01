@@ -394,7 +394,7 @@ find(66)['bunker']={
 
 # M19 audio script filled in below
 import os
-p='/tmp/claude-0/-home-user-spotify-to-ytmusic/5a36d2af-8697-5203-aeea-a0f2a3329615/scratchpad/bb/gen/m19.json'
+p='m19.json'
 if os.path.exists(p): find(19)['audio_script']=json.load(open(p))
 
 assert len(M)==66 and [x['number'] for x in M]==list(range(1,67))
