@@ -293,3 +293,24 @@ The research `gaps` assumptions are kept as written (dial model start = players 
 * Real-time play (jobs 10, 19, 30, 42, 54, 66) is driven by `tick()`. Racing claims between several humans (jobs 10, 45) needs the stage 2/3 UI and online layer.
 * `G.log` lines are public-only. A human seat's private information (own hand, own cards, own restriction in job 34) must be read from `knowledge(seat)`, and the UI should render through it to keep hot-seat play honest.
 
+
+## AI pass 2 (hard level, jobs that were never won)
+
+Changes in `src/ai.js` only: miss/step cost x1.6, probes spent more freely (spend .15, used whenever best single cut < 99.5%), target-information bonus .04 -> .12, and a new public inference in `buildModel`: a missed call proves the caller holds that value among their hidden wires (skipped when the caller already cut that value, or when Handsets / Relay / juggling can move wires). `tools/load.js` honours env `AIFILE` to test an alternative ai.js; `run.sh`, `sum.js`, `tools/an.js`, `tools/pass.js`, `tools/eqs.js` are the measuring helpers (`out2/`).
+
+Hard AI, 10 seeds x every allowed player count (40 games per job, 30 for job 65), same seeds before/after:
+
+| Job | before | after | Job | before | after |
+|---|---|---|---|---|---|
+| 29 | 5/40 | 8/40 | 61 | 7/40 | 14/40 |
+| 43 | 11/40 | 12/40 | 64 | 0/40 | 1/40 |
+| 45 | 29/40 | 26/40 | 65 | 2/30 | 2/30 |
+| 47 | 1/40 | 1/40 | 66 | 0/40 | 1/40 |
+| 51 | 13/40 | 19/40 | | | |
+
+Easy-job check (jobs 20, 24, 31, 38, 44, 52, 56, 60): 137/320 before, 146/320 after. hidden-test PASS. Hard AI about 80 ms per main decision.
+
+Notes: jobs 47, 64, 65 are bounded by the fuse (np steps) against 2-3 forced gambles plus skips per game; further gains need new information, not scoring tweaks. Job 66's losses are headless-clock losses (12 s per turn, `turnSec`); the realtime UI clock will be kinder.
+
+### Engine bugs found by AI pass
+None found.
