@@ -700,7 +700,11 @@ const NetRoom=(()=>{
   // invite codes: 5 letters/digits without look-alikes
   function newCode(){return rand(5)}
   function cleanCode(c){return String(c||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,10)}
-  function lobby(game){return {join:async roomName=>makeRoom(game,String(roomName))}}
+  // one room per page: joining again (a retry, or another code) first closes the old room, so the host
+  // can't stay connected to an abandoned copy while the game listens on the new one
+  let active=null;
+  function lobby(game){return {join:async roomName=>{if(active){const old=active;active=null;try{await old.leave()}catch(e){}await new Promise(r=>setTimeout(r,250))}
+    const r=makeRoom(game,String(roomName));active=r;return r}}}
   function makeRoom(game,roomName){
     const cfg={appId:APP,password:game+'/'+roomName,relayConfig:{redundancy:6,warnOnRelayFailure:false}};
     if(window.NETROOM_RELAYS)cfg.relayConfig.urls=window.NETROOM_RELAYS;
@@ -716,15 +720,15 @@ const NetRoom=(()=>{
     const fire=(joined,gone)=>{const ch={peers:list(),joined,left:gone};peerFns.forEach(f=>{try{f(ch)}catch(e){console.error(e)}})};
     const sendPres=target=>{try{pA.send({pr:pres,by},target?{target}:undefined)}catch(e){}};
     const gone=new Set();
-    tr.onPeerJoin=p=>{gone.delete(p);sendPres(p)};
-    tr.onPeerLeave=p=>{gone.add(p);const v=remote.get(p);if(!v)return;remote.delete(p);fire([],[entry(p,v)])};
-    pA.onMessage=(d,info)=>{const p=info&&info.peerId;if(!p||gone.has(p)||!d||typeof d!=='object')return;
+    tr.onPeerJoin=p=>{if(left)return;gone.delete(p);sendPres(p)};
+    tr.onPeerLeave=p=>{if(left)return;gone.add(p);const v=remote.get(p);if(!v)return;remote.delete(p);fire([],[entry(p,v)])};
+    pA.onMessage=(d,info)=>{const p=info&&info.peerId;if(left||!p||gone.has(p)||!d||typeof d!=='object')return;
       const pr=d.pr&&typeof d.pr==='object'&&!Array.isArray(d.pr)?Object.assign({},d.pr):{};if('name' in pr)pr.name=String(pr.name||'').replace(/[<>&"]/g,'').slice(0,24);
       const v={presence:pr,by:typeof d.by==='string'?d.by.slice(0,40):null};
       const old=remote.get(p);remote.set(p,v);if(!old){sendPres(p);fire([entry(p,v)],[]);return}
       // presence is re-sent every few seconds in case one was lost; only a real change is reported
       if(JSON.stringify(old)!==JSON.stringify(v))fire([],[])};
-    gA.onMessage=(d,info)=>{const p=info&&info.peerId;if(!p||!d||typeof d.t!=='string')return;
+    gA.onMessage=(d,info)=>{const p=info&&info.peerId;if(left||!p||!d||typeof d.t!=='string')return;
       // a message can arrive just before that peer's presence does
       const v=remote.get(p)||{presence:{},by:null};(handlers[d.t]||[]).forEach(f=>{try{f({peer:p,data:d.d,isMe:false,by:v.by})}catch(e){console.error(e)}})};
     setTimeout(()=>connFns.forEach(f=>f(true)),0);
