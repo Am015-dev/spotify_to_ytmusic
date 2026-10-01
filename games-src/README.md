@@ -98,7 +98,7 @@ Tests:
 ## The shelf and the reference page
 
 - **Shelf:** `suite/src.html` is the source of the Game Night Shelf.
-  - `../games/index.html` is the same page without the two Mainhattan entries; those games live elsewhere. The entry snippets are in `mh_entry.txt` and `od_entry.txt`.
+  - `../games/index.html` is the same page. The two Mainhattan games (`mainhattan-nightrun/`, `mainhattan-overdrive/`) are built in another project and copied into `../games/` as finished pages; their shelf entries are also kept in `mh_entry.txt` and `od_entry.txt`.
 - **Card and token reference:** `refpage/gen.py` merges the `ref_*.json` files into `refpage/reference.html`. Copy that to `../games/reference.html`.
 
 ## Not included

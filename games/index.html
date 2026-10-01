@@ -89,7 +89,7 @@ footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
 
   <section class="shelf" id="shelf" aria-label="Games"></section>
 
-  <footer>Each game keeps its own save, sound and difficulty settings. Every game can be played online with friends for free: open it, press Host, and send them the invite code or link. Your browsers connect directly, with no account or server.</footer>
+  <footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link. Your browsers connect directly, with no account or server.</footer>
 </div>
 
 <div id="table" hidden>
@@ -137,7 +137,17 @@ const GAMES=[
    blurb:'Draw a tile, lay it where it fits and grow a sunlit Provence valley of walled towns, roads, rivers and priories. Place followers to claim them, and farmers to profit from the fields.',
    stats:[['2–6','players'],['45','minutes'],['7+','ages'],['138','tiles']],
    chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','The Riverlands','Taverns & Basilicas','Merchants & Masons'],
-   based:'Plays like Carcassonne (2000)',paint:paintRampart}
+   based:'Plays like Carcassonne (2000)',paint:paintRampart},
+  {id:'mainhattan',name:'Mainhattan Nightrun',src:'mainhattan-nightrun/index.html',ribbon:'Arcade shooter',ref:false,
+   blurb:'Fly a stolen-data courier over a neon Frankfurt in 2099. Graze drone fire to cool your guns, phase-dash through bullets and break four district bosses from the Bankenviertel to the Messe.',
+   stats:[['1','player'],['10','minutes'],['10+','ages'],['4','districts']],
+   chips:['Solo arcade','Keyboard & touch','4 bosses','Heat & graze','Phase-dash','Synth soundtrack','Endless loops'],
+   based:'Side-scrolling shooter · Main Tower, Eiserner Steg, EZB, Messeturm',paint:paintMainhattan},
+  {id:'overdrive',name:'Mainhattan Overdrive',src:'mainhattan-overdrive/index.html',ribbon:'Hover racing',ref:false,
+   blurb:'Anti-gravity racing across four Frankfurt circuits, from the Bankenviertel canyon to the Fraport runway where jets land over your head. Race in neon night, dawn, storm or fog, and play a career, Zone survival, three-lives Arena, ghost duels and a new daily challenge.',
+   stats:[['1','player'],['2–4','minutes'],['10+','ages'],['4','circuits']],
+   chips:['4 circuits + mirror','4 weathers','Crash cam & wrecks','Baustelle smash','6-event career','Zone survival','Arena · 3 lives','Demolition derby','Crash Junction','Aftertouch','Ghost duel','Daily challenge','Traffic & near misses','Takedowns','Gamepad & touch','Settings'],
+   based:'Anti-gravity racer in the style of Aether',paint:paintOverdrive}
 ];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
