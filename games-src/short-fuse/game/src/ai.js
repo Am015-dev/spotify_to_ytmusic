@@ -298,9 +298,12 @@ function pFlipOwn(K,Z,m){for(const st of K.stands)if(st.mine)for(let k=0;k<st.sl
 function probeCands(K,Z,cand,T,held,mc,rcst,rnd,L){
   // hard: a one-shot probe is worth more later, when single cuts are worse: early in the job it has to buy more safety to be spent
   let spend=0;if(L.think>=2&&L.spend!==0){let n=0,u=0;for(const st of K.stands)for(const x of st.slots){n++;if(!x.cut)u++}spend=.15*u/Math.max(1,n)}const byStand={};for(const m of K.legal.plain){if(m.v==='Y')continue;const x=K.stands[m.st].slots[m.ks[0]];if(x.x||x.flip)continue;(byStand[m.st+':'+m.v]=byStand[m.st+':'+m.v]||[]).push(m)}
-  const base=m=>{const o=Object.assign({},m);delete o.ks;return o};
+  const base=m=>{const o=Object.assign({},m);delete o.ks;return o};const redProbe=K.rules.includes('redTriple');
   for(const key in byStand){const ms=byStand[key];const st=ms[0].st,v=ms[0].v;const code=CODE(v);const ranked=ms.map(m=>({m,p:pAt(Z,st,m.ks[0],code)})).sort((a,b)=>b.p-a.p);const top=ranked.slice(0,5);
     const evOf=(ks,tool,cost)=>{const cells=ks.map(k=>[st,k]);const ph=pJoint(Z,cells,vs=>vs.some(c=>c===code));const pr=pJoint(Z,cells,vs=>vs.every(c=>c===14));
+      // job 13 (redTriple): a probe whose selection holds ANY red explodes, hit or not
+      if(redProbe){const pa=pJoint(Z,cells,vs=>vs.some(c=>c===14));const phn=pJoint(Z,cells,vs=>vs.some(c=>c===code)&&!vs.some(c=>c===14));
+        return {m:Object.assign(base(ms[0]),{ks,tool}),ev:phn*(1+bonusFor(K,v))-Math.max(0,1-phn-pa)*(mc-.25)-pa*rcst-cost+noisy(L,rnd),p:phn,why:`${Math.round(phn*100)}% that one is ${v} and none is red`}}
       return {m:Object.assign(base(ms[0]),{ks,tool}),ev:ph*(1+bonusFor(K,v))-(1-ph-pr)*(mc-.25)-pr*rcst-cost+noisy(L,rnd),p:ph,why:`${Math.round(ph*100)}% that one of these is ${v}`}};
     const ddCost=K.rules.includes('unlimitedDD')?0:.35+spend;
     if(T.dd)for(let a=0;a<top.length;a++)for(let b=a+1;b<top.length;b++)cand.push(evOf([top[a].m.ks[0],top[b].m.ks[0]].sort((x,y)=>x-y),'dd',ddCost));
@@ -313,7 +316,8 @@ function specialCand(K,Z,m,rnd){const n=m.tg.length;const want={red3:14,four:K.m
   const cells=[];for(const st of K.stands)st.slots.forEach((x,k)=>{if(!x.cut)cells.push([st.i,k,pAt(Z,st.i,k,want)])});cells.sort((a,b)=>b[2]-a[2]);const top=cells.slice(0,Math.min(cells.length,n+2));
   let best=null,bp=-1;const combo=(start,acc)=>{if(acc.length===n){const p=pJoint(Z,acc.map(c=>[c[0],c[1]]),vs=>vs.every(c=>c===want));if(p>bp){bp=p;best=acc.slice()}return}for(let i=start;i<top.length;i++){acc.push(top[i]);combo(i+1,acc);acc.pop()}};combo(0,[]);
   if(!best)return null;const failBoom=['red3','four','sevens','rush'].includes(m.kind);const forced=K.tfx.force||m.kind==='rush';
-  const ev=bp*(n*.9+1)-(1-bp)*(failBoom?BOOM:missCost(K))+(forced?BOOM/2:0);
+  let pany=0;if(!failBoom)pany=pJoint(Z,best.map(c=>[c[0],c[1]]),vs=>vs.some(c=>c===14));// y3 / lever: a red among the three still explodes
+  const ev=bp*(n*.9+1)-(1-bp-pany)*(failBoom?BOOM:missCost(K))-pany*redCost(K)+(forced?BOOM/2:0);
   return {m:{a:'multi',kind:m.kind,tg:best.map(c=>({s:c[0],k:c[1]}))},ev,p:bp,why:`${Math.round(bp*100)}% that all ${n} are right`}}
 function otherCand(K,Z,m,mc,rnd,L){switch(m.a){
   case 'trip':{const p=pAt(Z,m.s,m.k,13),pr=pAt(Z,m.s,m.k,14);return {m,ev:p*2-(1-p-pr)*mc-pr*BOOM+noisy(L,rnd),p,why:`${Math.round(p*100)}% snare wire`}}

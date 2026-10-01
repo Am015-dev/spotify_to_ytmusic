@@ -314,3 +314,17 @@ Notes: jobs 47, 64, 65 are bounded by the fuse (np steps) against 2-3 forced gam
 
 ### Engine bugs found by AI pass
 None found.
+
+## AI pass 3 (red-aware probes after the rules fixes)
+
+`src/ai.js` only. In job 13 (`redTriple`) a Twin/Triple Probe or Full Scan whose selection holds any red explodes, so `probeCands` now scores such a probe as P(a hit and no red in the selection) and charges the boom for P(any red in the selection) (from the sampled deals, i.e. public knowledge only). Job 48/66 three-wire calls (`y3`, `lever`) also charge the boom for a red among the three (a plain miss costs one step). Checked against the other fixed rules: the Sweep model already uses only the non-flipped wires (same list as the engine's `us`), job 39 token offers are already preferred for held values, and the 48 failed call tags every wire so no model change was needed.
+
+Normal AI, 20 seeds x every allowed player count (80 games), same seeds, old vs new ai.js:
+
+| Job | old AI | new AI |
+|---|---|---|
+| 13 | 45/80 (56%) | 60/80 (75%) |
+| 48 | 56/80 (70%) | 59/80 (74%) |
+| 38, 39, 5, 20, 31 (10 seeds, 40 games) | 25, 22, 33, 28, 15 | identical |
+
+hidden-test PASS; about 0.5 s per whole game, well under 200 ms per move; 0 errors, stalls, invariant failures.
