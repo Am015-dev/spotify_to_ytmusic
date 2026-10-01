@@ -1432,7 +1432,7 @@ function physPlayer(s,c){const st=s.stats;frameAt(TD,s.dist,F);const k=F.k;
   const sl=Math.sin(s.yaw-s.beta);s.v-=s.v*sl*sl*(s.hbDir?.5:3)*H;
   const px=s.x;const ds=s.v*Math.cos(s.beta)*H/Math.max(.35,1-k*s.x);s.x+=s.v*Math.sin(s.beta)*H;s.dist+=ds;s.yaw-=k*ds;s.beta-=k*ds;
   s.yaw=clamp(s.yaw,-1.5,1.5);s.beta=clamp(s.beta,-1.5,1.5);if(s.hbDir){s.yaw=clamp(s.yaw,-.85,.85);if(Math.abs(s.yaw)>=.85&&Math.sign(s.yawRate)===Math.sign(s.yaw))s.yawRate*=.5}
-  s.rollCd=Math.max(0,s.rollCd-H);if(pressed.roll&&s.rollCd<=0&&s.rollT<=0){s.rollDir=mirror?-pressed.roll:pressed.roll;s.rollT=ROLL_T;s.rollCd=.9;AU.sfx('roll');if(s.air){award(s,'BARREL ROLL',20,500,'#ffd12c');AU.sfx('style')}}pressed.roll=0;
+  s.rollCd=Math.max(0,s.rollCd-H);if(pressed.roll&&s.rollCd<=0&&s.rollT<=0){s.rollDir=mirror?-pressed.roll:pressed.roll;s.rollT=ROLL_T;s.rollCd=2;s.rollHit=false;AU.sfx('roll');if(s.air){award(s,'BARREL ROLL',20,500,'#ffd12c');AU.sfx('style')}}pressed.roll=0;
   if(s.rollT>0){s.rollT-=H;if(s.rollT>ROLL_T-.32&&!s.air)s.x+=s.rollDir*18*H}
   const drifting=!s.air&&ab>0&&Math.abs(c.steer)>.3&&Math.sign(c.steer)===Math.sign(c.abR-c.abL)&&s.v>st.top0*.5;
   if(drifting){s.driftT+=H;s.bm=Math.min(100,s.bm+14*H);if(R()<.6){const at=V3().copy(F.p).addScaledVector(F.r,s.x-Math.sign(c.steer)*2).addScaledVector(F.u,.4).addScaledVector(F.t,-3);emit(SPARK,at,V3(rr(-3,3),rr(1,5),rr(-3,3)).addScaledVector(F.t,-s.v*.3),.3,new THREE.Color(2,1.2,.5))}}
@@ -1479,7 +1479,7 @@ function physAI(s){const st=s.stats,sk=s.skill*s.rubber;frameAt(TD,s.dist,F);con
   const px=s.x,lat=s.attackT>0?14:9;s.x+=clamp(xt-s.x,-lat*H*cls.mul,lat*H*cls.mul);
   const ds=s.v*H/Math.max(.35,1-k*s.x);s.dist+=ds;s.latV=(s.x-px)/H;s.yaw=Math.atan2(s.latV,Math.max(1,s.v));s.beta=s.yaw;
   waterStep(s);airStep(s)}
-function damage(s,d){if(s.shield>0||s.inv>0||s.dead>0||(s.rollT>0&&d>3)||(s.finished&&s.isPlayer))return false;if(s.isPlayer)d*=RC.dmgK||1;s.hull-=d;s.lastHit=raceT;if(s.hull<=0)explode(s);return true}
+function damage(s,d){if(s.shield>0||s.inv>0||s.dead>0||(s.rollT>ROLL_T-.3&&d>3)||(s.finished&&s.isPlayer))return false;if(s.isPlayer)d*=RC.dmgK||1;s.hull-=d;s.lastHit=raceT;if(s.hull<=0)explode(s);return true}
 function explode(s,msg,imp){wreckStart(s,imp);s.dead=2.2;s.hull=0;s.v=0;s.item=null;if(s.isPlayer&&PK.has('empwreck')&&state==='race'){itemSpinUntil=0;s.item='emp';useItem(s)}s.air=null;if(RC.type==='arena')s.lives--;
   if(RC.type==='zone'&&s.isPlayer&&state==='race'){state='finished';finishT=2;pl.finishTime=raceT;pl.finished=true;s.dead=99;s.zoneKm=pl.dist/1000;AU.sfx('boom');shake=1;flashHud();say('WRECKED','ZONE '+RC.zone.k+' · '+(pl.dist/1000).toFixed(2)+' KM',2.4);return}const p=s.mesh.position;
   if(s.isPlayer&&s.lastBy&&raceT-s.lastByT<2.5&&state==='race'){rivalHit(s.lastBy,'gloat');s.lastBy=null}
@@ -1525,7 +1525,7 @@ function afterTouch(s,w,dt){s.after-=dt;const c=ctlPlayer();const J=RC.jn;if(J&&
 function crashBreaker(s,w){const J=RC.jn;J.boom=1;w.v.y+=16;burst(FIRE,w.p,60,34,.9,new THREE.Color(2.2,1,.3));burst(SPARK,w.p,50,40,.7,new THREE.Color(2,1.5,.8));puff(w.p,8,new THREE.Color(.1,.1,.12),5,24,2.4,.6,2,4);shake=1.2;flash=.4;AU.sfx('boom');say('CRASHBREAKER','',1.2);
   for(const o of traffic){if(o.wreck||Math.abs(tdd(o.dist,s.dist))>90)continue;frameAt(TD,o.dist,F2);if(hit2(F2.p.addScaledVector(F2.r,o.x),w.p,22))wreckTraffic(o,{v:40,x:o.x-Math.sign(o.x||1),chain:1},1.3)}}
 function takedown(o){if(state==='race')rivalHit(o,'hurt');const side=Math.sign(o.x-pl.x)||1;frameAt(TD,o.dist,F2);explode(o,null,F2.r.clone().multiplyScalar(side*14).addScaledVector(F2.t,pl.v*.25));crashCam(o,1.9);pl.takedowns++;award(pl,'TAKEDOWN',40,1500,'#ff2d95');AU.sfx('takedown');slowmo=.9;shake=.8;flash=.25;fovKick=12;say('TAKEDOWN',o.name+' · '+o.team.name.toUpperCase(),1.1)}
-function hitShip(s,dmg,slow,spin,by){if(s.isPlayer&&by&&!by.isPlayer){s.lastBy=by;s.lastByT=raceT}if(s.dead<=0&&s.shield<=0&&s.rollT<=0){const at=s.mesh.position.clone().add(s.mesh.userData.m.position);debris(at,(s._fw||V3()).clone().multiplyScalar(s.v*.5),5,teamCols(s.team),.8,at.y-2)}if(s.shield>0||s.rollT>0){if(s.isPlayer)feed(s.rollT>0?'DODGED':'SHIELD HOLDS',0,'#31f5c4');return}if(!damage(s,dmg*(RC.type==='arena'?2.3:1)/s.stats.hull))return;
+function hitShip(s,dmg,slow,spin,by){if(s.isPlayer&&by&&!by.isPlayer){s.lastBy=by;s.lastByT=raceT}if(s.dead<=0&&s.shield<=0&&s.rollT<=0){const at=s.mesh.position.clone().add(s.mesh.userData.m.position);debris(at,(s._fw||V3()).clone().multiplyScalar(s.v*.5),5,teamCols(s.team),.8,at.y-2)}if(s.shield>0||s.rollT>ROLL_T-.3){if(s.isPlayer)feed(s.shield>0?'SHIELD HOLDS':'DODGED',0,'#31f5c4');return}if(!damage(s,dmg*(RC.type==='arena'?2.3:1)/s.stats.hull))return;
   if(s.dead>0&&by&&by.isPlayer&&s!==by&&state==='race'){crashCam(s,1.5);by.takedowns++;if(by.isPlayer&&PK.has('heal'))by.hull=Math.min(100,by.hull+30);award(by,'KO · '+s.name,30,1200,'#ff2d95');AU.sfx('takedown');slowmo=.5}s.v*=1-slow;s.yawRate+=spin;
   if(s.isPlayer){AU.sfx('hit');shake=.7;flashHud();fovKick=Math.max(fovKick,8)}else if(by&&by.isPlayer)award(by,'HIT · '+s.name,6,250,'#ff5a2d')}
 function useItem(s){const it=s.item;if(!it)return;if(s.isPlayer&&performance.now()<itemSpinUntil)return;s.item=null;
@@ -1573,7 +1573,8 @@ function stepSim(){const racing=state==='race'||state==='menu'||state==='finishe
       if(RC.derby&&state==='race'&&(a.bumpT2||0)<raceT&&(b.bumpT2||0)<raceT){a.bumpT2=b.bumpT2=raceT+.35;const hard=Math.abs(b.v-a.v)*.35+3;if(!a.isPlayer&&!b.isPlayer){damage(front,hard)}else{const V=a.isPlayer?a:b,O=a.isPlayer?b:a;if(O.aggr!==0&&R()<.6)damage(V,hard*.8)}}
       if(a.isPlayer||b.isPlayer){const P=a.isPlayer?a:b,O=a.isPlayer?b:a;const toward=Math.sign(O.x-P.x)||1;const latV=P.v*Math.sin(P.beta)+(P.rollT>ROLL_T-.32?P.rollDir*18:0);
         const pinned=Math.abs(O.x)>=MARGIN-1.2;const rearRam=(O.dist-P.dist)>0&&P.nitro&&(P.v-O.v)>14;
-        if(state==='race'&&!P.finished&&((latV*toward>4.5&&pinned)||rearRam||(P.rollT>0&&P.rollDir===toward)))takedown(O);
+        if(state==='race'&&!P.finished&&((latV*toward>4.5&&pinned)||rearRam))takedown(O);
+        else if(state==='race'&&!P.finished&&P.rollT>0&&P.rollDir===toward&&!P.rollHit){P.rollHit=true;O.x+=toward*3;hitShip(O,28,.25,toward*2.5,P);AU.sfx('crash');shake=Math.max(shake,.4)}
         else if(RC.derby&&state==='race'&&!P.finished){if((P.bumpT||0)<raceT){P.bumpT=raceT+.3;const imp=Math.abs(latV)*.9+Math.max(0,P.v-O.v)*.5+4;AU.sfx('crash');shake=Math.max(shake,.45);damage(O,imp);if(O.dead>0){P.takedowns++;award(P,'DERBY KO',30,1500,'#ff2d95');crashCam(O,1.6)}else award(P,'HIT',4,Math.round(imp*20),'#ffd12c')}}
         else{if((P.bumpT||0)<raceT){AU.sfx('bump');P.bumpT=raceT+.25;shake=Math.max(shake,.25)}
           if(O.attackT>0&&P.rollT<=0){P.x-=toward*1.2;if(Math.abs(P.x)>=MARGIN-.3){damage(P,14/P.stats.hull);feed('SIDESWIPED',0,'#ff3b55');flashHud();O.attackT=0}}}}
