@@ -45,7 +45,14 @@ No edits to `src/engine.js`, `src/data.js` or `src/ai.js`.
 
 ### Layout (`lay.js`, PROBLEMS per size)
 
-LAYRESULTS
+| Size | PROBLEMS | Board share of screen |
+|---|---|---|
+| 1366x768 | 0 | 65% (970x704) |
+| 768x1024 | 0 | 46% (768x475) |
+| 390x844 | 0 | 42% (390x354) |
+| 1920x1080 | 0 | board 1500x1015 |
+
+Fixed after looking at the screenshots: at 768x1024 the top-bar buttons touched each other ("Rules"/"Cards" labels crowded their icons); added a 640-899px bar rule in `head.html` (smaller gap, padding, icons). `click.js 0 23`: 24 games, 0 errors. Left as is: on the 3-5 player layouts the two stands of one side seat sit close and lifted wires of the 2nd stand slightly touch the 1st at 1920 (kit geometry, not fixable in ui.js); on phones the table is small (42% board) and the top bar scrolls sideways (Menu is partly off-screen by design).
 
 Each size: start screen, mission board selection, the opening-token question, a human turn, a dual cut built through the dock, its result, all 8 popups opened and closed (x and Esc), dock collapsed and restored, three more turns through the buttons, a hot-seat pass screen and the taken view, a timed job paused/resumed (the clock must stop and restart), the game-over card. Checks: no page scroll (`scrollHeight/scrollWidth`), the board uncovered on a 5x5 `elementFromPoint` grid, dock visible at every decision, no console errors.
 
