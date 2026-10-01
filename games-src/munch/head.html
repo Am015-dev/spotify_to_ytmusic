@@ -392,5 +392,22 @@ html.baked[data-gfx="high"] .felt::before{display:block;background:radial-gradie
   .zgrid{grid-template-columns:1fr}.zoom .card{--w:170px}
   .modal{align-items:end;padding:0}.dlg{max-height:min(90dvh,calc(100dvh - 8px));border-radius:14px 14px 0 0}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ---- online play ---- */
+.online{border:1px dashed #8a5a22;border-radius:12px;padding:8px 10px;margin:.3rem 0;background:rgba(255,248,228,.5)}
+.online .orow{display:flex;flex-wrap:wrap;gap:6px;margin:.3rem 0;align-items:center}
+.online input,.lobby input{font:inherit;min-height:40px;padding:4px 10px;border:1px solid #8a5a22;border-radius:10px;background:#fffaf0;color:var(--ink);min-width:0;flex:1 1 150px;max-width:260px}
+.lobby .lcode{font-size:1.05rem;margin:.2rem 0}
+.code{font:800 1.35rem var(--title);letter-spacing:.14em;background:#fff3cf;border:1px solid #c08a2a;border-radius:8px;padding:0 8px;color:var(--ink)}
+.lobby .lrow{display:flex;gap:6px;align-items:center;margin:.3rem 0}
+.lobby .lrow input{max-width:none;flex:1 1 auto;font-size:.85rem}
+.plist{list-style:none;padding:0;margin:.3rem 0 .5rem;display:grid;gap:4px}
+.plist li{display:flex;align-items:center;gap:6px;padding:4px 8px;border-radius:8px;background:rgba(255,255,255,.45);border:1px solid rgba(90,55,20,.25)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#2f9e44;vertical-align:middle;margin-right:2px}
+.dot.warn{background:#f08c00}.dot.bad{background:#c92a2a}
+.netst{margin:.1rem 0 .3rem;padding:3px 8px;border-radius:8px;background:rgba(255,255,255,.4);border:1px solid rgba(90,55,20,.2);overflow-wrap:anywhere}
+.nw{margin:.35rem 0;padding:6px 8px;border:2px solid #c08a2a;border-radius:10px;background:linear-gradient(#fff6dc,#f6e6bc)}
+.nwl{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.nwc{font-size:.82rem;padding:1px 8px;border-radius:99px;border:1px solid var(--c);background:#fff;color:var(--ink);box-shadow:inset 4px 0 0 var(--c)}
+.nwc.ok{opacity:.7;background:#e9f5e3}
 </style>
 </head>

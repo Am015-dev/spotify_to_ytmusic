@@ -30,10 +30,10 @@ const EMO_RE=new RegExp(Object.keys(EMO).join('|'),'g');
 function iconize(h){return String(h).replace(EMO_RE,m=>ico(EMO[m]))}
 function paintIcons(root){for(const el of (root||document).querySelectorAll('i[data-ic]'))if(!el.firstChild)el.outerHTML=ico(el.dataset.ic)}
 function saveSeen(){try{localStorage.setItem('rv_seen',JSON.stringify(UI.seen))}catch(e){}}
-const me=()=>{if(!G||G.over)return null;const s=sideToAct();return s>=0&&P(s).human?P(s):null};
+const me=()=>{if(!G||G.over)return null;const s=sideToAct();if(NET.on&&(s!==NET.mySeat||netWaiting()||NET.hostGone))return null;return s>=0&&P(s).human?P(s):null};
 const human=()=>G&&G.pl.some(p=>p.human);
-function refresh(){if(G){try{if(!G.over&&human())localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
-  if(!G){render();return}computeUI();playFx();render();try{sync3D();autoFit()}catch(e){console.error(e)}schedule()}
+function refresh(){if(G&&!NET.on){try{if(!G.over&&human())localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
+  if(!G){render();return}computeUI();playFx();netTurnCue();render();try{sync3D();autoFit()}catch(e){console.error(e)}schedule()}
 // at the start of a human placement, make sure every glowing square is on screen
 function autoFit(){if(!V3.on||!me()||G.step!=='place'||UI.fitTurn===G.turn)return;UI.fitTurn=G.turn;const R=V3.r.domElement;const off=UI.cells.some(k=>{const [x,y]=unkey(k);const v=screenOf(cellWorld(x,y));return !v.in||v.x<50||v.y<50||v.x>R.clientWidth-50||v.y>R.clientHeight-50});if(off)fitAll(false)}
 // what glows for the human now
@@ -46,8 +46,8 @@ function computeUI(){const p=me();UI.cells=[];UI.spotOpts=[];
   if(G.step==='fig'){const ms=figMoves(p.i).filter(m=>m.act==='fig');const kinds=[...new Set(ms.map(m=>m.k))];if(!kinds.includes(UI.kind))UI.kind=kinds[0]||'f';
     UI.spotOpts=ms.filter(m=>m.k===UI.kind).map(m=>({l:m.l,k:m.k,adv:UI.advice&&same(UI.advice.fig,m)}))}}
 // ---------- sound + animation cues ----------
-function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(typeof sfx==='function')sfx({place:'place',fig:'fig',score:'score',home:'home',goods:'goods',story:'story',win:'win',turn:'turn',discard:'bad'}[f.t]||'');
-    if(f.t==='score'&&V3.on){const F=G.fd[f.x.r];let pos;if(F.ty==='M')pos=cellWorld(F.x,F.y);else{let sx=0,sz=0;for(const k of F.tiles){const [x,y]=unkey(k);sx+=x;sz+=y}pos=cellWorld(sx/F.tiles.length,sz/F.tiles.length)}scorePop('+'+f.x.pts,PCOL[f.x.win[0]],pos)}}
+function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(f.t==='turn'&&NET.on&&f.x===NET.mySeat)continue;if(typeof sfx==='function')sfx({place:'place',fig:'fig',score:'score',home:'home',goods:'goods',story:'story',win:'win',turn:'turn',discard:'bad'}[f.t]||'');
+    if(f.t==='score'&&V3.on&&f.x&&G.fd[f.x.r]){const F=G.fd[f.x.r];let pos;if(F.ty==='M')pos=cellWorld(F.x,F.y);else{let sx=0,sz=0;for(const k of F.tiles){const [x,y]=unkey(k);sx+=x;sz+=y}pos=cellWorld(sx/F.tiles.length,sz/F.tiles.length)}scorePop('+'+f.x.pts,PCOL[f.x.win[0]],pos)}}
   UI.fxSeen=UI.fx.length;if(UI.fx.length>40){UI.fx.splice(0,30);UI.fxSeen=UI.fx.length}}
 // ---------- words ----------
 function pChip(p){return `<span class="pc" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}</span>`}
@@ -55,7 +55,7 @@ function lower1(s){return s.charAt(0).toLowerCase()+s.slice(1)}
 function tileWords(t){return lower1(TT[t].n).replace(/^starting tile: /,'')}
 function figIcons(p){const s=p.sup;return `<span title="followers left">♟${s.f}</span>${G.ex.ic?` <span title="champion (counts as 2)" class="${s.big?'':'off'}">♜</span>`:''}${G.ex.tb?` <span title="mason" class="${s.bld?'':'off'}">🔨</span> <span title="hog" class="${s.pig?'':'off'}">🐖</span>`:''}`}
 function goodsIcons(p){return G.ex.tb?` <span title="wine, grain, cloth">🍷${p.goods.wine} 🌾${p.goods.grain} 🧵${p.goods.cloth}</span>`:''}
-function statRow(p){const cur=sideToAct()===p.i;return `<div class="stat ${cur?'cur':''}" style="--pc:${PCOL[p.i]}"><b>${esc(p.nm)}</b>${p.human?'':`<small class="muted">${p.lv}</small>`} ${figIcons(p)}${goodsIcons(p)} <span class="tot" title="points">★ ${p.score}</span></div>`}
+function statRow(p){const cur=sideToAct()===p.i;return `<div class="stat ${cur?'cur':''}" style="--pc:${PCOL[p.i]}"><b>${esc(p.nm)}</b>${NET.on&&p.i===NET.mySeat?' <small class="you">(you)</small>':''}${p.human?'':`<small class="muted">${p.away?'away · computer':p.lv}</small>`} ${figIcons(p)}${goodsIcons(p)} <span class="tot" title="points">★ ${p.score}</span></div>`}
 function tileCard(t,r,big){const th=big&&typeof tileThumb==="function"&&tileThumb(t);if(th)return `<img class="tcard tthumb" alt="" src="${th}" style="transform:rotate(${(r||0)*90}deg)">`;return `<svg class="tcard" viewBox="-4 -4 108 108" aria-hidden="true"><rect x="-4" y="-4" width="108" height="108" rx="8" fill="#6b4f35"/><g transform="rotate(${(r||0)*90} 50 50)">${tileSVG(t)}</g></svg>`}
 function featLine(ty,F,figs,forMe){// preview: points if finished now, points at the end, who holds it
   const n=F.tiles?F.tiles.length:0;let now='',end='';
@@ -87,15 +87,17 @@ function render(){renderModal();if(!G)return;renderDock();renderPopups();renderM
 function renderBar(){const pb=$('#pausebtn');if(pb){pb.hidden=!G||human()||!!G.over;pb.innerHTML=ico(UI.pause?'play':'pause')}const sb=$('#speedbtn');if(sb)sb.innerHTML=ico('ff')+' '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal');
   const gb=$('#guidebtn');if(gb){gb.classList.toggle('on',UI.guide);gb.setAttribute('aria-pressed',UI.guide?'true':'false')}
   const ab=$('#advbtn');if(ab)ab.disabled=!me();
-  const ch=$('#chip');if(ch){const s=sideToAct();ch.innerHTML=G.over?'Game over':iconize(`🂠 <b>${tilesLeft()}</b> tiles left · ${s>=0?`<span style="color:${PCOL[s]}">●</span> ${esc(P(s).nm)}`:''}`)}}
+  const ch=$('#chip');if(ch){const s=sideToAct();const ns=NET.on&&!NET.inLobby?`<span class="netst${NET.hostGone?' bad':''}">🌐 ${esc(netStatus())}</span> · `:'';ch.innerHTML=(G.over?ns+'Game over':ns+iconize(`🂠 <b>${tilesLeft()}</b> tiles left · ${s>=0?`<span style="color:${PCOL[s]}">●</span> ${esc(P(s).nm)}${NET.on&&s===NET.mySeat?' (you)':''}`:''}`))}}
 function renderDock(){const el=$('#dockbody');if(!el)return;const s=sideToAct();const p=s>=0?P(s):null;const hp=me();let h='';
-  const dt=$('#dockt');if(dt)dt.textContent=G.over?'Game over':hp?`${hp.nm}: ${G.step==='place'?'place your tile':'place a follower?'}${G.cur.bonus?' (extra turn)':''}`:p?`${p.nm} is playing…`:'';
+  const dt=$('#dockt');if(dt)dt.textContent=G.over?'Game over':NET.on&&NET.hostGone?'The host left':hp?`${hp.nm}: ${G.step==='place'?'place your tile':'place a follower?'}${G.cur.bonus?' (extra turn)':''}`:p?`${p.nm} is playing…`:'';
   // story beats from the last turns
   const st=G.story.filter(x=>x.n>=G.turn-G.np);if(st.length)h+=`<div class="story">📜 ${esc(st[st.length-1].t)}</div>`;
   h+=`<div class="stats">${G.pl.map(statRow).join('')}</div>`;
   if(G.over){h+=scoreTable()+`<div class="acts"><button class="btn go" data-ui="new">New game</button><button class="btn" data-a="fit">⤢ See the whole valley</button></div>`;el.innerHTML=iconize(h);return}
+  if(NET.on&&NET.hostGone){h=`<div class="prompt"><h3>The host left. The game is over.</h3><p class="small">The game ran on the host’s page, so it cannot go on without it.</p><div class="acts"><button class="btn go" data-net="leave">Back to the start</button></div></div>`+h;el.innerHTML=iconize(h);return}
   const t=G.cur.t;
-  if(!hp){h+=`<div class="prompt"><div class="trow">${tileCard(t,0)}<div><h3>${esc(p.nm)} ${G.step==='place'?'is placing':'placed'} ${esc(tileWords(t))}</h3><p class="muted small">${tilesLeft()} tiles left in the bag</p></div></div></div>`;
+  if(!hp){const wait=NET.on&&p.human?(p.i===NET.mySeat?'<p class="small wait">Sending your move to the host…</p>':`<p class="small wait">Waiting for ${esc(p.nm)}…</p>`):'';
+    h+=`<div class="prompt"><div class="trow">${tileCard(t,0)}<div><h3>${esc(p.nm)} ${G.step==='place'?'is placing':'placed'} ${esc(tileWords(t))}</h3><p class="muted small">${tilesLeft()} tiles left in the bag</p></div></div>${wait}</div>`;
     if(UI.recap)h+=`<div class="recap">🗣 ${UI.recap.html}</div>`;h+=lastLog(4);el.innerHTML=iconize(h);return}
   if(UI.mine&&UI.mine.p===hp.i)h+=`<div class="recap mine">✔ ${UI.mine.html}</div>`;
   if(UI.recap&&UI.recap.n>=G.turn-G.np)h+=`<div class="recap">🗣 ${UI.recap.html}</div>`;
@@ -138,7 +140,8 @@ function playersHtml(){const fs=finalScores();return G.pl.map(p=>{const a=fs.add
   <div class="small"><b>On the map:</b> ${G.figs.filter(f=>f.p===p.i).map(f=>`${f.k==='f'?ROLE[G.fd[find(f.s)].ty]:FIGN[f.k]} (${FEAT[G.fd[find(f.s)].ty]})`).join(', ')||'nobody'}</div></section>`}).join('')}
 // ---------- start screen, story, tile list ----------
 UI.setup={np:2,seats:['human','ai','ai','ai','ai','ai'],lv:['normal','normal','normal','normal','normal','normal'],ex:{river:true,ic:false,tb:false}};
-function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='start'?startHtml():UI.modal==='story'?storyHtml():'';m.hidden=!h;if(m.dataset.h!==h){m.innerHTML=iconize(h);m.dataset.h=h}}
+function renderModal(){const m=$('#modal');if(!m)return;if(UI.modal==='lobby'&&!NET.on)UI.modal=G?null:'start';const h=UI.modal==='start'?startHtml():UI.modal==='story'?storyHtml():UI.modal==='lobby'?lobbyHtml():'';m.hidden=!h;
+  if(m.dataset.h!==h){const ae=document.activeElement,aid=ae&&m.contains(ae)&&ae.id,sel=aid&&ae.selectionStart;m.innerHTML=iconize(h);m.dataset.h=h;if(aid){const n=document.getElementById(aid);if(n){n.focus({preventScroll:true});try{n.setSelectionRange(sel,sel)}catch(e){}}}}}
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox"><h2>Rampart &amp; Vine</h2><p class="lede">Lay tiles to grow a sunny southern valley — walled towns, winding roads, quiet priories and fields of lavender. Send your followers to claim what you build. Most points wins.</p>
    ${saved?`<div class="acts"><button class="btn go" data-ui="continue">Continue the saved game</button></div>`:''}
@@ -146,7 +149,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
    <div class="seats">${Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b><button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?'🙂 a person':'🤖 computer'}</button>${o.seats[i]==='ai'?`<button class="btn sm ghost" data-lv="${i}" title="Computer strength">${o.lv[i]}</button>`:''}</div>`).join('')}</div>
    <h3>Expansions</h3><div class="exs">${[['river','The Riverlands','12 river tiles laid first, from the spring to the pond'],['ic','Taverns & Basilicas','18 tiles: taverns double a road, basilicas triple a town (0 if unfinished); a champion counting as two; a 6th player'],['tb','Merchants & Masons','24 tiles: wine, grain and cloth for whoever closes a town; the mason (extra turns) and the hog (better farms)']].map(([k,n,x])=>`<label class="chk"><input type="checkbox" data-ex="${k}" ${o.ex[k]?'checked':''}> <b>${n}</b> <small>${x}</small></label>`).join('')}
    <label class="chk"><input type="checkbox" data-guide="1" ${UI.guide?'checked':''}> <b>🎓 Guided game</b> <small>the panel coaches each step in plain words</small></label></div>
-   <div class="acts"><button class="btn go" data-ui="start">Begin ▶</button><button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div></div>`}
+   <div class="acts"><button class="btn go" data-ui="start">Begin ▶</button><button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div>${onlineBlock()}</div>`}
 function storyArt(){return `<svg viewBox="0 0 320 150" class="art" role="img" aria-label="A walled hill town above a valley at sunset"><defs><linearGradient id="sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fb9d2"/><stop offset=".6" stop-color="#f6d7a5"/><stop offset="1" stop-color="#eeb57a"/></linearGradient></defs>
   <rect width="320" height="150" fill="url(#sk)"/><circle cx="250" cy="62" r="18" fill="#fff0c4" opacity=".9"/>
   <path d="M0 96 Q60 70 120 88 T240 80 T320 86 V150 H0Z" fill="#b8b06c"/><path d="M0 112 Q80 92 170 108 T320 102 V150 H0Z" fill="#9ea55a"/>
@@ -194,7 +197,7 @@ function on3DTap(k,w){const p=me();if(!p)return;
     if(best)return go({act:'fig',k:best.k,l:best.l});toast('Tap one of the glowing rings on your new tile, or use the buttons.')}}
 function rotGhost(d){const g=UI.ghost;if(!g||!g.rots.length)return;let i=g.rots.indexOf(g.r);i=(i+d+g.rots.length)%g.rots.length;g.r=g.rots[i];sfx&&sfx('click');refreshUI()}
 function refreshUI(){computeUI();render();try{sync3D()}catch(e){console.error(e)}}
-function go(m){const s=sideToAct();const r=performMove(m,s);if(!r.success){toast('That move isn’t allowed now.');console.error(r.error)}}
+function go(m){if(NET.on){if(isClient()){if(!me())return;sfx&&sfx('click');netSend(m);return}const s0=sideToAct();if(s0>=0&&P(s0).human&&!me())return}const s=sideToAct();const r=performMove(m,s);if(!r.success){toast('That move isn’t allowed now.');console.error(r.error)}}
 function toast(t){const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,3200)}
 function advise(){const p=me();if(!p)return;if(G.step==='place'){const plan=aiPlan(p.i,'normal');UI.advice={turn:G.turn+':'+G.step,place:plan.place,fig:plan.fig,text:adviceText(plan,p.i)};const k=key(plan.place.x,plan.place.y);
     UI.ghost={k,r:plan.place.r,rots:legalPlacements(G.cur.t).filter(q=>key(q.x,q.y)===k).map(q=>q.r),t:G.cur.t,turn:G.turn};focusCell(k)}
@@ -224,19 +227,22 @@ function uiAct(a){switch(a){case 'start':beginGame();return;case 'continue':load
   case 'apply':applyAdvice();return}}
 document.addEventListener('keydown',e=>{if(!me()||UI.modal||GX.open)return;if(e.key==='r'||e.key==='R')rotGhost(1);else if(e.key==='Enter'&&UI.ghost&&G.step==='place'){e.preventDefault();uiAct('confirm')}else if(e.key==='Escape'&&UI.ghost){UI.ghost=null;refreshUI()}});
 function openStart(){UI.modal='start';render()}
-function beginGame(){const o=UI.setup;UI.fx.length=0;UI.fxSeen=0;UI.recap=null;UI.advice=null;UI.ghost=null;const seats=o.seats.slice(0,o.np);
+function beginGame(){if(NET.on)netLeave(true);const o=UI.setup;UI.fx.length=0;UI.fxSeen=0;UI.recap=null;UI.advice=null;UI.ghost=null;const seats=o.seats.slice(0,o.np);
   newGame({np:o.np,seats,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex,o.np===6?{ic:true}:{})});resetScene();UI.modal=human()&&ANIM?'story':null;refresh();fitAll(true)}
-function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;resetScene();refresh();fitAll(true)}catch(e){openStart()}}
+function loadSaved(){if(NET.on)netLeave(true);try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;resetScene();refresh();fitAll(true)}catch(e){openStart()}}
 // after each move: recap computer turns in one line and show where they played
-function onMoveDone(m,s,before){if(UI.sim)return;const p=P(before.p);if(m.act==='place'&&!p.human&&V3.on){const [x,y]=[m.x,m.y];const sp=screenOf(cellWorld(x,y));const R=V3.r.domElement;if(!sp.in||sp.x<R.clientWidth*.12||sp.x>R.clientWidth*.88||sp.y<R.clientHeight*.12||sp.y>R.clientHeight*.88){if(human())focusCell(key(x,y));else fitAll(false)}}
-  if(G.cur!==before&&p.human){const sc=before.scored.filter(x=>x.win.length);UI.mine=sc.length?{p:p.i,html:'Your last turn: '+sc.map(x=>`${FEAT[x.ty]} finished, ${x.win.map(i=>i===p.i?'you':P(i).nm).join(' & ')} +${x.pts}`).join('; ')+(sc.some(x=>x.win.includes(p.i))?'. Your followers there came home.':'.')}:null}
-  if(G.cur!==before&&!p.human){const f=before.figPlaced;const T=G.tiles[before.k];let t=`<b style="color:${PCOL[p.i]}">${esc(p.nm)}</b> placed ${esc(tileWords(before.t))}`;
-    if(f){const ty=TSEG[T.t][f.l].ty;t+=` and set a ${f.k==='f'?ROLE[ty]:FIGN[f.k]} on the ${FEAT[ty]}`}else t+=' and kept its followers';
-    const sc=before.scored.filter(x=>x.win.length);if(sc.length)t+='. '+sc.map(x=>`${x.win.map(i=>P(i).nm).join(' & ')} +${x.pts} (${FEAT[x.ty]})`).join(', ');
-    if(before.bonusEarned)t+='. Its mason earns an extra turn';UI.recap={html:t+'.',n:G.turn}}}
+function onMoveDone(m,s,before){if(UI.sim)return;const p=P(before.p);const mineP=p.human&&(!NET.on||p.i===NET.mySeat);if(m.act==='place'&&!mineP&&V3.on){const [x,y]=[m.x,m.y];const sp=screenOf(cellWorld(x,y));const R=V3.r.domElement;if(!sp.in||sp.x<R.clientWidth*.12||sp.x>R.clientWidth*.88||sp.y<R.clientHeight*.12||sp.y>R.clientHeight*.88){if(human())focusCell(key(x,y));else fitAll(false)}}
+  if(G.cur!==before){const R=moveRecaps(before);if(mineP)UI.mine=R.mine;else UI.recap=R.recap;if(NET.on)netMoveDone(before,R)}}
+// the same turn in two voices: to the player who made it, and to everyone else
+function moveRecaps(before){const p=P(before.p);const sc=before.scored.filter(x=>x.win.length);
+  const mine=sc.length?{p:p.i,html:'Your last turn: '+sc.map(x=>`${FEAT[x.ty]} finished, ${x.win.map(i=>i===p.i?'you':P(i).nm).join(' & ')} +${x.pts}`).join('; ')+(sc.some(x=>x.win.includes(p.i))?'. Your followers there came home.':'.')}:null;
+  const f=before.figPlaced;const T=G.tiles[before.k];let t=`<b style="color:${PCOL[p.i]}">${esc(p.nm)}</b> placed ${esc(tileWords(before.t))}`;
+  if(f){const ty=TSEG[T.t][f.l].ty;t+=` and set a ${f.k==='f'?ROLE[ty]:FIGN[f.k]} on the ${FEAT[ty]}`}else t+=' and kept its followers';
+  if(sc.length)t+='. '+sc.map(x=>`${x.win.map(i=>P(i).nm).join(' & ')} +${x.pts} (${FEAT[x.ty]})`).join(', ');
+  if(before.bonusEarned)t+='. Its mason earns an extra turn';return {mine,recap:{html:t+'.',n:G.turn}}}
 // ---------- the computer ----------
-let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||UI.modal)return;const s=sideToAct();if(s<0||P(s).human)return;
-  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||UI.modal)return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.step);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*(G.step==='fig'?.7:1)))}
+let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!(isHost()&&UI.modal!=='story'))||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;
+  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!isHost())||isClient())return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.step);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*(G.step==='fig'?.7:1)))}
 // ---------- settings popup: graphics quality ----------
 function renderSettings(){const el=$('#setbody');if(!el)return;const has=typeof V3!=='undefined';const pref=has?V3.pref:'auto';const now=has&&V3.on?GFX[V3.q].nm:'2D map';
   const opt=[['auto','Auto','picks for this screen'],['high','High','bloom, soft 2k shadows, full sharpness'],['med','Medium','soft shadows, no post-processing'],['low','Low','no shadows or effects; lightest on the battery']];
@@ -245,5 +251,5 @@ function renderSettings(){const el=$('#setbody');if(!el)return;const has=typeof 
     ${typeof PerfHUD!=='undefined'?`<div class="qopts spd">${PerfHUD.buttonsHTML('btn')}</div><p class="small muted">Show speed: a frame-rate overlay (also F9). Test speed: tries each level for 2 s and suggests one.</p>`:''}</div>`}
 const CREDITS_HTML=`<section class="credits-audio"><h3>Credits</h3><p>Names, card text and art are original.</p><h4>Audio</h4><p>With thanks to these public-domain (CC0) creators:</p><ul><li>Music: &ldquo;Medieval: Harvest Season&rdquo; by RandomMind (<a target="_blank" rel="noopener" href="https://opengameart.org/content/medieval-harvest-season">OpenGameArt</a>, CC0)</li><li>Sound effects: Impact Sounds, Interface Sounds, Music Jingles, RPG Audio, UI Audio by <a target="_blank" rel="noopener" href="https://kenney.nl">Kenney</a> (CC0)</li></ul><p><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p></section>`;
 function onGfxChange(){if(typeof GX!=='undefined'&&GX.open==='setd')renderSettings()}
-function boot(){GX.init({key:'rv'});paintIcons();GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=iconize(RULES_HTML)+CREDITS_HTML;if(id==='refd')$('#refbody').innerHTML=iconize(refHtml());if(id==='setd')renderSettings();if(G)render()};try{init3D()}catch(e){console.error(e)}soundBtns();openStart()}
+function boot(){GX.init({key:'rv'});paintIcons();GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=iconize(RULES_HTML)+CREDITS_HTML;if(id==='refd')$('#refbody').innerHTML=iconize(refHtml());if(id==='setd')renderSettings();if(G)render()};try{init3D()}catch(e){console.error(e)}soundBtns();openStart();netInit()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();

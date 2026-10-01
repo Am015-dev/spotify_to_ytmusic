@@ -2,21 +2,21 @@
 UI.cat=null;
 const CATS=[['build','🔨','Build'],['gather','🧺','Gather'],['explore','🧭','Explore'],['threat','⚠️','Threats'],['hunt','🏹','Hunt'],['camp','🏕️','Camp & rest'],['special','⭐','Scenario']];
 function planHtml(){
-  if(storyActive())return `<div class="waiting"><div class="big">📖</div><p>The day is being told on the island. Step through it with <b>Continue</b> (or Enter), or turn on <b>Play by itself</b>.</p></div>`+journalHtml();
-  if(!planOpen())return `<p class="muted">${G.over?'The game is over.':'The castaways are busy…'}</p>`+recentHtml();
+  if(storyActive())return `<div class="waiting"><div class="big">📖</div><p>${typeof netOn==='function'&&netOn()?'The day is being told on the island, on everyone’s screen at once. The first player ★ steps through it with <b>Continue</b>.':'The day is being told on the island. Step through it with <b>Continue</b> (or Enter), or turn on <b>Play by itself</b>.'}</p></div>`+journalHtml();
+  if(!planOpen())return `${typeof netWaitHtml==='function'?netWaitHtml():''}<p class="muted">${G.over?'The game is over.':'The castaways are busy…'}</p>`+recentHtml();
   if(allAI())return `<p class="muted">The computer castaways are planning the day.</p>`+recentHtml();
   const st=pstep();const titles=['What today needs','Give each pawn a job','Check the risks','Start the day'];
   const bar=`<div class="wz-steps" aria-label="Planning: step ${st} of 4">${titles.map((t,k)=>`<button class="wz-s ${k+1<st?'done':k+1===st?'now':''}" data-pgo="${k+1}" ${k+1===st?'aria-current="step"':''}><i>${k+1<st?'✓':k+1}</i><span>${t}</span></button>`).join('')}</div>`;
   const head=`<h3 class="wz-t">${st}. ${titles[st-1]}</h3>`;
   const body=st===1?wzNeeds():st===2?wzAssign():st===3?wzReview():wzConfirm();
-  return `<div class="wz">${bar}${head}${body}</div>`}
+  return `<div class="wz">${bar}${typeof netPlanBar==='function'?netPlanBar():''}${head}${body}</div>`}
 // ---------- plan step state ----------
 UI.ps={round:0,step:1,skip:[],pick:false};
 function pstep(){if(!G)return 1;if(UI.ps.round!==G.round){UI.ps={round:G.round,step:1,skip:[],pick:false};UI.sugWhy={}}return UI.ps.step}
 function resetPlanSteps(){UI.ps={round:0,step:1,skip:[],pick:false};UI.rec=null;UI.sugWhy={}}
 function setPStep(n){pstep();UI.ps.step=Math.max(1,Math.min(4,n));UI.ps.pick=false;if(UI.ps.step!==2)UI.sel=null;UI.toTop=1}
 // the pawns you plan for, in order: your castaways' pawns, then the helpers (Friday, the dog, ...)
-function wizPawns(){const hs=new Set(G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i));const all=allPawns().filter(p=>p.c!=null?hs.has(p.c):true);return all.filter(p=>p.c!=null).concat(all.filter(p=>p.c==null))}
+function wizPawns(){const hs=new Set(G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i));const hm=typeof helperMine!=='function'||helperMine();const all=allPawns().filter(p=>p.c!=null?hs.has(p.c):hm);return all.filter(p=>p.c!=null).concat(all.filter(p=>p.c==null))}
 function curPawn(){const placed=placedIds();const free=wizPawns().filter(p=>!placed.has(p.id)&&!UI.ps.skip.includes(p.id));if(UI.sel&&free.some(p=>p.id===UI.sel))return pawnInfo(UI.sel);return free.find(p=>p.c!=null)||free[0]||null}
 function pawnNice(p){if(p.c==null)return pawnLabel(p);const c=P(p.c);const n=pawnsOf(c);return n>1?`${c.nm} (${p.id.endsWith('_0')?'1st':'2nd'} pawn)`:c.nm}
 function riskWords(a){const n=actNeed(a);const k=a.pw.length;if(k<n.need)return `<b class="warn">Not enough pawns: needs ${n.need-k} more</b>`;

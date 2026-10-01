@@ -4,7 +4,7 @@
 const SND_MAP={
   click:{s:'click',vol:.5},  place:{s:'place',vol:1.4}, fig:{s:'fig',vol:1.4},   home:{s:'home',vol:1.3},
   score:{s:'score',vol:.7},  goods:{s:'goods',vol:.9},  turn:{s:'turn',vol:.35}, story:{s:'story',vol:.7},
-  win:{s:'win',vol:.9},      bad:{s:'bad',vol:.6}
+  win:{s:'win',vol:.9},      bad:{s:'bad',vol:.6},  myturn:{s:'turn',vol:1}  // myturn: online only, when a decision becomes yours
 };
 const MUSIC_MAP={main:'main'};           // null = the synthesized ambience
 const SND={ctx:null,on:true,music:true,pitch:1,vol:.7,last:{},nb:null,beat:0,mTimer:null};
@@ -42,6 +42,7 @@ function sfx(name){if(!name||!SND.on)return;
   case 'home':tone(660,.12,{type:'sine',v:.07,to:990});break;
   case 'goods':for(let k=0;k<4;k++)tone(1500+Math.random()*700,.06,{type:'square',v:.035,lp:4000,at:k*.05});break;
   case 'turn':tone(392,.1,{type:'sine',v:.05});break;
+  case 'myturn':tone(523,.12,{type:'triangle',v:.1});tone(784,.18,{type:'triangle',v:.09,at:.1});break;
   case 'story':tone(293.7,1.2,{type:'sine',v:.1,a:.2});tone(440,1.2,{type:'sine',v:.07,a:.3,at:.15});tone(587.3,1.3,{type:'triangle',v:.05,a:.3,at:.3});break;
   case 'win':[523,659,784,1047,784,1047].forEach((f,k)=>tone(f,k===5?.9:.2,{type:'triangle',v:.13,at:k*.15}));break;
   case 'bad':tone(330,.25,{type:'sawtooth',to:220,v:.12,lp:1400});break;

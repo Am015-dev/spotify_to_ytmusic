@@ -13,7 +13,8 @@ const SND_MAP={
   round:{s:'round',vol:.6,duck:true},
   refill:{s:'refill',vol:.65},
   win:{s:'win',vol:.85},          // ducks the music by itself (GA default list)
-  bad:{s:'bad',vol:.55}
+  bad:{s:'bad',vol:.55},
+  turn:{s:null}                   // online: a decision became yours (synth chime)
 };
 const SND={ctx:null,on:true,music:true,pitch:1,vol:.7,last:{},nb:null,beat:0,mTimer:null};
 try{SND.on=localStorage.getItem('sgz_snd')!=='0';SND.music=localStorage.getItem('sgz_mus')!=='0'}catch(e){}
@@ -57,6 +58,7 @@ function sfx(name,arg){if(!SND.on)return;const m=SND_MAP[name];
   case 'refill':noise(.5,{f:900,fto:300,q:.8,v:.12});break;
   case 'win':[523,659,784,1047,784,1047].forEach((f,k)=>tone(f,k===5?.9:.2,{type:'triangle',v:.13,at:k*.15}));break;
   case 'bad':tone(330,.25,{type:'sawtooth',to:220,v:.12,lp:1400});break;
+  case 'turn':[784,1047].forEach((f,k)=>tone(f,.28,{type:'sine',v:.1,at:k*.12}));break;
   }}catch(e){}}
 // music: a slow plucked courtyard guitar in a Phrygian mode over a soft drone, with a light frame drum
 const GUIT=[220,233.1,277.2,293.7,329.6,349.2,392,440];

@@ -49,6 +49,8 @@ function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.ran
   lg(`Shipwrecked! ${G.chars.map(c=>c.nm).join(', ')}${G.fri?' and Friday':''}${G.dog?' (with the dog)':''} wash up on the beach. Scenario: ${S.n}.`,'big');
   G.stk.push({f:'round'});run();refresh()}
 // ---------- helpers ----------
+// hum(c): a person plays this castaway (online games keep that in c.hh, and c.human means "this page plays it")
+function hum(c){return !!c&&(c.hh!==undefined?!!c.hh:!!c.human)}
 const living=()=>G.chars.filter(c=>!c.dead);
 const P=i=>G.chars[i];
 const firstC=()=>P(G.first);
@@ -69,7 +71,7 @@ function ops(list,ctx){if(list&&list.length)push({f:'ops',ops:list.slice(),ctx:c
 // ask: a choice for a character (or the team via the first player). opts: [{l:label, ops:[...], ctx}] or kind-specific
 function ask(who,title,opts,extra){const c=who==='team'?firstC():(typeof who==='number'?P(who):who);
   if(!opts.length)return;if(opts.length===1&&!(extra&&extra.force)){pickOpt(opts[0]);return}
-  if(c&&!c.human){const ix=aiChoose(title,opts,c,extra);const o=opts[ix]||opts[0];if(!UI.sim&&!(extra&&extra.kind==='dice')&&opts.length>1&&G.chars.some(x=>x.human))lg(`${c.nm} (computer) chooses: ${o.l.replace(/\.$/,'')}.`,'ai');pickOpt(o);return}
+  if(c&&!hum(c)){const ix=aiChoose(title,opts,c,extra);const o=opts[ix]||opts[0];if(!UI.sim&&!(extra&&extra.kind==='dice')&&opts.length>1&&G.chars.some(hum))lg(`${c.nm} (computer) chooses: ${o.l.replace(/\.$/,'')}.`,'ai');pickOpt(o);return}
   G.q=Object.assign({who:c?c.i:0,title,opts},extra||{})}
 function pickOpt(o){if(o.frames)push(...o.frames);if(o.ops)ops(o.ops,o.ctx)}
 function answer(i){const q=G.q;G.q=null;pickOpt(q.opts[i]);run();refresh()}

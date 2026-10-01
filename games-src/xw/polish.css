@@ -70,3 +70,16 @@
 .pop{font-family:Orbitron,"Exo 2",sans-serif;text-shadow:0 0 10px currentColor,0 2px 0 #000,0 0 2px #000}
 @media (prefers-reduced-motion:reduce){.die,.die.atk,.die.def,#modal:not(.hidden) .dlg{animation:none}.btn,.mv{transition:none}}
 .launchbar{background:linear-gradient(180deg,#1f1b50 70%,rgba(31,27,80,0));padding-bottom:.4rem}
+/* ---- online play ---- */
+.online{border:1px solid var(--line);border-radius:10px;padding:.45rem .6rem;background:rgba(255,255,255,.03)}
+.online>p{margin:.1rem 0 .4rem}
+.online.hl{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.25)}
+.online .row{align-items:center}.online input,.invrow input{font:inherit;background:var(--panel2);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:.35rem .5rem;min-width:0}
+.online #netname{flex:1 1 8rem;max-width:12rem}.online #joincode{flex:1 1 6rem;max-width:9rem;text-transform:lowercase}
+.lobby .launchbar h2{margin:0;font-size:1.3rem}.lobby .x{margin-left:auto;font-size:1rem;padding:.3rem .6rem}
+.lobby .code,.online .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.15em;letter-spacing:.12em;color:var(--gold)}
+.invrow{align-items:center;flex-wrap:nowrap}.invrow .btn{white-space:nowrap;flex:none}.invrow input{flex:1 1 auto;width:100%}
+.plist{margin:.2rem 0 .4rem;padding-left:1.2rem}.plist li{margin:.1rem 0}
+.nb-dot{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#4fe08a;box-shadow:0 0 6px #4fe08a;margin-right:.3rem;vertical-align:middle}.nb-dot.off{background:#ffb347;box-shadow:0 0 6px #ffb347}
+.netbar{flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:.2rem .4rem;margin:0 0 .3rem;border-radius:8px;background:rgba(80,200,255,.07);border:1px solid rgba(120,200,255,.2);line-height:1.5}.netbar.hidden{display:none}.netbar .btn.sm{padding:.1rem .45rem;font-size:.78rem;margin-left:.3rem}
+.netwait{display:flex;flex-wrap:wrap;gap:.3rem;margin:.1rem 0 .35rem;color:var(--muted)}.netwait .nw{border:1px solid var(--line);border-radius:999px;padding:.05rem .5rem}.netwait .nw.ok{border-color:rgba(79,224,138,.55);color:#9ff0c0}

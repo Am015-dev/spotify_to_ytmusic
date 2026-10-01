@@ -52,7 +52,7 @@ function planNext(pl){const vm=validMoves(G.cur);const by=a=>vm.filter(m=>m.act=
   const last=G.move.hand.length===1;const cnt=G.move.hand.filter(x=>x===pl.c).length;
   if(last)return here.find(m=>m.c===pl.c)||here[0];if(nx===pl.e&&cnt>1){const m=here.find(m=>m.c===pl.c);if(m)return m}
   return here.find(m=>m.c!==pl.c)||here[0]}
-function runPlan(){const pl=UI.autoPlan;if(!pl||!G||G.step!=='move'){UI.autoPlan=null;return}const m=planNext(pl);
+function runPlan(){if(typeof NET!=='undefined'&&NET.on&&NET.wait&&UI.autoPlan){setTimeout(runPlan,60);return}const pl=UI.autoPlan;if(!pl||!G||G.step!=='move'){UI.autoPlan=null;return}const m=planNext(pl);
   if(!m){UI.autoPlan=null;toast('That plan is no longer possible here: finish the move by hand.');render();return}
   go(m);if(G.step==='move'&&UI.autoPlan)setTimeout(runPlan,ANIM?Math.max(120,420/(UI.speed||1)):0);else UI.autoPlan=null}
 
@@ -74,7 +74,7 @@ function moveWords(m){switch(m.act){
 // ---- recap of other players' turns, told as a story ----
 function recapLines(){return recapGroups().flatMap(g=>[{t:g.head,c:'turn'}].concat(g.items))}
 // every turn since the human last played, oldest first; each turn's events in the order they happened
-function recapGroups(){if(!G||!G.log.length)return[];const humans=G.pl.filter(p=>p.human).map(p=>p.nm);const groups=[];let cur=[];
+function recapGroups(){if(!G||!G.log.length)return[];const humans=typeof NET!=='undefined'&&NET.on&&NET.mySeat>=0?[P(NET.mySeat).nm]:G.pl.filter(p=>p.human).map(p=>p.nm);const groups=[];let cur=[];
   for(const l of G.log){if(l.c==='turn'||l.c==='round'){groups.push({head:l.t.replace(/—/g,'').trim(),items:cur.reverse()});cur=[];
       if(l.c==='turn'&&humans.some(n=>l.t.includes(n+"'s"))&&groups.length>1)break;if(groups.length>10)break;continue}cur.push(l)}
   if(cur.length)groups.push({head:'Earlier',items:cur.reverse()});

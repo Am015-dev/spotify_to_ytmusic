@@ -1,7 +1,7 @@
 // ---------- online multiplayer (room capability). The host runs the game; everyone else sends actions. ----------
 const NET={on:false,role:null,code:'',room:null,lobby:null,user:null,uid:null,peer:null,mySeat:-1,seq:0,applied:0,last:0,timer:null,parts:{},hostPeer:null,names:{},peers:[],inLobby:false,err:'',conn:false,ready:false,busy:false,ep:0,safe:null,lastRx:0,dead:[],expect:null};
 const EMOTES=['😂','😱','👏','😡','🔥','💤'];
-async function netInit(){try{if(!window.claude||!window.claude.use){NET.ready=true;render();return}const [room,user]=await Promise.all([window.claude.use('room'),window.claude.use('user')]);NET.lobby=room;NET.user=user;if(user)NET.uid=await user.id();NET.ready=true;render()}catch(e){NET.ready=true}}
+async function netInit(){try{if(!window.claude||!window.claude.use){if(typeof NetRoom!=='undefined'&&NetRoom.available()){NET.lobby=NetRoom.lobby('ccs');NET.p2p=true;NET.uid=NetRoom.uid();NET.myName=NetRoom.name();const lc=NetRoom.linkCode();if(lc){UI.joinCode=lc;setTimeout(()=>{const d=[...document.querySelectorAll('details')].find(x=>x.querySelector('.online'));if(d)d.open=true;const o=document.querySelector('.online');if(o){o.scrollIntoView({block:'center'});const n=document.getElementById(NET.myName?'joincode':'netname');if(n)n.focus()}},400)}}NET.ready=true;render();return}const [room,user]=await Promise.all([window.claude.use('room'),window.claude.use('user')]);NET.lobby=room;NET.user=user;if(user)NET.uid=await user.id();NET.ready=true;render()}catch(e){NET.ready=true}}
 netInit();
 const netAvail=()=>!!NET.lobby;
 const isClient=()=>NET.on&&NET.role==='client';
@@ -14,7 +14,7 @@ async function netJoin(role,code){
   try{if(NET.room){try{await NET.room.leave()}catch(e){}}NET.room=await NET.lobby.join('ccs-'+code)}catch(e){NET.busy=false;NET.err='Could not join the game room ('+(e&&e.code||'error')+').';render();return}
   NET.busy=false;NET.code=code;NET.role=role;NET.on=true;NET.inLobby=true;NET.mySeat=-1;NET.hostPeer=null;NET.parts={};NET.applied=0;NET.ep=0;NET.safe=null;NET.lastRx=0;NET.dead=[];NET.expect=null;
   if(role==='client')G=null;
-  NET.room.presence({role,uid:NET.uid||null,mon:UI.mon,v:1}).catch(()=>{});
+  NET.room.presence({role,uid:NET.uid||null,mon:UI.mon,v:1,name:NET.myName||''}).catch(()=>{});
   NET.room.on('st',onNetState);NET.room.on('act',onNetAct);NET.room.on('emo',onNetEmo);
   NET.room.onPeers(ch=>{NET.peers=ch.peers;const me=ch.peers.find(p=>p.isMe&&p.sameTab);if(me)NET.peer=me.peer;
     if(isHost()&&G){ch.left.forEach(l=>{const s=G.pl.find(p=>p.peer===l.peer&&p.human);if(s){s.human=false;s.away=true;lg(s.i,`${mname(s)}'s player left: the computer takes over.`)}});
@@ -25,7 +25,8 @@ async function netJoin(role,code){
   NET.room.onConnection(c=>{NET.conn=c;render()});
   UI.info=false;UI.rules=false;render()}
 async function netLeave(){try{if(NET.room)await NET.room.leave()}catch(e){}Object.assign(NET,{on:false,role:null,room:null,inLobby:false,mySeat:-1,hostPeer:null,err:''});G=null;UI.info=true;render()}
-async function netNames(){if(!NET.user)return;const ids=[...new Set([...NET.peers.map(p=>p.by||(p.presence&&p.presence.uid)),...(G?G.pl.map(p=>p.uid):[])].filter(Boolean))];if(!ids.length)return;
+async function netNames(){if(NET.p2p){let ch=false;NET.peers.forEach(p=>{const n=p.presence&&typeof p.presence.name==='string'?p.presence.name.slice(0,24):'';if(p.by&&n&&NET.names[p.by]!==n){NET.names[p.by]=n;ch=true}});if(NET.uid&&NET.myName&&NET.names[NET.uid]!==NET.myName){NET.names[NET.uid]=NET.myName;ch=true}if(ch)render();return}
+  if(!NET.user)return;const ids=[...new Set([...NET.peers.map(p=>p.by||(p.presence&&p.presence.uid)),...(G?G.pl.map(p=>p.uid):[])].filter(Boolean))];if(!ids.length)return;
   try{const ps=await NET.user.profiles(ids);let ch=false;for(const id of ids){const n=ps[id]&&ps[id].name||'';if(NET.names[id]!==n){NET.names[id]=n;ch=true}}if(ch)render()}catch(e){}}
 function pname(p){if(!p||!p.uid)return '';return NET.names[p.uid]||''}
 function peerName(pr){const uid=pr.by||(pr.presence&&pr.presence.uid);return (uid&&NET.names[uid])||(pr.isMe?'You':'Player')}
@@ -36,8 +37,8 @@ function netStart(){if(!isHost())return;const hum=NET.peers.filter(p=>p.kind==='
 // ---- state packets (compressed, chunked: a room message carries at most 4 KiB) ----
 function b64(u8){let s='';for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s)}
 function unb64(s){const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
-async function packStr(s){if(window.CompressionStream){try{const cs=new CompressionStream('deflate-raw');const w=cs.writable.getWriter();w.write(new TextEncoder().encode(s));w.close();return 'z'+b64(new Uint8Array(await new Response(cs.readable).arrayBuffer()))}catch(e){}}return 'j'+b64(new TextEncoder().encode(s))}
-async function unpackStr(s){const u=unb64(s.slice(1));if(s[0]==='z'){const ds=new DecompressionStream('deflate-raw');const w=ds.writable.getWriter();w.write(u);w.close();return await new Response(ds.readable).text()}return new TextDecoder().decode(u)}
+async function packStr(s){if(window.CompressionStream){try{const cs=new CompressionStream('deflate-raw');const w=cs.writable.getWriter();w.write(new TextEncoder().encode(s)).catch(()=>{});w.close().catch(()=>{});return 'z'+b64(new Uint8Array(await new Response(cs.readable).arrayBuffer()))}catch(e){}}return 'j'+b64(new TextEncoder().encode(s))}
+async function unpackStr(s){const u=unb64(s.slice(1));if(s[0]==='z'){const ds=new DecompressionStream('deflate-raw');const w=ds.writable.getWriter();w.write(u).catch(()=>{});w.close().catch(()=>{});return await new Response(ds.readable).text()}return new TextDecoder().decode(u)}
 function netPush(force){if(!isHost()||!NET.room)return;const now=Date.now();
   if(!force&&now-NET.last<300){if(!NET.timer)NET.timer=setTimeout(()=>{NET.timer=null;netPush(true)},310);return}
   NET.last=now;const seq=++NET.seq;
@@ -102,18 +103,21 @@ function lobbyHTML(){const host=isHost();const ps=NET.peers.filter(p=>p.kind==='
   const rows=ps.map(p=>{const pr=p.presence||{};const m=Number.isInteger(pr.mon)?MONS[pr.mon]:null;return `<li><b>${esc(peerName(p))}</b>${p.isMe&&p.sameTab?' (you)':''}${pr.role==='host'?' · host':''}${p.guest?' · guest':''}${m?` · wants ${esc(m.n)}`:''}</li>`}).join('')||'<li class="muted">Connecting…</li>';
   const exs=EXPS.filter(e=>e.k==='evo'?UI.evo:UI.ex[e.k]).map(e=>e.n).join(', ')||'none';
   return `<div class="dlg start" role="dialog" aria-modal="true"><h2>🌐 Online game</h2>
-   <p>Invite code: <b class="code">${esc(NET.code)}</b> <span class="small muted">Friends open this same page, press <b>Join a game</b> and type the code.</span></p>
+   <p>Invite code: <b class="code">${esc(NET.code)}</b> <span class="small muted">Friends open this same page, press <b>Join a game</b> and type the code.</span></p>${NET.p2p?`<p class="small">Or send them this link: <input class="invlink" readonly value="${esc(NetRoom.inviteLink(NET.code))}" onclick="this.select()"> <button class="btn" data-a="netcopy">Copy link</button>${NET.copied?' <span class="muted">Copied.</span>':''}</p>`:''}
    ${NET.err?`<p class="warn">${esc(NET.err)}</p>`:''}${NET.conn===false&&NET.on?'<p class="small muted">Connecting to the room…</p>':''}
-   <h3 style="margin:.4rem 0 .2rem">Players here (${ps.length})</h3><ul class="plist">${rows}</ul>
+   <h3 style="margin:.4rem 0 .2rem">Players here (${ps.length})</h3><ul class="plist">${rows}</ul>${NET.p2p&&ps.length<2?'<p class="small muted">⏳ Waiting for friends to join… Send them the code or link.</p>':''}
    <p style="margin:.4rem 0 .2rem"><b>Your monster</b> (if two players pick the same one, one gets a random monster):</p>
    <div class="monpick">${MONS.map((M,k)=>k).filter(k=>UI.xp!=='base'||k<6).map(k=>`<button class="${UI.mon===k?'on':''}" data-mon="${k}"><svg viewBox="-66 -70 132 136">${monArt(k)}</svg><span>${esc(MONS[k].n)}</span></button>`).join('')}</div>
    ${host?`<p class="small">Game: <b>${UI.xp==='base'?'Base game':UI.xp==='trial'?'Mindbug Trial':'Mindbug Experience'}</b> · Expansions: <b>${esc(exs)}</b> · Seats: <b>${Math.min(6,Math.max(UI.n,ps.length))}</b> (empty seats go to <b>${UI.lvl}</b> computer monsters). Change these on the start screen before hosting.</p>
      <div class="acts"><button class="btn primary" data-a="netstart" ${ps.length<1?'disabled':''}>Start the game with ${ps.length} player${ps.length===1?'':'s'}</button><button class="btn" data-a="netleave">Close the room</button></div>`
    :`<p class="tip">Waiting for the host to start the game…</p><div class="acts"><button class="btn" data-a="netleave">Leave</button></div>`}</div>`}
 function onlineBlock(){if(!NET.ready)return '<p class="small muted">Checking online play…</p>';
-  if(!netAvail())return '<p class="small muted">🌐 Online play works when this page is opened on claude.ai by people signed in and given access to it.</p>';
+  if(!netAvail())return '<p class="small muted">🌐 Online play needs a browser with WebRTC (any recent Chrome, Edge, Firefox or Safari).</p>';
+  if(NET.p2p)return `<div class="online"><b>🌐 Play online with friends</b><span class="small muted"> Free and direct: your browsers connect to each other. Host a game and send friends the code or link.</span>
+    <div class="row"><input id="netname" placeholder="your name" maxlength="24" autocomplete="off" value="${esc(NET.myName||'')}"><button class="btn" data-a="nethost">Host a game</button><input id="joincode" placeholder="invite code" maxlength="10" autocomplete="off" value="${esc(UI.joinCode||'')}"><button class="btn" data-a="netjoin">Join a game</button></div>${NET.err&&!NET.on?`<p class="warn">${esc(NET.err)}</p>`:''}</div>`;
   return `<div class="online"><b>🌐 Play online with friends</b><span class="small muted"> Share this page with them first (as Contributors or Editors).</span>
     <div class="row"><button class="btn" data-a="nethost">Host a game</button><input id="joincode" placeholder="invite code" maxlength="10" autocomplete="off" value="${esc(UI.joinCode||'')}"><button class="btn" data-a="netjoin">Join a game</button></div>${NET.err&&!NET.on?`<p class="warn">${esc(NET.err)}</p>`:''}</div>`}
 
-document.addEventListener('input',e=>{if(e.target&&e.target.id==='joincode')UI.joinCode=e.target.value});
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='joincode')UI.joinCode=e.target.value;if(e.target&&e.target.id==='netname'&&typeof NetRoom!=='undefined'){NET.myName=NetRoom.setName(e.target.value)}});
+function netCopy(){const t=NetRoom.inviteLink(NET.code);const done=()=>{NET.copied=true;render();setTimeout(()=>{NET.copied=false;render()},2500)};try{navigator.clipboard.writeText(t).then(done,()=>{const i=document.querySelector('.invlink');if(i)i.select()})}catch(e){const i=document.querySelector('.invlink');if(i)i.select()}}
 document.addEventListener('keydown',e=>{if(e.target&&e.target.id==='joincode'&&e.key==='Enter'){e.preventDefault();netJoin('client',e.target.value)}});

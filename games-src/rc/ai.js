@@ -87,7 +87,7 @@ function aiCandidates(st){const o=[];const ex=explored();const np=living().lengt
   for(const k in (SC().specials||{})){const v={temple:6,ada:18,reclaim:1.5}[k]||3;add('special',k,v)}
   if(G.kept.m_tmap)add('tmap',null,4);
   return o}
-function aiPawnPool(forChars){const placed=placedIds();return allPawns().filter(p=>!placed.has(p.id)&&(p.c==null?true:forChars.includes(p.c)))}
+function aiPawnPool(forChars){const placed=placedIds();return allPawns().filter(p=>!placed.has(p.id)&&(p.c==null?(typeof helperAI!=='function'||helperAI()):forChars.includes(p.c)))}
 function aiPlan(forChars){if(!planOpen())return;forChars=forChars||G.chars.filter(c=>!c.dead).map(c=>c.i);
   for(const c of forChars.map(P))if(c.npc){const pid='c'+c.i+'_0';if(!placedIds().has(pid))place(pid,'rest',null)}
   // hard rule: a castaway close to death rests before anything else
@@ -132,11 +132,11 @@ function aiPrePlan(forChars){const hum=forChars.some(i=>P(i)&&P(i).human);for(le
   if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();const spare=G.res.wood-(hasShelter()?0:2)-(G.round>=6?2:0);const stagesLeft=5-PILE_CUM.filter(c=>c<=G.sc.pile).length;const late=(10-G.round)<=stagesLeft;if(room&&spare>0&&(late||spare>=5))pileAdd(Math.min(room,spare))}}
 // ---------- driving the computer ----------
 let aiTimer=null;
-function allAI(){return !G.chars.some(c=>c.human&&!c.dead)}
-function schedule(){if(aiTimer||!G||G.over||UI.pause)return;if(G.q)return;if(typeof storyActive==='function'&&storyActive())return;if(G.phase!=='plan')return;
-  const ai=G.chars.filter(c=>!c.human&&!c.dead&&!c.npc).map(c=>c.i);const need=ai.filter(i=>allPawns().some(p=>p.c===i&&!placedIds().has(p.id)));
+function allAI(){return !G.chars.some(c=>hum(c)&&!c.dead)}
+function schedule(){if(aiTimer||!G||G.over||UI.pause)return;if(typeof isClient==='function'&&isClient())return;if(G.q)return;if(typeof storyActive==='function'&&storyActive())return;if(G.phase!=='plan')return;
+  const ai=G.chars.filter(c=>!hum(c)&&!c.dead&&!c.npc).map(c=>c.i);const need=ai.filter(i=>allPawns().some(p=>p.c===i&&!placedIds().has(p.id)));
   if(need.length||allAI()){aiTimer=setTimeout(()=>{aiTimer=null;aiStep()},Math.max(0,AIDELAY/(UI.speed||1)))}}
-function aiStep(){if(!G||G.over||!planOpen())return;const ai=G.chars.filter(c=>!c.human&&!c.dead).map(c=>c.i);
+function aiStep(){if(!G||G.over||!planOpen())return;if(typeof isClient==='function'&&isClient())return;const ai=G.chars.filter(c=>!hum(c)&&!c.dead).map(c=>c.i);
   if(allAI())aiPlanBest(ai);else{const need=ai.filter(i=>allPawns().some(p=>p.c===i&&!placedIds().has(p.id)));if(need.length){const before=placedIds(),mark=G.logN;aiPlanBest(need.concat(G.chars.filter(c=>c.npc).map(c=>c.i)));if(typeof mateNews==='function')mateNews(before,mark,need)}}
   if(allAI()&&planOpen()){const e=startActions();if(e){console.error('AI plan invalid: '+e);clearPlan();for(const c of living())for(const p of allPawns().filter(p=>p.c===c.i))place(p.id,c.w?'rest':'camp',null);startActions()}}refresh()}
 
@@ -152,7 +152,7 @@ function stateScore(g){if(g.over)return g.over.win?5000:-5000+g.round*60;let s=0
   if(g.scen==='stranded')s+=(g.sc.rescued?70:0)+(g.inv.built.jraft?20:0)+(g.inv.built.lifeboat?40:0)+(g.inv.built.rope?5:0)+(g.inv.built.knife?4:0)-(g.sc.rescued?0:g.sc.ada*2);
   if(g.scen==='settlers')s+=g.sc.goals.filter(k=>g.inv.built[k]).length*8-(g.sc.kids||0)*2;
   return s}
-function simOnce(json,seed){const keep=G;G=JSON.parse(json);G.rng=seed>>>0;for(const c of G.chars)c.human=false;
+function simOnce(json,seed){const keep=G;G=JSON.parse(json);G.rng=seed>>>0;for(const c of G.chars){c.human=false;if(c.hh!==undefined)c.hh=false}
   // hidden order is unknown to the planner: reshuffle every face-down pile
   shuffle(G.ev.deck);shuffle(G.tileDeck);shuffle(G.mys.deck);shuffle(G.hunt);shuffle(G.beast);shuffle(G.discs);for(const d in G.adv)shuffle(G.adv[d]);
   G.stk.push({f:'fn',k:'go'});const r0=G.round;let n=0;while(!G.over&&n++<80){run();if(G.phase==='plan'&&G.round>=r0+AIHOR)break;if(G.phase==='plan'&&!G.q){aiPlan();G.stk.push({f:'fn',k:'go'});continue}if(!G.stk.length)break}

@@ -1,8 +1,8 @@
 // ---------- interface: render() reads G and UI only; every click becomes a move through uiAct -> gameAct ----------
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function mySeat(){if(!G)return 0;if(G.mode==='hot'){const s=sideToAct();if(s>=0&&P(s).human)return s;return UI.lastSeat>=0?UI.lastSeat:G.active}if(G.mode==='ai')return -1;return 0}
-const viewSeat=()=>{const s=mySeat();return s<0?G.active:s};
+function mySeat(){if(!G)return 0;if(G.mode==='hot'){const s=sideToAct();if(s>=0&&P(s).human)return s;return UI.lastSeat>=0?UI.lastSeat:G.active}if(G.mode==='ai')return -1;if(G.mode==='net')return typeof NET!=='undefined'?NET.mySeat:-1;return 0}
+const viewSeat=()=>{const s=mySeat();return s<0?(G.mode==='net'?-1:G.active):s};
 const PCOL=['#e03131','#1c7ed6','#2f9e44','#f08c00','#7048e8','#d6336c'];
 const PSHAPE=['●','■','▲','◆','★','⬟'];
 const ptok=i=>`<span class="ptok" style="--c:${PCOL[i]}" aria-hidden="true">${PSHAPE[i]}</span>`;
@@ -12,8 +12,8 @@ const EMORE=new RegExp('('+Object.keys(EMO).join('|')+')\uFE0F?','gu');
 function emo(h){if(typeof ic!=='function'||!h)return h;return h.replace(/(<[^>]*>)|([^<]+)/g,(m,tag,txt)=>tag?tag:txt.replace(EMORE,(x,e)=>ic(EMO[e])))}
 UI.speed=0.5;try{UI.hints=localStorage.getItem('dkd_hints')!=='0';UI.speed=+(localStorage.getItem('dkd_speed2')||0.5)}catch(e){}
 const SPEEDN=v=>emo(v<1?'🐢 slow':v>1?'⏩ fast':'▶ normal');
-function refresh(){if(G&&!G.winner)autoPass();if(G&&!G.winner){try{if(G.mode!=='net')localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}else{try{localStorage.removeItem(SAVE)}catch(e){}}
-  render();schedule();sounds()}
+function refresh(){if(G&&G.mode==='net'&&typeof netWindow==='function')netWindow();if(G&&!G.winner)autoPass();if(G&&!G.winner){try{if(G.mode!=='net')localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}else{try{localStorage.removeItem(SAVE)}catch(e){}}
+  render();schedule();sounds();if(G&&G.mode==='net'&&typeof netPush==='function')netPush()}
 let lastFx=0;function sounds(){if(typeof sfx!=='function')return;for(const f of UI.fx){if(f.at<=lastFx)continue;lastFx=f.at;const m={monster:'roar',door:'door',win:'win',bad:'bad',death:'death',curse:'curse',lvl:'level',roll:'dice',shot:'whoosh',turn:'turn'}[f.t];if(m)sfx(m)}}
 // ---- one card ----
 function kindLabel(c){if(c.t==='monster')return 'monster'+(c.undead?' · undead':'');if(c.t==='item')return (c.slot==='head'?'headgear':c.slot==='foot'?'footgear':c.slot==='armor'?'armor':c.hands===2?'2 hands':c.hands===1?'1 hand':'item')+(c.big?' · big':'');if(c.t==='oneshot')return 'one-shot';if(c.t==='enh')return 'monster boost';if(c.t==='level')return 'level up';return c.t}
@@ -42,8 +42,8 @@ function cardHTML(id,o){o=o||{};const c=cd(id);const cls=['card',c.d==='door'?'d
   const flip=/\bflip\b/.test(o.cls||'');
   return `<button class="${cls}" data-card="${id}" ${o.attr||''}${tip} aria-label="${esc(c.n)}: ${esc(c.x||'')}${o.badge?' ('+o.badge+')':''}${o.risk?' (warning: '+esc(o.risk)+')':''}"><i class="hit" aria-hidden="true"></i>${o.badge?`<span class="sugb">💡 ${o.badge}</span>`:o.risk?`<span class="sugb risk">⚠ you’d lose</span>`:''}<span class="cn">${esc(c.n)}</span><span class="aw">${svgArt(c,c.k)}${gem?`<span class="tag">${gem}</span>`:''}${gold?`<span class="gold">${gold}</span>`:''}</span><span class="kind">${kindLabel(c)}${cond?' · '+cond:''}</span>${c.x?`<span class="cx">${esc(c.x)}</span>`:''}${flip&&typeof cardBack==='function'?`<span class="cback">${cardBack(c.d)}</span>`:''}</button>`}
 // ---- panels ----
-function render(){const root=$('#app');if(!root)return;syncMenu();
-  if(!G){setHTML(root,'');setHTML($('#side'),'<div id="prompt"><p>Set up a game to start.</p></div>');$('#docktitle').textContent='Doorkick Dungeon';setHTML($('#modal'),startHTML());$('#modal').hidden=false;if(GX.open&&GX.open!=='dkRules')GX.close();return}
+function render(){const root=$('#app');if(!root)return;syncMenu();if(typeof netRender==='function')netRender();
+  if(!G){setHTML(root,'');setHTML($('#side'),'<div id="prompt"><p>Set up a game to start.</p></div>');$('#docktitle').textContent='Doorkick Dungeon';setHTML($('#modal'),startHTML());$('#modal').hidden=false;if(GX.open&&GX.open!=='dkRules'&&GX.open!=='dkNet')GX.close();return}
   scanLog();const me=viewSeat();const s=sideToAct();if(UI.sell&&!(me>=0&&validMoves(me).some(m=>m.act==='sell')))UI.sell=null;
   if(UI.menu&&UI.menu.ask&&!(me>=0&&validMoves(me).some(m=>m.act==='ask')))UI.menu=null;
   // hot-seat: hide the hand while the device passes between human players
@@ -59,7 +59,7 @@ function render(){const root=$('#app');if(!root)return;syncMenu();
   const cardOn=(UI.menu&&UI.menu.card!=null)||UI.zoom!=null;
   if(cardOn&&UI.pass==null&&!G.winner){const cid=UI.menu&&UI.menu.card!=null?UI.menu.card:UI.zoom;setHTML($('#dkCardBody'),UI.menu&&UI.menu.card!=null?menuHTML(me):zoomHTML());const t=$('#dkCard h2');if(t)t.textContent=cname(cid);if(GX.open!=='dkCard')GX.show('dkCard')}
   else{if(cardOn){UI.menu=null;UI.zoom=null}if(GX.open==='dkCard')GX.close()}
-  let m='';if(UI.pass!=null&&!G.winner)m=passHTML(UI.pass);else if(G.winner)m=endHTML();
+  let m='';if(UI.pass!=null&&!G.winner)m=passHTML(UI.pass);else if(G.winner)m=endHTML();if(G.mode==='net'&&typeof netModalHTML==='function')m=netModalHTML()||m;
   if(m&&GX.open)GX.close();
   setHTML($('#modal'),m);$('#modal').hidden=!m;$('#modal').classList.toggle('opaque',UI.pass!=null&&!G.winner);
   // a human decision is pending: make sure the dock is open (once per new decision)
@@ -136,6 +136,7 @@ function orderHTML(me){const n=G.pl.length;const f=G.first!=null?G.first:0;const
 function hintBox(co,extra){if(!UI.hints)return '';const L=[];if(co.why)L.push(`<div class="hl">💡 ${co.why}</div>`);(co.lines||[]).forEach(x=>L.push(`<div class="hx">${x}</div>`));(extra||[]).forEach(x=>x&&L.push(`<div class="hx">${x}</div>`));return L.length?`<div class="hint" aria-label="Hint">${L.join('')}</div>`:''}
 function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me>=0&&s===me&&P(me).human;const vm=mine?validMoves(me):[];const si=stepIdx();
   let h=`<div id="prompt">${me>=0&&P(me)&&P(me).human?toastHTML():''}<div class="steps" aria-label="Turn step ${si+1} of ${STEPS.length}: ${STEPS[si][1]}">${STEPS.map((x,i)=>`<span class="${i===si?'on':i<si?'done':''}" title="${x[1]}">${i+1}${i===si?' '+x[1]:''}</span>`).join('')}</div>${G.phase!=='setup'?orderHTML(me):''}`;
+  if(G.mode==='net'&&typeof netStatusHTML==='function')h+=netStatusHTML()+nwHTML(me);
   if(!p){return h+'</div>'}
   const warn=G.cb?winWarnHTML(me):'';h+=warn;
   h+=`<div class="who">${ptok(p.i)} ${esc(p.nm)}${mine?' · your move':''}</div>`;
@@ -203,19 +204,21 @@ function zoomHTML(){const id=UI.zoom;const c=cd(id);const me=viewSeat();const mi
 function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h2>Pass the device to ${esc(P(s).nm)}</h2><p>Everyone else, look away: ${esc(P(s).nm)}'s hand is secret.</p><button class="btn primary" data-a="iam">I'm ${esc(P(s).nm)}: show my cards</button></div>`}
 function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewSeat();const won=G.winner==='P'+(me+1)&&P(me).human&&G.mode!=='ai';
   return `<div class="dlg paper end ${won?'won':''}">${won?'<div class="confetti" aria-hidden="true">🎉 ✨ 🏆 ✨ 🎉</div>':''}<h2>${won?'🎉 Victory! You are a Level 10 Legend!':'🏆 '+esc(G.winText)}</h2>${won?`<p class="small muted">${esc(G.winText)}</p>`:''}${recapHTML()}<table style="width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums"><tr><th align="left">Hero</th><th>Level</th><th>Kills</th><th>Helps</th><th>Deaths</th><th>Cursed</th></tr>${ps.map(p=>`<tr style="${'P'+(p.i+1)===G.winner?'background:#fff3bf;color:#2b2233':''}"><td>${nmY(p.i)}</td><td align="center">${p.lvl}</td><td align="center">${p.st.kills}</td><td align="center">${p.st.helps}</td><td align="center">${p.st.deaths}</td><td align="center">${p.st.cursed}</td></tr>`).join('')}</table><p class="small muted">The dungeon doors slam shut for another year.</p><div class="acts"><button class="btn primary" data-a="new">Play again</button></div></div>`}
-function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
-  return `<div class="dlg paper start"><h2 style="font-size:2rem">Doorkick <span style="color:var(--red)">Dungeon</span></h2><p>Kick open doors, fight monsters, grab the loot and stab your friends in the back. First hero to <b>level 10</b> wins, and the last level only comes from killing a monster.</p>${introHTML(n,UI.mode||'F')}
-   <h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].map(([k,l])=>`<button class="btn ${ (UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
-   <h3>Heroes at the table</h3><div class="seg">${[3,4,5,6].map(k=>`<button class="btn ${n===k?'on':''}" data-set="n" data-v="${k}">${k}</button>`).join('')}</div>
+function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}const net=typeof netAvail==='function'&&netAvail();if(UI.mode==='net'&&!net)UI.mode='F';const online=UI.mode==='net';const guest=online&&typeof isClient==='function'&&isClient();
+  return `<div class="dlg paper start"${typeof NET!=='undefined'&&NET.on?' style="animation:none"':''}><h2 style="font-size:2rem">Doorkick <span style="color:var(--red)">Dungeon</span></h2><p>Kick open doors, fight monsters, grab the loot and stab your friends in the back. First hero to <b>level 10</b> wins, and the last level only comes from killing a monster.</p>${online?'':introHTML(n,UI.mode||'F')}
+   <h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${ (UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
+   ${online?`<h3>🌐 Play online</h3>${onlineBlock()}`:''}${guest?'<p class="small muted">The host chooses the seats, the computer skill and the expansions.</p>':startOpts(n,online)}
+   <div class="acts" style="margin-top:12px">${online?'':`<button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>${saved?'<button class="btn" data-a="load">Continue saved game</button>':''}`}<button class="btn" data-a="rules">How to play</button></div>${!net&&typeof onlineBlock==='function'?onlineBlock():''}</div>`}
+function startOpts(n,online){return `<h3>${online?'Seats (friends first, the computer fills the rest)':'Heroes at the table'}</h3><div class="seg">${[3,4,5,6].map(k=>`<button class="btn ${n===k?'on':''}" data-set="n" data-v="${k}">${k}</button>`).join('')}</div>
    <h3>Computer skill</h3><div class="seg">${['easy','normal','hard'].map(k=>`<button class="btn ${(UI.lvl||'normal')===k?'on':''}" data-set="lvl" data-v="${k}">${k[0].toUpperCase()+k.slice(1)}</button>`).join('')}</div>
-   ${EXPS.length?`<h3>Expansions</h3><div class="grid2">${EXPS.map(e=>`<button class="btn ${DEFEX[e.k]?'on':''}" data-set="ex" data-v="${e.k}" title="${esc(e.d)}"><b>${esc(e.n)}</b><br><span class="small">${esc(e.d)}</span></button>`).join('')}</div>`:''}
-   <div class="acts" style="margin-top:12px"><button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>${saved?'<button class="btn" data-a="load">Continue saved game</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
+   ${EXPS.length?`<h3>Expansions</h3><div class="grid2">${EXPS.map(e=>`<button class="btn ${DEFEX[e.k]?'on':''}" data-set="ex" data-v="${e.k}" title="${esc(e.d)}"><b>${esc(e.n)}</b><br><span class="small">${esc(e.d)}</span></button>`).join('')}</div>`:''}`}
 function rulesHTML(){return RULES_HTML}
 // ---- input ----
-function uiAct(m){const me=viewSeat();const s=m.seat!=null?m.seat:me;UI.menu=null;if(m.act==='sell')UI.sell=null;const ok=gameAct(m,s);if(!ok)render()}
+function uiAct(m){const me=viewSeat();const s=m.seat!=null?m.seat:me;UI.menu=null;if(m.act==='sell')UI.sell=null;if(G&&G.mode==='net'&&typeof netAct==='function'){netAct(m);render();return}const ok=gameAct(m,s);if(!ok)render()}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-a],[data-card],[data-start],[data-set],[data-opp]');if(!t)return;
   if(t.dataset.mv){uiAct(JSON.parse(t.dataset.mv));return}
   const a=t.dataset.a;
+  if(typeof netClick==='function'&&(a&&/^net/.test(a)||(a==='new'&&G&&G.mode==='net'))){netClick(a==='new'?'netnew':a);return}
   if(a==='close'){UI.menu=null;UI.zoom=null;UI.rules=false;if(GX.open==='dkCard')GX.close();render();return}
   if(a==='askmenu'){UI.menu={ask:true};render();return}
   if(a==='sellmode'){UI.sell=[];render();return}
@@ -255,6 +258,7 @@ GX.drawer('dkOpp','Rivals: gear and cards',$('#dkOppBody'),true);
 GX.drawer('dkCard','Card',$('#dkCardBody'));
 GX.drawer('dkRules','How to play',$('#dkRulesBody'),true);$('#dkRulesBody').innerHTML=rulesHTML();
 GX.drawer('dkMenu','Menu',$('#dkMenuBody'));
+GX.drawer('dkNet','🌐 Online game',$('#dkNetBody'));
 $('#speedbtn').innerHTML=SPEEDN(UI.speed);$('#hintbtn').innerHTML=ic('hint')+' '+(UI.hints?'On':'Off');if(typeof GFX!=='undefined'){GFX.init();syncGfxBtn()}
 GX.onClose=id=>{if(id==='dkCard'&&((UI.menu&&UI.menu.card!=null)||UI.zoom!=null)){UI.menu=null;UI.zoom=null;if(G)render()}};
 render();

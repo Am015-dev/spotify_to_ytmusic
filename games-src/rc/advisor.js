@@ -1,7 +1,7 @@
 // ---------- the advisor: today's priorities in plain words, each with a one-tap "Do it" ----------
 // One source of truth: priorities() decides what matters, doJob() is the only way the advisor places pawns
 // (it never leaves an illegal plan), and suggestPlan() fills the priorities in order before the computer adds the rest.
-function humanFree(){const hs=new Set(G.chars.filter(c=>c.human).map(c=>c.i));const placed=placedIds();return allPawns().filter(p=>!placed.has(p.id)&&(p.c==null||hs.has(p.c)))}
+function humanFree(){const hs=new Set(G.chars.filter(c=>c.human).map(c=>c.i));const placed=placedIds();const hm=typeof helperMine!=='function'||helperMine();return allPawns().filter(p=>!placed.has(p.id)&&(p.c==null?hm:hs.has(p.c)))}
 function jobPlanned(type,tgt){const key=JSON.stringify(tgt);return G.plan.acts.some(a=>a.type===type&&JSON.stringify(a.tgt)===key)}
 const lifeLeft=c=>CHARS[c.k].die-c.w;
 const NEAR_DEATH=3;
@@ -17,7 +17,7 @@ function nextFirst(){const n=G.chars.length;if(n<2)return firstC();let i=G.first
 // On any problem the plan is put back exactly as it was and the reason is returned.
 function doJob(type,tgt,alt,lead){if(!planOpen())return 'not planning now';
   const snap=JSON.stringify(G.plan),la=UI.lastAct;const fail=m=>{G.plan=JSON.parse(snap);UI.lastAct=la;return m};
-  if(lead!=null&&!P(lead).human)return `${P(lead).nm} is a computer castaway and plans their own pawns.`;
+  if(lead!=null&&!P(lead).human)return hum(P(lead))?`Another player plans the ${P(lead).nm}.`:`${P(lead).nm} is a computer castaway and plans their own pawns.`;
   const n=actNeed({type,tgt,alt:alt||0,pw:[]});const free=humanFree();
   const chars=free.filter(p=>p.c!=null&&!P(p.c).npc&&!placeWhy(p.id,type,tgt,alt));
   // the healthiest castaway leads; someone close to death is kept for resting
@@ -69,7 +69,7 @@ function allPriorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.
   const need=eatersNeed(),have=food(),planF=plannedFood();
   // near death: the hard rule
   for(const c of living()){if(c.npc||c.out)continue;const life=lifeLeft(c);if(!nearDeath(c))continue;
-    add({w:100,red:true,icon:'😴',title:`${c.nm} must rest: ${life} ${life>1?'wounds':'wound'} from death`,why:`${c.human?'Put one of '+c.nm+'’s pawns on Rest':c.nm+' (computer) rests by itself'}: rest heals 1. If anyone dies, you all lose.`,act:{type:'rest',tgt:null},lead:c.i,done:restPlanned(c.i),confirm:`⚠ ${c.nm} is ${life} ${life>1?'wounds':'wound'} from death and not resting.`})}
+    add({w:100,red:true,icon:'😴',title:`${c.nm} must rest: ${life} ${life>1?'wounds':'wound'} from death`,why:`${c.human?'Put one of '+c.nm+'’s pawns on Rest':hum(c)?c.nm+'’s player should put a pawn on Rest':c.nm+' (computer) rests by itself'}: rest heals 1. If anyone dies, you all lose.`,act:{type:'rest',tgt:null},lead:c.i,done:restPlanned(c.i),confirm:`⚠ ${c.nm} is ${life} ${life>1?'wounds':'wound'} from death and not resting.`})}
   // food for tonight
   const short=need-have-planF;
   if(short>0){const fo=foodOpts();const f=fo[0];const enough=f&&f.food>=need-have-planF;

@@ -44,7 +44,7 @@ const SCEN={
     else if(n===3){lg('Masts and spars wash up: you can make rope from them.','good');if(!has('rope'))completeInv('rope',null,true)}
     else{lg('The wreck of a balloon: good cloth.','good');gain('fur',2,ctx)}},
   specials:{ada:{n:'Row out and rescue Ada',dice:'explore',advWound:1,why(){if(G.sc.rescued)return 'Ada is already safe';if(!has('jraft'))return 'build the Rescue Raft first';return null},
-    win(ctx){G.sc.rescued=true;const c={i:G.chars.length,k:'ada',nm:'Ada',w:G.sc.ada,det:0,dead:false,used:{},sp:{},cov:[],human:G.chars.some(x=>x.human),lv:'normal',pawnMinus:0,only:null,noSkills:true,out:null,rr:0,rrNext:0,pmNext:0,npc:1};G.chars.push(c);lg('⛵ Ada is safe in camp! She can only rest, but she eats and feels the weather like everyone.','big');fx('build');SCEN.stranded.check()}}},
+    win(ctx){G.sc.rescued=true;const c={i:G.chars.length,k:'ada',nm:'Ada',w:G.sc.ada,det:0,dead:false,used:{},sp:{},cov:[],human:G.chars.some(hum),lv:'normal',pawnMinus:0,only:null,noSkills:true,out:null,rr:0,rrNext:0,pmNext:0,npc:1};if(G.net){c.hh=false;c.human=false}G.chars.push(c);lg('⛵ Ada is safe in camp! She can only rest, but she eats and feels the weather like everyone.','big');fx('build');SCEN.stranded.check()}}},
   afterWeather(){},
   night(){if(!G.sc.rescued){G.sc.ada+=2;lg(`Out on the rock, Ada suffers through the night (${G.sc.ada}/${CHARS.ada.die}).`,'bad');if(G.sc.ada>=CHARS.ada.die){G.over={win:false,why:'Ada did not survive on the rock.'};lg('☠ Ada is gone. The castaways have lost.','bad');fx('lose')}}},
   built(){},

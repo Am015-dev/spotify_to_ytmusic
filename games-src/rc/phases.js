@@ -236,7 +236,7 @@ FN.night=fr=>{G.phase='night';beat('night');lg('Night falls.','step');fx('night'
   const need=eaters.length;const have=G.res.food+G.res.pfood;
   if(have>=need){pay('food',need,[],true);lg(`Everyone eats (${need} food).`)}else{const hungry=need-have;pay('food',have,[],true);
     const o=eaters.slice().sort((a,b)=>(CHARS[b.k].die-b.w)-(CHARS[a.k].die-a.w));const starve=o.slice(0,hungry);
-    if(eaters.some(c=>c.human)&&hungry<eaters.length){push({f:'fn',k:'night2'});ask('team',`Only ${have} food for ${need} castaways. Who goes hungry (2 wounds each)?`,combos(eaters,hungry).map(g=>({l:g.map(c=>c.nm).join(' and '),frames:[{f:'fn',k:'starve',ids:g.map(c=>c.i)}]})),{kind:'starve'});return}
+    if(eaters.some(hum)&&hungry<eaters.length){push({f:'fn',k:'night2'});ask('team',`Only ${have} food for ${need} castaways. Who goes hungry (2 wounds each)?`,combos(eaters,hungry).map(g=>({l:g.map(c=>c.nm).join(' and '),frames:[{f:'fn',k:'starve',ids:g.map(c=>c.i)}]})),{kind:'starve'});return}
     for(const c of starve)wound(c,2,'hunger')}
   push({f:'fn',k:'night2'})};
 function combos(arr,k){const out=[];const go=(s,acc)=>{if(acc.length===k){out.push(acc.slice());return}for(let i=s;i<arr.length;i++){acc.push(arr[i]);go(i+1,acc);acc.pop()}};go(0,[]);return out.slice(0,20)}
@@ -262,7 +262,7 @@ FN.nheal=fr=>{const who=living().filter(c=>c.w>0).sort((a,b)=>(a.w/CHARS[a.k].di
 FN.night3=fr=>{if(G.over)return;G.items=G.items.filter(i=>i.uses>0);
   push({f:'fn',k:'night4'});
   // optionally move the camp
-  const alt=MAP[G.camp.pos].adj.filter(p=>tileAt(p)&&!G.map[p].fog);if(alt.length&&G.chars.some(c=>c.human)&&G.moveAsk){G.moveAsk=0;push({f:'fn',k:'moveCamp'})}else if(alt.length&&!G.chars.some(c=>c.human)){const p=aiMoveCamp();if(p!=null)push({f:'fn',k:'doMove',p})}};
+  const alt=MAP[G.camp.pos].adj.filter(p=>tileAt(p)&&!G.map[p].fog);if(alt.length&&G.chars.some(hum)&&G.moveAsk){G.moveAsk=0;push({f:'fn',k:'moveCamp'})}else if(alt.length&&!G.chars.some(hum)){const p=aiMoveCamp();if(p!=null)push({f:'fn',k:'doMove',p})}};
 FN.night4=fr=>{if(G.over)return;SC().night&&SC().night();if(G.over)return;
   if(!hasShelter()){lg('No shelter: everyone sleeps in the open.','bad');for(const c of living())if(!c.out)wound(c,1,'sleeping in the open')}
   for(const c of G.chars)if(c.out&&!c.dead){wound(c,1,'a night in the wild')}

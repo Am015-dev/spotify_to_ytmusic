@@ -494,10 +494,11 @@ const maxDist=()=>Math.max(220,V3.fitDist*1.6);
 // place the camera from the orbit state (C) and optional shake
 function placeCam(sx,sy,C){C=C||V3.cam;V3.camera.position.set(C.tx+Math.sin(C.yaw)*Math.cos(C.pitch)*C.dist+(sx||0),Math.sin(C.pitch)*C.dist+(sy||0),C.tz+Math.cos(C.yaw)*Math.cos(C.pitch)*C.dist);V3.camera.lookAt(C.tx,0,C.tz)}
 // fit the camera so the whole 91.4 x 91.4 mat (plus the height of the ships' name plates) fills the board at any aspect ratio
-function fitCam(k){if(!V3.camera)return;const C=V3.cam,cam=V3.camera,top=k==='top';const asp=V3.camera.aspect||1.6;Object.assign(C,{yaw:0,pitch:top?1.45:.98+Math.max(0,Math.min(1,(1.45-asp)/.5))*.22,tx:45.7,tz:45.7,dist:C.dist||122});
+function fitCam(k){if(!V3.camera)return;const C=V3.cam,cam=V3.camera,top=k==='top';const asp=V3.camera.aspect||1.6;// online, side 1 sees the mat from its own edge
+  const yaw=typeof NET!=='undefined'&&NET.on&&NET.mySide===1?Math.PI:0,sg=Math.cos(yaw);Object.assign(C,{yaw,pitch:top?1.45:.98+Math.max(0,Math.min(1,(1.45-asp)/.5))*.22,tx:45.7,tz:45.7,dist:C.dist||122});
   const pts=[];for(const x of [0,91.4])for(const z of [0,91.4])for(const y of (top?[0]:[0,9]))pts.push(new THREE.Vector3(x,y,z));const lim=.95;
   for(let it=0;it<60;it++){placeCam();cam.updateMatrixWorld();let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const p of pts){const q=p.clone().project(cam);a=Math.min(a,q.x);b=Math.max(b,q.x);c=Math.min(c,q.y);d=Math.max(d,q.y)}
-    const ext=Math.max((b-a)/2,(d-c)/2)/lim;C.dist*=1+(ext-1)*.8;C.tz-=(c+d)/2*25;C.tx+=(a+b)/2*25;if(Math.abs(ext-1)<.002&&Math.abs(c+d)<.004)break}
+    const ext=Math.max((b-a)/2,(d-c)/2)/lim;C.dist*=1+(ext-1)*.8;C.tz-=sg*(c+d)/2*25;C.tx+=sg*(a+b)/2*25;if(Math.abs(ext-1)<.002&&Math.abs(c+d)<.004)break}
   V3.fitDist=C.dist}
 // switching views eases the camera over ~0.7 s (instant with reduced motion); resizes snap so the mat always fits
 function camView(k){const from=V3.camera&&V3.on?Object.assign({},V3.cam):null;V3.view=k;if(typeof UI!=='undefined')UI.top=k==='top';fitCam(k);
@@ -592,7 +593,7 @@ function loop3D(now){(PH?PH.raf:requestAnimationFrame)(loop3D);if(!V3.on)return;
   if(V3.gas&&!reduce)V3.gas.children.forEach(s=>s.material.rotation+=s.userData.spin*dt);if(V3.planet)V3.planet.rotation.y+=dt*.004;
   for(let i=V3.later.length-1;i>=0;i--){if(now>=V3.later[i].t){const f=V3.later[i].fn;V3.later.splice(i,1);try{f()}catch(e){}}}
   const cur=G&&G.cur,sel=typeof UI!=='undefined'?UI.sel:null;let nMove=0,easing=false;
-  for(const id in V3.ships){const m=V3.ships[id],a=V3.anim[id];const s=ship(id);const U=m.userData;
+  for(const id in V3.ships){const m=V3.ships[id],a=V3.anim[id];const s=G?ship(id):null;const U=m.userData;// G is null in an online lobby between battles
     if(a&&a.boom){if(now<a.t0)continue;const k=(now-a.t0)/a.dur;U.mdl.scale.multiplyScalar(.95);U.mdl.rotation.x+=dt*6;U.mdl.rotation.z+=dt*3;if(k>.25)U.mdl.visible=false;if(k>=1){m.visible=false;delete V3.anim[id]}continue}
     let moving=false;if(a&&a.path)nMove++;
     if(a&&a.path&&a.path.length<2){delete V3.anim[id]}

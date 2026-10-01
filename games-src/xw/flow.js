@@ -15,6 +15,8 @@ function guideBtn(){const b=document.querySelector('.na-guide');if(b){const on=g
 function sumPending(){return !!(G&&!G.winner&&G.phase==='plan'&&planSide()>=0&&G.round>=2&&UI.sumSeen<G.round-1&&!UI.info)}
 function roundShown(){return G?(sumPending()?G.round-1:G.round):0}
 function stepShown(){if(!G)return 0;if(G.winner)return 5;if(G.round===0)return 0;if(sumPending())return 4;return G.phase==='plan'?1:Math.min(4,G.step||1)}
+// guided pauses stop the host's engine, so online games never pause
+const holdOK=()=>ANIM&&!(typeof NET!=='undefined'&&NET.on);
 const mine=s=>s&&isHuman(s.side)&&(typeof NET==='undefined'||!NET.on||s.side===NET.mySide);
 const nm=s=>esc(s.name);
 const youTag=s=>mine(s)&&soloSide()>=0?' (you)':'';
@@ -48,7 +50,7 @@ function renderQueue(){const el=$('queue');if(!el)return;const q=queueData();if(
 }
 // ---- notices: lost actions, no shot, rocks, forced moves (from the battle log; the log itself is unchanged) ----
 function addNote(n){flowSync();const R=G.round;const L=(UI.notes[R]=UI.notes[R]||[]);if(L.some(x=>x.id===n.id&&x.kind===n.kind))return null;n.r=R;n.t0=Date.now();L.push(n);
-  const s=ship(n.id);if(n.hold&&s&&mine(s)&&guided()&&ANIM&&!G.winner&&!UI.hold)UI.hold={kind:'note',n};return n}
+  const s=ship(n.id);if(n.hold&&s&&mine(s)&&guided()&&holdOK()&&!G.winner&&!UI.hold)UI.hold={kind:'note',n};return n}
 const _lgF=lg;lg=function(side,t){_lgF(side,t);try{if(G)flowLog(side,t)}catch(e){}};
 function flowLog(side,t){let m;const by=n=>byName(n,side);
   if(m=t.match(/^(.+) bumps into (.+) and skips its action\./)){const s=by(m[1]);if(s)addNote({id:s.id,kind:'bump',lost:true,hold:true,t:`<b>${nm(s)}${youTag(s)} bumped into ${esc(m[2])}: action lost.</b> Why: its move ended on top of ${esc(m[2])}, so it stopped short and skips its action. Ships that touch can't shoot each other this round.`,tip:'Next time pick a shorter, longer or sideways move so the bases do not overlap.'});return}
@@ -73,7 +75,7 @@ function noShotText(s){const en=enemiesOf(s);const why=en.length?en.map(e=>`${nm
 const _nextAttacker=nextAttacker;nextAttacker=function(){let pause=false;
   try{if(G&&!G.winner&&G.order){for(let i=G.oi;i<G.order.length;i++){const s=ship(G.order[i]);if(!s)continue;const psNow=psOf(s);
       if((s.alive||s.flags.dyingPS===psNow)&&!s.fired&&weaponsFor(s).length)break;
-      if(s.alive&&!s.fired){const n=addNote({id:s.id,kind:'noshot',t:noShotText(s),tip:'Plan a move that ends with an enemy in front of you, at range 1-3.'});if(n&&mine(s)&&guided()&&ANIM&&!UI.hold){UI.hold={kind:'note',n};pause=true}}}}}catch(e){}
+      if(s.alive&&!s.fired){const n=addNote({id:s.id,kind:'noshot',t:noShotText(s),tip:'Plan a move that ends with an enemy in front of you, at range 1-3.'});if(n&&mine(s)&&guided()&&holdOK()&&!UI.hold){UI.hold={kind:'note',n};pause=true}}}}}catch(e){}
   if(pause){UI.holdK.push(()=>_nextAttacker());refresh();return}return _nextAttacker()};
 // guided pauses: the engine's own "later" steps wait while a pause box is up (the computer waits too)
 for(const f of ['nextActivationLater','nextAttackerLater']){const o=window[f];if(typeof o!=='function')continue;window[f]=function(){const a=arguments;if(UI.hold&&ANIM&&G&&!G.winner){UI.holdK.push(()=>o.apply(null,a));return}return o.apply(null,a)}}
@@ -81,7 +83,7 @@ const _schedF=schedule;schedule=function(){if(UI.hold&&G&&!G.winner)return;retur
 function releaseHold(){UI.hold=null;const ks=UI.holdK.splice(0);render();for(const k of ks)try{k()}catch(e){console.error(e)}schedule()}
 // a finished attack that involved a human ship: in guided mode it pauses on the result
 function flowWatch(){flowSync();if(!G)return;if(G.winner&&UI.hold){UI.hold=null;UI.holdK=[]}const R=UI.results[0];
-  if(R&&R.t>UI.resSeen){UI.resSeen=R.t;const a=ship(R.a),d=ship(R.d);if(guided()&&ANIM&&!G.winner&&!UI.hold&&(mine(a)||mine(d)))UI.hold={kind:'res',R}}
+  if(R&&R.t>UI.resSeen){UI.resSeen=R.t;const a=ship(R.a),d=ship(R.d);if(guided()&&holdOK()&&!G.winner&&!UI.hold&&(mine(a)||mine(d)))UI.hold={kind:'res',R}}
   if(G.phase!=='plan'&&UI.draftR!==G.round)UI.draftR=null;if(G.phase==='plan'&&UI.draftR!==G.round){UI.draft={};UI.draftR=G.round}}
 function holdHTML(){const H=UI.hold;const g=guided();let h='';
   if(H.kind==='res'){const R=H.R;const a=ship(R.a),d=ship(R.d);h+=`<p class="head">Combat · attack result</p>${stepList(['Choose a target','Roll and modify dice','Result'],2)}${resultHTML(R)}${R.dice?`<div class="drow"><span class="dl">Attack dice · ${esc(shortName(a))}</span><div class="dice">${R.dice.map(f=>die(f,'atk')).join('')||'<i class="muted small">none</i>'}</div></div><div class="drow"><span class="dl">Defence dice · ${esc(shortName(d))}</span><div class="dice">${R.def.map(f=>die(f,'def')).join('')||'<i class="muted small">none</i>'}</div></div>`:''}`;

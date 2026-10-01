@@ -6,7 +6,7 @@ This folder holds the source for the games in `../games/`. Each game is built in
 
 ```sh
 cd games-src
-npm install                   # three@0.158 (inlined into builds), jsdom (headless tests)
+npm install                   # three@0.158 (inlined into builds), jsdom (headless tests), trystero + esbuild + ws (online play)
 npm install -g playwright     # only for the layout checks and screenshot scripts
 ```
 
@@ -71,6 +71,29 @@ Run them from each game's folder unless noted, and read the header of each scrip
   - the idle battery saver.
   
   `perf/INTEGRATE.md` explains how to add it to a game.
+
+## Online play (free, peer to peer)
+
+Every game can be played online with friends without a server:
+- **Finding each other:** players meet through public Nostr relays, which only see an encrypted handshake.
+- **Playing:** after that, moves go directly between the browsers over WebRTC.
+
+The files:
+- **`net/trystero.min.js`:** Trystero 0.25.4 (MIT, see `net/TRYSTERO-LICENSE.txt`), bundled from `net/entry.mjs` with `npx esbuild net/entry.mjs --bundle --format=iife --global-name=Trystero --minify`. The file then gets a one-line guard so it only loads where WebRTC exists (jsdom has none).
+- **`net/netroom.js`:** a small room layer with the same shape as the claude.ai room capability. It handles lobby, presence, broadcast, per-peer send, leave on tab close, and stable per-browser ids for rejoining.
+- **`<game>/net.js`:** each game's online layer.
+  - The host's page runs the rules and the computer players.
+  - Clients render what the host sends and send back small move messages.
+  - The host checks every move and applies it through the same code path a local player uses.
+  - Hidden information (hands, dials, deck order, the random seed) is removed from what each client receives.
+  - Each game's `ONLINE-REPORT.md` describes its seat model, simultaneous decisions, host migration and test results.
+
+Tests:
+- **Over real WebRTC:** `net/p2p-<game>.js` plays full games between separate Chromium contexts, using a local relay (`node net/relay.js <port>`, started by the scripts).
+  - The pages are served from a fake `https://gns.test/` origin, and everything else is blocked.
+  - Each script's header lists its options: leave, rejoin, bad moves, host leaving, screenshots.
+- **Transport only:** `net/rj.js` checks leave and rejoin.
+- Real relays and real networks can only be tested from a normal browser. Some strict networks block direct connections and would need a TURN server, which can be set with `window.NETROOM_TURN`.
 
 ## The shelf and the reference page
 

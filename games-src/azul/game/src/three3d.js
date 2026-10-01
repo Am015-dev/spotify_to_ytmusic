@@ -242,7 +242,7 @@ function makeSunToken(){const g=new THREE.Group();const brass=emat(new THREE.Mes
   const sh=new THREE.Mesh(V3.blobGeo||new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:V3.T.blob,transparent:true,depthWrite:false,opacity:.7}));sh.scale.setScalar(.95);sh.position.y=.004;g.add(sh);
   V3.sunTok=g;V3.scene.add(g);g.userData={pos:new THREE.Vector3()}}
 // ---------- layout: kiln ring and player boards, chosen to fill the current board area ----------
-function focusSeat(){if(!G)return 0;const s=sideToAct();if(s>=0&&P(s).human)return s;if(UI.lastHuman!=null&&P(UI.lastHuman)&&P(UI.lastHuman).human)return UI.lastHuman;const h=G.pl.find(p=>p.human);return h?h.i:(s>=0?s:0)}
+function focusSeat(){if(!G)return 0;if(NET.on&&NET.mySeat>=0&&P(NET.mySeat))return NET.mySeat;const s=sideToAct();if(s>=0&&P(s).human)return s;if(UI.lastHuman!=null&&P(UI.lastHuman)&&P(UI.lastHuman).human)return UI.lastHuman;const h=G.pl.find(p=>p.human);return h?h.i:(s>=0?s:0)}
 function ringGeom(n){const RR=Math.max(4.6,n*(2*KR+.5)/(2*Math.PI));return {RR,cr:RR-KR-.25,out:RR+KR}}
 function computeLayout(w,h){const n=G?G.fac.length:5,np=G?G.np:2;const ring=ringGeom(n);const R=ring.out+.4;const me=focusSeat();const gp=1.2;
   const others=[];for(let k=1;k<np;k++)others.push((me+k)%np);const cands=[];const narrow=w<700;
@@ -372,7 +372,7 @@ function boardTexture(pi){const c=mkCanvas(BW*100,BH*100);const t=texOf(c,true);
 function paperCanvas(W,H){const c=mkCanvas(W,H),x=c.getContext('2d');const R=rng(33);for(let i=0;i<260;i++){const cx=R()*W,cy=R()*H,r=30+R()*140;const g=x.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,R()<.4?'rgba(255,250,235,.06)':'rgba(150,110,60,.07)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(cx-r,cy-r,2*r,2*r)}
   for(let i=0;i<W;i+=3){x.fillStyle=`rgba(120,90,50,${.018+R()*.02})`;x.fillRect(i,0,1,H)}for(let j=0;j<H;j+=3){x.fillStyle=`rgba(120,90,50,${.018+R()*.02})`;x.fillRect(0,j,W,1)}return c}
 function star8(x,cx,cy,r){x.beginPath();for(let i=0;i<16;i++){const a=i*Math.PI/8,q=i%2?r*.45:r;x.lineTo(cx+Math.cos(a)*q,cy+Math.sin(a)*q)}x.closePath()}
-function paintBoard(o,pi){const GG=G||{ex:{},pl:[{nm:PNAMES[0],score:0,human:1},{nm:PNAMES[1],score:0,human:0,lv:'normal'}],markerIn:null};const p=GG.pl[pi];if(!p)return;const act=!!G&&sideToAct()===pi&&G.phase==='offer';const key=[p.nm,p.score,p.human,p.lv,GG.ex.gray,act,GG.markerIn===pi,V3.fontOK,!!G].join('|');if(o.key===key)return;o.key=key;
+function paintBoard(o,pi){const GG=G||{ex:{},pl:[{nm:PNAMES[0],score:0,human:1},{nm:PNAMES[1],score:0,human:0,lv:'normal'}],markerIn:null};const p=GG.pl[pi];if(!p)return;const act=!!G&&sideToAct()===pi&&G.phase==='offer';const you=!!G&&!!p.human&&isYou(pi);const key=[p.nm,p.score,p.human,p.lv,GG.ex.gray,act,GG.markerIn===pi,V3.fontOK,!!G,you].join('|');if(o.key===key)return;o.key=key;
   const c=o.c,x=c.getContext('2d'),S=100,W=c.width,H=c.height;const X=v=>(v+BW/2)*S,Z=v=>(v+BH/2)*S;const pc=PCOL[pi];const FH='"Cormorant Garamond",Georgia,serif';
   x.fillStyle='#e6d6b4';x.fillRect(0,0,W,H);if(!V3.paper)V3.paper=paperCanvas(W,H);x.drawImage(V3.paper,0,0);
   // printed border: cobalt band with gold stars and hairlines
@@ -383,7 +383,7 @@ function paintBoard(o,pi){const GG=G||{ex:{},pl:[{nm:PNAMES[0],score:0,human:1},
   x.strokeStyle=act?'#ffe27a':'#d9a441';x.lineWidth=act?6:3;if(act){x.shadowColor='#ffd24a';x.shadowBlur=18}rr2(x,56,48,W-112,76,12);x.stroke();x.shadowBlur=0;
   x.strokeStyle='rgba(255,248,230,.45)';x.lineWidth=1.5;rr2(x,64,56,W-128,60,8);x.stroke();
   x.fillStyle='#fff8ea';x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=4;x.shadowOffsetY=2;x.font=`700 52px ${FH}`;x.textBaseline="middle";x.textAlign="left";
-  x.fillText(p.nm+(p.human?(GG.pl.filter(q=>q.human).length===1?'  (you)':''):'  ·  '+p.lv+' computer'),88,88);x.shadowBlur=0;x.shadowOffsetY=0;
+  x.fillText(p.nm+(p.human?(G?(you?'  (you)':''):(GG.pl.filter(q=>q.human).length===1?'  (you)':'')):'  ·  '+p.lv+' computer'),88,88);x.shadowBlur=0;x.shadowOffsetY=0;
   if(act){const sx=W-210,sy=86;x.fillStyle='#ffd24a';x.fill(new Path2D(rays(sx,sy,12,12,24,4)));x.beginPath();x.arc(sx,sy,11,0,7);x.fill()}
   // score medallion
   const mx=W-118,my=86;const mg=x.createRadialGradient(mx-12,my-14,6,mx,my,52);mg.addColorStop(0,'#fff0b0');mg.addColorStop(.6,'#e0a53a');mg.addColorStop(1,'#9a6418');x.fillStyle=mg;x.shadowColor='rgba(0,0,0,.35)';x.shadowBlur=8;x.shadowOffsetY=3;x.beginPath();x.arc(mx,my,50,0,7);x.fill();x.shadowBlur=0;x.shadowOffsetY=0;

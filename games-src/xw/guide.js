@@ -50,7 +50,7 @@ function recOpt(q){if(q.key==='rock'){let best=q.opts[0],bv=1e9;for(const o of q
   if(q.key==='deploy'){let best=q.opts[0],bv=1e9;for(const o of q.opts){const n=+String(o.l).slice(5);const v=Math.abs(n-5);if(v<bv){bv=v;best=o}}return {o:best,why:best.l==='Spot 5'?'the centre: start central so you can turn either way':'the free spot nearest the centre, so you can turn either way'}}
   return {o:q.opts[0],why:''}}
 // Auto-place answers every remaining setup question of the human side at once, with the recommended spot
-function autoPlaceAll(){let guard=0;while(G&&G.round<1&&!G.winner&&G.phase==='ask'&&G.q&&['rock','deploy'].includes(G.q.key)&&humanTurn()&&guard++<40){const kid=G.q.kid;uiAct({act:'ask',k:recOpt(G.q).o.k});if(G.q&&G.q.kid===kid)break}render()}
+function autoPlaceAll(){if(typeof isClient==='function'&&isClient()){if(humanTurn())netSend({act:'autoplace'});return}let guard=0;while(G&&G.round<1&&!G.winner&&G.phase==='ask'&&G.q&&['rock','deploy'].includes(G.q.key)&&humanTurn()&&guard++<40){const kid=G.q.kid;uiAct({act:'ask',k:recOpt(G.q).o.k});if(G.q&&G.q.kid===kid)break}render()}
 // ---- suggestion with its reason and its cost ----
 function sugInfo(s,i){const m0=dialOf(s)[i],m=exColor(s,m0),b=B(s),p=finalPose(s,b,m0);const en=enemiesOf(s);
   const mine=en.map(e=>{const r=arcReach(p,b,e,B(e),s.arc);return r&&rangeOf(r.d)<=3?{e,rg:rangeOf(r.d)}:null}).filter(Boolean).sort((x,y)=>x.rg-y.rg);

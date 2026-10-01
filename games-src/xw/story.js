@@ -43,7 +43,8 @@ const SORTIES=[
 function campaign(){try{return JSON.parse(localStorage.getItem('na_camp')||'null')||{i:0,won:0}}catch(e){return {i:0,won:0}}}
 function saveCampaign(c){try{localStorage.setItem('na_camp',JSON.stringify(c))}catch(e){}}
 // the side the single human plays (solo mode), else -1
-function soloSide(){if(!G)return -1;const h=[0,1].filter(k=>G.players[k].human);return h.length===1?h[0]:-1}
+function soloSide(){if(!G)return -1;if(typeof NET!=='undefined'&&NET.on)return NET.mySide;// online: this page's own side (-1 when watching)
+  const h=[0,1].filter(k=>G.players[k].human);return h.length===1?h[0]:-1}
 function briefingHTML(){const me=soloSide()>=0?soloSide():0,fo=1-me;const mine=G.ships.filter(s=>s.side===me),foe=G.ships.filter(s=>s.side===fo);const so=G.sortie!=null?SORTIES[G.sortie]:null;
   const lead=mine.slice().sort((a,b)=>b.ps-a.ps)[0],boss=foe.slice().sort((a,b)=>(PILOTS[b.pilot].uniq?1:0)-(PILOTS[a.pilot].uniq?1:0)||b.ps-a.ps)[0];
   const F=k=>FACTIONS[G.fac[k]].n;

@@ -132,5 +132,15 @@ body{background:#4a2e1c}
 @keyframes mpop{from{opacity:0;transform:translateY(10px) scale(.975)}to{opacity:1;transform:none}}
 .seg button{background:linear-gradient(#fffdf8,#f3e6cc);box-shadow:var(--sh1);transition:transform .12s}.seg button.on{background:linear-gradient(#d4744a,#a9492a);color:#fff;border-color:#833619}
 @media (prefers-reduced-motion:reduce){.mbox{animation:none}.btn,.gx-ibtn,.hc{transition:none}}
+/* online play */
+.online{border-top:1px solid #d6bf94;padding-top:8px;display:flex;flex-direction:column;gap:6px}.online h3{margin:0}.online p{margin:0}
+.orow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.orow input{flex:1 1 150px;min-width:0;font:inherit;padding:0 10px;border:1px solid #d6bf94;border-radius:10px;background:#fffdf7;height:42px;box-sizing:border-box}.orow .btn{flex:0 0 auto;min-height:42px;padding-top:4px;padding-bottom:4px}
+.netna{color:var(--mut);margin:0}.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:1.15em;letter-spacing:.08em;color:var(--terra)}
+.mbox.lobby{position:relative;max-width:480px}.mbox.lobby h2{padding-right:40px}.mbox.lobby p,.mbox.lobby h3{margin:0}.mx{position:absolute;right:8px;top:8px}
+.invrow{display:flex;gap:6px;margin-top:4px}.invrow input{flex:1 1 auto;min-width:0;font:inherit;font-size:.85rem;padding:6px 9px;border:1px solid #d6bf94;border-radius:9px;background:#fffdf7}.invrow .btn{flex:0 0 auto}
+.plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}.plist li{display:flex;align-items:center;gap:7px}.plist i{width:13px;height:13px;border-radius:4px;background:var(--pc)}.plist small{color:var(--mut)}
+.nstat{color:var(--mut);display:flex;align-items:center;gap:6px}.dotp{width:9px;height:9px;border-radius:50%;background:var(--gold);animation:dotp 1.2s infinite alternate}@keyframes dotp{from{opacity:.3}to{opacity:1}}
+.lobby .hint{color:var(--mut)}.lobby .tip{color:var(--mut);font-style:italic}.lobby .warn,.online .warn{color:var(--bad);font-weight:600}
+.wait{color:var(--mut);font-style:italic;margin:.3rem 0 0}.stat small.you{color:var(--terra);display:inline}.netst.bad{color:#ffb4a0}
 </style>
 </head>

@@ -4,10 +4,12 @@ UI.sel=null;UI.tgt=null;UI.adv=null;UI.recap=[];UI.fxSeen=0;UI.hover=null;UI.las
 try{UI.coach=localStorage.getItem('sgz_coach')!=='0'}catch(e){UI.coach=true}
 const CHAPTERS=['The king’s first commission: the north wall','Morning light on the fountain court','The king inspects the east wall','Dust and glaze in the south arcade','The west wall catches the sunset','The whole court gathers to watch','Lanterns over the throne-room gallery','One last wall before the feast'];
 const chapter=r=>`Round ${r}: ${CHAPTERS[Math.min(r,CHAPTERS.length)-1]}`;
-function refresh(){if(G){try{if(!G.over&&G.pl.some(p=>p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
+function refresh(){if(G&&!NET.on){try{if(!G.over&&G.pl.some(p=>p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G){render();return}const h=me();if(h&&UI.lastHuman!==h.i){UI.lastHuman=h.i;if(V3.on)relayout()}
-  playFx();computeHL();render();try{sync3D();camFocus()}catch(e){console.error(e)}schedule()}
-const me=()=>{if(!G||G.over)return null;const s=sideToAct();return s>=0&&P(s).human?P(s):null};
+  playFx();computeHL();render();try{sync3D();camFocus()}catch(e){console.error(e)}schedule();netAfter()}
+const me=()=>{if(!G||G.over)return null;const s=sideToAct();if(NET.on&&s!==NET.mySeat)return null;return s>=0&&P(s).human?P(s):null};
+// online: is seat i this page's player? offline: the only human seat
+const isYou=i=>G&&(NET.on?i===NET.mySeat:G.pl.filter(q=>q.human).length===1&&!!P(i).human);
 const human=()=>G&&G.pl.some(p=>p.human);
 function pname(i){return `<span class="pc" style="color:${PCOL[i]};font-weight:800">${esc(P(i).nm)}</span>`}
 function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){const x=f.x;try{V3fx(f)}catch(e){}
@@ -36,16 +38,16 @@ function render(){renderModal();if(!G)return;renderDock();renderPopups();renderM
   const pb=$('#pausebtn');if(pb){pb.hidden=human();const h=IC(UI.pause?'play':'pause');if(pb.dataset.h!==h){pb.innerHTML=h;pb.dataset.h=h}}const sb=$('#speedbtn');if(sb){const h=IC('speed')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';if(sb.dataset.h!==h){sb.innerHTML=h;sb.dataset.h=h}}
   const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',!!UI.coach);
   const ch=$('#chip');if(ch){const s=sideToAct();ch.textContent=G.over?'The king’s judgement':`${innerWidth<700?'Round '+G.round:chapter(G.round)} · ${G.phase==='wall'?'setting the mosaics':s>=0?P(s).nm+' to play':''}`}}
-function scoresHtml(){const s=sideToAct();return `<div class="scores">${G.pl.map(p=>`<span class="sc ${p.i===s?'cur':''}" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)} ★${p.score}${G.markerIn===p.i?' ☀':''}</span>`).join('')}</div>`}
+function scoresHtml(){const s=sideToAct();return `<div class="scores">${G.pl.map(p=>`<span class="sc ${p.i===s?'cur':''}" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''} ★${p.score}${G.markerIn===p.i?' ☀':''}</span>`).join('')}</div>`}
 function thumbsHtml(){const f=focusSeat();const narrow=V3.on?(V3.L&&V3.L.name==='focus'):innerWidth<700;if(!narrow)return '';
   return `<div class="thumbs">${G.pl.filter(p=>p.i!==f).map(p=>`<button class="thumb" data-gx="plrd" style="--pc:${PCOL[p.i]}" aria-label="Open ${esc(p.nm)}'s board">${esc(p.nm)} ★${p.score}<svg viewBox="0 0 1240 940">${boardG(p,{})}</svg></button>`).join('')}</div>`}
 function btn(m,label,cls,extra){return `<button class="btn ${cls||''}" data-mv='${esc(JSON.stringify(m))}'${extra||''}>${label}</button>`}
 function renderDock(){const el=$('#dockbody');if(!el)return;const s=sideToAct();const p=s>=0?P(s):null;const hp=me();let h='';
-  const dt=$('#dockt');if(dt)dt.textContent=G.over?'The king’s judgement':hp?(G.pl.filter(q=>q.human).length>1?`${hp.nm}, your turn`:'Your turn'):p?`${p.nm} is choosing…`:G.phase==='wall'?'Setting the mosaics':'';
-  h+=`<div class="chapter">${esc(G.over?'The unveiling':chapter(G.round))}</div>`+scoresHtml()+thumbsHtml();
+  const dt=$('#dockt');if(dt)dt.textContent=G.over?'The king’s judgement':hp?(G.pl.filter(q=>q.human).length>1&&!NET.on?`${hp.nm}, your turn`:'Your turn'):p?(NET.on&&p.human?`Waiting for ${p.nm}…`:`${p.nm} is choosing…`):G.phase==='wall'?'Setting the mosaics':'';
+  h+=netDockHtml()+`<div class="chapter">${esc(G.over?'The unveiling':chapter(G.round))}</div>`+scoresHtml()+thumbsHtml();
   if(G.over){h+=endHtml();el.innerHTML=h;return}
   if(UI.recap.length)h+=`<div class="recap" aria-label="Recent moves">${UI.recap.slice(0,3).map(t=>`<div>${t}</div>`).join('')}</div>`;
-  if(!hp){h+=`<p class="muted">${p?`${esc(p.nm)} is choosing tiles…`:'The mosaics are being set…'}</p>`;if(UI.coach)h+=`<div class="coach"><span class="x">Watch the table: each glazier takes every tile of one glaze from one kiln or from the courtyard. When the kilns and courtyard are empty, full racks move one tile into the mosaic.</span></div>`;
+  if(!hp){h+=`<p class="muted">${p?(NET.on&&p.human?`Waiting for ${esc(p.nm)}…`:`${esc(p.nm)} is choosing tiles…`):'The mosaics are being set…'}</p>`;if(UI.coach)h+=`<div class="coach"><span class="x">Watch the table: each glazier takes every tile of one glaze from one kiln or from the courtyard. When the kilns and courtyard are empty, full racks move one tile into the mosaic.</span></div>`;
     h+=`<ol class="mini">${G.log.slice(0,3).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ol>${infoHtml()}`;el.innerHTML=h;return}
   GX.showDock();
   if(G.phase==='wall'){const q=G.wt.q;const L=hp.lines[q.r];const lc=lineColour(L);const isP=L.includes(PRISM);
@@ -77,10 +79,10 @@ function advHtml(){const hp=me();if(!hp)return '';if(!UI.adv)return `<div class=
   return `<div class="adv"><b>${IC('bulb')} Advice</b><p>${UI.adv.why}</p><div class="acts">${btn(UI.adv.m,'Do it','go')}<button class="btn ghost sm" data-ui="noadv">Dismiss</button></div></div>`}
 function endHtml(){const rows=G.over.scores;const L=[['place','Tiles set'],['floor','Breakage'],['rows','Rows +2'],['cols','Columns +7'],['colours','Full glazes +10'],['total','★ Total'],['fr','Complete rows (tie-break)']];
   if(UI.guideNote==null){let note='';if(UI.coach&&human()){let seen=null;try{seen=localStorage.getItem('sgz_guided')}catch(e){}if(!seen){try{localStorage.setItem('sgz_guided','1');localStorage.setItem('sgz_coach','0')}catch(e){}note='<p class="small muted">That was your guided first game: next time the guide starts switched off. The Guide button brings it back at any time.</p>'}}UI.guideNote=note}const note=UI.guideNote;
-  return `<div class="prompt"><h3>${IC('trophy')} ${esc(G.winText)}</h3><p class="muted">The king walks the courtyard in the evening light and names ${esc(G.winner)}’s mosaic the finest in the palace.</p><div class="tw"><table><tr><th></th>${rows.map(r=>`<th style="color:${PCOL[r.p]}">${esc(P(r.p).nm)}</th>`).join('')}</tr>${L.map(([k,n])=>`<tr class="${k==='total'?'tot':''}"><td>${n}</td>${rows.map(r=>`<td>${r.s[k]}</td>`).join('')}</tr>`).join('')}</table></div>${note}</div><div class="acts"><button class="btn go" data-ui="new">New game</button><button class="btn" data-gx="plrd">See the mosaics</button></div>`}
+  return `<div class="prompt"><h3>${IC('trophy')} ${esc(G.winText)}</h3><p class="muted">The king walks the courtyard in the evening light and names ${esc(G.winner)}’s mosaic the finest in the palace.</p><div class="tw"><table><tr><th></th>${rows.map(r=>`<th style="color:${PCOL[r.p]}">${esc(P(r.p).nm)}</th>`).join('')}</tr>${L.map(([k,n])=>`<tr class="${k==='total'?'tot':''}"><td>${n}</td>${rows.map(r=>`<td>${r.s[k]}</td>`).join('')}</tr>`).join('')}</table></div>${note}</div><div class="acts">${isClient()?'<span class="small muted">The host can start another game.</span>':'<button class="btn go" data-ui="new">New game</button>'}<button class="btn" data-gx="plrd">See the mosaics</button></div>`}
 // ---------- the board as SVG (2D view, drawers, thumbnails); units: 100 = one tile pitch ----------
 function boardG(p,o){o=o||{};const X=v=>(v+6.2)*100,Z=v=>(v+4.7)*100;const pi=p.i;let s=`<rect x="4" y="4" width="1232" height="932" rx="18" fill="#efe3c8" stroke="#8a5a2b" stroke-width="8"/><rect x="24" y="24" width="1192" height="92" rx="8" fill="${PCOL[pi]}"/>
-  <text x="50" y="86" font-size="56" font-weight="700" fill="#fff8ea" font-family="Georgia,serif">${esc(p.nm)}${p.human?'':' · '+p.lv}</text><text x="1190" y="88" text-anchor="end" font-size="62" font-weight="700" fill="#fff8ea" font-family="Georgia,serif">★ ${p.score}</text>`;
+  <text x="50" y="86" font-size="56" font-weight="700" fill="#fff8ea" font-family="Georgia,serif">${esc(p.nm)}${p.human?(NET.on&&G&&isYou(pi)?' (you)':''):' · '+p.lv}</text><text x="1190" y="88" text-anchor="end" font-size="62" font-weight="700" fill="#fff8ea" font-family="Georgia,serif">★ ${p.score}</text>`;
   const hl=o.hl||{};const ghost={};for(const g of hl.ghost||[])ghost[g.sl]=g;
   for(let r=0;r<5;r++){const zc=Z(-3.2+.54+r*CP);const lineHl=(hl.lines||[]).find(l=>l.r===r);
     s+=`<g ${o.act?`data-line="${r}" class="hit"`:''}>`;for(let k=0;k<cap(r);k++){const xc=X(-.45-.54-k*CP);const t=p.lines[r][k];const sl=`l${pi}_${r}_${k}`;s+=`<rect x="${xc-46}" y="${zc-46}" width="92" height="92" rx="10" fill="#d8c6a2" stroke="#9a7a4e" stroke-width="4"/>`;
@@ -110,20 +112,20 @@ function renderMap2D(){const el=$('#map2d');if(!el)return;if(V3.on){el.hidden=tr
   others.forEach((p,k)=>{s+=`<g transform="translate(${(k%2)*(W/2)+20},${top+960+Math.floor(k/2)*600}) scale(.6)">${boardG(p,{})}</g>`});el.innerHTML=s+'</svg>'}
 // ---------- popups ----------
 function renderPopups(){if(GX.open==='logd')$('#logbody').innerHTML=`<ol class="log">${G.log.slice(0,400).map(l=>`<li class="${l.c}"><small>R${l.r}</small> ${esc(l.t)}</li>`).join('')}</ol>`;
-  if(GX.open==='plrd')$('#plrbody').innerHTML=G.pl.map(p=>`<section class="sheet" style="--pc:${PCOL[p.i]}"><h3><span style="color:${PCOL[p.i]}">${esc(p.nm)}</span> <small class="muted">${p.human?'player':p.lv+' computer'}</small>${G.markerIn===p.i?' ☀':''}<span class="tot">★ ${p.score}</span></h3>${boardSVG(p,{})}
+  if(GX.open==='plrd')$('#plrbody').innerHTML=G.pl.map(p=>`<section class="sheet" style="--pc:${PCOL[p.i]}"><h3><span style="color:${PCOL[p.i]}">${esc(p.nm)}</span> <small class="muted">${p.human?(NET.on?(p.i===NET.mySeat?'you':'online player'):'player'):p.lv+' computer'+(p.away?' (player away)':'')}</small>${G.markerIn===p.i?' ☀':''}<span class="tot">★ ${p.score}</span></h3>${boardSVG(p,{})}
     <div class="small muted">Tiles set ${p.st.place} · breakage ${p.st.floor}${G.over?` · rows +${p.st.rows} · columns +${p.st.cols} · glazes +${p.st.colours}`:''} · complete rows ${fullRows(p)}</div></section>`).join('')}
 // ---------- modal: start screen and the opening story ----------
 UI.setup={np:2,seats:['human','ai','ai','ai'],lv:['normal','normal','normal','normal'],ex:{gray:false,prism:false}};
-function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='start'?startHtml():UI.modal==='story'?storyHtml():'';m.hidden=!h;if(m.dataset.h!==h){m.innerHTML=h;m.dataset.h=h}}
+function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='start'?startHtml():UI.modal==='story'?storyHtml():UI.modal==='lobby'&&NET.on?lobbyHTML():'';m.hidden=!h;if(m.dataset.h!==h){m.innerHTML=h;m.dataset.h=h}}
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox"><h2>Sunglaze</h2><p class="lede">Draft glazed tiles from the kilns, dry them on your racks and set them into the palace mosaic. Tiles score by what they touch; finished rows, columns and glazes pay at the end.</p>
-   ${saved?`<div class="acts"><button class="btn go" data-ui="continue">Continue the saved game</button></div>`:''}
+   ${saved&&!NET.on?`<div class="acts"><button class="btn go" data-ui="continue">Continue the saved game</button></div>`:''}
    <h3>Glaziers</h3><div class="seg">${[2,3,4].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div>
-   <div class="seats">${Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b><button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?IC('person')+' you / a friend':IC('cpu')+' computer'}</button>${o.seats[i]==='ai'?`<button class="btn sm ghost" data-lv="${i}" title="easy · normal · hard">${o.lv[i]}</button>`:''}</div>`).join('')}</div>
+   <div class="seats">${NET.on?'<p class="small muted">Online: players take the seats in the order they joined; the computer plays the rest at the levels set here.</p>':''}${Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b>${NET.on?'':`<button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?IC('person')+' you / a friend':IC('cpu')+' computer'}</button>`}${o.seats[i]==='ai'||NET.on?`<button class="btn sm ghost" data-lv="${i}" title="easy · normal · hard">${o.lv[i]}</button>`:''}</div>`).join('')}</div>
    <h3>Variants</h3><div class="exs"><label class="chk"><input type="checkbox" data-ex="gray" ${o.ex.gray?'checked':''}> <b>Unmarked mosaic</b> <small>choose where each tile goes; no glaze twice in a row or column</small></label>
    <label class="chk"><input type="checkbox" data-ex="prism" ${o.ex.prism?'checked':''}> <b>Prism tiles</b> <small>wild tiles (promo): ${o.np===2?5:10} in the game</small></label>
    <label class="chk"><input type="checkbox" data-coach="1" ${UI.coach?'checked':''}> <b>Guided game</b> <small>the panel explains each step</small></label></div>
-   <div class="acts"><button class="btn go" data-ui="start">Begin ▶</button><button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div></div>`}
+   ${onlineBlock()}<div class="acts">${NET.on?'<button class="btn go" data-a="netopen">Back to the online lobby</button>':'<button class="btn go" data-ui="start">Begin ▶</button>'}<button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div></div>`}
 function storyPic(){const tiles=[];for(let i=0;i<14;i++)tiles.push(tileSVG(i%5,40+i*38,152,32));const arch=(x)=>`<path d="M${x} 300V210a55 55 0 0 1 110 0V300Z" fill="#5a3a2a" opacity=".85"/><path d="M${x+8} 300V212a47 47 0 0 1 94 0V300Z" fill="url(#shade)"/>`;
   return `<svg viewBox="0 0 600 330" role="img" aria-label="A palace courtyard at sunrise with tiled arches"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7c77c"/><stop offset="1" stop-color="#fde9c4"/></linearGradient><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3f6e"/><stop offset="1" stop-color="#6e4b3a"/></linearGradient></defs>
   <rect width="600" height="330" fill="url(#sky)"/><circle cx="470" cy="70" r="40" fill="#fff1b8"/><circle cx="470" cy="70" r="28" fill="#ffd66b"/><rect x="0" y="120" width="600" height="190" fill="#e9c99a"/><rect x="0" y="120" width="600" height="14" fill="#c98e5a"/>
@@ -148,10 +150,15 @@ function pickLine(r){if(!UI.sel)return toast('First tap a tile on a kiln or in t
 function upd(){computeHL();render();if(V3.on){syncHighlights();camFocus()}}
 // narrow screens: zoom onto your own board while you choose a rack or a mosaic space
 function camFocus(){if(!V3.on||!V3.L)return;const p=me();const z=p&&(UI.sel||(G.phase==='wall'&&G.wt&&G.wt.q))?{p:p.i}:null;const k=JSON.stringify(z);if(k!==V3.zk){V3.zk=k;V3.zoomBoard=z;fitCam()}}
-function go(m){const s=sideToAct();const keep=[UI.sel,UI.tgt,UI.adv];UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;const r=performMove(m,s);if(!r.success){[UI.sel,UI.tgt,UI.adv]=keep;toast('That move isn’t allowed now.');console.error(r.error);return}sfx('place')}
+function go(m){const s=sideToAct();if(NET.on&&(s<0||s!==NET.mySeat)&&P(s)&&P(s).human)return;
+  if(isClient()){if(!me())return;if(NET.pend&&NET.pend.k===G.logN&&Date.now()-NET.pend.t<2500)return;NET.pend={k:G.logN,t:Date.now()};UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;netSend(Object.assign({},m));sfx('place');upd();return}
+  const keep=[UI.sel,UI.tgt,UI.adv];UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;const r=performMove(m,s);if(!r.success){[UI.sel,UI.tgt,UI.adv]=keep;toast('That move isn’t allowed now.');console.error(r.error);return}sfx('place')}
 function toast(t){if(!t)return;const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,3000)}
 // the advisor: the move the normal computer would make, with a reason in plain words
-function advise(){const p=me();if(!p)return;const lv=p.lv;p.lv='normal';let m;try{m=aiMove(p.i)}finally{p.lv=lv}if(!m)return;let why='';
+function advise(){const p=me();if(!p)return;if(isClient()){if(!UI.advWait){UI.advWait=true;netSend({act:'advise'})}return}const a=adviceFor(p.i);if(a)showAdvice(a)}
+function showAdvice(a){const m=a.m;if(m.act==='take'){UI.sel={src:m.src,c:m.c,j:m.j};UI.tgt=m.line}UI.adv={m,why:esc(a.why)};upd()}
+// the advice for a seat (the host computes it for its online players too)
+function adviceFor(seat){const p=P(seat);const lv=p.lv;p.lv='normal';let m;try{m=aiMove(p.i)}finally{p.lv=lv}if(!m)return null;let why='';
   if(m.act==='wall'){why=`Put it in column ${m.c+1}: it scores +${adjPts2(p.wall,m.r,m.c)} now${G.ex.gray?' and keeps your other racks placeable':''}.`}
   else{const a=m.src<0?G.ctr:G.fac[m.src];const n=a.filter(t=>t===m.c).length,nj=a.filter(t=>t===PRISM).length;const pv=preview(m,p.i);
     const what=m.c===PRISM?`the ${nj} prism${nj>1?'s':''}`:`the ${n} ${TNAME[m.c]}${m.j&&nj?` and ${nj} prism${nj>1?'s':''}`:''}`;
@@ -159,8 +166,8 @@ function advise(){const p=me();if(!p)return;const lv=p.lv;p.lv='normal';let m;tr
     if(m.line<5&&pv.full)bits.push(`it fills rack ${m.line+1}${pv.pts!=null?`, which should score about +${pv.pts}`:''}`);else if(m.line<5)bits.push(`rack ${m.line+1} gets to ${pv.cnt} of ${cap(m.line)}`);else bits.push('every other choice would cost more');
     bits.push(pv.pen?`${pv.info.fl+pv.info.lid||''}${pv.info.fl+pv.info.lid?' break, ':''}costing ${pv.pen}`:'nothing breaks');if(pv.info.sun)bits.push('you also take the Sun token and start next round');
     if(G.np>1){const nx=(p.i+1)%G.np;const near=endNear(G);const b0=bestGain(G,nx,near);const S=cloneS(G);applyTake(S,p.i,m);const b1=emptyS(S)?0:bestGain(S,nx,near);if(b1<=.3)bits.push(`and it leaves ${P(nx).nm} nothing useful`);else if(b0-b1>=1.5)bits.push(`and it takes away ${P(nx).nm}’s best pick`)}
-    why+=bits.join(', ')+'.';UI.sel={src:m.src,c:m.c,j:m.j};UI.tgt=m.line}
-  UI.adv={m,why:esc(why)};upd()}
+    why+=bits.join(', ')+'.'}
+  return {m,why}}
 document.addEventListener('click',e=>{const b=e.target.closest('button,[data-slot],[data-line],[data-cell],input[type=checkbox]');if(!b)return;const d=b.dataset;
   if(d.mv){const m=JSON.parse(d.mv);sfx('click');return go(m)}
   if(d.pick){return pickSel(JSON.parse(d.pick))}
@@ -171,10 +178,12 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-slo
   if(d.lv!=null){const i=+d.lv;const L=['easy','normal','hard'];UI.setup.lv[i]=L[(L.indexOf(UI.setup.lv[i])+1)%3];render();return}
   if(d.ex&&b.type==='checkbox'){UI.setup.ex[d.ex]=b.checked;return}if(d.coach&&b.type==='checkbox'){setCoach(b.checked);return}
   if(d.ui)return uiAct(d.ui);
+  if(d.a&&d.a.startsWith('net')&&netClick(d.a))return;
+  if(d.a==='new'&&NET.on){if(GX.open)GX.close();UI.modal='lobby';render();return}
   switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':openStart();return;case 'coach':setCoach(!UI.coach);if(G)render();return;case 'gfx':gfxCycle();return}});
 function gfxBtn(){const b=$('#gfxbtn');if(!b)return;const h=IC('gfx')+'<span>'+(typeof gfxLabel==='function'?gfxLabel():'Graphics')+'</span>';if(b.dataset.h!==h){b.innerHTML=h;b.dataset.h=h}b.title='Graphics quality: '+(typeof gfxLabel==='function'?gfxLabel():'')+' (Auto picks by device and steps down if frames stutter)'}
 function setCoach(v){UI.coach=!!v;try{localStorage.setItem('sgz_coach',v?'1':'0')}catch(e){}const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach)}
-function uiAct(a){switch(a){case 'start':beginGame();return;case 'continue':loadSaved();return;case 'new':openStart();return;case 'story-ok':UI.modal=null;render();schedule();return;
+function uiAct(a){switch(a){case 'start':beginGame();return;case 'continue':loadSaved();return;case 'new':if(NET.on){UI.modal='lobby';render();return}openStart();return;case 'story-ok':UI.modal=null;render();schedule();return;
   case 'unsel':UI.sel=null;UI.tgt=null;UI.adv=null;upd();return;case 'prism':if(UI.sel){UI.sel={src:UI.sel.src,c:UI.sel.c,j:UI.sel.j?0:1};const ms=movesFor(UI.sel);if(!ms.some(m=>m.line===UI.tgt))UI.tgt=null;upd()}return;
   case 'advise':advise();return;case 'noadv':UI.adv=null;upd();return}}
 document.addEventListener('keydown',e=>{if(GX.open||UI.modal||!me())return;if(e.key==='Escape'&&UI.sel){UI.sel=null;UI.tgt=null;upd()}else if(e.key==='Enter'&&UI.sel&&UI.tgt!=null){const m=movesFor(UI.sel).find(m=>m.line===UI.tgt);if(m){e.preventDefault();go(m)}}});
@@ -184,8 +193,8 @@ function beginGame(){const o=UI.setup;UI.guideNote=null;UI.fx.length=0;UI.fxSeen
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh()}catch(e){openStart()}}
 function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].m);V3.tiles={};V3.lkey='';relayout()}
 // ---------- the computer ----------
-let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||UI.modal)return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)&&G.turn>0?2.2:1;
-  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||UI.modal)return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*wait))}
+let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!NET.on)||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)&&G.turn>0?2.2:1;
+  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!NET.on)||isClient())return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*wait))}
 function boot(){$('#defs').innerHTML=glazeDefs();GX.init({key:'sgz'});GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(id==='refd')$('#refbody').innerHTML=refHtml();if(G)render()};
-  try{init3D()}catch(e){console.error(e)}if(!V3.on){V3.qPref=gfxLoadPref();V3.q=V3.qPref==='auto'?gfxAuto():V3.qPref}gfxBtn();soundBtns();setCoach(UI.coach);openStart()}
+  try{init3D()}catch(e){console.error(e)}if(!V3.on){V3.qPref=gfxLoadPref();V3.q=V3.qPref==='auto'?gfxAuto():V3.qPref}gfxBtn();soundBtns();setCoach(UI.coach);netInit();openStart()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();

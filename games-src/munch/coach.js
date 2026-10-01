@@ -171,6 +171,6 @@ function recapHTML(){const W=G.winner?P(+G.winner.slice(1)-1):null;const me=view
 function introHTML(n,mode){const names=(UI.names||HERO_NAMES).slice(0,n);const me=mode==='F'?names[0]:null;const riv=names.filter(x=>x!==me);
   return `<p class="intro">The Doorkick Dungeon opens once a year. ${n} fools go in; one comes out a <b>Level 10 Legend</b>.</p><ul class="cast">${me?`<li><b>You: ${esc(me)} ${PERSONA[me]?PERSONA[me][0]:''}</b></li>`:''}${riv.map(x=>`<li><b>${esc(x)} ${PERSONA[x]?PERSONA[x][0]:''}</b>${PERSONA[x]?': '+PERSONA[x][1]:''}</li>`).join('')}</ul>`}
 // ---- auto-continue: skip a prompt where the only legal move is "pass" (and nothing is at stake) ----
-function autoPass(){for(let k=0;k<12&&G&&!G.winner;k++){const s=sideToAct();if(s<0||!P(s).human)return;
+function autoPass(){if(G&&G.mode==='net')return;for(let k=0;k<12&&G&&!G.winner;k++){const s=sideToAct();if(s<0||!P(s).human)return;
   if(!(G.phase==='window'||(G.phase==='combat'&&G.cb&&G.cb.stage==='others'))||G.q)return;const vm=validMoves(s);if(vm.length!==1||vm[0].act!=='pass')return;if(G.cb&&winThreat(G.cb))return;
   const r=performMove(vm[0],s);if(!r.success)return}}

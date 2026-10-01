@@ -6,10 +6,10 @@ try{const st=JSON.parse(localStorage.getItem('na_setup')||'null');if(st)Object.a
 function saveSetup(){try{localStorage.setItem('na_setup',JSON.stringify({lvl:UI.lvl,size:UI.size,fac:UI.fac,ex:UI.ex}))}catch(e){}}
 function announce(t){const el=$('live');if(el)el.textContent=t}
 // which human side is planning right now (hot-seat hides the other side's dials behind a pass screen)
-function planSide(){if(!G||G.phase!=='plan')return -1;for(const k of [0,1])if(isHuman(k)&&!planDone(k))return k;return -1}
+function planSide(){if(!G||G.phase!=='plan')return -1;const net=(typeof NET!=='undefined'&&NET.on);for(const k of [0,1])if(isHuman(k)&&!planDone(k)&&(!net||k===NET.mySide))return k;return -1}
 function humanTurn(){const k=sideToAct();return k>=0&&isHuman(k)&&(typeof NET==='undefined'||!NET.on||k===NET.mySide)}
 function refresh(){render();schedule()}
-function render(){if(typeof isHost==='function'&&isHost())netPush();
+function render(){if(typeof netTick==='function')netTick();
   if(G&&G.winner&&UI.wonSnd!==G.seed){UI.wonSnd=G.seed;sfx('win');if(G.sortie!=null&&soloSide()===0&&G.winner==='P1'){const c=campaign();c.i=Math.max(c.i,Math.min(SORTIES.length,G.sortie+1));c.won++;saveCampaign(c)}if(ANIM)setTimeout(()=>{UI.stats=true;render()},2200)}
   attackWatch();flowWatch();trackStats();if(V3.on)sync3D();else render2D();renderFlow();renderPrompt();renderShipCard();renderRoster();renderLog();renderModal();renderDock();renderCoach()}
 // ---- step bar ----
@@ -42,7 +42,7 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
   if(G.phase==='plan'){const ps=planSide();h=ps<0?watchHTML():planHTML(ps)}
   else if(G.phase==='action'){h=me?actionHTML(ship(G.cur)):watchHTML()}
   else if(G.phase==='target'){h=me?targetHTML(ship(G.cur)):watchHTML()}
-  else if(G.phase==='ask'&&G.q){const q=G.q;if(!humanTurn())h=`<p class="head">Waiting for ${esc(sideName(q.side))}…</p>`;else{const A=G.atk;h=`<p class="head">${esc(q.title)}</p>${q.key==='rock'||q.key==='deploy'?setupText(q):`<p>${esc(q.text)}</p>`}${A&&['dice','pay','jan','heat','brakk','maarek','garven','munitions'].includes(q.key)?diceRows(A):''}${askButtons(q)}`}}
+  else if(G.phase==='ask'&&G.q){const q=G.q;if(!humanTurn())h=`<p class="head">Waiting for ${esc((typeof NET!=='undefined'&&NET.on)?netWho(q.side):sideName(q.side))}…</p>`;else{const A=G.atk;h=`<p class="head">${esc(q.title)}</p>${q.key==='rock'||q.key==='deploy'?setupText(q):`<p>${esc(q.text)}</p>`}${A&&['dice','pay','jan','heat','brakk','maarek','garven','munitions'].includes(q.key)?diceRows(A):''}${askButtons(q)}`}}
   else if(G.phase==='damod'){const A=G.atk,d=ship(A.d);h=diceHead(A)+diceRows(A)+`<p class="preview">The defender may tamper with the attack dice first.</p>`;
     if(humanTurn())h+=`<div class="acts col">${exDAMods().map(m=>`<button class="btn" data-act="damod" data-k="${m.k}">${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="damod" data-k="done">Let the attack stand</button></div>`;else h+=`<p class="small muted">${esc(d.name)} is reacting…</p>`}
   else if(G.phase==='amod'||G.phase==='dmod'){const A=G.atk,a=ship(A.a),d=ship(A.d);const r=preview(A);const rk=me?recMod():null;
@@ -51,7 +51,7 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
     else h+=`<p class="small muted">${G.phase==='amod'?esc(a.name)+' is modifying its attack…':esc(d.name)+' is defending…'}</p>`;
     h+=DLEG}
   else h=watchHTML();
-  el.innerHTML=h}
+  el.innerHTML=(typeof netWaitHTML==='function'?netWaitHTML():'')+h}
 function sugTip(s,sug){const m=dialOf(s)[sug];const si=sugInfo(s,sug);let h=`<p class="tip">💡 <b>${mText(m)}</b> (dashed outline): ${si.why}. <span class="${exColor(s,m).c==='r'?'warn':''}">${si.cost}</span>`;
   if(exColor(s,m).c==='r'){const alt=saferAlt(s);if(alt!=null&&alt!==sug)h+=` Safer: <b>${mText(dialOf(s)[alt])}</b> (${exColor(s,dialOf(s)[alt]).c==='g'?'green':'white'}).`}return h+'</p>'}
 function setupText(q){const r=recOpt(q);const rock=q.key==='rock';
@@ -118,22 +118,23 @@ function renderShipCard(){const el=$('shipcard');if(!el)return;const ss=focusShi
   el.innerHTML=ss.length===2?`<div class="shipc two" aria-label="Attacker and defender"><div>${one(ss[0])}</div><div>${one(ss[1])}</div></div>`:`<div class="shipc" aria-label="Selected ship"><button class="btn ghost more" data-gx="d-squads" title="All ship cards">🛩 All</button>${one(ss[0])}</div>`}
 function renderLog(){const el=$('log');if(el&&G)el.innerHTML=G.log.slice(0,300).map(l=>`<li class="s${l.s}">${esc(l.t)}</li>`).join('');const ll=$('lastlog');if(ll)ll.innerHTML=G?G.log.slice(0,2).map(l=>`<div class="s${l.s}" title="${esc(l.t)}">${esc(l.t)}</div>`).join(''):''}
 // ---- modals: start screen, pass-the-device, rules, stats ----
-function renderModal(){const el=$('modal');let h='';
+function renderModal(){const el=$('modal');let h=typeof netModalHTML==='function'?netModalHTML():'';if(h){el.innerHTML=h;el.classList.remove('hidden');return}
   if(typeof GX!=='undefined'&&GX.app){if(UI.build!=null){const d=GX.drawer('d-build','✎ '+FACTIONS[UI.fac[UI.build]].n+' squadron',$('bbody'),true);$('bbody').innerHTML=builderHTML();if(GX.open!=='d-build')GX.show('d-build')}else if(GX.open==='d-build')GX.close()}
   if(UI.build!=null){if(!(typeof GX!=='undefined'&&GX.app))h=`<div class="dlg">${builderHTML()}</div>`}else if(UI.rules)h=rulesHTML();else if(UI.info)h=startHTML();else if(UI.stats&&G)h=statsHTML();
   else if(G&&G.phase==='plan'&&UI.pass!=null&&UI.pass!==planSide()&&planSide()>=0&&bothHuman())h=`<div class="dlg pass"><h2>Pass the device to ${esc(sideName(planSide()))}</h2><p>The other side's dials are hidden. Only ${esc(sideName(planSide()))} should look now.</p><div class="acts"><button class="btn primary" data-a="passok">I'm ${esc(sideName(planSide()))}: show my ships</button></div></div>`;
   el.innerHTML=h;el.classList.toggle('hidden',!h)}
-const bothHuman=()=>G&&isHuman(0)&&isHuman(1);
-function startHTML(){const saved=load();const camp=campaign();const campOK=UI.fac[0]===0&&UI.fac[1]===1;return `<div class="dlg start" role="dialog" aria-modal="true"><div class="launchbar"><h1>Nebula Aces</h1><button class="btn primary" data-start="${UI.mode}">Launch ▶</button></div><p class="lead">A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.</p>
+const bothHuman=()=>G&&isHuman(0)&&isHuman(1)&&!(typeof NET!=='undefined'&&NET.on);// online games never show the pass-the-device screen
+function startHTML(){const saved=load();const camp=campaign();const campOK=UI.fac[0]===0&&UI.fac[1]===1;return `<div class="dlg start" role="dialog" aria-modal="true"><div class="launchbar"><h1>Nebula Aces</h1>${NET.on?'<button class="btn primary" data-a="netopen">🌐 Lobby ▶</button>':`<button class="btn primary" data-start="${UI.mode}">Launch ▶</button>`}</div><p class="lead">A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.</p>
   <p class="small">First time? Just press <b>Launch</b>: the defaults are a good first battle and the first round is guided. Everything below is optional.</p>
   ${campOK&&UI.mode==='solo'&&camp.i>0&&camp.i<SORTIES.length?`<div class="row"><button class="btn" data-a="sortie" data-k="${camp.i}">▶ Continue the campaign<small>Sortie ${camp.i+1}: ${esc(SORTIES[camp.i].title)}</small></button></div>`:''}
   <h3>Mode</h3><div class="row">${[['solo','Me vs computer'],['hot','Two players, one screen'],['ai','Watch the computer']].map(([k,l])=>`<button class="btn ${UI.mode===k?'on':''}" data-mode="${k}">${l}</button>`).join('')}</div>
+  <h3>🌐 Play online</h3>${typeof onlineBlock==='function'?onlineBlock():''}
   <h3>Factions</h3><div class="row">${[0,1].map(k=>`<label>${k?'Opponent':'You'}: <select data-fac="${k}">${FACTIONS.map((f,i)=>`<option value="${i}" ${UI.fac[k]===i?'selected':''} ${f.ex&&!UI.ex[f.ex]?'disabled':''}>${esc(f.n)}</option>`).join('')}</select><small class="bio">${esc(FACTION_BIO[UI.fac[k]]||'')}</small></label>`).join(' ')}</div>
   <h3>Battle size</h3><div class="row">${SIZES.map(z=>`<button class="btn ${UI.size===z.k?'on':''}" data-size="${z.k}">${esc(z.n)}<small>${esc(z.d)}</small></button>`).join('')}</div>
   <h3>Computer skill</h3><div class="row">${['easy','normal','hard'].map(l=>`<button class="btn ${UI.lvl===l?'on':''}" data-lvl="${l}">${l[0].toUpperCase()+l.slice(1)}</button>`).join('')}</div>
   ${EXPS.length?`<h3>Expansions</h3><div class="exps">${EXPS.map(e=>`<button class="ex ${UI.ex[e.k]?'on':''}" data-exk="${e.k}"><b>${UI.ex[e.k]?'✓ ':''}${esc(e.n)}</b><small>${esc(e.d)}</small></button>`).join('')}</div>`:''}
   ${UI.size==='custom'?`<div class="row">${[0,1].map(k=>{const sq=UI.squads&&UI.squads[k];return `<button class="btn" data-a="build" data-k="${k}">✎ ${k?'Opponent':'Your'} squad<small>${sq&&sq.length?`${sq.length} ships · ${squadCost(sq)} pts`:'not built yet (random)'}</small></button>`}).join('')}</div>`:''}
-  <div class="acts"><button class="btn primary" data-start="${UI.mode}">Launch</button>${saved?'<button class="btn" data-start="load">Continue saved battle</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
+  <div class="acts">${NET.on?'<button class="btn primary" data-a="netopen">🌐 Back to the lobby</button>':`<button class="btn primary" data-start="${UI.mode}">Launch</button>`}${saved&&!NET.on?'<button class="btn" data-start="load">Continue saved battle</button>':''}<button class="btn" data-a="rules">How to play</button></div></div>`}
 const CREDITS_HTML=`<section class="credits-audio"><h3>Credits</h3><p>Names, card text and art are original.</p><h4>Audio</h4><p>With thanks to these public-domain (CC0) creators:</p><ul><li>Music: &ldquo;Hostile Fleet Interception&rdquo; by vitalezzz (<a target="_blank" rel="noopener" href="https://opengameart.org/content/hostile-fleet-interception">OpenGameArt</a>, CC0)</li><li>Sound effects: Casino Audio, Digital Audio, Impact Sounds, Interface Sounds, Music Jingles, Sci-fi Sounds, UI Audio by <a target="_blank" rel="noopener" href="https://kenney.nl">Kenney</a> (CC0)</li><li>Sound effects: &ldquo;100 CC0 SFX #2&rdquo; by rubberduck (<a target="_blank" rel="noopener" href="https://opengameart.org/content/100-cc0-sfx-2">OpenGameArt</a>, CC0)</li></ul><p><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p></section>`;
 function rulesHTML(){return `<div class="dlg rules"><h2>How to play</h2>${RULES_HTML}${CREDITS_HTML}<div class="acts"><button class="btn primary" data-a="close">Close</button></div></div>`}
 function nextSortieBtn(){if(!G||G.sortie==null||soloSide()!==0)return '';const won=G.winner==='P1';const i=won?G.sortie+1:G.sortie;
@@ -161,24 +162,29 @@ function renderDock(){const t=$('docktitle');if(!t)return;const pr=$('prompt');c
   if(sig&&sig!==UI.needSig&&typeof GX!=='undefined'&&GX.app){GX.showDock();const b=document.querySelector('.gx-dock-body');if(b)b.scrollTop=0}UI.needSig=sig}
 if(PHONE.addEventListener)PHONE.addEventListener('change',()=>{render();if(V3.on)resize3D()});
 // ---- 2D fallback (no WebGL): a top-down SVG of the field ----
-function render2D(){const svg=$('map');if(!svg||!G)return;const Y=y=>MAT-y;let h=`<rect width="${MAT}" height="${MAT}" fill="#0c0a22"/>`;
-  for(const o of G.rocks)h+=`<polygon points="${rockPoly(o).map(p=>p.x+','+Y(p.y)).join(' ')}" fill="#6b5a55"/>`;
-  const sel=UI.sel&&ship(UI.sel);if(G.phase==='plan'&&sel&&myPlanShip(sel)){const di=UI.hoverDial!=null?UI.hoverDial:UI.draft[sel.id];if(di!=null){const m=dialOf(sel)[di];h+=`<polyline points="${tplPoints(sel,B(sel),m,4).map(p=>p.x+','+Y(p.y)).join(' ')}" stroke="${m.c==='r'?'#f55':m.c==='g'?'#5f8':'#fff'}" stroke-width="20" stroke-opacity=".4" fill="none"/>`;const fp=finalPose(sel,B(sel),m);h+=`<polygon points="${corners(fp,B(sel)).map(p=>p.x+','+Y(p.y)).join(' ')}" fill="none" stroke="#fff" stroke-dasharray="4 3"/>`}}
+function render2D(){const svg=$('map');if(!svg||!G)return;const F=typeof NET!=='undefined'&&NET.on&&NET.mySide===1,X=x=>F?MAT-x:x,Y=y=>F?y:MAT-y;/* online, side 1 sees the mat from its own edge */let h=`<rect width="${MAT}" height="${MAT}" fill="#0c0a22"/>`;
+  for(const o of G.rocks)h+=`<polygon points="${rockPoly(o).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="#6b5a55"/>`;
+  const sel=UI.sel&&ship(UI.sel);if(G.phase==='plan'&&sel&&myPlanShip(sel)){const di=UI.hoverDial!=null?UI.hoverDial:UI.draft[sel.id];if(di!=null){const m=dialOf(sel)[di];h+=`<polyline points="${tplPoints(sel,B(sel),m,4).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" stroke="${m.c==='r'?'#f55':m.c==='g'?'#5f8':'#fff'}" stroke-width="20" stroke-opacity=".4" fill="none"/>`;const fp=finalPose(sel,B(sel),m);h+=`<polygon points="${corners(fp,B(sel)).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="none" stroke="#fff" stroke-dasharray="4 3"/>`}}
   for(const s of G.ships){if(!s.alive)continue;const c=FACCOL[FACTIONS[G.fac[s.side]].col].base;const P=corners(s,B(s));const f=add(s,mul(fwd(s.h),B(s)/2));
-    h+=`<g data-ship="${s.id}" class="seat"><polygon points="${P.map(p=>p.x+','+Y(p.y)).join(' ')}" fill="#15122e" stroke="${c}" stroke-width="${G.cur===s.id?5:2.5}"/><line x1="${s.x}" y1="${Y(s.y)}" x2="${f.x}" y2="${Y(f.y)}" stroke="${c}" stroke-width="4"/><text x="${s.x}" y="${Y(s.y)-B(s)/2-6}" text-anchor="middle" font-size="16" fill="#fff">${esc(s.name.split(' ')[0])} ${s.hull-hullDmg(s)}</text></g>`}
-  if(G.phase==='ask'&&G.q)G.q.opts.forEach((o,i)=>{if(!o.p)return;const on=UI.hoverAct&&UI.hoverAct.a==='Q'&&UI.hoverAct.i===i;h+=`<polygon points="${corners(o.p,o.b||40).map(p=>p.x+','+Y(p.y)).join(' ')}" fill="none" stroke="#6df" stroke-width="${on?4:1.5}" stroke-dasharray="5 4" opacity="${on?1:.55}"/>`})
+    h+=`<g data-ship="${s.id}" class="seat"><polygon points="${P.map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="#15122e" stroke="${c}" stroke-width="${G.cur===s.id?5:2.5}"/><line x1="${X(s.x)}" y1="${Y(s.y)}" x2="${X(f.x)}" y2="${Y(f.y)}" stroke="${c}" stroke-width="4"/><text x="${X(s.x)}" y="${Y(s.y)-B(s)/2-6}" text-anchor="middle" font-size="16" fill="#fff">${esc(s.name.split(' ')[0])} ${s.hull-hullDmg(s)}</text></g>`}
+  if(G.phase==='ask'&&G.q)G.q.opts.forEach((o,i)=>{if(!o.p)return;const on=UI.hoverAct&&UI.hoverAct.a==='Q'&&UI.hoverAct.i===i;h+=`<polygon points="${corners(o.p,o.b||40).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="none" stroke="#6df" stroke-width="${on?4:1.5}" stroke-dasharray="5 4" opacity="${on?1:.55}"/>`})
   svg.innerHTML=h}
 // ---- input: every action goes through gameAct(ds, side) ----
-function uiAct(ds){if(typeof isClient==='function'&&isClient()){netSend(ds);return}gameAct(ds,sideToAct())}
-function gameAct(ds,side){if(!G)return;
-  if(ds.act==='ask'){performMove({act:'ask',k:ds.k},side);return}
-  if(ds.act==='damod'){performMove({act:'damod',k:ds.k},side);return}
-  if(ds.ship&&!ds.act){const s=ship(ds.ship);if(!s)return;if(G.phase==='target'&&humanTurn()){const s2=ship(G.cur);const w=weaponsFor(s2).find(w=>w.k==='P'&&w.targets.some(t=>t.id===s.id))||weaponsFor(s2).find(w=>w.targets.some(t=>t.id===s.id));if(w){performMove({act:'fire',w:w.k,t:s.id},side);return}}
-    UI.sel=s.id;render();return}
-  if(ds.act==='action'){const mv={act:'action',a:ds.a2};if(ds.arg!=null)mv.arg=['TL','SL','SB'].includes(ds.a2)?ds.arg:+ds.arg;UI.hoverAct=null;performMove(mv,side)}
-  else if(ds.act==='fire'){performMove(ds.w==='skip'?{act:'fire',w:'skip'}:{act:'fire',w:ds.w,t:ds.t},side)}
-  else if(ds.act==='amod'||ds.act==='dmod'){performMove({act:ds.act,k:ds.k},side)}
-  else if(ds.act==='dials'){for(const id in ds.dials){const s=ship(id);if(s&&s.side===side&&s.dial==null)performMove({act:'dial',ship:id,m:ds.dials[id]},side)}}}
+function uiAct(ds){if(typeof isClient==='function'&&isClient()){// a client only sends its choice; the host checks it and runs it
+    if(ds.ship&&!ds.act){if(G&&G.phase==='target'&&humanTurn()){const s2=ship(G.cur);const w=weaponsFor(s2).find(w=>w.k==='P'&&w.targets.some(t=>t.id===ds.ship))||weaponsFor(s2).find(w=>w.targets.some(t=>t.id===ds.ship));if(w){netSend({act:'fire',w:w.k,t:ds.ship});return}}if(G&&ship(ds.ship)){UI.sel=ds.ship;render()}return}
+    netSend(ds);return}
+  return gameAct(ds,(typeof NET!=='undefined'&&NET.on)?NET.mySide:sideToAct())}
+function gameAct(ds,side){if(!G)return null;
+  if(ds.act==='ask')return performMove({act:'ask',k:ds.k},side);
+  if(ds.act==='damod')return performMove({act:'damod',k:ds.k},side);
+  if(ds.ship&&!ds.act){const s=ship(ds.ship);if(!s)return;if(G.phase==='target'&&humanTurn()){const s2=ship(G.cur);const w=weaponsFor(s2).find(w=>w.k==='P'&&w.targets.some(t=>t.id===s.id))||weaponsFor(s2).find(w=>w.targets.some(t=>t.id===s.id));if(w)return performMove({act:'fire',w:w.k,t:s.id},side)}
+    UI.sel=s.id;render();return null}
+  if(ds.act==='action'){const mv={act:'action',a:ds.a2};if(ds.arg!=null)mv.arg=['TL','SL','SB'].includes(ds.a2)?ds.arg:+ds.arg;UI.hoverAct=null;return performMove(mv,side)}
+  else if(ds.act==='fire'){return performMove(ds.w==='skip'?{act:'fire',w:'skip'}:{act:'fire',w:ds.w,t:ds.t},side)}
+  else if(ds.act==='amod'||ds.act==='dmod'){return performMove({act:ds.act,k:ds.k},side)}
+  else if(ds.act==='dials'){const ids=Object.keys(ds.dials);if(G.phase!=='plan'||!ids.every(id=>{const s=ship(id);return s&&s.alive&&s.side===side&&s.dial==null&&validMoves(side).some(v=>v.ship===id&&v.m===ds.dials[id])}))return {success:false};
+    let r=null;for(const id of ids)r=performMove({act:'dial',ship:id,m:ds.dials[id]},side);return r}
+  return null}
 const ICON_PAUSE='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="9.4" y="2" width="3.6" height="12" rx="1" fill="currentColor"/></svg>',ICON_PLAY='<svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 2l10 6-10 6z" fill="currentColor"/></svg>';
 function toggleMenu(open){const m=$('more'),b=document.querySelector('[data-a="menu"]');if(!m)return;const on=open!=null?open:!m.classList.contains('open');m.classList.toggle('open',on);if(b)b.setAttribute('aria-expanded',String(on))}
 document.addEventListener('click',e=>{const m=$('more');if(m&&m.classList.contains('open')&&!e.target.closest('[data-a="menu"]')&&(!e.target.closest('#more')||e.target.closest('button')))setTimeout(()=>toggleMenu(false),0)},true);
@@ -186,6 +192,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
   if(ds.mode){UI.mode=ds.mode;render();return}if(ds.size){UI.size=ds.size;saveSetup();render();return}if(ds.lvl){UI.lvl=ds.lvl;saveSetup();render();return}
   if(ds.exk){UI.ex[ds.exk]=!UI.ex[ds.exk];FACTIONS.forEach((f,i)=>{if(f.ex&&!UI.ex[f.ex]&&UI.fac.includes(i))UI.fac=UI.fac.map(x=>x===i?(i===UI.fac[0]?0:1):x)});saveSetup();render();return}
   if(ds.start){startGame(ds.start);return}
+  if(ds.a&&/^net/.test(ds.a)&&typeof netClick==='function'&&netClick(ds.a))return;
   if(ds.dial!=null){UI.draft[ds.ship]=+ds.dial;UI.hoverDial=null;const mine=alive().filter(s=>s.side===planSide());const nxt=mine.find(s=>UI.draft[s.id]==null);if(nxt&&ds.ship===UI.sel)UI.sel=nxt.id;render();return}
   if(ds.sel){UI.sel=ds.sel;render();return}
   if(ds.a==='lock'){const ps=planSide();const dials={};alive().filter(s=>s.side===ps).forEach(s=>dials[s.id]=UI.draft[s.id]);UI.pass=null;sfx('token');uiAct({act:'dials',dials});if(G&&G.phase==='plan'&&planSide()>=0)UI.pass=ps;render();return}
@@ -217,20 +224,22 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
 document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-dial],[data-hov]');const nd=t&&t.dataset.dial!=null?+t.dataset.dial:null;const nh=t&&t.dataset.hov?{a:t.dataset.hov.split(':')[0],i:+t.dataset.hov.split(':')[1]}:null;
   if(nd!==UI.hoverDial||JSON.stringify(nh)!==JSON.stringify(UI.hoverAct)){UI.hoverDial=nd;UI.hoverAct=nh;if(V3.on)drawGuides();else render2D();const info=document.querySelector('.dialinfo .mvread');if(info&&G&&G.phase==='plan'&&UI.sel&&ship(UI.sel)){const s=ship(UI.sel);const di=nd!=null?nd:UI.draft[s.id];if(di!=null)info.innerHTML=moveRead(s,di)}}});
 document.addEventListener('change',e=>{if(e.target.dataset.fac!=null){UI.fac[+e.target.dataset.fac]=+e.target.value;saveSetup()}});
-document.addEventListener('keydown',e=>{if(e.target&&/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;if(e.key==='Escape'){UI.rules=false;UI.stats=false;render();return}
+document.addEventListener('keydown',e=>{if(e.target&&/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;if(e.key==='Escape'){UI.rules=false;UI.stats=false;if(typeof NET!=='undefined'&&NET.on&&NET.inLobby)NET.lobbyMin=true;render();return}
   if(e.key==='p'||e.key==='P'){$('pausebtn').click();return}if(e.key==='t'||e.key==='T'){document.querySelector('[data-a="top"]').click();return}
   if(!G||G.winner||!humanTurn())return;const click=sel=>{const b=document.querySelector(sel);if(b&&!b.disabled){b.click();e.preventDefault()}};
   if(e.key==='Enter')click('#prompt .btn.primary');else if(e.key==='s'||e.key==='S')click('#prompt [data-a2="skip"],#prompt [data-w="skip"]');
   else if(/^[1-9]$/.test(e.key))click(`#prompt .acts button:nth-of-type(${e.key})`)});
-function startGame(mode,sortie){UI.info=false;UI.stats=false;UI.draft={};UI.pass=null;UI.sel=null;UI.sugCache=null;UI.autoSetup=false;UI.advOpen=false;
+function startGame(mode,sortie){if(typeof NET!=='undefined'&&NET.on)netLeave(true);UI.info=false;UI.stats=false;UI.draft={};UI.pass=null;UI.sel=null;UI.sugCache=null;UI.autoSetup=false;UI.advOpen=false;
   if(mode==='load'){const g=load();if(g){G=g;if(!['plan','over'].includes(G.phase)){G.phase='plan';G.step=1;alive().forEach(s=>s.dial=null);G.atk=null}refresh();return}}
   UI.mode=mode;const players=mode==='solo'?[{human:true},{human:false,lvl:UI.lvl}]:mode==='hot'?[{human:true},{human:true}]:[{human:false,lvl:UI.lvl},{human:false,lvl:UI.lvl}];
-  const custom=UI.size==='custom'&&UI.squads?UI.squads.map((sq,k)=>sq&&sq.length&&sq.every(e=>PILOTS[e.p]&&factionPilots(UI.fac[k],UI.ex).includes(e.p))&&squadCost(sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})))<=100?sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})):null):null;
-  const squads=custom&&(custom[0]||custom[1])?[custom[0]||randomSquad(UI.fac[0],100,UI.ex),custom[1]||randomSquad(UI.fac[1],100,UI.ex)]:null;
+  const squads=customSquads();
   if(sortie!=null&&SORTIES[sortie]){const so=SORTIES[sortie];UI.mode='solo';
     newGame({fac:[0,1],players:[{human:true},{human:false,lvl:UI.lvl}],sizeK:so.size||'core',squads:so.sq?so.sq.map(sq=>sq.map(e=>({p:e.p,u:e.u.slice()}))):null,ex:Object.assign({},UI.ex,so.ex||{})});G.sortie=sortie}
   else{newGame({fac:UI.fac.slice(),players,sizeK:UI.size,squads,ex:Object.assign({},UI.ex)});if(mode==='solo'&&UI.fac[0]===0&&UI.fac[1]===1&&UI.size==='core'&&!squads)G.sortie=0}
   resetGuide();if(bothHuman())UI.pass=0;camView('tilt');render()}
+// the squads built in the squad builder (battle size "custom"), checked; null = use the battle size's squads
+function customSquads(){const custom=UI.size==='custom'&&UI.squads?UI.squads.map((sq,k)=>sq&&sq.length&&sq.every(e=>PILOTS[e.p]&&factionPilots(UI.fac[k],UI.ex).includes(e.p))&&squadCost(sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})))<=100?sq.map(e=>({p:e.p,u:e.u.filter(Boolean)})):null):null;
+  return custom&&(custom[0]||custom[1])?[custom[0]||randomSquad(UI.fac[0],100,UI.ex),custom[1]||randomSquad(UI.fac[1],100,UI.ex)]:null}
 // ---- squad builder: add pilots, pick upgrades per slot, live points and unique checks ----
 try{const q=JSON.parse(localStorage.getItem('na_squads')||'null');if(q)UI.squads=q}catch(e){}
 function slotsOf(e){const P=PILOTS[e.p];const out=P.u.slice();(e.u||[]).forEach(u=>{const U=UPGRADES[u];if(U&&U.addSlot)out.push(U.addSlot)});return out}

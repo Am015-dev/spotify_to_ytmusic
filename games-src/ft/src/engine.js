@@ -7,7 +7,7 @@ function rnd(n){let t=(G.rng+=0x6D2B79F5);t=Math.imul(t^t>>>15,t|1);t^=t+Math.im
 function setSeed(s){DEFSEED=s>>>0;if(G)G.rng=s>>>0}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function lg(t,c){G.logN=(G.logN||0)+1;G.log.unshift({t,r:G.round,c:c||'',i:G.logN});if(G.log.length>500)G.log.length=500}
-function fx(t,x){if(UI.sim)return;UI.fx.push({t,x});if(UI.fx.length>40)UI.fx.shift()}
+function fx(t,x){if(UI.sim)return;UI.fxN=(UI.fxN||0)+1;UI.fx.push({t,x,n:UI.fxN});if(UI.fx.length>40)UI.fx.shift()}
 const P=i=>G.pl[i];
 // ---------- geometry (W×H grid, impassable tiles, mountains between tiles) ----------
 const wkey=(a,b)=>a<b?a+'_'+b:b+'_'+a;

@@ -3,10 +3,14 @@ const $=s=>document.querySelector(s);const esc=s=>String(s==null?'':s).replace(/
 const PCOL=['#2b2b33','#119e98','#ff4fa3','#8b5a2b','#6d7b8d'];const MCSS={vizier:'#f2c230',elder:'#f4f1ea',merchant:'#3fa34d',builder:'#2f6fd6',assassin:'#d23a2e',artisan:'#9a5bd0'};
 UI.dropColor=null;UI.pendDj=null;UI.sellSel=[];UI.fxSeen=0;UI.plans=null;UI.planKey='';UI.showPlan=-1;UI.autoPlan=null;UI.adv=null;UI.morePlans=false;
 try{UI.coach=localStorage.getItem('soq_coach')!=='0'}catch(e){UI.coach=true}
-function refresh(){if(G){try{if(!G.over&&!G.pl.every(p=>!p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
-  if(!G)return;playFx();render();try{computePick();sync3D()}catch(e){console.error(e)}schedule()}
+function refresh(){if(G&&!(typeof NET!=='undefined'&&NET.on)){try{if(!G.over&&!G.pl.every(p=>!p.human))localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
+  if(!G)return;playFx();render();try{computePick();sync3D()}catch(e){console.error(e)}schedule();if(typeof NET!=='undefined'&&NET.on){if(isHost())netPush();netTurnCheck()}}
 function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){const m={pick:'pick',drop:'drop',take:'take',camel:'camel',coins:'coins',res:'take',kill:'kill',djinn:'djinn',build:'build',bid:'bid',round:'round',win:'win',thief:'kill',item:'djinn'}[f.t];if(m&&typeof sfx==='function')sfx(m)}UI.fxSeen=UI.fx.length;if(UI.fx.length>30){UI.fx.splice(0,20);UI.fxSeen=UI.fx.length}}
-const me=()=>{if(!G)return null;const s=sideToAct();return s>=0&&P(s).human?P(s):null};
+const online=()=>typeof NET!=='undefined'&&NET.on;
+const me=()=>{if(!G)return null;const s=sideToAct();if(online()&&s!==NET.mySeat)return null;return s>=0&&P(s).human?P(s):null};
+const mySeatP=()=>online()?(NET.mySeat>=0?P(NET.mySeat):null):null;
+// online, a rival's Crafter items are face down: their points stay hidden until the end
+function shownTotal(p){const s=scoreOf(p);return online()&&!G.over&&p.i!==NET.mySeat?s.total-s.items:s.total}
 function human(){return G&&G.pl.some(p=>p.human)}
 // which tiles glow for the human now
 function computePick(){UI.pick=[];UI.pickFaint=[];UI.badges=null;const p=me();if(!p||G.q)return;const vm=validMoves(p.i);
@@ -19,23 +23,24 @@ function computePick(){UI.pick=[];UI.pickFaint=[];UI.badges=null;const p=me();if
 // ---------- top-level render ----------
 function render(){if(!G){renderModal();return}if(G.move&&!UI.autoPlan&&(!UI.path||UI.path.length!==G.move.path.length))showPath(G.move.path.slice());if(G.phase==='bid'&&!UI.modal)showChapter();renderDock();renderPopups();renderModal();renderMap2D();
   const pb=$('#pausebtn');if(pb){pb.hidden=human();pb.innerHTML=ICON(UI.pause?'play':'pause')}const sb=$('#speedbtn');if(sb)sb.innerHTML=ICON('fast')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';
-  const ch=$('#chip');if(ch){const s=sideToAct();ch.textContent=G.over?'Game over':`Round ${G.round} · ${G.phase==='bid'?'bidding':s>=0?P(s).nm+(G.phase==='turn'?' · '+stepName():''):''}`}}
+  renderChip()}
+function renderChip(){const ch=$('#chip');if(ch&&G){const s=sideToAct();ch.textContent=(G.over?'Game over':`Round ${G.round} · ${G.phase==='bid'?'bidding':s>=0?(online()&&s===NET.mySeat?'You':P(s).nm)+(G.phase==='turn'?' · '+stepName():''):''}`)+(online()?' · 🌐 '+netStatus().replace(/ players online$/,' online'):'')}}
 function stepName(){return {move:'moving',tribe:'tribe action',tile:'tile action',sell:'selling'}[G.step]||''}
 function pChip(p){return `<span class="pc" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}</span>`}
 function mdot(c,big){return `<span class="md ${big?'big':''}" style="--mc:${MCSS[c]}" title="${MNAME[c]}"></span>`}
 function statusHtml(p){const s=scoreOf(p);const L=(ic,n,lab,t)=>`<span class="st" title="${t||lab}">${ic} <b>${n}</b><small>${lab}</small></span>`;
-  return `<div class="stat" style="--pc:${PCOL[p.i]}"><b class="nm">${esc(p.nm)}${p.human?'':' <small>(cpu)</small>'}</b><span class="tot" title="points so far">★ ${s.total}</span>
+  return `<div class="stat" style="--pc:${PCOL[p.i]}"><b class="nm">${esc(p.nm)}${online()&&p.i===NET.mySeat?' <small>(you)</small>':''}${p.human?'':p.away?' <small>(left · cpu)</small>':' <small>(cpu)</small>'}</b><span class="tot" title="points so far">★ ${shownTotal(p)}</span>
    <div class="sts">${L('🪙',p.coins,'coins')}${L('🐪',p.camels,'camels')}${p.tent?L('⛺',1,'tent'):''}${L(mdot('vizier'),p.vz,'Advisors')}${L(mdot('elder'),p.el,'Sages')}${G.ex.artisans?L(mdot('artisan'),p.art,'Crafters'):''}${L('🔮',p.fk,'Mystics','Mystic cards: add power to Masons or Shadows, or stand in for a Sage')}${L('🧺',p.res.length,'goods · set '+goodsBest(p),'goods cards; the set is worth '+goodsBest(p)+' points now')}${p.dj.length?L('🧞',p.dj.length,'djinns'):''}</div></div>`}
-function standing(){const h=me()||G.pl.find(p=>p.human);if(!h)return '';const sc=G.pl.map(p=>({p,t:scoreOf(p).total})).sort((a,b)=>b.t-a.t);const mine=sc.find(x=>x.p===h).t;const lead=sc.find(x=>x.p!==h);if(!lead)return '';
+function standing(){const h=online()?mySeatP():me()||G.pl.find(p=>p.human);if(!h)return '';const sc=G.pl.map(p=>({p,t:shownTotal(p)})).sort((a,b)=>b.t-a.t);const mine=sc.find(x=>x.p===h).t;const lead=sc.find(x=>x.p!==h);if(!lead)return '';
   const d=mine-lead.t;return `<p class="standing">${d>0?`You lead ${esc(lead.p.nm)} by <b>${d}</b>.`:d<0?`You are <b>${-d}</b> behind ${esc(sc[0].p.nm)}.`:`You are level with ${esc(lead.p.nm)}.`} ${G.pl.map(p=>p.camels).some(c=>c<=3)?'⏳ A player is down to their last camels: the end is near.':''}</p>`}
 function marketHtml(hl){return `<div class="mkt" aria-label="Market row">${G.market.map((r,j)=>`<span class="gc ${hl&&j<hl?'hl':''}" title="${RNAME[r]}">${RICON[r]}<small>${j+1}</small></span>`).join('')}</div>`}
 function djRowHtml(){return `<p class="small muted" style="margin:0">Summon one at a Shrine with 2 Sages (or 1 Sage + 1 Mystic).</p><div class="djrow">${G.djRow.map(k=>`<button class="djc" data-dj="${k}" title="${esc(DJ[k].x)}"><b>${esc(DJ[k].n)} <small>${DJ[k].vp} pts</small></b><small class="dx">${esc(DJ[k].x)}</small></button>`).join('')}${G.ex.thieves&&G.thRow.length?G.thRow.map(k=>`<button class="djc th" data-th="${k}" title="${esc(THIEVES[k].x)}"><b>${esc(THIEVES[k].n)}</b><small>cutpurse</small></button>`).join(''):''}</div>`}
 function btn(m,label,cls){return `<button class="btn ${cls||''}" data-mv='${esc(JSON.stringify(m))}'>${label}</button>`}
 function renderDock(){const el=$('#dockbody');if(!el)return;const s=sideToAct();const p=s>=0?P(s):null;const hp=me();let h='';
-  const dt=$('#dockt');if(dt)dt.textContent=G.over?'Game over':G.q&&hp?'Your choice':hp?`${hp.nm}: ${G.phase==='bid'?'bid for turn order':stepName()}`:p?`${p.nm} is thinking…`:'';
+  const dt=$('#dockt');if(dt)dt.textContent=G.over?'Game over':G.q&&hp?'Your choice':hp?`${online()?'Your turn':hp.nm}: ${G.phase==='bid'?'bid for turn order':stepName()}`:p?(online()&&p.human?`Waiting for ${p.nm}…`:`${p.nm} is thinking…`):'';
   const statsH=`<div class="stats">${G.pl.map(statusHtml).join('')}${standing()}</div>`;
   if(G.over){h+=statsH+scoreTable();h+=`<div class="acts">${btn({ui:'new'},'New game','go')}</div>`;el.innerHTML=h;return}
-  if(!hp){h+=statsH+`<div class="recap"><h4>${p?esc(p.nm)+(G.phase==='bid'?' is bidding…':' is playing…'):''}</h4>${recapHtml()}</div>${marketHtml()}${djRowHtml()}`;el.innerHTML=h;return}
+  if(!hp){h+=statsH+`<div class="recap"><h4>${p?(online()&&p.human?'Waiting for '+esc(p.nm)+(G.phase==='bid'?' to bid…':'…'):esc(p.nm)+(G.phase==='bid'?' is bidding…':' is playing…')):''}</h4>${recapHtml()}</div>${marketHtml()}${djRowHtml()}`;el.innerHTML=h;return}
   if(UI.adv&&UI.adv.key!==G.logN+'_'+G.step+'_'+G.phase+'_'+!!G.q)UI.adv=null;
   if(UI.adv)h+=advHtml();
   if(G.q){h+=`<div class="prompt"><h3>${esc(G.q.title)}</h3><div class="opts">${G.q.opts.map((o,i)=>btn({act:'q',i},esc(o.l),'opt')).join('')}</div></div>`+statsH;el.innerHTML=h;GX.showDock();return}
@@ -109,25 +114,27 @@ function showPath(path){UI.path=path;if(typeof showPath3D==='function')try{showP
 function renderPopups(){if(GX.open==='logd'){const lb=$('#logbody');lb.innerHTML=`<ol class="log">${G.log.slice(0,300).reverse().map(l=>`<li class="${l.c}"><small>R${l.r}</small> ${esc(l.t)}</li>`).join('')}</ol>`;lb.scrollTop=lb.scrollHeight}
   if(GX.open==='plrd')$('#plrbody').innerHTML=G.pl.map(p=>playerSheet(p)).join('');
   if(GX.open==='djd'&&$('#djbody').dataset.v!==String(G.logN))renderDjPop()}
-function playerSheet(p){const s=scoreOf(p);return `<section class="sheet" style="--pc:${PCOL[p.i]}"><h3>${pChip(p)} ${p.human?'':'<small>(computer)</small>'} <span class="tot">★ ${s.total}</span></h3>${statusHtml(p)}
+function playerSheet(p){const s=scoreOf(p);const hid=online()&&!G.over&&p.i!==NET.mySeat;return `<section class="sheet" style="--pc:${PCOL[p.i]}"><h3>${pChip(p)} ${online()&&p.i===NET.mySeat?'<small>(you)</small>':''}${p.human?'':'<small>(computer)</small>'} <span class="tot">★ ${shownTotal(p)}</span></h3>${statusHtml(p)}
   <div><b>Goods:</b> ${p.res.length?p.res.slice().sort().map(r=>RICON[r]).join(' '):'none'} ${p.fk?`· ${p.fk} Mystic${p.fk>1?'s':''}`:''}</div>
   <div><b>Djinns:</b> ${p.dj.length?p.dj.map(k=>`<span class="tag" title="${esc(DJ[k].x)}">${esc(DJ[k].n)} ${DJ[k].vp}</span>`).join(' '):'none'}</div>
-  ${G.ex.artisans?`<div><b>Items:</b> ${p.items.length?p.items.map(k=>`<span class="tag" title="${esc(ITEMS[k].x)}">${esc(ITEMS[k].n)}</span>`).join(' '):'none'}</div>`:''}
+  ${G.ex.artisans?`<div><b>Items:</b> ${hid&&p.items.length?`${p.items.length} face down`:p.items.length?p.items.map(k=>`<span class="tag" title="${esc(ITEMS[k].x)}">${esc(ITEMS[k].n)}</span>`).join(' '):'none'}</div>`:''}
   ${G.ex.thieves?`<div><b>Cutpurses:</b> ${p.thieves.length?p.thieves.map(t=>esc(THIEVES[t.k].n)).join(', '):'none'}</div>`:''}
   <div><b>Tiles held:</b> ${G.board.filter(t=>owner(t)===p.i).map(t=>`${esc(tileName(t))}${t.palm?' 🌴'+t.palm:''}${t.pal?' 🏰'+t.pal:''}`).join(', ')||'none'}</div>
-  <div class="small muted">So far: ${Object.entries(s).filter(([k,v])=>v&&k!=='total').map(([k,v])=>k+' '+v).join(' · ')}</div></section>`}
+  <div class="small muted">So far: ${Object.entries(s).filter(([k,v])=>v&&k!=='total'&&!(hid&&k==='items')).map(([k,v])=>k+' '+v).join(' · ')}</div></section>`}
 function renderDjPop(){const b=$('#djbody');b.dataset.v=String(G.logN);const inGame=DJINNS_FOR(G.ex);const where=k=>{if(G.djRow.includes(k))return 'on offer';for(const p of G.pl)if(p.dj.includes(k))return 'owned by '+p.nm;if(G.djDisc.includes(k))return 'discarded';return 'in the deck'};
   b.innerHTML=`<p class="muted small">Summon djinns at a Shrine: 2 Sages, or 1 Sage and 1 Mystic. Powers with a cost can be used once per turn, paying each time.</p><div class="cgrid">${inGame.map(d=>`<div class="card dj"><h4>${esc(d.n)} <small>${d.vp} pts</small></h4>${cardArt('djinn',d.n)}<div class="tag">${d.cost?{EF:'power: 1 Sage or 1 Mystic',EEF:'power: 1 Sage + 1 Sage-or-Mystic',F:'power: 1 Mystic','F+':'power: Mystics when bidding'}[d.cost]:'always on'} · ${where(d.k)}</div><p>${esc(d.x)}</p></div>`).join('')}</div>`}
 // ---------- the start screen, rules and card list ----------
-function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='start'?startHtml():UI.modal==='opening'?openingHtml():'';m.hidden=!h;if(m.dataset.h!==h){m.innerHTML=h;m.dataset.h=h;if(UI.modal==='opening')paintOpening()}}
+function renderModal(){const m=$('#modal');if(!m)return;const h=UI.modal==='start'?startHtml():UI.modal==='opening'?openingHtml():UI.modal==='lobby'&&online()?lobbyHtml():'';m.hidden=!h;if(m.dataset.h!==h){
+  const a=document.activeElement,id=a&&m.contains(a)&&a.id,sel=id&&a.selectionStart!=null?[a.selectionStart,a.selectionEnd]:null;const det=[...m.querySelectorAll('details')].map(d=>d.open);
+  m.innerHTML=h;m.dataset.h=h;if(UI.modal==='opening')paintOpening();[...m.querySelectorAll('details')].forEach((d,i)=>{if(det[i]!=null)d.open=det[i]});if(id){const e=document.getElementById(id);if(e){e.focus({preventScroll:true});if(sel)try{e.setSelectionRange(sel[0],sel[1])}catch(x){}}}}}
 UI.setup={np:2,seats:['human','ai','ai','ai','ai'],lv:['normal','normal','normal','normal','normal'],ex:{artisans:false,sultan:false,thieves:false,promos:false}};
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox"><h2>Sands of Qamar</h2><p class="lede">Move the five tribes across the sultanate, claim tiles with your camels, summon djinns and trade in the bazaar. Most points wins.</p>
-   ${saved?`<div class="acts"><button class="btn go" data-ui="continue">Continue the saved game</button></div>`:''}
+   ${saved&&!online()?`<div class="acts"><button class="btn go" data-ui="continue">Continue the saved game</button></div>`:''}
    <h3>Players</h3><div class="seg">${[2,3,4,5].map(n=>`<button class="${o.np===n?'on':''}" data-np="${n}">${n}</button>`).join('')}</div>
    <div class="seats">${Array.from({length:o.np},(_,i)=>`<div class="seat" style="--pc:${PCOL[i]}"><i></i><b>${PNAMES[i]}</b><button class="btn sm" data-seat="${i}">${o.seats[i]==='human'?'🙂 you / a friend':'🤖 computer'}</button>${o.seats[i]==='ai'?`<button class="btn sm ghost" data-lv="${i}">${o.lv[i]}</button>`:''}</div>`).join('')}</div>
    <details class="exd"><summary><b>Expansions</b> <small>(optional: try the base game first)</small></summary><div class="exs">${[['artisans','The Crafters','purple Crafters, Workshops, items, mountains, a tent each'],['sultan','Wonder Cities','Wonder Cities, the Great Lake and a 5th player'],['thieves','Cutpurses','hire a cutpurse at a Shrine to rob every rival'],['promos','Promo djinns','three extra djinns']].map(([k,n,x])=>`<label class="chk"><input type="checkbox" data-ex="${k}" ${o.ex[k]||(k==='sultan'&&o.np===5)?'checked':''} ${k==='sultan'&&o.np===5?'disabled':''}> <b>${n}</b> <small>${x}</small></label>`).join('')}</div></details>
-   <div class="acts"><button class="btn go" data-ui="start">Begin ▶</button><button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Card list</button></div></div>`}
+   <div class="acts">${online()?'':'<button class="btn go" data-ui="start">Begin ▶</button>'}<button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Card list</button></div>${typeof onlineBlock==='function'?onlineBlock():''}</div>`}
 function refHtml(){const sec=(t,items)=>`<h3>${t}</h3><div class="cgrid">${items.map(i=>`<div class="card"><h4>${i.n}${i.c>1?` <small>×${i.c}</small>`:''}</h4>${i.art||(/^[^\x00-\x7f]/.test(i.n)?cardArt('good',i.n,{glyph:i.n.split(' ')[0],hue:30}):'')}${i.tag?`<div class="tag">${esc(i.tag)}</div>`:''}<p>${esc(i.x)}</p></div>`).join('')}</div>`;
   const tiles=[];for(const [k,v,n,col] of TILESET.concat(TILESET_ART,TILESET_WHIM)){const d=TILEDEF[k];tiles.push({art:cardArt('tile',d.n+v,{blue:col?col==='blue':d.blue,v,hue:30}),n:d.n,c:n,tag:`${v?v+' points · ':''}${(col?col==='blue':d.blue)?'blue':'red'}${TILESET_ART.some(x=>x[0]===k)?' · Crafters':TILESET_WHIM.some(x=>x[0]===k)?' · Wonder Cities':''}`,x:d.x})}
   return sec('The five tribes (and the Crafters)',Object.keys(MNAME).map(c=>({art:cardArt('tribe',c,{col:MCSS[c]||'#888',hue:35}),n:`${MNAME[c]} (${c==='vizier'?'yellow':c==='elder'?'white':c==='merchant'?'green':c==='builder'?'blue':c==='assassin'?'red':'purple'})`,c:c==='artisan'?15:MEEPLE_COUNT[c],tag:c==='artisan'?'Crafters expansion':'meeples',x:MHELP[c]})))+
@@ -145,13 +152,13 @@ function on3DTile(i){const p=me();if(!p||G.q)return;const vm=validMoves(p.i);
     const ok=vm.filter(m=>m.act==='step'&&m.tile===i);if(!ok.length)return toast('You can’t drop there.');const m=ok.find(m=>m.c===UI.dropColor)||ok[0];if(m.c!==UI.dropColor&&UI.dropColor)toast(`Dropped a ${MNAME[m.c]} (the ${MNAME[UI.dropColor]} can’t go there).`);return go(m)}
   if(G.step==='tribe'&&G.act.color==='assassin'){const ks=vm.filter(m=>m.act==='tribe'&&m.kill&&m.kill.tile===i);if(ks.length===1)return go(ks[0]);if(ks.length)return toast('Choose which meeple in the panel.');}
   if(G.step==='tile'){const m=vm.find(m=>m.act==='tile'&&m.place===i);if(m)return go(m)}}
-function go(m){UI.adv=null;const s=sideToAct();const human=s>=0&&P(s).human;
+function go(m){UI.adv=null;if(online()&&isClient()){netSend(m);return}const s=sideToAct();const human=s>=0&&P(s).human;const mine=!online()||s===NET.mySeat;
   // remember the move so a human can take back drops one at a time (nothing hidden is revealed while moving)
   if(human&&m.act==='start'){UI.moveSnap=JSON.stringify(G);UI.moveSteps=[m]}
   else if(human&&m.act==='step'&&UI.moveSteps)UI.moveSteps.push(m);else if(m.act!=='djinn'&&m.act!=='item')UI.moveSnap=null;
   const before=human?scoreOf(P(s)):null;
-  const r=performMove(m,s);if(r.success&&human&&G&&!G.over)scoreNote(P(s),before);
-  if(G&&!G.move){UI.moveSnap=G.step==='move'?UI.moveSnap:null}if(G&&G.step!=='move'&&UI.path)showPath(null);if(!r.success){toast('That move isn’t allowed now.');console.error(r.error)}}
+  const r=performMove(m,s);if(r.success&&human&&mine&&G&&!G.over)scoreNote(P(s),before);
+  if(G&&!G.move){UI.moveSnap=G.step==='move'?UI.moveSnap:null}if(G&&G.step!=='move'&&UI.path)showPath(null);if(!r.success&&mine){toast('That move isn’t allowed now.');console.error(r.error)}}
 function toast(t){const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,3000)}
 document.addEventListener('click',e=>{const b=e.target.closest('button,[data-tile],input[type=checkbox]');if(!b)return;const d=b.dataset;
   if(d.mv){const m=JSON.parse(d.mv);if(m.ui)return uiAct(m.ui);UI.adv=null;if(m.act==='sell')UI.sellSel=[];sfx&&sfx('click');return go(m)}
@@ -169,8 +176,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-til
   if(d.lv!=null){const i=+d.lv;const L=['easy','normal','hard'];UI.setup.lv[i]=L[(L.indexOf(UI.setup.lv[i])+1)%3];render();return}
   if(d.ex&&b.type==='checkbox'){UI.setup.ex[d.ex]=b.checked;return}
   if(d.ui)return uiAct(d.ui);
-  switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':openStart();return;case 'advise':askAdvisor();return}});
-function uiAct(a){switch(a){case 'start':beginGame();return;case 'continue':loadSaved();return;case 'new':openStart();return;case 'cancelpw':UI.pendDj=null;computePick();sync3D();render();return;case 'undodrop':{if(!UI.moveSnap||!UI.moveSteps)return;const steps=UI.moveSteps.slice(0,-1);G=JSON.parse(UI.moveSnap);UI.moveSteps=[];for(const m of steps){performMove(m,G.cur);UI.moveSteps.push(m)}if(!steps.length)UI.moveSnap=null;resetScene();refresh();return}
+  switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':if(online()){UI.modal='lobby';render();return}openStart();return;case 'advise':askAdvisor();return}});
+function uiAct(a){if(online()){if(a==='new'||a==='start'){UI.modal='lobby';render();return}if(a==='undodrop'&&isClient()){netSend({act:'undodrop'});return}if(a==='continue')return}switch(a){case 'start':beginGame();return;case 'continue':loadSaved();return;case 'new':openStart();return;case 'cancelpw':UI.pendDj=null;computePick();sync3D();render();return;case 'undodrop':{if(!UI.moveSnap||!UI.moveSteps)return;const steps=UI.moveSteps.slice(0,-1);G=JSON.parse(UI.moveSnap);UI.moveSteps=[];for(const m of steps){performMove(m,G.cur);UI.moveSteps.push(m)}if(!steps.length)UI.moveSnap=null;resetScene();refresh();return}
   case 'moreplans':UI.morePlans=!UI.morePlans;render();return;case 'advx':UI.adv=null;showPath(null);render();return;case 'play':UI.modal=G?null:'start';render();schedule();return}}
 document.addEventListener('mouseover',e=>{const c=e.target.closest&&e.target.closest('.plan[data-plani]');if(!c||!UI.plans||UI.autoPlan)return;const i=+c.dataset.plani;if(UI.hoverPlan===i)return;UI.hoverPlan=i;showPath(UI.plans[i].path)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pendDj){UI.pendDj=null;render()}});
@@ -213,7 +220,8 @@ function cardArt(kind,name,o){o=o||{};const h=o.hue!=null?o.hue:hueOf(name);cons
   else fg=`<text x="50" y="58" font-size="30" text-anchor="middle">${o.glyph||''}</text>`;
   return `<svg class="ca" viewBox="0 0 100 76" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl(${h},55%,${kind==='djinn'?30:62}%)"/><stop offset="1" stop-color="hsl(${(h+30)%360},60%,${kind==='djinn'?14:40}%)"/></linearGradient></defs><rect width="100" height="76" fill="url(#${id})"/><path d="M0 76V40q50-30 100 0v36z" fill="rgba(255,255,255,.08)"/>${fg}</svg>`}
 // ---------- the computer ----------
-let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||UI.modal)return;const s=sideToAct();if(s<0||P(s).human)return;aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||UI.modal)return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase+'/'+G.step);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*(G.step==='move'&&G.move?.5:1)))}
-function showOpeningFirst(){UI.modal='opening';render()}
+const modalStops=()=>UI.modal&&UI.modal!=='lobby';
+let aiTimer=null;function schedule(){if(online()&&isClient())return;if(aiTimer||!G||G.over||UI.pause||modalStops())return;const s=sideToAct();if(s<0||P(s).human)return;aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||modalStops()||(online()&&isClient()))return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase+'/'+G.step);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*(G.step==='move'&&G.move?.5:1)))}
+function showOpeningFirst(){UI.modal=UI.netOpen&&UI.joinCode?'start':'opening';render()}
 function boot(){GX.init({key:'soq'});paintIcons();GX.onShow=id=>{if(id==='setd')renderSettings();if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(id==='refd')$('#refbody').innerHTML=refHtml();if(G)render()};try{init3D()}catch(e){console.error(e)}soundBtns();showOpeningFirst()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
