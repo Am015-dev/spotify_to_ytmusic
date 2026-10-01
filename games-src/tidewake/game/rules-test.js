@@ -152,6 +152,18 @@ T('Maelstrom does not move on a monster-moving roll (6/7/8)',()=>{game(2,{exp:{m
   for(let sd=1;sd<=200;sd++){rig({ships:[{x:5,y:5,e:4},{x:0,y:5,e:6}],mons:[{id:11,x:2,y:2},{id:0,x:3,y:3},{id:1,x:5,y:0},{id:2,x:0,y:0}]});X.G.rng=sd*131;X.G.step=null;X.G.agI=0;
     const m0=E.monById(11);const pos=[m0.x,m0.y];E.AG.roll({});run();const t=X.G.dice[0]+X.G.dice[1];if(t>=6&&t<=8){tot++;const m=E.monById(11);if(m&&m.x===pos[0]&&m.y===pos[1])still++}}
   ok(tot>20&&still===tot,`maelstrom stood still on all ${tot} monster rolls`)});
+T('FIX1 Maelstrom: a tile it destroys leaves the game (G.gone), not the draw pile; a leviathan still recycles its tiles',()=>{game(2,{exp:{maelstrom:1}});
+  rig({tiles:[{x:3,y:2,id:T1b,r:0}],ships:[{x:5,y:5,e:4},{x:0,y:3,e:6}],mons:[{id:11,x:2,y:2},{id:0,x:0,y:0},{id:1,x:5,y:0},{id:2,x:0,y:5}]});
+  const d0=X.G.deck.length;X.G.arr={id:11,k:'M',x:3,y:2,r:0,dead:[],move:1};X.G.agI=0;E.AG.arrive({});run();
+  ok(!X.G.bd[2*6+3],'tile removed');ok(X.G.gone.includes(T1b),'in gone');ok(X.G.deck.length===d0&&!X.G.deck.includes(T1b),'not in the pile');inv();
+  game(2);rig({tiles:[{x:3,y:2,id:T1b,r:0}],ships:[{x:5,y:5,e:4},{x:0,y:3,e:6}],mons:[{id:0,x:2,y:2},{id:1,x:5,y:0},{id:2,x:0,y:5}]});
+  X.G.arr={id:0,k:'L',x:3,y:2,r:0,dead:[]};X.G.agI=0;E.AG.arrFinal({});run();ok(X.G.deck[X.G.deck.length-1]===T1b,'leviathan tile goes to the bottom of the pile');inv()});
+T('FIX4 set-up: Rogue Wave / Maelstrom drawn at set-up count toward the 6/5/4 starting tiles',()=>{let sawExtra=0;
+  for(let sd=1;sd<=60;sd++){game(4,{seed:sd,exp:{wave:1,maelstrom:1}});const G=X.G;const lev=G.mons.filter(m=>m.k==='L').length,extra=(G.wave?1:0)+(G.mons.some(m=>m.k==='M')?1:0)+(G.mgone.some(i=>i>=10)?1:0);
+    ok(lev+extra<=6,'seed '+sd+': '+lev+' leviathans + '+extra+' specials > 6');if(extra)sawExtra++;inv()}
+  ok(sawExtra>5,'specials do get drawn at set-up');for(let sd=1;sd<=80;sd++){game(1,{variant:'easysolo',seed:sd,exp:{wave:1,maelstrom:1}});ok(X.G.mons.filter(m=>m.k==='L').length>=3,'min 3 leviathans after set-up, seed '+sd)}});
+T('FIX5 teams: only 4, 6 or 8 players (5 -> 4, 7 -> 6, 2 -> 4)',()=>{for(const [n,w] of [[2,4],[3,4],[4,4],[5,4],[6,6],[7,6],[8,8]]){game(n,{variant:'teams'});eq(X.G.np,w,n+' players');eq(X.G.team.filter(t=>t===0).length,w/2)}});
+T('FIX3 easy solo (our variant): 4 starting leviathans, goal 24 turns',()=>{game(1,{variant:'easysolo'});eq(X.G.mons.filter(m=>m.k==='L').length,4);eq(X.G.opts.goal,24)});
 T('knowledge hides others\' hands, deck order, monster-deck order and seed',()=>{game(3,{exp:{cannon:1,rift:1}});const K=X.knowledge(1);ok(K.hands[0].every(c=>c===-1)&&K.hands[1].every(c=>c>=0),'own hand only');ok(K.deck.every(c=>c===-1));ok(K.seed===undefined&&K.rng===undefined);
   ok(JSON.stringify(K.mdeck)===JSON.stringify(K.mdeck.slice().sort((a,b)=>a-b)),'monster deck order hidden');inv()});
 console.log(`\n${pass} passed, ${fail} failed`+(fails.length?': '+fails.join('; '):''));process.exit(fail?1:0);

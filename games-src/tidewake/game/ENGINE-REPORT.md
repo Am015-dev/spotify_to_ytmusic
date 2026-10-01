@@ -18,7 +18,7 @@ Squares `(x,y)` x = column 0-5 (gold die - 1), y = row 0-5 (blue die - 1). Ports
 ## API
 | Call | Meaning |
 |---|---|
-| `newGame({players 2-8, seats?, level?/lv[], exp:{rift,wave,maelstrom,cannon}, variant:'solo'\|'easysolo'\|'teams', first?, seed?, noMon?, goalTurns?, soloLev?})` | `seats` = array of `'human'`/`'ai'`. Teams: seat%2, needs 4+ (2 teams). Solo/easysolo force 1 player. `noMon` = the official "no daikaiju" option. Phase `setup` first (ships choose start marks, in play order, before any tile) |
+| `newGame({players 2-8, seats?, level?/lv[], exp:{rift,wave,maelstrom,cannon}, variant:'solo'\|'easysolo'\|'teams', first?, seed?, noMon?, goalTurns?, soloLev?})` | `seats` = array of `'human'`/`'ai'`. Teams: seat%2, 4, 6 or 8 players only (others are rounded to 4/6). Solo/easysolo force 1 player. `noMon` = the official "no daikaiju" option. Phase `setup` first (ships choose start marks, in play order, before any tile) |
 | `sideToAct()` | seat the game waits for: start-mark chooser, the question owner (`G.q.who`, may be an interrupter on someone else's turn), or the active player; -1 when over |
 | `validMoves(seat)` | `{a:'start',x,y,e}` \| `{a:'place',t,r,s}` (hand index, rotation 0-3, ship seat; 4 rotations per tile; prohibited placements only when nothing else is legal) \| `{a:'gate',t,s}` \| `{a:'cannon',t,m,s}` \| `{a:'pass'}` \| `{a:'q',i,l}` (answer to `G.q`) |
 | `legal(m,seat)` | `''` or a reason; `performMove(m,seat)` -> `{success,error}` (calls global `refresh()` if defined and `UI.sim` is 0) |
@@ -33,12 +33,12 @@ State is one JSON-safe `G` (no functions): `phase` setup/play/over, `step` act/n
 1 Roll 2d6 (skipped on a minimum-3 refill turn): 6/7/8 moves every leviathan in order of corner number (gold arrow breaks ties) with one die each (1-5 arrow, 6 = it stays and a new leviathan is placed); otherwise the Maelstrom moves. The Rogue Wave first moves if this is its placer's slot and a round has passed, then the active ship in the row rolls. A leviathan in front of the active ship eliminates it (interrupts first; an unmoved start may relocate along its edge). 2 Place a current (or Rift Gate / Deck Cannon) on the front square, any rotation. 3 Every ship whose front is that square follows its wake through chained tiles to the open end; edge or leviathan tile = elimination; two ships on one port = both sink; Rogue Wave rolls for ships passing the row. 4 Elimination bonus (swap), draw to 3 (a drawn cannon: keep or show-and-discard). Leviathans entering a tile destroy it (to the bottom of the pile; discarded in easy solo) and sink ships on it; a moving leviathan destroys a stationary one; leaving the board removes it; under 3 on board -> next player refills to 3 and does not roll. Last ship wins; ships lost in the same step share the win.
 
 ## Choices and guesses (flagged)
-- 21 duplicate currents: `EXTRA_TYPES` (even spread). Leviathan arrow layouts and numbers: ours (two gold tie-breaks); setup draws until N leviathans (6/5/4) are down, the Rogue Wave / Maelstrom drawn on the way are extra.
+- 21 duplicate currents: `EXTRA_TYPES` (even spread). Leviathan arrow layouts and numbers: ours (two gold tie-breaks); setup draws N tiles (6/5/4) and every one counts, the Rogue Wave / Maelstrom drawn on the way included (literal rule); if that leaves fewer than 3 leviathans, set-up tops up to 3 at once (minimum-3 rule).
 - Collision: rules notes say ships pass through each other, but two ships forced onto one wake end in the same direction both sink (Tsuro rule; that placement is otherwise prohibited). A head-on link of two wakes sends each back along the other's wake (to the other's start edge), so both sink.
 - Rift Gate interrupt placement: an empty square next to the doomed ship's last tile; own-turn play: on the front square. Transport rolls 2 dice (re-rolling squares with leviathans, gates, or empty with no tile to place), asks for a tile (empty target) then the wake and direction (not onto another ship's end if avoidable, no more than 2 gate loops). A gate on a front square sweeps every ship waiting there.
 - Deck Cannon own-turn range: leviathans orthogonally adjacent to the front square or the ship's tile. Interrupt: any ship about to be lost to that leviathan (tile landing, path into its tile, blocked front, spawn). Not usable on the Maelstrom or Wave.
 - Rogue Wave strength 2 / 3 after its first move / 4 from the fourth round; rolls for the active ship after its own move, when the wave moves, and for any ship moved through the row by a tile; a ship's square = its tile (start ships: front square).
-- Easy solo: pile exhausted OR 24 turns survived (`goalTurns`): a 6x6 board holds only 36 of the 56 currents, so "play every current" is out of reach (0/100 for the AI). Solo: 6 leviathans, outlast all 10.
+- Easy solo (OUR variant: 4 starting leviathans, 24-turn goal): pile exhausted OR 24 turns survived (`goalTurns`): a 6x6 board holds only 36 of the 56 currents, so "play every current" is out of reach (0/100 for the AI). Solo: 6 leviathans, outlast all 10.
 
 ## Numbers (normal AI, equal captains; `out/`)
 - gauntlet: 6,000 + 2,400 games (2-8 players x base/rift/wave/maelstrom/cannon/all, + solo, easy solo, teams): 0 errors, 0 stalls, 0 invariant failures; easy and hard 720 games each also clean.
@@ -53,3 +53,7 @@ State is one JSON-safe `G` (no functions): `phase` setup/play/over, `step` act/n
 
 ## For stage 2 notes
 Show `G.q` to `G.q.who` even on another player's turn (interrupts). The human hand is `G.hands[seat]`; for online play send `knowledge(seat)`. `UI.sim` suppresses `refresh()`. `G.stats` and `G.log` (newest first, `{t,c,i,turn}`) are for the coach/HUD.
+
+
+## Rules-audit pass (stage 3)
+See RULES-AUDIT.md Status lines. Changes: Maelstrom-destroyed tiles leave the game (`G.gone`); Wave/Maelstrom drawn at set-up count toward 6/5/4; teams only 4/6/8; 6x6 board and easy-solo 4 leviathans/24 turns kept as stated variants; remaining ambiguities keep the reading closest to the rulebook (finding notes). rules-test.js now has 38 scenarios (FIX1, FIX3, FIX4, FIX5 added). UI wording in TEXT-PATCH.md.

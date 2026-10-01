@@ -79,7 +79,7 @@ function flow(){let g=0;while(G&&G.phase!=='over'&&!G.q&&G.ag.length&&g++<4000){
 // ---------- setup ----------
 function newGame(o){o=o||{};const seed=o.seed!=null?o.seed>>>0:DEFSEED!=null?DEFSEED:Math.floor(Math.random()*2**31);
   const variant=o.variant||null;const solo=variant==='solo'||variant==='easysolo';
-  let np=solo?1:Math.max(2,Math.min(8,o.players||o.np||2));if(variant==='teams'&&np<4)np=4;
+  let np=solo?1:Math.max(2,Math.min(8,o.players||o.np||2));if(variant==='teams'){if(np<4)np=4;else if(np%2)np--}  // teams: 4, 6 or 8 players only (two equal teams)
   const ex=Object.assign({rift:0,wave:0,maelstrom:0,cannon:0},o.exp||{});
   G={v:1,seed,rng:seed,np,variant,exp:ex,opts:{noMon:!!o.noMon,goal:o.goalTurns||24},phase:'setup',step:null,turn:0,cur:-1,first:0,order:[],sp:0,
     ships:[],hands:[],team:null,seats:[],deck:[],gone:[],limbo:null,mdeck:[],mons:[],mgone:[],wave:null,gates:[],bd:new Array(BW*BW).fill(null),
@@ -96,7 +96,8 @@ function newGame(o){o=o||{};const seed=o.seed!=null?o.seed>>>0:DEFSEED!=null?DEF
   for(let i=0;i<np;i++)later('draw',{seat:G.order[i]});
   if(!G.opts.noMon)later('setupMon',{n:(solo?(o.soloLev||(variant==='easysolo'?4:6)):LEV_AT_START[np]),placed:0});
   flow();return G}
-AG.setupMon=d=>{if(d.placed>=d.n||!G.mdeck.length)return;const nxt=G.mdeck[0];now('spawn',{});now('setupMon',{n:d.n,placed:d.placed+(nxt<10?1:0)})};
+AG.setupMon=d=>{if(d.placed>=d.n||!G.mdeck.length){now('fill',{});return}  // min-3 rule applies from the start (specials drawn at set-up may leave fewer than 3 leviathans)
+  now('spawn',{});now('setupMon',{n:d.n,placed:d.placed+1})}  // literal rule: every tile drawn at set-up (incl. Rogue Wave / Maelstrom) counts toward 6/5/4;
 // ---------- draw ----------
 AG.draw=d=>{if(!G.ships[d.seat].alive)return;const h=G.hands[d.seat];while(h.length<3&&G.deck.length){const c=G.deck.shift();
   if(isCannon(c)){if(h.filter(isCannon).length>=2){G.gone.push(c);lg(`${G.seats[d.seat].nm} already holds two Deck Cannons and discards a third.`);stat('cannonDiscard');continue}
@@ -108,7 +109,7 @@ QH.cDiscard=d=>{G.gone.push(G.limbo);G.limbo=null;lg(`${G.seats[d.seat].nm} show
 const monById=id=>G.mons.find(m=>m.id===id)||null;
 const monExists=id=>!!monById(id)||(G.arr&&G.arr.id===id);
 function tileToDeck(c){if(G.variant==='easysolo')G.gone.push(c);else G.deck.push(c)}
-function destroyTile(x,y){const c=cellAt(G,x,y);if(!c)return;G.bd[y*BW+x]=null;tileToDeck(c[0]);stat('tileDestroyed');lg(`A current at column ${x+1}, row ${y+1} is torn from the sea.`)}
+function destroyTile(x,y,gone){const c=cellAt(G,x,y);if(!c)return;G.bd[y*BW+x]=null;if(gone)G.gone.push(c[0]);else tileToDeck(c[0]);stat('tileDestroyed');lg(`A current at column ${x+1}, row ${y+1} is torn from the sea.`)}
 function rollSq(avoidMon){let x,y,k=0;do{x=d6()-1;y=d6()-1;k++}while(k<200&&(monAt(G,x,y)&&avoidMon||gateAt(G,x,y)));return [x,y]}
 AG.spawn=d=>{if(!G.mdeck.length){lg('The deep stirs, but no leviathan is left to rise.');return}
   const id=G.mdeck.shift();
@@ -122,7 +123,7 @@ AG.arrFinal=d=>{const a=G.arr;if(!a)return;G.arr=null;
   const old=monById(a.id);const other=monAt(G,a.x,a.y);
   if(a.k==='L'&&other&&other.k==='M'){if(old)G.mons.splice(G.mons.indexOf(old),1);G.mgone.push(a.id);stat('levSwallowed');lg(`${levName(a.id)} is swallowed by the Maelstrom.`);return}
   if(other&&other!==old){G.mons.splice(G.mons.indexOf(other),1);G.mgone.push(other.id);stat(a.k==='L'?'levCrush':'maelEatLev');lg(`${levName(a.id)} destroys ${levName(other.id)}.`)}
-  if(cellAt(G,a.x,a.y)){destroyTile(a.x,a.y);}
+  if(cellAt(G,a.x,a.y)){destroyTile(a.x,a.y,a.k==='M');} // the whirlpool removes the tile from the game (leviathans recycle it)
   for(const sh of G.ships)if(sh.alive&&sh.on&&sh.on[0]===a.x&&sh.on[1]===a.y&&!a.dead.includes(sh.i))a.dead.push(sh.i); // e.g. a ship that rode a rift wake onto the doomed square meanwhile
   for(const i of a.dead)if(G.ships[i].alive){eliminate(i,'was crushed by '+levName(a.id),false);stat(a.k==='L'?'levKillShip':'maelKillShip')}
   if(old){old.x=a.x;old.y=a.y;old.r=a.r}else G.mons.push({id:a.id,k:a.k,x:a.x,y:a.y,r:a.r})};
