@@ -7,10 +7,12 @@
 function netStrip(G0,seat){
   const P=JSON.parse(JSON.stringify(G0));const mine=seat>=0;
   const vis=(s,sl)=>{if(sl.cut)return true;if(!mine)return false;const own=P.pos[seat]===s.pos;return (own&&!sl.flip)||(!own&&sl.flip)};
-  // job 13 offers the red-triple action only while a red wire is still uncut (public: markers.redN minus the reds cut), so one hidden slot,
+  // the red-triple job (hasRule 'redTriple') offers the red-triple action only while a red wire is still uncut (public: markers.redN minus the reds cut), so one hidden slot,
   // chosen by position and not by content, keeps a red id when the real state has a hidden uncut red; every other hidden wire is blanked
   const holes=[];let anyRed=false;
   for(const s of P.st)for(const sl of s.w)if(!vis(s,sl)){holes.push(sl);if(!sl.cut&&WIRES[sl.id].c==='r')anyRed=true}
+  // only the red-triple job needs that hint; in every other job a surviving red id would tell a seat that a hidden red exists
+  if(!hasRule(P.mission,'redTriple'))anyRed=false;
   for(const sl of holes)sl.id=0;
   if(anyRed){const h=holes.find(sl=>!sl.cut);if(h)h.id=RED_IDS[0]}
   if(P.robot)P.robot.w=P.robot.w.map(()=>0);

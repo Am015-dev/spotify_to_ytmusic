@@ -31,3 +31,6 @@ Files: `net.js` (page side), `src/netstrip.js` (what a seat may see), small hook
 * Pausing and restart/mission board are host-only. Crew card choice is random or set by the host for each seat.
 * Racing claims depend on network order, so a laggy player loses ties.
 * `render_game_to_text` (not used by the UI) differs between real and stripped states only in the counts/ids of other seats' hidden question options and face-down gear, which is the point.
+
+## Leak fix: red-id placeholder (p2p `leave` / `claim`)
+Root cause: netStrip kept one hidden uncut slot with a red id (RED_IDS[0]) whenever any hidden uncut red existed, in EVERY job. That hint is only needed by the red-triple job (RH.redTriple.moves checks for a remaining red); in other jobs it told a seat that a hidden red exists on another stand (and p2p-sf.js flagged it as "hidden wire present / hidden id in a packet", showing up in jobs 3 and 10 once the probes-vs-reds fix made reds appear there). Fix (src/netstrip.js): the placeholder is kept only when hasRule(mission,'redTriple'); otherwise every hidden wire is id 0. Checks: net-strip-test 0 diffs/0 leaks, p2p-sf.js full1/full2/leave/hostleft/claim 0 bad and 0 page errors, click.js 0 23 0 errors. p2p-sf.js now prints which wire/seat/job a violation concerns.

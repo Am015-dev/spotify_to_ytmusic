@@ -48,6 +48,31 @@ function humans(){return G?G.seats.filter(q=>q.human).map(q=>q.i):[]}
 function isHuman(s){return !!(G&&G.seats[s]&&G.seats[s].human)}
 function modeOf(){if(NET.on)return NET.mySeat>=0?'solo':'watch';const h=humans().length;return h===0?'watch':h===1?'solo':'hot'}
 function nm(s){return G&&G.seats[s]?G.seats[s].nm:'?'}
+// ---- newcomer-review additions (all new UI strings live here) ----
+const noGear=()=>!!G&&G.mission===1;
+const GLOSSARY=[['Stand','The rack in front of you that holds your wires, sorted from low to high. Only you see the faces of your own stand. With 2 or 3 players some people hold two stands.'],
+ ['Foreman','The player marked with a star (★). Starts the job and takes the first turn; the turn then passes clockwise.'],
+ ['Info token','A marker placed in front of a wire that tells everyone its number (or, in some jobs, only even/odd or "not this number").'],
+ ['Tag','To tag a wire is to put an info token in front of it. Everyone places one opening token at the start; a missed cut tags the wire that was pointed at.'],
+ ['Fuse','The bomb timer. Every miss burns one step; when no step is left, the bomb goes off.'],
+ ['Dual cut','Point at one wire of a crewmate and say a number you hold. If it matches, both wires are cut. If not, it is a miss.'],
+ ['Solo cut','Cut every wire of one value yourself, when you hold all the wires of that value still uncut. It never fails.'],
+ ['Equipment (gear)','Cards on the table that unlock when the crew cuts certain numbers. Some jobs have none.'],
+ ['Personal tool','A tool on your crew card (for example the Twin Probe) that you can use once per job.'],
+ ['Validation token','Goes on the track when all four wires of a value are cut: that value is finished.'],
+ ['Red wire','Never match a red wire. Pointing at one blows up the bomb. A player holding only reds reveals them and is done.']];
+const GLOSS_HTML='<h3>Glossary</h3><dl class="gloss">'+GLOSSARY.map(g=>`<dt>${g[0]}</dt><dd>${g[1]}</dd>`).join('')+'</dl>';
+function hintify(t){return String(t).replace(/The fuse is lit\./,'Round 1 begins: the foreman (★) takes the first turn.').replace(/(reveals \d+ red wires? and is done\.)/,'$1 (a player who holds only red wires shows them and is finished)').replace(/(validation token (\d+) goes on the track\.)/,'$1 (every wire of value $2 is cut, so $2 is finished)')}
+const DOING={infoStd:'choosing an opening info token',tagPick:'choosing which wire gets the info token',pickMatch:'choosing which wire to cut',swapPick:'choosing a wire to trade',designate:'choosing who must cut',declare:'turning over a number card'};
+function doing(q){return (q&&DOING[q.kind])||'answering a question'}
+function wLabel(u){const f=findU(u);if(!f)return {s:0,k:0,t:'?'};const sl=G.st[f.s].w[f.k];const v=sl&&ownerOf(f.s)===(UI.V&&UI.V.seat)?cv(sl.id):null;return {s:f.s,k:f.k,t:`wire ${LET(f.k)}${v!=null?' ('+VNm(v)+')':''}`}}
+(function(){const set=(id,o)=>{const t=TUTORIAL.find(x=>x.id===id);if(t)Object.assign(t,o)};
+ set('hello',{p:'You defuse the bomb together. <b>Cut every wire</b> on every stand to win. The <b>fuse</b> (the bomb timer, top of the panel) burns one step on every miss: when it is gone, boom. The <b>foreman</b> (marked ★) starts.'});
+ set('stand',{p:'A <b>stand</b> is the rack that holds a player\'s wires. Yours is at the front of the table, face up for you and sorted from low to high. Your crewmates see only the backs of your wires, and you see only theirs.'});
+ set('open',{p:'Everyone starts by placing an <b>info token</b>: a marker in front of one of your wires that tells the whole crew its number (placing one is called <b>tagging</b> the wire). Pick one of yours.'});
+ set('confirm',{p:'Check the summary and press the big button. The <b>Suggested move</b> card shows a good move and says why.'});
+ set('solo',{p:'If you hold <b>all</b> the wires still left of a value (all four, or the last two), you may cut them yourself without pointing: a solo cut never fails. The <b>Solo cut</b> button is at the top of this panel.'});
+ set('know',{p:'The bulb button (Know) opens the full table of what every wire could be. Use it whenever you are unsure.'})})();
 // who must decide next (question owner, actor, or a claimer)
 function decider(){if(!G||G.over)return -1;return sideToAct()}
 // hot-seat: the device must change hands when a human other than the holder must decide
@@ -68,14 +93,14 @@ function posOf(s){return G.pos[s]}
 function seatStands(seat){return standsOf(seat).slice().sort((a,b)=>a-b)}
 function wireName(si,k,V){const own=ownerOf(si);const ss=seatStands(own);const two=ss.length>1;const who=V&&own===V.seat?'your':nm(own)+'\'s';return `${who} wire ${LET(k)}${two?' (stand '+(ss.indexOf(si)+1)+')':''}`}
 // engine texts say "stand 3, slot 2": rewrite to the letters on the table
-function nice(t,V){return String(t).replace(/stand (\d+),? slots? ([\d,]+)/g,(m,a,b)=>{const si=+a-1;if(!G.st[si])return m;const ks=b.split(',').map(x=>+x-1);return ks.length>1?wireName(si,ks[0],V).replace(/wire [A-Z]/,'wires '+ks.map(LET).join(', ')):wireName(si,ks[0],V)})}
+function nice(t,V){return hintify(t).replace(/stand (\d+),? slots? ([\d,]+)/g,(m,a,b)=>{const si=+a-1;if(!G.st[si])return m;const ks=b.split(',').map(x=>+x-1);return ks.length>1?wireName(si,ks[0],V).replace(/wire [A-Z]/,'wires '+ks.map(LET).join(', ')):wireName(si,ks[0],V)})}
 // ---------- the one entry point for human input (stage 3 intercepts here) ----------
 function act(m,seat){if(!G||G.over)return {success:false,error:'no game'};if(seat==null)seat=viewer();
   if(!isHuman(seat))return {success:false,error:'not a human seat'};
   if(typeof window.NET_INTERCEPT==='function'){const r=window.NET_INTERCEPT(m,seat);if(r)return r}
   const err=legal(m,seat);if(err){toast(err);sfx('buzzer');return {success:false,error:err}}
   if(isClient()){if(seat!==NET.mySeat||(NET.pend===G.logN&&Date.now()-NET.pendT<2500))return {success:false,error:'wait'};NET.pend=G.logN;NET.pendT=Date.now();UI.sel=null;sfx('click');netSend(m);refresh();return {success:true,sent:1}}
-  UI.sel=null;UI.offSeat=null;UI.lastActor=seat;sfx('click');return applyMove(m,seat)}
+  UI.sel=null;UI.offSeat=null;UI.lastActor=seat;if(modeOf()==='solo'){UI.aiNotBefore=Date.now()+2800/UI.speed;UI.myAck=false}sfx('click');return applyMove(m,seat)}
 function applyMove(m,seat){const r=performMove(m,seat);if(!r.success){console.error('move rejected: '+r.error+' '+JSON.stringify(m));refresh()}return r}
 // ---------- snapshots: what changed since the last refresh (drives sounds, effects and the result banner) ----------
 function snap(){const cut=new Set(),tok={};for(const s of G.st)for(const x of s.w){if(x.cut)cut.add(x.u);tok[x.u]=x.tok.length}let side=0;for(const s of G.st)side+=s.side.length;
@@ -94,6 +119,7 @@ function diffFx(a,b){if(!a||a.g!==b.g)return;const newLog=G.log.filter(l=>l.i>a.
   else if(dialDown)kind='miss';
   const lines=newLog.filter(l=>l.c!=='turn');
   if(kind||lines.some(l=>l.c==='eq'||l.c==='good'||l.c==='bad'||l.c==='big'))UI.res={kind:kind||'info',lines:lines.slice(-6),turn:G.turn,actor:UI.lastActor!=null?UI.lastActor:G.actor,t:Date.now()};
+  if(UI.res&&modeOf()==='solo'&&UI.lastActor!=null&&UI.lastActor===humans()[0]){UI.myRes=UI.res;UI.myAck=false}
   UI.lastActor=null;
   if(!ANIM)return;
   const tileAt=u=>tid(u);
@@ -116,18 +142,19 @@ function refresh(){if(!G||!UI.started)return;try{if(window.PerfHUD)PerfHUD.wake(
   const V=view();UI.V=V;
   if(UI.sel&&!selValid(V))UI.sel=null;
   syncBoard(V);renderDock(V);renderOpenDrawer();audioMood(V);
-  const need=humanNeeded();if(need)GX.showDock();
+  const need=humanNeeded();if(need||UI.brief)GX.showDock();
   if(need&&need!==UI.lastNeed){UI.lastNeed=need;if(ANIM)sfx('turn')}if(!need)UI.lastNeed=null;
   schedule();netAfter()}
 function humanNeeded(){if(!G||G.over)return null;const p=passTo();if(p>=0)return 'pass'+p;const v=viewer();if(v<0)return null;const s=decider();if(s===v)return 'me'+G.turn+':'+(G.q?G.q.kind:G.step);return null}
 function saveNow(){if(NET.on)return;try{if(G&&!G.over&&humans().length)localStorage.setItem(SAVE,JSON.stringify({G,ui:{holder:UI.holder,help:UI.help,tut:UI.tut,rt:UI.rt}}));else if(G&&G.over)localStorage.removeItem(SAVE)}catch(e){}}
 // ---------- the computer crew ----------
-function schedule(){if(isClient()||UI.aiT||!G||G.over||UI.pause||!UI.started)return;
+function aiHeld(){if(!G||G.over)return false;if(UI.brief)return true;if(UI.tut&&UI.coach&&!NET.on){try{if(tutStep(view()))return true}catch(e){}if(ANIM&&UI.myRes&&!UI.myAck&&modeOf()==='solo'&&decider()!==humans()[0])return true}return false}
+function schedule(){if(isClient()||UI.aiT||!G||G.over||UI.pause||!UI.started||aiHeld())return;
   if(UI.sel&&UI.sel.off)return;                 // a human is choosing an any-time card: wait
   const s=decider();const open=G.step==='claim'||G.step==='snip';
   if(s>=0&&isHuman(s)&&!open){if(UI.offChecked!==G.logN){UI.offChecked=G.logN;const st=aiStep();if(st&&!isHuman(st.seat))UI.aiT=setTimeout(()=>{UI.aiT=null;if(G&&!G.over&&!UI.pause&&!legal(st.m,st.seat))applyMove(st.m,st.seat)},ANIM?AIDELAY/UI.speed:0)}return}
   if(passTo()>=0&&!open)return;
-  let d=ANIM?AIDELAY/UI.speed:0;if(open&&humans().length&&ANIM)d=Math.max(d,2600/UI.speed);
+  let d=ANIM?AIDELAY/UI.speed:0;if(open&&humans().length&&ANIM)d=Math.max(d,2600/UI.speed);if(ANIM&&UI.aiNotBefore)d=Math.max(d,UI.aiNotBefore-Date.now());
   if(!ANIM&&open&&humans().length)d=AIDELAY;
   UI.aiT=setTimeout(()=>{UI.aiT=null;if(!G||G.over||UI.pause)return;if(UI.sel&&UI.sel.off){schedule();return}
     let st=null;try{st=aiStep()}catch(e){console.error(e);return}if(!st)return;if(isHuman(st.seat))return;applyMove(st.m,st.seat)},d)}
@@ -137,7 +164,7 @@ function clockLeft(K){const ms=K.ms;if(ms.timer)return {left:ms.timer.show,real:
   if(ms.bus){const e=ms.bus.finalEnd!=null?ms.bus.finalEnd:ms.bus.ends;return e!=null?{left:Math.max(0,e-K.clock),real:Math.max(0,e-K.clock),label:ms.bus.finalEnd!=null?'Final dash':'Target'}:null}
   if(ms.bunker&&ms.bunker.ends!=null)return {left:Math.max(0,ms.bunker.ends-K.clock),real:Math.max(0,ms.bunker.ends-K.clock),label:'Objective'};
   if(ms.circus&&ms.circus.next!=null)return {left:Math.max(0,ms.circus.next-K.clock),real:999,label:'Next act'};return null}
-function clockRunning(){return !isClient()&&timedJob()&&UI.started&&!UI.pause&&G&&!G.over&&G.phase==='turn'&&!G.q&&passTo()<0&&Date.now()>=UI.holdUntil&&!(document.hidden)}
+function clockRunning(){return !isClient()&&timedJob()&&UI.started&&!UI.pause&&!UI.brief&&G&&!G.over&&G.phase==='turn'&&!G.q&&passTo()<0&&Date.now()>=UI.holdUntil&&!(document.hidden)}
 function clockTick(){if(!clockRunning()){UI.clockAcc=0;sndLoop('clock_loop',false);return}
   UI.clockAcc+=.25*UI.tickRate;sndLoop('clock_loop',SND.on&&!!ANIM);if(UI.clockAcc>=1){const n=Math.floor(UI.clockAcc);UI.clockAcc-=n;tick(n)}}
 const fmt=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
@@ -177,7 +204,11 @@ function syncBoard(V){if(!window.SFKit)return;const np=G.np;const me=kitMe();con
   const ch=V.seats.map(q=>({seat:q.pos,name:q.ch?CHARS[q.ch].n:'No crew card',item:q.ch?ITEMS[CHARS[q.ch].item].n:'No tool',captain:q.i===G.captain,used:!!q.chUsed||!!q.chDown}));
   kitCall('ch',JSON.stringify(ch),()=>SFKit.setCharacters(ch));
   const hl=highlights(V);kitCall('hl',JSON.stringify(hl),()=>SFKit.highlight(hl));
-  const chip=$('#chip');const s=decider();chip.textContent=G.over?'':UI.pause?'Paused':s>=0&&!isHuman(s)?`${nm(s)} is thinking…`:'';}
+  chipSet();const zb=$('#zoombtn');if(zb){zb.hidden=!G||G.over||!(window.SFKit&&SFKit._K&&SFKit._K.on);zb.lastChild.textContent=UI.zoomI>=0?' Zoom: '+nm(zoomSeats()[UI.zoomI]||0)+' (tap to change)':' Zoom'}}
+function zoomSeats(){const me=kitMe();return G.seats.map(q=>q.i).filter(i=>i!==me&&G.st.some(st=>ownerOf(st.i)===i))}
+function zoomNext(){const z=zoomSeats();UI.zoomI=(UI.zoomI==null?-1:UI.zoomI)+1;if(UI.zoomI>=z.length)UI.zoomI=-1;try{if(UI.zoomI<0)SFKit.focus(null);else SFKit.focus({kind:'stand',seat:posOf(z[UI.zoomI])},2.2)}catch(e){}refresh()}
+function chipSet(){const chip=$('#chip');if(!chip||!G)return;const s=decider();chip.classList.toggle('hv',!!UI.hoverTxt);chip.textContent=UI.hoverTxt||(G.over?'':UI.pause?'Paused':s>=0&&!isHuman(s)?`${nm(s)} is thinking…`:'')}
+function hoverTile(p){let t='';try{if(p&&p.kind==='tile'&&p.id&&G&&UI.V){const f=findU(uOf(p.id));if(f){const sl=G.st[f.s].w[f.k];const own=ownerOf(f.s)===UI.V.seat;const v=sl.cut?'cut':own?cv(sl.id):'';t=wireName(f.s,f.k,UI.V)+(v?' ('+VNm(v)+')':'')+(sl.tok&&sl.tok.length?', has an info token':'')}}}catch(e){}if(t!==UI.hoverTxt){UI.hoverTxt=t;chipSet()}}
 function shortEq(id){return ({eq1:'Tag two different neighbours',eq2:'Trade a wire face down',eq3:'Probe three wires',eq4:'Show one of your values',eq5:'Probe a whole stand',eq6:'Fuse back one step',eq7:'Wake spent tools',eq8:'Everyone says yes or no',eq9:'Your miss burns nothing',eq10:'Say two values',eq11:'Skip, pick who is next',eq12:'Tag two equal neighbours',eqY:'Two more gear cards',eq22:'Mark a lone value',eq33:'Used gear works again',eq99:'Solo-cut two',eq1010:'Cut a random number',eq1111:'Pull a crewmate wire'})[id]||''}
 function missionCards(V){const n=G.mission,M=MISSIONS[n],ms=V.ms;const o={mission:{number:n,name:M.nm,text:M.text,difficulty:Math.min(5,1+Math.floor((n-1)/13))},numbers:[],constraints:[],challenges:[]};
   if(ms.gate){o.numbers=ms.gate.vals.map((v,i)=>({value:v,done:i<ms.gate.at}));o.sequence={side:ms.gate.req===4?'B':'A',at:ms.gate.at}}
@@ -258,62 +289,82 @@ function startChoose(moves,off){const key=moveKey(moves[0]);UI.sel={mode:'choose
 function answer(i){const V=UI.V;act({a:'q',i},V.seat)}
 // ---------- the dock ----------
 function rsHTML(V){let h='';const order=[];for(let p=0;p<G.np;p++)order.push(G.pos.indexOf(p));const startP=posOf(G.captain);order.sort((a,b)=>((posOf(a)-startP+G.np)%G.np)-((posOf(b)-startP+G.np)%G.np));
-  for(const s of order){const q=V.seats[s];const now=s===G.actor&&!G.over;h+=`<div class="rs${now?' now':''}${q.nUncut?'':' out'}" style="--sc:${SEATC[posOf(s)%5]}"><b>${s===G.captain?'★ ':''}${esc(q.nm)}</b>${q.nUncut} wire${q.nUncut===1?'':'s'}<br><i>${q.human?(s===V.seat?'you':'human'):LV_NAME[q.lv]||'computer'}</i></div>`}return h}
+  for(const s of order){const q=V.seats[s];const now=s===G.actor&&!G.over;h+=`<div class="rs${now?' now':''}${q.nUncut?'':' out'}" style="--sc:${SEATC[posOf(s)%5]}"><b>${s===G.captain?'<span title="Foreman: starts the job and takes the first turn">★</span> ':''}${esc(q.nm)}</b>${q.nUncut} wire${q.nUncut===1?'':'s'}<br><i>${q.human?(s===V.seat?'you':'human'):LV_NAME[q.lv]||'computer'}</i></div>`}return h}
 function statHTML(V){let h='';if(G.dial!=null){const on=G.dial;let pp='';for(let i=1;i<=Math.max(G.dial,G.np,DIAL_MAX>6?6:Math.max(on,G.np));i++)pp+=`<i class="${i<=on?'':'off'}"></i>`;
     h+=`<span class="pill fuse${on<=1?' danger':''}" title="Fuse: ${on} step${on===1?'':'s'} left">${ico('fuse')}Fuse <span class="pp">${pp}</span> ${on}</span>`}
   else if(V.ms.robotFuse)h+=`<span class="pill fuse${V.ms.robotFuse.at>=10?' danger':''}">${ico('robot')}Robot ${V.ms.robotFuse.at}/12</span>`;
   const tot=G.st.reduce((a,s)=>a+s.w.length,0),cut=G.st.reduce((a,s)=>a+s.w.filter(x=>x.cut).length,0);h+=`<span class="pill" title="Wires cut">${ico('cut')}${cut}/${tot} cut</span>`;
-  const c=timedJob()?clockLeft(V):null;if(c)h+=`<span class="pill timer${c.real<30?' low':''}${UI.pause?' paused':''}" id="timerpill" title="${esc(c.label)}">${ico('clock')}${esc(c.label)} ${fmt(c.left)}${UI.pause?' ⏸':''}</span>`;
+  const c=timedJob()?clockLeft(V):null;if(c)h+=`<span class="pill timer${c.real<30?' low':''}${UI.pause?' paused':''}" id="timerpill" title="${esc(c.label)}">${ico('clock')}${esc(c.label)} ${fmt(c.left)}${UI.pause?' ⏸':''}</span>`;if(c&&c.real<30&&c.real>0)h+=`<span class="pill lowtime">Hurry: under 30 seconds!</span>`;
   if(V.ms.oxygen){const me=V.seat>=0?V.seats[V.seat].ox:null;h+=`<span class="pill">${ico('bubble')}O₂ ${V.ms.oxygen.v==='gift'||V.ms.oxygen.v==='bundle'?(me!=null?'you '+me:''):'reserve '+V.ms.oxygen.res}</span>`}
   return h}
 function dockTitle(V){if(!G)return 'Short Fuse';if(G.over)return G.over.win?'Defused!':'BOOM!';const p=passTo();if(p>=0)return 'Pass to '+nm(p);const s=decider();
-  if(V.seat>=0&&s===V.seat)return G.q?'Your answer, '+nm(V.seat):'Your turn, '+nm(V.seat);if(s>=0)return isHuman(s)?nm(s)+' decides':nm(s)+' (computer)';if(G.step==='claim')return 'Who takes the next turn?';if(G.step==='snip')return 'Who calls it?';return 'Job '+G.mission}
+  if(UI.brief)return 'Job briefing';if(G.step==='claim'&&!G.q)return 'Who goes next? Claim it!';if(V.seat>=0&&s===V.seat)return G.q?'Your answer, '+nm(V.seat):'Your turn, '+nm(V.seat);if(s>=0)return G.q&&!isHuman(G.q.who)?nm(G.q.who)+' is '+doing(G.q):isHuman(s)?nm(s)+' decides':nm(s)+' (computer)';if(G.step==='claim')return 'Who takes the next turn?';if(G.step==='snip')return 'Who calls it?';return 'Job '+G.mission}
 function renderDock(V){$('#dockt').textContent=dockTitle(V);$('#road').innerHTML=rsHTML(V);$('#stat').innerHTML=statHTML(V);
   const pb=$('#pausebtn');pb.hidden=!UI.started||!!G.over;pb.innerHTML=ico(UI.pause?'play':'pause');pb.setAttribute('aria-label',UI.pause?'Resume':'Pause');
   setHTML('#res',resHTML(V));setHTML('#coach',coachHTML(V));
-  const sig=dockSig(V);if(sig!==UI.dockSig){UI.dockSig=sig;$('#main').innerHTML=mainHTML(V);$('#tip').innerHTML=tipHTML(V)}
+  const sig=dockSig(V);if(sig!==UI.dockSig){const newTurn=!UI.dockSig||JSON.parse(UI.dockSig)[3]!==G.turn||JSON.parse(UI.dockSig)[2]!==G.actor;UI.dockSig=sig;$('#main').innerHTML=mainHTML(V);$('#tip').innerHTML=tipHTML(V);if(newTurn||UI.brief){const db=$('#dockbody');if(db)db.scrollTop=0}}
   $('#logmini').innerHTML=G.log.filter(l=>l.c!=='turn').slice(0,4).map(l=>`<div class="lg-${l.c||'n'}">${esc(nice(l.t,V))}</div>`).join('');
   const jc=$('#jobchip');jc.hidden=false;jc.innerHTML=`Job ${G.mission}<span class="jn">: ${esc(MISSIONS[G.mission].nm)}</span>`;paintIcons($('.gx-dock'))}
 function setHTML(sel,h){const el=$(sel);if(el._h!==h){el._h=h;el.innerHTML=h}}
-function dockSig(V){return JSON.stringify([G.logN,G.step,G.actor,G.turn,!!G.q,G.q&&G.q.kind,G.q&&G.q.who,V.seat,passTo(),UI.sel,UI.pause,UI.help,UI.coach,!!G.over,G.prompt&&G.prompt.t,UI.holder,modeOf()==='watch'&&UI.xray,UI.wwkN])}
-function resHTML(V){const r=UI.res;if(!r||!G)return '';if(G.over)return '';if(r.turn<G.turn-1)return '';
-  const big={hit:'SNIP!',solo:'SNIP SNIP!',reveal:'REVEALED',miss:'BUZZ!',phew:'PHEW!',info:'',win:'DEFUSED!',boom:'BOOM!'}[r.kind];
+function dockSig(V){return JSON.stringify([G.logN,G.step,G.actor,G.turn,!!G.q,G.q&&G.q.kind,G.q&&G.q.who,V.seat,passTo(),UI.sel,UI.pause,UI.help,UI.coach,!!UI.brief,UI.myAck,!!G.over,G.prompt&&G.prompt.t,UI.holder,modeOf()==='watch'&&UI.xray,UI.wwkN])}
+function resBox(r,V,cls2){const big={hit:'SNIP!',solo:'SNIP SNIP!',reveal:'REVEALED',miss:'BUZZ!',phew:'PHEW!',info:'',win:'DEFUSED!',boom:'BOOM!'}[r.kind];
   const cls={hit:'hit',solo:'hit',reveal:'hit',miss:'miss',phew:'phew',info:'info',win:'win',boom:'boom'}[r.kind];
-  let why='';if(r.kind==='miss'){const line=r.lines.find(l=>/Miss/.test(l.t));why=`<p>${esc(line?nice(line.t,V):'A miss.')} The fuse burned a step${G.dial!=null?', '+G.dial+' left':''}.</p>`}
+  let why='';if(r.kind==='miss'){const line=r.lines.find(l=>/Miss/.test(l.t));const pl=r.lines.find(l=>/ points at | says /.test(l.t));why=`${pl?`<p>${esc(nice(pl.t,V))}</p>`:''}<p>${esc(line?nice(line.t,V):'A miss.')} The fuse burned a step${G.dial!=null?', '+G.dial+' left':''}.</p>`}
   const body=r.lines.filter(l=>!/^Narrator/.test(l.t)).slice(-3).map(l=>`<p class="lg-${l.c}">${esc(nice(l.t,V))}</p>`).join('');
-  return `<div class="res ${cls}" role="status">${big?`<big>${big}</big>`:''}${r.kind==='miss'?why:body}</div>${G.dial===1?'<div class="lastlife">⚠ Last step on the fuse: the next miss is a BOOM!</div>':''}`}
-function coachHTML(V){if(!UI.tut||!UI.coach||G.over)return '';const s=tutStep(V);if(!s)return '';return `<div class="card coach"><h3>${esc(s.t)}</h3><p>${s.p}</p><div class="row"><button class="btn small" data-a="coach" data-id="${s.id}">${ico('check')}Got it</button><button class="btn small" data-a="coachoff">Hide the guide</button></div></div>`}
+  return {cls,big,html:r.kind==='miss'?why+body.split('</p>').slice(0,0).join(''):body}}
+function resHTML(V){if(!G||G.over)return '';const mine=UI.myRes,r=UI.res;let h='';
+  const mineOn=mine&&modeOf()==='solo'&&mine.turn>=G.turn-3&&(!UI.myAck||decider()===V.seat);
+  if(mineOn){const b=resBox(mine,V);const myTurn=decider()===V.seat&&!G.q;
+    if(myTurn)h+=`<div class="res later" role="status"><p><b>Your last move</b> (${esc(nm(V.seat))}): ${esc(mine.lines.filter(l=>!/^Narrator/.test(l.t)).map(l=>nice(l.t,V)).slice(-2).join(' '))}</p></div>`;
+    else h+=`<div class="res mine shrink ${b.cls}" role="status"><p class="who">You (${esc(nm(V.seat))}) just played:</p>${b.big?`<big>${b.big}</big>`:''}${b.html}${UI.tut&&UI.coach&&!UI.myAck?`<div class="cont"><button class="btn small go" data-a="myack">${ico('check')}Continue</button></div>`:''}</div>`;
+    if(r&&r!==mine&&r.turn>=G.turn-1&&!myTurn)h+=`<div class="res later"><p><b>Then:</b> ${esc(r.lines.filter(l=>!/^Narrator/.test(l.t)).map(l=>nice(l.t,V)).slice(-2).join(' '))}</p></div>`;
+    return h+(G.dial===1?'<div class="lastlife">⚠ Last step on the fuse: the next miss is a BOOM!</div>':'')}
+  if(!r||r.turn<G.turn-1)return '';const b=resBox(r,V);
+  return `<div class="res ${b.cls}" role="status">${b.big?`<big>${b.big}</big>`:''}${b.html}</div>${G.dial===1?'<div class="lastlife">⚠ Last step on the fuse: the next miss is a BOOM!</div>':''}`}
+function coachHTML(V){if(!UI.tut||G.over)return '';const s=tutStep(V);if(!s)return '';
+  if(!UI.coach)return `<button class="btn small resume" data-a="coachon">${ico('play')}Resume lesson</button>`;
+  if(UI.coachAsk)return `<div class="card coach"><h3>Turn off the tips?</h3><p>You can turn them back on any time: press "Resume lesson" in this panel, or Menu, then Guide.</p><div class="row"><button class="btn small go" data-a="coachoff">Turn off tips</button><button class="btn small" data-a="coachkeep">Keep the tips</button></div></div>`;
+  return `<div class="card coach"><h3>${esc(s.t)}</h3><p>${s.p}</p><div class="row"><button class="btn small go" data-a="coach" data-id="${s.id}">${ico('check')}Got it</button><button class="linkbtn" data-a="coachask">Turn off tips</button></div></div>`}
 function tutStep(V){const T=UI.tut,d=T.done;const me=V.seat;if(me<0)return null;const pick=id=>d[id]?null:TUTORIAL.find(x=>x.id===id);
+  if(G.phase==='turn'&&!d.open)d.open=1;
   if(!d.hello)return pick('hello');if(!d.stand)return pick('stand');
   if(V.q&&V.q.who===me&&V.q.kind==='infoStd')return pick('open');
   if(UI.res&&UI.res.actor===me&&UI.res.turn>=G.turn-1){if(UI.res.kind==='miss'&&!d.miss)return pick('miss');if((UI.res.kind==='hit')&&!d.hit)return pick('hit')}
-  if(V.legal){if(V.legal.solo.length&&!d.solo)return pick('solo');const s=UI.sel;if(!s&&!d.dual)return pick('dual');if(s&&s.mode==='dual'&&s.tg.length&&s.v==null&&!d.value)return pick('value');if(s&&s.v!=null&&!d.confirm)return pick('confirm')}
+  if(V.legal&&decider()===me){const s=UI.sel;if(!s&&!d.dual)return pick('dual');if(s&&s.mode==='dual'&&s.tg.length&&s.v==null&&!d.value)return pick('value');if(s&&s.v!=null&&!d.confirm)return pick('confirm');if(V.legal.solo.length&&!d.solo&&!s)return pick('solo')}
   if(G.turn>=4&&!d.know)return pick('know');return null}
-function tipHTML(V){if(!UI.help||V.seat<0||G.over||!V.legal)return '';const W=wwk(V);if(!W||!W.suggestion)return '';const S=W.suggestion;
+function tipHTML(V){if(!UI.help||V.seat<0||G.over||!V.legal)return '';const W=wwk(V);if(!W||!W.suggestion)return '';const S=W.suggestion;if(noGear()&&S.m&&(S.m.tool||S.m.two||S.m.a==='eq'||S.m.a==='item'))return '';
   return `<div class="card"><h3>${ico('bulb')} Suggested move</h3><p><b>${esc(nice(sugText(S.m,V),V))}</b></p><p class="why">${esc(nice(S.why||'',V))}</p><div class="row"><button class="btn small" data-a="sugg">Set it up for me</button><button class="btn small" data-gx="knowd">${ico('bulb')}What we know</button></div></div>`}
 function sugText(m,V){if(!m)return '';switch(m.a){case 'dual':return `Say ${VNm(m.v)}${m.v2!=null?' or '+VNm(m.v2):''} at ${m.ks.length>1?nm(ownerOf(m.st))+'\'s wires '+m.ks.map(LET).join(', '):wireName(m.st,m.ks[0],V)}${m.tool?' with the '+toolName(m.tool):''}`;case 'solo':return `Solo cut your ${VNm(m.v)}s`;case 'reveal':return 'Reveal your reds';
   case 'eq':return 'Use '+EQUIP[m.id].n;case 'item':return 'Use '+ITEMS[m.k].n;case 'multi':return 'Point at '+m.tg.length+' wires at once';default:return keyName(m)}}
 function toolName(t){return t==='dd'?'Twin Probe':t==='pt3'?'Pocket Triple Probe':t==='pt10'?'Pocket Two-Value Probe':EQUIP[t]?EQUIP[t].n:t}
 // the cached "what we know" for the current position
 function wwk(V){if(V.seat<0)return null;const key=G.logN+':'+V.seat+':'+G.turn;if(UI.wwk&&UI.wwk.key===key)return UI.wwk.W;let W=null;try{W=whatWeKnow(V.seat,ANIM?80:24)}catch(e){console.error(e)}UI.wwk={key,W};return W}
-function mainHTML(V){if(G.over)return overHTML(V);
+function briefHTML(V){const n=G.mission,M=MISSIONS[n];const chips=ruleChips(n);const ng=noGear();
+  return `<div class="card brief"><h3>Job ${n}: ${esc(M.nm)}</h3><div class="row"><button class="btn go" data-a="briefok">${ico('play')}Continue</button><button class="linkbtn" data-gx="rulesd">Rules and glossary</button></div><p>${esc(BRIEFS[n]||'')}</p><p><b>The job:</b> ${esc(M.text)}</p>${chips.length?`<div class="new"><b>New this job</b><ul>${chips.map(c=>`<li><b>${esc(c[1])}:</b> ${esc(c[2])}</li>`).join('')}</ul></div>`:''}<p class="tiny">Wires: ${mixHTML(n,G.np)} Fuse: ${fuseStart(n,G.np)} steps. Gear: ${ng?'none in this job':(V.eq?V.eq.length:0)+' cards (Gear button)'}.</p></div>`}
+function mainHTML(V){if(G.over)return overHTML(V);if(UI.brief)return briefHTML(V);
   const p=passTo();if(p>=0)return `<div class="card pass"><h3>Pass to ${esc(nm(p))}</h3><p>${UI.holder>=0?`${esc(nm(UI.holder))}, hand the device to <b>${esc(nm(p))}</b>. `:''}Everyone else looks away: the table now shows only the backs of the wires.</p>${G.q&&G.q.who===p?`<p class="hint">${esc(nm(p))} must answer: ${esc(G.q.title)}</p>`:''}<button class="btn go wide" data-a="take" data-seat="${p}">${ico('eye')}I am ${esc(nm(p))}: show my wires</button></div>`;
   let h='';if(G.prompt&&G.clock-G.prompt.t<40&&UI.rt)h+=`<div class="card q"><h3>${ico('radar'in ICO?'radar':'clock')} Narrator</h3><p>${esc(G.prompt.say)}</p></div>`;
   const me=V.seat,s=decider();
-  if(me<0){h+=`<div class="card wait"><h3>${s>=0?esc(nm(s))+' is thinking…':'Watching the computer crew'}</h3><p class="hint">${UI.xray?'All wires are shown face up (x-ray).':'Wire faces are hidden.'} Change the speed in the menu.</p><div class="row"><button class="btn small" data-a="xray">${ico('eye')}${UI.xray?'Hide':'Show'} all wires</button><button class="btn small" data-a="pause">${ico(UI.pause?'play':'pause')}${UI.pause?'Resume':'Pause'}</button></div></div>`;return h}
+  if(me<0){h+=`<div class="card wait"><h3>${s>=0?esc(nm(s))+(G.q?' is '+esc(doing(G.q)):' is thinking…'):'Watching the computer crew'}</h3><p class="hint">${UI.xray?'All wires are shown face up (x-ray).':'Wire faces are hidden.'} Change the speed in the menu.</p><div class="row"><button class="btn small" data-a="xray">${ico('eye')}${UI.xray?'Hide':'Show'} all wires</button><button class="btn small" data-a="pause">${ico(UI.pause?'play':'pause')}${UI.pause?'Resume':'Pause'}</button></div></div>`;return h}
   if(V.q&&V.q.who===me&&V.q.opts)return h+qHTML(V);
   if(UI.sel&&UI.sel.off)return h+chooseHTML(V);
   if(V.legal&&s===me)return h+turnHTML(V);
   // waiting: off-turn options
-  const off=V.off||[];let w=`<div class="card wait"><h3>${s>=0?(isHuman(s)?esc(nm(s))+' decides…':esc(nm(s))+' is thinking…'):G.step==='claim'?'Anyone may claim the next turn':G.step==='snip'?'Who calls the number?':'Waiting…'}</h3>`;
-  if(G.q&&G.q.who!==me)w+=`<p class="hint">${esc(nm(G.q.who))} is answering a question.</p>`;
-  if(G.step==='claim')w+=`<p>The job has no fixed order: the first to claim takes the next turn (never twice in a row).</p>`;
+  const off=(V.off||[]).filter(m=>!(noGear()&&(m.a==='eq'||m.a==='item')));let w=`<div class="card wait"><h3>${s>=0?(isHuman(s)?esc(nm(s))+' decides…':esc(nm(s))+(G.q&&G.q.who===s?' is '+esc(doing(G.q)):' is thinking…')):G.step==='claim'?'Who goes next? Claim it!':G.step==='snip'?'Who calls the number?':'Waiting…'}</h3>`;
+  if(G.q&&G.q.who!==me)w+=`<p class="hint">${esc(nm(G.q.who))} is ${esc(doing(G.q))}.</p>`;
+  if(G.step==='claim')w+=`<p>This job has no fixed order. Press <b>Claim the next turn</b> to go next. The player who just went cannot go twice in a row.</p>`;
   if(G.step==='snip'&&V.ms.volunteer)w+=`<p>The card shows <b>${esc(VNm(V.ms.volunteer.v))}</b>. Call "Snip!" only if you hold one: whoever calls must cut that value. A false call burns a step.</p>`;
-  if(off.length)w+=`<div class="row">${off.map((m,i)=>`<button class="btn ${m.a==='claim'||m.a==='snip'?'go':''}" data-a="off" data-i="${i}">${esc(keyName(m))}</button>`).join('')}</div>`;
+  if(off.length)w+=`<div class="row">${off.map((m,i)=>`<button class="btn ${m.a==='claim'||m.a==='snip'?'go':''}" data-a="off" data-i="${(V.off||[]).indexOf(m)}">${esc(keyName(m))}</button>`).join('')}</div>`;
   w+=anyTimeHTML(V)+otherGearHTML(V)+'</div>';return h+w+annHTML(V)}
 function qHTML(V){const q=V.q;const wires=q.opts.some(o=>o.d&&(o.d.u!=null||(o.d.st!=null&&o.d.k!=null)));
-  return `<div class="card q"><h3>${esc(nice(q.title,V))}</h3>${wires?'<p class="hint">Tap a glowing wire on the table, or pick below.</p>':''}<div class="row">${q.opts.map((o,i)=>`<button class="btn" data-a="q" data-i="${i}">${esc(nice(o.l,V))}</button>`).join('')}</div>${qHelp(q)}</div>`}
-function qHelp(q){const h={infoStd:'Everyone shows one of their own blue wires. Pick one that helps the crew: a value you hold once or twice is a good clue.',pickMatch:'Two of your wires match: choose which one is cut.',tagPick:'The cut missed: choose which pointed wire gets the true token.',swapPick:'A trade: pick the wire you give back.',designate:'Pick who must cut this value.',declare:'Turn over a number card: you must then cut that value.'}[q.kind];return h?`<p class="tiny">${esc(h)}</p>`:''}
+  const byU=(q.kind==='infoStd'||q.kind==='tagPick')&&q.opts.every(o=>o.d&&o.d.u!=null);let btns;
+  if(byU){const gr={};q.opts.forEach((o,i)=>{const w=wLabel(o.d.u);(gr[w.s]=gr[w.s]||[]).push([o,i,w])});const keys=Object.keys(gr).sort((a,b)=>a-b);const multi=keys.length>1;
+    btns=keys.map(k=>{const ss=seatStands(ownerOf(+k));return (multi?`<div class="tagrp">${esc(ownerOf(+k)===V.seat?'Your':nm(ownerOf(+k))+'\'s')} stand ${ss.indexOf(+k)+1}</div>`:'')+`<div class="row">${gr[k].map(([o,i,w])=>`<button class="btn" data-a="q" data-i="${i}">${q.kind==='infoStd'?'Tag your ':'Tag '}${esc(w.t)}${multi?esc(', stand '+(ss.indexOf(+k)+1)):''}</button>`).join('')}</div>`}).join('');
+    const reds=[];for(const st of V.stands)if(st.mine)st.slots.forEach((x,k)=>{if(!x.cut&&x.c==='r')reds.push(LET(k))});
+    if(q.kind==='infoStd'&&reds.length)btns+=`<p class="tiny">Your red wire${reds.length>1?'s':''} ${reds.join(', ')} cannot be tagged: red wires never get an opening token.</p>`}
+  else btns=`<div class="row">${q.opts.map((o,i)=>`<button class="btn" data-a="q" data-i="${i}">${esc(nice(o.l,V))}</button>`).join('')}</div>`;
+  return `<div class="card q"><h3>${esc(nice(q.title,V))}</h3>${wires?'<p class="hint">Tap a glowing wire on the table, or pick below.</p>':''}${btns}${qHelp(q)}</div>`}
+function qHelp(q){const h={infoStd:'An info token is a marker in front of a wire that tells everyone its number. Everyone places one (tags one of their own blue wires): pick one that helps the crew, such as a value you hold once or twice.',pickMatch:'Two of your wires match: choose which one is cut.',tagPick:'The cut missed. To tag a wire is to put an info token with its true number in front of it, so everyone knows it: choose which pointed wire gets it.',swapPick:'A trade: pick the wire you give back.',designate:'Pick who must cut this value.',declare:'Turn over a number card: you must then cut that value.'}[q.kind];return h?`<p class="tiny">${esc(h)}</p>`:''}
 function turnHTML(V){const L=V.legal,sel=UI.sel;let h='';
   // special all-at-once actions
   if(sel&&sel.mode==='multi'){const m={a:'multi',kind:sel.kind,tg:sel.tg};const err=sel.tg.length===sel.n?legal(m,V.seat):`pick ${sel.n-sel.tg.length} more`;
@@ -330,30 +381,31 @@ function turnHTML(V){const L=V.legal,sel=UI.sel;let h='';
     if(sel.v!=null){const m=buildDual(sel);const err=legal(m,V.seat);let risk='';if(UI.help&&sel.tg.length===1){const W=wwk(V);const sl=W&&W.slots.find(x=>x.st===t.st&&x.k===t.k);if(sl){const p=sl.prob[String(sel.v==='Y'?'yellow':sel.v)]||0;const pr=sl.prob.red||0;risk=`<p class="why">Chance it is ${esc(VNm(sel.v))}: <b>${Math.round(p*100)}%</b>${pr>0?` · red: <b>${Math.round(pr*100)}%</b>`:''}</p>`}}
       h+=risk+`<button class="btn go wide" data-a="dual" ${err?'disabled':''}>${ico('cut')}Snip: say ${esc(VNm(sel.v))}${sel.v2!=null?' / '+esc(VNm(sel.v2)):''}</button>${err?`<p class="hint">${esc(err)}</p>`:''}`}}
   // tools and probes
-  const T=L.tools,tools=[];for(const t of ['dd','pt3','eq3','eq5'])if(T[t])tools.push(t);const twos=['pt10','eq10'].filter(t=>T[t]);
+  const T=noGear()?{}:L.tools,tools=[];for(const t of ['dd','pt3','eq3','eq5'])if(T[t])tools.push(t);const twos=['pt10','eq10'].filter(t=>T[t]);
   if(tools.length||twos.length||L.flip.length){h+=`<div class="gear" style="margin-top:6px">`+tools.map(t=>`<button class="gbtn tool${sel&&sel.tool===t?' on':''}" data-a="tool" data-t="${t}"><b>${toolN(t)===99?'∀':toolN(t)}</b><span>${esc(toolName(t))}<small>${t==='eq5'?'a whole stand':'point at '+toolN(t)+' wires'}</small></span></button>`).join('')+
       twos.map(t=>`<button class="gbtn tool${sel&&sel.two===t?' on':''}" data-a="two" data-t="${t}"><b>2</b><span>${esc(toolName(t))}<small>say two values</small></span></button>`).join('')+(L.flip.length?`<button class="gbtn tool${sel&&sel.fu!=null?' on':''}" data-a="flipmode"><b>↺</b><span>Use my flipped wire<small>you cannot see it</small></span></button>`:'')+`</div>`}
   if(sel)h+=`<div class="row" style="margin-top:6px"><button class="btn small" data-a="cancel">Start again</button></div>`;
   h+='</div>';
   // other actions
-  const solos=L.solo;const others=L.other.filter(m=>m.a!=='eq');const coffee=L.other.filter(m=>m.a==='eq');
-  if(solos.length||others.length||L.special.length){h+=`<div class="card"><h3>Other actions</h3><div class="row">`;
-    for(const m of solos)h+=`<button class="btn go" data-a="solo" data-v="${m.v}" data-ep="${m.ep?1:''}" data-fu="${m.fu!=null?m.fu:''}">${ico('cut')}Solo cut ${esc(VNm(m.v))}${m.ep?' (Express Pass)':''}${m.flip?' + flipped wire':''}</button>`;
-    for(const m of L.special)h+=`<button class="btn" data-a="multi" data-kind="${m.kind}" data-n="${m.tg.length}">${ico('four')}${esc(multiName(m.kind))}</button>`;
+  const solos=L.solo;const others=L.other.filter(m=>m.a!=='eq'&&!(noGear()&&m.a==='item'));const coffee=noGear()?[]:L.other.filter(m=>m.a==='eq');
+  let oa='';if(solos.length||others.length||L.special.length){oa+=`<div class="card"><h3>Other actions</h3><div class="row">`;
+    for(const m of solos)oa+=`<button class="btn go" data-a="solo" data-v="${m.v}" data-ep="${m.ep?1:''}" data-fu="${m.fu!=null?m.fu:''}">${ico('cut')}Solo cut ${esc(VNm(m.v))}${m.ep?' (Express Pass)':''}${m.flip?' + flipped wire':''}</button>`;
+    for(const m of L.special)oa+=`<button class="btn" data-a="multi" data-kind="${m.kind}" data-n="${m.tg.length}">${ico('four')}${esc(multiName(m.kind))}</button>`;
     const groups={};for(const m of others){const k=moveKey(m);(groups[k]=groups[k]||[]).push(m)}
-    for(const k in groups)h+=`<button class="btn" data-a="grp" data-k="${esc(k)}">${esc(keyName(groups[k][0]))}${groups[k].length>1&&!stepsOf(k).length?' ('+groups[k].length+')':''}</button>`;
-    h+=`</div>${solos.length?'<p class="hint">A solo cut never fails: you hold every wire of that value still uncut.</p>':''}</div>`}
+    for(const k in groups)oa+=`<button class="btn" data-a="grp" data-k="${esc(k)}">${esc(keyName(groups[k][0]))}${groups[k].length>1&&!stepsOf(k).length?' ('+groups[k].length+')':''}</button>`;
+    oa+=`</div>${solos.length?'<p class="hint">A solo cut never fails: you hold every wire of that value still uncut.</p>':''}</div>`}
+  if(solos.length)h=oa+h;else h+=oa;
   // equipment
-  const eqm=L.eq.concat(coffee);h+=gearButtons(eqm,false,V);const og=otherGearHTML(V);if(og)h+=`<div class="card">${og}</div>`;
+  const eqm=noGear()?[]:L.eq.concat(coffee);h+=gearButtons(eqm,false,V);const og=otherGearHTML(V);if(og)h+=`<div class="card">${og}</div>`;
   return h+annHTML(V)}
 function multiName(k){return ({red3:'Grab the three reds',four:'Point at all four',sevens:'Cut the four 7s',y3:'Point at the three yellows',lever:'Pull the lever (two yellows)',rush:'Yellow rush'})[k]||'All at once'}
 function gearButtons(moves,off,V){if(!moves.length)return '';const groups={};for(const m of moves){const k=moveKey(m);(groups[k]=groups[k]||[]).push(m)}
   let h=`<div class="card"><h3>${ico('gear')} ${off?'Any-time gear':'Gear you can use'}</h3><div class="gear">`;
   for(const k in groups){const m=groups[k][0];const E=m.a==='eq'?EQUIP[m.id]:null;h+=`<button class="gbtn" data-a="${off?'offgrp':'grp'}" data-k="${esc(k)}"><b>${E?(E.v==='Y'?'Y':E.v):'★'}</b><span>${esc(keyName(m))}<small>${esc(E?shortEq(m.id):ITEMS[m.k]?'personal tool':'')}</small></span></button>`}
   return h+`</div></div>`}
-function anyTimeHTML(V){if(V.seat<0||G.over)return '';let moves=[];try{moves=validMoves(V.seat).filter(m=>m.a==='eq'||m.a==='item')}catch(e){}let h=moves.length?gearButtons(moves,true,V):'';
+function anyTimeHTML(V){if(V.seat<0||G.over||noGear())return '';let moves=[];try{moves=validMoves(V.seat).filter(m=>m.a==='eq'||m.a==='item')}catch(e){}let h=moves.length?gearButtons(moves,true,V):'';
   if(UI.offSeat===V.seat)h+=`<div class="row"><button class="btn small" data-a="offdone">${ico('back')}Done: pass the device back</button></div>`;return h}
-function otherGearHTML(V){if(modeOf()!=='hot'||G.over||G.q)return '';const o=humans().filter(s=>s!==V.seat&&(()=>{try{return validMoves(s).some(m=>m.a==='eq'||m.a==='item')}catch(e){return false}})());
+function otherGearHTML(V){if(noGear()||modeOf()!=='hot'||G.over||G.q)return '';const o=humans().filter(s=>s!==V.seat&&(()=>{try{return validMoves(s).some(m=>m.a==='eq'||m.a==='item')}catch(e){return false}})());
   if(!o.length)return '';return `<p class="tiny">Any-time gear can be used by anyone, even off-turn:</p><div class="row">${o.map(s=>`<button class="btn small" data-a="offseat" data-seat="${s}">${ico('gear')}${esc(nm(s))} wants to use gear</button>`).join('')}</div>`}
 function chooseHTML(V){const sel=UI.sel;const rem=selRemaining(sel);const step=nextStep(sel);const m0=sel.opts[0];const E=m0.a==='eq'?EQUIP[m0.id]:m0.a==='item'?ITEMS[m0.k]:null;
   let h=`<div class="card you"><h3>${esc(keyName(m0))}</h3>${E?`<p class="tiny">${esc(E.text)}</p>`:''}`;
@@ -365,8 +417,9 @@ function chooseHTML(V){const sel=UI.sel;const rem=selRemaining(sel);const step=n
 function annHTML(V){const A=(V.ann||[]).slice(-5).reverse();if(!A.length)return '';return `<div class="card"><h3>${ico('mute')} Crew calls</h3><ul class="ann">${A.map(a=>`<li>${esc(annText(a,V))}</li>`).join('')}</ul><p class="tiny">The only talk allowed: the answers the rules ask for.</p></div>`}
 function annText(a,V){switch(a.k){case 'sweep':return `Sweep for ${a.v}: `+a.res.map(r=>`${nm(ownerOf(r.st))}${seatStands(ownerOf(r.st)).length>1?' (stand '+(seatStands(ownerOf(r.st)).indexOf(r.st)+1)+')':''} ${r.yes?'yes':'no'}`).join(', ');case 'holds':return `${nm(a.seat)} ${a.yes?'holds':'holds no'} ${VNm(a.v)}`;
   case 'side':return `${nm(ownerOf(a.st))}: ${a.mean==='none'?'holds no':'holds'} ${VNm(a.v)}`;case 'needOx':return `${nm(a.seat)} signals: I need oxygen`;case 'yel':return `${nm(a.seat)} holds ${a.n} yellow`;default:return Object.entries(a).filter(([k])=>k!=='turn').map(([k,v])=>k==='seat'?nm(v):typeof v==='object'?'':v).filter(Boolean).join(' ')}}
+function gearWords(t){const o=[];try{for(const id of Object.keys(EQUIP)){const E=EQUIP[id];if(E&&E.n&&new RegExp('\\b'+E.n+'\\b').test(t)&&shortEq(id))o.push(`<b>${esc(E.n)}</b>: a gear card that unlocks mid-job (${esc(shortEq(id).toLowerCase())}).`)}if(/Twin Probe/.test(t))o.push('<b>Twin Probe</b>: a personal tool on a crew card; it points at two wires at once.')}catch(e){}return o.length?`<p class="tiny">${o.join(' ')}</p>`:''}
 function overHTML(V){const w=G.over.win;const [title,tip]=w?['Every wire is safe.','']:lossHelp(G.over.why);const st=G.stats||{};const n=G.mission;const next=n<66?n+1:null;
-  return `<div class="card over ${w?'win':'lose'}"><h3>${w?'DEFUSED!':'BOOM!'}</h3><p><b>${esc(w?G.winText:title)}</b></p>${w?'':`<p class="why"><b>Why it failed:</b> ${esc(G.over.why)}. ${esc(tip)}</p>`}
+  return `<div class="card over ${w?'win':'lose'}"><h3>${w?'DEFUSED!':'BOOM!'}</h3><p><b>${esc(w?G.winText:title)}</b></p>${w?'':`<p class="why"><b>Why it failed:</b> ${esc(G.over.why)}. ${esc(tip)}</p>${gearWords(tip)}`}
   <div class="statgrid"><div><b>${G.turn}</b>turns</div><div><b>${G.dial!=null?G.dial:'-'}</b>fuse left</div><div><b>${st.miss||0}</b>misses</div><div><b>${st.dualOk||0}/${st.dual||0}</b>dual hits</div><div><b>${st.solo||0}</b>solo cuts</div><div><b>${st.eqUse||0}</b>gear used</div></div>
   ${isClient()?'<p class="hint">Waiting for the host to pick the next job.</p>':`<div class="row">${w&&next?`<button class="btn go" data-a="next">${ico('fwd')}Next job: ${next}</button>`:''}<button class="btn ${w?'':'go'}" data-a="again">${ico('flip')}Play job ${n} again</button><button class="btn" data-a="board">${ico('target')}Mission board</button></div>`}</div>`}
 function toast(t){const el=$('#res');if(!el)return;el._h=null;const d=document.createElement('div');d.className='res info';d.innerHTML=`<p>${esc(t)}</p>`;el.innerHTML='';el.appendChild(d);$('#live').textContent=t;GX.showDock()}
@@ -401,7 +454,12 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'choose':{const rem=selRemaining(UI.sel);if(rem[0])act(rem[0],V.seat);return}
   case 'sugg':{const W=wwk(V);const m=W&&W.suggestion&&W.suggestion.m;if(!m)return;if(m.a==='dual'){UI.sel={mode:'dual',tool:m.tool||null,tg:m.ks.map(k=>({st:m.st,k})),v:m.v,v2:m.v2!=null?m.v2:null,two:m.two||null,fu:m.fu!=null?m.fu:null}}else if(m.a==='multi'){UI.sel={mode:'multi',kind:m.kind,n:m.tg.length,tg:m.tg.slice()}}else{act(m,V.seat);return}refresh();return}
   case 'coach':UI.tut.done[b.dataset.id]=1;refresh();return;
-  case 'coachoff':UI.coach=false;saveSettings();refresh();return;
+  case 'zoom':zoomNext();return;
+  case 'coachask':UI.coachAsk=true;refresh();return;
+  case 'coachkeep':UI.coachAsk=false;refresh();return;
+  case 'coachoff':UI.coach=false;UI.coachAsk=false;saveSettings();refresh();return;
+  case 'myack':UI.myAck=true;UI.aiNotBefore=0;refresh();return;
+  case 'briefok':UI.brief=null;sfx('click');refresh();return;
   case 'next':startJob(Object.assign({},UI.lastSetup,{job:G.mission+1,captain:(G.captain+1)%G.np}));return;
   case 'again':startJob(Object.assign({},UI.lastSetup,{captain:G.captain}));return;
   case 'board':showStart();return;
@@ -439,7 +497,7 @@ function renderSettings(){const g=gfxState();const on3=window.SFKit&&SFKit._K&&S
   <div><div class="lbl">Computer crew speed</div><div class="row">${sp.map(([v,l])=>`<button class="btn small${UI.speed===v?' on':''}" data-a="speed" data-v="${v}">${l}</button>`).join('')}</div></div>
   <div><div class="lbl">Graphics ${on3?`(now: ${esc(g.active)})`:'(2D board: no WebGL here)'}</div><div class="row">${['auto','high','medium','low'].map(q=>`<button class="btn small${g.pref===q?' on':''}" data-a="gfx" data-v="${q}" ${on3?'':'disabled'}>${q[0].toUpperCase()+q.slice(1)}</button>`).join('')}</div>
    <p class="tiny">Auto picks Low on a software graphics driver and steps down by itself if frames drop.</p><div id="perfslot">${window.PerfHUD&&PerfHUD.buttonsHTML?PerfHUD.buttonsHTML('btn small'):''}</div></div>
-  <div><div class="lbl">Help</div><div class="row"><button class="btn small${UI.help?' on':''}" data-a="help">${ico('bulb')}Suggested move ${UI.help?'on':'off'}</button><button class="btn small${UI.coach?' on':''}" data-a="coachon">${ico('info')}Guide ${UI.coach?'on':'off'}</button></div></div>
+  <div><div class="lbl">Help</div><div class="row"><button class="swt${UI.help?' on':''}" role="switch" aria-checked="${!!UI.help}" data-a="help"><i></i>Suggested move: ${UI.help?'On':'Off'}</button><button class="swt${UI.coach?' on':''}" role="switch" aria-checked="${!!UI.coach}" data-a="coachon"><i></i>Lesson tips: ${UI.coach?'On':'Off'}</button></div></div>
   <div><div class="lbl">Game</div><div class="row">${isClient()?`<button class="btn small" data-a="netleave">${ico('back')}Leave the online game</button>`:`${G&&!G.over?`<button class="btn small" data-a="pause">${ico(UI.pause?'play':'pause')}${UI.pause?'Resume':'Pause'}</button><button class="btn small" data-a="restart">${ico('flip')}Restart this job</button>`:''}<button class="btn small" data-a="newgame">${ico('target')}Mission board</button>`}<button class="btn small" data-gx="credd">${ico('info')}Credits</button></div></div></div>`}
 // ---------- drawers ----------
 function renderOpenDrawer(){const id=GX.open;if(!id||!G)return;if(id==='logd')renderLog();else if(id==='missiond')renderMission();else if(id==='geard')renderGear();else if(id==='knowd')renderKnow();else if(id==='setd')renderSettings()}
@@ -489,20 +547,20 @@ function jobState(V){const ms=V.ms,o=[];const N=s=>nm(s);
   if(V.robot)o.push(`The robot holds ${V.robot.n} wire${V.robot.n===1?'':'s'}.`);
   for(const st of V.stands)if(st.side.length)o.push(`Beside ${nm(st.owner)}'s stand: `+st.side.map(t=>(t.mean==='none'?'no ':'')+VNm(t.v)).join(', ')+'.');
   return o}
-function renderGear(){const V=UI.V||view();let h='<div class="eqgrid">';
+function renderGear(){const V=UI.V||view();if(noGear()){$('#gearbody').innerHTML='<p><b>This training job has no equipment and no personal tools.</b> Gear cards appear in later jobs: they unlock when the crew cuts certain numbers, and this drawer will show them.</p>';return}let h='<p class="tiny">The row of cards on the table mat is the crew\'s equipment. A card is <b>locked</b> until the crew cuts the numbers named on it, then it is <b>ready</b> for one use (or every turn, if it says so) and then <b>used</b>. Personal tools sit on each player\'s crew card.</p><div class="eqgrid">';
   V.eq.forEach((e,i)=>{if(e.down||!e.id){h+=`<div class="eqc locked"><div class="et"><b>?</b>Face-down card</div><div class="ex">It turns up during the job.</div><div class="es">face down</div></div>`;return}const E=EQUIP[e.id];
     h+=`<div class="eqc ${e.st}"><div class="et"><b>${E.v==='Y'?'Y':E.v}</b>${esc(E.n)}<span class="tm">${{any:'any time',turn:'your turn',start:'start of turn',instant:'instant'}[E.timing]}</span></div><div class="ex">${esc(E.text)}</div><div class="es">${e.st==='locked'?`${ico('lock')} locked: cut ${E.need===4?'all four':'two'} ${E.v==='Y'?'yellows':E.v+'s'}${e.cover!=null?' and two '+e.cover+'s':''}`:e.st==='ready'?'ready to use'+(e.perm?' (every turn)':''):'used'}</div></div>`});
   h+='</div><h3>Crew and personal tools</h3><div class="eqgrid">';
   for(const q of V.seats){const c=q.ch?CHARS[q.ch]:null;const it=c?ITEMS[c.item]:null;h+=`<div class="eqc ${q.chUsed?'used':'ready'}"><div class="et" style="background:${SEATC[q.pos%5]}"><b>${q.i===G.captain?'★':''}</b>${esc(q.nm)}: ${esc(c?c.n:q.chDown?'face-down card':'no crew card')}</div><div class="ex">${it?`<b>${esc(it.n)}</b>: ${esc(it.text)}`:'No personal tool.'}</div><div class="es">${q.chUsed?'tool used':q.chDown?'face down':it?'tool ready':''}</div></div>`}
   $('#gearbody').innerHTML=h+'</div>'}
 function renderKnow(){const V=UI.V||view();if(V.seat<0){$('#knowbody').innerHTML='<p>"What we know" is shown for a human crew member. In watch mode, use "Show all wires".</p>'+annHTML(V);return}
-  const W=wwk(V);let h=`<p class="tiny">From ${esc(nm(V.seat))}'s point of view: the sort order, every token, failed probes, tags and the crew's calls${W?`, checked against ${W.samples} possible deals${W.consistent?'':' (approximate)'}`:''}.</p>`;
+  const W=wwk(V);let h=`<p class="tiny">From ${esc(nm(V.seat))}'s point of view: the sort order, every token, failed probes, tags and the crew's calls.</p><div class="legend"><b>How to read this:</b> "Could be" lists every number the wire can still be. "Most likely" gives the best guesses and their chances. "certain" means only one number fits.</div>`;
   if(W&&W.suggestion)h+=`<div class="now"><b>Suggested:</b> ${esc(nice(sugText(W.suggestion.m,V),V))}. <i>${esc(nice(W.suggestion.why||'',V))}</i></div>`;
   for(const st of V.stands){if(st.mine)continue;const cells=W?W.slots.filter(x=>x.st===st.i):[];
     h+=`<h4>${esc(nm(st.owner))}${seatStands(st.owner).length>1?' (stand '+(seatStands(st.owner).indexOf(st.i)+1)+')':''}</h4><table class="wk"><tr><th>Wire</th><th>Could be</th><th>Most likely</th></tr>`;
-    st.slots.forEach((x,k)=>{if(x.cut){h+=`<tr><td>${LET(k)}</td><td colspan="2">cut: ${esc(VNm(x.v))}</td></tr>`;return}const c=cells.find(y=>y.k===k);if(x.v!=null){h+=`<tr><td>${LET(k)}</td><td class="c" colspan="2">${esc(VNm(x.v))} (you can see it)</td></tr>`;return}
+    const cutL=[];st.slots.forEach((x,k)=>{if(x.cut){cutL.push(LET(k)+'='+VNm(x.v));return}const c=cells.find(y=>y.k===k);if(x.v!=null){h+=`<tr><td>${LET(k)}</td><td class="c" colspan="2">${esc(VNm(x.v))} (you can see it)</td></tr>`;return}
       const pr=c?Object.entries(c.prob).sort((a,b)=>b[1]-a[1]).slice(0,3):[];const tk=x.tok.map(t=>tok2kit(t)).filter(Boolean).join(', ');
-      h+=`<tr><td>${LET(k)}${tk?` <small>token ${esc(tk)}</small>`:''}</td><td>${c?esc(c.possible.join(', ')):'?'}${x.not.length?` <small>not ${esc(x.not.map(VNm).join(', '))}</small>`:''}</td><td${c&&c.certain!=null?' class="c"':''}>${c&&c.certain!=null?'certain: '+esc(c.certain):pr.map(([v,p])=>`${esc(v)} ${Math.round(p*100)}%`).join(' · ')}</td></tr>`});h+='</table>'}
+      h+=`<tr><td>${LET(k)}${tk?` <small>token ${esc(tk)}</small>`:''}</td><td>${c?esc(c.possible.join(', ')):'?'}${x.not.length?` <small>not ${esc(x.not.map(VNm).join(', '))}</small>`:''}</td><td${c&&c.certain!=null?' class="c"':''}>${c&&c.certain!=null?'certain: '+esc(c.certain):pr.length?pr.map(([v,p])=>`${esc(v)} ${Math.round(p*100)}%`).join(' · '):'no favourite yet'}</td></tr>`});if(cutL.length)h+=`<tr><td colspan="3"><small>Already cut: ${esc(cutL.join(', '))}</small></td></tr>`;h+='</table>'}
   h+=annHTML(V);const lines=jobState(V);if(lines.length)h+=`<h4>The job</h4><ul class="ann">${lines.map(l=>`<li>${esc(l)}</li>`).join('')}</ul>`;
   $('#knowbody').innerHTML=h}
 function renderRef(){const E=refEntries();let h='',sec='';for(const e of E){if(e.s!==sec){if(sec)h+='</div>';sec=e.s;h+=`<h3>${esc(sec)}</h3><div class="reflist">`}
@@ -515,7 +573,7 @@ function recordResult(){if(!humans().length)return;const c=camp();const n=G.miss
   if(G.over.win){j.w++;const r={left:G.dial,turns:G.turn,np:G.np};if(!j.best||(r.left!=null&&(j.best.left==null||r.left>j.best.left))||(r.left===j.best.left&&r.turns<j.best.turns))j.best=r}lsSet('sf_camp',c)}
 // ---------- start screen ----------
 function defaultSetup(){const s=lsGet('sf_setup',null);const d={job:1,np:3,seats:['human','ai','ai','ai','ai'],lv:'normal',chars:[],names:DEFNAMES.slice(),help:true};if(s)Object.assign(d,s,{helpTouched:0},{names:(s.names||DEFNAMES).slice()});fixSetup(d);return d}
-function fixSetup(s){s=s||UI.setup;const M=MISSIONS[s.job];if(!M.pl.includes(s.np))s.np=M.pl.find(x=>x>=s.np)||M.pl[M.pl.length-1];if(!s.helpTouched)s.help=s.job<=3;const ok=allowedChars(s.job,s.np);s.chars=s.chars||[];for(let i=0;i<5;i++)if(s.chars[i]&&!ok.includes(s.chars[i]))s.chars[i]='';return s}
+function fixSetup(s){s=s||UI.setup;const M=MISSIONS[s.job];if(!M.pl.includes(s.np))s.np=M.pl.find(x=>x>=s.np)||M.pl[M.pl.length-1];if(!s.helpTouched)s.help=true;const ok=allowedChars(s.job,s.np);s.chars=s.chars||[];for(let i=0;i<5;i++)if(s.chars[i]&&!ok.includes(s.chars[i]))s.chars[i]='';return s}
 function preset(v){const s=UI.setup;if(v==='solo')s.seats=['human','ai','ai','ai','ai'];if(v==='hot')s.seats=['human','human','human','human','human'];if(v==='watch')s.seats=['ai','ai','ai','ai','ai'];renderStart()}
 function showStart(){if(isClient()){hideStart();return}clearTimeout(UI.aiT);UI.aiT=null;UI.setup=UI.setup||defaultSetup();sndLoop('hum',true);musicStop(.8);$('#start').hidden=false;renderStart();sndLoop('clock_loop',false)}
 function hideStart(){$('#start').hidden=true;sndLoop('hum',false)}
@@ -526,7 +584,7 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=camp();const sav
   const onl=isHost(),nOnl=onl?Math.min(s.np,NET.peers.length||1):0;const seats=[];for(let i=0;i<s.np;i++)seats.push(`<div class="seat" style="--sc:${SEATC[i]}"><span class="dot"></span><span class="nm">${onl&&i<nOnl?`<b>${esc(netPlan(s).names&&netPlan(s).names[i]||'Player')}</b>`:`<input data-nm="${i}" value="${esc(s.names[i])}" aria-label="Name of seat ${i+1}" maxlength="14" style="width:7.5em;font:800 .9rem var(--fb);border:2px solid var(--ink);border-radius:8px;padding:3px 5px;background:#fff7e8">`}<select data-ch="${i}" aria-label="Crew card for seat ${i+1}"><option value="">Crew: random</option>${ok.map(id=>`<option value="${id}"${s.chars[i]===id?' selected':''}>${esc(CHARS[id].n)} (${esc(ITEMS[CHARS[id].item].n)})</option>`).join('')}</select></span>${onl?`<span class="tag${i<nOnl?' b':''}">${i<nOnl?ico('user')+'Online player':ico('robot')+'Computer'}</span>`:`<button class="btn small${s.seats[i]==='human'?' on':''}" data-a="seatkind" data-i="${i}">${s.seats[i]==='human'?ico('user')+'Human':ico('robot')+'Computer'}</button>`}</div>`);
   const nh=s.seats.slice(0,s.np).filter(x=>x==='human').length;
   $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">${ICO.bomb}</svg><div><h1>Short Fuse</h1><p>A cartoon demolition crew defuses rigged charges together. 2-5 players, 66 jobs.</p></div><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back to the job</button>':''}</div>
-  <div class="st-body"><div class="pane"><div class="quick"><button class="btn blue" data-a="tutorial">${ico('info')}Guided first game<small>Job 1 with a coach</small></button>${saved?`<button class="btn go" data-a="resume">${ico('play')}Continue<small>Job ${saved.G.mission}, turn ${saved.G.turn}</small></button>`:`<button class="btn" data-a="preset" data-v="solo">${ico('user')}Me + computers<small>one human seat</small></button>`}<button class="btn" data-a="preset" data-v="${saved?'solo':'hot'}">${ico(saved?'user':'swap')}${saved?'Me + computers':'Hot-seat'}<small>${saved?'one human seat':'pass the device'}</small></button></div>
+  <div class="st-body"><div class="pane"><div class="quick"><button class="btn blue" data-a="tutorial">${ico('info')}Guided first game<small>Job 1 with a coach: best for new players</small></button>${saved?`<button class="btn go" data-a="resume">${ico('play')}Continue<small>Job ${saved.G.mission}, turn ${saved.G.turn}</small></button>`:`<button class="btn" data-a="preset" data-v="solo">${ico('user')}Me + computers<small>one human seat</small></button>`}<button class="btn" data-a="preset" data-v="${saved?'solo':'hot'}">${ico(saved?'user':'swap')}${saved?'Me + computers':'Hot-seat'}<small>${saved?'one human seat':'pass the device'}</small></button></div>
     ${onlineBlock()}<h2>${ico('map')} Mission board</h2><p class="tiny">Win a job to unlock the next. Every job can still be played at any time. ✓ = defused, ⏱ = timed.</p>${jobs}</div>
    <div class="pane"><div class="brief"><div class="bt"><b>${n}</b><h3>${esc(M.nm)}</h3></div><p class="flav">${esc(BRIEFS[n]||'')}</p>
     <div class="tags"><span class="tag b">${mixHTML(n,s.np)}</span><span class="tag">${ico('fuse')}Fuse ${fuseStart(n,s.np)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?`<span class="tag t">${ico('clock')}Timed</span>`:''}<span class="tag">${M.pl[0]}-${M.pl[M.pl.length-1]} players</span>${j&&j.w?`<span class="tag e">${ico('check')}Defused ${j.w}×${j.best&&j.best.left!=null?', best: '+j.best.left+' fuse left':''}</span>`:j&&j.p?`<span class="tag r">Tried ${j.p}×</span>`:''}</div>
@@ -534,22 +592,22 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=camp();const sav
     <div class="setup"><div><div class="lbl">Crew size</div><div class="seg">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div></div>
     <div><div class="lbl">Seats</div>${onl?`<p class="tiny">Online: seats go to the players in the lobby in join order; the rest are played by the computer.</p>`:`<div class="seg" style="margin-bottom:4px"><button class="btn small" data-a="preset" data-v="solo">Me + computers</button><button class="btn small" data-a="preset" data-v="hot">All human (hot-seat)</button><button class="btn small" data-a="preset" data-v="watch">Watch the computer</button></div>`}${seats.join('')}</div>
     <div><div class="lbl">Computer level</div><div class="seg">${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div></div>
-    ${nh||onl?`<button class="chk btn small${s.help?' on':''}" data-a="helpset">${ico('bulb')}"What we know" suggestions ${s.help?'on':'off'}</button>`:''}
+    ${nh||onl?`<div><button class="swt${s.help?' on':''}" role="switch" aria-checked="${!!s.help}" data-a="helpset"><i></i>Suggested move: ${s.help?'On':'Off'}</button><p class="tiny">Shows a good move and why, on every turn of yours.</p></div>`:''}
     <button class="btn go wide" data-a="start">${ico('play')}${onl?'Start job '+n+' online ('+nOnl+' player'+(nOnl>1?'s':'')+')':nh===0?'Watch job '+n:nh===1?'Start job '+n:'Start job '+n+' (hot-seat, '+nh+' humans)'}</button></div></div></div>`;paintIcons($('#start'))}
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}
 function realtimeJob(n){const M=MISSIONS[n];return !!(M.audio||hasRule(n,'timer'))}
 function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats=plan.seats;s.names=plan.names;fixSetup(s)}
-  if(!plan)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names,help:s.help});UI.lastSetup=s;
+  if(!plan&&!s.tutorial)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names,help:s.help});UI.lastSetup=s;
   const seats=s.seats.slice(0,s.np);const chars={};let any=0;for(let i=0;i<s.np;i++)if(s.chars[i]){chars[i]=s.chars[i];any=1}
   UI.rt=realtimeJob(s.job);UI.started=false;clearTimeout(UI.aiT);UI.aiT=null;UI.sel=null;UI.res=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.kitSig={};UI.wwk=null;UI.lastPrompt=null;UI.pause=false;UI.dockSig=null;
-  UI.help=s.help!==false;UI.tut=s.tutorial?{done:{}}:(s.job<=3&&UI.coach?{done:{hello:1,stand:1}}:null);if(s.tutorial)UI.coach=true;
+  UI.help=s.help!==false;UI.tut=s.tutorial?{done:{}}:(s.job<=3?{done:{hello:1,stand:1}}:null);if(s.tutorial)UI.coach=true;UI.coachAsk=false;UI.myRes=null;UI.myAck=true;UI.aiNotBefore=0;UI.brief=(NET.on||isHost())?null:{n:s.job};
   const o={np:s.np,mission:s.job,seats,level:s.lv,names:s.names.slice(0,s.np),realtime:UI.rt};if(any){try{const ch=[];for(let i=0;i<s.np;i++)ch[i]=chars[i]||null;o.chars=ch}catch(e){}}if(s.captain!=null&&s.captain<s.np)o.captain=s.captain;if(s.seed!=null)o.seed=s.seed;
   kitReset();UI.started=true;hideStart();NET.starting=true;try{try{newGame(o)}catch(e){try{delete o.chars;newGame(o)}catch(e2){console.error(e2);UI.started=false;showStart();return}}
   if(plan)netBound(plan)}finally{NET.starting=false}
   if(humans().length===1&&!NET.on)UI.holder=humans()[0];
   UI.prev=snap();try{if(window.PerfHUD)PerfHUD.hitch()}catch(e){}if(SND.gesture)musicStart();else SND.wantMusic=1;refresh()}
 function startTutorial(){const s=Object.assign(defaultSetup(),{job:1,np:3,seats:['human','ai','ai'],lv:'easy',help:true,tutorial:true,chars:[]});UI.setup=s;startJob(s)}
-function resumeSaved(){const s=savedGame();if(!s)return;kitReset();G=s.G;UI.holder=s.ui.holder;UI.help=s.ui.help;UI.tut=s.ui.tut;UI.rt=!!s.ui.rt;UI.started=true;UI.prev=snap();UI.kitSig={};UI.sel=null;UI.res=null;UI.dockSig=null;UI.campDone=0;hideStart();if(SND.gesture)musicStart();refresh()}
+function resumeSaved(){const s=savedGame();if(!s)return;kitReset();G=s.G;UI.holder=s.ui.holder;UI.help=s.ui.help;UI.tut=s.ui.tut;UI.rt=!!s.ui.rt;UI.brief=null;UI.myRes=null;UI.myAck=true;UI.started=true;UI.prev=snap();UI.kitSig={};UI.sel=null;UI.res=null;UI.dockSig=null;UI.campDone=0;hideStart();if(SND.gesture)musicStart();refresh()}
 // ---------- boot ----------
 function detectSoftGPU(){if(/jsdom/i.test(navigator.userAgent))return false;try{const c=document.createElement('canvas');const gl=c.getContext('webgl');if(!gl)return false;const e=gl.getExtension('WEBGL_debug_renderer_info');const r=e?gl.getParameter(e.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);const lose=gl.getExtension('WEBGL_lose_context');if(lose)lose.loseContext();return /swiftshader|llvmpipe|software|softpipe/i.test(String(r))}catch(e){return false}}
 function perfHooks(){const PH=window.PerfHUD;if(!PH||!SFKit._K||!SFKit._K.on)return;const K=SFKit._K;const DPR={high:2,medium:1.5,low:1};
@@ -559,17 +617,17 @@ function perfHooks(){const PH=window.PerfHUD;if(!PH||!SFKit._K||!SFKit._K.on)ret
     basePR:()=>Math.min(window.devicePixelRatio||1,DPR[SFKit.getQuality().active]||1),onPixelRatio:v=>{K.r.setPixelRatio(v);const b=GX.boardSize();SFKit.resize(b.w,b.h)},
     orbit:t=>{const C=K.camState;if(!C)return;if(t==null){if(UI.orb0){C.pos.copy(UI.orb0.p);C.look.copy(UI.orb0.l);UI.orb0=null}return}if(!UI.orb0)UI.orb0={p:C.pos.clone(),l:C.look.clone()};const a=Math.sin(t*Math.PI*2)*.5;const d=UI.orb0.p.clone().sub(UI.orb0.l);const x=d.x*Math.cos(a)-d.z*Math.sin(a),z=d.x*Math.sin(a)+d.z*Math.cos(a);C.pos.set(UI.orb0.l.x+x,UI.orb0.p.y,UI.orb0.l.z+z)},
     isAnimating:()=>{try{return SFKit.isAnimating()}catch(e){return false}},beforeTest:()=>GX.close()})}
-function boot(){GX.init({key:'sf'});paintIcons();loadSettings();window.SF_SOFTGPU=detectSoftGPU();
+function boot(){window.SF_COLAT=1.05;GX.init({key:'sf'});paintIcons();loadSettings();window.SF_SOFTGPU=detectSoftGPU();
   const cv=$('#c3'),fb=$('#fb');const P=new URLSearchParams(location.search);let res={ok:false};
   try{res=SFKit.init(cv,{fallback:fb,force2D:P.has('2d')})}catch(e){console.error(e)}
   if(!res.ok){cv.hidden=true;fb.hidden=false;fb._wired=1;fb.addEventListener('click',e=>{const p=SFKit.pick2D(e.target);if(p)onPick(p)})}
-  else{let down=null;cv.addEventListener('pointermove',e=>{try{SFKit.hover(e.clientX,e.clientY)}catch(x){}});cv.addEventListener('pointerleave',()=>{try{SFKit.hover(null)}catch(x){}});
+  else{let down=null;cv.addEventListener('pointermove',e=>{try{hoverTile(SFKit.hover(e.clientX,e.clientY))}catch(x){}});cv.addEventListener('pointerleave',()=>{try{SFKit.hover(null)}catch(x){}hoverTile(null)});
     cv.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY}});
     // a lost WebGL context (GPU reset, memory pressure on phones): carry on with the kit's 2D board instead of a blank table
     cv.addEventListener('webglcontextlost',e=>{e.preventDefault();window.SF_LOST=(window.SF_LOST||0)+1;console.warn('WebGL context lost: switching to the 2D board');setTimeout(()=>{try{SFKit._K.loopOn=false;SFKit.init(cv,{fallback:fb,force2D:true});cv.hidden=true;fb.hidden=false;
-      if(!fb._wired){fb._wired=1;fb.addEventListener('click',e2=>{const p=SFKit.pick2D(e2.target);if(p)onPick(p)})}UI.kitSig={};if(G){const S=SFKit._K.st;S.stands={};refresh()}}catch(x){console.error(x)}},0)},false);cv.addEventListener('click',e=>{if(down&&Math.abs(e.clientX-down.x)+Math.abs(e.clientY-down.y)>8)return;onPick(SFKit.pick(e.clientX,e.clientY))});perfHooks()}
+      if(!fb._wired){fb._wired=1;fb.addEventListener('click',e2=>{const p=SFKit.pick2D(e2.target);if(p)onPick(p)})}UI.kitSig={};if(G){const S=SFKit._K.st;S.stands={};refresh()}}catch(x){console.error(x)}},0)},false);cv.addEventListener('click',e=>{if(down&&Math.abs(e.clientX-down.x)+Math.abs(e.clientY-down.y)>8)return;const pk=SFKit.pick(e.clientX,e.clientY);hoverTile(pk);onPick(pk)});perfHooks()}
   GX.onResize((w,h)=>{try{SFKit.resize(w,h);SFKit.renderOnce()}catch(e){}});{const b=GX.boardSize();try{SFKit.resize(b.w,b.h)}catch(e){}}
-  GX.onShow=id=>{sfx('open');if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML+'<h3>Credits</h3><p>Names, card text and art are original. <button class="btn small" data-gx="credd">Full credits</button></p>';if(id==='refd')renderRef();if(id==='setd')renderSettings();if(G)renderOpenDrawer();else if(id==='logd'||id==='missiond'||id==='geard'||id==='knowd')$('#'+id+' .gx-drawer-body').innerHTML='<p>Start a job first.</p>'};
+  GX.onShow=id=>{sfx('open');if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML+GLOSS_HTML+'<h3>Credits</h3><p>Names, card text and art are original. <button class="btn small" data-gx="credd">Full credits</button></p>';if(id==='refd')renderRef();if(id==='setd')renderSettings();if(G)renderOpenDrawer();else if(id==='logd'||id==='missiond'||id==='geard'||id==='knowd')$('#'+id+' .gx-drawer-body').innerHTML='<p>Start a job first.</p>'};
   GX.onClose=()=>sfx('close');
   setInterval(clockTick,250);setInterval(()=>{if(G&&UI.started&&timedJob()&&!G.over){const p=$('#timerpill');if(p&&UI.V){const c=clockLeft(knowledge(Math.max(0,UI.V.seat)));if(c)p.lastChild.textContent=` ${c.label} ${fmt(c.left)}${UI.pause?' ⏸':''}`}}},1000);
   netInit();showStart();if(UI.netOpen)netRender()}

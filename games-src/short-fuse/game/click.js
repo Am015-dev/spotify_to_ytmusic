@@ -51,6 +51,7 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
     const q=s=>[...d.querySelectorAll(s)].filter(b=>!b.disabled);const r=R();
     // popups now and then
     if(r<.02){const t=rnd(q('.gx-bar [data-gx]'));if(t){click(t);clicks++;seen.add('pop:'+t.dataset.gx);const x=d.querySelector('.gx-drawer.on .gx-x');if(x)click(x)}return}
+    {const bo=q('[data-a=briefok],[data-a=myack]');if(bo.length){click(bo[0]);seen.add('brief/ack');return}}
     if(r<.03){const c=q('#coach [data-a=coach]');if(c.length){click(c[0]);seen.add('coach');return}}
     const take=q('#main [data-a=take]');if(take.length){click(take[0]);clicks++;seen.add('pass-screen');return}
     const qs=q('#main [data-a=q]');if(qs.length){const tiles=[...d.querySelectorAll('#fb .sf2d-hl')];if(tiles.length&&R()<.5){click(rnd(tiles));seen.add('q-by-tile')}else{seen.add('q:'+w.eval('G.q&&G.q.kind'));click(rnd(qs))}clicks++;return}

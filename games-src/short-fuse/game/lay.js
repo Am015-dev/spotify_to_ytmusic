@@ -27,7 +27,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
   await scroll('start');await shot('0start');
   // start screen panes scroll inside themselves only
   await p.click('[data-a=job][data-n="9"]');await p.waitForTimeout(200);await p.click('[data-a=np][data-v="3"]');await p.click('[data-a=preset][data-v=solo]');await p.waitForTimeout(150);await shot('0start_job9');
-  await p.click('[data-a=start]');await p.waitForTimeout(2500);await scroll('setup q');const c1=await cover('setup q');await dockOn('setup q');await shot('1q');
+  await p.click('[data-a=start]');await p.evaluate(()=>{const b=document.querySelector('[data-a=briefok]');if(b)b.click()});await p.waitForTimeout(2500);await scroll('setup q');const c1=await cover('setup q');await dockOn('setup q');await shot('1q');
   // 2. answer the opening token by button
   for(let k=0;k<6;k++){const q=await p.$('#main [data-a=q]');if(!q)break;await q.click();await p.waitForTimeout(500)}
   // wait for the human turn
@@ -38,7 +38,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
   await p.waitForTimeout(500);await scroll('dual ready');await cover('dual ready');await shot('3dual');
   const go=await p.$('#main [data-a=dual]:not([disabled])');if(go){await go.click();await p.waitForTimeout(450);await shot('4result');await p.waitForTimeout(1500)}
   // 4. every popup opens and closes (x and Esc)
-  for(const id of DRAWERS){const btn=await p.$(`.gx-bar [data-gx="${id}"]`);if(btn){await btn.click()}else{await p.evaluate(i=>GX.show(i),id)}await p.waitForTimeout(900);
+  for(const id of DRAWERS){const btn=await p.$(`.gx-bar .gx-ibtn[data-gx="${id}"]`);if(btn){await btn.click()}else{await p.evaluate(i=>GX.show(i),id)}await p.waitForTimeout(900);
     const on=await p.evaluate(i=>document.getElementById(i).classList.contains('on'),id);await scroll('popup '+id);if(['missiond','geard','knowd','refd','setd'].includes(id))await shot('5pop_'+id);
     if(id==='logd'||id==='refd')await p.keyboard.press('Escape');else await p.click(`#${id} .gx-x`);await p.waitForTimeout(380);
     const off=await p.evaluate(i=>!document.getElementById(i).classList.contains('on'),id);if(!on||!off){bad++;log('popup',id,'open',on,'closed',off)}}
@@ -50,11 +50,11 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
     else await p.waitForTimeout(500)}
   await scroll('later');await cover('later');await shot('7later');
   // 7. a hot-seat pass screen
-  await p.evaluate(()=>{showStart();UI.setup.job=4;UI.setup.np=2;UI.setup.seats=['human','human'];renderStart()});await p.waitForTimeout(300);await p.click('[data-a=start]');await p.waitForTimeout(1800);
+  await p.evaluate(()=>{showStart();UI.setup.job=4;UI.setup.np=2;UI.setup.seats=['human','human'];renderStart()});await p.waitForTimeout(300);await p.click('[data-a=start]');await p.evaluate(()=>{const b=document.querySelector('[data-a=briefok]');if(b)b.click()});await p.waitForTimeout(1800);
   await scroll('pass');await cover('pass');await dockOn('pass');await shot('8pass');
   await p.click('#main [data-a=take]');await p.waitForTimeout(1200);await shot('8pass_taken');
   // 8. a timed job (countdown in the dock), paused and resumed
-  await p.evaluate(()=>{showStart();UI.setup.job=19;UI.setup.np=3;UI.setup.seats=['human','ai','ai'];renderStart()});await p.waitForTimeout(300);await p.click('[data-a=start]');await p.waitForTimeout(1500);
+  await p.evaluate(()=>{showStart();UI.setup.job=19;UI.setup.np=3;UI.setup.seats=['human','ai','ai'];renderStart()});await p.waitForTimeout(300);await p.click('[data-a=start]');await p.evaluate(()=>{const b=document.querySelector('[data-a=briefok]');if(b)b.click()});await p.waitForTimeout(1500);
   for(let k=0;k<6;k++){const q=await p.$('#main [data-a=q]');if(!q)break;await q.click();await p.waitForTimeout(500)}
   await p.waitForTimeout(3500);const tp=await p.evaluate(()=>{const e=document.getElementById('timerpill');return e?e.textContent:null});if(!tp){bad++;log('NO TIMER in a timed job')}
   await p.click('#pausebtn');await p.waitForTimeout(300);const c0=await p.evaluate(()=>G.clock);await p.waitForTimeout(2200);const c1b=await p.evaluate(()=>G.clock);if(c1b!==c0){bad++;log('PAUSE did not stop the clock',c0,c1b)}

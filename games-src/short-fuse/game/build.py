@@ -33,6 +33,8 @@ KIT_PATCHES=[
  ("esc(mine ? 'You' : (names[s] || 'Crew ' + (s + 1)))","esc(names[s] || (mine ? 'You' : 'Crew ' + (s + 1)))"),
  # 10. false tokens ("not 10") need three characters
  ("return 'info:' + s.slice(0, 2);","return 'info:' + s.slice(0, 3);"),
+ # 12. portrait boards use the tall 'column' layout up to a squarer aspect (a phone sheet leaves a nearly square board); SF_COLAT is set by the game
+ ("aspect < .82 ?","aspect < (global.SF_COLAT || .82) ?"),
  # 11. 3D seat plate: the name we pass ("You" in solo, "Name (you)" in hot-seat)
  ("var label = me ? 'YOU' : name.toUpperCase();","var label = name.toUpperCase();"),
 ]

@@ -217,7 +217,7 @@ const MISSION_INFO={
 10:{nm:'No Coffee Today',text:'Against the clock (15 minutes, 12 with two players). No fixed order: when a turn ends, anyone may claim the next one, but never two in a row (unless only two of you, or you are the last with wires). Coffee Break is swapped out.',rules:[{k:'freeTurns'},{k:'timer',script:'plain'}]},
 11:{nm:'Colourblind',text:'No red wires, but a random number card marks a blue value that behaves exactly like red: never cut it, reveal it at the end.',rules:[{k:'fakeRed'}]},
 12:{nm:'Paperwork',text:'A number card covers each equipment card. A card unlocks only when two wires of its own value AND two of the covering value are cut.',rules:[{k:'eqCover'}]},
-13:{nm:'Triple Trouble',text:'The three reds are dealt one per player from the foreman. Opening tokens are drawn at random. Reds go only by a special action: point at three uncut wires anywhere at once; if any is not red, boom. A hand of only reds must try it.',info:'rand',rules:[{k:'redTriple'}]},
+13:{nm:'Triple Trouble',text:'The three reds are dealt one per player from the foreman. Opening tokens are drawn at random. Reds go only by a special action: point at three uncut wires anywhere at once; if any is not red, boom. Equipment and probes cannot choose reds (pointing one at a red is a boom). A hand of only reds must try it.',info:'rand',rules:[{k:'redTriple'}]},
 14:{nm:'The Rookie',text:'Crew cards are dealt at random; whoever gets the foreman card is the rookie. If the rookie misses a dual cut, boom. The rookie may not use the Damper.',rules:[{k:'rookie'}]},
 15:{nm:'Garbled Orders',text:'Equipment lies face down. A number deck is turned up one card at a time: when all four wires of the shown value are cut, one equipment card turns up, ready at once.',rules:[{k:'eqDeckReveal'}]},
 16:{nm:'Same Again',text:'Like Pecking Order, but all four wires of each value in the order must be cut before the next.',rules:[{k:'gate',cards:3,req:4}]},
@@ -248,11 +248,11 @@ const MISSION_INFO={
 41:{nm:'Snare Tango',text:'The yellows are snare wires, one per player. The fuse starts one step from the end. A snare goes only by pointing at a crewmate\'s snare: right means the fuse turns back a step, wrong means a token and a burnt step.',info:'rand',rules:[{k:'tripwire'}]},
 42:{nm:'Big Top',text:'No time limit, but circus acts keep interrupting: wires come back, seats move, cut wires get juggled or thrown away.',rules:[{k:'circus'}],audio:true},
 43:{nm:'Robo-Pal',text:'A robot holds a few unseen wires and walks the 1-12 track, one step after every turn. Cut the value it stands on and you take one of its wires. Its wires must be cut too.',rules:[{k:'robotPatrol'}]},
-44:{nm:'Deep Dive',text:'A shared oxygen reserve (2 per player). Each cut costs 1, 2 or 3 by depth. It all comes back at the foreman\'s turn. Cannot pay: skip and burn a step. No talking.',rules:[{k:'oxygen',variant:'shared'},{k:'speech',what:'all'}]},
+44:{nm:'Deep Dive',text:'A shared oxygen reserve (2 per player). Each cut costs 1, 2 or 3 by depth. It all comes back each round, when the turn passes the foreman\'s seat. Cannot pay: skip and burn a step. No talking.',rules:[{k:'oxygen',variant:'shared'},{k:'speech',what:'all'}]},
 45:{nm:'Volunteers',text:'No fixed order. A number card is turned up and the first to call it must cut that value. A false call burns a step. If nobody calls, the foreman picks someone.',rules:[{k:'volunteer'}]},
 46:{nm:'Lucky Sevens',text:'No reds; four yellows at 5.1, 6.1, 7.1 and 8.1. The four 7s must go last, all at once, by a player holding only 7s.',rules:[{k:'sevens'}]},
 47:{nm:'Mental Math',text:'Twelve number cards face up. To cut, combine two of them by adding or subtracting: the result is the value you must cut. Cannot or will not: burn a step.',rules:[{k:'math'}]},
-48:{nm:'Yellow Trio',text:'Three yellows, dealt one each. They go only all three at once by pointing at them; a miss tags every pointed wire and burns one step.',rules:[{k:'yellowTrio'}]},
+48:{nm:'Yellow Trio',text:'Three yellows, dealt one each. They go only all three at once by pointing at them; a miss gives every pointed wire an info token and burns one step (a red among them still explodes).',rules:[{k:'yellowTrio'}]},
 49:{nm:'Bottle Post',text:'Each player keeps oxygen. To cut value V, first hand V oxygen to a crewmate. Cannot pay: skip and burn a step. No talking.',rules:[{k:'oxygen',variant:'gift'},{k:'speech',what:'all'}]},
 50:{nm:'Lights Out',text:'No validation tokens or markers. Tokens are laid beside the stand, not in front of the wire: remember where they pointed.',info:'memory',rules:[{k:'memory'}]},
 51:{nm:'Yes, Boss!',text:'Each turn the boss of the moment turns up a number card and picks who must cut it. The fuse starts one step further back.',rules:[{k:'sir'}]},
@@ -267,7 +267,7 @@ const MISSION_INFO={
 60:{nm:'Dare Board Again',text:'As Dare Board: one challenge per player, fuse one step from the end.',rules:[{k:'challenges'}]},
 61:{nm:'Pass It On',text:'Each player gets a restriction (A to E). Each round the crew may rotate them all. Anyone may swap theirs for a random F-L card by burning a step. If nobody can play for a whole round, boom.',rules:[{k:'persCon',pick:'random',rotate:true,swap:true,roundBlock:'explode'}]},
 62:{nm:'Meteor Run',text:'One number card per player. The fuse starts one step from the end; each finished card value turns it back a step.',rules:[{k:'meteor'}]},
-63:{nm:'Unsinkable',text:'The foreman starts with all the oxygen. Cut value V: pay V into the reserve. Pass all your oxygen left after your turn. The foreman refills each round. No talking.',rules:[{k:'oxygen',variant:'bundle'},{k:'speech',what:'all'}]},
+63:{nm:'Unsinkable',text:'The foreman starts with all the oxygen. Cut value V: pay V into the reserve. Pass all your oxygen left after your turn. Each round the foreman (or the next player with wires) collects the reserve. No talking.',rules:[{k:'oxygen',variant:'bundle'},{k:'speech',what:'all'}]},
 64:{nm:'Double Haywire',text:'Each player flips two own wires unseen: the lower to the far left, the higher to the far right. Same rules as Haywire.',rules:[{k:'flip',who:'each',n:2,others:1}]},
 65:{nm:'Hot Potato',text:'Number cards are dealt face up. You may only cut values on your cards; none: skip and burn a step. After each turn hand one card to a crewmate.',rules:[{k:'hotPotato'}]},
 66:{nm:'Bunker Showdown',text:'Timed final job on the bunker map. Every cut moves the crew toward a side whose restriction it met. Reach the key, the guard, the stairs, the lever and the doctor in time, then finish the bomb.',rules:[{k:'bunker'}],audio:true}
@@ -287,7 +287,7 @@ const SCRIPTS={
   {t:0,len:20,say:'Number target! At least two wires of the shown value within 20 seconds.'},
   {t:20,len:20,check:'dialIfMissed',say:'Missed targets burn a step. New target, 20 seconds.'},
   {t:40,len:20,check:'none',say:'No reward this time. New target, 20 seconds.'},
-  {t:60,len:20,check:'eqIfMissed',say:'A miss now costs the lowest ready equipment card. New target, 20 seconds.'},
+  {t:60,len:20,check:'eqIfMissed',say:'A miss now costs the lowest visible equipment card (locked or ready). New target, 20 seconds.'},
   {t:80,len:15,check:'yellowCountIfHit',say:'Hit: everyone announces how many yellows they hold. New target, 15 seconds.'},
   {t:95,len:15,check:'mimeIfMissed',say:'Miss: the active player may only mime. New target, 15 seconds.'},
   {t:110,len:15,check:'holdIfHit',say:'Hit: the active player draws a number card and says if they hold it. New target, 15 seconds.'},
@@ -626,6 +626,7 @@ function doDual(seat,m){const tool=m.tool||null,two=m.two||null;const vals=[m.v]
   G.stats.dual++;const T=m.ks.map(k=>G.st[m.st].w[k]);const owner=ownerOf(m.st);
   const tn=tool==='dd'?'Twin Probe':tool==='eq3'||tool==='pt3'?'Triple Probe':tool==='eq5'?'Full Scan':'';
   lg(`${SP(seat).nm} points at ${T.length>1?T.length+' wires':'a wire'} of ${SP(owner).nm} and says "${vals.map(VN).join(' or ')}"${tn?' ('+tn+(two?' + Two-Value':'')+')':two?' (Two-Value Probe)':''}.`);
+  if((tool||two)&&hasRule(G.mission,'redTriple')&&T.some(sl=>isRed(sl.id))){explode(`${SP(seat).nm}'s probe pointed at a red wire (equipment cannot choose reds)`);return}
   const match=T.filter(sl=>vals.includes(cv(sl.id)));
   const ctx={seat,st:m.st,us:T.map(x=>x.u),vals,v:m.v,tool,two,own:m.own,ownFlip:m.own==='flip',fu:m.fu};
   if(match.length){if(match.length>1){ask(owner,'pickMatch',`${SP(seat).nm} hit: choose which matching wire to cut`,match.map(sl=>({l:`Cut slot ${G.st[m.st].w.indexOf(sl)+1}`,h:'dualHit',d:Object.assign({u:sl.u},ctx)})));return}
@@ -774,7 +775,7 @@ function doEq(seat,m){const E=EQUIP[m.id];useEq(m.id);lg(`${SP(seat).nm} uses ${
   case 'eq1111':{const t=G.st[m.ts].w.splice(m.tk,1)[0];const from=ownerOf(m.ts);const k=insertSlot(m.s,t);lg(`${SP(seat).nm} hooks a wire from ${SP(from).nm} into stand ${m.s+1}, slot ${k+1}.`);dropStaleAnn(m.ts);dropStaleAnn(m.s);break}}}
 function doItem(seat,m){useItem(seat);lg(`${SP(seat).nm} uses ${ITEMS[m.k].n}.`,'eq');if(m.k==='sweep')sweep(m.v,seat);else startSwap(seat,m.s,m.k2,m.to)}
 // a Sweep: every stand answers yes/no for uncut blue wires of v (X wires ignored)
-function sweep(v,by){const res=G.st.map(s=>({st:s.i,yes:s.w.some(x=>!x.cut&&!x.x&&WIRES[x.id].c==='b'&&cv(x.id)===v)?1:0,us:s.w.filter(x=>!x.cut&&!x.x).map(x=>x.u)}));
+function sweep(v,by){const res=G.st.map(s=>({st:s.i,yes:s.w.some(x=>!x.cut&&!x.x&&!x.flip&&WIRES[x.id].c==='b'&&cv(x.id)===v)?1:0,us:s.w.filter(x=>!x.cut&&!x.x&&!x.flip).map(x=>x.u)}));
   G.ann.push({k:'sweep',by,v,res,turn:G.turn});lg(`Sweep for ${v}: ${res.map(r=>`${SP(ownerOf(r.st)).nm}${standsOf(ownerOf(r.st)).length>1?' (stand '+(r.st+1)+')':''} ${r.yes?'yes':'no'}`).join(', ')}.`)}
 function dropStaleAnn(si){for(const a of G.ann)if(a.k==='side'&&a.st===si)a.stale=1}
 // sorted insert: before the first sorted wire with a higher sort value (X / flipped wires stay at the ends)
@@ -783,7 +784,7 @@ function insertSlot(si,sl){const w=G.st[si].w;let lo=0,hi=w.length;while(lo<hi&&
 function startSwap(seat,s,k,to){const give=G.st[s].w[k];const opts=uncutOf(to).filter(x=>!x.sl.x&&!x.sl.flip).map(x=>({l:`Give stand ${x.s+1} slot ${x.k+1}`,h:'swapBack',d:{seat,to,gu:give.u,ru:x.sl.u}}));
   ask(to,'swapPick',`${SP(seat).nm} offers a wire trade: pick one of yours to hand over`,opts)}
 QH.swapBack=d=>{const g=findU(d.gu),r=findU(d.ru);const gs=g.s,rs=r.s;G.st[gs].w.splice(g.k,1);const r2=findU(d.ru);G.st[r2.s].w.splice(r2.k,1);
-  if(G.mission===24){g.sl.tok=[];r.sl.tok=[]}
+  if(G.tokFam==='cnt'){g.sl.tok=[];r.sl.tok=[]}
   const k1=insertSlot(rs,g.sl),k2=insertSlot(gs,r.sl);G.marks=G.marks.filter(x=>![g.sl.u,r.sl.u].includes(x.a)&&![g.sl.u,r.sl.u].includes(x.b));
   dropStaleAnn(gs);dropStaleAnn(rs);lg(`${SP(d.seat).nm} and ${SP(d.to).nm} trade wires: in at stand ${rs+1} slot ${k1+1} and stand ${gs+1} slot ${k2+1}.`)};
 // ===================== mission rule handlers =====================
@@ -814,7 +815,7 @@ function multiSlots(m){return m.tg.map(t=>G.st[t.s].w[t.k])}
 function doMulti(seat,m,want,label,onFail){const S=multiSlots(m);lg(`${SP(seat).nm} points at ${S.length} wires and calls them all ${label}.`);
   if(S.every(sl=>cv(sl.id)===want)){for(const sl of S)cutSlot(sl);lg(`All ${S.length} are ${label}!`,'good');afterCut({seat,v:want,n:S.length,kind:'special',ok:1});if(!G.over&&!G.q)endAction();else if(!G.over)G.tfx.endAfterQ=1;return true}
   if(onFail==='explode'||S.some(sl=>isRed(sl.id))&&want!=='R'){explode(`${SP(seat).nm}'s ${label} call was wrong`);return false}
-  for(const t of m.tg){const sl=G.st[t.s].w[t.k];if(!sl.not.includes(want))sl.not.push(want);if(!sl.cut&&cv(sl.id)!==want&&!isRed(sl.id))putTok(t.s,sl,trueTok(t.s,sl,want))}
+  for(const t of m.tg){const sl=G.st[t.s].w[t.k];if(cv(sl.id)!==want&&!sl.not.includes(want))sl.not.push(want);if(!sl.cut&&!isRed(sl.id)&&!sl.tok.length)putTok(t.s,sl,trueTok(t.s,sl,want))}
   advance(1,`wrong ${label} call`,{miss:1});if(G.over)return false;afterMiss({seat,v:want,kind:'special'});endAction();return false}
 // ---------- 9, 16: the cut order ----------
 RH.gate={setup(r){G.ms.gate={vals:shuffle(NUMS.slice()).slice(0,r.cards),at:0,req:r.req};lg(`Cut order: ${G.ms.gate.vals.join(', ')} (${r.req} of each before the next).`)},
@@ -878,7 +879,7 @@ RH.special4={setup(r){const v=1+rnd(12);G.ms.sp4={v,done:0,reward:r.reward};if(r
   round(r){if(G.ms.sp4.done)return;if(r.reward==='eqDeck'){if(G.eqDeck.length){const id=G.eqDeck.shift();G.eqOut.push(id);lg(`End of round: ${EQUIP[id].n} burns from the pile.`,'bad')}}
     else if(G.ms.sp4.deck.length){G.ms.sp4.box.push(G.ms.sp4.deck.shift());lg('End of round: a number card burns.','bad')}},
   pub(){const s=G.ms.sp4;return {v:s.v,done:s.done,pile:G.eqDeck.length,deck:s.deck?s.deck.length:0}}};
-AG.numInfo=d=>{const vals=[...new Set(SP(d.seat).cards)].filter(v=>G.tokSup[v]>0);if(!vals.length)return;ask(d.seat,'numInfo','Place one info token for a value on your cards',vals.map(v=>({l:`Token ${v}`,h:'numInfo',d:{seat:d.seat,v}})))};
+AG.numInfo=d=>{const held=heldVals(d.seat);const vals=[...new Set(SP(d.seat).cards)].filter(v=>G.tokSup[v]>0&&held[v]);if(!vals.length)return;ask(d.seat,'numInfo','Place one info token for a value on your cards',vals.map(v=>({l:`Token ${v}`,h:'numInfo',d:{seat:d.seat,v}})))};
 QH.numInfo=d=>{placeTruthful(d.seat,d.v,1)};
 // ---------- 25, 44, 49, 63: no talking (the interface has no chat; nothing to enforce) ----------
 RH.speech={offMoves(r,seat){if(r.what!=='all'||G.q||G.phase!=='turn'||!hasWires(seat))return [];const last=G.ann.filter(a=>a.k==='needOx'&&a.seat===seat).pop();if(last&&last.turn>=G.turn-G.np+1)return [];return [{a:'signal'}]},acts:['signal'],
@@ -915,7 +916,7 @@ function busRushDone(){const b=G.ms.bus;b.rush=0;b.lock=0;b.disc.push(...b.tg);b
 function busPhase(i){const b=G.ms.bus;const P=SCRIPTS.m30.phases;const ph=P[i];const prev=b.tg[0];const hit=prev!=null&&cutCount(prev)>=2;
   switch(ph.check){
   case 'dialIfMissed':if(!hit)advance(1,'missed the target');break;
-  case 'eqIfMissed':if(!hit){const e=G.eq.filter(x=>x.st==='ready'&&!x.down).sort((a,c)=>(EQUIP[a.id].v==='Y'?0:EQUIP[a.id].v)-(EQUIP[c.id].v==='Y'?0:EQUIP[c.id].v))[0];if(e){e.st='used';lg(`${EQUIP[e.id].n} is lost.`,'bad')}}break;
+  case 'eqIfMissed':if(!hit){const e=G.eq.filter(x=>(x.st==='ready'||x.st==='locked')&&!x.down).sort((a,c)=>(EQUIP[a.id].v==='Y'?0:EQUIP[a.id].v)-(EQUIP[c.id].v==='Y'?0:EQUIP[c.id].v))[0];if(e){e.st='used';lg(`${EQUIP[e.id].n} is lost.`,'bad')}}break;
   case 'yellowCountIfHit':if(hit)for(const s of G.seats){const n=uncutOf(s.i).filter(x=>!x.sl.flip&&cv(x.sl.id)==='Y').length;G.ann.push({k:'ycount',seat:s.i,n,turn:G.turn});lg(`${s.nm} holds ${n} yellow.`)}break;
   case 'holdIfHit':if(hit){const v=drawNum(b);if(v!=null){b.disc.push(v);const yes=heldVals(G.cur)[v]?1:0;G.ann.push({k:'holds',seat:G.cur,v,yes,turn:G.turn});lg(`${SP(G.cur).nm} draws ${v}: ${yes?'holds it':'does not hold it'}.`)}}break;
   case 'finishIfHit':if(hit){const s=allSlots().filter(x=>!x.sl.cut&&cv(x.sl.id)===prev);for(const x of s)cutSlot(x.sl);if(s.length){lg(`Bonus: the remaining ${prev}s are cut.`,'good');afterCut({seat:G.cur,v:prev,n:s.length,kind:'mass',ok:1})}}break;
@@ -937,8 +938,8 @@ RH.persCon={setup(r){G.ms.pc={pool:[],fl:shuffle(CON_IDS.filter(c=>'FGHIJKL'.inc
   legalX(r,m,seat){return r.swap&&SP(seat).con&&G.ms.pc.fl.length&&G.phase==='turn'&&G.step==='act'?'':'not available'},
   doX(r,m,seat){const old=SP(seat).con;G.ms.pc.disc.push(old);SP(seat).con=G.ms.pc.fl.shift();lg(`${SP(seat).nm} trades restriction ${old} for ${SP(seat).con} (${CONSTRAINTS[SP(seat).con].n}).`);advance(1,'restriction swap')},
   pub(){return {table:G.ms.pc.table,pool:G.ms.pc.pool,fl:G.ms.pc.fl.length}}};
-AG.draftCon=d=>{let pool=G.ms.pc.pool.slice();if(G.np===2){const other=G.seats.find(s=>s.i!==d.seat&&s.con);if(other){const bad={A:'B',B:'A',C:'D',D:'C'}[other.con];pool=pool.filter(c=>c!==bad)}}
-  ask(d.seat,'draftCon','Pick your restriction card',pool.map(c=>({l:`${c}: ${CONSTRAINTS[c].n} - ${CONSTRAINTS[c].text}`,h:'draftCon',d:{seat:d.seat,c}})))};
+AG.draftCon=d=>{let pool=G.ms.pc.pool.slice();let warn=null;if(G.np===2){const other=G.seats.find(s=>s.i!==d.seat&&s.con);if(other)warn={A:'B',B:'A',C:'D',D:'C'}[other.con]}
+  ask(d.seat,'draftCon','Pick your restriction card',pool.map(c=>({l:`${c}: ${CONSTRAINTS[c].n} - ${CONSTRAINTS[c].text}${c===warn?' (the rules advise against this pairing)':''}`,h:'draftCon',d:{seat:d.seat,c}})))};
 QH.draftCon=d=>{SP(d.seat).con=d.c;G.ms.pc.pool.splice(G.ms.pc.pool.indexOf(d.c),1);lg(`${SP(d.seat).nm} takes restriction ${d.c} (${CONSTRAINTS[d.c].n}).`)};
 function withoutCons(seat,fn){const p=SP(seat);const a=p.conDown,g=G.ms.gcon;p.conDown=1;G.ms.gcon=null;const r=fn();p.conDown=a;G.ms.gcon=g;return r}
 function dropIfBlocked(seat){const p=SP(seat);if(!p.con||p.conDown)return;const G0=G.step;G.step='act';const ok=mainMoves(seat,true).length>0;const free=ok?true:withoutCons(seat,()=>mainMoves(seat,true).length>0);G.step=G0;
@@ -1035,8 +1036,9 @@ RH.oxygen={setup(r){const np=G.np;G.ms.ox={res:0,v:r.variant};
   legalCut(r,seat,m,vals){if(G.tfx.noOx)return '';if(!RH.oxygen.canPay(r,seat,m.v))return 'not enough oxygen';if(r.variant==='gift'&&m.a==='dual'||r.variant==='gift'&&m.a==='solo'){if(m.oxTo==null||!SP(m.oxTo)||m.oxTo===seat)return 'name the crewmate who gets your oxygen'}return ''},
   dualParams(r,seat,m){if(r.variant!=='gift'||(m.a!=='dual'&&m.a!=='solo'))return null;const to=G.seats.filter(q=>q.i!==seat).sort((a,b)=>a.ox-b.ox)[0];return {oxTo:to.i}},
   pay(r,seat,v,m){const c=oxCost(r,v);if(r.variant==='shared'){G.ms.ox.res-=c;SP(seat).ox+=c}else if(r.variant==='gift'){SP(seat).ox-=c;SP(m.oxTo).ox+=c}else{SP(seat).ox-=c;G.ms.ox.res+=c}lg(`${SP(seat).nm} spends ${c} oxygen.`)},
-  start(r,seat){if(r.variant==='shared'&&seat===G.captain){G.ms.ox.res=2*G.np;G.seats.forEach(s=>s.ox=0)}if(r.variant==='bundle'&&seat===G.captain&&G.round>1&&G.ms.ox.res){SP(seat).ox+=G.ms.ox.res;lg(`${SP(seat).nm} collects ${G.ms.ox.res} oxygen from the reserve.`);G.ms.ox.res=0}},
-  stuck(r,seat){G.tfx.noOx=1;const free=mainMoves(seat,true).length>0;G.tfx.noOx=0;if(!free)return false;skipTurn('not enough oxygen',1);return true},
+  round(r){if(r.variant==='shared'){G.ms.ox.res=2*G.np;G.seats.forEach(s=>s.ox=0);lg('The reserve is refilled: all oxygen is back in the middle.')}
+    if(r.variant==='bundle'&&G.ms.ox.res){const to=clockFrom(G.captain).find(q=>hasWires(q));if(to!=null){SP(to).ox+=G.ms.ox.res;lg(`${SP(to).nm} collects ${G.ms.ox.res} oxygen from the reserve.`);G.ms.ox.res=0}}},
+  stuck(r,seat){G.tfx.noOx=1;const free=mainMoves(seat,true).length>0;G.tfx.noOx=0;if(!free)return false;if(eqOK(seat,'eq9')&&ask(seat,'stuckDamper','You cannot pay: use the Damper to ignore the fuse step?',[{l:'Use the Damper (no step)',h:'stuckDamper',d:{seat,use:1}},{l:'Skip and burn a step',h:'stuckDamper',d:{seat,use:0}}]))return true;skipTurn('not enough oxygen',1);return true},
   moves(r,seat){return r.variant==='shared'||r.variant==='gift'?[{a:'pass',pass:1}]:[]},acts:['pass'],
   legalX(r,m,seat){return G.step==='act'&&seat===G.actor&&!G.tfx.acted&&(r.variant==='shared'||r.variant==='gift')?'':'you may not pass'},
   doX(r,m,seat){G.tfx.acted=1;G.hist.push({seat,kind:'skip',turn:G.turn});lg(`${SP(seat).nm} passes.`);if(G.tfx.damper)lg('The Damper cancels the step.');else advance(1,'passing');if(!G.over){G.step='end';schedEnd()}},
@@ -1044,6 +1046,7 @@ RH.oxygen={setup(r){const np=G.np;G.ms.ox={res:0,v:r.variant};
     if(r.variant==='gift')for(const s of G.seats)if(!hasWires(s.i)&&s.ox){G.ms.ox.lost=(G.ms.ox.lost||0)+s.ox;s.ox=0}},
   valid(r){if(r.variant!=='depth')return;for(const s of clockFrom(G.captain))if(G.ms.ox.res>0){G.ms.ox.res--;SP(s).ox++}lg('Fresh air: everyone takes one oxygen from the reserve (while it lasts).')},
   pub(r){return {res:G.ms.ox.res,v:r.variant,seats:G.seats.map(s=>s.ox)}}};
+QH.stuckDamper=d=>{if(d.use){useEq('eq9');lg('The Damper cancels the step.','good');skipTurn('not enough oxygen',0)}else skipTurn('not enough oxygen',1)};
 // ---------- 45: volunteers ----------
 RH.volunteer={setup(){G.ms.vol={deck:shuffle(NUMS.slice()),disc:[],v:null,who:null}},noForced(){return true},
   start(r,seat){const s=G.ms.vol;s.who=null;const v=drawNum(s);if(v==null){for(const q of G.seats){const u=uncutOf(q.i);if(u.length&&u.every(x=>isRed(x.sl.id))){for(const x of u)cutSlot(x.sl);lg(`${q.nm} reveals their reds.`)}}G.tfx.skip=1;checkWin();if(!G.over&&!G.seats.some(q=>hasWires(q.i)&&uncutOf(q.i).some(x=>!isRed(x.sl.id))))explode('no number card is left to call');return}s.v=v;s.disc.push(v);lg(`${SP(G.captain).nm} turns up ${v}: who calls it?`);G.tfx.wait=1;G.step='snip'},
@@ -1259,7 +1262,7 @@ function describeMove(m){if(!m)return '';switch(m.a){case 'dual':return `dual cu
 //   (49), who can still play after the hand-over (65), solo cuts kept in reserve (26, 47, 65), robot brakes kept (53), flipped wires taken
 //   off a crewmate before they must gamble (64), one-shot probes saved for worse turns, the Damper kept for forced gambles, opening tokens
 //   where the table cannot tell the value, public sure cuts left for crewmates, a small bonus for informative targets; 200 samples.
-const AILV={easy:{S:16,noise:.6,tools:.3,think:0,forget:1,sloppy:.9,ch:1},normal:{S:60,noise:.04,tools:1,think:1,ch:1},hard:{S:200,noise:0,tools:1,think:2,ch:1,info:.04}};
+const AILV={easy:{S:16,noise:.6,tools:.3,think:0,forget:1,sloppy:.9,ch:1},normal:{S:60,noise:.04,tools:1,think:1,ch:1},hard:{S:200,noise:0,tools:1,think:2,ch:1,info:.12}};
 let AISALT=12345,AICHAINS=0;function setAiSeed(s){AISALT=s>>>0}function setAiChains(n){AICHAINS=n}
 function mkRng(seed){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
 function kHash(K){let h=AISALT^(K.seat*2654435761);const mix=x=>{h=Math.imul(h^x,2246822519)>>>0;h^=h>>>13};mix(K.turn);mix(K.hist.length);mix(K.ann.length);mix(K.q?K.q.opts?K.q.opts.length:1:0);mix(K.legal?K.legal.plain.length:0);mix(Math.round(K.clock));return h>>>0}
@@ -1306,6 +1309,12 @@ function buildModel(K,forget){const M={bad:0,W:[],T:[],hid:[],ref:{},bins:[],glo
   for(const a of forget?[]:K.ann){if(a.k==='sweep')for(const r of a.res){const refs=r.us.map(u=>byU[u]).filter(Boolean);M.glob.push({k:'sweep',refs,code:a.v,yes:r.yes})}
     else if(a.k==='holds')M.glob.push({k:a.yes?'has':'none',refs:a.yes?seatSlots(a.seat):hidOf(a.seat),code:CODE(a.v)});
     else if(a.k==='holdsNone')for(const v of a.vals)M.glob.push({k:'none',refs:hidOf(a.seat),code:CODE(v)})}
+  // a missed call proves the caller holds that value (a call needs a matching wire): while the caller has cut none of it, one of the
+  // caller's hidden wires still is that value (not when wires can change hands)
+  if(!forget&&!(K.eq&&K.eq.some&&K.eq.some(e=>e.st==='used'&&(e.id==='eq2'||e.id==='eq1111')))&&!K.seats.some(q=>q.chUsed&&q.ch==='ch_new2')&&!K.rules.includes('juggle')){const seen={};
+    for(const h of K.hist){if(h.kind!=='dual'||h.ok||h.seat===K.seat||h.v==null||h.v==='R')continue;const key=h.seat+':'+h.v;if(seen[key])continue;seen[key]=1;const c=CODE(h.v);
+      let cutIt=false;for(const st of K.stands)if(st.owner===h.seat)for(const x of st.slots)if(x.cut&&x.v!=null&&CODE(x.v)===c)cutIt=true;
+      const refs=hidOf(h.seat);if(!cutIt&&refs.length)M.glob.push({k:'has',refs,code:c})}}
   for(const st of K.stands)for(const t of st.side){if(t.mean==='none')M.glob.push({k:'none',refs:hidOf(st.owner),code:CODE(t.v)});else if(t.mean==='has')M.glob.push({k:'has',refs:st.slots.map((y,j)=>R(st.i,j)),code:CODE(t.v)})}
   if(K.rules.includes('flip'))for(const q of K.seats){const fl=[];for(const st of K.stands)if(st.owner===q.i)st.slots.forEach((x,k)=>{if(x.flip)fl.push(R(st.i,k))});if(fl.length===2)M.glob.push({k:'le',a:fl[0],b:fl[1]})}
   const dealt=(K.ms.redTriple&&K.ms.redTriple.dealt)||(K.ms.tripwire&&K.ms.tripwire.dealt)||(K.ms.yellowTrio&&K.ms.yellowTrio.dealt);
@@ -1383,7 +1392,7 @@ const BOOM=1000;
 function fuseLeft(K){if(K.dial!=null)return K.dial;if(K.ms.robotFuse)return Math.max(1,Math.floor((12-K.ms.robotFuse.at)/2));return 9}
 function missSteps(K){let s=1;const me=K.seats[K.seat];const cons=[me.con&&me.con!=='?'&&!me.conDown?me.con:null,K.ms.globCon&&K.ms.globCon.con].filter(Boolean);if(cons.includes('L'))s=2;return s}
 function missCost(K,extra){if(K.tfx.damper)return 0;const me=K.seats[K.seat];if(K.ms.rookie&&me.role==='rookie')return BOOM;if(K.rules.includes('butterfingers')&&K.seat===K.captain)return BOOM;
-  const f=fuseLeft(K)-(missSteps(K)+(extra||0));if(K.ms.robotFuse)return f<=0?BOOM:1.5+4/(f+.5);if(f<=0)return BOOM;return 1.2+4/(f+.5)}
+  const f=fuseLeft(K)-(missSteps(K)+(extra||0));if(K.ms.robotFuse)return f<=0?BOOM:1.5+4/(f+.5);if(f<=0)return BOOM;return (1.2+4/(f+.5))*1.6}
 function redCost(K){return K.tfx.damper?0:BOOM}
 function heldCounts(K){const o={};for(const st of K.stands)if(st.mine)for(const x of st.slots)if(!x.cut&&x.v!=null&&!x.flip)o[x.v]=(o[x.v]||0)+1;return o}
 function bonusFor(K,v){let b=0;const ms=K.ms;
@@ -1492,7 +1501,7 @@ function mainDecision(K,rnd,L){const lg2=K.legal;const held=heldCounts(K);const 
   for(const m of lg2.flip){let p=pFlipOwn(K,Z,m);const pt=pAt(Z,m.st,m.ks[0],CODE(m.v));if(p*pt>.985&&!(flipSure(m)&&(L.think<1||certainCheck(K,m.st,m.ks[0],CODE(m.v),rnd,L))))p=.5;const pp=p*pt;cand.push({m,ev:pp*1.2-(1-pp)*BOOM,p:pp,why:`own flipped wire and target both ${VN(m.v)}: ${Math.round(pp*100)}%`})}
   // probes
   const T=lg2.tools;const best1=cand.reduce((a,c)=>Math.max(a,c.p),0);
-  if(best1<.97&&(T.dd||T.eq3||T.pt3||T.eq5||T.eq10||T.pt10)&&rnd()<L.tools)probeCands(K,Z,cand,T,held,mc,rcst,rnd,L);
+  if(best1<.995&&(T.dd||T.eq3||T.pt3||T.eq5||T.eq10||T.pt10)&&rnd()<L.tools)probeCands(K,Z,cand,T,held,mc,rcst,rnd,L);
   for(const m of lg2.special){const c=specialCand(K,Z,m,rnd);if(c)cand.push(c)}
   for(const m of lg2.other){const c=otherCand(K,Z,m,mc,rnd,L);if(c)cand.push(c)}
   // hard: what a cut teaches the table. Hit or miss, the pointed wire's value becomes public (cut, or a token), so a target whose
@@ -1537,10 +1546,13 @@ function bestCalc(K,v){const up=K.ms.math.up;let best=null,bs=-1;const formable=
 function pFlipOwn(K,Z,m){for(const st of K.stands)if(st.mine)for(let k=0;k<st.slots.length;k++){const x=st.slots[k];if(x.flip&&!x.cut&&x.u===m.fu)return pAt(Z,st.i,k,CODE(m.v))}return 0}
 function probeCands(K,Z,cand,T,held,mc,rcst,rnd,L){
   // hard: a one-shot probe is worth more later, when single cuts are worse: early in the job it has to buy more safety to be spent
-  let spend=0;if(L.think>=2&&L.spend!==0){let n=0,u=0;for(const st of K.stands)for(const x of st.slots){n++;if(!x.cut)u++}spend=.45*u/Math.max(1,n)}const byStand={};for(const m of K.legal.plain){if(m.v==='Y')continue;const x=K.stands[m.st].slots[m.ks[0]];if(x.x||x.flip)continue;(byStand[m.st+':'+m.v]=byStand[m.st+':'+m.v]||[]).push(m)}
-  const base=m=>{const o=Object.assign({},m);delete o.ks;return o};
+  let spend=0;if(L.think>=2&&L.spend!==0){let n=0,u=0;for(const st of K.stands)for(const x of st.slots){n++;if(!x.cut)u++}spend=.15*u/Math.max(1,n)}const byStand={};for(const m of K.legal.plain){if(m.v==='Y')continue;const x=K.stands[m.st].slots[m.ks[0]];if(x.x||x.flip)continue;(byStand[m.st+':'+m.v]=byStand[m.st+':'+m.v]||[]).push(m)}
+  const base=m=>{const o=Object.assign({},m);delete o.ks;return o};const redProbe=K.rules.includes('redTriple');
   for(const key in byStand){const ms=byStand[key];const st=ms[0].st,v=ms[0].v;const code=CODE(v);const ranked=ms.map(m=>({m,p:pAt(Z,st,m.ks[0],code)})).sort((a,b)=>b.p-a.p);const top=ranked.slice(0,5);
     const evOf=(ks,tool,cost)=>{const cells=ks.map(k=>[st,k]);const ph=pJoint(Z,cells,vs=>vs.some(c=>c===code));const pr=pJoint(Z,cells,vs=>vs.every(c=>c===14));
+      // job 13 (redTriple): a probe whose selection holds ANY red explodes, hit or not
+      if(redProbe){const pa=pJoint(Z,cells,vs=>vs.some(c=>c===14));const phn=pJoint(Z,cells,vs=>vs.some(c=>c===code)&&!vs.some(c=>c===14));
+        return {m:Object.assign(base(ms[0]),{ks,tool}),ev:phn*(1+bonusFor(K,v))-Math.max(0,1-phn-pa)*(mc-.25)-pa*rcst-cost+noisy(L,rnd),p:phn,why:`${Math.round(phn*100)}% that one is ${v} and none is red`}}
       return {m:Object.assign(base(ms[0]),{ks,tool}),ev:ph*(1+bonusFor(K,v))-(1-ph-pr)*(mc-.25)-pr*rcst-cost+noisy(L,rnd),p:ph,why:`${Math.round(ph*100)}% that one of these is ${v}`}};
     const ddCost=K.rules.includes('unlimitedDD')?0:.35+spend;
     if(T.dd)for(let a=0;a<top.length;a++)for(let b=a+1;b<top.length;b++)cand.push(evOf([top[a].m.ks[0],top[b].m.ks[0]].sort((x,y)=>x-y),'dd',ddCost));
@@ -1553,7 +1565,8 @@ function specialCand(K,Z,m,rnd){const n=m.tg.length;const want={red3:14,four:K.m
   const cells=[];for(const st of K.stands)st.slots.forEach((x,k)=>{if(!x.cut)cells.push([st.i,k,pAt(Z,st.i,k,want)])});cells.sort((a,b)=>b[2]-a[2]);const top=cells.slice(0,Math.min(cells.length,n+2));
   let best=null,bp=-1;const combo=(start,acc)=>{if(acc.length===n){const p=pJoint(Z,acc.map(c=>[c[0],c[1]]),vs=>vs.every(c=>c===want));if(p>bp){bp=p;best=acc.slice()}return}for(let i=start;i<top.length;i++){acc.push(top[i]);combo(i+1,acc);acc.pop()}};combo(0,[]);
   if(!best)return null;const failBoom=['red3','four','sevens','rush'].includes(m.kind);const forced=K.tfx.force||m.kind==='rush';
-  const ev=bp*(n*.9+1)-(1-bp)*(failBoom?BOOM:missCost(K))+(forced?BOOM/2:0);
+  let pany=0;if(!failBoom)pany=pJoint(Z,best.map(c=>[c[0],c[1]]),vs=>vs.some(c=>c===14));// y3 / lever: a red among the three still explodes
+  const ev=bp*(n*.9+1)-(1-bp-pany)*(failBoom?BOOM:missCost(K))-pany*redCost(K)+(forced?BOOM/2:0);
   return {m:{a:'multi',kind:m.kind,tg:best.map(c=>({s:c[0],k:c[1]}))},ev,p:bp,why:`${Math.round(bp*100)}% that all ${n} are right`}}
 function otherCand(K,Z,m,mc,rnd,L){switch(m.a){
   case 'trip':{const p=pAt(Z,m.s,m.k,13),pr=pAt(Z,m.s,m.k,14);return {m,ev:p*2-(1-p-pr)*mc-pr*BOOM+noisy(L,rnd),p,why:`${Math.round(p*100)}% snare wire`}}
