@@ -2839,8 +2839,9 @@ function cleanEv(e){if(!e||typeof e!=='object')return null;const I=(v,a,b)=>Numb
 function netEvent(e){if(!isHost())return;try{const c=cleanEv(JSON.parse(JSON.stringify(e)));if(c){NET.evLog.push({id:++NET.evId,ts:Date.now(),e:c});if(NET.evLog.length>10)NET.evLog.shift()}}catch(x){}}
 // ---- client -> host ----
 function netSend(k){if(!NET.room||!NET.hostPeer)return false;NET.sent++;NET.room.sendTo(NET.hostPeer,'act',{k}).catch(()=>{});return true}
-function onNetRej(msg){if(!isClient()||msg.peer!==NET.hostPeer)return;const e=msg.data&&typeof msg.data.e==='string'?msg.data.e.slice(0,160):'';NET.pend=null;if(e&&G){toast(e);NET.lastRej=e}}
-function netRej(peer,why){NET.rej++;NET.why.push(String(why).slice(0,60));if(NET.why.length>60)NET.why.shift();try{if(peer)NET.room.sendTo(peer,'rej',{e:'That move was not accepted.'}).catch(()=>{})}catch(x){}}
+// a refused move means this page was a moment behind: wait for the fresh state the host sends with every refusal (no instant retry)
+function onNetRej(msg){if(!isClient()||msg.peer!==NET.hostPeer)return;const e=msg.data&&typeof msg.data.e==='string'?msg.data.e.slice(0,160):'';NET.pendT=Date.now()-1500;NET.nrej=(NET.nrej||0)+1;if(e&&G){toast(e);NET.lastRej=e}}
+function netRej(peer,why){NET.rej++;NET.why.push(String(why).slice(0,60));if(NET.why.length>60)NET.why.shift();try{if(peer){NET.room.sendTo(peer,'rej',{e:'That move was not accepted.'}).catch(()=>{});delete NET.lastSent[peer];netPush()}}catch(x){}}
 // the host's check of a client's move: the sender owns a human seat, the seat is asked, and TB.moves offers exactly that key
 function onNetAct(msg){if(!isHost()||!G||msg.isMe)return;const d=msg.data;
   if(!d||typeof d!=='object'||Array.isArray(d)){netRej(null,'shape');return}
