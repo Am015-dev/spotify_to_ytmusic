@@ -220,12 +220,110 @@ body[data-gfx=high] .view::after{display:none}
 .mbox.lobby{position:relative;max-width:520px}.mbox.lobby h2{padding-right:36px}.mbox.lobby h3{margin:4px 0 0;font-size:1rem}.lobx.gx-x{position:absolute;top:8px;right:8px;color:var(--gx-ink)}.lobx.gx-x:hover{background:rgba(0,0,0,.06)}
 .plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}.plist li{display:flex;gap:7px;align-items:center}.plist i{width:12px;height:12px;border-radius:3px;background:var(--pc);flex:0 0 auto}
 .lobby .seg button:disabled{opacity:.4;cursor:default}.lobby .exs{flex-direction:row;flex-wrap:wrap;gap:4px 14px}.netst{margin:0}
+/* ===== phone layout (html.ph): board first, a control strip, pop-ups and one card at a time. Every rule starts with html.ph. ===== */
+#ps,#ppop,#pc,.pchip{display:none}
+html.ph #ps,html.ph #ppop,html.ph #pc{display:flex}html.ph .pchip{display:block}
+html.ph #ps[hidden],html.ph #ppop[hidden],html.ph #pc[hidden]{display:none!important}
+html.ph .gx-app{position:fixed;inset:0;box-sizing:border-box;padding:0 var(--sar,0px) var(--sab,0px) var(--sal,0px);display:grid;background:#3a2415}
+html.ph .gx-main{display:contents}
+html.ph .gx-board{grid-area:board;min-width:0;min-height:0}
+html.ph .gx-bar{grid-area:bar;min-height:0;height:calc(44px + var(--sat,0px));padding:var(--sat,0px) 6px 0 8px;gap:4px;box-sizing:border-box;border-bottom:0}
+html.ph .gx-dock{grid-area:zone;position:relative;display:block;max-height:none;visibility:visible!important;border:0;border-radius:0;padding:0;box-shadow:none;overflow:hidden;min-height:0}
+html.ph.ph-p .gx-app{grid-template-columns:minmax(0,1fr);grid-template-rows:calc(44px + var(--sat,0px)) var(--bh) minmax(0,1fr);grid-template-areas:"bar" "board" "zone"}
+html.ph.ph-l .gx-app{grid-template-columns:var(--bw) minmax(0,1fr);grid-template-rows:calc(44px + var(--sat,0px)) minmax(0,1fr);grid-template-areas:"board bar" "board zone"}
+html.ph.ph-p .gx-dock{border-top:3px solid var(--brass2,#d9a441)}html.ph.ph-l .gx-dock{border-left:3px solid var(--brass2,#d9a441)}
+html.ph .gx-dock-head,html.ph .gx-dock-body,html.ph .gx-reopen,html.ph #chip,html.ph #banner{display:none!important}
+html.ph #dockmsg{position:absolute;left:8px;right:8px;top:6px;z-index:9;margin:0;font-size:14px}
+/* top bar: icons + one status chip */
+html.ph .gx-bar h1{display:none}
+html.ph .gx-bar .gx-ibtn{display:none;min-width:44px;min-height:44px;padding:0 8px}
+html.ph .gx-bar .gx-ibtn>span{display:none}
+html.ph .gx-bar .adv-btn,html.ph .gx-bar [data-gx=logd],html.ph .gx-bar [data-gx=menud],html.ph .gx-bar #pausebtn{display:inline-flex!important}
+html.ph .gx-bar #pausebtn[hidden]{display:none!important}
+html.ph .pchip{flex:1 1 auto;min-width:0;font-weight:700;font-size:14px;color:#ffe8c0;background:rgba(43,26,16,.78);border:1px solid rgba(240,190,110,.5);border-radius:999px;padding:0 12px;line-height:34px;height:34px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph .gx-bar .gx-sp{display:none}
+/* board: the tile grid, flat camera; nothing floats over it */
+html.ph .view::after{box-shadow:none}
+html.ph #c3{touch-action:none}
+/* zone */
+html.ph #ps{position:absolute;inset:0;flex-direction:column;gap:6px;padding:8px 10px 8px;overflow:auto;box-sizing:border-box;background:var(--paper),linear-gradient(180deg,#fcf3e1,#f3e2c2)}
+html.ph .ps-main{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:48px}
+html.ph .ps-msg{flex:1 1 140px;min-width:0;font-size:15px;line-height:1.25}
+html.ph .ps-ctl{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+html.ph .ps-log{margin:0;font-size:13px;color:var(--mut);line-height:1.3}
+html.ph .ps-chips{display:flex;flex-wrap:wrap;gap:6px}
+html.ph .pk{appearance:none;font:inherit;flex:1 1 calc(50% - 6px);min-width:0;min-height:44px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;text-align:left;padding:3px 10px;border-radius:12px;border:1px solid rgba(138,90,24,.4);background:linear-gradient(180deg,#fffdf6,#f1e2c2);color:var(--gx-ink);cursor:pointer;line-height:1.2}
+html.ph .pk.wide{flex:1 1 100%}
+html.ph .pk .pkn{font-weight:700;font-size:13px;color:var(--terra)}html.ph .pk .pkv{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}html.ph .pk .pks{font-size:13px;color:var(--mut)}
+html.ph .pd{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--pc);margin:0 3px 0 2px;vertical-align:-1px}
+html.ph.ph-l .pk.wide{flex:1 1 100%}
+html.ph #ppop,html.ph #pc{position:absolute;inset:0;flex-direction:column;box-sizing:border-box;padding:6px 10px 8px;background:var(--paper),linear-gradient(180deg,#fcf3e1,#f3e2c2);z-index:6;overflow:hidden}
+html.ph #pc{z-index:7}
+html.ph .pp-h{display:flex;align-items:center;gap:6px;flex:0 0 auto;min-height:44px}
+html.ph .pp-h h3{flex:1;min-width:0;font-size:17px;color:var(--terra);margin:0}
+html.ph .pp-x{appearance:none;border:1px solid rgba(138,90,24,.4);background:linear-gradient(180deg,#fff8ea,#efdcb8);border-radius:12px;width:44px;height:44px;font-size:26px;line-height:1;color:var(--gx-ink);cursor:pointer;flex:0 0 auto}
+html.ph .pp-b{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;padding:2px 0 4px;-webkit-overflow-scrolling:touch}
+html.ph .pp-f{flex:0 0 auto;display:flex;gap:8px;padding-top:6px}html.ph .pp-f .btn{flex:1 1 0;text-align:center}
+html.ph .pp-b .prompt{border:0;background:none;padding:0;box-shadow:none}html.ph .pp-b .prompt>h3{display:none}
+html.ph .chapt{font-size:20px;color:var(--indigo);margin:2px 0}
+/* >= 44 px targets, >= 13 px text, only inside the phone UI */
+html.ph #ps .btn,html.ph #ppop .btn,html.ph #pc .btn{min-height:44px;font-size:15px;padding:6px 12px}
+html.ph #ps .btn small,html.ph #ppop .btn small,html.ph #pc .btn small{font-size:13px}
+html.ph #ppop .btn.sm,html.ph #pc .btn.sm,html.ph #ppop .btn.xs{min-height:44px;font-size:14px}
+html.ph #ppop .hc,html.ph #pc .hc{min-height:44px;font-size:15px}
+html.ph #ppop .opts .btn,html.ph #pc .opts .btn{flex:1 1 100%}
+html.ph .pp-b .small,html.ph .pp-b small,html.ph .pp-b .tag,html.ph .pp-b .muted.small,html.ph .pp-b ol.mini,html.ph .pp-b ul.story,html.ph .pp-b .plan .pr,html.ph .pp-b .plan .pg,html.ph .pp-b .stat,html.ph .pp-b .st small,html.ph .pp-b .sp .ord,html.ph .pp-b .sp small{font-size:13px}
+html.ph .pp-b .track{grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:6px}
+html.ph .pp-b .sp{min-height:84px;padding:5px}html.ph .pp-b .sp .btn{min-height:44px;padding:4px 6px}
+html.ph .pp-b .sp.rec{border-width:3px}
+html.ph .phm-row{display:flex;flex-wrap:wrap;gap:6px}
+html.ph .phm{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 10px;border-radius:12px;background:#fff;border:1px solid var(--sand2);font-size:15px}
+html.ph .phg{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+html.ph .phc{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:12px;background:#fffdf6;border:2px solid var(--sand2);text-align:center;font-size:14px;line-height:1.15}
+html.ph .phc .ico{font-size:34px;line-height:1.1}html.ph .phc small{position:absolute;right:6px;top:2px;color:var(--mut);font-size:13px}html.ph .phc.hl{border-color:var(--terra);background:#ffeccc}
+html.ph .pp-b .cgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:2px 0}
+html.ph .pp-b .card p{font-size:14px}html.ph .pp-b .card h4{font-size:15px}
+html.ph .pp-b>*{flex-shrink:0}
+html.ph .drops{display:flex;flex-wrap:wrap;gap:6px}html.ph .drops .btn{flex:1 1 calc(50% - 6px);display:flex;align-items:center;gap:4px;line-height:1.15;font-size:14px;padding:4px 8px}
+html.ph .path{color:var(--mut)}
+html.ph .pp-b .stat{font-size:14px}
+html.ph .pp-b .plans .plan .acts .btn{flex:1 1 0;text-align:center}
+html.ph .pp-b .djrow .djc{min-height:44px}
+html.ph .pp-b .sheet{margin-bottom:0}
+/* menus and drawers: in landscape they slide over the right rail, never over the board */
+html.ph .gx-drawer{height:auto;max-height:88dvh}
+html.ph.ph-l .gx-drawer{top:0;bottom:0;left:auto;right:0;width:calc(100vw - var(--bw,0px) - var(--sal,0px));height:auto;max-height:none;border-radius:0;transform:translateX(100%)}
+html.ph.ph-l .gx-drawer.wide{width:calc(100vw - var(--bw,0px) - var(--sal,0px))}
+html.ph.ph-l .gx-drawer.on{transform:none}
+html.ph .gx-drawer .btn,html.ph .gx-drawer .gx-x{min-height:44px}
+html.ph .gx-drawer .small,html.ph .gx-drawer small{font-size:13px}
+/* start screen / story / lobby */
+html.ph #modal{padding:8px;align-items:flex-start;padding-top:max(8px,var(--sat,0px))}
+html.ph .mbox{box-sizing:border-box;padding:12px 14px;gap:8px;max-height:calc(100dvh - 16px);border-radius:14px}
+html.ph .mbox h2{font-size:1.4rem}
+html.ph .mbox .btn,html.ph .mbox .seg button{min-height:44px}
+html.ph .mbox .acts{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(251,241,222,0),#fbf1de 30%);padding:8px 0 4px}
+html.ph .mbox.story canvas{max-height:96px;object-fit:cover}
+html.ph.ph-l .mbox.story canvas{display:none}
+html.ph .mbox.story p{font-size:15px;line-height:1.35}
+html.ph .seat .btn{min-height:44px}
+@media (max-width:360px){html.ph .pk{flex-basis:100%}}
+html.ph .mbox .chk{min-height:44px;align-items:center;gap:8px}html.ph .mbox .chk input{width:22px;height:22px;flex:0 0 auto}
+html.ph .mbox summary{min-height:44px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+html.ph .mbox small,html.ph .mbox .small{font-size:13px}
+html.ph .mbox .netrow input{min-height:44px}
+html.ph .pp-b h4,html.ph .gx-drawer h4{font-size:13px}
+html.ph .pp-b .plan .pn{width:24px;height:24px;font-size:13px}
+html.ph .gx-drawer .gx-x{min-width:44px}
+html.ph .bidrec{width:100%;text-align:center;font-size:16px}
+html.ph .gx-drawer{box-sizing:border-box}
 </style>
 </head>
 <body>
 <div class="gx-app">
 <header class="gx-bar">
   <h1>Sands of Qamar</h1>
+  <span id="pchip" class="pchip" role="status"></span>
   <span class="gx-sp"></span>
   <button class="gx-ibtn adv-btn" data-a="advise" title="What would a good player do now?"><i data-ic="bulb"></i><span>Advise me</span></button>
   <button class="gx-ibtn nar-hide" data-gx="plrd" aria-expanded="false"><i data-ic="camel"></i><span>Players</span></button>
@@ -246,6 +344,7 @@ body[data-gfx=high] .view::after{display:none}
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Sands of Qamar</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel">↕</button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel">⇥</button></div>
     <div id="dockmsg" hidden role="status"></div><div class="gx-dock-body" id="dockbody"></div>
+    <div id="ps" hidden></div><div id="ppop" role="dialog" aria-label="Details" hidden></div><div id="pc" role="dialog" aria-label="Card" hidden></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock">☰ Panel</button>
 </div>
@@ -1747,10 +1846,10 @@ function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return fa
   const rim=new THREE.DirectionalLight(0xa8c6ff,1.25);rim.position.set(9,7,-16);sc.add(rim);
   buildTable();fxKeepers();
   cv.addEventListener('pointerdown',e=>{V3.drag={x:e.clientX,y:e.clientY,a:V3.orbit.a,e:V3.orbit.e,moved:false}});
-  window.addEventListener('pointermove',e=>{const d=V3.drag;if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>6)d.moved=true;if(d.moved){V3.orbit.a=d.a-dx*.006;V3.orbit.e=Math.max(.55,Math.min(1.45,d.e+dy*.004))}});
+  window.addEventListener('pointermove',e=>{const d=V3.drag;if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>6)d.moved=true;if(d.moved&&!(typeof PHONE!=='undefined'&&PHONE.on)){V3.orbit.a=d.a-dx*.006;V3.orbit.e=Math.max(.55,Math.min(1.45,d.e+dy*.004))}});
   window.addEventListener('pointerup',e=>{const d=V3.drag;V3.drag=null;if(d&&!d.moved&&e.target===cv){const id=pickTile(e);if(id!=null&&typeof on3DTile==='function')on3DTile(id)}});
   cv.addEventListener('pointermove',e=>{V3.hover=pickTile(e)});cv.addEventListener('pointerleave',()=>{V3.hover=null});
-  cv.addEventListener('wheel',e=>{e.preventDefault();V3.zoom=Math.max(.6,Math.min(1.6,(V3.zoom||1)+e.deltaY*.001));fitDist()},{passive:false});
+  cv.addEventListener('wheel',e=>{e.preventDefault();if(typeof PHONE!=='undefined'&&PHONE.on)return;V3.zoom=Math.max(.6,Math.min(1.6,(V3.zoom||1)+e.deltaY*.001));fitDist()},{passive:false});
   buildPieces();buildPlinth();V3.on=true;document.body.classList.add('three');applyQ();new ResizeObserver(()=>resize3D()).observe(cv.parentElement);resize3D(true);
   V3.clock=new THREE.Clock();perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
 // PerfHUD: overlay, speed test, auto step-down/up and the idle-frame saver (see perf/INTEGRATE.md)
@@ -1830,7 +1929,7 @@ function placeCam(){const o=V3.cur;V3.cam.position.set(V3.look.x+Math.sin(o.a)*M
 function resize3D(snap){if(!V3.r)return;V3.dirty=true;const el=V3.r.domElement.parentElement;const w=Math.max(50,el.clientWidth),h=Math.max(50,el.clientHeight);V3.r.setSize(w,h,false);V3.r.domElement.style.width=w+'px';V3.r.domElement.style.height=h+'px';V3.cam.aspect=w/h;V3.cam.updateProjectionMatrix();
   if(V3.post)postSize(w,h);fitDist();if(snap!==false){Object.assign(V3.cur,V3.orbit);placeCam()}}
 // fit the whole board (plus stacks) for the current aspect ratio; the camera eases there
-function fitDist(){const a=V3.cam.aspect;const W=BW()*(TS+GAP)+2.6,D=BH()*(TS+GAP)+2.6;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);
+function fitDist(){if(typeof PHONE!=='undefined'&&PHONE.on)return phFit();const a=V3.cam.aspect;const W=BW()*(TS+GAP)+2.6,D=BH()*(TS+GAP)+2.6;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);
   const e=V3.orbit.e;const needH=(D*Math.sin(e)+3)/2,needW=W/2;const d=Math.max(needH/Math.tan(vf/2),needW/Math.tan(hf/2))*1.06+3;V3.orbit.d=d*(V3.zoom||1)}
 function tilePos(i){const W=BW(),H=BH();const c=i%W,r=Math.floor(i/W);return new THREE.Vector3((c-(W-1)/2)*(TS+GAP),0,(r-(H-1)/2)*(TS+GAP))}
 function seeded(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
@@ -1923,7 +2022,7 @@ function syncStacks(){const want={};
   let born=0;for(const id in want){const w=want[id];let s=V3.stacks[id];if(!s){const g=meepleMesh(w.c);const p0=tilePos(w.i);g.position.set(p0.x+(Math.random()-.5)*.3,TH+2.4,p0.z+(Math.random()-.5)*.3);const col=new THREE.Color(MCOL[w.c]||0x888888);col.offsetHSL(0,(Math.random()-.5)*.04,(Math.random()-.5)*.05);
       s=V3.stacks[id]={g,c:w.c,col,rot:Math.random()*6,delay:Math.min(1.2,born++*.012)}}
     const p=tilePos(w.i);const cols=Math.min(4,Math.ceil(Math.sqrt(w.n)));const row=Math.floor(w.k/cols),col=w.k%cols;s.i=w.i;s.hand=!!w.hand;
-    s.to=w.hand?new THREE.Vector3(p.x-.4+w.k*.28,TH+1.1,p.z-.2):new THREE.Vector3(p.x-.5+col*.33,TH+.004,p.z-.3+row*.3)}}
+    const ss=V3.pawnScale||1;s.to=w.hand?new THREE.Vector3(p.x-.4*ss+w.k*.28*ss,TH+1.1,p.z-.2):new THREE.Vector3(p.x-.5*ss+col*.33*ss,TH+.004,p.z-.3+row*.3*ss)}}
 function tween(obj,k,to,dur){V3.tweens.push({obj,k,from:obj[k],to,t:0,dur})}
 const ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
 // ---- particles: dust puffs on landing, sparkles on claims and builds ----
@@ -1946,8 +2045,8 @@ function stepPieces(dt,t){let n=0;const P=V3.pawns,B=V3.pblobs;
     if(s.to&&(!s.arc||!s.arc.to.equals(s.to))&&pos.distanceTo(s.to)>.02){const d=pos.distanceTo(s.to);s.arc={from:pos.clone(),to:s.to.clone(),t:-(s.delay||0),dur:.34+Math.min(.3,d*.05),h:Math.min(1.2,.35+d*.12)};s.delay=0}
     if(s.arc){const a=s.arc;a.t+=dt;if(a.t>=0){const k=Math.min(1,a.t/a.dur),e=ease(k);pos.lerpVectors(a.from,a.to,e);pos.y+=Math.sin(Math.PI*k)*a.h;if(k>=1){s.arc=null;pos.copy(a.to);if(!s.hand){s.sq=0;if(Math.random()<.5||V3.q!=='low')burst(pos,'dust',3)}}}}
     let sq=0;if(s.sq!=null){s.sq+=dt;const u=s.sq/.32;if(u>=1)s.sq=null;else sq=Math.sin(u*Math.PI)*.16*(1-u)}
-    const lift=V3.lift[s.i]||0;_v.copy(pos);_v.y+=lift+(s.hand&&!s.arc?Math.sin(t*3+s.rot)*.06:0);_s.set(1+sq*.6,1-sq,1+sq*.6);_q.setFromEuler(_e.set(0,s.rot+(s.hand?t*.8:0),0));_m4.compose(_v,_q,_s);P.setMatrixAt(n,_m4);P.setColorAt(n,s.col);
-    const hgt=Math.max(0,_v.y-TH);const bs=.5*Math.max(.35,1-hgt*.45);_v.set(pos.x,TH+.006+lift,pos.z);_s.set(bs,1,bs);_q.identity();_m4.compose(_v,_q,_s);B.setMatrixAt(n,_m4);n++;if(n>=180)break}
+    const lift=V3.lift[s.i]||0;_v.copy(pos);_v.y+=lift+(s.hand&&!s.arc?Math.sin(t*3+s.rot)*.06:0);const ps=V3.pawnScale||1;_s.set((1+sq*.6)*ps,(1-sq)*ps,(1+sq*.6)*ps);_q.setFromEuler(_e.set(0,s.rot+(s.hand?t*.8:0),0));_m4.compose(_v,_q,_s);P.setMatrixAt(n,_m4);P.setColorAt(n,s.col);
+    const hgt=Math.max(0,_v.y-TH);const bs=.5*ps*Math.max(.35,1-hgt*.45);_v.set(pos.x,TH+.006+lift,pos.z);_s.set(bs,1,bs);_q.identity();_m4.compose(_v,_q,_s);B.setMatrixAt(n,_m4);n++;if(n>=180)break}
   V3.moving=Object.values(V3.stacks).some(s=>s.arc||s.sq!=null);P.count=B.count=n;P.instanceMatrix.needsUpdate=B.instanceMatrix.needsUpdate=true;if(P.instanceColor)P.instanceColor.needsUpdate=true}
 function stepAnims(dt){for(let k=V3.anims.length-1;k>=0;k--){const o=V3.anims[k];const a=o.userData.anim;a.t+=dt;const u=Math.max(0,Math.min(1,a.t/.55));
     if(a.kind==='drop'){const e=u<.7?Math.pow(u/.7,2):1;o.position.y=a.base.y+(1-e)*1.6+(u>.7?Math.sin((u-.7)/.3*Math.PI)*.12*(1-u):0);if(u>=.7&&!a.hit){a.hit=1;const p=tilePos(a.tile);burst(new THREE.Vector3(p.x+o.position.x,TH,p.z+o.position.z),'dust',6);burst(new THREE.Vector3(p.x+o.position.x,TH,p.z+o.position.z),'spark',8)}}
@@ -2276,9 +2375,9 @@ function computePick(){UI.pick=[];UI.pickFaint=[];UI.badges=null;const p=me();if
   if(G.step==='tribe'&&G.act.color==='assassin')UI.pick=[...new Set(vm.filter(m=>m.act==='tribe'&&m.kill&&m.kill.tile!=null).map(m=>m.kill.tile))];
   if(G.step==='tile')UI.pick=[...new Set(vm.filter(m=>m.place!=null).map(m=>m.place))]}
 // ---------- top-level render ----------
-function render(){if(!G){renderModal();return}if(G.move&&!UI.autoPlan&&(!UI.path||UI.path.length!==G.move.path.length))showPath(G.move.path.slice());if(G.phase==='bid'&&!UI.modal)showChapter();renderDock();renderPopups();renderModal();renderMap2D();
+function render(){if(!G){renderModal();if(typeof phRender==='function')phRender();return}if(G.move&&!UI.autoPlan&&(!UI.path||UI.path.length!==G.move.path.length))showPath(G.move.path.slice());if(G.phase==='bid'&&!UI.modal)showChapter();renderDock();renderPopups();renderModal();renderMap2D();
   const pb=$('#pausebtn');if(pb){pb.hidden=human();pb.innerHTML=ICON(UI.pause?'play':'pause')}const sb=$('#speedbtn');if(sb)sb.innerHTML=ICON('fast')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';
-  renderChip()}
+  renderChip();if(typeof phRender==='function')phRender()}
 function renderChip(){const ch=$('#chip');if(ch&&G){const s=sideToAct();ch.textContent=(G.over?'Game over':`Round ${G.round} · ${G.phase==='bid'?'bidding':s>=0?(online()&&s===NET.mySeat?'You':P(s).nm)+(G.phase==='turn'?' · '+stepName():''):''}`)+(online()?' · 🌐 '+netStatus().replace(/ players online$/,' online'):'')}}
 function stepName(){return {move:'moving',tribe:'tribe action',tile:'tile action',sell:'selling'}[G.step]||''}
 function pChip(p){return `<span class="pc" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}</span>`}
@@ -2480,6 +2579,157 @@ let aiTimer=null;function schedule(){if(online()&&isClient())return;if(aiTimer||
 function showOpeningFirst(){UI.modal=UI.netOpen&&UI.joinCode?'start':'opening';render()}
 function boot(){GX.init({key:'soq'});paintIcons();GX.onShow=id=>{if(id==='setd')renderSettings();if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(id==='refd')$('#refbody').innerHTML=refHtml();if(G)render()};try{init3D()}catch(e){console.error(e)}soundBtns();showOpeningFirst()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+
+</script>
+<script>
+// ---------- phone: board first, tap to play, pop-ups and one card at a time (html.ph) ----------
+// Rules, engine, AI and the online protocol are untouched. Everything here is layout + presentation: it clones/rebuilds
+// what the dock shows (same data-mv / data-plando / data-dc handlers) into a control strip (#ps), a pop-up (#ppop) and a card (#pc).
+var PHONE={on:false,land:false,pop:null,hideAuto:'',e:1.5,mx:.7,ins:{t:0,r:0,b:0,l:0},tips:{},chDone:'',overDone:'',pawn:1.5};
+try{PHONE.tips=JSON.parse(localStorage.getItem('soq_ph_tips')||'{}')||{}}catch(e){PHONE.tips={}}
+function phDetect(){try{const q=new URLSearchParams(location.search).get('phone');if(q==='1')return true;if(q==='0')return false;
+  const s=Math.min(innerWidth,innerHeight);return s<=500||(!!window.matchMedia&&matchMedia('(pointer:coarse)').matches&&s<=600)}catch(e){return false}}
+function phInsets(){try{const P=new URLSearchParams(location.search);if(P.has('safe')){const a=P.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
+  let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}
+  const c=getComputedStyle(p);return {t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}}catch(e){return {t:0,r:0,b:0,l:0}}}
+// board height / width of the framed bazaar (tiles + a small margin) seen from the phone camera
+function phAspect(){const W=(typeof G!=='undefined'&&G&&G.W)||6,H=(typeof G!=='undefined'&&G&&G.H)||5,e=PHONE.e,u=2.2+.12;return ((H*u+PHONE.mx)*Math.sin(e)+1.2*Math.cos(e))/(W*u+PHONE.mx)}
+function phApply(){const R=document.documentElement,was=PHONE.on;PHONE.on=phDetect();R.classList.toggle('ph',PHONE.on);
+  const vars=['--bw','--bh','--sat','--sar','--sab','--sal'];
+  if(!PHONE.on){R.classList.remove('ph-l','ph-p');for(const k of vars)R.style.removeProperty(k);if(V3&&V3.on)V3.pawnScale=1;return was}
+  const w=innerWidth,h=innerHeight,I=phInsets(),bar=44;PHONE.land=w>h;PHONE.ins=I;const ar=phAspect();
+  const aw=w-I.l-I.r,ah=h-I.b;let bw,bh;
+  if(PHONE.land){bh=ah;bw=bh/ar;const mx=aw-280;if(bw>mx){bw=mx;bh=bw*ar}}
+  else{bw=aw;bh=bw*ar;const mx=ah-bar-I.t-250;if(bh>mx){bh=mx;bw=bh/ar}}
+  R.classList.toggle('ph-l',PHONE.land);R.classList.toggle('ph-p',!PHONE.land);
+  R.style.setProperty('--bw',Math.floor(bw)+'px');R.style.setProperty('--bh',Math.floor(bh)+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');
+  for(const [s,l] of [['.adv-btn','Advise me'],['[data-gx=logd]','Log'],['[data-gx=menud]','Menu'],['#pausebtn','Pause']]){const b=document.querySelector('.gx-bar '+s);if(b&&!b.getAttribute('aria-label'))b.setAttribute('aria-label',l)}
+  if(V3&&V3.on){V3.pawnScale=PHONE.pawn;V3.zoom=1;V3.orbit.e=PHONE.e;V3.orbit.a=0;try{resize3D(true);if(G)sync3D()}catch(e){}}
+  return true}
+// the camera: near top-down, the tile grid (not the carved frame) fills the board
+function phFit(){const cam=V3.cam,a=cam.aspect,e=PHONE.e,u=2.2+.12,W=BW()*u+PHONE.mx,D=BH()*u+PHONE.mx;const vf=cam.fov*Math.PI/180,hf=2*Math.atan(Math.tan(vf/2)*a);
+  const needH=(D*Math.sin(e)+1.2*Math.cos(e))/2,needW=W/2;V3.orbit.d=Math.max(needH/Math.tan(vf/2),needW/Math.tan(hf/2))*1.01;V3.orbit.e=e;V3.orbit.a=0;V3.pawnScale=PHONE.pawn}
+(function(){let t=null;const f=()=>{clearTimeout(t);t=setTimeout(()=>{phApply();if(G)phRender()},60)};addEventListener('resize',f);addEventListener('orientationchange',f);phApply()})();
+
+// ---------- helpers ----------
+const phSig=()=>G?(me()?[G.logN,G.step,G.phase,G.move?G.move.hand.length+':'+G.move.path.length:-1,!!G.q,UI.pendDj?1:0].join():'w'):'';
+function phMine(){if(!G)return null;const p=online()?mySeatP():me()||G.pl.find(q=>q.human);return p||null}
+function phWho(){if(!G)return '';const s=sideToAct();if(G.over)return 'Game over';if(G.phase==='bid')return s>=0&&me()?'Your bid':'bidding';return s>=0?(me()?'Your move':P(s).nm):''}
+function phStep(){if(!G||G.over)return '';if(G.phase==='bid')return 'bid for turn order';return {move:G.move?'drop them':'pick a tile',tribe:'tribe action',tile:'tile action',sell:'sell goods'}[G.step]||''}
+function phChip(){const c=$('#pchip');if(!c||!G)return;const s=sideToAct();const who=G.over?'Game over':me()?'You':s>=0?P(s).nm:'';
+  const t=G.over?'Game over':`R${G.round} · ${who}${G.phase==='bid'?' · bid':G.phase==='turn'&&G.step&&me()?' · '+({move:'move',tribe:'tribe',tile:'tile',sell:'sell'}[G.step]||''):''}`;
+  if(c.textContent!==t)c.textContent=t;c.setAttribute('aria-label',`Round ${G.round}, ${who}${G.phase==='bid'?', bidding':''}${online()?', online':''}`)}
+function phPanel(el,o){if(!el)return;if(!o){if(!el.hidden){el.hidden=true;el.dataset.h=''}return}
+  const h=`<div class="pp-h"><h3>${o.title}</h3>${o.x?`<button class="pp-x" data-ph="close" aria-label="Close">×</button>`:''}</div><div class="pp-b">${o.body}</div>${o.foot?`<div class="pp-f">${o.foot}</div>`:''}`;
+  el.hidden=false;if(el.dataset.h!==h){const sc=el.querySelector('.pp-b'),top=sc&&el.dataset.k===o.key?sc.scrollTop:0;el.innerHTML=h;el.dataset.h=h;el.dataset.k=o.key||'';const b=el.querySelector('.pp-b');if(b)b.scrollTop=top}}
+// take a prompt from the (hidden) dock, drop the long coach text
+function phDock(sel){const b=$('#dockbody');return b?b.querySelector(sel):null}
+function phClean(n,keepP){if(!n)return '';const c=n.cloneNode(true);for(const e of c.querySelectorAll('.coach,details,.muted.small'))e.remove();if(!keepP)for(const e of c.querySelectorAll('p:not(.small):not(.flav)'))e.remove();return c.innerHTML}
+
+// ---------- cards: one at a time, in priority order ----------
+function phCard(hp){
+  if(G.over){if(PHONE.overDone===G.seed+':'+G.round)return null;const pr=phDock('.prompt');return {key:'over',title:'Result',x:false,body:pr?pr.innerHTML:'',foot:`<button class="btn go" data-ph="cont" data-k="over">Continue</button>${btn({ui:'new'},'New game')}`}}
+  if(hp&&G.q){const pr=phDock('.prompt');return {key:'q',title:'Your choice',x:false,body:pr?phClean(pr,1):''}}
+  const adv=hp&&UI.adv?phDock('.adv'):null;if(adv)return {key:'adv',title:'💡 Advisor',x:false,body:adv.innerHTML.replace(/^\s*<b>💡 Advisor<\/b>/,'')}
+  if(PHONE.chapter&&PHONE.chapter.key!==PHONE.chDone&&!UI.modal&&G.phase==='bid'){const c=PHONE.chapter;return {key:'chapter',title:`Round ${c.round}`,x:false,body:`<h3 class="chapt">${esc(c.title)}</h3><p>${c.line}</p>`,foot:`<button class="btn go" data-ph="cont" data-k="chapter">Continue</button>`}}
+  if(hp&&UI.coach){const tip=G.phase==='bid'?'bid':G.step==='move'&&!G.move?'move':G.step==='move'&&G.move?'hand':null;
+    const T={bid:['Turn order','Pay coins to choose <b>when</b> you play this round. Dearer spots go first and get the best moves; free spots go last. Coins also count as points, so spend them only when a great move is at stake. The bulb in the top bar gives advice.'],
+      move:['Your turn','You lift everyone off one tile and lead them across the land, leaving one person on each tile you pass. The last one lands where its own tribe already stands: you collect that tribe and put it to work. Tap a glowing tile to start, or choose a ready-made plan.'],
+      hand:['Leaving people behind','Pick which colour to leave, then tap a glowing tile next to you. The last person must land on a tile that already has their colour.']};
+    if(tip&&!PHONE.tips[tip])return {key:'tip-'+tip,title:T[tip][0],x:false,body:`<p>${T[tip][1]}</p>`,foot:`<button class="btn go" data-ph="cont" data-k="tip-${tip}">Continue</button>`}}
+  if(hp&&G.phase==='bid'){const pr=phDock('.prompt');if(!pr)return null;const c=pr.cloneNode(true);const rec=c.querySelector('.sp.rec .btn');const ro=c.querySelector('.sp.rec');
+    const top=rec&&ro?`<button class="btn go bidrec" data-mv='${esc(rec.dataset.mv)}'>★ Suggested: ${esc(ro.querySelector('.ord').textContent)} spot · ${ro.querySelector('b').textContent}</button>`:'';
+    const worth=[...c.querySelectorAll('p.small')].map(e=>e.textContent).find(t=>/best move/i.test(t));
+    for(const e of c.querySelectorAll('.coach,details,h3,p'))e.remove();
+    return {key:'bid',title:'Bid for turn order',x:false,body:`<p class="small">Higher spots play earlier; coins are points too.${worth?' '+esc(worth):''}</p>${top}`+c.innerHTML}}
+  return null}
+
+// ---------- pop-ups (tap a chip or a tile) ----------
+const phMeeples=t=>{const n={};for(const c of t.m||[])n[c]=(n[c]||0)+1;return Object.keys(n).map(c=>`<span class="phm">${mdot(c,1)} <b>${n[c]}</b> ${n[c]>1?MPLUR[c]:MNAME[c]}</span>`).join('')||'<span class="muted">nobody here</span>'};
+function phInfo(i){const t=G.board[i],o=owner(t);const d=TILEDEF[t.k]||{n:t.k,x:''};
+  return {key:'info',title:esc(tileName(t)),x:true,body:`<div class="phm-row">${phMeeples(t)}</div>
+   <p>${esc(d.x||'')}</p><p class="small">${t.blue?'Blue tile (Masons count it).':'Red tile.'}${t.v?` Worth ${t.v} points.`:''}${t.block?' Blocked.':''}</p>
+   <p>${o!=null?`Held by ${pChip(P(o))}${t.palm?' · 🌴 ×'+t.palm:''}${t.pal?' · 🏰 ×'+t.pal:''}`:'<span class="muted">Nobody holds this tile yet.</span>'}${t.tent!=null?' ⛺':''}</p>`}}
+function phMarket(hp){const t=G.step==='tile'&&hp&&G.act?G.board[G.act.tile]:null;const hl=t&&t.k==='small'?3:t&&t.k==='large'?6:0;let buy='';
+  if(hl){const vm=validMoves(hp.i);buy=`<div class="opts">${tileButtons(hp,vm,t)}</div>`}
+  return {key:'market',title:'Market',x:true,body:`<div class="phg">${G.market.map((r,j)=>`<div class="phc ${hl&&j<hl?'hl':''}"><span class="ico">${RICON[r]}</span><b>${esc(RNAME[r])}</b><small>${j+1}</small></div>`).join('')||'<p class="muted">The market is empty.</p>'}</div>
+   <p class="small">${esc(TILEDEF.small?TILEDEF.small.x:'')} ${esc(TILEDEF.large?TILEDEF.large.x:'')}</p>${buy}`}}
+function phDjinns(hp){let pw='';if(hp){const vm=validMoves(hp.i);const l=[...vm.filter(m=>m.act==='djinn'),...vm.filter(m=>m.act==='item')];if(l.length)pw=`<h4>Use now</h4><div class="opts">${powerButtons(hp,l)}</div>`}
+  const card=k=>`<div class="card dj"><h4>${esc(DJ[k].n)} <small>${DJ[k].vp} pts</small></h4>${cardArt('djinn',DJ[k].n)}<p>${esc(DJ[k].x)}</p></div>`;
+  const th=G.ex.thieves&&G.thRow.length?`<h4>Cutpurses</h4><div class="cgrid">${G.thRow.map(k=>`<div class="card"><h4>${esc(THIEVES[k].n)}</h4><p>${esc(THIEVES[k].x)}</p></div>`).join('')}</div>`:'';
+  return {key:'djinns',title:'Djinns',x:true,body:`${pw}<p class="small">Summon one at a Shrine with 2 Sages (or 1 Sage + 1 Mystic).</p><div class="cgrid">${G.djRow.map(card).join('')||'<p class="muted">None on offer.</p>'}</div>${th}`}}
+function phMineP(){const p=phMine();if(!p)return {key:'mine',title:'You',x:true,body:'<p class="muted">No player here.</p>'};
+  const hp=me();const items=hp&&hp.i===p.i?validMoves(p.i).filter(m=>m.act==='item'||m.act==='djinn'):[];
+  return {key:'mine',title:'Your things',x:true,body:`${playerSheet(p)}${items.length?`<h4>Use now</h4><div class="opts">${powerButtons(p,items)}</div>`:''}`}}
+function phPlayers(){return {key:'players',title:'Players',x:true,body:`<div class="stats">${G.pl.map(statusHtml).join('')}${standing()}</div>`}}
+function phPlansP(hp){if(!hp)return null;const all=curPlans(hp);const n=UI.morePlans?12:5;return {key:'plans',title:'Plans',x:true,body:`<p class="small">A plan is a whole move. Tap Show to see its path, Do this to play it.</p><div class="plans">${all.slice(0,n).map((o,i)=>planHtml(hp,o,i)).join('')}</div>${all.length>n?`<div class="acts"><button class="btn sm ghost" data-ui="moreplans">Show more plans (${all.length})</button></div>`:UI.morePlans?`<div class="acts"><button class="btn sm ghost" data-ui="moreplans">Show fewer</button></div>`:''}`}}
+function phPowers(hp){const pr=phDock('.powers');return {key:'powers',title:'Powers',x:true,body:pr?pr.innerHTML.replace(/<h4>.*?<\/h4>/,''):'<p class="muted">Nothing to use now.</p>'}}
+function phPop(k,hp){switch(k.kind){case 'info':return phInfo(k.i);case 'market':return phMarket(hp);case 'djinns':return phDjinns(hp);case 'mine':return phMineP();case 'players':return phPlayers();case 'plans':return phPlansP(hp);case 'powers':return phPowers(hp)}return null}
+// the decision pop-ups that open by themselves
+function phHandPop(hp){const mv=G.move,vm=validMoves(hp.i),by=a=>vm.filter(m=>m.act===a),steps=by('step');const cols=[...new Set(mv.hand)];
+  if(!UI.dropColor||!mv.hand.includes(UI.dropColor))UI.dropColor=cols[0];
+  const next=[...new Set(steps.map(m=>m.tile))];const path=mv.path.map(i=>esc(tileName(G.board[i])));
+  const undo=by('undo').map(m=>btn(m,'↶ Put them back','ghost')).join('')+(!by('undo').length&&UI.moveSnap&&!UI.autoPlan?'<button class="btn ghost" data-ui="undodrop">↶ Undo last drop</button>':'');
+  const here=mv.path[0];const plans=mv.path.length===1&&UI.plans?UI.plans.map((o,i)=>({o,i})).filter(x=>x.o.s===here).slice(0,2):[];
+  const ds=next.map(i=>{const ok=steps.filter(m=>m.tile===i);const m=ok.find(x=>x.c===UI.dropColor)||ok[0];return `<button class="btn drop" data-ph="drop" data-i="${i}" title="leave ${MNAME[m.c]}">⬇ ${esc(tileName(G.board[i]))} ${mdot(m.c)}</button>`}).join('');
+  return {key:'hand',title:`${mv.hand.length} in hand`,x:false,body:`<div class="hand">${cols.map(c=>`<button class="hc ${UI.dropColor===c?'on':''}" data-dc="${c}" ${steps.some(m=>m.c===c)?'':'disabled'}>${mdot(c,1)}${MNAME[c]} ×${mv.hand.filter(x=>x===c).length}</button>`).join('')}</div>
+   <p class="small">${UI.autoPlan?'Following your plan…':mv.hand.length===1?'<b>Last one:</b> it must land on a tile with its own colour.':'Tap a glowing tile (or one below) to leave the chosen colour.'}</p>
+   ${UI.autoPlan?'':`<div class="drops">${ds}</div>`}
+   <p class="small path">${path.join(' → ')}</p>
+   ${plans.length?`<h4>Plans from here</h4><div class="acts">${plans.map(x=>`<button class="btn sm go" data-plando="${x.i}">▶ ${esc(MNAME[x.o.c])} → ${esc(tileName(G.board[x.o.e]))} · +${Math.max(0,Math.round(x.o.v))}★</button>`).join('')}</div>`:''}
+   <div class="acts">${undo}</div>`}}
+function phGainPop(hp){const pr=phDock('.prompt');if(!pr)return null;let log=G.log.slice(0,2).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('');
+  const pw=phDock('.powers');return {key:'gain',title:G.step==='tribe'?'Tribe action':G.step==='tile'?'Tile action':G.step==='sell'?'End of turn':'Your choice',x:false,body:`${phClean(pr,1)}${log?`<ol class="mini">${log}</ol>`:''}${pw?`<div class="powers">${pw.innerHTML}</div>`:''}`}}
+function phAuto(hp){if(!hp||G.over||G.q||G.phase!=='turn')return null;if(G.step==='move'&&G.move&&G.move.hand&&G.move.hand.length)return phHandPop(hp);if(G.step==='tribe'||G.step==='tile'||G.step==='sell')return phGainPop(hp);return null}
+
+// ---------- the control strip ----------
+function phStrip(hp,pop,card){const m=phMine();const s=sideToAct();let msg='',acts='';
+  if(G.over){msg='<b>Game over</b>';acts=`<button class="btn go" data-ph="reopen">Result</button>${btn({ui:'new'},'New game')}`}
+  else if(!hp){const p=s>=0?P(s):null;msg=p?`${pChip(p)} ${online()&&p.human?'is deciding…':G.phase==='bid'?'is bidding…':'is playing…'}`:'';}
+  else if(UI.pendDj){msg=`Tap a glowing tile for <b>${esc(DJ[UI.pendDj.k].n)}</b>`;acts=`<button class="btn sm" data-ui="cancelpw">Cancel</button>`}
+  else if(G.phase==='bid'){msg='<b>Bid for turn order</b>'}
+  else if(G.step==='move'&&!G.move){msg='<b>Your move.</b> Tap a glowing tile.';const pl=curPlans(hp);if(pl&&pl[0])acts=`<button class="btn go" data-plando="0">Best plan ▶ <small>+${Math.max(0,Math.round(pl[0].v))}★</small></button><button class="btn" data-ph="open" data-k="plans">Plans</button>`}
+  else if(G.step==='move'&&G.move){msg=`<b>${G.move.hand.length} in hand.</b> Tap a glowing tile.`;if(!pop)acts=`<button class="btn go" data-ph="reopen">Open</button>`}
+  else {msg=`<b>${phStep()}</b>`;if(!pop&&!card)acts=`<button class="btn go" data-ph="reopen">Open</button>`}
+  const chips=[];
+  if(m)chips.push(`<button class="pk wide" data-ph="open" data-k="mine" aria-label="Your things"><span class="pkn">${esc(m.nm)}</span><span class="pkv">★ <b>${shownTotal(m)}</b> · 🪙 <b>${m.coins}</b> · 🐪 <b>${m.camels}</b></span><span class="pks">🧺 ${m.res.length} · ${mdot('vizier')}${m.vz} · ${mdot('elder')}${m.el}${m.fk?' · 🔮 '+m.fk:''}</span></button>`);
+  chips.push(`<button class="pk" data-ph="open" data-k="players" aria-label="Players and scores"><span class="pkn">Players</span><span class="pkv">${G.pl.map(p=>`<i class="pd" style="--pc:${PCOL[p.i]}"></i>${shownTotal(p)}`).join(' ')}</span></button>`);
+  chips.push(`<button class="pk" data-ph="open" data-k="market" aria-label="Market"><span class="pkn">🛒 Market</span><span class="pkv">${G.market.map(r=>RICON[r]).join('')||'–'}</span></button>`);
+  chips.push(`<button class="pk" data-ph="open" data-k="djinns" aria-label="Djinns on offer"><span class="pkn">🧞 Djinns</span><span class="pkv">${G.djRow.length} on offer</span></button>`);
+  if(hp&&phDock('.powers'))chips.push(`<button class="pk" data-ph="open" data-k="powers"><span class="pkn">✨ Powers</span><span class="pkv">use now</span></button>`);
+  const last=!hp&&!G.over&&G.log[0]?`<p class="ps-log">${esc(G.log[0].t)}</p>`:'';
+  return `<div class="ps-main"><div class="ps-msg">${msg}</div><div class="ps-ctl">${acts}</div></div>${last}<div class="ps-chips">${chips.join('')}</div>`}
+
+// ---------- render ----------
+function phRender(){const ps=$('#ps'),pp=$('#ppop'),pc=$('#pc');if(!ps)return;
+  if(!PHONE.on||!G){for(const e of [ps,pp,pc])if(e)e.hidden=true;return}
+  const bk=G.W+'x'+G.H;if(PHONE.k!==bk){PHONE.k=bk;phApply()}
+  const hp=me(),sig=phSig();if(PHONE.pop&&PHONE.pop.sig!==sig)PHONE.pop=null;if(PHONE.hideAuto&&PHONE.hideAuto!==sig)PHONE.hideAuto='';
+  phChip();let card=null,pop=null;
+  try{card=phCard(hp);pop=PHONE.pop?phPop(PHONE.pop,hp):PHONE.hideAuto?null:phAuto(hp);if(PHONE.pop&&!pop)PHONE.pop=null}catch(e){console.error(e)}
+  ps.hidden=false;const h=phStrip(hp,pop,card);if(ps.dataset.h!==h){ps.innerHTML=h;ps.dataset.h=h}
+  phPanel(pp,pop);phPanel(pc,card);document.documentElement.classList.toggle('ph-pop',!!pop&&!card);document.documentElement.classList.toggle('ph-card',!!card)}
+
+// ---------- input ----------
+const phBoardTap=on3DTile;
+on3DTile=function(i){if(!PHONE.on||!G)return phBoardTap(i);const p=me();PHONE.pop=null;
+  if(p&&!G.q&&(UI.pick||[]).includes(i)&&!(PHONE.chapter&&0))return phBoardTap(i);
+  PHONE.pop={kind:'info',i,sig:phSig()};phRender()};
+const phShowChapter=showChapter;
+showChapter=function(){if(!PHONE.on)return phShowChapter();const key=G.round+'_'+G.seed;if(UI.chapterShown===key)return;UI.chapterShown=key;
+  const sc=G.pl.map(p=>({p,t:scoreOf(p).total})).sort((x,y)=>y.t-x.t);const low=G.pl.filter(p=>p.camels<=3);
+  PHONE.chapter={key,round:G.round,title:chapterTitle(G.round),line:G.round===1?'Bid for turn order, then each player takes their turn.':`${esc(sc[0].p.nm)} leads with ${sc[0].t} points.`+(low.length?` Only ${Math.min(...low.map(p=>p.camels))} camels left for ${esc(low[0].nm)}: the end is near.`:'')}};
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-ph]');if(!b||!PHONE.on)return;const a=b.dataset.ph,d=b.dataset;
+  if(a==='open'){PHONE.pop={kind:d.k,sig:phSig()};phRender()}
+  else if(a==='close'){if(PHONE.pop)PHONE.pop=null;else PHONE.hideAuto=phSig();phRender()}
+  else if(a==='reopen'){PHONE.pop=null;PHONE.hideAuto='';if(G&&G.over)PHONE.overDone='';phRender()}
+  else if(a==='drop'){PHONE.pop=null;on3DTile(+d.i)}
+  else if(a==='cont'){if(d.k==='chapter')PHONE.chDone=PHONE.chapter&&PHONE.chapter.key;else if(d.k==='over')PHONE.overDone=G.seed+':'+G.round;else if(/^tip-/.test(d.k)){PHONE.tips[d.k.slice(4)]=1;try{localStorage.setItem('soq_ph_tips',JSON.stringify(PHONE.tips))}catch(x){}}
+    phRender()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&PHONE.on&&PHONE.pop&&!GX.open){PHONE.pop=null;phRender();e.stopImmediatePropagation()}},true);
+// a new game: forget what the last one hid
+const phBegin=beginGame;beginGame=function(){PHONE.pop=null;PHONE.hideAuto='';PHONE.chapter=null;PHONE.chDone='';PHONE.overDone='';return phBegin.apply(this,arguments)};
+document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('#ppop,#pc,#ps'))UI.dockTouch=Date.now()},true);
 
 </script>
 </body>
