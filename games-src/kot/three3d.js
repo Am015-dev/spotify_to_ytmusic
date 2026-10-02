@@ -77,7 +77,7 @@ function fitPoints(){if(V3.fitPts)return V3.fitPts;const pts=[];
   pts.push(new THREE.Vector3(-2.8,10.1,-4.2),new THREE.Vector3(2.8,10.1,-4.2));
   [[-4.6,12.6],[4.6,12.6],[0,17.2],[-3.3,15.9],[3.3,15.9]].forEach(([x,z])=>pts.push(new THREE.Vector3(x,.3,z)));
   return V3.fitPts=pts}
-function fitCamera(asp){const cam=V3.cam;const pts=fitPoints();const tall=asp<1.05;cam.fov=tall?50:asp<1.4?44:40;cam.aspect=asp;cam.updateProjectionMatrix();
+function fitCamera(asp){const _ph=!!(window.phFit&&phFit(asp));if(V3.tray)V3.tray.visible=!_ph;if(_ph)return;const cam=V3.cam;const pts=fitPoints();const tall=asp<1.05;cam.fov=tall?50:asp<1.4?44:40;cam.aspect=asp;cam.updateProjectionMatrix();
   // portrait boards look down more steeply (the arena gets taller on screen) and aim a bit right, towards the Harbor
   const t=Math.max(0,Math.min(1,(1.3-asp)/.6));V3.camOff=new THREE.Vector3(0,15+t*6,25.1-t*6.5);V3.look.set(t*1.6,2,2.4-t*.8);
   const off=V3.camOff,mx=tall?.94:.9,my=.9,v=new THREE.Vector3();
@@ -572,9 +572,10 @@ function rollDice3D(rebuild){const n=G.dice.length;if(rebuild){clearDice();if(!V
 function setDieFace(d,gd,now){const tp=gd.t||'n';const mats=DIEFACES[tp].map(f=>V3.faceMats[tp+f+(gd.k?'k':'')]);d.m.material=mats;d.shown=tp+gd.f+(gd.k?'k':'');
   if(now||d.t>=1){d.final=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,1,0),d.yaw||0).multiply(upQuat(gd.f,gd.t))}}
 function ray(ev){const r=ev.target.getBoundingClientRect();const v=new THREE.Vector2((ev.clientX-r.left)/r.width*2-1,-(ev.clientY-r.top)/r.height*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(v,V3.cam);return rc}
-function onClick3D(ev){if(!G||G.phase!=='roll'||UI.choice)return;const myTurn=humanTurn();const rc=ray(ev);
-  const hit=myTurn&&rc.intersectObjects(V3.dice.map(d=>d.m),false)[0];if(hit){const k=V3.dice.findIndex(d=>d.m===hit.object);if(k>=0){V3.dice[k].pulse=1;uiAct({die:String(k)})}return}
-  const mh=rc.intersectObjects(V3.mons.map(o=>o.g),true)[0];if(mh){const k=V3.mons.findIndex(o=>{let x=mh.object;while(x){if(x===o.g)return true;x=x.parent}return false});if(k>=0)seatInfo(k)}}
+function onClick3D(ev){const _p=!!(window.PHONE&&PHONE.on);if(!G||UI.choice||(G.phase!=='roll'&&!_p))return;const myTurn=humanTurn();const rc=ray(ev);
+  const hit=myTurn&&!_p&&G.phase==='roll'&&rc.intersectObjects(V3.dice.map(d=>d.m),false)[0];if(hit){const k=V3.dice.findIndex(d=>d.m===hit.object);if(k>=0){V3.dice[k].pulse=1;uiAct({die:String(k)})}return}
+  const mh=rc.intersectObjects(V3.mons.map(o=>o.g),true)[0];if(mh){const k=V3.mons.findIndex(o=>{let x=mh.object;while(x){if(x===o.g)return true;x=x.parent}return false});if(k>=0){seatInfo(k);return}}
+  if(_p&&window.phNearMon){const k=phNearMon(ev);if(k>=0)seatInfo(k)}}
 function onMove3D(ev){if(V3.moveBusy)return;V3.moveBusy=true;requestAnimationFrame(()=>{V3.moveBusy=false;let k=-1;
   if(G&&G.phase==='roll'&&!UI.choice&&humanTurn()&&V3.dice.length){const h=ray(ev).intersectObjects(V3.dice.map(d=>d.m),false)[0];if(h)k=V3.dice.findIndex(d=>d.m===h.object)}
   V3.hover=k;ev.target.style.cursor=k>=0?'pointer':''})}
