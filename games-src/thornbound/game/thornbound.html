@@ -2667,7 +2667,7 @@ const NetRoom=(()=>{
 // netStrip(G, seat) builds a NEW object. Nothing is copied by default: every field that leaves the host's page is listed below, so a field the engine
 // adds later is simply absent until somebody lists it. The engine's own TB.stripView does the hiding of other seats' hand / deck / face-down cards /
 // unrevealed bid / Kingdom Deck order / question options (hidden-test.js proves it with a poison test); this file is the second wall: it drops
-// rng, seed, the agenda, the stats counters and anything unlisted, and keeps only the last 150 log lines.
+// rng, seed, the agenda, the stats counters (an empty object is sent) and anything unlisted, and keeps only the last 150 log lines.
 // seat = -1 is a spectator (everything hidden). Pure function of (G, seat), no globals except TB.
 const NET_TOP=['v','np','len','rounds','round','phase','step','order','reg','council','cmk','lost','burned','kburn','limbo','klimbo','road','kdisc','fav','cmod','rm','used','cord','loc','bq','taken','bidRev','bfirst','curReg'];
 const NET_PL=['seat','name','ai','fac','inf','lore','hs','hand','deck','disc','site','hq','ks','sup','tac','herald','supp','mk','bid','gate'];
@@ -2683,7 +2683,7 @@ function netPick(src,keys){const o={};if(!src)return o;for(const k of keys)if(Ob
 function netStrip(G,seat){
   const V=TB.stripView(G,seat);               // a clone: hidden cards are already -(owner+1), deck order and rng gone
   const o=netPick(V,NET_TOP);
-  o.seed=0;o.me=seat;o.ag=[];o.agI=0;
+  o.seed=0;o.me=seat;o.ag=[];o.agI=0;o.stats={};   // stats: the engine's eff() bumps counters in it, so it must exist, but the host's numbers (they name revealed cards) are not sent
   o.pl=V.pl.map(p=>{const q=netPick(p,NET_PL);if(p.seat===seat&&Array.isArray(p.peek))q.peek=p.peek.slice();return q});
   o.reg=V.reg.map(R=>netPick(R,NET_REG));
   o.kdeck=V.kdeck.map(()=>0);                 // only how many Kingdom cards are left
@@ -2850,7 +2850,7 @@ function onNetAct(msg){if(!isHost()||!G||msg.isMe)return;const d=msg.data;
   const k=Object.prototype.hasOwnProperty.call(d,'k')?d.k:undefined;if(typeof k!=='string'||k.length>80){netRej(msg.peer,'key');return}
   if(!G.q||!G.q.seats.includes(seat)){netRej(msg.peer,'not asked');return}
   let mv=null;try{mv=TB.moves(G,seat).find(m=>m.k===k)}catch(e){}
-  if(!mv){netRej(msg.peer,'illegal '+k+' '+G.q.kind+' '+G.logN);return}
+  if(!mv){netRej(msg.peer,'illegal '+k+' '+G.q.kind+' '+G.logN+' seats '+G.q.seats.join('')+' t '+(Date.now()%100000));return}
   let ok=false;try{ok=doMove(mv)}catch(e){console.error(e)}
   if(ok){NET.acc++;pump()}else netRej(msg.peer,'refused')}
 // ---- the pump for online games: cards are per page, the game itself never waits for a Continue button ----
@@ -2870,7 +2870,7 @@ function netPump(){if(UI.pumping)return;UI.pumping=true;
 function netSig(){return G.logN+':'+(G.q?G.q.kind+':'+(G.q.chosen?G.q.chosen.length:'')+':'+G.q.seats.join():'')}
 function netHumanMove(k){const s=NET.mySeat;if(!G||!G.q||s<0||!G.q.seats.includes(s)||G.pl[s].ai)return false;
   const mv=legal(s).find(m=>m.k===k);if(!mv)return false;
-  if(isClient()){const key=G.logN+':'+G.q.kind+':'+(G.q.chosen?G.q.chosen.length:'')+':'+k;if(NET.pend===key&&Date.now()-NET.pendT<2500)return false;NET.pend=key;NET.pendSig=netSig();NET.pendT=Date.now();UI.sel={};UI.hand=null;closePop(true);netSend(k);return true}
+  if(isClient()){const key=G.logN+':'+G.q.kind+':'+(G.q.chosen?G.q.chosen.length:'')+':'+k;if(NET.pend===key&&Date.now()-NET.pendT<2500)return false;NET.pend=key;NET.pendSig=netSig();NET.pendT=Date.now();(NET.sends=NET.sends||[]).push([Date.now()%100000,k,netSig(),NET.applied,NET.lastRx&&Date.now()-NET.lastRx,legal(s).length]);if(NET.sends.length>400)NET.sends.shift();UI.sel={};UI.hand=null;closePop(true);netSend(k);return true}
   const ok=doMove(mv);if(ok){UI.sel={};UI.hand=null;closePop(true);pump()}return ok}
 // ---- text helpers for the waiting line ----
 function seatWho(s){const P=G.pl[s];const nm=P.ai?'':(NET.on&&P.name?P.name.replace(/\s*\(.*\)$/,''):'');return shortName(s).replace(' (you)','')+(nm?' ('+nm+')':'')}

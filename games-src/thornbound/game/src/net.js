@@ -150,7 +150,7 @@ function onNetAct(msg){if(!isHost()||!G||msg.isMe)return;const d=msg.data;
   const k=Object.prototype.hasOwnProperty.call(d,'k')?d.k:undefined;if(typeof k!=='string'||k.length>80){netRej(msg.peer,'key');return}
   if(!G.q||!G.q.seats.includes(seat)){netRej(msg.peer,'not asked');return}
   let mv=null;try{mv=TB.moves(G,seat).find(m=>m.k===k)}catch(e){}
-  if(!mv){netRej(msg.peer,'illegal '+k+' '+G.q.kind+' '+G.logN);return}
+  if(!mv){netRej(msg.peer,'illegal '+k+' '+G.q.kind+' '+G.logN+' seats '+G.q.seats.join('')+' t '+(Date.now()%100000));return}
   let ok=false;try{ok=doMove(mv)}catch(e){console.error(e)}
   if(ok){NET.acc++;pump()}else netRej(msg.peer,'refused')}
 // ---- the pump for online games: cards are per page, the game itself never waits for a Continue button ----
@@ -170,7 +170,7 @@ function netPump(){if(UI.pumping)return;UI.pumping=true;
 function netSig(){return G.logN+':'+(G.q?G.q.kind+':'+(G.q.chosen?G.q.chosen.length:'')+':'+G.q.seats.join():'')}
 function netHumanMove(k){const s=NET.mySeat;if(!G||!G.q||s<0||!G.q.seats.includes(s)||G.pl[s].ai)return false;
   const mv=legal(s).find(m=>m.k===k);if(!mv)return false;
-  if(isClient()){const key=G.logN+':'+G.q.kind+':'+(G.q.chosen?G.q.chosen.length:'')+':'+k;if(NET.pend===key&&Date.now()-NET.pendT<2500)return false;NET.pend=key;NET.pendSig=netSig();NET.pendT=Date.now();UI.sel={};UI.hand=null;closePop(true);netSend(k);return true}
+  if(isClient()){const key=G.logN+':'+G.q.kind+':'+(G.q.chosen?G.q.chosen.length:'')+':'+k;if(NET.pend===key&&Date.now()-NET.pendT<2500)return false;NET.pend=key;NET.pendSig=netSig();NET.pendT=Date.now();(NET.sends=NET.sends||[]).push([Date.now()%100000,k,netSig(),NET.applied,NET.lastRx&&Date.now()-NET.lastRx,legal(s).length]);if(NET.sends.length>400)NET.sends.shift();UI.sel={};UI.hand=null;closePop(true);netSend(k);return true}
   const ok=doMove(mv);if(ok){UI.sel={};UI.hand=null;closePop(true);pump()}return ok}
 // ---- text helpers for the waiting line ----
 function seatWho(s){const P=G.pl[s];const nm=P.ai?'':(NET.on&&P.name?P.name.replace(/\s*\(.*\)$/,''):'');return shortName(s).replace(' (you)','')+(nm?' ('+nm+')':'')}

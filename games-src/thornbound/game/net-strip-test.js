@@ -11,12 +11,12 @@ for(let g=0;g<games;g++){const np=2+g%3;const facs=[];for(let i=0;i<np;i++)facs.
   while(G.phase!=='over'&&n<4000){const p=TB.pending(G);if(!p)break;
     if(n%4===0){G.secretField={deck:[1,2,3]};G.pl[0].secretNote='x';
       for(let seat=-1;seat<np;seat++){const S=netStrip(G,seat);const sj=J(S);checks++;bytes+=sj.length;maxBytes=Math.max(maxBytes,sj.length);
-        if(sj.includes('secretField')||sj.includes('secretNote')||sj.includes('"rng"')||sj.includes('"stats"')){unlisted++;if(bad.length<5)bad.push('unlisted field leaked')}
+        if(sj.includes('secretField')||sj.includes('secretNote')||sj.includes('"rng"')||sj.includes('"stats":{"')){unlisted++;if(bad.length<5)bad.push('unlisted field leaked')}
         if(seat>=0){const P=TB.poison(G,seat,rngf(g*131+n*7+seat));const S2=netStrip(P,seat);
           if(sj!==J(S2)){poisonDiff++;if(bad.length<5)bad.push('poison differs seat '+seat+' '+G.phase+'/'+G.step)}
           if(J(TB.moves(G,seat))!==J(TB.moves(P,seat))){moveDiff++}}
         // structure
-        const e=[];if(S.seed!==0)e.push('seed');if(S.rng!==undefined)e.push('rng');if(S.ag.length)e.push('ag');if(S.stats!==undefined)e.push('stats');if(S.kdeck.some(x=>x!==0))e.push('kdeck order');
+        const e=[];if(S.seed!==0)e.push('seed');if(S.rng!==undefined)e.push('rng');if(S.ag.length)e.push('ag');if(!S.stats||Object.keys(S.stats).length)e.push('stats');if(S.kdeck.some(x=>x!==0))e.push('kdeck order');
         S.pl.forEach((q,i)=>{if(i===seat)return;if(q.hand.some(id=>id>=0))e.push('rival hand');if(q.deck.some(id=>id>=0))e.push('rival deck');if(q.bid!=null&&!G.bidRev&&q.bid>=0)e.push('unrevealed bid');if(q.peek!==undefined)e.push('rival peek');if(q.hand.length!==G.pl[i].hand.length)e.push('hand count')});
         S.reg.forEach(R=>R.down.forEach(id=>{if(id>=0&&own(id)!==seat&&!(G.peek[seat]||[]).includes(id))e.push('rival face-down')}));
         if(S.q){if(Object.keys(S.q.got).length)e.push('got');for(const s in S.q.o)if(+s!==seat)e.push('rival options');if(!S.q.seats.includes(seat)&&Object.keys(S.q.o).length)e.push('options for a seat not asked')}

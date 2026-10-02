@@ -25,7 +25,7 @@ async function mkPage(tag,{uid,hash,vp}={}){const c=await B.newContext({viewport
     const own=id=>(id/100)|0;
     // host side: every packet it sends is compared with the host's real G
     const o=sendPacked;sendPacked=function(room,target,js,seq){try{if(target&&G&&UI.started){const seat=NET.seatPeer.indexOf(target),p=JSON.parse(js);if(!p.lobby&&p.g){const g=p.g,why=[];window.__sent++;
-        if(g.seed!==0)why.push('seed');if('rng' in g)why.push('rng');if('stats' in g)why.push('stats');if(g.ag&&g.ag.length)why.push('agenda');if(g.kdeck.some(x=>x))why.push('kdeck order');if(/"rng"|"stats"|"seed":[1-9]/.test(js))why.push('rng/stats/seed text');
+        if(g.seed!==0)why.push('seed');if('rng' in g)why.push('rng');if(g.stats&&Object.keys(g.stats).length)why.push('stats');if(g.ag&&g.ag.length)why.push('agenda');if(g.kdeck.some(x=>x))why.push('kdeck order');if(/"rng"|"seed":[1-9]/.test(js))why.push('rng/stats/seed text');
         g.pl.forEach((q,i)=>{if(i===seat)return;if(q.hand.some(id=>id>=0))why.push('rival hand '+i);if(q.deck.some(id=>id>=0))why.push('rival deck '+i);if(q.hand.length!==G.pl[i].hand.length)why.push('hand count');if(q.deck.length!==G.pl[i].deck.length)why.push('deck count');if(q.bid!=null&&q.bid>=0&&!G.bidRev)why.push('unrevealed bid '+i)});
         g.reg.forEach(R=>R.down.forEach(id=>{if(id>=0&&own(id)!==seat&&!(G.peek[seat]||[]).includes(id))why.push('rival face-down card')}));
         if(g.q){if(Object.keys(g.q.got||{}).length)why.push('answers collected');for(const s in (g.q.o||{}))if(+s!==seat)why.push('rival options')}
@@ -36,7 +36,7 @@ async function mkPage(tag,{uid,hash,vp}={}){const c=await B.newContext({viewport
         if(why.length){window.__leak+=why.length;if(window.__leakWhat.length<8)window.__leakWhat.push(why.join(',')+' phase '+G.phase+'/'+G.step)}}}}catch(e){window.__leakWhat.push('check failed '+e.message)}
       return o.apply(this,arguments)};
     // client side: whatever arrives is checked once more
-    const ap=applyNet;applyNet=function(x){try{window.__rx++;const g=x&&x.g;if(g){const me=NET.mySeat;g.pl.forEach((q,i)=>{if(i===(x.seat))return;if(q.hand.some(id=>id>=0)||q.deck.some(id=>id>=0))window.__rxLeak++});if(g.seed||g.rng||g.stats)window.__rxLeak++}}catch(e){}return ap(x)};
+    const ap=applyNet;applyNet=function(x){try{window.__rx++;const g=x&&x.g;if(g){const me=NET.mySeat;g.pl.forEach((q,i)=>{if(i===(x.seat))return;if(q.hand.some(id=>id>=0)||q.deck.some(id=>id>=0))window.__rxLeak++});if(g.seed||g.rng||(g.stats&&Object.keys(g.stats).length))window.__rxLeak++}}catch(e){}return ap(x)};
   });
   pages.push(P);return P}
 // one random click on this page's own buttons (only when it is this page's decision)
@@ -105,8 +105,11 @@ for(let g=1;g<=NG;g++){
   const ok=await Promise.all(C.map((c,i)=>waitFor(c,s=>G&&UI.started&&NET.mySeat===s&&!G.over,30000,i+1)));
   log(`game ${g} started; clients seated:`,JSON.stringify(ok));const np=await H.p.evaluate(()=>G.np);log('players',np);
   let clicks=0,rem0=await H.p.evaluate(()=>NET.acc),leaveStage=MODE==='leave'?0:9,leaveInfo={},illegalDone=MODE!=='illegal',illegal=null,shotDone=false,shotMid=false,lastR=0;t0=Date.now();
-  const seatOfC=1;
+  const stall={};
   while(Date.now()-t0<SECS*1000){
+    if(Date.now()-(stall.t||0)>1000){stall.t=Date.now();const sg=await H.p.evaluate(()=>G&&G.logN+':'+(G.q&&G.q.kind)+':'+(G.q&&G.q.seats.join()));if(sg!==stall.sig){stall.sig=sg;stall.at=Date.now()}
+      else if(Date.now()-stall.at>40000){const dump=[];for(const P of [H,...C]){if(P.closed)continue;dump.push(P.tag+' '+JSON.stringify(await P.p.evaluate(()=>({q:G.q&&{kind:G.q.kind,seats:G.q.seats,t:G.q.t,title:G.q.title},mySeat:NET.mySeat,card:UI.card&&UI.card.kind,pop:UI.pop,pend:!!NET.pend,main:document.querySelector('#main').innerText.slice(0,200),logN:G.logN,ai:G.pl.map(p=>p.ai),away:NET.away,peers:NET.peers.length,bad:NET.bad,badE:NET.badE,lastRx:NET.lastRx&&Date.now()-NET.lastRx,applied:NET.applied,seq:NET.seq,nmv:(()=>{try{return TB.moves(G,Math.max(0,NET.mySeat)).length}catch(e){return 'ERR '+e.message}})()})).catch(e=>'ERR '+e.message)))}
+        log('STALL',dump.join('\n'));results.push({stall:dump});break}}
     const hs=await H.p.evaluate(()=>G&&{o:!!G.over,r:G.round,ph:G.phase,q:G.q&&G.q.kind,seats:G.q&&G.q.seats.slice(),simul:G.q&&G.q.simul});if(!hs||hs.o)break;
     // illegal / malformed messages while it is the host's decision (and the client is not asked, or at least cannot do anything with these)
     if(!illegalDone&&hs.r>=2&&hs.seats&&hs.seats.includes(0)){
@@ -136,6 +139,7 @@ for(let g=1;g<=NG;g++){
   const hf=await H.p.evaluate(final);const cfs=[];for(const c of C){cfs.push(c.closed?null:await c.p.evaluate(final).catch(()=>null))}
   const net=await H.p.evaluate(()=>({acc:NET.acc,rej:NET.rej,why:NET.why.slice(-6),sent:__sent,leak:__leak,leakWhat:__leakWhat,simul:__simul,bad:__bad,badWhat:__badWhat,inv:TB.invariants(G).length}));
   const cl=[];for(const c of C){cl.push(c.closed?null:await c.p.evaluate(()=>({bad:__bad,badWhat:__badWhat,rxLeak:__rxLeak,rx:__rx,sent:NET.sent,mySeat:NET.mySeat,card:UI.card&&UI.card.kind,badPackets:NET.bad,applied:NET.applied})))}
+  if(net.rej>(MODE==='illegal'?28:0)&&!C[0].closed)log('REJECT DIAG host',JSON.stringify(net.why),'client sends',JSON.stringify(await C[0].p.evaluate(()=>NET.sends&&NET.sends.filter(x=>/^b:/.test(x[1])).slice(-24))));
   const agree=cfs.map(c=>c?JSON.stringify(c)===JSON.stringify(hf):'closed');
   const r={game:g,players:np,secs:Math.round((Date.now()-t0)/1000),over,winner:hf&&hf.w,scores:hf&&hf.scores,rounds:hf&&hf.r,agreeWithHost:agree,remoteMovesApplied:net.acc-rem0,hostRejected:net.rej,rejectReasons:net.why,
     hiddenInfo:{packetsChecked:net.sent,hostPacketLeaks:net.leak,what:net.leakWhat,simultaneousPackets:net.simul,hostDomViolations:net.bad,hostBad:net.badWhat,clients:cl},invariantFailures:net.inv,illegal,leave:MODE==='leave'?leaveInfo:undefined,clicks};
