@@ -22,11 +22,11 @@ const LOCID=DD.LOCIDS;
 const regOfLoc=l=>l>>1;
 const humans=()=>G?G.pl.filter(p=>!p.ai).map(p=>p.seat):[];
 const isHuman=s=>!!G&&!G.pl[s].ai;
-const hotSeat=()=>UI.mode==='hot'||(UI.mode==='me'&&humans().length>1);
-function viewSeat(){if(!G)return -1;const hs=humans();if(!hs.length)return -1;if(hs.length===1)return hs[0];return UI.holder}
+const hotSeat=()=>!NET.on&&(UI.mode==='hot'||(UI.mode==='me'&&humans().length>1));
+function viewSeat(){if(!G)return -1;if(NET.on)return NET.mySeat;const hs=humans();if(!hs.length)return -1;if(hs.length===1)return hs[0];return UI.holder}
 const vs=viewSeat;
 const nameOf=s=>G.pl[s].name;
-const tname=s=>G.pl[s].ai?(G.pl[s].name):(hotSeat()||humans().length>1?G.pl[s].name:'You');
+const tname=s=>G.pl[s].ai?(G.pl[s].name):(NET.on?(s===vs()?'You':G.pl[s].name):hotSeat()||humans().length>1?G.pl[s].name:'You');
 const ordinal=n=>['first','second','third','fourth'][n]||n+'th';
 // ---------------------------------------------------------------- card specs for TBKit
 const ART={ruse:{nobility:'herald',clans:'ravens',uprising:'mob',gathering:'moonmoth'},trader:{_:'merchant'},
@@ -71,11 +71,12 @@ function cardDetail(id){const i=cinfo(id);const ar=ARCH_LBL[i.archetype]||'';con
 const EV={cur:null};
 function snapInf(){return G.pl.map(p=>p.inf)}
 function logSince(n){return G.log.filter(e=>e.i>n)}
+function pushEv(e){UI.evq.push(e);if(typeof netEvent==='function')netEvent(e)}
 function hookEngine(){const I=TB.internal;if(!I||!I.AG||I.__hooked)return;I.__hooked=1;const AG=I.AG,PK=I.PICKH;
   const wrap=(h,before,after)=>{const o=AG[h];if(!o)return;AG[h]=function(d){const mine=(()=>{const g=TB.internal.G;if(!G)G=g;return g===G})();try{mine&&before&&before(d)}catch(e){console.warn('hook',h,e.message)}const r=o.call(this,d);try{mine&&after&&after(d)}catch(e){console.warn('hook',h,e.message)}return r}};
-  const flush=()=>{if(EV.cur&&EV.cur.t==='clash'&&EV.cur.tot){const c=EV.cur;c.logs=logSince(c.log0).map(e=>e.t);c.inf1=snapInf();UI.evq.push(c)}EV.cur=null};
+  const flush=()=>{if(EV.cur&&EV.cur.t==='clash'&&EV.cur.tot){const c=EV.cur;c.logs=logSince(c.log0).map(e=>e.t);c.inf1=snapInf();pushEv(c)}EV.cur=null};
   wrap('roundStart',()=>{flush()},()=>{UI.rs0=snapInf();UI.rsLog=G.logN;UI.clashRes={};UI.placed=[]});
-  wrap('bidReveal',null,()=>{UI.evq.push({t:'bids',round:G.round,bids:G.pl.map(p=>({seat:p.seat,id:p.bid,str:G.bstr[p.seat]})).filter(b=>b.id!=null),order:G.order.slice()})});
+  wrap('bidReveal',null,()=>{pushEv({t:'bids',round:G.round,bids:G.pl.map(p=>({seat:p.seat,id:p.bid,str:G.bstr[p.seat]})).filter(b=>b.id!=null),order:G.order.slice()})});
   wrap('clashReveal',()=>{if(EV.cur&&EV.cur.tot)flush()},()=>{const c=G.clash;if(!c)return;if(!EV.cur)EV.cur={t:'clash',r:c.r,idx:G.cord.indexOf(c.r),rounds:0,log0:G.logN-c.parts.length,inf0:snapInf()};
     EV.cur.n=c.n;EV.cur.cards={};for(const s of c.parts)EV.cur.cards[s]=(c.cards[s]||[]).slice();EV.cur.supp={};for(const s of c.parts)EV.cur.supp[s]=G.pl[s].supp.r[c.r];EV.cur.parts=c.parts.slice();EV.cur.tot=null});
   wrap('clashTally',null,()=>{const c=G.clash;if(!c||!EV.cur)return;EV.cur.tot=Object.assign({},c.tot);EV.cur.winner=c.winner;EV.cur.tied=c.tied?c.tied.slice():null;
@@ -83,10 +84,10 @@ function hookEngine(){const I=TB.internal;if(!I||!I.AG||I.__hooked)return;I.__ho
     const ci=G.clash.cards;for(const s in ci)EV.cur.cardsF[s]=ci[s].slice();
     EV.cur.str={};for(const s in EV.cur.cardsF)EV.cur.str[s]=EV.cur.cardsF[s].map(id=>cinfo(id).strength)});
   wrap('regionDone',()=>{flush()});
-  wrap('cleanup',()=>{if(UI.rs0)UI.evq.push({t:'summary',round:G.round,rounds:G.rounds,inf0:UI.rs0,inf1:snapInf(),order:G.order.slice(),warns:logSince(UI.rsLog||0).filter(e=>e.c==='warn').map(e=>e.t),big:logSince(UI.rsLog||0).filter(e=>e.c==='big').map(e=>e.t).slice(-8),last:G.round>=G.rounds})});
+  wrap('cleanup',()=>{if(UI.rs0)pushEv({t:'summary',round:G.round,rounds:G.rounds,inf0:UI.rs0,inf1:snapInf(),order:G.order.slice(),warns:logSince(UI.rsLog||0).filter(e=>e.c==='warn').map(e=>e.t),big:logSince(UI.rsLog||0).filter(e=>e.c==='big').map(e=>e.t).slice(-8),last:G.round>=G.rounds})});
   if(PK&&PK.bidRes){const o=PK.bidRes;PK.bidRes=function(seat,opt,d){const r=o.call(this,seat,opt,d);try{UI.toast=G.log.length?G.log[G.log.length-1].t:''}catch(e){}return r}}}
 // ---------------------------------------------------------------- AI adapter (the engine author's TB.ai when present, else a modest fallback)
-function legal(seat){return TB.moves(G,seat)}
+function legal(seat){return TB.moves(G,seat)}  // on a client this runs on its own stripped copy (same list as the host's, net-strip-test.js)
 function aiLevel(seat){return G.pl[seat].ai||'normal'}
 function rndAI(){UI.aiSeed=(UI.aiSeed*1664525+1013904223)>>>0;return UI.aiSeed/4294967296}
 function pickR(a){return a[Math.floor(rndAI()*a.length)]}
@@ -108,7 +109,7 @@ function aiChoose(seat,level){const mv=legal(seat);if(!mv.length)return null;if(
   catch(e){console.warn('ai failed, fallback',e.message)}
   return fallbackPick(seat,mv)}
 // "recommended": what the Hard computer would play for the human, from the human's own information only
-function suggest(seat){if(!G||!G.q||!G.q.seats.includes(seat))return null;try{return aiChoose(seat,ANIM?'hard':'normal')}catch(e){return null}}
+function suggest(seat){if(!G||!G.q||!G.q.seats.includes(seat))return null;if(isClient()){const k=NET.rk;return k!=null?(legal(seat).find(m=>m.k===k)||null):null}try{return aiChoose(seat,ANIM?'hard':'normal')}catch(e){return null}}
 // ---------------------------------------------------------------- game start / save / load
 function mkSeats(cfg){const n=cfg.np,seats=[];const fac=FIDS.slice();
   const mine=cfg.faction&&fac.includes(cfg.faction)?cfg.faction:null;
@@ -131,7 +132,7 @@ function newGame(mode,o){o=o||{};mode=mode||'me';
   UI.rs0=snapInf();UI.rsLog=0;
   saveGame();hideStart();afterStart();return G}
 function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
-function saveGame(){try{if(!G||G.over||!UI.cfg)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,t:Date.now()}))}catch(e){}}
+function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,t:Date.now()}))}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem('tb_save');return s?JSON.parse(s):null}catch(e){return null}}
 function clearSave(){try{localStorage.removeItem('tb_save')}catch(e){}}
 function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI.holder=sv.holder||0;UI.guide=sv.guide||'full';UI.aiSeed=sv.ai||1;resetUI();UI.started=true;UI.rs0=snapInf();UI.rsLog=G.logN;return G}
@@ -147,6 +148,7 @@ function whoActs(){ // returns {ai:[seats], hum:[seats]}
   const ps=pendingSeats();return {ai:ps.filter(s=>G.pl[s].ai),hum:ps.filter(s=>!G.pl[s].ai)}}
 var _pumpT=0;
 function pump(){clearTimeout(_pumpT);_pumpT=0;if(!G||!UI.started)return;
+  if(NET.on)return netPump();
   if(UI.pumping)return;UI.pumping=true;
   try{
     for(let guard=0;guard<4000;guard++){
@@ -174,11 +176,11 @@ function pickHumanSeat(hum){
   const nxt=hum.includes(UI.holder)?UI.holder:hum[0];
   UI.passDelay=null;UI.card={kind:'pass',seat:nxt};UI.passed=null;return null}
 function afterHumanMove(){UI.passed=hotSeat()?UI.passed:null;pump()}
-function humanMove(k){const s=viewSeatForQ();if(s==null)return false;const mv=legal(s).find(m=>m.k===k);if(!mv)return false;
+function humanMove(k){if(NET.on)return netHumanMove(k);const s=viewSeatForQ();if(s==null)return false;const mv=legal(s).find(m=>m.k===k);if(!mv)return false;
   const ok=doMove(mv);if(ok){UI.sel={};UI.hand=null;closePop(true);if(hotSeat()){ // pass on once this seat has nothing more to decide
       const still=G.q&&G.q.seats.includes(s);if(!still)UI.passed=null}
     pump()}return ok}
-function viewSeatForQ(){if(!G||!G.q)return null;const hum=G.q.seats.filter(s=>!G.pl[s].ai);if(!hum.length)return null;if(!hotSeat())return hum[0];return hum.includes(UI.holder)&&UI.passed===UI.holder?UI.holder:null}
+function viewSeatForQ(){if(!G||!G.q)return null;if(NET.on){const m=NET.mySeat;return m>=0&&G.q.seats.includes(m)&&!G.pl[m].ai?m:null}const hum=G.q.seats.filter(s=>!G.pl[s].ai);if(!hum.length)return null;if(!hotSeat())return hum[0];return hum.includes(UI.holder)&&UI.passed===UI.holder?UI.holder:null}
 // ===================== part 2: the kingdom map (TBKit.map with 6 locations = 3 regions x 2, plus the throne) =====================
 const MAP={m:null,sig:'',ov:null,pan:null,hl:[],busyHerald:{},shown:{}};
 const LOCPOS=[[290,205],[710,205],[165,610],[165,850],[835,610],[835,850]];
@@ -316,11 +318,11 @@ function recapHTML(){const c=G.clash;if(!c)return '';const parts=c.parts,V=UI.V;
   const rows=parts.map(s=>{const ids=(c.cards[s]||[]);const tot=c.tot&&c.tot[s]!=null?c.tot[s]:null;
     return '<span class="rc-s" style="--fc:'+fcol(s)+'"><b>'+esc(shortName(s))+'</b> '+ids.map(id=>cinfo(id).strength).join('+')+(G.pl[s].supp.r[c.r]?' +'+G.pl[s].supp.r[c.r]+' supporter'+(G.pl[s].supp.r[c.r]>1?'s':''):'')+(tot!=null?' = <b>'+tot+'</b>':'')+'</span>'}).join('');
   return '<div class="recap" aria-label="Current clash"><span class="rc-t">Clash in '+esc(REG[c.r])+(c.n>1?' (round '+c.n+')':'')+'</span>'+rows+'</div>'}
-const shortName=s=>kf(s).short.replace('Gilded Court','Gilded').replace('Heathbound Clans','Heath').replace('Lantern Rising','Lantern').replace('Pale Choir','Choir')+(!G.pl[s].ai&&(humans().length===1)?' (you)':'');
+const shortName=s=>kf(s).short.replace('Gilded Court','Gilded').replace('Heathbound Clans','Heath').replace('Lantern Rising','Lantern').replace('Pale Choir','Choir')+(!G.pl[s].ai&&(NET.on?s===vs():humans().length===1)?' (you)':'');
 function waitingHTML(){const q=G.q;let who='';
-  if(q){const names=q.seats.map(s=>shortName(s));who=names.join(', ')+(q.seats.length>1?' are':' is')+' deciding'}
+  if(q){const names=q.seats.map(s=>shortName(s));who=NET.on?decidingLine():names.join(', ')+(q.seats.length>1?' are':' is')+' deciding'}
   const cur=G.log.slice(-3).map(e=>'<li>'+esc(e.t)+'</li>').join('');
-  return '<div class="wait"><p class="w-t">'+(UI.mode==='watch'?'Watching the computers play.':'Waiting for the others.')+' '+esc(who)+'.</p><ul class="w-log">'+cur+'</ul>'+(UI.mode==='watch'?watchControls():'')+'</div>'}
+  return '<div class="wait"><p class="w-t">'+(UI.mode==='watch'?'Watching the computers play.':NET.on&&vs()<0?'You are watching.':'Waiting for the others.')+' '+esc(who)+'.</p><ul class="w-log">'+cur+'</ul>'+(UI.mode==='watch'?watchControls():'')+'</div>'}
 function watchControls(){return '<div class="btnrow"><button class="btn" data-a="wpause" aria-pressed="'+UI.watchPaused+'">'+(UI.watchPaused?'Resume':'Pause')+'</button><button class="btn" data-a="wstep">Step</button><button class="btn" data-a="wspeed">Speed x'+UI.speed+'</button></div>'}
 function optBtn(m,cls,extra){const rec=recK()===m.k;return '<button class="opt'+(cls?' '+cls:'')+(rec?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+(extra||'')+'<span class="ot">'+esc(m.label)+'</span>'+(rec?'<span class="rtag">'+ico('star')+'Recommended</span>':'')+'</button>'}
 function thumbFor(m){if(m.id!=null&&m.id>=0&&m.t!=='sel')return '<span class="th"'+(ownerOf(m.id)===vs()?' data-owner="'+ownerOf(m.id)+'" data-up="1"':'')+'>'+cardEl(m.id,44).outerHTML+'</span>';
@@ -333,6 +335,7 @@ function renderMain(){const el=$('#main');if(!el)return;const q=G.q;
   let h='';const help=tipLine(q.kind);
   h+='<div class="step"><h3 class="st">'+esc(KIND_NAME[q.kind]||q.title.replace(/^[^:]*:\s*/,''))+'</h3>';
   h+='<p class="pr">'+esc(promptText(q))+'</p>';
+  if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Everyone decides at the same time. Still to choose: '+esc(oth.map(seatWho).join(', '))+'.</p>'}
   if(G.clash&&['day','night','tally'].includes(G.step)||G.clash&&q.kind==='location'||G.clash&&['castle','wilderness','harvest','shrine','ossuary','tie'].includes(q.kind))h+=recapHTML();
   const hl=[];
   switch(q.kind){
@@ -411,7 +414,7 @@ function renderRivals(){const el=$('#rivals');if(!el)return;const V=UI.V;const h
   el.innerHTML=ordSeats.map(s=>{const P=V.pl[s];const kfac=TBKit.FACTIONS[FK[P.fac]];const turn=act.has(s);
     const favs=V.fav.h===s?'<span class="rv-f" title="Holds the Kingdom\'s Favour ('+V.fav.u+' uses left)">'+ico('star')+'</span>':'';
     return '<button class="rv'+(s===me?' me':'')+(turn?' turn':'')+'" data-a="rival" data-s="'+s+'" style="--fc:'+kfac.main+'" aria-label="'+esc(P.name)+': '+P.inf+' influence, '+P.hand.length+' cards in hand. Tap for details">'+
-      '<span class="rv-e">'+emb(s,26)+'</span><span class="rv-t"><b>'+esc(shortName(s).replace(' (you)',''))+(s===me&&humans().length===1?' <u>you</u>':'')+'</b><small><i>'+P.inf+'</i> inf · '+P.hand.length+' cards</small></span>'+favs+'</button>'}).join('')}
+      '<span class="rv-e">'+emb(s,26)+'</span><span class="rv-t"><b>'+esc(shortName(s).replace(' (you)',''))+(s===me&&(NET.on||humans().length===1)?' <u>you</u>':'')+'</b><small><i>'+P.inf+'</i> inf · '+P.hand.length+' cards</small></span>'+favs+'</button>'}).join('')}
 // ---------------------------------------------------------------- pop-ups (live in the dock zone, never over the board)
 function openPop(kind,arg){if(!G)return;UI.pop=kind;UI.popArg=arg||{};renderPop();applyHl();if(typeof sfx==='function')sfx('tap')}
 function closePop(quiet){if(!UI.pop)return;UI.pop=null;UI.popArg=null;UI.hand=null;const p=$('#ppop');if(p){p.hidden=true;p.innerHTML=''}applyHl();if(!quiet)renderAll()}
@@ -520,15 +523,16 @@ function playClash(ev,root){const panel=root.querySelector('#clp');if(!panel)ret
   mapReveal(ev);
   setTimeout(()=>{const key=UI._cardKey;cp.play().then(()=>{if(UI._cardKey===key)fin()})},350)}
 function overHTML(){const o=G.over,sc=TB.scores(G);const rk=o.ranking;const win=o.winner;
-  return '<div class="cd cd-over"><h3>'+(humans().length&&!G.pl[win].ai&&humans().length===1?'You win the throne!':esc(nameOf(win))+' takes the throne')+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+esc(nameOf(s))+'</b><span>'+G.pl[s].inf+(o.bonus&&o.bonus[s]?' <small>(includes +'+o.bonus[s]+' from emptying the Site of Power)</small>':'')+'</span></li>').join('')+'</ol><div class="btnrow"><button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="menu">Main menu</button></div></div>'}
+  return '<div class="cd cd-over"><h3>'+(NET.on?(win===vs()?'You win the throne!':esc(nameOf(win))+' takes the throne'):humans().length&&!G.pl[win].ai&&humans().length===1?'You win the throne!':esc(nameOf(win))+' takes the throne')+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+esc(nameOf(s))+'</b><span>'+G.pl[s].inf+(o.bonus&&o.bonus[s]?' <small>(includes +'+o.bonus[s]+' from emptying the Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(NET.on?(isHost()?'<div class="btnrow"><button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="netopen">Lobby</button></div>':'<p class="sub">The host can start another game.</p><div class="btnrow"><button class="btn" data-a="netleave">Leave</button></div>'):'<div class="btnrow"><button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="menu">Main menu</button></div>')+'</div>'}
 // ===================== part 5: render loop, clicks, drawers (rules, log, board, menu), start screen =====================
 function renderAll(){if(!G||!UI.started)return;
-  try{UI.V=TB.stripView(G,isPassing()?-1:vs())}catch(e){console.error('view '+e.message);return}
+  try{UI.V=isClient()?G:TB.stripView(G,isPassing()?-1:vs())}catch(e){console.error('view '+e.message);return}  // a client's G is already its own stripped copy
   if(isPassing()){if(GX.open)GX.close();const bb=$('#boardbody');if(bb)bb.innerHTML='';if(UI.pop)closePop(true)}
   if(!(UI.card&&UI.card.kind==='event'))renderMap();else if(!MAP.m)renderMap();
   renderBar();renderRoad();renderMain();renderHand();renderRivals();renderCard();renderPop();updateLive();
   document.documentElement.dataset.step=String(roadIdx());
   if(typeof phoneRefresh==='function')phoneRefresh();
+  netAfter();
   const lb=$('#logbody');if(lb&&GX.open==='logd')renderLog()}
 function updateLive(){const l=$('#live');if(!l)return;const last=G.log[G.log.length-1];if(last&&UI._liveN!==last.i){UI._liveN=last.i;l.textContent=last.t}}
 // ---------------------------------------------------------------- clicks
@@ -536,6 +540,7 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   if(!t){ // tap on the empty board closes a pop-up
     if(UI.pop&&e.target.closest&&e.target.closest('#mapwrap')&&!e.target.closest('.tb-loc')){closePop();e.stopPropagation()}return}
   const a=t.dataset.a;
+  if(netClick(a,t))return;
   switch(a){
    case 'mv':{if(!humanMove(t.dataset.k)){renderAll()}break}
    case 'hand':{const id=+t.dataset.id;if(UI.pop==='card'&&UI.popArg.id===id&&!t.closest('#ppop')){closePop();break}UI.hand=id;openPop('card',{id});renderHand();break}
@@ -580,17 +585,17 @@ function showStart(){$('#start').hidden=false;document.body.classList.add('in-st
 function hideStart(){$('#start').hidden=true;document.body.classList.remove('in-start')}
 function renderStart(){const el=$('#start');if(!el||el.hidden)return;const sav=loadSave();
   const lvl=(i)=>'<select class="sel" data-a="lv" data-i="'+i+'" aria-label="Computer level, seat '+(i+1)+'">'+['easy','normal','hard'].map(l=>'<option value="'+l+'"'+(sv.levels[i]===l?' selected':'')+'>'+l[0].toUpperCase()+l.slice(1)+'</option>').join('')+'</select>';
-  const nSeats=sv.np;let seats='';
+  const ONL=NET.on&&isHost(),plan=ONL?netPlan():null;const nSeats=ONL?plan.np:sv.np;let seats='';
   const fac=FIDS.slice();const mine=sv.faction;const rest=fac.filter(f=>f!==mine);
-  for(let i=0;i<nSeats;i++){const f=sv.mode==='me'?(i===0?mine:rest[i-1]):FIDS[i];const k=TBKit.FACTIONS[FK[f]];const human=sv.mode==='hot'||(sv.mode==='me'&&i===0);
-    seats+='<div class="seat" style="--fc:'+k.main+'">'+TBKit.token('influence',{faction:FK[f]},30).outerHTML+'<span class="sn"><b>'+esc(k.short)+'</b><small>'+(human?(sv.mode==='hot'?'Player '+(i+1):'You'):'Computer')+'</small></span>'+(human?'':lvl(i))+'</div>'}
+  for(let i=0;i<nSeats;i++){const pm=ONL?'me':sv.mode;const f=pm==='me'?(i===0?mine:rest[i-1]):FIDS[i];const k=TBKit.FACTIONS[FK[f]];const human=ONL?i<plan.hum.length:(sv.mode==='hot'||(sv.mode==='me'&&i===0));
+    seats+='<div class="seat" style="--fc:'+k.main+'">'+TBKit.token('influence',{faction:FK[f]},30).outerHTML+'<span class="sn"><b>'+esc(k.short)+'</b><small>'+(human?(ONL?'Online: '+esc(plan.hum[i].nm)+(i===0?' (you)':''):sv.mode==='hot'?'Player '+(i+1):'You'):'Computer')+'</small></span>'+(human?'':lvl(i))+'</div>'}
   el.innerHTML='<div class="st-box"><h1 class="st-t">The Thornbound Throne</h1><p class="st-s">An area-control card game for 2 to 4. Win clashes in three regions, place your Herald where you will be, and hold the most Influence when the last round ends.</p>'+
-   '<div class="st-bt"><button class="btn pri big" data-a="guided">Guided first game</button>'+(sav?'<button class="btn big" data-a="cont">Continue saved game (round '+sav.G.round+')</button>':'')+'</div>'+
-   '<h2>Or set up a game</h2><div class="seg" role="radiogroup" aria-label="Mode">'+[['me','Play the computer'],['hot','Hot-seat (pass the device)'],['watch','Watch computers']].map(([v,l])=>'<button role="radio" aria-checked="'+(sv.mode===v)+'" class="'+(sv.mode===v?'on':'')+'" data-a="mode" data-v="'+v+'" data-start="'+v+'">'+l+'</button>').join('')+'</div>'+
+   (ONL?'':'<div class="st-bt"><button class="btn pri big" data-a="guided">Guided first game</button>'+(sav?'<button class="btn big" data-a="cont">Continue saved game (round '+sav.G.round+')</button>':'')+'</div>')+onlineBlock()+
+   '<h2>'+(ONL?'Game setup':'Or set up a game')+'</h2>'+(ONL?'':'<div class="seg" role="radiogroup" aria-label="Mode">'+[['me','Play the computer'],['hot','Hot-seat (pass the device)'],['watch','Watch computers']].map(([v,l])=>'<button role="radio" aria-checked="'+(sv.mode===v)+'" class="'+(sv.mode===v?'on':'')+'" data-a="mode" data-v="'+v+'" data-start="'+v+'">'+l+'</button>').join('')+'</div>')+
    '<div class="row"><span>Players</span><div class="seg">'+[2,3,4].map(n=>'<button class="'+(sv.np===n?'on':'')+'" data-a="np" data-v="'+n+'">'+n+'</button>').join('')+'</div><span>Length</span><div class="seg">'+[['short','4 rounds'],['standard','5 rounds'],['extended','6 rounds']].map(([v,l])=>'<button class="'+(sv.length===v?'on':'')+'" data-a="len" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+
-   (sv.mode==='me'?'<div class="row"><span>Your side</span><div class="seg fseg">'+FIDS.map(f=>{const k=TBKit.FACTIONS[FK[f]];return '<button class="'+(sv.faction===f?'on':'')+'" data-a="fac" data-v="'+f+'" style="--fc:'+k.main+'">'+esc(k.short)+'</button>'}).join('')+'</div></div>':'')+
+   ((sv.mode==='me'||ONL)?'<div class="row"><span>Your side</span><div class="seg fseg">'+FIDS.map(f=>{const k=TBKit.FACTIONS[FK[f]];return '<button class="'+(sv.faction===f?'on':'')+'" data-a="fac" data-v="'+f+'" style="--fc:'+k.main+'">'+esc(k.short)+'</button>'}).join('')+'</div></div>':'')+
    '<div class="seats">'+seats+'</div><div class="row"><span>Guide</span><div class="seg">'+[['full','Full tips'],['light','Light'],['off','Off']].map(([v,l])=>'<button class="'+(sv.guide===v?'on':'')+'" data-a="gd" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+
-   '<div class="st-bt"><button class="btn pri big" data-a="start" data-start="go">Start game</button><button class="btn big" data-a="rules">How to play</button></div><p class="st-c">Original art drawn in code. Fonts: Cinzel and EB Garamond (SIL OFL). Based on the mechanics of a published game; names and text are our own.</p></div>';
+   '<div class="st-bt"><button class="btn pri big" data-a="start" data-start="go">'+(ONL?'Start online game':'Start game')+'</button>'+(NET.on&&G&&UI.started?'<button class="btn big" data-a="netback">Back to the game</button>':'')+'<button class="btn big" data-a="rules">How to play</button></div><p class="st-c">Original art drawn in code. Fonts: Cinzel and EB Garamond (SIL OFL). Based on the mechanics of a published game; names and text are our own.</p></div>';
   $$('#start [data-a=lv]').forEach(s=>s.addEventListener('change',()=>{sv.levels[+s.dataset.i]=s.value}))}
 function startFromSetup(){hideStart();const lv=sv.levels.slice();
   const o={np:sv.np,length:sv.length,faction:sv.faction,levels:lv,guide:sv.guide};
@@ -605,7 +610,7 @@ function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slic
   el.innerHTML=h+'</ol>'}
 function renderMenu(){const el=$('#setbody');if(!el)return;
   const seg=(a,cur,opts)=>'<div class="seg">'+opts.map(([v,l])=>'<button class="'+(String(cur)===String(v)?'on':'')+'" data-a="'+a+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
-  el.innerHTML='<div class="mrow"><button class="btn pri" data-a="newgame">New game / main menu</button><button class="btn" data-a="savenow">Save now</button></div>'+
+  el.innerHTML=(NET.on?'<div class="mrow"><button class="btn pri" data-a="netopen">Online lobby</button>'+(isHost()?'<button class="btn" data-a="newgame">Change setup</button>':'')+'<button class="btn" data-a="netleave">Leave the room</button></div>':'<div class="mrow"><button class="btn pri" data-a="newgame">New game / main menu</button><button class="btn" data-a="savenow">Save now</button></div>')+
    '<div class="mrow"><span>Guide</span>'+seg('gdset',UI.guide,[['full','Full tips'],['light','Light'],['off','Off']])+'</div>'+
    '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
    '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button></div>'+
@@ -670,7 +675,7 @@ function boot(){
   try{UI.sound=localStorage.getItem('tb_snd')!=='0';UI.music=localStorage.getItem('tb_mus')==='1';UI.lowGfx=localStorage.getItem('tb_gfx')==='low'}catch(e){}
   try{if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'tbt'});GA.setSfx(UI.sound);GA.setMusic(UI.music)}}catch(e){}
   try{if(window.PerfHUD)PerfHUD.register({game:'Thornbound Throne',levels:['high','low'],names:{high:'High',low:'Low'},getLevel:()=>UI.lowGfx?'low':'high',isAuto:()=>false,setLevel:(l,why)=>{if(why==='apply'){UI.lowGfx=l==='low';UI.mapReset=true;G&&renderAll()}},isAnimating:()=>UI.busy,anchor:'.gx-board',corner:'tl'})}catch(e){}
-  GX.init({key:'tb'});setupDrawers();phApply();
+  GX.init({key:'tb'});setupDrawers();phApply();netInit();
   TBKit.ready.then(()=>{document.documentElement.classList.add('tb-ready');if(!UI.started)showStart()});
   document.addEventListener('pointerdown',()=>{try{if(window.GA)GA.unlock();if(UI.music)musicFor()}catch(e){}},{once:true})}
 function startUiReady(){return TBKit.ready}

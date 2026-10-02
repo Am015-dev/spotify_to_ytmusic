@@ -13,7 +13,7 @@
   <main class="gx-board" id="board" aria-label="The kingdom map"><div id="mapwrap"></div></main>
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet"></span><span class="gx-dt">What to do now</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">&#8677;</button></div>
-    <div class="gx-dock-body" id="dockbody"><div id="road"></div><div id="main"></div><div id="handw" hidden></div><div id="rivals"></div></div>
+    <div class="gx-dock-body" id="dockbody"><div id="netst" class="netst" hidden></div><div id="road"></div><div id="main"></div><div id="handw" hidden></div><div id="rivals"></div></div>
     <div id="ppop" class="ppop" hidden role="dialog" aria-label="Details"></div>
     <div id="pc" class="pcard" hidden role="dialog" aria-label="Message"></div>
   </aside>
@@ -21,6 +21,7 @@
 </div>
 </div>
 <div id="start" role="dialog" aria-label="New game" hidden></div>
+<div id="netbox" hidden></div>
 <div id="live" class="sr" aria-live="polite"></div>
 <script src="shell.js"></script>
 <script src="perfhud.js"></script>
@@ -28,6 +29,10 @@
 <script src="data.js"></script>
 <script src="engine.js"></script>
 <script src="ai.js"></script>
+<script src="trystero.min.js"></script>
+<script src="netroom.js"></script>
+<script src="netstrip.js"></script>
+<script src="net.js"></script>
 <script src="gameaudio.js"></script>
 <script src="audio-data.js"></script>
 <script src="ui.js"></script>

@@ -22,11 +22,11 @@ const LOCID=DD.LOCIDS;
 const regOfLoc=l=>l>>1;
 const humans=()=>G?G.pl.filter(p=>!p.ai).map(p=>p.seat):[];
 const isHuman=s=>!!G&&!G.pl[s].ai;
-const hotSeat=()=>UI.mode==='hot'||(UI.mode==='me'&&humans().length>1);
-function viewSeat(){if(!G)return -1;const hs=humans();if(!hs.length)return -1;if(hs.length===1)return hs[0];return UI.holder}
+const hotSeat=()=>!NET.on&&(UI.mode==='hot'||(UI.mode==='me'&&humans().length>1));
+function viewSeat(){if(!G)return -1;if(NET.on)return NET.mySeat;const hs=humans();if(!hs.length)return -1;if(hs.length===1)return hs[0];return UI.holder}
 const vs=viewSeat;
 const nameOf=s=>G.pl[s].name;
-const tname=s=>G.pl[s].ai?(G.pl[s].name):(hotSeat()||humans().length>1?G.pl[s].name:'You');
+const tname=s=>G.pl[s].ai?(G.pl[s].name):(NET.on?(s===vs()?'You':G.pl[s].name):hotSeat()||humans().length>1?G.pl[s].name:'You');
 const ordinal=n=>['first','second','third','fourth'][n]||n+'th';
 // ---------------------------------------------------------------- card specs for TBKit
 const ART={ruse:{nobility:'herald',clans:'ravens',uprising:'mob',gathering:'moonmoth'},trader:{_:'merchant'},
@@ -71,11 +71,12 @@ function cardDetail(id){const i=cinfo(id);const ar=ARCH_LBL[i.archetype]||'';con
 const EV={cur:null};
 function snapInf(){return G.pl.map(p=>p.inf)}
 function logSince(n){return G.log.filter(e=>e.i>n)}
+function pushEv(e){UI.evq.push(e);if(typeof netEvent==='function')netEvent(e)}
 function hookEngine(){const I=TB.internal;if(!I||!I.AG||I.__hooked)return;I.__hooked=1;const AG=I.AG,PK=I.PICKH;
   const wrap=(h,before,after)=>{const o=AG[h];if(!o)return;AG[h]=function(d){const mine=(()=>{const g=TB.internal.G;if(!G)G=g;return g===G})();try{mine&&before&&before(d)}catch(e){console.warn('hook',h,e.message)}const r=o.call(this,d);try{mine&&after&&after(d)}catch(e){console.warn('hook',h,e.message)}return r}};
-  const flush=()=>{if(EV.cur&&EV.cur.t==='clash'&&EV.cur.tot){const c=EV.cur;c.logs=logSince(c.log0).map(e=>e.t);c.inf1=snapInf();UI.evq.push(c)}EV.cur=null};
+  const flush=()=>{if(EV.cur&&EV.cur.t==='clash'&&EV.cur.tot){const c=EV.cur;c.logs=logSince(c.log0).map(e=>e.t);c.inf1=snapInf();pushEv(c)}EV.cur=null};
   wrap('roundStart',()=>{flush()},()=>{UI.rs0=snapInf();UI.rsLog=G.logN;UI.clashRes={};UI.placed=[]});
-  wrap('bidReveal',null,()=>{UI.evq.push({t:'bids',round:G.round,bids:G.pl.map(p=>({seat:p.seat,id:p.bid,str:G.bstr[p.seat]})).filter(b=>b.id!=null),order:G.order.slice()})});
+  wrap('bidReveal',null,()=>{pushEv({t:'bids',round:G.round,bids:G.pl.map(p=>({seat:p.seat,id:p.bid,str:G.bstr[p.seat]})).filter(b=>b.id!=null),order:G.order.slice()})});
   wrap('clashReveal',()=>{if(EV.cur&&EV.cur.tot)flush()},()=>{const c=G.clash;if(!c)return;if(!EV.cur)EV.cur={t:'clash',r:c.r,idx:G.cord.indexOf(c.r),rounds:0,log0:G.logN-c.parts.length,inf0:snapInf()};
     EV.cur.n=c.n;EV.cur.cards={};for(const s of c.parts)EV.cur.cards[s]=(c.cards[s]||[]).slice();EV.cur.supp={};for(const s of c.parts)EV.cur.supp[s]=G.pl[s].supp.r[c.r];EV.cur.parts=c.parts.slice();EV.cur.tot=null});
   wrap('clashTally',null,()=>{const c=G.clash;if(!c||!EV.cur)return;EV.cur.tot=Object.assign({},c.tot);EV.cur.winner=c.winner;EV.cur.tied=c.tied?c.tied.slice():null;
@@ -83,10 +84,10 @@ function hookEngine(){const I=TB.internal;if(!I||!I.AG||I.__hooked)return;I.__ho
     const ci=G.clash.cards;for(const s in ci)EV.cur.cardsF[s]=ci[s].slice();
     EV.cur.str={};for(const s in EV.cur.cardsF)EV.cur.str[s]=EV.cur.cardsF[s].map(id=>cinfo(id).strength)});
   wrap('regionDone',()=>{flush()});
-  wrap('cleanup',()=>{if(UI.rs0)UI.evq.push({t:'summary',round:G.round,rounds:G.rounds,inf0:UI.rs0,inf1:snapInf(),order:G.order.slice(),warns:logSince(UI.rsLog||0).filter(e=>e.c==='warn').map(e=>e.t),big:logSince(UI.rsLog||0).filter(e=>e.c==='big').map(e=>e.t).slice(-8),last:G.round>=G.rounds})});
+  wrap('cleanup',()=>{if(UI.rs0)pushEv({t:'summary',round:G.round,rounds:G.rounds,inf0:UI.rs0,inf1:snapInf(),order:G.order.slice(),warns:logSince(UI.rsLog||0).filter(e=>e.c==='warn').map(e=>e.t),big:logSince(UI.rsLog||0).filter(e=>e.c==='big').map(e=>e.t).slice(-8),last:G.round>=G.rounds})});
   if(PK&&PK.bidRes){const o=PK.bidRes;PK.bidRes=function(seat,opt,d){const r=o.call(this,seat,opt,d);try{UI.toast=G.log.length?G.log[G.log.length-1].t:''}catch(e){}return r}}}
 // ---------------------------------------------------------------- AI adapter (the engine author's TB.ai when present, else a modest fallback)
-function legal(seat){return TB.moves(G,seat)}
+function legal(seat){return TB.moves(G,seat)}  // on a client this runs on its own stripped copy (same list as the host's, net-strip-test.js)
 function aiLevel(seat){return G.pl[seat].ai||'normal'}
 function rndAI(){UI.aiSeed=(UI.aiSeed*1664525+1013904223)>>>0;return UI.aiSeed/4294967296}
 function pickR(a){return a[Math.floor(rndAI()*a.length)]}
@@ -108,7 +109,7 @@ function aiChoose(seat,level){const mv=legal(seat);if(!mv.length)return null;if(
   catch(e){console.warn('ai failed, fallback',e.message)}
   return fallbackPick(seat,mv)}
 // "recommended": what the Hard computer would play for the human, from the human's own information only
-function suggest(seat){if(!G||!G.q||!G.q.seats.includes(seat))return null;try{return aiChoose(seat,ANIM?'hard':'normal')}catch(e){return null}}
+function suggest(seat){if(!G||!G.q||!G.q.seats.includes(seat))return null;if(isClient()){const k=NET.rk;return k!=null?(legal(seat).find(m=>m.k===k)||null):null}try{return aiChoose(seat,ANIM?'hard':'normal')}catch(e){return null}}
 // ---------------------------------------------------------------- game start / save / load
 function mkSeats(cfg){const n=cfg.np,seats=[];const fac=FIDS.slice();
   const mine=cfg.faction&&fac.includes(cfg.faction)?cfg.faction:null;
@@ -131,7 +132,7 @@ function newGame(mode,o){o=o||{};mode=mode||'me';
   UI.rs0=snapInf();UI.rsLog=0;
   saveGame();hideStart();afterStart();return G}
 function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
-function saveGame(){try{if(!G||G.over||!UI.cfg)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,t:Date.now()}))}catch(e){}}
+function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,t:Date.now()}))}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem('tb_save');return s?JSON.parse(s):null}catch(e){return null}}
 function clearSave(){try{localStorage.removeItem('tb_save')}catch(e){}}
 function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI.holder=sv.holder||0;UI.guide=sv.guide||'full';UI.aiSeed=sv.ai||1;resetUI();UI.started=true;UI.rs0=snapInf();UI.rsLog=G.logN;return G}
@@ -147,6 +148,7 @@ function whoActs(){ // returns {ai:[seats], hum:[seats]}
   const ps=pendingSeats();return {ai:ps.filter(s=>G.pl[s].ai),hum:ps.filter(s=>!G.pl[s].ai)}}
 var _pumpT=0;
 function pump(){clearTimeout(_pumpT);_pumpT=0;if(!G||!UI.started)return;
+  if(NET.on)return netPump();
   if(UI.pumping)return;UI.pumping=true;
   try{
     for(let guard=0;guard<4000;guard++){
@@ -174,8 +176,8 @@ function pickHumanSeat(hum){
   const nxt=hum.includes(UI.holder)?UI.holder:hum[0];
   UI.passDelay=null;UI.card={kind:'pass',seat:nxt};UI.passed=null;return null}
 function afterHumanMove(){UI.passed=hotSeat()?UI.passed:null;pump()}
-function humanMove(k){const s=viewSeatForQ();if(s==null)return false;const mv=legal(s).find(m=>m.k===k);if(!mv)return false;
+function humanMove(k){if(NET.on)return netHumanMove(k);const s=viewSeatForQ();if(s==null)return false;const mv=legal(s).find(m=>m.k===k);if(!mv)return false;
   const ok=doMove(mv);if(ok){UI.sel={};UI.hand=null;closePop(true);if(hotSeat()){ // pass on once this seat has nothing more to decide
       const still=G.q&&G.q.seats.includes(s);if(!still)UI.passed=null}
     pump()}return ok}
-function viewSeatForQ(){if(!G||!G.q)return null;const hum=G.q.seats.filter(s=>!G.pl[s].ai);if(!hum.length)return null;if(!hotSeat())return hum[0];return hum.includes(UI.holder)&&UI.passed===UI.holder?UI.holder:null}
+function viewSeatForQ(){if(!G||!G.q)return null;if(NET.on){const m=NET.mySeat;return m>=0&&G.q.seats.includes(m)&&!G.pl[m].ai?m:null}const hum=G.q.seats.filter(s=>!G.pl[s].ai);if(!hum.length)return null;if(!hotSeat())return hum[0];return hum.includes(UI.holder)&&UI.passed===UI.holder?UI.holder:null}

@@ -46,11 +46,11 @@ function recapHTML(){const c=G.clash;if(!c)return '';const parts=c.parts,V=UI.V;
   const rows=parts.map(s=>{const ids=(c.cards[s]||[]);const tot=c.tot&&c.tot[s]!=null?c.tot[s]:null;
     return '<span class="rc-s" style="--fc:'+fcol(s)+'"><b>'+esc(shortName(s))+'</b> '+ids.map(id=>cinfo(id).strength).join('+')+(G.pl[s].supp.r[c.r]?' +'+G.pl[s].supp.r[c.r]+' supporter'+(G.pl[s].supp.r[c.r]>1?'s':''):'')+(tot!=null?' = <b>'+tot+'</b>':'')+'</span>'}).join('');
   return '<div class="recap" aria-label="Current clash"><span class="rc-t">Clash in '+esc(REG[c.r])+(c.n>1?' (round '+c.n+')':'')+'</span>'+rows+'</div>'}
-const shortName=s=>kf(s).short.replace('Gilded Court','Gilded').replace('Heathbound Clans','Heath').replace('Lantern Rising','Lantern').replace('Pale Choir','Choir')+(!G.pl[s].ai&&(humans().length===1)?' (you)':'');
+const shortName=s=>kf(s).short.replace('Gilded Court','Gilded').replace('Heathbound Clans','Heath').replace('Lantern Rising','Lantern').replace('Pale Choir','Choir')+(!G.pl[s].ai&&(NET.on?s===vs():humans().length===1)?' (you)':'');
 function waitingHTML(){const q=G.q;let who='';
-  if(q){const names=q.seats.map(s=>shortName(s));who=names.join(', ')+(q.seats.length>1?' are':' is')+' deciding'}
+  if(q){const names=q.seats.map(s=>shortName(s));who=NET.on?decidingLine():names.join(', ')+(q.seats.length>1?' are':' is')+' deciding'}
   const cur=G.log.slice(-3).map(e=>'<li>'+esc(e.t)+'</li>').join('');
-  return '<div class="wait"><p class="w-t">'+(UI.mode==='watch'?'Watching the computers play.':'Waiting for the others.')+' '+esc(who)+'.</p><ul class="w-log">'+cur+'</ul>'+(UI.mode==='watch'?watchControls():'')+'</div>'}
+  return '<div class="wait"><p class="w-t">'+(UI.mode==='watch'?'Watching the computers play.':NET.on&&vs()<0?'You are watching.':'Waiting for the others.')+' '+esc(who)+'.</p><ul class="w-log">'+cur+'</ul>'+(UI.mode==='watch'?watchControls():'')+'</div>'}
 function watchControls(){return '<div class="btnrow"><button class="btn" data-a="wpause" aria-pressed="'+UI.watchPaused+'">'+(UI.watchPaused?'Resume':'Pause')+'</button><button class="btn" data-a="wstep">Step</button><button class="btn" data-a="wspeed">Speed x'+UI.speed+'</button></div>'}
 function optBtn(m,cls,extra){const rec=recK()===m.k;return '<button class="opt'+(cls?' '+cls:'')+(rec?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+(extra||'')+'<span class="ot">'+esc(m.label)+'</span>'+(rec?'<span class="rtag">'+ico('star')+'Recommended</span>':'')+'</button>'}
 function thumbFor(m){if(m.id!=null&&m.id>=0&&m.t!=='sel')return '<span class="th"'+(ownerOf(m.id)===vs()?' data-owner="'+ownerOf(m.id)+'" data-up="1"':'')+'>'+cardEl(m.id,44).outerHTML+'</span>';
@@ -63,6 +63,7 @@ function renderMain(){const el=$('#main');if(!el)return;const q=G.q;
   let h='';const help=tipLine(q.kind);
   h+='<div class="step"><h3 class="st">'+esc(KIND_NAME[q.kind]||q.title.replace(/^[^:]*:\s*/,''))+'</h3>';
   h+='<p class="pr">'+esc(promptText(q))+'</p>';
+  if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Everyone decides at the same time. Still to choose: '+esc(oth.map(seatWho).join(', '))+'.</p>'}
   if(G.clash&&['day','night','tally'].includes(G.step)||G.clash&&q.kind==='location'||G.clash&&['castle','wilderness','harvest','shrine','ossuary','tie'].includes(q.kind))h+=recapHTML();
   const hl=[];
   switch(q.kind){
