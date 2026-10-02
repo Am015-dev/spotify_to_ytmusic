@@ -38,7 +38,8 @@ Files: `net.js` (page side), `src/netstrip.js` (new: what a seat may see), small
 | p2p `ui` | Esc, tap outside and X close the lobby; link is `#join-CODE` with a 5-letter code; Copy falls back to selecting the link; players list shows "Hosty (you) · host" / "Friend1"; no hot-seat button in a room |
 | phone (390x844, touch, `?phone=1`): `full` (2 games), `full2`, `leave`, `ui`, `hostleft` | same results as desktop, 0 errors, 0 leaks; layout check on every page: badge 44x44 beside the other bar buttons, not over the board, no tile covered, no page scroll, prompt still 112 px wide |
 | phone `touch` (client plays 6 moves by real taps: badge, lobby, X, tile, Place worker, Prepare/Pass) | 6 moves arrived at the host, lobby opened/closed, targets >= 44 px |
-| `click.js 0 14` (jsdom, offline, all modes incl. phone) and `lay-phone.js` after the hooks | see the final message |
+| `click.js 0 14` (jsdom, offline, 15 configs incl. hot-seat, solo, watch, phone) after the hooks | 15 games, 0 errors, 0 hidden-hand violations |
+| `lay-phone.js` (390x844, 844x390, 360x740, 740x360) after the hooks | 1 FAIL: `740x360 outside tap did not close` (the test taps the left edge of the top bar to close a pop-up). The same FAIL reproduces on the build from before the online work (git 5ea4860, 2 of 2 runs), so it is not caused by these hooks; everything else passes |
 | Screenshots 1366x768-ish (1100x760) and 390x844: `shots/net_desk_*.png`, `shots/net_ph_*.png` (lobby host/client, start screen in a room, client and host mid-game) | looked at: no overlap, no horizontal scroll |
 
 ## Known gaps
