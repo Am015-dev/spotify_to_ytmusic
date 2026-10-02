@@ -52,14 +52,45 @@ function init3D(){
   V3.boltL=new THREE.DirectionalLight(0xd8e4ff,0);sc.add(V3.boltL);sc.add(V3.boltL.target);
   V3.fire=new THREE.PointLight(0xff8a3d,0,16,1.7);sc.add(V3.fire);
   buildSky();buildSea();buildRain();
-  cv.addEventListener('pointerdown',e=>{V3.drag={x:e.clientX,y:e.clientY,a:V3.orbit.a,e:V3.orbit.e,moved:false}});
-  window.addEventListener('pointermove',e=>{const d=V3.drag;if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>5)d.moved=true;V3.orbit.a=d.a-dx*.006;V3.orbit.e=Math.max(.35,Math.min(1.35,d.e+dy*.004));placeCam()});
-  window.addEventListener('pointerup',e=>{const d=V3.drag;V3.drag=null;if(d&&!d.moved&&e.target===cv)onClick3D(e)});
-  cv.addEventListener('wheel',e=>{e.preventDefault();V3.orbit.d=Math.max(12,Math.min(48,V3.orbit.d+e.deltaY*.02));placeCam()},{passive:false});
+  // phone (V3.ph, set by the phone module): top-down view, one finger pans, two fingers pinch-zoom, a tap picks a tile
+  const PT=V3.pts=new Map();
+  cv.addEventListener('pointerdown',e=>{if(V3.ph){PT.set(e.pointerId,{x:e.clientX,y:e.clientY});try{cv.setPointerCapture(e.pointerId)}catch(_){}
+      if(PT.size===1)V3.drag={x:e.clientX,y:e.clientY,l:V3.look.clone(),moved:false};
+      else if(PT.size===2){const [a,b]=[...PT.values()];V3.pinch={d0:Math.hypot(a.x-b.x,a.y-b.y)||1,od:V3.orbit.d};V3.drag=V3.drag||{moved:true};V3.drag.moved=true}return}
+    V3.drag={x:e.clientX,y:e.clientY,a:V3.orbit.a,e:V3.orbit.e,moved:false}});
+  window.addEventListener('pointermove',e=>{if(V3.ph){const p=PT.get(e.pointerId);if(!p)return;p.x=e.clientX;p.y=e.clientY;
+      if(PT.size>=2&&V3.pinch){const [a,b]=[...PT.values()];phSetD(V3.pinch.od*V3.pinch.d0/Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)));return}
+      const d=V3.drag;if(!d||!d.l)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(!d.moved&&Math.abs(dx)+Math.abs(dy)<=8)return;d.moved=true;phPan(d.l,dx,dy);return}
+    const d=V3.drag;if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>5)d.moved=true;V3.orbit.a=d.a-dx*.006;V3.orbit.e=Math.max(.35,Math.min(1.35,d.e+dy*.004));placeCam()});
+  const up=e=>{if(V3.ph){if(!PT.has(e.pointerId))return;PT.delete(e.pointerId);if(PT.size<2)V3.pinch=null;
+      if(PT.size===1){const [r]=[...PT.values()];V3.drag={x:r.x,y:r.y,l:V3.look.clone(),moved:true};return}
+      const d=V3.drag;V3.drag=null;if(e.type==='pointerup'&&d&&!d.moved&&(e.target===cv||cv.hasPointerCapture&&0))onClick3D(e);return}
+    const d=V3.drag;V3.drag=null;if(d&&!d.moved&&e.target===cv)onClick3D(e)};
+  window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+  cv.addEventListener('wheel',e=>{e.preventDefault();if(V3.ph){phSetD(V3.orbit.d*(1+e.deltaY*.0015));return}V3.orbit.d=Math.max(12,Math.min(48,V3.orbit.d+e.deltaY*.02));placeCam()},{passive:false});
   cv.addEventListener('pointermove',e=>{V3.hover=pickTile(e)});cv.addEventListener('pointerleave',()=>{V3.hover=null});
   V3.on=true;applyQ(V3.pref==='auto'?gfxAuto():V3.pref);placeCam();
   new ResizeObserver(resize3D).observe(cv.parentElement);resize3D();
   document.body.classList.add('three');V3.clock=new THREE.Clock();perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
+// ---------- phone camera: the whole island fills the board; drag pans, pinch / +/- zoom, "camp" centres on the camp ----------
+function phIslandPts(){const o=[];for(const t of MAP){const p=hexPos(t.q,t.r);for(let i=0;i<6;i++){const a=i/6*Math.PI*2;o.push([p.x+Math.sin(a)*HR0*1.02,p.z+Math.cos(a)*HR0*1.02])}}return o}
+function phBox(pts){const v=new THREE.Vector3();V3.cam.updateMatrixWorld();V3.cam.updateProjectionMatrix();let x0=9,x1=-9,y0=9,y1=-9;for(const q of pts){v.set(q[0],HEXH,q[1]).project(V3.cam);x0=Math.min(x0,v.x);x1=Math.max(x1,v.x);y0=Math.min(y0,v.y);y1=Math.max(y1,v.y)}return {x0,x1,y0,y1}}
+function phFit(){if(!V3.cam||!V3.rad||!V3.center||!V3.r)return;const FILL=V3.phFill||.97;V3.orbit.e=V3.phE||1.4;V3.orbit.a=0;const pts=phIslandPts();const o=V3.orbit;V3.look.copy(V3.center);
+  const ext=()=>{placeCam();const b=phBox(pts);return {b,w:(b.x1-b.x0)/2,h:(b.y1-b.y0)/2}};
+  for(let it=0;it<3;it++){let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h)>FILL)lo=mid;else hi=mid}o.d=hi;const e=ext();const cx=(e.b.x0+e.b.x1)/2,cy=(e.b.y0+e.b.y1)/2;
+    const hh=Math.tan(V3.cam.fov*Math.PI/360)*o.d,hw=hh*V3.cam.aspect;const a=o.a;V3.look.x+=Math.cos(a)*cx*hw+(-Math.sin(a))*cy*hh/Math.sin(o.e);V3.look.z+=(-Math.sin(a))*cx*hw+(-Math.cos(a))*cy*hh/Math.sin(o.e)}
+  let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h)>FILL)lo=mid;else hi=mid}o.d=hi;placeCam();
+  V3.phFitL=V3.look.clone();V3.phFitD=o.d;V3.phL=V3.look.clone();V3.phD=o.d;V3.phMin=o.d*.38;V3.phMax=o.d*1.12;V3.d0=o.d;V3.phMode='fit'}
+function phSetD(d){V3.phD=Math.max(V3.phMin||8,Math.min(V3.phMax||80,d));V3.orbit.d=V3.phD;placeCam()}
+function phPan(l0,dx,dy){const cv=V3.r.domElement,o=V3.orbit;const s=2*Math.tan(V3.cam.fov*Math.PI/360)*o.d/Math.max(1,cv.clientHeight);const a=o.a;
+  const rx=Math.cos(a),rz=-Math.sin(a),fx=-Math.sin(a),fz=-Math.cos(a),k=s/Math.sin(o.e);
+  let x=l0.x-rx*dx*s+fx*dy*k,z=l0.z-rz*dx*s+fz*dy*k;const c=V3.center,R=V3.rad*.95;const ox=x-c.x,oz=z-c.z,L=Math.hypot(ox,oz);if(L>R){x=c.x+ox/L*R;z=c.z+oz/L*R}
+  V3.look.set(x,V3.look.y,z);V3.phL=V3.look.clone();V3.phMode='free';placeCam()}
+// view buttons: 'fit' the whole island, 'camp' zoomed on the camp, 'in' / 'out'
+function phView(m){if(!V3.ph||!V3.phFitL)return;
+  if(m==='fit'){V3.phL=V3.phFitL.clone();V3.phD=V3.phFitD;V3.phMode='fit'}
+  else if(m==='camp'){const t=MAP[G.camp.pos];const p=hexPos(t.q,t.r);V3.phL=new THREE.Vector3(p.x,0,p.z);V3.phD=V3.phFitD*.55;V3.phMode='camp'}
+  else if(m==='in'){V3.phD=Math.max(V3.phMin,V3.phD*.75);V3.phMode='free'}else if(m==='out'){V3.phD=Math.min(V3.phMax,V3.phD/.75);V3.phMode='free'}}
 function placeCam(){if(!V3.cam)return;const o=V3.orbit;V3.cam.position.set(V3.look.x+Math.sin(o.a)*Math.cos(o.e)*o.d,V3.look.y+Math.sin(o.e)*o.d,V3.look.z+Math.cos(o.a)*Math.cos(o.e)*o.d);V3.cam.lookAt(V3.look);
   // the key light comes low from the west; its shadow box hugs the island
   const c=V3.center||V3.look,e=(V3.rad||10)+3;const s=V3.sun;s.target.position.copy(c);Object.assign(s.shadow.camera,{left:-e,right:e,top:e,bottom:-e,near:2,far:90});s.shadow.camera.updateProjectionMatrix();
@@ -68,7 +99,7 @@ function placeCam(){if(!V3.cam)return;const o=V3.orbit;V3.cam.position.set(V3.lo
 function resize3D(){if(!V3.r)return;const el=V3.r.domElement.parentElement;const w=Math.max(50,el.clientWidth),h=Math.max(50,el.clientHeight);V3.r.setSize(w,h,false);V3.r.domElement.style.width=w+'px';V3.r.domElement.style.height=h+'px';V3.cam.aspect=w/h;V3.cam.fov=w/h<1?50:40;V3.cam.updateProjectionMatrix();
   if(V3.post||V3.lt){const v=V3.r.getDrawingBufferSize(new THREE.Vector2());if(V3.post)V3.post.setSize(v.x,v.y);if(V3.lt)V3.lt.setSize(v.x,v.y)}fitDist()}
 // distance that fits the whole island for this aspect ratio
-function fitDist(){if(!V3.rad)return;const a=V3.cam.aspect;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);const need=V3.rad*1.12;const d=Math.max(need/Math.tan(vf/2)*.78,need/Math.tan(hf/2))+4;V3.d0=Math.max(14,d);if(V3.focus==null){V3.orbit.d=V3.d0;placeCam()}}
+function fitDist(){if(!V3.rad)return;if(V3.ph){phFit();return}const a=V3.cam.aspect;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);const need=V3.rad*1.12;const d=Math.max(need/Math.tan(vf/2)*.78,need/Math.tan(hf/2))+4;V3.d0=Math.max(14,d);if(V3.focus==null){V3.orbit.d=V3.d0;placeCam()}}
 // ---------- small helpers ----------
 // Low builds a lighter scene (V3.lite): the same shapes with fewer segments, cached under their own keys.
 // At phone size SwiftShader spent ~80% of a Low frame on vertices (119k triangles), not on pixels.
@@ -485,18 +516,19 @@ function sync3D(){if(!V3.on||!G)return;if(PH)PH.wake();const sc=V3.scene;if(!V3.
   V3.weather.rain=Math.min(1,(w.rain||0)/2);V3.weather.snow=Math.min(1,(w.snow||0)/2);V3.weather.storm=Math.min(1,(w.rain||0)*.25+(w.snow||0)*.25+(w.storm?0.5:0));V3.night=G.phase==='night'||G.over&&!G.over.win?1:0;
   V3.pickable=UI.pick||null;syncLabels()}
 function fitIsland(){let m=0,cx=0,cz=0;const ts=MAP;for(const t of ts){const p=hexPos(t.q,t.r);cx+=p.x/ts.length;cz+=p.z/ts.length}for(const t of ts){const p=hexPos(t.q,t.r);m=Math.max(m,Math.hypot(p.x-cx,p.z-cz))}
-  const rad=m+HEXR*1.6;buildIsland(cx,cz,rad);buildMist();V3.look.set(cx,0,cz+.6);V3.center=V3.look.clone();V3.rad=rad;V3.orbit.d=Math.max(20,rad*2.2);V3.d0=V3.orbit.d;fitDist();V3.orbit.e=1.12;placeCam()}
+  const rad=m+HEXR*1.6;buildIsland(cx,cz,rad);buildMist();V3.look.set(cx,0,cz+.6);V3.center=V3.look.clone();V3.rad=rad;V3.orbit.d=Math.max(20,rad*2.2);V3.d0=V3.orbit.d;fitDist();if(!V3.ph)V3.orbit.e=1.12;placeCam()}
 // ---------- floating labels over every tile you can read or act on ----------
 const TICON={beach:'🏖️',river:'🏞️',plains:'🌾',hills:'⛰️',mountains:'🏔️'};const SICON={wood:'🪵',fish:'🐟',parrot:'🦜'};
-function syncLabels(){const box=document.getElementById('labels');if(!box)return;V3.lab=V3.lab||{};
+function syncLabels(){const box=document.getElementById('labels');if(!box)return;V3.lab=V3.lab||{};const PHN=!!V3.ph;
   for(const m of G.map){const t=tileAt(m.id);let h='';const reach=!t&&!m.down&&MAP[m.id].adj.some(p=>tileAt(p));
-    if(t){const cr=G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id);h=`<b><s class="pn">${m.id+1}</s>${TICON[t.terr]||''} ${t.terr}</b><i>${t.src.map((s,i)=>`<u class="${m.exh[i]?'gone':''}">${SICON[s]||s}</u>`).join('')}</i>${m.id===G.camp.pos?'<em class="camp">🏕️ camp</em>':''}${t.shelter?'<em>⛰ cave</em>':''}${m.fog?'<em>🌫 fog</em>':''}${cr?'<em>✝️</em>':''}${m.waste?'<em>barren</em>':''}`}
+    if(PHN){h=(t||reach)?`<b><s class="pn">${m.id+1}</s></b>`:''}
+    else if(t){const cr=G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id);h=`<b><s class="pn">${m.id+1}</s>${TICON[t.terr]||''} ${t.terr}</b><i>${t.src.map((s,i)=>`<u class="${m.exh[i]?'gone':''}">${SICON[s]||s}</u>`).join('')}</i>${m.id===G.camp.pos?'<em class="camp">🏕️ camp</em>':''}${t.shelter?'<em>⛰ cave</em>':''}${m.fog?'<em>🌫 fog</em>':''}${cr?'<em>✝️</em>':''}${m.waste?'<em>barren</em>':''}`}
     else if(reach)h=`<b class="unk">❔${m.id+1} explore</b>${m.fog?'<em>🌫</em>':''}`;
     let el=V3.lab[m.id];if(!h){if(el)el.hidden=true;continue}
     if(!el){el=V3.lab[m.id]=document.createElement('button');el.className='tl';el.dataset.tile=m.id;box.appendChild(el)}
     el.hidden=false;if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h}el.classList.toggle('sel',UI.tileSel===m.id);el.classList.toggle('pulse',UI.hoverPos===m.id);el.setAttribute('aria-label',`Place ${m.id+1}: ${t?t.terr:'unexplored'}`);el.classList.toggle('far',!t)}}
 function placeLabels(){if(!V3.lab)return;const cv=V3.r.domElement;const w=cv.clientWidth,h=cv.clientHeight;const v=new THREE.Vector3();
-  for(const id in V3.lab){const el=V3.lab[id];if(el.hidden)continue;const p=hexPos(MAP[id].q,MAP[id].r);v.set(p.x,HEXH+.2,p.z+HEXR*.55).project(V3.cam);
+  for(const id in V3.lab){const el=V3.lab[id];if(el.hidden)continue;const p=hexPos(MAP[id].q,MAP[id].r);(V3.ph?v.set(p.x-1.0,HEXH+.2,p.z-1.0):v.set(p.x,HEXH+.2,p.z+HEXR*.55)).project(V3.cam);
     if(v.z>1){el.style.opacity=0;continue}el.style.opacity='';const tr=`translate(${((v.x+1)/2*w).toFixed(1)}px,${((1-v.y)/2*h).toFixed(1)}px) translate(-50%,-50%)`;if(el._tr!==tr){el._tr=tr;el.style.transform=tr}}}
 function tween(obj,k,to,dur,done){V3.tweens.push({obj,k,from:obj[k],to,t:0,dur,done})}
 // a little dust puff where a tile lands or a pawn arrives
@@ -521,7 +553,8 @@ function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);
   for(const f of V3.fx){f.t+=dt;const k=f.t/f.life;f.s.position.addScaledVector(f.v,dt);f.v.multiplyScalar(Math.pow(.1,dt));f.s.scale.setScalar(.2+k*f.g);f.s.material.opacity=f.a*Math.sin(Math.min(1,k)*Math.PI);if(k>=1){V3.scene.remove(f.s);f.s.material.dispose()}}V3.fx=V3.fx.filter(f=>f.t<f.life);
   let camMv=false;
   // camera glides to the scene being told, and back to the whole island for planning
-  if(V3.center&&!V3.drag){const f=V3.focus!=null&&MAP[V3.focus]?hexPos(MAP[V3.focus].q,MAP[V3.focus].r).add(new THREE.Vector3(0,0,1.2)):V3.center;const k=Math.min(1,dtR*2);if(V3.look.distanceTo(f)>.02||Math.abs(V3.orbit.d-(V3.focus!=null?V3.d0*.72:V3.d0))>.05){camMv=true;V3.look.lerp(f,k);V3.orbit.d+=((V3.focus!=null?V3.d0*.72:V3.d0)-V3.orbit.d)*k;placeCam()}}
+  if(V3.ph&&V3.phL&&!V3.drag){const k=Math.min(1,dtR*3);if(V3.look.distanceTo(V3.phL)>.01||Math.abs(V3.orbit.d-V3.phD)>.02){camMv=true;V3.look.lerp(V3.phL,k);V3.orbit.d+=(V3.phD-V3.orbit.d)*k;placeCam()}}
+  else if(!V3.ph&&V3.center&&!V3.drag){const f=V3.focus!=null&&MAP[V3.focus]?hexPos(MAP[V3.focus].q,MAP[V3.focus].r).add(new THREE.Vector3(0,0,1.2)):V3.center;const k=Math.min(1,dtR*2);if(V3.look.distanceTo(f)>.02||Math.abs(V3.orbit.d-(V3.focus!=null?V3.d0*.72:V3.d0))>.05){camMv=true;V3.look.lerp(f,k);V3.orbit.d+=((V3.focus!=null?V3.d0*.72:V3.d0)-V3.orbit.d)*k;placeCam()}}
   placeLabels();
   // pawns walk to their spots on little hops, and land with a puff
   let pi=0,walk=false;for(const k in V3.pawns){const o=V3.pawns[k];pi++;const to=o.userData.to;if(to){const dx=to.x-o.position.x,dz=to.z-o.position.z,dist=Math.hypot(dx,dz);const mv=dist>.06;if(mv){walk=true;const st=Math.min(dist,dt*Math.max(1.6,dist*2.2));o.position.x+=dx/dist*st;o.position.z+=dz/dist*st;o.rotation.y=Math.atan2(dx,dz);o.userData.w=true}
@@ -555,4 +588,4 @@ function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);
   draw()}
 function pickTile(e){const rc=V3.r.domElement.getBoundingClientRect();const m=new THREE.Vector2(((e.clientX-rc.left)/rc.width)*2-1,-((e.clientY-rc.top)/rc.height)*2+1);const ray=new THREE.Raycaster();ray.setFromCamera(m,V3.cam);
   const hits=ray.intersectObjects(Object.values(V3.tiles).map(o=>o.g),true);if(!hits.length)return null;for(const h of hits){let o=h.object;while(o&&o.userData.id===undefined)o=o.parent;if(o)return o.userData.id}return null}
-function onClick3D(e){const id=pickTile(e);if(id==null)return;if(typeof on3DTile==='function')on3DTile(id)}
+function onClick3D(e){const id=pickTile(e);if(id==null){if(typeof PHO!=='undefined'&&PHO.on)PHO.tile(null);return}if(typeof on3DTile==='function')on3DTile(id)}

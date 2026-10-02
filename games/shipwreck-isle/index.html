@@ -416,6 +416,151 @@ em.sure,em.roll{font-style:normal;font-size:.75rem;padding:0 6px;border-radius:9
 .netwait{margin:6px 0;padding:8px 10px;border-radius:10px;background:rgba(242,179,90,.16);border:1px dashed rgba(184,122,42,.6);font-size:.95rem}
 .netturn{flex-basis:100%;margin:2px 0 0}
 @media (max-width:560px){.netst{max-width:28px;margin-left:4px;padding:3px 6px;text-overflow:clip}.netbar li{font-size:.84rem}}
+
+/* ===== phone (html.ph): the island first; a slim icon bar + one status chip; pop-ups and ONE card at a time in the free zone under (portrait) / beside (landscape) the island ===== */
+html.ph .gx-app{padding:var(--sat,0px) var(--sar,0px) 0 var(--sal,0px)}
+html.ph .gx-main{display:contents}
+html.ph.ph-p .gx-app{grid-template-columns:minmax(0,1fr);grid-template-rows:44px var(--bh) auto minmax(0,1fr)}
+html.ph.ph-l .gx-app{grid-template-columns:var(--bw) minmax(0,1fr);grid-template-rows:44px auto minmax(0,1fr)}
+html.ph .gx-bar{grid-row:1;height:44px;min-height:44px;padding:0 4px;gap:4px;overflow:visible;align-items:center;border-bottom:1px solid var(--line)}
+html.ph .gx-bar h1,html.ph .gx-bar .gx-sp{display:none}
+html.ph .gx-bar .gx-ibtn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;flex:0 0 auto;border-radius:10px}
+html.ph .gx-bar .gx-ibtn span{display:none}
+html.ph .gx-bar .gx-ibtn svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+html.ph.ph-p .gx-bar [data-gx="campd"]{display:none}
+html.ph.ph-p .gx-board{grid-row:2;grid-column:1}
+html.ph.ph-p #phview{grid-row:3;grid-column:1}
+html.ph.ph-p .gx-dock{grid-row:4;grid-column:1}
+html.ph.ph-l .gx-board{grid-column:1;grid-row:1/4}
+html.ph.ph-l .gx-bar{grid-column:2}
+html.ph.ph-l #phview{grid-row:2;grid-column:2}
+html.ph.ph-l .gx-dock{grid-row:3;grid-column:2;border-left:1px solid #b99f67}
+/* more menu: a drop-down on phones in both orientations */
+html.ph .menub{display:inline-flex!important}
+html.ph .more{display:none;position:fixed;right:calc(var(--sar,0px) + 6px);top:calc(var(--sat,0px) + 46px);z-index:45;flex-direction:column;align-items:stretch;gap:4px;padding:8px;border-radius:12px;background:#101c27;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.5);max-height:calc(100dvh - var(--sat,0px) - 52px);overflow:auto}
+html.ph .more.open{display:flex}
+html.ph .more .gx-ibtn{width:auto!important;min-width:44px;padding:0 12px!important;justify-content:flex-start;font-size:15px}
+html.ph .more .gx-ibtn span{display:inline!important}
+/* status chip */
+#phchip{display:none}
+html.ph #phchip:not([hidden]){display:inline-flex;flex:1 1 auto;min-width:0;width:auto!important;justify-content:flex-start;gap:9px;padding:0 10px!important;font:700 15px/1 var(--sans);white-space:nowrap;overflow:hidden}
+html.ph #phchip i{font-style:normal}html.ph #phchip b{color:var(--amber2)}html.ph #phchip .bad{color:#ff9b8f}html.ph #phchip.warn{border-color:#e0625c}
+html.ph #phchip[aria-expanded]{}
+html.ph .gx-bar #phchip{order:-1}
+#phview{display:none}
+html.ph #phview:not([hidden]){display:flex;align-items:center;gap:4px;padding:0 4px;min-height:44px;background:#0b1620;border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--ink)}
+html.ph #phview #phlabel{flex:1;min-width:0;padding:0 8px;font:600 14px/1.2 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph.ph-l #phview #phlabel{display:none}
+html.ph #phview .gx-ibtn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;flex:0 0 auto;border-color:var(--line);background:var(--slate);color:var(--ink)}
+html.ph #phview .gx-ibtn svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
+html.ph #phview .gx-ibtn[aria-pressed="true"]{background:var(--amber);color:#2b1a05}
+html.ph #phview #phchip{flex:1 1 auto}
+/* the island: no floating labels; small place numbers; a tile tap opens a pop-up */
+html.ph #chip{display:none}
+html.ph #labels .tl{pointer-events:none;padding:0;border:0;background:none;box-shadow:none;min-width:0;opacity:.95}
+html.ph #labels .tl::after{display:none}
+html.ph #labels .tl b{font-size:0;display:block}
+html.ph #labels .tl .pn{font:700 13px/20px var(--sans);min-width:20px;height:20px;padding:0 3px;margin:0;border-radius:50%;text-align:center;background:rgba(20,14,6,.78);color:#fff4d8;box-shadow:0 0 0 1px rgba(255,220,160,.5)}
+html.ph #labels .tl.far .pn{background:rgba(10,18,28,.75);color:#ffe7b8}
+html.ph #labels .tl.sel .pn,html.ph #labels .tl.pulse .pn{background:var(--amber);color:#2b1a05;transform:scale(1.35)}
+html.ph #c3{touch-action:none}
+/* the free zone */
+html.ph .gx-dock{display:flex;flex-direction:column;position:relative;min-height:0;height:auto!important;max-height:none!important;border:0;border-radius:0;box-shadow:none;visibility:visible!important;padding-bottom:var(--sab,0px);font-size:15px}
+html.ph .gx-app:not(.gx-dock-min) .gx-dock,html.ph .gx-app.gx-sheet-full:not(.gx-dock-min) .gx-dock{height:auto!important}
+html.ph.ph-l .gx-dock{border-top:0}
+html.ph .gx-dock-head,html.ph #roadmap,html.ph #hud{display:none!important}
+html.ph .gx-dock-body{display:block!important;flex:1 1 auto;min-height:0;overflow:auto;padding:8px 10px;order:2}
+html.ph .gx-dock[data-phs="plan2"] .gx-dock-body{display:none!important}
+html.ph #dockmsg{order:1;margin:6px 8px 0;font-size:14px;max-height:5.5em}
+html.ph #step{order:4;padding:6px 8px;padding-bottom:6px;flex:0 0 auto}
+html.ph #step .st-t{font-size:14px;line-height:1.25;max-height:3.8em;overflow:hidden}
+html.ph #step .st-b{display:flex;flex-wrap:wrap;gap:6px}
+html.ph #step .st-b .btn{flex:1 1 auto;min-height:44px;padding:0 10px}
+html.ph #step .st-b .btn.go{flex:2 1 120px}
+html.ph .gx-dock .btn,html.ph .gx-dock .chip,html.ph .gx-dock .cat,html.ph .gx-dock .pw,html.ph .gx-dock summary,html.ph .gx-dock .scene button,html.ph #modal.phcard .btn{min-height:44px}
+html.ph .gx-dock .btn.xs,html.ph .gx-dock .btn.sm{min-height:44px;font-size:14px;padding:0 12px}
+html.ph .gx-dock .btn.add,html.ph .zc .btn.add{width:44px;height:44px;flex:0 0 auto}
+html.ph .gx-dock .chip{font-size:14px;padding:0 12px 0 6px}html.ph .gx-dock .chip.placed{font-size:14px;min-height:44px}
+html.ph .gx-dock .chk{min-height:44px;display:flex;align-items:center;gap:8px;font-size:14px}html.ph .gx-dock .chk input,html.ph .gx-dock input[type=checkbox]{width:26px;height:26px;flex:0 0 auto}
+html.ph .gx-dock .wz-steps{display:none}
+html.ph .gx-dock small,html.ph .gx-dock .rs,html.ph .gx-dock .jt span{font-size:13px}
+/* the one card: story scenes. Continue stays in view. */
+html.ph #story{margin:0;border-radius:12px;max-height:none}
+html.ph #story .scene{padding:10px 12px 0}
+html.ph #story .phead p,html.ph #story .phead .qk{display:none}
+html.ph #story .phead{padding:4px 10px;margin:0 0 6px}
+html.ph #story .scene h2{font-size:1.3rem}
+html.ph #story .story{font-size:1rem;line-height:1.4}
+html.ph #story .sctl{position:sticky;bottom:-8px;margin:8px -12px 0;padding:8px 12px calc(8px);background:#f1e4c0;border-top:1px solid rgba(90,67,32,.25);z-index:2}
+html.ph #story .sctl .btn{flex:1 1 auto;min-height:44px}html.ph #story .sctl .btn.go{flex:2 1 150px}
+html.ph #story .opts .btn.opt{min-height:48px;font-size:15px}
+html.ph #story .prog{display:none}
+/* plan step 2: the strip */
+#ps{display:none}
+html.ph .gx-dock[data-phs="plan2"] #ps:not([hidden]){display:block;order:2;flex:1 1 auto;min-height:0;overflow:auto;padding:8px 10px;overscroll-behavior:contain}
+html.ph #ps .ps-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}html.ph #ps .ps-h b{font:1.1rem var(--title)}html.ph #ps .ps-h span{font-size:13px;color:#5b4a2c}
+html.ph #ps .pawnrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:6px;margin:0 0 8px}
+html.ph #ps .pw,html.ph #ppop .pw{min-height:48px;padding:4px 8px;border-radius:10px}html.ph .pw span{font-size:14px}html.ph .pw small{font-size:13px;max-width:none}
+html.ph #ps .pw i,html.ph #ppop .pw i{width:20px;height:20px}
+html.ph #ps .ps-go{width:100%;font-size:16px}html.ph #ps .ps-hint{margin:4px 0 8px;font-size:14px;color:#5b4a2c}
+html.ph #ps .ps-t{font:1rem var(--title);margin:8px 0 4px;color:#5a4320}
+html.ph #ps .pl{grid-template-columns:28px minmax(0,1fr)}
+/* pop-ups */
+#ppop{display:none}
+html.ph #ppop:not([hidden]){display:flex;flex-direction:column;position:absolute;inset:0;z-index:8;background:linear-gradient(var(--paper),var(--paper2));color:#2a2014;animation:pageIn .2s ease-out}
+html.ph #ppop .pp-h{display:flex;align-items:center;gap:6px;padding:0 4px 0 12px;min-height:48px;border-bottom:1px solid rgba(90,67,32,.3);flex:0 0 auto;background:#2a2014;color:#fff4d8}
+html.ph #ppop .pp-h b{flex:1;min-width:0;font:1.05rem var(--title);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html.ph #ppop .gx-ibtn.pp-x{width:44px;height:44px;font-size:1.7rem;background:transparent;border:0;color:#fff4d8}
+html.ph #ppop .pp-b{flex:1 1 auto;min-height:0;overflow:auto;padding:8px 10px 12px;overscroll-behavior:contain}
+html.ph #ppop .ti{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:#fff6dc;border:1px solid #d9b46a}html.ph #ppop .ti p{margin:3px 0 0;font-size:14px}
+html.ph #ppop .tp-for{margin:6px 0;font-size:14px}
+html.ph #ppop .job{padding:8px 4px}html.ph #ppop .job .jt b{font-size:15px}html.ph #ppop .job.rec1{background:#fff1cf;border-radius:10px;outline:2px solid #d98a1e}
+html.ph #ppop .star{text-decoration:none;font:700 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:#fff;background:#d98a1e;border-radius:6px;padding:1px 6px;margin-right:4px}
+html.ph #ppop .cats{grid-template-columns:repeat(3,minmax(0,1fr))}html.ph #ppop .cat{min-height:56px;font-size:13px}html.ph #ppop .cat small{font-size:12px}
+html.ph #ppop .rec .rb{display:grid;gap:6px;margin-top:6px}html.ph #ppop .rec .rb .btn{width:100%;white-space:normal}
+html.ph #ppop .qpick .btn{min-height:44px}
+html.ph #ppop #hud{display:grid!important;background:#2a2014;color:#f4ecd8;border-radius:10px;padding:8px 10px;margin:0 0 10px}
+html.ph #ppop #hud .hud-l,html.ph #ppop #hud .hud-r{display:grid!important;gap:6px}html.ph #ppop #hud .goal{display:block!important;font-size:14px;margin-top:6px}
+html.ph #ppop #hud .rtrack,html.ph #ppop #hud .fc,html.ph #ppop #hud .rleg,html.ph #ppop #hud .phases{display:flex!important}html.ph #ppop #hud .phases{flex-wrap:wrap;gap:4px}
+html.ph #ppop #hud .hk{font-size:15px}html.ph #ppop #hud .hk em{font-size:12px}html.ph #ppop #hud .rleg,html.ph #ppop #hud .lf small{font-size:13px}
+html.ph #ppop .pp-camp{margin-top:8px}html.ph #ppop .pp-camp .btn{width:100%}
+/* enlarged card */
+#pzoom{display:none}
+html.ph #pzoom:not([hidden]){display:flex;position:fixed;inset:0;z-index:60;background:rgba(3,8,12,.7);align-items:center;justify-content:center;padding:calc(var(--sat,0px) + 12px) calc(var(--sar,0px) + 12px) calc(var(--sab,0px) + 12px) calc(var(--sal,0px) + 12px)}
+html.ph #pzoom .zc{position:relative;width:min(100%,520px);max-height:100%;overflow:auto;border-radius:16px;padding:18px 16px 16px;background:linear-gradient(#f8eed4,#ead9ae);border:2px solid #b99f67;color:#2a2014;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+html.ph #pzoom .gx-ibtn.zc-x{position:absolute;right:4px;top:4px;width:44px;height:44px;font-size:1.7rem;background:transparent;border:0;color:#5a4320;min-width:44px}
+html.ph #pzoom .zc-b{display:flex;flex-direction:column;gap:10px;padding-right:36px;font-size:16px;line-height:1.4}
+html.ph #pzoom .zc-b .jt b,html.ph #pzoom .zc-b .rn,html.ph #pzoom .zc-b h4{font:1.35rem/1.15 var(--title);display:block}
+html.ph #pzoom .zc-b .jt span,html.ph #pzoom .zc-b .rs,html.ph #pzoom .zc-b p{font-size:16px;color:#3b2d17}
+html.ph #pzoom .zc-b .job,html.ph #pzoom .zc-b .row{display:flex;flex-direction:column;align-items:stretch;gap:12px;border:0;background:none}
+html.ph #pzoom .zc-b .btn{width:100%;min-height:48px;font-size:16px;border-radius:12px}html.ph #pzoom .zc-b .btn.add{width:100%;height:48px;border-radius:12px}
+html.ph #pzoom .zc-b .tag{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#8a6a2a}
+/* game over: a card in the free zone */
+html.ph #modal.phcard{inset:auto;left:var(--dz-l);top:var(--dz-t);width:var(--dz-w);height:var(--dz-h);padding:0;display:block;background:linear-gradient(var(--paper),var(--paper2));backdrop-filter:none;overflow:auto;z-index:12}
+html.ph #modal.phcard .mbox{max-width:none;max-height:none;border:0;border-radius:0;box-shadow:none;animation:none;padding:12px 14px calc(12px + var(--sab,0px));background:none}
+html.ph #modal.phcard .mb{display:grid;gap:6px}html.ph #modal.phcard .mb .btn{width:100%;min-height:48px}
+/* the other modals (setup, lobby) and drawers fit the phone */
+html.ph #modal:not(.phcard){padding:calc(var(--sat,0px) + 6px) calc(var(--sar,0px) + 6px) calc(var(--sab,0px) + 6px) calc(var(--sal,0px) + 6px)}
+html.ph #modal:not(.phcard) .mbox{max-height:calc(100dvh - var(--sat,0px) - var(--sab,0px) - 12px);padding:14px 12px}
+html.ph #modal .btn,html.ph #modal button.scen,html.ph #modal .cp,html.ph #modal .dpick,html.ph #modal .ctl2 button{min-height:44px}
+html.ph .gx-drawer{height:min(88dvh,calc(100dvh - var(--sat,0px) - 8px));max-height:none;padding-bottom:var(--sab,0px)}
+html.ph.ph-l .gx-drawer{left:auto;right:0;top:calc(var(--sat,0px));bottom:0;height:auto;width:min(560px,calc(100vw - var(--sal,0px) - 60px));transform:translateX(105%);border-radius:var(--gx-radius) 0 0 var(--gx-radius)}
+html.ph.ph-l .gx-drawer.on{transform:none}
+html.ph .gx-drawer .gx-x{width:44px;height:44px}
+html.ph .gx-drawer .btn,html.ph .gx-drawer .ctabs button,html.ph .gx-drawer summary{min-height:44px}
+html.ph .gx-drawer .row{min-height:44px}
+html.ph #cardsbody .card{cursor:pointer}
+html.ph .gfxpop button{min-height:44px}
+html.ph.ph-l #phchip:not([hidden]){gap:7px;padding:0 8px!important;font-size:14px}html.ph.ph-l #phchip .c-x{display:none}
+html.ph #modal summary{min-height:44px;display:flex;align-items:center}html.ph #modal input:not([type=checkbox]),html.ph #modal select{min-height:44px;font-size:16px}html.ph #modal .chk{min-height:44px;display:flex;align-items:center;gap:8px}html.ph #modal input[type=checkbox]{width:26px;height:26px}
+html.ph .gx-drawer input:not([type=checkbox]){min-height:44px;font-size:16px}
+html.ph #ppop .pp-camp .btn{background:#fffaf0;color:#2a2014;border-color:#b99f67}
+html.ph #modal.phcard .mb{position:sticky;bottom:0;padding:8px 0 4px;background:#ecdcb4;margin:8px 0 0}
+html.ph .gx-dock[data-phs="plan2"] #step .st-t{display:none}
+html.ph #ps .ps-hint{margin:2px 0 8px}
+html.ph.ph-l #step .st-t{display:none}
+html.ph #story .sctl .btn.go{flex:1 1 100%}html.ph #story .sctl .btn.ghost{flex:1 1 40%;padding:0 6px;font-size:14px}
+html.ph #modal.phcard .mbox{overflow:visible}
 </style>
 </head>
 <body>
@@ -424,10 +569,11 @@ em.sure,em.roll{font-style:normal;font-size:.75rem;padding:0 6px;border-radius:9
   <h1>Shipwreck Isle</h1>
   <span id="netst" class="netst" role="status" hidden></span>
   <span class="gx-sp"></span>
-  <button class="gx-ibtn" data-gx="campd" aria-expanded="false" data-ico="tent"><span>Camp</span></button>
-  <button class="gx-ibtn" data-gx="logd" aria-expanded="false" data-ico="scroll"><span>Log</span></button>
-  <button class="gx-ibtn" data-gx="cardsd" aria-expanded="false" data-ico="cards"><span>Cards</span></button>
-  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" data-ico="book"><span>Rules</span></button>
+  <button class="gx-ibtn" id="phchip" data-ph="status" aria-label="Camp status" hidden></button>
+  <button class="gx-ibtn" data-gx="campd" aria-expanded="false" data-ico="tent" aria-label="Camp: castaways, items, skills"><span>Camp</span></button>
+  <button class="gx-ibtn" data-gx="logd" aria-expanded="false" data-ico="scroll" aria-label="Log"><span>Log</span></button>
+  <button class="gx-ibtn" data-gx="cardsd" aria-expanded="false" data-ico="cards" aria-label="Card list"><span>Cards</span></button>
+  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" data-ico="book" aria-label="Rules"><span>Rules</span></button>
   <button class="gx-ibtn menub" data-a="menu" aria-expanded="false" aria-controls="moremenu" aria-label="More: sound, speed, graphics, new game" data-ico="menu"></button>
   <div class="more" id="moremenu">
   <button class="gx-ibtn" data-a="snd" id="sndbtn" aria-label="Sound">🔊</button>
@@ -440,10 +586,13 @@ em.sure,em.roll{font-style:normal;font-size:.75rem;padding:0 6px;border-radius:9
 </header>
 <div class="gx-main">
   <main class="gx-board"><div class="view"><div id="labels" aria-label="Island tiles"></div><canvas id="c3" aria-label="The island, in 3D. Drag to turn it, scroll to zoom, tap a tile to plan there."></canvas><div id="map2d" hidden></div><div id="chip" aria-hidden="true"></div></div></main>
+  <div id="phview" hidden><span id="phlabel"></span><button class="gx-ibtn" data-ph="out" aria-label="Zoom out the island"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button><button class="gx-ibtn" data-ph="in" aria-label="Zoom in on the island"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button class="gx-ibtn" data-ph="camp" id="phcamp" aria-label="Centre on camp"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.8"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button></div>
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Plan the day</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel" id="sheetbtn">↕</button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel">⇥</button></div>
     <nav id="roadmap" class="roadmap" hidden aria-label="Where you are in the day"></nav><div id="dockmsg" hidden role="status"></div><div class="gx-dock-body"><div id="hud"></div><div id="story" hidden aria-live="polite"></div><div id="panel"></div></div>
     <div id="step" aria-live="polite"></div>
+    <div id="ps" hidden></div>
+    <div id="ppop" hidden role="dialog" aria-modal="false" aria-label="Details"></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock">☰ Panel</button>
 </div>
@@ -453,6 +602,7 @@ em.sure,em.roll{font-style:normal;font-size:.75rem;padding:0 6px;border-radius:9
 <section class="gx-drawer wide" id="cardsd" role="dialog" aria-label="Card list"><div class="gx-drawer-head"><h2 data-ico="cards">Card list</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="cardsbody"></div></section>
 <section class="gx-drawer wide" id="rulesd" role="dialog" aria-label="Rules"><div class="gx-drawer-head"><h2 data-ico="book">How to play</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="rulesbody"></div></section>
 <div id="gfxpop" class="gfxpop" role="dialog" aria-label="Graphics and speed" hidden></div>
+<div id="pzoom" hidden role="dialog" aria-label="Card"></div>
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="modal" hidden></div>
 <script>
@@ -2985,14 +3135,45 @@ function init3D(){
   V3.boltL=new THREE.DirectionalLight(0xd8e4ff,0);sc.add(V3.boltL);sc.add(V3.boltL.target);
   V3.fire=new THREE.PointLight(0xff8a3d,0,16,1.7);sc.add(V3.fire);
   buildSky();buildSea();buildRain();
-  cv.addEventListener('pointerdown',e=>{V3.drag={x:e.clientX,y:e.clientY,a:V3.orbit.a,e:V3.orbit.e,moved:false}});
-  window.addEventListener('pointermove',e=>{const d=V3.drag;if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>5)d.moved=true;V3.orbit.a=d.a-dx*.006;V3.orbit.e=Math.max(.35,Math.min(1.35,d.e+dy*.004));placeCam()});
-  window.addEventListener('pointerup',e=>{const d=V3.drag;V3.drag=null;if(d&&!d.moved&&e.target===cv)onClick3D(e)});
-  cv.addEventListener('wheel',e=>{e.preventDefault();V3.orbit.d=Math.max(12,Math.min(48,V3.orbit.d+e.deltaY*.02));placeCam()},{passive:false});
+  // phone (V3.ph, set by the phone module): top-down view, one finger pans, two fingers pinch-zoom, a tap picks a tile
+  const PT=V3.pts=new Map();
+  cv.addEventListener('pointerdown',e=>{if(V3.ph){PT.set(e.pointerId,{x:e.clientX,y:e.clientY});try{cv.setPointerCapture(e.pointerId)}catch(_){}
+      if(PT.size===1)V3.drag={x:e.clientX,y:e.clientY,l:V3.look.clone(),moved:false};
+      else if(PT.size===2){const [a,b]=[...PT.values()];V3.pinch={d0:Math.hypot(a.x-b.x,a.y-b.y)||1,od:V3.orbit.d};V3.drag=V3.drag||{moved:true};V3.drag.moved=true}return}
+    V3.drag={x:e.clientX,y:e.clientY,a:V3.orbit.a,e:V3.orbit.e,moved:false}});
+  window.addEventListener('pointermove',e=>{if(V3.ph){const p=PT.get(e.pointerId);if(!p)return;p.x=e.clientX;p.y=e.clientY;
+      if(PT.size>=2&&V3.pinch){const [a,b]=[...PT.values()];phSetD(V3.pinch.od*V3.pinch.d0/Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)));return}
+      const d=V3.drag;if(!d||!d.l)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(!d.moved&&Math.abs(dx)+Math.abs(dy)<=8)return;d.moved=true;phPan(d.l,dx,dy);return}
+    const d=V3.drag;if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>5)d.moved=true;V3.orbit.a=d.a-dx*.006;V3.orbit.e=Math.max(.35,Math.min(1.35,d.e+dy*.004));placeCam()});
+  const up=e=>{if(V3.ph){if(!PT.has(e.pointerId))return;PT.delete(e.pointerId);if(PT.size<2)V3.pinch=null;
+      if(PT.size===1){const [r]=[...PT.values()];V3.drag={x:r.x,y:r.y,l:V3.look.clone(),moved:true};return}
+      const d=V3.drag;V3.drag=null;if(e.type==='pointerup'&&d&&!d.moved&&(e.target===cv||cv.hasPointerCapture&&0))onClick3D(e);return}
+    const d=V3.drag;V3.drag=null;if(d&&!d.moved&&e.target===cv)onClick3D(e)};
+  window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+  cv.addEventListener('wheel',e=>{e.preventDefault();if(V3.ph){phSetD(V3.orbit.d*(1+e.deltaY*.0015));return}V3.orbit.d=Math.max(12,Math.min(48,V3.orbit.d+e.deltaY*.02));placeCam()},{passive:false});
   cv.addEventListener('pointermove',e=>{V3.hover=pickTile(e)});cv.addEventListener('pointerleave',()=>{V3.hover=null});
   V3.on=true;applyQ(V3.pref==='auto'?gfxAuto():V3.pref);placeCam();
   new ResizeObserver(resize3D).observe(cv.parentElement);resize3D();
   document.body.classList.add('three');V3.clock=new THREE.Clock();perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
+// ---------- phone camera: the whole island fills the board; drag pans, pinch / +/- zoom, "camp" centres on the camp ----------
+function phIslandPts(){const o=[];for(const t of MAP){const p=hexPos(t.q,t.r);for(let i=0;i<6;i++){const a=i/6*Math.PI*2;o.push([p.x+Math.sin(a)*HR0*1.02,p.z+Math.cos(a)*HR0*1.02])}}return o}
+function phBox(pts){const v=new THREE.Vector3();V3.cam.updateMatrixWorld();V3.cam.updateProjectionMatrix();let x0=9,x1=-9,y0=9,y1=-9;for(const q of pts){v.set(q[0],HEXH,q[1]).project(V3.cam);x0=Math.min(x0,v.x);x1=Math.max(x1,v.x);y0=Math.min(y0,v.y);y1=Math.max(y1,v.y)}return {x0,x1,y0,y1}}
+function phFit(){if(!V3.cam||!V3.rad||!V3.center||!V3.r)return;const FILL=V3.phFill||.97;V3.orbit.e=V3.phE||1.4;V3.orbit.a=0;const pts=phIslandPts();const o=V3.orbit;V3.look.copy(V3.center);
+  const ext=()=>{placeCam();const b=phBox(pts);return {b,w:(b.x1-b.x0)/2,h:(b.y1-b.y0)/2}};
+  for(let it=0;it<3;it++){let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h)>FILL)lo=mid;else hi=mid}o.d=hi;const e=ext();const cx=(e.b.x0+e.b.x1)/2,cy=(e.b.y0+e.b.y1)/2;
+    const hh=Math.tan(V3.cam.fov*Math.PI/360)*o.d,hw=hh*V3.cam.aspect;const a=o.a;V3.look.x+=Math.cos(a)*cx*hw+(-Math.sin(a))*cy*hh/Math.sin(o.e);V3.look.z+=(-Math.sin(a))*cx*hw+(-Math.cos(a))*cy*hh/Math.sin(o.e)}
+  let lo=6,hi=140;for(let k=0;k<26;k++){const mid=(lo+hi)/2;o.d=mid;const e=ext();if(Math.max(e.w,e.h)>FILL)lo=mid;else hi=mid}o.d=hi;placeCam();
+  V3.phFitL=V3.look.clone();V3.phFitD=o.d;V3.phL=V3.look.clone();V3.phD=o.d;V3.phMin=o.d*.38;V3.phMax=o.d*1.12;V3.d0=o.d;V3.phMode='fit'}
+function phSetD(d){V3.phD=Math.max(V3.phMin||8,Math.min(V3.phMax||80,d));V3.orbit.d=V3.phD;placeCam()}
+function phPan(l0,dx,dy){const cv=V3.r.domElement,o=V3.orbit;const s=2*Math.tan(V3.cam.fov*Math.PI/360)*o.d/Math.max(1,cv.clientHeight);const a=o.a;
+  const rx=Math.cos(a),rz=-Math.sin(a),fx=-Math.sin(a),fz=-Math.cos(a),k=s/Math.sin(o.e);
+  let x=l0.x-rx*dx*s+fx*dy*k,z=l0.z-rz*dx*s+fz*dy*k;const c=V3.center,R=V3.rad*.95;const ox=x-c.x,oz=z-c.z,L=Math.hypot(ox,oz);if(L>R){x=c.x+ox/L*R;z=c.z+oz/L*R}
+  V3.look.set(x,V3.look.y,z);V3.phL=V3.look.clone();V3.phMode='free';placeCam()}
+// view buttons: 'fit' the whole island, 'camp' zoomed on the camp, 'in' / 'out'
+function phView(m){if(!V3.ph||!V3.phFitL)return;
+  if(m==='fit'){V3.phL=V3.phFitL.clone();V3.phD=V3.phFitD;V3.phMode='fit'}
+  else if(m==='camp'){const t=MAP[G.camp.pos];const p=hexPos(t.q,t.r);V3.phL=new THREE.Vector3(p.x,0,p.z);V3.phD=V3.phFitD*.55;V3.phMode='camp'}
+  else if(m==='in'){V3.phD=Math.max(V3.phMin,V3.phD*.75);V3.phMode='free'}else if(m==='out'){V3.phD=Math.min(V3.phMax,V3.phD/.75);V3.phMode='free'}}
 function placeCam(){if(!V3.cam)return;const o=V3.orbit;V3.cam.position.set(V3.look.x+Math.sin(o.a)*Math.cos(o.e)*o.d,V3.look.y+Math.sin(o.e)*o.d,V3.look.z+Math.cos(o.a)*Math.cos(o.e)*o.d);V3.cam.lookAt(V3.look);
   // the key light comes low from the west; its shadow box hugs the island
   const c=V3.center||V3.look,e=(V3.rad||10)+3;const s=V3.sun;s.target.position.copy(c);Object.assign(s.shadow.camera,{left:-e,right:e,top:e,bottom:-e,near:2,far:90});s.shadow.camera.updateProjectionMatrix();
@@ -3001,7 +3182,7 @@ function placeCam(){if(!V3.cam)return;const o=V3.orbit;V3.cam.position.set(V3.lo
 function resize3D(){if(!V3.r)return;const el=V3.r.domElement.parentElement;const w=Math.max(50,el.clientWidth),h=Math.max(50,el.clientHeight);V3.r.setSize(w,h,false);V3.r.domElement.style.width=w+'px';V3.r.domElement.style.height=h+'px';V3.cam.aspect=w/h;V3.cam.fov=w/h<1?50:40;V3.cam.updateProjectionMatrix();
   if(V3.post||V3.lt){const v=V3.r.getDrawingBufferSize(new THREE.Vector2());if(V3.post)V3.post.setSize(v.x,v.y);if(V3.lt)V3.lt.setSize(v.x,v.y)}fitDist()}
 // distance that fits the whole island for this aspect ratio
-function fitDist(){if(!V3.rad)return;const a=V3.cam.aspect;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);const need=V3.rad*1.12;const d=Math.max(need/Math.tan(vf/2)*.78,need/Math.tan(hf/2))+4;V3.d0=Math.max(14,d);if(V3.focus==null){V3.orbit.d=V3.d0;placeCam()}}
+function fitDist(){if(!V3.rad)return;if(V3.ph){phFit();return}const a=V3.cam.aspect;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);const need=V3.rad*1.12;const d=Math.max(need/Math.tan(vf/2)*.78,need/Math.tan(hf/2))+4;V3.d0=Math.max(14,d);if(V3.focus==null){V3.orbit.d=V3.d0;placeCam()}}
 // ---------- small helpers ----------
 // Low builds a lighter scene (V3.lite): the same shapes with fewer segments, cached under their own keys.
 // At phone size SwiftShader spent ~80% of a Low frame on vertices (119k triangles), not on pixels.
@@ -3418,18 +3599,19 @@ function sync3D(){if(!V3.on||!G)return;if(PH)PH.wake();const sc=V3.scene;if(!V3.
   V3.weather.rain=Math.min(1,(w.rain||0)/2);V3.weather.snow=Math.min(1,(w.snow||0)/2);V3.weather.storm=Math.min(1,(w.rain||0)*.25+(w.snow||0)*.25+(w.storm?0.5:0));V3.night=G.phase==='night'||G.over&&!G.over.win?1:0;
   V3.pickable=UI.pick||null;syncLabels()}
 function fitIsland(){let m=0,cx=0,cz=0;const ts=MAP;for(const t of ts){const p=hexPos(t.q,t.r);cx+=p.x/ts.length;cz+=p.z/ts.length}for(const t of ts){const p=hexPos(t.q,t.r);m=Math.max(m,Math.hypot(p.x-cx,p.z-cz))}
-  const rad=m+HEXR*1.6;buildIsland(cx,cz,rad);buildMist();V3.look.set(cx,0,cz+.6);V3.center=V3.look.clone();V3.rad=rad;V3.orbit.d=Math.max(20,rad*2.2);V3.d0=V3.orbit.d;fitDist();V3.orbit.e=1.12;placeCam()}
+  const rad=m+HEXR*1.6;buildIsland(cx,cz,rad);buildMist();V3.look.set(cx,0,cz+.6);V3.center=V3.look.clone();V3.rad=rad;V3.orbit.d=Math.max(20,rad*2.2);V3.d0=V3.orbit.d;fitDist();if(!V3.ph)V3.orbit.e=1.12;placeCam()}
 // ---------- floating labels over every tile you can read or act on ----------
 const TICON={beach:'🏖️',river:'🏞️',plains:'🌾',hills:'⛰️',mountains:'🏔️'};const SICON={wood:'🪵',fish:'🐟',parrot:'🦜'};
-function syncLabels(){const box=document.getElementById('labels');if(!box)return;V3.lab=V3.lab||{};
+function syncLabels(){const box=document.getElementById('labels');if(!box)return;V3.lab=V3.lab||{};const PHN=!!V3.ph;
   for(const m of G.map){const t=tileAt(m.id);let h='';const reach=!t&&!m.down&&MAP[m.id].adj.some(p=>tileAt(p));
-    if(t){const cr=G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id);h=`<b><s class="pn">${m.id+1}</s>${TICON[t.terr]||''} ${t.terr}</b><i>${t.src.map((s,i)=>`<u class="${m.exh[i]?'gone':''}">${SICON[s]||s}</u>`).join('')}</i>${m.id===G.camp.pos?'<em class="camp">🏕️ camp</em>':''}${t.shelter?'<em>⛰ cave</em>':''}${m.fog?'<em>🌫 fog</em>':''}${cr?'<em>✝️</em>':''}${m.waste?'<em>barren</em>':''}`}
+    if(PHN){h=(t||reach)?`<b><s class="pn">${m.id+1}</s></b>`:''}
+    else if(t){const cr=G.sc&&G.sc.crosses&&G.sc.crosses.includes(m.id);h=`<b><s class="pn">${m.id+1}</s>${TICON[t.terr]||''} ${t.terr}</b><i>${t.src.map((s,i)=>`<u class="${m.exh[i]?'gone':''}">${SICON[s]||s}</u>`).join('')}</i>${m.id===G.camp.pos?'<em class="camp">🏕️ camp</em>':''}${t.shelter?'<em>⛰ cave</em>':''}${m.fog?'<em>🌫 fog</em>':''}${cr?'<em>✝️</em>':''}${m.waste?'<em>barren</em>':''}`}
     else if(reach)h=`<b class="unk">❔${m.id+1} explore</b>${m.fog?'<em>🌫</em>':''}`;
     let el=V3.lab[m.id];if(!h){if(el)el.hidden=true;continue}
     if(!el){el=V3.lab[m.id]=document.createElement('button');el.className='tl';el.dataset.tile=m.id;box.appendChild(el)}
     el.hidden=false;if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h}el.classList.toggle('sel',UI.tileSel===m.id);el.classList.toggle('pulse',UI.hoverPos===m.id);el.setAttribute('aria-label',`Place ${m.id+1}: ${t?t.terr:'unexplored'}`);el.classList.toggle('far',!t)}}
 function placeLabels(){if(!V3.lab)return;const cv=V3.r.domElement;const w=cv.clientWidth,h=cv.clientHeight;const v=new THREE.Vector3();
-  for(const id in V3.lab){const el=V3.lab[id];if(el.hidden)continue;const p=hexPos(MAP[id].q,MAP[id].r);v.set(p.x,HEXH+.2,p.z+HEXR*.55).project(V3.cam);
+  for(const id in V3.lab){const el=V3.lab[id];if(el.hidden)continue;const p=hexPos(MAP[id].q,MAP[id].r);(V3.ph?v.set(p.x-1.0,HEXH+.2,p.z-1.0):v.set(p.x,HEXH+.2,p.z+HEXR*.55)).project(V3.cam);
     if(v.z>1){el.style.opacity=0;continue}el.style.opacity='';const tr=`translate(${((v.x+1)/2*w).toFixed(1)}px,${((1-v.y)/2*h).toFixed(1)}px) translate(-50%,-50%)`;if(el._tr!==tr){el._tr=tr;el.style.transform=tr}}}
 function tween(obj,k,to,dur,done){V3.tweens.push({obj,k,from:obj[k],to,t:0,dur,done})}
 // a little dust puff where a tile lands or a pawn arrives
@@ -3454,7 +3636,8 @@ function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);
   for(const f of V3.fx){f.t+=dt;const k=f.t/f.life;f.s.position.addScaledVector(f.v,dt);f.v.multiplyScalar(Math.pow(.1,dt));f.s.scale.setScalar(.2+k*f.g);f.s.material.opacity=f.a*Math.sin(Math.min(1,k)*Math.PI);if(k>=1){V3.scene.remove(f.s);f.s.material.dispose()}}V3.fx=V3.fx.filter(f=>f.t<f.life);
   let camMv=false;
   // camera glides to the scene being told, and back to the whole island for planning
-  if(V3.center&&!V3.drag){const f=V3.focus!=null&&MAP[V3.focus]?hexPos(MAP[V3.focus].q,MAP[V3.focus].r).add(new THREE.Vector3(0,0,1.2)):V3.center;const k=Math.min(1,dtR*2);if(V3.look.distanceTo(f)>.02||Math.abs(V3.orbit.d-(V3.focus!=null?V3.d0*.72:V3.d0))>.05){camMv=true;V3.look.lerp(f,k);V3.orbit.d+=((V3.focus!=null?V3.d0*.72:V3.d0)-V3.orbit.d)*k;placeCam()}}
+  if(V3.ph&&V3.phL&&!V3.drag){const k=Math.min(1,dtR*3);if(V3.look.distanceTo(V3.phL)>.01||Math.abs(V3.orbit.d-V3.phD)>.02){camMv=true;V3.look.lerp(V3.phL,k);V3.orbit.d+=(V3.phD-V3.orbit.d)*k;placeCam()}}
+  else if(!V3.ph&&V3.center&&!V3.drag){const f=V3.focus!=null&&MAP[V3.focus]?hexPos(MAP[V3.focus].q,MAP[V3.focus].r).add(new THREE.Vector3(0,0,1.2)):V3.center;const k=Math.min(1,dtR*2);if(V3.look.distanceTo(f)>.02||Math.abs(V3.orbit.d-(V3.focus!=null?V3.d0*.72:V3.d0))>.05){camMv=true;V3.look.lerp(f,k);V3.orbit.d+=((V3.focus!=null?V3.d0*.72:V3.d0)-V3.orbit.d)*k;placeCam()}}
   placeLabels();
   // pawns walk to their spots on little hops, and land with a puff
   let pi=0,walk=false;for(const k in V3.pawns){const o=V3.pawns[k];pi++;const to=o.userData.to;if(to){const dx=to.x-o.position.x,dz=to.z-o.position.z,dist=Math.hypot(dx,dz);const mv=dist>.06;if(mv){walk=true;const st=Math.min(dist,dt*Math.max(1.6,dist*2.2));o.position.x+=dx/dist*st;o.position.z+=dz/dist*st;o.rotation.y=Math.atan2(dx,dz);o.userData.w=true}
@@ -3488,7 +3671,7 @@ function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);
   draw()}
 function pickTile(e){const rc=V3.r.domElement.getBoundingClientRect();const m=new THREE.Vector2(((e.clientX-rc.left)/rc.width)*2-1,-((e.clientY-rc.top)/rc.height)*2+1);const ray=new THREE.Raycaster();ray.setFromCamera(m,V3.cam);
   const hits=ray.intersectObjects(Object.values(V3.tiles).map(o=>o.g),true);if(!hits.length)return null;for(const h of hits){let o=h.object;while(o&&o.userData.id===undefined)o=o.parent;if(o)return o.userData.id}return null}
-function onClick3D(e){const id=pickTile(e);if(id==null)return;if(typeof on3DTile==='function')on3DTile(id)}
+function onClick3D(e){const id=pickTile(e);if(id==null){if(typeof PHO!=='undefined'&&PHO.on)PHO.tile(null);return}if(typeof on3DTile==='function')on3DTile(id)}
 
 </script>
 <script>
@@ -4171,6 +4354,127 @@ function netOverBtns(){return isHost()?`<button class="btn go" data-a="new">New 
 
 </script>
 <script>
+// ===================== phone layout (board first, tap to play, pop-ups, one card at a time) =====================
+// Only active when html.ph is set (short side <= 500 px, or a touch screen <= 600 px; ?phone=1 / ?phone=0 force it).
+// Desktop and tablets never run any of this. It only re-arranges and re-presents the existing dock HTML (cloned, so every data-a handler still works).
+const PHO={on:false,land:false,pop:null,popSig:'',zoom:false,tmr:0,st:''};
+(function(){
+const q=s=>document.querySelector(s),qa=s=>[...document.querySelectorAll(s)];
+const E=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function detect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
+  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
+function insets(){try{const P=new URLSearchParams(location.search);if(P.has('safe')){const a=P.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
+  let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}
+  const c=getComputedStyle(p);return {t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}}catch(e){return {t:0,r:0,b:0,l:0}}}
+const BAR=44,VIEW=44;
+PHO.boot=function(){PHO.apply();let t=0;const f=()=>{clearTimeout(t);t=setTimeout(()=>{PHO.apply();PHO.sync()},60)};addEventListener('resize',f);addEventListener('orientationchange',f);
+  document.addEventListener('click',e=>{PHO._pawn=!!(e.target.closest&&e.target.closest('#ps [data-pawn],#ppop [data-pawn]'))},true);document.addEventListener('click',onClick);document.addEventListener('keydown',e=>{if(!PHO.on||e.key!=='Escape')return;if(PHO.zoom){closeZoom();e.stopImmediatePropagation();return}if(PHO.pop){PHO.closePop();e.stopImmediatePropagation()}},true)};
+PHO.apply=function(){const R=document.documentElement;const was=PHO.on,wasL=PHO.land;PHO.on=detect();R.classList.toggle('ph',PHO.on);
+  const app=q('.gx-app');
+  if(!PHO.on){R.classList.remove('ph-l','ph-p');for(const k of['--bw','--bh','--rail','--sat','--sar','--sab','--sal'])R.style.removeProperty(k);
+    if(typeof V3!=='undefined'){V3.ph=false;if(was&&V3.on&&V3.rad){V3.orbit.e=1.12;fitDist();placeCam()}}if(was){const c=q('#phchip');if(c)c.hidden=true;const v=q('#phview');if(v)v.hidden=true}return was}
+  const w=innerWidth,h=innerHeight,I=insets();PHO.land=w>h;const aw=w-I.l-I.r;
+  let bw,bh,rail=0;
+  if(PHO.land){rail=w>=800?300:280;bw=aw-rail;bh=h-I.t-I.b}else{bw=aw;bh=Math.round(Math.min(aw*.95,h-I.t-I.b-BAR-VIEW-250))}
+  R.classList.toggle('ph-l',PHO.land);R.classList.toggle('ph-p',!PHO.land);
+  const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--rail',rail);set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
+  if(app)app.classList.remove('gx-dock-min','gx-sheet-full');
+  // the chip sits in the bar (portrait) or in the view row under the bar (landscape rail)
+  const chip=q('#phchip'),bar=q('.gx-bar'),pv=q('#phview');
+  if(chip&&bar&&pv){if(PHO.land){if(chip.parentNode!==pv)pv.insertBefore(chip,pv.firstChild)}else if(chip.parentNode!==bar){const sp=bar.querySelector('.gx-sp');bar.insertBefore(chip,sp?sp.nextSibling:bar.firstChild)}}
+  if(typeof V3!=='undefined'){const first=!V3.ph;V3.ph=true;V3.phFill=.97;V3.phE=1.4;if(V3.on&&V3.rad&&(first||wasL!==PHO.land||!was)){V3.orbit.e=1.4;fitDist()}}
+  return !was};
+// ---------- what the dock shows ----------
+function state(){if(!G||typeof UI==='undefined')return 'none';if(UI.modal==='start')return 'start';
+  if(typeof NET!=='undefined'&&(NET.gone||(NET.on&&NET.inLobby)))return 'none';
+  if(G.over&&!UI.overSeen&&!storyActive())return 'over';if(storyActive())return 'story';
+  if(planOpen()&&!allAI())return pstep()===2?'plan2':'plan';return 'wait'}
+function lowLife(){let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded')continue;if(c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m}
+function chipHtml(){let o={};withView(()=>{const need=eatersNeed(),have=food();o={d:G.round,r:G.rounds,f:have,need,w:G.res.wood,fur:G.res.fur,low:lowLife(),roof:G.camp.roof,pal:G.camp.pal,wp:G.weapon,sh:hasShelter()}});
+  const bad=(c,t)=>`<i class="${c?'bad':''}">${t}</i>`;
+  return {h:`<b>D${o.d}</b>${bad(o.f<o.need,'🍖'+o.f)}${bad(false,'🪵'+o.w)}${bad(o.low<=3,'♥'+o.low)}<i class="c-x">☂${o.roof}</i>`,
+    a:`Day ${o.d} of ${o.r}. Food ${o.f} (${o.need} needed tonight), wood ${o.w}, fur ${o.fur}. Lowest life ${o.low}. Roof ${o.roof}, palisade ${o.pal}, weapon ${o.wp}, ${o.sh?'shelter built':'no shelter'}. Tap for details.`,warn:o.f<o.need||o.low<=3}}
+function phaseLabel(){let t='';withView(()=>{const f=flowNow();const ph=f&&PHI(f.k)>=0?PH7[PHI(f.k)].n:'';t=`Day ${G.round}/${G.rounds}`+(storyActive()?(f&&f.k==='done'?' · done':ph?' · '+ph:''):planOpen()?' · plan':'')});return t}
+PHO.sync=function(){if(!PHO.on)return;const dock=q('.gx-dock'),app=q('.gx-app');if(!dock)return;const st=state();PHO.st=st;dock.dataset.phs=st;if(app)app.dataset.phs=st;
+  const pv=q('#phview'),chip=q('#phchip');const show=!!G&&st!=='none'&&st!=='start';if(pv)pv.hidden=!show;if(chip)chip.hidden=!show;
+  if(show){try{const c=chipHtml();if(chip.dataset.h!==c.h){chip.dataset.h=c.h;chip.innerHTML=c.h}chip.setAttribute('aria-label',c.a);chip.classList.toggle('warn',c.warn);
+    const lb=q('#phlabel');if(lb)lb.textContent=phaseLabel();const cm=q('#phcamp');if(cm){const on=typeof V3!=='undefined'&&V3.phMode==='camp';cm.setAttribute('aria-label',on?'Show the whole island':'Centre on camp');cm.setAttribute('aria-pressed',on?'true':'false')}}catch(e){console.error(e)}}
+  // the game-over report and the setup screen are cards in the free zone
+  const m=q('#modal');if(m){m.classList.toggle('phcard',st==='over');const r=dock.getBoundingClientRect();const R=document.documentElement;R.style.setProperty('--dz-t',Math.round(r.top)+'px');R.style.setProperty('--dz-l',Math.round(r.left)+'px');R.style.setProperty('--dz-w',Math.round(r.width)+'px');R.style.setProperty('--dz-h',Math.round(r.height)+'px')}
+  buildStrip();
+  if(PHO.pop){if((PHO.pop.k==='pawn'||PHO.pop.k==='tile')&&(st!=='plan2'||PHO.popSig!==planSig()))PHO.closePop(true);else if(PHO.pop.k==='status'&&(st==='none'||st==='start'))PHO.closePop(true)}
+  renderPop();
+  // a new plan step / a new card starts at the top
+  const key=st+':'+(st==='plan'?pstep():'')+':'+(st==='story'?UI.beats.length+':'+(UI.seenBeat||''):'');if(PHO.key!==key){PHO.key=key;const b=q('.gx-dock-body');if(b)b.scrollTop=0}};
+// ---------- the strip: the pawns of the plan (step 2), one row of big buttons ----------
+function buildStrip(){const ps=q('#ps');if(!ps)return;if(PHO.st!=='plan2'){ps.hidden=true;if(ps.innerHTML){ps.innerHTML='';ps.dataset.h=''}return}
+  const wz=q('#panel .wz');if(!wz){ps.hidden=true;return}
+  const row=wz.querySelector('.pawnrow'),done=wz.querySelector('.alldone'),net=wz.querySelector('.netbar,.netturn,.netwait');const cur=curPawn();
+  const plan=G.plan.acts.length?`<div class="plan">${G.plan.acts.map(a=>planLine(a)).join('')}</div>`:'';
+  const nm=cur?pawnNice(cur):'';
+  const hint=cur?`<button class="btn go ps-go" data-ph="pawn">Give ${E(pawnLabel(cur).split(' ')[0])} a job</button><p class="ps-hint">Or tap a place on the island.</p>`:`<p class="ps-hint">Every pawn has a job. Tap a pawn to change its job, or press Next.</p>`;
+  const h=`<div class="ps-h"><b>Plan day ${G.round}</b><span>pawn ${cur?wizPawns().findIndex(p=>p.id===cur.id)+1:wizPawns().length} of ${wizPawns().length}</span></div>${net?net.outerHTML:''}${hint}${row?row.outerHTML:''}${plan?`<h4 class="ps-t">The plan so far</h4>${plan}`:''}`;
+  ps.hidden=false;if(ps.dataset.h!==h){const t=ps.scrollTop;ps.innerHTML=h;ps.dataset.h=h;ps.scrollTop=t}}
+// ---------- pop-ups (in the free zone, never over the island) ----------
+function jobLine(r,rec){const key=encodeURIComponent(JSON.stringify({type:r.type,tgt:r.tgt,alt:r.alt}));const planned=findActAny(r.type,r.tgt,r.alt);const sel=UI.sel;const pw=sel&&!r.why?placeWhy(sel,r.type,r.tgt,r.alt):null;
+  const isRec=rec&&rec.type===r.type&&JSON.stringify(rec.tgt)===JSON.stringify(r.tgt)&&(rec.alt||0)===(r.alt||0);
+  return `<div class="job ${r.why?'no':''} ${planned?'has':''} ${isRec?'rec1':''}" ${posAttr({type:r.type,tgt:r.tgt})}><div class="jt"><b>${isRec?'<u class="star">Recommended</u> ':''}${E(r.title)}</b><span>${E(r.sub)}${r.why?` <em>(${E(r.why)})</em>`:''}</span></div>${r.why?'':`<button class="btn add" data-place="${key}" ${pw?'disabled':''} aria-label="Give ${E(sel?pawnLabel(pawnInfo(sel)):'a pawn')} this job: ${E(r.title)}" title="${E(pw||'Give this job')}">+</button>`}</div>`}
+function tileRows(id){const out=[];const cats=id===G.camp.pos?['build','camp','hunt','threat','special']:['gather','explore','build','special'];
+  for(const k of cats){let rows=[];try{rows=catRows(k)}catch(e){}for(const r of rows){const onTile=(r.type==='gather'&&r.tgt&&r.tgt.pos===id)||(r.type==='explore'&&r.tgt===id)||(r.type==='build'&&r.tgt&&r.tgt.cross===id)||(r.type==='special'&&id===G.sc.temple&&r.tgt==='temple')||(id===G.camp.pos&&k!=='gather'&&k!=='explore'&&!(r.type==='build'&&r.tgt&&r.tgt.cross!=null));if(onTile)out.push(r)}}return out}
+function tileInfo(id){const t=tileAt(id),m=G.map[id];if(!t){if(m.down)return `<div class="ti"><b>A cut-off place</b><p>This place has broken away and can’t be used.</p></div>`;const reach=MAP[id].adj.some(p=>tileAt(p));
+    return `<div class="ti"><b>Unexplored place ${id+1}${m.fog?' · 🌫 fog':''}</b><p>${reach?'You can send a pawn to explore it. It turns over a new island tile.':'Too far to explore yet: explore the places next to the land you know first.'}</p></div>`}
+  const toks=Object.keys(m.tok||{}).filter(k=>m.tok[k]).map(k=>({time:'slow going (+1 pawn)',beast:'animal tracks: danger without a weapon',food:'extra food (parrots)'}[k]||k));
+  return `<div class="ti"><b>Place ${id+1}: ${E(t.terr)}${id===G.camp.pos?' · 🏕 camp':''}</b><p>${t.src.length?'Sources: '+t.src.map((s,i)=>E(s)+(m.exh[i]?' (used up)':'')).join(', '):'No sources here.'}${t.shelter?' · natural shelter':''}${t.totem?' · 🗿 totem':''}${m.fog?' · 🌫 fog':''}${m.waste?' · barren':''}${toks.length?' · '+toks.join(' · '):''}</p></div>`}
+function pawnPickRow(){const wz=q('#panel .wz');const row=wz&&wz.querySelector('.pawnrow');return row?row.outerHTML:''}
+function popContent(){const p=PHO.pop;if(!p||!G)return null;
+  if(p.k==='status')return {title:'Camp status',cls:'st'};
+  if(p.k==='pawn'){const wz=q('#panel .wz');if(!wz)return null;const c=wz.cloneNode(true);for(const s of['.wz-steps','.wz-t','.pawnrow','.sofar','.alldone','.hint','.netbar','.netturn','.netwait'])c.querySelectorAll(s).forEach(e=>e.remove());
+    const cur=curPawn();return {title:cur?'A job for '+pawnNice(cur):'Jobs',html:c.innerHTML,cls:'pawn'}}
+  if(p.k==='tile'){const id=p.id;let h=tileInfo(id);const plan=PHO.st==='plan2';
+    if(plan){const cur=curPawn();const rec=cur?recPlan().map[cur.id]:null;const rows=tileRows(id);const ok=rows.filter(r=>!r.why),no=rows.filter(r=>r.why);
+      h+=`<div class="tp-for">${cur?'Giving a job to <b>'+E(pawnNice(cur))+'</b>':'Every pawn has a job'}${cur&&wizPawns().length>1?' · pick another pawn:':''}</div>${wizPawns().length>1?pawnPickRow():''}`;
+      h+=ok.length?`<div class="tjobs">${ok.map(r=>jobLine(r,rec)).join('')}</div>`:`<p class="muted">No job possible here right now.</p>`;
+      if(no.length)h+=`<details class="later"><summary>Not possible yet (${no.length})</summary>${no.map(r=>jobLine(r,rec)).join('')}</details>`}
+    const t=tileAt(id);return {title:t?`Place ${id+1} · ${t.terr}`:`Place ${id+1}`,html:h,cls:'tile'}}
+  return null}
+PHO.openPop=function(p){PHO.pop=p;PHO.popSig=G?planSig():'';PHO.popOpen=true;renderPop();const b=q('#ppop .pp-b');if(b)b.scrollTop=0};
+PHO.closePop=function(quiet){const was=PHO.pop;PHO.pop=null;const hud=q('#hud');if(hud&&hud.parentNode&&hud.parentNode.classList.contains('pp-b')){const body=q('.gx-dock-body');if(body)body.insertBefore(hud,body.firstChild)}
+  if(typeof V3!=='undefined')V3.hover=null;const pp=q('#ppop');if(pp){pp.hidden=true;pp.innerHTML='';pp.dataset.h=''}if(was&&was.k==='tile'&&!quiet){UI.tileSel=null;if(typeof render==='function')render()}};
+function renderPop(){const pp=q('#ppop');if(!pp)return;if(!PHO.pop){if(!pp.hidden){pp.hidden=true;pp.innerHTML=''}return}
+  const c=popContent();if(!c){PHO.closePop(true);return}
+  if(PHO.pop.k==='status'){if(!pp.querySelector('.pp-b')||pp.dataset.k!=='status'){pp.innerHTML=`<div class="pp-h"><b>${E(c.title)}</b><button class="gx-ibtn pp-x" data-ph="close" aria-label="Close">×</button></div><div class="pp-b"></div>`;pp.dataset.k='status'}
+    const b=pp.querySelector('.pp-b'),hud=q('#hud');if(hud&&hud.parentNode!==b){b.appendChild(hud)}
+    if(!b.querySelector('.pp-camp')){b.insertAdjacentHTML('beforeend',`<div class="pp-camp"><button class="btn" data-gx="campd">Castaways, skills and items</button></div>`)}
+    pp.hidden=false;pp.className='st';return}
+  const html=`<div class="pp-h"><b>${E(c.title)}</b><button class="gx-ibtn pp-x" data-ph="close" aria-label="Close">×</button></div><div class="pp-b">${c.html}</div>`;
+  const hs=pp.dataset.k+'|'+html;pp.hidden=false;pp.className=c.cls||'';
+  if(pp.dataset.h!==html){const old=pp.querySelector('.pp-b'),sc=old&&pp.dataset.k===PHO.pop.k?old.scrollTop:0;pp.innerHTML=html;pp.dataset.h=html;pp.dataset.k=PHO.pop.k;const nb=pp.querySelector('.pp-b');if(nb)nb.scrollTop=sc}}
+// a tile was tapped on the island
+PHO.tile=function(id){if(!PHO.on)return;if(id==null){if(PHO.pop&&(PHO.pop.k==='tile'||PHO.pop.k==='pawn'))PHO.closePop();return}
+  if(!G||PHO.st==='none'||PHO.st==='start')return;
+  PHO.openPop({k:'tile',id});if(typeof V3!=='undefined')V3.hover=id};
+// ---------- view buttons, pop-up buttons, enlarged cards ----------
+function closeZoom(){PHO.zoom=false;const z=q('#pzoom');if(z){z.hidden=true;z.innerHTML=''}}
+function openZoom(el){const z=q('#pzoom');if(!z)return;const c=el.cloneNode(true);c.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));c.removeAttribute('data-pos');
+  z.innerHTML=`<div class="zc" role="document"><button class="gx-ibtn zc-x" data-ph="zclose" aria-label="Close the card">×</button><div class="zc-b ${[...el.classList].join(' ')}">${c.innerHTML}</div></div>`;z.hidden=false;PHO.zoom=true}
+function onClick(e){if(!PHO.on)return;const t=e.target;if(!t.closest)return;
+  const b=t.closest('[data-ph]');
+  if(b){const a=b.dataset.ph;
+    if(a==='in'||a==='out'){if(typeof V3!=='undefined')phView(a);PHO.sync();return}
+    if(a==='camp'){if(typeof V3!=='undefined')phView(V3.phMode==='camp'?'fit':'camp');PHO.sync();return}
+    if(a==='status'){if(PHO.pop&&PHO.pop.k==='status')PHO.closePop();else PHO.openPop({k:'status'});return}
+    if(a==='pawn'){PHO.openPop({k:'pawn'});return}
+    if(a==='close'){PHO.closePop();return}
+    if(a==='zclose'){closeZoom();return}return}
+  if(PHO.zoom){if(t.closest('#pzoom button,#pzoom input')){setTimeout(closeZoom,0);return}if(!t.closest('.zc')){closeZoom();return}return}
+  if(PHO._pawn&&PHO.st==='plan2'){if(!PHO.pop||PHO.pop.k==='status')PHO.openPop({k:'pawn'});else if(PHO.pop.k==='pawn'||PHO.pop.k==='tile'){PHO.popSig=planSig()}return}
+  if(t.closest('[data-gx]')&&PHO.pop&&PHO.pop.k==='status'){PHO.closePop();return}
+  if(t.closest('button,input,summary,a,label,select'))return;
+  const card=t.closest('#ppop .job,#campbody .row:not(.empty),#panel .thr,#panel .prio,#cardsbody .card,#panel .rv,#story .card');if(card)openZoom(card)}
+})();
+
+</script>
+<script>
 // ---------- UI: the island stage, the planning table, the camp, cards, questions and reports ----------
 const $=s=>document.querySelector(s);const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const PCOL=['#e0625c','#4f8fe6','#57b36a','#e8ad45','#a57ce0','#9a9a9a'];
@@ -4207,6 +4511,7 @@ function closeGfx(){const p=$('#gfxpop');if(p&&!p.hidden){p.hidden=true;const b=
 // ---------- top-level render ----------
 function render(){if(typeof netPill==='function')netPill();if(!G){renderModal();renderStory();renderRoadmap();return}msgCheck();wizSync();renderRoadmap();withView(()=>{renderHud();renderMap2D()});renderStep();renderPanel();renderStory();renderModal();
   const pb=$('#pausebtn');if(pb){pb.hidden=!allAI()||(typeof NET!=='undefined'&&NET.on);pb.textContent=UI.pause?'▶ Resume':'⏸ Pause'}setBtn($('#speedbtn'),'fast',({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'));gfxBtn()}
+{const r0=render;render=function(){r0();if(typeof PHO!=='undefined')PHO.sync()}}
 const RLAB={food:'food',pfood:'dry food',wood:'wood',fur:'fur'};
 const RTIP={food:'🍖 Food: each castaway eats 1 at night; what is left spoils overnight',pfood:'🥫 Dry food: eaten like food, but it never spoils',wood:'🪵 Wood: pays for building, the roof and palisade, and warmth in snow',fur:'🧶 Fur: can pay for the shelter, roof or palisade instead of wood'};
 function renderHud(){const S=SCENARIOS[G.scen];const el=$('#hud');if(!el)return;const wx=S.wx[G.round]||[];const ph=G.phase==='actdone'?'act':G.phase==='start'?'event':G.phase;
@@ -4357,6 +4662,7 @@ function renderMap2D(){const el=$('#map2d');if(!el||V3.on){if(el)el.hidden=true;
     return `<g data-tile="${m.id}" class="hx ${UI.tileSel===m.id?'sel':''} ${UI.hoverPos===m.id?'pulse':''}"><polygon points="${pts}" fill="${t?col[t.terr]:g.down?'#333':'#24364a'}" stroke="#0b1520" stroke-width="2"/><text x="${x}" y="${y-6}" text-anchor="middle">${t?(m.id+1)+' '+t.terr.slice(0,5):'❔'+(m.id+1)}</text><text x="${x}" y="${y+12}" text-anchor="middle">${m.id===G.camp.pos?'🏕':''}${g.fog?'🌫':''}${G.sc.crosses&&G.sc.crosses.includes(m.id)?'✝':''}${t?t.src.map((s,i)=>g.exh[i]?'▪':s==='wood'?'🪵':'🐟').join(''):''}</text></g>`}).join('')}</svg>`}
 // ---------- input ----------
 function on3DTile(id){if(storyActive())return;if(planOpen()&&!allAI()&&pstep()!==2){setPStep(2);UI.ps.pick=true}UI.tileSel=id;UI.tab='plan';tutAdvance(3);const t=tileAt(id);if(!t&&G.map[id].tile==null)UI.cat=null;render();const f=document.querySelector('.tfocus');if(f&&f.scrollIntoView)f.scrollIntoView({block:'nearest',behavior:'smooth'})}
+{const t0=on3DTile;on3DTile=function(id){t0(id);if(typeof PHO!=='undefined'&&PHO.on)PHO.tile(id)}}
 function autoPawn(type,tgt,alt){const humans=new Set(G.chars.filter(c=>c.human).map(c=>c.i));const free=allPawns().filter(p=>!placedIds().has(p.id)&&(p.c==null||humans.has(p.c)));const a=findActAny(type,tgt,alt);const hasLead=a&&a.pw.some(q=>{const p=pawnInfo(q);return p&&(p.c!=null||p.f)});
   const order=hasLead?free.filter(p=>p.x).concat(free.filter(p=>p.c!=null),free.filter(p=>p.f)):free.filter(p=>p.c!=null).concat(free.filter(p=>p.f),free.filter(p=>p.x));return order.find(p=>!placeWhy(p.id,type,tgt,alt))}
 function doPlace(type,tgt,alt){let pid=UI.sel;if(!pid){const p=autoPawn(type,tgt,alt);if(!p){toast('No free pawn can do that.');return}pid=p.id}
@@ -4441,7 +4747,7 @@ function beginGame(){const s=UI.setup;resetPlanSteps();UI.modal=null;UI.report=n
   const all=s.chars.every(k=>s.ai[k]);newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff});UI.reportMark=G.logN;V3.layout=null;
   for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};refresh()}
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;resetPlanSteps();UI.beats.length=0;UI.shown=-1;beat('dawn',{round:G.round});UI.modal=null;UI.reportMark=G.logN;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};if(G.scen==='stranded'&&!CHARS.ada)CHARS.ada={n:'Ada',die:11,arrows:[],skills:[],npc:1};refresh()}catch(e){toast('No saved game found.');openStart()}}
-function boot(){GX.init({key:'swi'});GX.onClose=id=>{if(id==='rulesd'&&UI.backToStart){UI.backToStart=false;openStart()}};GX.onShow=id=>{if(!G&&id!=='rulesd'&&id!=='cardsd'){GX.close();return}if(id==='cardsd')renderCards();if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(G)render()};paintIcons();try{init3D()}catch(e){console.error(e)}gfxBtn();soundBtns&&soundBtns();openStart()}
+function boot(){GX.init({key:'swi'});if(typeof PHO!=='undefined')PHO.boot();GX.onClose=id=>{if(id==='rulesd'&&UI.backToStart){UI.backToStart=false;openStart()}};GX.onShow=id=>{if(!G&&id!=='rulesd'&&id!=='cardsd'){GX.close();return}if(id==='cardsd')renderCards();if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(G)render()};paintIcons();try{init3D()}catch(e){console.error(e)}gfxBtn();soundBtns&&soundBtns();openStart()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 
 </script>

@@ -4,10 +4,11 @@
   <h1>Shipwreck Isle</h1>
   <span id="netst" class="netst" role="status" hidden></span>
   <span class="gx-sp"></span>
-  <button class="gx-ibtn" data-gx="campd" aria-expanded="false" data-ico="tent"><span>Camp</span></button>
-  <button class="gx-ibtn" data-gx="logd" aria-expanded="false" data-ico="scroll"><span>Log</span></button>
-  <button class="gx-ibtn" data-gx="cardsd" aria-expanded="false" data-ico="cards"><span>Cards</span></button>
-  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" data-ico="book"><span>Rules</span></button>
+  <button class="gx-ibtn" id="phchip" data-ph="status" aria-label="Camp status" hidden></button>
+  <button class="gx-ibtn" data-gx="campd" aria-expanded="false" data-ico="tent" aria-label="Camp: castaways, items, skills"><span>Camp</span></button>
+  <button class="gx-ibtn" data-gx="logd" aria-expanded="false" data-ico="scroll" aria-label="Log"><span>Log</span></button>
+  <button class="gx-ibtn" data-gx="cardsd" aria-expanded="false" data-ico="cards" aria-label="Card list"><span>Cards</span></button>
+  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" data-ico="book" aria-label="Rules"><span>Rules</span></button>
   <button class="gx-ibtn menub" data-a="menu" aria-expanded="false" aria-controls="moremenu" aria-label="More: sound, speed, graphics, new game" data-ico="menu"></button>
   <div class="more" id="moremenu">
   <button class="gx-ibtn" data-a="snd" id="sndbtn" aria-label="Sound">🔊</button>
@@ -20,10 +21,13 @@
 </header>
 <div class="gx-main">
   <main class="gx-board"><div class="view"><div id="labels" aria-label="Island tiles"></div><canvas id="c3" aria-label="The island, in 3D. Drag to turn it, scroll to zoom, tap a tile to plan there."></canvas><div id="map2d" hidden></div><div id="chip" aria-hidden="true"></div></div></main>
+  <div id="phview" hidden><span id="phlabel"></span><button class="gx-ibtn" data-ph="out" aria-label="Zoom out the island"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button><button class="gx-ibtn" data-ph="in" aria-label="Zoom in on the island"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button class="gx-ibtn" data-ph="camp" id="phcamp" aria-label="Centre on camp"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.8"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button></div>
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Plan the day</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel" id="sheetbtn">↕</button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel">⇥</button></div>
     <nav id="roadmap" class="roadmap" hidden aria-label="Where you are in the day"></nav><div id="dockmsg" hidden role="status"></div><div class="gx-dock-body"><div id="hud"></div><div id="story" hidden aria-live="polite"></div><div id="panel"></div></div>
     <div id="step" aria-live="polite"></div>
+    <div id="ps" hidden></div>
+    <div id="ppop" hidden role="dialog" aria-modal="false" aria-label="Details"></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock">☰ Panel</button>
 </div>
@@ -33,6 +37,7 @@
 <section class="gx-drawer wide" id="cardsd" role="dialog" aria-label="Card list"><div class="gx-drawer-head"><h2 data-ico="cards">Card list</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="cardsbody"></div></section>
 <section class="gx-drawer wide" id="rulesd" role="dialog" aria-label="Rules"><div class="gx-drawer-head"><h2 data-ico="book">How to play</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="rulesbody"></div></section>
 <div id="gfxpop" class="gfxpop" role="dialog" aria-label="Graphics and speed" hidden></div>
+<div id="pzoom" hidden role="dialog" aria-label="Card"></div>
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="modal" hidden></div>
 <script src="shell.js"></script>
@@ -61,6 +66,7 @@
 <script src="audio-data.js"></script>
 <script src="sound.js"></script>
 <script src="net.js"></script>
+<script src="ph.js"></script>
 <script src="ui.js"></script>
 </body>
 </html>
