@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Nebula Aces</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Exo+2:wght@400;600;800&display=swap" rel="stylesheet">
@@ -315,6 +315,168 @@ table.dial thead th{font:600 .58rem "Exo 2",system-ui,sans-serif;color:var(--mut
 .nb-dot{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#4fe08a;box-shadow:0 0 6px #4fe08a;margin-right:.3rem;vertical-align:middle}.nb-dot.off{background:#ffb347;box-shadow:0 0 6px #ffb347}
 .netbar{flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:.2rem .4rem;margin:0 0 .3rem;border-radius:8px;background:rgba(80,200,255,.07);border:1px solid rgba(120,200,255,.2);line-height:1.5}.netbar.hidden{display:none}.netbar .btn.sm{padding:.1rem .45rem;font-size:.78rem;margin-left:.3rem}
 .netwait{display:flex;flex-wrap:wrap;gap:.3rem;margin:.1rem 0 .35rem;color:var(--muted)}.netwait .nw{border:1px solid var(--line);border-radius:999px;padding:.05rem .5rem}.netwait .nw.ok{border-color:rgba(79,224,138,.55);color:#9ff0c0}
+
+</style>
+<style>
+/* ===== Phone layout (html.ph): the mat first, decisions in pop-ups next to it. Every rule starts with html.ph so desktop and tablets are untouched. ===== */
+html.ph,html.ph body{overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%}
+html.ph .gx-app{padding:0 var(--sar,0px) var(--sab,0px) var(--sal,0px);display:grid}
+html.ph .gx-main{display:contents}
+/* portrait: slim bar, then a square board at full width, then the dock */
+html.ph.ph-p .gx-app{grid-template-columns:minmax(0,1fr);grid-template-rows:calc(44px + var(--sat,0px)) var(--bs,100vw) minmax(0,1fr)}
+html.ph.ph-p .gx-bar{grid-row:1;height:calc(44px + var(--sat,0px));min-height:0;padding:var(--sat,0px) 6px 0}
+html.ph.ph-p .gx-board{grid-row:2;width:var(--bs);height:var(--bs)}
+html.ph.ph-p .gx-dock{grid-row:3}
+/* landscape: the board is full height on the left, the dock is the rail, the icon bar is a thin column on the right */
+html.ph.ph-l .gx-app{grid-template-columns:var(--bs,100vh) minmax(0,1fr) 48px;grid-template-rows:minmax(0,1fr);padding-top:var(--sat,0px)}
+html.ph.ph-l .gx-bar{grid-column:3;grid-row:1;flex-direction:column;width:48px;height:100%;padding:4px 2px;gap:4px;overflow:hidden;border-bottom:0;border-left:2px solid var(--gold);align-items:center}
+html.ph.ph-l .gx-board{grid-column:1;grid-row:1;width:var(--bs);height:var(--bs)}
+html.ph.ph-l .gx-dock{grid-column:2;grid-row:1}
+html.ph .gx-bar .gx-sp{flex:1 1 0}
+html.ph .gx-bar h1{display:none}
+html.ph .gx-bar>.btn[data-gx],html.ph .gx-bar>.btn[data-a="rules"],html.ph .gx-gear{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;font-size:0;display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px;text-align:center}
+html.ph .gx-bar>.btn .ico,html.ph .gx-gear .ico{width:23px;height:23px;vertical-align:middle}
+html.ph .gx-bar .icw{gap:0;display:inline-flex}
+html.ph .gx-bar>.btn:not(.gx-gear):not([data-gx]):not([data-a="rules"]){display:none}
+html.ph .ph-chip{display:flex;align-items:center;gap:6px;color:var(--gold);font:700 14px/1.1 Orbitron,"Exo 2",sans-serif;white-space:nowrap;min-width:0;overflow:hidden}
+html.ph .ph-chip i.you{font:700 13px "Exo 2",sans-serif;font-style:normal;background:var(--gold);color:#1b1030;border-radius:999px;padding:1px 7px}
+html.ph.ph-l .ph-chip{flex-direction:column;gap:1px;font-size:13px;text-align:center;width:46px}
+html.ph.ph-l .ph-chip i.you{padding:0 4px;font-size:13px}
+html.ph .gx-more{max-height:calc(100dvh - 16px);overflow:auto}
+html.ph.ph-p .gx-more{top:calc(var(--sat,0px) + 48px);right:calc(var(--sar,0px) + 6px)}
+html.ph.ph-l .gx-more{top:calc(var(--sat,0px) + 6px);right:calc(var(--sar,0px) + 54px);bottom:auto;max-height:calc(100dvh - var(--sat,0px) - var(--sab,0px) - 12px)}
+html.ph .gx-more .btn{min-height:44px}
+/* the board */
+html.ph .gx-board{overflow:hidden;background:#05040f}
+html.ph .viewbar,html.ph .legend,html.ph .lgbtn{display:none!important}
+html.ph #tags .tag,html.ph #coachtag{display:none!important}
+html.ph .stage canvas{touch-action:none}
+/* the dock: control row, roadmap, then one panel (strip / step card / pop-up) */
+html.ph .gx-dock{border:0;border-top:2px solid var(--gold);box-shadow:none;max-height:none!important;visibility:visible!important;display:flex;flex-direction:column;position:relative;min-height:0;padding-bottom:0;border-radius:0}
+html.ph.ph-l .gx-dock{border-top:0;border-left:0}
+html.ph .gx-app.gx-dock-min .gx-dock-body{display:flex}
+html.ph .gx-dock-head{order:1;flex:0 0 auto;height:48px;padding:2px 6px;gap:4px;justify-content:flex-start}
+html.ph .gx-dock-head .gx-grab,html.ph .gx-dock-head .gx-dt,html.ph .gx-dock-head [data-gx="dock"]{display:none}
+html.ph .gx-reopen{display:none!important}
+html.ph .ph-ctl{display:flex;gap:4px;margin-right:auto}
+html.ph .gx-dock-head .gx-ibtn{min-width:44px;min-height:44px;padding:0 8px;font-size:0;border-radius:10px}
+html.ph .gx-dock-head .gx-ibtn .ico{width:22px;height:22px}
+html.ph .gx-dock-head .gx-ibtn.on,html.ph .gx-dock-head .gx-ibtn[aria-pressed="true"].na-guide{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.35)}
+html.ph .gx-dock-head .na-guide{font-size:0;gap:4px}
+html.ph .gx-dock-head .na-guide b{font-size:13px;color:var(--gold)}
+html.ph .gx-dock-head .na-guide .icw{font-size:0}
+html.ph .gx-dock-top{order:2;flex:0 0 auto;padding:2px 6px 4px;gap:0}
+html.ph #queue{display:none}
+html.ph .road .rn{display:none}
+html.ph .road{gap:4px}
+html.ph .road .ph{min-height:44px;font-size:13px;padding:0 2px}
+html.ph .road .ph b{font-size:13px}html.ph .road .ph i{font-size:13px}
+html.ph .roadinfo{font-size:13px;max-height:80px;overflow:auto}html.ph .roadinfo .linkb{min-width:44px;min-height:44px;font-size:16px}
+html.ph #ps{order:3;flex:1 1 auto;min-height:0;overflow:auto;padding:6px 8px;display:flex;flex-direction:column;gap:8px}
+html.ph #ps[hidden]{display:none}
+html.ph .gx-dock-body{order:4;flex:1 1 auto;min-height:0;padding:6px 8px 8px;gap:6px;overflow:auto}
+html.ph.ph-ps .gx-dock-body{flex:0 0 auto;padding:0 8px}
+html.ph.ph-ps #prompt,html.ph.ph-ps #notice,html.ph.ph-ps #radio,html.ph.ph-ps #lastlog,html.ph.ph-ps #shipcard{display:none}
+html.ph #shipcard,html.ph #radio,html.ph #lastlog,html.ph #recap,html.ph #coach{display:none!important}
+html.ph .nowbox{padding:8px 10px}
+html.ph #prompt .head{font-size:15px}
+html.ph #prompt ol.sub{display:none}
+html.ph .now-t,html.ph #prompt p,html.ph .small{font-size:13px}
+html.ph .btn{min-height:44px;font-size:15px}
+html.ph .btn small{font-size:13px}
+html.ph .btn.sm{min-height:44px;font-size:14px}
+html.ph .acts.col .btn{min-height:52px}
+html.ph .acts.col{gap:6px}
+html.ph .btn.armed{border-color:#7fd4ff;box-shadow:0 0 0 3px rgba(127,212,255,.5)}
+html.ph .btn.armed::after{content:"Tap again to confirm";display:block;font-size:13px;color:#7fd4ff;font-weight:700}
+html.ph .ph-move{font-size:14px;background:var(--panel2);border-radius:8px;padding:6px 8px;margin:2px 0 6px}
+html.ph .acts.main{position:sticky;bottom:-8px;padding:6px 0 8px;margin-bottom:-6px}
+html.ph .acts.tiles{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+html.ph .acts.grid{grid-template-columns:repeat(5,minmax(44px,1fr))}html.ph .acts.grid .btn{min-height:44px;font-size:15px}
+html.ph .acts.grid.g9{grid-template-columns:repeat(5,minmax(44px,1fr))}html.ph .acts.grid.g9 .btn{grid-column:auto!important}
+html.ph .tab{min-height:44px}html.ph .linkb{min-height:44px;min-width:44px}
+html.ph .mv{width:44px;height:44px;font-size:20px}
+html.ph .netbar{font-size:13px;min-height:0}
+html.ph .die{width:44px;height:48px}html.ph .dice .die{width:44px;height:48px}html.ph .die .d8{width:40px;height:40px}
+html.ph .dice{gap:6px}
+html.ph .sumgrid b{font-size:1.1rem}
+/* strip */
+html.ph .ps-t{margin:0;font-size:14px;line-height:1.35}
+html.ph .ps-chips{display:flex;flex-wrap:wrap;gap:6px}
+html.ph .ps-chip{flex:1 1 120px;min-height:52px;text-align:left;border:1.5px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--ink);font:inherit;padding:4px 10px;cursor:pointer;display:flex;flex-direction:column;justify-content:center}
+html.ph .ps-chip b{font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph .ps-chip span{font-size:13px;color:var(--muted)}
+html.ph .ps-chip.need{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.3);animation:psPulse 1.6s ease-in-out infinite}
+html.ph .ps-chip.need span{color:var(--gold);font-weight:700}
+html.ph .ps-chip.set span{color:#8ff5b8}
+html.ph .ps-chip.on{background:rgba(255,200,107,.16)}
+@keyframes psPulse{50%{box-shadow:0 0 0 5px rgba(255,200,107,.1)}}
+@media (prefers-reduced-motion:reduce){html.ph .ps-chip.need{animation:none}}
+html.ph .ps-btns{display:flex;gap:8px}html.ph .ps-btns .btn{flex:1 1 0;text-align:center;min-height:48px}
+/* pop-ups and cards fill the dock zone (never the board) */
+html.ph #ppop,html.ph #pc{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;background:var(--panel);border-top:2px solid var(--gold)}
+html.ph #ppop[hidden],html.ph #pc[hidden]{display:none}
+html.ph #pc{z-index:9;background:linear-gradient(180deg,#1b1848,#100e2e)}
+html.ph .pp-h{display:flex;align-items:center;gap:8px;padding:2px 4px 2px 10px;min-height:44px;flex:0 0 auto;border-bottom:1px solid var(--line)}
+html.ph .pp-h b{flex:1;min-width:0;font:700 15px Orbitron,"Exo 2",sans-serif;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph .pp-n{font-size:13px;color:var(--muted);white-space:nowrap}
+html.ph .pp-h .gx-x{min-width:44px;min-height:44px;font-size:28px}
+html.ph .pp-b,html.ph .pc-b{flex:1 1 auto;min-height:0;overflow:auto;padding:6px 10px;-webkit-overflow-scrolling:touch}
+html.ph .pp-f{flex:0 0 auto;display:flex;gap:8px;padding:6px 10px calc(6px + 0px);border-top:1px solid var(--line);background:var(--panel)}
+html.ph .pp-f .btn{flex:1 1 0;text-align:center;min-height:48px}
+html.ph .pm-grid{display:grid;grid-template-columns:22px repeat(6,44px);gap:2px;justify-content:center;align-items:center}
+html.ph .pm-sp{font:700 13px "Exo 2",sans-serif;color:var(--muted);text-align:center}
+html.ph .pm-e{display:block;width:44px;height:44px}
+html.ph .pm-grid .mv{width:44px;height:44px;font-size:21px;border-radius:9px}
+html.ph .pm-grid .mv[disabled]{opacity:.3}
+html.ph .pm-grid .mv .rs{position:absolute;left:3px;top:0;font-size:13px;color:#06306a}
+html.ph .pm-grid .mv .rk{position:absolute;right:3px;top:0;font-size:13px;font-style:normal;color:#7a0a18;font-weight:800}
+html.ph .pm-leg{font-size:13px;color:var(--muted);margin:4px 0;text-align:center}
+html.ph .pm-leg .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin:0 2px 0 6px}
+html.ph .pm-read{font-size:13px;margin:2px 0;line-height:1.35}
+html.ph .pp-l{margin:2px 0 6px;font-size:14px}
+html.ph .pp-r{border:1.5px solid var(--line);border-radius:10px;padding:6px 10px;margin:4px 0}html.ph .pp-r.rec{border-color:var(--gold);background:rgba(255,200,107,.1)}
+html.ph .pp-r .dice-n{font-size:16px}
+html.ph .pp-m{margin:4px 0;padding-left:18px;font-size:13px}
+html.ph .pp-c{padding-left:18px}
+html.ph .stats.big span{font-size:14px;padding:2px 6px}html.ph .stats.big span i{font-size:13px}
+html.ph .pp-bars{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;margin:6px 0}
+html.ph .pp-bars .bar{display:inline-flex;gap:3px;margin-left:6px;vertical-align:middle}
+html.ph .pp-bars .bar i{width:14px;height:14px;border-radius:3px;background:#ffd0a0}html.ph .pp-bars .bar.s i{background:#7fd4ff}html.ph .pp-bars .bar i.x{background:transparent;border:1.5px solid var(--line)}
+html.ph .adv2{font-size:15px;line-height:1.4;border:1.5px solid var(--gold);border-radius:10px;padding:8px 10px;background:rgba(255,200,107,.1)}
+html.ph .pc-b .brief{font-size:14px}
+/* modals, drawers: full-width sheets with scrolling inside */
+html.ph #modal{padding:max(8px,var(--sat,0px)) max(8px,var(--sar,0px)) max(8px,var(--sab,0px)) max(8px,var(--sal,0px));align-items:center}
+html.ph .dlg{max-height:calc(100dvh - 16px);border-radius:14px;padding:10px 12px 12px;max-width:none;overscroll-behavior:contain}
+html.ph .dlg h1{font-size:1.5rem}
+html.ph .launchbar{top:-10px}
+html.ph .gx-drawer{height:calc(100dvh - 10px);max-height:none;border-radius:14px 14px 0 0}
+html.ph .gx-x{min-width:44px;min-height:44px}
+html.ph select,html.ph .row select{min-height:44px;font-size:16px}
+html.ph input{min-height:44px;font-size:16px}
+html.ph .ex{min-height:44px}
+html.ph .exps{grid-template-columns:1fr}
+html.ph .bld .tab{min-height:44px;font-size:14px}
+html.ph .bld .btn.ghost{min-width:44px}
+html.ph .stats span,html.ph .small{font-size:13px}
+html.ph small,html.ph label small.bio{font-size:13px}
+html.ph #prompt .btn small,html.ph .sumgrid span,html.ph #prompt h4,html.ph .pc-type,html.ph .pc-uq,html.ph .stats span i,html.ph .pcard .stats span,html.ph .stats span{font-size:13px}
+html.ph .pc-art{height:70px}
+html.ph .dice .die,html.ph .die{width:50px;height:64px}html.ph .die i{font-size:13px;margin-top:0;opacity:1}
+html.ph .drow .dl,html.ph .ab,html.ph .ups,html.ph .ups span,html.ph .crit,html.ph .dleg,html.ph .qwhy,html.ph #prompt .dleg{font-size:13px}
+html.ph #prompt .acts.col>.btn.primary{position:sticky;bottom:-4px;z-index:2;box-shadow:0 -8px 10px var(--panel),0 3px 12px rgba(255,170,60,.3)}
+html.ph .dice .die,html.ph .die{width:46px;height:60px}
+html.ph .gx-more{width:min(280px,calc(100vw - 16px));align-items:stretch}html.ph .gx-more .btn{display:flex;align-items:center;gap:8px;text-align:left}
+html.ph .roadinfo:not(:has(.linkb)){display:none}
+/* landscape: the rail is short, so the whole dock scrolls (the control row and the roadmap scroll away to give the card the full height) */
+html.ph.ph-l .gx-dock{overflow-y:auto;overflow-x:hidden;display:block;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+html.ph.ph-l.ph-pop .gx-dock,html.ph.ph-l.ph-card .gx-dock{overflow:hidden}
+html.ph.ph-l .gx-dock-body{overflow:visible}
+html.ph.ph-l #ps{overflow:visible}
+html.ph.ph-l .gx-dock-head{display:flex}
+html.ph:not(.ph-3d) .ph-ctl{display:none}
+html.ph #sndbtn::after,html.ph #pausebtn::after{content:attr(data-phl);font-size:15px;font-weight:600}
+html.ph #map text{display:none}
 
 </style>
 </head>
@@ -2533,8 +2695,8 @@ function tags3D(){const box=document.getElementById('tags');if(!box)return;for(c
 // ---- camera: drag to orbit, right-drag or two fingers to pan, wheel/pinch to zoom ----
 function bindCamera(cv){const P={};cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);P[e.pointerId]={x:e.clientX,y:e.clientY,b:e.button,x0:e.clientX,y0:e.clientY,t:performance.now()}});
   cv.addEventListener('pointermove',e=>{const p=P[e.pointerId];if(!p)return;const ids=Object.keys(P);const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;const C=V3.cam;V3.ez=null;
-    if(ids.length===2){const o=P[ids.find(i=>i!=e.pointerId)];const d0=Math.hypot(p.x-dx-o.x,p.y-dy-o.y),d1=Math.hypot(p.x-o.x,p.y-o.y);C.dist=Math.max(35,Math.min(maxDist(),C.dist*d0/Math.max(1,d1)));panBy(dx/2,dy/2);return}
-    if(p.b===2||e.shiftKey)panBy(dx,dy);else{C.yaw-=dx*.005;C.pitch=Math.max(.25,Math.min(1.45,C.pitch+dy*.004))}});
+    if(ids.length===2){const o=P[ids.find(i=>i!=e.pointerId)];const d0=Math.hypot(p.x-dx-o.x,p.y-dy-o.y),d1=Math.hypot(p.x-o.x,p.y-o.y);C.dist=Math.max(35,Math.min(maxDist(),C.dist*d0/Math.max(1,d1)));panBy(dx/2,dy/2);if(window.PHN&&PHN.on)PHN.clamp();return}
+    if(window.PHN&&PHN.on){if(Math.hypot(e.clientX-p.x0,e.clientY-p.y0)>8)panBy(dx,dy);PHN.clamp();return}if(p.b===2||e.shiftKey)panBy(dx,dy);else{C.yaw-=dx*.005;C.pitch=Math.max(.25,Math.min(1.45,C.pitch+dy*.004))}});
   const up=e=>{const p=P[e.pointerId];delete P[e.pointerId];if(p&&Math.hypot(e.clientX-p.x0,e.clientY-p.y0)<6&&performance.now()-p.t<500)onClick3D(e)};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',e=>delete P[e.pointerId]);
   cv.addEventListener('wheel',e=>{e.preventDefault();V3.ez=null;V3.cam.dist=Math.max(35,Math.min(maxDist(),V3.cam.dist*(1+Math.sign(e.deltaY)*.1)))},{passive:false});cv.addEventListener('contextmenu',e=>e.preventDefault())}
 function panBy(dx,dy){const C=V3.cam,k=C.dist/900;C.tx-=(Math.cos(C.yaw)*dx+Math.sin(C.yaw)*dy)*k*1.2;C.tz-=(-Math.sin(C.yaw)*dx+Math.cos(C.yaw)*dy)*k*1.2;C.tx=Math.max(-10,Math.min(100,C.tx));C.tz=Math.max(-10,Math.min(100,C.tz))}
@@ -2543,16 +2705,16 @@ const maxDist=()=>Math.max(220,V3.fitDist*1.6);
 function placeCam(sx,sy,C){C=C||V3.cam;V3.camera.position.set(C.tx+Math.sin(C.yaw)*Math.cos(C.pitch)*C.dist+(sx||0),Math.sin(C.pitch)*C.dist+(sy||0),C.tz+Math.cos(C.yaw)*Math.cos(C.pitch)*C.dist);V3.camera.lookAt(C.tx,0,C.tz)}
 // fit the camera so the whole 91.4 x 91.4 mat (plus the height of the ships' name plates) fills the board at any aspect ratio
 function fitCam(k){if(!V3.camera)return;const C=V3.cam,cam=V3.camera,top=k==='top';const asp=V3.camera.aspect||1.6;// online, side 1 sees the mat from its own edge
-  const yaw=typeof NET!=='undefined'&&NET.on&&NET.mySide===1?Math.PI:0,sg=Math.cos(yaw);Object.assign(C,{yaw,pitch:top?1.45:.98+Math.max(0,Math.min(1,(1.45-asp)/.5))*.22,tx:45.7,tz:45.7,dist:C.dist||122});
-  const pts=[];for(const x of [0,91.4])for(const z of [0,91.4])for(const y of (top?[0]:[0,9]))pts.push(new THREE.Vector3(x,y,z));const lim=.95;
+  const yaw=typeof NET!=='undefined'&&NET.on&&NET.mySide===1?Math.PI:0,sg=Math.cos(yaw);const phn=window.PHN&&PHN.on;Object.assign(C,{yaw,pitch:phn?1.52:top?1.45:.98+Math.max(0,Math.min(1,(1.45-asp)/.5))*.22,tx:45.7,tz:45.7,dist:C.dist||122});
+  const pts=[];for(const x of [0,91.4])for(const z of [0,91.4])for(const y of (top?[0]:[0,9]))pts.push(new THREE.Vector3(x,y,z));const lim=phn?.985:.95;
   for(let it=0;it<60;it++){placeCam();cam.updateMatrixWorld();let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const p of pts){const q=p.clone().project(cam);a=Math.min(a,q.x);b=Math.max(b,q.x);c=Math.min(c,q.y);d=Math.max(d,q.y)}
     const ext=Math.max((b-a)/2,(d-c)/2)/lim;C.dist*=1+(ext-1)*.8;C.tz-=sg*(c+d)/2*25;C.tx+=sg*(a+b)/2*25;if(Math.abs(ext-1)<.002&&Math.abs(c+d)<.004)break}
   V3.fitDist=C.dist}
 // switching views eases the camera over ~0.7 s (instant with reduced motion); resizes snap so the mat always fits
-function camView(k){const from=V3.camera&&V3.on?Object.assign({},V3.cam):null;V3.view=k;if(typeof UI!=='undefined')UI.top=k==='top';fitCam(k);
+function camView(k){if(window.PHN&&PHN.on)k='top';const from=V3.camera&&V3.on?Object.assign({},V3.cam):null;V3.view=k;if(typeof UI!=='undefined')UI.top=k==='top';fitCam(k);
   if(from&&V3.on&&!reduceMotion()){V3.ez={from,t0:performance.now(),dur:700}}}
 function reduceMotion(){try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
-function onClick3D(e){const c=V3.r.domElement,r=c.getBoundingClientRect();const m=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(m,V3.camera);
+function onClick3D(e){if(window.PHN&&PHN.on&&PHN.tap(e))return;const c=V3.r.domElement,r=c.getBoundingClientRect();const m=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(m,V3.camera);
   const picks=Object.values(V3.ships).filter(g=>g.visible).map(g=>g.userData.pick);const h=rc.intersectObjects(picks)[0];if(h&&typeof uiAct==='function'){uiAct({ship:h.object.userData.ship});return}
   const pt=new THREE.Vector3();if(typeof matPick==='function'&&rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),pt))matPick(pt.x*10,MAT-pt.z*10)}
 // the canvas fills the whole board (width AND height); the camera is refitted to the new aspect ratio
@@ -3184,7 +3346,7 @@ const _schedF=schedule;schedule=function(){if(UI.hold&&G&&!G.winner)return;retur
 function releaseHold(){UI.hold=null;const ks=UI.holdK.splice(0);render();for(const k of ks)try{k()}catch(e){console.error(e)}schedule()}
 // a finished attack that involved a human ship: in guided mode it pauses on the result
 function flowWatch(){flowSync();if(!G)return;if(G.winner&&UI.hold){UI.hold=null;UI.holdK=[]}const R=UI.results[0];
-  if(R&&R.t>UI.resSeen){UI.resSeen=R.t;const a=ship(R.a),d=ship(R.d);if(guided()&&holdOK()&&!G.winner&&!UI.hold&&(mine(a)||mine(d)))UI.hold={kind:'res',R}}
+  if(R&&R.t>UI.resSeen){UI.resSeen=R.t;const a=ship(R.a),d=ship(R.d);if((guided()||(window.PHN&&PHN.on))&&holdOK()&&!G.winner&&!UI.hold&&(mine(a)||mine(d)))UI.hold={kind:'res',R}}
   if(G.phase!=='plan'&&UI.draftR!==G.round)UI.draftR=null;if(G.phase==='plan'&&UI.draftR!==G.round){UI.draft={};UI.draftR=G.round}}
 function holdHTML(){const H=UI.hold;const g=guided();let h='';
   if(H.kind==='res'){const R=H.R;const a=ship(R.a),d=ship(R.d);h+=`<p class="head">Combat · attack result</p>${stepList(['Choose a target','Roll and modify dice','Result'],2)}${resultHTML(R)}${R.dice?`<div class="drow"><span class="dl">Attack dice · ${esc(shortName(a))}</span><div class="dice">${R.dice.map(f=>die(f,'atk')).join('')||'<i class="muted small">none</i>'}</div></div><div class="drow"><span class="dl">Defence dice · ${esc(shortName(d))}</span><div class="dice">${R.def.map(f=>die(f,'def')).join('')||'<i class="muted small">none</i>'}</div></div>`:''}`;
@@ -3387,7 +3549,7 @@ function askButtons(q){const rk=(q.key==='rock'||q.key==='deploy')?recOpt(q).o.k
   return `<div class="acts col">${q.opts.map((o,i)=>btn(o,i)).join('')}</div>`}
 // tapping the mat picks the nearest outlined spot of the current question (asteroid spots, placements)
 function matPick(x,y){if(!G||G.phase!=='ask'||!G.q||!humanTurn())return;let best=null,bd=1e9;for(const o of G.q.opts){if(!o.p)continue;const d=Math.hypot(o.p.x-x,o.p.y-y);if(d<bd){bd=d;best=o}}
-  if(best&&bd<=(best.b||40)/2+25){sfx('click');uiAct({act:'ask',k:best.k})}}
+  if(best&&bd<=(best.b||40)/2+(window.PHN&&PHN.on?80:25)){sfx('click');uiAct({act:'ask',k:best.k})}}
 // an eight-sided die drawn as a faceted octahedron (front face, three side facets) with its symbol engraved in the front face;
 // when WebGL is on, rendered 3D dice replace the drawing (see makePortraits in three3d.js)
 const D8SYM=(()=>{const star=(n,r0,r1)=>{let d='';for(let i=0;i<n*2;i++){const a=i/(n*2)*Math.PI*2-Math.PI/2,r=i%2?r1:r0;d+=(i?'L':'M')+(Math.cos(a)*r).toFixed(3)+' '+(Math.sin(a)*r).toFixed(3)}return d+'Z'};
@@ -3485,7 +3647,7 @@ function render2D(){const svg=$('map');if(!svg||!G)return;const F=typeof NET!=='
   for(const o of G.rocks)h+=`<polygon points="${rockPoly(o).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="#6b5a55"/>`;
   const sel=UI.sel&&ship(UI.sel);if(G.phase==='plan'&&sel&&myPlanShip(sel)){const di=UI.hoverDial!=null?UI.hoverDial:UI.draft[sel.id];if(di!=null){const m=dialOf(sel)[di];h+=`<polyline points="${tplPoints(sel,B(sel),m,4).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" stroke="${m.c==='r'?'#f55':m.c==='g'?'#5f8':'#fff'}" stroke-width="20" stroke-opacity=".4" fill="none"/>`;const fp=finalPose(sel,B(sel),m);h+=`<polygon points="${corners(fp,B(sel)).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="none" stroke="#fff" stroke-dasharray="4 3"/>`}}
   for(const s of G.ships){if(!s.alive)continue;const c=FACCOL[FACTIONS[G.fac[s.side]].col].base;const P=corners(s,B(s));const f=add(s,mul(fwd(s.h),B(s)/2));
-    h+=`<g data-ship="${s.id}" class="seat"><polygon points="${P.map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="#15122e" stroke="${c}" stroke-width="${G.cur===s.id?5:2.5}"/><line x1="${X(s.x)}" y1="${Y(s.y)}" x2="${X(f.x)}" y2="${Y(f.y)}" stroke="${c}" stroke-width="4"/><text x="${X(s.x)}" y="${Y(s.y)-B(s)/2-6}" text-anchor="middle" font-size="16" fill="#fff">${esc(s.name.split(' ')[0])} ${s.hull-hullDmg(s)}</text></g>`}
+    h+=`<g data-ship="${s.id}" class="seat"><polygon points="${P.map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="#15122e" stroke="${c}" stroke-width="${G.cur===s.id?5:2.5}"/>${window.PHN&&PHN.on?`<circle cx="${X(s.x)}" cy="${Y(s.y)}" r="70" fill="rgba(0,0,0,0.01)"/>`:''}<line x1="${X(s.x)}" y1="${Y(s.y)}" x2="${X(f.x)}" y2="${Y(f.y)}" stroke="${c}" stroke-width="4"/><text x="${X(s.x)}" y="${Y(s.y)-B(s)/2-6}" text-anchor="middle" font-size="16" fill="#fff">${esc(s.name.split(' ')[0])} ${s.hull-hullDmg(s)}</text></g>`}
   if(G.phase==='ask'&&G.q)G.q.opts.forEach((o,i)=>{if(!o.p)return;const on=UI.hoverAct&&UI.hoverAct.a==='Q'&&UI.hoverAct.i===i;h+=`<polygon points="${corners(o.p,o.b||40).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="none" stroke="#6df" stroke-width="${on?4:1.5}" stroke-dasharray="5 4" opacity="${on?1:.55}"/>`})
   svg.innerHTML=h}
 // ---- input: every action goes through gameAct(ds, side) ----
@@ -3540,7 +3702,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
   if(ds.a==='speed'){const s=['slow','normal','fast'];UI.speed=s[(s.indexOf(UI.speed||'normal')+1)%3];AIDELAY={slow:1100,normal:600,fast:220}[UI.speed];$('speedbtn').textContent='⏩ '+UI.speed;return}
   if(ds.act){uiAct(Object.assign({},ds));return}
   if(ds.ship){uiAct({ship:ds.ship})}});
-document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-dial],[data-hov]');const nd=t&&t.dataset.dial!=null?+t.dataset.dial:null;const nh=t&&t.dataset.hov?{a:t.dataset.hov.split(':')[0],i:+t.dataset.hov.split(':')[1]}:null;
+document.addEventListener('mouseover',e=>{if(window.PHN&&PHN.on)return;/* phone: previews come from taps (armed buttons, the dial pop-up), not from hover */const t=e.target.closest('[data-dial],[data-hov]');const nd=t&&t.dataset.dial!=null?+t.dataset.dial:null;const nh=t&&t.dataset.hov?{a:t.dataset.hov.split(':')[0],i:+t.dataset.hov.split(':')[1]}:null;
   if(nd!==UI.hoverDial||JSON.stringify(nh)!==JSON.stringify(UI.hoverAct)){UI.hoverDial=nd;UI.hoverAct=nh;if(V3.on)drawGuides();else render2D();const info=document.querySelector('.dialinfo .mvread');if(info&&G&&G.phase==='plan'&&UI.sel&&ship(UI.sel)){const s=ship(UI.sel);const di=nd!=null?nd:UI.draft[s.id];if(di!=null)info.innerHTML=moveRead(s,di)}}});
 document.addEventListener('change',e=>{if(e.target.dataset.fac!=null){UI.fac[+e.target.dataset.fac]=+e.target.value;saveSetup()}});
 document.addEventListener('keydown',e=>{if(e.target&&/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;if(e.key==='Escape'){UI.rules=false;UI.stats=false;if(typeof NET!=='undefined'&&NET.on&&NET.inLobby)NET.lobbyMin=true;render();return}
@@ -3582,6 +3744,164 @@ if(typeof GX!=='undefined'){GX.init({key:'na'});GX.drawer('d-squads','Squads',$(
   GX.onClose=id=>{if(id==='d-build'&&UI.build!=null){UI.build=null;render()}}}
 render();
 window.addEventListener('load',()=>{soundBtns();if(!init3D())document.body.classList.add('flat');if(typeof gfxLabel==='function')gfxLabel();render()});
+
+</script>
+<script>
+// ---------- phone layer (interface only, no rules): board-first layout, top-down camera with zoom/focus, tap a ship -> pop-up in the free zone ----------
+// html.ph is set on a short side <= 500 px (or a touch screen <= 600 px); ?phone=1 / ?phone=0 force it. Every CSS rule for it starts with html.ph (see phone.css).
+var PHN={on:false,land:false,bs:0,pop:null,popSig:'',armed:null,ctx:'',focusOn:false,fkey:'',briefSeen:null,cardKey:''};
+(function(){
+const R=document.documentElement;
+const SVG=d=>`<svg class="ico" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const IC={focus:SVG('<circle cx="10" cy="10" r="3.2"/><circle cx="10" cy="10" r="7.2"/><path d="M10 1.5v3M10 15.5v3M1.5 10h3M15.5 10h3"/>'),plus:SVG('<path d="M10 4v12M4 10h12"/>'),minus:SVG('<path d="M4 10h12"/>'),fit:SVG('<path d="M3 7V3h4M13 3h4v4M17 13v4h-4M7 17H3v-4"/>')};
+const forced=()=>{const m=/[?&]phone=([01])/.exec(location.search||'');return m?m[1]==='1':null};
+function insets(){const m=/[?&]safe=([\d.]+),([\d.]+),([\d.]+),([\d.]+)/.exec(location.search||'');if(m)return {t:+m[1],r:+m[2],b:+m[3],l:+m[4]};
+  try{const d=document.createElement('div');d.style.cssText='position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(d);const c=getComputedStyle(d);const r={t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0};d.remove();return r}catch(e){return {t:0,r:0,b:0,l:0}}}
+function apply(){const w=innerWidth,h=innerHeight,short=Math.min(w,h);let coarse=false;try{coarse=matchMedia('(pointer:coarse)').matches}catch(e){}
+  const f=forced();const on=f!=null?f:(short<=500||(coarse&&short<=600));const land=w>h;const was=PHN.on;
+  R.classList.toggle('ph',on);R.classList.toggle('ph-l',on&&land);R.classList.toggle('ph-p',on&&!land);PHN.on=on;PHN.land=land;
+  if(on){const sf=insets();const BAR=44,BARV=48;let bs=land?Math.min(h-sf.t-sf.b,w-sf.l-sf.r-BARV-300):Math.min(w-sf.l-sf.r,h-sf.t-sf.b-BAR-250);bs=Math.max(200,Math.floor(bs));PHN.bs=bs;
+    const st=R.style;st.setProperty('--bs',bs+'px');st.setProperty('--sat',sf.t+'px');st.setProperty('--sar',sf.r+'px');st.setProperty('--sab',sf.b+'px');st.setProperty('--sal',sf.l+'px')}
+  else{['--bs','--sat','--sar','--sab','--sal'].forEach(k=>R.style.removeProperty(k))}
+  if(on&&!was)PHN.build();
+  if(typeof V3!=='undefined'&&V3.on){V3.w=0;try{resize3D()}catch(e){}if(on!==was||true){PHN.focusOn=false;try{camView('top')}catch(e){}}}
+  try{if(typeof render==='function'&&G)render()}catch(e){}}
+PHN.apply=apply;
+let rz=0;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(apply,60)});window.addEventListener('orientationchange',()=>setTimeout(apply,120));
+// ---- one-time DOM: zoom controls in the dock head, status chip in the bar, strip + pop-up + card in the dock ----
+PHN.build=function(){if(PHN.built)return;PHN.built=true;
+  const head=document.querySelector('.gx-dock-head');if(head&&!$('phctl')){const c=document.createElement('div');c.id='phctl';c.className='ph-ctl';c.setAttribute('role','group');c.setAttribute('aria-label','Camera');
+    c.innerHTML=`<button class="gx-ibtn" id="ph-focus" data-ph="focus" aria-pressed="false" aria-label="Focus on the active ship">${IC.focus}</button><button class="gx-ibtn" data-ph="zin" aria-label="Zoom in">${IC.plus}</button><button class="gx-ibtn" data-ph="zout" aria-label="Zoom out">${IC.minus}</button><button class="gx-ibtn" data-ph="fit" aria-label="Show the whole mat">${IC.fit}</button>`;head.insertBefore(c,head.firstChild)}
+  const bar=document.querySelector('.gx-bar');if(bar&&!$('phchip')){const c=document.createElement('div');c.id='phchip';c.className='ph-chip';c.setAttribute('role','status');bar.insertBefore(c,bar.firstChild)}
+  const dock=document.querySelector('.gx-dock');if(dock){const top=dock.querySelector('.gx-dock-top');
+    if(!$('ps')){const e=document.createElement('div');e.id='ps';e.hidden=true;top.after(e)}
+    if(!$('ppop')){const e=document.createElement('div');e.id='ppop';e.hidden=true;e.setAttribute('role','dialog');dock.appendChild(e)}
+    if(!$('pc')){const e=document.createElement('div');e.id='pc';e.hidden=true;e.setAttribute('role','dialog');dock.appendChild(e)}}
+  [['sndbtn','Sound'],['pausebtn','Pause the computer'],['musbtn','Music'],['hintbtn','Hints'],['speedbtn','Speed']].forEach(([id,l])=>{const b=$(id);if(b)b.setAttribute('data-phl',l)});
+  document.querySelectorAll('.gx-bar .btn,.gx-gear').forEach(b=>{if(!b.getAttribute('aria-label')){const t=(b.getAttribute('title')||b.textContent||'').trim();if(t)b.setAttribute('aria-label',t.replace(/^[^\w]+/,''))}})};
+// ---- camera: zoom, focus, clamp (the camera is top-down on phones; one finger pans, two fingers pinch) ----
+PHN.clamp=function(){if(typeof V3==='undefined'||!V3.camera)return;const C=V3.cam;const hv=C.dist*Math.tan(V3.camera.fov*Math.PI/360);const off=Math.max(0,45.7+2-hv);C.tx=Math.max(45.7-off,Math.min(45.7+off,C.tx));C.tz=Math.max(45.7-off,Math.min(45.7+off,C.tz))};
+function ease(from){if(typeof ANIM!=='undefined'&&ANIM&&!reduceMotion())V3.ez={from,t0:performance.now(),dur:420};else V3.ez=null}
+function frame(pts,margin){if(!pts.length||typeof V3==='undefined'||!V3.on||!V3.camera)return;const C=V3.cam,cam=V3.camera;const from=Object.assign({},C);let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const p of pts){a=Math.min(a,p.x);b=Math.max(b,p.x);c=Math.min(c,p.z);d=Math.max(d,p.z)}
+  C.tx=(a+b)/2;C.tz=(c+d)/2;const ext=Math.max(b-a,d-c,30)/2+margin;C.dist=ext/Math.tan(cam.fov*Math.PI/360);
+  for(let i=0;i<10;i++){placeCam();cam.updateMatrixWorld();let m=0;for(const p of pts){const q=p.clone().project(cam);m=Math.max(m,Math.abs(q.x),Math.abs(q.y))}if(!m)break;const k=(m+ (margin/ext)*.5)/.86;C.dist*=Math.pow(k,.9);if(Math.abs(k-1)<.02)break}
+  C.dist=Math.max(36,Math.min(V3.fitDist||122,C.dist));PHN.clamp();ease(from)}
+function actingShip(){if(!G||G.winner)return null;if(PHN.pop&&PHN.pop.id&&ship(PHN.pop.id)&&PHN.pop.kind!=='atk')return ship(PHN.pop.id);
+  if(G.phase==='plan'){const ps=planSide();const my=alive().filter(s=>s.side===ps);return ps>=0?((UI.sel&&my.find(s=>s.id===UI.sel))||my.find(s=>UI.draft[s.id]==null)||my[0]):null}
+  return G.cur&&ship(G.cur)||null}
+function focusPts(){const s=actingShip();if(!s)return [];const pts=[];const around=(x,y,r)=>{for(const [dx,dy] of [[-r,-r],[r,-r],[r,r],[-r,r]])pts.push(W(x+dx,y+dy,0))};const rb=B(s);around(s.x,s.y,rb*1.4);
+  try{if(G.phase==='plan'&&planSide()>=0&&s.side===planSide()){const pk=UI.draft[s.id];dialOf(s).forEach((m,i)=>{if(pk!=null?i!==pk:m.s>3)return;const p=finalPose(s,rb,m);around(p.x,p.y,rb*.9)})}
+    else if(G.phase==='action'&&G.cur===s.id)actionsFor(s).forEach(a=>(a.opts||[]).forEach(o=>o.p&&around(o.p.x,o.p.y,rb*.9)));
+    else if(G.phase==='target'&&G.cur===s.id)weaponsFor(s).forEach(w=>w.targets.forEach(t=>{around(t.p.x,t.p.y,rb*.9)}))}catch(e){}
+  if(pts.length===4){const f=fwd(s.h);around(s.x+f.x*RANGE*1.3,s.y+f.y*RANGE*1.3,rb*.9)}return pts}
+PHN.focus=function(on,quiet){if(typeof V3==='undefined'||!V3.on)return;if(on==null)on=!PHN.focusOn;PHN.focusOn=on;PHN.fkey='';
+  if(on){PHN.fkey=fkey();frame(focusPts(),8)}else{camView('top')}if(!quiet)syncCtl()};
+function fkey(){return G?[G.round,G.phase,G.cur,UI.sel,PHN.pop&&PHN.pop.id,UI.draft&&UI.sel&&UI.draft[UI.sel]].join('|'):''}
+PHN.zoom=function(k){if(typeof V3==='undefined'||!V3.on)return;const C=V3.cam,from=Object.assign({},C);C.dist=Math.max(36,Math.min(V3.fitDist||122,C.dist*k));PHN.clamp();ease(from)};
+function syncCtl(){const b=$('ph-focus');if(b){b.setAttribute('aria-pressed',String(PHN.focusOn));b.classList.toggle('on',PHN.focusOn)}}
+// ---- tapping the board: the nearest ship within a thumb-sized radius, else the setup spot / nothing ----
+function shipPx(s){const c=V3.r.domElement,r=c.getBoundingClientRect();V3.camera.updateMatrixWorld();const pr=q=>{const v=W(q.x,q.y,0).project(V3.camera);return [(v.x+1)/2*r.width,(1-v.y)/2*r.height]};const k=corners(s,B(s)).map(pr);return Math.max(8,Math.hypot(k[0][0]-k[2][0],k[0][1]-k[2][1])*.7)}
+function pickShip(x,y){let best=null,bd=1e9;V3.camera.updateMatrixWorld();const c=V3.r.domElement,r=c.getBoundingClientRect();
+  for(const s of G.ships){if(!s.alive)continue;const v=W(s.x,s.y,1.2).project(V3.camera);const px=(v.x+1)/2*r.width,py=(1-v.y)/2*r.height;const d=Math.hypot(px-x,py-y);const rad=Math.max(26,shipPx(s)*.9);if(d<=rad&&d<bd){bd=d;best=s}}return best}
+PHN.tap=function(e){if(!G||typeof V3==='undefined'||!V3.on)return false;const r=V3.r.domElement.getBoundingClientRect();const s=pickShip(e.clientX-r.left,e.clientY-r.top);
+  if(s){PHN.shipTap(s.id);return true}if(PHN.pop){PHN.closePop();return true}return false};
+PHN.shipTap=function(id){const s=ship(id);if(!s||!s.alive)return;
+  if(G.phase==='plan'&&planSide()>=0&&s.side===planSide()&&!sumPending()&&!UI.info&&!UI.hold){UI.sel=s.id;PHN.openPop('dial',s.id);return}
+  if(G.phase==='target'&&humanTurn()&&G.cur&&validTarget(s)){PHN.openPop('atk',s.id);return}
+  PHN.openPop('info',s.id)};
+function validTarget(d){const a=ship(G.cur);return !!a&&d.side!==a.side&&weaponsFor(a).some(w=>w.targets.some(t=>t.id===d.id))}
+const sigNow=()=>G?[G.round,G.phase,G.cur,G.q&&G.q.kid,G.atk&&G.atk.step,planSide()].join('|'):'';
+PHN.openPop=function(kind,id){PHN.pop={kind,id};PHN.popSig=sigNow();if(typeof sfx==='function')sfx('click');render()};
+PHN.closePop=function(){if(!PHN.pop)return;PHN.pop=null;if(typeof V3!=='undefined')UI.hoverDial=null;render()};
+// ---- pop-ups (live in the dock zone: under the board in portrait, in the right rail in landscape; they never cover the mat) ----
+const COLSX=[['T',-1,'↰'],['B',-1,'↖'],['S',0,'↑'],['B',1,'↗'],['T',1,'↱'],['K',0,'⤺']];
+function dialPopHTML(s){const d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];const my=alive().filter(x=>x.side===s.side);const idx=my.indexOf(s);
+  let g='';for(let sp=5;sp>=1;sp--){const cells=COLSX.map(([t,dd,ic])=>{const i=d.findIndex(m=>m.s===sp&&m.t===t&&(m.d||0)===dd);if(i<0)return '<span class="pm-e"></span>';const m=exColor(s,d[i]);const bad=m.c==='r'&&s.stress;const rk=rockHits(s,d[i]);
+      return `<button class="mv pm ${m.c} ${pick===i?'on':''} ${sug===i?'sugg':''}" data-pd="${i}" ${bad?'disabled':''} aria-pressed="${pick===i}" aria-label="${mvWords(d[i])}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i?', recommended':''}${rk?', asteroid danger':''}${bad?', blocked while stressed':''}">${ic}${sug===i?'<em class="rs">★</em>':''}${rk?'<em class="rk">!</em>':''}</button>`}).join('');
+    if(cells.includes('data-pd'))g+=`<span class="pm-sp">${sp}</span>${cells}`}
+  const read=pick!=null?moveRead(s,pick):`<span class="muted">Tap a maneuver: the ghost on the mat shows where ${nm(s)} ends. Rows are speed, arrows the direction.${sug>=0?` ★ is recommended.`:''}</span>`;
+  return `<div class="pp-h"><b>${nm(s)} · set the dial</b><span class="pp-n">${my.length>1?`ship ${idx+1}/${my.length}`:''}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
+  <div class="pp-b"><div class="pm-grid" role="group" aria-label="Maneuver dial">${g}</div><div class="pm-leg"><span class="sw g"></span>easy <span class="sw w"></span>normal <span class="sw r"></span>hard (stress)${s.stress?' · <span class="warn">stressed: red is blocked</span>':''}</div><p class="pm-read">${read}</p></div>
+  <div class="pp-f">${sug>=0&&pick!==sug?`<button class="btn" data-ph="rec">★ Use recommended</button>`:''}<button class="btn primary" data-ph="set" ${pick==null?'disabled':''}>Set</button></div>`}
+function atkPopHTML(d){const s=ship(G.cur);const rows=[];for(const w of weaponsFor(s))for(const t of w.targets)if(t.id===d.id){const sd=shotDice(s,w,t,d);rows.push({w,t,sd,e:expDmg(sd.atk,sd.def,s.focus>0||s.tl===d.id,d.focus>0)})}
+  const best=rows.slice().sort((a,b)=>b.e-a.e)[0];const t0=rows[0];const tl=s.tl===d.id||s.tl2===d.id;
+  const mods=[s.focus?'◉ your focus token turns focus results into hits':'',tl?'⌖ target lock: you may reroll dice':'',t0&&t0.t.rg===1?'range 1: +1 attack die':'',t0&&t0.t.rg===3?'range 3: +1 defence die':'',t0&&t0.t.obstructed?'a rock is in the way: +1 defence die':'',d.focus?'defender holds a focus token':'',d.evade?'defender holds an evade token':''].filter(Boolean);
+  return `<div class="pp-h"><b>Shoot ${nm(d)}?</b><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
+  <div class="pp-b"><p class="pp-l"><b>Range ${t0.t.rg}</b> · inside your ${s.arc==='T'?'turret':'front'} arc · ${esc(SHIPS[d.type].n)} · hull ${d.hull-hullDmg(d)}/${d.hull}${d.shMax?` · shields ${d.sh}/${d.shMax}`:''}</p>
+  ${rows.map(o=>`<div class="pp-r${o===best?' rec':''}"><div class="dice-n"><b>${o.sd.atk}</b> attack dice <span class="vs">vs</span> <b>${o.sd.def}</b> defence</div><div class="small muted">${o.w.k==='P'?'Primary weapon':esc(o.w.n)} · expected ≈${o.e.toFixed(1)} damage</div></div>`).join('')}
+  <ul class="pp-m">${mods.map(m=>`<li>${m}</li>`).join('')||'<li class="muted">No modifiers right now.</li>'}</ul></div>
+  <div class="pp-f">${rows.map(o=>`<button class="btn ${o===best?'primary':''}" data-act="fire" data-w="${o.w.k}" data-t="${d.id}">🎯 Fire${o.w.k!=='P'?' '+esc(o.w.n):''}<small>${o.sd.atk} dice, range ${o.t.rg}</small></button>`).join('')}</div>`}
+function infoPopHTML(s){const T=SHIPS[s.type],P=PILOTS[s.pilot];const hp=s.hull-hullDmg(s);const col=FACTIONS[G.fac[s.side]].col;const tok=s.alive?shipTokens(s):'destroyed';
+  const crits=s.dmg.filter(x=>x.up).map(x=>`<li><b>${esc(DAMAGE[x.c].n)}</b>: ${esc(critPlain(x.c,s))}</li>`).join('');
+  let extra='';if(G.phase==='target'&&humanTurn()&&G.cur&&s.side!==ship(G.cur).side&&!validTarget(s))extra=`<p class="warn small">Can't shoot it: ${esc(whyNot(ship(G.cur),s))}.</p>`;
+  return `<div class="pp-h"><b style="color:var(--c${col})">${nm(s)}</b><span class="pp-n">${esc(T.n)}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
+  <div class="pp-b"><div class="stats big">${statSpans(s)}</div>
+  <div class="pp-bars"><div>Hull ${hp}/${s.hull}<span class="bar h">${'<i></i>'.repeat(Math.max(0,hp))}${'<i class="x"></i>'.repeat(Math.max(0,s.hull-hp))}</span></div>${s.shMax?`<div>Shields ${s.sh}/${s.shMax}<span class="bar s">${'<i></i>'.repeat(s.sh)}${'<i class="x"></i>'.repeat(Math.max(0,s.shMax-s.sh))}</span></div>`:''}</div>
+  <p class="small">${s.stress?'':'<b>Stress:</b> 0 · '}${tok||'no tokens'}</p>${P.t?`<p class="small"><b>Pilot:</b> ${esc(P.t)}</p>`:''}
+  ${s.ups.length?`<p class="small"><b>Upgrades:</b> ${s.ups.map(u=>`<span class="${u.gone?'gone':''}">${esc(UPGRADES[u.id].n)}</span>`).join(', ')}</p>`:''}${crits?`<ul class="small pp-c">${crits}</ul>`:''}${extra}</div>
+  <div class="pp-f">${typeof V3!=='undefined'&&V3.on?`<button class="btn" data-ph="zoomto" data-id="${s.id}">${IC.focus} Zoom to it</button>`:''}<button class="btn primary" data-ph="x">Close</button></div>`}
+// ---- strip (planning): which ships still need a dial, recommended-for-all, lock ----
+function stripHTML(){const ps=planSide();const my=alive().filter(s=>s.side===ps);const nset=my.filter(s=>UI.draft[s.id]!=null).length,all=nset===my.length;const g=guided();
+  const chips=my.map(s=>{const i=UI.draft[s.id];const set=i!=null;const m=set?dialOf(s)[i]:null;return `<button class="ps-chip ${set?'set':'need'} ${UI.sel===s.id?'on':''}" data-ph="ship" data-id="${s.id}" aria-label="${esc(s.name)}: ${set?'dial set, '+mvWords(m):'needs a dial'}"><b>${esc(shortName(s))}</b><span>${set?'✓ '+esc(mvWords(m)):'needs a dial'}</span></button>`}).join('');
+  return `<p class="ps-t">${all?'All dials set. Lock them in.':g?`Tap ${my.length>1?'a ship':'your ship'} (on the board or below) to open its dial. A ghost shows where it would end.`:`Tap ${my.length>1?'a ship':'your ship'} to set its dial.`} <span class="muted">${all?'':`${my.length-nset} still need${my.length-nset>1?'':'s'} a maneuver.`}</span></p>
+  <div class="ps-chips">${chips}</div><div class="ps-btns"><button class="btn" data-a="autodial">★ Recommended${my.length>1?' for all':''}</button><button class="btn primary" data-a="lock" ${all?'':'disabled'}>Lock in dials</button></div>`}
+// ---- the render hook ----
+function stage(){if(!G)return 'none';if(UI.info)return 'start';return 'game'}
+function chipHTML(){if(!G)return 'Nebula Aces';const st=G.winner?'Over':G.round===0?'Setup':['','Plan','Move','Fire','End'][stepShown()]||'';const r=G.round===0||G.winner?'':'R'+roundShown();
+  const who=G.winner?'':(planSide()>=0||humanTurn())?'<i class="you">you</i>':'';return `${r?`<b>${r}</b>`:''}<span>${st}</span>${who}`}
+function cardHTML(){if(UI.advOpen){const a=advice();return {key:'adv',h:`<div class="pc-b"><div class="adv2"><b>🧭 ${a.say}</b> ${a.why}</div></div><div class="pp-f"><button class="btn primary" data-a="advise">Got it</button></div>`}}
+  if(G&&G.round===0&&!G.winner&&PHN.briefSeen!==G.seed&&(isHuman(0)||isHuman(1))&&typeof briefingHTML==='function')return {key:'brief'+G.seed,h:`<div class="pc-b">${briefingHTML()}</div><div class="pp-f"><button class="btn primary" data-ph="briefok">Continue ▶</button></div>`};
+  return null}
+function phRender(){if(!PHN.on)return;PHN.build();const dock=document.querySelector('.gx-dock');if(!dock)return;
+  const chip=$('phchip');if(chip){const h=chipHTML();if(chip.innerHTML!==h)chip.innerHTML=h;chip.setAttribute('aria-label',G?`Round ${roundShown()}, ${['','planning','activation','combat','end'][stepShown()]||'setup'}`:'Nebula Aces')}
+  const play=!!G&&!UI.info&&UI.build==null&&!UI.rules&&!UI.stats;R.classList.toggle('ph-play',play);
+  const ps=$('ps'),pp=$('ppop'),pc=$('pc');
+  // pop-ups close when the situation they were about changes
+  if(PHN.pop){const s=ship(PHN.pop.id);const k=PHN.pop.kind;let ok=!!G&&!!s&&s.alive&&play;
+    if(ok&&k==='dial')ok=G.phase==='plan'&&planSide()>=0&&s.side===planSide()&&!sumPending()&&!UI.hold;
+    else if(ok&&k==='atk')ok=G.phase==='target'&&humanTurn()&&validTarget(s);
+    else if(ok&&k==='info')ok=PHN.popSig===sigNow();
+    if(!ok)PHN.pop=null}
+  const strip=play&&G.phase==='plan'&&planSide()>=0&&!sumPending()&&!UI.hold;R.classList.toggle('ph-ps',strip);
+  if(ps){ps.hidden=!strip;if(strip){const h=stripHTML();if(ps._h!==h){ps._h=h;ps.innerHTML=h}}else if(ps._h){ps._h=null;ps.innerHTML=''}}
+  const card=play?cardHTML():null;
+  R.classList.toggle('ph-card',!!card);if(card||PHN.pop){const dk=document.querySelector('.gx-dock');if(dk&&dk.scrollTop)dk.scrollTop=0}
+  if(pc){pc.hidden=!card;if(card){if(pc._k!==card.key||pc._h!==card.h){pc._k=card.key;pc._h=card.h;pc.innerHTML=card.h;pc.scrollTop=0}}else pc._k=null}
+  if(pp){const open=!!PHN.pop&&!card;pp.hidden=!open;R.classList.toggle('ph-pop',open);
+    if(open){const s=ship(PHN.pop.id);const k=PHN.pop.kind;if(k==='dial'){UI.sel=s.id;UI.hoverDial=null}
+      const h=k==='dial'?dialPopHTML(s):k==='atk'?atkPopHTML(s):infoPopHTML(s);const keep=pp.querySelector('.pp-b');const sc=keep?keep.scrollTop:0;
+      if(pp._h!==h){pp._h=h;pp.innerHTML=h;pp.className='pp pp-'+k;const nb=pp.querySelector('.pp-b');if(nb)nb.scrollTop=sc}}
+    else if(pp._h){pp._h=null;pp.innerHTML=''}}
+  // the action step: say what the move did; barrel-roll / boost options preview before they are confirmed
+  const pr=$('prompt');if(pr&&G&&G.phase==='action'&&humanTurn()&&!UI.hold&&!sumPending()){const s=ship(G.cur);if(s&&!pr.querySelector('.ph-move')){const rv=s.rev;const c=rv?exColor(s,rv).c:'w';const hd=pr.querySelector('.head');
+      if(hd)hd.insertAdjacentHTML('afterend',`<div class="ph-move"><b>${nm(s)}</b> flew <b>${rv?mvWords(rv):'its move'}</b>${rv?` <span class="cw ${c}">${c==='g'?'green':c==='r'?'red':'white'}</span>`:''}${s.stress?` · <span class="warn">stress ${s.stress}</span>`:''}</div>`)}}
+  const ctx=G?[G.round,G.phase,G.cur].join('|'):'';if(ctx!==PHN.ctx){PHN.ctx=ctx;PHN.armed=null;if(UI.hoverAct){UI.hoverAct=null}}
+  if(PHN.armed&&!UI.hoverAct&&G&&G.phase==='action'){const q=PHN.armed.split(':');UI.hoverAct={a:q[0],i:+q[1]};try{if(V3.on)drawGuides();else render2D()}catch(e){}}
+  if(PHN.armed){const b=document.querySelector(`#prompt [data-hov="${PHN.armed}"]`);if(b)b.classList.add('armed')}
+  // focus follows the decision while it is on; it returns to the whole mat when you are not deciding any more
+  if(PHN.focusOn){if(!G||G.winner||!(planSide()>=0||humanTurn())){PHN.focus(false,true)}else{const k=fkey();if(k!==PHN.fkey){PHN.fkey=k;frame(focusPts(),8)}}}
+  syncCtl();const v=typeof V3!=='undefined'&&V3.on;R.classList.toggle('ph-3d',v)}
+const _render=render;render=function(){_render();try{phRender()}catch(e){console.error(e)}};
+// ---- events (capture phase, so they run before the game's own delegated handlers) ----
+document.addEventListener('click',e=>{if(!PHN.on)return;const t=e.target.closest('[data-ph],[data-pd]');
+  if(t&&t.dataset.pd!=null){e.stopImmediatePropagation();e.preventDefault();const s=PHN.pop&&ship(PHN.pop.id);if(!s)return;UI.draft[s.id]=+t.dataset.pd;UI.sel=s.id;UI.hoverDial=null;sfx('click');render();if(PHN.focusOn){/* keep the frame */}return}
+  if(t&&t.dataset.ph){const a=t.dataset.ph;e.stopImmediatePropagation();e.preventDefault();
+    if(a==='x'){PHN.closePop();return}
+    if(a==='ship'){const s=ship(t.dataset.id);if(s){UI.sel=s.id;PHN.openPop('dial',s.id)}return}
+    if(a==='rec'){const s=PHN.pop&&ship(PHN.pop.id);if(s){UI.draft[s.id]=suggestDial(s);render()}return}
+    if(a==='set'){const s=PHN.pop&&ship(PHN.pop.id);if(!s||UI.draft[s.id]==null)return;sfx('token');const my=alive().filter(x=>x.side===s.side);const nxt=my.find(x=>UI.draft[x.id]==null);PHN.pop=null;if(nxt){UI.sel=nxt.id;PHN.pop={kind:'dial',id:nxt.id};PHN.popSig=sigNow()}render();return}
+    if(a==='focus'){PHN.focus();return}if(a==='zin'){PHN.zoom(.72);return}if(a==='zout'){PHN.zoom(1.38);return}if(a==='fit'){PHN.focus(false);return}
+    if(a==='zoomto'){const s=ship(t.dataset.id);if(s){PHN.focusOn=true;PHN.fkey=fkey();frame([W(s.x,s.y,0),W(s.x+fwd(s.h).x*RANGE,s.y+fwd(s.h).y*RANGE,0)],8);syncCtl();PHN.closePop()}return}
+    if(a==='briefok'){PHN.briefSeen=G.seed;render();return}return}
+  // barrel roll / boost: first tap previews the ghost on the mat, the second tap confirms
+  const b=e.target.closest('#prompt [data-hov]');if(b&&b.dataset.act==='action'&&PHN.armed!==b.dataset.hov){e.stopImmediatePropagation();e.preventDefault();PHN.armed=b.dataset.hov;const p=b.dataset.hov.split(':');UI.hoverAct={a:p[0],i:+p[1]};document.querySelectorAll('#prompt .armed').forEach(x=>x.classList.remove('armed'));b.classList.add('armed');try{if(V3.on)drawGuides();else render2D()}catch(e2){}}
+  // 2D fallback: a tap on a ship opens the pop-up too
+  const sg=e.target.closest('#map [data-ship]');if(sg&&!(typeof V3!=='undefined'&&V3.on)){e.stopImmediatePropagation();e.preventDefault();PHN.shipTap(sg.dataset.ship)}},true);
+document.addEventListener('keydown',e=>{if(PHN.on&&e.key==='Escape'&&PHN.pop){PHN.closePop();e.stopImmediatePropagation()}},true);
+apply();
+if(typeof V3!=='undefined'&&V3.on)apply();else window.addEventListener('load',()=>setTimeout(apply,0));
+PHN.guided=()=>typeof guided==='function'&&guided();
+})();
 
 </script>
 </body>
