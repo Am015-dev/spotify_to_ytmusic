@@ -71,7 +71,8 @@ function renderDrawers() {
 function renderMenu() {
   const b = $('#setbody'); b.innerHTML = '';
   const row = (l, ...k) => b.appendChild(h('div.mrow', h('div.lbl', l), h('div.mbt', k)));
-  row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
+  if (NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
+  else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
   row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
   row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
   row('Sound', h('button.btn' + (UI.sound === false ? '.alt' : ''), { 'data-a': 'sound', type: 'button' }, UI.sound === false ? 'Off' : 'On'));
@@ -81,6 +82,7 @@ function renderMenu() {
 // ---- start screen
 function renderStart() {
   const s = $('#start'); s.hidden = false; s.innerHTML = '';
+  if (NET.on) { netStartScreen(s); return; }
   const o = UI.opt = UI.opt || Object.assign({}, DEF);
   const seg = (l, key, vals, fmt) => h('div.seg', h('span.lbl', l), vals.map(v => h('button.chipb' + (o[key] === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': key, 'data-v': v, type: 'button' }, fmt ? fmt(v) : v)));
   const card = h('div.scard',
@@ -94,6 +96,7 @@ function renderStart() {
       h('button.sbtn', { 'data-start': 'solo', 'data-a': 'start', 'data-m': 'solo', type: 'button' }, h('b', 'Solo vs ' + D.soloName), h('span', 'Beat the automated rival')),
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', '2 to 4 people, one device')),
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch computers'), h('span', 'Sit back and learn'))),
+    netBlock(),
     h('div.srow2', hasSave() ? h('button.btn', { 'data-a': 'loadsave', type: 'button' }, 'Continue saved game') : null, h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play')));
   s.appendChild(card);
 }
@@ -103,6 +106,7 @@ document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]'); const pop = $('#ppop');
   if (!t) { if (UI.pop && pop && !pop.contains(ev.target) && !ev.target.closest('#pc,.gx-drawer')) closePop(); return; }
   const a = t.dataset.a, d = t.dataset;
+  if (netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'tile': openTile(d.k, d.i); break;
@@ -159,6 +163,7 @@ function boot() {
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'hb' }); }; } catch (e) { }
   try { if (window.PerfHUD && PerfHUD.register) PerfHUD.register({ game: 'Hollowbough' }); } catch (e) { }
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
+  netInit();
   renderStart();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

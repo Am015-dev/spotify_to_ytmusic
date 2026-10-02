@@ -7,11 +7,12 @@ function promptText() {
   if (G.phase === 'over') return 'The game is over.';
   const a = HB.actor(G), p = G.players[a];
   if (UI.cards.length) return 'Read the card, then Continue.';
+  if (NET.on && !p.ai && a !== viewSeat()) return p.name + ' is deciding…';
   if (hotSeat() && UI.holder !== a && !p.ai) return 'Pass the device to ' + p.name + '.';
   if (p.ai) { const l = G.log.length ? G.log[G.log.length - 1].t : ''; return p.name + ' is playing… ' + (UI.lastAi || ''); }
   if (G.q) return G.q.title;
   const n = availW(p);
-  const pre = hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
+  const pre = NET.on ? 'Your turn. ' : hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
   return pre + (n > 0 ? 'Tap a place for a worker (' + n + ' free) or a card to play.' : 'No workers left: play a card, Prepare for ' + (p.season < 3 ? SEASN[p.season + 1] : 'the end') + ', or Pass.');
 }
 function chipEl(s) {
@@ -68,14 +69,14 @@ function renderStrips() {
     $('#handLab').textContent = 'Hand ' + hand.length + '/8';
   } else {
     hr.removeAttribute('data-owner');
-    hr.appendChild(h('span.empty', watching() ? 'Watching the computers play.' : 'Hand hidden until the device is passed.'));
+    hr.appendChild(h('span.empty', watching() ? 'Watching the computers play.' : NET.on ? 'You are watching this game.' : 'Hand hidden until the device is passed.'));
     $('#handLab').textContent = 'Hand';
   }
 }
 function renderDock() {
   if (!G) return;
   $('#prompt').textContent = promptText();
-  $('#prompt').classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai));
+  $('#prompt').classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai && (!NET.on || HB.actor(G) === viewSeat())));
   renderChips(); renderRes(); renderActs(); renderStrips();
   const t = $('#barstat'); if (t) { const p = G.players[Math.max(0, focusSeat())]; t.innerHTML = ''; t.appendChild(HBKit.season(SEAS[p.season], 22)); t.appendChild(h('span', SEASN[p.season] + (G.phase === 'over' ? ' · over' : ''))); }
 }

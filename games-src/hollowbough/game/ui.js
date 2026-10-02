@@ -81,9 +81,9 @@ function cardEl(id, w, o) {
 function backEl(w) { const wr = h('div.cd.back'); wr.style.width = w + 'px'; wr.style.height = Math.round(w * 1.406) + 'px'; wr.appendChild(h('span', { html: ICO.tree })); return wr; }
 // ---- game helpers
 const humans = () => G ? G.players.map((p, i) => p.ai ? -1 : i).filter(i => i >= 0) : [];
-const hotSeat = () => !!G && humans().length > 1;
+const hotSeat = () => !!G && !NET.on && humans().length > 1;
 const watching = () => !!G && humans().length === 0;
-function viewSeat() { if (!G) return -1; if (hotSeat()) return UI.holder; const hs = humans(); return hs.length ? hs[0] : -1; }
+function viewSeat() { if (!G) return -1; if (NET.on) return NET.mySeat; if (hotSeat()) return UI.holder; const hs = humans(); return hs.length ? hs[0] : -1; }
 function pname(s) { return s === 'G' ? D.soloName : (G.players[s] ? G.players[s].name : '?'); }
 function availW(p) { return p.workers - p.dep.length; }
 function movesFor(seat) { return G && G.phase !== 'over' ? HB.moves(G, seat) : []; }
@@ -250,11 +250,12 @@ function promptText() {
   if (G.phase === 'over') return 'The game is over.';
   const a = HB.actor(G), p = G.players[a];
   if (UI.cards.length) return 'Read the card, then Continue.';
+  if (NET.on && !p.ai && a !== viewSeat()) return p.name + ' is deciding…';
   if (hotSeat() && UI.holder !== a && !p.ai) return 'Pass the device to ' + p.name + '.';
   if (p.ai) { const l = G.log.length ? G.log[G.log.length - 1].t : ''; return p.name + ' is playing… ' + (UI.lastAi || ''); }
   if (G.q) return G.q.title;
   const n = availW(p);
-  const pre = hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
+  const pre = NET.on ? 'Your turn. ' : hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
   return pre + (n > 0 ? 'Tap a place for a worker (' + n + ' free) or a card to play.' : 'No workers left: play a card, Prepare for ' + (p.season < 3 ? SEASN[p.season + 1] : 'the end') + ', or Pass.');
 }
 function chipEl(s) {
@@ -311,14 +312,14 @@ function renderStrips() {
     $('#handLab').textContent = 'Hand ' + hand.length + '/8';
   } else {
     hr.removeAttribute('data-owner');
-    hr.appendChild(h('span.empty', watching() ? 'Watching the computers play.' : 'Hand hidden until the device is passed.'));
+    hr.appendChild(h('span.empty', watching() ? 'Watching the computers play.' : NET.on ? 'You are watching this game.' : 'Hand hidden until the device is passed.'));
     $('#handLab').textContent = 'Hand';
   }
 }
 function renderDock() {
   if (!G) return;
   $('#prompt').textContent = promptText();
-  $('#prompt').classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai));
+  $('#prompt').classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai && (!NET.on || HB.actor(G) === viewSeat())));
   renderChips(); renderRes(); renderActs(); renderStrips();
   const t = $('#barstat'); if (t) { const p = G.players[Math.max(0, focusSeat())]; t.innerHTML = ''; t.appendChild(HBKit.season(SEAS[p.season], 22)); t.appendChild(h('span', SEASN[p.season] + (G.phase === 'over' ? ' · over' : ''))); }
 }
@@ -610,6 +611,7 @@ function newGame(mode, o) {
   if (mode === 'solo') { players = [{ name: 'You', ai: null }]; solo = { difficulty: cfg.solo }; }
   else if (mode === 'guided') { players = [{ name: 'You', ai: null }, { name: PNAMES[0], ai: 'easy' }]; }
   else if (mode === 'hot') { players = []; for (let i = 0; i < cfg.np; i++) players.push({ name: (cfg.names && cfg.names[i]) || 'Player ' + (i + 1), ai: null }); }
+  else if (mode === 'net') { players = o.players; }
   else if (mode === 'ai') { players = []; for (let i = 0; i < cfg.np; i++) players.push({ name: PNAMES[i], ai: cfg.level }); if (cfg.np < 2) players.push({ name: PNAMES[1], ai: cfg.level }); }
   else { players = [{ name: 'You', ai: null }]; for (let i = 1; i < cfg.np; i++) players.push({ name: PNAMES[i - 1], ai: (o.levels && o.levels[i - 1]) || cfg.level }); }
   G = HB.newGame({ players, solo, seed: UI.seed != null ? UI.seed : undefined });
@@ -627,6 +629,7 @@ function render() {
   if (!G || !UI.started) return;
   try { if (window.PerfHUD) PerfHUD.wake(); } catch (e) { }
   renderBoard(); renderDock(); renderQ(); renderCard(); placePop(); markSel(); renderDrawers();
+  if (NET.on) netRenderHook();
 }
 function markSel() {
   $$('.sel').forEach(x => x.classList.remove('sel')); const p = UI.pop; if (!p) return;
@@ -653,22 +656,22 @@ function takeDevice() { const c = UI.cards.shift(); UI.holder = c && c.seat != n
 // ---- driver
 function schedule() {
   clearTimeout(UI.tm); clearTimeout(UI.tr); UI.tm = 0;
-  if (!G || !UI.started || UI.cards.length) return;
+  if (!G || !UI.started || (UI.cards.length && !NET.on)) return;
   if (G.phase === 'over') { if (!UI.overShown) { UI.overShown = true; queueOver(); const w = G.over; snd(G.grim ? (w.win ? 'fanfare' : 'lose') : 'fanfare', { duck: true }); sndMusic(); } return; }
   const a = HB.actor(G), p = G.players[a], hs = humans();
   if (UI.after.length && hs.length && !(G.q && !G.players[G.q.who].ai)) { if (flushAfter()) return; }
-  if (p.ai) { UI.tm = setTimeout(aiStep, ANIM ? AIDELAY : 0); return; }
+  if (p.ai) { if (!isClient()) UI.tm = setTimeout(aiStep, ANIM ? AIDELAY : 0); return; }
   if (hotSeat() && UI.holder !== a) {
     UI.holder = -1; closePop(); render();
     pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', p.name + ', take the device. Nobody else should look at the screen. Your hand and resources appear when you tap the button.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
     return;
   }
   if (UI.coachOn && coachCheck()) return;
-  if (UI.turnSnd !== G.turn + ':' + a) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); }
+  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); }
   if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
 }
 function aiStep() {
-  UI.tm = 0; if (!G || G.phase === 'over' || UI.cards.length) return;
+  UI.tm = 0; if (isClient() || !G || G.phase === 'over' || (UI.cards.length && !NET.on)) return;
   const a = HB.actor(G); if (a < 0) return; const p = G.players[a]; if (!p.ai) { schedule(); return; }
   const n0 = G.logN; let m;
   try { m = HB.AI.choose(G, a); } catch (e) { m = HB.moves(G, a)[0]; console.error('AI error', e); }
@@ -679,11 +682,13 @@ function aiStep() {
   const ls = logSince(n0); UI.lastAi = ls.length ? ls[0].replace(/^[^ ]+ /, '') : '';
   afterMove();
 }
-function afterMove() { save(); render(); sndMusic(); schedule(); }
+function afterMove() { save(); render(); sndMusic(); schedule(); if (NET.on) netPush(); }
 function act(m) {
   if (!G || !m) return; const a = HB.actor(G);
+  if (isClient()) { netAct(m); return; }
+  if (NET.on && a !== NET.mySeat) return;
   const n0 = G.logN;
-  if (m.type === 'prepare') UI.after.push({ kind: 'season', seat: a, from: n0 });
+  if (m.type === 'prepare' && !NET.on) UI.after.push({ kind: 'season', seat: a, from: n0 });
   const pre = sndPre();
   const r = HB.apply(G, m);
   closePop(); UI.rec = null;
@@ -717,12 +722,12 @@ function queueOver() {
   UI.cards.push({
     kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + ' wins!'), sub: 'The game is over',
     body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); return t; },
-    buttons: [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
+    buttons: NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
   });
   clearSave(); render();
 }
 // ---- save / load
-function save() { try { if (!G || G.phase === 'over') return; localStorage.setItem(SAVEKEY, JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, coach: UI.coach, coachOn: UI.coachOn, holder: -1 })); } catch (e) { } }
+function save() { try { if (!G || G.phase === 'over' || NET.on) return; localStorage.setItem(SAVEKEY, JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, coach: UI.coach, coachOn: UI.coachOn, holder: -1 })); } catch (e) { } }
 function clearSave() { try { localStorage.removeItem(SAVEKEY); } catch (e) { } }
 function hasSave() { try { return !!localStorage.getItem(SAVEKEY); } catch (e) { return false; } }
 function loadSave() {
@@ -807,7 +812,8 @@ function renderDrawers() {
 function renderMenu() {
   const b = $('#setbody'); b.innerHTML = '';
   const row = (l, ...k) => b.appendChild(h('div.mrow', h('div.lbl', l), h('div.mbt', k)));
-  row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
+  if (NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
+  else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
   row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
   row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
   row('Sound', h('button.btn' + (UI.sound === false ? '.alt' : ''), { 'data-a': 'sound', type: 'button' }, UI.sound === false ? 'Off' : 'On'));
@@ -817,6 +823,7 @@ function renderMenu() {
 // ---- start screen
 function renderStart() {
   const s = $('#start'); s.hidden = false; s.innerHTML = '';
+  if (NET.on) { netStartScreen(s); return; }
   const o = UI.opt = UI.opt || Object.assign({}, DEF);
   const seg = (l, key, vals, fmt) => h('div.seg', h('span.lbl', l), vals.map(v => h('button.chipb' + (o[key] === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': key, 'data-v': v, type: 'button' }, fmt ? fmt(v) : v)));
   const card = h('div.scard',
@@ -830,6 +837,7 @@ function renderStart() {
       h('button.sbtn', { 'data-start': 'solo', 'data-a': 'start', 'data-m': 'solo', type: 'button' }, h('b', 'Solo vs ' + D.soloName), h('span', 'Beat the automated rival')),
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', '2 to 4 people, one device')),
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch computers'), h('span', 'Sit back and learn'))),
+    netBlock(),
     h('div.srow2', hasSave() ? h('button.btn', { 'data-a': 'loadsave', type: 'button' }, 'Continue saved game') : null, h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play')));
   s.appendChild(card);
 }
@@ -839,6 +847,7 @@ document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]'); const pop = $('#ppop');
   if (!t) { if (UI.pop && pop && !pop.contains(ev.target) && !ev.target.closest('#pc,.gx-drawer')) closePop(); return; }
   const a = t.dataset.a, d = t.dataset;
+  if (netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'tile': openTile(d.k, d.i); break;
@@ -895,6 +904,7 @@ function boot() {
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'hb' }); }; } catch (e) { }
   try { if (window.PerfHUD && PerfHUD.register) PerfHUD.register({ game: 'Hollowbough' }); } catch (e) { }
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
+  netInit();
   renderStart();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();

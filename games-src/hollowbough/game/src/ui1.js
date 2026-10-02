@@ -81,9 +81,9 @@ function cardEl(id, w, o) {
 function backEl(w) { const wr = h('div.cd.back'); wr.style.width = w + 'px'; wr.style.height = Math.round(w * 1.406) + 'px'; wr.appendChild(h('span', { html: ICO.tree })); return wr; }
 // ---- game helpers
 const humans = () => G ? G.players.map((p, i) => p.ai ? -1 : i).filter(i => i >= 0) : [];
-const hotSeat = () => !!G && humans().length > 1;
+const hotSeat = () => !!G && !NET.on && humans().length > 1;
 const watching = () => !!G && humans().length === 0;
-function viewSeat() { if (!G) return -1; if (hotSeat()) return UI.holder; const hs = humans(); return hs.length ? hs[0] : -1; }
+function viewSeat() { if (!G) return -1; if (NET.on) return NET.mySeat; if (hotSeat()) return UI.holder; const hs = humans(); return hs.length ? hs[0] : -1; }
 function pname(s) { return s === 'G' ? D.soloName : (G.players[s] ? G.players[s].name : '?'); }
 function availW(p) { return p.workers - p.dep.length; }
 function movesFor(seat) { return G && G.phase !== 'over' ? HB.moves(G, seat) : []; }

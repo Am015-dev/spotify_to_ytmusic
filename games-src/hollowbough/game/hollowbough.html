@@ -230,12 +230,33 @@ html.ph #start{padding:6px}.html-ph .scard{padding:10px}
 html.ph .scard h1{font-size:1.6rem}
 html.ph .seg .lbl{flex-basis:96px}
 html.ph.ph-l .sgrid{grid-template-columns:1fr 1fr}
+/* ---- online play ---- */
+#netst{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:36vw;background:rgba(255,255,255,.1);color:#f6ecd6;border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:3px 10px;font-size:13px;white-space:nowrap;cursor:pointer;min-height:30px}
+#netst[hidden]{display:none}
+#netst .nl{overflow:hidden;text-overflow:ellipsis}#netst .ns{display:none}
+.nd{width:10px;height:10px;border-radius:50%;background:#e3b02e;flex:0 0 auto}.nd.ok{background:#7fd65a}.nd.bad{background:#e0583c}
+.nst.ok{color:#2e6a1c}.nst.bad,.warn{color:#a0301c;font-weight:700}
+#netbox{position:fixed;inset:0;z-index:70;background:rgba(20,28,18,.6);display:flex;align-items:center;justify-content:center;padding:10px}
+#netbox[hidden]{display:none}
+.nbox{position:relative;background:var(--paper);color:var(--ink);border:3px solid var(--ink);border-radius:14px;padding:14px;width:min(480px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:8px;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.nbox h2{margin:0;font-size:1.3rem;padding-right:50px}.nbox h3{margin:2px 0 0;font-size:1rem}.nbox p{margin:0;font-size:14px}
+.nbox .lbx{position:absolute;right:8px;top:8px}
+.nbox .code{font-size:1.3rem;letter-spacing:.12em;text-transform:uppercase}
+.invrow,.nrow,.acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.invrow input,.nrow input{flex:1 1 150px;min-width:0;min-height:44px;font:inherit;font-size:16px;padding:4px 10px;border:2px solid var(--ink);border-radius:10px;background:#fffdf5;color:var(--ink)}
+.plist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:3px}.plist li{display:flex;align-items:center;gap:6px;font-size:14px;min-height:24px}
+.online{border:2px solid var(--ink);border-radius:12px;padding:6px 10px;background:rgba(255,255,255,.35)}
+.online summary{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+.online .nrow{margin:6px 0}.online p{margin:4px 0}
+html.ph #netst{min-width:44px;min-height:44px;padding:0 8px;justify-content:center;border-radius:10px}html.ph #netst .nl{display:none}html.ph #netst .ns{display:inline;font-weight:700}
+html.ph.ph-l.net #barstat{display:none}
 </style></head>
 <body>
 <div class="gx-app">
 <header class="gx-bar">
   <h1><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="7.5" fill="#7fae62" stroke="#f6ecd6" stroke-width="1.4"/><path d="M10.5 22V14h3v8Z" fill="#c99a63" stroke="#f6ecd6" stroke-width="1.2"/></svg></span><span class="tt">Hollowbough</span></h1>
   <span id="barstat"></span>
+  <button id="netst" type="button" data-a="netopen" hidden></button>
   <div id="barprompt"></div>
   <span class="gx-sp"></span>
   <button class="gx-ibtn" data-gx="rivald" aria-expanded="false" aria-label="Cities and players" title="Cities and players"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-4 3-6 6-6s6 2 6 6M15 14c3 0 6 1.5 6 5"/></svg><span>Players</span></button>
@@ -262,6 +283,7 @@ html.ph.ph-l .sgrid{grid-template-columns:1fr 1fr}
 </div>
 </div>
 <div id="start" hidden></div>
+<div id="netbox" hidden></div>
 <div id="toast" role="status"></div>
 <script>
 // ===== Board-first shell: dock toggle, sheet sizing, closable popups (drawers) =====
@@ -477,6 +499,88 @@ const GX={key:'gx',open:null,
     get live(){return LIVE},get testing(){return testing},get idling(){return idleOn},get shown(){return hudOn}};
   root.PerfHUD=PerfHUD;
 })(typeof window!=='undefined'?window:globalThis);
+
+</script>
+<script>
+/* Trystero 0.25.4 (MIT, github.com/dmotz/trystero), bundled with esbuild. Loaded only where WebRTC exists. */
+var Trystero;if(typeof RTCPeerConnection!=="undefined"&&typeof TextEncoder!=="undefined"&&typeof crypto!=="undefined"&&crypto.subtle)try{Trystero=(()=>{var nn=Object.defineProperty;var qr=Object.getOwnPropertyDescriptor;var Kr=Object.getOwnPropertyNames;var Wr=Object.prototype.hasOwnProperty;var Fr=(e,n,t)=>n in e?nn(e,n,{enumerable:!0,configurable:!0,writable:!0,value:t}):e[n]=t;var Jr=(e,n)=>{for(var t in n)nn(e,t,{get:n[t],enumerable:!0})},zr=(e,n,t,o)=>{if(n&&typeof n=="object"||typeof n=="function")for(let a of Kr(n))!Wr.call(e,a)&&a!==t&&nn(e,a,{get:()=>n[a],enumerable:!(o=qr(n,a))||o.enumerable});return e};var Vr=e=>zr(nn({},"__esModule",{value:!0}),e);var Q=(e,n,t)=>Fr(e,typeof n!="symbol"?n+"":n,t);var Hs={};Jr(Hs,{joinRoom:()=>Lr,selfId:()=>Z});var An=Object.freeze,Se=0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn,We=0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n,Pt=0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798n,kt=0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n,Gr=An({p:Se,n:We,h:1n,a:0n,b:7n,Gx:Pt,Gy:kt}),de=32,ut=e=>e instanceof Uint8Array||ArrayBuffer.isView(e)&&e.constructor.name==="Uint8Array"&&e.BYTES_PER_ELEMENT===1,ce=(e,n,t="")=>{if(ut(e)&&(n===void 0||e.length===n))return e;let o=ut(e),a=n!==void 0?` of length ${n}`:"",s=o?`length=${e.length}`:`type=${typeof e}`,r=(t?`"${t}" `:"")+"expected Uint8Array"+a+", got "+s;throw o?new RangeError(r):new TypeError(r)},Zr=e=>Uint8Array.from(e),Xr=(e,n,t)=>Zr(ce(e,t,n)),vt=(e,n)=>e.toString(16).padStart(n,"0"),St=e=>{let n="";for(let t of ce(e))n+=vt(t,2);return n},bt=e=>{let n="hex invalid";if(typeof e!="string")throw new TypeError(n);if(e.length%2||!/^[\da-f]*$/i.test(e))throw new RangeError(n);let t=new Uint8Array(e.length/2);for(let o=0,a=0;o<t.length;o++,a+=2){let s=e.charCodeAt(a),r=e.charCodeAt(a+1);t[o]=((s&15)+(s>>6)*9)*16+(r&15)+(r>>6)*9}return t},dt=()=>{let e=globalThis?.crypto?.subtle;if(e)return e;throw new Error("crypto.subtle must be defined, consider polyfill")},_e=(...e)=>{let n=0;for(let a of e)n+=ce(a).length;let t=new Uint8Array(n),o=0;for(let a of e)t.set(a,o),o+=a.length;return t},Rn=(e=de)=>{let n=globalThis?.crypto;if(typeof n?.getRandomValues!="function")throw new Error("crypto.getRandomValues must be defined, consider polyfill");return n.getRandomValues(new Uint8Array(e))},Yr=BigInt,Fe=(e,n,t,o="bad number: out of range")=>{if(typeof e!="bigint")throw new TypeError(o);if(n<=e&&e<t)return e;throw new RangeError(o)},M=(e,n=Se)=>(e%=n)>=0n?e:n+e,rn=e=>M(e,We),Qr=(e,n)=>{if(e===0n)throw new Error("invert: expected non-zero number");if(n<=1n)throw new Error("invert: expected modulus > 1, got "+n);let t=M(e,n),o=n,a=0n,s=1n;for(;t!==0n;){let i=o/t,c=o-t*i,m=a-s*i;o=t,t=c,a=s,s=m}if(o!==1n)throw new Error("invert: does not exist");return M(a,n)},Tt=e=>{let n=ro[e];if(typeof n!="function")throw new Error("hashes."+e+" not set");return n},mt=(e,n,t)=>ce(Tt(e)(n,t),de,"digest"),gt=async(e,n,t)=>ce(await Tt(e)(n,t),de,"digest");var vn=e=>{if(e instanceof be)return e;throw new TypeError("Point expected")},Sn="bad point: not on curve",At=e=>M(M(e*e)*e+7n),ht=e=>Fe(e,0n,Se),qe=e=>Fe(e,1n,Se),Rt=e=>Fe(e,1n,We),on=e=>!(e&1n),eo=e=>Uint8Array.of(on(e)?2:3),Et=e=>{let n=At(qe(e)),t=1n;for(let o=n,a=(Se+1n)/4n;a>0n;a>>=1n)a&1n&&(t=t*o%Se),o=o*o%Se;if(M(t*t)!==n)throw new Error("sqrt invalid");return new be(e,on(t)?t:M(-t),1n)},ye=class ye{constructor(n,t,o){Q(this,"X");Q(this,"Y");Q(this,"Z");this.X=ht(n),this.Y=qe(t),this.Z=ht(o),An(this)}static CURVE(){return Gr}static fromAffine(n){let{x:t,y:o}=n;return t===0n&&o===0n?Ke:new ye(t,o,1n)}static fromBytes(n){ce(n);let t=n.length,o=n[0],a=tn(n,1,33);try{if(t===33&&(o===2||o===3)){let s=Et(a);return o===3?s.negate():s}if(t===65&&o===4)return new ye(a,tn(n,33,65),1n).assertValidity()}catch{throw new Error(Sn)}throw new Error(Sn)}static fromHex(n){return ye.fromBytes(bt(n))}get x(){return this.toAffine().x}get y(){return this.toAffine().y}equals(n){let{X:t,Y:o,Z:a}=this,{X:s,Y:r,Z:i}=vn(n);return M(t*i)===M(s*a)&&M(o*i)===M(r*a)}is0(){return this.Z===0n}negate(){return new ye(this.X,M(-this.Y),this.Z)}double(){return this.add(this)}add(n){let{X:t,Y:o,Z:a}=this,{X:s,Y:r,Z:i}=vn(n),c=0n,m=7n,u=0n,f=0n,d=0n,h=M(m*3n),y=M(t*s),A=M(o*r),T=M(a*i),B=M(t+o),w=M(s+r);B=M(B*w),w=M(y+A),B=M(B-w),w=M(t+a);let O=M(s+i);return w=M(w*O),O=M(y+T),w=M(w-O),O=M(o+a),u=M(r+i),O=M(O*u),u=M(A+T),O=M(O-u),d=M(c*w),u=M(h*T),d=M(u+d),u=M(A-d),d=M(A+d),f=M(u*d),A=M(y+y),A=M(A+y),T=M(c*T),w=M(h*w),A=M(A+T),T=M(y-T),T=M(c*T),w=M(w+T),y=M(A*w),f=M(f+y),y=M(O*w),u=M(B*u),u=M(u-y),y=M(B*A),d=M(O*d),d=M(d+y),new ye(u,f,d)}subtract(n){return this.add(vn(n).negate())}multiply(n,t=!0){if(!t&&n===0n)return Ke;if(Rt(n),n===1n)return this;if(this.equals(Be))return uo(n).p;let o=Ke,a=Be,s=this;for(let r=0;t?r<256:n>0n;r++)n&1n?o=o.add(s):t&&(a=a.add(s)),s=s.double(),n>>=1n;return o}multiplyUnsafe(n){return this.multiply(n,!1)}toAffine(){let{X:n,Y:t,Z:o}=this;if(o===0n)return{x:0n,y:0n};if(o===1n)return{x:n,y:t};let a=Qr(o,Se);if(M(o*a)!==1n)throw new Error("inverse invalid");return{x:M(n*a),y:M(t*a)}}assertValidity(){let{x:n,y:t}=this.toAffine();if(qe(n),qe(t),M(t*t)!==At(n))throw new Error(Sn);return this}toBytes(n=!0){let{x:t,y:o}=this.assertValidity().toAffine(),a=pe(t);return n?_e(eo(o),a):_e(Uint8Array.of(4),a,pe(o))}toHex(n){return St(this.toBytes(n))}};Q(ye,"BASE"),Q(ye,"ZERO");var be=ye,Be=new be(Pt,kt,1n),Ke=new be(0n,1n,0n);be.BASE=Be;be.ZERO=Ke;var no=(e,n,t)=>Be.multiply(n,!1).add(e.multiply(t,!1)).assertValidity(),Oe=e=>Yr("0x"+(St(e)||"0")),tn=(e,n,t)=>Oe(e.subarray(n,t)),pe=e=>bt(vt(Fe(e,0n,2n**256n),de*2)),to=e=>{let n=Oe(ce(e,de,"secret key"));return Fe(n,1n,We,"invalid secret key: outside of range")};var yt="SHA-256",ro={hmacSha256Async:async(e,n)=>{let t=dt(),o=await t.importKey("raw",e,{name:"HMAC",hash:yt},!1,["sign"]);return new Uint8Array(await t.sign("HMAC",o,n))},hmacSha256:void 0,sha256Async:async e=>new Uint8Array(await dt().digest(yt,e)),sha256:void 0};var oo=e=>{if(e=e===void 0?Rn(48):e,ce(e),e.length<48||e.length>1024)throw new RangeError("expected 48-1024b");let n=M(Oe(e),We-1n);return pe(n+1n)},so=e=>n=>{let t=oo(n);return{secretKey:t,publicKey:e(t)}};var Mt=e=>Uint8Array.from("BIP0340/"+e,n=>n.charCodeAt(0)),bn=(e,...n)=>{let t=mt("sha256",Mt(e));return mt("sha256",_e(t,t,...n))},Tn=(e,...n)=>gt("sha256Async",Mt(e)).then(t=>gt("sha256Async",_e(t,t,...n))),En=e=>{let n=to(e),t=Be.multiply(n),{x:o,y:a}=t.assertValidity().toAffine(),s=on(a)?n:rn(-n),r=pe(o);return{d:s,px:r}},Mn=e=>rn(Oe(e)),Bt=(...e)=>Mn(bn("challenge",...e)),Ot=async(...e)=>Mn(await Tn("challenge",...e)),Ct=e=>En(e).px,ao=so(Ct),Dt=(e,n,t)=>{let o=Xr(e,"message"),{px:a,d:s}=En(n);return{m:o,px:a,d:s,a:ce(t,de)}},Lt=e=>{let n=Mn(e);if(n===0n)throw new Error("sign failed: k is zero");let{px:t,d:o}=En(pe(n));return{rx:t,k:o}},Ht=(e,n,t,o)=>_e(n,pe(rn(e+t*o))),xt="invalid signature produced",io=(e,n,t=Rn(de))=>{let{m:o,px:a,d:s,a:r}=Dt(e,n,t),i=pe(s^Oe(bn("aux",r))),{rx:c,k:m}=Lt(bn("nonce",i,a,o)),u=Ht(m,c,Bt(c,a,o),s);if(!It(u,o,a))throw new Error(xt);return u},co=async(e,n,t=Rn(de))=>{let{m:o,px:a,d:s,a:r}=Dt(e,n,t),i=pe(s^Oe(await Tn("aux",r))),{rx:c,k:m}=Lt(await Tn("nonce",i,a,o)),u=Ht(m,c,await Ot(c,a,o),s);if(!await Ut(u,o,a))throw new Error(xt);return u},fo=(e,n)=>e instanceof Promise?e.then(n):n(e),_t=(e,n,t,o)=>{let a=ce(e,64,"signature"),s=ce(n,void 0,"message"),r=ce(t,de,"publicKey"),i,c,m,u;try{let f=Oe(r);i=Et(f),c=qe(tn(a,0,de)),m=Rt(tn(a,de,64)),u=_e(pe(c),r,s)}catch{return!1}return fo(o(u),f=>{try{let{x:d,y:h}=no(i,m,rn(-f)).toAffine();return!(!on(h)||d!==c)}catch{return!1}})},It=(e,n,t)=>_t(e,n,t,Bt),Ut=async(e,n,t)=>_t(e,n,t,Ot),Bn=An({keygen:ao,getPublicKey:Ct,sign:io,verify:It,signAsync:co,verifyAsync:Ut}),lo=()=>{let e=[],n=Be,t=n;for(let o=0;o<33;o++){t=n,e.push(t);for(let a=1;a<128;a++)t=t.add(n),e.push(t);n=t.double()}return e},pt,wt=(e,n)=>{let t=n.negate();return e?t:n},uo=e=>{let n=pt||(pt=lo()),t=Ke,o=Be;for(let a=0;a<33;a++){let s=Number(e&255n);e>>=8n,s>128&&(s-=256,e+=1n);let r=a*128,i=r+Math.abs(s)-1,c=a%2!==0,m=s<0;s===0?o=o.add(wt(c,n[r])):t=t.add(wt(m,n[i]))}if(e!==0n)throw new Error("invalid wnaf");return{p:t,f:o}};var{floor:On,min:mo,sin:go}=Math,G="Trystero",Te=(e,n)=>Array(e).fill(void 0).map(n),ho="0123456789AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz",fe=e=>Te(e,()=>ho[On(Math.random()*62)]??"").join(""),Z=fe(20),se=Promise.all.bind(Promise),Dn=typeof window<"u",{entries:me,fromEntries:Ln,keys:ne,values:we}=Object,V=()=>{},sn="candidate",_=e=>(e!==null&&clearTimeout(e),null),I=e=>new Error(`${G}: ${e}`),Pe=(e,n)=>e instanceof Error&&e.message?e.message:typeof e=="string"&&e?e:X(e??n),le=(e,n)=>e instanceof Error?e:I(Pe(e,n)),yo=new TextEncoder,po=new TextDecoder,ue=e=>yo.encode(e),ge=e=>po.decode(e),ke=e=>e.reduce((n,t)=>n+t.toString(16).padStart(2,"0"),""),Ce=(...e)=>e.join("@"),wo=(e,n)=>{let t=[...e],o=()=>{let s=go(n++)*1e4;return s-On(s)},a=t.length;for(;a;){let s=On(o()*a--),r=t[a];t[a]=t[s],t[s]=r}return t},Hn=(e,n,t,o=!1)=>e.relayConfig?.urls||(o?wo(n,an(e.appId)):n).slice(0,e.relayConfig?.redundancy??t),X=JSON.stringify,he=e=>{try{return JSON.parse(e)}catch{throw I(`failed to parse JSON: ${e}`)}},an=(e,n=Number.MAX_SAFE_INTEGER)=>e.split("").reduce((t,o)=>t+o.charCodeAt(0),0)%n,Nt=3333,$t=6e4,Je={},ze=null,Cn=null,xn=()=>{ze||(ze=new Promise(e=>{Cn=e}).finally(()=>{Cn=null,ze=null}))},_n=()=>{Cn?.()},In=(e,n,t)=>{let o={},a=!1,s=!1,r,i=V;o.isClosed=!1,o.ready=new Promise(m=>i=m);let c=()=>{if(o.isClosed)return;r=void 0,s=!1;let m=new WebSocket(e);m.onclose=()=>{if(o.isClosed||s)return;if(s=!0,ze){ze.then(c);return}let u=Je[e]??(Je[e]=Nt);if(u>=$t){o.isClosed=!0;return}r=setTimeout(c,Math.random()*u),Je[e]=mo(u*2,$t)},m.onmessage=u=>n(String(u.data)),o.socket=m,o.url=m.url,m.onopen=()=>{let u=a;a=!0,i(o),Je[e]=Nt,u&&t?.()},o.send=u=>{m.readyState===1&&m.send(u)}};return o.close=()=>{o.isClosed=!0,r!==void 0&&(clearTimeout(r),r=void 0),o.socket.close()},c(),o};var Un=e=>{let n={},t=new WeakMap,o=r=>{let i=t.get(r);if(!i)throw I("relay bookkeeping missing registration for relay client");return i},a=()=>{let r={},i=c=>r[c]??(r[c]={});return{forKey:i,forRelay:c=>i(o(c))}},s=(r,i)=>(n[r]=i,t.set(i,r),i);return{register:(r,i)=>{let c=n[r];return c||s(r,i())},keyOf:o,scoped:a,getSockets:()=>Ln(me(n).flatMap(([r,i])=>{let c=e(i);return c?[[r,c]]:[]}))}},jt=()=>{if(Dn){let e=new AbortController;return addEventListener("online",_n,{signal:e.signal}),addEventListener("offline",xn,{signal:e.signal}),()=>e.abort()}return V};var $n="AES-GCM",Nn={},Po=e=>btoa(String.fromCharCode.apply(null,Array.from(new Uint8Array(e)))),ko=e=>{let n=atob(e);return new Uint8Array(n.length).map((t,o)=>n.charCodeAt(o)).buffer},De=async(e,n)=>new Uint8Array(await crypto.subtle.digest(e,ue(n))),Ae=async e=>Nn[e]??(Nn[e]=Array.from(await De("SHA-1",e)).map(n=>n.toString(36)).join("")),qt=async(e,n,t)=>crypto.subtle.importKey("raw",await crypto.subtle.digest({name:"SHA-256"},ue(`${e}:${n}:${t}`)),{name:$n},!1,["encrypt","decrypt"]),Kt=async(e,n)=>ke(await De("SHA-256",`${G}:${e}:${n}`)),Wt="$",Ft=",",Jt=async(e,n)=>{let t=crypto.getRandomValues(new Uint8Array(16));return t.join(Ft)+Wt+Po(await crypto.subtle.encrypt({name:$n,iv:t},await e,ue(n)))},zt=async(e,n)=>{let[t,o]=n.split(Wt);return ge(await crypto.subtle.decrypt({name:$n,iv:new Uint8Array(t?.split(Ft).map(Number)??[])},await e,ko(o??"")))};var Ve=57333,vo=18e4,So=20,Vt=class{constructor(e){Q(this,"makeOffer");Q(this,"pool",[]);Q(this,"pooled",new Set);Q(this,"leased",new Map);Q(this,"recycling",new Set);Q(this,"cleanupTimer",null);Q(this,"active",!1);this.makeOffer=e}get isActive(){return this.active}warmup(){this.pool=[],this.pooled.clear(),Te(So,this.makeOffer).forEach(e=>this.push(e)),this.active=!0,this.cleanupTimer=setInterval(()=>{this.pool=this.pool.filter(e=>e.isDead?(this.pooled.delete(e),!1):!0)},Ve)}push(e){e.isDead||this.pooled.has(e)||this.leased.has(e)||(this.pool.push(e),this.pooled.add(e))}shift(e){let n=[];for(;n.length<e&&this.pool.length>0;){let t=this.pool.shift();if(!t)break;this.pooled.delete(t),n.push(t)}return n}claimLeased(e){let n=this.leased.get(e);n&&(_(n),this.leased.delete(e))}recycle(e){if(!(e.isDead||this.recycling.has(e))){if(e.connection.remoteDescription){e.destroy();return}if(!this.active){e.destroy();return}this.recycling.add(e),e.setHandlers({connect:V,close:V,error:V}),e.getOffer(!0).then(n=>{if(!n||n.type!=="offer"||e.isDead||!this.active){e.destroy();return}this.push(e)}).catch(()=>e.destroy()).finally(()=>this.recycling.delete(e))}}reclaimLeased(e){let n=this.leased.get(e);n&&(_(n),this.leased.delete(e),this.recycle(e))}lease(e){this.claimLeased(e),this.leased.set(e,setTimeout(()=>{this.leased.delete(e),this.recycle(e)},vo))}checkout(e,n,t){let o=this.shift(e),a=Math.max(0,e-o.length);a>0&&o.push(...Te(a,this.makeOffer));let s=async(r,i=!1)=>{try{let c=await t(r);return n?(this.lease(r),{peer:r,offer:c,claim:()=>this.claimLeased(r),reclaim:()=>this.reclaimLeased(r)}):{peer:r,offer:c}}catch(c){if(this.claimLeased(r),this.pooled.delete(r),r.destroy(),!i)return s(this.makeOffer(),!0);throw c}};return se(o.map(r=>s(r)))}getOffers(e,n){return this.checkout(e,!0,n)}destroy(){this.active=!1,this.cleanupTimer&&(clearInterval(this.cleanupTimer),this.cleanupTimer=null),this.pool.forEach(e=>e.destroy()),this.pool=[],this.pooled.clear(),this.leased.forEach((e,n)=>{_(e),n.destroy()}),this.leased.clear(),this.recycling.forEach(e=>e.destroy()),this.recycling.clear()}};var jn=I("incorrect password for overlapping room"),Gt=(e,n,t)=>{let o=r=>De("SHA-256",`${r}:${e}:${n}:${t}`).then(ke),a=async(r,i,c)=>{if(!e)return;if(c){let u=fe(36);await r({__trystero_pw:"challenge",c:u});let{data:f}=await i();if(!f||typeof f!="object"||f.__trystero_pw!=="response"||typeof f.h!="string")throw jn;let d=await o(u);if(f.h!==d)throw jn;return}let{data:m}=await i();if(!m||typeof m!="object"||m.__trystero_pw!=="challenge"||typeof m.c!="string")throw jn;await r({__trystero_pw:"response",h:await o(m.c)})};return{run:a,compose:r=>e||r?async(i,c,m,u)=>{await a(c,m,u),await r?.(i,c,m,u)}:void 0}},bo=e=>{let n=Pe(e,"unknown error");return n.startsWith("handshake ")?n:`handshake failed: ${n}`},Zt=({onPeerHandshake:e,onHandshakeError:n,handshakeTimeoutMs:t,sendHandshakeData:o,sendHandshakeReady:a,onActivate:s,onFailure:r})=>{let i={},c=(f,d)=>{let h=i[f];!h||d&&h.peer!==d||h.isActive||!h.didLocalHandshakePass||!h.didReceiveRemoteReady||(h.isActive=!0,h.handshakeTimer=_(h.handshakeTimer),s(f,h.peer))},m=(f,d,h)=>{let y=i[f];if(!y||y.peer!==d)return;let A=bo(h);n?.(f,A),r(f,d,I(A))},u=(f,d)=>{let h=i[f];!h||h.peer!==d||h.isActive||(h.didLocalHandshakePass=!0,a("",f).catch(y=>m(f,d,I(`failed sending handshake readiness: ${Pe(y,"unknown send failure")}`))),c(f,d))};return{addPeer:(f,d)=>{i[f]={peer:d,isActive:!1,didLocalHandshakePass:!1,didReceiveRemoteReady:!1,handshakeTimer:null,pendingHandshakePayloads:[],handshakeWaiters:[]}},clearPeer:(f,d)=>{let h=i[f];h&&(h.handshakeTimer=_(h.handshakeTimer),h.pendingHandshakePayloads.length=0,h.handshakeWaiters.splice(0).forEach(y=>y.reject(d)),delete i[f])},canReceiveFromPeer:(f,d)=>{let h=i[f];return!!(h&&(h.isActive||d))},start:(f,d)=>{let h=i[f];if(!h||h.peer!==d)return;h.handshakeTimer=setTimeout(()=>m(f,d,I(`handshake timed out after ${t}ms`)),t);let y=async(B,w)=>{await o(B,f,w)},A=()=>new Promise((B,w)=>{let O=i[f];if(!O||O.peer!==d){w(I("peer disconnected during handshake"));return}let x=O.pendingHandshakePayloads.shift();if(x){B(x);return}O.handshakeWaiters.push({resolve:B,reject:P=>w(P)})}),T=Z<f;Promise.resolve(e?.(f,y,A,T)).then(()=>u(f,d)).catch(B=>m(f,d,le(B,"handshake failed")))},receiveHandshakeData:(f,d,h)=>{let y=i[d];if(!y||y.isActive)return;let A=h===void 0?{data:f}:{data:f,metadata:h},T=y.handshakeWaiters.shift();if(T){T.resolve(A);return}y.pendingHandshakePayloads.push(A)},receiveHandshakeReady:f=>{let d=i[f];!d||d.isActive||(d.didReceiveRemoteReady=!0,c(f))}}};var To=15e3,Ao=5e3,Xt="icegatheringstatechange",Ro="iceconnectionstatechange",Ge="offer",Eo="answer",Mo=/out of range/i,Yt=e=>e.replace(/ (\S+\.local) (\d+) typ host/g," 127.0.0.1 $2 typ host"),qn=(e,{trickleIce:n,rtcConfig:t,rtcPolyfill:o,turnConfig:a,_test_only_mdnsHostFallbackToLoopback:s})=>{let r=new(o??RTCPeerConnection)({iceServers:Bo.concat(a??[]),...t}),i={},c=[],m=[],u=n!==!1,f=[],d=[],h=!1,y=!1,A=null,T=null,B=!1,w=()=>T=_(T),O=()=>{B||(B=!0,w(),i.close?.())},x=g=>{i.signal?i.signal(g):c.push(g)},P=g=>{let v=i.signal;i.signal=H=>{v?.(H),g(H)},c.length>0&&c.splice(0).forEach(H=>i.signal?.(H))},R=g=>s?Yt(g):g,$=g=>{if(!s||typeof g.candidate!="string")return g;let v=Yt(g.candidate);return v===g.candidate?g:{...g,candidate:v}},S=g=>({type:g.localDescription?.type??Ge,sdp:R(g.localDescription?.sdp??"")}),K=()=>{let g=r.remoteDescription?.sdp;return g?g.match(/a=ice-ufrag:([^\s]+)/)?.[1]??null:null},W=()=>(r.remoteDescription?.sdp?.match(/^m=/gm)??[]).length,q=g=>{if(!r.remoteDescription)return!1;let v=W();if(typeof g.sdpMLineIndex=="number"&&v>0&&g.sdpMLineIndex>=v)return!1;let H=K();return!(H&&g.usernameFragment&&g.usernameFragment!==H)},F=async g=>{try{return await r.addIceCandidate(g),!0}catch(v){if(v instanceof Error&&Mo.test(v.message)&&typeof g.sdpMLineIndex=="number")return!1;throw v}},J=async()=>{if(!r.remoteDescription||f.length===0)return;let g=f.splice(0),v=[];for(let H of g){if(!q(H)){v.push(H);continue}await F(H)||v.push(H)}v.length>0&&f.push(...v)},l=async g=>{if(q(g)){await F(g)||f.push(g);return}f.push(g)},p=g=>{g.binaryType="arraybuffer",g.bufferedAmountLowThreshold=65535,g.onmessage=v=>{let H=v.data;i.data?i.data(H):m.push(H)},g.onopen=()=>i.connect?.(),g.onclose=O,g.onerror=({error:v})=>i.error?.(le(v,"data channel error"))},b=async g=>{let v=null;try{await Promise.race([new Promise(H=>{let ee=()=>{g.iceGatheringState==="complete"&&(g.removeEventListener(Xt,ee),H())};g.addEventListener(Xt,ee),ee()}),new Promise(H=>{v=setTimeout(H,To)})])}finally{_(v)}return S(g)},k=async()=>{let g=u?S(r):await b(r);return x(g),g};e?(A=r.createDataChannel("data"),p(A)):r.ondatachannel=({channel:g})=>{A=g,p(g)};let E=async(g=!1)=>{if(r.connectionState!=="closed")try{return h=!0,g&&(r.signalingState!=="stable"&&r.signalingState!=="closed"&&r.localDescription?.type===Ge&&await r.setLocalDescription({type:"rollback"}),typeof r.restartIce=="function"&&r.restartIce()),await r.setLocalDescription(g?await r.createOffer({iceRestart:!0}):void 0),await k()}catch(v){i.error?.(le(v,"failed to create local offer"))}finally{h=!1}};r.onnegotiationneeded=async()=>E(!1),r.onicecandidate=({candidate:g})=>{if(!u||!g)return;let v=$(typeof g.toJSON=="function"?g.toJSON():{candidate:g.candidate,sdpMid:g.sdpMid,sdpMLineIndex:g.sdpMLineIndex,usernameFragment:g.usernameFragment});x({type:sn,sdp:JSON.stringify(v)})};let U=()=>{if(r.connectionState==="failed"||r.connectionState==="closed"||r.iceConnectionState==="failed"||r.iceConnectionState==="closed"){O();return}if(r.connectionState==="connected"||r.connectionState==="connecting"||r.iceConnectionState==="connected"||r.iceConnectionState==="completed"||r.iceConnectionState==="checking"){w();return}if(r.connectionState==="disconnected"||r.iceConnectionState==="disconnected"){T||(T=setTimeout(()=>{T=null,(r.connectionState==="disconnected"||r.iceConnectionState==="disconnected")&&O()},Ao));return}};r.onconnectionstatechange=U,r.addEventListener(Ro,U),r.ontrack=g=>{let v=g.streams[0];if(v){if(!i.track&&!i.stream){d.push({track:g.track,stream:v});return}i.track?.(g.track,v),i.stream?.(v)}},r.onremovestream=g=>i.stream?.(g.stream);let j=e?new Promise(g=>P(v=>{v.type===Ge&&g(v)})):Promise.resolve();return e&&queueMicrotask(()=>{!h&&r.signalingState==="stable"&&!r.localDescription&&r.connectionState!=="closed"&&r.onnegotiationneeded?.(new Event("negotiationneeded"))}),{created:Date.now(),connection:r,get channel(){return A},get isDead(){return r.connectionState==="closed"},getOffer:async(g=!1)=>{if(e)return g?E(!0):r.localDescription?.type===Ge?u?S(r):b(r):j},async signal(g){if(g.type==="candidate"){try{let v=JSON.parse(g.sdp);v&&typeof v=="object"&&await l($(v))}catch(v){i.error?.(le(v,"failed to parse remote candidate"))}return}if(!(A?.readyState==="open"&&!g.sdp?.includes("a=rtpmap")))try{let v={...g,sdp:R(g.sdp)};if(g.type===Ge){if(h||r.signalingState!=="stable"&&!y){if(e)return;await se([r.setLocalDescription({type:"rollback"}),r.setRemoteDescription(v)])}else await r.setRemoteDescription(v);return await J(),await r.setLocalDescription(),await k()}if(g.type===Eo){y=!0;try{await r.setRemoteDescription(v),await J()}finally{y=!1}}}catch(v){i.error?.(le(v,"failed to apply remote signal"))}},sendData:g=>A?.send(g),destroy:()=>{w(),A?.close(),r.close(),h=!1,y=!1,O()},setHandlers:g=>{let{signal:v,...H}=g;Object.assign(i,H),i.data&&m.length>0&&m.splice(0).forEach(ee=>i.data?.(ee)),v&&P(v),(i.track||i.stream)&&d.length>0&&d.splice(0).forEach(({track:ee,stream:te})=>{i.track?.(ee,te),i.stream?.(te)})},offerPromise:j,addStream:g=>g.getTracks().forEach(v=>r.addTrack(v,g)),removeStream:g=>r.getSenders().filter(v=>v.track&&g.getTracks().includes(v.track)).forEach(v=>r.removeTrack(v)),addTrack:(g,v)=>r.addTrack(g,v),removeTrack:g=>{let v=r.getSenders().find(H=>H.track===g);v&&r.removeTrack(v)},replaceTrack:(g,v)=>{let H=r.getSenders().find(ee=>ee.track===g);if(H)return H.replaceTrack(v)}}},Bo=[...Te(3,(e,n)=>`stun:stun${n||""}.l.google.com:19302`),"stun:stun.cloudflare.com:3478"].map(e=>({urls:e}));var Oo=Object.getPrototypeOf(Uint8Array),Kn=32,Co=0,Wn=32,Qt=34,Fn=35,cn=36,Le=16*2**10-cn,Ze=255,Do=65535,er="bufferedamountlow",nr="close",tr="error",Lo=1e4,Ho=e=>e instanceof ArrayBuffer?new Uint8Array(e):new Uint8Array(e.buffer,e.byteOffset,e.byteLength),xo=(e,n=Lo)=>e.readyState!=="open"||e.bufferedAmount<=e.bufferedAmountLowThreshold?Promise.resolve(e.readyState==="open"):new Promise(t=>{let o=!1,a=null,s=c=>{o||(o=!0,e.removeEventListener(er,r),e.removeEventListener(nr,i),e.removeEventListener(tr,i),_(a),t(c))},r=()=>s(!0),i=()=>s(!1);if(e.addEventListener(er,r),e.addEventListener(nr,i),e.addEventListener(tr,i),a=setTimeout(()=>s(!1),n),e.readyState!=="open"){s(!1);return}e.bufferedAmount<=e.bufferedAmountLowThreshold&&s(!0)}),rr=({getPeer:e,getPeerIds:n,canReceiveFromPeer:t,throwIfAborted:o})=>{let a={},s={},r={},i={},c=(f,d,{includePending:h=!1}={})=>(f?Array.isArray(f)?f:[f]:n(h)).flatMap(y=>{let A=e(y,h);return A?[Promise.resolve(d(y,A))]:(console.warn(`${G}: no peer with id ${y} found`),[])});return{makeInternalAction:(f,d={})=>{let h=s[f];if(a[f]&&h){let w=a[f].options;if(w.sendToPending!==!!d.sendToPending||w.receiveWhilePending!==!!d.receiveWhilePending)throw I(`action type "${f}" cannot be redefined`);return h}if(!f)throw I("action type argument is required");let y=ue(f);if(y.byteLength>Kn)throw I(`action type string "${f}" (${y.byteLength}b) exceeds byte limit (${Kn}). Hint: choose a shorter name.`);let A={sendToPending:!!d.sendToPending,receiveWhilePending:!!d.receiveWhilePending},T=new Uint8Array(Kn);T.set(y);let B=0;return a[f]={onComplete:V,onProgress:V,setOnComplete:w=>{a[f].onComplete=w;let O=i[f];O?.length&&(delete i[f],O.forEach(({payload:x,peerId:P,metadata:R})=>w(x,P,R)))},setOnProgress:w=>{a[f].onProgress=w},send:async(w,O,x,P,R)=>{o(R);let $=typeof w;if($==="undefined")throw I("action data cannot be undefined");let S=$!=="string",K=w instanceof Blob,W=K||w instanceof ArrayBuffer||w instanceof Oo,q=x!==void 0,F=W?Ho(K?await w.arrayBuffer():w):ue(S?X(w):w),J=q?ue(X(x)):null,l=Math.ceil(F.byteLength/Le)+(q?1:0)||1,p=Te(l,(b,k)=>{let E=k===l-1,U=!!(q&&k===0),j=new Uint8Array(cn+(U?J?.byteLength??0:E?F.byteLength-Le*(l-(q?2:1)):Le));return j.set(T),j.set([B>>8,B&Ze],Wn),j.set([Number(E)|Number(U)<<1|Number(W)<<2|Number(S)<<3],Qt),j.set([Math.round((k+1)/l*Ze)],Fn),j.set(q?U?J??new Uint8Array:F.subarray((k-1)*Le,k*Le):F.subarray(k*Le,(k+1)*Le),cn),j});return B=B+1&Do,await se(c(O,async(b,k)=>{let{channel:E}=k,U=0;for(;U<l;){o(R);let j=p[U];if(!j)break;if(E&&E.bufferedAmount>E.bufferedAmountLowThreshold){let H=await xo(E);if(o(R),!H)break}let g=e(b,A.sendToPending);if(!g||g!==k)break;k.sendData(j),U++;let v=j[Fn]??Ze;P?.(v/Ze,b,x)}},{includePending:A.sendToPending})),[]},options:A},s[f]={send:a[f].send,onMessage:a[f].setOnComplete,onProgress:a[f].setOnProgress}},handleData:(f,d)=>{var q,F;let h=new Uint8Array(d),y=ge(h.subarray(Co,Wn)).replaceAll("\0",""),A=a[y];if(!t(f,!!A?.options.receiveWhilePending))return;let T=(h[Wn]??0)<<8|(h[33]??0),B=h[Qt]??0,w=h[Fn]??0,O=h.subarray(cn),x=!!(B&1),P=!!(B&2),R=!!(B&4),$=!!(B&8);r[f]??(r[f]={}),(q=r[f])[y]??(q[y]={});let S=(F=r[f][y])[T]??(F[T]={chunks:[]});if(P?S.meta=he(ge(O)):S.chunks.push(O),A?.onProgress(w/Ze,f,S.meta),!x)return;let K=new Uint8Array(S.chunks.reduce((J,l)=>J+l.byteLength,0));S.chunks.reduce((J,l)=>(K.set(l,J),J+l.byteLength),0),delete r[f][y][T];let W=R?K:$?he(ge(K)):ge(K);if(A){A.onComplete(W,f,S.meta);return}(i[y]??(i[y]=[])).push({payload:W,peerId:f,...S.meta===void 0?{}:{metadata:S.meta}})},clearPeer:f=>{delete r[f]}}};var _o=500,Ie=(e,n)=>{let t=I(n);return t.kind=e,t.name=e==="aborted"?"AbortError":t.name,t},Jn=e=>{if(e?.aborted)throw Ie("aborted","operation aborted")},or=e=>e&&typeof e=="object"&&!Array.isArray(e)&&typeof e.r=="string"?{r:e.r,...Object.hasOwn(e,"m")?{m:e.m}:{}}:null,Io=e=>e&&typeof e=="object"&&!Array.isArray(e)&&typeof e.r=="string"?{r:e.r,...typeof e.e=="string"?{e:e.e}:{}}:null,fn=(e,n)=>n===void 0?e:{...e,metadata:n},sr=({getPeer:e,getPeerIds:n,canReceiveFromPeer:t})=>{let o={},a={},s=rr({getPeer:e,getPeerIds:n,canReceiveFromPeer:t,throwIfAborted:Jn}),r=s.makeInternalAction,i=s.handleData,c=h=>{let y=a[h];y&&(_(y.timer),y.signal&&y.abortHandler&&y.signal.removeEventListener("abort",y.abortHandler),delete a[h])},m=(h,y)=>{me(a).forEach(([A,T])=>{T.peerId===h&&(c(A),T.reject(y))})},u=(h,y)=>{s.clearPeer(h),m(h,Ie("disconnected",Pe(y,"peer disconnected")))},f=r("@_response");return f.onMessage((h,y,A)=>{let T=Io(A);if(!T)return;let B=a[T.r];if(!(!B||B.peerId!==y)){if(c(T.r),T.e!==void 0){B.reject(Ie("rejected",T.e));return}B.resolve(h)}}),{makeAction:(h,y)=>{if(y&&"onRequest"in y&&y.kind!=="request")throw I('request actions must use kind: "request"');let A=y?.kind??"message",T=r(h),B=o[h];if(B){if(B.kind!==A)throw I(`action type "${h}" cannot be redefined`);return B.action}let w={kind:A,action:null,pendingMessages:[],pendingRequests:[],onReceiveProgress:y?.onReceiveProgress??null},O=(l,p)=>l?(b,k)=>l(b,fn({peerId:k},p)):void 0,x=l=>{w.onReceiveProgress=l},P=(l,p,b)=>{let k=w.kind==="request"?or(b):null;w.onReceiveProgress?.(l,fn({peerId:p},k?k.m:b))};if(T.onProgress(P),A==="message"){let l=y?.onMessage??null,p=()=>{if(!l)return;let k=l;w.pendingMessages.splice(0).forEach(({payload:E,peerId:U,metadata:j})=>{Promise.resolve().then(()=>k(E,fn({peerId:U},j))).catch(g=>console.error(`${G} action handler error:`,g))})},b={send:async(k,E={})=>{await T.send(k,E.target,E.metadata,O(E.onProgress,E.metadata),E.signal)},get onMessage(){return l},set onMessage(k){l=k,p()},get onReceiveProgress(){return w.onReceiveProgress},set onReceiveProgress(k){x(k)}};return T.onMessage((k,E,U)=>{if(!l){w.pendingMessages.push(U===void 0?{payload:k,peerId:E}:{payload:k,peerId:E,metadata:U});return}let j=l;Promise.resolve().then(()=>j(k,fn({peerId:E},U))).catch(g=>console.error(`${G} action handler error:`,g))}),w.action=b,o[h]=w,p(),b}let R=y?.onRequest??null,$=l=>{_(l.timer);let p=w.pendingRequests.indexOf(l);p>-1&&w.pendingRequests.splice(p,1)},S=(l,p,b)=>{f.send(null,l,{r:p,e:Pe(b,"request failed")})},K=(l,p)=>{$(l),Promise.resolve().then(()=>p(l.payload,{peerId:l.peerId,...l.metadata===void 0?{}:{metadata:l.metadata},signal:l.controller.signal})).then(async b=>{if(b===void 0)throw I("request handler returned undefined");await f.send(b,l.peerId,{r:l.requestId})}).catch(b=>S(l.peerId,l.requestId,b)).finally(()=>l.controller.abort())},W=()=>{R&&w.pendingRequests.slice().forEach(l=>K(l,R))},q=(l,p,b,k)=>{if(R){let U={payload:l,peerId:p,...b===void 0?{}:{metadata:b},requestId:k,controller:new AbortController,timer:null};K(U,R);return}let E={payload:l,peerId:p,...b===void 0?{}:{metadata:b},requestId:k,controller:new AbortController,timer:setTimeout(()=>{$(E),E.controller.abort(),S(p,k,"request handler unavailable")},_o)};w.pendingRequests.push(E)},F=async(l,p)=>{let{target:b,metadata:k,onProgress:E,signal:U,timeoutMs:j}=p;if(Jn(U),!e(b,!1))throw Ie("disconnected",`no active peer with id ${b}`);let g=fe(20),v=new Promise((H,ee)=>{let te={peerId:b,resolve:H,reject:ee,timer:null,...U===void 0?{}:{signal:U}},$e=()=>{c(g),ee(Ie("aborted","operation aborted"))};U&&(te.abortHandler=$e,U.addEventListener("abort",$e,{once:!0})),a[g]=te}).catch(H=>{throw H});try{await T.send(l,b,k===void 0?{r:g}:{r:g,m:k},O(E,k),U);let H=a[g];return H&&j!==void 0&&(H.timer=setTimeout(()=>{c(g),H.reject(Ie("timeout","request timed out"))},j)),await v}catch(H){throw c(g),H}},J={request:F,requestMany:async(l,p)=>(Jn(p.signal),await se(p.targets.map(async b=>{try{let k={peerId:b,status:"fulfilled",value:await F(l,{target:b,...p.metadata===void 0?{}:{metadata:p.metadata},...p.timeoutMs===void 0?{}:{timeoutMs:p.timeoutMs},...p.onProgress===void 0?{}:{onProgress:p.onProgress},...p.signal===void 0?{}:{signal:p.signal}})};return p.onResult?.(k),k}catch(k){let E=le(k,"request failed");if(E.kind==="aborted"||!E.kind)throw E;let U=E.kind==="timeout"?{peerId:b,status:"timeout"}:E.kind==="disconnected"?{peerId:b,status:"disconnected"}:{peerId:b,status:"rejected",error:E};return p.onResult?.(U),U}}))),get onRequest(){return R},set onRequest(l){R=l,W()},get onReceiveProgress(){return w.onReceiveProgress},set onReceiveProgress(l){x(l)}};return T.onMessage((l,p,b)=>{let k=or(b);k&&q(l,p,k.m,k.r)}),w.action=J,o[h]=w,W(),J},makeInternalAction:r,handleData:i,clearPeer:u}};var ar=e=>e&&typeof e=="object"&&!Array.isArray(e)&&typeof e.k=="string"?{key:e.k,...typeof e.s=="string"?{streamId:e.s}:{},...typeof e.t=="string"?{trackId:e.t}:{},...Object.hasOwn(e,"m")?{metadata:e.m}:{}}:null,ir=e=>n=>{let t=e.get(n);return t||(t=fe(20),e.set(n,t)),t},zn=()=>{let e=new WeakMap,n=new WeakMap,t=new Map,o=new Map,a=new Map,s=new Map;return{getStreamKey:ir(e),getTrackKey:ir(n),rememberRemoteStream:(r,i,c)=>{t.set(r,i),c&&o.set(c,i)},getRemoteStream:(r,i)=>t.get(r)??(i?o.get(i):void 0),rememberRemoteTrack:(r,i,c,m,u)=>{let f={track:i,stream:c};a.set(r,f),m&&s.set(m,f),u&&o.set(u,c)},getRemoteTrack:(r,i)=>a.get(r)??(i?s.get(i):void 0),clearRemote:()=>{t.clear(),o.clear(),a.clear(),s.clear()}}},cr=({iterate:e,isActive:n,getSharedMediaPeer:t})=>{let o={},a={},s=zn(),r={onPeerStream:null,onPeerTrack:null},i=(u,f,d,h)=>{n(u)&&(t(u)?.__trysteroMedia?.rememberRemoteStream(f,d,typeof d.id=="string"?d.id:void 0),r.onPeerStream?.(d,u,h))},c=(u,f,d,h,y)=>{n(u)&&(t(u)?.__trysteroMedia?.rememberRemoteTrack(f,d,h,typeof d.id=="string"?d.id:void 0,typeof h.id=="string"?h.id:void 0),r.onPeerTrack?.(d,h,u,y))},m=(u,f,d,h,y,A={})=>{let T={k:f,...A,...d===void 0?{}:{m:d}};return e(u,async(B,w)=>{await h(T,B),y(w)})};return{addStream:(u,f,d)=>m(f.target,s.getStreamKey(u),f.metadata,d,h=>h.addStream(u),{s:u.id}),removeStream:(u,f)=>{e(f,(d,h)=>h.removeStream(u))},addTrack:(u,f,d,h)=>m(d.target,s.getTrackKey(u),d.metadata,h,y=>y.addTrack(u,f),{s:f.id,t:u.id}),removeTrack:(u,f)=>{e(f,(d,h)=>h.removeTrack(u))},replaceTrack:(u,f,d,h)=>m(d.target,s.getTrackKey(f),d.metadata,h,y=>y.replaceTrack(u,f),{t:u.id}),receiveStreamMeta:(u,f)=>{if(!n(f))return;let d=ar(u);if(!d)return;let h=t(f)?.__trysteroMedia?.getRemoteStream(d.key,d.streamId);if(h){i(f,d.key,h,d.metadata);return}(o[f]??(o[f]=[])).push(d)},receiveTrackMeta:(u,f)=>{if(!n(f))return;let d=ar(u);if(!d)return;let h=t(f)?.__trysteroMedia?.getRemoteTrack(d.key,d.trackId);if(h){c(f,d.key,h.track,h.stream,d.metadata);return}(a[f]??(a[f]=[])).push(d)},receiveRemoteStream:(u,f)=>{if(!n(u))return;let d=o[u]?.shift();d&&i(u,d.key,f,d.metadata)},receiveRemoteTrack:(u,f,d)=>{if(!n(u))return;let h=a[u]?.shift();h&&c(u,h.key,f,d,h.metadata)},clearPeer:u=>{delete o[u],delete a[u]},get onPeerStream(){return r.onPeerStream},set onPeerStream(u){r.onPeerStream=u},get onPeerTrack(){return r.onPeerTrack},set onPeerTrack(u){r.onPeerTrack=u}}};var fr="beforeunload",Uo=1e4,Re=e=>"@_"+e,Xe=new Set,lr=()=>Xe.forEach(e=>e()),No=e=>(Xe.add(e),Xe.size===1&&addEventListener(fr,lr),()=>{Xe.delete(e),Xe.size||removeEventListener(fr,lr)}),ur=(e,n,t,{onPeerHandshake:o,onHandshakeError:a,handshakeTimeoutMs:s=Uo,isPassive:r=!1}={})=>{let i={},c={},m={},u={onPeerJoin:null,onPeerLeave:null},f=V,d=null,h=(l,p,{includePending:b=!1}={})=>(l?Array.isArray(l)?l:[l]:ne(b?i:c)).flatMap(k=>{let E=b?i[k]:c[k];return E?[Promise.resolve(p(k,E))]:(console.warn(`${G}: no peer with id ${k} found`),[])}),y=cr({iterate:(l,p)=>h(l,(b,k)=>p(b,k)),isActive:l=>!!c[l],getSharedMediaPeer:l=>i[l]??null}),A=sr({getPeer:(l,p)=>(p?i:c)[l],getPeerIds:l=>ne(l?i:c),canReceiveFromPeer:(l,p)=>!!d?.canReceiveFromPeer(l,p)}),T=A.makeInternalAction,B=A.handleData,w=A.makeAction,O=(l,p=I("peer disconnected"))=>{let b=le(p,"peer disconnected");d?.clearPeer(l,b),delete i[l],delete c[l],A.clearPeer(l,b),m[l]?.splice(0).forEach(k=>k.reject(b)),delete m[l],y.clearPeer(l)},x=(l,p,b)=>{let k=i[l];if(!k||p&&k!==p)return;let E=!!c[l];O(l,b),k.destroy(),E&&u.onPeerLeave?.(l),n(l)},P=async()=>{await q.send(""),await new Promise(l=>setTimeout(l,99)),me(i).forEach(([l,p])=>{p.destroy(),O(l,I("room left"))}),f(),t()},R=T(Re("ping")),$=T(Re("pong")),S=T(Re("signal")),K=T(Re("stream")),W=T(Re("track")),q=T(Re("leave"),{sendToPending:!0,receiveWhilePending:!0}),F=T(Re("hsdata"),{sendToPending:!0,receiveWhilePending:!0}),J=T(Re("hsready"),{sendToPending:!0,receiveWhilePending:!0});return d=Zt({...o===void 0?{}:{onPeerHandshake:o},...a===void 0?{}:{onHandshakeError:a},handshakeTimeoutMs:s,sendHandshakeData:F.send,sendHandshakeReady:J.send,onActivate:(l,p)=>{c[l]=p,u.onPeerJoin?.(l)},onFailure:(l,p,b)=>x(l,p,b)}),R.onMessage((l,p)=>$.send("",p)),$.onMessage((l,p)=>{let b=m[p];b?.shift()?.resolve(),b&&!b.length&&delete m[p]}),S.onMessage((l,p)=>{c[p]&&i[p]?.signal(l)}),K.onMessage((l,p)=>y.receiveStreamMeta(l,p)),W.onMessage((l,p)=>y.receiveTrackMeta(l,p)),q.onMessage((l,p)=>x(p,void 0,I("peer left room"))),F.onMessage((l,p,b)=>d?.receiveHandshakeData(l,p,b)),J.onMessage((l,p)=>d?.receiveHandshakeReady(p)),e((l,p)=>{let b=i[p];if(b){if(b===l)return;b.destroy(),O(p,I("peer replaced"))}i[p]=l,d?.addPeer(p,l),l.setHandlers({data:k=>B(p,k),stream:k=>y.receiveRemoteStream(p,k),track:(k,E)=>y.receiveRemoteTrack(p,k,E),signal:k=>{c[p]&&S.send(k,p)},close:()=>x(p,l,I("peer disconnected")),error:k=>{console.error(`${G} peer error:`,k),x(p,l,k)}}),d?.start(p,l)}),Dn&&(f=No(()=>P().catch(V))),{makeAction:w,leave:P,ping:async l=>{if(!c[l])throw I(`no active peer with id ${l}`);let p=Date.now();return await new Promise((b,k)=>{let E=m[l]??(m[l]=[]),U=()=>{let g=m[l];if(!g)return;let v=g.indexOf(j);v>-1&&g.splice(v,1),g.length||delete m[l]},j={resolve:()=>{U(),b()},reject:g=>{U(),k(g)}};E.push(j),R.send("",l).catch(g=>j.reject(le(g,"peer disconnected")))}),Date.now()-p},isPassive:()=>r,getPeers:()=>Ln(me(c).map(([l,p])=>[l,p.connection])),addStream:(l,p={})=>y.addStream(l,p,K.send),removeStream:(l,p={})=>{y.removeStream(l,p.target)},addTrack:(l,p,b={})=>y.addTrack(l,p,b,W.send),removeTrack:(l,p={})=>{y.removeTrack(l,p.target)},replaceTrack:(l,p,b={})=>y.replaceTrack(l,p,b,W.send),get onPeerJoin(){return u.onPeerJoin},set onPeerJoin(l){u.onPeerJoin=l,l&&ne(c).forEach(p=>l(p))},get onPeerLeave(){return u.onPeerLeave},set onPeerLeave(l){u.onPeerLeave=l},get onPeerStream(){return y.onPeerStream},set onPeerStream(l){y.onPeerStream=l},get onPeerTrack(){return y.onPeerTrack},set onPeerTrack(l){y.onPeerTrack=l}}};var mr=1,gr=2,dr=(e,n)=>{let t=ue(e),o=new Uint8Array(3+t.byteLength+n.byteLength);return o[0]=mr,o[1]=t.byteLength>>>8&255,o[2]=t.byteLength&255,o.set(t,3),o.set(n,3+t.byteLength),o},$o=(e,n)=>{let t=ue(e),o=new Uint8Array(4+t.byteLength);return o[0]=gr,o[1]=Number(n),o[2]=t.byteLength>>>8&255,o[3]=t.byteLength&255,o.set(t,4),o},jo=e=>{let n=new Uint8Array(e);if(n.byteLength<3)return null;if(n[0]===mr){let a=(n[1]??0)<<8|(n[2]??0),s=3+a;return a<=0||n.byteLength<s?null:{type:"room",roomToken:ge(n.subarray(3,s)),payload:n.subarray(s).slice().buffer}}if(n[0]!==gr||n.byteLength<4)return null;let t=(n[2]??0)<<8|(n[3]??0),o=4+t;return t<=0||n.byteLength<o?null:{type:"presence",roomToken:ge(n.subarray(4,o)),isPresent:n[1]===1}},hr=e=>{let{connection:n,channel:t}=e;return e.isDead||n.connectionState==="closed"||n.connectionState==="failed"||n.iceConnectionState==="closed"||n.iceConnectionState==="failed"||t?.readyState==="closing"||t?.readyState==="closed"},yr=e=>{if(hr(e))return"stale";let{channel:n}=e;return!n||n.readyState!=="open"?"transient":"live"},pr=class{constructor(){Q(this,"byApp",{});Q(this,"roomPresenceHandlers",{})}getMap(e){var n;return(n=this.byApp)[e]??(n[e]={})}get(e,n){return this.byApp[e]?.[n]}isPeerStale(e){return hr(e)}getHealth(e){return this.isPeerStale(e)?"stale":"live"}setRoomPresenceHandler(e,n){return this.roomPresenceHandlers[e]=n,()=>{this.roomPresenceHandlers[e]===n&&delete this.roomPresenceHandlers[e]}}sendRoomPresence(e,n,t){e.isClosing||e.peer.isDead||e.peer.sendData($o(n,t))}clear(e,n,{destroyPeer:t}){let o=this.byApp[e],a=o?.[n];if(!a||a.isClosing)return;a.idleTimer=_(a.idleTimer),a.isClosing=!0,t&&!a.peer.isDead&&a.peer.destroy();let s=we(a.bindings);a.bindings={},a.bindingsByToken={},a.controlRoomId=null,delete o[n],s.forEach(r=>{r.handlers.close?.(),r.pendingData.length=0,r.pendingSendData.length=0,r.pendingTracks.length=0}),a.media.clearRemote(),a.pendingDataByToken.clear(),a.remoteRoomTokens.clear(),ne(o).length===0&&delete this.byApp[e]}register(e,n,t,o){let a=this.getMap(e),s=a[n];if(s){if(s.idleTimer=_(s.idleTimer),s.peer===t)return s;this.clear(e,n,{destroyPeer:!0})}let r={appId:e,peerId:n,peer:t,bindings:{},bindingsByToken:{},pendingDataByToken:new Map,remoteRoomTokens:new Set,idleTimer:null,controlRoomId:null,streamOwners:new Map,trackOwners:new Map,media:zn(),idleMs:o,isClosing:!1};return t.setHandlers({data:i=>this.dispatchData(r,i),signal:i=>this.dispatchSignal(r,i),close:()=>this.clear(e,n,{destroyPeer:!1}),error:i=>{console.error(`${G} peer error:`,i),this.clear(e,n,{destroyPeer:!1})},track:(i,c)=>this.dispatchTrack(r,i,c)}),a[n]=r,r}bind(e,n,t,{onDetach:o}){let a=t.bindings[e];if(a)return t.idleTimer=_(t.idleTimer),{proxy:a.proxy,isNew:!1};let s={roomId:e,roomToken:null,roomTokenPromise:n,handlers:{},pendingData:[],pendingSendData:[],pendingTracks:[],detach:V,proxy:{}},r=()=>{t.bindings[e]&&(this.pruneRoomOwnership(t,e),delete t.bindings[e],s.roomToken&&t.bindingsByToken[s.roomToken]===s&&delete t.bindingsByToken[s.roomToken],t.controlRoomId===e&&(t.controlRoomId=ne(t.bindings)[0]??null),o(),this.scheduleIdleTimer(t))},i={created:t.peer.created,get connection(){return t.peer.connection},get channel(){return t.peer.channel},get isDead(){return t.peer.isDead},getOffer:c=>t.peer.getOffer(c),signal:c=>t.peer.signal(c),sendData:c=>{if(!s.roomToken){s.pendingSendData.push(c);return}t.peer.sendData(dr(s.roomToken,c))},destroy:()=>r(),setHandlers:c=>{let{signal:m,...u}=c;Object.assign(s.handlers,u),m&&(s.handlers.signal=m),this.flushBindingQueues(s)},offerPromise:t.peer.offerPromise,addStream:c=>{let m=t.streamOwners.get(c)??new Set,u=m.size===0;m.add(e),t.streamOwners.set(c,m),u&&t.peer.addStream(c)},removeStream:c=>{let m=t.streamOwners.get(c);m&&(m.delete(e),m.size===0&&(t.streamOwners.delete(c),t.peer.removeStream(c)))},addTrack:(c,m)=>{let u=t.trackOwners.get(c)??{stream:m,rooms:new Set},f=u.rooms.size===0;return u.stream=m,u.rooms.add(e),t.trackOwners.set(c,u),f?t.peer.addTrack(c,m):t.peer.connection.getSenders().find(d=>d.track===c)??t.peer.addTrack(c,m)},removeTrack:c=>{let m=t.trackOwners.get(c);m&&(m.rooms.delete(e),m.rooms.size===0&&(t.trackOwners.delete(c),t.peer.removeTrack(c)))},replaceTrack:(c,m)=>{let u=t.trackOwners.get(c);if(u){t.trackOwners.delete(c);let f=t.trackOwners.get(m)??{stream:u.stream,rooms:new Set};u.rooms.forEach(d=>f.rooms.add(d)),t.trackOwners.set(m,f)}return t.peer.replaceTrack(c,m)},__trysteroMedia:t.media};return s.proxy=i,s.detach=r,t.bindings[e]=s,t.controlRoomId??(t.controlRoomId=e),t.idleTimer=_(t.idleTimer),n.then(c=>{if(t.isClosing||t.bindings[e]!==s)return;s.roomToken=c,t.bindingsByToken[c]=s;let m=t.pendingDataByToken.get(c);m?.length&&(s.pendingData.push(...m),t.pendingDataByToken.delete(c)),s.pendingSendData.splice(0).forEach(u=>t.peer.sendData(dr(c,u))),this.flushBindingQueues(s)}),{proxy:i,isNew:!0}}pruneRoomOwnership(e,n){e.streamOwners.forEach((t,o)=>{t.delete(n),t.size===0&&(e.streamOwners.delete(o),e.peer.removeStream(o))}),e.trackOwners.forEach((t,o)=>{t.rooms.delete(n),t.rooms.size===0&&(e.trackOwners.delete(o),e.peer.removeTrack(o))})}scheduleIdleTimer(e){e.isClosing||ne(e.bindings).length>0||(e.idleTimer=_(e.idleTimer),e.idleTimer=setTimeout(()=>{let n=this.byApp[e.appId]?.[e.peerId];!n||ne(n.bindings).length>0||this.clear(e.appId,e.peerId,{destroyPeer:!0})},e.idleMs))}getSignalBinding(e){if(e.controlRoomId){let t=e.bindings[e.controlRoomId];if(t?.handlers.signal)return t}let n=we(e.bindings).find(t=>!!t.handlers.signal);return n?(e.controlRoomId=n.roomId,n):null}flushBindingQueues(e){let{handlers:n}=e;n.data&&e.pendingData.length>0&&e.pendingData.splice(0).forEach(t=>n.data?.(t)),(n.track||n.stream)&&e.pendingTracks.length&&e.pendingTracks.splice(0).forEach(({track:t,stream:o})=>{n.track?.(t,o),n.stream?.(o)})}dispatchData(e,n){let t=jo(n);if(!t)return;if(t.type==="presence"){t.isPresent?e.remoteRoomTokens.add(t.roomToken):e.remoteRoomTokens.delete(t.roomToken),this.roomPresenceHandlers[e.appId]?.(e.peerId,t.roomToken,t.isPresent);return}let o=e.bindingsByToken[t.roomToken];if(!o){let a=e.pendingDataByToken.get(t.roomToken)??[];a.push(t.payload),e.pendingDataByToken.set(t.roomToken,a);return}o.handlers.data?o.handlers.data(t.payload):o.pendingData.push(t.payload)}dispatchSignal(e,n){this.getSignalBinding(e)?.handlers.signal?.(n)}dispatchTrack(e,n,t){we(e.bindings).forEach(o=>{if(o.handlers.track||o.handlers.stream){o.handlers.track?.(n,t),o.handlers.stream?.(t);return}o.pendingTracks.push({track:n,stream:t})})}};var qo=23333,Ko=12,Wo=7533,Fo=23333,Vn="__legacy__",un="offer-placeholder",Jo=["offer","answer","candidate"],zo=e=>{if(typeof e=="string")try{let n=he(e);return n&&typeof n=="object"?n:null}catch{return null}return e&&typeof e=="object"?e:null},Ye=(e,n)=>typeof e[n]=="string"&&e[n]?e[n]:void 0,Vo=e=>Jo.some(n=>n in e&&(typeof e[n]!="string"||e[n]==="")),Pr=(e,n,t,o,a,s)=>{e.toCipher(n).then(r=>{e.isLeaving()||!s()||o(t,X(a(r.sdp)))})},Go=()=>({status:"idle",offerPeer:null,offerId:null,offerSdp:null,offerInitPromise:null,offerAnswered:!1,offerRelays:[],offerSignalRelays:[],offerSignalBacklog:[],offerRelayTimers:[],offerExpiryTimer:null,connectedPeer:null,connectedPeerUnhealthySinceMs:null,answeringExpiryTimer:null,answeringPeer:null,answerSent:!1,connectionErrorReported:!1,pendingCandidates:{}}),Zo=e=>[...e.turnConfig??[],...e.rtcConfig?.iceServers??[]].some(({urls:n})=>(Array.isArray(n)?n:[n]).some(t=>/^turns?:/i.test(t))),Xo=(e,n)=>`could not connect to peer ${e} after exchanging SDP; ${Zo(n)?"check that your TURN server URLs and credentials are reachable by both peers":"configure TURN servers with turnConfig or rtcConfig.iceServers"}`,mn=(e,n,t)=>{e.isLeaving()||n.connectedPeer||n.connectionErrorReported||(n.connectionErrorReported=!0,e.onJoinError?.({error:Xo(t,e.config),appId:e.appId,peerId:t,roomId:e.roomId}))},Ue=(e,n)=>e[n]??(e[n]=Go()),ie=e=>{e.connectedPeer?e.status="connected":e.answeringPeer?e.status="answering":e.offerPeer||e.offerRelays.some(Boolean)?e.status="offering":e.status="idle"},ln=(e,n)=>{e.answeringPeer===n&&(e.answeringExpiryTimer=_(e.answeringExpiryTimer),e.answeringPeer=null,e.answerSent=!1,ie(e))},dn=(e,n,t)=>{e.connectedPeer&&(e.connectedPeer.isDead||e.connectedPeer.destroy(),e.connectedPeer=null,e.connectedPeerUnhealthySinceMs=null,ie(e))},Gn=(e,n)=>{e.offerRelayTimers[n]=_(e.offerRelayTimers[n]),e.offerRelays[n]&&(e.offerRelays[n]=void 0,ie(e))},wr=(e,n)=>{e?.offerRelays[n]===un&&Gn(e,n)},Yo=e=>{if(e.isDead||e.connection.connectionState==="closed")return!0;try{return!!e.connection.remoteDescription}catch{return!0}},Ne=(e,n)=>{let t=e.offerAnswered;e.offerExpiryTimer=_(e.offerExpiryTimer),e.offerInitPromise=null,e.offerRelays.forEach((o,a)=>Gn(e,a)),e.offerRelays=[],e.offerSignalRelays=[],e.offerRelayTimers=[],e.offerSignalBacklog=[],e.offerPeer&&e.offerPeer!==e.connectedPeer&&(t||Yo(e.offerPeer)?e.offerPeer.isDead||e.offerPeer.destroy():n.recycle(e.offerPeer)),e.offerPeer=null,e.offerId=null,e.offerSdp=null,e.offerAnswered=!1,e.connectionErrorReported=!1,ie(e)},Qo=(e,n,t,o)=>{_(n.answeringExpiryTimer),n.answeringExpiryTimer=setTimeout(()=>{let a=e.peerStates[t];!a||a.connectedPeer||a.answeringPeer!==o||(a.answerSent&&mn(e,a,t),o.destroy(),ln(a,o),e.checkDeactivate())},Fo)},es=async(e,n,t)=>{let o=t?[t,Vn]:[Vn];for(let a of o){let s=e.pendingCandidates[a];if(s?.length){delete e.pendingCandidates[a];for(let r of s)await n.signal(r)}}},kr=(e,n,t,o=Ve)=>{_(n.offerExpiryTimer);let a=n.offerId;n.offerExpiryTimer=setTimeout(()=>{let s=e.peerStates[t];!s||s.connectedPeer||s.offerId!==a||(s.offerAnswered&&mn(e,s,t),Ne(s,e.offerPool),e.checkDeactivate())},o)},ns=(e,n,t,o)=>n.offerPeer&&n.offerId&&n.offerSdp?Promise.resolve({peer:n.offerPeer,offer:n.offerSdp,offerId:n.offerId}):(n.offerInitPromise||(n.offerInitPromise=(async()=>{let a=(await e.offerPool.checkout(1,!1,e.encryptOffer))[0];if(!a)throw I("failed to allocate offer peer");let{peer:s,offer:r}=a;n.offerPeer=s,n.offerId=fe(Ko),n.offerSdp=r,n.offerAnswered=!1,n.connectionErrorReported=!1,n.offerSignalBacklog=[],ie(n);let i=()=>{n.offerPeer===s&&!n.connectedPeer&&(n.offerAnswered&&mn(e,n,t),Ne(n,e.offerPool)),e.disconnectPeer(s,t),e.checkDeactivate()};return s.setHandlers({connect:()=>e.connectPeer(s,t,o),signal:c=>{n.offerPeer===s&&(n.offerSignalBacklog.push(c),n.offerSignalRelays.forEach(m=>m?.(c)))},close:i,error:i}),kr(e,n,t),{peer:s,offer:r,offerId:n.offerId}})().finally(()=>n.offerInitPromise=null)),n.offerInitPromise),ts=async(e,n,t,o,a)=>{if(o){e.attachSharedPeerToRoom(t,o);return}let s=e.peerStates[t];if(!s||s.connectedPeer||s.answeringPeer||s.offerAnswered){wr(s,n);return}if(s.offerRelays[n]!==un)return;let[r,i]=await se([Ae(Ce(e.rootTopicPlaintext,t)),ns(e,s,t,n)]);if(e.isLeaving())return;if(s.connectedPeer||s.answeringPeer||s.offerAnswered||s.offerRelays[n]!==un){wr(s,n);return}s.offerRelayTimers[n]=_(s.offerRelayTimers[n]),s.offerRelays[n]=!0,ie(s),s.offerRelayTimers[n]=setTimeout(()=>as(e,t,n),(e.announceIntervals[n]??e.announceIntervalMs)*.9);let c=!1;s.offerSignalRelays[n]=m=>{c&&(e.isLeaving()||s.connectedPeer||s.offerPeer!==i.peer||s.offerId!==i.offerId||m.type!=="candidate"||Pr(e,m,r,a,u=>({peerId:Z,offerId:i.offerId,candidate:u,...e.isPassive?{passive:!0}:{}}),()=>!s.connectedPeer&&s.offerPeer===i.peer&&s.offerId===i.offerId))},a(r,X({peerId:Z,offerId:i.offerId,offer:i.offer,...e.isPassive?{passive:!0}:{}})),c=!0,s.offerSignalBacklog.forEach(m=>s.offerSignalRelays[n]?.(m))},rs=async(e,n,t,o,a,s,r)=>{let i=Ue(e.peerStates,t);if(i.answeringPeer||i.offerAnswered)return;let c=!!(i.offerPeer||i.offerRelays.some(Boolean));if((c||s)&&Z<t)return;c&&Ne(i,e.offerPool);let m=e.initPeer(!1,e.config);i.answeringPeer=m,i.answerSent=!1,i.connectionErrorReported=!1,Qo(e,i,t,m),ie(i);let u=()=>{i.answeringPeer===m&&!i.connectedPeer&&i.answerSent&&mn(e,i,t),ln(i,m),e.disconnectPeer(m,t),e.checkDeactivate()};m.setHandlers({connect:()=>e.connectPeer(m,t,n),close:u,error:u});let f;try{f=await e.toPlain({type:"offer",sdp:o})}catch{ln(i,m),e.onJoinError?.({error:"incorrect room password when decrypting offer",appId:e.appId,peerId:t,roomId:e.roomId});return}if(m.isDead){ln(i,m);return}let d=await Ae(Ce(e.rootTopicPlaintext,t));e.isLeaving()||(m.setHandlers({signal:h=>{e.isLeaving()||i.answeringPeer!==m||m.isDead||h.type!=="answer"&&h.type!=="candidate"||Pr(e,h,d,r,y=>{let A={peerId:Z};return h.type==="answer"?(i.answerSent=!0,A.answer=y):A.candidate=y,a&&(A.offerId=a),e.isPassive&&(A.passive=!0),A},()=>i.answeringPeer===m&&!m.isDead)}}),await m.signal(f),await es(i,m,a))},os=async(e,n,t,o,a)=>{var f;let s;try{s=await e.toPlain({type:sn,sdp:t})}catch{return}let r=Ue(e.peerStates,n),i=o&&r?.offerPeer&&r.offerId===o?r.offerPeer:null,c=r?.answeringPeer??null,m=!o&&r?.offerPeer?r.offerPeer:null,u=a&&!a.isDead?a:i??c??m;if(!u||u.isDead){let d=o??Vn;((f=r.pendingCandidates)[d]??(f[d]=[])).push(s);return}u.signal(s)},ss=async(e,n,t,o,a,s)=>{let r;try{r=await e.toPlain({type:"answer",sdp:o})}catch{e.onJoinError?.({error:"incorrect room password when decrypting answer",appId:e.appId,peerId:t,roomId:e.roomId});return}if(s)e.offerPool.claimLeased(s),s.setHandlers({connect:()=>e.connectPeer(s,t,n),close:()=>e.disconnectPeer(s,t)}),s.signal(r);else{let i=e.peerStates[t];if(!i||!i.offerPeer||i.offerAnswered||a&&i.offerId&&a!==i.offerId||i.offerPeer.isDead)return;i.offerAnswered=!0,kr(e,i,t,qo),i.offerPeer.signal(r)}},as=(e,n,t)=>{let o=e.peerStates[n];!o||o.connectedPeer||o.offerRelays[t]&&(Gn(o,t),e.checkDeactivate())},vr=e=>n=>async(t,o,a)=>{if(e.isLeaving())return;let s=zo(o);if(!s||Vo(s))return;let r=Ye(s,"peerId")??"",i=Ye(s,"offer"),c=Ye(s,"answer"),m=Ye(s,"candidate"),u=Ye(s,"offerId"),f=s.peer,d=s.hasOutgoingOffer===!0,h=s.passive===!0;if(!r||r===Z)return;let[y,A]=await se([e.rootTopicP,e.selfTopicP]);if(e.isLeaving()||t!==y&&t!==A||e.isPassive&&h||(e.isPassive&&!e.isActive&&!c&&!m&&(e.isActive=!0,e.requeueAnnounce?.()),e.isPassive&&!e.isActive))return;let T=e.peerStates[r],B=T?.connectedPeer;if(B&&T){let x=yr(B);if(x==="live"){T.connectedPeerUnhealthySinceMs=null;return}if(x==="stale")dn(T,r,"message-from-stale-peer");else{let P=Date.now(),R=T.connectedPeerUnhealthySinceMs??P;if(T.connectedPeerUnhealthySinceMs=R,P-R<Wo)return;dn(T,r,"message-from-prolonged-disconnect")}}let w=e.sharedPeers.get(e.appId,r);w&&e.sharedPeers.getHealth(w.peer)==="stale"&&(e.sharedPeers.clear(e.appId,r,{destroyPeer:!0}),w=void 0);let O=!!(r&&!i&&!c&&!m);if(O&&!w){let x=Ue(e.peerStates,r),P=Z<r;if(x.answeringPeer||x.connectedPeer||x.offerAnswered)return;if(!P&&!x.offerPeer){let R=await Ae(Ce(e.rootTopicPlaintext,r));!e.isLeaving()&&!x.connectedPeer&&a(R,X({peerId:Z}));return}if(x.offerRelays[n])return;x.offerRelays[n]=un,ie(x)}if(w&&(i||c||m)){if(w.bindings[e.roomId])return;e.attachSharedPeerToRoom(r,w);return}if(O)return ts(e,n,r,w,a);if(i)return rs(e,n,r,i,u,d,a);if(m)return os(e,r,m,u,f);if(c)return ss(e,n,r,c,u,f)};var gn=5333,is=[233,533,1333],cs=7533,fs=123333,Zn=({init:e,subscribe:n,announce:t,deactivate:o})=>{let a={},s={},r={},i={},c=new pr,m=()=>we(a).some(P=>ne(P).length>0),u=P=>s[P]??(s[P]={}),f=P=>r[P]??(r[P]={}),d=(P,R,$)=>{c.getHealth(P.peer)==="live"&&c.sendRoomPresence(P,R,$)},h=(P,R)=>{me(s[P]??{}).forEach(([$,S])=>{if(!S.shouldAdvertise())return;let{roomToken:K,roomTokenPromise:W}=S;if(K){d(R,K,!0);return}W.then(q=>{s[P]?.[$]===S&&S.roomToken===q&&(c.get(P,R.peerId)!==R||R.isClosing||S.shouldAdvertise()&&d(R,q,!0))})})},y=(P,R,$)=>we(c.getMap(P)).forEach(S=>d(S,R,$)),A=P=>{i[P]||(i[P]=c.setRoomPresenceHandler(P,(R,$,S)=>{if(!S)return;let K=c.get(P,R),W=r[P]?.[$];!K||!W||s[P]?.[W]?.attachSharedPeerToRoom(R,K)}))},T=P=>{a[P]&&ne(a[P]).length>0||(i[P]?.(),delete i[P],delete s[P],delete r[P])},B=!1,w=[],O=null,x=V;return(P,R,$)=>{if(!P)throw I("requires a config map as the first argument");if($&&typeof $!="object")throw I("third argument must be a callbacks object");let{appId:S}=P,K=$?.onJoinError,W=$?.onPeerHandshake,q=$?.handshakeTimeoutMs;if(!S)throw I("config map is missing appId field");if(!R)throw I("roomId argument required");if(q!==void 0&&(!Number.isFinite(q)||q<=0))throw I("handshakeTimeoutMs must be a positive number");if(a[S]?.[R])return a[S][R];A(S);let F=Ce(G,S,R),J=Ae(F),l=Ae(Ce(F,Z)),p=qt(P.password??"",S,R),b=Kt(S,R),k=P._test_only_sharedPeerIdleMs??fs,E=!1,U=C=>async D=>({type:D.type,sdp:await C(p,D.sdp)}),j=U(zt),g=U(Jt),v=c.getMap(S),H=()=>qn(!0,P),ee=!1;O||(O=new Vt(H));let te=O,$e=async C=>{let D=await C.getOffer(Date.now()-C.created>Ve);if(!D||D.type!=="offer")throw I("failed to get offer for peer");return(await g(D)).sdp},je=(C,D)=>{let L=Ue(z.peerStates,C);L.answeringExpiryTimer=_(L.answeringExpiryTimer),L.answeringPeer=null;let{proxy:Y,isNew:N}=c.bind(R,b,D,{onDetach:()=>{let re=z.peerStates[C];re?.connectedPeer===D.peer&&(re.connectedPeer=null,re.connectedPeerUnhealthySinceMs=null,ie(re))}});L.connectedPeer=D.peer,L.connectedPeerUnhealthySinceMs=null,ie(L),N&&kn(Y,C),Ne(L,te)},Hr=(C,D,L)=>{if(E){C.destroy();return}let Y=Ue(z.peerStates,D);if(Y.connectedPeer){let oe=v[D];if(oe&&Y.connectedPeer===oe.peer&&oe.bindings[R])return;Y.connectedPeer!==C&&!C.isDead&&C.destroy();return}let N=v[D];if(N&&c.getHealth(N.peer)==="stale"&&(c.clear(S,D,{destroyPeer:!0}),N=void 0),N&&N.peer!==C){C.isDead||C.destroy(),je(D,N);return}let re=!N;N||(N=c.register(S,D,C,k)),je(D,N),re&&h(S,N)},xr=(C,D)=>{if(E)return;let L=z.peerStates[D];L?.connectedPeer===C&&(dn(L,D,"close-event"),en(),!ae&&ee&&z.requeueAnnounce?.())},ae=!!P.passive,Ee=null,Me,ot=V,en=()=>{if(!ae||!z.isActive)return;let C=!1;me(z.peerStates).forEach(([D,L])=>{L.connectedPeer||L.answeringPeer||L.offerInitPromise||L.offerPeer||L.offerRelays.some(Boolean)?C=!0:L.status==="idle"&&delete z.peerStates[D]}),C||(z.isActive=!1,Me=_(Me),xe.forEach(_),xe.length=0,ot(),Ee?.roomToken&&y(S,Ee.roomToken,!1))},z={appId:S,roomId:R,config:P,peerStates:{},rootTopicPlaintext:F,rootTopicP:J,selfTopicP:l,toPlain:j,toCipher:g,isLeaving:()=>E,isPassive:ae,isActive:!ae,onJoinError:K,sharedPeers:c,offerPool:te,encryptOffer:$e,initPeer:qn,connectPeer:Hr,disconnectPeer:xr,attachSharedPeerToRoom:je,checkDeactivate:en,announceIntervals:[],announceIntervalMs:gn},yn={config:P,appId:S,roomId:R,isPassive:ae},_r=vr(z);if(!B){let C=e(P);w=(Array.isArray(C)?C:[C]).map(D=>Promise.resolve(D)),B=!0,x=P.relayConfig?.manualReconnection?V:jt()}!ae&&!te.isActive&&te.warmup(),z.announceIntervals=w.map(()=>gn);let pn=w.map(()=>gn),wn=w.map(()=>0),Pn=w.map(()=>0),xe=[],st=w.map(async(C,D)=>n(await C,await J,await l,_r(D),L=>te.getOffers(L,$e),yn));se([J,l]).then(([C,D])=>{if(E)return;let L=async(Y,N)=>{if(E||ae&&!z.isActive)return;let re=ae?{passive:!0}:void 0,oe;try{oe=await t(Y,C,D,re,yn),Pn[N]=0}catch(jr){let lt=Pn[N]??0;lt===0&&P.relayConfig?.warnOnRelayFailure!==!1&&console.warn(`${G}: announce failed - ${Pe(jr,"")}`),Pn[N]=lt+1}if(E||ae&&!z.isActive||oe&&typeof oe!="number"&&"stopAnnouncing"in oe)return;typeof oe=="number"?(z.announceIntervals[N]=oe,pn[N]=oe):oe&&(pn[N]=oe.nextAnnounceMs,ee||(ee=oe.reannounceOnDisconnect===!0));let it=wn[N]??0;wn[N]=it+1;let ct=pn[N]??gn,ft=is[it];xe[N]=setTimeout(()=>{L(Y,N)},typeof ft=="number"?Math.min(ct,ft):ct)};ot=()=>{o&&w.forEach(async Y=>{let N=await Y;E||o(N,C,D,yn)})},z.requeueAnnounce=()=>{xe.forEach(_),xe.length=0,Me=_(Me),te.isActive||te.warmup(),Ee?.roomToken&&y(S,Ee.roomToken,!0),Me=setTimeout(en,cs),w.forEach(async(Y,N)=>{let re=await Y;re&&!E&&(wn[N]=0,L(re,N))})},st.forEach(async(Y,N)=>{if(await Y,E)return;let re=await w[N];re&&!E&&(!ae||z.isActive)&&L(re,N)})});let kn=V,{compose:Ir}=Gt(P.password??"",S,R),at=Ir(W),Ur={...at?{onPeerHandshake:at}:{},...q===void 0?{}:{handshakeTimeoutMs:q},isPassive:ae,onHandshakeError:(C,D)=>K?.({error:D.replace(/^handshake failed: /,""),appId:S,peerId:C,roomId:R})};a[S]??(a[S]={});let Nr=u(S),$r=ur(C=>kn=C,C=>{if(E)return;let D=z.peerStates[C];D?.connectedPeer&&(D.connectedPeer=null,ie(D),en())},()=>{E=!0,kn=V;let C=s[S]?.[R];C?.roomToken&&(y(S,C.roomToken,!1),delete r[S]?.[C.roomToken],r[S]&&!ne(r[S]).length&&delete r[S]),s[S]&&(delete s[S][R],ne(s[S]).length||delete s[S]),me(z.peerStates).forEach(([D,L])=>{if(L.answeringExpiryTimer=_(L.answeringExpiryTimer),L.connectedPeer&&!L.connectedPeer.isDead){let Y=v[D];(!Y||Y.peer!==L.connectedPeer)&&L.connectedPeer.destroy()}L.answeringPeer&&!L.answeringPeer.isDead&&L.answeringPeer.destroy(),Ne(L,te),L.connectedPeer=null,L.answeringPeer=null,ie(L)}),a[S]&&(delete a[S][R],ne(a[S]).length===0&&delete a[S]),xe.forEach(_),Me=_(Me),st.forEach(async D=>{(await D)()}),!m()&&(B=!1,te.destroy(),O=null,x(),T(S))},Ur);return Ee={roomToken:null,roomTokenPromise:b,attachSharedPeerToRoom:je,shouldAdvertise:()=>!ae||z.isActive},Nr[R]=Ee,b.then(C=>{let D=Ee;!D||E||s[S]?.[R]!==D||(D.roomToken=C,f(S)[C]=R,we(v).forEach(L=>{L.remoteRoomTokens.has(C)&&je(L.peerId,L)}),(!ae||z.isActive)&&y(S,C,!0))}),a[S][R]=$r}};var ls=["offer","answer","candidate"],us=6e4,ds=e=>{if(typeof e=="string")try{let n=he(e);return n&&typeof n=="object"?n:null}catch{return null}return e},Xn=(e,n)=>typeof e[n]=="string"&&e[n]?e[n]:void 0,ms=e=>ls.some(n=>n in e&&(typeof e[n]!="string"||e[n]==="")),gs=e=>{let n=ds(e);if(!n||ms(n))return!1;let t=Xn(n,"peerId");return!!(t&&t!==Z&&n.passive!==!0&&!Xn(n,"answer")&&!Xn(n,"candidate"))},Yn=e=>{if(!e)throw I("topic strategy missing room context");return e},Sr=(e,n,t,o)=>({kind:n,appId:e.appId,roomId:e.roomId,rootTopic:t,selfTopic:o}),Qn=(e,n,t,o)=>({kind:n,appId:e.appId,roomId:e.roomId,rootTopic:t,selfTopic:o}),et=({steadyAnnounceIntervalMs:e=us,reannounceOnDisconnect:n=!0,init:t,subscribeTopic:o,publishTopic:a,unpublishTopic:s})=>Zn({init:t,subscribe:async(r,i,c,m,u,f)=>{let d=Yn(f),h=(P,R)=>{a(r,P,R,Qn(d,"signal",i,c))},y=null,A=!1,T=null,B=!1,w=P=>{A||(A=!0,P())},O=()=>(T||(T=Promise.resolve(o(r,c,(P,R)=>{B||m(P,R,h)},Sr(d,"self",i,c))).then(P=>{y=P,B&&w(P)})),T);d.isPassive||await O();let x=await o(r,i,async(P,R)=>{B||(d.isPassive&&gs(R)&&await O(),B||await m(P,R,h))},Sr(d,"root",i,c));return()=>{B=!0,y&&w(y),x()}},announce:async(r,i,c,m,u)=>{let f=Yn(u),d=await a(r,i,X({peerId:Z,...m}),Qn(f,"announce",i,c));return typeof d=="number"||d!==void 0&&"stopAnnouncing"in d?d:{nextAnnounceMs:d?.nextAnnounceMs??e,reannounceOnDisconnect:d?.reannounceOnDisconnect??n}},...s?{deactivate:(r,i,c,m)=>{let u=Yn(m);return s(r,i,Qn(u,"announce",i,c))}}:{}});var Ar=Un(e=>e.socket),hs=5,Rr="x",Er="EVENT",{secretKey:ys,publicKey:ps}=Bn.keygen(),ws=ke(ps),Ps={},ks={},nt={},br=250,hn=6e4,vs=15*6e4,Ss=5333,Qe=new WeakMap,rt=new WeakSet,He=new WeakMap,Tr=e=>{let n=Qe.get(e),t=Math.min(n?.delayMs?Math.max(hn,n.delayMs*2):hn,vs);return Qe.set(e,{delayMs:t,untilMs:Date.now()+t}),t},bs=e=>{let n=Qe.get(e);if(!n)return 0;let t=n.untilMs-Date.now();return t>0?t:0},tt=e=>({nextAnnounceMs:e}),Ts={stopAnnouncing:!0},As=e=>{if(rt.has(e))return!1;let n=He.get(e);return n&&(clearTimeout(n.timer),He.delete(e)),rt.add(e),Qe.delete(e),e.close?.(),!0},Rs=(e,n)=>{let t=He.get(e);t&&(clearTimeout(t.timer),t.eventIds.add(n));let o=t?.eventIds??new Set([n]),a=setTimeout(()=>{He.delete(e)},Ss);He.set(e,{eventIds:o,timer:a})},Es=(e,n)=>{let t=He.get(e);return t?.eventIds.has(n)?(clearTimeout(t.timer),He.delete(e),!0):!1},Mr=()=>Math.floor(Date.now()/1e3),Br=e=>nt[e]??(nt[e]=an(e,1e4)+2e4),Ms=async(e,n)=>{let t={kind:Br(e),tags:[[Rr,e]],created_at:Mr(),content:n,pubkey:ws},o=await De("SHA-256",X([0,t.pubkey,t.created_at,t.kind,t.tags,t.content]));return X([Er,{...t,id:ke(o),sig:ke(await Bn.signAsync(o,ys))}])};var ve={},Or=e=>{e.flushWaiters.forEach(n=>n()),e.flushWaiters.clear()},Bs=(e,n,t)=>{var a;let o=ve[a=e.url]??(ve[a]={subIds:[],topics:new Map,updateTimer:null,flushWaiters:new Set});o.topics.set(n,t),Cr(e,o)},Os=(e,n)=>{let t=ve[e.url];t&&(t.topics.delete(n),t.topics.size===0?(t.updateTimer!==null&&(clearTimeout(t.updateTimer),t.updateTimer=null),Or(t),t.subIds.forEach(o=>e.send(X(["CLOSE",o]))),delete ve[e.url]):Cr(e,t))},Cr=(e,n)=>{n.updateTimer===null&&(n.updateTimer=setTimeout(()=>{n.updateTimer=null;try{Dr(e)}finally{Or(n)}},0))},Cs=e=>{let n=ve[e.url];return!n||n.updateTimer===null?Promise.resolve():new Promise(t=>n.flushWaiters.add(t))},Dr=e=>{let n=ve[e.url];if(!n||n.topics.size===0)return;let t=[...n.topics.keys()],o=[],a=Mr();for(let s=0;s<t.length;s+=br)o.push(t.slice(s,s+br));for(;n.subIds.length>o.length;){let s=n.subIds.pop();s&&e.send(X(["CLOSE",s]))}o.forEach((s,r)=>{var c;let i=(c=n.subIds)[r]??(c[r]=fe(64));e.send(X(["REQ",i,{kinds:[...new Set(s.map(Br))],since:a,"#x":s}]))})},Ds=e=>{let n=ve[e.url];n&&n.topics.size>0&&Dr(e)},Lr=et({init:e=>Hn(e,Ls,hs,!0).map(n=>{let t=Ar.register(n,()=>In(n,o=>{let[a,s,r,i]=he(o);if(a!==Er){let c=`${G}: relay failure from ${t.url} - `,m=a==="CLOSED"&&typeof r=="string"?r:i,u=a==="OK"&&r===!1,f=u&&m?.startsWith("rate-limited:"),d=u&&m?.startsWith("duplicate:"),h=a==="CLOSED"||u&&!f&&!d,y=a==="OK"&&Es(t,s);if(h&&!As(t))return;f?Tr(t):y&&Qe.delete(t),!d&&e.relayConfig?.warnOnRelayFailure!==!1&&(a==="NOTICE"?console.warn(c+s):(u||a==="CLOSED")&&console.warn(c+m));return}if(r&&typeof r=="object"&&"content"in r){let{content:c}=r,m=ks[s];if(m){m(Ps[s]??"",c);return}let u=ve[t.url];if(u?.subIds.includes(s)&&r.tags){let f=r.tags.find(d=>d[0]===Rr);f?.[1]&&u.topics.get(f[1])?.(f[1],c)}}},()=>Ds(t)));return t.ready}),subscribeTopic:(e,n,t,o)=>{Bs(e,n,(r,i)=>{t(r,i)});let s=()=>{Os(e,n)};return o.kind==="root"?Cs(e).then(()=>s):s},publishTopic:async(e,n,t,o)=>{if(rt.has(e)||e.isClosed)return o.kind==="announce"?Ts:void 0;if(o.kind==="announce"){let i=bs(e);if(i>0)return tt(Math.max(hn,i))}let a=await Ms(n,typeof t=="string"?t:X(t)),s=e.socket.readyState===1;if(e.send(a),o.kind!=="announce")return;if(!s)return tt(Tr(e));let r=he(a)[1].id;return Rs(e,r),tt(hn)}}),Ua=Ar.getSockets,Ls=["basspistol.org","bucket.coracle.social","chorus.pjv.me","koru.bitcointxoko.org","nos.lol","nostr-01.uid.ovh","nostr-01.yakihonne.com","nostr-relay.corb.net","nostr.data.haus","nostr.islandarea.net","nostr.sathoarder.com","nostr.tegila.com.br","nostr.vulpem.com","purplerelay.com","relay-can.zombi.cloudrodion.com","relay-rpi.edufeed.org","relay.agorist.space","relay.artio.inf.unibe.ch","relay.mostr.pub","relay.mostro.network","relay.sigit.io","relay02.lnfi.network","schnorr.me","social.amanah.eblessing.co","staging.yabu.me","strfry.shock.network","top.testrelay.top","yabu.me/v2"].map(e=>"wss://"+e);return Vr(Hs);})();
+/*! Bundled license information:
+
+@noble/secp256k1/index.js:
+  (*! noble-secp256k1 - MIT License (c) 2019 Paul Miller (paulmillr.com) *)
+*/}catch(e){Trystero=undefined}
+
+</script>
+<script>
+// ---------- NetRoom: free peer-to-peer game rooms (WebRTC through Trystero, MIT) ----------
+// Players find each other through public Nostr relays; after that the moves go browser to browser.
+// The room object has the same shape as the claude.ai "room" capability, so a game's net code runs on either:
+//   lobby.join(name) -> room {presence(o), on(type,fn), emit(type,data), onPeers(fn), onConnection(fn), leave()}
+//   messages: {peer, data, isMe:false, by}   peers: {peer, isMe, sameTab, kind:'viewer', presence, by, guest:false}
+// Tests can point it at a local relay with window.NETROOM_RELAYS=['ws://127.0.0.1:17700'].
+const NetRoom=(()=>{
+  const APP='game-night-shelf-v1';
+  const rand=n=>{const a='abcdefghijkmnpqrstuvwxyz23456789',u=new Uint8Array(n);crypto.getRandomValues(u);return [...u].map(x=>a[x%a.length]).join('')};
+  const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+  let myUid=null;
+  function uid(){if(myUid)return myUid;myUid=store.get('gns-uid');if(!myUid){myUid='p'+rand(15);store.set('gns-uid',myUid)}return myUid}
+  function name(){return (store.get('gns-name')||'').slice(0,24)}
+  function setName(n){n=String(n||'').replace(/[<>&"]/g,'').trim().slice(0,24);store.set('gns-name',n);return n}
+  function available(){return typeof Trystero!=='undefined'&&typeof RTCPeerConnection!=='undefined'&&!!(window.crypto&&crypto.subtle)}
+  // invite codes: 5 letters/digits without look-alikes
+  function newCode(){return rand(5)}
+  function cleanCode(c){return String(c||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,10)}
+  // one room per page: joining again (a retry, or another code) first closes the old room, so the host
+  // can't stay connected to an abandoned copy while the game listens on the new one
+  let active=null;
+  function lobby(game){return {join:async roomName=>{if(active){const old=active;active=null;try{await old.leave()}catch(e){}await new Promise(r=>setTimeout(r,250))}
+    const r=makeRoom(game,String(roomName));active=r;return r}}}
+  function makeRoom(game,roomName){
+    const cfg={appId:APP,password:game+'/'+roomName,relayConfig:{redundancy:6,warnOnRelayFailure:false}};
+    if(window.NETROOM_RELAYS)cfg.relayConfig.urls=window.NETROOM_RELAYS;
+    if(window.NETROOM_ICE)cfg.rtcConfig={iceServers:window.NETROOM_ICE};
+    if(window.NETROOM_TURN)cfg.turnConfig=window.NETROOM_TURN;
+    const tr=Trystero.joinRoom(cfg,game+'/'+roomName);
+    const me=Trystero.selfId,by=uid();
+    let pres={name:name()},left=false;
+    const remote=new Map(),handlers={},peerFns=[],connFns=[];
+    const gA=tr.makeAction('g'),pA=tr.makeAction('p');
+    const entry=(p,v)=>({peer:p,isMe:false,sameTab:false,kind:'viewer',presence:v.presence,by:v.by,guest:false});
+    const list=()=>[{peer:me,isMe:true,sameTab:true,kind:'viewer',presence:pres,by,guest:false},...[...remote].map(([p,v])=>entry(p,v))];
+    const fire=(joined,gone)=>{const ch={peers:list(),joined,left:gone};peerFns.forEach(f=>{try{f(ch)}catch(e){console.error(e)}})};
+    const sendPres=target=>{try{pA.send({pr:pres,by},target?{target}:undefined)}catch(e){}};
+    const gone=new Set();
+    tr.onPeerJoin=p=>{if(left)return;gone.delete(p);sendPres(p)};
+    tr.onPeerLeave=p=>{if(left)return;gone.add(p);const v=remote.get(p);if(!v)return;remote.delete(p);fire([],[entry(p,v)])};
+    pA.onMessage=(d,info)=>{const p=info&&info.peerId;if(left||!p||gone.has(p)||!d||typeof d!=='object')return;
+      const pr=d.pr&&typeof d.pr==='object'&&!Array.isArray(d.pr)?Object.assign({},d.pr):{};if('name' in pr)pr.name=String(pr.name||'').replace(/[<>&"]/g,'').slice(0,24);
+      const v={presence:pr,by:typeof d.by==='string'?d.by.slice(0,40):null};
+      const old=remote.get(p);remote.set(p,v);if(!old){sendPres(p);fire([entry(p,v)],[]);return}
+      // presence is re-sent every few seconds in case one was lost; only a real change is reported
+      if(JSON.stringify(old)!==JSON.stringify(v))fire([],[])};
+    gA.onMessage=(d,info)=>{const p=info&&info.peerId;if(left||!p||!d||typeof d.t!=='string')return;
+      // a message can arrive just before that peer's presence does
+      const v=remote.get(p)||{presence:{},by:null};(handlers[d.t]||[]).forEach(f=>{try{f({peer:p,data:d.d,isMe:false,by:v.by})}catch(e){console.error(e)}})};
+    setTimeout(()=>connFns.forEach(f=>f(true)),0);
+    const hb=setInterval(()=>{if(!left)sendPres()},5000);
+    // closing the tab tells the others at once, instead of after WebRTC's ~10 s timeout
+    const bye=()=>{if(left)return;left=true;clearInterval(hb);try{tr.leave()}catch(e){}};window.addEventListener('pagehide',bye);
+    return {
+      self:me,
+      presence(o){pres=Object.assign({},pres,o||{});sendPres();fire([],[]);return Promise.resolve()},
+      on(t,f){(handlers[t]=handlers[t]||[]).push(f)},
+      emit(t,d){if(left)return Promise.resolve();try{return Promise.resolve(gA.send({t,d})).then(()=>{},()=>{})}catch(e){return Promise.resolve()}},
+      sendTo(peer,t,d){if(left)return Promise.resolve();try{return Promise.resolve(gA.send({t,d},{target:peer})).then(()=>{},()=>{})}catch(e){return Promise.resolve()}},
+      onPeers(f){peerFns.push(f);setTimeout(()=>f({peers:list(),joined:[],left:[]}),0)},
+      onConnection(f){connFns.push(f)},
+      peerCount(){return remote.size},
+      leave(){window.removeEventListener('pagehide',bye);left=true;clearInterval(hb);try{return Promise.resolve(tr.leave())}catch(e){return Promise.resolve()}}};
+  }
+  // an invite link opens the game with the code filled in: …/game/#join-abcde
+  function linkCode(){const m=/^#join-([a-z0-9]{3,10})$/i.exec(location.hash||'');return m?m[1].toLowerCase():''}
+  function inviteLink(code){return location.href.split('#')[0]+'#join-'+code}
+  return {available,lobby,uid,name,setName,newCode,cleanCode,linkCode,inviteLink};
+})();
 
 </script>
 <script>
@@ -2468,6 +2572,29 @@ if (typeof module === 'object' && module.exports) module.exports = HB.AI;
 
 </script>
 <script>
+// ---------- online play: what a remote seat may see ----------
+// netStrip(G, seat) builds a NEW state object for ONE seat from a WHITELIST of public fields (nothing is copied by default: a field the
+// engine gains later is absent from the copy until it is listed here, so it cannot leak by accident). It starts from HB.stripView (own hand
+// only, deck order gone, private limbo / tucked cards hidden, other seats' pending question has no options, seed and rng zeroed) and then
+// rebuilds the object field by field. The copy answers HB.actor / HB.moves(seat) / HB.score / HB.AI.choose the same as the real state
+// (tools: net-strip-test.js). seat -1 = a watcher (every hand hidden). Pure function: no DOM.
+const NET_TOP = ['v', 'np', 'solo', 'deck', 'discard', 'meadow', 'limbo', 'lpriv', 'forest', 'bev', 'sev', 'grim', 'cur', 'first', 'turn', 'phase', 'logN', 'over', 'nolog'];
+const NET_PL = ['name', 'ai', 'seat', 'hand', 'city', 'res', 'pts', 'workers', 'lost', 'season', 'passed', 'dep'];
+function netStrip(g, seat) {
+  const v = HB.stripView(g, Number.isInteger(seat) && seat >= 0 && seat < g.np ? seat : -1);
+  const cp = o => o == null ? o : JSON.parse(JSON.stringify(o));
+  const P = {};
+  for (const k of NET_TOP) if (v[k] !== undefined) P[k] = cp(v[k]);
+  P.players = v.players.map(p => { const o = {}; for (const k of NET_PL) if (p[k] !== undefined) o[k] = cp(p[k]); return o; });
+  P.q = v.q ? { who: v.q.who, kind: v.q.kind, title: v.q.who === seat ? v.q.title : '', opts: v.q.who === seat ? cp(v.q.opts) : [] } : null;
+  P.log = cp(v.log.slice(-150));
+  P.used = {}; P.rng = 0; P.seed = 0; P.ag = []; P.agI = 0;
+  return P;
+}
+if (typeof module === 'object' && module.exports) module.exports = netStrip;
+
+</script>
+<script>
 /* gameaudio.js - shared sample playback for the single-file board games.
  * Plain script (no modules). Defines window.GA. Every public call is wrapped so it never throws;
  * without Web Audio (jsdom, very old browsers) it stays silent and GA.has() returns false,
@@ -2741,6 +2868,293 @@ if (typeof module === 'object' && module.exports) module.exports = HB.AI;
 
 </script>
 <script>
+// ---------- online play: free peer-to-peer rooms (net/netroom.js over WebRTC) ----------
+// The host's page runs the game: it holds the real G, runs the engine and the computer seats. Every other player's page only draws what ITS
+// seat may see: the host sends each peer its own copy of the state made by netStrip(G, seat) (src/netstrip.js: a whitelist built on
+// HB.stripView; other hands, the deck order, tucked cards and the seed are never copied) and the peer sends back one small move message that
+// the host checks (the sender owns the seat that must act, and the move is one of HB.moves(G, seat)) before HB.apply runs it.
+// Seats go to the players in join order (host = seat 0, up to 4); the other seats are computers. A player who leaves is replaced by the
+// computer (a pending question included) and gets the seat back when the same browser (same uid) rejoins. If the host leaves the game is over:
+// the others never hold the hidden state, so nobody can take over (no host migration).
+const NET = { on: false, role: null, code: '', room: null, lobby: null, uid: null, peer: null, mySeat: -1, seq: 0, last: 0, timer: null, parts: {}, hostPeer: null, peers: [],
+  err: '', busy: false, ready: false, lastRx: 0, gid: null, myName: '', copied: false, opt: null, hostGone: false, remote: 0, rejected: 0, sent: 0, rx: 0,
+  seatPeer: [], seatUid: [], away: [], pend: -1, pendT: 0, conn: null, lastSt: '', trace: null, applied: 0, rejLog: [], lastTxt: '', wasMine: null, lvl: 'normal', bad: 0 };
+const isClient = () => NET.on && NET.role === 'client';
+const isHost = () => NET.on && NET.role === 'host';
+const netAvail = () => !!NET.lobby;
+const cleanName = s => String(s == null ? '' : s).replace(/[<>&"'`]/g, '').trim().slice(0, 24);
+function netInit() {
+  try { if (typeof NetRoom !== 'undefined' && NetRoom.available()) { NET.lobby = NetRoom.lobby('hollowbough'); NET.uid = NetRoom.uid(); NET.myName = NetRoom.name(); const lc = NetRoom.linkCode(); if (lc) { UI.joinCode = lc; UI.onl = true; } } } catch (e) { console.error(e); }
+  NET.ready = true;
+}
+function netIdle() { clearTimeout(UI.tm); clearTimeout(UI.tr); G = null; UI.started = false; UI.cards = []; UI.after = []; UI.pop = null; UI.overShown = false; closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } try { GX.close(); } catch (e) { } }
+async function netJoin(role, code) {
+  if (NET.busy || !NET.lobby) return; NET.err = ''; code = NetRoom.cleanCode(code);
+  if (!code) { NET.err = 'Type the invite code first.'; netRender(); return; }
+  NET.busy = true; netRender(); let room;
+  try { if (NET.room) { try { await NET.room.leave(); } catch (e) { } NET.room = null; } room = await NET.lobby.join('hb-' + code); } catch (e) { NET.busy = false; NET.err = 'Could not open the game room.'; netRender(); return; }
+  if (G || UI.started) netIdle();
+  Object.assign(NET, { busy: false, code, role, on: true, room, mySeat: -1, hostPeer: null, parts: {}, applied: 0, lastRx: 0, gid: null, hostGone: false, peer: room.self, peers: [], opt: null, seatPeer: [], seatUid: [], away: [], pend: -1, lastTxt: '', wasMine: null, err: '' });
+  document.documentElement.classList.add('net');
+  room.presence({ role, uid: NET.uid, name: NET.myName || '' }).catch(() => { });
+  room.on('st', onNetState); room.on('act', onNetAct); room.on('rej', onNetRej);
+  room.onPeers(onNetPeers); room.onConnection(c => { NET.conn = c; netRender(); });
+  UI.netOpen = true; renderStart(); netRender();
+  if (role === 'host') netPush(true);
+}
+async function netLeave() {
+  const r = NET.room, was = NET.on;
+  Object.assign(NET, { on: false, role: null, room: null, mySeat: -1, hostPeer: null, err: '', hostGone: false, peers: [], gid: null, opt: null, seatPeer: [], seatUid: [], away: [], lastTxt: '', wasMine: null });
+  document.documentElement.classList.remove('net');
+  try { if (r) await r.leave(); } catch (e) { }
+  if (!was) return; UI.netOpen = false; netIdle(); renderStart(); netRender();
+}
+// ---- peers: seats follow the room ----
+function onNetPeers(ch) {
+  NET.peers = ch.peers || [];
+  if (isClient()) {
+    const hp = NET.peers.find(p => !p.isMe && p.presence && p.presence.role === 'host'); if (hp) NET.hostPeer = hp.peer;
+    if (NET.hostPeer && (ch.left || []).some(p => p.peer === NET.hostPeer)) { NET.hostGone = true; NET.err = G ? 'The host left. The game is over.' : 'The host closed the room.'; UI.netOpen = true; }
+  }
+  if (isHost()) {
+    let chg = false;
+    (ch.left || []).forEach(l => { const i = NET.seatPeer.indexOf(l.peer); if (G && i >= 0 && !NET.away[i] && G.phase !== 'over') { netAway(i); chg = true; } });
+    (ch.joined || []).forEach(j => { if (j.isMe || !G || !j.by) return; const i = NET.seatUid.findIndex(u => u && u === j.by); if (i >= 0 && NET.seatPeer[i] !== j.peer) { netRestore(i, j.peer); chg = true; } else if (i >= 0 && NET.away[i]) { netRestore(i, j.peer); chg = true; } });
+    if (chg && G) { render(); schedule(); }
+    netPush(true);
+  }
+  netRender();
+}
+// the computer takes the seat (a pending question included: schedule() answers it)
+function netAway(i) { const p = G.players[i]; NET.away[i] = true; NET.seatPeer[i] = null; p.ai = NET.lvl || 'normal'; HB._.withG(G, () => HB._.lg(p.name + ' left the game: the computer plays for them now.')); }
+function netRestore(i, peer) { const p = G.players[i]; NET.seatPeer[i] = peer; NET.away[i] = false; p.ai = null; HB._.withG(G, () => HB._.lg(p.name + ' is back and takes their seat again.')); }
+// ---- the lobby: players in join order (the host first); seat i goes to player i ----
+function netHumans() {
+  const hum = [];
+  for (const p of NET.peers) { if (hum.length >= 4) break; hum.push({ peer: p.peer, uid: p.isMe ? NET.uid : (p.by || null), nm: cleanName(p.isMe ? NET.myName : (p.presence && p.presence.name)), host: !!p.isMe }); }
+  if (!hum.some(h => h.peer === NET.peer)) hum.unshift({ peer: NET.peer, uid: NET.uid, nm: cleanName(NET.myName), host: true });
+  const seen = {}; hum.forEach((h, i) => { let n = h.nm || 'Player ' + (i + 1); while (seen[n.toLowerCase()]) n = n.slice(0, 20) + ' ' + (i + 1); seen[n.toLowerCase()] = 1; h.nm = n; });
+  return hum;
+}
+function netPlan() {
+  const o = UI.opt || DEF, hum = netHumans(), np = Math.min(4, Math.max(2, o.np || 2, hum.length)), lvl = o.level || 'normal';
+  return { hum, np, lvl };
+}
+function netPlayers() { // raw list for the lobby (and for clients inside the packet)
+  if (isClient()) return Array.isArray(NET.opt && NET.opt.pl) ? NET.opt.pl.slice(0, 12).map(p => ({ nm: cleanName(p && p.nm) || 'Player', by: p && typeof p.by === 'string' ? p.by.slice(0, 40) : '', host: !!(p && p.host), seat: p && Number.isInteger(p.seat) ? p.seat : -1 })) : [];
+  return NET.peers.map((p, k) => { const by = p.isMe ? NET.uid : (p.by || ''); const i = G ? NET.seatUid.indexOf(by) : -1; return { nm: cleanName(p.isMe ? NET.myName : (p.presence && p.presence.name)) || 'Player', by, host: !!p.isMe, seat: i >= 0 ? i : (G ? -1 : k < 4 ? k : -1) }; });
+}
+function netOpt() { const pl = netPlan(); return { np: pl.np, lv: pl.lvl, pl: netPlayers() }; }
+// host: start (or restart) a game for everyone in the room
+function netStart() {
+  if (!isHost()) return;
+  const pl = netPlan(); const players = pl.hum.map(h => ({ name: h.nm, ai: null }));
+  const used = new Set(players.map(p => p.name.toLowerCase())); let k = 0;
+  while (players.length < pl.np) { let n = PNAMES[k++ % PNAMES.length]; while (used.has(n.toLowerCase())) n += ' ' + k; used.add(n.toLowerCase()); players.push({ name: n, ai: pl.lvl }); }
+  NET.seatPeer = pl.hum.map(h => h.peer); NET.seatUid = pl.hum.map(h => h.uid); NET.away = []; NET.mySeat = 0; NET.lvl = pl.lvl; NET.wasMine = null;
+  NET.gid = NetRoom.newCode() + Date.now().toString(36); UI.netOpen = false;
+  newGame('net', { players, np: pl.np, level: pl.lvl });
+  netRender(); netPush(true);
+}
+// ---- state packets: JSON, deflate-compressed, cut into chunks ----
+function b64(u8) { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); }
+function unb64(s) { const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+async function packStr(s) { if (window.CompressionStream) { try { const cs = new CompressionStream('deflate-raw'); const w = cs.writable.getWriter(); w.write(new TextEncoder().encode(s)).catch(() => { }); w.close().catch(() => { }); return 'z' + b64(new Uint8Array(await new Response(cs.readable).arrayBuffer())); } catch (e) { } } return 'j' + b64(new TextEncoder().encode(s)); }
+async function unpackStr(s) { const u = unb64(s.slice(1)); if (s[0] === 'z') { const ds = new DecompressionStream('deflate-raw'); const w = ds.writable.getWriter(); w.write(u).catch(() => { }); w.close().catch(() => { }); return await new Response(ds.readable).text(); } return new TextDecoder().decode(u); }
+function sendPacked(room, target, txt, seq) { packStr(txt).then(z => { const CH = 3200, n = Math.ceil(z.length / CH); for (let i = 0; i < n; i++) { const d = { s: seq, i, n, d: z.slice(i * CH, (i + 1) * CH) }; (target ? room.sendTo(target, 'st', d) : room.emit('st', d)).catch(() => { }); } }); }
+function netPush(force) {
+  if (!isHost() || !NET.room) return; const now = Date.now();
+  if (!force && now - NET.last < 300) { if (!NET.timer) NET.timer = setTimeout(() => { NET.timer = null; netPush(true); }, 310); return; }
+  NET.last = now; const seq = ++NET.seq, room = NET.room, opt = netOpt();
+  if (!G || !UI.started) { sendPacked(room, null, JSON.stringify({ code: NET.code, lobby: true, opt }), seq); return; }
+  // every peer gets ITS OWN stripped copy: no other hand, no deck order, no seed
+  for (const p of NET.peers) {
+    if (p.isMe) continue; const seat = NET.seatPeer.indexOf(p.peer);
+    sendPacked(room, p.peer, JSON.stringify({ code: NET.code, gid: NET.gid, seat, opt, g: netStrip(G, seat) }), seq);
+  }
+}
+setInterval(() => { if (isHost()) netPush(true); }, 3000);
+function onNetState(msg) {
+  NET.rx++; if (!NET.on || msg.isMe || !isClient()) return; const d = msg.data;
+  if (!d || typeof d.d !== 'string' || !(d.n > 0 && d.n < 80) || !(d.i >= 0 && d.i < d.n) || !Number.isInteger(d.s)) return;
+  if (!NET.hostPeer || msg.peer !== NET.hostPeer) return;
+  const k = msg.peer + ':' + d.s, P2 = NET.parts[k] = NET.parts[k] || { n: d.n, got: 0, c: [] };
+  if (P2.c[d.i] === undefined) { P2.c[d.i] = d.d; P2.got++; }
+  if (P2.got < P2.n) return; delete NET.parts[k];
+  Object.keys(NET.parts).forEach(x => { const i = x.lastIndexOf(':'); if (x.slice(0, i) === msg.peer && +x.slice(i + 1) < d.s) delete NET.parts[x]; });
+  unpackStr(P2.c.join('')).then(txt => { const o = JSON.parse(txt); if (!o || o.code !== NET.code || !NET.on) return; if (d.s <= NET.applied) return; NET.applied = d.s; NET.lastRx = Date.now(); if (window.NET_TRACE) (NET.trace = NET.trace || []).push(txt); applyNet(o); }).catch(e => { NET.bad++; NET.badE = String(e); });
+}
+function validState(g) {
+  const num = x => Number.isFinite(x);
+  return !!g && typeof g === 'object' && Number.isInteger(g.np) && g.np >= 2 && g.np <= 4 && Array.isArray(g.players) && g.players.length === g.np && Array.isArray(g.deck) && Array.isArray(g.discard) && Array.isArray(g.meadow) && g.meadow.length === 8 &&
+    Array.isArray(g.forest) && Array.isArray(g.bev) && Array.isArray(g.sev) && Array.isArray(g.log) && Array.isArray(g.limbo) && (g.phase === 'play' || g.phase === 'over') && num(g.logN) && num(g.cur) && num(g.turn) &&
+    g.players.every(p => p && typeof p === 'object' && Array.isArray(p.hand) && Array.isArray(p.city) && Array.isArray(p.dep) && p.res && typeof p.res === 'object' && num(p.season) && num(p.workers) && num(p.pts));
+}
+function applyNet(o) {
+  NET.opt = o.opt && typeof o.opt === 'object' ? o.opt : NET.opt;
+  if (o.lobby || !o.g) { if (G || UI.started) { netIdle(); renderStart(); } NET.gid = null; NET.lastTxt = ''; netRender(); return; }
+  if (!validState(o.g) || typeof o.gid !== 'string') return;
+  const g = o.g, fresh = o.gid !== NET.gid, seat = Number.isInteger(o.seat) && o.seat >= 0 && o.seat < g.np ? o.seat : -1;
+  const txt = JSON.stringify(g) + '|' + seat; if (!fresh && txt === NET.lastTxt) { netRender(); return; }
+  NET.lastTxt = txt; const prev = fresh ? null : G; const prevLog = prev ? prev.logN : g.logN; const wasAct = prev ? HB.actor(prev) : -2;
+  g.players.forEach(p => { p.name = cleanName(p.name) || '?'; });
+  G = g; NET.mySeat = seat;
+  if (fresh) {
+    NET.gid = o.gid; clearTimeout(UI.tm); clearTimeout(UI.tr); closePop();
+    Object.assign(UI, { cards: [], after: [], rec: null, recKey: '', pop: null, over: null, overShown: false, lastAi: '', started: true, focus: 0, holder: -1, mode: 'net', coachOn: false, turnSnd: '' });
+    NET.pend = -1; NET.wasMine = null; const st = $('#start'); if (st) st.hidden = true; try { GX.close(); } catch (e) { } UI.netOpen = false;
+  } else if (g.logN > prevLog) {
+    NET.pend = -1; const ls = logSince(prevLog); if (ls.length) UI.lastAi = ls[0].replace(/^[^ ]+ /, ''); snd('place', { vol: .45 });
+  }
+  // a pop-up built from an older state would offer moves that may no longer exist
+  if (prev && g.logN !== prevLog && (wasAct === seat || HB.actor(G) === seat)) closePop();
+  else if (prev && (wasAct === seat) !== (HB.actor(G) === seat)) closePop();
+  netRender(); render(); sndMusic(); schedule();
+}
+function onNetRej(msg) { if (!isClient() || msg.peer !== NET.hostPeer) return; const e = msg.data && typeof msg.data.e === 'string' ? msg.data.e.slice(0, 160) : ''; NET.pend = -1; if (e && G) toast(e); }
+// ---- client -> host ----
+function netAct(m) {
+  if (!NET.room || !NET.hostPeer || !G || G.phase === 'over') { toast('Not connected to the host yet.'); return; }
+  if (HB.actor(G) !== NET.mySeat) { toast('It is not your turn.'); return; }
+  if (NET.pend === G.logN && Date.now() - NET.pendT < 2500) return;
+  const o = {}; for (const k in m) if (k !== 'label') o[k] = m[k];
+  NET.pend = G.logN; NET.pendT = Date.now(); NET.sent++; NET.room.sendTo(NET.hostPeer, 'act', { m: o, n: G.logN }).catch(() => { });
+  closePop(); UI.rec = null;
+}
+// a move is compared by its content (the label is ignored); only primitive values are accepted
+function netKey(m) { if (!m || typeof m !== 'object' || Array.isArray(m)) return null; const ks = Object.keys(m).filter(k => k !== 'label').sort(); if (ks.length > 12) return null; const a = []; for (const k of ks) { const v = m[k]; if (v === undefined) continue; if (v !== null && typeof v !== 'string' && typeof v !== 'number' && typeof v !== 'boolean') return null; a.push([k, v]); } return JSON.stringify(a); }
+function netRej(peer, e, why) { NET.rejected++; NET.rejLog.push(String(e).slice(0, 40) + (why ? ' ' + String(why).slice(0, 120) : '')); if (NET.rejLog.length > 30) NET.rejLog.shift(); try { NET.room.sendTo(peer, 'rej', { e }).catch(() => { }); } catch (x) { } }
+// the host runs a move for a remote seat the same way a local click or the computer does
+function netApplyMove(m, seat) {
+  const pre = sndPre(); const r = HB.apply(G, m);
+  if (r.ok) { sndPost(pre, m, seat); UI.lastAi = ''; afterMove(); }
+  return r;
+}
+function onNetAct(msg) {
+  if (!isHost() || !G || msg.isMe) return; const d = msg.data;
+  if (!d || typeof d !== 'object' || Array.isArray(d)) { NET.rejected++; return; }
+  let seat = NET.seatPeer.indexOf(msg.peer);
+  if (seat < 0) { const i = msg.by ? NET.seatUid.findIndex(u => u && u === msg.by) : -1; if (i >= 0) { netRestore(i, msg.peer); render(); seat = i; } else { NET.rejected++; return; } }
+  if (G.phase === 'over') { NET.rejected++; return; }
+  let js; try { js = JSON.stringify(d.m); } catch (e) { }
+  if (typeof js !== 'string' || js.length > 300 || js[0] !== '{') { NET.rejected++; return; }
+  const key = netKey(JSON.parse(js)); if (key == null) { NET.rejected++; return; }
+  if (d.n !== undefined && d.n !== G.logN) { netRej(msg.peer, 'The game moved on. Look at the board and try again.', 'n' + d.n + '/' + G.logN); return; }
+  if (HB.actor(G) !== seat || G.players[seat].ai) { netRej(msg.peer, 'It is not your turn.'); return; }
+  const real = HB.moves(G, seat).find(x => netKey(x) === key);
+  if (!real) { netRej(msg.peer, 'That move is not allowed.', 'n' + d.n + '/' + G.logN + ' ' + key + ' have ' + HB.moves(G, seat).length); return; }
+  let r; try { r = netApplyMove(real, seat); } catch (e) { console.error(e); r = { ok: false }; }
+  if (r && r.ok) NET.remote++; else netRej(msg.peer, (r && r.error) || 'That move did not work.');
+}
+// ---- status, bar badge, lobby, start-screen panel ----
+function netStatus() {
+  const n = NET.peers.length;
+  if (NET.hostGone || NET.err) return { t: NET.err || 'The host left.', c: 'bad', n };
+  if (NET.conn === false) return { t: 'Connecting...', c: 'wait', n };
+  if (isClient() && !NET.hostPeer) return { t: 'Looking for the host...', c: 'wait', n };
+  if (isClient() && NET.lastRx && Date.now() - NET.lastRx > 12000) return { t: 'Reconnecting...', c: 'wait', n };
+  if (n <= 1) return { t: 'Looking for players...', c: 'wait', n };
+  return { t: n + ' players online', c: 'ok', n };
+}
+function netDock() {
+  const el = $('#netst'); if (!el) return; if (!NET.on) { el.hidden = true; return; } el.hidden = false;
+  const s = netStatus(), key = NET.code + '|' + s.t + '|' + s.c + '|' + s.n + '|' + NET.mySeat; if (el._k === key) return; el._k = key;
+  el.innerHTML = ''; el.appendChild(h('span.nd.' + s.c)); el.appendChild(h('span.nl', 'Room ' + NET.code.toUpperCase() + ' · ' + s.t)); el.appendChild(h('span.ns', String(s.n)));
+  el.setAttribute('aria-label', 'Online room ' + NET.code + ': ' + s.t + '. Open the lobby.'); el.title = 'Room ' + NET.code + ' · ' + s.t;
+}
+function netLobbyEl() {
+  const host = isHost(), ps = netPlayers(), st = netStatus(), o = host ? netOpt() : (NET.opt || null);
+  const box = h('div.nbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Online game' }, h('button.px.lbx', { 'data-a': 'netclose', type: 'button', 'aria-label': 'Close' }, '×'), h('h2', 'Online game'));
+  box.appendChild(h('p', 'Invite code: ', h('b.code#netcode', NET.code)));
+  box.appendChild(h('div.invrow', h('input.invlink', { readonly: true, value: NetRoom.inviteLink(NET.code), 'aria-label': 'Invite link' }), h('button.btn.small', { 'data-a': 'netcopy', type: 'button' }, NET.copied ? 'Copied ✓' : 'Copy link')));
+  box.appendChild(h('p.sm', 'Friends open the link, or tap Play online and type the code. Nobody can see another player\'s hand.'));
+  box.appendChild(h('p.sm.nst.' + st.c, st.t));
+  if (NET.hostGone) { box.appendChild(h('div.acts', h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, 'Back to the start'))); return box; }
+  box.appendChild(h('h3', 'Players (' + ps.length + ')'));
+  const ul = h('ul.plist');
+  ps.forEach((p, i) => { const sIdx = p.seat >= 0 ? p.seat : i; ul.appendChild(h('li', pawn(Math.min(3, sIdx), 18), h('b', p.nm || 'Player'), p.by && p.by === NET.uid ? ' (you)' : '', p.host ? ' · host' : '', G && p.seat < 0 ? ' · watching' : '')); });
+  if (!ps.length) ul.appendChild(h('li.muted', 'Connecting...'));
+  box.appendChild(ul);
+  if (o && o.np) {
+    const hum = Math.min(ps.length, o.np), ai = Math.max(0, o.np - hum);
+    if (host) {
+      const oo = UI.opt = UI.opt || Object.assign({}, DEF);
+      const seg = (l, key, vals) => h('div.seg', h('span.lbl', l), vals.map(v => h('button.chipb' + (oo[key] === v ? '.on' : ''), { 'data-a': 'netopt', 'data-k': key, 'data-v': v, type: 'button' }, v)));
+      box.appendChild(h('div.opts', seg('Players', 'np', [2, 3, 4]), seg('Computer level', 'level', ['easy', 'normal', 'hard'])));
+    }
+    box.appendChild(h('p.sm', o.np + ' players' + (ai > 0 ? ' · ' + ai + ' computer seat' + (ai > 1 ? 's' : '') + ' (' + (o.lv || 'normal') + ')' : '') + '. Empty seats go to the computer; a friend who leaves is replaced by it.'));
+  }
+  if (host) box.appendChild(h('div.acts', h('button.btn', { 'data-a': 'netstart', type: 'button' }, G && G.phase !== 'over' ? 'Start a new game' : 'Start game'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, 'Close the room')));
+  else box.appendChild(h('div', h('p.sm', NET.hostGone ? '' : (G && G.phase !== 'over' ? 'The game is running.' : 'Waiting for the host to start...')), h('div.acts', h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, NET.hostGone ? 'Back to the start' : 'Leave'))));
+  return box;
+}
+function netInner() {
+  if (!NET.ready) return [h('p.sm.muted', 'Checking online play...')];
+  if (!netAvail()) return [h('p.sm.muted', 'Online play needs a recent browser with WebRTC (Chrome, Edge, Firefox or Safari).')];
+  return [h('p.sm.muted', 'Free and direct: your browsers connect to each other. Host a game, then send friends the code or the link.'),
+    h('div.nrow', h('input#netname', { placeholder: 'Your name', maxlength: 24, autocomplete: 'off', value: NET.myName || '' }), h('button.btn.small', { 'data-a': 'nethost', type: 'button' }, 'Host')),
+    h('div.nrow', h('input#joincode', { placeholder: 'Invite code', maxlength: 10, autocomplete: 'off', autocapitalize: 'off', value: UI.joinCode || '' }), h('button.btn.small', { 'data-a': 'netjoin', type: 'button' }, 'Join')),
+    NET.busy ? h('p.sm.muted', 'Opening the room...') : null, NET.err ? h('p.sm.warn', NET.err) : null];
+}
+function netBlock() { return h('details.online#onl', { open: UI.onl ? true : null }, h('summary', 'Play online (free, peer to peer)'), h('div#netblock', netInner())); }
+// the start screen while in a room: the lobby holds the controls, this card just waits
+function netStartScreen(s) {
+  const st = netStatus();
+  s.appendChild(h('div.scard', h('h1', h('span', { html: ICO.tree }), 'Hollowbough'), h('p.tag', isHost() ? 'You are hosting room ' + NET.code.toUpperCase() + '. Friends join with the code or the link; press Start game in the lobby.' : 'You are in room ' + NET.code.toUpperCase() + '. Waiting for the host to start the game.'),
+    h('p.sm.nst.' + st.c, st.t), h('div.srow2', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Open the lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'))));
+}
+function netRender() {
+  netDock(); const box = $('#netbox');
+  if (box) { if (UI.netOpen && NET.on) { box.hidden = false; const ae = document.activeElement; const keep = ae && box.contains(ae) && ae.tagName === 'INPUT'; if (!keep || !box.firstChild) { box.innerHTML = ''; box.appendChild(netLobbyEl()); } } else { box.hidden = true; box.innerHTML = ''; } }
+  const nb = $('#netblock'); if (nb && !(document.activeElement && nb.contains(document.activeElement) && document.activeElement.tagName === 'INPUT')) { nb.innerHTML = ''; add(nb, netInner()); }
+  const sn = $('#start .nst'); if (sn && NET.on) { const st = netStatus(); sn.textContent = st.t; sn.className = 'sm nst ' + st.c; }
+}
+function netCopy() {
+  const t = NetRoom.inviteLink(NET.code), sel = () => { const i = document.querySelector('.invlink'); if (i) { i.focus(); i.select(); } };
+  const done = () => { NET.copied = true; netRender(); setTimeout(() => { NET.copied = false; netRender(); }, 2500); };
+  try { navigator.clipboard.writeText(t).then(done, sel); } catch (e) { sel(); }
+}
+function netClose() { UI.netOpen = false; netRender(); }
+// hooks called from the UI: the end of render(), and after every applied move
+function netRenderHook() {
+  netDock(); const mine = !!G && G.phase !== 'over' && HB.actor(G) === NET.mySeat;
+  if (NET.wasMine !== null && NET.wasMine !== mine && UI.pop) closePop(); NET.wasMine = mine;
+}
+function netOverButtons() { return (isHost() ? [{ label: 'Play again', a: 'again' }] : []).concat([{ label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Lobby', a: 'netopen', cls: 'alt' }]); }
+// returns true when the click was an online-play button (or a local-game button that makes no sense online)
+function netClick(a, t) {
+  switch (a) {
+    case 'nethost': { const i = $('#netname'); if (i) NET.myName = NetRoom.setName(i.value); netJoin('host', NetRoom.newCode()); return true; }
+    case 'netjoin': { const i = $('#netname'); if (i) NET.myName = NetRoom.setName(i.value); netJoin('client', ($('#joincode') || {}).value); return true; }
+    case 'netstart': netStart(); return true;
+    case 'netleave': netLeave(); return true;
+    case 'netcopy': netCopy(); return true;
+    case 'netclose': netClose(); return true;
+    case 'netopen': try { GX.close(); } catch (e) { } UI.netOpen = true; netRender(); return true;
+    case 'netopt': { if (isHost() && t && t.dataset) { UI.opt = UI.opt || Object.assign({}, DEF); UI.opt[t.dataset.k] = isNaN(+t.dataset.v) ? t.dataset.v : +t.dataset.v; netRender(); netPush(true); } return true; }
+  }
+  if (!NET.on) return false;
+  switch (a) {
+    case 'again': if (isHost()) netStart(); return true;
+    case 'menu': try { GX.close(); } catch (e) { } UI.netOpen = true; netRender(); return true;
+    case 'start': case 'guided': case 'save': case 'loadsave': return true;
+  }
+  return false;
+}
+document.addEventListener('input', e => { const t = e.target; if (!t) return; if (t.id === 'joincode') UI.joinCode = t.value; if (t.id === 'netname' && typeof NetRoom !== 'undefined') NET.myName = NetRoom.setName(t.value); });
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  if (t && t.id === 'joincode' && e.key === 'Enter') { e.preventDefault(); netClick('netjoin'); return; }
+  if (t && t.id === 'netname' && e.key === 'Enter') { e.preventDefault(); netClick('nethost'); return; }
+  if (e.key === 'Escape' && UI.netOpen) { e.preventDefault(); netClose(); }
+});
+document.addEventListener('click', e => { if (UI.netOpen && e.target && e.target.id === 'netbox') netClose(); });
+document.addEventListener('toggle', e => { if (e.target && e.target.id === 'onl') UI.onl = e.target.open; }, true);
+// the lobby and the badge keep showing the live player count
+setInterval(() => { if (!NET.on) return; const st = netStatus(), k = st.t + '|' + NET.peers.length; if (k !== NET.lastSt) { NET.lastSt = k; netRender(); } }, 1000);
+
+</script>
+<script>
 /* audio-data.js for Hollowbough - generated by audio/tools/bundle_real.py. Licences: see audio/ASSETS.md */
 const GA_DATA={sfx:{
 "click":"SUQzBAAAAAAAIlRTU0UAAAAOAAADTGF2ZjYxLjEuMTAwAAAAAAAAAAAAAAD/+0DAAAAAAAAAAAAAAAAAAAAAAABJbmZvAAAADwAAAAUAAAPFAFlZWVlZWVlZWVlZWVlZWVlZWVmDg4ODg4ODg4ODg4ODg4ODg4ODg6ysrKysrKysrKysrKysrKysrKys1tbW1tbW1tbW1tbW1tbW1tbW1tb//////////////////////////wAAAABMYXZjNjEuMy4AAAAAAAAAAAAAAAAkBewAAAAAAAADxYWz9JYAAAAAAP/7MMQAAAb87yAUgYABGJDqpx4wAHgOAUAKA0FER9CDE/9EL3dEREROohdd+O//T3P3dzju5//oiIiFUREQv0L//////3d9AMWf+Ugg91//7zxzAAAA7iClq0ZzPrv6Ukf+Mro+ERbjE7uCekDpZk6tGJpp02olttZP9AmPKmw8pzzIEDAtpE6NI06yaAwxX8JJ6UaQgQIAAAIAAP/7MsQEgAi4iWU8ZAABDg2t8GSaQAACGeCbECCEZbADgvKBpWWDcP1F7REouyxcXPhMs+nuESnt73e/0SnFwJBByxYM6a5wH8EIPpxOHsa9uJ0XGUAEWAoQOngpqJSyRKnkjMtQMSt5IyCwZc1vecONRwkSLRROAOHLrmqOCVQ8FpYO+RNs79Si0FXSJUNCGOJKyLiClSzHiKUyPNv/+zLEA4AIbE1n5gwNARCLqzyRghhImg68uDcOgLuskl85OF5XPK4CpAWDQC+SRh2bBHhUJB8TWBZCXHoqUey9plxZ08WjLytAvFbkNdLWafMxV5dOxiLaJIEAMCRAdKhUSim1xCgRJkqpljGln5QUPRtmar60j2YKNw14VhTlnrcKmZWsBG2xE8soup5DdF1TsRLS4WVWZ3aXYTsa//syxAOASHR/SeWkSoEAIySEcol4IAIFo0013235c0+OFjg+S3hnQKCHKgnhSVfQxbQ109HVkCvPZuGixJBbUOwaOwEFQVGEjWItT0BLBos0ngIQcmd/+XXqQWERoqZyobzOVpcrUAYeXlqFE5jG1wp25WMYBZ2N00NRwoCZygKCkAhWhjUfm+ZiorGCtqAicJIAWgBcFRQNyBMsXP/7MMQFg8ZJIsRDgHTAAAA0gAAABNNQ9nb+zqir5ZZLD///7LJf+WS//7WfZQQYHLLLJY5GrWoZMoYGEKpMQU1FMy4xMDCqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqg==",
@@ -2851,9 +3265,9 @@ function cardEl(id, w, o) {
 function backEl(w) { const wr = h('div.cd.back'); wr.style.width = w + 'px'; wr.style.height = Math.round(w * 1.406) + 'px'; wr.appendChild(h('span', { html: ICO.tree })); return wr; }
 // ---- game helpers
 const humans = () => G ? G.players.map((p, i) => p.ai ? -1 : i).filter(i => i >= 0) : [];
-const hotSeat = () => !!G && humans().length > 1;
+const hotSeat = () => !!G && !NET.on && humans().length > 1;
 const watching = () => !!G && humans().length === 0;
-function viewSeat() { if (!G) return -1; if (hotSeat()) return UI.holder; const hs = humans(); return hs.length ? hs[0] : -1; }
+function viewSeat() { if (!G) return -1; if (NET.on) return NET.mySeat; if (hotSeat()) return UI.holder; const hs = humans(); return hs.length ? hs[0] : -1; }
 function pname(s) { return s === 'G' ? D.soloName : (G.players[s] ? G.players[s].name : '?'); }
 function availW(p) { return p.workers - p.dep.length; }
 function movesFor(seat) { return G && G.phase !== 'over' ? HB.moves(G, seat) : []; }
@@ -3020,11 +3434,12 @@ function promptText() {
   if (G.phase === 'over') return 'The game is over.';
   const a = HB.actor(G), p = G.players[a];
   if (UI.cards.length) return 'Read the card, then Continue.';
+  if (NET.on && !p.ai && a !== viewSeat()) return p.name + ' is deciding…';
   if (hotSeat() && UI.holder !== a && !p.ai) return 'Pass the device to ' + p.name + '.';
   if (p.ai) { const l = G.log.length ? G.log[G.log.length - 1].t : ''; return p.name + ' is playing… ' + (UI.lastAi || ''); }
   if (G.q) return G.q.title;
   const n = availW(p);
-  const pre = hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
+  const pre = NET.on ? 'Your turn. ' : hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
   return pre + (n > 0 ? 'Tap a place for a worker (' + n + ' free) or a card to play.' : 'No workers left: play a card, Prepare for ' + (p.season < 3 ? SEASN[p.season + 1] : 'the end') + ', or Pass.');
 }
 function chipEl(s) {
@@ -3081,14 +3496,14 @@ function renderStrips() {
     $('#handLab').textContent = 'Hand ' + hand.length + '/8';
   } else {
     hr.removeAttribute('data-owner');
-    hr.appendChild(h('span.empty', watching() ? 'Watching the computers play.' : 'Hand hidden until the device is passed.'));
+    hr.appendChild(h('span.empty', watching() ? 'Watching the computers play.' : NET.on ? 'You are watching this game.' : 'Hand hidden until the device is passed.'));
     $('#handLab').textContent = 'Hand';
   }
 }
 function renderDock() {
   if (!G) return;
   $('#prompt').textContent = promptText();
-  $('#prompt').classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai));
+  $('#prompt').classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai && (!NET.on || HB.actor(G) === viewSeat())));
   renderChips(); renderRes(); renderActs(); renderStrips();
   const t = $('#barstat'); if (t) { const p = G.players[Math.max(0, focusSeat())]; t.innerHTML = ''; t.appendChild(HBKit.season(SEAS[p.season], 22)); t.appendChild(h('span', SEASN[p.season] + (G.phase === 'over' ? ' · over' : ''))); }
 }
@@ -3380,6 +3795,7 @@ function newGame(mode, o) {
   if (mode === 'solo') { players = [{ name: 'You', ai: null }]; solo = { difficulty: cfg.solo }; }
   else if (mode === 'guided') { players = [{ name: 'You', ai: null }, { name: PNAMES[0], ai: 'easy' }]; }
   else if (mode === 'hot') { players = []; for (let i = 0; i < cfg.np; i++) players.push({ name: (cfg.names && cfg.names[i]) || 'Player ' + (i + 1), ai: null }); }
+  else if (mode === 'net') { players = o.players; }
   else if (mode === 'ai') { players = []; for (let i = 0; i < cfg.np; i++) players.push({ name: PNAMES[i], ai: cfg.level }); if (cfg.np < 2) players.push({ name: PNAMES[1], ai: cfg.level }); }
   else { players = [{ name: 'You', ai: null }]; for (let i = 1; i < cfg.np; i++) players.push({ name: PNAMES[i - 1], ai: (o.levels && o.levels[i - 1]) || cfg.level }); }
   G = HB.newGame({ players, solo, seed: UI.seed != null ? UI.seed : undefined });
@@ -3397,6 +3813,7 @@ function render() {
   if (!G || !UI.started) return;
   try { if (window.PerfHUD) PerfHUD.wake(); } catch (e) { }
   renderBoard(); renderDock(); renderQ(); renderCard(); placePop(); markSel(); renderDrawers();
+  if (NET.on) netRenderHook();
 }
 function markSel() {
   $$('.sel').forEach(x => x.classList.remove('sel')); const p = UI.pop; if (!p) return;
@@ -3423,22 +3840,22 @@ function takeDevice() { const c = UI.cards.shift(); UI.holder = c && c.seat != n
 // ---- driver
 function schedule() {
   clearTimeout(UI.tm); clearTimeout(UI.tr); UI.tm = 0;
-  if (!G || !UI.started || UI.cards.length) return;
+  if (!G || !UI.started || (UI.cards.length && !NET.on)) return;
   if (G.phase === 'over') { if (!UI.overShown) { UI.overShown = true; queueOver(); const w = G.over; snd(G.grim ? (w.win ? 'fanfare' : 'lose') : 'fanfare', { duck: true }); sndMusic(); } return; }
   const a = HB.actor(G), p = G.players[a], hs = humans();
   if (UI.after.length && hs.length && !(G.q && !G.players[G.q.who].ai)) { if (flushAfter()) return; }
-  if (p.ai) { UI.tm = setTimeout(aiStep, ANIM ? AIDELAY : 0); return; }
+  if (p.ai) { if (!isClient()) UI.tm = setTimeout(aiStep, ANIM ? AIDELAY : 0); return; }
   if (hotSeat() && UI.holder !== a) {
     UI.holder = -1; closePop(); render();
     pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', p.name + ', take the device. Nobody else should look at the screen. Your hand and resources appear when you tap the button.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
     return;
   }
   if (UI.coachOn && coachCheck()) return;
-  if (UI.turnSnd !== G.turn + ':' + a) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); }
+  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); }
   if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
 }
 function aiStep() {
-  UI.tm = 0; if (!G || G.phase === 'over' || UI.cards.length) return;
+  UI.tm = 0; if (isClient() || !G || G.phase === 'over' || (UI.cards.length && !NET.on)) return;
   const a = HB.actor(G); if (a < 0) return; const p = G.players[a]; if (!p.ai) { schedule(); return; }
   const n0 = G.logN; let m;
   try { m = HB.AI.choose(G, a); } catch (e) { m = HB.moves(G, a)[0]; console.error('AI error', e); }
@@ -3449,11 +3866,13 @@ function aiStep() {
   const ls = logSince(n0); UI.lastAi = ls.length ? ls[0].replace(/^[^ ]+ /, '') : '';
   afterMove();
 }
-function afterMove() { save(); render(); sndMusic(); schedule(); }
+function afterMove() { save(); render(); sndMusic(); schedule(); if (NET.on) netPush(); }
 function act(m) {
   if (!G || !m) return; const a = HB.actor(G);
+  if (isClient()) { netAct(m); return; }
+  if (NET.on && a !== NET.mySeat) return;
   const n0 = G.logN;
-  if (m.type === 'prepare') UI.after.push({ kind: 'season', seat: a, from: n0 });
+  if (m.type === 'prepare' && !NET.on) UI.after.push({ kind: 'season', seat: a, from: n0 });
   const pre = sndPre();
   const r = HB.apply(G, m);
   closePop(); UI.rec = null;
@@ -3487,12 +3906,12 @@ function queueOver() {
   UI.cards.push({
     kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + ' wins!'), sub: 'The game is over',
     body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); return t; },
-    buttons: [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
+    buttons: NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
   });
   clearSave(); render();
 }
 // ---- save / load
-function save() { try { if (!G || G.phase === 'over') return; localStorage.setItem(SAVEKEY, JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, coach: UI.coach, coachOn: UI.coachOn, holder: -1 })); } catch (e) { } }
+function save() { try { if (!G || G.phase === 'over' || NET.on) return; localStorage.setItem(SAVEKEY, JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, coach: UI.coach, coachOn: UI.coachOn, holder: -1 })); } catch (e) { } }
 function clearSave() { try { localStorage.removeItem(SAVEKEY); } catch (e) { } }
 function hasSave() { try { return !!localStorage.getItem(SAVEKEY); } catch (e) { return false; } }
 function loadSave() {
@@ -3577,7 +3996,8 @@ function renderDrawers() {
 function renderMenu() {
   const b = $('#setbody'); b.innerHTML = '';
   const row = (l, ...k) => b.appendChild(h('div.mrow', h('div.lbl', l), h('div.mbt', k)));
-  row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
+  if (NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
+  else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
   row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
   row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
   row('Sound', h('button.btn' + (UI.sound === false ? '.alt' : ''), { 'data-a': 'sound', type: 'button' }, UI.sound === false ? 'Off' : 'On'));
@@ -3587,6 +4007,7 @@ function renderMenu() {
 // ---- start screen
 function renderStart() {
   const s = $('#start'); s.hidden = false; s.innerHTML = '';
+  if (NET.on) { netStartScreen(s); return; }
   const o = UI.opt = UI.opt || Object.assign({}, DEF);
   const seg = (l, key, vals, fmt) => h('div.seg', h('span.lbl', l), vals.map(v => h('button.chipb' + (o[key] === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': key, 'data-v': v, type: 'button' }, fmt ? fmt(v) : v)));
   const card = h('div.scard',
@@ -3600,6 +4021,7 @@ function renderStart() {
       h('button.sbtn', { 'data-start': 'solo', 'data-a': 'start', 'data-m': 'solo', type: 'button' }, h('b', 'Solo vs ' + D.soloName), h('span', 'Beat the automated rival')),
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', '2 to 4 people, one device')),
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch computers'), h('span', 'Sit back and learn'))),
+    netBlock(),
     h('div.srow2', hasSave() ? h('button.btn', { 'data-a': 'loadsave', type: 'button' }, 'Continue saved game') : null, h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play')));
   s.appendChild(card);
 }
@@ -3609,6 +4031,7 @@ document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]'); const pop = $('#ppop');
   if (!t) { if (UI.pop && pop && !pop.contains(ev.target) && !ev.target.closest('#pc,.gx-drawer')) closePop(); return; }
   const a = t.dataset.a, d = t.dataset;
+  if (netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'tile': openTile(d.k, d.i); break;
@@ -3665,6 +4088,7 @@ function boot() {
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'hb' }); }; } catch (e) { }
   try { if (window.PerfHUD && PerfHUD.register) PerfHUD.register({ game: 'Hollowbough' }); } catch (e) { }
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
+  netInit();
   renderStart();
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
