@@ -8,7 +8,7 @@ const OUT=path.join(__dirname,'shots','ph');fs.mkdirSync(OUT,{recursive:true});
 (async()=>{const b=await PW.chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});let bad=0;
 for(const [W,H] of SIZES){const t=W+'x'+H+(HOT?'_hot':'');const ctx=await b.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
   const p=await ctx.newPage();p.setDefaultTimeout(30000);const errs=[];p.on('pageerror',e=>errs.push('pageerror '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load resource|ERR_/.test(m.text()))errs.push(m.text())});
-  const log=(...a)=>console.log(t,...a);const prob=(...a)=>{bad++;log('PROBLEM',...a)};
+  const log=(...a)=>console.log(t,...a);const prob=(...a)=>{bad++;console.log('FAIL '+t+' '+a.map(x=>typeof x==='string'?x:JSON.stringify(x)).join(' '))};
   const seen=new Set();const note=k=>seen.add(k);
   await p.goto('file://'+path.resolve(FILE)+'?phone=1'+(SAFE?'&safe='+SAFE:''));await p.waitForTimeout(1500);
   await p.evaluate(a=>{ANIM=a;AIDELAY=60;try{localStorage.removeItem('na_tour');localStorage.removeItem('na_coach');localStorage.removeItem('na_guide')}catch(e){}},ANIMV);
@@ -24,7 +24,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(HOT?'_hot':'');const ctx=await b.newC
   const fonts=async tag=>{const r=await p.evaluate(()=>{const o=new Set();const walk=document.createTreeWalker(document.body,4);while(walk.nextNode()){const n=walk.currentNode;if(!n.nodeValue.trim())continue;const e=n.parentElement;if(!e||e.closest('script,style,.sr,#live'))continue;const R=e.getBoundingClientRect();if(R.width<2||R.height<2)continue;let hid=false;for(let q=e;q&&q!==document.body;q=q.parentElement){const c=getComputedStyle(q);if(c.display==='none'||c.visibility==='hidden'){hid=true;break}}if(hid)continue;
         if(e.closest('.gx-drawer')&&!e.closest('.gx-drawer.on'))continue;if(e.closest('#more')&&!e.closest('#more.open'))continue;if(e.closest('#roster,#log,#bbody')&&!e.closest('.gx-drawer.on'))continue;
         const fs=parseFloat(getComputedStyle(e).fontSize);if(fs>0&&fs<12.5)o.add(e.className+'|'+(e.tagName)+'|'+fs.toFixed(1)+'|'+n.nodeValue.trim().slice(0,16))}return [...o]});if(r.length)prob(tag,'SMALL TEXT',JSON.stringify(r.slice(0,8)))};
-  const board=async tag=>{const r=await p.evaluate(()=>{const cv=V3.r.domElement;const R=cv.getBoundingClientRect();V3.camera.updateMatrixWorld();const P=(x,y)=>{const v=W(x,y,0).project(V3.camera);return [R.left+(v.x+1)/2*R.width,R.top+(1-v.y)/2*R.height]};
+  const board=async tag=>{await settle();const r=await p.evaluate(()=>{const cv=V3.r.domElement;const R=cv.getBoundingClientRect();V3.camera.updateMatrixWorld();const P=(x,y)=>{const v=W(x,y,0).project(V3.camera);return [R.left+(v.x+1)/2*R.width,R.top+(1-v.y)/2*R.height]};
       const cs=[P(0,0),P(MAT,0),P(MAT,MAT),P(0,MAT)];const xs=cs.map(a=>a[0]),ys=cs.map(a=>a[1]);const mat=[Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys)];
       const ships=G.ships.filter(s=>s.alive).map(s=>{const q=P(s.x,s.y);const k=corners(s,B(s)).map(c=>P(c.x,c.y));const e=document.elementFromPoint(q[0],q[1]);return {n:s.name,gx:Math.round(s.x),gy:Math.round(s.y),x:q[0],y:q[1],px:Math.hypot(k[0][0]-k[2][0],k[0][1]-k[2][1])*.707,in:q[0]>=R.left&&q[0]<=R.right&&q[1]>=R.top&&q[1]<=R.bottom,hit:!!e&&(e===cv||cv.contains(e))}});
       return {rect:[R.left,R.top,R.width,R.height].map(Math.round),mat:mat.map(Math.round),short:Math.min(innerWidth,innerHeight),ships,zoomed:V3.cam.dist<V3.fitDist*.97}});return r};
@@ -34,10 +34,15 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(HOT?'_hot':'');const ctx=await b.newC
   const popCheck=async tag=>{const r=await p.evaluate(()=>{const o=[];const B=document.querySelector('.gx-board').getBoundingClientRect();for(const sel of ['#ppop','#pc']){const e=document.querySelector(sel);if(!e||e.hidden)continue;const R=e.getBoundingClientRect();if(R.width<2)continue;
         if(R.left<B.right-0.5&&R.right>B.left+0.5&&R.top<B.bottom-0.5&&R.bottom>B.top+0.5)o.push(sel+' overlaps the board');if(R.right>innerWidth+1||R.bottom>innerHeight+1||R.left<-1)o.push(sel+' outside viewport')}return o});if(r.length)prob(tag,r.join('; '))};
   const all=async(tag,o)=>{await noScroll(tag);await tapTargets(tag);await fonts(tag);await popCheck(tag);try{return await boardCheck(tag,o&&o.allowOut)}catch(e){prob(tag,'board check threw',e.message)}};
-  const shipXY=async id=>p.evaluate(id=>{const s=ship(id);const cv=V3.r.domElement,R=cv.getBoundingClientRect();V3.camera.updateMatrixWorld();const v=W(s.x,s.y,1.2).project(V3.camera);return [R.left+(v.x+1)/2*R.width,R.top+(1-v.y)/2*R.height]},id);
+  const shipXY=async id=>{await settle();return p.evaluate(id=>{const s=ship(id);const cv=V3.r.domElement,R=cv.getBoundingClientRect();V3.camera.updateMatrixWorld();const v=W(s.x,s.y,1.2).project(V3.camera);return [R.left+(v.x+1)/2*R.width,R.top+(1-v.y)/2*R.height]},id)};
   const st=()=>p.evaluate(()=>{const vis=s=>{const e=document.querySelector(s);return !!e&&!e.hidden&&e.getClientRects().length>0};return {has:!!G,info:!!UI.info,build:UI.build,rules:!!UI.rules,stats:!!UI.stats,round:G&&G.round,phase:G&&G.phase,win:G&&G.winner,ps:G?planSide():-1,hum:G?humanTurn():false,cur:G&&G.cur,hold:!!UI.hold,sum:G?sumPending():false,pc:vis('#pc'),pcKey:(document.querySelector('#pc')||{})._k||null,pop:vis('#ppop'),popKind:window.PHN&&PHN.pop&&PHN.pop.kind,strip:vis('#ps'),modal:!document.querySelector('#modal').classList.contains('hidden'),pass:!!document.querySelector('#modal .pass'),q:G&&G.q&&G.q.key,atk:G&&G.atk&&G.atk.step,drawer:GX.open}});
-  const tapL=async(sel,tag)=>{const l=p.locator(sel).first();try{await l.tap({timeout:20000});return true}catch(e){prob(tag||sel,'tap failed',e.message.split('\n').filter(x=>/intercept|not visible|outside|detached|obscur/.test(x)).slice(-1)[0]||e.message.split('\n')[0]);return false}};
-  const tapXY=async(x,y)=>{await p.touchscreen.tap(x,y);await p.waitForTimeout(250)};
+  const tapL=async(sel,tag,okFn)=>{const l=p.locator(sel).first();let last='';for(let k=0;k<3;k++){if(k&&okFn&&await p.evaluate(okFn).catch(()=>false))return true;try{await l.tap({timeout:8000});return true}catch(e){last=e.message.split('\n').filter(x=>/intercept|not visible|outside|detached|obscur/.test(x)).slice(-1)[0]||e.message.split('\n')[0];
+      // diagnose: what is really on top of the target's centre right now?
+      await p.screenshot({path:path.join(OUT,`${t}_FAIL_${(tag||'x').replace(/\W/g,'')}${k}.png`)}).catch(()=>{});const d=await p.evaluate(sel=>{const el=document.querySelector(sel);if(!el)return {missing:true,modal:document.getElementById('modal').className,html:document.getElementById('modal').innerHTML.slice(0,80)};const r=el.getBoundingClientRect();const x=r.left+r.width/2,y=r.top+r.height/2;const t=document.elementFromPoint(x,y);return {x,y,r:[r.left,r.top,r.width,r.height].map(Math.round),top:t?(t.id||t.className||t.tagName):null,own:!!t&&(t===el||el.contains(t)),anim:document.getAnimations().length,vis:innerHeight,all:[...document.querySelectorAll(sel)].length,modalCls:document.getElementById('modal').className,gx:GX.open,scrim:document.querySelector('.gx-scrim').className}},sel).catch(e=>String(e));
+      if(d)console.log('DIAG '+t+' '+(tag||sel)+' '+JSON.stringify(d));await p.waitForTimeout(800)}}
+    if(okFn&&await p.evaluate(okFn).catch(()=>false))return true;prob(tag||sel,'tap failed after 3 tries',last);return false};
+  const settle=async()=>{for(let k=0;k<60;k++){const e=await p.evaluate(()=>!!V3.ez);if(!e)break;await p.waitForTimeout(150)}await p.waitForTimeout(150)};
+  const tapXY=async(x,y)=>{const inb=await p.evaluate(([x,y])=>{const R=document.querySelector('.gx-board').getBoundingClientRect();return x>=R.left&&x<=R.right&&y>=R.top&&y<=R.bottom},[x,y]);if(!inb){prob('board tap point is outside the board',Math.round(x),Math.round(y));return}await p.touchscreen.tap(x,y);await p.waitForTimeout(250)};
   // ---- 0. start screen ----
   await noScroll('start');await tapTargets('start');await fonts('start');await shot('0start');
   // 0b. drawers and menu
@@ -48,7 +53,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(HOT?'_hot':'');const ctx=await b.newC
     await p.evaluate(()=>{GX.close()});await p.waitForTimeout(300)}
   await p.evaluate(()=>{UI.size='core';UI.info=true;render()});await p.waitForTimeout(300);
   if(HOT){await p.evaluate(()=>{UI.mode='hot';render()});await p.waitForTimeout(200)}
-  await tapL('#modal [data-start]','launch');await p.waitForTimeout(1500);
+  await tapL('#modal [data-start]','launch',()=>!!G);await p.waitForTimeout(1500);
   // ---- main loop: only touch taps through the board, pop-ups, cards and the dock ----
   let steps=0,maxRound=0,stuck=0,lastSig='';const done=new Set();let atkTapped=0,armTapped=0,dialTapped=0;
   while(steps++<400){const s=await st();if(s.win){note('winner');break}
