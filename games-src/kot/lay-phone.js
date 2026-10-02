@@ -49,7 +49,7 @@ for(const [W,H] of L.SIZES){if(process.env.ONLY&&!process.env.ONLY.split(',').in
     chk(c.vis,`${where}: card ${c.k} not visible`);chk(!c.ov,`${where}: card ${c.k} overlaps the board ${c.r}`);chk(c.inV,`${where}: card ${c.k} outside viewport ${c.r}`);chk(c.others.length===0,`${where}: cards stack: ${c.others}`);
     await geo(where+' (card open)');await targets(where+' (card)');return c};
   // ---- touch tap on an element, after a hit test ----
-  const tap=async(sel,where,minSize)=>{if(!/coach|tour|pcx|choice/.test(sel)){const kk=await pg.evaluate(()=>document.querySelector('.gx-dock').dataset.card);if(kk==='coach'){await tap('[data-tour="next"]','tip (in the way)');await sleep(250)}}const r=await pg.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;if(e.closest('#modal'))e.scrollIntoView({block:'center'});const b=e.getBoundingClientRect();const x=b.left+b.width/2,y=b.top+b.height/2;const h=document.elementFromPoint(x,y);return {x,y,w:b.width,h:b.height,ok:!!h&&(h===e||e.contains(h)),hit:h?(h.id||h.className||h.tagName):'none',dis:e.disabled}},sel);
+  const tap=async(sel,where,minSize)=>{if(!/coach|tour|pcx|choice/.test(sel)){const kk=await pg.evaluate(()=>document.getElementById('modal').classList.contains('hidden')?document.querySelector('.gx-dock').dataset.card:'');if(kk==='coach'){await tap('[data-tour="next"]','tip (in the way)');await sleep(250)}}const r=await pg.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;if(e.closest('#modal'))e.scrollIntoView({block:'center'});const b=e.getBoundingClientRect();const x=b.left+b.width/2,y=b.top+b.height/2;const h=document.elementFromPoint(x,y);return {x,y,w:b.width,h:b.height,ok:!!h&&(h===e||e.contains(h)),hit:h?(h.id||h.className||h.tagName):'none',dis:e.disabled}},sel);
     if(!r){fail(`${where}: nothing to tap for ${sel}`);return false}if(!chk(r.ok,`${where}: ${sel} not hit-testable (${r.hit})`))return false;chk(Math.min(r.w,r.h)>=(minSize||44)-.5,`${where}: ${sel} only ${Math.round(r.w)}x${Math.round(r.h)}`);
     await pg.touchscreen.tap(r.x,r.y);await sleep(180);return true};
   const tapXY=async(x,y)=>{await pg.touchscreen.tap(x,y);await sleep(220)};
@@ -122,7 +122,7 @@ for(const [W,H] of L.SIZES){if(process.env.ONLY&&!process.env.ONLY.split(',').in
     }
     if(PART!=='main'){
     // ---- 5-6 monsters: Harbor in frame, 6 chips ----
-    await pg.evaluate(()=>{UI.info=true;render()});await sleep(300);await pg.evaluate(()=>{UI.n=6;UI.evo=false;UI.xp='base'});await pg.evaluate(()=>{UI.custOpen=true;render()});
+    await pg.evaluate(()=>{UI.coach=-1;UI.tour=false;UI.info=true;render()});await sleep(300);await pg.evaluate(()=>{UI.n=6;UI.evo=false;UI.xp='base'});await pg.evaluate(()=>{UI.custOpen=true;render()});
     await tap('[data-start="hot"]','start hot-seat');if(!(await until(()=>!!G&&G.mode==='hot',40000))){R.info.retry=(R.info.retry||0)+1;await pg.evaluate(()=>{const b=document.querySelector('[data-start="hot"]');if(b)b.click()});await until(()=>!!G&&G.mode==='hot',40000)}await sleep(800);
     await pg.evaluate(()=>{UI.intro=false;UI.tour=false;UI.coach=-1;render()});await sleep(500);
     const nc=await pg.evaluate(()=>document.querySelectorAll('.pchip').length);chk(nc===6,`6 chips expected, saw ${nc}`);
