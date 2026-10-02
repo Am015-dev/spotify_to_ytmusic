@@ -529,7 +529,17 @@ const TRACK_DEFS=[
   desc:'An elevated ring through the towers, up to 130 m high. Light gates, a dive into the Gallus and a gap between two skyscrapers.',
   cp:[[-300,60,-300,'TAUNUSANLAGE'],[-280,80,-600,'COMMERZBANK'],[-400,110,-950,'ESCHENHEIMER TURM'],[-700,130,-1100,'OPERNPLATZ'],[-1100,120,-1150,'WESTEND'],[-1300,100,-900,'WESTEND'],
    [-1250,90,-600,'MESSE-NORD'],[-1050,70,-420,'MAINZER LANDSTRASSE'],[-900,40,-200,'GALLUS-TAL'],[-650,20,-100,'BANKENVIERTEL'],[-450,40,-150,'TAUNUSANLAGE']],
-  jumps:[{id:'turm',name:'HOCHHAUS',kind:'sky',at:[-900,-1125],half:36,msg:'INTO THE STREET'}],clear:[]}];
+  jumps:[{id:'turm',name:'HOCHHAUS',kind:'sky',at:[-900,-1125],half:36,msg:'INTO THE STREET'}],clear:[]},
+ {id:'nord',name:'Nordend Nordschleife',short:'Nordschleife',laps:3,tunnel:'',
+  desc:'A long, hilly run through the north: up the Bornheimer Hang to the Lohrberg viewpoint, down through Seckbach and a jump over the rail cutting.',
+  cp:[[0,4,-1300,'NORDEND'],[500,6,-1350,'NORDEND'],[850,14,-1500,'BORNHEIM'],[950,26,-1800,'BORNHEIMER HANG'],[750,40,-2050,'LOHRBERG'],[350,48,-2150,'LOHRBERG · AUSSICHT'],[0,42,-2000,'LOHRBERG'],
+   [-200,30,-1750,'SECKBACH'],[-500,24,-1950,'SECKBACH'],[-850,34,-2100,'HUTHPARK'],[-1100,20,-1850,'HUTHPARK'],[-1000,10,-1550,'PREUNGESHEIM'],[-650,6,-1450,'PREUNGESHEIM'],[-350,4,-1250,'NORDEND']],
+  jumps:[{id:'gleis2',name:'BAHNEINSCHNITT',kind:'pit',at:[-1050,-1700],half:36,floor:-12,style:'rail',msg:'OVER THE RAILS'}],clear:[]},
+ {id:'sachs',name:'Sachsenhausen Twister',short:'Twister',laps:4,tunnel:'',
+  desc:'Short and twisty south of the Main: cider lanes, up the Lerchesberg to the Goetheturm and back through the Stadtwald. Drift every corner.',
+  cp:[[200,6,1250,'SACHSENHAUSEN'],[600,8,1200,'SCHWEIZER STRASSE'],[900,12,1330,'LERCHESBERG'],[1000,24,1550,'LERCHESBERG'],[800,30,1760,'GOETHETURM'],[450,34,1810,'GOETHETURM'],[250,20,1620,'STADTWALD'],
+   [-50,14,1760,'STADTWALD'],[-400,10,1720,'OBERRAD'],[-600,6,1480,'OBERRAD'],[-450,8,1250,'MÜHLBERG'],[-150,6,1150,'ÄPPELWOI-GASSE']],
+  jumps:[],clear:[]}];
 let TRK=TRACK_DEFS[0],CP=TRK.cp;
 // Light and weather presets. sky: top/mid/horizon/below-horizon colours (linear), sun glow, stars, milky band, moon, clouds
 const MOODS=[
@@ -2828,6 +2838,7 @@ function buildMenu(){const pts=medalPts();
 // ---------- Cup Series: four races, points table, trophy, stars per class
 const CUPS=[{id:'main',name:'Mainhattan Cup',ic:'🏆',races:[{t:'grand',m:'night'},{t:'hafen',m:'dawn'},{t:'fraport',m:'night'},{t:'sky',m:'golden'}],roster:['ROSSI','WEBER','VOSS','KAYA','ADLER','LINDQVIST','MOREAU']},
  {id:'storm',name:'Storm Cup',ic:'⛈',races:[{t:'hafen',m:'storm'},{t:'grand',m:'fog',d:'rev'},{t:'sky',m:'storm'},{t:'fraport',m:'fog',d:'rev'}],roster:['OKAFOR','FERREIRA','BRANDT','KAYA','VOSS','ÇELIK','ADLER']},
+ {id:'hills',name:'Hügel Cup',ic:'⛰',races:[{t:'nord',m:'golden'},{t:'sachs',m:'dawn'},{t:'nord',m:'night',d:'rev'},{t:'sachs',m:'storm',mir:1}],roster:['WEBER','LINDQVIST','OKAFOR','ADLER','KAYA','MOREAU','BRANDT'],need:3},
  {id:'mirror',name:'Mirror Cup',ic:'🪞',races:[{t:'sky',m:'night',mir:1},{t:'fraport',m:'day',mir:1},{t:'grand',m:'dawn',mir:1},{t:'hafen',m:'night',mir:1}],roster:['MOREAU','NAKAMURA','LINDQVIST','WEBER','ROSSI','BRANDT','FERREIRA'],need:6},
  {id:'kaiser',name:'Kaiser Cup',ic:'👑',races:[{t:'grand',m:'storm',d:'rev'},{t:'sky',m:'night',mir:1},{t:'hafen',m:'golden',d:'rev'},{t:'fraport',m:'storm',mir:1}],roster:['NAKAMURA','BRANDT','ÇELIK','FERREIRA','OKAFOR','MOREAU','ROSSI'],need:15}];
 const CUP_CLS=[['rookie','C',800],['pro','B',1200],['elite','A',1800]];
