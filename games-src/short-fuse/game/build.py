@@ -37,8 +37,38 @@ KIT_PATCHES=[
  ("aspect < .82 ?","aspect < (global.SF_COLAT || .82) ?"),
  # 11. 3D seat plate: the name we pass ("You" in solo, "Name (you)" in hot-seat)
  ("var label = me ? 'YOU' : name.toUpperCase();","var label = name.toUpperCase();"),
+ # ---- phone pass (window.SF_PHONE, set by phone.js before the kit starts; every change is inert on desktop) ----
+ # 13. compact detonator board on phones: fuse dial + defuse track + briefing cards only (mission card and gear cards become chips in the strip)
+ ("function boardLayout(mode) {","function boardLayout(mode) {\n  if (global.SF_PHONE) return { W: 12.4, D: 7.0, track: { x0: -4.5, x1: 4.5, z: -1.5, r: .37 }, dial: { x: -4.0, z: 1.6, s: .9 }, mission: { x: 0, z: 40, w: 2.3, h: 3.1 }, extras: { x0: -2.1, x1: 5.2, z: 1.55, h: 1.6 }, equip: { x0: -2.9, x1: 2.9, z: 40, w: 1.75, h: 2.55 }, oxy: { x: -1.4, z: 1.6 } };"),
+ ("var e = BL.equip; plate(e.x0 - .3, e.z - e.h / 2 - .55, e.x1 + .3, e.z + e.h / 2 + .45, 'GEAR');","var e = BL.equip; if (!global.SF_PHONE) plate(e.x0 - .3, e.z - e.h / 2 - .55, e.x1 + .3, e.z + e.h / 2 + .45, 'GEAR');"),
+ ("var ms = BL.mission; plate(ms.x - ms.w / 2 - .3, ms.z - ms.h / 2 - .5, ms.x + ms.w / 2 + .3, ms.z + ms.h / 2 + .3, 'MISSION');","var ms = BL.mission; if (!global.SF_PHONE) plate(ms.x - ms.w / 2 - .3, ms.z - ms.h / 2 - .5, ms.x + ms.w / 2 + .3, ms.z + ms.h / 2 + .3, 'MISSION');"),
+ ("for (var s = 0; s < 5; s++) { var sx = e.x0 + e.w / 2 + s","for (var s = 0; s < (global.SF_PHONE ? 0 : 5); s++) { var sx = e.x0 + e.w / 2 + s"),
+ ("var a2 = P(ms.x - ms.w / 2, ms.z - ms.h / 2), b2 = P(ms.x + ms.w / 2, ms.z + ms.h / 2); rr(x, a2[0]","var a2 = P(ms.x - ms.w / 2, ms.z - ms.h / 2), b2 = P(ms.x + ms.w / 2, ms.z + ms.h / 2); if (!global.SF_PHONE) rr(x, a2[0]"),
+ ("K.eqCards = K.eqCards || {}; var want = {}, BL = K.layout.BL, e = BL.equip,","K.eqCards = K.eqCards || {}; if (global.SF_PHONE) { for (var k0 in K.eqCards) K.gCards.remove(K.eqCards[k0]); K.eqCards = {}; K.dirty = true; return; } var want = {}, BL = K.layout.BL, e = BL.equip,"),
+ ("  if (M.mission) { var md = M.mission;","  if (M.mission && !global.SF_PHONE) { var md = M.mission;"),
+ ("K.chCards = K.chCards || {}; var want = {};","K.chCards = K.chCards || {}; if (global.SF_PHONE) { for (var kc in K.chCards) K.gCards.remove(K.chCards[kc]); K.chCards = {}; K.dirty = true; return; } var want = {};"),
+ # 14. my own rack is the strip under the board on phones: no 3D rack, sign or crew card for my seat; the crew card and seat sign of the others shrink / go
+ ("sts = standsOf(s), rows = [];","sts = (global.SF_HIDEME && (s - my + n) % n === 0) ? [] : standsOf(s), rows = [];"),
+ ("oppS = clamp((BL.W + .4) / (ml + 2.6), .5, .8); }","oppS = clamp((BL.W + .4) / (ml + (global.SF_PHONE ? .5 : 2.6)), .5, global.SF_PHONE ? .98 : .8); }"),
+ ("    S.foot.push(obb(S.charPos[0], S.charPos[1], .85 * sc, 1.2 * sc, 0));","    if (!global.SF_PHONE) S.foot.push(obb(S.charPos[0], S.charPos[1], .85 * sc, 1.2 * sc, 0));"),
+ ("    S.foot.push(obb(S.signPos[0], S.signPos[1], .55 * sc, .35 * sc, rot));","    if (!global.SF_PHONE) S.foot.push(obb(S.signPos[0], S.signPos[1], .55 * sc, .35 * sc, rot));"),
+ ("if (needAux(S.seat)) S.foot.push(obb(S.auxPos[0], S.auxPos[1], .9 * sc, 1.1 * sc, 0));","if (needAux(S.seat) && !(global.SF_PHONE && S.mine)) S.foot.push(obb(S.auxPos[0], S.auxPos[1], .9 * sc, 1.1 * sc, 0));"),
+ ("    S.foot.push(obb(S.charPos[0], S.charPos[1], .5, .7, 0)); S.foot.push(obb(S.signPos[0], S.signPos[1], .5, .25, 0));","    if (!global.SF_PHONE) { S.foot.push(obb(S.charPos[0], S.charPos[1], .5, .7, 0)); S.foot.push(obb(S.signPos[0], S.signPos[1], .5, .25, 0)); }"),
+ ("    me.foot.push(obb(me.charPos[0], me.charPos[1], .85, 1.2, 0)); me.foot.push(obb(me.signPos[0], me.signPos[1], .6, .3, 0));","    if (!global.SF_PHONE) { me.foot.push(obb(me.charPos[0], me.charPos[1], .85, 1.2, 0)); me.foot.push(obb(me.signPos[0], me.signPos[1], .6, .3, 0)); }"),
+ ("if (needAux(me.seat)) me.foot.push(","if (needAux(me.seat) && !global.SF_PHONE) me.foot.push("),
+ ("  L.seats.forEach(function (S) {\n    var g = new THREE.Group(); var sc = S.mine ? 1 : S.scale;","  L.seats.forEach(function (S) {\n    if (global.SF_PHONE) return;\n    var g = new THREE.Group(); var sc = S.mine ? 1 : S.scale;"),
+ ("g.add(post, base, board); g.scale.setScalar(sc);","g.add(post, base, board); g.scale.setScalar(sc * (global.SF_PHONE ? .62 : 1));"),
+ ("var xs = [Math.max(B.x0 - .3, T.x0), Math.min(B.x1 + .3, T.x1)], zs = [Math.max(B.z0 - .3, T.z0), Math.min(B.z1 + .3, T.z1)];","var pm_ = global.SF_PHONE ? .08 : .3; var xs = [Math.max(B.x0 - pm_, T.x0), Math.min(B.x1 + pm_, T.x1)], zs = [Math.max(B.z0 - pm_, T.z0), Math.min(B.z1 + pm_, T.z1)];"),
+ ("pts.push(new THREE.Vector3(x, 1.9, z)); }); });","pts.push(new THREE.Vector3(x, global.SF_PHONE && col && z === zs[1] ? .5 : 1.9, z)); }); });"),
+ ("var mt = (ins.top || 0) / K.h * 2 + .04, mb = (ins.bottom || 0) / K.h * 2 + .04, ml = (ins.left || 0) / K.w * 2 + .03, mr = (ins.right || 0) / K.w * 2 + .03;","var pg_ = global.SF_PHONE ? .4 : 1; var mt = (ins.top || 0) / K.h * 2 + .04 * pg_, mb = (ins.bottom || 0) / K.h * 2 + .04 * pg_, ml = (ins.left || 0) / K.w * 2 + .03 * pg_, mr = (ins.right || 0) / K.w * 2 + .03 * pg_;"),
+ ("if (mode === 'column' && mine && m > 10) per =","if (mode === 'column' && mine && m > 10 && !global.SF_PHONE) per ="),
+ ("me.rows.forEach(function (row) { var len = rowLen(row.m); var rail = c2 - U0; row.px = 0; row.pz = rail; row.rot = 0; row.s = 1; row.len = len; row.mine = true; row.M = m4(0, rail, 0, 1); me.foot.push(obb(0, rail + (U0 + U1) / 2, len / 2, RDEPTH / 2, 0)); c2 = rail + U1 + me.gap; maxHalf = Math.max(maxHalf, len / 2); });",
+  "me.rows.forEach(function (row) { var len = rowLen(row.m); var ms_ = global.SF_PHONE ? Math.min(1, (BL.W + .2) / (len + .5)) : 1; var rail = c2 - U0 * ms_; row.px = 0; row.pz = rail; row.rot = 0; row.s = ms_; row.len = len; row.mine = true; row.M = m4(0, rail, 0, ms_); me.foot.push(obb(0, rail + (U0 + U1) / 2 * ms_, len * ms_ / 2, RDEPTH * ms_ / 2, 0)); c2 = rail + U1 * ms_ + me.gap * ms_; maxHalf = Math.max(maxHalf, len * ms_ / 2); });"),
+ # 15. phone camera; the phone module can take over the camera (zoom to one rack) and gets a callback after every refit
+ ("var el = (col ? 60 : 54) * Math.PI / 180;","var el = (global.SF_PHONE ? (col ? (K.st.n >= 5 ? 58 : 72) : 64) : col ? 60 : 54) * Math.PI / 180;"),
+ ("if (K.focusT && !instant) {","if (K.phCam && !instant) { K.camState.ready = true; K.phCam(); applyCam(); return; } if (K.focusT && !instant) {"),
 ]
-kit=rd(os.path.join(SP,'bb','kit','kit.js'))
+kit=rd(os.path.join(SP,'short-fuse','kit','kit.js'))
 miss=[a for a,_ in KIT_PATCHES if a not in kit]
 if miss:print('WARNING kit patch anchors not found:',miss,file=sys.stderr)
 for a,z in KIT_PATCHES:kit=kit.replace(a,z)
@@ -46,13 +76,13 @@ for a,z in KIT_PATCHES:kit=kit.replace(a,z)
 # ---------- the game ----------
 T=os.path.join(SP,'node_modules','three','build','three.min.js')
 SRC={'shell.js':os.path.join(SP,'shell','shell.js'),'perfhud.js':os.path.join(SP,'perf','perfhud.js'),
-     'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(SP,'audio','shortfuse','audio-data.js'),
+     'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(SP,'short-fuse','audio','audio-data.js'),
      'data.js':os.path.join(D,'src','data.js'),'engine.js':os.path.join(D,'src','engine.js'),'ai.js':os.path.join(D,'src','ai.js'),'netstrip.js':os.path.join(D,'src','netstrip.js'),
      'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js')}
-ORDER=['shell.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','kit.js','data.js','engine.js','ai.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js']
+ORDER=['shell.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','kit.js','data.js','engine.js','ai.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js','phone.js']
 h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css')))
 body=rd(os.path.join(D,'body.html'))
-body=body.replace('<!--CREDITS-->',rd(os.path.join(SP,'audio','shortfuse','credits.html')))
+body=body.replace('<!--CREDITS-->',rd(os.path.join(SP,'short-fuse','audio','credits.html')))
 for f in ORDER:
     tag=f'<script src="{f}"></script>';assert tag in body,f
     if f=='three.min.js':

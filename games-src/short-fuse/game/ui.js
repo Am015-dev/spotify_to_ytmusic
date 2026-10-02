@@ -182,7 +182,8 @@ function kitReset(){UI.gameN=(UI.gameN||0)+1;try{const S=SFKit._K.st.stands;for(
 function kitCall(key,sig,fn){if(UI.kitSig[key]===sig)return;UI.kitSig[key]=sig;try{fn()}catch(e){console.error(e)}}
 function syncBoard(V){if(!window.SFKit)return;const np=G.np;const me=kitMe();const myPos=posOf(me);
   const names=[];for(const q of G.seats)names[G.pos[q.i]]=q.i===V.seat?(modeOf()==='solo'&&!NET.on?'You':q.nm+' (you)'):q.nm;
-  kitCall('players',JSON.stringify([np,myPos,names,posOf(G.captain)]),()=>SFKit.setPlayers(np,myPos,{names,captain:posOf(G.captain)}));
+  window.SF_HIDEME=!!window.SF_PHONE&&V.seat>=0;   // phone: my own rack is the strip under the table (not drawn in 3D) while somebody holds the device
+  kitCall('players',JSON.stringify([np,myPos,names,posOf(G.captain),window.SF_HIDEME]),()=>SFKit.setPlayers(np,myPos,{names,captain:posOf(G.captain)}));
   for(let p=0;p<np;p++){const seat=G.pos.indexOf(p);const ss=V.stands.filter(st=>posOf(st.owner)===p).map(st=>st.i).sort((a,b)=>a-b);
     ss.forEach((si,j)=>{const tiles=V.stands[si].slots.map(tileOf);kitCall('st'+p+':'+j,JSON.stringify(tiles),()=>SFKit.setStand(p,j,tiles))})}
   kitCall('turn',String(G.actor>=0?posOf(G.actor):-1),()=>SFKit.setTurn(G.actor>=0?posOf(G.actor):null));
