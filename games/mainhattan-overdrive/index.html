@@ -248,6 +248,15 @@ body.touch #msg{font-size:clamp(40px,14vh,96px);top:22%}body.touch #sub{top:calc
  #roamCard{top:calc(46px + env(safe-area-inset-top,0px));transform:translateX(-50%);max-height:calc(100% - 150px);overflow:auto}
  #story{max-height:calc(100% - 24px);overflow:auto;padding:10px 14px}#story img{width:52px;height:52px}#story p{font-size:12px;max-height:52vh}
  #spRes{top:calc(46px + env(safe-area-inset-top,0px));transform:translateX(-50%);max-height:calc(100% - 60px);overflow:auto;padding:10px 14px}}
+@media (max-height:520px){
+ #roamGauge{bottom:calc(4px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:6px;padding:3px 10px;border-radius:14px;background:rgba(3,14,26,.45)}
+ #roamGauge b{font-size:18px}#roamGauge small{font-size:8px}
+ #rgBar,#rgHull{width:70px;margin-top:0}#rgBar{height:5px}#rgHull{height:4px}
+ #roamGauge>div{display:block}#rgGb{margin-top:0;font-size:10px}
+ #roamPrompt{left:auto;right:calc(14px + env(safe-area-inset-right,0px));top:40%;bottom:auto;transform:none;max-width:30vw;padding:4px 12px}
+ #roamPrompt b{font-size:11px;white-space:normal}
+ #roamPop{width:min(160px,20vw);background:linear-gradient(135deg,rgba(255,45,149,.62),rgba(140,85,255,.62))}#roamPop small{display:inline;margin-left:6px}
+}
 </style>
 
 <canvas id="c"></canvas>
@@ -2363,9 +2372,9 @@ let RAMPT=null;function addRamp(x,z,h,len,hgt,w,col){if(!RAMPT){const[c,g2]=cv(1
   RO.ramps.push({x,z,h,len,hgt,w,y0})}
 function buildRoam(){const grp=new THREE.Group();HUB.grp.add(grp);RO.grp=grp;RO.marks=[];RO.studs=[];RO.ramps=[];RO.built=true;const cat=roamCatalog();if(HUB.garage)MARKPOS.garage=[HUB.garage.x,ST_N[0]];
   for(const m of cat){const p=MARKPOS[markKey(m)];if(!p)continue;m.x=p[0];m.z=p[1];m.h=ST_N.includes(m.z)||ST_S.includes(m.z)?Math.PI/2:0;const y=groundY(m.x,m.z),g=new THREE.Group();g.position.set(m.x,y,m.z);
-    if(m.kind==='otg'){const arch=new THREE.Mesh(new THREE.TorusGeometry(7,.5,8,40,Math.PI),neonMat(m.col,2.2));arch.rotation.y=m.h+Math.PI/2;g.add(arch);const pane=new THREE.Mesh(new THREE.CircleGeometry(7,32,0,Math.PI),new THREE.MeshBasicMaterial({color:glowCol(m.col,.8),transparent:true,opacity:.2,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));pane.rotation.y=m.h+Math.PI/2;g.add(pane);m.ring=arch}
+    if(m.kind==='otg'){const arch=new THREE.Mesh(new THREE.TorusGeometry(7,.5,8,40,Math.PI),neonMat(m.col,2.2));arch.rotation.y=m.h+Math.PI/2;g.add(arch);const pane=new THREE.Mesh(new THREE.CircleGeometry(7,32,0,Math.PI),new THREE.MeshBasicMaterial({color:glowCol(m.col,.8),transparent:true,opacity:.2,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));pane.rotation.y=m.h+Math.PI/2;g.add(pane);m.ring=arch;m.pane=pane}
     else{const ring=new THREE.Mesh(new THREE.TorusGeometry(9,.6,8,48),neonMat(m.col,2.4));ring.rotation.x=Math.PI/2;ring.position.y=.3;g.add(ring);m.ring=ring}
-    const beam=new THREE.Mesh(new THREE.CylinderGeometry(1.6,3,140,14,1,true),new THREE.MeshBasicMaterial({color:glowCol(m.col,1),transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));beam.position.y=70;g.add(beam);
+    const beam=new THREE.Mesh(new THREE.CylinderGeometry(1.6,3,140,14,1,true),new THREE.MeshBasicMaterial({color:glowCol(m.col,1),transparent:true,opacity:.28,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));beam.position.y=70;g.add(beam);m.beam=beam;
     const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:iconTex(m),depthWrite:false}));sp.scale.set(10,10,1);sp.position.y=m.kind==='otg'?13:12;g.add(sp);m.g=g;m.sp=sp;if(m.kind==='quest'){const f=minifig(m.col);f.position.set(Math.cos(m.h)*13,0,-Math.sin(m.h)*13);f.rotation.y=m.h-Math.PI/2;g.add(f);m.fig=f}grp.add(g);RO.marks.push(m)}
   const LJ=RO.marks.filter(m=>m.kind==='otg'&&m.ev.kind==='longjump');for(const m of LJ){const big=m.ev.id==='lj2',d=28;addRamp(m.x+Math.sin(m.h)*d,m.z+Math.cos(m.h)*d,m.h,big?26:18,big?9:5.5,12,big?0xff5a1c:0xffcd03);m.rampAt=RO.ramps[RO.ramps.length-1]}
   for(const[x,z,h]of[[-260,450,0],[580,1150,0],[-1240,570,Math.PI/2],[300,-560,Math.PI],[1000,90,Math.PI/2],[-540,-1000,0],[720,690,0],[-1100,930,0],[1140,450,Math.PI],[-260,930,Math.PI],[860,1170,0],[-820,1050,Math.PI/2],[440,1050,-Math.PI/2],[20,450,0],[1420,690,Math.PI],[-1380,450,0],[-680,-440,Math.PI/2],[860,-560,0],[1140,-1100,Math.PI/2],[-1100,-860,0]])addRamp(x,z,h,24,7,16,0xffb020);
@@ -2530,7 +2539,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){roamWreckStep(dt);hubTra
     if(!st.pull&&d<mag&&Math.abs(dy)<mag)st.pull=true;if(st.pull){const k=Math.min(1,dt*(9+sp*.12));st.m.position.x+=dx*k;st.m.position.z+=dz*k;st.m.position.y+=dy*k}
     if(d<2.6&&Math.abs(dy)<3){st.alive=false;st.m.visible=false;st.t=240;studGain(st.v)}}
   RO.cool=Math.max(0,RO.cool-dt);RO.saveT=(RO.saveT||0)+dt;if(RO.saveT>3&&!air){RO.saveT=0;roamSavePos()}
-  sprintStep(dt);tutStep(dt);if(RO.ch)chStep(dt);else{let near=null,nd=1e9;for(const m of RO.marks){const d=Math.hypot(m.x-RO.x,m.z-RO.z);m.ring.rotation.z+=dt;if(m.fig){const u=m.fig.userData;u.arm.rotation.z=-.6-Math.sin(T*5)*.6;u.ex.position.y=5.4+Math.sin(T*3)*.25;u.ex.visible=!markDone(m)}const lk=markLocked(m);m.sp.material.opacity=lk?.25:markDone(m)?.5:1;m.g.visible=!lk||d<160;if(!markDone(m)&&!lk&&d<nd){nd=d;near=m}if(d<11&&Math.abs(RO.y-m.g.position.y)<6&&!RO.card&&RO.cool<=0){RO.pmNew=m;if(Math.abs(RO.v)<7)roamOpen(m)}}
+  sprintStep(dt);tutStep(dt);if(RO.ch)chStep(dt);else{let near=null,nd=1e9;for(const m of RO.marks){const d=Math.hypot(m.x-RO.x,m.z-RO.z);m.ring.rotation.z+=dt;if(m.fig){const u=m.fig.userData;u.arm.rotation.z=-.6-Math.sin(T*5)*.6;u.ex.position.y=5.4+Math.sin(T*3)*.25;u.ex.visible=!markDone(m)}const lk=markLocked(m);{const nf=clamp((d-12)/45,.12,1);m.sp.material.opacity=(lk?.25:markDone(m)?.5:1)*nf;if(m.beam)m.beam.material.opacity=.28*nf;if(m.pane)m.pane.material.opacity=.2*nf}m.g.visible=!lk||d<160;if(!markDone(m)&&!lk&&d<nd){nd=d;near=m}if(d<11&&Math.abs(RO.y-m.g.position.y)<6&&!RO.card&&RO.cool<=0){RO.pmNew=m;if(Math.abs(RO.v)<7)roamOpen(m)}}
     if(RO.wp){const d=Math.hypot(RO.wp.x-RO.x,RO.wp.z-RO.z);if(d<12)RO.wp=null;else{near=RO.wp;nd=d}}RO.near=near;RO.nd=nd}
   if(RO.card&&!RO.cardPin&&Math.hypot(RO.card.x-RO.x,RO.card.z-RO.z)>12){RO.card=null;$('#roamCard').hidden=true}roamPrompt(dt);
   smashCheck(dt);studFXStep(dt);hubTrafficStep(dt);comboStep(dt);popStep(dt,busy);gbStep(dt);RO.prT=(RO.prT||0)+dt;if(RO.prT>1){propRespawn(RO.prT);RO.prT=0}hubFrame(dt);
