@@ -44,7 +44,7 @@
   <main class="gx-board"><div class="view"><canvas id="c3" aria-label="The courtyard table in 3D. Tap a glowing tile to pick its glaze, then a glowing rack. Drag to tilt, scroll to zoom, double-click to reset."></canvas><div id="map2d" hidden></div><div id="chip" aria-hidden="true"></div></div></main>
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Sunglaze</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel"><svg class="ic" aria-hidden="true"><use href="#i-resize"/></svg></button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel"><svg class="ic" aria-hidden="true"><use href="#i-hide"/></svg></button></div>
-    <div id="dockmsg" hidden role="status"></div><div class="gx-dock-body" id="dockbody" aria-live="polite"></div>
+    <div id="dockmsg" hidden role="status"></div><div id="ph-z" aria-live="polite"><div id="ph-st"></div><div id="ph-pop" class="ph-card" hidden></div><div id="ph-card" class="ph-card" hidden></div></div><div class="gx-dock-body" id="dockbody" aria-live="polite"></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock"><svg class="ic" aria-hidden="true"><use href="#i-menu"/></svg> Panel</button>
 </div>
@@ -71,5 +71,6 @@
 <script src="sound.js"></script>
 <script src="net.js"></script>
 <script src="ui.js"></script>
+<script src="ui8.js"></script>
 </body>
 </html>

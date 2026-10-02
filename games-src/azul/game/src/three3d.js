@@ -194,11 +194,11 @@ function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return fa
   V3.hitMat=new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false});
   initFx();initPost();
   cv.addEventListener('pointerdown',e=>{V3.drag={x:e.clientX,y:e.clientY,a:V3.orbit.a,e:V3.orbit.e,moved:false}});
-  window.addEventListener('pointermove',e=>{const d=V3.drag;if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>8)d.moved=true;if(d.moved){V3.orbit.a=Math.max(-.6,Math.min(.6,d.a-dx*.004));V3.orbit.e=Math.max(.8,Math.min(1.45,d.e+dy*.003));fitCam()}});
-  window.addEventListener('pointerup',e=>{const d=V3.drag;V3.drag=null;if(d&&!d.moved&&e.target===cv){const h=pick3D(e);if(h&&typeof on3DPick==='function')on3DPick(h)}});
+  window.addEventListener('pointermove',e=>{const d=V3.drag;if(!d||PHN.on)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>8)d.moved=true;if(d.moved){V3.orbit.a=Math.max(-.6,Math.min(.6,d.a-dx*.004));V3.orbit.e=Math.max(.8,Math.min(1.45,d.e+dy*.003));fitCam()}});
+  window.addEventListener('pointerup',e=>{const d=V3.drag;V3.drag=null;if(d&&!d.moved&&e.target===cv){const h=pick3D(e);if((h||PHN.on)&&typeof on3DPick==='function')on3DPick(h)}});
   cv.addEventListener('pointermove',e=>{if(V3.drag)return;const h=pick3D(e);const k=h?JSON.stringify(h):null;if(k!==V3.hoverK){V3.hoverK=k;V3.hover=h;if(typeof onHover==='function')onHover(h)}cv.style.cursor=h&&typeof hoverable==='function'&&hoverable(h)?'pointer':'grab'});
-  cv.addEventListener('wheel',e=>{e.preventDefault();V3.zoom=Math.max(.55,Math.min(1.5,V3.zoom+e.deltaY*.001));fitCam()},{passive:false});
-  cv.addEventListener('dblclick',()=>{V3.zoom=1;V3.orbit={a:0,e:1.2};fitCam()});
+  cv.addEventListener('wheel',e=>{e.preventDefault();if(PHN.on)return;V3.zoom=Math.max(.55,Math.min(1.5,V3.zoom+e.deltaY*.001));fitCam()},{passive:false});
+  cv.addEventListener('dblclick',()=>{if(PHN.on)return;V3.zoom=1;V3.orbit={a:0,e:1.2};fitCam()});
   new ResizeObserver(()=>resize3D()).observe(cv.parentElement);V3.on=true;document.body.classList.add('three');V3.clock=new THREE.Clock();
   V3.qPref=gfxLoadPref();applyQuality(V3.qPref==='auto'?gfxAuto():V3.qPref);
   try{document.fonts&&document.fonts.ready.then(()=>{V3.fontOK=1;if(G&&V3.L){sync3D(true)}})}catch(e){}
@@ -273,10 +273,10 @@ function slotPos(sl){const L=V3.L;const a=sl.split('_');const t=a[0][0];const n=
 function resize3D(){if(!V3.r)return;const el=V3.r.domElement.parentElement;const w=Math.max(50,el.clientWidth),h=Math.max(50,el.clientHeight);V3.r.setSize(w,h,false);V3.dirty=3;if(PH)PH.wake();V3.r.domElement.style.width='100%';V3.r.domElement.style.height='100%';V3.cam.aspect=w/h;V3.cam.updateProjectionMatrix();V3.W=w;V3.H=h;sizePost();relayout()}
 function relayout(){if(V3.on&&!G){V3.L=computeLayout(V3.W||800,V3.H||600);if(!V3.lkey){V3.lkey='idle';buildStatic()}fitCam();return}if(!V3.on||!G)return;const L=computeLayout(V3.W||800,V3.H||600);const key=L.name+JSON.stringify(L.boards.map(b=>[b.p,b.x,b.z]))+G.fac.length;V3.L=L;if(key!==V3.lkey){V3.lkey=key;buildStatic()}fitCam();sync3D(true)}
 // camera: binary-search the distance so the whole layout (with tile height) fits, then centre it
-function fitCam(){const L=V3.L;if(!L)return;V3.dirty=3;if(PH)PH.wake();let b=L.box;const zb=V3.zoomBoard&&L.name==='focus'&&L.bp[V3.zoomBoard.p];if(zb)b={x0:zb.x-BW/2-.3,x1:zb.x+BW/2+.3,z0:zb.z-BH/2-(V3.zoomBoard.ring?L.ring.out*2+1.2:.3),z1:zb.z+BH/2+.3};const pts=[];for(const x of [b.x0,b.x1])for(const z of [b.z0,b.z1])for(const y of [0,.6])pts.push(new THREE.Vector3(x,y,z));
-  const o=V3.orbit;const dir=new THREE.Vector3(Math.sin(o.a)*Math.cos(o.e),Math.sin(o.e),Math.cos(o.a)*Math.cos(o.e));const look=new THREE.Vector3((b.x0+b.x1)/2,0,(b.z0+b.z1)/2);
+function fitCam(){const L=V3.L;if(!L)return;V3.dirty=3;if(PH)PH.wake();let b=L.box;const zb=!PHN.on&&V3.zoomBoard&&L.name==='focus'&&L.bp[V3.zoomBoard.p];if(PHN.on){const R=L.ring.out+.3;b={x0:-R,x1:R,z0:-R,z1:R}}if(zb)b={x0:zb.x-BW/2-.3,x1:zb.x+BW/2+.3,z0:zb.z-BH/2-(V3.zoomBoard.ring?L.ring.out*2+1.2:.3),z1:zb.z+BH/2+.3};const pts=[];for(const x of [b.x0,b.x1])for(const z of [b.z0,b.z1])for(const y of [0,.6])pts.push(new THREE.Vector3(x,y,z));
+  const o=PHN.on?{a:0,e:1.53}:V3.orbit;const dir=new THREE.Vector3(Math.sin(o.a)*Math.cos(o.e),Math.sin(o.e),Math.cos(o.a)*Math.cos(o.e));const look=new THREE.Vector3((b.x0+b.x1)/2,0,(b.z0+b.z1)/2);
   const test=d=>{V3.cam.position.copy(look).addScaledVector(dir,d);V3.cam.lookAt(look);V3.cam.updateMatrixWorld();let mx=0,my0=1,my1=-1;for(const p of pts){const v=p.clone().project(V3.cam);mx=Math.max(mx,Math.abs(v.x));my0=Math.min(my0,v.y);my1=Math.max(my1,v.y)}return {mx,my0,my1}};
-  for(let it=0;it<3;it++){let lo=5,hi=400;for(let k=0;k<30;k++){const d=(lo+hi)/2;const r=test(d);const fits=r.mx<=.97&&r.my1<=.97&&r.my0>=-.97&&(r.my1-r.my0)<=1.94;if(fits)hi=d;else lo=d}
+  for(let it=0;it<3;it++){let lo=5,hi=400;for(let k=0;k<30;k++){const d=(lo+hi)/2;const r=test(d);const lim=PHN.on?.995:.97;const fits=r.mx<=lim&&r.my1<=lim&&r.my0>=-lim&&(r.my1-r.my0)<=lim*2;if(fits)hi=d;else lo=d}
     const r=test(hi);const off=(r.my1+r.my0)/2;look.z-=off*(b.z1-b.z0)*.5;V3.dist=hi}
   const d=V3.dist*V3.zoom;V3.camTo={pos:look.clone().addScaledVector(dir,d),look:look.clone()};if(!V3.camNow||!ANIM||V3.drag){V3.camNow={pos:V3.camTo.pos.clone(),look:look.clone()}}V3.cam.position.copy(V3.camNow.pos);V3.cam.lookAt(V3.camNow.look);V3.look.copy(look);
   // tight shadow frustum around the whole layout
@@ -310,7 +310,7 @@ function buildStatic(){const sc=V3.scene;if(V3.stat)for(const m of V3.stat)sc.re
   // the clay sack and the shard box
   const bag=add(V3.sack||(V3.sack=sackMesh()));bag.position.set(L.bag.x,0,L.bag.z);
   const box=add(V3.sbox||(V3.sbox=shardBox()));box.position.set(L.lid.x,0,L.lid.z);V3.shardN=-1;
-  V3.bagLbl=add(V3.bagLbl||labelMesh('',2.6));V3.bagLbl.position.set(L.bag.x,.03,L.bag.z+1.55);V3.lidLbl=add(V3.lidLbl||labelMesh('',2.6));V3.lidLbl.position.set(L.lid.x,.03,L.lid.z+1.35);V3.lblKey='';
+  V3.bagLbl=add(V3.bagLbl||labelMesh('',2.6));V3.bagLbl.position.set(L.bag.x,.03,L.bag.z+1.55);V3.lidLbl=add(V3.lidLbl||labelMesh('',2.6));V3.lidLbl.position.set(L.lid.x,.03,L.lid.z+1.35);V3.lblKey='';if(PHN.on){V3.bagLbl.visible=false;V3.lidLbl.visible=false}else{V3.bagLbl.visible=true;V3.lidLbl.visible=true}
   // boards: a printed base with a punched top layer (47 slots)
   const bg=boardGeos();
   for(const bd of L.boards){const g=new THREE.Group();const tex=boardTexture(bd.p);tex.t.userData.own=1;const print=smat(new THREE.MeshStandardMaterial({map:tex.t,roughness:.8,normalMap:V3.linenB,normalScale:new THREE.Vector2(.35,.35),envMapIntensity:.4}));

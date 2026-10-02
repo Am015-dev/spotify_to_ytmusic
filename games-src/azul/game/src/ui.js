@@ -12,7 +12,7 @@ const me=()=>{if(!G||G.over)return null;const s=sideToAct();if(NET.on&&s!==NET.m
 const isYou=i=>G&&(NET.on?i===NET.mySeat:G.pl.filter(q=>q.human).length===1&&!!P(i).human);
 const human=()=>G&&G.pl.some(p=>p.human);
 function pname(i){return `<span class="pc" style="color:${PCOL[i]};font-weight:800">${esc(P(i).nm)}</span>`}
-function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){const x=f.x;try{V3fx(f)}catch(e){}
+function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){const x=f.x;try{V3fx(f)}catch(e){}try{phFx(f)}catch(e){}
     if(f.t==='take'){const p=P(x.p);UI.recap.unshift(`<b style="color:${PCOL[x.p]}">${esc(p.nm)}</b> took ${x.c===PRISM?x.n+' Prism':(x.n-x.nj)+' '+TNAME[x.c]+(x.nj?' + '+x.nj+' Prism':'')} from ${srcName(x.src)} → ${x.line<5?'rack '+(x.line+1):'breakage'}${x.br&&x.line<5?` (${x.br} broke)`:''}${x.sun?' · took the Sun token':''}`);if(UI.recap.length>4)UI.recap.length=4;sfx('take')}
     else if(f.t==='wall')sfx('wall',x.pts);else if(f.t==='floor')sfx('floor');else if(f.t==='sun')sfx('sun');else if(f.t==='round'){sfx('round');if(G.round>1&&G.rsum)UI.recap.unshift(`Mosaics set: ${G.pl.map(q=>`<b style="color:${PCOL[q.i]}">${esc(q.nm)}</b> +${G.rsum[q.i].place}${G.rsum[q.i].floor?' '+G.rsum[q.i].floor+' breakage':''}`).join(' · ')}`);UI.recap.unshift(`<i>${esc(chapter(G.round))}</i>`);UI.recap.length=Math.min(UI.recap.length,4)}else if(f.t==='refill')sfx('refill');else if(f.t==='win')sfx('win')}
   UI.fxSeen=UI.fx.length;if(UI.fx.length>40){UI.fx.splice(0,30);UI.fxSeen=UI.fx.length}}
@@ -34,7 +34,7 @@ function computeHL(){const H={};UI.pick=[];const p=me();
 function slotSel(sl){const p=me();if(!p||G.phase!=='offer')return null;let src,k;if(sl[0]==='f'){const a=sl.slice(1).split('_');src=+a[0];k=+a[1]}else if(sl[0]==='c'){src=-1;k=+sl.split('_')[1]}else return null;
   const arr=src<0?G.ctr:G.fac[src];const t=arr&&arr[k];if(t==null)return null;if(t===PRISM)return {src,c:PRISM,j:1};return {src,c:t,j:0}}
 // ---------- render ----------
-function render(){renderModal();if(!G)return;renderDock();renderPopups();renderMap2D();
+function render(){renderModal();if(!G){try{phRender()}catch(e){console.error(e)}return}renderDock();renderPopups();renderMap2D();try{phRender()}catch(e){console.error(e)}
   const pb=$('#pausebtn');if(pb){pb.hidden=human();const h=IC(UI.pause?'play':'pause');if(pb.dataset.h!==h){pb.innerHTML=h;pb.dataset.h=h}}const sb=$('#speedbtn');if(sb){const h=IC('speed')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';if(sb.dataset.h!==h){sb.innerHTML=h;sb.dataset.h=h}}
   const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',!!UI.coach);
   const ch=$('#chip');if(ch){const s=sideToAct();ch.textContent=G.over?'The king’s judgement':`${innerWidth<700?'Round '+G.round:chapter(G.round)} · ${G.phase==='wall'?'setting the mosaics':s>=0?P(s).nm+' to play':''}`}}
@@ -98,9 +98,9 @@ function boardG(p,o){o=o||{};const X=v=>(v+6.2)*100,Z=v=>(v+4.7)*100;const pi=p.
   if(flHl)s+=`<rect x="${X(-5.85)-6}" y="${fz-58}" width="${7*CP*100+12}" height="116" rx="14" fill="none" stroke="${flHl.col===0xffffff?'#fff':'#ff7a3a'}" stroke-width="10"><animate attributeName="stroke-opacity" values="1;.35;1" dur="1.2s" repeatCount="indefinite"/></rect>`;
   s+=`</g><text x="${X(1.9)}" y="${fz-18}" font-size="23" fill="#6b4a2a">extra tiles: shard box, no penalty</text><text x="${X(1.9)}" y="${fz+30}" font-size="23" font-weight="700" fill="#6b4a2a">end: row +2 · col +7 · glaze +10</text>`;return s}
 function boardSVG(p,o){return `<svg viewBox="0 0 1240 940" role="img" aria-label="${esc(p.nm)}'s board">${boardG(p,o)}</svg>`}
-function ringSVG(cx,cy){const n=G.fac.length;const rg=ringGeom(n);let s=`<circle cx="${cx}" cy="${cy}" r="${rg.cr*100+10}" fill="#d9b98a" stroke="#a0703e" stroke-width="6"/>`;const H=UI.hl||{};const lifted=new Set(H.tiles||[]);const srcHl=new Set((H.src||[]).map(x=>x.src));
+function ringSVG(cx,cy){const n=G.fac.length;const rg=ringGeom(n);let s=`<circle data-ctr="1" class="hit" cx="${cx}" cy="${cy}" r="${rg.cr*100+10}" fill="#d9b98a" stroke="#a0703e" stroke-width="6"/>`;const H=UI.hl||{};const lifted=new Set(H.tiles||[]);const srcHl=new Set((H.src||[]).map(x=>x.src));
   const tile=(t,x,y,sz,sl,src)=>{const sel=lifted.has(sl);return `<g data-slot="${sl}" class="hit">${tileSVG(t,x-sz/2,y-sz/2-(sel?10:0),sz)}${sel?`<rect x="${x-sz/2-5}" y="${y-sz/2-15}" width="${sz+10}" height="${sz+10}" rx="10" fill="none" stroke="#fff" stroke-width="6"/>`:''}</g>`};
-  G.fac.forEach((a,i)=>{const ang=-Math.PI/2+i*2*Math.PI/n;const x=cx+Math.cos(ang)*rg.RR*100,y=cy+Math.sin(ang)*rg.RR*100;s+=`<circle cx="${x}" cy="${y}" r="${KR*100}" fill="#f4ead6" stroke="${srcHl.has(i)?'#ffb400':'#2f6f8a'}" stroke-width="${srcHl.has(i)?14:10}"/><text x="${x}" y="${y-KR*100+34}" text-anchor="middle" font-size="30" font-weight="700" fill="#1f4f66">${i+1}</text>`;
+  G.fac.forEach((a,i)=>{const ang=-Math.PI/2+i*2*Math.PI/n;const x=cx+Math.cos(ang)*rg.RR*100,y=cy+Math.sin(ang)*rg.RR*100;s+=`<circle data-kiln="${i}" class="hit" cx="${x}" cy="${y}" r="${KR*100}" fill="#f4ead6" stroke="${srcHl.has(i)?'#ffb400':'#2f6f8a'}" stroke-width="${srcHl.has(i)?14:10}"/><text x="${x}" y="${y-KR*100+34}" text-anchor="middle" font-size="30" font-weight="700" fill="#1f4f66">${i+1}</text>`;
     a.forEach((t,k)=>{s+=tile(t,x+(k%2?50:-50),y+(k<2?-50:50),88,`f${i}_${k}`,i)})});
   const cnt=G.ctr.length;const cols=Math.max(3,Math.ceil(Math.sqrt(cnt+1)));const pitch=Math.min(105,rg.cr*138/cols);const rows=Math.ceil((cnt+1)/cols);
   G.ctr.forEach((t,k)=>{s+=tile(t,cx+(k%cols-(cols-1)/2)*pitch,cy+(Math.floor(k/cols)-(rows-1)/2)*pitch+pitch*.5,pitch*.9,`c_${k}`,-1)});
@@ -108,6 +108,7 @@ function ringSVG(cx,cy){const n=G.fac.length;const rg=ringGeom(n);let s=`<circle
   if(srcHl.has(-1))s+=`<circle cx="${cx}" cy="${cy}" r="${rg.cr*100+14}" fill="none" stroke="#ffb400" stroke-width="10"/>`;return s}
 function renderMap2D(){const el=$('#map2d');if(!el)return;if(V3.on){el.hidden=true;return}el.hidden=false;const rg=ringGeom(G.fac.length);const R=(rg.out+.4)*100;const f=focusSeat();const others=G.pl.filter(p=>p.i!==f);
   const W=Math.max(2*R,1240*2+60),top=2*R+30;const H=top+940*(1+Math.ceil(others.length/2)*0.62)+40;
+  if(PHN.on){el.innerHTML=`<svg viewBox="${W/2-R-20} 0 ${2*R+40} ${2*R+40}" role="img" aria-label="The kilns and courtyard">${ringSVG(W/2,R+20)}</svg>`;return}
   let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="The table">${ringSVG(W/2,R)}<g transform="translate(${W/2-620},${top})">${boardG(P(f),{act:!!me(),hl:me()?UI.hl:{}})}</g>`;
   others.forEach((p,k)=>{s+=`<g transform="translate(${(k%2)*(W/2)+20},${top+960+Math.floor(k/2)*600}) scale(.6)">${boardG(p,{})}</g>`});el.innerHTML=s+'</svg>'}
 // ---------- popups ----------
@@ -136,8 +137,9 @@ function storyHtml(){const names=G?G.pl.filter(p=>p.human).map(p=>p.nm):[];retur
   <p>Dry them on your racks, set them into your mosaic so each new tile touches the others, and waste nothing: every broken tile costs you.</p><p>When the first mosaic row is finished, the king will walk the courtyard and judge.</p>
   <div class="acts"><button class="btn go" data-ui="story-ok">Enter the courtyard ▶</button></div></div>`}
 // ---------- input ----------
-function on3DPick(h){const p=me();if(!p||!G||G.over)return;
-  if(G.phase==='wall'){if(h.k==='cell'&&h.p===p.i){const m=validMoves(p.i).find(m=>m.r===h.r&&m.c===h.c);if(m)return go(m);return toast('That space is not allowed.')}return toast('Tap a glowing mosaic space.')}
+function on3DPick(h){const p=me();if(!p||!G||G.over)return;if(!h&&!PHN.on)return;
+  if(G.phase==='wall'){if(h&&h.k==='cell'&&h.p===p.i){const m=validMoves(p.i).find(m=>m.r===h.r&&m.c===h.c);if(m)return go(m);return toast('That space is not allowed.')}return toast('Tap a glowing mosaic space.')}
+  if(PHN.on)return phPick(h);
   if(h.k==='tile'){const sl=h.sl;if(sl[0]==='l'||sl[0]==='x'){const a=sl.slice(1).split('_');if(+a[0]===p.i)return pickLine(sl[0]==='x'?5:+a[1]);return}if(sl[0]==='w'){const a=sl.slice(1).split('_');if(+a[0]===p.i&&UI.sel)return pickLine(+a[1]);return}
     const s=slotSel(sl);if(s)return pickSel(s);return}
   if(h.k==='line'&&h.p===p.i)return pickLine(h.r);if(h.k==='cell'&&h.p===p.i&&UI.sel)return pickLine(h.r);
@@ -149,8 +151,8 @@ function pickSel(s){const p=me();if(!p||G.phase!=='offer')return;if(UI.sel&&UI.s
 function pickLine(r){if(!UI.sel)return toast('First tap a tile on a kiln or in the courtyard.');const m=movesFor(UI.sel).find(m=>m.line===r);if(!m)return toast(r<5?`Rack ${r+1} can’t take ${TNAME[UI.sel.c]} now.`:'');if(UI.tgt===r)return go(m);UI.tgt=r;sfx('click');upd()}
 function upd(){computeHL();render();if(V3.on){syncHighlights();camFocus()}}
 // narrow screens: zoom onto your own board while you choose a rack or a mosaic space
-function camFocus(){if(!V3.on||!V3.L)return;const p=me();const z=p&&(UI.sel||(G.phase==='wall'&&G.wt&&G.wt.q))?{p:p.i}:null;const k=JSON.stringify(z);if(k!==V3.zk){V3.zk=k;V3.zoomBoard=z;fitCam()}}
-function go(m){const s=sideToAct();if(NET.on&&(s<0||s!==NET.mySeat)&&P(s)&&P(s).human)return;
+function camFocus(){if(!V3.on||!V3.L||PHN.on)return;const p=me();const z=p&&(UI.sel||(G.phase==='wall'&&G.wt&&G.wt.q))?{p:p.i}:null;const k=JSON.stringify(z);if(k!==V3.zk){V3.zk=k;V3.zoomBoard=z;fitCam()}}
+function go(m){const s=sideToAct();if(PHN.on)PHN.src=null;if(NET.on&&(s<0||s!==NET.mySeat)&&P(s)&&P(s).human)return;
   if(isClient()){if(!me())return;if(NET.pend&&NET.pend.k===G.logN&&Date.now()-NET.pend.t<2500)return;NET.pend={k:G.logN,t:Date.now()};UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;netSend(Object.assign({},m));sfx('place');upd();return}
   const keep=[UI.sel,UI.tgt,UI.adv];UI.sel=null;UI.tgt=null;UI.adv=null;UI.hover=null;const r=performMove(m,s);if(!r.success){[UI.sel,UI.tgt,UI.adv]=keep;toast('That move isn’t allowed now.');console.error(r.error);return}sfx('place')}
 function toast(t){if(!t)return;const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,3000)}
@@ -168,12 +170,13 @@ function adviceFor(seat){const p=P(seat);const lv=p.lv;p.lv='normal';let m;try{m
     if(G.np>1){const nx=(p.i+1)%G.np;const near=endNear(G);const b0=bestGain(G,nx,near);const S=cloneS(G);applyTake(S,p.i,m);const b1=emptyS(S)?0:bestGain(S,nx,near);if(b1<=.3)bits.push(`and it leaves ${P(nx).nm} nothing useful`);else if(b0-b1>=1.5)bits.push(`and it takes away ${P(nx).nm}’s best pick`)}
     why+=bits.join(', ')+'.'}
   return {m,why}}
-document.addEventListener('click',e=>{const b=e.target.closest('button,[data-slot],[data-line],[data-cell],input[type=checkbox]');if(!b)return;const d=b.dataset;
+document.addEventListener('click',e=>{const b=e.target.closest('button,[data-slot],[data-kiln],[data-ctr],[data-line],[data-cell],input[type=checkbox]');if(!b)return;const d=b.dataset;
   if(d.mv){const m=JSON.parse(d.mv);sfx('click');return go(m)}
   if(d.pick){return pickSel(JSON.parse(d.pick))}
   if(d.line!=null){return pickLine(+d.line)}
   if(d.cell!=null){const [r,c]=d.cell.split(',').map(Number);return on3DPick({k:'cell',p:me()?me().i:-1,r,c})}
   if(d.slot){return on3DPick({k:'tile',sl:d.slot})}
+  if(d.kiln!=null)return on3DPick({k:'kiln',i:+d.kiln});if(d.ctr!=null)return on3DPick({k:'ctr'});
   if(d.np){UI.setup.np=+d.np;render();return}if(d.seat!=null){const i=+d.seat;UI.setup.seats[i]=UI.setup.seats[i]==='human'?'ai':'human';render();return}
   if(d.lv!=null){const i=+d.lv;const L=['easy','normal','hard'];UI.setup.lv[i]=L[(L.indexOf(UI.setup.lv[i])+1)%3];render();return}
   if(d.ex&&b.type==='checkbox'){UI.setup.ex[d.ex]=b.checked;return}if(d.coach&&b.type==='checkbox'){setCoach(b.checked);return}
@@ -193,8 +196,8 @@ function beginGame(){const o=UI.setup;UI.guideNote=null;UI.fx.length=0;UI.fxSeen
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh()}catch(e){openStart()}}
 function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].m);V3.tiles={};V3.lkey='';relayout()}
 // ---------- the computer ----------
-let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!NET.on)||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)&&G.turn>0?2.2:1;
-  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!NET.on)||isClient())return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*wait))}
+let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!NET.on)||phHold()||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)&&G.turn>0?2.2:1;
+  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!NET.on)||phHold()||isClient())return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*wait))}
 function boot(){$('#defs').innerHTML=glazeDefs();GX.init({key:'sgz'});GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(id==='refd')$('#refbody').innerHTML=refHtml();if(G)render()};
   try{init3D()}catch(e){console.error(e)}if(!V3.on){V3.qPref=gfxLoadPref();V3.q=V3.qPref==='auto'?gfxAuto():V3.qPref}gfxBtn();soundBtns();setCoach(UI.coach);netInit();openStart()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
