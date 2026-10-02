@@ -2713,7 +2713,7 @@ function netStrip(G,seat){
 // The host's own page also draws only its own hand (viewSeat() = my seat, no pass-the-device screen).
 const NET={on:false,role:null,code:'',room:null,lobby:null,uid:null,peer:null,mySeat:-1,seq:0,last:0,timer:null,parts:{},hostPeer:null,peers:[],
   err:'',busy:false,ready:false,lastRx:0,gid:null,myName:'',copied:false,opt:null,hostGone:false,acc:0,rej:0,why:[],sent:0,rx:0,applied:0,
-  seatPeer:[],seatUid:[],seatName:[],away:[],evLog:[],evId:0,evSeen:0,rk:null,recC:{},lastSent:{},lastLobby:'',lastTxt:'',pend:null,pendT:0,conn:null,lastSt:'',wasMine:false,
+  seatPeer:[],seatUid:[],seatName:[],away:[],evLog:[],evId:0,evSeen:0,rk:null,recC:{},lastSent:{},lastLobby:'',lastTxt:'',pend:null,pendT:0,mid:0,pendN:0,ack:{},conn:null,lastSt:'',wasMine:false,
   retries:0,bad:0,sounds:0};
 const isClient=()=>NET.on&&NET.role==='client';
 const isHost=()=>NET.on&&NET.role==='host';
@@ -2727,7 +2727,7 @@ async function netJoin(role,code){if(NET.busy||!NET.lobby)return;NET.err='';code
   NET.busy=true;netRender();let room;
   try{if(NET.room){try{await NET.room.leave()}catch(e){}NET.room=null}room=await NET.lobby.join('tb-'+code)}catch(e){NET.busy=false;NET.err='Could not open the game room.';netRender();return}
   Object.assign(NET,{busy:false,code,role,on:true,room,mySeat:-1,hostPeer:null,parts:{},applied:0,lastRx:0,gid:null,hostGone:false,peer:room.self,peers:[],opt:null,
-    seatPeer:[],seatUid:[],seatName:[],away:[],evLog:[],evId:0,evSeen:0,rk:null,recC:{},lastSent:{},lastLobby:'',lastTxt:'',pend:null,wasMine:false});
+    seatPeer:[],seatUid:[],seatName:[],away:[],evLog:[],evId:0,evSeen:0,rk:null,recC:{},lastSent:{},lastLobby:'',lastTxt:'',pend:null,mid:0,pendN:0,ack:{},wasMine:false});
   if(G||UI.started)netIdle();
   room.presence({role,uid:NET.uid,name:NET.myName||''}).catch(()=>{});
   room.on('st',onNetState);room.on('act',onNetAct);room.on('rej',onNetRej);
@@ -2796,7 +2796,7 @@ function netPush(force){if(!isHost()||!NET.room)return;const now=Date.now();
   const ev=NET.evLog.filter(b=>now-b.ts<60000).map(b=>({id:b.id,e:b.e}));
   // every peer gets ITS OWN stripped copy: nobody receives another seat's hand, face-down cards, bid, deck order or the seed
   for(const p of NET.peers){if(p.isMe)continue;const seat=NET.seatPeer.indexOf(p.peer);
-    let js;try{js=JSON.stringify({code:NET.code,gid:NET.gid,seat,opt,evid:NET.evId,ev,rk:seat>=0?netRec(seat):null,g:netStrip(G,seat)})}catch(e){console.error(e);continue}
+    let js;try{js=JSON.stringify({code:NET.code,gid:NET.gid,seat,opt,evid:NET.evId,ev,ack:NET.ack[p.peer]||0,rk:seat>=0?netRec(seat):null,g:netStrip(G,seat)})}catch(e){console.error(e);continue}
     if(!force&&NET.lastSent[p.peer]===js)continue;NET.lastSent[p.peer]=js;sendPacked(room,p.peer,js,++NET.seq)}}
 setInterval(()=>{if(isHost())netPush(true)},3000);
 // the end of every renderAll(): the host pushes the new state
@@ -2815,7 +2815,7 @@ function applyNet(o){
   if(o.lobby||!o.g){NET.opt=o.opt&&typeof o.opt==='object'?o.opt:NET.opt;if(G||UI.started){netIdle();hideStart()}NET.gid=null;if(!NET.hostGone)UI.netOpen=true;netRender();return}
   if(!validState(o.g))return;const g=o.g;const fresh=o.gid!==NET.gid;NET.opt=o.opt&&typeof o.opt==='object'?o.opt:NET.opt;
   const prev=G&&!fresh?{inf:G.pl.reduce((a,p)=>a+p.inf,0),over:!!G.over}:null;
-  G=g;NET.mySeat=Number.isInteger(o.seat)&&o.seat>=0&&o.seat<g.np?o.seat:-1;NET.rk=typeof o.rk==='string'?o.rk.slice(0,80):null;if(NET.pend&&NET.pendSig!==netSig())NET.pend=null;
+  G=g;NET.mySeat=Number.isInteger(o.seat)&&o.seat>=0&&o.seat<g.np?o.seat:-1;NET.rk=typeof o.rk==='string'?o.rk.slice(0,80):null;if(NET.pend&&Number.isInteger(o.ack)&&o.ack>=NET.pendN)NET.pend=null;   // this copy already contains the host's answer to my last move
   if(fresh){NET.gid=typeof o.gid==='string'?o.gid.slice(0,40):'x';NET.evSeen=Number.isInteger(o.evid)?o.evid:0;resetUI();UI.cfg={mode:'me',np:g.np,length:g.len,online:true};UI.mode='me';UI.started=true;UI.holder=Math.max(0,NET.mySeat);UI.rs0=snapInf();UI.rsLog=g.logN;
     hideStart();GX.close();UI.netOpen=false;UI.mapReset=true;closePop(true);NET.wasMine=false}
   else if(Array.isArray(o.ev)){const bs=o.ev.filter(b=>b&&Number.isInteger(b.id)&&b.id>NET.evSeen&&b.e).sort((a,b)=>a.id-b.id).slice(0,12);
@@ -2838,13 +2838,14 @@ function cleanEv(e){if(!e||typeof e!=='object')return null;const I=(v,a,b)=>Numb
   return null}
 function netEvent(e){if(!isHost())return;try{const c=cleanEv(JSON.parse(JSON.stringify(e)));if(c){NET.evLog.push({id:++NET.evId,ts:Date.now(),e:c});if(NET.evLog.length>10)NET.evLog.shift()}}catch(x){}}
 // ---- client -> host ----
-function netSend(k){if(!NET.room||!NET.hostPeer)return false;NET.sent++;NET.room.sendTo(NET.hostPeer,'act',{k}).catch(()=>{});return true}
+function netSend(k){if(!NET.room||!NET.hostPeer)return false;NET.sent++;NET.pendN=++NET.mid;NET.room.sendTo(NET.hostPeer,'act',{k,n:NET.mid}).catch(()=>{});return true}
 // a refused move means this page was a moment behind: wait for the fresh state the host sends with every refusal (no instant retry)
-function onNetRej(msg){if(!isClient()||msg.peer!==NET.hostPeer)return;const e=msg.data&&typeof msg.data.e==='string'?msg.data.e.slice(0,160):'';NET.pendT=Date.now()-1500;NET.nrej=(NET.nrej||0)+1;if(e&&G){toast(e);NET.lastRej=e}}
+function onNetRej(msg){if(!isClient()||msg.peer!==NET.hostPeer)return;const e=msg.data&&typeof msg.data.e==='string'?msg.data.e.slice(0,160):'';NET.nrej=(NET.nrej||0)+1;if(e&&G){toast(e);NET.lastRej=e}}
 function netRej(peer,why){NET.rej++;NET.why.push(String(why).slice(0,60));if(NET.why.length>60)NET.why.shift();try{if(peer){NET.room.sendTo(peer,'rej',{e:'That move was not accepted.'}).catch(()=>{});delete NET.lastSent[peer];netPush()}}catch(x){}}
 // the host's check of a client's move: the sender owns a human seat, the seat is asked, and TB.moves offers exactly that key
 function onNetAct(msg){if(!isHost()||!G||msg.isMe)return;const d=msg.data;
   if(!d||typeof d!=='object'||Array.isArray(d)){netRej(null,'shape');return}
+  if(Number.isInteger(d.n)&&d.n>0&&d.n<1e9)NET.ack[msg.peer]=Math.max(NET.ack[msg.peer]||0,d.n);   // answered (accepted or not) by the next copy this peer gets
   let seat=NET.seatPeer.indexOf(msg.peer);
   if(seat<0&&msg.by){const i=NET.seatUid.findIndex((u,k)=>u&&u===msg.by&&G.pl[k]);if(i>=0){netBack(i,msg.peer);seat=i}}
   if(seat<0||seat>=G.np||G.pl[seat].ai||G.over){netRej(null,'not a human seat');return}
@@ -2871,7 +2872,7 @@ function netPump(){if(UI.pumping)return;UI.pumping=true;
 function netSig(){return G.logN+':'+(G.q?G.q.kind+':'+(G.q.chosen?G.q.chosen.length:'')+':'+G.q.seats.join():'')}
 function netHumanMove(k){const s=NET.mySeat;if(!G||!G.q||s<0||!G.q.seats.includes(s)||G.pl[s].ai)return false;
   const mv=legal(s).find(m=>m.k===k);if(!mv)return false;
-  if(isClient()){const key=G.logN+':'+G.q.kind+':'+(G.q.chosen?G.q.chosen.length:'')+':'+k;if(NET.pend===key&&Date.now()-NET.pendT<2500)return false;NET.pend=key;NET.pendSig=netSig();NET.pendT=Date.now();(NET.sends=NET.sends||[]).push([Date.now()%100000,k,netSig(),NET.applied,NET.lastRx&&Date.now()-NET.lastRx,legal(s).length]);if(NET.sends.length>400)NET.sends.shift();UI.sel={};UI.hand=null;closePop(true);netSend(k);return true}
+  if(isClient()){const key=G.logN+':'+G.q.kind+':'+(G.q.chosen?G.q.chosen.length:'')+':'+k;if(NET.pend&&Date.now()-NET.pendT<5000)return false;NET.pend=key;NET.pendT=Date.now();(NET.sends=NET.sends||[]).push([Date.now()%100000,k,netSig(),NET.applied,NET.lastRx&&Date.now()-NET.lastRx,legal(s).length]);if(NET.sends.length>400)NET.sends.shift();UI.sel={};UI.hand=null;closePop(true);netSend(k);return true}
   const ok=doMove(mv);if(ok){UI.sel={};UI.hand=null;closePop(true);pump()}return ok}
 // ---- text helpers for the waiting line ----
 function seatWho(s){const P=G.pl[s];const nm=P.ai?'':(NET.on&&P.name?P.name.replace(/\s*\(.*\)$/,''):'');return shortName(s).replace(' (you)','')+(nm?' ('+nm+')':'')}
