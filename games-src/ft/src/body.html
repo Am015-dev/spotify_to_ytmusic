@@ -2,6 +2,7 @@
 <div class="gx-app">
 <header class="gx-bar">
   <h1>Sands of Qamar</h1>
+  <span id="pchip" class="pchip" role="status"></span>
   <span class="gx-sp"></span>
   <button class="gx-ibtn adv-btn" data-a="advise" title="What would a good player do now?"><i data-ic="bulb"></i><span>Advise me</span></button>
   <button class="gx-ibtn nar-hide" data-gx="plrd" aria-expanded="false"><i data-ic="camel"></i><span>Players</span></button>
@@ -22,6 +23,7 @@
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Sands of Qamar</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel">↕</button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel">⇥</button></div>
     <div id="dockmsg" hidden role="status"></div><div class="gx-dock-body" id="dockbody"></div>
+    <div id="ps" hidden></div><div id="ppop" role="dialog" aria-label="Details" hidden></div><div id="pc" role="dialog" aria-label="Card" hidden></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock">☰ Panel</button>
 </div>
@@ -54,5 +56,6 @@
 <script src="sound.js"></script>
 <script src="net.js"></script>
 <script src="ui.js"></script>
+<script src="ui8.js"></script>
 </body>
 </html>

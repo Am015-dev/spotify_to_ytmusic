@@ -51,10 +51,10 @@ function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return fa
   const rim=new THREE.DirectionalLight(0xa8c6ff,1.25);rim.position.set(9,7,-16);sc.add(rim);
   buildTable();fxKeepers();
   cv.addEventListener('pointerdown',e=>{V3.drag={x:e.clientX,y:e.clientY,a:V3.orbit.a,e:V3.orbit.e,moved:false}});
-  window.addEventListener('pointermove',e=>{const d=V3.drag;if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>6)d.moved=true;if(d.moved){V3.orbit.a=d.a-dx*.006;V3.orbit.e=Math.max(.55,Math.min(1.45,d.e+dy*.004))}});
+  window.addEventListener('pointermove',e=>{const d=V3.drag;if(!d)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>6)d.moved=true;if(d.moved&&!(typeof PHONE!=='undefined'&&PHONE.on)){V3.orbit.a=d.a-dx*.006;V3.orbit.e=Math.max(.55,Math.min(1.45,d.e+dy*.004))}});
   window.addEventListener('pointerup',e=>{const d=V3.drag;V3.drag=null;if(d&&!d.moved&&e.target===cv){const id=pickTile(e);if(id!=null&&typeof on3DTile==='function')on3DTile(id)}});
   cv.addEventListener('pointermove',e=>{V3.hover=pickTile(e)});cv.addEventListener('pointerleave',()=>{V3.hover=null});
-  cv.addEventListener('wheel',e=>{e.preventDefault();V3.zoom=Math.max(.6,Math.min(1.6,(V3.zoom||1)+e.deltaY*.001));fitDist()},{passive:false});
+  cv.addEventListener('wheel',e=>{e.preventDefault();if(typeof PHONE!=='undefined'&&PHONE.on)return;V3.zoom=Math.max(.6,Math.min(1.6,(V3.zoom||1)+e.deltaY*.001));fitDist()},{passive:false});
   buildPieces();buildPlinth();V3.on=true;document.body.classList.add('three');applyQ();new ResizeObserver(()=>resize3D()).observe(cv.parentElement);resize3D(true);
   V3.clock=new THREE.Clock();perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
 // PerfHUD: overlay, speed test, auto step-down/up and the idle-frame saver (see perf/INTEGRATE.md)
@@ -134,7 +134,7 @@ function placeCam(){const o=V3.cur;V3.cam.position.set(V3.look.x+Math.sin(o.a)*M
 function resize3D(snap){if(!V3.r)return;V3.dirty=true;const el=V3.r.domElement.parentElement;const w=Math.max(50,el.clientWidth),h=Math.max(50,el.clientHeight);V3.r.setSize(w,h,false);V3.r.domElement.style.width=w+'px';V3.r.domElement.style.height=h+'px';V3.cam.aspect=w/h;V3.cam.updateProjectionMatrix();
   if(V3.post)postSize(w,h);fitDist();if(snap!==false){Object.assign(V3.cur,V3.orbit);placeCam()}}
 // fit the whole board (plus stacks) for the current aspect ratio; the camera eases there
-function fitDist(){const a=V3.cam.aspect;const W=BW()*(TS+GAP)+2.6,D=BH()*(TS+GAP)+2.6;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);
+function fitDist(){if(typeof PHONE!=='undefined'&&PHONE.on)return phFit();const a=V3.cam.aspect;const W=BW()*(TS+GAP)+2.6,D=BH()*(TS+GAP)+2.6;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);
   const e=V3.orbit.e;const needH=(D*Math.sin(e)+3)/2,needW=W/2;const d=Math.max(needH/Math.tan(vf/2),needW/Math.tan(hf/2))*1.06+3;V3.orbit.d=d*(V3.zoom||1)}
 function tilePos(i){const W=BW(),H=BH();const c=i%W,r=Math.floor(i/W);return new THREE.Vector3((c-(W-1)/2)*(TS+GAP),0,(r-(H-1)/2)*(TS+GAP))}
 function seeded(s){return()=>{s=(s*16807)%2147483647;return(s-1)/2147483646}}
@@ -227,7 +227,7 @@ function syncStacks(){const want={};
   let born=0;for(const id in want){const w=want[id];let s=V3.stacks[id];if(!s){const g=meepleMesh(w.c);const p0=tilePos(w.i);g.position.set(p0.x+(Math.random()-.5)*.3,TH+2.4,p0.z+(Math.random()-.5)*.3);const col=new THREE.Color(MCOL[w.c]||0x888888);col.offsetHSL(0,(Math.random()-.5)*.04,(Math.random()-.5)*.05);
       s=V3.stacks[id]={g,c:w.c,col,rot:Math.random()*6,delay:Math.min(1.2,born++*.012)}}
     const p=tilePos(w.i);const cols=Math.min(4,Math.ceil(Math.sqrt(w.n)));const row=Math.floor(w.k/cols),col=w.k%cols;s.i=w.i;s.hand=!!w.hand;
-    s.to=w.hand?new THREE.Vector3(p.x-.4+w.k*.28,TH+1.1,p.z-.2):new THREE.Vector3(p.x-.5+col*.33,TH+.004,p.z-.3+row*.3)}}
+    const ss=V3.pawnScale||1;s.to=w.hand?new THREE.Vector3(p.x-.4*ss+w.k*.28*ss,TH+1.1,p.z-.2):new THREE.Vector3(p.x-.5*ss+col*.33*ss,TH+.004,p.z-.3+row*.3*ss)}}
 function tween(obj,k,to,dur){V3.tweens.push({obj,k,from:obj[k],to,t:0,dur})}
 const ease=k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;
 // ---- particles: dust puffs on landing, sparkles on claims and builds ----
@@ -250,8 +250,8 @@ function stepPieces(dt,t){let n=0;const P=V3.pawns,B=V3.pblobs;
     if(s.to&&(!s.arc||!s.arc.to.equals(s.to))&&pos.distanceTo(s.to)>.02){const d=pos.distanceTo(s.to);s.arc={from:pos.clone(),to:s.to.clone(),t:-(s.delay||0),dur:.34+Math.min(.3,d*.05),h:Math.min(1.2,.35+d*.12)};s.delay=0}
     if(s.arc){const a=s.arc;a.t+=dt;if(a.t>=0){const k=Math.min(1,a.t/a.dur),e=ease(k);pos.lerpVectors(a.from,a.to,e);pos.y+=Math.sin(Math.PI*k)*a.h;if(k>=1){s.arc=null;pos.copy(a.to);if(!s.hand){s.sq=0;if(Math.random()<.5||V3.q!=='low')burst(pos,'dust',3)}}}}
     let sq=0;if(s.sq!=null){s.sq+=dt;const u=s.sq/.32;if(u>=1)s.sq=null;else sq=Math.sin(u*Math.PI)*.16*(1-u)}
-    const lift=V3.lift[s.i]||0;_v.copy(pos);_v.y+=lift+(s.hand&&!s.arc?Math.sin(t*3+s.rot)*.06:0);_s.set(1+sq*.6,1-sq,1+sq*.6);_q.setFromEuler(_e.set(0,s.rot+(s.hand?t*.8:0),0));_m4.compose(_v,_q,_s);P.setMatrixAt(n,_m4);P.setColorAt(n,s.col);
-    const hgt=Math.max(0,_v.y-TH);const bs=.5*Math.max(.35,1-hgt*.45);_v.set(pos.x,TH+.006+lift,pos.z);_s.set(bs,1,bs);_q.identity();_m4.compose(_v,_q,_s);B.setMatrixAt(n,_m4);n++;if(n>=180)break}
+    const lift=V3.lift[s.i]||0;_v.copy(pos);_v.y+=lift+(s.hand&&!s.arc?Math.sin(t*3+s.rot)*.06:0);const ps=V3.pawnScale||1;_s.set((1+sq*.6)*ps,(1-sq)*ps,(1+sq*.6)*ps);_q.setFromEuler(_e.set(0,s.rot+(s.hand?t*.8:0),0));_m4.compose(_v,_q,_s);P.setMatrixAt(n,_m4);P.setColorAt(n,s.col);
+    const hgt=Math.max(0,_v.y-TH);const bs=.5*ps*Math.max(.35,1-hgt*.45);_v.set(pos.x,TH+.006+lift,pos.z);_s.set(bs,1,bs);_q.identity();_m4.compose(_v,_q,_s);B.setMatrixAt(n,_m4);n++;if(n>=180)break}
   V3.moving=Object.values(V3.stacks).some(s=>s.arc||s.sq!=null);P.count=B.count=n;P.instanceMatrix.needsUpdate=B.instanceMatrix.needsUpdate=true;if(P.instanceColor)P.instanceColor.needsUpdate=true}
 function stepAnims(dt){for(let k=V3.anims.length-1;k>=0;k--){const o=V3.anims[k];const a=o.userData.anim;a.t+=dt;const u=Math.max(0,Math.min(1,a.t/.55));
     if(a.kind==='drop'){const e=u<.7?Math.pow(u/.7,2):1;o.position.y=a.base.y+(1-e)*1.6+(u>.7?Math.sin((u-.7)/.3*Math.PI)*.12*(1-u):0);if(u>=.7&&!a.hit){a.hit=1;const p=tilePos(a.tile);burst(new THREE.Vector3(p.x+o.position.x,TH,p.z+o.position.z),'dust',6);burst(new THREE.Vector3(p.x+o.position.x,TH,p.z+o.position.z),'spark',8)}}

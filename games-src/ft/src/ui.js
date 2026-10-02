@@ -21,9 +21,9 @@ function computePick(){UI.pick=[];UI.pickFaint=[];UI.badges=null;const p=me();if
   if(G.step==='tribe'&&G.act.color==='assassin')UI.pick=[...new Set(vm.filter(m=>m.act==='tribe'&&m.kill&&m.kill.tile!=null).map(m=>m.kill.tile))];
   if(G.step==='tile')UI.pick=[...new Set(vm.filter(m=>m.place!=null).map(m=>m.place))]}
 // ---------- top-level render ----------
-function render(){if(!G){renderModal();return}if(G.move&&!UI.autoPlan&&(!UI.path||UI.path.length!==G.move.path.length))showPath(G.move.path.slice());if(G.phase==='bid'&&!UI.modal)showChapter();renderDock();renderPopups();renderModal();renderMap2D();
+function render(){if(!G){renderModal();if(typeof phRender==='function')phRender();return}if(G.move&&!UI.autoPlan&&(!UI.path||UI.path.length!==G.move.path.length))showPath(G.move.path.slice());if(G.phase==='bid'&&!UI.modal)showChapter();renderDock();renderPopups();renderModal();renderMap2D();
   const pb=$('#pausebtn');if(pb){pb.hidden=human();pb.innerHTML=ICON(UI.pause?'play':'pause')}const sb=$('#speedbtn');if(sb)sb.innerHTML=ICON('fast')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';
-  renderChip()}
+  renderChip();if(typeof phRender==='function')phRender()}
 function renderChip(){const ch=$('#chip');if(ch&&G){const s=sideToAct();ch.textContent=(G.over?'Game over':`Round ${G.round} · ${G.phase==='bid'?'bidding':s>=0?(online()&&s===NET.mySeat?'You':P(s).nm)+(G.phase==='turn'?' · '+stepName():''):''}`)+(online()?' · 🌐 '+netStatus().replace(/ players online$/,' online'):'')}}
 function stepName(){return {move:'moving',tribe:'tribe action',tile:'tile action',sell:'selling'}[G.step]||''}
 function pChip(p){return `<span class="pc" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}</span>`}
