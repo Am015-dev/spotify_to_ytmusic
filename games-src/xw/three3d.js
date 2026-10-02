@@ -485,8 +485,8 @@ function tags3D(){const box=document.getElementById('tags');if(!box)return;for(c
 // ---- camera: drag to orbit, right-drag or two fingers to pan, wheel/pinch to zoom ----
 function bindCamera(cv){const P={};cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);P[e.pointerId]={x:e.clientX,y:e.clientY,b:e.button,x0:e.clientX,y0:e.clientY,t:performance.now()}});
   cv.addEventListener('pointermove',e=>{const p=P[e.pointerId];if(!p)return;const ids=Object.keys(P);const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;const C=V3.cam;V3.ez=null;
-    if(ids.length===2){const o=P[ids.find(i=>i!=e.pointerId)];const d0=Math.hypot(p.x-dx-o.x,p.y-dy-o.y),d1=Math.hypot(p.x-o.x,p.y-o.y);C.dist=Math.max(35,Math.min(maxDist(),C.dist*d0/Math.max(1,d1)));panBy(dx/2,dy/2);return}
-    if(p.b===2||e.shiftKey)panBy(dx,dy);else{C.yaw-=dx*.005;C.pitch=Math.max(.25,Math.min(1.45,C.pitch+dy*.004))}});
+    if(ids.length===2){const o=P[ids.find(i=>i!=e.pointerId)];const d0=Math.hypot(p.x-dx-o.x,p.y-dy-o.y),d1=Math.hypot(p.x-o.x,p.y-o.y);C.dist=Math.max(35,Math.min(maxDist(),C.dist*d0/Math.max(1,d1)));panBy(dx/2,dy/2);if(window.PHN&&PHN.on)PHN.clamp();return}
+    if(window.PHN&&PHN.on){if(Math.hypot(e.clientX-p.x0,e.clientY-p.y0)>8)panBy(dx,dy);PHN.clamp();return}if(p.b===2||e.shiftKey)panBy(dx,dy);else{C.yaw-=dx*.005;C.pitch=Math.max(.25,Math.min(1.45,C.pitch+dy*.004))}});
   const up=e=>{const p=P[e.pointerId];delete P[e.pointerId];if(p&&Math.hypot(e.clientX-p.x0,e.clientY-p.y0)<6&&performance.now()-p.t<500)onClick3D(e)};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',e=>delete P[e.pointerId]);
   cv.addEventListener('wheel',e=>{e.preventDefault();V3.ez=null;V3.cam.dist=Math.max(35,Math.min(maxDist(),V3.cam.dist*(1+Math.sign(e.deltaY)*.1)))},{passive:false});cv.addEventListener('contextmenu',e=>e.preventDefault())}
 function panBy(dx,dy){const C=V3.cam,k=C.dist/900;C.tx-=(Math.cos(C.yaw)*dx+Math.sin(C.yaw)*dy)*k*1.2;C.tz-=(-Math.sin(C.yaw)*dx+Math.cos(C.yaw)*dy)*k*1.2;C.tx=Math.max(-10,Math.min(100,C.tx));C.tz=Math.max(-10,Math.min(100,C.tz))}
@@ -495,16 +495,16 @@ const maxDist=()=>Math.max(220,V3.fitDist*1.6);
 function placeCam(sx,sy,C){C=C||V3.cam;V3.camera.position.set(C.tx+Math.sin(C.yaw)*Math.cos(C.pitch)*C.dist+(sx||0),Math.sin(C.pitch)*C.dist+(sy||0),C.tz+Math.cos(C.yaw)*Math.cos(C.pitch)*C.dist);V3.camera.lookAt(C.tx,0,C.tz)}
 // fit the camera so the whole 91.4 x 91.4 mat (plus the height of the ships' name plates) fills the board at any aspect ratio
 function fitCam(k){if(!V3.camera)return;const C=V3.cam,cam=V3.camera,top=k==='top';const asp=V3.camera.aspect||1.6;// online, side 1 sees the mat from its own edge
-  const yaw=typeof NET!=='undefined'&&NET.on&&NET.mySide===1?Math.PI:0,sg=Math.cos(yaw);Object.assign(C,{yaw,pitch:top?1.45:.98+Math.max(0,Math.min(1,(1.45-asp)/.5))*.22,tx:45.7,tz:45.7,dist:C.dist||122});
-  const pts=[];for(const x of [0,91.4])for(const z of [0,91.4])for(const y of (top?[0]:[0,9]))pts.push(new THREE.Vector3(x,y,z));const lim=.95;
+  const yaw=typeof NET!=='undefined'&&NET.on&&NET.mySide===1?Math.PI:0,sg=Math.cos(yaw);const phn=window.PHN&&PHN.on;Object.assign(C,{yaw,pitch:phn?1.52:top?1.45:.98+Math.max(0,Math.min(1,(1.45-asp)/.5))*.22,tx:45.7,tz:45.7,dist:C.dist||122});
+  const pts=[];for(const x of [0,91.4])for(const z of [0,91.4])for(const y of (top?[0]:[0,9]))pts.push(new THREE.Vector3(x,y,z));const lim=phn?.985:.95;
   for(let it=0;it<60;it++){placeCam();cam.updateMatrixWorld();let a=1e9,b=-1e9,c=1e9,d=-1e9;for(const p of pts){const q=p.clone().project(cam);a=Math.min(a,q.x);b=Math.max(b,q.x);c=Math.min(c,q.y);d=Math.max(d,q.y)}
     const ext=Math.max((b-a)/2,(d-c)/2)/lim;C.dist*=1+(ext-1)*.8;C.tz-=sg*(c+d)/2*25;C.tx+=sg*(a+b)/2*25;if(Math.abs(ext-1)<.002&&Math.abs(c+d)<.004)break}
   V3.fitDist=C.dist}
 // switching views eases the camera over ~0.7 s (instant with reduced motion); resizes snap so the mat always fits
-function camView(k){const from=V3.camera&&V3.on?Object.assign({},V3.cam):null;V3.view=k;if(typeof UI!=='undefined')UI.top=k==='top';fitCam(k);
+function camView(k){if(window.PHN&&PHN.on)k='top';const from=V3.camera&&V3.on?Object.assign({},V3.cam):null;V3.view=k;if(typeof UI!=='undefined')UI.top=k==='top';fitCam(k);
   if(from&&V3.on&&!reduceMotion()){V3.ez={from,t0:performance.now(),dur:700}}}
 function reduceMotion(){try{return matchMedia('(prefers-reduced-motion: reduce)').matches}catch(e){return false}}
-function onClick3D(e){const c=V3.r.domElement,r=c.getBoundingClientRect();const m=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(m,V3.camera);
+function onClick3D(e){if(window.PHN&&PHN.on&&PHN.tap(e))return;const c=V3.r.domElement,r=c.getBoundingClientRect();const m=new THREE.Vector2((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(m,V3.camera);
   const picks=Object.values(V3.ships).filter(g=>g.visible).map(g=>g.userData.pick);const h=rc.intersectObjects(picks)[0];if(h&&typeof uiAct==='function'){uiAct({ship:h.object.userData.ship});return}
   const pt=new THREE.Vector3();if(typeof matPick==='function'&&rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),pt))matPick(pt.x*10,MAT-pt.z*10)}
 // the canvas fills the whole board (width AND height); the camera is refitted to the new aspect ratio

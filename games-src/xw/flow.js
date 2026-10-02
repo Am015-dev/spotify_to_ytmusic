@@ -83,7 +83,7 @@ const _schedF=schedule;schedule=function(){if(UI.hold&&G&&!G.winner)return;retur
 function releaseHold(){UI.hold=null;const ks=UI.holdK.splice(0);render();for(const k of ks)try{k()}catch(e){console.error(e)}schedule()}
 // a finished attack that involved a human ship: in guided mode it pauses on the result
 function flowWatch(){flowSync();if(!G)return;if(G.winner&&UI.hold){UI.hold=null;UI.holdK=[]}const R=UI.results[0];
-  if(R&&R.t>UI.resSeen){UI.resSeen=R.t;const a=ship(R.a),d=ship(R.d);if(guided()&&holdOK()&&!G.winner&&!UI.hold&&(mine(a)||mine(d)))UI.hold={kind:'res',R}}
+  if(R&&R.t>UI.resSeen){UI.resSeen=R.t;const a=ship(R.a),d=ship(R.d);if((guided()||(window.PHN&&PHN.on))&&holdOK()&&!G.winner&&!UI.hold&&(mine(a)||mine(d)))UI.hold={kind:'res',R}}
   if(G.phase!=='plan'&&UI.draftR!==G.round)UI.draftR=null;if(G.phase==='plan'&&UI.draftR!==G.round){UI.draft={};UI.draftR=G.round}}
 function holdHTML(){const H=UI.hold;const g=guided();let h='';
   if(H.kind==='res'){const R=H.R;const a=ship(R.a),d=ship(R.d);h+=`<p class="head">Combat · attack result</p>${stepList(['Choose a target','Roll and modify dice','Result'],2)}${resultHTML(R)}${R.dice?`<div class="drow"><span class="dl">Attack dice · ${esc(shortName(a))}</span><div class="dice">${R.dice.map(f=>die(f,'atk')).join('')||'<i class="muted small">none</i>'}</div></div><div class="drow"><span class="dl">Defence dice · ${esc(shortName(d))}</span><div class="dice">${R.def.map(f=>die(f,'def')).join('')||'<i class="muted small">none</i>'}</div></div>`:''}`;

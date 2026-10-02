@@ -68,7 +68,7 @@ function askButtons(q){const rk=(q.key==='rock'||q.key==='deploy')?recOpt(q).o.k
   return `<div class="acts col">${q.opts.map((o,i)=>btn(o,i)).join('')}</div>`}
 // tapping the mat picks the nearest outlined spot of the current question (asteroid spots, placements)
 function matPick(x,y){if(!G||G.phase!=='ask'||!G.q||!humanTurn())return;let best=null,bd=1e9;for(const o of G.q.opts){if(!o.p)continue;const d=Math.hypot(o.p.x-x,o.p.y-y);if(d<bd){bd=d;best=o}}
-  if(best&&bd<=(best.b||40)/2+25){sfx('click');uiAct({act:'ask',k:best.k})}}
+  if(best&&bd<=(best.b||40)/2+(window.PHN&&PHN.on?80:25)){sfx('click');uiAct({act:'ask',k:best.k})}}
 // an eight-sided die drawn as a faceted octahedron (front face, three side facets) with its symbol engraved in the front face;
 // when WebGL is on, rendered 3D dice replace the drawing (see makePortraits in three3d.js)
 const D8SYM=(()=>{const star=(n,r0,r1)=>{let d='';for(let i=0;i<n*2;i++){const a=i/(n*2)*Math.PI*2-Math.PI/2,r=i%2?r1:r0;d+=(i?'L':'M')+(Math.cos(a)*r).toFixed(3)+' '+(Math.sin(a)*r).toFixed(3)}return d+'Z'};
@@ -166,7 +166,7 @@ function render2D(){const svg=$('map');if(!svg||!G)return;const F=typeof NET!=='
   for(const o of G.rocks)h+=`<polygon points="${rockPoly(o).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="#6b5a55"/>`;
   const sel=UI.sel&&ship(UI.sel);if(G.phase==='plan'&&sel&&myPlanShip(sel)){const di=UI.hoverDial!=null?UI.hoverDial:UI.draft[sel.id];if(di!=null){const m=dialOf(sel)[di];h+=`<polyline points="${tplPoints(sel,B(sel),m,4).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" stroke="${m.c==='r'?'#f55':m.c==='g'?'#5f8':'#fff'}" stroke-width="20" stroke-opacity=".4" fill="none"/>`;const fp=finalPose(sel,B(sel),m);h+=`<polygon points="${corners(fp,B(sel)).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="none" stroke="#fff" stroke-dasharray="4 3"/>`}}
   for(const s of G.ships){if(!s.alive)continue;const c=FACCOL[FACTIONS[G.fac[s.side]].col].base;const P=corners(s,B(s));const f=add(s,mul(fwd(s.h),B(s)/2));
-    h+=`<g data-ship="${s.id}" class="seat"><polygon points="${P.map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="#15122e" stroke="${c}" stroke-width="${G.cur===s.id?5:2.5}"/><line x1="${X(s.x)}" y1="${Y(s.y)}" x2="${X(f.x)}" y2="${Y(f.y)}" stroke="${c}" stroke-width="4"/><text x="${X(s.x)}" y="${Y(s.y)-B(s)/2-6}" text-anchor="middle" font-size="16" fill="#fff">${esc(s.name.split(' ')[0])} ${s.hull-hullDmg(s)}</text></g>`}
+    h+=`<g data-ship="${s.id}" class="seat"><polygon points="${P.map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="#15122e" stroke="${c}" stroke-width="${G.cur===s.id?5:2.5}"/>${window.PHN&&PHN.on?`<circle cx="${X(s.x)}" cy="${Y(s.y)}" r="70" fill="rgba(0,0,0,0.01)"/>`:''}<line x1="${X(s.x)}" y1="${Y(s.y)}" x2="${X(f.x)}" y2="${Y(f.y)}" stroke="${c}" stroke-width="4"/><text x="${X(s.x)}" y="${Y(s.y)-B(s)/2-6}" text-anchor="middle" font-size="16" fill="#fff">${esc(s.name.split(' ')[0])} ${s.hull-hullDmg(s)}</text></g>`}
   if(G.phase==='ask'&&G.q)G.q.opts.forEach((o,i)=>{if(!o.p)return;const on=UI.hoverAct&&UI.hoverAct.a==='Q'&&UI.hoverAct.i===i;h+=`<polygon points="${corners(o.p,o.b||40).map(p=>X(p.x)+','+Y(p.y)).join(' ')}" fill="none" stroke="#6df" stroke-width="${on?4:1.5}" stroke-dasharray="5 4" opacity="${on?1:.55}"/>`})
   svg.innerHTML=h}
 // ---- input: every action goes through gameAct(ds, side) ----
@@ -221,7 +221,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
   if(ds.a==='speed'){const s=['slow','normal','fast'];UI.speed=s[(s.indexOf(UI.speed||'normal')+1)%3];AIDELAY={slow:1100,normal:600,fast:220}[UI.speed];$('speedbtn').textContent='⏩ '+UI.speed;return}
   if(ds.act){uiAct(Object.assign({},ds));return}
   if(ds.ship){uiAct({ship:ds.ship})}});
-document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-dial],[data-hov]');const nd=t&&t.dataset.dial!=null?+t.dataset.dial:null;const nh=t&&t.dataset.hov?{a:t.dataset.hov.split(':')[0],i:+t.dataset.hov.split(':')[1]}:null;
+document.addEventListener('mouseover',e=>{if(window.PHN&&PHN.on)return;/* phone: previews come from taps (armed buttons, the dial pop-up), not from hover */const t=e.target.closest('[data-dial],[data-hov]');const nd=t&&t.dataset.dial!=null?+t.dataset.dial:null;const nh=t&&t.dataset.hov?{a:t.dataset.hov.split(':')[0],i:+t.dataset.hov.split(':')[1]}:null;
   if(nd!==UI.hoverDial||JSON.stringify(nh)!==JSON.stringify(UI.hoverAct)){UI.hoverDial=nd;UI.hoverAct=nh;if(V3.on)drawGuides();else render2D();const info=document.querySelector('.dialinfo .mvread');if(info&&G&&G.phase==='plan'&&UI.sel&&ship(UI.sel)){const s=ship(UI.sel);const di=nd!=null?nd:UI.draft[s.id];if(di!=null)info.innerHTML=moveRead(s,di)}}});
 document.addEventListener('change',e=>{if(e.target.dataset.fac!=null){UI.fac[+e.target.dataset.fac]=+e.target.value;saveSetup()}});
 document.addEventListener('keydown',e=>{if(e.target&&/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;if(e.key==='Escape'){UI.rules=false;UI.stats=false;if(typeof NET!=='undefined'&&NET.on&&NET.inLobby)NET.lobbyMin=true;render();return}
