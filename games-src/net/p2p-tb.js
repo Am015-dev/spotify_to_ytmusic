@@ -20,7 +20,7 @@ async function mkPage(tag,{uid,hash,vp}={}){const c=await B.newContext({viewport
   await c.route('**/*',r=>{const u=r.request().url();if(u.startsWith('https://gns.test/'))return r.fulfill({body:html,contentType:'text/html; charset=utf-8'});return r.abort()});
   const p=await c.newPage();const P={tag,p,c,errs:[],closed:false};p.on('pageerror',e=>P.errs.push(e.message));p.on('console',m=>{if(m.type()==='error')P.errs.push(m.text())});
   await p.goto('https://gns.test/thornbound/'+(PHONE?'?phone=1':'')+(hash||''),{waitUntil:'domcontentloaded',timeout:120000});await sleep(1500);
-  await p.evaluate(()=>{ANIM=0;AIDELAY=0;UI.speed=40;
+  await p.evaluate(a=>{ANIM=a?1:0;AIDELAY=a?150:0;UI.speed=a?4:40;
     window.__sent=0;window.__leak=0;window.__leakWhat=[];window.__simul=0;window.__bad=0;window.__badWhat=[];window.__rxLeak=0;window.__rx=0;
     const own=id=>(id/100)|0;
     // host side: every packet it sends is compared with the host's real G
@@ -37,7 +37,7 @@ async function mkPage(tag,{uid,hash,vp}={}){const c=await B.newContext({viewport
       return o.apply(this,arguments)};
     // client side: whatever arrives is checked once more
     const ap=applyNet;applyNet=function(x){try{window.__rx++;const g=x&&x.g;if(g){const me=NET.mySeat;g.pl.forEach((q,i)=>{if(i===(x.seat))return;if(q.hand.some(id=>id>=0)||q.deck.some(id=>id>=0))window.__rxLeak++});if(g.seed||g.rng||(g.stats&&Object.keys(g.stats).length))window.__rxLeak++}}catch(e){}return ap(x)};
-  });
+  },!!process.env.ANIM1);
   pages.push(P);return P}
 // one random click on this page's own buttons (only when it is this page's decision)
 const tick=()=>{const d=document,rnd=a=>a[Math.floor(Math.random()*a.length)];
@@ -57,7 +57,7 @@ const tick=()=>{const d=document,rnd=a=>a[Math.floor(Math.random()*a.length)];
   if(mvb.length){const pri=mvb.filter(x=>x.classList.contains('pri'));click(Math.random()<.5&&pri.length?pri[0]:rnd(mvb));return 1}return 0};
 const final=()=>G&&{w:G.over&&G.over.winner,scores:G.over&&G.over.scores,rank:G.over&&G.over.ranking,r:G.round,inf:G.pl.map(p=>p.inf),lore:G.pl.map(p=>p.lore),hand:G.pl.map(p=>p.hand.length),ai:G.pl.map(p=>!!p.ai),herald:G.pl.map(p=>p.herald),council:G.council&&Object.values(G.council).map(c=>c.length),last:G.log.slice(-2).map(e=>e.t),card:UI.card&&UI.card.kind};
 async function clk(P,sel){const ok=await P.p.evaluate(s=>{const b=document.querySelector(s);if(!b||b.disabled)return false;b.click();return true},sel);if(!ok)throw new Error('no button '+sel+' on '+P.tag)}
-async function shot(P,name,vp){if(vp)await P.p.setViewportSize(vp);await sleep(600);await P.p.screenshot({path:path.join(OUT,name+'.png')});log('shot',name)}
+async function shot(P,name,vp){if(vp)await P.p.setViewportSize(vp);await P.p.evaluate(()=>{const b=document.querySelector('#pc [data-a=tipok]');if(b)b.click()}).catch(()=>{});await sleep(600);await P.p.screenshot({path:path.join(OUT,name+'.png')});log('shot',name)}
 async function waitFor(P,fn,ms,arg){const t0=Date.now();while(Date.now()-t0<ms){if(await P.p.evaluate(fn,arg).catch(()=>false))return true;await sleep(150)}return false}
 async function openOnl(P){await P.p.evaluate(()=>{const d=document.getElementById('onl');if(d&&!d.open)d.querySelector('summary').click()});await sleep(200)}
 async function hostRoom(H,name){await openOnl(H);await H.p.fill('#netname',name);await clk(H,'[data-a="nethost"]');await waitFor(H,()=>NET.on&&NET.code,10000);return await H.p.evaluate(()=>NET.code)}
@@ -93,6 +93,10 @@ if(MODE==='ui'){
   res.started=await waitFor(C[0],()=>G&&UI.started&&NET.mySeat===1,30000);await sleep(1500);
   res.statusLine=await C[0].p.evaluate(()=>{const e=document.querySelector('#netst');const b=document.querySelector('#board').getBoundingClientRect(),r=e.getBoundingClientRect();return {text:e.textContent.trim().slice(0,90),hidden:e.hidden,belowBoard:r.top>=b.bottom-1||r.left>=b.right-1,overBoard:!(r.bottom<=b.top||r.top>=b.bottom||r.right<=b.left||r.left>=b.right)}});
   await shot(C[0],'client-start');await shot(H,'host-start');
+  // a latecomer (never seated) watches: no hand, no buttons, still gets state
+  const SP=await mkPage('spectator');await joinRoom(SP,'Watcher',code);res.spectator=await waitFor(SP,()=>G&&UI.started&&NET.mySeat===-1,30000);await sleep(1500);
+  res.spectatorView=await SP.p.evaluate(()=>({seat:NET.mySeat,hand:!document.querySelector('#handw .hc'),moveButtons:document.querySelectorAll('#main [data-a=mv]').length,faceUpOfOthers:document.querySelectorAll('[data-owner][data-up="1"]').length,status:(document.getElementById('netst')||{}).textContent.trim().slice(0,70)}));await shot(SP,'spectator');
+  res.spectatorPacketLeaks=await H.p.evaluate(()=>__leak);
   // host closes the tab: the client says so
   await H.c.close();H.closed=true;res.hostLeftMsg=await waitFor(C[0],()=>NET.hostGone&&/host left/i.test((document.querySelector('#netbox')||{}).textContent||''),30000);
   await shot(C[0],'client-host-left');const dm=await C[0].p.evaluate(()=>(document.querySelector('#netst')||{}).textContent);res.dock=dm.trim().slice(0,100);
