@@ -191,14 +191,130 @@ body{background:#4a2e1c}
 .nstat{color:var(--mut);display:flex;align-items:center;gap:6px}.dotp{width:9px;height:9px;border-radius:50%;background:var(--gold);animation:dotp 1.2s infinite alternate}@keyframes dotp{from{opacity:.3}to{opacity:1}}
 .lobby .hint{color:var(--mut)}.lobby .tip{color:var(--mut);font-style:italic}.lobby .warn,.online .warn{color:var(--bad);font-weight:600}
 .wait{color:var(--mut);font-style:italic;margin:.3rem 0 0}.stat small.you{color:var(--terra);display:inline}.netst.bad{color:#ffb4a0}
+/* ===== phone layout (html.ph): the map is the screen; play by tapping it; choices in pop-ups next to it ===== */
+.ph-only{display:none}
+html.ph{--bar:44px;touch-action:manipulation}
+html.ph .gx-app{padding:var(--sat,0px) var(--sar,0px) var(--sab,0px) var(--sal,0px);box-sizing:border-box;background:#4a2e1c}
+html.ph .gx-main{display:contents}
+html.ph .gx-reopen,html.ph #chip,html.ph .gx-dock-head,html.ph #dockmsg,html.ph .gx-dock-body{display:none!important}
+html.ph .gx-bar{box-sizing:border-box;padding:0 6px;min-height:var(--bar);height:var(--bar);gap:6px;overflow:hidden;align-items:center;border-bottom-width:0}
+html.ph .gx-bar>*{display:none!important}
+html.ph .gx-bar>.ph-keep{display:inline-flex!important}
+html.ph .gx-bar .gx-ibtn{min-width:44px;width:44px;min-height:44px;height:44px;padding:0;border-radius:10px;flex:0 0 auto}
+html.ph .gx-bar .gx-ibtn>span{display:none}
+html.ph #pbar{flex:1 1 auto;min-width:0;display:flex!important;align-items:center;gap:10px;color:#ffe9c0;font:700 15px var(--ff);white-space:nowrap;overflow:hidden}
+html.ph #pbar .pb-n{display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,.25);border-radius:12px;padding:3px 9px;min-height:30px}
+html.ph #pbar .pb-t{display:inline-flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis}
+html.ph #pbar .pb-t i{width:12px;height:12px;border-radius:4px;flex:0 0 auto}
+html.ph #pbar small{font-weight:600;opacity:.8}html.ph #pbar .netst{font-size:13px}
+html.ph-p .gx-app{grid-template-columns:minmax(0,1fr);grid-template-rows:var(--bar) minmax(0,1fr) var(--dh)}
+html.ph-p .gx-bar{grid-row:1}html.ph-p .gx-board{grid-row:2;grid-column:1}html.ph-p .gx-dock{grid-row:3;grid-column:1}
+html.ph-l .gx-app{grid-template-columns:minmax(0,1fr) var(--rw);grid-template-rows:var(--bar) minmax(0,1fr)}
+html.ph-l .gx-board{grid-column:1;grid-row:1/3}html.ph-l .gx-bar{grid-column:2;grid-row:1}html.ph-l .gx-dock{grid-column:2;grid-row:2}
+html.ph .gx-board{background:#b7a36e}
+html.ph .gx-app .gx-dock{display:flex;flex-direction:column;height:auto!important;max-height:none!important;visibility:visible!important;border:0;box-shadow:none;border-radius:0;padding:0;min-height:0;overflow:clip;position:relative;border-top:3px solid #c99236}
+html.ph-l .gx-app .gx-dock{border-top:0;border-left:3px solid #c99236}
+html.ph .ph-only.pchips,html.ph .pchips{display:flex}
+html.ph .pchips{gap:6px;padding:6px 8px 0;flex:0 0 auto}
+html.ph-l .pchips{flex-wrap:wrap}
+html.ph .pchip{appearance:none;flex:1 1 0;min-width:44px;min-height:44px;border:2px solid var(--pc);border-radius:10px;background:#fffaf0;color:var(--gx-ink);display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:5px;align-items:center;justify-items:center;padding:1px 4px;font:700 15px/1.05 var(--ff);cursor:pointer}
+html.ph-l .pchip{flex:1 1 64px}
+html.ph .pchip .pn{grid-column:1;display:inline-flex;align-items:center;gap:3px;font-size:13px;opacity:.85}html.ph .pchip .pn i{width:9px;height:9px;border-radius:3px;background:var(--pc)}
+html.ph .pchip b{grid-column:2;grid-row:1/3;font-size:19px;font-variant-numeric:tabular-nums}
+html.ph .pchip .pf{grid-column:1;display:inline-flex;align-items:center;gap:1px;font-size:13px;font-weight:600}html.ph .pchip .pf .ic{width:17px;height:17px}
+html.ph .pchip.cur{background:#fff;box-shadow:0 0 0 3px var(--pc);}
+html.ph #ps{display:flex;flex-direction:column;gap:6px;padding:6px 8px 4px;flex:1 1 auto;min-height:0;overflow:auto}
+html.ph .ps-row{display:flex;align-items:center;gap:8px}
+html.ph .ps-tile{flex:0 0 auto;width:72px;height:72px;display:flex;align-items:center;justify-content:center}
+html.ph .ps-tile .tcard{width:68px;height:68px;transition:transform .15s}
+html.ph .ps-mid,html.ph .ps-msg{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:14px;line-height:1.2}
+html.ph .ps-mid b,html.ph .ps-msg b{font:400 16px var(--ff-h);color:var(--terra);display:flex;align-items:center;gap:6px}
+html.ph .ps-msg span,html.ph .ps-mid span{color:var(--mut);font-size:13.5px}
+html.ph .ps-msg .dot{display:inline-block;width:12px;height:12px;border-radius:4px}
+html.ph .ph-rb{display:flex;gap:6px;flex:0 0 auto}
+html.ph .ps-zoom{display:flex;gap:6px;flex-wrap:wrap}
+html.ph .ps-hint{font-size:13.5px;line-height:1.25;color:var(--mut);min-height:1.2em}
+html.ph .pb{appearance:none;font:700 15px var(--ff);min-width:44px;min-height:44px;padding:0 12px;border:2px solid #b8a272;border-radius:12px;background:linear-gradient(#fffdf7,#f1e3c6);color:var(--gx-ink);box-shadow:0 2px 0 #b8a272;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;text-align:left}
+html.ph .pb:active{transform:translateY(1px);box-shadow:0 1px 0 #b8a272}
+html.ph .pb:disabled{opacity:.4}
+html.ph .pb.sq{padding:0 8px}html.ph .pb.sq.wide{padding:0 10px}html.ph .pb small{font-size:13px;opacity:.8}
+html.ph .pb.pri{background:linear-gradient(#d4744a,#a9492a);color:#fff8ec;border-color:#7d3217;box-shadow:0 2px 0 #7d3217;min-width:72px;justify-content:center;font-size:17px}
+html.ph .pb .ic{width:22px;height:22px}
+html.ph .pb.on{background:linear-gradient(#ffe7c2,#ffd08a);border-color:var(--terra)}
+html.ph .pb.rec,html.ph .pb.opt.rec{border-color:#1b9ab3;background:linear-gradient(#f2feff,#d6f3f8);box-shadow:0 2px 0 #1b9ab3}
+html.ph .star{display:inline-flex;align-items:center;gap:3px;font:700 13px var(--ff);font-style:normal;color:#0d7388}html.ph .star .ic{width:15px;height:15px}
+html.ph .btn,html.ph .btn.sm,html.ph .hc,html.ph .seg button,html.ph .gx-x{min-height:44px}
+html.ph .gx-x{min-width:44px}
+html.ph .chk{min-height:44px;align-items:center}html.ph .chk input{width:24px;height:24px}
+html.ph #ppop,html.ph #pc{position:absolute;inset:0;z-index:5;overflow:auto;overscroll-behavior:contain}
+html.ph #ppop:not([hidden]){z-index:6;display:flex;flex-direction:column;gap:6px;background:linear-gradient(#fdf8ec,#f4e6c8);padding:0 8px 6px}
+html.ph #pc:not([hidden]){z-index:7;background:linear-gradient(#fdf8ec,#f4e6c8);padding:6px 10px 8px;display:flex}
+html.ph #ppop.in,html.ph #pc.in{animation:phin .16s ease-out}
+@keyframes phin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+html.ph .ph-head{display:flex;align-items:center;gap:8px;min-height:44px;flex:0 0 auto}
+html.ph .ph-ht{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:1px}html.ph .ph-ht b{flex:none}html.ph .ph-ht small{font:600 13.5px var(--ff);color:var(--mut);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+html.ph .ph-head b{flex:1 1 auto;min-width:0;font:400 17px var(--ff-h);color:var(--terra)}html.ph .ph-head b small{font:600 13.5px var(--ff);color:var(--mut)}
+html.ph .ph-head>small{font:600 13.5px var(--ff);color:var(--mut);white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+html.ph .ph-head .oi.big{width:34px;height:34px;display:inline-flex;color:var(--terra)}html.ph .ph-head .oi.big .ic{width:100%;height:100%}
+html.ph .ph-x{appearance:none;border:0;background:transparent;min-width:44px;min-height:44px;color:var(--gx-ink);cursor:pointer;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+html.ph .ph-x .ic{width:24px;height:24px}
+html.ph .ph-row{display:flex;align-items:center;gap:8px}html.ph .ph-row .pb.place{flex:1 1 auto;min-height:56px}
+html.ph .ph-note{font-size:13.5px;line-height:1.3;color:var(--gx-ink);margin:0}
+html.ph .ph-tabs{display:flex;gap:6px;flex:1 1 auto;min-width:0}
+html.ph-p .ph-head.hastabs .ph-ht{display:none}
+html.ph .ph-tabs.icons .pb.tab span{display:none}html.ph .ph-tabs.icons .pb.tab{padding:0 4px}
+html.ph-l .ph-head{flex-wrap:wrap;row-gap:0}html.ph-l .ph-head .ph-tabs{order:5;flex:1 1 100%}html.ph-l .ph-head .skip{margin-left:auto}
+html.ph .pb.tab{flex:1 1 0;min-width:0;padding:0 4px;gap:4px;font-size:14px;position:relative}html.ph .pb.tab .ic{width:20px;height:20px;flex:0 0 auto}html.ph .pb.tab .star{position:absolute;top:-7px;right:-5px;width:20px;height:20px;border-radius:50%;background:#fff;border:1.5px solid #1b9ab3;justify-content:center;padding:0}html.ph .pb.tab .star .ic{width:13px;height:13px}
+html.ph .ph-opts{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+html.ph .pb.opt{justify-content:flex-start;align-items:center;text-align:left;padding:3px 8px;min-height:58px;position:relative;line-height:1.15}
+html.ph .pb.opt .oi{flex:0 0 auto;width:30px;height:30px;color:var(--terra)}html.ph .pb.opt .oi .ic{width:30px;height:30px}
+html.ph .pb.opt .ot{display:flex;flex-direction:column;gap:2px;min-width:0}html.ph .pb.opt .ot b{font-size:15px}html.ph .pb.opt .ot small{font-size:13px;font-weight:600;opacity:.85}
+html.ph .pb.opt .ot b .star{margin-left:4px;vertical-align:-2px}
+html.ph .pb.skip{min-width:64px;min-height:44px}
+html.ph .ph-menu{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+html.ph .pb.mi{flex-direction:column;gap:2px;min-height:56px;padding:4px 4px;font-size:14px;text-align:center}
+html.ph .ph-tgs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+html.ph .pb.tg{flex-direction:column;padding:2px 2px;gap:2px;min-height:56px;font-size:13.5px;text-align:center}html.ph .pb.tg span,html.ph .pb.tg small{white-space:nowrap;line-height:1.1}html.ph .pb.tg small{font-size:13px;opacity:.85}
+html.ph .ph-body{font-size:14.5px;display:flex;flex-direction:column;gap:5px}html.ph .ph-body p{margin:0}
+html.ph .pcz{display:inline-block;padding:1px 7px;border-radius:8px;border-left:5px solid var(--pc);background:#fff;font-weight:700}
+html.ph .pc-in{display:flex;flex-direction:column;gap:6px;width:100%;min-height:0}
+html.ph .pc-h{display:flex;align-items:center;gap:10px}html.ph .pc-h .ic.big{width:38px;height:38px;color:var(--terra)}
+html.ph .pc-h b{display:block;font:400 19px var(--ff-h);color:var(--terra)}html.ph .pc-h small{font-size:14px;color:var(--mut)}
+html.ph .pc-rows{display:flex;flex-direction:column;gap:4px;overflow:auto;min-height:0}
+html.ph .pc-row{display:flex;align-items:center;gap:8px;font:700 17px var(--ff);background:#fff;border-radius:10px;border-left:6px solid var(--pc);padding:6px 10px}
+html.ph .pc-row i{display:none}html.ph .pc-row b{flex:1}html.ph .pc-row span{font-size:21px;color:var(--terra)}html.ph .pc-row.win{box-shadow:0 0 0 2px var(--gold) inset}
+html.ph .pc-row2{display:flex;justify-content:space-between;gap:8px;font-size:14px;background:#fff;border-radius:8px;padding:4px 8px}
+html.ph .pc-in small,html.ph .ph-note small{font-size:13px}
+html.ph .pc-t{margin:0;font-size:14px;color:var(--gx-ink);line-height:1.3}
+html.ph .pc-b{display:flex;gap:8px;flex-wrap:wrap}
+html.ph .pb.cont{align-self:flex-start;min-height:48px;min-width:140px}
+html.ph .pb.skipall{background:transparent;box-shadow:none;border-color:transparent;text-decoration:underline;color:var(--mut);font-size:14px}
+html.ph .stat,html.ph .gx-drawer .stat{font-size:15px}
+html.ph .gx-drawer{height:min(88dvh,100% - var(--bar))}
+html.ph .mbox{padding:12px;max-height:calc(100dvh - 24px)}
+html.ph .mbox h2{font-size:1.5rem}
+html.ph .seats .btn.sm{min-height:44px}
+html.ph-l .ps-tile{width:64px;height:64px}html.ph-l .ps-tile .tcard{width:60px;height:60px}
+html.ph-l .ps-row{gap:6px;flex-wrap:wrap}html.ph-l .ps-row.r1{flex-wrap:nowrap}
+html.ph-l .ps-mid{display:none}
+html.ph-l .ps-hint{display:none}
+@media (min-height:381px){html.ph-l .ps-hint{display:block}}
+html.ph-l .ph-ht{min-width:70px}html.ph-l .ph-ht .sg{display:none}
+html.ph-l #ps{gap:5px;padding-top:5px}
+html.ph-l .ph-opts{grid-template-columns:1fr}
+html.ph-l .ph-row{flex-wrap:wrap}html.ph-l .ph-row .pb.place{flex:1 1 100%}
+html.ph-l #pbar .pb-t b{max-width:110px;overflow:hidden;text-overflow:ellipsis}
+html.ph-l .pb.opt{min-height:50px}html.ph-l #ppop:not([hidden]){padding-bottom:2px}html.ph-l .ph-opts{gap:3px}html.ph-l .pb.opt .ot b{font-size:14.5px}
+@media (prefers-reduced-motion:reduce){html.ph #ppop.in,html.ph #pc.in{animation:none}}
 </style>
 </head>
 <body>
 <div class="gx-app">
 <header class="gx-bar">
   <h1>Rampart &amp; Vine</h1>
+  <span id="pbar" class="ph-only ph-keep"></span>
   <span class="gx-sp"></span>
-  <button class="gx-ibtn" data-a="adv" id="advbtn" title="What would the computer do?"><i data-ic="bulb"></i> <span>Advice</span></button>
+  <button class="gx-ibtn ph-keep" data-a="adv" id="advbtn" title="What would the computer do?"><i data-ic="bulb"></i> <span>Advice</span></button>
   <button class="gx-ibtn" data-a="fit" title="Show the whole valley"><i data-ic="fit"></i> <span>Fit all</span></button>
   <button class="gx-ibtn" data-gx="plrd" aria-expanded="false"><i data-ic="players"></i> <span>Players</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-expanded="false"><i data-ic="scroll"></i> <span>Log</span></button>
@@ -211,12 +327,17 @@ body{background:#4a2e1c}
   <button class="gx-ibtn" data-a="pause" id="pausebtn" hidden><i data-ic="pause"></i></button>
   <button class="gx-ibtn" data-gx="setd" aria-expanded="false" title="Settings"><i data-ic="gear"></i> <span>Settings</span></button>
   <button class="gx-ibtn" data-a="new"><i data-ic="plus"></i> <span>New game</span></button>
+  <button class="gx-ibtn ph-only ph-keep" data-ph="menu" id="phmenu" aria-label="Menu" aria-haspopup="dialog"><i data-ic="menu"></i></button>
 </header>
 <div class="gx-main">
   <main class="gx-board"><div class="view"><canvas id="c3" aria-label="The valley in 3D. Drag to move the map, pinch or scroll to zoom, tap a glowing square to try your tile there."></canvas><div id="map2d" hidden></div><div id="chip" aria-live="polite"></div></div></main>
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Rampart &amp; Vine</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel"><i data-ic="vert"></i></button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel"><i data-ic="hide"></i></button></div>
     <div id="dockmsg" hidden role="status"></div><div class="gx-dock-body" id="dockbody"></div>
+    <div id="pchips" class="pchips ph-only" aria-label="Scores and followers left"></div>
+    <div id="ps" class="ps ph-only" aria-label="Controls"></div>
+    <div id="ppop" class="ppop ph-only" hidden role="dialog" aria-label="Choices"></div>
+    <div id="pc" class="pcard ph-only" hidden role="dialog" aria-label="Message"></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock"><i data-ic="menu"></i> Panel</button>
 </div>
@@ -1389,7 +1510,7 @@ function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return fa
     if(!d){const h=cellAt(e);if(h!==V3.hover){V3.hover=h;V3.dirty=true}return}
     if(ptrs.size>=2){const pd=pinchD(ptrs);if(d.d0>0){V3.dist=clampDist(d.dist0*d.d0/pd);V3.userMoved=true;placeCam()}d.moved=true;return}
     const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>7)d.moved=true;
-    if(d.moved&&d.n===1){const k=V3.dist*.0016*(700/Math.max(300,V3.r.domElement.clientHeight));V3.look.set(d.l.x-dx*k,0,d.l.z-dy*k/Math.sin(V3.tilt));V3.camTo=null;V3.userMoved=true;placeCam()}});
+    if(d.moved&&d.n===1){const k=PHN.on?PHN.panK():V3.dist*.0016*(700/Math.max(300,V3.r.domElement.clientHeight));V3.look.set(d.l.x-dx*k,0,d.l.z-dy*k/Math.sin(V3.tilt));V3.camTo=null;V3.userMoved=true;placeCam()}});
   const up=e=>{ptrs.delete(e.pointerId);const d=V3.drag;if(!ptrs.size)V3.drag=null;if(d&&!d.moved&&d.n===1&&e.type==='pointerup'){const c=cellAt(e);const w=worldAt(e);if(typeof on3DTap==='function')on3DTap(c,w)}};
   cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
   cv.addEventListener('pointerleave',()=>{if(V3.hover){V3.hover=null;V3.dirty=true}});
@@ -1411,9 +1532,9 @@ function cellWorld(x,y){return new THREE.Vector3(x*TS,0,y*TS)}
 // fit every tile (and every glowing spot) into the view for this aspect ratio
 function boardBounds(){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;const eat=k=>{const [x,y]=unkey(k);x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)};
   if(G){for(const k of G.order)eat(k);for(const k of (UI.cells||[]))eat(k)}if(x0>x1){x0=x1=y0=y1=0}return {x0,x1,y0,y1}}
-function fitAll(instant){if(!V3.cam)return;const b=boardBounds();const W=(b.x1-b.x0+1)*TS+.8,D=(b.y1-b.y0+1)*TS+.8;const a=V3.cam.aspect;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);
+function fitAll(instant,real){if(!V3.cam)return;const b=boardBounds();const W=(b.x1-b.x0+1)*TS+.8,D=(b.y1-b.y0+1)*TS+.8;const a=V3.cam.aspect;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);
   const e=V3.tilt;const needH=(D*Math.sin(e)+1.2)/2,needW=W/2;const d=Math.max(needH/Math.tan(vf/2),needW/Math.tan(hf/2))*1.02+D*Math.cos(e)*.12;
-  const to=new THREE.Vector3((b.x0+b.x1)/2*TS,0,(b.y0+b.y1)/2*TS+.1);V3.userMoved=false;if(instant){V3.look.copy(to);V3.dist=clampDist(Math.max(10,d));V3.camTo=null;placeCam()}else{V3.camTo={look:to,dist:clampDist(Math.max(10,d)),t:0}}V3.fitted=true;V3.dirty=true}
+  if(!real&&PHN.on&&PHN.frame(instant,Math.max(10,d)))return;const to=new THREE.Vector3((b.x0+b.x1)/2*TS,0,(b.y0+b.y1)/2*TS+.1);V3.userMoved=false;if(instant){V3.look.copy(to);V3.dist=clampDist(Math.max(10,d));V3.camTo=null;placeCam()}else{V3.camTo={look:to,dist:clampDist(Math.max(10,d)),t:0}}V3.fitted=true;V3.dirty=true}
 function focusCell(k,zoom){if(!V3.on||!k)return;const [x,y]=unkey(k);const to=cellWorld(x,y);V3.camTo={look:to,dist:zoom?Math.min(V3.dist,zoom):V3.dist,t:0}}
 function screenOf(v){const p=v.clone().project(V3.cam);const R=V3.r.domElement;return {x:(p.x+1)/2*R.clientWidth,y:(1-p.y)/2*R.clientHeight,in:Math.abs(p.x)<1&&Math.abs(p.y)<1}}
 function ndc(e){const rc=V3.r.domElement.getBoundingClientRect();return new THREE.Vector2(((e.clientX-rc.left)/rc.width)*2-1,-((e.clientY-rc.top)/rc.height)*2+1)}
@@ -1754,7 +1875,7 @@ function syncOverlays(){const sc=V3.scene;const sig=JSON.stringify([UI.cells,UI.
       const ring=new THREE.Mesh(gq('ringG',()=>{const g=new THREE.PlaneGeometry(.62,.62);g.rotateX(-Math.PI/2);return g}),new THREE.MeshBasicMaterial({map:ringTex(),color:o.adv?new THREE.Color(.6,1.8,2):new THREE.Color(1.9,1.6,.8),transparent:true,depthTest:false,depthWrite:false}));ring.position.copy(p);ring.position.y+=.01;ring.userData.pulse=1;ring.renderOrder=6;sg.add(ring);
       const gm=figMesh(G.cur.p,o.k||UI.kind||'f',ty,true,o.adv);gm.position.copy(p);if(o.k==='bld'||o.k==='pig'){gm.position.x+=.0}gm.rotation.y=-.4;gm.userData.bob=1;gm.userData.y0=p.y+.04;sg.add(gm)}sc.add(sg);V3.spots=sg}}
 // floating "+N" medallion when a feature scores
-function scorePop(text,col,pos){if(!V3.on)return;const c=cvs(256,128);const x=c.getContext('2d');x.translate(128,64);
+function scorePop(text,col,pos){if(!V3.on||PHN.on)return;const c=cvs(256,128);const x=c.getContext('2d');x.translate(128,64);
   const g=x.createLinearGradient(0,-44,0,44);g.addColorStop(0,'#fff6df');g.addColorStop(1,'#ecd3a0');x.fillStyle=g;x.strokeStyle=col;x.lineWidth=7;x.beginPath();x.roundRect?x.roundRect(-78,-40,156,80,40):x.rect(-78,-40,156,80);x.shadowColor='rgba(40,20,5,.5)';x.shadowBlur=10;x.shadowOffsetY=4;x.fill();x.shadowColor='transparent';x.stroke();
   x.font='bold 58px "Marcellus SC",Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#3a2414';x.fillText(text,0,4);
   const tx=tex(c,true);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,transparent:true,depthTest:false}));s.scale.set(.01,.005,1);s.position.copy(pos);s.position.y+=.7;s.renderOrder=10;V3.scene.add(s);V3.pops.push({s,t:0});sparkle(pos,col,14)}
@@ -2005,6 +2126,189 @@ document.addEventListener('keydown',e=>{const t=e.target;if(t&&t.id==='joincode'
 
 </script>
 <script>
+// ===================== phone layout: the map is the screen, play by tapping it, choices in pop-ups =====================
+// Only active when html.ph is set (short side <= 500 px, or a touch screen <= 600 px; ?phone=1 / ?phone=0 force it). Desktop and tablets never run this code.
+const PHN={on:false,land:false,pop:null,info:null,rot:0,strip:'',pops:'',chips:'',bar:'',cards:[],figHide:'',tst:'',tt:0,rec:null,recK:'',gi:0,ng:1,MIN:56,figZ:false,endKey:'',lastTurn:0,np:0,tile:'',mine:null};
+function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
+  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
+function phInsets(){try{const P=new URLSearchParams(location.search);if(P.has('safe')){const a=P.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
+  let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}
+  const c=getComputedStyle(p);return {t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}}catch(e){return {t:0,r:0,b:0,l:0}}}
+function phApply(){const R=document.documentElement;const was=PHN.on;PHN.on=phDetect();R.classList.toggle('ph',PHN.on);
+  if(!PHN.on){R.classList.remove('ph-l','ph-p');for(const k of['--dh','--rw','--sat','--sar','--sab','--sal'])R.style.removeProperty(k);if(was&&typeof V3!=='undefined'){V3.tilt=1.02;if(V3.cam)placeCam()}return was}
+  const w=innerWidth,h=innerHeight,I=phInsets();PHN.land=w>h;
+  R.classList.toggle('ph-l',PHN.land);R.classList.toggle('ph-p',!PHN.land);
+  R.style.setProperty('--dh',Math.round(Math.max(228,Math.min(252,h*.285)))+'px');R.style.setProperty('--rw',Math.round(Math.max(226,Math.min(268,w*.29)))+'px');
+  R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');
+  if(typeof V3!=='undefined'&&V3.tilt!==1.32){V3.tilt=1.32;if(V3.cam){placeCam()}}return true}
+phApply();
+addEventListener('resize',()=>{const w=PHN.on,l=PHN.land;phApply();if(PHN.on!==w||PHN.land!==l){try{PHN.render(true)}catch(e){}}});
+addEventListener('orientationchange',()=>setTimeout(()=>{phApply();try{PHN.render(true)}catch(e){}},200));
+const phCap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const PH_IC={minus:'<path d="M5 12h14"/>',target:'<circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.8"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/>',last:'<rect x="4" y="5" width="16" height="14" rx="2.5"/><path d="M9 12l2.2 2.2L15.5 9.5"/>',
+  rotl:'<path d="M5 12a7 7 0 1 0 2.4-5.3M5 4v4h4"/>',rotr:'<path d="M19 12a7 7 0 1 1-2.4-5.3M19 4v4h-4"/>',road:'<path d="M8 21L10.5 3M16 21l-2.5-18"/><path d="M12 5v2.5M12 11v2.5M12 17v2.5"/>',
+  town:'<path d="M3.5 20.5V8.5l2-.8V5.5h2.4v1.8h2V5.5h2.4v1.8h2V5.5h2.4v2.2l2 .8v12z"/><path d="M10 20.5v-5.5h4v5.5"/>',priory:'<path d="M12 2.8v5M9.8 5h4.4"/><path d="M5.5 21V12.5L12 8.5l6.5 4V21z"/><path d="M10 21v-5.5h4V21"/>',
+  close:'<path d="M6 6l12 12M18 6L6 18"/>',star:'<path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.9L12 16.9l-5.2 2.8 1-5.9L3.5 9.7l5.9-.8z" fill="currentColor"/>',more:'<path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3.4"/>'};
+const phI=(n,c)=>ico(n,c);
+// ---------- camera: top-down-ish, zoom to a tile size that keeps the glowing squares tappable ----------
+const phTf=()=>Math.tan(V3.cam.fov*Math.PI/360);
+Object.assign(PHN,{
+  tilePx(){if(!V3.cam||!V3.r)return 0;return TS*(V3.r.domElement.clientHeight/2)/(V3.dist*phTf())},
+  distFor(px){return clampDist(TS*(V3.r.domElement.clientHeight/2)/(px*phTf()))},
+  panK(){return 2*V3.dist*phTf()/Math.max(100,V3.r.domElement.clientHeight)},
+  cells(){return (G&&me()&&G.step==='place'?UI.cells:[]).map(unkey)},
+  // windows of the map that hold as many glowing squares as fit at the minimum tile size
+  groups(){const cs=this.cells();if(!cs.length||!V3.r)return [];const R=V3.r.domElement,cw=R.clientWidth/this.MIN-.7,ch=R.clientHeight/(this.MIN*.94)-.7;const last=this.lastXY();let rem=cs.slice();const out=[];
+    while(rem.length&&out.length<9){let best=null;for(const c of rem){const inn=rem.filter(q=>Math.abs(q[0]-c[0])<=cw/2&&Math.abs(q[1]-c[1])<=ch/2);const x0=Math.min(...inn.map(q=>q[0])),x1=Math.max(...inn.map(q=>q[0])),y0=Math.min(...inn.map(q=>q[1])),y1=Math.max(...inn.map(q=>q[1]));const cx=(x0+x1)/2,cy=(y0+y1)/2;const d=Math.hypot(cx-last[0],cy-last[1]);
+        if(!best||inn.length>best.n||(inn.length===best.n&&d<best.d))best={n:inn.length,d,cx,cy,x0,x1,y0,y1,cells:inn}}
+      out.push(best);const s=new Set(best.cells.map(q=>q.join()));rem=rem.filter(q=>!s.has(q.join()))}
+    return out},
+  lastXY(){const k=G&&G.cur&&G.cur.k&&G.tiles[G.cur.k]?G.cur.k:G&&G.order[G.order.length-1];return k?unkey(k):[0,0]},
+  go(look,dist,instant){if(instant){V3.look.copy(look);V3.dist=dist;V3.camTo=null;placeCam()}else V3.camTo={look,dist,t:0};V3.dirty=true},
+  focusGroup(i,instant){const gs=this.groups();if(!gs.length||!V3.r)return false;this.ng=gs.length;this.gi=((i%gs.length)+gs.length)%gs.length;const g=gs[this.gi],R=V3.r.domElement;
+    const px=Math.max(this.MIN,Math.min(115,R.clientWidth/(g.x1-g.x0+1.5),R.clientHeight/((g.y1-g.y0+1.5)*.94)));this.go(cellWorld(g.cx,g.cy),this.distFor(px),instant);V3.userMoved=false;return true},
+  // called by fitAll(): returns true when it framed the map itself (the whole map would make the tiles smaller than MIN px)
+  frame(instant,dAll){if(!this.on||!V3.cam||!G)return false;const px=TS*(V3.r.domElement.clientHeight/2)/(dAll*phTf());if(px>=this.MIN)return false;
+    if(this.focusGroup(0,instant))return true;const [x,y]=this.lastXY();this.go(cellWorld(x,y),this.distFor(this.MIN),instant);V3.userMoved=false;return true},
+  zoom(f){if(!V3.cam)return;const c=V3.camTo;V3.camTo={look:(c?c.look:V3.look).clone(),dist:clampDist((c?c.dist:V3.dist)*f),t:0};V3.userMoved=true},
+  spots(){if(!V3.cam)return;const gs=this.groups();if(!gs.length){this.last();return}this.focusGroup(gs.length>1?this.gi+1:0,false)},
+  // bring a scored feature into view (only when its middle is off screen)
+  focusFeat(r){try{if(!V3.on||!G.fd[r]||!G.fd[r].tiles||!G.fd[r].tiles.length)return;let sx=0,sz=0;const ks=G.fd[r].tiles;for(const k of ks){const [x,y]=unkey(k);sx+=x;sz+=y}const cx=sx/ks.length,cz=sz/ks.length;const v=screenOf(cellWorld(cx,cz)),R=V3.r.domElement;
+    if(!v.in||v.x<R.clientWidth*.1||v.x>R.clientWidth*.9||v.y<R.clientHeight*.1||v.y>R.clientHeight*.9){this.go(cellWorld(cx,cz),Math.min(V3.dist,this.distFor(this.MIN*1.1)),false);V3.userMoved=true}}catch(e){}},
+  last(){if(!V3.cam||!G)return;const [x,y]=this.lastXY();this.go(cellWorld(x,y),Math.min(V3.camTo?V3.camTo.dist:V3.dist,this.distFor(this.MIN*1.25)),false);V3.userMoved=true},
+  figFrame(){if(!V3.cam||!G||!G.cur||!G.cur.k)return;const [x,y]=unkey(G.cur.k),R=V3.r.domElement;const px=Math.min(Math.min(R.clientWidth,R.clientHeight*.94)*.62,200);this.go(cellWorld(x,y),this.distFor(px),false);this.figZ=true}
+});
+// ---------- what the player sees ----------
+function phWhere(k,l){return segWhere(k,l).trim()}
+function phFeatName(ty){return ty==='F'?'Farm':phCap(FEAT[ty])}
+function phFeatIc(ty){return ty==='F'?'grain':ty==='C'?'town':ty==='R'?'road':'priory'}
+function phRecFig(hp){const key=G.turn+':'+G.step+':'+hp.i;if(PHN.recK!==key){PHN.recK=key;try{PHN.rec=bestFigNow(hp.i,'normal')}catch(e){PHN.rec=null}}return PHN.rec}
+function phPts(m,F,s,fl){if(m.k==='bld')return 'extra turn when you extend it';if(m.k==='pig')return `+1 per town (${fieldCities(F).size} now)`;
+  if(s.ty==='F')return `end +${fl.end} · ${fieldCities(F).size} town${fieldCities(F).size===1?'':'s'}`;
+  if(F.done)return `scores +${fl.now} now`;return `done +${fl.now} · open +${fl.end}`}
+function phOptHTML(m,hp,rec){const T=G.tiles[G.cur.k],s=TSEG[T.t][m.l],r=find(T.s0+m.l),F=G.fd[r],fl=featLine(s.ty,F,figsIn(r),hp.i);const w=phWhere(G.cur.k,m.l);
+  const kind=m.k==='f'?'':m.k==='big'?'Champion · ':m.k==='bld'?'Mason · ':'Hog · ';
+  return `<button class="pb opt${rec?' rec':''}" data-mv='${esc(JSON.stringify(m))}' aria-label="${esc(kind+phFeatName(s.ty)+(w?' '+w:'')+', '+phPts(m,F,s,fl)+(rec?', suggested':''))}"><span class="oi">${phI(m.k==='f'?phFeatIc(s.ty):m.k==='big'?'champ':m.k==='bld'?'mason':'hog')}</span><span class="ot"><b>${kind}${phFeatName(s.ty)}${w?' <small>'+esc(w)+'</small>':''}${rec?`<em class="star">${phI('star')}</em>`:''}</b><small>${esc(phPts(m,F,s,fl))}</small></span></button>`}
+function phFigPopup(hp){const ms=figMoves(hp.i).filter(m=>m.act==='fig');const kinds=[...new Set(ms.map(m=>m.k))];const rec=phRecFig(hp)||{act:'skip'};const many=kinds.length>2;
+  const tabs=kinds.length>1?`<div class="ph-tabs${many?' icons':''}">${kinds.map(k=>{const nm={f:'Follower',big:'Champion',bld:'Mason',pig:'Hog'}[k];return `<button class="pb tab${UI.kind===k?' on':''}" data-kind="${k}" aria-pressed="${UI.kind===k}" aria-label="${nm}${rec.k===k&&rec.act==='fig'?' (suggested)':''}">${phI({f:'meeple',big:'champ',bld:'mason',pig:'hog'}[k])}<span>${nm}</span>${rec.k===k&&rec.act==='fig'?`<em class="star">${phI('star')}</em>`:''}</button>`}).join('')}</div>`:'';
+  return `<div class="ph-head${tabs?' hastabs':''}"><div class="ph-ht"><b>Follower?</b><small>${G.cur.bonus?'extra turn · ':''}<em class="star">${phI('star')}<span class="sg"> suggested</span></em></small></div>${tabs}<button class="pb skip${rec.act==='skip'?' rec':''}" data-mv='{"act":"skip"}'>${rec.act==='skip'?`<em class="star">${phI('star')}</em>`:''}Skip</button><button class="ph-x" data-ph="figx" aria-label="Close">${phI('close')}</button></div>
+   <div class="ph-opts">${ms.filter(m=>m.k===UI.kind).map(m=>phOptHTML(m,hp,rec.act==='fig'&&same(rec,m))).join('')}</div>`}
+function phPlacePopup(hp){const gh=UI.ghost,t=G.cur.t;const pv=placementPreview(t,gh.r,...unkey(gh.k),hp.i);const multi=gh.rots.length>1;const adv=UI.advice&&UI.advice.place&&same({x:UI.advice.place.x,y:UI.advice.place.y,r:UI.advice.place.r},{x:unkey(gh.k)[0],y:unkey(gh.k)[1],r:gh.r});
+  return `<div class="ph-head"><b>${adv?'Suggested spot':'Place here?'}</b><button class="ph-x" data-ui="cancel" aria-label="Cancel">${phI('close')}</button></div>
+   <div class="ph-row"><div class="ps-tile">${tileCard(t,gh.r,1)}</div><div class="ph-rb"><button class="pb sq" data-ui="rotl" aria-label="Turn left"${multi?'':' disabled'}>${phI('rotl')}</button><button class="pb sq" data-ui="rotr" aria-label="Turn right"${multi?'':' disabled'}>${phI('rotr')}</button></div><button class="pb pri place" data-ui="confirm">Place</button></div>
+   <p class="ph-note">${UI.advice&&UI.advice.text?'<b>Advice:</b> '+esc(UI.advice.text)+' ':''}${multi?`Fits ${gh.rots.length} ways: turn it, or tap the tile again.`:'Fits one way.'}${pv.length?' '+pv.map(esc).join(' · '):''}</p>`}
+function phMenuPopup(){const sb=document.getElementById('sndbtn'),mb=document.getElementById('musbtn');const on=x=>x&&x.getAttribute('aria-pressed')==='true';const sp={0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal';
+  const it=(a,ic,l)=>`<button class="pb mi" ${a}>${phI(ic)}<span>${l}</span></button>`;
+  const tg=(a,ic,l,st,pr)=>`<button class="pb tg${pr?' on':''}" ${a} aria-label="${l}: ${st}"${pr!=null?` aria-pressed="${pr}"`:''}>${phI(ic)}<span>${l}</span><small>${st}</small></button>`;
+  return `<div class="ph-head"><b>Menu</b><button class="ph-x" data-ph="pclose" aria-label="Close">${phI('close')}</button></div>
+    <div class="ph-tgs">${tg('data-a="guide"','guide','Guide',UI.guide?'on':'off',UI.guide)}${tg('data-a="snd"',on(sb)?'snd':'sndoff','Sound',on(sb)?'on':'off',on(sb))}${tg('data-a="mus"',on(mb)?'mus':'musoff','Music',on(mb)?'on':'off',on(mb))}${tg('data-a="speed"','ff','Speed',sp,null)}</div>
+    <div class="ph-menu">${it('data-gx="plrd"','players','Scores')}${it('data-gx="logd"','scroll','Log')}${it('data-gx="refd"','tile','Tiles')}${it('data-gx="rulesd"','book','Rules')}${it('data-gx="setd"','gear','Settings')}${it('data-a="new"','plus','New game')}</div>`}
+function phFeatAt(k,w){const T=G.tiles[k];if(!T||!w)return null;let best=-1,bd=1e9;TSEG[T.t].forEach((s,l)=>{const q=spotWorld(k,l);const d=Math.hypot(q.x-w.x,q.z-w.z);if(d<bd){bd=d;best=l}});return best<0?null:{k,l:best}}
+function phInfoPopup(){const I=PHN.info;if(!I||!G.tiles[I.k])return null;const T=G.tiles[I.k],s=TSEG[T.t][I.l],r=find(T.s0+I.l),F=G.fd[r],figs=figsIn(r);const hp=me();const fl=featLine(s.ty,F,figs,hp?hp.i:-1);const w=phWhere(I.k,I.l);
+  const fg=figs.length?figs.map(f=>`<span class="pcz" style="--pc:${PCOL[f.p]}">${esc(P(f.p).nm)}’s ${f.k==='f'?ROLE[s.ty]:FIGN[f.k]}</span>`).join(' '):'nobody here yet';
+  const pts=F.done?(s.ty==='M'?'Finished: 9 points were scored.':'Finished and scored.'):s.ty==='F'?`At the end: +${fl.end} for whoever has most farmers (3 per finished town${hp&&G.ex.tb?', 4 with a hog':''}).`:`Finished: ${fl.now} points. Left open at the end: ${fl.end}.`;
+  return `<div class="ph-head"><span class="oi big">${phI(phFeatIc(s.ty))}</span><b>${phFeatName(s.ty)}${w?' <small>'+esc(w)+'</small>':''}</b><button class="ph-x" data-ph="pclose" aria-label="Close">${phI('close')}</button></div>
+   <div class="ph-body"><p>${esc(phCap(fl.size))}.</p><p>${esc(pts)}</p><p><b>Held by:</b> ${fg}${figs.length?' · '+esc(fl.who):''}</p></div>`}
+// ---------- cards: scoring events, coach tips, the final count. One at a time, each with Continue ----------
+function phScoreCard(x){const F=G.fd[x.r];if(!F)return null;const ty=F.ty,n=F.tiles?F.tiles.length:0;
+  const size=ty==='C'?`${n} tile${n>1?'s':''}${F.pen?`, ${F.pen} banner${F.pen>1?'s':''}`:''}${F.cat?', basilica':''}`:ty==='R'?`${n} tile${n>1?'s':''}${F.inn?', tavern':''}`:'the tile and all 8 around it';
+  return {id:'s'+x.r+':'+G.turn,root:x.r,h:`<div class="pc-in"><div class="pc-h">${phI(phFeatIc(ty),'big')}<div><b>${phCap(FEAT[ty])} finished</b><small>${esc(size)}</small></div></div>
+   <div class="pc-rows">${x.win.map(i=>`<div class="pc-row" style="--pc:${PCOL[i]}"><i></i><b>${esc(P(i).nm)}</b><span>+${x.pts}</span></div>`).join('')}</div><p class="pc-t">The followers there go home.</p>
+   <button class="pb pri cont" data-ph="cont">Continue</button></div>`}}
+function phGoodsCard(pi){const l=G.log.find(e=>e.t&&e.t.indexOf('🧺')===0);return {id:'g'+G.turn+':'+pi,h:`<div class="pc-in"><div class="pc-h">${phI('wine','big')}<div><b>Goods</b><small>${esc(P(pi).nm)} closed the town</small></div></div><p class="pc-t">${esc(l?l.t.replace('🧺 ',''):'')}</p><button class="pb pri cont" data-ph="cont">Continue</button></div>`}}
+function phCoachCard(id,txt){return {id:'c'+id,coach:1,h:`<div class="pc-in"><div class="pc-h">${phI('guide','big')}<div><b>Tip</b></div></div><p class="pc-t">${txt}</p><button class="pb pri cont" data-ph="cont">Got it</button></div>`}}
+function phEndCards(){const out=[];const {add,det}=finalScores();const nm=i=>esc(P(i).nm);const open=det.filter(d=>d.ty!=='F');const farms=det.filter(d=>d.ty==='F'&&d.n);
+  const skip=`<button class="pb skipall" data-ph="skipall">Skip to the result</button>`;
+  if(open.length)out.push({id:'e-open',end:1,h:`<div class="pc-in"><div class="pc-h">${phI('scroll','big')}<div><b>Unfinished features</b><small>they score a little at the end</small></div></div><div class="pc-rows">${open.map(d=>{const F=G.fd[d.r];const z=d.pts===0?' <small>(0: tavern or basilica left open)</small>':'';return `<div class="pc-row2"><span>${phCap(FEAT[d.ty])} (${F.tiles?F.tiles.length:'1'} tile${F.tiles&&F.tiles.length>1?'s':''})${z}</span><span>${d.win.map(i=>`<b style="color:${PCOL[i]}">${nm(i)}</b> +${d.pts}`).join(', ')}</span></div>`}).join('')}</div><div class="pc-b"><button class="pb pri cont" data-ph="cont">Continue</button>${skip}</div></div>`});
+  farms.forEach((d,i)=>{const pig=w=>figsIn(d.r).some(f=>f.p===w&&f.k==='pig');out.push({id:'e-f'+d.r,end:1,root:d.r,h:`<div class="pc-in"><div class="pc-h">${phI('grain','big')}<div><b>Farm ${i+1} of ${farms.length}</b><small>${d.n} finished town${d.n>1?'s':''} beside it</small></div></div><div class="pc-rows">${d.win.map(w=>`<div class="pc-row" style="--pc:${PCOL[w]}"><i></i><b>${nm(w)}</b><span>+${d.n*(pig(w)?4:3)}</span></div>`).join('')}</div>${d.win.some(pig)?'<p class="pc-t">The hog is worth 4 per town instead of 3.</p>':''}<div class="pc-b"><button class="pb pri cont" data-ph="cont">Continue</button>${skip}</div></div>`})});
+  if(G.ex.tb&&G.pl.some(p=>p.end&&p.end.goods))out.push({id:'e-goods',end:1,h:`<div class="pc-in"><div class="pc-h">${phI('wine','big')}<div><b>Goods</b><small>10 points for the most of each kind</small></div></div><div class="pc-rows">${G.pl.filter(p=>p.end.goods).map(p=>`<div class="pc-row" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>+${p.end.goods}</span></div>`).join('')}</div><div class="pc-b"><button class="pb pri cont" data-ph="cont">Continue</button>${skip}</div></div>`});
+  out.push(phResultCard());return out}
+function phResultCard(){const top=Math.max(...G.pl.map(p=>p.score));const order=G.pl.slice().sort((a,b)=>b.score-a.score);
+  return {id:'e-result',end:1,final:1,h:`<div class="pc-in"><div class="pc-h">${phI('trophy','big')}<div><b>${esc(G.winText||'Game over')}</b></div></div><div class="pc-rows">${order.map(p=>`<div class="pc-row${p.score===top?' win':''}" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>${p.score}</span></div>`).join('')}</div><div class="pc-b"><button class="pb pri cont" data-ph="cont">Close</button><button class="pb" data-a="new">New game</button></div></div>`}}
+Object.assign(PHN,{
+  blocking(){return this.on&&!NET.on&&human()&&this.cards.length>0},
+  add(c){if(!c||!this.on)return;if(!human()&&!c.end)return;if(this.cards.some(x=>x.id===c.id))return;this.cards.push(c)},
+  fx(f){if(!this.on||!G)return;if(f.t==='score'&&f.x)this.add(phScoreCard(f.x));else if(f.t==='goods'&&typeof f.x==='number')this.add(phGoodsCard(f.x))},
+  cont(){this.cards.shift();this.render(true);if(typeof schedule==='function')schedule()},
+  toast(t){this.tst=t;clearTimeout(this.tt);this.tt=setTimeout(()=>{this.tst='';this.render()},3200);this.render()},
+  reset(){this.cards=[];this.pop=null;this.info=null;this.rot=0;this.figHide='';this.tst='';this.endKey='';this.figZ=false;this.rec=null;this.recK=''},
+  // taps on the map: info for a feature, closing pop-ups. Returns true when the tap was used.
+  tap(k,w){if(!this.on||!G)return false;if(this.cards.length)return true;
+    if(this.pop==='menu'||this.pop==='info'){this.pop=null;this.info=null;this.render(true);return true}
+    if(!k||!G.tiles[k])return false;const hp=me();
+    if(hp&&G.step==='fig'&&k===G.cur.k&&UI.spotOpts.length&&w){let bd=.45;for(const o of UI.spotOpts){const q=spotWorld(G.cur.k,o.l);const d=Math.hypot(q.x-w.x,q.z-w.z);if(d<bd)bd=d}if(bd<.45)return false}
+    if(!w)return false;const f=phFeatAt(k,w);if(!f)return false;this.info=f;this.pop='info';this.render(true);return true}
+});
+// ---------- strip, chips, bar ----------
+function phChips(){if(!G)return '';const cur=sideToAct();return G.pl.map(p=>`<button class="pchip${cur===p.i&&!G.over?' cur':''}" style="--pc:${PCOL[p.i]}" data-gx="plrd" aria-label="${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''}: ${p.score} points, ${p.sup.f} followers left. Tap for all scores"><span class="pn"><i></i>${esc(p.nm.charAt(0))}</span><b>${p.score}</b><span class="pf">${ico('meeple')}${p.sup.f}</span></button>`).join('')}
+function phBarHTML(){if(!G)return '';const s=sideToAct();const ns=NET.on&&!NET.inLobby?`<span class="netst${NET.hostGone?' bad':''}" title="Online">${esc(netStatus())}</span>`:'';
+  return `<span class="pb-n" aria-label="${tilesLeft()} tiles left">${ico('tile')}<b>${tilesLeft()}</b></span>`+(G.over?'<span class="pb-t"><b>Game over</b></span>':s>=0?`<span class="pb-t"><i style="background:${PCOL[s]}"></i><b>${esc(P(s).nm)}</b>${NET.on&&s===NET.mySeat?' <small>(you)</small>':''}</span>`:'')+ns}
+function phZoomRow(){if(!V3.on)return '';const g=PHN.groups();const lab=g.length>1?`<small>${PHN.gi+1}/${g.length}</small>`:'';
+  return `<div class="ps-zoom"><button class="pb sq" data-ph="zout" aria-label="Zoom out">${phI('minus')}</button><button class="pb sq" data-ph="zin" aria-label="Zoom in">${phI('plus')}</button><button class="pb sq" data-ph="all" aria-label="Show the whole valley">${phI('fit')}</button>${me()&&G.step==='place'?`<button class="pb sq wide" data-ph="spots" aria-label="Go to the glowing squares${g.length>1?', group '+(PHN.gi+1)+' of '+g.length:''}">${phI('target')}<span>Spots</span>${lab}</button>`:''}<button class="pb sq wide" data-ph="last" aria-label="Go to the last tile">${phI('last')}<span>Last</span></button></div>`}
+function phStripHTML(){if(!G)return '';const hp=me(),s=sideToAct(),p=s>=0?P(s):null;const hint=PHN.tst;
+  if(G.over)return `<div class="ps-row"><div class="ps-msg"><b>Game over</b><span>${esc(G.winText||'')}</span></div></div><div class="ps-row"><button class="pb pri" data-ph="results">Result</button><button class="pb" data-a="new">New game</button></div>${phZoomRow()}`;
+  if(NET.on&&NET.hostGone)return `<div class="ps-row"><div class="ps-msg"><b>The host left</b><span>The game is over.</span></div></div><div class="ps-row"><button class="pb pri" data-net="leave">Back to the start</button></div>`;
+  if(!hp){const wait=NET.on&&p&&p.human?(p.i===NET.mySeat?'Sending your move…':'Waiting for '+esc(p.nm)+'…'):'';
+    return `<div class="ps-row"><div class="ps-msg"><b>${p?`<i class="dot" style="background:${PCOL[p.i]}"></i>${esc(p.nm)} is ${G.step==='place'?'placing':'choosing'}…`:''}</b><span>${wait||(UI.recap?UI.recap.html:'')}</span></div>${human()?'':`<button class="pb sq" data-a="pause" aria-label="${UI.pause?'Resume':'Pause'}">${ico(UI.pause?'play':'pause')}</button>`}</div>${phZoomRow()}`}
+  if(G.step==='place'){const gh=UI.ghost,t=G.cur.t,r=gh?gh.r:PHN.rot,n=UI.cells.length;
+    return `<div class="ps-row r1"><div class="ps-tile">${tileCard(t,r,1)}</div><div class="ps-mid"><b>${esc(phCap(tileWords(t)))}</b><span>${n} spot${n===1?'':'s'} fit${n===1?'s':''} · ${tilesLeft()} left${G.cur.bonus?' · mason’s extra turn':''}</span></div><div class="ph-rb"><button class="pb sq" data-ph="rot" data-d="-1" aria-label="Turn tile left">${phI('rotl')}</button><button class="pb sq" data-ph="rot" data-d="1" aria-label="Turn tile right">${phI('rotr')}</button></div></div>${phZoomRow()}<div class="ps-hint">${hint?esc(hint):'Tap a glowing square to try your tile there.'}</div>`}
+  if(G.step==='fig')return `<div class="ps-row"><div class="ps-msg"><b>Place a follower?</b><span>${hp.sup.f} left${G.cur.bonus?' · extra turn':''}</span></div><button class="pb pri" data-ph="figshow">Choose</button><button class="pb" data-mv='{"act":"skip"}'>Skip</button></div>${phZoomRow()}<div class="ps-hint">${hint?esc(hint):''}</div>`;
+  return ''}
+function phPopHTML(){if(!G)return '';if(PHN.cards.length)return '';const hp=me();
+  if(PHN.pop==='menu')return phMenuPopup();if(PHN.pop==='info')return phInfoPopup()||'';
+  if(hp&&G.step==='place'&&UI.ghost)return phPlacePopup(hp);
+  if(hp&&G.step==='fig'&&PHN.figHide!==G.turn+':'+G.step)return phFigPopup(hp);return ''}
+function phCoachTip(){if(!UI.guide||!G||!me()||UI.modal||PHN.cards.length)return;const hp=me(),k=(x)=>'ph_'+x;const once=(key,txt)=>{if(UI.seen[k(key)])return false;UI.seen[k(key)]=G.turn;saveSeen();PHN.add(phCoachCard(key,txt));return true};
+  if(G.step==='place'){once('place',`Tap a glowing square to try your tile there. Edges must match: town to town, road to road, field to field${G.rv?', river to river':''}. Drag the map to move it, pinch or use + and - to zoom.`);
+    if(hp.sup.f===0)once('nof'+G.turn,'<b>No followers left.</b> They come home when their road, town or priory is finished (farmers never do), so try to finish what you started.')}
+  else if(G.step==='fig'){once('fig','You may put ONE follower on the tile you just laid, only where nobody stands yet. It scores and comes home when its road, town or priory is finished. Skip if you want to keep it.');
+    const ms=figMoves(hp.i).filter(m=>m.act==='fig');if(ms.some(m=>TSEG[G.tiles[G.cur.k].t][m.l].ty==='F'))once('farm','<b>Farmers</b> never come home. At the end a field pays 3 per finished town it touches to whoever has most farmers there.');
+    if(ms.some(m=>m.k==='big'))once('big','<b>Champion:</b> counts as two followers.');if(ms.some(m=>m.k==='bld'))once('bld','<b>Mason:</b> goes where you already have a follower; extend that road or town later for an extra turn.');if(ms.some(m=>m.k==='pig'))once('pig','<b>Hog:</b> joins your farmer; the field pays 4 per town instead of 3.');
+    if(hp.sup.f>0&&hp.sup.f<=2)once('few','You have only '+hp.sup.f+' follower'+(hp.sup.f>1?'s':'')+' left: keep one for a road or town you can finish soon.')}}
+Object.assign(PHN,{
+  render(force){if(!this.on)return;const ps=document.getElementById('ps');if(!ps)return;
+    if(!G){return}
+    if(G.turn<this.lastTurn||G.pl.length!==this.np){this.reset()}this.lastTurn=G.turn;this.np=G.pl.length;
+    // end of game: the final count as cards, once
+    const ek=(G.over?G.turn+':'+G.winText:'');if(ek&&this.endKey!==ek){this.endKey=ek;for(const c of phEndCards())this.add(c)}
+    if(UI.ghost)this.rot=UI.ghost.r;
+    // a new decision for me closes an info / menu pop-up left open from before
+    {const sk=me()?G.turn+':'+G.step:'';if(sk&&this.stepK!==sk&&this.pop){this.pop=null;this.info=null}this.stepK=sk}
+    // pop-ups that no longer apply close by themselves
+    if(this.pop==='info'&&(!this.info||!G.tiles[this.info.k]))this.pop=null;
+    if(G.step!=='fig'||!me()){if(this.figHide)this.figHide=''}
+    // my turn: bring the new tile's spots / rings into view
+    const hp=me();const fk=hp&&G.step==='fig'?G.turn+':fig':'';if(fk&&this.figK!==fk&&V3.on&&!this.cards.length){this.figK=fk;this.figFrame()}if(!fk)this.figK='';
+    if(hp&&G.step==='place'&&this.figZ&&V3.on){this.figZ=false;this.gi=0;fitAll(false)}
+    phCoachTip();
+    const card=this.cards[0];const ch=card?card.h:'';const pc=document.getElementById('pc');
+    if(card&&card.root!=null&&this.focusK!==card.id){this.focusK=card.id;this.focusFeat(card.root)}if(!card)this.focusK='';
+    if(ch!==this.cardH||force){this.cardH=ch;pc.innerHTML=ch;pc.hidden=!ch;pc.classList.toggle('in',!!ch)}
+    const chips=phChips();if(chips!==this.chips){this.chips=chips;document.getElementById('pchips').innerHTML=chips}
+    const bar=phBarHTML();if(bar!==this.bar){this.bar=bar;document.getElementById('pbar').innerHTML=bar}
+    const sh=phStripHTML();if(sh!==this.strip){this.strip=sh;ps.innerHTML=sh}
+    const pp=document.getElementById('ppop');const ph=phPopHTML();if(ph!==this.pops){const fresh=!this.pops;this.pops=ph;pp.innerHTML=ph;pp.hidden=!ph;pp.classList.toggle('in',fresh&&!!ph)}
+    const ab=document.getElementById('advbtn');if(ab){ab.setAttribute('aria-label','What would the computer do?')}
+  },
+  init(){Object.assign(ICP,PH_IC);if(!this.on)return;this.render(true)}
+});
+document.addEventListener('click',e=>{if(!PHN.on)return;const b=e.target.closest('[data-ph],.ph-menu .mi,#ppop [data-gx]');if(!b)return;const a=b.dataset.ph;
+  if(!a){if(b.closest('.ph-menu'))setTimeout(()=>{PHN.pop=null;PHN.render(true)},0);return}
+  if(a==='menu'){PHN.pop=PHN.pop==='menu'?null:'menu';PHN.info=null;PHN.render(true)}
+  else if(a==='pclose'){PHN.pop=null;PHN.info=null;PHN.render(true)}
+  else if(a==='figx'){PHN.figHide=G.turn+':'+G.step;PHN.render(true)}
+  else if(a==='figshow'){PHN.figHide='';PHN.render(true)}
+  else if(a==='cont')PHN.cont();
+  else if(a==='skipall'){PHN.cards=PHN.cards.filter(c=>!c.end||c.final);PHN.render(true)}
+  else if(a==='results'){PHN.add(phResultCard());PHN.render(true)}
+  else if(a==='rot'){const d=+b.dataset.d;if(UI.ghost)rotGhost(d);else{PHN.rot=(PHN.rot+d+4)%4;PHN.render(true)}}
+  else if(a==='zin'){PHN.zoom(1/1.4)}else if(a==='zout'){PHN.zoom(1.4)}else if(a==='all'){fitAll(false,true)}else if(a==='spots')PHN.spots();else if(a==='last')PHN.last()});
+document.addEventListener('keydown',e=>{if(!PHN.on||e.key!=='Escape')return;if(GX.open)return;if(PHN.cards.length)return;
+  if(PHN.pop){PHN.pop=null;PHN.info=null;PHN.render(true);e.stopImmediatePropagation();return}
+  if(G&&me()&&G.step==='fig'&&PHN.figHide!==G.turn+':'+G.step){PHN.figHide=G.turn+':'+G.step;PHN.render(true);e.stopImmediatePropagation()}},true);
+
+</script>
+<script>
 // ---------- UI: the valley fills the screen; the dock says what to do now; everything else is a popup ----------
 const $=s=>document.querySelector(s);const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 Object.assign(UI,{cells:[],ghost:null,spotOpts:[],kind:'f',advice:null,recap:null,fxSeen:0,modal:null,guide:true,seen:{},storySeen:0,tt:null});
@@ -2042,7 +2346,7 @@ const human=()=>G&&G.pl.some(p=>p.human);
 function refresh(){if(G&&!NET.on){try{if(!G.over&&human())localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G){render();return}computeUI();playFx();netTurnCue();render();try{sync3D();autoFit()}catch(e){console.error(e)}schedule()}
 // at the start of a human placement, make sure every glowing square is on screen
-function autoFit(){if(!V3.on||!me()||G.step!=='place'||UI.fitTurn===G.turn)return;UI.fitTurn=G.turn;const R=V3.r.domElement;const off=UI.cells.some(k=>{const [x,y]=unkey(k);const v=screenOf(cellWorld(x,y));return !v.in||v.x<50||v.y<50||v.x>R.clientWidth-50||v.y>R.clientHeight-50});if(off)fitAll(false)}
+function autoFit(){if(!V3.on||!me()||G.step!=='place'||UI.fitTurn===G.turn)return;UI.fitTurn=G.turn;const R=V3.r.domElement;const off=(PHN.on&&PHN.tilePx()<PHN.MIN*.9)||UI.cells.some(k=>{const [x,y]=unkey(k);const v=screenOf(cellWorld(x,y));return !v.in||v.x<50||v.y<50||v.x>R.clientWidth-50||v.y>R.clientHeight-50});if(off)fitAll(false)}
 // what glows for the human now
 function computeUI(){const p=me();UI.cells=[];UI.spotOpts=[];
   if(!p){UI.ghost=null;UI.advice=null;return}
@@ -2053,7 +2357,7 @@ function computeUI(){const p=me();UI.cells=[];UI.spotOpts=[];
   if(G.step==='fig'){const ms=figMoves(p.i).filter(m=>m.act==='fig');const kinds=[...new Set(ms.map(m=>m.k))];if(!kinds.includes(UI.kind))UI.kind=kinds[0]||'f';
     UI.spotOpts=ms.filter(m=>m.k===UI.kind).map(m=>({l:m.l,k:m.k,adv:UI.advice&&same(UI.advice.fig,m)}))}}
 // ---------- sound + animation cues ----------
-function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(f.t==='turn'&&NET.on&&f.x===NET.mySeat)continue;if(typeof sfx==='function')sfx({place:'place',fig:'fig',score:'score',home:'home',goods:'goods',story:'story',win:'win',turn:'turn',discard:'bad'}[f.t]||'');
+function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(PHN.on)PHN.fx(f);if(f.t==='turn'&&NET.on&&f.x===NET.mySeat)continue;if(typeof sfx==='function')sfx({place:'place',fig:'fig',score:'score',home:'home',goods:'goods',story:'story',win:'win',turn:'turn',discard:'bad'}[f.t]||'');
     if(f.t==='score'&&V3.on&&f.x&&G.fd[f.x.r]){const F=G.fd[f.x.r];let pos;if(F.ty==='M')pos=cellWorld(F.x,F.y);else{let sx=0,sz=0;for(const k of F.tiles){const [x,y]=unkey(k);sx+=x;sz+=y}pos=cellWorld(sx/F.tiles.length,sz/F.tiles.length)}scorePop('+'+f.x.pts,PCOL[f.x.win[0]],pos)}}
   UI.fxSeen=UI.fx.length;if(UI.fx.length>40){UI.fx.splice(0,30);UI.fxSeen=UI.fx.length}}
 // ---------- words ----------
@@ -2090,7 +2394,7 @@ function placementPreview(t,r,x,y,pi){const pr=probe(t,r,x,y);const out=[];const
   if(G.ex.tb&&!G.cur.bonus){const b=G.figs.find(f=>f.p===pi&&f.k==='bld');if(b){const br=find(b.s);if(pr.groups.some(g=>g.roots.includes(br)))out.push('🔨 Extends your mason’s feature: extra turn')}}
   return out}
 // ---------- rendering ----------
-function render(){renderModal();if(!G)return;renderDock();renderPopups();renderMap2D();renderBar()}
+function render(){renderModal();if(!G)return;renderDock();renderPopups();renderMap2D();renderBar();if(PHN.on)PHN.render()}
 function renderBar(){const pb=$('#pausebtn');if(pb){pb.hidden=!G||human()||!!G.over;pb.innerHTML=ico(UI.pause?'play':'pause')}const sb=$('#speedbtn');if(sb)sb.innerHTML=ico('ff')+' '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal');
   const gb=$('#guidebtn');if(gb){gb.classList.toggle('on',UI.guide);gb.setAttribute('aria-pressed',UI.guide?'true':'false')}
   const ab=$('#advbtn');if(ab)ab.disabled=!me();
@@ -2194,18 +2498,18 @@ function renderMap2D(){const el=$('#map2d');if(!el)return;if(V3.on){el.hidden=tr
   el.innerHTML=s+'</svg>'}
 function spot2(k,l){const T=G.tiles[k],[x,y]=unkey(k);const sp=rotP(buildGeo(T.t).spots[l],T.r);return [x*100-50+sp[0],y*100-50+sp[1]]}
 // ---------- input ----------
-function on3DTap(k,w){const p=me();if(!p)return;
+function on3DTap(k,w){if(PHN.on&&PHN.tap(k,w))return;const p=me();if(!p)return;
   if(G.step==='place'){if(!k||!UI.cells.includes(k)){if(k&&!G.tiles[k])toast('Your tile can’t go there — pick a glowing square.');return}
     const L=legalPlacements(G.cur.t).filter(q=>key(q.x,q.y)===k).map(q=>q.r);
     if(UI.ghost&&UI.ghost.k===k){rotGhost(1);return}
-    let r=L[0];const adv=UI.advice&&UI.advice.place;if(adv&&key(adv.x,adv.y)===k)r=adv.r;else if(UI.ghost&&L.includes(UI.ghost.r))r=UI.ghost.r;
+    let r=L[0];const adv=UI.advice&&UI.advice.place;if(adv&&key(adv.x,adv.y)===k)r=adv.r;else if(UI.ghost&&L.includes(UI.ghost.r))r=UI.ghost.r;else if(PHN.on&&L.includes(PHN.rot))r=PHN.rot;
     UI.ghost={k,r,rots:L,t:G.cur.t,turn:G.turn};sfx&&sfx('click');refreshUI();return}
   if(G.step==='fig'&&w&&UI.spotOpts.length){let best=null,bd=.45;for(const o of UI.spotOpts){const q=spotWorld(G.cur.k,o.l);const d=Math.hypot(q.x-w.x,q.z-w.z);if(d<bd){bd=d;best=o}}
     if(best)return go({act:'fig',k:best.k,l:best.l});toast('Tap one of the glowing rings on your new tile, or use the buttons.')}}
 function rotGhost(d){const g=UI.ghost;if(!g||!g.rots.length)return;let i=g.rots.indexOf(g.r);i=(i+d+g.rots.length)%g.rots.length;g.r=g.rots[i];sfx&&sfx('click');refreshUI()}
 function refreshUI(){computeUI();render();try{sync3D()}catch(e){console.error(e)}}
 function go(m){if(NET.on){if(isClient()){if(!me())return;sfx&&sfx('click');netSend(m);return}const s0=sideToAct();if(s0>=0&&P(s0).human&&!me())return}const s=sideToAct();const r=performMove(m,s);if(!r.success){toast('That move isn’t allowed now.');console.error(r.error)}}
-function toast(t){const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,3200)}
+function toast(t){if(PHN.on){PHN.toast(t);return}const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,3200)}
 function advise(){const p=me();if(!p)return;if(G.step==='place'){const plan=aiPlan(p.i,'normal');UI.advice={turn:G.turn+':'+G.step,place:plan.place,fig:plan.fig,text:adviceText(plan,p.i)};const k=key(plan.place.x,plan.place.y);
     UI.ghost={k,r:plan.place.r,rots:legalPlacements(G.cur.t).filter(q=>key(q.x,q.y)===k).map(q=>q.r),t:G.cur.t,turn:G.turn};focusCell(k)}
   else if(G.step==='fig'){const m=bestFigNow(p.i,'normal');let text;if(m.act==='skip')text='Keep your followers: nothing here is worth one right now.';else{const T=G.tiles[G.cur.k];const s=TSEG[T.t][m.l];const r=find(T.s0+m.l);const d=descRoot(r,'normal');const w=Math.round(worth(d,'normal'));
@@ -2248,8 +2552,8 @@ function moveRecaps(before){const p=P(before.p);const sc=before.scored.filter(x=
   if(sc.length)t+='. '+sc.map(x=>`${x.win.map(i=>P(i).nm).join(' & ')} +${x.pts} (${FEAT[x.ty]})`).join(', ');
   if(before.bonusEarned)t+='. Its mason earns an extra turn';return {mine,recap:{html:t+'.',n:G.turn}}}
 // ---------- the computer ----------
-let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!(isHost()&&UI.modal!=='story'))||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;
-  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!isHost())||isClient())return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.step);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*(G.step==='fig'?.7:1)))}
+let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||PHN.blocking()||(UI.modal&&!(isHost()&&UI.modal!=='story'))||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;
+  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!isHost())||isClient())return;if(PHN.blocking()){return}const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.step);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*(G.step==='fig'?.7:1)))}
 // ---------- settings popup: graphics quality ----------
 function renderSettings(){const el=$('#setbody');if(!el)return;const has=typeof V3!=='undefined';const pref=has?V3.pref:'auto';const now=has&&V3.on?GFX[V3.q].nm:'2D map';
   const opt=[['auto','Auto','picks for this screen'],['high','High','bloom, soft 2k shadows, full sharpness'],['med','Medium','soft shadows, no post-processing'],['low','Low','no shadows or effects; lightest on the battery']];
@@ -2258,7 +2562,7 @@ function renderSettings(){const el=$('#setbody');if(!el)return;const has=typeof 
     ${typeof PerfHUD!=='undefined'?`<div class="qopts spd">${PerfHUD.buttonsHTML('btn')}</div><p class="small muted">Show speed: a frame-rate overlay (also F9). Test speed: tries each level for 2 s and suggests one.</p>`:''}</div>`}
 const CREDITS_HTML=`<section class="credits-audio"><h3>Credits</h3><p>Names, card text and art are original.</p><h4>Audio</h4><p>With thanks to these public-domain (CC0) creators:</p><ul><li>Music: &ldquo;Medieval: Harvest Season&rdquo; by RandomMind (<a target="_blank" rel="noopener" href="https://opengameart.org/content/medieval-harvest-season">OpenGameArt</a>, CC0)</li><li>Sound effects: Impact Sounds, Interface Sounds, Music Jingles, RPG Audio, UI Audio by <a target="_blank" rel="noopener" href="https://kenney.nl">Kenney</a> (CC0)</li></ul><p><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p></section>`;
 function onGfxChange(){if(typeof GX!=='undefined'&&GX.open==='setd')renderSettings()}
-function boot(){GX.init({key:'rv'});paintIcons();GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=iconize(RULES_HTML)+CREDITS_HTML;if(id==='refd')$('#refbody').innerHTML=iconize(refHtml());if(id==='setd')renderSettings();if(G)render()};try{init3D()}catch(e){console.error(e)}soundBtns();openStart();netInit()}
+function boot(){GX.init({key:'rv'});paintIcons();phApply();PHN.init();GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=iconize(RULES_HTML)+CREDITS_HTML;if(id==='refd')$('#refbody').innerHTML=iconize(refHtml());if(id==='setd')renderSettings();if(G)render()};try{init3D()}catch(e){console.error(e)}soundBtns();openStart();netInit()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 
 </script>
