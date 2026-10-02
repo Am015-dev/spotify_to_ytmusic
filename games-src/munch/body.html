@@ -2,6 +2,7 @@
 <div class="gx-app">
 <header class="gx-bar">
   <h1>Doorkick <span>Dungeon</span></h1>
+  <span class="ph-chip" id="phchip" aria-live="off"></span>
   <span class="gx-sp"></span>
   <button class="gx-ibtn" data-gx="dkLog" aria-label="Dungeon diary"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-scroll"/></svg> <span class="gx-lbl">Diary</span></button>
   <button class="gx-ibtn" data-gx="dkOpp" aria-label="Rivals: their gear and cards"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-rivals"/></svg> <span class="gx-lbl">Rivals</span></button>
@@ -15,6 +16,7 @@
   <button class="gx-ibtn dk-wide" data-a="new">New game</button>
   <button class="gx-ibtn dk-menub" data-gx="dkMenu" aria-label="Menu: sound, speed, hints, graphics, speed test, new game" title="Menu (and Show speed / Test speed)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg></button>
 </header>
+<div id="phopps" class="phopps" aria-label="Players"></div>
 <div class="gx-main">
   <main class="gx-board" id="app"></main>
   <aside class="gx-dock" aria-label="What to do now"><div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Doorkick Dungeon</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-dock"/></svg></button></div><div class="gx-dock-body" id="side"></div></aside>
@@ -45,5 +47,6 @@
 <script src="coach.js"></script>
 <script src="net.js"></script>
 <script src="ui.js"></script>
+<script src="ph.js"></script>
 </body>
 </html>

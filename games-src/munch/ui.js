@@ -82,12 +82,15 @@ function recentHTML(){if(!G||!G.log.length)return '';const o=G.out&&G.out.turn==
 function oppsHTML(me){return `<div class="opps" aria-label="Rivals">${G.pl.filter(p=>p.i!==me).map(p=>{const act=p.i===G.active;const bk=barkOf(p.i);const rv=me>=0&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]||null):null;
   return `<button class="opp paper ${act?'active':''}" data-opp="${p.i}" title="${esc(heroTitle(p))}: level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play" aria-label="${esc(p.nm)}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items${act?', their turn':''}${rv&&rv.curse?`, has cursed you ${rv.curse} times`:''}. Tap for details."><span class="nm">${ptok(p.i)} ${esc(p.nm)}${p.human?'':' <span class="small muted bot">🤖</span>'}${rv&&rv.curse?` <span class="grudge">☁×${rv.curse} on you</span>`:''}</span><span class="lv" aria-hidden="true"><small>Lv</small>${p.lvl}</span>
    <span class="st" aria-hidden="true">${bk?`<span class="bark">💬 “${esc(bk)}”</span>`:`⚔${pStr(p)}<i> str</i> ✋${p.hand.length}<i> cards</i> 🎒${p.eq.length}<i> items</i>${p.curse.length?' ☁'+p.curse.length:''}${p.dead?' 💀':''}`}</span></button>`}).join('')}</div>`}
+// phone only (CSS shows it instead of the mini cards): one readable row per card, tap = the big card
+function phList(p){const ids=p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>({id,on:true})).concat(p.eq.map(e=>({id:e.id,on:e.on})));
+  return `<ul class="phlist">${ids.map(x=>{const c=cd(x.id);const t=tagOf(c).replace(/<[^>]+>/g,'');return `<li><button class="gchip ${c.d==='door'?'door':'tr'} ${x.on?'':'eqoff'}" data-card="${x.id}" aria-label="${esc(c.n)}: ${esc(c.x||'')}${x.on?'':' (carried, not worn)'}"><b>${esc(c.n)}</b>${t?' '+esc(t):''}${x.on?'':' (not worn)'}</button></li>`}).join('')||'<li class="small muted">No items yet.</li>'}</ul>`}
 function oppsFullHTML(me){const ps=G.pl.filter(p=>p.i!==me);const f=UI.oppView;ps.sort((a,b)=>(b.i===f)-(a.i===f));if(!ps.length)return '<p class="muted">No rivals.</p>';
   return ps.map(p=>{const act=p.i===G.active;return `<div class="oppfull paper ${act?'active':''}"><span class="lv" aria-label="level">${p.lvl}</span>
    <div class="nm">${ptok(p.i)} ${esc(heroTitle(p))} ${p.human?'':'<span class="small muted">(computer'+(p.lv!=='normal'?' · '+p.lv:'')+')</span>'}${act?' <span class="chip" style="background:#ffd43b;color:#2b2233">their turn</span>':''}</div>
    <div class="small">⚔ strength ${pStr(p)} (level ${p.lvl} + items ${itemBonus(p)}) · ${p.sex==='m'?'♂':'♀'} · ✋ ${p.hand.length} card${p.hand.length===1?'':'s'} in hand (secret)${p.dead?' · 💀 dead':''}</div>${PERSONA[p.nm]?`<div class="small muted">${esc(PERSONA[p.nm][1])}.</div>`:''}${(()=>{const me=viewSeat();const rv=me>=0&&me!==p.i&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]):null;return rv&&(rv.curse+rv.boost+rv.stab)?`<div class="small warn">Against you so far: ${rv.curse} curse${plural(rv.curse)}, ${rv.boost} monster boost${plural(rv.boost)}, ${rv.stab} backstab${plural(rv.stab)}.${rv.curse>=2?' Payback?':''}</div>`:''})()}
    <div class="chips">${races(p).concat(classes(p)).map(r=>`<span class="chip">${esc(TRAITNAME[r]||r)}</span>`).join('')}${p.curse.map(id=>`<span class="chip" style="background:#e9ecef;color:#2b2233">☁ ${esc(cname(id))}</span>`).join('')}</div>
-   <div class="tableau">${p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>cardHTML(id,{size:'xs'})).join('')}${p.eq.map(e=>cardHTML(e.id,{size:'xs',cls:e.on?'':'eqoff'})).join('')||'<span class="small muted">No items yet.</span>'}</div></div>`}).join('')}
+   <div class="tableau">${p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>cardHTML(id,{size:'xs'})).join('')}${p.eq.map(e=>cardHTML(e.id,{size:'xs',cls:e.on?'':'eqoff'})).join('')||'<span class="small muted">No items yet.</span>'}</div>${phList(p)}</div>`}).join('')}
 function deckHTML(kind,n){const d=Math.min(10,Math.ceil(n/7));const sh=[];for(let i=1;i<=d;i++)sh.push(`${(i*.55).toFixed(1)}px ${(i*1.25).toFixed(1)}px 0 ${i===d?'#1a0d06':i%2?'#e9dab4':'#bfa878'}`);
   const door=kind==='door';return `<div class="stack ${door?'door':'treas'}" aria-label="${door?'Door':'Treasure'} deck" style="--deck:${sh.join(',')||'0 0 0 transparent'}${n?'':';opacity:.35'}"><span class="back">${typeof cardBack==='function'?cardBack(door?'door':'tr'):''}</span><span class="dn">${door?'DOOR':'TREASURE'}</span><span class="n">${n}</span></div>`}
 function pilesHTML(){const dk=G.door.length;const ld=G.dd[G.dd.length-1];
@@ -197,8 +200,8 @@ function askHTML(me){const cb=G.cb;const opts=validMoves(me).filter(m=>m.act==='
 function infoHTML(c){return `${c.t==='monster'?`<p class="small">Level ${c.lvl} · ${c.tr} treasure${c.tr===1?'':'s'}${(c.lv||1)>1?` · worth ${c.lv} levels`:''}<br>Bad Stuff: ${esc(c.badt||'lose a level')}</p>`:''}${c.t==='item'?`<p class="small">${kindLabel(c)} · ${tagOf(c).replace(/<[^>]+>/g,'')||'+0'} · ${c.g||0} gold${c.req?` · ${[].concat(c.req).map(r=>r[0]==='!'?'not for '+(TRAITS[r.slice(1)]||r.slice(1)):'only for '+(TRAITS[r]||r)).join(', ')}`:''}</p>`:''}<p class="when small"><b>When you can play it:</b> ${esc(whenText(c))}</p>`}
 function menuHTML(me){const u=UI.menu;
   const id=u.card;const ms=cardMoves(me,id);const c=cd(id);const co=coach(me);const recK=UI.hints&&co.rec?mvKey(co.rec):null;const rk=riskyCard(me,id);
-  return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${rk?`<p class="warn">⚠ ${esc(rk)}.</p>`:''}
-    <div class="opts">${ms.map(m=>`<button class="btn opt ${recK&&recK===mvKey(m)?'rec':''}" data-mv='${esc(JSON.stringify(m))}'>${moveLabel(m)}</button>`).join('')||'<p class="small muted">You can\'t use this card right now.</p>'}</div>
+  return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${rk?`<p class="warn">⚠ ${esc(rk)}.</p>`:''}${UI.hints&&co.card===id&&co.why?`<p class="why">💡 ${co.why}</p>`:''}
+    <div class="opts">${ms.map(m=>`<button class="btn opt ${recK&&recK===mvKey(m)?'rec':''}" data-mv='${esc(JSON.stringify(m))}'>${moveLabel(m)}</button>`).join('')||'<p class="small muted">You can\'t use this card right now.</p>'}${me>=0&&validMoves(me).some(m=>m.act==='sell')&&sellable(P(me)).includes(id)?`<button class="btn opt sellone" data-a="sellone" data-id="${id}">Sell it (${cd(id).g||0} gold)</button>`:''}</div>
     <div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function zoomHTML(){const id=UI.zoom;const c=cd(id);const me=viewSeat();const mineCard=me>=0&&P(me).hand.includes(id);return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${mineCard?'<p class="small muted">You can’t use this card right now.</p>':''}<div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h2>Pass the device to ${esc(P(s).nm)}</h2><p>Everyone else, look away: ${esc(P(s).nm)}'s hand is secret.</p><button class="btn primary" data-a="iam">I'm ${esc(P(s).nm)}: show my cards</button></div>`}
@@ -223,6 +226,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='askmenu'){UI.menu={ask:true};render();return}
   if(a==='sellmode'){UI.sell=[];render();return}
   if(a==='sellx'){UI.sell=null;render();return}
+  if(a==='sellone'){const me=viewSeat();if(me>=0&&sellable(P(me)).includes(+t.dataset.id)){UI.sell=[+t.dataset.id];UI.menu=null;UI.zoom=null;if(GX.open==='dkCard')GX.close();render()}return}
   if(a==='iam'){UI.lastSeat=UI.pass;UI.pass=null;render();return}
   if(a==='rules'){GX.show('dkRules');return}
   if(a==='new'){G=null;UI.info=true;UI.menu=null;UI.zoom=null;UI.sell=null;GX.close();render();return}
@@ -240,7 +244,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
     if(t.closest('.dlg')||t.closest('#dkCard')){return}
     if(UI.sell){if(me>=0&&sellable(P(me)).includes(id)){const i=UI.sell.indexOf(id);if(i>=0)UI.sell.splice(i,1);else UI.sell.push(id);render()}return}
     const ms=cardMoves(me,id);
-    if(ms.length===1&&['give','toss','equip','unequip'].includes(ms[0].act)){uiAct(ms[0]);return}
+    if(ms.length===1&&['give','toss','equip','unequip'].includes(ms[0].act)&&!document.documentElement.classList.contains('ph')){uiAct(ms[0]);return}
     if(ms.length){UI.menu={card:id};render();return}UI.zoom=id;render();return}
 });
 document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key==='Escape'){UI.menu=null;UI.zoom=null;UI.rules=false;if(G)render();return}

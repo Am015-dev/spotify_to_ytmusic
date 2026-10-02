@@ -460,12 +460,142 @@ html.baked[data-gfx="high"] .felt::before{display:block;background:radial-gradie
 .nwl{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .nwc{font-size:.82rem;padding:1px 8px;border-radius:99px;border:1px solid var(--c);background:#fff;color:var(--ink);box-shadow:inset 4px 0 0 var(--c)}
 .nwc.ok{opacity:.7;background:#e9f5e3}
+/* ===== phone layout: every rule starts with html.ph (desktop and the 768x1024 tablet are untouched) ===== */
+.ph-chip,.phopps{display:none}
+html.ph{--ph-bar:44px;--ph-rail:clamp(290px,41vw,340px);--ph-dock:clamp(172px,23dvh,226px);--ph-tb:62dvh}
+html.ph .gx-app{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
+/* top bar: status chip + 3 icon buttons (44 px) */
+html.ph .gx-bar{height:calc(var(--ph-bar) + env(safe-area-inset-top,0px));min-height:0;padding:env(safe-area-inset-top,0px) 6px 0;gap:6px;overflow:hidden;align-items:center}
+html.ph .gx-bar h1,html.ph .gx-bar .gx-sp,html.ph .gx-bar .gx-lbl,html.ph .gx-bar .dk-wide,html.ph .gx-bar [data-gx="dkOpp"]{display:none!important}
+html.ph .gx-bar .gx-ibtn{min-width:44px;min-height:44px;width:44px;padding:0;border-radius:10px;flex:none}
+html.ph .ph-chip{display:block;flex:1 1 0;min-width:0;font:700 14px/1.2 var(--title);color:var(--cream);text-shadow:0 1px 0 #000;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px}
+/* player chips: rivals (and me in landscape): level, strength, cards, items; tap = their cards */
+html.ph .phopps{display:flex;gap:6px;padding:4px 6px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;min-width:0}
+html.ph .phopps::-webkit-scrollbar{display:none}
+html.ph .phc{flex:1 0 108px;max-width:190px;min-height:46px;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto;align-content:center;padding:3px 8px 3px 11px;border-radius:10px;border:1px solid #0d0603;color:var(--cream);font:inherit;text-align:left;cursor:pointer;
+  background:linear-gradient(#5a2f1a,#3a1c0e);box-shadow:inset 4px 0 0 var(--c),inset 0 1px 0 rgba(255,220,160,.18),0 2px 0 rgba(0,0,0,.4)}
+html.ph .phc .n{display:flex;align-items:center;gap:4px;min-width:0;font-size:13px;line-height:1.2}
+html.ph .phc .n b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+html.ph .phc .l{font:800 13px/1 var(--title);font-style:normal;color:#ffd76a;text-shadow:0 1px 0 #000;margin-right:2px}
+html.ph .phc .s{font-size:13px;line-height:1.2;color:var(--cream2);white-space:nowrap;overflow:hidden}
+html.ph .phc .s .ic{width:1em;height:1em;vertical-align:-.12em}
+html.ph .phc.act{outline:2px solid #ffd76a;outline-offset:1px}
+html.ph .phc.me{cursor:default;background:linear-gradient(#6a3a1c,#44230f)}
+html.ph-p .phc.me{display:none}
+/* table first */
+html.ph .gx-board{padding:4px;gap:4px}
+html.ph #app .opps{display:none}
+html.ph .table{perspective:none;--sw:clamp(34px,min(15cqh,12cqw),54px)}
+html.ph .felt{transform:none;padding:6px;gap:4px;border-radius:12px}
+html.ph .pile{gap:3px}html.ph .pile .lbl{font-size:13px}
+html.ph .pile .lbl{font-size:13px}
+html.ph .arena{--cw:clamp(56px,calc((100cqh - var(--res,110px))/1.42),230px)}
+html.ph .arena .vs{font-size:14px}
+html.ph .score .sl{display:none}html.ph .score .num{font-size:1.1rem}
+html.ph .arena .mon>.small,html.ph .arena .small{font-size:13px}
+html.ph .empty{font-size:15px}html.ph .empty.small{font-size:13px}
+html.ph .outcome{padding:6px 14px}html.ph .outcome .oh{font-size:1.2rem}html.ph .outcome .os,html.ph .outcome .story{font-size:14px}
+/* my mat: one status line (portrait), gear chips, hand as a compact fan */
+html.ph .mine{padding:3px 6px 2px;--hw:64px;gap:2px}
+html.ph .mine.paper::before{display:none}
+html.ph .mine .top .who{font-size:14px}html.ph .mine .top .str{font-size:13px}html.ph .mine .lv{font-size:1.2rem}
+html.ph-l .mine .top{display:none}
+html.ph .gear{min-height:46px;gap:6px;padding:1px 2px}
+html.ph .gear:not(:has(.gchip)){min-height:20px}
+html.ph .gear .gl{display:none}
+html.ph .gear>.small{font-size:13px}
+html.ph .gchip{min-height:44px;font-size:13px;padding:2px 10px 2px 7px}html.ph .gchip b{font-size:13px}
+html.ph .hand{gap:0;padding:12px 8px 4px;scroll-snap-type:none;-webkit-mask-image:none;mask-image:none}
+html.ph .hand .card{--w:var(--hw);rotate:none;translate:0 0}
+html.ph .hand .card+.card{margin-left:-14px}
+html.ph .hand .card.play,html.ph .hand .card.sug{translate:0 -6px}
+html.ph .hand .card .sugb{display:none}
+html.ph .card:hover{transform:none}
+html.ph .swipe{display:none}
+html.ph-l .mine{--hw:60px}
+/* one action card (the dock) under the table / in the right rail */
+html.ph .gx-dock-head,html.ph .gx-reopen{display:none!important}
+html.ph .gx-dock{border:0;border-top:2px solid var(--brass2);border-radius:0;box-shadow:none;visibility:visible!important}
+html.ph .gx-dock-body{display:block!important;padding:6px 10px 8px;font-size:15px}
+html.ph #prompt .order,html.ph #prompt .steps,html.ph #prompt>.who,html.ph #prompt ol,html.ph #prompt>.fightnote,html.ph #prompt>.tip:last-child,html.ph .recent,html.ph .hint .hx{display:none}
+html.ph #prompt p{margin:2px 0 4px;font-size:15px;line-height:1.25}
+html.ph #prompt .acts.main{position:static;background:none;box-shadow:none;padding:2px 0;margin:4px 0;gap:8px}
+html.ph #prompt .acts .btn{min-height:48px;font-size:16px;flex:1 1 auto;justify-content:center;text-align:center;padding:6px 12px}
+html.ph .hint{padding:5px 8px;font-size:13px;margin:4px 0}
+html.ph .hint .hl{font-size:13px;line-height:1.25}
+html.ph .toast{font-size:14px}
+html.ph .rec::after{font-size:13px}
+html.ph .btn{min-height:44px}
+html.ph .btn.rec{box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 2px 0 #3a2213,0 0 0 3px #7fd0ff}
+html.ph #prompt .asks{margin:0;box-sizing:border-box;position:fixed;z-index:35;left:0;right:0;bottom:0;max-height:calc(100dvh - var(--ph-tb));overflow:auto;border-radius:14px 14px 0 0;background:var(--paper);padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));font-size:15px;box-shadow:0 -10px 30px rgba(0,0,0,.5)}
+html.ph #prompt .asks .small{font-size:13px}
+/* portrait grid: bar / chips / (table+mat | action card) */
+html.ph-p .gx-app{grid-template-rows:auto auto minmax(0,1fr)}
+html.ph-p .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) var(--ph-dock)}
+html.ph-p .gx-dock{height:var(--ph-dock)!important;max-height:none!important;padding-bottom:env(safe-area-inset-bottom,0px)}
+/* landscape grid: board full height on the left; bar + chips + action card in the right rail */
+html.ph-l .gx-app{grid-template-columns:minmax(0,1fr) var(--ph-rail);grid-template-rows:auto auto minmax(0,1fr)}
+html.ph-l .gx-main{display:contents}
+html.ph-l .gx-board{grid-column:1;grid-row:1/4;padding-top:calc(4px + env(safe-area-inset-top,0px))}
+html.ph-l .gx-bar{grid-column:2;grid-row:1}
+html.ph-l .phopps{grid-column:2;grid-row:2;flex-wrap:wrap;overflow:hidden;max-height:104px}
+html.ph-l .phc{flex:1 1 calc(50% - 6px);max-width:none}
+html.ph-l .gx-dock{grid-column:2;grid-row:3;height:auto!important;max-height:none!important;min-height:0;border-top:2px solid var(--brass2);border-left:0;padding-bottom:env(safe-area-inset-bottom,0px)}
+/* landscape fight: the two totals sit beside the monster card instead of above it */
+html.ph-l .arena:has(>.vs){--res:34px!important;display:grid;grid-template-columns:auto minmax(0,auto) auto;grid-template-rows:auto auto;column-gap:6px;align-content:center;justify-content:center;align-items:center}
+html.ph-l .arena:has(>.vs) .vs{display:contents}
+html.ph-l .arena:has(>.vs) .vs .score.hero{grid-column:1;grid-row:1}
+html.ph-l .arena:has(>.vs) .vs .vsx{position:absolute;left:50%;top:2px;translate:-50% 0;width:1.6em;height:1.6em;opacity:.9}
+html.ph-l .arena:has(>.vs) .vs .score.mons{grid-column:3;grid-row:1}
+html.ph-l .arena:has(>.vs) .row.mons{grid-column:2;grid-row:1}
+html.ph-l .arena:has(>.vs)>.row.small,html.ph-l .arena:has(>.vs)>.rollbox{grid-column:1/4}
+/* pop-ups (card, rival, ask) live in the free zone: under the table (portrait) / in the right rail (landscape) */
+html.ph .gx-scrim{background:rgba(0,0,0,.18)}
+html.ph .gx-drawer-head{padding:4px 6px 4px 12px;min-height:48px}
+html.ph .gx-drawer-head h2{font-size:1.05rem}
+html.ph .gx-x{min-width:44px;min-height:44px}
+html.ph-p #dkCard,html.ph-p #dkOpp{top:auto;left:0;right:0;bottom:0;width:auto;height:auto;max-height:calc(100dvh - var(--ph-tb))}
+html.ph-l #dkCard,html.ph-l #dkOpp{top:0;bottom:0;right:0;left:auto;width:var(--ph-rail);height:auto;max-height:none;border-radius:14px 0 0 14px;transform:translateX(105%);padding-bottom:env(safe-area-inset-bottom,0px)}
+html.ph-l #dkCard.on,html.ph-l #dkOpp.on{transform:none}
+html.ph .gx-drawer-body{padding:8px 10px 12px;font-size:15px}
+html.ph .zgrid{grid-template-columns:auto minmax(0,1fr);gap:10px}
+html.ph .zoom .card{--w:168px;margin:0;font-size:15px}
+html.ph-l .zoom .card{--w:calc(var(--ph-rail)*.44)}
+html.ph .zoom .card .cx{font-size:13px;line-height:1.15;-webkit-line-clamp:unset}
+html.ph .zoom .card .cn{font-size:14px}html.ph .zoom .card .kind{font-size:13px}html.ph .zoom .card .gold{font-size:13px}html.ph .zoom .card .tag small{display:none}
+html.ph .zoom .small,html.ph .zoom p{font-size:14px;line-height:1.3;margin:.25rem 0}
+html.ph .zoom .why{background:linear-gradient(#eef7ff,#d6ebfb);color:#10263e;border:1px solid #4a86c0;border-radius:8px;padding:4px 8px}
+html.ph .zoom .opts{gap:8px;margin-top:6px}
+html.ph .zoom .opts .btn,html.ph .zoom .acts .btn{width:100%;min-height:48px;white-space:normal;text-align:left;justify-content:flex-start;font-size:15px;line-height:1.2;padding:6px 12px}
+html.ph .zoom .acts{margin:8px 0 0}
+html.ph .oppfull .small,html.ph .oppfull{font-size:14px}
+/* dialogs: start / pass / end */
+html.ph .dlg{padding:12px 14px;font-size:15px}
+html.ph .dlg .small{font-size:13px}
+html.ph .dlg .btn{min-height:46px}
+
+.phlist{display:none}
+html.ph .oppfull .tableau{display:none}
+html.ph .phlist{display:grid;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+html.ph .phlist .gchip{width:100%;justify-content:flex-start;white-space:normal;font-size:14px;min-height:44px}
+html.ph .oppfull .chip{font-size:13px}
+html.ph .phc .n .ptok,html.ph .dlg .ptok,html.ph .mine .ptok,html.ph .oppfull .ptok,html.ph #prompt .ptok{font-size:13px}
+html.ph .seg .btn,html.ph .grid2 .btn{min-width:44px}
+html.ph .zoom .card .tag{font-size:max(13px,calc(var(--u)*10.5))}
+html.ph .zgrid>div:last-child{display:flex;flex-direction:column;min-width:0}
+html.ph .zgrid .opts{order:-2;margin-top:0}
+html.ph .zgrid .why{order:-1;margin-top:8px}
+html.ph .zgrid .acts{display:none}
+html.ph .zgrid .opts .rec::after{display:none}
+html.ph .zgrid .opts .rec::before{content:"";width:1.05em;height:1.05em;flex:none;margin-right:4px;background:currentColor;-webkit-mask:var(--bulb) center/contain no-repeat;mask:var(--bulb) center/contain no-repeat}
+html.ph-l #prompt .asks{left:auto;right:0;top:0;bottom:0;width:var(--ph-rail);max-height:none;border-radius:14px 0 0 14px}
 </style>
 </head>
 <body>
 <div class="gx-app">
 <header class="gx-bar">
   <h1>Doorkick <span>Dungeon</span></h1>
+  <span class="ph-chip" id="phchip" aria-live="off"></span>
   <span class="gx-sp"></span>
   <button class="gx-ibtn" data-gx="dkLog" aria-label="Dungeon diary"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-scroll"/></svg> <span class="gx-lbl">Diary</span></button>
   <button class="gx-ibtn" data-gx="dkOpp" aria-label="Rivals: their gear and cards"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-rivals"/></svg> <span class="gx-lbl">Rivals</span></button>
@@ -479,6 +609,7 @@ html.baked[data-gfx="high"] .felt::before{display:block;background:radial-gradie
   <button class="gx-ibtn dk-wide" data-a="new">New game</button>
   <button class="gx-ibtn dk-menub" data-gx="dkMenu" aria-label="Menu: sound, speed, hints, graphics, speed test, new game" title="Menu (and Show speed / Test speed)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg></button>
 </header>
+<div id="phopps" class="phopps" aria-label="Players"></div>
 <div class="gx-main">
   <main class="gx-board" id="app"></main>
   <aside class="gx-dock" aria-label="What to do now"><div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Doorkick Dungeon</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-dock"/></svg></button></div><div class="gx-dock-body" id="side"></div></aside>
@@ -3139,12 +3270,15 @@ function recentHTML(){if(!G||!G.log.length)return '';const o=G.out&&G.out.turn==
 function oppsHTML(me){return `<div class="opps" aria-label="Rivals">${G.pl.filter(p=>p.i!==me).map(p=>{const act=p.i===G.active;const bk=barkOf(p.i);const rv=me>=0&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]||null):null;
   return `<button class="opp paper ${act?'active':''}" data-opp="${p.i}" title="${esc(heroTitle(p))}: level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play" aria-label="${esc(p.nm)}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items${act?', their turn':''}${rv&&rv.curse?`, has cursed you ${rv.curse} times`:''}. Tap for details."><span class="nm">${ptok(p.i)} ${esc(p.nm)}${p.human?'':' <span class="small muted bot">🤖</span>'}${rv&&rv.curse?` <span class="grudge">☁×${rv.curse} on you</span>`:''}</span><span class="lv" aria-hidden="true"><small>Lv</small>${p.lvl}</span>
    <span class="st" aria-hidden="true">${bk?`<span class="bark">💬 “${esc(bk)}”</span>`:`⚔${pStr(p)}<i> str</i> ✋${p.hand.length}<i> cards</i> 🎒${p.eq.length}<i> items</i>${p.curse.length?' ☁'+p.curse.length:''}${p.dead?' 💀':''}`}</span></button>`}).join('')}</div>`}
+// phone only (CSS shows it instead of the mini cards): one readable row per card, tap = the big card
+function phList(p){const ids=p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>({id,on:true})).concat(p.eq.map(e=>({id:e.id,on:e.on})));
+  return `<ul class="phlist">${ids.map(x=>{const c=cd(x.id);const t=tagOf(c).replace(/<[^>]+>/g,'');return `<li><button class="gchip ${c.d==='door'?'door':'tr'} ${x.on?'':'eqoff'}" data-card="${x.id}" aria-label="${esc(c.n)}: ${esc(c.x||'')}${x.on?'':' (carried, not worn)'}"><b>${esc(c.n)}</b>${t?' '+esc(t):''}${x.on?'':' (not worn)'}</button></li>`}).join('')||'<li class="small muted">No items yet.</li>'}</ul>`}
 function oppsFullHTML(me){const ps=G.pl.filter(p=>p.i!==me);const f=UI.oppView;ps.sort((a,b)=>(b.i===f)-(a.i===f));if(!ps.length)return '<p class="muted">No rivals.</p>';
   return ps.map(p=>{const act=p.i===G.active;return `<div class="oppfull paper ${act?'active':''}"><span class="lv" aria-label="level">${p.lvl}</span>
    <div class="nm">${ptok(p.i)} ${esc(heroTitle(p))} ${p.human?'':'<span class="small muted">(computer'+(p.lv!=='normal'?' · '+p.lv:'')+')</span>'}${act?' <span class="chip" style="background:#ffd43b;color:#2b2233">their turn</span>':''}</div>
    <div class="small">⚔ strength ${pStr(p)} (level ${p.lvl} + items ${itemBonus(p)}) · ${p.sex==='m'?'♂':'♀'} · ✋ ${p.hand.length} card${p.hand.length===1?'':'s'} in hand (secret)${p.dead?' · 💀 dead':''}</div>${PERSONA[p.nm]?`<div class="small muted">${esc(PERSONA[p.nm][1])}.</div>`:''}${(()=>{const me=viewSeat();const rv=me>=0&&me!==p.i&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]):null;return rv&&(rv.curse+rv.boost+rv.stab)?`<div class="small warn">Against you so far: ${rv.curse} curse${plural(rv.curse)}, ${rv.boost} monster boost${plural(rv.boost)}, ${rv.stab} backstab${plural(rv.stab)}.${rv.curse>=2?' Payback?':''}</div>`:''})()}
    <div class="chips">${races(p).concat(classes(p)).map(r=>`<span class="chip">${esc(TRAITNAME[r]||r)}</span>`).join('')}${p.curse.map(id=>`<span class="chip" style="background:#e9ecef;color:#2b2233">☁ ${esc(cname(id))}</span>`).join('')}</div>
-   <div class="tableau">${p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>cardHTML(id,{size:'xs'})).join('')}${p.eq.map(e=>cardHTML(e.id,{size:'xs',cls:e.on?'':'eqoff'})).join('')||'<span class="small muted">No items yet.</span>'}</div></div>`}).join('')}
+   <div class="tableau">${p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>cardHTML(id,{size:'xs'})).join('')}${p.eq.map(e=>cardHTML(e.id,{size:'xs',cls:e.on?'':'eqoff'})).join('')||'<span class="small muted">No items yet.</span>'}</div>${phList(p)}</div>`}).join('')}
 function deckHTML(kind,n){const d=Math.min(10,Math.ceil(n/7));const sh=[];for(let i=1;i<=d;i++)sh.push(`${(i*.55).toFixed(1)}px ${(i*1.25).toFixed(1)}px 0 ${i===d?'#1a0d06':i%2?'#e9dab4':'#bfa878'}`);
   const door=kind==='door';return `<div class="stack ${door?'door':'treas'}" aria-label="${door?'Door':'Treasure'} deck" style="--deck:${sh.join(',')||'0 0 0 transparent'}${n?'':';opacity:.35'}"><span class="back">${typeof cardBack==='function'?cardBack(door?'door':'tr'):''}</span><span class="dn">${door?'DOOR':'TREASURE'}</span><span class="n">${n}</span></div>`}
 function pilesHTML(){const dk=G.door.length;const ld=G.dd[G.dd.length-1];
@@ -3254,8 +3388,8 @@ function askHTML(me){const cb=G.cb;const opts=validMoves(me).filter(m=>m.act==='
 function infoHTML(c){return `${c.t==='monster'?`<p class="small">Level ${c.lvl} · ${c.tr} treasure${c.tr===1?'':'s'}${(c.lv||1)>1?` · worth ${c.lv} levels`:''}<br>Bad Stuff: ${esc(c.badt||'lose a level')}</p>`:''}${c.t==='item'?`<p class="small">${kindLabel(c)} · ${tagOf(c).replace(/<[^>]+>/g,'')||'+0'} · ${c.g||0} gold${c.req?` · ${[].concat(c.req).map(r=>r[0]==='!'?'not for '+(TRAITS[r.slice(1)]||r.slice(1)):'only for '+(TRAITS[r]||r)).join(', ')}`:''}</p>`:''}<p class="when small"><b>When you can play it:</b> ${esc(whenText(c))}</p>`}
 function menuHTML(me){const u=UI.menu;
   const id=u.card;const ms=cardMoves(me,id);const c=cd(id);const co=coach(me);const recK=UI.hints&&co.rec?mvKey(co.rec):null;const rk=riskyCard(me,id);
-  return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${rk?`<p class="warn">⚠ ${esc(rk)}.</p>`:''}
-    <div class="opts">${ms.map(m=>`<button class="btn opt ${recK&&recK===mvKey(m)?'rec':''}" data-mv='${esc(JSON.stringify(m))}'>${moveLabel(m)}</button>`).join('')||'<p class="small muted">You can\'t use this card right now.</p>'}</div>
+  return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${rk?`<p class="warn">⚠ ${esc(rk)}.</p>`:''}${UI.hints&&co.card===id&&co.why?`<p class="why">💡 ${co.why}</p>`:''}
+    <div class="opts">${ms.map(m=>`<button class="btn opt ${recK&&recK===mvKey(m)?'rec':''}" data-mv='${esc(JSON.stringify(m))}'>${moveLabel(m)}</button>`).join('')||'<p class="small muted">You can\'t use this card right now.</p>'}${me>=0&&validMoves(me).some(m=>m.act==='sell')&&sellable(P(me)).includes(id)?`<button class="btn opt sellone" data-a="sellone" data-id="${id}">Sell it (${cd(id).g||0} gold)</button>`:''}</div>
     <div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function zoomHTML(){const id=UI.zoom;const c=cd(id);const me=viewSeat();const mineCard=me>=0&&P(me).hand.includes(id);return `<div class="zoom"><div class="zgrid">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}<div>${infoHTML(c)}${mineCard?'<p class="small muted">You can’t use this card right now.</p>':''}<div class="acts"><button class="btn" data-a="close">Close</button></div></div></div></div>`}
 function passHTML(s){return `<div class="dlg paper" style="text-align:center"><h2>Pass the device to ${esc(P(s).nm)}</h2><p>Everyone else, look away: ${esc(P(s).nm)}'s hand is secret.</p><button class="btn primary" data-a="iam">I'm ${esc(P(s).nm)}: show my cards</button></div>`}
@@ -3280,6 +3414,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='askmenu'){UI.menu={ask:true};render();return}
   if(a==='sellmode'){UI.sell=[];render();return}
   if(a==='sellx'){UI.sell=null;render();return}
+  if(a==='sellone'){const me=viewSeat();if(me>=0&&sellable(P(me)).includes(+t.dataset.id)){UI.sell=[+t.dataset.id];UI.menu=null;UI.zoom=null;if(GX.open==='dkCard')GX.close();render()}return}
   if(a==='iam'){UI.lastSeat=UI.pass;UI.pass=null;render();return}
   if(a==='rules'){GX.show('dkRules');return}
   if(a==='new'){G=null;UI.info=true;UI.menu=null;UI.zoom=null;UI.sell=null;GX.close();render();return}
@@ -3297,7 +3432,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
     if(t.closest('.dlg')||t.closest('#dkCard')){return}
     if(UI.sell){if(me>=0&&sellable(P(me)).includes(id)){const i=UI.sell.indexOf(id);if(i>=0)UI.sell.splice(i,1);else UI.sell.push(id);render()}return}
     const ms=cardMoves(me,id);
-    if(ms.length===1&&['give','toss','equip','unequip'].includes(ms[0].act)){uiAct(ms[0]);return}
+    if(ms.length===1&&['give','toss','equip','unequip'].includes(ms[0].act)&&!document.documentElement.classList.contains('ph')){uiAct(ms[0]);return}
     if(ms.length){UI.menu={card:id};render();return}UI.zoom=id;render();return}
 });
 document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;if(e.key==='Escape'){UI.menu=null;UI.zoom=null;UI.rules=false;if(G)render();return}
@@ -3319,6 +3454,35 @@ GX.drawer('dkNet','🌐 Online game',$('#dkNetBody'));
 $('#speedbtn').innerHTML=SPEEDN(UI.speed);$('#hintbtn').innerHTML=ic('hint')+' '+(UI.hints?'On':'Off');if(typeof GFX!=='undefined'){GFX.init();syncGfxBtn()}
 GX.onClose=id=>{if(id==='dkCard'&&((UI.menu&&UI.menu.card!=null)||UI.zoom!=null)){UI.menu=null;UI.zoom=null;if(G)render()}};
 render();
+
+</script>
+<script>
+// ---------- phone layout (html.ph): table first, rivals as chips, card pop-up, one action card ----------
+// Rules, engine, AI and the online protocol are untouched. This file only sets classes / CSS variables, builds the
+// compact player chips (same data-opp handler as the old rival boxes) and mirrors the status text into the top bar.
+const PH={on:false,
+  want(){let f=null;try{const m=location.search.match(/[?&]phone=(\d)/);if(m)f=m[1]==='1'}catch(e){}if(f!=null)return f;
+    const s=Math.min(innerWidth,innerHeight);let co=false;try{co=matchMedia('(pointer:coarse)').matches}catch(e){}return s<=500||(co&&s<=600)},
+  apply(){const h=document.documentElement,on=this.want(),l=innerWidth>innerHeight;this.on=on;
+    h.classList.toggle('ph',on);h.classList.toggle('ph-p',on&&!l);h.classList.toggle('ph-l',on&&l);
+    if(on){const a=document.querySelector('.gx-app');if(a)a.classList.remove('gx-dock-min','gx-sheet-full')}
+    this.metrics()},
+  metrics(){const h=document.documentElement;if(!this.on){h.style.removeProperty('--ph-tb');return}
+    const t=document.querySelector('.table');if(t){const r=t.getBoundingClientRect();h.style.setProperty('--ph-tb',Math.round(r.bottom+4)+'px')}},
+  chips(){if(typeof G==='undefined'||!G||!G.pl)return '';const me=viewSeat();
+    const chip=(p,mine)=>{const act=p.i===G.active;const nm=esc(p.nm);
+      const lab=`${p.nm}${mine?' (you)':''}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play${act?', their turn':''}`;
+      const inner=`<span class="n">${ptok(p.i)}<b>${nm}</b></span><span class="s" aria-hidden="true"><i class="l">Lv ${p.lvl}</i> ⚔${pStr(p)} ✋${p.hand.length}${p.curse&&p.curse.length?' ☁'+p.curse.length:''}${p.dead?' 💀':''}</span>`;
+      return mine?`<div class="phc me ${act?'act':''}" style="--c:${PCOL[p.i]}" role="group" aria-label="${esc(lab)}">${inner}</div>`
+        :`<button class="phc ${act?'act':''}" data-opp="${p.i}" style="--c:${PCOL[p.i]}" aria-label="${esc(lab)}. Tap for their cards.">${inner}</button>`};
+    const mp=me>=0&&G.pl[me]?G.pl[me]:null;
+    return (mp?chip(mp,true):'')+G.pl.filter(p=>p.i!==me).map(p=>chip(p,false)).join('')},
+  after(){if(!this.on)return;const o=document.getElementById('phopps');if(o){const sl=o.scrollLeft;const h=emo(this.chips());if(o._h!==h){o._h=h;o.innerHTML=h;o.scrollLeft=sl}}
+    const c=document.getElementById('phchip');if(c&&typeof G!=='undefined'){const t=!G?'Doorkick Dungeon':dockTitle(viewSeat()).replace(/^(.*) · turn (\d+)$/,'T$2 · $1');if(c.textContent!==t)c.textContent=t}
+    this.metrics()}};
+(function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{PH.after()}catch(e){UI.lastErr='ph '+e}return x};
+  let rt=0;const re=()=>{clearTimeout(rt);rt=setTimeout(()=>{PH.apply();PH.after()},60)};addEventListener('resize',re);addEventListener('orientationchange',re);
+  PH.apply();PH.after();requestAnimationFrame(()=>PH.metrics())})();
 
 </script>
 </body>
