@@ -35,7 +35,7 @@ const human=()=>G&&G.pl.some(p=>p.human);
 function refresh(){if(G&&!NET.on){try{if(!G.over&&human())localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G){render();return}computeUI();playFx();netTurnCue();render();try{sync3D();autoFit()}catch(e){console.error(e)}schedule()}
 // at the start of a human placement, make sure every glowing square is on screen
-function autoFit(){if(!V3.on||!me()||G.step!=='place'||UI.fitTurn===G.turn)return;UI.fitTurn=G.turn;const R=V3.r.domElement;const off=UI.cells.some(k=>{const [x,y]=unkey(k);const v=screenOf(cellWorld(x,y));return !v.in||v.x<50||v.y<50||v.x>R.clientWidth-50||v.y>R.clientHeight-50});if(off)fitAll(false)}
+function autoFit(){if(!V3.on||!me()||G.step!=='place'||UI.fitTurn===G.turn)return;UI.fitTurn=G.turn;const R=V3.r.domElement;const off=(PHN.on&&PHN.tilePx()<PHN.MIN*.9)||UI.cells.some(k=>{const [x,y]=unkey(k);const v=screenOf(cellWorld(x,y));return !v.in||v.x<50||v.y<50||v.x>R.clientWidth-50||v.y>R.clientHeight-50});if(off)fitAll(false)}
 // what glows for the human now
 function computeUI(){const p=me();UI.cells=[];UI.spotOpts=[];
   if(!p){UI.ghost=null;UI.advice=null;return}
@@ -46,7 +46,7 @@ function computeUI(){const p=me();UI.cells=[];UI.spotOpts=[];
   if(G.step==='fig'){const ms=figMoves(p.i).filter(m=>m.act==='fig');const kinds=[...new Set(ms.map(m=>m.k))];if(!kinds.includes(UI.kind))UI.kind=kinds[0]||'f';
     UI.spotOpts=ms.filter(m=>m.k===UI.kind).map(m=>({l:m.l,k:m.k,adv:UI.advice&&same(UI.advice.fig,m)}))}}
 // ---------- sound + animation cues ----------
-function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(f.t==='turn'&&NET.on&&f.x===NET.mySeat)continue;if(typeof sfx==='function')sfx({place:'place',fig:'fig',score:'score',home:'home',goods:'goods',story:'story',win:'win',turn:'turn',discard:'bad'}[f.t]||'');
+function playFx(){for(const f of UI.fx.slice(UI.fxSeen)){if(PHN.on)PHN.fx(f);if(f.t==='turn'&&NET.on&&f.x===NET.mySeat)continue;if(typeof sfx==='function')sfx({place:'place',fig:'fig',score:'score',home:'home',goods:'goods',story:'story',win:'win',turn:'turn',discard:'bad'}[f.t]||'');
     if(f.t==='score'&&V3.on&&f.x&&G.fd[f.x.r]){const F=G.fd[f.x.r];let pos;if(F.ty==='M')pos=cellWorld(F.x,F.y);else{let sx=0,sz=0;for(const k of F.tiles){const [x,y]=unkey(k);sx+=x;sz+=y}pos=cellWorld(sx/F.tiles.length,sz/F.tiles.length)}scorePop('+'+f.x.pts,PCOL[f.x.win[0]],pos)}}
   UI.fxSeen=UI.fx.length;if(UI.fx.length>40){UI.fx.splice(0,30);UI.fxSeen=UI.fx.length}}
 // ---------- words ----------
@@ -83,7 +83,7 @@ function placementPreview(t,r,x,y,pi){const pr=probe(t,r,x,y);const out=[];const
   if(G.ex.tb&&!G.cur.bonus){const b=G.figs.find(f=>f.p===pi&&f.k==='bld');if(b){const br=find(b.s);if(pr.groups.some(g=>g.roots.includes(br)))out.push('🔨 Extends your mason’s feature: extra turn')}}
   return out}
 // ---------- rendering ----------
-function render(){renderModal();if(!G)return;renderDock();renderPopups();renderMap2D();renderBar()}
+function render(){renderModal();if(!G)return;renderDock();renderPopups();renderMap2D();renderBar();if(PHN.on)PHN.render()}
 function renderBar(){const pb=$('#pausebtn');if(pb){pb.hidden=!G||human()||!!G.over;pb.innerHTML=ico(UI.pause?'play':'pause')}const sb=$('#speedbtn');if(sb)sb.innerHTML=ico('ff')+' '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal');
   const gb=$('#guidebtn');if(gb){gb.classList.toggle('on',UI.guide);gb.setAttribute('aria-pressed',UI.guide?'true':'false')}
   const ab=$('#advbtn');if(ab)ab.disabled=!me();
@@ -187,18 +187,18 @@ function renderMap2D(){const el=$('#map2d');if(!el)return;if(V3.on){el.hidden=tr
   el.innerHTML=s+'</svg>'}
 function spot2(k,l){const T=G.tiles[k],[x,y]=unkey(k);const sp=rotP(buildGeo(T.t).spots[l],T.r);return [x*100-50+sp[0],y*100-50+sp[1]]}
 // ---------- input ----------
-function on3DTap(k,w){const p=me();if(!p)return;
+function on3DTap(k,w){if(PHN.on&&PHN.tap(k,w))return;const p=me();if(!p)return;
   if(G.step==='place'){if(!k||!UI.cells.includes(k)){if(k&&!G.tiles[k])toast('Your tile can’t go there — pick a glowing square.');return}
     const L=legalPlacements(G.cur.t).filter(q=>key(q.x,q.y)===k).map(q=>q.r);
     if(UI.ghost&&UI.ghost.k===k){rotGhost(1);return}
-    let r=L[0];const adv=UI.advice&&UI.advice.place;if(adv&&key(adv.x,adv.y)===k)r=adv.r;else if(UI.ghost&&L.includes(UI.ghost.r))r=UI.ghost.r;
+    let r=L[0];const adv=UI.advice&&UI.advice.place;if(adv&&key(adv.x,adv.y)===k)r=adv.r;else if(UI.ghost&&L.includes(UI.ghost.r))r=UI.ghost.r;else if(PHN.on&&L.includes(PHN.rot))r=PHN.rot;
     UI.ghost={k,r,rots:L,t:G.cur.t,turn:G.turn};sfx&&sfx('click');refreshUI();return}
   if(G.step==='fig'&&w&&UI.spotOpts.length){let best=null,bd=.45;for(const o of UI.spotOpts){const q=spotWorld(G.cur.k,o.l);const d=Math.hypot(q.x-w.x,q.z-w.z);if(d<bd){bd=d;best=o}}
     if(best)return go({act:'fig',k:best.k,l:best.l});toast('Tap one of the glowing rings on your new tile, or use the buttons.')}}
 function rotGhost(d){const g=UI.ghost;if(!g||!g.rots.length)return;let i=g.rots.indexOf(g.r);i=(i+d+g.rots.length)%g.rots.length;g.r=g.rots[i];sfx&&sfx('click');refreshUI()}
 function refreshUI(){computeUI();render();try{sync3D()}catch(e){console.error(e)}}
 function go(m){if(NET.on){if(isClient()){if(!me())return;sfx&&sfx('click');netSend(m);return}const s0=sideToAct();if(s0>=0&&P(s0).human&&!me())return}const s=sideToAct();const r=performMove(m,s);if(!r.success){toast('That move isn’t allowed now.');console.error(r.error)}}
-function toast(t){const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,3200)}
+function toast(t){if(PHN.on){PHN.toast(t);return}const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,3200)}
 function advise(){const p=me();if(!p)return;if(G.step==='place'){const plan=aiPlan(p.i,'normal');UI.advice={turn:G.turn+':'+G.step,place:plan.place,fig:plan.fig,text:adviceText(plan,p.i)};const k=key(plan.place.x,plan.place.y);
     UI.ghost={k,r:plan.place.r,rots:legalPlacements(G.cur.t).filter(q=>key(q.x,q.y)===k).map(q=>q.r),t:G.cur.t,turn:G.turn};focusCell(k)}
   else if(G.step==='fig'){const m=bestFigNow(p.i,'normal');let text;if(m.act==='skip')text='Keep your followers: nothing here is worth one right now.';else{const T=G.tiles[G.cur.k];const s=TSEG[T.t][m.l];const r=find(T.s0+m.l);const d=descRoot(r,'normal');const w=Math.round(worth(d,'normal'));
@@ -241,8 +241,8 @@ function moveRecaps(before){const p=P(before.p);const sc=before.scored.filter(x=
   if(sc.length)t+='. '+sc.map(x=>`${x.win.map(i=>P(i).nm).join(' & ')} +${x.pts} (${FEAT[x.ty]})`).join(', ');
   if(before.bonusEarned)t+='. Its mason earns an extra turn';return {mine,recap:{html:t+'.',n:G.turn}}}
 // ---------- the computer ----------
-let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!(isHost()&&UI.modal!=='story'))||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;
-  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!isHost())||isClient())return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.step);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*(G.step==='fig'?.7:1)))}
+let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||PHN.blocking()||(UI.modal&&!(isHost()&&UI.modal!=='story'))||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;
+  aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!isHost())||isClient())return;if(PHN.blocking()){return}const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.step);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*(G.step==='fig'?.7:1)))}
 // ---------- settings popup: graphics quality ----------
 function renderSettings(){const el=$('#setbody');if(!el)return;const has=typeof V3!=='undefined';const pref=has?V3.pref:'auto';const now=has&&V3.on?GFX[V3.q].nm:'2D map';
   const opt=[['auto','Auto','picks for this screen'],['high','High','bloom, soft 2k shadows, full sharpness'],['med','Medium','soft shadows, no post-processing'],['low','Low','no shadows or effects; lightest on the battery']];
@@ -251,5 +251,5 @@ function renderSettings(){const el=$('#setbody');if(!el)return;const has=typeof 
     ${typeof PerfHUD!=='undefined'?`<div class="qopts spd">${PerfHUD.buttonsHTML('btn')}</div><p class="small muted">Show speed: a frame-rate overlay (also F9). Test speed: tries each level for 2 s and suggests one.</p>`:''}</div>`}
 const CREDITS_HTML=`<section class="credits-audio"><h3>Credits</h3><p>Names, card text and art are original.</p><h4>Audio</h4><p>With thanks to these public-domain (CC0) creators:</p><ul><li>Music: &ldquo;Medieval: Harvest Season&rdquo; by RandomMind (<a target="_blank" rel="noopener" href="https://opengameart.org/content/medieval-harvest-season">OpenGameArt</a>, CC0)</li><li>Sound effects: Impact Sounds, Interface Sounds, Music Jingles, RPG Audio, UI Audio by <a target="_blank" rel="noopener" href="https://kenney.nl">Kenney</a> (CC0)</li></ul><p><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p></section>`;
 function onGfxChange(){if(typeof GX!=='undefined'&&GX.open==='setd')renderSettings()}
-function boot(){GX.init({key:'rv'});paintIcons();GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=iconize(RULES_HTML)+CREDITS_HTML;if(id==='refd')$('#refbody').innerHTML=iconize(refHtml());if(id==='setd')renderSettings();if(G)render()};try{init3D()}catch(e){console.error(e)}soundBtns();openStart();netInit()}
+function boot(){GX.init({key:'rv'});paintIcons();phApply();PHN.init();GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=iconize(RULES_HTML)+CREDITS_HTML;if(id==='refd')$('#refbody').innerHTML=iconize(refHtml());if(id==='setd')renderSettings();if(G)render()};try{init3D()}catch(e){console.error(e)}soundBtns();openStart();netInit()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();

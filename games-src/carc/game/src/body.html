@@ -2,8 +2,9 @@
 <div class="gx-app">
 <header class="gx-bar">
   <h1>Rampart &amp; Vine</h1>
+  <span id="pbar" class="ph-only ph-keep"></span>
   <span class="gx-sp"></span>
-  <button class="gx-ibtn" data-a="adv" id="advbtn" title="What would the computer do?"><i data-ic="bulb"></i> <span>Advice</span></button>
+  <button class="gx-ibtn ph-keep" data-a="adv" id="advbtn" title="What would the computer do?"><i data-ic="bulb"></i> <span>Advice</span></button>
   <button class="gx-ibtn" data-a="fit" title="Show the whole valley"><i data-ic="fit"></i> <span>Fit all</span></button>
   <button class="gx-ibtn" data-gx="plrd" aria-expanded="false"><i data-ic="players"></i> <span>Players</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-expanded="false"><i data-ic="scroll"></i> <span>Log</span></button>
@@ -16,12 +17,17 @@
   <button class="gx-ibtn" data-a="pause" id="pausebtn" hidden><i data-ic="pause"></i></button>
   <button class="gx-ibtn" data-gx="setd" aria-expanded="false" title="Settings"><i data-ic="gear"></i> <span>Settings</span></button>
   <button class="gx-ibtn" data-a="new"><i data-ic="plus"></i> <span>New game</span></button>
+  <button class="gx-ibtn ph-only ph-keep" data-ph="menu" id="phmenu" aria-label="Menu" aria-haspopup="dialog"><i data-ic="menu"></i></button>
 </header>
 <div class="gx-main">
   <main class="gx-board"><div class="view"><canvas id="c3" aria-label="The valley in 3D. Drag to move the map, pinch or scroll to zoom, tap a glowing square to try your tile there."></canvas><div id="map2d" hidden></div><div id="chip" aria-live="polite"></div></div></main>
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Rampart &amp; Vine</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel"><i data-ic="vert"></i></button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel"><i data-ic="hide"></i></button></div>
     <div id="dockmsg" hidden role="status"></div><div class="gx-dock-body" id="dockbody"></div>
+    <div id="pchips" class="pchips ph-only" aria-label="Scores and followers left"></div>
+    <div id="ps" class="ps ph-only" aria-label="Controls"></div>
+    <div id="ppop" class="ppop ph-only" hidden role="dialog" aria-label="Choices"></div>
+    <div id="pc" class="pcard ph-only" hidden role="dialog" aria-label="Message"></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock"><i data-ic="menu"></i> Panel</button>
 </div>
@@ -47,6 +53,7 @@
 <script src="three3d.js"></script>
 <script src="sound.js"></script>
 <script src="net.js"></script>
+<script src="phone.js"></script>
 <script src="ui.js"></script>
 </body>
 </html>

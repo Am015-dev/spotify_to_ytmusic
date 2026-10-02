@@ -58,7 +58,7 @@ function init3D(){if(!window.THREE||/jsdom/i.test(navigator.userAgent))return fa
     if(!d){const h=cellAt(e);if(h!==V3.hover){V3.hover=h;V3.dirty=true}return}
     if(ptrs.size>=2){const pd=pinchD(ptrs);if(d.d0>0){V3.dist=clampDist(d.dist0*d.d0/pd);V3.userMoved=true;placeCam()}d.moved=true;return}
     const dx=e.clientX-d.x,dy=e.clientY-d.y;if(Math.abs(dx)+Math.abs(dy)>7)d.moved=true;
-    if(d.moved&&d.n===1){const k=V3.dist*.0016*(700/Math.max(300,V3.r.domElement.clientHeight));V3.look.set(d.l.x-dx*k,0,d.l.z-dy*k/Math.sin(V3.tilt));V3.camTo=null;V3.userMoved=true;placeCam()}});
+    if(d.moved&&d.n===1){const k=PHN.on?PHN.panK():V3.dist*.0016*(700/Math.max(300,V3.r.domElement.clientHeight));V3.look.set(d.l.x-dx*k,0,d.l.z-dy*k/Math.sin(V3.tilt));V3.camTo=null;V3.userMoved=true;placeCam()}});
   const up=e=>{ptrs.delete(e.pointerId);const d=V3.drag;if(!ptrs.size)V3.drag=null;if(d&&!d.moved&&d.n===1&&e.type==='pointerup'){const c=cellAt(e);const w=worldAt(e);if(typeof on3DTap==='function')on3DTap(c,w)}};
   cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
   cv.addEventListener('pointerleave',()=>{if(V3.hover){V3.hover=null;V3.dirty=true}});
@@ -80,9 +80,9 @@ function cellWorld(x,y){return new THREE.Vector3(x*TS,0,y*TS)}
 // fit every tile (and every glowing spot) into the view for this aspect ratio
 function boardBounds(){let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;const eat=k=>{const [x,y]=unkey(k);x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)};
   if(G){for(const k of G.order)eat(k);for(const k of (UI.cells||[]))eat(k)}if(x0>x1){x0=x1=y0=y1=0}return {x0,x1,y0,y1}}
-function fitAll(instant){if(!V3.cam)return;const b=boardBounds();const W=(b.x1-b.x0+1)*TS+.8,D=(b.y1-b.y0+1)*TS+.8;const a=V3.cam.aspect;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);
+function fitAll(instant,real){if(!V3.cam)return;const b=boardBounds();const W=(b.x1-b.x0+1)*TS+.8,D=(b.y1-b.y0+1)*TS+.8;const a=V3.cam.aspect;const vf=V3.cam.fov*Math.PI/180;const hf=2*Math.atan(Math.tan(vf/2)*a);
   const e=V3.tilt;const needH=(D*Math.sin(e)+1.2)/2,needW=W/2;const d=Math.max(needH/Math.tan(vf/2),needW/Math.tan(hf/2))*1.02+D*Math.cos(e)*.12;
-  const to=new THREE.Vector3((b.x0+b.x1)/2*TS,0,(b.y0+b.y1)/2*TS+.1);V3.userMoved=false;if(instant){V3.look.copy(to);V3.dist=clampDist(Math.max(10,d));V3.camTo=null;placeCam()}else{V3.camTo={look:to,dist:clampDist(Math.max(10,d)),t:0}}V3.fitted=true;V3.dirty=true}
+  if(!real&&PHN.on&&PHN.frame(instant,Math.max(10,d)))return;const to=new THREE.Vector3((b.x0+b.x1)/2*TS,0,(b.y0+b.y1)/2*TS+.1);V3.userMoved=false;if(instant){V3.look.copy(to);V3.dist=clampDist(Math.max(10,d));V3.camTo=null;placeCam()}else{V3.camTo={look:to,dist:clampDist(Math.max(10,d)),t:0}}V3.fitted=true;V3.dirty=true}
 function focusCell(k,zoom){if(!V3.on||!k)return;const [x,y]=unkey(k);const to=cellWorld(x,y);V3.camTo={look:to,dist:zoom?Math.min(V3.dist,zoom):V3.dist,t:0}}
 function screenOf(v){const p=v.clone().project(V3.cam);const R=V3.r.domElement;return {x:(p.x+1)/2*R.clientWidth,y:(1-p.y)/2*R.clientHeight,in:Math.abs(p.x)<1&&Math.abs(p.y)<1}}
 function ndc(e){const rc=V3.r.domElement.getBoundingClientRect();return new THREE.Vector2(((e.clientX-rc.left)/rc.width)*2-1,-((e.clientY-rc.top)/rc.height)*2+1)}
@@ -423,7 +423,7 @@ function syncOverlays(){const sc=V3.scene;const sig=JSON.stringify([UI.cells,UI.
       const ring=new THREE.Mesh(gq('ringG',()=>{const g=new THREE.PlaneGeometry(.62,.62);g.rotateX(-Math.PI/2);return g}),new THREE.MeshBasicMaterial({map:ringTex(),color:o.adv?new THREE.Color(.6,1.8,2):new THREE.Color(1.9,1.6,.8),transparent:true,depthTest:false,depthWrite:false}));ring.position.copy(p);ring.position.y+=.01;ring.userData.pulse=1;ring.renderOrder=6;sg.add(ring);
       const gm=figMesh(G.cur.p,o.k||UI.kind||'f',ty,true,o.adv);gm.position.copy(p);if(o.k==='bld'||o.k==='pig'){gm.position.x+=.0}gm.rotation.y=-.4;gm.userData.bob=1;gm.userData.y0=p.y+.04;sg.add(gm)}sc.add(sg);V3.spots=sg}}
 // floating "+N" medallion when a feature scores
-function scorePop(text,col,pos){if(!V3.on)return;const c=cvs(256,128);const x=c.getContext('2d');x.translate(128,64);
+function scorePop(text,col,pos){if(!V3.on||PHN.on)return;const c=cvs(256,128);const x=c.getContext('2d');x.translate(128,64);
   const g=x.createLinearGradient(0,-44,0,44);g.addColorStop(0,'#fff6df');g.addColorStop(1,'#ecd3a0');x.fillStyle=g;x.strokeStyle=col;x.lineWidth=7;x.beginPath();x.roundRect?x.roundRect(-78,-40,156,80,40):x.rect(-78,-40,156,80);x.shadowColor='rgba(40,20,5,.5)';x.shadowBlur=10;x.shadowOffsetY=4;x.fill();x.shadowColor='transparent';x.stroke();
   x.font='bold 58px "Marcellus SC",Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillStyle='#3a2414';x.fillText(text,0,4);
   const tx=tex(c,true);const s=new THREE.Sprite(new THREE.SpriteMaterial({map:tx,transparent:true,depthTest:false}));s.scale.set(.01,.005,1);s.position.copy(pos);s.position.y+=.7;s.renderOrder=10;V3.scene.add(s);V3.pops.push({s,t:0});sparkle(pos,col,14)}

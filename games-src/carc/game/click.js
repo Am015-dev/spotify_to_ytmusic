@@ -1,6 +1,6 @@
 // random clicker: humans play only through the page's buttons and the 2D map (jsdom has no WebGL, so the 2D fallback is used)
 const {JSDOM}=require('jsdom');const fs=require('fs');const html=fs.readFileSync(__dirname+'/rampart.html','utf8');
-function run(cfg,seed){return new Promise(res=>{const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'http://localhost/'});const w=dom.window,d=w.document;
+function run(cfg,seed){return new Promise(res=>{const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'http://localhost/'+(cfg.phone?'?phone=1':'')});const w=dom.window,d=w.document;
   const errs=[];w.addEventListener('error',e=>errs.push(e.message));w.console.error=(...a)=>errs.push(a.join(' '));w.console.warn=()=>{};
   const click=el=>el.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));const rnd=a=>a[Math.floor(Math.random()*a.length)];const seen=new Set();
   w.addEventListener('load',()=>{w.eval(`AIDELAY=0;ANIM=${cfg.anim?1:0};setSeed(${seed});try{localStorage.clear()}catch(e){}`);const q=s=>d.querySelector(s);
@@ -10,9 +10,25 @@ function run(cfg,seed){return new Promise(res=>{const dom=new JSDOM(html,{runScr
     click(q('[data-ui=start]'));if(!w.eval('G'))errs.push('start failed');const so=q('[data-ui=storyok]');if(so){seen.add('story');click(so)}go()});
   let stall=0,last='',iv;const t0=Date.now();
   function go(){iv=setInterval(()=>{try{const G=w.eval('G');if(!G)return;
-    if(G.over){clearInterval(iv);const sc=G.pl.map(p=>p.score);if(!d.querySelector('#dockbody table'))errs.push('no final score table');res({cfg,turn:G.turn,win:G.winText,sc,errs,seen});w.close();return}
-    const hp=w.eval('me()');
-    if(hp){const r=Math.random();
+    if(G.over){clearInterval(iv);const sc=G.pl.map(p=>p.score);if(!cfg.phone&&!d.querySelector('#dockbody table'))errs.push('no final score table');if(cfg.phone&&!w.eval('PHN.endKey'))errs.push('no phone end cards');res({cfg,turn:G.turn,win:G.winText,sc,errs,seen});w.close();return}
+    const hp=w.eval('me()');if(cfg.phone){const cc=d.querySelector('#pc:not([hidden]) [data-ph=cont]');if(cc&&!hp){click(cc);seen.add('phone:card-ai');return}}
+    if(hp&&cfg.phone){const r=Math.random();
+      const card=d.querySelector('#pc:not([hidden]) [data-ph=cont]');if(card){seen.add('phone:card');click(card);return}
+      if(r<.03){const m=d.querySelector('#phmenu');click(m);seen.add('phone:menu');const mi=rnd([...d.querySelectorAll('#ppop .ph-menu [data-gx],#ppop .ph-tgs [data-a]')]);if(mi&&Math.random()<.6){click(mi);seen.add('phone:mi:'+(mi.dataset.gx||mi.dataset.a));const x=d.querySelector('.gx-drawer.on .gx-x');if(x)click(x)}else{const x=d.querySelector('#ppop [data-ph=pclose]');if(x)click(x)}return}
+      if(r<.06){const a=d.querySelector('#advbtn');if(a&&!a.disabled){click(a);seen.add('phone:advice:'+G.step);if(G.step==='fig'){const ap=d.querySelector('#dockbody [data-ui=apply]');if(ap){click(ap)}}return}}
+      if(r<.08){click(d.querySelector('#pchips [data-gx=plrd]'));seen.add('phone:chip');const x=d.querySelector('.gx-drawer.on .gx-x');if(x)click(x);return}
+      if(G.step==='place'){const conf=d.querySelector('#ppop [data-ui=confirm]');
+        if(conf&&Math.random()<.5){if(Math.random()<.4){const rr=d.querySelector('#ppop [data-ui=rotr]:not([disabled])');if(rr){click(rr);seen.add('phone:rotate-popup')}}click(conf);seen.add('phone:place');return}
+        if(conf&&Math.random()<.1){click(d.querySelector('#ppop [data-ui=cancel]'));seen.add('phone:cancel');return}
+        if(!conf&&Math.random()<.2){const rb=d.querySelector('#ps [data-ph=rot]');if(rb){click(rb);seen.add('phone:rotate-strip')}}
+        const cells=[...d.querySelectorAll('#map2d [data-cell]')];if(cells.length){click(rnd(cells));seen.add('phone:cell');return}}
+      if(G.step==='fig'){const pop=d.querySelector('#ppop [data-mv]');
+        if(!pop&&d.querySelector('#ps [data-ph=figshow]')){click(d.querySelector('#ps [data-ph=figshow]'));seen.add('phone:figshow');return}
+        const kinds=[...d.querySelectorAll('#ppop [data-kind]')];if(kinds.length&&Math.random()<.25){const k=rnd(kinds);click(k);seen.add('phone:kind:'+k.dataset.kind);return}
+        if(Math.random()<.1){const x=d.querySelector('#ppop [data-ph=figx]');if(x){click(x);seen.add('phone:figx');return}}
+        const spots=[...d.querySelectorAll('#map2d [data-spot]')];if(spots.length&&Math.random()<.3){click(rnd(spots));seen.add('phone:spot');return}
+        const bs=[...d.querySelectorAll('#ppop [data-mv],#ps [data-mv]')];if(bs.length){const b=rnd(bs);const m=JSON.parse(b.dataset.mv);seen.add('phone:btn:'+m.act+(m.k?':'+m.k:''));click(b);return}}}
+    else if(hp){const r=Math.random();
       if(r<.02){const t=rnd([...d.querySelectorAll('.gx-bar [data-gx]')]);click(t);seen.add('pop:'+t.dataset.gx);const x=d.querySelector('.gx-drawer.on .gx-x');if(x)click(x);return}
       if(r<.05){const a=d.querySelector('#dockbody [data-a=adv]');if(a){click(a);seen.add('advice:'+G.step);const ap=d.querySelector('#dockbody [data-ui=apply]');if(ap&&Math.random()<.7){click(ap);seen.add('advice-applied');}return}}
       if(r<.07){const b=d.querySelector('.gx-bar [data-a=guide]');click(b);seen.add('guide-toggle');return}
@@ -25,10 +41,11 @@ function run(cfg,seed){return new Promise(res=>{const dom=new JSDOM(html,{runScr
         const bs=[...d.querySelectorAll('#dockbody button[data-mv]')];if(bs.length){const b=rnd(bs);const m=JSON.parse(b.dataset.mv);seen.add('btn:'+m.act+(m.k?':'+m.k:''));click(b);return}}}
     const sig=JSON.stringify([G.turn,G.step,G.logN,w.eval('UI.ghost&&UI.ghost.k+UI.ghost.r')]);if(sig===last)stall++;else{stall=0;last=sig}
     const inv=w.eval('checkInvariants()');if(inv.length&&errs.length<5)errs.push('INV '+inv[0]);
-    if(hp&&w.getComputedStyle(d.querySelector('.gx-dock')).visibility==='hidden')errs.push('dock hidden on decision');
+    if(hp&&!cfg.phone&&w.getComputedStyle(d.querySelector('.gx-dock')).visibility==='hidden')errs.push('dock hidden on decision');
     if(stall>4000||Date.now()-t0>280000){errs.push('STALL '+G.step+' turn '+G.turn);clearInterval(iv);res({cfg,turn:G.turn,errs,seen});w.close()}
   }catch(e){errs.push(String(e.stack||e).slice(0,300));clearInterval(iv);res({cfg,errs,seen});w.close()}},1)}})}
-const games=[{np:2,h:[0],ex:{},guide:1},{np:2,h:[0,1],ex:{river:1},guide:0},{np:3,h:[1],ex:{ic:1},lv:'hard',guide:1},{np:4,h:[0,2],ex:{tb:1},lv:'easy'},{np:5,h:[0],ex:{river:1,ic:1,tb:1},anim:1,guide:1},{np:6,h:[0,1,2,3,4,5],ex:{river:1,ic:1,tb:1}},{np:2,h:[0],ex:{ic:1,tb:1},lv:'hard',anim:1}];
+const games0=[{np:2,h:[0],ex:{},guide:1},{np:2,h:[0,1],ex:{river:1},guide:0},{np:3,h:[1],ex:{ic:1},lv:'hard',guide:1},{np:4,h:[0,2],ex:{tb:1},lv:'easy'},{np:5,h:[0],ex:{river:1,ic:1,tb:1},anim:1,guide:1},{np:6,h:[0,1,2,3,4,5],ex:{river:1,ic:1,tb:1}},{np:2,h:[0],ex:{ic:1,tb:1},lv:'hard',anim:1}];
+const games=games0.concat([{np:2,h:[0],ex:{},guide:1,phone:1},{np:3,h:[0,1],ex:{river:1},guide:0,phone:1},{np:4,h:[0,1,2,3],ex:{ic:1},phone:1,guide:1},{np:3,h:[1],ex:{tb:1},lv:'hard',phone:1,guide:1},{np:5,h:[0,2],ex:{river:1,ic:1,tb:1},phone:1,guide:1},{np:6,h:[0,1,2,3,4,5],ex:{river:1,ic:1,tb:1},phone:1},{np:2,h:[0],ex:{ic:1,tb:1},lv:'hard',anim:1,phone:1,guide:1},{np:2,h:[0,1],ex:{},phone:1,guide:0},{np:4,h:[0],ex:{river:1,tb:1},lv:'easy',phone:1,guide:1}]);
 (async()=>{const all=new Set();let bad=0;const only=process.argv[2]!=null?process.argv[2].split(',').map(Number):games.map((_,i)=>i);
   for(const i of only){const r=await run(games[i],900+i);r.seen.forEach(x=>all.add(x));bad+=r.errs.length;console.log(JSON.stringify(games[i]),'turns',r.turn,r.win||'',JSON.stringify(r.sc||[]),'errors',r.errs.length,JSON.stringify(r.errs.slice(0,3)))}
   console.log('TOTAL errors',bad);console.log('seen:',[...all].sort().join(' | '))})()
