@@ -9,7 +9,7 @@ function perfHooks(){const PH=window.PerfHUD;if(!PH||!TWKit._K||!TWKit._K.on)ret
     isAnimating:()=>{try{return TWKit.isAnimating()||UI.busy}catch(e){return false}},beforeTest:()=>GX.close()})}
 // board framing: the whole chart (frame, edge numbers, ships on the marks) must stay inside the board area at any aspect
 function frame(w,h){const a=w/h;window.TW_PADX=a<1.2?.3:.15;window.TW_PADT=a<.8?.55:.6;window.TW_PADB=.2}
-function boot(){GX.init({key:'tw'});const st=lsGet('tw_set',{});if(st.speed)UI.speed=st.speed;if(st.guide)UI.guide=st.guide;if(st.anim===false){UI.anim=false;ANIM=0}
+function boot(){phApply();GX.init({key:'tw'});const st=lsGet('tw_set',{});if(st.speed)UI.speed=st.speed;if(st.guide)UI.guide=st.guide;if(st.anim===false){UI.anim=false;ANIM=0}
   window.TW_SOFTGPU=detectSoftGPU();installRecorders();
   const cv=$('#c3'),fb=$('#fb');const P=new URLSearchParams(location.search);let res={ok:false};
   {const b=GX.boardSize();frame(b.w,b.h)}
@@ -20,7 +20,7 @@ function boot(){GX.init({key:'tw'});const st=lsGet('tw_set',{});if(st.speed)UI.s
   else{let down=null;cv.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY}});
     cv.addEventListener('webglcontextlost',e=>{e.preventDefault();window.TW_LOST=(window.TW_LOST||0)+1;console.warn('WebGL context lost: switching to the 2D chart');setTimeout(()=>{try{TWKit._K.loopOn=false;TWKit.init(cv,{fallback:fb,force2D:true});on2d();KS={tiles:{},mons:{},ships:{},gates:{},mael:{},wave:null,hold:{}};kitSync();render()}catch(x){console.error(x)}},0)},false);
     cv.addEventListener('click',e=>{if(down&&Math.abs(e.clientX-down.x)+Math.abs(e.clientY-down.y)>8)return;onPick(TWKit.pick(e.clientX,e.clientY))});perfHooks()}
-  const tiltFor=(w,h)=>w<700?82:(w/h<.8?76:61);GX.onResize((w,h)=>{try{frame(w,h);TWKit.resize(w,h);TWKit.setView({tilt:tiltFor(w,h),immediate:true});TWKit.renderOnce()}catch(e){}});{const b=GX.boardSize();try{TWKit.resize(b.w,b.h);TWKit.setView({tilt:tiltFor(b.w,b.h),immediate:true})}catch(e){}}
+  const tiltFor=(w,h)=>PH.on?89:w<700?82:(w/h<.8?76:61),regFor=()=>PH.on?PH_REGION:null;GX.onResize((w,h)=>{try{frame(w,h);TWKit.resize(w,h);TWKit.setView({tilt:tiltFor(w,h),region:regFor(),immediate:true});PH.zk='?';phZoom();TWKit.renderOnce()}catch(e){}});{const b=GX.boardSize();try{TWKit.resize(b.w,b.h);TWKit.setView({tilt:tiltFor(b.w,b.h),region:regFor(),immediate:true})}catch(e){}}
   $('#rulesbody').innerHTML=RULES_HTML;
   GX.onShow=id=>{sfx('open');if(id==='piecesd'&&!$('#piecesbody').firstChild)$('#piecesbody').innerHTML=piecesHTML();renderOpenDrawer()};GX.onClose=()=>sfx('close');
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!GX.open&&G&&UI.started&&UI.confirm){UI.confirm=null;renderCoach()}});

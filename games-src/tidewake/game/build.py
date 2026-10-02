@@ -23,7 +23,7 @@ miss=[a for a,_ in KIT_PATCHES if a not in kit]
 if miss:print('WARNING kit patch anchors not found:',miss,file=sys.stderr)
 for a,z in KIT_PATCHES:kit=kit.replace(a,z)
 # ui.js is the join of ui1..ui5.js (kept in parts for editing)
-open(os.path.join(D,'ui.js'),'w',encoding='utf-8').write(''.join(rd(os.path.join(D,'ui%d.js'%i)) for i in range(1,7)))
+open(os.path.join(D,'ui.js'),'w',encoding='utf-8').write(''.join(rd(os.path.join(D,'ui%d.js'%i)) for i in range(1,8)))
 T=os.path.join(SP,'node_modules','three','build','three.min.js')
 SRC={'shell.js':os.path.join(SP,'shell','shell.js'),'perfhud.js':os.path.join(SP,'perf','perfhud.js'),
      'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(SP,'audio','tidewake','audio-data.js'),

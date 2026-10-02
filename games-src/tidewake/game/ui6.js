@@ -134,6 +134,8 @@ function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];
   if(UI.route&&!busy)D.push({k:'route',id:'rt',pts:UI.route.pts,bad:UI.route.bad,stop:UI.route.stop,label:UI.route.label});
   if(UI.arrow)D.push({k:'arrow',id:'ar',a:UI.arrow.a,b:UI.arrow.b});
   for(const m of UI.marks||[])D.push({k:'mark',id:'mk'+m.id+m.seat,wx:m.at[0],wz:m.at[1],t:nm(m.seat)+' sunk'});
+  if(PH.on&&PH.pop==='info'){const I=phInfoData(PH.pd);if(I&&I.at)D.push({k:'ring',id:'ri',wx:I.at[0]-2.5,wz:I.at[1]-2.5})}
+  if(PH.on&&PH.pop==='start'&&PH.pd)D.push({k:'ring',id:'rs',wx:PH.pd.x-2.5,wz:PH.pd.y-2.5})
   {const seen={};for(const t of D){if(t.k!=='tag')continue;const k=t.wx.toFixed(1)+','+t.wz.toFixed(1);const n=seen[k]=(seen[k]||0)+1;if(n>1)t.wy+=.28*(n-1)}}
   ovApply(D)}
 function ovApply(D){const sig=JSON.stringify(D);if(sig===OV.sig&&OV.items.length===D.length)return;OV.sig=sig;OV.descs=D;const root=$('#ov');if(!root)return;

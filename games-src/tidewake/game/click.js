@@ -21,9 +21,19 @@ const CONF=[
  {name:'hot 2p no leviathans',mode:'hot',np:2,noMon:1},
  {name:'mixed hot 4p (2 humans)',mode:'hot',np:4,mixed:[2,3],exp:['rift','cannon']},
  {name:'me 7p all exp anim',mode:'me',np:7,exp:['rift','wave','maelstrom','cannon'],anim:1},
- {name:'solo watch (computer)',mode:'watch',variant:'solo'}];
+ {name:'solo watch (computer)',mode:'watch',variant:'solo'},
+ // phone layout: humans play through board taps + the pop-up
+ {name:'PHONE guided 2p',guided:1,anim:0,phone:1},
+ {name:'PHONE me 3p anim',mode:'me',np:3,anim:1,phone:1},
+ {name:'PHONE hot 3p all exp',mode:'hot',np:3,exp:['rift','wave','maelstrom','cannon'],phone:1},
+ {name:'PHONE me 4p rift+cannon anim',mode:'me',np:4,exp:['rift','cannon'],anim:1,phone:1},
+ {name:'PHONE teams 4p me',mode:'me',np:4,variant:'teams',phone:1},
+ {name:'PHONE solo',mode:'me',variant:'solo',phone:1},
+ {name:'PHONE easy solo all exp',mode:'me',variant:'easysolo',exp:['rift','cannon','wave','maelstrom'],phone:1},
+ {name:'PHONE mixed hot 4p',mode:'hot',np:4,mixed:[2,3],exp:['rift','cannon','wave','maelstrom'],anim:1,phone:1},
+ {name:'PHONE me 2p cannon+rift timer',mode:'me',np:2,exp:['cannon','rift'],qt:1,phone:1}];
 function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new VirtualConsole();vc.on('jsdomError',e=>errs.push('JSDOM '+String(e.message).slice(0,200)+(e.detail?String(e.detail.stack||e.detail).slice(0,300):'')));vc.on('error',(...a)=>errs.push('ERR '+a.map(x=>x&&x.stack||x).join(' ').slice(0,500)));vc.on('warn',()=>{});
-  const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://gns.test/',virtualConsole:vc});const w=dom.window,d=w.document;
+  const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'https://gns.test/'+(cf.phone?'?phone=1':''),virtualConsole:vc,beforeParse(win){if(cf.phone){Object.defineProperty(win,'innerWidth',{value:390,configurable:true});Object.defineProperty(win,'innerHeight',{value:844,configurable:true})}}});const w=dom.window,d=w.document;
   const click=el=>el.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));const R=(()=>{let s=seed*7919+13;return ()=>{s=(s*16807)%2147483647;return (s-1)/2147483646}})();const rnd=a=>a[Math.floor(R()*a.length)];
   const seen=new Set();let hidden=0,clicks=0,mism=0,mm=0;
   w.addEventListener('load',()=>{try{w.eval(`AIDELAY=${cf.anim?10:0};ANIM=${cf.anim?1:0};UI.speed=${cf.anim?40:1};UI.qTime=${cf.qt||0};UI.tickRate=${cf.qt?60:1};setSeed(${seed});setAiSeed(${seed});TWKit.setSpeed(${cf.anim?40:1})`);
@@ -49,7 +59,32 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
     if(G.over){clearInterval(iv);const ov=d.querySelector('#dockbody [data-over]');if(!ov)errs.push('no game-over card');else seen.add('over');
       const again=d.querySelector('[data-a=again]');if(cf.replay===undefined&&again&&!replayed&&R()<.3){replayed=1;seen.add('again');click(again);const g2=w.eval('G');if(!g2||g2.over||g2.turn>1)errs.push('replay did not start');go();return}
       res({cf,over:G.over,turns:G.turn,errs,seen,clicks,hidden,mism,secs:Math.round((Date.now()-t0)/1000)});w.close();return}
-    const q=s=>[...d.querySelectorAll(s)].filter(b=>!b.disabled);const r=R();
+    const PSEL=s=>cf.phone?s.split(',').map(x=>x.trim()).flatMap(x=>x.startsWith('#dockbody ')?['#ps','#ppop','#pc'].map(r=>r+' '+x.slice(10)):x.startsWith('#coach ')?['#pc '+x.slice(7)]:[x]).join(','):s;
+    const q=s=>[...d.querySelectorAll(PSEL(s))].filter(b=>!b.disabled);const r=R();
+    if(cf.phone&&!w.eval('UI.busy')){ // phone: board taps + pop-up
+      const ph=w.eval('({pop:PH.pop,on:PH.on,card:PH.cur&&PH.cur.kind})');if(!ph.on){errs.push('phone mode not on');clearInterval(iv);res({cf,errs,seen,clicks});w.close();return}
+      const sqEl=(c,rr)=>d.querySelector(`#fb [data-c="${c}"][data-r="${rr}"]`);
+      const dd=w.eval('sideToAct()');const mine=dd>=0&&G.seats[dd].human&&!w.eval('mustPass(sideToAct())');
+      if(mine&&!G.q&&!G.over&&!ph.card){
+        if(G.phase==='setup'){if(!d.querySelector('#ppop:not([hidden]) [data-a=startmark]')&&R()<.9){const info=w.eval('startInfo(sideToAct()).map(o=>[o.m.x,o.m.y])');const o=rnd(info);const t=sqEl(o[0],o[1]);if(t){click(t);clicks++;seen.add('ph:start-square');if(w.eval('PH.pop')!=='start'){const mk=w.eval('G.mons.some(m=>m.x==='+o[0]+'&&m.y==='+o[1]+')');if(!mk)errs.push('start popup did not open for '+o);}return}}}
+        else if(G.phase==='play'&&G.step==='act'){
+          const fr=w.eval('UI.fronts');
+          if(ph.pop!=='tiles'&&fr&&fr.length&&R()<.5){const f=rnd(fr);const sq=w.eval(`(()=>{const S=G.ships[${f}];return [S.x,S.y]})()`);const t=sqEl(sq[0],sq[1]);if(t){click(t);clicks++;seen.add('ph:front-tap');if(w.eval('PH.pop')!=='tiles')errs.push('tile popup did not open on the front square tap');else if(!d.querySelector('#ppop .ph-t'))errs.push('popup has no tiles');else{const bds=[...d.querySelectorAll('#ppop .ph-t .bd')].map(x=>x.textContent);if(!bds.some(x=>/SAFE|SINKS|GATE|CANNON/.test(x)))errs.push('popup has no badges')}return}}
+          if(ph.pop==='tiles'){const r2=R();
+            if(r2<.12){const c=q('#ppop [data-ph=pcard]');if(c.length){click(rnd(c));seen.add('ph:pcard');return}}
+            if(r2<.2){const c=q('#ppop [data-a=rot]');if(c.length){click(rnd(c));seen.add('ph:rot');return}}
+            if(r2<.24){const t=d.querySelector('#ppop .ph-tiles');if(t){const dx=R()<.5?60:-60;t.dispatchEvent(new w.Event('pointerdown',{bubbles:true}));seen.add('ph:swipe-skip')}}
+            if(r2<.27){click(d.querySelector('#ppop [data-ph=pclose]'));seen.add('ph:close-x');return}
+            if(r2<.29){d.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));seen.add('ph:esc');return}
+            if(r2<.31){const sg=q('#ppop [data-a=sugg]');if(sg.length){click(sg[0]);seen.add('sugg');return}}
+            const pb=q('#ppop [data-a=place],#ppop [data-a=gate]');if(pb.length&&r2<.8){click(pb[0]);clicks++;seen.add('ph:place-popup');return}
+          }
+          if(ph.pop==null&&R()<.04){const mons=w.eval('G.mons.map(m=>[m.x,m.y,m.k])');const frs=fr?fr.map(f=>w.eval(`G.ships[${f}].x+","+G.ships[${f}].y`)):[];const m=mons.find(x=>!frs.includes(x[0]+','+x[1]));if(m){const t=sqEl(m[0],m[1]);if(t){click(t);seen.add('ph:info-'+m[2]);if(w.eval('PH.pop')!=='info')errs.push('info popup did not open');else if(!d.querySelector('#ppop .ph-head'))errs.push('info popup empty');click(d.querySelector('#ppop [data-ph=pclose]'));return}}}
+        }
+      }
+      const ck=q('#pc [data-a=coachok],#pc [data-a=sunkok]');if(ck.length&&R()<.35){click(ck[0]);seen.add('ph:continue');return}
+      const dm=q('#pc [data-ph=dismiss]');if(dm.length&&R()<.5){click(dm[0]);seen.add('ph:dismiss');return}
+    }
     if(r<.015){const t=rnd(q('.gx-bar [data-gx]'));if(t){click(t);clicks++;seen.add('pop:'+t.dataset.gx);const x=d.querySelector('.gx-drawer.on .gx-x');if(x)click(x)}return}
     if(w.eval('UI.busy')){if(R()<.05)click(d.querySelector('[data-a=skip]')||d.body);return}
     // kit mirror = G once nothing is moving
@@ -60,7 +95,7 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
     const take=q('#dockbody [data-a=take]');if(take.length){click(take[0]);clicks++;seen.add('pass-screen');return}
     const qs=q('#dockbody [data-a=q]');if(qs.length){seen.add('q:'+w.eval('G.q&&G.q.kind'));const tiles=[...d.querySelectorAll('#fb [data-c]')];if(R()<.3&&w.eval('UI.fronts===null||true')){const lg=w.eval('(G.q.opts.find(o=>o.d&&o.d.x!=null&&(o.h==="dGateAt"||o.h==="dReloc"))||{}).d||null');if(lg){const t=d.querySelector(`#fb [data-c="${lg.x}"][data-r="${lg.y}"]`);if(t){click(t);clicks++;seen.add('q-by-square');return}}}click(rnd(qs));clicks++;return}
     const sm=q('#dockbody [data-a=startmark]');if(sm.length){click(rnd(sm));clicks++;seen.add('startmark');return}
-    const main=d.getElementById('main');
+    const main=d.getElementById(cf.phone?'ps':'main');
     if(q('#dockbody [data-a=place],#dockbody [data-a=cannon],#dockbody [data-a=gate],#dockbody [data-a=pass],#dockbody [data-a=card]').length||main.querySelector('[data-a=place]')){
       const sg=q('#dockbody [data-a=sugg]');if(sg.length&&R()<(cf.careful||.6)){click(sg[0]);seen.add('sugg');return}
       const hint=q('#dockbody [data-a=hint]');if(hint.length&&R()<.1){click(hint[0]);seen.add('hint');return}
