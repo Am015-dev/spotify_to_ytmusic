@@ -48,8 +48,7 @@ party word games, push-your-luck. Size = how big the build is (S small, M medium
 | Doorkick Dungeon | Private build with your own card scans | Personal copy only, never on the public site |
 
 ## In progress now (not new games)
-- Realistic living room with free CC0 assets, plus the retro TV for the video games
-- Phone fixes at real phone sizes for the remaining games
+- Kaiten Kitchen: painted 2D table (PixiJS), flying cards, painted art, simpler title and setup screens
 
 ## Done (on the shelf)
 Crown City Smash · Nebula Aces · Doorkick Dungeon · Shipwreck Isle · Sands of Qamar · Sunglaze ·
