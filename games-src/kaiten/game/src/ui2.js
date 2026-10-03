@@ -6,6 +6,7 @@ function render() {
   renderBar(); renderTable(); renderBelt(); renderDock();
   try { renderDrawers(); } catch (e) { }
   try { netRenderHook(); } catch (e) { }
+  if (PX.on) pxDirty();
 }
 function renderBar() {
   const s = $('#barstat'); if (!s) return;
@@ -90,7 +91,7 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
 }
 function grpEl(g, pd, landing) {
   const layers = Math.min(g.n, 3);
-  const b = h('button.grp.' + g.cls + (g.pulse ? '.waitf' : '') + (landing ? '.land' : ''), { type: 'button', 'data-a': 'grp', 'data-seat': g.seat, 'data-k': g.k, 'aria-label': g.tip, title: g.tip });
+  const b = h('button.grp.' + g.cls + (g.pulse ? '.waitf' : '') + (landing ? '.land' : ''), { type: 'button', 'data-a': 'grp', 'data-seat': g.seat, 'data-k': g.k, 'data-type': g.type, 'data-on': g.on || null, 'data-n': g.n, 'data-pts': g.pts, 'aria-label': g.tip, title: g.tip });
   const pl = h('div.pl'); pl.style.width = (pd + 6 * (layers - 1)) + 'px';
   for (let i = 0; i < layers; i++) pl.appendChild(plateN(g.type, pd, g.on));
   b.appendChild(pl);
@@ -100,7 +101,7 @@ function grpEl(g, pd, landing) {
 }
 function shelfEl(s, n, pd, landing) {
   const tip = n + ' Custard Cup' + (n === 1 ? '' : 's') + ' kept for the end of the game (most scores 6, fewest loses 6; no penalty with 2 players).';
-  const b = h('button.grp.shelf' + (landing ? '.land' : ''), { type: 'button', 'data-a': 'grp', 'data-seat': s, 'data-k': 'pud', 'aria-label': tip, title: tip });
+  const b = h('button.grp.shelf' + (landing ? '.land' : ''), { type: 'button', 'data-a': 'grp', 'data-seat': s, 'data-k': 'pud', 'data-type': 'pudding', 'data-n': n, 'data-pts': 0, 'aria-label': tip, title: tip });
   const pl = h('div.pl'); pl.appendChild(plateN('pudding', pd)); if (!n) pl.style.opacity = '.45';
   b.appendChild(pl); b.appendChild(h('span.bg', String(n))); b.appendChild(h('span.hn', 'custard'));
   return b;
@@ -164,6 +165,7 @@ function renderBelt() {
   if (!hand.length) frag.push(h('div.beltnote', G.phase === 'over' ? 'The meal is over.' : (v >= 0 ? 'The belt is empty: new plates are coming.' : 'Watching the belt.')));
   { let same = belt.children.length === frag.length; if (same) for (let i = 0; i < frag.length; i++) if (belt.children[i] !== frag[i]) { same = false; break; } if (!same) belt.replaceChildren(...frag); }
   belt.dataset.hidden = hidden ? '1' : '0';
+  if (enter) UI.pxEnter = enter;
   UI.enter = '';
   belt.scrollLeft = sl;
   try { const s = belt.querySelector('.hc.sel'); if (s) { const bl = belt.getBoundingClientRect(), sr = s.getBoundingClientRect(); if (sr.left < bl.left) belt.scrollLeft += sr.left - bl.left - 8; else if (sr.right > bl.right) belt.scrollLeft += sr.right - bl.right + 8; } } catch (e) { }

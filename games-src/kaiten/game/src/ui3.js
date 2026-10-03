@@ -1,21 +1,31 @@
 // ===================== part 3: game flow (new game, picking, AI, reveal / pass / round sequence, hot-seat, save) =====================
 function lvAt(opt, k) { const a = opt.lv || DEF.lv; return a[Math.max(0, Math.min(3, k - 1))] || opt.level || 'normal'; }
+// which chefs sit at the table: seat 0 is you (Mina's portrait), the others come from the setup screen (opt.seats, chef numbers 1-4)
+function chefsFor(np, opt) {
+  const pick = Array.isArray(opt.seats) ? opt.seats.filter((c, i, a) => c >= 1 && c <= 4 && a.indexOf(c) === i) : [];
+  if (pick.length >= np - 1) return [0].concat(pick.slice(0, np - 1));
+  const out = [0].concat(pick); for (let c = 1; c <= 4 && out.length < np; c++) if (out.indexOf(c) < 0) out.push(c);
+  return out;
+}
 function newGame(mode, o) {
   o = o || {};
   const opt = Object.assign({}, DEF, UI.opt || {}, o);
   let np = Math.max(2, Math.min(5, opt.np | 0 || 3)), names = [], ai = [];
   if (mode === 'guided') np = 2;
   if (mode === 'net') { np = opt.np; names = opt.players.map(p => p.name); ai = opt.players.map(p => p.ai || null); }
-  else for (let i = 0; i < np; i++) {
-    if (mode === 'hot') { names.push(PN[i]); ai.push(null); }
-    else if (mode === 'ai') { names.push(PN[i]); ai.push(lvAt(opt, i + 1)); }
+  const chefs = mode === 'net' ? null : chefsFor(np, opt);
+  if (mode !== 'net') for (let i = 0; i < np; i++) {
+    const c = chefs[i], lv = c > 0 ? lvAt(opt, c) : (opt.level || 'normal');
+    if (mode === 'hot') { names.push(PN[c]); ai.push(null); }
+    else if (mode === 'ai') { names.push(PN[c]); ai.push(lv); }
     else if (i === 0) { names.push('You'); ai.push(null); }
-    else { names.push(PN[i]); ai.push(mode === 'guided' ? 'normal' : lvAt(opt, i)); }
+    else { names.push(PN[c]); ai.push(mode === 'guided' ? 'normal' : lv); }
   }
+  UI.chefs = chefs;
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
   G = KK.newGame({ players: np, seed, names, ai });
-  Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice() }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
+  Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && UI.coach.keep ? 'full' : 'off'), seen: {}, turn: '', keep: UI.coach.keep };
   if (mode === 'guided') UI.coach.level = 'full';
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
@@ -83,7 +93,7 @@ function serveSel() {
 }
 function doPick(seat, mv) {
   // the lifted plate flies to the seat under a cover
-  try { if (ANIM && document.body.animate) flyPick(); } catch (e) { }
+  try { if (ANIM && !pxServe() && document.body.animate) flyPick(); } catch (e) { }
   if (isClient()) { netAct({ pk: mv.pick.join(',') }); UI.sel = []; UI.twin = false; UI.rec = null; snd('pick'); render(); return; }
   commit(seat, mv);
 }
@@ -127,7 +137,7 @@ function takeDevice() {
   drawCard(); render(); schedule();
 }
 // ---------- the reveal / pass / round sequence ----------
-const keyOfCard = c => { const k = c.key; return ICONS[k] ? 'roll' : NIG[k] ? (c.w >= 0 ? 'pn-' : 'n-') + k : k; };
+const keyOfCard = c => { const k = c.key; return ICONS[k] ? 'roll' : NIG[k] ? (c.w >= 0 ? 'pn-' : 'n-') + k : k === 'pudding' ? 'pud' : k; };
 function drainQ() { if (UI.rq.length && !UI.busy) { const q = UI.rq.shift(); playResolve(q[0], q[1]); } }
 async function playResolve(evs, preHand) {
   if (UI.busy) { UI.rq.push([evs, preHand]); return; }
@@ -156,7 +166,7 @@ async function playResolve(evs, preHand) {
     render(); snd('clink'); await wait(750); if (tok !== UI.seq) return;
     if (ps) {
       // 4: every hand moves one seat to the left
-      if (ANIM) { try { await slideOutBelt(); animatePass(ps.sizes); } catch (e) { } snd('pass'); }
+      if (ANIM) { try { if (PX.on) { snd('pass'); await pxPassOut(); if (!pxPackets(ps.sizes)) animatePass(ps.sizes); } else { await slideOutBelt(); animatePass(ps.sizes); snd('pass'); } } catch (e) { } }
       UI.fz = null; UI.enter = v >= 0 ? 'pass' : ''; render();
       await wait(ANIM ? 900 : 0); if (tok !== UI.seq) return;
       UI.busy = false; render(); schedule(); drainQ(); if (NET.on && isHost()) netPush(true); return;
@@ -195,7 +205,7 @@ function afterRound(ge) {
 function hasSave() { return !!lsGet('kk_save'); }
 function save() {
   if (NET.on || !G || !UI.started) return false;
-  try { lsSet('kk_save', JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
+  try { lsSet('kk_save', JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
 }
 function loadSave() {
   if (NET.on) return false;
@@ -205,6 +215,7 @@ function loadSave() {
   G = o.G; try { if (KK.checkInvariants(G).length) { G = null; return false; } } catch (e) { return false; }
   Object.assign(UI, { started: true, mode: o.mode || 'vs', cfg: o.cfg || null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, enter: 'deal', focus: 0, evN: G.evN, over: null });
   if (o.coach) UI.coach = o.coach;
+  UI.chefs = Array.isArray(o.chefs) && o.chefs.length === G.np ? o.chefs : null;
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
   placePrompt(); render(); sndMusic();

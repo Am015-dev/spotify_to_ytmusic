@@ -25,7 +25,7 @@ function buildRules() {
     'The glowing seat shows who is still choosing. Covered plates on the right of each counter mean that diner has chosen.',
     'Tap a group of plates on any counter to see what it is worth right now. Tap a chef to see their whole table.',
     'Hot-seat: the hands are hidden between diners, with a "pass the device" screen. Online: friends see only their own hand.'].map(t => h('li', t))));
-  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: &ldquo;Jazz Slower&rdquo; by Pro Sensory (OpenGameArt, CC0). Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). Names, card text and art are original.</p></section>' }));
+  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: &ldquo;Jazz Slower&rdquo; by Pro Sensory (OpenGameArt, CC0). Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
   return root;
 }
 function renderRival(seat) {
@@ -62,33 +62,81 @@ function renderMenu() {
   if (!NET.on) row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
   row('Help on the belt', tog('hints', UI.prefs.hint, 'Show +N scores'), tog('tap2', UI.prefs.tap2, 'Tap twice to serve'));
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
+  { const g = gfxPref(); row('Graphics' + (PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
   row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('span.tinyc', { html: sp }));
   b.appendChild(h('p.sm', 'Kaiten Kitchen is an original conveyor-belt card game. Names, card text and art are original; the audio credits are in How to play.'));
 }
-// ---------- start screen ----------
+// ---------- start screens: painted title -> setup (diner cards) / online ----------
+// the four chefs who can join you (you are seat 0 with Mina's portrait). Default level = the character's temper; every level can be changed.
+const DINERS = {
+  1: { lv: 'hard', story: 'Taro cooks noodles on the night shift and eats his supper at the belt long after midnight. He counts every plate that rolls past and remembers exactly who took the last prawn.', enjoy: 'Choose Taro if you enjoy a sharp rival who punishes every loose plate.' },
+  2: { lv: 'normal', story: 'Odile ran a bakery for forty years and still wears her tall hat to dinner. She has never once left without dessert, and she will happily tell you about it.', enjoy: 'Choose Odile if you enjoy a fair, steady race with the custard on the line.' },
+  3: { lv: 'normal', story: 'Kofi drives the number 9 bus and knows every regular by name. He loves a roll race, cheers when he wins it and cheers just as loudly when he loses.', enjoy: 'Choose Kofi if you enjoy a lively table where the seaweed rolls are always fought over.' },
+  4: { lv: 'easy', story: 'Pip saved up pocket money all month for this dinner and wants to try one of everything. Pip picks whichever plate looks the happiest.', enjoy: 'Choose Pip if you enjoy a relaxed first meal with room to try things out.' }
+};
+const SEAT_ORDER = [2, 3, 1, 4];
+function optObj() { const o = UI.opt = UI.opt || Object.assign({}, DEF, { lv: DEF.lv.slice(), seats: DEF.seats.slice() }); if (!Array.isArray(o.seats)) o.seats = chefsFor(o.np || 3, o).slice(1); if (!o.lv) o.lv = DEF.lv.slice(); o.np = o.seats.length + 1; return o; }
+function setNp(n) { const o = optObj(), want = Math.max(1, Math.min(4, n - 1)); const st = o.seats.slice(); while (st.length > want) st.pop(); for (const c of SEAT_ORDER) { if (st.length >= want) break; if (st.indexOf(c) < 0) st.push(c); } o.seats = st; o.np = st.length + 1; }
+function toggleChef(c) { const o = optObj(), st = o.seats.slice(), i = st.indexOf(c); if (i >= 0) { if (st.length > 1) st.splice(i, 1); else { toast('At least one chef joins you.'); return; } } else st.push(c); o.seats = st; o.np = st.length + 1; }
+function logoSVG() { return '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#fbf0da" stroke="#4a2a22" stroke-width="1.6"/><circle cx="12" cy="12" r="7" fill="#e5553a" stroke="#4a2a22" stroke-width="1.2"/><circle cx="12" cy="12" r="3.2" fill="#fbf0da" stroke="#4a2a22" stroke-width="1"/></svg>'; }
+function tableLine(o) { const nm = o.seats.map(c => PN[c]); return 'You + ' + nameList(nm) + ' · ' + o.np + ' diners'; }
 function renderStart() {
   const s = $('#start'); s.hidden = false; s.innerHTML = '';
   const rs = $('#rs'); if (rs && !UI.rsOpen) { rs.hidden = true; }
-  if (NET.on) { netStartScreen(s); return; }
-  const o = UI.opt = UI.opt || Object.assign({}, DEF, { lv: DEF.lv.slice() });
-  const seg = (l, key, vals, fmt) => h('div.seg', h('span.lbl', l), vals.map(v => h('button.chipb' + (o[key] === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': key, 'data-v': v, type: 'button' }, fmt ? fmt(v) : v)));
-  const lvRows = []; for (let k = 1; k < o.np; k++) lvRows.push(h('div.seg', h('span.lbl', h('span', { html: avatarS(k, 40) }), PN[k]), ['easy', 'normal', 'hard'].map(v => h('button.chipb' + ((o.lv[k - 1] || 'normal') === v ? '.on' : ''), { 'data-a': 'lv', 'data-seat': k, 'data-v': v, type: 'button' }, v))));
-  const card = h('div.scard',
-    h('h1', h('span', { html: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#fbf0da" stroke="#4a2a22" stroke-width="1.6"/><circle cx="12" cy="12" r="7" fill="#e5553a" stroke="#4a2a22" stroke-width="1.2"/><circle cx="12" cy="12" r="3.2" fill="#fbf0da" stroke="#4a2a22" stroke-width="1"/></svg>' }), 'Kaiten Kitchen'),
-    h('div.chefs', [0, 1, 2, 3, 4].map(i => h('span', { html: avatarS(i, 96) }))),
-    h('p.tag', 'A conveyor-belt sushi card game for 2 to 5. Everyone picks a plate at the same time, then the hands slide to the left. Build the best meal over three rounds.'),
-    h('button.sbtn.big', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and one friendly computer; short tips explain each plate the first time you meet it.')),
-    h('div.opts', seg('Diners', 'np', [2, 3, 4, 5]), lvRows.length ? h('p.sm', 'Computer level for each chef:') : null, lvRows),
-    h('div.sgrid',
-      h('button.sbtn', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Play vs computer'), h('span', 'You against 1 to 4 chefs')),
-      h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', '2 to 5 people, one device')),
-      h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch computers'), h('span', 'Sit back and learn'))),
-    netBlock(),
-    h('div.srow2', hasSave() ? h('button.btn', { 'data-a': 'loadsave', type: 'button' }, 'Continue saved game') : null, h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play')));
-  s.appendChild(card);
+  if (NET.on) { s.dataset.v = 'net'; netStartScreen(s); return; }
+  if (!UI.sv) UI.sv = UI.onl ? 'online' : 'title';
+  s.dataset.v = UI.sv;
+  if (UI.sv === 'title') { s.appendChild(titleEl()); return; }
+  if (KIT.ART.title) s.appendChild(h('img.ttl-bg.dim', { src: KIT.ART.title, alt: '' }));
+  if (UI.sv === 'online') { s.appendChild(onlineEl()); return; }
+  s.appendChild(setupEl());
 }
-function showStart() { try { GX.close(); } catch (e) { } closePop(); UI.cards = []; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } closeRS(); clearTimeout(UI.tm); renderStart(); }
+function titleEl() {
+  const bg = KIT.ART.title ? h('img.ttl-bg', { src: KIT.ART.title, alt: '' }) : h('div.ttl-bg.ttl-plain');
+  const sv = hasSave();
+  return h('div.ttl', bg, h('div.ttl-in',
+    h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Kaiten Kitchen')),
+    h('p.tag', 'Grab a plate, pass the belt.'),
+    h('div.tbtns',
+      h('button.tbtn.go', { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer chefs')),
+      h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')),
+      sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved meal')) : null),
+    h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
+}
+function dinerCard(c, o) {
+  const d = DINERS[c], on = o.seats.indexOf(c) >= 0, lv = o.lv[c - 1] || 'normal', pc = KIT.PLAYERS[c];
+  const card = h('article.dcard' + (on ? '.on' : ''), { 'aria-label': PN[c] + (on ? ', at the table' : ', not at the table') });
+  card.style.setProperty('--dc', pc.c);
+  card.append(h('div.dtop', h('div.dimg', { html: avatarC(c, 120) }), h('h3', PN[c], h('small', on ? lv : 'not invited'))), h('div.dtx', h('p.story', d.story), h('p.enjoy', d.enjoy),
+    h('div.drow', h('button.chipb.seatb' + (on ? '.on' : ''), { 'data-a': 'seatchef', 'data-c': c, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, on ? 'At the table ✓' : 'Invite'),
+      on ? h('span.lvs', ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (lv === v ? '.on' : ''), { 'data-a': 'lv', 'data-seat': c, 'data-v': v, type: 'button', 'aria-pressed': lv === v ? 'true' : 'false', 'aria-label': PN[c] + ' plays ' + v }, v))) : null)));
+  return card;
+}
+function setupEl() {
+  const o = optObj(), ph = isPh(), open = !!UI.cfgOpen;
+  const head = h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Who is at the counter?'));
+  const sum = h('div.ssum', h('div.sfaces', o.seats.map(c => h('span', { html: avatarC(c, 64) }))), h('span.sline', tableLine(o)), h('button.btn.alt', { 'data-a': 'cfgopen', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, 'Configure'));
+  const cfg = h('div.cfg#cfg', { hidden: ph && !open ? true : null, role: ph ? 'dialog' : null, 'aria-label': ph ? 'Configure the table' : null },
+    ph ? h('div.cfghead', h('b', 'Configure the table'), h('button.btn', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null,
+    h('div.seg', h('span.lbl', 'Table for'), [2, 3, 4, 5].map(v => h('button.chipb' + (o.np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': o.np === v ? 'true' : 'false' }, v))),
+    h('div.dgrid', [1, 2, 3, 4].map(c => dinerCard(c, o))),
+    ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
+  const n = o.np - 1;
+  const go = h('div.sgo',
+    h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c])))),
+    h('div.sgrid3',
+      h('button.sbtn', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and ' + PN[o.seats[0]] + ', with tips')),
+      h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', o.np + ' people, one device')),
+      h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch'), h('span', 'the chefs play'))));
+  return h('div.setup.scard', head, ph ? sum : h('p.ssub', 'Invite the chefs you want at the belt. Each one has a temper; change their level if you like.'), cfg, go);
+}
+function onlineEl() {
+  return h('div.setup.scard.onlv', h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Play online')),
+    h('p.ssub', 'Host a table and send friends the code or the link. Every browser connects directly; nobody sees another hand. Empty seats go to the computer chefs.'),
+    h('details.online#onl', { open: true }, h('summary', 'Free, peer to peer'), h('div#netblock', netInner())));
+}
+function showStart() { try { GX.close(); } catch (e) { } closePop(); UI.cards = []; UI.sv = 'title'; UI.cfgOpen = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } closeRS(); clearTimeout(UI.tm); renderStart(); }
 // ---------- events ----------
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]'); const pop = $('#ppop');
@@ -111,12 +159,19 @@ document.addEventListener('click', ev => {
     case 'rsnext': afterRound(UI.rsInfo && UI.rsInfo.ge); break;
     case 'rsskip': skipCount(); break;
     case 'rsclose': closeRS(); break;
-    case 'again': { const m = UI.mode, c = UI.cfg || {}; UI.cards = []; closeRS(); newGame(m === 'net' ? 'vs' : m, { np: c.np, level: c.level, lv: c.lv }); break; }
+    case 'again': { const m = UI.mode, c = UI.cfg || {}; UI.cards = []; closeRS(); newGame(m === 'net' ? 'vs' : m, { np: c.np, level: c.level, lv: c.lv, seats: c.seats || undefined }); break; }
+    case 'play': UI.sv = 'setup'; renderStart(); break;
+    case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;
+    case 'title': UI.sv = 'title'; UI.cfgOpen = false; renderStart(); break;
+    case 'cfgopen': UI.cfgOpen = true; renderStart(); try { const c = $('#cfg'); if (c) c.querySelector('button').focus({ preventScroll: true }); } catch (e) { } break;
+    case 'cfgclose': UI.cfgOpen = false; renderStart(); break;
+    case 'seatchef': toggleChef(+d.c); renderStart(); break;
+    case 'gfx': setGfx(d.v); renderMenu(); break;
     case 'menu': showStart(); break;
     case 'start': newGame(d.m); break;
     case 'guided': newGame('guided'); break;
-    case 'opt': { const o = UI.opt = UI.opt || Object.assign({}, DEF, { lv: DEF.lv.slice() }); o[d.k] = isNaN(+d.v) ? d.v : +d.v; if (d.k === 'level') o.lv = [d.v, d.v, d.v, d.v]; renderStart(); break; }
-    case 'lv': { const o = UI.opt = UI.opt || Object.assign({}, DEF, { lv: DEF.lv.slice() }); o.lv = (o.lv || DEF.lv).slice(); o.lv[+d.seat - 1] = d.v; renderStart(); break; }
+    case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else { o[d.k] = isNaN(+d.v) ? d.v : +d.v; if (d.k === 'level') o.lv = [d.v, d.v, d.v, d.v]; } renderStart(); break; }
+    case 'lv': { const o = optObj(); o.lv = (o.lv || DEF.lv).slice(); o.lv[+d.seat - 1] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
     case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
@@ -136,7 +191,7 @@ function applyPhone() {
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
   r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(150, Math.min(206, Math.round(hh * .26))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
-  placePrompt(); if (was !== ph) { if (G && UI.started) render(); }
+  placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !NET.on && UI.sv === 'setup') renderStart(); }
 }
 let rzT = 0;
 function onResize() { clearTimeout(rzT); rzT = setTimeout(() => { applyPhone(); if (G && UI.started) render(); }, 60); }
@@ -152,7 +207,8 @@ function boot() {
   addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { clearTimeout(rzT); rzT = setTimeout(() => { if (G && UI.started) render(); }, 40); } }).observe(bd);
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'kk' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); } } catch (e) { }
-  try { if (window.PerfHUD && PerfHUD.register) PerfHUD.register({ game: 'Kaiten Kitchen', anchor: '.gx-board', corner: 'tl', isAnimating: () => !!UI.busy, idleMode: 'demand' }); } catch (e) { }
+  pxPerfReg();
+  pxInit().then(ok => { if (ok) { pxPerfReg(); if (G && UI.started) render(); } });
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
   netInit();
   renderStart();

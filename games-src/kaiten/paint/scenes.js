@@ -87,7 +87,7 @@ function chefInner(i, seed) {
 function chef(i, seed) {
   const a = CHEF[i]; const id = 'chc' + i;
   return `<defs><clipPath id="${id}"><circle cx="256" cy="256" r="246"/></clipPath><radialGradient id="${id}g" cx=".45" cy=".35" r=".75"><stop offset="0" stop-color="${lit(a.bg, .55)}"/><stop offset="1" stop-color="${a.bg}"/></radialGradient></defs>
-<g filter="url(#paintN)"><circle cx="256" cy="256" r="248" fill="url(#${id}g)"/></g><g clip-path="url(#${id})"><g transform="translate(0 30)">${chefInner(i, seed)}</g></g>`;
+<g filter="url(#paintN)"><circle cx="256" cy="256" r="248" fill="url(#${id}g)"/></g><g clip-path="url(#${id})"><g transform="translate(256 300) scale(1.42) translate(-256 -262)">${chefInner(i, seed)}</g></g>`;
 }
 
 // ---------------- title painting 1600 x 900: a cosy belt-sushi bar at night ----------------

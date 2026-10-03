@@ -2,16 +2,26 @@
 var ANIM = 1, AIDELAY = 650;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, seq: 0, rec: null, noRec: false, over: null,
-  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: true, sound: true, music: true }, enter: '', land: null, tm: null, pend: null, rq: [] };
+  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: true, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
 const D = KK.DATA;
 const KIT = KKKit;
 const TY = KIT.TYPES;
 const ORDER = KIT.ORDER;
+// painted art: KK_ART (data URIs made by build.py) -> blob URLs so the many card <svg>s only carry a short link. Without blob URLs
+// (old browsers, jsdom) the kit keeps its own vector drawings.
+(function () {
+  try {
+    if (typeof KK_ART === 'undefined' || /jsdom/i.test(navigator.userAgent || '') || !window.URL || !URL.createObjectURL || !window.Blob || !window.atob) return;
+    const m = {};
+    for (const k in KK_ART) { const p = KK_ART[k].split(','), mime = (/data:([^;]+)/.exec(p[0]) || [0, 'image/webp'])[1], bin = atob(p[1]), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); m[k] = URL.createObjectURL(new Blob([u], { type: mime })); }
+    KIT.setArt(m);
+  } catch (e) { }
+})();
 const $ = s => /^#[\w-]+$/.test(s) ? document.getElementById(s.slice(1)) : document.querySelector(s);
 const $$ = s => Array.from(document.querySelectorAll(s));
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const PN = KIT.PLAYERS.map(p => p.name);
-const DEF = { np: 3, level: 'normal', lv: ['normal', 'normal', 'normal', 'normal'] };
+const DEF = { np: 3, level: 'normal', lv: ['hard', 'normal', 'normal', 'easy'], seats: [2, 3] };
 const NIG = { salmon: 2, squid: 3, egg: 1 };
 const ICONS = { roll1: 1, roll2: 2, roll3: 3 };
 const tkey = id => KK.cardKey(id);
@@ -35,12 +45,16 @@ function cached(key, fn) { let v = _art.get(key); if (v === undefined) { v = fn(
 const _nodes = new Map();
 function artNode(key, strFn) { let t = _nodes.get(key); if (!t) { t = svgEl(strFn()); _nodes.set(key, t); } return t.cloneNode(true); }
 const plateN = (type, d, on) => artNode('p|' + type + '|' + d + '|' + (on || ''), () => KIT.plateSVG(type, on ? { d, on } : { d }));
-const avN = (i, size) => artNode('a|' + i + '|' + size, () => KIT.avatarSVG(i % 5, { size }));
+// seat -> diner (chef portrait / colour). Local games may seat any of the chefs; online games use the seat number.
+const chefOf = s => UI.chefs && UI.chefs[s] != null ? UI.chefs[s] : s;
+const avC = (c, size) => artNode('a|' + c + '|' + size, () => KIT.avatarSVG(c % 5, { size }));
+const avN = (i, size) => avC(chefOf(i), size);
 const backN = w => artNode('b|' + w, () => KIT.backSVG({ w }));
 const plateS = (type, d, on) => cached('p|' + type + '|' + d + '|' + (on || ''), () => KIT.plateSVG(type, on ? { d, on } : { d }));
-const avatarS = (i, size) => cached('a|' + i + '|' + size, () => KIT.avatarSVG(i % 5, { size }));
+const avatarC = (c, size) => cached('a|' + c + '|' + size, () => KIT.avatarSVG(c % 5, { size }));
+const avatarS = (i, size) => avatarC(chefOf(i), size);
 const iconS = (name, size, type) => cached('i|' + name + '|' + size + '|' + (type || ''), () => KIT.iconSVG(name, type ? { size, type } : { size }));
-const counterURL = seat => cached('c|' + seat, () => 'url("' + KIT.dataURL(KIT.counterSVG({ w: 360, h: 120, seat, standalone: true }).replace('<svg ', '<svg preserveAspectRatio="none" ')) + '")');
+const counterURL = s => { const seat = chefOf(s); return KIT.ART.counter ? 'linear-gradient(180deg,rgba(42,18,12,.16),rgba(42,18,12,0) 22%),linear-gradient(90deg,transparent 3%,' + KIT.PLAYERS[seat % 5].c + 'aa 3%,' + KIT.PLAYERS[seat % 5].c + 'aa 97%,transparent 97%) 0 52%/100% 62% no-repeat,url("' + KIT.ART.counter + '") 0 0/auto 170% repeat-x' : cached('c|' + seat, () => 'url("' + KIT.dataURL(KIT.counterSVG({ w: 360, h: 120, seat, standalone: true }).replace('<svg ', '<svg preserveAspectRatio="none" ')) + '") center/100% 100%'); };
 function cardNode(type, w, on) { return KIT.cardEl(type, on ? { w, variant: 'nigiri', on } : { w }); }
 function cardDiv(type, w, on) { const d = h('div.cd'); d.style.width = w + 'px'; d.style.height = Math.round(w * 1.4) + 'px'; d.appendChild(cardNode(type, w, on)); return d; }
 // ---- game helpers
@@ -49,7 +63,7 @@ const hotSeat = () => !!G && !NET.on && humans().length > 1;
 const watching = () => !!G && humans().length === 0;
 function viewSeat() { if (!G) return -1; if (NET.on) return NET.mySeat; if (hotSeat()) return UI.holder; const hs = humans(); return hs.length ? hs[0] : -1; }
 const pname = s => G && G.players[s] ? G.players[s].name : '?';
-const pcol = s => KIT.PLAYERS[s % 5];
+const pcol = s => KIT.PLAYERS[chefOf(s) % 5];
 const nameList = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
 // the tables as displayed: a frozen copy during the reveal sequence, otherwise the real ones
 function tables() { return UI.fz && UI.fz.tables ? UI.fz.tables : G.players.map(p => p.table); }

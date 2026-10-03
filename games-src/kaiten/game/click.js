@@ -37,10 +37,22 @@ function run(cf, seed) {
     w.addEventListener('load', () => {
       try {
         w.eval(`ANIM=${ANIMON ? 1 : 0};AIDELAY=${ANIMON ? 40 : 0};UI.seed=${seed};UI.noRec=${R() < .7 ? 'true' : 'false'}`);
+        // title -> setup (on phones the table options sit behind Configure)
+        if (!d.querySelector('#start .ttl [data-a=play]')) errs.push('no Play button on the title');
+        if (d.querySelector('#start [data-a=loadsave]')) errs.push('Resume shown without a save');
+        click(d.querySelector('[data-a=play]')); seen.add('title->setup');
+        const phm = w.eval('isPh()'); if (cf.phone && !phm) errs.push('phone mode off on a phone');
+        if (phm) { const c = d.querySelector('[data-a=cfgopen]'); if (!c) errs.push('no Configure button on the phone setup'); else { click(c); if (d.querySelector('#cfg').hidden) errs.push('Configure did not open'); seen.add('configure'); } }
+        else if (d.querySelector('#cfg').hidden) errs.push('setup options hidden on desktop');
         const o = (k, v) => { const b = d.querySelector(`[data-a=opt][data-k=${k}][data-v="${v}"]`); if (b) click(b); };
         if (cf.np) o('np', cf.np); if (cf.level) o('level', cf.level);
-        if (cf.start === 'vs' && cf.np > 2) { const b = d.querySelector('[data-a=lv][data-seat="1"][data-v="hard"]'); if (b) click(b); }
+        if (cf.np && w.eval('UI.opt.np') !== cf.np) errs.push('table size not set: ' + w.eval('UI.opt.np'));
+        if (cf.start === 'vs' && cf.np > 2) { const b = d.querySelector('[data-a=lv][data-v="hard"]'); if (b) click(b); }
+        if (cf.np === 3 && R() < .5) { const inv = d.querySelector('[data-a=seatchef][aria-pressed=false]'); if (inv) { click(inv); seen.add('invite'); if (w.eval('UI.opt.np') !== 4) errs.push('invite did not add a chef'); click(d.querySelector('[data-a=opt][data-k=np][data-v="3"]')); } }
+        if (phm) { click(d.querySelector('[data-a=cfgclose]')); if (!d.querySelector('#cfg').hidden) errs.push('Configure did not close'); }
+        const want = w.eval('UI.opt.seats.slice()');
         click(d.querySelector(`[data-start=${cf.start}]`)); if (!w.eval('UI.started')) errs.push('start click failed');
+        if (cf.start !== 'guided') { const got = w.eval('G.players.map(p => p.name)').slice(1).join(','), exp = want.map(c => w.eval('PN[' + c + ']')).join(','); if (got !== exp) errs.push('seated chefs ' + got + ' != chosen ' + exp); }
         if (cf.phone && !d.documentElement.classList.contains('ph')) errs.push('phone class missing');
         iv = setInterval(() => {
           try {

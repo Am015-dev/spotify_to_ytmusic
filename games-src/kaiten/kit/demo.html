@@ -225,7 +225,7 @@ function plateBase(type) {
   return s;
 }
 
-root.__KK = { INK, CREAM, CREAM2, WOOD, WOOD_D, FONT, NS, f1, esc, hash, rng, mix, lighten, darken, TYPES, ORDER, PLAYERS, defs, P, E, L, dot, star, blobPath, ringPts, face, rimOrn, plateBase };
+root.__KK = { ART: {}, INK, CREAM, CREAM2, WOOD, WOOD_D, FONT, NS, f1, esc, hash, rng, mix, lighten, darken, TYPES, ORDER, PLAYERS, defs, P, E, L, dot, star, blobPath, ringPts, face, rimOrn, plateBase };
 })(typeof window !== 'undefined' ? window : globalThis);
 /* p2: the food characters (plate space, centre 0,0, well radius ~38) */
 (function (root) {
@@ -485,14 +485,20 @@ function cardSVG(type, o) {
   const matc = mix(CREAM, T.c, .10), matd = mix(CREAM2, T.c, .22);
   let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-card kk-t-${type}" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}" role="img" aria-label="${esc(T.name)}: ${esc(T.ruleText)}"${o.cls ? ` data-c="${esc(o.cls)}"` : ''}>`;
   if (o.standalone) s += K.defs();
+  // painted art (KKKit.setArt): the illustration replaces the vector plate; part:'mat'|'top' draws only the layers under / over it
+  const ak = type === 'wasabi' && (o.on || o.variant === 'nigiri') ? 'wasabi-nigiri' : type, art = !o.vector && K.ART[ak];
+  if (o.part !== 'top') {
   // shadow + mat
   s += `<rect x="${f1(w * .02)}" y="${f1(w * .035)}" width="${w - w * .02}" height="${H - w * .035}" rx="${f1(rx)}" fill="#2a120c" opacity=".25"/>`;
   s += `<rect x=".8" y=".8" width="${f1(w - 1.6)}" height="${f1(H - 1.6)}" rx="${f1(rx)}" fill="${matc}" stroke="${INK}" stroke-width="${f1(Math.max(1.2, w * .014))}"/>`;
   s += `<rect x=".8" y=".8" width="${f1(w - 1.6)}" height="${f1(H - 1.6)}" rx="${f1(rx)}" fill="url(#kk-weave)"/>`;
   s += `<rect x="${f1(w * .04)}" y="${f1(w * .04)}" width="${f1(w * .92)}" height="${f1(H - w * .08)}" rx="${f1(rx * .7)}" fill="none" stroke="${mix(T.c, '#ffffff', .1)}" stroke-width="${f1(Math.max(1, w * .011))}" stroke-dasharray="${f1(w * .03)} ${f1(w * .025)}" opacity=".6"/>`;
   s += `<path d="M${f1(rx)} ${f1(w * .018)}H${f1(w - rx)}" stroke="#fff" stroke-opacity=".55" stroke-width="1.2" stroke-linecap="round"/>`;
+  }
+  if (o.part === 'mat') return s + '</svg>';
   // plate + food
-  s += `<g transform="translate(${f1(Ly.cx)} ${f1(Ly.cy)}) scale(${f1(k)})">${K.plateBase(type)}<g${fx === 'none' ? '' : ` filter="url(#kk-fx-${fx})"`}>${K.foodArt(type, o)}</g></g>`;
+  if (!o.part) { if (art) { const D2 = Ly.D * 1.1; s += `<image href="${art}" x="${f1(Ly.cx - D2 / 2)}" y="${f1(Ly.cy - D2 / 2)}" width="${f1(D2)}" height="${f1(D2)}"/>`; }
+  else s += `<g transform="translate(${f1(Ly.cx)} ${f1(Ly.cy)}) scale(${f1(k)})">${K.plateBase(type)}<g${fx === 'none' ? '' : ` filter="url(#kk-fx-${fx})"`}>${K.foodArt(type, o)}</g></g>`; }
   // name chit
   const cx0 = w * .075, cw = w - 2 * cx0, cr = Math.max(3, w * .035);
   s += `<g><rect x="${f1(cx0 + 1)}" y="${f1(Ly.y0 + 1.6)}" width="${f1(cw)}" height="${f1(Ly.chH)}" rx="${f1(cr)}" fill="#2a120c" opacity=".28"/>`;
@@ -525,6 +531,11 @@ function backSVG(o) {
   s += `<rect x="${f1(w * .02)}" y="${f1(w * .035)}" width="${w - w * .02}" height="${H - w * .035}" rx="${f1(rx)}" fill="#2a120c" opacity=".25"/>`;
   s += `<rect x=".8" y=".8" width="${f1(w - 1.6)}" height="${f1(H - 1.6)}" rx="${f1(rx)}" fill="url(#${id})" stroke="${INK}" stroke-width="${f1(Math.max(1.2, w * .014))}"/>`;
   s += `<rect x=".8" y=".8" width="${f1(w - 1.6)}" height="${f1(H - 1.6)}" rx="${f1(rx)}" fill="url(#${id}-v)"/>`;
+  if (K.ART.back && !o.vector) {   // painted back: the picture inside the ink border, rounded corners
+    s += `<defs><clipPath id="${id}-c"><rect x="1.5" y="1.5" width="${f1(w - 3)}" height="${f1(H - 3)}" rx="${f1(rx - 1)}"/></clipPath></defs><image href="${K.ART.back}" x="0" y="0" width="${w}" height="${H}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${id}-c)"/>`;
+    s += `<rect x=".8" y=".8" width="${f1(w - 1.6)}" height="${f1(H - 1.6)}" rx="${f1(rx)}" fill="none" stroke="${INK}" stroke-width="${f1(Math.max(1.2, w * .014))}"/>`;
+    return s + '</svg>';
+  }
   // gold frame
   s += `<rect x="${f1(w * .055)}" y="${f1(w * .055)}" width="${f1(w * .89)}" height="${f1(H - w * .11)}" rx="${f1(rx * .6)}" fill="none" stroke="#f0cd7a" stroke-width="${f1(Math.max(1.2, w * .018))}"/>`;
   s += `<rect x="${f1(w * .085)}" y="${f1(w * .085)}" width="${f1(w * .83)}" height="${f1(H - w * .17)}" rx="${f1(rx * .45)}" fill="none" stroke="#f0cd7a" stroke-width="${f1(Math.max(.7, w * .007))}" stroke-opacity=".7"/>`;
@@ -705,6 +716,7 @@ function dataURL(svg) { return 'data:image/svg+xml;charset=utf-8,' + encodeURICo
 // css: a div with this class scrolls the belt forever (respects prefers-reduced-motion)
 function beltCSS(o) {
   o = o || {}; const h = o.h || 72, P = o.period || 96, sel = o.selector || '.kk-belt', t = o.seconds || 5;
+  if (K.ART.belt && !o.vector) { const tw = Math.round(1024 * h / 128); return `${sel}{height:${h}px;background:url("${K.ART.belt}") repeat-x 0 0/${tw}px ${h}px;animation:kk-belt-${P} ${t * tw / P}s linear infinite}@keyframes kk-belt-${P}{to{background-position-x:-${tw}px}}@media (prefers-reduced-motion:reduce){${sel}{animation:none}}`; }
   const url = dataURL(beltSegmentSVG({ h, period: P, standalone: true }));
   return `${sel}{height:${h}px;background:url("${url}") repeat-x 0 0/${P}px ${h}px;animation:kk-belt-${P} ${t}s linear infinite}@keyframes kk-belt-${P}{to{background-position-x:-${P}px}}@media (prefers-reduced-motion:reduce){${sel}{animation:none}}`;
 }
@@ -828,7 +840,8 @@ function avatarSVG(i, o) {
   if (o.standalone) s += K.defs();
   s += `<defs><clipPath id="${uid}"><circle cx="50" cy="50" r="46"/></clipPath><radialGradient id="${uid}b" cx=".5" cy=".35" r=".8"><stop offset="0" stop-color="${lighten(pc.t, .5)}"/><stop offset="1" stop-color="${pc.t}"/></radialGradient></defs>`;
   s += `<circle cx="51" cy="53" r="46" fill="#2a120c" opacity=".25"/><circle cx="50" cy="50" r="46" fill="url(#${uid}b)"/>`;
-  s += `<g clip-path="url(#${uid})">${avatarBody(i)}</g>`;
+  const art = !o.vector && K.ART['chef-' + pc.name.toLowerCase()];
+  s += art ? `<image href="${art}" x="2" y="2" width="96" height="96" clip-path="url(#${uid})"/>` : `<g clip-path="url(#${uid})">${avatarBody(i)}</g>`;
   s += `<circle cx="50" cy="50" r="46" fill="none" stroke="${pc.c}" stroke-width="${o.ring === false ? 0 : 6}"/><circle cx="50" cy="50" r="48.6" fill="none" stroke="${INK}" stroke-width="2.4"/><circle cx="50" cy="50" r="43.2" fill="none" stroke="${INK}" stroke-width="1.2" opacity=".6"/>`;
   return s + '</svg>';
 }
@@ -850,6 +863,8 @@ function seatSVG(i, o) {
 function plateSVG(type, o) {
   o = o || {}; const d = o.d || 64; if (!TYPES[type]) type = 'tempura';
   const fx = o.fx || (d >= 120 ? 'full' : d >= 48 ? 'lite' : 'none');
+  const ak = type === 'wasabi' && (o.on || o.variant === 'nigiri') ? 'wasabi-nigiri' : type;
+  if (K.ART[ak] && !o.vector) return `<svg xmlns="http://www.w3.org/2000/svg" class="kk-plate kk-t-${type}" width="${d}" height="${d}" viewBox="-52 -52 104 104" role="img" aria-label="${esc(TYPES[type].name)}"><image href="${K.ART[ak]}" x="-58" y="-58" width="116" height="116"/></svg>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" class="kk-plate kk-t-${type}" width="${d}" height="${d}" viewBox="-52 -52 104 104" role="img" aria-label="${esc(TYPES[type].name)}">${o.standalone ? K.defs() : ''}${K.plateBase(type)}<g${fx === 'none' ? '' : ` filter="url(#kk-fx-${fx})"`}>${K.foodArt(type, o)}</g></svg>`;
 }
 
@@ -921,7 +936,7 @@ function clocheOn(host, o) {
 function revealAll(hosts, o) { o = o || {}; const st = o.stagger != null ? o.stagger : 140; return Promise.all(hosts.map((h, i) => { const c = h.__kkc || clocheOn(h); return c.lift({ delay: i * st, onLift: o.onLift }); })); }
 
 const API = {
-  version: '1.0', TYPES, ORDER, PLAYERS, INK, CREAM, FONT, AVATARS: AV,
+  version: '1.1', ART: K.ART, setArt: m => { for (const k in m) K.ART[k] = m[k]; elCache.clear(); imgCache.clear(); }, TYPES, ORDER, PLAYERS, INK, CREAM, FONT, AVATARS: AV,
   cardSVG: K.cardSVG, backSVG: K.backSVG, pileSVG: K.pileSVG, plateSVG, cardLayout: K.cardLayout,
   beltSegmentSVG: K.beltSegmentSVG, beltCSS: K.beltCSS, beltEl: K.beltEl, counterSVG: K.counterSVG,
   avatarSVG, seatSVG, iconSVG: K.iconSVG, iconNames: K.ICON_NAMES, iconLabel: K.ICON_LABEL, ruleIcon: t => (TYPES[t] || {}).rule,

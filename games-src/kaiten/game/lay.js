@@ -21,9 +21,19 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
       if (r.length) fail('unreachable ' + tag, JSON.stringify(r));
     };
     const humanTurn = async () => { for (let k = 0; k < 160; k++) { if (await p.evaluate(() => canPick())) return true; await p.waitForTimeout(150); } return false; };
-    await p.goto('https://gns.test/'); await p.waitForTimeout(600); await scroll('start'); await shot('0start');
-    await p.evaluate(() => { UI.seed = 3; AIDELAY = 60; UI.opt = { np: 4, level: 'normal', lv: ['normal', 'normal', 'normal', 'normal'] }; });
-    await p.click('[data-start=vs]'); await p.waitForTimeout(700);
+    await p.goto('https://gns.test/'); await p.waitForTimeout(900); await scroll('start'); await shot('0start');
+    // title: Play and Online, Resume only with a save; the three buttons sit inside the screen and are not covered
+    { const t = await p.evaluate(() => { const bs = [...document.querySelectorAll('#start .tbtns button')]; return { n: bs.length, acts: bs.map(b => b.dataset.a), bad: bs.filter(b => { const r = b.getBoundingClientRect(); const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.bottom > innerHeight + 1 || r.top < 0 || r.height < 44 || !b.contains(h); }).map(b => b.dataset.a), art: !!document.querySelector('#start img.ttl-bg') }; });
+      if (t.acts.join() !== 'play,online') fail('title buttons', JSON.stringify(t)); if (t.bad.length) fail('title button off screen or covered', JSON.stringify(t.bad)); if (!t.art) fail('no title painting'); }
+    await p.click('[data-a=play]'); await p.waitForTimeout(300); await scroll('setup'); await shot('0setup');
+    { const st = await p.evaluate(() => ({ cards: document.querySelectorAll('#start .dcard').length, on: document.querySelectorAll('#start .dcard.on').length, cfg: !document.querySelector('#cfg').hidden, start: (() => { const b = document.querySelector('[data-start=vs]'); const r = b.getBoundingClientRect(); return r.bottom <= innerHeight + 1 && r.top >= 0; })(), enjoy: [...document.querySelectorAll('.dcard .enjoy')].every(e => /^Choose \w+ if you enjoy /.test(e.textContent)) }));
+      if (st.cards !== 4 || st.on !== 2 || !st.cfg || !st.enjoy) fail('setup cards', JSON.stringify(st)); if (!st.start) fail('Start button not visible without scrolling', JSON.stringify(st)); }
+    // invite / remove a chef changes the table size, the seated chefs become the opponents
+    await p.click('[data-a=seatchef][data-c="4"]'); await p.waitForTimeout(100); if (await p.evaluate(() => UI.opt.np) !== 4) fail('invite Pip did not make a table for 4');
+    await p.click('[data-a=seatchef][data-c="4"]'); await p.waitForTimeout(100); if (await p.evaluate(() => UI.opt.np) !== 3) fail('removing Pip did not make a table for 3');
+    await p.evaluate(() => { UI.seed = 3; AIDELAY = 60; UI.opt = { np: 4, level: 'normal', lv: ['normal', 'normal', 'normal', 'normal'], seats: [2, 3, 1] }; });
+    await p.click('[data-start=vs]'); await p.waitForTimeout(900);
+    { const nm = await p.evaluate(() => G.players.map(q => q.name).join(',')); if (nm !== 'You,Odile,Kofi,Taro') fail('seated chefs', nm); }
     if (!(await humanTurn())) fail('no human turn'); await scroll('game'); await reach('turn');
     const m = await p.evaluate(() => { const B = document.querySelector('#board').getBoundingClientRect(), D = document.querySelector('#dock').getBoundingClientRect(), T = document.querySelector('#tbl').getBoundingClientRect(); return { board: [Math.round(B.width), Math.round(B.height)], share: +(B.width * B.height / (innerWidth * innerHeight)).toFixed(2), dock: [Math.round(D.width), Math.round(D.height)], tbl: [Math.round(T.width), Math.round(T.height)] }; });
     console.log(t, 'board', JSON.stringify(m)); if (m.share < .5) fail('board share', m.share);
@@ -52,7 +62,7 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
     await p.waitForTimeout(400); await scroll('final'); await shot('9final'); { const rr = await rect('.rsbox'); if (!rr) fail('no final result'); else if (rr[0] < 0 || rr[1] < 0 || rr[2] > W + 1 || rr[3] > H + 1) fail('final box does not fit', JSON.stringify(rr)); }
     await p.click('#rs [data-a=rsclose]'); await p.waitForTimeout(200); await scroll('after final'); await shot('10after');
     // hot-seat pass card
-    await p.evaluate(() => { showStart(); }); await p.waitForTimeout(200); await p.click('[data-a=opt][data-k=np][data-v="3"]'); await p.click('[data-start=hot]'); await p.waitForTimeout(500);
+    await p.evaluate(() => { showStart(); }); await p.waitForTimeout(200); await p.click('[data-a=play]'); await p.click('[data-a=opt][data-k=np][data-v="3"]'); await p.click('[data-start=hot]'); await p.waitForTimeout(500);
     if (await p.evaluate(() => document.querySelector('#pc').hidden || !document.querySelector('#pc [data-a=take]'))) fail('no pass-the-device card'); else { const pr = await rect('#pc'), br = await rect('#bd'); if (ov(pr, br)) fail('pass card over the board'); await shot('11pass'); if (await p.evaluate(() => document.querySelectorAll('#belt [data-up="1"]').length)) fail('hand visible before the pass card was taken'); }
     await scroll('hot');
     if (errs.length) fail('console errors', JSON.stringify(errs.slice(0, 3)));
