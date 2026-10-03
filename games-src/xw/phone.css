@@ -177,3 +177,11 @@ html.ph.ph-p .roadinfo{position:absolute;left:6px;right:6px;top:46px;z-index:6;m
 html.ph .ph-ctl .gx-ibtn{min-width:44px;min-height:44px;width:44px;height:44px;padding:0;font-size:0;border-radius:10px;flex:0 0 44px}
 html.ph .ph-ctl .gx-ibtn .ico{width:22px;height:22px}
 html.ph .ph-ctl .gx-ibtn.on,html.ph .ph-ctl .gx-ibtn[aria-pressed="true"]{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.35)}
+html.ph.ph-p .road{width:100%}
+/* the panel scrolls, the primary button stays pinned and fully visible at its bottom edge.
+   .acts.col dissolves into the prompt so its buttons can stick to the scroller (a sticky child cannot leave its own parent) */
+html.ph .gx-dock-body{scroll-padding-bottom:60px}
+html.ph #prompt .acts.col{display:contents}
+html.ph #prompt .acts.col>.btn{display:block;width:100%;margin:0 0 6px}
+html.ph #prompt .acts.col>.btn.primary,html.ph #prompt .acts.col:not(:has(>.btn.primary))>.btn.rec,html.ph #prompt>.acts:has(>.btn.primary.big){position:sticky;bottom:-4px;z-index:2;background-clip:padding-box;box-shadow:0 -10px 10px -2px var(--panel),0 3px 12px rgba(255,170,60,.25)}
+html.ph #prompt>.acts:has(>.btn.primary.big){background:var(--panel);bottom:-8px;padding:4px 0 6px;margin:0 0 4px;box-shadow:0 -10px 10px -2px var(--panel)}
