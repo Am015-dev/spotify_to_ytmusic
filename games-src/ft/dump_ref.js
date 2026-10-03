@@ -1,0 +1,14 @@
+// dump the Sands of Qamar card list for the shared reference page
+const fs=require('fs'),vm=require('vm');const D=__dirname+'/src/';const ctx={console};vm.createContext(ctx);
+vm.runInContext(['data.js','djinns.js'].map(f=>fs.readFileSync(D+f,'utf8')).join('\n')+';globalThis.__D={MNAME,MHELP,MEEPLE_COUNT,TILEDEF,TILESET,TILESET_ART,TILESET_WHIM,RNAME,RESOURCE_COUNT,SETVP,DJINNS,ITEMS,THIEVES,CAMELS}',ctx);const X=ctx.__D;const E=[];
+const add=(s,n,tags,t,c,sub)=>E.push({s,n,tags:tags.filter(Boolean),t,c:c||null,sub:sub||[]});
+const col={vizier:'yellow',elder:'white',merchant:'green',builder:'blue',assassin:'red',artisan:'purple'};
+for(const c in X.MNAME)add('Tribes (meeples)',X.MNAME[c],[col[c],c==='artisan'?'Crafters expansion':'base'],X.MHELP[c],c==='artisan'?15:X.MEEPLE_COUNT[c]);
+for(const [set,lab] of [[X.TILESET,'base'],[X.TILESET_ART,'Crafters expansion'],[X.TILESET_WHIM,'Wonder Cities expansion']])for(const [k,v,n,cl] of set){const d=X.TILEDEF[k];add('Tiles',d.n+(v?` (${v})`:''),[(cl?cl==='blue':d.blue)?'blue':'red',lab],d.x,n)}
+for(const r in X.RNAME)add('Goods cards',X.RNAME[r],[r==='fakir'?'special':'goods'],r==='fakir'?'Adds a Mason or a step of Shadow range, stands in for a Sage when summoning, pays djinn powers. Never part of a set.':'Sets of different kinds score '+X.SETVP.slice(1).join(', ')+' for 1–9 kinds.',X.RESOURCE_COUNT[r]);
+const cost={EF:'power: 1 Sage or 1 Mystic',EEF:'power: 1 Sage + 1 Sage or Mystic',F:'power: 1 Mystic','F+':'Mystics when bidding'};
+for(const d of X.DJINNS)add('Djinns',d.n,[d.vp+' points',d.cost?cost[d.cost]:'always on',d.set?{promos:'promo',artisans:'Crafters expansion',thieves:'Cutpurses expansion'}[d.set]:'base',d.assumed?d.assumed+' assumed':''],d.x);
+for(const k in X.ITEMS){const i=X.ITEMS[k];add('Items (Crafters)',i.n,[i.kind,i.vp?i.vp+' points':''],i.x,i.cp)}
+for(const k in X.THIEVES)add('Cutpurses',X.THIEVES[k].n,['Cutpurses expansion',col[k]],X.THIEVES[k].x);
+for(const [n,tag,t] of [['Camel','11 each (2 players) / 8 each','Marks a tile you control. Placing your last camel ends the game at the end of the round.'],['Tent','Crafters · 1 each','Claims a tile instead of a camel; scores the tile plus 1 for each red tile around it.'],['Palm tree','12','3 points to whoever holds its tile (doubled next to the Great Lake).'],['Palace','10','5 points to whoever holds its tile (doubled next to the Great Lake).'],['Mountain','Crafters','Blocks moving between two tiles.'],['Coins','50 each to start','1 point each at the end; pay for turn order and the bazaar.'],['Turn-order track','9 spots','Costs 18, 12, 8, 5, 3, 1, 0, 0, 0; five players use 12 spots. On equal-cost spots the later bidder plays first.']])add('Tokens and pieces',n,[tag],t);
+fs.writeFileSync(__dirname+'/../ref_ft.json',JSON.stringify(E));console.log(E.length)

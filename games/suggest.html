@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Suggestion Box</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rammetto+One&family=Chivo:wght@400;600;800&family=Chivo+Mono:wght@500&display=swap">
+<style>
+/* Layout: the shelf's walnut room; a paper suggestion card sits on the desk, and posting it drops it through the box's brass slot. */
+:root{
+  --wood:#1d1411; --wood2:#2b1d17; --plank:#5a3a26; --ink:#f4ead8; --muted:#bca78c;
+  --brass:#e0a948; --line:#4a3326; --shadow:rgba(0,0,0,.55);
+  --paper:#f1e6d0; --paper2:#e2d2b3; --pink:#241810; --pmuted:#6b5238; --err:#a3341c; --ok:#3d6b2a;
+  --display:"Rammetto One","Arial Black",Impact,sans-serif; --body:"Chivo",system-ui,sans-serif; --mono:"Chivo Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--wood:#efe3cc;--wood2:#e4d3b4;--plank:#a4744b;--ink:#2a1a10;--muted:#6d5640;--brass:#9c6412;--line:#d2bb95;--shadow:rgba(80,50,20,.28);color-scheme:light}}
+:root[data-theme="light"]{--wood:#efe3cc;--wood2:#e4d3b4;--plank:#a4744b;--ink:#2a1a10;--muted:#6d5640;--brass:#9c6412;--line:#d2bb95;--shadow:rgba(80,50,20,.28);color-scheme:light}
+[hidden]{display:none!important}
+html,body{min-height:100%}
+body{margin:0;background:radial-gradient(120% 70% at 50% -10%,var(--wood2),var(--wood) 70%);background-color:var(--wood);color:var(--ink);font:16px/1.55 var(--body)}
+.page{max-width:760px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px),env(safe-area-inset-right,0px));padding-block:calc(24px + env(safe-area-inset-top,0px)) calc(40px + env(safe-area-inset-bottom,0px))}
+.back{font:600 .9rem var(--body);color:var(--muted);text-decoration:none;display:inline-flex;gap:6px;align-items:center;min-height:44px}
+.back:hover{color:var(--brass)}
+h1{font:400 clamp(1.8rem,5vw,2.6rem)/1.05 var(--display);margin:.2rem 0 0;text-wrap:balance}
+.lede{color:var(--muted);max-width:60ch;margin:.6rem 0 0}
+/* the box: a brass slot the card posts into */
+.slot{margin:26px auto 0;height:14px;width:min(72%,420px);border-radius:7px;background:linear-gradient(#000,#2a1a10);box-shadow:0 0 0 4px var(--brass),0 0 0 6px color-mix(in srgb,var(--brass) 50%,#000),0 10px 18px var(--shadow)}
+.card{position:relative;margin-top:-4px;background:var(--paper);color:var(--pink);border-radius:4px;box-shadow:0 18px 30px var(--shadow),inset 0 0 0 1px rgba(0,0,0,.15);padding:22px 20px 20px}
+.card::before{content:"";position:absolute;left:0;right:0;top:0;height:6px;background:var(--plank);border-radius:4px 4px 0 0}
+.card.posting{animation:post .7s cubic-bezier(.5,0,.75,0) forwards}
+@keyframes post{to{transform:translateY(-120px) scaleY(.05);opacity:0}}
+form{display:grid;gap:18px}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend,label.lbl{font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--pmuted);margin-bottom:8px;display:block;padding:0}
+.kinds{display:flex;flex-wrap:wrap;gap:8px}
+.kinds label{position:relative}
+.kinds input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.kinds span{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:99px;background:var(--paper2);font:600 .92rem var(--body);box-shadow:inset 0 0 0 1.5px transparent;cursor:pointer}
+.kinds input:checked+span{background:var(--pink);color:var(--paper)}
+.kinds input:focus-visible+span{outline:3px solid var(--brass);outline-offset:2px}
+.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:560px){.row{grid-template-columns:minmax(0,1fr)}}
+input[type=text],input[type=email],input[type=url],select,textarea{width:100%;box-sizing:border-box;font:400 1rem var(--body);color:var(--pink);background:#fffaf0;border:1.5px solid #3a2718;border-radius:4px;padding:10px 12px;min-height:44px;color-scheme:light}
+textarea{min-height:150px;resize:vertical;line-height:1.5}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--brass);outline-offset:1px}
+.hint{font:400 .82rem var(--body);color:var(--pmuted);margin:6px 0 0}
+.count{font:500 .72rem var(--mono);color:var(--pmuted);text-align:right;margin-top:4px;font-variant-numeric:tabular-nums}
+.trap{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.acts{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.btn{font:800 1rem var(--body);border:0;border-radius:4px;padding:0 22px;min-height:48px;cursor:pointer;background:var(--pink);color:var(--paper);display:inline-flex;gap:8px;align-items:center}
+.btn:hover{background:#000}
+.btn:disabled{opacity:.55;cursor:default}
+.btn:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.privacy{font:400 .82rem var(--body);color:var(--pmuted);max-width:40ch;margin:0}
+.msg{border-radius:4px;padding:10px 12px;font:600 .92rem var(--body)}
+.msg.err{background:color-mix(in srgb,var(--err) 14%,var(--paper));color:var(--err)}
+.thanks{text-align:center;padding:30px 10px 10px;display:grid;gap:12px;justify-items:center}
+.thanks h2{font:400 1.6rem/1.1 var(--display);margin:0;color:var(--ink)}
+.thanks p{margin:0;color:var(--muted);max-width:46ch}
+.thanks .btn{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--muted)}
+.thanks .btn:hover{box-shadow:inset 0 0 0 1.5px var(--brass);background:transparent}
+.closed{background:var(--paper2);color:var(--pink);border-radius:4px;padding:12px 14px;font:600 .95rem var(--body)}
+footer{margin-top:26px;color:var(--muted);font-size:.8rem}
+@media (prefers-reduced-motion:reduce){.card.posting{animation:none;opacity:0}}
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back" href="./">← Back to the shelf</a>
+  <h1>Suggestion Box</h1>
+  <p class="lede">Want a game added? Did something annoy you, break, or confuse you? Tell me here. I read every card, and a lot of the shelf's fixes started as a complaint.</p>
+
+  <div class="slot" aria-hidden="true"></div>
+  <div class="card" id="card">
+    <p class="closed" id="closed" hidden>The suggestion box opens soon. Please check back in a day or two.</p>
+    <form id="form" novalidate>
+      <fieldset>
+        <legend>What is it about?</legend>
+        <div class="kinds" id="kinds">
+          <label><input type="radio" name="kind" value="New game idea" checked><span>🎲 A game to add</span></label>
+          <label><input type="radio" name="kind" value="Something I don't like"><span>👎 Something I don't like</span></label>
+          <label><input type="radio" name="kind" value="Bug"><span>🐞 Something broke</span></label>
+          <label><input type="radio" name="kind" value="Rules question"><span>📜 A rule seems wrong</span></label>
+          <label><input type="radio" name="kind" value="Praise"><span>❤️ Something I love</span></label>
+          <label><input type="radio" name="kind" value="Other"><span>Other</span></label>
+        </div>
+      </fieldset>
+
+      <div id="gameRow">
+        <label class="lbl" for="game">Which game?</label>
+        <select id="game" name="game">
+          <option value="General">The shelf in general</option>
+          <option value="Crown City Smash">Crown City Smash</option>
+          <option value="Nebula Aces">Nebula Aces</option>
+          <option value="Doorkick Dungeon">Doorkick Dungeon</option>
+          <option value="Shipwreck Isle">Shipwreck Isle</option>
+          <option value="Sands of Qamar">Sands of Qamar</option>
+          <option value="Sunglaze">Sunglaze</option>
+          <option value="Rampart & Vine">Rampart &amp; Vine</option>
+          <option value="Short Fuse">Short Fuse</option>
+          <option value="Tidewake">Tidewake</option>
+          <option value="Hollowbough">Hollowbough</option>
+          <option value="The Thornbound Throne">The Thornbound Throne</option>
+          <option value="Mainhattan Nightrun">Mainhattan Nightrun</option>
+          <option value="Mainhattan Overdrive">Mainhattan Overdrive</option>
+        </select>
+      </div>
+
+      <div id="ideaRow">
+        <label class="lbl" for="idea">Which game should come next?</label>
+        <input type="text" id="idea" name="idea" maxlength="200" placeholder="Its name, or a BoardGameGeek link" autocomplete="off">
+        <p class="hint">A boardgamegeek.com link helps me find the exact edition.</p>
+      </div>
+
+      <div>
+        <label class="lbl" for="message" id="msgLbl">Tell me more</label>
+        <textarea id="message" name="message" maxlength="2000" required placeholder="Why this game? Who would you play it with?"></textarea>
+        <div class="count" id="count">0 / 2000</div>
+      </div>
+
+      <div class="row">
+        <div><label class="lbl" for="name">Your name (optional)</label><input type="text" id="name" name="name" maxlength="80" autocomplete="nickname"></div>
+        <div><label class="lbl" for="email">Email for a reply (optional)</label><input type="email" id="email" name="email" maxlength="120" autocomplete="email"></div>
+      </div>
+
+      <div class="trap" aria-hidden="true"><label>Leave this empty <input type="checkbox" name="botcheck" id="botcheck" tabindex="-1"></label></div>
+
+      <p class="msg err" id="err" role="alert" hidden></p>
+      <div class="acts">
+        <p class="privacy">Only the shelf's maker reads this. Your email is used only to reply, and only if you give it.</p>
+        <button class="btn" type="submit" id="send">Post it ✉️</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="thanks" id="thanks" hidden>
+    <h2>Posted. Thank you!</h2>
+    <p id="thanksText">Your card is in the box. New games and fixes appear on the shelf as they're built.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button class="btn" type="button" id="again">Write another</button><a class="btn" href="./">Back to the shelf</a><a class="btn" href="https://ko-fi.com/am015dev" target="_blank" rel="noopener" style="background:#29abe0;color:#fff;box-shadow:none">☕ Support on Ko-fi</a></div>
+  </div>
+
+  <footer>&copy; 2026 Am015-dev. All rights reserved.</footer>
+</div>
+<script>
+// Web3Forms access key: public by design (it only lets this form send mail to the owner's inbox).
+const ACCESS_KEY = '80e007b1-f092-4aaf-96ea-9e2afc9425a4';
+const ENDPOINT = 'https://api.web3forms.com/submit';
+const $ = id => document.getElementById(id);
+const form = $('form'), msg = $('message'), err = $('err');
+
+const COPY = {
+  'New game idea': ['Tell me more', 'Why this game? Who would you play it with?'],
+  "Something I don't like": ['What bothers you?', 'What happened, and what would feel better?'],
+  'Bug': ['What went wrong?', 'What did you tap, what did you expect, and what happened instead? Phone or computer?'],
+  'Rules question': ['Which rule?', 'What did the game do, and what does the rulebook say?'],
+  'Praise': ['What do you love?', 'It helps to know what to keep.'],
+  'Other': ['Tell me more', '']
+};
+function kind(){ return form.kind.value; }
+function sync(){
+  const k = kind(), idea = k === 'New game idea';
+  $('ideaRow').hidden = !idea; $('gameRow').hidden = idea;
+  $('msgLbl').textContent = COPY[k][0]; msg.placeholder = COPY[k][1];
+}
+$('kinds').addEventListener('change', sync);
+form.addEventListener('input', () => { err.hidden = true; });
+msg.addEventListener('input', () => { $('count').textContent = msg.value.length + ' / 2000'; });
+
+// ?game=<slug or name> preselects a game, e.g. from a link inside a game.
+(() => {
+  const q = new URLSearchParams(location.search), g = (q.get('game') || '').toLowerCase().replace(/[^a-z]/g, '');
+  if (!g) return sync();
+  for (const o of $('game').options) if (o.value.toLowerCase().replace(/[^a-z]/g, '').includes(g)) { $('game').value = o.value; form.kind.value = 'Bug'; break; }
+  const k = q.get('kind'); if (k && COPY[k]) form.kind.value = k;
+  sync();
+})();
+
+if (!ACCESS_KEY) { $('closed').hidden = false; for (const el of form.elements) el.disabled = true; }
+
+function fail(t){ err.textContent = t; err.hidden = false; }
+form.addEventListener('submit', async e => {
+  e.preventDefault(); err.hidden = true;
+  if (!ACCESS_KEY) return;
+  const k = kind(), text = msg.value.trim(), idea = $('idea').value.trim();
+  if (k === 'New game idea' && !idea && text.length < 3) { fail('Which game would you like? Type its name or paste a link.'); $('idea').focus(); return; }
+  if (k !== 'New game idea' && text.length < 5) { fail('Please write a few words so I know what you mean.'); msg.focus(); return; }
+  const email = $('email').value.trim();
+  if (email && !$('email').checkValidity()) { fail('That email address looks incomplete. Fix it, or leave it empty.'); $('email').focus(); return; }
+  let last = 0; try { last = +localStorage.getItem('gns-suggest-at') || 0; } catch (_) {}
+  if (Date.now() - last < 20000) { fail('Thanks! Please wait a few seconds before posting another card.'); return; }
+
+  const game = k === 'New game idea' ? '' : $('game').value;
+  const body = {
+    access_key: ACCESS_KEY,
+    subject: 'Game Night Shelf: ' + k + (game ? ' · ' + game : '') + (idea ? ' · ' + idea.slice(0, 60) : ''),
+    from_name: $('name').value.trim() || 'Game Night Shelf visitor',
+    kind: k, game: game || '(new game idea)', requested_game: idea || '-',
+    message: text || '(no details)', name: $('name').value.trim() || '-', reply_to: email || '-',
+    page: location.href, device: (matchMedia('(pointer:coarse)').matches ? 'touch' : 'mouse') + ' · ' + innerWidth + 'x' + innerHeight,
+    botcheck: $('botcheck').checked
+  };
+  if (email) body.email = email;
+  const send = $('send'); send.disabled = true; send.textContent = 'Posting…';
+  try {
+    const r = await fetch(ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.success) throw new Error(j.message || ('HTTP ' + r.status));
+    try { localStorage.setItem('gns-suggest-at', String(Date.now())); } catch (_) {}
+    $('thanksText').textContent = k === 'New game idea'
+      ? 'Your idea is in the box. New games take a while to build properly, so it may be a few weeks.'
+      : 'Your card is in the box. Fixes appear on the shelf as they’re made.';
+    const card = $('card'); card.classList.add('posting');
+    setTimeout(() => { card.hidden = true; card.classList.remove('posting'); $('thanks').hidden = false; $('thanks').querySelector('button').focus(); }, matchMedia('(prefers-reduced-motion:reduce)').matches ? 0 : 700);
+  } catch (x) {
+    fail('It didn’t send (' + x.message + '). Check your connection and try again; your text is still here.');
+  } finally { send.disabled = false; send.textContent = 'Post it ✉️'; }
+});
+$('again').addEventListener('click', () => {
+  form.reset(); sync(); $('count').textContent = '0 / 2000';
+  $('thanks').hidden = true; $('card').hidden = false; msg.focus();
+});
+</script>
+</body>
+</html>

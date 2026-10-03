@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. --><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Screen Test</title>
+<style>
+html,body{margin:0;height:100%;background:#1d1411;color:#f4ead8;font:15px/1.4 system-ui,sans-serif}
+#probe{position:fixed;inset:0;visibility:hidden;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+#frame{position:fixed;inset:0;width:100vw;height:100dvh;border:0;display:block}
+#info{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.75);border:2px solid #e0a948;border-radius:12px;padding:12px 14px;z-index:3;font:600 14px/1.5 ui-monospace,monospace;white-space:pre;max-width:92vw}
+a{color:#e0a948}
+</style></head><body>
+<div id="probe"></div>
+<iframe id="frame" title="frame test"></iframe>
+<div id="info">measuring…</div>
+<script>
+const p=getComputedStyle(document.getElementById('probe'));const pins=[p.paddingTop,p.paddingRight,p.paddingBottom,p.paddingLeft].map(v=>Math.round(parseFloat(v))).join(' / ');
+const standalone=matchMedia('(display-mode: standalone),(display-mode: fullscreen)').matches||navigator.standalone===true;
+const inner=`<!doctype html><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>html,body{margin:0;height:100%;background:repeating-linear-gradient(45deg,#2c4a6b 0 12px,#24405e 12px 24px)}#q{position:fixed;inset:0;visibility:hidden;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}.e{position:fixed;background:#ff4d6d}</style><div id=q></div><div class=e style="left:0;right:0;top:0;height:4px"></div><div class=e style="left:0;right:0;bottom:0;height:4px"></div><div class=e style="top:0;bottom:0;left:0;width:4px"></div><div class=e style="top:0;bottom:0;right:0;width:4px"></div><script>const c=getComputedStyle(document.getElementById('q'));parent.postMessage([c.paddingTop,c.paddingRight,c.paddingBottom,c.paddingLeft].map(v=>Math.round(parseFloat(v))).join(' / ')+' | '+innerWidth+'x'+innerHeight,'*')<\/script>`;
+const f=document.getElementById('frame');f.srcdoc=inner;
+addEventListener('message',e=>{document.getElementById('info').textContent=`SCREEN TEST — please screenshot this\n\npage size:   ${innerWidth} x ${innerHeight}\npage insets: ${pins}   (top/right/bottom/left)\nframe insets+size: ${e.data}\nhome-screen app: ${standalone?'yes':'no'}\n${navigator.userAgent.match(/(iPhone|Android)[^;)]*/)?.[0]||''}\n\nThe red lines mark the frame's edges.`});
+setTimeout(()=>{if(document.getElementById('info').textContent==='measuring…')document.getElementById('info').textContent=`page: ${innerWidth}x${innerHeight}\npage insets: ${pins}\n(frame did not report)`},2500);
+</script></body></html>

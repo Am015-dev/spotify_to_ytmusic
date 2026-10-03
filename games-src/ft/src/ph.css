@@ -1,0 +1,100 @@
+/* ===== phone layout (html.ph): board first, a control strip, pop-ups and one card at a time. Every rule starts with html.ph. ===== */
+#ps,#ppop,#pc,.pchip{display:none}
+html.ph #ps,html.ph #ppop,html.ph #pc{display:flex}html.ph .pchip{display:block}
+html.ph #ps[hidden],html.ph #ppop[hidden],html.ph #pc[hidden]{display:none!important}
+html.ph .gx-app{position:fixed;inset:0;box-sizing:border-box;padding:0 var(--sar,0px) var(--sab,0px) var(--sal,0px);display:grid;background:#3a2415}
+html.ph .gx-main{display:contents}
+html.ph .gx-board{grid-area:board;min-width:0;min-height:0}
+html.ph .gx-bar{grid-area:bar;min-height:0;height:calc(44px + var(--sat,0px));padding:var(--sat,0px) 6px 0 8px;gap:4px;box-sizing:border-box;border-bottom:0}
+html.ph .gx-dock{grid-area:zone;position:relative;display:block;max-height:none;visibility:visible!important;border:0;border-radius:0;padding:0;box-shadow:none;overflow:hidden;min-height:0}
+html.ph.ph-p .gx-app{grid-template-columns:minmax(0,1fr);grid-template-rows:calc(44px + var(--sat,0px)) var(--bh) minmax(0,1fr);grid-template-areas:"bar" "board" "zone"}
+html.ph.ph-l .gx-app{grid-template-columns:var(--bw) minmax(0,1fr);grid-template-rows:calc(44px + var(--sat,0px)) minmax(0,1fr);grid-template-areas:"board bar" "board zone"}
+html.ph.ph-p .gx-dock{border-top:3px solid var(--brass2,#d9a441)}html.ph.ph-l .gx-dock{border-left:3px solid var(--brass2,#d9a441)}
+html.ph .gx-dock-head,html.ph .gx-dock-body,html.ph .gx-reopen,html.ph #chip,html.ph #banner{display:none!important}
+html.ph #dockmsg{position:absolute;left:8px;right:8px;top:6px;z-index:9;margin:0;font-size:14px}
+/* top bar: icons + one status chip */
+html.ph .gx-bar h1{display:none}
+html.ph .gx-bar .gx-ibtn{display:none;min-width:44px;min-height:44px;padding:0 8px}
+html.ph .gx-bar .gx-ibtn>span{display:none}
+html.ph .gx-bar .adv-btn,html.ph .gx-bar [data-gx=logd],html.ph .gx-bar [data-gx=menud],html.ph .gx-bar #pausebtn{display:inline-flex!important}
+html.ph .gx-bar #pausebtn[hidden]{display:none!important}
+html.ph .pchip{flex:1 1 auto;min-width:0;font-weight:700;font-size:14px;color:#ffe8c0;background:rgba(43,26,16,.78);border:1px solid rgba(240,190,110,.5);border-radius:999px;padding:0 12px;line-height:34px;height:34px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph .gx-bar .gx-sp{display:none}
+/* board: the tile grid, flat camera; nothing floats over it */
+html.ph .view::after{box-shadow:none}
+html.ph #c3{touch-action:none}
+/* zone */
+html.ph #ps{position:absolute;inset:0;flex-direction:column;gap:6px;padding:8px 10px 8px;overflow:auto;box-sizing:border-box;background:var(--paper),linear-gradient(180deg,#fcf3e1,#f3e2c2)}
+html.ph .ps-main{display:flex;gap:8px;align-items:center;flex-wrap:wrap;min-height:48px}
+html.ph .ps-msg{flex:1 1 140px;min-width:0;font-size:15px;line-height:1.25}
+html.ph .ps-ctl{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+html.ph .ps-log{margin:0;font-size:13px;color:var(--mut);line-height:1.3}
+html.ph .ps-chips{display:flex;flex-wrap:wrap;gap:6px}
+html.ph .pk{appearance:none;font:inherit;flex:1 1 calc(50% - 6px);min-width:0;min-height:44px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:0;text-align:left;padding:3px 10px;border-radius:12px;border:1px solid rgba(138,90,24,.4);background:linear-gradient(180deg,#fffdf6,#f1e2c2);color:var(--gx-ink);cursor:pointer;line-height:1.2}
+html.ph .pk.wide{flex:1 1 100%}
+html.ph .pk .pkn{font-weight:700;font-size:13px;color:var(--terra)}html.ph .pk .pkv{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}html.ph .pk .pks{font-size:13px;color:var(--mut)}
+html.ph .pd{display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--pc);margin:0 3px 0 2px;vertical-align:-1px}
+html.ph.ph-l .pk.wide{flex:1 1 100%}
+html.ph #ppop,html.ph #pc{position:absolute;inset:0;flex-direction:column;box-sizing:border-box;padding:6px 10px 8px;background:var(--paper),linear-gradient(180deg,#fcf3e1,#f3e2c2);z-index:6;overflow:hidden}
+html.ph #pc{z-index:7}
+html.ph .pp-h{display:flex;align-items:center;gap:6px;flex:0 0 auto;min-height:44px}
+html.ph .pp-h h3{flex:1;min-width:0;font-size:17px;color:var(--terra);margin:0}
+html.ph .pp-x{appearance:none;border:1px solid rgba(138,90,24,.4);background:linear-gradient(180deg,#fff8ea,#efdcb8);border-radius:12px;width:44px;height:44px;font-size:26px;line-height:1;color:var(--gx-ink);cursor:pointer;flex:0 0 auto}
+html.ph .pp-b{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:8px;padding:2px 0 4px;-webkit-overflow-scrolling:touch}
+html.ph .pp-f{flex:0 0 auto;display:flex;gap:8px;padding-top:6px}html.ph .pp-f .btn{flex:1 1 0;text-align:center}
+html.ph .pp-b .prompt{border:0;background:none;padding:0;box-shadow:none}html.ph .pp-b .prompt>h3{display:none}
+html.ph .chapt{font-size:20px;color:var(--indigo);margin:2px 0}
+/* >= 44 px targets, >= 13 px text, only inside the phone UI */
+html.ph #ps .btn,html.ph #ppop .btn,html.ph #pc .btn{min-height:44px;font-size:15px;padding:6px 12px}
+html.ph #ps .btn small,html.ph #ppop .btn small,html.ph #pc .btn small{font-size:13px}
+html.ph #ppop .btn.sm,html.ph #pc .btn.sm,html.ph #ppop .btn.xs{min-height:44px;font-size:14px}
+html.ph #ppop .hc,html.ph #pc .hc{min-height:44px;font-size:15px}
+html.ph #ppop .opts .btn,html.ph #pc .opts .btn{flex:1 1 100%}
+html.ph .pp-b .small,html.ph .pp-b small,html.ph .pp-b .tag,html.ph .pp-b .muted.small,html.ph .pp-b ol.mini,html.ph .pp-b ul.story,html.ph .pp-b .plan .pr,html.ph .pp-b .plan .pg,html.ph .pp-b .stat,html.ph .pp-b .st small,html.ph .pp-b .sp .ord,html.ph .pp-b .sp small{font-size:13px}
+html.ph .pp-b .track{grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:6px}
+html.ph .pp-b .sp{min-height:84px;padding:5px}html.ph .pp-b .sp .btn{min-height:44px;padding:4px 6px}
+html.ph .pp-b .sp.rec{border-width:3px}
+html.ph .phm-row{display:flex;flex-wrap:wrap;gap:6px}
+html.ph .phm{display:inline-flex;align-items:center;gap:4px;min-height:44px;padding:0 10px;border-radius:12px;background:#fff;border:1px solid var(--sand2);font-size:15px}
+html.ph .phg{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+html.ph .phc{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:12px;background:#fffdf6;border:2px solid var(--sand2);text-align:center;font-size:14px;line-height:1.15}
+html.ph .phc .ico{font-size:34px;line-height:1.1}html.ph .phc small{position:absolute;right:6px;top:2px;color:var(--mut);font-size:13px}html.ph .phc.hl{border-color:var(--terra);background:#ffeccc}
+html.ph .pp-b .cgrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:2px 0}
+html.ph .pp-b .card p{font-size:14px}html.ph .pp-b .card h4{font-size:15px}
+html.ph .pp-b>*{flex-shrink:0}
+html.ph .drops{display:flex;flex-wrap:wrap;gap:6px}html.ph .drops .btn{flex:1 1 calc(50% - 6px);display:flex;align-items:center;gap:4px;line-height:1.15;font-size:14px;padding:4px 8px}
+html.ph .path{color:var(--mut)}
+html.ph .pp-b .stat{font-size:14px}
+html.ph .pp-b .plans .plan .acts .btn{flex:1 1 0;text-align:center}
+html.ph .pp-b .djrow .djc{min-height:44px}
+html.ph .pp-b .sheet{margin-bottom:0}
+/* menus and drawers: in landscape they slide over the right rail, never over the board */
+html.ph .gx-drawer{height:auto;max-height:88dvh}
+html.ph.ph-l .gx-drawer{top:0;bottom:0;left:auto;right:0;width:calc(100vw - var(--bw,0px) - var(--sal,0px));height:auto;max-height:none;border-radius:0;transform:translateX(100%)}
+html.ph.ph-l .gx-drawer.wide{width:calc(100vw - var(--bw,0px) - var(--sal,0px))}
+html.ph.ph-l .gx-drawer.on{transform:none}
+html.ph .gx-drawer .btn,html.ph .gx-drawer .gx-x{min-height:44px}
+html.ph .gx-drawer .small,html.ph .gx-drawer small{font-size:13px}
+/* start screen / story / lobby */
+html.ph #modal{padding:8px;align-items:flex-start;padding-top:max(8px,var(--sat,0px))}
+html.ph .mbox{box-sizing:border-box;padding:12px 14px;gap:8px;max-height:calc(100dvh - 16px);border-radius:14px}
+html.ph .mbox h2{font-size:1.4rem}
+html.ph .mbox .btn,html.ph .mbox .seg button{min-height:44px}
+html.ph .mbox .acts{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(251,241,222,0),#fbf1de 30%);padding:8px 0 4px}
+html.ph .mbox.story canvas{max-height:96px;object-fit:cover}
+html.ph.ph-l .mbox.story canvas{display:none}
+html.ph .mbox.story p{font-size:15px;line-height:1.35}
+html.ph .seat .btn{min-height:44px}
+@media (max-width:360px){html.ph .pk{flex-basis:100%}}
+html.ph .mbox .chk{min-height:44px;align-items:center;gap:8px}html.ph .mbox .chk input{width:22px;height:22px;flex:0 0 auto}
+html.ph .mbox summary{min-height:44px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+html.ph .mbox small,html.ph .mbox .small{font-size:13px}
+html.ph .mbox .netrow input{min-height:44px}
+html.ph .pp-b h4,html.ph .gx-drawer h4{font-size:13px}
+html.ph .pp-b .plan .pn{width:24px;height:24px;font-size:13px}
+html.ph .gx-drawer .gx-x{min-width:44px}
+html.ph .bidrec{width:100%;text-align:center;font-size:16px}
+html.ph .gx-drawer{box-sizing:border-box}
+/* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
+html.ph .mbox,html.ph .dlg{box-sizing:border-box}
+html.ph .pp-b :not(:has(>.btn.go~.btn.go))>.btn.go{position:sticky;bottom:0;z-index:3;box-shadow:0 0 0 6px #f8ecd2,0 2px 0 rgba(0,0,0,.25)}

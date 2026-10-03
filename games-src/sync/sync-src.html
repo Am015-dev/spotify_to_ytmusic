@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+<head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Saves &amp; Offline</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1d1411">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Game Night">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rammetto+One&family=Chivo:wght@400;600;800&family=Chivo+Mono:wght@500&display=swap">
+<style>
+/* Layout: the shelf's walnut room; two brass-trimmed ledgers on the desk, one for games to carry, one for saves to move. */
+:root{
+  --wood:#1d1411; --wood2:#2b1d17; --plank:#5a3a26; --ink:#f4ead8; --muted:#bca78c;
+  --brass:#e0a948; --brassink:#1d1411; --line:#4a3326; --shadow:rgba(0,0,0,.55); --panel:#2b1d17; --field:#1d1411;
+  --ok:#8fcf7a; --err:#ff9c85; --paper:#f1e6d0;
+  --display:"Rammetto One","Arial Black",Impact,sans-serif; --body:"Chivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:"Chivo Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--wood:#efe3cc;--wood2:#e4d3b4;--plank:#a4744b;--ink:#2a1a10;--muted:#6d5640;--brass:#9c6412;--brassink:#fff;--line:#d2bb95;--shadow:rgba(80,50,20,.28);--panel:#f7eedb;--field:#fffaf0;--ok:#2f6a1c;--err:#a3341c;color-scheme:light}}
+:root[data-theme="light"]{--wood:#efe3cc;--wood2:#e4d3b4;--plank:#a4744b;--ink:#2a1a10;--muted:#6d5640;--brass:#9c6412;--brassink:#fff;--line:#d2bb95;--shadow:rgba(80,50,20,.28);--panel:#f7eedb;--field:#fffaf0;--ok:#2f6a1c;--err:#a3341c;color-scheme:light}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:radial-gradient(120% 70% at 50% -10%,var(--wood2),var(--wood) 70%);background-color:var(--wood);color:var(--ink);font:16px/1.5 var(--body);overflow-x:hidden}
+.page{max-width:760px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px),env(safe-area-inset-right,0px));padding-block:calc(18px + env(safe-area-inset-top,0px)) calc(40px + env(safe-area-inset-bottom,0px))}
+.back{font:600 .95rem var(--body);color:var(--muted);text-decoration:none;display:inline-flex;gap:6px;align-items:center;min-height:44px}
+.back:hover,.back:focus-visible{color:var(--brass)}
+h1{font:400 clamp(1.8rem,6vw,2.6rem)/1.05 var(--display);margin:.2rem 0 0;text-wrap:balance}
+h2{font:400 1.3rem/1.15 var(--display);margin:0 0 6px;color:var(--brass)}
+h3{font:600 1rem/1.3 var(--body);margin:0 0 4px}
+p{margin:.4rem 0}
+.lede{color:var(--muted);max-width:60ch;margin:.6rem 0 0}
+.net{display:inline-flex;align-items:center;gap:8px;margin-top:12px;padding:6px 14px;min-height:36px;border:1px solid var(--line);border-radius:999px;font:600 .875rem var(--body);background:var(--panel)}
+.net i{width:10px;height:10px;border-radius:50%;background:var(--ok);display:inline-block}
+.net.off i{background:var(--err)}
+section.card{margin-top:22px;background:var(--panel);border:1px solid var(--line);border-top:6px solid var(--plank);border-radius:6px;padding:18px 16px 18px;box-shadow:0 14px 26px var(--shadow)}
+.small{font-size:.875rem;color:var(--muted)}
+.note{font-size:.9rem;color:var(--muted);border-left:3px solid var(--brass);padding:2px 0 2px 10px;margin:10px 0}
+.row{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px}
+.btn{font:700 1rem var(--body);min-height:48px;padding:10px 18px;border-radius:8px;border:1px solid var(--line);background:var(--wood);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;text-align:center;touch-action:manipulation}
+.btn:hover{border-color:var(--brass)}
+.btn.pri{background:var(--brass);color:var(--brassink);border-color:var(--brass)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn:focus-visible,input:focus-visible,.sw:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.meter{height:10px;border-radius:5px;background:var(--wood);border:1px solid var(--line);overflow:hidden;margin-top:6px}
+.meter b{display:block;height:100%;width:0;background:var(--brass);transition:width .2s}
+.stor{margin:12px 0 0;font-size:.9rem}
+.stor strong{font-family:var(--mono);font-weight:500}
+ul.list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px}
+.g{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--wood)}
+.g img{width:52px;height:52px;border-radius:6px;object-fit:cover;background:var(--plank);display:block}
+.g .nm{font-weight:600;line-height:1.25;overflow-wrap:anywhere}
+.g .st{font-size:.875rem;color:var(--muted)}
+.g .st.ok{color:var(--ok)} .g .st.bad{color:var(--err)}
+.g .meter{grid-column:1/-1;margin:0;height:8px}
+.sw{min-height:44px;min-width:44px;padding:0 6px 0 12px;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;background:var(--wood2);color:var(--ink);font:600 .875rem var(--body);cursor:pointer;touch-action:manipulation}
+.sw .trk{width:40px;height:24px;border-radius:12px;background:var(--line);position:relative;flex:none;transition:background .15s}
+.sw .trk::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--ink);transition:left .15s}
+.sw[aria-checked="true"] .trk{background:var(--brass)} .sw[aria-checked="true"] .trk::after{left:19px;background:var(--brassink)}
+.sw:disabled{opacity:.6}
+.saves{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+.saves li{display:flex;justify-content:space-between;gap:12px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--wood);font-size:.95rem}
+.saves li span:last-child{color:var(--muted);font:500 .875rem var(--mono);text-align:right;flex:none}
+.drop{margin-top:10px;border:2px dashed var(--line);border-radius:8px;padding:14px;text-align:center;color:var(--muted);font-size:.9rem}
+.drop.over{border-color:var(--brass);color:var(--ink)}
+.sub{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+input.code{font:500 1.6rem/1 var(--mono);letter-spacing:.3em;text-transform:uppercase;text-align:center;width:11ch;max-width:100%;min-height:52px;padding:6px 8px;border-radius:8px;border:2px solid var(--line);background:var(--field);color:var(--ink)}
+.bigcode{font:500 2.2rem/1.1 var(--mono);letter-spacing:.28em;color:var(--brass);margin:6px 0;padding-left:.28em;user-select:all;overflow-wrap:anywhere}
+.qr{display:inline-block;background:#fff;padding:6px;border-radius:8px;line-height:0}
+.qr svg{width:min(60vw,200px);height:auto}
+.msg{margin:10px 0 0;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--wood);font-size:.95rem}
+.msg.ok{border-color:var(--ok)} .msg.err{border-color:var(--err);color:var(--err)}
+.imp{margin-top:16px;padding:14px;border:2px solid var(--brass);border-radius:8px;background:var(--wood)}
+.imp ul{list-style:none;margin:8px 0;padding:0;display:grid;gap:4px}
+.imp li{display:flex;justify-content:space-between;gap:10px;font-size:.95rem}
+.imp li span:last-child{font:500 .875rem var(--mono);color:var(--muted);text-align:right}
+.priv{margin-top:22px;font-size:.875rem;color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:420px){h2{font-size:1.15rem}.btn{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<div class="page">
+<a class="back" href="./">← Back to the shelf</a>
+<h1>Saves &amp; Offline</h1>
+<p class="lede">Keep games on this device so they open without internet, and move your saved games between your phone and your computer.</p>
+<div class="net" id="net" role="status"><i></i><span id="nettxt">Online</span></div>
+
+<section class="card" id="offline" aria-labelledby="h-off">
+  <h2 id="h-off">Take games with you</h2>
+  <p>Switch on <b>Keep on this device</b> and the game is stored here. Offline you can play against the computer or pass one device around. <b>Online play with friends needs internet.</b></p>
+  <div class="stor" id="stor">Checking storage…</div>
+  <div class="row"><button class="btn pri" id="dlall" type="button">Download all</button><button class="btn" id="rmall" type="button">Remove all</button></div>
+  <div class="msg" id="offmsg" hidden role="status"></div>
+  <ul class="list" id="games"></ul>
+  <p class="note">The shelf itself, its covers and these pages are stored too, so the shelf opens offline as soon as one game is kept. Phones may clear stored data if they run low on space; if a game is gone, just download it again. Saves are not affected by this, but see below for backups.</p>
+</section>
+
+<section class="card" id="saves" aria-labelledby="h-sav">
+  <h2 id="h-sav">Move your saves</h2>
+  <p>Saved games stay in the browser they were made in. Use this to copy them from your phone to your computer, or back.</p>
+  <h3 style="margin-top:12px">Saves on this device</h3>
+  <ul class="saves" id="savelist"></ul>
+
+  <div class="sub">
+    <h3>Method 1: a saves file</h3>
+    <div class="row"><button class="btn pri" id="dlsaves" type="button">Download saves file</button><label class="btn" for="file" id="filebtn">Load saves file</label><input class="sr" type="file" id="file" accept=".json,application/json"></div>
+    <div class="drop" id="drop">…or drop a saves file here</div>
+    <p class="small">Send the file to yourself by email, a chat app or cloud storage, then load it on the other device.</p>
+  </div>
+
+  <div class="sub">
+    <h3>Method 2: device to device</h3>
+    <p class="small">No file needed. Both devices must be online and open this page.</p>
+    <div class="row"><button class="btn pri" id="send" type="button">Send to another device</button><button class="btn" id="recv" type="button">Receive from another device</button></div>
+    <div id="p2p" hidden>
+      <div id="sendbox" hidden>
+        <p>On the other device, tap <b>Receive</b> and type this code, or scan the picture.</p>
+        <div class="bigcode" id="code" aria-live="polite"></div>
+        <div class="qr" id="qr"></div>
+        <p class="small" id="exp"></p>
+      </div>
+      <div id="recvbox" hidden>
+        <label for="rcode" style="display:block;margin-bottom:6px">Code shown on the sending device</label>
+        <div class="row" style="margin-top:0"><input class="code" id="rcode" maxlength="9" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" aria-label="6-character code"><button class="btn pri" id="rgo" type="button">Connect</button></div>
+      </div>
+      <div class="msg" id="p2pmsg" role="status" aria-live="polite" hidden></div>
+      <div class="meter" id="p2pbar" hidden><b></b></div>
+      <div id="accept" class="imp" hidden>
+        <h3 id="acctitle"></h3>
+        <p class="small">Only accept saves from a device you own. Nothing is changed until you choose Merge or Replace on the next step.</p>
+        <div class="row"><button class="btn pri" id="accyes" type="button">Accept</button><button class="btn" id="accno" type="button">Decline</button></div>
+      </div>
+      <div class="row"><button class="btn" id="p2pcancel" type="button">Close</button></div>
+    </div>
+    <p class="note">iPhone: the Home Screen app and Safari keep separate saves. This tool moves saves between them too: in the app, tap Receive and type the code instead of scanning.</p>
+  </div>
+
+  <div class="imp" id="imp" hidden>
+    <h3 id="imptitle">Saves found</h3>
+    <ul id="implist"></ul>
+    <p class="small" id="impnote"></p>
+    <div class="row"><button class="btn pri" id="merge" type="button">Merge</button><button class="btn" id="replace" type="button">Replace all</button><button class="btn" id="impcancel" type="button">Cancel</button></div>
+    <p class="small"><b>Merge</b> adds new saves and overwrites matching ones with the incoming copy; saves only on this device are kept. <b>Replace all</b> makes this device match the file exactly. Your current saves are backed up first.</p>
+  </div>
+  <div class="msg" id="impmsg" hidden role="status"></div>
+  <div class="row" id="bkrow" hidden><button class="btn" id="bkdl" type="button">Download backup file</button><button class="btn" id="bkrestore" type="button">Undo: restore backup</button></div>
+</section>
+
+<p class="priv">Privacy: your saves never go to a server. Device-to-device transfer only uses the same public peer-to-peer matchmaking as online play; the saves travel straight between your two devices.</p>
+</div>
+
+<script>/*TRYSTERO*/</script>
+<script>/*NETROOM*/</script>
+<script>/*QR*/</script>
+<script>
+(()=>{
+'use strict';
+const GAMES=/*GAMES*/[];
+const $=id=>document.getElementById(id);
+const SHELF_CACHE='gns-shelf-v1',GAME_CACHE='gns-games-v1'; // keep in step with VER in sw.js
+const BACKUP_KEY='gns_backup_last';
+const EXCLUDE=new Set([BACKUP_KEY,'gns-uid']);
+// localStorage key prefixes of each game (found by scanning the game files); anything else goes under "Other"
+const PREFIX=[['ccs_','crown'],['na_','nebula'],['dkd_','doorkick'],['swi_','shipwreck'],['soq_','sands'],['sgz_','sunglaze'],['rv_','rampart'],['shortfuse_','shortfuse'],['sf_','shortfuse'],['tidewake_','tidewake'],['tw_','tidewake'],['hb_','hollowbough'],['tb_','thornbound'],['kk_','kaiten'],['mnr_','mainhattan'],['mho_','overdrive']];
+const NAMES={};GAMES.forEach(g=>NAMES[g.id]=g.name);NAMES.shelf='Shelf settings';NAMES.other='Other';
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=b=>b==null?'':b<1024?b+' B':b<1048576?(b/1024).toFixed(0)+' KB':(b/1048576).toFixed(1)+' MB';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const LS={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){localStorage.setItem(k,v)},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+function owner(k){if(k.startsWith('gns'))return 'shelf';for(const [p,id] of PREFIX)if(k.startsWith(p))return id;return 'other'}
+
+// ---------- online / offline ----------
+function setNet(){const on=navigator.onLine!==false;$('net').classList.toggle('off',!on);$('nettxt').textContent=on?'Online':'Offline: stored games still work';
+  for(const id of ['send','recv'])$(id).disabled=!on||!p2pOK();updateButtons()}
+addEventListener('online',setNet);addEventListener('offline',setNet);
+const p2pOK=()=>typeof NetRoom!=='undefined'&&NetRoom.available();
+
+// ---------- service worker ----------
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{});
+
+// ---------- downloads ----------
+const state={}; // id -> {have:bool,size:number|null,busy:bool,pct:number,err:string}
+const abs=u=>new URL(u,location.href).href;
+const HAVE_CACHES='caches' in window;
+function render(){
+  const ul=$('games');ul.innerHTML='';
+  for(const g of GAMES){const s=state[g.id]||(state[g.id]={have:false,size:null,busy:false,pct:0,err:''});
+    const li=document.createElement('li');li.className='g';li.dataset.id=g.id;
+    const st=s.busy?'Downloading '+s.pct+'%':s.err?s.err:s.have?'On this device · '+fmt(s.size):'About '+fmt(g.bytes);
+    li.innerHTML='<img alt="" width="52" height="52" loading="lazy" src="'+esc(g.cover)+'"><div><div class="nm">'+esc(g.name)+'</div><div class="st'+(s.have&&!s.busy?' ok':'')+(s.err?' bad':'')+'">'+esc(st)+'</div></div>'+
+      '<button type="button" class="sw" role="switch" aria-checked="'+(s.have||s.busy)+'" aria-label="Keep '+esc(g.name)+' on this device"'+(HAVE_CACHES?'':' disabled')+'><span>Keep</span><span class="trk"></span></button>'+
+      (s.busy?'<div class="meter"><b style="width:'+s.pct+'%"></b></div>':'');
+    li.querySelector('.sw').onclick=()=>toggle(g);ul.appendChild(li)}
+  updateButtons();
+}
+function updateButtons(){const all=GAMES.every(g=>state[g.id]&&state[g.id].have),none=GAMES.every(g=>!(state[g.id]&&state[g.id].have)),busy=GAMES.some(g=>state[g.id]&&state[g.id].busy),off=navigator.onLine===false;
+  $('dlall').disabled=!HAVE_CACHES||all||busy||off;$('rmall').disabled=!HAVE_CACHES||none||busy}
+const msgOff=(t,cls)=>{const m=$('offmsg');m.hidden=!t;m.textContent=t||'';m.className='msg'+(cls?' '+cls:'')};
+async function scan(){
+  if(!HAVE_CACHES){msgOff('This browser cannot store games for offline use.','err');render();return}
+  try{const c=await caches.open(GAME_CACHE);
+    for(const g of GAMES){const s=state[g.id]||(state[g.id]={have:false,size:null,busy:false,pct:0,err:''});const r=await c.match(abs(g.src));
+      s.have=!!r;s.size=null;if(r){const h=r.headers.get('x-gns-size');s.size=h?+h:(await r.blob()).size}}}catch(e){}
+  render();usage();
+}
+async function usage(){
+  const el=$('stor');let txt='';
+  const used=GAMES.reduce((a,g)=>a+((state[g.id]&&state[g.id].have&&state[g.id].size)||0),0),n=GAMES.filter(g=>state[g.id]&&state[g.id].have).length;
+  txt='<b>'+n+' of '+GAMES.length+'</b> games stored, <strong>'+fmt(used)+'</strong>.';
+  try{if(navigator.storage&&navigator.storage.estimate){const e=await navigator.storage.estimate();if(e.quota)txt+=' This browser has used <strong>'+fmt(e.usage)+'</strong> of about <strong>'+fmt(e.quota)+'</strong> available.';
+    if(navigator.storage.persisted){const p=await navigator.storage.persisted();txt+=p?' Storage is protected from automatic clearing.':' Storage may be cleared by the browser if the device runs low.'}}}catch(e){}
+  el.innerHTML=txt;
+}
+async function persist(){try{if(navigator.storage&&navigator.storage.persist&&!(await navigator.storage.persisted()))await navigator.storage.persist()}catch(e){}}
+async function cacheShelf(){ // covers and shelf pages, so the shelf opens offline
+  try{const c=await caches.open(SHELF_CACHE);const urls=GAMES.map(g=>g.cover).concat(['./','index.html','classic.html','sync.html','suggest.html','reference.html','manifest.webmanifest','icons/icon-180.png','icons/icon-192.png','icons/icon-512.png']);
+    await Promise.all(urls.map(async u=>{const k=abs(u);const key=k.endsWith('/')?k+'index.html':k;try{if(await c.match(key))return;const r=await fetch(u);if(r.ok)await c.put(key,r)}catch(e){}}))}catch(e){}}
+async function download(g){
+  const s=state[g.id];if(s.busy)return;Object.assign(s,{busy:true,pct:0,err:''});render();
+  try{
+    const url=abs(g.src),r=await fetch(url,{cache:'reload'});if(!r.ok)throw new Error('HTTP '+r.status);
+    const total=+r.headers.get('content-length')||g.bytes||0,parts=[];let got=0;
+    if(r.body&&r.body.getReader){const rd=r.body.getReader();for(;;){const {done,value}=await rd.read();if(done)break;parts.push(value);got+=value.length;const p=Math.min(99,Math.floor(got/Math.max(total,got)*100));if(p!==s.pct){s.pct=p;const li=document.querySelector('[data-id="'+g.id+'"]');if(li){const b=li.querySelector('.meter b'),t=li.querySelector('.st');if(b)b.style.width=p+'%';if(t)t.textContent='Downloading '+p+'%'}}}}
+    else parts.push(await r.arrayBuffer());
+    const blob=new Blob(parts,{type:r.headers.get('content-type')||'text/html; charset=utf-8'});
+    if(blob.size<1000)throw new Error('empty');
+    const c=await caches.open(GAME_CACHE);
+    await c.put(url,new Response(blob,{status:200,headers:{'content-type':blob.type,'x-gns-size':String(blob.size)}}));
+    Object.assign(s,{have:true,size:blob.size,busy:false,pct:100});persist();cacheShelf();
+  }catch(e){Object.assign(s,{busy:false,have:false,err:navigator.onLine===false?'You are offline. Try again when connected.':'Download failed. Try again.'})}
+  render();usage();
+}
+async function remove(g){const s=state[g.id];try{const c=await caches.open(GAME_CACHE);await c.delete(abs(g.src))}catch(e){}Object.assign(s,{have:false,size:null,err:''});render();usage()}
+function toggle(g){const s=state[g.id];if(s.busy)return;if(s.have)remove(g);else{if(navigator.onLine===false){s.err='You are offline. Try again when connected.';render();return}download(g)}}
+$('dlall').onclick=async()=>{msgOff('');persist();for(const g of GAMES)if(!state[g.id].have)await download(g);const f=GAMES.filter(g=>!state[g.id].have).length;msgOff(f?f+' could not be downloaded. Try again.':'All games are stored on this device.',f?'err':'ok')};
+$('rmall').onclick=async()=>{for(const g of GAMES)if(state[g.id].have)await remove(g);msgOff('Removed. Your saves were not touched.','ok')};
+
+// ---------- saves ----------
+function deviceName(){
+  const ua=navigator.userAgent||'',touch=navigator.maxTouchPoints>1;
+  const os=/iPhone/.test(ua)?'iPhone':/iPad/.test(ua)||(/Macintosh/.test(ua)&&touch)?'iPad':/Android/.test(ua)?'Android':/Windows/.test(ua)?'Windows PC':/Mac/.test(ua)?'Mac':/CrOS/.test(ua)?'Chromebook':/Linux/.test(ua)?'Linux PC':'Device';
+  const app=(window.matchMedia&&matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches)||navigator.standalone;
+  const br=/Edg\//.test(ua)?'Edge':/Firefox|FxiOS/.test(ua)?'Firefox':/Chrome|CriOS/.test(ua)?'Chrome':/Safari/.test(ua)?'Safari':'browser';
+  return (os+' ('+(app?'app':br)+')').slice(0,24)}
+function localEntries(){const o={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k==null||EXCLUDE.has(k))continue;o[k]=localStorage.getItem(k)}}catch(e){}return o}
+function makeExport(){const d=localEntries();return {app:'game-night-shelf',v:1,at:new Date().toISOString(),from:deviceName(),keys:Object.keys(d).length,data:d}}
+function groupBy(d){const g={};for(const k of Object.keys(d)){const id=owner(k);(g[id]||(g[id]={keys:0,bytes:0})).keys++;g[id].bytes+=k.length+String(d[k]).length}return g}
+const order=id=>{const i=GAMES.findIndex(g=>g.id===id);return i<0?(id==='shelf'?1000:1001):i};
+function listSaves(){
+  const g=groupBy(localEntries()),ids=Object.keys(g).sort((a,b)=>order(a)-order(b)),ul=$('savelist');
+  ul.innerHTML=ids.length?ids.map(id=>'<li><span>'+esc(NAMES[id]||id)+'</span><span>'+g[id].keys+(g[id].keys===1?' item · ':' items · ')+fmt(g[id].bytes)+'</span></li>').join(''):'<li><span>No saves on this device yet</span><span></span></li>';
+  const bk=LS.get(BACKUP_KEY);$('bkrow').hidden=!bk;
+}
+function validate(txt){
+  let o;try{o=JSON.parse(txt)}catch(e){throw new Error('That is not a saves file (it could not be read).')}
+  if(!o||typeof o!=='object'||o.app!=='game-night-shelf')throw new Error('That file is not from the Game Night Shelf.');
+  if(typeof o.v!=='number'||o.v>1)throw new Error('That saves file is from a newer version. Update this page and try again.');
+  if(!o.data||typeof o.data!=='object'||Array.isArray(o.data))throw new Error('That saves file has no saves in it.');
+  const d={};let n=0,size=0;
+  for(const k of Object.keys(o.data)){const v=o.data[k];
+    if(typeof v!=='string'||k.length>200||k==='__proto__')throw new Error('That saves file looks damaged.');
+    if(EXCLUDE.has(k))continue;d[k]=v;n++;size+=k.length+v.length;if(n>5000||size>40e6)throw new Error('That saves file is too large.')}
+  return {from:typeof o.from==='string'?o.from.replace(/[<>]/g,'').slice(0,60):'',at:typeof o.at==='string'?o.at.slice(0,40):'',data:d};
+}
+let pending=null;
+function preview(inc,label){
+  pending=inc;const loc=localEntries(),rows={};
+  for(const k of Object.keys(inc.data)){const id=owner(k),r=rows[id]||(rows[id]={n:0,c:0,s:0});if(!(k in loc))r.n++;else if(loc[k]!==inc.data[k])r.c++;else r.s++}
+  const gone=Object.keys(loc).filter(k=>!(k in inc.data)),ids=Object.keys(rows).sort((a,b)=>order(a)-order(b));
+  $('imptitle').textContent='Saves from '+(inc.from||label||'a file')+(inc.at?' ('+inc.at.slice(0,10)+')':'');
+  $('implist').innerHTML=ids.length?ids.map(id=>{const r=rows[id],t=[];if(r.n)t.push(r.n+' new');if(r.c)t.push(r.c+' overwritten');if(r.s)t.push(r.s+' same');return '<li><span>'+esc(NAMES[id]||id)+'</span><span>'+t.join(' · ')+'</span></li>'}).join(''):'<li><span>The file has no saves.</span><span></span></li>';
+  $('impnote').textContent=gone.length?'Replace all would also remove '+gone.length+' item'+(gone.length===1?' that exists':'s that exist')+' only on this device.':'';
+  $('imp').hidden=false;$('impmsg').hidden=true;$('merge').disabled=$('replace').disabled=!ids.length;
+  $('imp').scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function writeAll(data,replace){
+  if(replace){for(const k of Object.keys(localEntries()))LS.del(k)}
+  for(const k of Object.keys(data))LS.set(k,data[k]);
+}
+function apply(mode){
+  const inc=pending;if(!inc)return;
+  const cur=makeExport();let backupOk=true;
+  try{LS.set(BACKUP_KEY,JSON.stringify(cur))}catch(e){backupOk=false}
+  lastBackup=cur;
+  try{writeAll(inc.data,mode==='replace')}
+  catch(e){try{writeAll(cur.data,true)}catch(_){}
+    return say('Could not save: this browser has no room left. Nothing was changed.','err')}
+  pending=null;$('imp').hidden=true;
+  say((mode==='replace'?'Replaced: ':'Merged: ')+Object.keys(inc.data).length+' items from '+(inc.from||'the file')+'. '+(backupOk?'Your previous saves were backed up.':'Backup was too large to keep in the browser; use Download backup file.'),'ok');
+  listSaves();$('bkrow').hidden=false;
+}
+let lastBackup=null;
+function say(t,cls){const m=$('impmsg');m.hidden=!t;m.textContent=t||'';m.className='msg'+(cls?' '+cls:'')}
+$('merge').onclick=()=>apply('merge');$('replace').onclick=()=>apply('replace');
+$('impcancel').onclick=()=>{pending=null;$('imp').hidden=true};
+function fileName(pre){const d=new Date(),p=n=>String(n).padStart(2,'0');return pre+'-'+d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'.json'}
+async function saveFile(obj,name){
+  const txt=JSON.stringify(obj),blob=new Blob([txt],{type:'application/json'});
+  const ios=/iPad|iPhone|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+  if(ios&&navigator.share&&window.File){try{const f=new File([blob],name,{type:'application/json'});if(!navigator.canShare||navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Game Night saves'});return}}catch(e){if(e&&e.name==='AbortError')return}}
+  const url=URL.createObjectURL(blob);
+  if(ios){window.open(url,'_blank');return}
+  const a=document.createElement('a');a.href=url;a.download=name;a.style.display='none';document.body.appendChild(a);a.click();
+  setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},60000);
+}
+$('dlsaves').onclick=async()=>{const o=makeExport();if(!o.keys){say('There are no saves on this device to download yet.','err');return}await saveFile(o,fileName('gns-saves'));say('Saves file ready ('+o.keys+' items).','ok')};
+$('bkdl').onclick=()=>{const b=LS.get(BACKUP_KEY)||(lastBackup&&JSON.stringify(lastBackup));if(b)saveFile(JSON.parse(b),fileName('gns-backup'))};
+$('bkrestore').onclick=()=>{const b=LS.get(BACKUP_KEY);if(!b)return;try{const inc=validate(b);inc.from='the backup';pending=inc;preview(inc,'the backup')}catch(e){say(e.message,'err')}};
+async function loadFile(f){
+  say('');if(!f)return;if(f.size>40e6){say('That file is too large to be a saves file.','err');return}
+  try{preview(validate(await f.text()),f.name)}catch(e){say(e.message,'err')}
+}
+$('file').onchange=e=>{loadFile(e.target.files[0]);e.target.value=''};
+const drop=$('drop');['dragenter','dragover'].forEach(t=>addEventListener(t,e=>{e.preventDefault();drop.classList.add('over')}));
+['dragleave','drop'].forEach(t=>addEventListener(t,e=>{e.preventDefault();drop.classList.remove('over')}));
+addEventListener('drop',e=>{const f=e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0];if(f)loadFile(f)});
+
+// ---------- device to device ----------
+const ALPHA='ABCDEFGHJKMNPQRSTUVWXYZ23456789',CHUNK=6000;
+const newCode=()=>{const u=new Uint8Array(6);crypto.getRandomValues(u);return [...u].map(x=>ALPHA[x%ALPHA.length]).join('')};
+const cleanCode=c=>[...String(c||'').toUpperCase()].filter(ch=>ALPHA.includes(ch)).join('').slice(0,6);
+const EXPIRY=()=>window.SYNC_EXPIRY_MS||600000,FIND=()=>window.SYNC_FIND_MS||30000;
+let sess=null; // {role,room,timers[],stopped}
+function pmsg(t,cls){const m=$('p2pmsg');m.hidden=!t;m.textContent=t||'';m.className='msg'+(cls?' '+cls:'')}
+function pbar(p){const b=$('p2pbar');b.hidden=p==null;if(p!=null)b.firstElementChild.style.width=Math.round(p*100)+'%'}
+async function endSession(keepUI){const s=sess;sess=null;if(s){s.stopped=true;s.timers.forEach(t=>{clearTimeout(t);clearInterval(t)});try{await s.room.leave()}catch(e){}}
+  if(!keepUI){$('p2p').hidden=true;$('sendbox').hidden=true;$('recvbox').hidden=true;$('accept').hidden=true;pmsg('');pbar(null);if(location.hash)history.replaceState(null,'',location.pathname+location.search)}}
+async function openRoom(role,code){
+  await endSession(true);$('accept').hidden=true;pbar(null);pmsg('');$('p2p').hidden=false;
+  let room;try{room=await NetRoom.lobby('sync').join('sv-'+code)}catch(e){pmsg('Could not open a connection. Check your internet and try again.','err');return null}
+  sess={role,room,code,timers:[],stopped:false,peer:null,got:0};
+  return sess;
+}
+// -- sender
+$('send').onclick=async()=>{
+  if(!p2pOK())return;const data=makeExport();
+  if(!data.keys){say('');pmsg('');$('p2p').hidden=false;$('sendbox').hidden=true;$('recvbox').hidden=true;pmsg('There are no saves on this device to send yet.','err');return}
+  const code=newCode(),s=await openRoom('send',code);if(!s)return;
+  $('recvbox').hidden=true;$('sendbox').hidden=false;$('code').textContent=code;
+  const link=location.href.split('#')[0]+'#receive='+code;
+  try{$('qr').innerHTML=QR.svg(link,200)}catch(e){$('qr').innerHTML=''}
+  const t0=Date.now(),exp=EXPIRY();
+  const tick=()=>{const left=Math.max(0,exp-(Date.now()-t0));if(!s.busy)$('exp').textContent='Code works for '+(left>60000?Math.ceil(left/60000)+' more minutes':Math.ceil(left/1000)+' more seconds')+'. Waiting for the other device…'};
+  tick();s.timers.push(setInterval(tick,1000));
+  s.timers.push(setTimeout(()=>{if(sess===s&&!s.busy){endSession(true);$('sendbox').hidden=true;pmsg('This code expired. Tap Send to another device for a new one.','err')}},exp));
+  s.room.presence({role:'send',name:deviceName()});
+  s.room.on('want',m=>{if(sess!==s||s.busy)return;s.busy=true;s.peer=m.peer;sendData(s,data,m.data&&m.data.name)});
+  s.room.on('no',m=>{if(sess===s&&!s.busy)pmsg('The other device declined. The code still works if you want to try again.','err')});
+  s.room.on('got',m=>{if(sess===s&&m.peer===s.peer&&m.data&&typeof m.data.n==='number')s.acked=m.data.n});
+  s.room.on('done',m=>{if(sess===s&&m.peer===s.peer){s.done=m.data&&m.data.ok?1:2}});
+  pmsg('');
+};
+async function pack(txt){
+  const raw=new TextEncoder().encode(txt);let bytes=raw,gz=false;
+  if(typeof CompressionStream!=='undefined'){try{const cs=new CompressionStream('gzip'),w=cs.writable.getWriter();w.write(raw).catch(()=>{});w.close().catch(()=>{});bytes=new Uint8Array(await new Response(cs.readable).arrayBuffer());gz=true}catch(e){bytes=raw;gz=false}}
+  let b='';for(let i=0;i<bytes.length;i+=0x8000)b+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+  return {b64:btoa(b),gz,raw:raw.length};
+}
+async function sendData(s,data,peerName){
+  $('qr').innerHTML='';$('code').textContent='';$('sendbox').hidden=true;
+  try{
+    pmsg('Sending to '+(peerName||'the other device')+'…');pbar(0);
+    const p=await pack(JSON.stringify(data)),n=Math.ceil(p.b64.length/CHUNK);
+    await s.room.sendTo(s.peer,'meta',{n,gz:p.gz,raw:p.raw,keys:data.keys,len:p.b64.length});
+    for(let i=0;i<n;i++){if(sess!==s)return;await s.room.sendTo(s.peer,'chunk',{i,d:p.b64.slice(i*CHUNK,(i+1)*CHUNK)});pbar((i+1)/n);if(i%8===7)await sleep(10)}
+    await s.room.sendTo(s.peer,'end',{n});
+    for(let k=0;k<200&&!s.done&&sess===s;k++)await sleep(100);
+    if(sess!==s)return;
+    if(s.done===1){pmsg('Sent '+data.keys+' items to '+(peerName||'the other device')+'. Finish on that device.','ok')}
+    else if(s.done===2)pmsg('The other device could not read the saves. Try again.','err');
+    else pmsg('Sent, but the other device did not confirm. Check that it shows the saves.','err');
+    pbar(null);await endSession(true);
+  }catch(e){pmsg('Sending failed. Try again.','err');pbar(null);await endSession(true)}
+}
+// -- receiver
+function showRecv(code){$('sendbox').hidden=true;$('p2p').hidden=false;$('recvbox').hidden=false;$('rcode').value=code||'';if(!code)$('rcode').focus()}
+$('recv').onclick=async()=>{await endSession(true);pending=null;$('imp').hidden=true;pmsg('');showRecv('')};
+$('rcode').addEventListener('input',e=>{const p=e.target.selectionStart;e.target.value=cleanCode(e.target.value)});
+$('rcode').addEventListener('keydown',e=>{if(e.key==='Enter')$('rgo').click()});
+$('rgo').onclick=async()=>{
+  const code=cleanCode($('rcode').value);if(code.length!==6){pmsg('The code has 6 letters and numbers. Check the other screen.','err');return}
+  if(!p2pOK()||navigator.onLine===false){pmsg('You need to be online for this.','err');return}
+  $('rgo').disabled=true;const s=await openRoom('recv',code);$('recvbox').hidden=false;$('rgo').disabled=false;if(!s)return;
+  pmsg('Looking for the sending device…');
+  let accepted=false;const parts=[];let meta=null;
+  const fail=t=>{if(sess!==s)return;pmsg(t,'err');pbar(null);$('accept').hidden=true;endSession(true)};
+  s.timers.push(setTimeout(()=>{if(!s.peer)fail('No device is showing that code. Check the code, make sure the other device is still showing it and has not expired (10 minutes).')},FIND()));
+  s.room.presence({role:'recv',name:deviceName()});
+  s.room.onPeers(ch=>{if(sess!==s)return;
+    const sp=(ch.peers||[]).find(p=>!p.isMe&&p.presence&&p.presence.role==='send');
+    if(sp&&!s.peer){s.peer=sp.peer;const nm=(sp.presence.name||'').slice(0,24)||'another device';s.peerName=nm;$('acctitle').textContent='Accept saves from '+nm+'?';$('accept').hidden=false;pmsg('Found '+nm+'.')}
+    if(s.peer&&(ch.left||[]).some(p=>p.peer===s.peer)&&!s.finished)fail('The other device went away before the saves arrived.')});
+  $('accyes').onclick=()=>{if(sess!==s||!s.peer)return;$('accept').hidden=true;accepted=true;pmsg('Waiting for '+s.peerName+' to send…');pbar(0);s.last=Date.now();
+    s.room.sendTo(s.peer,'want',{name:deviceName()});
+    s.timers.push(setInterval(()=>{if(sess===s&&!s.finished&&Date.now()-s.last>25000)fail('The transfer stalled. Try again.')},2000))};
+  $('accno').onclick=async()=>{if(sess!==s)return;$('accept').hidden=true;try{await s.room.sendTo(s.peer,'no',{});await sleep(250)}catch(e){}if(sess!==s)return;pmsg('Declined. Nothing was changed.');endSession(true)};
+  s.room.on('meta',m=>{if(sess!==s||!accepted||m.peer!==s.peer||meta)return;const d=m.data;
+    if(!d||!Number.isInteger(d.n)||d.n<1||d.n>5000||!Number.isInteger(d.len)||d.len>CHUNK*d.n||typeof d.gz!=='boolean'){fail('The other device sent something unexpected.');return}
+    meta=d;s.last=Date.now()});
+  s.room.on('chunk',m=>{if(sess!==s||!meta||m.peer!==s.peer)return;const d=m.data;if(!d||!Number.isInteger(d.i)||d.i<0||d.i>=meta.n||typeof d.d!=='string'||d.d.length>CHUNK||parts[d.i]!==undefined)return;
+    parts[d.i]=d.d;s.got=(s.got||0)+1;s.last=Date.now();pbar(s.got/meta.n);pmsg('Receiving from '+s.peerName+': '+Math.round(s.got/meta.n*100)+'%');
+    if(s.got%8===0)s.room.sendTo(s.peer,'got',{n:s.got})});
+  s.room.on('end',async m=>{if(sess!==s||!meta||m.peer!==s.peer||s.finished)return;
+    if(s.got!==meta.n){fail('Some parts went missing. Try again.');return}
+    s.finished=true;let inc;
+    try{const bin=atob(parts.join('')),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);let txt;
+      if(meta.gz){if(typeof DecompressionStream==='undefined')throw new Error('This browser cannot unpack the data.');const ds=new DecompressionStream('gzip'),w=ds.writable.getWriter();w.write(u).catch(()=>{});w.close().catch(()=>{});
+        const rd=ds.readable.getReader(),out=[];let tot=0;for(;;){const {done,value}=await rd.read();if(done)break;tot+=value.length;if(tot>60e6)throw new Error('too large');out.push(value)}
+        txt=new TextDecoder().decode(await new Blob(out).arrayBuffer())}else txt=new TextDecoder().decode(u);
+      inc=validate(txt)}catch(e){try{s.room.sendTo(s.peer,'done',{ok:false})}catch(_){}pbar(null);pmsg(e&&e.message&&/^That/.test(e.message)?e.message:'The saves could not be read. Try again.','err');await endSession(true);return}
+    try{s.room.sendTo(s.peer,'done',{ok:true})}catch(_){}
+    const from=s.peerName;pbar(null);pmsg('Received '+Object.keys(inc.data).length+' items from '+from+'. Choose what to do with them below.','ok');
+    await sleep(300);await endSession(true);inc.from=inc.from||from;preview(inc,from)});
+};
+$('p2pcancel').onclick=()=>endSession(false);
+// a QR link or invite opens the receive box with the code filled in
+function fromHash(){const m=/^#receive=([A-Za-z0-9]{6})$/.exec(location.hash||'');if(m&&p2pOK()){const c=cleanCode(m[1]);if(c.length===6){history.replaceState(null,'',location.pathname+location.search);showRecv(c);$('rgo').click()}}}
+
+// ---------- start ----------
+setNet();listSaves();render();scan();
+if(!p2pOK()){const n=document.createElement('p');n.className='msg';n.textContent='Device-to-device transfer is not available in this browser. Use a saves file instead.';$('send').parentNode.after(n)}
+fromHash();
+addEventListener('storage',listSaves);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)listSaves()});
+})();
+</script>
+</body>
+</html>

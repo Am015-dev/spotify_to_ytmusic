@@ -1,0 +1,172 @@
+/* ===== Phone layout (html.ph): the city is the board; one control zone next to it; one pop-up at a time. Every rule starts with html.ph ===== */
+#pchips,#pshop,#pcx{display:none}
+html.ph{--pk:#1a1320}
+html.ph .gx-app{padding:var(--sat,0px) var(--sar,0px) var(--sab,0px) var(--sal,0px);box-sizing:border-box;grid-template-rows:var(--ph-bar,48px) minmax(0,1fr)}
+/* top bar: icon buttons only */
+html.ph header.gx-bar{height:var(--ph-bar,48px);min-height:var(--ph-bar,48px);padding:0 6px;gap:4px;justify-content:center;overflow:visible;-webkit-mask-image:none;mask-image:none;border-bottom-width:3px}
+html.ph header.gx-bar h1{display:none}
+html.ph header.gx-bar .gx-sp{display:none}
+html.ph header.gx-bar .gx-ibtn.btn{font-size:0;min-width:44px;min-height:44px;width:44px;height:44px;padding:0;border-width:2.5px;border-radius:10px;flex:0 0 auto;justify-content:center}
+html.ph header.gx-bar .gx-ibtn .ico,html.ph header.gx-bar .gx-ibtn .pz{width:22px;height:22px;margin:0;font-size:1rem}
+html.ph header.gx-bar .pzb span{display:none}
+html.ph header.gx-bar [data-gx="dr-menu"]{min-width:44px}
+html.ph .gx-reopen{display:none!important}
+/* the board */
+html.ph .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:var(--ph-bh,50vw) minmax(0,1fr)}
+html.ph .gx-board{min-height:0}
+html.ph #tags,html.ph #hud{display:none!important}
+/* the control zone (the dock) */
+html.ph .gx-dock{display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:6px;padding:4px 8px 8px;max-height:none;border-radius:0;border:0;border-top:4px solid var(--pk);overflow-x:hidden;overflow-y:auto;position:relative;min-height:0;visibility:visible}
+html.ph .gx-app.gx-dock-min .gx-dock{visibility:visible;max-height:none}
+html.ph .gx-dock-body,html.ph .gx-app.gx-dock-min .gx-dock-body{display:contents}
+html.ph #prompt{display:contents}
+html.ph .gx-dock>*,html.ph #prompt>*,html.ph .gx-dock-body>*{grid-column:1/-1}
+html.ph .gx-dock-head{grid-row:1;min-height:44px;padding:0 2px;gap:6px;border:0;background:none;box-shadow:none}
+html.ph .gx-grab,html.ph .gx-dock-head [data-gx="dock"]{display:none}
+html.ph .gx-dock-head .gx-dt{font-size:1.1rem;line-height:1.05}
+html.ph .gx-dock-head .advb{font-size:0;width:44px;height:44px;min-width:44px;min-height:44px;padding:0;flex:0 0 44px;justify-content:center}
+html.ph .gx-dock-head .advb::before{content:"🧭";font-size:22px;line-height:1}
+html.ph #pchips{display:grid;grid-row:2;grid-template-columns:repeat(var(--cc,4),minmax(0,1fr));gap:5px}
+html.ph .pchip{appearance:none;position:relative;min-height:46px;min-width:0;border:2.5px solid var(--pk);border-top:6px solid var(--mc);border-radius:9px;background:#fffdf5;color:var(--pk);padding:1px 4px 2px;text-align:left;display:flex;flex-direction:column;justify-content:center;gap:0;cursor:pointer;font-family:Nunito,sans-serif;box-shadow:2px 2px 0 var(--shadow)}
+html.ph .pchip b{display:block;font:400 14.5px/1.05 Bangers,Impact,sans-serif;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph .pchip.hasn b{padding-right:24px}
+html.ph .pchip u{position:absolute;right:4px;top:-9px;font:900 13px/1 Nunito,sans-serif;text-decoration:none;background:var(--pk);color:#ffd23f;border-radius:4px;padding:2px 4px;letter-spacing:.04em}
+html.ph .pchip span{display:flex;gap:4px;font:900 13px/1.15 Nunito,sans-serif;white-space:nowrap;letter-spacing:-.2px}
+html.ph .pchip em{font-style:normal}html.ph .pchip .h{color:#d62839}html.ph .pchip .v{color:#a86f00}html.ph .pchip .e{color:#17884f}
+html.ph .pchip .pn{position:absolute;right:3px;top:0;font:800 13px/1.2 Nunito,sans-serif;font-style:normal;color:#5b4a62}
+html.ph .pchip.on{background:#ffe27a;box-shadow:0 0 0 3px #fff,0 0 0 5px var(--pk)}
+html.ph .pchip.city{border-color:#e63946}
+html.ph .pchip.ko{opacity:.5;filter:grayscale(1)}
+/* the line of text under the chips */
+html.ph #banner{grid-row:3;margin:0;padding:2px 8px;font-size:13px;line-height:1.25;box-shadow:none;border-width:2px;border-radius:8px;max-height:2.7em;overflow:hidden;cursor:pointer;text-align:left}
+html.ph #banner .because{display:none}
+html.ph #banner b{font-weight:900}
+html.ph #news,html.ph #ptop,html.ph #pmsg,html.ph #buymini,html.ph #youbox,html.ph #rolls{display:none!important}
+/* dice: the real buttons, 52+ px */
+html.ph #dicewrap{grid-row:4;margin:0}
+html.ph #dice{display:grid;grid-template-columns:repeat(var(--dc,6),var(--dw,56px));gap:10px 6px;justify-content:center;min-height:0;padding-top:4px}
+html.ph .die{width:var(--dw,56px);height:var(--dw,56px);border-radius:12px;min-width:52px;min-height:52px}
+html.ph .die svg{width:calc(var(--dw,56px)*.66);height:calc(var(--dw,56px)*.66)}
+html.ph #dice>span{grid-column:1/-1;text-align:center;font-size:13px}
+html.ph #preview{margin-top:8px;font-size:13px;line-height:1.25;text-align:center;max-height:2.6em;overflow:hidden}
+html.ph #pacts{grid-row:5;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 52px;gap:6px;margin:0;align-items:stretch}
+html.ph #pacts .btn{min-height:44px;margin:0;padding:2px 6px;font-size:14px;line-height:1.15;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;grid-column:1/-1}
+html.ph #pacts .btn small{font-size:13px;line-height:1.1;margin-top:1px}
+html.ph #pacts [data-act="reroll"],html.ph #pacts [data-act="resolve"]{grid-column:auto;min-height:54px;font-size:19px}
+html.ph #pacts [data-act="hint"]{grid-column:auto;min-height:54px;font-size:22px;padding:0}
+html.ph #pacts [data-act="end"]{grid-column:1/-1;min-height:54px;font-size:20px}
+html.ph #pacts [data-act="sweep"]{display:none}
+html.ph-p #pacts [data-a="advise"]{display:none}
+html.ph #pacts [data-a="advise"]{font-size:22px;padding:0;grid-column:auto}
+html.ph #pacts .bl{font:400 21px/1 Bangers,Impact,sans-serif;letter-spacing:.04em}
+html.ph #pacts .emotes{grid-column:1/-1;flex-wrap:nowrap;overflow-x:auto;margin:0}
+html.ph #pacts .emotes .btn{min-width:44px;min-height:44px;font-size:1.3rem;flex:0 0 auto;grid-column:auto;display:inline-flex}
+/* the shop tiles (buy step) */
+html.ph #pshop{display:grid;grid-row:4;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+html.ph #pshop:empty{display:none}
+html.ph .ptile{appearance:none;position:relative;min-height:60px;border:3px solid var(--pk);border-radius:10px;background:#fff6dc;color:var(--pk);padding:3px 5px;display:flex;align-items:center;gap:5px;text-align:left;cursor:pointer;box-shadow:2px 2px 0 var(--shadow)}
+html.ph .ptile .cost{flex:0 0 28px;height:28px;border-radius:50%;background:var(--energy,#1f9d5c);border:2.5px solid var(--pk);color:#fff;display:grid;place-items:center;font:17px/1 Bangers,Impact,sans-serif}
+html.ph .ptile b{font:400 14.5px/1.05 Bangers,Impact,sans-serif;letter-spacing:.03em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+html.ph .ptile.sugg{outline:3px solid var(--yellow);outline-offset:1px}
+html.ph .ptile .star{position:absolute;right:3px;top:0;font-style:normal;font-size:14px;color:#c98500}
+html.ph .ptile.no{opacity:.6}
+/* cards: one at a time, over the control zone (never over the city) */
+html.ph #choice,html.ph #coach,html.ph #advice,html.ph #pcx{display:none}
+html.ph .gx-dock[data-card="choice"] #choice,html.ph .gx-dock[data-card="coach"] #coach,html.ph .gx-dock[data-card="advice"] #advice,html.ph .gx-dock[data-card="pop"] #pcx{display:block;position:fixed;left:var(--pz-l,0px);right:var(--sar,0px);top:var(--pz-t,50vh);bottom:var(--sab,0px);z-index:8;margin:0;border:0;border-radius:0;box-shadow:none;overflow:auto;overscroll-behavior:contain;padding:8px 12px 12px;background-color:var(--card)}
+html.ph .gx-dock[data-card="pop"] #pcx{display:flex;flex-direction:column;padding:0}
+html.ph .gx-dock[data-card="choice"] #choice{border-top:4px solid var(--red)}
+html.ph #choice h2{font-size:1.35rem}
+html.ph #choice p,html.ph #choice .btn small{font-size:13px}
+html.ph #choice .acts{margin-top:.35rem;gap:6px}
+html.ph #choice .acts .btn{min-height:48px;padding:.3rem .6rem}
+html.ph #choice .mdice{margin:.2rem 0}
+html.ph #choice .die.sm,html.ph .die.sm{min-width:0;min-height:0;width:40px;height:40px}
+html.ph #coach .acts .btn,html.ph #advice .gx-x{min-height:44px}
+html.ph #advice .gx-x{min-width:44px;min-height:44px}
+html.ph #coach h3{font-size:1.2rem}html.ph #coach p{font-size:13.5px}
+html.ph .pcx-h{display:flex;align-items:center;gap:8px;padding:4px 6px 4px 12px;border-bottom:3px solid var(--pk);background:var(--dusk,#44185e);flex:0 0 auto}
+html.ph .pcx-h b{flex:1;min-width:0;font:400 1.35rem/1.05 Bangers,Impact,sans-serif;letter-spacing:.04em;color:#ffe36a;text-shadow:2px 2px 0 #2a0f2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph .pcx-h .gx-x{background:#fff8ea;color:var(--pk);border:2.5px solid #120a1f;border-radius:10px;min-width:44px;min-height:44px;font-size:1.5rem;line-height:1}
+html.ph .pcx-h .sweep{min-height:44px;padding:0 8px;font-size:13px;white-space:nowrap;line-height:1.1}
+html.ph .pcx-b{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:6px 10px 10px}
+html.ph .pcx-sub{margin:2px 0 6px;font-size:13px;line-height:1.25}
+html.ph .pcard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;border:3px solid var(--pk);border-radius:12px;background:#fffdf5;color:var(--pk);padding:4px 6px;margin:0 0 6px;box-shadow:2px 2px 0 var(--shadow)}
+html.ph .pcard.sugg{outline:3px solid var(--yellow);outline-offset:1px}
+html.ph .pcard .pcc{position:relative;width:54px;height:54px;border-radius:8px;background:#e6d4ff;display:grid;place-items:center;overflow:hidden}
+html.ph .pcard.D .pcc{background:#ffe0cf}html.ph .pcard.C .pcc{background:#d8ecff}
+html.ph .pcard .art{width:42px;height:42px;display:block}html.ph .pcard .art svg{width:100%;height:100%}
+html.ph .pcard .cost{position:absolute;left:1px;top:1px;width:24px;height:24px;border-radius:50%;background:var(--energy,#1f9d5c);border:2px solid var(--pk);color:#fff;display:grid;place-items:center;font:15px/1 Bangers,Impact,sans-serif;z-index:1}
+html.ph .pcard .pct b{display:block;font:400 16.5px/1.05 Bangers,Impact,sans-serif;letter-spacing:.03em}
+html.ph .pcard .pct .rec{font:900 13px/1 Nunito,sans-serif;font-style:normal;background:var(--pk);color:#ffd23f;border-radius:4px;padding:1px 4px;vertical-align:2px}
+html.ph .pcard .pct p{margin:2px 0 0;font-size:13px;line-height:1.25}
+html.ph .pcard .pct .why{color:#5a2aa8}
+html.ph .pcard .btn{min-width:64px;min-height:48px;padding:2px 8px;font-size:15px;white-space:normal;max-width:96px;line-height:1.1}
+html.ph .pcard .btn[disabled]{font-size:13px}
+html.ph .monwrap .mon{margin:0}html.ph .monwrap .mon .mc{font-size:13px}
+html.ph .banwrap{font-size:14px;line-height:1.35}html.ph .banwrap .because{display:block;font-size:13px;margin-top:6px}
+html.ph #moment{position:fixed;left:8px;right:8px;top:calc(var(--sat,0px) + var(--ph-bar,48px) + 6px);z-index:30;pointer-events:none;padding:.25rem .5rem;margin:0}
+html.ph #moment b{font-size:1.1rem}
+/* portrait: board on top, control zone below */
+html.ph-p .gx-main{grid-template-rows:var(--ph-bh,50vw) minmax(0,1fr)}
+html.ph-p .gx-dock-head .gx-dt{font-size:1.05rem}
+/* landscape: board full height on the left, the bar and the control zone in the right rail */
+html.ph-l .gx-app{grid-template-columns:var(--ph-bw,60vw) minmax(0,1fr);grid-template-rows:var(--ph-bar,48px) minmax(0,1fr)}
+html.ph-l .gx-main{display:contents}
+html.ph-l .gx-board{grid-column:1;grid-row:1/3}
+html.ph-l header.gx-bar{grid-column:2;grid-row:1;padding:0 4px;gap:3px;justify-content:space-between}
+html.ph-l .gx-dock{grid-column:2;grid-row:2;border-top:0;border-left:4px solid var(--pk);padding:2px 6px 6px;gap:5px}
+html.ph-l .gx-dock-head{min-height:22px;padding:0 2px}
+html.ph-l .gx-dock-head .advb{display:none}
+html.ph-l .gx-dock-head .gx-dt{font-size:13.5px}
+html.ph-l .gx-dock[data-ps="side"]{grid-template-columns:calc(var(--dc,3)*var(--dw,54px) + (var(--dc,3) - 1)*6px) minmax(100px,1fr)}
+html.ph-l .gx-dock[data-ps="side"]>*{grid-column:1/-1}
+html.ph-l #pacts{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+html.ph-l #pacts [data-act="reroll"],html.ph-l #pacts [data-act="resolve"]{grid-column:span 2;min-height:50px}
+html.ph-l #pacts [data-act="hint"],html.ph-l #pacts [data-a="advise"]{grid-column:span 1;min-height:44px;font-size:22px;padding:0}
+html.ph-l .gx-dock[data-ps="side"] #dicewrap{grid-column:1;grid-row:4}
+html.ph-l .gx-dock[data-ps="side"] #pacts{grid-column:2;grid-row:4;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start}
+html.ph-l .gx-dock[data-ps="side"] #pacts [data-act="reroll"],html.ph-l .gx-dock[data-ps="side"] #pacts [data-act="resolve"]{grid-column:1/-1}
+html.ph-l .gx-dock[data-pp="buy"] #pacts,html.ph-l .gx-dock[data-pp="watch"] #pacts{grid-column:1/-1;grid-row:5;grid-template-columns:repeat(4,minmax(0,1fr))}
+html.ph-l .gx-dock[data-pp="buy"] #pacts [data-act="end"]{grid-column:span 3}
+html.ph-l .gx-dock[data-pp="buy"] #pacts [data-a="advise"]{grid-column:span 1}
+html.ph-l #pchips .pchip{min-height:44px}
+html.ph-l #preview{margin-top:4px;max-height:none}
+html.ph-l #dice{gap:8px 6px}
+/* draweres (Yours, Monsters, Log, Menu, Rules): bottom sheets, as before, but never taller than the screen */
+html.ph .gx-drawer{max-height:calc(100dvh - var(--ph-bar,48px));height:88dvh}
+html.ph-l .gx-drawer{height:calc(100dvh - 12px);max-height:none}
+html.ph .gx-x{min-width:44px;min-height:44px}
+html.ph .gx-drawer-head h2{font-size:1.35rem}
+html.ph .dlg{max-height:calc(100dvh - 20px);overflow:auto}
+html.ph .dlg .btn,html.ph .dlg button,html.ph .dlg summary{min-height:44px}
+html.ph .dlg .btn.mini{min-width:44px;padding:.2rem .6rem;font-size:13px}
+html.ph #choice .recchip{font-size:13px}
+html.ph .chip{font-size:13px;line-height:1.35}
+html.ph .mon>b i,html.ph .mon .mc i,html.ph .mc i{font-size:13px}
+html.ph .mon .st2,html.ph .mon .small{font-size:13px}
+html.ph-l #moment{right:auto;left:calc(var(--sal,0px) + 8px);width:calc(var(--ph-bw,50vw) - 16px);top:calc(var(--sat,0px) + 8px)}
+html.ph .pcard .pct .why b{display:inline;font:900 13px/1.25 Nunito,sans-serif;letter-spacing:0}
+html.ph .ptile b{overflow-wrap:anywhere}
+html.ph header.gx-bar .pzb.paused::before{content:"▶";font-size:20px;line-height:1}
+
+/* real usable heights: the primary button row stays pinned while the control zone scrolls; short portrait screens (<=640 px) tighten up */
+html.ph-p #pacts{display:contents}
+html.ph-p .gx-dock{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 52px}
+html.ph-p #pacts>*{grid-row:6}
+html.ph-p #pacts [data-act="reroll"]{grid-column:1;grid-row:5}
+html.ph-p #pacts [data-act="resolve"]{grid-column:2;grid-row:5}
+html.ph-p #pacts [data-act="hint"]{grid-column:3;grid-row:5}
+html.ph-p #pacts [data-act="end"]{grid-column:1/-1;grid-row:5}
+html.ph-p #pacts [data-act="reroll"],html.ph-p #pacts [data-act="resolve"],html.ph-p #pacts [data-act="hint"],html.ph-p #pacts [data-act="end"]{position:sticky;bottom:4px;z-index:3}
+@media (max-height:640px){html.ph-p .gx-dock{gap:4px;padding:4px 8px 4px}html.ph-p #preview{display:none}html.ph-p #dice{padding-top:0}}
+html.ph #banner{max-height:none;overflow:visible}
+html.ph #banner:not(:empty){flex-shrink:0}
+@media (max-height:600px){html.ph-p #banner{display:none}}
+html.ph #choice .acts,html.ph #coach .acts,html.ph #advice .acts{position:sticky;bottom:-12px;z-index:2;background:var(--card,#fffdf5);padding:6px 0 12px;margin-bottom:-12px}
+html.ph .dlg .acts:has(>.btn.primary){position:sticky;bottom:-1rem;z-index:3;margin:.4rem -1.2rem -1rem;padding:.5rem 1.2rem 1rem;background:linear-gradient(rgba(247,240,222,0),var(--card,#f7f0de) 14px)}
+html.ph-l .gx-dock[data-pp="watch"] #pacts{position:sticky;bottom:0;z-index:3;background:var(--paper,#fff6dc)}
+/* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
+html.ph .mbox,html.ph .dlg{box-sizing:border-box}
+
+html.ph #preview{max-height:none;overflow:visible}
+html.ph-p #pacts [data-act="again"]{grid-column:1/-1;grid-row:5;position:sticky;bottom:4px;z-index:3}

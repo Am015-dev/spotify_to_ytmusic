@@ -1,0 +1,10 @@
+node_modules/
+x.js
+# build outputs (the finished games live in ../games/)
+ft/sands.html
+kot/kot2.html
+rc/shipwreck.html
+xw/nebula.html
+munch/doorkick.html
+azul/game/sunglaze.html
+carc/game/rampart.html

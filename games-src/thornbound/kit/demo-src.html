@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Thornbound Kit</title>
+<style>
+:root{--ink:#f1e3c3;--bg:#120c09;--panel:#1d130e;--gold:#d4ad55;--gold2:#8f7330;--line:#4a3420}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:radial-gradient(ellipse at 50% 0,#2a1b12,#0e0907 70%);color:var(--ink);font-family:'TB Body','EB Garamond',Georgia,serif;overflow:hidden}
+body.gal{overflow:auto;height:auto}
+button{font:700 15px 'TB Display',Georgia,serif;letter-spacing:.06em;color:#2b1808;background:linear-gradient(#f3d98c,#c19a3e);border:1px solid #4a3208;border-radius:8px;min-height:44px;padding:0 16px;cursor:pointer}
+button.ghost{background:#2a1b12;color:var(--ink);border-color:var(--gold2)}
+.bar{display:flex;align-items:center;gap:8px;height:44px;padding:0 8px;background:linear-gradient(#2a1b12,#1a110c);border-bottom:1px solid var(--gold2)}
+.bar .chip{font:700 13px 'TB Display',serif;letter-spacing:.05em;padding:4px 10px;border-radius:14px;background:#0008;border:1px solid var(--gold2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;text-align:center}
+.ib{width:44px;height:44px;min-height:44px;padding:0;display:grid;place-items:center;background:#2a1b12;color:var(--gold);border:1px solid var(--gold2);border-radius:10px;font-size:20px}
+#app{display:flex;height:100%}
+#mapbox{flex:none}
+.strip{display:flex;gap:6px;padding:6px 8px;overflow-x:auto;scrollbar-width:none}
+.strip .tb-card{flex:none;cursor:pointer;border-radius:7px}.strip .sel .tb-card{outline:2px solid #ffe9a0;outline-offset:2px}
+.strip>div{flex:none;border-radius:7px}
+.modal{position:fixed;inset:0;background:#000b;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:9}
+.modal.on{display:flex}.modal .row{display:flex;gap:10px}
+.note{font-size:13px;color:#cdbb92;padding:2px 10px}
+/* portrait phone */
+.pp #app{flex-direction:column}.pp #mapbox{width:100%}.pp .side{flex:1;min-height:0;display:flex;flex-direction:column}
+/* landscape phone */
+.pl #app{flex-direction:row}.pl .side{flex:1;min-width:0;display:flex;flex-direction:column;height:100%}.pl .rail{display:flex;gap:8px;padding:6px 8px;flex:1;min-height:0}
+.pl .rail .strip{flex-direction:column;overflow-y:auto;padding:0}
+/* desktop */
+.dk #app{flex-direction:row}.dk .side{flex:1;display:flex;flex-direction:column;min-width:0;height:100%;overflow:auto}
+.dk .rail{display:flex;gap:16px;padding:12px;align-items:flex-start}.dk .rail .strip{flex-wrap:wrap;width:260px;padding:0}
+#clashbox{padding:10px;min-height:250px}
+/* gallery */
+.gal section{padding:16px 20px;border-bottom:1px solid var(--line)}.gal h2{font:700 20px 'TB Display',serif;color:var(--gold);margin:0 0 12px;letter-spacing:.08em}
+.grid{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}.cell{text-align:center;font-size:13px;color:#cdbb92}.cell .tb-art{display:block;border-radius:6px;border:1px solid var(--gold2);margin-bottom:3px}
+</style></head><body>
+<!--KIT-->
+<script>
+var CARDS={
+ g1:{faction:'gilded',title:'Ashen Knight',value:5,cost:2,type:'unit',typeLabel:'Knight',art:'knight',text:'When revealed: if you hold the most influence, gain 1 influence.',flavor:'The crown outlives the hand.',num:'G-01'},
+ g2:{faction:'gilded',title:'Court Herald',value:2,cost:1,type:'unit',typeLabel:'Herald',art:'herald',text:'When revealed: move one of your heralds to an adjacent location.',num:'G-02'},
+ g3:{faction:'gilded',title:'The Thorn Crown',value:0,cost:4,type:'relic',art:'crown',text:'The winner here gains 2 influence. Losers lose 1.',flavor:'It bites the head that wears it.',num:'G-03'},
+ g4:{faction:'gilded',title:'Regent in Ruin',value:6,cost:4,type:'unit',typeLabel:'Regent',art:'regent',text:'Strength +1 for each Gilded card in this location.',num:'G-04'},
+ h1:{faction:'heath',title:'Hearth Warrior',value:3,cost:1,type:'unit',typeLabel:'Warrior',art:'clan_warrior',text:'Clash: +2 strength in a location with standing stones.',num:'H-01'},
+ h2:{faction:'heath',title:'Stone-Speaker',value:4,cost:2,type:'unit',typeLabel:'Chief',art:'clan_chief',text:'When revealed: move one rival card in this location to an adjacent one.',num:'H-02'},
+ h3:{faction:'heath',title:'Mournwood Stag',value:2,cost:1,type:'unit',typeLabel:'Beast',art:'stag',text:'Cannot be affected by Ploys.',flavor:'Antlers like a second forest.',num:'H-03'},
+ h4:{faction:'heath',title:'The Wolf Oath',value:1,cost:2,type:'oath',art:'wolf',text:'Bind this card to a location. Your heralds there may not be moved by others.',num:'H-04'},
+ l1:{faction:'lantern',title:'Torch Rioter',value:2,cost:0,type:'unit',typeLabel:'Rioter',art:'rioter',text:'When revealed: move one herald to any location.',num:'L-01'},
+ l2:{faction:'lantern',title:'Lantern Bearer',value:3,cost:1,type:'unit',typeLabel:'Bearer',art:'lantern_bearer',text:'If you lose the clash here, gain 1 influence anyway.',num:'L-02'},
+ l3:{faction:'lantern',title:'Bellringer',value:1,cost:2,type:'edict',art:'bellringer',text:'Reveal all face-down cards in one location before the clash.',num:'L-03'},
+ l4:{faction:'lantern',title:'Barricade',value:4,cost:2,type:'ploy',art:'barricade',text:'Rival cards here have -1 strength.',num:'L-04'},
+ c1:{faction:'choir',title:'Moon Priest',value:4,cost:3,type:'rite',typeLabel:'Priest',art:'moon_priest',text:'Look at one face-down card in this location, then swap it with one of yours.',num:'C-01'},
+ c2:{faction:'choir',title:'Vesper Choir',value:3,cost:2,type:'unit',typeLabel:'Choir',art:'choir',text:'Strength +1 for each other Pale Choir card in play.',num:'C-02'},
+ c3:{faction:'choir',title:'Pale Spirit',value:2,cost:1,type:'ploy',typeLabel:'Spirit',art:'spirit',text:'Reveals as strength 0 to rivals until the clash.',num:'C-03'},
+ c4:{faction:'choir',title:'Black Eclipse',value:0,cost:3,type:'omen',art:'eclipse',text:'Cancel the effects of every card in one location.',num:'C-04'},
+ n1:{faction:'neutral',title:'Road Merchant',value:1,cost:2,type:'trade',typeLabel:'Merchant',art:'merchant',text:'Gain 2 coins when revealed.',num:'M-01'},
+ n2:{faction:'neutral',title:'Hired Spy',value:1,cost:1,type:'ploy',typeLabel:'Spy',art:'spy',text:'Look at every face-down card in one location.',num:'M-02'},
+ n3:{faction:'neutral',title:'Grey Caravan',value:2,cost:3,type:'trade',typeLabel:'Caravan',art:'caravan',text:'Gain 1 coin, 1 grain and 1 iron.',num:'M-03'}
+};
+var HAND=['g1','h2','l4','c1','n1','g3','h3'];
+var mode=(function(){var q=location.search.match(/mode=(\w+)/);if(q)return q[1];var w=innerWidth,h=innerHeight;if(Math.min(w,h)<=600)return h>w?'pp':'pl';return 'dk';})();
+document.documentElement.className=mode;document.body.className=mode==='gal'?'gal':mode;
+var DEMO={mode:mode,map:null,sel:'g1'};
+function el(t,c,p){var e=document.createElement(t);if(c)e.className=c;if(p)p.appendChild(e);return e;}
+function seed(map){
+  var L=map.locations();
+  var put=function(i,seat,o){map.setSlot(L[i].id,seat,o)};
+  put(0,0,{count:2});put(0,1,{count:1});put(0,3,{count:1});
+  put(1,2,{count:1});put(1,0,{count:1});put(2,3,{count:2});put(2,1,{count:1});put(3,2,{count:3});put(3,0,{count:1});
+  put(4,1,{count:2});put(5,2,{count:1});put(5,3,{count:1});put(6,0,{count:1});put(7,1,{count:1});put(7,2,{count:2});put(8,3,{count:1});put(9,0,{count:2});put(9,2,{count:1});
+  [[0,0],[1,4],[2,2],[3,7]].forEach(function(a){map.setHerald(a[0],L[a[1]%L.length].id)});
+  map.setInfluence(0,12,{immediate:1});map.setInfluence(1,9,{immediate:1});map.setInfluence(2,9,{immediate:1});map.setInfluence(3,17,{immediate:1});
+  map.setRound(3,8);
+}
+function revealDemo(){
+  var m=DEMO.map,loc=m.locations()[3].id;
+  m.setSlot(loc,0,{count:1});m.setSlot(loc,2,{count:3});m.setSlot(loc,1,{count:1});
+  return m.revealSlots(loc,[{seat:0,card:CARDS.g2},{seat:1,card:CARDS.h3},{seat:2,card:CARDS.l2,winner:true}]);
+}
+function openCard(k){DEMO.sel=k;var m=document.getElementById('modal');if(!m)return;m.innerHTML='';var sc=Math.min(1,(innerHeight-130)/372,(innerWidth-24)/260);m.appendChild(TBKit.card(CARDS[k],Math.round(260*sc)));var r=el('div','row',m);var b=el('button','',r);b.textContent='PLAY FACE-DOWN';var c=el('button','ghost',r);c.textContent='CLOSE';c.onclick=function(){m.classList.remove('on')};m.classList.add('on');}
+function buildPlay(){
+  var app=el('div');app.id='app';document.body.appendChild(app);
+  var portrait=mode==='pp',H=portrait?1120:1000;
+  var mb=el('div');mb.id='mapbox';app.appendChild(mb);
+  var side=el('div','side');app.appendChild(side);
+  var map=TBKit.map({container:mb,h:H,compact:mode!=='dk',players:['gilded','heath','lantern','choir'],locations:TBKit.defaultLocations(10),
+    onTap:function(id){DEMO.map.select(id);chip.textContent=(DEMO.map.locations().filter(function(l){return l.id===id})[0]||{name:'The Thornbound Throne'}).name+' - tap to inspect';}});
+  DEMO.map=map;seed(map);map.highlight([map.locations()[4].id,map.locations()[5].id,map.locations()[7].id]);
+  var bar=el('div','bar',side);var b1=el('button','ib',bar);b1.textContent='☰';b1.setAttribute('aria-label','Menu');var chip=el('div','chip',bar);chip.textContent='Your turn - place a card';var b2=el('button','ib',bar);b2.textContent='⚒';b2.setAttribute('aria-label','Clash');b2.onclick=revealDemo;
+  var strip;
+  if(mode==='pp'){
+    var n=el('div','note',side);n.textContent='Hand - tap a card to enlarge';
+    strip=el('div','strip',side);
+    var hr=el('div','strip',side);hr.style.paddingTop='0';
+    ['coin','grain','iron'].forEach(function(k){var d=el('div','',hr);d.appendChild(TBKit.token(k,{},40));});
+    var pl=el('div','',side);pl.style.cssText='padding:4px 10px;display:grid;grid-template-columns:1fr 1fr;gap:6px';
+    [['gilded','You - Gilded Court',12],['heath','Heathbound Clans',9],['lantern','Lantern Rising',9],['choir','Pale Choir',17]].forEach(function(r){var row=el('div','',pl);row.style.cssText='display:flex;align-items:center;gap:6px;background:#0006;border:1px solid #4a3420;border-radius:8px;padding:4px 6px;min-height:44px;font:700 12px/1.1 "TB Display",serif;color:#f1d98a';row.appendChild(TBKit.token('herald',{faction:r[0]},36));var t=el('div','',row);t.textContent=r[1];t.style.flex='1';row.appendChild(TBKit.token('influence',{faction:r[0],n:r[2]},34));});
+    d=el('div','',hr);d.appendChild(TBKit.token('influence',{faction:'gilded',n:12},40));d=el('div','',hr);d.appendChild(TBKit.token('first',{},40));d=el('div','',hr);d.appendChild(TBKit.token('clash',{},40));d=el('div','',hr);d.appendChild(TBKit.token('reveal',{},40));
+  }else{
+    var rail=el('div','rail',side);var big=el('div','',rail);
+    var cw=mode==='pl'?Math.min(260,Math.floor((innerHeight-44-16)/372*260)):260;
+    big.appendChild(TBKit.card(CARDS[DEMO.sel],cw));DEMO.big=big;DEMO.cw=cw;
+    strip=el('div','strip',rail);
+    if(mode==='dk'){var cb=el('div','',side);cb.id='clashbox';var pr=el('div','',cb);var tb=el('div','',side);tb.style.cssText='display:flex;gap:6px;padding:0 12px;flex-wrap:wrap';['coin','grain','iron','influence','herald','clash','reveal','tie','winner','first','round'].forEach(function(k){tb.appendChild(TBKit.token(k,{faction:'heath',n:3},44))});['gilded','heath','lantern','choir'].forEach(function(f){tb.appendChild(TBKit.token('herald',{faction:f},64))});
+      DEMO.clash=TBKit.clashPanel(cb,[{faction:'gilded',name:'Gilded Court',card:CARDS.g1,strength:5},{faction:'heath',name:'Heathbound',card:CARDS.h2,strength:4,winner:false},{faction:'lantern',name:'Lantern Rising',card:CARDS.l4,strength:6,winner:true},{faction:'choir',name:'Pale Choir',card:CARDS.c3,strength:2}],{size:110});}
+  }
+  var sz=mode==='pl'?60:60;
+  HAND.forEach(function(k){var d=el('div','',strip);d.appendChild(TBKit.card(CARDS[k],mode==='pp'?96:(mode==='dk'?80:60)));d.setAttribute('role','button');d.setAttribute('aria-label',CARDS[k].title);d.style.minWidth='60px';
+    d.onclick=function(){DEMO.sel=k;if(mode==='pp')openCard(k);else{DEMO.big.innerHTML='';DEMO.big.appendChild(TBKit.card(CARDS[k],DEMO.cw))}};});
+  var m=el('div','modal');m.id='modal';document.body.appendChild(m);m.onclick=function(e){if(e.target===m)m.classList.remove('on')};
+  var w=innerWidth,h=innerHeight;
+  if(mode==='pp'){mb.style.width=w+'px';}
+  if(mode==='pl'){mb.style.width=h+'px';mb.style.height=h+'px';}
+  if(mode==='dk'){var s=Math.min(h,w-420);mb.style.width=s+'px';}
+}
+function buildGallery(){
+  var A=function(t){var s=el('section');var h=el('h2','',s);h.textContent=t;document.body.appendChild(s);return el('div','grid',s)};
+  var g=A('Five frames, enlarged 260 x 372');['g1','h1','l1','c1','n1'].forEach(function(k){g.appendChild(TBKit.card(CARDS[k],260))});
+  g=A('Face-down backs');['gilded','heath','lantern','choir','neutral'].forEach(function(f){g.appendChild(TBKit.cardBack(f,200))});
+  g=A('Small 60 x 86 (and 90, 130)');Object.keys(CARDS).forEach(function(k){g.appendChild(TBKit.card(CARDS[k],60))});g.appendChild(TBKit.card(CARDS.g3,130));g.appendChild(TBKit.card(CARDS.c4,130));
+  g=A('More enlarged cards');['g3','g4','h3','h4','l3','l4','c2','c3','c4','n2','n3','g2'].forEach(function(k){g.appendChild(TBKit.card(CARDS[k],260))});
+  g=A('Art keys ('+TBKit.artKeys.length+')');TBKit.artKeys.forEach(function(k){var c=el('div','cell',g);c.appendChild(TBKit.art(k,null,196));var t=el('div','',c);t.textContent=k});
+  g=A('Tokens & heralds');['coin','grain','iron','influence','clash','reveal','tie','winner','first','round'].forEach(function(k){g.appendChild(TBKit.token(k,{faction:'gilded',n:7},72))});['gilded','heath','lantern','choir','neutral'].forEach(function(f){g.appendChild(TBKit.token('herald',{faction:f},110))});['gilded','heath','lantern','choir'].forEach(function(f){g.appendChild(TBKit.token('influence',{faction:f},72))});
+  g=A('Reveal / clash (after playing)');var cp=TBKit.clashPanel(g,[{faction:'gilded',name:'Gilded Court',card:CARDS.g1,strength:5},{faction:'heath',name:'Heathbound',card:CARDS.h2,strength:4},{faction:'lantern',name:'Lantern Rising',card:CARDS.l4,strength:6,winner:true},{faction:'choir',name:'Pale Choir',card:CARDS.c3,strength:2}],{size:200,run:true});DEMO.clash=cp;
+  var ms=A('Maps: 8 / 12 locations (layout hook)');[8,12].forEach(function(n){var d=el('div','',ms);d.style.width='480px';var m=TBKit.map({container:d,players:['gilded','heath','lantern','choir'],locations:TBKit.defaultLocations(n)});seed2(m)});
+}
+function seed2(m){var L=m.locations();L.forEach(function(l,i){m.setSlot(l.id,i%4,{count:1+i%3});m.setSlot(l.id,(i+1)%4,{count:1})});[0,1,2,3].forEach(function(s){m.setHerald(s,L[(s*2)%L.length].id);m.setInfluence(s,5+s*6,{immediate:1})});}
+TBKit.ready.then(function(){
+  if(mode==='gal')buildGallery();else buildPlay();
+  window.DEMO=DEMO;window.DONE=true;
+});
+</script></body></html>

@@ -1,0 +1,50 @@
+// ---------- rules (in our own words) and the list of every tile, token and scoring table ----------
+const RULES_HTML=`<div class="rules">
+<p class="lede">You are a glazier at the Sun King's summer palace. Each round you draft glazed tiles, dry them on your racks and set them into your mosaic. Points come from tiles that touch other tiles, and from finished rows, columns and glazes at the end.</p>
+<h3>What you have</h3><ul><li><b>100 tiles</b>: 20 each of Cobalt, Saffron, Garnet, Obsidian and Frost.</li><li><b>Kilns</b> (round coasters): 5 with 2 players, 7 with 3, 9 with 4. Each is loaded with 4 tiles from the clay sack at the start of a round.</li>
+<li>The <b>courtyard</b> in the middle of the kilns, where leftover tiles gather. The <b>Sun token</b> starts there each round.</li><li>Your board: 5 <b>drying racks</b> (rack 1 holds 1 tile … rack 5 holds 5), a 5×5 <b>mosaic</b>, and a <b>breakage</b> line of 7 spaces.</li></ul>
+<h3>1 · Take tiles</h3><p>On your turn take <b>every tile of one glaze</b> from either</p><ul><li><b>one kiln</b>: the other tiles on that kiln slide into the courtyard; or</li><li><b>the courtyard</b>: the first player to do this in a round also takes the Sun token and puts it on their breakage line (it costs a penalty slot, but that player starts the next round).</li></ul>
+<p>Put all the tiles on <b>one rack</b>, filling it from the right. A rack holds only one glaze. You cannot start a glaze on a rack if that mosaic row already has that glaze. Tiles that do not fit fall onto your breakage line; you may also put them there on purpose. When your breakage line is full, further tiles go to the shard box with no extra penalty. You must take something if you can: there is no passing.</p>
+<p>The round's drafting ends when every kiln and the courtyard are empty.</p>
+<h3>2 · Set the mosaic</h3><p>Work down your racks from the top. Each <b>full</b> rack sends one tile to the matching space in the same mosaic row; the rest of that rack goes to the shard box. Racks that are not full keep their tiles for the next round.</p>
+<p>A newly set tile scores at once:</p><ul><li>no neighbour above, below, left or right: <b>1 point</b>;</li><li>otherwise count the unbroken line of tiles it forms left-right (including itself), and the unbroken line up-down, and add both. A tile in both a row and a column line is counted twice.</li></ul>
+<p>Then lose points for breakage: <b>−1, −1, −2, −2, −2, −3, −3</b> for spaces 1 to 7 (the Sun token counts as a tile). A score never drops below 0. The breakage tiles go to the shard box; the Sun token goes to its holder.</p>
+<h3>3 · Next round</h3><p>The Sun token holder loads every kiln with 4 tiles from the sack. If the sack runs out, pour the whole shard box into it and carry on. If both are empty, some kilns simply stay short.</p>
+<h3>End of the game</h3><p>The game ends after the setting phase of the round in which anyone completes a <b>horizontal row</b> of 5. Then add: <b>+2</b> for each complete row, <b>+7</b> for each complete column, <b>+10</b> for each glaze with all 5 of its tiles on your mosaic. Most points wins; a tie goes to the player with more complete rows, and if that is also tied the win is shared.</p>
+<h3>Variant · Unmarked mosaic</h3><p>Everyone uses a plain grey mosaic. When a rack is full you choose any empty space in that row, but no glaze may appear twice in any row or any column. If a full rack has no legal space, all of its tiles fall to breakage.</p>
+<h3>Variant · Prism tiles (promo)</h3><p>With 2 players take out 1 tile of each glaze and add 5 prism tiles; with 3 or 4 take out 2 of each and add 10. You may take all the prisms from a kiln or the courtyard, and if you do you may also take all the tiles of one other glaze from the same place; everything goes on one rack. A rack may hold one glaze plus prisms. When a rack with a prism is full, a prism is the tile that goes to the mosaic (on that glaze's space; a rack of only prisms may go to any empty space in the row). A prism blocks that glaze in its row and counts for rows and columns, but never for the +10 full-glaze bonus.</p>
+<h3>Not included</h3><p>The Crystal Mosaic boards (C and D sides) are left out: we could not confirm where their coloured spaces sit. The Special Factories promo is left out too: its factory powers are not documented in any source we could reach.</p>
+<h3>Credits</h3>
+<section class="credits-audio">
+<h4>Audio</h4>
+<p>Used under Creative Commons Attribution:</p>
+<ul>
+<li>Music: &ldquo;Morning&rdquo; by <a href="https://incompetech.com" target="_blank" rel="noopener">Kevin MacLeod</a> (incompetech.com), source <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN2300003" target="_blank" rel="noopener">incompetech.com</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons: By Attribution 4.0</a>. Modified: cut to a 114 s seamless loop, loudness-normalised, re-encoded to MP3.<br><small>&quot;Morning&quot; Kevin MacLeod (incompetech.com) Licensed under Creative Commons: By Attribution 4.0 https://creativecommons.org/licenses/by/4.0/</small></li>
+</ul>
+<p>With thanks to these public-domain (CC0) creators:</p>
+<ul>
+<li>Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, UI Audio by <a href="https://kenney.nl" target="_blank" rel="noopener">Kenney</a> (CC0)</li>
+</ul>
+<p class="small muted">All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</p>
+</section>
+<p class="small muted">Names, card text and art are original; the rules follow the published game.</p></div>`;
+// the reference list: every tile, token and table, with counts (also dumped for the shared reference page)
+const REF=[
+  ...[0,1,2,3,4].map(k=>({s:'Tiles',n:TNAME[k],tags:['glazed tile','base game'],t:`One of the five glazes. On the printed mosaic it sits on the diagonal that starts at row 1, column ${WALLCOL(k,0)+1}. With prism tiles: 19 (2 players) or 18 (3–4 players).`,c:20})),
+  {s:'Tiles',n:'Prism tile',tags:['promo','joker'],t:'Wild tile. Take all the prisms from one place, optionally with all of one other glaze there. Joins any rack with one glaze; a prism is what goes to the mosaic from a full rack. Counts for rows and columns, never for the full-glaze bonus.',c:10,sub:['2 players: 5 in the game (1 of each glaze removed)','3–4 players: 10 in the game (2 of each glaze removed)']},
+  {s:'Components',n:'Kiln',tags:['factory display'],t:'Round coaster loaded with 4 tiles each round. 2 players use 5, 3 players use 7, 4 players use 9 (twice the players plus one).',c:9,sub:['2 players: 5 kilns, 20 tiles a round','3 players: 7 kilns, 28 tiles a round','4 players: 9 kilns, 36 tiles a round']},
+  {s:'Components',n:'Courtyard',tags:['centre'],t:'Leftover tiles from kilns gather here. You may take all of one glaze from it like from a kiln.',c:1},
+  {s:'Components',n:'Sun token',tags:['first player marker'],t:'Starts each round in the courtyard. The first player to take from the courtyard takes it onto their breakage line (it fills a penalty space) and starts the next round.',c:1},
+  {s:'Components',n:'Clay sack',tags:['bag'],t:'Holds the tiles that are drawn to load the kilns. When empty, the shard box is poured back into it.',c:1},
+  {s:'Components',n:'Shard box',tags:['box lid'],t:'Used tiles wait here: the spare tiles of set racks, breakage tiles, and tiles beyond the 7th breakage space.',c:1},
+  {s:'Components',n:'Player board',tags:['double-sided'],t:'5 drying racks (1 to 5 spaces), a 5×5 mosaic (printed or unmarked side) and a 7-space breakage line. Everyone uses the same side.',c:4},
+  {s:'Scoring',n:'Setting a tile',tags:['during play'],t:'Alone: 1 point. Otherwise: length of its unbroken left-right line (if 2 or more) plus length of its unbroken up-down line (if 2 or more).',c:null,sub:['Example: joins a line of 4 across and 3 down = 4 + 3 = 7']},
+  {s:'Scoring',n:'Breakage',tags:['penalty'],t:'Each round, lose the printed amount for every filled breakage space. A score never drops below 0.',c:null,sub:FLOOR.map((v,i)=>`space ${i+1}: ${v}`).concat(['7 spaces full: −14 in total'])},
+  {s:'Scoring',n:'End bonuses',tags:['end of game'],t:'After the last round.',c:null,sub:[`each complete row: +${BONUS.row}`,`each complete column: +${BONUS.col}`,`each glaze with all 5 tiles on the mosaic: +${BONUS.colour}`,'tie: more complete rows wins; still tied: shared win']},
+  {s:'Variants',n:'Unmarked mosaic',tags:['official variant'],t:'Grey mosaic: set each tile on any empty space of its row, never repeating a glaze in a row or column. A full rack with no legal space drops all its tiles to breakage.',c:null},
+  {s:'Variants',n:'Prism tiles',tags:['promo'],t:'Adds the wild prism tiles (see Tiles).',c:null},
+  {s:'Variants',n:'Crystal Mosaic boards',tags:['expansion','not included'],t:'Not included: the positions of its pre-coloured spaces could not be confirmed from any source we could reach.',c:null},
+  {s:'Variants',n:'Special Factories promo',tags:['promo','not included'],t:'Not included: the special factory powers are undocumented in the sources we could reach.',c:null}];
+function refHtml(){const secs=[...new Set(REF.map(e=>e.s))];return secs.map(s=>`<h3>${s}</h3><div class="cgrid">${REF.filter(e=>e.s===s).map(e=>{const k=TNAME.indexOf(e.n.replace(' tile',''));
+  return `<div class="card"><h4>${k>=0?tileChip(k)+' ':''}${esc(e.n)}${e.c?` <small>×${e.c}</small>`:''}</h4><div>${e.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join(' ')}</div><p>${esc(e.t)}</p>${e.sub&&e.sub.length?`<ul class="sub">${e.sub.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</div>`}).join('')}</div>`).join('')+
+  `<h3>Mosaic layout (printed side)</h3><div class="wallref">${[0,1,2,3,4].map(r=>`<div>${[0,1,2,3,4].map(c=>`<svg viewBox="0 0 100 100" width="26" height="26"><use href="#gz${WALLC(r,c)}"/></svg>`).join('')}</div>`).join('')}</div>`}

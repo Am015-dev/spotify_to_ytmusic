@@ -1,0 +1,73 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1>Nebula Aces</h1>
+  <button class="btn gx-tb" data-gx="d-squads" aria-expanded="false" title="Every ship's card: stats, upgrades, damage">🛩 Squads</button>
+  <button class="btn gx-tb" data-gx="d-log" aria-expanded="false" title="Battle log">📜 Log</button>
+  <button class="btn" data-a="rules">❔ Rules</button>
+  <span class="gx-sp"></span>
+  <button class="btn gx-gear" data-a="menu" aria-expanded="false" aria-controls="more" aria-label="More controls">⚙</button>
+  <div class="gx-more" id="more">
+  <button class="btn" data-a="new">✦ New</button>
+  <button class="btn" data-a="snd" id="sndbtn" aria-label="Sound">🔊</button>
+  <button class="btn" data-a="mus" id="musbtn" aria-label="Music">🎵 On</button>
+  <button class="btn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ normal</button>
+  <button class="btn" data-a="pause" id="pausebtn" title="Pause the computer (P)" aria-label="Pause the computer"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="9.4" y="2" width="3.6" height="12" rx="1" fill="currentColor"/></svg></button>
+  <button class="btn" data-a="hints" id="hintbtn" title="Suggested maneuvers">💡 On</button>
+  <button class="btn" data-a="gfx" id="gfxbtn" title="Graphics quality">Graphics</button>
+  <button type="button" class="btn" data-perfhud="show" aria-pressed="false" title="Show the frame-rate overlay (F9)">Show speed</button><button type="button" class="btn" data-perfhud="test" title="Measure each graphics level and suggest one">Test speed</button>
+  </div>
+</header>
+<div class="gx-main">
+  <main class="gx-board" id="board">
+    <div id="stage" class="stage"><canvas id="c3" aria-label="The battlefield in 3D"></canvas><div id="tags"></div>
+      <div class="viewbar"><button class="btn" data-a="top" title="Top-down or tilted view (T)" aria-label="Switch view: top-down or tilted">⬒ View</button><button class="btn lgbtn" data-a="legend" aria-label="What the tag symbols mean">ⓘ Tags</button><div class="legend" aria-label="Name tag legend"><b class="ps">8</b> skill <b class="h">◆</b> hull <b class="sh">◈</b> shields <b class="f">◉</b> focus <b class="e">✦</b> evade <b class="sx">!1</b> stress <b class="l">⌖</b> lock ▣ dial set</div></div></div>
+    <svg id="map" viewBox="0 0 914 914" role="img" aria-label="The battlefield from above"></svg>
+  </main>
+  <aside class="gx-dock" aria-label="What to do now">
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" role="button" tabindex="0" aria-label="Resize panel"></span><span class="gx-dt" id="docktitle">Nebula Aces</span><button class="gx-ibtn na-guide" data-a="guide" aria-pressed="true">📘 Guide</button><button class="gx-ibtn na-adv" data-a="advise" aria-expanded="false" title="What should I do now, and why?">🧭 Advice</button><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">⇥</button></div>
+    <div class="gx-dock-top">
+      <div id="steps" class="roadmap"></div>
+      <div id="queue" class="queue"></div>
+    </div>
+    <div class="gx-dock-body">
+      <div id="netbar" class="netbar small hidden" aria-live="polite"></div>
+      <div id="prompt" class="nowbox" aria-live="off"></div>
+      <div id="notice"></div>
+      <div id="recap"></div>
+      <div id="coach"></div>
+      <div id="shipcard"></div>
+      <div id="radio" class="small"></div>
+      <div id="lastlog" class="small muted"></div>
+    </div>
+  </aside>
+  <button class="gx-ibtn gx-reopen" data-gx="dock">☰ Panel</button>
+</div>
+</div>
+<div id="roster" class="roster"></div>
+<ol id="log"></ol>
+<div id="bbody"></div>
+<div id="live" class="sr" aria-live="polite"></div>
+<div id="modal" class="hidden"></div>
+<script src="perfhud.js"></script>
+<script src="gameaudio.js"></script>
+<script src="audio-data.js"></script>
+<script src="trystero.min.js"></script>
+<script src="netroom.js"></script>
+<script src="three.min.js"></script>
+<script src="geo.js"></script>
+<script src="data.js"></script>
+<script src="exp.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="sound.js"></script>
+<script src="three3d.js"></script>
+<script src="net.js"></script>
+<script src="shell.js"></script>
+<script src="story.js"></script>
+<script src="guide.js"></script>
+<script src="flow.js"></script>
+<script src="ui.js"></script>
+<script src="ui-ph.js"></script>
+</body>
+</html>

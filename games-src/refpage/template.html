@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Card &amp; Token Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rammetto+One&family=Chivo:wght@400;600;800&family=Chivo+Mono:wght@500&display=swap">
+<style>
+/* Layout: the rulebook appendix of the shelf — a paper index card per entry, grouped by section, with a sticky search bar */
+:root{
+  --wood:#1d1411; --wood2:#2b1d17; --paper:#f1e6d0; --paper2:#e6d7b8; --ink:#241810; --muted:#6b5238; --text:#f4ead8; --tmuted:#bca78c;
+  --accent:#e0a948; --line:#3a2718; --mark:#ffe08a;
+  --display:"Rammetto One","Arial Black",Impact,sans-serif; --body:"Chivo",system-ui,sans-serif; --mono:"Chivo Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--wood:#efe3cc;--wood2:#e4d3b4;--text:#2a1a10;--tmuted:#6d5640;--accent:#9c6412;color-scheme:light}}
+:root[data-theme="light"]{--wood:#efe3cc;--wood2:#e4d3b4;--text:#2a1a10;--tmuted:#6d5640;--accent:#9c6412;color-scheme:light}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--wood);color:var(--text);font:16px/1.5 var(--body)}
+.page{max-width:1100px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px),env(safe-area-inset-right,0px));padding-block:calc(24px + env(safe-area-inset-top,0px)) calc(48px + env(safe-area-inset-bottom,0px))}
+h1{font:400 clamp(1.7rem,4.5vw,2.6rem)/1.05 var(--display);margin:0;text-wrap:balance}
+.lede{color:var(--tmuted);max-width:62ch;margin:.5rem 0 0}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.tab{font:800 .95rem var(--body);padding:9px 14px;border-radius:4px;border:1.5px solid var(--tmuted);background:transparent;color:var(--text);cursor:pointer}
+.tab small{display:block;font:500 .66rem var(--mono);color:var(--tmuted);letter-spacing:.04em;text-transform:uppercase}
+.tab[aria-selected="true"]{background:var(--text);color:var(--wood);border-color:var(--text)}
+.tab[aria-selected="true"] small{color:var(--wood);opacity:.75}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:3;background:var(--wood);padding-block:12px;margin-top:6px;display:grid;gap:10px;border-bottom:1px solid color-mix(in srgb,var(--tmuted) 35%,transparent)}
+.search{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.search input{flex:1 1 240px;min-width:0;font:inherit;padding:10px 12px;border-radius:4px;border:1.5px solid var(--tmuted);background:var(--paper);color:var(--ink)}
+.count{font:500 .8rem var(--mono);color:var(--tmuted);white-space:nowrap}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.chip{font:600 .8rem var(--body);white-space:nowrap;padding:5px 10px;border-radius:99px;border:1.5px solid var(--tmuted);background:transparent;color:var(--text);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#241810}
+.chip b{font:500 .72rem var(--mono);opacity:.8;margin-left:4px}
+.tab:focus-visible,.chip:focus-visible,.search input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+section{margin-top:26px}
+section h2{font:400 1.25rem var(--display);margin:0 0 10px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+section h2 span{font:500 .78rem var(--mono);color:var(--tmuted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:10px}
+.card{background:var(--paper);color:var(--ink);border-radius:4px;border:1px solid color-mix(in srgb,var(--tmuted) 45%,transparent);padding:12px 14px;display:grid;gap:6px;align-content:start;min-width:0;box-shadow:0 1px 0 rgba(0,0,0,.25)}
+.card h3{margin:0;font:800 1.02rem/1.25 var(--body)}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tags span{font:600 .72rem var(--body);padding:1px 7px;border-radius:99px;background:var(--paper2);color:var(--ink)}
+.tags span:first-child{background:var(--ink);color:var(--paper)}
+.card p{margin:0;font-size:.92rem;line-height:1.45}
+.card dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:.86rem}
+.card dt{font:500 .72rem var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding-top:2px}
+.card dd{margin:0}
+mark{background:var(--mark);color:var(--ink);border-radius:2px}
+.empty{color:var(--tmuted);padding:30px 0;text-align:center}
+footer{margin-top:34px;color:var(--tmuted);font-size:.85rem;max-width:70ch}
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Card &amp; Token Reference</h1>
+  <p class="lede">Every card, tile, die face and token in the three games on the shelf, taken straight from the games' own card tables. Pick a game, then search or jump to a section.</p>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div class="bar">
+    <div class="search"><input id="q" type="search" placeholder="Search names and rules text…" aria-label="Search cards" autocomplete="off"><span class="count" id="count"></span></div>
+    <div class="chips" id="chips" aria-label="Sections"></div>
+  </div>
+  <div id="list"></div>
+  <footer>Names, card text and art are original to these games; the numbers and effects follow the real games. Counts: “×3” means three copies in the deck.</footer>
+</div>
+<script>
+const DATA=/*DATA*/null;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const S={g:'crown',sec:null,q:''};
+try{const h=location.hash.slice(1);if(DATA.G.some(g=>g[0]===h))S.g=h}catch(e){}
+function hl(t){const s=esc(t);if(!S.q)return s;const q=S.q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');return s.replace(new RegExp('('+esc(q)+')','ig'),'<mark>$1</mark>')}
+function matches(e){if(S.sec&&e.s!==S.sec)return false;if(!S.q)return true;const q=S.q.toLowerCase();return (e.n+' '+e.t+' '+e.tags.join(' ')+' '+e.sub.map(x=>x.join(' ')).join(' ')).toLowerCase().includes(q)}
+function render(){
+  document.getElementById('tabs').innerHTML=DATA.G.map(([k,n,d])=>`<button class="tab" role="tab" id="tab-${k}" aria-selected="${S.g===k}" data-g="${k}">${esc(n)}<small>${esc(d)}</small></button>`).join('');
+  const all=DATA.E.filter(e=>e.g===S.g);const secs=[...new Set(all.map(e=>e.s))];
+  document.getElementById('chips').innerHTML=`<button class="chip" id="chip-all" aria-pressed="${!S.sec}" data-s="">All<b>${all.length}</b></button>`+secs.map((s,i)=>`<button class="chip" id="chip-${i}" aria-pressed="${S.sec===s}" data-s="${esc(s)}">${esc(s)}<b>${all.filter(e=>e.s===s).length}</b></button>`).join('');
+  const shown=all.filter(matches);document.getElementById('count').textContent=`${shown.length} of ${all.length}`;
+  const html=secs.map(s=>{const es=shown.filter(e=>e.s===s);if(!es.length)return '';
+    return `<section><h2>${esc(s)} <span>${es.length}</span></h2><div class="grid">${es.map(e=>`<article class="card"><h3>${hl(e.n)}</h3>${e.tags.length?`<div class="tags">${e.tags.map(t=>`<span>${hl(t)}</span>`).join('')}</div>`:''}${e.t?`<p>${hl(e.t)}</p>`:''}${e.sub.length?`<dl>${e.sub.map(([a,b])=>`<dt>${esc(a)}</dt><dd>${hl(b)}</dd>`).join('')}</dl>`:''}</article>`).join('')}</div></section>`}).join('');
+  document.getElementById('list').innerHTML=html||`<p class="empty">Nothing matches “${esc(S.q)}”. Try fewer letters, or pick “All”.</p>`}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-g],[data-s]');if(!t)return;
+  if(t.dataset.g){S.g=t.dataset.g;S.sec=null;try{history.replaceState(null,'','#'+S.g)}catch(x){}render();window.scrollTo(0,0);return}
+  S.sec=t.dataset.s||null;render()});
+document.getElementById('q').addEventListener('input',e=>{S.q=e.target.value.trim();render()});
+render();
+</script>
+</body>
+</html>

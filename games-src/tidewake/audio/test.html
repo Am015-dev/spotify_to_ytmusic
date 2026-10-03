@@ -1,0 +1,17 @@
+<!doctype html><meta charset="utf-8"><title>Tidewake audio test</title>
+<body style="font:14px sans-serif"><h3>Tidewake audio: decode and play check</h3><button id="go">Decode all</button><pre id="out"></pre>
+<script src="../gameaudio.js"></script><script src="audio-data.js"></script>
+<script>
+const EVENTS=["sea_loop","tile_place","tile_rotate","ship_glide","ship_creak","wake_swish","crash","splash","ship_sink","leviathan_spawn","leviathan_roar","tile_destroyed","cannon","dice_roll","rift_gate","rogue_wave","maelstrom","win","lose","click","hover","open","close","confirm","error","turn"];
+window.RESULT=null;
+async function run(){
+  const AC=window.AudioContext||window.webkitAudioContext, ctx=new AC(), res={ok:[],bad:[],music:{}};
+  for(const k of EVENTS){ try{ if(!GA_DATA.sfx[k]) throw 'missing'; const b=await ctx.decodeAudioData(Uint8Array.from(atob(GA_DATA.sfx[k]),c=>c.charCodeAt(0)).buffer); (b.duration>0.03?res.ok:res.bad).push(k+' '+b.duration.toFixed(2)+'s'); }catch(e){res.bad.push(k+' '+e);} }
+  for(const k of ['calm','tension']){ try{ const b=await ctx.decodeAudioData(Uint8Array.from(atob(GA_DATA.music[k]),c=>c.charCodeAt(0)).buffer); res.music[k]=b.duration.toFixed(1)+'s'; }catch(e){res.bad.push('music '+k+' '+e);} }
+  GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'tw',ctx:()=>ctx}); GA.unlock&&GA.unlock();
+  await new Promise(r=>setTimeout(r,1500)); res.has=EVENTS.filter(k=>GA.has(k)).length; res.played=EVENTS.filter(k=>GA.play(k)).length;
+  const m=GA.music('calm'); res.extra=Object.keys(GA_DATA.sfx).filter(k=>!EVENTS.includes(k));
+  document.getElementById('out').textContent=JSON.stringify(res,null,1); window.RESULT=res; return res;
+}
+document.getElementById('go').onclick=run;
+</script>

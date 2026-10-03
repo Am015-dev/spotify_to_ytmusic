@@ -1,0 +1,13 @@
+const PW = require(require('child_process').execSync('npm root -g').toString().trim() + '/playwright');
+const fs = require('fs'), path = require('path'); const HERE = __dirname, OUT = path.resolve(process.argv[2]); fs.mkdirSync(OUT, { recursive: true });
+const html = fs.readFileSync(path.join(HERE, 'demo.html')), fcss = fs.readFileSync(path.join(HERE, 'fontcache', 'fonts.css'));
+(async () => { const br = await PW.chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
+ const ctx = await br.newContext({ viewport: { width: 1366, height: 768 } });
+ await ctx.route('**/*', r => { const u = new URL(r.request().url()); if (u.host === 'gns.test') return r.fulfill({ status: 200, contentType: 'text/html', body: html }); if (u.host === 'fonts.googleapis.com') return r.fulfill({ status: 200, contentType: 'text/css', body: fcss }); if (u.host === 'fonts.gstatic.com') { const f = path.join(HERE, 'fontcache', path.basename(u.pathname)); if (fs.existsSync(f)) return r.fulfill({ status: 200, contentType: 'font/woff2', body: fs.readFileSync(f) }); } return r.abort(); });
+ const pg = await ctx.newPage(); pg.setDefaultTimeout(150000); const errs = []; pg.on('pageerror', e => errs.push(String(e)));
+ await pg.goto('https://gns.test/?static&noqbar&gfx=' + (process.argv[3] || 'high')); await pg.waitForFunction(() => window.DEMO_READY === true);
+ await pg.evaluate(() => { SFKit.setSpeed(1000); DEMO.extras(); SFKit.highlight([]); }); await pg.waitForTimeout(1500); await pg.evaluate(() => SFKit.setSpeed(1)); await pg.waitForTimeout(2500);
+ await pg.screenshot({ path: path.join(OUT, 'extras.png') });
+ await pg.evaluate(() => { SFKit.setSpeed(1000); SFKit.focus({ x: 2.4, y: .3, z: -2.2 }, 2.4); }); await pg.waitForTimeout(800); await pg.evaluate(() => SFKit.setSpeed(1)); await pg.waitForTimeout(2500); await pg.screenshot({ path: path.join(OUT, 'extras-board.png') });
+ await pg.evaluate(() => { SFKit.setSpeed(1000); SFKit.focus({ kind: 'stand', seat: 0 }, 2.3); }); await pg.waitForTimeout(800); await pg.evaluate(() => SFKit.setSpeed(1)); await pg.waitForTimeout(2500); await pg.screenshot({ path: path.join(OUT, 'extras-stand.png') });
+ console.log('errors', errs); await br.close(); })();
