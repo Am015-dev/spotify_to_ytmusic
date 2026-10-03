@@ -63,6 +63,7 @@ function renderTable() {
   }
   let same = tbl.children.length === els.length; if (same) for (let i = 0; i < els.length; i++) if (tbl.children[i] !== els[i]) { same = false; break; }
   if (!same) tbl.replaceChildren(...els);
+  if (UI.land && PX.on) for (const k of UI.land) PX.landSet.add(k);
   UI.land = null;
   if (!tbl.__ap) { tbl.__ap = 1; try { KIT.applyTable($('#bd'), 'day'); } catch (e) { } }
 }

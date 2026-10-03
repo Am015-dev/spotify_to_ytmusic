@@ -92,7 +92,8 @@ const RUNS = ONLY >= 0 ? [RUNS0[ONLY]] : RUNS0;
       turns++;
     }
     if (!R.dom && turns && flights < turns) fail('serve flights ' + flights + ' for ' + turns + ' served turns');
-    const nl = await p.evaluate(() => PX.on ? PX.state().nLand : 0); if (!R.dom && turns > 1 && nl < turns) fail('landing flights ' + nl + ' for ' + turns + ' turns');
+    // every completed table turn lands one plate (or two with Twin Sticks) per diner from the reveal slots
+    if (!R.dom) { await settle('end'); const ln = await p.evaluate(t0 => ({ nl: PX.state().nLand, done: (G.round - 1) * G.hand + G.turn - 1 - t0, np: G.np }), 0); if (ln.nl < ln.done * ln.np) fail('landing flights ' + ln.nl + ' for ' + ln.done + ' table turns x ' + ln.np + ' diners'); }
     if (turns < Math.min(3, R.turns)) fail('too few turns', turns);
     if (!R.dom && last) {
       if (R.gfx === 'low' && (last.blur || maxParts)) fail('Low must have no blur filters and no particles', JSON.stringify({ blur: last.blur, maxParts }));

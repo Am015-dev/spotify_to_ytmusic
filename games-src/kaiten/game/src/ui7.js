@@ -4,7 +4,7 @@
 // after every render() and moves painted sprites there: cards ease to their new places (FLIP-style re-flow), served cards fly to the seat,
 // plates land on the counters with a squash, hands slide along the belt, steam / flames / sparkles and a burst when a plate scores.
 // Nothing here changes the game state; it only follows the DOM (so hidden hands stay hidden: a sprite only shows what its button shows).
-const PX = { on: false, app: null, q: 'high', res: 1, kind: '', B: null, cv: null, L: {}, objs: new Map(), tweens: [], parts: [], tex: {}, img: {}, faceP: {}, hw: 0, dirty: true, t: 0, last: 0, beltX: 0, seats: new Map(), err: '', ready: false, raf: 0, landQ: [] };
+const PX = { on: false, app: null, q: 'high', res: 1, kind: '', B: null, cv: null, L: {}, objs: new Map(), tweens: [], parts: [], tex: {}, img: {}, faceP: {}, hw: 0, dirty: true, t: 0, last: 0, beltX: 0, seats: new Map(), err: '', ready: false, raf: 0, landSet: new Set() };
 const PXQ = { high: { pr: 2, fx: 1, blur: true, parts: 1, belt: 1 }, medium: { pr: 1.5, fx: .55, blur: false, parts: .5, belt: 1 }, low: { pr: 1, fx: 0, blur: false, parts: 0, belt: 0 } };
 const pxRM = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
 function gfxAuto() {
@@ -145,13 +145,13 @@ function pxSync() {
     seen.add(key);
     let o = PX.objs.get(key), fresh = false;
     if (!o) { o = pxPlateObj(key, s); fresh = true; }
-    const landing = g.classList.contains('land') && !o.landedSig;
+    const landing = PX.landSet.has(s + '|' + k); if (landing) PX.landSet.delete(s + '|' + k);
     o.seat = s; o.type = type; o.on = on; o.layers = layers; o.dim = dim; o.pulse = g.classList.contains('waitf'); o.tw = R.w ? R.h : o.tw; o.tx = R.x; o.ty = R.y; o.d = R.h; o.vis = so ? pxVisIn(R, so.ctr) : 1; o.k = k;
     if (o.pts == null) o.pts = pts;
     if (landing && ANIM && so && so.slot) {   // the plate lands from this seat's reveal slot
-      o.landedSig = 1; const from = so.slot, gain = pts - (o.pts || 0);
+      const from = so.slot, gain = pts - (o.pts || 0);
       pxFlyPlate(o, from, fresh, gain);
-    } else if (!g.classList.contains('land')) o.landedSig = 0;
+    }
     o.pts = pts;
     if (fresh && !landing) { o.x = o.tx; o.y = o.ty; o.w = o.d; if (ANIM && !ent && G.phase === 'pick') { o.s = .6; o.a = 0; } }
     pxPlateTex(o);
@@ -183,6 +183,7 @@ function pxSync() {
     if (o.kind === 'plate') pxTween(o, { a: 0, s: .5 }, 260, 'in', () => pxKill(o));
     else pxTween(o, { a: 0, s: .7, y: o.y + 20 }, 220, 'in', () => pxKill(o));
   }
+  PX.landSet.clear();
   if (PX.beltR) { PX.handMask.clear(); PX.handMask.rect(PX.beltR.x, PX.beltR.y - 40, PX.beltR.w, PX.beltR.h + 44).fill(0xffffff); }
   PX.dirty = true;
 }
