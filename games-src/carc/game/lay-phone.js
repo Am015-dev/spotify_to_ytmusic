@@ -40,7 +40,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'');const ctx=await 
   if(BEFORE){const bm=await boardM('BEFORE');await shot('2play');await ctx.close();continue}
   if(!phOn)prob('html.ph not set');
   const nc=await cards();log('coach cards dismissed',nc);
-  await p.waitForTimeout(600);await scroll('place');const bm=await boardM('first turn');if(bm.ratio<.85)prob('board ratio',bm.ratio);await cellsOK('first');await targets('strip');await fontsOK('strip');await shot('2place');
+  await p.waitForTimeout(600);await scroll('place');const bm=await boardM('first turn');if(bm.ratio<FIT.share(W,H))prob('board ratio',bm.ratio);await cellsOK('first');await targets('strip');await fontsOK('strip');await shot('2place');
   if(bm.m.tile<44)prob('tile px at default zoom',bm.m.tile);
   // 1. a full human turn by touch only
   let turns=0,ghostShot=false,figShot=false,infoDone=false,menuDone=false,rotDone=false,spotsDone=false,scoreCards=0,placedByMe=0;

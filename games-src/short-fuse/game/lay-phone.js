@@ -64,7 +64,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
   await camDone();
   await scroll('turn');const m0=await metersFor('metrics');
   const need=FIT.share(W,H)*m0.short;if(m0.board[2]<need-1||m0.board[3]<need-1)prob('board smaller than 0.85 of the short side',JSON.stringify(m0.board),need);
-  const ringDim=m0.W>m0.H?m0.ring[1]:m0.ring[0],needB=FIT.share(W,H)*Math.min(m0.board[2],m0.board[3]);if(ringDim<needB)prob('rack ring',m0.ring,(m0.W>m0.H?'height':'width'),'< 0.85 x the board short side',needB);
+  const ringDim=m0.W>m0.H?m0.ring[1]:m0.ring[0],needB=.85*Math.min(m0.board[2],m0.board[3]);if(ringDim<needB)prob('rack ring',m0.ring,(m0.W>m0.H?'height':'width'),'< 0.85 x the board short side',needB);
   await shot('2turn');await targets('turn');
   // board points inside the board and hit-testing to the canvas
   const whole=async tag=>{const r=await p.evaluate(()=>{const R=document.querySelector('.gx-board').getBoundingClientRect();const cv=document.querySelector('#c3');const out=[],cov={};let n=0;for(let si=0;si<G.st.length;si++){if(ownerOf(si)===UI.V.seat)continue;for(let k=0;k<G.st[si].w.length;k++){if(G.st[si].w[k].cut)continue;const P=window.__wire(si,k);if(!P)continue;n++;if(!(P[0]>=R.left&&P[0]<=R.right&&P[1]>=R.top&&P[1]<=R.bottom)){out.push(si+':'+k+':'+Math.round(P[0])+','+Math.round(P[1]));continue}const e=document.elementFromPoint(P[0],P[1]);if(!(e===cv||cv.contains(e)||(e&&e.closest('.sfk-ov,#zb')))){const kk=e?(e.id||String(e.className)||e.tagName):'none';cov[kk]=(cov[kk]||0)+1}}}return {n,out:out.slice(0,5),outN:out.length,cov}});
