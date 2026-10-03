@@ -1,4 +1,11 @@
 <title>Game Night Shelf</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1d1411">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Game Night">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rammetto+One&family=Chivo:wght@400;600;800&family=Chivo+Mono:wght@500&display=swap">
 <style>
@@ -58,6 +65,18 @@ footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
 #table .bar button,#table .bar a{font:700 .85rem var(--body);background:transparent;color:var(--ink);border:1.5px solid var(--line);border-radius:4px;padding:6px 12px;cursor:pointer;text-decoration:none}
 #table .bar button:hover,#table .bar a:hover{border-color:var(--brass)}
 #table iframe{width:100%;height:100%;border:0;background:#0b0a1a;display:block}
+/* phones: the game gets the whole screen; the bar shrinks to one floating, draggable button */
+html.ph #table{grid-template-rows:1fr;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);height:100dvh;inset:0 auto auto 0;width:100vw}
+html.ph #table .bar{display:none}
+#fab{display:none}
+html.ph #fab{display:grid;place-items:center;position:fixed;z-index:12;width:44px;height:44px;border-radius:50%;border:1.5px solid rgba(255,255,255,.35);background:rgba(20,12,8,.72);color:#f4ead8;font:800 1.15rem var(--body);box-shadow:0 4px 14px rgba(0,0,0,.45);touch-action:none;transition:opacity .3s;opacity:.9;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+html.ph #fab.dim{opacity:.4}
+#fabmenu{position:fixed;z-index:13;display:grid;gap:6px;padding:8px;border-radius:10px;background:var(--wood);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.6);min-width:210px}
+#fabmenu button,#fabmenu a{font:700 .95rem var(--body);color:var(--ink);background:transparent;border:1.5px solid var(--line);border-radius:6px;min-height:44px;padding:0 14px;text-align:left;text-decoration:none;display:flex;align-items:center;cursor:pointer}
+#fabmenu .t{font:400 .9rem var(--display);padding:4px 6px 2px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:240px}
+#iostip{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:9;display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:10px;background:var(--paper);color:#241810;box-shadow:0 10px 30px var(--shadow);font:600 .92rem/1.4 var(--body)}
+#iostip p{margin:0;flex:1}
+#iostip button{font:800 .9rem var(--body);border:0;border-radius:6px;background:#241810;color:#f6ecd9;min-height:44px;padding:0 14px;cursor:pointer}
 #table.opening{animation:open .35s ease-out}
 @keyframes open{from{clip-path:inset(40% 30% 40% 30% round 12px);opacity:.4}to{clip-path:inset(0 0 0 0);opacity:1}}
 @media (prefers-reduced-motion:reduce){.box,.box:hover{transition:none;transform:none}#table.opening{animation:none}}
@@ -92,6 +111,9 @@ footer{margin-top:26px;color:var(--muted);font-size:.85rem;max-width:70ch}
   </div>
   <iframe id="frame" title="Game" allow="fullscreen; autoplay"></iframe>
 </div>
+<button type="button" id="fab" aria-label="Game menu: back to the shelf" hidden>←</button>
+<div id="fabmenu" role="menu" hidden><div class="t" id="fabname"></div><button type="button" id="fabback" role="menuitem">← Back to the shelf</button><button type="button" id="fabfull" role="menuitem">⛶ Full screen</button><a id="fabsolo" role="menuitem" href="#" target="_blank" rel="noopener">Open on its own</a></div>
+<div id="iostip" hidden><p>For a full-screen shelf on iPhone: tap <b>Share</b> <span aria-hidden="true">⬆︎</span>, then <b>Add to Home Screen</b>, and open it from there.</p><button type="button" id="iosok">Got it</button></div>
 
 <script>
 const GAMES=[
@@ -279,11 +301,42 @@ for(const g of GAMES){const el=document.createElement('article');el.className='b
 
 const table=document.getElementById('table'),frame=document.getElementById('frame');
 function openGame(g){if(g.id!=='ref')store.set('shelf_last',g.id);document.getElementById('tname').textContent=g.name;document.getElementById('solo').href=g.src;
-  frame.title=g.name;frame.src=g.src;table.hidden=false;table.classList.remove('opening');void table.offsetWidth;table.classList.add('opening');document.body.style.overflow='hidden';
+  frame.title=g.name;frame.src=g.src;table.hidden=false;if(PH){document.getElementById('fabname').textContent=g.name;document.getElementById('fabsolo').href=g.src;showFab(true);goFull()}table.classList.remove('opening');void table.offsetWidth;table.classList.add('opening');document.body.style.overflow='hidden';
   try{history.replaceState(null,'','#'+g.id)}catch(e){}frame.focus()}
-function closeGame(){table.hidden=true;frame.src='about:blank';document.body.style.overflow='';try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+function closeGame(){table.hidden=true;if(typeof showFab==='function'){showFab(false);leaveFull()}frame.src='about:blank';document.body.style.overflow='';try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
   document.querySelector('.last')?.remove();const id=store.get('shelf_last');const b=document.getElementById('play-'+id);if(b){b.parentNode.insertAdjacentHTML('beforeend','<span class="last">Played last</span>');b.focus()}}
 document.getElementById('back').onclick=closeGame;
+/* phones: same rule as the games (short side <= 500, or <= 600 on touch); ?phone=1/0 overrides */
+const PH=(()=>{const q=new URLSearchParams(location.search).get('phone');if(q==='1')return true;if(q==='0')return false;const sh=Math.min(innerWidth,innerHeight);return sh<=500||(sh<=600&&matchMedia('(pointer:coarse)').matches)})();
+document.documentElement.classList.toggle('ph',PH);
+const fab=document.getElementById('fab'),fabmenu=document.getElementById('fabmenu');
+const canFull=!!(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen)&&!/iPhone|iPod/.test(navigator.userAgent);
+const standalone=matchMedia('(display-mode: standalone),(display-mode: fullscreen)').matches||navigator.standalone===true;
+function goFull(){if(!canFull||standalone||document.fullscreenElement)return;const el=document.documentElement;try{const r=(el.requestFullscreen||el.webkitRequestFullscreen).call(el,{navigationUI:'hide'});if(r&&r.catch)r.catch(()=>{})}catch(e){}}
+function leaveFull(){try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{})}catch(e){}}
+document.getElementById('fabfull').hidden=!canFull||standalone;
+let dimT;function wake(){fab.classList.remove('dim');clearTimeout(dimT);dimT=setTimeout(()=>fab.classList.add('dim'),2500)}
+function placeFab(c){const m=8,W=innerWidth,H=innerHeight;const x=c.x==='r'?W-44-m:m,y=c.y==='b'?H-44-m-24:m+6;fab.style.left=x+'px';fab.style.top=`calc(${y}px + env(safe-area-inset-top,0px))`}
+let corner;try{corner=JSON.parse(store.get('shelf_fab'))}catch(e){}if(!corner||!corner.x)corner={x:'l',y:'t'};
+function showFab(on){fab.hidden=!PH||!on;fabmenu.hidden=true;if(on&&PH){placeFab(corner);wake()}}
+let drag=null;
+fab.addEventListener('pointerdown',e=>{drag={sx:e.clientX,sy:e.clientY,moved:false};fab.setPointerCapture(e.pointerId);wake()});
+fab.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.sx,dy=e.clientY-drag.sy;if(!drag.moved&&Math.hypot(dx,dy)<10)return;drag.moved=true;fab.style.left=(e.clientX-22)+'px';fab.style.top=(e.clientY-22)+'px'});
+fab.addEventListener('pointerup',e=>{if(!drag)return;const moved=drag.moved;drag=null;
+  if(moved){corner={x:e.clientX>innerWidth/2?'r':'l',y:e.clientY>innerHeight/2?'b':'t'};store.set('shelf_fab',JSON.stringify(corner));placeFab(corner);wake();return}
+  toggleMenu()});
+fab.addEventListener('pointercancel',()=>{drag=null;placeFab(corner)});
+fab.addEventListener('click',e=>{if(e.detail===0)toggleMenu()}); /* keyboard */
+function toggleMenu(){if(!fabmenu.hidden){fabmenu.hidden=true;return}fabmenu.hidden=false;const r=fab.getBoundingClientRect(),mw=fabmenu.offsetWidth,mh=fabmenu.offsetHeight;
+  fabmenu.style.left=Math.max(8,Math.min(innerWidth-mw-8,r.left))+'px';fabmenu.style.top=(r.top+mh+52<innerHeight?r.bottom+6:r.top-mh-6)+'px';document.getElementById('fabback').focus()}
+document.getElementById('fabback').onclick=()=>closeGame();
+document.getElementById('fabfull').onclick=()=>{fabmenu.hidden=true;goFull()};
+document.getElementById('fabsolo').onclick=()=>{fabmenu.hidden=true};
+document.addEventListener('pointerdown',e=>{if(!fabmenu.hidden&&!fabmenu.contains(e.target)&&e.target!==fab)fabmenu.hidden=true},true);
+addEventListener('resize',()=>{if(!fab.hidden)placeFab(corner)});
+/* iPhone: browsers can't go full screen, so suggest the home-screen app once */
+if(PH&&/iPhone|iPod/.test(navigator.userAgent)&&!standalone&&!store.get('shelf_iostip')){const t=document.getElementById('iostip');t.hidden=false;document.getElementById('iosok').onclick=()=>{t.hidden=true;store.set('shelf_iostip','1')}}
+
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ref]');if(!b)return;openGame({id:'ref',name:'Card & token reference',src:'reference.html'+(b.dataset.ref?'#'+b.dataset.ref:'')})});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!table.hidden)closeGame()});
 const start=GAMES.find(g=>'#'+g.id===location.hash);if(start)openGame(start);
