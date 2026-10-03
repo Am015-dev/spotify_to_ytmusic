@@ -16,7 +16,7 @@ SKIP = {"mainhattan-nightrun", "mainhattan-overdrive"}
 
 def pages(args):
     if args:
-        return [pathlib.Path(a) for a in args]
+        return [pathlib.Path(a).resolve() for a in args]
     return [p for p in sorted(ROOT.glob("*/index.html")) if p.parent.name not in SKIP] + \
            [ROOT / "index.html", ROOT / "reference.html"]
 
