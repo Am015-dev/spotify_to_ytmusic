@@ -1,3 +1,4 @@
+require('../../phfit.js').guard(2);
 // Phone layout + touch-only play check. node lay-phone.js [WxH,...]   prints "FAIL <size> <check>" lines, then PROBLEMS n
 const PW=require(process.env.PW||(require('child_process').execSync('npm root -g').toString().trim()+'/playwright'));
 const fs=require('fs'),path=require('path');const HERE=__dirname,OUT=path.join(HERE,'shots','ph');fs.mkdirSync(OUT,{recursive:true});

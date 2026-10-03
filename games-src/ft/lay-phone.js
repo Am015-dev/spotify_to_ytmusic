@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require('../phfit.js').guard(null);
 // Phone layout test for Sands of Qamar. Usage: ONLY=390x844 node lay-phone.js [sands.html] [outdir]
 // Real WebGL (SwiftShader), isMobile + hasTouch; every action is a touch tap at an element/tile centre after an elementFromPoint hit-test.
 // Checks: no page scroll (also with drawers open), bazaar >= 0.85 x short side, every tile + meeple stack inside the board and hit-testing to the canvas

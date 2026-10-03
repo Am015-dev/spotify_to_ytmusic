@@ -1,3 +1,4 @@
+require('../phfit.js').guard(2);
 // Phone layout check for Shipwreck Isle (real WebGL via SwiftShader, isMobile+hasTouch). node lay-phone.js [WxH,...] [--safe=t,r,b,l]
 const PW=require(process.env.PW||'/opt/node22/lib/node_modules/playwright');const fs=require('fs'),path=require('path');
 const HERE=__dirname;fs.mkdirSync(path.join(HERE,'shots','ph'),{recursive:true});const html=fs.readFileSync(path.join(HERE,'shipwreck.html'));

@@ -1,3 +1,4 @@
+require('../../phfit.js').guard(2);
 // Phone layout check (real WebGL via SwiftShader, isMobile + hasTouch). node lay-phone.js [WxH,...] [--before] [--2d] [--safe=t,r,b,l] [--hot]
 // Plays a real human turn ONLY by touch: tap a crewmate's wire on the table -> zoom + "Call a value" pop-up -> value -> Snip -> result card -> Continue.
 // --before = same build with ?phone=0 (the old layout): only measures the board.

@@ -80,3 +80,24 @@ exports.extraSRC=`(()=>{const out=[];const VW=innerWidth,VH=innerHeight;
   const e=document.elementFromPoint(x,y);const TL='#pzoom,#modal,.gx-drawer,#ppop,#pc';if(e&&e.closest(TL)!==h.closest(TL))continue;if(e&&!(h===e||h.contains(e)||e.contains(h)))out.push('HEADING COVERED by '+(e.id||e.className||e.tagName)+': "'+h.textContent.trim().slice(0,30)+'"')}
  return out})()`;
 exports.extra=async(page)=>{try{return await page.evaluate(exports.extraSRC)}catch(e){return []}};
+// guard(idx): make a multi-size lay-phone run robust. Parent re-spawns itself once per size (PHCHILD=1), a crash/timeout of one size is
+// reported as FAIL and the run continues; always prints a final "PROBLEMS N". idx = argv index holding the size list (omit: SIZES env).
+exports.guard=(idx)=>{
+  const cp=require('child_process');
+  const get=()=>idx==null?(process.env.SIZES||''):(process.argv[idx]||'');
+  if(process.env.PHCHILD){
+    const die=e=>{console.log('FAIL crash: '+String(e&&e.stack||e).split('\n').slice(0,2).join(' | ').slice(0,300));process.exit(3)};
+    process.on('uncaughtException',die);process.on('unhandledRejection',die);return}
+  const sizes=get().split(',').filter(Boolean);if(!sizes.length)return;   // default sizes: run unguarded
+  let total=0;
+  for(const sz of sizes){
+    const args=process.argv.slice(1);const env=Object.assign({},process.env,{PHCHILD:'1'});
+    if(idx==null)env.SIZES=sz;else args[idx-1]=sz;
+    const r=cp.spawnSync(process.execPath,args,{env,encoding:'utf8',timeout:+(process.env.PHTIMEOUT||1500000),maxBuffer:1<<28});
+    const out=(r.stdout||'')+(r.stderr?'':'');process.stdout.write(out);
+    const lines=out.split('\n').filter(l=>!/dbus|pid=/.test(l));
+    const m=[...out.matchAll(/PROBLEMS:? (\d+)/g)];let n;
+    if(m.length)n=m.reduce((a,x)=>a+ +x[1],0);else n=lines.filter(l=>/FAIL |PROBLEM |FATAL/.test(l)).length;
+    if(r.status!==0&&!m.length||r.error){n+=1;console.log(sz+' FAIL crashed or timed out (status '+r.status+(r.error?', '+r.error.code:'')+') '+((r.stderr||'').split('\n').filter(l=>l&&!/dbus|pid=/.test(l)).slice(0,2).join(' | ').slice(0,200)))}
+    console.log('SIZE '+sz+' problems '+n);total+=n}
+  console.log('PROBLEMS '+total);process.exit(total?1:0)};

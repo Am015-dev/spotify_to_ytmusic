@@ -1,3 +1,4 @@
+require('../phfit.js').guard(null);
 // Phone layout test for Doorkick Dungeon (Playwright, plain Chromium, isMobile + hasTouch).
 // Usage: PW=/opt/node22/lib/node_modules/playwright node lay-phone.js [W H] [query]   (no W H = all four phone sizes)
 // A full human turn is played ONLY by touch taps (page.touchscreen.tap at element centres, after an elementFromPoint hit test).

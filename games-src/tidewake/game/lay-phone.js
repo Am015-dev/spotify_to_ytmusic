@@ -1,3 +1,4 @@
+require('../../phfit.js').guard(2);
 // Phone layout check (real WebGL via SwiftShader, isMobile + hasTouch). node lay-phone.js [WxH,...] [--before] [--2d] [--safe=t,r,b,l]
 // --before = same build with ?phone=0 (the old layout) to measure the board only.
 const PW=require((process.env.PW||require('child_process').execSync('npm root -g').toString().trim()+'/playwright'));

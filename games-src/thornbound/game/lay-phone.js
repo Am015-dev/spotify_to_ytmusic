@@ -1,3 +1,4 @@
+require('../../phfit.js').guard(2);
 // Phone layout check. node lay-phone.js [WxH,...]  (touch only: a full human round through taps)
 const PW=require(require('child_process').execSync('npm root -g').toString().trim()+'/playwright');
 const fs=require('fs'),path=require('path');const OUT=path.join(__dirname,'shots','ph');fs.mkdirSync(OUT,{recursive:true});

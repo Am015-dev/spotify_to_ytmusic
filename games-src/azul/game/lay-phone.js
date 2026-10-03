@@ -1,3 +1,4 @@
+require('../../phfit.js').guard(4);
 // phone layout test (touch only, real WebGL): node lay-phone.js '{"np":3,"ex":{"gray":true}}' TAG [sizes] [file]
 // no scroll, ring >= 0.85 of the short side, board targets hit-test to the canvas with every pop-up/card open, pop-ups never cover the kilns,
 // a full human turn by touch taps only (tile or kiln -> pop-up -> rack button), wall choice card, round card + Continue, board pop-ups, end card; tap targets >= 44 px, text >= 13 px, 0 console errors

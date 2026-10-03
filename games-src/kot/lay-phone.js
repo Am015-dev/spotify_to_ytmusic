@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require('../phfit.js').guard(null);
 // Phone layout test for Crown City Smash. Usage: ONLY=390x844 node lay-phone.js [kot2.html] [outdir]
 // Real WebGL (SwiftShader), isMobile + hasTouch, every action by a touch tap (touchscreen.tap at the element centre after an
 // elementFromPoint hit-test). Checks: no scroll, board >= 0.85 x short side, board hit-tests to the canvas with every card /

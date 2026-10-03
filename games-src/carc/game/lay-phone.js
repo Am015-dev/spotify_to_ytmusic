@@ -1,3 +1,4 @@
+require('../../phfit.js').guard(2);
 // Phone layout check (real WebGL via SwiftShader, isMobile + hasTouch). node lay-phone.js [WxH,...] [--before] [--safe=t,r,b,l] [--tiles=N]
 // Every human action is a touch tap (page.touchscreen) on the map or on a pop-up / strip / card button.
 const PW=require((process.env.PW||require('child_process').execSync('npm root -g').toString().trim()+'/playwright'));
