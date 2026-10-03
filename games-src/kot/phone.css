@@ -169,3 +169,4 @@ html.ph-l .gx-dock[data-pp="watch"] #pacts{position:sticky;bottom:0;z-index:3;ba
 html.ph .mbox,html.ph .dlg{box-sizing:border-box}
 
 html.ph #preview{max-height:none;overflow:visible}
+html.ph-p #pacts [data-act="again"]{grid-column:1/-1;grid-row:5;position:sticky;bottom:4px;z-index:3}
