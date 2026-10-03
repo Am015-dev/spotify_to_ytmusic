@@ -228,7 +228,8 @@ for(const [w,h] of [[740,360],[844,390],[360,740]]){const [c,p]=await mk(b,w,h,'
  ok(r.boxIn&&r.x&&r.fit,'inspect card layout '+JSON.stringify(r));await p.screenshot({path:'shots/1280x720-inspect-card.png'});await c.close()}
 /* phone full-screen mode */
 {const IP='Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
- const c=await b.newContext({viewport:{width:390,height:844},userAgent:IP,hasTouch:true,colorScheme:'dark'});const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
+ const c=await b.newContext({viewport:{width:390,height:844},userAgent:IP,hasTouch:true,colorScheme:'dark'});await c.route('**/games/*/index.html',r=>r.fulfill({body:'<!doctype html><title>stub</title><body>stub',contentType:'text/html'}));
+ const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
  await p.goto(URL);await p.waitForTimeout(500);
  ok(await p.evaluate(()=>!document.getElementById('iostip').hidden),'iOS tip shown once');await p.click('#iosok');
  await p.locator('.boxbtn[data-id="sunglaze"]').scrollIntoViewIfNeeded();await p.click('.boxbtn[data-id="sunglaze"]');await p.waitForTimeout(600);await p.click('#inspect .play');await p.waitForTimeout(800);
