@@ -54,7 +54,7 @@ const plateS = (type, d, on) => cached('p|' + type + '|' + d + '|' + (on || ''),
 const avatarC = (c, size) => cached('a|' + c + '|' + size, () => KIT.avatarSVG(c % 5, { size }));
 const avatarS = (i, size) => avatarC(chefOf(i), size);
 const iconS = (name, size, type) => cached('i|' + name + '|' + size + '|' + (type || ''), () => KIT.iconSVG(name, type ? { size, type } : { size }));
-const counterURL = s => { const seat = chefOf(s); return KIT.ART.counter ? 'linear-gradient(180deg,rgba(42,18,12,.16),rgba(42,18,12,0) 22%),linear-gradient(90deg,transparent 3%,' + KIT.PLAYERS[seat % 5].c + 'aa 3%,' + KIT.PLAYERS[seat % 5].c + 'aa 97%,transparent 97%) 0 52%/100% 62% no-repeat,url("' + KIT.ART.counter + '") 0 0/auto 170% repeat-x' : cached('c|' + seat, () => 'url("' + KIT.dataURL(KIT.counterSVG({ w: 360, h: 120, seat, standalone: true }).replace('<svg ', '<svg preserveAspectRatio="none" ')) + '") center/100% 100%'); };
+const counterURL = s => { const seat = chefOf(s); return KIT.ART.counter ? 'linear-gradient(180deg,rgba(42,18,12,.16),rgba(42,18,12,0) 22%),linear-gradient(0deg,' + KIT.PLAYERS[seat % 5].c + ' 6px,transparent 6px),url("' + KIT.ART.counter + '") 0 0/auto 170% repeat-x' : cached('c|' + seat, () => 'url("' + KIT.dataURL(KIT.counterSVG({ w: 360, h: 120, seat, standalone: true }).replace('<svg ', '<svg preserveAspectRatio="none" ')) + '") center/100% 100%'); };
 function cardNode(type, w, on) { return KIT.cardEl(type, on ? { w, variant: 'nigiri', on } : { w }); }
 function cardDiv(type, w, on) { const d = h('div.cd'); d.style.width = w + 'px'; d.style.height = Math.round(w * 1.4) + 'px'; d.appendChild(cardNode(type, w, on)); return d; }
 // ---- game helpers
@@ -206,7 +206,7 @@ function renderTable() {
     const rowH = isMe ? rowMe : rowOther, cw = isMe ? tblW : tblW / L.cols;
     const av = Math.max(34, Math.min(isMe ? 60 : 52, Math.round(rowH * .46)));
     const cmp = rowH < 88, shw = av + 14, sl = Math.max(30, Math.min(58, Math.round((rowH - (cmp ? 12 : 36)) / 1.4)));
-    const ctrW = cw - shw - sl - 22;
+    const ctrW = cw - shw - sl - 25;
     let pd = Math.min(rowH - (isMe ? 34 : 32), ctrW / (isMe ? 7.2 : 5.6) - 6, isMe ? 84 : 68); pd = Math.max(24, Math.round(pd));
     const dm = { av, shw, sl, pd, cmp };
     const sg = seatSig(s, tab, info, pcs, isMe, dm) + '|' + sigAll;
@@ -292,7 +292,7 @@ function renderBelt() {
   const hand = v >= 0 ? dispHand() : (G.phase === 'over' ? [] : new Array(UI.fz && UI.fz.backN != null ? UI.fz.backN : G.players[f].hand.length).fill(-1));
   const hidden = v < 0;
   const m = Math.max(G.hand, 1), avail = beltWidth() - 20;
-  const land = ph && boardSize().w >= boardSize().h; const hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(ph ? 74 : 104, Math.floor((avail - (m - 1) * 6) / m)));
+  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? 74 : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); const hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
   $('#bd').style.setProperty('--hw', hw + 'px');
   if (!belt.__bt) { belt.__bt = 1; try { const bt = KIT.beltEl({ h: 72, period: 96, seconds: 6 }); bt.style.height = '60px'; $('#beltw').insertBefore(bt, belt); bt.style.bottom = '8px'; } catch (e) { } }
   const frag = [], oldC = new Map(); for (const c of belt.children) if (c.dataset && c.dataset.rk) oldC.set(c.dataset.rk, c);
@@ -990,7 +990,7 @@ function applyPhone() {
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(150, Math.min(206, Math.round(hh * .26))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(146, Math.min(178, Math.round(hh * .22))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !NET.on && UI.sv === 'setup') renderStart(); }
 }
 let rzT = 0;
@@ -1233,11 +1233,10 @@ function pxDrawSeat(o, s, R, Cr, me, ch) {
   o.ctrT.x = Cr.x + 1; o.ctrT.y = Cr.y + 1; o.ctrT.width = Math.max(1, Cr.w - 2); o.ctrT.height = Math.max(1, Cr.h - 2);
   const k = Math.max(.2, (Cr.h - 2) / 256 * 1.7); o.ctrT.tileScale.set(k, k); o.ctrT.tilePosition.x = -s * 211;
   o.top.clear();
-  // cloth runner in the diner's colour, a soft shade from the belt above, an ink rim
-  const rh = Math.max(10, Math.min(Cr.h * .5, 46)), rx = Cr.x + 8, ry = Cr.y + Cr.h * .5 - rh / 2 + 2, rw = Cr.w - 16;
-  o.top.roundRect(rx + 2, ry + 3, rw, rh, 6).fill({ color: 0x2a120c, alpha: .16 });
-  o.top.roundRect(rx, ry, rw, rh, 6).fill({ color: col, alpha: .34 });
-  o.top.rect(rx, ry + 4, rw, 2).fill({ color: 0xffffff, alpha: .3 }); o.top.rect(rx, ry + rh - 6, rw, 2).fill({ color: 0xffffff, alpha: .3 });
+  // the diner's colour as a painted trim along the front edge of the counter (no band across the wood)
+  const th = Math.max(4, Math.min(8, Cr.h * .08));
+  o.top.roundRect(Cr.x + 2, Cr.y + Cr.h - th - 2, Cr.w - 4, th, th / 2).fill({ color: col, alpha: .95 });
+  o.top.rect(Cr.x + 6, Cr.y + Cr.h - th - 1, Cr.w - 12, 1.2).fill({ color: 0xffffff, alpha: .35 });
   o.top.rect(Cr.x + 2, Cr.y + 2, Cr.w - 4, Math.min(10, Cr.h * .14)).fill({ color: 0x2a120c, alpha: .14 });
   o.top.roundRect(Cr.x, Cr.y, Cr.w, Cr.h, 10).stroke({ color: 0x4a2a22, width: 2 });
   if (PX.q !== 'low') { if (!o.mask) { o.mask = new PIXI.Graphics(); PX.app.stage.addChild(o.mask); } o.mask.clear(); o.mask.roundRect(Cr.x + 1, Cr.y + 1, Cr.w - 2, Cr.h - 2, 9).fill(0xffffff); o.ctrT.mask = o.mask; }

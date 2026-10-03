@@ -56,7 +56,7 @@ svg{display:block}
 .grp.land .pl{animation:kk-land .35s ease-out both}
 .ctr .none{white-space:nowrap;font-size:14px;font-weight:700;color:#fff6e0;text-shadow:0 1px 2px rgba(0,0,0,.55);align-self:center;padding:0 6px}
 @keyframes kkpulse{50%{transform:scale(1.08)}}
-.slot{flex:0 0 var(--sl,46px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative}
+.slot{flex:0 0 var(--sl,46px);margin-right:3px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;position:relative}
 .slot .sbox{position:relative;width:var(--sl,46px);height:calc(var(--sl,46px)*1.4);display:flex;align-items:center;justify-content:center}
 .slot .sbox.empty{border:2px dashed rgba(74,42,34,.5);border-radius:9px;font-weight:900;font-size:15px;color:rgba(74,42,34,.65)}
 .slot .sbox.empty.mine{border-color:#e0a31c;color:#9a6a05;animation:kkpulse 1.6s ease-in-out infinite}
@@ -64,7 +64,7 @@ svg{display:block}
 .slot .sbox .cv{position:absolute;inset:0}
 .slot .sbox .cv>svg{width:100%;height:100%}
 .slot .two{display:flex;gap:2px;align-items:center;position:relative}
-.slot .st{font-size:13px;font-weight:800;line-height:1;white-space:nowrap;color:#4a2a22}
+.slot .st{font-size:13px;font-weight:800;line-height:1.05;white-space:nowrap;color:#4a2a22;max-width:calc(var(--sl,46px) + 6px);overflow:hidden;text-overflow:ellipsis}
 .slot .st.rd{color:#2d7a35}
 /* ---- the belt with your hand ---- */
 #beltz{flex:0 0 auto;position:relative;background:#2f1f1a;border-top:3px solid #1c1210;display:flex;flex-direction:column;min-width:0}
@@ -72,7 +72,7 @@ svg{display:block}
 #beltz .lab span{overflow:hidden;text-overflow:ellipsis;min-width:0}
 #beltw{position:relative;padding:8px 0 6px;overflow:hidden}
 #beltw .kk-belt{position:absolute;left:0;right:0;bottom:6px;pointer-events:none}
-#belt{position:relative;display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:28px 10px 4px;scrollbar-width:thin;-webkit-overflow-scrolling:touch;justify-content:safe center;align-items:flex-end;min-height:calc(var(--hw)*1.4 + 42px)}
+#belt{position:relative;display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:20px 10px 4px;scrollbar-width:thin;-webkit-overflow-scrolling:touch;justify-content:safe center;align-items:flex-end;min-height:calc(var(--hw)*1.4 + 32px)}
 .hc{position:relative;flex:0 0 auto;border:0;background:transparent;padding:0;margin:0;cursor:pointer;font:inherit;transition:transform .16s ease;transform:translateY(0);width:var(--hw);height:calc(var(--hw)*1.4);border-radius:8px}
 .hc>svg.kk-card{width:100%;height:100%}
 .hc.sel{transform:translateY(-16px);filter:drop-shadow(0 0 7px #ffc83a) drop-shadow(0 6px 5px rgba(0,0,0,.5))}
@@ -263,8 +263,8 @@ html.ph .ctr .none{display:none}
 html.ph #netst{min-width:44px;min-height:44px;padding:0 8px;justify-content:center;border-radius:10px}html.ph #netst .nl{display:none}html.ph #netst .ns{display:inline;font-weight:800}
 html.ph.ph-l.net #barstat{display:none}
 html.ph #beltz .lab{font-size:13px;padding:1px 6px 0;min-height:17px}
-html.ph #belt{padding:30px 6px 4px;gap:5px}
-html.ph.ph-p.kk-short.kk-sel #roster,html.ph.ph-p.kk-short.kk-sel #rt{display:none}
+html.ph #belt{padding:24px 6px 4px;gap:5px}
+html.ph.ph-p.kk-sel #roster,html.ph.ph-p.kk-short.kk-sel #rt{display:none}
 html.ph .rsbox{padding:8px;gap:6px}
 html.ph .cat td.n{font-size:15px;min-width:34px}
 #acts .btn,.cbtns .btn{flex-shrink:0}

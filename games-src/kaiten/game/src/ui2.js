@@ -53,7 +53,7 @@ function renderTable() {
     const rowH = isMe ? rowMe : rowOther, cw = isMe ? tblW : tblW / L.cols;
     const av = Math.max(34, Math.min(isMe ? 60 : 52, Math.round(rowH * .46)));
     const cmp = rowH < 88, shw = av + 14, sl = Math.max(30, Math.min(58, Math.round((rowH - (cmp ? 12 : 36)) / 1.4)));
-    const ctrW = cw - shw - sl - 22;
+    const ctrW = cw - shw - sl - 25;
     let pd = Math.min(rowH - (isMe ? 34 : 32), ctrW / (isMe ? 7.2 : 5.6) - 6, isMe ? 84 : 68); pd = Math.max(24, Math.round(pd));
     const dm = { av, shw, sl, pd, cmp };
     const sg = seatSig(s, tab, info, pcs, isMe, dm) + '|' + sigAll;
@@ -139,7 +139,7 @@ function renderBelt() {
   const hand = v >= 0 ? dispHand() : (G.phase === 'over' ? [] : new Array(UI.fz && UI.fz.backN != null ? UI.fz.backN : G.players[f].hand.length).fill(-1));
   const hidden = v < 0;
   const m = Math.max(G.hand, 1), avail = beltWidth() - 20;
-  const land = ph && boardSize().w >= boardSize().h; const hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(ph ? 74 : 104, Math.floor((avail - (m - 1) * 6) / m)));
+  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? 74 : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); const hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
   $('#bd').style.setProperty('--hw', hw + 'px');
   if (!belt.__bt) { belt.__bt = 1; try { const bt = KIT.beltEl({ h: 72, period: 96, seconds: 6 }); bt.style.height = '60px'; $('#beltw').insertBefore(bt, belt); bt.style.bottom = '8px'; } catch (e) { } }
   const frag = [], oldC = new Map(); for (const c of belt.children) if (c.dataset && c.dataset.rk) oldC.set(c.dataset.rk, c);

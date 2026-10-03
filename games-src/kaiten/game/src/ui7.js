@@ -198,11 +198,10 @@ function pxDrawSeat(o, s, R, Cr, me, ch) {
   o.ctrT.x = Cr.x + 1; o.ctrT.y = Cr.y + 1; o.ctrT.width = Math.max(1, Cr.w - 2); o.ctrT.height = Math.max(1, Cr.h - 2);
   const k = Math.max(.2, (Cr.h - 2) / 256 * 1.7); o.ctrT.tileScale.set(k, k); o.ctrT.tilePosition.x = -s * 211;
   o.top.clear();
-  // cloth runner in the diner's colour, a soft shade from the belt above, an ink rim
-  const rh = Math.max(10, Math.min(Cr.h * .5, 46)), rx = Cr.x + 8, ry = Cr.y + Cr.h * .5 - rh / 2 + 2, rw = Cr.w - 16;
-  o.top.roundRect(rx + 2, ry + 3, rw, rh, 6).fill({ color: 0x2a120c, alpha: .16 });
-  o.top.roundRect(rx, ry, rw, rh, 6).fill({ color: col, alpha: .34 });
-  o.top.rect(rx, ry + 4, rw, 2).fill({ color: 0xffffff, alpha: .3 }); o.top.rect(rx, ry + rh - 6, rw, 2).fill({ color: 0xffffff, alpha: .3 });
+  // the diner's colour as a painted trim along the front edge of the counter (no band across the wood)
+  const th = Math.max(4, Math.min(8, Cr.h * .08));
+  o.top.roundRect(Cr.x + 2, Cr.y + Cr.h - th - 2, Cr.w - 4, th, th / 2).fill({ color: col, alpha: .95 });
+  o.top.rect(Cr.x + 6, Cr.y + Cr.h - th - 1, Cr.w - 12, 1.2).fill({ color: 0xffffff, alpha: .35 });
   o.top.rect(Cr.x + 2, Cr.y + 2, Cr.w - 4, Math.min(10, Cr.h * .14)).fill({ color: 0x2a120c, alpha: .14 });
   o.top.roundRect(Cr.x, Cr.y, Cr.w, Cr.h, 10).stroke({ color: 0x4a2a22, width: 2 });
   if (PX.q !== 'low') { if (!o.mask) { o.mask = new PIXI.Graphics(); PX.app.stage.addChild(o.mask); } o.mask.clear(); o.mask.roundRect(Cr.x + 1, Cr.y + 1, Cr.w - 2, Cr.h - 2, 9).fill(0xffffff); o.ctrT.mask = o.mask; }
