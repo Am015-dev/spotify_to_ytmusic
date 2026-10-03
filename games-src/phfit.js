@@ -47,16 +47,17 @@ const SRC=`(()=>{
  // primary button(s)
  const PRI='.pri,.primary,.go,.btn.go,.btn.pri,.pb.pri,.ps-go,[data-a=cont],[data-a=next],[data-a=ok],[data-a=take],[data-a=start],[data-a=coachok],[data-a=pnext],[data-ui=start],[data-ui=play],[data-ph=go],[data-ph=dismiss],[data-tour=next],[data-a=sunkok],[data-a=guided]';
  const cands=[...document.querySelectorAll(PRI)].filter(b=>vis(b)&&b.tagName!=='A'||vis(b)&&b.tagName==='A');
- const seenb=new Set();
+ const grp=new Map();for(const b of cands){let sc=null;for(let n=b.parentElement;n&&n!==document.body;n=n.parentElement){const st=getComputedStyle(n);if(/(auto|scroll)/.test(st.overflowY)&&n.scrollHeight>n.clientHeight+1){sc=n;break}}b.__sc=sc;if(sc)grp.set(sc,(grp.get(sc)||0)+1)}
  for(const b of cands){
    if(!inPanel(b)&&!b.closest('#modal,#startscreen,.start,.menu'))continue;
+   if(b.__sc&&grp.get(b.__sc)>1)continue;
    if(b.disabled||b.getAttribute('aria-disabled')==='true')continue;
    if(b.closest('.gx-bar')&&!/start|cont/.test(b.className))continue;
    const r=b.getBoundingClientRect();const lab=nm(b)+' "'+(b.textContent||'').trim().slice(0,20)+'"';
    // skip buttons that live inside a scroller and are scrolled out of it only if some other primary is reachable? no: report
    if(r.left<-1||r.top<-1||r.right>VW+1||r.bottom>VH+1){out.push('PRIMARY BUTTON NOT FULLY IN VIEWPORT ['+[r.left,r.top,r.right,r.bottom].map(Math.round)+'] '+lab);continue}
    const x=r.left+r.width/2,y=r.top+r.height/2;const h=document.elementFromPoint(x,y);
-   if(h&&!(h===b||b.contains(h))){const o=h.closest('.scrim,.zoom,.oppfull,.modal,#modal,#pzoom,[class*=overlay],[class*=scrim]');const fx=(()=>{for(let n=h;n&&n!==document.body;n=n.parentElement){const st=getComputedStyle(n);if(st.position==='fixed'){const q=n.getBoundingClientRect();if(q.width*q.height>.6*VW*VH&&!n.contains(b))return true}}return false})();if(o||fx)continue}
+   if(h&&!(h===b||b.contains(h))){const o=h.closest('.scrim,.zoom,.oppfull,.modal,#modal,#pzoom,#ppop,#pc,#pcx,.gx-drawer,.ph-pop,#ph-pop,#ph-z,[class*=overlay],[class*=scrim]');const o2=o&&!o.contains(b)?o:null;const fx=(()=>{for(let n=h;n&&n!==document.body;n=n.parentElement){const st=getComputedStyle(n);if(st.position==='fixed'){const q=n.getBoundingClientRect();if(q.width*q.height>.6*VW*VH&&!n.contains(b))return true}}return false})();if(o2||fx)continue}
    if(!h||!(h===b||b.contains(h)||h.contains(b)&&h.closest('button,a,[data-a]')===b)){out.push('PRIMARY BUTTON COVERED by '+(h?nm(h):'none')+': '+lab);continue}
    // clipped by a scroller / hidden ancestor
    for(const c of clipAnc(b)){const q=c.n.getBoundingClientRect();if(r.left<q.left-1||r.right>q.right+1||r.top<q.top-1||r.bottom>q.bottom+1){out.push('PRIMARY BUTTON CLIPPED by '+nm(c.n)+' '+(c.sc?'(scrolled away)':'')+' btn['+[r.left,r.top,r.right,r.bottom].map(Math.round)+'] clip['+[q.left,q.top,q.right,q.bottom].map(Math.round)+']: '+lab);break}}
