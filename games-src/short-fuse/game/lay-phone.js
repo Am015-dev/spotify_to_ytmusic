@@ -127,10 +127,10 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
         const id=P4.l?'#zpl:not([hidden])':'#zpr:not([hidden])';const ab=await p.evaluate(id=>{const b=document.querySelector(id);if(!b)return null;const R=b.getBoundingClientRect();return [R.left+R.width/2,R.top+R.height/2]},id);if(!ab){prob('wire off screen but no slide arrow',id);break}await p.touchscreen.tap(ab[0],ab[1]);await p.waitForTimeout(250)}
       const P5=await p.evaluate(([si,k])=>window.__wire(si,k),[tg.st,tg.k]);await p.touchscreen.tap(P5[0],P5[1]);await p.waitForTimeout(700);const sel2=await p.evaluate(()=>!!(UI.sel&&UI.sel.tg&&UI.sel.tg.length));if(!sel2)prob('pointing at the wire again after the rack change did not select it')}
     // value (the recommended one if marked), then Snip
-    const v=await p.evaluate(()=>{const b=document.querySelector('#ppop .ph-v.best')||document.querySelector('#ppop .ph-v');if(!b)return null;const R=b.getBoundingClientRect();return [R.left+R.width/2,R.top+R.height/2,b.dataset.v]});
+    const v=await p.evaluate(()=>{const b=document.querySelector('#ppop .ph-v.best')||document.querySelector('#ppop .ph-v');if(!b)return null;b.scrollIntoView({block:'center'});const R=b.getBoundingClientRect();return [R.left+R.width/2,R.top+R.height/2,b.dataset.v]});
     if(!v){log('no value I could say here: closing');await p.touchscreen.tap(...(await p.evaluate(()=>{const b=document.querySelector('#ppop [data-ph=pclose]');const R=b.getBoundingClientRect();return [R.left+R.width/2,R.top+R.height/2]})));await p.waitForTimeout(400);turns++;continue}
     await p.touchscreen.tap(v[0],v[1]);await p.waitForTimeout(400);
-    const go=await p.evaluate(()=>{const b=document.querySelector('#ppop [data-a=dual]:not([disabled])');if(!b)return null;const R=b.getBoundingClientRect();return [R.left+R.width/2,R.top+R.height/2]});
+    const go=await p.evaluate(()=>{const b=document.querySelector('#ppop [data-a=dual]:not([disabled])');if(!b)return null;b.scrollIntoView({block:'nearest'});const R=b.getBoundingClientRect();return [R.left+R.width/2,R.top+R.height/2]});
     if(turns===0)await shot('7value');
     if(!go){prob('no Snip button after choosing a value');break}
     await p.touchscreen.tap(go[0],go[1]);await p.waitForTimeout(700);
