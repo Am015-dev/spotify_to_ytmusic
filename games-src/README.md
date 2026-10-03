@@ -2,6 +2,8 @@
 
 This folder holds the source for the games in `../games/`. Each game is built into one self-contained HTML file, which you then copy into `../games/<game>/index.html`.
 
+After copying a build in, run `python3 scripts/stamp-copyright.py` to add the copyright notice to the page head (it skips pages that already have it). Everything here is all rights reserved; see `../LICENSE`.
+
 ## Setup
 
 ```sh
