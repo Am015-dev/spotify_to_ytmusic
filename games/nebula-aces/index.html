@@ -480,9 +480,14 @@ html.ph:not(.ph-3d) .ph-ctl{display:none}
 html.ph #sndbtn::after,html.ph #pausebtn::after{content:attr(data-phl);font-size:15px;font-weight:600}
 html.ph #map text{display:none}
 /* ===== portrait: compact chrome so the action panel gets the room ===== */
-/* camera: a floating vertical stack in the board's corner (semi-transparent, 44px targets) */
-html.ph.ph-p .ph-ctl{position:absolute;right:6px;bottom:6px;z-index:5;flex-direction:column;gap:2px;margin:0;padding:3px;border-radius:14px;background:rgba(10,8,30,.5);pointer-events:none}
-html.ph.ph-p .ph-ctl .gx-ibtn{pointer-events:auto;background:rgba(26,22,64,.55);border-color:rgba(255,255,255,.22)}
+/* camera: off the board in portrait. A camera button in the top bar opens the four controls as a small
+   pop-up row under the bar for a few seconds; pinch and drag on the board work as always */
+.ph-cam{display:none}
+html.ph.ph-p .ph-cam,html.ph.ph-p .gx-bar>.btn.ph-cam{display:inline-flex!important;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0}
+html.ph.ph-p .ph-cam .ico{width:22px;height:22px}
+html.ph.ph-p.camopen .ph-cam{border-color:var(--gold)}
+html.ph.ph-p .ph-ctl{position:fixed;right:6px;top:var(--cam-top,52px);z-index:20;flex-direction:row;gap:4px;margin:0;padding:4px;border-radius:14px;background:rgba(10,8,30,.88);border:1px solid rgba(255,200,107,.45);box-shadow:0 8px 20px rgba(0,0,0,.5);display:none}
+html.ph.ph-p.camopen .ph-ctl{display:flex}
 /* one 44px row: the phase strip on the left, Guide + Advice on the right */
 html.ph.ph-p .gx-dock-head{position:absolute;top:0;right:0;z-index:4;height:44px;padding:0 4px 0 0;gap:2px;order:0}
 html.ph.ph-p .gx-dock-head .na-guide b{display:none}
@@ -3811,6 +3816,10 @@ let rz=0;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(ap
 PHN.build=function(){if(PHN.built)return;PHN.built=true;
   const head=document.querySelector('.gx-dock-head');if(head&&!$('phctl')){const c=document.createElement('div');c.id='phctl';c.className='ph-ctl';c.setAttribute('role','group');c.setAttribute('aria-label','Camera');
     c.innerHTML=`<button class="gx-ibtn" id="ph-focus" data-ph="focus" aria-pressed="false" aria-label="Focus on the active ship">${IC.focus}</button><button class="gx-ibtn" data-ph="zin" aria-label="Zoom in">${IC.plus}</button><button class="gx-ibtn" data-ph="zout" aria-label="Zoom out">${IC.minus}</button><button class="gx-ibtn" data-ph="fit" aria-label="Show the whole mat">${IC.fit}</button>`;head.insertBefore(c,head.firstChild);PHN.placeCtl()}
+  {const bar=document.querySelector('.gx-bar'),sp=bar&&bar.querySelector('.gx-sp');if(sp&&!$('phcam')){const b=document.createElement('button');b.id='phcam';b.type='button';b.className='btn gx-tb ph-cam';b.setAttribute('aria-label','Camera: focus, zoom, whole mat');b.setAttribute('aria-expanded','false');b.innerHTML=IC.focus;bar.insertBefore(b,sp);
+    let t=0;const R=document.documentElement;const close=()=>{R.classList.remove('camopen');b.setAttribute('aria-expanded','false')};const arm=()=>{clearTimeout(t);t=setTimeout(close,10000)};
+    b.addEventListener('click',()=>{if(R.classList.toggle('camopen')){const r=bar.getBoundingClientRect();R.style.setProperty('--cam-top',(r.bottom+4)+'px');b.setAttribute('aria-expanded','true');arm()}else close()});
+    document.addEventListener('pointerdown',e=>{if(!R.classList.contains('camopen'))return;if(e.target.closest('#phctl')){arm();return}if(e.target.closest('#phcam'))return;close()},true)}}
   const bar=document.querySelector('.gx-bar');if(bar&&!$('phchip')){const c=document.createElement('div');c.id='phchip';c.className='ph-chip';c.setAttribute('role','status');bar.insertBefore(c,bar.firstChild)}
   const dock=document.querySelector('.gx-dock');if(dock){const top=dock.querySelector('.gx-dock-top');
     if(!$('ps')){const e=document.createElement('div');e.id='ps';e.hidden=true;top.after(e)}
