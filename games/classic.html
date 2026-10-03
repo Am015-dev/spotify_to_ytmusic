@@ -92,6 +92,24 @@ html.ph #fab.dim{opacity:.4}
 @media (min-width:681px) and (max-width:1559px){.box:last-child:nth-child(odd){grid-column:1/-1;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);grid-template-rows:none}.box:last-child:nth-child(odd) .cover{aspect-ratio:auto;height:100%;min-height:280px}}
 @media (max-width:680px){.shelf{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:480px){.stats div{padding:6px 6px}.btn{padding:10px 14px}}
+/* loading card shown over a game while it starts */
+#table iframe,#loader{grid-area:-2/1/-1/2}
+#loader{position:relative;z-index:2;display:grid;place-items:center;background:radial-gradient(120% 80% at 50% 30%,#3a2618,#140d09 75%);color:#f4ead8;transition:opacity .45s ease}
+#loader.done{opacity:0;pointer-events:none}
+#loader .lc{display:grid;gap:14px;justify-items:center;text-align:center;padding:24px;max-width:min(420px,88vw)}
+#loader .lt{font:400 clamp(1.4rem,5vw,2rem)/1.1 "Rammetto One","Arial Black",Impact,sans-serif;text-wrap:balance}
+#loader .lb{width:min(300px,70vw);height:10px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+#loader .lb i{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#c98a2e,#f2c05a);transition:width .35s ease}
+#loader .lm{font:600 .95rem "Chivo",system-ui,sans-serif;color:#d9c6a6;letter-spacing:.02em}
+#loader .lm b{color:#ff7a7a;font-weight:800}
+#loader .lk{font:600 .85rem "Chivo",system-ui,sans-serif;color:#bca78c}
+#loader .lk a{color:#f2c05a}
+@media (prefers-reduced-motion:reduce){#loader,#loader .lb i{transition:none}}
+/* support the shelf */
+.kofi{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:99px;background:#29abe0;color:#fff!important;font:800 .95rem "Chivo",system-ui,sans-serif;text-decoration:none;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.kofi:hover{filter:brightness(1.08)}
+.support{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.support p{margin:0;max-width:52ch}
 </style>
 
 </head>
@@ -107,7 +125,7 @@ html.ph #fab.dim{opacity:.4}
 
   <section class="shelf" id="shelf" aria-label="Games"></section>
 
-  <footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link. Your browsers connect directly, with no account or server. Missing a game, or something bugs you? <a href="suggest.html" style="color:var(--brass)">Drop a card in the suggestion box</a>.<br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small></footer>
+  <footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link. Your browsers connect directly, with no account or server. Missing a game, or something bugs you? <a href="suggest.html" style="color:var(--brass)">Drop a card in the suggestion box</a>.<br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
 </div>
 
 <div id="table" hidden>
@@ -117,6 +135,7 @@ html.ph #fab.dim{opacity:.4}
     <a id="solo" href="#" target="_blank" rel="noopener">Open on its own</a>
   </div>
   <iframe id="frame" title="Game" allow="fullscreen; autoplay"></iframe>
+  <div id="loader" class="done" aria-live="polite"><div class="lc"><div class="lt" id="lname">Game</div><div class="lb" role="progressbar" aria-label="Loading"><i id="lbar"></i></div><div class="lm">Made with <b aria-label="love">♥</b> by Alex</div><div class="lk" id="lkofi" hidden>Enjoying the shelf? <a class="kofi-link" target="_blank" rel="noopener" href="#">Buy Alex a coffee ☕</a></div></div></div>
 </div>
 <button type="button" id="fab" aria-label="Game menu: back to the shelf" hidden>←</button>
 <div id="fabmenu" role="menu" hidden><div class="t" id="fabname"></div><button type="button" id="fabback" role="menuitem">← Back to the shelf</button><button type="button" id="fabfull" role="menuitem">⛶ Full screen</button><a id="fabsolo" role="menuitem" href="#" target="_blank" rel="noopener">Open on its own</a></div>
@@ -308,7 +327,7 @@ for(const g of GAMES){const el=document.createElement('article');el.className='b
 
 const table=document.getElementById('table'),frame=document.getElementById('frame');
 function openGame(g){if(g.id!=='ref')store.set('shelf_last',g.id);document.getElementById('tname').textContent=g.name;document.getElementById('solo').href=g.src;
-  frame.title=g.name;frame.src=g.src;table.hidden=false;if(PH){document.getElementById('fabname').textContent=g.name;document.getElementById('fabsolo').href=g.src;showFab(true);goFull()}table.classList.remove('opening');void table.offsetWidth;table.classList.add('opening');document.body.style.overflow='hidden';
+  frame.title=g.name;if(g.id!=='ref')showLoader(g.name.replace(/ \(preview\)$/,''));frame.src=g.src;table.hidden=false;if(PH){document.getElementById('fabname').textContent=g.name;document.getElementById('fabsolo').href=g.src;showFab(true);goFull()}table.classList.remove('opening');void table.offsetWidth;table.classList.add('opening');document.body.style.overflow='hidden';
   try{history.replaceState(null,'','#'+g.id)}catch(e){}frame.focus()}
 function closeGame(){table.hidden=true;if(typeof showFab==='function'){showFab(false);leaveFull()}frame.src='about:blank';document.body.style.overflow='';try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
   document.querySelector('.last')?.remove();const id=store.get('shelf_last');const b=document.getElementById('play-'+id);if(b){b.parentNode.insertAdjacentHTML('beforeend','<span class="last">Played last</span>');b.focus()}}
@@ -349,6 +368,16 @@ if(PH&&/iPhone|iPod/.test(navigator.userAgent)&&!standalone&&!store.get('shelf_i
 document.addEventListener('click',e=>{const b=e.target.closest('[data-ref]');if(!b)return;openGame({id:'ref',name:'Card & token reference',src:'reference.html'+(b.dataset.ref?'#'+b.dataset.ref:'')})});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!table.hidden)closeGame()});
 const start=GAMES.find(g=>'#'+g.id===location.hash);if(start)openGame(start);
+
+/* Ko-fi support: set the page name to switch the support links on */
+const KOFI='';
+if(KOFI){for(const a of document.querySelectorAll('.kofi-link'))a.href='https://ko-fi.com/'+KOFI;const s=document.getElementById('support');if(s)s.hidden=false;const k=document.getElementById('lkofi');if(k)k.hidden=false}
+/* loading card while a game starts: "Made with love by Alex" */
+var lt0=0,ltick=0;
+function showLoader(name){const loader=document.getElementById('loader'),lbar=document.getElementById('lbar');if(!loader)return;document.getElementById('lname').textContent=name;loader.classList.remove('done');lt0=performance.now();let p=8;lbar.style.width=p+'%';clearInterval(ltick);
+  clearInterval(ltick);ltick=setInterval(()=>{p+=(92-p)*0.12;lbar.style.width=p.toFixed(1)+'%'},120)}
+function hideLoader(){const loader=document.getElementById('loader'),lbar=document.getElementById('lbar');if(!loader||loader.classList.contains('done'))return;clearInterval(ltick);lbar.style.width='100%';const wait=Math.max(0,900-(performance.now()-lt0));setTimeout(()=>loader.classList.add('done'),wait+250)}
+document.getElementById('frame').addEventListener('load',()=>{if(document.getElementById('frame').src.startsWith('about:'))return;hideLoader()});
 </script>
 </body>
 </html>
