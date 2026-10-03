@@ -40,7 +40,6 @@ h1{font:400 clamp(1.9rem,5vw,3rem)/1 var(--display);margin:0;letter-spacing:.01e
 .stats span{font:500 .66rem var(--mono);text-transform:uppercase;letter-spacing:.08em;color:#6b5238}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chips span{font:600 .75rem var(--body);padding:3px 9px;border-radius:99px;background:#e2d2b3;color:#3a2718}
-.based{font:500 .72rem var(--mono);color:#7a6149;letter-spacing:.03em}
 .acts{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
 .btn{font:800 .95rem var(--body);border:0;border-radius:4px;padding:10px 18px;cursor:pointer;text-decoration:none;display:inline-flex;gap:8px;align-items:center}
 .play{background:#241810;color:#f6ecd9}
@@ -99,68 +98,55 @@ const GAMES=[
   {id:'crown',cover:'covers/crown.jpg',name:'Crown City Smash',src:'crown-city-smash/index.html',ribbon:'Dice brawl',
    blurb:'Giant monsters roll dice to stomp, heal, charge up and buy power cards. Hold the city for stars and try to be the last monster standing, or the first to 20 stars.',
    stats:[['2–6','players'],['30','minutes'],['8+','ages'],['3D','table']],
-   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Power Up evolutions','Halloween','Cultists','Tower','Anubis','Berserk','Wickedness','Mindbug'],
-   based:'Plays like King of Tokyo (2011)',paint:paintCrown},
+   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Power Up evolutions','Halloween','Cultists','Tower','Anubis','Berserk','Wickedness','Mindbug'],paint:paintCrown},
   {id:'nebula',cover:'covers/nebula.jpg',name:'Nebula Aces',src:'nebula-aces/index.html',ribbon:'Starfighter duel',
    blurb:'Set secret maneuver dials, fly your squadron along real templates, then roll attack and defence dice. Build a 100-point squad or fly the learning duel.',
    stats:[['1–2','players'],['45','minutes'],['12+','ages'],['914','mm mat']],
-   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Squad builder','Waves 1–3','Large ships','Bombs & mines','Ion & turrets'],
-   based:'Plays like the X-Wing Miniatures Game, 1st edition (2012)',paint:paintNebula},
+   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Squad builder','Waves 1–3','Large ships','Bombs & mines','Ion & turrets'],paint:paintNebula},
   {id:'doorkick',cover:'covers/doorkick.jpg',name:'Doorkick Dungeon',src:'doorkick-dungeon/index.html',ribbon:'Card brawl',
    blurb:'Kick open doors, fight ridiculous monsters, grab the loot and stab your friends in the back. First hero to level 10 wins, but only by killing a monster.',
    stats:[['3–6','players'],['60','minutes'],['10+','ages'],['168','cards']],
-   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Every base card','Races & classes','Curses','Helping & bribes'],
-   based:'Plays like Munchkin (2001)',paint:paintDoor},
+   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Every base card','Races & classes','Curses','Helping & bribes'],paint:paintDoor},
   {id:'shipwreck',cover:'covers/shipwreck.jpg',name:'Shipwreck Isle',src:'shipwreck-isle/index.html',ribbon:'Co-op survival',
    blurb:'Wash up on a storm-lashed island. Plan every day together: build a shelter, explore, hunt and invent, then hold out against rain, snow and hunger until your scenario goal is done.',
    stats:[['1–4','players'],['90','minutes'],['12+','ages'],['3D','island']],
-   chips:['Co-op','Hot-seat','Online with friends','Computer teammates','4 scenarios','Every base card','Friday & the dog','3 difficulties'],
-   based:'Plays like Robinson Crusoe: Adventures on the Cursed Island (2012)',paint:paintIsle},
+   chips:['Co-op','Hot-seat','Online with friends','Computer teammates','4 scenarios','Every base card','Friday & the dog','3 difficulties'],paint:paintIsle},
   {id:'sands',cover:'covers/sands.jpg',name:'Sands of Qamar',src:'sands-of-qamar/index.html',ribbon:'Bazaar tactics',
    blurb:'Bid for turn order, then sweep the five tribes across a sunlit sultanate. Claim tiles with your camels, summon djinns and corner the bazaar. Every move is a small puzzle.',
    stats:[['2–5','players'],['60','minutes'],['13+','ages'],['3D','bazaar']],
-   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','28 djinns','The Crafters','Wonder Cities','Cutpurses','Promo djinns'],
-   based:'Plays like Five Tribes: The Djinns of Naqala (2014)',paint:paintSands},
+   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','28 djinns','The Crafters','Wonder Cities','Cutpurses','Promo djinns'],paint:paintSands},
   {id:'sunglaze',cover:'covers/sunglaze.jpg',name:'Sunglaze',src:'sunglaze/index.html',ribbon:'Tile drafting',
    blurb:'Draft glazed tiles from the kilns and set them into the Sun King\'s courtyard mosaic. Every pick leaves something for your rivals, and every broken tile costs you.',
    stats:[['2–4','players'],['40','minutes'],['8+','ages'],['100','tiles']],
-   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','Unmarked mosaic','Prism tiles'],
-   based:'Plays like Azul (2017)',paint:paintGlaze},
+   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','Unmarked mosaic','Prism tiles'],paint:paintGlaze},
   {id:'rampart',cover:'covers/rampart.jpg',name:'Rampart & Vine',src:'rampart-and-vine/index.html',ribbon:'Tile laying',
    blurb:'Draw a tile, lay it where it fits and grow a sunlit Provence valley of walled towns, roads, rivers and priories. Place followers to claim them, and farmers to profit from the fields.',
    stats:[['2–6','players'],['45','minutes'],['7+','ages'],['138','tiles']],
-   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','The Riverlands','Taverns & Basilicas','Merchants & Masons'],
-   based:'Plays like Carcassonne (2000)',paint:paintRampart},
+   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','The Riverlands','Taverns & Basilicas','Merchants & Masons'],paint:paintRampart},
   {id:'shortfuse',cover:'covers/short-fuse.jpg',name:'Short Fuse (preview)',src:'short-fuse/index.html',ribbon:'Co-op deduction',ref:false,
    blurb:'A cartoon demolition crew defuses rigged charges together. Everyone sees only their own wires: point at a teammate\'s wire, call a number and cut as a pair. One red wire and it all goes bang. Play with computer teammates, pass one device around, or online with friends. Preview: the hardest jobs are still being tuned.',
    stats:[['2–5','players'],['30','minutes'],['10+','ages'],['66','jobs']],
-   chips:['Preview','Co-op','Computer teammates · 3 levels','Hot-seat','Online with friends','Guided first game','All 66 jobs','Gear & crew powers'],
-   based:'Plays like Bomb Busters (2024)'},
+   chips:['Preview','Co-op','Computer teammates · 3 levels','Hot-seat','Online with friends','Guided first game','All 66 jobs','Gear & crew powers']},
   {id:'tidewake',cover:'covers/tidewake.jpg',name:'Tidewake (preview)',src:'tidewake/index.html',ribbon:'Path-laying at sea',ref:false,
    blurb:'Lay sea currents to steer your junk across a painted chart, and keep every rival and every leviathan away from it. Last ship afloat wins. Play against computers, pass one device around, or online with friends. Preview: still being polished.',
    stats:[['1–8','players'],['30','minutes'],['8+','ages'],['56','currents']],
-   chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','Solo & teams','Rift Gate','Rogue Wave','Maelstrom','Deck Cannon'],
-   based:'Plays like Tsuro of the Seas (2012) with Veterans of the Seas'},
+   chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','Solo & teams','Rift Gate','Rogue Wave','Maelstrom','Deck Cannon']},
   {id:'hollowbough',cover:'covers/hollowbough.jpg',name:'Hollowbough (preview)',src:'hollowbough/index.html',ribbon:'Woodland city-building',ref:false,
    blurb:'Send your critters out across the valley through four seasons, gather twigs, resin, pebbles and berries, and build a city of 15 critters and constructions under the great tree. Play against computers, solo against Old Grimbeard, pass one device around, or online with friends. Preview: still being polished.',
    stats:[['1–4','players'],['60','minutes'],['10+','ages'],['48','cards']],
-   chips:['Preview','Vs computer · 3 levels','Solo vs Old Grimbeard','Hot-seat','Online with friends','Guided first game','Four seasons','Events & Long Road'],
-   based:'Plays like Everdell (2018)'},
+   chips:['Preview','Vs computer · 3 levels','Solo vs Old Grimbeard','Hot-seat','Online with friends','Guided first game','Four seasons','Events & Long Road']},
   {id:'thornbound',cover:'covers/thornbound.jpg',name:'The Thornbound Throne (preview)',src:'thornbound/index.html',ribbon:'Card-driven war for a crown',ref:false,
    blurb:'Four heirs fight over an empty throne in an overgrown kingdom. Bid for turn order, send your Herald, play cards face-down beside each region and reveal them in clashes for Influence. Most Influence after five rounds wins. Play against computers, pass one device around, or online with friends. Preview: still being polished; solo mode to come.',
    stats:[['2–4','players'],['90','minutes'],['12+','ages'],['4','factions']],
-   chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','4 asymmetric factions','Bluffing & bidding'],
-   based:"Plays like The Old King's Crown (2023)"},
+   chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','4 asymmetric factions','Bluffing & bidding']},
   {id:'mainhattan',cover:'covers/nightrun.jpg',name:'Mainhattan Nightrun',src:'mainhattan-nightrun/index.html',ribbon:'Arcade shooter',ref:false,
    blurb:'Fly a stolen-data courier over a neon Frankfurt in 2099. Graze drone fire to cool your guns, phase-dash through bullets and break four district bosses from the Bankenviertel to the Messe.',
    stats:[['1','player'],['10','minutes'],['10+','ages'],['4','districts']],
-   chips:['Solo arcade','Keyboard & touch','4 bosses','Heat & graze','Phase-dash','Synth soundtrack','Endless loops'],
-   based:'Side-scrolling shooter · Main Tower, Eiserner Steg, EZB, Messeturm',paint:paintMainhattan},
+   chips:['Solo arcade','Keyboard & touch','4 bosses','Heat & graze','Phase-dash','Synth soundtrack','Endless loops'],paint:paintMainhattan},
   {id:'overdrive',cover:'covers/overdrive.jpg',name:'Mainhattan Overdrive',src:'mainhattan-overdrive/index.html',ribbon:'Hover racing',ref:false,
    blurb:'Anti-gravity racing across four Frankfurt circuits, from the Bankenviertel canyon to the Fraport runway where jets land over your head. Race in neon night, dawn, storm or fog, and play a career, Zone survival, three-lives Arena, ghost duels and a new daily challenge.',
    stats:[['1','player'],['2–4','minutes'],['10+','ages'],['4','circuits']],
-   chips:['4 circuits + mirror','4 weathers','Crash cam & wrecks','Baustelle smash','6-event career','Zone survival','Arena · 3 lives','Demolition derby','Crash Junction','Aftertouch','Ghost duel','Daily challenge','Traffic & near misses','Takedowns','Gamepad & touch','Settings'],
-   based:'Anti-gravity racer in the style of Aether',paint:paintOverdrive}
+   chips:['4 circuits + mirror','4 weathers','Crash cam & wrecks','Baustelle smash','6-event career','Zone survival','Arena · 3 lives','Demolition derby','Crash Junction','Aftertouch','Ghost duel','Daily challenge','Traffic & near misses','Takedowns','Gamepad & touch','Settings'],paint:paintOverdrive}
 ];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 
@@ -288,7 +274,6 @@ for(const g of GAMES){const el=document.createElement('article');el.className='b
   <div class="info"><p>${g.blurb}</p>
     <div class="stats">${g.stats.map(s=>`<div><b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div>
     <div class="chips">${g.chips.map(c=>`<span>${c}</span>`).join('')}</div>
-    <div class="based">${g.based}</div>
     <div class="acts"><button type="button" class="btn play" id="play-${g.id}">▶ Play</button><a class="btn alt" href="${g.src}" target="_blank" rel="noopener">New tab</a>${g.ref===false?'':`<button type="button" class="btn alt" data-ref="${g.id}">Card list</button>`}${lastId===g.id?'<span class="last">Played last</span>':''}</div></div>`;
   shelf.appendChild(el);if(!g.cover)g.paint(el.querySelector('canvas'));el.querySelector('.play').onclick=()=>openGame(g)}
 

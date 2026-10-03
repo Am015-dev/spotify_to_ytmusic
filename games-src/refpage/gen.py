@@ -106,7 +106,7 @@ for e in json.load(open('ref_ft.json')):add('sands',e['s'],e['n'],e['tags'],e['t
 for e in json.load(open('ref_azul.json')):add('sunglaze',e['s'],e['n'],e.get('tags',[]),e['t'],[tuple(x) for x in e.get('sub',[])],e.get('c'))
 # ---- Rampart & Vine ----
 for e in json.load(open('ref_carc.json')):add('rampart',e['s'],e['n'],e.get('tags',[]),e['t'],[tuple(x) for x in e.get('sub',[])],e.get('c'))
-GAMES=[('crown','Crown City Smash','Dice brawl · plays like King of Tokyo'),('nebula','Nebula Aces','Starfighter duel · plays like X-Wing 1st edition'),('doorkick','Doorkick Dungeon','Card brawl · plays like Munchkin'),('shipwreck','Shipwreck Isle','Co-op survival · plays like Robinson Crusoe'),('sands','Sands of Qamar','Tile-and-meeple bazaar · plays like Five Tribes'),('sunglaze','Sunglaze','Tile drafting · plays like Azul'),('rampart','Rampart & Vine','Tile laying · plays like Carcassonne')]
+GAMES=[('crown','Crown City Smash','Dice brawl'),('nebula','Nebula Aces','Starfighter duel'),('doorkick','Doorkick Dungeon','Card brawl'),('shipwreck','Shipwreck Isle','Co-op survival'),('sands','Sands of Qamar','Tile-and-meeple bazaar'),('sunglaze','Sunglaze','Tile drafting'),('rampart','Rampart & Vine','Tile laying')]
 data=json.dumps({'E':E,'G':GAMES},ensure_ascii=False)
 tpl=open('refpage/template.html').read()
 out=tpl.replace('/*DATA*/null',data)
