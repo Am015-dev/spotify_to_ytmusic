@@ -671,7 +671,7 @@ function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('p
   const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
 function phApply(){const was=UI.phone;const on=phDetect();const root=document.documentElement;
   UI.phone=on;UI.land=innerWidth>innerHeight;root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);
-  if(on){const W=innerWidth,H=innerHeight,bar=44;const bs=UI.land?H:Math.min(W,H-bar-150);root.style.setProperty('--bs',bs+'px');root.style.setProperty('--bar','44px')}
+  if(on){const W=innerWidth,H=innerHeight,bar=44;const bs=UI.land?H:Math.min(W,Math.max(Math.round(W*.75),H-bar-270));root.style.setProperty('--bs',bs+'px');root.style.setProperty('--bar','44px')}
   else root.style.removeProperty('--bs');
   if(was!==on&&G){UI.mapReset=true;renderAll()}}
 function phoneRefresh(){}

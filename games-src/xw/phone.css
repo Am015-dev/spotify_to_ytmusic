@@ -162,12 +162,13 @@ html.ph #map text{display:none}
 html.ph.ph-p .ph-ctl{position:absolute;right:6px;bottom:6px;z-index:5;flex-direction:column;gap:2px;margin:0;padding:3px;border-radius:14px;background:rgba(10,8,30,.5);pointer-events:none}
 html.ph.ph-p .ph-ctl .gx-ibtn{pointer-events:auto;background:rgba(26,22,64,.55);border-color:rgba(255,255,255,.22)}
 /* one 44px row: the phase strip on the left, Guide + Advice on the right */
-html.ph.ph-p .gx-dock-head{position:absolute;top:0;right:0;z-index:4;height:44px;padding:0 6px 0 0;gap:4px;order:0}
+html.ph.ph-p .gx-dock-head{position:absolute;top:0;right:0;z-index:4;height:44px;padding:0 4px 0 0;gap:2px;order:0}
 html.ph.ph-p .gx-dock-head .na-guide b{display:none}
-html.ph.ph-p .gx-dock-top{padding:0 100px 0 6px;height:44px;display:flex;flex-direction:row;align-items:center}
+html.ph.ph-p .gx-dock-top{padding:0 94px 0 4px;height:44px;display:flex;flex-direction:row;align-items:center}
 html.ph.ph-p #steps{flex:1;min-width:0}
-html.ph.ph-p .road{gap:3px;align-items:center}
-html.ph.ph-p .road .ph{position:relative;min-height:0;height:34px;display:flex;align-items:center;justify-content:center;gap:1px;padding:0 1px;font-size:12.5px;line-height:1;white-space:nowrap;letter-spacing:-.01em}
+html.ph.ph-p .road{gap:1px;align-items:center}
+html.ph.ph-p .road .ph{border-width:1px}
+html.ph.ph-p .road .ph{position:relative;min-height:0;height:34px;display:flex;align-items:center;justify-content:center;gap:1px;padding:0 1px;font-size:12.5px;line-height:1;white-space:nowrap;letter-spacing:-.02em}
 html.ph.ph-p .road .ph::before{content:"";position:absolute;left:0;right:0;top:-5px;bottom:-5px}
 html.ph.ph-p .road .ph b,html.ph.ph-p .road .ph i{display:inline;font-size:12.5px;overflow:visible;text-overflow:clip}
 html.ph.ph-p .road .ph .lg,html.ph.ph-p .road .ph .tx{display:none}
@@ -185,3 +186,4 @@ html.ph #prompt .acts.col{display:contents}
 html.ph #prompt .acts.col>.btn{display:block;width:100%;margin:0 0 6px}
 html.ph #prompt .acts.col>.btn.primary,html.ph #prompt .acts.col:not(:has(>.btn.primary))>.btn.rec,html.ph #prompt>.acts:has(>.btn.primary.big){position:sticky;bottom:-4px;z-index:2;background-clip:padding-box;box-shadow:0 -10px 10px -2px var(--panel),0 3px 12px rgba(255,170,60,.25)}
 html.ph #prompt>.acts:has(>.btn.primary.big){background:var(--panel);bottom:-8px;padding:4px 0 6px;margin:0 0 4px;box-shadow:0 -10px 10px -2px var(--panel)}
+html.ph.ph-l #prompt .acts.col>.btn.primary,html.ph.ph-l #prompt .acts.col:not(:has(>.btn.primary))>.btn.rec,html.ph.ph-l #prompt>.acts:has(>.btn.primary.big),html.ph.ph-l .acts.main{bottom:0}

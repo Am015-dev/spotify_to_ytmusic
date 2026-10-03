@@ -8,7 +8,7 @@
 const SRC=`(()=>{
  const PANELS='#pc,#ppop,#ps,#step,#story,#modal,#ph-pop,#ph-z,#pzoom,.gx-dock,.gx-drawer.on,.pcard,.mbox,.zoom,#netst,.gx-bar,#cardstrip,.ph-card,.ph-pop,#phpop,#phcard,#hud,.pstrip,.dock';
  const VW=innerWidth,VH=innerHeight,out=[];
- const vis=e=>{if(!e.isConnected)return false;for(let n=e;n&&n!==document.documentElement;n=n.parentElement){const s=getComputedStyle(n);if(s.display==='none'||s.visibility==='hidden'||+s.opacity<.05||n.hidden)return false}if(getComputedStyle(e).display==='contents')return true;const r=e.getBoundingClientRect();return r.width>0&&r.height>0};
+ const vis=e=>{if(!e.isConnected)return false;for(let n=e;n&&n!==document.documentElement;n=n.parentElement){const s=getComputedStyle(n);if(s.display==='none'||s.visibility==='hidden'||+s.opacity<.05||n.hidden||s.contentVisibility==='hidden')return false;if(n.tagName==='DETAILS'&&!n.open&&!(e.closest('summary')&&e.closest('summary').parentElement===n))return false}if(getComputedStyle(e).display==='contents')return true;const r=e.getBoundingClientRect();return r.width>0&&r.height>0};
  const nm=e=>(e.id?'#'+e.id:'')+(e.className&&typeof e.className==='string'?'.'+e.className.trim().split(/\\s+/).slice(0,2).join('.'):'')||e.tagName;
  const panels=[...document.querySelectorAll(PANELS)].filter(vis);
  const inPanel=e=>panels.some(p=>p.contains(e));
@@ -23,7 +23,7 @@ const SRC=`(()=>{
   const w=document.createTreeWalker(p,NodeFilter.SHOW_TEXT);let t;
   while(t=w.nextNode()){
    const txt=t.nodeValue.replace(/\\s+/g,' ').trim();if(txt.length<1)continue;const el=t.parentElement;if(!el||seen.has(t))continue;seen.add(t);
-   if(!vis(el)||/^(SCRIPT|STYLE|CANVAS|TITLE|OPTION)$/.test(el.tagName))continue;
+   if(!vis(el)||/^(SCRIPT|STYLE|CANVAS|TITLE|OPTION)$/.test(el.tagName)||el.closest('svg'))continue;
    const rg=document.createRange();rg.selectNodeContents(t);const rs=[...rg.getClientRects()].filter(r=>r.width>.5&&r.height>.5);if(!rs.length)continue;
    const L=Math.min(...rs.map(r=>r.left)),T=Math.min(...rs.map(r=>r.top)),R=Math.max(...rs.map(r=>r.right)),B=Math.max(...rs.map(r=>r.bottom));
    const lab=nm(el)+' "'+txt.slice(0,32)+'"';

@@ -244,6 +244,8 @@ html.ph .stat,html.ph .gx-drawer .stat{font-size:15px}
 html.ph .gx-drawer{height:min(88dvh,100% - var(--bar))}
 html.ph .mbox{padding:12px;max-height:calc(100dvh - 24px)}
 html.ph .mbox h2{font-size:1.5rem}
+/* real usable heights: the primary row of a dialog stays pinned while the dialog scrolls */
+html.ph .mbox .acts:has(>.btn.go){position:sticky;bottom:-12px;z-index:2;margin:0 -12px -12px;padding:8px 12px 12px;background:linear-gradient(rgba(249,239,216,0),#f6e9cc 12px)}
 html.ph .seats .btn.sm{min-height:44px}
 html.ph-l .ps-tile{width:64px;height:64px}html.ph-l .ps-tile .tcard{width:60px;height:60px}
 html.ph-l .ps-row{gap:6px;flex-wrap:wrap}html.ph-l .ps-row.r1{flex-wrap:nowrap}

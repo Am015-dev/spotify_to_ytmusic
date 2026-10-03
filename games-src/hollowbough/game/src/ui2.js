@@ -14,7 +14,7 @@ function items(list, px) {
 function basicItems(i) { const b = D.basic[i], l = []; for (const r of RESK) if (b.gain[r]) l.push([r, b.gain[r]]); if (b.draw) l.push(['card', b.draw]); if (b.pts) l.push(['point', b.pts]); return l; }
 // ---- layout: returns rects for every board item
 function boardLayout(W, H) {
-  const nf = G.forest.length, g = 2, tall = W < H * 1.0;
+  const nf = G.forest.length, g = 2, tall = W < H * 1.0 || (document.documentElement.classList.contains('ph-p') && H >= 270);
   const R = { W, H, tall, tiles: [], meadow: [], g };
   const tl = (kind, i, x, y, w, hh) => R.tiles.push({ kind, i, x, y, w, h: hh });
   const extra = [['haven', 0], ['journey', 0], ['deck', 0], ['tree', 0]];

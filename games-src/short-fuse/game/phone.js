@@ -15,7 +15,7 @@ function pxApply(){const R=document.documentElement;const was=PX.on;PX.on=pxDete
   const w=innerWidth,h=innerHeight,I=pxInsets();PX.land=w>h;
   R.classList.toggle('ph-l',PX.land);R.classList.toggle('ph-p',!PX.land);
   // portrait: the free zone under the board; landscape: the rail on the right (the board is the full height)
-  const zh=Math.round(Math.max(278,Math.min(310,(h-I.t-I.b)*.35))),rw=Math.round(Math.max(232,Math.min(300,(w-I.l-I.r)*.31)));
+  const zh=Math.round(Math.min(Math.max(278,Math.min(310,(h-I.t-I.b)*.35)),Math.max(150,h-I.t-I.b-44-.75*(w-I.l-I.r)))),rw=Math.round(Math.max(232,Math.min(300,(w-I.l-I.r)*.31)));
   R.style.setProperty('--zh',zh+'px');R.style.setProperty('--rw',rw+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');return true}
 pxApply();
 // ---------- helpers ----------

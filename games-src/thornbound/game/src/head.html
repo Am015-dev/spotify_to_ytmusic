@@ -158,4 +158,10 @@ html.ph .netst{min-height:44px;margin:2px 6px 0}html.ph .netst .btn.small{min-he
 html.ph .step h3.st{font-size:1.05rem}html.ph .pr{font-size:.95rem;margin-bottom:4px}
 html.ph-l .road4{display:none}
 html.ph-l .pp-row{flex-direction:row}
+/* real usable heights: the board gives up a little (never below 0.75 x width) so the card/panel has room; the primary row stays pinned while a card scrolls */
+html.ph .cd{max-height:none}
+html.ph .pcard:not([hidden]){justify-content:safe center}
+html.ph .btnrow:has(>.btn.pri),html.ph .pp-act:has(>.btn.pri){position:sticky;bottom:0;z-index:3;padding:8px 0 6px;margin:0;background:linear-gradient(rgba(21,12,16,0),#150c10 10px)}
+html.ph .ppop .pp-act:has(>.btn.pri){background:linear-gradient(rgba(243,230,191,0),#f3e6bf 10px)}
+html.ph .gx-dock .btnrow:has(>.btn.pri){background:linear-gradient(rgba(26,15,19,0),#1a0f13 10px)}
 </style></head>

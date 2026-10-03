@@ -41,9 +41,9 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(HOT?'_hot':'');const ctx=await b.newC
   const clipCheck=async tag=>{const r=await p.evaluate(()=>{const o=[];const VW=innerWidth,VH=innerHeight;const desc=e=>(e.id?'#'+e.id:'')+(e.className&&typeof e.className==='string'?'.'+e.className.trim().split(/\s+/).slice(0,2).join('.'):'')||e.tagName;
     const vis=e=>{for(let n=e;n&&n!==document.documentElement;n=n.parentElement){const c=getComputedStyle(n);if(c.display==='none'||c.visibility==='hidden'||c.opacity==='0')return false;if(n.hidden)return false}return true};
     const live=e=>{if(!vis(e))return false;if(e.closest('.gx-drawer')&&!e.closest('.gx-drawer.on'))return false;if(e.closest('#more')&&!e.closest('#more.open'))return false;if(e.closest('#roster,#log,#bbody')&&!e.closest('.gx-drawer.on'))return false;if(e.closest('.sr,#live,script,style'))return false;return true};
-    const roots='.gx-dock,#ppop,#pc,#modal,#more,.gx-drawer.on,.gx-bar,#phctl';
+    const roots='.gx-dock,#ppop,#pc,#modal,#more,.gx-drawer.on,.gx-bar,#phctl';const ovl=['#ppop','#pc'].map(q=>document.querySelector(q)).filter(e=>e&&!e.hidden&&e.getClientRects().length);
     const w=document.createTreeWalker(document.body,4);const seen=new Set();
-    while(w.nextNode()){const n=w.currentNode;if(!n.nodeValue.trim())continue;const e=n.parentElement;if(!e||!e.closest(roots)||!live(e))continue;
+    while(w.nextNode()){const n=w.currentNode;if(!n.nodeValue.trim())continue;const e=n.parentElement;if(!e||!e.closest(roots)||!live(e))continue;if(ovl.length&&!ovl.some(x=>x.contains(e))&&e.closest('.gx-dock'))continue;
       const rg=document.createRange();rg.selectNodeContents(n);const R=rg.getBoundingClientRect();if(R.width<1||R.height<1)continue;const lab=desc(e)+' "'+n.nodeValue.trim().slice(0,28)+'"';
       let ok=true;
       if(R.left<-1||R.right>VW+1||R.top<-1||R.bottom>VH+1){let scrolled=false;for(let a=e;a&&a!==document.documentElement;a=a.parentElement){const c=getComputedStyle(a);if(/(auto|scroll)/.test(c.overflowY)&&a.scrollHeight>a.clientHeight+1){scrolled=true;break}}if(!scrolled){o.push('outside viewport: '+lab+' '+[R.left,R.top,R.right,R.bottom].map(Math.round));ok=false}}
@@ -51,7 +51,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(HOT?'_hot':'');const ctx=await b.newC
         const hy=/(hidden|clip)/.test(c.overflowY),sy=/(auto|scroll)/.test(c.overflowY),hx=/(hidden|clip)/.test(c.overflowX);
         if(a===e&&hy&&a.clientHeight>0&&a.scrollHeight>a.clientHeight+1&&!seen.has(a)){seen.add(a);o.push('scrollHeight>clientHeight, overflow hidden: '+lab+' '+a.scrollHeight+'>'+a.clientHeight)}
         if(R.top<ar.top-1||R.bottom>ar.bottom+1){if(hy&&!sy){o.push('cut by '+desc(a)+': '+lab+' text '+Math.round(R.top)+'-'+Math.round(R.bottom)+' box '+Math.round(ar.top)+'-'+Math.round(ar.bottom));break}if(sy){break}}
-        if(hx&&(R.left<ar.left-1||R.right>ar.right+1)&&!/ellipsis/.test(getComputedStyle(e).textOverflow)){o.push('cut sideways by '+desc(a)+': '+lab);break}}}
+        if(hx&&(R.left<ar.left-1||R.right>ar.right+1)&&!/ellipsis/.test(getComputedStyle(e).textOverflow)&&!/ellipsis/.test(c.textOverflow)){o.push('cut sideways by '+desc(a)+': '+lab);break}}}
     for(const b of document.querySelectorAll('.gx-dock button,.gx-bar button,#ppop button,#pc button,#phctl button,#more button')){if(!live(b))continue;if(b.clientWidth>0&&b.scrollWidth>b.clientWidth+1&&!/ellipsis/.test(getComputedStyle(b).textOverflow))o.push('text wider than its button: '+desc(b)+' "'+(b.textContent||'').trim().slice(0,20)+'" '+b.scrollWidth+'>'+b.clientWidth)}
     const over=['#ppop','#pc'].map(q=>document.querySelector(q)).filter(e=>e&&!e.hidden&&e.getClientRects().length);
     for(const b of document.querySelectorAll('#prompt .btn.primary,#ps .btn.primary,#ppop .btn.primary,#pc .btn.primary,#modal .btn.primary')){if(!live(b)||b.disabled||b.closest('.acts.grid'))continue;if(over.length&&!over.some(e=>e.contains(b)))continue;const R=b.getBoundingClientRect();if(R.width<2)continue;const lab=desc(b)+' "'+(b.textContent||'').trim().slice(0,24)+'"';
