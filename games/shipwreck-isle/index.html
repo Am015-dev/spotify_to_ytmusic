@@ -561,6 +561,14 @@ html.ph #ps .ps-hint{margin:2px 0 8px}
 html.ph.ph-l #step .st-t{display:none}
 html.ph #story .sctl .btn.go{flex:1 1 100%}html.ph #story .sctl .btn.ghost{flex:1 1 40%;padding:0 6px;font-size:14px}
 html.ph #modal.phcard .mbox{overflow:visible}
+/* real usable heights: the recommended job's button stays pinned while the pawn pop-up scrolls */
+html.ph #ppop .rec .rb{position:sticky;bottom:-12px;z-index:2;padding:6px 0 12px;margin-bottom:-12px;background:linear-gradient(rgba(255,247,227,0),#fff7e3 10px)}
+@media (max-width:400px){html.ph #phchip:not([hidden]){gap:4px;padding:0 5px!important;font-size:13.5px}}
+/* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
+html.ph .mbox,html.ph .dlg{box-sizing:border-box}
+/* real usable heights: all five pawns fit beside each other in 3 columns */
+html.ph #ps .pawnrow{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:5px;margin:0 0 6px}
+html.ph #ps .pw{min-height:44px;padding:3px 6px;gap:5px}html.ph #ps .pw span{font-size:13.5px}html.ph #ps .pw i{width:16px;height:16px}
 </style>
 </head>
 <body>
@@ -4375,7 +4383,7 @@ PHO.apply=function(){const R=document.documentElement;const was=PHO.on,wasL=PHO.
     if(typeof V3!=='undefined'){V3.ph=false;if(was&&V3.on&&V3.rad){V3.orbit.e=1.12;fitDist();placeCam()}}if(was){const c=q('#phchip');if(c)c.hidden=true;const v=q('#phview');if(v)v.hidden=true}return was}
   const w=innerWidth,h=innerHeight,I=insets();PHO.land=w>h;const aw=w-I.l-I.r;
   let bw,bh,rail=0;
-  if(PHO.land){rail=w>=800?300:280;bw=aw-rail;bh=h-I.t-I.b}else{bw=aw;bh=Math.round(Math.min(aw*.95,h-I.t-I.b-BAR-VIEW-250))}
+  if(PHO.land){rail=w>=800?300:280;bw=aw-rail;bh=h-I.t-I.b}else{bw=aw;bh=Math.round(Math.max(aw*.75,Math.min(aw*.95,h-I.t-I.b-BAR-VIEW-296)))}
   R.classList.toggle('ph-l',PHO.land);R.classList.toggle('ph-p',!PHO.land);
   const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--rail',rail);set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
   if(app)app.classList.remove('gx-dock-min','gx-sheet-full');
