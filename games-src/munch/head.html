@@ -541,5 +541,7 @@ html.ph-l #prompt .asks{left:auto;right:0;top:0;bottom:0;width:var(--ph-rail);ma
 /* real usable heights: primary action rows stay pinned while a dialog / ask panel scrolls */
 html.ph .dlg .acts{position:sticky;bottom:-12px;z-index:2;margin:10px -14px -12px!important;padding:8px 14px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(240,228,200,0),var(--paper) 14px)}
 html.ph #prompt .asks>div:last-child{position:sticky;bottom:calc(-10px - env(safe-area-inset-bottom,0px));padding:8px 0 calc(10px + env(safe-area-inset-bottom,0px));margin-bottom:calc(-10px - env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(240,228,200,0),var(--paper) 12px)}
+/* landscape rail on short screens: the action buttons share a row so the hint under them is not cut */
+@media (max-height:420px){html.ph-l #prompt .acts.main{flex-wrap:wrap;gap:6px}html.ph-l #prompt .acts .btn{flex:1 1 calc(50% - 6px);min-width:0;min-height:44px;font-size:14px;padding:4px 6px}html.ph-l #prompt p{margin:1px 0 3px;font-size:14px}}
 </style>
 </head>
