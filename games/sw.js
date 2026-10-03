@@ -8,7 +8,7 @@ const VER = 'v1';
 const SHELF = 'gns-shelf-' + VER;
 const GAMES = 'gns-games-' + VER;
 const SLUGS = ['crown-city-smash', 'nebula-aces', 'doorkick-dungeon', 'shipwreck-isle', 'sands-of-qamar', 'sunglaze', 'rampart-and-vine', 'short-fuse', 'tidewake', 'hollowbough', 'thornbound', 'kaiten-kitchen', 'mainhattan-nightrun', 'mainhattan-overdrive'];
-const PRECACHE = ['./', 'index.html', 'classic.html', 'sync.html', 'suggest.html', 'reference.html', 'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png'];
+const PRECACHE = ['./', 'index.html', 'classic.html', 'sync.html', 'suggest.html', 'reference.html', 'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png', 'room/plant.webp', 'room/room-back-day.webp', 'room/room-back-night.webp', 'room/room-front-day.webp', 'room/room-front-night.webp', 'room/suitcase.webp', 'room/velour.webp', 'room/wood.webp'];
 const BASE = new URL('./', self.registration.scope).pathname;
 
 self.addEventListener('install', e => {
@@ -23,7 +23,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
     const names = await caches.keys();
-    // downloaded games survive a version bump: copy them across before the old cache goes
+    // keep VER in step with SHELF_CACHE/GAME_CACHE in sync.html; downloaded games survive a version bump: copy them across before the old cache goes
     const gOld = names.filter(n => n.startsWith('gns-games-') && n !== GAMES);
     if (gOld.length) {
       const dst = await caches.open(GAMES);

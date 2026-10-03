@@ -28,8 +28,8 @@
 @media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--ink:#2a1a10;--muted:#6d5640;--brass:#9c6412;--line:#d2bb95;--shadow:rgba(80,50,20,.3);--bg:#efe3cc;--wall1:#ecd9b0;--wall2:#e0c791;--wallpat:rgba(120,70,20,.09);--wain:#f6eedb;--wain2:#e6d8b8;--rail:#d9c8a2;--floor1:#c99b6a;--floor2:#a6764a;--case:#b07a4c;--case2:#8d5c35;--caseback:#7d5539;--board1:#cb9460;--board2:#9a6a42;--rug:#b25a48;--rug2:#e6c07a;--hdr:rgba(247,238,218,.8);color-scheme:light}}
 :root[data-theme="light"]{--ink:#2a1a10;--muted:#6d5640;--brass:#9c6412;--line:#d2bb95;--shadow:rgba(80,50,20,.3);--bg:#efe3cc;--wall1:#ecd9b0;--wall2:#e0c791;--wallpat:rgba(120,70,20,.09);--wain:#f6eedb;--wain2:#e6d8b8;--rail:#d9c8a2;--floor1:#c99b6a;--floor2:#a6764a;--case:#b07a4c;--case2:#8d5c35;--caseback:#7d5539;--board1:#cb9460;--board2:#9a6a42;--rug:#b25a48;--rug2:#e6c07a;--hdr:rgba(247,238,218,.8);color-scheme:light}
 html[data-tod="day"]{--lamp:.25;--dim:0}
-html[data-tod="dusk"]{--lamp:.7;--dim:.2}
-html[data-tod="night"]{--lamp:1;--dim:.3}
+html[data-tod="dusk"]{--lamp:.7;--dim:.3}
+html[data-tod="night"]{--lamp:1;--dim:.5}
 [hidden]{display:none!important}
 *{box-sizing:border-box}
 html{min-height:100%}
@@ -38,6 +38,12 @@ button{font-family:inherit}
 :focus-visible{outline:3px solid var(--brass);outline-offset:2px}
 /* header */
 header.top{position:absolute;z-index:20;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 18px}
+/* the rendered wall is light by day and warm-dark at night whatever the colour scheme, so the heading follows the time of day */
+html:not(.ph)[data-tod="day"] header.top h1{color:#2a1a10;text-shadow:0 1px 0 rgba(255,255,255,.4)}
+html:not(.ph)[data-tod="day"] header.top .tally,html:not(.ph)[data-tod="day"] header.top .classic{color:#5a4330}
+html:not(.ph)[data-tod="day"] header.top .classic:hover{color:#8a5a12}
+html:not(.ph):not([data-tod="day"]) header.top h1{color:#f6ecd9;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+html:not(.ph):not([data-tod="day"]) header.top .tally,html:not(.ph):not([data-tod="day"]) header.top .classic{color:#e2d2b3;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 header.top{pointer-events:none}header.top>*{pointer-events:auto}
 header.top h1{font:400 clamp(1.3rem,2.2vw,1.8rem)/1.1 var(--display);margin:0;text-shadow:0 2px 0 rgba(0,0,0,.25)}
 .sub{display:flex;flex-wrap:wrap;gap:2px 14px;align-items:center;margin-top:2px}
@@ -58,6 +64,15 @@ header.top h1{font:400 clamp(1.3rem,2.2vw,1.8rem)/1.1 var(--display);margin:0;te
 .rb-rug{left:50%;right:auto;top:calc(var(--u)*71.5);width:calc(var(--u)*96);margin-left:calc(var(--u)*-48);height:calc(var(--u)*19);border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--rug) 80%,#000),var(--rug));box-shadow:inset 0 0 0 calc(var(--u)*.9) var(--rug2),inset 0 0 0 calc(var(--u)*1.7) var(--rug),inset 0 0 0 calc(var(--u)*2.2) var(--rug2),0 calc(var(--u)*.6) calc(var(--u)*1.4) rgba(0,0,0,.4);opacity:.95}
 .rb-glow{top:0;height:calc(var(--u)*90);background:radial-gradient(ellipse calc(var(--u)*50) calc(var(--u)*46) at calc(50% + var(--u)*56) calc(var(--u)*30),rgba(255,196,110,calc(var(--lamp)*.34)),transparent 70%)}
 .rb-floorglow{top:calc(var(--u)*67);height:calc(var(--u)*23);background:radial-gradient(ellipse calc(var(--u)*26) calc(var(--u)*9) at calc(50% + var(--u)*58) calc(var(--u)*8),rgba(255,200,120,calc(var(--lamp)*.4)),transparent 70%)}
+/* rendered room (CC0 models, see room/ASSETS.md): back layer under the bookcase, front layer (coffee table, lounge chair) over it */
+.rimg{position:absolute;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.rimg.back{left:0;top:0;width:144em;height:90em;z-index:0}
+.rimg.front{left:29.55em;top:47.85em;width:114.45em;height:42.15em;z-index:5}
+.rimg.dd{opacity:.4}
+html.ph .rimg{display:none}
+html:not(.ph) .roombg{background:linear-gradient(180deg,#c0b7a1 0.0%,#c0b7a1 2.2%,#beb59f 4.4%,#bfb6a0 6.7%,#bfb7a0 8.9%,#c1b9a1 11.1%,#c0b9a1 13.3%,#c0b9a1 15.6%,#c1baa2 17.8%,#c1baa3 20.0%,#bfb9a1 22.2%,#bfb9a1 24.4%,#c0bba3 26.7%,#c1bca4 28.9%,#c1bea4 31.1%,#c2bea5 33.3%,#c2bfa6 35.6%,#c2c0a7 37.8%,#c2c0a7 40.0%,#c0bea5 42.2%,#c1c0a7 44.4%,#c2c0a8 46.7%,#c2c1a7 48.9%,#5f331c 51.1%,#bab79a 53.3%,#bdb99e 55.6%,#bdb99c 57.8%,#bab59a 60.0%,#bbb79c 62.2%,#bbb59a 64.4%,#b9b398 66.7%,#bbb499 68.9%,#ada187 71.1%,#582b17 73.3%,#75573d 75.6%,#664f38 77.8%,#775a3c 80.0%,#795e3c 82.2%,#7c603c 84.4%,#795c3a 86.7%,#7a5a37 88.9%,#684b30 91.1%,#6d4e31 93.3%,#6b4c30 95.6%,#6e4e31 97.8%,#6e4f32 100.0%)}
+html[data-tod="day"]:not(.ph) .roombg{background:linear-gradient(180deg,#ebe7e0 0.0%,#ebe7df 2.2%,#eae6de 4.4%,#eae7df 6.7%,#eae7df 8.9%,#ebe7df 11.1%,#ebe7df 13.3%,#ebe7df 15.6%,#ebe7df 17.8%,#ebe7df 20.0%,#eae6de 22.2%,#eae6de 24.4%,#eae7df 26.7%,#eae7df 28.9%,#eae7df 31.1%,#ebe7df 33.3%,#eae7df 35.6%,#ebe7df 37.8%,#ebe7df 40.0%,#eae6de 42.2%,#eae7de 44.4%,#eae7df 46.7%,#ebe7df 48.9%,#783a1f 51.1%,#e2dac7 53.3%,#e8e1d0 55.6%,#e9e2d0 57.8%,#e8e1cf 60.0%,#e9e2d1 62.2%,#e8e2d0 64.4%,#e8e1cf 66.7%,#e8e1d0 68.9%,#d9cbb8 71.1%,#74361c 73.3%,#ab7c52 75.6%,#986d49 77.8%,#a8774e 80.0%,#a9794e 82.2%,#ac7b4e 84.4%,#a9784c 86.7%,#ac794a 88.9%,#986740 91.1%,#9f6e44 93.3%,#9c6b41 95.6%,#a26f42 97.8%,#a26e42 100.0%)}
+html:not(.ph) .roombg>*{display:none}
 /* stage */
 main{position:relative;z-index:1}
 .stage{position:relative;width:calc(var(--u)*144);height:calc(var(--u)*90);margin:0 auto;font-size:var(--u)}
@@ -76,7 +91,7 @@ html[data-tod="day"] .sky .hills{background:#5c9a63}
 .window .mull{position:absolute;background:var(--frame);box-shadow:0 0 .3em rgba(0,0,0,.3)}
 .window .mull.v{left:50%;top:0;bottom:0;width:.6em;margin-left:-.3em}
 .window .mull.h{top:50%;left:0;right:0;height:.6em;margin-top:-.3em}
-.window .curtain{position:absolute;top:-1.2em;bottom:-2em;width:5em;background:repeating-linear-gradient(90deg,rgba(0,0,0,.16) 0 .4em,transparent .4em 1.2em),#a4423a;border-radius:.4em .4em 2em 2em}
+.window .curtain{position:absolute;top:-1.2em;bottom:-2em;width:5em;background:repeating-linear-gradient(90deg,rgba(0,0,0,.22) 0 .45em,rgba(255,255,255,.07) .45em .7em,transparent .7em 1.3em),linear-gradient(rgba(70,12,16,.3),rgba(40,6,10,.35)),url(room/velour.webp) 0 0/9em 9em,#9a3a3a;border-radius:.4em .4em 2em 2em}
 .window .curtain.l{left:-3.6em;transform:skewY(2deg)}
 .window .curtain.r{right:-3.6em;transform:skewY(-2deg)}
 .window .sill{position:absolute;left:-1.6em;right:-1.6em;bottom:-2.3em;height:1.3em;background:linear-gradient(var(--frame),#a99d84);border-radius:.3em;box-shadow:0 .4em .8em rgba(0,0,0,.35)}
@@ -85,7 +100,8 @@ html[data-tod="day"] .sky .hills{background:#5c9a63}
 .lamp .bulb{position:absolute;left:3em;top:7.5em;width:12em;height:6em;background:radial-gradient(ellipse at 50% 0,rgba(255,220,140,calc(var(--lamp)*.95)),transparent 70%)}
 .lamp .pole{position:absolute;left:8.6em;top:9em;width:.8em;height:42em;background:linear-gradient(90deg,#6a4a22,#e0b25a,#6a4a22)}
 .lamp .foot{position:absolute;left:4em;bottom:0;width:10em;height:2.4em;border-radius:50%;background:radial-gradient(#e0b25a,#6a4a22);box-shadow:0 .6em 1em rgba(0,0,0,.5)}
-.sideboard{position:absolute;left:3em;top:54.5em;width:27em;height:12.5em;z-index:2}
+.sideboard{display:none}
+.sideboard-old{position:absolute;left:3em;top:54.5em;width:27em;height:12.5em;z-index:2}
 .sideboard .stop{position:absolute;left:-.6em;right:-.6em;top:0;height:1.5em;background:linear-gradient(var(--board1),var(--board2));border-radius:.3em;box-shadow:0 .4em .8em rgba(0,0,0,.35)}
 .sideboard .sbody{position:absolute;left:0;right:0;top:1.5em;bottom:.8em;background:linear-gradient(90deg,var(--case2),var(--case) 50%,var(--case2));box-shadow:inset 0 0 0 .3em rgba(0,0,0,.2)}
 .sideboard .sbody::before,.sideboard .sbody::after{content:"";position:absolute;top:1.2em;bottom:1.2em;width:calc(50% - 1.8em);border:.25em solid rgba(0,0,0,.28);border-radius:.3em;background:rgba(255,255,255,.04)}
@@ -93,11 +109,13 @@ html[data-tod="day"] .sky .hills{background:#5c9a63}
 .sideboard .knob{position:absolute;top:5em;width:.9em;height:.9em;border-radius:50%;background:radial-gradient(#ffe39a,#9c6412)}
 .sideboard .leg{position:absolute;bottom:0;width:1.3em;height:1.2em;background:var(--case2)}
 /* bookcase */
-.bookcase{position:absolute;left:32em;top:9em;width:84em;height:58.6em;z-index:1;border-radius:.6em .6em 0 0;background:linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.1) 10%,rgba(0,0,0,.1) 90%,rgba(0,0,0,.45)),var(--caseback);box-shadow:inset 0 0 0 2.4em var(--case),inset 0 0 0 2.6em rgba(0,0,0,.25),0 1em 2.4em rgba(0,0,0,.45)}
-.bookcase::before{content:"";position:absolute;left:-1.2em;right:-1.2em;top:-1.6em;height:2.2em;border-radius:.5em;background:linear-gradient(color-mix(in srgb,var(--case) 80%,#fff),var(--case2));box-shadow:0 .5em 1em rgba(0,0,0,.4)}
-.bookcase::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2em;background:linear-gradient(var(--case),var(--case2))}
+.bookcase{position:absolute;left:32em;top:9em;width:84em;height:58.6em;z-index:1;border-radius:.6em .6em 0 0;background:linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,.1) 10%,rgba(0,0,0,.1) 90%,rgba(0,0,0,.45)),linear-gradient(rgba(34,18,8,.72),rgba(34,18,8,.78)),url(room/wood.webp) 0 0/40em auto,var(--caseback);box-shadow:inset 0 0 0 2.6em rgba(0,0,0,.25),0 1em 2.4em rgba(0,0,0,.45)}
+.bookcase>.bc-frame{position:absolute;inset:0;pointer-events:none;border-radius:.6em .6em 0 0;padding:2.4em;background:linear-gradient(90deg,rgba(0,0,0,.25),transparent 12%,transparent 88%,rgba(0,0,0,.25)),linear-gradient(rgba(255,230,190,.1),rgba(60,30,10,.12)),url(room/wood.webp) 0 0/42em auto,var(--case);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0)}
+html.ph .bookcase>.bc-frame{display:none}
+.bookcase::before{content:"";position:absolute;left:-1.2em;right:-1.2em;top:-1.6em;height:2.2em;border-radius:.5em;background:linear-gradient(rgba(255,230,190,.2),rgba(60,30,10,.25)),url(room/wood.webp) 0 30%/38em auto,var(--case);box-shadow:0 .5em 1em rgba(0,0,0,.4)}
+.bookcase::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2em;background:linear-gradient(rgba(255,230,190,.12),rgba(40,20,8,.3)),url(room/wood.webp) 0 70%/38em auto,var(--case)}
 .bay{position:absolute;left:2.4em;width:79.2em;height:18em;top:calc(2.6em + var(--i)*18em);display:flex;align-items:flex-end;gap:1.4em;padding:0 1.8em 1.2em;perspective:110em;perspective-origin:50% -110%;transform-style:flat}
-.bay::after{content:"";position:absolute;z-index:-1;left:-.6em;right:-.6em;bottom:0;height:1.8em;background:linear-gradient(var(--board1) 0 42%,var(--board2) 42%);box-shadow:0 .5em 1em rgba(0,0,0,.4)}
+.bay::after{content:"";position:absolute;z-index:-1;left:-.6em;right:-.6em;bottom:0;height:1.8em;background:linear-gradient(rgba(255,235,200,.28) 0 42%,rgba(30,14,4,.3) 42%),url(room/wood.webp) 0 50%/30em auto,var(--board1);box-shadow:0 .5em 1em rgba(0,0,0,.4)}
 .cell{position:relative;flex:none;transform-style:preserve-3d}
 .deco{flex:none;position:relative;margin-left:auto;align-self:flex-end}
 .dbooks{display:flex;align-items:flex-end;gap:.15em;flex:none}
@@ -157,7 +175,10 @@ html[data-tod="day"] .sky .hills{background:#5c9a63}
 .obj:hover .art,.obj:focus-visible .art{transform:translateY(-.4em) scale(1.05)}
 .obj svg{width:100%;height:100%;display:block;overflow:visible}
 .sl{display:none}
+.obj.case-obj .art{display:block;width:100%;height:100%}
+.obj.case-obj img{width:100%;height:100%;object-fit:contain;display:block}
 .lab{position:absolute;left:50%;bottom:calc(100% + .5em);transform:translateX(-50%);white-space:nowrap;background:#241810;color:#f6ecd9;font:700 max(13px,1.7em)/1.2 var(--body);padding:.35em .8em;border-radius:.4em;opacity:0;pointer-events:none;transition:opacity .15s;z-index:9;box-shadow:0 .3em .8em rgba(0,0,0,.4)}
+.obj[data-obj="inv"] .lab{left:auto;right:0;transform:none}
 .obj:hover .lab,.obj:focus-visible .lab,.trophy:hover .lab,.trophy:focus-visible .lab{opacity:1}
 .mantel{position:absolute;left:56em;top:3.2em;width:56em;height:5.9em;display:flex;gap:3em;justify-content:center;align-items:flex-end;z-index:6}
 .trophy{font:inherit;position:relative;flex:none;width:4.2em;height:5.4em;padding:0;border:0;background:none;cursor:pointer;color:var(--brass);--tf:transparent;--ts:currentColor}
@@ -167,8 +188,10 @@ html[data-tod="day"] .sky .hills{background:#5c9a63}
 .trophy.on::after{content:"";position:absolute;left:10%;right:10%;bottom:-.3em;height:.5em;background:radial-gradient(rgba(0,0,0,.4),transparent 70%)}
 .trlab{display:none}
 /* coffee table */
-.coffee{position:absolute;left:38em;top:67em;width:68em;height:23em;z-index:3}
-.t-top{position:absolute;left:0;top:8em;width:100%;height:8.6em;clip-path:polygon(4% 0,96% 0,100% 100%,0 100%);background:linear-gradient(#a8744a,#7a4c2c)}
+.coffee{position:absolute;left:38em;top:67em;width:68em;height:23em;z-index:7}
+.t-top,.t-edge,.t-leg{display:none}
+html.ph .coffee>.t-top,html.ph .coffee>.t-edge,html.ph .coffee>.t-leg{display:none}
+.t-top0{position:absolute;left:0;top:8em;width:100%;height:8.6em;clip-path:polygon(4% 0,96% 0,100% 100%,0 100%);background:linear-gradient(#a8744a,#7a4c2c)}
 .t-top::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,rgba(0,0,0,.08) 0 .15em,transparent .15em 4em)}
 .t-edge{position:absolute;left:0;top:16.6em;width:100%;height:2.4em;background:linear-gradient(#6c4226,#3f2514);border-radius:.3em;box-shadow:0 .8em 1.2em rgba(0,0,0,.4)}
 .t-leg{position:absolute;top:19em;width:2.2em;height:4em;background:linear-gradient(90deg,#4a2c1a,#6c4226,#3a2012)}
@@ -187,6 +210,81 @@ html[data-tod="day"] .sky .hills{background:#5c9a63}
 .pcard::after{content:"";position:absolute;inset:.5em;border-radius:.2em;background:repeating-linear-gradient(45deg,var(--cc,#b33) 0 .25em,transparent .25em .5em);opacity:.55}
 .mee{position:absolute;width:2.2em;height:2.4em;pointer-events:none;filter:drop-shadow(0 .2em .2em rgba(0,0,0,.45))}
 .mee svg{width:100%;height:100%;display:block}
+/* retro TV: a real CC0 CRT model is rendered into the room image; the screen and knobs are live HTML laid over it */
+.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tv{position:absolute;left:0;top:0;width:144em;height:90em;z-index:6;pointer-events:none}
+.tv>*{pointer-events:auto}
+.tv-top{position:absolute;width:0;height:0}
+.tv-screen{position:absolute;border:0;padding:0;margin:0;cursor:pointer;border-radius:9%/12%;font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
+.tv-screen:focus-visible{outline:3px solid var(--brass);outline-offset:3px}
+.tv-screen:hover{filter:brightness(1.12)}
+.tvk{font:inherit;position:absolute;width:2.9em;height:2.9em;margin:-1.45em 0 0 -1.45em;border-radius:50%;border:0;padding:0;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tvk::after{content:"";position:absolute;left:calc(-.4em - 8px);right:calc(-.4em - 8px);top:calc(-.2em - 6px);bottom:calc(-.2em - 6px)}
+.tvk:hover,.tvk:focus-visible{box-shadow:0 0 0 .25em rgba(255,236,170,.75),0 0 1em rgba(255,226,140,.6)}
+.tvk .lab{bottom:auto;top:50%;left:calc(100% + .8em);transform:translateY(-50%)}
+.tvk:hover .lab,.tvk:focus-visible .lab{opacity:1}
+/* the glass, shared by the TV, the guide card and the phone card */
+.crt{position:relative;overflow:hidden;background:#07100c;isolation:isolate}
+.crt img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:sepia(.3) saturate(1.25) hue-rotate(-6deg) contrast(1.08) brightness(1.18)}
+.crt::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.34) 0 1px,transparent 1px 3px)}
+.crt::after{content:"";position:absolute;inset:0;z-index:4;pointer-events:none;background:linear-gradient(125deg,rgba(255,255,255,.2),transparent 26%),radial-gradient(ellipse at 50% 50%,transparent 58%,rgba(0,0,0,.6) 100%);box-shadow:inset 0 0 1.4em rgba(0,0,0,.75),inset 0 0 .3em rgba(150,255,210,.25)}
+.tv-flick{position:absolute;inset:0;z-index:2;pointer-events:none;background:rgba(190,255,225,.07);animation:tvflick 3.1s steps(1,end) infinite}
+.tv-roll{position:absolute;left:0;right:0;top:-30%;height:28%;z-index:2;pointer-events:none;background:linear-gradient(transparent,rgba(190,255,225,.09),transparent);animation:tvroll 6.5s linear infinite}
+html.playing .tv-flick,html.playing .tv-roll{animation:none}
+@keyframes tvflick{0%{opacity:.2}7%{opacity:1}9%{opacity:.35}31%{opacity:.7}33%{opacity:.15}58%{opacity:.9}61%{opacity:.3}84%{opacity:.65}100%{opacity:.2}}
+@keyframes tvroll{from{transform:translateY(0)}to{transform:translateY(560%)}}
+.tv-noise{display:none;position:absolute;inset:0;z-index:2;width:100%;height:100%;image-rendering:pixelated;opacity:.92}
+.crt.sw .tv-noise{display:block}.crt.sw img,.crt.sw .tv-ttl{visibility:hidden}
+.tv-ch{position:absolute;left:7%;top:8%;z-index:5;font:500 max(10px,1.05em)/1 var(--mono);letter-spacing:.08em;color:#b6ffc4;text-shadow:0 0 .4em #5dff9a,0 0 .1em #000;pointer-events:none}
+.tv-ttl{position:absolute;left:0;right:0;bottom:0;z-index:5;padding:1.6em 1.2em .8em;text-align:center;color:#fff;font:400 max(10px,1.15em)/1.08 var(--display);text-wrap:balance;text-shadow:0 .1em 0 rgba(0,0,0,.6),0 0 .5em rgba(0,0,0,.8);background:linear-gradient(transparent,rgba(2,8,5,.82));pointer-events:none}
+/* phone-card pieces that still use the metal knob look */
+.tv-knob{border-radius:50%;border:0;padding:0;cursor:pointer;color:#262626;font:800 1.15em/1 var(--body);display:grid;place-items:center;background:conic-gradient(from 20deg,#6b6b6b,#d9d9d9,#7c7c7c,#ececec,#6b6b6b);box-shadow:0 .25em .4em rgba(0,0,0,.6),inset 0 0 0 .22em #2b2b2b,inset 0 0 0 .5em #bdbdbd;-webkit-tap-highlight-color:transparent}
+.tv-knob:hover{filter:brightness(1.12)}
+.tv-ant{position:absolute;pointer-events:none}
+.tv-bez{border-radius:16px/18px;background:linear-gradient(#1b1814,#090806);box-shadow:inset 0 0 .5em #000,0 0 0 .2em rgba(0,0,0,.4),0 .12em 0 .26em rgba(255,255,255,.1)}
+/* phone card */
+.tvc{position:relative;display:flex;gap:10px;align-items:center;padding:8px;border-radius:14px;background:linear-gradient(90deg,var(--case2),var(--case) 50%,var(--case2));box-shadow:inset 0 0 0 2px rgba(0,0,0,.25),0 6px 14px rgba(0,0,0,.35);font-size:16px}
+.tvc .tv-ant{right:52px;top:-17px;width:56px;height:20px}
+.tvc .tv-bez{position:relative;flex:none;width:128px;height:98px;padding:5px;border-radius:16px/18px}
+.tvc .tv-screen{position:absolute;left:5px;top:5px;right:5px;bottom:5px;font-size:9px;border-radius:12px/14px}
+.tvc .tv-ch{font-size:13px}
+.tvc-side{flex:1;min-width:0;display:grid;gap:5px}
+.tvc-plate{justify-self:start;padding:3px 8px;border-radius:3px;background:linear-gradient(#ecc982,#b78638);color:#3a2208;font:800 13px/1.1 var(--mono);letter-spacing:.1em}
+.tvc-t{font:400 1.05rem/1.15 var(--display);color:#fff7e6;text-shadow:0 1px 0 rgba(0,0,0,.5);overflow-wrap:anywhere}
+.tvc-btns{display:flex;gap:8px;align-items:center}
+.tvc-btns .tv-knob{position:relative;left:auto;top:auto;margin:0;width:44px;height:44px;font-size:16px;flex:none}
+.tvc-btns .tv-knob::after{inset:0}
+.tvc-btns span{font:500 13px var(--mono);letter-spacing:.08em;color:#f0dcb4}
+.tvc.cat1{margin-top:46px}
+html.ph .tvc{order:3;flex:1 1 100%;margin-top:14px}
+html.ph .tvc.cat1{margin-top:46px}
+@media (max-height:499px){html.ph .tvc{flex:1 1 100%;order:5}}
+/* TV guide card (inspect) */
+.fly.tvg .ins-l{padding:26px;gap:12px;grid-auto-flow:row;align-content:center;background:radial-gradient(ellipse at 50% 80%,rgba(100,255,190,.1),transparent 60%),linear-gradient(#2c1e14,#150e09)}
+.tvpic{width:min(30vw,320px);aspect-ratio:4/3;border-radius:14%/18%;font-size:clamp(11px,1.3vw,16px);border:.9em solid #0b0a08;box-shadow:0 0 0 .22em #5a3a22,0 .6em 1.4em rgba(0,0,0,.6),0 0 2.4em rgba(120,255,200,.18)}
+.tvg-cap{justify-self:center;padding:3px 12px;border-radius:3px;background:linear-gradient(#ecc982,#b78638);color:#3a2208;font:800 13px/1.2 var(--mono);letter-spacing:.14em}
+.tvg .bk-h.tvg-h{background:linear-gradient(#17353f,#0b1d24);padding-top:3.2cqw}
+.tvg .tvg-on{flex:0 0 100%;font:700 13px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#8affc0;text-shadow:0 0 .6em rgba(100,255,170,.5)}
+.tvg .bk-r{color:#b9e8d2}
+.tvg .stats{border-color:#17353f}.tvg .stats div{border-color:#17353f}
+.tvg .chips span{background:#cfe3d8;color:#12302a}
+.tvg .acts{border-top:1.5px dashed #8db3a2}
+.tvg .btn.play{background:#12302a}
+.sheet.tvg .sh-head{background:linear-gradient(#17353f,#0b1d24);border-radius:18px 18px 0 0;border-bottom:0}
+.sheet.tvg .grab{background:#6ea08c}
+.sheet.tvg .sh-ttl h2{color:#fff}.sheet.tvg .sh-ttl .bk-r{color:#8affc0}
+.sheet.tvg .sh-x{border-color:#8affc0;color:#8affc0}
+.mini.mtv .crt{position:absolute;inset:0;border-radius:10px;font-size:6px;border:4px solid #0b0a08;box-shadow:0 0 0 1.5px #5a3a22}
+.mini.mtv .tv-ch{font-size:9px}
+/* controller + cartridge on the coffee table when the last game was a video game */
+.pad{position:absolute;left:4em;top:6.6em;width:17em;height:8.4em;transform:rotate(-8deg);filter:drop-shadow(0 .3em .3em rgba(0,0,0,.5));pointer-events:none}
+.pad svg{width:100%;height:100%;display:block}
+.cart{position:absolute;left:23.5em;top:-.4em;width:12.4em;height:12.6em;transform:rotate(-2.5deg);border-radius:.7em .7em .35em .35em;background:linear-gradient(90deg,#1c1c22,#3a3a44 50%,#1c1c22);box-shadow:0 0 0 .2em #121217,0 .8em 1.4em rgba(0,0,0,.5);pointer-events:none}
+.cart::before{content:"";position:absolute;left:1.2em;right:1.2em;top:.7em;height:.9em;border-radius:.2em;background:repeating-linear-gradient(90deg,#0b0b0e 0 .5em,transparent .5em .9em)}
+.cart::after{content:"";position:absolute;left:1.6em;right:1.6em;bottom:0;height:1.5em;border-radius:.2em .2em 0 0;background:repeating-linear-gradient(90deg,#d8b04a 0 .3em,#8a6a20 .3em .6em);opacity:.85}
+.cart .cl{position:absolute;left:1.2em;right:1.2em;top:2.4em;height:7.6em;overflow:hidden;border-radius:.3em;background:var(--c);box-shadow:0 0 0 .22em var(--c),inset 0 0 0 .1em rgba(255,255,255,.25)}
+.cart .cl img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.cart .cl span{position:absolute;left:0;right:0;bottom:0;padding:.8em .4em .3em;background:linear-gradient(transparent,rgba(10,6,4,.88));color:#fff;font:400 .95em/1.05 var(--display);text-align:center;text-wrap:balance}
 /* overlays */
 .dimlay{position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(ellipse calc(var(--u)*62) calc(var(--u)*56) at calc(var(--u)*124) calc(var(--u)*26),rgba(10,5,22,calc(var(--dim)*.15)),rgba(10,5,22,var(--dim)) 80%)}
 .plight{position:absolute;left:32em;top:9em;width:84em;height:58.6em;z-index:5;pointer-events:none;opacity:0;transition:opacity .3s;background:radial-gradient(circle 17em at var(--px,50%) var(--py,50%),rgba(255,220,150,.24),transparent 72%)}
@@ -259,6 +357,7 @@ footer a{color:var(--brass)}
 .pl-t span{font:500 .82rem var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 .plist .btn.play{background:var(--brass);color:#1d1208;flex:none;min-width:88px}
 .lt{margin:6px 0 14px}
+.lh{font:400 1.25rem/1.2 var(--display);margin:20px 2px 10px;color:var(--ink)}
 /* tiny toast and dialog */
 #tip{position:fixed;z-index:60;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);max-width:min(92vw,420px);background:#241810;color:#f6ecd9;padding:12px 16px;border-radius:8px;font:500 .95rem/1.4 var(--body);box-shadow:0 8px 28px rgba(0,0,0,.5);border:1px solid #5a3a26}
 #tip b{display:block;font:400 1.05rem var(--display);color:#f0c05a;margin-bottom:2px}
@@ -329,6 +428,7 @@ html.ph .t-card.w b{font-size:1rem}
 html.ph header.top h1{font-size:1.2rem}
 @media (max-height:499px){html.ph header.top>div:first-child{display:flex;align-items:center;gap:2px 16px;flex-wrap:wrap}html.ph header.top .sub{margin-top:0}html.ph .coffee{flex:1 1 260px}html.ph .objects{flex:0 1 auto}html.ph .obj{flex:0 0 92px}html.ph .cell{margin-top:6px}}
 html.ph footer{padding-top:8px}
+html.ph footer a{display:inline-flex;align-items:center;min-height:44px}
 html.ph{scroll-snap-type:y proximity}
 html.ph header.top{scroll-snap-align:start}
 .t-card{display:flex;gap:12px;align-items:center;background:var(--paper);color:#241810;border-radius:12px;padding:10px;box-shadow:0 6px 16px rgba(0,0,0,.4)}
@@ -340,7 +440,7 @@ html.ph header.top{scroll-snap-align:start}
 .t-card.w{display:block}
 .t-card.w b{display:block;font:400 1.25rem/1.15 var(--display)}
 .t-card.w p{margin:4px 0 0;font:500 .95rem/1.35 var(--body);color:#5a4330}
-@media (prefers-reduced-motion:reduce){.b3,.ins-bd,.sheet,.plight,.obj .art{transition:none!important}.cat .body,.cat.tw .ear,.cat.purr svg,#table.opening{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.b3,.ins-bd,.sheet,.plight,.obj .art{transition:none!important}.cat .body,.cat.tw .ear,.cat.purr svg,#table.opening,.tv-flick,.tv-roll{animation:none!important}.tv-knob:active{transform:none}}
 /* loading card shown over a game while it starts */
 #table iframe,#loader{grid-area:-2/1/-1/2}
 #loader{position:relative;z-index:2;display:grid;place-items:center;background:radial-gradient(120% 80% at 50% 30%,#3a2618,#140d09 75%);color:#f4ead8;transition:opacity .45s ease}
@@ -364,7 +464,7 @@ html.ph header.top{scroll-snap-align:start}
 <body>
 <div class="roombg" aria-hidden="true"><div class="rb-wall"></div><div class="rb-wain"></div><div class="rb-skirt"></div><div class="rb-floor"></div><div class="rb-rug"></div><div class="rb-glow"></div><div class="rb-floorglow"></div></div>
 <header class="top">
-  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">13 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div></div>
+  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">14 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div></div>
   <div class="tools"><button type="button" class="tbtn" id="sndbtn" aria-label="Sound on" aria-pressed="true">🔊</button><button type="button" class="tbtn" id="viewbtn">☰ Plain list</button></div>
 </header>
 <main>
@@ -376,6 +476,7 @@ html.ph header.top{scroll-snap-align:start}
     <div class="bookcase" id="bookcase" role="group" aria-label="Bookcase of games"></div>
     <div class="coffee" id="coffee"></div>
     <div class="objects" id="objects"></div>
+    <div id="tv" hidden></div>
     <div class="mantel" id="mantel" role="group" aria-label="Trophies"></div>
     <div class="dimlay"></div>
     <div class="plight" id="plight"></div>
@@ -451,11 +552,11 @@ const GAMES=[
    blurb:'Plates glide past on the conveyor belt: grab one, pass the rest along, and build the tastiest table. Pair the prawns, finish fish sets, race for seaweed rolls and save a custard for dessert. Everyone picks at once, so watch what your neighbours collect. Play against computers, pass one device around, or online with friends.',
    stats:[['2–5','players'],['20','minutes'],['8+','ages'],['3','rounds']],
    chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','Simultaneous picks']},
-  {id:'mainhattan',cover:'covers/nightrun.jpg',name:'Mainhattan Nightrun',src:'mainhattan-nightrun/index.html',ribbon:'Arcade shooter',ref:false,
+  {id:'mainhattan',kind:'video',cover:'covers/nightrun.jpg',name:'Mainhattan Nightrun',src:'mainhattan-nightrun/index.html',ribbon:'Arcade shooter',ref:false,
    blurb:'Fly a stolen-data courier over a neon Frankfurt in 2099. Graze drone fire to cool your guns, phase-dash through bullets and break four district bosses from the Bankenviertel to the Messe.',
    stats:[['1','player'],['10','minutes'],['10+','ages'],['4','districts']],
    chips:['Solo arcade','Keyboard & touch','4 bosses','Heat & graze','Phase-dash','Synth soundtrack','Endless loops']},
-  {id:'overdrive',cover:'covers/overdrive.jpg',name:'Mainhattan Overdrive',src:'mainhattan-overdrive/index.html',ribbon:'Hover racing',ref:false,
+  {id:'overdrive',kind:'video',cover:'covers/overdrive.jpg',name:'Mainhattan Overdrive',src:'mainhattan-overdrive/index.html',ribbon:'Hover racing',ref:false,
    blurb:'Anti-gravity racing across four Frankfurt circuits, from the Bankenviertel canyon to the Fraport runway where jets land over your head. Race in neon night, dawn, storm or fog, and play a career, Zone survival, three-lives Arena, ghost duels and a new daily challenge.',
    stats:[['1','player'],['2–4','minutes'],['10+','ages'],['4','circuits']],
    chips:['4 circuits + mirror','4 weathers','Crash cam & wrecks','Baustelle smash','6-event career','Zone survival','Arena · 3 lives','Demolition derby','Crash Junction','Aftertouch','Ghost duel','Daily challenge','Traffic & near misses','Takedowns','Gamepad & touch','Settings']}
@@ -464,7 +565,8 @@ const GAMES=[
 const LOOK={crown:{c:'#8c3f5e',W:14.6,H:11.8,D:3.4},nebula:{c:'#3c3a78',W:13.4,H:11.6,D:3.0},doorkick:{c:'#b5622a',W:13.8,H:11.0,D:3.6},shipwreck:{c:'#4f7a58',W:14.4,H:11.2,D:3.4},sands:{c:'#b8683c',W:13.6,H:11.6,D:3.0},
  sunglaze:{c:'#2a5fa8',W:14.4,H:11.4,D:3.4},rampart:{c:'#7a8a3c',W:13.6,H:11.0,D:3.0},shortfuse:{c:'#c9372c',W:14.2,H:10.8,D:3.0},tidewake:{c:'#2f6b66',W:14.6,H:11.2,D:2.8},hollowbough:{c:'#7a5a2c',W:14.4,H:11.8,D:3.2},
  thornbound:{c:'#3b2a4f',W:14.0,H:11.8,D:3.4},kaiten:{c:'#c2502e',W:13.2,H:10.6,D:3.0},mainhattan:{c:'#6a1f6e',W:13.4,H:10.8,D:2.8},overdrive:{c:'#4a3f9a',W:14.4,H:11.4,D:3.4}};
-const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck','sands'],['sunglaze','rampart',['shortfuse','tidewake'],'hollowbough'],['thornbound','kaiten','mainhattan','overdrive']];
+/* board games only; video games (kind:'video') live on the TV */
+const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck'],['sands','sunglaze','rampart',['shortfuse','tidewake']],['hollowbough','thornbound','kaiten']];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const $=(s,r=document)=>r.querySelector(s);
 const root=document.documentElement;
@@ -472,6 +574,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const clean=n=>n.replace(/\s*\(preview\)\s*$/,'');
 const isPrev=g=>/\(preview\)/.test(g.name);
 const byId=id=>GAMES.find(g=>g.id===id);
+const VIDEO=()=>GAMES.filter(g=>g.kind==='video'),BOARD=()=>GAMES.filter(g=>g.kind!=='video');
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isPh=()=>{const q=new URLSearchParams(location.search).get('phone');if(q==='1')return true;if(q==='0')return false;const sh=Math.min(innerWidth,innerHeight);return sh<=500||(sh<=600&&matchMedia('(pointer:coarse)').matches)};
 function jget(k){try{return JSON.parse(store.get(k)||'{}')||{}}catch(e){return{}}}
@@ -506,6 +609,8 @@ trophy:{
  explorer:'<svg viewBox="0 0 40 52"><circle cx="20" cy="26" r="17"/><circle cx="20" cy="26" r="12" fill="none"/><path d="M20 12l5 14-5 14-5-14z"/><path d="M20 3v4M20 45v4" fill="none"/></svg>',
  collector:'<svg viewBox="0 0 40 52"><path d="M10 4h20l-1 14c-1 7-5 11-9 11s-8-4-9-11z"/><path d="M18 29h4v9h-4zM9 38h22v10H9z"/><path d="M20 8l2.2 4.6 5 .6-3.7 3.4 1 5-4.5-2.5-4.5 2.5 1-5-3.7-3.4 5-.6z" fill="none"/></svg>',
  owl:'<svg viewBox="0 0 40 52"><path d="M20 5c9 0 15 7 15 17 0 11-6 20-15 20S5 33 5 22C5 12 11 5 20 5z"/><circle cx="13.5" cy="21" r="5" fill="none"/><circle cx="26.5" cy="21" r="5" fill="none"/><path d="M18 27l2 4 2-4zM12 44h16" fill="none"/></svg>'},
+ant:'<svg viewBox="0 0 140 56"><g fill="none" stroke="#d8d0bd" stroke-width="2.6" stroke-linecap="round"><path d="M64 54L16 5"/><path d="M76 54L118 3"/></g><g fill="#efe8d4" stroke="#8d8672" stroke-width="1.2"><circle cx="16" cy="5" r="3.2"/><circle cx="118" cy="3" r="3.2"/></g><path d="M52 56a18 14 0 0 1 36 0z" fill="#2b2b30" stroke="#0e0e12" stroke-width="1.6"/></svg>',
+pad:c=>`<svg viewBox="0 0 200 100"><path d="M52 14h96c20 0 30 10 38 38l8 30c3 11-6 16-15 14-8-2-12-8-18-16-5-6-8-8-16-8H67c-8 0-11 2-16 8-6 8-10 14-18 16-9 2-18-3-15-14l8-30C22 24 32 14 52 14z" fill="${c}" stroke="rgba(0,0,0,.6)" stroke-width="3"/><path d="M52 18h96c16 0 24 8 31 30" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="3" stroke-linecap="round"/><g fill="#15151a"><rect x="46" y="38" width="10" height="30" rx="2"/><rect x="36" y="48" width="30" height="10" rx="2"/></g><g stroke="rgba(0,0,0,.5)" stroke-width="2"><circle cx="150" cy="36" r="7" fill="#e8b84a"/><circle cx="166" cy="50" r="7" fill="#d94a3a"/><circle cx="134" cy="50" r="7" fill="#3a7bd9"/><circle cx="150" cy="64" r="7" fill="#4aa05a"/></g><rect x="84" y="50" width="12" height="5" rx="2.5" fill="#15151a"/><rect x="104" y="50" width="12" height="5" rx="2.5" fill="#15151a"/></svg>`,
 cat:'<svg viewBox="0 0 120 64"><g class="body"><ellipse cx="58" cy="44" rx="48" ry="17" fill="#d08436" stroke="#7a4410" stroke-width="2"/><path d="M30 34c4-3 8-4 12-4M46 28c4-2 9-2 13-1M66 28c4-1 9 0 13 2" stroke="#9a5a1a" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M104 44c14-2 14-20 2-22" fill="none" stroke="#d08436" stroke-width="9" stroke-linecap="round"/><path d="M104 44c14-2 14-20 2-22" fill="none" stroke="#7a4410" stroke-width="1.6" stroke-linecap="round" opacity=".6"/><circle cx="26" cy="38" r="15" fill="#d9903e" stroke="#7a4410" stroke-width="2"/><path d="M13 29L11 14l12 8z" class="ear e1" fill="#d9903e" stroke="#7a4410" stroke-width="2" stroke-linejoin="round"/><path d="M33 24l6-12 5 12z" class="ear e2" fill="#d9903e" stroke="#7a4410" stroke-width="2" stroke-linejoin="round"/><path d="M17 39q3 3 6 0M29 39q3 3 6 0" stroke="#3a1f08" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M24 44l2 2 2-2z" fill="#e8928a"/><path d="M16 56c3 0 5 2 5 4M28 58c3 0 5 1 6 3" stroke="#7a4410" stroke-width="2" fill="none" stroke-linecap="round"/></g></svg>'
 };
 const TROPHIES=[
@@ -555,21 +660,22 @@ function topCat(){const P=getPlays();let best=null,m=2;for(const g of GAMES){con
 let view=store.get('room_view')==='list'?'list':'room';
 let lastBuiltPh=null;
 function obj(kind,style){
-  const defs={ref:['button','Card & token reference',ART.book,'Cards'],sugg:['a','Suggestion box',ART.sugg,'Suggest'],inv:['button','Play online with friends',ART.inv,'Online']};
+  const defs={ref:['button','Card & token reference',ART.book,'Cards'],sugg:['a','Suggestion box',ART.sugg,'Suggest'],inv:['button','Play online with friends',ART.inv,'Online'],case:['a','Saves & offline',style?'<img src="room/suitcase.webp" alt="" width="267" height="128" loading="lazy" decoding="async" draggable="false">':'🧳','Saves']};
   const [tag,label,art,sl]=defs[kind];const e=document.createElement(tag);e.className='obj';e.dataset.obj=kind;
-  if(tag==='a')e.href='suggest.html';else e.type='button';
+  if(tag==='a')e.href=kind==='case'?'sync.html':'suggest.html';else e.type='button';
+  if(kind==='case'&&style)e.classList.add('case-obj');
   if(kind==='ref')e.dataset.ref='';
   if(kind==='inv')e.setAttribute('aria-haspopup','dialog');
-  e.setAttribute('aria-label',kind==='sugg'?'Suggestion box: suggest a game or fix':label);
+  e.setAttribute('aria-label',kind==='sugg'?'Suggestion box: suggest a game or fix':kind==='case'?'Saves and offline play: back up your saves and keep games offline':label);
   if(style)e.style.cssText=style;
   e.innerHTML=`<span class="art">${art}</span><span class="lab">${label}</span><span class="sl">${sl}</span>`;return e}
 function pcs(h){return h}
 function dieHtml(v,x,y,r){const P={1:[[50,50]],2:[[28,28],[72,72]],3:[[28,28],[50,50],[72,72]],4:[[28,28],[72,28],[28,72],[72,72]],5:[[28,28],[72,28],[50,50],[28,72],[72,72]],6:[[28,24],[72,24],[28,50],[72,50],[28,76],[72,76]]}[v];
   return `<i class="die" style="left:${x}em;top:${y}em;transform:rotate(${r}deg);background-image:${P.map(p=>`radial-gradient(circle at ${p[0]}% ${p[1]}%,#222 0 11%,transparent 13%)`).join(',')}"></i>`}
 function renderRoom(ph){
-  const P=getPlays(),cat=topCat(),bc=$('#bookcase');bc.innerHTML='';
+  const P=getPlays(),cat=topCat(),bc=$('#bookcase');bc.innerHTML='';if(!ph){const f=document.createElement('i');f.className='bc-frame';bc.append(f)}mountRoom(ph);
   const rows=[];
-  if(ph){const w=innerWidth,per=w<400?2:w<620?3:4,ids=GAMES.map(g=>g.id);for(let i=0;i<ids.length;i+=per)rows.push(ids.slice(i,i+per))}
+  if(ph){const w=innerWidth,per=w<400?2:w<620?3:4,ids=BOARD().map(g=>g.id);for(let i=0;i<ids.length;i+=per)rows.push(ids.slice(i,i+per))}
   const cw=root.clientWidth-24-12;const per=ph?(innerWidth<400?2:innerWidth<620?3:4):0;
   const gap=10,bw=ph?Math.floor((cw-gap*(per-1))/per):0;
   (ph?rows:BAYS).forEach((row,i)=>{
@@ -585,28 +691,33 @@ function renderRoom(ph){
         let lift=0;it.forEach((id,k)=>{const g=byId(id),l=LOOK[id];const bt=boxBtn(g,'flat',null,[-2,1.8][k%2]);bt.classList.add('st');bt.style.setProperty('--lift',lift);bt.style.left=((Math.max(...Ls.map(x=>x.W))-l.W)/2+(k?.5:-.3))+'em';lift+=l.D;cell.append(bt)});
         if(it.includes(cat))cell.append(catEl())}
       bay.append(cell)}
-    if(!ph){if(i===0){const d=document.createElement('div');d.className='deco';d.style.cssText='width:6em;height:8.6em';d.innerHTML=ART.plant;bay.append(d)}
+    if(!ph){if(i===0){const d=document.createElement('div');d.className='deco';d.style.cssText='width:6.7em;height:8.6em';d.innerHTML='<img src="room/plant.webp" alt="" width="238" height="306" style="width:100%;height:100%;display:block" decoding="async" draggable="false">';bay.append(d)}
       if(i===1){const d=document.createElement('div');d.className='deco';d.style.cssText='width:3.6em;height:6.4em;margin-right:5em';d.innerHTML=ART.glass;bay.append(d)}
-      if(i===2){const d=document.createElement('div');d.className='dbooks';d.style.cssText='margin-left:9em;font-size:1em';[['#a4423a',8.4],['#2f5f8a',9.6],['#6b7f3a',7.6],['#c08a2a',9],['#5a3a6a',8]].forEach(([c,h])=>{const k=document.createElement('i');k.style.cssText=`--bc:${c};height:${h}em`;d.append(k)});bay.append(d)}}
+      if(i===2){const d=document.createElement('div');d.className='dbooks';d.style.cssText='margin-left:auto;margin-right:-3.2em;font-size:1em';[['#a4423a',8.4],['#2f5f8a',9.6],['#6b7f3a',7.6],['#c08a2a',9],['#5a3a6a',8]].forEach(([c,h])=>{const k=document.createElement('i');k.style.cssText=`--bc:${c};height:${h}em`;d.append(k)});bay.append(d)}}
     bc.append(bay)});
   // objects
   const ob=$('#objects');ob.innerHTML='';
   ob.append(obj('ref',ph?'':'left:101.5em;top:55em;width:8em;height:9em'));
-  ob.append(obj('sugg',ph?'':'left:11.5em;top:46.2em;width:10em;height:8em'));
-  ob.append(obj('inv',ph?'':'left:8.5em;top:35.4em;width:7.2em;height:9em'));
+  ob.append(obj('sugg',ph?'':'left:20.5em;top:36em;width:10em;height:8em'));
+  ob.append(obj('inv',ph?'':'left:133em;top:32.6em;width:7.2em;height:9em'));
+  ob.append(obj('case',ph?'':'left:7.7em;top:74.4em;width:22.1em;height:9.9em'));
   if(ph){const t=document.createElement('button');t.type='button';t.className='obj trbtn';t.id='trbtn';t.setAttribute('aria-label','Trophies');t.setAttribute('aria-expanded','false');t.setAttribute('aria-controls','mantel');t.innerHTML='<span class="art">🏆</span><span class="sl">Trophies</span>';ob.append(t)}
   // trophies
   const tr=evalTrophies(false),mt=$('#mantel');mt.classList.remove('open');mt.innerHTML=`<span class="trlab">Trophies</span>`;
   for(const t of TROPHIES){const b=document.createElement('button');b.type='button';b.className='trophy'+(tr[t.id]?' on':'');b.dataset.t=t.id;
     b.setAttribute('aria-label',`${t.name} trophy, ${tr[t.id]?'earned':'not earned yet'}. ${t.how}`);b.innerHTML=ART.trophy[t.id]+`<span class="lab">${t.name}</span>`;mt.append(b)}
-  renderCoffee(ph)}
+  renderTV(ph);renderCoffee(ph)}
 function renderCoffee(ph){
   const c=$('#coffee'),id=store.get('shelf_last'),g=byId(id);c.innerHTML='';
   if(ph){
     c.innerHTML=g?`<div class="t-card"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><button type="button" class="btn cbtn2" data-cont="${g.id}">▶ Continue: ${esc(clean(g.name))}</button></div>`:`<div class="t-card w"><b>Pick a box from the shelf</b></div>`;
     c.firstElementChild.classList.add('t-card');return}
   let h='<div class="t-top"></div><div class="t-edge"></div><i class="t-leg" style="left:3em"></i><i class="t-leg" style="right:3em"></i>';
-  if(g){const L=LOOK[g.id];
+  if(g&&g.kind==='video'){const L=LOOK[g.id];
+    h+=`<div class="cart" style="--c:${L.c}"><div class="cl"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><span>${esc(clean(g.name))}</span></div></div><div class="pad">${ART.pad(L.c)}</div>`;
+    h+=dieHtml(5,1.4,12.8,18)+`<i class="mee" style="left:40em;top:13.4em">${ART.mee('#4aa05a')}</i>`;
+    h+=`<button type="button" class="cbtn" data-cont="${g.id}">▶ Continue: ${esc(clean(g.name))}</button>`}
+  else if(g){const L=LOOK[g.id];
     h+=`<div class="tray" style="--c:${L.c}"></div><div class="lid" style="--c:${L.c}"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><span>${esc(clean(g.name))}</span></div>`;
     h+=`<i class="pcard" style="left:9em;top:12.2em;transform:rotate(-14deg);--cc:#b33"></i><i class="pcard" style="left:11.4em;top:11.6em;transform:rotate(6deg);--cc:#336"></i><i class="pcard" style="left:14em;top:12.6em;transform:rotate(22deg);--cc:#363"></i>`;
     h+=dieHtml(5,45.4,12.2,18)+dieHtml(3,43,14.6,-24)+dieHtml(6,3.6,13.8,12);
@@ -614,9 +725,54 @@ function renderCoffee(ph){
     h+=`<button type="button" class="cbtn" data-cont="${g.id}">▶ Continue: ${esc(clean(g.name))}</button>`}
   else{h+=`<div class="welcome"><h2>Pick a box from the shelf</h2><p>Look it over, turn it around, then lift the lid.</p></div>`+dieHtml(4,10,13,-10)+dieHtml(2,13.4,14.2,20)+`<i class="mee" style="left:52em;top:12.6em">${ART.mee('#d94a3a')}</i><i class="mee" style="left:55.4em;top:13.8em">${ART.mee('#3a7bd9')}</i>`}
   c.innerHTML=h}
+/* ---------- rendered room layers (desktop only; the phone keeps its light painted wall) ---------- */
+function mountRoom(ph){
+  const st=$('#stage');st.querySelectorAll('.rimg').forEach(e=>e.remove());if(ph)return;
+  const t=root.dataset.tod,list=t==='day'?[['day','']]:t==='night'?[['night','']]:[['night',''],['day',' dd']];
+  for(const L of ['back','front'])for(const [m,x] of list){const i=new Image();i.className='rimg '+L+x;i.alt='';i.decoding='async';i.draggable=false;i.setAttribute('aria-hidden','true');if(L==='back'&&!x)i.fetchPriority='high';i.src=`room/room-${L}-${m}.webp`;st.insertBefore(i,st.firstChild)}}
+/* ---------- the TV (video games) ---------- */
+let tvCh=0,tvFl=0;
+function tvScr(g,i,ph){return `<img src="${g.cover}" alt="" decoding="async" draggable="false"><canvas class="tv-noise" width="64" height="48" aria-hidden="true"></canvas><span class="tv-ch">CH ${i+1}</span>${ph?'':`<span class="tv-ttl">${esc(clean(g.name))}</span>`}<i class="tv-roll"></i><i class="tv-flick"></i>`}
+function renderTV(ph){
+  const tv=$('#tv'),V=VIDEO();tv.innerHTML='';
+  if(!V.length){tv.hidden=true;return}
+  tv.hidden=false;tvCh=((tvCh%V.length)+V.length)%V.length;
+  const g=V[tvCh],multi=V.length>1,cat=topCat(),catHere=cat&&byId(cat).kind==='video';
+  const knobs=multi?{p:'<button type="button" class="tv-knob k1" data-tvch="-1" aria-label="Previous channel">◀</button>',n:'<button type="button" class="tv-knob k2" data-tvch="1" aria-label="Next channel">▶</button>'}:{p:'',n:''};
+  tv.setAttribute('role','group');tv.setAttribute('aria-label','Retro TV with the video games');
+  const scr=`<button type="button" class="tv-screen crt" id="tvscreen" aria-haspopup="dialog">${tvScr(g,tvCh,ph)}</button>`;
+  if(ph){
+    tv.className='tvc'+(catHere?' cat1':'');
+    tv.innerHTML=`<div class="tv-ant" aria-hidden="true">${ART.ant}</div><div class="tv-bez">${scr}</div><div class="tvc-side"><span class="tvc-plate">VIDEO GAMES</span><b class="tvc-t" id="tvtitle">${esc(clean(g.name))}</b><div class="tvc-btns">${knobs.p.replace('tv-knob k1','tv-knob')}${multi?`<span id="tvchn">CH ${tvCh+1}</span>`:''}${knobs.n.replace('tv-knob k2','tv-knob')}</div></div><span class="sr" id="tvlive" aria-live="polite"></span>`;
+    if(catHere)tv.append(catEl());
+  }else{
+    tv.className='tv';
+    const k=multi?`<button type="button" class="tvk" data-tvch="-1" aria-label="Previous channel" style="left:20.78em;top:51.96em"><span class="lab">◀ Previous channel</span></button><button type="button" class="tvk" data-tvch="1" aria-label="Next channel" style="left:20.78em;top:54.92em"><span class="lab">Next channel ▶</span></button>`:'';
+    tv.innerHTML=`<button type="button" class="tv-screen crt" id="tvscreen" aria-haspopup="dialog" style="left:3.49em;top:49.9em;width:13.8em;height:10.5em">${tvScr(g,tvCh,ph)}</button>${k}<span class="sr" id="tvlive" aria-live="polite"></span>`;
+    if(catHere){const a=document.createElement('span');a.className='tv-top';a.style.cssText='left:10.5em;top:47.2em';a.append(catEl());tv.append(a)}
+  }
+  tvShow(false)}
+function tvShow(flash,say){
+  const V=VIDEO(),s=$('#tvscreen');if(!V.length||!s)return;
+  tvCh=((tvCh%V.length)+V.length)%V.length;const g=V[tvCh];
+  s.querySelector('img').src=g.cover;s.querySelector('.tv-ch').textContent='CH '+(tvCh+1);
+  const tt=s.querySelector('.tv-ttl');if(tt)tt.textContent=clean(g.name);
+  const t2=$('#tvtitle');if(t2)t2.textContent=clean(g.name);const cn=$('#tvchn');if(cn)cn.textContent='CH '+(tvCh+1);
+  s.setAttribute('aria-label',`TV channel ${tvCh+1}: ${g.name}, ${g.ribbon}. Open the now playing card`);
+  if(say){const l=$('#tvlive');if(l)l.textContent=`Channel ${tvCh+1}: ${g.name}`}
+  if(flash&&!reduced())tvStatic()}
+function tvStatic(){
+  const s=$('#tvscreen');if(!s)return;const cv=s.querySelector('.tv-noise'),c=cv.getContext('2d'),d=c.createImageData(64,48);let n=0;
+  clearInterval(tvFl);s.classList.add('sw');
+  const draw=()=>{for(let i=0;i<d.data.length;i+=4){const v=60+Math.random()*195|0;d.data[i]=d.data[i+1]=d.data[i+2]=v;d.data[i+3]=255}c.putImageData(d,0,0)};
+  draw();tvFl=setInterval(()=>{if(++n>4){clearInterval(tvFl);s.classList.remove('sw');return}draw()},55)}
+/* auto channel surfing; paused while the pointer or focus is on the TV, a game or a card is open, or the tab is hidden */
+setInterval(()=>{if(document.hidden||!table.hidden||ins||view!=='room'||!$('#tvscreen')||VIDEO().length<2)return;if($('#tv:hover,#tv:focus-within'))return;tvCh++;tvShow(true)},6000);
 function renderList(){
   const lv=$('#listview'),id=store.get('shelf_last');
-  lv.innerHTML=`<div class="lobj"><button type="button" class="tbtn" data-ref="">📖 Card &amp; token reference</button><a class="tbtn" href="suggest.html">💬 Suggestion box</a><button type="button" class="tbtn" data-inv="1" aria-haspopup="dialog">✉ Play online with friends</button></div><ul class="plist">${GAMES.map(g=>`<li data-id="${g.id}"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><div class="pl-t"><b>${esc(g.name)}</b><span>${esc(g.ribbon)}${id===g.id?' · Played last':''}</span></div><button type="button" class="btn play" data-play="${g.id}" aria-label="Play ${esc(g.name)}">▶ Play</button></li>`).join('')}</ul>`}
+  const row=g=>`<li data-id="${g.id}"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><div class="pl-t"><b>${esc(g.name)}</b><span>${esc(g.ribbon)}${id===g.id?' · Played last':''}</span></div><button type="button" class="btn play" data-play="${g.id}" aria-label="Play ${esc(g.name)}">▶ Play</button></li>`;
+  const sec=(t,k,a)=>a.length?`<h2 class="lh" id="lh-${k}">${t}</h2><ul class="plist" aria-labelledby="lh-${k}">${a.map(row).join('')}</ul>`:'';
+  lv.innerHTML=`<div class="lobj"><button type="button" class="tbtn" data-ref="">📖 Card &amp; token reference</button><a class="tbtn" href="suggest.html">💬 Suggestion box</a><button type="button" class="tbtn" data-inv="1" aria-haspopup="dialog">✉ Play online with friends</button></div>${sec('Board games','board',BOARD())}${sec('Video games','video',VIDEO())}`}
 function render(){
   const ph=isPh();lastBuiltPh=ph;
   const list=view==='list';
@@ -646,15 +802,16 @@ function openGame(g,count){
   if(ins)hideInspect(true);
   $('#tname').textContent=g.name;$('#solo').href=g.src;frame.title=g.name;if(g.id!=='ref')showLoader(g.name.replace(/ \(preview\)$/,''));frame.src=g.src;
   table.hidden=false;if(isPh()){$('#fabname').textContent=g.name;$('#fabsolo').href=g.src;showFab(true);goFull()}table.classList.remove('opening');void table.offsetWidth;if(!reduced())table.classList.add('opening');
-  document.body.style.overflow='hidden';
+  document.body.style.overflow='hidden';root.classList.add('playing');
   try{history.replaceState(null,'','#'+g.id)}catch(e){}frame.focus()}
 function closeGame(){
   if(typeof showFab==='function'){showFab(false);leaveFull()}
-  table.hidden=true;frame.src='about:blank';document.body.style.overflow='';
+  table.hidden=true;root.classList.remove('playing');frame.src='about:blank';document.body.style.overflow='';
   try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
   const id=store.get('shelf_last'),rf=retFocus;retFocus=null;
   render();
   let el=rf&&rf.dataset&&rf.dataset.id?document.querySelector(`.boxbtn[data-id="${rf.dataset.id}"],[data-play="${rf.dataset.id}"]`):null;
+  if(!el&&rf&&rf.id==='tvscreen')el=$('#tvscreen');
   if(!el&&rf&&rf.isConnected)el=rf;
   if(!el&&rf&&rf.dataset&&rf.dataset.obj)el=document.querySelector(`[data-obj="${rf.dataset.obj}"]`);
   if(!el)el=document.querySelector('.cbtn,.cbtn2,.boxbtn,[data-play]');
@@ -710,6 +867,37 @@ async function openInspect(g,btn){
   const a1=fly.animate([{transform:`translate(${rx-cx}px,${ry-cy}px) scale(${s0})`,opacity:.2},{transform:'translate(0,0) scale(1)',opacity:1}],{duration:440,easing:'cubic-bezier(.2,.8,.25,1)'});
   ins.anims=[a1];o.querySelector('.play').focus({preventScroll:true});
   await fin(a1);if(!ins||ins.closing)return;ins.busy=false}
+async function openTvInspect(g,btn){
+  if(ins||!table.hidden)return;
+  const ph=isPh(),rm=reduced(),o=$('#inspect'),ch=VIDEO().indexOf(g)+1;
+  ins={g,btn,ph,root:o,busy:true,anims:[],pose:'tv'};
+  o.hidden=false;o.className='';o.innerHTML='<div class="ins-bd"></div>';
+  const parts=backParts(g),L=LOOK[g.id];
+  const pic=`<div class="crt tvpic"><img src="${g.cover}" alt="" draggable="false"><span class="tv-ch">CH ${ch}</span><i class="tv-flick"></i></div>`;
+  if(ph){
+    const sh=document.createElement('div');sh.className='sheet tvg';sh.setAttribute('role','dialog');sh.setAttribute('aria-modal','true');sh.setAttribute('aria-label',`Now playing: ${g.name}`);
+    sh.innerHTML=`<div class="sh-head"><i class="grab"></i><div class="sh-top"><div class="mini mtv"><div class="crt"><img src="${g.cover}" alt="" draggable="false"><span class="tv-ch">CH ${ch}</span></div></div><div class="sh-ttl"><span class="bk-r">Now playing · CH ${ch}</span><h2>${esc(g.name)}</h2><span class="bk-r">${esc(g.ribbon)}</span></div><button type="button" class="sh-x" aria-label="Close the TV guide card">✕</button></div></div><div class="sh-body">${parts.body}</div><div class="sh-foot">${parts.acts}</div>`;
+    o.append(sh);ins.sheet=sh;ins.fly=sh;
+    sh.querySelector('.sh-x').onclick=()=>closeInspect();
+    swipe(sh.querySelector('.sh-head'),sh);
+    void sh.offsetWidth;o.classList.add('on');
+    sh.querySelector('.play').focus({preventScroll:true});
+    ins.busy=false;return}
+  const st=document.createElement('div');st.className='ins-stage';
+  const fly=document.createElement('div');fly.className='fly tvg';fly.style.setProperty('--c',L.c);fly.setAttribute('role','dialog');fly.setAttribute('aria-modal','true');fly.setAttribute('aria-label',`Now playing: ${g.name}`);
+  fly.innerHTML=`<div class="ins-l">${pic}<span class="tvg-cap">VIDEO GAMES · CH ${ch}</span></div><div class="ins-r"><div class="bk"><div class="bk-h tvg-h"><span class="tvg-on">▶ Now playing · CH ${ch}</span>${parts.head}</div><div class="bk-b">${parts.body}</div><div class="acts">${parts.acts}</div></div></div>`;
+  const x=document.createElement('button');x.type='button';x.className='ins-x';x.textContent='✕ Close';x.setAttribute('aria-label','Close the TV guide card');x.onclick=()=>closeInspect();fly.append(x);
+  const hint=document.createElement('div');hint.className='ins-hint';hint.textContent='Esc or click outside switches the card off';
+  st.append(fly);o.append(st,hint);ins.fly=fly;
+  st.addEventListener('click',e=>{if(e.target===st)closeInspect()});
+  o.querySelector('.ins-bd').addEventListener('click',()=>closeInspect());
+  o.querySelector('.play').focus({preventScroll:true});
+  if(rm){o.classList.add('on');ins.busy=false;return}
+  const fr=fly.getBoundingClientRect(),rect=btn.getBoundingClientRect(),cx=fr.left+fr.width/2,cy=fr.top+fr.height/2,rx=rect.left+rect.width/2,ry=rect.top+rect.height/2;
+  const s0=Math.max(.08,Math.max(rect.width/fr.width,rect.height/fr.height));
+  o.classList.add('on');
+  const a1=fly.animate([{transform:`translate(${rx-cx}px,${ry-cy}px) scale(${s0})`,opacity:.2},{transform:'translate(0,0) scale(1)',opacity:1}],{duration:380,easing:'cubic-bezier(.2,.8,.25,1)'});
+  ins.anims=[a1];await fin(a1);if(!ins||ins.closing)return;ins.busy=false}
 function swipe(h,sh){let y0=null,dy=0;
   h.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;y0=e.clientY;dy=0});
   h.addEventListener('pointermove',e=>{if(y0===null)return;dy=Math.max(0,e.clientY-y0);if(dy>6){sh.style.transition='none';try{h.setPointerCapture(e.pointerId)}catch(_){}sh.style.transform=`translate(-50%,${dy}px)`}});
@@ -721,7 +909,7 @@ function hideInspect(instant){
 async function closeInspect(){
   if(!ins||ins.closing)return;ins.closing=true;
   const {btn,fly,ph}=ins,rm=reduced();
-  const done=()=>{const b=hideInspect();try{(document.querySelector(`.boxbtn[data-id="${b.dataset.id}"]`)||b).focus({preventScroll:true})}catch(e){}};
+  const done=()=>{const b=hideInspect();try{(b.id==='tvscreen'?($('#tvscreen')||b):(document.querySelector(`.boxbtn[data-id="${b.dataset.id}"]`)||b)).focus({preventScroll:true})}catch(e){}};
   if(ph){ins.root.classList.remove('on');setTimeout(done,rm?0:300);return}
   ins.anims.forEach(a=>{try{a.cancel()}catch(e){}});
   if(rm||!btn.isConnected){done();return}
@@ -745,7 +933,9 @@ async function playFromInspect(g){
 document.addEventListener('click',e=>{
   const t=e.target;
   const bb=t.closest('.boxbtn');if(bb){retFocus=bb;openInspect(byId(bb.dataset.id),bb);return}
-  const pl=t.closest('[data-play]');if(pl){const g=byId(pl.dataset.play);retFocus=pl;if(ins)playFromInspect(g);else openGame(g,true);return}
+  const tk=t.closest('[data-tvch]');if(tk){tvCh+=+tk.dataset.tvch;tvShow(true,true);return}
+  const ts=t.closest('#tvscreen');if(ts){const V=VIDEO();retFocus=ts;if(V.length)openTvInspect(V[tvCh],ts);return}
+  const pl=t.closest('[data-play]');if(pl){const g=byId(pl.dataset.play);retFocus=ins&&ins.pose==='tv'?$('#tvscreen'):pl;if(ins)playFromInspect(g);else openGame(g,true);return}
   const ct=t.closest('[data-cont]');if(ct){retFocus=ct;openGame(byId(ct.dataset.cont),true);return}
   const rf=t.closest('[data-ref]');if(rf){retFocus=ins&&ins.btn?ins.btn:rf;openGame({id:'ref',name:'Card & token reference',src:'reference.html'+(rf.dataset.ref?'#'+rf.dataset.ref:'')});return}
   const iv=t.closest('[data-obj="inv"],[data-inv]');if(iv){$('#invite').showModal();return}
