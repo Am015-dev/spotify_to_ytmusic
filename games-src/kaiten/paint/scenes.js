@@ -113,8 +113,8 @@ function title(seed, imgs) {
       `<rect x="${f(x - 30 * sc)}" y="${f(y - 116 * sc)}" width="${f(60 * sc)}" height="${f(18 * sc)}" rx="${f(5 * sc)}" fill="#2a1810"/><rect x="${f(x - 30 * sc)}" y="${f(y + 98 * sc)}" width="${f(60 * sc)}" height="${f(18 * sc)}" rx="${f(5 * sc)}" fill="#2a1810"/><path d="M${x} ${f(y + 116 * sc)}v${f(40 * sc)}" stroke="#c9302a" stroke-width="${f(6 * sc)}" stroke-linecap="round"/>`; };
   s += lantern(150, 170, 1.05, '#e5553a') + lantern(370, 120, .8, '#f3e2b8') + lantern(1230, 120, .8, '#f3e2b8') + lantern(1450, 170, 1.05, '#e5553a');
   // diners behind the belt (bust figures)
-  const dn = [[300, 1, .78], [640, 0, .86], [960, 3, .86], [1300, 4, .78]];
-  for (const [x, i, sc] of dn) s += `<g transform="translate(${f(x - 256 * sc)} ${f(318)}) scale(${sc})">${chefInner(i, seed + i * 7)}</g>`;
+  const dn = [[300, 1, .8], [640, 0, .9], [960, 3, .9], [1300, 4, .8]];
+  for (const [x, i, sc] of dn) s += `<g transform="translate(${f(x - 256 * sc)} ${f(560 - 400 * sc)}) scale(${sc})">${chefInner(i, seed + i * 7)}</g>`;
   // conveyor belt (perspective-free strip) with plates gliding
   const by = 600, bh = 130;
   s += `<rect x="-10" y="${by - 16}" width="${W + 20}" height="${bh + 32}" fill="#1f1512" filter="url(#wob)"/>`;
