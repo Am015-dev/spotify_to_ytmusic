@@ -38,7 +38,7 @@ function phBuild(){const dk=document.querySelector('.gx-dock');if(!dk||$ph('pchi
   phLabels()}
 // ---- monster chips ----
 function phChips(){const el=$ph('pchips');if(!el)return;if(!G){el.innerHTML='';return}
-  const n=G.pl.length,dk=document.querySelector('.gx-dock');const w=(dk?dk.clientWidth:PHONE.aw)-16;const maxc=Math.max(2,Math.floor((w+5)/93));const rows=Math.ceil(n/maxc);el.style.setProperty('--cc',Math.ceil(n/rows));
+  const n=G.pl.length,dk=document.querySelector('.gx-dock');const w=(dk?dk.clientWidth:PHONE.aw)-16;const maxc=Math.max(2,Math.floor((w+5)/(innerHeight<640&&innerHeight>innerWidth?86:93)));const rows=Math.ceil(n/maxc);el.style.setProperty('--cc',Math.ceil(n/rows));
   el.innerHTML=G.pl.map(p=>{const me=(G.mode==='solo'&&p.human)||(NET.on&&p.i===NET.mySeat);const c=inTokyo(p.i),b=G.bay===p.i;const nm=esc(mname(p));
     const lab=`${mname(p)}${me?' (you)':''}: ${p.alive?`${p.hp} hearts, ${p.vp} stars, ${p.en} energy, ${p.cards.length} power cards${c?', in Downtown':b?', in the Harbor':''}`:'knocked out'}. ${p.i===G.active&&!G.winner?'Its turn. ':''}Tap for details.`;
     return `<button class="pchip ${me?'me':''} ${p.cards.length?'hasn':''} ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'} ${c?'city':''}" data-pm="${p.i}" style="--mc:${MONS[p.m].c}" aria-label="${esc(lab)}"><b>${c?'👑':b?'⚓':''}${nm}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e">⚡${p.en}</em></span>${p.cards.length?`<i class="pn" aria-hidden="true">🃏${p.cards.length}</i>`:''}`:'<span>K.O.</span>'}${me?'<u aria-hidden="true">YOU</u>':''}</button>`}).join('')}

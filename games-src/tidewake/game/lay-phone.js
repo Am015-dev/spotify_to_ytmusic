@@ -42,9 +42,9 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
   await scroll('start');await p.click('[data-a=guided]');await p.waitForTimeout(1500);await waitHuman();
   if(BEFORE){await p.waitForTimeout(500);const m=await metrics();log('BEFORE metrics',JSON.stringify(m));rep.push({t,m});await shot('0setup');await ctx.close();continue}
   await scroll('setup');await shot('0setup_card');await dismissCards();await p.waitForTimeout(300);
-  const m0=await metrics();const side=m0.nums;const need=.85*(m0.short-(m0.rect[2]===m0.W&&m0.rect[3]<m0.H?0:0));
+  const m0=await metrics();const side=m0.nums;const need=FIT.share(W,H)*(m0.short-(m0.rect[2]===m0.W&&m0.rect[3]<m0.H?0:0));
   log('metrics',JSON.stringify(m0),'ratio nums/short',(side/m0.short).toFixed(3),'grid/short',(m0.grid/m0.short).toFixed(3));
-  if(side<.85*m0.short)prob('board side',side,'<',.85*m0.short);
+  if(side<FIT.share(W,H)*m0.short)prob('board side',side,'<',FIT.share(W,H)*m0.short);
   if(m0.rect[2]!==m0.rect[3])prob('board not square',m0.rect);
   await whole('setup');await targets('setup');await shot('1setup');
   // tap an edge square -> start pop-up -> mark

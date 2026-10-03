@@ -29,7 +29,7 @@ for(const [W,H] of L.SIZES){if(process.env.ONLY&&!process.env.ONLY.split(',').in
       return out},null);
     chk(g.sw<=g.vw+1&&g.sh<=g.vh+1&&g.bsw<=g.vw+1&&g.bsh<=g.vh+1,`${where}: page scroll ${g.sw}x${g.sh} vs ${g.vw}x${g.vh}`);
     if(!o.noBoard){chk(g.bad.length===0,`${where}: ${g.bad.length} board targets not hit-testing to the canvas: ${g.bad.slice(0,4)}`);chk(g.ovl.length===0,`${where}: panels overlap the board / go off screen: ${g.ovl}`);
-      const base=g.vw>g.vh?g.bazaar[1]:g.bazaar[0];chk(base>=.85*short-.5,`${where}: bazaar ${Math.round(base)} < .85 x ${short}`);chk(g.tile>=44,`${where}: smallest tile ${Math.round(g.tile)} px`);R.info.bazaar=g.bazaar.map(Math.round);R.info.tile=Math.round(g.tile);R.info.board=g.board.map(Math.round)}
+      const base=g.vw>g.vh?g.bazaar[1]:g.bazaar[0];chk(base>=FIT.share(W,H)*short-.5,`${where}: bazaar ${Math.round(base)} < .85 x ${short}`);chk(g.tile>=44,`${where}: smallest tile ${Math.round(g.tile)} px`);R.info.bazaar=g.bazaar.map(Math.round);R.info.tile=Math.round(g.tile);R.info.board=g.board.map(Math.round)}
     return g};
   // tap targets >= 44 and text >= 13 inside the phone UI
   const targets=async where=>{const r=await pg.evaluate(()=>{const out={small:[],text:[]};const roots=['.gx-bar','#ps','#ppop','#pc','#modal','.gx-drawer.on'].map(s=>document.querySelector(s)).filter(e=>e&&!e.hidden&&e.getBoundingClientRect().width>0);

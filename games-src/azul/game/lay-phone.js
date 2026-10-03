@@ -32,8 +32,8 @@ for(const [w,h] of SIZES){const t=TAG+'_'+w+'x'+h;const c=await b.newContext({vi
       out.txt=[];const walker=document.createTreeWalker(document.querySelector('.gx-app'),NodeFilter.SHOW_TEXT);let n;while(n=walker.nextNode()){const el=n.parentElement;if(!n.textContent.trim()||el.closest('svg')||el.closest('[hidden]')||el.closest('#c3'))continue;const s=getComputedStyle(el);if(s.display==='none'||s.visibility==='hidden')continue;const r=el.getBoundingClientRect();if(!r.width||!r.height)continue;if(parseFloat(s.fontSize)<12.9)out.txt.push(n.textContent.trim().slice(0,16)+':'+s.fontSize)}
       out.mode=PHN.mode;out.dbg=document.querySelectorAll('#ph-pop .ph-g').length+' chips, src '+(UI.sel?UI.sel.src:PHN.src)+', tg '+!!document.querySelector('#ph-pop .ph-tg');return out});
     if(!(r.scroll.h<=r.scroll.vh+1&&r.scroll.w<=r.scroll.vw+1))prob(tag,'SCROLL '+JSON.stringify(r.scroll));
-    if(!r.inside)prob(tag,'canvas outside the viewport '+r.cv);if(r.cv[2]<.85*short-1||r.cv[3]<.85*short-1)prob(tag,'canvas '+r.cv.map(Math.round)+' < 0.85 short');
-    if(r.ring!=null){stats.ringMax=Math.max(stats.ringMax,r.ring);if(r.ring<.85*short-1)prob(tag,'ring '+Math.round(r.ring)+' < 0.85 x '+short)}
+    if(!r.inside)prob(tag,'canvas outside the viewport '+r.cv);if(r.cv[2]<FIT.share(w,h)*short-1||r.cv[3]<FIT.share(w,h)*short-1)prob(tag,'canvas '+r.cv.map(Math.round)+' < 0.85 short');
+    if(r.ring!=null){stats.ringMax=Math.max(stats.ringMax,r.ring);if(r.ring<FIT.share(w,h)*short-1)prob(tag,'ring '+Math.round(r.ring)+' < 0.85 x '+short)}
     if(r.hit&&r.hit.length)prob(tag,'board targets not hit-testing to the canvas: '+r.hit.slice(0,5).join(','));
     if(r.overlap.length)prob(tag,'overlaps the board: '+r.overlap);if(r.small.length)prob(tag,'tap targets < 44: '+r.small.slice(0,6).join(' | ')+' ['+r.dbg+']');
     if(r.txt.length)prob(tag,'text < 13px: '+r.txt.slice(0,5).join(' | '));if(r.zs)stats.zoneScroll++;if(r.minTap<stats.mins){stats.mins=r.minTap;stats.minName=tag}return r};

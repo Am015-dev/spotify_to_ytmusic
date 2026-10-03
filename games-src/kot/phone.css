@@ -148,3 +148,8 @@ html.ph-l #moment{right:auto;left:calc(var(--sal,0px) + 8px);width:calc(var(--ph
 html.ph .pcard .pct .why b{display:inline;font:900 13px/1.25 Nunito,sans-serif;letter-spacing:0}
 html.ph .ptile b{overflow-wrap:anywhere}
 html.ph header.gx-bar .pzb.paused::before{content:"▶";font-size:20px;line-height:1}
+
+/* real usable heights: the primary button row stays pinned while the control zone scrolls; short portrait screens (<=640 px) tighten up */
+html.ph #pacts{position:sticky;bottom:0;z-index:3;background:var(--paper,#fff6dc);padding-top:3px;margin-top:-3px}
+@media (max-height:640px){html.ph-p .gx-dock{gap:4px;padding:4px 8px 4px}html.ph-p #preview{display:none}html.ph-p #dice{padding-top:0}}
+html.ph #banner:not(:empty){min-height:calc(1.25em + 8px);flex-shrink:0}

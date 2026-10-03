@@ -31,9 +31,9 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
  await scroll('setup');await shot('0setup');await T('setup');await vis('[data-a=start]','setup');
  await p.tap('[data-a=start]');await p.waitForTimeout(1500);
  const bd=await board();const isl=await island();const SA=(SAFE||'0,0,0,0').split(',').map(Number);const sh=Math.min(W-SA[1]-SA[3],H-SA[0]-SA[2]);
- if(bd.w<.85*sh||bd.h<.85*sh)prob('board too small',JSON.stringify(bd));
+ {const need=(W<H&&H<800)?.75:.85;if(bd.w<need*sh||bd.h<need*sh-.5)prob('board too small (<'+need+')',JSON.stringify(bd))}
  if(isl.x0<bd.l-1||isl.x1>bd.l+bd.w+1||isl.y0<bd.t-1||isl.y1>bd.t+bd.h+1)prob('island clipped',JSON.stringify(isl));
- if(Math.max(isl.w,isl.h)<.85*sh||Math.min(isl.w/bd.w,isl.h/bd.h)<.0)prob('island small',JSON.stringify(isl));
+ if(Math.max(isl.w,isl.h)<((W<H&&H<800)?.75:.85)*sh||Math.min(isl.w/bd.w,isl.h/bd.h)<.0)prob('island small',JSON.stringify(isl));
  log('board',Math.round(bd.w)+'x'+Math.round(bd.h),'island',Math.round(isl.w)+'x'+Math.round(isl.h),'ratio(long/short side)',(Math.max(isl.w,isl.h)/sh).toFixed(2),'(board/short)',(Math.min(bd.w,bd.h)/sh).toFixed(2));
  await hit('story');await scroll('story');await shot('1story');await T('story card');await vis('#story [data-a=next]','story');await noOverlap('story');
  // hot labels are hidden

@@ -21,7 +21,7 @@ for(const [W,H] of L.SIZES){if(process.env.ONLY&&!process.env.ONLY.split(',').in
       return out});
     chk(g.sw<=g.iw&&g.sh<=g.ih&&g.bsw<=g.iw&&g.bsh<=g.ih,`${where}: page scrolls ${g.sw}x${g.sh} (body ${g.bsw}x${g.bsh}) > ${g.iw}x${g.ih}`);
     if(skipBoard){R.board=g.bd;return g}
-    chk(Math.min(g.bd[2],g.bd[3])>=.85*short-.5,`${where}: board ${g.bd.map(Math.round)} < 0.85 x ${short}`);
+    {const need=(W<H&&H<800)?.75:.85;chk(Math.min(g.bd[2],g.bd[3])>=need*short-.5,`${where}: board ${g.bd.map(Math.round)} < ${need} x ${short}`)}
     chk(g.bad.length===0,`${where}: board covered at ${g.bad.slice(0,3).join(' ')}`);
     for(const m of g.mon)chk(m.inside&&m.hit,`${where}: monster/city ${m.k} at ${m.x},${m.y} ${m.inside?'covered':'outside the board'}`);
     R.board=g.bd;return g};

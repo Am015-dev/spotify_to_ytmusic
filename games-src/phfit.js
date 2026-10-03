@@ -28,20 +28,20 @@ const SRC=`(()=>{
    const L=Math.min(...rs.map(r=>r.left)),T=Math.min(...rs.map(r=>r.top)),R=Math.max(...rs.map(r=>r.right)),B=Math.max(...rs.map(r=>r.bottom));
    const lab=nm(el)+' "'+txt.slice(0,32)+'"';
    // own-box clipping (element or any block ancestor up to the panel)
-   for(const c of clipAnc(el,true)){const n=c.n,s=getComputedStyle(n);const hid=/(hidden|clip)/.test(s.overflowY);const hidx=/(hidden|clip)/.test(s.overflowX);
+   for(const c of clipAnc(el,true)){const n=c.n,s=getComputedStyle(n);if(c.sc&&(n.scrollHeight>n.clientHeight+1||n.scrollWidth>n.clientWidth+1))break;const hid=/(hidden|clip)/.test(s.overflowY);const hidx=/(hidden|clip)/.test(s.overflowX);
      if(hid&&!c.sc&&n.scrollHeight>n.clientHeight+1&&n.clientHeight>0){const nr=n.getBoundingClientRect();if(B>nr.bottom+1||T<nr.top-1){out.push('TEXT CLIPPED (height '+n.scrollHeight+'>'+n.clientHeight+' in '+nm(n)+'): '+lab);break}}
      if(hidx&&!c.sc&&n.scrollWidth>n.clientWidth+1&&s.textOverflow!=='ellipsis'&&n.clientWidth>0){const nr=n.getBoundingClientRect();if(R>nr.right+1||L<nr.left-1){out.push('TEXT CLIPPED (width '+n.scrollWidth+'>'+n.clientWidth+' in '+nm(n)+'): '+lab);break}}}
    // glyph box vs clipping ancestors
-   let bad=false,scrolled=false;
+   let bad=false,scrolled=false;let vl=L,vt=T,vr=R,vb=B;
    for(const c of clipAnc(el)){const q=c.n.getBoundingClientRect();
-     const inter=!(R<=q.left||L>=q.right||B<=q.top||T>=q.bottom);
-     const cut=L<q.left-1.5||R>q.right+1.5||T<q.top-1.5||B>q.bottom+1.5;
-     if(c.sc){if(!inter)scrolled=true;else if(cut&&c.n.scrollHeight<=c.n.clientHeight+1&&c.n.scrollWidth<=c.n.clientWidth+1){bad=nm(c.n)}continue}
-     if(c.hid&&inter&&cut){bad=nm(c.n);break}}
+     const inter=!(vr<=q.left||vl>=q.right||vb<=q.top||vt>=q.bottom);
+     if(!inter){if(c.sc){scrolled=true;break}continue}
+     const cut=vl<q.left-1.5||vr>q.right+1.5||vt<q.top-1.5||vb>q.bottom+1.5;
+     if(c.sc){const can=c.n.scrollHeight>c.n.clientHeight+1||c.n.scrollWidth>c.n.clientWidth+1;if(cut&&!can){bad=nm(c.n);break}vl=Math.max(vl,q.left);vt=Math.max(vt,q.top);vr=Math.min(vr,q.right);vb=Math.min(vb,q.bottom);continue}
+     if(c.hid&&cut){const cs2=getComputedStyle(c.n);const ell=cs2.textOverflow==='ellipsis'||(cs2.webkitLineClamp&&cs2.webkitLineClamp!=='none');if(ell)continue;bad=nm(c.n);break}}
    if(bad){out.push('TEXT OUTSIDE CLIPPER '+bad+' ['+[L,T,R,B].map(Math.round)+']: '+lab);continue}
    if(scrolled)continue;
-   // inside a scroller whose box straddles the viewport edge is also an overflow; plain viewport check
-   if((L<-1.5||T<-1.5||R>VW+1.5||B>VH+1.5)&&R>0&&B>0&&L<VW&&T<VH){const sc=clipAnc(el).some(c=>c.sc&&c.n.scrollHeight>c.n.clientHeight+1);if(!sc)out.push('TEXT OUTSIDE VIEWPORT ['+[L,T,R,B].map(Math.round)+'] vs '+VW+'x'+VH+': '+lab)}
+   if((vl<-1.5||vt<-1.5||vr>VW+1.5||vb>VH+1.5)&&vr>0&&vb>0&&vl<VW&&vt<VH)out.push('TEXT OUTSIDE VIEWPORT ['+[vl,vt,vr,vb].map(Math.round)+'] vs '+VW+'x'+VH+': '+lab)
   }
  }
  // primary button(s)
@@ -66,3 +66,5 @@ const SRC=`(()=>{
 })()`;
 exports.SRC=SRC;
 exports.run=async(page)=>{try{return await page.evaluate(SRC)}catch(e){return ['phfit eval error '+e.message.slice(0,80)]}};
+// share of the short side the board must reach: 0.85 normally, 0.75 on short portrait screens (usable height < 800 px)
+exports.share=(W,H)=>(W<H&&H<800)?.75:.85;

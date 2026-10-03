@@ -10,10 +10,10 @@
     apply:function(){var W=innerWidth,H=innerHeight,on=PHONE.want(),land=W>H,st=R.style;PHONE.on=on;PHONE.land=land;
       R.classList.toggle('ph',on);R.classList.toggle('ph-l',on&&land);R.classList.toggle('ph-p',on&&!land);
       if(!on){['--ph-bw','--ph-bh','--sat','--sar','--sab','--sal','--ph-bar','--pz-l','--pz-t'].forEach(function(p){st.removeProperty(p)});return}
-      var s=env();st.setProperty('--sat',s[0]+'px');st.setProperty('--sar',s[1]+'px');st.setProperty('--sab',s[2]+'px');st.setProperty('--sal',s[3]+'px');st.setProperty('--ph-bar',PHONE.bar+'px');
+      PHONE.bar=(!land&&H<640)?44:48;var s=env();st.setProperty('--sat',s[0]+'px');st.setProperty('--sar',s[1]+'px');st.setProperty('--sab',s[2]+'px');st.setProperty('--sal',s[3]+'px');st.setProperty('--ph-bar',PHONE.bar+'px');
       var aw=W-s[1]-s[3],ah=H-s[0]-s[2],bw,bh;
       if(land){bh=ah;bw=Math.min(Math.round(ah*1.28),aw-300);bw=Math.max(bw,Math.round(ah*.9))}
-      else{bw=aw;bh=Math.max(Math.round(aw*.9),Math.min(Math.round(aw*1.2),ah-PHONE.bar-PHONE.zone))}
+      else{bw=aw;bh=Math.max(Math.round(aw*.75),Math.min(Math.round(aw*1.2),ah-PHONE.bar-PHONE.zone))}
       st.setProperty('--ph-bw',bw+'px');st.setProperty('--ph-bh',bh+'px');
       st.setProperty('--pz-l',(land?s[3]+bw:s[3])+'px');st.setProperty('--pz-t',(land?s[0]+PHONE.bar:s[0]+PHONE.bar+bh)+'px');PHONE.bw=bw;PHONE.bh=bh;PHONE.aw=aw;PHONE.ah=ah}};
   PHONE.apply();var t;function again(){clearTimeout(t);PHONE.apply();t=setTimeout(function(){PHONE.apply();if(window.phLayout)phLayout()},150)}

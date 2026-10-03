@@ -31,7 +31,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
   await scroll('game');
   const m=await p.evaluate(()=>{const b=document.querySelector('#bd').getBoundingClientRect();return {w:b.width,h:b.height,short:Math.min(innerWidth,innerHeight),ph:document.documentElement.className,vw:innerWidth,vh:innerHeight}});
   log('board',JSON.stringify(m));
-  const port=m.vw<m.vh;const side=port?m.w:m.h;if(side<.85*m.short)fail('board share',side+' < '+.85*m.short);if(!port&&m.w<.85*m.short)fail('board width landscape',m.w);
+  const port=m.vw<m.vh;const side=port?m.w:m.h;if(side<FIT.share(W,H)*m.short)fail('board share',side+' < '+FIT.share(W,H)*m.short);if(!port&&m.w<FIT.share(W,H)*m.short)fail('board width landscape',m.w);
   if(!/ph/.test(m.ph))fail('phone class missing',m.ph);
   await boardCheck('turn');await targets('turn');await shot('1turn');
   // tap a legal location

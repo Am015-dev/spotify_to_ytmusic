@@ -164,12 +164,12 @@ html.ph.ph-p .ph-ctl .gx-ibtn{pointer-events:auto;background:rgba(26,22,64,.55);
 /* one 44px row: the phase strip on the left, Guide + Advice on the right */
 html.ph.ph-p .gx-dock-head{position:absolute;top:0;right:0;z-index:4;height:44px;padding:0 6px 0 0;gap:4px;order:0}
 html.ph.ph-p .gx-dock-head .na-guide b{display:none}
-html.ph.ph-p .gx-dock-top{padding:0 104px 0 6px;height:44px;display:flex;align-items:center}
+html.ph.ph-p .gx-dock-top{padding:0 100px 0 6px;height:44px;display:flex;flex-direction:row;align-items:center}
 html.ph.ph-p #steps{flex:1;min-width:0}
 html.ph.ph-p .road{gap:3px;align-items:center}
-html.ph.ph-p .road .ph{position:relative;min-height:0;height:34px;display:flex;align-items:center;justify-content:center;gap:2px;padding:0 2px;font-size:13px;line-height:1;white-space:nowrap}
+html.ph.ph-p .road .ph{position:relative;min-height:0;height:34px;display:flex;align-items:center;justify-content:center;gap:1px;padding:0 1px;font-size:12.5px;line-height:1;white-space:nowrap;letter-spacing:-.01em}
 html.ph.ph-p .road .ph::before{content:"";position:absolute;left:0;right:0;top:-5px;bottom:-5px}
-html.ph.ph-p .road .ph b,html.ph.ph-p .road .ph i{display:inline;font-size:13px;overflow:visible;text-overflow:clip}
+html.ph.ph-p .road .ph b,html.ph.ph-p .road .ph i{display:inline;font-size:12.5px;overflow:visible;text-overflow:clip}
 html.ph.ph-p .road .ph .lg,html.ph.ph-p .road .ph .tx{display:none}
 html.ph.ph-p .road .ph .sh{display:inline}
 html.ph.ph-p .road .ph.on{border-color:var(--gold)}

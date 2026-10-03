@@ -12,7 +12,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(HOT?'_hot':'');const ctx=await b.newC
   const seen=new Set();const note=k=>seen.add(k);
   await p.goto('file://'+path.resolve(FILE)+'?phone=1'+(SAFE?'&safe='+SAFE:''));await p.waitForTimeout(1500);
   await p.evaluate(a=>{ANIM=a;AIDELAY=60;try{localStorage.removeItem('na_tour');localStorage.removeItem('na_coach');localStorage.removeItem('na_guide')}catch(e){}},ANIMV);
-  const shot=async n=>{await p.screenshot({path:path.join(OUT,`${t}_${n}.png`)});if(process.env.DUMP)fs.writeFileSync(path.join(OUT,`${t}_${n}.html`),await p.evaluate(()=>['#prompt','#ps','#ppop','#pc'].map(q=>{const e=document.querySelector(q);return e&&!e.hidden?e.outerHTML:''}).join('\n\n')))};
+  const shot=async n=>{if(process.env.AT===n&&process.env.JS){console.log('EVAL',n,JSON.stringify(await p.evaluate(process.env.JS)));if(process.env.AT_EXIT)process.exit(0)}await p.screenshot({path:path.join(OUT,`${t}_${n}.png`)});if(process.env.DUMP)fs.writeFileSync(path.join(OUT,`${t}_${n}.html`),await p.evaluate(()=>['#prompt','#ps','#ppop','#pc'].map(q=>{const e=document.querySelector(q);return e&&!e.hidden?e.outerHTML:''}).join('\n\n')))};
   const info=()=>p.evaluate(()=>({w:innerWidth,h:innerHeight,sw:document.documentElement.scrollWidth,sh:document.documentElement.scrollHeight,ph:document.documentElement.className}));
   // ---- generic checks ----
   const noScroll=async tag=>{const r=await info();if(r.sw>r.w+1||r.sh>r.h+1)prob(tag,'PAGE SCROLL',JSON.stringify(r))};
@@ -52,6 +52,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(HOT?'_hot':'');const ctx=await b.newC
         if(a===e&&hy&&a.clientHeight>0&&a.scrollHeight>a.clientHeight+1&&!seen.has(a)){seen.add(a);o.push('scrollHeight>clientHeight, overflow hidden: '+lab+' '+a.scrollHeight+'>'+a.clientHeight)}
         if(R.top<ar.top-1||R.bottom>ar.bottom+1){if(hy&&!sy){o.push('cut by '+desc(a)+': '+lab+' text '+Math.round(R.top)+'-'+Math.round(R.bottom)+' box '+Math.round(ar.top)+'-'+Math.round(ar.bottom));break}if(sy){break}}
         if(hx&&(R.left<ar.left-1||R.right>ar.right+1)&&!/ellipsis/.test(getComputedStyle(e).textOverflow)){o.push('cut sideways by '+desc(a)+': '+lab);break}}}
+    for(const b of document.querySelectorAll('.gx-dock button,.gx-bar button,#ppop button,#pc button,#phctl button,#more button')){if(!live(b))continue;if(b.clientWidth>0&&b.scrollWidth>b.clientWidth+1&&!/ellipsis/.test(getComputedStyle(b).textOverflow))o.push('text wider than its button: '+desc(b)+' "'+(b.textContent||'').trim().slice(0,20)+'" '+b.scrollWidth+'>'+b.clientWidth)}
     const over=['#ppop','#pc'].map(q=>document.querySelector(q)).filter(e=>e&&!e.hidden&&e.getClientRects().length);
     for(const b of document.querySelectorAll('#prompt .btn.primary,#ps .btn.primary,#ppop .btn.primary,#pc .btn.primary,#modal .btn.primary')){if(!live(b)||b.disabled||b.closest('.acts.grid'))continue;if(over.length&&!over.some(e=>e.contains(b)))continue;const R=b.getBoundingClientRect();if(R.width<2)continue;const lab=desc(b)+' "'+(b.textContent||'').trim().slice(0,24)+'"';
       if(R.left<-0.5||R.top<-0.5||R.right>VW+.5||R.bottom>VH+.5)o.push('PRIMARY outside viewport: '+lab);

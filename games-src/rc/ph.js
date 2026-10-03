@@ -19,7 +19,7 @@ PHO.apply=function(){const R=document.documentElement;const was=PHO.on,wasL=PHO.
     if(typeof V3!=='undefined'){V3.ph=false;if(was&&V3.on&&V3.rad){V3.orbit.e=1.12;fitDist();placeCam()}}if(was){const c=q('#phchip');if(c)c.hidden=true;const v=q('#phview');if(v)v.hidden=true}return was}
   const w=innerWidth,h=innerHeight,I=insets();PHO.land=w>h;const aw=w-I.l-I.r;
   let bw,bh,rail=0;
-  if(PHO.land){rail=w>=800?300:280;bw=aw-rail;bh=h-I.t-I.b}else{bw=aw;bh=Math.round(Math.min(aw*.95,h-I.t-I.b-BAR-VIEW-250))}
+  if(PHO.land){rail=w>=800?300:280;bw=aw-rail;bh=h-I.t-I.b}else{bw=aw;bh=Math.round(Math.max(aw*.75,Math.min(aw*.95,h-I.t-I.b-BAR-VIEW-250)))}
   R.classList.toggle('ph-l',PHO.land);R.classList.toggle('ph-p',!PHO.land);
   const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--rail',rail);set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
   if(app)app.classList.remove('gx-dock-min','gx-sheet-full');
