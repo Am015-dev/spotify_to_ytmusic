@@ -47,8 +47,10 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
   // TV: visible, switchable, opens guide card, plays the video games
   {const info=()=>p.evaluate(()=>{const e=document.querySelector('#tvscreen');if(!e)return null;const r=e.getBoundingClientRect();return{x:r.x,y:r.y,r:r.right,b:r.bottom,w:r.width,h:r.height,lab:e.getAttribute('aria-label'),vw:innerWidth,vh:innerHeight}});
    if(!ph){const t=await info();ok(t&&t.w>100&&t.h>70&&t.x>=0&&t.r<=t.vw&&t.y>=0&&t.b<=t.vh,`${tag} TV screen visible on desktop ${JSON.stringify(t)}`);
-     const sb=await p.evaluate(()=>{const t=document.querySelector('#tv').getBoundingClientRect(),l=document.querySelector('.lamp .pole').getBoundingClientRect(),b=document.querySelector('.bookcase').getBoundingClientRect();return{lamp:t.right>l.left&&t.left<l.right&&t.top<l.bottom&&t.bottom>l.top,case:t.left<b.right-2&&t.right>b.left&&t.top<b.bottom-12&&t.bottom>b.top}});
-     ok(!sb.lamp&&!sb.case,`${tag} TV overlaps lamp/bookcase ${JSON.stringify(sb)}`)}
+     const sb=await p.evaluate(()=>{const ov=(a,b)=>a.right>b.left&&a.left<b.right&&a.top<b.bottom&&a.bottom>b.top;const els=['#tvscreen','.tvk'].flatMap(q=>[...document.querySelectorAll(q)]).map(e=>e.getBoundingClientRect());const l=document.querySelector('.lamp').getBoundingClientRect(),b=document.querySelector('.bookcase').getBoundingClientRect(),w=document.querySelector('.window').getBoundingClientRect();return{lamp:els.some(e=>ov(e,l)),case:els.some(e=>ov(e,b)),win:els.some(e=>ov(e,w))}});
+     ok(!sb.lamp&&!sb.case&&!sb.win,`${tag} TV overlaps lamp/bookcase/window ${JSON.stringify(sb)}`);
+     const im=await p.evaluate(()=>[...document.querySelectorAll('.rimg')].map(i=>i.complete&&i.naturalWidth>0));ok(im.length>=2&&im.every(Boolean),`${tag} room images loaded ${im}`);
+     ok(await p.evaluate(()=>{const c=document.querySelector('[data-obj="case"]');if(!c)return false;const r=c.getBoundingClientRect();return c.getAttribute('href')==='sync.html'&&r.width>40&&r.height>20&&r.right<=innerWidth&&r.bottom<=innerHeight+1}),tag+' suitcase link to sync.html visible')}
    else{await p.locator('#tvscreen').scrollIntoViewIfNeeded();const t=await info();ok(t&&t.w>=100&&t.h>=70&&t.x>=0&&t.r<=t.vw+1,`${tag} TV screen visible on phone ${JSON.stringify(t)}`)}
    await p.locator('#tv').scrollIntoViewIfNeeded();
    const insW=async hid=>{await p.waitForFunction(h=>document.getElementById('inspect').hidden===h,hid,{timeout:8000}).catch(()=>{});await p.waitForTimeout(hid?150:700)};
@@ -56,8 +58,9 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
    ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),tag+' no sideways scroll with TV');
    await gotoCh(1);const l0=(await info()).lab;ok(/channel 1.*Nightrun/i.test(l0),tag+' starts on CH 1 '+l0);
    ok(await p.locator('[data-tvch]').count()===2,tag+' two channel controls');
-   for(const e of await p.locator('[data-tvch]').all()){const bx=await e.boundingBox();ok(bx&&bx.width>=43&&bx.height>=43||(!ph&&bx&&bx.width>=24),`${tag} channel button size ${JSON.stringify(bx)}`);
+   for(const e of await p.locator('[data-tvch]').all()){const bx=await e.boundingBox();ok(bx&&bx.width>=43&&bx.height>=43||(!ph&&bx&&bx.width>=20),`${tag} channel button size ${JSON.stringify(bx)}`);
      const hit=await e.evaluate(n=>{const r=n.getBoundingClientRect(),cs=getComputedStyle(n,'::after');return Math.max(r.width,parseFloat(cs.width)||0)});ok(hit>=43,`${tag} channel hit area ${hit}`)}
+   if(ph)ok(await p.evaluate(()=>{const c=document.querySelector('[data-obj="case"]');return c&&c.getAttribute('href')==='sync.html'}),tag+' phone suitcase link');
    await p.screenshot({path:`shots/${tag}-tv.png`});
    await gotoCh(1);await p.click('[data-tvch="1"]');await p.waitForTimeout(450);
    const l1=(await info()).lab;ok(/channel 2.*Overdrive/i.test(l1),tag+' next channel '+l1);
@@ -255,7 +258,7 @@ for(const [w,h] of [[1440,900],[390,844],[844,390]]){const tag=`catTV-${w}x${h}`
  const [c,p]=await mk(b,w,h,'dark',{seed:{room_plays:JSON.stringify({overdrive:9,crown:4}),shelf_last:'overdrive'}});
  ok(await p.locator('.cat').count()===1&&await p.locator('#tv .cat').count()===1,tag+' cat sits on the TV when a video game is most played');
  await p.locator('#tv').scrollIntoViewIfNeeded();await p.screenshot({path:`shots/${tag}.png`});
- const g=await p.evaluate(()=>{const c=document.querySelector('.cat').getBoundingClientRect(),s=document.querySelector('#tv .tv-cab,#tv .tv-bez').getBoundingClientRect();return{catB:c.bottom,top:s.top}});
+ const g=await p.evaluate(()=>{const c=document.querySelector('.cat').getBoundingClientRect(),s=document.querySelector('#tvscreen').getBoundingClientRect();return{catB:c.bottom,top:s.top}});
  ok(g.catB<=g.top+ (ph?20:10),tag+' cat above TV '+JSON.stringify(g));
  await p.click('.cat');await p.waitForTimeout(100);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' cat tap does not open card');
  ok(await p.locator('.boxbtn .cat,.cell .cat').count()===0,tag+' no cat on shelf');

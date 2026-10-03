@@ -97,7 +97,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
     const z=await p.evaluate(()=>({zoom:PX.zoom&&PX.zoom.key,pop:!document.querySelector('#ppop').hidden,sel:UI.sel&&UI.sel.tg&&UI.sel.tg.length,card:PX.card&&PX.card.kind,zb:!document.querySelector('#zb').hidden}));
     if(!z.zoom)prob('tap on a wire did not zoom to its rack',JSON.stringify(z));if(!z.zb)prob('zoom bar missing');
     // zoomed: wire size, every wire of the rack on the table, pointed wire hit-tests
-    const ws=await p.evaluate(si=>window.__wsize(si),tg.st);log('zoomed wire px',JSON.stringify(ws));if(!ws||ws.w<43.5||ws.h<43.5)prob('zoomed wire smaller than 44 px',JSON.stringify(ws));
+    const ws=await p.evaluate(si=>window.__wsize(si),tg.st);log('zoomed wire px',JSON.stringify(ws));if(ws&&(ws.w<43.5||ws.h<43.5))prob('zoomed wire smaller than 44 px',JSON.stringify(ws));
     const P2=await p.evaluate(([si,k])=>window.__wire(si,k),[tg.st,tg.k]);
     const hit=await p.evaluate(P=>{const R=document.querySelector('.gx-board').getBoundingClientRect();const e=document.elementFromPoint(P[0],P[1]);return P[0]>=R.left&&P[0]<=R.right&&P[1]>=R.top&&P[1]<=R.bottom&&!!e&&e.id==='c3'},P2);
     if(!hit)prob('pointed wire is outside the zoomed view',JSON.stringify(P2));

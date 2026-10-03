@@ -16,7 +16,8 @@ function pxApply(){const R=document.documentElement;const was=PX.on;PX.on=pxDete
   R.classList.toggle('ph-l',PX.land);R.classList.toggle('ph-p',!PX.land);
   // portrait: the free zone under the board; landscape: the rail on the right (the board is the full height)
   const zh=Math.round(Math.min(Math.max(278,Math.min(310,(h-I.t-I.b)*.35)),Math.max(150,h-I.t-I.b-44-.75*(w-I.l-I.r)))),rw=Math.round(Math.max(232,Math.min(300,(w-I.l-I.r)*.31)));
-  R.style.setProperty('--zh',zh+'px');R.style.setProperty('--rw',rw+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');return true}
+  let zh2=zh;{const aw=w-I.l-I.r,bh=h-I.t-I.b-44-zh,as=aw/bh;if(!PX.land&&as>.8&&as<1.05)zh2=Math.round(h-I.t-I.b-44-aw/1.06)}
+  R.style.setProperty('--zh',zh2+'px');R.style.setProperty('--rw',rw+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');return true}
 pxApply();
 // ---------- helpers ----------
 const PXK=()=>{try{return SFKit._K}catch(e){return null}};

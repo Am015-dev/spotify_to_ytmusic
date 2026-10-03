@@ -24,7 +24,7 @@ for(const [w,h] of SIZES){const t=TAG+'_'+w+'x'+h;const c=await b.newContext({vi
       const zone=document.querySelector('.gx-dock').getBoundingClientRect();out.zone=[zone.left,zone.top,zone.width,zone.height];
       const inter=(a,b)=>a.left<b.right-1&&a.right>b.left+1&&a.top<b.bottom-1&&a.bottom>b.top+1;
       out.overlap=[];for(const s of ['#ph-pop','#ph-card','#ph-st','.gx-bar']){const e=document.querySelector(s);if(!e||e.hidden)continue;const r=e.getBoundingClientRect();if(r.width&&inter(r,R))out.overlap.push(s)}
-      const z=document.getElementById('ph-z');out.zs=z.scrollHeight>z.clientHeight+2;
+      const z=document.getElementById('ph-z');out.zs=[z,document.getElementById('ph-pop'),document.getElementById('ph-card')].some(e=>e&&e.scrollHeight>e.clientHeight+2);
       const vis=e=>{const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&s.visibility!=='hidden'&&s.display!=='none'};
       out.small=[];for(const e of document.querySelectorAll('.gx-bar button,#ph-z button,#ph-z [data-cell],#ph-z [data-mv]')){if(!vis(e)||e.closest('[hidden]'))continue;const r=e.getBoundingClientRect();const m=Math.min(r.width,r.height);
         if(m<43.5)out.small.push((e.getAttribute('aria-label')||e.dataset.ph||e.dataset.a||e.textContent.trim().slice(0,12))+':'+Math.round(m));
