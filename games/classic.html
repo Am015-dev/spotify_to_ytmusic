@@ -26,7 +26,7 @@
 [hidden]{display:none!important}
 html,body{min-height:100%}
 body{margin:0;background:radial-gradient(120% 70% at 50% -10%,var(--wood2),var(--wood) 70%);background-color:var(--wood);color:var(--ink);font:16px/1.55 var(--body)}
-.page{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:28px 40px}
+.page{max-width:1180px;margin:0 auto;padding-inline:max(16px,env(safe-area-inset-left,0px),env(safe-area-inset-right,0px));padding-block:calc(28px + env(safe-area-inset-top,0px)) calc(40px + env(safe-area-inset-bottom,0px))}
 header.top{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px 24px}
 h1{font:400 clamp(1.9rem,5vw,3rem)/1 var(--display);margin:0;letter-spacing:.01em;text-wrap:balance}
 .lede{color:var(--muted);max-width:60ch;margin:.5rem 0 0}
