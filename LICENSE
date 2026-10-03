@@ -7,7 +7,7 @@ This repository holds two separate works under two separate licences.
    Copyright (c) 2026 Am015-dev. All rights reserved.
 
    Covers everything in these folders, and the website built from them
-   (https://am015-dev.github.io/spotify_to_ytmusic/games/):
+   (https://am015-dev.github.io/spotify_to_ytmusic/):
 
      games/       the published games, shelf page, covers and reference page
      games-src/   game source code, art, card text, rules notes, tests and tools
