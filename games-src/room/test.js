@@ -3,7 +3,7 @@ const URL='file:///home/user/spotify_to_ytmusic/games/index.html';
 const VPS=[[1440,900],[1280,720],[844,390],[390,844],[360,740]];
 let problems=0;const fail=m=>{problems++;console.log('FAIL',m)};
 const ok=(c,m)=>{if(!c)fail(m)};
-const GAMES=[['kaiten','kaiten-kitchen/index.html'],['crown','crown-city-smash/index.html'],['nebula','nebula-aces/index.html'],['doorkick','doorkick-dungeon/index.html'],['shipwreck','shipwreck-isle/index.html'],['sands','sands-of-qamar/index.html'],['sunglaze','sunglaze/index.html'],['rampart','rampart-and-vine/index.html'],['shortfuse','short-fuse/index.html'],['tidewake','tidewake/index.html'],['hollowbough','hollowbough/index.html'],['thornbound','thornbound/index.html'],['mainhattan','mainhattan-nightrun/index.html'],['overdrive','mainhattan-overdrive/index.html']];
+const GAMES=[['crown','crown-city-smash/index.html'],['nebula','nebula-aces/index.html'],['doorkick','doorkick-dungeon/index.html'],['shipwreck','shipwreck-isle/index.html'],['sands','sands-of-qamar/index.html'],['sunglaze','sunglaze/index.html'],['rampart','rampart-and-vine/index.html'],['shortfuse','short-fuse/index.html'],['tidewake','tidewake/index.html'],['hollowbough','hollowbough/index.html'],['thornbound','thornbound/index.html'],['kaiten','kaiten-kitchen/index.html'],['mainhattan','mainhattan-nightrun/index.html'],['overdrive','mainhattan-overdrive/index.html']];
 const BOARD=GAMES.filter(g=>!['mainhattan','overdrive'].includes(g[0]));
 const TVSRC={mainhattan:'mainhattan-nightrun/index.html',overdrive:'mainhattan-overdrive/index.html'};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -21,6 +21,7 @@ async function backFromGame(p){if(await p.locator('#back').isVisible())await p.c
 const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium'});
 for(const [w,h] of VPS)for(const scheme of ['light','dark']){
   const tag=`${w}x${h}-${scheme}`,ph=w<700||h<500;
+  if(process.env.VP&&process.env.VP!==tag)continue;
   let [c,p]=await mk(b,w,h,scheme,{});
   ok(await p.title()==='Game Night Shelf',tag+' title');
   ok((await p.textContent('#tally'))==='14 games on the shelf',tag+' tally');
@@ -54,13 +55,13 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
    await gotoCh(1);const l0=(await info()).lab;ok(/channel 1.*Nightrun/i.test(l0),tag+' starts on CH 1 '+l0);
    ok(await p.locator('[data-tvch]').count()===2,tag+' two channel controls');
    for(const e of await p.locator('[data-tvch]').all()){const bx=await e.boundingBox();ok(bx&&bx.width>=43&&bx.height>=43||(!ph&&bx&&bx.width>=24),`${tag} channel button size ${JSON.stringify(bx)}`);
-     const hit=await e.evaluate(n=>{n.scrollIntoView({block:'center'});const r=n.getBoundingClientRect(),cs=getComputedStyle(n,'::after');return Math.max(r.width,parseFloat(cs.width)||0)});ok(hit>=43,`${tag} channel hit area ${hit}`)}
+     const hit=await e.evaluate(n=>{const r=n.getBoundingClientRect(),cs=getComputedStyle(n,'::after');return Math.max(r.width,parseFloat(cs.width)||0)});ok(hit>=43,`${tag} channel hit area ${hit}`)}
    await p.screenshot({path:`shots/${tag}-tv.png`});
-   await p.click('[data-tvch="1"]');await p.waitForTimeout(450);
+   await gotoCh(1);await p.click('[data-tvch="1"]');await p.waitForTimeout(450);
    const l1=(await info()).lab;ok(/channel 2.*Overdrive/i.test(l1),tag+' next channel '+l1);
    ok((await p.textContent(ph?'#tvtitle':'#tvscreen .tv-ttl')).includes('Mainhattan Overdrive'),tag+' title shows on screen');
    ok((await p.textContent('#tvscreen .tv-ch')).trim()==='CH 2',tag+' CH 2 label');
-   await p.click('[data-tvch="-1"]');await p.waitForTimeout(450);
+   await p.hover('#tvscreen');await p.click('[data-tvch="-1"]');await p.waitForTimeout(450);
    ok(/channel 1/i.test((await info()).lab),tag+' previous channel');
    for(const [ch,id] of [[1,'mainhattan'],[2,'overdrive']]){
      await p.locator('#tvscreen').scrollIntoViewIfNeeded();await gotoCh(ch);await p.click('#tvscreen');await p.waitForTimeout(900);
@@ -76,7 +77,7 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
        await p.click('#tvscreen');await p.waitForTimeout(800);
        if(!ph){await p.mouse.click(8,8);await p.waitForTimeout(800);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' tv outside click closes');await p.click('#tvscreen');await p.waitForTimeout(800)}}
      const n0=await p.evaluate(id=>(JSON.parse(localStorage.room_plays||'{}')[id]|0),id);
-     await p.click('#inspect .play');await p.waitForTimeout(1600);
+     await p.click('#inspect .play');await p.waitForTimeout(500);
      const s=await p.evaluate(()=>({src:document.getElementById('frame').src,hid:document.getElementById('table').hidden}));
      ok(!s.hid&&s.src.endsWith(TVSRC[id]),`${tag} tv play ${id} src ${s.src}`);
      await backFromGame(p);
@@ -156,6 +157,7 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
   ok(p.errs.length===0,`${tag} page errors ${p.errs}`);
   await c.close();
 }
+if(process.env.VP){await b.close();console.log(problems+' problems (partial run '+process.env.VP+')');return}
 /* seeded: wear, cat, trophies */
 for(const [w,h] of [[1440,900],[390,844],[844,390]]){
   const ph=w<700||h<500,tag=`${w}x${h}`;
