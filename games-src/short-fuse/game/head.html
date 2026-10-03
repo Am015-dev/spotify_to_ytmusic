@@ -411,6 +411,7 @@ html.ph .pcard .statgrid{grid-template-columns:repeat(3,1fr)}
 html.ph .pcard .btn.go{font-size:1rem}
 /* real usable heights: the strip scrolls instead of clipping, its action row stays pinned; cards pin their primary row */
 html.ph #ps{overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
+html.ph-l .ps-acts{flex-wrap:wrap;overflow-x:visible}
 html.ph .ps-msg{max-height:none;overflow:visible}
 html.ph .res:not(.mine) p{display:block;-webkit-line-clamp:unset;overflow:visible}
 html.ph .ps-acts:has(.pb.pri){position:sticky;bottom:0;z-index:3;background:#f7e2b9;box-shadow:0 -6px 6px -4px #f7e2b9}
