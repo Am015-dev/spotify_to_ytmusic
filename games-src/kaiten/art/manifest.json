@@ -1,0 +1,109 @@
+{
+ "note": "id -> base file name in this folder. build.py embeds <name>.png if present (a user painting, resized to the size below), else <name>.webp (made by ../paint/paint.js).",
+ "items": {
+  "tempura": "tempura",
+  "sashimi": "sashimi",
+  "dumpling": "dumpling",
+  "roll2": "roll2",
+  "roll1": "roll1",
+  "roll3": "roll3",
+  "salmon": "salmon",
+  "squid": "squid",
+  "egg": "egg",
+  "wasabi": "wasabi",
+  "wasabi-nigiri": "wasabi-nigiri",
+  "chop": "chop",
+  "pudding": "pudding",
+  "back": "back"
+ },
+ "size": {
+  "tempura": [
+   384,
+   384
+  ],
+  "sashimi": [
+   384,
+   384
+  ],
+  "dumpling": [
+   384,
+   384
+  ],
+  "roll1": [
+   384,
+   384
+  ],
+  "roll2": [
+   384,
+   384
+  ],
+  "roll3": [
+   384,
+   384
+  ],
+  "salmon": [
+   384,
+   384
+  ],
+  "squid": [
+   384,
+   384
+  ],
+  "egg": [
+   384,
+   384
+  ],
+  "wasabi": [
+   384,
+   384
+  ],
+  "wasabi-nigiri": [
+   384,
+   384
+  ],
+  "chop": [
+   384,
+   384
+  ],
+  "pudding": [
+   384,
+   384
+  ],
+  "back": [
+   320,
+   448
+  ],
+  "belt": [
+   1024,
+   128
+  ],
+  "counter": [
+   1024,
+   256
+  ],
+  "chef-mina": [
+   256,
+   256
+  ],
+  "chef-taro": [
+   256,
+   256
+  ],
+  "chef-odile": [
+   256,
+   256
+  ],
+  "chef-kofi": [
+   256,
+   256
+  ],
+  "chef-pip": [
+   256,
+   256
+  ],
+  "title": [
+   1440,
+   810
+  ]
+ }
+}
