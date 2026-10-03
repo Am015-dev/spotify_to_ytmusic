@@ -1924,14 +1924,14 @@ const recKey=()=>RC.ev?`mho_rec_${RC.ev.id}`:`mho_rec_${trkTag()}${cls.id}_${dir
 /* ---- physics (fixed step) ---- */
 const HZ=120,H=1/HZ,ROLL_T=.55;
 const PAD={};
-function ctlPlayer(){const pad=navigator.getGamepads?[...navigator.getGamepads()].find(g=>g&&g.connected):null;
+function ctlPlayer(dtR){const pad=navigator.getGamepads?[...navigator.getGamepads()].find(g=>g&&g.connected):null;
   let steer=(K.ArrowRight||K.KeyD?1:0)-(K.ArrowLeft||K.KeyA?1:0),thr=K.ArrowUp||K.KeyW?1:0,brk=K.ArrowDown||K.KeyS?1:0,abL=K.KeyQ?1:0,abR=K.KeyE?1:0,boost=K.ShiftLeft||K.ShiftRight?1:0,hb=K.KeyX||K.ControlLeft||TOUCH.hb?1:0;
   if(pad){const ax=pad.axes[0]||0;if(Math.abs(ax)>.12)steer=clamp(steer+Math.sign(ax)*(Math.abs(ax)-.12)/.88,-1,1);thr=Math.max(thr,pad.buttons[7]?.value||0);brk=Math.max(brk,pad.buttons[6]?.value||0);
     abL=Math.max(abL,pad.buttons[4]?.pressed?1:0);abR=Math.max(abR,pad.buttons[5]?.pressed?1:0);boost=Math.max(boost,pad.buttons[1]?.pressed?1:0);
     if(pad.buttons[0]?.pressed&&!PAD.b0)pressed.fire=true;if(pad.buttons[2]?.pressed&&!PAD.b2&&Math.abs(ax)>.4)pressed.roll=Math.sign(ax);if(pad.buttons[3]?.pressed&&!PAD.b3)cycleCam();if(pad.buttons[9]?.pressed&&!PAD.b9)togglePause();
     PAD.b0=pad.buttons[0]?.pressed;PAD.b2=pad.buttons[2]?.pressed;PAD.b3=pad.buttons[3]?.pressed;PAD.b9=pad.buttons[9]?.pressed}
   if(document.body.dataset.tc!==SET.touch)document.body.dataset.tc=SET.touch;{const te=thrEff();if(document.body.dataset.thr!==te)document.body.dataset.thr=te}
-  if(TOUCH.on&&TOUCH.used){if(TOUCH.park&&(state!=='roam'||TOUCH.boost))parkSet(false);thr=TOUCH.brake||TOUCH.park||thrEff()==='pedal'&&!TOUCH.gas?0:1;brk=TOUCH.brake?1:0;if(SET.touch==='buttons'){TOUCH.target=TOUCH.dir;const up=TOUCH.dir&&Math.sign(TOUCH.dir)===Math.sign(TOUCH.steer||TOUCH.dir);const rp=SENS().ramp;if(TOUCH.kick){const k0=[.3,.36,.42,.48,.55][clamp((SET.sens|0)-1,0,4)];if(TOUCH.steer*TOUCH.kick<k0)TOUCH.steer=TOUCH.kick*k0;TOUCH.kick=0}TOUCH.steer+=clamp(TOUCH.dir-TOUCH.steer,-(up?rp:10)*H,(up?rp:10)*H)}else if(SET.touch==='tilt'){TOUCH.target=TILT.v;TOUCH.steer+=(TILT.v-TOUCH.steer)*Math.min(1,H*8)}else TOUCH.steer+=((TOUCH.target||0)-TOUCH.steer)*Math.min(1,H*(TOUCH.sid!=null?9:14));if(Math.abs(TOUCH.steer)<.004)TOUCH.steer=0;if(TOUCH.sid!=null||TOUCH.steer||TOUCH.dir)steer=TOUCH.steer;boost=Math.max(boost,TOUCH.boost?1:0);
+  if(TOUCH.on&&TOUCH.used){if(TOUCH.park&&(state!=='roam'||TOUCH.boost))parkSet(false);thr=TOUCH.brake||TOUCH.park||thrEff()==='pedal'&&!TOUCH.gas?0:1;brk=TOUCH.brake?1:0;if(SET.touch==='buttons'){TOUCH.target=TOUCH.dir;const up=TOUCH.dir&&Math.sign(TOUCH.dir)===Math.sign(TOUCH.steer||TOUCH.dir);const rp=SENS().ramp;if(state==='roam'){const dd=Math.min(dtR||H,.05),r1=rp*1.25;TOUCH.kick=0;if(up){if(TOUCH.steer*TOUCH.dir<.12)TOUCH.steer=TOUCH.dir*.12;TOUCH.steer+=clamp(TOUCH.dir-TOUCH.steer,-r1*dd,r1*dd)}else{const rb=TOUCH.dir?24:16;TOUCH.steer+=clamp(TOUCH.dir-TOUCH.steer,-rb*dd,rb*dd)}}else{if(TOUCH.kick){const k0=[.3,.36,.42,.48,.55][clamp((SET.sens|0)-1,0,4)];if(TOUCH.steer*TOUCH.kick<k0)TOUCH.steer=TOUCH.kick*k0;TOUCH.kick=0}TOUCH.steer+=clamp(TOUCH.dir-TOUCH.steer,-(up?rp:10)*H,(up?rp:10)*H)}}else if(SET.touch==='tilt'){TOUCH.target=TILT.v;TOUCH.steer+=(TILT.v-TOUCH.steer)*Math.min(1,H*8)}else TOUCH.steer+=((TOUCH.target||0)-TOUCH.steer)*Math.min(1,H*(TOUCH.sid!=null?9:14));if(Math.abs(TOUCH.steer)<.004)TOUCH.steer=0;if(TOUCH.sid!=null||TOUCH.steer||TOUCH.dir)steer=TOUCH.steer;boost=Math.max(boost,TOUCH.boost?1:0);
     // holding full lock opens the airbrake on that side: a drift
     if(SET.touch==='drag'&&Math.abs(TOUCH.steer)>.93){TOUCH.lock+=H;if(TOUCH.lock>.45){if(TOUCH.steer<0)abL=1;else abR=1}}else TOUCH.lock=0}
   if(mirror){steer=-steer;const t=abL;abL=abR;abR=t}
@@ -3502,7 +3502,7 @@ function hubTrafficStep(dt){if(RO.on&&!RO.frozen){const v=Math.abs(RO.v);RO.pdis
     const dx=(B.x-A.x)/L,dz=(B.z-A.z)/L,gA=A.g||B.g,W=A.ab||gA?0:Math.min(A.w||20,B.w||20),lane=W*c.lane,x=A.x+(B.x-A.x)*c.t-dz*lane,z=A.z+(B.z-A.z)*c.t+dx*lane;
     c.x=x;c.z=z;c.y=A.ab||gA?groundAt(x,z,(c.y||0)+4):groundY(x,z);
     _m.makeBasis(_hrt.set(dz,0,-dx),_hup,_hfw.set(dx,0,dz)).setPosition(x,c.y,z);im.setMatrixAt(c.j,_m);
-    const d=Math.hypot(x-RO.x,z-RO.z);if(d<5&&Math.abs(c.y-RO.y)<3){if(Math.abs(RO.v)>10){c.dead=25;const at=V3(x,c.y+1.5,z),f2=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,V3(0,9,0).addScaledVector(f2,Math.abs(RO.v)*.5),18,[new THREE.Color(HCOL[(c.j*3+c.k)%HCOL.length]),new THREE.Color('#22252f'),new THREE.Color('#d0e8ff')],1.1,c.y);for(let k=0;k<8;k++)studBurst(at,f2,Math.abs(RO.v));RO.v*=pl&&pl.nitro?.95:.8;shake=.5;AU.sfx('crash');if(pl&&pl.nitro)roamHeal(3);else roamDamage(9);addXP(3,'traffic smash');comboAdd(3);qCrate();if(pl)pl.bm=Math.min(100,pl.bm+12)}else{c.t=Math.max(0,c.t-.02)}}
+    const d=Math.hypot(x-RO.x,z-RO.z);if(d<5&&Math.abs(c.y-RO.y)<3){if(Math.abs(RO.v)>10){c.dead=25;const at=V3(x,c.y+1.5,z),f2=V3(Math.sin(RO.vh),0,Math.cos(RO.vh));debris(at,V3(0,9,0).addScaledVector(f2,Math.abs(RO.v)*.5),18,[new THREE.Color(HCOL[(c.j*3+c.k)%HCOL.length]),new THREE.Color('#22252f'),new THREE.Color('#d0e8ff')],1.1,c.y);for(let k=0;k<8;k++)studBurst(at,f2,Math.abs(RO.v));const rx=x-RO.x,rz=z-RO.z,rl=Math.hypot(rx,rz)||1,ho=(f2.x*dx+f2.z*dz)<-.6&&(f2.x*rx+f2.z*rz)/rl>.7;RO.v*=pl&&pl.nitro?.95:ho?.6:.88;shake=ho?.5:.3;AU.sfx('crash');if(pl&&pl.nitro)roamHeal(3);else roamDamage(ho?12:5);addXP(3,'traffic smash');comboAdd(3);qCrate();if(pl)pl.bm=Math.min(100,pl.bm+12)}else{c.t=Math.max(0,c.t-.02)}}
     else if(d<10&&Math.abs(RO.v)>45&&!(c.nm>0)&&Math.abs(c.y-RO.y)<3){c.nm=3;if(pl){pl.bm=Math.min(100,pl.bm+8);award(pl,'NEAR MISS',0,200,'#4ceaff');AU.sfx('near');comboAdd(2)}}if(c.nm>0)c.nm-=dt}
   for(const im of HUB.cim)im.instanceMatrix.needsUpdate=true}
 // ---------- entering / leaving the hub world
@@ -3751,21 +3751,21 @@ function roamWarp(x,z,h,now){if(!RO.on||RO.ch||RO.sp||RO.wk)return false;RO.x=cl
 function roamSavePos(){const st=store.get('mho_story',{seen:0,end:0});st.last=Date.now();store.set('mho_story',st);const o=roamSave();o.pos={x:+RO.x.toFixed(1),z:+RO.z.toFixed(1),y:+RO.y.toFixed(1),h:+RO.h.toFixed(3)};o.lay=LAYOUT_VER;roamStore(o)}
 function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.scrape(false);roamWreckStep(dt);hubTrafficStep(dt);studFXStep(dt);roamHud();return}RO.inv=Math.max(0,(RO.inv||0)-dt);RO.lastHit=(RO.lastHit||0)+dt;if(RO.lastHit>4)roamHeal(3*dt);
   if((RO.hp??100)<35&&R()<.25)puff(s.mesh.position.clone().add(V3(0,2.4,0)),1,_tipC.setRGB(.2,.2,.22),1,4,.9,.5,1,3);if((RO.hp??100)<15&&R()<.2)burst(SPARK,s.mesh.position.clone().add(V3(0,2,0)),4,8,.3,new THREE.Color(2,1.2,.4));
-  if(RO.inv>0)s.mesh.visible=Math.floor(RO.inv*10)%2===0;else if(!s.mesh.visible)s.mesh.visible=true;const c=ctlPlayer();CTL=c;const busy=RO.card||RO.mapOpen||RO.story;
+  if(RO.inv>0)s.mesh.visible=Math.floor(RO.inv*10)%2===0;else if(!s.mesh.visible)s.mesh.visible=true;const c=ctlPlayer(dt);CTL=c;const busy=RO.card||RO.mapOpen||RO.story;RO.hitCd=Math.max(0,(RO.hitCd||0)-dt);
   const T0=roamTerr(RO.x,RO.z,RO.y+.3),ground=T0.g,air=RO.y>ground+.5;const terr=T0.deck?'road':ground<-1.5?'water':inLot(RO.x,RO.z)&&ground<.5?'dirt':'road';
   const veh=(RO.vsel||'auto')==='auto'?(terr==='water'?'boat':terr==='dirt'?'offroad':'ship'):RO.vsel;
   const fit={ship:{road:1,dirt:.72,water:.78},boat:{road:.42,dirt:.38,water:1},offroad:{road:.93,dirt:1,water:.35}}[veh][terr];
-  if(((RO.abF=(RO.abF||0)+1)&3)===1){const a=abAt(RO.x,RO.z);RO.onAB=!!a&&!!a.road.ab&&Math.abs(a.lat)<a.road.w/2+1&&RO.y<groundY(RO.x,RO.z)+14;RO.abRoad=RO.onAB?a.road.name:null}
+  if(((RO.abF=(RO.abF||0)+1)&3)===1){const a=abAt(RO.x,RO.z);RO.onAB=!!a&&!!a.road.ab&&Math.abs(a.lat)<a.road.w/2+1&&RO.y<groundY(RO.x,RO.z)+14;RO.abRoad=RO.onAB?a.road.name:null;const q=RO.onAB?null:cityAt(RO.x,RO.z);RO.inCity=!RO.onAB&&(RO.x>HX0&&RO.x<HX1&&RO.z>HZS&&RO.z<HZN||!!q&&q.d<q.road.w/2+30);const rq=RO.onAB?a:q&&q.d<q.road.w/2+2?q:null;RO.rdT=rq?[rq.p.tx,rq.p.tz]:null}
   const lvl=carStat();const top=s.stats.top*.8*lvl.top,boost=c.boost&&s.bm>1&&!busy;RO.boosting=boost||RO.turbo>0;RO.turbo=Math.max(0,(RO.turbo||0)-dt);
   if(boost){RO.boostT=(RO.boostT||0)+dt;if(!RO.wasB){AU.sfx('nitro');fovKick=Math.max(fovKick,9)}s.bm=Math.max(0,s.bm-22*dt);RO.bIdle=0}else{RO.bIdle=(RO.bIdle||0)+dt;if(RO.bIdle>.8)s.bm=Math.min(100,s.bm+7*dt)}RO.wasB=boost;s.nitro=boost||RO.turbo>0;RO.top=top;
   // hop: Space / HOP button
   if(pressed.fire){pressed.fire=false;if(!busy&&!air&&RO.vy<=0){RO.tutHop=true;RO.vy=12;RO.y+=.05;AU.sfx('launch');fovKick=Math.max(fovKick,4)}}
   if(air)RO.airT=(RO.airT||0)+dt;
-  if(busy)RO.v*=Math.max(0,1-dt*4);else if(!air){RO.bRamp=clamp((RO.bRamp||0)+(boost?dt*2.5:-dt*4),0,1);const tt=top*(1+.3*RO.bRamp)*(RO.turbo>0?1.25:1)*fit*(RO.onAB?1.22:1);if(c.thr||boost||RO.turbo>0)RO.v+=(s.stats.acc*1.15*lvl.acc*Math.max(0,1-RO.v/tt)+20*RO.bRamp+(RO.turbo>0?16:0))*dt;else RO.v-=RO.v*.4*dt;if(c.park){RO.v-=Math.sign(RO.v)*Math.min(Math.abs(RO.v),60*dt);RO.bz=0}else if(c.brk){if(RO.v>0){RO.v=Math.max(0,RO.v-75*dt);RO.bz=0}else{RO.bz=(RO.bz||0)+dt;if(RO.bz>.7||RO.v<0)RO.v-=22*dt}}else RO.bz=0;RO.v=Math.max(-18,RO.v);if(RO.v>tt)RO.v-=(RO.v-tt)*1.5*dt}
+  if(busy)RO.v*=Math.max(0,1-dt*4);else if(!air){RO.bRamp=clamp((RO.bRamp||0)+(boost?dt*2.5:-dt*4),0,1);const tt=top*(1+(RO.inCity?.5:.3)*RO.bRamp)*(RO.turbo>0?1.25:1)*fit*(RO.onAB?1.22:RO.inCity?.62:.85);if(c.thr||boost||RO.turbo>0)RO.v+=(s.stats.acc*1.15*lvl.acc*Math.max(0,1-RO.v/tt)+20*RO.bRamp+(RO.turbo>0?16:0))*dt;else RO.v-=RO.v*.4*dt;if(c.park){RO.v-=Math.sign(RO.v)*Math.min(Math.abs(RO.v),60*dt);RO.bz=0}else if(c.brk){if(RO.v>0){RO.v=Math.max(0,RO.v-75*dt);RO.bz=0}else{RO.bz=(RO.bz||0)+dt;if(RO.bz>.7||RO.v<0)RO.v-=22*dt}}else RO.bz=0;RO.v=Math.max(-18,RO.v);if(RO.v>tt)RO.v-=(RO.v-tt)*1.5*dt}
   // boost pads
   for(const pd of RO.pads||[]){if(!air&&Math.hypot(pd.x-RO.x,pd.z-RO.z)<7&&(RO.padT||0)<=0){RO.turbo=Math.max(RO.turbo,1.8);RO.v=Math.max(RO.v,top*1.05);RO.padT=.8;award(s,'BOOST PAD',8,100,'#ffd12c');comboAdd(1);AU.sfx('boost');fovKick=Math.max(fovKick,10)}}RO.padT=Math.max(0,(RO.padT||0)-dt);
   // steering: target yaw rate eases in; sharper when slow, calmer when fast; velocity heading follows with surface grip (slight slide on dirt/water)
-  const sp=Math.abs(RO.v),vr=clamp(sp/Math.max(30,top),0,1),maxR=(2.4-1.1*vr)*lvl.han*(air?.45:1)*(air?clamp(sp/9,0,1):Math.max(.6,clamp(sp/9,0,1)));
+  const sp=Math.abs(RO.v),vr=clamp(sp/Math.max(30,top),0,1),maxR=(2.5-1.3*vr)*({low:.85,high:1.15}[SET.steer]||1)*lvl.han*(air?.45:1)*(air?clamp(sp/9,0,1):Math.max(.6,clamp(sp/9,0,1)));
   const hbOk=c.hb&&!air&&sp>22&&!busy;
   if(hbOk&&!RO.dDir&&Math.abs(c.steer)>.2){RO.dDir=Math.sign(c.steer);RO.dT=0;AU.sfx('roll')}
   if(RO.dDir&&!hbOk){const tr=RO.dT>2?3:RO.dT>1.1?2:RO.dT>.5?1:0;if(tr){RO.tutTurbo=true;RO.turbo=Math.max(RO.turbo,[0,.8,1.3,2][tr]);s.bm=Math.min(100,s.bm+6*tr);award(s,['','MINI-TURBO','SUPER TURBO','ULTRA TURBO'][tr],0,250*tr*tr,['','#4ceaff','#ff9a3c','#c46bff'][tr]);AU.sfx('boost');fovKick=Math.max(fovKick,5+3*tr);comboAdd(tr)}RO.dDir=0;RO.dT=0}
@@ -3773,12 +3773,14 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.
   if(RO.dDir){const into=clamp(c.steer*RO.dDir,-1,1);ytg=-RO.dDir*maxR*(1.5+.6*into);RO.dT+=dt*(1+.8*Math.max(0,into))*(PK.has('drift')?1.35:1);s.bm=Math.min(100,s.bm+8*dt);RO.v-=RO.v*.06*dt;
     const tr=RO.dT>2?3:RO.dT>1.1?2:RO.dT>.5?1:0,col=[new THREE.Color(1.4,1.4,1.4),new THREE.Color(.6,1.6,2.6),new THREE.Color(2.6,1.2,.3),new THREE.Color(1.8,.6,2.6)][tr],fx0=Math.sin(RO.h),fz0=Math.cos(RO.h);
     for(const sd of[-1,1])if(R()<.8)emit(SPARK,V3(RO.x-fx0*3+fz0*sd*2.2,RO.y+.3,RO.z-fz0*3-fx0*sd*2.2),V3(rr(-2,2)-fx0*6,rr(1,4),rr(-2,2)-fz0*6),.28,col)}
-  RO.yr=(RO.yr||0)+(ytg-(RO.yr||0))*Math.min(1,dt*(c.steer||RO.dDir?7:10));RO.h+=RO.yr*dt;
+  // steering assist (touch): with no steering input at speed, gently line the car up with the road it is on
+  if(SET.assist!=='off'&&TOUCH.used&&!air&&!busy&&!RO.dDir&&RO.rdT&&RO.v>15&&Math.abs(c.steer)<.05){const a0=Math.atan2(RO.rdT[0],RO.rdT[1]);let e=angDiff(a0,RO.h);if(Math.abs(e)>Math.PI/2)e=angDiff(a0+Math.PI,RO.h);if(Math.abs(e)<.3)ytg+=e*.6*clamp((sp-15)/25,0,1)*(1-Math.abs(e)/.6)}
+  RO.yr=(RO.yr||0)+(ytg-(RO.yr||0))*Math.min(1,dt*(c.steer||RO.dDir?14:18));RO.h+=RO.yr*dt;
   // pinned (throttle on, barely moving): turn to the nearest open direction and roll off
   {const mv=Math.hypot(RO.x-(RO.stkX??RO.x),RO.z-(RO.stkZ??RO.z));RO.stkX=RO.x;RO.stkZ=RO.z;if((c.thr||boost)&&!busy&&!air&&mv<dt*5)RO.stkT=(RO.stkT||0)+dt;else RO.stkT=Math.max(0,(RO.stkT||0)-dt*2);
    if(RO.stkT>.6){let best=null,bd=9;for(let k=1;k<16;k++){const ang=RO.h+(k%2?1:-1)*Math.ceil(k/2)*Math.PI/8,px=RO.x+Math.sin(ang)*7,pz=RO.z+Math.cos(ang)*7,N=roamTerr(px,pz,RO.y+.3);if(N.low||N.g>RO.y+1.4||roamHit(px,pz,2.4,RO.y))continue;const d=Math.abs(angDiff(ang,RO.h));if(d<bd){bd=d;best=ang}}
      if(best!=null){RO.h=RO.vh=best;RO.yr=0;RO.v=Math.max(RO.v,10)}RO.stkT=0}}
-  const grip=(air?.6:terr==='water'?2.6:terr==='dirt'?3.6:8.5)*(RO.dDir?.22:1);RO.vh=(RO.vh??RO.h)+angDiff(RO.h,RO.vh??RO.h)*Math.min(1,dt*grip);s.latV=Math.sin(angDiff(RO.h,RO.vh))*sp;
+  const grip=(air?.6:terr==='water'?2.6:terr==='dirt'?3.6:13)*(RO.dDir?(terr==='road'?.15:.22):1);RO.vh=(RO.vh??RO.h)+angDiff(RO.h,RO.vh??RO.h)*Math.min(1,dt*grip);s.latV=Math.sin(angDiff(RO.h,RO.vh))*sp;
   if(Math.abs(angDiff(RO.h,RO.vh))>.25&&sp>25&&!air&&(terr!=='road'))RO.v-=RO.v*.25*dt;
   const fx=Math.sin(RO.vh),fz=Math.cos(RO.vh);let nx=RO.x+fx*RO.v*dt,nz=RO.z+fz*RO.v*dt;
   const N=roamTerr(nx,nz,RO.y+.3);
@@ -3789,8 +3791,8 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.
     else{const ax=roamTerr(nx,RO.z,RO.y+.3).g>RO.y+1.4;roamBounce(ax?'x':'z',sp);nx=RO.x;nz=RO.z}}
   else if(air&&N.g>RO.y+.2){nx=RO.x;nz=RO.z}
   // deck walls keep you on the road
-  if(T0.deck&&!air){const b=T0.deck,lim=b.w/2-1.6,dl=deckLocal(b,nx,nz);if(Math.abs(dl[1])>lim&&Math.abs(dl[0])<b.half-2){const q=deckPt(b,dl[0],Math.sign(dl[1])*lim);nx=q[0];nz=q[1];if(sp>20){RO.v*=1-.6*dt*4;if(R()<.4)burst(SPARK,V3(nx,RO.y+1.2,nz),6,12,.3,new THREE.Color(2,1.4,.6))}}}
-  const hb=roamHit(nx,nz,2.2,RO.y);if(hb){const pp=bldPush(hb,nx,nz,2.2);nx=pp[0];nz=pp[1];if(sp>20)burst(SPARK,V3(nx,RO.y+1.5,nz),14,18,.4,new THREE.Color(2,1.4,.6));roamBounce(pp[2],sp)}
+  if(T0.deck&&!air){const b=T0.deck,lim=b.w/2-1.6,dl=deckLocal(b,nx,nz);if(Math.abs(dl[1])>lim&&Math.abs(dl[0])<b.half-2){const q=deckPt(b,dl[0],Math.sign(dl[1])*lim);nx=q[0];nz=q[1];{const ua=Math.atan2(b.ux,b.uz);let e=angDiff(ua,RO.h);if(Math.abs(e)>Math.PI/2)e=angDiff(ua+Math.PI,RO.h);RO.h+=e*Math.min(1,dt*6)}if(sp>20){RO.v*=1-.5*dt;if(R()<.4)burst(SPARK,V3(nx,RO.y+1.2,nz),6,12,.3,new THREE.Color(2,1.4,.6))}}}
+  const hb=roamHit(nx,nz,2.2,RO.y);if(hb){const pp=bldPush(hb,nx,nz,2.2),ddx=pp[0]-nx,ddz=pp[1]-nz,dl=Math.hypot(ddx,ddz);nx=pp[0];nz=pp[1];if(sp>20)burst(SPARK,V3(nx,RO.y+1.5,nz),RO.hitCd>0?4:14,18,.4,new THREE.Color(2,1.4,.6));roamBounce(pp[2],sp,dl>1e-4?ddx/dl:null,dl>1e-4?ddz/dl:null)}
   RO.x=clamp(nx,WX0+10,WX1-10);RO.z=clamp(nz,WZS+10,WZN-10);edgeStep(dt);
   const g2=groundAt(RO.x,RO.z,RO.y+.3);const onRamp=RO.ramps.find(r=>{const dx=RO.x-r.x,dz=RO.z-r.z,a=dx*Math.sin(r.h)+dz*Math.cos(r.h),b=dx*Math.cos(r.h)-dz*Math.sin(r.h);return Math.abs(b)<r.w/2&&a>-r.len/2&&a<r.len/2});
   if(onRamp&&!air){RO.rampV=RO.v*onRamp.hgt/onRamp.len;RO.lastRamp=onRamp}else if(RO.lastRamp&&!onRamp&&!air&&RO.y>g2+.3){RO.vy=Math.max(RO.vy,RO.rampV*1.15+3);RO.takeoff={x:RO.x,z:RO.z,r:RO.lastRamp};RO.lastRamp=null;AU.sfx('launch');fovKick=Math.max(fovKick,8)}
@@ -3828,10 +3830,13 @@ function roamWreckStep(dt){const W=RO.wk,s=pl;W.t+=dt;const fw=V3(Math.sin(RO.h)
 function roamGlance(ax,sp){if(RO.v<0){RO.v=3;return}const st=(CTL&&CTL.steer)||0,a=ax==='x'?[0,Math.PI]:[Math.PI/2,-Math.PI/2];
   let t;if(Math.abs(st)>.2)t=a.find(x=>Math.sign(angDiff(x,RO.h))===-Math.sign(st))??a[0];else{const d0=Math.abs(angDiff(a[0],RO.h)),d1=Math.abs(angDiff(a[1],RO.h));t=Math.abs(d0-d1)<.05?a[R()<.5?0:1]:d0<d1?a[0]:a[1]}
   RO.h+=angDiff(t,RO.h)*.8;RO.vh=t;RO.yr=0;RO.v=Math.max(12,sp*.45);RO.stkT=0}
-function roamBounce(ax,sp){if(sp>18)qCrate();let vx=Math.sin(RO.vh)*RO.v,vz=Math.cos(RO.vh)*RO.v;const head=ax==='x'?Math.abs(vx)/(sp||1):Math.abs(vz)/(sp||1);
-  if(ax==='x'){vx=-vx*.35;vz*=.92}else{vz=-vz*.35;vx*=.92}const nv=Math.hypot(vx,vz),nh=Math.atan2(vx,vz);
-  roamDamage(head>.8?sp*.55:sp>20?sp*.12:0);if(head>.8){roamGlance(ax,sp);if(sp>12){AU.sfx('crash');shake=Math.min(1,sp/70)}}
-  else{RO.vh=nh;RO.h+=angDiff(nh,RO.h)*.7;RO.v=nv*(RO.v<0?-1:1);if(sp>20){AU.sfx('bump');shake=Math.min(.6,sp/120)}}}
+function roamBounce(ax,sp,nX,nZ){const vx=Math.sin(RO.vh)*RO.v,vz=Math.cos(RO.vh)*RO.v;if(nX==null){if(ax==='x'){nX=-(Math.sign(vx)||1);nZ=0}else{nX=0;nZ=-(Math.sign(vz)||1)}}
+  const vn=vx*nX+vz*nZ;if(vn>-.05)return;const a=Math.min(1,-vn/Math.max(sp,.1)),hard=-vn>7&&RO.hitCd<=0,fd=Math.sin(RO.h)*nX+Math.cos(RO.h)*nZ;if(hard){RO.hitCd=.3;if(sp>18)qCrate()}
+  if(a>.9&&Math.abs(fd)>.35){const bv=Math.min(12,2+(-vn)*.2);RO.vh=RO.h;RO.v=fd<0?-bv:bv;RO.yr*=.3;if(sp<14)RO.stkT=(RO.stkT||0)+.2;
+    if(hard){roamDamage(Math.max(0,(-vn-10)*.5));if(-vn>12){AU.sfx('crash');shake=Math.max(shake,Math.min(.7,-vn/70))}else AU.sfx('bump')}return}
+  const tx=vx-vn*nX,tz=vz-vn*nZ;if(Math.hypot(tx,tz)<.01){RO.v*=.5;return}const ns=sp*(1-.6*a*a),tf=Math.atan2(tx,tz);
+  if(Math.abs(angDiff(tf,RO.h))<=Math.PI/2){RO.vh=tf;RO.v=ns;RO.h+=angDiff(tf,RO.h)*.6}else{RO.vh=tf+Math.PI;RO.v=-ns;RO.h+=angDiff(tf+Math.PI,RO.h)*.6}RO.yr*=.5;RO.stkT=0;
+  if(hard){roamDamage(Math.max(0,(-vn-15)*.3));if(-vn>10){AU.sfx('bump');shake=Math.max(shake,Math.min(.3,-vn/140))}}}
 const angDiff=(a,b)=>{let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d};
 let studCombo=0,studComboT=0;// street studs: earnings from wandering decay with a 4-minute half-life; past 1200 recent studs the payout drops to 50 %, past 3000 to 20 %
 function streetMul(){const now=performance.now()/1000,dt=now-(RO.stT||now);RO.stT=now;RO.stE=(RO.stE||0)*Math.pow(.5,dt/240);return RO.stE<1200?1:RO.stE<3000?.5:.2}
