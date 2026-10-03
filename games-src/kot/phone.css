@@ -152,6 +152,7 @@ html.ph header.gx-bar .pzb.paused::before{content:"▶";font-size:20px;line-heig
 /* real usable heights: the primary button row stays pinned while the control zone scrolls; short portrait screens (<=640 px) tighten up */
 html.ph-p #pacts{display:contents}
 html.ph-p .gx-dock{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 52px}
+html.ph-p #pacts>*{grid-row:6}
 html.ph-p #pacts [data-act="reroll"]{grid-column:1;grid-row:5}
 html.ph-p #pacts [data-act="resolve"]{grid-column:2;grid-row:5}
 html.ph-p #pacts [data-act="hint"]{grid-column:3;grid-row:5}
