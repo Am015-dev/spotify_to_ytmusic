@@ -3,7 +3,7 @@ const URL='file:///home/user/spotify_to_ytmusic/games/index.html';
 const VPS=[[1440,900],[1280,720],[844,390],[390,844],[360,740]];
 let problems=0;const fail=m=>{problems++;console.log('FAIL',m)};
 const ok=(c,m)=>{if(!c)fail(m)};
-const GAMES=[['crown','crown-city-smash/index.html'],['nebula','nebula-aces/index.html'],['doorkick','doorkick-dungeon/index.html'],['shipwreck','shipwreck-isle/index.html'],['sands','sands-of-qamar/index.html'],['sunglaze','sunglaze/index.html'],['rampart','rampart-and-vine/index.html'],['shortfuse','short-fuse/index.html'],['tidewake','tidewake/index.html'],['hollowbough','hollowbough/index.html'],['thornbound','thornbound/index.html'],['mainhattan','mainhattan-nightrun/index.html'],['overdrive','mainhattan-overdrive/index.html']];
+const GAMES=[['kaiten','kaiten-kitchen/index.html'],['crown','crown-city-smash/index.html'],['nebula','nebula-aces/index.html'],['doorkick','doorkick-dungeon/index.html'],['shipwreck','shipwreck-isle/index.html'],['sands','sands-of-qamar/index.html'],['sunglaze','sunglaze/index.html'],['rampart','rampart-and-vine/index.html'],['shortfuse','short-fuse/index.html'],['tidewake','tidewake/index.html'],['hollowbough','hollowbough/index.html'],['thornbound','thornbound/index.html'],['mainhattan','mainhattan-nightrun/index.html'],['overdrive','mainhattan-overdrive/index.html']];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function mk(b,w,h,scheme,opt={}){
   const c=await b.newContext({viewport:{width:w,height:h},colorScheme:scheme,reducedMotion:opt.rm?'reduce':'no-preference',hasTouch:w<700||h<500,isMobile:false});
@@ -21,9 +21,9 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
   const tag=`${w}x${h}-${scheme}`,ph=w<700||h<500;
   let [c,p]=await mk(b,w,h,scheme,{});
   ok(await p.title()==='Game Night Shelf',tag+' title');
-  ok((await p.textContent('#tally'))==='13 games on the shelf',tag+' tally');
+  ok((await p.textContent('#tally'))==='14 games on the shelf',tag+' tally');
   ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),tag+' scrollWidth '+await p.evaluate(()=>document.documentElement.scrollWidth));
-  ok(await p.locator('.boxbtn').count()===13,tag+' 13 boxes');
+  ok(await p.locator('.boxbtn').count()===14,tag+' 14 boxes');
   ok(await p.evaluate(()=>getComputedStyle(document.body).backgroundColor!=='rgba(0, 0, 0, 0)'),tag+' body bg');
   {const t0=await p.evaluate(()=>{const r=document.querySelector('.boxbtn[data-id="crown"]').getBoundingClientRect();return{top:r.top,h:innerHeight}});
    if(ph)ok(t0.top<t0.h-60,`${tag} first shelf row not visible on load (top ${Math.round(t0.top)} of ${t0.h})`);}
@@ -89,17 +89,17 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
   ok((await p.textContent('#tip')).includes('Explorer'),tag+' trophy tip');if(ph){await p.keyboard.press('Escape');ok(!await p.evaluate(()=>document.getElementById('mantel').classList.contains('open')),tag+' trophy popover closes')}
   // plain list
   await p.click('#viewbtn');await p.waitForTimeout(200);
-  ok(await p.locator('#listview li').count()===13&&await p.locator('#listview').isVisible(),tag+' list view');
+  ok(await p.locator('#listview li').count()===14&&await p.locator('#listview').isVisible(),tag+' list view');
   ok(await p.evaluate(()=>localStorage.room_view)==='list',tag+' room_view saved');
   if(ph){const bad=await p.evaluate(()=>{const o=[];for(const e of document.querySelectorAll('#listview button,#listview a,header button,header a')){const r=e.getBoundingClientRect();if(r.width&&(r.width<43.5||r.height<43.5))o.push(e.textContent+Math.round(r.height))}return o});bad.forEach(x=>fail(tag+' list small tap '+x))}
   await p.screenshot({path:`shots/${tag}-list.png`});
   await p.reload();await p.waitForTimeout(400);
-  ok(await p.locator('#listview li').count()===13&&await p.locator('#listview').isVisible(),tag+' list persists');
+  ok(await p.locator('#listview li').count()===14&&await p.locator('#listview').isVisible(),tag+' list persists');
   await p.click('#listview [data-play="doorkick"]');await p.waitForTimeout(300);
   ok((await p.evaluate(()=>document.getElementById('frame').src)).endsWith('doorkick-dungeon/index.html'),tag+' list play');
   await backFromGame(p);
   await p.click('#viewbtn');await p.waitForTimeout(200);
-  ok(await p.locator('.boxbtn').count()===13,tag+' back to room');
+  ok(await p.locator('.boxbtn').count()===14,tag+' back to room');
   ok(p.errs.length===0,`${tag} page errors ${p.errs}`);
   await c.close();
 }

@@ -447,6 +447,10 @@ const GAMES=[
    blurb:'Four heirs fight over an empty throne in an overgrown kingdom. Bid for turn order, send your Herald, play cards face-down beside each region and reveal them in clashes for Influence. Most Influence after five rounds wins. Play against computers, pass one device around, or online with friends. Preview: still being polished; solo mode to come.',
    stats:[['2–4','players'],['90','minutes'],['12+','ages'],['4','factions']],
    chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','4 asymmetric factions','Bluffing & bidding']},
+  {id:'kaiten',cover:'covers/kaiten.jpg',name:'Kaiten Kitchen (preview)',src:'kaiten-kitchen/index.html',ribbon:'Conveyor-belt sushi drafting',ref:false,isNew:true,
+   blurb:'Plates glide past on the conveyor belt: grab one, pass the rest along, and build the tastiest table. Pair the prawns, finish fish sets, race for seaweed rolls and save a custard for dessert. Everyone picks at once, so watch what your neighbours collect. Play against computers, pass one device around, or online with friends.',
+   stats:[['2–5','players'],['20','minutes'],['8+','ages'],['3','rounds']],
+   chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','Simultaneous picks']},
   {id:'mainhattan',cover:'covers/nightrun.jpg',name:'Mainhattan Nightrun',src:'mainhattan-nightrun/index.html',ribbon:'Arcade shooter',ref:false,
    blurb:'Fly a stolen-data courier over a neon Frankfurt in 2099. Graze drone fire to cool your guns, phase-dash through bullets and break four district bosses from the Bankenviertel to the Messe.',
    stats:[['1','player'],['10','minutes'],['10+','ages'],['4','districts']],
@@ -459,8 +463,8 @@ const GAMES=[
 /* box look: colour and size (em) per game; deterministic */
 const LOOK={crown:{c:'#8c3f5e',W:14.6,H:11.8,D:3.4},nebula:{c:'#3c3a78',W:13.4,H:11.6,D:3.0},doorkick:{c:'#b5622a',W:13.8,H:11.0,D:3.6},shipwreck:{c:'#4f7a58',W:14.4,H:11.2,D:3.4},sands:{c:'#b8683c',W:13.6,H:11.6,D:3.0},
  sunglaze:{c:'#2a5fa8',W:14.4,H:11.4,D:3.4},rampart:{c:'#7a8a3c',W:13.6,H:11.0,D:3.0},shortfuse:{c:'#c9372c',W:14.2,H:10.8,D:3.0},tidewake:{c:'#2f6b66',W:14.6,H:11.2,D:2.8},hollowbough:{c:'#7a5a2c',W:14.4,H:11.8,D:3.2},
- thornbound:{c:'#3b2a4f',W:14.0,H:11.8,D:3.4},mainhattan:{c:'#6a1f6e',W:13.4,H:10.8,D:2.8},overdrive:{c:'#4a3f9a',W:14.4,H:11.4,D:3.4}};
-const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck','sands'],['sunglaze','rampart',['shortfuse','tidewake'],'hollowbough'],['thornbound','mainhattan','overdrive']];
+ thornbound:{c:'#3b2a4f',W:14.0,H:11.8,D:3.4},kaiten:{c:'#c2502e',W:13.2,H:10.6,D:3.0},mainhattan:{c:'#6a1f6e',W:13.4,H:10.8,D:2.8},overdrive:{c:'#4a3f9a',W:14.4,H:11.4,D:3.4}};
+const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck','sands'],['sunglaze','rampart',['shortfuse','tidewake'],'hollowbough'],['thornbound','kaiten','mainhattan','overdrive']];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const $=(s,r=document)=>r.querySelector(s);
 const root=document.documentElement;
