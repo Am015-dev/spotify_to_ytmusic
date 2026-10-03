@@ -11,6 +11,7 @@ async function mk(b,w,h,scheme,opt={}){
   const c=await b.newContext({viewport:{width:w,height:h},colorScheme:scheme,reducedMotion:opt.rm?'reduce':'no-preference',hasTouch:w<700||h<500,isMobile:false});
   if(opt.seed)await c.addInitScript(s=>{if(!sessionStorage.getItem('seeded')){const o=JSON.parse(s);for(const k in o)localStorage.setItem(k,o[k]);sessionStorage.setItem('seeded','1')}},JSON.stringify(opt.seed));
   if(opt.hour!=null)await c.addInitScript(h=>{Date.prototype.getHours=()=>h},opt.hour);
+  await c.route('**/games/*/index.html',r=>r.fulfill({body:'<!doctype html><title>stub</title><body>stub',contentType:'text/html'})); // the games are heavy 3D pages that can stall headless Chromium; the shelf only needs their src
   const p=await c.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.errs=errs;
   await p.goto(URL+(opt.q||''));await p.waitForTimeout(500);return[c,p]}
 const rectOf=(p,sel)=>p.evaluate(s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,r:r.right,b:r.bottom}},sel);
@@ -50,6 +51,7 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
      ok(!sb.lamp&&!sb.case,`${tag} TV overlaps lamp/bookcase ${JSON.stringify(sb)}`)}
    else{await p.locator('#tvscreen').scrollIntoViewIfNeeded();const t=await info();ok(t&&t.w>=100&&t.h>=70&&t.x>=0&&t.r<=t.vw+1,`${tag} TV screen visible on phone ${JSON.stringify(t)}`)}
    await p.locator('#tv').scrollIntoViewIfNeeded();
+   const insW=async hid=>{await p.waitForFunction(h=>document.getElementById('inspect').hidden===h,hid,{timeout:8000}).catch(()=>{});await p.waitForTimeout(hid?150:700)};
    const gotoCh=async n=>{await p.hover('#tvscreen');for(let i=0;i<3&&!new RegExp('channel '+n).test((await info()).lab);i++){await p.click('[data-tvch="1"]');await p.waitForTimeout(450)}};
    ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),tag+' no sideways scroll with TV');
    await gotoCh(1);const l0=(await info()).lab;ok(/channel 1.*Nightrun/i.test(l0),tag+' starts on CH 1 '+l0);
@@ -64,18 +66,18 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
    await p.hover('#tvscreen');await p.click('[data-tvch="-1"]');await p.waitForTimeout(450);
    ok(/channel 1/i.test((await info()).lab),tag+' previous channel');
    for(const [ch,id] of [[1,'mainhattan'],[2,'overdrive']]){
-     await p.locator('#tvscreen').scrollIntoViewIfNeeded();await gotoCh(ch);await p.click('#tvscreen');await p.waitForTimeout(900);
+     await p.locator('#tvscreen').scrollIntoViewIfNeeded();await gotoCh(ch);await p.click('#tvscreen');await insW(false);
      ok(await p.locator('#inspect .tvg').count()===1&&!await p.evaluate(()=>document.getElementById('inspect').hidden),`${tag} tv card opens ${id}`);
      ok(await inside(p,'#inspect .play'),`${tag} tv Play inside viewport`);
      ok(await p.evaluate(()=>document.activeElement&&document.activeElement.closest('#inspect')!==null),tag+' tv card focus inside');
      ok((await p.textContent('#inspect')).includes('CH '+ch)&&await p.locator('#inspect .stats div').count()===4&&await p.locator('#inspect .chips span').count()>3&&await p.locator('#inspect a.alt').count()===1,`${tag} tv card content ${id}`);
      const nm=await p.evaluate(()=>document.querySelector('#inspect [role=dialog]').getAttribute('aria-label'));ok(/^Now playing:/.test(nm),tag+' tv card name '+nm);
      if(ch===1)await p.screenshot({path:`shots/${tag}-tv-card.png`});
-     if(ch===1){await p.keyboard.press('Escape');await p.waitForTimeout(800);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' tv Esc closes');ok(await p.evaluate(()=>document.activeElement&&document.activeElement.id==='tvscreen'),tag+' focus back on screen');
-       await p.keyboard.press('Enter');await p.waitForTimeout(900);ok(!await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' Enter on screen opens card');
-       await p.click('#inspect .ins-x, #inspect .sh-x');await p.waitForTimeout(800);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' tv close button');
-       await p.click('#tvscreen');await p.waitForTimeout(800);
-       if(!ph){await p.mouse.click(8,8);await p.waitForTimeout(800);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' tv outside click closes');await p.click('#tvscreen');await p.waitForTimeout(800)}}
+     if(ch===1){await p.keyboard.press('Escape');await insW(true);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' tv Esc closes');ok(await p.evaluate(()=>document.activeElement&&document.activeElement.id==='tvscreen'),tag+' focus back on screen');
+       await p.keyboard.press('Enter');await insW(false);ok(!await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' Enter on screen opens card');
+       await p.click('#inspect .ins-x, #inspect .sh-x');await insW(true);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' tv close button');
+       await p.click('#tvscreen');await insW(false);
+       if(!ph){await p.mouse.click(8,8);await insW(true);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' tv outside click closes');await p.click('#tvscreen');await insW(false)}}
      const n0=await p.evaluate(id=>(JSON.parse(localStorage.room_plays||'{}')[id]|0),id);
      await p.click('#inspect .play');await p.waitForTimeout(500);
      const s=await p.evaluate(()=>({src:document.getElementById('frame').src,hid:document.getElementById('table').hidden}));

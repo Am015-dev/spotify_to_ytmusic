@@ -166,3 +166,5 @@ html.ph .dlg .acts:has(>.btn.primary){position:sticky;bottom:-1rem;z-index:3;mar
 html.ph-l .gx-dock[data-pp="watch"] #pacts{position:sticky;bottom:0;z-index:3;background:var(--paper,#fff6dc)}
 /* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
 html.ph .mbox,html.ph .dlg{box-sizing:border-box}
+
+html.ph #preview{max-height:none;overflow:visible}
