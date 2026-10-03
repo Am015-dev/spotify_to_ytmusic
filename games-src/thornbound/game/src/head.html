@@ -164,8 +164,8 @@ html.ph .pcard:not([hidden]){justify-content:safe center}
 html.ph .btnrow:has(>.btn.pri),html.ph .pp-act:has(>.btn.pri){position:sticky;bottom:0;z-index:3;padding:8px 0 6px;margin:0;background:linear-gradient(rgba(21,12,16,0),#150c10 10px)}
 html.ph .cd>.btn.pri{position:sticky;bottom:0;z-index:3;box-shadow:0 0 0 6px #150c10,0 2px 0 #7a5a14}
 html.ph .offer.rec{order:-1}
-html.ph-p .gx-dock:has(.offers) #handw{display:none}
-@media (max-height:420px){html.ph-l .offer{padding:3px 6px}html.ph-l .offer p{margin:0 0 3px;font-size:.85rem;line-height:1.2}html.ph-l .step h3.st{font-size:1rem;margin:0}html.ph-l #main{padding-top:2px}}
+html.ph-p .gx-dock:has(.offers,.step[data-q=location],.step[data-q=herald]) #handw{display:none}
+@media (max-height:420px){html.ph-l .offer{padding:3px 6px}html.ph-l .offer .ob p:not(.st-n){display:none}html.ph-l .step h3.st{font-size:1rem;margin:0}html.ph-l #main{padding-top:2px}}
 html.ph #main .offer .btn.pri{position:sticky;bottom:2px;z-index:3;box-shadow:0 0 0 4px #241620,0 2px 0 #7a5a14}
 @media (max-height:600px){html.ph-p .hand-h{display:none}html.ph-p #handw{padding-bottom:0}}
 html.ph .ppop .pp-act:has(>.btn.pri){background:linear-gradient(rgba(243,230,191,0),#f3e6bf 10px)}

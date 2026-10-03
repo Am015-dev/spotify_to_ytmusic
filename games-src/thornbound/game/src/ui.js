@@ -340,7 +340,7 @@ function renderMain(){const el=$('#main');if(!el)return;const q=G.q;
   if(!q||s==null||UI.card&&UI.card.kind==='pass'){el.innerHTML=waitingHTML();setHl([]);return}
   const mv=legal(s);const rec=getRec(s,mv);const rm=rec?mv.find(m=>m.k===rec.k):null;
   let h='';const help=tipLine(q.kind);
-  h+='<div class="step"><h3 class="st">'+esc(KIND_NAME[q.kind]||q.title.replace(/^[^:]*:\s*/,''))+'</h3>';
+  h+='<div class="step" data-q="'+q.kind+'"><h3 class="st">'+esc(KIND_NAME[q.kind]||q.title.replace(/^[^:]*:\s*/,''))+'</h3>';
   h+='<p class="pr">'+esc(promptText(q))+'</p>';
   if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Everyone decides at the same time. Still to choose: '+esc(oth.map(seatWho).join(', '))+'.</p>'}
   if(G.clash&&['day','night','tally'].includes(G.step)||G.clash&&q.kind==='location'||G.clash&&['castle','wilderness','harvest','shrine','ossuary','tie'].includes(q.kind))h+=recapHTML();

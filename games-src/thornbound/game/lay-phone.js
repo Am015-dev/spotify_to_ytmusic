@@ -35,7 +35,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
  for(let i=0;i<500;i++){await p.waitForTimeout(200);
   const st=await p.evaluate(()=>({over:!!G.over,card:UI.card&&UI.card.kind,k:G.q&&G.q.kind,s:G.q&&viewSeatForQ(),r:G.round,pop:UI.pop,busy:UI.busy}));
   if(st.over||st.r>=2&&st.k==='bid'&&turns>5)break;
-  if(process.env.DBG&&i%10==0)console.log('it',i,JSON.stringify(st));
+  if(process.env.DBG&&i%10==0){console.log('it',i,JSON.stringify(st));if(i==60)await p.screenshot({path:'/tmp/tb_dbg.png'})}
   const key=st.card?'card_'+st.card:'q_'+st.k;if(!shots.has(key)){shots.add(key);await p.waitForTimeout(450);await scroll(key);await checks(key);await hitLocs(key);await shot(key)}
   if(st.card){const sel=({pass:'#pc [data-a=take]',tip:'#pc [data-a=tipok]',event:'#pc [data-a=evok]:visible',over:'#pc [data-a=menu]'})[st.card];await tapEl(sel||'#pc button:visible');continue}
   if(st.s==null){continue}
