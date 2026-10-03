@@ -9,7 +9,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
  const p=await ctx.newPage();p.setDefaultTimeout(60000);const errs=[];p.on('pageerror',e=>errs.push('pageerror '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load resource/.test(m.text()))errs.push(m.text())});
  const log=(...a)=>console.log(t,...a);const prob=(...a)=>{bad++;log('PROBLEM',...a)};
  await p.goto('https://swi.test/?phone=1'+(SAFE?'&safe='+SAFE:''));await p.waitForTimeout(1200);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}setSeed(5);AIDELAY=60;ANIM=0});
- const FIT=require('../phfit.js');const shot=async n=>{(await FIT.run(p)).forEach(m=>prob('FIT '+n,m));return p.screenshot({path:path.join(HERE,'shots','ph',`P_${t}_${n}.png`)})};
+ const FIT=require('../phfit.js');const shot=async n=>{(await FIT.run(p)).concat(await FIT.extra(p)).forEach(m=>prob('FIT '+n,m));return p.screenshot({path:path.join(HERE,'shots','ph',`P_${t}_${n}.png`),timeout:150000})};
  const scroll=async tag=>{const r=await p.evaluate(()=>({h:document.documentElement.scrollHeight,w:document.documentElement.scrollWidth,vh:innerHeight,vw:innerWidth}));if(r.h>r.vh+1||r.w>r.vw+1)prob(tag,'SCROLL',JSON.stringify(r))};
  // all visible interactive things must be >= 44 px and inside the screen
  const targets=async tag=>{const r=await p.evaluate(()=>{const o=[];const vis=e=>{const r=e.getBoundingClientRect();if(r.width<1||r.height<1)return null;for(let n=e;n&&n!==document.body;n=n.parentElement){const cs=getComputedStyle(n);if(cs.display==='none'||cs.visibility==='hidden'||n.hidden)return null}

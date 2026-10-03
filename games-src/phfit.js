@@ -68,3 +68,15 @@ exports.SRC=SRC;
 exports.run=async(page)=>{try{await page.evaluate(()=>{if(!document.getElementById('phfit-noanim')){const st=document.createElement('style');st.id='phfit-noanim';st.textContent='*,*::before,*::after{animation:none!important;transition:none!important}';document.head.appendChild(st)}});await page.evaluate(()=>Promise.race([Promise.all(document.getAnimations().filter(a=>{try{return a.effect.getComputedTiming().endTime!==Infinity&&a.playState==='running'}catch(e){return false}}).map(a=>a.finished.catch(()=>0))),new Promise(r=>setTimeout(r,2500))]));return await page.evaluate(SRC)}catch(e){return ['phfit eval error '+e.message.slice(0,80)]}};
 // share of the short side the board must reach: 0.85 normally, 0.75 on short portrait screens (usable height < 800 px)
 exports.share=(W,H)=>(W<H&&H<800)?.75:.85;
+// extra checks (rc): no empty band > 12 px between the visible content (bar, board, dock) and the viewport edges;
+// no heading hidden under a sticky/overlapping element (elementFromPoint at its centre must hit it)
+exports.extraSRC=`(()=>{const out=[];const VW=innerWidth,VH=innerHeight;
+ const els=[...document.querySelectorAll('.gx-bar,.gx-board,.gx-dock,#phview,#story,#modal .mbox,#start')].filter(e=>{const r=e.getBoundingClientRect();const s=getComputedStyle(e);return r.width>20&&r.height>20&&s.display!=='none'&&s.visibility!=='hidden'});
+ let l=1e9,t=1e9,r=-1e9,b=-1e9;for(const e of els){const q=e.getBoundingClientRect();l=Math.min(l,q.left);t=Math.min(t,q.top);r=Math.max(r,q.right);b=Math.max(b,q.bottom)}
+ if(els.length){if(t>12)out.push('EMPTY BAND top '+Math.round(t));if(l>12)out.push('EMPTY BAND left '+Math.round(l));if(VW-r>12)out.push('EMPTY BAND right '+Math.round(VW-r));if(VH-b>12)out.push('EMPTY BAND bottom '+Math.round(VH-b))}
+ for(const h of document.querySelectorAll('.gx-dock h1,.gx-dock h2,.gx-dock h3,.gx-dock h4,#ppop h1,#ppop h2,#ppop h3,#ppop h4,#ppop .pp-t,#story h2,#panel h4')){const q=h.getBoundingClientRect();if(!q.width||!q.height)continue;const s=getComputedStyle(h);if(s.visibility==='hidden'||s.display==='none')continue;
+  const x=q.left+Math.min(q.width/2,60),y=q.top+q.height/2;if(x<0||y<0||x>VW||y>VH)continue;
+  let clipped=false;for(let n=h.parentElement;n;n=n.parentElement){const cs=getComputedStyle(n);if(/(auto|scroll|hidden)/.test(cs.overflowY)){const nr=n.getBoundingClientRect();if(y<nr.top||y>nr.bottom){clipped=true;break}}}if(clipped)continue;
+  const e=document.elementFromPoint(x,y);const TL='#pzoom,#modal,.gx-drawer,#ppop,#pc';if(e&&e.closest(TL)!==h.closest(TL))continue;if(e&&!(h===e||h.contains(e)||e.contains(h)))out.push('HEADING COVERED by '+(e.id||e.className||e.tagName)+': "'+h.textContent.trim().slice(0,30)+'"')}
+ return out})()`;
+exports.extra=async(page)=>{try{return await page.evaluate(exports.extraSRC)}catch(e){return []}};

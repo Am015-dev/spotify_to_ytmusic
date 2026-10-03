@@ -161,7 +161,7 @@ html.ph #map text{display:none}
 /* camera: off the board in portrait. A camera button in the top bar opens the four controls as a small
    pop-up row under the bar for a few seconds; pinch and drag on the board work as always */
 .ph-cam{display:none}
-html.ph.ph-p .ph-cam{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0}
+html.ph.ph-p .ph-cam,html.ph.ph-p .gx-bar>.btn.ph-cam{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0}
 html.ph.ph-p .ph-cam .ico{width:22px;height:22px}
 html.ph.ph-p.camopen .ph-cam{border-color:var(--gold)}
 html.ph.ph-p .ph-ctl{position:fixed;right:6px;top:var(--cam-top,52px);z-index:20;flex-direction:row;gap:4px;margin:0;padding:4px;border-radius:14px;background:rgba(10,8,30,.88);border:1px solid rgba(255,200,107,.45);box-shadow:0 8px 20px rgba(0,0,0,.5);display:none}
