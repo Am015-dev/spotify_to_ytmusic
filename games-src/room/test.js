@@ -206,7 +206,10 @@ for(const [w,h] of [[1440,900],[390,844],[844,390]]){
 /* reduced motion */
 for(const [w,h] of [[1440,900],[390,844]]){
   const tag=`rm-${w}x${h}`;const [c,p]=await mk(b,w,h,'dark',{rm:true});
-  await openBox(p,'overdrive');ok(await inside(p,'#inspect .play'),tag+' play visible');
+  ok(await p.evaluate(()=>getComputedStyle(document.querySelector('.tv-flick')).animationName==='none'&&getComputedStyle(document.querySelector('.tv-roll')).animationName==='none'),tag+' no TV flicker animation under reduced motion');
+  await p.locator('#tvscreen').scrollIntoViewIfNeeded();await p.click('[data-tvch="1"]');await p.waitForTimeout(60);
+  ok(await p.locator('#tvscreen.sw').count()===0,tag+' no static flash under reduced motion');
+  await p.click('#tvscreen');await p.waitForTimeout(500);ok(await inside(p,'#inspect .play'),tag+' play visible');
   await p.screenshot({path:`shots/${tag}-inspect.png`});
   await p.click('#inspect .play');await p.waitForTimeout(500);
   ok((await p.evaluate(()=>document.getElementById('frame').src)).endsWith('mainhattan-overdrive/index.html'),tag+' play');
@@ -233,8 +236,31 @@ for(const [w,h] of [[740,360],[844,390],[360,740]]){const [c,p]=await mk(b,w,h,'
  ok(errs.length===0,'fab errors '+errs);await c.close();
  const [c2,p2]=await mk(b,1280,720,'dark',{});await openBox(p2,'sunglaze');await p2.click('#inspect .play');await p2.waitForTimeout(1500);
  ok(await p2.evaluate(()=>getComputedStyle(document.querySelector('#table .bar')).display!=='none'&&getComputedStyle(document.getElementById('fab')).display==='none'),'desktop keeps bar, no fab');await c2.close()}
+/* TV: flicker animation present when motion allowed, auto channel switching with static, cat on the TV */
+{const [c,p]=await mk(b,1440,900,'light',{});
+ ok(await p.evaluate(()=>getComputedStyle(document.querySelector('.tv-flick')).animationName!=='none'),'TV flicker animates by default');
+ const lab=()=>p.getAttribute('#tvscreen','aria-label');const a=await lab();
+ let saw=false;for(let i=0;i<30;i++){await p.waitForTimeout(250);if(await p.locator('#tvscreen.sw').count()){saw=true;break}}
+ await p.waitForTimeout(500);const a2=await lab();
+ ok(saw,'static flash shown on auto switch');ok(a!==a2,'TV auto-switches channel after ~6 s ('+a+' / '+a2+')');
+ await p.screenshot({path:'shots/1440x900-tv-auto.png'});
+ await p.hover('#tvscreen');const h0=await lab();await p.waitForTimeout(6600);ok(h0===await lab(),'auto switch pauses while hovering the TV');
+ await c.close()}
+for(const [w,h] of [[1440,900],[390,844],[844,390]]){const tag=`catTV-${w}x${h}`,ph=w<700||h<500;
+ const [c,p]=await mk(b,w,h,'dark',{seed:{room_plays:JSON.stringify({overdrive:9,crown:4}),shelf_last:'overdrive'}});
+ ok(await p.locator('.cat').count()===1&&await p.locator('#tv .cat').count()===1,tag+' cat sits on the TV when a video game is most played');
+ await p.locator('#tv').scrollIntoViewIfNeeded();await p.screenshot({path:`shots/${tag}.png`});
+ const g=await p.evaluate(()=>{const c=document.querySelector('.cat').getBoundingClientRect(),s=document.querySelector('#tv .tv-cab,#tv .tv-bez').getBoundingClientRect();return{catB:c.bottom,top:s.top}});
+ ok(g.catB<=g.top+ (ph?20:10),tag+' cat above TV '+JSON.stringify(g));
+ await p.click('.cat');await p.waitForTimeout(100);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' cat tap does not open card');
+ ok(await p.locator('.boxbtn .cat,.cell .cat').count()===0,tag+' no cat on shelf');
+ ok(p.errs.length===0,tag+' errors '+p.errs);await c.close()}
 /* deep link */
 {const [c,p]=await mk(b,1280,720,'dark',{});await p.goto(URL+'#sands');await p.reload();await p.waitForTimeout(500);
- ok((await p.evaluate(()=>document.getElementById('frame').src)).endsWith('sands-of-qamar/index.html'),'deep link');await c.close()}
+ ok((await p.evaluate(()=>document.getElementById('frame').src)).endsWith('sands-of-qamar/index.html'),'deep link');
+ await p.goto(URL+'#overdrive');await p.reload();await p.waitForTimeout(500);
+ ok((await p.evaluate(()=>document.getElementById('frame').src)).endsWith('mainhattan-overdrive/index.html')&&!await p.evaluate(()=>document.getElementById('table').hidden),'deep link to a video game');
+ await p.goto(URL+'#mainhattan');await p.reload();await p.waitForTimeout(500);
+ ok((await p.evaluate(()=>document.getElementById('frame').src)).endsWith('mainhattan-nightrun/index.html'),'deep link mainhattan');await c.close()}
 await b.close();console.log(problems+' problems');
 })();
