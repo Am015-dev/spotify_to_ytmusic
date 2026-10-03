@@ -174,3 +174,5 @@ cython_debug/
 oauth.json
 raw_headers.txt
 playlists.json
+# game kit sources (the Python "parts/" rule above is for packaging)
+!games-src/**/parts/
