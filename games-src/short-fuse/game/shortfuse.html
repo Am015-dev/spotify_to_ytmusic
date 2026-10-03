@@ -458,6 +458,11 @@ html.ph .pcard .vals{grid-template-columns:repeat(auto-fill,minmax(60px,1fr))}
 html.ph .pcard .over h3{font-size:1.5rem}
 html.ph .pcard .statgrid{grid-template-columns:repeat(3,1fr)}
 html.ph .pcard .btn.go{font-size:1rem}
+/* real usable heights: the strip scrolls instead of clipping, its action row stays pinned; cards pin their primary row */
+html.ph #ps{overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
+html.ph .ps-msg{max-height:none;overflow:visible}
+html.ph .ps-acts:has(.pb.pri){position:sticky;bottom:0;z-index:3;background:#f7e2b9;box-shadow:0 -6px 6px -4px #f7e2b9}
+html.ph .pcard :is(.row,.acts):has(>.btn.go){position:sticky;bottom:-8px;z-index:3;background:#f7e2b9;padding:6px 0 8px;margin:6px 0 0;box-shadow:0 -6px 6px -4px #f7e2b9}
 /* zoom bar over the table */
 html.ph .zb{position:absolute;left:0;right:0;top:0;height:44px;z-index:3;display:flex;align-items:center;gap:2px;padding:0 4px;background:rgba(28,24,56,.86);color:#fff}
 html.ph .zb[hidden]{display:none}

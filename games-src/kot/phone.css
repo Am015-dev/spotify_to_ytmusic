@@ -150,7 +150,13 @@ html.ph .ptile b{overflow-wrap:anywhere}
 html.ph header.gx-bar .pzb.paused::before{content:"▶";font-size:20px;line-height:1}
 
 /* real usable heights: the primary button row stays pinned while the control zone scrolls; short portrait screens (<=640 px) tighten up */
-html.ph-p #pacts [data-act="reroll"],html.ph-p #pacts [data-act="resolve"],html.ph-p #pacts [data-act="end"]{position:sticky;bottom:4px;z-index:3}
+html.ph-p #pacts{display:contents}
+html.ph-p .gx-dock{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 52px}
+html.ph-p #pacts [data-act="reroll"]{grid-column:1;grid-row:5}
+html.ph-p #pacts [data-act="resolve"]{grid-column:2;grid-row:5}
+html.ph-p #pacts [data-act="hint"]{grid-column:3;grid-row:5}
+html.ph-p #pacts [data-act="end"]{grid-column:1/-1;grid-row:5}
+html.ph-p #pacts [data-act="reroll"],html.ph-p #pacts [data-act="resolve"],html.ph-p #pacts [data-act="hint"],html.ph-p #pacts [data-act="end"]{position:sticky;bottom:4px;z-index:3}
 @media (max-height:640px){html.ph-p .gx-dock{gap:4px;padding:4px 8px 4px}html.ph-p #preview{display:none}html.ph-p #dice{padding-top:0}}
 html.ph #banner:not(:empty){min-height:calc(1.25em + 8px);flex-shrink:0}
 @media (max-height:600px){html.ph-p #banner{display:none}}

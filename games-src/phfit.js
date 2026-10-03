@@ -57,7 +57,7 @@ const SRC=`(()=>{
    // skip buttons that live inside a scroller and are scrolled out of it only if some other primary is reachable? no: report
    if(r.left<-1||r.top<-1||r.right>VW+1||r.bottom>VH+1){out.push('PRIMARY BUTTON NOT FULLY IN VIEWPORT ['+[r.left,r.top,r.right,r.bottom].map(Math.round)+'] '+lab);continue}
    const x=r.left+r.width/2,y=r.top+r.height/2;const h=document.elementFromPoint(x,y);
-   if(h&&!(h===b||b.contains(h))){const o=h.closest('.scrim,.zoom,.oppfull,.modal,#modal,#pzoom,#ppop,#pc,#pcx,.gx-drawer,.ph-pop,#ph-pop,#ph-z,[class*=overlay],[class*=scrim]');const o2=o&&!o.contains(b)?o:null;const fx=(()=>{for(let n=h;n&&n!==document.body;n=n.parentElement){const st=getComputedStyle(n);if(st.position==='fixed'){const q=n.getBoundingClientRect();if(q.width*q.height>.6*VW*VH&&!n.contains(b))return true}}return false})();if(o2||fx)continue}
+   if(h&&!(h===b||b.contains(h))){const o=h.closest('.scrim,.zoom,.oppfull,.modal,#modal,#pzoom,#ppop,#pc,#pcx,.gx-drawer,.ph-pop,#ph-pop,#ph-z,.more,[role=menu],[class*=overlay],[class*=scrim]');const o2=o&&!o.contains(b)?o:null;const fx=(()=>{for(let n=h;n&&n!==document.body;n=n.parentElement){const st=getComputedStyle(n);if(st.position==='fixed'){const q=n.getBoundingClientRect();if(q.width*q.height>.6*VW*VH&&!n.contains(b))return true}}return false})();if(o2||fx)continue}
    if(!h||!(h===b||b.contains(h)||h.contains(b)&&h.closest('button,a,[data-a]')===b)){out.push('PRIMARY BUTTON COVERED by '+(h?nm(h):'none')+': '+lab);continue}
    // clipped by a scroller / hidden ancestor
    for(const c of clipAnc(b)){const q=c.n.getBoundingClientRect();if(r.left<q.left-1||r.right>q.right+1||r.top<q.top-1||r.bottom>q.bottom+1){out.push('PRIMARY BUTTON CLIPPED by '+nm(c.n)+' '+(c.sc?'(scrolled away)':'')+' btn['+[r.left,r.top,r.right,r.bottom].map(Math.round)+'] clip['+[q.left,q.top,q.right,q.bottom].map(Math.round)+']: '+lab);break}}
@@ -65,6 +65,6 @@ const SRC=`(()=>{
  return [...new Set(out)];
 })()`;
 exports.SRC=SRC;
-exports.run=async(page)=>{try{return await page.evaluate(SRC)}catch(e){return ['phfit eval error '+e.message.slice(0,80)]}};
+exports.run=async(page)=>{try{await page.evaluate(()=>{if(!document.getElementById('phfit-noanim')){const st=document.createElement('style');st.id='phfit-noanim';st.textContent='*,*::before,*::after{animation:none!important;transition:none!important}';document.head.appendChild(st)}});await page.evaluate(()=>Promise.race([Promise.all(document.getAnimations().filter(a=>{try{return a.effect.getComputedTiming().endTime!==Infinity&&a.playState==='running'}catch(e){return false}}).map(a=>a.finished.catch(()=>0))),new Promise(r=>setTimeout(r,2500))]));return await page.evaluate(SRC)}catch(e){return ['phfit eval error '+e.message.slice(0,80)]}};
 // share of the short side the board must reach: 0.85 normally, 0.75 on short portrait screens (usable height < 800 px)
 exports.share=(W,H)=>(W<H&&H<800)?.75:.85;
