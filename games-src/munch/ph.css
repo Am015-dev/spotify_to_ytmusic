@@ -127,3 +127,6 @@ html.ph .zgrid .acts{display:none}
 html.ph .zgrid .opts .rec::after{display:none}
 html.ph .zgrid .opts .rec::before{content:"";width:1.05em;height:1.05em;flex:none;margin-right:4px;background:currentColor;-webkit-mask:var(--bulb) center/contain no-repeat;mask:var(--bulb) center/contain no-repeat}
 html.ph-l #prompt .asks{left:auto;right:0;top:0;bottom:0;width:var(--ph-rail);max-height:none;border-radius:14px 0 0 14px}
+/* real usable heights: primary action rows stay pinned while a dialog / ask panel scrolls */
+html.ph .dlg .acts{position:sticky;bottom:-12px;z-index:2;margin:10px -14px -12px!important;padding:8px 14px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(240,228,200,0),var(--paper) 14px)}
+html.ph #prompt .asks>div:last-child{position:sticky;bottom:calc(-10px - env(safe-area-inset-bottom,0px));padding:8px 0 calc(10px + env(safe-area-inset-bottom,0px));margin-bottom:calc(-10px - env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(240,228,200,0),var(--paper) 12px)}

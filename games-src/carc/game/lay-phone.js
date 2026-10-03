@@ -9,7 +9,7 @@ const BEFORE=process.argv.includes('--before'),SAFE=(process.argv.find(a=>a.star
 for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'');const ctx=await b.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
   const p=await ctx.newPage();p.setDefaultTimeout(60000);const errs=[];p.on('pageerror',e=>errs.push('pageerror '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load resource|CERT|fonts/.test(m.text()))errs.push(m.text())});
   const log=(...a)=>console.log(t,...a);const prob=(...a)=>{bad++;log('PROBLEM',...a)};
-  const shot=async n=>{await p.screenshot({path:path.join(OUT,`P_${t}_${n}.png`)})};
+  const FIT=require('../../phfit.js');const shot=async n=>{(await FIT.run(p)).forEach(m=>prob('FIT '+n,m));await p.screenshot({path:path.join(OUT,`P_${t}_${n}.png`)})};
   const q=(BEFORE?'?phone=0':'?phone=1')+(SAFE?'&safe='+SAFE:'');
   await p.goto('file://'+FILE+q);await p.waitForTimeout(1500);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}setSeed(7);AIDELAY=50;ANIM=0});
   const scroll=async tag=>{const r=await p.evaluate(()=>({h:document.documentElement.scrollHeight,w:document.documentElement.scrollWidth,vh:innerHeight,vw:innerWidth,bh:document.body.scrollHeight}));if(r.h>r.vh+1||r.w>r.vw+1||r.bh>r.vh+1)prob(tag,'SCROLL',JSON.stringify(r))};

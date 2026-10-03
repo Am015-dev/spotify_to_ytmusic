@@ -9,7 +9,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
   await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
   const p=await ctx.newPage();p.setDefaultTimeout(30000);const errs=[];p.on('pageerror',e=>errs.push('pageerror '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load/.test(m.text()))errs.push(m.text())});
   const fail=(c,d)=>{bad++;console.log('FAIL',t,c,d||'')};const log=(...a)=>console.log(t,...a);
-  const shot=async n=>{await p.screenshot({path:path.join(OUT,`${t}_${n}.png`)})};
+  const FIT=require('../../phfit.js');const shot=async n=>{(await FIT.run(p)).forEach(m=>fail('FIT '+n+': '+m));await p.screenshot({path:path.join(OUT,`${t}_${n}.png`)})};
   const scroll=async tag=>{const r=await p.evaluate(()=>({h:document.documentElement.scrollHeight,w:document.documentElement.scrollWidth,vh:innerHeight,vw:innerWidth,b:document.body.scrollHeight}));if(r.h>r.vh+1||r.w>r.vw+1)fail('scroll '+tag,JSON.stringify(r))};
   const ov=(A,B)=>A[0]<B[2]-.5&&A[2]>B[0]+.5&&A[1]<B[3]-.5&&A[3]>B[1]+.5;
   const rect=sel=>p.evaluate(s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]},sel);

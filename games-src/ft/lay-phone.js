@@ -11,7 +11,7 @@ const EXTRA=process.env.EX?JSON.parse(process.env.EX):{};const PLAYERS=+(process
 for(const [W,H] of L.SIZES){if(process.env.ONLY&&!process.env.ONLY.split(',').includes(W+'x'+H))continue;
   const tag=W+'x'+H+(process.env.TAG||'');const short=Math.min(W,H);const R={tag,checks:0,fails:[],info:{}};const fail=m=>{R.fails.push(m);console.log('  FAIL',tag,m)};const chk=(c,m)=>{R.checks++;if(!c)fail(m);return c};
   const {ctx,pg,errs}=await L.open(br,W,H,process.env.Q||'',{file:FILE});
-  const shot=n=>pg.screenshot({path:`${OUT}/${tag}-${n}.png`});
+  const FIT=require('../phfit.js');const shot=async n=>{(await FIT.run(pg)).forEach(m=>fail('FIT '+n+': '+m));return pg.screenshot({path:`${OUT}/${tag}-${n}.png`})};
   const st=()=>pg.evaluate(()=>({g:!!G,me:!!(G&&me()),ph:G&&G.phase,step:G&&G.step,mv:G&&G.move?G.move.hand.length:-1,q:G&&!!G.q,over:G&&!!G.over,turn:G&&G.turn,cur:G&&G.cur,
     card:(()=>{const e=document.getElementById('pc');return e&&!e.hidden?e.dataset.k:''})(),pop:(()=>{const e=document.getElementById('ppop');return e&&!e.hidden?e.dataset.k:''})(),modal:UI.modal||'',pick:UI.pick.slice(),auto:!!UI.autoPlan,pend:!!UI.pendDj}));
   // ---- generic geometry checks, run at every stage ----

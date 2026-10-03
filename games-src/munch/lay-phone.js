@@ -3,7 +3,7 @@
 // A full human turn is played ONLY by touch taps (page.touchscreen.tap at element centres, after an elementFromPoint hit test).
 const {chromium}=require(process.env.PW||'/opt/node22/lib/node_modules/playwright');
 const fs=require('fs');const OUT=process.env.OUT||'shots';fs.mkdirSync(OUT,{recursive:true});
-const SIZES=process.argv[2]?[[+process.argv[2],+process.argv[3]]]:[[390,844],[844,390],[360,740],[740,360]];
+const SIZES=process.env.SIZES?process.env.SIZES.split(',').map(s=>s.split('x').map(Number)):process.argv[2]?[[+process.argv[2],+process.argv[3]]]:[[390,844],[844,390],[360,740],[740,360]];
 const QUERY=process.argv[4]||'';const FILE=process.env.FILE||'doorkick.html';
 const MODE=process.env.MODE||'F';
 (async()=>{const b=await chromium.launch();let total=0;
@@ -14,7 +14,7 @@ for(const [W,H] of SIZES){const land=W>H,short=Math.min(W,H);
   const B=(m)=>{if(!bad.includes(m))bad.push(m)};
   await p.goto('file://'+process.cwd()+'/'+FILE+QUERY);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});await p.goto('file://'+process.cwd()+'/'+FILE+QUERY);await p.waitForTimeout(400);
   if(!QUERY.includes('phone=0')&&!await p.evaluate(()=>document.documentElement.classList.contains('ph')))B('ph class not set');
-  const shot=async s=>p.screenshot({path:`${OUT}/P_${tag}_${s}.png`});
+  const FIT=require('../phfit.js');const shot=async s=>{(await FIT.run(p)).forEach(m=>B('FIT '+s+': '+m));return p.screenshot({path:`${OUT}/P_${tag}_${s}.png`})};
   // ---- generic probes ----
   const noScroll=async w=>{const r=await p.evaluate(()=>{const d=document.documentElement;const dr=[...document.querySelectorAll('.gx-drawer')].filter(x=>x.classList.contains('on')).map(x=>x.scrollWidth>x.clientWidth+1?x.id:'' ).filter(Boolean);return {sh:d.scrollHeight,sw:d.scrollWidth,ih:innerHeight,iw:innerWidth,bs:document.body.scrollHeight,dr}});
     if(r.sh>r.ih||r.sw>r.iw||r.bs>r.ih)B(`${w}: page scrolls ${r.sw}x${r.sh} > ${r.iw}x${r.ih}`);if(r.dr.length)B(`${w}: horizontal overflow in ${r.dr}`)};

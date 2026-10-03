@@ -11,7 +11,7 @@ const TURNS=+(process.env.TURNS||1);const PART=process.env.PART||'all';
 for(const [W,H] of L.SIZES){if(process.env.ONLY&&!process.env.ONLY.split(',').includes(W+'x'+H))continue;
   const tag=W+'x'+H;const short=Math.min(W,H);const R={tag,checks:0,fails:[],info:{}};const fail=m=>{R.fails.push(m);console.log('  FAIL',tag,m)};const chk=(c,m)=>{R.checks++;if(!c)fail(m);return c};
   const {ctx,pg,errs}=await L.open(br,W,H,process.env.Q||'',{file:FILE,tour:true});
-  const shot=n=>pg.screenshot({path:`${OUT}/${tag}-${n}.png`});
+  const FIT=require('../phfit.js');const shot=async n=>{(await FIT.run(pg)).forEach(m=>fail('FIT '+n+': '+m));return pg.screenshot({path:`${OUT}/${tag}-${n}.png`})};
   const until=async(fn,ms,arg)=>{const t0=Date.now();while(Date.now()-t0<(ms||20000)){if(await pg.evaluate(fn,arg))return true;await sleep(120)}return false};
   // ---- geometry: no scroll, board size, hit-test, monsters inside ----
   const geo=async (where,skipBoard)=>{const g=await pg.evaluate(()=>{const bd=document.querySelector('.gx-board').getBoundingClientRect();const cv=document.getElementById('c3');const out={sw:document.documentElement.scrollWidth,sh:document.documentElement.scrollHeight,bsw:document.body.scrollWidth,bsh:document.body.scrollHeight,iw:innerWidth,ih:innerHeight,bd:[bd.left,bd.top,bd.width,bd.height],bad:[],mon:[],ph:document.documentElement.className};

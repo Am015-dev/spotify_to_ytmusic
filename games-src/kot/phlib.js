@@ -2,7 +2,7 @@
 const PW=require(require('child_process').execSync('npm root -g').toString().trim()+'/playwright');
 const path=require('path'),fs=require('fs');
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-const SIZES=[[390,844],[844,390],[360,740],[740,360]];
+const SIZES=process.env.SIZES?process.env.SIZES.split(',').map(s=>s.split('x').map(Number)):[[390,844],[844,390],[360,740],[740,360]];
 async function launch(){return PW.chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']})}
 async function open(br,W,H,q,opts){opts=opts||{};const ctx=await br.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,hasTouch:true,isMobile:true});
   const pg=await ctx.newPage();const errs=[];pg.on('console',m=>{if(m.type()==='error'&&!/fonts\.g|ERR_|net::/.test(m.text()))errs.push(m.text())});pg.on('pageerror',e=>errs.push(String(e)));pg.setDefaultTimeout(120000);

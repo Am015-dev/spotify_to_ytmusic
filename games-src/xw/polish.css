@@ -83,3 +83,5 @@
 .nb-dot{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:#4fe08a;box-shadow:0 0 6px #4fe08a;margin-right:.3rem;vertical-align:middle}.nb-dot.off{background:#ffb347;box-shadow:0 0 6px #ffb347}
 .netbar{flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:.2rem .4rem;margin:0 0 .3rem;border-radius:8px;background:rgba(80,200,255,.07);border:1px solid rgba(120,200,255,.2);line-height:1.5}.netbar.hidden{display:none}.netbar .btn.sm{padding:.1rem .45rem;font-size:.78rem;margin-left:.3rem}
 .netwait{display:flex;flex-wrap:wrap;gap:.3rem;margin:.1rem 0 .35rem;color:var(--muted)}.netwait .nw{border:1px solid var(--line);border-radius:999px;padding:.05rem .5rem}.netwait .nw.ok{border-color:rgba(79,224,138,.55);color:#9ff0c0}
+
+.road .ph .sh{display:none}

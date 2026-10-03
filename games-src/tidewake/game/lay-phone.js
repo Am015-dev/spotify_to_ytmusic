@@ -12,7 +12,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
   const log=(...a)=>console.log(t,...a);const prob=(...a)=>{bad++;log('PROBLEM',...a)};
   const q='?'+(BEFORE?'phone=0':'phone=1')+(TWO?'&2d':'')+(SAFE?'&safe='+SAFE:'');
   await p.goto('https://gns.test/'+q);await p.waitForTimeout(1200);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}setSeed(5);setAiSeed(5);AIDELAY=60});
-  const shot=async n=>{await p.screenshot({path:path.join(OUT,`P_${t}_${n}.png`)})};
+  const FIT=require('../../phfit.js');const shot=async n=>{(await FIT.run(p)).forEach(m=>prob('FIT '+n,m));await p.screenshot({path:path.join(OUT,`P_${t}_${n}.png`)})};
   const scroll=async tag=>{const r=await p.evaluate(()=>({h:document.documentElement.scrollHeight,w:document.documentElement.scrollWidth,vh:innerHeight,vw:innerWidth}));if(r.h>r.vh+1||r.w>r.vw+1)prob(tag,'SCROLL',JSON.stringify(r))};
   // projection helper on the page
   await p.evaluate(()=>{window.__P=()=>{const host=document.querySelector('#c3:not([hidden])')||document.querySelector('#fb');const is3=host.id==='c3';if(is3){TWKit.renderOnce();const K=TWKit._K;K.cam.updateMatrixWorld();const v=new THREE.Vector3();return (x,y,z)=>{v.set(x,y,z).project(K.cam);const hr=host.getBoundingClientRect();return [hr.left+(v.x+1)/2*hr.width,hr.top+(1-v.y)/2*hr.height]}}

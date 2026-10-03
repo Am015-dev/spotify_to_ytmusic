@@ -37,7 +37,7 @@ for(const [w,h] of SIZES){const t=TAG+'_'+w+'x'+h;const c=await b.newContext({vi
     if(r.hit&&r.hit.length)prob(tag,'board targets not hit-testing to the canvas: '+r.hit.slice(0,5).join(','));
     if(r.overlap.length)prob(tag,'overlaps the board: '+r.overlap);if(r.small.length)prob(tag,'tap targets < 44: '+r.small.slice(0,6).join(' | ')+' ['+r.dbg+']');
     if(r.txt.length)prob(tag,'text < 13px: '+r.txt.slice(0,5).join(' | '));if(r.zs)stats.zoneScroll++;if(r.minTap<stats.mins){stats.mins=r.minTap;stats.minName=tag}return r};
-  const shot=async n=>p.screenshot({path:`shots/${t}_${n}.png`});
+  const FIT=require('../../phfit.js');const shot=async n=>{(await FIT.run(p)).forEach(m=>prob('FIT '+n,m));return p.screenshot({path:`shots/${t}_${n}.png`})};
   // ---- start screen, story ----
   await shot('0start');
   await p.evaluate(c=>{UI.setup.np=c.np||3;Object.assign(UI.setup.ex,c.ex||{});for(let i=1;i<4;i++)UI.setup.seats[i]='ai';if(c.hot)for(let i=0;i<UI.setup.np;i++)UI.setup.seats[i]='human'},CFG);

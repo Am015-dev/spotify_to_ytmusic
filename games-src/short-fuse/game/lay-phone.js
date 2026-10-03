@@ -14,7 +14,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
   const log=(...a)=>console.log(t,...a);const prob=(...a)=>{bad++;log('PROBLEM',...a)};
   const q='?'+(BEFORE?'phone=0':'phone=1')+(TWO?'&2d':'')+(SAFE?'&safe='+SAFE:'');
   await p.goto('https://gns.test/'+q);await p.waitForTimeout(1200);await p.evaluate(()=>{try{localStorage.clear()}catch(e){}setSeed(5);setAiSeed(5);AIDELAY=60});
-  const shot=async n=>{await p.screenshot({path:path.join(OUT,`P_${t}_${n}.png`),timeout:150000})};
+  const FIT=require('../../phfit.js');const shot=async n=>{(await FIT.run(p)).forEach(m=>prob('FIT '+n,m));await p.screenshot({path:path.join(OUT,`P_${t}_${n}.png`),timeout:150000})};
   const scroll=async tag=>{const r=await p.evaluate(()=>({h:document.documentElement.scrollHeight,w:document.documentElement.scrollWidth,vh:innerHeight,vw:innerWidth,bh:document.body.scrollHeight}));if(r.h>r.vh+1||r.w>r.vw+1||r.bh>r.vh+1)prob(tag,'SCROLL',JSON.stringify(r))};
   // projection of a wire (or any world point) to client px
   await p.evaluate(()=>{window.__proj=(x,y,z)=>{const K=SFKit._K;K.cam.updateMatrixWorld(true);const cv=document.querySelector('#c3');const R=cv.getBoundingClientRect();const v=new THREE.Vector3(x,y,z).project(K.cam);return [R.left+(v.x+1)/2*R.width,R.top+(1-v.y)/2*R.height]};

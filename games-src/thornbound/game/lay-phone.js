@@ -7,7 +7,7 @@ const SIZES=(process.argv[2]||'390x844,844x390,360x740,740x360').split(',').map(
 for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:true,hasTouch:true});
  await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
  const p=await ctx.newPage();p.setDefaultTimeout(30000);const errs=[];p.on('pageerror',e=>errs.push('PE '+e.message+(e.stack||'').split('\n').slice(0,4).join('|')));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load/.test(m.text()))errs.push(m.text())});
- const FAIL=(c,x)=>{bad++;console.log('FAIL',t,c,x||'')};const shot=n=>p.screenshot({path:path.join(OUT,`${t}_${n}.png`)});
+ const FAIL=(c,x)=>{bad++;console.log('FAIL',t,c,x||'')};const FIT=require('../../phfit.js');const shot=async n=>{(await FIT.run(p)).forEach(m=>FAIL('FIT '+n,m));return p.screenshot({path:path.join(OUT,`${t}_${n}.png`)})};
  await p.goto('https://gns.test/?phone=1');await p.waitForTimeout(1200);
  await p.evaluate(()=>{try{localStorage.clear()}catch(e){}});
  const scroll=async tag=>{const r=await p.evaluate(()=>({h:document.documentElement.scrollHeight,w:document.documentElement.scrollWidth,vh:innerHeight,vw:innerWidth}));if(r.h>r.vh+1||r.w>r.vw+1)FAIL('scroll '+tag,JSON.stringify(r))};

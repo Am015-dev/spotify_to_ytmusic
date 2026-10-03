@@ -157,3 +157,23 @@ html.ph.ph-l .gx-dock-head{display:flex}
 html.ph:not(.ph-3d) .ph-ctl{display:none}
 html.ph #sndbtn::after,html.ph #pausebtn::after{content:attr(data-phl);font-size:15px;font-weight:600}
 html.ph #map text{display:none}
+/* ===== portrait: compact chrome so the action panel gets the room ===== */
+/* camera: a floating vertical stack in the board's corner (semi-transparent, 44px targets) */
+html.ph.ph-p .ph-ctl{position:absolute;right:6px;bottom:6px;z-index:5;flex-direction:column;gap:2px;margin:0;padding:3px;border-radius:14px;background:rgba(10,8,30,.5);pointer-events:none}
+html.ph.ph-p .ph-ctl .gx-ibtn{pointer-events:auto;background:rgba(26,22,64,.55);border-color:rgba(255,255,255,.22)}
+/* one 44px row: the phase strip on the left, Guide + Advice on the right */
+html.ph.ph-p .gx-dock-head{position:absolute;top:0;right:0;z-index:4;height:44px;padding:0 6px 0 0;gap:4px;order:0}
+html.ph.ph-p .gx-dock-head .na-guide b{display:none}
+html.ph.ph-p .gx-dock-top{padding:0 104px 0 6px;height:44px;display:flex;align-items:center}
+html.ph.ph-p #steps{flex:1;min-width:0}
+html.ph.ph-p .road{gap:3px;align-items:center}
+html.ph.ph-p .road .ph{position:relative;min-height:0;height:34px;display:flex;align-items:center;justify-content:center;gap:2px;padding:0 2px;font-size:13px;line-height:1;white-space:nowrap}
+html.ph.ph-p .road .ph::before{content:"";position:absolute;left:0;right:0;top:-5px;bottom:-5px}
+html.ph.ph-p .road .ph b,html.ph.ph-p .road .ph i{display:inline;font-size:13px;overflow:visible;text-overflow:clip}
+html.ph.ph-p .road .ph .lg,html.ph.ph-p .road .ph .tx{display:none}
+html.ph.ph-p .road .ph .sh{display:inline}
+html.ph.ph-p .road .ph.on{border-color:var(--gold)}
+html.ph.ph-p .roadinfo{position:absolute;left:6px;right:6px;top:46px;z-index:6;max-height:calc(100% - 52px);font-size:14px;background:var(--panel2);border:1px solid var(--gold);padding:6px 8px}
+html.ph .ph-ctl .gx-ibtn{min-width:44px;min-height:44px;width:44px;height:44px;padding:0;font-size:0;border-radius:10px;flex:0 0 44px}
+html.ph .ph-ctl .gx-ibtn .ico{width:22px;height:22px}
+html.ph .ph-ctl .gx-ibtn.on,html.ph .ph-ctl .gx-ibtn[aria-pressed="true"]{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,200,107,.35)}

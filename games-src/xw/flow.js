@@ -24,7 +24,7 @@ const youTag=s=>mine(s)&&soloSide()>=0?' (you)':'';
 function renderRoad(){const el=$('steps');if(!el)return;if(!G){el.innerHTML='';return}const st=stepShown(),R=roundShown();
   let h=`<div class="road" role="list" aria-label="Round roadmap"><span class="rn">${G.round===0?'Setup':G.winner?'Over':'Round '+R}</span>`;
   PHASES.forEach((p,i)=>{const k=i+1;const cls=G.winner||k<st?'done':k===st?'on':'next';
-    h+=`<button class="ph ${cls}" data-road="${i}" role="listitem" aria-current="${k===st?'step':'false'}" aria-expanded="${UI.roadInfo===i}"><b>${p.n}</b><i>${cls==='done'?'✓ done':cls==='on'?'● now':p.sub}</i></button>`});
+    h+=`<button class="ph ${cls}" data-road="${i}" role="listitem" aria-current="${k===st?'step':'false'}" aria-expanded="${UI.roadInfo===i}"><b><span class="lg">${p.n}</span><span class="sh">${['Plan','Act','Combat','End'][i]||p.n}</span></b><i>${cls==='done'?'<span class="mk">✓</span><span class="tx"> done</span>':cls==='on'?'<span class="mk">●</span><span class="tx"> now</span>':'<span class="tx">'+p.sub+'</span>'}</i></button>`});
   h+='</div>';
   const info=UI.roadInfo!=null?PHASES[UI.roadInfo].t:G.round===0?'<b>Setup:</b> place the asteroids and the ships, then round 1 starts. Every round has the same 4 phases.':'';
   if(info)h+=`<p class="roadinfo">${info}${UI.roadInfo!=null?' <button class="linkb" data-road="x" aria-label="Close explanation">✕</button>':''}</p>`;
