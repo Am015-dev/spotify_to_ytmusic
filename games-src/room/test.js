@@ -248,8 +248,8 @@ for(const [w,h] of [[740,360],[844,390],[360,740]]){const [c,p]=await mk(b,w,h,'
 {const [c,p]=await mk(b,1440,900,'light',{});
  ok(await p.evaluate(()=>getComputedStyle(document.querySelector('.tv-flick')).animationName!=='none'),'TV flicker animates by default');
  const lab=()=>p.getAttribute('#tvscreen','aria-label');const a=await lab();
- let saw=false;for(let i=0;i<30;i++){await p.waitForTimeout(250);if(await p.locator('#tvscreen.sw').count()){saw=true;break}}
- await p.waitForTimeout(500);const a2=await lab();
+ await p.evaluate(()=>{window.__sw=0;new MutationObserver(()=>{if(document.querySelector('#tvscreen.sw'))window.__sw=1}).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']})});
+ await p.waitForTimeout(7200);const saw=await p.evaluate(()=>window.__sw===1);const a2=await lab();
  ok(saw,'static flash shown on auto switch');ok(a!==a2,'TV auto-switches channel after ~6 s ('+a+' / '+a2+')');
  await p.screenshot({path:'shots/1440x900-tv-auto.png'});
  await p.hover('#tvscreen');const h0=await lab();await p.waitForTimeout(6600);ok(h0===await lab(),'auto switch pauses while hovering the TV');
