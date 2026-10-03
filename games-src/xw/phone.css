@@ -158,10 +158,14 @@ html.ph:not(.ph-3d) .ph-ctl{display:none}
 html.ph #sndbtn::after,html.ph #pausebtn::after{content:attr(data-phl);font-size:15px;font-weight:600}
 html.ph #map text{display:none}
 /* ===== portrait: compact chrome so the action panel gets the room ===== */
-/* camera: a faint row along the opponent's (top) edge of the board, away from your own ships; solid while touched */
-html.ph.ph-p .ph-ctl{position:absolute;right:6px;top:6px;z-index:5;flex-direction:row;gap:2px;margin:0;padding:3px;border-radius:14px;background:rgba(10,8,30,.28);pointer-events:none;opacity:.42;transition:opacity .2s}
-html.ph.ph-p .ph-ctl:hover,html.ph.ph-p .ph-ctl:focus-within,html.ph.ph-p .ph-ctl:active{opacity:1}
-html.ph.ph-p .ph-ctl .gx-ibtn{pointer-events:auto;background:rgba(26,22,64,.45);border-color:rgba(255,255,255,.18)}
+/* camera: off the board in portrait. A camera button in the top bar opens the four controls as a small
+   pop-up row under the bar for a few seconds; pinch and drag on the board work as always */
+.ph-cam{display:none}
+html.ph.ph-p .ph-cam{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;padding:0}
+html.ph.ph-p .ph-cam .ico{width:22px;height:22px}
+html.ph.ph-p.camopen .ph-cam{border-color:var(--gold)}
+html.ph.ph-p .ph-ctl{position:fixed;right:6px;top:var(--cam-top,52px);z-index:20;flex-direction:row;gap:4px;margin:0;padding:4px;border-radius:14px;background:rgba(10,8,30,.88);border:1px solid rgba(255,200,107,.45);box-shadow:0 8px 20px rgba(0,0,0,.5);display:none}
+html.ph.ph-p.camopen .ph-ctl{display:flex}
 /* one 44px row: the phase strip on the left, Guide + Advice on the right */
 html.ph.ph-p .gx-dock-head{position:absolute;top:0;right:0;z-index:4;height:44px;padding:0 4px 0 0;gap:2px;order:0}
 html.ph.ph-p .gx-dock-head .na-guide b{display:none}
