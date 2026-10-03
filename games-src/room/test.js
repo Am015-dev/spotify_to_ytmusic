@@ -4,6 +4,8 @@ const VPS=[[1440,900],[1280,720],[844,390],[390,844],[360,740]];
 let problems=0;const fail=m=>{problems++;console.log('FAIL',m)};
 const ok=(c,m)=>{if(!c)fail(m)};
 const GAMES=[['kaiten','kaiten-kitchen/index.html'],['crown','crown-city-smash/index.html'],['nebula','nebula-aces/index.html'],['doorkick','doorkick-dungeon/index.html'],['shipwreck','shipwreck-isle/index.html'],['sands','sands-of-qamar/index.html'],['sunglaze','sunglaze/index.html'],['rampart','rampart-and-vine/index.html'],['shortfuse','short-fuse/index.html'],['tidewake','tidewake/index.html'],['hollowbough','hollowbough/index.html'],['thornbound','thornbound/index.html'],['mainhattan','mainhattan-nightrun/index.html'],['overdrive','mainhattan-overdrive/index.html']];
+const BOARD=GAMES.filter(g=>!['mainhattan','overdrive'].includes(g[0]));
+const TVSRC={mainhattan:'mainhattan-nightrun/index.html',overdrive:'mainhattan-overdrive/index.html'};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function mk(b,w,h,scheme,opt={}){
   const c=await b.newContext({viewport:{width:w,height:h},colorScheme:scheme,reducedMotion:opt.rm?'reduce':'no-preference',hasTouch:w<700||h<500,isMobile:false});
@@ -23,12 +25,13 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
   ok(await p.title()==='Game Night Shelf',tag+' title');
   ok((await p.textContent('#tally'))==='14 games on the shelf',tag+' tally');
   ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),tag+' scrollWidth '+await p.evaluate(()=>document.documentElement.scrollWidth));
-  ok(await p.locator('.boxbtn').count()===14,tag+' 14 boxes');
+  ok(await p.locator('.boxbtn').count()===12,tag+' 12 boxes (board games only)');
+  ok(await p.locator('.boxbtn[data-id="mainhattan"],.boxbtn[data-id="overdrive"]').count()===0,tag+' video games are not on the shelf');
   ok(await p.evaluate(()=>getComputedStyle(document.body).backgroundColor!=='rgba(0, 0, 0, 0)'),tag+' body bg');
   {const t0=await p.evaluate(()=>{const r=document.querySelector('.boxbtn[data-id="crown"]').getBoundingClientRect();return{top:r.top,h:innerHeight}});
    if(ph)ok(t0.top<t0.h-60,`${tag} first shelf row not visible on load (top ${Math.round(t0.top)} of ${t0.h})`);}
   // boxes visible on their shelf
-  for(const [id] of GAMES){const l=p.locator(`.boxbtn[data-id="${id}"]`);await l.evaluate(e=>e.scrollIntoView({block:'center'}));await p.waitForTimeout(80);
+  for(const [id] of BOARD){const l=p.locator(`.boxbtn[data-id="${id}"]`);await l.evaluate(e=>e.scrollIntoView({block:'center'}));await p.waitForTimeout(80);
     const r=await p.evaluate(id=>{const e=document.querySelector(`.boxbtn[data-id="${id}"]`),r=e.getBoundingClientRect(),bay=e.closest('.bay').getBoundingClientRect();return{r:[r.x,r.y,r.right,r.bottom],bay:[bay.x,bay.y,bay.right,bay.bottom],vw:innerWidth,vh:innerHeight}},id);
     const [x,y,rr,bb]=r.r,[bx,by,br,bbb]=r.bay;
     if(!(rr-x>20&&bb-y>10&&x>=-1&&rr<=r.vw+1&&y>=-1&&bb<=r.vh+1&&x>=bx-2&&rr<=br+2&&y>=by-2&&bb<=bbb+4))fail(`${tag} box ${id} not visible on its shelf ${JSON.stringify(r)}`)}
@@ -39,6 +42,54 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
     const small=await p.evaluate(()=>{const out=new Set();const w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode()){if(!n.nodeValue.trim())continue;const e=n.parentElement;if(e.closest('script,style,#inspect:not(.on),dialog:not([open]),[hidden]'))continue;const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden')continue;const r=e.getBoundingClientRect();if(!r.width||!r.height)continue;if(parseFloat(cs.fontSize)<12.95)out.add(e.className+':'+cs.fontSize+':'+n.nodeValue.trim().slice(0,20))}return[...out]});
     small.forEach(x=>fail(`${tag} small text ${x}`))}
   await p.screenshot({path:`shots/${tag}.png`});
+  // TV: visible, switchable, opens guide card, plays the video games
+  {const info=()=>p.evaluate(()=>{const e=document.querySelector('#tvscreen');if(!e)return null;const r=e.getBoundingClientRect();return{x:r.x,y:r.y,r:r.right,b:r.bottom,w:r.width,h:r.height,lab:e.getAttribute('aria-label'),vw:innerWidth,vh:innerHeight}});
+   if(!ph){const t=await info();ok(t&&t.w>100&&t.h>70&&t.x>=0&&t.r<=t.vw&&t.y>=0&&t.b<=t.vh,`${tag} TV screen visible on desktop ${JSON.stringify(t)}`);
+     const sb=await p.evaluate(()=>{const t=document.querySelector('#tv').getBoundingClientRect(),l=document.querySelector('.lamp .pole').getBoundingClientRect(),b=document.querySelector('.bookcase').getBoundingClientRect();return{lamp:t.right>l.left&&t.left<l.right&&t.top<l.bottom&&t.bottom>l.top,case:t.left<b.right-2&&t.right>b.left&&t.top<b.bottom-12&&t.bottom>b.top}});
+     ok(!sb.lamp&&!sb.case,`${tag} TV overlaps lamp/bookcase ${JSON.stringify(sb)}`)}
+   else{await p.locator('#tvscreen').scrollIntoViewIfNeeded();const t=await info();ok(t&&t.w>=100&&t.h>=70&&t.x>=0&&t.r<=t.vw+1,`${tag} TV screen visible on phone ${JSON.stringify(t)}`)}
+   await p.locator('#tv').scrollIntoViewIfNeeded();
+   ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),tag+' no sideways scroll with TV');
+   const l0=(await info()).lab;ok(/channel 1.*Nightrun/i.test(l0),tag+' starts on CH 1 '+l0);
+   ok(await p.locator('[data-tvch]').count()===2,tag+' two channel controls');
+   for(const e of await p.locator('[data-tvch]').all()){const bx=await e.boundingBox();ok(bx&&bx.width>=43&&bx.height>=43||(!ph&&bx&&bx.width>=24),`${tag} channel button size ${JSON.stringify(bx)}`);
+     const hit=await e.evaluate(n=>{n.scrollIntoView({block:'center'});const r=n.getBoundingClientRect(),cs=getComputedStyle(n,'::after');return Math.max(r.width,parseFloat(cs.width)||0)});ok(hit>=43,`${tag} channel hit area ${hit}`)}
+   await p.screenshot({path:`shots/${tag}-tv.png`});
+   await p.click('[data-tvch="1"]');await p.waitForTimeout(450);
+   const l1=(await info()).lab;ok(/channel 2.*Overdrive/i.test(l1),tag+' next channel '+l1);
+   ok((await p.textContent(ph?'#tvtitle':'#tvscreen .tv-ttl')).includes('Mainhattan Overdrive'),tag+' title shows on screen');
+   ok((await p.textContent('#tvscreen .tv-ch')).trim()==='CH 2',tag+' CH 2 label');
+   await p.click('[data-tvch="-1"]');await p.waitForTimeout(450);
+   ok(/channel 1/i.test((await info()).lab),tag+' previous channel');
+   for(const [ch,id] of [[1,'mainhattan'],[2,'overdrive']]){
+     if(ch===2){await p.click('[data-tvch="1"]');await p.waitForTimeout(450)}
+     await p.locator('#tvscreen').scrollIntoViewIfNeeded();await p.click('#tvscreen');await p.waitForTimeout(900);
+     ok(await p.locator('#inspect .tvg').count()===1&&!await p.evaluate(()=>document.getElementById('inspect').hidden),`${tag} tv card opens ${id}`);
+     ok(await inside(p,'#inspect .play'),`${tag} tv Play inside viewport`);
+     ok(await p.evaluate(()=>document.activeElement&&document.activeElement.closest('#inspect')!==null),tag+' tv card focus inside');
+     ok((await p.textContent('#inspect')).includes('CH '+ch)&&await p.locator('#inspect .stats div').count()===4&&await p.locator('#inspect .chips span').count()>3&&await p.locator('#inspect a.alt').count()===1,`${tag} tv card content ${id}`);
+     const nm=await p.evaluate(()=>document.querySelector('#inspect [role=dialog]').getAttribute('aria-label'));ok(/^Now playing:/.test(nm),tag+' tv card name '+nm);
+     if(ch===1)await p.screenshot({path:`shots/${tag}-tv-card.png`});
+     if(ch===1){await p.keyboard.press('Escape');await p.waitForTimeout(800);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' tv Esc closes');ok(await p.evaluate(()=>document.activeElement&&document.activeElement.id==='tvscreen'),tag+' focus back on screen');
+       await p.keyboard.press('Enter');await p.waitForTimeout(900);ok(!await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' Enter on screen opens card');
+       await p.click('#inspect .ins-x, #inspect .sh-x');await p.waitForTimeout(800);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' tv close button');
+       await p.click('#tvscreen');await p.waitForTimeout(800);
+       if(!ph){await p.mouse.click(8,8);await p.waitForTimeout(800);ok(await p.evaluate(()=>document.getElementById('inspect').hidden),tag+' tv outside click closes');await p.click('#tvscreen');await p.waitForTimeout(800)}}
+     const n0=await p.evaluate(id=>(JSON.parse(localStorage.room_plays||'{}')[id]|0),id);
+     await p.click('#inspect .play');await p.waitForTimeout(1600);
+     const s=await p.evaluate(()=>({src:document.getElementById('frame').src,hid:document.getElementById('table').hidden}));
+     ok(!s.hid&&s.src.endsWith(TVSRC[id]),`${tag} tv play ${id} src ${s.src}`);
+     await backFromGame(p);
+     ok(await p.evaluate(()=>document.getElementById('table').hidden&&document.getElementById('inspect').hidden),`${tag} tv game closed`);
+     ok(await p.evaluate(id=>localStorage.getItem('shelf_last')===id&&(JSON.parse(localStorage.room_plays)[id]|0),id)===n0+1,`${tag} tv play counted ${id}`);
+     ok(await p.evaluate(()=>document.activeElement&&document.activeElement.id==='tvscreen'),`${tag} focus returns to TV after game`);
+     ok(/channel/i.test((await info()).lab),tag+' TV still there after game');
+   }
+   // coffee table shows controller + cartridge for a video game
+   if(!ph){ok(await p.locator('#coffee .cart').count()===1&&await p.locator('#coffee .pad').count()===1&&await p.locator('#coffee .lid').count()===0,tag+' coffee table video prop');await p.screenshot({path:`shots/${tag}-continue-video.png`})}
+   else ok(/Overdrive/.test(await p.textContent('.cbtn2')),tag+' phone continue is the video game');
+   ok(await p.evaluate(()=>{const b=document.querySelector('.cbtn,.cbtn2');return b&&b.textContent.includes('Overdrive')}),tag+' continue label video');
+   await p.evaluate(()=>scrollTo(0,0))}
   // inspect three games
   for(const [id,src] of [GAMES[0],GAMES[8],GAMES[10]]){
     await openBox(p,id);
@@ -90,6 +141,8 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
   // plain list
   await p.click('#viewbtn');await p.waitForTimeout(200);
   ok(await p.locator('#listview li').count()===14&&await p.locator('#listview').isVisible(),tag+' list view');
+  {const hs=await p.evaluate(()=>[...document.querySelectorAll('#listview h2')].map(h=>[h.textContent,h.nextElementSibling.querySelectorAll('li').length]));ok(JSON.stringify(hs)===JSON.stringify([['Board games',12],['Video games',2]]),tag+' list sections '+JSON.stringify(hs));
+   ok(await p.locator('#listview .plist:last-of-type [data-play="overdrive"]').count()===1,tag+' video list play button')}
   ok(await p.evaluate(()=>localStorage.room_view)==='list',tag+' room_view saved');
   if(ph){const bad=await p.evaluate(()=>{const o=[];for(const e of document.querySelectorAll('#listview button,#listview a,header button,header a')){const r=e.getBoundingClientRect();if(r.width&&(r.width<43.5||r.height<43.5))o.push(e.textContent+Math.round(r.height))}return o});bad.forEach(x=>fail(tag+' list small tap '+x))}
   await p.screenshot({path:`shots/${tag}-list.png`});
@@ -99,7 +152,7 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
   ok((await p.evaluate(()=>document.getElementById('frame').src)).endsWith('doorkick-dungeon/index.html'),tag+' list play');
   await backFromGame(p);
   await p.click('#viewbtn');await p.waitForTimeout(200);
-  ok(await p.locator('.boxbtn').count()===14,tag+' back to room');
+  ok(await p.locator('.boxbtn').count()===12,tag+' back to room');
   ok(p.errs.length===0,`${tag} page errors ${p.errs}`);
   await c.close();
 }
@@ -108,7 +161,7 @@ for(const [w,h] of [[1440,900],[390,844],[844,390]]){
   const ph=w<700||h<500,tag=`${w}x${h}`;
   let [c,p]=await mk(b,w,h,'dark',{seed:{room_plays:JSON.stringify({crown:20,nebula:7,sands:2,rampart:1,doorkick:3,tidewake:4}),shelf_last:'crown'}});
   const wr=await p.evaluate(()=>Object.fromEntries([...document.querySelectorAll('.boxbtn')].map(b=>[b.dataset.id,b.querySelector('.b3').dataset.wear])));
-  const exp={crown:'3',nebula:'2',sands:'1',rampart:'1',doorkick:'1',tidewake:'1',shipwreck:'0',overdrive:'0'};
+  const exp={crown:'3',nebula:'2',sands:'1',rampart:'1',doorkick:'1',tidewake:'1',shipwreck:'0'};
   for(const k in exp)ok(wr[k]===exp[k],`${tag} wear ${k} ${wr[k]} want ${exp[k]}`);
   ok(await p.locator('.cat').count()===1,tag+' one cat');await p.locator('.cat').evaluate(e=>e.scrollIntoView({block:'center'}));await p.waitForTimeout(100);
   const cat=await p.evaluate(()=>{const c=document.querySelector('.cat'),cell=c.closest('.cell'),bx=cell.querySelector('.boxbtn[data-id="crown"]');if(!bx)return null;const a=c.getBoundingClientRect(),b=bx.getBoundingClientRect();const mid=document.elementFromPoint(b.x+b.width/2,b.y+3+0);const top=document.elementFromPoint(b.x+b.width/2,b.y+1);return{catBottom:a.bottom,boxTop:b.top,catW:a.width,catH:a.height,hit:!!(top&&bx.contains(top)),inBay:c.closest('.bay')===bx.closest('.bay')}});
