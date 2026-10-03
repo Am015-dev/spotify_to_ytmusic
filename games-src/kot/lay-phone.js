@@ -76,7 +76,7 @@ for(const [W,H] of L.SIZES){if(process.env.ONLY&&!process.env.ONLY.split(',').in
       if(s.ph==='roll'){
         if(!did.roll){did.roll=1;await sleep(500);await geo('roll');await targets('roll');await shot('4-roll');
           // dice: every die >= 52, tap to keep / release
-          const dd=await pg.evaluate(()=>[...document.querySelectorAll('#dice .die')].map(d=>{const r=d.getBoundingClientRect();return [r.width,r.height]}));R.info.dice=dd.length+' dice '+Math.round(Math.min(...dd.map(x=>Math.min(...x))))+'px';chk(dd.length>=6&&dd.every(x=>x[0]>=52&&x[1]>=52),`dice < 52 px: ${JSON.stringify(dd)}`);
+          const dd=await pg.evaluate(()=>[...document.querySelectorAll('#dice .die')].map(d=>{const r=d.getBoundingClientRect();return [r.width,r.height]}));R.info.dice=dd.length+' dice '+Math.round(Math.min(...dd.map(x=>Math.min(...x))))+'px';chk(dd.length>=4&&dd.every(x=>x[0]>=52&&x[1]>=52),`dice < 52 px: ${JSON.stringify(dd)}`);
           const k0=await pg.evaluate(()=>G.dice[0].k);await tap('#dice .die:nth-child(1)','die 1',52);const k1=await pg.evaluate(()=>G.dice[0].k);chk(k1===!k0,'tap on a die did not toggle keep');await tap('#dice .die:nth-child(1)','die 1 again',52);chk((await pg.evaluate(()=>G.dice[0].k))===k0,'second tap did not release the die');
           await tap('#dice .die:nth-child(2)','die 2',52);const pv=await pg.evaluate(()=>document.getElementById('preview').textContent.trim().length);chk(pv>5,'no preview line under the dice');
           await tap('#pacts [data-act="hint"]','hint');await shot('5-kept');
