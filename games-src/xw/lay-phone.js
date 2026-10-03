@@ -94,7 +94,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(HOT?'_hot':'');const ctx=await b.newC
     if(s.phase==='ask'&&s.hum){note('ask:'+s.q);
       if(!done.has('spot')&&(s.q==='rock'||s.q==='deploy')){done.add('spot');await all('setup');await shot('2setup');const spot=await p.evaluate(()=>{const o=G.q.opts.find(o=>o.p);if(!o)return null;const cv=V3.r.domElement,R=cv.getBoundingClientRect();const v=W(o.p.x,o.p.y,0).project(V3.camera);return [R.left+(v.x+1)/2*R.width,R.top+(1-v.y)/2*R.height,R.left,R.top,R.width,R.height]});
         if(spot){if(spot[0]<spot[2]||spot[0]>spot[2]+spot[4]||spot[1]<spot[3]||spot[1]>spot[3]+spot[5])prob('setup spot outside the board');await tapXY(spot[0],spot[1]);note('spot tap');await p.waitForTimeout(500);continue}}
-      if(s.q==='rock'||s.q==='deploy'){await tapL('#prompt [data-a=autoplace]','autoplace');await p.waitForTimeout(500);continue}
+      if(s.q==='rock'||s.q==='deploy'){await tapL('#prompt [data-a=autoplace]','autoplace',()=>!document.querySelector('#prompt [data-a=autoplace]'));await p.waitForTimeout(500);continue}
       const ok=await p.locator('#prompt [data-act=ask].primary,#prompt [data-act=ask]').first();if(await ok.count()){await ok.tap();await p.waitForTimeout(400)}continue}
     if(s.sum){note('summary card');if(!done.has('sum')){done.add('sum');await all('summary');await shot('6summary')}await tapL('#prompt [data-a=nextround]','nextround');await p.waitForTimeout(400);continue}
     if(s.hold){note('hold card');if(!done.has('hold')){done.add('hold');await all('hold');await shot('5hold')}await tapL('#prompt [data-a=hold]','hold');await p.waitForTimeout(400);continue}

@@ -643,7 +643,7 @@ function phInsets(){try{const P=new URLSearchParams(location.search);if(P.has('s
 function phApply(){const R=document.documentElement;const was=PH.on;PH.on=phDetect();R.classList.toggle('ph',PH.on);
   if(!PH.on){R.classList.remove('ph-l','ph-p');for(const k of['--bs','--sat','--sar','--sab','--sal'])R.style.removeProperty(k);return was}
   const w=innerWidth,h=innerHeight,I=phInsets(),bar=44;PH.land=w>h;
-  const bs=PH.land?Math.min(h-I.t-I.b,w-I.l-I.r-300):Math.max(Math.round((w-I.l-I.r)*.75),Math.min(w-I.l-I.r,h-I.t-I.b-bar-250));
+  const bs=PH.land?Math.min(h-I.t-I.b,w-I.l-I.r-300):Math.max(Math.round((w-I.l-I.r)*.78),Math.min(w-I.l-I.r,h-I.t-I.b-bar-250));
   R.classList.toggle('ph-l',PH.land);R.classList.toggle('ph-p',!PH.land);
   R.style.setProperty('--bs',Math.max(200,Math.floor(bs))+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');return true}
 // ---------- camera: flat top-down, the 6x6 board + edge numbers fill the square ----------

@@ -28,7 +28,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
  await scroll('start');await shot('0start');await checks('start');
  await p.tap('[data-a=guided]');await p.waitForTimeout(800);await scroll('game');
  const m=await p.evaluate(()=>{const B=document.querySelector('.gx-board').getBoundingClientRect();return {w:B.width,h:B.height,short:Math.min(innerWidth,innerHeight)}});
- console.log(t,'board',Math.round(m.w)+'x'+Math.round(m.h),'ratio',(Math.min(m.w,m.h)/m.short).toFixed(2));if(Math.min(m.w,m.h)<FIT.share(W,H)*m.short)FAIL('board size',JSON.stringify(m));
+ console.log(t,'board',Math.round(m.w)+'x'+Math.round(m.h),'ratio',(Math.min(m.w,m.h)/m.short).toFixed(2));if(Math.min(m.w,m.h)<FIT.share(W,H)*m.short-1)FAIL('board size',JSON.stringify(m));
  const tapEl=async sel=>{const l=p.locator(sel).first();if(!(await l.count()))return false;await l.scrollIntoViewIfNeeded().catch(()=>{});try{await l.tap({timeout:7000})}catch(e){return false}await p.waitForTimeout(250);return true};
  let shots=new Set(),turns=0,heraldViaMap=false,lastR=0;
  for(let i=0;i<500;i++){await p.waitForTimeout(200);

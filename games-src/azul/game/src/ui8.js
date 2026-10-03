@@ -11,7 +11,7 @@ function phInsets(){try{const q=new URLSearchParams(location.search);if(q.has('s
 function phApply(){const R=document.documentElement;const was=PHN.on,wasL=PHN.land;PHN.on=phDetect();R.classList.toggle('ph',PHN.on);
   if(!PHN.on){R.classList.remove('ph-l','ph-p');for(const k of['--bs','--sat','--sar','--sab','--sal'])R.style.removeProperty(k);if(was){phChrome();try{if(V3.on)relayout()}catch(e){}}return}
   const w=innerWidth,h=innerHeight,I=phInsets(),bar=44;PHN.land=w>h;const W=w-I.l-I.r,H=h-I.t-I.b;
-  const bs=PHN.land?Math.max(Math.min(H,W-280),Math.min(H,Math.ceil(H*.86))):Math.min(W,Math.max(Math.ceil(W*.75),H-bar-310));
+  const bs=PHN.land?Math.max(Math.min(H,W-280),Math.min(H,Math.ceil(H*.86))):Math.min(W,Math.max(Math.ceil(W*.81),H-bar-310));
   R.classList.toggle('ph-l',PHN.land);R.classList.toggle('ph-p',!PHN.land);PHN.bs=Math.max(200,Math.floor(bs));
   R.style.setProperty('--bs',PHN.bs+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');
   if(!was||wasL!==PHN.land){phChrome();try{if(V3.on)relayout()}catch(e){}}}

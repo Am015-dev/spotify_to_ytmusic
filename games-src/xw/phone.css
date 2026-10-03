@@ -187,3 +187,5 @@ html.ph #prompt .acts.col>.btn{display:block;width:100%;margin:0 0 6px}
 html.ph #prompt .acts.col>.btn.primary,html.ph #prompt .acts.col:not(:has(>.btn.primary))>.btn.rec,html.ph #prompt>.acts:has(>.btn.primary.big){position:sticky;bottom:-4px;z-index:2;background-clip:padding-box;box-shadow:0 -10px 10px -2px var(--panel),0 3px 12px rgba(255,170,60,.25)}
 html.ph #prompt>.acts:has(>.btn.primary.big){background:var(--panel);bottom:-8px;padding:4px 0 6px;margin:0 0 4px;box-shadow:0 -10px 10px -2px var(--panel)}
 html.ph.ph-l #prompt .acts.col>.btn.primary,html.ph.ph-l #prompt .acts.col:not(:has(>.btn.primary))>.btn.rec,html.ph.ph-l #prompt>.acts:has(>.btn.primary.big),html.ph.ph-l .acts.main{bottom:0}
+html.ph .acts.main>.btn.primary{flex:1 1 100%;width:100%}
+html.ph.ph-p .gx-board{justify-self:center}

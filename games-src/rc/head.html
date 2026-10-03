@@ -563,5 +563,8 @@ html.ph #story .sctl .btn.go{flex:1 1 100%}html.ph #story .sctl .btn.ghost{flex:
 html.ph #modal.phcard .mbox{overflow:visible}
 /* real usable heights: the recommended job's button stays pinned while the pawn pop-up scrolls */
 html.ph #ppop .rec .rb{position:sticky;bottom:-12px;z-index:2;padding:6px 0 12px;margin-bottom:-12px;background:linear-gradient(rgba(255,247,227,0),#fff7e3 10px)}
+@media (max-width:400px){html.ph #phchip:not([hidden]){gap:4px;padding:0 5px!important;font-size:13.5px}}
+/* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
+html.ph .mbox,html.ph .dlg{box-sizing:border-box}
 </style>
 </head>
