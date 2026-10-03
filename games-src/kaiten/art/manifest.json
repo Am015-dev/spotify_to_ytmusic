@@ -14,7 +14,15 @@
   "wasabi-nigiri": "wasabi-nigiri",
   "chop": "chop",
   "pudding": "pudding",
-  "back": "back"
+  "back": "back",
+  "belt": "belt",
+  "counter": "counter",
+  "chef-mina": "chef-mina",
+  "chef-taro": "chef-taro",
+  "chef-odile": "chef-odile",
+  "chef-kofi": "chef-kofi",
+  "chef-pip": "chef-pip",
+  "title": "title"
  },
  "size": {
   "tempura": [
