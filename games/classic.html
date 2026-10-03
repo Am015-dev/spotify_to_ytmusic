@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="en">
+<head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Game Night Shelf</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#1d1411">
@@ -89,6 +94,8 @@ html.ph #fab.dim{opacity:.4}
 @media (max-width:480px){.stats div{padding:6px 6px}.btn{padding:10px 14px}}
 </style>
 
+</head>
+<body>
 <div class="page">
   <header class="top">
     <div>
@@ -341,3 +348,5 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-ref]');if(
 addEventListener('keydown',e=>{if(e.key==='Escape'&&!table.hidden)closeGame()});
 const start=GAMES.find(g=>'#'+g.id===location.hash);if(start)openGame(start);
 </script>
+</body>
+</html>

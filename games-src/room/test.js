@@ -1,5 +1,5 @@
 const {chromium}=require('playwright');
-const URL='file:///home/user/spotify_to_ytmusic/games/room.html';
+const URL='file:///home/user/spotify_to_ytmusic/games/index.html';
 const VPS=[[1440,900],[1280,720],[844,390],[390,844],[360,740]];
 let problems=0;const fail=m=>{problems++;console.log('FAIL',m)};
 const ok=(c,m)=>{if(!c)fail(m)};
@@ -147,7 +147,7 @@ for(const [w,h] of [[1440,900],[390,844],[844,390]]){
 }
 /* copyright: no 'based on' references */
 {const BAN=['Plays like','plays like','in the style of','King of Tokyo','X-Wing','Munchkin','Robinson Crusoe','Five Tribes','Azul','Carcassonne','Bomb Busters','Tsuro','Everdell','Old King','Aether'];
- const src=require('fs').readFileSync('/home/user/spotify_to_ytmusic/games/room.html','utf8');
+ const src=require('fs').readFileSync('/home/user/spotify_to_ytmusic/games/index.html','utf8');
  for(const t of BAN)ok(!src.includes(t),'banned text in source: '+t);
  for(const v of ['room','list']){const [c,p]=await mk(b,1280,720,'dark',{seed:{room_view:v}});await openBox(p,'crown').catch(()=>{});const html=await p.evaluate(()=>document.documentElement.outerHTML);for(const t of BAN)ok(!html.includes(t),'banned text in DOM ('+v+'): '+t);await c.close()}}
 /* reduced motion */

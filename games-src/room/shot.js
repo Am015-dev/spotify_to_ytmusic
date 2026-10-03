@@ -4,5 +4,5 @@ const [w,h,scheme,out,seed,tod]=[+process.argv[2],+process.argv[3],process.argv[
 const c=await b.newContext({viewport:{width:w,height:h},colorScheme:scheme});const p=await c.newPage();
 p.on('pageerror',e=>console.log('ERR',e.message));p.on('console',m=>{if(m.type()==='error')console.log('CON',m.text())});
 if(seed)await p.addInitScript(s=>{const o=JSON.parse(s);for(const k in o)localStorage.setItem(k,o[k])},seed);
-await p.goto('file:///home/user/spotify_to_ytmusic/games/room.html'+(tod?'?tod='+tod:''));await p.waitForTimeout(800);
+await p.goto('file:///home/user/spotify_to_ytmusic/games/index.html'+(tod?'?tod='+tod:''));await p.waitForTimeout(800);
 await p.screenshot({path:out});await b.close()})();
