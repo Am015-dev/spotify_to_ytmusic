@@ -158,9 +158,10 @@ html.ph:not(.ph-3d) .ph-ctl{display:none}
 html.ph #sndbtn::after,html.ph #pausebtn::after{content:attr(data-phl);font-size:15px;font-weight:600}
 html.ph #map text{display:none}
 /* ===== portrait: compact chrome so the action panel gets the room ===== */
-/* camera: a floating vertical stack in the board's corner (semi-transparent, 44px targets) */
-html.ph.ph-p .ph-ctl{position:absolute;right:6px;bottom:6px;z-index:5;flex-direction:column;gap:2px;margin:0;padding:3px;border-radius:14px;background:rgba(10,8,30,.5);pointer-events:none}
-html.ph.ph-p .ph-ctl .gx-ibtn{pointer-events:auto;background:rgba(26,22,64,.55);border-color:rgba(255,255,255,.22)}
+/* camera: a faint row along the opponent's (top) edge of the board, away from your own ships; solid while touched */
+html.ph.ph-p .ph-ctl{position:absolute;right:6px;top:6px;z-index:5;flex-direction:row;gap:2px;margin:0;padding:3px;border-radius:14px;background:rgba(10,8,30,.28);pointer-events:none;opacity:.42;transition:opacity .2s}
+html.ph.ph-p .ph-ctl:hover,html.ph.ph-p .ph-ctl:focus-within,html.ph.ph-p .ph-ctl:active{opacity:1}
+html.ph.ph-p .ph-ctl .gx-ibtn{pointer-events:auto;background:rgba(26,22,64,.45);border-color:rgba(255,255,255,.18)}
 /* one 44px row: the phase strip on the left, Guide + Advice on the right */
 html.ph.ph-p .gx-dock-head{position:absolute;top:0;right:0;z-index:4;height:44px;padding:0 4px 0 0;gap:2px;order:0}
 html.ph.ph-p .gx-dock-head .na-guide b{display:none}
