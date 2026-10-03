@@ -268,6 +268,7 @@ html.ph .ph-sh,html.ph .ph-sr{display:grid;grid-template-columns:minmax(0,1.5fr)
 html.ph .ph-sh{color:var(--mut)}html.ph .ph-sr{min-height:30px;border-left:5px solid var(--pc);padding-left:5px;background:#fff;border-radius:6px}
 html.ph .ph-sr i{display:none}html.ph .ph-sr .good{color:var(--good);font-weight:700}html.ph .ph-sr .bad{color:var(--bad);font-weight:700}
 html.ph .ph-cont{display:flex;gap:6px;margin-top:auto;flex:0 0 auto;flex-wrap:wrap}
+html.ph .ph-card>.ph-cont{position:sticky;bottom:-8px;z-index:3;margin:auto -8px -8px;padding:6px 8px 8px;background:linear-gradient(rgba(255,250,240,0),#fffaf0 10px)}
 html.ph .ph-go{appearance:none;font:inherit;font-weight:800;font-size:16px;flex:1 1 120px;min-height:48px;border-radius:12px;border:1px solid #7e3214;background:linear-gradient(180deg,#d56e40,#a8431f);color:#fff8ec;cursor:pointer;padding:0 14px}
 html.ph .ph-go.ghost{background:linear-gradient(180deg,#fffdf7,#f1e4c8);color:var(--gx-ink);border-color:rgba(110,70,30,.35)}
 html.ph .ph-coach{font-size:14px;line-height:1.35;display:flex;flex-direction:column;gap:4px}html.ph .ph-coach .st{font-size:16px}html.ph .ph-coach .x{font-size:14px;color:#40507a}
@@ -290,6 +291,8 @@ html.ph .mbox>.acts:last-child{position:sticky;bottom:-12px;background:var(--gx-
 html.ph .ph-card{position:relative}
 html.ph.ph-l #ph-z[data-mode=wallq] .ph-head{min-height:30px}html.ph.ph-l #ph-z[data-mode=wallq] .ph-ib{position:absolute;right:8px;bottom:8px}
 @media (prefers-reduced-motion:reduce){html.ph .ph-o:active{transform:none}}
+/* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
+html.ph .mbox,html.ph .dlg{box-sizing:border-box}
 </style>
 </head>
 <body>
@@ -2235,7 +2238,7 @@ function phInsets(){try{const q=new URLSearchParams(location.search);if(q.has('s
 function phApply(){const R=document.documentElement;const was=PHN.on,wasL=PHN.land;PHN.on=phDetect();R.classList.toggle('ph',PHN.on);
   if(!PHN.on){R.classList.remove('ph-l','ph-p');for(const k of['--bs','--sat','--sar','--sab','--sal'])R.style.removeProperty(k);if(was){phChrome();try{if(V3.on)relayout()}catch(e){}}return}
   const w=innerWidth,h=innerHeight,I=phInsets(),bar=44;PHN.land=w>h;const W=w-I.l-I.r,H=h-I.t-I.b;
-  const bs=PHN.land?Math.max(Math.min(H,W-280),Math.min(H,Math.ceil(H*.86))):Math.min(W,Math.max(Math.ceil(W*.9),H-bar-310));
+  const bs=PHN.land?Math.max(Math.min(H,W-280),Math.min(H,Math.ceil(H*.86))):Math.min(W,Math.max(Math.ceil(W*.82),H-bar-340));
   R.classList.toggle('ph-l',PHN.land);R.classList.toggle('ph-p',!PHN.land);PHN.bs=Math.max(200,Math.floor(bs));
   R.style.setProperty('--bs',PHN.bs+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');
   if(!was||wasL!==PHN.land){phChrome();try{if(V3.on)relayout()}catch(e){}}}

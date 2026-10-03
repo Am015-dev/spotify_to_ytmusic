@@ -199,7 +199,7 @@ html.ph .gx-dock-head,html.ph .gx-reopen{display:none!important}
 html.ph .gx-dock{border-left:0;border-top:3px solid var(--wood2);max-height:none;padding-bottom:env(safe-area-inset-bottom,0px)}
 html.ph .gx-dock-body{padding:4px 5px;gap:3px;overflow:hidden}
 html.ph .strip{height:73px;box-sizing:border-box}
-html.ph .slab{flex-basis:16px}
+html.ph .slab{flex-basis:30px;white-space:normal;line-height:1.1;text-align:center}
 html.ph .chip{flex:1 0 70px}
 html.ph #res{min-height:32px;gap:0}
 html.ph .rs,html.ph .rs b{font-size:14px}
@@ -230,6 +230,18 @@ html.ph #start{padding:6px}.html-ph .scard{padding:10px}
 html.ph .scard h1{font-size:1.6rem}
 html.ph .seg .lbl{flex-basis:96px}
 html.ph.ph-l .sgrid{grid-template-columns:1fr 1fr}
+/* ---- real usable heights (portrait): the prompt gets its own full-width row, the board never drops below 0.75 x width, the dock scrolls with the action row pinned ---- */
+html.ph.ph-p{--dockh:min(298px,calc(100dvh - 82px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 75vw))}
+html.ph.ph-p .gx-app{grid-template-rows:auto minmax(0,1fr)}
+html.ph.ph-p .gx-bar{flex-wrap:wrap;height:auto;align-content:flex-start}
+html.ph.ph-p .gx-bar [data-gx="rivald"]{margin-left:auto}
+html.ph.ph-p #barprompt{order:9;flex:0 0 100%;box-sizing:border-box;min-height:36px;padding:0 6px 2px}
+html.ph .gx-dock-body{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
+html.ph .ph-body:not(:has(.btn.go~.btn.go)) .btn.go:not(.dis){position:sticky;bottom:0;z-index:3;box-shadow:0 0 0 5px var(--paper),0 2px 3px rgba(0,0,0,.35)}
+html.ph .cbtns{position:sticky;bottom:0;z-index:3;background:var(--paper);padding:5px 0 2px;box-shadow:0 -6px 6px -4px var(--paper)}
+html.ph.ph-l #promptDock{height:auto;min-height:32px;overflow:visible}html.ph.ph-l #prompt{display:block;-webkit-line-clamp:unset;overflow:visible}
+@media (max-height:600px){html.ph.ph-p .ph-t span{display:none}html.ph.ph-p .ph-head{padding:2px 6px 2px 10px}html.ph.ph-p .ph-body{padding:6px 8px 8px;gap:5px}}
+@media (max-height:700px){html.ph.ph-p #acts{position:sticky;top:0;z-index:3;order:-1;background:var(--paper);padding:2px 0}}
 /* ---- online play ---- */
 #netst{display:inline-flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;max-width:36vw;background:rgba(255,255,255,.1);color:#f6ecd6;border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:3px 10px;font-size:13px;white-space:nowrap;cursor:pointer;min-height:30px}
 #netst[hidden]{display:none}
@@ -3294,7 +3306,7 @@ function items(list, px) {
 function basicItems(i) { const b = D.basic[i], l = []; for (const r of RESK) if (b.gain[r]) l.push([r, b.gain[r]]); if (b.draw) l.push(['card', b.draw]); if (b.pts) l.push(['point', b.pts]); return l; }
 // ---- layout: returns rects for every board item
 function boardLayout(W, H) {
-  const nf = G.forest.length, g = 2, tall = W < H * 1.0;
+  const nf = G.forest.length, g = 2, tall = W < H * 1.0 || (document.documentElement.classList.contains('ph-p') && H >= 270);
   const R = { W, H, tall, tiles: [], meadow: [], g };
   const tl = (kind, i, x, y, w, hh) => R.tiles.push({ kind, i, x, y, w, h: hh });
   const extra = [['haven', 0], ['journey', 0], ['deck', 0], ['tree', 0]];
