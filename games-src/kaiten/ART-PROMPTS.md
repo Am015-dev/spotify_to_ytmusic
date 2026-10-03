@@ -71,3 +71,10 @@ Rules (keep the art ours):
 
 When you send the images I'll swap them in (the code keeps the frames, names and score badges),
 check them at phone size and run the layout tests before it goes live.
+
+## Swapping in your own paintings
+The game already ships with painted stand-ins made by `paint/paint.js` (`art/*.webp`, listed in `art/manifest.json`).
+To use a real painting, save it as `art/<file name above>.png` (for example `art/tempura.png`, `art/chef-mina.png`,
+`art/title.png`) and run `python3 game/build.py`. A PNG always wins over the WebP of the same name; the build resizes it
+to the size in `manifest.json` and re-encodes it as WebP, so the page stays small. Delete the PNG to go back.
+Extra names the game uses: `title.png` (1600 x 900 title painting, no text; keep the top middle calm for the logo).

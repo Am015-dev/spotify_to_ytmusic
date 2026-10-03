@@ -239,7 +239,7 @@ function pxCardTex(o) {
   if (t) { o.face = t; o.sp.alpha = 1; } else if (!o.face) o.sp.alpha = 0;
   o.backT = pxBack(w);
 }
-function pxKill(o) { PX.objs.delete(o.key); PX.tweens = PX.tweens.filter(t => t.o !== o); try { o.c.destroy({ children: true }); } catch (e) { } PX.dirty = true; }
+function pxKill(o) { PX.objs.delete(o.key); for (const t of PX.tweens) if (t.o === o) t.dead = true; PX.tweens = PX.tweens.filter(t => !t.dead); try { o.c.destroy({ children: true }); } catch (e) { } PX.dirty = true; }
 // ---- tweens
 const EASE = { out: t => 1 - Math.pow(1 - t, 3), in: t => t * t * t, io: t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, back: t => { const c = 1.6; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); } };
 function pxTween(o, to, ms, ease, done, extra) {
@@ -249,18 +249,20 @@ function pxTween(o, to, ms, ease, done, extra) {
   PX.tweens.push(tw); o.busy = (o.busy || 0) + 1; PX.dirty = true; return tw;
 }
 function pxStepTweens(now) {
-  const keep = [];
-  for (const tw of PX.tweens) {
-    if (now < tw.t0) { keep.push(tw); continue; }
+  // callbacks may start new tweens or kill objects: step a snapshot, then drop the finished ones, then run their callbacks
+  const done = [];
+  for (const tw of PX.tweens.slice()) {
+    if (tw.dead || now < tw.t0) continue;
     const u = Math.min(1, (now - tw.t0) / tw.ms), e = tw.ease(u), o = tw.o;
     for (const p in tw.to) o[p] = tw.from[p] + (tw.to[p] - tw.from[p]) * e;
     if (tw.arc) o.y -= Math.sin(u * Math.PI) * tw.arc;
     if (tw.spin) o.rot = tw.spin * Math.sin(u * Math.PI);
     if (tw.flipAt != null) o.flip = u < tw.flipAt ? 0 : 1;
     if (tw.step) tw.step(u);
-    if (u >= 1) { o.busy--; if (tw.done) try { tw.done(); } catch (er) { console.error(er); } } else keep.push(tw);
+    if (u >= 1) { tw.dead = true; done.push(tw); }
   }
-  PX.tweens = keep;
+  if (done.length) PX.tweens = PX.tweens.filter(t => !t.dead);
+  for (const tw of done) { tw.o.busy = Math.max(0, (tw.o.busy || 0) - 1); if (tw.done) try { tw.done(); } catch (er) { console.error(er); } }
 }
 // ---- the moments ----
 // a served plate flies from the belt to the diner's covered slot (face down halfway), then slips under the cover
@@ -269,7 +271,7 @@ function pxServe() {
   const v = viewSeat(), so = PX.seats.get(v); if (!so || !so.slot) return false;
   const sels = [...document.querySelectorAll('#belt .hc.sel')]; if (!sels.length) return false;
   sels.forEach((el, n) => {
-    const o = PX.objs.get('h:' + el.dataset.id); if (!o) return;
+    const o = PX.objs.get('h:' + el.dataset.id); if (!o) return; PX.nServe = (PX.nServe || 0) + 1;
     o.detached = true; o.c.parent && o.c.parent.removeChild(o.c); PX.L.fly.addChild(o.c);
     const S = so.slot, tw = S.w * (n ? .9 : 1);
     pxTween(o, { x: S.x + S.w / 2 - tw / 2 + n * 6, y: S.y + n * 4, w: tw }, 520, 'io', () => { o.sq = .25; pxTween(o, { sq: 0, a: 0 }, 260, 'out', () => pxKill(o)); }, { arc: 46, spin: n ? -.25 : .25, flipAt: .5, delay: n * 70 });
@@ -285,7 +287,7 @@ function pxFlyPlate(o, from, fresh, gain) {
   if (!fresh) { fly.type = o.type; fly.on = o.on; fly.layers = 1; pxPlateTex(fly); fly.x = from.x + from.w / 2 - d0 / 2; fly.y = from.y + from.h / 2 - d0 / 2; fly.w = d0; fly.d = d0; fly.detached = true; fly.c.parent.removeChild(fly.c); PX.L.fly.addChild(fly.c); }
   fly.flying = true;
   const land = () => {
-    fly.flying = false;
+    fly.flying = false; PX.nLand = (PX.nLand || 0) + 1;
     if (!fresh) { pxKill(fly); o.hideTop = 0; }
     o.sq = .3; pxTween(o, { sq: 0 }, 300, 'out');
     if (gain > 0) pxBurst(o.tx + o.d / 2, o.ty + o.d / 2, gain);
@@ -322,6 +324,13 @@ function pxPackets(sizes) {
     pxTween(o, { x: b.av.x + b.av.w / 2 - w / 2, y: b.av.y + b.av.h / 2 - w * .7 }, 760, 'io', () => pxTween(o, { a: 0 }, 140, 'out', () => pxKill(o)), { arc: 40, spin: .6, delay: 100 });
   }
   return any;
+}
+// the covers lift: a few sparks and a puff over every slot
+function pxReveal() {
+  if (!PX.on || !ANIM) return;
+  for (const [, so] of PX.seats) { const S = so.slot; if (!S) continue; const x = S.x + S.w / 2, y = S.y + S.h * .45;
+    for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + (i - 2) * .5; pxPart('spark', x, y, { vx: Math.cos(a) * 60, vy: Math.sin(a) * 60, g: 60, life: .6, s0: .5, s1: .15, rot: 3, noFilter: true }); }
+    pxPart('puff', x, y - S.h * .3, { vy: -30, life: 1, s0: S.w / 50, s1: S.w / 26, a0: .6 }); }
 }
 // +N and a ring of sparks / coins where a plate scored
 function pxBurst(x, y, gain) {
@@ -367,7 +376,7 @@ function pxLoop() {
   const tick = ts => { PX.raf = (PH ? PH.raf : requestAnimationFrame)(tick); try { pxFrame(ts); } catch (e) { console.error(e); } };
   PX.raf = (PH ? PH.raf : requestAnimationFrame)(tick);
 }
-function pxMoving() { return PX.tweens.length > 0 || PX.parts.length > 0 || [...PX.objs.values()].some(o => !o.detached && (Math.abs(o.x - o.tx) > .5 || Math.abs(o.y - o.ty) > .5 || Math.abs(o.w - (o.kind === 'plate' ? o.d : o.tw)) > .5)); }
+function pxMoving() { return PX.tweens.length > 0 || [...PX.objs.values()].some(o => !o.detached && (Math.abs(o.x - o.tx) > .5 || Math.abs(o.y - o.ty) > .5 || Math.abs(o.w - (o.kind === 'plate' ? o.d : o.tw)) > .5)); }
 function pxFrame(ts) {
   if (!PX.on) return;
   const now = performance.now(), dt = Math.min(.05, Math.max(0, (now - (PX.last || now)) / 1000)); PX.last = now; PX.t += dt;
@@ -421,6 +430,8 @@ function pxPerfReg() {
       isAnimating: () => !!UI.busy || !!PX.tweens.length || !!PX.parts.length, idleMode: PX.on ? 'throttle' : 'demand', idleFps: 10 });
   } catch (e) { }
 }
+// share of painted (non-transparent) pixels in the canvas: the table is never blank
+function pxPainted() { try { const c = PX.app.renderer.extract.canvas({ target: PX.app.stage, resolution: .25 }); const x = c.getContext('2d'), d = x.getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 20) n++; return +(n / (d.length / 4)).toFixed(3); } catch (e) { return -1; } }
 // test hook: where every sprite is and whether anything still moves (px-test.js)
-PX.state = () => ({ on: PX.on, kind: PX.kind, q: PX.q, res: PX.res, tweens: PX.tweens.length, parts: PX.parts.length, moving: pxMoving(), frames: PX.frames || 0, err: PX.err,
+PX.state = () => ({ nServe: PX.nServe || 0, nLand: PX.nLand || 0, on: PX.on, kind: PX.kind, q: PX.q, res: PX.res, tweens: PX.tweens.length, parts: PX.parts.length, moving: pxMoving(), frames: PX.frames || 0, err: PX.err, blur: !!(PX.L.fx && PX.L.fx.filters && PX.L.fx.filters.length), canvasOK: pxPainted(),
   objs: [...PX.objs.values()].filter(o => !o.detached).map(o => ({ key: o.key, kind: o.kind, type: o.type || null, x: o.x, y: o.y, w: o.kind === 'plate' ? o.w : o.w, tx: o.tx, ty: o.ty, tw: o.kind === 'plate' ? o.d : o.tw, layers: o.layers || 0, shown: o.kind === 'plate' ? o.sp.filter(s => s.visible).length : 1, back: !!o.back, face: o.kind === 'card' ? (o.sp.texture === o.face && !!o.face) : null, alpha: o.c.alpha, vis: o.vis })) });

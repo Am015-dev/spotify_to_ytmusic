@@ -10,7 +10,7 @@ async function page(ctx, label, hash) {
   const p = await ctx.newPage(); p.setDefaultTimeout(150000); const errs = []; p.on('pageerror', e => errs.push(label + ' pageerror: ' + e.message));
   p.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push(label + ' console: ' + m.text()); });
   await p.goto('https://gns.test/' + (PHONE ? '?phone=1' : '') + (hash || ''), { waitUntil: 'domcontentloaded', timeout: 120000 });
-  await p.waitForFunction(() => typeof NET !== 'undefined' && NET.ready && typeof UI !== 'undefined' && document.querySelector('#start .scard'), null, { timeout: 120000, polling: 300 }); return { p, ctx, label, errs };
+  await p.waitForFunction(() => typeof NET !== 'undefined' && NET.ready && typeof UI !== 'undefined' && document.querySelector('#start .ttl,#start .scard'), null, { timeout: 120000, polling: 300 }); return { p, ctx, label, errs };
 }
 async function ctxNew() {
   const c = await b.newContext(PHONE ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } : { viewport: { width: 1100, height: 760 } });
@@ -20,9 +20,9 @@ async function ctxNew() {
 async function setup(ncl, opt) {
   const H = await page(await ctxNew(), 'host'); const C = []; for (let i = 0; i < ncl; i++) C.push(await page(await ctxNew(), 'c' + (i + 1)));
   console.log('host', JSON.stringify(await H.p.evaluate(() => ({ avail: netAvail(), trystero: typeof Trystero }))));
-  await H.p.evaluate(o => { AIDELAY = o.delay || 80; UI.opt = { np: o.np, level: o.level || 'normal', lv: ['normal', 'normal', 'normal', 'normal'] }; if (!document.querySelector('#onl').open) document.querySelector('#onl summary').click(); document.getElementById('netname').value = 'Hosty'; document.querySelector('[data-a=nethost]').click(); }, opt);
+  await H.p.evaluate(o => { AIDELAY = o.delay || 80; UI.opt = { np: o.np, level: o.level || 'normal', lv: ['normal', 'normal', 'normal', 'normal'] }; if (!document.querySelector('#onl')) document.querySelector('#start [data-a=online]').click(); if (!document.querySelector('#onl').open) document.querySelector('#onl summary').click(); document.getElementById('netname').value = 'Hosty'; document.querySelector('[data-a=nethost]').click(); }, opt);
   let code = ''; for (let k = 0; k < 60 && !code; k++) { await sleep(100); code = await H.p.evaluate(() => NET.on ? NET.code : ''); }
-  for (const [i, c] of C.entries()) await c.p.evaluate(([code, i]) => { AIDELAY = 80; if (!document.querySelector('#onl').open) document.querySelector('#onl summary').click(); document.getElementById('netname').value = 'Friend' + (i + 1); document.getElementById('joincode').value = code; document.querySelector('[data-a=netjoin]').click(); }, [code, i]);
+  for (const [i, c] of C.entries()) await c.p.evaluate(([code, i]) => { AIDELAY = 80; if (!document.querySelector('#onl')) document.querySelector('#start [data-a=online]').click(); if (!document.querySelector('#onl').open) document.querySelector('#onl summary').click(); document.getElementById('netname').value = 'Friend' + (i + 1); document.getElementById('joincode').value = code; document.querySelector('[data-a=netjoin]').click(); }, [code, i]);
   const t0 = Date.now(); while (Date.now() - t0 < 40000) { const n = await H.p.evaluate(() => NET.peers.length); const m = await Promise.all(C.map(c => c.p.evaluate(() => NET.peers.length))); if (n >= ncl + 1 && m.every(x => x >= ncl + 1)) break; await sleep(250); }
   await sleep(1500); const lobby = await H.p.evaluate(() => netPlayers().map(p => p.nm)); const cl = await Promise.all(C.map(c => c.p.evaluate(() => ({ open: UI.netOpen, pl: netPlayers().map(p => p.nm), opt: !!NET.opt, hostPeer: !!NET.hostPeer }))));
   console.log('lobby after', Date.now() - t0, 'ms host sees', JSON.stringify(lobby), 'clients see', JSON.stringify(cl)); return { H, C, code };
