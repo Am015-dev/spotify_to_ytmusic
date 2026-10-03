@@ -2,4 +2,4 @@
    blurb:'Fly a stolen-data courier over a neon Frankfurt in 2099. Graze drone fire to cool your guns, phase-dash through bullets and break four district bosses from the Bankenviertel to the Messe.',
    stats:[['1','player'],['10','minutes'],['10+','ages'],['4','districts']],
    chips:['Solo arcade','Keyboard & touch','4 bosses','Heat & graze','Phase-dash','Synth soundtrack','Endless loops'],
-,paint:paintMainhattan}
+   paint:paintMainhattan}
