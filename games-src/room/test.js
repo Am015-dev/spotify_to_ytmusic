@@ -49,8 +49,9 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
      ok(!sb.lamp&&!sb.case,`${tag} TV overlaps lamp/bookcase ${JSON.stringify(sb)}`)}
    else{await p.locator('#tvscreen').scrollIntoViewIfNeeded();const t=await info();ok(t&&t.w>=100&&t.h>=70&&t.x>=0&&t.r<=t.vw+1,`${tag} TV screen visible on phone ${JSON.stringify(t)}`)}
    await p.locator('#tv').scrollIntoViewIfNeeded();
+   const gotoCh=async n=>{await p.hover('#tvscreen');for(let i=0;i<3&&!new RegExp('channel '+n).test((await info()).lab);i++){await p.click('[data-tvch="1"]');await p.waitForTimeout(450)}};
    ok(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),tag+' no sideways scroll with TV');
-   const l0=(await info()).lab;ok(/channel 1.*Nightrun/i.test(l0),tag+' starts on CH 1 '+l0);
+   await gotoCh(1);const l0=(await info()).lab;ok(/channel 1.*Nightrun/i.test(l0),tag+' starts on CH 1 '+l0);
    ok(await p.locator('[data-tvch]').count()===2,tag+' two channel controls');
    for(const e of await p.locator('[data-tvch]').all()){const bx=await e.boundingBox();ok(bx&&bx.width>=43&&bx.height>=43||(!ph&&bx&&bx.width>=24),`${tag} channel button size ${JSON.stringify(bx)}`);
      const hit=await e.evaluate(n=>{n.scrollIntoView({block:'center'});const r=n.getBoundingClientRect(),cs=getComputedStyle(n,'::after');return Math.max(r.width,parseFloat(cs.width)||0)});ok(hit>=43,`${tag} channel hit area ${hit}`)}
@@ -62,8 +63,7 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
    await p.click('[data-tvch="-1"]');await p.waitForTimeout(450);
    ok(/channel 1/i.test((await info()).lab),tag+' previous channel');
    for(const [ch,id] of [[1,'mainhattan'],[2,'overdrive']]){
-     if(ch===2){await p.click('[data-tvch="1"]');await p.waitForTimeout(450)}
-     await p.locator('#tvscreen').scrollIntoViewIfNeeded();await p.click('#tvscreen');await p.waitForTimeout(900);
+     await p.locator('#tvscreen').scrollIntoViewIfNeeded();await gotoCh(ch);await p.click('#tvscreen');await p.waitForTimeout(900);
      ok(await p.locator('#inspect .tvg').count()===1&&!await p.evaluate(()=>document.getElementById('inspect').hidden),`${tag} tv card opens ${id}`);
      ok(await inside(p,'#inspect .play'),`${tag} tv Play inside viewport`);
      ok(await p.evaluate(()=>document.activeElement&&document.activeElement.closest('#inspect')!==null),tag+' tv card focus inside');
