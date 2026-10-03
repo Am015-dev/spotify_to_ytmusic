@@ -313,7 +313,7 @@ html.ph-l .ps-msg{flex:1 1 auto}
 html.ph-l .ps-hint{text-align:left}
 /* pop-ups live in the free zone (dock area), never over the board */
 html.ph .ppop,html.ph .pcard{position:absolute;inset:0;z-index:5;overflow:auto;overscroll-behavior:contain}
-html.ph .pcard{bottom:auto;max-height:100%;color:#14232b;box-shadow:0 8px 18px rgba(0,0,0,.5)}
+html.ph .pcard{bottom:0;color:#14232b;box-shadow:0 8px 18px rgba(0,0,0,.5)}
 html.ph .ppop:not([hidden]){z-index:6;display:flex;flex-direction:column;gap:6px;background:#f3e6bf;color:#14232b;border-top:3px solid #c99a35;padding:4px 8px calc(8px + 0px)}
 /* real usable heights: the Continue row of a card stays pinned while the card scrolls */
 html.ph #pc [data-a=coachok],html.ph #pc [data-a=sunkok],html.ph #pc [data-ph=dismiss],html.ph #pc [data-a=take]{position:sticky;bottom:6px;z-index:3;box-shadow:0 0 0 5px #0b2a33,0 2px 0 #7a5a14}

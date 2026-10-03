@@ -97,3 +97,4 @@ html.ph .bidrec{width:100%;text-align:center;font-size:16px}
 html.ph .gx-drawer{box-sizing:border-box}
 /* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
 html.ph .mbox,html.ph .dlg{box-sizing:border-box}
+html.ph .pp-b :not(:has(>.btn.go~.btn.go))>.btn.go{position:sticky;bottom:0;z-index:3;box-shadow:0 0 0 6px #f8ecd2,0 2px 0 rgba(0,0,0,.25)}
