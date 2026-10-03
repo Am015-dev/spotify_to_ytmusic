@@ -65,7 +65,7 @@ const SRC=`(()=>{
  return [...new Set(out)];
 })()`;
 exports.SRC=SRC;
-exports.run=async(page)=>{try{await page.evaluate(()=>{if(!document.getElementById('phfit-noanim')){const st=document.createElement('style');st.id='phfit-noanim';st.textContent='*,*::before,*::after{animation:none!important;transition:none!important}';document.head.appendChild(st)}});await page.evaluate(()=>Promise.race([Promise.all(document.getAnimations().filter(a=>{try{return a.effect.getComputedTiming().endTime!==Infinity&&a.playState==='running'}catch(e){return false}}).map(a=>a.finished.catch(()=>0))),new Promise(r=>setTimeout(r,2500))]));return await page.evaluate(SRC)}catch(e){return ['phfit eval error '+e.message.slice(0,80)]}};
+exports.run=async(page)=>{try{await page.evaluate(()=>{if(!document.getElementById('phfit-noanim')){const st=document.createElement('style');st.id='phfit-noanim';st.textContent='*,*::before,*::after{animation:none!important;transition:none!important}';document.head.appendChild(st)}});await page.evaluate(()=>Promise.race([Promise.all(document.getAnimations().filter(a=>{try{return a.effect.getComputedTiming().endTime!==Infinity&&a.playState==='running'}catch(e){return false}}).map(a=>a.finished.catch(()=>0))),new Promise(r=>setTimeout(r,2500))]));const r=await page.evaluate(SRC);await page.evaluate(()=>{const e=document.getElementById('phfit-noanim');if(e)e.remove()});return r}catch(e){return ['phfit eval error '+e.message.slice(0,80)]}};
 // share of the short side the board must reach: 0.85 normally, 0.75 on short portrait screens (usable height < 800 px)
 exports.share=(W,H)=>(W<H&&H<800)?.75:.85;
 // extra checks (rc): no empty band > 12 px between the visible content (bar, board, dock) and the viewport edges;
