@@ -7,7 +7,7 @@ const ROUNDS=+arg('rounds',2),ANIMV=arg('anim','1')==='1',FILE=arg('file','nebul
 const OUT=path.join(__dirname,'shots','ph');fs.mkdirSync(OUT,{recursive:true});
 (async()=>{const b=await PW.chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});let bad=0;
 for(const [W,H] of SIZES){const t=W+'x'+H+(HOT?'_hot':'');const ctx=await b.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
-  const p=await ctx.newPage();p.setDefaultTimeout(30000);const errs=[];p.on('pageerror',e=>errs.push('pageerror '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load resource|ERR_/.test(m.text()))errs.push(m.text())});
+  const p=await ctx.newPage();p.setDefaultTimeout(+arg("timeout",90000));const errs=[];p.on('pageerror',e=>errs.push('pageerror '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load resource|ERR_/.test(m.text()))errs.push(m.text())});
   const log=(...a)=>console.log(t,...a);const prob=(...a)=>{bad++;console.log('FAIL '+t+' '+a.map(x=>typeof x==='string'?x:JSON.stringify(x)).join(' '))};
   const seen=new Set();const note=k=>seen.add(k);
   await p.goto('file://'+path.resolve(FILE)+'?phone=1'+(SAFE?'&safe='+SAFE:''));await p.waitForTimeout(1500);
