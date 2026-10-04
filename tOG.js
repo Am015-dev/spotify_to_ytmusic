@@ -33,7 +33,7 @@ if(want('E')){const r=await B('fra');const plan={gate:[40,20,16,8],ring:[40,20,1
   const lg=await r.p.evaluate(()=>__og.OG.log);ok(lg.fin>=25,'event log',lg);await fin(r,'events')}
 if(want('C')){const r=await B('fra');const p=r.p;
   const c=await p.evaluate(()=>{const S=__og.spots();const ev=S.find(s=>s.k==='ev'&&s.t==='ring'&&!__og.blocked(s.id));const A=ev.a,s0=__og.stats(A);
-    const res=__ogRun(ev.id,40);const s1=__og.stats(A);const g=S.find(s=>s.k==='col'&&!s.done&&s.a===A)||S.find(s=>s.k==='col'&&!s.done);
+    const res=__ogRun(ev.id,40);const s1=__og.stats(A);const reach=s=>s.k==='col'&&!s.done&&!!__og.appr(s.id,40);const g=S.find(s=>reach(s)&&s.a===A)||S.find(reach);
     const P=__og.appr(g.id,40).P;__mho.warp(P[0][0],P[0][1],Math.atan2(P[1][0]-P[0][0],P[1][1]-P[0][1]));__mho.roamSim(2);__og.tick();const col0=__og.OG.log.col;__ogDrive(P,14,{maxT:15,until:()=>__og.OG.log.col>col0});
     const sv=JSON.parse(localStorage.getItem('mho_og@1')||'{}');return{p2:__og.stats(A).pct,A,d0:s0.D,p0:s0.pct,md:res.md,d1:s1.D,p1:s1.pct,ev:ev.id,savedEv:sv.e&&sv.e[ev.id],g:g.id,ga:g.a,savedG:!!(sv.c&&sv.c[g.id]),sum:sv.sum&&sv.sum[A]}});
   ok(c.md>=1&&c.d1===c.d0+1&&c.savedEv>=1&&c.sum===c.p2,'completing an event raises the area count/% and is saved to mho_og@1',c);ok(c.savedG,'collectible picked up by driving through it (keys) and saved',{g:c.g,area:c.ga});
@@ -45,7 +45,7 @@ if(want('C')){const r=await B('fra');const p=r.p;
   await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:240000});await p.evaluate(()=>__mho.enterRoam());await p.waitForFunction(()=>__mho.state==='roam',null,{timeout:240000});await F.on(p);await p.evaluate(BOT);await p.evaluate(()=>{try{__mho.storyClose()}catch(e){}__mho.roamSim(30)});
   const after=await p.evaluate(([A,ev,g])=>({pct:__og.stats(A).pct,evDone:__og.spots().find(s=>s.id===ev).done,gDone:__og.spots().find(s=>s.id===g).done}),[c.A,c.ev,c.g]);ok(after.pct===c.p2&&after.evDone>=1&&after.gDone,'completion % and finished spots survive a page reload',after);
   // 100% reward: mark everything in a story-free area done except one collectible, then drive through it
-  const rw=await p.evaluate(()=>{const S=__og.spots(),sv=__og.sv();let A=null,last=null;for(const a of __og.areas()){const st=__og.stats(a);if(st.st[1])continue;const L=S.filter(s=>s.a===a&&s.k==='col'&&!s.done);if(L.length){A=a;last=L[0];break}}if(!A)return{err:'no area'};
+  const rw=await p.evaluate(()=>{const S=__og.spots(),sv=__og.sv();let A=null,last=null;for(const a of __og.areas()){const st=__og.stats(a);if(st.st[1])continue;const L=S.filter(s=>s.a===a&&s.k==='col'&&!s.done&&!!__og.appr(s.id,40));if(L.length){A=a;last=L[0];break}}if(!A)return{err:'no area'};
     for(const s of S){if(s.a!==A||s.id===last.id)continue;if(s.k==='ev')sv.e[s.id]=3;else if(s.k==='gold')sv.g[s.id]=1;else sv.c[s.id]=1}for(const g of __mho.RO.gbs||[])if(__og.areaAt(g.x,g.z)===A&&g.m)g.m.visible=false;
     const pre=__og.stats(A).pct,cr0=JSON.parse(localStorage.getItem('mho_season@1')||'{}').cr||0;const P=__og.appr(last.id,40).P;__mho.warp(P[0][0],P[0][1],Math.atan2(P[1][0]-P[0][0],P[1][1]-P[0][1]));__mho.roamSim(2);__og.tick();const c0=__og.OG.log.col;__ogDrive(P,14,{maxT:15,until:()=>__og.OG.log.col>c0});
     const cr1=JSON.parse(localStorage.getItem('mho_season@1')||'{}').cr||0;return{A,pre,post:__og.stats(A).pct,rw:!!__og.sv().rw[A],rewards:__og.OG.log.reward||0,studs:cr1-cr0}});
