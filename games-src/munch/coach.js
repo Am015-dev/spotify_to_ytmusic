@@ -184,7 +184,7 @@ function sinceDiff(me,sn){const p=P(me),nm=p.nm,out=[];const lines=G.log.filter(
   const yo=t=>youify(t,nm);const skip=/^— |kicks open the door and finds|goes looking for trouble|won't chase|agrees to help|refuses to help|asks /;
   const why=(test,max)=>lines.filter(l=>!skip.test(l.t)&&test(l.t)).slice(-max).map(l=>yo(l.t));
   G.pl.forEach(x=>{const a=sn.lv[x.i],b=x.lvl;if(a==null||a===b)return;const who=x.i===me?'You':esc(x.nm);const n=x.nm;
-    const r=why(t=>t.includes(n)&&/defeats|level|dies|sells|steals|curse|Bad Stuff/.test(t),2);
+    const r=why(t=>t.includes(n)&&/defeats|level|dies|sells|steals|curse|Bad Stuff/.test(t),1);
     out.push(`<b>${who}: level ${a} → ${b}</b>${r.length?` <span class="muted">(${r.map(esc).join(' ')})</span>`:''}`)});
   const lost=sn.eq.filter(id=>!p.eq.some(e=>e.id===id));
   if(lost.length){const r=why(t=>lost.some(id=>t.includes(cname(id)))||/^💀/.test(t)&&t.includes(nm),2);out.push(`<b>You lost ${lost.map(id=>esc(cname(id))).join(', ')}</b>${r.length?` <span class="muted">(${r.map(esc).join(' ')})</span>`:''}`)}
@@ -194,7 +194,7 @@ function sinceDiff(me,sn){const p=P(me),nm=p.nm,out=[];const lines=G.log.filter(
   const cu=p.curse.filter(id=>!sn.cu.includes(id));if(cu.length)out.push(`<b>Curse on you:</b> ${cu.map(id=>esc(cname(id))+': '+esc(cd(id).x||'')).join(' ')}`);
   return out.length?out:null}
 function sinceHTML(me){if(!UI.since||!G||G.active!==me||!['window','main'].includes(G.phase)||G.cb)return '';
-  return `<div class="since" role="status"><b>While you waited</b><ul>${UI.since.slice(0,5).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}
+  return `<div class="since" role="status"><b>While you waited</b><ul>${UI.since.slice(0,3).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}
 // ---- learn as you play: one short idea, the first time it matters (only in a "teach me" game) ----
 const LESSONS={
   setup:'<b>Goal:</b> be the first hero to <b>level 10</b>. Your <b>strength</b> is your level + your items. Tap a glowing card in your hand to play it, then press Ready.',
