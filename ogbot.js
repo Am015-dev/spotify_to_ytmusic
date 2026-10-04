@@ -6,7 +6,7 @@ module.exports=`window.__ogDrive=(P,vt,o={})=>{const M=__mho,R=M.RO,K=M.K;const 
   if(o.drift&&t<(o.dlim||99)*60){const ph=Math.floor(t/(o.dp||70))%2;K.KeyX=(t%(o.dc||1))===0||o.dc==null;K.ArrowLeft=ph===0;K.ArrowRight=ph===1}else{K.ArrowLeft=a>.035;K.ArrowRight=a<-.035}
   K.ArrowUp=R.v<v;K.ArrowDown=R.v>v+5;K.ShiftLeft=!!o.boost&&R.y>M.gnd(R.x,R.z,R.y+.3)+.5;M.roamSim(1);if(o.until&&o.until())break;if(!o.until&&i>=P.length-2)break}
  K.ArrowLeft=K.ArrowRight=K.ArrowUp=K.ArrowDown=K.KeyX=K.ShiftLeft=false;return{t:+(t/60).toFixed(1),i,n:P.length}};
-window.__ogRun=(id,vt,o={})=>{const A=__og.appr(id,o.back||45);if(!A)return{err:'appr'};const M=__mho,R=M.RO,P=A.P;M.warp(P[0][0],P[0][1],Math.atan2(P[1][0]-P[0][0],P[1][1]-P[0][1]));M.roamSim(2);__og.tick();
+window.__ogRun=(id,vt,o={})=>{const A=__og.appr(id,o.back||45);if(!A)return{err:'appr'};__og.OG.lastRes=null;const M=__mho,R=M.RO,P=A.P;M.warp(P[0][0],P[0][1],Math.atan2(P[1][0]-P[0][0],P[1][1]-P[0][1]));M.roamSim(2);__og.tick();
  __ogDrive(P,o.v0||Math.min(vt,22),{maxT:12,until:()=>!!__og.OG.ev});const ev=__og.OG.ev;if(!ev)return{err:'nostart',at:[R.x,R.z]};if(ev.sp.id!==id){__og.end();return{err:'other',got:ev.sp.id}}
  const E=__og.ev(),P2=E.P,started=E.t;let r;if(E.t==='drift'){r=__ogDrive(P2.concat(P2.slice().reverse()),vt,{maxT:30,drift:1,dp:o.dp||70,dc:o.dc,dlim:o.dlim,until:()=>!__og.OG.ev})}
  else r=__ogDrive(P2,vt,{maxT:70,until:()=>!__og.OG.ev,boost:o.boost,slowTurn:o.slowTurn});if(__og.OG.ev){const t0=__og.OG.ev.tm;M.K.ArrowUp=false;for(let q=0;q<60*40&&__og.OG.ev;q++)M.roamSim(1)}

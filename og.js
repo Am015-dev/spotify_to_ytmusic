@@ -35,6 +35,8 @@ function OG_walk(i,dx,dz,L){const G=qvGraph(),P=[[G.X[i],G.Z[i]]],C=[0];const d0
   while(len<L){let b=-1,bs=-2;for(let k=G.off[i];k<G.off[i+1];k++){const j=G.nb[k];if(seen.has(j))continue;const ex=G.X[j]-G.X[i],ez=G.Z[j]-G.Z[i],l=Math.hypot(ex,ez)||1,c=(ex*dx+ez*dz)/l;if(c>bs){bs=c;b=j}}
     if(b<0||bs<.4)break;const ex=G.X[b]-G.X[i],ez=G.Z[b]-G.Z[i],l=Math.hypot(ex,ez)||1;dx=ex/l;dz=ez/l;turn=Math.max(turn,Math.acos(clamp(dx*d0x+dz*d0z,-1,1)));len+=l;P.push([G.X[b],G.Z[b]]);C.push(len);seen.add(b);i=b}
   return{P,C,len,turn}}
+// flat ground along a walk: every 8 m within ±2.5 m of its start height (v81 terrain: no jump ramps onto hillsides)
+function OG_flat(W){const y0=groundY(W.P[0][0],W.P[0][1]);for(let d=8;d<=W.len;d+=8){const q=OG_at(W,d);if(Math.abs(groundY(q.x,q.z)-y0)>2.5)return false}return true}
 function OG_at(W,s){const P=W.P,C=W.C;let k=1;while(k<P.length-1&&C[k]<s)k++;const a=P[k-1],b=P[k]||a,l=(C[k]-C[k-1])||1,u=clamp((s-C[k-1])/l,0,1),hx=(b[0]-a[0])/l,hz=(b[1]-a[1])/l;return{x:a[0]+(b[0]-a[0])*u,z:a[1]+(b[1]-a[1])*u,hx,hz,h:Math.atan2(hx,hz)}}
 function OG_excl(){const ex=[];for(const g of HUB.gates||[])ex.push([g.x,g.z,55]);for(const m of RO.marks||[])if(Number.isFinite(m.x))ex.push([m.x,m.z,45]);for(const g of GARAGES)if(g.x!=null)ex.push([g.x,g.z,45]);return ex}
 const OG_near=(ex,x,z,f=1)=>ex.some(([a,b,r])=>(a-x)**2+(b-z)**2<r*r*f);
@@ -61,14 +63,14 @@ function OG_build(){const G=qvGraph();if(!G||!RO.grp)return false;const t0=perfo
     let ti=0;for(const a of Object.keys(byA).sort()){const L=byA[a];const th=CID==='fra'?OG_TH.fra[ti++%OG_TH.fra.length]:OG_TH.ath[ATHD];A[a]={th,n:0};const want=Math.min(5,Math.floor(L.length/25));const pick=[];
       for(let it=0;it<want;it++){let b=null,bv=-1;for(let q=0;q<L.length;q+=3){const s=L[q];if(!ok(s[0],s[1]))continue;let dm=400;for(const p of pick)dm=Math.min(dm,Math.hypot(p[0]-s[0],p[1]-s[1]));const sp=nearest(s[0],s[1],60);if(sp)continue;const v=dm+(deg(s[2])===1?120:0)+rn()*40;if(v>bv){bv=v;b=s}}
         if(!b)break;pick.push(b);put({k:'col',t:a,x:b[0],z:b[1],ci:it,y:groundY(b[0],b[1])+1.6})}A[a].n=pick.length}}
-  // on-the-go events: greedy cover of the road samples (no two rings closer than 60 m), then a fix-up pass for any sample > 140 m
+  // on-the-go events: greedy cover of the road samples (no two rings closer than 60 m), then a fix-up pass for any sample > 125 m (headroom for spots pruned under later mission marks)
   const ord=smp.map((s,i)=>i);for(let i=ord.length-1;i>0;i--){const j=Math.floor(rn()*(i+1));[ord[i],ord[j]]=[ord[j],ord[i]]}
   const addEv=s=>{const sp=put({k:'ev',t:null,x:s[0],z:s[1],i:s[2]});return sp};
   for(const oi of ord){const s=smp[oi];if(nearest(s[0],s[1],OG_R))continue;if(ok(s[0],s[1]))addEv(s)}
-  for(let pass=0;pass<2;pass++)for(const s of smp){if(nearest(s[0],s[1],140))continue;let b=null,bd=1e9;for(const q of smp){const d=(q[0]-s[0])**2+(q[1]-s[1])**2;if(d<bd&&d<130*130&&ok(q[0],q[1])&&!nearest(q[0],q[1],45)){bd=d;b=q}}if(b)addEv(b)}
-  // event types: balanced per area; jumps only where the road runs straight ≥ 110 m both ways
+  for(let pass=0;pass<2;pass++)for(const s of smp){if(nearest(s[0],s[1],125))continue;let b=null,bd=1e9;for(const q of smp){const d=(q[0]-s[0])**2+(q[1]-s[1])**2;if(d<bd&&d<130*130&&ok(q[0],q[1])&&!nearest(q[0],q[1],45)){bd=d;b=q}}if(b)addEv(b)}
+  // event types: balanced per area; jumps only where the road runs straight ≥ 110 m both ways over flat ground (hills cut long jumps short / launch into slopes)
   const cnt={};let ti2=0;for(const sp of S){if(sp.k!=='ev')continue;const i=sp.i,nb=[];for(let k=G.off[i];k<G.off[i+1];k++)nb.push(G.nb[k]);let st=false,dir=null;
-    if(nb.length===2){const a=nb[0],ax=G.X[a]-G.X[i],az=G.Z[a]-G.Z[i],la=Math.hypot(ax,az)||1,w1=OG_walk(i,ax/la,az/la,110),w2=OG_walk(i,-ax/la,-az/la,110);st=w1.len>=105&&w2.len>=105&&w1.turn<.22&&w2.turn<.22;dir=[ax/la,az/la]}
+    if(nb.length===2){const a=nb[0],ax=G.X[a]-G.X[i],az=G.Z[a]-G.Z[i],la=Math.hypot(ax,az)||1,w1=OG_walk(i,ax/la,az/la,110),w2=OG_walk(i,-ax/la,-az/la,110);st=w1.len>=105&&w2.len>=105&&w1.turn<.22&&w2.turn<.22&&OG_flat(w1)&&OG_flat(w2);dir=[ax/la,az/la]}
     const c=cnt[sp.a]=cnt[sp.a]||{};const pool=OG_KS.filter(k=>st||(k!=='stunt'&&k!=='ljump'));pool.sort((p,q)=>(c[p]||0)-(c[q]||0)||((OG_KS.indexOf(p)+ti2)%8)-((OG_KS.indexOf(q)+ti2)%8));ti2++;
     const t=pool[0];c[t]=(c[t]||0)+1;sp.t=t;sp.dir=dir;if(sp.i!=null){sp.x=G.X[i];sp.z=G.Z[i];sp.y=groundY(sp.x,sp.z)}}
   OG.S=S;OG.grid=grid;OG.A=A;OG.key=OG_key();OG.ms=Math.round(performance.now()-t0);OG_meshes();OG_sum();return true}
@@ -126,6 +128,8 @@ function OG_css(){if(document.getElementById('ogCss'))return;const st=document.c
 #ogArea b{font:italic 900 16px system-ui;letter-spacing:.1em}#ogArea em{display:block;font-style:normal;color:#5dffb0;font-weight:900}#ogArea.on{animation:ogIn .4s ease-out}@keyframes ogIn{0%{opacity:0;transform:translate(-50%,-14px)}100%{opacity:1}}
 .ogBar{height:7px;background:#333a;border-radius:4px;margin:4px 0;overflow:hidden}.ogBar i{display:block;height:100%;background:linear-gradient(90deg,#5dffb0,#ffd12c)}
 #ogMapP{position:absolute;right:10px;top:calc(56px + env(safe-area-inset-top,0px));z-index:5;background:rgba(12,14,30,.86);color:#fff;border-radius:12px;padding:8px 10px;font:700 12px system-ui;max-width:min(260px,44vw);max-height:46vh;overflow:auto}
+#ogMapP>b.h{display:block;cursor:pointer}#ogMapP>b.h i{font-style:normal;color:#ffd12c}
+@media (max-aspect-ratio:1/1){#ogMapP{max-height:40vh;padding:6px 10px}#ogMapP>b.h::after{content:' ▾'}#ogMapP.open>b.h::after{content:' ▴'}#ogMapP:not(.open)>:not(.h){display:none}}
 #ogMapP .r{display:flex;justify-content:space-between;gap:8px}#ogMapP .r.cur{color:#ffd12c}#ogMapP button{width:100%;margin-top:6px;background:#ffd12c;border:0;border-radius:8px;font:900 12px system-ui;padding:6px;cursor:pointer}
 #ogCol{position:fixed;inset:0;z-index:60;background:rgba(8,10,22,.94);color:#fff;font:700 13px system-ui;overflow:auto;padding:calc(16px + env(safe-area-inset-top,0px)) 16px 16px}
 #ogCol h2{margin:0 0 10px;font:italic 900 20px system-ui;letter-spacing:.08em}#ogCol .set{background:#1b1f3a;border-radius:12px;padding:8px 12px;margin:0 0 8px}#ogCol .it{display:inline-block;margin:4px 6px 0 0;padding:3px 7px;border-radius:8px;background:#2a3058;font-size:12px}#ogCol .it.no{opacity:.35}
@@ -148,18 +152,18 @@ function OG_start(sp,re){if(OG.ev)return;const G=qvGraph();let i=sp.i??qvNear(sp
   else if(t==='ring'){const n=6;for(let k=1;k<=n;k++){const q=OG_at(W,len*k/(n+.3)),r=new THREE.Mesh(OG.rG||(OG.rG=new THREE.TorusGeometry(5.2,.5,8,28)),OG_m('#2f9bff',2.6));r.rotation.y=q.h;OG_obj(e,r,q.x,y(q.x,q.z)+5.4,q.z);e.objs.push({x:q.x,z:q.z,m:r})}
     e.goal=[tm(13),tm(19),tm(25)];e.lim=Math.min(60,Math.max(20,tm(9)));e.hi=0;e.u=' s'}
   else if(t==='rush'){const n=26,im=new THREE.InstancedMesh(OG.sG||(OG.sG=new THREE.CylinderGeometry(.75,.75,.3,12).rotateX(Math.PI/2)),OG_m('#ffd12c',1.8),n);for(let k=0;k<n;k++){const q=OG_at(W,len*(k+1)/(n+1)),o=(k%3-1)*2.2,x=q.x+q.hz*o,z=q.z-q.hx*o;_om.makeTranslation(x,y(x,z)+1.3,z);im.setMatrixAt(k,_om);e.objs.push({x,z,k})}OG_obj(e,im,0,0,0);e.im=im;
-    e.goal=[10,17,23];e.lim=Math.min(60,Math.max(20,Math.round(len/17)));e.u=''}
+    e.goal=[9,14,22];e.lim=Math.min(60,Math.max(12,Math.round(len/17)));e.u=''}
   else if(t==='smash'){const n=14,im=new THREE.InstancedMesh(OG.cG||(OG.cG=new THREE.BoxGeometry(2.2,2.2,2.2)),new THREE.MeshStandardMaterial({color:0xc8862a,roughness:.7}),n);for(let k=0;k<n;k++){const q=OG_at(W,len*(k+1)/(n+1)),o=(k%2?1:-1)*1.6,x=q.x+q.hz*o,z=q.z-q.hx*o;_om.makeTranslation(x,y(x,z)+1.1,z);im.setMatrixAt(k,_om);e.objs.push({x,z,k})}OG_obj(e,im,0,0,0);e.im=im;
     e.goal=[6,10,13];e.lim=Math.min(60,Math.max(20,Math.round(len/21)));e.u=''}
   else if(t==='ghost'){const g=new THREE.Group();const gm=new THREE.MeshBasicMaterial({color:0x9fe8ff,transparent:true,opacity:.45,depthWrite:false});box(g,gm,2.4,1.2,4.4,0,1,0);box(g,gm,2,1,2.2,0,2,-.3);OG_obj(e,g,W.P[0][0],y(W.P[0][0],W.P[0][1]),W.P[0][1]);e.gh=g;
     const f=OG_at(W,len),fl=new THREE.Mesh(OG.fG||(OG.fG=new THREE.TorusGeometry(6,.5,8,28)),OG_m('#ffffff',2.4));fl.rotation.y=f.h;OG_obj(e,fl,f.x,y(f.x,f.z)+6,f.z);e.d=0;e.gd=0;e.gv=len/(len/21);e.fin=f;
     e.goal=[tm(15),tm(21),tm(26)];e.lim=Math.min(60,Math.max(20,tm(10)));e.hi=0;e.u=' s'}
-  else if(t==='drift'){const r=new THREE.Mesh(OG.dG||(OG.dG=new THREE.TorusGeometry(70,.6,6,64).rotateX(Math.PI/2)),OG_m('#c46bff',2));OG_obj(e,r,sp.x,y(sp.x,sp.z)+.4,sp.z);e.goal=[450,1000,1800];e.lim=30;e.u=' pts'}
+  else if(t==='drift'){const r=new THREE.Mesh(OG.dG||(OG.dG=new THREE.TorusGeometry(70,.6,6,64).rotateX(Math.PI/2)),OG_m('#c46bff',2));OG_obj(e,r,sp.x,y(sp.x,sp.z)+.4,sp.z);e.goal=[180,450,1100];e.lim=30;e.u=' pts'}
   else if(t==='stunt'||t==='ljump'){const q=OG_at(W,32),big=t==='ljump',len2=big?12:10,hg=big?5:3.2,n0=RO.grp.children.length,r0=RO.ramps.length;addRamp(q.x,q.z,q.h,len2,hg,8,big?0x5dffb0:0xff2d95);e.rampMeshes=RO.grp.children.slice(n0);e.rampR=RO.ramps.slice(r0);e.rampR.forEach(r=>r.og=1);e.ramp=e.rampR[0];
     e.rx=q.x+q.hx*len2/2;e.rz=q.z+q.hz*len2/2;e.rh=q.h;
     if(t==='stunt'){const v=28,rv=v*hg/len2,vy=rv*1.15+3,ft=(vy+Math.sqrt(vy*vy+60*hg))/30,d=v*ft,tx=e.rx+q.hx*d,tz=e.rz+q.hz*d;e.tx=tx;e.tz=tz;for(const[r,c]of[[18,'#ff2d95'],[10,'#ffffff'],[5,'#ffd12c']]){const m=new THREE.Mesh(new THREE.RingGeometry(r-1.2,r,40).rotateX(-Math.PI/2),OG_m(c,1.6));OG_obj(e,m,tx,y(tx,tz)+.15+r*.002,tz)}
       e.goal=[18,10,5];e.lim=25;e.hi=0;e.u=' m'}
-    else{e.goal=[28,38,48];e.lim=25;e.u=' m'}}
+    else{e.goal=[30,42,54];e.lim=25;e.u=' m'}}
   OG_snd('go');say(OG_T[t].ic+' '+OG_T[t].n.toUpperCase(),OG_T[t].d,1.4);OG.cool=0;OG_draw();OG_hud()}
 function OG_val(e,live){const k=e.kind;if(k==='gate'||k==='ring'||k==='ghost')return e.fin_t??(live?null:null);if(k==='stunt'||k==='ljump')return e.land??null;return e.n}
 function OG_tier(e,v){if(v==null)return 0;const g=e.goal;if(e.hi)return v>=g[2]?3:v>=g[1]?2:v>=g[0]?1:0;return v<=g[2]?3:v<=g[1]?2:v<=g[0]?1:0}
@@ -194,7 +198,7 @@ function OG_pick(sp){const s=OG_sv();if(sp.k==='gold'){s.g[sp.id]=1;OG.log.gold+
 function OG_prune(){const sig=(RO.marks||[]).length+':'+(HUB.gates||[]).length;if(sig===OG.mkSig)return;OG.mkSig=sig;const ex=OG_excl(),keep=OG.S.filter(sp=>!OG_near(ex,sp.x,sp.z));if(keep.length===OG.S.length)return;OG.S=keep;const g=new Map();for(const sp of keep){const k=OG_gk(sp.x,sp.z);(g.get(k)||g.set(k,[]).get(k)).push(sp)}OG.grid=g;OG.vis=OG.vis.filter(sp=>keep.includes(sp))}
 // ---------- per-frame
 function OG_tick(dt){if(state!=='roam'||!RO.on||!RO.built)return;if(!OG.grp||OG.key!==OG_key()){if(!QV.g&&(OG.f++%30))return;if(!OG_build())return}
-  OG.cool=Math.max(0,OG.cool-dt);if(OG.ev){if(RO.ch||RO.sp||RO.wk)OG_end(null,1);else OG_step(dt)}
+  OG.cool=Math.max(0,OG.cool-dt);if(OG.ev){if(RO.ch||RO.sp)OG_end(null,1);else if(!RO.wk)OG_step(dt)}  // a wreck (2 s rebuild) pauses the event instead of silently cancelling it
   if(OG.f%120===0)OG_prune();if(++OG.f%8===0)OG_pickVis();
   const busy=RO.ch||RO.sp||RO.wk||RO.card||RO.mapOpen||RO.story||RO.frozen||(window.__m1&&__m1.cs&&__m1.cs());
   if(!OG.ev&&!busy&&OG.cool<=0)for(const sp of OG.vis){const d2=(sp.x-RO.x)**2+(sp.z-RO.z)**2;if(sp.k==='ev'){if(d2<7.2*7.2&&Math.abs(RO.y-sp.y)<6&&Math.abs(RO.v)>3&&!OG_blocked(sp)){OG_start(sp);break}}
@@ -213,7 +217,7 @@ function OG_map(){const cvs=$('#roamMapC');if(!cvs||!RO.mapP||!OG.S.length)retur
 function OG_mapPanel(){const host=$('#roamMap');if(!host)return;let el=document.getElementById('ogMapP');if(!el){el=document.createElement('div');el.id='ogMapP';host.appendChild(el)}const s=OG_sv(),cur=OG_areaAt(RO.x,RO.z);
   const rows=OG_areas().map(a=>`<div class="r${a===cur?' cur':''}"><span>${a}</span><span>${s.sum[a]??0}%${s.rw[a]?' 🏆':''}</span></div>`).join('');
   const dist=CID!=='fra'?Object.keys(ATH_DIST).map(d=>`<div class="r${d===ATHD?' cur':''}"><span>${d} · ${ATH_DIST[d].name}</span><span>${s.sum['§'+d]!=null?s.sum['§'+d]+'%':'—'}</span></div>`).join('')+'<hr>':'';
-  const html=`<b>AREA COMPLETION</b>${dist}${rows}<button id="ogColB">🏺 COLLECTION (U)</button>`;if(el._h!==html){el._h=html;el.innerHTML=html;el.querySelector('#ogColB').onclick=e=>{e.stopPropagation();OG_col(true)}}}
+  const html=`<b class="h">AREA COMPLETION <i>${cur?(s.sum[cur]??0)+'%':''}</i></b>${dist}${rows}<button id="ogColB">🏺 COLLECTION (U)</button>`;if(el._h!==html){el._h=html;el.innerHTML=html;el.querySelector('#ogColB').onclick=e=>{e.stopPropagation();OG_col(true)};el.querySelector('b.h').onclick=e=>{e.stopPropagation();el.classList.toggle('open')}}}
 function OG_col(on){const el=OG_el('ogCol');if(!on){el.hidden=true;return}const s=OG_sv();let h=`<button class="x" id="ogColX">✕ CLOSE</button><h2>🏺 UNIQUE COLLECTIBLES · ${OG_distName().toUpperCase()}</h2>`;
   for(const a of Object.keys(OG.A).sort()){const A=OG.A[a];if(!A.n)continue;const L=OG.S.filter(q=>q.k==='col'&&q.t===a).sort((p,q)=>p.ci-q.ci),got=L.filter(q=>s.c[q.id]).length,o=OG_stats(a);
     h+=`<div class="set"><b>${A.th[1]} ${a} · ${A.th[0]}</b> <span>${got}/${L.length}${got===L.length?' ✔ SET COMPLETE':''}</span><div class="ogBar"><i style="width:${o.pct}%"></i></div><small>${o.pct}% area · 🧱 ${o.g[0]}/${o.g[1]} golden · ⚡ ${o.ev[0]}/${o.ev[1]} events${s.rw[a]?' · 🏆 reward claimed':''}</small><div>${L.map(q=>`<span class="it${s.c[q.id]?'':' no'}">${s.c[q.id]?A.th[1]+' '+A.th[3][q.ci%5]:'❔ ???'}</span>`).join('')}</div></div>`}

@@ -64,4 +64,4 @@ if(want('S')){const r=await B('fra');
   await r.p.evaluate(()=>{const E=__og.ev();if(E)__ogDrive(E.P,40,{maxT:40,until:()=>!__og.OG.ev})});await F.shot(r.p,'shots/og_result.jpg',{type:'jpeg',quality:70});
   await go('stunt',28,2.1);await F.shot(r.p,'shots/og_stunt.jpg',{type:'jpeg',quality:70});
   await fin(r,'shots')}
-console.log(`\ntOG: ${pass} pass, ${fail} fail · ${Math.round((Date.now()-T0)/1000)} s`);process.exit(fail?1:0)})();
+console.log(`\ntOG: ${pass} pass, ${fail} fail · ${Math.round((Date.now()-T0)/1000)} s`);process.exit(fail?1:0)})().catch(e=>{console.log('FAIL tOG crashed: '+(e&&e.stack||e));console.log(`\ntOG: ${pass} pass, ${fail+1} fail`);process.exit(1)});

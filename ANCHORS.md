@@ -1,6 +1,8 @@
 # OG (open-world density) — merge anchors
 
-Patch order: `pOG1.py` only. Rebuild: `./reapply.sh pOG1.py` → `REAPPLY_OK`.
+Patch order (v81 base, with the AU module): `./reapply.sh pAU1.py pAU2.py pOG1.py` → `REAPPLY_OK`. OG alone still works: `./reapply.sh pOG1.py`.
+
+AU on v81: the live base already embeds an older AU module, so `pAU1.py` now replaces that exact block (`docs/modules/au.js`) with `au.js` and only falls back to inserting before `window.__mho={` on bases without it. `pAU2.py` skips text swaps the base already carries.
 
 ## Exact-string replacements
 | # | patch | anchor (old string, exact, count 1) | what happens |
