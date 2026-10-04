@@ -24,17 +24,17 @@ Base: devkit v80 (`alex/overdrive-devkit` @ 259a4cf). Rebuild: `./reapply.sh pAU
 Kept on purpose, as proper names: street, district and landmark names (Innenstadt, Polizeipräsidium, Attiki Odos), character names (Oma Hilde, Opa Klaus, Frau Schmitt, Herr Krause, Kyria Maria, Yiayia Despina), and the drinks Ebbelwoi / Äppler.
 
 ## Tests
-- `node tAU.js` → **RESULT_TAU**
+- `node tAU.js` → **tAU PASS · 18/18** (451 s)
   - AudioContext is null until the first keydown, then exists.
   - Bus gains measured after each switch (target > 0.8, all others < 0.1): roam Frankfurt → race → mission (`heist`) → cutscene; the Athens roam theme is checked separately.
   - Duck goes to 0.3 under the cutscene dialogue and back to 1 afterwards.
-  - 5 min of sim (keyboard bot: throttle, steer, drift, boost) with the scheduler running: live audio sources stay flat (RESULT_LEAK).
+  - 5 min of sim (keyboard bot: throttle, steer, drift, boost) with the scheduler running: live audio sources stay flat (average 46.7 early vs 53.9 late, peak 131, 5638 sources created in total). An earlier run peaked at 171 from smash bursts with no growth over time; that is what the clatter voice cap fixes.
   - Music 0.3 and Effects 0.45 survive a reload (SET, slider UI and bus gain).
   - Portrait 390×844 touch: hint seen, never overlaps `#m1Next`, minimap or map, gone by ~2.6 s, not shown again after a reload, hides when the map opens.
   - Non-English strings: a 54-entry list scanned in the built page, none left; Athens plate text is checked live.
   - Zero page errors.
-- `node smoke.js .` → **RESULT_SMOKE**; `smoke/sheet.png` checked (Frankfurt, map, Athens A/B, race, phone portrait and landscape all render normally).
-- Screenshots: `shots/au_takedown.jpg`, `shots/au_confetti.jpg` (staged: one software-rendered frame takes seconds and the CSS animation clock barely advances here, so the pop is pinned and the confetti pieces are spread down the screen for the picture), `shots/au_portrait.jpg`.
+- `node smoke.js .` → **SMOKE PASS** (556 s); `smoke/sheet.png` checked (Frankfurt, map, Athens A/B, race, phone portrait and landscape all render normally).
+- Screenshots: `shots/au_takedown.jpg`, `shots/au_confetti.jpg` (staged: one software-rendered frame takes seconds and the CSS animation clock barely advances here, so the pop is pinned and the confetti pieces are spread down the screen for the picture). The portrait layout is in the phone shots of `smoke/sheet.png`.
 
 ## Known gaps
 - Nothing here can listen to the mix: levels and timbres are judged only by the numbers above, so they need a by-ear pass on a real device (especially iPhone speaker loudness).
