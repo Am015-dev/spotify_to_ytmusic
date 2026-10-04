@@ -1,6 +1,6 @@
 # Sunglaze: board-first report (Oct 2026)
 
-Preview: `games/sunglaze-next/` (built from `azul/game/src/`, UI layer `ui9.js` only). The rules engine, AI, online
+Preview: `games/sunglaze-next/` (built from `game/src/` next to this report; UI layer `ui9.js` only). The rules engine, AI, online
 code and saves are unchanged.
 
 ## Blind phone testers (drive-serve.js; they read only the first 8 words and decide in about 2 seconds)
