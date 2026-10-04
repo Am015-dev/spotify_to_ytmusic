@@ -1,0 +1,13 @@
+job 38 2p  win 7/10  turns 24  3.5s  1x the fuse burnt down; 2x X pointed at a red wire
+job 38 3p  win 6/10  turns 26  4.7s  3x X pointed at a red wire; 1x X cut their own flipped wire and it was not 4
+SLOW 38/4 0 8784 ms turns 29 start
+SLOW 38/4 5 10536 ms turns 26 start
+SLOW 38/4 6 9126 ms turns 27 act
+job 38 4p  win 6/10  turns 27  7.4s  2x X pointed at a red wire; 2x the fuse burnt down
+SLOW 38/5 0 8163 ms turns 30 act
+SLOW 38/5 2 8548 ms turns 28 start
+SLOW 38/5 4 10788 ms turns 30 act
+SLOW 38/5 5 11413 ms turns 28 act
+job 38 5p  win 5/10  turns 27  6.9s  1x X cut their own flipped wire and it was not 1; 1x X pointed at a red wire; 2x the fuse burnt down; 1x X cut their own flipped wire and it was not 3
+TOTAL games 40 wins 24 (60%) errors 0 stalls 0 invariant-fails 0 time 226s level hard
+loss reasons {"the fuse burnt down":5,"X pointed at a red wire":8,"X cut their own flipped wire and it was not 4":1,"X cut their own flipped wire and it was not 1":1,"X cut their own flipped wire and it was not 3":1}

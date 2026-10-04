@@ -1,0 +1,310 @@
+{
+  "game": "nebula",
+  "title": "The Crown Rift Run",
+  "version": 1,
+  "cast": {
+    "brecken":  { "name": "Marshal Odile Brecken", "portrait": "camp-brecken.webp", "emoji": "🎖️", "color": "#3a6ea5" },
+    "kael":     { "name": "Kael Varro", "portrait": "camp-kael.webp", "emoji": "🧑‍✈️", "color": "#e08a2c" },
+    "quill":    { "name": "Quill Marren", "portrait": "camp-quill.webp", "emoji": "📦", "color": "#5f9e6e" },
+    "drill":    { "name": "Drill Wing Flight Officer", "portrait": "camp-drill.webp", "emoji": "🎯", "color": "#7d8590" },
+    "knife":    { "name": "\"Knifepoint\"", "portrait": "camp-knife.webp", "emoji": "🗡️", "color": "#b0413e" },
+    "hammer":   { "name": "Hammer Squadron Lead", "portrait": "camp-hammer.webp", "emoji": "🔨", "color": "#8a5a3c" },
+    "hex":      { "name": "\"Hex\"", "portrait": "camp-hex.webp", "emoji": "🕸️", "color": "#6b4c9a" },
+    "sorin":    { "name": "Sorin Vael", "portrait": "camp-sorin.webp", "emoji": "⚡", "color": "#c23b5a" },
+    "kira":     { "name": "Kira Scald", "portrait": "camp-kira.webp", "emoji": "🦅", "color": "#9e6b2f" },
+    "wailer":   { "name": "\"Wailer\"", "portrait": "camp-wailer.webp", "emoji": "📢", "color": "#a33d2e" },
+    "castigan": { "name": "Lord Castigan", "portrait": "camp-castigan.webp", "emoji": "👁️", "color": "#2b2b3a" }
+  },
+  "acts": [
+    { "act": 1, "title": "Convoy Run", "blurb": "Learn to fly, shoot and act on the edge of Sector Nebula-7." },
+    { "act": 2, "title": "The Ashfall Belt", "blurb": "The Iron Armada sends its bombers and its fastest ace." },
+    { "act": 3, "title": "The Crown Rift", "blurb": "Break the blockade and face Lord Castigan himself." }
+  ],
+  "twists": [
+    { "id": "ace-shields", "where": "setup", "how": "Right after newGame() adds the squads, the enemy ship whose pilot id equals twist.pilot gets sh and shMax increased by twist.param." },
+    { "id": "opening-focus", "where": "setup", "how": "In startRound(), when G.round becomes 1, every living enemy ship whose pilot id equals twist.pilot (or every enemy ship if twist.pilot is null) gets focus set to twist.param." },
+    { "id": "veteran-skill", "where": "setup", "how": "Right after newGame() adds the squads, the enemy ship whose pilot id equals twist.pilot gets ps increased by twist.param (capped at 12), so it moves later and fires earlier." },
+    { "id": "protect-lead", "where": "scoring", "how": "The campaign's isWon(G) and metrics.won return false if the player's ship whose pilot id equals twist.pilot is no longer alive, even when the player's side won the battle." },
+    { "id": "clock", "where": "scoring", "how": "The chapter sets ex.roundCap to twist.param so missionCheck() ends the battle at that round on points destroyed, and isWon(G) counts only G.winner === 'P1' as a win (a draw is a loss)." },
+    { "id": "ace-hunter", "where": "ai", "how": "In aiTarget(s), for enemy-side ships, a target whose pilot id equals twist.pilot gets its value multiplied by (1 + twist.param) before the best target is picked." }
+  ],
+  "chapters": [
+    {
+      "id": "c1", "act": 1, "title": "First Sortie", "boss": false,
+      "intro": [
+        { "who": "brecken", "text": "Varro, the convoy leaves at dawn. Before that, I want you comfortable at the stick." },
+        { "who": "brecken", "text": "One Armada drone is loose in open space. No rocks, no tricks. Pick a maneuver and fly." },
+        { "who": "kael", "text": "Green lines are easy, red lines strain the engines. Got it, Marshal." }
+      ],
+      "outro": [
+        { "who": "brecken", "text": "Clean flying. You kept your nose on the target. That is half of every dogfight." }
+      ],
+      "opponent": { "name": "Drill Wing Flight Officer", "portrait": "camp-drill.webp", "emoji": "🎯", "cast": "drill",
+        "personality": "A rookie in a target-practice fighter. Flies straight and panics when chased.",
+        "aiLevel": "easy", "aiStyle": "cautious" },
+      "setup": { "fac": [0, 1], "seed": null, "ex": { "noRocks": true },
+        "squads": [ [ { "p": "kael", "u": [] } ], [ { "p": "drill", "u": [] } ] ] },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Fly into range and destroy the lone Drill Wing fighter." },
+      "hints": true,
+      "stars": [
+        { "text": "Destroy the Drill Wing fighter", "test": { "k": "won" } },
+        { "text": "Finish before round 8", "test": { "k": "rounds", "op": "<", "v": 8 } },
+        { "text": "Take 2 damage or less", "test": { "k": "dmgTaken", "op": "<=", "v": 2 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Same drone, but the coach suggests every maneuver for you." },
+      "unlock": [ { "type": "portrait", "id": "kael", "text": "Kael Varro's portrait" } ]
+    },
+    {
+      "id": "c2", "act": 1, "title": "Range Practice", "boss": false,
+      "intro": [
+        { "who": "brecken", "text": "Two drones this time. Get close: at range 1 you roll an extra attack die." },
+        { "who": "brecken", "text": "Stay in their blind side. A ship can only shoot what sits in its front arc." },
+        { "who": "kael", "text": "Close in, stay out of their arc, shoot first. Understood." }
+      ],
+      "outro": [
+        { "who": "kael", "text": "Range 1 hurts. I can feel the difference in the dice." },
+        { "who": "brecken", "text": "Good. Tomorrow we add the rocks." }
+      ],
+      "opponent": { "name": "Drill Wing Flight Officer", "portrait": "camp-drill.webp", "emoji": "🎯", "cast": "drill",
+        "personality": "Two drones flying in a loose pair; they rarely cover each other.",
+        "aiLevel": "easy", "aiStyle": "cautious" },
+      "setup": { "fac": [0, 1], "seed": null, "ex": { "noRocks": true },
+        "squads": [ [ { "p": "kael", "u": ["u_plasma"] } ], [ { "p": "slate", "u": [] }, { "p": "drill", "u": [] } ] ] },
+      "twist": null,
+      "goal": { "type": "before-round", "value": 12, "text": "Destroy both enemy fighters before round 12." },
+      "hints": true,
+      "stars": [
+        { "text": "Destroy both fighters before round 12", "test": { "k": "rounds", "op": "<", "v": 12 } },
+        { "text": "Finish before round 8", "test": { "k": "rounds", "op": "<", "v": 8 } },
+        { "text": "Take 3 damage or less", "test": { "k": "dmgTaken", "op": "<=", "v": 3 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "squads": [ [ { "p": "kael", "u": ["u_plasma"] } ], [ { "p": "drill", "u": [] }, { "p": "drill", "u": [] } ] ] }, "maxStars": 2, "text": "Both drones are rookies with the lowest pilot skill." },
+      "unlock": [ { "type": "title", "id": "marksman", "text": "Title: Marksman" } ]
+    },
+    {
+      "id": "c3", "act": 1, "title": "Rocks and Locks", "boss": false,
+      "intro": [
+        { "who": "brecken", "text": "Asteroids are back. Fly through one and you roll for damage and lose your action." },
+        { "who": "brecken", "text": "After every move you get one action: focus, or a target lock to fire your torpedoes." },
+        { "who": "kael", "text": "Lock first, then torpedoes from range 2 or 3. And keep clear of the rocks." }
+      ],
+      "outro": [
+        { "who": "brecken", "text": "Moving, shooting and acting. You are ready for the real convoy." }
+      ],
+      "opponent": { "name": "Onyx Squadron Pilot", "portrait": "camp-drill.webp", "emoji": "🎯", "cast": "drill",
+        "personality": "Armada patrol pair that likes to hide behind asteroids.",
+        "aiLevel": "easy", "aiStyle": "cautious" },
+      "setup": { "fac": [0, 1], "seed": null, "ex": {},
+        "squads": [ [ { "p": "kael", "u": ["u_plasma", "u_tinker"] } ], [ { "p": "onyx", "u": [] }, { "p": "slate", "u": [] } ] ] },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Destroy both patrol fighters among the asteroids." },
+      "hints": true,
+      "stars": [
+        { "text": "Destroy both patrol fighters", "test": { "k": "won" } },
+        { "text": "Never fly into an asteroid", "test": { "k": "rockHits", "op": "<=", "v": 0 } },
+        { "text": "Take 3 damage or less", "test": { "k": "dmgTaken", "op": "<=", "v": 3 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "ex": { "noRocks": true } }, "maxStars": 2, "text": "The asteroids are cleared from the field." },
+      "unlock": [ { "type": "table", "id": "nebula7", "text": "Battlefield skin: Nebula-7 dust" } ]
+    },
+    {
+      "id": "c4", "act": 1, "title": "The Knife at the Gate", "boss": true,
+      "intro": [
+        { "who": "brecken", "text": "The convoy is jumping. \"Knifepoint\" and a wingman are waiting at the gate." },
+        { "who": "brecken", "text": "She is fragile, but deadly up close. Do not let her reach range 1 in your blind side." },
+        { "who": "knife", "text": "One heavy fighter? I was hoping for a challenge, Varro." }
+      ],
+      "outro": [
+        { "who": "kael", "text": "Gate's clear. Convoy, you are free to jump." },
+        { "who": "brecken", "text": "The Armada will notice this. Expect bombers next." }
+      ],
+      "opponent": { "name": "\"Knifepoint\"", "portrait": "camp-knife.webp", "emoji": "🗡️", "cast": "knife",
+        "personality": "Fast and fragile. Dives straight for range 1 and gambles on the extra die.",
+        "aiLevel": "easy", "aiStyle": "bold",
+        "taunt": "Too slow, Varro. Range 1 always wins.",
+        "praise": "Hah. You kept me at arm's length. Smart pilot." },
+      "setup": { "fac": [0, 1], "seed": null, "sizeK": "core", "ex": {} },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the core duel: destroy \"Knifepoint\" and her wingman." },
+      "hints": true,
+      "stars": [
+        { "text": "Destroy \"Knifepoint\" and her wingman", "test": { "k": "won" } },
+        { "text": "Finish before round 10", "test": { "k": "rounds", "op": "<", "v": 10 } },
+        { "text": "Take 3 damage or less", "test": { "k": "dmgTaken", "op": "<=", "v": 3 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "sizeK": null, "squads": [ [ { "p": "kael", "u": ["u_plasma", "u_tinker"] } ], [ { "p": "knife", "u": [] } ] ] }, "maxStars": 2, "text": "\"Knifepoint\" comes alone, without her wingman." },
+      "unlock": [ { "type": "portrait", "id": "knife", "text": "\"Knifepoint\" portrait" }, { "type": "act", "id": "2", "text": "Act 2: The Ashfall Belt" } ]
+    },
+    {
+      "id": "c5", "act": 2, "title": "Bomber Intercept", "boss": false,
+      "intro": [
+        { "who": "brecken", "text": "A Talon Maul bomber is inbound for the convoy, with one escort." },
+        { "who": "brecken", "text": "It is slow and tough. Stay out of its front arc and wear it down." },
+        { "who": "hammer", "text": "Hammer Lead to convoy: surrender your cargo or burn." }
+      ],
+      "outro": [
+        { "who": "kael", "text": "Bomber down. The convoy slips through." }
+      ],
+      "opponent": { "name": "Hammer Squadron Lead", "portrait": "camp-hammer.webp", "emoji": "🔨", "cast": "hammer",
+        "personality": "Methodical bomber crew that trusts its armour and flies the straight line.",
+        "aiLevel": "normal", "aiStyle": "balanced" },
+      "setup": { "fac": [0, 1], "seed": null, "ex": { "w3": true },
+        "squads": [ [ { "p": "kael", "u": ["u_plasma", "u_tinker"] } ], [ { "p": "hammer", "u": [] }, { "p": "slate", "u": [] } ] ] },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Destroy the bomber and its escort." },
+      "hints": false,
+      "stars": [
+        { "text": "Destroy the bomber and its escort", "test": { "k": "won" } },
+        { "text": "Finish before round 10", "test": { "k": "rounds", "op": "<", "v": 10 } },
+        { "text": "Take 3 damage or less", "test": { "k": "dmgTaken", "op": "<=", "v": 3 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "The bomber crew flies like rookies." },
+      "unlock": [ { "type": "portrait", "id": "hammer", "text": "Hammer Squadron Lead portrait" } ]
+    },
+    {
+      "id": "c6", "act": 2, "title": "Ambush at Veil Station", "boss": false,
+      "intro": [
+        { "who": "brecken", "text": "Four Armada fighters wait in the station's shadow. You get a wingman this time." },
+        { "who": "brecken", "text": "Fly together so they cannot gang up on one of you." },
+        { "who": "hex", "text": "Spend your focus on me if you can. Oh, wait. You can't." }
+      ],
+      "outro": [
+        { "who": "kael", "text": "Ambush broken. Ember, good flying." },
+        { "who": "brecken", "text": "Their best ace is coming for you now, Varro." }
+      ],
+      "opponent": { "name": "\"Hex\"", "portrait": "camp-hex.webp", "emoji": "🕸️", "cast": "hex",
+        "personality": "A jinx who leads a swarm. Attackers cannot spend focus or reroll against her.",
+        "aiLevel": "normal", "aiStyle": "balanced" },
+      "setup": { "fac": [0, 1], "seed": null, "ex": {},
+        "squads": [ [ { "p": "kael", "u": ["u_plasma", "u_tinker"] }, { "p": "ember", "u": [] } ],
+                    [ { "p": "hex", "u": [] }, { "p": "nightjar", "u": [] }, { "p": "onyx", "u": [] }, { "p": "drill", "u": [] } ] ] },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Destroy all four ambushers." },
+      "hints": false,
+      "stars": [
+        { "text": "Destroy all four ambushers", "test": { "k": "won" } },
+        { "text": "Lose no ships", "test": { "k": "lost", "op": "<=", "v": 0 } },
+        { "text": "Finish before round 12", "test": { "k": "rounds", "op": "<", "v": 12 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "The ambushers fly like rookies." },
+      "unlock": [ { "type": "portrait", "id": "hex", "text": "\"Hex\" portrait" } ]
+    },
+    {
+      "id": "c7", "act": 2, "title": "The Red Streak", "boss": true,
+      "intro": [
+        { "who": "brecken", "text": "Sorin Vael, the Armada's top ace, flies a Razor interceptor with two wingmen." },
+        { "who": "brecken", "text": "Wren Talvo and Garrick Dray fly with you. Wren's shots strip an enemy's agility." },
+        { "who": "sorin", "text": "Stress only sharpens me. Come and tire me out, if you can." }
+      ],
+      "outro": [
+        { "who": "kael", "text": "The Red Streak is down. The Belt is ours." },
+        { "who": "brecken", "text": "Next stop is the Crown Rift. Castigan is waiting there." }
+      ],
+      "opponent": { "name": "Sorin Vael", "portrait": "camp-sorin.webp", "emoji": "⚡", "cast": "sorin",
+        "personality": "Proud and fearless. Takes red maneuvers on purpose and turns the stress into focus.",
+        "aiLevel": "normal", "aiStyle": "bold",
+        "taunt": "You flew well. I flew better. Go home, Compact.",
+        "praise": "Brought down by a convoy guard. Remember my name, pilot." },
+      "setup": { "fac": [0, 1], "seed": null, "ex": { "w1": true, "w2": true },
+        "squads": [ [ { "p": "wren", "u": [] }, { "p": "garrick", "u": [] } ],
+                    [ { "p": "sorin", "u": [] }, { "p": "fangsq", "u": [] }, { "p": "vengsq", "u": [] } ] ] },
+      "twist": { "id": "opening-focus", "param": 1, "pilot": "sorin", "text": "Boss rule: Sorin Vael starts round 1 with a focus token." },
+      "goal": { "type": "win", "value": null, "text": "Destroy Sorin Vael and both of his wingmen." },
+      "hints": false,
+      "stars": [
+        { "text": "Destroy Sorin Vael and both wingmen", "test": { "k": "won" } },
+        { "text": "Lose no ships", "test": { "k": "lost", "op": "<=", "v": 0 } },
+        { "text": "Finish before round 10", "test": { "k": "rounds", "op": "<", "v": 10 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Sorin flies at easy and loses his opening focus." },
+      "unlock": [ { "type": "portrait", "id": "sorin", "text": "Sorin Vael portrait" }, { "type": "act", "id": "3", "text": "Act 3: The Crown Rift" } ]
+    },
+    {
+      "id": "c8", "act": 3, "title": "Toll at the Rift", "boss": false,
+      "intro": [
+        { "who": "brecken", "text": "A Warden gunship guards the mouth of the Rift. It shoots from front and rear." },
+        { "who": "brecken", "text": "Tamsin Coe flies with you. She keeps acting while stressed: use her for the flank." },
+        { "who": "kira", "text": "Every ship that passes pays the toll. Yours will pay in parts." }
+      ],
+      "outro": [
+        { "who": "kael", "text": "Gunship silenced. The Rift is open." }
+      ],
+      "opponent": { "name": "Kira Scald", "portrait": "camp-kira.webp", "emoji": "🦅", "cast": "kira",
+        "personality": "Patient hunter. Parks the gunship where both arcs cover the approach.",
+        "aiLevel": "hard", "aiStyle": "cautious" },
+      "setup": { "fac": [0, 1], "seed": null, "ex": { "w2": true },
+        "squads": [ [ { "p": "kael", "u": ["u_plasma", "u_tinker"] }, { "p": "tamsin", "u": [] } ],
+                    [ { "p": "kira", "u": [] }, { "p": "slate", "u": [] }, { "p": "drill", "u": [] } ] ] },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Destroy the Warden gunship and its two escorts." },
+      "hints": false,
+      "stars": [
+        { "text": "Destroy the gunship and its escorts", "test": { "k": "won" } },
+        { "text": "Lose no ships", "test": { "k": "lost", "op": "<=", "v": 0 } },
+        { "text": "Finish before round 12", "test": { "k": "rounds", "op": "<", "v": 12 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "The gunship crew plans at normal instead of hard." },
+      "unlock": [ { "type": "portrait", "id": "kira", "text": "Kira Scald portrait" } ]
+    },
+    {
+      "id": "c9", "act": 3, "title": "Courier Run", "boss": false,
+      "intro": [
+        { "who": "quill", "text": "I carry the Rift codes. If my courier goes down, the whole run is for nothing." },
+        { "who": "brecken", "text": "\"Wailer\" and his screaming wing are hunting her. Keep Quill alive." },
+        { "who": "wailer", "text": "Find the courier! Everyone near me, roll again and roll true!" }
+      ],
+      "outro": [
+        { "who": "quill", "text": "Codes delivered. The blockade's gate will open for us." },
+        { "who": "brecken", "text": "Then there is only Castigan left." }
+      ],
+      "opponent": { "name": "\"Wailer\"", "portrait": "camp-wailer.webp", "emoji": "📢", "cast": "wailer",
+        "personality": "Loud wing leader who keeps his swarm tight and hunts the weakest ship.",
+        "aiLevel": "hard", "aiStyle": "bold" },
+      "setup": { "fac": [0, 1], "seed": null, "ex": { "w1": true, "w3": true },
+        "squads": [ [ { "p": "quill", "u": [] }, { "p": "kael", "u": [] }, { "p": "garrick", "u": [] } ],
+                    [ { "p": "wailer", "u": [] }, { "p": "gutter", "u": [] }, { "p": "shiv", "u": [] }, { "p": "onyx", "u": [] } ] ] },
+      "twist": { "id": "protect-lead", "param": 1, "pilot": "quill", "text": "Mission rule: if Quill Marren's courier is destroyed, the mission fails." },
+      "goal": { "type": "custom", "value": null, "text": "Destroy all four Armada fighters with Quill Marren still flying." },
+      "hints": false,
+      "stars": [
+        { "text": "Win with Quill Marren still flying", "test": { "k": "won" } },
+        { "text": "Lose no ships", "test": { "k": "lost", "op": "<=", "v": 0 } },
+        { "text": "Finish before round 12", "test": { "k": "rounds", "op": "<", "v": 12 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "The swarm plans at normal and the courier may be lost." },
+      "unlock": [ { "type": "portrait", "id": "quill", "text": "Quill Marren portrait" }, { "type": "title", "id": "escort", "text": "Title: Shepherd of the Rift" } ]
+    },
+    {
+      "id": "c10", "act": 3, "title": "The Dark Lord", "boss": true,
+      "intro": [
+        { "who": "brecken", "text": "Lord Castigan leads in person: two actions every turn, and now a reinforced hull." },
+        { "who": "brecken", "text": "Take down his wingmen first, or catch him at range 1. Do not chase him alone." },
+        { "who": "castigan", "text": "The Compact sends a convoy guard to my Rift. How very brave." },
+        { "who": "kael", "text": "Wren, Tamsin, on me. This ends today." }
+      ],
+      "outro": [
+        { "who": "castigan", "text": "Retreat. All ships, retreat. This is not over, Varro." },
+        { "who": "brecken", "text": "The Rift is ours and the convoy is home. Well flown, all of you." }
+      ],
+      "opponent": { "name": "Lord Castigan", "portrait": "camp-castigan.webp", "emoji": "👁️", "cast": "castigan",
+        "personality": "Cold and exact. Never takes a risk he does not need and always finishes a crippled ship.",
+        "aiLevel": "hard", "aiStyle": "balanced",
+        "taunt": "Kneel, Varro. The Rift belongs to the Armada.",
+        "praise": "You have earned this sector, pilot. Enjoy it while it lasts." },
+      "setup": { "fac": [0, 1], "seed": null, "ex": { "w1": true, "w2": true },
+        "squads": [ [ { "p": "kael", "u": ["u_plasma", "u_tinker"] }, { "p": "wren", "u": [] }, { "p": "tamsin", "u": [] } ],
+                    [ { "p": "castigan", "u": [] }, { "p": "varn", "u": [] }, { "p": "wailer", "u": [] }, { "p": "squallsq", "u": [] } ] ] },
+      "twist": { "id": "ace-shields", "param": 2, "pilot": "castigan", "text": "Boss rule: Lord Castigan's Talon Prime has 2 extra shields." },
+      "goal": { "type": "win", "value": null, "text": "Destroy Lord Castigan and his three escorts." },
+      "hints": false,
+      "stars": [
+        { "text": "Destroy Castigan and his escorts", "test": { "k": "won" } },
+        { "text": "Lose at most 1 ship", "test": { "k": "lost", "op": "<=", "v": 1 } },
+        { "text": "Finish before round 12", "test": { "k": "rounds", "op": "<", "v": 12 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Castigan's wing plans at normal and loses the extra shields." },
+      "unlock": [ { "type": "portrait", "id": "castigan", "text": "Lord Castigan portrait" }, { "type": "cardback", "id": "rift-crown", "text": "Card back: The Rift Crown" }, { "type": "title", "id": "rift-ace", "text": "Title: Ace of the Crown Rift" } ]
+    }
+  ]
+}

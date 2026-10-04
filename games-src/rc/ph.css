@@ -1,0 +1,135 @@
+
+/* ===== phone (html.ph): the island first; a slim icon bar + one status chip; pop-ups and ONE card at a time in the free zone under (portrait) / beside (landscape) the island ===== */
+html.ph .gx-app{padding:var(--sat,0px) var(--sar,0px) 0 var(--sal,0px)}
+html.ph .gx-main{display:contents}
+html.ph.ph-p .gx-app{grid-template-columns:minmax(0,1fr);grid-template-rows:44px var(--bh) auto minmax(0,1fr)}
+html.ph.ph-l .gx-app{grid-template-columns:var(--bw) minmax(0,1fr);grid-template-rows:44px auto minmax(0,1fr)}
+html.ph .gx-bar{grid-row:1;height:44px;min-height:44px;padding:0 4px;gap:4px;overflow:visible;align-items:center;border-bottom:1px solid var(--line)}
+html.ph .gx-bar h1,html.ph .gx-bar .gx-sp{display:none}
+html.ph .gx-bar .gx-ibtn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;flex:0 0 auto;border-radius:10px}
+html.ph .gx-bar .gx-ibtn span{display:none}
+html.ph .gx-bar .gx-ibtn svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+html.ph.ph-p .gx-bar [data-gx="campd"]{display:none}
+html.ph.ph-p .gx-board{grid-row:2;grid-column:1}
+html.ph.ph-p #phview{grid-row:3;grid-column:1}
+html.ph.ph-p .gx-dock{grid-row:4;grid-column:1}
+html.ph.ph-l .gx-board{grid-column:1;grid-row:1/4}
+html.ph.ph-l .gx-bar{grid-column:2}
+html.ph.ph-l #phview{grid-row:2;grid-column:2}
+html.ph.ph-l .gx-dock{grid-row:3;grid-column:2;border-left:1px solid #b99f67}
+/* more menu: a drop-down on phones in both orientations */
+html.ph .menub{display:inline-flex!important}
+html.ph .more{display:none;position:fixed;right:calc(var(--sar,0px) + 6px);top:calc(var(--sat,0px) + 46px);z-index:45;flex-direction:column;align-items:stretch;gap:4px;padding:8px;border-radius:12px;background:#101c27;border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.5);max-height:calc(100dvh - var(--sat,0px) - 52px);overflow:auto}
+html.ph .more.open{display:flex}
+html.ph .more .gx-ibtn{width:auto!important;min-width:44px;padding:0 12px!important;justify-content:flex-start;font-size:15px}
+html.ph .more .gx-ibtn span{display:inline!important}
+/* status chip */
+#phchip{display:none}
+html.ph #phchip:not([hidden]){display:inline-flex;flex:1 1 auto;min-width:0;width:auto!important;justify-content:flex-start;gap:9px;padding:0 10px!important;font:700 15px/1 var(--sans);white-space:nowrap;overflow:hidden}
+html.ph #phchip b{color:var(--amber2)}html.ph #phchip .bad{color:#ff9b8f}html.ph #phchip.warn{border-color:#e0625c}
+html.ph #phchip[aria-expanded]{}
+html.ph .gx-bar #phchip{order:-1}
+#phview{display:none}
+html.ph #phview:not([hidden]){display:flex;align-items:center;gap:4px;padding:0 4px;min-height:44px;background:#0b1620;border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--ink)}
+html.ph #phview #phlabel{flex:1;min-width:0;padding:0 8px;font:600 14px/1.2 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph.ph-l #phview #phlabel{display:none}
+html.ph #phview .gx-ibtn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;flex:0 0 auto;border-color:var(--line);background:var(--slate);color:var(--ink)}
+html.ph #phview .gx-ibtn svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
+html.ph #phview .gx-ibtn[aria-pressed="true"]{background:var(--amber);color:#2b1a05}
+html.ph #phview #phchip{flex:1 1 auto}
+/* the island: no floating labels; small place numbers; a tile tap opens a pop-up */
+html.ph #chip{display:none}
+html.ph #labels .tl{pointer-events:none;padding:0;border:0;background:none;box-shadow:none;min-width:0;opacity:.95}
+html.ph #labels .tl::after{display:none}
+html.ph #labels .tl b{font-size:0;display:block}
+html.ph #labels .tl .pn{font:700 13px/20px var(--sans);min-width:20px;height:20px;padding:0 3px;margin:0;border-radius:50%;text-align:center;background:rgba(20,14,6,.78);color:#fff4d8;box-shadow:0 0 0 1px rgba(255,220,160,.5)}
+html.ph #labels .tl.far .pn{background:rgba(10,18,28,.75);color:#ffe7b8}
+html.ph #labels .tl.sel .pn,html.ph #labels .tl.pulse .pn{background:var(--amber);color:#2b1a05;transform:scale(1.35)}
+html.ph #c3{touch-action:none}
+/* the free zone */
+html.ph .gx-dock{display:flex;flex-direction:column;position:relative;min-height:0;height:auto!important;max-height:none!important;border:0;border-radius:0;box-shadow:none;visibility:visible!important;padding-bottom:var(--sab,0px);font-size:15px}
+html.ph .gx-app:not(.gx-dock-min) .gx-dock,html.ph .gx-app.gx-sheet-full:not(.gx-dock-min) .gx-dock{height:auto!important}
+html.ph.ph-l .gx-dock{border-top:0}
+html.ph .gx-dock-head,html.ph #roadmap,html.ph #hud{display:none!important}
+html.ph .gx-dock-body{display:block!important;flex:1 1 auto;min-height:0;overflow:auto;padding:8px 10px;order:2}
+html.ph .gx-dock[data-ph="plan2"] .gx-dock-body{display:none!important}
+html.ph #dockmsg{order:1;margin:6px 8px 0;font-size:14px;max-height:5.5em}
+html.ph #step{order:4;padding:6px 8px;padding-bottom:6px;flex:0 0 auto}
+html.ph #step .st-t{font-size:14px;line-height:1.25;max-height:3.8em;overflow:hidden}
+html.ph #step .st-b{display:flex;flex-wrap:wrap;gap:6px}
+html.ph #step .st-b .btn{flex:1 1 auto;min-height:44px;padding:0 10px}
+html.ph #step .st-b .btn.go{flex:2 1 120px}
+html.ph .gx-dock .btn,html.ph .gx-dock .chip,html.ph .gx-dock .cat,html.ph .gx-dock .pw,html.ph .gx-dock summary,html.ph .gx-dock .scene button,html.ph #modal.phcard .btn{min-height:44px}
+html.ph .gx-dock .btn.xs,html.ph .gx-dock .btn.sm{min-height:44px;font-size:14px;padding:0 12px}
+html.ph .gx-dock .btn.add,html.ph .zc .btn.add{width:44px;height:44px;flex:0 0 auto}
+html.ph .gx-dock .chip{font-size:14px;padding:0 12px 0 6px}html.ph .gx-dock .chip.placed{font-size:14px;min-height:44px}
+html.ph .gx-dock .chk{min-height:44px;display:flex;align-items:center;gap:8px;font-size:14px}html.ph .gx-dock .chk input,html.ph .gx-dock input[type=checkbox]{width:26px;height:26px;flex:0 0 auto}
+html.ph .gx-dock .wz-steps{display:none}
+html.ph .gx-dock small,html.ph .gx-dock .rs,html.ph .gx-dock .jt span{font-size:13px}
+/* the one card: story scenes. Continue stays in view. */
+html.ph #story{margin:0;border-radius:12px;max-height:none}
+html.ph #story .scene{padding:10px 12px 0}
+html.ph #story .phead p,html.ph #story .phead .qk{display:none}
+html.ph #story .phead{padding:4px 10px;margin:0 0 6px}
+html.ph #story .scene h2{font-size:1.3rem}
+html.ph #story .story{font-size:1rem;line-height:1.4}
+html.ph #story .sctl{position:sticky;bottom:-8px;margin:8px -12px 0;padding:8px 12px calc(8px);background:linear-gradient(rgba(246,236,210,0),#f1e4c0 28%);z-index:2}
+html.ph #story .sctl .btn{flex:1 1 auto;min-height:44px}html.ph #story .sctl .btn.go{flex:2 1 150px}
+html.ph #story .opts .btn.opt{min-height:48px;font-size:15px}
+html.ph #story .prog{display:none}
+/* plan step 2: the strip */
+#ps{display:none}
+html.ph .gx-dock[data-ph="plan2"] #ps:not([hidden]){display:block;order:2;flex:1 1 auto;min-height:0;overflow:auto;padding:8px 10px;overscroll-behavior:contain}
+html.ph #ps .ps-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}html.ph #ps .ps-h b{font:1.1rem var(--title)}html.ph #ps .ps-h span{font-size:13px;color:#5b4a2c}
+html.ph #ps .pawnrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:6px;margin:0 0 8px}
+html.ph #ps .pw,html.ph #ppop .pw{min-height:48px;padding:4px 8px;border-radius:10px}html.ph .pw span{font-size:14px}html.ph .pw small{font-size:13px;max-width:none}
+html.ph #ps .pw i,html.ph #ppop .pw i{width:20px;height:20px}
+html.ph #ps .ps-go{width:100%;font-size:16px}html.ph #ps .ps-hint{margin:4px 0 8px;font-size:14px;color:#5b4a2c}
+html.ph #ps .ps-t{font:1rem var(--title);margin:8px 0 4px;color:#5a4320}
+html.ph #ps .pl{grid-template-columns:28px minmax(0,1fr)}
+/* pop-ups */
+#ppop{display:none}
+html.ph #ppop:not([hidden]){display:flex;flex-direction:column;position:absolute;inset:0;z-index:8;background:linear-gradient(var(--paper),var(--paper2));color:#2a2014;animation:pageIn .2s ease-out}
+html.ph #ppop .pp-h{display:flex;align-items:center;gap:6px;padding:0 4px 0 12px;min-height:48px;border-bottom:1px solid rgba(90,67,32,.3);flex:0 0 auto;background:#2a2014;color:#fff4d8}
+html.ph #ppop .pp-h b{flex:1;min-width:0;font:1.05rem var(--title);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html.ph #ppop .pp-x{width:44px;height:44px;font-size:1.7rem;background:transparent;border:0;color:#fff4d8}
+html.ph #ppop .pp-b{flex:1 1 auto;min-height:0;overflow:auto;padding:8px 10px 12px;overscroll-behavior:contain}
+html.ph #ppop .ti{margin:0 0 8px;padding:8px 10px;border-radius:10px;background:#fff6dc;border:1px solid #d9b46a}html.ph #ppop .ti p{margin:3px 0 0;font-size:14px}
+html.ph #ppop .tp-for{margin:6px 0;font-size:14px}
+html.ph #ppop .job{padding:8px 4px}html.ph #ppop .job .jt b{font-size:15px}html.ph #ppop .job.rec1{background:#fff1cf;border-radius:10px;outline:2px solid #d98a1e}
+html.ph #ppop .star{text-decoration:none;font:700 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:#fff;background:#d98a1e;border-radius:6px;padding:1px 6px;margin-right:4px}
+html.ph #ppop .cats{grid-template-columns:repeat(3,minmax(0,1fr))}html.ph #ppop .cat{min-height:56px;font-size:13px}html.ph #ppop .cat small{font-size:12px}
+html.ph #ppop .rec .rb{display:grid;gap:6px;margin-top:6px}html.ph #ppop .rec .rb .btn{width:100%;white-space:normal}
+html.ph #ppop .qpick .btn{min-height:44px}
+html.ph #ppop #hud{display:grid!important;background:#2a2014;color:#f4ecd8;border-radius:10px;padding:8px 10px;margin:0 0 10px}
+html.ph #ppop #hud .hud-l,html.ph #ppop #hud .hud-r{display:grid!important;gap:6px}html.ph #ppop #hud .goal{display:block!important;font-size:14px;margin-top:6px}
+html.ph #ppop #hud .rtrack,html.ph #ppop #hud .fc,html.ph #ppop #hud .rleg,html.ph #ppop #hud .phases{display:flex!important}html.ph #ppop #hud .phases{flex-wrap:wrap;gap:4px}
+html.ph #ppop #hud .hk{font-size:15px}html.ph #ppop #hud .hk em{font-size:12px}html.ph #ppop #hud .rleg,html.ph #ppop #hud .lf small{font-size:13px}
+html.ph #ppop .pp-camp{margin-top:8px}html.ph #ppop .pp-camp .btn{width:100%}
+/* enlarged card */
+#pzoom{display:none}
+html.ph #pzoom:not([hidden]){display:flex;position:fixed;inset:0;z-index:60;background:rgba(3,8,12,.7);align-items:center;justify-content:center;padding:calc(var(--sat,0px) + 12px) calc(var(--sar,0px) + 12px) calc(var(--sab,0px) + 12px) calc(var(--sal,0px) + 12px)}
+html.ph #pzoom .zc{position:relative;width:min(100%,520px);max-height:100%;overflow:auto;border-radius:16px;padding:18px 16px 16px;background:linear-gradient(#f8eed4,#ead9ae);border:2px solid #b99f67;color:#2a2014;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+html.ph #pzoom .zc-x{position:absolute;right:4px;top:4px;width:44px;height:44px;font-size:1.7rem;background:transparent;border:0;color:#5a4320}
+html.ph #pzoom .zc-b{display:flex;flex-direction:column;gap:10px;padding-right:36px;font-size:16px;line-height:1.4}
+html.ph #pzoom .zc-b .jt b,html.ph #pzoom .zc-b .rn,html.ph #pzoom .zc-b h4{font:1.35rem/1.15 var(--title);display:block}
+html.ph #pzoom .zc-b .jt span,html.ph #pzoom .zc-b .rs,html.ph #pzoom .zc-b p{font-size:16px;color:#3b2d17}
+html.ph #pzoom .zc-b .job,html.ph #pzoom .zc-b .row{display:flex;flex-direction:column;align-items:stretch;gap:12px;border:0;background:none}
+html.ph #pzoom .zc-b .btn{width:100%;min-height:48px;font-size:16px;border-radius:12px}html.ph #pzoom .zc-b .btn.add{width:100%;height:48px;border-radius:12px}
+html.ph #pzoom .zc-b .tag{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:#8a6a2a}
+/* game over: a card in the free zone */
+html.ph #modal.phcard{inset:auto;left:var(--dz-l);top:var(--dz-t);width:var(--dz-w);height:var(--dz-h);padding:0;display:block;background:linear-gradient(var(--paper),var(--paper2));backdrop-filter:none;overflow:auto;z-index:12}
+html.ph #modal.phcard .mbox{max-width:none;max-height:none;border:0;border-radius:0;box-shadow:none;animation:none;padding:12px 14px calc(12px + var(--sab,0px));background:none}
+html.ph #modal.phcard .mb{display:grid;gap:6px}html.ph #modal.phcard .mb .btn{width:100%;min-height:48px}
+/* the other modals (setup, lobby) and drawers fit the phone */
+html.ph #modal:not(.phcard){padding:calc(var(--sat,0px) + 6px) calc(var(--sar,0px) + 6px) calc(var(--sab,0px) + 6px) calc(var(--sal,0px) + 6px)}
+html.ph #modal:not(.phcard) .mbox{max-height:calc(100dvh - var(--sat,0px) - var(--sab,0px) - 12px);padding:14px 12px}
+html.ph #modal .btn,html.ph #modal button.scen,html.ph #modal .cp,html.ph #modal .dpick,html.ph #modal .ctl2 button{min-height:44px}
+html.ph .gx-drawer{height:min(88dvh,calc(100dvh - var(--sat,0px) - 8px));max-height:none;padding-bottom:var(--sab,0px)}
+html.ph.ph-l .gx-drawer{left:auto;right:0;top:calc(var(--sat,0px));bottom:0;height:auto;width:min(560px,calc(100vw - var(--sal,0px) - 60px));transform:translateX(105%);border-radius:var(--gx-radius) 0 0 var(--gx-radius)}
+html.ph.ph-l .gx-drawer.on{transform:none}
+html.ph .gx-drawer .gx-x{width:44px;height:44px}
+html.ph .gx-drawer .btn,html.ph .gx-drawer .ctabs button,html.ph .gx-drawer summary{min-height:44px}
+html.ph .gx-drawer .row{min-height:44px}
+html.ph #cardsbody .card{cursor:pointer}
+html.ph .gfxpop button{min-height:44px}

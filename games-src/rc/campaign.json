@@ -1,0 +1,296 @@
+{
+  "game": "shipwreck",
+  "title": "The Log of the Gull's Wake",
+  "version": 1,
+  "cast": {
+    "log":       { "name": "The Ship's Log", "portrait": "camp-log.webp", "emoji": "📓", "color": "#7a5a34" },
+    "carpenter": { "name": "The Carpenter", "portrait": "camp-carpenter.webp", "emoji": "🪚", "color": "#8a5a2b" },
+    "cook":      { "name": "The Cook", "portrait": "camp-cook.webp", "emoji": "🍲", "color": "#b5462e" },
+    "explorer":  { "name": "The Explorer", "portrait": "camp-explorer.webp", "emoji": "🧭", "color": "#2f6f6a" },
+    "soldier":   { "name": "The Soldier", "portrait": "camp-soldier.webp", "emoji": "🛡️", "color": "#4b5563" },
+    "friday":    { "name": "Friday", "portrait": "camp-friday.webp", "emoji": "🧑🏾", "color": "#a0702a" },
+    "ada":       { "name": "Ada", "portrait": "camp-ada.webp", "emoji": "🧕", "color": "#3f6fa8" },
+    "hunger":    { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "🦴", "color": "#9c7a3c" },
+    "rain":      { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "🌧️", "color": "#4a6a8a" },
+    "prowlers":  { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "🐆", "color": "#5b4a2e" },
+    "horizon":   { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "🌅", "color": "#c9853a" },
+    "whisper":   { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "🌫️", "color": "#7d8a94" },
+    "altar":     { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "🕯️", "color": "#5a2d4a" },
+    "shroud":    { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "👁️", "color": "#3b3f4a" },
+    "gale":      { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "🌪️", "color": "#36506b" },
+    "winter":    { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "❄️", "color": "#6f8fa8" },
+    "undertow":  { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "🌊", "color": "#1f4e6e" }
+  },
+  "acts": [
+    { "act": 1, "title": "Washed Ashore", "blurb": "Eat, build a roof, look around, and light the signal fire." },
+    { "act": 2, "title": "The Hexed Isle", "blurb": "Something on this island keeps the ships away. Break its hold." },
+    { "act": 3, "title": "The Way Home", "blurb": "A gale, a hard season, and one friend still out on the rocks." }
+  ],
+  "twists": [
+    { "id": "early-threat", "where": "setup", "how": "After newGame, put the top card of G.ev.deck into the left threat slot (G.ev.threat[0]), so its threat effect fires when the round-2 event pushes it off." },
+    { "id": "low-morale", "where": "setup", "how": "After newGame, set G.morale to -param (morale still stays inside the normal -3..+3 track)." },
+    { "id": "ada-adrift", "where": "setup", "how": "After the Stranded Friend scenario setup, set G.sc.ada to param, so Ada starts that many wounds down on the rock." }
+  ],
+  "chapters": [
+    {
+      "id": "c1", "act": 1, "title": "Driftwood Dawn", "boss": false,
+      "intro": [
+        { "who": "log", "text": "Day one. The Gull's Wake broke on the reef in the night. Two of us made it to the sand." },
+        { "who": "cook", "text": "Before anything clever: everyone eats one food each night, or takes two wounds." },
+        { "who": "carpenter", "text": "Then let's gather food today and keep our hands whole. Friday and the dog will help." }
+      ],
+      "outro": [
+        { "who": "log", "text": "Three nights, three meals, nobody lost. The beach almost feels like a camp." }
+      ],
+      "opponent": { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "🦴", "cast": "hunger",
+        "personality": "Quiet and patient. It only bites at night, and only if the food pile is empty.",
+        "aiLevel": "easy", "aiStyle": "starvation" },
+      "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
+      "twist": null,
+      "goal": { "type": "custom", "value": { "surviveDays": 3 }, "text": "Survive to the end of day 3 with everyone alive." },
+      "hints": true,
+      "stars": [
+        { "text": "Survive to the end of day 3", "test": { "k": "won" } },
+        { "text": "Take 3 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 3 } },
+        { "text": "End with at least 1 food in camp", "test": { "k": "food", "op": ">=", "v": 1 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "items": 4, "dog": true }, "maxStars": 2, "text": "Same gentle island; the coach points at the food every morning." },
+      "unlock": [ { "type": "portrait", "id": "carpenter", "text": "The Carpenter's portrait" }, { "type": "portrait", "id": "cook", "text": "The Cook's portrait" } ]
+    },
+    {
+      "id": "c2", "act": 1, "title": "A Roof Overhead", "boss": false,
+      "intro": [
+        { "who": "log", "text": "Day four. Rain clouds over the ridge. Sleeping in the open costs a wound every night." },
+        { "who": "carpenter", "text": "Wood is everything here. Gather it, then put two of us on the Shelter to make it a sure thing." },
+        { "who": "cook", "text": "Two pawns on one build is a sure success. One pawn rolls the dice." }
+      ],
+      "outro": [
+        { "who": "carpenter", "text": "Walls and a floor. The rain can drum on it all it likes." }
+      ],
+      "opponent": { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "🌧️", "cast": "rain",
+        "personality": "Grey and steady. Ruins food and wood that sits above the roof.",
+        "aiLevel": "easy", "aiStyle": "weather" },
+      "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
+      "twist": null,
+      "goal": { "type": "custom", "value": { "build": "shelter", "byDay": 5 }, "text": "Build the Shelter before the end of day 5." },
+      "hints": true,
+      "stars": [
+        { "text": "Build the Shelter by day 5", "test": { "k": "won" } },
+        { "text": "Have it built by day 4", "test": { "k": "rounds", "op": "<=", "v": 4 } },
+        { "text": "Take 4 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 4 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "items": 4, "dog": true }, "maxStars": 2, "text": "The coach reminds you to stack wood first, then build." },
+      "unlock": [ { "type": "portrait", "id": "friday", "text": "Friday's portrait" } ]
+    },
+    {
+      "id": "c3", "act": 1, "title": "Beyond the Treeline", "boss": false,
+      "intro": [
+        { "who": "log", "text": "Day seven. The beach is picked clean. We need to know what else this island holds." },
+        { "who": "carpenter", "text": "Exploring finds new tiles with food, wood and shelter. Two tiles out costs one more pawn." },
+        { "who": "cook", "text": "Mind the eyes in the dark. Something hunts out there, and it will notice us." }
+      ],
+      "outro": [
+        { "who": "log", "text": "A river, a ridge, a grove of good timber. And tracks we will not follow alone." }
+      ],
+      "opponent": { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "🐆", "cast": "prowlers",
+        "personality": "Curious and hungry. They wait at the edge of every new tile you uncover.",
+        "aiLevel": "easy", "aiStyle": "beasts" },
+      "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
+      "twist": null,
+      "goal": { "type": "custom", "value": { "explored": 4, "byDay": 6 }, "text": "Have 4 island tiles explored (3 new ones) before the end of day 6." },
+      "hints": true,
+      "stars": [
+        { "text": "Explore 4 tiles by day 6", "test": { "k": "won" } },
+        { "text": "Explore 5 tiles or more", "test": { "k": "explored", "op": ">=", "v": 5 } },
+        { "text": "Take 5 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 5 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "items": 4, "dog": true }, "maxStars": 2, "text": "The coach marks the closest unexplored space each morning." },
+      "unlock": [ { "type": "portrait", "id": "prowlers", "text": "The Night Prowlers' portrait" } ]
+    },
+    {
+      "id": "c4", "act": 1, "title": "Smoke on the Hill", "boss": true,
+      "intro": [
+        { "who": "log", "text": "Day ten. A sail passed far out this morning and never turned. We need a fire they can see." },
+        { "who": "carpenter", "text": "Build Fire, then stack the signal pile: 1, 2, 3, 4, 5 wood, one stage a day. Fifteen in all." },
+        { "who": "horizon", "text": "Sail after sail will pass you by. I am very good at being empty." }
+      ],
+      "outro": [
+        { "who": "log", "text": "The ship turned. But her captain swore she'd seen grey fog wrap the island like a hand." },
+        { "who": "log", "text": "She took our letters and promised to return. Then she sailed. The fog came in that night." }
+      ],
+      "opponent": { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "🌅", "cast": "horizon",
+        "personality": "Calm and vast. It never attacks; it simply lets the days run out.",
+        "aiLevel": "easy", "aiStyle": "time-pressure",
+        "taunt": "Day twelve is over. Nothing on the water but me.",
+        "praise": "A column of smoke, and a ship that turns. Fine. I was never yours to keep." },
+      "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
+      "twist": null,
+      "goal": { "type": "mission", "value": "marooned", "text": "Marooned: have Fire and a full 15-wood signal pile in round 10, 11 or 12." },
+      "hints": true,
+      "stars": [
+        { "text": "Get rescued", "test": { "k": "won" } },
+        { "text": "Take 8 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 8 } },
+        { "text": "Finish with morale 0 or higher", "test": { "k": "morale", "op": ">=", "v": 0 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "items": 4, "dog": true, "friday": true }, "maxStars": 2, "text": "The coach watches the signal pile and tells you when a stage is due." },
+      "unlock": [ { "type": "act", "id": "2", "text": "Act 2: The Hexed Isle" }, { "type": "title", "id": "signal-keeper", "text": "Title: Signal Keeper" }, { "type": "portrait", "id": "horizon", "text": "The Empty Horizon's portrait" } ]
+    },
+    {
+      "id": "c5", "act": 2, "title": "Strange Crosses", "boss": false,
+      "intro": [
+        { "who": "log", "text": "The fog has not lifted in a week. The cook found old crosses carved into the cliff." },
+        { "who": "cook", "text": "Every tale I know says the same: crosses on five different tiles break a curse like this." },
+        { "who": "whisper", "text": "Plant your sticks. I will sit on your best ground and make every step cost double." }
+      ],
+      "outro": [
+        { "who": "carpenter", "text": "Two crosses up, and the fog thinned a hand's width. It can be beaten." }
+      ],
+      "opponent": { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "🌫️", "cast": "whisper",
+        "personality": "Sly. Book events bring fog onto tiles, and fog makes every action there cost one more pawn.",
+        "aiLevel": "normal", "aiStyle": "fog" },
+      "setup": { "scen": "hexed", "chars": ["carpenter", "cook"], "friday": true, "dog": false, "items": 2, "diff": "standard" },
+      "twist": null,
+      "goal": { "type": "custom", "value": { "crosses": 2, "byDay": 6 }, "text": "Raise 2 crosses on different tiles before the end of day 6." },
+      "hints": false,
+      "stars": [
+        { "text": "Raise 2 crosses by day 6", "test": { "k": "won" } },
+        { "text": "Raise 3 crosses", "test": { "k": "crosses", "op": ">=", "v": 3 } },
+        { "text": "Take 6 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 6 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "diff": "easy", "items": 4, "dog": true }, "maxStars": 2, "text": "Fewer book events (less fog), the dog joins and you start with 4 items." },
+      "unlock": [ { "type": "portrait", "id": "whisper", "text": "The Whispering Fog's portrait" } ]
+    },
+    {
+      "id": "c6", "act": 2, "title": "The Dark Temple", "boss": false,
+      "intro": [
+        { "who": "log", "text": "The explorer walked out of the fog this morning. She'd been lost since the wreck." },
+        { "who": "explorer", "text": "There is a temple up in the hills. Whatever holds this island, it keeps its treasures there." },
+        { "who": "altar", "text": "Come in, come in. Pay the altar in blood, and the temple pays you back. Maybe." }
+      ],
+      "outro": [
+        { "who": "explorer", "text": "Old tools, a bell, a blade. The temple gave more than it took. This time." }
+      ],
+      "opponent": { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "🕯️", "cast": "altar",
+        "personality": "Greedy and theatrical. Totems reveal the temple, a wounding altar and hideouts full of fog.",
+        "aiLevel": "normal", "aiStyle": "totems" },
+      "setup": { "scen": "hexed", "chars": ["carpenter", "cook", "explorer"], "friday": false, "dog": false, "items": 2, "diff": "standard" },
+      "twist": null,
+      "goal": { "type": "custom", "value": { "temple": true, "crosses": 3, "byDay": 8 }, "text": "Search the dark temple and raise 3 crosses before the end of day 8." },
+      "hints": false,
+      "stars": [
+        { "text": "Temple searched and 3 crosses by day 8", "test": { "k": "won" } },
+        { "text": "Explore 6 tiles or more", "test": { "k": "explored", "op": ">=", "v": 6 } },
+        { "text": "Take 8 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 8 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "diff": "easy", "items": 4 }, "maxStars": 2, "text": "Fewer book events and 4 starting items." },
+      "unlock": [ { "type": "portrait", "id": "explorer", "text": "The Explorer's portrait" }, { "type": "table", "id": "temple-ruins", "text": "Table skin: Temple Ruins" } ]
+    },
+    {
+      "id": "c7", "act": 2, "title": "The Fifth Cross", "boss": true,
+      "intro": [
+        { "who": "log", "text": "The soldier came down from the hideouts with a rusted musket and no memory of the last month." },
+        { "who": "soldier", "text": "Five crosses, five tiles. I'll keep the beasts off whoever is carrying the wood." },
+        { "who": "shroud", "text": "I have kept this island for a hundred years. I already took the edge of your first night." }
+      ],
+      "outro": [
+        { "who": "log", "text": "The fifth cross went up at dusk. The fog lifted like a curtain, and out on the reef we saw her:" },
+        { "who": "ada", "text": "Hello the shore! I've been on this rock for days. Please, a boat!" }
+      ],
+      "opponent": { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "👁️", "cast": "shroud",
+        "personality": "Old, cold and certain. It spreads fog, wakes the altar, and lets the clock do the rest.",
+        "aiLevel": "normal", "aiStyle": "curse",
+        "taunt": "Ten days, and still the island is mine. Lie down in the fog.",
+        "praise": "Five crosses. The bell rings and I go quiet. You earned your sky." },
+      "setup": { "scen": "hexed", "chars": ["carpenter", "explorer", "soldier"], "friday": false, "dog": false, "items": 2, "diff": "standard" },
+      "twist": { "id": "early-threat", "param": 1, "text": "Boss rule: the Grey Shroud starts with an event card already in the left threat slot. It fires on day 2 unless you deal with it." },
+      "goal": { "type": "mission", "value": "hexed", "text": "The Hexed Isle: raise a cross on five different tiles within 10 rounds." },
+      "hints": false,
+      "stars": [
+        { "text": "Break the curse", "test": { "k": "won" } },
+        { "text": "Do it by round 9", "test": { "k": "rounds", "op": "<=", "v": 9 } },
+        { "text": "Take 8 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 8 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "diff": "easy", "items": 4 }, "maxStars": 2, "text": "No early threat, fewer book events and 4 starting items." },
+      "unlock": [ { "type": "act", "id": "3", "text": "Act 3: The Way Home" }, { "type": "portrait", "id": "soldier", "text": "The Soldier's portrait" }, { "type": "cardback", "id": "cross", "text": "Card back: Driftwood Cross" } ]
+    },
+    {
+      "id": "c8", "act": 3, "title": "Signal in the Gale", "boss": false,
+      "intro": [
+        { "who": "log", "text": "Ada is alive out there, but no raft of ours would survive the autumn sea. We signal again." },
+        { "who": "carpenter", "text": "Same fire, same 15-wood pile. But the weather turns ugly and we kept only one useful item." },
+        { "who": "gale", "text": "Stack your wood. I like a tall pile; it's more to scatter." }
+      ],
+      "outro": [
+        { "who": "log", "text": "The ship came, but the sea was too high to land. She dropped crates and a promise: spring." }
+      ],
+      "opponent": { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "🌪️", "cast": "gale",
+        "personality": "Loud and wasteful. More book events, more storms, and nothing kept dry for long.",
+        "aiLevel": "hard", "aiStyle": "storms" },
+      "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": false, "items": 1, "diff": "hard" },
+      "twist": null,
+      "goal": { "type": "mission", "value": "marooned", "text": "Marooned on Harder: Fire and a full 15-wood signal pile in round 10, 11 or 12." },
+      "hints": false,
+      "stars": [
+        { "text": "Get the ship to turn", "test": { "k": "won" } },
+        { "text": "Take 8 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 8 } },
+        { "text": "Finish with morale 0 or higher", "test": { "k": "morale", "op": ">=", "v": 0 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "diff": "standard", "items": 2 }, "maxStars": 2, "text": "Standard book events and 2 starting items." },
+      "unlock": [ { "type": "portrait", "id": "gale", "text": "The Autumn Gale's portrait" } ]
+    },
+    {
+      "id": "c9", "act": 3, "title": "Hearth and Home", "boss": false,
+      "intro": [
+        { "who": "log", "text": "No ship till spring. Three stowaway children from the lower deck will find us before then." },
+        { "who": "cook", "text": "Each child eats 1 food a night, and if one goes hungry, we've failed. So: a real home." },
+        { "who": "winter", "text": "Bad crops, barren ground, snow on the roof. Let us see how well you plan for the lean days." }
+      ],
+      "outro": [
+        { "who": "cook", "text": "A roof, a fence, a full larder, and three small voices arguing over the last fish." },
+        { "who": "log", "text": "Spring is close. Ada is not. It's time to build a boat." }
+      ],
+      "opponent": { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "❄️", "cast": "winter",
+        "personality": "Thrifty and grim. Halves your harvest, turns land to waste and counts every mouth.",
+        "aiLevel": "hard", "aiStyle": "scarcity" },
+      "setup": { "scen": "settlers", "chars": ["carpenter", "cook", "soldier"], "friday": false, "dog": false, "items": 1, "diff": "hard" },
+      "twist": { "id": "low-morale", "param": 1, "text": "Season rule: the camp is homesick. Morale starts at -1 instead of 0." },
+      "goal": { "type": "mission", "value": "settlers", "text": "Settlers: shelter, roof, palisade and weapon at 1+, and all 9 dealt inventions within 12 rounds." },
+      "hints": false,
+      "stars": [
+        { "text": "Settle the island", "test": { "k": "won" } },
+        { "text": "Take 10 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 10 } },
+        { "text": "End with 3 or more food in camp", "test": { "k": "food", "op": ">=", "v": 3 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "diff": "standard", "items": 2 }, "maxStars": 2, "text": "Morale starts at 0, standard book events and 2 starting items." },
+      "unlock": [ { "type": "portrait", "id": "winter", "text": "The Lean Season's portrait" }, { "type": "table", "id": "homestead", "text": "Table skin: Homestead" } ]
+    },
+    {
+      "id": "c10", "act": 3, "title": "The Last Rescue", "boss": true,
+      "intro": [
+        { "who": "log", "text": "Spring storms. Ada is weaker than she was, and the sea around her rock is all teeth." },
+        { "who": "explorer", "text": "Rescue Raft first, row out and bring her in, then the Lifeboat. Two wounds a night on that rock." },
+        { "who": "undertow", "text": "She is mine already. Every night I take a little more of her." }
+      ],
+      "outro": [
+        { "who": "ada", "text": "I watched your smoke every day. I knew you would come." },
+        { "who": "log", "text": "The Lifeboat cleared the reef at dawn. Last entry from the island. We are going home." }
+      ],
+      "opponent": { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "🌊", "cast": "undertow",
+        "personality": "Cold, slow and relentless. Storms knock down your palisade while the clock runs on Ada.",
+        "aiLevel": "hard", "aiStyle": "drowning",
+        "taunt": "The rock is empty now. The sea keeps what it takes.",
+        "praise": "A lifeboat with every soul aboard. Go, then. The sea will remember you." },
+      "setup": { "scen": "stranded", "chars": ["carpenter", "cook", "explorer"], "friday": false, "dog": false, "items": 1, "diff": "hard" },
+      "twist": { "id": "ada-adrift", "param": 2, "text": "Boss rule: Ada has spent a long winter on the rock. She starts with 2 wounds." },
+      "goal": { "type": "mission", "value": "stranded", "text": "Stranded Friend: rescue Ada with the Rescue Raft and build the Lifeboat within 8 rounds." },
+      "hints": false,
+      "stars": [
+        { "text": "Sail home with Ada", "test": { "k": "won" } },
+        { "text": "Do it by round 7", "test": { "k": "rounds", "op": "<=", "v": 7 } },
+        { "text": "Ada has 6 wounds or fewer at the end", "test": { "k": "adaWounds", "op": "<=", "v": 6 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "diff": "standard", "items": 2 }, "maxStars": 2, "text": "Ada starts unhurt, standard book events and 2 starting items." },
+      "unlock": [ { "type": "portrait", "id": "ada", "text": "Ada's portrait" }, { "type": "title", "id": "homeward", "text": "Title: Homeward Bound" }, { "type": "cardback", "id": "lifeboat", "text": "Card back: The Lifeboat" } ]
+    }
+  ]
+}

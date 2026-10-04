@@ -1,0 +1,56 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1><span data-ico="bomb"></span><span class="tt">Short Fuse</span></h1>
+  <button class="jobchip" id="jobchip" data-gx="missiond" aria-expanded="false" hidden></button>
+  <span class="gx-sp"></span><span id="barstat" class="barstat" role="status"></span>
+  <button class="gx-ibtn" data-gx="missiond" aria-expanded="false" data-ico="target" title="The job card and its special rules"><span>Job</span></button>
+  <button class="gx-ibtn" data-gx="geard" aria-expanded="false" data-ico="gear" title="Equipment cards"><span>Gear</span></button>
+  <button class="gx-ibtn" data-gx="knowd" aria-expanded="false" data-ico="bulb" title="What we know"><span>Know</span></button>
+  <button class="gx-ibtn" data-gx="logd" aria-expanded="false" data-ico="scroll" title="Log"><span>Log</span></button>
+  <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" data-ico="book" title="How to play"><span>Rules</span></button>
+  <button class="gx-ibtn" data-gx="refd" aria-expanded="false" data-ico="cards" title="Every wire, token and card"><span>Cards</span></button>
+  <button class="gx-ibtn" data-gx="setd" aria-expanded="false" data-ico="menu" title="Settings: sound, music, speed, graphics, new game" aria-label="Settings"><span>Menu</span></button>
+</header>
+<div class="gx-main">
+  <main class="gx-board" id="board" aria-label="The table"><canvas id="c3" aria-label="The demolition table in 3D. Tap a glowing wire to pick it."></canvas><div id="fb" hidden aria-label="The table"></div><div id="chip" aria-hidden="true"></div><div id="feed" class="feed" role="log" aria-live="polite" aria-label="What just happened"></div><div id="hud" class="hud" role="status"></div><div id="zb" class="zb" hidden></div><button id="zpl" class="zpan l" data-ph="zpanl" hidden aria-label="Slide the rack left">&#9664;</button><button id="zpr" class="zpan r" data-ph="zpanr" hidden aria-label="Slide the rack right">&#9654;</button><button class="gx-ibtn" id="zoombtn" data-a="zoom" aria-label="Zoom the table on one crewmate's stand" hidden><span data-ico="eye"></span>Zoom</button></main>
+  <aside class="gx-dock" aria-label="What to do now">
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Short Fuse</span><button class="gx-ibtn" data-a="pause" id="pausebtn" aria-label="Pause" title="Pause / resume" hidden></button><button class="gx-ibtn" data-gx="sheet" aria-label="Resize the panel (expand, show the table, show the panel)" id="sheetbtn"><span class="lb"></span></button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel">⇥</button></div>
+    <div class="gx-dock-body" id="dockbody"><div id="netst" class="netst" hidden></div><nav id="road" class="road" aria-label="Turn order"></nav><div id="stat" class="stat"></div><div id="res" aria-live="polite"></div><div id="coach"></div><div id="tip"></div><div id="main" aria-live="polite"></div><div id="logmini" class="logmini"></div></div>
+    <div id="ps" class="ps" aria-label="Controls"></div>
+    <div id="ppop" class="ppop" hidden role="dialog" aria-label="Details"></div>
+    <div id="pc" class="pcard" hidden role="dialog" aria-label="Message"></div>
+  </aside>
+  <button class="gx-ibtn gx-reopen" data-gx="dock">☰ Panel</button>
+</div>
+</div>
+<section class="gx-drawer wide" id="missiond" role="dialog" aria-label="Job card"><div class="gx-drawer-head"><h2 data-ico="target">Job card</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="missionbody"></div></section>
+<section class="gx-drawer wide" id="geard" role="dialog" aria-label="Equipment"><div class="gx-drawer-head"><h2 data-ico="gear">Equipment</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="gearbody"></div></section>
+<section class="gx-drawer wide" id="knowd" role="dialog" aria-label="What we know"><div class="gx-drawer-head"><h2 data-ico="bulb">What we know</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="knowbody"></div></section>
+<section class="gx-drawer" id="logd" role="dialog" aria-label="Log"><div class="gx-drawer-head"><h2 data-ico="scroll">Log</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="logbody"></div></section>
+<section class="gx-drawer wide" id="rulesd" role="dialog" aria-label="How to play"><div class="gx-drawer-head"><h2 data-ico="book">How to play</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="rulesbody"></div></section>
+<section class="gx-drawer wide" id="refd" role="dialog" aria-label="Wires, tokens and cards"><div class="gx-drawer-head"><h2 data-ico="cards">Wires, tokens and cards</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="refbody"></div></section>
+<section class="gx-drawer" id="setd" role="dialog" aria-label="Settings"><div class="gx-drawer-head"><h2 data-ico="menu">Settings</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="setbody"></div></section>
+<section class="gx-drawer" id="credd" role="dialog" aria-label="Credits"><div class="gx-drawer-head"><h2 data-ico="info">Credits</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="credbody"><h3>Short Fuse</h3><p>A browser version of a co-operative deduction game about defusing bombs. Game rules and numbers follow the published game. <b>Names, card text and art are original</b>: every picture, card and token is drawn in code, and every text is our own.</p><p>Fonts: Lilita One and Nunito (Google Fonts, SIL Open Font License). 3D: three.js (MIT).</p><!--CREDITS--></div></section>
+<div id="start" role="dialog" aria-label="Start a job" hidden></div>
+<div id="netbox" hidden></div>
+<div id="live" class="sr" aria-live="polite"></div>
+<script src="shell.js"></script>
+<script src="perfhud.js"></script>
+<script src="trystero.min.js"></script>
+<script src="netroom.js"></script>
+<script src="three.min.js"></script>
+<script src="kit.js"></script>
+<script src="data.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="netstrip.js"></script>
+<script src="texts.js"></script>
+<script src="gameaudio.js"></script>
+<script src="audio-data.js"></script>
+<script src="sound.js"></script>
+<script src="net.js"></script>
+<script src="ui.js"></script>
+<script src="phone.js"></script>
+</body>
+</html>

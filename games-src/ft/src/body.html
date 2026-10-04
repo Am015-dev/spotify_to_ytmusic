@@ -1,0 +1,62 @@
+<body>
+<div class="gx-app">
+<header class="gx-bar">
+  <h1>Sands of Qamar</h1>
+  <span id="pchip" class="pchip" role="status"></span>
+  <span class="gx-sp"></span>
+  <button class="gx-ibtn zoom-btn" data-phz="toggle" aria-label="Zoom in on the board" title="Zoom (or pinch the board)">🔍</button>
+  <button class="gx-ibtn adv-btn" data-a="advise" title="What would a good player do now?"><i data-ic="bulb"></i><span>Advise me</span></button>
+  <button class="gx-ibtn nar-hide" data-gx="plrd" aria-expanded="false"><i data-ic="camel"></i><span>Players</span></button>
+  <button class="gx-ibtn" data-gx="djd" aria-expanded="false"><i data-ic="lamp"></i><span>Djinns</span></button>
+  <button class="gx-ibtn" data-gx="logd" aria-expanded="false"><i data-ic="scroll"></i><span>Log</span></button>
+  <button class="gx-ibtn nar-hide" data-gx="refd" aria-expanded="false"><i data-ic="cards"></i><span>Card list</span></button>
+  <button class="gx-ibtn nar-hide" data-gx="rulesd" aria-expanded="false"><i data-ic="book"></i><span>Rules</span></button>
+  <button class="gx-ibtn nar-hide" data-a="snd" id="sndbtn" aria-label="Sound"></button>
+  <button class="gx-ibtn nar-hide" data-a="mus" id="musbtn" aria-label="Music"></button>
+  <button class="gx-ibtn nar-hide" data-a="speed" id="speedbtn" title="How fast the computer plays"><i data-ic="fast"></i><span>normal</span></button>
+  <button class="gx-ibtn nar-hide" data-gx="setd" aria-expanded="false" aria-label="Settings" title="Settings: graphics quality, sound, speed"><i data-ic="gear"></i></button>
+  <button class="gx-ibtn" data-a="pause" id="pausebtn" hidden aria-label="Pause"><i data-ic="pause"></i></button>
+  <button class="gx-ibtn nar-show" data-gx="menud" aria-label="Menu"><i data-ic="menu"></i></button>
+  <button class="gx-ibtn nar-hide" data-a="new"><i data-ic="plus"></i><span>New game</span></button>
+</header>
+<div class="gx-main">
+  <main class="gx-board"><div class="view"><canvas id="c3" aria-label="The sultanate in 3D. Drag to turn it, scroll to zoom, tap a glowing tile to play there."></canvas><div id="map2d" hidden></div><div id="chip" aria-hidden="true"></div><div id="banner" hidden aria-live="polite"></div></div></main>
+  <aside class="gx-dock" aria-label="What to do now">
+    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet" title="Resize"></span><span class="gx-dt" id="dockt">Sands of Qamar</span><button class="gx-ibtn" data-gx="sheet" aria-label="Resize panel">↕</button><button class="gx-ibtn gx-hide-narrow" data-gx="dock" aria-label="Hide panel">⇥</button></div>
+    <div id="dockmsg" hidden role="status"></div><div class="gx-dock-body" id="dockbody"></div>
+    <div id="ps" hidden></div><div id="ppop" role="dialog" aria-label="Details" hidden></div><div id="pc" role="dialog" aria-label="Card" hidden></div>
+  </aside>
+  <button class="gx-ibtn gx-reopen" data-gx="dock">☰ Panel</button>
+</div>
+</div>
+<section class="gx-drawer wide" id="plrd" role="dialog" aria-label="Players"><div class="gx-drawer-head"><h2><i data-ic="camel"></i> Players</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="plrbody"></div></section>
+<section class="gx-drawer wide" id="djd" role="dialog" aria-label="Djinns"><div class="gx-drawer-head"><h2><i data-ic="lamp"></i> Djinns in this game</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="djbody"></div></section>
+<section class="gx-drawer" id="logd" role="dialog" aria-label="Log"><div class="gx-drawer-head"><h2><i data-ic="scroll"></i> Log</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="logbody"></div></section>
+<section class="gx-drawer wide" id="refd" role="dialog" aria-label="Card list"><div class="gx-drawer-head"><h2><i data-ic="cards"></i> Cards, tiles and tokens</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="refbody"></div></section>
+<section class="gx-drawer wide" id="rulesd" role="dialog" aria-label="Rules"><div class="gx-drawer-head"><h2><i data-ic="book"></i> How to play</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="rulesbody"></div></section>
+<section class="gx-drawer" id="menud" role="dialog" aria-label="Menu"><div class="gx-drawer-head"><h2><i data-ic="menu"></i> Menu</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body menu">
+  <button class="btn" data-gx="plrd">🐪 Players and scores</button><button class="btn" data-gx="djd">🧞 Djinns</button><button class="btn" data-gx="refd">🃏 Card list</button><button class="btn" data-gx="rulesd">📖 How to play</button>
+  <button class="btn" data-a="snd">🔊 Sound on/off</button><button class="btn" data-a="mus">🎶 Music on/off</button><button class="btn" data-a="speed">⏩ Computer speed</button><button class="btn" data-gx="setd">⚙ Settings and graphics</button><button class="btn" data-perfhud="show" aria-pressed="false">Show speed</button><button class="btn" data-perfhud="test">Test speed</button><button class="btn" data-a="new">✚ New game</button></div></section>
+<section class="gx-drawer" id="setd" role="dialog" aria-label="Settings"><div class="gx-drawer-head"><h2><i data-ic="gear"></i> Settings</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="setbody"></div></section>
+<div id="modal" hidden></div>
+<script src="shell.js"></script>
+<script src="perfhud.js"></script>
+<script src="gameaudio.js"></script>
+<script src="audio-data.js"></script>
+<script src="trystero.min.js"></script>
+<script src="netroom.js"></script>
+<script src="three.min.js"></script>
+<script src="data.js"></script>
+<script src="djinns.js"></script>
+<script src="engine.js"></script>
+<script src="ai.js"></script>
+<script src="rules-html.js"></script>
+<script src="story.js"></script>
+<script src="art3d.js"></script>
+<script src="three3d.js"></script>
+<script src="sound.js"></script>
+<script src="net.js"></script>
+<script src="ui.js"></script>
+<script src="ui8.js"></script>
+</body>
+</html>

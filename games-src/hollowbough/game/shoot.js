@@ -1,0 +1,11 @@
+const PW=require(require('child_process').execSync('npm root -g').toString().trim()+'/playwright');
+const fs=require('fs');const html=fs.readFileSync(__dirname+'/hollowbough.html');
+const [W,H,mode]=[+process.argv[2],+process.argv[3],process.argv[4]||'vs'];const touch=Math.min(W,H)<=600;
+(async()=>{const b=await PW.chromium.launch();const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:touch,hasTouch:touch,deviceScaleFactor:1});
+await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
+const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error')errs.push(m.text())});
+await p.goto('https://gns.test/');await p.waitForTimeout(600);await p.screenshot({path:`shots/s_${W}x${H}_start.png`});
+await p.evaluate(m=>{ANIM=0;AIDELAY=0;UI.noRec=false;newGame(m)},mode);await p.waitForTimeout(1500);
+await p.screenshot({path:`shots/s_${W}x${H}_a.png`});
+await p.tap?.('.mc.ok').catch(()=>{});
+console.log(JSON.stringify(errs));await b.close()})();
