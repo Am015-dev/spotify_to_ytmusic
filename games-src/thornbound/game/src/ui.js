@@ -265,7 +265,7 @@ function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=
     // supporters: little discs in the faction colour under each slot
     const n=G.np,cols=S.cols>=n?n:S.cols,rows=Math.ceil(n/cols),sw=UI.phone?44:38,sh=UI.phone?62:54,gap=6,tw=cols*sw+(cols-1)*gap,th=rows*sh+(rows-1)*gap;
     for(let s=0;s<n;s++){const sp=V.pl[s].supp,cnt=sp.r[r]+sp.x[r];if(!cnt)continue;const c=s%cols,rw=Math.floor(s/cols);const x=S.cx-tw/2+c*(sw+gap)+sw/2,y=S.cy-th/2+rw*(sh+gap)+sh+(UI.phone?10:9);
-      f.push('<g transform="translate('+x+' '+y+')"><circle r="'+(UI.phone?11:10)+'" fill="'+fcol(s)+'" stroke="#fff3c4" stroke-width="2"/><text y="5" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="'+TBKit.fonts.display+'">'+cnt+'</text></g>')}}
+      f.push('<g transform="translate('+x+' '+y+')"><circle r="'+(UI.phone?11:10)+'" fill="'+fcol(s)+'" stroke="#fff3c4" stroke-width="2"/><text y="5" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="'+TBKit.fonts.display+'">'+cnt+'</text><text class="tbx-cb" x="'+(UI.phone?15:14)+'" y="-6" font-size="14" font-weight="700" fill="#fff3c4" stroke="#000" stroke-width="3" paint-order="stroke">'+GX.mark(s)+'</text></g>')}}
   if(UI.phone&&(UI.bs||0)>=250){ // phones: the kit's banners are hidden, so every location gets a short name tag of its own
     for(let l=0;l<6;l++){const P=LOCPOS[l],name=LOCN[l],fs=36,words=name.split(' ');const lines=name.length>8&&words.length>1?[words[0],words.slice(1).join(' ')]:[name];
       const wd=Math.max(...lines.map(t=>t.length))*fs*.6+18,ht=lines.length*fs+8;const cx=Math.max(wd/2+4,Math.min(996-wd/2,P[0])),top=P[1]+52;
@@ -386,7 +386,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q
   let h='';
   h+='<div class="step" data-q="'+q.kind+'"><h3 class="st">'+esc(co&&co.title||KIND_NAME[q.kind]||titleOf(q))+'</h3>';
   if(co)h+='<p class="coach">'+gloss(co.text)+'</p>';
-  else{h+=tipLine(q.kind)+'<p class="pr">'+gloss(promptText(q))+'</p>'}
+  else{h+=tipLine(q.kind==='menu'&&menuPhase(q)?'menu:'+menuPhase(q):q.kind)+'<p class="pr">'+gloss(promptText(q))+'</p>'}
   if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Everyone decides at the same time. Still to choose: '+esc(oth.map(seatWho).join(', '))+'.</p>'}
   if(G.clash&&['day','night','tally'].includes(G.step)||G.clash&&q.kind==='location'||G.clash&&['castle','wilderness','harvest','shrine','ossuary','tie'].includes(q.kind))h+=recapHTML();
   if(!co||!co.noRec)h+=recLine(s,rm);
@@ -419,7 +419,7 @@ function placeProgress(){const me=vs();let n=0;for(const R of UI.V.reg)for(const
   const mv=me>=0?legal(me):[];const rs=[...new Set(mv.map(m=>m.r))];return 'card '+Math.min(3,n+1)+' of 3'+(rs.length===1?', for '+REG[rs[0]]:'')}
 function recLine(s,rm){if(!rm)return '';return '<p class="rec-l">'+ico('star')+'<span><b>Suggested:</b> '+esc(shortRec(rm))+' <span class="why2">'+gloss(whyFor(s,rm))+'</span></span></p>'}
 function shortRec(m){const q=G.q;if(q.kind==='bid')return cinfo(m.id).name+' ('+cinfo(m.id).strength+').';if(q.kind==='herald')return LOCN[m.loc]+'.';if(q.kind==='place'||q.kind==='tie')return m.pass?'pass.':cinfo(m.id).name+(m.r!=null?' at '+REG[m.r]:'')+'.';if(q.kind==='location')return LOCN[m.loc]+'.';if(m.t==='done')return 'finish this step.';return m.label.replace(/\.$/,'')+'.'}
-function heraldDots(l){const o=G.pl.filter(p=>p.herald===l);return o.length?'<span class="hd">'+o.map(p=>'<i style="background:'+fcol(p.seat)+'" title="'+esc(p.name)+'"></i>').join('')+'</span>':''}
+function heraldDots(l){const o=G.pl.filter(p=>p.herald===l);return o.length?'<span class="hd">'+o.map(p=>'<i style="background:'+fcol(p.seat)+'" title="'+esc(p.name)+'"></i><b class="gx-cbm" aria-hidden="true">'+GX.mark(p.seat)+'</b>').join('')+'</span>':''}
 function orderChips(o){return '<span class="oc">'+o.map((r,i)=>'<i>'+['I','II','III'][i]+'</i>'+esc(REG[r].replace('The ',''))).join('<em>›</em>')+'</span>'}
 // Kingdom Card offers (bid resolution)
 function bidResHTML(s,mv){let h='<div class="offers">';
@@ -474,7 +474,9 @@ function renderRivals(){const el=$('#rivals');if(!el)return;const V=UI.V;const h
   el.innerHTML=ordSeats.map(s=>{const P=V.pl[s];const kfac=TBKit.FACTIONS[FK[P.fac]];const turn=act.has(s);
     const favs=V.fav.h===s?'<span class="rv-f" title="Holds the Kingdom\'s Favour ('+V.fav.u+' uses left)">'+ico('star')+'</span>':'';
     return '<button class="rv'+(s===me?' me':'')+(turn?' turn':'')+'" data-a="rival" data-s="'+s+'" style="--fc:'+kfac.main+'" aria-label="'+esc(P.name)+': '+P.inf+' influence, '+P.hand.length+' cards in hand. Tap for details">'+
-      '<span class="rv-e">'+emb(s,26)+'</span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'<u>You</u> · ':'')+esc(shortName(s).replace(' (you)',''))+'</b><small><i>'+P.inf+'</i> Influence'+(G.np<3?' · '+P.hand.length+' cards':'')+'</small></span>'+favs+'</button>'}).join('')}
+      '<span class="rv-e">'+emb(s,26)+'<i class="gx-cbm" aria-hidden="true">'+GX.mark(s)+'</i></span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'<u>You</u> · ':'')+esc(shortName(s).replace(' (you)',''))+'</b><small><i>'+P.inf+'</i> Influence'+(G.np<3?' · '+P.hand.length+' cards':'')+'</small>'+(s===me&&!hot?meChips(s,P):'')+'</span>'+favs+'</button>'}).join('')}
+function meChips(s,P){const kc=(P.ks||[]).filter(Boolean).length,tl=(P.tac||[]).filter(t=>!t.ex&&!t.burn).length;
+  return '<span class="me-chips" aria-label="Your board"><span>KC '+kc+'</span><span>Sup '+P.supp.b+'</span><span>Tac '+tl+'/'+(P.tac||[]).length+'</span>'+(P.lore?'<span>Lore '+P.lore+'</span>':'')+'</span>'}
 // ---------------------------------------------------------------- pop-ups (live in the dock zone, never over the board)
 function openPop(kind,arg){if(!G)return;UI.pop=kind;UI.popArg=arg||{};renderPop();applyHl();if(typeof sfx==='function')sfx('tap')}
 function closePop(quiet){if(!UI.pop)return;UI.pop=null;UI.popArg=null;UI.hand=null;const p=$('#ppop');if(p){p.hidden=true;p.innerHTML=''}applyHl();if(!quiet)renderAll()}
@@ -545,7 +547,10 @@ function showOver(){if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over
 const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid picks a Kingdom Card first; the card you bid then sits under it and cannot fight.'],
   herald:['Heralds','Your Herald is public. If you win a region and claim the location where your Herald stands, you gain +1 Influence and take 1 from every rival Herald there.'],
   place:['Hidden cards','You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere.'],
-  menu:['Actions','Supporters add +1 Strength each in a region\'s first Clash. Open the list for other actions, or finish the step.'],
+  menu:['Actions','These actions are optional. Open the list to see them, or finish the step.'],
+  'menu:Spring':['Spring','Supporters add +1 Strength each in a region\'s first Clash; they are spent in Winter. Spring Tactics and abilities work now too.'],
+  'menu:Day':['Day','The cards are face up. Ambush adds a hidden card from your hand, Retreat pulls your cards out of a Clash you cannot win, Flank moves a card to a region that has not fought yet.'],
+  'menu:Autumn':['Autumn','Once a round each: Govern puts a hand card with votes into a Council, Journey sends a hand card away for Lore, and Rally takes your cards on the map back to your hand.'],
   clashOrder:['Clash order','The player with the least Influence chooses the order of the three Clashes.'],
   location:['Winning','The winner claims one of the region\'s two locations: its Influence and its bonus.'],
   bidRes:['Your bid','Take a Kingdom Card from the Great Road, steal one a rival holds (your bid must beat the card under it), or take your card back.']};
@@ -586,7 +591,7 @@ function overHTML(){const o=G.over;const rk=o.ranking;const win=o.winner;const m
   const head=iWon?'You win the throne!':esc(nameOf(win).replace(/^You$/,'You'))+' takes the throne';
   const body='<h3>'+head+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+(i+1)+'. '+esc(shortName(s))+'</b><span>'+G.pl[s].inf+' Influence'+(o.bonus&&o.bonus[s]?' <small>(+'+o.bonus[s]+' from the emptied Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(typeof overBreakdown==='function'?overBreakdown():'');
   const foot=NET.on?(isHost()?'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="netopen">Lobby</button>':'<button class="btn" data-a="netleave">Leave</button>'):'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="menu">Main menu</button>';
-  const gnote=typeof isGuided==='function'&&isGuided()?'<p class="coach">'+gloss('You have played a whole game. Next time try a full game from Play: choose the faction whose story you like, 3 players, 5 rounds. The suggestions stay on if you want them.')+'</p>':'';
+  const gnote=(UI.earned&&UI.earned.length?'<p class="achv">★ New achievement'+(UI.earned.length>1?'s':'')+': '+esc(UI.earned.join(', '))+'</p>':'')+(typeof isGuided==='function'&&isGuided()?'<p class="coach">'+gloss('You have played a whole game. Next time try a full game from Play: choose the faction whose story you like, 3 players, 5 rounds. The suggestions stay on if you want them.')+'</p>':'');
   return cdWrap('cd-over',body+gnote+(NET.on&&!isHost()?'<p class="sub">The host can start another game.</p>':''),foot)}
 // ===================== part 5: render loop, clicks, drawers (rules, log, board, menu), start screen =====================
 function renderAll(){if(!G||!UI.started)return;
@@ -643,13 +648,8 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
    case 'guided':newGame('guided');break;
    case 'cont':{const s=loadSave();if(s){hideStart();resumeGame(s);afterStart()}break}
    case 'rules':GX.show('rulesd');break;
-   case 'gdset':UI.guide=t.dataset.v;renderMenu();break;
-   case 'snd':UI.sound=!UI.sound;try{localStorage.setItem('tb_snd',UI.sound?'1':'0')}catch(x){}if(window.GA)GA.setSfx(UI.sound);renderMenu();break;
-   case 'mus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);renderMenu();break;
-   case 'gfx':UI.lowGfx=!UI.lowGfx;try{localStorage.setItem('tb_gfx',UI.lowGfx?'low':'high')}catch(x){}UI.mapReset=true;renderAll();renderMenu();break;
    case 'savenow':saveGame();toast('Saved. You can continue from the start screen.');break;
    case 'newgame':GX.close();showStart();break;
-   case 'spd':UI.speed=+t.dataset.v;renderMenu();break;
    case 'logall':UI.logAll=!UI.logAll;renderLog();break;
   }});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pop&&!GX.open){closePop();e.preventDefault()}});
@@ -662,14 +662,6 @@ function afterStart(){closePop(true);GX.close();UI.mapReset=true;renderAll();pum
 function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slice().reverse();let h='<p class="small"><button class="btn" data-a="logall">'+(UI.logAll?'Show key events only':'Show everything')+'</button></p><ol class="log">';
   let r=-1;for(const e of L){if(!UI.logAll&&e.c!=='big'&&e.c!=='warn')continue;h+='<li class="'+(e.c||'')+'"><i style="background:'+(e.s>=0?fcol(e.s):'#777')+'"></i>'+esc(e.t)+'</li>'}
   el.innerHTML=h+'</ol>'}
-function renderMenu(){const el=$('#setbody');if(!el)return;
-  const seg=(a,cur,opts)=>'<div class="seg">'+opts.map(([v,l])=>'<button class="'+(String(cur)===String(v)?'on':'')+'" data-a="'+a+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
-  el.innerHTML=(NET.on?'<div class="mrow"><button class="btn pri" data-a="netopen">Online lobby</button>'+(isHost()?'<button class="btn" data-a="newgame">Change setup</button>':'')+'<button class="btn" data-a="netleave">Leave the room</button></div>':'<div class="mrow"><button class="btn pri" data-a="newgame">New game / main menu</button><button class="btn" data-a="savenow">Save now</button></div>')+
-   '<div class="mrow"><span>Guide</span>'+seg('gdset',UI.guide,[['full','Full tips'],['light','Light'],['off','Off']])+'</div>'+
-   '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
-   '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button></div>'+
-   '<div class="mrow"><span>Graphics</span><button class="btn" data-a="gfx" aria-pressed="'+!!UI.lowGfx+'">'+(UI.lowGfx?'Low (fast)':'High')+'</button>'+(window.PerfHUD?PerfHUD.buttonsHTML('btn'):'')+'</div>'+
-   '<h4>Credits</h4><p class="small">Art, map, cards and icons are original and drawn procedurally. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo), SIL Open Font License 1.1. The game rules follow a published game family; every name and text here is our own wording. Sound: placeholder synthesised tones.</p>'}
 function renderBoardDrawer(){const el=$('#boardbody');if(!el||!G)return;const s=vs()>=0?vs():0;UI.V=UI.V||TB.stripView(G,vs());
   const P=UI.V.pl[s];let h=popRival(s).replace(/^<div class="pp-h">.*?<\/div><div class="pp-b[^"]*">/,'<div>');h=h.replace(/<\/div>$/,'');
   h+='<h5>Site of Power</h5><div class="piles">'+P.site.map(id=>'<div class="sitec"><button class="hc pk" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1">'+cardEl(id,64).outerHTML+'</button><small>cost '+cinfo(id).cost+'</small></div>').join('')+'</div>';
@@ -683,7 +675,7 @@ const RULES_HTML=()=>`<div class="rules">
 <li><b>Hide one card</b> at each of the three regions. Send <b>Supporters</b> (+1 each) if you like.</li>
 <li><b>Clashes:</b> cards flip; the highest total Strength in a region wins and claims one of its two locations (its Influence, plus +1 and a steal if your Herald stands there).</li>
 <li><b>Autumn, then Winter:</b> optional Govern and Journey, then played cards are discarded and a new round begins.</li></ol>
-<p>The guided first game walks you through this once. Underlined words in the game can be tapped for their meaning.</p></div>
+<p>The guided first game walks you through this once. Underlined words in the game can be tapped for their meaning. The <b>Cards</b> button lists every card, Kingdom Card, Tactic and location.</p><p class="small">Not in this version yet: the solo opponent and the optional advanced setup (a mulligan and a secret starting Kingdom Card). Everything else in the base game is here, for 2 to 4 players.</p></div>
 <details><summary>The full rules</summary>
 <h3>The goal</h3><p>You lead one of four factions competing for the throne. The game lasts a fixed number of rounds (4, 5 or 6). When the last round ends, the player with the most <b>Influence</b> wins. Ties go to whoever holds the Kingdom's Favour, then to the better place on the Order Track.</p>
 <h3>How a round goes</h3><ol class="rl">
@@ -710,8 +702,7 @@ function setupDrawers(){
   GX.drawer('rulesd','How to play',(()=>{const d=document.createElement('div');d.innerHTML=RULES_HTML();return d})(),true);
   GX.drawer('logd','Log',(()=>{const d=document.createElement('div');d.id='logbody';return d})());
   GX.drawer('boardd','My board and piles',(()=>{const d=document.createElement('div');d.id='boardbody';return d})());
-  GX.drawer('setd','Menu',(()=>{const d=document.createElement('div');d.id='setbody';return d})());
-  GX.onShow=id=>{if(id==='logd')renderLog();if(id==='setd')renderMenu();if(id==='boardd')renderBoardDrawer()}}
+  GX.onShow=id=>{if(id==='logd')renderLog();if(id==='boardd')renderBoardDrawer()}}
 // ===================== part 6: sound, phone layout, boot, test hooks =====================
 const SFXMAP={tap:'click',place:'place',flip:'flip',clash:'clash',win:'win',tie:'clash',inf:'influence',herald:'herald',bid:'bid',bell:'bell',fanfare:'fanfare',lose:'lose',err:'error'};
 let _ac=null;
@@ -745,9 +736,9 @@ addEventListener('orientationchange',()=>setTimeout(()=>{phApply();if(G)renderAl
 // ---------------------------------------------------------------- boot
 function boot(){
   try{UI.sound=localStorage.getItem('tb_snd')!=='0';UI.music=localStorage.getItem('tb_mus')==='1';UI.lowGfx=localStorage.getItem('tb_gfx')==='low'}catch(e){}
-  try{if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'tbt'});GA.setSfx(UI.sound);GA.setMusic(UI.music)}}catch(e){}
+  try{if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'tbt'});GA.setSfx(UI.sound);GA.setMusic(UI.music);GX.applyPrefs()}}catch(e){}
   try{if(window.PerfHUD)PerfHUD.register({game:'Thornbound Throne',levels:['high','low'],names:{high:'High',low:'Low'},getLevel:()=>UI.lowGfx?'low':'high',isAuto:()=>false,setLevel:(l,why)=>{if(why==='apply'){UI.lowGfx=l==='low';UI.mapReset=true;G&&renderAll()}},isAnimating:()=>UI.busy,anchor:'.gx-board',corner:'tl'})}catch(e){}
-  GX.init({key:'tb'});setupDrawers();phApply();netInit();
+  GX.init({key:'tb'});setupDrawers();kitBoot();phApply();netInit();
   TBKit.ready.then(()=>{document.documentElement.classList.add('tb-ready');if(!UI.started)showStart()});
   document.addEventListener('pointerdown',()=>{try{if(window.GA)GA.unlock();if(UI.music)musicFor()}catch(e){}},{once:true})}
 function startUiReady(){return TBKit.ready}
@@ -847,6 +838,7 @@ const byLabel=(mv,txt)=>mv.find(m=>(m.label||'').indexOf(txt)>=0);
 function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
   if(G.round===1){
     if(k==='bid')return byLabel(mv,'Sailing Hall');
+    if(k==='bidRes')return byLabel(mv,'Knives\' Fellowship')||null;
     if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return riv?mv.find(m=>m.loc===riv.herald):byLabel(mv,'Cairn Field')}
     if(k==='place'){const P=G.pl[s];const heir=P.hand.find(id=>cinfo(id).archetype==='heir');if(heir!=null)return mv.find(m=>m.id===heir&&m.r===1);const big=P.hand.slice().sort((a,b)=>cinfo(b).strength-cinfo(a).strength);
       if(big.length)return mv.find(m=>m.id===big[0]&&m.r===0)||mv.find(m=>m.id===big[0]);return null}
@@ -854,13 +846,17 @@ function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
     if(q.t==='menu'){const ph=menuPhase(q);if(ph==='Spring'&&G.pl[s].supp.r[1]===0){const m=mv.find(x=>x.a==='supp'&&x.p.r===1&&x.p.n===2);if(m)return m}return mv.find(m=>m.t==='done')}}
   if(G.round===2&&q.t==='menu'&&menuPhase(q)==='Autumn'&&!UI.coachDone.au2){return mv.find(m=>m.a==='journey')||null}
   return null}
+// guided round 1: the easy Court keeps its Tactics and skips optional actions, so the newcomer's first bid and Herald work as taught
+(function(){const o=aiChoose;aiChoose=function(seat,level){if(isGuided()&&G&&G.round===1&&G.q&&G.pl[seat].ai){const mv=legal(seat);
+  if(G.q.kind==='edict'){const k=mv.find(m=>m.k==='no'||m.yes===0);if(k)return k}
+  if(G.q.t==='menu'){const d=mv.find(m=>m.t==='done');if(d)return d}}return o(seat,level)}})();
 const STEPN=(n,t)=>'Step '+n+' of 6 · '+t;
 // the coach line that replaces the prompt in round 1 (and the first time a few things appear later)
 function coachFor(s,mv,rm){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind,R=G.round;UI.coachDone=UI.coachDone||{};
   const nm=id=>cinfo(id).name+' ('+cinfo(id).strength+')';
   if(R===1){
     if(k==='bid')return {title:STEPN(1,'Bid'),pulse:1,noRec:1,text:'Pick a hand card as a secret bid: the higher bid picks a Kingdom Card first.'+(rm?' '+nm(rm.id)+' is fair and keeps your big cards for the Clashes.':'')};
-    if(k==='bidRes')return {title:STEPN(2,'Take a Kingdom Card'),pulse:1,noRec:1,text:'A Kingdom Card is a lasting power; your bid card stays tucked under it.'+(rm&&rm.kc?' Take '+TB.kingdomInfo(rm.kc).name+' (tap it to read it).':'')};
+    if(k==='bidRes')return {title:STEPN(2,'Take a Kingdom Card'),pulse:1,noRec:1,text:'Your bid was higher, so you choose first. A Kingdom Card is a lasting power; your bid card stays tucked under it.'+(rm&&rm.kc?(/Knives/.test(TB.kingdomInfo(rm.kc).name)?' Take '+TB.kingdomInfo(rm.kc).name+': your Heir becomes Deadly, so it wipes out the cards it fights. Its price: keep your Heir away from rival Followers.':' Take '+TB.kingdomInfo(rm.kc).name+' (tap it to read it).'):'')};
     if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return {title:STEPN(3,'Place your Herald'),pulse:1,noRec:1,text:'Win the region where your Herald stands and claim its location: +1 Influence, and you take 1 from each rival Herald there.'+(riv&&rm?' The Court is on '+LOCN[riv.herald]+': join it.':'')}}
     if(k==='place'){const n=UI.V.reg.reduce((a,R2)=>a+R2.down.filter(id=>id>=0&&ownerOf(id)===s).length,0);
       return {title:STEPN(4,'Hide a card at each region'),pulse:1,noRec:1,text:'Card '+Math.min(3,n+1)+' of 3, hidden until the Clash. '+(rm?nm(rm.id)+' to '+REG[rm.r]+(cinfo(rm.id).archetype==='heir'?': your strongest card where both Heralds wait.':'.'):'Choose a card for each region.')}}
@@ -884,9 +880,19 @@ function coachEvent(ev){if(!isGuided())return '';UI.coachDone=UI.coachDone||{};c
 // guided: mark the Autumn coach as done once the player acts in round 2 Autumn
 (function(){const o=humanMove;humanMove=function(k){if(G)UI.nowMark=G.logN;const was=G&&G.q&&G.q.t==='menu'&&menuPhase(G.q)==='Autumn'&&G.round===2;if(G&&G.q&&G.q.kind==='siteBuy'&&UI.coachDone)UI.coachDone.sb=1;const r=o(k);if(was&&r&&UI.coachDone)UI.coachDone.au2=1;return r}})();
 // end screen: where the Influence came from (from the engine's own counters; a client without them shows nothing)
-function overBreakdown(){if(!G.stats||NET.on)return '';const rows=G.pl.map(p=>{const parts=[];for(const k in G.stats){const m=k.match(/^src:([a-z]+):(.*)$/);if(m&&m[1]===p.fac)parts.push([m[2],G.stats[k]])}
-  parts.sort((a,b)=>b[1]-a[1]);return '<li style="--fc:'+fcol(p.seat)+'"><b>'+esc(shortName(p.seat))+'</b><span>'+(parts.length?parts.slice(0,5).map(x=>esc(x[0])+' '+x[1]).join(', '):'none')+'</span></li>'}).join('');
-  return '<h4 class="bdh">Where the Influence came from</h4><ul class="rank bd2">'+rows+'</ul><p class="sub small">Steals by Heralds are not listed; they move Influence between players.</p>'}
+function overBreakdown(){const st=G.stats&&Object.keys(G.stats).some(k=>/^src:/.test(k))?G.stats:(G.over&&G.over.src)||null;if(!st)return '';
+  const rows=G.pl.map(p=>{const parts=[];let sum=0;for(const k in st){const m=k.match(/^src:([a-z]+):(.*)$/);if(m&&m[1]===p.fac){parts.push([m[2],st[k]]);sum+=st[k]}}
+    parts.sort((a,b)=>b[1]-a[1]);const bonus=G.over.bonus&&G.over.bonus[p.seat]||0,rest=p.inf-sum-bonus;
+    if(bonus)parts.push(['Leftover Lore (Site of Power emptied)',bonus]);if(rest)parts.push([rest>0?'Taken by your Herald from rivals':'Taken by rival Heralds',rest]);
+    return '<li style="--fc:'+fcol(p.seat)+'"><b>'+esc(shortName(p.seat))+'</b><span class="bd-t">'+p.inf+' Influence</span><span class="bd-l">'+(parts.length?parts.map(x=>'<i>'+esc(x[0])+' <b>'+sgn(x[1])+'</b></i>').join(''):'none')+'</span></li>'}).join('');
+  return '<h4 class="bdh">Where the Influence came from</h4><ul class="rank bd2">'+rows+'</ul>'+histHTML()}
+// Influence after each round (recorded from the end-of-round summaries, kept in the save)
+function histHTML(){const H=UI.hist;if(!H||!H.length)return '';const mx=Math.max(1,...H.flat(),...G.pl.map(p=>p.inf));const n=H.length;
+  const W=280,Ht=96,x=i=>Math.round(14+(W-28)*(n>1?i/(n-1):.5)),y=v=>Math.round(Ht-10-(Ht-22)*v/mx);
+  let svg='<svg class="hist" viewBox="0 0 '+W+' '+Ht+'" role="img" aria-label="Influence after each round">';
+  for(let i=0;i<n;i++)svg+='<text x="'+x(i)+'" y="'+(Ht-1)+'" text-anchor="middle" font-size="9" fill="#d8c69a">R'+(i+1)+'</text>';
+  G.pl.forEach((p,s)=>{const pts=H.map((r,i)=>x(i)+','+y(r[s]||0)).join(' ');svg+='<polyline points="'+pts+'" fill="none" stroke="'+fcol(s)+'" stroke-width="2.5"/>'+H.map((r,i)=>'<circle cx="'+x(i)+'" cy="'+y(r[s]||0)+'" r="3" fill="'+fcol(s)+'"/>').join('')+'<text class="tbx-cb" x="'+(x(n-1)+6)+'" y="'+(y(H[n-1][s]||0)+4)+'" font-size="10" fill="#fff">'+GX.mark(s)+'</text>'});
+  return '<h4 class="bdh">Influence round by round</h4>'+svg+'</svg>'}
 // ---------------------------------------------------------------- title + setup
 const STORY={
  nobility:{story:'The old court still dresses for dinner in a palace with no king. Its stewards count every coin and every vote, and they mean to crown one of their own before the frost.',enjoy:'Choose the Gilded Court if you enjoy steady income, sturdy cards and winning the Councils.',tag:'Defence and votes · easy to learn'},
@@ -928,12 +934,14 @@ function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=e
       '<button class="tbtn go" data-a="play"><b>Play</b><span>'+(firstTime()?'new here? a guided first game is ready':'against the computer')+'</span></button>'+
       '<button class="tbtn" data-a="online"><b>Online</b><span>with friends, free, no sign-up</span></button>'+
       (sav?'<button class="tbtn" data-a="cont"><b>Resume</b><span>your game, round '+Math.max(1,sav.G.round)+' of '+sav.G.rounds+'</span></button>':'')+
-      '</div><button class="tlink" data-a="rules">How to play</button></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
+      '</div><div class="tlinks"><button class="tlink" data-a="rules">How to play</button><button class="tlink" data-a="refopen">Cards</button><button class="tlink" data-a="setopen">Settings</button></div></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
   const ONL=view==='online';
   el.innerHTML='<div class="setup"><div class="bgart">'+titleArt()+'</div>'+(ONL?onlineSetupHTML():setupHTML())+'</div>'+(UI.phone&&UI.cfgOpen&&!ONL?cfgDialogHTML():'');
   el.scrollTop=top}
 function firstTime(){try{return !localStorage.getItem('tb_played')}catch(e){return true}}
-function facCard(f,on){const k=TBKit.FACTIONS[FK[f]],S=STORY[f];return '<button class="fcard'+(on?' on':'')+'" data-a="fac" data-v="'+f+'" style="--fc:'+k.main+'" aria-pressed="'+on+'"><span class="ft"><span class="fe">'+TBKit.token('influence',{faction:FK[f]},44).outerHTML+'</span><span><b>'+esc(DD.FNAME[f])+'</b><small>'+esc(S.tag)+'</small></span></span><p>'+esc(S.story)+'</p><p class="enj">'+esc(S.enjoy)+'</p>'+(on?'<span class="fpick">Your faction ✓</span>':'')+'</button>'}
+function facCard(f,on){const k=TBKit.FACTIONS[FK[f]],S=STORY[f];return '<button class="fcard'+(on?' on':'')+'" data-a="fac" data-v="'+f+'" style="--fc:'+k.main+'" aria-pressed="'+on+'"><span class="ft"><span class="fe">'+TBKit.token('influence',{faction:FK[f]},44).outerHTML+'</span><span><b>'+esc(DD.FNAME[f])+'</b><small>'+esc(S.tag)+'</small></span></span><p>'+esc(S.story)+'</p><p class="enj">'+esc(S.enjoy)+'</p>'+(sv.np===2&&BAL2[f]?'<p class="bal">'+esc(BAL2[f])+'</p>':'')+(on?'<span class="fpick">Your faction ✓</span>':'')+'</button>'}
+// honest 2-player balance, from 500 computer games per pairing (ENGINE-REPORT.md)
+const BAL2={nobility:'Strongest at 2 players: wins about 6 games in 10.',clans:'Hardest at 2 players: wins about 4 games in 10.'};
 function seatRows(ONL,plan){const n=ONL?plan.np:sv.np;const rest=FIDS.filter(f=>f!==sv.faction);let h='';
   for(let i=0;i<n;i++){const f=i===0?sv.faction:rest[i-1];const k=TBKit.FACTIONS[FK[f]];const human=ONL?i<plan.hum.length:i===0;
     h+='<div class="seat" style="--fc:'+k.main+'">'+TBKit.token('influence',{faction:FK[f]},30).outerHTML+'<span class="sn"><b>'+esc(k.short)+'</b><small>'+(human?(ONL?'Online: '+esc(plan.hum[i].nm)+(i===0?' (you)':''):'You'):'Computer')+'</small></span>'+(human?'':levelSeg(i))+'</div>'}
@@ -959,3 +967,135 @@ function onlineSetupHTML(){const host=NET.on&&isHost(),plan=host?netPlan():null;
 function startFromSetup(){hideStart();try{localStorage.setItem('tb_played','1')}catch(e){}const lv=sv.levels.slice();
   const o={np:sv.np,length:sv.length,faction:sv.faction,levels:lv.map((l,i)=>i===0?l:sv.levels[i]),guide:sv.guide};
   newGame(sv.mode==='watch'?'ai':sv.mode,o)}
+// ===================== part 8: shared GX kit (settings, reference, undo + bid confirm, recap, results, offline) =====================
+const GAME_ID='thornbound';
+// ---------------------------------------------------------------- achievements (stored by the shelf; shown in Stats & achievements on the home page)
+const ACH=[
+ {id:'first',name:'A seat at court',how:'Finish a game.',test:r=>true},
+ {id:'guide',name:'Taught by the Herald',how:'Finish the guided first game.',test:r=>r.mode==='guided'},
+ {id:'win',name:'The thorns part',how:'Win the throne against the computer.',test:r=>r.won&&(r.mode==='vs'||r.mode==='guided')},
+ {id:'hard',name:'Crowned in iron',how:'Win a 3- or 4-player game against hard computers.',test:r=>r.won&&r.mode==='vs'&&r.level==='hard'&&r.np>=3},
+ {id:'twenty',name:'The realm listens',how:'End a game with 20 Influence or more.',test:r=>r.score>=20},
+ {id:'sweep',name:'Three banners',how:'Win all three Clashes in one round.',test:(r,s,x)=>x.extra&&x.extra.sweep},
+ {id:'site',name:'Every stone laid',how:'Buy all five of your Site of Power cards in one game.',test:(r,s,x)=>x.extra&&x.extra.site},
+ {id:'four',name:'Four crowns',how:'Win with each of the four factions.',test:(r,s,x)=>x.extra&&x.extra.facWins>=4},
+ {id:'hot',name:'Pass the crown',how:'Finish a hot-seat game.',test:r=>r.mode==='hot'},
+ {id:'online',name:'Envoys abroad',how:'Finish an online game.',test:r=>r.mode==='online'}];
+// ---------------------------------------------------------------- settings: the same sections as every game; Thornbound adds its own rows
+const sbtn=(a,txt,dis,extra)=>{const b=document.createElement('button');b.type='button';b.className='gx-sb';b.dataset.a=a;b.textContent=txt;if(dis)b.disabled=true;if(extra)for(const k in extra)b.dataset[k]=extra[k];return b};
+function kitSettings(){
+  GX.settings({id:'setd',title:'Menu',
+    game:S=>{
+      if(NET.on)S.appendChild(GX.row('Online',[sbtn('netopen','Lobby'),isHost()?sbtn('newgame','Change setup'):null,sbtn('netleave','Leave the room')]));
+      else S.appendChild(GX.row('This game',[sbtn('newgame','New game'),sbtn('savenow','Save now',!G||!UI.started||!!G.over)]));
+      S.appendChild(GX.row('Undo',sbtn('undo','Undo my last step',!GX.undo.can()),'Hidden cards and Supporters, until the turn passes or a card is revealed'));
+    },
+    sound:S=>{S.appendChild(GX.row('Sound effects',GX.onoff(UI.sound,v=>{UI.sound=v;try{localStorage.setItem('tb_snd',v?'1':'0')}catch(x){}if(window.GA)GA.setSfx(v)},'Sound effects')));
+      S.appendChild(GX.row('Music',GX.onoff(UI.music,v=>{UI.music=v;try{localStorage.setItem('tb_mus',v?'1':'0')}catch(x){}if(window.GA)GA.setMusic(v);if(v)musicFor()},'Music')))},
+    help:S=>{S.appendChild(GX.row('Read',[sbtn('rules','How to play'),sbtn('refopen','Cards & map')]));
+      S.appendChild(GX.row('Guide',GX.seg([['full','Full tips'],['light','Light'],['off','Off']],UI.guide,v=>{UI.guide=v;if(G&&UI.started)renderAll()},'Guide level'),'Step tips and the suggested move'))},
+    graphics:S=>S.appendChild(GX.row('Graphics',GX.seg([['high','High'],['low','Low (fast)']],UI.lowGfx?'low':'high',v=>{UI.lowGfx=v==='low';try{localStorage.setItem('tb_gfx',v)}catch(x){}UI.mapReset=true;if(G&&UI.started)renderAll()},'Graphics'))),
+    about:{name:'The Thornbound Throne',version:'preview',text:'An original game of four factions reaching for an empty throne. Names, card texts and pictures are our own; the pictures are drawn in code. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo), SIL Open Font License 1.1. Music: "Dark Forest Theme" by cynicmusic and "Dungeon Ambience" by yd (OpenGameArt, CC0). Sound effects by Kenney (CC0).'}})}
+// ---------------------------------------------------------------- component reference
+function refCardSpec(f,k){const D=DD,c=k<14?D.BASIC[k]:D.SITE[f][k-14],nm=k<14?(D.BASICNAMES[f]||[])[k]:c.nm;const ar=c.ar||(c.kind==='hq'?'':'ruse');
+  const art=(ART[ar]&&(ART[ar][f]||ART[ar]._))||(c.kind==='hq'?'ruin_arch':'banner');const tr=(c.tr||[]).map(t=>TRAIT_N[t]||t);
+  const bits=[];if(c.v)bits.push(c.v+' vote'+(c.v>1?'s':''));if(c.l)bits.push(c.l+' lore');
+  return {faction:FK[f],title:nm,value:c.kind==='hq'?null:c.s,cost:c.lc>0?c.lc:null,type:c.kind==='hq'?'relic':(ARCH_TYPE[ar]||'unit'),typeLabel:c.kind==='hq'?'HQ':(ARCH_LBL[ar]||'Card'),art,text:(((tr.length?tr.join(', ')+'. ':'')+(c.txt||'')).trim())||'No special ability.',tag:bits.join(' · ')||undefined}}
+function refPic(it,big){const p=it.pic||{},w=big?200:52;
+  if(p.fac)return TBKit.card(refCardSpec(p.fac,p.k),w);
+  if(p.kc)return TBKit.card(kcSpec(p.kc),w);
+  const sz=big?72:36;
+  if(p.tac)return TBKit.token('influence',{faction:FK[p.tac]},sz);
+  if(p.loc!=null){const l=DD.LOCS[p.loc];return '<svg viewBox="-24 -24 48 48" width="'+sz+'" height="'+sz+'"><circle r="21" fill="#2a1c10" stroke="#e8c867" stroke-width="2.5"/><text y="7" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="19" fill="#fff0b8">+'+l[2]+'</text></svg>'}
+  if(p.council)return '<svg viewBox="-24 -24 48 48" width="'+sz+'" height="'+sz+'"><rect x="-19" y="-19" width="38" height="38" rx="8" fill="#3a2414" stroke="#e8c867" stroke-width="2.5"/><text y="7" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="17" fill="#fff0b8">'+SUIT_N[p.council][0]+'</text></svg>';
+  if(p.piece==='herald')return TBKit.token('herald',{faction:'gilded'},sz);
+  if(p.piece==='supp')return '<svg viewBox="-24 -24 48 48" width="'+sz+'" height="'+sz+'"><circle r="15" fill="#2a9d8f" stroke="#fff3c4" stroke-width="3"/><text y="6" text-anchor="middle" font-size="17" font-weight="700" fill="#fff">1</text></svg>';
+  if(p.piece==='fav')return '<svg viewBox="-24 -24 48 48" width="'+sz+'" height="'+sz+'"><circle r="18" fill="#e8c867" stroke="#fff3c4" stroke-width="3"/><path d="M0 -11 L3.2 -3.2 11 -3.2 4.6 2 7 10 0 5 -7 10 -4.6 2 -11 -3.2 -3.2 -3.2Z" fill="#fff6d0" stroke="#4a3208"/></svg>';
+  if(p.piece==='inf')return TBKit.token('influence',{faction:'lantern'},sz);
+  return null}
+function refInGame(it){if(!G)return true;const p=it.pic||{};
+  if(p.fac||p.tac)return G.pl.some(P=>P.fac===(p.fac||p.tac));
+  if(p.kc){const V=UI.V||G;return (V.road||[]).includes(p.kc)||V.pl.some(P=>(P.ks||[]).some(T=>T&&T.kc===p.kc)||(P.sup||[]).includes(p.kc))||V.loc.some(L=>L.kc.some(k=>k.n===p.kc))}
+  return true}
+function refIdOfCard(id){const s=ownerOf(id);return 'f-'+G.pl[s].fac+'-'+(id%100)}
+function kitReference(){GX.reference(TB.refSections(DD),{title:'Cards & map',label:'Cards',picture:refPic,inGame:refInGame,before:'[data-gx="boardd"]'})}
+// "Read it big" on the card, Kingdom Card and location pop-ups
+(function(){const o=renderPop;renderPop=function(){o();const el=$('#ppop');if(!el||el.hidden||!UI.pop)return;const a=UI.popArg||{};let rid=null;
+  if(UI.pop==='card'&&a.id!=null&&a.id>=0)rid=refIdOfCard(a.id);else if(UI.pop==='kc')rid='kc'+a.n;else if(UI.pop==='loc')rid='loc'+a.l;
+  const b=el.querySelector('.pp-b');if(rid&&b&&!b.querySelector('[data-a=refcard]')){const x=document.createElement('p');x.className='pp-ref';x.innerHTML='<button class="lk" data-a="refcard" data-r="'+esc(rid)+'">Read it in the card list</button>';b.appendChild(x)}}})();
+// ---------------------------------------------------------------- undo: snapshot before a local human step. Sealed when the decision passes to another
+// seat (hot-seat included), or when a card, the Kingdom deck, the dice of the shuffle, a clash or a round moved on. Off online.
+const humansPending=g=>g&&g.q&&!g.over?g.q.seats.filter(s=>!g.pl[s].ai).join(','):null;
+function revealed(a,b){if(!a)return true;if(a.rng!==b.rng||a.round!==b.round||a.phase!==b.phase||!!a.over!==!!b.over||a.bidRev!==b.bidRev)return true;
+  if(JSON.stringify(a.clash)!==JSON.stringify(b.clash)||JSON.stringify(a.road)!==JSON.stringify(b.road)||a.kdeck.length!==b.kdeck.length)return true;
+  for(let r=0;r<a.reg.length;r++)if(a.reg[r].up.length!==b.reg[r].up.length||a.reg[r].done!==b.reg[r].done)return true;
+  for(let s=0;s<a.pl.length;s++){const p=a.pl[s],q=b.pl[s];if(p.deck.length!==q.deck.length||p.disc.length!==q.disc.length)return true}
+  return a.lost.length!==b.lost.length}
+function kitUndo(){GX.undo.config({get:()=>G,owner:humansPending,online:()=>NET.on,
+  set:s=>{G=s;UI.evq=[];UI.sel={};UI.hand=null;UI.pendBid=null;UI._rk=null;closePop(true);hideGloss();MAP.slotDirty=true;saveGame();toast('Step undone.');renderAll();pump()},
+  onChange:can=>{if(can!==UI.undoCan){UI.undoCan=can;if(G&&UI.started)renderMain()}}})}
+function doUndo(){if(GX.undo.undo())sfx('tap')}
+// ---------------------------------------------------------------- the bid is confirmed before it is locked in (one tap used to commit it)
+(function(){const o=humanMove;humanMove=function(k){
+  if(G&&G.q&&G.q.kind==='bid'&&UI.pendBid!==k){const s=NET.on?NET.mySeat:viewSeatForQ();const m=s!=null&&s>=0?legal(s).find(x=>x.k===k):null;if(m&&m.t==='bid'){UI.pendBid=k;closePop(true);UI.hand=m.id;renderAll();sfx('tap');return true}}
+  UI.pendBid=null;const s0=NET.on?NET.mySeat:viewSeatForQ(),l0=G?G.logN:0,local=!NET.on&&s0!=null;
+  if(local)GX.undo.snap(k);
+  const r=o(k);
+  if(local){if(!r)GX.undo.drop();else{GX.undo.check(revealed);GX.recap.mark(s0);GX.recap.push(logSince(l0).map(e=>plain(e.t)),s0)}}
+  return r}})();
+function bidConfirmHTML(){const m=legal(viewSeatForQ()).find(x=>x.k===UI.pendBid);if(!m)return null;const i=cinfo(m.id);
+  return {h:'<div class="step" data-q="bidok"><h3 class="st">Confirm your bid</h3><div class="bidok"><span class="th" data-owner="'+ownerOf(m.id)+'" data-up="1">'+cardEl(m.id,UI.phone?52:64).outerHTML+'</span><p>'+gloss('You bid '+i.name+' (Strength '+i.strength+'). Once everyone has bid, the bids are revealed and the highest bid picks a Kingdom Card first.')+'</p></div><p class="hint">Changed your mind? Choose another card first.</p></div>',
+    f:'<button class="btn" data-a="bidx">Choose another</button><button class="btn pri pulse" data-a="mv" data-k="'+esc(m.k)+'">Confirm bid</button>'}}
+(function(){const o=renderMain;renderMain=function(){
+  if(UI.pendBid&&!(G&&G.q&&G.q.kind==='bid'&&viewSeatForQ()!=null&&!UI.coachInfo&&!(UI.card&&UI.card.kind==='pass')))UI.pendBid=null;
+  if(UI.pendBid){const r=bidConfirmHTML();if(r){const el=$('#main'),ft=$('#act');el.innerHTML=r.h;ft.innerHTML=r.f;setHl([]);return}UI.pendBid=null}
+  o();const ft=$('#act');
+  if(ft&&GX.undo.can()&&!G.over&&viewSeatForQ()!=null&&!UI.coachInfo&&!(UI.card&&UI.card.kind==='pass')){const b=document.createElement('button');b.className='btn undo';b.dataset.a='undo';b.setAttribute('aria-label','Undo my last step');b.textContent='↶ Undo';ft.insertBefore(b,ft.firstChild)}}})();
+// ---------------------------------------------------------------- "since your last turn" strip in the dock
+function kitRecap(){GX.recap.attach('#dockbody',{before:true,title:'Since your turn'})}
+function recapSeats(){GX.recap.clear();const hs=G?humans():[];GX.recap.seats(hs.length?hs:[0])}
+(function(){const o=aiStep;aiStep=function(w){const s=w.ai[0],l0=G.logN;o(w);if(G&&!NET.on)GX.recap.push(logSince(l0).map(e=>plain(e.t)),s)}})();
+// ---------------------------------------------------------------- results, statistics, achievements
+function kitTrackClash(ev){if(G&&ev.t==='summary'&&ev.inf1){UI.hist=UI.hist||[];UI.hist[ev.round-1]=ev.inf1.slice()}
+  if(!G||ev.t!=='clash'||ev.winner==null||ev.winner<0)return;UI.cw=UI.cw||{};const k=ev.round||G.round;const a=UI.cw[k]=UI.cw[k]||{};a[ev.r]=ev.winner}
+function swept(seat){const W=UI.cw||{};for(const k in W){const a=W[k];if([0,1,2].every(r=>a[r]===seat))return true}return false}
+function kitResult(){
+  if(!G||!G.over||UI.resultDone)return;UI.resultDone=true;GX.undo.clear();GX.recap.clear();
+  const hs=humans();if(!hs.length||(NET.on&&NET.mySeat<0))return;  // watching computers: not your game
+  const me=NET.on?NET.mySeat:hs.length===1?hs[0]:-1;
+  const mode=NET.on?'online':isGuided()?'guided':UI.mode==='hot'||hs.length>1?'hot':'vs';
+  const seats=G.pl.map((p,i)=>({name:p.name,ai:p.ai||null,me:i===me}));
+  let extra=null;
+  if(me>=0){const P=G.pl[me];let fw={};try{fw=JSON.parse(localStorage.getItem('tb_facwins')||'{}')||{}}catch(e){}
+    if(G.over.winner===me&&mode!=='hot'){fw[P.fac]=1;try{localStorage.setItem('tb_facwins',JSON.stringify(fw))}catch(e){}}
+    extra={fac:P.fac,sweep:swept(me),site:!!(P.site&&P.site.length===0),facWins:Object.keys(fw).length}}
+  const lv=G.pl.filter(p=>p.ai).map(p=>p.ai);const level=lv.length&&lv.every(l=>l===lv[0])?lv[0]:(lv.includes('hard')?'mixed':null);
+  try{const r=GNS.result({game:GAME_ID,mode,seats,winner:G.over.winner,scores:G.pl.map(p=>p.inf),turns:G.round,ms:UI.t0?Date.now()-UI.t0:0,level,extra});
+    if(r&&r.earned.length){UI.earned=r.earned.map(a=>a.name);GX.buzz([30,60,30])}}catch(e){}}
+(function(){const o=showOver;showOver=function(){kitResult();return o()}})();
+(function(){const o=pushEv;pushEv=function(e){try{kitTrackClash(e)}catch(x){}return o(e)}})();
+function kitNewGame(){GX.undo.clear();recapSeats();UI.t0=Date.now();UI.resultDone=false;UI.earned=null;UI.pendBid=null;UI.cw={};}
+(function(){const o=newGame;newGame=function(m,op){UI.cw={};UI.hist=null;const r=o(m,op);kitNewGame();renderAll();return r}})();
+(function(){const o=resumeGame;resumeGame=function(sv){const r=o(sv);kitNewGame();UI.cw=sv.cw||{};UI.hist=sv.hist||null;return r}})();
+// save: report to the shelf's Continue row; keep the round-by-round history and clash wins in the save
+(function(){const o=saveGame;saveGame=function(){o();try{if(NET.on||!G||G.over||!UI.cfg)return;const raw=localStorage.getItem('tb_save');if(raw&&(UI.cw||UI.hist)){const s=JSON.parse(raw);s.cw=UI.cw||{};s.hist=UI.hist||null;localStorage.setItem('tb_save',JSON.stringify(s))}if(!UI.savedFlag){UI.savedFlag=1;GNS.saved(GAME_ID,true)}}catch(e){}}})();
+(function(){const o=clearSave;clearSave=function(){o();UI.savedFlag=0;try{GNS.saved(GAME_ID,false)}catch(e){}}})();
+// a save from an older or broken build is not resumed (it would crash): the title offers a new game instead
+const SAVE_V=1;
+function saveOk(s){try{const g=s&&s.G;return !!(g&&(s.v||1)===SAVE_V&&(g.v||1)===1&&Array.isArray(g.pl)&&g.pl.length>=2&&Array.isArray(g.reg)&&g.reg.length===3&&s.cfg&&Array.isArray(g.log))}catch(e){return false}}
+(function(){const o=loadSave;loadSave=function(){const s=o();if(s&&!saveOk(s)){UI.badSave=true;return null}return s}})();
+// ---------------------------------------------------------------- boot (called at the end of boot() in part 6)
+function kitBoot(){
+  kitSettings();kitReference();kitUndo();kitRecap();
+  GNS.achievements(GAME_ID,ACH);
+  AIDELAY=GX.aiDelay(650);applyAnim();
+  GX.onPref(k=>{if(k==='ai'||typeof k==='object')AIDELAY=GX.aiDelay(650);if(k==='anim'||k==='reduce'||typeof k==='object')applyAnim();if((k==='cb'||k==='text')&&G&&UI.started){MAP.slotSig='';renderAll()}});
+  GX.offline({sw:'../sw.js',scope:'../'})}
+function applyAnim(){ANIM=GX.animMs(1000)>0?1:0}
+document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
+  if(a==='undo')doUndo();
+  else if(a==='bidx'){UI.pendBid=null;UI.hand=null;renderAll()}
+  else if(a==='refopen'){GX.close();GX.show('gx-refd')}
+  else if(a==='setopen'){GX.close();GX.show('setd')}
+  else if(a==='refcard'){closePop(true);GX.refOpen(t.dataset.r)}});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!GX.open&&GX.undo.can()){e.preventDefault();doUndo()}});

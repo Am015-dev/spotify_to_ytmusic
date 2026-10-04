@@ -255,4 +255,25 @@ body.in-start .gx-scrim{z-index:66}body.in-start .gx-drawer{z-index:67}
 #main .lk,.wait .lk{color:var(--gold)}
 .rv-t small{overflow:hidden;text-overflow:ellipsis}
 #main{background:linear-gradient(#241419 30%,rgba(36,20,25,0)) top/100% 24px no-repeat local,linear-gradient(rgba(36,20,25,0),#241419 70%) bottom/100% 24px no-repeat local,radial-gradient(farthest-side at 50% 0,rgba(0,0,0,.55),rgba(0,0,0,0)) top/100% 10px no-repeat scroll,radial-gradient(farthest-side at 50% 100%,rgba(0,0,0,.6),rgba(0,0,0,0)) bottom/100% 12px no-repeat scroll}
+/* part 8: shared kit (undo, bid confirm, reference links, colour-blind marks, text size, left-handed) */
+.tlinks{display:flex;flex-wrap:wrap;justify-content:center;gap:2px}
+#act .btn.undo{flex:0 0 auto;padding:6px 10px}
+.bidok{display:flex;gap:10px;align-items:center;margin:4px 0}.bidok .th{flex:none;line-height:0}.bidok p{margin:0}
+.pp-ref{margin:8px 0 2px}
+.gx-cbm{display:none}html.cb .gx-cbm{display:inline-block}
+.hd .gx-cbm{font:700 11px/12px system-ui,sans-serif;color:#fff;margin:0 2px 0 -1px}
+.rv-e{position:relative}.rv .gx-cbm{position:absolute;left:-5px;top:-5px;min-width:15px;height:15px;border-radius:50%;background:#fff3c4;color:#2b1808;font:700 11px/15px system-ui,sans-serif;text-align:center}
+.tbx-cb{display:none}html.cb .tbx-cb{display:inline}
+html.lefty #act{flex-direction:row-reverse}
+#dockbody{zoom:var(--gx-text,1)}#ppop .pp-b,#pc .cd-sc,#gdef,.gx-drawer-body .rules,#logbody,#boardbody{zoom:var(--gx-text,1)}
+#dockbody .gx-recap{margin:6px 8px 2px;font-size:.92rem}
+.gx-refbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.gx-ref-pic .tb-card{flex:none}
+.me-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}.me-chips span{font-size:.72rem;padding:1px 6px;border-radius:8px;background:rgba(255,243,196,.14);white-space:nowrap}
+.bd2 li{flex-wrap:wrap}.bd2 .bd-t{font-weight:700}.bd2 .bd-l{display:flex;flex-wrap:wrap;gap:2px 10px;width:100%;font-size:.86rem}.bd2 .bd-l i{font-style:normal;white-space:nowrap}
+.hist{display:block;width:100%;max-width:340px;height:auto;margin:2px auto 6px}
+.achv{margin:8px 0 0;padding:6px 10px;border-radius:10px;background:#f3d77a;color:#3a2412;font-weight:700}
+.fcard .bal{margin:4px 0 0;font-size:.82rem;color:#ffd98a;font-style:italic}
+html:not(.ph) #start[data-v=setup] .sgo{position:sticky;bottom:0;z-index:3;margin:0 -12px calc(-14px - var(--sab));padding:10px 12px calc(12px + var(--sab));background:linear-gradient(rgba(20,10,16,.82),#140a10 30%);box-shadow:0 -8px 18px rgba(0,0,0,.45)}
+.gx-set-nav>.gx-chip,.gx-ref-secs>.gx-chip,.gx-ref-tags>.gx-chip{flex:none}
 </style></head>

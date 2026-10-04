@@ -51,6 +51,90 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 @media (min-width:1000px){.gx-grab{display:none}}
 @media (prefers-reduced-motion:reduce){.gx-drawer,.gx-scrim{transition:none}}
 
+/* ===== GX kit styles (load after shell.css). Themed by the shell's --gx-* variables. ===== */
+:root{--gx-text:1;--gx-anim:1;--gx-chip:rgba(0,0,0,.07);--gx-chip-on:var(--gx-accent)}
+/* text size: games opt in by using these classes, the kit's own panels always follow it */
+.gx-drawer-body,.gx-dock-body,.gx-recap,.gx-tx{font-size:calc(1em * var(--gx-text,1))}
+/* settings */
+.gx-set-nav{position:sticky;top:-10px;z-index:2;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 0;margin:-10px 0 4px;background:var(--gx-panel)}
+.gx-set-nav::-webkit-scrollbar{display:none}
+.gx-sec{padding:4px 0 12px;border-bottom:1px solid var(--gx-line);scroll-margin-top:56px}
+.gx-sec:last-child{border-bottom:0}
+.gx-sec h3{margin:8px 0 6px;font-size:1.02em;letter-spacing:.02em}
+.gx-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:6px 0}
+.gx-row-l{flex:1 1 9em;min-width:0;font-weight:600}
+.gx-row-l small{display:block;font-weight:400;opacity:.75;font-size:max(13px,.82em)}
+.gx-row-k{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.gx-seg{display:inline-flex;flex-wrap:wrap;gap:4px}
+.gx-sb,.gx-tg,.gx-chip{appearance:none;font:inherit;color:inherit;min-height:44px;min-width:44px;padding:4px 12px;border-radius:10px;border:1px solid var(--gx-line);background:var(--gx-chip);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;text-decoration:none;white-space:nowrap}
+.gx-sb[aria-pressed=true],.gx-tg[aria-checked=true],.gx-chip[aria-pressed=true]{background:var(--gx-chip-on);border-color:transparent;color:#1d140b;font-weight:700}
+.gx-sb:disabled{opacity:.4;cursor:default}
+.gx-tg{min-width:64px}
+.gx-chip{min-height:36px;padding:2px 11px;border-radius:99px;font-size:max(13px,.88em)}
+.gx-sb:focus-visible,.gx-tg:focus-visible,.gx-chip:focus-visible,.gx-ref-it:focus-visible,.gx-ref-q:focus-visible,.gx-recap button:focus-visible,.gx-sl input:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
+.gx-sl{display:inline-flex;align-items:center;gap:8px;min-height:44px}
+.gx-sl input{width:min(190px,44vw);accent-color:var(--gx-accent);height:28px}
+.gx-sl output{min-width:3.2em;text-align:right;font-variant-numeric:tabular-nums}
+.gx-links{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.gx-small{font-size:max(13px,.85em);opacity:.8;margin:6px 0}
+.gx-about-n{font-weight:700;margin:4px 0}
+/* reference */
+.gx-ref-top{position:sticky;top:-10px;z-index:2;background:var(--gx-panel);margin:-10px -12px 6px;padding:10px 12px 6px;border-bottom:1px solid var(--gx-line)}
+.gx-ref.big .gx-ref-top{display:none}
+.gx-ref-q{width:100%;box-sizing:border-box;min-height:44px;font:inherit;padding:6px 12px;border-radius:10px;border:1px solid var(--gx-line);background:rgba(255,255,255,.6);color:inherit}
+.gx-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px 0 0}
+.gx-chips::-webkit-scrollbar{display:none}
+.gx-chips>*{flex:none}
+.gx-ref-list[hidden],.gx-ref-big[hidden]{display:none}
+.gx-ref-n{font-size:max(13px,.82em);opacity:.75;padding-top:4px}
+.gx-ref-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:8px}
+.gx-ref-it{appearance:none;font:inherit;color:inherit;text-align:left;display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:12px;border:1px solid var(--gx-line);background:rgba(255,255,255,.35);cursor:pointer;min-height:64px}
+.gx-ref-it:hover{background:rgba(255,255,255,.55)}
+.gx-ref-pic{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:52px}
+.gx-ref-pic>img,.gx-ref-pic>svg{max-width:100%;height:auto;display:block}
+.gx-ref-pic.big{width:min(240px,62vw);margin:4px auto 8px;display:flex}
+.gx-ref-tx{min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+.gx-ref-tx b{font-size:1em}
+.gx-ref-c{font-size:max(13px,.8em);font-weight:700;padding:0 6px;border-radius:99px;background:var(--gx-chip)}
+.gx-ref-m{font-size:max(13px,.8em);opacity:.75;flex-basis:100%}
+.gx-ref-d{font-size:max(13px,.86em);flex-basis:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gx-ref-big h3{margin:4px 0 2px;text-align:center;font-size:1.25em}
+.gx-ref-big .gx-ref-m{text-align:center}
+.gx-ref-full{font-size:1.02em;line-height:1.5;max-width:40em;margin:10px auto}
+.gx-ref-x{max-width:40em;margin:8px auto;font-size:max(13px,.9em)}
+.gx-ref-big .gx-chips{justify-content:center;flex-wrap:wrap}
+.gx-tag{font-size:max(13px,.8em);padding:2px 9px;border-radius:99px;background:var(--gx-chip)}
+.gx-ref-bh{display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:-10px;background:var(--gx-panel);padding:6px 0;z-index:2}
+.gx-ref-nav{display:inline-flex;align-items:center;gap:6px}
+.gx-ref-big:focus{outline:none}
+/* recap strip */
+.gx-recap{box-sizing:border-box;min-width:0;max-width:calc(100% - 16px);align-self:stretch;margin:6px 8px;border-radius:12px;background:rgba(0,0,0,.07);border:1px solid var(--gx-line)}
+.gx-recap[hidden]{display:none}
+.gx-recap-top{display:flex;align-items:stretch}
+.gx-recap-h{appearance:none;flex:1;min-width:0;display:flex;align-items:center;gap:8px;font:inherit;color:inherit;background:transparent;border:0;padding:6px 10px;min-height:44px;text-align:left;cursor:pointer}
+.gx-recap-h b{white-space:nowrap;font-size:max(13px,.86em)}
+.gx-recap-n{font-size:max(13px,.75em);font-weight:700;min-width:1.6em;text-align:center;border-radius:99px;padding:1px 6px;background:var(--gx-accent);color:#1d140b}
+.gx-recap-1{flex:1;min-width:0;font-size:max(13px,.84em);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gx-recap-x{appearance:none;border:0;background:transparent;color:inherit;font-size:1.4em;min-width:44px;min-height:44px;cursor:pointer;border-radius:10px}
+.gx-recap-l{margin:0;padding:0 12px 8px 30px;font-size:max(13px,.86em);max-height:9.5em;overflow:auto;line-height:1.4}
+/* update notice */
+.gx-update{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;appearance:none;font:inherit;font-weight:700;padding:10px 18px;min-height:48px;border-radius:99px;border:0;background:var(--gx-accent);color:#1d140b;box-shadow:var(--gx-shadow);cursor:pointer;max-width:calc(100vw - 24px)}
+/* left-handed: the dock and the drawers swap sides on wide screens; games can flip their own button rows with html.lefty */
+@media (min-width:1000px){
+  html.lefty .gx-main{grid-template-columns:var(--gx-dock-w) minmax(0,1fr)}
+  html.lefty .gx-app.gx-dock-min .gx-main{grid-template-columns:0 minmax(0,1fr)}
+  html.lefty .gx-dock{grid-column:1;grid-row:1}
+  html.lefty .gx-board{grid-column:2;grid-row:1}
+  html.lefty .gx-drawer{right:auto;left:8px;transform:translateX(calc(-100% - 16px))}
+  html.lefty .gx-drawer.on{transform:none}
+  html.lefty .gx-ibtn.gx-reopen{right:auto;left:10px}
+}
+/* reduce motion / animations off */
+html.gx-reduce *,html.gx-reduce *::before,html.gx-reduce *::after,html.gx-noanim *,html.gx-noanim *::before,html.gx-noanim *::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important;scroll-behavior:auto!important}
+/* colour-blind symbols: games add <i class="gx-cbm">▲</i> next to colour-coded pieces; shown only with html.cb */
+.gx-cbm{display:none;font-style:normal}
+html.cb .gx-cbm{display:inline}
+
 :root{--ink:#f6e6b4;--gold:#e8c867;--bg:#120b0e;--panel:#241419;--panel2:#33202a;--line:rgba(232,200,103,.35);--fd:'TB Display','Cinzel',Georgia,serif;--fb:'TB Body','EB Garamond',Georgia,serif;--gx-bg:#0c0709;--gx-bar:#1a0f13;--gx-panel:#f3e6bf;--gx-ink:#231a10;--gx-accent:#e8c867;--sat:env(safe-area-inset-top,0px);--sar:env(safe-area-inset-right,0px);--sab:env(safe-area-inset-bottom,0px);--sal:env(safe-area-inset-left,0px)}
 html,body{background:var(--bg);color:var(--ink);font:17px/1.3 var(--fb);margin:0}
 button{font:inherit;color:inherit}
@@ -304,6 +388,27 @@ body.in-start .gx-scrim{z-index:66}body.in-start .gx-drawer{z-index:67}
 #main .lk,.wait .lk{color:var(--gold)}
 .rv-t small{overflow:hidden;text-overflow:ellipsis}
 #main{background:linear-gradient(#241419 30%,rgba(36,20,25,0)) top/100% 24px no-repeat local,linear-gradient(rgba(36,20,25,0),#241419 70%) bottom/100% 24px no-repeat local,radial-gradient(farthest-side at 50% 0,rgba(0,0,0,.55),rgba(0,0,0,0)) top/100% 10px no-repeat scroll,radial-gradient(farthest-side at 50% 100%,rgba(0,0,0,.6),rgba(0,0,0,0)) bottom/100% 12px no-repeat scroll}
+/* part 8: shared kit (undo, bid confirm, reference links, colour-blind marks, text size, left-handed) */
+.tlinks{display:flex;flex-wrap:wrap;justify-content:center;gap:2px}
+#act .btn.undo{flex:0 0 auto;padding:6px 10px}
+.bidok{display:flex;gap:10px;align-items:center;margin:4px 0}.bidok .th{flex:none;line-height:0}.bidok p{margin:0}
+.pp-ref{margin:8px 0 2px}
+.gx-cbm{display:none}html.cb .gx-cbm{display:inline-block}
+.hd .gx-cbm{font:700 11px/12px system-ui,sans-serif;color:#fff;margin:0 2px 0 -1px}
+.rv-e{position:relative}.rv .gx-cbm{position:absolute;left:-5px;top:-5px;min-width:15px;height:15px;border-radius:50%;background:#fff3c4;color:#2b1808;font:700 11px/15px system-ui,sans-serif;text-align:center}
+.tbx-cb{display:none}html.cb .tbx-cb{display:inline}
+html.lefty #act{flex-direction:row-reverse}
+#dockbody{zoom:var(--gx-text,1)}#ppop .pp-b,#pc .cd-sc,#gdef,.gx-drawer-body .rules,#logbody,#boardbody{zoom:var(--gx-text,1)}
+#dockbody .gx-recap{margin:6px 8px 2px;font-size:.92rem}
+.gx-refbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.gx-ref-pic .tb-card{flex:none}
+.me-chips{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}.me-chips span{font-size:.72rem;padding:1px 6px;border-radius:8px;background:rgba(255,243,196,.14);white-space:nowrap}
+.bd2 li{flex-wrap:wrap}.bd2 .bd-t{font-weight:700}.bd2 .bd-l{display:flex;flex-wrap:wrap;gap:2px 10px;width:100%;font-size:.86rem}.bd2 .bd-l i{font-style:normal;white-space:nowrap}
+.hist{display:block;width:100%;max-width:340px;height:auto;margin:2px auto 6px}
+.achv{margin:8px 0 0;padding:6px 10px;border-radius:10px;background:#f3d77a;color:#3a2412;font-weight:700}
+.fcard .bal{margin:4px 0 0;font-size:.82rem;color:#ffd98a;font-style:italic}
+html:not(.ph) #start[data-v=setup] .sgo{position:sticky;bottom:0;z-index:3;margin:0 -12px calc(-14px - var(--sab));padding:10px 12px calc(12px + var(--sab));background:linear-gradient(rgba(20,10,16,.82),#140a10 30%);box-shadow:0 -8px 18px rgba(0,0,0,.45)}
+.gx-set-nav>.gx-chip,.gx-ref-secs>.gx-chip,.gx-ref-tags>.gx-chip{flex:none}
 </style></head>
 <body>
 <div class="gx-app">
@@ -358,6 +463,460 @@ const GX={key:'gx',open:null,
   drawer(id,title,bodyEl,wide){let d=document.getElementById(id);if(!d){d=document.createElement('section');d.id=id;d.className='gx-drawer'+(wide?' wide':'');d.setAttribute('role','dialog');d.setAttribute('aria-label',title);
       d.innerHTML=`<div class="gx-drawer-head"><h2></h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"></div>`;document.body.appendChild(d)}
     d.querySelector('h2').textContent=title;if(bodyEl){const b=d.querySelector('.gx-drawer-body');if(bodyEl.parentNode!==b){b.innerHTML='';b.appendChild(bodyEl)}}return d}};
+
+</script>
+<script>
+// ===== GX kit: opt-in shared parts for every game on the shelf (load AFTER shell.js) =====
+// Adds to the existing GX object without changing any of its existing calls:
+//   GX.pref / GX.setPref / GX.onPref / GX.applyPrefs     shared settings stored once as `gns-prefs`
+//   GX.settings(opts)                                     the Menu drawer with the same sections in every game
+//   GX.reference(sections, opts) / GX.refOpen(id)         component reference drawer (search, chips, big view)
+//   GX.undo                                               snapshot / restore of the JSON game state
+//   GX.recap                                              "Since your last turn" strip for the dock
+//   GX.buzz / GX.animMs / GX.aiDelay / GX.reduced / GX.mark   small helpers
+//   GX.offline(opts)                                      service worker + "a new version is ready" notice
+// and a global GNS for local results, statistics and achievements (shared with the shelf home page).
+// Everything is wrapped in try/catch: a missing localStorage, navigator.vibrate or service worker never throws.
+(function (root, shellGX) {
+  'use strict';
+  // shell.js declares `const GX` (a global lexical binding, not window.GX): extend that same object, and expose it as window.GX too
+  var GX = root.GX = shellGX || root.GX || {};
+  var doc = root.document;
+  var LS = {
+    get: function (k) { try { return root.localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { root.localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+    json: function (k, d) { try { var v = JSON.parse(root.localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+    put: function (k, v) { try { root.localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  };
+  GX._ls = LS;
+  function el(tag, cls, txt) { var e = doc.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function btn(cls, txt, on) { var b = el('button', cls, txt); b.type = 'button'; if (on) b.addEventListener('click', on); return b; }
+  var qs = function () { try { return root.location ? root.location.search : ''; } catch (e) { return ''; } };
+  GX.dev = /[?&]dev=1\b/.test(qs());
+  // hooks run just before a drawer opens (the game's own GX.onShow keeps working untouched)
+  var bsh = [];
+  GX.beforeShow = function (f) {
+    if (!GX._kitShow && typeof GX.show === 'function') { var base = GX.show; GX._kitShow = true; GX.show = function (id) { for (var i = 0; i < bsh.length; i++) { try { bsh[i](id); } catch (e) { } } return base.apply(this, arguments); }; }
+    bsh.push(f); return f;
+  };
+
+  // ------------------------------------------------------------------ shared settings
+  var PDEF = { master: 1, music: 0.5, sfx: 0.8, anim: 'normal', ai: 'normal', text: 1, cb: false, lefty: false, reduce: false, haptics: true };
+  var P = Object.assign({}, PDEF, LS.json('gns-prefs', {}) || {});
+  var pl = [];
+  GX.PREF_DEFAULTS = PDEF;
+  GX.pref = function (k) { return k == null ? Object.assign({}, P) : P[k]; };
+  GX.setPref = function (k, v) {
+    if (typeof k === 'object') { for (var x in k) P[x] = k[x]; } else P[k] = v;
+    LS.put('gns-prefs', P); GX.applyPrefs();
+    for (var i = 0; i < pl.length; i++) { try { pl[i](k, v, GX.pref()); } catch (e) { } }
+    return v;
+  };
+  GX.onPref = function (f) { pl.push(f); return f; };
+  GX.reduced = function () { if (P.reduce) return true; try { return !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { return false; } };
+  var AM = { slow: 1.6, normal: 1, fast: 0.5, off: 0 };
+  // scale an animation length by the player's animation speed (0 when animations are off or motion is reduced)
+  GX.animMs = function (ms) { return GX.reduced() ? 0 : Math.round(ms * (AM[P.anim] != null ? AM[P.anim] : 1)); };
+  var AD = { slow: 2, normal: 1, fast: 0.25 };
+  // scale the pause between computer moves by the player's computer speed
+  GX.aiDelay = function (ms) { return Math.round(ms * (AD[P.ai] != null ? AD[P.ai] : 1)); };
+  GX.buzz = function (pat) { try { if (P.haptics && root.navigator && typeof root.navigator.vibrate === 'function') return root.navigator.vibrate(pat == null ? 12 : pat); } catch (e) { } return false; };
+  GX.canBuzz = function () { try { return !!(root.navigator && typeof root.navigator.vibrate === 'function'); } catch (e) { return false; } };
+  // colour-blind hook: one symbol per seat / colour index, shown next to colour-coded pieces when html.cb is on
+  GX.SYMBOLS = ['●', '▲', '■', '◆', '★', '✚', '⬟', '✱'];
+  GX.mark = function (i) { return GX.SYMBOLS[((i | 0) % GX.SYMBOLS.length + GX.SYMBOLS.length) % GX.SYMBOLS.length]; };
+  GX.applyPrefs = function () {
+    try {
+      var h = doc.documentElement, c = h.classList;
+      c.toggle('cb', !!P.cb); c.toggle('lefty', !!P.lefty); c.toggle('gx-reduce', !!P.reduce); c.toggle('gx-noanim', P.anim === 'off');
+      h.style.setProperty('--gx-text', String(+P.text || 1));
+      h.style.setProperty('--gx-anim', String(GX.reduced() ? 0 : (AM[P.anim] != null ? AM[P.anim] : 1)));
+      if (root.GA && root.GA.setVolume) { root.GA.setVolume('master', +P.master); root.GA.setVolume('music', +P.music); root.GA.setVolume('sfx', +P.sfx); }
+    } catch (e) { }
+  };
+
+  // ------------------------------------------------------------------ settings panel
+  // GX.settings({id, title, label, game, sound, speed, help, graphics, accessibility, about:{name, version, text}, shelf:'../'})
+  // game / sound / speed / help / graphics / accessibility: optional fn(sectionEl) that appends the game's own rows.
+  // Sections are always in this order: Game · Sound · Speed · Help · Graphics · Accessibility · About (+ Developer with ?dev=1).
+  GX.SECTIONS = ['Game', 'Sound', 'Speed', 'Help', 'Graphics', 'Accessibility', 'About'];
+  GX.row = function (label, kids, hint) {
+    var r = el('div', 'gx-row'), l = el('div', 'gx-row-l', label), k = el('div', 'gx-row-k');
+    r.appendChild(l); if (hint) l.appendChild(el('small', null, hint));
+    (Array.isArray(kids) ? kids : [kids]).forEach(function (x) { if (x) k.appendChild(typeof x === 'string' ? doc.createTextNode(x) : x); });
+    r.appendChild(k); return r;
+  };
+  // segmented choice: GX.seg([[value,label],...], current, onPick)
+  GX.seg = function (vals, cur, on, name) {
+    var g = el('div', 'gx-seg'); g.setAttribute('role', 'group'); if (name) g.setAttribute('aria-label', name);
+    vals.forEach(function (v) {
+      var b = btn('gx-sb', v[1], function () { on(v[0]); g.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); });
+      b.setAttribute('aria-pressed', String(v[0] === cur)); b.dataset.v = String(v[0]); g.appendChild(b);
+    });
+    return g;
+  };
+  GX.onoff = function (on, set, name) {
+    var b = btn('gx-tg', on ? 'On' : 'Off'); b.setAttribute('role', 'switch'); b.setAttribute('aria-checked', String(!!on)); if (name) b.setAttribute('aria-label', name);
+    b.addEventListener('click', function () { on = !on; b.textContent = on ? 'On' : 'Off'; b.setAttribute('aria-checked', String(on)); set(on); });
+    return b;
+  };
+  GX.slider = function (val, set, name) {
+    var w = el('span', 'gx-sl'), i = el('input'), o = el('output', null, Math.round(val * 100) + '%');
+    i.type = 'range'; i.min = '0'; i.max = '100'; i.step = '5'; i.value = String(Math.round(val * 100)); if (name) i.setAttribute('aria-label', name);
+    i.addEventListener('input', function () { o.textContent = i.value + '%'; set(+i.value / 100); });
+    w.appendChild(i); w.appendChild(o); return w;
+  };
+  function prefRows(sec, S) {
+    if (sec === 'Sound') {
+      S.appendChild(GX.row('Master volume', GX.slider(+P.master, function (v) { GX.setPref('master', v); }, 'Master volume')));
+      S.appendChild(GX.row('Music', GX.slider(+P.music, function (v) { GX.setPref('music', v); }, 'Music volume')));
+      S.appendChild(GX.row('Effects', GX.slider(+P.sfx, function (v) { GX.setPref('sfx', v); }, 'Effects volume')));
+      if (GX.canBuzz()) S.appendChild(GX.row('Vibration', GX.onoff(P.haptics, function (v) { GX.setPref('haptics', v); if (v) GX.buzz(20); }, 'Vibration'), 'Short buzz on your turn and on big moments'));
+    } else if (sec === 'Speed') {
+      S.appendChild(GX.row('Animations', GX.seg([['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Fast'], ['off', 'Off']], P.anim, function (v) { GX.setPref('anim', v); }, 'Animation speed')));
+      S.appendChild(GX.row('Computer players', GX.seg([['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Fast']], P.ai, function (v) { GX.setPref('ai', v); }, 'Computer speed')));
+    } else if (sec === 'Accessibility') {
+      S.appendChild(GX.row('Text size', GX.seg([[0.9, 'Small'], [1, 'Normal'], [1.15, 'Large'], [1.3, 'Huge']], +P.text, function (v) { GX.setPref('text', v); }, 'Text size')));
+      S.appendChild(GX.row('Colour-blind help', GX.onoff(P.cb, function (v) { GX.setPref('cb', v); }, 'Colour-blind help'), 'Adds symbols to colour-coded pieces'));
+      S.appendChild(GX.row('Left-handed', GX.onoff(P.lefty, function (v) { GX.setPref('lefty', v); }, 'Left-handed layout'), 'Panel and main buttons on the left'));
+      S.appendChild(GX.row('Reduce motion', GX.onoff(P.reduce, function (v) { GX.setPref('reduce', v); }, 'Reduce motion'), 'No sliding or flying pieces'));
+    }
+  }
+  GX.settings = function (o) {
+    o = o || {}; GX._set = o;
+    var id = o.id || 'gx-setd';
+    var body = el('div', 'gx-set');
+    GX.drawer(id, o.title || 'Menu', body, false);
+    var render = function () {
+      body.innerHTML = '';
+      var nav = el('nav', 'gx-set-nav'); nav.setAttribute('aria-label', 'Menu sections'); body.appendChild(nav);
+      var secs = GX.SECTIONS.slice(); if (GX.dev) secs.push('Developer');
+      secs.forEach(function (sec) {
+        var key = sec.toLowerCase(), S = el('section', 'gx-sec'); S.id = id + '-' + key; S.setAttribute('aria-label', sec);
+        S.appendChild(el('h3', null, sec));
+        try { if (typeof o[key] === 'function') o[key](S); } catch (e) { if (root.console) console.error(e); }
+        prefRows(sec, S);
+        if (sec === 'About') aboutRows(S, o);
+        if (sec === 'Developer') devRows(S);
+        if (S.childNodes.length > 1) { body.appendChild(S); var a = btn('gx-chip', sec, function () { S.scrollIntoView({ block: 'start', behavior: GX.reduced() ? 'auto' : 'smooth' }); }); nav.appendChild(a); }
+      });
+    };
+    GX._setRender = render;
+    GX.beforeShow(function (x) { if (x === id) render(); });
+    render();
+    return id;
+  };
+  GX.renderSettings = function () { if (GX._setRender) GX._setRender(); };
+  function aboutRows(S, o) {
+    var a = o.about || {}, shelf = o.shelf != null ? o.shelf : '../';
+    if (a.name) S.appendChild(el('p', 'gx-about-n', a.name + (a.version ? ' · ' + a.version : '')));
+    if (a.text) { var p = el('p', 'gx-small'); p.textContent = a.text; S.appendChild(p); }
+    var links = el('div', 'gx-links');
+    [['credits.html', 'Credits & licences'], ['privacy.html', 'Privacy'], ['terms.html', 'Terms'], ['reference.html', 'All cards on the shelf']].forEach(function (l) {
+      var x = el('a', 'gx-chip', l[1]); x.href = shelf + l[0]; x.target = '_blank'; x.rel = 'noopener'; links.appendChild(x);
+    });
+    S.appendChild(links);
+    S.appendChild(el('p', 'gx-small', 'Settings, saves and statistics stay on this device. Nothing is sent anywhere unless you play online.'));
+  }
+  function devRows(S) {
+    var H = root.PerfHUD;
+    S.appendChild(GX.row('Speed tools', [
+      btn('gx-sb', 'Show speed', function () { try { H && (H.toggle ? H.toggle() : H.show && H.show()); } catch (e) { } }),
+      btn('gx-sb', 'Test speed', function () { try { H && H.test && H.test(); } catch (e) { } }),
+      btn('gx-sb', 'Copy report', function () { try { var r = H && H.report ? H.report() : JSON.stringify(GX.pref()); root.navigator.clipboard.writeText(r); } catch (e) { } })
+    ]));
+  }
+
+  // ------------------------------------------------------------------ component reference
+  // sections: [{id, title, items:[{id, name, count, text, tags:[], meta, picture}]}]
+  //   picture: optional; a string (image URL or SVG/HTML markup), a DOM node, or anything opts.picture(item, big) can draw.
+  // opts: {id:'gx-refd', title:'Cards', label:'Cards', button:true|selector, picture:fn(item,big)->Node|string,
+  //        inGame:fn(item)->bool (adds an "In this game" chip), search:'placeholder'}
+  GX.reference = function (sections, opts) {
+    opts = opts || {}; var id = opts.id || 'gx-refd';
+    var R = GX._ref = { id: id, sections: sections || [], opts: opts, sec: 'all', tags: {}, q: '', inGame: false, big: null };
+    var body = el('div', 'gx-ref'); GX.drawer(id, opts.title || 'Cards', body, true);
+    R.body = body;
+    var top = el('div', 'gx-ref-top');
+    var s = el('input', 'gx-ref-q'); s.type = 'search'; s.placeholder = opts.search || 'Search names and text'; s.setAttribute('aria-label', 'Search');
+    s.addEventListener('input', function () { R.q = s.value; draw(); });
+    top.appendChild(s);
+    R.secRow = el('div', 'gx-chips gx-ref-secs'); R.tagRow = el('div', 'gx-chips gx-ref-tags'); R.count = el('div', 'gx-ref-n'); R.count.setAttribute('aria-live', 'polite');
+    top.appendChild(R.secRow); top.appendChild(R.tagRow); top.appendChild(R.count);
+    R.list = el('div', 'gx-ref-list'); R.view = el('div', 'gx-ref-big'); R.view.hidden = true; R.view.setAttribute('role', 'region'); R.view.setAttribute('aria-label', 'Card');
+    body.appendChild(top); body.appendChild(R.list); body.appendChild(R.view);
+    R.input = s;
+    if (opts.button !== false) {
+      var bar = doc.querySelector(typeof opts.button === 'string' ? opts.button : '.gx-bar');
+      if (bar && !doc.querySelector('[data-gx="' + id + '"]')) {
+        var b = btn('gx-ibtn gx-refbtn'); b.dataset.gx = id; b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', opts.title || 'Cards'); b.title = opts.title || 'Cards';
+        b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="11" height="16" rx="2"/><path d="M14 6.5 20 8l-3.2 12.2-5-1.3"/></svg><span></span>';
+        b.querySelector('span').textContent = opts.label || 'Cards';
+        var sp = bar.querySelector('.gx-sp'); var after = sp ? sp.nextElementSibling : null;
+        if (opts.before) after = bar.querySelector(opts.before) || after;
+        if (after) bar.insertBefore(b, after); else bar.appendChild(b);
+      }
+    }
+    GX.beforeShow(function (x) { if (x === id) { if (!R.keepBig) closeBig(); R.keepBig = false; draw(); } });
+    R.view.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') step(1); else if (e.key === 'ArrowLeft') step(-1); });
+    draw();
+    return id;
+  };
+  GX.refData = function (sections) { if (GX._ref) { GX._ref.sections = sections; draw(); } };
+  function all() { var R = GX._ref, out = []; R.sections.forEach(function (S) { (S.items || []).forEach(function (it) { out.push({ s: S, it: it }); }); }); return out; }
+  function norm(x) { return String(x == null ? '' : x).toLowerCase(); }
+  function matches(e) {
+    var R = GX._ref, it = e.it;
+    if (R.sec !== 'all' && e.s.id !== R.sec) return false;
+    for (var t in R.tags) if (R.tags[t] && (it.tags || []).indexOf(t) < 0) return false;
+    if (R.inGame && R.opts.inGame && !R.opts.inGame(it)) return false;
+    if (R.q) { var hay = norm(it.name) + ' ' + norm(it.text) + ' ' + norm((it.tags || []).join(' ')) + ' ' + norm(it.meta); var w = norm(R.q).split(/\s+/); for (var i = 0; i < w.length; i++) if (w[i] && hay.indexOf(w[i]) < 0) return false; }
+    return true;
+  }
+  function pic(it, big) {
+    var R = GX._ref, p = null;
+    try { p = R.opts.picture ? R.opts.picture(it, big) : null; } catch (e) { p = null; }
+    if (p == null) p = it.picture;
+    if (p == null) return null;
+    var w = el('span', 'gx-ref-pic' + (big ? ' big' : ''));
+    if (typeof p === 'string') { if (/^\s*</.test(p)) w.innerHTML = p; else { var im = el('img'); im.src = p; im.alt = ''; im.loading = 'lazy'; w.appendChild(im); } }
+    else if (p.nodeType) w.appendChild(p);
+    return w;
+  }
+  function chip(label, on, f) { var b = btn('gx-chip', label, f); b.setAttribute('aria-pressed', String(!!on)); return b; }
+  function draw() {
+    var R = GX._ref; if (!R) return;
+    R.secRow.innerHTML = '';
+    if (R.sections.length > 1) {
+      R.secRow.appendChild(chip('All', R.sec === 'all', function () { R.sec = 'all'; R.tags = {}; draw(); }));
+      R.sections.forEach(function (S) { var n = (S.items || []).length; R.secRow.appendChild(chip(S.title + ' ' + n, R.sec === S.id, function () { R.sec = S.id; R.tags = {}; draw(); })); });
+    }
+    // tag chips for the chosen section (most common first, at most 14)
+    var tc = {}; all().forEach(function (e) { if (R.sec !== 'all' && e.s.id !== R.sec) return; (e.it.tags || []).forEach(function (t) { tc[t] = (tc[t] || 0) + 1; }); });
+    var tl = Object.keys(tc).sort(function (a, b) { return tc[b] - tc[a] || (a < b ? -1 : 1); }).slice(0, 14);
+    R.tagRow.innerHTML = '';
+    if (R.opts.inGame) R.tagRow.appendChild(chip('In this game', R.inGame, function () { R.inGame = !R.inGame; draw(); }));
+    tl.forEach(function (t) { R.tagRow.appendChild(chip(t, R.tags[t], function () { R.tags[t] = !R.tags[t]; draw(); })); });
+    var hits = all().filter(matches), copies = 0;
+    hits.forEach(function (e) { copies += +e.it.count || 0; });
+    R.hits = hits;
+    R.count.textContent = hits.length + (hits.length === 1 ? ' entry' : ' entries') + (copies > hits.length ? ' · ' + copies + ' pieces in the box' : '');
+    R.list.innerHTML = '';
+    if (!hits.length) R.list.appendChild(el('p', 'gx-small', 'Nothing matches. Clear the search or a chip.'));
+    var frag = doc.createDocumentFragment();
+    hits.forEach(function (e, i) {
+      var it = e.it, b = btn('gx-ref-it'); b.dataset.ref = it.id != null ? String(it.id) : String(i);
+      b.setAttribute('aria-label', it.name + (it.count ? ', ' + it.count + ' in the box' : ''));
+      var p = pic(it, false); if (p) b.appendChild(p);
+      var t = el('span', 'gx-ref-tx'); var nm = el('b', null, it.name); t.appendChild(nm);
+      if (it.count != null) { var c = el('span', 'gx-ref-c', '×' + it.count); t.appendChild(c); }
+      if (it.meta) t.appendChild(el('span', 'gx-ref-m', it.meta));
+      if (it.text) t.appendChild(el('span', 'gx-ref-d', it.text));
+      b.appendChild(t);
+      b.addEventListener('click', function () { openBig(i); });
+      frag.appendChild(b);
+    });
+    R.list.appendChild(frag);
+  }
+  function openBig(i) {
+    var R = GX._ref, e = R.hits[i]; if (!e) return; R.big = i; var it = e.it, V = R.view;
+    V.innerHTML = '';
+    var head = el('div', 'gx-ref-bh');
+    head.appendChild(btn('gx-sb', '‹ All', closeBig));
+    var nav = el('span', 'gx-ref-nav');
+    var pv = btn('gx-sb', '‹', function () { step(-1); }); pv.setAttribute('aria-label', 'Previous'); pv.disabled = i <= 0;
+    var nx = btn('gx-sb', '›', function () { step(1); }); nx.setAttribute('aria-label', 'Next'); nx.disabled = i >= R.hits.length - 1;
+    nav.appendChild(pv); nav.appendChild(el('span', 'gx-small', (i + 1) + ' / ' + R.hits.length)); nav.appendChild(nx);
+    head.appendChild(nav); V.appendChild(head);
+    var p = pic(it, true); if (p) V.appendChild(p);
+    V.appendChild(el('h3', null, it.name));
+    var m = []; if (it.count != null) m.push(it.count + (it.count === 1 ? ' in the box' : ' in the box')); if (it.meta) m.push(it.meta); m.push(e.s.title);
+    V.appendChild(el('p', 'gx-ref-m', m.join(' · ')));
+    if (it.text) V.appendChild(el('p', 'gx-ref-full', it.text));
+    if (it.extra) { var x = el('div', 'gx-ref-x'); if (typeof it.extra === 'string') x.textContent = it.extra; else x.appendChild(it.extra); V.appendChild(x); }
+    if (it.tags && it.tags.length) { var tg = el('div', 'gx-chips'); it.tags.forEach(function (t) { tg.appendChild(el('span', 'gx-tag', t)); }); V.appendChild(tg); }
+    V.hidden = false; R.list.hidden = true; R.body.classList.add('big');
+    V.tabIndex = -1; try { V.focus({ preventScroll: true }); } catch (er) { }
+    var sc = V.closest && V.closest('.gx-drawer-body'); if (sc) sc.scrollTop = 0;
+  }
+  function closeBig() { var R = GX._ref; if (!R) return; R.big = null; R.view.hidden = true; R.list.hidden = false; R.body.classList.remove('big'); }
+  function step(d) { var R = GX._ref; if (R && R.big != null) openBig(Math.max(0, Math.min(R.hits.length - 1, R.big + d))); }
+  // open the drawer straight at one item (e.g. from a card pop-up: "Read in the reference")
+  GX.refOpen = function (itemId) {
+    var R = GX._ref; if (!R) return false;
+    R.sec = 'all'; R.tags = {}; R.q = ''; R.inGame = false; if (R.input) R.input.value = '';
+    draw();
+    var i = -1; R.hits.forEach(function (e, k) { if (String(e.it.id) === String(itemId)) i = k; });
+    R.keepBig = i >= 0; if (GX.open !== R.id) GX.show(R.id); else R.keepBig = false;
+    if (i >= 0) openBig(i);
+    return i >= 0;
+  };
+
+  // ------------------------------------------------------------------ undo
+  // GX.undo.config({get:()=>state, set:state=>{...re-render...}, owner:state=>seat|null, online:()=>bool, allowOnline:false,
+  //                 onChange:fn(can)})
+  // snap() before each human move; check() after it (seals when the turn passed to someone else); drop() if the move was refused;
+  // seal() when hidden information was revealed or the move is confirmed. undo() restores the last snapshot.
+  GX.undo = (function () {
+    var C = { get: null, set: null, owner: null, online: null, allowOnline: false, onChange: null, max: 40 }, st = [], ow = null;
+    function changed() { if (C.onChange) { try { C.onChange(U.can()); } catch (e) { } } }
+    var U = {
+      config: function (o) { for (var k in o) C[k] = o[k]; st = []; ow = null; changed(); return U; },
+      enabled: function () { if (C.online && C.online() && !C.allowOnline) return false; return !!(C.get && C.set); },
+      snap: function (label) {
+        if (!U.enabled()) return false;
+        var s; try { s = JSON.stringify(C.get()); } catch (e) { return false; }
+        var o = C.owner ? C.owner(C.get()) : null;
+        if (st.length && o !== ow) st = [];
+        ow = o; st.push({ s: s, label: label || '' }); if (st.length > C.max) st.shift(); changed(); return true;
+      },
+      // call after the move: seals when the decision passed to another seat, or when sealIf(beforeState, nowState) says so
+      check: function (sealIf) {
+        if (!st.length) return;
+        var now = C.get(), o = C.owner ? C.owner(now) : null;
+        if (C.owner && o !== ow) return U.seal('turn');
+        if (sealIf) { var before; try { before = JSON.parse(st[st.length - 1].s); } catch (e) { before = null; } try { if (sealIf(before, now)) return U.seal('reveal'); } catch (e) { } }
+      },
+      seal: function (why) { if (st.length) { st = []; U.why = why || 'sealed'; changed(); } return false; },
+      // the move was rejected by the rules: forget its snapshot without restoring anything
+      drop: function () { if (st.length) { st.pop(); changed(); } },
+      clear: function () { st = []; ow = null; changed(); },
+      can: function () { return U.enabled() && st.length > 0; },
+      size: function () { return st.length; },
+      label: function () { return st.length ? st[st.length - 1].label : ''; },
+      undo: function () {
+        if (!U.can()) return false;
+        var e = st.pop(), s;
+        try { s = JSON.parse(e.s); } catch (er) { return false; }
+        C.set(s); changed(); return true;
+      }
+    };
+    return U;
+  })();
+
+  // ------------------------------------------------------------------ "Since your last turn"
+  // GX.recap.attach(el|selector, {title}); push(lines, fromSeat) while others play; mark(seat) when that seat decides;
+  // view(seat) chooses whose summary is shown (hot-seat); the strip renders itself and can be dismissed.
+  GX.recap = (function () {
+    var box = null, buf = {}, cur = 0, open = false, title = 'Since your last turn', seats = null;
+    function list() { return buf[cur] || []; }
+    function render() {
+      if (!box) return;
+      var L = list(); box.innerHTML = '';
+      if (!L.length) { box.hidden = true; return; }
+      box.hidden = false; box.classList.toggle('open', open);
+      var head = btn('gx-recap-h'); head.setAttribute('aria-expanded', String(open));
+      head.appendChild(el('b', null, title)); head.appendChild(el('span', 'gx-recap-n', String(L.length)));
+      head.appendChild(el('span', 'gx-recap-1', open ? '' : L[L.length - 1]));
+      head.addEventListener('click', function () { open = !open; render(); });
+      var x = btn('gx-recap-x', '×', function () { R.dismiss(); }); x.setAttribute('aria-label', 'Dismiss');
+      var top = el('div', 'gx-recap-top'); top.appendChild(head); top.appendChild(x); box.appendChild(top);
+      if (open) { var ul = el('ol', 'gx-recap-l'); L.forEach(function (t) { ul.appendChild(el('li', null, t)); }); box.appendChild(ul); }
+    }
+    var R = {
+      attach: function (where, o) {
+        var host = typeof where === 'string' ? doc.querySelector(where) : where; if (!host) return null;
+        if (o && o.title) title = o.title;
+        box = el('div', 'gx-recap'); box.setAttribute('role', 'status'); box.hidden = true;
+        if (o && o.before) host.insertBefore(box, host.firstChild); else host.appendChild(box);
+        render(); return box;
+      },
+      seats: function (list) { seats = list; },
+      push: function (lines, fromSeat) {
+        lines = (Array.isArray(lines) ? lines : [lines]).filter(function (x) { return x != null && x !== ''; }).map(String);
+        if (!lines.length) return;
+        var ks = seats || Object.keys(buf).map(Number); if (!ks.length) ks = [cur];
+        ks.forEach(function (s) { if (s === fromSeat) return; var b = buf[s] = buf[s] || []; b.push.apply(b, lines); if (b.length > 60) b.splice(0, b.length - 60); });
+        render();
+      },
+      mark: function (seat) { buf[seat == null ? cur : seat] = []; open = false; render(); },
+      view: function (seat) { if (seat !== cur) { cur = seat; open = false; render(); } },
+      dismiss: function () { buf[cur] = []; open = false; render(); },
+      clear: function () { buf = {}; open = false; render(); },
+      lines: function (seat) { return (buf[seat == null ? cur : seat] || []).slice(); },
+      render: render
+    };
+    return R;
+  })();
+
+  // ------------------------------------------------------------------ offline + new version notice
+  // GX.offline({sw:'../sw.js', scope:'../'}) registers the shelf service worker (http/https only) and shows
+  // "A new version is ready — tap to reload" when the worker says this page changed or a new worker takes over.
+  GX.offline = function (o) {
+    o = o || {};
+    try {
+      var nav = root.navigator; if (!nav || !nav.serviceWorker || !/^https?:$/.test(root.location.protocol)) return false;
+      var had = !!nav.serviceWorker.controller, url = o.sw || '../sw.js';
+      // register only when the worker file really is a script (a test server that answers every URL with the page would
+      // otherwise make the browser log a registration error)
+      var reg = function () { nav.serviceWorker.register(url, { scope: o.scope || '../' }).catch(function () { }); };
+      if (root.fetch) root.fetch(url, { method: 'HEAD', cache: 'no-store' }).then(function (r) { if (r.ok && /javascript/.test(r.headers.get('content-type') || '')) reg(); }, function () { });
+      else reg();
+      nav.serviceWorker.addEventListener('controllerchange', function () { if (had) GX.updateNotice(); had = true; });
+      nav.serviceWorker.addEventListener('message', function (e) {
+        var d = e.data || {}; if (d.type !== 'gns-update') return;
+        try { var u = new URL(d.url, root.location.href), me = new URL(root.location.href); var p = function (x) { return x.pathname.replace(/index\.html$/, ''); }; if (p(u) === p(me)) GX.updateNotice(); } catch (er) { }
+      });
+      return true;
+    } catch (e) { return false; }
+  };
+  GX.updateNotice = function (text) {
+    if (!doc || doc.querySelector('.gx-update')) return;
+    var b = btn('gx-update', text || 'A new version is ready — tap to reload', function () { try { root.location.reload(); } catch (e) { } });
+    b.setAttribute('role', 'status'); doc.body.appendChild(b);
+  };
+
+  try { GX.applyPrefs(); } catch (e) { }
+  if (root.matchMedia) { try { root.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', GX.applyPrefs); } catch (e) { } }
+})(typeof window !== 'undefined' ? window : this, typeof GX !== 'undefined' ? GX : null);
+
+// ===== GNS: local results, statistics and achievements (read by the shelf home page) =====
+// GNS.result({game, mode, seats:[{name, me, ai}], winner, scores, turns, ms})  on game over -> {stats, earned:[new achievements]}
+// GNS.achievements(game, [{id, name, how, test:(result, stats)=>bool}])          declare once at boot
+// GNS.stats(game) · GNS.earned(game) · GNS.results(game) · GNS.saved(game, bool) · GNS.onEarn(fn)
+(function (root) {
+  'use strict';
+  var GNS = root.GNS = root.GNS || {};
+  var LS = {
+    json: function (k, d) { try { var v = JSON.parse(root.localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+    put: function (k, v) { try { root.localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  };
+  var DEFS = {}, earnL = [];
+  GNS.achievements = function (game, list) {
+    DEFS[game] = list || [];
+    var all = LS.json('gns-achdef', {}) || {};
+    all[game] = DEFS[game].map(function (a) { return { id: a.id, name: a.name, how: a.how }; });
+    LS.put('gns-achdef', all);
+    return DEFS[game];
+  };
+  GNS.onEarn = function (f) { earnL.push(f); };
+  GNS.stats = function (game) { var s = LS.json('gns-stats', {}) || {}; return game ? s[game] || null : s; };
+  GNS.earned = function (game) { var a = LS.json('gns-ach', {}) || {}; return game ? a[game] || {} : a; };
+  GNS.results = function (game) { var r = LS.json('gns-results', []) || []; return game ? r.filter(function (x) { return x.game === game; }) : r; };
+  GNS.saved = function (game, has) { var s = LS.json('gns-saves', {}) || {}; if (has) s[game] = Date.now(); else delete s[game]; LS.put('gns-saves', s); };
+  GNS.result = function (r) {
+    r = r || {}; if (!r.game) return null;
+    if (DEFS[r.game]) GNS.achievements(r.game, DEFS[r.game]); // keep the shelf's list of names even if storage was cleared
+    var seats = r.seats || [], me = -1;
+    seats.forEach(function (s, i) { if (me < 0 && s && s.me) me = i; });
+    var humans = seats.filter(function (s) { return s && !s.ai; }).length;
+    var won = me >= 0 && (Array.isArray(r.winner) ? r.winner.indexOf(me) >= 0 : r.winner === me);
+    if (r.won != null) won = !!r.won;
+    var rec = { game: r.game, mode: r.mode || 'vs', at: Date.now(), np: seats.length, me: me, won: won, winner: r.winner, scores: r.scores || null,
+      score: me >= 0 && r.scores ? r.scores[me] : null, turns: r.turns || 0, ms: r.ms || 0, humans: humans, level: r.level || null };
+    var list = LS.json('gns-results', []) || []; list.push(rec); if (list.length > 200) list.splice(0, list.length - 200); LS.put('gns-results', list);
+    var all = LS.json('gns-stats', {}) || {}, s = all[r.game] || { played: 0, won: 0, best: null, turns: 0, ms: 0, modes: {}, streak: 0, bestStreak: 0 };
+    s.played++; if (won) { s.won++; s.streak++; s.bestStreak = Math.max(s.bestStreak, s.streak); } else if (me >= 0) s.streak = 0;
+    if (rec.score != null && (s.best == null || rec.score > s.best)) s.best = rec.score;
+    s.turns += rec.turns; s.ms += rec.ms; s.modes[rec.mode] = (s.modes[rec.mode] || 0) + 1; s.last = rec.at;
+    all[r.game] = s; LS.put('gns-stats', all);
+    var ach = LS.json('gns-ach', {}) || {}, mine = ach[r.game] = ach[r.game] || {}, fresh = [];
+    (DEFS[r.game] || []).forEach(function (a) { if (mine[a.id]) return; var ok = false; try { ok = !!a.test(rec, s, r); } catch (e) { } if (ok) { mine[a.id] = rec.at; fresh.push(a); } });
+    LS.put('gns-ach', ach);
+    fresh.forEach(function (a) { earnL.forEach(function (f) { try { f(a, r.game); } catch (e) { } }); });
+    return { stats: s, earned: fresh, record: rec };
+  };
+})(typeof window !== 'undefined' ? window : this);
 
 </script>
 <script>
@@ -1558,6 +2117,92 @@ TB.DATA={
 };
 if(typeof module!=="undefined")module.exports=TB;
 })(typeof globalThis!=="undefined"?globalThis:this);
+
+</script>
+<script>
+// Component reference for The Thornbound Throne in the shared GX.reference format (JSON-safe, so node can read it too).
+//   TB.refSections(DATA) -> [{id, title, items:[{id, name, count, text, tags, meta, extra, pic}]}]
+// `pic` says what to draw ({fac, k} a faction card, {kc: n} a Kingdom Card, {loc: i} ...); the page turns it into a picture.
+(function (g) {
+  var TB = g.TB = g.TB || {};
+  var ARCH = { ruse: 'Ruse', trader: 'Trader', agent: 'Agent', follower: 'Follower', cavalry: 'Cavalry', war_machine: 'War machine', captain: 'Captain', champion: 'Champion', heir: 'Heir' };
+  var TRAIT = { inv: ['Invulnerable', 'cannot be Eliminated'], res: ['Resilient', 'if Eliminated it goes to your discard pile instead of the Lost Pile'], path: ['Pathfinder', 'if it is used to Journey it goes to your discard pile, not the Lost Pile'] };
+  var SUIT = { relics: 'Coin', secrets: 'Whispers', oaths: 'Pledges' };
+  var PLACE = { board: 'Sits on your board with your bid card under it', supply: 'Goes to your Supply', region: 'Placed on a region', loc: 'Placed on a location', none: 'Used once, then discarded' };
+  var STEP = { passive: 'Lasting', spring: 'Spring', day: 'Day', autumn: 'Autumn', night: 'Night', any: 'Any time', bid: 'Bids', winter: 'Winter' };
+  function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : s; }
+  function cardText(c) {
+    var t = (c.tr || []).map(function (x) { return TRAIT[x] ? TRAIT[x][0] + '.' : ''; }).filter(Boolean).join(' ');
+    return ((t ? t + ' ' : '') + (c.txt || '')).trim() || 'No special ability.';
+  }
+  function cardMeta(c) {
+    var m = [];
+    if (c.kind !== 'hq') m.push('Strength ' + c.s);
+    if (c.v) m.push(c.v + ' vote' + (c.v > 1 ? 's' : ''));
+    if (c.l) m.push(c.l + ' lore');
+    if (c.lc) m.push('costs ' + c.lc + ' Lore');
+    return m.join(' · ');
+  }
+  function cardExtra(c) {
+    var x = (c.tr || []).map(function (t) { return TRAIT[t] ? TRAIT[t][0] + ': ' + TRAIT[t][1] + '.' : ''; }).filter(Boolean);
+    if (c.kind === 'basic' || c.kind === 'heir') x.push('One of the 14 basic cards every faction starts with (the Heir starts in your hand).');
+    else if (c.kind === 'hq') x.push('Headquarters: bought with Lore, it never enters your deck; its power works from your board.');
+    else x.push('Site of Power card: buy it with Lore after a Journey; it then joins your deck.');
+    return x.join(' ');
+  }
+  TB.refSections = function (D) {
+    D = D || TB.DATA;
+    var fac = D.FACTIONS, cards = [], kcs = [], tac = [], fav = [], places = [], box = [];
+    fac.forEach(function (f) {
+      var fs = D.FSHORT[f];
+      D.BASIC.forEach(function (c, k) {
+        var nm = (D.BASICNAMES[f] || [])[k] || c.nm || ('Card ' + (k + 1));
+        cards.push({ id: 'f-' + f + '-' + k, name: nm, count: 1, text: cardText(c), meta: cardMeta(c), extra: cardExtra(c),
+          tags: [fs, ARCH[c.ar] || 'Card', 'Basic'], pic: { fac: f, k: k } });
+      });
+      (D.SITE[f] || []).forEach(function (c, j) {
+        cards.push({ id: 'f-' + f + '-' + (14 + j), name: c.nm, count: 1, text: cardText(c), meta: cardMeta(c), extra: cardExtra(c),
+          tags: [fs, c.kind === 'hq' ? 'HQ' : (ARCH[c.ar] || 'Card'), 'Site of Power'], pic: { fac: f, k: 14 + j } });
+      });
+      (D.TACTICS[f] || []).forEach(function (t) {
+        tac.push({ id: 't-' + t.id, name: t.nm, count: 1, text: t.txt, meta: fs + ' · ' + (STEP[t.step] || cap(t.step) || 'Any time') + (t.mk ? ' · starts with ' + t.mk + ' markers' : ''),
+          extra: 'A Tactic is a once-only faction power: after use it is Exhausted until something refreshes it.', tags: [fs, 'Tactic'], pic: { tac: f } });
+      });
+      var fv = D.FAVOUR[f];
+      if (fv) fav.push({ id: 'v-' + f, name: fv.nm, count: 1, text: fv.txt, meta: fs + ' · ' + (STEP[fv.step] || cap(fv.step) || ''),
+        extra: 'Usable only while you hold the Kingdom\'s Favour (claimed at the Gleaning Meadow); each use spends one of its three charges.', tags: [fs, 'Favour'], pic: { tac: f } });
+    });
+    D.KC.forEach(function (k) {
+      kcs.push({ id: 'kc' + k.n, name: k.nm, count: 1, text: k.txt, meta: SUIT[k.suit] + ' suit · ' + (PLACE[k.place] || k.place) + ' · No. ' + k.n,
+        extra: 'Kingdom Cards are won with your bid: the highest bid chooses first from the four on the Great Road. You can hold at most two on your board; a rival steals one with a bid stronger than the card under it.',
+        tags: ['Kingdom Card', SUIT[k.suit]], pic: { kc: k.n } });
+    });
+    D.LOCS.forEach(function (l, i) {
+      places.push({ id: 'loc' + i, name: l[1], count: 1, text: '+' + l[2] + ' Influence' + (l[3] ? '. ' + l[3] : '. Nothing else: the best plain Influence on the map.'),
+        meta: D.RNAMES[i >> 1] + ' · reward +' + l[2], extra: 'The winner of the Clash in ' + D.RNAMES[i >> 1] + ' claims one of its two locations. With your Herald here you also gain +1 and take 1 Influence from each rival Herald here.',
+        tags: ['Location', D.RNAMES[i >> 1]], pic: { loc: i } });
+    });
+    D.COUNCILS.forEach(function (c) {
+      places.push({ id: 'co-' + c, name: D.COUNCIL_NAMES[c], count: 1, text: D.COUNCIL_TXT[c], meta: SUIT[c] + ' suit · cards with votes go here by Govern',
+        tags: ['Council'], pic: { council: c } });
+    });
+    box.push({ id: 'x-heralds', name: 'Heralds', count: 4, text: 'One per faction. Placed in Spring on a location, in public; they go home in Winter.', tags: ['Box'], pic: { piece: 'herald' } });
+    box.push({ id: 'x-supp', name: 'Supporters', count: 20, text: '5 per faction. Each one sent to a region adds +1 Strength in its first Clash; those on the map are spent in Winter.', tags: ['Box'], pic: { piece: 'supp' } });
+    box.push({ id: 'x-fav', name: 'The Kingdom\'s Favour', count: 1, text: 'A disc with three uses. Claimed at the Gleaning Meadow; it unlocks your faction\'s Favour power and breaks ties at the end.', tags: ['Box'], pic: { piece: 'fav' } });
+    box.push({ id: 'x-track', name: 'Influence track', count: 1, text: 'Runs round the map edge, 0 to 40. Each faction has one marker on it.', tags: ['Box'], pic: { piece: 'inf' } });
+    box.push({ id: 'x-markers', name: 'Faction markers', count: 4, text: 'One set per faction, used by the Council of Whispers and by some Tactics. Four on one location claim its bonus.', tags: ['Box'], pic: { piece: 'inf' } });
+    box.push({ id: 'x-order', name: 'Clash order markers', count: 3, text: 'I, II and III: the player lowest on Influence decides which region fights first.', tags: ['Box'] });
+    return [
+      { id: 'cards', title: 'Faction cards', items: cards },
+      { id: 'kc', title: 'Kingdom Cards', items: kcs },
+      { id: 'tactics', title: 'Tactics', items: tac },
+      { id: 'favour', title: 'Favour powers', items: fav },
+      { id: 'map', title: 'Map', items: places },
+      { id: 'box', title: 'In the box', items: box }
+    ];
+  };
+  if (typeof module === 'object' && module.exports) module.exports = TB.refSections;
+})(typeof window !== 'undefined' ? window : globalThis);
 
 </script>
 <script>
@@ -2789,6 +3434,7 @@ function netStrip(G,seat){
   o.peek={};if(seat>=0)o.peek[seat]=(V.peek&&V.peek[seat]||[]).slice();
   o.clash=V.clash?netPick(V.clash,NET_CL):null;
   o.over=V.over?netPick(V.over,['winner','ranking','scores','bonus','tieBreak']):null;
+  if(o.over){o.over.src={};const st=V.stats||{};for(const k of Object.keys(st))if(/^src:[a-z]+:/.test(k)&&typeof st[k]==='number')o.over.src[k.slice(0,120)]=st[k]}  // where the Influence came from: public (every gain is logged), sent only at the end
   o.q=V.q?netPick(V.q,NET_Q):null;
   if(o.q){o.q.got={};if(!o.q.seats.includes(seat)){o.q.o={};o.q.ctx={};if(o.q.items)o.q.items=[];if(o.q.chosen)o.q.chosen=[]}}
   o.bstr=V.bidRev?V.bstr.slice():[];
@@ -3047,6 +3693,7 @@ setInterval(()=>{if(!NET.on)return;const st=netStatus()+'|'+NET.peers.length;if(
  *   GA.loop(name, {vol, fade}) / GA.stopLoop(name, {fade})         ambience beds
  *   GA.music(name|null, {vol, fade})                                 cross-fading background track
  *   GA.setSfx(on) GA.setMusic(on) GA.setVolume('sfx'|'music', 0..1)  persisted in localStorage
+ *   GA.setVolume('master', 0..1)  one level over everything (the shared settings panel sets it; default 1)
  *   GA.has(name) GA.playing() GA.state() GA.unlock() GA.names() GA.duration(name)
  * Samples are decoded lazily on the first user gesture (atob -> ArrayBuffer -> decodeAudioData, no fetch).
  */
@@ -3056,7 +3703,7 @@ setInterval(()=>{if(!NET.on)return;const st=netStatus()+'|'+NET.peers.length;if(
   var S = {
     inited: false, key: 'ga', src: {}, kind: {}, buf: {}, failed: {}, pending: {},
     ctx: null, ctxOpt: null, out: null, sfxBus: null, musBus: null, duckBus: null,
-    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, last: {}, loops: {},
+    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, masterVol: 1, last: {}, loops: {},
     cur: null, curName: null, wantMusic: null, duckSet: {}, duckUntil: 0, unlocked: false, decoding: false
   };
   var DEFAULT_DUCK = ['win', 'lose', 'levelup', 'level', 'boom', 'ko', 'thunder', 'roar', 'smash', 'stomp', 'door', 'death', 'crit', 'crumble'];
@@ -3101,6 +3748,7 @@ setInterval(()=>{if(!NET.on)return;const st=netStatus()+'|'+NET.peers.length;if(
     var t = S.ctx.currentTime;
     S.sfxBus.gain.setTargetAtTime(S.sfxOn ? S.sfxVol : 0, t, 0.02);
     S.musBus.gain.setTargetAtTime(S.musOn ? S.musVol : 0, t, 0.08);
+    S.out.gain.setTargetAtTime(S.masterVol, t, 0.02);
   }
 
   // Loops: skip encoder padding / near-silence at the edges so MP3 loops don't gap.
@@ -3176,6 +3824,7 @@ setInterval(()=>{if(!NET.on)return;const st=netStatus()+'|'+NET.peers.length;if(
     S.sfxOn = lsGet('sfx', '1') !== '0'; S.musOn = lsGet('mus', '1') !== '0';
     S.sfxVol = clamp(lsGet('sfxvol', o.sfxVol != null ? o.sfxVol : 0.8), 0, 1);
     S.musVol = clamp(lsGet('musvol', o.musVol != null ? o.musVol : 0.5), 0, 1);
+    S.masterVol = clamp(lsGet('mastervol', 1), 0, 1);
     if (!S.inited && root.document && root.document.addEventListener) {
       ['pointerdown', 'keydown', 'touchstart', 'mousedown'].forEach(function (ev) {
         root.document.addEventListener(ev, onGesture, { capture: true, passive: true });
@@ -3287,11 +3936,11 @@ setInterval(()=>{if(!NET.on)return;const st=netStatus()+'|'+NET.peers.length;if(
   }
   function setVolume(kind, v) {
     v = clamp(v, 0, 1);
-    if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
+    if (kind === 'master') { S.masterVol = v; lsSet('mastervol', v); } else if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
     applyVol(); return v;
   }
   function state() {
-    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, audio: !!S.ctx,
+    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, masterVol: S.masterVol, audio: !!S.ctx,
       ctxState: S.ctx ? S.ctx.state : 'none', decoded: Object.keys(S.buf).length, failed: Object.keys(S.failed),
       total: Object.keys(S.src).length, playing: S.curName, loops: Object.keys(S.loops) };
   }
@@ -3598,7 +4247,7 @@ function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=
     // supporters: little discs in the faction colour under each slot
     const n=G.np,cols=S.cols>=n?n:S.cols,rows=Math.ceil(n/cols),sw=UI.phone?44:38,sh=UI.phone?62:54,gap=6,tw=cols*sw+(cols-1)*gap,th=rows*sh+(rows-1)*gap;
     for(let s=0;s<n;s++){const sp=V.pl[s].supp,cnt=sp.r[r]+sp.x[r];if(!cnt)continue;const c=s%cols,rw=Math.floor(s/cols);const x=S.cx-tw/2+c*(sw+gap)+sw/2,y=S.cy-th/2+rw*(sh+gap)+sh+(UI.phone?10:9);
-      f.push('<g transform="translate('+x+' '+y+')"><circle r="'+(UI.phone?11:10)+'" fill="'+fcol(s)+'" stroke="#fff3c4" stroke-width="2"/><text y="5" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="'+TBKit.fonts.display+'">'+cnt+'</text></g>')}}
+      f.push('<g transform="translate('+x+' '+y+')"><circle r="'+(UI.phone?11:10)+'" fill="'+fcol(s)+'" stroke="#fff3c4" stroke-width="2"/><text y="5" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="'+TBKit.fonts.display+'">'+cnt+'</text><text class="tbx-cb" x="'+(UI.phone?15:14)+'" y="-6" font-size="14" font-weight="700" fill="#fff3c4" stroke="#000" stroke-width="3" paint-order="stroke">'+GX.mark(s)+'</text></g>')}}
   if(UI.phone&&(UI.bs||0)>=250){ // phones: the kit's banners are hidden, so every location gets a short name tag of its own
     for(let l=0;l<6;l++){const P=LOCPOS[l],name=LOCN[l],fs=36,words=name.split(' ');const lines=name.length>8&&words.length>1?[words[0],words.slice(1).join(' ')]:[name];
       const wd=Math.max(...lines.map(t=>t.length))*fs*.6+18,ht=lines.length*fs+8;const cx=Math.max(wd/2+4,Math.min(996-wd/2,P[0])),top=P[1]+52;
@@ -3719,7 +4368,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q
   let h='';
   h+='<div class="step" data-q="'+q.kind+'"><h3 class="st">'+esc(co&&co.title||KIND_NAME[q.kind]||titleOf(q))+'</h3>';
   if(co)h+='<p class="coach">'+gloss(co.text)+'</p>';
-  else{h+=tipLine(q.kind)+'<p class="pr">'+gloss(promptText(q))+'</p>'}
+  else{h+=tipLine(q.kind==='menu'&&menuPhase(q)?'menu:'+menuPhase(q):q.kind)+'<p class="pr">'+gloss(promptText(q))+'</p>'}
   if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Everyone decides at the same time. Still to choose: '+esc(oth.map(seatWho).join(', '))+'.</p>'}
   if(G.clash&&['day','night','tally'].includes(G.step)||G.clash&&q.kind==='location'||G.clash&&['castle','wilderness','harvest','shrine','ossuary','tie'].includes(q.kind))h+=recapHTML();
   if(!co||!co.noRec)h+=recLine(s,rm);
@@ -3752,7 +4401,7 @@ function placeProgress(){const me=vs();let n=0;for(const R of UI.V.reg)for(const
   const mv=me>=0?legal(me):[];const rs=[...new Set(mv.map(m=>m.r))];return 'card '+Math.min(3,n+1)+' of 3'+(rs.length===1?', for '+REG[rs[0]]:'')}
 function recLine(s,rm){if(!rm)return '';return '<p class="rec-l">'+ico('star')+'<span><b>Suggested:</b> '+esc(shortRec(rm))+' <span class="why2">'+gloss(whyFor(s,rm))+'</span></span></p>'}
 function shortRec(m){const q=G.q;if(q.kind==='bid')return cinfo(m.id).name+' ('+cinfo(m.id).strength+').';if(q.kind==='herald')return LOCN[m.loc]+'.';if(q.kind==='place'||q.kind==='tie')return m.pass?'pass.':cinfo(m.id).name+(m.r!=null?' at '+REG[m.r]:'')+'.';if(q.kind==='location')return LOCN[m.loc]+'.';if(m.t==='done')return 'finish this step.';return m.label.replace(/\.$/,'')+'.'}
-function heraldDots(l){const o=G.pl.filter(p=>p.herald===l);return o.length?'<span class="hd">'+o.map(p=>'<i style="background:'+fcol(p.seat)+'" title="'+esc(p.name)+'"></i>').join('')+'</span>':''}
+function heraldDots(l){const o=G.pl.filter(p=>p.herald===l);return o.length?'<span class="hd">'+o.map(p=>'<i style="background:'+fcol(p.seat)+'" title="'+esc(p.name)+'"></i><b class="gx-cbm" aria-hidden="true">'+GX.mark(p.seat)+'</b>').join('')+'</span>':''}
 function orderChips(o){return '<span class="oc">'+o.map((r,i)=>'<i>'+['I','II','III'][i]+'</i>'+esc(REG[r].replace('The ',''))).join('<em>›</em>')+'</span>'}
 // Kingdom Card offers (bid resolution)
 function bidResHTML(s,mv){let h='<div class="offers">';
@@ -3807,7 +4456,9 @@ function renderRivals(){const el=$('#rivals');if(!el)return;const V=UI.V;const h
   el.innerHTML=ordSeats.map(s=>{const P=V.pl[s];const kfac=TBKit.FACTIONS[FK[P.fac]];const turn=act.has(s);
     const favs=V.fav.h===s?'<span class="rv-f" title="Holds the Kingdom\'s Favour ('+V.fav.u+' uses left)">'+ico('star')+'</span>':'';
     return '<button class="rv'+(s===me?' me':'')+(turn?' turn':'')+'" data-a="rival" data-s="'+s+'" style="--fc:'+kfac.main+'" aria-label="'+esc(P.name)+': '+P.inf+' influence, '+P.hand.length+' cards in hand. Tap for details">'+
-      '<span class="rv-e">'+emb(s,26)+'</span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'<u>You</u> · ':'')+esc(shortName(s).replace(' (you)',''))+'</b><small><i>'+P.inf+'</i> Influence'+(G.np<3?' · '+P.hand.length+' cards':'')+'</small></span>'+favs+'</button>'}).join('')}
+      '<span class="rv-e">'+emb(s,26)+'<i class="gx-cbm" aria-hidden="true">'+GX.mark(s)+'</i></span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'<u>You</u> · ':'')+esc(shortName(s).replace(' (you)',''))+'</b><small><i>'+P.inf+'</i> Influence'+(G.np<3?' · '+P.hand.length+' cards':'')+'</small>'+(s===me&&!hot?meChips(s,P):'')+'</span>'+favs+'</button>'}).join('')}
+function meChips(s,P){const kc=(P.ks||[]).filter(Boolean).length,tl=(P.tac||[]).filter(t=>!t.ex&&!t.burn).length;
+  return '<span class="me-chips" aria-label="Your board"><span>KC '+kc+'</span><span>Sup '+P.supp.b+'</span><span>Tac '+tl+'/'+(P.tac||[]).length+'</span>'+(P.lore?'<span>Lore '+P.lore+'</span>':'')+'</span>'}
 // ---------------------------------------------------------------- pop-ups (live in the dock zone, never over the board)
 function openPop(kind,arg){if(!G)return;UI.pop=kind;UI.popArg=arg||{};renderPop();applyHl();if(typeof sfx==='function')sfx('tap')}
 function closePop(quiet){if(!UI.pop)return;UI.pop=null;UI.popArg=null;UI.hand=null;const p=$('#ppop');if(p){p.hidden=true;p.innerHTML=''}applyHl();if(!quiet)renderAll()}
@@ -3878,7 +4529,10 @@ function showOver(){if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over
 const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid picks a Kingdom Card first; the card you bid then sits under it and cannot fight.'],
   herald:['Heralds','Your Herald is public. If you win a region and claim the location where your Herald stands, you gain +1 Influence and take 1 from every rival Herald there.'],
   place:['Hidden cards','You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere.'],
-  menu:['Actions','Supporters add +1 Strength each in a region\'s first Clash. Open the list for other actions, or finish the step.'],
+  menu:['Actions','These actions are optional. Open the list to see them, or finish the step.'],
+  'menu:Spring':['Spring','Supporters add +1 Strength each in a region\'s first Clash; they are spent in Winter. Spring Tactics and abilities work now too.'],
+  'menu:Day':['Day','The cards are face up. Ambush adds a hidden card from your hand, Retreat pulls your cards out of a Clash you cannot win, Flank moves a card to a region that has not fought yet.'],
+  'menu:Autumn':['Autumn','Once a round each: Govern puts a hand card with votes into a Council, Journey sends a hand card away for Lore, and Rally takes your cards on the map back to your hand.'],
   clashOrder:['Clash order','The player with the least Influence chooses the order of the three Clashes.'],
   location:['Winning','The winner claims one of the region\'s two locations: its Influence and its bonus.'],
   bidRes:['Your bid','Take a Kingdom Card from the Great Road, steal one a rival holds (your bid must beat the card under it), or take your card back.']};
@@ -3919,7 +4573,7 @@ function overHTML(){const o=G.over;const rk=o.ranking;const win=o.winner;const m
   const head=iWon?'You win the throne!':esc(nameOf(win).replace(/^You$/,'You'))+' takes the throne';
   const body='<h3>'+head+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+(i+1)+'. '+esc(shortName(s))+'</b><span>'+G.pl[s].inf+' Influence'+(o.bonus&&o.bonus[s]?' <small>(+'+o.bonus[s]+' from the emptied Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(typeof overBreakdown==='function'?overBreakdown():'');
   const foot=NET.on?(isHost()?'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="netopen">Lobby</button>':'<button class="btn" data-a="netleave">Leave</button>'):'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="menu">Main menu</button>';
-  const gnote=typeof isGuided==='function'&&isGuided()?'<p class="coach">'+gloss('You have played a whole game. Next time try a full game from Play: choose the faction whose story you like, 3 players, 5 rounds. The suggestions stay on if you want them.')+'</p>':'';
+  const gnote=(UI.earned&&UI.earned.length?'<p class="achv">★ New achievement'+(UI.earned.length>1?'s':'')+': '+esc(UI.earned.join(', '))+'</p>':'')+(typeof isGuided==='function'&&isGuided()?'<p class="coach">'+gloss('You have played a whole game. Next time try a full game from Play: choose the faction whose story you like, 3 players, 5 rounds. The suggestions stay on if you want them.')+'</p>':'');
   return cdWrap('cd-over',body+gnote+(NET.on&&!isHost()?'<p class="sub">The host can start another game.</p>':''),foot)}
 // ===================== part 5: render loop, clicks, drawers (rules, log, board, menu), start screen =====================
 function renderAll(){if(!G||!UI.started)return;
@@ -3976,13 +4630,8 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
    case 'guided':newGame('guided');break;
    case 'cont':{const s=loadSave();if(s){hideStart();resumeGame(s);afterStart()}break}
    case 'rules':GX.show('rulesd');break;
-   case 'gdset':UI.guide=t.dataset.v;renderMenu();break;
-   case 'snd':UI.sound=!UI.sound;try{localStorage.setItem('tb_snd',UI.sound?'1':'0')}catch(x){}if(window.GA)GA.setSfx(UI.sound);renderMenu();break;
-   case 'mus':UI.music=!UI.music;try{localStorage.setItem('tb_mus',UI.music?'1':'0')}catch(x){}if(window.GA)GA.setMusic(UI.music);renderMenu();break;
-   case 'gfx':UI.lowGfx=!UI.lowGfx;try{localStorage.setItem('tb_gfx',UI.lowGfx?'low':'high')}catch(x){}UI.mapReset=true;renderAll();renderMenu();break;
    case 'savenow':saveGame();toast('Saved. You can continue from the start screen.');break;
    case 'newgame':GX.close();showStart();break;
-   case 'spd':UI.speed=+t.dataset.v;renderMenu();break;
    case 'logall':UI.logAll=!UI.logAll;renderLog();break;
   }});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pop&&!GX.open){closePop();e.preventDefault()}});
@@ -3995,14 +4644,6 @@ function afterStart(){closePop(true);GX.close();UI.mapReset=true;renderAll();pum
 function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slice().reverse();let h='<p class="small"><button class="btn" data-a="logall">'+(UI.logAll?'Show key events only':'Show everything')+'</button></p><ol class="log">';
   let r=-1;for(const e of L){if(!UI.logAll&&e.c!=='big'&&e.c!=='warn')continue;h+='<li class="'+(e.c||'')+'"><i style="background:'+(e.s>=0?fcol(e.s):'#777')+'"></i>'+esc(e.t)+'</li>'}
   el.innerHTML=h+'</ol>'}
-function renderMenu(){const el=$('#setbody');if(!el)return;
-  const seg=(a,cur,opts)=>'<div class="seg">'+opts.map(([v,l])=>'<button class="'+(String(cur)===String(v)?'on':'')+'" data-a="'+a+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
-  el.innerHTML=(NET.on?'<div class="mrow"><button class="btn pri" data-a="netopen">Online lobby</button>'+(isHost()?'<button class="btn" data-a="newgame">Change setup</button>':'')+'<button class="btn" data-a="netleave">Leave the room</button></div>':'<div class="mrow"><button class="btn pri" data-a="newgame">New game / main menu</button><button class="btn" data-a="savenow">Save now</button></div>')+
-   '<div class="mrow"><span>Guide</span>'+seg('gdset',UI.guide,[['full','Full tips'],['light','Light'],['off','Off']])+'</div>'+
-   '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
-   '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button></div>'+
-   '<div class="mrow"><span>Graphics</span><button class="btn" data-a="gfx" aria-pressed="'+!!UI.lowGfx+'">'+(UI.lowGfx?'Low (fast)':'High')+'</button>'+(window.PerfHUD?PerfHUD.buttonsHTML('btn'):'')+'</div>'+
-   '<h4>Credits</h4><p class="small">Art, map, cards and icons are original and drawn procedurally. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo), SIL Open Font License 1.1. The game rules follow a published game family; every name and text here is our own wording. Sound: placeholder synthesised tones.</p>'}
 function renderBoardDrawer(){const el=$('#boardbody');if(!el||!G)return;const s=vs()>=0?vs():0;UI.V=UI.V||TB.stripView(G,vs());
   const P=UI.V.pl[s];let h=popRival(s).replace(/^<div class="pp-h">.*?<\/div><div class="pp-b[^"]*">/,'<div>');h=h.replace(/<\/div>$/,'');
   h+='<h5>Site of Power</h5><div class="piles">'+P.site.map(id=>'<div class="sitec"><button class="hc pk" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1">'+cardEl(id,64).outerHTML+'</button><small>cost '+cinfo(id).cost+'</small></div>').join('')+'</div>';
@@ -4016,7 +4657,7 @@ const RULES_HTML=()=>`<div class="rules">
 <li><b>Hide one card</b> at each of the three regions. Send <b>Supporters</b> (+1 each) if you like.</li>
 <li><b>Clashes:</b> cards flip; the highest total Strength in a region wins and claims one of its two locations (its Influence, plus +1 and a steal if your Herald stands there).</li>
 <li><b>Autumn, then Winter:</b> optional Govern and Journey, then played cards are discarded and a new round begins.</li></ol>
-<p>The guided first game walks you through this once. Underlined words in the game can be tapped for their meaning.</p></div>
+<p>The guided first game walks you through this once. Underlined words in the game can be tapped for their meaning. The <b>Cards</b> button lists every card, Kingdom Card, Tactic and location.</p><p class="small">Not in this version yet: the solo opponent and the optional advanced setup (a mulligan and a secret starting Kingdom Card). Everything else in the base game is here, for 2 to 4 players.</p></div>
 <details><summary>The full rules</summary>
 <h3>The goal</h3><p>You lead one of four factions competing for the throne. The game lasts a fixed number of rounds (4, 5 or 6). When the last round ends, the player with the most <b>Influence</b> wins. Ties go to whoever holds the Kingdom's Favour, then to the better place on the Order Track.</p>
 <h3>How a round goes</h3><ol class="rl">
@@ -4043,8 +4684,7 @@ function setupDrawers(){
   GX.drawer('rulesd','How to play',(()=>{const d=document.createElement('div');d.innerHTML=RULES_HTML();return d})(),true);
   GX.drawer('logd','Log',(()=>{const d=document.createElement('div');d.id='logbody';return d})());
   GX.drawer('boardd','My board and piles',(()=>{const d=document.createElement('div');d.id='boardbody';return d})());
-  GX.drawer('setd','Menu',(()=>{const d=document.createElement('div');d.id='setbody';return d})());
-  GX.onShow=id=>{if(id==='logd')renderLog();if(id==='setd')renderMenu();if(id==='boardd')renderBoardDrawer()}}
+  GX.onShow=id=>{if(id==='logd')renderLog();if(id==='boardd')renderBoardDrawer()}}
 // ===================== part 6: sound, phone layout, boot, test hooks =====================
 const SFXMAP={tap:'click',place:'place',flip:'flip',clash:'clash',win:'win',tie:'clash',inf:'influence',herald:'herald',bid:'bid',bell:'bell',fanfare:'fanfare',lose:'lose',err:'error'};
 let _ac=null;
@@ -4078,9 +4718,9 @@ addEventListener('orientationchange',()=>setTimeout(()=>{phApply();if(G)renderAl
 // ---------------------------------------------------------------- boot
 function boot(){
   try{UI.sound=localStorage.getItem('tb_snd')!=='0';UI.music=localStorage.getItem('tb_mus')==='1';UI.lowGfx=localStorage.getItem('tb_gfx')==='low'}catch(e){}
-  try{if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'tbt'});GA.setSfx(UI.sound);GA.setMusic(UI.music)}}catch(e){}
+  try{if(window.GA&&typeof GA_DATA!=='undefined'){GA.init({sfx:GA_DATA.sfx,music:GA_DATA.music,key:'tbt'});GA.setSfx(UI.sound);GA.setMusic(UI.music);GX.applyPrefs()}}catch(e){}
   try{if(window.PerfHUD)PerfHUD.register({game:'Thornbound Throne',levels:['high','low'],names:{high:'High',low:'Low'},getLevel:()=>UI.lowGfx?'low':'high',isAuto:()=>false,setLevel:(l,why)=>{if(why==='apply'){UI.lowGfx=l==='low';UI.mapReset=true;G&&renderAll()}},isAnimating:()=>UI.busy,anchor:'.gx-board',corner:'tl'})}catch(e){}
-  GX.init({key:'tb'});setupDrawers();phApply();netInit();
+  GX.init({key:'tb'});setupDrawers();kitBoot();phApply();netInit();
   TBKit.ready.then(()=>{document.documentElement.classList.add('tb-ready');if(!UI.started)showStart()});
   document.addEventListener('pointerdown',()=>{try{if(window.GA)GA.unlock();if(UI.music)musicFor()}catch(e){}},{once:true})}
 function startUiReady(){return TBKit.ready}
@@ -4180,6 +4820,7 @@ const byLabel=(mv,txt)=>mv.find(m=>(m.label||'').indexOf(txt)>=0);
 function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
   if(G.round===1){
     if(k==='bid')return byLabel(mv,'Sailing Hall');
+    if(k==='bidRes')return byLabel(mv,'Knives\' Fellowship')||null;
     if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return riv?mv.find(m=>m.loc===riv.herald):byLabel(mv,'Cairn Field')}
     if(k==='place'){const P=G.pl[s];const heir=P.hand.find(id=>cinfo(id).archetype==='heir');if(heir!=null)return mv.find(m=>m.id===heir&&m.r===1);const big=P.hand.slice().sort((a,b)=>cinfo(b).strength-cinfo(a).strength);
       if(big.length)return mv.find(m=>m.id===big[0]&&m.r===0)||mv.find(m=>m.id===big[0]);return null}
@@ -4187,13 +4828,17 @@ function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
     if(q.t==='menu'){const ph=menuPhase(q);if(ph==='Spring'&&G.pl[s].supp.r[1]===0){const m=mv.find(x=>x.a==='supp'&&x.p.r===1&&x.p.n===2);if(m)return m}return mv.find(m=>m.t==='done')}}
   if(G.round===2&&q.t==='menu'&&menuPhase(q)==='Autumn'&&!UI.coachDone.au2){return mv.find(m=>m.a==='journey')||null}
   return null}
+// guided round 1: the easy Court keeps its Tactics and skips optional actions, so the newcomer's first bid and Herald work as taught
+(function(){const o=aiChoose;aiChoose=function(seat,level){if(isGuided()&&G&&G.round===1&&G.q&&G.pl[seat].ai){const mv=legal(seat);
+  if(G.q.kind==='edict'){const k=mv.find(m=>m.k==='no'||m.yes===0);if(k)return k}
+  if(G.q.t==='menu'){const d=mv.find(m=>m.t==='done');if(d)return d}}return o(seat,level)}})();
 const STEPN=(n,t)=>'Step '+n+' of 6 · '+t;
 // the coach line that replaces the prompt in round 1 (and the first time a few things appear later)
 function coachFor(s,mv,rm){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind,R=G.round;UI.coachDone=UI.coachDone||{};
   const nm=id=>cinfo(id).name+' ('+cinfo(id).strength+')';
   if(R===1){
     if(k==='bid')return {title:STEPN(1,'Bid'),pulse:1,noRec:1,text:'Pick a hand card as a secret bid: the higher bid picks a Kingdom Card first.'+(rm?' '+nm(rm.id)+' is fair and keeps your big cards for the Clashes.':'')};
-    if(k==='bidRes')return {title:STEPN(2,'Take a Kingdom Card'),pulse:1,noRec:1,text:'A Kingdom Card is a lasting power; your bid card stays tucked under it.'+(rm&&rm.kc?' Take '+TB.kingdomInfo(rm.kc).name+' (tap it to read it).':'')};
+    if(k==='bidRes')return {title:STEPN(2,'Take a Kingdom Card'),pulse:1,noRec:1,text:'Your bid was higher, so you choose first. A Kingdom Card is a lasting power; your bid card stays tucked under it.'+(rm&&rm.kc?(/Knives/.test(TB.kingdomInfo(rm.kc).name)?' Take '+TB.kingdomInfo(rm.kc).name+': your Heir becomes Deadly, so it wipes out the cards it fights. Its price: keep your Heir away from rival Followers.':' Take '+TB.kingdomInfo(rm.kc).name+' (tap it to read it).'):'')};
     if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return {title:STEPN(3,'Place your Herald'),pulse:1,noRec:1,text:'Win the region where your Herald stands and claim its location: +1 Influence, and you take 1 from each rival Herald there.'+(riv&&rm?' The Court is on '+LOCN[riv.herald]+': join it.':'')}}
     if(k==='place'){const n=UI.V.reg.reduce((a,R2)=>a+R2.down.filter(id=>id>=0&&ownerOf(id)===s).length,0);
       return {title:STEPN(4,'Hide a card at each region'),pulse:1,noRec:1,text:'Card '+Math.min(3,n+1)+' of 3, hidden until the Clash. '+(rm?nm(rm.id)+' to '+REG[rm.r]+(cinfo(rm.id).archetype==='heir'?': your strongest card where both Heralds wait.':'.'):'Choose a card for each region.')}}
@@ -4217,9 +4862,19 @@ function coachEvent(ev){if(!isGuided())return '';UI.coachDone=UI.coachDone||{};c
 // guided: mark the Autumn coach as done once the player acts in round 2 Autumn
 (function(){const o=humanMove;humanMove=function(k){if(G)UI.nowMark=G.logN;const was=G&&G.q&&G.q.t==='menu'&&menuPhase(G.q)==='Autumn'&&G.round===2;if(G&&G.q&&G.q.kind==='siteBuy'&&UI.coachDone)UI.coachDone.sb=1;const r=o(k);if(was&&r&&UI.coachDone)UI.coachDone.au2=1;return r}})();
 // end screen: where the Influence came from (from the engine's own counters; a client without them shows nothing)
-function overBreakdown(){if(!G.stats||NET.on)return '';const rows=G.pl.map(p=>{const parts=[];for(const k in G.stats){const m=k.match(/^src:([a-z]+):(.*)$/);if(m&&m[1]===p.fac)parts.push([m[2],G.stats[k]])}
-  parts.sort((a,b)=>b[1]-a[1]);return '<li style="--fc:'+fcol(p.seat)+'"><b>'+esc(shortName(p.seat))+'</b><span>'+(parts.length?parts.slice(0,5).map(x=>esc(x[0])+' '+x[1]).join(', '):'none')+'</span></li>'}).join('');
-  return '<h4 class="bdh">Where the Influence came from</h4><ul class="rank bd2">'+rows+'</ul><p class="sub small">Steals by Heralds are not listed; they move Influence between players.</p>'}
+function overBreakdown(){const st=G.stats&&Object.keys(G.stats).some(k=>/^src:/.test(k))?G.stats:(G.over&&G.over.src)||null;if(!st)return '';
+  const rows=G.pl.map(p=>{const parts=[];let sum=0;for(const k in st){const m=k.match(/^src:([a-z]+):(.*)$/);if(m&&m[1]===p.fac){parts.push([m[2],st[k]]);sum+=st[k]}}
+    parts.sort((a,b)=>b[1]-a[1]);const bonus=G.over.bonus&&G.over.bonus[p.seat]||0,rest=p.inf-sum-bonus;
+    if(bonus)parts.push(['Leftover Lore (Site of Power emptied)',bonus]);if(rest)parts.push([rest>0?'Taken by your Herald from rivals':'Taken by rival Heralds',rest]);
+    return '<li style="--fc:'+fcol(p.seat)+'"><b>'+esc(shortName(p.seat))+'</b><span class="bd-t">'+p.inf+' Influence</span><span class="bd-l">'+(parts.length?parts.map(x=>'<i>'+esc(x[0])+' <b>'+sgn(x[1])+'</b></i>').join(''):'none')+'</span></li>'}).join('');
+  return '<h4 class="bdh">Where the Influence came from</h4><ul class="rank bd2">'+rows+'</ul>'+histHTML()}
+// Influence after each round (recorded from the end-of-round summaries, kept in the save)
+function histHTML(){const H=UI.hist;if(!H||!H.length)return '';const mx=Math.max(1,...H.flat(),...G.pl.map(p=>p.inf));const n=H.length;
+  const W=280,Ht=96,x=i=>Math.round(14+(W-28)*(n>1?i/(n-1):.5)),y=v=>Math.round(Ht-10-(Ht-22)*v/mx);
+  let svg='<svg class="hist" viewBox="0 0 '+W+' '+Ht+'" role="img" aria-label="Influence after each round">';
+  for(let i=0;i<n;i++)svg+='<text x="'+x(i)+'" y="'+(Ht-1)+'" text-anchor="middle" font-size="9" fill="#d8c69a">R'+(i+1)+'</text>';
+  G.pl.forEach((p,s)=>{const pts=H.map((r,i)=>x(i)+','+y(r[s]||0)).join(' ');svg+='<polyline points="'+pts+'" fill="none" stroke="'+fcol(s)+'" stroke-width="2.5"/>'+H.map((r,i)=>'<circle cx="'+x(i)+'" cy="'+y(r[s]||0)+'" r="3" fill="'+fcol(s)+'"/>').join('')+'<text class="tbx-cb" x="'+(x(n-1)+6)+'" y="'+(y(H[n-1][s]||0)+4)+'" font-size="10" fill="#fff">'+GX.mark(s)+'</text>'});
+  return '<h4 class="bdh">Influence round by round</h4>'+svg+'</svg>'}
 // ---------------------------------------------------------------- title + setup
 const STORY={
  nobility:{story:'The old court still dresses for dinner in a palace with no king. Its stewards count every coin and every vote, and they mean to crown one of their own before the frost.',enjoy:'Choose the Gilded Court if you enjoy steady income, sturdy cards and winning the Councils.',tag:'Defence and votes · easy to learn'},
@@ -4261,12 +4916,14 @@ function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=e
       '<button class="tbtn go" data-a="play"><b>Play</b><span>'+(firstTime()?'new here? a guided first game is ready':'against the computer')+'</span></button>'+
       '<button class="tbtn" data-a="online"><b>Online</b><span>with friends, free, no sign-up</span></button>'+
       (sav?'<button class="tbtn" data-a="cont"><b>Resume</b><span>your game, round '+Math.max(1,sav.G.round)+' of '+sav.G.rounds+'</span></button>':'')+
-      '</div><button class="tlink" data-a="rules">How to play</button></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
+      '</div><div class="tlinks"><button class="tlink" data-a="rules">How to play</button><button class="tlink" data-a="refopen">Cards</button><button class="tlink" data-a="setopen">Settings</button></div></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
   const ONL=view==='online';
   el.innerHTML='<div class="setup"><div class="bgart">'+titleArt()+'</div>'+(ONL?onlineSetupHTML():setupHTML())+'</div>'+(UI.phone&&UI.cfgOpen&&!ONL?cfgDialogHTML():'');
   el.scrollTop=top}
 function firstTime(){try{return !localStorage.getItem('tb_played')}catch(e){return true}}
-function facCard(f,on){const k=TBKit.FACTIONS[FK[f]],S=STORY[f];return '<button class="fcard'+(on?' on':'')+'" data-a="fac" data-v="'+f+'" style="--fc:'+k.main+'" aria-pressed="'+on+'"><span class="ft"><span class="fe">'+TBKit.token('influence',{faction:FK[f]},44).outerHTML+'</span><span><b>'+esc(DD.FNAME[f])+'</b><small>'+esc(S.tag)+'</small></span></span><p>'+esc(S.story)+'</p><p class="enj">'+esc(S.enjoy)+'</p>'+(on?'<span class="fpick">Your faction ✓</span>':'')+'</button>'}
+function facCard(f,on){const k=TBKit.FACTIONS[FK[f]],S=STORY[f];return '<button class="fcard'+(on?' on':'')+'" data-a="fac" data-v="'+f+'" style="--fc:'+k.main+'" aria-pressed="'+on+'"><span class="ft"><span class="fe">'+TBKit.token('influence',{faction:FK[f]},44).outerHTML+'</span><span><b>'+esc(DD.FNAME[f])+'</b><small>'+esc(S.tag)+'</small></span></span><p>'+esc(S.story)+'</p><p class="enj">'+esc(S.enjoy)+'</p>'+(sv.np===2&&BAL2[f]?'<p class="bal">'+esc(BAL2[f])+'</p>':'')+(on?'<span class="fpick">Your faction ✓</span>':'')+'</button>'}
+// honest 2-player balance, from 500 computer games per pairing (ENGINE-REPORT.md)
+const BAL2={nobility:'Strongest at 2 players: wins about 6 games in 10.',clans:'Hardest at 2 players: wins about 4 games in 10.'};
 function seatRows(ONL,plan){const n=ONL?plan.np:sv.np;const rest=FIDS.filter(f=>f!==sv.faction);let h='';
   for(let i=0;i<n;i++){const f=i===0?sv.faction:rest[i-1];const k=TBKit.FACTIONS[FK[f]];const human=ONL?i<plan.hum.length:i===0;
     h+='<div class="seat" style="--fc:'+k.main+'">'+TBKit.token('influence',{faction:FK[f]},30).outerHTML+'<span class="sn"><b>'+esc(k.short)+'</b><small>'+(human?(ONL?'Online: '+esc(plan.hum[i].nm)+(i===0?' (you)':''):'You'):'Computer')+'</small></span>'+(human?'':levelSeg(i))+'</div>'}
@@ -4292,6 +4949,138 @@ function onlineSetupHTML(){const host=NET.on&&isHost(),plan=host?netPlan():null;
 function startFromSetup(){hideStart();try{localStorage.setItem('tb_played','1')}catch(e){}const lv=sv.levels.slice();
   const o={np:sv.np,length:sv.length,faction:sv.faction,levels:lv.map((l,i)=>i===0?l:sv.levels[i]),guide:sv.guide};
   newGame(sv.mode==='watch'?'ai':sv.mode,o)}
+// ===================== part 8: shared GX kit (settings, reference, undo + bid confirm, recap, results, offline) =====================
+const GAME_ID='thornbound';
+// ---------------------------------------------------------------- achievements (stored by the shelf; shown in Stats & achievements on the home page)
+const ACH=[
+ {id:'first',name:'A seat at court',how:'Finish a game.',test:r=>true},
+ {id:'guide',name:'Taught by the Herald',how:'Finish the guided first game.',test:r=>r.mode==='guided'},
+ {id:'win',name:'The thorns part',how:'Win the throne against the computer.',test:r=>r.won&&(r.mode==='vs'||r.mode==='guided')},
+ {id:'hard',name:'Crowned in iron',how:'Win a 3- or 4-player game against hard computers.',test:r=>r.won&&r.mode==='vs'&&r.level==='hard'&&r.np>=3},
+ {id:'twenty',name:'The realm listens',how:'End a game with 20 Influence or more.',test:r=>r.score>=20},
+ {id:'sweep',name:'Three banners',how:'Win all three Clashes in one round.',test:(r,s,x)=>x.extra&&x.extra.sweep},
+ {id:'site',name:'Every stone laid',how:'Buy all five of your Site of Power cards in one game.',test:(r,s,x)=>x.extra&&x.extra.site},
+ {id:'four',name:'Four crowns',how:'Win with each of the four factions.',test:(r,s,x)=>x.extra&&x.extra.facWins>=4},
+ {id:'hot',name:'Pass the crown',how:'Finish a hot-seat game.',test:r=>r.mode==='hot'},
+ {id:'online',name:'Envoys abroad',how:'Finish an online game.',test:r=>r.mode==='online'}];
+// ---------------------------------------------------------------- settings: the same sections as every game; Thornbound adds its own rows
+const sbtn=(a,txt,dis,extra)=>{const b=document.createElement('button');b.type='button';b.className='gx-sb';b.dataset.a=a;b.textContent=txt;if(dis)b.disabled=true;if(extra)for(const k in extra)b.dataset[k]=extra[k];return b};
+function kitSettings(){
+  GX.settings({id:'setd',title:'Menu',
+    game:S=>{
+      if(NET.on)S.appendChild(GX.row('Online',[sbtn('netopen','Lobby'),isHost()?sbtn('newgame','Change setup'):null,sbtn('netleave','Leave the room')]));
+      else S.appendChild(GX.row('This game',[sbtn('newgame','New game'),sbtn('savenow','Save now',!G||!UI.started||!!G.over)]));
+      S.appendChild(GX.row('Undo',sbtn('undo','Undo my last step',!GX.undo.can()),'Hidden cards and Supporters, until the turn passes or a card is revealed'));
+    },
+    sound:S=>{S.appendChild(GX.row('Sound effects',GX.onoff(UI.sound,v=>{UI.sound=v;try{localStorage.setItem('tb_snd',v?'1':'0')}catch(x){}if(window.GA)GA.setSfx(v)},'Sound effects')));
+      S.appendChild(GX.row('Music',GX.onoff(UI.music,v=>{UI.music=v;try{localStorage.setItem('tb_mus',v?'1':'0')}catch(x){}if(window.GA)GA.setMusic(v);if(v)musicFor()},'Music')))},
+    help:S=>{S.appendChild(GX.row('Read',[sbtn('rules','How to play'),sbtn('refopen','Cards & map')]));
+      S.appendChild(GX.row('Guide',GX.seg([['full','Full tips'],['light','Light'],['off','Off']],UI.guide,v=>{UI.guide=v;if(G&&UI.started)renderAll()},'Guide level'),'Step tips and the suggested move'))},
+    graphics:S=>S.appendChild(GX.row('Graphics',GX.seg([['high','High'],['low','Low (fast)']],UI.lowGfx?'low':'high',v=>{UI.lowGfx=v==='low';try{localStorage.setItem('tb_gfx',v)}catch(x){}UI.mapReset=true;if(G&&UI.started)renderAll()},'Graphics'))),
+    about:{name:'The Thornbound Throne',version:'preview',text:'An original game of four factions reaching for an empty throne. Names, card texts and pictures are our own; the pictures are drawn in code. Fonts: Cinzel (Natanael Gama) and EB Garamond (Georg Duffner, Octavio Pardo), SIL Open Font License 1.1. Music: "Dark Forest Theme" by cynicmusic and "Dungeon Ambience" by yd (OpenGameArt, CC0). Sound effects by Kenney (CC0).'}})}
+// ---------------------------------------------------------------- component reference
+function refCardSpec(f,k){const D=DD,c=k<14?D.BASIC[k]:D.SITE[f][k-14],nm=k<14?(D.BASICNAMES[f]||[])[k]:c.nm;const ar=c.ar||(c.kind==='hq'?'':'ruse');
+  const art=(ART[ar]&&(ART[ar][f]||ART[ar]._))||(c.kind==='hq'?'ruin_arch':'banner');const tr=(c.tr||[]).map(t=>TRAIT_N[t]||t);
+  const bits=[];if(c.v)bits.push(c.v+' vote'+(c.v>1?'s':''));if(c.l)bits.push(c.l+' lore');
+  return {faction:FK[f],title:nm,value:c.kind==='hq'?null:c.s,cost:c.lc>0?c.lc:null,type:c.kind==='hq'?'relic':(ARCH_TYPE[ar]||'unit'),typeLabel:c.kind==='hq'?'HQ':(ARCH_LBL[ar]||'Card'),art,text:(((tr.length?tr.join(', ')+'. ':'')+(c.txt||'')).trim())||'No special ability.',tag:bits.join(' · ')||undefined}}
+function refPic(it,big){const p=it.pic||{},w=big?200:52;
+  if(p.fac)return TBKit.card(refCardSpec(p.fac,p.k),w);
+  if(p.kc)return TBKit.card(kcSpec(p.kc),w);
+  const sz=big?72:36;
+  if(p.tac)return TBKit.token('influence',{faction:FK[p.tac]},sz);
+  if(p.loc!=null){const l=DD.LOCS[p.loc];return '<svg viewBox="-24 -24 48 48" width="'+sz+'" height="'+sz+'"><circle r="21" fill="#2a1c10" stroke="#e8c867" stroke-width="2.5"/><text y="7" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="19" fill="#fff0b8">+'+l[2]+'</text></svg>'}
+  if(p.council)return '<svg viewBox="-24 -24 48 48" width="'+sz+'" height="'+sz+'"><rect x="-19" y="-19" width="38" height="38" rx="8" fill="#3a2414" stroke="#e8c867" stroke-width="2.5"/><text y="7" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="17" fill="#fff0b8">'+SUIT_N[p.council][0]+'</text></svg>';
+  if(p.piece==='herald')return TBKit.token('herald',{faction:'gilded'},sz);
+  if(p.piece==='supp')return '<svg viewBox="-24 -24 48 48" width="'+sz+'" height="'+sz+'"><circle r="15" fill="#2a9d8f" stroke="#fff3c4" stroke-width="3"/><text y="6" text-anchor="middle" font-size="17" font-weight="700" fill="#fff">1</text></svg>';
+  if(p.piece==='fav')return '<svg viewBox="-24 -24 48 48" width="'+sz+'" height="'+sz+'"><circle r="18" fill="#e8c867" stroke="#fff3c4" stroke-width="3"/><path d="M0 -11 L3.2 -3.2 11 -3.2 4.6 2 7 10 0 5 -7 10 -4.6 2 -11 -3.2 -3.2 -3.2Z" fill="#fff6d0" stroke="#4a3208"/></svg>';
+  if(p.piece==='inf')return TBKit.token('influence',{faction:'lantern'},sz);
+  return null}
+function refInGame(it){if(!G)return true;const p=it.pic||{};
+  if(p.fac||p.tac)return G.pl.some(P=>P.fac===(p.fac||p.tac));
+  if(p.kc){const V=UI.V||G;return (V.road||[]).includes(p.kc)||V.pl.some(P=>(P.ks||[]).some(T=>T&&T.kc===p.kc)||(P.sup||[]).includes(p.kc))||V.loc.some(L=>L.kc.some(k=>k.n===p.kc))}
+  return true}
+function refIdOfCard(id){const s=ownerOf(id);return 'f-'+G.pl[s].fac+'-'+(id%100)}
+function kitReference(){GX.reference(TB.refSections(DD),{title:'Cards & map',label:'Cards',picture:refPic,inGame:refInGame,before:'[data-gx="boardd"]'})}
+// "Read it big" on the card, Kingdom Card and location pop-ups
+(function(){const o=renderPop;renderPop=function(){o();const el=$('#ppop');if(!el||el.hidden||!UI.pop)return;const a=UI.popArg||{};let rid=null;
+  if(UI.pop==='card'&&a.id!=null&&a.id>=0)rid=refIdOfCard(a.id);else if(UI.pop==='kc')rid='kc'+a.n;else if(UI.pop==='loc')rid='loc'+a.l;
+  const b=el.querySelector('.pp-b');if(rid&&b&&!b.querySelector('[data-a=refcard]')){const x=document.createElement('p');x.className='pp-ref';x.innerHTML='<button class="lk" data-a="refcard" data-r="'+esc(rid)+'">Read it in the card list</button>';b.appendChild(x)}}})();
+// ---------------------------------------------------------------- undo: snapshot before a local human step. Sealed when the decision passes to another
+// seat (hot-seat included), or when a card, the Kingdom deck, the dice of the shuffle, a clash or a round moved on. Off online.
+const humansPending=g=>g&&g.q&&!g.over?g.q.seats.filter(s=>!g.pl[s].ai).join(','):null;
+function revealed(a,b){if(!a)return true;if(a.rng!==b.rng||a.round!==b.round||a.phase!==b.phase||!!a.over!==!!b.over||a.bidRev!==b.bidRev)return true;
+  if(JSON.stringify(a.clash)!==JSON.stringify(b.clash)||JSON.stringify(a.road)!==JSON.stringify(b.road)||a.kdeck.length!==b.kdeck.length)return true;
+  for(let r=0;r<a.reg.length;r++)if(a.reg[r].up.length!==b.reg[r].up.length||a.reg[r].done!==b.reg[r].done)return true;
+  for(let s=0;s<a.pl.length;s++){const p=a.pl[s],q=b.pl[s];if(p.deck.length!==q.deck.length||p.disc.length!==q.disc.length)return true}
+  return a.lost.length!==b.lost.length}
+function kitUndo(){GX.undo.config({get:()=>G,owner:humansPending,online:()=>NET.on,
+  set:s=>{G=s;UI.evq=[];UI.sel={};UI.hand=null;UI.pendBid=null;UI._rk=null;closePop(true);hideGloss();MAP.slotDirty=true;saveGame();toast('Step undone.');renderAll();pump()},
+  onChange:can=>{if(can!==UI.undoCan){UI.undoCan=can;if(G&&UI.started)renderMain()}}})}
+function doUndo(){if(GX.undo.undo())sfx('tap')}
+// ---------------------------------------------------------------- the bid is confirmed before it is locked in (one tap used to commit it)
+(function(){const o=humanMove;humanMove=function(k){
+  if(G&&G.q&&G.q.kind==='bid'&&UI.pendBid!==k){const s=NET.on?NET.mySeat:viewSeatForQ();const m=s!=null&&s>=0?legal(s).find(x=>x.k===k):null;if(m&&m.t==='bid'){UI.pendBid=k;closePop(true);UI.hand=m.id;renderAll();sfx('tap');return true}}
+  UI.pendBid=null;const s0=NET.on?NET.mySeat:viewSeatForQ(),l0=G?G.logN:0,local=!NET.on&&s0!=null;
+  if(local)GX.undo.snap(k);
+  const r=o(k);
+  if(local){if(!r)GX.undo.drop();else{GX.undo.check(revealed);GX.recap.mark(s0);GX.recap.push(logSince(l0).map(e=>plain(e.t)),s0)}}
+  return r}})();
+function bidConfirmHTML(){const m=legal(viewSeatForQ()).find(x=>x.k===UI.pendBid);if(!m)return null;const i=cinfo(m.id);
+  return {h:'<div class="step" data-q="bidok"><h3 class="st">Confirm your bid</h3><div class="bidok"><span class="th" data-owner="'+ownerOf(m.id)+'" data-up="1">'+cardEl(m.id,UI.phone?52:64).outerHTML+'</span><p>'+gloss('You bid '+i.name+' (Strength '+i.strength+'). Once everyone has bid, the bids are revealed and the highest bid picks a Kingdom Card first.')+'</p></div><p class="hint">Changed your mind? Choose another card first.</p></div>',
+    f:'<button class="btn" data-a="bidx">Choose another</button><button class="btn pri pulse" data-a="mv" data-k="'+esc(m.k)+'">Confirm bid</button>'}}
+(function(){const o=renderMain;renderMain=function(){
+  if(UI.pendBid&&!(G&&G.q&&G.q.kind==='bid'&&viewSeatForQ()!=null&&!UI.coachInfo&&!(UI.card&&UI.card.kind==='pass')))UI.pendBid=null;
+  if(UI.pendBid){const r=bidConfirmHTML();if(r){const el=$('#main'),ft=$('#act');el.innerHTML=r.h;ft.innerHTML=r.f;setHl([]);return}UI.pendBid=null}
+  o();const ft=$('#act');
+  if(ft&&GX.undo.can()&&!G.over&&viewSeatForQ()!=null&&!UI.coachInfo&&!(UI.card&&UI.card.kind==='pass')){const b=document.createElement('button');b.className='btn undo';b.dataset.a='undo';b.setAttribute('aria-label','Undo my last step');b.textContent='↶ Undo';ft.insertBefore(b,ft.firstChild)}}})();
+// ---------------------------------------------------------------- "since your last turn" strip in the dock
+function kitRecap(){GX.recap.attach('#dockbody',{before:true,title:'Since your turn'})}
+function recapSeats(){GX.recap.clear();const hs=G?humans():[];GX.recap.seats(hs.length?hs:[0])}
+(function(){const o=aiStep;aiStep=function(w){const s=w.ai[0],l0=G.logN;o(w);if(G&&!NET.on)GX.recap.push(logSince(l0).map(e=>plain(e.t)),s)}})();
+// ---------------------------------------------------------------- results, statistics, achievements
+function kitTrackClash(ev){if(G&&ev.t==='summary'&&ev.inf1){UI.hist=UI.hist||[];UI.hist[ev.round-1]=ev.inf1.slice()}
+  if(!G||ev.t!=='clash'||ev.winner==null||ev.winner<0)return;UI.cw=UI.cw||{};const k=ev.round||G.round;const a=UI.cw[k]=UI.cw[k]||{};a[ev.r]=ev.winner}
+function swept(seat){const W=UI.cw||{};for(const k in W){const a=W[k];if([0,1,2].every(r=>a[r]===seat))return true}return false}
+function kitResult(){
+  if(!G||!G.over||UI.resultDone)return;UI.resultDone=true;GX.undo.clear();GX.recap.clear();
+  const hs=humans();if(!hs.length||(NET.on&&NET.mySeat<0))return;  // watching computers: not your game
+  const me=NET.on?NET.mySeat:hs.length===1?hs[0]:-1;
+  const mode=NET.on?'online':isGuided()?'guided':UI.mode==='hot'||hs.length>1?'hot':'vs';
+  const seats=G.pl.map((p,i)=>({name:p.name,ai:p.ai||null,me:i===me}));
+  let extra=null;
+  if(me>=0){const P=G.pl[me];let fw={};try{fw=JSON.parse(localStorage.getItem('tb_facwins')||'{}')||{}}catch(e){}
+    if(G.over.winner===me&&mode!=='hot'){fw[P.fac]=1;try{localStorage.setItem('tb_facwins',JSON.stringify(fw))}catch(e){}}
+    extra={fac:P.fac,sweep:swept(me),site:!!(P.site&&P.site.length===0),facWins:Object.keys(fw).length}}
+  const lv=G.pl.filter(p=>p.ai).map(p=>p.ai);const level=lv.length&&lv.every(l=>l===lv[0])?lv[0]:(lv.includes('hard')?'mixed':null);
+  try{const r=GNS.result({game:GAME_ID,mode,seats,winner:G.over.winner,scores:G.pl.map(p=>p.inf),turns:G.round,ms:UI.t0?Date.now()-UI.t0:0,level,extra});
+    if(r&&r.earned.length){UI.earned=r.earned.map(a=>a.name);GX.buzz([30,60,30])}}catch(e){}}
+(function(){const o=showOver;showOver=function(){kitResult();return o()}})();
+(function(){const o=pushEv;pushEv=function(e){try{kitTrackClash(e)}catch(x){}return o(e)}})();
+function kitNewGame(){GX.undo.clear();recapSeats();UI.t0=Date.now();UI.resultDone=false;UI.earned=null;UI.pendBid=null;UI.cw={};}
+(function(){const o=newGame;newGame=function(m,op){UI.cw={};UI.hist=null;const r=o(m,op);kitNewGame();renderAll();return r}})();
+(function(){const o=resumeGame;resumeGame=function(sv){const r=o(sv);kitNewGame();UI.cw=sv.cw||{};UI.hist=sv.hist||null;return r}})();
+// save: report to the shelf's Continue row; keep the round-by-round history and clash wins in the save
+(function(){const o=saveGame;saveGame=function(){o();try{if(NET.on||!G||G.over||!UI.cfg)return;const raw=localStorage.getItem('tb_save');if(raw&&(UI.cw||UI.hist)){const s=JSON.parse(raw);s.cw=UI.cw||{};s.hist=UI.hist||null;localStorage.setItem('tb_save',JSON.stringify(s))}if(!UI.savedFlag){UI.savedFlag=1;GNS.saved(GAME_ID,true)}}catch(e){}}})();
+(function(){const o=clearSave;clearSave=function(){o();UI.savedFlag=0;try{GNS.saved(GAME_ID,false)}catch(e){}}})();
+// a save from an older or broken build is not resumed (it would crash): the title offers a new game instead
+const SAVE_V=1;
+function saveOk(s){try{const g=s&&s.G;return !!(g&&(s.v||1)===SAVE_V&&(g.v||1)===1&&Array.isArray(g.pl)&&g.pl.length>=2&&Array.isArray(g.reg)&&g.reg.length===3&&s.cfg&&Array.isArray(g.log))}catch(e){return false}}
+(function(){const o=loadSave;loadSave=function(){const s=o();if(s&&!saveOk(s)){UI.badSave=true;return null}return s}})();
+// ---------------------------------------------------------------- boot (called at the end of boot() in part 6)
+function kitBoot(){
+  kitSettings();kitReference();kitUndo();kitRecap();
+  GNS.achievements(GAME_ID,ACH);
+  AIDELAY=GX.aiDelay(650);applyAnim();
+  GX.onPref(k=>{if(k==='ai'||typeof k==='object')AIDELAY=GX.aiDelay(650);if(k==='anim'||k==='reduce'||typeof k==='object')applyAnim();if((k==='cb'||k==='text')&&G&&UI.started){MAP.slotSig='';renderAll()}});
+  GX.offline({sw:'../sw.js',scope:'../'})}
+function applyAnim(){ANIM=GX.animMs(1000)>0?1:0}
+document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.closest('[data-a]');if(!t)return;const a=t.dataset.a;
+  if(a==='undo')doUndo();
+  else if(a==='bidx'){UI.pendBid=null;UI.hand=null;renderAll()}
+  else if(a==='refopen'){GX.close();GX.show('gx-refd')}
+  else if(a==='setopen'){GX.close();GX.show('setd')}
+  else if(a==='refcard'){closePop(true);GX.refOpen(t.dataset.r)}});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!GX.open&&GX.undo.can()){e.preventDefault();doUndo()}});
 
 </script>
 </body>

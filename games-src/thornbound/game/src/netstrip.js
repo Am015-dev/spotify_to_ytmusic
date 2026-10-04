@@ -25,6 +25,7 @@ function netStrip(G,seat){
   o.peek={};if(seat>=0)o.peek[seat]=(V.peek&&V.peek[seat]||[]).slice();
   o.clash=V.clash?netPick(V.clash,NET_CL):null;
   o.over=V.over?netPick(V.over,['winner','ranking','scores','bonus','tieBreak']):null;
+  if(o.over){o.over.src={};const st=V.stats||{};for(const k of Object.keys(st))if(/^src:[a-z]+:/.test(k)&&typeof st[k]==='number')o.over.src[k.slice(0,120)]=st[k]}  // where the Influence came from: public (every gain is logged), sent only at the end
   o.q=V.q?netPick(V.q,NET_Q):null;
   if(o.q){o.q.got={};if(!o.q.seats.includes(seat)){o.q.o={};o.q.ctx={};if(o.q.items)o.q.items=[];if(o.q.chosen)o.q.chosen=[]}}
   o.bstr=V.bidRev?V.bstr.slice():[];

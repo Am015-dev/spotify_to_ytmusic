@@ -93,6 +93,7 @@ const byLabel=(mv,txt)=>mv.find(m=>(m.label||'').indexOf(txt)>=0);
 function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
   if(G.round===1){
     if(k==='bid')return byLabel(mv,'Sailing Hall');
+    if(k==='bidRes')return byLabel(mv,'Knives\' Fellowship')||null;
     if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return riv?mv.find(m=>m.loc===riv.herald):byLabel(mv,'Cairn Field')}
     if(k==='place'){const P=G.pl[s];const heir=P.hand.find(id=>cinfo(id).archetype==='heir');if(heir!=null)return mv.find(m=>m.id===heir&&m.r===1);const big=P.hand.slice().sort((a,b)=>cinfo(b).strength-cinfo(a).strength);
       if(big.length)return mv.find(m=>m.id===big[0]&&m.r===0)||mv.find(m=>m.id===big[0]);return null}
@@ -100,13 +101,17 @@ function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
     if(q.t==='menu'){const ph=menuPhase(q);if(ph==='Spring'&&G.pl[s].supp.r[1]===0){const m=mv.find(x=>x.a==='supp'&&x.p.r===1&&x.p.n===2);if(m)return m}return mv.find(m=>m.t==='done')}}
   if(G.round===2&&q.t==='menu'&&menuPhase(q)==='Autumn'&&!UI.coachDone.au2){return mv.find(m=>m.a==='journey')||null}
   return null}
+// guided round 1: the easy Court keeps its Tactics and skips optional actions, so the newcomer's first bid and Herald work as taught
+(function(){const o=aiChoose;aiChoose=function(seat,level){if(isGuided()&&G&&G.round===1&&G.q&&G.pl[seat].ai){const mv=legal(seat);
+  if(G.q.kind==='edict'){const k=mv.find(m=>m.k==='no'||m.yes===0);if(k)return k}
+  if(G.q.t==='menu'){const d=mv.find(m=>m.t==='done');if(d)return d}}return o(seat,level)}})();
 const STEPN=(n,t)=>'Step '+n+' of 6 · '+t;
 // the coach line that replaces the prompt in round 1 (and the first time a few things appear later)
 function coachFor(s,mv,rm){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind,R=G.round;UI.coachDone=UI.coachDone||{};
   const nm=id=>cinfo(id).name+' ('+cinfo(id).strength+')';
   if(R===1){
     if(k==='bid')return {title:STEPN(1,'Bid'),pulse:1,noRec:1,text:'Pick a hand card as a secret bid: the higher bid picks a Kingdom Card first.'+(rm?' '+nm(rm.id)+' is fair and keeps your big cards for the Clashes.':'')};
-    if(k==='bidRes')return {title:STEPN(2,'Take a Kingdom Card'),pulse:1,noRec:1,text:'A Kingdom Card is a lasting power; your bid card stays tucked under it.'+(rm&&rm.kc?' Take '+TB.kingdomInfo(rm.kc).name+' (tap it to read it).':'')};
+    if(k==='bidRes')return {title:STEPN(2,'Take a Kingdom Card'),pulse:1,noRec:1,text:'Your bid was higher, so you choose first. A Kingdom Card is a lasting power; your bid card stays tucked under it.'+(rm&&rm.kc?(/Knives/.test(TB.kingdomInfo(rm.kc).name)?' Take '+TB.kingdomInfo(rm.kc).name+': your Heir becomes Deadly, so it wipes out the cards it fights. Its price: keep your Heir away from rival Followers.':' Take '+TB.kingdomInfo(rm.kc).name+' (tap it to read it).'):'')};
     if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return {title:STEPN(3,'Place your Herald'),pulse:1,noRec:1,text:'Win the region where your Herald stands and claim its location: +1 Influence, and you take 1 from each rival Herald there.'+(riv&&rm?' The Court is on '+LOCN[riv.herald]+': join it.':'')}}
     if(k==='place'){const n=UI.V.reg.reduce((a,R2)=>a+R2.down.filter(id=>id>=0&&ownerOf(id)===s).length,0);
       return {title:STEPN(4,'Hide a card at each region'),pulse:1,noRec:1,text:'Card '+Math.min(3,n+1)+' of 3, hidden until the Clash. '+(rm?nm(rm.id)+' to '+REG[rm.r]+(cinfo(rm.id).archetype==='heir'?': your strongest card where both Heralds wait.':'.'):'Choose a card for each region.')}}
@@ -130,9 +135,19 @@ function coachEvent(ev){if(!isGuided())return '';UI.coachDone=UI.coachDone||{};c
 // guided: mark the Autumn coach as done once the player acts in round 2 Autumn
 (function(){const o=humanMove;humanMove=function(k){if(G)UI.nowMark=G.logN;const was=G&&G.q&&G.q.t==='menu'&&menuPhase(G.q)==='Autumn'&&G.round===2;if(G&&G.q&&G.q.kind==='siteBuy'&&UI.coachDone)UI.coachDone.sb=1;const r=o(k);if(was&&r&&UI.coachDone)UI.coachDone.au2=1;return r}})();
 // end screen: where the Influence came from (from the engine's own counters; a client without them shows nothing)
-function overBreakdown(){if(!G.stats||NET.on)return '';const rows=G.pl.map(p=>{const parts=[];for(const k in G.stats){const m=k.match(/^src:([a-z]+):(.*)$/);if(m&&m[1]===p.fac)parts.push([m[2],G.stats[k]])}
-  parts.sort((a,b)=>b[1]-a[1]);return '<li style="--fc:'+fcol(p.seat)+'"><b>'+esc(shortName(p.seat))+'</b><span>'+(parts.length?parts.slice(0,5).map(x=>esc(x[0])+' '+x[1]).join(', '):'none')+'</span></li>'}).join('');
-  return '<h4 class="bdh">Where the Influence came from</h4><ul class="rank bd2">'+rows+'</ul><p class="sub small">Steals by Heralds are not listed; they move Influence between players.</p>'}
+function overBreakdown(){const st=G.stats&&Object.keys(G.stats).some(k=>/^src:/.test(k))?G.stats:(G.over&&G.over.src)||null;if(!st)return '';
+  const rows=G.pl.map(p=>{const parts=[];let sum=0;for(const k in st){const m=k.match(/^src:([a-z]+):(.*)$/);if(m&&m[1]===p.fac){parts.push([m[2],st[k]]);sum+=st[k]}}
+    parts.sort((a,b)=>b[1]-a[1]);const bonus=G.over.bonus&&G.over.bonus[p.seat]||0,rest=p.inf-sum-bonus;
+    if(bonus)parts.push(['Leftover Lore (Site of Power emptied)',bonus]);if(rest)parts.push([rest>0?'Taken by your Herald from rivals':'Taken by rival Heralds',rest]);
+    return '<li style="--fc:'+fcol(p.seat)+'"><b>'+esc(shortName(p.seat))+'</b><span class="bd-t">'+p.inf+' Influence</span><span class="bd-l">'+(parts.length?parts.map(x=>'<i>'+esc(x[0])+' <b>'+sgn(x[1])+'</b></i>').join(''):'none')+'</span></li>'}).join('');
+  return '<h4 class="bdh">Where the Influence came from</h4><ul class="rank bd2">'+rows+'</ul>'+histHTML()}
+// Influence after each round (recorded from the end-of-round summaries, kept in the save)
+function histHTML(){const H=UI.hist;if(!H||!H.length)return '';const mx=Math.max(1,...H.flat(),...G.pl.map(p=>p.inf));const n=H.length;
+  const W=280,Ht=96,x=i=>Math.round(14+(W-28)*(n>1?i/(n-1):.5)),y=v=>Math.round(Ht-10-(Ht-22)*v/mx);
+  let svg='<svg class="hist" viewBox="0 0 '+W+' '+Ht+'" role="img" aria-label="Influence after each round">';
+  for(let i=0;i<n;i++)svg+='<text x="'+x(i)+'" y="'+(Ht-1)+'" text-anchor="middle" font-size="9" fill="#d8c69a">R'+(i+1)+'</text>';
+  G.pl.forEach((p,s)=>{const pts=H.map((r,i)=>x(i)+','+y(r[s]||0)).join(' ');svg+='<polyline points="'+pts+'" fill="none" stroke="'+fcol(s)+'" stroke-width="2.5"/>'+H.map((r,i)=>'<circle cx="'+x(i)+'" cy="'+y(r[s]||0)+'" r="3" fill="'+fcol(s)+'"/>').join('')+'<text class="tbx-cb" x="'+(x(n-1)+6)+'" y="'+(y(H[n-1][s]||0)+4)+'" font-size="10" fill="#fff">'+GX.mark(s)+'</text>'});
+  return '<h4 class="bdh">Influence round by round</h4>'+svg+'</svg>'}
 // ---------------------------------------------------------------- title + setup
 const STORY={
  nobility:{story:'The old court still dresses for dinner in a palace with no king. Its stewards count every coin and every vote, and they mean to crown one of their own before the frost.',enjoy:'Choose the Gilded Court if you enjoy steady income, sturdy cards and winning the Councils.',tag:'Defence and votes · easy to learn'},
@@ -174,12 +189,14 @@ function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=e
       '<button class="tbtn go" data-a="play"><b>Play</b><span>'+(firstTime()?'new here? a guided first game is ready':'against the computer')+'</span></button>'+
       '<button class="tbtn" data-a="online"><b>Online</b><span>with friends, free, no sign-up</span></button>'+
       (sav?'<button class="tbtn" data-a="cont"><b>Resume</b><span>your game, round '+Math.max(1,sav.G.round)+' of '+sav.G.rounds+'</span></button>':'')+
-      '</div><button class="tlink" data-a="rules">How to play</button></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
+      '</div><div class="tlinks"><button class="tlink" data-a="rules">How to play</button><button class="tlink" data-a="refopen">Cards</button><button class="tlink" data-a="setopen">Settings</button></div></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
   const ONL=view==='online';
   el.innerHTML='<div class="setup"><div class="bgart">'+titleArt()+'</div>'+(ONL?onlineSetupHTML():setupHTML())+'</div>'+(UI.phone&&UI.cfgOpen&&!ONL?cfgDialogHTML():'');
   el.scrollTop=top}
 function firstTime(){try{return !localStorage.getItem('tb_played')}catch(e){return true}}
-function facCard(f,on){const k=TBKit.FACTIONS[FK[f]],S=STORY[f];return '<button class="fcard'+(on?' on':'')+'" data-a="fac" data-v="'+f+'" style="--fc:'+k.main+'" aria-pressed="'+on+'"><span class="ft"><span class="fe">'+TBKit.token('influence',{faction:FK[f]},44).outerHTML+'</span><span><b>'+esc(DD.FNAME[f])+'</b><small>'+esc(S.tag)+'</small></span></span><p>'+esc(S.story)+'</p><p class="enj">'+esc(S.enjoy)+'</p>'+(on?'<span class="fpick">Your faction ✓</span>':'')+'</button>'}
+function facCard(f,on){const k=TBKit.FACTIONS[FK[f]],S=STORY[f];return '<button class="fcard'+(on?' on':'')+'" data-a="fac" data-v="'+f+'" style="--fc:'+k.main+'" aria-pressed="'+on+'"><span class="ft"><span class="fe">'+TBKit.token('influence',{faction:FK[f]},44).outerHTML+'</span><span><b>'+esc(DD.FNAME[f])+'</b><small>'+esc(S.tag)+'</small></span></span><p>'+esc(S.story)+'</p><p class="enj">'+esc(S.enjoy)+'</p>'+(sv.np===2&&BAL2[f]?'<p class="bal">'+esc(BAL2[f])+'</p>':'')+(on?'<span class="fpick">Your faction ✓</span>':'')+'</button>'}
+// honest 2-player balance, from 500 computer games per pairing (ENGINE-REPORT.md)
+const BAL2={nobility:'Strongest at 2 players: wins about 6 games in 10.',clans:'Hardest at 2 players: wins about 4 games in 10.'};
 function seatRows(ONL,plan){const n=ONL?plan.np:sv.np;const rest=FIDS.filter(f=>f!==sv.faction);let h='';
   for(let i=0;i<n;i++){const f=i===0?sv.faction:rest[i-1];const k=TBKit.FACTIONS[FK[f]];const human=ONL?i<plan.hum.length:i===0;
     h+='<div class="seat" style="--fc:'+k.main+'">'+TBKit.token('influence',{faction:FK[f]},30).outerHTML+'<span class="sn"><b>'+esc(k.short)+'</b><small>'+(human?(ONL?'Online: '+esc(plan.hum[i].nm)+(i===0?' (you)':''):'You'):'Computer')+'</small></span>'+(human?'':levelSeg(i))+'</div>'}
