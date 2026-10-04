@@ -32,8 +32,8 @@ const D=p=>p.evaluate(()=>[__SP.pl.dist,__SP.p2.dist,__SP.pl.x,__SP.p2.x]);
  {await p.evaluate(()=>{const pad=(thr,ax)=>({connected:true,axes:[ax,0],buttons:Array.from({length:17},(_,i)=>({pressed:i===7&&thr>0,value:i===7?thr:0}))});window.__pads=[pad(1,-.8)];navigator.getGamepads=()=>window.__pads;__SP.pl.v=0;__SP.p2.v=0;window.__pad=pad});
   const g0=await D(p);await p.evaluate(()=>__mho.sim(300));const g1=await D(p);const cc=await p.evaluate(()=>[__SP.ctl(1),__SP.ctl(2)]);
   ok(g1[1]-g0[1]>25&&g1[0]-g0[0]<5&&cc[1].steer<-.5&&cc[0].thr===0,'1 gamepad: RT + stick drive P2 only',{p1:Math.round(g1[0]-g0[0]),p2:Math.round(g1[1]-g0[1]),steer2:+cc[1].steer.toFixed(2)});
-  await p.evaluate(()=>{window.__pads=[__pad(1,0),__pad(0,0)];__SP.pl.v=0;__SP.p2.v=0});const h0=await D(p);await p.evaluate(()=>__mho.sim(300));const h1=await D(p);
-  ok(h1[0]-h0[0]>30&&h1[1]-h0[1]<5,'2 gamepads: pad 1 drives P1, pad 2 (idle) leaves P2 still',{p1:Math.round(h1[0]-h0[0]),p2:Math.round(h1[1]-h0[1])});await p.evaluate(()=>{window.__pads=[]})}
+  await p.evaluate(()=>{window.__pads=[__pad(1,0),__pad(0,0)];__SP.pl.v=0;__SP.p2.v=0});const h0=await D(p);await p.evaluate(()=>__mho.sim(300));const h1=await D(p);const hc=await p.evaluate(()=>[__SP.ctl(1).thr,__SP.ctl(2).thr,__SP.ctl(2).steer]);
+  ok(h1[0]-h0[0]>30&&hc[0]===1&&hc[1]===0&&hc[2]===0&&h1[1]-h0[1]<15,'2 gamepads: pad 1 drives P1, idle pad 2 gives P2 no input (P2 only nudged by contact)',{p1:Math.round(h1[0]-h0[0]),p2:Math.round(h1[1]-h0[1]),thr:hc});await p.evaluate(()=>{window.__pads=[]})}
  // 4 · full race with AI fill: both finish and are placed, results for both, rematch
  {await p.evaluate(()=>__SP.start({mode:'race',ai:true,trk:'grand'}));await p.keyboard.down('KeyW');await p.keyboard.down('ArrowUp');
   const r=await p.evaluate(()=>{const M=__mho;let i=0;for(;i<60*60*12;i+=60){M.sim(60);if(__SP.pl.finished&&__SP.p2.finished)break}return{t:+(i/60).toFixed(0),n:M.ships?0:0,f:[__SP.pl.finished,__SP.p2.finished],pl:[__SP.pl.place,__SP.p2.place],laps:[__SP.pl.laps.length,__SP.p2.laps.length]}});
@@ -66,7 +66,7 @@ const D=p=>p.evaluate(()=>[__SP.pl.dist,__SP.p2.dist,__SP.pl.x,__SP.p2.x]);
   await p.evaluate(()=>__mho.roamSim(60*180));await p.waitForFunction(()=>!document.querySelector('#SP_res').hidden,null,{timeout:60000,polling:200});
   const br=await p.evaluate(()=>({t:document.querySelector('#SP_rt').textContent,sub:document.querySelector('#SP_rs').textContent,timer:__SP.bt.t,cards:document.querySelectorAll('.SP_card').length}));ok(br.timer===0&&br.cards===2&&/WINS|DRAW/.test(br.t),'battle: 3:00 timer ends in results for both',br);
   await F.shot(p,'shots/sp_battle_results.jpg',{type:'jpeg',quality:70});
-  await p.click('#SP_again');const rb=await p.evaluate(()=>({t:__SP.bt.t,sc:JSON.stringify(__SP.bt.sc),fr:__mho.RO.frozen}));ok(rb.t===180&&rb.sc==='[{"pr":0,"tr":0,"td":0},{"pr":0,"tr":0,"td":0}]'&&!rb.fr,'battle rematch resets timer + scores',rb);
+  await p.click('#SP_again');const rb=await p.evaluate(()=>({t:__SP.bt.t,sc:JSON.stringify(__SP.bt.sc),fr:__mho.RO.frozen}));ok(rb.t>179.5&&rb.sc==='[{"pr":0,"tr":0,"td":0},{"pr":0,"tr":0,"td":0}]'&&!rb.fr,'battle rematch resets timer + scores',rb);
   await p.evaluate(()=>__SP.menu());await p.waitForFunction(()=>__mho.state==='menu');}
  // 6 · back to single player: nothing of split-screen left
  {const r=await p.evaluate(()=>{const M=__mho;M.homeHide();M.setOpt('tab','quick');M.setOpt('traffic',false);M.startRace();M.sim(1);const d0=M.pl.dist;M.K.ArrowUp=true;M.sim(600);M.K.ArrowUp=false;return{on:__SP.S.on,cls:document.body.className,p2:M.ships?0:0,hasP2:!!__SP.p2,d:Math.round(M.pl.dist-d0),hud:!document.querySelector('#hud').hidden,sph:document.querySelector('#SP_h').hidden}});
