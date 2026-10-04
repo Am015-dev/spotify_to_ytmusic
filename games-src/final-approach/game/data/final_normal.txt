@@ -15,3 +15,4 @@ normal r1 red Cloudspire                       0/30   0% avg rounds 6.4 {"short"
 normal r2 red Seabright Bay                    0/30   0% avg rounds 6.6 {"short":9,"mandatory":3,"fuel":14,"speed":3,"checks:gear":1} 1738ms/game
 normal r3 red Palmreach                        2/30   7% avg rounds 6.4 {"short":4,"mandatory":11,"speed":3,"collision":6,"fuel":2,"checks:planes+flaps+axis":1,"spin":1} 2050ms/game
 normal r4 red Lake Orrin                       0/30   0% avg rounds 7.0 {"checks:ice":17,"short":2,"fuel":3,"spin":2,"mandatory":1,"speed":2,"checks:axis+ice":2,"checks:flaps+axis+ice":1} 3584ms/game
+normal r5 red Bowlrock                         0/30   0% avg rounds 5.7 {"mandatory":7,"corridor":7,"fuel":5,"short":5,"collision":1,"speed":4,"checks:planes+gear+flaps+axis":1} 2179ms/game
