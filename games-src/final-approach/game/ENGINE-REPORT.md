@@ -26,16 +26,19 @@ trainee token cross-check, ice columns, each ability, real-time, toss, hidden in
 
 ## AI
 * **Fair.** Every decision starts from `FA.stripView(G, seat)`: own dice + public state only. `hidden-test.js` poisons everything the seat cannot see and checks that the legal moves and the choice of easy / normal / hard are identical.
-* **easy:** greedy on the feature cost below with noise (35 % picks one of the top four, 30 % in pending questions), never uses the free actions (abilities), rerolls rarely, no briefing talk.
+* **easy:** a beginner partner: the greedy best move on the cost model below (no search), 12 % of the time the second best when it is within one nat of the best (never a clear disaster), uses the free actions (rerolls, abilities) only 60 % of the time, no briefing talk.
 * **normal:** every candidate is applied to a light copy of the real engine and the resulting state is judged by a "nats of failure" model (minus log of the probability that a task still succeeds): schedule (can the remaining rounds still deliver the exact distance at the engine thresholds the
-  markers will have), planes to clear, gear / flaps / brakes (binomial models of the dice still to come), dice budget of each seat, axis balance, fuel (normal approximation), trainee, ice columns (half-done column credited by the chance the other half arrives this round), coffee / reroll tokens,
-  and the expected cost of the half-finished axis / engine pair (own dice known, partner's k dice unknown, uniform d6). On top, a small Monte Carlo: the top 3 candidates are each played to the end of the round in 3 sampled worlds (partner's unknown dice drawn at random,
-  everybody continues with the greedy policy) and the best average cost is played. Weights are the hand-set prior (a logistic fit and an SPSA search were tried and did not beat it on a fresh check).
-* **hard:** the same with 6 candidates and 12 sampled worlds.
+  markers will have), planes to clear, gear / flaps / brakes (binomial models of the dice still to come), dice budget of each seat, axis balance, fuel (normal approximation + a linear "units burnt this round" term), trainee, ice columns (a half-done column is credited by the chance
+  the other half arrives this round), coffee / reroll tokens, and the expected cost of the half-finished axis / engine pair (own dice known, partner's k dice unknown, uniform d6). On top, a small Monte Carlo (`FA.AI.NMC`): the top 3 candidates are each played to the end of the round in
+  3 sampled worlds (partner's unknown dice drawn at random, everybody continues with the greedy policy) and the best average cost is played. Weights are the hand-set prior `W0` (a logistic fit `fit.py` and an SPSA search `tune.js` were tried and did not beat it; kept in `data/experiments/`).
+  The Monte Carlo is what separates normal from the greedy policy (green band 37 % -> 51 %).
+* **hard:** the same with 6 candidates and 12 sampled worlds (`FA.AI.HMC`). Measured, it is not distinguishable from normal (see `TEST-RESULTS.md`); it just searches more.
 * Briefing: the computer says up to two public worries (planes ahead, gear / flaps / brakes still to do, fuel, trainee, wind) and presses Roll.
 
 ## Hidden information
 `stripView` (engine), `netStrip` (wire), the DOM (`#pz .die` shows `?` for the other crew member; hot-seat shows no value while nobody holds the device) and the painted layer (reads the DOM) are all covered by tests: `hidden-test.js`, `net-strip-test.js`, `click.js`, `px-test.js`, `p2p-fa.js`.
 
 ## Results of the last runs
-See the hand-off message (exact lines). Per-airport landing rates of two computer crew members at easy / normal / hard are in `gauntlet.js` output (`node gauntlet.js all all 30`; `--abil` fixes the ability cards to two of the six, default draws them at random).
+`TEST-RESULTS.md` (every test with numbers, and the per-airport landing rate of two computer crew members at easy / normal / hard). `node gauntlet.js <ids|all|green|yellow|red|black> <easy|normal|hard|all> <games> <seed0> [--abil] [--nmc=top,samples] [--hmc=top,samples]` reproduces it (`--abil` fixes the ability cards to two of the six, default draws them at random).
+
+Tools kept for the AI work: `trace.js` (print a game), `train.js` / `fit.py` (self-play data and logistic fit), `evalw.js` / `tune.js` (SPSA search), `guided-search.js` (found the scripted hands of the guided first flight).

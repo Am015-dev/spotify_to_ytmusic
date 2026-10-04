@@ -169,7 +169,7 @@ const SHELF_CACHE='gns-shelf-v1',GAME_CACHE='gns-games-v1'; // keep in step with
 const BACKUP_KEY='gns_backup_last';
 const EXCLUDE=new Set([BACKUP_KEY,'gns-uid']);
 // localStorage key prefixes of each game (found by scanning the game files); anything else goes under "Other"
-const PREFIX=[['ccs_','crown'],['na_','nebula'],['dkd_','doorkick'],['swi_','shipwreck'],['soq_','sands'],['sgz_','sunglaze'],['rv_','rampart'],['shortfuse_','shortfuse'],['sf_','shortfuse'],['tidewake_','tidewake'],['tw_','tidewake'],['hb_','hollowbough'],['tb_','thornbound'],['kk_','kaiten'],['mnr_','mainhattan'],['mho_','overdrive']];
+const PREFIX=[['ccs_','crown'],['na_','nebula'],['dkd_','doorkick'],['swi_','shipwreck'],['soq_','sands'],['sgz_','sunglaze'],['rv_','rampart'],['shortfuse_','shortfuse'],['sf_','shortfuse'],['tidewake_','tidewake'],['tw_','tidewake'],['hb_','hollowbough'],['tb_','thornbound'],['kk_','kaiten'],['ld_','lantern'],['cf_','cauldron'],['fa_','approach'],['mnr_','mainhattan'],['mho_','overdrive']];
 const NAMES={};GAMES.forEach(g=>NAMES[g.id]=g.name);NAMES.shelf='Shelf settings';NAMES.other='Other';
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=b=>b==null?'':b<1024?b+' B':b<1048576?(b/1024).toFixed(0)+' KB':(b/1048576).toFixed(1)+' MB';

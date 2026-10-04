@@ -4,7 +4,7 @@
 const PWP = process.env.PW || '/tmp/claude-0/-home-user-spotify-to-ytmusic/5a36d2af-8697-5203-aeea-a0f2a3329615/scratchpad/node_modules/playwright';
 const { chromium } = require(PWP);
 const http = require('http'), fs = require('fs'), path = require('path'), { spawn } = require('child_process');
-const ROOT = path.resolve(__dirname, '..', '..', 'games'), SHOTS = path.join(__dirname, 'shots');
+const ROOT = process.env.GAMES_DIR ? path.resolve(process.env.GAMES_DIR) : path.resolve(__dirname, '..', '..', 'games'), SHOTS = path.join(__dirname, 'shots');
 fs.mkdirSync(SHOTS, { recursive: true });
 const PORT = +process.env.PORT || 18090, RELAY = +process.env.RELAY || 17790;
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.webmanifest': 'application/manifest+json', '.md': 'text/plain' };
@@ -48,13 +48,13 @@ const SAVES = { ccs_save2: JSON.stringify({ round: 4, hp: [10, 7], log: 'x'.repe
     const ver = await pA.evaluate(async () => (await caches.keys()).sort());
     ok(ver.includes('gns-shelf-v1'), 'SW installed, shelf cache exists: ' + ver);
     await pA.reload(); await pA.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 15000 });
-    ok(await pA.locator('#games li').count() === 14, '14 games listed');
+    ok(await pA.locator('#games li').count() === 17, '17 games listed');
     const row = id => pA.locator('[data-id="' + id + '"]');
     ok((await row('crown').locator('.st').textContent()).startsWith('About'), 'size shown before download: ' + await row('crown').locator('.st').textContent());
     await row('mainhattan').locator('.sw').click(); await row('kaiten').locator('.sw').click();
     await pA.waitForFunction(() => /On this device/.test(document.querySelector('[data-id=mainhattan] .st').textContent) && /On this device/.test(document.querySelector('[data-id=kaiten] .st').textContent), null, { timeout: 30000 });
     ok(true, 'two games downloaded: ' + await row('kaiten').locator('.st').textContent());
-    ok(/2 of 14/.test(await pA.locator('#stor').textContent()), 'storage line: ' + (await pA.locator('#stor').textContent()).slice(0, 120));
+    ok(/2 of 17/.test(await pA.locator('#stor').textContent()), 'storage line: ' + (await pA.locator('#stor').textContent()).slice(0, 120));
     await sleep(1500); // let the shelf (covers) finish caching
     await pA.screenshot({ path: SHOTS + '/offline-online.png', fullPage: true });
     await down(cA);
@@ -65,7 +65,7 @@ const SAVES = { ccs_save2: JSON.stringify({ round: 4, hp: [10, 7], log: 'x'.repe
     };
     await (await chk('index.html', 'shelf index')).close(); await (await chk('', 'shelf root /')).close(); await (await chk('classic.html', 'classic')).close();
     const ps = await chk('sync.html', 'sync page'); ok(!(await ps.locator('#nettxt').textContent()).startsWith('Online'), 'offline pill: ' + await ps.locator('#nettxt').textContent());
-    ok(await ps.locator('#games li').count() === 14, 'sync page lists games offline'); ok(await ps.evaluate(() => document.querySelector('.g img').complete && document.querySelector('.g img').naturalWidth > 0), 'cover image shows offline');
+    ok(await ps.locator('#games li').count() === 17, 'sync page lists games offline'); ok(await ps.evaluate(() => document.querySelector('.g img').complete && document.querySelector('.g img').naturalWidth > 0), 'cover image shows offline');
     ok(await ps.locator('#dlall').isDisabled(), 'Download all disabled offline'); await ps.screenshot({ path: SHOTS + '/offline-offline.png', fullPage: true }); await ps.close();
     await (await chk('suggest.html', 'suggest')).close(); await (await chk('reference.html', 'reference')).close();
     await (await chk('mainhattan-nightrun/', 'game1 /slug/')).close(); await (await chk('mainhattan-nightrun/index.html', 'game1 /slug/index.html')).close();

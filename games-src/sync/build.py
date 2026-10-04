@@ -19,6 +19,9 @@ LIST = [('crown','Crown City Smash','crown-city-smash/index.html','covers/crown.
  ('hollowbough','Hollowbough (preview)','hollowbough/index.html','covers/hollowbough.jpg'),
  ('thornbound','The Thornbound Throne (preview)','thornbound/index.html','covers/thornbound.jpg'),
  ('kaiten','Kaiten Kitchen (preview)','kaiten-kitchen/index.html','covers/kaiten.jpg'),
+ ('lantern','Lantern Dive (preview)','lantern-dive/index.html','covers/lantern.jpg'),
+ ('cauldron','Cauldron Fair (preview)','cauldron-fair/index.html','covers/cauldron.jpg'),
+ ('approach','Final Approach (preview)','final-approach/index.html','covers/approach.jpg'),
  ('mainhattan','Mainhattan Nightrun','mainhattan-nightrun/index.html','covers/nightrun.jpg'),
  ('overdrive','Mainhattan Overdrive','mainhattan-overdrive/index.html','covers/overdrive.jpg')]
 games = []
