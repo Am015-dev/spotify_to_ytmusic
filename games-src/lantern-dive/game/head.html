@@ -105,16 +105,16 @@ svg{display:block}
 #mine .mjobs .jc{flex:0 0 auto;width:auto;max-width:none;min-height:34px;padding:0 8px 0 5px}
 #mine .tok{width:30px;height:30px;flex:0 0 auto}
 #handz{flex:0 0 auto;position:relative;background:linear-gradient(180deg,rgba(2,10,24,0),rgba(2,10,24,.55) 30%)}
-#hand{position:relative;display:flex;overflow-x:auto;overflow-y:hidden;padding:20px 8px 5px;scrollbar-width:thin;-webkit-overflow-scrolling:touch;justify-content:safe center;align-items:flex-end;min-height:calc(var(--hw)*1.4 + 28px)}
-.hc{position:relative;flex:0 0 auto;border:0;background:transparent;padding:0;margin:0 0 0 calc(var(--hw)*var(--ov,-.34));cursor:pointer;font:inherit;width:var(--hw);height:calc(var(--hw)*1.4);border-radius:8px}
-.hc:first-child{margin-left:0}
-.hc.gap{margin-left:calc(var(--hw)*var(--ov,-.34) + 9px)}
+#hand{position:relative;overflow:visible;min-height:calc(var(--hw)*1.4 + 24px)}
+.hc{position:absolute;border:0;background:transparent;padding:0;margin:0;cursor:pointer;font:inherit;width:var(--hw);height:calc(var(--hw)*1.4);border-radius:8px}
 .hc.sel{transform:translateY(-16px)}
 .hc.dim{cursor:default}
-.hc.pinged::after{content:'';position:absolute;inset:-3px;border-radius:10px;border:3px solid var(--ok);pointer-events:none}
-.hc .rm{position:absolute;right:-3px;top:-12px;width:26px;height:26px;z-index:2;pointer-events:none}
+.hc.pinged{margin-top:-9px}.hc.pinged::after{content:'';position:absolute;inset:-2px;border-radius:9px;border:3px solid var(--ok);pointer-events:none}
+.hc .gotb{position:absolute;left:50%;top:-14px;transform:translateX(-50%);background:var(--gold);color:#2a1d04;border:2px solid #0b1f3a;border-radius:9px;padding:0 7px;font-size:13px;font-weight:900;line-height:17px;pointer-events:none;z-index:3}
+.hc.got::after{content:'';position:absolute;inset:-2px;border-radius:9px;border:3px solid var(--gold);pointer-events:none}
+.hc .rm{position:absolute;left:50%;margin-left:-13px;top:-16px;width:26px;height:26px;z-index:2;pointer-events:none}
 .hc .rm svg{width:100%;height:100%}
-.hc.pk::after{content:'';position:absolute;inset:-3px;border-radius:10px;border:3px solid var(--gold);pointer-events:none;animation:ldpulse 1.4s ease-in-out infinite}
+.hc.pk::after{content:'';position:absolute;inset:0;border-radius:8px;border:4px solid var(--ok);box-shadow:inset 0 0 0 2px rgba(255,255,255,.6);pointer-events:none}
 .handnote{color:var(--ink2);font-size:14px;font-weight:700;padding:14px 10px;text-align:center;align-self:center;width:100%}
 @keyframes ldpulse{50%{transform:scale(1.06)}}
 .tslot.turn{animation:none}
@@ -124,6 +124,10 @@ svg{display:block}
 .gx-dock-body{display:flex;flex-direction:column;gap:7px;padding:8px;min-height:0}
 .gx-dock .gx-ibtn{color:var(--ink);background:rgba(255,255,255,.08);border-color:var(--line)}
 #dockbody>*{flex-shrink:0}
+.gx-dock-body{overflow:hidden}
+#dockscroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:7px;overscroll-behavior:contain}
+#dockscroll>*{flex-shrink:0}
+#acts{flex:0 0 auto}
 #promptDock{min-height:2.7em}
 #prompt{font-size:16px;line-height:1.3;font-weight:800}
 #prompt small{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin-top:2px}
@@ -277,8 +281,9 @@ html.ph.ph-p .ppop .ph-body{max-height:none;flex:1 1 auto;min-height:0;overflow:
 html.ph .ppop .kv{padding:2px 0;font-size:13.5px}
 html.ph .ppop p{margin:2px 0}
 html.ph .gx-dock{border-left:0;border-top:3px solid #1d4f8c;max-height:none;padding-bottom:env(safe-area-inset-bottom,0px)}
-html.ph .gx-dock-body{padding:5px 6px 0;gap:5px;overflow-x:hidden;overflow-y:auto}
-html.ph #acts{position:sticky;bottom:0;background:var(--panel);padding:3px 0 5px;z-index:2;margin-top:auto}
+html.ph .gx-dock-body{padding:5px 6px 0;gap:5px;overflow:hidden}
+html.ph #dockscroll{gap:5px}
+html.ph #acts{padding:3px 0 5px}
 html.ph #acts .btn{font-size:14px}
 html.ph #acts.many .btn{flex:1 1 calc(16% - 6px);min-height:44px;padding:0}
 html.ph.tipon #acts,html.ph.tipon #psub,html.ph.tipon #roster{display:none}
@@ -328,7 +333,6 @@ html.ph.ph-l .setup.scard{width:min(820px,100%)}
 html.ph .op{padding:2px 2px 3px;border-width:2px}
 html.ph .op .nm{font-size:13px}
 html.ph.ph-l #opp{padding:3px 3px 0}
-html.ph #hand{padding:18px 6px 3px}
 .cfghead,.cfgfoot{display:none}
 html.ph .cfghead,html.ph .cfgfoot{display:flex}
 @media (prefers-reduced-motion:reduce){.tslot.turn,.hc.pk{animation:none}.emo{animation:none;opacity:1}}

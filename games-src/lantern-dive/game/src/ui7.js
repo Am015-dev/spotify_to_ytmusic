@@ -5,7 +5,7 @@
 // to its slot, other divers' cards fly from their portrait, a finished trick is swept to the winner. Sprites only mirror what the DOM shows,
 // so hidden hands stay hidden: a sprite exists only for a card the DOM shows face up.
 const PX = { on: false, app: null, q: 'high', res: 1, kind: '', B: null, cv: null, L: {}, objs: new Map(), tweens: [], parts: [], tex: {}, img: {}, faceP: {}, dirty: true, t: 0, last: 0, err: '', ready: false, raf: 0, nPlay: 0, nSweep: 0 };
-const PXQ = { high: { pr: 2, fx: 1, blur: true, parts: 1, bub: 1 }, medium: { pr: 1.5, fx: .55, blur: false, parts: .5, bub: .6 }, low: { pr: 1, fx: 0, blur: false, parts: 0, bub: 0 } };
+const PXQ = { high: { pr: 2, fx: 1, blur: true, parts: 1, bub: 1 }, medium: { pr: 1.5, fx: .55, blur: false, parts: .5, bub: .6 }, low: { pr: 1.5, fx: 0, blur: false, parts: 0, bub: 0 } };
 const pxRM = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
 function gfxAuto() { const n = navigator.hardwareConcurrency || 4, mem = navigator.deviceMemory || 4, ph = isPh(); if (n <= 2 || mem <= 2) return 'low'; if (PX.soft) return 'low'; return ph ? 'medium' : 'high'; }
 function gfxPref() { return UI.prefs.gfx || 'auto'; }
@@ -84,7 +84,7 @@ async function pxTextures() {
 function svgImgP(svg) { return pxLoadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)); }
 // a card face at w CSS px, drawn straight on a canvas (no SVG decoding, so it is ready at once): paper, frame, the painted emblem, crisp numerals
 function pxFace(id, w) {
-  const r = Math.min(2, Math.max(1, PX.res)), key = id + '|' + w + '|' + r;
+  const r = Math.min(2, Math.max(1, window.devicePixelRatio || 1)), key = id + '|' + w + '|' + r;   // faces are always drawn at the screen's own sharpness (2x phones), whatever the graphics level
   if (PX.tex['f:' + key]) return PX.tex['f:' + key];
   const s = suitOf(id), v = valOf(id), lan = s === 4, su = D.suits[s], H = Math.round(w * 1.4);
   const c = document.createElement('canvas'); c.width = Math.round(w * r); c.height = Math.round(H * r); const x = c.getContext('2d'); x.scale(r, r);
@@ -268,7 +268,7 @@ function pxFrame(ts) {
     o.sp.tint = o.dim && !o.detached && o.layer === 'hand' ? 0xa9b8d0 : 0xffffff;
     o.sh.width = w * 1.25; o.sh.height = h * 1.18; o.sh.x = 3 + o.lift * 4; o.sh.y = 5 + o.lift * 8; o.sh.alpha = tex ? .55 + o.lift * .2 : 0;
     const lan = o.id >= 36, pulse = .8 + .2 * Math.sin(PX.t * 3 + o.id);
-    o.gl.width = w * 1.5; o.gl.height = h * 1.35; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .8 : 0)) * pulse : 0;
+    o.gl.width = w * (o.pk ? 1.14 : 1.5); o.gl.height = h * (o.pk ? 1.1 : 1.35); o.gl.tint = o.pk ? 0x35c27b : 0xffffff; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .55 : 0)) * pulse : 0;
     o.lg.width = w * 1.9; o.lg.height = w * 1.9; o.lg.alpha = lan && q.fx && !o.dim ? .28 * pulse : 0;
     if (o.lift > .01 && o.lift < .99) moving = true; if (o.pk || (lan && q.fx)) moving = true;
   }
