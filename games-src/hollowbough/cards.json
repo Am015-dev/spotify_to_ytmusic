@@ -1,5 +1,5 @@
 {
- "game": "Hollowbough (original-name reskin of Everdell base game, BGG 199792)",
+ "game": "Hollowbough (own-name adaptation of the original base game)",
  "notes": [
   "Original role keys follow the base game card roles; new_name and new_text are original.",
   "Every number (cost, base_points, copies, type, unique/common, kind) was asserted equal across two independent sources; see sources.md."
@@ -144,7 +144,7 @@
       "target": "any 1 other production card in your own city"
      }
     ],
-    "note": "ASSUMPTION: cannot target itself or another Chip Sweep recursively beyond one level (source silent)."
+    "note": "ASSUMPTION: cannot target itself or another Tinder Chipmunk recursively beyond one level (source silent)."
    },
    "new_text": "Re-run one other production card in your own city."
   },
@@ -201,7 +201,7 @@
       "owner_scores_base_points": true
      }
     ],
-    "note": "Cannot be played into your own city. Also playable into a city that has passed. Solo: Rugwort may play it into your city; if you play it, discard it and remove 1 Rugwort card instead."
+    "note": "Cannot be played into your own city. Also playable into a city that has passed. Solo: Old Grimbeard may play it into your city; if you play it, discard it and remove 1 Old Grimbeard card instead."
    },
    "new_text": "Plant this prankster in a rival village; it takes one of their spaces and costs them 2 points."
   },
@@ -373,10 +373,10 @@
       "op": "copy_production",
       "source": "any 1 green production card in an opponent city",
       "evaluate_in": "that opponent city",
-      "solo_source": "Rugwort's city"
+      "solo_source": "Old Grimbeard's city"
      }
     ],
-    "note": "Cannot copy a Storehouse. May copy another Miner Mole."
+    "note": "Cannot copy a Storehouse. May copy another Echo Mole."
    },
    "new_text": "Mimic any one production card in a rival village, as though it were theirs."
   },
@@ -469,7 +469,7 @@
       "op": "discard_rest"
      }
     ],
-    "note": "The free card triggers Courthouse/Historian-type triggers. Solo: counts as 2 cards played for Rugwort."
+    "note": "The free card triggers Courthouse/Historian-type triggers. Solo: counts as 2 cards played for Old Grimbeard."
    },
    "new_text": "Reveal 2 cards; you may play one worth up to 3 base points free; discard the other."
   },
@@ -1278,7 +1278,7 @@
       "op": "draw_up_to_hand_limit"
      }
     ],
-    "solo": "may visit Rugwort Post Office; Rugwort gains 1 point token"
+    "solo": "may visit Old Grimbeard Post Office; Old Grimbeard gains 1 point token"
    },
    "new_text": "Give a rival 2 cards, discard any others you like, then refill your hand from the deck. Visitors pay you 1 point."
   },
@@ -1414,7 +1414,7 @@
      "visitable_by": "owner only",
      "op": "take all resources stored on this card"
     },
-    "note": "Cannot be copied by Miner Mole; stored resources do not count for Architect."
+    "note": "Cannot be copied by Echo Mole; stored resources do not count for Architect."
    },
    "new_text": "Each production adds a stack (3 twigs, 2 resin, 1 pebble or 2 berries) to this card; send a worker to haul it all away."
   },
@@ -1732,7 +1732,7 @@
  ],
  "special_events": [
   {
-   "role": "special_a_brilliant_marketing_plan",
+   "role": "special_grand_market_scheme",
    "new_name": "Grand Market Scheme",
    "requires_cards": [
     "shopkeeper",
@@ -1749,7 +1749,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_a_wee_run_city",
+   "role": "special_hurry_scurry_dash",
    "new_name": "Hurry-Scurry Dash",
    "requires_cards": [
     "chip_sweep",
@@ -1766,7 +1766,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_an_evening_of_fireworks",
+   "role": "special_night_of_sparklers",
    "new_name": "Night of Sparklers",
    "requires_cards": [
     "lookout",
@@ -1783,11 +1783,11 @@
     "per_twig_on_event": 2
    },
    "new_text": "Stack up to 3 of your twigs here; each is worth 2 points at the end.",
-   "errata": "printed as Tower+Miner Mole in 1st printing; correct is Lookout+Miner Mole",
+   "errata": "printed as Tower+Echo Mole in 1st printing; correct is Lookout+Echo Mole",
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_ancient_scrolls_discovered",
+   "role": "special_lost_parchments_unearthed",
    "new_name": "Lost Parchments Unearthed",
    "requires_cards": [
     "historian",
@@ -1806,7 +1806,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_capture_of_the_acorn_thieves",
+   "role": "special_acorn_bandits_seized",
    "new_name": "Acorn Bandits Seized",
    "requires_cards": [
     "courthouse",
@@ -1823,7 +1823,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_croak_wart_cure",
+   "role": "special_marsh_fever_remedy",
    "new_name": "Marsh Fever Remedy",
    "requires_cards": [
     "undertaker",
@@ -1843,7 +1843,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_flying_doctor_service",
+   "role": "special_wingborne_healers",
    "new_name": "Wingborne Healers",
    "requires_cards": [
     "doctor",
@@ -1858,7 +1858,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_graduation_of_scholars",
+   "role": "special_commencement_of_pupils",
    "new_name": "Commencement of Pupils",
    "requires_cards": [
     "teacher",
@@ -1875,7 +1875,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_ministering_to_miscreants",
+   "role": "special_counsel_for_scoundrels",
    "new_name": "Counsel for Scoundrels",
    "requires_cards": [
     "monk",
@@ -1890,7 +1890,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_path_of_the_pilgrims",
+   "role": "special_pilgrims_trail",
    "new_name": "Pilgrims Trail",
    "requires_cards": [
     "monastery",
@@ -1905,7 +1905,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_performer_in_residence",
+   "role": "special_resident_minstrel",
    "new_name": "Resident Minstrel",
    "requires_cards": [
     "inn",
@@ -1925,7 +1925,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_pristine_chapel_ceiling",
+   "role": "special_gilded_shrine_vault",
    "new_name": "Gilded Shrine Vault",
    "requires_cards": [
     "woodcarver",
@@ -1943,7 +1943,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_remembering_the_fallen",
+   "role": "special_vigil_of_remembrance",
    "new_name": "Vigil of Remembrance",
    "requires_cards": [
     "cemetery",
@@ -1958,7 +1958,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_tax_relief",
+   "role": "special_toll_holiday",
    "new_name": "Toll Holiday",
    "requires_cards": [
     "judge",
@@ -1975,7 +1975,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_the_everdell_games",
+   "role": "special_grand_hollow_games",
    "new_name": "Grand Hollow Games",
    "requires_cards": [],
    "base_points": 9,
@@ -1994,7 +1994,7 @@
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
-   "role": "special_under_new_management",
+   "role": "special_change_of_proprietors",
    "new_name": "Change of Proprietors",
    "requires_cards": [
     "peddler",

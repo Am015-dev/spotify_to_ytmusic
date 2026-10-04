@@ -1,7 +1,7 @@
 {
  "_meta": {
-  "game": "The Old King's Crown (Eerie Idol Games, 2025) -> browser game 'The Thornbound Throne'",
-  "base_game_only": "Wild Kingdom expansion (Aeronauts, Legendary Creatures, Whispering Tower tile, Boon tokens, +15 Kingdom cards) deliberately not documented",
+  "game": "Adaptation of a published board game (2025) -> browser game 'The Thornbound Throne'",
+  "base_game_only": "The original expansion (four extra character pieces, four extra creature pieces, a tower tile, Boon tokens, +15 Kingdom cards) deliberately not documented",
   "name_policy": "ALL names/text here are NEW original wording; original titles/flavour/card text are NOT included. Original-name mapping lives only in the private scratch dir (not in repo).",
   "dsl": {
    "timings": {

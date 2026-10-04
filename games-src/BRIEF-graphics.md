@@ -1,6 +1,6 @@
 # Graphics upgrade brief: "AAA tabletop" look
 
-The user says the games look like "sloppy objects and drawings" and wants them to look like AAA games. The bar to aim for is a premium digital board game (Digital Wingspan, Tabletop Simulator with a good mod, Board Game Arena 3D, the Carcassonne and Azul apps): pieces that look like real, well-made physical components, lit like a product photo, on a rich table.
+The user says the games look like "sloppy objects and drawings" and wants them to look like AAA games. The bar to aim for is a premium digital board game (Digital Wingspan, Tabletop Simulator with a good mod, an online board-game platform in 3D, the official tile-laying and tile-drafting apps): pieces that look like real, well-made physical components, lit like a product photo, on a rich table.
 
 ## Hard constraints
 - One self-contained HTML file per game, built by the game's `build.py`. Three.js r158 UMD is inlined from `SP/node_modules/three/build/three.min.js` (SP = games-src).

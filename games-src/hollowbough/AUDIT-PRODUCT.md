@@ -38,7 +38,7 @@ Screenshots are in `audit-shots/`.
    - Effort M. **[shared]**: the drawer frame and search belong in the shell; each game supplies its data.
 
 2. **Selling needs a licence.** Hollowbough copies the mechanics, numbers and card structure of one published game exactly; only names, text and art are its own. Free play among friends is the current basis, but a paid release needs a licence from the rights holder, or a redesign deep enough to be our own game.
-   - Also: the public repo files `PLAN.md`, `rules-notes.md`, `sources.md` and `game/ENGINE-REPORT.md` name the original title, publisher and BGG id. The brief allows real names only in private research data.
+   - Also: the public repo files `PLAN.md`, `rules-notes.md`, `sources.md` and `game/ENGINE-REPORT.md` name the original title, publisher and catalogue id. The brief allows real names only in private research data.
    - Fix: decide licence or redesign, and move those files to the private research repo.
    - Effort L (business).
 
@@ -47,7 +47,7 @@ Screenshots are in `audit-shots/`.
 3. **Original role names show up in the game.** Players see card names that do not exist in this game:
    - The Rules drawer says "Some cards (Inn, Crane, Dungeon, Judge, Hostler) change the price" (`src/ui6.js:31`).
    - Four special-event texts use the original roles: "Husband+Wife pair", "prisoner in your Dungeon", "worker in your Monastery", "worker buried in your Cemetery" (`cards.json:1857,1889,1904,1957`).
-   - The shipped HTML also carries every original role name as the internal `key` (for example `"key":"barge_toad"`, `"req":["monk","dungeon"]`) and "1 Ever Tree piece" in the component data.
+   - The shipped HTML also carries every original role name as the internal `key` (for example `"key":"barge_toad"`, `"req":["monk","dungeon"]`) and the original name of the tree piece in the component data.
 
    This confuses players (the cards are called Lantern Rest, Pulley Lift, Thornhold Cells, Hostler Hedgehog and so on) and weakens the "all names are ours" claim.
    - Fix: rewrite these texts with our own card names. Have `gen-data.py` replace keys with neutral ids in the build.

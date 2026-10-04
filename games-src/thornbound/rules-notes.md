@@ -1,6 +1,6 @@
-# The Old King's Crown - rules notes (for "The Thornbound Throne")
+# Rules notes (for "The Thornbound Throne", adapted from the original game)
 
-Own-words paraphrase of the published base-game rules (rulebook "Copyright Eerie Idol Games 2025", design Pablo Clark; Simulacrum solo design Pablo Clark and Richard Wilkins). Numbers are exact unless marked. Original card names/text are deliberately NOT reproduced; see `cards.json` (new names, new wording, same mechanics).
+Own-words paraphrase of the published base-game rules (rulebook copyright the original publisher 2025, by the original designer; solo mode by the original designers). Numbers are exact unless marked. Original card names/text are deliberately NOT reproduced; see `cards.json` (new names, new wording, same mechanics).
 
 ## 0. Read this first: unknowns, conflicts, corrections
 
@@ -9,11 +9,11 @@ Own-words paraphrase of the published base-game rules (rulebook "Copyright Eerie
 **Also not in the rulebook:** there are no per-player-count rule differences and no map adjacency/movement graph (see sections 3 and 12).
 
 Remaining unknowns (full detail and where to find each in GAPS.md):
-1. Solo mode (Simulacrum) rules: setup, Ambition / Scheme / Fog / Tier decks, bid tokens, Sim reward tables, Forge cards, Heat scale. Only fragments from reviews + 24 Threat cards + 11 Sim faction cards are captured. NOT enough to build faithfully.
+1. Solo mode (the Sim) rules: setup, Ambition / Scheme / Fog / Tier decks, bid tokens, Sim reward tables, Forge cards, Heat scale. Only fragments from reviews + 24 Threat cards + 11 Sim faction cards are captured. NOT enough to build faithfully.
 2. Printed starting Hand Size value on the Player Boards (assumed 6, see 4).
 3. Exact per-faction Hand Size marker range detail beyond global min 3 / max 8 (global limits are confirmed).
 4. Rulebook "Teaching guide" / "Reference sheets" / FAQ errata (not retrieved).
-5. Tier values (Gold/Silver/Bronze) and copy counts of Simulacrum faction cards.
+5. Tier values (Gold/Silver/Bronze) and copy counts of Sim faction cards.
 6. A few glyph-to-name mappings (trait icons) are inferred, marked ASSUMPTION in cards.json.
 7. Whether the 2p/3p faction restriction ("2p: Nobility+Clans, 3p: without Gathering") reported by one search snippet exists in the real rules - unconfirmed, likely a recommendation only.
 
@@ -126,13 +126,13 @@ Because each player places a card in each of the 3 Regions every round (3 cards 
 
 ## 13. Solo mode - everything known (INCOMPLETE; see GAPS.md)
 
-Confirmed from reviews + card images (no official solo rulebook was readable; BGG file page returned HTTP 403 to automated fetches):
-- Opponent: "the Simulacrum" (the Sim), a 2-player-style duel. The player wins by having more Influence than the Sim after the final Round (5 rounds recommended; 4 or 6 possible).
+Confirmed from reviews + card images (no official solo rulebook was readable; the catalogue file page returned HTTP 403 to automated fetches):
+- Opponent: "the Sim" (the solo opponent), a 2-player-style duel. The player wins by having more Influence than the Sim after the final Round (5 rounds recommended; 4 or 6 possible).
 - The Sim has no Hand; whenever an effect makes it choose/target/gain a card it uses the top card of its Deck. It bids with a stack of bid TOKENS of fixed Strength (not cards) and does not use Kingdom Cards' text; per round it gets a reward based on the SUIT symbol of each Kingdom token/card held (details unknown).
 - Decks: Ambition cards (priority of Regions and Council suit; decide Herald placement, Kingdom Card steal targets, location choice on a win; priority backs are visible so you can read its intent; some are "lies"), Scheme/Plan cards (Supporter placement, faction-card placement, Clash marker order, Fog), Fog deck/markers + 24 Threat cards (list in cards.json), Sim Faction Cards graded Gold / Silver / Bronze Tier on the back (visible; some Gold may reveal as weak Ruse "bluffs"). Sim Site of Power "Fog nest": when exhausted it converts 2 Lore into 1 Influence repeatedly.
 - Sim ordering: reviews say player order in Spring is by LOWEST Influence (opposite of normal) - ASSUMPTION; Sim in Autumn adds Influence on Councils based on its Ambition suit, and gains more Lore when it Governs/Journeys; if the Sim holds the Favour it draws an extra Threat each round.
 - Fog: Regions with Fog get Threat effects (all 24 Threat card effects are in cards.json). Threat cards show 1-3 wave icons at the bottom (meaning unknown).
-- Forge: 30 double-sided small cards (60 faces) modify the Sim's behavior; "Heat" scale from -10 (easy) to +15 (hard); default 0; five preset Simulacra; custom/random Sims supported; heat is also used for trophies/high-score eligibility. Examples mentioned: lower the influence requirement, no extra Fog card, bigger Sim clash rewards.
+- Forge: 30 double-sided small cards (60 faces) modify the Sim's behavior; "Heat" scale from -10 (easy) to +15 (hard); default 0; five preset Sims; custom/random Sims supported; heat is also used for trophies/high-score eligibility. Examples mentioned: lower the influence requirement, no extra Fog card, bigger Sim clash rewards.
 - Sim card faces seen: 11 faces with Strength 1,3,3,5,5,6,6,8,10,11,13 (see cards.json `solo.sim_faction_cards_seen`); real deck size and Tier assignment unknown.
 Difficulty: reviewers say the default Sim is hard (Clans/Nobility easiest). 
 

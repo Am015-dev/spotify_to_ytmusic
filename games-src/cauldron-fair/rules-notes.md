@@ -7,7 +7,7 @@ what the engine implements. Real-game names live only in the private research fo
 Sources used: the publisher's English rules (an early draft), the final English rulebook text, the final
 ingredient almanac text (all four book sets), a fan tool that transcribed the cauldron track "from the physical
 board" and all 24 fortune cards, and two pictures in the official PDF that show the rat tails on the scoring
-track. BoardGameGeek itself refused every fetch (403), so no thread could be read directly; every number
+track. The board-game catalogue site itself refused every fetch (403), so no thread could be read directly; every number
 below was cross-checked against at least two of the other sources or against a worked example in the rulebook.
 
 ## Names
@@ -203,12 +203,12 @@ effects match what I remember of the box).
 * **Test-tube side of the cauldron** (the advanced variant in the base box): a second droplet walks along 12 test
   tubes (ruby, 1 VP, blue 1-chip, ..., black 1-chip as the 5th, ..., yellow 4-chip, 4 VP at the end). Only the
   first three, the fifth and the last two rewards could be confirmed; the rest are unknown, so it is not built.
-* **Expansion 1 (herb witches):** a 5th player, new books (sets 5 and 6), the Locoweed chip, orange 6-chips,
-  overflow bowls (half the value of extra chips as VP), 12 witches (4 per type, 3 colours of Witch Penny, each used
-  once per game; a leftover penny is 2 VP) with powers per phase, extra fortune cards. Researched from the
+* **Expansion 1 (the original first expansion):** a 5th player, new books (sets 5 and 6), a new ingredient chip, orange 6-chips,
+  overflow bowls (half the value of extra chips as VP), 12 witches (4 per type, 3 colours of witch coin, each used
+  once per game; a leftover coin is 2 VP) with powers per phase, extra fortune cards. Researched from the
   publisher rules and a how-to-play page; reliable enough to build in a later phase, but only after the base game
   is signed off.
-* **Expansion 2 (alchemists):** flask board with an essence track, essence cards, patient cards, cauldron
+* **Expansion 2 (the original second expansion):** flask board with an essence track, essence cards, patient cards, cauldron
   variants. Only a third-party summary was found, so it is not reliable yet.
 
 ## Audit fixes (round 1 of the rules audit)

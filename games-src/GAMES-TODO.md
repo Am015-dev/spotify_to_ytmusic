@@ -8,13 +8,13 @@ computer players, hot-seat, online play, a guided first game and the phone-first
 |---|---|---|---|
 | 1 | Catan (1995) | 3–4 | Trading and building on a hex island; trading UI between players is the hard part |
 | 2 | Wingspan (2019) | 1–5 | Engine building with ~170 bird cards; card art is the big job; has a solo mode |
-| 3 | The Quacks of Quedlinburg (2018) | 2–4 | Push-your-luck bag building; quick and great online |
+| 3 | A push-your-luck potion bag game (2018) | 2–4 | Push-your-luck bag building; quick and great online |
 | 4 | 7 Wonders (2010) | 3–7 | Card drafting like Kaiten Kitchen, scales to 7 players |
 | 5 | Camel Up (2014) | 3–8 | Betting on a stacking camel race; light party game |
 | 6 | Cascadia (2021) | 1–4 | Tile and token drafting; nature habitats; has a solo mode |
-| 7 | Sky Team (2023) | 2 | Two-player co-op landing a plane with dice; no talking |
-| 8 | King of New York (2014) | 2–6 | A second mode inside Crown City Smash: boroughs, buildings and army, Fame, its own dice and cards |
-| — | Ticket to Ride (2004) | 2–5 | On hold (your call earlier) |
+| 7 | A two-player co-op plane-landing dice game (2023) | 2 | Two-player co-op landing a plane with dice; no talking |
+| 8 | The city-smash sequel (2014) | 2–6 | A second mode inside Crown City Smash: boroughs, buildings and army, Fame, its own dice and cards |
+| — | A train-route collecting game (2004) | 2–5 | On hold (your call earlier) |
 
 ## Candidates from research (fill gaps on the shelf)
 Gaps today: bluffing / hidden roles, co-op card games, roll-and-write, deck-building, 2-player duels,
@@ -22,7 +22,7 @@ party word games, push-your-luck. Size = how big the build is (S small, M medium
 
 | Game (plays like) | Players | Gap it fills | Size | Why it suits the shelf |
 |---|---|---|---|---|
-| The Crew: Mission Deep Sea | 2–5 | Co-op card game | M | Co-op trick-taking with 96 short missions; perfect online, tiny components |
+| A co-op trick-taking mission game (deep-sea edition) | 2–5 | Co-op card game | M | Co-op trick-taking with 96 short missions; perfect online, tiny components |
 | Skull | 3–6 | Bluffing | S | Rules on one card, huge fun online, great with friends on phones |
 | Avalon / The Resistance | 5–10 | Hidden roles | S | Big-group party game; online hidden info suits our host-only rooms |
 | Codenames | 2–8 | Party word game | S | Needs our own word list; teams online or in one room |
@@ -42,8 +42,8 @@ party word games, push-your-luck. Size = how big the build is (S small, M medium
 ## Expansions and modes for games already on the shelf
 | Game | To do | Notes |
 |---|---|---|
-| Hollowbough | Pearlbrook, then Spirecrest, Bellfaire, Newleaf, Mistwood | One at a time |
-| The Thornbound Throne | Songs of Home expansion | |
+| Hollowbough | The five original expansions, in release order | One at a time |
+| The Thornbound Throne | The second original expansion | |
 | The Thornbound Throne | Solo mode | Needs photos of the solo rulebook and solo cards, or a clearly labelled house solo mode |
 | Doorkick Dungeon | Private build with your own card scans | Personal copy only, never on the public site |
 
