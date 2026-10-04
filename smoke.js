@@ -9,7 +9,7 @@ const fastOn=p=>p.evaluate(()=>{if(window.__dbg&&!window.__fastR){window.__fastR
 const shot=async(p,name)=>{await p.evaluate(()=>{if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}});await p.evaluate(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))));const f=path.join(OUT,name+'.jpg');await p.screenshot({path:f,type:'jpeg',quality:70,timeout:600000});shots.push(name);await fastOn(p)};
 async function page(b,vp,mobile){const ctx=await b.newContext(mobile?{viewport:vp,deviceScaleFactor:2,isMobile:true,hasTouch:true}:{viewport:vp});const p=await ctx.newPage();p.setDefaultTimeout(900000);p.errs=[];
  p.on('pageerror',e=>p.errs.push(e.message.slice(0,160)));p.on('console',m=>{if(m.type()==='error')p.errs.push('console: '+m.text().slice(0,160))});await p.goto(U);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');return p}
-const seed=(p,city,d)=>p.evaluate(([c,d])=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_city@1',c);if(d)localStorage.setItem('mho_athd@1',d);const k=c==='ath'?'.ath':'';localStorage.setItem('mho_roam'+k+'@1','{"tut":1,"otg":{}}')},[city,d]);
+const seed=(p,city,d)=>p.evaluate(([c,d])=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_city@1',c);if(d)localStorage.setItem('mho_athd@1',d);const k=c==='ath'?'.ath':'';localStorage.setItem('mho_roam'+k+'@1','{"tut":1,"otg":{}}');if(c==='ath')localStorage.setItem('mho_story.ath@1','{"seen":1}')},[city,d]).then(()=>p.reload()).then(()=>p.waitForFunction(()=>window.__mho&&__mho.state==='menu'));
 async function roam(p){await p.evaluate(()=>__mho.enterRoam());await p.waitForFunction(()=>__mho.state==='roam',null,{polling:500});await fastOn(p);await p.evaluate(()=>{try{__mho.storyClose()}catch(e){}try{window.__m1&&__m1.skip&&__m1.skip()}catch(e){}});await p.evaluate(()=>__mho.roamSim(30))}
 // keyboard bot along a street-graph GPS path; counts airborne frames, vertical spikes, stuck time
 const drive=(p,from,len)=>p.evaluate(([from,len])=>{const M=__mho,R=M.RO,K=M.K;let q0=from?M.rsnap(from[0],from[1],400):[R.x,R.z];
@@ -39,7 +39,7 @@ const overlaps=p=>p.evaluate(()=>{const sel=['.tbtn','#m1Next','#tW','#roamPark'
   await shot(p,`3_ath_${d}`);allErr.push(...p.errs.map(e=>`ath ${d}: `+e));await p.context().close()}
  // 3 · quick race
  {const p=await page(b,{width:1280,height:720});await fastOn(p);
-  const r=await p.evaluate(()=>{const M=__mho;M.homeHide();M.setOpt('tab','quick');M.setOpt('traffic',false);M.startRace();M.sim(1);const d0=M.pl.dist||0;M.sim(60*30);return{st:M.state,d:Math.round((M.pl.dist||0)-d0)}});
+  const r=await p.evaluate(()=>{const M=__mho;M.homeHide();M.setOpt('tab','quick');M.setOpt('traffic',false);M.startRace();M.sim(1);const d0=M.pl.dist||0;const K=M.K;for(let i=0;i<60*30;i++){if(K)K.ArrowUp=true;M.sim(1)}if(K)K.ArrowUp=false;return{st:M.state,d:Math.round((M.pl.dist||0)-d0)}});
   ok(r.d>250,'race: player covers ground in 30 s (auto/AI-free)',r);await shot(p,'4_race');allErr.push(...p.errs.map(e=>'race: '+e));await p.context().close()}
  // 4 · phone portrait + landscape layout
  for(const [n,vp] of [['port',{width:390,height:844}],['land',{width:844,height:390}]]){const p=await page(b,vp,true);await seed(p,'fra');await roam(p);await p.waitForTimeout(500);
