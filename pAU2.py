@@ -61,6 +61,18 @@ T=[
 ("win:'OPA! Best plate-smashing ever!'","win:'YES! Best plate-smashing ever!'",1),
 ('txt:"Opa! The Akropolis Cup','txt:"Bravo! The Akropolis Cup',1),
 ("'Clear streets! Efcharistó.'","'Clear streets! Thank you.'",1),
+('"Willkommen in Mainhattan!','"Welcome to Mainhattan!',1),
+("hi:'Drei Kisten Ebbelwoi for","hi:'Three crates of Ebbelwoi for",1),
+("'The festival is saved! Prost!'","'The festival is saved! Cheers!'",1),
+('Hilfe! Kaiser’s goons','Help! Kaiser’s goons',2),
+('paidi mou','my child',3),
+("lose:'Ach, they got away.","lose:'Oh no, they got away.",1),
+('<b>Pame!</b>','<b>Let’s go!</b>',1),
+("win:'Opa! The whole of Plaka","win:'Yes! The whole of Plaka",1),
+("['YIAYIA','Opa! Now drift for them!']","['YIAYIA','Now! Drift for them!']",1),
+("['YIAYIA','Opa! Koulouria for everyone","['YIAYIA','Hooray! Koulouria for everyone",1),
+("COP:{n:'Polizei Funk'","COP:{n:'Police Radio'",1),
+('The Polizei just found','The police just found',1),
 ]
 for a,b,n in T:R(a,b,n)
 save()

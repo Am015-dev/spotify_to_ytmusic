@@ -21,7 +21,12 @@ const only=(g,k)=>g[k]>.8&&['fra','ath','race','mission','cut'].every(j=>j===k||
   await p.evaluate(()=>__au.scene({lines:[['HILDE','Sound check.']],dur:60}));await p.waitForTimeout(2500);g=await buses(p);
   ok(only(g,'cut'),'cutscene: crossfades to the cutscene bus (stinger on entry)',g);ok(g.duck<.4,'music ducks under dialogue',{duck:g.duck});
   await p.evaluate(()=>{__mho.roamSim(1);__au.csEnd()});await p.waitForTimeout(1200);g=await buses(p);ok(g.duck>.9,'duck releases after the dialogue',{duck:g.duck});
-  await p.evaluate(()=>{__au.pop('TAKEDOWN!','#ff2d55')});await F.shot(p,'shots/au_takedown.png');await p.evaluate(()=>{__au.confetti()});await p.waitForTimeout(900);await F.shot(p,'shots/au_confetti.png');
+  // screenshots: rendering one frame takes seconds here, so freeze the pop / confetti mid-animation for the picture
+  await p.evaluate(()=>{__au.pop('TAKEDOWN!','#ff2d55');const e=document.getElementById('hitPop'),k=e.cloneNode(true);k.id='auHold1';k.className='au2k';k.hidden=false;k.style.animation='none';k.style.transform='translateX(-50%) rotate(-4deg)';e.parentNode.appendChild(k)});
+  await F.shot(p,'shots/au_takedown.jpg',{type:'jpeg',quality:70});await p.evaluate(()=>document.getElementById('auHold1').remove());
+  await p.evaluate(async()=>{__au.confetti();await new Promise(r=>setTimeout(r,1000));const c=document.getElementById('auConf'),k=c.cloneNode(false);k.id='auHold2';k.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:60';
+    for(const i of c.children){const j=i.cloneNode(false),r=i.getBoundingClientRect();j.style.cssText=`position:absolute;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;background:${i.style.background};border-radius:2px`;k.appendChild(j)}document.body.appendChild(k)});
+  await F.shot(p,'shots/au_confetti.jpg',{type:'jpeg',quality:70});await p.evaluate(()=>document.getElementById('auHold2').remove());
   // 5 min of sim (keyboard bot: throttle, steer, drift, boost) while the scheduler keeps playing: live audio sources must stay flat
   const samp=[];for(let i=0;i<60;i++){await p.evaluate(i=>{const K=__mho.K;K.ArrowUp=true;K.ArrowLeft=i%6<2;K.ArrowRight=i%6===3;K.KeyX=i%5===1;K.ShiftLeft=i%7===2;__mho.roamSim(300)},i);await p.waitForTimeout(150);samp.push(await p.evaluate(()=>__au.M.live))}
   await p.evaluate(()=>{const K=__mho.K;K.ArrowUp=K.ArrowLeft=K.ArrowRight=K.KeyX=K.ShiftLeft=false});
@@ -42,7 +47,7 @@ const only=(g,k)=>g[k]>.8&&['fra','ath','race','mission','cut'].every(j=>j===k||
         for(const id of['m1Next','roamMini','roamMap']){const o=document.getElementById(id);if(vis(o)&&hit(r,o.getBoundingClientRect()))ov.push(id)}}
       if(performance.now()-t0>1200&&!window.__mapT){window.__mapT=1}
       await new Promise(r=>setTimeout(r,100))}return{seen,ov:[...new Set(ov)],first:first&&Math.round(first),last:last&&Math.round(last),ok:document.body.classList.contains('portraitOk')}});
-  ok(r.seen>0&&!r.ov.length&&r.last<3600&&r.ok,'portrait hint: visible briefly, gone within ~3 s, never over NEXT bar / minimap / map',r);await F.shot(p,'shots/au_portrait.png');
+  ok(r.seen>0&&!r.ov.length&&r.last<3600&&r.ok,'portrait hint: visible briefly, gone within ~3 s, never over NEXT bar / minimap / map',r);
   await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');await roam(p);await p.waitForTimeout(600);
   const again=await p.evaluate(()=>{const h=document.getElementById('rotateHint');return!!h&&h.offsetWidth>0&&getComputedStyle(h).display!=='none'});ok(!again,'portrait hint: not shown again on the same device');
   // open the map while it would be showing: it must hide
@@ -52,7 +57,7 @@ const only=(g,k)=>g[k]>.8&&['fra','ath','race','mission','cut'].every(j=>j===k||
  // 4 · English UI text: scanned list of former German / Greek strings must be gone; Athens plate reads "Chapter 1 · Welcome to Athens"
  {const src=fs.readFileSync(__dirname+'/local_dbg.html','utf8');
   const BAN=['Kefalaio','Kalos irthes','Ta stena tis','TELOS TOU CHARTI','ENDE DER KARTE',"'Kapitel'",'Neu in Mainhattan','Die Hafenbande','Kaisers Schatten','Das Finale','Los geht','BAUSTELLE',"'Feierabend'","'Rushhour'",'Brücke gesperrt','Letzte Bahn','Takedown-Rausch','Nachtfinale','Hügel Cup','Brückensprint',
-   'Landeanflug','Hinauf in den','Ankunft im','Einfahrt nach','Über die Felder','Einlaufen in','Kräne am','Durch den Stadtwald',"'Zubringer",'Danke','Wunderbar','Ach nein','Ach,','Ach!','Efcharist','Siga siga','Ela!','yiayia drives','Astynomia','Polizei Frankfurt','Kalimera','Opa!','OPA!',"'Umland'","fb:['Athina'"];
+   'Landeanflug','Hinauf in den','Ankunft im','Einfahrt nach','Über die Felder','Einlaufen in','Kräne am','Durch den Stadtwald',"'Zubringer",'Danke','Wunderbar','Ach nein','Ach,','Ach!','Efcharist','Siga siga','Ela!','yiayia drives','Astynomia','Polizei Frankfurt','Kalimera','Opa!','OPA!',"'Umland'",'Willkommen','Drei Kisten','Prost!','Hilfe!','paidi mou','Pame!','Polizei',"fb:['Athina'"];
   const left=BAN.filter(w=>src.includes(w));ok(!left.length,`non-English UI strings: ${BAN.length} scanned, none left`,left);
   const p=await page(b,{width:1280,height:720});await seed(p,'ath','A');await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');await roam(p);await p.evaluate(()=>__mho.roamSim(60));
   const t=await p.evaluate(()=>({sub:document.querySelector('#roamPlate small').textContent,}));
