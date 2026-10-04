@@ -14,7 +14,6 @@ var SC_K={
   cam:.8,        // chase camera distances/heights × this (base + juice offsets)
   rad:1.15,      // collision: centre circle radius (half width 1.12)
   off:1.35,      // collision: nose / tail circles at ± this along the heading, radius rad (5.0 m long)
-  smash:3.8,     // traffic smash distance between centres (was 5: cars one lane over got smashed)
   skid:[.9,1.7] // skid marks: half track, behind the centre
 };
 var SC_S={on:true,dx:0,dz:0,nb:0};

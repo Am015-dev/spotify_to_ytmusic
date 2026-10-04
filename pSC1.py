@@ -7,8 +7,8 @@ R('const hb=roamHit(nx,nz,2.2,RO.y);if(hb){const pp=bldPush(hb,nx,nz,2.2)','cons
 R('S2=.66;','S2=SC_S&&SC_S.on?SC_K.ped:.66;')
 # quest / passenger minifigs 6.8 m -> 2.0 m (kit pilot and drivers set their own scale afterwards)
 R('g.scale.setScalar(1.7);g.userData={arm,ex}','g.scale.setScalar(SC_S&&SC_S.on?SC_K.fig:1.7);g.userData={arm,ex}')
-# traffic smash distance follows the smaller cars
-R('if(d<5&&Math.abs(c.y-RO.y)<3)','if(d<(SC_S&&SC_S.on?SC_K.smash:5)&&Math.abs(c.y-RO.y)<3)')
+# ownerbugs' oriented car boxes (OB_cdim half width/length) follow the scaled km cars (player box OB_HW/OB_HL 1.25 × 2.45 already matches 2.24 × 5.0 m)
+R('/truck|delivery|van/.test(n)?[1.3,3.3]:[1.15,2.4]','/truck|delivery|van/.test(n)?(SC_S&&SC_S.on?[1.05,2.9]:[1.3,3.3]):(SC_S&&SC_S.on?[1.04,2.35]:[1.15,2.4])')
 # skid marks under the (narrower) car
 R('addScaledVector(fw,-2.6).addScaledVector(rs,sd*2.1)','addScaledVector(fw,SC_S&&SC_S.on?-SC_K.skid[1]:-2.6).addScaledVector(rs,sd*(SC_S&&SC_S.on?SC_K.skid[0]:2.1))')
 # juice camera (ju.js): drop + pull limit scale with the chase camera; near-miss band follows the car widths
