@@ -91,6 +91,8 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
       await boardCheck('lifted'); await targets('lifted'); await shot('2lifted');
     }
     // tap a group on a counter: details open in the dock, never over the board
+    // (phones show no empty custard spot, so serve one plate first if every counter is still empty)
+    if (!(await p.$('#tbl .grp'))) { await p.evaluate(() => { if (!UI.sel.length) { const b = document.querySelector('#belt .hc'); if (b) b.click(); } const s = document.querySelector('[data-a=serve]'); if (s) s.click(); }); await p.waitForFunction(() => document.querySelector('#tbl .grp') && canPick(), null, { timeout: 30000 }).catch(() => { }); await p.waitForTimeout(300); }
     await p.evaluate(() => { const g = [...document.querySelectorAll('#tbl .grp')].find(e => e.dataset.k !== 'pud'); window.__g = g && g.dataset.seat + '|' + g.dataset.k; });
     {
       const g = await p.$('#tbl .grp'); if (!g) fail('no group on the table'); else {
@@ -106,7 +108,7 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     { const us = await p.$('#acts [data-a=unsel]'); if (us) await us.tap(); await p.waitForTimeout(150); } await p.tap('#roster .chip >> nth=1'); await p.waitForTimeout(500); await scroll('drawer'); await shot('4diners'); await targets('diners drawer'); { const on = await p.evaluate(() => document.getElementById('rivald').classList.contains('on')); if (!on) fail('chip did not open the diners drawer'); } await p.keyboard.press('Escape'); await p.waitForTimeout(300);
     for (const id of ['logd', 'rulesd', 'setd']) { await p.tap(`.gx-bar [data-gx=${id}]`); await p.waitForTimeout(450); await scroll('drawer ' + id); if (!(await p.evaluate(i => document.getElementById(i).classList.contains('on'), id))) fail('drawer did not open', id); if (id === 'setd') { await shot('5menu'); await targets('menu'); } if (id === 'rulesd') await shot('5rules'); await p.keyboard.press('Escape'); await p.waitForTimeout(300); }
     // hint
-    { const hb = await p.$('#acts [data-a=hint]'); if (hb) { await hb.tap(); await p.waitForTimeout(400); const st = await p.evaluate(() => ({ rec: document.querySelectorAll('#belt .hc.rec').length, sel: document.querySelectorAll('#belt .hc.sel').length })); if (!st.rec) fail('hint marked no plate'); await shot('6hint'); await targets('hint'); } else fail('no hint button'); }
+    { const hb = await p.$('#acts [data-a=hint], #hintb'); if (hb) { await hb.tap(); await p.waitForTimeout(400); const st = await p.evaluate(() => ({ rec: document.querySelectorAll('#belt .hc.rec').length, sel: document.querySelectorAll('#belt .hc.sel').length })); if (!st.rec) fail('hint marked no plate'); await shot('6hint'); await targets('hint'); } else fail('no hint button'); }
     // serve with the real animations, look at the cover and the reveal
     await p.tap('#acts [data-a=serve]'); await p.waitForTimeout(500); await shot('7cover'); await scroll('cover'); await targets('cover');
     let rv = false; for (let k = 0; k < 50; k++) { const st = await p.evaluate(() => ({ lift: !!document.querySelector('.kk-cloche.kk-lift'), can: canPick(), busy: UI.busy })); if (st.lift && !rv) { rv = true; await shot('8reveal'); await boardCheck('reveal'); } if (st.can) break; await p.waitForTimeout(120); }

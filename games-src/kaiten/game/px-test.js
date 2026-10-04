@@ -60,7 +60,7 @@ const RUNS = ONLY >= 0 ? [RUNS0[ONLY]] : RUNS0;
           const backs = document.querySelectorAll('#belt .hc.back').length, sb = cards.filter(o => o.back).length; if (backs !== sb) out.push('back sprites ' + sb + ' != DOM backs ' + backs);
           // counters: every group the engine scores (groupsOf on the engine tables) has a plate sprite with the right stack at its button
           const tab = G.players.map(q => q.table), info = seatScoreInfo(tab), pc = pudCounts();
-          const want = new Map(); G.players.forEach((q, s) => { groupsOf(s, tab, info).list.forEach(g => want.set('g:' + s + '|' + g.k, { n: g.n, type: g.type })); want.set('g:' + s + '|pud', { n: pc[s], type: 'pudding' }); });
+          const want = new Map(); G.players.forEach((q, s) => { groupsOf(s, tab, info).list.forEach(g => want.set('g:' + s + '|' + g.k, { n: g.n, type: g.type })); if (pc[s] || document.querySelector('.seat[data-seat="' + s + '"] .grp.shelf')) want.set('g:' + s + '|pud', { n: pc[s], type: 'pudding' }); });   // phones show the custard spot from the first cup
           const plates = S.objs.filter(o => o.kind === 'plate');
           for (const [k, w] of want) { const o = plates.find(q => q.key === k); if (!o) { out.push('no plate sprite for ' + k); continue; } if (o.layers !== Math.min(Math.max(w.n, 1), 3)) out.push(k + ' layers ' + o.layers + ' for ' + w.n); if (o.type !== w.type) out.push(k + ' type ' + o.type); }
           for (const o of plates) if (!want.has(o.key)) out.push('extra plate sprite ' + o.key);
