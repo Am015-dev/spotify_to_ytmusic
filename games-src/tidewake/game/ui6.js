@@ -98,7 +98,7 @@ function sunkNames(seats){const me=youSeat();const l=seats.map(i=>i===me?'Your j
 function renderCards(){const el=$('#cards');if(!el)return;if(!G||!UI.sunk||!UI.sunk.length){el.innerHTML='';el.hidden=true;return}el.hidden=false;
   const me=youSeat();
   el.innerHTML=UI.sunk.map(c=>{const mine=c.seats.includes(me);const who=sunkNames(c.seats);const dots=c.seats.map(dot).join('');
-    return `<div class="prompt sunk${mine?' mine':''}" data-sunk="${c.seats.join(',')}"><h4><span class="x">&#10006;</span> Sunk! ${dots} ${esc(who)}</h4><p><b>Because</b> ${esc(c.t)}</p><p class="tiny">${c.k==='collision'?'Both junks are out.':''} It happened during ${esc(nm(c.cur))}'s turn${c.actor!=null&&c.actor!==c.cur?` (${esc(nm(c.actor))} answered)`:''}. The red mark on the board shows where.${mine?' You are out, but you can watch the rest of the game.':''}</p><button class="btn small" data-a="sunkok" data-id="${c.id}">Got it</button></div>`}).join('')}
+    return `<div class="prompt sunk${mine?' mine':''}" data-sunk="${c.seats.join(',')}"><h4><span class="x">&#10006;</span> Sunk! ${dots} ${esc(who)}</h4><p><b>Because</b> ${esc(c.t)}</p><p class="tiny">${c.k==='collision'?'Both junks are out.':''} It happened on ${c.cur===youSeat()&&!hotSeat()?'your':esc(nm(c.cur))+"'s"} turn. The red mark on the board shows where.${mine?' You are out, but you can watch the rest of the game.':''}</p><button class="btn small" data-a="sunkok" data-id="${c.id}">Got it</button></div>`}).join('')}
 function sunkClear(){UI.sunk=[];UI.marks=[];UI.sunkSeen={};renderCards()}
 // ---------- the monster-phase card ----------
 // builds the card's lines from the recorded events: roll, then one line per leviathan move / rise / swim-off, in the order they happen
@@ -110,16 +110,18 @@ function mphBuild(evs){let mp=null;
       e.ln=mp.lines.length;mp.lines.push({id:e.id,txt:`rolled ${e.die}: ${txt}`,nm:nmx})}
     else if(mp&&e.t==='arrive'&&(e.spawn||e.k==='M')){const pr=evs[i-1];const txt=pr&&pr.t==='log'?pr.text:(e.k==='M'?'The Maelstrom moves':levName(e.id)+' rises');if(pr&&pr.t==='log')pr.skip=true;
       e.ln=mp.lines.length;mp.lines.push({id:e.id,txt:txt.replace(/\.$/,''),nm:'',plain:1,maelstrom:e.k==='M'})}
+    else if(mp&&mp.lines.length&&e.t==='destroy'){const l=mp.lines[mp.lines.length-1];if(!/smashes/.test(l.txt))l.txt+=` and smashes the tile at column ${e.x+1}, row ${e.y+1}`}
+    else if(mp&&mp.lines.length&&e.t==='sink'){const l=mp.lines[mp.lines.length-1];l.txt+=`: ${e.seat===youSeat()&&!hotSeat()?'your':nm(e.seat)+"'s"} junk sinks!`;l.bad=1}
     else if(mp&&e.t==='log'&&/^The Maelstrom (churns|drains)/.test(e.text)){e.skip=true;mp.lines.push({id:-1,txt:e.text.replace(/\.$/,''),nm:'',plain:1});e.ln=mp.lines.length-1}}
   return mp}
 function mphHTML(){const mp=UI.mph;if(!mp||G&&G.over&&!UI.busy)return '';
   const sc=[];for(let n=2;n<=12;n++)sc.push(`<span class="${n>=6&&n<=8?'w':''}${!mp.roll&&n===mp.total?' cur':''}">${n}</span>`);
   const verdict=mp.roll?'Rolling...':mp.wake?'6, 7 or 8: the leviathans stir!':'Not 6, 7 or 8: calm, nothing moves.';
   const shown=mp.lines.slice(0,mp.shown);
-  return `<div class="mph ${mp.wake&&!mp.roll?'wake':''}"><div class="mh"><b>Monster wake roll</b> <span class="tiny">two dice added together${G&&G.seats[mp.seat]?' ('+esc(nm(mp.seat))+' rolled)':''}</span></div>
+  return `<div class="mph ${mp.wake&&!mp.roll?'wake':''}"><div class="mh"><b>${G&&G.seats[mp.seat]?(mp.seat===youSeat()&&!hotSeat()?'Your':esc(nm(mp.seat))+"'s")+' roll':'The roll'}</b> <span class="tiny">two dice added: 6, 7 or 8 wakes the leviathans</span></div>
   <div class="dice"><span class="die g${mp.roll?' roll':''}">${mp.roll?'?':mp.d[0]}</span><span class="die b${mp.roll?' roll':''}">${mp.roll?'?':mp.d[1]}</span><span class="tot">${mp.roll?'':'= '+mp.total}</span><span class="verdict">${verdict}</span></div>
   <div class="scale" aria-label="Leviathans wake on a total of 6, 7 or 8">${sc.join('')}</div>
-  ${shown.length?`<ol class="mlines">${shown.map((l,i)=>`<li class="${i===shown.length-1&&UI.mphLive?'now':''}">${l.plain?'':`<b data-mon="${l.id}">${esc(l.nm)}</b> `}${esc(l.txt)}</li>`).join('')}</ol>`:''}</div>`}
+  ${shown.length?`<ol class="mlines">${shown.map((l,i)=>`<li class="${i===shown.length-1&&UI.mphLive?'now':''}${l.bad?' bad':''}">${l.plain?'':`<b data-mon="${l.id}">${esc(l.nm)}</b> `}${esc(l.txt)}</li>`).join('')}</ol>`:''}</div>`}
 // ---------- the overlay descriptors ----------
 function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];const busy=UI.busy;const me=youSeat();const d=sideToAct();const myTurn=!busy&&!G.over&&d>=0&&G.seats[d].human&&!mustPass(d);
   const near=new Set();let dq=null;if(G.q&&G.q.kind==='doom'&&G.q.ctx&&G.q.ctx.cause&&G.q.ctx.cause.id!=null&&G.q.who===me)dq=G.q.ctx.cause.id;if(myTurn&&G.phase==='play'){const S=G.ships[d];if(S&&S.x!=null)for(const id of adjMons(G,S))near.add(id)}

@@ -94,9 +94,9 @@ function oppHTML(d){const now=UI.busy&&UI.curTurn!=null&&G.seats[UI.curTurn]?UI.
 function goalHTML(){if(!G)return '';const L=G.mons.filter(m=>m.k==='L').length,toRise=G.mdeck.filter(x=>x<10).length;
   if(G.variant==='solo')return `<div class="goal"><b>Goal:</b> outlast every leviathan. ${toRise} still to rise, ${L} on the board; you win when none are left.</div>`;
   if(G.variant==='easysolo')return `<div class="goal"><b>Goal:</b> stay afloat for ${G.opts.goal} turns (turn ${G.turn} now), or play out the whole tile pile.</div>`;return ''}
-function mainHTML(){const gh=goalHTML();const h=mainHTML0();return G.over||!h?h:gh+h}
+function mainHTML(){const gh=goalHTML();const h=mainHTML0();return G.over&&!UI.busy||!h?h:gh+h}
 function mainHTML0(){
-  if(G.over)return overHTML();const d=sideToAct(),vs=viewSeat();
+  if(G.over&&!UI.busy)return overHTML();const d=sideToAct(),vs=viewSeat();
   if(UI.busy)return oppHTML(d)+handStrip(vs,false);
   if(d<0)return '';const dh=G.seats[d].human;
   if(NET.on&&dh&&d!==NET.mySeat)return netWaitHTML(d,vs);

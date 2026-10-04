@@ -56,6 +56,7 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
       if(hot&&own!==holder){hidden++;if(errs.length<6)errs.push('HIDDEN hand of '+own+' face up, holder '+holder)}}
     if(!humans.length||humans.length>=1){for(const el of d.querySelectorAll('[data-crewhand][data-up="1"]'))if(humans.length){hidden++;errs.push('HIDDEN crew hand face up')}}
     if(hot&&!w.eval('UI.busy')){const dd=w.eval('sideToAct()');if(dd>=0&&G.seats[dd].human&&holder!==dd&&d.querySelector('#dockbody [data-hand]')){hidden++;errs.push('hand shown before the pass screen was taken')}}
+    if(G.over&&w.eval('UI.busy'))return; // the result card waits until the replay has shown what sank the junks
     if(G.over){clearInterval(iv);const ov=d.querySelector('#dockbody [data-over]');if(!ov)errs.push('no game-over card');else seen.add('over');
       const again=d.querySelector('[data-a=again]');if(cf.replay===undefined&&again&&!replayed&&R()<.3){replayed=1;seen.add('again');click(again);const g2=w.eval('G');if(!g2||g2.over||g2.turn>1)errs.push('replay did not start');go();return}
       res({cf,over:G.over,turns:G.turn,errs,seen,clicks,hidden,mism,secs:Math.round((Date.now()-t0)/1000)});w.close();return}
