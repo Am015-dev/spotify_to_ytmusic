@@ -192,3 +192,15 @@ html.ph .gx-dock[data-pp="watch"]:not([data-card="choice"]):not([data-card="coac
 @media (max-height:700px){#pfeed li:nth-last-child(n+3){display:none}}
 @media (max-height:600px){html.ph-p #pfeed{display:none!important}}
 html.ph-l #pfeed li:nth-last-child(n+3){display:none}
+html.ph #banner{pointer-events:auto}
+.banwrap .more{display:none}
+/* extra actions (cards you can use now) must fit above the fold: the result line drops to one line, the gaps shrink */
+@media (min-height:641px){
+  html.ph-p .gx-dock[data-xa] #banner,html.ph-p .gx-dock[data-xa] #banner:empty{-webkit-line-clamp:1;height:1.6em;max-height:1.6em}
+  html.ph-p .gx-dock[data-xa] #preview{height:2.7em;max-height:2.7em;margin-top:4px}
+}
+html.ph-p .gx-dock[data-xa]{gap:4px}
+html.ph-p .gx-dock[data-xa] #pacts>.btn:not([data-act="reroll"]):not([data-act="resolve"]):not([data-act="hint"]):not([data-act="end"]){min-height:44px;padding:0 6px}
+/* a pick with many options: the option list scrolls with the title instead of a sticky block covering it */
+html.ph #choice .acts:has(> .btn:nth-of-type(5)){position:static;margin-bottom:0;padding-bottom:4px}
+@media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #preview{-webkit-line-clamp:1;height:1.5em;max-height:1.5em}}

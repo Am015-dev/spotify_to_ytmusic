@@ -83,7 +83,7 @@ function phActs(){if(!G)return;const pa=$ph('pacts');if(!pa)return;
     set('[data-act="reroll"]',`<span class="bl">🎲 Roll</span><small>${nk} ${nk===1?'die':'dice'} · ${G.rolls} left</small>`,`Roll the ${nk} unkept ${nk===1?'die':'dice'} again, ${G.rolls} rerolls left`);
     set('[data-act="resolve"]','<span class="bl">✔ Done</span><small>use these dice</small>','Done: resolve these dice');
     set('[data-act="hint"]','<span aria-hidden="true">💡</span>','Keep the suggested dice')}
-  if(humanTurn()&&G.phase==='buy'){const win=!G.bug&&cur().vp>=20;set('[data-act="end"]',`<span class="bl">✔ ${G.bug?'Finish turn':'End turn'}</span>${win?'<small>you have 20★: end your turn to win</small>':G.market.length?'<small>or tap a card above to read and buy it</small>':''}`,G.bug?'Finish the borrowed turn':win?'End your turn: you have 20 stars and win if you survive it':'End your turn')}
+  if(humanTurn()&&G.phase==='buy'){const win=!G.bug&&cur().vp>=20;set('[data-act="end"]',`<span class="bl">✔ ${G.bug?'Finish turn':'End turn'}</span>${win?`<small>you have ${cur().vp}★ (20 wins): end your turn to win</small>`:G.market.length?'<small>or tap a card above to read and buy it</small>':''}`,G.bug?'Finish the borrowed turn':win?'End your turn: you have 20 stars and win if you survive it':'End your turn')}
   if(PHONE.land&&!pa.querySelector('[data-a="advise"]')){const ab=document.createElement('button');ab.className='btn';ab.dataset.a='advise';ab.setAttribute('aria-label','What should I do now, and why?');ab.setAttribute('aria-expanded',UI.adv?'true':'false');ab.innerHTML='<span aria-hidden="true">🧭</span>';const hb=pa.querySelector('[data-act="hint"]')||pa.querySelector('[data-act="resolve"]')||pa.querySelector('[data-act="end"]');if(hb)hb.after(ab);else pa.prepend(ab)}
   const dk=document.querySelector('.gx-dock');if(!dk)return;
   const n=G.dice.length,land=document.documentElement.classList.contains('ph-l');const railW=dk.clientWidth-16;
@@ -91,7 +91,8 @@ function phActs(){if(!G)return;const pa=$ph('pacts');if(!pa)return;
   if(land&&n<=6){side=true;dc=3;dw=Math.max(52,Math.min(60,Math.floor((railW-6-104-12)/3)))}
   else{dc=n>6?4:Math.max(1,n);dw=Math.max(52,Math.min(64,Math.floor((railW-(dc-1)*6)/dc)))}
   dk.style.setProperty('--dc',dc);dk.style.setProperty('--dw',dw+'px');dk.dataset.ps=side?'side':'stack';
-  dk.dataset.pp=(!G.winner&&humanTurn()?G.phase:'watch')}
+  dk.dataset.pp=(!G.winner&&humanTurn()?G.phase:'watch');
+  const xa=pa.querySelectorAll('.btn[data-act]:not([data-act="reroll"]):not([data-act="resolve"]):not([data-act="hint"]):not([data-act="end"]):not([data-act="sweep"]):not([data-act="again"])').length;if(xa)dk.dataset.xa=xa;else delete dk.dataset.xa}
 function phNote(){const c=$ph('choice');if(c&&!c.classList.contains('hidden')){const li=c.querySelector('.intro ul li');if(li&&/glowing plate/.test(li.textContent))li.innerHTML='The <b>chips</b> under the board show every monster\'s ♥ ★ ⚡ and cards. The highlighted one is whose turn it is. Tap a chip or a monster for details.'}}
 // ---- the computer's turn, narrated: every logged event of this turn, oldest first, in the otherwise empty dock ----
 function phFeed(){const el=$ph('pfeed');if(!el)return;if(!G||G.winner||humanTurn()){el.innerHTML='';return}

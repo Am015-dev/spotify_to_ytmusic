@@ -566,7 +566,7 @@ function canBuy(p,k){const id=G.market[k];return !!id&&buyOK(p,id)&&p.en>=costOf
 function buyCore(p,k,done){const id=G.market[k];if(!id||!canBuy(p,k)){done();return}
   const full=costOf(p,id);const half=Math.ceil(full/2);
   const pay=(c,ufo)=>{p.en-=c;G.market[k]=null;refill();snd('buy');cov('buy');if(p.i===G.active)G.tf.bought=true;if(ufo){(p.tok.ufo=p.tok.ufo||[]).push(id);cov('evo:28')}
-    lg(p.i,`${mname(p)} buys “${CN(id)}”${ufo?' at half price ('+evoName(28)+')':''}.`);UI.banner=`<b>${esc(mname(p))}</b> buys ${esc(CN(id))}`;acquire(p,id,true,done)};
+    {const C=CARDS[base(id)];const fx1=C&&C.t==='D'?` (one-shot: ${C.x.replace(/\.$/,'')})`:'';lg(p.i,`${mname(p)} buys “${CN(id)}”${ufo?' at half price ('+evoName(28)+')':''}${fx1}.`);UI.banner=`<b>${esc(mname(p))}</b> buys ${esc(CN(id))}${esc(fx1)}`}acquire(p,id,true,done)};
   if(hasE(p,28)&&CARDS[base(id)].t==='K'&&(p.tok.ufo||[]).length<3&&half<full)ask(p.i,evoName(28),`Pay ${half} instead of ${full} and put a barnacle token on it (roll each turn: a claw loses it)?`,[{k:'h',l:`Pay ${half} (saucer)`},{k:'f',l:`Pay ${full}`}],()=>full>=4?'h':'f',k=>pay(k==='h'?half:full,k==='h'));
   else pay(full,false)}
 function buy(k){const p=cur();if(!canBuy(p,k))return;buyCore(p,k,()=>afterBuy(p))}
