@@ -115,7 +115,7 @@ thing.
 | `net-strip-test.js 20` | 20 games, 2,870 stripped views, 0 problems: PASSED |
 | `score-flash-test.js 3` (new) | 1,979 samples, 0 problems: PASSED (942 problems on the build before the fix) |
 | `click.js` (ANIM=0) | 16 games, 0 errors, 0 stalls, 0 hidden-hand violations |
-| `click.js --anim` | CLICKANIM |
+| `click.js --anim` | 16 games, 0 errors, 0 stalls, 0 hidden-hand violations |
 | `lay.js` 1366x768, 1920x1080, 768x1024, 1100x700 | PROBLEMS 0 |
 | `lay-phone.js` 390x844, 390x763, 390x664, 375x553, 412x780, 844x390, 750x342 | PROBLEMS 0 at all 7 sizes (touch play at each) |
 | `px-test.js` | PROBLEMS 0 on the rerun. The first run had 1: "animations did not finish" at 1366x768 webgl high, turn 3, a hand card 2 px from its target after 15 s; it did not recur. |
