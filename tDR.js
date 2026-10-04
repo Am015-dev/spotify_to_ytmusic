@@ -7,7 +7,7 @@ let fails=0,pass=0;const ok=(c,m,i)=>{c?pass++:fails++;console.log((c?'PASS ':'F
 const seed=async(p,city,d)=>{await p.evaluate(([c,d])=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_city@1',c);if(d)localStorage.setItem('mho_athd@1',d);const k=c==='ath'?'.ath':'';localStorage.setItem('mho_roam'+k+'@1','{"tut":1,"otg":{}}');if(c==='ath')localStorage.setItem('mho_story.ath@1','{"seen":1}')},[city,d]);
  await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');await F.on(p);await p.evaluate(()=>__mho.enterRoam());await p.waitForFunction(()=>__mho.state==='roam',null,{polling:500});
  await p.evaluate(()=>{try{__mho.storyClose()}catch(e){}try{__m1.skip()}catch(e){}__mho.roamSim(30)})};
-const CITIES=[{c:'ath',d:'A',area:'Kolonaki',routes:[[-300,0,300,0],[0,-300,0,300],[-250,-250,250,250],[250,-250,-250,250],[-150,-50,350,150]]},{c:'fra',d:null,area:'Altstadt',routes:[[-300,0,300,0],[0,-300,0,300],[-250,-250,250,250],[250,-250,-250,250],[-150,-50,350,150]]}];
+const CITIES=[{c:'ath',d:'B',area:'Kolonaki',routes:[[-300,0,300,0],[0,-300,0,300],[-250,-250,250,250],[250,-250,-250,250],[-150,-50,350,150]]},{c:'fra',d:null,area:'Altstadt',routes:[[-300,0,300,0],[0,-300,0,300],[-250,-250,250,250],[250,-250,-250,250],[-150,-50,350,150]]}];
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const errs=[];
 for(const C of CITIES){const p=await (await b.newContext({viewport:{width:1000,height:460}})).newPage();p.setDefaultTimeout(900000);p.on('pageerror',e=>errs.push(C.c+': '+e.message.slice(0,160)));
  await p.goto(U);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');await seed(p,C.c,C.d);
@@ -25,7 +25,7 @@ for(const C of CITIES){const p=await (await b.newContext({viewport:{width:1000,h
 // phone landscape (2000x920 like the owner's iPhone 16 shot) with a mission running
 {const ctx=await b.newContext({viewport:{width:870,height:400},deviceScaleFactor:2.3,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(900000);p.on('pageerror',e=>errs.push('phone: '+e.message.slice(0,160)));
  const cdp=await ctx.newCDPSession(p);
- await p.goto(U);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');await seed(p,'ath','A');
+ await p.goto(U);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');await seed(p,'ath','B');
  await p.evaluate(()=>{const e=document.querySelector('#rotOk');if(e&&e.offsetParent)e.click()});
  const mk=await p.evaluate(()=>{const M=__mho.RO.marks,m=M.find(m=>m.kind==='quest')||M.find(m=>m.kind==='otg');__mho.chStart(m);__mho.roamSim(240);return m&&(m.ev&&m.ev.id)});
  const rr=s=>p.evaluate(s=>{const e=document.querySelector(s);if(!e||!e.offsetParent||e.hidden||getComputedStyle(e).visibility==='hidden')return null;const r=e.getBoundingClientRect();return{l:Math.round(r.left),t:Math.round(r.top),r:Math.round(r.right),b:Math.round(r.bottom),w:Math.round(r.width),h:Math.round(r.height)}},s);
