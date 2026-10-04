@@ -13,3 +13,4 @@ normal y6 yellow Twin Spires                  10/30  33% avg rounds 7.0 {"fuel":
 normal y7 yellow Grand Crossing                3/30  10% avg rounds 6.6 {"mandatory":3,"short":12,"spin":3,"checks:flaps":3,"checks:planes+axis":1,"corridor":2,"checks:planes":1,"fuel":1,"collision":1} 2083ms/game
 normal r1 red Cloudspire                       0/30   0% avg rounds 6.4 {"short":10,"collision":1,"fuel":9,"mandatory":4,"checks:gear+flaps":1,"spin":2,"corridor":3} 2243ms/game
 normal r2 red Seabright Bay                    0/30   0% avg rounds 6.6 {"short":9,"mandatory":3,"fuel":14,"speed":3,"checks:gear":1} 1738ms/game
+normal r3 red Palmreach                        2/30   7% avg rounds 6.4 {"short":4,"mandatory":11,"speed":3,"collision":6,"fuel":2,"checks:planes+flaps+axis":1,"spin":1} 2050ms/game
