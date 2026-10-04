@@ -356,7 +356,7 @@ function elimWhy(id,marks){const sd=own(id),who=nm(sd)+'\'s '+cname(id)+' ('+str
 AG.clashNight=()=>{const c=G.clash,R=G.reg[c.r];G.step='night';const all=[];for(const s of c.parts)for(const id of (c.cards[s]||[]))all.push(id);
   const E=nightMarks(all);
   const dead=[],kills={};
-  for(const id of all){if(!E[id])continue;if(eff(id).tr.has('inv')){stat('invulnerable');const W=elimWhy(id,E[id]);lg(nm(own(id))+'\'s '+cname(id)+' is Invulnerable: '+W.t.replace(/ eliminates .*$/,'').replace(/ (eliminates itself|is eliminated).*$/,'')+' cannot remove it.',own(id),'',{k:'inv',ids:[id],by:W.by,why:W.why});continue}
+  for(const id of all){if(!E[id])continue;if(eff(id).tr.has('inv')){stat('invulnerable');const W=elimWhy(id,E[id]);lg(nm(own(id))+'\'s '+cname(id)+' is Invulnerable: '+W.t.replace(/ eliminates .*$/,'').replace(/ (eliminates itself|is eliminated).*$/,'')+' cannot remove it.',own(id),'',{k:'inv',ids:[id],by:W.by,why:W.why,r:c.r});continue}
     dead.push(id);for(const x of E[id])if(x.src!==id)kills[x.src]=(kills[x.src]||0)+1}
   if(!dead.length){now('clashTally');return}
   const trig=[];
@@ -595,14 +595,14 @@ function doRetreat(seat,src){const c=G.clash,r=c.r,P=G.pl[seat];const items=G.re
   askSel(seat,'retreat','Retreat: choose what returns (cards to hand, Herald or Supporters to your board).',items,'retreat',{src},{min:0})}
 SELH.retreat=(seat,ch,d)=>{const P=G.pl[seat],c=G.clash;const cards=[];for(const x of ch){if(x==='H'){P.herald=-1}else if(x==='S'){P.supp.b+=P.supp.r[c.r];P.supp.r[c.r]=0}else cards.push(x)}
   for(const id of cards){const m=G.cmod[id];toHand(seat,id);if(m&&m.ret){delete m.ret;now('contraband',{seat,id})}}
-  if(ch.length)lg(nm(seat)+' Retreats ('+ch.map(x=>x==='H'?'Herald':x==='S'?'Supporters':cname(x)).join(', ')+').',seat);stat('retreat')};
+  if(ch.length)lg(nm(seat)+' Retreats from '+regionName(c.r)+': '+ch.map(x=>x==='H'?'their Herald goes home':x==='S'?'their Supporters go back to the board':cname(x)+' goes back to their hand').join(', ')+'.',seat,'big',{k:'move',ids:cards.slice(),why:'Retreat',r:c.r});stat('retreat')};
 AG.contraband=d=>{if(!G.pl[d.seat].hand.includes(d.id)||eff(d.id).l<1)return;askYN(d.seat,'contraband','Contraband Gap: Journey with '+cname(d.id)+' now?','Journey with it','No','contraband',d)};
 PICKH.contraband=(seat,opt,d)=>{if(opt.yes)doJourney(seat,d.id)};
 act('cmd:flank','day',seat=>{const c=G.clash,o=[];const dests=[0,1,2].filter(r=>r!==c.r&&!G.reg[r].done&&!lockedFor(seat,r));if(!dests.length)return o;
   for(const id of myClash(seat))if(eff(id).cm.flank&&!c.used[id+':flank'])o.push({id,p:{card:id},label:'Flank with '+cname(id)+': move it to another unresolved Region'});return o},
   (seat,p)=>{const c=G.clash;c.used[p.card+':flank']=1;const dests=[0,1,2].filter(r=>r!==c.r&&!G.reg[r].done&&!lockedFor(seat,r));
     askPick(seat,'flank','Flank: choose the Region '+cname(p.card)+' moves to.',dests.map(r=>({k:'r'+r,r,label:'Move to '+regionName(r)})),'flank',{card:p.card})},true);
-PICKH.flank=(seat,opt,d)=>{const c=G.clash,from=c.r;if(holds(seat,39)&&cdef(d.card).ar==='heir')stat('kc39');moveActive(d.card,opt.r);stat('flank');lg(nm(seat)+'\'s '+cname(d.card)+' Flanks to '+regionName(opt.r)+'.',seat,'big');
+PICKH.flank=(seat,opt,d)=>{const c=G.clash,from=c.r;if(holds(seat,39)&&cdef(d.card).ar==='heir')stat('kc39');moveActive(d.card,opt.r);stat('flank');lg(nm(seat)+'\'s '+cname(d.card)+' Flanks from '+regionName(from)+' to '+regionName(opt.r)+' (it fights there instead).',seat,'big',{k:'move',ids:[d.card],why:'Flank',r:from,to:opt.r});
   if(cdef(d.card).fx.includes('flankSupp')&&G.pl[seat].supp.r[from]>0){const k=G.pl[seat].supp.r[from];askPick(seat,'flankSupp','Torchbearer Raiders: move Supporters from '+regionName(from)+' to '+regionName(opt.r)+'?',[...Array(k+1).keys()].map(n=>({k:'n'+n,n,label:n?'Move '+n+' Supporter'+(n>1?'s':''):'Move none'})),'flankSupp',{from,to:opt.r})}};
 PICKH.flankSupp=(seat,opt,d)=>{const s=G.pl[seat].supp;s.r[d.from]-=opt.n;s.r[d.to]+=opt.n;if(opt.n)lg(nm(seat)+' moves '+opt.n+' Supporter'+(opt.n>1?'s':'')+' with the Flank.',seat)};
 // DAY: tactics

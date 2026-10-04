@@ -427,7 +427,7 @@ html.ph .cat{width:64px;height:44px;bottom:100%}
 html.ph .band{font-size:13px;padding:14px 5px 5px}
 html.ph .note{font-size:13px;max-width:72%}
 html.ph .new{font-size:13px;width:46px;height:46px}
-html.ph .f.left b,html.ph .f.bot b{font-size:13px}
+html.ph .f.left b,html.ph .f.bot b{font-size:13px!important}
 html.ph .classic{min-height:44px}
 footer small{font-size:inherit}
 html.ph .coffee{position:relative;left:auto;top:auto;width:auto;height:auto;order:1;flex:1 1 100%;min-width:0}
@@ -487,7 +487,7 @@ html.ph header.top{scroll-snap-align:start}
 <body>
 <div class="roombg" aria-hidden="true"><div class="rb-wall"></div><div class="rb-wain"></div><div class="rb-skirt"></div><div class="rb-floor"></div><div class="rb-rug"></div><div class="rb-glow"></div><div class="rb-floorglow"></div></div>
 <header class="top">
-  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">14 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div><div class="controw" id="controw" role="group" aria-label="Continue a saved game" hidden></div></div>
+  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">17 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div><div class="controw" id="controw" role="group" aria-label="Continue a saved game" hidden></div></div>
   <div class="tools"><button type="button" class="tbtn" id="sndbtn" aria-label="Sound on" aria-pressed="true">🔊</button><button type="button" class="tbtn" id="viewbtn">☰ Plain list</button></div>
 </header>
 <main>
@@ -576,6 +576,18 @@ const GAMES=[
    blurb:'Plates glide past on the conveyor belt: grab one, pass the rest along, and build the tastiest table. Pair the prawns, finish fish sets, race for seaweed rolls and save a custard for dessert. Everyone picks at once, so watch what your neighbours collect. Play against computers, pass one device around, or online with friends.',
    stats:[['2–5','players'],['20','minutes'],['8+','ages'],['3','rounds']],
    chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','Simultaneous picks']},
+  {id:'lantern',cover:'covers/lantern.jpg',name:'Lantern Dive (preview)',src:'lantern-dive/index.html',ribbon:'Co-op deep-sea trick-taking',isNew:true,
+   blurb:'Dive together, say nothing, trust the lantern. Each diver takes jobs, then the crew plays tricks in silence: Lanterns beat every colour, and every job is a promise about the tricks one diver will win. Each of you may show a single card as a hint, so read your crew. One failed job and the dive is lost. Play with computer divers, pass one device around, or online with friends.',
+   stats:[['2–5','players'],['20','minutes'],['10+','ages'],['32','dives']],
+   chips:['Preview','Co-op','Computer divers · 3 levels','Hot-seat','Online with friends','Guided first game','32 dives + Deep Dive','96 job cards','Drone for two divers']},
+  {id:'cauldron',cover:'covers/cauldron.jpg',name:'Cauldron Fair (preview)',src:'cauldron-fair/index.html',ribbon:'Push-your-luck potion brewing',isNew:true,
+   blurb:'Everyone brews at once at the village fair. Draw chips from your own bag one at a time and lay them on your cauldron: draw again for a bigger payout, or stop before the pot boils over. Coins buy new chips in colours with their own powers, so your bag grows stranger and stronger over nine rounds. Play against computers, pass one device around, or online with friends.',
+   stats:[['2–4','players'],['45','minutes'],['10+','ages'],['9','rounds']],
+   chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','Push your luck','Bag building','Fortune cards','4 ingredient sets']},
+  {id:'approach',cover:'covers/approach.jpg',name:'Final Approach (preview)',src:'final-approach/index.html',ribbon:'Two-player co-op dice landing',isNew:true,
+   blurb:'Two seats, eight dice, one runway. Sit in the cockpit as Pilot and Co-pilot, roll behind your own screen and place your dice one at a time on axis, engines, flaps, gear, brakes and radio. You may talk about the plan but never about the dice. Bring the airliner down in seven rounds, past the traffic, level, at the right speed. Fly with a computer crewmate, pass one device between you, or online with a friend.',
+   stats:[['2','players'],['15','minutes'],['12+','ages'],['21','flights']],
+   chips:['Preview','Co-op','Computer crewmate · 3 levels','Hot-seat','Online with a friend','Guided first game','11 airports','Hidden dice','Traffic, wind & fuel']},
   {id:'mainhattan',kind:'video',cover:'covers/nightrun.jpg',name:'Mainhattan Nightrun',src:'mainhattan-nightrun/index.html',ribbon:'Arcade shooter',ref:false,
    blurb:'Fly a stolen-data courier over a neon Frankfurt in 2099. Graze drone fire to cool your guns, phase-dash through bullets and break four district bosses from the Bankenviertel to the Messe.',
    stats:[['1','player'],['10','minutes'],['10+','ages'],['4','districts']],
@@ -588,9 +600,9 @@ const GAMES=[
 /* box look: colour and size (em) per game; deterministic */
 const LOOK={crown:{c:'#8c3f5e',W:14.6,H:11.8,D:3.4},nebula:{c:'#3c3a78',W:13.4,H:11.6,D:3.0},doorkick:{c:'#b5622a',W:13.8,H:11.0,D:3.6},shipwreck:{c:'#4f7a58',W:14.4,H:11.2,D:3.4},sands:{c:'#b8683c',W:13.6,H:11.6,D:3.0},
  sunglaze:{c:'#2a5fa8',W:14.4,H:11.4,D:3.4},rampart:{c:'#7a8a3c',W:13.6,H:11.0,D:3.0},shortfuse:{c:'#c9372c',W:14.2,H:10.8,D:3.0},tidewake:{c:'#2f6b66',W:14.6,H:11.2,D:2.8},hollowbough:{c:'#7a5a2c',W:14.4,H:11.8,D:3.2},
- thornbound:{c:'#3b2a4f',W:14.0,H:11.8,D:3.4},kaiten:{c:'#c2502e',W:13.2,H:10.6,D:3.0},mainhattan:{c:'#6a1f6e',W:13.4,H:10.8,D:2.8},overdrive:{c:'#4a3f9a',W:14.4,H:11.4,D:3.4}};
+ thornbound:{c:'#3b2a4f',W:14.0,H:11.8,D:3.4},kaiten:{c:'#c2502e',W:13.2,H:10.6,D:3.0},lantern:{c:'#c99a2e',W:13.8,H:11.4,D:3.2},cauldron:{c:'#2e9c8f',W:14.2,H:11.0,D:3.4},approach:{c:'#7aa0c4',W:12.8,H:10.6,D:2.6},mainhattan:{c:'#6a1f6e',W:13.4,H:10.8,D:2.8},overdrive:{c:'#4a3f9a',W:14.4,H:11.4,D:3.4}};
 /* board games only; video games (kind:'video') live on the TV */
-const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck'],['sands','sunglaze','rampart',['shortfuse','tidewake']],['hollowbough','thornbound','kaiten']];
+const BAYS=[['crown','nebula',['doorkick','spine'],'shipwreck','sands'],['sunglaze','rampart',['shortfuse','tidewake'],'hollowbough'],['thornbound','kaiten',['lantern','spine'],'cauldron','approach']];
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
 const $=(s,r=document)=>r.querySelector(s);
 const root=document.documentElement;
@@ -696,11 +708,13 @@ function obj(kind,style){
 function pcs(h){return h}
 function dieHtml(v,x,y,r){const P={1:[[50,50]],2:[[28,28],[72,72]],3:[[28,28],[50,50],[72,72]],4:[[28,28],[72,28],[28,72],[72,72]],5:[[28,28],[72,28],[50,50],[28,72],[72,72]],6:[[28,24],[72,24],[28,50],[72,50],[28,76],[72,76]]}[v];
   return `<i class="die" style="left:${x}em;top:${y}em;transform:rotate(${r}deg);background-image:${P.map(p=>`radial-gradient(circle at ${p[0]}% ${p[1]}%,#222 0 11%,transparent 13%)`).join(',')}"></i>`}
+/* phone shelf: boxes per row (2 under 400 px, 3 under 620, else 4), widened by one when that makes every row full: 15 games = 3 / 3 / 3 / 3 / 3 at 390 px, not 7 pairs and a lone box */
+function phPer(n){const w=innerWidth,p=w<400?2:w<620?3:4;return n%p===0?p:n%(p+1)===0?p+1:p}
 function renderRoom(ph){
   const P=getPlays(),cat=topCat(),bc=$('#bookcase');bc.innerHTML='';if(!ph){const f=document.createElement('i');f.className='bc-frame';bc.append(f)}mountRoom(ph);
   const rows=[];
-  if(ph){const w=innerWidth,per=w<400?2:w<620?3:4,ids=BOARD().map(g=>g.id);for(let i=0;i<ids.length;i+=per)rows.push(ids.slice(i,i+per))}
-  const cw=root.clientWidth-24-12;const per=ph?(innerWidth<400?2:innerWidth<620?3:4):0;
+  if(ph){const ids=BOARD().map(g=>g.id),per=phPer(ids.length);for(let i=0;i<ids.length;i+=per)rows.push(ids.slice(i,i+per))}
+  const cw=root.clientWidth-24-12;const per=ph?phPer(BOARD().length):0;
   const gap=10,bw=ph?Math.floor((cw-gap*(per-1))/per):0;
   (ph?rows:BAYS).forEach((row,i)=>{
     const bay=document.createElement('div');bay.className='bay';bay.style.setProperty('--i',i);

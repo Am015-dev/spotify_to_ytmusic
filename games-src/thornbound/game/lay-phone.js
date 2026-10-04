@@ -45,10 +45,10 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
   const st=await p.evaluate(()=>({over:!!G.over,card:UI.card&&UI.card.kind,ev:UI.card&&UI.card.ev&&UI.card.ev.t,co:UI.coachInfo&&UI.coachInfo.id,k:G.q&&G.q.kind,t:G.q&&G.q.t,s:G.q&&viewSeatForQ(),r:G.round,pop:UI.pop,busy:UI.busy}));
   if(st.over||st.r>=2&&st.k==='bid'&&turns>5)break;
   const key=st.co?'coach_'+st.co:st.card?'card_'+st.card+(st.ev?'_'+st.ev:''):'q_'+st.k+(st.t==='menu'?'_'+i:'');const k2=key.replace(/_\d+$/,'');
-  if(!shots.has(k2)){shots.add(k2);await p.waitForTimeout(450);await scroll(key);await checks(key);const rm=await room(key);if(!st.card)minRoom=Math.min(minRoom,rm);await hitLocs(key);await shot(k2)}
+  if(!shots.has(k2)){shots.add(k2);await p.waitForTimeout(450);await scroll(key);await checks(key);const rm=await room(key);if(!st.card)minRoom=Math.min(minRoom,rm);await hitLocs(key);await shot(k2);if(process.env.PHVERBOSE)console.log("shot",k2,i)}
   if(!glossDone&&!st.card){const g=p.locator('#main [data-a=gloss]').first();if(await g.count()){await g.tap();await p.waitForTimeout(250);const ok=await p.evaluate(()=>!document.querySelector('#gdef').hidden);if(!ok)FAIL('glossary chip opened nothing');await checks('gloss');await shot('gloss');await tapEl('#gdef [data-a=gclose]');glossDone=true;continue}}
   if(st.co){await tapEl('#act [data-a=coachok]');continue}
-  if(st.card){const sel=({pass:'#pc [data-a=take]',event:'#pc [data-a=evok]:visible',over:'#pc [data-a=menu]'})[st.card];await tapEl(sel||'#pc button:visible');continue}
+  if(st.card){const sel=({pass:'#pc [data-a=take]',event:'#pc [data-a=evok]:visible',over:'#pc [data-a=menu]',news:'#news [data-a=newsok]'})[st.card];await tapEl(sel||'#pc button:visible');continue}
   if(st.s==null){continue}
   turns++;
   if((st.k==='bid'||st.k==='place')&&!shots.has('pop_'+st.k)){ // once: read a hand card in its pop-up, then use the pop-up's button
