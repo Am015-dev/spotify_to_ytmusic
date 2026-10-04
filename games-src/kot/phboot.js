@@ -10,7 +10,7 @@
     apply:function(){var W=innerWidth,H=innerHeight,on=PHONE.want(),land=W>H,st=R.style;PHONE.on=on;PHONE.land=land;
       R.classList.toggle('ph',on);R.classList.toggle('ph-l',on&&land);R.classList.toggle('ph-p',on&&!land);
       if(!on){['--ph-bw','--ph-bh','--sat','--sar','--sab','--sal','--ph-bar','--pz-l','--pz-t'].forEach(function(p){st.removeProperty(p)});return}
-      PHONE.bar=land?48:50;var s=env();st.setProperty('--sat',s[0]+'px');st.setProperty('--sar',s[1]+'px');st.setProperty('--sab',s[2]+'px');st.setProperty('--sal',s[3]+'px');st.setProperty('--ph-bar',PHONE.bar+'px');
+      PHONE.bar=land?48:52;var s=env();st.setProperty('--sat',s[0]+'px');st.setProperty('--sar',s[1]+'px');st.setProperty('--sab',s[2]+'px');st.setProperty('--sal',s[3]+'px');st.setProperty('--ph-bar',PHONE.bar+'px');
       var aw=W-s[1]-s[3],ah=H-s[0]-s[2],bw,bh;
       if(land){bh=ah;bw=Math.min(Math.round(ah*1.28),aw-300);bw=Math.max(bw,Math.round(ah*.9))}
       else{bw=aw;bh=Math.max(Math.round(aw*.75),Math.min(Math.round(aw*1.3),ah-PHONE.bar-PHONE.zone))}

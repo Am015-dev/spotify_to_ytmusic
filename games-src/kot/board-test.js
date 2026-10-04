@@ -9,14 +9,12 @@ const words=t=>t.trim().split(/\s+/).filter(x=>x&&!/^[·★⚡♥]$/.test(x)).le
 // 1. the score strip lives in the top bar
 {const w=mk(3);const d=w.document;ok(d.querySelector('header.gx-bar #pchips .pchip'),'monster chips sit in the top bar (score strip)');
   ok(d.querySelectorAll('#menuwrap [data-bfm]').length===4,'the menu holds Cards, Yours, Monsters and Log');w.close()}
-// 2. buying is tapping the card in the market: first tap picks it, second tap buys it; a card you cannot afford never buys
+// 2. buying is tapping the card in the market: one tap buys an affordable card; a card you cannot afford never buys
 {const w=mk(11);const d=w.document;w.eval(`while(!humanTurn()){G.active=(G.active+1)%G.pl.length}G.phase='buy';G.step=4;cur().en=20;render()`);
   const t0=d.querySelector('#pshop [data-shop="0"]');ok(t0,'the shop shows three cards in the tray');
   const n0=w.eval('cur().cards.length+G.disc.length'),e0=w.eval('cur().en'),id=w.eval('G.market[0]');
-  click(w,t0);ok(w.eval('BF.sel')===0&&w.eval('cur().en')===e0,'first tap picks the card (no purchase)');
-  ok(/again to buy/.test(d.getElementById('bline').textContent),'the line says tap again to buy');
-  ok(d.getElementById('btip').textContent.includes(w.eval(`CARDS[base(${JSON.stringify(id)})].n`)),'the picked card shows its text on the board');
-  click(w,d.querySelector('#pshop [data-shop="0"]'));ok(w.eval('cur().en')<e0,'second tap buys it');
+  ok(d.getElementById('btip').textContent.length>10,'a card\'s text sits on the board in the buy step');
+  click(w,t0);ok(w.eval('cur().en')<e0,'one tap on an affordable card buys it');
   w.eval(`cur().en=0;BF.sel=-1;render()`);const e1=w.eval('cur().en'),m1=JSON.stringify(w.eval('G.market'));
   click(w,d.querySelector('#pshop [data-shop="1"]'));click(w,d.querySelector('#pshop [data-shop="1"]'));
   ok(w.eval('cur().en')===e1&&JSON.stringify(w.eval('G.market'))===m1,'a card you cannot afford is never bought');
