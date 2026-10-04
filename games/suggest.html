@@ -54,6 +54,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px soli
 .btn:disabled{opacity:.55;cursor:default}
 .btn:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
 .privacy{font:400 .82rem var(--body);color:var(--pmuted);max-width:40ch;margin:0}
+.privacy a{color:var(--pink);font-weight:600}
 .msg{border-radius:4px;padding:10px 12px;font:600 .92rem var(--body)}
 .msg.err{background:color-mix(in srgb,var(--err) 14%,var(--paper));color:var(--err)}
 .thanks{text-align:center;padding:30px 10px 10px;display:grid;gap:12px;justify-items:center}
@@ -129,7 +130,7 @@ footer{margin-top:26px;color:var(--muted);font-size:.8rem}
 
       <p class="msg err" id="err" role="alert" hidden></p>
       <div class="acts">
-        <p class="privacy">Only the shelf's maker reads this. Your email is used only to reply, and only if you give it.</p>
+        <p class="privacy">Only the shelf's maker reads this. Your email is used only to reply, and only if you give it. It is sent through the form service Web3Forms; see <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="credits.html">Credits</a>.</p>
         <button class="btn" type="submit" id="send">Post it ✉️</button>
       </div>
     </form>
