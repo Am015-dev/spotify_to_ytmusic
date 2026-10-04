@@ -73,6 +73,10 @@ T=[
 ("['YIAYIA','Opa! Koulouria for everyone","['YIAYIA','Hooray! Koulouria for everyone",1),
 ("COP:{n:'Polizei Funk'","COP:{n:'Police Radio'",1),
 ('The Polizei just found','The police just found',1),
+("title:'Chapter 2 complete · Die Hafenbande'","title:'Chapter 2 complete · The Harbour Gang'",1),
+("title:'Chapter 3 · Kaisers Schatten'","title:'Chapter 3 · Kaiser’s Shadow'",1),
+('<b>Das Finale</b>','<b>The Finale</b>',1),
+("title:'Chapter 4 · Das Finale'","title:'Chapter 4 · The Finale'",1),
 ]
 for a,b,n in T:R(a,b,n)
 save()
