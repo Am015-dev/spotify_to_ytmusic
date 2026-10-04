@@ -368,6 +368,7 @@ html.lefty #acts{flex-direction:row-reverse}
 .gx-ref-pic .its{display:flex;flex-wrap:wrap;gap:2px;justify-content:center}
 .gx-ref-pic.big .its{gap:8px}
 /* clarity pass */
+.qres{font-size:13px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;opacity:.9}
 .morecue{flex:0 0 auto;text-align:center;font-size:13px;font-weight:700;padding:3px 0;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(60,40,20,.15));color:var(--ink);pointer-events:none}
 html.ph #handRow,html.ph #cityRow{gap:2px}html.ph .strip{padding:2px}
 .jgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.jgrid .btn{min-height:52px;flex-direction:column;align-items:flex-start;font-size:13px}
@@ -4466,8 +4467,11 @@ function renderQ() {
   if (q.who !== v || G.players[q.who].ai) { pc.hidden = true; return; }
   closePop();
   pc.hidden = false; pc.innerHTML = ''; pc.setAttribute('data-card', 'q'); pc.setAttribute('data-kind', q.kind);
-  pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', q.title), h('span', qHint(q.kind) || 'Your choice')), GX.undo.can() ? h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶ Undo') : null));
+  let qh = qHint(q.kind) || 'Your choice';
+  if (q.kind === 'discard' && !q.opts.some(o => o.card === undefined)) qh = 'Tap a card to discard it. It finishes by itself after the last one.';
+  pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', q.title), h('span', qh)), GX.undo.can() ? h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶ Undo') : null));
   const body = h('div.ph-body.qbody');
+  { const me = G.players[q.who]; body.appendChild(h('div.qres', h('b', 'You have: '), RESK.map(k => h('span', ic(k, 16), ' ' + me.res[k] + ' ')), h('span', ' · hand ' + me.hand.length + '/8'))); }
   const rm = UI.rec && UI.rec.m && UI.rec.m.type === 'choose' ? UI.rec.m : null;
   const hasCards = q.opts.some(o => o.card !== undefined), hasRes = q.opts.some(o => o.res !== undefined);
   const grid = h('div.qgrid' + (hasCards ? '.cards' : '') + (hasRes ? '.res' : ''));

@@ -270,8 +270,11 @@ function renderQ() {
   if (q.who !== v || G.players[q.who].ai) { pc.hidden = true; return; }
   closePop();
   pc.hidden = false; pc.innerHTML = ''; pc.setAttribute('data-card', 'q'); pc.setAttribute('data-kind', q.kind);
-  pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', q.title), h('span', qHint(q.kind) || 'Your choice')), GX.undo.can() ? h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶ Undo') : null));
+  let qh = qHint(q.kind) || 'Your choice';
+  if (q.kind === 'discard' && !q.opts.some(o => o.card === undefined)) qh = 'Tap a card to discard it. It finishes by itself after the last one.';
+  pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', q.title), h('span', qh)), GX.undo.can() ? h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶ Undo') : null));
   const body = h('div.ph-body.qbody');
+  { const me = G.players[q.who]; body.appendChild(h('div.qres', h('b', 'You have: '), RESK.map(k => h('span', ic(k, 16), ' ' + me.res[k] + ' ')), h('span', ' · hand ' + me.hand.length + '/8'))); }
   const rm = UI.rec && UI.rec.m && UI.rec.m.type === 'choose' ? UI.rec.m : null;
   const hasCards = q.opts.some(o => o.card !== undefined), hasRes = q.opts.some(o => o.res !== undefined);
   const grid = h('div.qgrid' + (hasCards ? '.cards' : '') + (hasRes ? '.res' : ''));
