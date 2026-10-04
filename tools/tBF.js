@@ -11,9 +11,12 @@ let pass=0,fail=0;const ok=(c,m,i)=>{c?pass++:fail++;console.log((c?'PASS ':'FAI
  ok(!g,'BF2 GARAGE is hidden in the pause menu while an event runs (saving would silently abort it)');
 // garage is still reachable outside events (and via the menu): force the button to test the overlay freeze
  await p.evaluate(()=>{const b=document.querySelector('#roamPause [data-p="garage"]');b.hidden=false;b.click()});await p.waitForTimeout(300);
- let a=await st();await p.keyboard.down('ArrowUp');await p.evaluate(()=>__mho.roamSim(120));await p.keyboard.up('ArrowUp');let b=await st();
+ let a,b;if(await p.evaluate(()=>{const g=document.querySelector('#gbx');return !g||g.hidden||getComputedStyle(g).display==='none'})){
+  // GB (garage builder) refuses the garage during an event: the overlay must not open and the pause menu must be closed
+  ok(await p.evaluate(()=>!__mho.RO.pOpen&&!!__mho.RO.ch),'BF1 garage refused mid-event (GB): no overlay, pause closed, event still running');
+ }else{a=await st();await p.keyboard.down('ArrowUp');await p.evaluate(()=>__mho.roamSim(120));await p.keyboard.up('ArrowUp');b=await st();
  ok(Math.hypot(b.x-a.x,b.z-a.z)<1&&Math.abs(b.t-a.t)<.05,'BF1 garage overlay open: gas held 2 s does not move the car nor run the event clock',{moved:+Math.hypot(b.x-a.x,b.z-a.z).toFixed(1),dt:+(b.t-a.t).toFixed(2)});
- await p.keyboard.press('Escape');await p.waitForTimeout(200);
+ await p.keyboard.press('Escape');await p.waitForTimeout(200)}
  // BF1 map: M key opens the full map; the event clock must not run behind it
  await p.keyboard.press('KeyM');await p.waitForTimeout(200);a=await st();await p.evaluate(()=>__mho.roamSim(120));b=await st();
  ok(await p.evaluate(()=>__mho.RO.mapOpen)&&Math.abs(b.t-a.t)<.05,'BF1 full map open: event clock paused',{dt:+(b.t-a.t).toFixed(2)});
