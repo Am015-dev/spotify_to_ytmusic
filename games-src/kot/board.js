@@ -152,7 +152,9 @@ function bfRender(){if(!phOn())return;bfBuild();bfRollWatch();bfSlowAgain();if(B
 // ---- wiring ----
 {const _pr=phRender;phRender=function(){_pr.apply(this,arguments);try{bfRender()}catch(e){console.error(e)}};
  // the chips hold the old numbers until the dice that change them land
- const _pc=phChips;phChips=function(){_pc.apply(this,arguments);const el=$bf('pchips');if(el&&G&&el.parentNode&&el.parentNode.matches&&el.parentNode.matches('header.gx-bar'))el.style.setProperty('--cc',G.pl.length);// names that do not fit are trimmed (never clipped)
+ const _pc=phChips;phChips=function(){_pc.apply(this,arguments);const el=$bf('pchips');if(el&&G&&el.parentNode&&el.parentNode.matches&&el.parentNode.matches('header.gx-bar'))el.style.setProperty('--cc',G.pl.length);if(G&&!G.winner){const me=meSeat();G.pl.forEach(q=>{const c=document.querySelector(`#pchips .pchip[data-pm="${q.i}"]`);const hot=q.alive&&q.vp>=15&&q.i!==me;if(c)c.classList.toggle('hot',hot);
+     if(hot&&me>=0&&!(BF.warned||(BF.warned={}))[q.i+':'+G.gid]){BF.warned[q.i+':'+G.gid]=1;setTimeout(()=>bfFlash(`${mname(q)} is close to 20★!`,2200),50)}})}
+   // names that do not fit are trimmed (never clipped)
    document.querySelectorAll('header.gx-bar .pchip b').forEach(b=>{if(b.scrollWidth<=b.clientWidth+1)return;const full=b.textContent;let n=full.length;while(n>2&&b.scrollWidth>b.clientWidth+1){n--;b.textContent=full.slice(0,n)+'…'}});
    if(!BF.snap)return;
    document.querySelectorAll('#pchips .pchip').forEach(c=>{const k=+c.dataset.pm,s=BF.snap[k];if(!s)return;[['h','♥'],['v','★'],['e','⚡']].forEach(([f,sym])=>{if(BF.rel[k+f])return;const em=c.querySelector('em.'+f);if(em)em.textContent=sym+s[f]})})};
@@ -175,12 +177,13 @@ window.addEventListener('click',e=>{if(!bfOn())return;const t=e.target;
   const sh=t.closest&&t.closest('#pshop [data-shop]');if(sh){e.stopPropagation();e.preventDefault();bfTapCard(+sh.dataset.shop,sh);return}
   if(t.closest&&t.closest('.gx-board')&&(UI.choice||UI.intro)&&!$bf('choice').classList.contains('hidden')){const c=$bf('choice');c.classList.remove('bfpoke');void c.offsetWidth;c.classList.add('bfpoke');bfFlash('Choose below ↓',1500);return}
   if(t.closest&&t.closest('.gx-board')&&!humanTurn()&&!G.winner&&!UI.choice&&!UI.intro){bfSpeed()}
+  else if(t.closest&&t.closest('.gx-board')&&humanTurn()&&!UI.choice&&!UI.intro&&!t.closest('#bline')){bfFlash(G.phase==='roll'?'Tap the dice below ↓':'Tap a card below ↓',1300)}
   if(t.closest&&t.closest('[data-die]')&&humanTurn()&&G.phase==='roll'){bfTut('keep',1);setTimeout(()=>{const d=t.closest('[data-die]');if(d&&typeof sfx==='function'){SND.last.clack=0;sfx('clack')}},0)}
   if(t.closest&&t.closest('[data-act="reroll"]')&&humanTurn()&&G.phase==='roll'&&G.dice.some(d=>d.k))bfTut('roll',1);
   if(t.closest&&t.closest('[data-act="resolve"]')&&humanTurn()&&G.phase==='roll')bfTut('done',1);
   if(t.closest&&t.closest('[data-act="end"]'))BF.sel=-1;
   // tapping the board outside the shop drops the picked card
   if(BF.sel>=0&&!(t.closest&&t.closest('#pshop'))){BF.sel=-1;setTimeout(phRender,0)}},true);
-try{if(phOn()&&localStorage.getItem('ccs_speed')===null&&ANIM)AIDELAY=420}catch(e){}
+try{if(phOn()&&localStorage.getItem('ccs_speed')===null&&ANIM)AIDELAY=320}catch(e){}
 setInterval(()=>{if(!bfOn())return;bfMarks();bfFinger();bfLine()},400);
 phLayout();
