@@ -19,15 +19,16 @@ function newGame(mode, o) {
     if (mode === 'hot') { names.push(PN[c]); ai.push(null); }
     else if (mode === 'ai') { names.push(PN[c]); ai.push(lv); }
     else if (i === 0) { names.push('You'); ai.push(null); }
-    else { names.push(PN[c]); ai.push(mode === 'guided' ? 'normal' : lv); }
+    else { names.push(PN[c]); ai.push(mode === 'guided' ? 'easy' : lv); }
   }
   UI.chefs = chefs;
-  clearTimeout(UI.tm); UI.seq++; UI.rq = [];
+  clearTimeout(UI.tm); UI.seq++; UI.rq = []; dropHold(); UI.tut = null;
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
   G = KK.newGame({ players: np, seed, names, ai });
-  Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
+  Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN, resultDone: false, earned: null, t0: Date.now() });
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && UI.coach.keep ? 'full' : 'off'), seen: {}, turn: '', keep: UI.coach.keep };
-  if (mode === 'guided') UI.coach.level = 'full';
+  if (mode === 'guided') { UI.coach.level = 'full'; try { tutDeal(); } catch (e) { console.error(e); UI.tut = null; } }
+  recapSeats();
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
   placePrompt(); render(); sndMusic(); schedule();
@@ -52,7 +53,7 @@ function schedule() {
 function aiPick(seat) {
   if (!G || UI.busy || G.phase !== 'pick') return;
   const p = G.players[seat]; if (!p || p.picked || !p.ai) { schedule(); return; }
-  let mv; try { mv = KK.AI.choose(G, seat); } catch (e) { console.error(e); mv = KK.moves(G, seat)[0]; }
+  let mv = tutPartner(seat); if (!mv) try { mv = KK.AI.choose(G, seat); } catch (e) { console.error(e); mv = KK.moves(G, seat)[0]; }
   commit(seat, mv);
 }
 function commit(seat, mv) {
@@ -82,6 +83,7 @@ function tapHand(i) {
     if (k >= 0) cur.splice(k, 1); else { if (cur.length >= 2) cur.shift(); cur.push(i); }
     UI.sel = cur; UI.rec = null; render(); return;
   }
+  if (!tutGuard(i)) return;
   if (cur.length === 1 && cur[0] === i && UI.prefs.tap2) { serveSel(); return; }
   UI.sel = [i]; UI.rec = null; snd('click', { vol: .4 }); render();
 }
@@ -95,7 +97,9 @@ function serveSel() {
 function doPick(seat, mv) {
   // the lifted plate flies to the seat under a cover
   try { if (ANIM && !pxServe() && document.body.animate) flyPick(); } catch (e) { }
+  try { GX.recap.mark(seat); } catch (e) { }
   if (isClient()) { netAct({ pk: mv.pick.join(',') }); UI.sel = []; UI.twin = false; UI.rec = null; snd('pick'); render(); return; }
+  if (canHold(seat)) { holdServe(seat, mv); return; }
   commit(seat, mv);
 }
 function flyPick() {
@@ -115,7 +119,7 @@ function toggleTwin() {
   render();
 }
 function hint() {
-  const v = viewSeat(); if (!canPick()) return;
+  const v = viewSeat(); if (!canPick() || tutStep()) return;
   let mv; try { mv = KK.AI.choose(G, v, 'normal'); } catch (e) { return; }
   if (!mv) return;
   UI.rec = { ids: mv.ids.slice(), pick: mv.pick.slice() };
@@ -142,7 +146,7 @@ const keyOfCard = c => { const k = c.key; return ICONS[k] ? 'roll' : NIG[k] ? (c
 function drainQ() { if (UI.rq.length && !UI.busy) { const q = UI.rq.shift(); playResolve(q[0], q[1]); } }
 async function playResolve(evs, preHand) {
   if (UI.busy) { UI.rq.push([evs, preHand]); return; }
-  const tok = UI.seq; UI.busy = true; closePop();
+  const tok = UI.seq; UI.busy = true; closePop(); recapReveal(evs);
   const rv = evs.find(e => e.t === 'reveal'), ps = evs.find(e => e.t === 'pass'), sc = evs.find(e => e.t === 'score'), ge = evs.find(e => e.t === 'gameEnd');
   const v = viewSeat(), np = G.np, block = !NET.on;
   try {
@@ -209,7 +213,7 @@ function hasSave() { return !!lsGet('kk_save'); }
 function saveInfo() { try { const o = JSON.parse(lsGet('kk_save')); if (o && o.sv === SAVE_V && o.G && o.G.phase !== 'over') return { round: o.G.round, np: o.G.np, mode: o.mode }; } catch (e) { } return null; }
 function save() {
   if (NET.on || !G || !UI.started || G.phase === 'over') return false;
-  try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
+  try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach, tut: UI.tut || null, t0: UI.t0 || 0 })); GNS.saved(GAME_ID, true); return true; } catch (e) { return false; }
 }
 // autosave: after every resolved turn (schedule runs after each one) and when the page is hidden or closed (iPhone app switch)
 function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
@@ -217,12 +221,13 @@ function flushSave() { UI.svk = ''; autoSave(); }
 function loadSave() {
   if (NET.on) return false;
   let o; try { o = JSON.parse(lsGet('kk_save')); } catch (e) { return false; }
-  if (o && o.G && o.sv !== SAVE_V) { lsSet('kk_save', ''); toast('That saved meal is from an older version of the game, so it could not be resumed.'); if (!G) renderStart(); return 'old'; }
+  if (o && o.G && o.sv !== SAVE_V) { lsSet('kk_save', ''); try { GNS.saved(GAME_ID, false); } catch (e) { } toast('That saved meal is from an older version of the game, so it could not be resumed.'); if (!G) renderStart(); return 'old'; }
   if (!o || !o.G || !Array.isArray(o.G.players) || o.G.v !== 1) return false;
-  clearTimeout(UI.tm); UI.seq++;
+  clearTimeout(UI.tm); UI.seq++; dropHold();
   G = o.G; try { if (KK.checkInvariants(G).length) { G = null; return false; } } catch (e) { return false; }
-  Object.assign(UI, { started: true, mode: o.mode || 'vs', cfg: o.cfg || null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, enter: 'deal', focus: 0, evN: G.evN, over: null });
+  Object.assign(UI, { started: true, mode: o.mode || 'vs', cfg: o.cfg || null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, enter: 'deal', focus: 0, evN: G.evN, over: null, resultDone: false, earned: null, t0: o.t0 || Date.now(), tut: o.tut && o.tut.on ? { on: true, step: -1 } : null });
   if (o.coach) UI.coach = o.coach;
+  recapSeats();
   UI.chefs = Array.isArray(o.chefs) && o.chefs.length === G.np ? o.chefs : null;
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }

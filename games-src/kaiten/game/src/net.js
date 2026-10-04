@@ -28,6 +28,7 @@ async function netJoin(role, code) {
   if (G || UI.started) netIdle();
   Object.assign(NET, { busy: false, code, role, on: true, room, mySeat: -1, hostPeer: null, parts: {}, applied: 0, lastRx: 0, gid: null, hostGone: false, peer: room.self, peers: [], opt: null, seatPeer: [], seatUid: [], away: [], pend: -1, lastTxt: '', err: '', evq: [] });
   document.documentElement.classList.add('net');
+  NET.t0 = Date.now(); setTimeout(() => { if (NET.on && NET.room === room) netRender(); }, 15500);
   room.presence({ role, uid: NET.uid, name: NET.myName || '' }).catch(() => { });
   room.on('st', onNetState); room.on('act', onNetAct); room.on('rej', onNetRej);
   room.onPeers(onNetPeers); room.onConnection(c => { NET.conn = c; netRender(); });
@@ -192,8 +193,10 @@ function onNetAct(msg) {
 function netStatus() {
   const n = NET.peers.length;
   if (NET.hostGone || NET.err) return { t: NET.err || 'The host left.', c: 'bad', n };
-  if (NET.conn === false) return { t: 'Connecting...', c: 'wait', n };
-  if (isClient() && !NET.hostPeer) return { t: 'Looking for the host...', c: 'wait', n };
+  // after 15 s without a connection, say so and what to try instead of waiting forever
+  const slow = Date.now() - (NET.t0 || Date.now()) > 15000;
+  if (NET.conn === false) return slow ? { t: 'Cannot connect yet. Try Wi-Fi instead of mobile data, or leave and join again.', c: 'bad', n } : { t: 'Connecting...', c: 'wait', n };
+  if (isClient() && !NET.hostPeer) return slow ? { t: 'Cannot reach the host yet. Check the code, try Wi-Fi, or leave and join again.', c: 'bad', n } : { t: 'Looking for the host...', c: 'wait', n };
   if (isClient() && NET.lastRx && Date.now() - NET.lastRx > 12000) return { t: 'Reconnecting...', c: 'wait', n };
   if (n <= 1) return { t: 'Looking for players...', c: 'wait', n };
   return { t: n + ' players online', c: 'ok', n };

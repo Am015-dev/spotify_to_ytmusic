@@ -2,6 +2,15 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Kaiten Kitchen</title>
+<meta name="description" content="Kaiten Kitchen: a free conveyor-belt card game for 2 to 5 diners. Pick a plate, pass the belt, score sets over three rounds. Play the computer chefs, pass one device around, or play online with friends.">
+<meta name="theme-color" content="#33201a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kaiten Kitchen · Game Night Shelf">
+<meta property="og:description" content="Grab a plate, pass the belt. A free card game for 2 to 5 diners, against the computer or online with friends.">
+<meta property="og:image" content="https://am015-dev.github.io/spotify_to_ytmusic/covers/kaiten.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10.5' fill='%23fbf0da' stroke='%234a2a22' stroke-width='1.6'/%3E%3Ccircle cx='12' cy='12' r='7' fill='%23e5553a' stroke='%234a2a22' stroke-width='1.2'/%3E%3Ccircle cx='12' cy='12' r='3.2' fill='%23fbf0da'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="../icons/icon-180.png">
 <style>
 /* ===== Board-first shell (shared by every game on the shelf) =====
    The page never scrolls. The board fills what the bar and the dock leave; the dock is in flow (never over the board);
@@ -52,6 +61,90 @@ html.gx,html.gx body{height:100%;margin:0;overflow:hidden;overscroll-behavior:no
 }
 @media (min-width:1000px){.gx-grab{display:none}}
 @media (prefers-reduced-motion:reduce){.gx-drawer,.gx-scrim{transition:none}}
+
+/* ===== GX kit styles (load after shell.css). Themed by the shell's --gx-* variables. ===== */
+:root{--gx-text:1;--gx-anim:1;--gx-chip:rgba(0,0,0,.07);--gx-chip-on:var(--gx-accent)}
+/* text size: games opt in by using these classes, the kit's own panels always follow it */
+.gx-drawer-body,.gx-dock-body,.gx-recap,.gx-tx{font-size:calc(1em * var(--gx-text,1))}
+/* settings */
+.gx-set-nav{position:sticky;top:-10px;z-index:2;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 0;margin:-10px 0 4px;background:var(--gx-panel)}
+.gx-set-nav::-webkit-scrollbar{display:none}
+.gx-sec{padding:4px 0 12px;border-bottom:1px solid var(--gx-line);scroll-margin-top:56px}
+.gx-sec:last-child{border-bottom:0}
+.gx-sec h3{margin:8px 0 6px;font-size:1.02em;letter-spacing:.02em}
+.gx-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:6px 0}
+.gx-row-l{flex:1 1 9em;min-width:0;font-weight:600}
+.gx-row-l small{display:block;font-weight:400;opacity:.75;font-size:max(13px,.82em)}
+.gx-row-k{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.gx-seg{display:inline-flex;flex-wrap:wrap;gap:4px}
+.gx-sb,.gx-tg,.gx-chip{appearance:none;font:inherit;color:inherit;min-height:44px;min-width:44px;padding:4px 12px;border-radius:10px;border:1px solid var(--gx-line);background:var(--gx-chip);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px;text-decoration:none;white-space:nowrap}
+.gx-sb[aria-pressed=true],.gx-tg[aria-checked=true],.gx-chip[aria-pressed=true]{background:var(--gx-chip-on);border-color:transparent;color:#1d140b;font-weight:700}
+.gx-sb:disabled{opacity:.4;cursor:default}
+.gx-tg{min-width:64px}
+.gx-chip{min-height:36px;padding:2px 11px;border-radius:99px;font-size:max(13px,.88em)}
+.gx-sb:focus-visible,.gx-tg:focus-visible,.gx-chip:focus-visible,.gx-ref-it:focus-visible,.gx-ref-q:focus-visible,.gx-recap button:focus-visible,.gx-sl input:focus-visible{outline:3px solid var(--gx-accent);outline-offset:2px}
+.gx-sl{display:inline-flex;align-items:center;gap:8px;min-height:44px}
+.gx-sl input{width:min(190px,44vw);accent-color:var(--gx-accent);height:28px}
+.gx-sl output{min-width:3.2em;text-align:right;font-variant-numeric:tabular-nums}
+.gx-links{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.gx-small{font-size:max(13px,.85em);opacity:.8;margin:6px 0}
+.gx-about-n{font-weight:700;margin:4px 0}
+/* reference */
+.gx-ref-top{position:sticky;top:-10px;z-index:2;background:var(--gx-panel);margin:-10px -12px 6px;padding:10px 12px 6px;border-bottom:1px solid var(--gx-line)}
+.gx-ref.big .gx-ref-top{display:none}
+.gx-ref-q{width:100%;box-sizing:border-box;min-height:44px;font:inherit;padding:6px 12px;border-radius:10px;border:1px solid var(--gx-line);background:rgba(255,255,255,.6);color:inherit}
+.gx-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px 0 0}
+.gx-chips::-webkit-scrollbar{display:none}
+.gx-chips>*{flex:none}
+.gx-ref-list[hidden],.gx-ref-big[hidden]{display:none}
+.gx-ref-n{font-size:max(13px,.82em);opacity:.75;padding-top:4px}
+.gx-ref-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:8px}
+.gx-ref-it{appearance:none;font:inherit;color:inherit;text-align:left;display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:12px;border:1px solid var(--gx-line);background:rgba(255,255,255,.35);cursor:pointer;min-height:64px}
+.gx-ref-it:hover{background:rgba(255,255,255,.55)}
+.gx-ref-pic{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:52px}
+.gx-ref-pic>img,.gx-ref-pic>svg{max-width:100%;height:auto;display:block}
+.gx-ref-pic.big{width:min(240px,62vw);margin:4px auto 8px;display:flex}
+.gx-ref-tx{min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px}
+.gx-ref-tx b{font-size:1em}
+.gx-ref-c{font-size:max(13px,.8em);font-weight:700;padding:0 6px;border-radius:99px;background:var(--gx-chip)}
+.gx-ref-m{font-size:max(13px,.8em);opacity:.75;flex-basis:100%}
+.gx-ref-d{font-size:max(13px,.86em);flex-basis:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gx-ref-big h3{margin:4px 0 2px;text-align:center;font-size:1.25em}
+.gx-ref-big .gx-ref-m{text-align:center}
+.gx-ref-full{font-size:1.02em;line-height:1.5;max-width:40em;margin:10px auto}
+.gx-ref-x{max-width:40em;margin:8px auto;font-size:max(13px,.9em)}
+.gx-ref-big .gx-chips{justify-content:center;flex-wrap:wrap}
+.gx-tag{font-size:max(13px,.8em);padding:2px 9px;border-radius:99px;background:var(--gx-chip)}
+.gx-ref-bh{display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:-10px;background:var(--gx-panel);padding:6px 0;z-index:2}
+.gx-ref-nav{display:inline-flex;align-items:center;gap:6px}
+.gx-ref-big:focus{outline:none}
+/* recap strip */
+.gx-recap{box-sizing:border-box;min-width:0;max-width:calc(100% - 16px);align-self:stretch;margin:6px 8px;border-radius:12px;background:rgba(0,0,0,.07);border:1px solid var(--gx-line)}
+.gx-recap[hidden]{display:none}
+.gx-recap-top{display:flex;align-items:stretch}
+.gx-recap-h{appearance:none;flex:1;min-width:0;display:flex;align-items:center;gap:8px;font:inherit;color:inherit;background:transparent;border:0;padding:6px 10px;min-height:44px;text-align:left;cursor:pointer}
+.gx-recap-h b{white-space:nowrap;font-size:max(13px,.86em)}
+.gx-recap-n{font-size:max(13px,.75em);font-weight:700;min-width:1.6em;text-align:center;border-radius:99px;padding:1px 6px;background:var(--gx-accent);color:#1d140b}
+.gx-recap-1{flex:1;min-width:0;font-size:max(13px,.84em);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gx-recap-x{appearance:none;border:0;background:transparent;color:inherit;font-size:1.4em;min-width:44px;min-height:44px;cursor:pointer;border-radius:10px}
+.gx-recap-l{margin:0;padding:0 12px 8px 30px;font-size:max(13px,.86em);max-height:9.5em;overflow:auto;line-height:1.4}
+/* update notice */
+.gx-update{position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:80;appearance:none;font:inherit;font-weight:700;padding:10px 18px;min-height:48px;border-radius:99px;border:0;background:var(--gx-accent);color:#1d140b;box-shadow:var(--gx-shadow);cursor:pointer;max-width:calc(100vw - 24px)}
+/* left-handed: the dock and the drawers swap sides on wide screens; games can flip their own button rows with html.lefty */
+@media (min-width:1000px){
+  html.lefty .gx-main{grid-template-columns:var(--gx-dock-w) minmax(0,1fr)}
+  html.lefty .gx-app.gx-dock-min .gx-main{grid-template-columns:0 minmax(0,1fr)}
+  html.lefty .gx-dock{grid-column:1;grid-row:1}
+  html.lefty .gx-board{grid-column:2;grid-row:1}
+  html.lefty .gx-drawer{right:auto;left:8px;transform:translateX(calc(-100% - 16px))}
+  html.lefty .gx-drawer.on{transform:none}
+  html.lefty .gx-ibtn.gx-reopen{right:auto;left:10px}
+}
+/* reduce motion / animations off */
+html.gx-reduce *,html.gx-reduce *::before,html.gx-reduce *::after,html.gx-noanim *,html.gx-noanim *::before,html.gx-noanim *::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important;scroll-behavior:auto!important}
+/* colour-blind symbols: games add <i class="gx-cbm">▲</i> next to colour-coded pieces; shown only with html.cb */
+.gx-cbm{display:none;font-style:normal}
+html.cb .gx-cbm{display:inline}
 
 *{box-sizing:border-box}
 :root{--ink:#4a2a22;--paper:#fbf0da;--paper2:#f3e0bd;--wood:#a96b3a;--wood2:#7d4a27;--red:#e5553a;--gold:#e0a31c;--teal:#2a97a0;--green:#3f9a4a;--gx-bg:#3a231d;--gx-bar:#33201a;--gx-panel:#fbf0da;--gx-ink:#4a2a22;--gx-accent:#e0a31c;--gx-dock-w:clamp(330px,30vw,410px);--gx-bar-h:48px;
@@ -287,6 +380,9 @@ html.ph.ph-p .gx-app{grid-template-rows:calc(44px + env(safe-area-inset-top,0px)
 html.ph.ph-p .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) calc(var(--dockh) + env(safe-area-inset-bottom,0px))}
 html.ph.ph-p .gx-dock{max-height:none;height:auto}
 html.ph.ph-p #barprompt{display:block}
+/* portrait phones: a lesson or tip card grows up over the belt instead of squeezing its text into the dock */
+html.ph.ph-p .pcard[data-card=coach]{position:fixed;top:auto;bottom:0;max-height:min(78vh,calc(100% - 52px));z-index:30;border-radius:14px 14px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+html.ph.ph-p .pcard[data-card=coach] .ph-body{flex:0 1 auto}
 html.ph.ph-p #prompt{font-size:13px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 html.ph.ph-p #promptDock,html.ph.ph-p #rt{display:none}
 html.ph.ph-p .gx-bar .gx-sp,html.ph.ph-p #barstat{display:none}
@@ -314,6 +410,8 @@ html.ph .sh .sc{font-size:13px}
 html.ph .seat{padding:1px 2px;gap:3px}
 html.ph .ctr{padding:2px 4px;gap:2px 3px;border-width:2px}
 html.ph .ctr .none{display:none}
+html.ph .seat .ctr.wrap{flex-wrap:wrap;overflow:hidden;align-content:center;row-gap:3px}
+html.ph .grp .hn{font-size:12px;padding:0 3px}
 html.ph #netst{min-width:44px;min-height:44px;padding:0 8px;justify-content:center;border-radius:10px}html.ph #netst .nl{display:none}html.ph #netst .ns{display:inline;font-weight:800}
 html.ph.ph-l.net #barstat{display:none}
 html.ph #beltz .lab{font-size:13px;padding:1px 6px 0;min-height:17px}
@@ -326,6 +424,16 @@ html.ph .cat td.n{font-size:15px;min-width:34px}
 .rsbox .cbtns{position:sticky;bottom:-12px;background:var(--paper);padding:6px 0 4px;z-index:2}
 @media (prefers-reduced-motion:reduce){.hc.ent-pass,.hc.ent-deal{animation:none}.grp.waitf .pl,.slot .sbox.empty.mine{animation:none}.conf{display:none}}
 
+/* ---- guided lesson: one glowing plate, the others dimmed; a glowing Serve button ---- */
+.hc.tut::after{content:'';position:absolute;inset:-4px;border-radius:11px;border:3px solid #ffd25a;box-shadow:0 0 12px 4px rgba(255,200,60,.85);pointer-events:none;animation:tutglow 1.2s ease-in-out infinite}
+.hc.tutno::after{content:'';position:absolute;inset:0;border-radius:8px;background:rgba(42,20,12,.42);pointer-events:none}
+.btn.tut{box-shadow:0 0 0 3px #ffd25a,0 0 14px 4px rgba(255,200,60,.85);animation:tutglow 1.2s ease-in-out infinite}
+@keyframes tutglow{50%{box-shadow:0 0 0 3px #ffe9a0,0 0 20px 8px rgba(255,200,60,.55)}}
+html.gx-reduce .hc.tut::after,html.gx-reduce .btn.tut{animation:none}
+.tutintro{background:#f3e0bd;border-radius:8px;padding:6px 8px}
+.btn.undo{flex:1 1 100%}
+.refbig{align-self:flex-start;min-height:40px;font-size:14px;padding:2px 12px}
+.earned{background:#fff3c4;border:2px solid #e0a31c;border-radius:10px;padding:6px 10px;font-size:14px;text-align:center;margin:4px 0}
 /* ---- painted table (PixiJS canvas under the DOM buttons) ---- */
 #pxc{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;display:block}
 html.kkpx #tbl,html.kkpx #beltz{position:relative;z-index:1}
@@ -2843,6 +2951,460 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+// ===== GX kit: opt-in shared parts for every game on the shelf (load AFTER shell.js) =====
+// Adds to the existing GX object without changing any of its existing calls:
+//   GX.pref / GX.setPref / GX.onPref / GX.applyPrefs     shared settings stored once as `gns-prefs`
+//   GX.settings(opts)                                     the Menu drawer with the same sections in every game
+//   GX.reference(sections, opts) / GX.refOpen(id)         component reference drawer (search, chips, big view)
+//   GX.undo                                               snapshot / restore of the JSON game state
+//   GX.recap                                              "Since your last turn" strip for the dock
+//   GX.buzz / GX.animMs / GX.aiDelay / GX.reduced / GX.mark   small helpers
+//   GX.offline(opts)                                      service worker + "a new version is ready" notice
+// and a global GNS for local results, statistics and achievements (shared with the shelf home page).
+// Everything is wrapped in try/catch: a missing localStorage, navigator.vibrate or service worker never throws.
+(function (root, shellGX) {
+  'use strict';
+  // shell.js declares `const GX` (a global lexical binding, not window.GX): extend that same object, and expose it as window.GX too
+  var GX = root.GX = shellGX || root.GX || {};
+  var doc = root.document;
+  var LS = {
+    get: function (k) { try { return root.localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { root.localStorage.setItem(k, v); return true; } catch (e) { return false; } },
+    json: function (k, d) { try { var v = JSON.parse(root.localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+    put: function (k, v) { try { root.localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  };
+  GX._ls = LS;
+  function el(tag, cls, txt) { var e = doc.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function btn(cls, txt, on) { var b = el('button', cls, txt); b.type = 'button'; if (on) b.addEventListener('click', on); return b; }
+  var qs = function () { try { return root.location ? root.location.search : ''; } catch (e) { return ''; } };
+  GX.dev = /[?&]dev=1\b/.test(qs());
+  // hooks run just before a drawer opens (the game's own GX.onShow keeps working untouched)
+  var bsh = [];
+  GX.beforeShow = function (f) {
+    if (!GX._kitShow && typeof GX.show === 'function') { var base = GX.show; GX._kitShow = true; GX.show = function (id) { for (var i = 0; i < bsh.length; i++) { try { bsh[i](id); } catch (e) { } } return base.apply(this, arguments); }; }
+    bsh.push(f); return f;
+  };
+
+  // ------------------------------------------------------------------ shared settings
+  var PDEF = { master: 1, music: 0.5, sfx: 0.8, anim: 'normal', ai: 'normal', text: 1, cb: false, lefty: false, reduce: false, haptics: true };
+  var P = Object.assign({}, PDEF, LS.json('gns-prefs', {}) || {});
+  var pl = [];
+  GX.PREF_DEFAULTS = PDEF;
+  GX.pref = function (k) { return k == null ? Object.assign({}, P) : P[k]; };
+  GX.setPref = function (k, v) {
+    if (typeof k === 'object') { for (var x in k) P[x] = k[x]; } else P[k] = v;
+    LS.put('gns-prefs', P); GX.applyPrefs();
+    for (var i = 0; i < pl.length; i++) { try { pl[i](k, v, GX.pref()); } catch (e) { } }
+    return v;
+  };
+  GX.onPref = function (f) { pl.push(f); return f; };
+  GX.reduced = function () { if (P.reduce) return true; try { return !!(root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { return false; } };
+  var AM = { slow: 1.6, normal: 1, fast: 0.5, off: 0 };
+  // scale an animation length by the player's animation speed (0 when animations are off or motion is reduced)
+  GX.animMs = function (ms) { return GX.reduced() ? 0 : Math.round(ms * (AM[P.anim] != null ? AM[P.anim] : 1)); };
+  var AD = { slow: 2, normal: 1, fast: 0.25 };
+  // scale the pause between computer moves by the player's computer speed
+  GX.aiDelay = function (ms) { return Math.round(ms * (AD[P.ai] != null ? AD[P.ai] : 1)); };
+  GX.buzz = function (pat) { try { if (P.haptics && root.navigator && typeof root.navigator.vibrate === 'function') return root.navigator.vibrate(pat == null ? 12 : pat); } catch (e) { } return false; };
+  GX.canBuzz = function () { try { return !!(root.navigator && typeof root.navigator.vibrate === 'function'); } catch (e) { return false; } };
+  // colour-blind hook: one symbol per seat / colour index, shown next to colour-coded pieces when html.cb is on
+  GX.SYMBOLS = ['●', '▲', '■', '◆', '★', '✚', '⬟', '✱'];
+  GX.mark = function (i) { return GX.SYMBOLS[((i | 0) % GX.SYMBOLS.length + GX.SYMBOLS.length) % GX.SYMBOLS.length]; };
+  GX.applyPrefs = function () {
+    try {
+      var h = doc.documentElement, c = h.classList;
+      c.toggle('cb', !!P.cb); c.toggle('lefty', !!P.lefty); c.toggle('gx-reduce', !!P.reduce); c.toggle('gx-noanim', P.anim === 'off');
+      h.style.setProperty('--gx-text', String(+P.text || 1));
+      h.style.setProperty('--gx-anim', String(GX.reduced() ? 0 : (AM[P.anim] != null ? AM[P.anim] : 1)));
+      if (root.GA && root.GA.setVolume) { root.GA.setVolume('master', +P.master); root.GA.setVolume('music', +P.music); root.GA.setVolume('sfx', +P.sfx); }
+    } catch (e) { }
+  };
+
+  // ------------------------------------------------------------------ settings panel
+  // GX.settings({id, title, label, game, sound, speed, help, graphics, accessibility, about:{name, version, text}, shelf:'../'})
+  // game / sound / speed / help / graphics / accessibility: optional fn(sectionEl) that appends the game's own rows.
+  // Sections are always in this order: Game · Sound · Speed · Help · Graphics · Accessibility · About (+ Developer with ?dev=1).
+  GX.SECTIONS = ['Game', 'Sound', 'Speed', 'Help', 'Graphics', 'Accessibility', 'About'];
+  GX.row = function (label, kids, hint) {
+    var r = el('div', 'gx-row'), l = el('div', 'gx-row-l', label), k = el('div', 'gx-row-k');
+    r.appendChild(l); if (hint) l.appendChild(el('small', null, hint));
+    (Array.isArray(kids) ? kids : [kids]).forEach(function (x) { if (x) k.appendChild(typeof x === 'string' ? doc.createTextNode(x) : x); });
+    r.appendChild(k); return r;
+  };
+  // segmented choice: GX.seg([[value,label],...], current, onPick)
+  GX.seg = function (vals, cur, on, name) {
+    var g = el('div', 'gx-seg'); g.setAttribute('role', 'group'); if (name) g.setAttribute('aria-label', name);
+    vals.forEach(function (v) {
+      var b = btn('gx-sb', v[1], function () { on(v[0]); g.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); }); });
+      b.setAttribute('aria-pressed', String(v[0] === cur)); b.dataset.v = String(v[0]); g.appendChild(b);
+    });
+    return g;
+  };
+  GX.onoff = function (on, set, name) {
+    var b = btn('gx-tg', on ? 'On' : 'Off'); b.setAttribute('role', 'switch'); b.setAttribute('aria-checked', String(!!on)); if (name) b.setAttribute('aria-label', name);
+    b.addEventListener('click', function () { on = !on; b.textContent = on ? 'On' : 'Off'; b.setAttribute('aria-checked', String(on)); set(on); });
+    return b;
+  };
+  GX.slider = function (val, set, name) {
+    var w = el('span', 'gx-sl'), i = el('input'), o = el('output', null, Math.round(val * 100) + '%');
+    i.type = 'range'; i.min = '0'; i.max = '100'; i.step = '5'; i.value = String(Math.round(val * 100)); if (name) i.setAttribute('aria-label', name);
+    i.addEventListener('input', function () { o.textContent = i.value + '%'; set(+i.value / 100); });
+    w.appendChild(i); w.appendChild(o); return w;
+  };
+  function prefRows(sec, S) {
+    if (sec === 'Sound') {
+      S.appendChild(GX.row('Master volume', GX.slider(+P.master, function (v) { GX.setPref('master', v); }, 'Master volume')));
+      S.appendChild(GX.row('Music', GX.slider(+P.music, function (v) { GX.setPref('music', v); }, 'Music volume')));
+      S.appendChild(GX.row('Effects', GX.slider(+P.sfx, function (v) { GX.setPref('sfx', v); }, 'Effects volume')));
+      if (GX.canBuzz()) S.appendChild(GX.row('Vibration', GX.onoff(P.haptics, function (v) { GX.setPref('haptics', v); if (v) GX.buzz(20); }, 'Vibration'), 'Short buzz on your turn and on big moments'));
+    } else if (sec === 'Speed') {
+      S.appendChild(GX.row('Animations', GX.seg([['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Fast'], ['off', 'Off']], P.anim, function (v) { GX.setPref('anim', v); }, 'Animation speed')));
+      S.appendChild(GX.row('Computer players', GX.seg([['slow', 'Slow'], ['normal', 'Normal'], ['fast', 'Fast']], P.ai, function (v) { GX.setPref('ai', v); }, 'Computer speed')));
+    } else if (sec === 'Accessibility') {
+      S.appendChild(GX.row('Text size', GX.seg([[0.9, 'Small'], [1, 'Normal'], [1.15, 'Large'], [1.3, 'Huge']], +P.text, function (v) { GX.setPref('text', v); }, 'Text size')));
+      S.appendChild(GX.row('Colour-blind help', GX.onoff(P.cb, function (v) { GX.setPref('cb', v); }, 'Colour-blind help'), 'Adds symbols to colour-coded pieces'));
+      S.appendChild(GX.row('Left-handed', GX.onoff(P.lefty, function (v) { GX.setPref('lefty', v); }, 'Left-handed layout'), 'Panel and main buttons on the left'));
+      S.appendChild(GX.row('Reduce motion', GX.onoff(P.reduce, function (v) { GX.setPref('reduce', v); }, 'Reduce motion'), 'No sliding or flying pieces'));
+    }
+  }
+  GX.settings = function (o) {
+    o = o || {}; GX._set = o;
+    var id = o.id || 'gx-setd';
+    var body = el('div', 'gx-set');
+    GX.drawer(id, o.title || 'Menu', body, false);
+    var render = function () {
+      body.innerHTML = '';
+      var nav = el('nav', 'gx-set-nav'); nav.setAttribute('aria-label', 'Menu sections'); body.appendChild(nav);
+      var secs = GX.SECTIONS.slice(); if (GX.dev) secs.push('Developer');
+      secs.forEach(function (sec) {
+        var key = sec.toLowerCase(), S = el('section', 'gx-sec'); S.id = id + '-' + key; S.setAttribute('aria-label', sec);
+        S.appendChild(el('h3', null, sec));
+        try { if (typeof o[key] === 'function') o[key](S); } catch (e) { if (root.console) console.error(e); }
+        prefRows(sec, S);
+        if (sec === 'About') aboutRows(S, o);
+        if (sec === 'Developer') devRows(S);
+        if (S.childNodes.length > 1) { body.appendChild(S); var a = btn('gx-chip', sec, function () { S.scrollIntoView({ block: 'start', behavior: GX.reduced() ? 'auto' : 'smooth' }); }); nav.appendChild(a); }
+      });
+    };
+    GX._setRender = render;
+    GX.beforeShow(function (x) { if (x === id) render(); });
+    render();
+    return id;
+  };
+  GX.renderSettings = function () { if (GX._setRender) GX._setRender(); };
+  function aboutRows(S, o) {
+    var a = o.about || {}, shelf = o.shelf != null ? o.shelf : '../';
+    if (a.name) S.appendChild(el('p', 'gx-about-n', a.name + (a.version ? ' · ' + a.version : '')));
+    if (a.text) { var p = el('p', 'gx-small'); p.textContent = a.text; S.appendChild(p); }
+    var links = el('div', 'gx-links');
+    [['credits.html', 'Credits & licences'], ['privacy.html', 'Privacy'], ['terms.html', 'Terms'], ['reference.html', 'All cards on the shelf']].forEach(function (l) {
+      var x = el('a', 'gx-chip', l[1]); x.href = shelf + l[0]; x.target = '_blank'; x.rel = 'noopener'; links.appendChild(x);
+    });
+    S.appendChild(links);
+    S.appendChild(el('p', 'gx-small', 'Settings, saves and statistics stay on this device. Nothing is sent anywhere unless you play online.'));
+  }
+  function devRows(S) {
+    var H = root.PerfHUD;
+    S.appendChild(GX.row('Speed tools', [
+      btn('gx-sb', 'Show speed', function () { try { H && (H.toggle ? H.toggle() : H.show && H.show()); } catch (e) { } }),
+      btn('gx-sb', 'Test speed', function () { try { H && H.test && H.test(); } catch (e) { } }),
+      btn('gx-sb', 'Copy report', function () { try { var r = H && H.report ? H.report() : JSON.stringify(GX.pref()); root.navigator.clipboard.writeText(r); } catch (e) { } })
+    ]));
+  }
+
+  // ------------------------------------------------------------------ component reference
+  // sections: [{id, title, items:[{id, name, count, text, tags:[], meta, picture}]}]
+  //   picture: optional; a string (image URL or SVG/HTML markup), a DOM node, or anything opts.picture(item, big) can draw.
+  // opts: {id:'gx-refd', title:'Cards', label:'Cards', button:true|selector, picture:fn(item,big)->Node|string,
+  //        inGame:fn(item)->bool (adds an "In this game" chip), search:'placeholder'}
+  GX.reference = function (sections, opts) {
+    opts = opts || {}; var id = opts.id || 'gx-refd';
+    var R = GX._ref = { id: id, sections: sections || [], opts: opts, sec: 'all', tags: {}, q: '', inGame: false, big: null };
+    var body = el('div', 'gx-ref'); GX.drawer(id, opts.title || 'Cards', body, true);
+    R.body = body;
+    var top = el('div', 'gx-ref-top');
+    var s = el('input', 'gx-ref-q'); s.type = 'search'; s.placeholder = opts.search || 'Search names and text'; s.setAttribute('aria-label', 'Search');
+    s.addEventListener('input', function () { R.q = s.value; draw(); });
+    top.appendChild(s);
+    R.secRow = el('div', 'gx-chips gx-ref-secs'); R.tagRow = el('div', 'gx-chips gx-ref-tags'); R.count = el('div', 'gx-ref-n'); R.count.setAttribute('aria-live', 'polite');
+    top.appendChild(R.secRow); top.appendChild(R.tagRow); top.appendChild(R.count);
+    R.list = el('div', 'gx-ref-list'); R.view = el('div', 'gx-ref-big'); R.view.hidden = true; R.view.setAttribute('role', 'region'); R.view.setAttribute('aria-label', 'Card');
+    body.appendChild(top); body.appendChild(R.list); body.appendChild(R.view);
+    R.input = s;
+    if (opts.button !== false) {
+      var bar = doc.querySelector(typeof opts.button === 'string' ? opts.button : '.gx-bar');
+      if (bar && !doc.querySelector('[data-gx="' + id + '"]')) {
+        var b = btn('gx-ibtn gx-refbtn'); b.dataset.gx = id; b.setAttribute('aria-expanded', 'false'); b.setAttribute('aria-label', opts.title || 'Cards'); b.title = opts.title || 'Cards';
+        b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="11" height="16" rx="2"/><path d="M14 6.5 20 8l-3.2 12.2-5-1.3"/></svg><span></span>';
+        b.querySelector('span').textContent = opts.label || 'Cards';
+        var sp = bar.querySelector('.gx-sp'); var after = sp ? sp.nextElementSibling : null;
+        if (opts.before) after = bar.querySelector(opts.before) || after;
+        if (after) bar.insertBefore(b, after); else bar.appendChild(b);
+      }
+    }
+    GX.beforeShow(function (x) { if (x === id) { if (!R.keepBig) closeBig(); R.keepBig = false; draw(); } });
+    R.view.addEventListener('keydown', function (e) { if (e.key === 'ArrowRight') step(1); else if (e.key === 'ArrowLeft') step(-1); });
+    draw();
+    return id;
+  };
+  GX.refData = function (sections) { if (GX._ref) { GX._ref.sections = sections; draw(); } };
+  function all() { var R = GX._ref, out = []; R.sections.forEach(function (S) { (S.items || []).forEach(function (it) { out.push({ s: S, it: it }); }); }); return out; }
+  function norm(x) { return String(x == null ? '' : x).toLowerCase(); }
+  function matches(e) {
+    var R = GX._ref, it = e.it;
+    if (R.sec !== 'all' && e.s.id !== R.sec) return false;
+    for (var t in R.tags) if (R.tags[t] && (it.tags || []).indexOf(t) < 0) return false;
+    if (R.inGame && R.opts.inGame && !R.opts.inGame(it)) return false;
+    if (R.q) { var hay = norm(it.name) + ' ' + norm(it.text) + ' ' + norm((it.tags || []).join(' ')) + ' ' + norm(it.meta); var w = norm(R.q).split(/\s+/); for (var i = 0; i < w.length; i++) if (w[i] && hay.indexOf(w[i]) < 0) return false; }
+    return true;
+  }
+  function pic(it, big) {
+    var R = GX._ref, p = null;
+    try { p = R.opts.picture ? R.opts.picture(it, big) : null; } catch (e) { p = null; }
+    if (p == null) p = it.picture;
+    if (p == null) return null;
+    var w = el('span', 'gx-ref-pic' + (big ? ' big' : ''));
+    if (typeof p === 'string') { if (/^\s*</.test(p)) w.innerHTML = p; else { var im = el('img'); im.src = p; im.alt = ''; im.loading = 'lazy'; w.appendChild(im); } }
+    else if (p.nodeType) w.appendChild(p);
+    return w;
+  }
+  function chip(label, on, f) { var b = btn('gx-chip', label, f); b.setAttribute('aria-pressed', String(!!on)); return b; }
+  function draw() {
+    var R = GX._ref; if (!R) return;
+    R.secRow.innerHTML = '';
+    if (R.sections.length > 1) {
+      R.secRow.appendChild(chip('All', R.sec === 'all', function () { R.sec = 'all'; R.tags = {}; draw(); }));
+      R.sections.forEach(function (S) { var n = (S.items || []).length; R.secRow.appendChild(chip(S.title + ' ' + n, R.sec === S.id, function () { R.sec = S.id; R.tags = {}; draw(); })); });
+    }
+    // tag chips for the chosen section (most common first, at most 14)
+    var tc = {}; all().forEach(function (e) { if (R.sec !== 'all' && e.s.id !== R.sec) return; (e.it.tags || []).forEach(function (t) { tc[t] = (tc[t] || 0) + 1; }); });
+    var tl = Object.keys(tc).sort(function (a, b) { return tc[b] - tc[a] || (a < b ? -1 : 1); }).slice(0, 14);
+    R.tagRow.innerHTML = '';
+    if (R.opts.inGame) R.tagRow.appendChild(chip('In this game', R.inGame, function () { R.inGame = !R.inGame; draw(); }));
+    tl.forEach(function (t) { R.tagRow.appendChild(chip(t, R.tags[t], function () { R.tags[t] = !R.tags[t]; draw(); })); });
+    var hits = all().filter(matches), copies = 0;
+    hits.forEach(function (e) { copies += +e.it.count || 0; });
+    R.hits = hits;
+    R.count.textContent = hits.length + (hits.length === 1 ? ' entry' : ' entries') + (copies > hits.length ? ' · ' + copies + ' pieces in the box' : '');
+    R.list.innerHTML = '';
+    if (!hits.length) R.list.appendChild(el('p', 'gx-small', 'Nothing matches. Clear the search or a chip.'));
+    var frag = doc.createDocumentFragment();
+    hits.forEach(function (e, i) {
+      var it = e.it, b = btn('gx-ref-it'); b.dataset.ref = it.id != null ? String(it.id) : String(i);
+      b.setAttribute('aria-label', it.name + (it.count ? ', ' + it.count + ' in the box' : ''));
+      var p = pic(it, false); if (p) b.appendChild(p);
+      var t = el('span', 'gx-ref-tx'); var nm = el('b', null, it.name); t.appendChild(nm);
+      if (it.count != null) { var c = el('span', 'gx-ref-c', '×' + it.count); t.appendChild(c); }
+      if (it.meta) t.appendChild(el('span', 'gx-ref-m', it.meta));
+      if (it.text) t.appendChild(el('span', 'gx-ref-d', it.text));
+      b.appendChild(t);
+      b.addEventListener('click', function () { openBig(i); });
+      frag.appendChild(b);
+    });
+    R.list.appendChild(frag);
+  }
+  function openBig(i) {
+    var R = GX._ref, e = R.hits[i]; if (!e) return; R.big = i; var it = e.it, V = R.view;
+    V.innerHTML = '';
+    var head = el('div', 'gx-ref-bh');
+    head.appendChild(btn('gx-sb', '‹ All', closeBig));
+    var nav = el('span', 'gx-ref-nav');
+    var pv = btn('gx-sb', '‹', function () { step(-1); }); pv.setAttribute('aria-label', 'Previous'); pv.disabled = i <= 0;
+    var nx = btn('gx-sb', '›', function () { step(1); }); nx.setAttribute('aria-label', 'Next'); nx.disabled = i >= R.hits.length - 1;
+    nav.appendChild(pv); nav.appendChild(el('span', 'gx-small', (i + 1) + ' / ' + R.hits.length)); nav.appendChild(nx);
+    head.appendChild(nav); V.appendChild(head);
+    var p = pic(it, true); if (p) V.appendChild(p);
+    V.appendChild(el('h3', null, it.name));
+    var m = []; if (it.count != null) m.push(it.count + (it.count === 1 ? ' in the box' : ' in the box')); if (it.meta) m.push(it.meta); m.push(e.s.title);
+    V.appendChild(el('p', 'gx-ref-m', m.join(' · ')));
+    if (it.text) V.appendChild(el('p', 'gx-ref-full', it.text));
+    if (it.extra) { var x = el('div', 'gx-ref-x'); if (typeof it.extra === 'string') x.textContent = it.extra; else x.appendChild(it.extra); V.appendChild(x); }
+    if (it.tags && it.tags.length) { var tg = el('div', 'gx-chips'); it.tags.forEach(function (t) { tg.appendChild(el('span', 'gx-tag', t)); }); V.appendChild(tg); }
+    V.hidden = false; R.list.hidden = true; R.body.classList.add('big');
+    V.tabIndex = -1; try { V.focus({ preventScroll: true }); } catch (er) { }
+    var sc = V.closest && V.closest('.gx-drawer-body'); if (sc) sc.scrollTop = 0;
+  }
+  function closeBig() { var R = GX._ref; if (!R) return; R.big = null; R.view.hidden = true; R.list.hidden = false; R.body.classList.remove('big'); }
+  function step(d) { var R = GX._ref; if (R && R.big != null) openBig(Math.max(0, Math.min(R.hits.length - 1, R.big + d))); }
+  // open the drawer straight at one item (e.g. from a card pop-up: "Read in the reference")
+  GX.refOpen = function (itemId) {
+    var R = GX._ref; if (!R) return false;
+    R.sec = 'all'; R.tags = {}; R.q = ''; R.inGame = false; if (R.input) R.input.value = '';
+    draw();
+    var i = -1; R.hits.forEach(function (e, k) { if (String(e.it.id) === String(itemId)) i = k; });
+    R.keepBig = i >= 0; if (GX.open !== R.id) GX.show(R.id); else R.keepBig = false;
+    if (i >= 0) openBig(i);
+    return i >= 0;
+  };
+
+  // ------------------------------------------------------------------ undo
+  // GX.undo.config({get:()=>state, set:state=>{...re-render...}, owner:state=>seat|null, online:()=>bool, allowOnline:false,
+  //                 onChange:fn(can)})
+  // snap() before each human move; check() after it (seals when the turn passed to someone else); drop() if the move was refused;
+  // seal() when hidden information was revealed or the move is confirmed. undo() restores the last snapshot.
+  GX.undo = (function () {
+    var C = { get: null, set: null, owner: null, online: null, allowOnline: false, onChange: null, max: 40 }, st = [], ow = null;
+    function changed() { if (C.onChange) { try { C.onChange(U.can()); } catch (e) { } } }
+    var U = {
+      config: function (o) { for (var k in o) C[k] = o[k]; st = []; ow = null; changed(); return U; },
+      enabled: function () { if (C.online && C.online() && !C.allowOnline) return false; return !!(C.get && C.set); },
+      snap: function (label) {
+        if (!U.enabled()) return false;
+        var s; try { s = JSON.stringify(C.get()); } catch (e) { return false; }
+        var o = C.owner ? C.owner(C.get()) : null;
+        if (st.length && o !== ow) st = [];
+        ow = o; st.push({ s: s, label: label || '' }); if (st.length > C.max) st.shift(); changed(); return true;
+      },
+      // call after the move: seals when the decision passed to another seat, or when sealIf(beforeState, nowState) says so
+      check: function (sealIf) {
+        if (!st.length) return;
+        var now = C.get(), o = C.owner ? C.owner(now) : null;
+        if (C.owner && o !== ow) return U.seal('turn');
+        if (sealIf) { var before; try { before = JSON.parse(st[st.length - 1].s); } catch (e) { before = null; } try { if (sealIf(before, now)) return U.seal('reveal'); } catch (e) { } }
+      },
+      seal: function (why) { if (st.length) { st = []; U.why = why || 'sealed'; changed(); } return false; },
+      // the move was rejected by the rules: forget its snapshot without restoring anything
+      drop: function () { if (st.length) { st.pop(); changed(); } },
+      clear: function () { st = []; ow = null; changed(); },
+      can: function () { return U.enabled() && st.length > 0; },
+      size: function () { return st.length; },
+      label: function () { return st.length ? st[st.length - 1].label : ''; },
+      undo: function () {
+        if (!U.can()) return false;
+        var e = st.pop(), s;
+        try { s = JSON.parse(e.s); } catch (er) { return false; }
+        C.set(s); changed(); return true;
+      }
+    };
+    return U;
+  })();
+
+  // ------------------------------------------------------------------ "Since your last turn"
+  // GX.recap.attach(el|selector, {title}); push(lines, fromSeat) while others play; mark(seat) when that seat decides;
+  // view(seat) chooses whose summary is shown (hot-seat); the strip renders itself and can be dismissed.
+  GX.recap = (function () {
+    var box = null, buf = {}, cur = 0, open = false, title = 'Since your last turn', seats = null;
+    function list() { return buf[cur] || []; }
+    function render() {
+      if (!box) return;
+      var L = list(); box.innerHTML = '';
+      if (!L.length) { box.hidden = true; return; }
+      box.hidden = false; box.classList.toggle('open', open);
+      var head = btn('gx-recap-h'); head.setAttribute('aria-expanded', String(open));
+      head.appendChild(el('b', null, title)); head.appendChild(el('span', 'gx-recap-n', String(L.length)));
+      head.appendChild(el('span', 'gx-recap-1', open ? '' : L[L.length - 1]));
+      head.addEventListener('click', function () { open = !open; render(); });
+      var x = btn('gx-recap-x', '×', function () { R.dismiss(); }); x.setAttribute('aria-label', 'Dismiss');
+      var top = el('div', 'gx-recap-top'); top.appendChild(head); top.appendChild(x); box.appendChild(top);
+      if (open) { var ul = el('ol', 'gx-recap-l'); L.forEach(function (t) { ul.appendChild(el('li', null, t)); }); box.appendChild(ul); }
+    }
+    var R = {
+      attach: function (where, o) {
+        var host = typeof where === 'string' ? doc.querySelector(where) : where; if (!host) return null;
+        if (o && o.title) title = o.title;
+        box = el('div', 'gx-recap'); box.setAttribute('role', 'status'); box.hidden = true;
+        if (o && o.before) host.insertBefore(box, host.firstChild); else host.appendChild(box);
+        render(); return box;
+      },
+      seats: function (list) { seats = list; },
+      push: function (lines, fromSeat) {
+        lines = (Array.isArray(lines) ? lines : [lines]).filter(function (x) { return x != null && x !== ''; }).map(String);
+        if (!lines.length) return;
+        var ks = seats || Object.keys(buf).map(Number); if (!ks.length) ks = [cur];
+        ks.forEach(function (s) { if (s === fromSeat) return; var b = buf[s] = buf[s] || []; b.push.apply(b, lines); if (b.length > 60) b.splice(0, b.length - 60); });
+        render();
+      },
+      mark: function (seat) { buf[seat == null ? cur : seat] = []; open = false; render(); },
+      view: function (seat) { if (seat !== cur) { cur = seat; open = false; render(); } },
+      dismiss: function () { buf[cur] = []; open = false; render(); },
+      clear: function () { buf = {}; open = false; render(); },
+      lines: function (seat) { return (buf[seat == null ? cur : seat] || []).slice(); },
+      render: render
+    };
+    return R;
+  })();
+
+  // ------------------------------------------------------------------ offline + new version notice
+  // GX.offline({sw:'../sw.js', scope:'../'}) registers the shelf service worker (http/https only) and shows
+  // "A new version is ready — tap to reload" when the worker says this page changed or a new worker takes over.
+  GX.offline = function (o) {
+    o = o || {};
+    try {
+      var nav = root.navigator; if (!nav || !nav.serviceWorker || !/^https?:$/.test(root.location.protocol)) return false;
+      var had = !!nav.serviceWorker.controller, url = o.sw || '../sw.js';
+      // register only when the worker file really is a script (a test server that answers every URL with the page would
+      // otherwise make the browser log a registration error)
+      var reg = function () { nav.serviceWorker.register(url, { scope: o.scope || '../' }).catch(function () { }); };
+      if (root.fetch) root.fetch(url, { method: 'HEAD', cache: 'no-store' }).then(function (r) { if (r.ok && /javascript/.test(r.headers.get('content-type') || '')) reg(); }, function () { });
+      else reg();
+      nav.serviceWorker.addEventListener('controllerchange', function () { if (had) GX.updateNotice(); had = true; });
+      nav.serviceWorker.addEventListener('message', function (e) {
+        var d = e.data || {}; if (d.type !== 'gns-update') return;
+        try { var u = new URL(d.url, root.location.href), me = new URL(root.location.href); var p = function (x) { return x.pathname.replace(/index\.html$/, ''); }; if (p(u) === p(me)) GX.updateNotice(); } catch (er) { }
+      });
+      return true;
+    } catch (e) { return false; }
+  };
+  GX.updateNotice = function (text) {
+    if (!doc || doc.querySelector('.gx-update')) return;
+    var b = btn('gx-update', text || 'A new version is ready — tap to reload', function () { try { root.location.reload(); } catch (e) { } });
+    b.setAttribute('role', 'status'); doc.body.appendChild(b);
+  };
+
+  try { GX.applyPrefs(); } catch (e) { }
+  if (root.matchMedia) { try { root.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', GX.applyPrefs); } catch (e) { } }
+})(typeof window !== 'undefined' ? window : this, typeof GX !== 'undefined' ? GX : null);
+
+// ===== GNS: local results, statistics and achievements (read by the shelf home page) =====
+// GNS.result({game, mode, seats:[{name, me, ai}], winner, scores, turns, ms})  on game over -> {stats, earned:[new achievements]}
+// GNS.achievements(game, [{id, name, how, test:(result, stats)=>bool}])          declare once at boot
+// GNS.stats(game) · GNS.earned(game) · GNS.results(game) · GNS.saved(game, bool) · GNS.onEarn(fn)
+(function (root) {
+  'use strict';
+  var GNS = root.GNS = root.GNS || {};
+  var LS = {
+    json: function (k, d) { try { var v = JSON.parse(root.localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+    put: function (k, v) { try { root.localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  };
+  var DEFS = {}, earnL = [];
+  GNS.achievements = function (game, list) {
+    DEFS[game] = list || [];
+    var all = LS.json('gns-achdef', {}) || {};
+    all[game] = DEFS[game].map(function (a) { return { id: a.id, name: a.name, how: a.how }; });
+    LS.put('gns-achdef', all);
+    return DEFS[game];
+  };
+  GNS.onEarn = function (f) { earnL.push(f); };
+  GNS.stats = function (game) { var s = LS.json('gns-stats', {}) || {}; return game ? s[game] || null : s; };
+  GNS.earned = function (game) { var a = LS.json('gns-ach', {}) || {}; return game ? a[game] || {} : a; };
+  GNS.results = function (game) { var r = LS.json('gns-results', []) || []; return game ? r.filter(function (x) { return x.game === game; }) : r; };
+  GNS.saved = function (game, has) { var s = LS.json('gns-saves', {}) || {}; if (has) s[game] = Date.now(); else delete s[game]; LS.put('gns-saves', s); };
+  GNS.result = function (r) {
+    r = r || {}; if (!r.game) return null;
+    if (DEFS[r.game]) GNS.achievements(r.game, DEFS[r.game]); // keep the shelf's list of names even if storage was cleared
+    var seats = r.seats || [], me = -1;
+    seats.forEach(function (s, i) { if (me < 0 && s && s.me) me = i; });
+    var humans = seats.filter(function (s) { return s && !s.ai; }).length;
+    var won = me >= 0 && (Array.isArray(r.winner) ? r.winner.indexOf(me) >= 0 : r.winner === me);
+    if (r.won != null) won = !!r.won;
+    var rec = { game: r.game, mode: r.mode || 'vs', at: Date.now(), np: seats.length, me: me, won: won, winner: r.winner, scores: r.scores || null,
+      score: me >= 0 && r.scores ? r.scores[me] : null, turns: r.turns || 0, ms: r.ms || 0, humans: humans, level: r.level || null };
+    var list = LS.json('gns-results', []) || []; list.push(rec); if (list.length > 200) list.splice(0, list.length - 200); LS.put('gns-results', list);
+    var all = LS.json('gns-stats', {}) || {}, s = all[r.game] || { played: 0, won: 0, best: null, turns: 0, ms: 0, modes: {}, streak: 0, bestStreak: 0 };
+    s.played++; if (won) { s.won++; s.streak++; s.bestStreak = Math.max(s.bestStreak, s.streak); } else if (me >= 0) s.streak = 0;
+    if (rec.score != null && (s.best == null || rec.score > s.best)) s.best = rec.score;
+    s.turns += rec.turns; s.ms += rec.ms; s.modes[rec.mode] = (s.modes[rec.mode] || 0) + 1; s.last = rec.at;
+    all[r.game] = s; LS.put('gns-stats', all);
+    var ach = LS.json('gns-ach', {}) || {}, mine = ach[r.game] = ach[r.game] || {}, fresh = [];
+    (DEFS[r.game] || []).forEach(function (a) { if (mine[a.id]) return; var ok = false; try { ok = !!a.test(rec, s, r); } catch (e) { } if (ok) { mine[a.id] = rec.at; fresh.push(a); } });
+    LS.put('gns-ach', ach);
+    fresh.forEach(function (a) { earnL.forEach(function (f) { try { f(a, r.game); } catch (e) { } }); });
+    return { stats: s, earned: fresh, record: rec };
+  };
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
 // ---------- PerfHUD: one speed tool for every game on the shelf ----------
 // 1. an optional overlay (FPS, frame time avg/p95, level, draws/triangles, heap, dpr, render size): menu "Show speed", ?fps=1 or F9
 // 2. "Test speed": 2 s per graphics level with a slow camera orbit, then a result card with Apply and Copy report
@@ -4071,6 +4633,58 @@ if (typeof module === 'object' && module.exports) module.exports = KK.DATA;
 
 </script>
 <script>
+// Component reference for Kaiten Kitchen in the shared GX.reference format (JSON-safe, so node can read it too).
+//   KK.refSections(DATA) -> [{id, title, items:[{id, name, count, text, tags, meta, extra, pic}]}]
+// `pic` says what to draw ({type: plate type}); the page turns it into a painted plate card.
+(function (g) {
+  var KK = g.KK = g.KK || {};
+  var GROUP = { set: 'Set', maki: 'Roll race', nigiri: 'Nigiri', wasabi: 'Booster', chop: 'Tool', pudding: 'End of game' };
+  var META = {
+    tempura: 'Pairs · 5 points a pair', sashimi: 'Sets of three · 10 points a set', dumpling: 'Ladder · 1, 3, 6, 10, 15',
+    roll1: 'Roll race · 1 icon', roll2: 'Roll race · 2 icons', roll3: 'Roll race · 3 icons',
+    salmon: 'Nigiri · 2 points (6 on Fire Paste)', squid: 'Nigiri · 3 points (9 on Fire Paste)', egg: 'Nigiri · 1 point (3 on Fire Paste)',
+    wasabi: 'Triples your next nigiri', chop: 'Serve two plates on a later turn', pudding: 'Kept to the end · most +6, fewest −6'
+  };
+  var EXTRA = {
+    tempura: 'A lone prawn scores nothing, so take the first one only if a second is likely to come round.',
+    sashimi: 'One or two Fish Slices score nothing. With few diners the hands come back to you, which makes sets easier.',
+    dumpling: 'Five buns is the top of the ladder: a sixth one adds nothing.',
+    roll1: 'Add up every roll icon on your counter this round. Ties for the most split 6 (rounded down) and nobody scores second.',
+    roll2: 'Add up every roll icon on your counter this round. Ties for the most split 6 (rounded down) and nobody scores second.',
+    roll3: 'Add up every roll icon on your counter this round. Ties for the most split 6 (rounded down) and nobody scores second.',
+    salmon: 'A nigiri served after a Fire Paste lands on the oldest waiting paste.',
+    squid: 'The best nigiri to put on a Fire Paste: 9 points.',
+    egg: 'Cheap on its own, but still 3 points on a Fire Paste.',
+    wasabi: 'Each paste takes one nigiri. A paste served together with a nigiri (Twin Sticks) lands under it.',
+    chop: 'After you use them, the sticks go back into the hand you are holding and move on to the next diner.',
+    pudding: 'Custard is never cleared at the end of a round. With two diners nobody loses points for the fewest. Ties for the most decide the winner when totals are equal.'
+  };
+  KK.refSections = function (D) {
+    D = D || KK.DATA;
+    var plates = D.types.map(function (t) {
+      return { id: 'p-' + t.id, name: t.name + (t.icons ? ' (' + t.icons + ' icon' + (t.icons > 1 ? 's' : '') + ')' : ''), count: t.copies, text: t.text,
+        tags: [GROUP[t.group] || t.group, t.group === 'pudding' ? 'Kept' : 'Cleared each round'], meta: META[t.id] || '', extra: EXTRA[t.id] || '', pic: { type: t.id } };
+    });
+    var hs = D.handSize, total = D.types.reduce(function (a, t) { return a + t.copies; }, 0);
+    var rules = [
+      { id: 'r-pick', name: 'Picking a plate', text: 'Everyone secretly picks one plate from the belt in their hand at the same time. When all have chosen, the covers lift together, then every hand passes one seat to the left.', tags: ['Turn'], meta: 'Every turn' },
+      { id: 'r-hand', name: 'Hand sizes', text: 'Each round everyone is dealt ' + hs[2] + ' plates with 2 diners, ' + hs[3] + ' with 3, ' + hs[4] + ' with 4 and ' + hs[5] + ' with 5.', tags: ['Round'], meta: D.rounds + ' rounds' },
+      { id: 'r-race', name: 'Roll race', text: 'Most roll icons this round scores ' + D.makiFirst + ', second most ' + D.makiSecond + '. Ties for the most split ' + D.makiFirst + ' (rounded down) and nobody scores second; ties for second split ' + D.makiSecond + '. No icons, no points.', tags: ['Scoring', 'Round'], meta: 'Scored at the end of each round', pic: { type: 'roll3' } },
+      { id: 'r-paste', name: 'Fire Paste bonus', text: 'A nigiri served onto a waiting Fire Paste scores triple. The score pad shows the extra points as their own row.', tags: ['Scoring'], meta: 'Nigiri × 3', pic: { type: 'wasabi', on: 'squid' } },
+      { id: 'r-custard', name: 'Custard at the end', text: 'After the third round the most Custard Cups score +' + D.puddingMost + ' and the fewest lose ' + D.puddingFewest + ' (not with 2 diners). Ties split the points, rounded down. If everyone has the same number, nobody scores.', tags: ['Scoring', 'End of game'], meta: 'Once, after round 3', pic: { type: 'pudding' } },
+      { id: 'r-tie', name: 'Ties', text: 'The highest total wins. A tie goes to the diner with more Custard Cups; if that is tied too, the win is shared.', tags: ['End of game'], meta: 'Final result' }
+    ];
+    var box = [
+      { id: 'x-deck', name: 'Plate cards', count: total, text: D.types.length + ' kinds of plate (three of them Seaweed Rolls with 1, 2 or 3 icons). The whole deck is shuffled once; the plates left over after a deal wait for the next round.', tags: ['Box'] },
+      { id: 'x-pad', name: 'Score pad', count: 1, text: 'Adds up every diner\'s three rounds and the custard at the end.', tags: ['Box'] }
+    ];
+    return [{ id: 'plates', title: 'Plates', items: plates }, { id: 'rules', title: 'Scoring', items: rules }, { id: 'box', title: 'In the box', items: box }];
+  };
+  if (typeof module === 'object' && module.exports) module.exports = KK.refSections;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script>
+<script>
 // ===================== Kaiten Kitchen rules engine =====================
 // Plain JS (browser global KK / node module). State G is one JSON-serialisable object with its own seeded RNG.
 //   KK.newGame({players:2..5, seed, names:[], ai:[level|null,...]}) -> G
@@ -4641,6 +5255,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
  *   GA.loop(name, {vol, fade}) / GA.stopLoop(name, {fade})         ambience beds
  *   GA.music(name|null, {vol, fade})                                 cross-fading background track
  *   GA.setSfx(on) GA.setMusic(on) GA.setVolume('sfx'|'music', 0..1)  persisted in localStorage
+ *   GA.setVolume('master', 0..1)  one level over everything (the shared settings panel sets it; default 1)
  *   GA.has(name) GA.playing() GA.state() GA.unlock() GA.names() GA.duration(name)
  * Samples are decoded lazily on the first user gesture (atob -> ArrayBuffer -> decodeAudioData, no fetch).
  */
@@ -4650,7 +5265,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
   var S = {
     inited: false, key: 'ga', src: {}, kind: {}, buf: {}, failed: {}, pending: {},
     ctx: null, ctxOpt: null, out: null, sfxBus: null, musBus: null, duckBus: null,
-    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, last: {}, loops: {},
+    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, masterVol: 1, last: {}, loops: {},
     cur: null, curName: null, wantMusic: null, duckSet: {}, duckUntil: 0, unlocked: false, decoding: false
   };
   var DEFAULT_DUCK = ['win', 'lose', 'levelup', 'level', 'boom', 'ko', 'thunder', 'roar', 'smash', 'stomp', 'door', 'death', 'crit', 'crumble'];
@@ -4695,6 +5310,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
     var t = S.ctx.currentTime;
     S.sfxBus.gain.setTargetAtTime(S.sfxOn ? S.sfxVol : 0, t, 0.02);
     S.musBus.gain.setTargetAtTime(S.musOn ? S.musVol : 0, t, 0.08);
+    S.out.gain.setTargetAtTime(S.masterVol, t, 0.02);
   }
 
   // Loops: skip encoder padding / near-silence at the edges so MP3 loops don't gap.
@@ -4770,6 +5386,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
     S.sfxOn = lsGet('sfx', '1') !== '0'; S.musOn = lsGet('mus', '1') !== '0';
     S.sfxVol = clamp(lsGet('sfxvol', o.sfxVol != null ? o.sfxVol : 0.8), 0, 1);
     S.musVol = clamp(lsGet('musvol', o.musVol != null ? o.musVol : 0.5), 0, 1);
+    S.masterVol = clamp(lsGet('mastervol', 1), 0, 1);
     if (!S.inited && root.document && root.document.addEventListener) {
       ['pointerdown', 'keydown', 'touchstart', 'mousedown'].forEach(function (ev) {
         root.document.addEventListener(ev, onGesture, { capture: true, passive: true });
@@ -4881,11 +5498,11 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
   }
   function setVolume(kind, v) {
     v = clamp(v, 0, 1);
-    if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
+    if (kind === 'master') { S.masterVol = v; lsSet('mastervol', v); } else if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
     applyVol(); return v;
   }
   function state() {
-    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, audio: !!S.ctx,
+    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, masterVol: S.masterVol, audio: !!S.ctx,
       ctxState: S.ctx ? S.ctx.state : 'none', decoded: Object.keys(S.buf).length, failed: Object.keys(S.failed),
       total: Object.keys(S.src).length, playing: S.curName, loops: Object.keys(S.loops) };
   }
@@ -4934,6 +5551,7 @@ async function netJoin(role, code) {
   if (G || UI.started) netIdle();
   Object.assign(NET, { busy: false, code, role, on: true, room, mySeat: -1, hostPeer: null, parts: {}, applied: 0, lastRx: 0, gid: null, hostGone: false, peer: room.self, peers: [], opt: null, seatPeer: [], seatUid: [], away: [], pend: -1, lastTxt: '', err: '', evq: [] });
   document.documentElement.classList.add('net');
+  NET.t0 = Date.now(); setTimeout(() => { if (NET.on && NET.room === room) netRender(); }, 15500);
   room.presence({ role, uid: NET.uid, name: NET.myName || '' }).catch(() => { });
   room.on('st', onNetState); room.on('act', onNetAct); room.on('rej', onNetRej);
   room.onPeers(onNetPeers); room.onConnection(c => { NET.conn = c; netRender(); });
@@ -5098,8 +5716,10 @@ function onNetAct(msg) {
 function netStatus() {
   const n = NET.peers.length;
   if (NET.hostGone || NET.err) return { t: NET.err || 'The host left.', c: 'bad', n };
-  if (NET.conn === false) return { t: 'Connecting...', c: 'wait', n };
-  if (isClient() && !NET.hostPeer) return { t: 'Looking for the host...', c: 'wait', n };
+  // after 15 s without a connection, say so and what to try instead of waiting forever
+  const slow = Date.now() - (NET.t0 || Date.now()) > 15000;
+  if (NET.conn === false) return slow ? { t: 'Cannot connect yet. Try Wi-Fi instead of mobile data, or leave and join again.', c: 'bad', n } : { t: 'Connecting...', c: 'wait', n };
+  if (isClient() && !NET.hostPeer) return slow ? { t: 'Cannot reach the host yet. Check the code, try Wi-Fi, or leave and join again.', c: 'bad', n } : { t: 'Looking for the host...', c: 'wait', n };
   if (isClient() && NET.lastRx && Date.now() - NET.lastRx > 12000) return { t: 'Reconnecting...', c: 'wait', n };
   if (n <= 1) return { t: 'Looking for players...', c: 'wait', n };
   return { t: n + ' players online', c: 'ok', n };
@@ -5224,7 +5844,7 @@ const GA_DATA={sfx:{
 var ANIM = 1, AIDELAY = 650;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, seq: 0, rec: null, noRec: false, over: null,
-  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: null, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
+  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: null, sound: true, music: true, gfx: 'auto', undo: 'short' }, enter: '', land: null, tm: null, pend: null, rq: [] };
 const D = KK.DATA;
 const KIT = KKKit;
 const TY = KIT.TYPES;
@@ -5301,11 +5921,11 @@ function pudCounts() {
 function dispHand() {
   const v = viewSeat(); if (v < 0 || !G) return [];
   if (UI.fz && UI.fz.hand) return UI.fz.hand;
-  const p = G.players[v], pk = p.picked && p.pick ? p.pick : [];
+  const p = G.players[v], pk = p.picked && p.pick ? p.pick : UI.hold && UI.hold.seat === v ? UI.hold.mv.ids : [];
   return p.hand.filter(id => pk.indexOf(id) < 0);
 }
 const mySeatPicked = () => { const v = viewSeat(); return v >= 0 && G && G.players[v].picked; };
-function canPick() { const v = viewSeat(); return !!G && G.phase === 'pick' && v >= 0 && !G.players[v].picked && !UI.busy && !UI.cards.length && !UI.fz && !(NET.on && !NET.hostPeer && isClient()) && !(NET.on && NET.pend === G.round * 100 + G.turn && Date.now() - NET.pendT < 2500); }
+function canPick() { const v = viewSeat(); return !!G && G.phase === 'pick' && v >= 0 && !G.players[v].picked && !UI.hold && !UI.busy && !UI.cards.length && !UI.fz && !(NET.on && !NET.hostPeer && isClient()) && !(NET.on && NET.pend === G.round * 100 + G.turn && Date.now() - NET.pendT < 2500); }
 function mkey(m) { return m && m.pick ? m.pick.join(',') : ''; }
 // ---- scoring model for the table (works on any displayed tables)
 function liveScores(tab) { return KK.roundScores({ players: tab.map(t => ({ table: t })) }); }
@@ -5370,9 +5990,11 @@ function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
 function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2200); }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
-function loadPrefs() { try { const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
-function savePrefs() { lsSet('kk_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
-const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35))) : Promise.resolve();
+// the computer speed now lives in the shared settings (GX.pref('ai')); an old per-game speed in kk_prefs is ignored
+function loadPrefs() { try { const p = JSON.parse(lsGet('kk_prefs') || '{}'); delete p.speed; Object.assign(UI.prefs, p); } catch (e) { } }
+function savePrefs() { lsSet('kk_prefs', JSON.stringify(UI.prefs)); }
+const animF = () => { try { return Math.max(.3, GX.animMs(1000) / 1000 || 1); } catch (e) { return 1; } };
+const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35) * animF())) : Promise.resolve();
 // ===================== part 2: rendering (table, belt, dock) =====================
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) UI.focus = v; return UI.focus || 0; }
@@ -5429,8 +6051,17 @@ function renderTable() {
     const av = Math.max(34, Math.min(isMe ? 60 : 52, Math.round(rowH * .46)));
     const cmp = rowH < 88, shw = av + 14, sl = Math.max(30, Math.min(58, Math.round((rowH - (cmp ? 12 : 36)) / 1.4)));
     const ctrW = cw - shw - sl - 25;
-    let pd = Math.min(rowH - (isMe ? 34 : 32), ctrW / (isMe ? 7.2 : 5.6) - 6, isMe ? 84 : 68); pd = Math.max(24, Math.round(pd));
-    const dm = { av, shw, sl, pd, cmp };
+    let pd = Math.min(rowH - (isMe ? 34 : 32), ctrW / (isMe ? 7.2 : 5.6) - 6, isMe ? 84 : 68), wrap = false;
+    if (L.ph) {
+      // phones: size the plates by how many groups this counter really holds, and use two rows before plates get tiny
+      const ng = groupsOf(s, tab, info).list.length + 1, cap = isMe ? 84 : 68;
+      const fit = rows => Math.min(Math.floor((ctrW - 12) / Math.ceil(ng / rows)) - 18, Math.floor((rowH - 8) / rows) - 21);
+      const one = Math.min(rowH - (isMe ? 34 : 32), fit(1)), two = fit(2);
+      if (one < 34 && two > one) { pd = two; wrap = true; } else pd = one;
+      pd = Math.min(cap, pd);
+    }
+    pd = Math.max(24, Math.round(pd));
+    const dm = { av, shw, sl, pd, cmp, wrap };
     const sg = seatSig(s, tab, info, pcs, isMe, dm) + '|' + sigAll;
     const old = oldSeats[s];
     if (old && old.dataset.sg === sg) { els.push(old); continue; }
@@ -5445,7 +6076,7 @@ function renderTable() {
 function seatSig(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots, sl = fz ? JSON.stringify(fz[s]) : (G.phase === 'pick' ? (p.picked ? 'p' : 'w') : 'x');
   const lnd = UI.land ? [...UI.land].filter(x => x.startsWith(s + '|')).join(',') : '';
-  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs[s], sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' : '', G.phase].join('|');
+  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs[s], sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, dm.wrap ? 1 : 0, p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' : '', G.phase].join('|');
 }
 function seatEl(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], col = pcol(s), picking = G.phase === 'pick' && !p.picked && !UI.fz;
@@ -5454,12 +6085,12 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
   el.style.setProperty('--pd', dm.pd + 'px'); el.style.setProperty('--shw', dm.shw + 'px'); el.style.setProperty('--av', dm.av + 'px'); el.style.setProperty('--sl', dm.sl + 'px'); el.style.setProperty('--ctr', counterURL(s));
   const av = h('div.av' + (picking ? '.act' : '')); av.appendChild(avN(s, 96));
   av.appendChild(h('span.sc', String(total)));
-  const sh = h('button.sh', { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer ' + p.ai + ')' : '') + ': ' + total + ' points. Open details.' }, av, h('span.nm', p.name));
+  const sh = h('button.sh', { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer ' + p.ai + ')' : '') + ': ' + total + ' points. Open details.' }, av, h('span.nm', h('i.gx-cbm', GX.mark(chefOf(s)) + ' '), p.name));
   el.appendChild(sh);
-  const ctr = h('div.ctr');
+  const ctr = h('div.ctr' + (dm.wrap ? '.wrap' : ''));
   const land = UI.land || new Set();
   for (const g of gs.list) ctr.appendChild(grpEl(g, dm.pd, land.has(s + '|' + g.k)));
-  ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));
+  ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud'), isPh() && dm.pd < 44));
   if (!gs.list.length && !pcs[s]) ctr.insertBefore(h('span.none', G.phase === 'pick' ? 'Nothing served yet' : ''), ctr.firstChild);
   el.appendChild(ctr);
   el.appendChild(slotEl(s, dm.sl, dm.cmp));
@@ -5475,11 +6106,11 @@ function grpEl(g, pd, landing) {
   b.appendChild(h('span.hn', g.hint));
   return b;
 }
-function shelfEl(s, n, pd, landing) {
+function shelfEl(s, n, pd, landing, short) {
   const tip = n + ' Custard Cup' + (n === 1 ? '' : 's') + ' kept for the end of the game (most scores 6, fewest loses 6; no penalty with 2 players).';
   const b = h('button.grp.shelf' + (landing ? '.land' : ''), { type: 'button', 'data-a': 'grp', 'data-seat': s, 'data-k': 'pud', 'data-type': 'pudding', 'data-n': n, 'data-pts': 0, 'aria-label': tip, title: tip });
   const pl = h('div.pl'); pl.appendChild(plateN('pudding', pd)); if (!n) pl.style.opacity = '.45';
-  b.appendChild(pl); b.appendChild(h('span.bg', String(n))); b.appendChild(h('span.hn', 'custard'));
+  b.appendChild(pl); b.appendChild(h('span.bg', String(n))); b.appendChild(h('span.hn', short ? 'kept' : 'custard'));
   return b;
 }
 function slotEl(s, sl, cmp) {
@@ -5498,7 +6129,7 @@ function slotEl(s, sl, cmp) {
     return wrap;
   }
   if (UI.fz) { box.className = 'sbox'; }
-  else if (G.phase === 'pick' && p.picked) { cover(); if (!cmp) wrap.appendChild(h('span.st.rd', 'ready')); }
+  else if (G.phase === 'pick' && (p.picked || (UI.hold && UI.hold.seat === s))) { cover(); if (!cmp) wrap.appendChild(h('span.st.rd', 'ready')); }
   else if (G.phase === 'pick') { box.className = 'sbox empty' + (s === viewSeat() ? ' mine' : ''); box.textContent = '…'; box.setAttribute('aria-label', p.name + ' is choosing'); }
   else box.className = 'sbox';
   return wrap;
@@ -5521,15 +6152,16 @@ function renderBelt() {
   const frag = [], oldC = new Map(); for (const c of belt.children) if (c.dataset && c.dataset.rk) oldC.set(c.dataset.rk, c);
   const hp = v >= 0 ? G.players[v] : null, can = canPick();
   const rec = UI.rec && !UI.noRec ? UI.rec.ids : [];
-  const enter = UI.enter;
+  const enter = UI.enter, tt = can ? tutTarget() : -1;
   hand.forEach((id, k) => {
     if (id < 0) { const key = 'b' + k, sg = 'b' + hw; const o = oldC.get(key); if (o && o.dataset.sg === sg && !enter) { frag.push(o); return; } const b = h('div.hc.back', { 'data-up': '0', 'aria-hidden': 'true' }); b.style.setProperty('--k', k); b.appendChild(backN(hw)); if (enter) b.classList.add('ent-' + enter); b.dataset.rk = key; b.dataset.sg = sg; frag.push(b); return; }
     const idx = hp && !UI.fz ? hp.hand.indexOf(id) : -1;
     const ty = tkey(id), selPos = UI.sel.indexOf(idx);
     const g = UI.prefs.hint && can ? gainOf(v, [id]) : null;
-    const key = 'c' + id, sg = [id, idx, selPos, rec.indexOf(id) >= 0 ? 1 : 0, can ? 1 : 0, g, UI.twin ? 1 : 0, hw, UI.prefs.tap2 ? 1 : 0].join('|');
+    const tu = tt < 0 ? '' : idx === tt ? '.tut' : '.tutno';
+    const key = 'c' + id, sg = [id, idx, selPos, rec.indexOf(id) >= 0 ? 1 : 0, can ? 1 : 0, g, UI.twin ? 1 : 0, hw, UI.prefs.tap2 ? 1 : 0, tu].join('|');
     const o = oldC.get(key); if (o && o.dataset.sg === sg && !enter) { frag.push(o); return; }
-    const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked'), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? '. Tap to lift it' + (selPos >= 0 ? (UI.prefs.tap2 ? ', tap again to serve' : ', then press Serve') : '') : '') });
+    const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked') + (selPos >= 0 ? '' : tu), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? '. Tap to lift it' + (selPos >= 0 ? (UI.prefs.tap2 ? ', tap again to serve' : ', then press Serve') : '') : '') });
     b.style.setProperty('--k', k);
     b.appendChild(cardNode(ty, hw));
     if (g != null) b.appendChild(h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : '0'));
@@ -5556,11 +6188,13 @@ function promptText() {
   if (watching()) return 'The computers are choosing a plate…';
   if (hotSeat() && v < 0) return 'Pass the device to the next diner.';
   const pend = KK.pending(G).filter(s => s !== v).map(pname);
+  if (v >= 0 && UI.hold && UI.hold.seat === v) return isPh() ? 'Served. Undo?' : 'Served. Changed your mind? Press Undo.';
   if (v >= 0 && G.players[v].picked) return pend.length ? 'Served. Waiting for ' + (isPh() && pend.length > 2 ? pend.length + ' diners' : nameList(pend)) + '…' : 'Served. Here come the plates…';
   if (v >= 0) {
     const nm = hotSeat() ? pname(v) + ', ' : '';
     if (UI.twin) return nm + 'Twin Sticks: pick two plates, then serve them.';
     if (UI.sel.length) return nm + (UI.prefs.tap2 ? 'Tap it again, or press Serve.' : 'Press Serve to send it to your seat.');
+    if (tutStep()) return 'Take the glowing ' + TY[tutStep().take].name + '.';
     return nm + 'pick a plate: tap it to lift it.';
   }
   return '';
@@ -5584,12 +6218,13 @@ function renderDock() {
       const s = (f + k) % G.np, p = G.players[s], busyFz = !!UI.fz, rdy = G.phase === 'pick' && p.picked && !busyFz, tot = totalOf(s, info);
       const ph = isPh();
       const ch = h('button.chip' + (s === v ? '.me' : '') + (rdy ? '.rd' : G.phase === 'pick' && !busyFz ? '.wt' : ''), { type: 'button', 'data-a': 'chip', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer)' : '') + ': ' + tot + ' points, ' + (G.phase !== 'pick' || busyFz ? '' : rdy ? 'has chosen' : 'is choosing') },
-        (() => { const e = h('span.cav'); e.appendChild(avN(s, 96)); return e; })(), h('span.ct', h('b', p.name + (s === v && p.name !== 'You' ? ' (you)' : '')), h('i', (rdy ? '✓ ' : G.phase === 'pick' && !busyFz ? '… ' : '') + (ph ? tot : tot + ' pts' + (rdy ? ' · ready' : G.phase === 'pick' && !busyFz ? ' · choosing' : '')))));
+        (() => { const e = h('span.cav'); e.appendChild(avN(s, 96)); return e; })(), h('span.ct', h('b', h('i.gx-cbm', GX.mark(chefOf(s)) + ' '), p.name + (s === v && p.name !== 'You' ? ' (you)' : '')), h('i', (rdy ? '✓ ' : G.phase === 'pick' && !busyFz ? '… ' : '') + (ph ? tot : tot + ' pts' + (rdy ? ' · ready' : G.phase === 'pick' && !busyFz ? ' · choosing' : '')))));
       ro.appendChild(ch);
     }
     }
   }
   renderSel(); renderActs(); renderCheat();
+  try { GX.recap.view(viewSeat()); } catch (e) { }
 }
 function renderCheat() {
   const c = $('#cheat'); if (!c || c.firstChild || isPh()) return;
@@ -5614,6 +6249,7 @@ function renderSel() {
   let t;
   if (UI.cards.length && UI.cards[0].kind === 'pass') t = 'The hands are hidden until the device is passed.';
   else if (watching()) t = 'Sit back: the computers play all three rounds. Hands slide to the left every turn.';
+  else if (v >= 0 && UI.hold && UI.hold.seat === v) t = 'Your plate waits under a cover. Undo puts it back on your belt before the covers lift.';
   else if (v >= 0 && G.players[v].picked) t = 'Your plate is on its way to your seat under a cover. Everyone reveals together.';
   else if (v >= 0 && canPick()) t = UI.twin ? 'Tap two plates on the belt, then press Serve.' : 'Tap a plate on your belt to lift it' + (UI.prefs.tap2 ? ', then tap it again to serve it.' : ', then press Serve.');
   else t = 'Revealing the plates…';
@@ -5623,12 +6259,14 @@ function renderActs() {
   const a = $('#acts'); if (!a) return; a.innerHTML = '';
   const v = viewSeat();
   if (!G || G.phase === 'over') return;
+  if (v >= 0 && UI.hold && UI.hold.seat === v) { a.appendChild(h('button.btn.go.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo: take your plate back' }, 'Undo')); return; }
   if (v >= 0 && canPick()) {
     const p = G.players[v], chop = KK._.hasChop(p) && p.hand.length >= 2;
     const n = UI.sel.length;
-    if (n) { const ids = UI.sel.map(i => p.hand[i]); const g = gainOf(v, ids); a.appendChild(h('button.btn.go', { 'data-a': 'serve', type: 'button' }, n === 2 ? 'Serve both' + (g > 0 ? ' (+' + g + ')' : '') : 'Serve' + (g > 0 ? ' (+' + g + ')' : ''))); }
-    if (chop) a.appendChild(h('button.btn' + (UI.twin ? '.on' : '.alt'), { 'data-a': 'twin', type: 'button', 'aria-pressed': UI.twin ? 'true' : 'false' }, UI.twin ? 'Twin Sticks: on' : 'Use Twin Sticks'));
-    a.appendChild(h('button.btn.alt', { 'data-a': 'hint', type: 'button' }, 'Hint'));
+    const tut = !!tutStep();
+    if (n) { const ids = UI.sel.map(i => p.hand[i]); const g = gainOf(v, ids); a.appendChild(h('button.btn.go' + (tut ? '.tut' : ''), { 'data-a': 'serve', type: 'button' }, n === 2 ? 'Serve both' + (g > 0 ? ' (+' + g + ')' : '') : 'Serve' + (g > 0 ? ' (+' + g + ')' : ''))); }
+    if (chop && !tut) a.appendChild(h('button.btn' + (UI.twin ? '.on' : '.alt'), { 'data-a': 'twin', type: 'button', 'aria-pressed': UI.twin ? 'true' : 'false' }, UI.twin ? 'Twin Sticks: on' : 'Use Twin Sticks'));
+    if (!tut) a.appendChild(h('button.btn.alt', { 'data-a': 'hint', type: 'button' }, 'Hint'));
     if (n) a.appendChild(h('button.btn.alt', { 'data-a': 'unsel', type: 'button', 'aria-label': 'Put the plate back' }, 'Cancel'));
   }
 }
@@ -5643,7 +6281,7 @@ function openGroup(seat, k) {
   UI.pop = { kind: 'group', seat, k };
   const pp = $('#ppop'); pp.hidden = false; pp.innerHTML = '';
   const cw = isPh() ? 80 : 120;
-  const body = h('div.ph-body', h('div.cwrap', h('div.cardbox', cardDiv(type, cw, g && g.on)), h('div.cinfo', h('p', tip), h('p.sm', TY[type].ruleText))));
+  const body = h('div.ph-body', h('div.cwrap', h('div.cardbox', cardDiv(type, cw, g && g.on)), h('div.cinfo', h('p', tip), h('p.sm', TY[type].ruleText), h('button.btn.alt.refbig', { 'data-a': 'refbig', 'data-type': g && g.on ? g.on : type, type: 'button' }, 'Read it big'))));
   if (g && g.k === 'roll') { const mk = info.mk; body.appendChild(h('div.kv', h('span', 'Icons per diner'), h('b', G.players.map((q, i) => q.name + ' ' + info.rs[i].icons).join(' · ')))); }
   pp.append(h('div.ph-head', h('div.ph-t', h('b', title), h('span', p.name)), h('button.px', { 'data-a': 'popx', type: 'button', 'aria-label': 'Close' }, '×')), body);
 }
@@ -5669,15 +6307,16 @@ function newGame(mode, o) {
     if (mode === 'hot') { names.push(PN[c]); ai.push(null); }
     else if (mode === 'ai') { names.push(PN[c]); ai.push(lv); }
     else if (i === 0) { names.push('You'); ai.push(null); }
-    else { names.push(PN[c]); ai.push(mode === 'guided' ? 'normal' : lv); }
+    else { names.push(PN[c]); ai.push(mode === 'guided' ? 'easy' : lv); }
   }
   UI.chefs = chefs;
-  clearTimeout(UI.tm); UI.seq++; UI.rq = [];
+  clearTimeout(UI.tm); UI.seq++; UI.rq = []; dropHold(); UI.tut = null;
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
   G = KK.newGame({ players: np, seed, names, ai });
-  Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
+  Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN, resultDone: false, earned: null, t0: Date.now() });
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && UI.coach.keep ? 'full' : 'off'), seen: {}, turn: '', keep: UI.coach.keep };
-  if (mode === 'guided') UI.coach.level = 'full';
+  if (mode === 'guided') { UI.coach.level = 'full'; try { tutDeal(); } catch (e) { console.error(e); UI.tut = null; } }
+  recapSeats();
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
   placePrompt(); render(); sndMusic(); schedule();
@@ -5702,7 +6341,7 @@ function schedule() {
 function aiPick(seat) {
   if (!G || UI.busy || G.phase !== 'pick') return;
   const p = G.players[seat]; if (!p || p.picked || !p.ai) { schedule(); return; }
-  let mv; try { mv = KK.AI.choose(G, seat); } catch (e) { console.error(e); mv = KK.moves(G, seat)[0]; }
+  let mv = tutPartner(seat); if (!mv) try { mv = KK.AI.choose(G, seat); } catch (e) { console.error(e); mv = KK.moves(G, seat)[0]; }
   commit(seat, mv);
 }
 function commit(seat, mv) {
@@ -5732,6 +6371,7 @@ function tapHand(i) {
     if (k >= 0) cur.splice(k, 1); else { if (cur.length >= 2) cur.shift(); cur.push(i); }
     UI.sel = cur; UI.rec = null; render(); return;
   }
+  if (!tutGuard(i)) return;
   if (cur.length === 1 && cur[0] === i && UI.prefs.tap2) { serveSel(); return; }
   UI.sel = [i]; UI.rec = null; snd('click', { vol: .4 }); render();
 }
@@ -5745,7 +6385,9 @@ function serveSel() {
 function doPick(seat, mv) {
   // the lifted plate flies to the seat under a cover
   try { if (ANIM && !pxServe() && document.body.animate) flyPick(); } catch (e) { }
+  try { GX.recap.mark(seat); } catch (e) { }
   if (isClient()) { netAct({ pk: mv.pick.join(',') }); UI.sel = []; UI.twin = false; UI.rec = null; snd('pick'); render(); return; }
+  if (canHold(seat)) { holdServe(seat, mv); return; }
   commit(seat, mv);
 }
 function flyPick() {
@@ -5765,7 +6407,7 @@ function toggleTwin() {
   render();
 }
 function hint() {
-  const v = viewSeat(); if (!canPick()) return;
+  const v = viewSeat(); if (!canPick() || tutStep()) return;
   let mv; try { mv = KK.AI.choose(G, v, 'normal'); } catch (e) { return; }
   if (!mv) return;
   UI.rec = { ids: mv.ids.slice(), pick: mv.pick.slice() };
@@ -5792,7 +6434,7 @@ const keyOfCard = c => { const k = c.key; return ICONS[k] ? 'roll' : NIG[k] ? (c
 function drainQ() { if (UI.rq.length && !UI.busy) { const q = UI.rq.shift(); playResolve(q[0], q[1]); } }
 async function playResolve(evs, preHand) {
   if (UI.busy) { UI.rq.push([evs, preHand]); return; }
-  const tok = UI.seq; UI.busy = true; closePop();
+  const tok = UI.seq; UI.busy = true; closePop(); recapReveal(evs);
   const rv = evs.find(e => e.t === 'reveal'), ps = evs.find(e => e.t === 'pass'), sc = evs.find(e => e.t === 'score'), ge = evs.find(e => e.t === 'gameEnd');
   const v = viewSeat(), np = G.np, block = !NET.on;
   try {
@@ -5859,7 +6501,7 @@ function hasSave() { return !!lsGet('kk_save'); }
 function saveInfo() { try { const o = JSON.parse(lsGet('kk_save')); if (o && o.sv === SAVE_V && o.G && o.G.phase !== 'over') return { round: o.G.round, np: o.G.np, mode: o.mode }; } catch (e) { } return null; }
 function save() {
   if (NET.on || !G || !UI.started || G.phase === 'over') return false;
-  try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
+  try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach, tut: UI.tut || null, t0: UI.t0 || 0 })); GNS.saved(GAME_ID, true); return true; } catch (e) { return false; }
 }
 // autosave: after every resolved turn (schedule runs after each one) and when the page is hidden or closed (iPhone app switch)
 function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
@@ -5867,12 +6509,13 @@ function flushSave() { UI.svk = ''; autoSave(); }
 function loadSave() {
   if (NET.on) return false;
   let o; try { o = JSON.parse(lsGet('kk_save')); } catch (e) { return false; }
-  if (o && o.G && o.sv !== SAVE_V) { lsSet('kk_save', ''); toast('That saved meal is from an older version of the game, so it could not be resumed.'); if (!G) renderStart(); return 'old'; }
+  if (o && o.G && o.sv !== SAVE_V) { lsSet('kk_save', ''); try { GNS.saved(GAME_ID, false); } catch (e) { } toast('That saved meal is from an older version of the game, so it could not be resumed.'); if (!G) renderStart(); return 'old'; }
   if (!o || !o.G || !Array.isArray(o.G.players) || o.G.v !== 1) return false;
-  clearTimeout(UI.tm); UI.seq++;
+  clearTimeout(UI.tm); UI.seq++; dropHold();
   G = o.G; try { if (KK.checkInvariants(G).length) { G = null; return false; } } catch (e) { return false; }
-  Object.assign(UI, { started: true, mode: o.mode || 'vs', cfg: o.cfg || null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, enter: 'deal', focus: 0, evN: G.evN, over: null });
+  Object.assign(UI, { started: true, mode: o.mode || 'vs', cfg: o.cfg || null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, enter: 'deal', focus: 0, evN: G.evN, over: null, resultDone: false, earned: null, t0: o.t0 || Date.now(), tut: o.tut && o.tut.on ? { on: true, step: -1 } : null });
   if (o.coach) UI.coach = o.coach;
+  recapSeats();
   UI.chefs = Array.isArray(o.chefs) && o.chefs.length === G.np ? o.chefs : null;
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
@@ -5914,6 +6557,7 @@ function coachTip(key, title, text, type) {
   pushCard({ kind: 'coach', title, sub: 'Tip', body, buttons: [{ label: 'Got it', a: 'cont' }] });
 }
 function coachCheck() {
+  if (UI.tut && UI.tut.on && G && G.phase === 'pick') return tutCheck();
   const lv = UI.coach.level; if (lv === 'off' || !G || G.phase !== 'pick') return false;
   const v = viewSeat(); if (v < 0 || !canPick() || UI.cards.length) return false;
   const turn = G.round + '.' + G.turn; if (UI.coach.turn === turn) return false;
@@ -5997,12 +6641,14 @@ function skipCount() { if (UI.rsInfo) { UI.rsInfo.skip = true; } }
 function showFinal() {
   const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false; rs.innerHTML = '';
   const F = G.final, np = G.np;
+  try { kitResult(); } catch (e) { }
   const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Final result' });
   const ws = G.winners || [];
   const me = viewSeat(), iWin = me >= 0 && ws.includes(me);
   box.appendChild(h('h2', h('span', { html: KIT.iconSVG('crown', { size: 32 }) }), 'The meal is over'));
   const wn = h('div.win', h('span', { html: avatarS(ws[0] != null ? ws[0] : 0, 96) }), h('div', G.winText));
   box.appendChild(wn);
+  { const ea = earnedEl(); if (ea) box.appendChild(ea); }
   // custard resolved
   const tb = h('table.cat'); const hr = h('tr', h('th', ''));
   for (let s = 0; s < np; s++) { const th = h('th'); th.appendChild(h('div', { html: avatarS(s, 64) })); th.appendChild(h('span.sub', pname(s))); hr.appendChild(th); }
@@ -6023,7 +6669,7 @@ function showFinal() {
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
   if (humanWin) { snd('win', { duck: true }); celebrate(box); } else { snd('round', { duck: true }); if (humans().length || NET.on) wn.after(h('p.wp', 'Well played! Another meal?')); }
   UI.overShown = true;
-  if (UI.mode !== 'net') lsSet('kk_save', '');
+  if (UI.mode !== 'net') { lsSet('kk_save', ''); try { GNS.saved(GAME_ID, false); } catch (e) { } }
 }
 function celebrate(box) {
   if (!ANIM) return; const c = h('div.conf'); const cols = ['#e5553a', '#e0a31c', '#2a97a0', '#7a5ac8', '#5aa83c', '#f4b6d2'];
@@ -6094,22 +6740,6 @@ function renderDrawers() {
   if (!GX.open || !G) return;
   if (GX.open === 'logd') { const b = $('#logbody'); b.innerHTML = ''; b.appendChild(logHTML()); }
   if (GX.open === 'rivald') renderRival();
-  if (GX.open === 'setd') renderMenu();
-}
-function renderMenu() {
-  const b = $('#setbody'); b.innerHTML = '';
-  const row = (l, ...k) => b.appendChild(h('div.mrow', h('div.lbl', l), h('div.mbt', k)));
-  const tog = (name, on, label) => h('button.btn' + (on ? '' : '.alt'), { 'data-a': name, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, label + ': ' + (on ? 'On' : 'Off'));
-  if (NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
-  else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
-  if (!NET.on) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
-  if (!NET.on) row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
-  row('Help on the belt', tog('hints', UI.prefs.hint, 'Show +N scores'), tog('tap2', UI.prefs.tap2, 'Tap twice to serve'));
-  row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
-  { const g = gfxPref(); row('Graphics' + (PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
-  let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
-  row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('span.tinyc', { html: sp }));
-  b.appendChild(h('p.sm', 'Kaiten Kitchen is an original conveyor-belt card game. Names, card text and art are original; the audio credits are in How to play.'));
 }
 // ---------- start screens: painted title -> setup (diner cards) / online ----------
 // the four chefs who can join you (you are seat 0 with Mina's portrait). Default level = the character's temper; every level can be changed.
@@ -6168,10 +6798,14 @@ function setupEl() {
     h('div.dgrid', [1, 2, 3, 4].map(c => dinerCard(c, o))),
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
   const n = o.np - 1;
+  // until one guided game is finished, the lesson is the big button and "Start the meal" moves into the row below
+  const first = !lsGet('kk_guided_done');
+  const meal = cls => h('button.sbtn' + cls, { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
+  const lesson = cls => h('button.sbtn' + cls, { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', first ? 'Learn as you play' : 'Guided first game'), h('span', first ? 'A short lesson with ' + PN[o.seats[0]] + ', then a full meal' : 'You and ' + PN[o.seats[0]] + ', with a lesson'));
   const go = h('div.sgo',
-    h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c])))),
+    first ? lesson('.big') : meal('.big'),
     h('div.sgrid3',
-      h('button.sbtn', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and ' + PN[o.seats[0]] + ', with tips')),
+      first ? meal('') : lesson(''),
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', o.np + ' people, one device')),
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch'), h('span', 'the chefs play'))));
   return h('div.setup.scard', head, ph ? sum : h('p.ssub', 'Invite the chefs you want at the belt. Each one has a temper; change their level if you like.'), cfg, go);
@@ -6211,21 +6845,14 @@ document.addEventListener('click', ev => {
     case 'cfgopen': UI.cfgOpen = true; renderStart(); try { const c = $('#cfg'); if (c) c.querySelector('button').focus({ preventScroll: true }); } catch (e) { } break;
     case 'cfgclose': UI.cfgOpen = false; renderStart(); break;
     case 'seatchef': toggleChef(+d.c); renderStart(); break;
-    case 'gfx': setGfx(d.v); renderMenu(); break;
     case 'menu': showStart(); break;
     case 'start': newGame(d.m); break;
     case 'guided': newGame('guided'); break;
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else { o[d.k] = isNaN(+d.v) ? d.v : +d.v; if (d.k === 'level') o.lv = [d.v, d.v, d.v, d.v]; } renderStart(); break; }
     case 'lv': { const o = optObj(); o.lv = (o.lv || DEF.lv).slice(); o.lv[+d.seat - 1] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
-    case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); break;
+    case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); try { GX.renderSettings(); } catch (e) { } break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
-    case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
-    case 'guide': UI.coach.level = d.v; UI.coach.keep = d.v === 'full'; renderMenu(); break;
-    case 'hints': UI.prefs.hint = !UI.prefs.hint; savePrefs(); renderMenu(); if (G) render(); break;
-    case 'tap2': UI.prefs.tap2 = !UI.prefs.tap2; savePrefs(); renderMenu(); if (G) render(); break;
-    case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
-    case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
   }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop) closePop(); else if (UI.rsOpen && UI.mode && G && G.phase === 'over' && UI.overShown) closeRS(); } });
@@ -6248,14 +6875,13 @@ function boot() {
   GX.drawer('rulesd', 'How to play', buildRules(), true);
   GX.drawer('logd', 'Log', h('div#logbody'));
   GX.drawer('rivald', 'Diners and scores', h('div#rivalbody'));
-  GX.drawer('setd', 'Menu', h('div#setbody'));
   GX.onShow = id => { renderDrawers(); };
-  loadPrefs(); applyPhone();
+  loadPrefs(); kitBoot(); applyPhone();
   addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
   addEventListener('pagehide', () => { try { flushSave(); } catch (e) { } });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') try { flushSave(); } catch (e) { } });
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { clearTimeout(rzT); rzT = setTimeout(() => { if (G && UI.started) render(); }, 40); } }).observe(bd);
-  try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'kk' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); } } catch (e) { }
+  try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'kk' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); GX.applyPrefs(); } } catch (e) { }
   pxPerfReg();
   pxInit().then(ok => { if (ok) { pxPerfReg(); if (G && UI.started) render(); } });
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
@@ -6709,7 +7335,7 @@ function pxPerfReg() {
     const shim = PX.on ? { getPixelRatio: () => PX.res, setPixelRatio: v => pxSetRes(v), get domElement() { return PX.cv; }, getContext: () => PX.app && PX.app.renderer && PX.app.renderer.gl || null } : null;
     PerfHUD.register({ game: 'Kaiten Kitchen', anchor: '.gx-board', corner: 'tl', renderer: shim, levels: ['high', 'medium', 'low'],
       getLevel: () => PX.q, isAuto: () => gfxPref() === 'auto',
-      setLevel: (l, why) => { if (why === 'apply') setGfx(l); else { PX.autoQ = l; pxApplyQ(); } try { if (GX.open === 'setd') renderMenu(); } catch (e) { } },
+      setLevel: (l, why) => { if (why === 'apply') setGfx(l); else { PX.autoQ = l; pxApplyQ(); } try { if (GX.open === 'setd') GX.renderSettings(); } catch (e) { } },
       basePR: () => { const d = window.devicePixelRatio || 1; return Math.min((PXQ[PX.q] || PXQ.high).pr, d); }, onPixelRatio: v => pxSetRes(v),
       isAnimating: () => !!UI.busy || !!PX.tweens.length || !!PX.parts.length, idleMode: PX.on ? 'throttle' : 'demand', idleFps: 10 });
   } catch (e) { }
@@ -6719,6 +7345,173 @@ function pxPainted() { try { const c = PX.app.renderer.extract.canvas({ target: 
 // test hook: where every sprite is and whether anything still moves (px-test.js)
 PX.state = () => ({ nServe: PX.nServe || 0, nLand: PX.nLand || 0, on: PX.on, kind: PX.kind, q: PX.q, res: PX.res, tweens: PX.tweens.length, parts: PX.parts.length, moving: pxMoving(), frames: PX.frames || 0, err: PX.err, blur: !!(PX.L.fx && PX.L.fx.filters && PX.L.fx.filters.length), canvasOK: pxPainted(),
   objs: [...PX.objs.values()].filter(o => !o.detached).map(o => ({ key: o.key, kind: o.kind, type: o.type || null, x: o.x, y: o.y, w: o.kind === 'plate' ? o.w : o.w, tx: o.tx, ty: o.ty, tw: o.kind === 'plate' ? o.d : o.tw, layers: o.layers || 0, shown: o.kind === 'plate' ? o.sp.filter(s => s.visible).length : 1, back: !!o.back, face: o.kind === 'card' ? (o.sp.texture === o.face && !!o.face) : null, alpha: o.c.alpha, vis: o.vis })) });
+// ===================== part 8: shared GX kit (settings, reference, undo window, recap, results, offline) + the guided lesson =====================
+const GAME_ID = 'kaiten';
+// ---- achievements (stored by the shelf; shown in Stats & achievements on the home page)
+const ACH = [
+  { id: 'first', name: 'First meal', how: 'Finish a meal.', test: r => true },
+  { id: 'guide', name: 'Belt trained', how: 'Finish the guided first game.', test: r => r.mode === 'guided' },
+  { id: 'win', name: 'Clean plate', how: 'Beat the computer chefs.', test: r => r.won && (r.mode === 'vs' || r.mode === 'guided') },
+  { id: 'hard', name: 'Night-shift champion', how: 'Win a 4- or 5-diner meal with a hard chef at the table.', test: (r, s, x) => r.won && r.mode === 'vs' && r.np >= 4 && x.extra && x.extra.hard },
+  { id: 'fifty', name: 'Full belly', how: 'Score 50 points or more.', test: r => r.score >= 50 },
+  { id: 'ladder', name: 'Bun tower', how: 'Stack five Steam Buns in one round (15 points).', test: (r, s, x) => x.extra && x.extra.buns15 },
+  { id: 'paste', name: 'Fire breather', how: 'Score 10 or more Fire Paste bonus points in one meal.', test: (r, s, x) => x.extra && x.extra.paste >= 10 },
+  { id: 'custard', name: 'Sweet tooth', how: 'End a meal with the most Custard Cups on your own (3 or more diners).', test: (r, s, x) => x.extra && x.extra.custardTop && r.np >= 3 },
+  { id: 'rounds', name: 'Top of every round', how: 'Score the most points in all three rounds of a meal.', test: (r, s, x) => x.extra && x.extra.roundsTop === 3 },
+  { id: 'hot', name: 'Pass the plate', how: 'Finish a hot-seat meal.', test: r => r.mode === 'hot' }
+];
+// ---- settings: the same sections as every game; Kaiten adds its own rows
+const HOLD = { off: 0, short: 1200, long: 2600 };
+function kitSettings() {
+  GX.settings({
+    id: 'setd', title: 'Menu',
+    game: S => {
+      if (NET.on) S.appendChild(GX.row('Online', [h('button.gx-sb', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.gx-sb', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room')]));
+      else S.appendChild(GX.row('This game', [h('button.gx-sb', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.gx-sb', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.gx-sb', { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load')]));
+      if (!isClient()) S.appendChild(GX.row('Take back a plate', GX.seg([['off', 'Off'], ['short', 'Short'], ['long', 'Long']], UI.prefs.undo || 'short', v => { UI.prefs.undo = v; savePrefs(); }, 'Take-back window'), 'After you serve, a moment to press Undo before the covers lift'));
+      S.appendChild(GX.row('Serving', GX.onoff(!!UI.prefs.tap2, v => { UI.prefs.tap2 = v; savePrefs(); if (G) render(); }, 'Tap twice to serve'), 'Tap a lifted plate again to serve it (otherwise press Serve)'));
+    },
+    sound: S => {
+      S.appendChild(GX.row('Sound effects', GX.onoff(UI.prefs.sound !== false, v => { UI.prefs.sound = v; savePrefs(); try { if (window.GA) GA.setSfx(v); } catch (e) { } }, 'Sound effects')));
+      S.appendChild(GX.row('Music', GX.onoff(UI.prefs.music !== false, v => { UI.prefs.music = v; savePrefs(); try { if (window.GA) GA.setMusic(v); } catch (e) { } sndMusic(); }, 'Music')));
+    },
+    help: S => {
+      S.appendChild(GX.row('Read', [h('button.gx-sb', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.gx-sb', { 'data-a': 'refopen', type: 'button' }, 'Plates')]));
+      if (!NET.on) S.appendChild(GX.row('Guide', GX.seg([['full', 'Full'], ['light', 'Light'], ['off', 'Off']], UI.coach.level, v => { UI.coach.level = v; UI.coach.keep = v === 'full'; }, 'Guide level'), 'Tips that appear one at a time'));
+      S.appendChild(GX.row('Show +N', GX.onoff(!!UI.prefs.hint, v => { UI.prefs.hint = v; savePrefs(); if (G) render(); }, 'Show +N scores'), 'What each plate on your belt scores right now'));
+    },
+    graphics: S => {
+      const g = gfxPref();
+      S.appendChild(GX.row('Graphics', GX.seg([['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']], g, v => { setGfx(v); }, 'Graphics level'), PX.on ? (g === 'auto' ? 'Now ' + PX.q : '') : 'Simple view (this browser has no painted table)'));
+    },
+    about: { name: 'Kaiten Kitchen', version: 'preview', text: 'An original conveyor-belt card game. Names, card text and paintings are our own. Music and sounds are CC0 recordings (Pro Sensory, LEGIT Audio and Kenney on OpenGameArt and kenney.nl). Online play uses Trystero (MIT); the painted table uses PixiJS (MIT).' }
+  });
+}
+// ---- component reference
+function refPic(it, big) { const p = it.pic; if (!p || !p.type) return null; return cardDiv(p.type, big ? 170 : 44, p.on); }
+function refInGame(it) {
+  if (!G || !it.pic || !it.pic.type || !/^p-/.test(it.id)) return true;
+  const t = it.pic.type, has = id => tkey(id) === t, v = viewSeat();
+  return G.players.some(p => p.table.some(e => has(e.id)) || p.pud.some(has)) || (v >= 0 && G.players[v].hand.some(has));
+}
+function kitReference() { GX.reference(KK.refSections(D), { title: 'Plates & scoring', label: 'Plates', picture: refPic, inGame: refInGame, before: '[data-gx="rulesd"]' }); }
+// ---- undo: the rules let you change your mind until every diner has chosen. Kaiten resolves the turn the moment the last plate
+// is served, so a local serve is held for a short take-back window (Menu → Take back a plate) before it is committed.
+function holdMs() { const k = UI.prefs.undo || 'short'; return HOLD[k] ? Math.max(600, GX.aiDelay(HOLD[k])) : 0; }
+function canHold(seat) { return !isClient() && holdMs() > 0 && !(UI.tut && UI.tut.on); }
+function holdServe(seat, mv) {
+  clearTimeout(UI.holdT); UI.hold = { seat, mv, sel: UI.sel.slice(), twin: UI.twin, round: G.round, turn: G.turn };
+  UI.sel = []; UI.twin = false; UI.rec = null; snd('pick'); render();
+  const tok = UI.seq; UI.holdT = setTimeout(() => { if (tok === UI.seq) commitHold(); }, holdMs());
+}
+function commitHold() {
+  const H = UI.hold; clearTimeout(UI.holdT); UI.hold = null; if (!H || !G || G.round !== H.round || G.turn !== H.turn) { if (G) render(); return; }
+  commit(H.seat, H.mv);
+}
+function undoHold() {
+  const H = UI.hold; if (!H) return false; clearTimeout(UI.holdT); UI.hold = null;
+  UI.sel = H.sel; UI.twin = H.twin; snd('click'); render(); toast('Plate back on your belt.'); return true;
+}
+function dropHold() { clearTimeout(UI.holdT); UI.hold = null; }
+// ---- "since your last turn" strip in the dock
+function kitRecap() { GX.recap.attach('#dockbody', { before: true, title: 'Since your pick' }); }
+function recapSeats() { GX.recap.clear(); const hs = NET.on ? [NET.mySeat] : humans(); GX.recap.seats(hs.length ? hs : [0]); }
+function recapReveal(evs) {
+  try {
+    const rv = evs.find(e => e.t === 'reveal'), sc = evs.find(e => e.t === 'score');
+    if (rv) rv.picks.forEach(p => GX.recap.push(pname(p.seat) + (G.players[p.seat] && G.players[p.seat].name === 'You' ? ' took ' : ' took ') + p.cards.map(c => TY[c.key].name + (c.w >= 0 ? ' on Fire Paste' : '')).join(' and ') + '.', p.seat));
+    if (sc) GX.recap.push('Round ' + sc.round + ' scored: ' + sc.seats.map(s => pname(s.seat) + ' +' + s.total).join(', ') + '.', -1);
+  } catch (e) { }
+}
+// ---- results, statistics, achievements
+function kitResult() {
+  if (!G || G.phase !== 'over' || UI.resultDone) return; UI.resultDone = true;
+  if (UI.mode === 'ai' || (!NET.on && !humans().length)) return; // watching the chefs: not your meal
+  const hs = humans(), me = NET.on ? NET.mySeat : UI.mode === 'hot' ? -1 : (hs.length ? hs[0] : -1);
+  const F = G.final, seats = G.players.map((p, i) => ({ name: p.name, ai: p.ai || null, me: i === me }));
+  const winner = G.winners && G.winners.length > 1 ? G.winners.slice() : G.winner;
+  let extra = null;
+  if (me >= 0) {
+    const mx = Math.max(...F.pudding);
+    extra = { buns15: G.rs.some(r => r[me].dumpling >= 15), paste: G.rs.reduce((a, r) => a + (r[me].wasabi || 0), 0),
+      custardTop: F.pudding[me] === mx && F.pudding.filter(x => x === mx).length === 1,
+      roundsTop: G.rs.filter(r => r[me].total === Math.max(...r.map(x => x.total))).length, hard: G.players.some(p => p.ai === 'hard') };
+  }
+  const mode = UI.mode === 'net' ? 'online' : UI.mode;
+  try {
+    const r = GNS.result({ game: GAME_ID, mode, seats, winner, scores: F.totals.slice(), turns: G.round * 100 + G.turn, ms: UI.t0 ? Date.now() - UI.t0 : 0, level: UI.cfg && UI.cfg.level, extra });
+    if (r && r.earned.length) { UI.earned = r.earned.map(a => a.name); GX.buzz([30, 60, 30]); }
+  } catch (e) { }
+  if (UI.mode === 'guided') lsSet('kk_guided_done', '1');
+}
+function earnedEl() { return UI.earned && UI.earned.length ? h('div.earned', h('b', 'New achievement' + (UI.earned.length > 1 ? 's' : '') + ': '), UI.earned.join(' · ')) : null; }
+// ---- the guided first game: a scripted opening (fixed deal, one idea per step, a "why", one glowing plate), then free play
+// Seat 1 (the partner chef) follows its own short script so the plates the lesson needs come back round.
+const TUT_A = ['tempura', 'tempura', 'squid', 'dumpling', 'dumpling', 'roll1', 'egg', 'salmon', 'sashimi', 'roll2'];
+const TUT_B = ['sashimi', 'sashimi', 'wasabi', 'roll3', 'pudding', 'pudding', 'chop', 'salmon', 'dumpling', 'egg'];
+const TUT_PARTNER = ['sashimi', 'dumpling', 'salmon', 'roll2', 'pudding', 'sashimi'];
+const TUT = [
+  { take: 'tempura', title: 'Step 1 of 6 · Start a pair', why: 'Crispy Prawns score 5 for every pair, and a lone one scores nothing. There are two prawns on this belt: take one now, and with only two diners this hand comes back to you, so you can finish the pair later.' },
+  { take: 'wasabi', title: 'Step 2 of 6 · The hands swapped', why: 'You are now holding the plates that were in front of {P}. Take the Fire Paste: the next nigiri you serve lands on it and scores triple.' },
+  { take: 'squid', title: 'Step 3 of 6 · Use the paste', why: 'Your first belt is back. The Moon Nigiri is worth 3 points, but on your waiting Fire Paste it scores 9. Look for the +9 on the plate.' },
+  { take: 'roll3', title: 'Step 4 of 6 · The roll race', why: 'At the end of the round, the most roll icons on a counter scores 6 and the second most 3. This roll has three icons, the most a single plate can have.' },
+  { take: 'tempura', title: 'Step 5 of 6 · Finish the pair', why: 'The second Crispy Prawn came back round, as promised. Two prawns make a pair: +5 right away.' },
+  { take: 'pudding', title: 'Step 6 of 6 · Think ahead', why: 'Custard Cups score nothing now, but they stay on your counter for all three rounds. At the end the most custard scores 6 (with more diners, the fewest also loses 6).' }
+];
+function tutDeal() {
+  // rebuild the two first hands from the shuffled deck; every card stays where the invariants expect it (108 cards, no copies)
+  const pool = G.deck.concat(G.players[0].hand, G.players[1].hand), take = t => { const i = pool.findIndex(id => tkey(id) === t); return pool.splice(i, 1)[0]; };
+  const A = TUT_A.map(take), B = TUT_B.map(take);
+  G.players[0].hand = A; G.players[1].hand = B; G.deck = pool;
+  G.players.forEach(p => { p.mem = [{ turn: 1, hand: p.hand.slice().sort((a, b) => a - b) }]; });
+  UI.tut = { on: true, step: -1 };
+  Object.assign(UI.coach.seen, { welcome: 1, pick: 1, tempura: 1, wasabi: 1, squid: 1, roll3: 1, roll2: 1, roll1: 1, pudding: 1, pasteReady: 1 });
+}
+function tutStep() { return UI.tut && UI.tut.on && G && G.round === 1 && G.turn <= TUT.length ? TUT[G.turn - 1] : null; }
+function tutTarget() { const s = tutStep(), v = viewSeat(); if (!s || v < 0) return -1; return G.players[v].hand.findIndex(id => tkey(id) === s.take); }
+function tutPartner(seat) {
+  if (!UI.tut || !UI.tut.on || seat !== 1 || G.round !== 1 || G.turn > TUT_PARTNER.length) return null;
+  const t = TUT_PARTNER[G.turn - 1]; return KK.moves(G, seat).find(m => m.ids.length === 1 && tkey(m.ids[0]) === t) || null;
+}
+// called from coachCheck: the lesson card for this turn (once per turn), then the hand-over card after the last step
+function tutCheck() {
+  if (!UI.tut || !UI.tut.on) return false;
+  const v = viewSeat(); if (v < 0 || !canPick() || UI.cards.length) return false;
+  if (G.round > 1 || G.turn > TUT.length) {
+    UI.tut.on = false; UI.coach.turn = G.round + '.' + G.turn;
+    pushCard({ kind: 'coach', title: 'Your turn to choose', sub: 'Lesson done', body: h('div', h('p', 'From now on every plate is your choice. The green +N on a plate is what it scores you right now; Hint suggests a pick and says why.'), h('p.sm', 'New plates still get a short tip the first time you see them. Plates (top bar) lists every plate and how it scores.')), buttons: [{ label: 'Play on', a: 'cont', cls: 'go' }] });
+    return true;
+  }
+  const turn = G.round + '.' + G.turn; if (UI.tut.seen === turn) return false; UI.tut.seen = turn; UI.coach.turn = turn;
+  const s = tutStep(); if (!s) return false;
+  const cw = isPh() ? 52 : 96, why = s.why.replace('{P}', pname(1));
+  const body = h('div.cwrap', h('div.cardbox', cardDiv(s.take, cw)), h('div.cinfo', h('p', h('b', 'Take the ' + TY[s.take].name + '.')), h('p', h('i', 'Why: '), why)));
+  const intro = G.turn === 1 ? h('p.sm.tutintro', 'You and ' + pname(1) + ' each pick one plate at the same time; then the covers lift and the hands swap. Highest score after three rounds wins.') : null;
+  pushCard({ kind: 'coach', title: s.title, sub: 'Lesson', body: intro ? h('div', intro, body) : body, buttons: [{ label: 'Show me', a: 'cont', cls: 'go' }] });
+  return true;
+}
+function tutGuard(i) {
+  const s = tutStep(); if (!s) return true; const v = viewSeat(); const id = G.players[v].hand[i];
+  if (id != null && tkey(id) === s.take) return true;
+  snd('error'); toast('In this step, take the glowing ' + TY[s.take].name + '.'); return false;
+}
+// ---- boot (called from boot() in part 5)
+function kitBoot() {
+  kitSettings(); kitReference(); kitRecap();
+  GNS.achievements(GAME_ID, ACH);
+  const sync = () => { AIDELAY = GX.aiDelay(650); ANIM = GX.pref('anim') === 'off' || GX.reduced() ? 0 : 1; };
+  sync();
+  GX.onPref(k => { if (k === 'ai' || k === 'anim' || k === 'reduce' || typeof k === 'object') sync(); if (k === 'cb' && G && UI.started) render(); });
+  GX.offline({ sw: '../sw.js', scope: '../' });
+}
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-a]'); if (!t) return;
+  const a = t.dataset.a;
+  if (a === 'undo') undoHold();
+  else if (a === 'refopen') { GX.close(); GX.show('gx-refd'); }
+  else if (a === 'refbig') { const ty = t.dataset.type; closePop(); GX.refOpen('p-' + ty); }
+});
+document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !GX.open && UI.hold) { e.preventDefault(); undoHold(); } });
 
 </script>
 </body>

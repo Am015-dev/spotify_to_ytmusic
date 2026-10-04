@@ -108,6 +108,7 @@ function run(cf, seed) {
               return;
             }
             // not my turn: look around a little
+            const ub = q('#acts [data-a=undo]'); if (ub.length && R() < .02) { click(ub[0]); seen.add('undo'); if (w.eval('!!UI.hold')) errs.push('undo did not take the plate back'); return; }
             const r = R(); if (r < .03) { const g = q('#tbl .grp'); if (g.length) click(rnd(g)); } else if (r < .04) { const x = d.querySelector('#ppop [data-a=popx]'); if (x) click(x); }
             const sig = JSON.stringify([G.round, G.turn, G.logN, G.players.map(p => p.picked), w.eval('UI.cards.length'), w.eval('UI.holder'), w.eval('UI.busy'), rsOpen]);
             if (sig === last) stall++; else { stall = 0; last = sig; }

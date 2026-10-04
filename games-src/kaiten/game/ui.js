@@ -2,7 +2,7 @@
 var ANIM = 1, AIDELAY = 650;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, seq: 0, rec: null, noRec: false, over: null,
-  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: null, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
+  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: null, sound: true, music: true, gfx: 'auto', undo: 'short' }, enter: '', land: null, tm: null, pend: null, rq: [] };
 const D = KK.DATA;
 const KIT = KKKit;
 const TY = KIT.TYPES;
@@ -79,11 +79,11 @@ function pudCounts() {
 function dispHand() {
   const v = viewSeat(); if (v < 0 || !G) return [];
   if (UI.fz && UI.fz.hand) return UI.fz.hand;
-  const p = G.players[v], pk = p.picked && p.pick ? p.pick : [];
+  const p = G.players[v], pk = p.picked && p.pick ? p.pick : UI.hold && UI.hold.seat === v ? UI.hold.mv.ids : [];
   return p.hand.filter(id => pk.indexOf(id) < 0);
 }
 const mySeatPicked = () => { const v = viewSeat(); return v >= 0 && G && G.players[v].picked; };
-function canPick() { const v = viewSeat(); return !!G && G.phase === 'pick' && v >= 0 && !G.players[v].picked && !UI.busy && !UI.cards.length && !UI.fz && !(NET.on && !NET.hostPeer && isClient()) && !(NET.on && NET.pend === G.round * 100 + G.turn && Date.now() - NET.pendT < 2500); }
+function canPick() { const v = viewSeat(); return !!G && G.phase === 'pick' && v >= 0 && !G.players[v].picked && !UI.hold && !UI.busy && !UI.cards.length && !UI.fz && !(NET.on && !NET.hostPeer && isClient()) && !(NET.on && NET.pend === G.round * 100 + G.turn && Date.now() - NET.pendT < 2500); }
 function mkey(m) { return m && m.pick ? m.pick.join(',') : ''; }
 // ---- scoring model for the table (works on any displayed tables)
 function liveScores(tab) { return KK.roundScores({ players: tab.map(t => ({ table: t })) }); }
@@ -148,9 +148,11 @@ function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
 function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2200); }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
-function loadPrefs() { try { const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
-function savePrefs() { lsSet('kk_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
-const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35))) : Promise.resolve();
+// the computer speed now lives in the shared settings (GX.pref('ai')); an old per-game speed in kk_prefs is ignored
+function loadPrefs() { try { const p = JSON.parse(lsGet('kk_prefs') || '{}'); delete p.speed; Object.assign(UI.prefs, p); } catch (e) { } }
+function savePrefs() { lsSet('kk_prefs', JSON.stringify(UI.prefs)); }
+const animF = () => { try { return Math.max(.3, GX.animMs(1000) / 1000 || 1); } catch (e) { return 1; } };
+const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35) * animF())) : Promise.resolve();
 // ===================== part 2: rendering (table, belt, dock) =====================
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) UI.focus = v; return UI.focus || 0; }
@@ -207,8 +209,17 @@ function renderTable() {
     const av = Math.max(34, Math.min(isMe ? 60 : 52, Math.round(rowH * .46)));
     const cmp = rowH < 88, shw = av + 14, sl = Math.max(30, Math.min(58, Math.round((rowH - (cmp ? 12 : 36)) / 1.4)));
     const ctrW = cw - shw - sl - 25;
-    let pd = Math.min(rowH - (isMe ? 34 : 32), ctrW / (isMe ? 7.2 : 5.6) - 6, isMe ? 84 : 68); pd = Math.max(24, Math.round(pd));
-    const dm = { av, shw, sl, pd, cmp };
+    let pd = Math.min(rowH - (isMe ? 34 : 32), ctrW / (isMe ? 7.2 : 5.6) - 6, isMe ? 84 : 68), wrap = false;
+    if (L.ph) {
+      // phones: size the plates by how many groups this counter really holds, and use two rows before plates get tiny
+      const ng = groupsOf(s, tab, info).list.length + 1, cap = isMe ? 84 : 68;
+      const fit = rows => Math.min(Math.floor((ctrW - 12) / Math.ceil(ng / rows)) - 18, Math.floor((rowH - 8) / rows) - 21);
+      const one = Math.min(rowH - (isMe ? 34 : 32), fit(1)), two = fit(2);
+      if (one < 34 && two > one) { pd = two; wrap = true; } else pd = one;
+      pd = Math.min(cap, pd);
+    }
+    pd = Math.max(24, Math.round(pd));
+    const dm = { av, shw, sl, pd, cmp, wrap };
     const sg = seatSig(s, tab, info, pcs, isMe, dm) + '|' + sigAll;
     const old = oldSeats[s];
     if (old && old.dataset.sg === sg) { els.push(old); continue; }
@@ -223,7 +234,7 @@ function renderTable() {
 function seatSig(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots, sl = fz ? JSON.stringify(fz[s]) : (G.phase === 'pick' ? (p.picked ? 'p' : 'w') : 'x');
   const lnd = UI.land ? [...UI.land].filter(x => x.startsWith(s + '|')).join(',') : '';
-  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs[s], sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' : '', G.phase].join('|');
+  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs[s], sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, dm.wrap ? 1 : 0, p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' : '', G.phase].join('|');
 }
 function seatEl(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], col = pcol(s), picking = G.phase === 'pick' && !p.picked && !UI.fz;
@@ -232,12 +243,12 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
   el.style.setProperty('--pd', dm.pd + 'px'); el.style.setProperty('--shw', dm.shw + 'px'); el.style.setProperty('--av', dm.av + 'px'); el.style.setProperty('--sl', dm.sl + 'px'); el.style.setProperty('--ctr', counterURL(s));
   const av = h('div.av' + (picking ? '.act' : '')); av.appendChild(avN(s, 96));
   av.appendChild(h('span.sc', String(total)));
-  const sh = h('button.sh', { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer ' + p.ai + ')' : '') + ': ' + total + ' points. Open details.' }, av, h('span.nm', p.name));
+  const sh = h('button.sh', { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer ' + p.ai + ')' : '') + ': ' + total + ' points. Open details.' }, av, h('span.nm', h('i.gx-cbm', GX.mark(chefOf(s)) + ' '), p.name));
   el.appendChild(sh);
-  const ctr = h('div.ctr');
+  const ctr = h('div.ctr' + (dm.wrap ? '.wrap' : ''));
   const land = UI.land || new Set();
   for (const g of gs.list) ctr.appendChild(grpEl(g, dm.pd, land.has(s + '|' + g.k)));
-  ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));
+  ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud'), isPh() && dm.pd < 44));
   if (!gs.list.length && !pcs[s]) ctr.insertBefore(h('span.none', G.phase === 'pick' ? 'Nothing served yet' : ''), ctr.firstChild);
   el.appendChild(ctr);
   el.appendChild(slotEl(s, dm.sl, dm.cmp));
@@ -253,11 +264,11 @@ function grpEl(g, pd, landing) {
   b.appendChild(h('span.hn', g.hint));
   return b;
 }
-function shelfEl(s, n, pd, landing) {
+function shelfEl(s, n, pd, landing, short) {
   const tip = n + ' Custard Cup' + (n === 1 ? '' : 's') + ' kept for the end of the game (most scores 6, fewest loses 6; no penalty with 2 players).';
   const b = h('button.grp.shelf' + (landing ? '.land' : ''), { type: 'button', 'data-a': 'grp', 'data-seat': s, 'data-k': 'pud', 'data-type': 'pudding', 'data-n': n, 'data-pts': 0, 'aria-label': tip, title: tip });
   const pl = h('div.pl'); pl.appendChild(plateN('pudding', pd)); if (!n) pl.style.opacity = '.45';
-  b.appendChild(pl); b.appendChild(h('span.bg', String(n))); b.appendChild(h('span.hn', 'custard'));
+  b.appendChild(pl); b.appendChild(h('span.bg', String(n))); b.appendChild(h('span.hn', short ? 'kept' : 'custard'));
   return b;
 }
 function slotEl(s, sl, cmp) {
@@ -276,7 +287,7 @@ function slotEl(s, sl, cmp) {
     return wrap;
   }
   if (UI.fz) { box.className = 'sbox'; }
-  else if (G.phase === 'pick' && p.picked) { cover(); if (!cmp) wrap.appendChild(h('span.st.rd', 'ready')); }
+  else if (G.phase === 'pick' && (p.picked || (UI.hold && UI.hold.seat === s))) { cover(); if (!cmp) wrap.appendChild(h('span.st.rd', 'ready')); }
   else if (G.phase === 'pick') { box.className = 'sbox empty' + (s === viewSeat() ? ' mine' : ''); box.textContent = '…'; box.setAttribute('aria-label', p.name + ' is choosing'); }
   else box.className = 'sbox';
   return wrap;
@@ -299,15 +310,16 @@ function renderBelt() {
   const frag = [], oldC = new Map(); for (const c of belt.children) if (c.dataset && c.dataset.rk) oldC.set(c.dataset.rk, c);
   const hp = v >= 0 ? G.players[v] : null, can = canPick();
   const rec = UI.rec && !UI.noRec ? UI.rec.ids : [];
-  const enter = UI.enter;
+  const enter = UI.enter, tt = can ? tutTarget() : -1;
   hand.forEach((id, k) => {
     if (id < 0) { const key = 'b' + k, sg = 'b' + hw; const o = oldC.get(key); if (o && o.dataset.sg === sg && !enter) { frag.push(o); return; } const b = h('div.hc.back', { 'data-up': '0', 'aria-hidden': 'true' }); b.style.setProperty('--k', k); b.appendChild(backN(hw)); if (enter) b.classList.add('ent-' + enter); b.dataset.rk = key; b.dataset.sg = sg; frag.push(b); return; }
     const idx = hp && !UI.fz ? hp.hand.indexOf(id) : -1;
     const ty = tkey(id), selPos = UI.sel.indexOf(idx);
     const g = UI.prefs.hint && can ? gainOf(v, [id]) : null;
-    const key = 'c' + id, sg = [id, idx, selPos, rec.indexOf(id) >= 0 ? 1 : 0, can ? 1 : 0, g, UI.twin ? 1 : 0, hw, UI.prefs.tap2 ? 1 : 0].join('|');
+    const tu = tt < 0 ? '' : idx === tt ? '.tut' : '.tutno';
+    const key = 'c' + id, sg = [id, idx, selPos, rec.indexOf(id) >= 0 ? 1 : 0, can ? 1 : 0, g, UI.twin ? 1 : 0, hw, UI.prefs.tap2 ? 1 : 0, tu].join('|');
     const o = oldC.get(key); if (o && o.dataset.sg === sg && !enter) { frag.push(o); return; }
-    const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked'), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? '. Tap to lift it' + (selPos >= 0 ? (UI.prefs.tap2 ? ', tap again to serve' : ', then press Serve') : '') : '') });
+    const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked') + (selPos >= 0 ? '' : tu), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? '. Tap to lift it' + (selPos >= 0 ? (UI.prefs.tap2 ? ', tap again to serve' : ', then press Serve') : '') : '') });
     b.style.setProperty('--k', k);
     b.appendChild(cardNode(ty, hw));
     if (g != null) b.appendChild(h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : '0'));
@@ -334,11 +346,13 @@ function promptText() {
   if (watching()) return 'The computers are choosing a plate…';
   if (hotSeat() && v < 0) return 'Pass the device to the next diner.';
   const pend = KK.pending(G).filter(s => s !== v).map(pname);
+  if (v >= 0 && UI.hold && UI.hold.seat === v) return isPh() ? 'Served. Undo?' : 'Served. Changed your mind? Press Undo.';
   if (v >= 0 && G.players[v].picked) return pend.length ? 'Served. Waiting for ' + (isPh() && pend.length > 2 ? pend.length + ' diners' : nameList(pend)) + '…' : 'Served. Here come the plates…';
   if (v >= 0) {
     const nm = hotSeat() ? pname(v) + ', ' : '';
     if (UI.twin) return nm + 'Twin Sticks: pick two plates, then serve them.';
     if (UI.sel.length) return nm + (UI.prefs.tap2 ? 'Tap it again, or press Serve.' : 'Press Serve to send it to your seat.');
+    if (tutStep()) return 'Take the glowing ' + TY[tutStep().take].name + '.';
     return nm + 'pick a plate: tap it to lift it.';
   }
   return '';
@@ -362,12 +376,13 @@ function renderDock() {
       const s = (f + k) % G.np, p = G.players[s], busyFz = !!UI.fz, rdy = G.phase === 'pick' && p.picked && !busyFz, tot = totalOf(s, info);
       const ph = isPh();
       const ch = h('button.chip' + (s === v ? '.me' : '') + (rdy ? '.rd' : G.phase === 'pick' && !busyFz ? '.wt' : ''), { type: 'button', 'data-a': 'chip', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer)' : '') + ': ' + tot + ' points, ' + (G.phase !== 'pick' || busyFz ? '' : rdy ? 'has chosen' : 'is choosing') },
-        (() => { const e = h('span.cav'); e.appendChild(avN(s, 96)); return e; })(), h('span.ct', h('b', p.name + (s === v && p.name !== 'You' ? ' (you)' : '')), h('i', (rdy ? '✓ ' : G.phase === 'pick' && !busyFz ? '… ' : '') + (ph ? tot : tot + ' pts' + (rdy ? ' · ready' : G.phase === 'pick' && !busyFz ? ' · choosing' : '')))));
+        (() => { const e = h('span.cav'); e.appendChild(avN(s, 96)); return e; })(), h('span.ct', h('b', h('i.gx-cbm', GX.mark(chefOf(s)) + ' '), p.name + (s === v && p.name !== 'You' ? ' (you)' : '')), h('i', (rdy ? '✓ ' : G.phase === 'pick' && !busyFz ? '… ' : '') + (ph ? tot : tot + ' pts' + (rdy ? ' · ready' : G.phase === 'pick' && !busyFz ? ' · choosing' : '')))));
       ro.appendChild(ch);
     }
     }
   }
   renderSel(); renderActs(); renderCheat();
+  try { GX.recap.view(viewSeat()); } catch (e) { }
 }
 function renderCheat() {
   const c = $('#cheat'); if (!c || c.firstChild || isPh()) return;
@@ -392,6 +407,7 @@ function renderSel() {
   let t;
   if (UI.cards.length && UI.cards[0].kind === 'pass') t = 'The hands are hidden until the device is passed.';
   else if (watching()) t = 'Sit back: the computers play all three rounds. Hands slide to the left every turn.';
+  else if (v >= 0 && UI.hold && UI.hold.seat === v) t = 'Your plate waits under a cover. Undo puts it back on your belt before the covers lift.';
   else if (v >= 0 && G.players[v].picked) t = 'Your plate is on its way to your seat under a cover. Everyone reveals together.';
   else if (v >= 0 && canPick()) t = UI.twin ? 'Tap two plates on the belt, then press Serve.' : 'Tap a plate on your belt to lift it' + (UI.prefs.tap2 ? ', then tap it again to serve it.' : ', then press Serve.');
   else t = 'Revealing the plates…';
@@ -401,12 +417,14 @@ function renderActs() {
   const a = $('#acts'); if (!a) return; a.innerHTML = '';
   const v = viewSeat();
   if (!G || G.phase === 'over') return;
+  if (v >= 0 && UI.hold && UI.hold.seat === v) { a.appendChild(h('button.btn.go.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo: take your plate back' }, 'Undo')); return; }
   if (v >= 0 && canPick()) {
     const p = G.players[v], chop = KK._.hasChop(p) && p.hand.length >= 2;
     const n = UI.sel.length;
-    if (n) { const ids = UI.sel.map(i => p.hand[i]); const g = gainOf(v, ids); a.appendChild(h('button.btn.go', { 'data-a': 'serve', type: 'button' }, n === 2 ? 'Serve both' + (g > 0 ? ' (+' + g + ')' : '') : 'Serve' + (g > 0 ? ' (+' + g + ')' : ''))); }
-    if (chop) a.appendChild(h('button.btn' + (UI.twin ? '.on' : '.alt'), { 'data-a': 'twin', type: 'button', 'aria-pressed': UI.twin ? 'true' : 'false' }, UI.twin ? 'Twin Sticks: on' : 'Use Twin Sticks'));
-    a.appendChild(h('button.btn.alt', { 'data-a': 'hint', type: 'button' }, 'Hint'));
+    const tut = !!tutStep();
+    if (n) { const ids = UI.sel.map(i => p.hand[i]); const g = gainOf(v, ids); a.appendChild(h('button.btn.go' + (tut ? '.tut' : ''), { 'data-a': 'serve', type: 'button' }, n === 2 ? 'Serve both' + (g > 0 ? ' (+' + g + ')' : '') : 'Serve' + (g > 0 ? ' (+' + g + ')' : ''))); }
+    if (chop && !tut) a.appendChild(h('button.btn' + (UI.twin ? '.on' : '.alt'), { 'data-a': 'twin', type: 'button', 'aria-pressed': UI.twin ? 'true' : 'false' }, UI.twin ? 'Twin Sticks: on' : 'Use Twin Sticks'));
+    if (!tut) a.appendChild(h('button.btn.alt', { 'data-a': 'hint', type: 'button' }, 'Hint'));
     if (n) a.appendChild(h('button.btn.alt', { 'data-a': 'unsel', type: 'button', 'aria-label': 'Put the plate back' }, 'Cancel'));
   }
 }
@@ -421,7 +439,7 @@ function openGroup(seat, k) {
   UI.pop = { kind: 'group', seat, k };
   const pp = $('#ppop'); pp.hidden = false; pp.innerHTML = '';
   const cw = isPh() ? 80 : 120;
-  const body = h('div.ph-body', h('div.cwrap', h('div.cardbox', cardDiv(type, cw, g && g.on)), h('div.cinfo', h('p', tip), h('p.sm', TY[type].ruleText))));
+  const body = h('div.ph-body', h('div.cwrap', h('div.cardbox', cardDiv(type, cw, g && g.on)), h('div.cinfo', h('p', tip), h('p.sm', TY[type].ruleText), h('button.btn.alt.refbig', { 'data-a': 'refbig', 'data-type': g && g.on ? g.on : type, type: 'button' }, 'Read it big'))));
   if (g && g.k === 'roll') { const mk = info.mk; body.appendChild(h('div.kv', h('span', 'Icons per diner'), h('b', G.players.map((q, i) => q.name + ' ' + info.rs[i].icons).join(' · ')))); }
   pp.append(h('div.ph-head', h('div.ph-t', h('b', title), h('span', p.name)), h('button.px', { 'data-a': 'popx', type: 'button', 'aria-label': 'Close' }, '×')), body);
 }
@@ -447,15 +465,16 @@ function newGame(mode, o) {
     if (mode === 'hot') { names.push(PN[c]); ai.push(null); }
     else if (mode === 'ai') { names.push(PN[c]); ai.push(lv); }
     else if (i === 0) { names.push('You'); ai.push(null); }
-    else { names.push(PN[c]); ai.push(mode === 'guided' ? 'normal' : lv); }
+    else { names.push(PN[c]); ai.push(mode === 'guided' ? 'easy' : lv); }
   }
   UI.chefs = chefs;
-  clearTimeout(UI.tm); UI.seq++; UI.rq = [];
+  clearTimeout(UI.tm); UI.seq++; UI.rq = []; dropHold(); UI.tut = null;
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
   G = KK.newGame({ players: np, seed, names, ai });
-  Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
+  Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN, resultDone: false, earned: null, t0: Date.now() });
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && UI.coach.keep ? 'full' : 'off'), seen: {}, turn: '', keep: UI.coach.keep };
-  if (mode === 'guided') UI.coach.level = 'full';
+  if (mode === 'guided') { UI.coach.level = 'full'; try { tutDeal(); } catch (e) { console.error(e); UI.tut = null; } }
+  recapSeats();
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
   placePrompt(); render(); sndMusic(); schedule();
@@ -480,7 +499,7 @@ function schedule() {
 function aiPick(seat) {
   if (!G || UI.busy || G.phase !== 'pick') return;
   const p = G.players[seat]; if (!p || p.picked || !p.ai) { schedule(); return; }
-  let mv; try { mv = KK.AI.choose(G, seat); } catch (e) { console.error(e); mv = KK.moves(G, seat)[0]; }
+  let mv = tutPartner(seat); if (!mv) try { mv = KK.AI.choose(G, seat); } catch (e) { console.error(e); mv = KK.moves(G, seat)[0]; }
   commit(seat, mv);
 }
 function commit(seat, mv) {
@@ -510,6 +529,7 @@ function tapHand(i) {
     if (k >= 0) cur.splice(k, 1); else { if (cur.length >= 2) cur.shift(); cur.push(i); }
     UI.sel = cur; UI.rec = null; render(); return;
   }
+  if (!tutGuard(i)) return;
   if (cur.length === 1 && cur[0] === i && UI.prefs.tap2) { serveSel(); return; }
   UI.sel = [i]; UI.rec = null; snd('click', { vol: .4 }); render();
 }
@@ -523,7 +543,9 @@ function serveSel() {
 function doPick(seat, mv) {
   // the lifted plate flies to the seat under a cover
   try { if (ANIM && !pxServe() && document.body.animate) flyPick(); } catch (e) { }
+  try { GX.recap.mark(seat); } catch (e) { }
   if (isClient()) { netAct({ pk: mv.pick.join(',') }); UI.sel = []; UI.twin = false; UI.rec = null; snd('pick'); render(); return; }
+  if (canHold(seat)) { holdServe(seat, mv); return; }
   commit(seat, mv);
 }
 function flyPick() {
@@ -543,7 +565,7 @@ function toggleTwin() {
   render();
 }
 function hint() {
-  const v = viewSeat(); if (!canPick()) return;
+  const v = viewSeat(); if (!canPick() || tutStep()) return;
   let mv; try { mv = KK.AI.choose(G, v, 'normal'); } catch (e) { return; }
   if (!mv) return;
   UI.rec = { ids: mv.ids.slice(), pick: mv.pick.slice() };
@@ -570,7 +592,7 @@ const keyOfCard = c => { const k = c.key; return ICONS[k] ? 'roll' : NIG[k] ? (c
 function drainQ() { if (UI.rq.length && !UI.busy) { const q = UI.rq.shift(); playResolve(q[0], q[1]); } }
 async function playResolve(evs, preHand) {
   if (UI.busy) { UI.rq.push([evs, preHand]); return; }
-  const tok = UI.seq; UI.busy = true; closePop();
+  const tok = UI.seq; UI.busy = true; closePop(); recapReveal(evs);
   const rv = evs.find(e => e.t === 'reveal'), ps = evs.find(e => e.t === 'pass'), sc = evs.find(e => e.t === 'score'), ge = evs.find(e => e.t === 'gameEnd');
   const v = viewSeat(), np = G.np, block = !NET.on;
   try {
@@ -637,7 +659,7 @@ function hasSave() { return !!lsGet('kk_save'); }
 function saveInfo() { try { const o = JSON.parse(lsGet('kk_save')); if (o && o.sv === SAVE_V && o.G && o.G.phase !== 'over') return { round: o.G.round, np: o.G.np, mode: o.mode }; } catch (e) { } return null; }
 function save() {
   if (NET.on || !G || !UI.started || G.phase === 'over') return false;
-  try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
+  try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach, tut: UI.tut || null, t0: UI.t0 || 0 })); GNS.saved(GAME_ID, true); return true; } catch (e) { return false; }
 }
 // autosave: after every resolved turn (schedule runs after each one) and when the page is hidden or closed (iPhone app switch)
 function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
@@ -645,12 +667,13 @@ function flushSave() { UI.svk = ''; autoSave(); }
 function loadSave() {
   if (NET.on) return false;
   let o; try { o = JSON.parse(lsGet('kk_save')); } catch (e) { return false; }
-  if (o && o.G && o.sv !== SAVE_V) { lsSet('kk_save', ''); toast('That saved meal is from an older version of the game, so it could not be resumed.'); if (!G) renderStart(); return 'old'; }
+  if (o && o.G && o.sv !== SAVE_V) { lsSet('kk_save', ''); try { GNS.saved(GAME_ID, false); } catch (e) { } toast('That saved meal is from an older version of the game, so it could not be resumed.'); if (!G) renderStart(); return 'old'; }
   if (!o || !o.G || !Array.isArray(o.G.players) || o.G.v !== 1) return false;
-  clearTimeout(UI.tm); UI.seq++;
+  clearTimeout(UI.tm); UI.seq++; dropHold();
   G = o.G; try { if (KK.checkInvariants(G).length) { G = null; return false; } } catch (e) { return false; }
-  Object.assign(UI, { started: true, mode: o.mode || 'vs', cfg: o.cfg || null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, enter: 'deal', focus: 0, evN: G.evN, over: null });
+  Object.assign(UI, { started: true, mode: o.mode || 'vs', cfg: o.cfg || null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, enter: 'deal', focus: 0, evN: G.evN, over: null, resultDone: false, earned: null, t0: o.t0 || Date.now(), tut: o.tut && o.tut.on ? { on: true, step: -1 } : null });
   if (o.coach) UI.coach = o.coach;
+  recapSeats();
   UI.chefs = Array.isArray(o.chefs) && o.chefs.length === G.np ? o.chefs : null;
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
@@ -692,6 +715,7 @@ function coachTip(key, title, text, type) {
   pushCard({ kind: 'coach', title, sub: 'Tip', body, buttons: [{ label: 'Got it', a: 'cont' }] });
 }
 function coachCheck() {
+  if (UI.tut && UI.tut.on && G && G.phase === 'pick') return tutCheck();
   const lv = UI.coach.level; if (lv === 'off' || !G || G.phase !== 'pick') return false;
   const v = viewSeat(); if (v < 0 || !canPick() || UI.cards.length) return false;
   const turn = G.round + '.' + G.turn; if (UI.coach.turn === turn) return false;
@@ -775,12 +799,14 @@ function skipCount() { if (UI.rsInfo) { UI.rsInfo.skip = true; } }
 function showFinal() {
   const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false; rs.innerHTML = '';
   const F = G.final, np = G.np;
+  try { kitResult(); } catch (e) { }
   const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Final result' });
   const ws = G.winners || [];
   const me = viewSeat(), iWin = me >= 0 && ws.includes(me);
   box.appendChild(h('h2', h('span', { html: KIT.iconSVG('crown', { size: 32 }) }), 'The meal is over'));
   const wn = h('div.win', h('span', { html: avatarS(ws[0] != null ? ws[0] : 0, 96) }), h('div', G.winText));
   box.appendChild(wn);
+  { const ea = earnedEl(); if (ea) box.appendChild(ea); }
   // custard resolved
   const tb = h('table.cat'); const hr = h('tr', h('th', ''));
   for (let s = 0; s < np; s++) { const th = h('th'); th.appendChild(h('div', { html: avatarS(s, 64) })); th.appendChild(h('span.sub', pname(s))); hr.appendChild(th); }
@@ -801,7 +827,7 @@ function showFinal() {
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
   if (humanWin) { snd('win', { duck: true }); celebrate(box); } else { snd('round', { duck: true }); if (humans().length || NET.on) wn.after(h('p.wp', 'Well played! Another meal?')); }
   UI.overShown = true;
-  if (UI.mode !== 'net') lsSet('kk_save', '');
+  if (UI.mode !== 'net') { lsSet('kk_save', ''); try { GNS.saved(GAME_ID, false); } catch (e) { } }
 }
 function celebrate(box) {
   if (!ANIM) return; const c = h('div.conf'); const cols = ['#e5553a', '#e0a31c', '#2a97a0', '#7a5ac8', '#5aa83c', '#f4b6d2'];
@@ -872,22 +898,6 @@ function renderDrawers() {
   if (!GX.open || !G) return;
   if (GX.open === 'logd') { const b = $('#logbody'); b.innerHTML = ''; b.appendChild(logHTML()); }
   if (GX.open === 'rivald') renderRival();
-  if (GX.open === 'setd') renderMenu();
-}
-function renderMenu() {
-  const b = $('#setbody'); b.innerHTML = '';
-  const row = (l, ...k) => b.appendChild(h('div.mrow', h('div.lbl', l), h('div.mbt', k)));
-  const tog = (name, on, label) => h('button.btn' + (on ? '' : '.alt'), { 'data-a': name, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, label + ': ' + (on ? 'On' : 'Off'));
-  if (NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
-  else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
-  if (!NET.on) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
-  if (!NET.on) row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
-  row('Help on the belt', tog('hints', UI.prefs.hint, 'Show +N scores'), tog('tap2', UI.prefs.tap2, 'Tap twice to serve'));
-  row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
-  { const g = gfxPref(); row('Graphics' + (PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
-  let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
-  row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('span.tinyc', { html: sp }));
-  b.appendChild(h('p.sm', 'Kaiten Kitchen is an original conveyor-belt card game. Names, card text and art are original; the audio credits are in How to play.'));
 }
 // ---------- start screens: painted title -> setup (diner cards) / online ----------
 // the four chefs who can join you (you are seat 0 with Mina's portrait). Default level = the character's temper; every level can be changed.
@@ -946,10 +956,14 @@ function setupEl() {
     h('div.dgrid', [1, 2, 3, 4].map(c => dinerCard(c, o))),
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
   const n = o.np - 1;
+  // until one guided game is finished, the lesson is the big button and "Start the meal" moves into the row below
+  const first = !lsGet('kk_guided_done');
+  const meal = cls => h('button.sbtn' + cls, { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
+  const lesson = cls => h('button.sbtn' + cls, { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', first ? 'Learn as you play' : 'Guided first game'), h('span', first ? 'A short lesson with ' + PN[o.seats[0]] + ', then a full meal' : 'You and ' + PN[o.seats[0]] + ', with a lesson'));
   const go = h('div.sgo',
-    h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c])))),
+    first ? lesson('.big') : meal('.big'),
     h('div.sgrid3',
-      h('button.sbtn', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and ' + PN[o.seats[0]] + ', with tips')),
+      first ? meal('') : lesson(''),
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', o.np + ' people, one device')),
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch'), h('span', 'the chefs play'))));
   return h('div.setup.scard', head, ph ? sum : h('p.ssub', 'Invite the chefs you want at the belt. Each one has a temper; change their level if you like.'), cfg, go);
@@ -989,21 +1003,14 @@ document.addEventListener('click', ev => {
     case 'cfgopen': UI.cfgOpen = true; renderStart(); try { const c = $('#cfg'); if (c) c.querySelector('button').focus({ preventScroll: true }); } catch (e) { } break;
     case 'cfgclose': UI.cfgOpen = false; renderStart(); break;
     case 'seatchef': toggleChef(+d.c); renderStart(); break;
-    case 'gfx': setGfx(d.v); renderMenu(); break;
     case 'menu': showStart(); break;
     case 'start': newGame(d.m); break;
     case 'guided': newGame('guided'); break;
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else { o[d.k] = isNaN(+d.v) ? d.v : +d.v; if (d.k === 'level') o.lv = [d.v, d.v, d.v, d.v]; } renderStart(); break; }
     case 'lv': { const o = optObj(); o.lv = (o.lv || DEF.lv).slice(); o.lv[+d.seat - 1] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
-    case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); break;
+    case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); try { GX.renderSettings(); } catch (e) { } break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
-    case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
-    case 'guide': UI.coach.level = d.v; UI.coach.keep = d.v === 'full'; renderMenu(); break;
-    case 'hints': UI.prefs.hint = !UI.prefs.hint; savePrefs(); renderMenu(); if (G) render(); break;
-    case 'tap2': UI.prefs.tap2 = !UI.prefs.tap2; savePrefs(); renderMenu(); if (G) render(); break;
-    case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
-    case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
   }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop) closePop(); else if (UI.rsOpen && UI.mode && G && G.phase === 'over' && UI.overShown) closeRS(); } });
@@ -1026,14 +1033,13 @@ function boot() {
   GX.drawer('rulesd', 'How to play', buildRules(), true);
   GX.drawer('logd', 'Log', h('div#logbody'));
   GX.drawer('rivald', 'Diners and scores', h('div#rivalbody'));
-  GX.drawer('setd', 'Menu', h('div#setbody'));
   GX.onShow = id => { renderDrawers(); };
-  loadPrefs(); applyPhone();
+  loadPrefs(); kitBoot(); applyPhone();
   addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
   addEventListener('pagehide', () => { try { flushSave(); } catch (e) { } });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') try { flushSave(); } catch (e) { } });
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { clearTimeout(rzT); rzT = setTimeout(() => { if (G && UI.started) render(); }, 40); } }).observe(bd);
-  try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'kk' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); } } catch (e) { }
+  try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'kk' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); GX.applyPrefs(); } } catch (e) { }
   pxPerfReg();
   pxInit().then(ok => { if (ok) { pxPerfReg(); if (G && UI.started) render(); } });
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
@@ -1487,7 +1493,7 @@ function pxPerfReg() {
     const shim = PX.on ? { getPixelRatio: () => PX.res, setPixelRatio: v => pxSetRes(v), get domElement() { return PX.cv; }, getContext: () => PX.app && PX.app.renderer && PX.app.renderer.gl || null } : null;
     PerfHUD.register({ game: 'Kaiten Kitchen', anchor: '.gx-board', corner: 'tl', renderer: shim, levels: ['high', 'medium', 'low'],
       getLevel: () => PX.q, isAuto: () => gfxPref() === 'auto',
-      setLevel: (l, why) => { if (why === 'apply') setGfx(l); else { PX.autoQ = l; pxApplyQ(); } try { if (GX.open === 'setd') renderMenu(); } catch (e) { } },
+      setLevel: (l, why) => { if (why === 'apply') setGfx(l); else { PX.autoQ = l; pxApplyQ(); } try { if (GX.open === 'setd') GX.renderSettings(); } catch (e) { } },
       basePR: () => { const d = window.devicePixelRatio || 1; return Math.min((PXQ[PX.q] || PXQ.high).pr, d); }, onPixelRatio: v => pxSetRes(v),
       isAnimating: () => !!UI.busy || !!PX.tweens.length || !!PX.parts.length, idleMode: PX.on ? 'throttle' : 'demand', idleFps: 10 });
   } catch (e) { }
@@ -1497,3 +1503,170 @@ function pxPainted() { try { const c = PX.app.renderer.extract.canvas({ target: 
 // test hook: where every sprite is and whether anything still moves (px-test.js)
 PX.state = () => ({ nServe: PX.nServe || 0, nLand: PX.nLand || 0, on: PX.on, kind: PX.kind, q: PX.q, res: PX.res, tweens: PX.tweens.length, parts: PX.parts.length, moving: pxMoving(), frames: PX.frames || 0, err: PX.err, blur: !!(PX.L.fx && PX.L.fx.filters && PX.L.fx.filters.length), canvasOK: pxPainted(),
   objs: [...PX.objs.values()].filter(o => !o.detached).map(o => ({ key: o.key, kind: o.kind, type: o.type || null, x: o.x, y: o.y, w: o.kind === 'plate' ? o.w : o.w, tx: o.tx, ty: o.ty, tw: o.kind === 'plate' ? o.d : o.tw, layers: o.layers || 0, shown: o.kind === 'plate' ? o.sp.filter(s => s.visible).length : 1, back: !!o.back, face: o.kind === 'card' ? (o.sp.texture === o.face && !!o.face) : null, alpha: o.c.alpha, vis: o.vis })) });
+// ===================== part 8: shared GX kit (settings, reference, undo window, recap, results, offline) + the guided lesson =====================
+const GAME_ID = 'kaiten';
+// ---- achievements (stored by the shelf; shown in Stats & achievements on the home page)
+const ACH = [
+  { id: 'first', name: 'First meal', how: 'Finish a meal.', test: r => true },
+  { id: 'guide', name: 'Belt trained', how: 'Finish the guided first game.', test: r => r.mode === 'guided' },
+  { id: 'win', name: 'Clean plate', how: 'Beat the computer chefs.', test: r => r.won && (r.mode === 'vs' || r.mode === 'guided') },
+  { id: 'hard', name: 'Night-shift champion', how: 'Win a 4- or 5-diner meal with a hard chef at the table.', test: (r, s, x) => r.won && r.mode === 'vs' && r.np >= 4 && x.extra && x.extra.hard },
+  { id: 'fifty', name: 'Full belly', how: 'Score 50 points or more.', test: r => r.score >= 50 },
+  { id: 'ladder', name: 'Bun tower', how: 'Stack five Steam Buns in one round (15 points).', test: (r, s, x) => x.extra && x.extra.buns15 },
+  { id: 'paste', name: 'Fire breather', how: 'Score 10 or more Fire Paste bonus points in one meal.', test: (r, s, x) => x.extra && x.extra.paste >= 10 },
+  { id: 'custard', name: 'Sweet tooth', how: 'End a meal with the most Custard Cups on your own (3 or more diners).', test: (r, s, x) => x.extra && x.extra.custardTop && r.np >= 3 },
+  { id: 'rounds', name: 'Top of every round', how: 'Score the most points in all three rounds of a meal.', test: (r, s, x) => x.extra && x.extra.roundsTop === 3 },
+  { id: 'hot', name: 'Pass the plate', how: 'Finish a hot-seat meal.', test: r => r.mode === 'hot' }
+];
+// ---- settings: the same sections as every game; Kaiten adds its own rows
+const HOLD = { off: 0, short: 1200, long: 2600 };
+function kitSettings() {
+  GX.settings({
+    id: 'setd', title: 'Menu',
+    game: S => {
+      if (NET.on) S.appendChild(GX.row('Online', [h('button.gx-sb', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.gx-sb', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room')]));
+      else S.appendChild(GX.row('This game', [h('button.gx-sb', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.gx-sb', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.gx-sb', { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load')]));
+      if (!isClient()) S.appendChild(GX.row('Take back a plate', GX.seg([['off', 'Off'], ['short', 'Short'], ['long', 'Long']], UI.prefs.undo || 'short', v => { UI.prefs.undo = v; savePrefs(); }, 'Take-back window'), 'After you serve, a moment to press Undo before the covers lift'));
+      S.appendChild(GX.row('Serving', GX.onoff(!!UI.prefs.tap2, v => { UI.prefs.tap2 = v; savePrefs(); if (G) render(); }, 'Tap twice to serve'), 'Tap a lifted plate again to serve it (otherwise press Serve)'));
+    },
+    sound: S => {
+      S.appendChild(GX.row('Sound effects', GX.onoff(UI.prefs.sound !== false, v => { UI.prefs.sound = v; savePrefs(); try { if (window.GA) GA.setSfx(v); } catch (e) { } }, 'Sound effects')));
+      S.appendChild(GX.row('Music', GX.onoff(UI.prefs.music !== false, v => { UI.prefs.music = v; savePrefs(); try { if (window.GA) GA.setMusic(v); } catch (e) { } sndMusic(); }, 'Music')));
+    },
+    help: S => {
+      S.appendChild(GX.row('Read', [h('button.gx-sb', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.gx-sb', { 'data-a': 'refopen', type: 'button' }, 'Plates')]));
+      if (!NET.on) S.appendChild(GX.row('Guide', GX.seg([['full', 'Full'], ['light', 'Light'], ['off', 'Off']], UI.coach.level, v => { UI.coach.level = v; UI.coach.keep = v === 'full'; }, 'Guide level'), 'Tips that appear one at a time'));
+      S.appendChild(GX.row('Show +N', GX.onoff(!!UI.prefs.hint, v => { UI.prefs.hint = v; savePrefs(); if (G) render(); }, 'Show +N scores'), 'What each plate on your belt scores right now'));
+    },
+    graphics: S => {
+      const g = gfxPref();
+      S.appendChild(GX.row('Graphics', GX.seg([['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']], g, v => { setGfx(v); }, 'Graphics level'), PX.on ? (g === 'auto' ? 'Now ' + PX.q : '') : 'Simple view (this browser has no painted table)'));
+    },
+    about: { name: 'Kaiten Kitchen', version: 'preview', text: 'An original conveyor-belt card game. Names, card text and paintings are our own. Music and sounds are CC0 recordings (Pro Sensory, LEGIT Audio and Kenney on OpenGameArt and kenney.nl). Online play uses Trystero (MIT); the painted table uses PixiJS (MIT).' }
+  });
+}
+// ---- component reference
+function refPic(it, big) { const p = it.pic; if (!p || !p.type) return null; return cardDiv(p.type, big ? 170 : 44, p.on); }
+function refInGame(it) {
+  if (!G || !it.pic || !it.pic.type || !/^p-/.test(it.id)) return true;
+  const t = it.pic.type, has = id => tkey(id) === t, v = viewSeat();
+  return G.players.some(p => p.table.some(e => has(e.id)) || p.pud.some(has)) || (v >= 0 && G.players[v].hand.some(has));
+}
+function kitReference() { GX.reference(KK.refSections(D), { title: 'Plates & scoring', label: 'Plates', picture: refPic, inGame: refInGame, before: '[data-gx="rulesd"]' }); }
+// ---- undo: the rules let you change your mind until every diner has chosen. Kaiten resolves the turn the moment the last plate
+// is served, so a local serve is held for a short take-back window (Menu → Take back a plate) before it is committed.
+function holdMs() { const k = UI.prefs.undo || 'short'; return HOLD[k] ? Math.max(600, GX.aiDelay(HOLD[k])) : 0; }
+function canHold(seat) { return !isClient() && holdMs() > 0 && !(UI.tut && UI.tut.on); }
+function holdServe(seat, mv) {
+  clearTimeout(UI.holdT); UI.hold = { seat, mv, sel: UI.sel.slice(), twin: UI.twin, round: G.round, turn: G.turn };
+  UI.sel = []; UI.twin = false; UI.rec = null; snd('pick'); render();
+  const tok = UI.seq; UI.holdT = setTimeout(() => { if (tok === UI.seq) commitHold(); }, holdMs());
+}
+function commitHold() {
+  const H = UI.hold; clearTimeout(UI.holdT); UI.hold = null; if (!H || !G || G.round !== H.round || G.turn !== H.turn) { if (G) render(); return; }
+  commit(H.seat, H.mv);
+}
+function undoHold() {
+  const H = UI.hold; if (!H) return false; clearTimeout(UI.holdT); UI.hold = null;
+  UI.sel = H.sel; UI.twin = H.twin; snd('click'); render(); toast('Plate back on your belt.'); return true;
+}
+function dropHold() { clearTimeout(UI.holdT); UI.hold = null; }
+// ---- "since your last turn" strip in the dock
+function kitRecap() { GX.recap.attach('#dockbody', { before: true, title: 'Since your pick' }); }
+function recapSeats() { GX.recap.clear(); const hs = NET.on ? [NET.mySeat] : humans(); GX.recap.seats(hs.length ? hs : [0]); }
+function recapReveal(evs) {
+  try {
+    const rv = evs.find(e => e.t === 'reveal'), sc = evs.find(e => e.t === 'score');
+    if (rv) rv.picks.forEach(p => GX.recap.push(pname(p.seat) + (G.players[p.seat] && G.players[p.seat].name === 'You' ? ' took ' : ' took ') + p.cards.map(c => TY[c.key].name + (c.w >= 0 ? ' on Fire Paste' : '')).join(' and ') + '.', p.seat));
+    if (sc) GX.recap.push('Round ' + sc.round + ' scored: ' + sc.seats.map(s => pname(s.seat) + ' +' + s.total).join(', ') + '.', -1);
+  } catch (e) { }
+}
+// ---- results, statistics, achievements
+function kitResult() {
+  if (!G || G.phase !== 'over' || UI.resultDone) return; UI.resultDone = true;
+  if (UI.mode === 'ai' || (!NET.on && !humans().length)) return; // watching the chefs: not your meal
+  const hs = humans(), me = NET.on ? NET.mySeat : UI.mode === 'hot' ? -1 : (hs.length ? hs[0] : -1);
+  const F = G.final, seats = G.players.map((p, i) => ({ name: p.name, ai: p.ai || null, me: i === me }));
+  const winner = G.winners && G.winners.length > 1 ? G.winners.slice() : G.winner;
+  let extra = null;
+  if (me >= 0) {
+    const mx = Math.max(...F.pudding);
+    extra = { buns15: G.rs.some(r => r[me].dumpling >= 15), paste: G.rs.reduce((a, r) => a + (r[me].wasabi || 0), 0),
+      custardTop: F.pudding[me] === mx && F.pudding.filter(x => x === mx).length === 1,
+      roundsTop: G.rs.filter(r => r[me].total === Math.max(...r.map(x => x.total))).length, hard: G.players.some(p => p.ai === 'hard') };
+  }
+  const mode = UI.mode === 'net' ? 'online' : UI.mode;
+  try {
+    const r = GNS.result({ game: GAME_ID, mode, seats, winner, scores: F.totals.slice(), turns: G.round * 100 + G.turn, ms: UI.t0 ? Date.now() - UI.t0 : 0, level: UI.cfg && UI.cfg.level, extra });
+    if (r && r.earned.length) { UI.earned = r.earned.map(a => a.name); GX.buzz([30, 60, 30]); }
+  } catch (e) { }
+  if (UI.mode === 'guided') lsSet('kk_guided_done', '1');
+}
+function earnedEl() { return UI.earned && UI.earned.length ? h('div.earned', h('b', 'New achievement' + (UI.earned.length > 1 ? 's' : '') + ': '), UI.earned.join(' · ')) : null; }
+// ---- the guided first game: a scripted opening (fixed deal, one idea per step, a "why", one glowing plate), then free play
+// Seat 1 (the partner chef) follows its own short script so the plates the lesson needs come back round.
+const TUT_A = ['tempura', 'tempura', 'squid', 'dumpling', 'dumpling', 'roll1', 'egg', 'salmon', 'sashimi', 'roll2'];
+const TUT_B = ['sashimi', 'sashimi', 'wasabi', 'roll3', 'pudding', 'pudding', 'chop', 'salmon', 'dumpling', 'egg'];
+const TUT_PARTNER = ['sashimi', 'dumpling', 'salmon', 'roll2', 'pudding', 'sashimi'];
+const TUT = [
+  { take: 'tempura', title: 'Step 1 of 6 · Start a pair', why: 'Crispy Prawns score 5 for every pair, and a lone one scores nothing. There are two prawns on this belt: take one now, and with only two diners this hand comes back to you, so you can finish the pair later.' },
+  { take: 'wasabi', title: 'Step 2 of 6 · The hands swapped', why: 'You are now holding the plates that were in front of {P}. Take the Fire Paste: the next nigiri you serve lands on it and scores triple.' },
+  { take: 'squid', title: 'Step 3 of 6 · Use the paste', why: 'Your first belt is back. The Moon Nigiri is worth 3 points, but on your waiting Fire Paste it scores 9. Look for the +9 on the plate.' },
+  { take: 'roll3', title: 'Step 4 of 6 · The roll race', why: 'At the end of the round, the most roll icons on a counter scores 6 and the second most 3. This roll has three icons, the most a single plate can have.' },
+  { take: 'tempura', title: 'Step 5 of 6 · Finish the pair', why: 'The second Crispy Prawn came back round, as promised. Two prawns make a pair: +5 right away.' },
+  { take: 'pudding', title: 'Step 6 of 6 · Think ahead', why: 'Custard Cups score nothing now, but they stay on your counter for all three rounds. At the end the most custard scores 6 (with more diners, the fewest also loses 6).' }
+];
+function tutDeal() {
+  // rebuild the two first hands from the shuffled deck; every card stays where the invariants expect it (108 cards, no copies)
+  const pool = G.deck.concat(G.players[0].hand, G.players[1].hand), take = t => { const i = pool.findIndex(id => tkey(id) === t); return pool.splice(i, 1)[0]; };
+  const A = TUT_A.map(take), B = TUT_B.map(take);
+  G.players[0].hand = A; G.players[1].hand = B; G.deck = pool;
+  G.players.forEach(p => { p.mem = [{ turn: 1, hand: p.hand.slice().sort((a, b) => a - b) }]; });
+  UI.tut = { on: true, step: -1 };
+  Object.assign(UI.coach.seen, { welcome: 1, pick: 1, tempura: 1, wasabi: 1, squid: 1, roll3: 1, roll2: 1, roll1: 1, pudding: 1, pasteReady: 1 });
+}
+function tutStep() { return UI.tut && UI.tut.on && G && G.round === 1 && G.turn <= TUT.length ? TUT[G.turn - 1] : null; }
+function tutTarget() { const s = tutStep(), v = viewSeat(); if (!s || v < 0) return -1; return G.players[v].hand.findIndex(id => tkey(id) === s.take); }
+function tutPartner(seat) {
+  if (!UI.tut || !UI.tut.on || seat !== 1 || G.round !== 1 || G.turn > TUT_PARTNER.length) return null;
+  const t = TUT_PARTNER[G.turn - 1]; return KK.moves(G, seat).find(m => m.ids.length === 1 && tkey(m.ids[0]) === t) || null;
+}
+// called from coachCheck: the lesson card for this turn (once per turn), then the hand-over card after the last step
+function tutCheck() {
+  if (!UI.tut || !UI.tut.on) return false;
+  const v = viewSeat(); if (v < 0 || !canPick() || UI.cards.length) return false;
+  if (G.round > 1 || G.turn > TUT.length) {
+    UI.tut.on = false; UI.coach.turn = G.round + '.' + G.turn;
+    pushCard({ kind: 'coach', title: 'Your turn to choose', sub: 'Lesson done', body: h('div', h('p', 'From now on every plate is your choice. The green +N on a plate is what it scores you right now; Hint suggests a pick and says why.'), h('p.sm', 'New plates still get a short tip the first time you see them. Plates (top bar) lists every plate and how it scores.')), buttons: [{ label: 'Play on', a: 'cont', cls: 'go' }] });
+    return true;
+  }
+  const turn = G.round + '.' + G.turn; if (UI.tut.seen === turn) return false; UI.tut.seen = turn; UI.coach.turn = turn;
+  const s = tutStep(); if (!s) return false;
+  const cw = isPh() ? 52 : 96, why = s.why.replace('{P}', pname(1));
+  const body = h('div.cwrap', h('div.cardbox', cardDiv(s.take, cw)), h('div.cinfo', h('p', h('b', 'Take the ' + TY[s.take].name + '.')), h('p', h('i', 'Why: '), why)));
+  const intro = G.turn === 1 ? h('p.sm.tutintro', 'You and ' + pname(1) + ' each pick one plate at the same time; then the covers lift and the hands swap. Highest score after three rounds wins.') : null;
+  pushCard({ kind: 'coach', title: s.title, sub: 'Lesson', body: intro ? h('div', intro, body) : body, buttons: [{ label: 'Show me', a: 'cont', cls: 'go' }] });
+  return true;
+}
+function tutGuard(i) {
+  const s = tutStep(); if (!s) return true; const v = viewSeat(); const id = G.players[v].hand[i];
+  if (id != null && tkey(id) === s.take) return true;
+  snd('error'); toast('In this step, take the glowing ' + TY[s.take].name + '.'); return false;
+}
+// ---- boot (called from boot() in part 5)
+function kitBoot() {
+  kitSettings(); kitReference(); kitRecap();
+  GNS.achievements(GAME_ID, ACH);
+  const sync = () => { AIDELAY = GX.aiDelay(650); ANIM = GX.pref('anim') === 'off' || GX.reduced() ? 0 : 1; };
+  sync();
+  GX.onPref(k => { if (k === 'ai' || k === 'anim' || k === 'reduce' || typeof k === 'object') sync(); if (k === 'cb' && G && UI.started) render(); });
+  GX.offline({ sw: '../sw.js', scope: '../' });
+}
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-a]'); if (!t) return;
+  const a = t.dataset.a;
+  if (a === 'undo') undoHold();
+  else if (a === 'refopen') { GX.close(); GX.show('gx-refd'); }
+  else if (a === 'refbig') { const ty = t.dataset.type; closePop(); GX.refOpen('p-' + ty); }
+});
+document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !GX.open && UI.hold) { e.preventDefault(); undoHold(); } });

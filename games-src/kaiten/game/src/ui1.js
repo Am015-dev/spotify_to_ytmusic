@@ -2,7 +2,7 @@
 var ANIM = 1, AIDELAY = 650;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, seq: 0, rec: null, noRec: false, over: null,
-  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: null, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
+  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: null, sound: true, music: true, gfx: 'auto', undo: 'short' }, enter: '', land: null, tm: null, pend: null, rq: [] };
 const D = KK.DATA;
 const KIT = KKKit;
 const TY = KIT.TYPES;
@@ -79,11 +79,11 @@ function pudCounts() {
 function dispHand() {
   const v = viewSeat(); if (v < 0 || !G) return [];
   if (UI.fz && UI.fz.hand) return UI.fz.hand;
-  const p = G.players[v], pk = p.picked && p.pick ? p.pick : [];
+  const p = G.players[v], pk = p.picked && p.pick ? p.pick : UI.hold && UI.hold.seat === v ? UI.hold.mv.ids : [];
   return p.hand.filter(id => pk.indexOf(id) < 0);
 }
 const mySeatPicked = () => { const v = viewSeat(); return v >= 0 && G && G.players[v].picked; };
-function canPick() { const v = viewSeat(); return !!G && G.phase === 'pick' && v >= 0 && !G.players[v].picked && !UI.busy && !UI.cards.length && !UI.fz && !(NET.on && !NET.hostPeer && isClient()) && !(NET.on && NET.pend === G.round * 100 + G.turn && Date.now() - NET.pendT < 2500); }
+function canPick() { const v = viewSeat(); return !!G && G.phase === 'pick' && v >= 0 && !G.players[v].picked && !UI.hold && !UI.busy && !UI.cards.length && !UI.fz && !(NET.on && !NET.hostPeer && isClient()) && !(NET.on && NET.pend === G.round * 100 + G.turn && Date.now() - NET.pendT < 2500); }
 function mkey(m) { return m && m.pick ? m.pick.join(',') : ''; }
 // ---- scoring model for the table (works on any displayed tables)
 function liveScores(tab) { return KK.roundScores({ players: tab.map(t => ({ table: t })) }); }
@@ -148,6 +148,8 @@ function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
 function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2200); }
 function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
-function loadPrefs() { try { const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
-function savePrefs() { lsSet('kk_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
-const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35))) : Promise.resolve();
+// the computer speed now lives in the shared settings (GX.pref('ai')); an old per-game speed in kk_prefs is ignored
+function loadPrefs() { try { const p = JSON.parse(lsGet('kk_prefs') || '{}'); delete p.speed; Object.assign(UI.prefs, p); } catch (e) { } }
+function savePrefs() { lsSet('kk_prefs', JSON.stringify(UI.prefs)); }
+const animF = () => { try { return Math.max(.3, GX.animMs(1000) / 1000 || 1); } catch (e) { return 1; } };
+const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35) * animF())) : Promise.resolve();

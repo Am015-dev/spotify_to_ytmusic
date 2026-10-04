@@ -32,6 +32,7 @@ function coachTip(key, title, text, type) {
   pushCard({ kind: 'coach', title, sub: 'Tip', body, buttons: [{ label: 'Got it', a: 'cont' }] });
 }
 function coachCheck() {
+  if (UI.tut && UI.tut.on && G && G.phase === 'pick') return tutCheck();
   const lv = UI.coach.level; if (lv === 'off' || !G || G.phase !== 'pick') return false;
   const v = viewSeat(); if (v < 0 || !canPick() || UI.cards.length) return false;
   const turn = G.round + '.' + G.turn; if (UI.coach.turn === turn) return false;
@@ -115,12 +116,14 @@ function skipCount() { if (UI.rsInfo) { UI.rsInfo.skip = true; } }
 function showFinal() {
   const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false; rs.innerHTML = '';
   const F = G.final, np = G.np;
+  try { kitResult(); } catch (e) { }
   const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Final result' });
   const ws = G.winners || [];
   const me = viewSeat(), iWin = me >= 0 && ws.includes(me);
   box.appendChild(h('h2', h('span', { html: KIT.iconSVG('crown', { size: 32 }) }), 'The meal is over'));
   const wn = h('div.win', h('span', { html: avatarS(ws[0] != null ? ws[0] : 0, 96) }), h('div', G.winText));
   box.appendChild(wn);
+  { const ea = earnedEl(); if (ea) box.appendChild(ea); }
   // custard resolved
   const tb = h('table.cat'); const hr = h('tr', h('th', ''));
   for (let s = 0; s < np; s++) { const th = h('th'); th.appendChild(h('div', { html: avatarS(s, 64) })); th.appendChild(h('span.sub', pname(s))); hr.appendChild(th); }
@@ -141,7 +144,7 @@ function showFinal() {
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
   if (humanWin) { snd('win', { duck: true }); celebrate(box); } else { snd('round', { duck: true }); if (humans().length || NET.on) wn.after(h('p.wp', 'Well played! Another meal?')); }
   UI.overShown = true;
-  if (UI.mode !== 'net') lsSet('kk_save', '');
+  if (UI.mode !== 'net') { lsSet('kk_save', ''); try { GNS.saved(GAME_ID, false); } catch (e) { } }
 }
 function celebrate(box) {
   if (!ANIM) return; const c = h('div.conf'); const cols = ['#e5553a', '#e0a31c', '#2a97a0', '#7a5ac8', '#5aa83c', '#f4b6d2'];

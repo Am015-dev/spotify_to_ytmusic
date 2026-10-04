@@ -9,7 +9,7 @@ parts = sorted(f for f in os.listdir(os.path.join(D, 'src')) if re.match(r'ui\d+
 ui = ''.join(rd(os.path.join(D, 'src', f)) for f in parts)
 open(os.path.join(D, 'ui.js'), 'w', encoding='utf-8').write(ui)
 audio = os.path.join(SP, 'audio', 'kaiten', 'audio-data.js')
-SRC = {'shell.js': os.path.join(SP, 'shell', 'shell.js'), 'perfhud.js': os.path.join(SP, 'perf', 'perfhud.js'), 'gameaudio.js': os.path.join(SP, 'audio', 'gameaudio.js'),
+SRC = {'shell.js': os.path.join(SP, 'shell', 'shell.js'), 'gx-kit.js': os.path.join(SP, 'shell', 'gx-kit.js'), 'refdata.js': os.path.join(D, 'src', 'refdata.js'), 'perfhud.js': os.path.join(SP, 'perf', 'perfhud.js'), 'gameaudio.js': os.path.join(SP, 'audio', 'gameaudio.js'),
        'kit.js': os.path.join(KT, 'kit', 'kit.js'), 'art-data.js': '', 'data.js': os.path.join(D, 'src', 'data.js'), 'engine.js': os.path.join(D, 'src', 'engine.js'), 'ai.js': os.path.join(D, 'src', 'ai.js'), 'ui.js': os.path.join(D, 'ui.js'),
        'trystero.min.js': os.path.join(SP, 'net', 'trystero.min.js'), 'netroom.js': os.path.join(SP, 'net', 'netroom.js'), 'netstrip.js': os.path.join(D, 'src', 'netstrip.js'), 'net.js': os.path.join(D, 'src', 'net.js')}
 # ---- painted art: ../art/manifest.json maps id -> base name. <name>.png (a painting dropped in by hand) wins over <name>.webp
@@ -33,8 +33,8 @@ def art_js():
 ART_JS = art_js()
 if os.path.exists(audio): SRC['audio-data.js'] = audio
 else: print('NOTE: audio-data.js missing, silent build', file=sys.stderr)
-ORDER = ['shell.js', 'perfhud.js', 'trystero.min.js', 'netroom.js', 'kit.js', 'art-data.js', 'data.js', 'engine.js', 'ai.js', 'netstrip.js', 'gameaudio.js', 'audio-data.js', 'net.js', 'ui.js']
-h = rd(os.path.join(D, 'head.html')).replace('/*SHELL_CSS*/', rd(os.path.join(SP, 'shell', 'shell.css')))
+ORDER = ['shell.js', 'gx-kit.js', 'perfhud.js', 'trystero.min.js', 'netroom.js', 'kit.js', 'art-data.js', 'data.js', 'refdata.js', 'engine.js', 'ai.js', 'netstrip.js', 'gameaudio.js', 'audio-data.js', 'net.js', 'ui.js']
+h = rd(os.path.join(D, 'head.html')).replace('/*SHELL_CSS*/', rd(os.path.join(SP, 'shell', 'shell.css')) + '\n' + rd(os.path.join(SP, 'shell', 'gx-kit.css')))
 body = rd(os.path.join(D, 'body.html'))
 if 'audio-data.js' in SRC: body = body.replace('<script src="ui.js"></script>', '<script src="audio-data.js"></script>\n<script src="ui.js"></script>')
 for f in ORDER:
