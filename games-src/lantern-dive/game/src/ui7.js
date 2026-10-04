@@ -157,7 +157,7 @@ function pxSync() {
       if (isTrick) {
         const sr = o.seatOf >= 0 ? pxSeatRect(o.seatOf, B) : null;
         if (sr && ANIM) { o.x = sr.x + sr.w / 2 - R.w * .3; o.y = sr.y + sr.h / 2 - R.w * .4; o.w = R.w * .6; o.a = 0; PX.nPlay++; } else { o.x = R.x; o.y = R.y; o.w = R.w; }
-      } else if (ANIM && ent === 'deal' && !o.drone) { o.x = PX.w / 2 - R.w / 2; o.y = -R.w * 1.6; o.w = R.w * .7; o.delay = now + hi * 55; o.rot = -.4 + hi * .06; o.flip = 1; }
+      } else if (ANIM && ent === 'deal' && !o.drone) { o.x = PX.w / 2 - R.w / 2; o.y = -R.w * 1.6; o.w = R.w * .7; o.delay = now + hi * 32; o.rot = -.4 + hi * .06; o.flip = 1; o.flipUntil = now + 1100 + hi * 40; }
       else { o.x = R.x; o.y = R.y; o.w = R.w; }
     }
     pxCardTex(o);
@@ -256,7 +256,7 @@ function pxFrame(ts) {
   const kf = snap ? 1 : 1 - Math.exp(-dt * 13);
   for (const [, o] of PX.objs) {
     if (o.kind !== 'card') continue;
-    if (!o.detached && !o.busy && !(o.delay && now < o.delay)) { o.x += (o.tx - o.x) * kf; o.y += (o.ty - o.y) * kf; o.w += (o.tw - o.w) * kf; if (o.flip && Math.abs(o.y - o.ty) < 6) o.flip = 0; if (o.rot && !o.busy) o.rot *= (1 - kf); if (o.a < 1 && !o.detached) o.a += (1 - o.a) * kf; }
+    if (!o.detached && !o.busy && !(o.delay && now < o.delay)) { o.x += (o.tx - o.x) * kf; o.y += (o.ty - o.y) * kf; o.w += (o.tw - o.w) * kf; if (o.flip && (Math.abs(o.y - o.ty) < 6 || (o.flipUntil && now > o.flipUntil))) o.flip = 0; if (o.rot && !o.busy) o.rot *= (1 - kf); if (o.a < 1 && !o.detached) o.a += (1 - o.a) * kf; }
     if (o.delay && now >= o.delay) o.delay = 0;
     if (!o.detached && (Math.abs(o.x - o.tx) > .4 || Math.abs(o.y - o.ty) > .4 || Math.abs(o.w - o.tw) > .4 || o.a < .99)) moving = true;
     const lift = o.sel && !o.detached ? 1 : 0; o.lift += (lift - o.lift) * (snap ? 1 : 1 - Math.exp(-dt * 16));

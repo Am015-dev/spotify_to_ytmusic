@@ -148,7 +148,8 @@ svg{display:block}
 #info.why{border-left:4px solid var(--gold);background:rgba(255,216,115,.1)}
 #acts{display:flex;gap:6px;flex-wrap:wrap}
 #acts .btn{flex:1 1 96px}
-#roster{display:flex;flex-wrap:wrap;gap:5px}
+#felt.roston #pool{top:78px}
+#roster{z-index:3;position:absolute;left:8px;right:8px;top:34px;display:flex;flex-wrap:wrap;gap:5px;justify-content:center;pointer-events:none}
 .rchip{display:flex;align-items:center;gap:5px;min-height:34px;border-radius:12px;padding:2px 8px 2px 3px;background:rgba(255,255,255,.07);border:2px solid var(--line);font-size:13px;font-weight:800}
 .rchip svg{width:26px;height:26px}.rchip.w{border-color:var(--gold)}.rchip.r{border-color:var(--ok)}
 .btn{appearance:none;border:2px solid #0b1f3a;background:linear-gradient(180deg,#ffe28a,#e0a31c);color:#2a1d04;font-weight:900;font-size:15px;min-height:44px;min-width:44px;padding:4px 14px;border-radius:12px;cursor:pointer;line-height:1.15}
@@ -303,7 +304,7 @@ html.ph #dockscroll{gap:5px}
 html.ph #acts{padding:3px 0 5px}
 html.ph #acts .btn{font-size:14px}
 html.ph #acts.many .btn{flex:1 1 calc(16% - 6px);min-height:44px;padding:0}
-html.ph.tipon #acts,html.ph.tipon #psub,html.ph.tipon #roster{display:none}
+html.ph.tipon #acts,html.ph.tipon #psub{display:none}
 html.ph.ph-p.tipon .gx-main{grid-template-rows:minmax(0,1fr) auto}
 html.ph.ph-p.tipon .gx-dock{max-height:min(330px,46dvh)}
 html.ph.ph-p.tipon .gx-dock-body{overflow:auto}
