@@ -22,7 +22,7 @@ You are the new **coordinator** for this game. The previous coordinator session 
 - **Live game:** https://am015-dev.github.io/spotify_to_ytmusic/mainhattan-overdrive/ is served from branch **`alex/brave-carson-rbpmlk`**, file **`games/mainhattan-overdrive/index.html`**. That repo branch also holds other games (shelf); touch only that folder.
 - **Beta artifact:** https://claude.ai/artifact/P6zT2b2SwfHYguRTtb67Ug. Republish it with the Artifact tool using `url=` after a read, and the title "Overdrive Beta".
 - **Dev kit:** branch **`alex/overdrive-devkit`** (this branch). Read README.md here.
-  - `base.html` is the LIVE build **v81**.
+  - `base.html` is the LIVE build **v82** (deployed split: index.html + km.js).
   - Workers write `p<TAG>N.py` patches plus self-contained modules, and must pass `node smoke.js .`.
   - Module sources for reference are in `docs/modules/`.
   - Design docs: `docs/fun_redesign.md` (story/activities) and `research_2k.md` (2K Drive research, in the old scratchpad; key points are in fun_redesign).
@@ -56,6 +56,8 @@ Known pitfalls:
   - tBF "BF3 car stuck inside a building": with terrain, the warp no longer lands inside the building.
   - tM3 "NEXT after finale": the test skips chapter 2.
   - tM2 "marked mission 4–7 min": the bot is faster than a human.
+
+## UPDATE 17:35 UTC: v82 deployed = v81 + od-ownerbugs + od-cityvar + od-juice + od-garage (split build live, smoke 12/12 on split, tBA 30/30). Known regressions in v82: tBF BF1 (world runs behind garage overlay; the new garage builder likely replaced the hold) and BF5 (chase camera inside buildings, 1441/4305 frames; likely new city-variety buildings or juice camera). A fix session runs on branch alex/od-v82fix. Still to merge: od-otg2 and od-ownerbugs2.
 
 ## Worker status at handoff (cloud sessions, tag "overdrive")
 Already **merged and live (v81)**:

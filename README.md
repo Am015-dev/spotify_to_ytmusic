@@ -1,7 +1,7 @@
 # Mainhattan Overdrive — dev kit
 
 Single-file three.js LEGO-2K-Drive-style racer. Cities: Frankfurt (real streets) and Athens (real OSM streets, 4 district maps A–D).
-`base.html` is the LIVE build (v81: v80 + real terrain/drivable hills, auto vehicle switch, smash→boost, day/night, split-screen, adaptive audio; module sources in docs/modules/ for reference — already inside base.html). You never edit it directly: you write small Python patch scripts that transform it.
+`base.html` is the LIVE build (v82 = v81 + owner bug fixes, traffic lights + city variety, juice, brick garage; earlier v81: v80 + real terrain/drivable hills, auto vehicle switch, smash→boost, day/night, split-screen, adaptive audio; module sources in docs/modules/ for reference — already inside base.html). You never edit it directly: you write small Python patch scripts that transform it.
 
 ## Setup (once per session)
 ```
