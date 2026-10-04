@@ -9,7 +9,7 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
   in files or commits.
 - A live game is replaced only after the owner OKs a preview (`games/<slug>-next/` or `thornbound-new/`).
 - Don't edit the Mainhattan / Overdrive games; other sessions own them. Ticket to Ride is on hold.
-- Read `games-src/BRIEF-2d-games.md`, its **Cost rules** section first.
+- Read the root `CLAUDE.md` (lessons learnt + cost rules), then `games-src/BRIEF-2d-games.md`.
 
 ## Where things stand (4 Oct 2026)
 - **Thornbound** is the quality pilot. It has blind playtests (`games-src/thornbound/playtest-1/`) and the spec
