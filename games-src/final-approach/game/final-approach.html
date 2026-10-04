@@ -4046,7 +4046,7 @@ function move(G0, seat, level, opt) {
     return pool[0].m;
   }
   const mcp = level === 'hard' ? AI.HMC : AI.NMC;
-  if ((level === 'hard' || level === 'normal') && scored.length > 1 && !opt.noMC && mcp.samples > 0) return monteCarlo(G, seat, scored, rand, Object.assign(level === 'hard' ? { top: AI.HMC.top, samples: AI.HMC.samples } : { top: AI.NMC.top, samples: AI.NMC.samples }, opt));
+  if ((level === 'hard' || level === 'normal') && scored.length > 1 && !opt.noMC && mcp.samples > 0) return monteCarlo(G, seat, scored, rand, Object.assign(level === 'hard' ? { top: AI.HMC.top, samples: AI.HMC.samples, ms: AI.HMC.ms } : { top: AI.NMC.top, samples: AI.NMC.samples, ms: AI.NMC.ms }, opt));
   return scored[0].m;
 }
 function freeAction(G, seat, cand, base) {
@@ -4100,7 +4100,9 @@ function rollout(S, startRound) {
 }
 function monteCarlo(G, seat, scored, rand, opt) {
   const K = Math.min(opt.top || 5, scored.length), N = opt.samples || 8, top = scored.slice(0, K), r0 = G.round, tot = top.map(() => 0);
+  const t0 = Date.now(), budget = opt.ms || 0;   // time guard: on a slow phone fewer worlds are sampled instead of a long pause
   for (let n = 0; n < N; n++) {
+    if (budget && n >= 2 && Date.now() - t0 > budget) break;
     const W0 = sampleWorld(G, seat, rand);
     for (let i = 0; i < K; i++) { const S = FA.cloneLite(W0); FA.performMove(S, top[i].m, seat, true); rollout(S, r0); tot[i] += cost(S, seat); }
   }
@@ -4108,8 +4110,8 @@ function monteCarlo(G, seat, scored, rand, opt) {
   return top[bi].m;
 }
 
-AI.NMC = AI.NMC || { top: 3, samples: 3 };   // normal: a small Monte Carlo over the partner's unknown dice
-AI.HMC = AI.HMC || { top: 6, samples: 12 };   // hard: a bigger one
+AI.NMC = AI.NMC || { top: 3, samples: 3, ms: 250 };   // normal: a small Monte Carlo over the partner's unknown dice
+AI.HMC = AI.HMC || { top: 5, samples: 10, ms: 450 };   // hard: a bigger one
 AI.move = move; AI.say = (G, seat) => sayCodes(G, seat); AI.cost = cost; AI.features = features; AI.schedCost = schedCost; AI.score = cost;
 if (typeof module === 'object' && module.exports) module.exports = FA;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
