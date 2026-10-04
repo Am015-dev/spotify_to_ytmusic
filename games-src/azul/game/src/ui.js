@@ -196,7 +196,7 @@ function beginGame(){const o=UI.setup;UI.guideNote=null;UI.fx.length=0;UI.fxSeen
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh()}catch(e){openStart()}}
 function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].m);V3.tiles={};V3.lkey='';relayout()}
 // ---------- the computer ----------
-let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!NET.on)||phHold()||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)&&G.turn>0?2.2:1;
+let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!NET.on)||phHold()||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)?2.6:1.4;
   aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!NET.on)||phHold()||isClient())return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*wait))}
 function boot(){$('#defs').innerHTML=glazeDefs();GX.init({key:'sgz'});GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(id==='refd')$('#refbody').innerHTML=refHtml();if(G)render()};
   try{init3D()}catch(e){console.error(e)}if(!V3.on){V3.qPref=gfxLoadPref();V3.q=V3.qPref==='auto'?gfxAuto():V3.qPref}gfxBtn();soundBtns();setCoach(UI.coach);netInit();openStart()}
