@@ -20,7 +20,11 @@ function page(o) {
   const w = dom.window; w.GX.init({ key: 't' }); return w;
 }
 const click = (w, e) => e.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
-function test(name, fn) { try { fn(); pass++; console.log('ok   ' + name); } catch (e) { fail++; console.log('FAIL ' + name + '\n     ' + (e && e.stack || e).toString().split('\n').slice(0, 3).join('\n     ')); } }
+const pending = [];
+function test(name, fn) {
+  const bad = e => { fail++; console.log('FAIL ' + name + '\n     ' + (e && e.stack || e).toString().split('\n').slice(0, 3).join('\n     ')); };
+  try { const r = fn(); if (r && r.then) { pending.push(r.then(() => { pass++; console.log('ok   ' + name); }, bad)); return; } pass++; console.log('ok   ' + name); } catch (e) { bad(e); }
+}
 const eq = (a, b, m) => { if (JSON.stringify(a) !== JSON.stringify(b)) throw new Error((m || 'value') + ': expected ' + JSON.stringify(b) + ', got ' + JSON.stringify(a)); };
 const ok = (c, m) => { if (!c) throw new Error(m || 'assertion failed'); };
 
@@ -248,14 +252,17 @@ test('GNS: results list capped at 200', () => {
 test('offline: registers ../sw.js with scope ../ and shows the update notice', () => {
   const w = page(); const calls = []; const ls = {};
   Object.defineProperty(w.navigator, 'serviceWorker', { value: { controller: {}, register: (u, o) => { calls.push([u, o.scope]); return Promise.resolve(); }, addEventListener: (t, f) => { ls[t] = f; } } });
-  ok(w.GX.offline()); eq(calls, [['../sw.js', '../']]);
+  let ct = 'text/html'; w.fetch = () => Promise.resolve({ ok: true, headers: { get: () => ct } });
+  ok(w.GX.offline());
   ls.message({ data: { type: 'gns-update', url: 'https://gns.test/other/' } }); ok(!w.document.querySelector('.gx-update'), 'other page: no notice');
   ls.message({ data: { type: 'gns-update', url: 'https://gns.test/game/index.html' } }); ok(w.document.querySelector('.gx-update'), 'notice');
   eq(w.document.querySelector('.gx-update').textContent, 'A new version is ready — tap to reload');
+  const tick = () => new Promise(r => setTimeout(r, 5));
+  return tick().then(() => { eq(calls, [], 'an HTML answer is not registered'); ct = 'application/javascript; charset=utf-8'; w.GX.offline(); return tick(); })
+    .then(() => eq(calls, [['../sw.js', '../']], 'a script is registered with scope ../'));
 });
 test('offline: nothing happens without a service worker or on file://', () => {
   const w = page(); eq(w.GX.offline(), false);
 });
 
-console.log(`kit-test: ${pass} passed, ${fail} failed`);
-process.exitCode = fail ? 1 : 0;
+Promise.all(pending).then(() => { console.log(`kit-test: ${pass} passed, ${fail} failed`); process.exitCode = fail ? 1 : 0; });

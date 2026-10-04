@@ -378,8 +378,12 @@
     o = o || {};
     try {
       var nav = root.navigator; if (!nav || !nav.serviceWorker || !/^https?:$/.test(root.location.protocol)) return false;
-      var had = !!nav.serviceWorker.controller;
-      nav.serviceWorker.register(o.sw || '../sw.js', { scope: o.scope || '../' }).catch(function () { });
+      var had = !!nav.serviceWorker.controller, url = o.sw || '../sw.js';
+      // register only when the worker file really is a script (a test server that answers every URL with the page would
+      // otherwise make the browser log a registration error)
+      var reg = function () { nav.serviceWorker.register(url, { scope: o.scope || '../' }).catch(function () { }); };
+      if (root.fetch) root.fetch(url, { method: 'HEAD', cache: 'no-store' }).then(function (r) { if (r.ok && /javascript/.test(r.headers.get('content-type') || '')) reg(); }, function () { });
+      else reg();
       nav.serviceWorker.addEventListener('controllerchange', function () { if (had) GX.updateNotice(); had = true; });
       nav.serviceWorker.addEventListener('message', function (e) {
         var d = e.data || {}; if (d.type !== 'gns-update') return;
