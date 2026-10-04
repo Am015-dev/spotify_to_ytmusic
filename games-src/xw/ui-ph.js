@@ -122,9 +122,10 @@ function phRender(){if(!PHN.on)return;PHN.build();const dock=document.querySelec
     else if(ok&&k==='atk')ok=G.phase==='target'&&humanTurn()&&validTarget(s);
     else if(ok&&k==='info')ok=PHN.popSig===sigNow();
     if(!ok)PHN.pop=null}
-  // dice steps: shrink the mat so the dice, the result and every button fit on screen without scrolling (testers got stuck with Done below the fold)
-  {const dz=!!(play&&(['amod','dmod','damod'].includes(G.phase)||(G.phase==='ask'&&G.atk&&humanTurn())));const da=!dz&&!!(play&&humanTurn()&&['action','target','ask'].includes(G.phase)&&!(G.q&&['rock','deploy'].includes(G.q.key)));
-    if(R.classList.contains('ph-dice')!==dz||R.classList.contains('ph-act')!==da){R.classList.toggle('ph-dice',dz);R.classList.toggle('ph-act',da);if(typeof resize3D==='function')requestAnimationFrame(()=>{try{resize3D()}catch(e){}})}}
+  // dice steps: if the dice, result and buttons don't fit, shrink the mat (never below 3/4) so nothing sits below the fold (testers got stuck with Done off-screen)
+  {const dz=!!(play&&(['amod','dmod','damod'].includes(G.phase)||(G.phase==='ask'&&G.atk&&humanTurn())));
+    if(!dz){if(R.classList.contains('ph-dice')){R.classList.remove('ph-dice');if(typeof resize3D==='function')requestAnimationFrame(()=>{try{resize3D()}catch(e){}})}}
+    else if(!R.classList.contains('ph-dice')&&!PHN.diceChk){PHN.diceChk=1;requestAnimationFrame(()=>{PHN.diceChk=0;const dk=document.querySelector('.gx-dock');if(dk&&dk.scrollHeight>dk.clientHeight+4&&!PHN.land){R.classList.add('ph-dice');if(typeof resize3D==='function')requestAnimationFrame(()=>{try{resize3D()}catch(e){}})}})}}
   const strip=play&&G.phase==='plan'&&planSide()>=0&&!sumPending()&&!UI.hold;R.classList.toggle('ph-ps',strip);
   if(ps){ps.hidden=!strip;if(strip){const h=stripHTML();if(ps._h!==h){ps._h=h;ps.innerHTML=h}}else if(ps._h){ps._h=null;ps.innerHTML=''}}
   const card=play?cardHTML():null;
