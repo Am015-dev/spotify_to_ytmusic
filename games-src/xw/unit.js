@@ -6,18 +6,18 @@ let ok=0,bad=0;const T=(n,c)=>{if(c)ok++;else{bad++;console.log('FAIL',n)}};
 {const w=fresh([[{p:'jax',u:['u_snap']}],[{p:'slate',u:[]}]]);// large ship barrel roll via Snap Roll
   const r=w.eval("(()=>{const s=G.ships[0];Object.assign(s,{x:457,y:457,h:Math.PI/2});G.ships[1].x=100;G.ships[1].y=850;return rollOptions(s).map(o=>[o.dir,o.sh,Math.round(o.p.x-457)])})()");
   T('large roll 10 options',r.length===10);T('large roll moves 100 mm',r.every(o=>Math.abs(o[2])===100));T('large slide +-20',r.some(o=>o[1]===20)&&r.some(o=>o[1]===-20))}
-{const w=fresh([[{p:'kael',u:[]}],[{p:'bram',u:[]}]]);T('Slave I title adds torpedo slot',w.eval("upgradesFor('bram',{w1:1,w2:1,w3:1}).includes('u_plasma')"));T('no torpedo on other pilots of ... check lancer ok',w.eval("upgradesFor('kael',{}).includes('u_plasma')"));
+{const w=fresh([[{p:'kael',u:[]}],[{p:'bram',u:[]}]]);T('Iron Warden title adds torpedo slot',w.eval("upgradesFor('bram',{w1:1,w2:1,w3:1}).includes('u_plasma')"));T('no torpedo on other pilots of ... check lancer ok',w.eval("upgradesFor('kael',{}).includes('u_plasma')"));
   T('unique character pilot+crew',w.eval("(()=>{for(let i=0;i<300;i++){const sq=randomSquad(0,100,{w1:1,w2:1,w3:1});const n=[];sq.forEach(e=>{if(PILOTS[e.p].uniq)n.push(uname(PILOTS[e.p]));e.u.forEach(u=>{if(UPGRADES[u].uniq)n.push(uname(UPGRADES[u]))})});if(new Set(n).size!==n.length)return false}return true})()"))}
 {const w=fresh([[{p:'kael',u:[]}],[{p:'slate',u:[]}]]);// simultaneous destruction: initiative wins
   const r=w.eval("(()=>{G.winner=null;G.phase='combat';G.ships.forEach(s=>{s.alive=false});return checkWin()&&G.winner==='P'+(G.init+1)})()");T('simultaneous: initiative wins',r)}
-{const w=fresh([[{p:'wren',u:[]}],[{p:'slate',u:[]}]]);// Wedge: agility -1 before bonus dice
+{const w=fresh([[{p:'wren',u:[]}],[{p:'slate',u:[]}]]);// Wren Talvo: agility -1 before bonus dice
   T('wedge def dice at range 3 = agi-1+1',w.eval("defDice(G.ships[0],G.ships[1],true,3,false)")===3);
   T('wedge floors agility at 0 then adds range die',w.eval("(()=>{G.ships[1].agi=0;return defDice(G.ships[0],G.ships[1],true,3,true)})()")===2)}
 {const w=fresh([[{p:'kael',u:[]}],[{p:'slate',u:[]}]]);// proton bomb: faceup card through shields
   const r=w.eval("(()=>{const s=G.ships[0];const sh=s.sh;const n=s.dmg.length;dealCardDirect(s,null);return [s.sh===sh,s.dmg.length===n+1||s.dmg.length===n]})()");T('plasma bomb bypasses shields',r[0]&&r[1])}
-{const w=fresh([[{p:'jax',u:[]}],[{p:'shiv',u:[]}]]);// Backstabber behind a turret ship
+{const w=fresh([[{p:'jax',u:[]}],[{p:'shiv',u:[]}]]);// "Shiv" behind a turret ship
   const r=w.eval("(()=>{const a=G.ships[1],d=G.ships[0];Object.assign(d,{x:457,y:457,h:Math.PI/2});Object.assign(a,{x:457,y:300,h:Math.PI/2});const behind=exAtkBonus(a,d,{},{});Object.assign(a,{x:457,y:620,h:-Math.PI/2});return [behind,exAtkBonus(a,d,{},{})]})()");T('shiv +1 behind a turret ship',r[0]===1);T('shiv +0 in its front arc',r[1]===0)}
-{const w=fresh([[{p:'kira',u:['u_ionlance']}],[{p:'slate',u:[]}]]);// Firespray secondary weapons front arc only
+{const w=fresh([[{p:'kira',u:['u_ionlance']}],[{p:'slate',u:[]}]]);// heavy pursuit ship secondary weapons front arc only
   const r=w.eval("(()=>{const a=G.ships[0],d=G.ships[1];Object.assign(a,{x:457,y:457,h:Math.PI/2});Object.assign(d,{x:457,y:300,h:Math.PI/2});return weaponsFor(a).map(x=>x.k)})()");T('rear arc: primary only',r.includes('P')&&!r.some(k=>k!=='P'))}
 {const w=fresh([[{p:'rhane',u:['u_adren']}],[{p:'kael',u:[]}]].reverse(),[{human:false},{human:false}]);// stressed ship + Adrenaline: flies the red maneuver as white
   const r=w.eval("(()=>{const s=G.ships.find(x=>x.pilot==='rhane');s.stress=1;const red=dialOf(s).find(m=>m.c==='r'&&m.t!=='K');let got=null;exReveal(s,red,m=>stressCheck(s,m,mm=>{got=mm}));return [got===red||(got&&got.t===red.t&&got.s===red.s),s.flags.adren]})()");T('adrenaline before stress check',r[0]&&r[1])}
@@ -27,7 +27,7 @@ let ok=0,bad=0;const T=(n,c)=>{if(c)ok++;else{bad++;console.log('FAIL',n)}};
   T('human deploy asked',w.eval("G.phase==='ask'&&G.q.key==='deploy'"))}
 {const w=fresh([[{p:'kael',u:[]}],[{p:'slate',u:[]}]]);// destroyed ship's cards go to the discard pile
   const r=w.eval("(()=>{const s=G.ships[1];const d0=G.disc.length;dealDamage(s,3,0,null);return [!s.alive,s.dmg.length===0,G.disc.length===d0+3]})()");T('destroyed cards discarded',r.every(Boolean))}
-{const w=fresh([[{p:'kael',u:['u_tinker']}],[{p:'hex',u:[]}]]);// Dark Curse blocks the Snapshot-style focus use and focus spending
+{const w=fresh([[{p:'kael',u:['u_tinker']}],[{p:'hex',u:[]}]]);// "Hex" blocks the Snapshot-style focus use and focus spending
   const r=w.eval("(()=>{const a=G.ships[0],d=G.ships[1];a.focus=1;return exWeaponNeedOK(a,{need:'F',spend:'F'},d)})()");T('no focus-cost weapon at Hex',r===false)}
 {const w=fresh([[{p:'tamsin',u:['u_snapeye','u_shock']}],[{p:'slate',u:[]}]],[{human:true},{human:false}]);// Snapshot Eye with lock and focus: player picks how to pay
   const r=w.eval("(()=>{G.q=null;const a=G.ships[0],d=G.ships[1];Object.assign(a,{x:457,y:200,h:Math.PI/2});Object.assign(d,{x:457,y:450,h:-Math.PI/2});a.tl=d.id;a.focus=1;G.phase='target';G.cur=a.id;G.inCombat=true;const w=weaponsFor(a).find(x=>x.k!=='P');declare(a,w.k,d.id);const k=G.q&&G.q.key;performMove({act:'ask',k:'f'},0);return [k,a.tl===d.id,a.focus]})()");
@@ -36,7 +36,7 @@ let ok=0,bad=0;const T=(n,c)=>{if(c)ok++;else{bad++;console.log('FAIL',n)}};
   const r=w.eval("(()=>{G.q=null;const s=G.ships[0];s.ups.push({id:'u_seeker',gone:false});G.deck.push('jam');let done=false;s.sh=0;dealDamage(s,0,1,null,()=>{done=true});const k=G.q&&G.q.key;if(k)performMove({act:'ask',k:G.q.opts[0].k},0);return [k,done,s.ups.filter(u=>u.gone).length]})()");
   T('munitions jam asks which weapon',r[0]==='munitions'&&r[1]&&r[2]===1)}
 {const w=fresh([[{p:'kael',u:[]}],[{p:'krell',u:['u_ionlance']}]]);// Krell: 1-die reroll on a secondary attack
-  const r=w.eval("(()=>{const a=G.ships[1],d=G.ships[0];Object.assign(a,{x:457,y:600,h:-Math.PI/2});Object.assign(d,{x:457,y:350,h:Math.PI/2});G.phase='target';G.cur=a.id;G.inCombat=true;const wp=weaponsFor(a).find(x=>x.k!=='P');declare(a,wp.k,d.id);if(G.phase==='damod')damodDone();const m=atkMods().map(m=>m.k);const before=G.atk.rr.filter(Boolean).length;if(m.includes('krassis'))applyAtkMod('krassis',[0]);return [m.includes('krassis'),G.atk.rr[0]===true,before===0]})()");
+  const r=w.eval("(()=>{const a=G.ships[1],d=G.ships[0];Object.assign(a,{x:457,y:600,h:-Math.PI/2});Object.assign(d,{x:457,y:350,h:Math.PI/2});G.phase='target';G.cur=a.id;G.inCombat=true;const wp=weaponsFor(a).find(x=>x.k!=='P');declare(a,wp.k,d.id);if(G.phase==='damod')damodDone();const m=atkMods().map(m=>m.k);const before=G.atk.rr.filter(Boolean).length;if(m.includes('krell'))applyAtkMod('krell',[0]);return [m.includes('krell'),G.atk.rr[0]===true,before===0]})()");
   T('krell reroll on secondary',r.every(Boolean))}
 {const w=fresh([[{p:'kael',u:[]}],[{p:'rhane',u:['u_plasma']}]]);// Rhane: torpedo range 2-3 becomes 1-3
   const r=w.eval("(()=>{const a=G.ships[1],d=G.ships[0];Object.assign(a,{x:457,y:470,h:-Math.PI/2});Object.assign(d,{x:457,y:390,h:Math.PI/2});a.tl=d.id;return weaponsFor(a).some(x=>x.k!=='P'&&x.targets.some(t=>t.rg===1))})()");

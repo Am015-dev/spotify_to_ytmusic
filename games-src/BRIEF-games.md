@@ -1,7 +1,7 @@
 # Brief for building a board game for the Game Night Shelf (read fully before starting)
 
 The user wants **the real game**: full rules including the listed expansions and variants. Simplify the interface, never the game.
-The reference build is **Sands of Qamar** (Five Tribes) in `SP/ft/`. Copy its structure and test scripts and adapt them.
+The reference build is **Sands of Qamar** in `SP/ft/`. Copy its structure and test scripts and adapt them.
 SP = games-src
 
 ## Hard rules

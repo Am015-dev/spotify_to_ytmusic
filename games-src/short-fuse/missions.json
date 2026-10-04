@@ -1,10 +1,9 @@
 {
  "meta": {
-  "game": "Bomb Busters (BGG 413246)",
+  "game": "Short Fuse (adaptation of the original game)",
   "mission_count": 66,
   "conventions": {
    "name": "our own short name",
-   "ref": "printed English title, internal reference only",
    "players": "allowed player counts",
    "dial_advance": "steps toward the skull (negative = move back)",
    "wires.red/yellow": "mode exact {count} | out_of {keep, of}: draw `of` at random, mark all with \"?\", keep `keep` unseen | fixed {values} | none. candidates restricts the draw range. dealing: shuffled (default) or a special deal.",
@@ -28,7 +27,6 @@
   {
    "number": 1,
    "name": "Boot Camp I",
-   "ref": "TRAINING, Day 1",
    "box": "base",
    "players": [
     2,
@@ -69,7 +67,7 @@
    "audio": null,
    "setup_changes": [],
    "special_rules": [],
-   "rules": "Tutorial. Only blue wires 1-6 (24 tiles); no equipment. Introduces the two cut actions: a dual cut (name a value, point at one teammate wire; on success both wires are cut in place, on failure the dial advances and the teammate shows the true value with an info token, and the active player never reveals which of their own wires they meant) and a solo cut (all the remaining wires of a value are in your hand: cut all 4, or the last 2). Also sets the defaults for every later mission: dial set for player count, one character each with a once-per-mission Double Detector, opening info tokens placed clockwise from the Captain.",
+   "rules": "Tutorial. Only blue wires 1-6 (24 tiles); no equipment. Introduces the two cut actions: a dual cut (name a value, point at one teammate wire; on success both wires are cut in place, on failure the dial advances and the teammate shows the true value with an info token, and the active player never reveals which of their own wires they meant) and a solo cut (all the remaining wires of a value are in your hand: cut all 4, or the last 2). Also sets the defaults for every later mission: dial set for player count, one character each with a once-per-mission Twin Probe, opening info tokens placed clockwise from the Captain.",
    "gaps": [],
    "documentation": "full",
    "sources": [
@@ -80,7 +78,6 @@
   {
    "number": 2,
    "name": "Boot Camp II",
-   "ref": "TRAINING, Day 2",
    "box": "base",
    "players": [
     2,
@@ -134,7 +131,6 @@
   {
    "number": 3,
    "name": "Boot Camp III",
-   "ref": "TRAINING, Day 3",
    "box": "base",
    "players": [
     2,
@@ -195,7 +191,6 @@
   {
    "number": 4,
    "name": "Field Day One",
-   "ref": "TRAINING: First Day in the Field",
    "box": "base",
    "players": [
     2,
@@ -260,7 +255,6 @@
   {
    "number": 5,
    "name": "Field Day Two",
-   "ref": "TRAINING: Second Day in the Field",
    "box": "base",
    "players": [
     2,
@@ -327,7 +321,6 @@
   {
    "number": 6,
    "name": "Field Day Three",
-   "ref": "TRAINING: Third Day in the Field",
    "box": "base",
    "players": [
     2,
@@ -392,7 +385,6 @@
   {
    "number": 7,
    "name": "Last Lesson",
-   "ref": "TRAINING: Last Day of Class",
    "box": "base",
    "players": [
     2,
@@ -453,7 +445,6 @@
   {
    "number": 8,
    "name": "Graduation",
-   "ref": "FINAL EXAM",
    "box": "base",
    "players": [
     2,
@@ -521,7 +512,6 @@
   {
    "number": 9,
    "name": "Pecking Order",
-   "ref": "A Sense of Priorities",
    "box": "9-19",
    "players": [
     2,
@@ -599,7 +589,6 @@
   {
    "number": 10,
    "name": "No Coffee Today",
-   "ref": "A Rough Patch",
    "box": "9-19",
    "players": [
     2,
@@ -672,7 +661,6 @@
   {
    "number": 11,
    "name": "Colourblind",
-   "ref": "Blue on Red, Looks Like We Are Dead",
    "box": "9-19",
    "players": [
     2,
@@ -740,7 +728,6 @@
   {
    "number": 12,
    "name": "Paperwork",
-   "ref": "Wrapped in Red Tape",
    "box": "9-19",
    "players": [
     2,
@@ -814,7 +801,6 @@
   {
    "number": 13,
    "name": "Triple Trouble",
-   "ref": "Red Alert!",
    "box": "9-19",
    "players": [
     2,
@@ -885,7 +871,6 @@
   {
    "number": 14,
    "name": "The Rookie",
-   "ref": "High-Risk Bomb Disposal Expert (aka. NOOB)",
    "box": "9-19",
    "players": [
     2,
@@ -966,7 +951,6 @@
   {
    "number": 15,
    "name": "Lost in Translation",
-   "ref": "Mission in НОВОСИБИРСК",
    "box": "9-19",
    "players": [
     2,
@@ -1038,7 +1022,6 @@
   {
    "number": 16,
    "name": "Groundhog Day",
-   "ref": "Time to Reprioritize (Is this déjà vu?)",
    "box": "9-19",
    "players": [
     2,
@@ -1114,7 +1097,6 @@
   {
    "number": 17,
    "name": "Fibber",
-   "ref": "Rhett Herrings",
    "box": "9-19",
    "players": [
     2,
@@ -1194,7 +1176,6 @@
   {
    "number": 18,
    "name": "Bat-Signal",
-   "ref": "BAT-Helping-Hand",
    "box": "9-19",
    "players": [
     2,
@@ -1270,7 +1251,6 @@
   {
    "number": 19,
    "name": "Cave Lair",
-   "ref": "In the Belly of the Beast",
    "box": "9-19",
    "players": [
     2,
@@ -1377,7 +1357,6 @@
   {
    "number": 20,
    "name": "Odd One Out",
-   "ref": "The Big Bad Wolf",
    "box": "20-30",
    "players": [
     2,
@@ -1460,7 +1439,6 @@
   {
    "number": 21,
    "name": "Even Stevens",
-   "ref": "Death by Haggis",
    "box": "20-30",
    "players": [
     2,
@@ -1529,7 +1507,6 @@
   {
    "number": 22,
    "name": "Ruled Out",
-   "ref": "Negative Impressions",
    "box": "20-30",
    "players": [
     2,
@@ -1591,7 +1568,6 @@
   {
    "number": 23,
    "name": "Small Town",
-   "ref": "Defusing in Fordwich (381 inhabitants, 64 miles from London)",
    "box": "20-30",
    "players": [
     2,
@@ -1653,7 +1629,7 @@
      "reward": "unlock_remaining_equipment_deck"
     }
    ],
-   "rules": "No equipment on the board: make a face-down deck of 7 random equipment cards instead. Lay a random Number card face up. The 4 wires of that value can only be cut together, by a special action: point at all 4 (no equipment or Double Detector); success cuts them, failure explodes the bomb. Until it succeeds, discard the top equipment card at the end of every round (before the Captain's turn). Once it succeeds, every equipment card left in the deck goes face up and is usable at once.",
+   "rules": "No equipment on the board: make a face-down deck of 7 random equipment cards instead. Lay a random Number card face up. The 4 wires of that value can only be cut together, by a special action: point at all 4 (no equipment or Twin Probe); success cuts them, failure explodes the bomb. Until it succeeds, discard the top equipment card at the end of every round (before the Captain's turn). Once it succeeds, every equipment card left in the deck goes face up and is usable at once.",
    "gaps": [
     "Whether the 4 targets may include your own wires: yes by analogy with mission 39 (\"even if you have none\")."
    ],
@@ -1666,7 +1642,6 @@
   {
    "number": 24,
    "name": "Head Count",
-   "ref": "Tally Ho!",
    "box": "20-30",
    "players": [
     2,
@@ -1735,7 +1710,6 @@
   {
    "number": 25,
    "name": "Big Ears",
-   "ref": "The Better to Hear You with...",
    "box": "20-30",
    "players": [
     2,
@@ -1804,7 +1778,6 @@
   {
    "number": 26,
    "name": "Dwindling Options",
-   "ref": "Speaking of the Wolf...",
    "box": "20-30",
    "players": [
     2,
@@ -1870,7 +1843,6 @@
   {
    "number": 27,
    "name": "Putty",
-   "ref": "Playing with Wire",
    "box": "20-30",
    "players": [
     2,
@@ -1934,7 +1906,6 @@
   {
    "number": 28,
    "name": "Butterfingers",
-   "ref": "Captain Careless",
    "box": "20-30",
    "players": [
     2,
@@ -2002,7 +1973,7 @@
      ]
     }
    ],
-   "rules": "The Captain puts their character card back in the box: no Double Detector. The Captain cannot use any equipment or personal item. If the Captain fails a dual cut the bomb explodes. The Captain may still take part in the handsets (2) and sweep (8) effects.",
+   "rules": "The Captain puts their character card back in the box: no Twin Probe. The Captain cannot use any equipment or personal item. If the Captain fails a dual cut the bomb explodes. The Captain may still take part in the handsets (2) and sweep (8) effects.",
    "gaps": [],
    "documentation": "full",
    "sources": [
@@ -2013,7 +1984,6 @@
   {
    "number": 29,
    "name": "Read My Mind",
-   "ref": "Guessing Game",
    "box": "20-30",
    "players": [
     2,
@@ -2081,7 +2051,6 @@
   {
    "number": 30,
    "name": "Runaway Bus",
-   "ref": "Speed Mission!",
    "box": "20-30",
    "players": [
     2,
@@ -2195,7 +2164,6 @@
   {
    "number": 31,
    "name": "Handicap",
-   "ref": "With One Hand Tied Behind My Back...",
    "box": "31-42",
    "players": [
     2,
@@ -2259,7 +2227,6 @@
   {
    "number": 32,
    "name": "Clown Tricks",
-   "ref": "Pranks-A-Plenty",
    "box": "31-42",
    "players": [
     2,
@@ -2328,7 +2295,6 @@
   {
    "number": 33,
    "name": "Casino Royale",
-   "ref": "What Happens in Vegas...",
    "box": "31-42",
    "players": [
     2,
@@ -2395,7 +2361,6 @@
   {
    "number": 34,
    "name": "Mole Hunt",
-   "ref": "The Weakest Link",
    "box": "31-42",
    "players": [
     3,
@@ -2466,7 +2431,6 @@
   {
    "number": 35,
    "name": "Hard-Wired",
-   "ref": "No Link, Single Wire",
    "box": "31-42",
    "players": [
     2,
@@ -2552,7 +2516,6 @@
   {
    "number": 36,
    "name": "Beach Panic",
-   "ref": "Panic under the Palm Trees",
    "box": "31-42",
    "players": [
     2,
@@ -2629,7 +2592,6 @@
   {
    "number": 37,
    "name": "Moving Goalposts",
-   "ref": "Joker's Gone Wild",
    "box": "31-42",
    "players": [
     2,
@@ -2700,7 +2662,6 @@
   {
    "number": 38,
    "name": "Blind Spot",
-   "ref": "Knit a Wire, Purl a Wire...",
    "box": "31-42",
    "players": [
     2,
@@ -2765,7 +2726,7 @@
      }
     }
    ],
-   "rules": "After the deal, the Captain turns one of their wires around without looking at it and puts it at the far right; the teammates can see its value. Only the Captain may cut that wire, with an ordinary cut but no equipment or Double Detector, and if that cut fails the bomb explodes. Nobody else may cut it; a player whose only option would be to cut it skips their turn and the dial advances 1. If it is red, the Captain reveals it when only reds remain (FAQ).",
+   "rules": "After the deal, the Captain turns one of their wires around without looking at it and puts it at the far right; the teammates can see its value. Only the Captain may cut that wire, with an ordinary cut but no equipment or Twin Probe, and if that cut fails the bomb explodes. Nobody else may cut it; a player whose only option would be to cut it skips their turn and the dial advances 1. If it is red, the Captain reveals it when only reds remain (FAQ).",
    "gaps": [
     "How the Captain \"cuts it themselves\": we read it as using the flipped wire as their own matching wire in a dual cut (naming a value for a teammate wire, guided only by what teammates may legally convey) or in a solo cut. Exact procedure not spelled out."
    ],
@@ -2779,7 +2740,6 @@
   {
    "number": 39,
    "name": "The Noble Four",
-   "ref": "The 4 Noble Wires",
    "box": "31-42",
    "players": [
     2,
@@ -2861,7 +2821,6 @@
   {
    "number": 40,
    "name": "Yippee-Ki-Yay",
-   "ref": "Hard to Die (A Christmas Tale)",
    "box": "31-42",
    "players": [
     2,
@@ -2923,7 +2882,6 @@
   {
    "number": 41,
    "name": "Tripwire Tango",
-   "ref": "Latin Bombshell",
    "box": "31-42",
    "players": [
     2,
@@ -3009,7 +2967,6 @@
   {
    "number": 42,
    "name": "Big Top",
-   "ref": "Time to Run Away and Join The Circus...",
    "box": "31-42",
    "players": [
     2,
@@ -3091,7 +3048,6 @@
   {
    "number": 43,
    "name": "Robo-Pal",
-   "ref": "Nano the Robot",
    "box": "43-54",
    "players": [
     2,
@@ -3176,7 +3132,6 @@
   {
    "number": 44,
    "name": "Deep Dive",
-   "ref": "Underwater Pressure",
    "box": "43-54",
    "players": [
     2,
@@ -3265,7 +3220,6 @@
   {
    "number": 45,
    "name": "Volunteers",
-   "ref": "Seeking Volunteers",
    "box": "43-54",
    "players": [
     2,
@@ -3349,7 +3303,6 @@
   {
    "number": 46,
    "name": "Double-Oh",
-   "ref": "Secret Agent",
    "box": "43-54",
    "players": [
     2,
@@ -3427,7 +3380,6 @@
   {
    "number": 47,
    "name": "Mental Math",
-   "ref": "Calculate the Odds",
    "box": "43-54",
    "players": [
     2,
@@ -3509,7 +3461,6 @@
   {
    "number": 48,
    "name": "Three Amigos",
-   "ref": "Lethal Wires 3",
    "box": "43-54",
    "players": [
     2,
@@ -3587,7 +3538,6 @@
   {
    "number": 49,
    "name": "Bottle Post",
-   "ref": "Message in a Bottle",
    "box": "43-54",
    "players": [
     2,
@@ -3682,7 +3632,6 @@
   {
    "number": 50,
    "name": "Lights Out",
-   "ref": "The Blackest Sea",
    "box": "43-54",
    "players": [
     2,
@@ -3757,7 +3706,6 @@
   {
    "number": 51,
    "name": "Yes, Sir!",
-   "ref": "It's Your (Un)Lucky Day!",
    "box": "43-54",
    "players": [
     2,
@@ -3839,7 +3787,6 @@
   {
    "number": 52,
    "name": "Two-Faced",
-   "ref": "Dirty Double-crossers",
    "box": "43-54",
    "players": [
     2,
@@ -3915,7 +3862,6 @@
   {
    "number": 53,
    "name": "Robo-Rogue",
-   "ref": "Nano Nano",
    "box": "43-54",
    "players": [
     2,
@@ -3993,7 +3939,6 @@
   {
    "number": 54,
    "name": "Red Tide",
-   "ref": "The Attack of Rabbit the Red",
    "box": "43-54",
    "players": [
     2,
@@ -4117,7 +4062,6 @@
   {
    "number": 55,
    "name": "Nope Dares You",
-   "ref": "Doctor Nope's Challenge",
    "box": "55-66",
    "players": [
     2,
@@ -4189,7 +4133,6 @@
   {
    "number": 56,
    "name": "Haywire",
-   "ref": "Tripwires",
    "box": "55-66",
    "players": [
     2,
@@ -4255,7 +4198,7 @@
      }
     }
    ],
-   "rules": "After the deal, each player turns one of their own wires around without looking and puts it at the far right; only the teammates see its value. Each player must cut their own flipped wire themselves with an ordinary cut, without equipment or Double Detector, and failure explodes the bomb. A player may also dual-cut a teammate's flipped wire, but doing so (even successfully) advances the dial 1. The setup panel shows a Number card, but the FAQ erratum says Number cards are NOT used. A flipped red is revealed with Reveal Reds (FAQ).",
+   "rules": "After the deal, each player turns one of their own wires around without looking and puts it at the far right; only the teammates see its value. Each player must cut their own flipped wire themselves with an ordinary cut, without equipment or Twin Probe, and failure explodes the bomb. A player may also dual-cut a teammate's flipped wire, but doing so (even successfully) advances the dial 1. The setup panel shows a Number card, but the FAQ erratum says Number cards are NOT used. A flipped red is revealed with Reveal Reds (FAQ).",
    "gaps": [
     "As mission 38: the exact way an owner \"cuts\" a wire they cannot see.",
     "Whether the extra dial step applies to a failed teammate cut on a flipped wire as well (presumably 1 extra on top of the failure)."
@@ -4270,7 +4213,6 @@
   {
    "number": 57,
    "name": "Self-Destruct",
-   "ref": "An Impossible Mission",
    "box": "55-66",
    "players": [
     2,
@@ -4331,7 +4273,7 @@
    ],
    "rules": "Lay all 12 Number cards face up and pair each with a random face-up constraint card. Each time a validation token is placed, the constraint paired with that number becomes active on the board (on top of any previous one; only one is active at a time). Everyone must obey the active constraint. A blocked player says so and skips (no dial step), but if nobody can play for a whole round, the bomb explodes. Reveal Reds is never constrained. Card 10-10 is replaced.",
    "gaps": [
-    "The card names card 10 as \"Disintegrator\", which is the 10-10 campaign card; whether the base card 10 is also excluded is unclear - assume only 10-10."
+    "The card names card 10 as \"Vaporiser\" (our name), which is the 10-10 campaign card; whether the base card 10 is also excluded is unclear - assume only 10-10."
    ],
    "documentation": "full",
    "sources": [
@@ -4342,7 +4284,6 @@
   {
    "number": 58,
    "name": "Probe Party",
-   "ref": "Double and/or Nothing",
    "box": "55-66",
    "players": [
     2,
@@ -4401,7 +4342,7 @@
      "item": "double_probe"
     }
    ],
-   "rules": "Put every info token back in the box: no opening tokens and no tokens on failures, so failed cuts give no information. In exchange, every player's Double Detector can be used on every turn, without limit. Cards 4 and 7 are replaced; no new characters (everyone must have a Double Detector).",
+   "rules": "Put every info token back in the box: no opening tokens and no tokens on failures, so failed cuts give no information. In exchange, every player's Twin Probe can be used on every turn, without limit. Cards 4 and 7 are replaced; no new characters (everyone must have a Twin Probe).",
    "gaps": [],
    "documentation": "full",
    "sources": [
@@ -4412,7 +4353,6 @@
   {
    "number": 59,
    "name": "Robot Guide",
-   "ref": "Nano to the Rescue",
    "box": "55-66",
    "players": [
     2,
@@ -4497,7 +4437,6 @@
   {
    "number": 60,
    "name": "Nope Returns",
-   "ref": "Yep, it's Doctor Nope!",
    "box": "55-66",
    "players": [
     2,
@@ -4567,7 +4506,6 @@
   {
    "number": 61,
    "name": "Pass It On",
-   "ref": "Sharing is Caring",
    "box": "55-66",
    "players": [
     2,
@@ -4645,7 +4583,6 @@
   {
    "number": 62,
    "name": "Meteor Run",
-   "ref": "Armageddon Roulette",
    "box": "55-66",
    "players": [
     2,
@@ -4712,7 +4649,6 @@
   {
    "number": 63,
    "name": "Unsinkable",
-   "ref": "It is Positively Titanic",
    "box": "55-66",
    "players": [
     2,
@@ -4803,7 +4739,6 @@
   {
    "number": 64,
    "name": "Double Haywire",
-   "ref": "Return of the Tripwires",
    "box": "55-66",
    "players": [
     2,
@@ -4868,7 +4803,7 @@
      }
     }
    ],
-   "rules": "After the deal, each player turns 2 of their wires around without looking. Following the teammates' directions, the lower one goes to the far left and the higher one to the far right. A 2-stand player flips only 2 in total: the lowest goes far left of stand 1, the highest far right of stand 2 (FAQ). Owners must cut their own flipped wires themselves with ordinary cuts, without equipment or Double Detector, and failure explodes. Dual-cutting a teammate's flipped wire is allowed but costs 1 dial step.",
+   "rules": "After the deal, each player turns 2 of their wires around without looking. Following the teammates' directions, the lower one goes to the far left and the higher one to the far right. A 2-stand player flips only 2 in total: the lowest goes far left of stand 1, the highest far right of stand 2 (FAQ). Owners must cut their own flipped wires themselves with ordinary cuts, without equipment or Twin Probe, and failure explodes. Dual-cutting a teammate's flipped wire is allowed but costs 1 dial step.",
    "gaps": [
     "Same procedural gap as missions 38 and 56."
    ],
@@ -4882,7 +4817,6 @@
   {
    "number": 65,
    "name": "Hot Potato",
-   "ref": "Hand-Me-Downs",
    "box": "55-66",
    "players": [
     3,
@@ -4954,7 +4888,6 @@
   {
    "number": 66,
    "name": "Bunker Showdown",
-   "ref": "The Final Countdown",
    "box": "55-66",
    "players": [
     2,

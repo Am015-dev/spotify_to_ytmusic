@@ -1,6 +1,6 @@
 # Short Fuse: rules audit against the real game
 
-Scope: `src/engine.js`, `src/data.js`, `rules-notes-impl.md`, `ENGINE-REPORT.md`, rules drawer (`texts.js` RULES_HTML / RULE_DOC). Sources: `/home/user/game-night-private/short-fuse-research/` (RB = rules-mop.txt, FAQ = faq-pegasus-2025.txt, CN = card-notes.txt, scans `combo/m*.jpg`, `eqA-C.jpg`, `chalA/B.jpg`, `conA/B.jpg`, `charA/B.jpg`, `stickers.jpg`, `bunker.jpg`), the audio transcripts in `scratchpad/bb/research/audio/`, `bb/rules-notes.md`, `bb/missions.json`. "Confirmed" = reproduced by running the engine (small node scripts, no engine edits). `rules-test.js` still passes 89/89.
+Scope: `src/engine.js`, `src/data.js`, `rules-notes-impl.md`, `ENGINE-REPORT.md`, rules drawer (`texts.js` RULES_HTML / RULE_DOC). Sources: `/home/user/game-night-private/short-fuse-research/` (RB = rules-mop.txt, FAQ = faq-2025.txt, CN = card-notes.txt, scans `combo/m*.jpg`, `eqA-C.jpg`, `chalA/B.jpg`, `conA/B.jpg`, `charA/B.jpg`, `stickers.jpg`, `bunker.jpg`), the audio transcripts in `scratchpad/bb/research/audio/`, `bb/rules-notes.md`, `bb/missions.json`. "Confirmed" = reproduced by running the engine (small node scripts, no engine edits). `rules-test.js` still passes 89/89.
 
 Totals: 6 wrong (1, 2, 3, 5, 6, 11), 2 missing (4, 15), 12 ambiguous (7-10, 12-14, 16-21). Item numbers are labels, not a ranking; 7 is wrong-or-ambiguous.
 
@@ -20,7 +20,7 @@ Totals: 6 wrong (1, 2, 3, 5, 6, 11), 2 missing (4, 15), 12 ambiguous (7-10, 12-1
 
 3. **Job 13: probes may point at red wires.**
    **Status: Fixed (probe on a red = boom).**
-   Real: FAQ Mission 13: equipment and personal equipment cannot cut reds, and reds "cannot be chosen when using a Double, Triple or Super detector". Engine: `RH.redTriple` has no `target` hook, so a Twin Probe or Triple Probe naming a number at a red + blue pair is legal (confirmed: `legal()` returns ''), and the Full Scan covers reds because it takes the whole stand.
+   Real: FAQ Mission 13: equipment and personal equipment cannot cut reds, and reds cannot be chosen when using a Twin Probe, Triple Probe or Full Scan. Engine: `RH.redTriple` has no `target` hook, so a Twin Probe or Triple Probe naming a number at a red + blue pair is legal (confirmed: `legal()` returns ''), and the Full Scan covers reds because it takes the whole stand.
    Fix: add `target(r,seat,si,k,ctx){return ctx.tool&&isRed(G.st[si].w[k].id)?'...':null}` for job 13. The rule text does not say what happens when the player happens to include a red, so the simplest consistent choice is "a red inside a probe selection counts as pointing at red: boom" (matches the job's all-or-nothing tone); the other reading (illegal move) leaks which wires are red. Pick one and say so in the job text. Severity could be read as ambiguous in the fix, not in the diagnosis.
 
 5. **Job 30: the "lose equipment" penalty only considers ready cards.**
@@ -30,7 +30,7 @@ Totals: 6 wrong (1, 2, 3, 5, 6, 11), 2 missing (4, 15), 12 ambiguous (7-10, 12-1
 
 6. **Sweep counts flipped wires (jobs 38, 56, 64).**
    **Status: Fixed (flipped wires ignored).**
-   Real: General Radar card: a player says yes if they have an uncut blue wire of that value on their stand; the owner cannot see their own flipped wires. Engine `sweep()` excludes X wires but not `x.flip`, so a stand answers "yes" because of a wire its owner cannot know about. Confirmed in 56 (stand whose only 4 is the flipped one answers yes).
+   Real: Sweep card: a player says yes if they have an uncut blue wire of that value on their stand; the owner cannot see their own flipped wires. Engine `sweep()` excludes X wires but not `x.flip`, so a stand answers "yes" because of a wire its owner cannot know about. Confirmed in 56 (stand whose only 4 is the flipped one answers yes).
    Fix: add `&&!x.flip` to the `some()` (and to `us`), same as `heldVals`.
 
 7. **Job 48: failed three-yellow call.**
@@ -50,7 +50,7 @@ Totals: 6 wrong (1, 2, 3, 5, 6, 11), 2 missing (4, 15), 12 ambiguous (7-10, 12-1
 
 15. **Job 44: Damper rulings.**
    **Status: Fixed in part (Damper at forced skip; pretend-cut not implemented, see notes).**
-   Real: FAQ Mission 44: the Stabilizer can be used to ignore the detonator step when a player passes, and to "pretend to cut in zone 1 when everything has already been cut". Engine: the voluntary pass honours the Damper (`doX` of `oxygen`), but a forced skip for lack of oxygen (`stuck` -> `skipTurn(...,1)`) happens before the player can arm it, and the pretend-cut is not supported. Fix: for jobs 44 (and 49 if desired) pause at the forced skip and offer "use Damper to cancel the step"; add the pretend-cut as a no-op action when no zone-1 wire is left.
+   Real: FAQ Mission 44: the Damper can be used to ignore the detonator step when a player passes, and to "pretend to cut in zone 1 when everything has already been cut". Engine: the voluntary pass honours the Damper (`doX` of `oxygen`), but a forced skip for lack of oxygen (`stuck` -> `skipTurn(...,1)`) happens before the player can arm it, and the pretend-cut is not supported. Fix: for jobs 44 (and 49 if desired) pause at the forced skip and offer "use Damper to cancel the step"; add the pretend-cut as a no-op action when no zone-1 wire is left.
 
 ### Ambiguous (engine choice not contradicted by a source)
 
@@ -91,13 +91,13 @@ Totals: 6 wrong (1, 2, 3, 5, 6, 11), 2 missing (4, 15), 12 ambiguous (7-10, 12-1
 
 **Turn.** One action per turn; Captain first then clockwise; empty hands skipped; dual cut hit (both cut in place, active player's own wire chosen), miss (step + true token, own wire never shown, yellow token for yellow), red = boom; deliberate wrong guesses allowed; naming a value you do not hold forbidden (FAQ house rule); solo cut 2 or 4 of the last wires of a value, across stands, never 3; reveal reds forced at the start of the turn; validation token when all four are cut; equipment unlocks on the first 2 (double cards 4) cut; token shortage handling (FAQ).
 
-**Equipment (all 12 + 6).** Texts and timings match the scans: Label ≠ / = (one token each, one end may be cut, reds/yellows equal), Walkie (token travels, 2-stand rule), Triple/Super (no yellow, hit if any match, owner tags a wire, red-in-selection logic), Post-It, Rewinder, Batteries (1-2 used characters), General Radar (per stand, blue only, ignores X), Stabilizer (before the dual cut; no step; no explosion on red; token on non-red only), X or Y ray (two values, yellow allowed, must hold both), Coffee Mug; Single Wire Label, Emergency Drop, Fast Pass, Disintegrator, Grappling Hook (stand choice), False Bottom (instant, may unlock at once).
+**Equipment (all 12 + 6).** Texts and timings match the scans: Unequal / Equal Tag (one token each, one end may be cut, reds/yellows equal), Handsets (token travels, 2-stand rule), Triple Probe / Full Scan (no yellow, hit if any match, owner tags a wire, red-in-selection logic), Sticky Note, Rewind, Recharge (1-2 used characters), Sweep (per stand, blue only, ignores X), Damper (before the dual cut; no step; no explosion on red; token on non-red only), Two-Value Probe (two values, yellow allowed, must hold both), Coffee Break; Lone Tag, Supply Drop, Express Pass, Vaporiser, Hook Line (stand choice), Hidden Compartment (instant, may unlock at once).
 
-**Characters.** Double Detector (same stand, number only, either match = hit and owner picks, none = step + token on one, one red = no boom and token on the other, both red = boom); once per job; Recharge resets it; the four new characters = copies of 8, 2, 3, 10.
+**Characters.** Twin Probe (same stand, number only, either match = hit and owner picks, none = step + token on one, one red = no boom and token on the other, both red = boom); once per job; Recharge resets it; the four new characters = copies of 8, 2, 3, 10.
 
-**Constraints A-L and challenges 1-9** match conA/B and chalA/B (including H: no token, no cutting a tokened wire, no Post-It; L: two steps).
+**Constraints A-L and challenges 1-9** match conA/B and chalA/B (including H: no token, no cutting a tokened wire, no Sticky Note; L: two steps).
 
-**Jobs checked against the card text/scan and found consistent:** 1-8, 9/16 (gate, FAQ explosion), 10 (claim, no repeat, 12 min with 2p), 11, 12 (both pairs, FAQ), 14, 15, 17, 20, 21/33, 22, 23, 26, 27, 28, 29 (deal 2/3, steps 1-4, FAQ bullets), 31, 32, 34, 35, 36, 37, 38, 39 (except finding 2), 41 (tripwire deal incl. 5p captain none, snare action, skip rule, FAQ red), 43 (counts, bounce, Coffee Mug), 44/49/54/63 (costs, starting oxygen, validation top-up, skip + step, must-play FAQ; except finding 1), 45, 46, 47, 50, 51, 52, 53, 55/60/62, 57, 58, 59, 61, 64, 65. Audio jobs: 19 timeline (668 s, 12/10/5/2 min cues), 30 (phase list, lengths and rewards match the transcript, except finding 5), 42 (3 magicians, 2 jugglers, 3 tamers, knife, ta-da, clouds, 3 trampolines), 54 (event order and counts), 66 (map, walls, door, laser, traps, stairs, striped squares, objective lengths 80/75/60/90/10/105/20) all match the transcripts and `bunker.jpg`.
+**Jobs checked against the card text/scan and found consistent:** 1-8, 9/16 (gate, FAQ explosion), 10 (claim, no repeat, 12 min with 2p), 11, 12 (both pairs, FAQ), 14, 15, 17, 20, 21/33, 22, 23, 26, 27, 28, 29 (deal 2/3, steps 1-4, FAQ bullets), 31, 32, 34, 35, 36, 37, 38, 39 (except finding 2), 41 (tripwire deal incl. 5p captain none, snare action, skip rule, FAQ red), 43 (counts, bounce, Coffee Break), 44/49/54/63 (costs, starting oxygen, validation top-up, skip + step, must-play FAQ; except finding 1), 45, 46, 47, 50, 51, 52, 53, 55/60/62, 57, 58, 59, 61, 64, 65. Audio jobs: 19 timeline (668 s, 12/10/5/2 min cues), 30 (phase list, lengths and rewards match the transcript, except finding 5), 42 (3 magicians, 2 jugglers, 3 tamers, knife, ta-da, clouds, 3 trampolines), 54 (event order and counts), 66 (map, walls, door, laser, traps, stairs, striped squares, objective lengths 80/75/60/90/10/105/20) all match the transcripts and `bunker.jpg`.
 
 ## Method notes
 Scripts used (kept out of the repo): rig a stand, call `performMove`/`legal`, read `G.log`. They reproduced findings 1, 2, 3, 6, 7. Findings 4, 5, 15 are from reading the code and the FAQ/transcript; the `G.mission===24` literal in `QH.swapBack` is the whole of 4.

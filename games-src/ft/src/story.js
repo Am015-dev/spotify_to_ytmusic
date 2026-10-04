@@ -4,7 +4,7 @@ const CHAPTERS=['The Sultan is dead','Whispers in the bazaar','The caravans arri
 function chapterTitle(r){return CHAPTERS[Math.min(r-1,CHAPTERS.length-1)]}
 const OPENING=[
   'The old Sultan of Qamar has died, and he named no heir.',
-  'Five tribes still live across the sultanate: Advisors, Sages, Traders, Masons and Shadows. Whoever guides them best will rule.',
+  'Its peoples still live across the sultanate: Advisors, Sages, Traders, Masons and Shadows. Whoever guides them best will rule.',
   'Each turn you lift the people off one tile and lead them across the land, leaving one on every tile you pass. Where the last one stops, you gather everyone of that tribe and put them to work.',
   'Claim land with your camels, build palaces, plant palms, trade in the bazaar and bargain with djinns. When the last camel is placed, the richest in points takes the throne.'];
 // flavour spoken by the narrator when a tribe is put to work
@@ -107,7 +107,7 @@ function paintOpening(){const c=document.getElementById('opencv');if(!c)return;l
   // a caravan crossing the dune
   x.fillStyle='#3a160c';const camel=(cx,cy,s)=>{x.save();x.translate(cx,cy);x.scale(s,s);x.beginPath();x.moveTo(-20,0);x.bezierCurveTo(-18,-14,-8,-24,0,-16);x.bezierCurveTo(6,-22,12,-14,14,-8);x.lineTo(20,-20);x.lineTo(26,-20);x.lineTo(24,-16);x.lineTo(18,-4);x.lineTo(14,2);x.lineTo(-18,2);x.fill();for(const lx of [-15,-10,8,12])x.fillRect(lx,0,2.5,16);x.restore()};
   camel(w*.2,h*.74,1.1);camel(w*.29,h*.72,1);camel(w*.37,h*.71,.9);
-  // the five tribes as turned pawns, lit from the sun
+  // the tribes as turned pawns, lit from the sun
   const cols=['#f0b72a','#f3eee2','#3a9a48','#2c62c6','#c9312a'];for(let k=0;k<5;k++){const px=w*(.58+k*.075),py=h*.93;const gg=x.createLinearGradient(px-10,0,px+10,0);gg.addColorStop(0,'rgba(0,0,0,.25)');gg.addColorStop(.6,'rgba(255,255,255,.25)');gg.addColorStop(1,'rgba(0,0,0,.1)');
     x.fillStyle='rgba(60,20,5,.35)';x.beginPath();x.ellipse(px+6,py+2,16,4,0,0,7);x.fill();for(const f of [cols[k],gg]){x.fillStyle=f;x.beginPath();x.moveTo(px-12,py);x.quadraticCurveTo(px-12,py-6,px-7,py-8);x.quadraticCurveTo(px-4,py-20,px-4,py-26);x.lineTo(px+4,py-26);x.quadraticCurveTo(px+4,py-20,px+7,py-8);x.quadraticCurveTo(px+12,py-6,px+12,py);x.fill();x.fillRect(px-6,py-29,12,3);x.beginPath();x.arc(px,py-36,7.5,0,7);x.fill()}}
   // gilded arch frame

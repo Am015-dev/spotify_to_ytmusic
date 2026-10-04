@@ -6,7 +6,7 @@ const {JSDOM}=require('jsdom');const fs=require('fs');
 const file=process.argv[2];if(!file){console.error('usage: node gauntlet.js <game.html> [games] [maxTurns]');process.exit(1)}
 const html=fs.readFileSync(file,'utf8');const N=+process.argv[3]||20,MAXT=+process.argv[4]||40;
 // Edit these to match the game's log wording. Each counts log lines matching the regex.
-const COUNT={smash:/ smashes /,buys:/ buys “/,yields:/ yields /,ko:/knocked out/,enters:/storms into/,mbug:/MINDBUGS/,evoDraw:/draws an evolution/,evoPlay:/plays its evolution/,cons:/ uses “/,cult:/gains a cultist/,bers:/goes BERSERK/,tower:/climbs the Tokyo Tower/,wick:/gains the wicked power/,steal:/ steals .*'s /,curse:/curse becomes/};
+const COUNT={smash:/ smashes /,buys:/ buys “/,yields:/ yields /,ko:/knocked out/,enters:/storms into/,mbug:/BRAINJACKS/,evoDraw:/draws an evolution/,evoPlay:/plays its evolution/,cons:/ uses “/,cult:/gains a cultist/,bers:/goes on a RAMPAGE/,tower:/climbs the Crown Spire/,wick:/takes the menace tile/,steal:/ steals .*'s /,curse:/curse becomes/};
 function game(){return new Promise(res=>{
   const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'http://localhost/'});const w=dom.window;
   const errs=[];w.addEventListener('error',e=>errs.push(e.message));w.console.error=(...a)=>errs.push(a.join(' '));

@@ -8,7 +8,7 @@ const SEAS = ['winter', 'spring', 'summer', 'autumn'];
 const SEASN = ['Winter', 'Spring', 'Summer', 'Autumn'];
 // data card key -> kit art key
 const ART = { architect: 'beetle_architect', bard: 'hedgehog_bard', barge_toad: 'toad_shopkeeper', chip_sweep: 'shrew_sweeper', doctor: 'bat_doctor', fool: 'mouse_fool', historian: 'owl_historian', husband: 'mouse_farmer', innkeeper: 'frog_innkeeper', judge: 'frog_judge', king: 'badger_king', miner_mole: 'mole_miner', monk: 'hedgehog_monk', peddler: 'rabbit_peddler', postal_pigeon: 'pigeon_postal', queen: 'rabbit_queen', ranger: 'shrew_ranger', shepherd: 'badger_harvester', shopkeeper: 'squirrel_shopkeeper', teacher: 'turtle_teacher', undertaker: 'toad_undertaker', wanderer: 'fox_wanderer', wife: 'hedgehog_farmer', woodcarver: 'squirrel_woodcarver',
-  castle: 'castle', cemetery: 'cemetery', chapel: 'chapel', clock_tower: 'clocktower', courthouse: 'courthouse', crane: 'crane', dungeon: 'dungeon', ever_tree: 'evertree', fair_grounds: 'fairground', farm: 'farm', general_store: 'store', inn: 'inn', lookout: 'lookout', mine: 'mine', monastery: 'monastery', palace: 'palace', post_office: 'postoffice', resin_refinery: 'refinery', ruins: 'ruins', school: 'school', storehouse: 'storehouse', theater: 'theatre', twig_barge: 'barge', university: 'university' };
+  castle: 'castle', cemetery: 'cemetery', chapel: 'chapel', clock_tower: 'clocktower', courthouse: 'courthouse', crane: 'crane', dungeon: 'dungeon', ever_tree: 'elderheart', fair_grounds: 'fairground', farm: 'farm', general_store: 'store', inn: 'inn', lookout: 'lookout', mine: 'mine', monastery: 'monastery', palace: 'palace', post_office: 'postoffice', resin_refinery: 'refinery', ruins: 'ruins', school: 'school', storehouse: 'storehouse', theater: 'theatre', twig_barge: 'barge', university: 'university' };
 const TYPEN = { traveler: 'Traveler', production: 'Production', destination: 'Destination', governance: 'Governance', prosperity: 'Prosperity' };
 const TYPEHELP = { traveler: 'Acts once when played.', production: 'Acts when played, then again every Spring and Autumn.', destination: 'A place where you can send a worker.', governance: 'Gives a lasting bonus or discount.', prosperity: 'Scores bonus points at the end.' };
 const spec = id => { const c = HB.cardOf(id); return { art: ART[c.key] || 'farm', name: c.name, type: c.type, kind: c.kind, unique: c.unique, cost: c.cost, points: c.pts, text: c.text }; };
@@ -94,7 +94,7 @@ function pawn(i, px) { return HBKit.worker(i === 'G' ? 4 : i % 4, px); }
 function score(seat) { try { return HB.score(G, seat); } catch (e) { return { total: 0 }; } }
 function lastLogs(n) { return G.log.slice(-n).map(x => x.t); }
 function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
-// ===================== part 2: the board (shared Evertree area): layout + render =====================
+// ===================== part 2: the board (shared Elderheart area): layout + render =====================
 const FIC = {
   forest_berry_thicket: [['berry', 2], ['card', 1]], forest_foragers_crossing: [['any', 2]], forest_rummage_hollow: [['discard', '*'], ['card', '2ea']],
   forest_echoing_meadow: [['copy', ''], ['card', 1]], forest_quarry_burrow: [['pebble', 1], ['card', 3]], forest_mixed_glade: [['twig', 1], ['resin', 1], ['berry', 1]],
@@ -462,7 +462,7 @@ function openInfo(which) {
       p.appendChild(popHead('Seasons'));
       body.appendChild(h('p.sm', 'Each player moves through the seasons on their own. You may Prepare for the next season only when all your workers are placed.'));
       G.players.forEach((pl, s) => { const nx = pl.season < 3 ? SEASN[pl.season + 1] : null; body.appendChild(h('div.kv', h('span', pawn(s, 16), ' ' + pl.name), h('b', HBKit.season(SEAS[pl.season], 20), ' ' + SEASN[pl.season] + ' · ' + pl.workers + ' workers'))); });
-      body.appendChild(h('div.tree', HBKit.evertree({ w: 150, season: SEAS[Math.max(0, focusSeat() >= 0 ? G.players[focusSeat()].season : 0)] })));
+      body.appendChild(h('div.tree', HBKit.elderheart({ w: 150, season: SEAS[Math.max(0, focusSeat() >= 0 ? G.players[focusSeat()].season : 0)] })));
     }
     p.appendChild(body); body.appendChild(h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Close'));
   });
@@ -502,7 +502,7 @@ function openCard(src, id, seat, slot, trig) {
     const ent = src === 'city' ? G.players[seat].city.find(e => e.id === id) : null;
     const left = h('div.cardbox', cardEl(id, w, { entry: ent }));
     const right = h('div.cinfo', h('div.cc', h('b', 'Cost '), costEl(c.cost, 16), h('b', ' · ' + c.pts + ' pt')), h('p.ct', c.text), h('p.sm', TYPEHELP[c.type]));
-    if (c.kind === 'critter') { const lk = D.cards.find(x => x.key === c.linked); right.appendChild(h('p.sm', 'Free if you own ' + (c.linked === 'any' ? 'the Ever Tree' : lk ? lk.name : '?') + ' with no token on it.')); }
+    if (c.kind === 'critter') { const lk = D.cards.find(x => x.key === c.linked); right.appendChild(h('p.sm', 'Free if you own ' + (c.linked === 'any' ? 'the Elderheart Oak' : lk ? lk.name : '?') + ' with no token on it.')); }
     if (ent) { const l = []; if (ent.occ) l.push('occupied'); if (ent.tok) l.push(ent.tok + ' point token(s)'); if (ent.pris && ent.pris.length) l.push(ent.pris.length + ' prisoner(s)'); if (ent.w) l.push(ent.w + ' worker(s) inside'); if (ent.stock) l.push('stock ' + costText(ent.stock)); if (l.length) right.appendChild(h('p.sm', l.join(', '))); }
     const cw = h('div.cwrap', left, right);
     const acts = h('div.pacts');

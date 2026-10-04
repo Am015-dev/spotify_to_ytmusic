@@ -233,7 +233,7 @@ test('occupy: a critter whose linked construction is in your city plays free; on
   X.withG(G, () => X.removeFromCity(0, h1)); G.discard.push(h1); ok(T.entry(G, 0, 'farm').occ, 'token stays when the critter leaves');
   ok(!T.find(G, 0, m => m.card === h2 && m.how === 'occupy'));
 });
-test('Ever Tree hosts any one critter for free', () => {
+test('Elderheart Oak hosts any one critter for free', () => {
   const G = T.game(2); T.city(G, 0, ['ever_tree']); const [c, d] = T.hand(G, 0, ['chip_sweep', 'bard']);
   T.act(G, 0, m => m.card === c && m.how === 'occupy'); ok(T.entry(G, 0, 'ever_tree').occ); T.cur(G, 0); ok(!T.find(G, 0, m => m.card === d && m.how === 'occupy'));
 });
@@ -528,13 +528,13 @@ test('scoring: base points, point tokens, tokens on cards, Fool -2', () => {
   const G = T.game(2); T.city(G, 0, ['farm', 'castle', 'fool']); G.players[0].pts = 3; T.entry(G, 0, 'castle');
   const s = sc(G, 0); eq(s.cards, 1 + 4 - 2); eq(s.tokens, 3); eq(s.total, 3 + 3 + s.bonus);
 });
-test('scoring: purple bonuses (Castle, Palace, School, Theater, Ever Tree, King, Architect, Wife)', () => {
+test('scoring: purple bonuses (Castle, Palace, School, Theater, Elderheart Oak, King, Architect, Wife)', () => {
   const G = T.game(2); T.city(G, 0, ['castle', 'palace', 'school', 'theater', 'ever_tree', 'king', 'architect', 'farm', 'farm', 'mine', 'husband', 'wife', 'bard', 'wanderer', 'teacher']);
   G.bev[0].o = 0; G.bev[1].o = 0; G.sev[0].o = 0; G.players[0].res.resin = 3; G.players[0].res.pebble = 5;
   const s = sc(G, 0);
   const commonConstr = 3 /*farm,farm,mine*/, uniqConstr = 5 /*castle palace school theater ever_tree*/, commonCrit = 3 /*husband wife teacher... */, uniqCrit = 4 /*king architect bard? */;
   // castle: common constructions = farm,farm,mine => 3 ; palace: unique constructions = castle,palace,school,theater,ever_tree => 5 ; school: common critters = husband,wife,wanderer,teacher => 4
-  // theater: unique critters = king,architect,bard => 3 ; ever tree: purple = castle palace school theater ever_tree king architect wife => 8 ; king: 2 basic + 1 special*2 = 4 ; architect min(6,8)=6 ; wife 3
+  // theater: unique critters = king,architect,bard => 3 ; elderheart oak: purple = castle palace school theater ever_tree king architect wife => 8 ; king: 2 basic + 1 special*2 = 4 ; architect min(6,8)=6 ; wife 3
   eq(s.bonus, 3 + 5 + 4 + 3 + 8 + 4 + 6 + 3);
 });
 test('scoring: leftover resources only count through Architect (max 6)', () => {
@@ -627,7 +627,7 @@ test('free plays (Queen, Dove, Grove) ignore cost entirely and still need city s
 test('Ruins in the city counts as a construction for Mosswood Assize and can be occupied by Haggle Magpie', () => {
   const G = T.game(2); T.city(G, 0, ['ruins']); const [p] = T.hand(G, 0, ['peddler']); ok(T.find(G, 0, m => m.card === p && m.how === 'occupy'));
 });
-test('exact one-token rule: Ever Tree and the linked construction offer separate occupy moves', () => {
+test('exact one-token rule: Elderheart Oak and the linked construction offer separate occupy moves', () => {
   const G = T.game(2); T.city(G, 0, ['farm', 'ever_tree']); const [h] = T.hand(G, 0, ['husband']); eq(HB.moves(G, 0).filter(m => m.card === h && m.how === 'occupy').length, 2);
 });
 test('worker on a destination is recalled at prepare (non-permanent)', () => {

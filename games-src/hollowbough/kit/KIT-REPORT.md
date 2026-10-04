@@ -8,13 +8,13 @@ Style: storybook watercolour. Cream paper cards with ink outlines; art groups pa
 - `HBKit.art(key, w)` art-only svg (100x62 box). `HBKit.mount()` inserts shared filter defs (called automatically).
 - `resource(kind,px)`, `point(n|null,px)`, `occupied(px)`, `worker(0..4|name,px)` (ember, river, honey, moss, automa=grey; each has a chest glyph leaf/drop/sun/star/moon so colour is not the only cue), `season('winter|spring|summer|autumn',px)`.
 - `plaque(kind,{label,sub,slots,taken,w})` kinds `basic|forest|haven|journey|event`: painted wooden plaque with icon, label, optional effect text, worker-slot dots.
-- `evertree({w,season})`: 600x720 painted tree with 4 season markers (current one glowing); `HBKit.evertreeSlots` = normalised marker centres `{season,x,y}`.
+- `elderheart({w,season})`: 600x720 painted tree with 4 season markers (current one glowing); `HBKit.elderheartSlots` = normalised marker centres `{season,x,y}`.
 - `table(w,h,'paper'|'forest')` svg; `tableURL(mood)` data URL; `applyTable(el,mood)` sets the background.
 - Data: `artKeys`, `critterKeys`, `constructionKeys`, `TYPES`, `PLAYER`, `RES`, `resources`, `seasons`.
 
 ## Art keys (58)
 Critters (32): mouse_farmer squirrel_shopkeeper hedgehog_bard frog_judge owl_historian badger_king rabbit_queen mole_miner beetle_architect fox_wanderer shrew_ranger pigeon_postal turtle_teacher bat_doctor toad_undertaker hedgehog_monk mouse_fool shrew_sweeper squirrel_woodcarver rabbit_peddler frog_innkeeper badger_harvester owl_judge fox_peddler mole_historian bat_bard turtle_monk toad_shopkeeper beetle_woodcarver pigeon_ranger mouse_queen hedgehog_farmer
-Constructions (26): farm mine refinery barge store inn chapel monastery palace castle theatre school museum university cemetery ruins postoffice fairground courthouse clocktower lookout crane storehouse dungeon evertree windmill
+Constructions (26): farm mine refinery barge store inn chapel monastery palace castle theatre school museum university cemetery ruins postoffice fairground courthouse clocktower lookout crane storehouse dungeon elderheart windmill
 
 ## Tests / what I looked at (Chromium, Playwright; screenshots in shots/)
 desktop 1366 / phone 390x844 / phone 844x390: `*-crit`, `*-cons`, `*-tok`, `*-board`, `*-stress`, phone `*-enlarged` (tap-to-enlarge modal). I viewed desktop crit/cons/tok/board and phone crit/enlarged and fixed: off-centre titles, plaque label overlapping icon, table background not covering page, modal taller than landscape viewport, streaky table texture.

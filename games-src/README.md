@@ -106,7 +106,7 @@ Tests:
 
 ## Not included
 
-- **Research data** with the original games' real names and card texts: rulebook extracts, card lists, BGA and open-source tile data.
+- **Research data** with the original games' real names and card texts: rulebook extracts, card lists, online-implementation and open-source tile data.
 - **Scripts that need that data:**
   - `ft/build_data.py`, `rc/build_cards.py` and `kot/extract_bga.py`;
   - `xw/gen.py`;

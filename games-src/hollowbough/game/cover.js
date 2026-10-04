@@ -113,7 +113,7 @@ scen('dungeon x2', (G, ctx) => {
   const m = T.find(G, 0, x => x.type === 'play' && x.card === b && x.how === 'dungeon'); if (m) { step(G, m, ctx); resolve(G, ctx); } else problems.push(ctx + ': second cell not usable');
   tally['dungeon:2cells'] = G.players[0].city.find(e => HB.cardKey(e.id) === 'dungeon').pris.length >= 2 ? 1 : 0;
 });
-scen('occupy + ever tree', (G, ctx) => { T.city(G, 0, ['farm', 'ever_tree']); const [h, b] = T.hand(G, 0, ['husband', 'bard']); A(G, 0, x => x.card === h && x.how === 'occupy', ctx); A(G, 0, x => x.card === b && x.how === 'occupy', ctx); });
+scen('occupy + elderheart', (G, ctx) => { T.city(G, 0, ['farm', 'ever_tree']); const [h, b] = T.hand(G, 0, ['husband', 'bard']); A(G, 0, x => x.card === h && x.how === 'occupy', ctx); A(G, 0, x => x.card === b && x.how === 'occupy', ctx); });
 scen('bazaar + undertaker + queen + inn on rival', (G, ctx) => {
   G.forest = [D.forest.findIndex(f => f.key === 'forest_meadow_bazaar'), 0, 1]; T.meadow(G, 0, 'mine'); T.meadow(G, 1, 'farm');
   A(G, 0, x => x.type === 'worker' && x.k === 'forest' && x.i === 0, ctx);

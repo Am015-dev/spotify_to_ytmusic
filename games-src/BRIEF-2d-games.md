@@ -26,7 +26,7 @@ audio bundle and every test script, and adapt them. Read `SP/kaiten/PLAN.md`, `g
 - **Copyright.** Mechanics, numbers and structure exactly; title, every name, all card/mission text and all art
   original. Never put the original game's or publisher's name in the shipped HTML (not even "plays like").
   Real names may appear only in `ref` fields of private research data.
-- **Research material.** Fetch the official rulebook (PDF) and FAQ, and cross-check with BGG threads. Keep
+- **Research material.** Fetch the official rulebook (PDF) and FAQ, and cross-check with forum threads on the board-game catalogue site. Keep
   rulebooks, FAQs, scans and saved pages ONLY in `/home/user/game-night-private/<slug>-research/` (a private
   repo; I commit it). Never put them in the public repo or the page. Your `rules-notes.md` in your folder is in
   your own words with a **Confirmed vs. guessed** section and exact numbers.

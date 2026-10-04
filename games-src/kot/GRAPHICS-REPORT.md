@@ -45,7 +45,7 @@ The kept hooks are `init3D`, `sync3D`, `V3.on`, `V3.fxSeen`, `V3.mons[k].g`, `po
 
 ### Dice: rounded resin dice with engraved symbols
 - Geometry and texture: a RoundedBoxGeometry port, including its per-face UV mapping. Each face has a 256px canvas with a resin gradient and swirl, paint-filled symbols with an inner engraving shadow, and a normal map made from a blurred height mask, so the symbol is recessed.
-- Materials: clearcoat physical. Kept dice turn amber resin. The berserk die is red resin and the Die of Fate is sand/gold.
+- Materials: clearcoat physical. Kept dice turn amber resin. The berserk die is red resin and the Omen Die is sand/gold.
 - Tray: dice land in a lacquered walnut tray with a felt bed.
 - Motion and feedback: blob shadows follow the dice height, and landing throws a dust puff. Hovering a die lifts it slightly and shows a pointer cursor; clicking pulses it.
 - Fonts: the face textures rebuild once web fonts load.

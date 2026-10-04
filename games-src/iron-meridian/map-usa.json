@@ -5,7 +5,7 @@
    650
   ],
   "note": "City names are real geography (not protectable); x/y are approximate and for our own redrawn board. Route data verified: 100 segments, 78 city pairs, 22 double pairs, 36 cities. Colour keys: purple/white/blue/yellow/orange/black/red/green + gray (any one colour). Train-card refs: purple=Box, blue=Passenger, orange=Tanker, white=Reefer, green=Freight, yellow=Hopper, black=Coal, red=Caboose (ref only). When playing 2-3 players, only one of each 'pair' may be claimed (other closes).",
-  "source": "Rob217/TicketToRideAnalysis CSV cross-checked against counts in rulebook"
+  "source": "An open-source route-analysis repo's CSV (source kept in the private research repo), cross-checked against counts in rulebook"
  },
  "cities": [
   {

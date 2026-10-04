@@ -4,7 +4,7 @@ Scope: `src/engine.js` and `src/data.js` (frozen build checked: the same lines a
 
 Reproductions: `/tmp/claude-0/-home-user-spotify-to-ytmusic/5a36d2af-8697-5203-aeea-a0f2a3329615/scratchpad/audit/repro.js` and `repro2.js` (they load the engine through `tlib.js` as `rules-test.js` does). Existing suite still passes (84 of 84). Nothing in the repo was edited.
 
-Limits of this audit: BoardGameGeek answered 403 to every fetch (also for me), and web search found no page that lists the six die faces or the test-tube rewards. Anything marked "unclear" could not be settled from the sources we hold.
+Limits of this audit: the board-game catalogue site answered 403 to every fetch (also for me), and web search found no page that lists the six die faces or the test-tube rewards. Anything marked "unclear" could not be settled from the sources we hold.
 
 Status words: WRONG = engine contradicts a source. MISSING = rule not implemented. UNCLEAR = sources silent or conflicting. FINE = checked and correct.
 
@@ -63,7 +63,7 @@ Status words: WRONG = engine contradicts a source. MISSING = rule not implemente
 
 ## Test-tube side
 
-The base box does contain it: the back of every cauldron board (8 droplets in the box, 4 of them for this variation). Rulebook p10 "Game variation" says: play it after a few games; place a second droplet on the far-left test tube; whenever you may move your droplet (fortune card, chip power, or paying 2 rubies) you choose which of your two droplets moves; the test-tube droplet moves one glass right and you immediately get the bonus shown there. The three bonus types listed are 1 ruby, 1 to 4 VP (all four values occur) and the chip shown, which goes into the bag at once. The explosion rules are unchanged. Not in any source we hold: the number of tubes and the exact order of rewards. The builder's list in rules-notes (12 tubes, black 1-chip as the fifth, yellow 4-chip and 4 VP at the end) cannot be confirmed from the research folder and should not be built until someone reads it off a photo of the real board. The Herb Witches and Alchemists material in rules-notes is expansion content, not base box.
+The base box does contain it: the back of every cauldron board (8 droplets in the box, 4 of them for this variation). Rulebook p10 "Game variation" says: play it after a few games; place a second droplet on the far-left test tube; whenever you may move your droplet (fortune card, chip power, or paying 2 rubies) you choose which of your two droplets moves; the test-tube droplet moves one glass right and you immediately get the bonus shown there. The three bonus types listed are 1 ruby, 1 to 4 VP (all four values occur) and the chip shown, which goes into the bag at once. The explosion rules are unchanged. Not in any source we hold: the number of tubes and the exact order of rewards. The builder's list in rules-notes (12 tubes, black 1-chip as the fifth, yellow 4-chip and 4 VP at the end) cannot be confirmed from the research folder and should not be built until someone reads it off a photo of the real board. The first and second expansion material in rules-notes is expansion content, not base box.
 
 ## Summary
 

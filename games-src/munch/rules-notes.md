@@ -1,12 +1,12 @@
 # Doorkick Dungeon: rules notes
 
-A browser version of the rules of *Munchkin* (Steve Jackson Games, 2001; BGG 1927). It uses the current 168-card base deck and rules sheet v1.71. Every name, card text and picture is original, for copyright reasons. The numbers and effects follow the real cards.
+A browser version of the rules of the original game (original publisher, 2001). It uses the current 168-card base deck and rules sheet v1.71. Every name, card text and picture is original, for copyright reasons. The numbers and effects follow the real cards.
 
 ## Sources
 - **Card data:** `cards-base.json` has every base card, with its source. It was built from a hand-corrected transcription of the scanned card sheets plus the official card list. All monster and item numbers were cross-checked against an independent dataset of the Russian printing.
 - **Rules:** `rules.md` is rules sheet v1.71 plus about 150 official FAQ rulings.
 - **Card inventory:** `inventory.md` covers the base game and each numbered expansion.
-- **Blocked sites:** the publisher's sites, the fan wiki and BGG were blocked by the network proxy, so everything came from GitHub-hosted copies.
+- **Blocked sites:** the publisher's sites, the fan wiki and the board-game catalogue site were blocked by the network proxy, so everything came from GitHub-hosted copies.
 - **Tags:** **[R]** is the rules sheet, **[F]** the FAQ, **[C]** a card's own text, **[H]** my interpretation where the physical game relies on table talk.
 
 ## The deck in this game
@@ -130,7 +130,7 @@ Treasures:
 - Online play. It needs private hands per player, so it's left for a later version. Friends on one device use a pass-the-device screen that hides hands.
 
 ## Expansions
-The inventory (`inventory.md`) has the full card data for Munchkin 3, 4, 5 and 8, probably full data for 7, and 109 of 112 cards for 2. It has card counts only for 6, 6.5, 9 and 10. This version plays the base game. The expansions' own mechanics (steeds, dungeons and portals, rangers and bards, and so on) are the next step.
+The inventory (`inventory.md`) has the full card data for original expansions 3, 4, 5 and 8, probably full data for 7, and 109 of 112 cards for 2. It has card counts only for 6, 6.5, 9 and 10. This version plays the base game. The expansions' own mechanics (steeds, dungeons and portals, rangers and bards, and so on) are the next step.
 
 ## Tests (headless)
 - **Rule scenarios:** `rules-test.js` has 42 small positions, each checking one rule above. All pass.

@@ -8,13 +8,13 @@ const SHIPS={
   talon:{n:'Talon light fighter',model:'shard',atk:2,agi:3,hull:3,sh:0,acts:['F','BR','E'],dial:dialFrom([[0,0,0,0,0,0],[1,0,0,0,1,0],[1,2,2,2,1,0],[1,1,2,1,1,3],[0,0,1,0,0,3],[0,0,1,0,0,0]])}};
 // ability keys (ab) are implemented in engine hooks; t is the card text shown to players
 const PILOTS={
-  kael:{n:'Kael Varro',ship:'lancer',ps:8,pts:28,u:['T','Tp','M'],uniq:1,uid:'luke',ab:'luke',t:'When defending, you may change 1 of your focus results to an evade result.'},
-  brink:{n:'Tomas Brink',ship:'lancer',ps:5,pts:25,u:['Tp','M'],uniq:1,ab:'biggs',t:'Other friendly ships at range 1 cannot be attacked if the attacker could attack you instead.'},
+  kael:{n:'Kael Varro',ship:'lancer',ps:8,pts:28,u:['T','Tp','M'],uniq:1,uid:'kael',ab:'kael',t:'When defending, you may change 1 of your focus results to an evade result.'},
+  brink:{n:'Tomas Brink',ship:'lancer',ps:5,pts:25,u:['Tp','M'],uniq:1,ab:'brink',t:'Other friendly ships at range 1 cannot be attacked if the attacker could attack you instead.'},
   ember:{n:'Ember Squadron Pilot',ship:'lancer',ps:4,pts:23,u:['Tp','M']},
   cadet:{n:'Cadet Pilot',ship:'lancer',ps:2,pts:21,u:['Tp','M']},
-  knife:{n:'"Knifepoint"',ship:'talon',ps:7,pts:17,u:['T'],uniq:1,ab:'mauler',t:'When attacking at range 1, roll 1 additional attack die.'},
-  hex:{n:'"Hex"',ship:'talon',ps:6,pts:16,u:[],uniq:1,ab:'curse',t:'When defending, ships attacking you cannot spend focus tokens or reroll attack dice.'},
-  nightjar:{n:'"Nightjar"',ship:'talon',ps:5,pts:15,u:[],uniq:1,ab:'nbeast',t:'After you fly a green maneuver, you may take a free focus action.'},
+  knife:{n:'"Knifepoint"',ship:'talon',ps:7,pts:17,u:['T'],uniq:1,ab:'knife',t:'When attacking at range 1, roll 1 additional attack die.'},
+  hex:{n:'"Hex"',ship:'talon',ps:6,pts:16,u:[],uniq:1,ab:'hex',t:'When defending, ships attacking you cannot spend focus tokens or reroll attack dice.'},
+  nightjar:{n:'"Nightjar"',ship:'talon',ps:5,pts:15,u:[],uniq:1,ab:'nightjar',t:'After you fly a green maneuver, you may take a free focus action.'},
   onyx:{n:'Onyx Squadron Pilot',ship:'talon',ps:4,pts:14,u:['T']},
   slate:{n:'Slate Squadron Pilot',ship:'talon',ps:3,pts:13,u:[]},
   drill:{n:'Drill Wing Pilot',ship:'talon',ps:1,pts:12,u:[]}};

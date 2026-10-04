@@ -1,6 +1,6 @@
 # Sands of Qamar: rules notes
 
-A browser version of *Five Tribes: The Djinns of Naqala* (Bruno Cathala, Days of Wonder), with its expansions. The rules and numbers follow the real game. Every name, text and piece of art is original, for copyright reasons. The djinns keep the real cards' effects under new names.
+A browser version of the original game (by the original designer and publisher), with its expansions. The rules and numbers follow the real game. Every name, text and piece of art is original, for copyright reasons. The djinns keep the real cards' effects under new names.
 
 ## Components (as in the real game)
 - **Board:** 30 tiles, 6×5.
@@ -38,17 +38,17 @@ Implemented exactly as the rulebook describes. Details:
 - Bazaar Stall: 3 coins for 1 of the first 3 goods. Grand Bazaar: 6 coins for 2 of the first 6.
 
 ## Expansions
-- **The Crafters** (*Artisans of Naqala*):
+- **The Crafters** (the first original expansion):
   - 15 purple Crafters, 3 Workshops and 2 Spice Exchanges (in the inner area), 1 Ravine.
   - Mountains: 2 per Workshop, always leaving every tile reachable.
   - One tent per player: it scores its tile plus 1 per red tile around it.
   - Items: precious items score; magic items are one-shot powers.
   - Crafters score 3 each for the player with the most, 2 each for everyone else.
-- **Wonder Cities** (*Whims of the Sultan*):
+- **Wonder Cities** (the second original expansion):
   - Wonder Cities, blue ×3 and red ×2, score 5/20/45/80/125 for holding 1–5.
   - The Great Lake: palms and palaces next to it score double.
   - A 5th player, with a 12-spot turn-order track.
-- **Cutpurses** (*Thieves of Naqala*):
+- **Cutpurses** (the original mini-expansion):
   - One cutpurse per colour. Hire the face-up one at a Shrine, like a djinn.
   - Trigger it when you take its colour: every rival gives something up and you take the best.
 - **Promo djinns:** 3.
@@ -57,7 +57,7 @@ Implemented exactly as the rulebook describes. Details:
 - **Item mix:** 9 precious items (3 each of 5/7/9 points) and 9 magic items (carpet 2, lamp 2, flute 2, scimitar 1, talisman 1, horn 1).
 - **Printed VP** of the two Crafters djinns, the "+5 per djinn" promo, and the Cutpurse djinn (name as well).
 - **Wonder City points** are added on top of the tile's own value.
-- **The Sultan's whim cards** are left out; only the tiles and the 5th player are in.
+- **The Wonder Cities whim cards** are left out; only the tiles and the 5th player are in.
 - **5-player track:** 18, 12, 8, 5, 5, 3, 3, 1, 1, 0, 0, 0 (inferred from photos).
 - **Broke bidder:** a player who cannot afford any free spot takes the cheapest free spot and pays all their coins.
 - **Crafter majority:** tied players all count as "most".

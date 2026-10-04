@@ -2,7 +2,7 @@
 // Every decision is a pure function of knowledge(seat) (plus a salt): the AI never reads G. A placement is simulated on a copy of the
 // public board (path following through chained currents, edge, leviathan tiles, collisions), then scored:
 //  * dying is terrible, sinking a rival is great (and sinking the last rival wins), a teammate's loss counts too
-//  * the next daikaiju rolls are looked up by expected risk: every leviathan's five arrows (and its spawn on a 6) against my front square and my tile,
+//  * the next leviathan rolls are looked up by expected risk: every leviathan's five arrows (and its spawn on a 6) against my front square and my tile,
 //    over the rolls that happen before my next turn; a held Deck Cannon / Rift Gate softens the risk
 //  * edges are avoided; safe options for the next turn are counted from my remaining tiles (normal) and, for hard, also the odds that the tile I
 //    draw gives a safe option, plus a one-turn look-ahead and a push on rivals toward the edge

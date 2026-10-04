@@ -111,7 +111,7 @@ function advice(){if(!G)return {say:'Press Launch.',why:'The defaults are a good
     const ds=en.map(e=>({e,d:baseDist(s,B(s),e,B(e))})).sort((a,b)=>a.d-b.d);const near=ds[0].e,rg=rangeOf(ds[0].d);let say,why;
     if(s.stress){say="You're stressed: no red moves and no action.";why='Fly a green move (straight 1-2, gentle banks) to clear it.'}
     else if(rg>=4){say="They're out of range.";why='Close in with a straight 3-4, or bank to stay outside their arcs: they must come to you.'}
-    else{say=`${esc(near.name)} is at range ${rg}.`;why=`Everyone rolls +1 attack die at range 1${pilotHas(near,'mauler')?`, and ${esc(near.name)} one more`:''}. Stay at range 2, or line up so it's in your arc but you're not in its arc.`}
+    else{say=`${esc(near.name)} is at range ${rg}.`;why=`Everyone rolls +1 attack die at range 1${pilotHas(near,'knife')?`, and ${esc(near.name)} one more`:''}. Stay at range 2, or line up so it's in your arc but you're not in its arc.`}
     const bumped=(UI.ev[G.round-1]||[]).some(e=>e.t.startsWith(s.name+' bumps into'));if(bumped)why='You bumped last round: no action, and touching ships can\'t fire. Pick a shorter or sideways move this time. '+why;
     const rp=s.dmg.find(x=>x.up&&DAMAGE[x.c].fix);if(rp)why+=` After your crit (${DAMAGE[rp.c].n}): ${critPlain(rp.c,s)}`;
     const sg=suggestDial(s),si=sugInfo(s,sg);why+=` <br>💡 ${mText(dialOf(s)[sg])}: ${si.why}. ${si.cost}`;return {say,why}}
@@ -133,7 +133,7 @@ function advice(){if(!G)return {say:'Press Launch.',why:'The defaults are a good
     if(f)return {say:'Spend focus.',why:`Your ◉ ${fc>1?'become hits':'becomes a hit'}: ${hc+fc} hit${hc+fc===1?'':'s'} before they roll.`};
     if(ms.length)return {say:esc(ms[0].l)+'.',why:esc(ms[0].d)};return {say:'Press Done.',why:'Nothing left to improve: the defender rolls next.'}}
   if(P==='dmod'&&A){const ms=defMods();const r=preview(A);if(r.hits+r.crits===0)return {say:'Press Done.',why:'Every hit is already cancelled: keep your tokens.'};
-    const l=ms.find(m=>m.k==='luke'),f=ms.find(m=>m.k==='focus'),ev=ms.find(m=>m.k==='evade');
+    const l=ms.find(m=>m.k==='kael'),f=ms.find(m=>m.k==='focus'),ev=ms.find(m=>m.k==='evade');
     if(l)return {say:'Use your pilot ability.',why:'Change 1 ◉ to an evade for free. Every evade cancels a hit.'};
     if(f)return {say:'Spend focus.',why:'Your ◉ become evades; every evade cancels a hit.'};if(ev)return {say:'Spend your evade token.',why:'+1 evade cancels one more hit.'};
     if(ms.length)return {say:esc(ms[0].l)+'.',why:esc(ms[0].d)};return {say:'Press Done.',why:`${r.hits+r.crits} will get through: shields absorb damage first, then the hull.`}}

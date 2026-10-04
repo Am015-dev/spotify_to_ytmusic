@@ -1,6 +1,6 @@
 # Shipwreck Isle: rules notes
 
-Shipwreck Isle is a single-file browser adaptation of the co-operative survival board game *Robinson Crusoe: Adventures on the Cursed Island* (Portal Games, 2012; BGG 121921).
+Shipwreck Isle is a single-file browser adaptation of the co-operative survival board game it is based on (original publisher, 2012).
 
 - The rules, numbers and card effects follow the base game.
 - Every name, all card text and all art are original.
@@ -27,16 +27,16 @@ The in-game **Cards** button lists every card, token, tile and scenario, with se
 
 These four are implemented, with the numbers from their sheets:
 
-| Scenario | Based on | What it needs |
-|---|---|---|
-| 1 Marooned | Castaways | Fire plus a 15-wood signal pile, one stage per round, in rounds 10–12. |
-| 2 The Hexed Isle | Cursed Island | Five crosses on different tiles. Fog from the book icon. The totems are a temple, an altar and hideouts. |
-| 3 Stranded Friend | Jenny Needs Help | Build a Rescue Raft and row out to rescue Ada, then build the Lifeboat. Ada takes 2 wounds a night until she is rescued, then joins the camp and can only rest. |
-| 6 Settlers | Family Robinson | Shelter, then roof, palisade and weapon at 1 or more, plus all 9 dealt inventions. Children arrive in rounds 7, 9 and 11. The book icon is bad crops. Totems are wasteland. The Reclaim action removes a black marker. |
+| Scenario | What it needs |
+|---|---|
+| 1 Marooned | Fire plus a 15-wood signal pile, one stage per round, in rounds 10–12. |
+| 2 The Hexed Isle | Five crosses on different tiles. Fog from the book icon. The totems are a temple, an altar and hideouts. |
+| 3 Stranded Friend | Build a Rescue Raft and row out to rescue Ada, then build the Lifeboat. Ada takes 2 wounds a night until she is rescued, then joins the camp and can only rest. |
+| 6 Settlers | Shelter, then roof, palisade and weapon at 1 or more, plus all 9 dealt inventions. Children arrive in rounds 7, 9 and 11. The book icon is bad crops. Totems are wasteland. The Reclaim action removes a black marker. |
 
 These scenarios are not included yet:
-- **4 (Volcano):** it needs its own map, with lava destroying spaces.
-- **5 (Cannibals):** it needs village fights on tiles.
+- **4:** it needs its own map, with lava destroying spaces.
+- **5:** it needs village fights on tiles.
 - **7:** it is a licensed-IP bonus sheet.
 
 ## Round flow (as implemented)

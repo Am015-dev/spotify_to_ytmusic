@@ -1,8 +1,8 @@
-# Sunglaze: rules notes (Azul, Michael Kiesling, 2017, BGG 230802)
+# Sunglaze: rules notes (adapted from the original game, 2017)
 
-Built from `../rules.md` and `../data.json` (sources S1–S12 listed there). The page uses original names:
+Built from `../rules.md` and `../data.json` (sources S1–S12 listed there). The page uses our own names:
 
-| Published game | Sunglaze |
+| Generic term | Sunglaze |
 |---|---|
 | Factory display | Kiln (round coaster) |
 | Centre of the table | Courtyard |
@@ -48,10 +48,10 @@ Built from `../rules.md` and `../data.json` (sources S1–S12 listed there). The
   - A joker blocks its colour in that row, counts for rows and columns, and never counts for the +10 colour bonus.
 
 ## Left out
-- **Crystal Mosaic (2020 expansion, BGG 294345).** Reviews confirm the idea: sides C and D have mostly gray walls with 5 pre-coloured spaces; C has ×2 spaces; D raises the bonuses to 3/10/12; there is a new floor line.
+- **The original 2020 expansion (two-sided boards).** Reviews confirm the idea: sides C and D have mostly gray walls with 5 pre-coloured spaces; C has ×2 spaces; D raises the bonuses to 3/10/12; there is a new floor line.
   - The exact positions of the coloured spaces are not in any source I could reach. The publisher PDF and the review sites were blocked by the proxy on 2026-09-29.
   - Which side uses the reported −1, 0, −1, −2, −1, −2, −3 floor is also unconfirmed. So it is left out rather than guessed.
-- **Special Factories promo (BGG 264017).** The factory powers are undocumented in reachable sources.
+- **The original special-factories promo.** The factory powers are undocumented in reachable sources.
 - **Solo play.** The known solo mode is fan-made, not official.
 
 ## Assumptions

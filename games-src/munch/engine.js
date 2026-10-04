@@ -18,7 +18,7 @@ function lg(s,t){G.ln=(G.ln||0)+1;G.log.unshift({s,t,n:G.ln});if(G.log.length>R.
 function fx(t,x){UI.fx.push({t,x,at:Date.now()+Math.random()});if(UI.fx.length>30)UI.fx.shift()}
 function drawOne(deck){const k=deck==='door'?'door':'tr',dk=deck==='door'?'dd':'td';if(!G[k].length){if(!G[dk].length)return null;G[k]=shuffle(G[dk]);G[dk]=[];lg(-1,`The ${deck==='door'?'door':'treasure'} discards are shuffled into a new deck.`)}return G[k].pop()}
 function discard(id){if(id==null)return;const c=cd(id);(c.d==='door'?G.dd:G.td).push(id)}
-// a card arriving in a hand; some cards act the moment you get them [R: Hoard!, Divine Intervention]
+// a card arriving in a hand; some cards act the moment you get them [R: Treasure Pile!, Heavenly Favor]
 function gain(p,id){if(id==null)return;const c=cd(id);
   if(c.sp==='hoard'){lg(p.i,`${p.nm} finds ${c.n} and draws 3 more treasures!`);discard(id);for(let i=0;i<3;i++)gain(p,drawOne('treasure'));return}
   if(c.sp==='divine'){discard(id);lg(p.i,`${p.nm} reveals ${c.n}: every Cleric goes up a level!`);for(const o of alive())if(isCls(o,'cleric'))gainLv(o,1,c.n,true);return}
@@ -149,7 +149,7 @@ function takeNext(){const t=G.take;if(!t)return;const v=P(t.v);
   G.take=null}
 function slugNext(){const s=G.slug;if(!s)return;const p=P(s.p);while(s.left>0&&(p.hand.length||p.eq.length)){const pool=p.eq.map(e=>e.id).concat(p.hand);if(pool.length<=s.left){pool.forEach(id=>loseCard(p,id,'slugs'));s.left=0;break}
     choose(p.i,'slug',pool,{k:'slug'},`Lose ${s.left} more item${s.left>1?'s':''} or cards: pick one.`);return}G.slug=null}
-// Income Tax [R card]
+// Tax Collector [R card]
 function taxStart(p,src){const pool=p.eq.map(e=>e.id);if(!pool.length){lg(p.i,`${p.nm} has no items, so nobody pays tax.`);return}choose(p.i,'taxpay',pool,{k:'tax0',p:p.i},'Choose an item to discard for the tax.')}
 function taxOthers(v,val){for(const o of alive()){if(o.i===v)continue;const pool=o.eq.map(e=>e.id);const tot=pool.reduce((a,id)=>a+(cd(id).g||0),0);
   if(tot<val){pool.forEach(id=>loseCard(o,id,'tax'));if(val>0){const l=loseLv(o,1);lg(o.i,`${o.nm} can't pay ${val} gold of tax: loses all items${l?' and a level':''}.`)}continue}

@@ -361,13 +361,13 @@ function buildWorld(){const sc=V3.scene;const TX=V3.tex;
   makeFaceMats();
   V3.activeRing=mesh(new THREE.TorusGeometry(2.25,.07,10,64),glowMat(0xffd23f,2.6),0,.3,0,sc,true);V3.activeRing.rotation.x=Math.PI/2;
   V3.activeGlow=mesh(new THREE.CircleGeometry(2.6,40),new THREE.MeshBasicMaterial({map:TX.glow,color:new THREE.Color(.5,.4,.05),transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}),0,.3,0,sc,true);V3.activeGlow.rotation.x=-Math.PI/2;
-  // Tokyo Tower (King Kong pack): painted lattice tower
+  // Crown Spire: painted lattice tower
   const tw=new THREE.Group();tw.position.set(-13.5,.25,-10.5);tw.scale.setScalar(.85);sc.add(tw);V3.tower=tw;V3.tsegs=[];
   const white=std(0xf0e8e0,{roughness:.5});
   [[2.2,1.6,3],[1.6,1.0,2.6],[1.0,.25,2.8]].forEach(([r0,r1,h],k)=>{const y=[0,3,5.6][k];const m=mesh(new THREE.CylinderGeometry(r1,r0,h,6,4,true),new THREE.MeshStandardMaterial({color:0x8a8190,roughness:.45,metalness:.35,side:THREE.DoubleSide,wireframe:false}),0,y+h/2,0,tw);
     const lat=mesh(new THREE.TorusGeometry(r0*.97,.09,6,6),white,0,y+.06,0,tw);lat.rotation.x=Math.PI/2;V3.tsegs.push(m)});
   mesh(new THREE.SphereGeometry(.25,12,10),glowMat(0xff3355,3),0,8.6,0,tw,true);
-  V3.tsign=sprite(signTex('TOKYO TOWER','#ffd23f','#fff6d0'),0,10.2,0,4.4,1.1,tw);tw.visible=false;
+  V3.tsign=sprite(signTex('CROWN SPIRE','#ffd23f','#fff6d0'),0,10.2,0,4.4,1.1,tw);tw.visible=false;
   V3.csign=sprite(signTex('CURSE','#b57bff','#ffffff'),0,12.6,-9,6.4,1.6);V3.csign.visible=false;V3.curseShown=null;
   sc.traverse(o=>{if(o.isInstancedMesh)o.frustumCulled=false});
   V3.icons={star:iconTex('star'),heart:iconTex('heart'),bolt:iconTex('bolt'),brain:iconTex('brain'),fire:iconTex('fire'),puff:iconTex('puff'),spark:iconTex('spark')};
@@ -532,9 +532,9 @@ function sync3D(){if(!V3.on)return;if(PH)PH.wake();
   if(G.rollId!==V3.rollId||V3.dice.length!==G.dice.length){rollDice3D(V3.dice.length!==G.dice.length);V3.rollId=G.rollId}
   V3.dice.forEach((d,k)=>{const gd=G.dice[k];if(!gd)return;if(d.shown!==(gd.t||'n')+gd.f+(gd.k?'k':'')&&d.t>=1){setDieFace(d,gd)}});
   // tags
-  [...tags.children].forEach((el,k)=>{const p=G.pl[k];el.className=`tag ${k===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'} ${inTokyo(p.i)?'city':''}`;
+  [...tags.children].forEach((el,k)=>{const p=G.pl[k];el.className=`tag ${k===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'} ${inCity(p.i)?'city':''}`;
     el.style.setProperty('--mc',MONS[p.m].c);
-    el.innerHTML=`<b>${inTokyo(p.i)?'👑 ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${NET.on&&pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e">⚡${p.en}</em>${mbOn()?`<em class="m">🧠${p.mb}</em>`:''}${exIcons(p)?`<em>${exIcons(p)}</em>`:''}</span>`:'<span>K.O.</span>'}`});
+    el.innerHTML=`<b>${inCity(p.i)?'👑 ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${NET.on&&pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>${p.alive?`<span><em class="h">♥${p.hp}</em><em class="v">★${p.vp}</em><em class="e">⚡${p.en}</em>${mbOn()?`<em class="m">🧠${p.mb}</em>`:''}${exIcons(p)?`<em>${exIcons(p)}</em>`:''}</span>`:'<span>K.O.</span>'}`});
   V3.tower.visible=exOn('tower');if(exOn('tower'))G.tower.forEach((o,l)=>{const m=V3.tsegs[l].material;m.color.set(o>=0?MONS[P(o).m].c:'#d8442e');m.emissive.set(o>=0?0x331100:0x000000)});
   V3.csign.visible=exOn('curse');if(exOn('curse')&&V3.curseShown!==G.curse){V3.curseShown=G.curse;V3.csign.material.map=signTex(CURSES[G.curse].n.toUpperCase(),'#b57bff','#ffffff');V3.csign.material.needsUpdate=true}
   G.pl.forEach((p,k)=>{const o=V3.mons[k];o.berserk=!!(p.tok&&p.tok.berserk&&p.alive);const n=p.alive?(p.cult||0):0;o.cults=o.cults||[];
@@ -550,7 +550,7 @@ function locKey(p){return !p.alive?'ko':G.city===p.i?'city':G.bay===p.i?'bay':'o
 function fx3D(k,e){const o=V3.mons[k];if(!o)return;const at=o.g.position.clone().add(new THREE.Vector3(0,4.4,0));
   popLabel(at,e.t,e.c);
   if(e.c==='hurt'){o.flash=1;o.shakeT=.5;V3.shake=Math.min(1,V3.shake+.35);spawn('fire',at.clone().add(new THREE.Vector3(0,-1,0)),6,1.3);spawn('puff',at.clone().add(new THREE.Vector3(0,-1.2,0)),3,.8)}
-  else if(e.c==='heal')spawn('heart',at,6,.9);else if(e.c==='star'){spawn(/mindbug/i.test(e.t)?'brain':'star',at,8,1);spawn('spark',at,4,1.2)}else if(e.c==='energy')spawn('bolt',at,6,.9)}
+  else if(e.c==='heal')spawn('heart',at,6,.9);else if(e.c==='star'){spawn(/brainjack/i.test(e.t)?'brain':'star',at,8,1);spawn('spark',at,4,1.2)}else if(e.c==='energy')spawn('bolt',at,6,.9)}
 function popLabel(v,text,c){const st=document.getElementById('stage');const p=v.clone().project(V3.cam);const el=document.createElement('div');el.className='pop '+c;el.textContent=text;
   el.style.left=((p.x+1)/2*100)+'%';el.style.top=((1-p.y)/2*100)+'%';el.style.setProperty('--dx',(Math.random()*40-20)+'px');st.appendChild(el);setTimeout(()=>el.remove(),1600)}
 function spawn(kind,at,n,speed){for(let i=0;i<n;i++){const s=sprite(V3.icons[kind],at.x,at.y,at.z,.6,.6);if(kind==='spark'||kind==='fire')s.material.color.setScalar(2);else if(kind!=='puff')s.material.color.setScalar(1.25);const a=Math.random()*Math.PI*2;

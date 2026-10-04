@@ -29,4 +29,4 @@ Built file: `game/thornbound.html` (single file, ~0.84 MB: shell, PerfHUD, TBKit
 * Generic questions (castle Govern etc.) list one button per option; long lists scroll inside the dock.
 * The map is always square (letterboxed on wide desktop screens); region strips use 44x62-unit kit slots (about 17 px on a phone), so card detail is read in the region pop-up.
 * Map slots show the clash total, not each card.
-* Online play, solo (Simulacrum) not built.
+* Online play, solo (the Sim) not built.

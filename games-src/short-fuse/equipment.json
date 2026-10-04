@@ -1,6 +1,6 @@
 {
   "meta": {
-    "note": "Names are our own; ref holds the printed English name for internal reference only. unlock.count = wires of that value that must be cut. Timing labels follow the card footers.",
+    "note": "Names are our own. unlock.count = wires of that value that must be cut. Timing labels follow the card footers.",
     "base_unlock_rule": "Usable from the moment the first 2 wires of the card value are cut; usable once per mission; flip face down after use. Anyone may use a card at any time unless its timing says otherwise; several may be chained.",
     "setup": "Draw one card per player at random from the eligible pool. Missions list cards to discard and replace."
   },
@@ -12,7 +12,6 @@
         "count": 2
       },
       "name": "Unequal Tag",
-      "ref": "Label ≠",
       "timing": "any_time",
       "effect": "Place the single ≠ marker against two neighbouring wires on your own stand whose values differ. One of the two may already be cut. Two reds, or two yellows, always count as equal, so they can never take this marker.",
       "structured": {
@@ -41,7 +40,6 @@
         "count": 2
       },
       "name": "Handsets",
-      "ref": "Walkie-Talkies",
       "timing": "any_time",
       "effect": "Swap one wire with a teammate. You hand them one of your uncut wires face down; they hand you one of theirs face down; each of you slots the new wire into sorted position. Any uncut wire may be swapped, red or yellow included. Everyone sees which slot each wire left and where it went. A player with two stands puts the incoming wire on the stand the outgoing one came from. Info tokens travel with their wire. Neither player may ask for or hint at a value.",
       "structured": {
@@ -75,7 +73,6 @@
         "count": 2
       },
       "name": "Triple Probe",
-      "ref": "Triple Detector",
       "timing": "your_turn",
       "effect": "During a dual cut, name a number (not yellow) and point at three wires on one teammate stand. The cut succeeds if at least one matches; the teammate cuts one matching wire without saying how many matched. On failure the dial advances 1 and the teammate places one info token in front of one of the three (their choice).",
       "structured": {
@@ -93,7 +90,7 @@
         "FAQ confirms success and failure handling."
       ],
       "gaps": [
-        "Red handling extrapolated from the Double Detector: explode only if all chosen wires are red; token goes on a non-red wire."
+        "Red handling extrapolated from the Twin Probe: explode only if all chosen wires are red; token goes on a non-red wire."
       ]
     },
     {
@@ -103,7 +100,6 @@
         "count": 2
       },
       "name": "Sticky Note",
-      "ref": "Post-It",
       "timing": "any_time",
       "effect": "Place an info token showing the true value in front of one of your own blue wires.",
       "structured": {
@@ -128,7 +124,6 @@
         "count": 2
       },
       "name": "Full Scan",
-      "ref": "Super Detector",
       "timing": "your_turn",
       "effect": "During a dual cut, name a number (not yellow) and point at a teammate's entire stand. Success if any wire on it matches; the teammate cuts one matching wire without saying how many. On failure the dial advances 1 and the teammate places one info token in front of a wire of their choice.",
       "structured": {
@@ -154,7 +149,6 @@
         "count": 2
       },
       "name": "Rewind",
-      "ref": "Rewinder",
       "timing": "any_time",
       "effect": "Move the detonator dial back one step.",
       "structured": {
@@ -178,7 +172,6 @@
         "count": 2
       },
       "name": "Recharge",
-      "ref": "Emergency Batteries",
       "timing": "any_time",
       "effect": "Pick one or two character cards whose personal item has already been used and turn them face up; each can be used once more this mission.",
       "structured": {
@@ -200,7 +193,6 @@
         "count": 2
       },
       "name": "Sweep",
-      "ref": "General Radar",
       "timing": "any_time",
       "effect": "Call out a number from 1 to 12. Every player, you included, answers yes if they hold at least one uncut blue wire of that number. Players with two stands answer once per stand. Nobody says how many or where. Red and yellow wires never count.",
       "structured": {
@@ -228,7 +220,6 @@
         "count": 2
       },
       "name": "Damper",
-      "ref": "Stabilizer",
       "timing": "start_of_your_turn",
       "effect": "Turn this card face down before you make a dual cut this turn. If that cut fails, the dial does not move, and if it lands on a red wire the bomb does not go off. A wrong non-red wire still gets its info token (number or yellow); a red one gets none.",
       "structured": {
@@ -256,7 +247,6 @@
         "count": 2
       },
       "name": "Two-Value Probe",
-      "ref": "X or Y ray",
       "timing": "your_turn",
       "effect": "During a dual cut, name two values (yellow may be one of them) for a single wire. You must hold both values. If the wire is either, the cut succeeds and you cut your matching wire, so teammates also learn that you hold the other value. The two values need not be adjacent. It can be combined with the double, triple or full-scan probes.",
       "structured": {
@@ -285,7 +275,6 @@
         "count": 2
       },
       "name": "Coffee Break",
-      "ref": "Coffee Mug",
       "timing": "your_turn",
       "effect": "Skip your turn and choose, without discussion, who takes the next turn; play carries on clockwise from that player.",
       "structured": {
@@ -308,7 +297,6 @@
         "count": 2
       },
       "name": "Equal Tag",
-      "ref": "Label =",
       "timing": "any_time",
       "effect": "Place the single = marker against two neighbouring wires on your own stand that share a value. One may already be cut. Any two reds, or any two yellows, count as the same.",
       "structured": {
@@ -333,7 +321,6 @@
         "count": 2
       },
       "name": "Hidden Compartment",
-      "ref": "False Bottom",
       "timing": "instant",
       "effect": "As soon as it unlocks, draw two more equipment cards and add them to this mission. They may already be unlocked if their values have been cut.",
       "structured": {
@@ -361,7 +348,6 @@
         "count": 4
       },
       "name": "Lone Tag",
-      "ref": "Single Wire Label",
       "timing": "any_time",
       "effect": "Place a ×1 token in front of one of your blue wires, cut or uncut. It means that value appears only once on that stand, counting cut wires.",
       "structured": {
@@ -386,7 +372,6 @@
         "count": 4
       },
       "name": "Supply Drop",
-      "ref": "Emergency Drop",
       "timing": "instant",
       "effect": "All equipment cards already used this mission turn face up again and can be used once more.",
       "structured": {
@@ -410,7 +395,6 @@
         "count": 4
       },
       "name": "Express Pass",
-      "ref": "Fast Pass Card",
       "timing": "your_turn",
       "effect": "Make a solo cut of two identical wires from your hand even if other wires of that value are still uncut elsewhere.",
       "structured": {
@@ -432,7 +416,6 @@
         "count": 4
       },
       "name": "Vaporiser",
-      "ref": "Disintegrator",
       "timing": "instant",
       "effect": "Draw an info token at random from the supply and reveal its number. Every player cuts all of their remaining wires of that number.",
       "structured": {
@@ -458,7 +441,6 @@
         "count": 4
       },
       "name": "Hook Line",
-      "ref": "Grappling Hook",
       "timing": "any_time",
       "effect": "Point at a teammate wire, take it without revealing it, and slot it into your hand in sorted order. Everyone sees where it came from and where it went.",
       "structured": {

@@ -55,7 +55,7 @@ function briefingHTML(){const me=soloSide()>=0?soloSide():0,fo=1-me;const mine=G
   return `<div class="brief"><h3>📡 Mission briefing${so?` · Sortie ${G.sortie+1}: ${esc(so.title)}`:''}</h3><p>${t}</p><p class="small"><b>Win:</b> destroy every enemy ship. You fly ${mine.length===1?'1 ship':mine.length+' ships'} (orange tags at the bottom edge); the enemy starts at the top.</p></div>`}
 // ---- radio chatter for the key beats (shown in the dock, never in the battle log) ----
 const CHAT={
-  fire:[[`Got you in my sights, {t}!`,`Stay on target…`,`Lining up… firing!`,`{t}, you're mine.`],[`Got you in my sights, {t}!`,`Target acquired. Firing.`,`For the Armada!`,`Hold still, {t}.`],[`Nothing personal, {t}.`,`Payday!`]],
+  fire:[[`Got you in my sights, {t}!`,`Steady… steady…`,`Lining up… firing!`,`{t}, you're mine.`],[`Got you in my sights, {t}!`,`Target acquired. Firing.`,`For the Armada!`,`Hold still, {t}.`],[`Nothing personal, {t}.`,`Payday!`]],
   shields:[`Shields holding… barely.`,`Shields took that one.`],shieldsdown:[`Shields are down!`,`I've lost my shields!`],
   hull:[`I'm hit! Hull damage!`,`That hurt. Still flying.`],crit:[`Critical hit: {c}!`,`Something's burning… {c}!`],
   miss:[`Too slow!`,`Missed me!`,`Not today.`],boom:[`{v} is going down!`,`Scratch one!`,`{v} is gone!`],lost:[`We lost {v}!`,`{v}! No!`],

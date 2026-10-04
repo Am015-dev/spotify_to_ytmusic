@@ -15,7 +15,7 @@ const SND_MAP={
   whoosh:{s:'whoosh',vol:.8},
   stomp:{s:'stomp',vol:1,then:'roar'},  // entering the city: impact, then the monster's roar (as the synth did)
   ko:{s:'ko',vol:.85},
-  mindbug:{s:'mindbug',vol:.7,duck:true},
+  brainjack:{s:'mindbug',vol:.7,duck:true},
   evolve:{s:'evolve',vol:.7,duck:true},
   buy:{s:'buy',vol:.85},
   turn:{s:'turn',vol:.5},         // every turn: kept soft so it does not nag
@@ -65,7 +65,7 @@ function sfx(name){if(!SND.on||!SND.ctx||SND.ctx.state!=='running')return;const 
   case 'whoosh':noise(.5,{f:3000,fto:250,q:1.2,v:.3,a:.08});break;
   case 'stomp':thump(0,.9);thump(.22,.7);SND.last.roar=0;setTimeout(()=>sfx('roar'),250);[392,523,659].forEach((f,k)=>tone(f,.35,{type:'sawtooth',v:.1,lp:1800,at:.3+k*.09}));break;
   case 'ko':tone(420,1.1,{type:'sawtooth',to:55,v:.25,lp:1400,vib:7,vibAmt:30});thump(.9,.9);noise(.7,{ft:'lowpass',f:900,fto:150,v:.35,at:.85});break;
-  case 'mindbug':tone(600,.9,{type:'sine',v:.18,vib:9,vibAmt:120});tone(905,.9,{type:'triangle',v:.08,vib:6,vibAmt:90,det:12});tone(300,.9,{type:'sine',to:200,v:.1});break;
+  case 'brainjack':tone(600,.9,{type:'sine',v:.18,vib:9,vibAmt:120});tone(905,.9,{type:'triangle',v:.08,vib:6,vibAmt:90,det:12});tone(300,.9,{type:'sine',to:200,v:.1});break;
   case 'evolve':tone(300,.6,{type:'triangle',to:1500,v:.14});[1319,1568,1976,2637].forEach((f,k)=>tone(f,.18,{type:'sine',v:.08,at:.35+k*.06}));break;
   case 'buy':noise(.03,{f:5000,q:3,v:.15});tone(1568,.12,{type:'triangle',v:.14,at:.03});tone(2093,.35,{type:'triangle',v:.14,at:.12});break;
   case 'turn':tone(784,.5,{type:'sine',v:.16});tone(1175,.7,{type:'sine',v:.12,at:.12});break;

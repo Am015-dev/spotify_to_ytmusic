@@ -1,8 +1,8 @@
 # Hollowbough — build plan
 
-An Everdell-style (BGG 199792) woodland city-building game for the Game Night Shelf.
-Original names, card text and art (storybook watercolour). Full base game first; expansions later
-(Pearlbrook, Spirecrest, Bellfaire, Newleaf, Mistwood), one at a time.
+A woodland city-building game for the Game Night Shelf, adapted from a published board game.
+Original names, card text and art (storybook watercolour). Full base game first; the original expansions later,
+one at a time.
 
 ## Stages and owners (one owner per file set; agents never edit another stage's files)
 1. Research — `rules-notes.md`, `cards.json`, `sources.md`.
@@ -10,7 +10,7 @@ Original names, card text and art (storybook watercolour). Full base game first;
 3. Engine + AI — `game/src/engine.js`, `data.js` (built from cards.json), `ai.js`, `rules-test.js`,
    `gauntlet.js`, `cover.js` (every card/location/event forced), `hidden-test.js`.
    State in one serialisable `G`; legal-move list `moves(G, seat)`; `apply(G, move)`; seeded RNG.
-   AI: easy / normal / hard for every seat, plus the solo automa (Rugwort-equivalent, renamed).
+   AI: easy / normal / hard for every seat, plus the solo automa (the original solo opponent, renamed).
 4. UI — `game/src/ui*.js`, `head.html`, `body.html`, `build.py` → `hollowbough.html`.
    PHONE FIRST: follow the phone-play spec from the start (board ≥ 0.85 of the short side, tap to act,
    pop-ups beside the board, one card at a time, ≥ 44 px targets) and the board-first desktop shell.

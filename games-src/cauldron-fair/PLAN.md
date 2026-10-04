@@ -17,4 +17,4 @@ they never enter this repo, the site or any artifact. Real names appear only in 
 2. Engine + AI + tests (src/engine.js, ai.js; rules-test, gauntlet, cover, hidden-test).
 3. Art kit + paint generator (kit.js, paint/), audio (audio/, real CC0 only, logged in games-src/audio/ASSETS.md).
 4. UI (phone-first, board-first desktop), painted PixiJS table, online (netstrip, p2p tests).
-5. Main session: cover, shelf entry, deploy. Expansions (herb witches, alchemists) are a later phase, not started.
+5. Main session: cover, shelf entry, deploy. Expansions (the original first and second expansions) are a later phase, not started.

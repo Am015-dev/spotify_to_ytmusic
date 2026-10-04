@@ -32,7 +32,7 @@ Companion to `../rules-notes.md` and `../missions.json`. Every rule in the resea
 | Yellow is cut as "yellow"; a miss on yellow shows the yellow token | `cv`, `trueTok` |
 | Validation token when all four of a value are cut | `afterCut` |
 | Equipment unlocks the moment the first 2 (double cards: all 4) of its value are cut, works once, timing labels | `checkUnlocks`, `eqOK` |
-| Twin Probe (Double Detector): two wires on one stand, number only, both match = owner picks, one red = no boom and token on the other, both red = boom | `doDual` with `tool:'dd'`, `QH.dualHit`, `dualMiss` |
+| Twin Probe: two wires on one stand, number only, both match = owner picks, one red = no boom and token on the other, both red = boom | `doDual` with `tool:'dd'`, `QH.dualHit`, `dualMiss` |
 | Fuse: start = players (1 in 41/55/60/62, players+1 in 51), each step -1, 0 = boom, max 6 | `advance`, `rewind`, `DIAL_MAX` |
 | Win: every stand wire cut or revealed (and the robot empty); loss: red, fuse, job explosions | `checkWin`, `explode` |
 | Info-token shortage (FAQ): a token still goes down as a "spoken" token; tokens of cut wires go back | `tokFromSupply`, `cutSlot` |
@@ -153,7 +153,7 @@ Fixed (wrong / missing)
 - 6 Jobs 38/56/64: the Sweep ignores flipped wires (the owner cannot see them).
 - 7 Job 48 (and the 66 lever): a failed three-yellow call puts a token on every pointed non-red wire (a yellow gets the yellow token), burns exactly one step, and never marks a real yellow "not yellow". A red among the three still explodes (cutting a red always does; the card is silent).
 - 11 Job 31 (2 players): the draft no longer forbids A+B / C+D; the option is labelled "(the rules advise against this pairing)".
-- 15 Job 44 Damper: with no oxygen to pay in jobs 54/63 (forced skip) a player holding a ready Stabilizer is asked whether to use it to cancel the step. In 44/49 the voluntary pass already honours it (and a player who cannot pay simply passes). The "pretend cut in zone 1" is not implemented: the FAQ gives no cost or effect and the Damper pass already gives the free turn.
+- 15 Job 44 Damper: with no oxygen to pay in jobs 54/63 (forced skip) a player holding a ready Damper is asked whether to use it to cancel the step. In 44/49 the voluntary pass already honours it (and a player who cannot pay simply passes). The "pretend cut in zone 1" is not implemented: the FAQ gives no cost or effect and the Damper pass already gives the free turn.
 
 Ambiguous: reading chosen (no code change unless stated)
 - 8 Job 18: keep the borrowed "lacks" penalty (tag a wire, one step); the FAQ says the designated player is chosen freely, so the radar answers do not restrict the choice.

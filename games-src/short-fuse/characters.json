@@ -10,7 +10,7 @@
       "27": "nobody has a personal item",
       "28": "the Captain has none",
       "34": "none until the weak link is exposed",
-      "58": "Double Detector is unlimited; new characters are banned",
+      "58": "Twin Probe is unlimited; new characters are banned",
       "new_character_ban_two_value_probe": [
         44,
         45,
@@ -26,7 +26,6 @@
   },
   "personal_items": {
     "double_probe": {
-      "ref": "Double Detector",
       "timing": "your_turn (during a Dual Cut)",
       "uses": "once per mission",
       "effect": "During a dual cut, name a number (1-12, never yellow or red) and point at two wires on the same stand of one teammate (not necessarily adjacent). If either matches, the cut succeeds: if both match, the teammate quietly picks which one to cut, and you cut one of your own matching wires. If neither matches, the dial advances 1 and the teammate places one info token in front of one of the two (their choice). If exactly one of the two is red, nothing explodes and the token must go on the non-red wire; if both are red, the bomb explodes.",
@@ -41,11 +40,10 @@
       },
       "sources": [
         "RB p.6",
-        "FAQ Double Detector"
+        "FAQ Twin Probe"
       ]
     },
     "sweep": {
-      "ref": "General Radar (personal)",
       "timing": "any_time",
       "uses": "once per mission",
       "effect": "Same as the Sweep equipment card (eq8).",
@@ -58,7 +56,6 @@
       ]
     },
     "handsets": {
-      "ref": "Walkie-Talkies (personal)",
       "timing": "any_time",
       "uses": "once per mission",
       "effect": "Same as the Handsets equipment card (eq2).",
@@ -71,7 +68,6 @@
       ]
     },
     "triple_probe": {
-      "ref": "Triple Detector (personal)",
       "timing": "your_turn",
       "uses": "once per mission",
       "effect": "Same as the Triple Probe equipment card (eq3).",
@@ -84,7 +80,6 @@
       ]
     },
     "two_value_probe": {
-      "ref": "X or Y Ray (personal)",
       "timing": "your_turn",
       "uses": "once per mission",
       "effect": "Same as the Two-Value Probe equipment card (eq10).",
@@ -104,7 +99,6 @@
     {
       "id": "ch_captain",
       "name": "Squad Lead",
-      "ref": "Captain (character card)",
       "is_captain": true,
       "personal_item": "double_probe",
       "availability": {
@@ -117,7 +111,6 @@
     {
       "id": "ch_base1",
       "name": "Wren",
-      "ref": "base character 2 (unnamed card, Double Detector)",
       "is_captain": false,
       "personal_item": "double_probe",
       "availability": {
@@ -127,7 +120,6 @@
     {
       "id": "ch_base2",
       "name": "Pike",
-      "ref": "base character 3 (unnamed card, Double Detector)",
       "is_captain": false,
       "personal_item": "double_probe",
       "availability": {
@@ -137,7 +129,6 @@
     {
       "id": "ch_base3",
       "name": "Moss",
-      "ref": "base character 4 (unnamed card, Double Detector)",
       "is_captain": false,
       "personal_item": "double_probe",
       "availability": {
@@ -147,7 +138,6 @@
     {
       "id": "ch_base4",
       "name": "Tally",
-      "ref": "base character 5 (unnamed card, Double Detector)",
       "is_captain": false,
       "personal_item": "double_probe",
       "availability": {
@@ -157,7 +147,6 @@
     {
       "id": "ch_new1",
       "name": "Echo",
-      "ref": "new character: General Radar",
       "is_captain": false,
       "personal_item": "sweep",
       "availability": {
@@ -168,7 +157,6 @@
     {
       "id": "ch_new2",
       "name": "Relay",
-      "ref": "new character: Walkie-Talkies",
       "is_captain": false,
       "personal_item": "handsets",
       "availability": {
@@ -179,7 +167,6 @@
     {
       "id": "ch_new3",
       "name": "Trident",
-      "ref": "new character: Triple Detector",
       "is_captain": false,
       "personal_item": "triple_probe",
       "availability": {
@@ -190,7 +177,6 @@
     {
       "id": "ch_new4",
       "name": "Prism",
-      "ref": "new character: X or Y Ray",
       "is_captain": false,
       "personal_item": "two_value_probe",
       "availability": {

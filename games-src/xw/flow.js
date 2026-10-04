@@ -212,4 +212,4 @@ document.addEventListener('keydown',e=>{if(e.key!=='Enter'||!G||!UI.hold||humanT
 // the recommended dice modification (the same reasoning as the advisor)
 function recMod(){const A=G.atk;if(!A)return null;
   if(G.phase==='amod'){const ms=atkMods();const f=ms.find(m=>m.k==='focus'),tl=ms.find(m=>m.k==='tl');const fc=cnt(A.dice,'focus');if(tl&&cnt(A.dice,'blank')+(!f?fc:0)>0)return 'tl';if(f&&fc)return 'focus';return ms.length?null:'done'}
-  if(G.phase==='dmod'){const r=preview(A);if(r.hits+r.crits===0)return 'done';const ms=defMods();for(const k of ['luke','focus','evade'])if(ms.some(m=>m.k===k))return k;return ms.length?null:'done'}return null}
+  if(G.phase==='dmod'){const r=preview(A);if(r.hits+r.crits===0)return 'done';const ms=defMods();for(const k of ['kael','focus','evade'])if(ms.some(m=>m.k===k))return k;return ms.length?null:'done'}return null}
