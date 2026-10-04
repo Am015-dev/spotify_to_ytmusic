@@ -2419,7 +2419,7 @@ function loadGame(){try{const s=localStorage.getItem(SAVE);if(s){G=JSON.parse(s)
 // Every decision is a pure function of knowledge(seat) (plus a salt): the AI never reads G. A placement is simulated on a copy of the
 // public board (path following through chained currents, edge, leviathan tiles, collisions), then scored:
 //  * dying is terrible, sinking a rival is great (and sinking the last rival wins), a teammate's loss counts too
-//  * the next daikaiju rolls are looked up by expected risk: every leviathan's five arrows (and its spawn on a 6) against my front square and my tile,
+//  * the next leviathan rolls are looked up by expected risk: every leviathan's five arrows (and its spawn on a 6) against my front square and my tile,
 //    over the rolls that happen before my next turn; a held Deck Cannon / Rift Gate softens the risk
 //  * edges are avoided; safe options for the next turn are counted from my remaining tiles (normal) and, for hard, also the odds that the tile I
 //    draw gives a safe option, plus a one-turn look-ahead and a push on rivals toward the edge
@@ -2613,6 +2613,7 @@ function levArrowRows(L){return L.arr.map((a,i)=>`<tr><td>${i+1}</td><td>${a==='
  *   GA.loop(name, {vol, fade}) / GA.stopLoop(name, {fade})         ambience beds
  *   GA.music(name|null, {vol, fade})                                 cross-fading background track
  *   GA.setSfx(on) GA.setMusic(on) GA.setVolume('sfx'|'music', 0..1)  persisted in localStorage
+ *   GA.setVolume('master', 0..1)  one level over everything (the shared settings panel sets it; default 1)
  *   GA.has(name) GA.playing() GA.state() GA.unlock() GA.names() GA.duration(name)
  * Samples are decoded lazily on the first user gesture (atob -> ArrayBuffer -> decodeAudioData, no fetch).
  */
@@ -2622,7 +2623,7 @@ function levArrowRows(L){return L.arr.map((a,i)=>`<tr><td>${i+1}</td><td>${a==='
   var S = {
     inited: false, key: 'ga', src: {}, kind: {}, buf: {}, failed: {}, pending: {},
     ctx: null, ctxOpt: null, out: null, sfxBus: null, musBus: null, duckBus: null,
-    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, last: {}, loops: {},
+    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, masterVol: 1, last: {}, loops: {},
     cur: null, curName: null, wantMusic: null, duckSet: {}, duckUntil: 0, unlocked: false, decoding: false
   };
   var DEFAULT_DUCK = ['win', 'lose', 'levelup', 'level', 'boom', 'ko', 'thunder', 'roar', 'smash', 'stomp', 'door', 'death', 'crit', 'crumble'];
@@ -2667,6 +2668,7 @@ function levArrowRows(L){return L.arr.map((a,i)=>`<tr><td>${i+1}</td><td>${a==='
     var t = S.ctx.currentTime;
     S.sfxBus.gain.setTargetAtTime(S.sfxOn ? S.sfxVol : 0, t, 0.02);
     S.musBus.gain.setTargetAtTime(S.musOn ? S.musVol : 0, t, 0.08);
+    S.out.gain.setTargetAtTime(S.masterVol, t, 0.02);
   }
 
   // Loops: skip encoder padding / near-silence at the edges so MP3 loops don't gap.
@@ -2742,6 +2744,7 @@ function levArrowRows(L){return L.arr.map((a,i)=>`<tr><td>${i+1}</td><td>${a==='
     S.sfxOn = lsGet('sfx', '1') !== '0'; S.musOn = lsGet('mus', '1') !== '0';
     S.sfxVol = clamp(lsGet('sfxvol', o.sfxVol != null ? o.sfxVol : 0.8), 0, 1);
     S.musVol = clamp(lsGet('musvol', o.musVol != null ? o.musVol : 0.5), 0, 1);
+    S.masterVol = clamp(lsGet('mastervol', 1), 0, 1);
     if (!S.inited && root.document && root.document.addEventListener) {
       ['pointerdown', 'keydown', 'touchstart', 'mousedown'].forEach(function (ev) {
         root.document.addEventListener(ev, onGesture, { capture: true, passive: true });
@@ -2853,11 +2856,11 @@ function levArrowRows(L){return L.arr.map((a,i)=>`<tr><td>${i+1}</td><td>${a==='
   }
   function setVolume(kind, v) {
     v = clamp(v, 0, 1);
-    if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
+    if (kind === 'master') { S.masterVol = v; lsSet('mastervol', v); } else if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
     applyVol(); return v;
   }
   function state() {
-    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, audio: !!S.ctx,
+    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, masterVol: S.masterVol, audio: !!S.ctx,
       ctxState: S.ctx ? S.ctx.state : 'none', decoded: Object.keys(S.buf).length, failed: Object.keys(S.failed),
       total: Object.keys(S.src).length, playing: S.curName, loops: Object.keys(S.loops) };
   }
