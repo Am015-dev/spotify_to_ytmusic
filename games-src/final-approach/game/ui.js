@@ -86,7 +86,9 @@ function render() {
   if (!G || !UI.started) return;
   const bd = $('#bd'), pz = $('#pz'); if (!bd || !pz) return;
   if (isPh()) applyPhone();
-  const W = bd.clientWidth, Hh = bd.clientHeight; if (W < 10 || Hh < 10) return;
+  let W = bd.clientWidth, Hh = bd.clientHeight;
+  if ((W < 10 || Hh < 10) && /jsdom/i.test(navigator.userAgent || '')) { const iw = innerWidth || 1100, ih = innerHeight || 700; W = iw < ih ? iw : Math.round(iw * .7); Hh = iw < ih ? Math.round(ih * .55) : ih - 48; }   // no layout engine in jsdom: pretend the board has a plausible size
+  if (W < 10 || Hh < 10) return;
   const v = viewSeat(), me = typeof v === 'number' ? v : -1;
   const LY = UI.LY = FA.layout(W, Hh, { mods: G.mods, me }); UI.W = W;
   const legal = selectedLegal(), r = LY.r, rows = altRows(), tr = trackOf(), size = tr.sp.length;

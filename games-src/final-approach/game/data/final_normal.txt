@@ -13,3 +13,8 @@ normal y6 yellow Twin Spires                   6/30  20% avg rounds 7.0 {"fuel":
 normal y7 yellow Grand Crossing                3/30  10% avg rounds 6.6 {"mandatory":3,"short":12,"spin":3,"checks:flaps":3,"checks:planes+axis":1,"corridor":2,"checks:planes":1,"fuel":1,"collision":1} 2697ms/game
 normal r1 red Cloudspire                       2/30   7% avg rounds 6.4 {"spin":2,"fuel":16,"mandatory":3,"short":2,"speed":1,"corridor":2,"collision":2} 3653ms/game
 normal r2 red Seabright Bay                    0/30   0% avg rounds 6.2 {"fuel":18,"corridor":3,"short":3,"collision":1,"speed":2,"mandatory":1,"spin":2} 4182ms/game
+normal r3 red Palmreach                        2/30   7% avg rounds 6.4 {"short":4,"mandatory":11,"speed":3,"collision":6,"fuel":2,"checks:planes+flaps+axis":1,"spin":1} 4628ms/game
+normal r4 red Lake Orrin                       0/30   0% avg rounds 7.0 {"checks:ice":17,"short":2,"fuel":3,"spin":2,"mandatory":1,"speed":2,"checks:axis+ice":2,"checks:flaps+axis+ice":1} 6327ms/game
+normal r5 red Bowlrock                         1/30   3% avg rounds 6.0 {"spin":1,"fuel":12,"short":5,"corridor":2,"mandatory":3,"speed":3,"collision":3} 5875ms/game
+normal b1 black Frostmere                      0/30   0% avg rounds 6.5 {"speed":12,"mandatory":9,"spin":3,"short":3,"collision":3} 5748ms/game
+normal b2 black Twin Spires                    2/30   7% avg rounds 6.6 {"short":13,"fuel":11,"corridor":3,"mandatory":1} 4411ms/game

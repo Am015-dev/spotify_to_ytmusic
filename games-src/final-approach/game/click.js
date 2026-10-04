@@ -11,11 +11,11 @@ const CONF = [
   { name: 'vs g2 normal', start: 'vs', sc: 'g2' },
   { name: 'vs y1 easy', start: 'vs', sc: 'y1', level: 'easy' },
   { name: 'vs r2 hard', start: 'vs', sc: 'r2', level: 'hard' },
-  { name: 'vs kerosene', start: 'vs', sc: 'y4' },
-  { name: 'vs wind', start: 'vs', sc: 'y6' },
-  { name: 'vs intern', start: 'vs', sc: 'r3' },
-  { name: 'vs ice + real-time', start: 'vs', sc: 'b2' },
-  { name: 'vs black', start: 'vs', sc: 'b3' },
+  { name: 'vs kerosene (g4)', start: 'vs', sc: 'g4' },
+  { name: 'vs wind (y3)', start: 'vs', sc: 'y3' },
+  { name: 'vs trainee (g5)', start: 'vs', sc: 'g5' },
+  { name: 'vs ice brakes (y4)', start: 'vs', sc: 'y4' },
+  { name: 'vs real-time + fuel (r1)', start: 'vs', sc: 'r1' },
   { name: 'hot g3', start: 'hot', sc: 'g3' },
   { name: 'hot y2', start: 'hot', sc: 'y2' },
   { name: 'watch g4', start: 'ai', sc: 'g4' },
@@ -77,6 +77,14 @@ function run(cf, seed) {
               const r = R();
               if (r < .02) { const t = rnd(q('.gx-bar [data-gx]')); if (t) { click(t); seen.add('drawer:' + t.dataset.gx); const x = d.querySelector('.gx-drawer.on .gx-x'); if (x) click(x); } return; }
               if (r < .04) { const sp = q('#pz .sp'); if (sp.length) { click(rnd(sp)); seen.add('space'); return; } }
+              // most of the time the computer crew logic suggests the move and it is carried out with real taps (so the game reaches the later rounds); the rest is random
+              if (G.phase !== 'brief' && R() < .8) {
+                const seat = hot ? holder : v, mv = w.eval(`FA.AI.move(G, ${seat}, 'normal', { noMC: true })`), dieBtn = i => d.querySelector(`#pz .die[data-s="${seat}"][data-d="${i}"]:not([disabled])`);
+                if (mv && mv.t === 'place') { const b = dieBtn(mv.d); if (b) { click(b); w.eval(`UI.cof=${mv.c || 0};render()`); const sl = d.querySelector(`#pz .slot[data-slot="${mv.to}"]`); if (sl) { click(sl); placed++; clicks++; seen.add('place (suggested)'); return; } } }
+                else if (mv && mv.t === 'rr') { const b = q('#acts [data-a=rr]'); if (b.length) { click(b[0]); seen.add('reroll'); return; } }
+                else if (mv && mv.t === 'rrpick') { const cur = w.eval('UI.rrm.slice()'); let did = false; mv.m.forEach((on, i) => { if (on !== !!cur[i]) { const b = dieBtn(i); if (b && !did) { click(b); did = true; } } }); if (did) return; const rp = q('#acts [data-a=rrpick]'); if (rp.length) { click(rp[0]); seen.add('reroll confirm'); return; } }
+                else if (mv && ['toss', 'antic', 'adapt', 'wt', 'wt2'].includes(mv.t)) { const b = dieBtn(mv.d); if (b) { click(b); const a = q(`#acts [data-a=${mv.t}]`); if (a.length) { click(a[0]); seen.add('act:' + mv.t); return; } } }
+              }
               const sel = w.eval('UI.sel'), legal = q('#pz .slot.legal');
               if (typeof sel === 'number' && sel !== -1 || sel === 'p') {
                 if (r < .12) { const cf2 = q('#dock [data-a=cof]'); if (cf2.length) { click(rnd(cf2)); seen.add('coffee chip'); return; } }

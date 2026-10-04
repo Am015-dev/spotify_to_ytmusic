@@ -1,0 +1,1 @@
+hard r2 red Seabright Bay                      0/12   0% avg rounds 6.5 {"fuel":5,"mandatory":2,"speed":4,"short":1} 74013ms/game

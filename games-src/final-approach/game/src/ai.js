@@ -24,8 +24,8 @@ const W = AI.W = {
   planeS: 0.30, flapQ: 0.333, flapM: 3.0, gearM: 2.6, brakeM: 3.2, brakeCoffee: 0.30, iceP: 0.30, internP: 0.8,
   ax0: 0.86, ax1: 0.66, ax2: 0.42, axR: 0.05, axCoffee: 0.05, axis1: 0.15, axis2: 0.5, tab: 0.5, fuelK: 1.1, leakAvg: 2.5, keroAvg: 2.8, eff: 0.8, lag: 1
 };
-const FN = ['pairA_n', 'pairA_f', 'pairE_n', 'pairE_f', 'sched', 'planes', 'imminent', 'flaps', 'gear', 'brake', 'intern', 'axisBal', 'fuel', 'tab', 'overload', 'coffee', 'coffeeLate', 'reroll', 'bias'];
-const W0 = { pairA_n: 1, pairA_f: 1, pairE_n: 1, pairE_f: 1, sched: 1, planes: 1, imminent: 0.5, flaps: 1, gear: 1, brake: 1, intern: 1, axisBal: 1, fuel: 1, tab: 1, overload: 0.9, coffee: -0.1, coffeeLate: -0.05, reroll: -0.15, bias: 0 };
+const FN = ['pairA_n', 'pairA_f', 'pairE_n', 'pairE_f', 'sched', 'planes', 'imminent', 'flaps', 'gear', 'brake', 'intern', 'axisBal', 'fuel', 'tab', 'overload', 'coffee', 'coffeeLate', 'reroll', 'burn', 'bias'];
+const W0 = { burn: 0.35, pairA_n: 1, pairA_f: 1, pairE_n: 1, pairE_f: 1, sched: 1, planes: 1, imminent: 0.5, flaps: 1, gear: 1, brake: 1, intern: 1, axisBal: 1, fuel: 1, tab: 1, overload: 0.9, coffee: -0.1, coffeeLate: -0.05, reroll: -0.15, bias: 0 };
 AI.FN = FN; AI.W0 = W0;
 AI.w = Object.assign({}, W0, (FA.AIW && FA.AIW.w) || {});
 if (FA.AIW && FA.AIW.c) Object.assign(W, FA.AIW.c);
@@ -177,6 +177,7 @@ function features(S, me) {
     const cur = (S.fl.keroUsed) ? 0 : (!inPlace ? 2.8 : 2.8 + 3.2 * Math.pow(0.6, freeT));
     const mu = S.pl.kero - later * W.keroAvg - cur, sd = 1.5 + 0.9 * Math.sqrt(later + 1);
     f.fuel = nats(1 / (1 + Math.exp(-1.7 * mu / sd)));
+    f.burn = S.fl.keroUsed ? (S.slots.ke ? S.slots.ke.v : 0) : cur;   // every unit of fuel burnt this round counts, however much is left
   }
   if (S.mods.leak) { const later = Math.max(0, rem - (enginesDone(S) ? 1 : 0)), mu = S.pl.kero - later * W.leakAvg, sd = 1.5 + 0.9 * Math.sqrt(later + 1); f.fuel = nats(1 / (1 + Math.exp(-1.7 * mu / sd))); }
   if (S.mods.tabs && !final) { const cur = sp[Math.min(pos, size) - 1]; if (cur && cur[2] && !cur[2].includes(S.pl.axis)) f.tab = 1; }

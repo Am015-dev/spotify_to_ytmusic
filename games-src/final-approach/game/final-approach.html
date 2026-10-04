@@ -3702,8 +3702,8 @@ const W = AI.W = {
   planeS: 0.30, flapQ: 0.333, flapM: 3.0, gearM: 2.6, brakeM: 3.2, brakeCoffee: 0.30, iceP: 0.30, internP: 0.8,
   ax0: 0.86, ax1: 0.66, ax2: 0.42, axR: 0.05, axCoffee: 0.05, axis1: 0.15, axis2: 0.5, tab: 0.5, fuelK: 1.1, leakAvg: 2.5, keroAvg: 2.8, eff: 0.8, lag: 1
 };
-const FN = ['pairA_n', 'pairA_f', 'pairE_n', 'pairE_f', 'sched', 'planes', 'imminent', 'flaps', 'gear', 'brake', 'intern', 'axisBal', 'fuel', 'tab', 'overload', 'coffee', 'coffeeLate', 'reroll', 'bias'];
-const W0 = { pairA_n: 1, pairA_f: 1, pairE_n: 1, pairE_f: 1, sched: 1, planes: 1, imminent: 0.5, flaps: 1, gear: 1, brake: 1, intern: 1, axisBal: 1, fuel: 1, tab: 1, overload: 0.9, coffee: -0.1, coffeeLate: -0.05, reroll: -0.15, bias: 0 };
+const FN = ['pairA_n', 'pairA_f', 'pairE_n', 'pairE_f', 'sched', 'planes', 'imminent', 'flaps', 'gear', 'brake', 'intern', 'axisBal', 'fuel', 'tab', 'overload', 'coffee', 'coffeeLate', 'reroll', 'burn', 'bias'];
+const W0 = { burn: 0.35, pairA_n: 1, pairA_f: 1, pairE_n: 1, pairE_f: 1, sched: 1, planes: 1, imminent: 0.5, flaps: 1, gear: 1, brake: 1, intern: 1, axisBal: 1, fuel: 1, tab: 1, overload: 0.9, coffee: -0.1, coffeeLate: -0.05, reroll: -0.15, bias: 0 };
 AI.FN = FN; AI.W0 = W0;
 AI.w = Object.assign({}, W0, (FA.AIW && FA.AIW.w) || {});
 if (FA.AIW && FA.AIW.c) Object.assign(W, FA.AIW.c);
@@ -3855,6 +3855,7 @@ function features(S, me) {
     const cur = (S.fl.keroUsed) ? 0 : (!inPlace ? 2.8 : 2.8 + 3.2 * Math.pow(0.6, freeT));
     const mu = S.pl.kero - later * W.keroAvg - cur, sd = 1.5 + 0.9 * Math.sqrt(later + 1);
     f.fuel = nats(1 / (1 + Math.exp(-1.7 * mu / sd)));
+    f.burn = S.fl.keroUsed ? (S.slots.ke ? S.slots.ke.v : 0) : cur;   // every unit of fuel burnt this round counts, however much is left
   }
   if (S.mods.leak) { const later = Math.max(0, rem - (enginesDone(S) ? 1 : 0)), mu = S.pl.kero - later * W.leakAvg, sd = 1.5 + 0.9 * Math.sqrt(later + 1); f.fuel = nats(1 / (1 + Math.exp(-1.7 * mu / sd))); }
   if (S.mods.tabs && !final) { const cur = sp[Math.min(pos, size) - 1]; if (cur && cur[2] && !cur[2].includes(S.pl.axis)) f.tab = 1; }
@@ -3922,18 +3923,19 @@ function move(G0, seat, level, opt) {
     const base = cost(G, seat);
     const sc = distinct(all, G, seat).filter(m => m.t !== 'timeout').map(m => ({ m, s: base - cost(afterMove(G, m, seat), seat) }));
     sc.sort((a, b) => b.s - a.s);
-    if (level === 'easy' && rand() < 0.3) return sc[Math.min(sc.length - 1, Math.floor(rand() * 3))].m;
+    if (level === 'easy' && rand() < 0.2) { const top = sc[0].s, pool = sc.filter(x => x.s > top - 2.5); return pool[Math.floor(rand() * Math.min(pool.length, 3))].m; }
     return sc[0].m;
   }
   const cand = distinct(all.filter(m => m.t !== 'timeout'), G, seat);
   const base = cost(G, seat);
   const scored = cand.filter(m => m.t === 'place' || m.t === 'toss').map(m => ({ m, s: base - cost(afterMove(G, m, seat), seat) }));
   scored.sort((a, b) => b.s - a.s);
-  if (level !== 'easy') { const free = freeAction(G, seat, cand, base); if (free) return free; }
+  if (level !== 'easy' || rand() < 0.6) { const free = freeAction(G, seat, cand, base); if (free) return free; }
   if (opt.eps && rand() < opt.eps && scored.length > 1) return scored[Math.min(scored.length - 1, 1 + Math.floor(rand() * 2))].m;   // exploration for training data
   if (level === 'easy') {
-    const safe = scored.filter(x => x.s > -60), pool = safe.length ? safe : scored;
-    if (rand() < 0.35) return pool[Math.min(pool.length - 1, Math.floor(rand() * 4))].m;
+    // a beginner partner: usually the sensible move, now and then another sensible one (never one that is clearly a disaster)
+    const top = scored[0].s, safe = scored.filter(x => x.s > top - 1.0), pool = safe.length ? safe : scored;
+    if (rand() < 0.12) return pool[Math.min(pool.length - 1, Math.floor(rand() * 2))].m;
     return pool[0].m;
   }
   if ((level === 'hard' || level === 'normal') && scored.length > 1 && !opt.noMC) return monteCarlo(G, seat, scored, rand, Object.assign(level === 'hard' ? { top: AI.HMC.top, samples: AI.HMC.samples } : { top: AI.NMC.top, samples: AI.NMC.samples }, opt));
@@ -4647,7 +4649,9 @@ function render() {
   if (!G || !UI.started) return;
   const bd = $('#bd'), pz = $('#pz'); if (!bd || !pz) return;
   if (isPh()) applyPhone();
-  const W = bd.clientWidth, Hh = bd.clientHeight; if (W < 10 || Hh < 10) return;
+  let W = bd.clientWidth, Hh = bd.clientHeight;
+  if ((W < 10 || Hh < 10) && /jsdom/i.test(navigator.userAgent || '')) { const iw = innerWidth || 1100, ih = innerHeight || 700; W = iw < ih ? iw : Math.round(iw * .7); Hh = iw < ih ? Math.round(ih * .55) : ih - 48; }   // no layout engine in jsdom: pretend the board has a plausible size
+  if (W < 10 || Hh < 10) return;
   const v = viewSeat(), me = typeof v === 'number' ? v : -1;
   const LY = UI.LY = FA.layout(W, Hh, { mods: G.mods, me }); UI.W = W;
   const legal = selectedLegal(), r = LY.r, rows = altRows(), tr = trackOf(), size = tr.sp.length;
