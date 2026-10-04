@@ -49,7 +49,7 @@ html.bf-land .bf-side{justify-content:center;padding:4px 8px}
 .bf-ar{width:calc(var(--cs)*.4);height:calc(var(--cs)*.5);margin:0 3px;flex:none;background:#a07040;opacity:.55;clip-path:polygon(0 0,100% 50%,0 100%)}
 .bf-wall .bf-c{background:#fffaf0;box-shadow:inset 0 0 0 1px #cdb995}
 html.gray .bf-wall .bf-c{background:#bdb5a8}
-.bf-c .pr{position:absolute;inset:12%;opacity:.34;display:block;filter:grayscale(.2)}
+.bf-c .pr{position:absolute;inset:10%;opacity:.55;display:block;filter:grayscale(.2)}
 .bf-c .pr svg{width:100%;height:100%;display:block}
 .bf-t{position:absolute;display:block;cursor:pointer}
 .bf-c>.bf-t{inset:1px}
@@ -103,7 +103,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-flyl{position:fixed;inset:0;pointer-events:none;z-index:60}
 .bf-fly{position:fixed!important;z-index:61;will-change:transform}
 .bf-pop{position:fixed;z-index:62;pointer-events:none;font:900 24px var(--ff);color:#ffe36b;text-shadow:0 2px 0 #7a3d14,0 0 10px rgba(0,0,0,.9);white-space:nowrap;transform:translate(-50%,-50%)}
-.bf-pop.big{font-size:34px}.bf-pop.chip{font-size:18px}.bf-pop.bad{color:#ff8a7a;text-shadow:0 2px 0 #5a0e08,0 0 10px rgba(0,0,0,.9)}.bf-pop.good{color:#b8ffb0;text-shadow:0 2px 0 #14501f,0 0 10px rgba(0,0,0,.9)}
+.bf-pop.big{font-size:34px}.bf-pop.cnt{font-size:16px}.bf-pop.chip{font-size:18px}.bf-pop.bad{color:#ff8a7a;text-shadow:0 2px 0 #5a0e08,0 0 10px rgba(0,0,0,.9)}.bf-pop.good{color:#b8ffb0;text-shadow:0 2px 0 #14501f,0 0 10px rgba(0,0,0,.9)}
 .bf-rvw{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:15;width:min(62%,220px);padding:8px;border-radius:14px;background:linear-gradient(#fcf6e8,#f1e3c4);color:#3a2410;box-shadow:0 0 0 2px #c99a3e,0 12px 30px rgba(0,0,0,.55)}
 .bf-rvw svg{width:100%;height:auto;display:block}.bf-rvw .bf-ph{font-size:15px;margin-bottom:4px}
 .bf-ban{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);z-index:20;text-align:center;pointer-events:none}
@@ -257,16 +257,18 @@ async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L|
   const mover=from[0],others=from.slice(1);
   const fl=[bfFly(mc,mover.r,bfR(bfSlot(wk)),{dur:620,lift:28})];others.forEach((o,i)=>fl.push(bfDrop(o.t,o.r,{delay:240+i*60})));
   await fl[0];bfShow(wk);await Promise.all(fl);
-  const run=bfRun1(p.wall,x.r,x.c);run.forEach(([r,c],i)=>{const el=bfSlot(`w${x.p}_${r}_${c}`);if(el){el.style.setProperty('--d',bfD(i*110)+'ms');el.classList.add('lit')}});
-  sfx('wall',x.pts);bfPop('+'+x.pts,bfR(bfSlot(wk)),'good',true);if(x.pts>1)bfTip('chain');if(x.pts>=3)bfBanner(x.pts>=6?'Great chain! +'+x.pts:'Chain +'+x.pts,'');
-  await bfWait(380+run.length*110);p.score+=x.pts;bfScore(x.p,p.score);bfChipPop(x.p,'+'+x.pts,'good');await bfWait(520);
+  const run=bfRun1(p.wall,x.r,x.c);const step=run.length>1?260:0;
+  for(let i=0;i<run.length;i++){const [r,c]=run[i];const el=bfSlot(`w${x.p}_${r}_${c}`);if(el){el.style.setProperty('--d','0ms');el.classList.add('lit')}
+    const v=Math.max(1,Math.round((i+1)*x.pts/run.length));if(run.length>1&&i<run.length-1)bfPop('+'+v,bfR(el),'good cnt');sfx('wall',Math.min(8,i+1));if(i<run.length-1)await bfWait(step)}
+  bfPop('+'+x.pts,bfR(bfSlot(wk)),'good',true);if(x.pts>1)bfTip('chain');if(x.pts>=3){bfBanner(x.pts>=6?'Great chain! +'+x.pts:'Chain +'+x.pts,'');const me=bfQ('.bf-me');if(me){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
+  await bfWait(700);p.score+=x.pts;bfScore(x.p,p.score);bfChipPop(x.p,'+'+x.pts,'good');await bfWait(520);
   for(const [r,c] of run){const el=bfSlot(`w${x.p}_${r}_${c}`);if(el)el.classList.remove('lit')}}
 function bfRival(){const tb=BF.tbl;if(!tb||!BF.rv)return;let el=tb.querySelector('.bf-rvw');if(!el){el=document.createElement('div');el.className='bf-rvw';tb.appendChild(el)}const p=BF.disp.pl[BF.rv.p];
   el.innerHTML=`<div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>★${p.score}</span></div>${phWallSVG(p,{marks:BF.rv.marks})}`}
 async function bfFloors(){BF.rv=null;const S=BF.disp;BF.say='Broken tiles cost points';
   for(const p of S.pl){if(!p.floor.length)continue;const pen=floorPenalty(p.floor.length);const loss=Math.min(p.score,-pen);const focus=p.i===bfFocus();
     if(focus){bfDraw();const fr=bfR(bfQ('.bf-fl'));p.floor.forEach((t,k)=>{const el=bfEl(`x${p.i}_${k}`);if(el){el.style.setProperty('--d',bfD(k*70)+'ms');el.classList.add('gone')}});
-      if(loss)bfPop('−'+loss,fr,'bad',true);sfx('floor');await bfWait(900)}
+      if(loss){bfPop('−'+loss,fr,'bad',true);bfBanner('Broken tiles','−'+loss)}sfx('floor');await bfWait(1500)}
     else if(loss)bfChipPop(p.i,'−'+loss,'bad');
     p.score-=loss;bfScore(p.i,p.score);if(p.floor.includes(SUN))S.first=p.i;p.floor=[]}
   S.markerIn='ctr';bfDraw();await bfWait(200)}
@@ -292,7 +294,7 @@ function bfRing(W,H,n){const cx=W/2,cy=H/2;let ks=Math.min(W,H)*(n<=5?.32:n<=7?.
   const ax=Math.max(10,W/2-ks/2-6),ay=Math.max(10,H/2-ks/2-6);const K=[];for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;K.push({x:cx+Math.cos(a)*ax,y:cy+Math.sin(a)*ay})}
   return {ks,K,cx,cy,pw:Math.max(70,2*(ax-ks*.6)),ph:Math.max(54,2*(ay-ks*.6))}}
 function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R.ks*.33;const live=!BF.busy;const sel=live&&hp&&G.phase==='offer'?UI.sel:null;const can=live&&hp&&G.phase==='offer'&&!sel;
-  const am=can&&UI.coach&&BF.seen.took?bfAdvice(hp):null;const isAdv=(src,t)=>am&&am.act==='take'&&am.src===src&&(t===am.c);
+  const am=can&&UI.coach&&BF.seen.took&&G.round<=1?bfAdvice(hp):null;const isAdv=(src,t)=>am&&am.act==='take'&&am.src===src&&(t===am.c);
   const nofit=new Set();if(can)for(let c=0;c<NC;c++){let ok=false;for(let r=0;r<5;r++)if(lineOk(G,hp,r,c))ok=true;if(!ok)nofit.add(c)}const nf=t=>nofit.has(t)?' nofit':'';
   let h=`<div class="bf-pool${can&&S.ctr.length?' can':''}" data-bfsrc="-1" style="left:${R.cx-R.pw/2}px;top:${R.cy-R.ph/2}px;width:${R.pw}px;height:${R.ph}px"></div>`;
   S.fac.forEach((a,i)=>{const K=R.K[i];const dx=R.cx-K.x,dy=R.cy-K.y,dl=Math.hypot(dx,dy)||1;
@@ -307,12 +309,12 @@ function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R
   return h}
 function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i===pi&&G.phase==='offer'?UI.sel:null;const ok={};
   if(sel)for(const m of movesFor(sel)){try{ok[m.line]={m,X:phNow(m,pi)}}catch(e){ok[m.line]={m,X:null}}}
-  let rec=-1;if(sel&&UI.coach){try{const ms=movesFor(sel);if(ms.length>1){const a=bfAdvice(hp);if(a&&a.act==='take'&&a.src===sel.src&&a.c===sel.c&&ms.some(m=>m.line===a.line))rec=a.line;else{const R=phRec(ms,pi);if(R)rec=R.m.line}}}catch(e){}}
+  let rec=-1;if(sel&&UI.coach&&G.round<=1){try{const ms=movesFor(sel);if(ms.length>1){const a=bfAdvice(hp);if(a&&a.act==='take'&&a.src===sel.src&&a.c===sel.c&&ms.some(m=>m.line===a.line))rec=a.line;else{const R=phRec(ms,pi);if(R)rec=R.m.line}}}catch(e){}}
   const wq=live&&hp&&hp.i===pi&&G.phase==='wall'&&G.wt&&G.wt.q&&G.wt.q.p===pi?G.wt.q:null;let h='';
   for(let r=0;r<5;r++){const o=ok[r],X=o&&o.X;let rk='';
     for(let col=0;col<5;col++){const k=4-col;if(k>=cap(r)){rk+='<b class="bf-c no"></b>';continue}const key=`l${pi}_${r}_${k}`;const t=p.lines[r][k];let inner='';
       if(t!=null)inner=bfTile(t,key);else if(X){const g=X.pv.ghost.find(g=>g.sl===key);if(g)inner=bfTile(g.k,null,'gh')}rk+=`<b class="bf-c" data-s="${key}">${inner}</b>`}
-    const badge=(rec===r?'<span class="bf-bd rec">★</span>':'')+(X&&(X.n||X.pv.full)?`<span class="bf-bd ${X.n?'bad':'good'}${rec===r?' r2':''}">${X.n?'✗'+X.n:'✓'}</span>`:'');
+    const badge=(rec===r?'<span class="bf-bd rec">★</span>':'')+(X&&X.tp?`<span class="bf-bd bad${rec===r?' r2':''}">${String(X.tp).replace('-','−')}</span>`:'');
     const tc=X&&X.pv.full&&!S.ex.gray?(()=>{const c0=sel.c<NC?sel.c:lineColour(p.lines[r]);return c0>=0?WALLCOL(c0,r):-1})():-1;
     const blk=sel&&!o?phReason(p,r,sel.c):'';const clashC=blk.startsWith('mosaic')&&sel.c<NC?WALLCOL(sel.c,r):-1;
     let wl='';for(let c=0;c<5;c++){const key=`w${pi}_${r}_${c}`;const v=p.wall[r][c];let inner=v>=0?bfTile(v<5?v:PRISM,key):S.ex.gray?'':`<i class="pr">${bfUse(WALLC(r,c))}</i>`;let cls='';
