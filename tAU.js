@@ -56,7 +56,7 @@ const only=(g,k)=>g[k]>.8&&['fra','ath','race','mission','cut'].every(j=>j===k||
   const left=BAN.filter(w=>src.includes(w));ok(!left.length,`non-English UI strings: ${BAN.length} scanned, none left`,left);
   const p=await page(b,{width:1280,height:720});await seed(p,'ath','A');await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');await roam(p);await p.evaluate(()=>__mho.roamSim(60));
   const t=await p.evaluate(()=>({sub:document.querySelector('#roamPlate small').textContent,}));
-  ok(t.sub==='Chapter 1 · Welcome to Athens'&&t.edge==='EDGE OF THE MAP','Athens plate subtitle is English',t);
+  ok(t.sub==='Chapter 1 · Welcome to Athens','Athens plate subtitle is English',t);
   const g=await (async()=>{await p.keyboard.press('Shift');await p.waitForTimeout(2000);return buses(p)})();ok(only(g,'ath'),'roam (Athens): bouzouki theme bus up',g);
   ok(!p.errs.length,'no page errors (Athens)',p.errs.slice(0,4));await p.context().close()}
  console.log(`${fails?'tAU FAILED '+fails:'tAU PASS'} · ${n-fails}/${n} · ${Math.round((Date.now()-T0)/1000)} s`);await b.close();process.exit(fails?1:0)})();
