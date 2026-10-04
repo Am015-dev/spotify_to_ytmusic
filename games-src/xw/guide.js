@@ -36,6 +36,9 @@ function resultHTML(R,plain){const a=ship(R.a),d=ship(R.d);if(!a||!d)return '';c
   let h=`<b>${an}</b> ${R.dmg||R.crits.length?(yours?'hit':'hits'):(yours?'missed':'misses')} <b>${dn}</b>`;
   if(R.dmg){const parts=[];if(R.sh0!==R.sh1)parts.push(`shields ${R.sh0} → ${R.sh1}`);if(R.hp0!==R.hp1)parts.push(`hull ${R.hp0} → ${R.hp1}`);h+=`: <b>${R.dmg} damage</b>${parts.length?' ('+parts.join(', ')+')':''}.`}
   else h+=R.rolled===0?': no hits rolled.':': every hit was cancelled by evade results.';
+  // the arithmetic, so a cancelled shot is never a mystery: hits and crits rolled against evades rolled
+  {const c=(L,f)=>(L||[]).filter(x=>x===f).length;const hi=c(R.dice,'hit'),cr=c(R.dice,'crit'),ev=c(R.def,'evade');
+    if(R.rolled!==0)h+=` <span class="sum">(${hi} hit${hi===1?'':'s'}${cr?` + ${cr} crit${cr>1?'s':''}`:''} vs ${ev} evade${ev===1?'':'s'}${R.def&&R.def.length?` from ${R.def.length} defence ${R.def.length===1?'die':'dice'}`:''}; each evade cancels one)</span>`}
   if(plain)return h+(R.crits.length?' Crit: '+R.crits.map(c=>DAMAGE[c].n).join(', ')+'.':'')+(R.dead?' Destroyed!':'');
   for(const c of R.crits)h+=`<div class="crit">✸ CRIT <b>${esc(DAMAGE[c].n)}</b>: ${you?'your ':esc(d.name)+'’s '}${esc(critPlain(c,d))}</div>`;
   if(R.dead)h+=`<div class="bad"><b>${you?'You are':esc(d.name)+' is'} destroyed!</b></div>`;
@@ -63,7 +66,8 @@ function sugInfo(s,i){const m0=dialOf(s)[i],m=exColor(s,m0),b=B(s),p=finalPose(s
   why+=', if they stay where they are';
   const clip=tplPoints(s,b,m0,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2));
   const cost=m.c==='r'?'Cost: red = a stress token, so no action this turn and no red moves until a green one clears it.':m.c==='g'?(s.stress?'Bonus: green clears your stress.':'Cost: none (green is an easy move).'):'Cost: none (white).';
-  return {why,cost:cost+(clip?' Risk: it clips an asteroid (damage roll, no action).':'')}}
+  const allRock=dialOf(s).every(x=>rockHits(s,x));
+  return {why:allRock?'every move from here touches an asteroid; this one does the least harm':why,cost:cost+(clip?' Risk: it clips an asteroid (roll 1 attack die for damage, and no action this round).':'')}}
 function saferAlt(s){const c=UI.sugCache;if(!c||!c.sc)return null;let best=-1,bv=-1e9;dialOf(s).forEach((m,i)=>{if(exColor(s,m).c==='r'||(s.stress&&false))return;if(c.sc[i]>bv){bv=c.sc[i];best=i}});return best>=0?best:null}
 // ---- coach moments for the first round ----
 const COACH={dial:{n:1,t:'<b>Pick where your ship will fly.</b> Hover or tap a maneuver on the dial to see its ghost on the mat (the dashed one is the suggestion), then press <b>Lock in dials</b>. The enemy picks at the same time, in secret.'},

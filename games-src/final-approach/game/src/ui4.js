@@ -3,7 +3,7 @@ var GUIDED_SCRIPT = [[[6,4,6,3],[4,3,4,4]],[[1,5,2,3],[4,1,5,5]],[[4,2,1,6],[3,1
 // Each tip has a short line (s) shown as a banner in the dock (never over the dice tray, Roll or the briefing phrases) and a full text (x) behind "More".
 // While a tip is up, the control it talks about pulses on the panel (TIPHL in part 2).
 const TIPS = [
-  { id: 'welcome', g: 1, when: () => G.phase === 'brief' && G.round === 0, t: 'Welcome aboard', s: 'You are Ines, the Pilot (blue). Ravi flies orange. Land in 7 rounds.', x: 'You are Captain Ines Marlow, the Pilot (blue). Your co-pilot, Ravi, plays the orange side. Land the plane in seven rounds, one altitude row per round. This first flight is Port Alder, the friendliest airport. I will introduce one control at a time, and the control I talk about pulses on the panel.' },
+  { id: 'welcome', g: 1, when: () => G.phase === 'brief' && G.round === 0, t: 'Welcome aboard', s: 'You are Ines, the Pilot (blue). Ravi flies orange. Reach the airport in 6 rounds, land in round 7.', x: 'You are Captain Ines Marlow, the Pilot (blue). Your co-pilot, Ravi, plays the orange side. Land the plane in seven rounds, one altitude row per round. This first flight is Port Alder, the friendliest airport. I will introduce one control at a time, and the control I talk about pulses on the panel.' },
   { id: 'brief', g: 1, when: () => G.phase === 'brief' && G.round === 0, t: 'The briefing', s: 'Tap a phrase to share a plan (never dice values), then Roll.', x: 'Before each roll you may talk strategy: "we need to clear traffic", "let us move two spaces". You never say dice values. Tap a phrase to tell Ravi your plan, then press Roll. After the roll both of you stay silent: the dice you place are your only words.' },
   { id: 'alt', g: 1, when: () => G.phase === 'brief' && G.round === 0, t: 'The altitude strip', s: 'One row per round. Its colour shows who places first.', x: 'Every round the plane sinks one row: seven rows, seven rounds, no waiting. The colour of each row (and the name next to it) says who places the first die that round: blue is the Pilot, orange the Co-pilot. A purple dot means a reroll token comes aboard at that altitude.' },
   { id: 'dice', g: 1, when: () => G.phase === 'place' && G.round === 0 && myTurn(), t: 'Your dice', s: 'Your blue dice: only you see them. Tap a die, then a glowing space.', x: 'Your four blue dice sit behind your screen at the bottom: only you can see them. Ravi’s orange dice are hidden from you. Players alternate: tap a die, then tap a glowing space on the panel. You must place every die.' },
@@ -34,15 +34,16 @@ function myTurn() { const v = actSeat(); return typeof v === 'number' && v >= 0 
 function coachTick() {
   const c = UI.coach; if (!G || !UI.started || G.result || c.level === 'off') return;
   if (UI.mode === 'net' || UI.mode === 'hot' && UI.holder < 0) return;
+  if (c.tip && c.tipR !== G.round + ':' + G.phase) { c.seen[c.tip] = 1; c.tip = ''; c.more = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } applyHL(); }
   if (c.tip) return;
   const gate = G.round + ':' + myPlaced();
   for (const t of TIPS) { if (c.seen[t.id]) continue; const on = t.g === 0 ? c.level === 'light' && UI.mode !== 'guided' : t.g === 1 ? UI.mode === 'guided' : c.level === 'full' && UI.mode === 'vs'; if (!on) continue;   // g:2, the role-aware set, speaks to one person at one seat
-    if (t.ctl && c.gate === gate) continue; let ok = false; try { ok = t.when(); } catch (e) { } if (ok) { if (t.ctl) c.gate = gate; c.tip = t.id; c.more = false; showTip(t); return; } }
+    if (t.ctl && c.gate === gate) continue; let ok = false; try { ok = t.when(); } catch (e) { } if (ok) { if (t.ctl) c.gate = gate; c.tip = t.id; c.tipR = G.round + ':' + G.phase; c.more = false; showTip(t); return; } }
 }
 function showTip(t) {
   const pc = $('#pc'); if (!pc) return; pc.hidden = false; pc.innerHTML = ''; const c = UI.coach;
   const ids = TIPS.filter(x => x.g === t.g).map(x => x.id), n = ids.indexOf(t.id) + 1;
-  pc.append(h('div.tbr', h('div.tbt', h('div.tbh', h('b', tval(t.t)), h('span', t.g && n ? (t.g === 1 ? 'Step ' : 'Tip ') + n + ' of ' + ids.length : 'Tip')), h('p', tval(c.more ? t.x : t.s))), h('button.btn.go', { type: 'button', 'data-a': 'tipok' }, 'Got it')),
+  pc.append(h('div.tbr', h('div.tbt', h('div.tbh', h('b', tval(t.t)), h('span', t.g === 1 ? 'Guided flight' : 'Tip')), h('p', tval(c.more ? t.x : t.s))), h('button.btn.go', { type: 'button', 'data-a': 'tipok' }, 'Got it')),
     h('div.cbtns', c.more ? null : h('button.btn.alt', { type: 'button', 'data-a': 'tipmore', 'aria-expanded': 'false' }, 'More'), h('button.btn.alt', { type: 'button', 'data-a': 'tipoff' }, 'No more tips')));
   if (typeof renderDock === 'function' && G) renderDock();
   applyHL();
@@ -101,7 +102,7 @@ function logHTML() {
 }
 function buildRules() {
   const root = h('div.rules'), sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
-  sec('The goal', h('p', 'You and your crewmate fly an airliner onto the runway. You are the Pilot (blue) and the Co-pilot (orange). You win or lose together. The game lasts seven rounds, one altitude row each. By the end of the last round the plane must be on the airport with a clear track, the gear and flaps down, a level axis, and a slow enough speed.'));
+  sec('The goal', h('p', 'You and your crewmate fly an airliner onto the runway. You are the Pilot (blue) and the Co-pilot (orange). You win or lose together. The game lasts seven rounds, one altitude row each. The plane must already be on the airport when the last round starts (rounds 1 to 6 are for flying there; arriving early is fine, you then hold). The last round is the landing: by its end the track must be clear, the gear and flaps down, the axis level, and the engine total no more than the brakes.'));
   sec('How a round goes', h('ol', ...['Round start: the altitude row appears (it may bring a reroll token), and the traffic die may add planes.', 'Briefing: talk strategy, never dice values. Then both crew roll four dice behind their screens.', 'Silence. The first player (shown on the altitude row) puts one die on a free space of their colour, then you alternate until all eight dice are used.', 'End of round: both axis and both engine dice must be there. The plane sinks one row and the dice come back.'].map(t => h('li', t))));
   sec('Every control', h('ul', ...[
     'Axis (both, mandatory): the plane tilts toward the higher die by the difference. Tilt of 3 = spin = lost. It never resets.',

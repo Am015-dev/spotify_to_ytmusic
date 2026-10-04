@@ -60,6 +60,8 @@ function doTake(m,seat){const p=P(seat);const info=applyTake(G,seat,m);G.turn++;
 function wallCells(p,r){const L=p.lines[r];const lc=lineColour(L);const o=[];
   if(!G.ex.gray){if(lc>=0){const c=WALLCOL(lc,r);if(p.wall[r][c]<0)o.push(c)}else for(let c=0;c<5;c++)if(p.wall[r][c]<0)o.push(c);return o}
   for(let c=0;c<5;c++){if(p.wall[r][c]>=0)continue;if(lc>=0&&(rowHas(p,r,lc)||p.wall.some(row=>eff(row[c])===lc)))continue;o.push(c)}return o}
+// the row and column lines a set tile joins, for explaining its points
+function runsAt(w,r,c){let h=1,v=1;for(let x=c-1;x>=0&&w[r][x]>=0;x--)h++;for(let x=c+1;x<5&&w[r][x]>=0;x++)h++;for(let y=r-1;y>=0&&w[y][c]>=0;y--)v++;for(let y=r+1;y<5&&w[y][c]>=0;y++)v++;return [h,v]}
 function adjPts(wall,r,c){let h=1,v=1;for(let x=c-1;x>=0&&wall[r][x]>=0;x--)h++;for(let x=c+1;x<5&&wall[r][x]>=0;x++)h++;for(let y=r-1;y>=0&&wall[y][c]>=0;y--)v++;for(let y=r+1;y<5&&wall[y][c]>=0;y++)v++;
   if(h===1&&v===1)return 1;return (h>1?h:0)+(v>1?v:0)}
 function beginWall(){G.phase='wall';const order=[];for(let k=0;k<G.np;k++)order.push((G.first+k)%G.np);G.wt={order,k:0,r:0,q:null};G.rsum=G.pl.map(()=>({place:0,floor:0,n:0}));lg('— The offer is empty: tiles move to the mosaics. —','round');fx('wallphase');runWall()}
@@ -75,9 +77,9 @@ function lineToFloor(p,r){const L=p.lines[r];p.lines[r]=[];const info={fl:0,lid:
 function placeWall(p,r,c){const L=p.lines[r];const lc=lineColour(L);const k=L.indexOf(PRISM);let v;
   if(k>=0){L.splice(k,1);v=lc>=0?10+lc:G.ex.gray?15:10+WALLC(r,c)}else{L.pop();v=lc}
   p.wall[r][c]=v;G.lid.push(...L);p.lines[r]=[];const pts=adjPts(p.wall,r,c);p.score+=pts;p.st.place+=pts;if(G.rsum){G.rsum[p.i].place+=pts;G.rsum[p.i].n++}if(pts>G.stats.maxChain)G.stats.maxChain=pts;
-  lg(`${p.nm} sets a ${k>=0?'Prism':TNAME[lc]} tile in mosaic row ${r+1}${G.ex.gray||lc<0?', column '+(c+1):''}: +${pts}.`,'good');fx('wall',{p:p.i,r,c,pts})}
+  lg(`${p.nm} sets a ${k>=0?'Prism':TNAME[lc]} tile in mosaic row ${r+1}${G.ex.gray||lc<0?', column '+(c+1):''}: +${pts}.`,'good');fx('wall',{p:p.i,r,c,pts,run:runsAt(p.wall,r,c)})}
 function floorPenalty(n){let s=0;for(let i=0;i<Math.min(7,n);i++)s+=FLOOR[i];return s}
-function scoreFloors(){for(const p of G.pl){if(!p.floor.length)continue;const pen=floorPenalty(p.floor.length);const loss=Math.min(p.score,-pen);p.score-=loss;p.st.floor-=loss;if(G.rsum)G.rsum[p.i].floor-=loss;
+function scoreFloors(){for(const p of G.pl){if(!p.floor.length)continue;const pen=floorPenalty(p.floor.length);const loss=Math.min(p.score,-pen);p.score-=loss;p.st.floor-=loss;if(G.rsum){const R=G.rsum[p.i];R.floor-=loss;R.pen=pen;R.nb=p.floor.length;R.sun=p.floor.includes(SUN)}
     if(p.floor.includes(SUN))G.first=p.i;const tiles=p.floor.filter(t=>t!==SUN);G.lid.push(...tiles);
     lg(`${p.nm} loses ${-pen} for breakage${loss<-pen?` (only ${loss}: a score never drops below 0)`:''}.`,'bad');p.floor=[]}
   if(G.markerIn!=='ctr')G.markerIn='ctr'}

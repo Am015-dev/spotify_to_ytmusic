@@ -213,7 +213,7 @@ function finish(G) {
   G.winText = w.length === 1 ? nm(w[0]) + (nm(w[0]) === 'You' ? ' win with ' : ' wins with ') + best + ' points' + (tie ? ' (more Custard Cups)' : '') + '.' : w.map(nm).join(' and ') + ' share the win with ' + best + ' points.';
   if (w.length > 1) use(G, 'sharedWin');
   ev(G, { t: 'gameEnd', pudding: counts, puddingPts: pts, totals, winners: w, text: G.winText });
-  lg(G, 'Puddings: ' + G.players.map((p, i) => p.name + ' ' + counts[i] + ' (' + (pts[i] > 0 ? '+' : '') + pts[i] + ')').join(', ') + '.');
+  lg(G, 'Custard Cups: ' + G.players.map((p, i) => p.name + ' ' + counts[i] + ' (' + (pts[i] > 0 ? '+' : '') + pts[i] + ')').join(', ') + '.');
   lg(G, G.winText);
 }
 

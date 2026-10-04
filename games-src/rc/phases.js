@@ -274,7 +274,7 @@ FN.night4=fr=>{if(G.over)return;SC().night&&SC().night();if(G.over)return;
   const keep=has('cellar')||G.kept.m_boxes;let barrel=G.kept.m_barrel&&G.night.barrel?Math.min(2,G.res.food):0;
   if(G.res.food&&!keep){const lost=G.res.food-barrel;if(lost>0)lg(`${lost} food spoils overnight.`,'bad');G.res.food=barrel}
   G.night.pot=0;G.night.fire=0;G.night.barrel=0};
-FN.endRound=fr=>{if(G.over)return;SC().endRound&&SC().endRound();if(G.over)return;
+FN.endRound=fr=>{if(G.over)return;SC().endRound&&SC().endRound();if(G.over)return;if(G.cmp&&campCheck())return;
   if(G.round>=G.rounds){G.over={win:false,why:G.scen==='marooned'?'Time ran out: no ship came.':'Time ran out.'};lg('The last round ends without rescue.','bad');fx('lose');return}
   beat('daysum',{round:G.round});G.round++;if(G.chars.length>1)passFirst();G.stk.push({f:'round'})};
 // ---------- invariants and test hooks ----------

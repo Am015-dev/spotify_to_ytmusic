@@ -56,6 +56,7 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
       if(hot&&own!==holder){hidden++;if(errs.length<6)errs.push('HIDDEN hand of '+own+' face up, holder '+holder)}}
     if(!humans.length||humans.length>=1){for(const el of d.querySelectorAll('[data-crewhand][data-up="1"]'))if(humans.length){hidden++;errs.push('HIDDEN crew hand face up')}}
     if(hot&&!w.eval('UI.busy')){const dd=w.eval('sideToAct()');if(dd>=0&&G.seats[dd].human&&holder!==dd&&d.querySelector('#dockbody [data-hand]')){hidden++;errs.push('hand shown before the pass screen was taken')}}
+    if(G.over&&w.eval('UI.busy'))return; // the result card waits until the replay has shown what sank the junks
     if(G.over){clearInterval(iv);const ov=d.querySelector('#dockbody [data-over]');if(!ov)errs.push('no game-over card');else seen.add('over');
       const again=d.querySelector('[data-a=again]');if(cf.replay===undefined&&again&&!replayed&&R()<.3){replayed=1;seen.add('again');click(again);const g2=w.eval('G');if(!g2||g2.over||g2.turn>1)errs.push('replay did not start');go();return}
       res({cf,over:G.over,turns:G.turn,errs,seen,clicks,hidden,mism,secs:Math.round((Date.now()-t0)/1000)});w.close();return}
@@ -69,7 +70,7 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
         if(G.phase==='setup'){if(!d.querySelector('#ppop:not([hidden]) [data-a=startmark]')&&R()<.9){const info=w.eval('startInfo(sideToAct()).map(o=>[o.m.x,o.m.y])');const o=rnd(info);const t=sqEl(o[0],o[1]);if(t){click(t);clicks++;seen.add('ph:start-square');if(w.eval('PH.pop')!=='start'){const mk=w.eval('G.mons.some(m=>m.x==='+o[0]+'&&m.y==='+o[1]+')');if(!mk)errs.push('start popup did not open for '+o);}return}}}
         else if(G.phase==='play'&&G.step==='act'){
           const fr=w.eval('UI.fronts');
-          if(ph.pop!=='tiles'&&fr&&fr.length&&R()<.5){const f=rnd(fr);const sq=w.eval(`(()=>{const S=G.ships[${f}];return [S.x,S.y]})()`);const t=sqEl(sq[0],sq[1]);if(t){click(t);clicks++;seen.add('ph:front-tap');if(w.eval('PH.pop')!=='tiles')errs.push('tile popup did not open on the front square tap');else if(!d.querySelector('#ppop .ph-t'))errs.push('popup has no tiles');else{const bds=[...d.querySelectorAll('#ppop .ph-t .bd')].map(x=>x.textContent);if(!bds.some(x=>/SAFE|SINKS|GATE|CANNON/.test(x)))errs.push('popup has no badges')}return}}
+          if(ph.pop!=='tiles'&&fr&&fr.length&&R()<.5){const f=rnd(fr);const sq=w.eval(`(()=>{const S=G.ships[${f}];return [S.x,S.y]})()`);const t=sqEl(sq[0],sq[1]);if(t){click(t);clicks++;seen.add('ph:front-tap');if(w.eval('PH.pop')!=='tiles')errs.push('tile popup did not open on the front square tap');else if(!d.querySelector('#ppop .ph-t'))errs.push('popup has no tiles');else{const bds=[...d.querySelectorAll('#ppop .ph-t .bd')].map(x=>x.textContent);if(!bds.some(x=>/SAFE|RISKY|SINKS|GATE|CANNON/.test(x)))errs.push('popup has no badges')}return}}
           if(ph.pop==='tiles'){const r2=R();
             if(r2<.12){const c=q('#ppop [data-ph=pcard]');if(c.length){click(rnd(c));seen.add('ph:pcard');return}}
             if(r2<.2){const c=q('#ppop [data-a=rot]');if(c.length){click(rnd(c));seen.add('ph:rot');return}}

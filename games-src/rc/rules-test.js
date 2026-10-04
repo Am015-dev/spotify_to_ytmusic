@@ -30,4 +30,7 @@ T('Settlers: a hungry child loses the game',`newGame({scen:'settlers',chars:['co
 T('Solo: morale +1 before the morale phase',`newGame({scen:'marooned',chars:['cook']});G.morale=0;G.stk=[];push({f:'fn',k:'morale'});run();return G.morale===1&&!!G.fri&&G.dog`);
 T('hunting: weapon short = wounds, food and fur arrive later',`G.stk=[];G.weapon=2;const c=P(0);const w=c.w;push({f:'fn',k:'fight',beast:Object.assign({},BEAST.bear),who:0,ctx:{fut:true},hunted:true});run();return c.w===w+4&&G.fut.food===5&&G.fut.fur===2&&G.weapon===1`);
 T('save/load round trip keeps a playable state',`G.stk=[];let s=0;while(!planOpen()&&s++<99){if(G.q)answer(0);else run()}const j=JSON.stringify(G);G=JSON.parse(j);aiPlan();return !startActions()`);
+// clarity: every wound from a card names its cause (the event, or the ignored threat)
+T('event wound names its card',`G.stk=[];push({f:'ops',ops:[['wound','all',1]],ctx:{actor:G.first,card:'tempers',half:'ev'}});run();return G.log.slice(0,3).some(l=>/takes 1 wound \\(“Tempers Flare”\\)/.test(l.t))||JSON.stringify(G.log.slice(0,3).map(l=>l.t))`);
+T('ignored threat wound names the threat',`G.stk=[];G.ev.threat=['weary','bicker'];push({f:'fn',k:'placeThreat',card:'tempers'});run();return G.log.slice(0,6).some(l=>/wound \\(ignored threat “Take It Slow”\\)/.test(l.t))||JSON.stringify(G.log.slice(0,6).map(l=>l.t))`);
 console.log(`rules tests: ${pass} pass, ${fail} fail`)

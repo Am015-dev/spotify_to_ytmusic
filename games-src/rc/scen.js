@@ -5,7 +5,7 @@ SCENARIOS.stranded={ref:'scen-3-jenny',n:'Stranded Friend',no:3,rounds:8,x:'Your
   finds:[{n:'Soothing Herbs',x:'Heal 1 wound.',ops:[['heal','choose',1]]},{n:'Ruined Hut',x:'Gain 2 wood.',ops:[['res','wood',2]]},{n:'Old Pistol',x:'+3 weapon for one fight.',ops:[['keep','sc_pistol']]},{n:'Tough Vines',x:'Palisade +1.',ops:[['pal',1,'shelter']]}],
   invs:{jraft:{n:'Rescue Raft',kind:'scen',it:['rope'],r:{wood:2},x:'Lets you row out to rescue Ada (an explore action; a "?" means a wound, not an adventure).'},lifeboat:{n:'Lifeboat',kind:'scen',it:['rope','knife'],r:{wood:6,fur:4},x:'With Ada back in camp, you sail away and win.'}},
   book:'storm',totem:'stranded'};
-SCENARIOS.settlers={ref:'scen-6-family-robinson',n:'Settlers',no:6,rounds:12,normals:9,x:'No rescue is coming, so make a home. Build a shelter, get roof, palisade and weapon to 1 or more, and make all 9 inventions dealt at the start. Children arrive in rounds 7, 9 and 11: each eats 1 food a night, and if a child goes hungry you lose.',
+SCENARIOS.settlers={ref:'scen-6-settlers',n:'Settlers',no:6,rounds:12,normals:9,x:'No rescue is coming, so make a home. Build a shelter, get roof, palisade and weapon to 1 or more, and make all 9 inventions dealt at the start. Children arrive in rounds 7, 9 and 11: each eats 1 food a night, and if a child goes hungry you lose.',
   wx:{3:['rain'],4:['rain'],5:['snow'],6:['snow'],7:['rain','animals'],8:['rain','animals'],9:['snow','animals'],10:['snow','animals'],11:['rain','animals'],12:['rain','animals']},wxFood:{7:1,8:1,9:2,10:2,11:3,12:3},
   finds:[{n:'Gunpowder',x:'Reroll the hungry-animals die once.',ops:[['keep','sc_powder']]},{n:'Seeds',x:'Gain 1 dry food.',ops:[['res','pfood',1]]},{n:'Old Tools',x:'Make Rope, Pot or Knife for free.',ops:[['buildFree',['rope','pot','knife']]]},{n:'Plough',x:'Remove 1 black marker from the island.',ops:[['unexhaust','any']]}],
   invs:{fence:{n:'Fence',kind:'scen',it:['shovel'],x:'Palisade +1.'},garden:{n:'Garden',kind:'scen',it:['shovel'],r:{food:2},x:'Gain 4 food.'}},
@@ -69,3 +69,30 @@ function fogHarm(p){const t=tileAt(p);let h=0;if(p===G.camp.pos)h+=20;if(t){h+=5
 function blackMarkers(){const o=[];for(const m of G.map){const t=tileAt(m.id);if(!t)continue;if(m.waste)o.push({p:m.id,w:1});for(const i in m.exh)o.push({p:m.id,i})}return o}
 FN.reclaimPick=fr=>{const o=blackMarkers().map(b=>({l:b.w?`Place ${b.p+1}: barren land becomes usable`:`Place ${b.p+1}: ${tileAt(b.p).src[b.i]||'extra'} source recovers`,frames:[{f:'fn',k:'reclaim',b}]}));ask('team','Which black marker is removed?',o,{kind:'reclaim'})};
 FN.reclaim=fr=>{const b=fr.b;if(b.w)delete G.map[b.p].waste;else delete G.map[b.p].exh[b.i];lg('The land recovers.','good')};
+
+// ---------- story campaign: chapter twists and checkpoint goals (only when a chapter is played; normal games never set G.cmp) ----------
+// cmp = {id, goal:{type,value,text}, twist:{id,param}|null}. Twists change the starting position only; a day's rules never change.
+function campSetup(cmp){G.cmp={id:cmp.id,goal:cmp.goal||null,twist:cmp.twist||null};const t=cmp.twist;if(!t)return;
+  if(t.id==='early-threat'){const k=G.ev.deck.shift();if(k)G.ev.threat[0]=k}
+  else if(t.id==='low-morale')G.morale=Math.max(-3,-(t.param||1));
+  else if(t.id==='ada-adrift'&&G.scen==='stranded')G.sc.ada=t.param||0}
+// the checkpoint's parts: [label, have, need] (need===true: a yes/no part)
+function campParts(){const v=G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom'&&G.cmp.goal.value;if(!v)return null;const o=[];
+  if(v.surviveDays)o.push(['day',G.round,v.surviveDays]);
+  if(v.build==='shelter')o.push(['shelter',hasShelter()?1:0,true]);
+  if(v.explored)o.push(['tiles explored',G.stats.explored,v.explored]);
+  if(v.temple)o.push(['temple searched',G.sc.templeDone?1:0,true]);
+  if(v.crosses)o.push(['crosses',(G.sc.crosses||[]).length,v.crosses]);
+  return o}
+function campMet(){const v=G.cmp.goal.value;const ok=[];
+  if(v.surviveDays)ok.push(G.round>=v.surviveDays&&!G.chars.some(c=>c.dead&&!c.npc));
+  if(v.build==='shelter')ok.push(hasShelter());
+  if(v.explored)ok.push(G.stats.explored>=v.explored);
+  if(v.temple)ok.push(!!G.sc.templeDone);
+  if(v.crosses)ok.push((G.sc.crosses||[]).length>=v.crosses);
+  return ok.length>0&&ok.every(Boolean)}
+// end of a day: a met checkpoint wins the chapter; a missed deadline loses it. true when the game is over.
+function campCheck(){const g=G.cmp.goal;if(!g||g.type!=='custom'||!g.value)return false;
+  if(campMet()){G.over={win:true,why:'Chapter goal reached: '+g.text.replace(/\.$/,'')+'.'};lg('🏆 '+G.over.why,'big');fx('win');return true}
+  const by=g.value.byDay||g.value.surviveDays;if(by&&G.round>=by){G.over={win:false,why:'Day '+by+' ended before the chapter goal: '+g.text.replace(/\.$/,'')+'.'};lg(G.over.why,'bad');fx('lose');return true}
+  return false}

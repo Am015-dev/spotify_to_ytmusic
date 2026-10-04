@@ -20,6 +20,12 @@ async function setup(ncl,opt){const H=await page(await ctxNew(),'host');const C=
   await sleep(1500);const lobby=await H.p.evaluate(()=>lobbyPlayers().map(p=>p.nm));const cl=await Promise.all(C.map(c=>c.p.evaluate(()=>({modal:UI.modal,pl:lobbyPlayers().map(p=>p.nm),opt:!!NET.opt}))));
   console.log('lobby after',Date.now()-t0,'ms host sees',JSON.stringify(lobby),'clients see',JSON.stringify(cl));return {H,C,code}}
 const tick=()=>{const rnd=a=>a[Math.floor(Math.random()*a.length)];if(!G||G.over)return 0;const q=s=>[...document.querySelectorAll(s)];const ck=e=>{e.dispatchEvent(new MouseEvent('click',{bubbles:true}));return 1};
+  // board-first phone table: tap a tile on a kiln / the courtyard, then a glowing rack (or the floor); wall spaces glow on the mosaic
+  if(typeof BF!=='undefined'&&BF.on){if(BF.busy||!me())return 0;
+    if(G.phase==='wall'){const bs=q('#bf [data-bfcell]');if(bs.length)return ck(rnd(bs));return 0}
+    if(Math.random()<.03){const a=document.querySelector('#bf [data-bf=hint]');if(a)return ck(a)}
+    if(!UI.sel){const t=q('#bf .bf-table [data-k^="f"],#bf .bf-table [data-k^="c_"]');if(t.length)return ck(rnd(t));return 0}
+    const g=q('#bf .bf-row.ok,#bf .bf-floor.ok');if(g.length)return ck(rnd(g));return 0}
   const c=document.querySelector('#ph-card [data-ph=continue]');if(c&&(PHN.mode==='sum'||PHN.mode==='coach'))return ck(c);
   if(!me())return 0;
   if(G.phase==='wall'){const bs=q('#ph-card [data-cell]');if(bs.length)return ck(rnd(bs));return 0}

@@ -47,7 +47,9 @@ function renderNews(){const n=document.getElementById('news'),m=document.getElem
   const last=UI.news&&UI.news[UI.news.length-1];n.innerHTML=last?`<button class="newsbtn" data-gx="dr-log" title="Open the chronicle">${esc(last)}</button>`:'';
   if(UI.moment){m.classList.remove('hidden');m.style.setProperty('--mc',UI.moment.c||'#e63946');m.innerHTML=`<b>${esc(UI.moment.h)}</b><span>${esc(UI.moment.s)}</span>`}else{m.classList.add('hidden');m.innerHTML=''}}
 // the resolve banner, with the reason things happened
-function storyBanner(R){const p=R.p;let h=`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (borrowed roll)':''}: ${R.out.length?esc(R.out.join(' · ')):'nothing useful'}`;const why=[];
+function storyBanner(R){const p=R.p;const out=[...R.out];
+  if(R.forced==='city'||(R.yielders.length&&R.forced))out.push(`moves into Downtown 👑 +1★`);else if(R.forced==='bay')out.push('moves into the Harbor ⚓ +1★');
+  let h=`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (borrowed roll)':''}: ${out.length?esc(out.join(' · ')):'nothing useful'}`;const why=[];
   if(R.out.some(o=>/^smashes /.test(o)))why.push(R.inT?'from the city, claws hit every monster outside':`claws from outside hit whoever holds the city${G.city>=0&&G.city!==p.i&&!R.yielders.length?` (${mname(P(G.city))} 👑)`:''}`);
   if(R.out.includes('claws hit nobody'))why.push('nobody was in the city to hit');
   if(R.out.some(o=>/hearts wasted/.test(o)))why.push('hearts cannot heal you inside the city');
@@ -64,22 +66,23 @@ function introHTML(){const me=meSeat(),q=me>=0?G.pl[me]:null;const names=G.pl.ma
   return `<div class="intro"><h2>📰 Dawn over Crown City</h2><p>The portal over Crown City cracked open at dawn. ${G.pl.length} monsters rose: ${esc(cast)}. Whoever reaches <b>20 ★</b>, or is the <b>last one standing</b>, becomes the city's new King.</p>
    ${q?`<p class="you" style="--mc:${MONS[q.m].c}"><svg viewBox="-66 -70 132 136" aria-hidden="true">${monArt(q.m)}</svg><span>You are <b>${esc(UP(mname(q)))}</b>, ${esc(MONS[q.m].d.charAt(0).toLowerCase()+MONS[q.m].d.slice(1))}.</span></p>`:G.mode==='hot'?'<p>Everyone shares this screen: pass it to the monster whose turn it is.</p>':'<p>Sit back and watch the computer play.</p>'}
 
+   <p class="goal"><b>Your turn:</b> roll 6 dice up to 3 times, keep what you like, then use them. <b>Three of a kind</b> scores stars, claws hit, hearts heal, ⚡ buys cards.</p>
    <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn&&q?'<small>First you pick a secret power</small>':''}</button></div>
    <ul class="small"><li>The <b>glowing plate</b> on the board shows whose turn it is.</li><li><b>👑</b> marks the monster in Downtown: it scores stars but everyone hits it.</li><li>Stuck? <b>🧭 What now?</b> at the top of this panel says what to do and why.</li></ul></div>`}
 
 // ---------- four tips, each at the real moment ----------
-const TIPS={dice:{el:'#dicewrap',t:'Your dice',b:'Tap a die to keep it (it turns yellow), then press Reroll to throw the others again. A blue dashed outline marks the dice we suggest keeping: “💡 Keep suggested” keeps them in one tap. The line under the dice says what you would get.'},
- city:{el:'#map',t:'Downtown and 👑',b:'👑 marks the monster in Downtown. It scores stars at the start of each turn but cannot heal, and everyone outside hits it. Claws from outside hit Downtown; claws from Downtown hit everyone outside. If Downtown is empty after you resolve, you must move in (+1 ★).'},
+const TIPS={dice:{el:'#dicewrap',t:'Your dice',b:'Tap a die to keep it (it turns yellow), then Roll the others again. Blue dashed outline = our suggestion (💡 keeps exactly those). The line under the dice says what you would get.'},
+ city:{el:'#map',t:'Downtown and 👑',b:'👑 = the monster in Downtown: +2 ★ at the start of each of its turns, but it cannot heal and every claw from outside hits it. When hit it may yield. If Downtown is empty after your roll, you move in (+1 ★).'},
  buy:{el:'#buymini',t:'Power cards',b:'Spend energy ⚡ on cards. ONE-SHOT cards happen at once, PERMANENT cards stay with you, SAVE FOR LATER cards wait for their moment. A yellow outline marks our suggestion. Saving ⚡ is fine: it carries over.'},
- bar:{el:'header.gx-bar',t:'While the others play',b:'The headline at the top of this panel tells the story. You may get a pop-up to yield Downtown or to steal a roll. Up top: 🃏 Cards for sale, 🎴 Yours, 👾 Monsters, 📰 Log. ⚙ has the rules, sound and speed.'}};
+ bar:{el:'header.gx-bar',t:'While the others play',b:'This panel narrates each computer turn, and your next turn starts with “While you waited” (tap it for every event). Up top: 🃏 cards for sale, 🎴 yours, 👾 monsters, 📰 log, ⚙ rules and speed. 🧭 What now? explains your best move.'}};
 const TIPORDER=['dice','city','buy','bar'];
 function startTour(){UI.tour=true;UI.tipSeen={};UI.coach=-1;checkTips();renderTour()}
 function checkTips(){if(!G||!UI.tour||NET.on||UI.info||UI.intro||G.winner||UI.coach>=0)return;const s=UI.tipSeen||(UI.tipSeen={});const ht=humanTurn(),p=cur();
   let k=null;if(!s.dice&&ht&&G.phase==='roll'&&!G.bug&&G.dice.length&&!UI.choice)k='dice';
-  else if(s.dice&&!s.city&&ht&&!UI.choice&&((G.phase==='roll'&&G.rolls<rerollsOf(p))||G.phase==='buy'))k='city';
+  else if(s.dice&&!s.city&&!ht&&!UI.choice)k='city';
   else if(s.city&&!s.buy&&ht&&!UI.choice&&G.phase==='buy'&&G.market.length)k='buy';
-  else if(s.buy&&!s.bar&&!ht&&!UI.choice)k='bar';
-  if(k){UI.coach=TIPORDER.indexOf(k);UI.freeze=k==='bar'}}
+  else if(s.buy&&s.city&&!s.bar&&!ht&&!UI.choice)k='bar';
+  if(k){UI.coach=TIPORDER.indexOf(k);UI.freeze=k==='bar'||k==='city'}}
 function renderTour(){document.querySelectorAll('.hl').forEach(e=>e.classList.remove('hl'));const el=document.getElementById('coach');if(!el)return;
   if(UI.coach<0){el.classList.add('hidden');el.innerHTML='';return}const k=TIPORDER[UI.coach],st=TIPS[k];el.classList.remove('hidden');
   el.innerHTML=`<h3>Tip ${UI.coach+1} of 4: ${esc(st.t)}</h3><p class="small">${esc(st.b)}</p><div class="acts"><button class="btn primary" data-tour="next">Got it</button><button class="btn" data-tour="skip">No more tips</button></div>`;
@@ -135,3 +138,25 @@ function statsHTML(){const {order,me,w}=placeOf();const W=w>=0?G.pl[w]:null;cons
   <div class="acts"><button class="btn primary" data-a="new">Play again</button><button class="btn" data-a="closestats">Look at the city</button></div></div>`}
 // sound buttons in the ⚙ menu keep their explanation
 function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.innerHTML=(SND.on?'🔊 Sound on':'🔇 Sound off')+'<small>Dice, smashes and cheers</small>';if(b)b.innerHTML=(SND.music?'🎵 Music on':'🎵 Music off')+'<small>Background music</small>'}
+
+// ---------- "While you waited": what the computer turns did, shown when your turn starts ----------
+// Snapshot ♥ ★ ⚡ and the log position when the first computer turn after yours begins; at your next turn the result
+// line shows the net change per monster, and tapping it lists every logged event since, oldest first.
+const RECAP={snap:null,n:0};
+function recapMe(){if(!G||G.mode!=='solo')return -1;return G.pl.findIndex(q=>q.human)}
+function recapHTML(){const me=recapMe();if(me<0||!RECAP.snap)return '';
+  const parts=[];G.pl.forEach((q,k)=>{const s=RECAP.snap[k];if(!s)return;const d=[];
+    if(s.alive&&!q.alive){d.push('knocked out')}else{if(q.vp!==s.vp)d.push(`${q.vp>s.vp?'+':'−'}${Math.abs(q.vp-s.vp)}★`);if(q.hp!==s.hp)d.push(`${q.hp>s.hp?'+':'−'}${Math.abs(q.hp-s.hp)}♥`);if(k===me&&s.en!==undefined&&q.en!==s.en)d.push(`${q.en>s.en?'+':'−'}${Math.abs(q.en-s.en)}⚡`)}
+    if(s.city!==(G.city===k)&&q.alive)d.push(G.city===k?'👑in':'👑out');
+    if(d.length)parts[k===me?'unshift':'push'](`<b>${k===me?'You':esc(mname(q))}</b> ${d.join(' ')}`)});
+  const ev=G.log.filter(l=>l.n>RECAP.n).reverse().map(l=>`<li>${esc(l.t)}</li>`);
+  if(!parts.length&&!ev.length)return '';
+  return `⏪ <b>While you waited:</b> ${parts.length?parts.join(' · '):'nothing changed'}${ev.length?` <span class="more">· tap: how</span><ol class="recap">${ev.join('')}</ol>`:''}`}
+{const _st=startTurn;startTurn=function(){
+  const me=recapMe();const nxt=G&&!G.winner?cur():null;
+  if(me>=0&&nxt&&nxt.i!==me&&!RECAP.snap){RECAP.snap=G.pl.map((q,k)=>({hp:q.hp,vp:q.vp,en:q.en,alive:q.alive,city:G.city===k}));RECAP.n=G.lseq||0}
+  RECAP.turnN=G?G.lseq||0:0;
+  const r=_st.apply(this,arguments);
+  if(me>=0&&G&&!G.winner&&G.active===me&&RECAP.snap){const h=recapHTML();RECAP.snap=null;if(h){UI.banner=h;try{render()}catch(e){}}}
+  return r}}
+{const _ng=newGame;newGame=function(){RECAP.snap=null;return _ng.apply(this,arguments)}}

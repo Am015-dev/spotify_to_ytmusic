@@ -45,7 +45,7 @@ function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.ran
   G.beast=shuffle(BEASTS.map(b=>b.k));
   G.discs=shuffle(Object.keys(DISCS).flatMap(k=>Array(DISCS[k].cp).fill(k)));
   const its=shuffle(Object.keys(ITEMS));G.items=its.slice(0,o.items!=null?o.items:2).map(k=>({k,uses:2}));
-  G.first=0;SC().setup&&SC().setup();UI.beats.length=0;UI.shown=-1;const fl=typeof FLAVOR!=='undefined'&&FLAVOR.scen&&FLAVOR.scen[sk];if(!o.noIntro)(fl&&fl.intro||[S.x]).forEach((p,i,a)=>beat('intro',{page:i,of:a.length,text:p}));
+  G.first=0;SC().setup&&SC().setup();if(o.cmp)campSetup(o.cmp);UI.beats.length=0;UI.shown=-1;const fl=typeof FLAVOR!=='undefined'&&FLAVOR.scen&&FLAVOR.scen[sk];if(!o.noIntro)(fl&&fl.intro||[S.x]).forEach((p,i,a)=>beat('intro',{page:i,of:a.length,text:p}));
   lg(`Shipwrecked! ${G.chars.map(c=>c.nm).join(', ')}${G.fri?' and Friday':''}${G.dog?' (with the dog)':''} wash up on the beach. Scenario: ${S.n}.`,'big');
   G.stk.push({f:'round'});run();refresh()}
 // ---------- helpers ----------
@@ -94,18 +94,20 @@ function morale(n,arrow){const b=G.morale;G.morale=Math.max(-3,Math.min(3,G.mora
 function gain(r,n,ctx){if(n<=0)return;const box=ctx&&ctx.fut?G.fut:G.res;box[r]+=n;lg(`+${n} ${RNAME[r]}${ctx&&ctx.fut?' (arrives after the actions)':''}.`,'good');fx('res',r)}
 // pay: take from available; food may use non-perishable food; missing units cost wounds to 'who'
 function pay(r,n,whoC,ip,why){let miss=0;if(r==='food'){const a=Math.min(n,G.res.food);G.res.food-=a;const b=Math.min(n-a,G.res.pfood);G.res.pfood-=b;miss=n-a-b}else{const a=Math.min(n,G.res[r]);G.res[r]-=a;miss=n-a}
-  if(n-miss>0)lg(`-${n-miss} ${RNAME[r]}.`);if(miss&&!ip){for(const c of whoC)wound(c,miss,why||`no ${RNAME[r]} to pay`)}return miss}
+  if(n-miss>0)lg(`-${n-miss} ${RNAME[r]}${why&&!/^no /.test(why)?' ('+why.replace(/: no \S+ to pay$/,'')+')':''}.`);if(miss&&!ip){for(const c of whoC)wound(c,miss,why||`no ${RNAME[r]} to pay`)}return miss}
 function roofPal(which,n,needShelter,ip,whoC){if(n>0){if(needShelter&&!hasShelter())return;G.camp[which]+=n;lg(`${which==='roof'?'Roof':'Palisade'} +${n} (now ${G.camp[which]}).`,'good');fx('build');return}
   const d=Math.min(-n,G.camp[which]);G.camp[which]-=d;if(d)lg(`${which==='roof'?'Roof':'Palisade'} -${d} (now ${G.camp[which]}).`,'bad');if(-n>d&&!ip)for(const c of (whoC||living()))wound(c,-n-d,`no ${which==='roof'?'roof':'palisade'} left`)}
 function weapon(n,ip,whoC){if(n>0){G.weapon+=n;lg(`Weapon +${n} (now ${G.weapon}).`,'good');return}const d=Math.min(-n,G.weapon);G.weapon-=d;if(d)lg(`Weapon -${d} (now ${G.weapon}).`,'bad');if(-n>d&&!ip)for(const c of (whoC||living()))wound(c,-n-d,'weapon already at 0')}
 // ---------- the op interpreter (card effects) ----------
+// the cause shown with a wound from a card: its name, and for an ignored threat, that it was ignored
+function opWhy(ctx){const c=ctx&&ctx.card&&typeof CARD!=='undefined'&&CARD[ctx.card];if(!c)return '';return ctx.half==='te'&&c.th?`ignored threat “${c.th.n}”`:`“${c.n}”`}
 function doOp(op,ctx){const [k,a,b,c2]=op;const who=w=>whoList(w,ctx);
   switch(k){
   case 'res':gain(a,b,ctx);break;
   case 'resPer':gain(a,living().length,ctx);break;
-  case 'lose':pay(a,b,ctx.pay?ctx.pay.map(P):living(),!!c2,null);break;
+  case 'lose':pay(a,b,ctx.pay?ctx.pay.map(P):living(),!!c2,ctx.card&&CARD[ctx.card]?`${opWhy(ctx)}: no ${RNAME[a]} to pay`:null);break;
   case 'loseAllRes':for(const r of RES){if(G.res[r])lg(`Lose all ${RNAME[r]} (${G.res[r]}).`,'bad');G.res[r]=0}break;
-  case 'wound':for(const c of who(a))wound(c,b);break;
+  case 'wound':for(const c of who(a))wound(c,b,opWhy(ctx));break;
   case 'det':if(a==='choose'){const c=living().sort((x,y)=>x.det-y.det)[0];gainDet(c,b)}else for(const c of who(a))gainDet(c,b);break;
   case 'ldet':for(const c of who(a))loseDet(c,b);break;
   case 'ldetAll':for(const c of who(a)){if(c.det)lg(`${c.nm} loses all ${c.det} determination.`,'bad');c.det=0}break;

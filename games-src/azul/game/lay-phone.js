@@ -1,5 +1,5 @@
 require('../../phfit.js').guard(4);
-// phone layout test (touch only, real WebGL): node lay-phone.js '{"np":3,"ex":{"gray":true}}' TAG [sizes] [file]
+// older phone panel (?bf=0 by default; the board-first table is lay-bf.js). phone layout test (touch only, real WebGL): node lay-phone.js '{"np":3,"ex":{"gray":true}}' TAG [sizes] [file]
 // no scroll, ring >= 0.85 of the short side, board targets hit-test to the canvas with every pop-up/card open, pop-ups never cover the kilns,
 // a full human turn by touch taps only (tile or kiln -> pop-up -> rack button), wall choice card, round card + Continue, board pop-ups, end card; tap targets >= 44 px, text >= 13 px, 0 console errors
 const {chromium}=require(process.env.PW||'/opt/node22/lib/node_modules/playwright');const CFG=JSON.parse(process.argv[2]||'{}');const TAG=process.argv[3]||'p';
@@ -8,7 +8,7 @@ const SIZES=(process.argv[4]||'390x844,844x390,360x740,740x360').split(',').map(
 for(const [w,h] of SIZES){const t=TAG+'_'+w+'x'+h;const c=await b.newContext({viewport:{width:w,height:h},isMobile:true,hasTouch:true,deviceScaleFactor:1});const p=await c.newPage();p.setDefaultTimeout(60000);
   const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>m.type()==='error'&&!/CERT|fonts|ERR_/.test(m.text())&&errs.push(m.text()));
   const short=Math.min(w,h);const prob=(tag,msg)=>{bad++;console.log(t,tag,'PROBLEM',msg)};const stats={mins:1e9,minName:'',zoneScroll:0,ringMax:0};
-  await p.goto('file://'+FILE+(CFG.q||''));await p.waitForTimeout(1200);
+  await p.goto('file://'+FILE+(CFG.q||'?bf=0'));await p.waitForTimeout(1200);
   await p.evaluate(()=>{try{localStorage.clear();localStorage.setItem('sgz_gfx','low')}catch(e){}setSeed(11);AIDELAY=60;ANIM=0});
   await p.addStyleTag({content:'.gx-drawer,.gx-scrim{transition:none!important}'});const on=await p.evaluate(()=>document.documentElement.classList.contains('ph'));if(!on)prob('start','html.ph not set');
   const audit=async tag=>{const r=await p.evaluate(()=>{const cv=document.querySelector('#c3'),R=cv.getBoundingClientRect(),vw=innerWidth,vh=innerHeight;const out={};

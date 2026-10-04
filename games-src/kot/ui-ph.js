@@ -33,7 +33,7 @@ function phLabels(){for(const b of document.querySelectorAll('header.gx-bar [dat
   const k=document.querySelector('.gx-dock-head [data-gx="dock"]');if(k)k.setAttribute('aria-label','Hide panel')}
 function phBuild(){const dk=document.querySelector('.gx-dock');if(!dk||$ph('pchips'))return;
   const mk=(id,tag,cls)=>{const e=document.createElement(tag||'div');e.id=id;if(cls)e.className=cls;dk.appendChild(e);return e};
-  mk('pchips');mk('pshop');const pc=mk('pcx','section','box');pc.setAttribute('role','dialog');pc.setAttribute('aria-label','Details');
+  mk('pchips');mk('pshop');mk('pfeed').setAttribute('aria-live','polite');const pc=mk('pcx','section','box');pc.setAttribute('role','dialog');pc.setAttribute('aria-label','Details');
   pc.innerHTML='<div class="pcx-h"><b id="pcxt"></b><span id="pcxa"></span><button class="gx-x" data-ph="close" aria-label="Close">×</button></div><div class="pcx-b" id="pcxb"></div>';
   phLabels()}
 // ---- monster chips ----
@@ -83,7 +83,7 @@ function phActs(){if(!G)return;const pa=$ph('pacts');if(!pa)return;
     set('[data-act="reroll"]',`<span class="bl">🎲 Roll</span><small>${nk} ${nk===1?'die':'dice'} · ${G.rolls} left</small>`,`Roll the ${nk} unkept ${nk===1?'die':'dice'} again, ${G.rolls} rerolls left`);
     set('[data-act="resolve"]','<span class="bl">✔ Done</span><small>use these dice</small>','Done: resolve these dice');
     set('[data-act="hint"]','<span aria-hidden="true">💡</span>','Keep the suggested dice')}
-  if(humanTurn()&&G.phase==='buy')set('[data-act="end"]',`<span class="bl">✔ ${G.bug?'Finish turn':'End turn'}</span>`,G.bug?'Finish the borrowed turn':'End your turn');
+  if(humanTurn()&&G.phase==='buy'){const win=!G.bug&&cur().vp>=20;set('[data-act="end"]',`<span class="bl">✔ ${G.bug?'Finish turn':'End turn'}</span>${win?`<small>you have ${cur().vp}★ (20 wins): end your turn to win</small>`:G.market.length?'<small>or tap a card above to read and buy it</small>':''}`,G.bug?'Finish the borrowed turn':win?'End your turn: you have 20 stars and win if you survive it':'End your turn')}
   if(PHONE.land&&!pa.querySelector('[data-a="advise"]')){const ab=document.createElement('button');ab.className='btn';ab.dataset.a='advise';ab.setAttribute('aria-label','What should I do now, and why?');ab.setAttribute('aria-expanded',UI.adv?'true':'false');ab.innerHTML='<span aria-hidden="true">🧭</span>';const hb=pa.querySelector('[data-act="hint"]')||pa.querySelector('[data-act="resolve"]')||pa.querySelector('[data-act="end"]');if(hb)hb.after(ab);else pa.prepend(ab)}
   const dk=document.querySelector('.gx-dock');if(!dk)return;
   const n=G.dice.length,land=document.documentElement.classList.contains('ph-l');const railW=dk.clientWidth-16;
@@ -91,10 +91,21 @@ function phActs(){if(!G)return;const pa=$ph('pacts');if(!pa)return;
   if(land&&n<=6){side=true;dc=3;dw=Math.max(52,Math.min(60,Math.floor((railW-6-104-12)/3)))}
   else{dc=n>6?4:Math.max(1,n);dw=Math.max(52,Math.min(64,Math.floor((railW-(dc-1)*6)/dc)))}
   dk.style.setProperty('--dc',dc);dk.style.setProperty('--dw',dw+'px');dk.dataset.ps=side?'side':'stack';
-  dk.dataset.pp=(!G.winner&&humanTurn()?G.phase:'watch')}
+  dk.dataset.pp=(!G.winner&&humanTurn()?G.phase:'watch');
+  const xa=pa.querySelectorAll('.btn[data-act]:not([data-act="reroll"]):not([data-act="resolve"]):not([data-act="hint"]):not([data-act="end"]):not([data-act="sweep"]):not([data-act="again"])').length;if(xa)dk.dataset.xa=xa;else delete dk.dataset.xa}
 function phNote(){const c=$ph('choice');if(c&&!c.classList.contains('hidden')){const li=c.querySelector('.intro ul li');if(li&&/glowing plate/.test(li.textContent))li.innerHTML='The <b>chips</b> under the board show every monster\'s ♥ ★ ⚡ and cards. The highlighted one is whose turn it is. Tap a chip or a monster for details.'}}
-function phRender(){if(!phOn())return;phBuild();phLabels();phChips();phTiles();phActs();phNote();phCard();
-  const bn=$ph('banner');if(bn){bn.setAttribute('role','button');bn.tabIndex=bn.textContent.trim()?0:-1}
+// ---- the computer's turn, narrated: every logged event of this turn, oldest first, in the otherwise empty dock ----
+function phFeed(){const el=$ph('pfeed');if(!el)return;if(!G||G.winner||humanTurn()){el.innerHTML='';return}
+  const p=cur(),n0=(typeof RECAP!=='undefined'&&RECAP.turnN)||0;const ev=G.log.filter(l=>l.n>n0).slice(0,6).reverse();
+  el.innerHTML=`<b class="fh" style="--mc:${MONS[p.m].c}">${esc(mname(p))}'s turn</b>`+(ev.length?`<ol>${ev.map((l,k)=>`<li class="${k===ev.length-1?'new':''}">${esc(l.t)}</li>`).join('')}</ol>`:'<p>Rolling…</p>')}
+// ---- fixed-height lines: trim the text (never clip it) so the line fits; the full result opens with a tap ----
+function phTrim(el,tail){if(!el||!el.clientHeight||el.scrollHeight<=el.clientHeight+1)return;const full=el.textContent.replace(/\s+/g,' ').trim();
+  let lo=0,hi=full.length;while(lo<hi){const m=(lo+hi+1)>>1;el.textContent=full.slice(0,m)+'…'+tail;if(el.scrollHeight<=el.clientHeight+1)lo=m;else hi=m-1}
+  el.textContent=full.slice(0,lo)+'…'+tail}
+function phRender(){if(!phOn())return;phBuild();phLabels();phChips();phTiles();phActs();phFeed();phNote();phCard();
+  {const bn=$ph('banner');if(bn){const r=bn.querySelector('.recap');if(r)r.remove();phTrim(bn,UI.banner?' (tap)':'')}phTrim($ph('preview'),'')}
+  const bn=$ph('banner');if(bn&&G&&!G.winner&&humanTurn()&&G.phase==='buy'&&!bn.textContent.trim())bn.innerHTML=`<b>Step 4 · Shop:</b> you have ${cur().en}⚡. Tap a card to read it and buy, or press End turn (⚡ carries over).`;
+  if(bn){bn.setAttribute('role','button');bn.tabIndex=bn.textContent.trim()?0:-1}
   // the camera needs a refit when the Harbor appears (5-6 monsters)
   const key=(G?G.pl.length:0)+':'+(PHONE.land?1:0);if(PHN.fit!==key){PHN.fit=key;try{if(typeof V3!=="undefined"&&V3.on&&window.resize3D)resize3D()}catch(e){}}}
 function phLayout(){document.querySelectorAll('.gx-app.gx-dock-min').forEach(a=>{if(phOn())a.classList.remove('gx-dock-min')});try{if(typeof V3!=="undefined"&&V3.on)resize3D()}catch(e){}phRender()}
@@ -108,7 +119,7 @@ document.addEventListener('click',e=>{if(!phOn())return;const t=e.target;
   const ch=t.closest&&t.closest('[data-pm]');if(ch){e.stopPropagation();phSeatInfo(+ch.dataset.pm);return}
   const sh=t.closest&&t.closest('[data-shop]');if(sh){e.stopPropagation();phPop('shop');return}
   const mk=t.closest&&t.closest('[data-gx="dr-market"]');if(mk&&G&&!UI.info){e.stopPropagation();e.preventDefault();if(GX.open)GX.close();if(PHN.pop==='shop')phClose();else phPop('shop');return}
-  const bn=t.closest&&t.closest('#banner');if(bn&&bn.textContent.trim()&&!UI.choice){e.stopPropagation();phPop('banner');return}
+  const bn=t.closest&&t.closest('#banner');if(bn&&UI.banner&&!UI.choice){e.stopPropagation();phPop('banner');return}
   if(t.closest&&t.closest('[data-ph="close"]')){e.stopPropagation();phClose();return}
   // a tap outside the pop-up closes it (the tap itself still works)
   if(PHN.pop&&!(t.closest&&t.closest('#pcx'))){phClose()}},true);

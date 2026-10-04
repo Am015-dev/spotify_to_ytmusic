@@ -18,14 +18,17 @@ function dockNeed(H){return H>=820?380:H>=760?396:H>=700?370:H>=640?350:H>=580?3
 function phApply(){const was=UI.phone;const on=phDetect();const root=document.documentElement;
   UI.phone=on;UI.land=innerWidth>innerHeight;const W=innerWidth,H=innerHeight;UI.short=on&&(UI.land?H<370:H<600);
   root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);root.classList.toggle('short',!!UI.short);
-  if(on){const big=Math.max(150,Math.min(W,H-44-dockNeed(H)));const bs=UI.land?Math.min(H,Math.round(W*.52)):(UI.boardSmall?Math.max(150,Math.min(big,Math.round(big-Math.max(90,H*.15)))):big);root.style.setProperty('--bs',bs+'px');UI.bs=bs}
+  if(on){const big=Math.max(150,Math.min(W,H-44-dockNeed(H)));let bs=UI.land?Math.min(H,Math.round(W*.52)):(UI.boardSmall?Math.max(UI.short?96:150,Math.min(big,Math.round(big-Math.max(90,H*.15)))):big);
+    if(UI.zoom)bs=UI.land?Math.min(H,Math.round(W*.62)):Math.max(bs,Math.min(W,H-44-150));root.style.setProperty('--bs',bs+'px');UI.bs=bs}
   else root.style.removeProperty('--bs');
   if(was!==on&&G){UI.mapReset=true;renderAll()}}
 function phoneRefresh(){}
+// tap the corner button to make the map bigger (the dock keeps the rest of the screen); tap again to go back
+function toggleZoom(){UI.zoom=!UI.zoom;document.documentElement.classList.toggle('zoom',!!UI.zoom);const b=$('.zbtn');if(b){b.setAttribute('aria-pressed',String(!!UI.zoom));b.setAttribute('aria-label',UI.zoom?'Make the map smaller':'Make the map bigger')}phApply();if(G)renderAll()}
 // map-centred decisions (Herald, hidden cards, claiming, ties, the map lesson) get the big map; lists, menus and result cards get the room instead
 function wantSmall(){if(!G)return false;const c=UI.card;if(c&&c.kind==='pass')return false;if(c&&(c.kind==='event'||c.kind==='over'))return true;
   if(UI.coachInfo)return UI.coachInfo.id!=='map';const s=viewSeatForQ();if(s==null||!G.q)return UI.boardSmall;
-  return !['herald','place','location','tie','clashOrder'].includes(G.q.kind)}
+  return !['herald','place','location','tie'].includes(G.q.kind)}
 let _rz=0;addEventListener('resize',()=>{clearTimeout(_rz);_rz=setTimeout(()=>{const l=UI.land,p=UI.phone;phApply();if(G&&UI.started)renderAll()},120)});
 addEventListener('orientationchange',()=>setTimeout(()=>{phApply();if(G)renderAll()},200));
 // ---------------------------------------------------------------- boot

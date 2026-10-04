@@ -35,7 +35,8 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
   const sqPt=async(c,r)=>p.evaluate(([c,r])=>__P()(c-2.5,0,r-2.5),[c,r]);
   const tapSq=async(c,r)=>{const [x,y]=await sqPt(c,r);await p.touchscreen.tap(x,y);await p.waitForTimeout(350)};
   const waitHuman=async()=>{let ok=0;for(let k=0;k<120&&ok<3;k++){const s=await p.evaluate(()=>{const d=sideToAct();return !!G.over||(d>=0&&G.seats[d].human&&!UI.busy&&!document.querySelector('#pc [data-a=take]'))});ok=s?ok+1:0;await p.waitForTimeout(250)}};
-  const dismissCards=async()=>{for(let k=0;k<8;k++){try{const l=p.locator('#pc:not([hidden]) [data-a=coachok],#pc:not([hidden]) [data-a=sunkok],#pc:not([hidden]) [data-ph=dismiss]').first();if(!(await l.count()))break;await l.tap({timeout:4000})}catch(e){}await p.waitForTimeout(250)}};
+  const dismissCards=async()=>{await p.waitForFunction(()=>!UI.busy,null,{timeout:60000}).catch(()=>{}); // result cards wait for the replay to end
+    for(let k=0;k<8;k++){try{const l=p.locator('#pc:not([hidden]) [data-a=coachok],#pc:not([hidden]) [data-a=sunkok],#pc:not([hidden]) [data-ph=dismiss]').first();if(!(await l.count()))break;await l.tap({timeout:4000})}catch(e){}await p.waitForTimeout(250)}};
   // tap targets >= 44
   const targets=async tag=>{const r=await p.evaluate(()=>{const o=[];for(const e of document.querySelectorAll('.gx-bar button,#ps button,#ppop button,#pc button,#netst button')){const R=e.getBoundingClientRect();if(!R.width||!R.height)continue;const cs=getComputedStyle(e);if(cs.visibility==='hidden')continue;if(R.width<43.5||R.height<43.5)o.push((e.dataset.a||e.dataset.ph||e.className||e.tagName)+':'+Math.round(R.width)+'x'+Math.round(R.height))}return o});if(r.length)prob(tag,'SMALL TAP TARGETS',JSON.stringify(r.slice(0,6)))};
   const overlap=(A,B)=>A[0]<B[2]&&A[2]>B[0]&&A[1]<B[3]&&A[3]>B[1];
@@ -111,6 +112,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
   await scroll('busy');await whole('busy 8p');await shot('14busy8');
   await p.evaluate(()=>{showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=watch]');await p.click('[data-a=np][data-v="4"]');for(const k of['rift','wave','maelstrom','cannon']){await p.evaluate(k=>{const c=document.querySelector(`[data-a=exp][data-k=${k}]`);if(c.checked){c.checked=false;c.dispatchEvent(new Event('change',{bubbles:true}))}},k)}await p.evaluate(()=>{setSeed(11);AIDELAY=0;ANIM=0});await p.click('#startbtn');await p.waitForTimeout(1200);
   await p.evaluate(()=>{ANIM=0;let n=0;while(!G.over&&n++<8000){const st=aiStep();if(!st)break;performMove(st.m,st.seat)}refresh();overCheck&&overCheck()});await p.waitForTimeout(1500);await scroll('over');await shot('15over');
+  for(let k=0;k<8;k++){const s=await p.$('#pc:not([hidden]) [data-a=sunkok]');if(!s)break;await s.click();await p.waitForTimeout(300)} // the Sunk! cards (the cause) come before the result card
   const ov=await p.evaluate(()=>({card:!document.querySelector('#pc').hidden&&!!document.querySelector('#pc [data-over]'),cont:!!document.querySelector('#pc [data-ph=dismiss]')}));if(!ov.card||!ov.cont)prob('end card missing',JSON.stringify(ov));
   await p.tap('#pc [data-ph=dismiss]');await p.waitForTimeout(400);await whole('over dismissed');await shot('16over_board');
   log('errors',JSON.stringify(errs.slice(0,4)));bad+=errs.length;rep.push({t,m0});await ctx.close()}

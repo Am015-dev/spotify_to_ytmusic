@@ -97,7 +97,7 @@ function sampleHands(V, B, rng) {
 // ---------- a simulation state shaped like G (so the real rules run unchanged) ----------
 function simBase(V) {
   const W = {
-    v: 1, np: V.np, hn: V.hn, two: V.two, helper: V.helper, mission: V.mission, comm: V.comm, cap: V.cap, ntr: V.ntr, nolog: true, phase: 'play', att: V.att, logN: 0, evN: 0, log: [], events: [], pool: 0,
+    v: 1, boss: V.boss || null, np: V.np, hn: V.hn, two: V.two, helper: V.helper, mission: V.mission, comm: V.comm, cap: V.cap, ntr: V.ntr, nolog: true, phase: 'play', att: V.att, logN: 0, evN: 0, log: [], events: [], pool: 0,
     pl: V.pl.slice(), tricks: V.tricks.slice(), pings: V.pings, firstW: V.firstW, lastCard: V.lastCard, offered: V.offered, result: null, rng: 1, seed: 1,
     tasks: V.tasks.map(t => ({ id: t.id, owner: t.owner, pn: t.pn, st: 0 })),
     players: V.players.map(p => ({ seat: p.seat, helper: p.helper, hand: [], stacks: null })), trick: null
@@ -117,13 +117,13 @@ function fillWorld(W, V, B, hands) {
     p.hand = hands[s].slice().sort((a, b) => a - b);
   });
   // the Commander's helper in a 2-diver game when I am the Commander: I can see the face-up cards and not the others (handled above)
-  W.trick = V.trick ? { n: V.trick.n, lead: V.trick.lead, turn: V.trick.turn, plays: V.trick.plays.map(p => ({ s: p.s, c: p.c })), ls: V.trick.ls } : null;
+  W.trick = V.trick ? { n: V.trick.n, lead: V.trick.lead, turn: V.trick.turn, plays: V.trick.plays.map(p => ({ s: p.s, c: p.c })), ls: V.trick.ls, cu: V.trick.cu || '' } : null;
 }
 function cloneW(W) {
   return Object.assign({}, W, {
     pl: W.pl.slice(), tricks: W.tricks.slice(), tasks: W.tasks.map(t => ({ id: t.id, owner: t.owner, pn: t.pn, st: t.st })), phase: W.phase, result: null,
     players: W.players.map(p => ({ seat: p.seat, helper: p.helper, hand: p.hand.slice(), stacks: p.stacks ? p.stacks.map(s => s.slice()) : null })),
-    trick: W.trick ? { n: W.trick.n, lead: W.trick.lead, turn: W.trick.turn, plays: W.trick.plays.map(p => ({ s: p.s, c: p.c })), ls: W.trick.ls } : null
+    trick: W.trick ? { n: W.trick.n, lead: W.trick.lead, turn: W.trick.turn, plays: W.trick.plays.map(p => ({ s: p.s, c: p.c })), ls: W.trick.ls, cu: W.trick.cu || '' } : null
   });
 }
 // ---------- soft progress of a job (0..1) and its orientation ----------
@@ -172,7 +172,7 @@ function trickU(W, s, c, ori) {
   const T = W.trick, np = W.np; const cur = T.plays.map(p => ({ s: p.s, c: p.c })); cur.push({ s, c }); const ls = T.plays.length ? T.ls : suit(c);
   let turn = (s + 1) % np; const added = [c];
   while (cur.length < np) { const lc = lowestLegal(W, turn, ls, cur); if (lc < 0) return -99; cur.push({ s: turn, c: lc }); added.push(lc); turn = (turn + 1) % np; }
-  const w = LD.trickWinner(cur, ls), wc = cur.find(p => p.s === w).c;
+  const w = LD.trickWinner(cur, ls, T.cu), wc = cur.find(p => p.s === w).c;
   const k = { n: T.n, lead: T.lead, ls, plays: cur, w, wc };
   const before = W.tasks.map((t, i) => soft(W, i));
   W.tricks.push(k); const prev = []; for (const x of cur) { prev.push(W.pl[x.c]); W.pl[x.c] = 1; }
@@ -192,7 +192,7 @@ function cands(W, s, L, many) {
   for (const c of L) (bySuit[suit(c)] = bySuit[suit(c)] || []).push(c);
   for (const k in bySuit) { const a = bySuit[k].sort((x, y) => val(x) - val(y)); out.add(a[0]); out.add(a[a.length - 1]); if (many && a.length > 2) out.add(a[a.length >> 1]); }
   const T = W.trick;
-  if (T && T.plays.length) { const w = LD.trickWinner(T.plays, T.ls); const wc = T.plays.find(p => p.s === w).c; const win = L.filter(c => LD.trickWinner(T.plays.concat([{ s, c }]), T.ls) === s).sort((a, b) => powerOf(a) - powerOf(b)); if (win.length) out.add(win[0]); }
+  if (T && T.plays.length) { const w = LD.trickWinner(T.plays, T.ls, T.cu); const wc = T.plays.find(p => p.s === w).c; const win = L.filter(c => LD.trickWinner(T.plays.concat([{ s, c }]), T.ls, T.cu) === s).sort((a, b) => powerOf(a) - powerOf(b)); if (win.length) out.add(win[0]); }
   return [...out];
 }
 function greedyCard(W, s) {
@@ -245,7 +245,7 @@ function fit(V, me, ti, owner, K, base) {
     const W = cloneW(W0); W.tasks.forEach((t, i) => { if (i === ti) t.owner = owner; else if (base && base.includes(i) && V.tasks[i].owner >= 0) t.owner = V.tasks[i].owner; else t.owner = -9; });
     W.tasks = W.tasks.filter(t => t.owner !== -9 && t.owner !== -1 || false);
     if (!W.tasks.length) continue;
-    W.phase = 'play'; W.cap = V.cap; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1 }; W.tricks = []; W.pl = new Array(40).fill(0);
+    W.phase = 'play'; W.cap = V.cap; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1, cu: LD.curseAt(W, 0) }; W.tricks = []; W.pl = new Array(40).fill(0);
     roll(W); if (W.result && W.result.ok) ok++; df += doneFrac(W);
   }
   return (ok + .25 * df) / wl.length;
@@ -294,6 +294,8 @@ function chooseAssign(V, me, level, moves) {
   }
   if (A.mode === 'split') { return best.m; }
   const pass = find('pass');
+  // Descent (G.share): the computer divers leave a job for every human diver who has none yet, when passing is allowed
+  if (pass && V.share) { const left = V.tasks.filter(t => t.owner < 0).length, need = V.players.filter(p => !p.ai && !p.helper && !V.tasks.some(t => t.owner === p.seat)).length; if (need && left <= need) return pass; }
   if (pass && (best.r.mine < .12 || best.r.mine + .15 < best.r.oth)) return pass;
   return best.m;
 }
@@ -302,7 +304,7 @@ function rateAll(V, me, level, asOwner) {
   const wl = worlds(V, me, K, 77).W; let ok = 0, ok2 = 0, n = 0;
   for (const W0 of wl) {
     for (const who of [me, V.cap === me ? (me + 1) % V.np : V.cap]) {
-      const W = cloneW(W0); W.tasks.forEach(t => { t.owner = who; }); W.phase = 'play'; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1 }; W.tricks = []; W.pl = new Array(40).fill(0); roll(W);
+      const W = cloneW(W0); W.tasks.forEach(t => { t.owner = who; }); W.phase = 'play'; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1, cu: LD.curseAt(W, 0) }; W.tricks = []; W.pl = new Array(40).fill(0); roll(W);
       if (who === me) { ok += W.result && W.result.ok ? 1 : 0; n++; } else ok2 += W.result && W.result.ok ? 1 : 0;
     }
   }
@@ -322,7 +324,7 @@ function choosePredict(V, me, level, moves) {
   const wl = worlds(V, me, K, 55).W;
   for (const m of moves) {
     if (m.n > Math.ceil(V.ntr * .7)) continue; let ok = 0;
-    for (const W0 of wl) { const W = cloneW(W0); W.tasks.forEach((t, i) => { t.owner = i === ti ? V.tasks[ti].owner : -9; }); W.tasks = W.tasks.filter(t => t.owner !== -9); W.tasks[0].pn = m.n; W.phase = 'play'; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1 }; W.tricks = []; W.pl = new Array(40).fill(0); roll(W); if (W.result && W.result.ok) ok++; }
+    for (const W0 of wl) { const W = cloneW(W0); W.tasks.forEach((t, i) => { t.owner = i === ti ? V.tasks[ti].owner : -9; }); W.tasks = W.tasks.filter(t => t.owner !== -9); W.tasks[0].pn = m.n; W.phase = 'play'; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1, cu: LD.curseAt(W, 0) }; W.tricks = []; W.pl = new Array(40).fill(0); roll(W); if (W.result && W.result.ok) ok++; }
     const sc = ok / Math.max(1, wl.length) - .001 * Math.abs(m.n - V.ntr / 3); if (sc > bs) { bs = sc; best = m; }
   }
   return best;
@@ -403,22 +405,36 @@ function step(G) {
   }
   return false;
 }
-// a short reason for a card: used by the hint button
+// a short reason for a card: used by the hint button. Every sampled world finishes the current trick (the others play greedily),
+// so there is always a likely winner, and the jobs that trick finishes or breaks are named. Never empty.
 function why(G, seat, card) {
-  const V = LD.stripView(G, seat); const wl = worlds(V, seat, 5, 3).W; const lines = {};
+  const V = LD.stripView(G, seat); const wl = worlds(V, seat, 6, 3).W; const lines = { w: {} }; const who = G.trick.turn; const n0 = V.tricks.length;
   for (const W0 of wl) {
-    const W = cloneW(W0); const who = G.trick.turn; const before = W.tasks.map((t, i) => LD.jobStatus(W, i));
-    LD._.doPlay(W, who, card);
-    if (W.tricks.length > V.tricks.length) {
-      const k = W.tricks[W.tricks.length - 1]; lines.w = lines.w || {}; lines.w[k.w] = (lines.w[k.w] || 0) + 1;
-      W.tasks.forEach((t, i) => { const st = LD.jobStatus(W, i); if (st > 0 && before[i] <= 0) lines['d' + i] = (lines['d' + i] || 0) + 1; if (st < 0) lines['f' + i] = (lines['f' + i] || 0) + 1; });
-    }
+    const W = cloneW(W0); const before = W.tasks.map((t, i) => LD.jobStatus(W, i));
+    LD._.doPlay(W, who, card); let g = 0;
+    while (W.phase === 'play' && W.tricks.length === n0 && g++ < 12) { const s = W.trick.turn; LD._.doPlay(W, s, greedyCard(W, s)); }
+    const k = W.tricks[n0]; if (k) lines.w[k.w] = (lines.w[k.w] || 0) + 1;
+    W.tasks.forEach((t, i) => { const st = LD.jobStatus(W, i); if (st > 0 && before[i] <= 0) lines['d' + i] = (lines['d' + i] || 0) + 1; if (st < 0 && before[i] >= 0) lines['f' + i] = (lines['f' + i] || 0) + 1; });
   }
-  const out = []; const n = Math.max(1, wl.length);
-  if (lines.w) { const best = Object.keys(lines.w).sort((a, b) => lines.w[b] - lines.w[a])[0]; out.push(+best === seat ? 'You most likely win this trick' : G.players[best].name + ' most likely wins this trick'); }
-  for (const k in lines) if (k[0] === 'd' && lines[k] >= n / 2) out.push('finishes: ' + TASKS[G.tasks[+k.slice(1)].id].t.replace(/\.$/, ''));
-  for (const k in lines) if (k[0] === 'f' && lines[k] >= n / 3) out.push('risk: breaks "' + TASKS[G.tasks[+k.slice(1)].id].t.replace(/\.$/, '') + '"');
-  return out.join('. ') + (out.length ? '.' : '');
+  const out = []; const n = Math.max(1, wl.length), nm = s => +s === seat ? 'you' : G.players[s].name;
+  const jt = i => '“' + TASKS[G.tasks[i].id].t.replace(/\.$/, '') + '”';
+  const wk = Object.keys(lines.w).sort((a, b) => lines.w[b] - lines.w[a])[0];
+  for (const k in lines) if (k[0] === 'd' && lines[k] >= n / 2) out.push('it finishes ' + jt(+k.slice(1)));
+  for (const k in lines) if (k[0] === 'f' && lines[k] >= n / 3) out.push('careful, it may break ' + jt(+k.slice(1)));
+  if (wk != null) {
+    const sure = lines.w[wk] >= n * .8 ? '' : 'probably ';
+    const open = G.tasks.map((t, i) => i).filter(i => G.tasks[i].owner >= 0 && LD.ctl(G, G.tasks[i].owner) === LD.ctl(G, +wk) && LD.jobStatus(G, i) === 0);
+    let s = (+wk === seat ? 'You ' + sure + 'win this trick' : nm(wk) + ' ' + sure + 'wins this trick');
+    if (!out.length) {
+      const mine = G.players[seat].hand.filter(c => suit(c) === suit(card)).map(val);
+      if (+wk !== seat && open.length) s += ' (' + nm(wk) + ' still needs ' + jt(open[0]) + ')';
+      else if (+wk !== seat) s += (mine.length > 1 && val(card) === Math.min(...mine) ? '; you give away your lowest ' + D.suits[suit(card)].name + ' and keep the strong cards' : '; nothing you need is in it');
+      else s += (G.tasks.some((t, i) => t.owner >= 0 && LD.ctl(G, t.owner) === seat && LD.jobStatus(G, i) === 0) ? ' and lead the next one' : '; it is safe for every job');
+    }
+    out.unshift(s);
+  }
+  if (!out.length) out.push('The safest card the team found');
+  const t = out.join('; '); return t.charAt(0).toUpperCase() + t.slice(1) + '.';
 }
 // Does EVERY card the diver may play now break one of his or her own jobs (or the dive's rule)? Played out on sampled worlds (the fair view):
 // only when it breaks in all of them for all legal cards. Returns { job: index | -1 for the dive rule } or null. Used for the prompt line.
