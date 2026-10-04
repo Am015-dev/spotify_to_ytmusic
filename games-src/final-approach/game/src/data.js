@@ -87,12 +87,12 @@ FA.DATA = {
   ],
   mods: {
     "traffic": {"name":"Busy Sky","text":"When a round starts on a space with dice icons, roll the traffic die once per icon. Each roll adds a plane that many spaces ahead (counting your space as 1), at most to the airport."},
-    "turns": {"name":"Tight Corridor","text":"A space that shows a corridor tab only lets you fly on while the axis is in one of the tab's marked positions. It is checked on every space you leave, but not when you stand still."},
+    "turns": {"name":"Tight Corridor","text":"A space that shows a corridor tab only lets you fly on while the axis is in one of the tab's marked positions. It is checked on every space you leave, but not when you stand still. On the strip a tab reads C (level), L1/L2 (tilted 1 or 2 toward the Pilot, left) or R1/R2 (toward the Co-pilot, right)."},
     "kero": {"name":"Fuel Watch","text":"Start at 20. Anyone may put a die of any value on the fuel space to burn that many units. A round with no die there burns 6 at the end. Below 0 you are out of fuel and lose."},
     "leak": {"name":"Fuel Leak","text":"No fuel space. Every round, when both engine dice are down, you burn the difference between them plus 1. Below 0 you lose."},
     "wind": {"name":"Tail Wind","text":"A wind dial adds to your engine total every round, even the last. It starts at +3. After the axis is set each round, turn the dial by the axis tilt."},
     "intern": {"name":"Trainee","text":"Put any die on your trainee space to take the next token from your side and place it as a die of that value right away (not on Concentration, no coffee). The die must differ from the token. Train all six before you land."},
-    "ice": {"name":"Icy Runway","text":"The brakes become a four-column track (2, 3, 4, 5). Pilot and anyone must put dice showing the column number into both halves of the next column in the same round. All four must be done, and speed must stay under the marker."},
+    "ice": {"name":"Icy Runway","text":"The brakes become a four-column track (2, 3, 4, 5). The pilot (upper half) and either crew (lower half) must put dice showing the column number into the next column in the same round. All four must be done, and the last-round speed must be no more than the brake value reached."},
     "real": {"name":"Against the Clock","text":"Each round has a 60-second timer that starts after the roll. When it runs out, unplaced dice are ignored. If both axis and both engine dice are not down, you lose."}
   },
   abilities: {

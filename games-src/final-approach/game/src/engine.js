@@ -62,6 +62,8 @@ function rrOnTrack(G) { let n = 0; const rows = D.alt[G.alt]; for (let r = G.rou
 const rrReserve = G => D.rerollTotal - G.rrHand - rrOnTrack(G);
 
 // ---------- setup ----------
+// ability cards: only known ids, no duplicates, at most as many as the scenario allows (0 to 2)
+function cleanAbil(a, sc) { const out = []; if (Array.isArray(a)) for (const id of a) if (typeof id === 'string' && Object.prototype.hasOwnProperty.call(D.abilities, id) && !out.includes(id)) out.push(id); return out.slice(0, sc.ab || 0); }
 function newGame(o) {
   o = o || {};
   const sc = scen(o.scenario || 'g1'); if (!sc) throw new Error('unknown scenario ' + o.scenario);
@@ -70,7 +72,7 @@ function newGame(o) {
   mods.fuel = mods.kero || mods.leak;
   const tr = D.tracks[sc.trk];
   mods.tabs = tr.sp.some(s => s[2]); mods.traffic = tr.sp.some(s => s[1] > 0);
-  const G = { v: 1, seed, rng: seed, sid: sc.id, tk: sc.trk, alt: sc.alt, row0: 0, mods, abil: Array.isArray(o.abil) ? o.abil.slice(0, 2) : [], names: (o.names || ['Captain Marlow', 'First Officer Okoro']).slice(0, 2), ai: o.ai ? o.ai.slice(0, 2) : [null, null],
+  const G = { v: 1, seed, rng: seed, sid: sc.id, tk: sc.trk, alt: sc.alt, row0: 0, mods, abil: cleanAbil(o.abil, sc), names: (o.names || ['Captain Marlow', 'First Officer Okoro']).slice(0, 2), ai: o.ai ? o.ai.slice(0, 2) : [null, null],
     round: 0, phase: 'brief', first: 0, turn: 0, ready: [false, false], say: [[], []],
     pl: { axis: 0, aeroB: 4, aeroO: 8, pos: 1, kero: D.keroStart, wind: D.windStart, ice: 0, sw: { lg: [0, 0, 0], fl: [0, 0, 0, 0], br: [0, 0, 0] } },
     planes: tr.sp.map(s => s[0]), coffee: 0, rrHand: 0, rrTaken: -1,
@@ -131,8 +133,8 @@ function landingChecks(G) {
 }
 function endRound(G) {
   G.pend = null;
-  if (!(G.slots.ax0 && G.slots.ax1)) { lose(G, 'mandatory', 'An axis die was missing at the end of the round.'); return; }
-  if (!(G.slots.en0 && G.slots.en1)) { lose(G, 'mandatory', 'An engine die was missing at the end of the round.'); return; }
+  const miss = ['ax0', 'ax1', 'en0', 'en1'].filter(k => !G.slots[k]);
+  if (miss.length) { lose(G, 'mandatory', 'Missing at the end of the round: ' + miss.map(k => 'the ' + (SLOT[k].s ? 'Co-pilot' : 'Pilot') + "'s " + (SLOT[k].grp === 'axis' ? 'axis' : 'engine') + ' die').join(' and ') + '.'); G.result.miss = miss; return; }
   if (G.mods.kero && !G.fl.keroUsed) { G.pl.kero -= D.keroSkip; ev(G, { t: 'kero', n: G.pl.kero, d: -D.keroSkip }); lg(G, 'Nobody used the fuel space: lose ' + D.keroSkip + ' fuel (' + G.pl.kero + ' left).'); if (G.pl.kero < 0) { lose(G, 'fuel', 'The fuel ran out.'); return; } }
   ev(G, { t: 'endround' });
   if (isFinal(G)) {
@@ -261,16 +263,17 @@ function validMoves(G, seat) {
   }
   if (G.phase !== 'place') return out;
   if (G.pend) { pendMoves(G, seat, out); if (G.mods.real) out.push({ t: 'timeout' }); return out; }
-  if (G.turn !== seat) return out;
-  const h = unusedDice(G, seat); if (!h.length) return out;
-  const start = out.length; placeMoves(G, seat, out);
-  const placed = out.length > start;
-  if (!placed) for (const i of h) out.push({ t: 'toss', d: i });
-  if (G.rrHand > 0) out.push({ t: 'rr' });
-  if (G.abil.includes('antic') && seat === G.first && !G.fl.antic && !Object.values(G.slots).some(x => x.s === seat)) for (const i of h) out.push({ t: 'antic', d: i });
+  const h = unusedDice(G, seat);
+  if (G.turn === seat && h.length) {
+    const start = out.length; placeMoves(G, seat, out);
+    if (out.length === start) for (const i of h) out.push({ t: 'toss', d: i });
+  }
+  // free actions: "at any time during the round", so either seat may use them while no question is open, not only on its own turn
+  if (G.rrHand > 0 && (h.length || unusedDice(G, 1 - seat).length)) out.push({ t: 'rr' });
+  if (G.turn === seat && h.length && G.abil.includes('antic') && seat === G.first && !G.fl.antic && !Object.values(G.slots).some(x => x.s === seat)) for (const i of h) out.push({ t: 'antic', d: i });
   if (G.abil.includes('adapt') && !G.adaptUsed[seat]) for (const i of h) out.push({ t: 'adapt', d: i });
   if (G.abil.includes('together') && !G.fl.wt && unusedDice(G, 1 - seat).length) for (const i of h) out.push({ t: 'wt', d: i });
-  if (G.mods.real) out.push({ t: 'timeout' });
+  if (G.mods.real && G.turn === seat) out.push({ t: 'timeout' });
   return out;
 }
 const SAYS = ['adv0', 'adv1', 'adv2', 'plane', 'level', 'gear', 'flaps', 'brakes', 'coffee', 'slow', 'fuel', 'trainee', 'first', 'ok'];
@@ -315,12 +318,13 @@ function performMove(G, m, seat, trust) {
       break;
     }
     case 'toss': {
-      if (m.d === 'p') G.pend = null; else G.dice[seat][m.d].u = true;
+      if (m.d === 'p') { const p = G.pend; G.pend = null; if (p && p.h === 'intern') { if (p.d.seat === 0) G.intern.unshift(p.d.val); else G.intern.push(p.d.val); G.internUsed--; ev(G, { t: 'internback', seat, val: p.d.val }); lg(G, 'The trainee token ' + p.d.val + ' has nowhere to go and goes back to the row.'); use(G, 'internBack'); } }
+      else G.dice[seat][m.d].u = true;
       ev(G, { t: 'toss', seat, d: m.d }); lg(G, (seat === 0 ? 'Pilot' : 'Co-pilot') + ' has no legal place and puts a die aside.'); use(G, 'toss');
       nextTurn(G, G.turn);
       break;
     }
-    case 'rr': G.rrHand--; G.pend = { h: 'rr', d: { m: [null, null], by: seat } }; ev(G, { t: 'rruse', seat }); lg(G, 'A reroll token is spent: both crew may reroll.'); use(G, 'rerollUse'); break;
+    case 'rr': G.rrHand--; G.pend = { h: 'rr', d: { m: [0, 1].map(s => unusedDice(G, s).length ? null : [false, false, false, false]), by: seat } }; ev(G, { t: 'rruse', seat }); lg(G, 'A reroll token is spent: both crew may reroll.'); use(G, 'rerollUse'); break;
     case 'rrpick': {
       const mask = m.m.map((b, i) => !!b && !G.dice[seat][i].u); G.pend.d.m[seat] = mask; ev(G, { t: 'rrdone', seat });
       if (G.pend.d.m[0] && G.pend.d.m[1]) {
@@ -414,7 +418,7 @@ function toText(G, seat) {
   return L.join('\n');
 }
 
-Object.assign(FA, { newGame, validMoves, performMove, sideToAct, pending: pendingSeats, stripView, checkInvariants, toText, clone, cloneLite, rnd, d6, shuffle, SLOT, SAYS, slotKeys, fits, scen, track, altRow, isFinal, brakeVal, windMod, planesOnTrack, unusedDice, rrReserve, landingChecks, niceSlot,
+Object.assign(FA, { cleanAbil, newGame, validMoves, performMove, sideToAct, pending: pendingSeats, stripView, checkInvariants, toText, clone, cloneLite, rnd, d6, shuffle, SLOT, SAYS, slotKeys, fits, scen, track, altRow, isFinal, brakeVal, windMod, planesOnTrack, unusedDice, rrReserve, landingChecks, niceSlot,
   _: { startRound, rollDice, endRound, lose, advance, applyEffect, afterAxis, afterEngines, nextTurn, removePlane, ALLKEYS } });
 if (typeof module === 'object' && module.exports) module.exports = FA;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -57,7 +57,8 @@ function run(cf, seed) {
             if (process.env.CLICKDBG && steps % 400 === 0) console.log('dbg', cf.name, 'steps', steps, 'round', G.round, 'phase', G.phase, 'pend', JSON.stringify(G.pend && G.pend.h), 'turn', G.turn, 'ready', JSON.stringify(G.ready), 'clicks', clicks, 'placed', placed, 'rs', !d.querySelector('#rs').hidden, 'busy', w.eval('UI.busy'), 'mode', w.eval('UI.mode'), 'secs', Math.round((Date.now() - t0) / 1000));
             const v = w.eval('viewSeat()'), hot = w.eval("UI.mode === 'hot'"), holder = w.eval('UI.holder');
             // hidden dice: a die face with a number must belong to the viewer (or everyone is shown in watch mode)
-            for (const el of d.querySelectorAll('#pz .die')) { const s = +el.getAttribute('data-s'), dv = el.querySelector('.dv'); if (dv && /^[1-6]$/.test(dv.textContent) && v !== 'all' && s !== v) { hidden++; if (errs.length < 6) errs.push('HIDDEN die of seat ' + s + ' visible to ' + v); } if (dv && /^[1-6]$/.test(dv.textContent) && hot && holder < 0) { hidden++; errs.push('die shown with no holder'); } }
+            for (const el of d.querySelectorAll('#pz .die:not([data-d="p"])')) {   // the trainee token / cross-check die are public
+              const s = +el.getAttribute('data-s'), dv = el.querySelector('.dv'); if (dv && /^[1-6]$/.test(dv.textContent) && v !== 'all' && s !== v) { hidden++; if (errs.length < 6) errs.push('HIDDEN die of seat ' + s + ' visible to ' + v); } if (dv && /^[1-6]$/.test(dv.textContent) && hot && holder < 0) { hidden++; errs.push('die shown with no holder'); } }
             const rsOpen = !d.querySelector('#rs').hidden;
             const q = s => [...d.querySelectorAll(s)].filter(b => !b.disabled && !b.closest('[hidden]'));
             if (!rsOpen || !G.result) { const inv = w.eval('FA.checkInvariants(G)'); if (inv.length && errs.length < 5) errs.push('INV ' + inv[0]); }
@@ -73,14 +74,14 @@ function run(cf, seed) {
             const pass = q('#pass [data-a=take]'); if (pass.length) { click(pass[0]); seen.add('pass card'); clicks++; return; }
             const tip = q('#pc [data-a=tipok],#pc [data-a=tipoff]'); if (tip.length) { click(R() < .8 ? tip[0] : tip[tip.length - 1]); seen.add('tip'); clicks++; return; }
             const seats = w.eval('FA.pending(G).filter(s => !G.ai[s])');
-            const mine = hot ? seats.includes(holder) : seats.includes(v);
+            const act = w.eval('actSeat()'); const mine = seats.includes(act);   // hot-seat: the holder, or the seat deciding on the shared screen (briefing, public tokens)
             if (mine) {
               const r = R();
               if (r < .02) { const t = rnd(q('.gx-bar [data-gx]')); if (t) { click(t); seen.add('drawer:' + t.dataset.gx); const x = d.querySelector('.gx-drawer.on .gx-x'); if (x) click(x); } return; }
               if (r < .04) { const sp = q('#pz .sp'); if (sp.length) { click(rnd(sp)); seen.add('space'); return; } }
               // most of the time the computer crew logic suggests the move and it is carried out with real taps (so the game reaches the later rounds); the rest is random
               if (G.phase !== 'brief' && R() < .8) {
-                const seat = hot ? holder : v, mv = w.eval(`FA.AI.move(G, ${seat}, 'normal', { noMC: true })`), dieBtn = i => d.querySelector(`#pz .die[data-s="${seat}"][data-d="${i}"]:not([disabled])`);
+                const seat = act, mv = w.eval(`FA.AI.move(G, ${seat}, 'normal', { noMC: true })`), dieBtn = i => d.querySelector(`#pz .die[data-s="${seat}"][data-d="${i}"]:not([disabled])`);
                 if (mv && mv.t === 'place') { const b = dieBtn(mv.d); if (b) { click(b); w.eval(`UI.cof=${mv.c || 0};render()`); const sl = d.querySelector(`#pz .slot[data-slot="${mv.to}"]`); if (sl) { click(sl); placed++; clicks++; seen.add('place (suggested)'); return; } } }
                 else if (mv && mv.t === 'rr') { const b = q('#acts [data-a=rr]'); if (b.length) { click(b[0]); seen.add('reroll'); return; } }
                 else if (mv && mv.t === 'rrpick') { const cur = w.eval('UI.rrm.slice()'); let did = false; mv.m.forEach((on, i) => { if (on !== !!cur[i]) { const b = dieBtn(i); if (b && !did) { click(b); did = true; } } }); if (did) return; const rp = q('#acts [data-a=rrpick]'); if (rp.length) { click(rp[0]); seen.add('reroll confirm'); return; } }

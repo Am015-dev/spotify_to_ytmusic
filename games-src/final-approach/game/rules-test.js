@@ -266,6 +266,45 @@ t('hand-over: either player puts an unplaced die there, the other must too, valu
   const V = FA.stripView((() => { const H = T.round('g6', 54, [1, 2, 3, 3], [6, 5, 4, 4], { abil: ['together'] }); T.mv(H, 0, { t: 'wt', d: 2 }); return H; })(), 1); eq(V.pend.d.ai, -1, 'the partner does not learn which die');
 });
 
+// ---------- fix round: audit findings ----------
+t('reroll token: either crew may spend it at any time while a die is unplaced, also off their turn and with no dice of their own left', () => {
+  let G = T.round('g1', 2, [3, 3, 3, 3], [3, 3, 3, 3]); eq(G.turn, 0); ok(FA.validMoves(G, 1).some(m => m.t === 'rr'), 'the co-pilot may spend it on the pilot turn');
+  ok(!FA.validMoves(G, 1).some(m => m.t === 'place'), 'but may not place off turn'); T.mv(G, 1, { t: 'rr' }); eq(G.pend.h, 'rr'); eq(FA.pending(G), [0, 1]);
+  G = T.round('g1', 2, [3], [3, 3, 3, 3]); T.put(G, 0, 3, 'co0'); eq(FA.unusedDice(G, 0).length, 0); eq(G.turn, 1);
+  ok(FA.validMoves(G, 0).some(m => m.t === 'rr'), 'a pilot with no dice left may still spend it for the co-pilot'); T.mv(G, 0, { t: 'rr' });
+  eq(FA.pending(G), [1], 'the pilot has nothing to reroll, so only the co-pilot is asked'); eq(G.pend.d.m[0], [false, false, false, false]);
+  T.mv(G, 1, { t: 'rrpick', m: [true, false, false, false] }); ok(!G.pend); T.inv(G);
+  G = T.round('g1', 2, [3, 3, 3, 3], [3, 3, 3, 3]); T.mv(G, 0, { t: 'rr' }); ok(!FA.validMoves(G, 1).some(m => m.t === 'rr'), 'not while a question is open');
+  G = T.game('g1', 2); ok(!FA.validMoves(G, 0).some(m => m.t === 'rr'), 'not during the briefing (no dice yet)');
+});
+t('ability cards in newGame: only known ids, no duplicates, clamped to the scenario count', () => {
+  eq(T.game('g1', 1, { abil: ['antic', 'adapt'] }).abil, [], '0-card scenario'); eq(T.game('y3', 1, { abil: ['antic', 'adapt'] }).abil, ['antic'], '1-card scenario');
+  eq(T.game('g6', 1, { abil: ['bogus', 'antic', 'antic', 'sync', 'mastery'] }).abil, ['antic', 'sync']); eq(T.game('g6', 1, { abil: 'antic' }).abil, []); eq(T.game('g6', 1, { abil: [{}, 3, 'toString'] }).abil, []);
+});
+t('trainee: a token with nowhere to go goes back to its end of the row and does not count as trained', () => {
+  const G = T.round('g5', 3, [1, 3, 3, 3], [3, 3, 3, 3]); G.intern = [6, 2, 3, 4, 5, 1];
+  for (const k of G.keys) if (k !== 'in0' && k !== 'in1') { const S = FA.SLOT[k]; G.slots[k] = { s: S.s === null ? 0 : S.s, v: S.vals ? S.vals[0] : 3, k: 'x' }; }
+  T.put(G, 0, 1, 'in0'); eq(G.pend && G.pend.h, 'intern'); eq(G.pend.d.val, 6); eq(G.internUsed, 1);
+  const mv = FA.validMoves(G, 0); eq(mv, [{ t: 'toss', d: 'p' }]); T.mv(G, 0, mv[0]);
+  eq(G.intern, [6, 2, 3, 4, 5, 1], 'token 6 is back at the pilot end'); eq(G.internUsed, 0); ok(!G.pend); eq(G.turn, 1, 'the turn passes once'); T.inv(G);
+  const H = T.round('g5', 3, [3, 3, 3, 3], [2, 3, 3, 3]); H.intern = [6, 2, 3, 4, 5, 1];
+  for (const k of H.keys) if (k !== 'in0' && k !== 'in1') { const S = FA.SLOT[k]; H.slots[k] = { s: S.s === null ? 1 : S.s, v: S.vals ? S.vals[0] : 3, k: 'x' }; }
+  T.put(H, 1, 2, 'in1'); eq(H.pend.d.val, 1); T.mv(H, 1, { t: 'toss', d: 'p' }); eq(H.intern, [6, 2, 3, 4, 5, 1], 'co-pilot token goes back to the co-pilot end'); T.inv(H);
+});
+t('flip side and hand-over: usable at any time by either crew while no question is open (not only on their own turn)', () => {
+  let G = T.round('g6', 51, [2, 3, 3, 3], [4, 3, 3, 3], { abil: ['adapt', 'together'] }); eq(G.turn, 0);
+  ok(FA.validMoves(G, 1).some(m => m.t === 'adapt'), 'co-pilot may flip on the pilot turn'); T.mv(G, 1, { t: 'adapt', d: 0 }); eq(G.dice[1][0].v, 3); eq(G.turn, 0, 'the turn does not change');
+  ok(FA.validMoves(G, 1).some(m => m.t === 'wt'), 'co-pilot may start a hand-over on the pilot turn'); T.mv(G, 1, { t: 'wt', d: 1 }); eq(FA.pending(G), [0]);
+  ok(!FA.validMoves(G, 1).some(m => m.t === 'adapt' || m.t === 'rr'), 'nothing else while the hand-over waits'); T.mv(G, 0, { t: 'wt2', d: 0 }); eq(G.dice[0][0].v, 3); eq(G.dice[1][1].v, 2); eq(G.turn, 0); T.inv(G);
+  G = T.round('g6', 51, [2], [4, 3, 3, 3], { abil: ['together'] }); T.put(G, 0, 2, 'co0'); ok(!FA.validMoves(G, 1).some(m => m.t === 'wt'), 'no hand-over when the partner has no die left');
+});
+
+t('end of round: a missing mandatory die loses and the result names whose die it was', () => {
+  const G = T.round('g1', 5, [3, 3], [3, 3]); T.put(G, 0, 3, 'ax0'); T.put(G, 1, 3, 'ax1'); T.put(G, 0, 3, 'co0'); T.put(G, 1, 3, 'en1');
+  eq(G.result && G.result.why, 'mandatory'); eq(G.result.miss, ['en0']); ok(/Pilot's engine die/.test(G.result.msg), G.result.msg);
+  const V = FA.netStrip ? FA.netStrip(G, 1) : require('./src/netstrip.js')(G, 1); eq(V.result.miss, ['en0'], 'online guests learn it too');
+});
+
 // ---------- real time, tosses ----------
 t('against the clock: when the timer runs out unplaced dice are ignored; missing axis or engine dice lose', () => {
   let G = T.round('r1', 60, [3, 3, 3, 3], [3, 3, 3, 3]); ok(FA.validMoves(G, 0).some(m => m.t === 'timeout')); T.put(G, 0, 3, 'ax0'); T.put(G, 1, 3, 'ax1'); T.put(G, 0, 3, 'en0'); T.put(G, 1, 3, 'en1'); G.planes = D.tracks['cls-r'].sp.map(() => 0); T.mv(G, 0, { t: 'timeout' }); ok(!G.result, 'both mandatory pairs done'); eq(G.round, 1);

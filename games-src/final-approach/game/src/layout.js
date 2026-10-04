@@ -21,14 +21,15 @@ function build(mode, LW, LH, mods, me) {
     slot('ra0', 52, A); slot('lg0', 148, A); slot('lg1', 244, A); slot('lg2', 340, A);
     slot('ax0', 434, A); slot('ax1', 686, A); r.dial = R(560, A, 104, 104);
     slot('fl0', 776, A); slot('fl1', 872, A); slot('fl2', 968, A); slot('fl3', 1064, A);
-    if (ice) { for (let i = 0; i < 4; i++) { slot('it' + i, 52 + i * 96, B); slot('ib' + i, 52 + i * 96, C); } }
-    else { slot('br0', 52, B); slot('br1', 148, B); slot('br2', 244, B); if (mods.kero) slot('ke', 340, B); }
+    // brakes (or the icy-runway columns) on the left with the brake readout (r.brk) right after them; the fuel space sits in the bottom row so the readout has room
+    if (ice) { for (let i = 0; i < 4; i++) { slot('it' + i, 52 + i * 96, B); slot('ib' + i, 52 + i * 96, C); } r.brk = R(450, C, 92, 44); }
+    else { slot('br0', 52, B); slot('br1', 148, B); slot('br2', 244, B); r.brk = R(341, B, 92, 44); if (mods.kero) slot('ke', 52, C); }
     slot('en0', 434, B); slot('en1', 686, B); r.gauge = R(560, B + 4, 162, 92);
     slot('ra1', 776, B); slot('ra2', 872, B); r.rerolls = R(1010, B, 130, 60);
-    slot('co0', 464, C); slot('co1', 560, C); slot('co2', 656, C); r.coffee = R(560, C + 62, 290, 24);
+    const cx = ice ? 656 : 560; slot('co0', cx - 96, C); slot('co1', cx, C); slot('co2', cx + 96, C); r.coffee = R(cx, C + 62, 290, 24);
     if (mods.intern) { slot('in0', 776, C); slot('in1', 1064, C); r.tokens = { x: 822, y: C - 22, w: 196, h: 44 }; }
-    if (!ice) { if (mods.wind) r.wind = R(70, C, 84, 84); if (mods.kero || mods.leak) r.fuel = { x: mods.wind ? 124 : 30, y: C - 12, w: mods.wind ? 280 : 370, h: 26 }; }
-    else { if (mods.wind) r.wind = R(790, C, 84, 84); if (mods.kero || mods.leak) r.fuel = { x: mods.wind ? 846 : 780, y: C - 12, w: mods.wind ? 250 : 316, h: 26 }; }
+    if (!ice) { const x0 = mods.kero ? 104 : 20; if (mods.wind) r.wind = R(x0 + 50, C, 84, 84); if (mods.kero || mods.leak) r.fuel = { x: mods.wind ? x0 + 100 : x0 + 10, y: C - 12, w: (mods.wind ? 410 - x0 - 100 : 410 - x0 - 10), h: 26 }; }
+    else { if (mods.wind) r.wind = R(1064, C, 84, 84); if (mods.kero || mods.leak) r.fuel = { x: 812, y: C - 12, w: mods.wind ? 196 : 290, h: 26 }; }
     const T = C + 130; r.ch = T + 58;
     r.trayP = { x: 12, y: T - 52, w: 460, h: 104 }; r.trayC = { x: 648, y: T - 52, w: 460, h: 104 };
     r.hud = R(560, T, 170, 100);
@@ -39,19 +40,21 @@ function build(mode, LW, LH, mods, me) {
     const A = wh + 10 + 58 + 10 + 48, B = A + 104;
     slot('ax0', 230, A); slot('ax1', 570, A); r.dial = R(400, A, 120, 120);
     slot('en0', 230, B); slot('en1', 570, B); r.gauge = R(400, B + 8, 230, 108);
-    // pilot column (left) / co-pilot column (right): eight slots across the 800 wide panel
-    const P1 = B + 104, P2 = P1 + 100;
-    slot('ra0', 50, P1); slot('lg0', 150, P1); slot('lg1', 250, P1); slot('lg2', 350, P1);
-    if (ice) { for (let i = 0; i < 4; i++) { slot('it' + i, 50 + i * 100, P2); slot('ib' + i, 50 + i * 100, P2 + 100); } }
-    else { slot('br0', 50, P2); slot('br1', 150, P2); slot('br2', 250, P2); }
-    slot('fl0', 450, P1); slot('fl1', 550, P1); slot('fl2', 650, P1); slot('fl3', 750, P1);
-    slot('ra1', 650, P2); slot('ra2', 750, P2);
+    // pilot column (left) / co-pilot column (right): eight slots across the 800 wide panel, kept 9 units in from the edges so a glow is never cut off
+    const P1 = B + 104, P2 = P1 + 100, X = i => 57 + 98 * i;
+    slot('ra0', X(0), P1); slot('lg0', X(1), P1); slot('lg1', X(2), P1); slot('lg2', X(3), P1);
+    if (ice) { for (let i = 0; i < 4; i++) { slot('it' + i, X(i), P2); slot('ib' + i, X(i), P2 + 100); } }
+    else { slot('br0', X(0), P2); slot('br1', X(1), P2); slot('br2', X(2), P2); }
+    r.brk = ice ? R(X(3) + 48 + 50, P2 + 100, 92, 44) : R(X(2) + 48 + 50, P2, 92, 44);
+    slot('fl0', X(4), P1); slot('fl1', X(5), P1); slot('fl2', X(6), P1); slot('fl3', X(7), P1);
+    slot('ra1', X(6), P2); slot('ra2', X(7), P2);
     const R3 = P2 + (ice ? 200 : 100); let C2 = R3;
-    if (mods.kero) slot('ke', 450, P2);
-    if (mods.intern) { slot('in0', 150, R3); slot('in1', 650, R3); r.tokens = { x: 220, y: R3 - 22, w: 360, h: 44 }; C2 = R3 + 100; }
-    slot('co0', 300, C2); slot('co1', 400, C2); slot('co2', 500, C2); r.coffee = R(400, C2 + 62, 300, 24); r.rerolls = R(680, C2 + 6, 150, 60);
-    if (mods.wind) r.wind = R(110, C2, 90, 90);
-    if (mods.kero || mods.leak) r.fuel = { x: 14, y: C2 + 52, w: 230, h: 26 };
+    if (mods.kero) slot('ke', X(5), P2);
+    if (mods.intern) { slot('in0', X(1), R3); slot('in1', X(6), R3); r.tokens = { x: 220, y: R3 - 22, w: 360, h: 44 }; C2 = R3 + 100; }
+    slot('co0', 290, C2); slot('co1', 400, C2); slot('co2', 510, C2); r.coffee = R(400, C2 + 62, 300, 24); r.rerolls = R(680, C2 + 6, 150, 60);
+    const fuel = mods.kero || mods.leak;
+    if (mods.wind) r.wind = fuel ? R(58, C2, 84, 84) : R(110, C2, 90, 90);
+    if (fuel) r.fuel = { x: mods.wind ? 106 : 14, y: C2 - 13, w: mods.wind ? 128 : 220, h: 26 };   // in the coffee row, clear of the tray labels
     const T = C2 + 140; r.ch = T + 64;
     const wm = 490, wo = 292, th = 124; if (me === 0) { r.trayP = { x: 8, y: T - 62, w: wm, h: th }; r.trayC = { x: 8 + wm + 6, y: T - 62, w: wo, h: th }; } else if (me === 1) { r.trayP = { x: 8, y: T - 62, w: wo, h: th }; r.trayC = { x: 8 + wo + 6, y: T - 62, w: wm, h: th }; } else { r.trayP = { x: 8, y: T - 62, w: 388, h: th }; r.trayC = { x: 404, y: T - 62, w: 388, h: th }; }
     r.lw = LW; r.lh = r.ch;

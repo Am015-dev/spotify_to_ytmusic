@@ -12,19 +12,20 @@
   <button class="gx-ibtn" data-gx="setd" aria-expanded="false" aria-label="Menu" title="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
 </header>
 <div class="gx-main">
-  <main class="gx-board" id="board" aria-label="The control panel"><div id="bd"><div id="pz" role="group" aria-label="Cockpit control panel"></div><div id="endv"></div></div></main>
+  <main class="gx-board" id="board" aria-label="The control panel"><div id="bd"><div id="pz" role="group" aria-label="Cockpit control panel"></div><div id="recap" hidden data-a="recapx"></div><div id="endv"></div></div></main>
   <aside class="gx-dock" id="dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-dt">Cockpit</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">&#8677;</button></div>
     <div class="gx-dock-body" id="dockbody">
       <div id="promptDock"><div id="prompt" aria-live="polite"></div></div>
+      <div class="tipb" id="pc" hidden role="region" aria-label="Tip"></div>
+      <div id="feed" hidden aria-live="polite"></div>
+      <div id="selinfo"></div>
       <div id="rt"></div>
       <div id="says"></div>
       <div id="roster"></div>
-      <div id="selinfo"></div>
       <div id="acts"></div>
       <div id="cheat"></div>
     </div>
-    <div class="pcard" id="pc" hidden role="dialog" aria-label="Message"></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock">&#9776; Panel</button>
 </div>

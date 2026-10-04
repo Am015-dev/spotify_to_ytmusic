@@ -44,7 +44,8 @@ function schedule() {
   if (UI.mode === 'net' && typeof isClient === 'function' && isClient()) return;
   const seats = FA.pending(G); if (!seats.length) return;
   const myUi = seats.filter(s => !G.ai[s]);
-  if (UI.mode === 'hot') { if (myUi.length && !myUi.includes(UI.holder)) { showPass(myUi[0]); return; } }
+  // hot-seat: hand the device over only when the next decision needs a player's hidden dice; the briefing and public tokens are done on the shared screen
+  if (UI.mode === 'hot') { if (hiddenFree() && (G.phase === 'brief' || !myUi.includes(UI.holder))) { if (UI.holder >= 0) { UI.holder = -1; UI.sel = -1; render(); } } else if (myUi.length && !myUi.includes(UI.holder)) { showPass(myUi[0]); return; } }
   const aiSeat = seats.find(s => G.ai[s]);
   if (aiSeat != null) {
     const seq = UI.seq, delay = G.phase === 'brief' ? Math.min(AIDELAY, 500) : AIDELAY, aiS = aiSeat;
@@ -54,19 +55,22 @@ function schedule() {
 // ---- human actions
 function dieTap(s, d) {
   if (!mayAct(s)) { if (G.phase === 'place' && !G.result) toast(s === viewSeat() ? 'Not your move yet.' : 'Those dice are hidden behind the screen.'); return; }
-  const v = viewSeat(); if (v !== s) return;
+  const v = actSeat(); if (v !== s) return;
   if (G.pend && G.pend.h === 'rr') { if (!G.pend.d.m[s] && typeof d === 'number' && !G.dice[s][d].u) { UI.rrm[d] = !UI.rrm[d]; render(); } return; }
   if (G.pend && G.pend.h === 'wt' && G.pend.d.a !== s) { const m = { t: 'wt2', d }; if (FA.validMoves(G, s).some(x => x.t === 'wt2' && x.d === d)) commit(s, m); return; }
   if (G.turn !== s && !(G.pend && (G.pend.h === 'intern' || G.pend.h === 'sync'))) { toast('Not your move yet.'); return; }
   if (G.dice[s][d] && G.dice[s][d].u && d !== 'p') return;
-  UI.sel = UI.sel === d ? -1 : d; UI.cof = 0; UI.hint = null; snd('click'); render();
+  UI.sel = UI.sel === d ? -1 : d; UI.cof = 0; UI.hint = null; UI.warnK = null; snd('click'); render();
 }
 function slotTap(k) {
-  const v = viewSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v)) { if (G && !G.result) toast('Wait for your turn.'); return; }
+  const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v)) { if (G && !G.result) toast('Wait for your turn.'); return; }
   if (G.slots[k]) { toast(slotName(k) + ' is taken this round.'); return; }
   if (UI.sel === -1 || UI.sel == null) { toast('Pick a die first.'); return; }
   const m = { t: 'place', d: UI.sel, to: k, c: UI.cof };
-  if (FA.validMoves(G, v).some(x => x.t === 'place' && x.d === m.d && x.to === k && (x.c || 0) === m.c)) { sendMove(v, m); return; }
+  if (FA.validMoves(G, v).some(x => x.t === 'place' && x.d === m.d && x.to === k && (x.c || 0) === m.c)) {
+    // the last dice are needed on the empty Axis / Engines: a second tap on the same space places anyway
+    const mi = mandInfo(v); if (UI.sel !== 'p' && mi && mi.tight && !mi.lost && !mi.need.includes(k) && UI.warnK !== k) { UI.warnK = k; snd('error'); toast('Careful: the ' + needNames(mi.need) + ' would stay empty and the flight is lost at the end of the round. Tap again to place it anyway.'); return; }
+    UI.warnK = null; sendMove(v, m); return; }
   const val = (UI.sel === 'p' ? G.pend.d.val : G.dice[v][UI.sel].v) + UI.cof; const S = FA.SLOT[k];
   const why = S.s !== null && S.s !== v ? 'That space belongs to the ' + (S.s === 0 ? 'pilot' : 'co-pilot') + '.' : (S.grp === 'flaps' && S.ix > 0 && !G.pl.sw.fl[S.ix - 1]) ? 'Flaps go in order: use the one above first.' : (S.grp === 'brakes' && S.ix > 0 && !G.pl.sw.br[S.ix - 1]) ? 'Brakes go in order: 2, then 4, then 6.' : (S.grp === 'ice' && S.ix !== G.pl.ice) ? 'Only the next icy-runway column can be used.' : (S.grp === 'intern' && G.intern.length && val === (v === 0 ? G.intern[0] : G.intern[G.intern.length - 1])) ? 'The die must differ from the next trainee token.' : S.vals ? slotName(k) + ' ' + slotNeed(k) + ' (your die shows ' + val + ').' : 'That does not fit.';
   snd('error'); toast(why);
@@ -74,7 +78,7 @@ function slotTap(k) {
 // route: online clients send to the host, everybody else applies at once
 function sendMove(seat, m) { if (UI.mode === 'net' && typeof isClient === 'function' && isClient()) { if (typeof netAct === 'function') netAct(m); UI.sel = -1; UI.cof = 0; render(); return; } commit(seat, m); }
 function doAction(a, t) {
-  const v = viewSeat(); if (typeof v !== 'number' || v < 0) return;
+  const v = actSeat(); if (typeof v !== 'number' || v < 0) return;
   const mv = FA.validMoves(G, v);
   switch (a) {
     case 'ready': sendMove(v, { t: 'ready' }); break;
@@ -87,12 +91,12 @@ function doAction(a, t) {
   }
 }
 function showHint() {
-  const v = viewSeat(); if (typeof v !== 'number' || !mayAct(v)) return;
+  const v = actSeat(); if (typeof v !== 'number' || !mayAct(v)) return;
   try {
     const m = FA.AI.move(G, v, 'normal', { noMC: true }); if (!m) { toast('No suggestion.'); return; }
     let why = whyMove(m, v), d = m.d;
-    UI.hint = { d: m.t === 'place' || m.t === 'toss' ? d : null, why };
-    if (m.t === 'place') { UI.sel = d; UI.cof = m.c || 0; } toast('Hint: ' + why);
+    UI.hint = { d: m.t === 'place' || m.t === 'toss' ? d : null, why: 'Hint: ' + why };
+    if (m.t === 'place') { UI.sel = d; UI.cof = m.c || 0; }   // the reason shows in the dock under the die, never as a toast over the buttons
   } catch (e) { console.error(e); }
   render();
 }
@@ -108,7 +112,7 @@ function whyMove(m, v) {
     case 'engines': return pre + 'on the engines ' + (G.slots.en0 || G.slots.en1 ? 'finishes the speed. Check the markers: ' + G.pl.aeroB + ' and ' + G.pl.aeroO + '.' : 'sets the speed for the round; your crewmate completes it.');
     case 'gear': return pre + 'lowers a landing gear (needed to land); the blue marker moves up.';
     case 'flaps': return pre + 'extends a flap (needed to land); the orange marker moves up.';
-    case 'brakes': case 'ice': return pre + 'sets a brake: the last-round speed must stay under the brake value.';
+    case 'brakes': case 'ice': return pre + 'sets a brake: the last-round speed must be no more than the brake value.';
     case 'conc': return pre + 'on Concentration earns a coffee token to bend a later die by one.';
     case 'kero': return pre + 'on the fuel space burns ' + val + '; skipping it would burn 6.';
     case 'intern': return pre + 'trains the trainee: take the next token and place it too.';
@@ -118,8 +122,8 @@ function whyMove(m, v) {
 // ---- pass-the-device screens (hot-seat)
 function showPass(seat) {
   UI.holder = -1; const el = $('#pass'); if (!el) return; el.hidden = false; el.innerHTML = '';
-  const waiting = G.phase === 'brief' ? 'briefing' : G.pend && G.pend.h === 'rr' ? 'reroll choice' : 'turn';
-  el.appendChild(h('div.passbox', ART['crew-' + seat] ? h('img', { src: ART['crew-' + seat], alt: '' }) : null, h('h2', 'Pass to ' + name(seat)), h('p', pname(seat) + ' (' + (seat ? 'orange' : 'blue') + '), it is your ' + waiting + '. Make sure only you can see the screen.'), h('p.sm', 'Your dice are hidden until you tap the button.'), h('button.btn.go', { type: 'button', 'data-a': 'take', 'data-s': seat }, "I'm " + pname(seat) + ' – show my dice')));
+  const waiting = G.pend && G.pend.h === 'rr' ? 'reroll choice' : G.pend && G.pend.h === 'wt' ? 'hand-over choice' : 'turn';
+  el.appendChild(h('div.passbox', ART['crew-' + seat] ? h('img', { src: ART['crew-' + seat], alt: '' }) : null, h('h2', 'Pass to ' + name(seat)), h('p', name(seat) + ', ' + pname(seat) + ' (' + (seat ? 'orange' : 'blue') + '): it is your ' + waiting + '. Make sure only you can see the screen.'), h('p.sm', 'Your dice are hidden until you tap the button.'), h('button.btn.go', { type: 'button', 'data-a': 'take', 'data-s': seat }, "I'm " + name(seat) + ' – show my dice')));
   render();
 }
 function takeDevice(seat) { UI.holder = seat; closePass(); render(); schedule(); }
