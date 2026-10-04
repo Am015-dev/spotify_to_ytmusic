@@ -128,9 +128,9 @@ Object.assign(PHN,{
     if(!w)return false;const f=phFeatAt(k,w);if(!f)return false;this.info=f;this.pop='info';this.render(true);return true}
 });
 // ---------- strip, chips, bar ----------
-function phChips(){if(!G)return '';const cur=sideToAct();let add=null;try{add=finalScores().add}catch(e){}const long=G.pl.length<=3;
+function phChips(){if(!G)return '';const cur=sideToAct();let add=null;try{add=finalScores().add}catch(e){}const long=G.pl.length<=2&&document.documentElement.classList.contains('ph-p');
   return G.pl.map(p=>{const a=add&&add[p.i];const proj=p.score+(a?a.road+a.town+a.priory+a.field+a.goods:0);
-    return `<button class="pchip${cur===p.i&&!G.over?' cur':''}" style="--pc:${PCOL[p.i]}" data-gx="plrd" aria-label="${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''}: ${p.score} points, ${proj} if the game ended now, ${p.sup.f} followers left. Tap for all scores"><span class="pn"><i></i>${esc(long?p.nm:p.nm.charAt(0))}</span><b>${p.score}</b><span class="pf">${ico('meeple')}${p.sup.f}</span>${G.over?'':`<small class="pe">${long?'if it ended: ':'end '}${proj}</small>`}</button>`}).join('')}
+    return `<button class="pchip${cur===p.i&&!G.over?' cur':''}" style="--pc:${PCOL[p.i]}" data-gx="plrd" aria-label="${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''}: ${p.score} points, ${proj} if the game ended now, ${p.sup.f} followers left. Tap for all scores"><span class="pn"><i></i>${esc(long?p.nm:p.nm.charAt(0))}</span><b>${p.score}</b><span class="pf">${ico('meeple')}${p.sup.f}</span>${G.over?'':`<small class="pe">${long?'if it ended: ':'→'}${proj}</small>`}</button>`}).join('')}
 function phBarHTML(){if(!G)return '';const c0=PHN.cards[0];const s=c0&&c0.by!=null&&!G.over?c0.by:sideToAct();const ns=NET.on&&!NET.inLobby?`<span class="netst${NET.hostGone?' bad':''}" title="Online">${esc(netStatus())}</span>`:'';
   const tl=tilesLeft()||(G.step==='place'&&!G.over?'last':0);return `<span class="pb-n" aria-label="${tilesLeft()} tiles left after this one">${ico('tile')}<b>${tl}</b></span>`+(G.over?'<span class="pb-t"><b>Game over</b></span>':s>=0?`<span class="pb-t"><i style="background:${PCOL[s]}"></i><b>${esc(P(s).nm)}</b>${NET.on&&s===NET.mySeat?' <small>(you)</small>':''}</span>`:'')+ns}
 function phZoomRow(){if(!V3.on)return '';const g=PHN.groups();const lab=g.length>1?`<small>${PHN.gi+1}/${g.length}</small>`:'';
@@ -150,7 +150,7 @@ function phPopHTML(){if(!G)return '';if(PHN.cards.length)return '';const hp=me()
   if(hp&&G.step==='place'&&UI.ghost)return phPlacePopup(hp);
   if(hp&&G.step==='fig'&&PHN.figHide!==G.turn+':'+G.step)return phFigPopup(hp);return ''}
 function phCoachTip(){if(!UI.guide||!G||!me()||UI.modal||PHN.cards.length)return;const hp=me(),k=(x)=>'ph_'+x;const tk=G.turn+':'+G.step;const once=(key,txt)=>{if(UI.seen[k(key)]||PHN.tipK===tk)return false;PHN.tipK=tk;UI.seen[k(key)]=G.turn;saveSeen();PHN.add(phCoachCard(key,txt));return true};
-  if(G.step==='place'){once('place',`<b>Goal:</b> most points when the tiles run out (“end” = the score if it ended now). Tap a glowing square to try your tile: edges must match${G.rv?', river to river':''}.`);
+  if(G.step==='place'){once('place',`<b>Goal:</b> most points when the tiles run out (“if it ended” or → is the score if the game ended now). Tap a glowing square to try your tile: edges must match${G.rv?', river to river':''}.`);
     if(hp.sup.f===0)once('nof','<b>No followers left.</b> They come home when their road, town or priory is finished (farmers never do), so try to finish what you started.')}
   else if(G.step==='fig'){once('fig','You may put ONE follower on the tile you just laid, only where nobody stands yet. It scores and comes home when its road, town or priory is finished. Skip if you want to keep it.');
     const ms=figMoves(hp.i).filter(m=>m.act==='fig');if(ms.some(m=>TSEG[G.tiles[G.cur.k].t][m.l].ty==='F'))once('farm','<b>Farmers</b> never come home. At the end a field pays 3 per finished town it touches to whoever has most farmers there.');
