@@ -36,15 +36,18 @@ function phChip(){const c=$('#pchip');if(!c||!G)return;const s=sideToAct();const
   const t=G.over?'Game over':`R${G.round} · ${who}${G.phase==='bid'?' · bid':G.phase==='turn'&&G.step&&me()?' · '+({move:'move',tribe:'tribe',tile:'tile',sell:'sell'}[G.step]||''):''}`;
   if(c.textContent!==t)c.textContent=t;c.setAttribute('aria-label',`Round ${G.round}, ${who}${G.phase==='bid'?', bidding':''}${online()?', online':''}`)}
 function phPanel(el,o){if(!el)return;if(!o){if(!el.hidden){el.hidden=true;el.dataset.h=''}return}
-  const h=`<div class="pp-h"><h3>${o.title}</h3>${o.x?`<button class="pp-x" data-ph="close" aria-label="Close">×</button>`:''}</div><div class="pp-b">${o.body}</div>${o.foot?`<div class="pp-f">${o.foot}</div>`:''}`;
-  el.hidden=false;if(el.dataset.h!==h){const sc=el.querySelector('.pp-b'),top=sc&&el.dataset.k===o.key?sc.scrollTop:0;el.innerHTML=h;el.dataset.h=h;el.dataset.k=o.key||'';const b=el.querySelector('.pp-b');if(b)b.scrollTop=top}}
+  const h=`<div class="pp-h"><h3>${o.title}</h3>${o.x?`<button class="pp-x" data-ph="close" aria-label="Close">×</button>`:''}</div><div class="pp-b">${o.body}</div><div class="pp-more" hidden>▼ more below: scroll</div>${o.foot?`<div class="pp-f">${o.foot}</div>`:''}`;
+  el.hidden=false;if(el.dataset.h!==h){const sc=el.querySelector('.pp-b'),top=sc&&el.dataset.k===o.key?sc.scrollTop:0;el.innerHTML=h;el.dataset.h=h;el.dataset.k=o.key||'';const b=el.querySelector('.pp-b');if(b){b.scrollTop=top;b.onscroll=()=>phMore(el)}}phMore(el)}
+function phMore(el){const b=el.querySelector('.pp-b'),m=el.querySelector('.pp-more');if(b&&m)m.hidden=!(b.scrollHeight>b.clientHeight+6&&b.scrollTop+b.clientHeight<b.scrollHeight-6)}
 // take a prompt from the (hidden) dock, drop the long coach text
 function phDock(sel){const b=$('#dockbody');return b?b.querySelector(sel):null}
 function phClean(n,keepP){if(!n)return '';const c=n.cloneNode(true);for(const e of c.querySelectorAll('.coach,details,.muted.small'))e.remove();if(!keepP)for(const e of c.querySelectorAll('p:not(.small):not(.flav)'))e.remove();return c.innerHTML}
 
 // ---------- cards: one at a time, in priority order ----------
 function phCard(hp){
-  if(G.over){if(PHONE.overDone===G.seed+':'+G.round)return null;const pr=phDock('.prompt');return {key:'over',title:'Result',x:false,body:pr?pr.innerHTML:'',foot:`<button class="btn go" data-ph="cont" data-k="over">Continue</button>${btn({ui:'new'},'New game')}`}}
+  if(G.over){if(PHONE.overDone===G.seed+':'+G.round)return null;const pr=phDock('.prompt');const mp=phMine();const top=mp?(()=>{const sc=G.over.scores.map(x=>({p:P(x.p),t:x.s.total})).sort((a,b)=>b.t-a.t);const won=G.over.win.includes(mp.i);const other=sc.find(x=>x.p!==mp);
+    return `<p class="verdict ${won?'up':'dn'}"><b>${won?(G.over.win.length>1?'You share the win':'You win'):'You lose'}</b>: ${sc.map(x=>`${x.p===mp?'You':esc(x.p.nm)} ${x.t}`).join(' · ')}${other&&!won?` (${sc[0].t-sc.find(x=>x.p===mp).t} behind)`:''}. The table below shows where every point came from.</p>`})():'';
+    return {key:'over',title:'Result',x:false,body:top+(pr?pr.innerHTML:''),foot:`<button class="btn go" data-ph="cont" data-k="over">Continue</button>${btn({ui:'new'},'New game')}`}}
   if(hp&&G.q){const pr=phDock('.prompt');return {key:'q',title:'Your choice',x:false,body:pr?phClean(pr,1):''}}
   const adv=hp&&UI.adv?phDock('.adv'):null;if(adv)return {key:'adv',title:'💡 Advisor',x:false,body:adv.innerHTML.replace(/^\s*<b>💡 Advisor<\/b>/,'')}
   if(PHONE.chapter&&PHONE.chapter.key!==PHONE.chDone&&!UI.modal&&G.phase==='bid'){const c=PHONE.chapter;return {key:'chapter',title:`Round ${c.round}`,x:false,body:`<h3 class="chapt">${esc(c.title)}</h3><p>${c.line}</p>`,foot:`<button class="btn go" data-ph="cont" data-k="chapter">Continue</button>`}}
@@ -54,10 +57,10 @@ function phCard(hp){
       hand:['Leaving people behind','Pick which colour to leave, then tap a glowing tile next to you. The last person must land on a tile that already has their colour.']};
     if(tip&&!PHONE.tips[tip])return {key:'tip-'+tip,title:T[tip][0],x:false,body:`<p>${T[tip][1]}</p>`,foot:`<button class="btn go" data-ph="cont" data-k="tip-${tip}">Continue</button>`}}
   if(hp&&G.phase==='bid'){const pr=phDock('.prompt');if(!pr)return null;const c=pr.cloneNode(true);const rec=c.querySelector('.sp.rec .btn');const ro=c.querySelector('.sp.rec');
-    const top=rec&&ro?`<button class="btn go bidrec" data-mv='${esc(rec.dataset.mv)}'>★ Suggested: ${esc(ro.querySelector('.ord').textContent)} spot · ${ro.querySelector('b').textContent}</button>`:'';
+    const rb=c.querySelector('.sp.rec .btn.go')||rec;const top=rb&&ro?`<button class="btn go bidrec" data-mv='${esc(rb.dataset.mv)}'>★ Suggested: ${esc(ro.querySelector('.ord').textContent)} spot · ${esc(rb.textContent.replace('★','').trim()==='Take'?ro.querySelector('b').textContent:rb.textContent.replace('★','').trim())}</button>`:'';
     const worth=[...c.querySelectorAll('p.small')].map(e=>e.textContent).find(t=>/best move/i.test(t));
     for(const e of c.querySelectorAll('.coach,details,h3,p'))e.remove();
-    return {key:'bid',title:'Bid for turn order',x:false,body:`<p class="small">Higher spots play earlier; coins are points too.${worth?' '+esc(worth):''}</p>${top}`+c.innerHTML}}
+    const two=hp.markers>1;return {key:'bid',title:two?`Bid for turn order (${Math.min(2,G.bids.filter(b=>b.mk.p===hp.i).length+1)} of 2)`:'Bid for turn order',x:false,body:`<p class="small">You have <b>${hp.coins}🪙</b> (coins are points too). Earlier spots play first and get the best moves.${two?' With 2 players you place <b>2 markers</b>: you bid twice and play twice this round.':''}${worth?' '+esc(worth):''}</p>${top}`+c.innerHTML}}
   return null}
 
 // ---------- pop-ups (tap a chip or a tile) ----------
@@ -79,8 +82,10 @@ function phMineP(){const p=phMine();if(!p)return {key:'mine',title:'You',x:true,
   return {key:'mine',title:'Your things',x:true,body:`${playerSheet(p)}${items.length?`<h4>Use now</h4><div class="opts">${powerButtons(p,items)}</div>`:''}`}}
 function phPlayers(){return {key:'players',title:'Players',x:true,body:`<div class="stats">${G.pl.map(statusHtml).join('')}${standing()}</div>`}}
 function phPlansP(hp){if(!hp)return null;const all=curPlans(hp);const n=UI.morePlans?12:5;return {key:'plans',title:'Plans',x:true,body:`<p class="small">A plan is a whole move. Tap Show to see its path, Do this to play it.</p><div class="plans">${all.slice(0,n).map((o,i)=>planHtml(hp,o,i)).join('')}</div>${all.length>n?`<div class="acts"><button class="btn sm ghost" data-ui="moreplans">Show more plans (${all.length})</button></div>`:UI.morePlans?`<div class="acts"><button class="btn sm ghost" data-ui="moreplans">Show fewer</button></div>`:''}`}}
+function phFeed(){const p=phMine();const list=(UI.feed||[]).slice(-14);const since=p?feedSince(p.i):[];
+  return {key:'feed',title:'Why the points changed',x:true,body:list.length?`<p class="small">Most points at the end wins. Every change, newest last:</p><ul class="feed">${list.map(e=>`<li class="${since.includes(e)?'new':''}">${feedLine(e)}</li>`).join('')}</ul>`:'<p class="muted">No points have changed yet.</p>',foot:`<button class="btn sm" data-ph="open" data-k="players">Everyone's points in detail</button>`}}
 function phPowers(hp){const pr=phDock('.powers');return {key:'powers',title:'Powers',x:true,body:pr?pr.innerHTML.replace(/<h4>.*?<\/h4>/,''):'<p class="muted">Nothing to use now.</p>'}}
-function phPop(k,hp){switch(k.kind){case 'info':return phInfo(k.i);case 'market':return phMarket(hp);case 'djinns':return phDjinns(hp);case 'mine':return phMineP();case 'players':return phPlayers();case 'plans':return phPlansP(hp);case 'powers':return phPowers(hp)}return null}
+function phPop(k,hp){switch(k.kind){case 'info':return phInfo(k.i);case 'market':return phMarket(hp);case 'djinns':return phDjinns(hp);case 'mine':return phMineP();case 'players':return phPlayers();case 'plans':return phPlansP(hp);case 'powers':return phPowers(hp);case 'feed':return phFeed()}return null}
 // the decision pop-ups that open by themselves
 function phHandPop(hp){const mv=G.move,vm=validMoves(hp.i),by=a=>vm.filter(m=>m.act===a),steps=by('step');const cols=[...new Set(mv.hand)];
   if(!UI.dropColor||!mv.hand.includes(UI.dropColor))UI.dropColor=cols[0];
@@ -92,10 +97,17 @@ function phHandPop(hp){const mv=G.move,vm=validMoves(hp.i),by=a=>vm.filter(m=>m.
    <p class="small">${UI.autoPlan?'Following your plan…':mv.hand.length===1?'<b>Last one:</b> it must land on a tile with its own colour.':'Tap a glowing tile (or one below) to leave the chosen colour.'}</p>
    ${UI.autoPlan?'':`<div class="drops">${ds}</div>`}
    <p class="small path">${path.join(' → ')}</p>
-   ${plans.length?`<h4>Plans from here</h4><div class="acts">${plans.map(x=>`<button class="btn sm go" data-plando="${x.i}">▶ ${esc(MNAME[x.o.c])} → ${esc(tileName(G.board[x.o.e]))} · +${Math.max(0,Math.round(x.o.v))}★</button>`).join('')}</div>`:''}
+   ${plans.length?`<h4>Plans from here</h4><div class="acts">${plans.map(x=>`<button class="btn sm go" data-plando="${x.i}">▶ ${esc(MNAME[x.o.c])} → ${esc(tileName(G.board[x.o.e]))} · ${planBadge(hp,x.o)}</button>`).join('')}</div>`:''}
    <div class="acts">${undo}</div>`}}
-function phGainPop(hp){const pr=phDock('.prompt');if(!pr)return null;let log=G.log.slice(0,2).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('');
-  const pw=phDock('.powers');return {key:'gain',title:G.step==='tribe'?'Tribe action':G.step==='tile'?'Tile action':G.step==='sell'?'End of turn':'Your choice',x:false,body:`${phClean(pr,1)}${log?`<ol class="mini">${log}</ol>`:''}${pw?`<div class="powers">${pw.innerHTML}</div>`:''}`}}
+// what the normal computer would pick here (cached per decision), shown as a starred option
+function phSuggest(hp){const k=G.logN+'_'+G.step+'_'+hp.i;if(PHONE.sgK===k)return PHONE.sgV;let v='';try{const lv=hp.lv;hp.lv='normal';try{const m=aiMove(hp.i);if(m&&m.act!=='djinn'&&m.act!=='item')v=JSON.stringify(m)}finally{hp.lv=lv}}catch(e){}PHONE.sgK=k;PHONE.sgV=v;return v}
+function phGainPop(hp){const pr=phDock('.prompt');if(!pr)return null;const box=document.createElement('div');box.innerHTML=phClean(pr,1);
+  const sj=phSuggest(hp);const sb=sj&&[...box.querySelectorAll('[data-mv]')].find(b=>b.dataset.mv===sj);
+  if(sb&&box.querySelectorAll('[data-mv]').length>1){const par=sb.parentNode;for(const b of par.querySelectorAll('.btn.go'))if(b!==sb)b.classList.remove('go');sb.classList.add('go');sb.classList.remove('ghost');
+    sb.insertAdjacentHTML('afterbegin','★ ');const first=par.querySelector('[data-mv]');if(first!==sb)par.insertBefore(sb,first);sb.insertAdjacentHTML('beforeend','<small class="sug"> · suggested</small>')}
+  const pw=phDock('.powers');const n=pw?pw.querySelectorAll('[data-mv],[data-pw]').length:0;
+  return {key:'gain',title:G.step==='tribe'?'Tribe action':G.step==='tile'?'Tile action':G.step==='sell'?'End of turn':'Your choice',x:false,body:box.innerHTML,
+    foot:n?`<button class="btn sm" data-ph="open" data-k="powers">✨ Djinn powers you can use (${n})</button>`:''}}
 function phAuto(hp){if(!hp||G.over||G.q||G.phase!=='turn')return null;if(G.step==='move'&&G.move&&G.move.hand&&G.move.hand.length)return phHandPop(hp);if(G.step==='tribe'||G.step==='tile'||G.step==='sell')return phGainPop(hp);return null}
 
 // ---------- the control strip ----------
@@ -104,16 +116,19 @@ function phStrip(hp,pop,card){const m=phMine();const s=sideToAct();let msg='',ac
   else if(!hp){const p=s>=0?P(s):null;msg=p?`${pChip(p)} ${online()&&p.human?'is deciding…':G.phase==='bid'?'is bidding…':'is playing…'}`:'';}
   else if(UI.pendDj){msg=`Tap a glowing tile for <b>${esc(DJ[UI.pendDj.k].n)}</b>`;acts=`<button class="btn sm" data-ui="cancelpw">Cancel</button>`}
   else if(G.phase==='bid'){msg='<b>Bid for turn order</b>'}
-  else if(G.step==='move'&&!G.move){msg='<b>Your move.</b> Tap a glowing tile.';const pl=curPlans(hp);if(pl&&pl[0])acts=`<button class="btn go" data-plando="0">Best plan ▶ <small>+${Math.max(0,Math.round(pl[0].v))}★</small></button><button class="btn" data-ph="open" data-k="plans">Plans</button>`}
+  else if(G.step==='move'&&!G.move){msg='<b>Your move.</b> Tap a glowing tile.';const pl=curPlans(hp);if(pl&&pl[0])acts=`<button class="btn go" data-plando="0">Best plan ▶ <small>${planBadge(hp,pl[0])}</small></button><button class="btn" data-ph="open" data-k="plans">Plans</button>`}
   else if(G.step==='move'&&G.move){msg=`<b>${G.move.hand.length} in hand.</b> Tap a glowing tile.`;if(!pop)acts=`<button class="btn go" data-ph="reopen">Open</button>`}
   else {msg=`<b>${phStep()}</b>`;if(!pop&&!card)acts=`<button class="btn go" data-ph="reopen">Open</button>`}
   const chips=[];
-  if(m)chips.push(`<button class="pk wide" data-ph="open" data-k="mine" aria-label="Your things"><span class="pkn">${esc(m.nm)}</span><span class="pkv">★ <b>${shownTotal(m)}</b> · 🪙 <b>${m.coins}</b> · 🐪 <b>${m.camels}</b></span><span class="pks">🧺 ${m.res.length} · ${mdot('vizier')}${m.vz} · ${mdot('elder')}${m.el}${m.fk?' · 🔮 '+m.fk:''}</span></button>`);
-  chips.push(`<button class="pk" data-ph="open" data-k="players" aria-label="Players and scores"><span class="pkn">Players</span><span class="pkv">${G.pl.map(p=>`<i class="pd" style="--pc:${PCOL[p.i]}"></i>${shownTotal(p)}`).join(' ')}</span></button>`);
+  if(m)chips.push(`<button class="pk wide" data-ph="open" data-k="mine" aria-label="Your things"><span class="pkn">${esc(m.nm)}</span><span class="pkv">★ <b>${shownTotal(m)}</b> · 🪙 <b>${m.coins}</b> · 🐪 <b>${m.camels}</b></span><span class="pks">🧺 ${m.res.length} goods · ${mdot('vizier')} ${m.vz} Advisors · ${mdot('elder')} ${m.el} Sages${m.fk?' · 🔮 '+m.fk+' Mystics':''}</span></button>`);
+  chips.push(`<button class="pk" data-ph="open" data-k="feed" aria-label="Score race: why the points changed"><span class="pkn">★ Most points wins</span><span class="pkv">${G.pl.map(p=>`<i class="pd" style="--pc:${PCOL[p.i]}"></i>${p===m?'You':esc(p.nm)} ${shownTotal(p)}`).join(' ')}</span></button>`);
   chips.push(`<button class="pk" data-ph="open" data-k="market" aria-label="Market"><span class="pkn">🛒 Market</span><span class="pkv">${G.market.map(r=>RICON[r]).join('')||'–'}</span></button>`);
   chips.push(`<button class="pk" data-ph="open" data-k="djinns" aria-label="Djinns on offer"><span class="pkn">🧞 Djinns</span><span class="pkv">${G.djRow.length} on offer</span></button>`);
-  if(hp&&phDock('.powers'))chips.push(`<button class="pk" data-ph="open" data-k="powers"><span class="pkn">✨ Powers</span><span class="pkv">use now</span></button>`);
-  const last=!hp&&!G.over&&G.log[0]?`<p class="ps-log">${esc(G.log[0].t)}</p>`:'';
+  if(hp&&!G.over&&phDock('.powers')&&!UI.pendDj)acts+=`<button class="btn sm" data-ph="open" data-k="powers">✨ Powers</button>`;
+  const mk=m?((UI.feedMark||{})[m.i]||0):0;const fresh=(UI.feed||[]).filter(e=>e.n>mk&&(!hp||e.actor!==m.i));
+  let last='';if(!hp&&!G.over){last=(G.log[0]?`<p class="ps-log">${esc(G.log[0].t)}</p>`:'')+fresh.slice(-2).map(e=>`<p class="ps-log fd">${feedLine(e)}</p>`).join('')}
+  else if(hp&&fresh.length)last=`<p class="ps-log fd">Since your last turn: <b>${feedSum(fresh)}</b> <button class="btn xs" data-ph="open" data-k="feed">Why?</button></p>`;
+  const cw=!G.over?camelWarn():'';if(cw)last=`<p class="ps-warn">⏳ ${cw}</p>`+last;
   return `<div class="ps-main"><div class="ps-msg">${msg}</div><div class="ps-ctl">${acts}</div></div>${last}<div class="ps-chips">${chips.join('')}</div>`}
 
 // ---------- render ----------
@@ -133,8 +148,7 @@ on3DTile=function(i){if(!PHONE.on||!G)return phBoardTap(i);const p=me();PHONE.po
   PHONE.pop={kind:'info',i,sig:phSig()};phRender()};
 const phShowChapter=showChapter;
 showChapter=function(){if(!PHONE.on)return phShowChapter();const key=G.round+'_'+G.seed;if(UI.chapterShown===key)return;UI.chapterShown=key;
-  const sc=G.pl.map(p=>({p,t:scoreOf(p).total})).sort((x,y)=>y.t-x.t);const low=G.pl.filter(p=>p.camels<=3);
-  PHONE.chapter={key,round:G.round,title:chapterTitle(G.round),line:G.round===1?'Bid for turn order, then each player takes their turn.':`${esc(sc[0].p.nm)} leads with ${sc[0].t} points.`+(low.length?` Only ${Math.min(...low.map(p=>p.camels))} camels left for ${esc(low[0].nm)}: the end is near.`:'')}};
+  PHONE.chapter={key,round:G.round,title:chapterTitle(G.round),line:chapterLine()}};
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-ph]');if(!b||!PHONE.on)return;const a=b.dataset.ph,d=b.dataset;
   if(a==='open'){PHONE.pop={kind:d.k,sig:phSig()};phRender()}
   else if(a==='close'){if(PHONE.pop)PHONE.pop=null;else PHONE.hideAuto=phSig();phRender()}

@@ -97,4 +97,15 @@ html.ph .bidrec{width:100%;text-align:center;font-size:16px}
 html.ph .gx-drawer{box-sizing:border-box}
 /* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
 html.ph .mbox,html.ph .dlg{box-sizing:border-box}
-html.ph .pp-b :not(:has(>.btn.go~.btn.go))>.btn.go{position:sticky;bottom:0;z-index:3;box-shadow:0 0 0 6px #f8ecd2,0 2px 0 rgba(0,0,0,.25)}
+
+
+/* clarity pass: score race, causes, scroll cue, one decision per pop */
+html.ph .ps-chips .pk:not(.wide){flex:1 1 0;min-width:0}
+html.ph .ps-warn{margin:0;font-size:13px;line-height:1.3;color:#8a2d12;font-weight:700}
+html.ph .ps-log.fd{color:var(--ink,#3a2a1a)}html.ph .ps-log .btn.xs{min-height:32px;padding:2px 10px;font-size:13px;margin-left:4px}
+.ps-log b.up,.feed b.up{color:#2e6b2e}.ps-log b.dn,.feed b.dn{color:#a12a1a}
+ul.feed{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}ul.feed li{font-size:14px;line-height:1.35;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,.45)}ul.feed li.new{background:#fff3c4}
+.btn small.djx{display:block;font-weight:400;font-size:13px;opacity:.85;margin-top:2px}.btn small.sug{font-weight:400}
+html.ph .pp-more{flex:0 0 auto;text-align:center;font-size:13px;font-weight:700;color:var(--terra);padding:2px 0;background:linear-gradient(180deg,rgba(248,236,210,0),#f8ecd2)}
+html.ph .pp-more[hidden]{display:none}
+html.ph .pp-b p.verdict,p.verdict{font-size:15px;margin:0 0 4px;line-height:1.35}p.verdict.up b{color:#2e6b2e}p.verdict.dn b{color:#a12a1a}

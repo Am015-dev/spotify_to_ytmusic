@@ -27,7 +27,8 @@ function planGains(p,o){const t=G.board[o.e];const g=[];
   if(t.k==='village')g.push(mine?'🏰 your palace (+5)':owner(t)!=null?'(builds a palace for '+P(owner(t)).nm+')':'🏰 a palace (+5 to whoever claims it)');
   if(t.k==='oasis')g.push(mine?'🌴 your palm (+3)':owner(t)!=null?'(plants a palm for '+P(owner(t)).nm+')':'🌴 a palm (+3 to whoever claims it)');
   if(t.k==='sacred'){const el=p.el+(o.c==='elder'?o.n:0);if(el>=2||(el>=1&&p.fk>=1))g.push('✨ you can summon a djinn');else g.push('(a Shrine, but you need 2 Sages to summon)')}
-  if(t.k==='small'&&p.coins>=3)g.push('🛒 buy 1 good for 3🪙');if(t.k==='large'&&p.coins>=6)g.push('🛒 buy 2 goods for 6🪙');
+  const buyOk=(n,c)=>{const m=G.market.slice(0,n);for(let a=0;a<m.length;a++){if(c===3&&goodsGain(p,[m[a]])>3)return true;for(let b=a+1;b<m.length;b++)if(c===6&&goodsGain(p,[m[a],m[b]])>6)return true}return false};
+  if(t.k==='small'&&p.coins>=3)g.push(buyOk(3,3)?'🛒 a good worth buying (3🪙)':'(a Bazaar: buying here would lose points)');if(t.k==='large'&&p.coins>=6)g.push(buyOk(6,6)?'🛒 2 goods worth buying (6🪙)':'(a Grand Bazaar: buying here would lose points)');
   if(t.k==='exchange'&&p.coins>=4)g.push('🛒 buy any good for 4🪙');if(t.k==='workshop'&&(p.art||p.fk>=2))g.push('🔨 an item');
   return g}
 function allPlans(p,max){const lv=p.lv;p.lv='hard';const seen={};let list=[];
@@ -41,7 +42,7 @@ function allPlans(p,max){const lv=p.lv;p.lv='hard';const seen={};let list=[];
   const mixed=firsts.slice(0,4).concat(firsts.slice(4),rest).sort((a,b)=>(firsts.indexOf(b)>=0&&firsts.indexOf(b)<4)-(firsts.indexOf(a)>=0&&firsts.indexOf(a)<4)||b.v-a.v);
   return max?mixed.slice(0,max):mixed}
 function planHtml(p,o,i){const s=G.board[o.s],e=G.board[o.e];const g=planGains(p,o);
-  return `<div class="plan ${UI.showPlan===i?'on':''}" data-plani="${i}"><div class="ph"><span class="pn">${i+1}</span>${mdot(o.c,1)}<b>${o.n} ${o.n>1?MPLUR[o.c]:MNAME[o.c]}</b><span class="pv">+${Math.max(0,Math.round(o.v))} ★</span></div>
+  return `<div class="plan ${UI.showPlan===i?'on':''}" data-plani="${i}"><div class="ph"><span class="pn">${i+1}</span>${mdot(o.c,1)}<b>${o.n} ${o.n>1?MPLUR[o.c]:MNAME[o.c]}</b><span class="pv">${planBadge(p,o)}</span></div>
     <div class="pg">${g.map(x=>`<span class="${x.startsWith('(')?'no':''}">${esc(x)}</span>`).join(' · ')}</div>
     <div class="pr">from <b>${esc(tileName(s))}</b> → ${o.path.length-1} steps → <b>${esc(tileName(e))}</b>${o.routes>1?` · ${o.routes} routes`:''}</div>
     <div class="acts"><button class="btn sm" data-planshow="${i}">👁 Show</button><button class="btn sm go" data-plando="${i}">Do this ▶</button></div></div>`}
@@ -83,9 +84,8 @@ function recapGroups(){if(!G||!G.log.length)return[];const humans=typeof NET!=='
 function narrate(l){let t=l.t;for(const c in TRIBE_FLAVOUR)if(t.includes('takes')&&(t.includes(MNAME[c])||t.includes(MPLUR[c])))return t+' '+TRIBE_FLAVOUR[c];return t}
 // the round banner over the board (not blocking)
 function showChapter(){const b=document.getElementById('banner');if(!b||!G)return;if(UI.chapterShown===G.round+'_'+G.seed)return;UI.chapterShown=G.round+'_'+G.seed;
-  const sc=G.pl.map(p=>({p,t:scoreOf(p).total})).sort((x,y)=>y.t-x.t);const low=G.pl.filter(p=>p.camels<=3);
-  const line=G.round===1?'Bid for turn order, then each player takes their turn.':`${esc(sc[0].p.nm)} leads with ${sc[0].t} points.`+(low.length?` Only ${Math.min(...low.map(p=>p.camels))} camels left for ${esc(low[0].nm)}: the end is near.`:'');
-  b.classList.toggle('late',!!low.length);b.innerHTML=`<small>Round ${G.round}</small><b>${esc(chapterTitle(G.round))}</b><span>${line}</span>`;b.hidden=false;b.classList.remove('go');void b.offsetWidth;b.classList.add('go');clearTimeout(UI.bt);UI.bt=setTimeout(()=>b.hidden=true,3200)}
+  const line=chapterLine();
+  b.classList.toggle('late',!!camelWarn());b.innerHTML=`<small>Round ${G.round}</small><b>${esc(chapterTitle(G.round))}</b><span>${line}</span>`;b.hidden=false;b.classList.remove('go');void b.offsetWidth;b.classList.add('go');clearTimeout(UI.bt);UI.bt=setTimeout(()=>b.hidden=true,3200)}
 // opening scene: a painted sunset over the sultanate
 function openingHtml(){return `<div class="mbox story"><canvas id="opencv" width="640" height="220" aria-hidden="true"></canvas><h2>The throne of Qamar</h2>${OPENING.map(t=>`<p>${esc(t)}</p>`).join('')}
   <label class="chk"><input type="checkbox" data-coach ${UI.coach?'checked':''}> <b>Guide me through my first turns</b> <small>shows the best plans and explains every step</small></label>
@@ -112,3 +112,46 @@ function paintOpening(){const c=document.getElementById('opencv');if(!c)return;l
     x.fillStyle='rgba(60,20,5,.35)';x.beginPath();x.ellipse(px+6,py+2,16,4,0,0,7);x.fill();for(const f of [cols[k],gg]){x.fillStyle=f;x.beginPath();x.moveTo(px-12,py);x.quadraticCurveTo(px-12,py-6,px-7,py-8);x.quadraticCurveTo(px-4,py-20,px-4,py-26);x.lineTo(px+4,py-26);x.quadraticCurveTo(px+4,py-20,px+7,py-8);x.quadraticCurveTo(px+12,py-6,px+12,py);x.fill();x.fillRect(px-6,py-29,12,3);x.beginPath();x.arc(px,py-36,7.5,0,7);x.fill()}}
   // gilded arch frame
   x.strokeStyle='rgba(224,165,58,.9)';x.lineWidth=3;x.strokeRect(6,6,w-12,h-12);x.strokeStyle='rgba(255,230,170,.35)';x.lineWidth=1;x.strokeRect(11,11,w-22,h-22)}
+
+// ---- the end of the game, said plainly: who is low on camels (the right player, the right number) ----
+function camelWarn(){if(!G)return '';const out=G.pl.filter(p=>p.camels<=0);
+  if(out.length)return `Last round: ${esc(out[0].nm)} has placed every camel, so the game ends after this round.`;
+  const low=G.pl.filter(p=>p.camels<=3);if(!low.length)return '';const m=Math.min(...low.map(p=>p.camels));const q=low.find(p=>p.camels===m);
+  return `Only ${m} camel${m===1?'':'s'} left for ${esc(q.nm)}: the game ends in the round their last camel is placed.`}
+// one line for the round banner: the score race, then the end warning
+function raceText(){const h=G.pl.find(p=>p.human&&(!online()||p.i===NET.mySeat));return G.pl.map(p=>`${p===h?'You':esc(p.nm)} ${shownTotal(p)}`).join(' · ')}
+function chapterLine(){const w=camelWarn();return (G.round===1?'Most points at the end wins (coins count). Bid for turn order, then each player takes a turn.':`Points: ${raceText()}.`)+(w?' '+w:'')}
+
+// ---- plan points: what a plan scores right away (the badge), separate from the computer's rating used to sort ----
+function planPoints(p,o){const t=G.board[o.e];let tribe=0,sure=true;
+  switch(o.c){
+  case 'vizier':{const mult=hasDj(p,'wazira')?3:1;const bonus=vz=>G.pl.filter(q=>q.i!==p.i&&q.vz<vz).length*10;tribe=o.n*mult+bonus(p.vz+o.n)-bonus(p.vz);break}
+  case 'elder':tribe=o.n*(hasDj(p,'hikma')?4:2);break;
+  case 'merchant':{const cards=G.market.slice(0,o.n).filter(r=>r!=='fakir');tribe=goodsBest(Object.assign({},p,{res:p.res.concat(cards)}))-goodsBest(p);break}
+  case 'builder':{const blues=AROUND(o.e).filter(i=>G.board[i].blue&&!G.board[i].block).length;tribe=o.n*blues*(G.turnFx&&G.turnFx.qirsh?2:1);break}
+  case 'assassin':sure=false;break;
+  case 'artisan':tribe=o.n*2;sure=false;break}
+  const baseM=o.e===o.s?[]:t.m;const visitsE=o.path.slice(1,-1).filter(i=>i===o.e).length;const extraC=o.n-1-baseM.filter(x=>x===o.c).length;const remain=baseM.filter(x=>x!==o.c).length+Math.max(0,visitsE-extraC);
+  const claim=owner(t)==null&&remain<=0&&p.camels>0?t.v:0;const mine=claim||owner(t)===p.i;const extra=mine&&t.k==='village'?5:mine&&t.k==='oasis'?3:0;
+  return {tribe,claim,extra,total:tribe+claim+extra,sure}}
+function planBadge(p,o){const x=planPoints(p,o);return `${x.sure?'':'≈'}+${x.total} pts`}
+
+// ---- cause -> effect: every change to anyone's points, with who did it and why ----
+const FEEDNM={coins:'coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'djinns',tiles:'land',palms:'palms',palaces:'palaces',goods:'goods set',items:'items',cities:'cities'};
+function feedSnap(){return G.pl.map(p=>({s:scoreOf(p),vz:p.vz,bonus:G.pl.filter(q=>q.i!==p.i&&q.vz<p.vz).length*10}))}
+function feedAdd(before,actor,log0,m){if(!G||!before)return;UI.feed=UI.feed||[];const newLog=G.log.filter(l=>l.i>log0).map(l=>l.t);const after=feedSnap();
+  const cause=(newLog.find(t=>!/^—/.test(t))||'').replace(/\s+/g,' ');
+  G.pl.forEach((p,i)=>{const a=after[i].s,b=before[i].s;const d=a.total-b.total;if(!d)return;const why=[];
+    for(const k in FEEDNM){let x=a[k]-b[k];if(!x)continue;
+      if(k==='advisors'){const bx=after[i].bonus-before[i].bonus;if(bx){const riv=G.pl.filter(q=>q.i!==p.i);
+          const r=riv.find(q=>bx<0?before[q.i].vz<before[i].vz&&q.vz>=p.vz:before[q.i].vz>=before[i].vz&&q.vz<p.vz)||riv[0];
+          why.push(bx<0?`Advisor bonus ${bx}: ${esc(r.nm)} now has ${r.vz} Advisor${r.vz===1?'':'s'}, ${p.human?'you have':esc(p.nm)+' has'} ${p.vz} (you get +10 only for each rival with fewer)`
+            :`Advisor bonus +${bx}: more Advisors than ${esc(r.nm)} (${p.vz} vs ${r.vz})`);x-=bx}if(!x)continue}
+      why.push(`${FEEDNM[k]} ${x>0?'+':''}${x}${k==='coins'&&m&&m.act==='bid'?' (paid for turn order)':''}`)}
+    UI.feed.push({p:i,d,why,cause,actor,r:G.round,n:UI.feedN=(UI.feedN||0)+1})});
+  if(UI.feed.length>80)UI.feed.splice(0,UI.feed.length-80)}
+function feedWho(i){const p=P(i);return p.human&&(!online()||i===NET.mySeat)?'You':esc(p.nm)}
+function feedLine(e){return `<b class="${e.d>0?'up':'dn'}">${feedWho(e.p)} ${e.d>0?'+':''}${e.d}</b> ${e.why.join(', ')}${e.cause?` <span class="muted">· ${esc(e.cause)}</span>`:''}`}
+// entries since this seat last acted
+function feedSince(seat){const f=UI.feed||[];const mark=(UI.feedMark||{})[seat]||0;return f.filter(e=>e.n>mark)}
+function feedSum(list){const by={};for(const e of list)by[e.p]=(by[e.p]||0)+e.d;return Object.keys(by).map(i=>`${feedWho(+i)} ${by[i]>0?'+':''}${by[i]}`).join(' · ')}

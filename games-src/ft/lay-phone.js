@@ -67,7 +67,7 @@ for(const [W,H] of L.SIZES){if(process.env.ONLY&&!process.env.ONLY.split(',').in
   if(s.card){await all('move card '+s.card);await L.tapSel(pg,'[data-ph=cont]','#pc');await sleep(300);s=await st()}
   chk(s.card===''&&s.pop==='','move step: strip only');await all('my move: strip');await shot('6move');
   // ---- pop-ups from chips: board stays visible and hit-testing ----
-  for(const k of ['mine','players','market','djinns','plans']){const sel=k==='plans'?'[data-ph=open][data-k=plans]':`[data-ph=open][data-k=${k}]`;const t=await L.tapSel(pg,sel,'#ps');chk(!!t&&t.ok,'chip '+k+' tap');await sleep(300);const x=await st();chk(x.pop===k,'pop-up '+k+' opens, got '+x.pop);await all('pop-up '+k);await shot('7pop-'+k);
+  for(const k of ['mine','feed','market','djinns','plans']){const sel=k==='plans'?'[data-ph=open][data-k=plans]':`[data-ph=open][data-k=${k}]`;const t=await L.tapSel(pg,sel,'#ps');chk(!!t&&t.ok,'chip '+k+' tap');await sleep(300);const x=await st();chk(x.pop===k,'pop-up '+k+' opens, got '+x.pop);await all('pop-up '+k);await shot('7pop-'+k);
     // close by x
     await L.tapSel(pg,'[data-ph=close]','#ppop');await sleep(200);const y=await st();chk(y.pop==='','pop-up '+k+' closes by x');
     if(k==='market'){await L.tapSel(pg,sel,'#ps');await sleep(200);await pg.keyboard.press('Escape');await sleep(200);chk((await st()).pop==='','pop-up closes by Esc')}}

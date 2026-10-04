@@ -15,8 +15,8 @@ function human(){return G&&G.pl.some(p=>p.human)}
 // which tiles glow for the human now
 function computePick(){UI.pick=[];UI.pickFaint=[];UI.badges=null;const p=me();if(!p||G.q)return;const vm=validMoves(p.i);
   if(UI.pendDj){UI.pick=vm.filter(m=>m.act==='djinn'&&m.k===UI.pendDj.k&&same(m.pay,UI.pendDj.pay)).map(m=>m.t);return}
-  if(G.step==='move'){if(!G.move){const legal=[...new Set(vm.filter(m=>m.act==='start').map(m=>m.tile))];const top=curPlans(p).slice(0,5);const best={};for(const o of top)if(best[o.s]==null||best[o.s]<o.v)best[o.s]=o.v;
-      UI.pick=Object.keys(best).map(Number);UI.pickFaint=legal.filter(i=>!UI.pick.includes(i));UI.badges=UI.pick.map(i=>({i,txt:'+'+Math.max(0,Math.round(best[i]))}));return}
+  if(G.step==='move'){if(!G.move){const legal=[...new Set(vm.filter(m=>m.act==='start').map(m=>m.tile))];const top=curPlans(p).slice(0,5);const best={};for(const o of top)if(best[o.s]==null||best[o.s].v<o.v)best[o.s]=o;
+      UI.pick=Object.keys(best).map(Number);UI.pickFaint=legal.filter(i=>!UI.pick.includes(i));UI.badges=UI.pick.map(i=>({i,txt:'+'+planPoints(p,best[i]).total}));return}
     UI.pick=[...new Set(vm.filter(m=>m.act==='step').map(m=>m.tile))];return}
   if(G.step==='tribe'&&G.act.color==='assassin')UI.pick=[...new Set(vm.filter(m=>m.act==='tribe'&&m.kill&&m.kill.tile!=null).map(m=>m.kill.tile))];
   if(G.step==='tile')UI.pick=[...new Set(vm.filter(m=>m.place!=null).map(m=>m.place))]}
@@ -39,14 +39,19 @@ function btn(m,label,cls){return `<button class="btn ${cls||''}" data-mv='${esc(
 function renderDock(){const el=$('#dockbody');if(!el)return;const s=sideToAct();const p=s>=0?P(s):null;const hp=me();let h='';
   const dt=$('#dockt');if(dt)dt.textContent=G.over?'Game over':G.q&&hp?'Your choice':hp?`${online()?'Your turn':hp.nm}: ${G.phase==='bid'?'bid for turn order':stepName()}`:p?(online()&&p.human?`Waiting for ${p.nm}…`:`${p.nm} is thinking…`):'';
   const statsH=`<div class="stats">${G.pl.map(statusHtml).join('')}${standing()}</div>`;
-  if(G.over){h+=statsH+scoreTable();h+=`<div class="acts">${btn({ui:'new'},'New game','go')}</div>`;el.innerHTML=h;return}
+  if(G.over){const ms=$('#dockmsg');if(ms)ms.hidden=true;h+=statsH+scoreTable();h+=`<div class="acts">${btn({ui:'new'},'New game','go')}</div>`;el.innerHTML=h;return}
   if(!hp){h+=statsH+`<div class="recap"><h4>${p?(online()&&p.human?'Waiting for '+esc(p.nm)+(G.phase==='bid'?' to bid…':'…'):esc(p.nm)+(G.phase==='bid'?' is bidding…':' is playing…')):''}</h4>${recapHtml()}</div>${marketHtml()}${djRowHtml()}`;el.innerHTML=h;return}
+  // nothing to decide (a Shrine without Sages, no goods to sell, no powers): say so and move on, no extra screen
+  if(!online()&&G.phase==='turn'&&(G.step==='tile'||G.step==='sell')&&!G.q){const vm0=validMoves(hp.i);const only=vm0.filter(m=>m.act!=='djinn'&&m.act!=='item'&&m.act!=='thief');
+    if(only.length===vm0.length&&only.length===1&&(G.step==='tile'?only[0].skip:only[0].act==='end')){const k=G.logN+G.step;if(UI.autoSkip!==k){UI.autoSkip=k;
+      toast(G.step==='tile'?`${tileName(G.board[G.act.tile])}: nothing you can do here, so its action is skipped.`:'No goods to sell: your turn is over.');
+      setTimeout(()=>{if(G&&!G.over&&UI.autoSkip===k&&G.logN+G.step===k&&me())go(only[0])},ANIM?1300:0)}}}
   if(UI.adv&&UI.adv.key!==G.logN+'_'+G.step+'_'+G.phase+'_'+!!G.q)UI.adv=null;
   if(UI.adv)h+=advHtml();
   if(G.q){h+=`<div class="prompt"><h3>${esc(G.q.title)}</h3><div class="opts">${G.q.opts.map((o,i)=>btn({act:'q',i},esc(o.l),'opt')).join('')}</div></div>`+statsH;el.innerHTML=h;GX.showDock();return}
   const vm=validMoves(hp.i);const by=a=>vm.filter(m=>m.act===a);
   if(G.phase==='bid'){const bk='b'+G.logN+hp.i;if(UI.bidKey!==bk){UI.bidKey=bk;try{const lv=hp.lv;hp.lv='normal';UI.bidRec=aiMove(hp.i);hp.lv=lv}catch(e){UI.bidRec=null}}const bidRec=UI.coach?UI.bidRec:null;h+=`<div class="prompt"><h3>Bid for turn order</h3>${''}<p>Pay coins to choose <b>when</b> you play this round. Dearer spots go first and get the best moves; free spots go last. Coins also count as points at the end, so spend them only when a great move is at stake. ${UI.coach?`<br><span class="coach">💡 Not sure? Press <b>Advise me</b>.</span>`:''}</p>${lastTurnHtml()}${G.pl.filter(q=>q.markers>1).length?`<p class="small">With 2 players each of you has <b>2 markers = 2 turns</b> this round.</p>`:''}${UI.coach&&curPlansSafe(hp)?`<p class="small">Your best move right now is worth about <b>+${curPlansSafe(hp)}</b>.</p>`:''}<div class="track">${G.track.map((t,sp)=>{const b=G.bids.find(x=>x.spot===sp);const mv=by('bid').filter(m=>m.spot===sp);
-      const rec=bidRec&&bidRec.spot===sp&&!bidRec.fk;return `<div class="sp ${b?'taken':''} ${rec?'rec':''}">${b?pChip(P(b.mk.p)):''}<small class="ord">${['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'][sp]}</small><b>${t.cost}🪙</b>${mv.map(m=>btn(m,m.fk?`−${m.fk}🔮 → ${bidPrice(hp,sp,m.fk)}🪙`:rec?'★ Take':'Take','sm'+(rec?' go':''))).join('')}${rec?'<small>suggested</small>':''}</div>`}).join('')}</div></div>`}
+      const rec=bidRec&&bidRec.spot===sp;const isRec=m=>rec&&(m.fk||0)===(bidRec.fk||0);return `<div class="sp ${b?'taken':''} ${rec?'rec':''}">${b?pChip(P(b.mk.p)):''}<small class="ord">${['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th','11th','12th'][sp]}</small><b>${t.cost}🪙</b>${mv.map(m=>btn(m,(isRec(m)?'★ ':'')+(m.fk?`−${m.fk}🔮 → ${bidPrice(hp,sp,m.fk)}🪙`:'Take'),'sm'+(isRec(m)?' go':''))).join('')}${rec?'<small>suggested</small>':''}</div>`}).join('')}</div></div>`}
   else if(G.step==='move'){const mv=G.move;
     if(!mv){h+=plansHtml(hp)+lastTurnHtml()}
     else{const cols=[...new Set(mv.hand)];const steps=by('step');const next=[...new Set(steps.map(m=>m.tile))];if(!UI.dropColor||!mv.hand.includes(UI.dropColor))UI.dropColor=cols[0];
@@ -79,13 +84,13 @@ function tileButtons(p,vm,t){let tm=vm.filter(m=>m.act==='tile');let h='';
   if(t.k==='sacred'&&!tm.some(m=>m.dj||m.thief))h+=`<p class="small">You can't summon here yet: you need 2 Sages, or 1 Sage and 1 Mystic card. You have ${p.el} Sage${p.el===1?'':'s'} and ${p.fk} Mystic${p.fk===1?'':'s'}.</p>`;
   for(const m of tm){if(m.skip){h+=btn(m,allBad||!tm.some(x=>!x.skip)&&!buys.length?'Skip (best choice)':'Skip',allBad||(!buys.length&&tm.length===1)?'go':'ghost');continue}
     if(m.place!=null)h+=btn(m,`${t.k==='village'?'🏰 Palace':'🌴 Palm'} on ${esc(tileName(G.board[m.place]))}${m.place===t.i?'':' (neighbour)'}`,m.place===t.i?'go':'');
-    else if(m.dj)h+=btn(m,`✨ ${esc(DJ[m.dj].n)} (${DJ[m.dj].vp} pts) — pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 Mystic':''}`,'');
+    else if(m.dj)h+=btn(m,`✨ ${esc(DJ[m.dj].n)} (${DJ[m.dj].vp} pts) — pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 Mystic':''}<small class="djx">${esc(DJ[m.dj].x)}</small>`,'');
     else if(m.thief)h+=btn(m,`🦹 Hire the ${esc(THIEVES[m.thief].n)} — pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 Mystic':''}`,'');
     else if(m.take)h+=btn(m,`Buy ${m.take.map(j=>RICON[G.market[j]]+' '+RNAME[G.market[j]]).join(' + ')} (${t.k==='small'?3:t.k==='large'?6:4}🪙)`,'');
     else if(m.work)h+=btn(m,m.work==='art'?'Pay 1 Crafter for an item':'Pay 2 Mystics for an item','')}
   return h}
 function powerButtons(p,pw){const seen=new Set();let h='';for(const m of pw){if(m.act==='djinn'){const key=m.k+JSON.stringify(m.pay);if(seen.has(key))continue;seen.add(key);const needsTile=m.t>=0;
-      h+=needsTile?`<button class="btn sm" data-pw='${esc(JSON.stringify({k:m.k,pay:m.pay}))}' title="${esc(DJ[m.k].x)}">✨ ${esc(DJ[m.k].n)} (${m.pay.el?m.pay.el+' Sage':''}${m.pay.el&&m.pay.fk?' + ':''}${m.pay.fk?m.pay.fk+' Mystic':''})</button>`:btn(m,`✨ ${esc(DJ[m.k].n)} (${m.pay.el?m.pay.el+' Sage':''}${m.pay.el&&m.pay.fk?' + ':''}${m.pay.fk?m.pay.fk+' Mystic':''})`,'sm')}
+      h+=needsTile?`<button class="btn sm" data-pw='${esc(JSON.stringify({k:m.k,pay:m.pay}))}' title="${esc(DJ[m.k].x)}">✨ ${esc(DJ[m.k].n)} (pay ${m.pay.el?m.pay.el+' Sage':''}${m.pay.el&&m.pay.fk?' + ':''}${m.pay.fk?m.pay.fk+' Mystic':''})<small class="djx">${esc(DJ[m.k].x)}</small></button>`:btn(m,`✨ ${esc(DJ[m.k].n)} (pay ${m.pay.el?m.pay.el+' Sage':''}${m.pay.el&&m.pay.fk?' + ':''}${m.pay.fk?m.pay.fk+' Mystic':''})<small class="djx">${esc(DJ[m.k].x)}</small>`,'sm')}
     else{const key='i'+m.k+(m.dj||'');if(seen.has(key))continue;seen.add(key);if(m.k==='talisman'||m.k==='flute'){if(seen.has('i'+m.k+'x'))continue;seen.add('i'+m.k+'x');h+=btn(m,`🪄 ${esc(ITEMS[m.k].n)}${m.k==='flute'?' onto '+esc(tileName(G.board[m.t])):''}`,'sm')}else h+=btn(m,`🪄 ${esc(ITEMS[m.k].n)}${m.dj?' → '+esc(DJ[m.dj].n):''}`,'sm')}}return h}
 function lastLog(n){return `<ol class="mini">${G.log.slice(0,n).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ol>`}
 function scoreTable(){const rows=G.over.scores;const keys=['coins','advisors','sages','crafters','djinns','tiles','palms','palaces','goods','items','cities','total'];const nm={coins:'🪙 Coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'Djinns',tiles:'Tiles',palms:'Palms',palaces:'Palaces',goods:'Goods',items:'Items',cities:'Cities',total:'★ Total'};
@@ -156,8 +161,8 @@ function go(m){UI.adv=null;if(online()&&isClient()){netSend(m);return}const s=si
   // remember the move so a human can take back drops one at a time (nothing hidden is revealed while moving)
   if(human&&m.act==='start'){UI.moveSnap=JSON.stringify(G);UI.moveSteps=[m]}
   else if(human&&m.act==='step'&&UI.moveSteps)UI.moveSteps.push(m);else if(m.act!=='djinn'&&m.act!=='item')UI.moveSnap=null;
-  const before=human?scoreOf(P(s)):null;
-  const r=performMove(m,s);if(r.success&&human&&mine&&G&&!G.over)scoreNote(P(s),before);
+  const before=human?scoreOf(P(s)):null;const fb=feedSnap(),fl=G.logN||0;if(s>=0&&P(s).human&&!['step','start','undo'].includes(m.act)){UI.feedMark=UI.feedMark||{};UI.feedMark[s]=UI.feedN||0}
+  const r=performMove(m,s);if(r.success&&G)feedAdd(fb,s,fl,m);if(r.success&&human&&mine&&G&&!G.over){scoreNote(P(s),before);if(m.act==='tile'&&m.dj)toast(`✨ ${DJ[m.dj].n} joins you: ${DJ[m.dj].x}`)}
   if(G&&!G.move){UI.moveSnap=G.step==='move'?UI.moveSnap:null}if(G&&G.step!=='move'&&UI.path)showPath(null);if(!r.success&&mine){toast('That move isn’t allowed now.');console.error(r.error)}}
 function toast(t){const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,3000)}
 document.addEventListener('click',e=>{const b=e.target.closest('button,[data-tile],input[type=checkbox]');if(!b)return;const d=b.dataset;
@@ -182,8 +187,8 @@ function uiAct(a){if(online()){if(a==='new'||a==='start'){UI.modal='lobby';rende
 document.addEventListener('mouseover',e=>{const c=e.target.closest&&e.target.closest('.plan[data-plani]');if(!c||!UI.plans||UI.autoPlan)return;const i=+c.dataset.plani;if(UI.hoverPlan===i)return;UI.hoverPlan=i;showPath(UI.plans[i].path)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pendDj){UI.pendDj=null;render()}});
 function openStart(){UI.modal='start';render()}
-function beginGame(){const o=UI.setup;UI.modal=null;UI.fx.length=0;UI.fxSeen=0;const seats=o.seats.slice(0,o.np);newGame({np:o.np,seats,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex,o.np===5?{sultan:true}:{}),mode:seats.every(s=>s==='ai')?'ai':'x'});resetScene();UI.modal=null;UI.chapterShown='';refresh()}
-function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;resetScene();refresh()}catch(e){openStart()}}
+function beginGame(){const o=UI.setup;UI.modal=null;UI.feed=[];UI.feedMark={};UI.feedN=0;UI.fx.length=0;UI.fxSeen=0;const seats=o.seats.slice(0,o.np);newGame({np:o.np,seats,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex,o.np===5?{sultan:true}:{}),mode:seats.every(s=>s==='ai')?'ai':'x'});resetScene();UI.modal=null;UI.chapterShown='';refresh()}
+function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.feed=[];UI.feedMark={};UI.feedN=0;resetScene();refresh()}catch(e){openStart()}}
 function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].g);V3.tiles={};for(const k in V3.stacks)V3.scene.remove(V3.stacks[k].g);V3.stacks={};buildPlinth();fitDist()}
 // the player is reaching for a button in the panel: automatic steps wait for them
 document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('#dockbody'))UI.dockTouch=Date.now()},true);document.addEventListener('pointermove',e=>{if(e.target.closest&&e.target.closest('#dockbody'))UI.dockTouch=Date.now()},true);
