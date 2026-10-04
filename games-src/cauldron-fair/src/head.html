@@ -142,7 +142,7 @@ details.rsum[open]>summary{margin-bottom:6px}
 details.ratd u{color:#5a3a82}
 .bk details.bd>summary{list-style:none;display:flex;align-items:center;gap:6px;cursor:pointer;min-height:44px}
 .bk details.bd>summary::-webkit-details-marker{display:none}
-.bk .bi{flex:0 0 auto;width:20px;height:20px;border-radius:50%;border:2px solid #5a3a82;color:#5a3a82;font:italic 900 12px/16px Georgia,serif;text-align:center;margin-left:auto}
+.bk .bi{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid #5a3a82;color:#5a3a82;font:italic 900 13px/18px Georgia,serif;text-align:center;margin-left:auto}
 .bk details.bd[open] .bx{margin:2px 0 4px}
 html.ph .books{grid-template-columns:1fr;gap:5px}
 html.ph .bk{flex-direction:row;flex-wrap:wrap;align-items:center;padding:3px 6px;column-gap:6px}
@@ -299,9 +299,9 @@ html.ph.ph-l #qbox:not([hidden]){position:fixed;top:48px;right:0;bottom:0;width:
 html.ph{--gx-bar-h:44px;--gx-dock-w:0px;--dockh:212px;--thh:62px;font-size:14px}
 html.ph .gx-bar{min-height:44px;height:44px;padding:0 6px;padding-top:env(safe-area-inset-top,0px);box-sizing:content-box;gap:4px}
 html.ph .gx-bar h1{display:none}
-html.ph .gx-ibtn span{display:block;font-size:10px;line-height:1;font-weight:700;opacity:.9}
-html.ph .gx-bar .gx-ibtn{flex-direction:column;gap:1px}
-html.ph .gx-bar .gx-ibtn svg{width:20px;height:20px}
+html.ph .gx-ibtn span{display:block;font-size:13px;line-height:1;font-weight:700;opacity:.9;letter-spacing:-.2px}
+html.ph .gx-bar .gx-ibtn{flex-direction:column;gap:1px;padding:0 3px}
+html.ph .gx-bar .gx-ibtn svg{width:18px;height:18px}
 html.ph .gx-ibtn{min-width:44px;min-height:44px;padding:0;border-radius:10px}
 html.ph .gx-dock-head,html.ph .gx-reopen{display:none!important}
 html.ph .gx-dock{border-left:0;border-top:3px solid var(--wood2);max-height:none;padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -314,7 +314,9 @@ html.ph #hint,html.ph #promptDock{flex:0 0 auto}
 html.ph .rc{flex:0 0 auto;padding:2px 4px;gap:3px;min-width:44px;max-width:62px;flex-direction:column;justify-content:center;text-align:center}
 html.ph .rc .ct b{display:none}
 html.ph .th .ti b{max-width:58px}
-html.ph .th{padding:2px 5px 2px 3px;gap:4px}
+html.ph .th{padding:2px 5px 2px 3px;gap:4px;flex:0 1 auto;min-width:0}
+html.ph #others{justify-content:safe center}
+.th .ti .ts{overflow:hidden;text-overflow:ellipsis}
 html.ph.ph-p .gx-dock{max-height:var(--dockh)}
 html.ph #roster{display:none}
 html.ph #fort{cursor:pointer;padding:3px 8px;font-size:13px;gap:6px;align-items:center}
