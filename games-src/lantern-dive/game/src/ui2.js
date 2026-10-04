@@ -214,7 +214,7 @@ function renderHand(v) {
   const need = Math.max(44, hw * .55), maxP = hw * 1.04;
   const pitchFor = m => m > 1 ? Math.min(maxP, (W - hw) / (m - 1)) : 0;
   const rows = n > 1 && pitchFor(n) < need && n >= 7 ? 2 : 1, per = rows === 2 ? Math.ceil(n / 2) : n, pitch = pitchFor(per);
-  const rowStep = Math.round(ch * .5), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
+  const rowStep = Math.round(ch * .6), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
   box.classList.toggle('two', rows === 2);
   box.style.height = Math.round(padTop + ch + (rows === 2 ? rowStep : 0) + 4) + 'px'; box.style.minHeight = box.style.height;
   btns.forEach((b, i) => {

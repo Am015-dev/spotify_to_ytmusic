@@ -5388,7 +5388,7 @@ function shopToggle(key) {
   if (i >= 0) sel.splice(i, 1); else { sel = sel.filter(k => k[0] !== c); sel.push(key); if (sel.length > 2) sel.shift(); }
   UI.shopSel = sel; snd('click'); renderReport();
 }
-function shopBuy() { const v = viewSeat(); if (v < 0) return; const items = UI.shopSel.slice(); UI.shopSel = []; if (!act({ t: 'buy', items }, v)) toast('That purchase did not work.'); else renderReport(); }
+function shopBuy() { const v = viewSeat(); if (v < 0) return; const items = UI.shopSel.slice(); UI.shopSel = []; if (!act({ t: 'buy', items }, v)) toast('That purchase did not work.'); }   // on success afterApply() has already redrawn the report (or put up the pass card in hot-seat)
 // ---------- pass the device (hot-seat) ----------
 function showPass(seat) {
   const rs = $('#rs'); if (!rs) return; rs.hidden = false; UI.rsMode = 'pass'; UI.rsOpen = true;
