@@ -41,7 +41,10 @@ process.on('exit', () => { try { srv.kill(); } catch (e) { } });
     }
     if (!recap) fail('no recap strip on a later turn'); await shot('05-recap');
     // "undo" in Short Fuse is for the unconfirmed choice: point, then Start again / Change (a Snip reveals, so it cannot be taken back)
-    const pa = await p.$('.palist .pa'); if (pa) { await ev(() => { const d = document.querySelector('.palist'); if (d) d.open = true; }); await (await p.$('.palist .pa')).click(); await p.waitForTimeout(200); await shot('06-choice-take-back'); const ch = await p.$('[data-a=untarget]:visible, [data-a=cancel]:visible'); if (!ch) fail('no way to take the choice back'); else { await ch.click(); await p.waitForTimeout(200); if (await ev(() => !!(UI.sel && UI.sel.tg && UI.sel.tg.length))) fail('the choice was not taken back'); } }
+    const pa = await p.$('.palist .pa:visible');
+    if (!pa && phone) { const ok = await ev(() => { const L = UI.V && UI.V.legal; const m = L && L.plain[0]; if (!m) return false; onTile(m.st, m.ks[0]); return !!(UI.sel && UI.sel.tg && UI.sel.tg.length); }); await p.waitForTimeout(300); await shot('06-choice-take-back');
+      if (ok) { const ch = await p.$('[data-a=untarget]:visible, [data-a=cancel]:visible, [data-ph=back]:visible'); if (!ch) fail('no way to take the choice back on the phone'); else { await ch.click(); await p.waitForTimeout(200); } } }
+    else if (pa) { await ev(() => { const d = document.querySelector('.palist'); if (d) d.open = true; }); await (await p.$('.palist .pa')).click(); await p.waitForTimeout(200); await shot('06-choice-take-back'); const ch = await p.$('[data-a=untarget]:visible, [data-a=cancel]:visible'); if (!ch) fail('no way to take the choice back'); else { await ch.click(); await p.waitForTimeout(200); if (await ev(() => !!(UI.sel && UI.sel.tg && UI.sel.tg.length))) fail('the choice was not taken back'); } }
     else if (!phone) fail('no Point from a list buttons on our turn');
     // reference
     await p.click('.gx-bar [data-gx="gx-refd"]'); await p.waitForTimeout(300); await shot('07-reference');

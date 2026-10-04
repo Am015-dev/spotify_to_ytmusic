@@ -360,6 +360,8 @@ html.kkpx .grp .pl{animation:none!important}
 .drow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:auto;padding-top:2px}.lvs{display:flex;gap:4px;flex:1 1 100%}.lvs .chipb{flex:1 1 0;padding:4px 6px}
 .chipb.seatb.on{background:#d8f1c9;border-color:#2d7a35}
 .sgo{display:flex;flex-direction:column;gap:8px}
+/* desktop: the start buttons stay in sight while the diner cards scroll under them */
+html:not(.ph) .setup .sgo{position:sticky;bottom:-12px;z-index:3;background:linear-gradient(rgba(251,240,218,0),var(--paper) 14px);padding:14px 0 4px;margin-bottom:-4px}
 .sgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .sgo .sbtn.big{align-items:center;text-align:center;min-height:62px}.sgo .sbtn.big b{font-size:20px}
 html.ph #start[data-v=setup],html.ph #start[data-v=online]{padding:6px}

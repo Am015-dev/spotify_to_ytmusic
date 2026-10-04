@@ -332,6 +332,8 @@ html.ph-l .barstat{display:none}
 html.ph .gx-app .gx-dock{display:flex;flex-direction:column;height:auto!important;max-height:none!important;visibility:visible!important;border:0;box-shadow:none;border-radius:0;background:linear-gradient(#fff6e2,#f7e2b9);color:var(--ink);padding:0;position:relative;overflow:hidden;min-height:0}
 html.ph .gx-app .gx-dock-body{display:block!important;flex:0 0 auto;padding:0 6px;overflow:visible}
 html.ph .gx-dock-body>:not(#netst){display:none!important}
+/* the "since your turn" strip stays visible above the phone controls */
+html.ph #dockbody>.gx-recap:not([hidden]){display:block!important;margin:4px 0 0}
 html.ph .netst{margin:3px 0 0;font-size:.74rem}
 /* status chips */
 html.ph .pchip{display:inline-flex;align-items:center;gap:5px;border:2px solid var(--ink);border-radius:999px;background:#fff;color:var(--ink);padding:1px 9px;font:800 .86rem var(--fb);white-space:nowrap;min-height:32px;box-sizing:border-box;flex:0 0 auto}
