@@ -1,5 +1,12 @@
 // ---------- the rules, in plain words ----------
 const RULES_HTML=`<div class="rules">
+<div class="quick"><h3>In one minute</h3><ol>
+<li><b>Bid</b> coins for when you play this round (coins are points too).</li>
+<li><b>Move:</b> lift everyone off one tile, drop one per tile as you go; the last one lands on its own colour and you take that colour.</li>
+<li><b>Tribe action</b> of that colour (keep Advisors and Sages, take goods, earn coins, remove a person), then the <b>tile action</b> (palace, palm, djinn, goods).</li>
+<li>A tile you empty is <b>yours</b>: put a camel there. The game ends in the round someone places their last camel. <b>Most points wins.</b></li></ol>
+<p class="small">The guided first game shows this once, step by step. The <b>Cards</b> button lists every tribe, tile, goods card, djinn, item and Cutpurse.</p></div>
+<details open><summary>Words used in the game</summary><dl class="words"><dt>Advisors (yellow)</dt><dd>Kept: 1 point each, +10 for each rival with fewer.</dd><dt>Sages (white)</dt><dd>Kept: 2 points each; pay them to summon djinns.</dd><dt>Traders (green)</dt><dd>Take goods cards from the market.</dd><dt>Masons (blue)</dt><dd>Earn coins for blue tiles around.</dd><dt>Shadows (red)</dt><dd>Remove a person nearby, or a rival's Advisor or Sage.</dd><dt>Mystic</dt><dd>A special goods card: +1 Mason or Shadow power, or half the price of a djinn.</dd><dt>Shrine</dt><dd>A tile where you summon djinns.</dd><dt>Set</dt><dd>Goods of different kinds; 1, 3, 7, 13, 21… points for 1, 2, 3, 4, 5… kinds.</dd><dt>Djinn</dt><dd>A spirit card with points and a power.</dd></dl></details>
 <p>The old sultan is gone and the sultanate of Qamar is up for grabs. Shift its tribes from tile to tile, claim land with your camels, summon djinns and trade in the bazaar. <b>The most points at the end wins.</b></p>
 <h3>1. Bid for turn order</h3>
 <p>Each round starts with a bid. In the order of the last round, each player puts a marker on a free spot of the turn-order track and pays its price: 0, 0, 0, 1, 3, 5, 8, 12 or 18 coins. Dearer spots play earlier. If two players sit on spots with the same price, the one who bid later plays first. With 2 players, each of you has two markers and so takes two turns a round.</p>
@@ -31,7 +38,7 @@ const RULES_HTML=`<div class="rules">
 <h3>5. Goods and Mystics</h3>
 <p>Goods score in sets of different kinds: 1, 3, 7, 13, 21, 30, 40, 50 or 60 points for 1 to 9 kinds. Build as many sets as you can. Mystics are special cards: they never score, but they boost Masons and Shadows, stand in for a Sage when summoning, and pay djinn powers.</p>
 <h3>6. The end</h3>
-<p>When someone places their last camel, the round is finished and the game ends. It also ends if no legal move is left on the board. Score coins, Advisors, Sages, djinns, the tiles you hold (with their palms and palaces), goods, and any expansion extras. Ties go to the player with more coins.</p>
+<p>When someone places their last camel, the round is finished and the game ends. It also ends if no legal move is left on the board. Score coins, Advisors, Sages, djinns, the tiles you hold (with their palms and palaces), goods, and any expansion extras. Equal totals share the win.</p>
 <h3>Expansions (switch them on at the start)</h3>
 <ul>
 <li><b>The Crafters</b>: purple Crafters, Workshops (pay 1 Crafter or 2 Mystics for an item), Spice Exchanges (4 coins for any face-up good), a Ravine, mountains beside the Workshops, and a tent for each player. The player with the most Crafters scores 3 for each, everyone else 2. Precious items score points; magic items are one-shot powers.</li>

@@ -130,7 +130,7 @@ QH.keepItem=d=>{const p=P(d.p);p.items.push(d.drawn[d.keep]);G.itemDisc.push(...
 function gainCard(p,r,quiet){if(r==null)return;if(r==='fakir')p.fk++;else p.res.push(r);if(!quiet)lg(`${p.nm} takes ${RNAME[r]}.`,'good')}
 function killOne(p,k,c){G.stats.kills++;const sirra=hasDj(p,'sirra');
   if(k.pl!=null){const q=P(k.pl);if(c==='vizier')q.vz--;else if(c==='elder')q.el--;else q.art--;lg(`🗡 ${p.nm}'s Shadow takes one of ${q.nm}'s ${MPLUR[c]}.`,'bad');fx('kill');}
-  else{const t=G.board[k.tile];t.m.splice(t.m.indexOf(c),1);lg(`🗡 ${p.nm}'s Shadow takes a ${MNAME[c]} from ${tileName(t)}.`,'bad');fx('kill',k.tile);if(!t.m.length&&t.camel==null&&t.tent==null)claimTile(p,k.tile,'camel')}
+  else{const t=G.board[k.tile];t.m.splice(t.m.indexOf(c),1);lg(`🗡 ${p.nm}'s Shadow takes ${/^[AEIOU]/.test(MNAME[c])?'an':'a'} ${MNAME[c]} from ${tileName(t)}.`,'bad');fx('kill',k.tile);if(!t.m.length&&t.camel==null&&t.tent==null)claimTile(p,k.tile,'camel')}
   if(sirra){if(c==='merchant'&&G.rdeck.length){gainCard(p,G.rdeck.shift());G.bag.push(c)}else if(c==='builder'&&k.tile!=null){const blues=AROUND(k.tile).filter(i=>G.board[i].blue&&!G.board[i].block).length;p.coins+=blues;lg(`${p.nm} pockets ${blues} coins from the fallen Mason (Sirra).`,'good');G.bag.push(c)}
     else if(c==='vizier'){p.vz++;lg(`${p.nm} keeps the Advisor (Sirra).`,'good')}else if(c==='elder'){p.el++;lg(`${p.nm} keeps the Sage (Sirra).`,'good')}else if(c==='artisan'){p.art++;if(G.items.length)p.items.push(G.items.shift());lg(`${p.nm} keeps the Crafter and draws an item (Sirra).`,'good')}else G.bag.push(c)}
   else G.bag.push(c);trig('kill',p.i)}

@@ -89,7 +89,7 @@ function showChapter(){const b=document.getElementById('banner');if(!b||!G)retur
 // opening scene: a painted sunset over the sultanate
 function openingHtml(){return `<div class="mbox story"><canvas id="opencv" width="640" height="220" aria-hidden="true"></canvas><h2>The throne of Qamar</h2>${OPENING.map(t=>`<p>${esc(t)}</p>`).join('')}
   <label class="chk"><input type="checkbox" data-coach ${UI.coach?'checked':''}> <b>Guide me through my first turns</b> <small>shows the best plans and explains every step</small></label>
-  <div class="acts"><button class="btn go" data-ui="play">Enter the sultanate ▶</button></div></div>`}
+  <div class="acts"><button class="btn go" data-ui="guided" data-start="guided">Guided first game ▶</button><button class="btn" data-ui="play">Choose players ▶</button></div><p class="small muted">New here? The guided game explains one step at a time, with a reason for every suggestion.</p></div>`}
 function paintOpening(){const c=document.getElementById('opencv');if(!c)return;let x=null;try{x=c.getContext('2d')}catch(e){}if(!x)return;const w=c.width,h=c.height;
   // golden-hour sky with a low sun and soft rays
   let g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,'#5a2a4a');g.addColorStop(.35,'#d8744a');g.addColorStop(.62,'#f6c070');g.addColorStop(1,'#f2b765');x.fillStyle=g;x.fillRect(0,0,w,h);

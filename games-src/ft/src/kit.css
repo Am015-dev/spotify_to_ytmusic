@@ -1,0 +1,26 @@
+/* Sands of Qamar: the shared kit's pieces in this game's look (ui9.js) */
+#recapbox .gx-recap{margin:6px 10px 0}
+#ps .ps-recap .gx-recap{margin:0 0 2px}
+#ps .ps-recap:empty{display:none}
+.gx-cbm{display:none}html.cb .gx-cbm{display:inline-block}
+.md .gx-cbm{font:700 8px/13px system-ui,sans-serif;color:#000;text-align:center;width:100%;text-shadow:0 0 2px #fff}.md.big .gx-cbm{font-size:10px;line-height:18px}
+html.cb .md{display:inline-flex;vertical-align:-3px}
+.pc .gx-cbm{font:700 11px system-ui,sans-serif;margin-right:1px}
+.gcoach{margin:6px 0 8px;padding:8px 10px;border-radius:12px;background:#fff6dc;border:2px solid #d9a441;box-shadow:0 2px 6px rgba(80,40,10,.15)}
+.gcoach>b{display:block;font-size:1rem;margin-bottom:2px}.gcoach p{margin:3px 0}.gcoach .gwhy{color:#5a3a12}
+#ps .gcoach{margin:0 0 4px;padding:6px 8px}#ps .gcoach p{font-size:13px}
+@keyframes gglow{0%,100%{box-shadow:0 0 0 0 rgba(255,190,60,.9)}50%{box-shadow:0 0 0 6px rgba(255,190,60,0)}}
+.gglow{animation:gglow 1.3s ease-in-out infinite;outline:3px solid #f2b13a;outline-offset:1px}
+html.gx-reduce .gglow,html.gx-noanim .gglow{animation:none}
+.guidebox{padding:8px 10px;border-radius:12px;background:#fff6dc;border:1px solid #d9a441}.guidebox p{margin:0 0 6px}
+.kitundo{margin-top:6px}
+.rules .quick{padding:8px 12px;border-radius:12px;background:#fff6dc;border:1px solid #d9a441;margin-bottom:10px}.rules .quick ol{margin:4px 0 4px 18px;padding:0}
+.rules .words dt{font-weight:700;margin-top:4px}.rules .words dd{margin:0 0 0 12px}
+/* text size from the shared settings */
+#dockbody,#ps,#ppop .pp-b,#pc .pp-b,#plrbody,#djbody,#logbody,#rulesbody{zoom:var(--gx-text,1)}
+.gx-refbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.gx-ref-pic .ca{width:100%;height:100%;display:block}
+.gx-ref-pic:not(.big){width:64px;height:48px;border-radius:8px;overflow:hidden;flex:none}
+.gx-ref-pic.big{width:min(260px,70vw);aspect-ratio:100/76;border-radius:14px;overflow:hidden;margin:0 auto}
+.gx-set-nav>.gx-chip,.gx-ref-secs>.gx-chip,.gx-ref-tags>.gx-chip{flex:none}
+html.lefty .acts{flex-direction:row-reverse}

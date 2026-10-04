@@ -1,6 +1,9 @@
 // ---------- computer players: plan the whole move (start, path, colour), then play it step by step ----------
 let AIPLAN=null;
-const LVL={easy:{noise:.9,depth:3000},normal:{noise:.25,depth:20000},hard:{noise:0,depth:60000}};
+// levels differ in what they understand, not only in noise: easy ignores the Advisor majority and goods sets and overbids;
+// hard also looks one move ahead (what the next rival can do after its move) and bids by how much the turn is worth to it.
+const LVL={easy:{noise:2.6,depth:3000,naive:1,overbid:1},normal:{noise:.25,depth:20000},hard:{noise:0,depth:60000,look:6}};
+const lvOf=p=>LVL[p.lv]||LVL.normal;
 function aiNoise(p){return (LVL[p.lv]||LVL.normal).noise}
 // every legal outcome of picking up tile s: {s,e,c,n,path}
 function outcomes(s,cap){const t=G.board[s];const hand=t.m.slice();const saved=t.m;t.m=[];const hc=handCounts(hand);const L=hand.length;const res={};let nodes=0;
@@ -14,7 +17,7 @@ function djValue(p,k){const d=DJ[k];let v=d.vp;const left=Math.max(1,12-G.round*
   if(d.cost)v+=Math.min(6,left*.6);if(k==='nakhla')v+=G.board.filter(t=>owner(t)===p.i).reduce((a,t)=>a+t.palm*2,0)+2;if(k==='wazira')v+=p.vz*2+2;if(k==='hikma')v+=p.el*2+2;if(k==='zarifa')v+=Math.floor(p.fk/2)*3;if(k==='majlis')v+=5*(p.dj.length+1);
   if(['harith','qasra','khanjar','tariq','amir'].includes(k))v+=left*.8;return v}
 function bestSummon(p){let b=null,bv=-1e9;for(const k of G.djRow)for(const pay of summonPays(p)){const cost=pay.el*2+pay.fk*1.5;const v=djValue(p,k)-cost;if(v>bv){bv=v;b={k,pay}}}return {b,v:bv}}
-function vizierValue(p,n){const others=G.pl.filter(q=>q.i!==p.i);let v=n*(hasDj(p,'wazira')?3:1);for(const q of others){const before=q.vz<p.vz,after=q.vz<p.vz+n;if(!before&&after)v+=10*(G.round>3?1:.7);else if(!after&&q.vz-p.vz<=n+2)v+=2}return v}
+function vizierValue(p,n){if(lvOf(p).naive)return n*(hasDj(p,'wazira')?3:1);const others=G.pl.filter(q=>q.i!==p.i);let v=n*(hasDj(p,'wazira')?3:1);for(const q of others){const before=q.vz<p.vz,after=q.vz<p.vz+n;if(!before&&after)v+=10*(G.round>3?1:.7);else if(!after&&q.vz-p.vz<=n+2)v+=2}return v}
 function killValue(p,n,tile){let best=0;for(const q of G.pl){if(q.i===p.i||hasDj(q,'sadim'))continue;if(q.vz){const leader=G.pl.every(x=>x.vz<=q.vz);best=Math.max(best,leader?6:2)}if(q.el)best=Math.max(best,3+(q.el>=2?1:0))}
   for(const t of G.board){if(t.block||!t.m.length||MDIST(tile,t.i)>n+p.fk)continue;if(t.m.length===1&&t.camel==null&&t.tent==null)best=Math.max(best,tileWorth(t)-2)}return best}
 function evalOutcome(p,o){const t=G.board[o.e];let v=0;
@@ -23,7 +26,7 @@ function evalOutcome(p,o){const t=G.board[o.e];let v=0;
   const mine=owner(t)===p.i||(owner(t)==null&&remain<=0&&p.camels>0);const theirs=owner(t)!=null&&owner(t)!==p.i;
   if(owner(t)==null&&remain<=0&&p.camels>0)v+=tileWorth(t)+(t.k==='city'?6:0)+(G.endTrig?0:1)-(p.camels<=2&&!aiAhead(p)?6:0);
   switch(o.c){case 'vizier':v+=vizierValue(p,o.n);break;case 'elder':v+=o.n*(hasDj(p,'hikma')?4:2)+(G.djRow.length?o.n*1.5:0);break;
-    case 'merchant':v+=goodsGain(p,G.market.slice(0,o.n));break;case 'builder':{const blues=AROUND(o.e).filter(i=>G.board[i].blue&&!G.board[i].block).length;v+=o.n*blues;break}
+    case 'merchant':v+=lvOf(p).naive?o.n*1.5:goodsGain(p,G.market.slice(0,o.n));break;case 'builder':{const blues=AROUND(o.e).filter(i=>G.board[i].blue&&!G.board[i].block).length;v+=o.n*blues;break}
     case 'assassin':v+=killValue(p,o.n,o.e);break;case 'artisan':v+=o.n*2.6+(G.items.length?4:0);break}
   switch(t.k){case 'village':v+=mine?5:theirs?-4:1;break;case 'oasis':v+=mine?(hasDj(p,'nakhla')?5:3):theirs?-2.5:1;break;
     case 'sacred':{const pe=Object.assign({},p,{el:p.el+(o.c==='elder'?o.n:0)});const s=bestSummon(pe);if(s.b)v+=Math.max(0,s.v);break}
@@ -33,12 +36,23 @@ function evalOutcome(p,o){const t=G.board[o.e];let v=0;
     case 'workshop':if(G.items.length&&(p.art||p.fk>=2))v+=3;break}
   return v+(Math.random()-.5)*aiNoise(p)*6}
 function aiAhead(p){const s=scoreOf(p).total;return G.pl.every(q=>q.i===p.i||scoreOf(q).total<=s)}
-function planTurn(p){const cap=(LVL[p.lv]||LVL.normal).depth;let best=null,bv=-1e9;for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);if(v>bv){bv=v;best=o}}return best&&Object.assign(best,{v:bv})}
+function planTurn(p){const L=lvOf(p),cap=L.depth;let best=null,bv=-1e9;const all=[];for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);all.push([o,v]);if(v>bv){bv=v;best=o}}
+  if(L.look&&!AISIM&&all.length>1){all.sort((a,b)=>b[1]-a[1]);best=null;bv=-1e9;for(const [o,v] of all.slice(0,L.look)){const r=v-1*replyValue(p,o);if(r>bv){bv=r;best=o}}}
+  return best&&Object.assign(best,{v:bv})}
+// one move ahead: play outcome o for p on a copy of the game (its own tribe and tile actions by the normal policy), then the best
+// value the next rival can get from the position. The real game, the log and the effects queue are restored afterwards.
+let AISIM=false;
+function replyValue(p,o){const save=G,plan=AIPLAN,fxn=UI.fx.length;AISIM=true;let val=0;
+  try{G=JSON.parse(JSON.stringify(G));const me=G.pl[p.i],lv=me.lv;me.lv='normal';AIPLAN=Object.assign({},o);
+    let r=performMove({act:'start',tile:o.s},p.i);let n=0;
+    while(r&&r.success&&!G.over&&sideToAct()===p.i&&n++<60){const m=G.step==='move'&&G.move?aiMove(p.i):aiMove(p.i);if(!m)break;r=performMove(m,p.i)}
+    me.lv=lv;const s=sideToAct();if(!G.over&&s>=0&&s!==p.i&&G.phase==='turn'&&G.step==='move'&&!G.move){const q=P(s),ql=q.lv;q.lv='normal';const b=planTurn(q);q.lv=ql;val=b?Math.max(0,b.v):0}}
+  catch(e){val=0}finally{G=save;AIPLAN=plan;UI.fx.length=fxn;AISIM=false}return val}
 function bestTurnValue(p){const b=planTurn(Object.assign({},p,{lv:'hard'}));return b?b.v:0}
 // the next concrete move for side s
 function aiMove(s){const p=P(s);const vm=validMoves(s);if(!vm.length)return null;const by=a=>vm.filter(m=>m.act===a);
   if(G.q)return {act:'q',i:aiAnswer(G.q)};
-  if(G.phase==='bid'){const v=bestTurnValue(p);const budget=Math.max(0,v*.35-2);let pick=vm[vm.length-1];let pv=-1;for(const m of vm){const pr=bidPrice(p,m.spot,m.fk);if(pr<=budget&&G.track[m.spot].cost>pv){pv=G.track[m.spot].cost;pick=m}}return pick}
+  if(G.phase==='bid'){const v=bestTurnValue(p);const budget=lvOf(p).overbid?Math.max(0,v*.8):Math.max(0,v*.35-2);let pick=vm[vm.length-1];let pv=-1;for(const m of vm){const pr=bidPrice(p,m.spot,m.fk);if(pr<=budget&&G.track[m.spot].cost>pv){pv=G.track[m.spot].cost;pick=m}}return pick}
   const dj=aiDjinn(p,vm);if(dj)return dj;const it=aiItem(p,vm);if(it)return it;
   switch(G.step){
   case 'move':{if(!G.move){AIPLAN=planTurn(p);if(!AIPLAN)return vm[0];return {act:'start',tile:AIPLAN.s}}
