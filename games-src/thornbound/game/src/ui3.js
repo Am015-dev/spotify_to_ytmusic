@@ -124,7 +124,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q
    case 'place':{const rs=[...new Set(mv.map(m=>m.r))];rs.forEach(r=>{hl.push(2*r,2*r+1)});h+='<p class="hint">Tap a hand card to choose it yourself'+(rs.length>1?' (then pick the region)':'')+'.</p>';if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
    case 'tie':{h+='<p class="hint">Or tap a hand card to play it face-down into the tied Clash.</p>';const ps=mv.find(m=>m.pass);foot=(ps&&!(rm&&rm.pass)?'<button class="btn" data-a="mv" data-k="'+esc(ps.k)+'">Pass</button>':'')+(rm?pbtn(rm,recBtnText(rm),pulse):'');break}
    case 'location':{h+='<div class="locgrid two">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' Influence'+(DD.LOCS[m.loc][3]?', '+esc(lcFirst(DD.LOCS[m.loc][3])):'')+(G.pl[s].herald===m.loc?' · your Herald: +1 more':'')+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';mv.forEach(m=>hl.push(m.loc));if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
-   case 'clashOrder':{h+='<div class="opts">'+mv.map(m=>optBtn(m,'ord',orderChips(m.order))).join('')+'</div>';if(rm)foot=pbtn(rm,'Use the suggested order',pulse);break}
+   case 'clashOrder':{h+='<div class="opts">'+mv.slice().sort((a,b)=>(recK()===b.k)-(recK()===a.k)).map(m=>optBtn(m,'ord',orderChips(m.order))).join('')+'</div>';if(rm)foot=pbtn(rm,'Use the suggested order',pulse);break}
    default:{
      if(q.t==='menu'){const r=menuHTML(s,mv,rm,pulse);h+=r.h;foot=r.f}
      else if(q.t==='sel'){const r=selHTML(s,mv,rm,q,pulse);h+=r.h;foot=r.f}
@@ -155,7 +155,7 @@ function orderChips(o){return '<span class="oc">'+o.map((r,i)=>'<i>'+['I','II','
 // Kingdom Card offers (bid resolution)
 function bidResHTML(s,mv){let h='<div class="offers">';
   const take=mv.filter(m=>m.t==='take'),steal=mv.filter(m=>m.t==='steal'),ret=mv.filter(m=>m.t==='return');
-  for(const m of take.concat(steal)){const k=TB.kingdomInfo(m.kc);const rec=recK()===m.k;
+  for(const m of take.concat(steal).sort((a,b)=>(recK()===b.k)-(recK()===a.k))){const k=TB.kingdomInfo(m.kc);const rec=recK()===m.k;
     h+='<div class="offer'+(rec?' rec':'')+'"><button class="kcth" data-a="kc" data-n="'+m.kc+'" aria-label="Read '+esc(k.name)+'">'+kcEl(m.kc,52).outerHTML+'</button><div class="ob"><b>'+esc(k.name)+'</b> <em>'+SUIT_N[k.suit]+'</em>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+'<p>'+gloss(k.text)+'</p>'+(m.t==='steal'?'<p class="st-n">'+stealPreview(s,m)+'</p>':'')+'<button class="btn" data-a="'+(m.t==='steal'?'confirm':'mv')+'" data-k="'+esc(m.k)+'">'+(m.t==='steal'?'Steal':'Take')+'</button></div></div>'}
   for(const m of ret){const rec=recK()===m.k;h+='<div class="offer ret'+(rec?' rec':'')+'"><div class="ob"><b>Keep your card</b><p>Take your bid card back into your hand and take nothing.</p><button class="btn" data-a="mv" data-k="'+esc(m.k)+'">Take it back</button></div></div>'}
   return h+'</div>'}
