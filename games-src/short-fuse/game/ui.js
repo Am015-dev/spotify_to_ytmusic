@@ -106,6 +106,8 @@ function applyMove(m,seat){const r=performMove(m,seat);if(!r.success){console.er
 function snap(){const cut=new Set(),tok={};for(const s of G.st)for(const x of s.w){if(x.cut)cut.add(x.u);tok[x.u]=x.tok.length}let side=0;for(const s of G.st)side+=s.side.length;
   return {g:G.seed+':'+G.mission,logN:G.logN,dial:G.dial,cut,tok,side,valid:G.valid.length,over:!!G.over,rf:G.ms.rf?G.ms.rf.at:null,turn:G.turn}}
 // whose turn a log turn number was (from the "— X's turn —" line); -1 for the opening
+// a later result on the same turn of yours (the tag after a miss, the fuse step) belongs to the same card
+function PX_SAME(a,b){return a.kind==='miss'||b.kind==='info'||b.kind==='miss'}
 function turnActor(t){const l=G.log.find(x=>x.turn===t&&x.c==='turn');if(!l)return -1;const m=/— (.+)'s turn —/.exec(l.t);const q=m&&G.seats.find(x=>x.nm===m[1]);return q?q.i:-1}
 function diffFx(a,b){if(!a||a.g!==b.g){UI.lastActor=null;return}const newLog=G.log.filter(l=>l.i>a.logN).reverse();if(!newLog.length&&b.dial===a.dial){if(!G.q||G.q.who!==UI.lastActor)UI.lastActor=null;return}
   const newCut=[...b.cut].filter(u=>!a.cut.has(u));const newTok=Object.keys(b.tok).filter(u=>b.tok[u]>(a.tok[u]||0));
@@ -121,7 +123,7 @@ function diffFx(a,b){if(!a||a.g!==b.g){UI.lastActor=null;return}const newLog=G.l
   else if(dialDown)kind='miss';
   const lines=newLog.filter(l=>l.c!=='turn');
   const made=!!(kind||lines.some(l=>l.c==='eq'||l.c==='good'||l.c==='bad'||l.c==='big'));if(made)UI.res={kind:kind||'info',lines:lines.slice(-6),turn:G.turn,actor:UI.lastActor!=null?UI.lastActor:G.actor,t:Date.now()};
-  if(made&&UI.res.kind!=='info'&&modeOf()==='solo'&&UI.res.lines.length&&turnActor(UI.res.lines[UI.res.lines.length-1].turn)===humans()[0]){UI.myRes=UI.res;UI.myAck=false}
+  if(made&&UI.res.kind!=='info'&&modeOf()==='solo'&&UI.res.lines.length&&turnActor(UI.res.lines[UI.res.lines.length-1].turn)===humans()[0]){const pm=UI.myRes;if(pm&&pm.turn===UI.res.turn&&pm!==UI.res&&(PX_SAME(pm,UI.res))){pm.lines=pm.lines.concat(UI.res.lines).slice(-6);if(UI.res.kind!=='info')pm.kind=pm.kind==='miss'?'miss':UI.res.kind;UI.res=pm}else{UI.myRes=UI.res;UI.myAck=false}}
   UI.lastActor=null;
   if(!ANIM)return;
   const tileAt=u=>tid(u);
