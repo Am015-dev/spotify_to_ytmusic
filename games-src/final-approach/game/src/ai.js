@@ -255,8 +255,8 @@ function move(G0, seat, level, opt) {
   if (opt.eps && rand() < opt.eps && scored.length > 1) return scored[Math.min(scored.length - 1, 1 + Math.floor(rand() * 2))].m;   // exploration for training data
   if (level === 'easy') {
     // a beginner partner: usually the sensible move, now and then another sensible one (never one that is clearly a disaster)
-    const top = scored[0].s, safe = scored.filter(x => x.s > top - 1.5), pool = safe.length ? safe : scored;
-    if (rand() < 0.2) return pool[Math.min(pool.length - 1, Math.floor(rand() * 3))].m;
+    const top = scored[0].s, safe = scored.filter(x => x.s > top - 1.0), pool = safe.length ? safe : scored;
+    if (rand() < 0.12) return pool[Math.min(pool.length - 1, Math.floor(rand() * 2))].m;
     return pool[0].m;
   }
   if ((level === 'hard' || level === 'normal') && scored.length > 1 && !opt.noMC) return monteCarlo(G, seat, scored, rand, Object.assign(level === 'hard' ? { top: AI.HMC.top, samples: AI.HMC.samples } : { top: AI.NMC.top, samples: AI.NMC.samples }, opt));
