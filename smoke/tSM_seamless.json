@@ -1,0 +1,185 @@
+{
+ "mode": "seamless",
+ "route": "C→D→A",
+ "bootMs": 70290,
+ "mem0": {
+  "heapMB": 325,
+  "geos": 1092,
+  "tex": 107
+ },
+ "calls0": {
+  "calls": 353,
+  "tris": 1331121
+ },
+ "legs": [
+  {
+   "done": true,
+   "to": "D",
+   "at": "D",
+   "t": 252.1,
+   "len": 9832,
+   "steps": 15128,
+   "p50": 18.7,
+   "p99": 92.1,
+   "max": 658.4,
+   "maxAt": {
+    "t": 25,
+    "d": "A"
+   },
+   "renMax": 0,
+   "lz": 5,
+   "spikes": [
+    [
+     658,
+     "miniDraw:647 pedStep:3 hubTrafficStep:654"
+    ],
+    [
+     646,
+     "miniDraw:623 pedStep:4 hubCullStep:4 hubTrafficStep:638"
+    ],
+    [
+     627,
+     "roamTerr:4 FL_terr:5 miniDraw:550 hubCullStep:9 hubTrafficStep:575"
+    ],
+    [
+     610,
+     "roamTerr:274 miniDraw:305 pedStep:80 hubCullStep:8 hubTrafficStep:603 roamHud:4"
+    ],
+    [
+     527,
+     "roamTerr:7 miniDraw:502 pedStep:4 hubCullStep:5 hubTrafficStep:526"
+    ],
+    [
+     500,
+     "roamTerr:11 miniDraw:458 pedStep:6 hubCullStep:7 hubTrafficStep:491"
+    ]
+   ],
+   "dl": [
+    [
+     "C",
+     "A",
+     0.2,
+     9
+    ],
+    [
+     "A",
+     "B",
+     42.5,
+     25
+    ],
+    [
+     "B",
+     "C",
+     104.8,
+     20
+    ],
+    [
+     "C",
+     "D",
+     212.8,
+     34
+    ]
+   ],
+   "rescue": 0,
+   "stuckMax": 0.1
+  },
+  {
+   "done": true,
+   "to": "A",
+   "at": "A",
+   "t": 241.8,
+   "len": 9140,
+   "steps": 14506,
+   "p50": 22.3,
+   "p99": 85,
+   "max": 421.1,
+   "maxAt": {
+    "t": 0.6,
+    "d": "D"
+   },
+   "renMax": 0,
+   "lz": 5,
+   "spikes": [
+    [
+     421,
+     "roamTerr:4 miniDraw:7 pedStep:2 hubTrafficStep:411"
+    ],
+    [
+     397,
+     "miniDraw:3 hubTrafficStep:200 roamHud:6"
+    ],
+    [
+     367,
+     "hubCullStep:51 hubTrafficStep:54 roamHud:312"
+    ],
+    [
+     340,
+     "roamTerr:5 pedStep:4 hubCullStep:310 hubTrafficStep:324 roamHud:3"
+    ],
+    [
+     329,
+     "roamTerr:3 tutStep:3 miniDraw:293 hubCullStep:9 hubTrafficStep:311"
+    ],
+    [
+     310,
+     "roamTerr:37 smashCheck:20 miniDraw:4 pedStep:20 hubCullStep:6 hubTrafficStep:116"
+    ]
+   ],
+   "dl": [
+    [
+     "D",
+     "C",
+     41.5,
+     33
+    ],
+    [
+     "C",
+     "B",
+     162.3,
+     32
+    ],
+    [
+     "B",
+     "A",
+     213.5,
+     35
+    ]
+   ],
+   "rescue": 0,
+   "stuckMax": 0.1
+  }
+ ],
+ "loadingScreens": 0,
+ "reloads": 0,
+ "reloadMs": [],
+ "cross": 6,
+ "worstFrame": 658.4,
+ "worstRender": null,
+ "mem1": {
+  "heapMB": 347,
+  "geos": 1092,
+  "tex": 108
+ },
+ "calls1": {
+  "calls": 445,
+  "tris": 1535722
+ },
+ "callsAt": {
+  "A": {
+   "calls": 419,
+   "tris": 1552696
+  },
+  "B": {
+   "calls": 500,
+   "tris": 1701448
+  },
+  "C": {
+   "calls": 417,
+   "tris": 1815953
+  },
+  "D": {
+   "calls": 362,
+   "tris": 1642413
+  }
+ }
+}

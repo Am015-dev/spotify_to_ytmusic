@@ -24,12 +24,12 @@ const throttle=(p,r)=>p.cdp.send('Emulation.setCPUThrottlingRate',{rate:r});
 const leg=(p,to,secs)=>p.evaluate(([to,secs,RENDER_EVERY])=>new Promise(res=>{const M=__mho,RO=M.RO,K=M.K,D=M.athDist()[to],sm=window.__sm;
  const W=(e,n)=>{const ox=1850,oy=1750;return[-(e-ox),n-oy]};let tgt=W(D.st[0],D.st[1]);
  // split build: the target district is not loaded, drive to the DRIVE TO gate that leads towards it
- const gates=M.athGates();if(!(sm&&sm.on)&&M.athd()!==to){const nb={A:'B',B:to==='A'?'A':'C',C:to==='D'?'D':'B',D:'C'}[M.athd()];let g=null,bd=1e9;for(const q of gates)if(q.to===nb){const d=Math.hypot(q.x-RO.x,q.z-RO.z);if(d<bd){bd=d;g=q}}if(g)tgt=[g.x,g.z,1]}
+ const gates=M.athGates();if(!(sm&&sm.on)&&M.athd()!==to){const nb={A:'B',B:to==='A'?'A':'C',C:to==='D'?'D':'B',D:'C'}[M.athd()];let g=null,bd=1e9;for(const q of gates)if(q.to===nb){const d=Math.hypot(q.x-RO.x,q.z-RO.z);if(d<bd){bd=d;g=q}}if(g)tgt=[g.x,g.z,1,nb]}
  const q0=M.rsnap(RO.x,RO.z,300),q1=M.rsnap(tgt[0],tgt[1],400);const P=M.qv.path(q0[0],q0[1],q1[0],q1[1]).P;if(!P||P.length<3)return res({err:'nopath',to,from:M.athd()});
  if(tgt[2])P.push([tgt[0]+(tgt[0]-P[P.length-2][0])*4,tgt[1]+(tgt[1]-P[P.length-2][1])*4]);
  M.warp(P[0][0],P[0][1],Math.atan2(P[2][0]-P[0][0],P[2][1]-P[0][1]));M.roamSim(2);const cum=[0];for(let k=1;k<P.length;k++)cum.push(cum[k-1]+Math.hypot(P[k][0]-P[k-1][0],P[k][1]-P[k-1][1]));
  const FT=[],REN=[],dl=[],ring=[],cross=[];let cw=0,cm=0,warpMax=0,over50=0,i=0,t=0,stuck=0,mst=0,air=0,lastD=M.athd(),rescue=0,maxSt=0,maxAt=null,maxR=0,lastX=RO.x,lastZ=RO.z;const R0=window.__fastR,dbg=__dbg;
- const step=()=>{for(let n=0;n<30;n++){if(!RO.on)return res({reload:1,t:+(t/60).toFixed(1),FT:FT.slice(-5),i,len:P.length});
+ const step=()=>{for(let n=0;n<30;n++){if(!RO.on){FT.sort((a,b)=>a-b);return res({reload:1,t:+(t/60).toFixed(1),steps:FT.length,p50:FT.length?+FT[FT.length>>1].toFixed(2):null,p99:FT.length?+FT[Math.floor(FT.length*.99)].toFixed(2):null,max:+maxSt.toFixed(1),over50,from:M.athd()})}
    let bj=i,bd=1e9;for(let k=i;k<Math.min(P.length,i+60);k++){const d=Math.hypot(P[k][0]-RO.x,P[k][1]-RO.z);if(d<bd){bd=d;bj=k}}i=bj;
    let k=i;while(k<P.length-1&&cum[k]-cum[i]<9+Math.abs(RO.v)*.35)k++;let a=Math.atan2(P[k][0]-RO.x,P[k][1]-RO.z)-RO.h;a=Math.atan2(Math.sin(a),Math.cos(a));const vt=34*Math.max(.35,1-Math.abs(a)*.9);
    K.ArrowLeft=a>.035;K.ArrowRight=a<-.035;K.ArrowUp=RO.v<vt;K.ArrowDown=RO.v>vt+6;
@@ -38,8 +38,9 @@ const leg=(p,to,secs)=>p.evaluate(([to,secs,RENDER_EVERY])=>new Promise(res=>{co
    ring.push(dt);if(ring.length>180)ring.shift();if(cw>0){cm=Math.max(cm,dt);if(--cw===0){cross.push(+cm.toFixed(1))}}
    if(M.athd()!==lastD){dl.push([lastD,M.athd(),+(t/60).toFixed(1),Math.round(RO.v)]);lastD=M.athd();cw=180;cm=Math.max(...ring)}
    if(Math.abs(RO.v)<2)stuck++;else stuck=0;mst=Math.max(mst,stuck);if(stuck>240){stuck=0;rescue++;const q=M.rsnap(P[Math.min(P.length-1,i+3)][0],P[Math.min(P.length-1,i+3)][1],100);M.warp(q[0],q[1],RO.h);M.roamSim(2)}
-   t++;const done=tgt[2]?false:(i>=P.length-3||(M.athd()===to&&Math.hypot(RO.x-tgt[0],RO.z-tgt[1])<250));if(done||t>secs*60){K.ArrowLeft=K.ArrowRight=K.ArrowUp=K.ArrowDown=false;
-    FT.sort((a,b)=>a-b);return res({done,to,at:M.athd(),t:+(t/60).toFixed(1),len:Math.round(cum[cum.length-1]),steps:FT.length,p50:+FT[FT.length>>1].toFixed(2),p99:+FT[Math.floor(FT.length*.99)].toFixed(2),max:+maxSt.toFixed(1),maxAt,over50,crossMax:cross,warpMax:+warpMax.toFixed(1),renMax:+maxR.toFixed(1),lz:window.__sm?__sm.lz().filter(l=>l.done).length:null,spikes:window.__dbgT?__dbgT.log.splice(0).sort((a,b)=>b[0]-a[0]).slice(0,6):undefined,dl,rescue,stuckMax:+(mst/60).toFixed(1)})}}
+   t++;if(tgt[2]&&(i>=P.length-3||t>60*60)&&!window.__smGo){window.__smGo=1;M.athGo(tgt[3],tgt[0],tgt[1],RO.h);continue}
+   const done=tgt[2]?false:(i>=P.length-3||(M.athd()===to&&Math.hypot(RO.x-tgt[0],RO.z-tgt[1])<250));if(done||t>secs*60){K.ArrowLeft=K.ArrowRight=K.ArrowUp=K.ArrowDown=false;
+    if(!FT.length)FT.push(0);FT.sort((a,b)=>a-b);return res({done,to,at:M.athd(),t:+(t/60).toFixed(1),len:Math.round(cum[cum.length-1]),steps:FT.length,p50:+FT[FT.length>>1].toFixed(2),p99:+FT[Math.floor(FT.length*.99)].toFixed(2),max:+maxSt.toFixed(1),maxAt,over50,crossMax:cross,warpMax:+warpMax.toFixed(1),renMax:+maxR.toFixed(1),lz:window.__sm?__sm.lz().filter(l=>l.done).length:null,spikes:window.__dbgT?__dbgT.log.splice(0).sort((a,b)=>b[0]-a[0]).slice(0,6):undefined,dl,rescue,stuckMax:+(mst/60).toFixed(1)})}}
   setTimeout(step,0)};step()}),[to,secs,+(process.env.REN||0)]);
 const mem=p=>p.evaluate(()=>{try{gc()}catch(e){}const i=__dbg.renderer.info;return{heapMB:Math.round(performance.memory.usedJSHeapSize/1e6),geos:i.memory.geometries,tex:i.memory.textures}});
 const calls=p=>p.evaluate(()=>{const D=__dbg,r=D.renderer;r.info.autoReset=false;r.info.reset();(window.__fastR||D.composer.render).call(D.composer);const o={calls:r.info.render.calls,tris:r.info.render.triangles};r.info.autoReset=true;return o});

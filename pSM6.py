@@ -34,5 +34,8 @@ R("try{if(!MINI&&HUB.built){const t1=performance.now();MINI=miniBase();SM3.miniM
   "try{if(HUB.built&&SM_ON){const t1=performance.now();SMM_grids();SM3.miniMs=Math.round(performance.now()-t1)}else if(!MINI&&HUB.built){const t1=performance.now();MINI=miniBase();SM3.miniMs=Math.round(performance.now()-t1)}}catch(e){console.error(e)}}")
 # one-map Athens: the window canvas is always the one to draw
 R("inC=RO.x-HX0>rr&&HX1-RO.x>rr&&RO.z-HZT>rr&&HZN-RO.z>rr;","inC=SM_ON||RO.x-HX0>rr&&HX1-RO.x>rr&&RO.z-HZT>rr&&HZN-RO.z>rr;")
+# full map: zoom steps stay district-sized (2.2 km = the old A box) instead of fitting the whole 10 km city; pinch out shows all of Athens
+R("const base=Math.min(W/(HX1-HX0),Hh/(HZN-HZT))","const base=SM_ON?Math.min(W,Hh)/2200:Math.min(W/(HX1-HX0),Hh/(HZN-HZT))")
+R("const sc=Math.min(C.width/(HX1-HX0),C.height/(HZN-HZT))*RO.mapZ/DPR2();RO.mapC.x+=dx/sc;","const sc=SM_ON&&RO.mapSc?RO.mapSc/DPR2():Math.min(C.width/(HX1-HX0),C.height/(HZN-HZT))*RO.mapZ/DPR2();RO.mapC.x+=dx/sc;")
 R("window.__sm3=SM3;","window.__sm3=SM3;window.__smm=SMM;SMM.fn={tile:(a,b)=>SMM_tile(a,b),center:(x,z)=>SMM_center(x,z)};")
 save()
