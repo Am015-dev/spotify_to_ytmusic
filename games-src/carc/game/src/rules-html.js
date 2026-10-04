@@ -5,7 +5,7 @@ const RULES_HTML=`<div class="rules">
 <p>On your turn you draw one tile and must lay it next to the tiles already down (side by side, not only corner to corner). You may turn it, but every edge that touches another tile must match: town wall to town, road to road, field to field. The glowing squares show every place your tile fits; tap one, turn the tile with ⟳, then press ✓.</p>
 <p>If a tile fits nowhere at all (very rare), it is put aside and you draw another.</p>
 <h3>2. You may place one follower</h3>
-<p>You may then put <b>one</b> of your 7 followers on the tile you just laid — on its road (a <i>wayfarer</i>), a town piece (a <i>warden</i>), the priory (a <i>brother</i>) or a field (a <i>farmer</i>). You may only choose a road, town or field in which <b>nobody</b> stands yet, counting all the tiles it already spreads over. Later, two separately claimed roads or towns can grow together; then they are shared.</p>
+<p>You may then put <b>one</b> of your 7 followers on the tile you just laid — on its road, a town piece, the priory, or a field (a follower lying in a field is a <i>farmer</i>). You may only choose a road, town or field in which <b>nobody</b> stands yet, counting all the tiles it already spreads over. Later, two separately claimed roads or towns can grow together; then they are shared.</p>
 <h3>3. Finished features score at once</h3>
 <ul>
 <li><b>Road:</b> finished when both ends stop (at a crossroads, a town, a priory, a farm) or it forms a loop. 1 point per tile.</li>
