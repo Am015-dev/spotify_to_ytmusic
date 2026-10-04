@@ -175,9 +175,10 @@ function OG_step(dt){const e=OG.ev;e.tm+=dt;const x=RO.x,z=RO.z;const sp=Math.ab
     if(e.n===e.objs.length)return OG_end(e.n)}
   else if(e.kind==='ghost'){e.gd=Math.min(e.W.len,e.gd+dt*e.gv);const q=OG_at(e.W,e.gd);e.gh.position.set(q.x,groundY(q.x,q.z),q.z);e.gh.rotation.y=q.h;let bd=1e9,bs=0;const P=e.W.P;for(let i=1;i<P.length;i++){const a=P[i-1],b=P[i],ex=b[0]-a[0],ez=b[1]-a[1],l2=ex*ex+ez*ez||1,u=clamp(((x-a[0])*ex+(z-a[1])*ez)/l2,0,1),d=Math.hypot(a[0]+ex*u-x,a[1]+ez*u-z);if(d<bd){bd=d;bs=e.W.C[i-1]+u*Math.sqrt(l2)}}e.d=Math.max(e.d,bd<25?bs:e.d);
     if(Math.hypot(e.fin.x-x,e.fin.z-z)<8&&e.d>e.W.len*.8){e.fin_t=e.tm;return OG_end(e.tm)}}
-  else if(e.kind==='drift'){if(RO.dDir&&Math.hypot(e.sp.x-x,e.sp.z-z)<75){const tr=RO.dT>2?3:RO.dT>1.1?2:RO.dT>.5?1:0;e.n+=dt*sp*1.2*(1+.5*tr)}}
+  else if(e.kind==='ljump'){const T=RO.takeoff;if(e.off==null)e.off=RO.y-groundY(x,z);if(T&&!T.og)T.og=RO.y>groundY(T.x,T.z)+e.off+1;if(T&&T.og&&T.r===e.ramp&&e.cross==null&&RO.y<=groundY(T.x,T.z)+(e.off??0)+.5)e.cross=Math.hypot(x-T.x,z-T.z)}  // back down at road height: flying off onto lower ground doesn't add distance
+else if(e.kind==='drift'){if(RO.dDir&&Math.hypot(e.sp.x-x,e.sp.z-z)<75){const tr=RO.dT>2?3:RO.dT>1.1?2:RO.dT>.5?1:0;e.n+=dt*sp*1.2*(1+.5*tr)}}
   OG_hud()}
-function OG_landed(t){const e=OG.ev;if(!e||!t||(e.kind!=='stunt'&&e.kind!=='ljump')||t.r!==e.ramp)return;if(e.kind==='stunt'){e.land=Math.hypot(RO.x-e.tx,RO.z-e.tz);if(e.land>40)e.land=null}else e.land=Math.hypot(RO.x-t.x,RO.z-t.z);OG_end(e.land)}
+function OG_landed(t){const e=OG.ev;if(!e||!t||(e.kind!=='stunt'&&e.kind!=='ljump')||t.r!==e.ramp)return;if(e.kind==='stunt'){e.land=Math.hypot(RO.x-e.tx,RO.z-e.tz);if(e.land>40)e.land=null}else e.land=Math.min(Math.hypot(RO.x-t.x,RO.z-t.z),e.cross??1e9);OG_end(e.land)}
 function OG_boom(x,z,c){try{const p=V3(x,groundY(x,z)+1.5,z);burst(SPARK,p,22,16,.5,new THREE.Color(c));debris(p,V3(Math.sin(RO.h)*12,6,Math.cos(RO.h)*12),6,[new THREE.Color(c),new THREE.Color('#ffd12c')],.8)}catch(err){}}
 function OG_end(v,silent){const e=OG.ev;if(!e)return;OG.ev=null;for(const m of e.meshes)m.parent&&m.parent.remove(m);for(const m of e.rampMeshes||[])m.parent&&m.parent.remove(m);for(const r of e.rampR||[]){const i=RO.ramps.indexOf(r);if(i>=0)RO.ramps.splice(i,1)}
   OG_el('ogHud').hidden=true;OG.cool=2.5;if(silent)return;const md=OG_tier(e,v),s=OG_sv(),prev=s.e[e.sp.id]||0;OG.log.fin++;OG.log.tier[md]++;
