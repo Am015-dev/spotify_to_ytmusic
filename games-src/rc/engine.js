@@ -94,7 +94,7 @@ function morale(n,arrow){const b=G.morale;G.morale=Math.max(-3,Math.min(3,G.mora
 function gain(r,n,ctx){if(n<=0)return;const box=ctx&&ctx.fut?G.fut:G.res;box[r]+=n;lg(`+${n} ${RNAME[r]}${ctx&&ctx.fut?' (arrives after the actions)':''}.`,'good');fx('res',r)}
 // pay: take from available; food may use non-perishable food; missing units cost wounds to 'who'
 function pay(r,n,whoC,ip,why){let miss=0;if(r==='food'){const a=Math.min(n,G.res.food);G.res.food-=a;const b=Math.min(n-a,G.res.pfood);G.res.pfood-=b;miss=n-a-b}else{const a=Math.min(n,G.res[r]);G.res[r]-=a;miss=n-a}
-  if(n-miss>0)lg(`-${n-miss} ${RNAME[r]}.`);if(miss&&!ip){for(const c of whoC)wound(c,miss,why||`no ${RNAME[r]} to pay`)}return miss}
+  if(n-miss>0)lg(`-${n-miss} ${RNAME[r]}${why&&!/^no /.test(why)?' ('+why.replace(/: no \S+ to pay$/,'')+')':''}.`);if(miss&&!ip){for(const c of whoC)wound(c,miss,why||`no ${RNAME[r]} to pay`)}return miss}
 function roofPal(which,n,needShelter,ip,whoC){if(n>0){if(needShelter&&!hasShelter())return;G.camp[which]+=n;lg(`${which==='roof'?'Roof':'Palisade'} +${n} (now ${G.camp[which]}).`,'good');fx('build');return}
   const d=Math.min(-n,G.camp[which]);G.camp[which]-=d;if(d)lg(`${which==='roof'?'Roof':'Palisade'} -${d} (now ${G.camp[which]}).`,'bad');if(-n>d&&!ip)for(const c of (whoC||living()))wound(c,-n-d,`no ${which==='roof'?'roof':'palisade'} left`)}
 function weapon(n,ip,whoC){if(n>0){G.weapon+=n;lg(`Weapon +${n} (now ${G.weapon}).`,'good');return}const d=Math.min(-n,G.weapon);G.weapon-=d;if(d)lg(`Weapon -${d} (now ${G.weapon}).`,'bad');if(-n>d&&!ip)for(const c of (whoC||living()))wound(c,-n-d,'weapon already at 0')}

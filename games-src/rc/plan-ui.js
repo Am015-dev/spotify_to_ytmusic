@@ -66,7 +66,7 @@ function wzReview(){let h=`<p class="wz-p">Each job shows its risk. <b>Certain</
   if(!G.plan.acts.length)return h+`<p class="muted">Nothing planned yet. Go back to step 2, or press 💡 Plan it for me.</p>`;
   const W=UI.sugWhy||{};
   h+=`<div class="review">${G.plan.acts.slice().sort((x,y)=>ORDER_T.indexOf(x.type)-ORDER_T.indexOf(y.type)).map((a,k)=>{const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v} ${RNAME[r]}`).join(' + ');const why=W[JSON.stringify([a.type,a.tgt])];
-    const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)?` <button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">pay with ${a.pay==='fur'?'fur':'wood'}</button>`:'';
+    const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?` <button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">pay with ${a.pay==='fur'?'fur':'wood'}</button>`:'';
     return `<div class="rv" ${posAttr(a)}><div class="rv-n">${k+1}</div><div><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')}</div><div class="rsk">${riskWords(a)}</div>${cost?`<small>Costs ${cost}.${payT}</small>`:''}${why?`<small class="why">Why: ${esc(why)}.</small>`:''}</div></div>`}).join('')}</div>`;
   const pb=planProblems();if(pb.length)h+=`<div class="probs">${pb.slice(0,4).map(x=>`<div>• ${esc(x)}</div>`).join('')}</div>`;
   const open=priorities().filter(p=>!p.done&&!p.info&&p.act);if(open.length)h+=`<div class="notcov"><b>Not covered today:</b> ${open.map(p=>`<span class="${p.red?'red':''}">${esc(p.title)}</span>`).join(' · ')}</div>`;
@@ -96,7 +96,7 @@ function pawnsText(n,far){return n.roll?`${n.need} pawn${n.need>1?'s':''}: dice 
 function planLine(a){const n=actNeed(a);const k=a.pw.length;const dt=dtype(a);let chance;
   if(k<n.need)chance=`<b class="warn">needs ${n.need-k} more</b>`;else if(n.roll&&k<n.max){const o=dt?diceOdds(dt):{s:80,w:1,q:3};chance=`<b class="roll" title="One pawn fewer than sure: the dice decide. Add 1 more pawn for a sure success. A failure gives the leader 2 determination.">🎲 ${o.s}% success · ${o.w}-in-6 wound risk</b>`}else chance='<b class="sure">✔ sure</b>';
   const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v}${RICON[r]}`).join(' ');
-  const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)?`<button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">${a.pay==='fur'?'🧶 fur':'🪵 wood'}</button>`:'';
+  const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?`<button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">${a.pay==='fur'?'🧶 fur':'🪵 wood'}</button>`:'';
   return `<div class="pl" ${posAttr(a)}><span class="pli">${ACT_ICON[a.type]||'•'}</span><div class="plt"><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')} ${chance} ${cost?`<span class="cost">${cost}</span>`:''} ${payT}</div></div></div>`}
 function catCount(k){try{return catRows(k).filter(r=>!r.why).length}catch(e){return 0}}
 // every job in a category: {type,tgt,alt,title,sub,why}

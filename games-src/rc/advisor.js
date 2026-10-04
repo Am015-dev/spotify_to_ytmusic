@@ -76,7 +76,7 @@ function allPriorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.
   const wxl=wxFoodLoss();const short=need+wxl-have-planF;
   if(short>0){const fo=foodOpts();const f=fo[0];const enough=f&&f.food>=short;
     const why=`${need} food needed tonight${wxl?` plus about ${wxl} the rain will likely ruin (clouds above your roof)`:''}, ${have} in store${planF?`, ${planF} planned`:''}. Anyone who goes hungry takes 2 wounds.`+(f?` Best source: ${f.title}, ${f.pawns} pawn${f.pawns>1?'s':''}${f.type==='gather'?'':' (a sure thing)'}, +${f.food} food${enough?' (enough for tonight)':''}.`:' No fish, birds or food reward in reach yet: explore to find some.');
-    add({w:95,red:true,key:'food',icon:'🍖',title:'Find food for tonight',why,act:f?{type:f.type,tgt:f.tgt,alt:f.alt}:null,cant:f?null:planF?'every food source in reach is already in the plan':'no food source in reach',done:false,confirm:`⚠ Only ${have+planF} of ${need+wxl} food for tonight${wxl?' (with the rain)':''}: someone may go hungry (2 wounds).`})}
+    add({w:95,red:true,key:'food',icon:'🍖',title:planF&&have+planF>=need?'More food: the rain will ruin some':'Find food for tonight',why,act:f?{type:f.type,tgt:f.tgt,alt:f.alt}:null,cant:f?null:planF?'every food source in reach is already in the plan':'no food source in reach',done:false,confirm:`⚠ Only ${have+planF} of ${need+wxl} food for tonight${wxl?' (with the rain)':''}: someone may go hungry (2 wounds).`})}
   if(short<=0&&planF>0)add({w:95,info:true,done:true,icon:'🍖',title:`Food for tonight: covered (${have+planF} for ${need}${wxl?`, +${wxl} for rain`:''})`,why:''});
   if(short<=0&&(have+planF>need||G.res.food>0)){const sp=Math.max(0,G.res.food+planF-need);if(sp>0&&!has('cellar')&&!G.kept.m_boxes){const ck=living().find(c=>c.k==='cook');const hurt=living().some(c=>c.w>0);const rem=ck&&hurt&&ck.det>=2;
     add({w:34,info:true,icon:'🥫',title:`${sp} food will spoil tonight`,why:`Fresh food keeps only one night (dry food 🥫 keeps).${rem?` ${ck.nm}: Home Remedy heals 2 wounds for 1 food, and you are offered it at night.`:' Spend pawns on wood or exploring instead of more food.'}`,skill:rem&&ck.human&&!skillWhy(ck.i,'remedy')?`${ck.i}:remedy`:null})}}
@@ -175,7 +175,7 @@ function tutHtml(){if(UI.tut>=99||!G||G.round>1||!planOpen()||allAI())return '';
 // ---------- the guided first game: one idea per screen, each shown once ----------
 UI.guide={on:false,seen:{}};
 const GUIDE={
-  plan1:'<b>Guided game.</b> Every day you <b>plan</b> first, then <b>watch the day play out</b>. This page shows what the camp needs tonight: <b>red rows are trouble</b>. Your goal is in the bar at the top (🎯). Press <b>Next</b>.',
+  plan1:'<b>Guided game.</b> Every day you <b>plan</b> first, then <b>watch the day play out</b>. This page shows what the camp needs tonight: <b>red rows are trouble</b>. Your goal is in the bar under the island (🎯). In the top bar, ♥ is the life of your most hurt castaway. Press <b>Next</b>.',
   plan2:'<b>Give every pawn a job.</b> Each castaway has 2 pawns (workers); Friday and the dog are helpers. The <b>recommended job</b> comes with a reason: tap ✔ if you agree.',
   plan3:'<b>Risks.</b> One pawn on a job rolls the dice (it can fail or hurt). Two pawns make it <b>certain</b>. Anything red is not covered today.',
   plan4:'<b>Start the day.</b> The plan is fixed after this, and the day plays out scene by scene.',
@@ -185,6 +185,8 @@ const GUIDE={
   choice:'<b>Your choice.</b> Pick one of the buttons. The card text under it explains what each one does.',
   weather:'<b>Weather.</b> Each cloud above your roof ruins 1 food and 1 wood. Snow also needs 1 wood each to keep warm.',
   night:'<b>Night.</b> Everyone eats 1 food; anyone hungry takes 2 wounds. Without a shelter, everyone takes 1 wound.',
+  morning:'<b>Morale.</b> Each morning the first player (★) gains or loses <b>✊ determination</b>, the points you spend on skills. Low morale costs ✊; anyone who can’t pay takes a wound.',
+  prod:'<b>Production.</b> Your camp’s place gives its food and wood every morning, for free.',
   daysum:'<b>End of the day:</b> what changed and why, and the one thing to do first tomorrow. <b>If any castaway dies, you all lose.</b>'};
 function guideTip(k){if(!UI.guide.on||UI.guide.seen[k]||!GUIDE[k]||!G||G.round>3)return '';return `<div class="coach gtip" role="note"><div class="cn">First game · tip</div><p>${GUIDE[k]}</p><div class="cb"><button class="btn xs" data-gtip="${k}">Got it</button><button class="btn xs ghost" data-gtip="off">No more tips</button></div></div>`}
 function tutAdvance(to){if(UI.tut<99)UI.tut=Math.max(UI.tut,to)}
