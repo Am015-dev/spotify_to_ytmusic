@@ -1854,7 +1854,7 @@
    "end_game_scoring": {
     "per_husband_wife_pair_in_all_cities": 3
    },
-   "new_text": "Worth 3 points for every Husband+Wife pair in every city, yours and rivals.",
+   "new_text": "Worth 3 points for every Goodman Vole and Goodwife Vole pair in every city, yours and rivals.",
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
@@ -1886,7 +1886,7 @@
    "end_game_scoring": {
     "per_dungeon_prisoner": 3
    },
-   "new_text": "Worth 3 points per prisoner in your Dungeon at game end.",
+   "new_text": "Worth 3 points per prisoner in your Thornhold Cells at game end.",
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
@@ -1901,7 +1901,7 @@
    "end_game_scoring": {
     "per_worker_in_monastery": 3
    },
-   "new_text": "Worth 3 points per worker in your Monastery at game end.",
+   "new_text": "Worth 3 points per worker in your Quietstone Cloister at game end.",
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {
@@ -1954,7 +1954,7 @@
    "end_game_scoring": {
     "per_cemetery_worker": 3
    },
-   "new_text": "Worth 3 points per worker buried in your Cemetery.",
+   "new_text": "Worth 3 points per worker buried in your Mossgrave Glade.",
    "requires_note": "Cards must be in your city when you place the worker; may be removed afterwards. Only one player may ever claim each event. Worker returns at next Prepare for Season."
   },
   {

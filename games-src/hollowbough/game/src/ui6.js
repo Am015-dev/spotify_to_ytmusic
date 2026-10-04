@@ -28,7 +28,7 @@ function coachCheck() {
 const RULES = `<h3>The goal</h3><p>Build the best woodland city. Each player has a city of up to 15 cards and a few workers. When every player has passed, you add up points from cards, point tokens, bonuses, events and the Long Road. The highest total wins.</p>
 <h3>How a turn goes</h3><p>On your turn do exactly <b>one</b> of these:</p><ul><li><b>Place a worker</b> on an open place and use it at once.</li><li><b>Play a card</b> from your hand or from the meadow by paying its price.</li><li><b>Prepare for the next season</b> (only when all your workers are out).</li></ul><p>When you cannot or do not want to do anything useful, <b>Pass</b>. You take no more turns, but your city still scores.</p>
 <h3>Places for workers</h3><ul><li><b>Brown places</b> give resources, cards or a point token. Some are shared, others take one worker only.</li><li><b>Forest places</b> (green) are special and take one worker (two players can share in a four-player game).</li><li><b>The Barter Burrow</b> turns spare cards into resources: 1 resource for every 2 cards you discard.</li><li><b>The Long Road</b> opens in Autumn. Discard cards equal to the spot (5, 4, 3 or 2); the worker stays and scores that many points.</li><li><b>Destinations</b> are red cards in your city. A worker on one uses its power. A few are Open, so rivals may visit them too (the owner gets a point token).</li><li><b>Events</b> are claimed with a worker when your city meets their requirement. Each can be claimed only once.</li></ul>
-<h3>Playing cards</h3><p>Pay the price in resources: twigs, resin, pebbles and berries. You can play from the eight-card meadow as well as from your hand. Your hand holds 8 cards at most. A <b>unique</b> card can be in your city once; a common card as often as you like.</p><p><b>Playing free:</b> each critter is paired with one building. If you own that building and it has no token, you can play the critter free and put a token on the building. Each building can do this once, ever.</p><p>Some cards (Inn, Crane, Dungeon, Judge, Hostler) change the price. They are offered as extra buttons when you play a card.</p>
+<h3>Playing cards</h3><p>Pay the price in resources: twigs, resin, pebbles and berries. You can play from the eight-card meadow as well as from your hand. Your hand holds 8 cards at most. A <b>unique</b> card can be in your city once; a common card as often as you like.</p><p><b>Playing free:</b> each critter is paired with one building. If you own that building and it has no token, you can play the critter free and put a token on the building. Each building can do this once, ever.</p><p>Some cards (Lantern Rest, Pulley Lift, Thornhold Cells, Gavel Marten, Hostler Hedgehog) change the price. They are offered as extra buttons when you play a card.</p>
 <h3>Card colours</h3><ul><li><b>Tan, Traveler:</b> acts once when played.</li><li><b>Green, Production:</b> acts when played and again every Spring and Autumn.</li><li><b>Red, Destination:</b> a place for your workers.</li><li><b>Blue, Governance:</b> a lasting bonus or discount.</li><li><b>Purple, Prosperity:</b> extra points at the end.</li></ul>
 <h3>Seasons</h3><p>Everyone starts in Winter with 2 workers. Preparing for <b>Spring</b> gives +1 worker and runs your production. <b>Summer</b> gives +1 worker and lets you take 2 meadow cards. <b>Autumn</b> gives +2 workers and runs production again. Every player moves through the seasons at their own pace.</p>
 <h3>Scoring</h3><p>Printed points on your cards, point tokens you hold, purple card bonuses, events and Long Road workers. Ties go to the player with more events, then more leftover resources.</p>
@@ -66,18 +66,6 @@ function renderDrawers() {
   if (!GX.open || !G) return;
   if (GX.open === 'logd') { const b = $('#logbody'); b.innerHTML = ''; b.appendChild(logHTML()); }
   if (GX.open === 'rivald') renderRival();
-  if (GX.open === 'setd') renderMenu();
-}
-function renderMenu() {
-  const b = $('#setbody'); b.innerHTML = '';
-  const row = (l, ...k) => b.appendChild(h('div.mrow', h('div.lbl', l), h('div.mbt', k)));
-  if (NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
-  else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
-  row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
-  row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
-  row('Sound', h('button.btn' + (UI.sound === false ? '.alt' : ''), { 'data-a': 'sound', type: 'button' }, UI.sound === false ? 'Off' : 'On'));
-  row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'Rules'), h('button.btn.alt', { 'data-a': 'speedhud', type: 'button' }, 'Speed tool'));
-  b.appendChild(h('p.sm', 'Hollowbough is an original game inspired by the family of woodland city-building worker-placement games. All names, art and text are our own. Art is drawn procedurally; no outside assets.'));
 }
 // ---- start screen
 function renderStart() {
@@ -131,10 +119,9 @@ document.addEventListener('click', ev => {
     case 'rules': GX.show('rulesd'); break;
     case 'save': save(); toast('Game saved.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
-    case 'speed': AIDELAY = +d.v; renderMenu(); break;
-    case 'guide': UI.coach.level = d.v; renderMenu(); break;
-    case 'sound': UI.sound = UI.sound === false; try { if (window.GA) { GA.setSfx(UI.sound); GA.setMusic(UI.sound); } } catch (e) { } renderMenu(); break;
-    case 'speedhud': try { PerfHUD.toggle ? PerfHUD.toggle() : PerfHUD.show && PerfHUD.show(); } catch (e) { } break;
+    case 'speed': AIDELAY = +d.v; break;
+    case 'guide': UI.coach.level = d.v; GX.renderSettings(); break;
+    case 'sound': UI.sound = UI.sound === false; try { if (window.GA) { GA.setSfx(UI.sound); GA.setMusic(UI.sound); } } catch (e) { } GX.renderSettings(); break;
   }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.pop) closePop(); });
@@ -155,12 +142,12 @@ function boot() {
   GX.drawer('rulesd', 'How to play', h('div.rules', { html: RULES }), true);
   GX.drawer('logd', 'Log', h('div#logbody'));
   GX.drawer('rivald', 'Cities and players', h('div#rivalbody'));
-  GX.drawer('setd', 'Menu', h('div#setbody'));
   GX.onShow = id => { renderDrawers(); };
+  kitBoot();
   applyPhone();
   addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { renderBoard(); placePop(); } }).observe(bd);
-  try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'hb' }); }; } catch (e) { }
+  try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'hb' }); GX.applyPrefs(); }; } catch (e) { }
   try { if (window.PerfHUD && PerfHUD.register) PerfHUD.register({ game: 'Hollowbough' }); } catch (e) { }
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
   netInit();

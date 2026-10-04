@@ -90,7 +90,7 @@ function movesFor(seat) { return G && G.phase !== 'over' ? HB.moves(G, seat) : [
 function mkey(m) { const o = {}; Object.keys(m).sort().forEach(k => { if (k !== 'label') o[k] = m[k]; }); return JSON.stringify(o); }
 function sameM(a, b) { return !!a && !!b && mkey(a) === mkey(b); }
 function pcolor(i) { return HBKit.PLAYER[i === 'G' ? 4 : i % 4]; }
-function pawn(i, px) { return HBKit.worker(i === 'G' ? 4 : i % 4, px); }
+function pawn(i, px) { const k = i === 'G' ? 4 : i % 4, w = h('span.pawnw', HBKit.worker(k, px), h('i.gx-cbm', { 'aria-hidden': 'true' }, GX.mark(k))); w.style.setProperty('--pw', px + 'px'); return w; }
 function score(seat) { try { return HB.score(G, seat); } catch (e) { return { total: 0 }; } }
 function lastLogs(n) { return G.log.slice(-n).map(x => x.t); }
 function logSince(i) { return G.log.filter(x => x.i > i).map(x => x.t); }
@@ -293,6 +293,7 @@ function renderActs() {
   a.appendChild(h('button.btn' + (prep ? '' : '.dis') + (rec && rec.type === 'prepare' ? '.rec' : ''), { 'data-a': 'prep', type: 'button', disabled: prep ? null : true }, prep ? 'Prepare: ' + SEASN[p.season + 1] : (mine && p.season >= 3 ? 'Last season' : 'Prepare')));
   a.appendChild(h('button.btn' + (pass ? '' : '.dis') + (rec && rec.type === 'pass' ? '.rec' : ''), { 'data-a': 'pass', type: 'button', disabled: pass ? null : true }, 'Pass'));
   a.appendChild(h('button.btn.alt' + (mine ? '' : '.dis'), { 'data-a': 'hint', type: 'button', disabled: mine ? null : true }, 'Hint'));
+  if (GX.undo.can() && !p.ai && act === viewSeat()) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶ Undo'));
 }
 function renderStrips() {
   const s = focusSeat(), p = G.players[s], w = stripW();
@@ -487,8 +488,8 @@ function howLabel(m) {
     case 'occupy': return [h('b', 'Play it free'), h('span.sm', 'occupies ' + cname(m.via))];
     case 'innkeeper': return [h('b', 'Send away ' + cname(m.via)), h('span.sm', 'cuts 3 berries off the price')];
     case 'crane': return [h('b', 'Dismantle ' + cname(m.via)), h('span.sm', 'cuts 3 resources off the price')];
-    case 'dungeon': return [h('b', 'Use a Dungeon'), h('span.sm', 'lock a critter below it, cut 3 resources')];
-    case 'judge': return [h('b', 'Swap one resource'), h('span.sm', 'the judge lets you pay with another kind')];
+    case 'dungeon': return [h('b', 'Use ' + (D.cards.find(x => x.key === 'dungeon') || { name: 'the cells' }).name), h('span.sm', 'lock a critter below it, cut 3 resources')];
+    case 'judge': return [h('b', 'Swap one resource'), h('span.sm', 'the Gavel Marten lets you pay with another kind')];
   }
   return [h('b', 'Play')];
 }
@@ -517,7 +518,7 @@ function openCard(src, id, seat, slot, trig) {
       if (mm.length) { mm.forEach(m => acts.appendChild(moveBtn(m, howLabel(m)))); const rm = UI.rec && UI.rec.m; if (rm && mm.some(m => sameM(m, rm))) acts.appendChild(reasonBox(why(rm, v))); }
       else acts.appendChild(reasonBox(whyNotPlay(id, src)));
     }
-    body.appendChild(acts); body.appendChild(cw); body.appendChild(h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Close'));
+    body.appendChild(acts); body.appendChild(cw); body.appendChild(h('div.pacts2', h('button.btn.alt', { 'data-a': 'refcard', 'data-id': id, type: 'button' }, 'Read it big'), h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Close')));
     p.appendChild(body);
   });
 }
@@ -580,7 +581,7 @@ function renderQ() {
   if (q.who !== v || G.players[q.who].ai) { pc.hidden = true; return; }
   closePop();
   pc.hidden = false; pc.innerHTML = ''; pc.setAttribute('data-card', 'q'); pc.setAttribute('data-kind', q.kind);
-  pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', q.title), h('span', qHint(q.kind) || 'Your choice')), null));
+  pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', q.title), h('span', qHint(q.kind) || 'Your choice')), GX.undo.can() ? h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶ Undo') : null));
   const body = h('div.ph-body.qbody');
   const rm = UI.rec && UI.rec.m && UI.rec.m.type === 'choose' ? UI.rec.m : null;
   const hasCards = q.opts.some(o => o.card !== undefined), hasRes = q.opts.some(o => o.res !== undefined);
@@ -622,11 +623,14 @@ function newGame(mode, o) {
   if (mode !== 'guided') UI.coachOn = false; else UI.coachOn = true;
   const st = $('#start'); if (st) st.hidden = true;
   closePop(); try { GX.close(); } catch (e) { }
+  kitNewGame();
   render(); schedule();
   return G;
 }
+function kitNewGame() { GX.undo.clear(); recapSeats(); UI.t0 = Date.now(); UI.resultDone = false; UI.earned = null; }
 function render() {
   if (!G || !UI.started) return;
+  { const v = viewSeat(); if (v >= 0) GX.recap.view(v); }
   try { if (window.PerfHUD) PerfHUD.wake(); } catch (e) { }
   renderBoard(); renderDock(); renderQ(); renderCard(); placePop(); markSel(); renderDrawers();
   if (NET.on) netRenderHook();
@@ -667,7 +671,7 @@ function schedule() {
     return;
   }
   if (UI.coachOn && coachCheck()) return;
-  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); }
+  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
   if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
 }
 function aiStep() {
@@ -680,6 +684,7 @@ function aiStep() {
   if (r.ok) sndPost(pre, m, a);
   if (!r.ok) { const ms = HB.moves(G, a); r = HB.apply(G, ms[0]); }
   const ls = logSince(n0); UI.lastAi = ls.length ? ls[0].replace(/^[^ ]+ /, '') : '';
+  GX.recap.push(ls, a);
   afterMove();
 }
 function afterMove() { save(); render(); sndMusic(); schedule(); if (NET.on) netPush(); }
@@ -690,10 +695,12 @@ function act(m) {
   const n0 = G.logN;
   if (m.type === 'prepare' && !NET.on) UI.after.push({ kind: 'season', seat: a, from: n0 });
   const pre = sndPre();
+  if (!G.players[a].ai) GX.undo.snap(m.label || m.type);
   const r = HB.apply(G, m);
   closePop(); UI.rec = null;
   if (r.ok) sndPost(pre, m, a);
-  if (!r.ok) { snd('error'); UI.after.pop(); toast(r.error || 'That move is not allowed.'); render(); return; }
+  if (!r.ok) { snd('error'); UI.after.pop(); GX.undo.drop(); toast(r.error || 'That move is not allowed.'); render(); return; }
+  GX.undo.check(revealed); GX.recap.mark(a); GX.recap.push(logSince(n0), a);
   UI.lastAi = ''; afterMove();
 }
 function choose(i) { const a = HB.actor(G); const m = movesFor(a).find(x => x.type === 'choose' && x.i === i); if (m) act(m); }
@@ -708,6 +715,7 @@ function flushAfter() {
 // ---- end of game: one card per player, then the result
 function queueOver() {
   const ov = G.over; if (!ov) return;
+  GX.undo.clear(); GX.recap.clear(); kitResult();
   const rows = (sc, name, s) => {
     const l = [['Printed card points', sc.cards], ['Point tokens', sc.tokens], ['Prosperity bonuses', sc.bonus], ['Events', sc.events], ['The Long Road', sc.journey]];
     const t = h('div.score');
@@ -720,15 +728,15 @@ function queueOver() {
   if (G.grim) UI.cards.push({ kind: 'over-score', title: 'Final score: ' + D.soloName, sub: 'Your solo rival', body: () => { const g = ov.grim, t = h('div.score'); [['Cards', g.cardPts], ['Events', g.basic + g.special], ['The Long Road', g.journey], ['Point tokens', g.tokens]].forEach(([k, v]) => t.appendChild(h('div.kv', h('span', k), h('b', v)))); t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', g.total))); return t; } });
   const order = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total);
   UI.cards.push({
-    kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + ' wins!'), sub: 'The game is over',
-    body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); return t; },
+    kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + (G.players[ov.winner].name === 'You' ? ' win!' : ' wins!')), sub: 'The game is over',
+    body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); if (UI.earned && UI.earned.length) t.appendChild(h('p.achv', '★ New achievement' + (UI.earned.length > 1 ? 's' : '') + ': ' + UI.earned.join(', '))); return t; },
     buttons: NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
   });
   clearSave(); render();
 }
 // ---- save / load
-function save() { try { if (!G || G.phase === 'over' || NET.on) return; localStorage.setItem(SAVEKEY, JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, coach: UI.coach, coachOn: UI.coachOn, holder: -1 })); } catch (e) { } }
-function clearSave() { try { localStorage.removeItem(SAVEKEY); } catch (e) { } }
+function save() { try { if (!G || G.phase === 'over' || NET.on) return; localStorage.setItem(SAVEKEY, JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, coach: UI.coach, coachOn: UI.coachOn, holder: -1 })); if (!UI.savedFlag) { UI.savedFlag = 1; GNS.saved(GAME_ID, true); } } catch (e) { } }
+function clearSave() { try { localStorage.removeItem(SAVEKEY); UI.savedFlag = 0; GNS.saved(GAME_ID, false); } catch (e) { } }
 function hasSave() { try { return !!localStorage.getItem(SAVEKEY); } catch (e) { return false; } }
 function loadSave() {
   try {
@@ -736,6 +744,7 @@ function loadSave() {
     G = s.G; UI.mode = s.mode; UI.cfg = s.cfg; UI.coach = s.coach || { level: 'full', seen: {} }; UI.coachOn = !!s.coachOn;
     UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.overShown = false; UI.started = true; UI.holder = -1; UI.lastAi = ''; UI.focus = 0;
     const st = $('#start'); if (st) st.hidden = true; try { GX.close(); } catch (e) { }
+    kitNewGame();
     render(); schedule(); return true;
   } catch (e) { return false; }
 }
@@ -769,7 +778,7 @@ function coachCheck() {
 const RULES = `<h3>The goal</h3><p>Build the best woodland city. Each player has a city of up to 15 cards and a few workers. When every player has passed, you add up points from cards, point tokens, bonuses, events and the Long Road. The highest total wins.</p>
 <h3>How a turn goes</h3><p>On your turn do exactly <b>one</b> of these:</p><ul><li><b>Place a worker</b> on an open place and use it at once.</li><li><b>Play a card</b> from your hand or from the meadow by paying its price.</li><li><b>Prepare for the next season</b> (only when all your workers are out).</li></ul><p>When you cannot or do not want to do anything useful, <b>Pass</b>. You take no more turns, but your city still scores.</p>
 <h3>Places for workers</h3><ul><li><b>Brown places</b> give resources, cards or a point token. Some are shared, others take one worker only.</li><li><b>Forest places</b> (green) are special and take one worker (two players can share in a four-player game).</li><li><b>The Barter Burrow</b> turns spare cards into resources: 1 resource for every 2 cards you discard.</li><li><b>The Long Road</b> opens in Autumn. Discard cards equal to the spot (5, 4, 3 or 2); the worker stays and scores that many points.</li><li><b>Destinations</b> are red cards in your city. A worker on one uses its power. A few are Open, so rivals may visit them too (the owner gets a point token).</li><li><b>Events</b> are claimed with a worker when your city meets their requirement. Each can be claimed only once.</li></ul>
-<h3>Playing cards</h3><p>Pay the price in resources: twigs, resin, pebbles and berries. You can play from the eight-card meadow as well as from your hand. Your hand holds 8 cards at most. A <b>unique</b> card can be in your city once; a common card as often as you like.</p><p><b>Playing free:</b> each critter is paired with one building. If you own that building and it has no token, you can play the critter free and put a token on the building. Each building can do this once, ever.</p><p>Some cards (Inn, Crane, Dungeon, Judge, Hostler) change the price. They are offered as extra buttons when you play a card.</p>
+<h3>Playing cards</h3><p>Pay the price in resources: twigs, resin, pebbles and berries. You can play from the eight-card meadow as well as from your hand. Your hand holds 8 cards at most. A <b>unique</b> card can be in your city once; a common card as often as you like.</p><p><b>Playing free:</b> each critter is paired with one building. If you own that building and it has no token, you can play the critter free and put a token on the building. Each building can do this once, ever.</p><p>Some cards (Lantern Rest, Pulley Lift, Thornhold Cells, Gavel Marten, Hostler Hedgehog) change the price. They are offered as extra buttons when you play a card.</p>
 <h3>Card colours</h3><ul><li><b>Tan, Traveler:</b> acts once when played.</li><li><b>Green, Production:</b> acts when played and again every Spring and Autumn.</li><li><b>Red, Destination:</b> a place for your workers.</li><li><b>Blue, Governance:</b> a lasting bonus or discount.</li><li><b>Purple, Prosperity:</b> extra points at the end.</li></ul>
 <h3>Seasons</h3><p>Everyone starts in Winter with 2 workers. Preparing for <b>Spring</b> gives +1 worker and runs your production. <b>Summer</b> gives +1 worker and lets you take 2 meadow cards. <b>Autumn</b> gives +2 workers and runs production again. Every player moves through the seasons at their own pace.</p>
 <h3>Scoring</h3><p>Printed points on your cards, point tokens you hold, purple card bonuses, events and Long Road workers. Ties go to the player with more events, then more leftover resources.</p>
@@ -807,18 +816,6 @@ function renderDrawers() {
   if (!GX.open || !G) return;
   if (GX.open === 'logd') { const b = $('#logbody'); b.innerHTML = ''; b.appendChild(logHTML()); }
   if (GX.open === 'rivald') renderRival();
-  if (GX.open === 'setd') renderMenu();
-}
-function renderMenu() {
-  const b = $('#setbody'); b.innerHTML = '';
-  const row = (l, ...k) => b.appendChild(h('div.mrow', h('div.lbl', l), h('div.mbt', k)));
-  if (NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room'));
-  else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
-  row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
-  row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
-  row('Sound', h('button.btn' + (UI.sound === false ? '.alt' : ''), { 'data-a': 'sound', type: 'button' }, UI.sound === false ? 'Off' : 'On'));
-  row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'Rules'), h('button.btn.alt', { 'data-a': 'speedhud', type: 'button' }, 'Speed tool'));
-  b.appendChild(h('p.sm', 'Hollowbough is an original game inspired by the family of woodland city-building worker-placement games. All names, art and text are our own. Art is drawn procedurally; no outside assets.'));
 }
 // ---- start screen
 function renderStart() {
@@ -872,10 +869,9 @@ document.addEventListener('click', ev => {
     case 'rules': GX.show('rulesd'); break;
     case 'save': save(); toast('Game saved.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
-    case 'speed': AIDELAY = +d.v; renderMenu(); break;
-    case 'guide': UI.coach.level = d.v; renderMenu(); break;
-    case 'sound': UI.sound = UI.sound === false; try { if (window.GA) { GA.setSfx(UI.sound); GA.setMusic(UI.sound); } } catch (e) { } renderMenu(); break;
-    case 'speedhud': try { PerfHUD.toggle ? PerfHUD.toggle() : PerfHUD.show && PerfHUD.show(); } catch (e) { } break;
+    case 'speed': AIDELAY = +d.v; break;
+    case 'guide': UI.coach.level = d.v; GX.renderSettings(); break;
+    case 'sound': UI.sound = UI.sound === false; try { if (window.GA) { GA.setSfx(UI.sound); GA.setMusic(UI.sound); } } catch (e) { } GX.renderSettings(); break;
   }
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.pop) closePop(); });
@@ -896,12 +892,12 @@ function boot() {
   GX.drawer('rulesd', 'How to play', h('div.rules', { html: RULES }), true);
   GX.drawer('logd', 'Log', h('div#logbody'));
   GX.drawer('rivald', 'Cities and players', h('div#rivalbody'));
-  GX.drawer('setd', 'Menu', h('div#setbody'));
   GX.onShow = id => { renderDrawers(); };
+  kitBoot();
   applyPhone();
   addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { renderBoard(); placePop(); } }).observe(bd);
-  try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'hb' }); }; } catch (e) { }
+  try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'hb' }); GX.applyPrefs(); }; } catch (e) { }
   try { if (window.PerfHUD && PerfHUD.register) PerfHUD.register({ game: 'Hollowbough' }); } catch (e) { }
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
   netInit();
@@ -926,3 +922,108 @@ function sndPost(pre, m, seat) {
 }
 function sndMusic() { try { if (UI.sound === false || !window.GA || !G) return; const s = G.players[Math.max(0, focusSeat())].season; GA.music(G.phase === 'over' ? null : SEAS[s], { vol: .35 }); } catch (e) { } }
 document.addEventListener('click', e => { const t = e.target.closest('button'); if (t && !t.disabled && !/data-a="(do|q)"/.test(t.outerHTML.slice(0, 80))) snd('click', { vol: .5 }); }, true);
+// ===================== part 8: shared GX kit (settings, reference, undo, recap, results, offline) =====================
+const GAME_ID = 'hollowbough';
+// ---- achievements (stored by the shelf; shown in Stats & achievements on the home page)
+const ACH = [
+  { id: 'first', name: 'First city', how: 'Finish a game.', test: r => true },
+  { id: 'guide', name: 'Guide graduate', how: 'Finish the guided first game.', test: r => r.mode === 'guided' },
+  { id: 'win', name: 'Top of the tree', how: 'Beat the computer players.', test: r => r.won && (r.mode === 'vs' || r.mode === 'guided') },
+  { id: 'hard', name: 'Sharp claws', how: 'Beat hard computer players in a 3- or 4-player game.', test: r => r.won && r.mode === 'vs' && r.level === 'hard' && r.np >= 3 },
+  { id: 'grumpy', name: 'Grumbles quieted', how: 'Beat Old Grimbeard on Grumpy.', test: r => r.won && r.mode === 'solo' },
+  { id: 'gruff', name: 'Beard trimmed', how: 'Beat Old Grimbeard on Gruff or Ghastly.', test: r => r.won && r.mode === 'solo' && r.level >= 2 },
+  { id: 'sixty', name: 'Bustling burrow', how: 'Score 60 points or more.', test: r => r.score >= 60 },
+  { id: 'full', name: 'Fifteen roofs', how: 'End a game with 15 cards in your city.', test: (r, s, x) => x.extra && x.extra.city >= 15 },
+  { id: 'events', name: 'Festival goer', how: 'Claim 3 or more events in one game.', test: (r, s, x) => x.extra && x.extra.events >= 3 },
+  { id: 'hot', name: 'Pass the acorn', how: 'Finish a hot-seat game.', test: r => r.mode === 'hot' }
+];
+// ---- settings: the same sections as every game; Hollowbough adds its own rows
+function kitSettings() {
+  GX.settings({
+    id: 'setd', title: 'Menu',
+    game: S => {
+      if (NET.on) S.appendChild(GX.row('Online', [h('button.gx-sb', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.gx-sb', { 'data-a': 'netleave', type: 'button' }, isHost() ? 'Close the room' : 'Leave the room')]));
+      else S.appendChild(GX.row('This game', [h('button.gx-sb', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.gx-sb', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.gx-sb', { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load')]));
+      S.appendChild(GX.row('Undo', h('button.gx-sb', { 'data-a': 'undo', type: 'button', disabled: GX.undo.can() ? null : true }, 'Undo my last step'), 'Works until a card is drawn or the turn passes'));
+    },
+    sound: S => { S.appendChild(GX.row('Sound', GX.onoff(UI.sound !== false, v => { UI.sound = v; try { if (window.GA) { GA.setSfx(v); GA.setMusic(v); } } catch (e) { } sndMusic(); }, 'Sound and music'))); },
+    help: S => {
+      S.appendChild(GX.row('Read', [h('button.gx-sb', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.gx-sb', { 'data-a': 'refopen', type: 'button' }, 'Cards & places')]));
+      S.appendChild(GX.row('Guide', GX.seg([['full', 'Full'], ['light', 'Light'], ['off', 'Off']], UI.coach.level, v => { UI.coach.level = v; }, 'Guide level'), 'Tips that appear one at a time'));
+    },
+    about: { name: 'Hollowbough', version: 'preview', text: 'An original woodland city-building game. Names, texts and pictures are our own; the pictures are drawn in code. Sounds and music are CC0 recordings (Kenney, OpenGameArt).' }
+  });
+}
+// ---- component reference
+function refPic(it, big) {
+  const p = it.pic || {}, px = big ? 200 : 52;
+  if (p.card != null) return cardEl(p.card, px);
+  const sz = big ? 44 : 22;
+  if (p.place === 'basic') return items(basicItems(p.i), sz);
+  if (p.place === 'forest') return items(FIC[D.forest[p.i].key] || [['any', '']], sz);
+  if (p.place === 'haven') return items([['haven', ''], ['any', '']], sz);
+  if (p.place === 'journey') return items([['road', ''], ['point', '2-5']], sz);
+  if (p.event) return ic(p.event === 'b' ? 'flag' : 'star', big ? 64 : 34);
+  if (p.res) return ic(p.res, big ? 64 : 34);
+  if (p.point) return ic('point', big ? 64 : 34);
+  if (p.occ) return ic('occ', big ? 64 : 34);
+  return null;
+}
+function refInGame(it) {
+  if (!G) return true;
+  const p = it.pic || {};
+  if (p.card != null) { const k = cdef(p.card).key, has = id => id >= 0 && cdef(id).key === k; const v = viewSeat();
+    return G.meadow.some(has) || G.players.some(pl => pl.city.some(e => has(e.id))) || (v >= 0 && G.players[v].hand.some(has)) || (G.grim && G.grim.city.some(has)); }
+  if (p.place === 'forest') return G.forest.indexOf(p.i) >= 0;
+  if (p.event === 's') return G.sev.some(e => e.k === p.i);
+  return true;
+}
+function kitReference() {
+  GX.reference(HB.refSections(D), { title: 'Cards & places', label: 'Cards', picture: refPic, inGame: refInGame, before: '[data-gx="rivald"]' });
+}
+function refCardId(id) { return 'c' + D.cards.indexOf(cdef(id)); }
+// ---- undo: snapshot the JSON state before each local human step; sealed once a card is drawn, the dice/shuffle moved,
+// a private pile changed or the turn passed (GX.undo.check). Off online.
+function revealed(a, b) { return !a || a.deck.length !== b.deck.length || a.rng !== b.rng || a.discard.length > b.discard.length || JSON.stringify(a.limbo) !== JSON.stringify(b.limbo) || a.phase !== b.phase; }
+function kitUndo() {
+  GX.undo.config({
+    get: () => G, owner: g => g && g.phase !== 'over' ? HB.actor(g) : null, online: () => NET.on,
+    set: s => { G = s; UI.rec = null; UI.recKey = ''; UI.after = UI.after.filter(e => e.from < G.logN); closePop(); UI.lastAi = ''; save(); render(); schedule(); toast('Step undone.'); },
+    onChange: can => { if (can !== UI.undoCan) { UI.undoCan = can; if (G && UI.started) renderActs(); } }
+  });
+}
+function doUndo() { if (GX.undo.undo()) snd('click'); }
+// ---- "since your last turn" strip in the dock
+function kitRecap() { GX.recap.attach('#dockbody', { before: true, title: 'Since your turn' }); }
+function recapSeats() { GX.recap.clear(); const hs = humans(); GX.recap.seats(hs.length ? hs : [0]); }
+// ---- results, statistics, achievements
+function kitResult() {
+  if (!G || !G.over || UI.resultDone) return; UI.resultDone = true;
+  const hs = humans(); if (!hs.length) return; // watching computers: not your game
+  const ov = G.over, me = NET.on ? NET.mySeat : hs.length === 1 ? hs[0] : -1;
+  const seats = G.players.map((p, i) => ({ name: p.name, ai: p.ai || null, me: i === me }));
+  const winner = G.grim ? (ov.win ? 0 : -1) : ov.tie ? -1 : ov.winner;
+  let extra = null;
+  if (me >= 0) { const evs = G.bev.filter(e => e.o === me).length + G.sev.filter(e => e.o === me).length; extra = { city: HB.cityCount(G, me), events: evs }; }
+  try {
+    const r = GNS.result({ game: GAME_ID, mode: UI.mode === 'net' ? 'online' : UI.mode, seats, winner, scores: ov.scores.map(s => s.total), turns: G.turn, ms: UI.t0 ? Date.now() - UI.t0 : 0,
+      level: UI.mode === 'solo' ? (UI.cfg && UI.cfg.solo) : (UI.cfg && UI.cfg.level), extra });
+    if (r && r.earned.length) { UI.earned = r.earned.map(a => a.name); GX.buzz([30, 60, 30]); }
+  } catch (e) { }
+}
+// ---- boot (called from boot() in part 6)
+function kitBoot() {
+  kitSettings(); kitReference(); kitUndo(); kitRecap();
+  GNS.achievements(GAME_ID, ACH);
+  AIDELAY = GX.aiDelay(650);
+  GX.onPref((k) => { if (k === 'ai' || typeof k === 'object') AIDELAY = GX.aiDelay(650); if (k === 'cb' && G && UI.started) render(); });
+  GX.offline({ sw: '../sw.js', scope: '../' });
+}
+document.addEventListener('click', ev => {
+  const t = ev.target.closest('[data-a]'); if (!t) return;
+  const a = t.dataset.a;
+  if (a === 'undo') doUndo();
+  else if (a === 'refopen') { GX.close(); GX.show('gx-refd'); }
+  else if (a === 'refcard') { closePop(); GX.refOpen(refCardId(+t.dataset.id)); }
+});
+document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !GX.open && GX.undo.can()) { e.preventDefault(); doUndo(); } });

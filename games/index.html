@@ -361,6 +361,29 @@ footer a{color:var(--brass)}
 /* tiny toast and dialog */
 #tip{position:fixed;z-index:60;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);max-width:min(92vw,420px);background:#241810;color:#f6ecd9;padding:12px 16px;border-radius:8px;font:500 .95rem/1.4 var(--body);box-shadow:0 8px 28px rgba(0,0,0,.5);border:1px solid #5a3a26}
 #tip b{display:block;font:400 1.05rem var(--display);color:#f0c05a;margin-bottom:2px}
+/* continue row, your games (statistics and achievements from the games' shared kit) */
+.controw{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;max-width:min(92vw,720px);width:fit-content;box-sizing:border-box;padding:3px 3px 3px 12px;border-radius:26px;background:var(--hdr);backdrop-filter:blur(3px)}
+.controw .crb{background:transparent}
+.controw[hidden]{display:none}
+.controw .cr-l{font:700 .8rem var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-right:2px}
+.crb{font:700 .85rem var(--body);display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 12px 0 4px;border-radius:99px;border:1.5px solid var(--line);background:var(--hdr);color:var(--ink);cursor:pointer;backdrop-filter:blur(3px)}
+.crb img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.trophy.achbtn .cnt{position:absolute;right:-.5em;top:-.3em;font:800 .72em var(--body);background:#8a5a12;color:#fff6e0;border-radius:99px;padding:.1em .45em}
+dialog#mine{border:0;border-radius:10px;padding:0;width:min(94vw,640px);max-height:min(88dvh,720px);background:var(--paper);color:#241810;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+dialog#mine::backdrop{background:rgba(8,4,2,.7)}
+dialog#mine .in{padding:18px 20px 16px;display:flex;flex-direction:column;gap:10px;max-height:min(88dvh,720px);box-sizing:border-box}
+dialog#mine h2{font:400 1.5rem/1.1 var(--display);margin:0}
+#minebody{overflow:auto;min-height:0}
+#minebody .mg{border-top:1px solid rgba(0,0,0,.15);padding:10px 0}
+#minebody .mg h3{margin:0 0 4px;font:700 1.05rem var(--body)}
+#minebody .ms{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.92rem;color:#3c2a1b}
+#minebody .ms b{font-size:1.05rem}
+#minebody .ma{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+#minebody .ma span{font:600 .8rem var(--body);padding:3px 10px;border-radius:99px;background:#e2d2b3;color:#6a5640;opacity:.75}
+#minebody .ma span.on{background:#e8b84a;color:#3a2412;opacity:1}
+#minebody .ma span.on::before{content:"★ "}
+#minebody p{margin:0 0 8px;line-height:1.5}
+dialog#mine .btn{background:#241810;color:#f6ecd9;align-self:flex-start}
 dialog#invite{border:0;border-radius:10px;padding:0;max-width:min(92vw,460px);background:var(--paper);color:#241810;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 dialog#invite::backdrop{background:rgba(8,4,2,.7)}
 dialog#invite .in{padding:20px 22px 18px}
@@ -464,7 +487,7 @@ html.ph header.top{scroll-snap-align:start}
 <body>
 <div class="roombg" aria-hidden="true"><div class="rb-wall"></div><div class="rb-wain"></div><div class="rb-skirt"></div><div class="rb-floor"></div><div class="rb-rug"></div><div class="rb-glow"></div><div class="rb-floorglow"></div></div>
 <header class="top">
-  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">14 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div></div>
+  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">14 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div><div class="controw" id="controw" role="group" aria-label="Continue a saved game" hidden></div></div>
   <div class="tools"><button type="button" class="tbtn" id="sndbtn" aria-label="Sound on" aria-pressed="true">🔊</button><button type="button" class="tbtn" id="viewbtn">☰ Plain list</button></div>
 </header>
 <main>
@@ -484,11 +507,12 @@ html.ph header.top{scroll-snap-align:start}
 </div>
 <div id="listview" hidden></div>
 </main>
-<footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link.<br><a href="screen-test.html" style="color:var(--brass)">Phone screen test</a><br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
+<footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link.<br><a href="credits.html">Credits &amp; licences</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="suggest.html">Suggestion box</a><span id="devlinks" hidden> · <a href="screen-test.html">Phone screen test</a></span><br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
 
 <div id="inspect" hidden></div>
 <div id="tip" role="status" hidden></div>
 <dialog id="invite" aria-labelledby="invh"><div class="in"><h2 id="invh">Play online with friends</h2><p>Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link. Your browsers connect directly, with no account or server.</p><p>Each game keeps its own save, sound and difficulty settings.</p><button type="button" class="btn" id="invok">Got it</button></div></dialog>
+<dialog id="mine" aria-labelledby="mineh"><div class="in"><h2 id="mineh">Your games</h2><div id="minebody"></div><button type="button" class="btn" id="mineok">Close</button></div></dialog>
 <button type="button" id="fab" aria-label="Game menu: back to the shelf" hidden>←</button>
 <div id="fabmenu" role="menu" hidden><div class="t" id="fabname"></div><button type="button" id="fabback" role="menuitem">← Back to the shelf</button><button type="button" id="fabfull" role="menuitem">⛶ Full screen</button><a id="fabsolo" role="menuitem" href="#" target="_blank" rel="noopener">Open on its own</a></div>
 <div id="iostip" hidden><p>For a full-screen shelf on iPhone: tap <b>Share</b> <span aria-hidden="true">⬆︎</span>, then <b>Add to Home Screen</b>, and open it from there.</p><button type="button" id="iosok">Got it</button></div>
@@ -507,7 +531,7 @@ const GAMES=[
   {id:'crown',cover:'covers/crown.jpg',name:'Crown City Smash',src:'crown-city-smash/index.html',ribbon:'Dice brawl',
    blurb:'Giant monsters roll dice to stomp, heal, charge up and buy power cards. Hold the city for stars and try to be the last monster standing, or the first to 20 stars.',
    stats:[['2–6','players'],['30','minutes'],['8+','ages'],['3D','table']],
-   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Power Up evolutions','Halloween','Cultists','Tower','Anubis','Berserk','Wickedness','Mindbug']},
+   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Evolutions','Costumes','Cultists','The Tower','Curses','Berserk','Wickedness','Mind Hijack']},
   {id:'nebula',cover:'covers/nebula.jpg',name:'Nebula Aces',src:'nebula-aces/index.html',ribbon:'Starfighter duel',
    blurb:'Set secret maneuver dials, fly your squadron along real templates, then roll attack and defence dice. Build a 100-point squad or fly the learning duel.',
    stats:[['1–2','players'],['45','minutes'],['12+','ages'],['914','mm mat']],
@@ -706,7 +730,9 @@ function renderRoom(ph){
   const tr=evalTrophies(false),mt=$('#mantel');mt.classList.remove('open');mt.innerHTML=`<span class="trlab">Trophies</span>`;
   for(const t of TROPHIES){const b=document.createElement('button');b.type='button';b.className='trophy'+(tr[t.id]?' on':'');b.dataset.t=t.id;
     b.setAttribute('aria-label',`${t.name} trophy, ${tr[t.id]?'earned':'not earned yet'}. ${t.how}`);b.innerHTML=ART.trophy[t.id]+`<span class="lab">${t.name}</span>`;mt.append(b)}
-  renderTV(ph);renderCoffee(ph)}
+  {const a=achCount(),b=document.createElement('button');b.type='button';b.className='trophy achbtn'+(a.got?' on':'');b.id='achbtn';b.setAttribute('aria-haspopup','dialog');
+    b.setAttribute('aria-label',`Your games: statistics and achievements, ${a.got} of ${a.tot} achievements earned`);b.innerHTML=ART.trophy.collector.replace('<svg','<svg aria-hidden="true"')+(a.tot?`<span class="cnt">${a.got}/${a.tot}</span>`:'')+'<span class="lab">Stats &amp; achievements</span>';mt.append(b)}
+  renderTV(ph);renderCoffee(ph);renderCont()}
 function renderCoffee(ph){
   const c=$('#coffee'),id=store.get('shelf_last'),g=byId(id);c.innerHTML='';
   if(ph){
@@ -725,6 +751,22 @@ function renderCoffee(ph){
     h+=`<button type="button" class="cbtn" data-cont="${g.id}">▶ Continue: ${esc(clean(g.name))}</button>`}
   else{h+=`<div class="welcome"><h2>Pick a box from the shelf</h2><p>Look it over, turn it around, then lift the lid.</p></div>`+dieHtml(4,10,13,-10)+dieHtml(2,13.4,14.2,20)+`<i class="mee" style="left:52em;top:12.6em">${ART.mee('#d94a3a')}</i><i class="mee" style="left:55.4em;top:13.8em">${ART.mee('#3a7bd9')}</i>`}
   c.innerHTML=h}
+/* ---------- your games: saved games, statistics and achievements (the games write gns-* keys through the shared kit) ---------- */
+const SAVEKEYS={crown:['ccs_save2'],nebula:['na_save'],doorkick:['dkd_save2'],shipwreck:['swi_save1'],sands:['soq_save1'],sunglaze:['sgz_save1'],rampart:['rv_save1'],shortfuse:['shortfuse_save1'],tidewake:['tidewake_save1'],hollowbough:['hb_save1'],thornbound:['tb_save'],kaiten:['kk_save']};
+function savedGames(){const kit=jget('gns-saves');return GAMES.filter(g=>kit[g.id]||(SAVEKEYS[g.id]||[]).some(k=>store.get(k)))}
+function renderCont(){const r=$('#controw');if(!r)return;const L=savedGames();r.hidden=!L.length;
+  r.innerHTML=L.length?'<span class="cr-l">Continue</span>'+L.map(g=>`<button type="button" class="crb" data-cont="${g.id}" aria-label="Continue your saved game of ${esc(clean(g.name))}"><img src="${g.cover}" alt="" loading="lazy" decoding="async">${esc(clean(g.name))}</button>`).join(''):''}
+function achCount(){const def=jget('gns-achdef'),ach=jget('gns-ach');let tot=0,got=0;for(const id in def){const L=Array.isArray(def[id])?def[id]:[];tot+=L.length;got+=L.filter(a=>ach[id]&&ach[id][a.id]).length}return {tot,got}}
+function renderMine(){
+  const st=jget('gns-stats'),ach=jget('gns-ach'),def=jget('gns-achdef'),b=$('#minebody');
+  const ids=GAMES.map(g=>g.id).filter(id=>st[id]||(def[id]&&def[id].length));
+  const min=ms=>ms>=60000?Math.round(ms/60000)+' min':Math.max(1,Math.round(ms/1000))+' s';
+  b.innerHTML=(ids.length?'':'<p>Nothing here yet. Finish a game and your results, records and achievements appear here. They stay on this device.</p>')+ids.map(id=>{
+    const g=byId(id),s=st[id],A=(def[id]||[]),E=ach[id]||{};
+    const stats=s?`<div class="ms"><span>Played <b>${s.played}</b></span><span>Won <b>${s.won}</b>${s.played?` (${Math.round(100*s.won/s.played)}%)`:''}</span>${s.best!=null?`<span>Best score <b>${s.best}</b></span>`:''}${s.bestStreak?`<span>Best streak <b>${s.bestStreak}</b></span>`:''}${s.turns?`<span>Average <b>${Math.round(s.turns/s.played)}</b> turns</span>`:''}${s.ms?`<span>about <b>${min(s.ms/s.played)}</b> a game</span>`:''}</div>`:'<div class="ms">No finished games yet.</div>';
+    const ac=A.length?`<div class="ma" aria-label="Achievements">${A.map(a=>`<span class="${E[a.id]?'on':''}" title="${esc(a.how||'')}">${esc(a.name)}</span>`).join('')}</div>`:'';
+    return `<div class="mg"><h3>${esc(clean(g.name))}${A.length?` · ${A.filter(a=>E[a.id]).length}/${A.length} achievements`:''}</h3>${stats}${ac}</div>`}).join('')}
+function openMine(){renderMine();const d=$('#mine');try{d.showModal()}catch(e){d.setAttribute('open','')}}
 /* ---------- rendered room layers (desktop only; the phone keeps its light painted wall) ---------- */
 function mountRoom(ph){
   const st=$('#stage');st.querySelectorAll('.rimg').forEach(e=>e.remove());if(ph)return;
@@ -772,7 +814,7 @@ function renderList(){
   const lv=$('#listview'),id=store.get('shelf_last');
   const row=g=>`<li data-id="${g.id}"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><div class="pl-t"><b>${esc(g.name)}</b><span>${esc(g.ribbon)}${id===g.id?' · Played last':''}</span></div><button type="button" class="btn play" data-play="${g.id}" aria-label="Play ${esc(g.name)}">▶ Play</button></li>`;
   const sec=(t,k,a)=>a.length?`<h2 class="lh" id="lh-${k}">${t}</h2><ul class="plist" aria-labelledby="lh-${k}">${a.map(row).join('')}</ul>`:'';
-  lv.innerHTML=`<div class="lobj"><button type="button" class="tbtn" data-ref="">📖 Card &amp; token reference</button><a class="tbtn" href="suggest.html">💬 Suggestion box</a><button type="button" class="tbtn" data-inv="1" aria-haspopup="dialog">✉ Play online with friends</button></div>${sec('Board games','board',BOARD())}${sec('Video games','video',VIDEO())}`}
+  lv.innerHTML=`<div class="lobj"><button type="button" class="tbtn" data-ref="">📖 Card &amp; token reference</button><a class="tbtn" href="suggest.html">💬 Suggestion box</a><button type="button" class="tbtn" data-inv="1" aria-haspopup="dialog">✉ Play online with friends</button><button type="button" class="tbtn" data-mine="1" aria-haspopup="dialog">★ Stats &amp; achievements</button></div>${sec('Board games','board',BOARD())}${sec('Video games','video',VIDEO())}`}
 function render(){
   const ph=isPh();lastBuiltPh=ph;
   const list=view==='list';
@@ -780,7 +822,7 @@ function render(){
   $('.roombg').hidden=false;
   $('#viewbtn').textContent=list?'🏠 Room view':'☰ Plain list';
   $('#viewbtn').setAttribute('aria-pressed',list?'true':'false');
-  if(list)renderList();else renderRoom(ph);
+  if(list){renderList();renderCont()}else renderRoom(ph);
   $('#tally').textContent=GAMES.length+' games on the shelf'}
 function fit(){
   const cw=root.clientWidth,ph=isPh();
@@ -939,11 +981,19 @@ document.addEventListener('click',e=>{
   const ct=t.closest('[data-cont]');if(ct){retFocus=ct;openGame(byId(ct.dataset.cont),true);return}
   const rf=t.closest('[data-ref]');if(rf){retFocus=ins&&ins.btn?ins.btn:rf;openGame({id:'ref',name:'Card & token reference',src:'reference.html'+(rf.dataset.ref?'#'+rf.dataset.ref:'')});return}
   const iv=t.closest('[data-obj="inv"],[data-inv]');if(iv){$('#invite').showModal();return}
+  if(t.closest('#achbtn,[data-mine]')){openMine();return}
   const tb=t.closest('#trbtn');if(tb){const m=$('#mantel'),o=m.classList.toggle('open');tb.setAttribute('aria-expanded',o);return}
   {const m=$('#mantel');if(m.classList.contains('open')&&!t.closest('#mantel')){m.classList.remove('open');$('#trbtn')&&$('#trbtn').setAttribute('aria-expanded','false')}}
   const tp=t.closest('.trophy');if(tp){const d=TROPHIES.find(x=>x.id===tp.dataset.t),on=tp.classList.contains('on');tip(`<b>${d.name}</b>${d.how} ${on?'<br>Earned.':'<br>Not earned yet.'}`);return}
 });
 $('#invok').onclick=()=>$('#invite').close();
+$('#mineok').onclick=()=>$('#mine').close();
+if(/[?&]dev=1\b/.test(location.search))$('#devlinks').hidden=false;
+$('#mine').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.close()});
+/* offline and install: the service worker keeps the shelf (and the games you download) working without internet */
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){let had=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!$('#gnsupd')){const b=document.createElement('button');b.type='button';b.id='gnsupd';b.textContent='A new version is ready — tap to reload';b.style.cssText='position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:90;min-height:48px;padding:10px 18px;border:0;border-radius:99px;background:#e0a948;color:#1d140b;font:700 1rem system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);cursor:pointer';b.onclick=()=>location.reload();document.body.appendChild(b)}had=true})}
 $('#invite').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.close()});
 addEventListener('keydown',e=>{
   if(e.key==='Escape'){if($('#mantel').classList.contains('open')){$('#mantel').classList.remove('open');const tb=$('#trbtn');tb&&tb.focus()}else if(!table.hidden)closeGame();else if(ins)closeInspect()}
