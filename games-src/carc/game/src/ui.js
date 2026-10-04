@@ -35,7 +35,7 @@ const human=()=>G&&G.pl.some(p=>p.human);
 function refresh(){if(G&&!NET.on){try{if(!G.over&&human())localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G){render();return}computeUI();playFx();netTurnCue();render();try{sync3D();autoFit()}catch(e){console.error(e)}schedule()}
 // at the start of a human placement, make sure every glowing square is on screen
-function autoFit(){if(!V3.on||!me()||G.step!=='place'||UI.fitTurn===G.turn)return;UI.fitTurn=G.turn;const R=V3.r.domElement;const off=(PHN.on&&PHN.tilePx()<PHN.MIN*.9)||UI.cells.some(k=>{const [x,y]=unkey(k);const v=screenOf(cellWorld(x,y));return !v.in||v.x<50||v.y<50||v.x>R.clientWidth-50||v.y>R.clientHeight-50});if(off)fitAll(false)}
+function autoFit(){if(!V3.on||!me()||G.step!=='place'||UI.fitTurn===G.turn)return;UI.fitTurn=G.turn;const R=V3.r.domElement;const off=(PHN.on&&PHN.tilePx()<PHN.MIN*.9)||(PHN.on?UI.cells.every:UI.cells.some).call(UI.cells,k=>{const [x,y]=unkey(k);const v=screenOf(cellWorld(x,y));return !v.in||v.x<50||v.y<50||v.x>R.clientWidth-50||v.y>R.clientHeight-50});if(off)fitAll(false)}
 // what glows for the human now
 function computeUI(){const p=me();UI.cells=[];UI.spotOpts=[];
   if(!p){UI.ghost=null;UI.advice=null;return}
@@ -233,7 +233,7 @@ function uiAct(a){switch(a){case 'start':beginGame();return;case 'continue':load
 document.addEventListener('keydown',e=>{if(!me()||UI.modal||GX.open)return;if(e.key==='r'||e.key==='R')rotGhost(1);else if(e.key==='Enter'&&UI.ghost&&G.step==='place'){e.preventDefault();uiAct('confirm')}else if(e.key==='Escape'&&UI.ghost){UI.ghost=null;refreshUI()}});
 function openStart(){UI.modal='start';render()}
 function beginGame(){if(NET.on)netLeave(true);const o=UI.setup;UI.fx.length=0;UI.fxSeen=0;UI.recap=null;UI.advice=null;UI.ghost=null;const seats=o.seats.slice(0,o.np);
-  newGame({np:o.np,seats,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex,o.np===6?{ic:true}:{})});resetScene();UI.modal=human()&&ANIM?'story':null;refresh();fitAll(true)}
+  newGame({np:o.np,seats,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex,o.np===6?{ic:true}:{})});resetScene();UI.modal=human()&&ANIM&&UI.guide?'story':null;refresh();fitAll(true)}
 function loadSaved(){if(NET.on)netLeave(true);try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;resetScene();refresh();fitAll(true)}catch(e){openStart()}}
 // after each move: recap computer turns in one line and show where they played
 function onMoveDone(m,s,before){if(UI.sim)return;const p=P(before.p);const mineP=p.human&&(!NET.on||p.i===NET.mySeat);if(m.act==='place'&&!mineP&&V3.on){const [x,y]=[m.x,m.y];const sp=screenOf(cellWorld(x,y));const R=V3.r.domElement;if(!sp.in||sp.x<R.clientWidth*.12||sp.x>R.clientWidth*.88||sp.y<R.clientHeight*.12||sp.y>R.clientHeight*.88){if(human())focusCell(key(x,y));else fitAll(false)}}
