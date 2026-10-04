@@ -3,3 +3,8 @@ hard r3 red Palmreach                          1/12   8% avg rounds 6.7 {"checks
 hard r4 red Lake Orrin                         0/12   0% avg rounds 7.0 {"checks:flaps+ice":1,"checks:ice":7,"checks:axis+ice":3,"fuel":1} 49477ms/game
 hard r5 red Bowlrock                           0/12   0% avg rounds 6.1 {"collision":1,"mandatory":5,"short":2,"fuel":2,"corridor":1,"speed":1} 34708ms/game
 hard b1 black Frostmere                        0/12   0% avg rounds 6.8 {"speed":9,"collision":1,"checks:axis+ice":1,"short":1} 42231ms/game
+hard b2 black Twin Spires                      0/12   0% avg rounds 6.7 {"speed":2,"short":5,"mandatory":1,"fuel":3,"corridor":1} 21632ms/game
+hard b3 black Cloudspire                       0/12   0% avg rounds 6.7 {"corridor":1,"mandatory":2,"short":8,"fuel":1} 24760ms/game
+BAND hard red 1/48 2.1%
+BAND hard black 0/36 0.0%
+errors 0 stalls 0 time 2778.5s
