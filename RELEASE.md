@@ -1,14 +1,16 @@
-# Release 82 — PHASE 2a BUILD (tests RUNNING, results pending; phase 1 results below are for the old order)
+# Release 82 — PHASE 2 BUILD (full test matrix RUNNING, results pending)
 
-## Phase 2a patch order (onto base.html = live v81)
+## Phase 2 patch order (onto base.html = live v81)
 ```
-./reapply.sh pOB1.py pOB2.py pOB3.py pOC1.py pCV1.py pCV2.py pJU1.py pGB1.py   → REAPPLY_OK
+./reapply.sh pAU1.py pAU2.py pOG1.py pOB1.py pOB2.py pOB3.py pOC1.py pCV1.py pCV2.py pRL1.py pJU1.py pGB1.py   → REAPPLY_OK
 python3 tools/split_km.py overdrive.html out
 ```
-ownerbugs (pOB1–3) → ownerbugs2 (pOC1) → cityvar (pCV1–2) → juice (pJU1) → garage (pGB1). od-otg2 not yet included (it goes first when it is ready).
-Conflict fixed: pOC1 and pCV2 both edit the Athens `const put=(U,x,z,ry,c,s,fr)=>{` line. pCV2.py now accepts either form and inserts `CV_put` after `OC_fix`.
-Sizes: overdrive.html 3,685,528 (over the 3.6 MB cap → split is mandatory) · out/overdrive.html 1,719,979 · out/km.js 1,961,521.
-Deploy files (out/ + km.js) boot check: tools/tOut.js → OUTBOOT PASS (car drives, 0 errors).
+otg2 (pAU1, pAU2, pOG1) → ownerbugs (pOB1–3) → ownerbugs2 (pOC1) → cityvar (pCV1, pCV2) → **pRL1 (integration)** → juice (pJU1) → garage (pGB1). Workers' pDR*/pSM* go last.
+- pAU1 swaps v81's embedded AU block for the new au.js (v81 contains docs/modules/au.js exactly). pAU2 skips the text swaps v81 already has.
+- Conflict fixed: pOC1 and pCV2 both edit the Athens `const put=(U,x,z,ry,c,s,fr)=>{` line. pCV2.py now accepts either form and inserts `CV_put` after `OC_fix`.
+- **pRL1.py (new):** in the 2a run, tOC's height audit failed in Athens A–D (thousands of poly buildings outside the owner's per-district storey range). The cause is CV's ±1–2 storey variation, and its 7–12 storey Kifisias towers, being applied after OC's clamp. pRL1 clamps CV's storey pick through `OC_fix`, inside the expression, so CV's details use the final height. Side effect: the Kifisias glass towers are capped at OC's district maximum.
+
+Sizes: overdrive.html 3,727,384 (over the 3.6 MB cap → split is mandatory) · out/overdrive.html 1,761,673 · out/km.js 1,961,521.
 
 ---
 # Release 82 (phase 1): v81 + cityvar + juice + garage
