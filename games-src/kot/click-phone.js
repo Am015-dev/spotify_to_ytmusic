@@ -2,7 +2,7 @@
 // Phone clicker (jsdom, 2D fallback board, ?phone=1): plays whole games through the PHONE controls only
 // (strip buttons, dice, chips, shop tiles + pop-up Buy/Sweep, cards' options, pop-up close) and checks 0 errors, no stalls,
 // and no hidden hand evolutions of other monsters in the monster pop-up. Usage: node click-phone.js kot2.html [games=6]
-const {JSDOM}=require('/tmp/claude-0/-home-user-spotify-to-ytmusic/5a36d2af-8697-5203-aeea-a0f2a3329615/scratchpad/node_modules/jsdom');const fs=require('fs');
+const {JSDOM}=require('jsdom');const fs=require('fs');
 const file=process.argv[2]||'kot2.html';const html=fs.readFileSync(file,'utf8');const N=+(process.argv[3]||6),OFF=+(process.argv[4]||0);
 const CFG=[{mode:'solo',n:4,ex:0,evo:0},{mode:'solo',n:3,ex:1,evo:1},{mode:'hot',n:3,ex:0,evo:0},{mode:'hot',n:5,ex:1,evo:1},{mode:'solo',n:6,ex:1,evo:0},{mode:'ai',n:4,ex:0,evo:0},{mode:'solo',n:2,ex:0,evo:1},{mode:'hot',n:4,ex:1,evo:0}];
 function run(cfg,seed){return new Promise(res=>{
