@@ -1,0 +1,1 @@
+normal g1 green Port Alder                    31/40  78% avg rounds 7.0 {"checks:flaps":5,"mandatory":1,"checks:axis":3} 4292ms/game
