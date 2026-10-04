@@ -10,3 +10,17 @@ easy y3 yellow Palmreach                       0/60   0% avg rounds 3.8 {"mandat
 easy y4 yellow Frostmere                       0/60   0% avg rounds 5.5 {"speed":10,"mandatory":32,"short":10,"collision":2,"spin":6} 116ms/game
 easy y5 yellow Castlemoor                      0/60   0% avg rounds 4.4 {"checks:planes+axis":1,"spin":9,"mandatory":31,"fuel":3,"speed":3,"checks:planes+flaps":1,"checks:planes+flaps+axis":1,"short":5,"collision":5,"checks:gear+flaps+axis":1} 64ms/game
 easy y6 yellow Twin Spires                     0/60   0% avg rounds 4.6 {"short":2,"checks:gear+flaps":1,"fuel":14,"spin":2,"mandatory":27,"corridor":11,"speed":2,"collision":1} 82ms/game
+easy y7 yellow Grand Crossing                  0/60   0% avg rounds 4.6 {"mandatory":40,"corridor":5,"short":5,"fuel":1,"collision":4,"spin":4,"speed":1} 60ms/game
+easy r1 red Cloudspire                         0/60   0% avg rounds 4.2 {"mandatory":35,"fuel":13,"corridor":7,"collision":4,"spin":1} 72ms/game
+easy r2 red Seabright Bay                      0/60   0% avg rounds 3.3 {"spin":7,"fuel":9,"mandatory":29,"collision":9,"corridor":6} 40ms/game
+easy r3 red Palmreach                          0/60   0% avg rounds 3.4 {"collision":19,"mandatory":34,"spin":4,"fuel":1,"speed":1,"short":1} 42ms/game
+easy r4 red Lake Orrin                         0/60   0% avg rounds 5.1 {"mandatory":40,"short":3,"spin":9,"fuel":4,"speed":3,"checks:flaps+ice":1} 105ms/game
+easy r5 red Bowlrock                           0/60   0% avg rounds 2.1 {"mandatory":26,"corridor":21,"collision":9,"spin":2,"fuel":2} 27ms/game
+easy b1 black Frostmere                        0/60   0% avg rounds 3.5 {"speed":5,"mandatory":28,"short":3,"corridor":10,"collision":10,"spin":4} 61ms/game
+easy b2 black Twin Spires                      0/60   0% avg rounds 3.8 {"mandatory":33,"corridor":11,"spin":5,"fuel":10,"collision":1} 63ms/game
+easy b3 black Cloudspire                       0/60   0% avg rounds 4.1 {"fuel":7,"mandatory":37,"corridor":7,"spin":4,"collision":4,"short":1} 73ms/game
+BAND easy green 5/360 1.4%
+BAND easy yellow 0/420 0.0%
+BAND easy red 0/300 0.0%
+BAND easy black 0/180 0.0%
+errors 0 stalls 0 time 109.0s

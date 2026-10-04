@@ -244,7 +244,7 @@ function move(G0, seat, level, opt) {
     const base = cost(G, seat);
     const sc = distinct(all, G, seat).filter(m => m.t !== 'timeout').map(m => ({ m, s: base - cost(afterMove(G, m, seat), seat) }));
     sc.sort((a, b) => b.s - a.s);
-    if (level === 'easy' && rand() < 0.3) return sc[Math.min(sc.length - 1, Math.floor(rand() * 3))].m;
+    if (level === 'easy' && rand() < 0.2) { const top = sc[0].s, pool = sc.filter(x => x.s > top - 2.5); return pool[Math.floor(rand() * Math.min(pool.length, 3))].m; }
     return sc[0].m;
   }
   const cand = distinct(all.filter(m => m.t !== 'timeout'), G, seat);
@@ -254,8 +254,9 @@ function move(G0, seat, level, opt) {
   if (level !== 'easy') { const free = freeAction(G, seat, cand, base); if (free) return free; }
   if (opt.eps && rand() < opt.eps && scored.length > 1) return scored[Math.min(scored.length - 1, 1 + Math.floor(rand() * 2))].m;   // exploration for training data
   if (level === 'easy') {
-    const safe = scored.filter(x => x.s > -60), pool = safe.length ? safe : scored;
-    if (rand() < 0.35) return pool[Math.min(pool.length - 1, Math.floor(rand() * 4))].m;
+    // a beginner partner: usually the sensible move, now and then another sensible one (never one that is clearly a disaster)
+    const top = scored[0].s, safe = scored.filter(x => x.s > top - 1.5), pool = safe.length ? safe : scored;
+    if (rand() < 0.2) return pool[Math.min(pool.length - 1, Math.floor(rand() * 3))].m;
     return pool[0].m;
   }
   if ((level === 'hard' || level === 'normal') && scored.length > 1 && !opt.noMC) return monteCarlo(G, seat, scored, rand, Object.assign(level === 'hard' ? { top: AI.HMC.top, samples: AI.HMC.samples } : { top: AI.NMC.top, samples: AI.NMC.samples }, opt));
