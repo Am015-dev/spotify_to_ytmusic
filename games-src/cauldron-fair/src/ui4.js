@@ -29,18 +29,28 @@ function renderReport() {
   box.appendChild(h('h2', h('span', { html: ico('coin', 30) }), hotPriv ? 'Day ' + R.round + ': ' + me.name : 'Day ' + R.round + ' report'));
   box.appendChild(h('div#rstip.tipb', { hidden: true }));
   const body = h('div.rsbody');
-  const tab = h('table.rt-tab'); tab.appendChild(h('tr', h('th', 'Cauldron'), h('th', 'Reached'), h('th', 'Result'), h('th', '+VP'), h('th', 'Total')));
+  const tab = h('table.rt-tab'); tab.appendChild(h('tr', h('th', 'Cauldron'), h('th', 'Score space'), h('th', 'Result'), h('th', 'Points today'), h('th', 'Total')));
+  const sumParts = [];
   for (const p of G.players) {
     const r = dayRow(p, R); if (!r) continue; const sp = r.space;
-    const res = r.boom ? (r.prot ? [h('span.ok', 'exploded, safe')] : [h('span.bad', 'exploded'), h('div.sm', (r.mode === 'buy' ? 'went shopping' : r.mode === 'vp' ? 'took points' : 'choosing') + ' (white ' + r.white + ' went over the limit)')]) : [h('span.ok', 'stopped'), r.die && r.die.length ? h('div.sm.dieb' + (r.live ? '.roll' : ''), { title: 'Bonus die' }, r.die.map(f => h('span', { html: KIT.ICON.die(24, f) }))) : null];
+    const gain = (r.live ? p.vp : (G.hist.find(x => x.round === R.round && x.seat === p.seat) || {}).after || p.vp) - dayStart(p.seat, R.round), gTxt = gain >= 0 ? '+' + gain : '' + gain, why = dayWhy(p, R.round);
+    const res = r.boom ? (r.prot ? [h('span.ok', 'exploded, safe')] : [h('span.bad', 'exploded'), h('div.sm', (r.mode === 'buy' ? 'went shopping' : r.mode === 'vp' ? 'took points' : 'choosing') + ' (white ' + r.white + ' was over the limit)')]) : [h('span.ok', 'stopped'), r.die && r.die.length ? h('div.sm.dieb' + (r.live ? '.roll' : ''), { title: 'Bonus die' }, r.die.map(f => h('span', { html: KIT.ICON.die(24, f) }))) : null];
     tab.appendChild(h('tr' + (p.seat === v ? '.me' : ''), h('td', h('span.nm', h('span', { html: avHTML(p.seat, 28) }), p.seat === v ? 'You' : p.name)),
-      h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', r.gain >= 0 ? '+' + r.gain : r.gain)), h('td', h('b', p.vp))));
+      h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', gTxt), why.length ? h('div.sm.why', why.join(' ')) : null), h('td', h('b', p.vp))));
+    sumParts.push((p.seat === v ? 'You' : p.name) + ' ' + gTxt);
   }
-  if (!hotPriv) body.appendChild(tab);
-  const lines = hotPriv ? [] : G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo)); if (lines.length) { const ev = h('div.evlog', { role: 'log', 'aria-label': 'What happened' }); lines.forEach(l => ev.appendChild(h('div', l.t))); body.appendChild(ev); setTimeout(() => { ev.scrollTop = ev.scrollHeight; }, 0); }
-  if (hotShared) body.appendChild(h('p.sm', 'Everybody has seen the table. Next, each maker makes the private choices (shop, rubies) while the others look away.'));
-  else if (myq) body.appendChild(decisionBox(me, myq));
-  else if (G.phase === 'eval') { const w = G.players.filter(p => p.q && p.seat !== v).map(p => p.name); body.appendChild(h('p.sm', w.length ? 'Waiting for ' + nameList(w) + '...' : 'Counting up...')); }
+  const lines = hotPriv ? [] : G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo) && !/ has decided\.$|^Stir!/.test(l.t)); let ev = null;
+  if (lines.length) { ev = h('div.evlog', { role: 'log', 'aria-label': 'What happened' }); lines.forEach(l => ev.appendChild(h('div', youText(l.t)))); setTimeout(() => { ev.scrollTop = ev.scrollHeight; }, 0); }
+  const fold = !!myq && !hotShared;   // a choice is waiting: put it first and fold today's results into one line
+  if (fold) {
+    body.appendChild(decisionBox(me, myq));
+    if (!hotPriv) { const d = h('details.rsum', h('summary', h('b', 'Today: '), sumParts.join(' · '), h('span.sm', ' (tap for details)')), tab); if (ev) d.appendChild(ev); body.appendChild(d); }
+  } else {
+    if (!hotPriv) body.appendChild(tab);
+    if (ev) body.appendChild(ev);
+    if (hotShared) body.appendChild(h('p.sm', 'Everybody has seen the table. Next, each maker makes the private choices (shop, rubies) while the others look away.'));
+    else if (G.phase === 'eval') { const w = G.players.filter(p => p.q && p.seat !== v).map(p => p.name); body.appendChild(h('p.sm', w.length ? 'Waiting for ' + nameList(w) + '...' : 'Counting up...')); }
+  }
   const done = G.phase !== 'eval' && !myq && !hotShared;
   const next = G.phase === 'over' ? 'See the final scores' : 'On to day ' + G.round;
   box.appendChild(body);
@@ -59,7 +69,7 @@ function renderReport() {
 }
 function repContinue() {
   if (G.phase === 'eval' && (viewSeat() >= 0 && G.players[viewSeat()].q)) return;
-  closeRS(true); UI.rsMode = ''; if (G.phase === 'over') { checkFinal(); } else { render(); checkReport(); schedule(); }
+  closeRS(true); UI.rsMode = ''; if (G.phase === 'over') { checkFinal(); } else { render(); checkReport(); if (!UI.rsOpen) newsLines(false); schedule(); }
 }
 // ---------- decisions inside the report ----------
 function decisionBox(p, q) {
@@ -67,12 +77,12 @@ function decisionBox(p, q) {
   const box = h('div.dec', h('h3', info[0]), h('div.sm', info[1](p, q.d)));
   if (q.h === 'shop') { box.appendChild(shopUI(p, q, legal)); return box; }
   if (q.h === 'ruby') {
-    box.appendChild(h('div.sm', 'You have ' + p.rubies + ' rubies. Droplet at ' + p.droplet + '. Flask ' + (p.flask ? 'full' : 'empty') + '.'));
+    box.appendChild(h('div.sm', 'You have ' + p.rubies + ' rubies. Your droplet (the blue drop on the spiral, where your first chip lands) is on space ' + p.droplet + '. Flask ' + (p.flask ? 'full' : 'empty (it puts a white chip back once a day)') + '.'));
     const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p))); box.appendChild(row); return box;
   }
   if (q.h === 'de') {
     const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p)));
-    box.append(h('div.sm', 'Space ' + p.res.space + ': ' + q.d.coins + ' coins or ' + q.d.vp + ' VP.'), row); return box;
+    box.append(h('div.sm', G.round <= 5 ? 'Early in the fair, new chips usually pay off more than a few points: they help on every later day.' : 'Late in the fair there are few days left to use new chips, so points usually matter more.'), row); return box;
   }
   const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p))); box.appendChild(row); return box;
 }
@@ -83,8 +93,7 @@ function shopUI(p, q, legal) {
   for (const c of D.SHOP_COLORS) {
     const out = CF.bookOut(G, c), bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
     const card = h('div.bk' + (out ? '' : '.locked'));
-    card.appendChild(h('div.bh', chipN(c + '1', 34), h('b', D.COLORS[c].name, h('div.sm', c === 'O' || c === 'K' ? bk.title : bk.title + ' (' + D.SET_NAMES[G.sets[c]].toLowerCase() + ')'))));
-    card.appendChild(h('details', h('summary.sm', { style: 'min-height:34px;display:flex;align-items:center;cursor:pointer' }, out ? 'How it works' : 'Opens day ' + D.BOOK_ROUND[c]), h('div.bx', bk.text)));
+    card.appendChild(h('details.bd', h('summary.bh', { 'aria-label': D.COLORS[c].name + ': how it works' }, chipN(c + '1', 34), h('b', D.COLORS[c].name, h('div.sm', out ? bk.title : 'Opens day ' + D.BOOK_ROUND[c])), h('span.bi', { 'aria-hidden': 'true' }, 'i')), h('div.bx', bk.text)));   // tap the stall's name to read its power
     const pr = h('div.pr');
     D.COLORS[c].vals.forEach(val => {
       if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
@@ -119,14 +128,14 @@ function showFinal() {
   const order = G.players.slice().sort((a, b) => b.vp - a.vp || b.last9 - a.last9);
   const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Final scores' });
   const body = h('div.rsbody'); const wn = G.winners.map(s => pname(s));
-  body.appendChild(h('div.win', h('span', { html: avHTML(G.winners[0], 52) }), h('div', G.winText)));
+  body.appendChild(h('div.win', h('span', { html: avHTML(G.winners[0], 52) }), h('div', youText(G.winText))));
   const t = h('table.fin-tab'); const head = h('tr', h('th', 'Cauldron')); for (let r = 1; r <= D.rounds; r++) head.appendChild(h('th', 'D' + r)); head.append(h('th', 'Extra'), h('th', 'Total')); t.appendChild(head);
   for (const p of order) {
-    const gains = []; let sum = 0; for (let r = 1; r <= D.rounds; r++) { const hh = G.hist.find(x => x.round === r && x.seat === p.seat); const gn = hh ? hh.gain : 0; gains.push(gn); sum += gn; }
+    const gains = []; let sum = 0; for (let r = 1; r <= D.rounds; r++) { const hh = G.hist.find(x => x.round === r && x.seat === p.seat); const gn = hh ? hh.after - dayStart(p.seat, r) : 0; gains.push(gn); sum += gn; }
     const row = h('tr' + (G.winners.indexOf(p.seat) >= 0 ? '.w' : ''), h('td', p.name)); gains.forEach(x => row.appendChild(h('td', x))); row.append(h('td', p.vp - sum), h('td', h('b', p.vp))); t.appendChild(row);
   }
   body.appendChild(h('div', { style: 'overflow-x:auto' }, t));
-  body.appendChild(h('p.sm', 'D1 to D9 are the points each day brought. Extra: fortune cards, the 2 rubies for 1 point conversion at the end and points before the brewing began. Tie: the cauldron that went furthest on the last day wins.'));
+  body.appendChild(h('p.sm', 'D1 to D9 are the points each day brought (fortune cards included). Extra: leftover rubies, 2 rubies for 1 point at the end. Tie: the cauldron that went furthest on the last day wins.'));
   const cfg = UI.cfg || {};
   const online = typeof NET !== 'undefined' && NET.on;
   box.appendChild(body);
@@ -144,7 +153,7 @@ const TIPS = [
   { id: 'stop', t: 'When to stop', x: () => 'Happy with your spiral? Press Stop to keep it. A high space gives coins to shop with and points for the track.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 4; } },
   { id: 'boom', modal: true, light: true, t: 'Boom!', x: () => 'Your cauldron exploded. You still reach a scoring space, but you must choose: take its victory points OR shop with its coins. Not both, and no bonus die.', when: () => { const p = mineP(); return p && p.boom && UI.rsOpen; } },
   { id: 'report', modal: true, t: 'The day report', x: () => 'When everybody has stopped the day is counted: the furthest cauldron that did not explode rolls the bonus die, chip powers happen, rubies on your space are yours, points move you along the track and the coins buy chips.', when: () => UI.rsOpen && UI.rsMode === 'report' },
-  { id: 'shop', modal: true, light: true, t: 'The shop', x: () => 'Coins buy new chips for your bag: pick one or two chips of different colours. Bigger numbers move you further, and every book has its own power: open "How it works" first. Leftover coins are lost.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'shop' && UI.rsOpen; } },
+  { id: 'shop', modal: true, light: true, t: 'The shop', x: () => 'Coins buy new chips for your bag: pick one or two chips of different colours. Bigger numbers move you further, and every colour has its own power: tap a stall\'s name to read it. Leftover coins are lost.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'shop' && UI.rsOpen; } },
   { id: 'rubies', modal: true, t: 'Rubies', x: () => 'Spend 2 rubies to start every day one space further on, or to refill your flask. On the last day 2 rubies are worth a point.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'ruby' && UI.rsOpen; } },
   { id: 'day2', t: 'Rats and new stalls', x: () => 'From day 2 a player behind the leader gets a rat stone: the first chip starts one space further on for every rat tail between you and the leader. The Sunroot stall opens today, the Dusk Sigh stall on day 3.', when: () => G.round === 2 && G.phase !== 'eval' && !UI.rsOpen },
   { id: 'last', t: 'The last day', x: () => 'No shopping today. Everybody secretly chooses Draw or Stop and all choices are revealed together. Every 5 coins and every 2 rubies you hold turn into a victory point.', when: () => G.round === 9 && G.phase !== 'eval' && !UI.rsOpen }
@@ -178,10 +187,10 @@ function renderTip() {
   for (const e of [pc, rt]) if (e && e !== target) { e.hidden = true; e.innerHTML = ''; }
   document.documentElement.classList.toggle('tipon', !!(on && !t.modal));
   if (!target) return;
-  const n = TIPS.filter(x => UI.tipShown[x.id]).length, open = !isPh() || t.modal || !!UI.tipOpen;
+  const n = TIPS.filter(x => UI.tipShown[x.id]).length, open = !isPh() || !!UI.tipOpen;   // phones: one line, More opens it
   target.hidden = false; target.innerHTML = ''; target.className = 'tipb';
   target.appendChild(h('div.tl', h('span.tt', h('b', 'Tip ' + n + ' of ' + TIPS.length + ': ' + t.t)),
-    isPh() && !t.modal ? h('button.btn.alt.tb', { 'data-a': 'tipmore', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, open ? 'Less' : 'More') : null,
+    isPh() ? h('button.btn.alt.tb', { 'data-a': 'tipmore', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, open ? 'Less' : 'More') : null,
     h('button.btn.go.tb', { 'data-a': 'tipok', type: 'button' }, 'Got it')));
   if (open) target.appendChild(h('div.tx', h('p', t.x()), h('button.tlink2', { 'data-a': 'tipoff', type: 'button' }, 'No more tips')));
 }

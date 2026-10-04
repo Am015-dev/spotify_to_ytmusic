@@ -1,5 +1,5 @@
 // ===================== part 5: drawers (scores, log, cards, rules, menu), start screens, events, phone mode, boot =====================
-function logHTML() { const e = h('div.logl'); for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 160); i--) e.appendChild(h('div.ll', h('span.lt', 'D' + G.log[i].round), ' ' + G.log[i].t)); return e; }
+function logHTML() { const e = h('div.logl'); for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 160); i--) e.appendChild(h('div.ll', h('span.lt', 'D' + G.log[i].round), ' ' + youText(G.log[i].t))); return e; }
 function buildRules() {
   const root = h('div.rules');
   const sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
@@ -148,7 +148,7 @@ function setupEl() {
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
   const first = !UI.prefs.played;
   const bStart = h('button.sbtn' + (first ? '' : '.big'), { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the fair'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
-  const bGuide = h('button.sbtn' + (first ? '.big' : ''), { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', first ? 'New here? Two makers, beginner books and short tips' : 'Two makers, beginner books, tips'));
+  const bGuide = h('button.sbtn' + (first ? '.big' : ''), { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', first ? 'New here? You and one computer maker, beginner books and short tips' : 'You and one computer maker, beginner books, tips'));
   const go = h('div.sgo', first ? [bGuide, bStart] : [bStart],
     h('div.sgrid3', first ? null : bGuide,
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', o.np + ' people, one device')),
@@ -222,7 +222,7 @@ function renderLegend() {
   e.append(h('span.lg', h('span.lgn', '12'), 'coins'), h('span.lg', h('span.lgb', '3'), 'VP'), h('span.lg', h('span', { html: ico('ruby', 16) }), 'ruby'), h('span.lg', 'path \u2192'), h('button.lgx', { 'data-a': 'legx', type: 'button', 'aria-label': 'Hide this key' }, '\u00d7'));
 }
 function renderBlg() {
-  const e = $('#blg'); if (!e) return; const on = G && UI.started && isPh() && !UI.prefs.blgSeen && G.round === 1 && G.phase !== 'over';
+  const e = $('#blg'); if (!e) return; const on = false;   // the header buttons carry their names on phones now
   e.hidden = !on; if (!on || e.dataset.k) return; e.dataset.k = 1;
   e.append(h('div', h('b', 'Top buttons, left to right: '), 'Scores, Log, Chips and cards, How to play, Menu.'), h('button.btn.go', { 'data-a': 'blgx', type: 'button' }, 'OK'));
 }
