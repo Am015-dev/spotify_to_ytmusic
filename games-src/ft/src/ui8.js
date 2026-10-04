@@ -69,9 +69,10 @@ function phCard(hp){
     return `<p class="verdict ${won?'up':'dn'}"><b>${won?(G.over.win.length>1?'You share the win':'You win'):'You lose'}</b>: ${sc.map(x=>`${x.p===mp?'You':esc(x.p.nm)} ${x.t}`).join(' · ')}${other&&!won?` (${sc[0].t-sc.find(x=>x.p===mp).t} behind)`:''}. The table below shows where every point came from.</p>`})():'';
     return {key:'over',title:'Result',x:false,body:top+(pr?pr.innerHTML:''),foot:`<button class="btn go" data-ph="cont" data-k="over">Continue</button>${btn({ui:'new'},'New game')}`}}
   if(hp&&G.q){const pr=phDock('.prompt');return {key:'q',title:'Your choice',x:false,body:pr?phClean(pr,1):''}}
+  if(hp&&UI.pendDj){const d=DJ[UI.pendDj.k];return {key:'pend',title:`✨ ${esc(d.n)}`,x:false,body:`<p><b>Tap a glowing tile on the board.</b></p><p class="small">${esc(d.x)}</p>`,foot:`<button class="btn" data-ui="cancelpw">Cancel</button>`}}
   const adv=hp&&UI.adv?phDock('.adv'):null;if(adv)return {key:'adv',title:'💡 Advisor',x:false,body:adv.innerHTML.replace(/^\s*<b>💡 Advisor<\/b>/,'')}
   if(PHONE.chapter&&PHONE.chapter.key!==PHONE.chDone&&!UI.modal&&G.phase==='bid'){const c=PHONE.chapter;return {key:'chapter',title:`Round ${c.round}`,x:false,body:`<h3 class="chapt">${esc(c.title)}</h3><p>${c.line}</p>`,foot:`<button class="btn go" data-ph="cont" data-k="chapter">Continue</button>`}}
-  if(hp&&UI.coach){const tip=G.phase==='bid'?'bid':G.step==='move'&&!G.move?'move':G.step==='move'&&G.move?'hand':null;
+  if(hp&&UI.coach&&!UI.autoPlan){const tip=G.phase==='bid'?'bid':G.step==='move'&&!G.move?'move':G.step==='move'&&G.move?'hand':null;
     const T={bid:['Turn order','Pay coins to choose <b>when</b> you play this round. Dearer spots go first and get the best moves; free spots go last. Coins also count as points, so spend them only when a great move is at stake. The bulb in the top bar gives advice.'],
       move:['Your turn','You lift everyone off one tile and lead them across the land, leaving one person on each tile you pass. The last one lands where its own tribe already stands: you collect that tribe and put it to work. Tap a glowing tile to start, or choose a ready-made plan.'],
       hand:['Leaving people behind','Pick which colour to leave, then tap a glowing tile next to you. The last person must land on a tile that already has their colour.']};
@@ -122,7 +123,7 @@ function phHandPop(hp){const mv=G.move,vm=validMoves(hp.i),by=a=>vm.filter(m=>m.
 // what the normal computer would pick here (cached per decision), shown as a starred option
 function phSuggest(hp){const k=G.logN+'_'+G.step+'_'+hp.i;if(PHONE.sgK===k)return PHONE.sgV;let v='';try{const lv=hp.lv;hp.lv='normal';try{const m=aiMove(hp.i);if(m&&m.act!=='djinn'&&m.act!=='item')v=JSON.stringify(m)}finally{hp.lv=lv}}catch(e){}PHONE.sgK=k;PHONE.sgV=v;return v}
 function phGainPop(hp){const pr=phDock('.prompt');if(!pr)return null;const box=document.createElement('div');box.innerHTML=phClean(pr,1);
-  const sj=phSuggest(hp);const sb=sj&&[...box.querySelectorAll('[data-mv]')].find(b=>b.dataset.mv===sj);
+  const sj=hintsOn()?phSuggest(hp):'';const sb=sj&&[...box.querySelectorAll('[data-mv]')].find(b=>b.dataset.mv===sj);
   if(sb&&box.querySelectorAll('[data-mv]').length>1){const par=sb.parentNode;for(const b of par.querySelectorAll('.btn.go'))if(b!==sb)b.classList.remove('go');sb.classList.add('go');sb.classList.remove('ghost');
     sb.insertAdjacentHTML('afterbegin','★ ');const first=par.querySelector('[data-mv]');if(first!==sb)par.insertBefore(sb,first);sb.insertAdjacentHTML('beforeend','<small class="sug"> · suggested</small>')}
   const pw=phDock('.powers');const n=pw?pw.querySelectorAll('[data-mv],[data-pw]').length:0;
@@ -136,7 +137,7 @@ function phStrip(hp,pop,card){const m=phMine();const s=sideToAct();let msg='',ac
   else if(!hp){const p=s>=0?P(s):null;msg=p?`${pChip(p)} ${online()&&p.human?'is deciding…':G.phase==='bid'?'is bidding…':'is playing…'}`:'';}
   else if(UI.pendDj){msg=`Tap a glowing tile for <b>${esc(DJ[UI.pendDj.k].n)}</b>`;acts=`<button class="btn sm" data-ui="cancelpw">Cancel</button>`}
   else if(G.phase==='bid'){msg='<b>Bid for turn order</b>'}
-  else if(G.step==='move'&&!G.move){msg='<b>Your move.</b> Tap a glowing tile. 🔍 or pinch to zoom.';const pl=curPlans(hp);if(pl&&pl[0]){acts=`<button class="btn go" data-plando="0">Best plan ▶ <small>${planBadge(hp,pl[0])}</small></button><button class="btn" data-ph="open" data-k="plans">Plans</button>`;
+  else if(G.step==='move'&&!G.move){msg='<b>Your move.</b> Tap a glowing tile. 🔍 or pinch to zoom.';const pl=curPlans(hp);if(pl&&pl[0]&&!hintsOn())acts=`<button class="btn go" data-ph="open" data-k="plans">Choose a plan ▶</button>`;else if(pl&&pl[0]){acts=`<button class="btn go" data-plando="0">Best plan ▶ <small>${planBadge(hp,pl[0])}</small></button><button class="btn" data-ph="open" data-k="plans">Plans</button>`;
       const mx=Math.max(...pl.slice(0,5).map(o=>planPoints(hp,o).total)),own=planPoints(hp,pl[0]).total;
       PHONE.why=`<p class="ps-why">Best plan: ${esc(planGains(hp,pl[0]).filter(x=>!x.startsWith('(')).join(', '))}.${mx>own?` Other plans score more right now (up to +${mx}), but this one sets up more points for later.`:''}</p>`}}
   else if(G.step==='move'&&G.move){msg=`<b>${G.move.hand.length} in hand.</b> Tap a glowing tile.`;if(!pop)acts=`<button class="btn go" data-ph="reopen">Open</button>`}

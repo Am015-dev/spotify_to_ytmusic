@@ -116,8 +116,11 @@ function paintOpening(){const c=document.getElementById('opencv');if(!c)return;l
 // ---- the end of the game, said plainly: who is low on camels (the right player, the right number) ----
 function camelWarn(){if(!G)return '';const out=G.pl.filter(p=>p.camels<=0);
   if(out.length)return `Last round: ${esc(out[0].nm)} has placed every camel, so the game ends after this round.`;
-  const low=G.pl.filter(p=>p.camels<=3);if(!low.length)return '';const m=Math.min(...low.map(p=>p.camels));const q=low.find(p=>p.camels===m);
-  return `Only ${m} camel${m===1?'':'s'} left for ${esc(q.nm)}: the game ends in the round their last camel is placed.`}
+  let ls=99;try{ls=legalStarts().length}catch(e){}const few=ls<=5?` Only ${ls} tile${ls===1?'':'s'} can still start a move: the game also ends at once when no move is left.`:'';
+  const low=G.pl.filter(p=>p.camels<=3);if(!low.length)return few.trim();const m=Math.min(...low.map(p=>p.camels));const q=low.find(p=>p.camels===m);
+  return `Only ${m} camel${m===1?'':'s'} left for ${esc(q.nm)}: the game ends in the round their last camel is placed.`+few}
+// suggestions (stars, Best plan) are on in the guided game and the first 2 rounds; after that the player chooses (Advise me still works)
+function hintsOn(){return !!(UI.coach||(G&&G.round<=2))}
 // one line for the round banner: the score race, then the end warning
 function raceText(){const h=G.pl.find(p=>p.human&&(!online()||p.i===NET.mySeat));return G.pl.map(p=>`${p===h?'You':esc(p.nm)} ${shownTotal(p)}`).join(' · ')}
 function chapterLine(){const w=camelWarn();return (G.round===1?'Most points at the end wins (coins count). Bid for turn order, then each player takes a turn.':`Points: ${raceText()}.`)+(w?' '+w:'')}
@@ -134,7 +137,7 @@ function planPoints(p,o){const t=G.board[o.e];let tribe=0,sure=true;
   const baseM=o.e===o.s?[]:t.m;const visitsE=o.path.slice(1,-1).filter(i=>i===o.e).length;const extraC=o.n-1-baseM.filter(x=>x===o.c).length;const remain=baseM.filter(x=>x!==o.c).length+Math.max(0,visitsE-extraC);
   const claim=owner(t)==null&&remain<=0&&p.camels>0?t.v:0;const mine=claim||owner(t)===p.i;const extra=mine&&t.k==='village'?5:mine&&t.k==='oasis'?3:0;
   return {tribe,claim,extra,total:tribe+claim+extra,sure}}
-function planBadge(p,o){const x=planPoints(p,o);return `${x.sure?'':'≈'}+${x.total} pts`}
+function planBadge(p,o){const x=planPoints(p,o);return o.c==='assassin'?`+${x.total} pts + 🗡 a kill`:`${x.sure?'':'≈'}+${x.total} pts`}
 
 // ---- cause -> effect: every change to anyone's points, with who did it and why ----
 const FEEDNM={coins:'coins',advisors:'Advisors',sages:'Sages',crafters:'Crafters',djinns:'djinns',tiles:'land',palms:'palms',palaces:'palaces',goods:'goods set',items:'items',cities:'cities'};

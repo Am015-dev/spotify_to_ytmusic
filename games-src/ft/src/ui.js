@@ -71,7 +71,7 @@ function tribeButtons(p,vm){const tr=vm.filter(m=>m.act==='tribe');const a=G.act
   for(const m of vm.filter(m=>m.act==='thief'))h+=btn(m,`🦹 Send the ${esc(THIEVES[m.k].n)} first`,'warn');
   if(a.color==='builder'){const blues=AROUND(a.tile).filter(i=>G.board[i].blue&&!G.board[i].block).length;return h+tr.map(m=>btn(m,`Earn ${(a.n+(m.fk||0))*blues*(G.turnFx.qirsh?2:1)}🪙${m.fk?` (use ${m.fk}🔮)`:''}`,m.fk?'':'go')).join('')}
   if(a.color==='assassin'){if(tr[0]&&tr[0].none)return h+btn(tr[0],'No target: carry on','go');return h+`<p class="muted small">Tap a glowing tile, or choose:</p>`+tr.map(m=>btn(m,killLabel(m.kill))).join('')}
-  return h+btn(tr[0],a.color==='merchant'?`Take ${Math.min(a.n,G.market.length)} goods`:a.color==='artisan'?'Keep them and draw items':'Keep them','go')}
+  return h+btn(tr[0],a.color==='merchant'?`Take ${G.market.slice(0,a.n).map(r=>RICON[r]+' '+RNAME[r]).join(', ')||'nothing (market empty)'}`:a.color==='artisan'?'Keep them and draw items':'Keep them','go')}
 function killLabel(k){const two=k.c2?` and a ${MNAME[k.c2]}`:'';if(k.pl!=null)return `🗡 ${esc(P(k.pl).nm)}'s ${MNAME[k.c]}${two}`;return `🗡 ${MNAME[k.c]}${two} on ${esc(tileName(G.board[k.tile]))}${k.fk?` (+${k.fk}🔮 range)`:''}`}
 function tileButtons(p,vm,t){let tm=vm.filter(m=>m.act==='tile');let h='';
   // purchases: show the net points, best first, one button per distinct set of goods
