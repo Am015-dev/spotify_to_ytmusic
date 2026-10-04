@@ -27,7 +27,8 @@ function rngOf(G, seat) { let s = (G.round * 7919 + seat * 104729 + G.logN * 31 
 
 // ---------- a light copy of a seat's brew, used for lookahead ----------
 function mkSim(G, p) {
-  const counts = {}; let n = 0; for (const c of p.bag) { if (!c || !c.c) continue; counts[ck(c)] = (counts[ck(c)] || 0) + 1; n++; }
+  const cnt = {}; let n = 0; for (const c of p.bag) { if (!c || !c.c) continue; cnt[ck(c)] = (cnt[ck(c)] || 0) + 1; n++; }
+  const counts = {}; for (const k of Object.keys(cnt).sort()) counts[k] = cnt[k];   // canonical key order: the bag's ORDER must never matter
   return { G, seat: p.seat, pot: p.pot.map(c => ({ c: c.c, v: c.v, pos: c.pos })), f: Object.assign({}, p.f), ws: CF.whiteSum(p), lim: CF.limitOf(G, p), start: CF.startPos(p), counts, n, flask: p.flask, boom: p.boom, prot: p.prot, safe: p.f.safe || 0,
     vpG: 0, ruG: 0, sideMove: 0, extra: 0, round: G.round };
 }
@@ -143,7 +144,7 @@ function shopChoice(G, p, coins, level, rnd) {
   if (level === 'normal') return scored[0].o;
   // hard: re-rank the best few by simulating whole brews with the new bag
   const cand = scored.slice(0, 7).map(x => x.o);
-  const bagNow = p.bag.filter(x => x && x.c).concat(p.newChips).concat(p.pot.map(c => ({ c: c.c, v: c.v })));
+  const bagNow = p.bag.filter(x => x && x.c).sort((a, b) => ck(a) < ck(b) ? -1 : ck(a) > ck(b) ? 1 : 0).concat(p.newChips).concat(p.pot.map(c => ({ c: c.c, v: c.v })));
   const base = bagNow.map(ck);
   let bestO = cand[0], bestV = -1e9; const sims = 70;
   const seeds = []; for (let i = 0; i < sims; i++) seeds.push(Math.floor(rnd() * 1e9));
@@ -264,7 +265,7 @@ function placeFrom(T, key) { const U = cloneSim(T); U.counts[key] = (U.counts[ke
 // what a brew from scratch with this bag is worth on average (for the do-over decision)
 const baseCache = {};
 function baselineValue(G, p) {
-  const keys = p.bag.filter(c => c && c.c).map(ck).concat(p.pot.map(ck)); let tot = 0; const n = 40;
+  const keys = p.bag.filter(c => c && c.c).map(ck).sort().concat(p.pot.map(ck)); let tot = 0; const n = 40;
   for (let i = 0; i < n; i++) tot += rollout(G, p, keys, 1234 + i * 77, G.round);
   return tot / n;
 }

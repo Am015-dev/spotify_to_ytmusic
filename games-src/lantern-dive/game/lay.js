@@ -34,7 +34,7 @@ const LIB = require('./laylib.js');
     let shots = { assign: 0, signal: 0, play: 0, popup: 0, mid: 0 }, steps = 0, reachChecked = {};
     for (let k = 0; k < 700 && steps < 400; k++) {
       const o = await p.evaluate(() => ({ over: G.phase === 'over', ph: G.phase, must: iMustAct() && canAct(), rs: !document.querySelector('#rs').hidden, plays: G.tricks.length }));
-      if (o.over) break;
+      if (o.over || o.plays >= 6) break;
       if (o.must) {
         if (!reachChecked[o.ph]) { reachChecked[o.ph] = 1; await p.waitForTimeout(500); await scroll('turn ' + o.ph); await reach('turn ' + o.ph); await shot('2' + o.ph); }
         if (o.ph === 'play' && o.plays === 2 && !shots.popup) { shots.popup = 1; await p.evaluate(() => { const c = document.querySelector('.jc'); if (c) c.click(); }); await p.waitForTimeout(350); const pr = await rect('#ppop'); if (!pr) fail('job pop-up did not open'); else { const br = await rect('#bd'); await shot('3jobpop'); await scroll('job popup'); await p.keyboard.press('Escape'); await p.waitForTimeout(200); if (await rect('#ppop')) fail('Esc did not close the pop-up'); } }
@@ -56,7 +56,7 @@ const LIB = require('./laylib.js');
     await p.evaluate(() => { showStart(); }); await p.waitForTimeout(300); await p.click('[data-a=play]'); await p.evaluate(() => { setNp(3); renderStart(); }); await p.click('[data-start=hot]'); await p.waitForTimeout(900);
     if (await p.evaluate(() => document.querySelector('#pass').hidden || !document.querySelector('#pass [data-a=take]'))) fail('no pass-the-device card'); else { await shot('7pass'); if (await p.evaluate(() => document.querySelectorAll('#hand .hc').length)) fail('hand visible behind the pass card'); await scroll('pass'); }
     // the painted table exists
-    { const px = await p.evaluate(() => ({ on: !!(window.PX && PX.on), cv: !!document.querySelector('canvas') })); console.log(t, 'pixi', JSON.stringify(px)); }
+    { const px = await p.evaluate(() => ({ on: PX.on, q: PX.q, err: PX.err, cv: !!document.querySelector('canvas') })); console.log(t, 'pixi', JSON.stringify(px)); }
     if (errs.length) fail('console errors', JSON.stringify(errs.slice(0, 3)));
     await ctx.close();
   }
