@@ -71,11 +71,11 @@ function cardDetail(id){const i=cinfo(id);const ar=ARCH_LBL[i.archetype]||'';con
 const EV={cur:null};
 function snapInf(){return G.pl.map(p=>p.inf)}
 function logSince(n){return G.log.filter(e=>e.i>n)}
-function pushEv(e){UI.evq.push(e);if(typeof netEvent==='function')netEvent(e)}
+function pushEv(e){e.at=G?G.logN+.5:0;UI.evq.push(e);if(typeof netEvent==='function')netEvent(e)}
 function hookEngine(){const I=TB.internal;if(!I||!I.AG||I.__hooked)return;I.__hooked=1;const AG=I.AG,PK=I.PICKH;
   const wrap=(h,before,after)=>{const o=AG[h];if(!o)return;AG[h]=function(d){const mine=(()=>{const g=TB.internal.G;if(!G)G=g;return g===G})();try{mine&&before&&before(d)}catch(e){console.warn('hook',h,e.message)}const r=o.call(this,d);try{mine&&after&&after(d)}catch(e){console.warn('hook',h,e.message)}return r}};
   const flush=()=>{if(EV.cur&&EV.cur.t==='clash'&&EV.cur.tot){const c=EV.cur;c.logs=logSince(c.log0).map(e=>e.t);c.inf1=snapInf();pushEv(c)}EV.cur=null};
-  wrap('roundStart',()=>{flush()},()=>{UI.rs0=snapInf();UI.rsLog=G.logN;UI.clashRes={};UI.placed=[]});
+  wrap('roundStart',()=>{flush()},()=>{UI.rs0=snapInf();UI.rsInfl=JSON.parse(JSON.stringify(G.infl||[]));UI.rsLog=G.logN;UI.clashRes={};UI.placed=[]});
   wrap(I.AG.bidOrder?'bidOrder':'bidReveal',null,()=>{pushEv({t:'bids',round:G.round,bids:G.pl.map(p=>({seat:p.seat,id:p.bid,str:G.bstr[p.seat]})).filter(b=>b.id!=null),order:G.order.slice()})});
   wrap('clashReveal',()=>{if(EV.cur&&EV.cur.tot)flush()},()=>{const c=G.clash;if(!c)return;if(!EV.cur)EV.cur={t:'clash',r:c.r,idx:G.cord.indexOf(c.r),rounds:0,log0:G.logN-c.parts.length,inf0:snapInf()};
     EV.cur.n=c.n;EV.cur.cards={};for(const s of c.parts)EV.cur.cards[s]=(c.cards[s]||[]).slice();EV.cur.supp={};for(const s of c.parts)EV.cur.supp[s]=G.pl[s].supp.r[c.r];EV.cur.parts=c.parts.slice();EV.cur.tot=null});
@@ -83,9 +83,12 @@ function hookEngine(){const I=TB.internal;if(!I||!I.AG||I.__hooked)return;I.__ho
     EV.cur.cardsF={};for(const s in EV.cur.cards)EV.cur.cardsF[s]=EV.cur.cards[s].slice();
     const ci=G.clash.cards;for(const s in ci)EV.cur.cardsF[s]=ci[s].slice();
     EV.cur.str={};for(const s in EV.cur.cardsF)EV.cur.str[s]=EV.cur.cardsF[s].map(id=>cinfo(id).strength);
+    EV.cur.brk=c.brk?JSON.parse(JSON.stringify(c.brk)):null;EV.cur.elims=logSince(EV.cur.log0).filter(e=>e.m&&(e.m.k==='elim'||e.m.k==='inv')).map(e=>({t:e.t,k:e.m.k,ids:e.m.ids.slice(),by:(e.m.by||[]).slice()}));
+    EV.cur.dead={};for(const e of EV.cur.elims)if(e.k==='elim')for(const id of e.ids){const o=(id/100)|0;(EV.cur.dead[o]=EV.cur.dead[o]||[]).push(id)}
     flush()});  // the result card comes right after the tally, before the winner is asked to claim a location
   wrap('regionDone',()=>{flush()});
-  wrap('cleanup',()=>{if(UI.rs0)pushEv({t:'summary',round:G.round,rounds:G.rounds,inf0:UI.rs0,inf1:snapInf(),order:G.order.slice(),warns:logSince(UI.rsLog||0).filter(e=>e.c==='warn').map(e=>e.t),big:logSince(UI.rsLog||0).filter(e=>e.c==='big').map(e=>e.t).slice(-8),last:G.round>=G.rounds})});
+  wrap('cleanup',null,()=>{if(UI.rs0){const why=G.pl.map((p,s)=>{const a=(UI.rsInfl||[])[s]||{},b=(G.infl||[])[s]||{},o=[];for(const k in b){const d=b[k]-(a[k]||0);if(d)o.push([k,d])}for(const k in a)if(!(k in b)&&a[k])o.push([k,-a[k]]);return o.sort((x,y)=>y[1]-x[1])});
+    pushEv({t:'summary',round:G.round,rounds:G.rounds,inf0:UI.rs0,inf1:snapInf(),why,order:G.order.slice(),warns:logSince(UI.rsLog||0).filter(e=>e.c==='warn'&&!(e.m&&e.m.k==='elim')).map(e=>e.t),winter:logSince(UI.rsLog||0).filter(e=>e.m&&(e.m.k==='supp'||e.m.k==='rm'&&e.m.why==='Winter')).map(e=>e.t),big:[],last:G.round>=G.rounds})}});
   if(PK&&PK.bidRes){const o=PK.bidRes;PK.bidRes=function(seat,opt,d){const r=o.call(this,seat,opt,d);try{UI.toast=G.log.length?G.log[G.log.length-1].t:''}catch(e){}return r}}}
 // ---------------------------------------------------------------- AI adapter (the engine author's TB.ai when present, else a modest fallback)
 function legal(seat){return TB.moves(G,seat)}  // on a client this runs on its own stripped copy (same list as the host's, net-strip-test.js)
@@ -136,7 +139,7 @@ function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=fal
 function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,coach:UI.coachDone||{},tip:UI.tip,t:Date.now()}))}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem('tb_save');return s?JSON.parse(s):null}catch(e){return null}}
 function clearSave(){try{localStorage.removeItem('tb_save')}catch(e){}}
-function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI.holder=sv.holder||0;UI.guide=sv.guide||'full';UI.aiSeed=sv.ai||1;resetUI();UI.coachDone=sv.coach||{};UI.tip=sv.tip||{};UI.started=true;UI.rs0=snapInf();UI.rsLog=G.logN;return G}
+function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI.holder=sv.holder||0;UI.guide=sv.guide||'full';UI.aiSeed=sv.ai||1;resetUI();UI.coachDone=sv.coach||{};UI.tip=sv.tip||{};UI.started=true;UI.rs0=snapInf();UI.rsInfl=JSON.parse(JSON.stringify(G.infl||[]));UI.rsLog=G.logN;return G}
 // ---------------------------------------------------------------- applying moves
 function doMove(mv){if(!G||!G.q)return false;const was=G.round,l0=G.logN;
   const res=TB.apply(G,mv);

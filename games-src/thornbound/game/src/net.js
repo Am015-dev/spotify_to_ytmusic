@@ -114,12 +114,13 @@ function validState(g){return g&&typeof g==='object'&&Array.isArray(g.pl)&&g.pl.
 function applyNet(o){
   if(o.lobby||!o.g){NET.opt=o.opt&&typeof o.opt==='object'?o.opt:NET.opt;if(G||UI.started){netIdle();hideStart()}NET.gid=null;if(!NET.hostGone)UI.netOpen=true;netRender();return}
   if(!validState(o.g))return;const g=o.g;const fresh=o.gid!==NET.gid;NET.opt=o.opt&&typeof o.opt==='object'?o.opt:NET.opt;
-  const prev=G&&!fresh?{inf:G.pl.reduce((a,p)=>a+p.inf,0),over:!!G.over}:null;
+  const prev=G&&!fresh?{inf:G.pl.reduce((a,p)=>a+p.inf,0),over:!!G.over}:null;const l0=G&&!fresh?G.logN:Infinity;
   G=g;NET.mySeat=Number.isInteger(o.seat)&&o.seat>=0&&o.seat<g.np?o.seat:-1;NET.rk=typeof o.rk==='string'?o.rk.slice(0,80):null;if(NET.pend&&Number.isInteger(o.ack)&&o.ack>=NET.pendN)NET.pend=null;   // this copy already contains the host's answer to my last move
   if(fresh){NET.gid=typeof o.gid==='string'?o.gid.slice(0,40):'x';NET.evSeen=Number.isInteger(o.evid)?o.evid:0;resetUI();UI.cfg={mode:'me',np:g.np,length:g.len,online:true};UI.mode='me';UI.started=true;UI.holder=Math.max(0,NET.mySeat);UI.rs0=snapInf();UI.rsLog=g.logN;
     hideStart();GX.close();UI.netOpen=false;UI.mapReset=true;closePop(true);NET.wasMine=false}
   else if(Array.isArray(o.ev)){const bs=o.ev.filter(b=>b&&Number.isInteger(b.id)&&b.id>NET.evSeen&&b.e).sort((a,b)=>a.id-b.id).slice(0,12);
     for(const b of bs){const c=cleanEv(b.e);if(c){UI.evq.push(c);if(c.t==='bids')sfx('bid')}NET.evSeen=b.id}}
+  if(l0!==Infinity&&typeof netNews==='function')netNews(l0);
   if(prev){const inf=G.pl.reduce((a,p)=>a+p.inf,0);if(inf>prev.inf)setTimeout(()=>sfx('inf'),150);if(G.over&&!prev.over)setTimeout(()=>sfx(NET.mySeat===G.over.winner?'fanfare':'lose'),300)}
   netRender();renderAll();pump()}
 // ---- events: the host remembers its bids / clash / round summaries for the clients (they only get state snapshots otherwise) ----
@@ -133,8 +134,12 @@ function cleanEv(e){if(!e||typeof e!=='object')return null;const I=(v,a,b)=>Numb
    case 'bids':{if(!Array.isArray(e.bids))return null;const bids=e.bids.slice(0,4).map(b=>b&&seat(b.seat)!=null&&card(b.id)!=null?{seat:b.seat,id:b.id,str:I(b.str,-99,99)==null?0:b.str}:null);if(bids.some(x=>!x))return null;return {t:'bids',round:I(e.round,0,99)||0,bids,order:seats(e.order)||[]}}
    case 'clash':{const parts=seats(e.parts);if(!parts||!parts.length)return null;const w=e.winner==null?-1:I(e.winner,-1,3);if(w==null)return null;
      return {t:'clash',r:I(e.r,0,2)==null?0:e.r,idx:I(e.idx,-1,2)==null?-1:e.idx,n:I(e.n,1,99)||1,parts,cards:bySeat(e.cards,v=>card(v)==null?0:v),cardsF:bySeat(e.cardsF,v=>card(v)==null?0:v),supp:num(e.supp),tot:num(e.tot),winner:w,tied:Array.isArray(e.tied)?seats(e.tied):null,
-       logs:Array.isArray(e.logs)?e.logs.slice(0,40).map(Sx):[],inf0:ints(e.inf0)||[],inf1:ints(e.inf1)||[]}}
-   case 'summary':return {t:'summary',round:I(e.round,0,99)||0,rounds:I(e.rounds,0,99)||0,inf0:ints(e.inf0)||[],inf1:ints(e.inf1)||[],order:seats(e.order)||[],warns:Array.isArray(e.warns)?e.warns.slice(0,12).map(Sx):[],big:[],last:!!e.last}}
+       logs:Array.isArray(e.logs)?e.logs.slice(0,40).map(Sx):[],inf0:ints(e.inf0)||[],inf1:ints(e.inf1)||[],
+       brk:(()=>{if(!e.brk||typeof e.brk!=='object')return null;const r={};for(const s of [0,1,2,3])if(Array.isArray(e.brk[s]))r[s]=e.brk[s].slice(0,12).map(x=>({l:Sx(x&&x.l).slice(0,80),n:I(x&&x.n,-99,99)||0,id:card(x&&x.id),k:Sx(x&&x.k).slice(0,10)}));return r})(),
+       elims:Array.isArray(e.elims)?e.elims.slice(0,8).map(x=>({t:Sx(x&&x.t),k:x&&x.k==='inv'?'inv':'elim',ids:arr(x&&x.ids,v=>card(v)==null?0:v,4)||[],by:arr(x&&x.by,v=>card(v)==null?0:v,4)||[]})):[],
+       dead:bySeat(e.dead,v=>card(v)==null?0:v)}}
+   case 'summary':return {t:'summary',round:I(e.round,0,99)||0,rounds:I(e.rounds,0,99)||0,inf0:ints(e.inf0)||[],inf1:ints(e.inf1)||[],order:seats(e.order)||[],warns:Array.isArray(e.warns)?e.warns.slice(0,12).map(Sx):[],winter:Array.isArray(e.winter)?e.winter.slice(0,8).map(Sx):[],
+     why:Array.isArray(e.why)?e.why.slice(0,4).map(L=>Array.isArray(L)?L.slice(0,16).filter(x=>Array.isArray(x)).map(x=>[Sx(x[0]).slice(0,80),I(x[1],-99,99)||0]):[]):[],big:[],last:!!e.last}}
   return null}
 function netEvent(e){if(!isHost())return;try{const c=cleanEv(JSON.parse(JSON.stringify(e)));if(c){NET.evLog.push({id:++NET.evId,ts:Date.now(),e:c});if(NET.evLog.length>10)NET.evLog.shift()}}catch(x){}}
 // ---- client -> host ----

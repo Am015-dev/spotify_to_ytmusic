@@ -25,6 +25,10 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
    case 'kc':openPop('kc',{n:+t.dataset.n});break;
    case 'road4':openPop('kingdom');break;
    case 'pclose':closePop();break;
+   case 'newsok':newsOk();break;
+   case 'hint':{const s=viewSeatForQ();if(s!=null){UI.hintQ=qKey(s,legal(s));renderAll()}break}
+   case 'confirm':{UI.pop='confirm';UI.popArg={k:t.dataset.k};renderPop();break}
+   case 'zoom':toggleZoom();break;
    case 'take':{const s=+t.dataset.s;UI.holder=s;UI.passed=s;UI.card=null;UI._cardKey=null;UI.pop=null;pump();break}
    case 'evok':{UI.card=null;UI._cardKey=null;UI.noAnim=false;if(UI._cp)UI._cp=null;UI.mapReset=false;MAP.slotDirty=true;pump();break}
    case 'tipx':UI.tip[t.dataset.k]='x';renderAll();break;
@@ -69,8 +73,8 @@ function startFromCfg(c){hideStart();const o={np:c.np,length:c.length,faction:c.
   if(c.guided)newGame('guided',o);else newGame(c.mode==='watch'?'ai':c.mode,o)}
 function afterStart(){closePop(true);GX.close();UI.mapReset=true;renderAll();pump()}
 // ---------------------------------------------------------------- drawers
-function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slice().reverse();let h='<p class="small"><button class="btn" data-a="logall">'+(UI.logAll?'Show key events only':'Show everything')+'</button></p><ol class="log">';
-  let r=-1;for(const e of L){if(!UI.logAll&&e.c!=='big'&&e.c!=='warn')continue;h+='<li class="'+(e.c||'')+'"><i style="background:'+(e.s>=0?fcol(e.s):'#777')+'"></i>'+esc(e.t)+'</li>'}
+function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slice().reverse();let h='<p class="small">Newest first. Tap an underlined word for its meaning. <button class="btn" data-a="logall">'+(UI.logAll?'Show key events only':'Show everything')+'</button></p><ol class="log">';
+  let r=-1;for(const e of L){if(!UI.logAll&&e.c!=='big'&&e.c!=='warn'&&!(e.m&&['inf','steal','elim','kcsteal','tac','fav','inv'].includes(e.m.k)))continue;if(e.r!==r){r=e.r;h+='<li class="lr">Round '+r+'</li>'}h+='<li class="'+(e.c||'')+'"><i style="background:'+(e.s>=0?fcol(e.s):'#777')+'"></i>'+gloss(plain(e.t))+'</li>'}
   el.innerHTML=h+'</ol>'}
 function renderMenu(){const el=$('#setbody');if(!el)return;
   const seg=(a,cur,opts)=>'<div class="seg">'+opts.map(([v,l])=>'<button class="'+(String(cur)===String(v)?'on':'')+'" data-a="'+a+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
