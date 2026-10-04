@@ -3,11 +3,11 @@
    through (tJU.js measures before/after on one build). No per-frame allocations: scratch vectors are made once below.
    · camera: lower + tighter at speed, look-ahead into turns, FOV curve, punch on impacts      · hit-stop 65–90 ms on takedowns / big smashes
    · drift tiers paced 0.5/1.1/2.0 s with a tier-up cue, payout grows per tier               · near miss at city speeds
-   · landing squash + kick · combo: pulse per link, big pop on cash-out · stud trail when nothing happened for 5.5 s
+   · landing squash + kick · combo: pulse per link, big pop on cash-out · stud trail when nothing happened for 5 s
    · speed blur / speed lines inside the mission caps · wind + road rumble                      · split-screen: no hit-stop, no camera punch */
 const JU={on:true,hold:false,rt:1/60,hs:0,hsCd:0,frz:false,off:0,clk:0,ev:{n:0,m:0,lm:0,last:0,gap:0,k:{}},sm0:0,cr0:0,
   kick:0,la:0,drop:0,fx:0,sq:0,airT0:0,dropT:0,nmF:0,co:new THREE.Vector3(),cf:0,v0:new THREE.Vector3(),v1:new THREE.Vector3(),Y:new THREE.Vector3(0,1,0)};
-const JU_C={tierK:.55,tierT:[.5,1.1,2],turbo:[.8,1.6,2.6],bm:[8,18,32],hsTd:.09,hsBig:.075,hsSmall:.065,deadT:5.5,airMin:.8};
+const JU_C={tierK:.55,tierT:[.5,1.1,2],turbo:[.8,1.6,2.6],bm:[8,18,32],hsTd:.09,hsBig:.075,hsSmall:.065,deadT:5,airMin:.8};
 const JU_TC=[new THREE.Color(.6,1.6,2.6),new THREE.Color(2.6,1.2,.3),new THREE.Color(1.8,.6,2.6)];
 function JU_ev(k){const E=JU.ev;E.n++;if(JU.clk-E.lm>.3||!E.m)E.m++;E.lm=JU.clk;E.k[k]=(E.k[k]||0)+1;const g=JU.clk-E.last;if(g>E.gap)E.gap=g;E.last=JU.clk}
 function JU_roam(){return state==='roam'&&!!pl}
@@ -46,9 +46,11 @@ roamStep=(f=>function(dt){const busy=JU_busy();if(!busy)JU.clk+=dt;if(!JU.on||!p
   // air: the base already pays an air bonus over 1 s (roamLanded); here: squash on landing, camera kick on big landings, slight stretch in the air
   if(s.air&&!a0)JU.airT0=JU.clk;else if(!s.air&&a0){const at=JU.clk-JU.airT0;JU.sq=Math.min(.24,.14+at*.1);if(at>=JU_C.airMin)JU.kick=Math.max(JU.kick,Math.min(.45,at*.3)*fxK())}
   JU.sq=Math.max(0,JU.sq-dt*1.1);{const q=s.air?-.05:JU.sq*Math.min(1,JU.sq*8),m=s.mesh.scale;if(Math.abs(m.y-(1-q))>1e-4)m.set(1+q*.45,1-q,1+q*.45)}
-  // stud trail: nothing rewarding for 5.5 s while driving → a fountain of studs on the road ahead (pooled stud meshes)
-  JU.dropT=Math.max(0,JU.dropT-dt);if(!busy&&sp>8&&JU.dropT<=0&&JU.clk-JU.ev.last>JU_C.deadT){JU.dropT=3;const sg=Math.sign(RO.v||1),fx=Math.sin(RO.h)*sg,fz=Math.cos(RO.h)*sg,ahead=Math.min(45,14+sp*.7);JU.v0.set(fx,0,fz);
-    for(let k=0;k<6;k++){const x=RO.x+fx*(ahead+k*3.5),z=RO.z+fz*(ahead+k*3.5);if(roamHit(x,z,1,RO.y))break;studBurst(JU.v1.set(x,groundAt(x,z,RO.y+3)+.8,z),JU.v0,0)}}})(roamStep);
+  // stud trail: nothing rewarding for 5 s while driving → a fountain of studs on the road ahead (pooled stud meshes)
+  JU.dropT=Math.max(0,JU.dropT-dt);if(!busy&&sp>3&&JU.dropT<=0&&JU.clk-JU.ev.last>JU_C.deadT){JU.dropT=2.5;const sg=Math.sign(RO.v||1),fx=Math.sin(RO.h)*sg,fz=Math.cos(RO.h)*sg,ahead=Math.min(45,14+sp*.7);JU.v0.set(fx,0,fz);let n=0;
+    for(let k=0;k<6;k++){const x=RO.x+fx*(ahead+k*3.5),z=RO.z+fz*(ahead+k*3.5);if(roamHit(x,z,1,RO.y))break;studBurst(JU.v1.set(x,groundAt(x,z,RO.y+3)+.8,z),JU.v0,0);n++}
+    // blocked ahead (a wall, a tight turn): pop them in a ring around the car instead, inside the stud magnet
+    if(!n){JU.v0.set(0,0,0);for(let k=0;k<6;k++){const a=k*1.047,x=RO.x+Math.sin(a)*6,z=RO.z+Math.cos(a)*6;if(!roamHit(x,z,1,RO.y))studBurst(JU.v1.set(x,groundAt(x,z,RO.y+3)+.8,z),JU.v0,0)}}}})(roamStep);
 // ---- camera: offsets are removed before the base camera runs and re-applied after, so they never feed back into its smoothing
 roamCam=(f=>function(dt){const c=camera;c.position.sub(JU.co);c.fov-=JU.cf;JU.co.set(0,0,0);JU.cf=0;f(dt);
   if(!JU.on||!JU_roam()||(typeof M1!=='undefined'&&(M1.cs||M1.tdc&&M1.tdc.t>0))){c.updateProjectionMatrix();return}
