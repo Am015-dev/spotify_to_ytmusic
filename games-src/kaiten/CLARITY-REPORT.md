@@ -108,7 +108,18 @@ thing.
 
 ## Tests (final build, kaiten.html)
 
-See "Final test run" below; numbers are filled in from the final run.
+| Test | Result |
+|---|---|
+| `rules-test.js` | 90 tests, 90 pass |
+| `hidden-test.js 40` | 40 games, 1,137 view checks, 0 leaks, 0 AI decision differences: PASSED |
+| `net-strip-test.js 20` | 20 games, 2,870 stripped views, 0 problems: PASSED |
+| `score-flash-test.js 3` (new) | 1,979 samples, 0 problems: PASSED (942 problems on the build before the fix) |
+| `click.js` (ANIM=0) | 16 games, 0 errors, 0 stalls, 0 hidden-hand violations |
+| `click.js --anim` | CLICKANIM |
+| `lay.js` 1366x768, 1920x1080, 768x1024, 1100x700 | PROBLEMS 0 |
+| `lay-phone.js` 390x844, 390x763, 390x664, 375x553, 412x780, 844x390, 750x342 | LAYPHONE |
+| `px-test.js` | PROBLEMS 0 on the rerun. The first run had 1: "animations did not finish" at 1366x768 webgl high, turn 3, a hand card 2 px from its target after 15 s; it did not recur. |
+| `net/p2p-kk.js full`, `p2p-kk-phone.js full` | 1 bad each: the client never joins and a computer takes its seat. **The untouched preview build fails identically** in this sandbox (the product audit also found the sandbox blocks the signalling path), so it is not caused by this change; online play is untested here. |
 
 Tests changed to match intended design changes (no check removed):
 - `lay-phone.js`: finds Hint beside the prompt (`#hintb`) as well as in `#acts`.
