@@ -15,7 +15,7 @@ const INIT=`(()=>{const q=[];let t=0;window.__auto=true;window.requestAnimationF
  window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}if(window.__mon)try{window.__mon()}catch(e){window.__monErr=String(e)}}return t};
  setInterval(()=>{if(window.__dbg&&!window.__fastR&&!window.__shooting){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}if(window.__auto)window.__tick(1)},16)})();`;
 // monitor: hits (speed loss not from the brake), stuck, speed, loading screens, smashes, camera inside a building
-const MON=()=>{const M=__mho,R=M.RO;window.__Q={f:0,drive:0,vSum:0,hits:[],stuck:0,stEp:0,ld:0,ldOn:false,ldT:[],camIn:0,smash:0,traf:0,trafN:0,hist:[],lastHit:-99,pos:[],ev:[],ch:null,yh:[],bh:[],y0:0};
+const MON=()=>{const M=__mho,R=M.RO;window.__Q={f:0,drive:0,vSum:0,hits:[],stuck:0,stEp:0,ld:0,ldOn:false,ldT:[],camIn:0,smash:0,traf:0,trafN:0,hist:[],lastHit:-99,pos:[],ev:[],ch:null,yh:[],bh:[],y0:0,camS:[]};
  const Q=__Q;let sm0=null;
  window.__mon=()=>{if(M.state!=='roam'){const on=!!(M.LD&&M.LD.on);if(on&&!Q.ldOn){Q.ld++;Q.ldT.push(Q.f)}Q.ldOn=on;return}
   Q.f++;const on=!!(M.LD&&M.LD.on)||!!document.querySelector('#loading:not([hidden]),#ldScreen:not([hidden])');if(on&&!Q.ldOn){Q.ld++;Q.ldT.push(Q.f)}Q.ldOn=on;
@@ -32,11 +32,11 @@ const MON=()=>{const M=__mho,R=M.RO;window.__Q={f:0,drive:0,vSum:0,hits:[],stuck
    let ped=0;for(const q of M.HUB.peds||[])if(Math.hypot((q._x??1e9)-R.x,(q._z??1e9)-R.z)<6)ped=1;const air=Q.yh.some(y=>y>.6),bst=Q.bh[0]&&!R.boosting;
    Q.hits.push({f:Q.f,v0:+(vmax*3.6).toFixed(0),v1:+(v*3.6).toFixed(0),drop:+(1-v/vmax).toFixed(2),kind:wall?'wall':car?'traffic':ped?'ped':air?'landing':bst?'boost-end':'other',x:Math.round(R.x),z:Math.round(R.z),dy:+(R.y-Q.y0).toFixed(1)})}
   if(v<5/3.6){Q.stEp++}else{if(Q.stEp>120)Q.stuck+=Q.stEp;Q.stEp=0}
-  const cam=window.__dbg&&__dbg.camera;if(cam&&Q.f%3===0&&M.roamHitAt(cam.position.x,cam.position.z,.3,cam.position.y))Q.camIn++};};
+  const cam=window.__dbg&&__dbg.camera;if(cam&&Q.f%3===0){const b=M.roamHitAt(cam.position.x,cam.position.z,.3,cam.position.y);if(b){Q.camIn++;if(Q.camS.length<8&&Q.f-(Q.camF||-999)>240){Q.camF=Q.f;Q.camS.push({f:Q.f,car:[Math.round(R.x),Math.round(R.z),+R.y.toFixed(1)],cam:[+cam.position.x.toFixed(1),+cam.position.z.toFixed(1),+cam.position.y.toFixed(1)],b:{x:+(+b.x).toFixed(1),z:+(+b.z).toFixed(1),hw:+(+b.hw).toFixed(1),hd:+(+b.hd).toFixed(1),h:b.h&&+b.h.toFixed(1),y0:b.y0&&+b.y0.toFixed(1),rot:b.c!=null}})}}}};};
 const STAT=()=>{const Q=__Q,mins=Q.drive/3600,st=Q.stuck+(Q.stEp>120?Q.stEp:0);const w=Q.hits.filter(h=>h.kind==='wall');const kinds={};for(const h of Q.hits)kinds[h.kind]=(kinds[h.kind]||0)+1;
  return{min:+mins.toFixed(2),hits:Q.hits.length,kinds,wallHits:w.length,wallPerMin:+(w.length/Math.max(.01,mins)).toFixed(2),hitsPerMin:+(Q.hits.length/Math.max(.01,mins)).toFixed(2),
   bigDrop:Q.hits.filter(h=>h.drop>.5).length,stuckPct:+(100*st/Math.max(1,Q.drive)).toFixed(1),avgKmh:+(Q.vSum/Math.max(1,Q.drive)*3.6).toFixed(1),
-  loads:Q.ld,loadsPerMin:+(Q.ld/Math.max(.01,Q.f/3600)).toFixed(2),camInsidePct:+(100*Q.camIn/Math.max(1,Q.drive/3)).toFixed(1),smashPerMin:+(Q.smash/Math.max(.01,mins)).toFixed(1),
+  loads:Q.ld,loadsPerMin:+(Q.ld/Math.max(.01,Q.f/3600)).toFixed(2),camInsidePct:+(100*Q.camIn/Math.max(1,Q.drive/3)).toFixed(1),camInside:Q.camS,smashPerMin:+(Q.smash/Math.max(.01,mins)).toFixed(1),
   traffic120m:+(Q.traf/Math.max(1,Q.trafN)).toFixed(1),missions:Q.ev.slice(0,30),worst:Q.hits.slice().sort((a,b)=>b.drop-a.drop).slice(0,5),monErr:window.__monErr||null}};
 // HUD vs touch-control overlap + tiny text
 const LAYOUT=()=>{const vis=e=>{const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)return false;for(let a=e;a;a=a.parentElement){if(a.hidden)return false;const c=getComputedStyle(a);if(c.display==='none'||+c.opacity<.05)return false}const r=e.getBoundingClientRect();return r.width>4&&r.height>4};
@@ -56,7 +56,7 @@ const SCALE=()=>{const T=__dbg.THREE,M=__mho,R=M.RO,H=M.HUB,B=new T.Box3(),m4=ne
  // pedestrians: union of their instanced body parts, height above their feet
  const peds=(H.peds||[]).map((p,i)=>({p,i,d:Math.hypot((p._x??1e9)-R.x,(p._z??1e9)-R.z)})).sort((a,b)=>a.d-b.d).slice(0,8).map(({p,i})=>{const U=new T.Box3();for(const k in (H.pP||{})){const b=inst(H.pP[k],i);if(b&&!b.isEmpty())U.union(b)}return U.isEmpty()?null:U.max.y-(p.y||0)-(p.jy||0)});
  const cars=(H.cars||[]).filter(c=>!c.dead&&H.cim&&H.cim[c.k]).map(c=>({c,d:Math.hypot(c.x-R.x,c.z-R.z)})).sort((a,b)=>a.d-b.d).slice(0,8).map(({c})=>{const b=inst(H.cim[c.k],c.j);if(!b)return null;b.getSize(sz);return{l:Math.max(sz.x,sz.z),h:sz.y}});
- let pc=null;if(M.pl&&M.pl.mesh){M.pl.mesh.updateMatrixWorld(true);B.setFromObject(M.pl.mesh);B.getSize(sz);pc={h:+sz.y.toFixed(2),l:+Math.max(sz.x,sz.z).toFixed(2),w:+Math.min(sz.x,sz.z).toFixed(2)}}
+ let pc=null;if(M.pl&&M.pl.mesh){M.pl.mesh.updateMatrixWorld(true);B.makeEmpty();M.pl.mesh.traverseVisible(o=>{if(o.isMesh&&o.geometry&&!(o.material&&(o.material.transparent||o.material.blending===T.AdditiveBlending))){if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();B.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld))}});B.getSize(sz);pc={h:+sz.y.toFixed(2),l:+Math.max(sz.x,sz.z).toFixed(2),w:+Math.min(sz.x,sz.z).toFixed(2)}}
  const pedH=med(peds),carL=med(cars.map(c=>c&&c.l)),carH=med(cars.map(c=>c&&c.h));
  const rel=h=>h&&carL?+((h/carL)/(1.8/4.5)).toFixed(2):null;   // adult 1.8 m vs car 4.5 m: >1 = people too big for the cars
  return{pedH,carL,carH,player:pc,pedRel:rel(pedH),pedVsPlayer:pedH&&pc?+((pedH/pc.l)/(1.8/4.5)).toFixed(2):null,nPed:peds.filter(Boolean).length,nCar:cars.filter(Boolean).length}};
@@ -105,7 +105,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   // scale + layout at the start
   const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny),hudAll=new Set(lay.hud);await shot(city+'_start');
   // ---- the drive: human driver
-  const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(city==='fra'?11:23);let wob=0,route=null,routeT=-1e9,dest=null,destKind='',lastBrake=-1e9,boostT=0,driftT=0,stuckT=0,revT=0,lastNext=-1e9,events=[],lagged=[];
+  const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(city==='fra'?11:23);let brakeUntil=-1,wob=0,route=null,routeT=-1e9,dest=null,destKind='',lastBrake=-1e9,boostT=0,driftT=0,stuckT=0,revT=0,lastNext=-1e9,events=[],lagged=[];
   const frames=MIN*3600;let f=0,lastLay=0,shotN=0,nextShot=frames/4;let extra={map:null,pause:null,garage:null,otg:null};
   while(f<frames){
    // side trips a person makes once: map drag+pinch, pause/resume, garage
@@ -129,11 +129,13 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    let a=Math.atan2(tx-o.x,tz-o.z)-o.h;a=Math.atan2(Math.sin(a),Math.cos(a));
    wob+=(rng()-.5)*.08-wob*.05;wob=Math.max(-.26,Math.min(.26,wob));const ae=a+wob*Math.min(1,Math.abs(o.v)/15);  // ±15° wobble while moving
    // corner ahead (next 40 m)
-   let k2=bi,a2=0;acc=0;while(k2<route.length-1&&acc<40){acc+=Math.hypot(route[k2+1][0]-route[k2][0],route[k2+1][1]-route[k2][1]);k2++}if(k2>bi+1){const h1=Math.atan2(route[Math.min(k2,route.length-1)][0]-route[bi][0],route[Math.min(k2,route.length-1)][1]-route[bi][1]);a2=Math.abs(Math.atan2(Math.sin(h1-o.h),Math.cos(h1-o.h)))}
+   let k2=bi,a2=0;acc=0;const cl=Math.max(40,Math.abs(o.v)*1.6);while(k2<route.length-1&&acc<cl){acc+=Math.hypot(route[k2+1][0]-route[k2][0],route[k2+1][1]-route[k2][1]);k2++}if(k2>bi+1){const h1=Math.atan2(route[Math.min(k2,route.length-1)][0]-route[bi][0],route[Math.min(k2,route.length-1)][1]-route[bi][1]);a2=Math.abs(Math.atan2(Math.sin(h1-o.h),Math.cos(h1-o.h)))}
    const c={steer:ae>.13?-1:ae<-.13?1:0,gas:true,brake:false,drift:false,boost:false};
    if(o.v<0)c.steer=-c.steer; // reversing: wheel works backwards
-   if(Math.abs(ae)>.7&&o.v>14){c.gas=false;if(f-lastBrake>40){c.brake=true;lastBrake=f}}else if(a2>.9&&o.v>20){c.gas=false}
-   if(Math.abs(ae)<.08&&a2<.2&&o.v>12&&f-boostT>600){boostT=f}if(f-boostT<90)c.boost=true;
+   let wantB=false;if(Math.abs(ae)>.7&&o.v>14){c.gas=false;wantB=true}else if(a2>.9&&o.v>20){c.gas=false;if(o.v>32)wantB=true}
+   // one held press per corner (a quick second tap would be the double-tap PARK gesture)
+   if(wantB&&(ctl.brake||f-lastBrake>60))brakeUntil=Math.max(brakeUntil,f+18);if(f<brakeUntil){c.brake=true;lastBrake=f}
+   if(Math.abs(ae)<.08&&a2<.2&&o.v>12&&o.v<45&&f-boostT>600){boostT=f}if(f-boostT<90)c.boost=true;
    if(Math.abs(ae)>.45&&Math.abs(ae)<1.1&&o.v>23&&f-driftT>900){driftT=f}if(f-driftT<50&&Math.abs(ae)>.2)c.drift=true;
    // stuck like a person: after 1.5 s at a standstill, reverse with opposite lock for 1.2 s
    if(Math.abs(s.v)<1.4)stuckT+=6;else stuckT=0;if(stuckT>90&&f>revT+150){revT=f;stuckT=0}
@@ -162,7 +164,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   await tap('#roamExit');r.opened=await p.evaluate(()=>!document.querySelector('#roamPause').hidden);await shot('pause');
   const x0=await pos();await tick(120);const x1=await pos();r.frozen=Math.hypot(x1[0]-x0[0],x1[1]-x0[1])<.5;
   await tap('#roamPause [data-p=resume]');await tick(10);r.resumed=await p.evaluate(()=>document.querySelector('#roamPause').hidden&&!__mho.RO.frozen);return r}
- async function garageTrip(){const r={};await tap('#roamExit');if(!(await tap('#roamPause [data-p=garage]')))return r;await tick(60);
+ async function garageTrip(){const r={};r.pause=await tap('#roamExit');await tick(6);r.btn=await p.evaluate(()=>{const b=document.querySelector('#roamPause [data-p=garage]');return!!b&&!b.hidden&&b.offsetWidth>0});if(!(await tap('#roamPause [data-p=garage]'))){await tap('#roamPause [data-p=resume]');await tick(10);r.back=await p.evaluate(()=>document.querySelector('#roamPause').hidden);return r}await tick(60);
   r.open=await p.evaluate(()=>[...document.querySelectorAll('body > [id]')].filter(e=>!e.hidden&&e.offsetWidth>300&&/gb|gar/i.test(e.id)).map(e=>e.id));await shot('garage');
   r.refused=await p.evaluate(()=>/GARAGE CLOSED/.test(document.body.innerText));
   const close=await p.evaluate(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.offsetWidth&&/^(✕|×|DONE|CLOSE|BACK|◀ BACK|SAVE.*|EXIT)/i.test(b.textContent.trim())&&b.closest('[id]')&&/gb|gar/i.test(b.closest('[id]').id));if(b)b.setAttribute('data-qa','gx');return b&&b.textContent.trim()});r.closeBtn=close;if(close)await tap('[data-qa=gx]');await tick(60);
@@ -176,6 +178,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    ok(s.scale.pedRel==null||s.scale.pedRel<=1.2,`${m} ${c}: pedestrians ≤ 1.2× adult scale vs cars`,s.scale);
    if(m==='phone')ok(!s.overlap.length,`${m} ${c}: no HUD element over a touch control`,s.overlap.slice(0,8));
    ok(s.road.blocked===0,`${m} ${c}: no collider on the paved road (invisible walls / oversize hulls)`,{pct:s.road.pct,n:s.road.colliders,ex:s.road.sample.slice(0,3)});
+   ok(s.camInsidePct<=2,`${m} ${c}: chase camera inside a building ≤ 2 % of frames`,{camInsidePct:s.camInsidePct,ex:(s.camInside||[]).slice(0,2)});
    ok(!s.monErr,`${m} ${c}: monitor ran`,s.monErr)}
   ok(!r.errs.length,`${m}: zero console / page errors`,r.errs.slice(0,6))}
  fs.writeFileSync(path.join(OUT,'tPlay.json'),JSON.stringify(results,null,1));
