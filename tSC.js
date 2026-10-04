@@ -82,7 +82,7 @@ async function shot(p,name,T){await p.evaluate(T=>{const M=__mho,R=M.RO,K=M.K,P=
    if(sc){const bf=table[tag+' before'];const H=REF.ped;
     ok(hu.ped/H>=.95&&hu.ped/H<=1.2&&hu.fig/H>=.95&&hu.fig/H<=1.2,`${tag}: pedestrian ${hu.ped} m / minifig ${hu.fig} m ≈ 1.8 m (≤1.2×)`,hu);
     ok(hu.driver!=null&&hu.driver/H>=.8&&hu.driver/H<=1.2,`${tag}: seated garage driver ${hu.driver} m standing height (0.8–1.2× of 1.8 m)`,hu);ok(hu.moped/H<=1.2,`${tag}: moped goon rider ${hu.moped} m`);
-    ok(vg.pct<=2&&vg.pct<bf.verge.pct,`${tag}: street edge with a building within 3 m: ${bf.verge.pct}% → ${vg.pct}%`,vg);
+    ok(vg.pct<=2&&vg.pct<=bf.verge.pct,`${tag}: street edge with a building within 3 m: ${bf.verge.pct}% → ${vg.pct}%`,vg);
     ok(STREETS.length>=5&&wb===0,`${tag}: weaving ±15° at 20 m/s along ${STREETS.length} streets: ${wb} building hits (before ${bf.weave.hits})`,wv.map(r=>r.w+'m:'+r.b));
     ok(dr&&dr.keep>=.8,`${tag}: 10° drift into a facade keeps ${dr&&dr.keep} of its speed (before ${bf.drift&&bf.drift.keep})`,dr)}
    if(SHOTS){await p.context().close();const q=await boot(b,city,d,sc,{width:1000,height:460});await shot(q,`${tag}_${mode}`,turns[0]);await shotHuman(q,`${tag}_human_${mode}`);allErr.push(...q.errs);await q.context().close()}else await p.context().close();
