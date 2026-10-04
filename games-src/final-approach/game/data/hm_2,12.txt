@@ -1,3 +1,7 @@
 hard g2 green Foxmere                          6/20  30% avg rounds 7.0 {"mandatory":1,"checks:planes+flaps+axis":1,"collision":1,"checks:flaps":3,"checks:axis":1,"spin":3,"speed":3,"checks:gear+flaps+axis":1} 11550ms/game
 hard g3 green Seabright Bay                   10/20  50% avg rounds 6.8 {"short":2,"speed":1,"checks:flaps+axis":2,"mandatory":1,"collision":1,"spin":2,"checks:axis":1} 11465ms/game
 hard y1 yellow Foxmere                         5/20  25% avg rounds 7.0 {"checks:axis":1,"short":2,"speed":5,"mandatory":3,"checks:planes+gear+flaps+axis":1,"spin":1,"checks:planes":2} 8430ms/game
+hard y6 yellow Twin Spires                     5/20  25% avg rounds 7.0 {"mandatory":3,"short":2,"checks:flaps":1,"checks:flaps+axis":1,"fuel":5,"speed":1,"spin":1,"checks:gear+flaps":1} 17207ms/game
+BAND hard green 16/40 40.0%
+BAND hard yellow 10/40 25.0%
+errors 0 stalls 0 time 973.1s
