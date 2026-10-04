@@ -22,7 +22,7 @@ const RUNS = ONLY >= 0 ? [RUNS0[ONLY]] : RUNS0;
     else { if (!st0.on || !st0.cls) fail('painted table did not start', JSON.stringify(st0)); if (R.kind && st0.kind !== R.kind) fail('renderer', st0.kind); if (!R.kind && !/webgl/.test(st0.kind)) fail('renderer', st0.kind); }
     if (R.gfx && !R.dom) await p.evaluate(g => { setGfx(g); }, R.gfx);
     await p.evaluate(() => { try { localStorage.clear(); } catch (e) { } UI.seed = 11; AIDELAY = 60; ANIM = 1; });
-    await p.click('[data-a=play]'); if (R.ph) { await p.tap('[data-a=cfgopen]'); await p.tap(`#cfg [data-a=opt][data-k=np][data-v="${R.np}"]`); await p.tap('#cfg .cfghead [data-a=cfgclose]'); } else await p.click(`[data-a=opt][data-k=np][data-v="${R.np}"]`);
+    await p.click('[data-a=play]'); if (R.ph) { await p.tap('[data-a=cfgopen]'); await p.tap(`#cfg [data-a=opt][data-k=np][data-v="${R.np}"]`); await p.tap('#cfg [data-a=cfgclose]'); } else await p.click(`[data-a=opt][data-k=np][data-v="${R.np}"]`);
     await p.click('[data-start=' + (R.mode || 'vs') + ']');
     await p.waitForTimeout(700);
     const settle = async tag => {

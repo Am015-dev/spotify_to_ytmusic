@@ -87,6 +87,7 @@ function pxBuildBoard(S) {
   const cauldron = PX.img.cauldron; if (cauldron) x.drawImage(cauldron, 0, 0, W, W); else { x.fillStyle = '#2a8a80'; x.beginPath(); x.arc(W / 2, W / 2, W / 2 - 4, 0, 7); x.fill(); }
   const pads = {}, pd = Math.round(.98 * u); for (const kd in BANDS) { const c = document.createElement('canvas'); c.width = c.height = pd; const y = c.getContext('2d'); if (PX.img.pad) y.drawImage(PX.img.pad, 0, 0, pd, pd); else { y.fillStyle = '#f4ecd2'; y.beginPath(); y.arc(pd / 2, pd / 2, pd / 2, 0, 7); y.fill(); } y.globalCompositeOperation = 'source-atop'; y.globalAlpha = .6; y.fillStyle = BANDS[kd]; y.fillRect(0, 0, pd, pd); pads[kd] = c; }
   const ff = 'Nunito,Trebuchet MS,Segoe UI,sans-serif';
+  { const P0 = KIT.GEO.pts; x.save(); x.strokeStyle = 'rgba(255,246,220,.5)'; x.lineWidth = Math.max(1.5, .09 * u); x.setLineDash([.1 * u, .12 * u]); x.beginPath(); P0.forEach((q, i) => { const X = W / 2 + q.x * u, Y = W / 2 + q.y * u; i ? x.lineTo(X, Y) : x.moveTo(X, Y); }); x.stroke(); x.restore(); }
   for (let i = 0; i < KIT.GEO.pts.length; i++) {
     const p = KIT.GEO.pts[i], X = W / 2 + p.x * u, Y = W / 2 + p.y * u;
     x.globalAlpha = i === 0 ? .85 : .96; x.drawImage(pads[padKind(i)], X - pd / 2, Y - pd / 2); x.globalAlpha = 1;
@@ -94,9 +95,10 @@ function pxBuildBoard(S) {
     x.textAlign = 'center'; x.fillStyle = '#4a2a22';
     if (i === D.SPOON) { x.font = '900 ' + Math.round(.27 * u) + 'px ' + ff; x.fillStyle = '#6a3a12'; x.fillText('15 VP', X, Y - .02 * u); x.fillText('35', X, Y + .3 * u); continue; }
     x.font = '900 ' + Math.round(.46 * u) + 'px ' + ff; x.fillText(String(D.COINS[i]), X, Y + .16 * u);
-    if (D.VP[i] > 0) { x.fillStyle = '#8a5a2a'; const bw = .4 * u, bh = .3 * u, bx = X + .12 * u, by = Y - .56 * u; x.beginPath(); (x.roundRect ? x.roundRect(bx, by, bw, bh, .05 * u) : x.rect(bx, by, bw, bh)); x.fill(); x.fillStyle = '#fff6dc'; x.font = '900 ' + Math.round(.26 * u) + 'px ' + ff; x.fillText(String(D.VP[i]), bx + bw / 2, by + bh * .78); }
+    if (D.VP[i] > 0) { x.fillStyle = '#7a4a1a'; const bw = .52 * u, bh = .36 * u, bx = X + .06 * u, by = Y - .62 * u; x.beginPath(); (x.roundRect ? x.roundRect(bx, by, bw, bh, .07 * u) : x.rect(bx, by, bw, bh)); x.fill(); x.strokeStyle = '#fff6dc'; x.lineWidth = Math.max(1, .03 * u); x.stroke(); x.fillStyle = '#fff6dc'; x.font = '900 ' + Math.round(.31 * u) + 'px ' + ff; x.fillText(String(D.VP[i]), bx + bw / 2, by + bh * .8); }
     if (D.RUBY[i]) { const rb = PX.img.ruby, sz = .36 * u; if (rb) x.drawImage(rb, X - .52 * u, Y - .6 * u, sz, sz); }
   }
+  { const P0 = KIT.GEO.pts; x.fillStyle = 'rgba(255,246,220,.85)'; for (let i = 1; i < P0.length - 1; i += 2) { const a = P0[i], b = P0[i + 1], mx = W / 2 + (a.x + b.x) / 2 * u, my = W / 2 + (a.y + b.y) / 2 * u, ang = Math.atan2(b.y - a.y, b.x - a.x); x.save(); x.translate(mx, my); x.rotate(ang); x.beginPath(); x.moveTo(-.1 * u, -.1 * u); x.lineTo(.12 * u, 0); x.lineTo(-.1 * u, .1 * u); x.closePath(); x.fill(); x.restore(); } }
   return PIXI.Texture.from(cv);
 }
 // ---- layout read ----
@@ -152,7 +154,7 @@ function pxSync() {
   // droplet, rat stone, the ring on the scoring space
   PX.drop.visible = true; const dp = pxPos(p.droplet); pxMoveMark(PX.drop, dp.x, dp.y, csz * .86, snapAll);
   const hasRat = p.rat > 0 && p.rat > p.droplet; PX.rat.visible = hasRat; if (hasRat) { const rp = pxPos(p.rat); pxMoveMark(PX.rat, rp.x, rp.y - csz * .08, csz * 1.0, snapAll); }
-  PX.ringAt = p.pot.length ? pxPos(CF.spaceOf(p)) : null; PX.ring.visible = !!PX.ringAt;
+  PX.ringAt = pxPos(CF.spaceOf(p)); PX.ring.visible = !!PX.ringAt;
   PX.boomNow = !!p.boom; PX.boardSp.tint = p.boom ? 0xffb090 : 0xffffff;
   PX.snap = false; PX.dirty = true; PX.chipsN = p.pot.length;
 }

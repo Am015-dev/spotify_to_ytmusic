@@ -105,12 +105,12 @@ const oneChips = G => ['O', 'G', 'B', 'R'].concat(bookOut(G, 'Y') ? ['Y'] : []);
 const chipsOfValue = (G, v) => ['G', 'B', 'R', 'Y'].filter(c => bookOut(G, c) && D.COLORS[c].vals.indexOf(v) >= 0 && G.supply[c + v] > 0).map(c => c + v);
 function ask(G, p, h, d) { p.q = { h, d: d || {} }; }
 function purple(G, id) {
-  const P = G.players, nxt = (key, f) => { };
+  const P = G.players, last = G.round === D.rounds;
   const lowest = (fn) => { const m = Math.min.apply(null, P.map(fn)); return P.filter(p => fn(p) === m); };
   switch (id) {
-    case 'pick': for (const p of P) ask(G, p, 'pick'); break;
+    case 'pick': if (last) { for (const p of P) addRuby(G, p, 3, 'Pedlar\'s Pick'); lg(G, 'Last day: a chip could never be drawn, so everybody simply takes the 3 rubies.'); } else for (const p of P) ask(G, p, 'pick'); break;
     case 'slide': for (const p of P) drop(G, p, 1, 'card'); break;
-    case 'swap': for (const p of P) if (p.rubies >= 1) ask(G, p, 'swap'); break;
+    case 'swap': if (last) lg(G, 'Last day: a chip could never be drawn, so Swap Stall is skipped (rubies are worth points now).'); else for (const p of P) if (p.rubies >= 1) ask(G, p, 'swap'); break;
     case 'alms': for (const p of lowest(p => p.rubies)) { p.rubies++; ev(G, { t: 'gain', seat: p.seat, k: 'ruby', n: 1 }); lg(G, nm(G, p) + ' takes a ruby (fewest).'); } break;
     case 'underdog': for (const p of lowest(p => p.vp)) { give(G, p, 'G1', true); lg(G, nm(G, p) + ' takes a Mossback 1 (fewest points).'); } break;
     case 'clear': for (const p of P) ask(G, p, 'clear'); break;
@@ -122,10 +122,10 @@ function purple(G, id) {
       break;
     }
     case 'bribe': for (const p of P) if (p.rat > p.droplet) ask(G, p, 'bribe', { max: Math.min(3, p.rat - p.droplet) }); break;
-    case 'bounty': for (const p of P) ask(G, p, 'bounty'); break;
-    case 'fork': for (const p of P) ask(G, p, 'fork'); break;
+    case 'bounty': for (const p of P) { if (last || !chipsOfValue(G, 4).length) { if (p.ratTails > 0) addVp(G, p, p.ratTails, 'Rat Bounty'); } else ask(G, p, 'bounty'); } if (last) lg(G, 'Last day: Rat Bounty gives points only (a chip could never be drawn).'); break;
+    case 'fork': if (last) lg(G, 'Last day: a droplet step or chip would never be used, so Fork in the Road is skipped.'); else for (const p of P) ask(G, p, 'fork'); break;
     case 'dice': for (const p of P) rollDie(G, p, 'card'); break;
-    case 'haggle': for (const p of P) {
+    case 'haggle': if (last) { lg(G, 'Last day: a chip could never be drawn, so Haggler\'s Hour is skipped.'); break; } for (const p of P) {
       const ch = []; const n = Math.min(4, p.bag.length); for (let i = 0; i < n; i++) ch.push(p.bag.pop()); p.hold = ch;
       ev(G, { t: 'peek', seat: p.seat, chips: ch.map(c => ({ i: c.i, c: c.c, v: c.v })) });
       if (upgrades(G, p.hold, true).length) ask(G, p, 'haggle'); else { give(G, p, 'G1', true); lg(G, nm(G, p) + ' cannot swap anything and takes a Mossback 1.'); p.hold.forEach(c => bagInsert(p, c)); p.hold = []; }
@@ -272,7 +272,7 @@ function moves(G, seat) {
     case 'swap': out.push(L({ t: 'swap', o: '' }, 'Keep my ruby')); for (const c of oneChips(G)) if (G.supply[c + 1] > 0) out.push(L({ t: 'swap', o: c + 1 }, 'Trade a ruby for a ' + nameOf(c + 1))); break;
     case 'clear': out.push(L({ t: 'clear', o: 'vp' }, 'Score 4 points')); if (p.bag.some(c => c.c === 'W' && c.v === 1)) out.push(L({ t: 'clear', o: 'white' }, 'Remove a white 1 from my bag')); break;
     case 'bribe': for (let n = 0; n <= d.max; n++) out.push(L({ t: 'bribe', n }, n ? 'Move the rat stone back ' + n + ' for ' + n + ' ruby' + (n > 1 ? 'ies' : '') : 'Keep the rat stone')); break;
-    case 'bounty': for (const k of chipsOfValue(G, 4)) out.push(L({ t: 'bounty', o: k }, 'Take a ' + nameOf(k))); out.push(L({ t: 'bounty', o: 'vp' }, 'Score ' + bountyVp(G, p) + ' point' + (bountyVp(G, p) === 1 ? '' : 's') + ' for the rat tails')); break;
+    case 'bounty': for (const k of chipsOfValue(G, 4)) out.push(L({ t: 'bounty', o: k }, 'Take a ' + nameOf(k))); if (bountyVp(G, p) > 0) out.push(L({ t: 'bounty', o: 'vp' }, 'Score ' + bountyVp(G, p) + ' point' + (bountyVp(G, p) === 1 ? '' : 's') + ' for the rat tails')); break;
     case 'fork': out.push(L({ t: 'fork', o: 'drop' }, 'Droplet 2 spaces')); if (bookOut(G, 'P') && G.supply.P1 > 0) out.push(L({ t: 'fork', o: 'P1' }, 'Take a Dusk Sigh')); break;
     case 'haggle': out.push(L({ t: 'haggle', idx: -1 }, 'Keep all as they are')); for (const u of upgrades(G, p.hold, true)) out.push(L({ t: 'haggle', idx: u.idx }, 'Swap the ' + nameOf(u.from) + ' for a ' + nameOf(u.to))); break;
     case 'crow': out.push(L({ t: 'crow', idx: -1 }, 'Place none, put them all back')); p.hold.forEach((c, i) => out.push(L({ t: 'crow', idx: i }, 'Place the ' + nameOf(ck(c))))); break;
@@ -285,14 +285,14 @@ function moves(G, seat) {
     }
     case 'gift': for (const k of chipsOfValue(G, 2)) out.push(L({ t: 'gift', o: k }, 'Take a ' + nameOf(k))); break;
     case 'g2': for (const k of d.opts) out.push(L({ t: 'g2', o: k }, 'Take a ' + nameOf(k))); out.push(L({ t: 'g2', o: '' }, 'Take nothing')); break;
-    case 'g4': for (let n = 0; n <= d.max; n++) out.push(L({ t: 'g4', n }, n ? 'Pay ' + n + ' ruby' + (n > 1 ? 'ies' : '') + ' for ' + n + ' droplet step' + (n > 1 ? 's' : '') : 'Pay nothing')); break;
+    case 'g4': for (let n = 0; n <= d.max; n++) out.push(L({ t: 'g4', n }, n ? 'Pay ' + n + ' ruby' + (n > 1 ? 'ies' : '') + ': start ' + n + ' space' + (n > 1 ? 's' : '') + ' further on each day' : 'Pay nothing')); break;
     case 'p1': for (let k = d.n; k >= 1; k--) out.push(L({ t: 'p1', k }, k === 1 ? 'Gentle sigh, lowest: 1 point' : k === 2 ? 'Gentle sigh, middle: 1 point and a ruby' : 'Gentle sigh, best: 2 points and a droplet step')); break;
     case 'g3': out.push(L({ t: 'g3', yes: true }, 'Slide the last chip ' + d.s + ' spaces'), L({ t: 'g3', yes: false }, 'Stay (keep the ruby on this space)')); break;
     case 'p2': for (const s of d.sets) out.push(L({ t: 'p2', set: s }, s.length ? 'Trade ' + s.map(k => k + ' purple').join(' + ') : 'Keep my purples')); break;
     case 'p4': out.push(L({ t: 'p4', from: '', to: '' }, 'No upgrade')); for (const u of d.opts) out.push(L({ t: 'p4', from: u.from, to: u.to }, 'Swap a ' + nameOf(u.from) + ' for a ' + nameOf(u.to))); break;
     case 'de': out.push(L({ t: 'de', o: 'vp' }, 'Take ' + d.vp + ' victory point' + (d.vp === 1 ? '' : 's')), L({ t: 'de', o: 'buy' }, 'Go shopping with ' + d.coins + ' coins')); break;
     case 'shop': for (const o of buyOptions(G, p, d.coins)) out.push(L({ t: 'buy', items: o }, o.length ? 'Buy ' + o.map(nameOf).join(' + ') : 'Buy nothing')); break;
-    case 'ruby': { const r = p.rubies, mx = Math.floor(r / D.rubySpend); for (let n = 0; n <= mx; n++) { out.push(L({ t: 'ruby', drop: n, flask: false }, n ? 'Spend ' + n * 2 + ' rubies: droplet ' + n + ' space' + (n > 1 ? 's' : '') : 'Keep my rubies')); if (!p.flask && n < mx) out.push(L({ t: 'ruby', drop: n, flask: true }, 'Spend ' + (n + 1) * 2 + ' rubies: refill flask' + (n ? ' and droplet ' + n : ''))); } break; }
+    case 'ruby': { const r = p.rubies, mx = Math.floor(r / D.rubySpend); for (let n = 0; n <= mx; n++) { out.push(L({ t: 'ruby', drop: n, flask: false }, n ? 'Spend ' + n * 2 + ' rubies: start ' + n + ' space' + (n > 1 ? 's' : '') + ' further on each day' : 'Keep my rubies')); if (!p.flask && n < mx) out.push(L({ t: 'ruby', drop: n, flask: true }, 'Spend ' + (n + 1) * 2 + ' rubies: refill the flask' + (n ? ' and start ' + n + ' further on' : ''))); } break; }
     default: break;
   }
   return out;
@@ -398,7 +398,7 @@ function H(G, p, m) {
       p.q = null; break;
     }
     case 'bounty': {
-      if (m.o === 'vp') addVp(G, p, bountyVp(G, p), 'Rat Bounty');
+      if (m.o === 'vp') { if (bountyVp(G, p) <= 0) return 'bad choice'; addVp(G, p, bountyVp(G, p), 'Rat Bounty'); }
       else if (typeof m.o === 'string' && chipsOfValue(G, 4).indexOf(m.o) >= 0) give(G, p, m.o, true);
       else return 'bad choice';
       p.q = null; break;
@@ -533,7 +533,7 @@ function evalStep(G) {
         ev(G, { t: 'scored', seat: p.seat, space: p.res.space, boom: p.boom });
       }
       for (const p of P) if (G.fcard === 'lucky7' && !p.boom && whiteSum(p) === 7) { drop(G, p, 1, 'Lucky Seven'); use(G, 'lucky7hit'); }
-      if (G.fcard === 'spilled') for (const p of P) if (p.boom) { const l = P[left(G, p.seat)]; if (chipsOfValue(G, 2).length) { ask(G, l, 'gift'); lg(G, pn(G, l.seat) + ' may take a 2-chip from ' + nm(G, p) + '\'s spilled brew.'); } }
+      if (G.fcard === 'spilled' && G.round < D.rounds) for (const p of P) if (p.boom) { const l = P[left(G, p.seat)]; if (chipsOfValue(G, 2).length) { ask(G, l, 'gift'); lg(G, pn(G, l.seat) + ' may take a 2-chip from ' + nm(G, p) + '\'s spilled brew.'); } }
       E.step = 'gifts'; return 'go';
     }
     case 'gifts': { if (hasQ(G)) return 'wait'; E.step = 'die'; return 'go'; }
@@ -569,7 +569,7 @@ function evalStep(G) {
         const r = p.res;
         if (G.fcard === 'glint' && D.RUBY[r.space]) addVp(G, p, 2, 'Ruby Glint');
         if (r.mode === 'both' || r.mode === 'vp') { addVp(G, p, r.vp, 'the scoring space'); }
-        if (G.round === 9 && (r.mode === 'both' || r.mode === 'buy')) { const n = Math.floor(r.coins / D.endCoinsPerVp); if (n) addVp(G, p, n, r.coins + ' coins at 5 to 1'); }
+        if (G.round === 9 && (r.mode === 'both' || r.mode === 'buy')) { const n = Math.floor(r.coins / D.endCoinsPerVp); if (n) addVp(G, p, n, r.coins + ' coins (5 coins = 1 point)'); }
         r.gotVp = p.vp;
       }
       E.step = 'shop'; E.i = 0; return 'go';

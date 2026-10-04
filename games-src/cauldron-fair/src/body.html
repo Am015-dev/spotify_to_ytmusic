@@ -17,12 +17,14 @@
     <div id="others" role="group" aria-label="The other cauldrons"></div>
     <div id="cz">
       <div id="me"></div>
+      <div id="legend" hidden></div>
       <div id="caul"><div id="cwrap"><div id="cpot" role="group" aria-label="Your cauldron"></div><div id="bagi"></div><div id="cbad" class="cbad" hidden></div></div></div>
     </div>
   </div></main>
   <aside class="gx-dock" id="dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet"></span><span class="gx-dt">Your turn</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">&#8677;</button></div>
     <div class="gx-dock-body" id="dockbody">
+      <div id="pc" class="tipb" hidden role="note" aria-label="Tip"></div>
       <div id="promptDock"><div id="prompt" aria-live="polite"></div></div>
       <div id="qbox" hidden></div>
       <div id="acts"></div>
@@ -31,7 +33,6 @@
       <div id="fort"></div>
       <div id="roster"></div>
     </div>
-    <div class="pcard" id="pc" hidden role="dialog" aria-label="Message"></div>
   </aside>
   <button class="gx-ibtn gx-reopen" data-gx="dock">&#9776; Panel</button>
 </div>
@@ -39,6 +40,7 @@
 <div id="start" hidden></div>
 <div id="rs" hidden></div>
 <div id="netbox" hidden></div>
+<div id="blg" hidden role="note"></div>
 <div id="toast" role="status"></div>
 <script type="text/plain" id="pixi-src" src="pixi.min.js"></script>
 <script src="shell.js"></script>

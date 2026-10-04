@@ -4,6 +4,12 @@ function buildRules() {
   const root = h('div.rules');
   const sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
   const li = a => a.map(t => h('li', t));
+  sec('Turn in one minute', h('ol', ...li([
+    'Draw chips from your bag one by one. Each lands that many spaces along the dotted path in your cauldron.',
+    'The white chips must add up to 7 or less. Over 7 and the cauldron explodes.',
+    'Stop whenever you like. Your last chip decides your space: the big number is coins, the small brown badge is victory points.',
+    'Then the day is counted: spend coins on new chips for your bag, spend rubies, and the next day begins.',
+    'After day 9 the most victory points wins.'])), h('p.sm', 'The full rules follow.'));
   sec('The goal', h('p', 'You are a travelling potion-maker at the village fair. Over nine days you brew in your cauldron, sell what you make and stock your bag with better ingredients. The most victory points after day 9 wins.'));
   sec('How a day goes', h('ol', ...li([
     'The fair\'s seer turns up a fortune card. Purple cards happen at once, blue cards last all day.',
@@ -39,6 +45,7 @@ function buildRef() {
   const supply = [['W', 'W1', 'W2', 'W3'], ['O', 'O1'], ['G', 'G1', 'G2', 'G4'], ['B', 'B1', 'B2', 'B4'], ['R', 'R1', 'R2', 'R4'], ['Y', 'Y1', 'Y2', 'Y4'], ['P', 'P1'], ['K', 'K1']];
   const t1 = h('table.reft'); t1.appendChild(h('tr', h('th', 'Chip'), h('th', 'In the box'), h('th', 'Where it comes from')));
   for (const row of supply) { const c = row[0]; t1.appendChild(h('tr', h('td', h('span.cb', chipN(c + (D.COLORS[c].vals[0]), 26), D.COLORS[c].name)), h('td', row.slice(1).map(k => k.slice(1) + ': ' + D.SUPPLY[k]).join(' · ')), h('td', c === 'W' ? 'Your starting bag (4 x 1, 2 x 2, 1 x 3) and a white 1 on day 6' : c === 'O' ? 'Shop, bonus die' : (c === 'Y' ? 'Shop from day 2' : c === 'P' ? 'Shop from day 3' : 'Shop')))); }
+  sec('Reading the cauldron', true, h('ul', ...[ 'The big number on a space is its coins (what you can spend in the shop).', 'The small brown badge is its victory points; no badge means none.', 'A pink space with a ruby gives you a ruby when it is your scoring space.', 'The dotted path with arrows runs from the droplet (start) outwards to the spoon (15 VP and 35 coins).', 'The gold ring is the space you score if you stop now. A chip lands as many spaces further along as its number.'].map(x => h('li', x))));
   sec('Chips and how many exist (215)', true, h('p.sm', 'You start with 4 white 1, 2 white 2, 1 white 3, 1 Marrow and 1 Mossback. When a kind runs out it cannot be bought.'), t1);
   const bk = h('div'); const sets = G ? G.sets : { G: 1, B: 1, R: 1, Y: 1, P: 1 };
   const bookRow = (c, set, active) => { const b = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][set]; const pr = b.price.map((x, i) => [1, 2, 4][i] + ': ' + x).join(' · '); return h('div.rcard', chipN(c + '1', 40), h('div.rt', h('b', D.COLORS[c].name + (c === 'O' || c === 'K' ? '' : ' · ' + D.SET_NAMES[set]) + ' — ' + b.title + (active ? ' (in this game)' : '')), h('div.sm', 'Costs ' + pr + ' coins'), h('div', b.text))); };
@@ -133,16 +140,17 @@ function setupEl() {
   const head = h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Who brews at the fair?'));
   const sum = h('div.ssum', h('div.sfaces', [o.me].concat(o.seats).map(c => h('span', { html: avHTML(c, 64) }))), h('span.sline', tableLine(o) + ' · ' + (SETCHOICES.find(x => x[0] === o.sets) || SETCHOICES[0])[1]), h('button.btn.alt', { 'data-a': 'cfgopen', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, 'Configure'));
   const cfg = h('div.cfg#cfg', { hidden: ph && !open ? true : null, role: ph ? 'dialog' : null, 'aria-label': ph ? 'Configure the table' : null },
-    ph ? h('div.cfghead', h('b', 'Configure the table'), h('button.btn', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null,
+    ph ? h('div.cfghead', h('b', 'Configure the table')) : null,
     h('div.seg', h('span.lbl', 'Table for'), [2, 3, 4].map(v => h('button.chipb' + (o.np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': o.np === v ? 'true' : 'false' }, v))),
     h('div.seg', h('span.lbl', 'Ingredient books'), h('div.setpick', SETCHOICES.map(([v, n]) => h('button.chipb' + (o.sets === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'sets', 'data-v': v, type: 'button', 'aria-pressed': o.sets === v ? 'true' : 'false' }, n)))),
     h('p.sm', (SETCHOICES.find(x => x[0] === o.sets) || SETCHOICES[0])[2]),
     h('div.dgrid', [0, 1, 2, 3].map(c => charCard(c, o))),
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
-  const go = h('div.sgo',
-    h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the fair'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c])))),
-    h('div.sgrid3',
-      h('button.sbtn', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'Two makers, beginner books, tips')),
+  const first = !UI.prefs.played;
+  const bStart = h('button.sbtn' + (first ? '' : '.big'), { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the fair'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
+  const bGuide = h('button.sbtn' + (first ? '.big' : ''), { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', first ? 'New here? Two makers, beginner books and short tips' : 'Two makers, beginner books, tips'));
+  const go = h('div.sgo', first ? [bGuide, bStart] : [bStart],
+    h('div.sgrid3', first ? null : bGuide,
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', o.np + ' people, one device')),
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch'), h('span', 'the makers play'))));
   return h('div.setup.scard', head, ph ? sum : h('p.ssub', 'Pick who is at the fair and choose a book set. Every maker has a temper; change their level if you like.'), cfg, go);
@@ -160,7 +168,19 @@ document.addEventListener('click', ev => {
   if (typeof netClick === 'function' && netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
-    case 'mv': { const v = viewSeat(); const m = (UI.legal[v] || [])[+d.i]; if (m) { if (UI.mode === 'guided' && UI.tip && UI.tip.block) { tipOk(); } act(m, v); } break; }
+    case 'mv': {
+      const v = viewSeat(); const m = (UI.legal[v] || [])[+d.i];
+      if (m) {
+        if (m.t === 'flask') { const pl = G.players[v], wc = pl.pot.filter(c => c.c === 'W').length; if (wc <= 1 && UI.flaskArm !== pl.ver) { UI.flaskArm = pl.ver; toast('That is your only white chip. Tap Flask again to put it back.'); break; } }
+        if (UI.tip && !UI.tip.modal && (m.t === 'draw' || m.t === 'stop')) { UI.tip = null; UI.tipMark = { round: G.round, log: G.logN }; renderTip(); }
+        act(m, v);
+      }
+      break;
+    }
+    case 'hotgo': if (G && G.rep) { UI.hotShared = G.rep.round; closeRS(true); updateHolder(); checkReport(); render(); } break;
+    case 'legx': UI.prefs.legendOff = true; savePrefs(); renderLegend(); break;
+    case 'blgx': UI.prefs.blgSeen = true; savePrefs(); renderBlg(); break;
+    case 'tipmore': UI.tipOpen = !UI.tipOpen; renderTip(); break;
     case 'fort': t.classList.toggle('open'); break;
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
     case 'rscont': repContinue(); break;
@@ -196,6 +216,16 @@ document.addEventListener('click', ev => {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.rsMode === 'final' && UI.overShown) closeRS(true); else if (UI.rsMode === 'report' && G && G.phase !== 'eval') repContinue(); } });
 // ---------- phone mode ----------
+function renderLegend() {
+  const e = $('#legend'); if (!e) return; const on = G && UI.started && !UI.prefs.legendOff && (G.round <= 2 || UI.mode === 'guided') && G.phase !== 'over';
+  e.hidden = !on; if (!on) { e.innerHTML = ''; return; } if (e.dataset.k) return; e.dataset.k = 1;
+  e.append(h('span.lg', h('span.lgn', '12'), 'coins'), h('span.lg', h('span.lgb', '3'), 'VP'), h('span.lg', h('span', { html: ico('ruby', 16) }), 'ruby'), h('span.lg', 'path \u2192'), h('button.lgx', { 'data-a': 'legx', type: 'button', 'aria-label': 'Hide this key' }, '\u00d7'));
+}
+function renderBlg() {
+  const e = $('#blg'); if (!e) return; const on = G && UI.started && isPh() && !UI.prefs.blgSeen && G.round === 1 && G.phase !== 'over';
+  e.hidden = !on; if (!on || e.dataset.k) return; e.dataset.k = 1;
+  e.append(h('div', h('b', 'Top buttons, left to right: '), 'Scores, Log, Chips and cards, How to play, Menu.'), h('button.btn.go', { 'data-a': 'blgx', type: 'button' }, 'OK'));
+}
 function isPh() { return document.documentElement.classList.contains('ph'); }
 function applyPhone() {
   const q = /[?&]phone=(\d)/.exec(location.search); const w = innerWidth, hh = innerHeight, short = Math.min(w, hh);

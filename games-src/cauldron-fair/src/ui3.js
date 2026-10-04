@@ -6,6 +6,7 @@ function cfgOf(o) {
 }
 // players: seat 0 = you (or the first person), the others follow
 function newGame(mode, o) {
+  if (mode !== 'guided' && !UI.prefs.played) { UI.prefs.played = true; try { savePrefs(); } catch (e) { } }
   o = o || {}; const c = cfgOf(o); clearTimeout(UI.tm0); Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; UI.seq++;
   let np = Math.max(2, Math.min(4, c.np || 3)); const me = c.me != null ? c.me : 0;
   let chars = [me]; for (const s of c.seats) { if (chars.length >= np) break; if (chars.indexOf(s) < 0) chars.push(s); } for (let k = 0; chars.length < np; k++) if (chars.indexOf(k) < 0) chars.push(k);
@@ -16,8 +17,8 @@ function newGame(mode, o) {
   else ai = chars.map((ch, i) => i === 0 ? null : lvOf(ch));
   const names = chars.map(ch => PN[ch]);
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0; UI.seed = null;
-  G = CF.newGame({ players: np, seed, names, ai, chars, setMode: sets === 'random' ? 'random' : sets, guided: mode === 'guided' });
-  UI.mode = mode; UI.cfg = c; UI.started = true; UI.holder = -1; UI.focus = 0; UI.evN = G.evN; UI.over = null; UI.overShown = false; UI.rsOpen = false; UI.repSeen = 0; UI.shopSel = []; UI.potSig = ''; UI.tip = null; UI.tipq = []; UI.tipShown = {};
+  G = CF.newGame({ players: np, seed, names, ai, chars, setMode: sets === 'random' ? 'random' : sets, guided: mode === 'guided', firstCard: mode === 'guided' ? 'lucky7' : undefined });
+  UI.mode = mode; UI.cfg = c; UI.started = true; UI.holder = -1; UI.focus = 0; UI.evN = G.evN; UI.over = null; UI.overShown = false; UI.rsOpen = false; UI.repSeen = 0; UI.shopSel = []; UI.potSig = ''; UI.tip = null; UI.tipRound = {}; UI.tipMark = null; UI.tipOpen = false; UI.hotShared = 0; UI.tipq = []; UI.tipShown = {};
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && mode !== 'guided' ? 'light' : UI.coach.level), seen: {} };
   if (mode === 'guided' && UI.coach.level === 'off') UI.coach.level = 'full';
   window.G = G; try { const st = $('#start'); if (st) st.hidden = true; } catch (e) { }

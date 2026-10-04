@@ -2,7 +2,7 @@
 function closeRS(quiet) { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; UI.rsMode = ''; if (!quiet && typeof schedule === 'function') schedule(); }
 function checkReport() {
   if (!G || !UI.started) return;
-  if (hotSeat() && UI.pass != null) { showPass(UI.pass); return; }
+  if (hotSeat() && UI.pass != null && !(G.phase === 'eval' && G.rep && UI.hotShared !== G.rep.round)) { showPass(UI.pass); return; }
   if (UI.rsMode === 'pass') closeRS(true);
   if (UI.rsMode === 'final') return;
   const R = G.rep;
@@ -23,32 +23,38 @@ function dayRow(p, R) {
 function renderReport() {
   const rs = $('#rs'); if (!rs || !G || !G.rep) return; const R = G.rep; rs.hidden = false;
   const v = viewSeat(), me = v >= 0 ? G.players[v] : null, myq = me && me.q && EVAL_Q[me.q.h] ? me.q : null;
-  const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Day ' + R.round + ' report' }); UI.rsFoot = null;
-  box.appendChild(h('h2', h('span', { html: ico('coin', 30) }), 'Day ' + R.round + ' report'));
+  const oldBody = rs.querySelector('.rsbody'), keepTop = oldBody ? oldBody.scrollTop : 0;
+  const hotShared = hotSeat() && G.phase === 'eval' && UI.hotShared !== R.round, hotPriv = hotSeat() && !!myq && !hotShared;   // hot-seat: the table is shown once to everybody, then each maker decides in private
+  const box = h('div.rsbox.fix', { role: 'dialog', 'aria-label': 'Day ' + R.round + ' report' }); UI.rsFoot = null;
+  box.appendChild(h('h2', h('span', { html: ico('coin', 30) }), hotPriv ? 'Day ' + R.round + ': ' + me.name : 'Day ' + R.round + ' report'));
+  box.appendChild(h('div#rstip.tipb', { hidden: true }));
   const body = h('div.rsbody');
   const tab = h('table.rt-tab'); tab.appendChild(h('tr', h('th', 'Cauldron'), h('th', 'Reached'), h('th', 'Result'), h('th', '+VP'), h('th', 'Total')));
   for (const p of G.players) {
     const r = dayRow(p, R); if (!r) continue; const sp = r.space;
-    const res = r.boom ? (r.prot ? [h('span.ok', 'exploded, safe')] : [h('span.bad', 'exploded'), h('div.sm', r.mode === 'buy' ? 'went shopping' : r.mode === 'vp' ? 'took points' : '...')]) : [h('span.ok', 'stopped'), r.die && r.die.length ? h('div.sm.dieb' + (r.live ? '.roll' : ''), { title: 'Bonus die' }, r.die.map(f => h('span', { html: KIT.ICON.die(24, f) }))) : null];
+    const res = r.boom ? (r.prot ? [h('span.ok', 'exploded, safe')] : [h('span.bad', 'exploded'), h('div.sm', (r.mode === 'buy' ? 'went shopping' : r.mode === 'vp' ? 'took points' : '...') + ' (white ' + r.white + ' went over the limit)')]) : [h('span.ok', 'stopped'), r.die && r.die.length ? h('div.sm.dieb' + (r.live ? '.roll' : ''), { title: 'Bonus die' }, r.die.map(f => h('span', { html: KIT.ICON.die(24, f) }))) : null];
     tab.appendChild(h('tr' + (p.seat === v ? '.me' : ''), h('td', h('span.nm', h('span', { html: avHTML(p.seat, 28) }), p.seat === v ? 'You' : p.name)),
       h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', r.gain >= 0 ? '+' + r.gain : r.gain)), h('td', h('b', p.vp))));
   }
-  body.appendChild(tab);
-  const lines = G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo)); if (lines.length) { const ev = h('div.evlog', { role: 'log', 'aria-label': 'What happened' }); lines.forEach(l => ev.appendChild(h('div', l.t))); body.appendChild(ev); setTimeout(() => { ev.scrollTop = ev.scrollHeight; }, 0); }
-  if (myq) body.appendChild(decisionBox(me, myq));
+  if (!hotPriv) body.appendChild(tab);
+  const lines = hotPriv ? [] : G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo)); if (lines.length) { const ev = h('div.evlog', { role: 'log', 'aria-label': 'What happened' }); lines.forEach(l => ev.appendChild(h('div', l.t))); body.appendChild(ev); setTimeout(() => { ev.scrollTop = ev.scrollHeight; }, 0); }
+  if (hotShared) body.appendChild(h('p.sm', 'Everybody has seen the table. Next, each maker makes the private choices (shop, rubies) while the others look away.'));
+  else if (myq) body.appendChild(decisionBox(me, myq));
   else if (G.phase === 'eval') { const w = G.players.filter(p => p.q && p.seat !== v).map(p => p.name); body.appendChild(h('p.sm', w.length ? 'Waiting for ' + nameList(w) + '...' : 'Counting up...')); }
-  const done = G.phase !== 'eval' && !myq;
+  const done = G.phase !== 'eval' && !myq && !hotShared;
   const next = G.phase === 'over' ? 'See the final scores' : 'On to day ' + G.round;
   box.appendChild(body);
   const foot = h('div.rsfoot');
   if (UI.rsFoot) UI.rsFoot.forEach(e => foot.appendChild(e));
+  else if (hotShared) foot.appendChild(h('div.cbtns', h('button.btn.go', { 'data-a': 'hotgo', type: 'button' }, 'Next: private choices')));
   else { const btns = h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' });
-    btns.appendChild(h('button.btn.go', { 'data-a': 'rscont', type: 'button', disabled: done ? null : true }, done ? next : 'Decide first'));
+    btns.appendChild(h('button.btn.go' + (done ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done ? null : true }, done ? next : 'Choose above first'));
     if (typeof NET !== 'undefined' && NET.on && done) btns.appendChild(h('span.sm', 'Closes by itself in a moment.'));
     foot.appendChild(btns); }
   box.appendChild(foot);
   rs.innerHTML = ''; rs.appendChild(box);
-  if (UI.mode === 'guided') tipCheck();
+  if (keepTop) { const nb = rs.querySelector('.rsbody'); if (nb) nb.scrollTop = keepTop; }
+  tipCheck();
   if (typeof NET !== 'undefined' && NET.on && done && !UI.repAuto) { UI.repAuto = setTimeout(() => { UI.repAuto = 0; if (UI.rsMode === 'report' && G.phase !== 'eval') repContinue(); }, 30000); }
 }
 function repContinue() {
@@ -84,7 +90,7 @@ function shopUI(p, q, legal) {
       if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
       const on = sel.indexOf(key) >= 0; const others = sel.filter(k => k[0] !== c).reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
       const dis = !out || left < 1 || price + others > coins;
-      pr.appendChild(h('button' + (on ? '.on' : ''), { 'data-a': 'shopsel', 'data-k': key, type: 'button', disabled: dis && !on ? true : null, 'aria-pressed': on ? 'true' : 'false', 'aria-label': keyName(key) + ' for ' + price + ' coins' + (left < 1 ? ', sold out' : '') }, chipN(key, 24), h('span', price + (left > 0 && left <= 4 ? ' (' + left + ' left)' : left < 1 ? ' sold out' : ''))));
+      pr.appendChild(h('button' + (on ? '.on' : ''), { 'data-a': 'shopsel', 'data-k': key, type: 'button', disabled: dis && !on ? true : null, 'aria-pressed': on ? 'true' : 'false', 'aria-label': keyName(key) + ' for ' + price + ' coins' + (left < 1 ? ', sold out' : '') }, chipN(key, 24), h('span.pc', h('span', { html: ico('coin', 13) }), price + (left > 0 && left <= 4 ? ' (' + left + ' left)' : left < 1 ? ' sold out' : ''))));
     });
     card.appendChild(pr); books.appendChild(card);
   }
@@ -130,41 +136,53 @@ function showFinal() {
 }
 // ---------- guided tips (one at a time, in the dock) ----------
 const TIPS = [
-  { id: 'welcome', light: false, block: true, t: 'Welcome to the fair', x: () => 'Everyone brews at the same time. Your bag holds 9 chips. Press Draw to pull one out, and keep drawing until you decide to stop. The further your chips climb the spiral, the more coins and points you earn.', when: () => G.round === 1 && mineP() && mineP().pot.length === 0 },
-  { id: 'place', t: 'Where chips land', x: () => 'Each chip lands as many spaces along the spiral as its number. The gold ring is where you would score if you stopped now. The panel shows what that is worth.', when: () => mineP() && mineP().pot.length >= 1 },
-  { id: 'white', t: 'White Fizzpods', x: () => 'White chips are Fizzpods. Add up the white numbers in your cauldron: if the total goes over 7 the cauldron explodes. The meter in the bar shows your white total.', when: () => mineP() && CF.whiteSum(mineP()) > 0 },
-  { id: 'risk', t: 'Reading the odds', x: () => 'The box under the buttons shows how likely your next chip is to explode the cauldron. Under about a quarter is a fair gamble. Higher, and stopping is often the better choice.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 3 && CF.risk(G, p.seat).pBoom >= .15; } },
-  { id: 'flask', t: 'The flask', x: () => 'Your flask can put the last white chip back into the bag, once per day. Use it right after a white chip moves you close to the limit. Rubies refill it later.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.flask && p.f.canFlask && CF.whiteSum(p) >= 4; } },
-  { id: 'stop', t: 'When to stop', x: () => 'Happy with your spiral? Press Stop to keep it. Stopping on a high number gives coins to shop with and points for the track.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 4; } },
-  { id: 'boom', light: true, t: 'Boom!', x: () => 'Your cauldron exploded. You still reach a scoring space, but you must choose: take its victory points OR shop with its coins. Not both, and no bonus die.', when: () => { const p = mineP(); return p && p.boom; } },
-  { id: 'report', t: 'The day report', x: () => 'When everybody has stopped, the day is counted: the highest cauldron that did not explode rolls the bonus die, chip powers happen, rubies on your space are yours, points move you along the track and the coins buy chips.', when: () => UI.rsOpen && UI.rsMode === 'report' },
-  { id: 'shop', light: true, t: 'The shop', x: () => 'Coins buy new chips for your bag. Choose one or two chips of different colours. Bigger numbers move you further, and every book has its own power: open "How it works" before you buy. Leftover coins are lost.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'shop'; } },
-  { id: 'rubies', t: 'Rubies', x: () => 'Spend 2 rubies to move your droplet (your first chip starts further along the spiral every day) or to refill your flask. In the last day 2 rubies are worth a point.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'ruby'; } },
-  { id: 'day2', t: 'Rats and new stalls', x: () => 'From day 2 players behind the leader get a rat stone: your first chip starts one space further for every rat tail between you and the leader. The Sunroot stall (yellow chips) opens today, the Dusk Sigh stall on day 3.', when: () => G.round === 2 && G.phase !== 'eval' && !UI.rsOpen },
-  { id: 'last', t: 'The last day', x: () => 'No shopping today. Every 5 coins and every 2 rubies you hold turn into a victory point at the end. Push your luck, then stop.', when: () => G.round === 9 && G.phase !== 'eval' && !UI.rsOpen }
+  { id: 'welcome', t: 'Welcome to the fair', x: () => 'Everyone brews at the same time. Your bag holds 9 chips. Press Draw to pull one out and keep drawing until you decide to stop. The further your chips climb the spiral, the more coins and points you earn.', when: () => G.round === 1 && mineP() && mineP().pot.length === 0 },
+  { id: 'place', t: 'Where chips land', x: () => 'A chip lands as many spaces along the dotted path as its number. The big number on a space is its coins, the small brown badge its victory points. The gold ring is where you score if you stop now.', when: () => mineP() && mineP().pot.length >= 1 },
+  { id: 'white', t: 'White Fizzpods', x: () => 'Add up the white numbers in your cauldron. If the total goes over the limit (7, unless a fortune card changes it: the counter and the line above Draw say so) the cauldron explodes.', when: () => mineP() && CF.whiteSum(mineP()) > 0 },
+  { id: 'risk', t: 'Reading the odds', x: () => 'The line above Draw and Stop shows the chance that the next chip explodes the cauldron, and what you score if you stop now. Under about a quarter is a fair gamble.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 3 && CF.risk(G, p.seat).pBoom >= .15; } },
+  { id: 'flask', t: 'The flask', x: () => 'The Flask button puts the last white chip back into the bag, once a day. Use it right after a white chip moves you close to the limit. Rubies refill it later.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.flask && p.f.canFlask && CF.whiteSum(p) >= 4; } },
+  { id: 'stop', t: 'When to stop', x: () => 'Happy with your spiral? Press Stop to keep it. A high space gives coins to shop with and points for the track.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 4; } },
+  { id: 'boom', modal: true, light: true, t: 'Boom!', x: () => 'Your cauldron exploded. You still reach a scoring space, but you must choose: take its victory points OR shop with its coins. Not both, and no bonus die.', when: () => { const p = mineP(); return p && p.boom && UI.rsOpen; } },
+  { id: 'report', modal: true, t: 'The day report', x: () => 'When everybody has stopped the day is counted: the furthest cauldron that did not explode rolls the bonus die, chip powers happen, rubies on your space are yours, points move you along the track and the coins buy chips.', when: () => UI.rsOpen && UI.rsMode === 'report' },
+  { id: 'shop', modal: true, light: true, t: 'The shop', x: () => 'Coins buy new chips for your bag: pick one or two chips of different colours. Bigger numbers move you further, and every book has its own power: open "How it works" first. Leftover coins are lost.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'shop' && UI.rsOpen; } },
+  { id: 'rubies', modal: true, t: 'Rubies', x: () => 'Spend 2 rubies to start every day one space further on, or to refill your flask. On the last day 2 rubies are worth a point.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'ruby' && UI.rsOpen; } },
+  { id: 'day2', t: 'Rats and new stalls', x: () => 'From day 2 a player behind the leader gets a rat stone: the first chip starts one space further on for every rat tail between you and the leader. The Sunroot stall opens today, the Dusk Sigh stall on day 3.', when: () => G.round === 2 && G.phase !== 'eval' && !UI.rsOpen },
+  { id: 'last', t: 'The last day', x: () => 'No shopping today. Everybody secretly chooses Draw or Stop and all choices are revealed together. Every 5 coins and every 2 rubies you hold turn into a victory point.', when: () => G.round === 9 && G.phase !== 'eval' && !UI.rsOpen }
 ];
 const mineP = () => { const v = viewSeat(); return G && v >= 0 ? G.players[v] : null; };
+const tipInRs = () => !!(UI.rsOpen && UI.rsMode === 'report');
+function tipSafe(t) { try { return !!t.when(); } catch (e) { return false; } }
 function tipStart() { tipCheck(); render(); }
+// one tip at a time, in the dock (or at the top of the day report for the report/shop/rubies/boom tips), never over the board or Draw:
+// dock tips are spaced out (3 on day 1, 1 on later days, not within 10 log lines of the last one); a tip whose moment has passed is dropped
 function tipCheck() {
-  if (!G || UI.coach.level === 'off' || UI.tip) return;
-  if (UI.mode !== 'guided' && UI.coach.level !== 'full') { if (UI.mode === 'guided') return; }
-  const lvl = UI.coach.level, guided = UI.mode === 'guided';
-  if (!guided && lvl !== 'light' && lvl !== 'full') return;
-  for (const t of TIPS) {
-    if (UI.tipShown[t.id] || UI.coach.seen[t.id]) continue;
-    if (!guided && lvl === 'light' && !t.light) continue;
-    if (!guided && lvl === 'full' && t.id === 'welcome') continue;
-    let ok = false; try { ok = !!t.when(); } catch (e) { }
-    if (ok) { UI.tipShown[t.id] = 1; UI.tip = t; UI.coach.seen[t.id] = 1; break; }
+  if (!G) return;
+  if (UI.coach.level === 'off') { UI.tip = null; renderTip(); return; }
+  if (UI.tip && (UI.tip.modal !== tipInRs() || !tipSafe(UI.tip))) UI.tip = null;
+  if (!UI.tip) {
+    const lvl = UI.coach.level, guided = UI.mode === 'guided'; UI.tipRound = UI.tipRound || {};
+    if (guided || lvl === 'light' || lvl === 'full') for (const t of TIPS) {
+      if (UI.tipShown[t.id] || UI.coach.seen[t.id]) continue;
+      if (!guided && lvl === 'light' && !t.light) continue;
+      if (!guided && lvl === 'full' && t.id === 'welcome') continue;
+      if (!!t.modal !== tipInRs()) continue;
+      if (!t.modal) { const m = UI.tipMark; if (m && m.round === G.round && G.logN - m.log < 10) continue; if ((UI.tipRound[G.round] || 0) >= (G.round === 1 ? 3 : 1)) continue; }
+      if (tipSafe(t)) { UI.tipShown[t.id] = 1; UI.tip = t; UI.coach.seen[t.id] = 1; if (!t.modal) UI.tipRound[G.round] = (UI.tipRound[G.round] || 0) + 1; break; }
+    }
   }
   renderTip();
 }
 function renderTip() {
-  const pc = $('#pc'); if (!pc) return; const t = UI.tip;
-  if (!t || UI.coach.level === 'off') { pc.hidden = true; pc.innerHTML = ''; return; }
-  const n = TIPS.filter(x => UI.tipShown[x.id]).length;
-  pc.hidden = false; pc.innerHTML = '';
-  pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', t.t), h('span', 'Tip ' + n + ' of ' + TIPS.length)), h('button.px', { 'data-a': 'tipok', type: 'button', 'aria-label': 'Close the tip' }, '×')));
-  pc.appendChild(h('div.ph-body', h('p', t.x()), h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, h('button.btn.go', { 'data-a': 'tipok', type: 'button' }, 'Got it'), h('button.btn.alt', { 'data-a': 'tipoff', type: 'button' }, 'No more tips'))));
+  const pc = $('#pc'), rt = $('#rstip'), t = UI.tip, on = !!t && UI.coach.level !== 'off';
+  const target = on ? (t.modal ? rt : pc) : null;
+  for (const e of [pc, rt]) if (e && e !== target) { e.hidden = true; e.innerHTML = ''; }
+  document.documentElement.classList.toggle('tipon', !!(on && !t.modal));
+  if (!target) return;
+  const n = TIPS.filter(x => UI.tipShown[x.id]).length, open = !isPh() || t.modal || !!UI.tipOpen;
+  target.hidden = false; target.innerHTML = ''; target.className = 'tipb';
+  target.appendChild(h('div.tl', h('span.tt', h('b', 'Tip ' + n + ' of ' + TIPS.length + ': ' + t.t)),
+    isPh() && !t.modal ? h('button.btn.alt.tb', { 'data-a': 'tipmore', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, open ? 'Less' : 'More') : null,
+    h('button.btn.go.tb', { 'data-a': 'tipok', type: 'button' }, 'Got it')));
+  if (open) target.appendChild(h('div.tx', h('p', t.x()), h('button.tlink2', { 'data-a': 'tipoff', type: 'button' }, 'No more tips')));
 }
-function tipOk() { UI.tip = null; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } tipCheck(); render(); schedule(); }
+function tipOk() { UI.tip = null; UI.tipMark = { round: G.round, log: G.logN }; tipCheck(); render(); schedule(); }

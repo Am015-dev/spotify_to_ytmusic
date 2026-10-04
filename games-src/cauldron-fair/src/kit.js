@@ -78,16 +78,18 @@ function potSVG(o) {
   let s = `<svg class="pot${o.boom ? ' boom' : ''}" viewBox="${f2(-R)} ${f2(-R)} ${f2(2 * R)} ${f2(2 * R)}" width="${size}" height="${size}" role="img" aria-label="${o.label || 'cauldron'}">`;
   s += `<defs><radialGradient id="${uid}w" cx="50%" cy="45%" r="60%"><stop offset="0" stop-color="${o.boom ? '#6a3a2a' : '#5fc6a8'}"/><stop offset="1" stop-color="${o.boom ? '#3a1a10' : '#2a7a72'}"/></radialGradient></defs>`;
   if (!ART.cauldron || mini) s += `<circle r="${f2(R)}" fill="#4a3a30" stroke="#2a1a10" stroke-width=".18"/><circle r="${f2(R - .35)}" fill="url(#${uid}w)"/>`; else s += `<image href="${ART.cauldron}" x="${f2(-R)}" y="${f2(-R)}" width="${f2(2 * R)}" height="${f2(2 * R)}"/>`;
+  if (!mini) { let d = ''; for (let i = 0; i < pts.length - 1; i++) { const a = pts[i], b = pts[i + 1]; d += `<path d="M${f2(a.x)} ${f2(a.y)} L${f2(b.x)} ${f2(b.y)}" stroke="#fff6dc" stroke-opacity=".5" stroke-width=".09" stroke-dasharray=".1 .12" fill="none"/>`; } s += d; }
   if (!mini || o.showPads) for (let i = 0; i < pts.length; i++) {
     const p = pts[i], isSp = i === D.SPOON;
     if (mini) { s += `<circle cx="${p.x}" cy="${p.y}" r=".34" fill="${D.RUBY[i] ? '#f4a0aa' : 'rgba(255,255,255,.35)'}"/>`; continue; }
     s += `<g class="sp" data-i="${i}"><circle cx="${p.x}" cy="${p.y}" r=".5" fill="${pad(i)}" stroke="#3a2616" stroke-width=".05" opacity="${i === 0 ? .9 : .94}"/>`;
     if (i > 0 && !isSp) s += `<text x="${p.x}" y="${f2(p.y + .16)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".46" fill="#4a2a22">${D.COINS[i]}</text>`;
     if (isSp) s += `<text x="${p.x}" y="${f2(p.y - .02)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".28" fill="#6a3a12">15 VP</text><text x="${p.x}" y="${f2(p.y + .3)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".28" fill="#6a3a12">35</text>`;
-    if (i > 0 && !isSp && D.VP[i] > 0) s += `<rect x="${f2(p.x + .12)}" y="${f2(p.y - .56)}" width=".4" height=".3" rx=".05" fill="#8a5a2a"/><text x="${f2(p.x + .32)}" y="${f2(p.y - .33)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".26" fill="#fff6dc">${D.VP[i]}</text>`;
+    if (i > 0 && !isSp && D.VP[i] > 0) s += `<rect x="${f2(p.x + .06)}" y="${f2(p.y - .62)}" width=".52" height=".36" rx=".07" fill="#7a4a1a" stroke="#fff6dc" stroke-width=".03"/><text x="${f2(p.x + .32)}" y="${f2(p.y - .34)}" text-anchor="middle" font-family="Nunito,sans-serif" font-weight="900" font-size=".31" fill="#fff6dc">${D.VP[i]}</text>`;
     if (D.RUBY[i]) s += `<path transform="translate(${f2(p.x - .52)} ${f2(p.y - .56)}) scale(.019)" d="M12 3 L19 9 L12 21 L5 9 Z" fill="#e0334c" stroke="#7a1022" stroke-width="1.6"/>`;
     s += '</g>';
   }
+  if (!mini) for (let i = 1; i < pts.length - 1; i += 2) { const a = pts[i], b = pts[i + 1], mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI; s += `<path transform="translate(${f2(mx)} ${f2(my)}) rotate(${f2(ang)})" d="M-.1 -.1 L.12 0 L-.1 .1 Z" fill="#fff6dc" fill-opacity=".8"/>`; }
   if (o.space != null && !mini) { const p = pts[o.space]; s += `<circle class="sc" cx="${p.x}" cy="${p.y}" r=".62" fill="none" stroke="#f2c230" stroke-width=".13" stroke-dasharray=".25 .15"/>`; }
   if (mini && o.space != null) { const p = pts[o.space]; s += `<circle cx="${p.x}" cy="${p.y}" r=".5" fill="none" stroke="#f2c230" stroke-width=".18"/>`; }
   const cr = mini ? .46 : .47;

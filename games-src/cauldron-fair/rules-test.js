@@ -366,6 +366,12 @@ test('Haggler\'s Hour: with only white chips in the hand the player takes a Moss
   eq(P(G, 0).q, null); eq(P(G, 0).hold.length, 0); yes(P(G, 0).bag.some(c => c.c === 'G' && c.v === 1), 'green 1 in the bag');
 });
 test('bonus die: six faces, 1 VP shows twice (the fan tool\'s reading of the rules\' five outcomes)', () => { T.dieOn(); eq(D.DIE.slice().sort(), ['drop', 'orange', 'ruby', 'vp1', 'vp1', 'vp2']); T.dieOff(); });
+test('day 9: Spilled Brew, Swap Stall, Fork, Haggler and Pedlar\'s Pick are skipped or reduced (a chip could never be drawn)', () => {
+  for (const id of ['swap', 'fork', 'haggle']) { const G = T.game(2); G.round = 9; G.force = id; CF._.startRound(G); eq(P(G, 0).q, null, id); eq(CF.pending(G).length, 0); }
+  const G = T.game(2); G.round = 9; const r0 = P(G, 0).rubies; G.force = 'pick'; CF._.startRound(G); eq(P(G, 0).rubies, r0 + 3); eq(P(G, 0).q, null);
+  const H = T.game(2); H.round = 9; H.force = 'spilled'; CF._.startRound(H); T.order(H, 0, ['W3', 'W3', 'W3']); H.phase = 'brew'; T.run9(H, [3, 1]); eq(CF.pending(H).filter(s => P(H, s).q && P(H, s).q.h === 'gift').length, 0, 'no gift on day 9');
+  const X = T.game(2); X.round = 3; P(X, 0).vp = 10; P(X, 1).vp = 10; X.force = 'bounty'; CF._.startRound(X); eq(CF.moves(X, 0).some(m => m.o === 'vp'), false, 'no points option when you trail by nothing'); yes(CF.moves(X, 0).length > 0);
+});
 
 let pass = 0, fail = 0;
 for (const [n, f] of tests) { try { f(); pass++; console.log('PASS ' + n); } catch (e) { fail++; console.log('FAIL ' + n + '\n     ' + (e.message || e).split('\n')[0]); } }

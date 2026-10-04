@@ -40,7 +40,7 @@ function moveBtn(m, p, cls) {
 function waitingNames() { return G.players.filter(p => (G.phase === 'brew' ? p.st !== 'done' : !!p.q) && !isMine(p.seat)).map(p => p.name); }
 function promptInfo() {
   if (!G) return { text: '' };
-  if (G.phase === 'over') return { text: G.winText };
+  if (G.phase === 'over') return { text: UI.rsOpen && UI.rsMode === 'final' ? '' : G.winText };
   const v = viewSeat(); const wn = waitingNames();
   if (v < 0) return { text: G.phase === 'brew' ? 'The computers are brewing.' : 'The fair goes on.' };
   const p = G.players[v];
@@ -57,12 +57,18 @@ function promptInfo() {
 }
 function placePrompt() { }
 function stateLabel(p) {
-  switch (seatState(p)) { case 'draw': return 'drawing'; case 'locked': return 'decided'; case 'done': return 'stopped'; case 'boom': return 'exploded'; case 'post': return 'finishing'; case 'choose': return 'choosing'; case 'ready': return 'ready'; case 'wait': return 'waiting'; default: return ''; }
+  switch (seatState(p)) { case 'draw': return 'drawing'; case 'locked': return 'decided'; case 'done': return 'stopped'; case 'boom': return 'exploded'; case 'post': return 'finishing'; case 'choose': return 'choosing'; case 'ready': return 'waiting'; case 'wait': return 'waiting'; case 'idle': return 'waiting'; default: return ''; }
+}
+// why the white limit is not 7 today (empty when it is 7)
+function limitNote(p) {
+  const lim = CF.limitOf(G, p); if (lim === D.limit) return ''; const why = [];
+  if (G.fcard === 'thick') why.push('Thick Skin'); if (G.sets.Y === 3 && p.pot.some(c => c.c === 'Y')) why.push('Sunroot');
+  return 'White limit ' + lim + ' today' + (why.length ? ' (' + why.join(' + ') + ')' : '');
 }
 function seatCls(p) { const s = seatState(p); return s === 'draw' || s === 'choose' || s === 'post' ? 'dr' : s === 'boom' ? 'bm' : s === 'done' ? 'dn' : ''; }
 function potOpts(p, mini) {
   const shown = p.pot.length > 0 || G.phase === 'brew';
-  return { pot: p.pot, droplet: p.droplet, rat: p.rat > 0 && p.rat > p.droplet ? p.rat : 0, space: shown && p.pot.length ? CF.spaceOf(p) : null, boom: p.boom, mini: !!mini, uid: p.seat, label: p.name + '\'s cauldron' };
+  return { pot: p.pot, droplet: p.droplet, rat: p.rat > 0 && p.rat > p.droplet ? p.rat : 0, space: shown && (p.pot.length || !mini) ? CF.spaceOf(p) : null, boom: p.boom, mini: !!mini, uid: p.seat, label: p.name + '\'s cauldron' };
 }
 // ---------- board ----------
 function renderOthers() {
@@ -87,6 +93,7 @@ function renderMe() {
     h('span.st', { title: 'Droplet: where your first chip starts' }, h('span', { html: ico('drop', 18) }), h('b', p.droplet)),
     h('span.st.fl', { title: p.flask ? 'Flask ready' : 'Flask used' }, h('span', { html: ico('flask', 18, p.flask) })),
     h('span.st.gauge' + (hot ? '.hot' : ''), { title: 'White chips in the pot: ' + ws + ' of ' + lim + ' allowed' }, h('span', { html: KIT.chipSVG('W', 0, { size: 18 }) }), h('b.w', ws + '/' + lim)));
+  if (lim !== D.limit) { const g = me.querySelector('.gauge'); if (g) { g.classList.add('chg'); g.title = limitNote(p) + ': ' + ws + ' white now'; } }
   if (sp != null && !document.documentElement.classList.contains('ph')) me.append(h('span.st', { title: 'Where you would score now' }, 'Space ' + sp + ': ' + D.COINS[sp] + ' coins, ' + D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : '')));
 }
 function renderStage() {
@@ -115,7 +122,7 @@ function renderRisk() {
     const n = Math.max(1, r.n), nb = r.boom, ny = r.whites - r.boom, nk = r.n - r.whites;
     const bar = h('div.rb', { 'aria-hidden': 'true' }, h('i', { style: 'width:' + (100 * nk / n) + '%;background:#7fd65a' }), h('i', { style: 'width:' + (100 * ny / n) + '%;background:#f2b81e' }), h('i', { style: 'width:' + (100 * nb / n) + '%;background:#d6392f' }));
     rk.append(h('div.rk', h('span', { html: ico('bag', 18) }), h('b', r.n), ' chips in the bag: ', h('b', r.whites), ' white'), bar,
-      h('div.rk', 'Next chip explodes it: ', h('span.big.' + lv, pct + '%'), h('span.sm', ' (' + nb + ' of ' + r.n + ')'), h('span.sm', ' · white total ' + r.ws + ' of ' + r.limit)), ...(here ? [here] : []));
+      h('div.rk', 'Next chip explodes it: ', h('span.big.' + lv, pct + '%'), h('span.sm', ' (' + nb + ' of ' + r.n + ' chips would explode)'), h('span.sm', ' · white total ' + r.ws + ' of ' + r.limit)), ...(limitNote(p) ? [h('div.rk.hi', limitNote(p) + '.')] : []), ...(here ? [here] : []));
     const fl = p.flask ? (p.f.canFlask && p.pot.length && p.pot[p.pot.length - 1].c === 'W' ? 'The flask can put your last white chip back.' : 'Flask ready: it can put back a white chip you just drew.') : 'Flask used this day.';
     rk.append(h('div.sm.fl', fl));
   } else {
@@ -146,7 +153,15 @@ function renderActs() {
   if (G.phase !== 'brew' || p.st !== 'draw' || p.q) return;
   const mk = (t, cls, label, icon) => { const m = legal.find(x => x.t === t); if (!m) return null; return h('button.btn' + cls, { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button' }, icon ? h('span', { html: icon }) : null, label); };
   const draw = mk('draw', '.drawb', 'Draw', ico('bag', 26)), stop = mk('stop', '.stopb', 'Stop');
-  const rowTop = [mk('flask', '.alt.sec', 'Flask: put the last white chip back', ico('flask', 22, true)), mk('froth', '.alt.sec', 'Put the first white chip back (free)'), mk('restart', '.alt.sec', 'Do-over: start the day again')].filter(Boolean);
+  if (!p.lock) {   // the one line that matters: how likely is the next chip to explode, and what am I worth right now
+    const r = CF.risk(G, v), pct = Math.round(r.pBoom * 100), lv = pct < 15 ? 'lo' : pct < 30 ? 'mid' : 'hi', sp = CF.spaceOf(p), ln = limitNote(p);
+    const fm = legal.find(x => x.t === 'flask');
+    const sr = h('div.sumrow', { 'data-priv': v }, h('span.s1', h('b.' + lv, pct + '%'), ' to explode'), h('span.s2', { title: 'If you stop now' }, h('span', { html: ico('coin', 16) }), h('b', D.COINS[sp]), h('span', { html: ico('vp', 16) }), h('b', D.VP[sp]), D.RUBY[sp] ? h('span', { html: ico('ruby', 16) }) : null),
+      fm ? h('button.btn.alt.flb', { 'data-a': 'mv', 'data-i': legal.indexOf(fm), type: 'button', 'aria-label': 'Flask: put the last white chip back in the bag', title: 'Flask: put the last white chip back' }, h('span', { html: ico('flask', 20, true) }), 'Flask') : null,
+      ln ? h('div.s3', ln + ': it explodes above ' + r.limit + '.') : null);
+    a.appendChild(sr);
+  }
+  const rowTop = [mk('froth', '.alt.sec', 'Put the first white chip back (free)'), mk('restart', '.alt.sec', 'Do-over: start the day again')].filter(Boolean);
   if (rowTop.length) rowTop.forEach(b => a.appendChild(b));
   const rat = legal.filter(m => m.t === 'ratset');
   if (rat.length) { const d = h('details', { style: 'flex:1 1 100%' }, h('summary.sm', { style: 'min-height:44px;display:flex;align-items:center;cursor:pointer' }, 'Rat stone: ' + (p.rat - p.droplet) + ' spaces ahead. Use fewer?')); const row = h('div', { style: 'display:flex;gap:6px;flex-wrap:wrap' }); rat.forEach(m => row.appendChild(h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button' }, m.n + ''))); d.appendChild(row); a.appendChild(d); }
@@ -156,7 +171,7 @@ function renderQ(p, legal, qb) {
   const q = p.q, info = QINFO[q.h]; qb.hidden = false;
   qb.append(h('div.qt', h('b', info[0]), h('div', info[1](p, q.d))));
   if (p.hold.length && p.hold[0] && p.hold[0].c) qb.append(h('div.hold', { 'data-priv': p.seat }, p.hold.map((c, i) => h('span.cb', chipN(c.c + c.v, 34)))));
-  const opts = h('div.opts' + (['pick', 'bounty', 'fork', 'gift'].indexOf(q.h) >= 0 ? '' : ''));
+  const opts = h('div.opts' + (legal.length > 3 ? '.g2' : ''));
   legal.forEach(m => opts.appendChild(moveBtn(m, p)));
   qb.append(opts);
 }
@@ -172,7 +187,7 @@ function render() {
     focusSeat(); placePrompt();
     renderBar(); renderOthers(); renderMe(); renderStage(); renderActs(); renderRisk(); renderFort(); renderRoster();
     const pi = promptInfo(), pr = $('#prompt'); if (pr) { pr.textContent = pi.text; pr.className = pi.mine ? 'mine' : ''; }
-    renderHint(); renderDrawers(); renderNetBadge && renderNetBadge();
+    renderHint(); renderLegend(); renderBlg(); renderDrawers(); renderNetBadge && renderNetBadge();
   } catch (e) { console.error(e); if (window.__cfErr) window.__cfErr.push(String(e.stack || e)); }
 }
 function renderHint() { const e = $('#hint'); if (e) { e.hidden = true; e.innerHTML = ''; } }  // tips live in #pc (the tip card)
