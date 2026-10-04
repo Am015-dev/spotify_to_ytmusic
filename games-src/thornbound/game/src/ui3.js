@@ -95,6 +95,10 @@ function recBtnText(m){const k=G.q.kind;if(!m)return '';
   if(k==='bidRes')return m.t==='return'?'Take my card back':(m.t==='steal'?'Steal ':'Take ')+TB.kingdomInfo(m.kc).name;
   if(m.t==='done')return doneText();if(m.t==='seldone')return m.label;
   if(G.q.t==='menu'&&m.a==='supp')return 'Send '+m.p.n+' to '+REG[m.p.r].replace('The ','');
+  if(G.q.t==='menu'&&m.a==='journey')return 'Journey with '+cinfo(m.p.id).name;
+  if(G.q.t==='menu'&&m.a==='govern')return 'Govern: '+cinfo(m.p.id).name+' into the '+DD.COUNCIL_NAMES[m.p.c];
+  // the same power offered several ways: the button says which one (it matches the Suggested row)
+  const t=m.label.replace(/:.*$/,''),vq=viewSeatForQ();if(G.q.t==='menu'&&vq!=null&&legal(vq).filter(x=>x.t==='act'&&(x.label||'').replace(/:.*$/,'')===t).length>1)return m.label.replace(/\.$/,'');
   return m.label.replace(/\s*\([^)]*\)\s*$/,'').replace(/:.*$/,'')}
 function doneText(){const ph=menuPhase(G.q);return ph==='Spring'?'Done with Spring':ph==='Day'?'Done: fight the Clash':ph==='Autumn'?'Done with Autumn':'Done'}
 function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q;let foot='';
@@ -178,7 +182,9 @@ function simCached(m){const key=G.logN+'|'+m.k;UI._simc=UI._simc||{};if(UI._simc
 function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day';const acts=visibleActs(mv).filter(m=>m.t==='act'),done=mv.find(m=>m.t==='done');let f='';
   const byG={};for(const m of acts){(byG[mgroup(m.a)]=byG[mgroup(m.a)]||[]).push(m)}
   if(!acts.length)h+='<p class="hint">'+(day?'You have no Day powers here.':'Nothing to do now: tap Done.')+'</p>';
-  for(const [g,nmG,dsc] of MGROUP){const L=byG[g];if(!L)continue;
+  const rk=recK();for(const g in byG)byG[g].sort((x,y)=>(y.k===rk)-(x.k===rk));   // the Suggested option is the first row of its group, and its group comes first
+  const rg=acts.find(m=>m.k===rk);const GORD=rg?MGROUP.slice().sort((x,y)=>(y[0]===mgroup(rg.a))-(x[0]===mgroup(rg.a))):MGROUP;
+  for(const [g,nmG,dsc] of GORD){const L=byG[g];if(!L)continue;
     if(g==='supp'){const b=G.pl[s].supp.b;h+='<p class="grp-h">'+gloss('Supporters: '+b+' on your board')+'</p>'+(UI._coachOn?'':'<p class="grp-n">'+gloss('Each adds +1 Strength in that region\'s first Clash. Supporters on the map go to the Lost Pile in Winter.')+'</p>');const byR={};for(const m of L){(byR[m.p.r]=byR[m.p.r]||[]).push(m)}
       for(const r in byR){const mine=UI.V.reg[r].down.filter(id=>id>=0&&ownerOf(id)===s).map(id=>cinfo(id).strength);const there=G.pl[s].supp.r[r];
         h+='<div class="sup-r"><span><b>'+esc(REG[r])+'</b><small>'+(mine.length?'your card '+mine.join('+'):'no card of yours')+(there?' · '+there+' Supporter'+(there>1?'s':'')+' there':'')+'</small></span>'+byR[r].map(m=>'<button class="nb'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'" aria-label="Send '+m.p.n+' to '+esc(REG[r])+'">+'+m.p.n+'</button>').join('')+'</div>'}continue}

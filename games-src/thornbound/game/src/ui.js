@@ -402,6 +402,10 @@ function recBtnText(m){const k=G.q.kind;if(!m)return '';
   if(k==='bidRes')return m.t==='return'?'Take my card back':(m.t==='steal'?'Steal ':'Take ')+TB.kingdomInfo(m.kc).name;
   if(m.t==='done')return doneText();if(m.t==='seldone')return m.label;
   if(G.q.t==='menu'&&m.a==='supp')return 'Send '+m.p.n+' to '+REG[m.p.r].replace('The ','');
+  if(G.q.t==='menu'&&m.a==='journey')return 'Journey with '+cinfo(m.p.id).name;
+  if(G.q.t==='menu'&&m.a==='govern')return 'Govern: '+cinfo(m.p.id).name+' into the '+DD.COUNCIL_NAMES[m.p.c];
+  // the same power offered several ways: the button says which one (it matches the Suggested row)
+  const t=m.label.replace(/:.*$/,''),vq=viewSeatForQ();if(G.q.t==='menu'&&vq!=null&&legal(vq).filter(x=>x.t==='act'&&(x.label||'').replace(/:.*$/,'')===t).length>1)return m.label.replace(/\.$/,'');
   return m.label.replace(/\s*\([^)]*\)\s*$/,'').replace(/:.*$/,'')}
 function doneText(){const ph=menuPhase(G.q);return ph==='Spring'?'Done with Spring':ph==='Day'?'Done: fight the Clash':ph==='Autumn'?'Done with Autumn':'Done'}
 function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q;let foot='';
@@ -485,7 +489,9 @@ function simCached(m){const key=G.logN+'|'+m.k;UI._simc=UI._simc||{};if(UI._simc
 function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day';const acts=visibleActs(mv).filter(m=>m.t==='act'),done=mv.find(m=>m.t==='done');let f='';
   const byG={};for(const m of acts){(byG[mgroup(m.a)]=byG[mgroup(m.a)]||[]).push(m)}
   if(!acts.length)h+='<p class="hint">'+(day?'You have no Day powers here.':'Nothing to do now: tap Done.')+'</p>';
-  for(const [g,nmG,dsc] of MGROUP){const L=byG[g];if(!L)continue;
+  const rk=recK();for(const g in byG)byG[g].sort((x,y)=>(y.k===rk)-(x.k===rk));   // the Suggested option is the first row of its group, and its group comes first
+  const rg=acts.find(m=>m.k===rk);const GORD=rg?MGROUP.slice().sort((x,y)=>(y[0]===mgroup(rg.a))-(x[0]===mgroup(rg.a))):MGROUP;
+  for(const [g,nmG,dsc] of GORD){const L=byG[g];if(!L)continue;
     if(g==='supp'){const b=G.pl[s].supp.b;h+='<p class="grp-h">'+gloss('Supporters: '+b+' on your board')+'</p>'+(UI._coachOn?'':'<p class="grp-n">'+gloss('Each adds +1 Strength in that region\'s first Clash. Supporters on the map go to the Lost Pile in Winter.')+'</p>');const byR={};for(const m of L){(byR[m.p.r]=byR[m.p.r]||[]).push(m)}
       for(const r in byR){const mine=UI.V.reg[r].down.filter(id=>id>=0&&ownerOf(id)===s).map(id=>cinfo(id).strength);const there=G.pl[s].supp.r[r];
         h+='<div class="sup-r"><span><b>'+esc(REG[r])+'</b><small>'+(mine.length?'your card '+mine.join('+'):'no card of yours')+(there?' · '+there+' Supporter'+(there>1?'s':'')+' there':'')+'</small></span>'+byR[r].map(m=>'<button class="nb'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'" aria-label="Send '+m.p.n+' to '+esc(REG[r])+'">+'+m.p.n+'</button>').join('')+'</div>'}continue}
@@ -810,7 +816,7 @@ function dockNeed(H){return H>=820?380:H>=760?396:H>=700?370:H>=640?350:H>=580?3
 function phApply(){const was=UI.phone;const on=phDetect();const root=document.documentElement;
   UI.phone=on;UI.land=innerWidth>innerHeight;const W=innerWidth,H=innerHeight;UI.short=on&&(UI.land?H<370:H<600);
   root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);root.classList.toggle('short',!!UI.short);
-  if(on){const big=Math.max(150,Math.min(W,H-44-dockNeed(H)));let bs=UI.land?Math.min(H,Math.round(W*.52)):(UI.boardSmall?Math.max(150,Math.min(big,Math.round(big-Math.max(90,H*.15)))):big);
+  if(on){const big=Math.max(150,Math.min(W,H-44-dockNeed(H)));let bs=UI.land?Math.min(H,Math.round(W*.52)):(UI.boardSmall?Math.max(UI.short?96:150,Math.min(big,Math.round(big-Math.max(90,H*.15)))):big);
     if(UI.zoom)bs=UI.land?Math.min(H,Math.round(W*.62)):Math.max(bs,Math.min(W,H-44-150));root.style.setProperty('--bs',bs+'px');UI.bs=bs}
   else root.style.removeProperty('--bs');
   if(was!==on&&G){UI.mapReset=true;renderAll()}}
@@ -842,6 +848,7 @@ function verbYou(w){const l=w.toLowerCase();if(l==='has')return 'have';if(l==='i
 function plain(t){const n=myName();if(!n||!t)return t;let subj=false;
   let out=t.replace(new RegExp(escRe(n)+"('s)?(?=\\W|$)( [A-Za-z]+)?",'g'),(m,poss,w,off,str)=>{const start=off===0||/[.:!?]\s*$/.test(str.slice(0,off));if(off===0)subj=true;
     const you=start?(poss?'Your':'You'):(poss?'your':'you');if(poss)return you+(w||'');if(!w)return you;if(!start&&off>0)return you+w;return you+' '+verbYou(w.trim())});
+  out=out.replace(/\b([Yy])ou \((?:[Tt]he )?you\) wins\b/,'$1ou win');   // "The game ends. X (faction) wins" when X is you
   if(subj)out=out.replace(/\btheir\b/,'your').replace(/^(You [^.]*?) and has /,'$1 and have ').replace(/^(You [^.]*?) and is /,'$1 and are ');return out}
 // ---------------------------------------------------------------- "what's happening": the newest public event, in plain words
 const PHASEN={spring:'Spring',summer:'Day',autumn:'Autumn'};

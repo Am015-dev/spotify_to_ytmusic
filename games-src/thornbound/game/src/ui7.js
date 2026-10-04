@@ -7,6 +7,7 @@ function verbYou(w){const l=w.toLowerCase();if(l==='has')return 'have';if(l==='i
 function plain(t){const n=myName();if(!n||!t)return t;let subj=false;
   let out=t.replace(new RegExp(escRe(n)+"('s)?(?=\\W|$)( [A-Za-z]+)?",'g'),(m,poss,w,off,str)=>{const start=off===0||/[.:!?]\s*$/.test(str.slice(0,off));if(off===0)subj=true;
     const you=start?(poss?'Your':'You'):(poss?'your':'you');if(poss)return you+(w||'');if(!w)return you;if(!start&&off>0)return you+w;return you+' '+verbYou(w.trim())});
+  out=out.replace(/\b([Yy])ou \((?:[Tt]he )?you\) wins\b/,'$1ou win');   // "The game ends. X (faction) wins" when X is you
   if(subj)out=out.replace(/\btheir\b/,'your').replace(/^(You [^.]*?) and has /,'$1 and have ').replace(/^(You [^.]*?) and is /,'$1 and are ');return out}
 // ---------------------------------------------------------------- "what's happening": the newest public event, in plain words
 const PHASEN={spring:'Spring',summer:'Day',autumn:'Autumn'};
