@@ -28,7 +28,9 @@ function newsItem(e,human,me){const t=e.t,m=e.m||{};
   const mine=touchesMe(e,me);
   if(human&&e.s===me&&!['inf','steal','elim','kcsteal','inv'].includes(m.k))return null;   // your own plain choices are not narrated back to you
   const big=me>=0&&(mine&&BIGK.includes(m.k)||(m.k==='tac'||m.k==='fav'||m.k==='kcsteal')&&e.s!==me)||m.k==='elim'&&UI.mode==='watch';
-  return {t:'news',at:e.i,s:e.s,text:t,k:m.k||'',big:!!big,mine,m:e.m||null}}
+  return {t:'news',at:e.i,s:e.s,text:t,k:m.k||'',big:!!big,keep:!big&&(m.k==='inf'||m.k==='steal'||((m.k==='move'||m.k==='elim')&&inMyClash())),mine,m:e.m||null}}
+// a rival's move inside a Clash you fight in is never skipped by a tap
+function inMyClash(){const me=vs();try{return me>=0&&!!G.clash&&!!(G.clash.cards[me]||[]).length}catch(e){return false}}
 function newsSince(l0,seat){const me=vs();const human=seat!=null&&G.pl[seat]&&!G.pl[seat].ai;const out=[];for(const e of G.log){if(e.i<=l0)continue;const it=newsItem(e,human,me);if(it)out.push(it)}return out}
 (function(){const o=doMove;doMove=function(mv){const q=G&&G.q?{kind:G.q.kind,t:G.q.t,title:G.q.title}:null;const l0=G?G.logN:0,e0=UI.evq.length,seat=mv&&mv.seat;
   const ok=o(mv);if(!ok||!G)return ok;
@@ -41,12 +43,14 @@ function newsSince(l0,seat){const me=vs();const human=seat!=null&&G.pl[seat]&&!G
 function netNews(l0){if(!wantNews()||!G)return;const me=vs();for(const e of G.log){if(e.i<=l0)continue;const it=newsItem(e,false,me);if(it&&!(it.s===me&&!it.big))UI.evq.push(it)}}
 function infK(it){return it.m&&(it.m.k==='inf'||it.m.k==='steal')}
 function showNews(first){const items=[first];if(first.big&&infK(first)){while(UI.evq.length&&items.length<4){const n=UI.evq[0];if(n.t!=='news'||!n.big||!infK(n))break;items.push(UI.evq.shift())}}
-  if(!first.big){while(UI.evq.length&&items.length<3){const n=UI.evq[0];if(n.t!=='news'||n.big||n.s!==first.s)break;items.push(UI.evq.shift())}}
+  if(!first.big){while(UI.evq.length&&items.length<4){const n=UI.evq[0];if(n.t!=='news'||n.big)break;items.push(UI.evq.shift())}}
   const c={kind:'news',items,big:first.big,id:(UI._nid=(UI._nid||0)+1)};UI.card=c;
-  const dur=(first.big?3400:900+450*(items.length-1))/Math.max(1,Math.min(UI.speed||1,4));
+  const dur=newsDur(c);
   clearTimeout(UI._nt);UI._nt=setTimeout(()=>{if(UI.card===c){UI.card=null;pump()}},dur)}
+// how long a news card stays: short for plain computer moves, longer when it changes Influence or your Clash (a tap always skips)
+function newsDur(c){const sp=Math.max(1,Math.min(UI.speed||1,4));if(c.big)return 3000/sp;const k=c.items.some(x=>x.keep);return Math.max(k?1700:700,600+380*c.items.length)/sp}
 function newsOk(){const c=UI.card;if(!c||c.kind!=='news')return;clearTimeout(UI._nt);UI.card=null;
-  if(!c.big){UI.evq=UI.evq.filter(e=>!(e.t==='news'&&!e.big))}   // a tap skips the rest of the narration (cards that touch you still come)
+  if(!c.big){UI.evq=UI.evq.filter(e=>!(e.t==='news'&&!e.big&&!e.keep))}   // a tap skips the rest of the narration (cards that touch you, Influence changes and moves in your Clash still come)
   pump()}
 const NEWSHEAD={inf:'Influence',steal:'Influence stolen',elim:'Eliminated',kcsteal:'Kingdom Card stolen',rm:'A card leaves play',inv:'Saved by Invulnerable',tac:'A Tactic',fav:'The Kingdom\'s Favour'};
 function newsHead(it,items){const me=vs();if(items&&items.length>1&&items.every(infK)){const d={};for(const x of items){const m=x.m;if(m.k==='inf')d[m.s]=(d[m.s]||0)+m.n;else{d[m.s]=(d[m.s]||0)+m.n;d[m.v]=(d[m.v]||0)-m.n}}
@@ -55,7 +59,7 @@ function newsHead(it,items){const me=vs();if(items&&items.length>1&&items.every(
 function renderNews(){const el=$('#news');if(!el)return;const c=UI.card;if(!c||c.kind!=='news'){if(!el.hidden){el.hidden=true;el.innerHTML=''}return}
   if(el.dataset.id===String(c.id)&&!el.hidden)return;el.dataset.id=c.id;el.hidden=false;const first=c.items[0];const col=first.s>=0&&G.pl[first.s]?fcol(first.s):'#e8c867';
   el.className='news'+(c.big?' big':'')+(first.mine?' mine':'');el.style.setProperty('--fc',col);
-  el.innerHTML='<div class="nw" data-a="newsok" role="button" tabindex="0" aria-label="Continue">'+(c.big?'<b class="nw-h">'+esc(newsHead(first,c.items))+'</b>':'')+c.items.map(it=>'<p><i style="background:'+(it.s>=0&&G.pl[it.s]?fcol(it.s):'#777')+'"></i>'+gloss(plain(it.text))+'</p>').join('')+'<small class="nw-t">'+(c.big?'tap to continue':'tap to skip')+'</small><span class="nw-bar" style="animation-duration:'+((c.big?3400:900+450*(c.items.length-1))/Math.max(1,Math.min(UI.speed||1,4)))+'ms"></span></div>'}
+  el.innerHTML='<div class="nw" data-a="newsok" role="button" tabindex="0" aria-label="Continue">'+(c.big?'<b class="nw-h">'+esc(newsHead(first,c.items))+'</b>':'')+c.items.map(it=>'<p'+(it.keep?' class="kp"':'')+'><i style="background:'+(it.s>=0&&G.pl[it.s]?fcol(it.s):'#777')+'"></i>'+esc(plain(it.text))+'</p>').join('')+'<small class="nw-t">'+(c.big?'tap to continue':'tap to skip')+'</small><span class="nw-bar" style="animation-duration:'+newsDur(c)+'ms"></span></div>'}
 // ---------------------------------------------------------------- previews: what the Night step and the tally give if nobody else acts
 function preview(V){try{return TB.clashPreview(V||UI.V)}catch(e){return null}}
 function sideName(s){return shortName(s).replace(' (you)','')}
@@ -63,7 +67,7 @@ function youFirst(parts){const me=vs();return parts.slice().sort((a,b)=>(b===me)
 function scoreLine(P){if(!P)return '';return youFirst(Object.keys(P.tot).map(Number)).map(s=>esc(s===vs()?'You':sideName(s))+' <b>'+P.tot[s]+'</b>').join(' · ')}
 function previewHTML(P,title){if(!P)return '';const me=vs();let h='<div class="pv" aria-label="Clash preview">'+(title===''?'':'<p class="pv-t">'+esc(title||('Clash in '+REG[P.r]))+(P.skip?' (no Day or Night steps here)':'')+'</p>');
   h+='<div class="pv-g'+(Object.keys(P.tot).length>2?' stack':'')+'">'+youFirst(Object.keys(P.tot).map(Number)).map(s=>'<div class="pv-s'+(P.win.length===1&&P.win[0]===s?' win':'')+'" style="--fc:'+fcol(s)+'"><b>'+esc(s===me?'You':sideName(s))+'</b><ul>'+(P.brk[s]||[]).map(x=>'<li><span>'+gloss(x.l)+'</span><i>'+(x.n<0?'−'+(-x.n):(x.n>0?'+':'')+x.n)+'</i></li>').join('')+
-    P.dead.filter(d=>ownerOf(d.id)===s).map(d=>'<li class="dead"><span>'+esc(TB.cardName(G,d.id))+'</span><i>'+TB.cardInfo(G,d.id).strength+'</i></li>').join('')+'</ul><p class="pv-tot">= '+P.tot[s]+'</p></div>').join('')+'</div>';
+    P.dead.filter(d=>ownerOf(d.id)===s).map(d=>'<li class="dead"><span>'+esc(TB.cardName(G,d.id))+'</span><small class="dn">dies at Night</small><i>'+TB.cardInfo(G,d.id).strength+'</i></li>').join('')+'</ul><p class="pv-tot">= '+P.tot[s]+'</p></div>').join('')+'</div>';
   for(const d of P.dead)h+='<p class="pv-n warn">'+ico('eye')+'<span>At Night: '+gloss(plain(d.t))+'.</span></p>';
   for(const d of P.saved)h+='<p class="pv-n">'+ico('eye')+'<span>'+gloss(plain(TB.cardName(G,d.id)+' is Invulnerable: it survives the Night'))+'.</span></p>';
   if(P.hidden)h+='<p class="pv-n">'+P.hidden+' face-down card'+(P.hidden>1?'s':'')+' added by Ambush will be revealed before the Night.</p>';

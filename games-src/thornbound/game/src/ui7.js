@@ -7,6 +7,7 @@ function verbYou(w){const l=w.toLowerCase();if(l==='has')return 'have';if(l==='i
 function plain(t){const n=myName();if(!n||!t)return t;let subj=false;
   let out=t.replace(new RegExp(escRe(n)+"('s)?(?=\\W|$)( [A-Za-z]+)?",'g'),(m,poss,w,off,str)=>{const start=off===0||/[.:!?]\s*$/.test(str.slice(0,off));if(off===0)subj=true;
     const you=start?(poss?'Your':'You'):(poss?'your':'you');if(poss)return you+(w||'');if(!w)return you;if(!start&&off>0)return you+w;return you+' '+verbYou(w.trim())});
+  out=out.replace(/\b([Yy])ou \((?:[Tt]he )?you\) wins\b/,'$1ou win');   // "The game ends. X (faction) wins" when X is you
   if(subj)out=out.replace(/\btheir\b/,'your').replace(/^(You [^.]*?) and has /,'$1 and have ').replace(/^(You [^.]*?) and is /,'$1 and are ');return out}
 // ---------------------------------------------------------------- "what's happening": the newest public event, in plain words
 const PHASEN={spring:'Spring',summer:'Day',autumn:'Autumn'};
@@ -46,7 +47,7 @@ const GLOSS=[
  ['journey',/\bJourney\b/,'Journey','An Autumn action, once a round: send away a hand card that shows Lore, and gain that much Lore.'],
  ['council',/\bCouncils?\b/,'Council','Three Councils (Coin, Whispers, Pledges). Cards with votes placed there give you a lasting benefit every round.'],
  ['attrition',/\bAttrition\b/,'Attrition','When you must draw and your deck is empty, your discard pile becomes a new deck and your hand size drops by one (never below 3).'],
- ['favour',/\b(Kingdom's )?Favour\b/,'Kingdom\'s Favour','A disc you claim at the Gleaning Meadow. While you hold it you may use your faction\'s Favour power (three uses), and it breaks ties at the end.'],
+ ['favour',/\b(Kingdom's )?Favour\b/,'Kingdom\'s Favour','A disc you claim at the Gleaning Meadow. While you hold it you may use your faction\'s Favour power (three uses), and if Influence is tied when the game ends, the holder wins (it does not decide Clash ties).'],
  ['order track',/\bOrder Track\b/,'Order Track','The turn order. At the start of each round the player with the most Influence goes first; the last one chooses the Clash order. Ties go to the player higher on it.'],
  ['winter',/\bWinter\b/,'Winter','The end of a round: Heralds go home, Supporters on the map go to the Lost Pile, and played cards go to the discard pile.'],
  ['autumn',/\bAutumn\b/,'Autumn','After the Clashes: once each you may Govern and Journey, and use Autumn abilities such as Rally.'],
@@ -141,7 +142,7 @@ const STEPN=(n,t)=>'Step '+n+' of 6 · '+t;
 const NEWK={cmd:['Card abilities','Some of your cards have a power printed on them (Flank, Ambush, Retreat, Rally, Deploy). The card says when it works. Why you\'d want it: move a card to where it wins, or save it for later.'],
   lore:['Journey','Send a hand card away to gain its Lore. Why you\'d want it: Lore buys your Site of Power cards, which are stronger than your basic cards.'],
   tactic:['Tactics','Four special powers of your faction. Most work once per game, some once a round. Why you\'d want them: one well-timed Tactic can turn a Clash.'],
-  favour:['The Kingdom\'s Favour','A faction power with three uses, from the Gleaning Meadow. Why you\'d want it: an extra push when you need it, and it wins ties at the end.'],
+  favour:['The Kingdom\'s Favour','A faction power with three uses, from the Gleaning Meadow. Why you\'d want it: an extra push when you need it, and if Influence is tied when the game ends, the holder wins (it does not decide Clash ties).'],
   govern:['Govern and Councils','Put a hand card with votes into a Council. Why you\'d want it: each Council gives a lasting power (Influence, Supporters back, or location bonuses).'],
   council:['Councils','Your cards in a Council give you a power. Why you\'d want it: it works every round while the cards stay there.'],
   kc:['Kingdom Card powers','Some Kingdom Cards and HQ cards have a power you choose when to use. Why you\'d want it: each row says what it costs and what it gives.']};
@@ -231,13 +232,13 @@ function optionsHTML(ONL,plan){return '<div class="opts2">'+(ONL?'':'<div class=
   '<div class="row"><span>Tips</span><div class="seg">'+[['full','Full'],['light','Light'],['off','Off']].map(([v,l])=>'<button class="'+(sv.guide===v?'on':'')+'" data-a="gd" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+seatRows(ONL,plan)+'</div>'}
 function sumLine(){const n=sv.np-1,R=({short:4,standard:5,extended:6}[sv.length]);return 'You lead <b>'+esc(DD.FSHORT[sv.faction])+'</b> against '+n+' computer'+(n>1?'s':'')+' · most Influence after round '+R+' wins'}
 function setupHTML(){const ph=UI.phone;const k=TBKit.FACTIONS[FK[sv.faction]];
-  const guide='<div class="guidebox"><p><b>First time?</b> The guided game teaches one step at a time: you lead the Heathbound Clans against the Gilded Court (Easy, for learning) for 4 rounds, about 15 minutes. Normal games start at Normal.</p></div>';
+  const guide='<div class="guidebox"><p><b>First time?</b> The <b>Guided first game</b> teaches one step at a time: Heathbound Clans against one computer (Easy, for learning), 4 rounds, about 15 minutes. <b>Start the game</b> is a normal game with the settings below.</p></div>';
   const ft=firstTime();const gbtn='<button class="sbtn'+(ft?' big':'')+'" data-a="guided" data-start="guided"><b>'+(ft?'Guided first game':'Guided game')+'</b><span>'+(ft?'recommended: learn one step at a time':'learn step by step')+'</span></button>';
   const go='<div class="sgo">'+(ft?gbtn:'')+'<button class="sbtn'+(ft?'':' big')+'" data-a="start" data-start="go"><b>Start the game</b><span>'+esc(DD.FSHORT[sv.faction])+' vs '+(sv.np-1)+' computer'+(sv.np>2?'s':'')+' ('+sv.levels.slice(1,sv.np).map(l=>l==='easy'?'Easy':l==='hard'?'Hard':'Normal').filter((x,i,a)=>a.indexOf(x)===i).join('/')+') · '+({short:4,standard:5,extended:6}[sv.length])+' rounds</span></button><div class="sgrid3">'+(ft?'<button class="sbtn" data-a="rules"><b>How to play</b><span>the rules in short</span></button>':gbtn)+
     '<button class="sbtn" data-a="mode" data-v="hot" data-go="1" data-start="hot"><b>Hot-seat</b><span>'+sv.np+' people, one device</span></button>'+
     '<button class="sbtn" data-a="mode" data-v="watch" data-go="1" data-start="watch"><b>Watch</b><span>the computers play</span></button></div></div>';
   const head='<div class="shead"><button class="sback" data-a="title" aria-label="Back to the title">‹</button><h2>'+(ph?'New game':'Choose your faction')+'</h2></div>';
-  if(ph)return head+(firstTime()?guide:'')+'<div class="ssum" style="--fc:'+k.main+'"><span class="fe">'+TBKit.token('influence',{faction:FK[sv.faction]},40).outerHTML+'</span><span class="sline">'+sumLine()+'</span><button class="btn" data-a="cfgopen" aria-label="Change faction, players, length and levels">Change</button></div><p class="ssub">'+esc(STORY[sv.faction].enjoy)+'</p>'+go;
+  if(ph)return head+(firstTime()?guide:'')+'<div class="ssum" style="--fc:'+k.main+'"><span class="fe">'+TBKit.token('influence',{faction:FK[sv.faction]},40).outerHTML+'</span><span class="sline">'+sumLine()+'</span><button class="btn" data-a="cfgopen" aria-label="Change faction, players, length and levels">Change</button></div>'+'<div class="opts2 qnp"><div class="row"><span>Computers</span><div class="seg">'+[2,3,4].map(n=>'<button class="'+(sv.np===n?'on':'')+'" data-a="np" data-v="'+n+'" aria-label="'+(n-1)+' computer opponent'+(n>2?'s':'')+'">'+(n-1)+'</button>').join('')+'</div></div></div><p class="ssub">'+esc(STORY[sv.faction].enjoy)+'</p>'+go;
   return head+'<p class="ssub">Each faction plays the same rules with its own cards and powers. Pick the story you like.</p>'+(firstTime()?guide:'')+'<div class="fgrid">'+FIDS.map(f=>facCard(f,f===sv.faction)).join('')+'</div>'+optionsHTML(false)+go}
 function cfgDialogHTML(){return '<div class="cfgdlg" role="dialog" aria-label="Configure the game"><div class="cfghead"><b>Configure</b><button class="btn" data-a="cfgclose">Done</button></div><div class="cfgbody"><div class="fgrid">'+FIDS.map(f=>facCard(f,f===sv.faction)).join('')+'</div>'+optionsHTML(false)+'</div><div class="cfgfoot"><button class="btn pri big" data-a="cfgclose">Done</button></div></div>'}
 function onlineSetupHTML(){const host=NET.on&&isHost(),plan=host?netPlan():null;

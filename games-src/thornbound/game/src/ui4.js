@@ -9,6 +9,8 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   const qk=G.q?G.q.kind:'';let HS=UI.handSlots;if(!HS||HS.round!==G.round||HS.seat!==s||HS.kind!==qk||ids0.some(id=>!HS.order.includes(id))||!ids0.length)HS=UI.handSlots={round:G.round,seat:s,kind:qk,order:ids0.slice()};
   const ids=HS.order;const inHand=new Set(ids0);
   const mv=G.q&&G.q.seats.includes(s)&&!G.pl[s].ai?legal(s):[];const use=new Set();for(const m of mv){if(m.id!=null)use.add(m.id);if(m.v!=null&&typeof m.v==='number')use.add(m.v)}
+  // phones: when this decision does not use the hand, it shrinks to one line of tappable numbers so the choices get the room
+  if(UI.phone&&!UI.land&&!use.size){el.innerHTML='<div class="hand mini" role="list" aria-label="Your hand"><span class="hm-l">Hand</span>'+ids0.map(id=>'<button class="hm" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="--fc:'+fcol(s)+'" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'">'+cinfo(id).strength+'</button>').join('')+(ids0.length?'':'<span class="hm-l">empty</span>')+'</div>';return}
   const W=Math.max(200,el.clientWidth||$('#dockbody').clientWidth||360)-8;const cw=UI.phone?(UI.land?42:(innerHeight<600?44:innerHeight<820?48:54)):66,ch=Math.round(cw*1.4308);
   const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
   const hh='<div class="hand-h"><span>Hand <b>'+ids0.length+'</b>/'+P.hs+'</span><span>Deck '+P.deck.length+'</span><span>Discard '+P.disc.length+'</span>'+(P.lore?'<span>Lore '+P.lore+'</span>':'')+'</div>';
@@ -22,7 +24,7 @@ function renderRivals(){const el=$('#rivals');if(!el)return;const V=UI.V;const h
   const act=G.q?new Set(G.q.seats):new Set();const me=vs();
   const ordSeats=G.pl.map(p=>p.seat);
   const top=Math.max(...V.pl.map(p=>p.inf));const lead=V.pl.filter(p=>p.inf===top).length===1&&top>0;
-  el.innerHTML='<p class="race-g">'+gloss('Most Influence after round '+G.rounds+' wins')+' · round '+Math.max(1,G.round)+' of '+G.rounds+'</p><div class="race-c'+(G.np>2?' many':'')+'">'+ordSeats.map(s=>{const P=V.pl[s];const kfac=TBKit.FACTIONS[FK[P.fac]];const turn=act.has(s);
+  el.innerHTML='<p class="race-g">'+gloss('Most Influence after round '+G.rounds+' wins')+(UI.phone?'':' · round '+Math.max(1,G.round)+' of '+G.rounds)+'</p><div class="race-c'+(G.np>2?' many':'')+'">'+ordSeats.map(s=>{const P=V.pl[s];const kfac=TBKit.FACTIONS[FK[P.fac]];const turn=act.has(s);
     const favs=V.fav.h===s?'<span class="rv-f" title="Holds the Kingdom\'s Favour ('+V.fav.u+' uses left)">'+ico('star')+'</span>':'';
     return '<button class="rv'+(s===me?' me':'')+(turn?' turn':'')+'" data-a="rival" data-s="'+s+'" style="--fc:'+kfac.main+'" aria-label="'+esc(P.name)+': '+P.inf+' influence, '+P.hand.length+' cards in hand. Tap for details">'+
       '<span class="rv-e">'+emb(s,24)+'</span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'You':esc(shortName(s).replace(' (you)','')))+(lead&&P.inf===top?' <span class="rv-l" title="In the lead">'+ico('crown')+'</span>':'')+'</b><small>'+P.hand.length+' card'+(P.hand.length===1?'':'s')+'</small></span><span class="rv-n">'+P.inf+'</span>'+favs+'</button>'}).join('')+'</div>'}
