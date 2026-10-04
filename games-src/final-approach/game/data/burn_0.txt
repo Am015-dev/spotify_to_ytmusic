@@ -1,0 +1,1 @@
+normal g4 green Lake Orrin                    12/30  40% avg rounds 7.0 {"mandatory":2,"fuel":6,"speed":5,"spin":1,"checks:flaps+axis":1,"checks:axis":2,"checks:flaps":1} 19363ms/game
