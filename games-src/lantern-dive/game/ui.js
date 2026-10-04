@@ -717,9 +717,9 @@ function coachCheck() {
 }
 function tipOk() { if (!UI.tip) return; markSeen(UI.tip.id); UI.tip = null; renderTip(); schedule(); coachCheck(); }
 // ---------- pop-ups inside the dock ----------
-function closePop() { UI.pop = null; const p = $('#ppop'); if (p) { p.hidden = true; p.innerHTML = ''; } }
+function closePop() { UI.pop = null; document.documentElement.classList.remove('popon'); const p = $('#ppop'); if (p) { p.hidden = true; p.innerHTML = ''; } }
 function openPop(title, sub, body) {
-  const p = $('#ppop'); if (!p) return; UI.pop = { title };
+  const p = $('#ppop'); if (!p) return; UI.pop = { title }; document.documentElement.classList.add('popon');
   p.innerHTML = ''; p.hidden = false;
   p.append(h('div.ph-head', h('div.ph-t', h('b', title), sub ? h('span', sub) : null), h('button.px', { 'data-a': 'popx', type: 'button', 'aria-label': 'Close' }, '×')), h('div.ph-body', body));
 }
@@ -1055,7 +1055,7 @@ function applyPhone() {
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(112, Math.min(150, Math.round(hh * .18))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(108, Math.min(128, Math.round(hh * .15))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !NET.on && UI.sv === 'setup') renderStart(); }
 }
 let rzT = 0;

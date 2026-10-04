@@ -48,4 +48,4 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
     console.log(t, 'errors', JSON.stringify(errs.slice(0, 3))); bad += errs.length; await ctx.close();
   }
   console.log('PROBLEMS', bad); await b.close(); process.exitCode = bad ? 1 : 0;
-})().catch(e => { console.error('FATAL', e); process.exitCode = 1; });
+})().catch(e => { console.error('FATAL', e); process.exit(1); });

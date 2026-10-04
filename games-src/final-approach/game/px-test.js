@@ -34,7 +34,7 @@ let bad = 0; const fail = (c, d) => { bad++; console.log('FAIL', c, d || ''); };
     // ending animation
     await p.evaluate(() => { G.ai = [true, true]; AIDELAY = 0; schedule(); });
     let sawEnd = false; for (let i = 0; i < 300; i++) { const st = await p.evaluate(() => ({ e: PX.state().ending, f: !!(G.result && UI.overShown && !document.querySelector('#rs').hidden) })); if (st.e) sawEnd = true; if (st.f) break; await p.waitForTimeout(200); }
-    if (!sawEnd) fail('ending animation never ran'); else ok('ending animation ran'); const fin = await p.evaluate(() => !!(G.result && !document.querySelector('#rs').hidden)); if (!fin) fail('final card did not follow the ending'); else ok('final card follows the ending', G && 'result shown');
+    if (!sawEnd) fail('ending animation never ran'); else ok('ending animation ran'); const fin = await p.evaluate(() => !!(G.result && !document.querySelector('#rs').hidden)); if (!fin) fail('final card did not follow the ending'); else ok('final card follows the ending');
     // new flight after the ending clears the overlay
     await p.click('#rs [data-a=again]'); await p.waitForTimeout(900); const ce = await p.evaluate(() => ({ cls: document.querySelector('#bd').classList.contains('ending'), e: PX.state().ending })); if (ce.cls || ce.e) fail('ending overlay still on after Again', JSON.stringify(ce)); else ok('Again clears the ending overlay');
     // context loss -> DOM view, still playable
@@ -49,4 +49,4 @@ let bad = 0; const fail = (c, d) => { bad++; console.log('FAIL', c, d || ''); };
   // ---- 4. phone portrait + landscape with Pixi
   for (const [vw, vh] of [[390, 763], [844, 390]]) { const ctx = await b.newContext({ viewport: { width: vw, height: vh }, isMobile: true, hasTouch: true }); await ctx.route('**/*', r => new URL(r.request().url()).host === 'gns.test' ? r.fulfill({ status: 200, contentType: 'text/html', body: html }) : r.abort()); const p = await ctx.newPage(); p.setDefaultTimeout(40000); p.errs = []; p.on('pageerror', e => p.errs.push(e.message)); await p.goto('https://gns.test/'); await p.waitForTimeout(1800); await start(p); await roll(p); await p.waitForTimeout(3000); const st = await p.evaluate(() => ({ s: PX.state(), q: PX.q })); const pr = await p.evaluate(() => pxPainted()); if (!st.s.on || !(pr > .4)) fail('phone ' + vw + 'x' + vh + ' panel not painted', JSON.stringify({ on: st.s.on, pr })); else ok('phone ' + vw + 'x' + vh + ' painted', 'q ' + st.q + ' res ' + st.s.res + ' ' + pr); if (p.errs.length) fail('console errors (phone)', JSON.stringify(p.errs.slice(0, 3))); await ctx.close(); }
   console.log(bad ? 'PX TEST FAILED (' + bad + ')' : 'PX TEST PASSED'); await b.close(); process.exitCode = bad ? 1 : 0;
-})().catch(e => { console.error('FATAL', e); process.exitCode = 1; });
+})().catch(e => { console.error('FATAL', e); process.exit(1); });

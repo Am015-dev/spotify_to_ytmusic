@@ -1,2 +1,3 @@
 hard r2 red Seabright Bay                      0/12   0% avg rounds 6.5 {"fuel":5,"mandatory":2,"speed":4,"short":1} 74013ms/game
 hard r3 red Palmreach                          1/12   8% avg rounds 6.7 {"checks:gear+axis":1,"checks:planes+gear+flaps+axis":1,"fuel":1,"short":3,"collision":2,"checks:planes+flaps+axis":1,"mandatory":1,"speed":1} 49844ms/game
+hard r4 red Lake Orrin                         0/12   0% avg rounds 7.0 {"checks:flaps+ice":1,"checks:ice":7,"checks:axis+ice":3,"fuel":1} 62852ms/game

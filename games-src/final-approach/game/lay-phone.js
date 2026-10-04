@@ -100,4 +100,4 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     await ctx.close();
   }
   console.log('PROBLEMS', bad); await b.close(); process.exitCode = bad ? 1 : 0;
-})().catch(e => { console.error('FATAL', e); process.exitCode = 1; });
+})().catch(e => { console.error('FATAL', e); process.exit(1); });

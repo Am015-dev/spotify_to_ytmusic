@@ -1,7 +1,4 @@
 host {"avail":true,"trystero":"object"}
-lobby after 1912 ms host sees ["Hosty","Friend1"]
-layout mid-start host {"bad":[],"w":1100,"vw":1100,"h":760,"vh":760,"txt":"Room HM8TN · 2 crew online2"} ok
-layout mid-start guest {"bad":[],"w":1100,"vw":1100,"h":760,"vh":760,"txt":"Room HM8TN · 2 crew online2"} ok
-{"tag":"flight 1","host":{"over":true,"win":false,"why":"mandatory","round":3,"logN":70,"seat":0,"shown":true},"guests":[{"seat":1,"over":true}],"agree":true,"exactStrip":true,"finalCardEverywhere":true,"stats":{"remote":21,"rejected":12,"inv":0},"nErrors":0,"errors":[],"clicks":52,"remoteClicks":31,"checks":14,"viol":[],"secs":69}
-{"tag":"flight 2 (Play again)","host":{"over":true,"win":false,"why":"mandatory","round":4,"logN":87,"seat":0,"shown":true},"guests":[{"seat":1,"over":true}],"agree":true,"exactStrip":true,"finalCardEverywhere":true,"stats":{"remote":47,"rejected":22,"inv":0},"nErrors":0,"errors":[],"clicks":64,"remoteClicks":36,"checks":18,"viol":[],"secs":56}
-SUMMARY full desktop 2 runs, 0 bad
+lobby after 1789 ms host sees ["Hosty","Friend1"]
+layout mid-start host {"bad":["covered ax0 by stimg","covered ax1 by stimg","covered en0 by rsbox stbox","covered en1 by rsbox stbox","covered ra0 by rs","covered ra1 by rsbox stbox"],"w":1100,"vw":1100,"h":760,"vh":760,"txt":"Room KPY2N · 2 crew online2"} PROBLEMS covered ax0 by stimg,covered ax1 by stimg,covered en0 by rsbox stbox,covered en1 by rsbox stbox,covered ra0 by rs,covered ra1 by rsbox stbox
+layout mid-start guest {"bad":["covered ax0 by stimg","covered ax1 by stimg","covered en0 by rsbox stbox","covered en1 by rsbox stbox","covered ra0 by rs","covered ra1 by rsbox stbox"],"w":1100,"vw":1100,"h":760,"vh":760,"txt":"Room KPY2N · 2 crew online2"} PROBLEMS covered ax0 by stimg,covered ax1 by stimg,covered en0 by rsbox stbox,covered en1 by rsbox stbox,covered ra0 by rs,covered ra1 by rsbox stbox

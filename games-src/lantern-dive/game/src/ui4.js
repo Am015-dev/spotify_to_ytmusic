@@ -34,9 +34,9 @@ function coachCheck() {
 }
 function tipOk() { if (!UI.tip) return; markSeen(UI.tip.id); UI.tip = null; renderTip(); schedule(); coachCheck(); }
 // ---------- pop-ups inside the dock ----------
-function closePop() { UI.pop = null; const p = $('#ppop'); if (p) { p.hidden = true; p.innerHTML = ''; } }
+function closePop() { UI.pop = null; document.documentElement.classList.remove('popon'); const p = $('#ppop'); if (p) { p.hidden = true; p.innerHTML = ''; } }
 function openPop(title, sub, body) {
-  const p = $('#ppop'); if (!p) return; UI.pop = { title };
+  const p = $('#ppop'); if (!p) return; UI.pop = { title }; document.documentElement.classList.add('popon');
   p.innerHTML = ''; p.hidden = false;
   p.append(h('div.ph-head', h('div.ph-t', h('b', title), sub ? h('span', sub) : null), h('button.px', { 'data-a': 'popx', type: 'button', 'aria-label': 'Close' }, '×')), h('div.ph-body', body));
 }
