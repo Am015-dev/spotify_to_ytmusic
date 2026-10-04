@@ -82,6 +82,7 @@ function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=
     const n=G.np,cols=S.cols>=n?n:S.cols,rows=Math.ceil(n/cols),sw=UI.phone?44:38,sh=UI.phone?62:54,gap=6,tw=cols*sw+(cols-1)*gap,th=rows*sh+(rows-1)*gap;
     for(let s=0;s<n;s++){const sp=V.pl[s].supp,cnt=sp.r[r]+sp.x[r];if(!cnt)continue;const c=s%cols,rw=Math.floor(s/cols);const x=S.cx-tw/2+c*(sw+gap)+sw/2,y=S.cy-th/2+rw*(sh+gap)+sh+(UI.phone?10:9);
       f.push('<g transform="translate('+x+' '+y+')"><circle r="'+(UI.phone?11:10)+'" fill="'+fcol(s)+'" stroke="#fff3c4" stroke-width="2"/><text y="5" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="'+TBKit.fonts.display+'">'+cnt+'</text></g>')}}
+  regionChips(f);
   if(UI.phone&&(UI.bs||0)>=250){ // phones: the kit's banners are hidden, so every location gets a short name tag of its own
     for(let l=0;l<6;l++){const P=LOCPOS[l],name=LOCN[l],fs=36,words=name.split(' ');const lines=name.length>8&&words.length>1?[words[0],words.slice(1).join(' ')]:[name];
       const wd=Math.max(...lines.map(t=>t.length))*fs*.6+18,ht=lines.length*fs+8;const cx=Math.max(wd/2+4,Math.min(996-wd/2,P[0])),top=P[1]+52;
@@ -98,3 +99,19 @@ function drawSelName(){const g=MAP.sg;if(!g)return;if(UI.phone){g.innerHTML='';r
 function mapReveal(ev){if(!MAP.m||!ANIM)return Promise.resolve();const a=LOCID[2*ev.r];const ents=ev.parts.filter(s=>ev.cardsF&&ev.cardsF[s]&&ev.cardsF[s].length).map(s=>{const ids=ev.cardsF[s];let tot=0;for(const id of ids)tot+=TB.cardInfo(G,id).strength;return {seat:s,value:tot,winner:ev.winner===s}});
   if(!ents.length)return Promise.resolve();try{return MAP.m.revealSlots(a,ents,{stagger:140}).catch(()=>{})}catch(e){return Promise.resolve()}}
 function mapResetReveal(r){try{MAP.m&&MAP.m.resetReveal(LOCID[2*r])}catch(e){}MAP.slotDirty=true}
+// strength chips per region: what you know of each side (your hidden cards, revealed cards, Supporters; a rival's hidden card is "?"),
+// the live preview during a Clash, and the final totals (crown = winner) once it is fought
+const CHIPPOS=[[500,312],[232,962],[768,962]];
+function regionChips(f){if(!G||!UI.V||G.phase==='setup')return;const V=UI.V,me=vs();const live=G.clash&&['day','night','tally'].includes(G.step)?preview(V):null;
+  for(let r=0;r<3;r++){const R=V.reg[r];const res=UI.clashRes[r];const anySup=V.pl.some(p=>p.supp.r[r]);if(!R.down.length&&!R.up.length&&!anySup&&!res)continue;if(R.done&&!res)continue;
+    const seats=youFirst(V.pl.map(p=>p.seat));const pills=[];
+    for(const s of seats){let txt,win=false;
+      if(res&&res.tot&&res.tot[s]!=null){txt=String(res.tot[s]);win=res.winner===s}
+      else if(live&&live.r===r&&live.tot[s]!=null){txt=String(live.tot[s]);win=live.win.length===1&&live.win[0]===s}
+      else{let known=0,unk=0;for(const id of R.up)if(ownerOf(id)===s&&!R.took.includes(id))known+=TB.cardInfo(G,id).strength;for(const id of R.down)if(ownerOf(id)===s){if(id>=0)known+=TB.cardInfo(G,id).strength;else unk++}
+        const sp=V.pl[s].supp.r[r]*(G.rm&&G.rm.masonry&&G.rm.masonry.includes(s)?2:1);if(!unk&&!known&&!sp)continue;txt=unk?'?'+(known+sp?'+'+(known+sp):''):String(known+sp)}
+      pills.push({s,txt,win})}
+    if(!pills.length)continue;const fs=58,pw=p=>Math.max(78,p.txt.length*fs*.62+34),ph=74,gap=10;const tot=pills.reduce((a,p)=>a+pw(p),0)+gap*(pills.length-1);
+    let x=CHIPPOS[r][0]-tot/2;const y=CHIPPOS[r][1];
+    f.push('<g class="rchip" data-reg="'+r+'">'+pills.map(p=>{const w=pw(p);const g='<g transform="translate('+Math.round(x)+' '+(y-ph/2)+')"><rect width="'+Math.round(w)+'" height="'+ph+'" rx="'+ph/2+'" fill="'+fcol(p.s)+'" stroke="'+(p.win?'#ffd24a':'#fff3c4')+'" stroke-width="'+(p.win?8:3)+'"/>'+
+      '<text x="'+Math.round(w/2)+'" y="'+(ph/2+fs*.36)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#fff" stroke="#000" stroke-opacity=".45" stroke-width="3" paint-order="stroke">'+esc(p.txt)+(p.s===me?'':'')+'</text></g>';x+=w+gap;return g}).join('')+'</g>')}}
