@@ -1,4 +1,0 @@
-normal g2 green Foxmere                       15/60  25% avg rounds 7.0 {"spin":5,"checks:gear+axis":4,"checks:planes":3,"checks:gear":3,"short":3,"checks:gear+flaps+axis":1,"speed":5,"mandatory":6,"checks:axis":3,"checks:planes+axis":2,"checks:flaps":6,"checks:gear+flaps":1,"checks:planes+gear+axis":1,"checks:planes+gear":1,"checks:flaps+axis":1} 496ms/game
-normal g3 green Seabright Bay                 19/60  32% avg rounds 6.7 {"short":7,"mandatory":4,"checks:axis":5,"speed":5,"spin":8,"collision":2,"checks:planes+axis":1,"checks:flaps+axis":2,"corridor":3,"checks:flaps":2,"checks:gear+flaps":1,"checks:gear+axis":1} 381ms/game
-BAND normal green 34/120 28.3%
-errors 0 stalls 0 time 52.7s

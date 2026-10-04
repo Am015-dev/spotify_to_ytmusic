@@ -30,7 +30,7 @@ function runGame(opts, mode) {
   }
   if (G.phase !== 'over') { problems++; bad.push('stall ' + G.mission.id); return G; }
   G.result.tasks.forEach((s, i) => { const id = G.tasks[i].id; if (s > 0) jobDone[id]++; else jobFail[id]++; });
-  fire('result:' + (G.result.ok ? 'won' : 'lost')); if (/Sunstar 5/.test(G.result.why)) fire('m27-fail'); if (/two more/.test(G.result.why)) fire('gap-fail'); if (/Coral card or a Lantern/.test(G.result.why)) fire('m12-fail'); if (/first trick winner/.test(G.result.why)) fire('m23-fail'); if (/Time/.test(G.result.why)) fire('time-fail');
+  fire('result:' + (G.result.ok ? 'won' : 'lost')); if (/Sunstar 5/.test(G.result.why)) fire('m27-fail'); if (/two more/.test(G.result.why)) fire('gap-fail'); if (/Coral card or a Lantern/.test(G.result.why)) fire('m12-fail'); if (/winner of the first trick/.test(G.result.why)) fire('m23-fail'); if (/Time/.test(G.result.why)) fire('time-fail');
   if (G.mission.m27) fire('m27-played'); if (G.mission.m23) fire('m23-played'); if (G.mission.gap) fire('gap-played'); if (G.mission.m12) fire('m12-played');
   // retry both ways
   if (!G.result.ok && G.att < 3) { LD.nextAttempt(G, { same: games % 2 === 0 }); fire(games % 2 === 0 ? 'retry-same' : 'retry-new'); if (LD.checkInvariants(G).length) { problems++; bad.push('retry invariant'); } }

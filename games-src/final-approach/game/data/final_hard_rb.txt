@@ -1,5 +1,0 @@
-hard r1 red Cloudspire                         0/16   0% avg rounds 6.3 {"mandatory":1,"collision":4,"fuel":8,"corridor":2,"speed":1} 27027ms/game
-hard r2 red Seabright Bay                      0/16   0% avg rounds 6.5 {"fuel":5,"mandatory":2,"spin":1,"short":4,"collision":1,"speed":2,"corridor":1} 22021ms/game
-hard r3 red Palmreach                          2/16  13% avg rounds 6.7 {"speed":3,"fuel":1,"checks:axis":1,"mandatory":4,"collision":1,"checks:flaps+axis":1,"spin":1,"short":2} 13870ms/game
-hard r4 red Lake Orrin                         0/16   0% avg rounds 7.0 {"speed":12,"mandatory":4} 23079ms/game
-hard r5 red Bowlrock                           0/16   0% avg rounds 6.4 {"fuel":10,"mandatory":2,"speed":1,"spin":2,"collision":1} 42503ms/game
