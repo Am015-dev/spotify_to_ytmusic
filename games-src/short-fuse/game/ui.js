@@ -1,7 +1,7 @@
 // ===================== Short Fuse: the page (stage 2) =====================
 // Every human input goes through act(move, seat) (the hook for the stage-3 network layer).
 // Every seat's view is drawn from knowledge(seat) only (the hidden-information rule for hot-seat and online play).
-AIDELAY=900;ANIM=1;UI.sim=0;
+AIDELAY=1250;ANIM=1;UI.sim=0;
 Object.assign(UI,{started:false,holder:-1,sel:null,pause:false,speed:1,tickRate:1,help:true,coach:true,xray:true,prev:null,res:null,aiT:null,tut:null,seen:{},kitSig:{},
   lastPrompt:null,holdUntil:0,clockAcc:0,setup:null,wwk:null,offSeat:null,lastHumanRes:null,mode:'solo',rt:false,camp:null});
 const SEATC=['#ff8a1f','#16b3a6','#8f5bff','#52c23a','#ff5c9a'];
@@ -67,11 +67,11 @@ const DOING={infoStd:'choosing an opening info token',tagPick:'choosing which wi
 function doing(q){return (q&&DOING[q.kind])||'answering a question'}
 function wLabel(u){const f=findU(u);if(!f)return {s:0,k:0,t:'?'};const sl=G.st[f.s].w[f.k];const v=sl&&ownerOf(f.s)===(UI.V&&UI.V.seat)?cv(sl.id):null;return {s:f.s,k:f.k,t:`wire ${LET(f.k)}${v!=null?' ('+VNm(v)+')':''}`}}
 (function(){const set=(id,o)=>{const t=TUTORIAL.find(x=>x.id===id);if(t)Object.assign(t,o)};
- set('hello',{p:'You defuse the bomb together. <b>Cut every wire</b> on every stand to win. The <b>fuse</b> (the bomb timer, top of the panel) burns one step on every miss: when it is gone, boom. The <b>foreman</b> (marked ★) starts.'});
+ set('hello',{t:'Defuse it together',p:'Your crew wins when <b>every wire is cut</b>. Each wrong guess burns one step of the <b>fuse</b> (the orange bars at the top): when it runs out, boom. The ★ <b>foreman</b> goes first; with 3 crew the foreman holds two racks of wires, so has twice as many.'});
  set('stand',{p:'A <b>stand</b> is the rack that holds a player\'s wires. Yours is at the front of the table, face up for you and sorted from low to high. Your crewmates see only the backs of your wires, and you see only theirs.'});
- set('open',{p:'Everyone starts by placing an <b>info token</b>: a marker in front of one of your wires that tells the whole crew its number (placing one is called <b>tagging</b> the wire). Pick one of yours.'});
+ set('open',{t:'Your wires',p:'The tiles below are <b>your wires</b>, sorted low to high. Only you see their numbers; crewmates see the backs. To start, everyone shows <b>one</b> wire to the crew: tap one of yours.'});
  set('confirm',{p:'Check the summary and press the big button. The <b>Suggested move</b> card shows a good move and says why.'});
- set('solo',{p:'If you hold <b>all</b> the wires still left of a value (all four, or the last two), you may cut them yourself without pointing: a solo cut never fails. The <b>Solo cut</b> button is at the top of this panel.'});
+ set('solo',{p:'If you hold <b>all</b> the remaining uncut wires of a value (all four, or the last two), you may cut them yourself without pointing: a solo cut never fails. The <b>Solo cut</b> button is at the top of this panel.'});
  set('know',{p:'The bulb button (Know) opens the full table of what every wire could be. Use it whenever you are unsure.'})})();
 // who must decide next (question owner, actor, or a claimer)
 function decider(){if(!G||G.over)return -1;return sideToAct()}
@@ -93,19 +93,23 @@ function posOf(s){return G.pos[s]}
 function seatStands(seat){return standsOf(seat).slice().sort((a,b)=>a-b)}
 function wireName(si,k,V){const own=ownerOf(si);const ss=seatStands(own);const two=ss.length>1;const who=V&&own===V.seat?'your':nm(own)+'\'s';return `${who} wire ${LET(k)}${two?' (stand '+(ss.indexOf(si)+1)+')':''}`}
 // engine texts say "stand 3, slot 2": rewrite to the letters on the table
-function nice(t,V){return hintify(t).replace(/stand (\d+),? slots? ([\d,]+)/g,(m,a,b)=>{const si=+a-1;if(!G.st[si])return m;const ks=b.split(',').map(x=>+x-1);return ks.length>1?wireName(si,ks[0],V).replace(/wire [A-Z]/,'wires '+ks.map(LET).join(', ')):wireName(si,ks[0],V)})}
+function nice(t,V){return hintify(t).replace(/Miss: none of those is ([^.]+)\./g,'Miss: wrong number (not $1).').replace(/\b(Cut|Tag) slot (\d+)\b/g,(m,a,b)=>a+' wire '+LET(+b-1)).replace(/stand (\d+),? slots? ([\d,]+)/g,(m,a,b)=>{const si=+a-1;if(!G.st[si])return m;const ks=b.split(',').map(x=>+x-1);return ks.length>1?wireName(si,ks[0],V).replace(/wire [A-Z]/,'wires '+ks.map(LET).join(', ')):wireName(si,ks[0],V)})}
 // ---------- the one entry point for human input (stage 3 intercepts here) ----------
 function act(m,seat){if(!G||G.over)return {success:false,error:'no game'};if(seat==null)seat=viewer();
   if(!isHuman(seat))return {success:false,error:'not a human seat'};
   if(typeof window.NET_INTERCEPT==='function'){const r=window.NET_INTERCEPT(m,seat);if(r)return r}
   const err=legal(m,seat);if(err){toast(err);sfx('buzzer');return {success:false,error:err}}
   if(isClient()){if(seat!==NET.mySeat||(NET.pend===G.logN&&Date.now()-NET.pendT<2500))return {success:false,error:'wait'};NET.pend=G.logN;NET.pendT=Date.now();UI.sel=null;sfx('click');netSend(m);refresh();return {success:true,sent:1}}
-  UI.sel=null;UI.offSeat=null;UI.lastActor=seat;if(modeOf()==='solo'){UI.aiNotBefore=Date.now()+2800/UI.speed;UI.myAck=false}sfx('click');return applyMove(m,seat)}
+  if(modeOf()==='solo'&&decider()===seat&&!G.q&&G.phase==='turn')UI.myLastTurn=G.turn;UI.sel=null;UI.offSeat=null;UI.lastActor=seat;if(modeOf()==='solo'){UI.aiNotBefore=Date.now()+2800/UI.speed;UI.myAck=false}sfx('click');return applyMove(m,seat)}
 function applyMove(m,seat){const r=performMove(m,seat);if(!r.success){console.error('move rejected: '+r.error+' '+JSON.stringify(m));refresh()}return r}
 // ---------- snapshots: what changed since the last refresh (drives sounds, effects and the result banner) ----------
 function snap(){const cut=new Set(),tok={};for(const s of G.st)for(const x of s.w){if(x.cut)cut.add(x.u);tok[x.u]=x.tok.length}let side=0;for(const s of G.st)side+=s.side.length;
   return {g:G.seed+':'+G.mission,logN:G.logN,dial:G.dial,cut,tok,side,valid:G.valid.length,over:!!G.over,rf:G.ms.rf?G.ms.rf.at:null,turn:G.turn}}
-function diffFx(a,b){if(!a||a.g!==b.g)return;const newLog=G.log.filter(l=>l.i>a.logN).reverse();if(!newLog.length&&b.dial===a.dial)return;
+// whose turn a log turn number was (from the "— X's turn —" line); -1 for the opening
+// a later result on the same turn of yours (the tag after a miss, the fuse step) belongs to the same card
+function PX_SAME(a,b){return a.kind==='miss'||b.kind==='info'||b.kind==='miss'}
+function turnActor(t){const l=G.log.find(x=>x.turn===t&&x.c==='turn');if(!l)return -1;const m=/— (.+)'s turn —/.exec(l.t);const q=m&&G.seats.find(x=>x.nm===m[1]);return q?q.i:-1}
+function diffFx(a,b){if(!a||a.g!==b.g){UI.lastActor=null;return}const newLog=G.log.filter(l=>l.i>a.logN).reverse();if(!newLog.length&&b.dial===a.dial){if(!G.q||G.q.who!==UI.lastActor)UI.lastActor=null;return}
   const newCut=[...b.cut].filter(u=>!a.cut.has(u));const newTok=Object.keys(b.tok).filter(u=>b.tok[u]>(a.tok[u]||0));
   const txt=newLog.map(l=>l.t).join(' ');const ev={cuts:newCut,toks:newTok,lines:newLog};
   const dialDown=b.dial!=null&&a.dial!=null&&b.dial<a.dial||(b.rf!=null&&a.rf!=null&&b.rf>a.rf&&/miss/i.test(txt)),dialUp=b.dial!=null&&a.dial!=null&&b.dial>a.dial;
@@ -118,8 +122,8 @@ function diffFx(a,b){if(!a||a.g!==b.g)return;const newLog=G.log.filter(l=>l.i>a.
   else if(newCut.length)kind='hit';
   else if(dialDown)kind='miss';
   const lines=newLog.filter(l=>l.c!=='turn');
-  if(kind||lines.some(l=>l.c==='eq'||l.c==='good'||l.c==='bad'||l.c==='big'))UI.res={kind:kind||'info',lines:lines.slice(-6),turn:G.turn,actor:UI.lastActor!=null?UI.lastActor:G.actor,t:Date.now()};
-  if(UI.res&&modeOf()==='solo'&&UI.lastActor!=null&&UI.lastActor===humans()[0]){UI.myRes=UI.res;UI.myAck=false}
+  const made=!!(kind||lines.some(l=>l.c==='eq'||l.c==='good'||l.c==='bad'||l.c==='big'));if(made)UI.res={kind:kind||'info',lines:lines.slice(-6),turn:G.turn,actor:UI.lastActor!=null?UI.lastActor:G.actor,t:Date.now()};
+  if(made&&UI.res.kind!=='info'&&modeOf()==='solo'&&UI.res.lines.length&&turnActor(UI.res.lines[UI.res.lines.length-1].turn)===humans()[0]){const pm=UI.myRes;if(pm&&pm.turn===UI.res.turn&&pm!==UI.res&&(PX_SAME(pm,UI.res))){pm.lines=pm.lines.concat(UI.res.lines).slice(-6);if(UI.res.kind!=='info')pm.kind=pm.kind==='miss'?'miss':UI.res.kind;UI.res=pm}else{UI.myRes=UI.res;UI.myAck=false}}
   UI.lastActor=null;
   if(!ANIM)return;
   const tileAt=u=>tid(u);
@@ -141,7 +145,7 @@ function refresh(){if(!G||!UI.started)return;try{if(window.PerfHUD)PerfHUD.wake(
   if(G.over&&!UI.campDone){UI.campDone=1;recordResult()}
   const V=view();UI.V=V;
   if(UI.sel&&!selValid(V))UI.sel=null;
-  syncBoard(V);renderDock(V);renderOpenDrawer();audioMood(V);
+  syncBoard(V);renderDock(V);setHTML('#feed',feedHTML(V));renderOpenDrawer();audioMood(V);
   const need=humanNeeded();if(need||UI.brief)GX.showDock();
   if(need&&need!==UI.lastNeed){UI.lastNeed=need;if(ANIM)sfx('turn')}if(!need)UI.lastNeed=null;
   schedule();netAfter()}
@@ -206,6 +210,22 @@ function syncBoard(V){if(!window.SFKit)return;const np=G.np;const me=kitMe();con
   kitCall('ch',JSON.stringify(ch),()=>SFKit.setCharacters(ch));
   const hl=highlights(V);kitCall('hl',JSON.stringify(hl),()=>SFKit.highlight(hl));
   chipSet();const zb=$('#zoombtn');if(zb){zb.hidden=!G||G.over||!(window.SFKit&&SFKit._K&&SFKit._K.on);zb.lastChild.textContent=UI.zoomI>=0?' Zoom: '+nm(zoomSeats()[UI.zoomI]||0)+' (tap to change)':' Zoom'}}
+// ---------- the feed on the table: the goal and the race, then every move since your last turn, one line each ----------
+function raceText(){const tot=G.st.reduce((a,s)=>a+s.w.length,0),cut=G.st.reduce((a,s)=>a+s.w.filter(x=>x.cut).length,0);
+  const fuse=G.dial!=null?`fuse: ${G.dial} miss${G.dial===1?'':'es'} left`:G.ms.robotFuse?`robot fuse ${G.ms.robotFuse.at}/12`:'';return {tot,cut,fuse}}
+function shortTurn(lines,V){const me=V&&V.seat>=0&&modeOf()==='solo'?nm(V.seat):null;let t=lines.map(l=>l.t).join(' ');
+  t=t.replace(/(\S+) points at a wire of (\S+) and says "([^"]+)"([^.]*)\./g,(m,a,b,v,x)=>`${a} → ${b}'s wire: "${v}"${/\(([^)]+)\)/.test(x)?' ('+/\(([^)]+)\)/.exec(x)[1]+')':''}.`)
+   .replace(/Hit! \S+'s wire is (\S+?); \S+ cuts a matching \S+ too\./g,'HIT: both $1s cut.').replace(/All four (\S+?)s are cut: validation token \S+ goes on the track\./g,'All four $1s are done ✓.')
+   .replace(/(\S+) solo-cuts (\d+) × (\S+?)\./g,'$1 solo-cuts $2 × $3.').replace(/Miss: none of those is ([^.]+)\./g,'MISS: not $1. Fuse −1.').replace(/(\S+) places an opening token\./g,'$1 shows one wire (opening token).').replace(/(.+?) is unlocked\./g,'New gear ready: $1 (anyone may use it; tap its chip to read it).');
+  t=nice(t,V);if(me)t=t.replace(new RegExp("\\b"+me.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"'s wire",'g'),'your wire');return t}
+function feedHTML(V){if(!G||!UI.started)return '';const R=raceText();
+  let h=`<div class="goal"><b>Goal:</b> cut all ${R.tot} wires · <b>${R.cut} cut</b>${R.fuse?' · '+esc(R.fuse):''}</div>`;if(G.over)return h;
+  const solo=modeOf()==='solo'&&V&&V.seat>=0;const from=solo&&UI.myLastTurn!=null?UI.myLastTurn:-1;const by={},order=[];
+  for(const l of G.log.slice().reverse()){if(l.turn<=from&&solo)continue;if(l.c==='big'&&/fuse is lit|Job \d+:/.test(l.t))continue;if(!(l.turn in by)){by[l.turn]={who:null,lines:[]};order.push(l.turn)}if(l.c==='turn'){const m=/— (.+)'s turn —/.exec(l.t);if(m)by[l.turn].who=m[1];continue}by[l.turn].lines.push(l)}
+  const groups=order.filter(t=>by[t].lines.length).slice(-3);UI.recapN=groups.length;if(!groups.length)return h;
+  const col=n=>{const q=G.seats.find(x=>x.nm===n);return q?SEATC[posOf(q.i)%5]:'#fff'};
+  h+=`<ol class="recap">${solo&&from>=0?'<li class="rh">Since your last turn:</li>':''}${groups.map((t,i)=>{const g=by[t];const txt=shortTurn(g.lines,V);const w=g.who||(/^(\S+)/.exec(g.lines[0].t)||[])[1];
+    const cls=g.lines.some(l=>/Miss|BOOM|blows/i.test(l.t))?' bad':g.lines.some(l=>/Hit!|solo-cuts|reveals/.test(l.t))?' good':'';return `<li class="${cls}${i===groups.length-1?' new':''}" style="--sc:${col(w)}">${esc(txt)}</li>`}).join('')}</ol>`;return h}
 function zoomSeats(){const me=kitMe();return G.seats.map(q=>q.i).filter(i=>i!==me&&G.st.some(st=>ownerOf(st.i)===i))}
 function zoomNext(){const z=zoomSeats();UI.zoomI=(UI.zoomI==null?-1:UI.zoomI)+1;if(UI.zoomI>=z.length)UI.zoomI=-1;try{if(UI.zoomI<0)SFKit.focus(null);else SFKit.focus({kind:'stand',seat:posOf(z[UI.zoomI])},2.2)}catch(e){}refresh()}
 function chipSet(){const chip=$('#chip');if(!chip||!G)return;const s=decider();chip.classList.toggle('hv',!!UI.hoverTxt);chip.textContent=UI.hoverTxt||(G.over?'':UI.pause?'Paused':s>=0&&!isHuman(s)?`${nm(s)} is thinking…`:'')}
@@ -307,10 +327,10 @@ function renderDock(V){$('#dockt').textContent=dockTitle(V);$('#road').innerHTML
   $('#logmini').innerHTML=G.log.filter(l=>l.c!=='turn').slice(0,4).map(l=>`<div class="lg-${l.c||'n'}">${esc(nice(l.t,V))}</div>`).join('');
   const jc=$('#jobchip');jc.hidden=false;jc.innerHTML=`Job ${G.mission}<span class="jn">: ${esc(MISSIONS[G.mission].nm)}</span>`;paintIcons($('.gx-dock'))}
 function setHTML(sel,h){const el=$(sel);if(el._h!==h){el._h=h;el.innerHTML=h}}
-function dockSig(V){return JSON.stringify([G.logN,G.step,G.actor,G.turn,!!G.q,G.q&&G.q.kind,G.q&&G.q.who,V.seat,passTo(),UI.sel,UI.pause,UI.help,UI.coach,!!UI.brief,UI.myAck,!!G.over,G.prompt&&G.prompt.t,UI.holder,modeOf()==='watch'&&UI.xray,UI.wwkN])}
+function dockSig(V){return JSON.stringify([G.logN,G.step,G.actor,G.turn,!!G.q,G.q&&G.q.kind,G.q&&G.q.who,V.seat,passTo(),UI.sel,UI.pause,UI.help,UI.coach,!!UI.brief,UI.myAck,UI.hintTurn,!!G.over,G.prompt&&G.prompt.t,UI.holder,modeOf()==='watch'&&UI.xray,UI.wwkN])}
 function resBox(r,V,cls2){const big={hit:'SNIP!',solo:'SNIP SNIP!',reveal:'REVEALED',miss:'BUZZ!',phew:'PHEW!',info:'',win:'DEFUSED!',boom:'BOOM!'}[r.kind];
   const cls={hit:'hit',solo:'hit',reveal:'hit',miss:'miss',phew:'phew',info:'info',win:'win',boom:'boom'}[r.kind];
-  let why='';if(r.kind==='miss'){const line=r.lines.find(l=>/Miss/.test(l.t));const pl=r.lines.find(l=>/ points at | says /.test(l.t));why=`${pl?`<p>${esc(nice(pl.t,V))}</p>`:''}<p>${esc(line?nice(line.t,V):'A miss.')} The fuse burned a step${G.dial!=null?', '+G.dial+' left':''}.</p>`}
+  let why='';if(r.kind==='miss'){const line=r.lines.find(l=>/Miss/.test(l.t));const pl=r.lines.find(l=>/ points at | says /.test(l.t));why=`${pl?`<p>${esc(nice(pl.t,V))}</p>`:''}<p>${esc(line?nice(line.t,V):'A miss.')} The fuse burns one step.</p>`}
   const body=r.lines.filter(l=>!/^Narrator/.test(l.t)).slice(-3).map(l=>`<p class="lg-${l.c}">${esc(nice(l.t,V))}</p>`).join('');
   return {cls,big,html:r.kind==='miss'?why+body.split('</p>').slice(0,0).join(''):body}}
 function resHTML(V){if(!G||G.over)return '';const mine=UI.myRes,r=UI.res;let h='';
@@ -328,20 +348,26 @@ function coachHTML(V){if(!UI.tut||G.over)return '';const s=tutStep(V);if(!s)retu
   return `<div class="card coach"><h3>${esc(s.t)}</h3><p>${s.p}</p><div class="row"><button class="btn small go" data-a="coach" data-id="${s.id}">${ico('check')}Got it</button><button class="linkbtn" data-a="coachask">Turn off tips</button></div></div>`}
 function tutStep(V){const T=UI.tut,d=T.done;const me=V.seat;if(me<0)return null;const pick=id=>d[id]?null:TUTORIAL.find(x=>x.id===id);
   if(G.phase==='turn'&&!d.open)d.open=1;
-  if(!d.hello)return pick('hello');if(!d.stand)return pick('stand');
-  if(V.q&&V.q.who===me&&V.q.kind==='infoStd')return pick('open');
-  if(UI.res&&UI.res.actor===me&&UI.res.turn>=G.turn-1){if(UI.res.kind==='miss'&&!d.miss)return pick('miss');if((UI.res.kind==='hit')&&!d.hit)return pick('hit')}
-  if(V.legal&&decider()===me){const s=UI.sel;if(!s&&!d.dual)return pick('dual');if(s&&s.mode==='dual'&&s.tg.length&&s.v==null&&!d.value)return pick('value');if(s&&s.v!=null&&!d.confirm)return pick('confirm');if(V.legal.solo.length&&!d.solo&&!s)return pick('solo')}
-  if(G.turn>=4&&!d.know)return pick('know');return null}
-function tipHTML(V){if(!UI.help||V.seat<0||G.over||!V.legal)return '';const W=wwk(V);if(!W||!W.suggestion)return '';const S=W.suggestion;if(noGear()&&S.m&&(S.m.tool||S.m.two||S.m.a==='eq'||S.m.a==='item'))return '';
+  if(!d.hello)return pick('hello');d.stand=1;
+  if(V.q&&V.q.who===me&&V.q.kind==='infoStd'&&!d.open)return pick('open');
+  {const r=modeOf()==='solo'?UI.myRes:UI.res;if(r&&r.actor===me&&r.turn>=G.turn-1){if(r.kind==='miss'&&!d.miss)return pick('miss');if((r.kind==='hit')&&!d.hit)return pick('hit')}}
+  if(V.legal&&decider()===me){const s=UI.sel;if(!s&&!d.dual)return pick('dual');if(V.legal.solo.length&&!d.solo&&!s)return pick('solo')}
+  return null}
+// hints are a resource: unlimited in the guided game, 3 per job otherwise (testers: "Suggest plays the game for me")
+const HINTS=3;function hintsLeft(){return UI.guided?99:UI.hintsLeft==null?HINTS:UI.hintsLeft}function hintOK(){return !!UI.guided||UI.hintTurn===G.turn}
+function spendHint(){if(hintOK())return true;if(hintsLeft()<=0){toast('No hints left in this job: trust the tokens and the sort order.');return false}UI.hintsLeft=hintsLeft()-1;UI.hintTurn=G.turn;return true}
+function hintLbl(){return UI.guided?'':` (${hintsLeft()} left)`}
+function tipHTML(V){if(!UI.help||V.seat<0||G.over||!V.legal)return '';const W=wwk(V);if(!W||!W.suggestion)return '';const S=W.suggestion;
+  if(!hintOK())return hintsLeft()>0?`<div class="card"><button class="btn small" data-a="hint1">${ico('bulb')}Show a hint${hintLbl()}</button></div>`:'';if(noGear()&&S.m&&(S.m.a==='eq'||S.m.a==='item'))return '';
   return `<div class="card"><h3>${ico('bulb')} Suggested move</h3><p><b>${esc(nice(sugText(S.m,V),V))}</b></p><p class="why">${esc(nice(S.why||'',V))}</p><div class="row"><button class="btn small" data-a="sugg">Set it up for me</button><button class="btn small" data-gx="knowd">${ico('bulb')}What we know</button></div></div>`}
 function sugText(m,V){if(!m)return '';switch(m.a){case 'dual':return `Say ${VNm(m.v)}${m.v2!=null?' or '+VNm(m.v2):''} at ${m.ks.length>1?nm(ownerOf(m.st))+'\'s wires '+m.ks.map(LET).join(', '):wireName(m.st,m.ks[0],V)}${m.tool?' with the '+toolName(m.tool):''}`;case 'solo':return `Solo cut your ${VNm(m.v)}s`;case 'reveal':return 'Reveal your reds';
   case 'eq':return 'Use '+EQUIP[m.id].n;case 'item':return 'Use '+ITEMS[m.k].n;case 'multi':return 'Point at '+m.tg.length+' wires at once';default:return keyName(m)}}
+function toolHelp(t){return ({dd:'Twin Probe (once per job): point at 2 wires on one rack and say one number. A hit if either matches.',pt3:'Triple Probe (once per job): point at 3 wires on one rack and say one number. A hit if any matches.',eq3:'Point at 3 wires on one rack and say one number. A hit if any matches.',eq5:'Point at a whole rack and say one number. A hit if any wire matches.',pt10:'Say two numbers at once: a hit if the wire is either.',eq10:'Say two numbers at once: a hit if the wire is either.'})[t]||''}
 function toolName(t){return t==='dd'?'Twin Probe':t==='pt3'?'Pocket Triple Probe':t==='pt10'?'Pocket Two-Value Probe':EQUIP[t]?EQUIP[t].n:t}
 // the cached "what we know" for the current position
 function wwk(V){if(V.seat<0)return null;const key=G.logN+':'+V.seat+':'+G.turn;if(UI.wwk&&UI.wwk.key===key)return UI.wwk.W;let W=null;try{W=whatWeKnow(V.seat,ANIM?80:24)}catch(e){console.error(e)}UI.wwk={key,W};return W}
 function briefHTML(V){const n=G.mission,M=MISSIONS[n];const chips=ruleChips(n);const ng=noGear();
-  return `<div class="card brief"><h3>Job ${n}: ${esc(M.nm)}</h3><div class="row"><button class="btn go" data-a="briefok">${ico('play')}Continue</button><button class="linkbtn" data-gx="rulesd">Rules and glossary</button></div><p>${esc(BRIEFS[n]||'')}</p><p><b>The job:</b> ${esc(M.text)}</p>${chips.length?`<div class="new"><b>New this job</b><ul>${chips.map(c=>`<li><b>${esc(c[1])}:</b> ${esc(c[2])}</li>`).join('')}</ul></div>`:''}<p class="tiny">Wires: ${mixHTML(n,G.np)} Fuse: ${fuseStart(n,G.np)} steps. Gear: ${ng?'none in this job':(V.eq?V.eq.length:0)+' cards (Gear button)'}.</p></div>`}
+  return `<div class="card brief"><h3>Job ${n}: ${esc(M.nm)}</h3><div class="row"><button class="btn go" data-a="briefok">${ico('play')}Continue</button><button class="linkbtn" data-gx="rulesd">Rules and glossary</button></div><p>${esc(BRIEFS[n]||'')}</p><p><b>The job:</b> ${esc(M.text)}</p>${chips.length?`<div class="new"><b>New this job</b><ul>${chips.map(c=>`<li><b>${esc(c[1])}:</b> ${esc(c[2])}</li>`).join('')}</ul></div>`:''}<p class="crewl">${V.seats.map(q=>`<span style="--sc:${SEATC[posOf(q.i)%5]}">${q.i===G.captain?'★ ':''}<b>${esc(q.i===V.seat&&modeOf()==='solo'?'You ('+q.nm+')':q.nm)}</b> ${q.nUncut} wires${seatStands(q.i).length>1?' on 2 racks':''}</span>`).join(' · ')}<br><small>The ★ foreman goes first. Goal: cut every wire before the fuse (${fuseStart(n,G.np)} misses) runs out.</small></p><p class="tiny">Wires: ${mixHTML(n,G.np)} Fuse: ${fuseStart(n,G.np)} steps. Gear: ${ng?'none in this job (your crew card\'s Twin Probe still works once)':(V.eq?V.eq.length:0)+' cards (Gear button)'}.</p></div>`}
 function mainHTML(V){if(G.over)return overHTML(V);if(UI.brief)return briefHTML(V);
   const p=passTo();if(p>=0)return `<div class="card pass"><h3>Pass to ${esc(nm(p))}</h3><p>${UI.holder>=0?`${esc(nm(UI.holder))}, hand the device to <b>${esc(nm(p))}</b>. `:''}Everyone else looks away: the table now shows only the backs of the wires.</p>${G.q&&G.q.who===p?`<p class="hint">${esc(nm(p))} must answer: ${esc(G.q.title)}</p>`:''}<button class="btn go wide" data-a="take" data-seat="${p}">${ico('eye')}I am ${esc(nm(p))}: show my wires</button></div>`;
   let h='';if(G.prompt&&G.clock-G.prompt.t<40&&UI.rt)h+=`<div class="card q"><h3>${ico('radar'in ICO?'radar':'clock')} Narrator</h3><p>${esc(G.prompt.say)}</p></div>`;
@@ -360,12 +386,12 @@ function mainHTML(V){if(G.over)return overHTML(V);if(UI.brief)return briefHTML(V
 function qHTML(V){const q=V.q;const wires=q.opts.some(o=>o.d&&(o.d.u!=null||(o.d.st!=null&&o.d.k!=null)));
   const byU=(q.kind==='infoStd'||q.kind==='tagPick')&&q.opts.every(o=>o.d&&o.d.u!=null);let btns;
   if(byU){const gr={};q.opts.forEach((o,i)=>{const w=wLabel(o.d.u);(gr[w.s]=gr[w.s]||[]).push([o,i,w])});const keys=Object.keys(gr).sort((a,b)=>a-b);const multi=keys.length>1;
-    btns=keys.map(k=>{const ss=seatStands(ownerOf(+k));return (multi?`<div class="tagrp">${esc(ownerOf(+k)===V.seat?'Your':nm(ownerOf(+k))+'\'s')} stand ${ss.indexOf(+k)+1}</div>`:'')+`<div class="row">${gr[k].map(([o,i,w])=>`<button class="btn" data-a="q" data-i="${i}">${q.kind==='infoStd'?'Tag your ':'Tag '}${esc(w.t)}${multi?esc(', stand '+(ss.indexOf(+k)+1)):''}</button>`).join('')}</div>`}).join('');
+    btns=keys.map(k=>{const ss=seatStands(ownerOf(+k));return (multi?`<div class="tagrp">${esc(ownerOf(+k)===V.seat?'Your':nm(ownerOf(+k))+'\'s')} stand ${ss.indexOf(+k)+1}</div>`:'')+(q.kind==='infoStd'?`<div class="row tagws">${gr[k].map(([o,i,w])=>{const f=findU(o.d.u);const sl=f&&G.st[f.s].w[f.k];const v=sl?VNm(cv(sl.id)):'?';return `<button class="btn tagw" data-a="q" data-i="${i}" aria-label="Tag your ${esc(w.t)}${multi?esc(', stand '+(ss.indexOf(+k)+1)):''}"><b>${esc(v)}</b><i>${LET(f?f.k:0)}</i></button>`}).join('')}</div>`:`<div class="row">${gr[k].map(([o,i,w])=>`<button class="btn" data-a="q" data-i="${i}">Tag ${esc(w.t)}${multi?esc(', stand '+(ss.indexOf(+k)+1)):''}</button>`).join('')}</div>`)}).join('');
     const reds=[];for(const st of V.stands)if(st.mine)st.slots.forEach((x,k)=>{if(!x.cut&&x.c==='r')reds.push(LET(k))});
     if(q.kind==='infoStd'&&reds.length)btns+=`<p class="tiny">Your red wire${reds.length>1?'s':''} ${reds.join(', ')} cannot be tagged: red wires never get an opening token.</p>`}
   else btns=`<div class="row">${q.opts.map((o,i)=>`<button class="btn" data-a="q" data-i="${i}">${esc(nice(o.l,V))}</button>`).join('')}</div>`;
-  return `<div class="card q"><h3>${esc(nice(q.title,V))}</h3>${wires?'<p class="hint">Tap a glowing wire on the table, or pick below.</p>':''}${btns}${qHelp(q)}</div>`}
-function qHelp(q){const h={infoStd:'An info token is a marker in front of a wire that tells everyone its number. Everyone places one (tags one of their own blue wires): pick one that helps the crew, such as a value you hold once or twice.',pickMatch:'Two of your wires match: choose which one is cut.',tagPick:'The cut missed. To tag a wire is to put an info token with its true number in front of it, so everyone knows it: choose which pointed wire gets it.',swapPick:'A trade: pick the wire you give back.',designate:'Pick who must cut this value.',declare:'Turn over a number card: you must then cut that value.'}[q.kind];return h?`<p class="tiny">${esc(h)}</p>`:''}
+  return `<div class="card q"><h3>${esc(nice(q.title,V))}</h3>${wires&&q.kind!=='infoStd'?'<p class="hint">Tap a glowing wire on the table, or pick below.</p>':''}${btns}${qHelp(q)}</div>`}
+function qHelp(q){const h={infoStd:'These are your wires. Tap one: a token with its number goes in front of it, so the whole crew knows it. A value you hold only once or twice helps most.',pickMatch:'Two of your wires match: choose which one is cut.',tagPick:'The cut missed. To tag a wire is to put an info token with its true number in front of it, so everyone knows it: choose which pointed wire gets it.',swapPick:'A trade: pick the wire you give back.',designate:'Pick who must cut this value.',declare:'Turn over a number card: you must then cut that value.'}[q.kind];return h?`<p class="tiny">${esc(h)}</p>`:''}
 function turnHTML(V){const L=V.legal,sel=UI.sel;let h='';
   // special all-at-once actions
   if(sel&&sel.mode==='multi'){const m={a:'multi',kind:sel.kind,tg:sel.tg};const err=sel.tg.length===sel.n?legal(m,V.seat):`pick ${sel.n-sel.tg.length} more`;
@@ -379,11 +405,11 @@ function turnHTML(V){const L=V.legal,sel=UI.sel;let h='';
     const need=toolN(sel.tool);if(need>1&&need<99&&sel.tg.length<need)h+=`<p class="hint">The ${esc(toolName(sel.tool))} points at ${need} wires on one stand: tap ${need-sel.tg.length} more.</p>`;
     const vs=dualVals(sel);h+=`<div class="vals">${vs.map(v=>`<button class="vb${v==='Y'?' y':''}${sel.v===v?' sel':''}" data-a="v" data-v="${v}">${v==='Y'?'⚡':v}<small>you hold ${heldCount(V,v)}</small></button>`).join('')}</div>`;
     if(sel.two&&sel.v!=null){h+=`<p class="hint">Second value for the ${esc(toolName(sel.two))}:</p><div class="vals">${vs.filter(v=>v!==sel.v).map(v=>`<button class="vb${v==='Y'?' y':''}${sel.v2===v?' sel':''}" data-a="v2" data-v="${v}">${v==='Y'?'⚡':v}</button>`).join('')}</div>`}
-    if(sel.v!=null){const m=buildDual(sel);const err=legal(m,V.seat);let risk='';if(UI.help&&sel.tg.length===1){const W=wwk(V);const sl=W&&W.slots.find(x=>x.st===t.st&&x.k===t.k);if(sl){const p=sl.prob[String(sel.v==='Y'?'yellow':sel.v)]||0;const pr=sl.prob.red||0;risk=`<p class="why">Chance it is ${esc(VNm(sel.v))}: <b>${Math.round(p*100)}%</b>${pr>0?` · red: <b>${Math.round(pr*100)}%</b>`:''}</p>`}}
+    if(sel.v!=null){const m=buildDual(sel);const err=legal(m,V.seat);let risk='';if(UI.help&&sel.tg.length===1&&!hintOK())risk=hintsLeft()>0?`<button class="btn small" data-a="hint1">${ico('bulb')}Hint: what could it be?${hintLbl()}</button>`:'';else if(UI.help&&sel.tg.length===1){const W=wwk(V);const sl=W&&W.slots.find(x=>x.st===t.st&&x.k===t.k);if(sl){const p=sl.prob[String(sel.v==='Y'?'yellow':sel.v)]||0;const pr=sl.prob.red||0;risk=`<p class="why">Chance it is ${esc(VNm(sel.v))}: <b>${Math.round(p*100)}%</b>${pr>0?` · red: <b>${Math.round(pr*100)}%</b>`:''}</p>`}}
       h+=risk+`<button class="btn go wide" data-a="dual" ${err?'disabled':''}>${ico('cut')}Snip: say ${esc(VNm(sel.v))}${sel.v2!=null?' / '+esc(VNm(sel.v2)):''}</button>${err?`<p class="hint">${esc(err)}</p>`:''}`}}
   // tools and probes
-  const T=noGear()?{}:L.tools,tools=[];for(const t of ['dd','pt3','eq3','eq5'])if(T[t])tools.push(t);const twos=['pt10','eq10'].filter(t=>T[t]);
-  if(tools.length||twos.length||L.flip.length){h+=`<div class="gear" style="margin-top:6px">`+tools.map(t=>`<button class="gbtn tool${sel&&sel.tool===t?' on':''}" data-a="tool" data-t="${t}"><b>${toolN(t)===99?'∀':toolN(t)}</b><span>${esc(toolName(t))}<small>${t==='eq5'?'a whole stand':'point at '+toolN(t)+' wires'}</small></span></button>`).join('')+
+  const T=L.tools,tools=[];for(const t of ['dd','pt3','eq3','eq5'])if(T[t])tools.push(t);const twos=['pt10','eq10'].filter(t=>T[t]);
+  if(tools.length||twos.length||L.flip.length){h+=`<div class="gear" style="margin-top:6px">`+tools.map(t=>`<button class="gbtn tool${sel&&sel.tool===t?' on':''}" data-a="tool" data-t="${t}"><b>${toolN(t)===99?'∀':toolN(t)}</b><span>${esc(toolName(t))}<small>${t==='eq5'?'a whole stand':'point at '+toolN(t)+' wires, say one number'}${t==='dd'||t==='pt3'?' · once per job':''}</small></span></button>`).join('')+
       twos.map(t=>`<button class="gbtn tool${sel&&sel.two===t?' on':''}" data-a="two" data-t="${t}"><b>2</b><span>${esc(toolName(t))}<small>say two values</small></span></button>`).join('')+(L.flip.length?`<button class="gbtn tool${sel&&sel.fu!=null?' on':''}" data-a="flipmode"><b>↺</b><span>Use my flipped wire<small>you cannot see it</small></span></button>`:'')+`</div>`}
   if(sel)h+=`<div class="row" style="margin-top:6px"><button class="btn small" data-a="cancel">Start again</button></div>`;
   h+='</div>';
@@ -421,7 +447,7 @@ function annText(a,V){switch(a.k){case 'sweep':return `Sweep for ${a.v}: `+a.res
 function gearWords(t){const o=[];try{for(const id of Object.keys(EQUIP)){const E=EQUIP[id];if(E&&E.n&&new RegExp('\\b'+E.n+'\\b').test(t)&&shortEq(id))o.push(`<b>${esc(E.n)}</b>: a gear card that unlocks mid-job (${esc(shortEq(id).toLowerCase())}).`)}if(/Twin Probe/.test(t))o.push('<b>Twin Probe</b>: a personal tool on a crew card; it points at two wires at once.')}catch(e){}return o.length?`<p class="tiny">${o.join(' ')}</p>`:''}
 function overHTML(V){const w=G.over.win;const [title,tip]=w?['Every wire is safe.','']:lossHelp(G.over.why);const st=G.stats||{};const n=G.mission;const next=n<66?n+1:null;
   return `<div class="card over ${w?'win':'lose'}"><h3>${w?'DEFUSED!':'BOOM!'}</h3><p><b>${esc(w?G.winText:title)}</b></p>${w?'':`<p class="why"><b>Why it failed:</b> ${esc(G.over.why)}. ${esc(tip)}</p>${gearWords(tip)}`}
-  <div class="statgrid"><div><b>${G.turn}</b>turns</div><div><b>${G.dial!=null?G.dial:'-'}</b>fuse left</div><div><b>${st.miss||0}</b>misses</div><div><b>${st.dualOk||0}/${st.dual||0}</b>dual hits</div><div><b>${st.solo||0}</b>solo cuts</div><div><b>${st.eqUse||0}</b>gear used</div></div>
+  <div class="statgrid"><div><b>${G.turn}</b>turns</div><div><b>${G.dial!=null?G.dial:'-'}</b>fuse left</div><div><b>${st.miss||0}</b>misses</div><div><b>${st.dualOk||0}/${st.dual||0}</b>dual hits</div><div><b>${st.solo||0}</b>solo cuts</div><div><b>${st.eqUse||0}</b>gear + tools used</div></div>
   ${isClient()?'<p class="hint">Waiting for the host to pick the next job.</p>':`<div class="row">${w&&next?`<button class="btn go" data-a="next">${ico('fwd')}Next job: ${next}</button>`:''}<button class="btn ${w?'':'go'}" data-a="again">${ico('flip')}Play job ${n} again</button><button class="btn" data-a="board">${ico('target')}Mission board</button></div>`}</div>`}
 function toast(t){const el=$('#res');if(!el)return;el._h=null;const d=document.createElement('div');d.className='res info';d.innerHTML=`<p>${esc(t)}</p>`;el.innerHTML='';el.appendChild(d);$('#live').textContent=t;GX.showDock()}
 // ---------- dock clicks ----------
@@ -453,10 +479,11 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'offseat':UI.offSeat=+b.dataset.seat;UI.sel=null;refresh();return;
   case 'offdone':UI.offSeat=null;UI.sel=null;refresh();return;
   case 'choose':{const rem=selRemaining(UI.sel);if(rem[0])act(rem[0],V.seat);return}
-  case 'sugg':{const W=wwk(V);const m=W&&W.suggestion&&W.suggestion.m;if(!m)return;if(m.a==='dual'){UI.sel={mode:'dual',tool:m.tool||null,tg:m.ks.map(k=>({st:m.st,k})),v:m.v,v2:m.v2!=null?m.v2:null,two:m.two||null,fu:m.fu!=null?m.fu:null}}else if(m.a==='multi'){UI.sel={mode:'multi',kind:m.kind,n:m.tg.length,tg:m.tg.slice()}}else{act(m,V.seat);return}refresh();return}
-  case 'coach':UI.tut.done[b.dataset.id]=1;refresh();return;
+  case 'hint1':if(spendHint())refresh();return;
+  case 'sugg':{if(!spendHint())return;const W=wwk(V);const m=W&&W.suggestion&&W.suggestion.m;if(!m)return;if(m.a==='dual'){UI.sel={mode:'dual',tool:m.tool||null,tg:m.ks.map(k=>({st:m.st,k})),v:m.v,v2:m.v2!=null?m.v2:null,two:m.two||null,fu:m.fu!=null?m.fu:null}}else if(m.a==='multi'){UI.sel={mode:'multi',kind:m.kind,n:m.tg.length,tg:m.tg.slice()}}else{act(m,V.seat);return}refresh();return}
+  case 'coach':UI.tut.done[b.dataset.id]=1;{const k=lsGet('sf_tipsdone',{});k[b.dataset.id]=1;lsSet('sf_tipsdone',k)}refresh();return;
   case 'zoom':zoomNext();return;
-  case 'coachask':UI.coachAsk=true;refresh();return;
+  case 'coachask':UI.coach=false;UI.coachAsk=false;toast('Tips are off. "Resume lesson" in this panel turns them back on.');refresh();return;
   case 'coachkeep':UI.coachAsk=false;refresh();return;
   case 'coachoff':UI.coach=false;UI.coachAsk=false;saveSettings();refresh();return;
   case 'myack':UI.myAck=true;UI.aiNotBefore=0;refresh();return;
@@ -548,7 +575,7 @@ function jobState(V){const ms=V.ms,o=[];const N=s=>nm(s);
   if(V.robot)o.push(`The robot holds ${V.robot.n} wire${V.robot.n===1?'':'s'}.`);
   for(const st of V.stands)if(st.side.length)o.push(`Beside ${nm(st.owner)}'s stand: `+st.side.map(t=>(t.mean==='none'?'no ':'')+VNm(t.v)).join(', ')+'.');
   return o}
-function renderGear(){const V=UI.V||view();if(noGear()){$('#gearbody').innerHTML='<p><b>This training job has no equipment and no personal tools.</b> Gear cards appear in later jobs: they unlock when the crew cuts certain numbers, and this drawer will show them.</p>';return}let h='<p class="tiny">The row of cards on the table mat is the crew\'s equipment. A card is <b>locked</b> until the crew cuts the numbers named on it, then it is <b>ready</b> for one use (or every turn, if it says so) and then <b>used</b>. Personal tools sit on each player\'s crew card.</p><div class="eqgrid">';
+function renderGear(){const V=UI.V||view();if(noGear()){$('#gearbody').innerHTML='<p><b>This training job has no equipment cards.</b> Your crew card still has its <b>Twin Probe</b>: once per job, point at two wires of one crewmate and say one value; if either matches, it is a hit. Gear cards appear in later jobs: they unlock when the crew cuts certain numbers, and this drawer will show them.</p>';return}let h='<p class="tiny">The row of cards on the table mat is the crew\'s equipment. A card is <b>locked</b> until the crew cuts the numbers named on it, then it is <b>ready</b> for one use (or every turn, if it says so) and then <b>used</b>. Personal tools sit on each player\'s crew card.</p><div class="eqgrid">';
   V.eq.forEach((e,i)=>{if(e.down||!e.id){h+=`<div class="eqc locked"><div class="et"><b>?</b>Face-down card</div><div class="ex">It turns up during the job.</div><div class="es">face down</div></div>`;return}const E=EQUIP[e.id];
     h+=`<div class="eqc ${e.st}"><div class="et"><b>${E.v==='Y'?'Y':E.v}</b>${esc(E.n)}<span class="tm">${{any:'any time',turn:'your turn',start:'start of turn',instant:'instant'}[E.timing]}</span></div><div class="ex">${esc(E.text)}</div><div class="es">${e.st==='locked'?`${ico('lock')} locked: cut ${E.need===4?'all four':'two'} ${E.v==='Y'?'yellows':E.v+'s'}${e.cover!=null?' and two '+e.cover+'s':''}`:e.st==='ready'?'ready to use'+(e.perm?' (every turn)':''):'used'}</div></div>`});
   h+='</div><h3>Crew and personal tools</h3><div class="eqgrid">';
@@ -575,7 +602,9 @@ function recordResult(){if(!humans().length)return;const c=camp();const n=G.miss
 // ---------- start screen ----------
 function defaultSetup(){const s=lsGet('sf_setup',null);const d={job:1,np:3,seats:['human','ai','ai','ai','ai'],lv:'normal',chars:[],names:DEFNAMES.slice(),help:true};if(s)Object.assign(d,s,{helpTouched:0},{names:(s.names||DEFNAMES).slice()});fixSetup(d);return d}
 function fixSetup(s){s=s||UI.setup;const M=MISSIONS[s.job];if(!M.pl.includes(s.np))s.np=M.pl.find(x=>x>=s.np)||M.pl[M.pl.length-1];if(!s.helpTouched)s.help=true;const ok=allowedChars(s.job,s.np);s.chars=s.chars||[];for(let i=0;i<5;i++)if(s.chars[i]&&!ok.includes(s.chars[i]))s.chars[i]='';return s}
-function preset(v){const s=UI.setup;if(v==='solo')s.seats=['human','ai','ai','ai','ai'];if(v==='hot')s.seats=['human','human','human','human','human'];if(v==='watch')s.seats=['ai','ai','ai','ai','ai'];renderStart()}
+function preset(v){const s=UI.setup;if(v==='solo')s.seats=['human','ai','ai','ai','ai'];if(v==='hot')s.seats=['human','human','human','human','human'];if(v==='watch')s.seats=['ai','ai','ai','ai','ai'];s.picked=v;renderStart();
+  try{const b=$('#start [data-a=start]');if(b){if(b.scrollIntoView)b.scrollIntoView({block:'nearest'})}}catch(e){}}
+function seatMode(s){const k=s.seats.slice(0,s.np).filter(x=>x==='human').length;return k===0?'watch':k===1?'solo':'hot'}
 function showStart(){if(isClient()){hideStart();return}clearTimeout(UI.aiT);UI.aiT=null;UI.setup=UI.setup||defaultSetup();sndLoop('hum',true);musicStop(.8);$('#start').hidden=false;renderStart();sndLoop('clock_loop',false)}
 function hideStart(){$('#start').hidden=true;sndLoop('hum',false)}
 function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=camp();const saved=savedGame();
@@ -585,23 +614,23 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=camp();const sav
   const onl=isHost(),nOnl=onl?Math.min(s.np,NET.peers.length||1):0;const seats=[];for(let i=0;i<s.np;i++)seats.push(`<div class="seat" style="--sc:${SEATC[i]}"><span class="dot"></span><span class="nm">${onl&&i<nOnl?`<b>${esc(netPlan(s).names&&netPlan(s).names[i]||'Player')}</b>`:`<input data-nm="${i}" value="${esc(s.names[i])}" aria-label="Name of seat ${i+1}" maxlength="14" style="width:7.5em;font:800 .9rem var(--fb);border:2px solid var(--ink);border-radius:8px;padding:3px 5px;background:#fff7e8">`}<select data-ch="${i}" aria-label="Crew card for seat ${i+1}"><option value="">Crew: random</option>${ok.map(id=>`<option value="${id}"${s.chars[i]===id?' selected':''}>${esc(CHARS[id].n)} (${esc(ITEMS[CHARS[id].item].n)})</option>`).join('')}</select></span>${onl?`<span class="tag${i<nOnl?' b':''}">${i<nOnl?ico('user')+'Online player':ico('robot')+'Computer'}</span>`:`<button class="btn small${s.seats[i]==='human'?' on':''}" data-a="seatkind" data-i="${i}">${s.seats[i]==='human'?ico('user')+'Human':ico('robot')+'Computer'}</button>`}</div>`);
   const nh=s.seats.slice(0,s.np).filter(x=>x==='human').length;
   $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">${ICO.bomb}</svg><div><h1>Short Fuse</h1><p>A cartoon demolition crew defuses rigged charges together. 2-5 players, 66 jobs.</p></div><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back to the job</button>':''}</div>
-  <div class="st-body"><div class="pane"><div class="quick"><button class="btn blue" data-a="tutorial">${ico('info')}Guided first game<small>Job 1 with a coach: best for new players</small></button>${saved?`<button class="btn go" data-a="resume">${ico('play')}Continue<small>Job ${saved.G.mission}, turn ${saved.G.turn}</small></button>`:`<button class="btn" data-a="preset" data-v="solo">${ico('user')}Me + computers<small>one human seat</small></button>`}<button class="btn" data-a="preset" data-v="${saved?'solo':'hot'}">${ico(saved?'user':'swap')}${saved?'Me + computers':'Hot-seat'}<small>${saved?'one human seat':'pass the device'}</small></button></div>
-    ${onlineBlock()}<h2>${ico('map')} Mission board</h2><p class="tiny">Win a job to unlock the next. Every job can still be played at any time. ✓ = defused, ⏱ = timed.</p>${jobs}</div>
+  <div class="st-body"><div class="pane"><div class="quick"><button class="btn blue" data-a="tutorial">${ico('info')}Guided first game<small>Job 1 with a coach: best for new players</small></button>${saved?`<button class="btn go" data-a="resume">${ico('play')}Continue<small>Job ${saved.G.mission}, turn ${saved.G.turn}</small></button>`:`<button class="btn${s.picked&&seatMode(s)==='solo'?' on':''}" data-a="preset" data-v="solo" aria-pressed="${!!s.picked&&seatMode(s)==='solo'}">${ico('user')}Me + computers<small>you and ${s.np-1} computer crewmate${s.np>2?'s':''}</small></button>`}<button class="btn${s.picked&&seatMode(s)===(saved?'solo':'hot')?' on':''}" data-a="preset" data-v="${saved?'solo':'hot'}">${ico(saved?'user':'swap')}${saved?'Me + computers':'Hot-seat'}<small>${saved?'one human seat':'pass the device'}</small></button></div>
+    ${s.picked?`<p class="chosen" role="status">${ico('check')}<b>${seatMode(s)==='solo'?'You + '+(s.np-1)+' computer crewmate'+(s.np>2?'s':''):seatMode(s)==='hot'?s.np+' humans, one device':'Watching '+s.np+' computers'}</b> · Job ${n} · then press <b>Start job ${n}</b></p>`:''}${onlineBlock()}<h2>${ico('map')} Mission board</h2><p class="tiny">Win a job to unlock the next. Every job can still be played at any time. ✓ = defused, ⏱ = timed.</p>${jobs}</div>
    <div class="pane"><div class="brief"><div class="bt"><b>${n}</b><h3>${esc(M.nm)}</h3></div><p class="flav">${esc(BRIEFS[n]||'')}</p>
     <div class="tags"><span class="tag b">${mixHTML(n,s.np)}</span><span class="tag">${ico('fuse')}Fuse ${fuseStart(n,s.np)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?`<span class="tag t">${ico('clock')}Timed</span>`:''}<span class="tag">${M.pl[0]}-${M.pl[M.pl.length-1]} players</span>${j&&j.w?`<span class="tag e">${ico('check')}Defused ${j.w}×${j.best&&j.best.left!=null?', best: '+j.best.left+' fuse left':''}</span>`:j&&j.p?`<span class="tag r">Tried ${j.p}×</span>`:''}</div>
     <p class="tiny">${esc(M.text)}</p>${chips.map(c=>`<span class="tag" style="margin:2px 2px 0 0">${ico(c[0])}${esc(c[1])}</span>`).join('')}</div>
     <div class="setup"><div><div class="lbl">Crew size</div><div class="seg">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div></div>
     <div><div class="lbl">Seats</div>${onl?`<p class="tiny">Online: seats go to the players in the lobby in join order; the rest are played by the computer.</p>`:`<div class="seg" style="margin-bottom:4px"><button class="btn small" data-a="preset" data-v="solo">Me + computers</button><button class="btn small" data-a="preset" data-v="hot">All human (hot-seat)</button><button class="btn small" data-a="preset" data-v="watch">Watch the computer</button></div>`}${seats.join('')}</div>
     <div><div class="lbl">Computer level</div><div class="seg">${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div></div>
-    ${nh||onl?`<div><button class="swt${s.help?' on':''}" role="switch" aria-checked="${!!s.help}" data-a="helpset"><i></i>Suggested move: ${s.help?'On':'Off'}</button><p class="tiny">Shows a good move and why, on every turn of yours.</p></div>`:''}
+    ${nh||onl?`<div><button class="swt${s.help?' on':''}" role="switch" aria-checked="${!!s.help}" data-a="helpset"><i></i>Suggested move: ${s.help?'On':'Off'}</button><p class="tiny">A good move and why, when you ask: 3 hints per job.</p></div>`:''}
     <button class="btn go wide" data-a="start">${ico('play')}${onl?'Start job '+n+' online ('+nOnl+' player'+(nOnl>1?'s':'')+')':nh===0?'Watch job '+n:nh===1?'Start job '+n:'Start job '+n+' (hot-seat, '+nh+' humans)'}</button></div></div></div>`;paintIcons($('#start'))}
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}
 function realtimeJob(n){const M=MISSIONS[n];return !!(M.audio||hasRule(n,'timer'))}
 function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats=plan.seats;s.names=plan.names;fixSetup(s)}
   if(!plan&&!s.tutorial)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names,help:s.help});UI.lastSetup=s;
   const seats=s.seats.slice(0,s.np);const chars={};let any=0;for(let i=0;i<s.np;i++)if(s.chars[i]){chars[i]=s.chars[i];any=1}
-  UI.rt=realtimeJob(s.job);UI.started=false;clearTimeout(UI.aiT);UI.aiT=null;UI.sel=null;UI.res=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.kitSig={};UI.wwk=null;UI.lastPrompt=null;UI.pause=false;UI.dockSig=null;
-  UI.help=s.help!==false;UI.tut=s.tutorial?{done:{}}:(s.job<=3?{done:{hello:1,stand:1}}:null);if(s.tutorial)UI.coach=true;UI.coachAsk=false;UI.myRes=null;UI.myAck=true;UI.aiNotBefore=0;UI.brief=(NET.on||isHost())?null:{n:s.job};
+  UI.rt=realtimeJob(s.job);UI.started=false;clearTimeout(UI.aiT);UI.aiT=null;UI.sel=null;UI.res=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.kitSig={};UI.wwk=null;UI.myLastTurn=null;UI.hintTurn=-1;UI.hintsLeft=HINTS;UI.guided=!!s.tutorial;UI.lastPrompt=null;UI.pause=false;UI.dockSig=null;
+  UI.help=s.help!==false;UI.tut=s.tutorial?{done:{}}:(s.job<=3?{done:Object.assign({hello:1,stand:1},lsGet('sf_tipsdone',{}))}:null);if(s.tutorial)UI.coach=true;UI.coachAsk=false;UI.myRes=null;UI.myAck=true;UI.aiNotBefore=0;UI.brief=(NET.on||isHost()||s.tutorial)?null:{n:s.job};
   const o={np:s.np,mission:s.job,seats,level:s.lv,names:s.names.slice(0,s.np),realtime:UI.rt};if(any){try{const ch=[];for(let i=0;i<s.np;i++)ch[i]=chars[i]||null;o.chars=ch}catch(e){}}if(s.captain!=null&&s.captain<s.np)o.captain=s.captain;if(s.seed!=null)o.seed=s.seed;
   kitReset();UI.started=true;hideStart();NET.starting=true;try{try{newGame(o)}catch(e){try{delete o.chars;newGame(o)}catch(e2){console.error(e2);UI.started=false;showStart();return}}
   if(plan)netBound(plan)}finally{NET.starting=false}
