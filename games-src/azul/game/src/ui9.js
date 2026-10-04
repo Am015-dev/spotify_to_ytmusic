@@ -16,7 +16,7 @@ html.bf body{background:#13234d;overflow:hidden}
 .bf-chip b{overflow:hidden;text-overflow:ellipsis;min-width:0}.bf-chip b:empty{display:none}
 html.bf-land .bf-say{font-size:15px}
 .bf-chip em{font-style:normal;color:#ffd24a}
-.bf-chip .bf-sc{margin-left:auto;font-size:16px;color:#ffd66b;flex:none}
+.bf-chip .bf-sc{margin-left:auto;font-size:16px;color:#ffd66b;flex:none}.bf-pj{flex:none;margin-left:3px;font:900 13px var(--ff);padding:1px 4px;border-radius:8px;background:#2f8a4a;color:#fff}.bf-pj.dn{background:#c0392b}
 .bf-chip.cur{border-color:var(--pc);background:rgba(255,255,255,.17);box-shadow:0 0 14px var(--pc)}
 .bf-chip.hit{animation:bfHit .5s}
 @keyframes bfHit{30%{transform:scale(1.12)}}
@@ -274,7 +274,7 @@ async function bfFloors(){BF.rv=null;const S=BF.disp;BF.say='Broken tiles cost p
   for(const p of S.pl){if(!p.floor.length)continue;const pen=floorPenalty(p.floor.length);const loss=Math.min(p.score,-pen);const focus=p.i===bfFocus();
     if(focus){bfDraw();const fr=bfR(bfQ('.bf-fl'));p.floor.forEach((t,k)=>{const el=bfEl(`x${p.i}_${k}`);if(el){el.style.setProperty('--d',bfD(k*70)+'ms');el.classList.add('gone')}});
       if(loss)bfPop('−'+loss,fr,'bad',true);sfx('floor');await bfWait(1500)}
-    else if(loss)bfChipPop(p.i,'−'+loss,'bad');
+    else if(loss){bfChipPop(p.i,'−'+loss+' broken','bad');sfx('floor');await bfWait(800)}
     p.score-=loss;bfScore(p.i,p.score);if(p.floor.includes(SUN))S.first=p.i;p.floor=[]}
   S.markerIn='ctr';bfDraw();
   if(BF.r0){const d=S.pl.map((p,i)=>p.score-(BF.r0[i]||0));BF.r0=null;const f=n=>(n>=0?'+':'−')+Math.abs(n);bfBanner('Round score',S.pl.map((p,i)=>(isYou(p.i)?'You ':S.pl.length>2?'':p.nm+' ')+f(d[i])).join('  ·  '));await bfWait(1300)}
@@ -321,11 +321,11 @@ function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i
   for(let r=0;r<5;r++){const o=ok[r],X=o&&o.X;let rk='';
     for(let col=0;col<5;col++){const k=4-col;if(k>=cap(r)){rk+='<b class="bf-c no"></b>';continue}const key=`l${pi}_${r}_${k}`;const t=p.lines[r][k];let inner='';
       if(t!=null)inner=bfTile(t,key);else if(X){const g=X.pv.ghost.find(g=>g.sl===key);if(g)inner=bfTile(g.k,null,'gh')}rk+=`<b class="bf-c" data-s="${key}">${inner}</b>`}
-    const badge=(rec===r?'<span class="bf-bd rec">★</span>':'')+(X&&X.tp?`<span class="bf-bd bad${rec===r?' r2':''}">${String(X.tp).replace('-','−')}</span>`:'');
+    const badge=(rec===r?'<span class="bf-bd rec">★</span>':'')+(X&&X.tp?`<span class="bf-bd ${X.net<0?'bad':'good'}${rec===r?' r2':''}">${X.net<0?'−'+(-X.net):'+'+X.net}</span>`:'');
     const tc=X&&X.pv.full&&!S.ex.gray?(()=>{const c0=sel.c<NC?sel.c:lineColour(p.lines[r]);return c0>=0?WALLCOL(c0,r):-1})():-1;
     const blk=sel&&!o?phReason(p,r,sel.c):'';const clashC=blk.startsWith('mosaic')&&sel.c<NC?WALLCOL(sel.c,r):-1;
     let wl='';for(let c=0;c<5;c++){const key=`w${pi}_${r}_${c}`;const v=p.wall[r][c];let inner=v>=0?bfTile(v<5?v:PRISM,key):S.ex.gray?'':`<i class="pr">${bfUse(WALLC(r,c))}</i>`;let cls='';
-      if(c===tc&&v<0){cls=' tgt';inner+=`<em>+${X.pv.pts}</em>`}
+      if(c===tc&&v<0){cls=' tgt';if(!X.tp)inner+=`<em>+${X.pv.pts}</em>`}
       else if(v<0&&!S.ex.gray&&p.lines[r].length===cap(r)&&lineColour(p.lines[r])>=0&&WALLCOL(lineColour(p.lines[r]),r)===c){cls=' ready';inner=bfTile(lineColour(p.lines[r]),null,'gh')}
       if(S.ex.gray?(blk.startsWith('mosaic')&&v>=0&&(v<5?v:v-10)===sel.c):c===clashC)cls=' clash';
       if(wq&&wq.r===r&&wq.cells.includes(c)){cls=' pick';inner+=`<em>+${adjPts2(p.wall,r,c)}</em>`}
@@ -334,8 +334,11 @@ function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i
   let fl='';for(let k=0;k<7;k++){const key=`x${pi}_${k}`;const t=p.floor[k];fl+=`<b class="bf-c" data-s="${key}">${t!=null?bfTile(t,key,t===SUN?'':'cr'):`<span>${String(FLOOR[k]).replace('-','−')}</span>`}</b>`}
   let fb=p.floor.length&&!sel?`<span class="bf-bd bad fbd">${String(floorPenalty(Math.min(7,p.floor.length))).replace('-','−')}</span>`:'';if(rec===5)fb+='<span class="bf-bd rec fbr">★</span>';if(sel){const m5=movesFor(sel).find(m=>m.line===5);if(m5){try{const pv=preview(m5,pi);fb=`<span class="bf-bd bad fbd">${String(pv.pen).replace('-','−')}</span>`}catch(e){}}}
   h+=`<div class="bf-floor${sel?' ok':''}" data-bfrow="5"${sel?' role="button" aria-label="Floor: break them"':''}><div class="bf-fl">${fl}</div><span class="bf-fll">floor</span>${fb}</div>`;return h}
+// what each score will be after this round's tiling and breakage, so the round end is never a surprise
+function bfProj(S,p){let pts=0;if(!S.ex.gray){const w=p.wall.map(r=>r.slice());for(let r=0;r<5;r++){const L=p.lines[r];if(L.length!==cap(r))continue;const lc=lineColour(L);if(lc<0)continue;const c=WALLCOL(lc,r);if(w[r][c]>=0)continue;pts+=adjPts2(w,r,c);w[r][c]=lc}}
+  return Math.max(0,p.score+pts+floorPenalty(Math.min(7,p.floor.length)))}
 function bfTopHTML(S){const s=BF.busy?BF.actor:sideToAct();
-  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points"><i></i><b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?'<em>☀</em>':''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span></button>`).join('')}</div><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
+  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points"><i></i><b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?'<em>☀</em>':''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span>${(()=>{if(BF.busy||S.phase!=='offer'||G.over)return '';const v=bfProj(S,p);return v===p.score?'':`<span class="bf-pj ${v<p.score?'dn':'up'}">→${v}</span>`})()}</button>`).join('')}</div><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
 function bfWinLine(){if(!G.over)return '';const w=G.over.win.map(i=>P(i));const sc=G.over.scores.map(s=>s.s.total);const you=w.some(p=>isYou(p.i));
   return (you?(w.length>1?'You share the win':'You win'):w.map(p=>p.nm).join(' & ')+(w.length>1?' share it':' wins'))+' '+sc.slice(0,2).join(' to ')+'!'}
 function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
@@ -344,7 +347,7 @@ function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
   else if(hp&&G.phase==='wall')say='Tap a glowing wall space';
   else if(hp&&UI.sel){const a=UI.sel.src<0?G.ctr:G.fac[UI.sel.src]||[];const n=a.filter(t=>t===UI.sel.c||(t===PRISM&&UI.sel.j)).length;chip=`<span class="bf-n">${bfUse(UI.sel.c)}<b>×${n}</b></span>`;say=movesFor(UI.sel).every(m=>m.line===5)?'No room: tap the floor':'Tap a glowing row';
     const nj=a.filter(t=>t===PRISM).length;if(UI.sel.c<NC&&nj)tg=`<button class="bf-pz${UI.sel.j?' on':''}" data-bf="prism" aria-pressed="${!!UI.sel.j}" aria-label="Also take the prism tiles">${bfUse(PRISM)}${UI.sel.j?'✓':'✗'}</button>`}
-  else if(hp)say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(BF.seen.took?'Your turn: tap a colour':'Tap a colour to grab every tile');
+  else if(hp){const allBad=BF.tbl&&!BF.tbl.querySelector('.bf-t[role=button]:not(.nofit)');say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(allBad?'Nothing fits: take the fewest tiles':BF.seen.took?'Your turn: tap a colour':'Tap a colour to grab every tile');}
   else{const s=sideToAct();say=s>=0?(NET.on&&P(s).human?'Waiting for '+P(s).nm+'…':P(s).nm+' is choosing…'):''}
   if(BF.tip){say=BF.tip;chip='';tg=''}
   return `<span class="bf-say${BF.tip?' bf-tipl':''}">${chip}<span>${esc(say)}</span></span>${tg}${live&&hp&&!G.over?`<button class="bf-ib bf-bulb" data-bf="hint" aria-label="Show me a good move">${IC('bulb')}</button>`:''}${live&&G.over&&BF.resHide?`<button class="bf-b" data-bf="res">Result</button>`:''}`}
