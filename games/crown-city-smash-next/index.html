@@ -694,9 +694,9 @@ html.ph-p #pacts [data-act="again"]{grid-column:1/-1;grid-row:5;position:sticky;
 /* clarity pass: the result line and the preview keep a fixed height in portrait, so Roll / Done never jump under a finger;
    the full text (and the "While you waited" list) opens with a tap on the line */
 @media (min-height:641px){
-  html.ph-p #banner,html.ph-p #banner:empty{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;height:2.75em;max-height:2.75em;box-sizing:border-box;flex-shrink:0}
+  html.ph-p #banner,html.ph-p #banner:empty{display:block;overflow:hidden;height:calc(2.5em + 9px);max-height:calc(2.5em + 9px);box-sizing:border-box;flex-shrink:0}
   html.ph-p #banner:empty{visibility:hidden}
-  html.ph-p #preview{height:3.1em;max-height:3.1em;box-sizing:border-box;padding-top:2px;padding-bottom:2px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+  html.ph-p #preview{height:3.1em;max-height:3.1em;box-sizing:border-box;padding-top:2px;padding-bottom:2px;overflow:hidden}
 }
 html.ph #banner .recap{display:none}
 #banner .recap{display:none}
@@ -717,14 +717,15 @@ html.ph #banner{pointer-events:auto}
 .banwrap .more{display:none}
 /* extra actions (cards you can use now) must fit above the fold: the result line drops to one line, the gaps shrink */
 @media (min-height:641px){
-  html.ph-p .gx-dock[data-xa] #banner,html.ph-p .gx-dock[data-xa] #banner:empty{-webkit-line-clamp:1;height:1.6em;max-height:1.6em}
-  html.ph-p .gx-dock[data-xa] #preview{height:2.7em;max-height:2.7em;margin-top:4px}
+  html.ph-p .gx-dock[data-xa] #banner,html.ph-p .gx-dock[data-xa] #banner:empty{height:calc(1.25em + 9px);max-height:calc(1.25em + 9px)}
+  html.ph-p .gx-dock[data-xa] #preview{height:2.7em;max-height:2.7em;margin-top:4px;overflow:hidden}
 }
 html.ph-p .gx-dock[data-xa]{gap:4px}
 html.ph-p .gx-dock[data-xa] #pacts>.btn:not([data-act="reroll"]):not([data-act="resolve"]):not([data-act="hint"]):not([data-act="end"]){min-height:44px;padding:0 6px}
 /* a pick with many options: the option list scrolls with the title instead of a sticky block covering it */
 html.ph #choice .acts:has(> .btn:nth-of-type(5)){position:static;margin-bottom:0;padding-bottom:4px}
-@media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #preview{-webkit-line-clamp:1;height:1.5em;max-height:1.5em}}
+@media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #preview{height:1.5em;max-height:1.5em}}
+@media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #dice{padding-top:0}html.ph-p .gx-dock[data-xa]{gap:3px}}
 
 </style>
 <script>
@@ -4029,15 +4030,15 @@ const RECAP={snap:null,n:0};
 function recapMe(){if(!G||G.mode!=='solo')return -1;return G.pl.findIndex(q=>q.human)}
 function recapHTML(){const me=recapMe();if(me<0||!RECAP.snap)return '';
   const parts=[];G.pl.forEach((q,k)=>{const s=RECAP.snap[k];if(!s)return;const d=[];
-    if(s.alive&&!q.alive){d.push('knocked out')}else{if(q.vp!==s.vp)d.push(`${q.vp>s.vp?'+':'−'}${Math.abs(q.vp-s.vp)}★`);if(q.hp!==s.hp)d.push(`${q.hp>s.hp?'+':'−'}${Math.abs(q.hp-s.hp)}♥`)}
+    if(s.alive&&!q.alive){d.push('knocked out')}else{if(q.vp!==s.vp)d.push(`${q.vp>s.vp?'+':'−'}${Math.abs(q.vp-s.vp)}★`);if(q.hp!==s.hp)d.push(`${q.hp>s.hp?'+':'−'}${Math.abs(q.hp-s.hp)}♥`);if(k===me&&s.en!==undefined&&q.en!==s.en)d.push(`${q.en>s.en?'+':'−'}${Math.abs(q.en-s.en)}⚡`)}
     if(s.city!==(G.city===k)&&q.alive)d.push(G.city===k?'👑in':'👑out');
-    if(d.length)parts.push(`<b>${k===me?'You':esc(mname(q))}</b> ${d.join(' ')}`)});
+    if(d.length)parts[k===me?'unshift':'push'](`<b>${k===me?'You':esc(mname(q))}</b> ${d.join(' ')}`)});
   const ev=G.log.filter(l=>l.n>RECAP.n).reverse().map(l=>`<li>${esc(l.t)}</li>`);
   if(!parts.length&&!ev.length)return '';
   return `⏪ <b>While you waited:</b> ${parts.length?parts.join(' · '):'nothing changed'}${ev.length?` <span class="more">· tap: how</span><ol class="recap">${ev.join('')}</ol>`:''}`}
 {const _st=startTurn;startTurn=function(){
   const me=recapMe();const nxt=G&&!G.winner?cur():null;
-  if(me>=0&&nxt&&nxt.i!==me&&!RECAP.snap){RECAP.snap=G.pl.map((q,k)=>({hp:q.hp,vp:q.vp,alive:q.alive,city:G.city===k}));RECAP.n=G.lseq||0}
+  if(me>=0&&nxt&&nxt.i!==me&&!RECAP.snap){RECAP.snap=G.pl.map((q,k)=>({hp:q.hp,vp:q.vp,en:q.en,alive:q.alive,city:G.city===k}));RECAP.n=G.lseq||0}
   RECAP.turnN=G?G.lseq||0:0;
   const r=_st.apply(this,arguments);
   if(me>=0&&G&&!G.winner&&G.active===me&&RECAP.snap){const h=recapHTML();RECAP.snap=null;if(h){UI.banner=h;try{render()}catch(e){}}}
@@ -4378,7 +4379,12 @@ function phNote(){const c=$ph('choice');if(c&&!c.classList.contains('hidden')){c
 function phFeed(){const el=$ph('pfeed');if(!el)return;if(!G||G.winner||humanTurn()){el.innerHTML='';return}
   const p=cur(),n0=(typeof RECAP!=='undefined'&&RECAP.turnN)||0;const ev=G.log.filter(l=>l.n>n0).slice(0,6).reverse();
   el.innerHTML=`<b class="fh" style="--mc:${MONS[p.m].c}">${esc(mname(p))}'s turn</b>`+(ev.length?`<ol>${ev.map((l,k)=>`<li class="${k===ev.length-1?'new':''}">${esc(l.t)}</li>`).join('')}</ol>`:'<p>Rolling…</p>')}
+// ---- fixed-height lines: trim the text (never clip it) so the line fits; the full result opens with a tap ----
+function phTrim(el,tail){if(!el||!el.clientHeight||el.scrollHeight<=el.clientHeight+1)return;const full=el.textContent.replace(/\s+/g,' ').trim();
+  let lo=0,hi=full.length;while(lo<hi){const m=(lo+hi+1)>>1;el.textContent=full.slice(0,m)+'…'+tail;if(el.scrollHeight<=el.clientHeight+1)lo=m;else hi=m-1}
+  el.textContent=full.slice(0,lo)+'…'+tail}
 function phRender(){if(!phOn())return;phBuild();phLabels();phChips();phTiles();phActs();phFeed();phNote();phCard();
+  {const bn=$ph('banner');if(bn){const r=bn.querySelector('.recap');if(r)r.remove();phTrim(bn,UI.banner?' (tap)':'')}phTrim($ph('preview'),'')}
   const bn=$ph('banner');if(bn&&G&&!G.winner&&humanTurn()&&G.phase==='buy'&&!bn.textContent.trim())bn.innerHTML=`<b>Step 4 · Shop:</b> you have ${cur().en}⚡. Tap a card to read it and buy, or press End turn (⚡ carries over).`;
   if(bn){bn.setAttribute('role','button');bn.tabIndex=bn.textContent.trim()?0:-1}
   // the camera needs a refit when the Harbor appears (5-6 monsters)

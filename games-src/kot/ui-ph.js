@@ -98,7 +98,12 @@ function phNote(){const c=$ph('choice');if(c&&!c.classList.contains('hidden')){c
 function phFeed(){const el=$ph('pfeed');if(!el)return;if(!G||G.winner||humanTurn()){el.innerHTML='';return}
   const p=cur(),n0=(typeof RECAP!=='undefined'&&RECAP.turnN)||0;const ev=G.log.filter(l=>l.n>n0).slice(0,6).reverse();
   el.innerHTML=`<b class="fh" style="--mc:${MONS[p.m].c}">${esc(mname(p))}'s turn</b>`+(ev.length?`<ol>${ev.map((l,k)=>`<li class="${k===ev.length-1?'new':''}">${esc(l.t)}</li>`).join('')}</ol>`:'<p>Rolling…</p>')}
+// ---- fixed-height lines: trim the text (never clip it) so the line fits; the full result opens with a tap ----
+function phTrim(el,tail){if(!el||!el.clientHeight||el.scrollHeight<=el.clientHeight+1)return;const full=el.textContent.replace(/\s+/g,' ').trim();
+  let lo=0,hi=full.length;while(lo<hi){const m=(lo+hi+1)>>1;el.textContent=full.slice(0,m)+'…'+tail;if(el.scrollHeight<=el.clientHeight+1)lo=m;else hi=m-1}
+  el.textContent=full.slice(0,lo)+'…'+tail}
 function phRender(){if(!phOn())return;phBuild();phLabels();phChips();phTiles();phActs();phFeed();phNote();phCard();
+  {const bn=$ph('banner');if(bn){const r=bn.querySelector('.recap');if(r)r.remove();phTrim(bn,UI.banner?' (tap)':'')}phTrim($ph('preview'),'')}
   const bn=$ph('banner');if(bn&&G&&!G.winner&&humanTurn()&&G.phase==='buy'&&!bn.textContent.trim())bn.innerHTML=`<b>Step 4 · Shop:</b> you have ${cur().en}⚡. Tap a card to read it and buy, or press End turn (⚡ carries over).`;
   if(bn){bn.setAttribute('role','button');bn.tabIndex=bn.textContent.trim()?0:-1}
   // the camera needs a refit when the Harbor appears (5-6 monsters)

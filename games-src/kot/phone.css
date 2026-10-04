@@ -173,9 +173,9 @@ html.ph-p #pacts [data-act="again"]{grid-column:1/-1;grid-row:5;position:sticky;
 /* clarity pass: the result line and the preview keep a fixed height in portrait, so Roll / Done never jump under a finger;
    the full text (and the "While you waited" list) opens with a tap on the line */
 @media (min-height:641px){
-  html.ph-p #banner,html.ph-p #banner:empty{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;height:2.75em;max-height:2.75em;box-sizing:border-box;flex-shrink:0}
+  html.ph-p #banner,html.ph-p #banner:empty{display:block;overflow:hidden;height:calc(2.5em + 9px);max-height:calc(2.5em + 9px);box-sizing:border-box;flex-shrink:0}
   html.ph-p #banner:empty{visibility:hidden}
-  html.ph-p #preview{height:3.1em;max-height:3.1em;box-sizing:border-box;padding-top:2px;padding-bottom:2px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+  html.ph-p #preview{height:3.1em;max-height:3.1em;box-sizing:border-box;padding-top:2px;padding-bottom:2px;overflow:hidden}
 }
 html.ph #banner .recap{display:none}
 #banner .recap{display:none}
@@ -196,11 +196,12 @@ html.ph #banner{pointer-events:auto}
 .banwrap .more{display:none}
 /* extra actions (cards you can use now) must fit above the fold: the result line drops to one line, the gaps shrink */
 @media (min-height:641px){
-  html.ph-p .gx-dock[data-xa] #banner,html.ph-p .gx-dock[data-xa] #banner:empty{-webkit-line-clamp:1;height:1.6em;max-height:1.6em}
-  html.ph-p .gx-dock[data-xa] #preview{height:2.7em;max-height:2.7em;margin-top:4px}
+  html.ph-p .gx-dock[data-xa] #banner,html.ph-p .gx-dock[data-xa] #banner:empty{height:calc(1.25em + 9px);max-height:calc(1.25em + 9px)}
+  html.ph-p .gx-dock[data-xa] #preview{height:2.7em;max-height:2.7em;margin-top:4px;overflow:hidden}
 }
 html.ph-p .gx-dock[data-xa]{gap:4px}
 html.ph-p .gx-dock[data-xa] #pacts>.btn:not([data-act="reroll"]):not([data-act="resolve"]):not([data-act="hint"]):not([data-act="end"]){min-height:44px;padding:0 6px}
 /* a pick with many options: the option list scrolls with the title instead of a sticky block covering it */
 html.ph #choice .acts:has(> .btn:nth-of-type(5)){position:static;margin-bottom:0;padding-bottom:4px}
-@media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #preview{-webkit-line-clamp:1;height:1.5em;max-height:1.5em}}
+@media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #preview{height:1.5em;max-height:1.5em}}
+@media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #dice{padding-top:0}html.ph-p .gx-dock[data-xa]{gap:3px}}
