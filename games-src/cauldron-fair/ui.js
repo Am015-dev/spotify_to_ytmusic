@@ -167,7 +167,7 @@ function promptInfo() {
   if (p.q && !EVAL_Q[p.q.h]) return { text: QINFO[p.q.h][0] + ': ' + QINFO[p.q.h][1](p, p.q.d), mine: true };
   if (G.phase === 'brew') {
     if (p.st === 'draw' && p.lock) return { text: 'You have decided. ' + (wn.length ? 'Waiting for ' + nameList(G.players.filter(q => q.st === 'draw' && !q.lock && !isMine(q.seat)).map(q => q.name)) + ', then everybody reveals together (Stir!).' : 'Revealing...') };
-    if (p.st === 'draw') { const rk = CF.risk(G, v); return { text: (G.round === 9 ? 'Last day: choose Draw or Stop. Nobody sees your choice until everybody has chosen. No shop today: at the end every 5 coins and every 2 rubies become 1 point. ' : '') + (p.pot.length ? 'Draw another chip, or stop and keep your score.' : 'Tap Draw to pull your first chip from the bag.' + (G.round <= 2 ? ' Everyone brews at the same time, so the others are drawing too.' : '')), mine: true }; }
+    if (p.st === 'draw') { const rk = CF.risk(G, v); return { text: (G.round === 9 ? 'Last day, no shop: everyone picks Draw or Stop in secret, then all reveal. At the end 5 coins or 2 rubies = 1 point. ' : '') + (p.pot.length ? 'Draw another chip, or stop and keep your score.' : 'Tap Draw to pull your first chip from the bag.' + (G.round <= 2 ? ' Everyone brews at the same time, so the others are drawing too.' : '')), mine: true }; }
     return { text: (p.boom ? 'Your cauldron exploded. ' : 'You stopped. ') + (wn.length ? 'Waiting for ' + nameList(wn) + '...' : 'Everyone is done.') };
   }
   if (G.phase === 'prep') return { text: wn.length ? 'Waiting for ' + nameList(wn) + ' to choose...' : 'The day begins.' };
@@ -277,7 +277,7 @@ function renderActs() {
   if (!p.lock) {   // the one line that matters: how likely is the next chip to explode, and what am I worth right now
     const r = CF.risk(G, v), pct = Math.round(r.pBoom * 100), lv = pct < 15 ? 'lo' : pct < 30 ? 'mid' : 'hi', sp = CF.spaceOf(p), ln = limitNote(p);
     const fm = legal.find(x => x.t === 'flask');
-    const sr = h('div.sumrow', { 'data-priv': v }, h('span.s1', h('b.' + lv, pct + '%'), ' to explode'), h('span.s2', { title: 'If you stop now' }, h('span', { html: ico('coin', 16) }), h('b', D.COINS[sp]), h('span', { html: ico('vp', 16) }), h('b', D.VP[sp]), D.RUBY[sp] ? h('span', { html: ico('ruby', 16) }) : null),
+    const sr = h('div.sumrow', { 'data-priv': v }, h('span.s1', 'Next chip: ', h('b.' + lv, pct + '%'), ' to explode'), h('span.s2', { title: 'If you stop now' }, h('span', { html: ico('coin', 16) }), h('b', D.COINS[sp]), h('span', { html: ico('vp', 16) }), h('b', D.VP[sp]), D.RUBY[sp] ? h('span', { html: ico('ruby', 16) }) : null),
       fm ? h('button.btn.alt.flb', { 'data-a': 'mv', 'data-i': legal.indexOf(fm), type: 'button', 'aria-label': 'Flask: put the last white chip back in the bag', title: 'Flask: put the last white chip back' }, h('span', { html: ico('flask', 20, true) }), 'Flask') : null,
       ln ? h('div.s3', ln + ': it explodes above ' + r.limit + '.') : null);
     a.appendChild(sr);
@@ -524,7 +524,7 @@ function decisionBox(p, q) {
   const box = h('div.dec', h('h3', info[0]), h('div.sm', info[1](p, q.d)));
   if (q.h === 'shop') { box.appendChild(shopUI(p, q, legal)); return box; }
   if (q.h === 'ruby') {
-    box.appendChild(h('div.sm', 'You have ' + p.rubies + ' rubies. Your droplet (the blue drop on the spiral, where your first chip lands) is on space ' + p.droplet + '. Flask ' + (p.flask ? 'full' : 'empty (it puts a white chip back once a day)') + '.'));
+    box.appendChild(h('div.sm', 'You have ' + p.rubies + ' rubies. Your droplet (the drop on the spiral, where your first chip lands) is on space ' + p.droplet + '. Flask ' + (p.flask ? 'full' : 'empty (it puts a white chip back once a day)') + '.'));
     const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p))); box.appendChild(row); return box;
   }
   if (q.h === 'de') {

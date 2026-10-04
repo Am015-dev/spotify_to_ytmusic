@@ -78,7 +78,7 @@ function decisionBox(p, q) {
   const box = h('div.dec', h('h3', info[0]), h('div.sm', info[1](p, q.d)));
   if (q.h === 'shop') { box.appendChild(shopUI(p, q, legal)); return box; }
   if (q.h === 'ruby') {
-    box.appendChild(h('div.sm', 'You have ' + p.rubies + ' rubies. Your droplet (the blue drop on the spiral, where your first chip lands) is on space ' + p.droplet + '. Flask ' + (p.flask ? 'full' : 'empty (it puts a white chip back once a day)') + '.'));
+    box.appendChild(h('div.sm', 'You have ' + p.rubies + ' rubies. Your droplet (the drop on the spiral, where your first chip lands) is on space ' + p.droplet + '. Flask ' + (p.flask ? 'full' : 'empty (it puts a white chip back once a day)') + '.'));
     const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p))); box.appendChild(row); return box;
   }
   if (q.h === 'de') {
