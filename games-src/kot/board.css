@@ -135,3 +135,5 @@ html.ph-p .gx-dock[data-bf] .die.kept{transform:translateY(-12px);box-shadow:0 0
 
 .bfly .btok.en{background:#2fd47a;font:900 20px/1 Nunito,sans-serif}.bfly .btok.hp{background:#ff7aa2;color:#fff;font:900 20px/1 Nunito,sans-serif}
 html.ph-p header.gx-bar #pchips[style*="--cc: 5"] .pchip span,html.ph-p header.gx-bar #pchips[style*="--cc: 6"] .pchip span{flex-wrap:wrap;row-gap:0;justify-content:center}
+html.ph .bm .no{color:#8a7f90;text-decoration:line-through}
+html.ph .bm .pair{color:#5a2aa8;font-size:15px}

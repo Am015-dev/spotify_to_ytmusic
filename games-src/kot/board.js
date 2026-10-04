@@ -53,6 +53,9 @@ function bfMarks(){const el=$bf('bmarks');if(!el)return;
   const br=el.getBoundingClientRect();const items=[];const at=(xy,cls,html)=>{if(xy)items.push(`<b class="bm ${cls}" style="left:${Math.round(xy.x-br.left)}px;top:${Math.round(xy.y-br.top)}px">${html}</b>`)};
   if(s.dmg&&s.targets.length)s.targets.forEach(q=>at(bfMonXY(q.i,3.6),'hit',`${faceSVG('C')}<span>−${s.dmg}</span>`));
   const gain=[];if(s.hl)gain.push(`<span class="h">+${s.hl}♥</span>`);if(s.en)gain.push(`<span class="e">+${s.en}⚡</span>`);if(s.vp)gain.push(`<span class="v">+${s.vp}★</span>`);
+  // hearts that cannot heal (in Downtown) and pairs that score nothing yet, shown where they would have counted
+  if(s.c&&s.c.H&&!s.hl)gain.push(`<span class="no">${canHealDice(p)?'♥ full':'♥ ✕ 👑'}</span>`);
+  if(!s.vp&&G.rolls>0)['1','2','3'].forEach(f=>{if((s.c&&s.c[f])===2)gain.push(`<span class="pair">one more ${f} → ★</span>`)});
   if(gain.length)at(bfMonXY(p.i,3.6),'gain',gain.join(''));
   if(G.city<0&&!inCity(p.i)&&(!G.bayOn||G.bay<0))at(bfCityXY(),'city','👑 <span>+1★</span>');
   const h=items.join('');if(h!==BF.marks){el.innerHTML=h;BF.marks=h}}
