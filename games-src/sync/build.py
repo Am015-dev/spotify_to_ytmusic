@@ -4,7 +4,7 @@
 import os, re, json
 D = os.path.dirname(os.path.abspath(__file__))
 SP = os.path.abspath(os.path.join(D, '..'))        # games-src
-GM = os.path.abspath(os.path.join(SP, '..', 'games'))
+GM = os.path.abspath(os.environ.get('GNS_GAMES') or os.path.join(SP, '..', 'games'))   # GNS_GAMES=<dir> builds against a copy of games/ (used by room/add-new-games.py)
 def rd(p): return open(p, encoding='utf-8').read()
 # same list as GAMES in games/classic.html: id, name, src, cover (the sizes are measured here)
 LIST = [('crown','Crown City Smash','crown-city-smash/index.html','covers/crown.jpg'),

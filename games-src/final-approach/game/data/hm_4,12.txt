@@ -1,0 +1,1 @@
+hard g2 green Foxmere                         11/20  55% avg rounds 7.0 {"spin":2,"speed":1,"checks:flaps":3,"checks:flaps+axis":1,"checks:gear":1,"checks:planes+gear":1} 24104ms/game
