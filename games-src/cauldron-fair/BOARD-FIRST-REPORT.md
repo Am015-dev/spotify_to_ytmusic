@@ -75,7 +75,7 @@ short news), `ui4.js` (report cards, choice tiles, short tips), `ui5.js` (the pu
 - `hidden-test.js 10`, `net-strip-test.js 10`: passed.
 - `px-test.js`: PROBLEMS 0 (WebGL high/low/medium, canvas renderer, hot-seat, DOM fallback; chips fly, land and end
   where the engine says).
-- `lay-phone.js`: LAYPHONE_RESULT. The test now opens Log and Cards through the Menu on phones, because they left the
+- `lay-phone.js`: PROBLEMS 0 at all 7 sizes (390x844, 390x763, 390x664, 375x553, 412x780, 844x390, 750x342); the baseline had 2 landscape failures. The test now opens Log and Cards through the Menu on phones, because they left the
   header.
 - `bf-shot.js` (new): a real-tap walk-through of two days at any size: `node bf-shot.js 390x763 bf [--vs]`.
 
