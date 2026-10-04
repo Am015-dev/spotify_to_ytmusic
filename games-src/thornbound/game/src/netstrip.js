@@ -4,10 +4,10 @@
 // unrevealed bid / Kingdom Deck order / question options (hidden-test.js proves it with a poison test); this file is the second wall: it drops
 // rng, seed, the agenda, the stats counters (an empty object is sent) and anything unlisted, and keeps only the last 150 log lines.
 // seat = -1 is a spectator (everything hidden). Pure function of (G, seat), no globals except TB.
-const NET_TOP=['v','np','len','rounds','round','phase','step','order','reg','council','cmk','lost','burned','kburn','limbo','klimbo','road','kdisc','fav','cmod','rm','used','cord','loc','bq','taken','bidRev','bfirst','curReg'];
+const NET_TOP=['v','np','len','rounds','round','phase','step','order','reg','council','cmk','lost','burned','kburn','limbo','klimbo','road','kdisc','fav','cmod','rm','used','cord','loc','bq','taken','bidRev','bfirst','curReg','infl'];
 const NET_PL=['seat','name','ai','fac','inf','lore','hs','hand','deck','disc','site','hq','ks','sup','tac','herald','supp','mk','bid','gate'];
 const NET_Q=['kind','title','seats','simul','t','h','o','ctx','items','chosen','budget','min','max','pl','st'];
-const NET_CL=['r','parts','first','cards','added','used','bonus','n','skip','winner','tot','tied','tp'];
+const NET_CL=['r','parts','first','cards','added','used','bonus','n','skip','winner','tot','tied','tp','brk'];
 const NET_REG=['up','down','took','kc','done','n'];
 function netPlain(x){ // deep copy of plain JSON data only (no functions, no prototypes)
   if(x===null||typeof x==='number'||typeof x==='boolean'||typeof x==='string')return x;
@@ -28,5 +28,5 @@ function netStrip(G,seat){
   o.q=V.q?netPick(V.q,NET_Q):null;
   if(o.q){o.q.got={};if(!o.q.seats.includes(seat)){o.q.o={};o.q.ctx={};if(o.q.items)o.q.items=[];if(o.q.chosen)o.q.chosen=[]}}
   o.bstr=V.bidRev?V.bstr.slice():[];
-  o.logN=V.logN;o.log=V.log.slice(-150).map(e=>({i:e.i,r:e.r,t:String(e.t).slice(0,300),s:e.s,c:e.c||''}));
+  o.logN=V.logN;o.log=V.log.slice(-150).map(e=>{const x={i:e.i,r:e.r,t:String(e.t).slice(0,400),s:e.s,c:e.c||''};if(e.m&&typeof e.m==='object'){const m=netPlain(e.m);if(JSON.stringify(m).length<4000)x.m=m}return x});
   return o}

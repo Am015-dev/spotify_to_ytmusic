@@ -132,7 +132,7 @@ test('Invulnerable cards (Followers) cannot be eliminated; the Agent eliminates 
 test('two Deadly cards eliminate each other',()=>{const G=clashGame(2);scene(G,{place:{0:[c(0,AGENT),null,null],1:[c(1,AGENT),null,null]}});runClashes(G,[0,1,2],{location:locPick(0)});ok(G.lost.includes(c(0,AGENT))&&G.lost.includes(c(1,AGENT)),'both lost');eq(G.pl[0].inf+G.pl[1].inf,0,'0 vs 0 is a tie: nobody scores')});
 test('Ambush adds a face-down card from hand that is revealed after everyone\'s Day step',()=>{const G=clashGame(2);scene(G,{place:{0:[c(0,RUSE),null,null],1:[c(1,C6),null,null]}});T.put(G,c(0,C9),'hand');
   startAt(G,[['clashOrder'],['regionLoop',{i:0}]]);T.answer(G,1,'o012');let p=TB.pending(G);eq(p.kind,'menu','day menu');eq(p.seats,[0],'turn order');const m=TB.moves(G,0).find(x=>x.a==='cmd:ambush');ok(m,'ambush offered');TB.apply(G,m);
-  T.answer(G,0,'c'+c(0,C9));ok(G.reg[0].down.includes(c(0,C9)),'face-down in the Region');T.answer(G,1,'done');pump(G,{menu:done,location:locPick(0)});ok(/Strength in The Uplands: P0 9, P1 6/.test(G.log.map(l=>l.t).join('\n')),'9 vs 6 after reveal');eq(G.pl[0].inf,1,'seat 0 wins')});
+  T.answer(G,0,'c'+c(0,C9));ok(G.reg[0].down.includes(c(0,C9)),'face-down in the Region');T.answer(G,0,'done');T.answer(G,1,'done');pump(G,{menu:done,location:locPick(0)});ok(/Strength in The Uplands: P0 9, P1 6/.test(G.log.map(l=>l.t).join('\n')),'9 vs 6 after reveal');eq(G.pl[0].inf,1,'seat 0 wins')});
 test('Retreat returns Active cards, the Herald and Supporters in the Region',()=>{const G=clashGame(2);scene(G,{place:{0:[c(0,RUSE),null,null],1:[c(1,C6),null,null]},herald:{0:0},supp:{0:[2,0,0]}});
   startAt(G,[['clashOrder'],['regionLoop',{i:0}]]);T.answer(G,1,'o012');T.answer(G,0,m=>m.a==='cmd:retreat');let p=TB.pending(G);eq(p.kind,'retreat','retreat selection');T.answer(G,0,'s:'+c(0,RUSE));T.answer(G,0,'s:H');T.answer(G,0,'s:S');
   ok(G.pl[0].hand.includes(c(0,RUSE)),'card back in hand');eq(G.pl[0].herald,-1,'herald home');eq(G.pl[0].supp.b,5,'supporters home');eq(G.pl[0].supp.r[0],0,'none in region')});
@@ -304,7 +304,7 @@ test('Chamberlain\'s Ledger / Dawn-Blue Chime / Rusted Colossus / Rally Standard
   const J=game(2);setHand(J,0,[]);T.put(J,c(0,C8),'up',1);T.giveKC(J,0,32,c(0,F1),0);startAt(J,[['menus',{step:'autumn',i:0}]]);T.answer(J,0,act('kc32'));ok(J.pl[0].hand.includes(c(0,C8)),'Colossus returned the Active card');
   const K=game(2);K.pl[0].supp.b=0;K.pl[0].supp.l=4;T.giveKC(K,0,42,c(0,F1),0);startAt(K,[['menus',{step:'autumn',i:0}]]);T.answer(K,0,act('kc42'));eq(K.pl[0].supp.b,2,'two Supporters back')});
 test('Shadow Assembly sits on a Region and Governs with your Active cards there; Dead Lamp moves Supporters',()=>{const G=game(2);T.kcRemove(G,10);G.reg[1].kc.push({n:10,o:0});T.put(G,c(0,C6),'up',1);startAt(G,[['menus',{step:'autumn',i:0}]]);T.answer(G,0,act('kc10',m=>m.p.c==='oaths'));eq(G.council.oaths,[c(0,C6)],'Governed from the Region');
-  const H=game(2);for(const P of H.pl)setHand(H,P.seat,[]);T.giveKC(H,0,22,c(0,F1),0);H.pl[0].supp.b=2;H.pl[0].supp.r[0]=3;T.put(H,c(0,F2),'down',0);T.put(H,c(1,F1),'down',0);startAt(H,[['clashOrder'],['regionLoop',{i:0}]]);T.answer(H,1,'o012');T.answer(H,0,act('kc22',m=>m.p.n===2&&m.p.to===2));eq(H.pl[0].supp.r[2],2,'moved two Supporters to the Sinks');eq(H.pl[0].supp.x[0],1,'the last one fought in the first Clash')});
+  const H=game(2);for(const P of H.pl)setHand(H,P.seat,[]);T.giveKC(H,0,22,c(0,F1),0);H.pl[0].supp.b=2;H.pl[0].supp.r[0]=3;T.put(H,c(0,F2),'down',0);T.put(H,c(1,F1),'down',0);startAt(H,[['clashOrder'],['regionLoop',{i:0}]]);T.answer(H,1,'o012');T.answer(H,0,act('kc22',m=>m.p.n===2&&m.p.to===2));T.answer(H,0,'done');{const pp=TB.pending(H);if(pp&&pp.kind==='menu')T.answer(H,pp.seats[0],'done')}eq(H.pl[0].supp.r[2],2,'moved two Supporters to the Sinks');eq(H.pl[0].supp.x[0],1,'the last one fought in the first Clash')});
 test('Roaming Company: all cards Pathfinder; Journey with an Active card; Crystal Warrens pays on Pathfinder Journeys; Vast Archive +1 Lore',()=>{const G=game(2);T.giveKC(G,0,1,c(0,F1),0);ok(TB.cardInfo(G,c(0,F2)).traits.includes('path'),'Pathfinder');T.put(G,c(0,C6),'up',0);setHand(G,0,[]);T.giveKC(G,0,12,c(0,F2),1);startAt(G,[['menus',{step:'autumn',i:0}]]);T.answer(G,0,act('journey',m=>m.p.id===c(0,C6)));eq(G.pl[0].inf,1,'Crystal Warrens +1');eq(G.pl[0].lore,2,'1 + 1 additional');ok(G.pl[0].disc.includes(c(0,C6)),'to Discard (Pathfinder)');
   const H=game(2);T.giveKC(H,0,8,c(0,F1),0);eq(TB.cardInfo(H,c(0,F2)).lore,2,'1-Lore cards gain +1');eq(TB.cardInfo(H,c(0,TRADER)).lore,2,'2-Lore cards unchanged')});
 test('Paper Diadems: Followers gain 1 Vote (2 when not first on the Order Track)',()=>{const G=game(2,null,{order:[0,1]});T.giveKC(G,0,3,c(0,C6),0);eq(TB.cardInfo(G,c(0,F2)).votes,1,'first');const H=game(2,null,{order:[1,0]});T.giveKC(H,0,3,c(0,C6),0);eq(TB.cardInfo(H,c(0,F2)).votes,2,'not first')});
@@ -319,6 +319,22 @@ test('no original names in any text a player can see (data, labels, titles, log)
   const check=(t,w)=>{if(bad.test(t))throw new Error('original name in '+w+': '+t.slice(0,120))};check(JSON.stringify(TB.DATA).replace(/Heathbound Clans/g,''),'data');
   for(let g=0;g<6;g++){const G=game(2+g%3,null,{seed:50+g});for(const P of G.pl)P.ai='normal';let n=0;while(G.phase!=='over'&&n++<4000){const p=TB.pending(G);check(p.title,'question title');for(const s of p.seats.slice()){const q=TB.pending(G);if(!q||!q.seats.includes(s))continue;for(const m of TB.moves(G,s))check(m.label||'','label');TB.apply(G,TB.AI.choose(G,s,'normal'))}}
     for(const e of G.log)check(e.t,'log')}});
+
+// ============================================================ CLARITY PLAN (J): causes, ledger, menus
+test('Spring: after placing your last Supporters the menu stays open until you finish it (it does not end by itself)',()=>{const G=game(2,null,{order:[0,1]});startAt(G,[['menus',{step:'spring',i:0}]]);
+  T.answer(G,0,m=>m.t==='act'&&m.a==='supp'&&m.p.n===5);const p=TB.pending(G);ok(p&&p.kind==='menu'&&p.seats[0]===0,'still asked after the last Supporter ('+(p&&p.kind)+' '+(p&&p.seats)+')');
+  ok(!TB.moves(G,0).some(m=>m.a==='supp'),'no Supporters left to send');ok(TB.moves(G,0).some(m=>m.t==='done'),'Done is offered');T.answer(G,0,'done');ok(!TB.pending(G)||TB.pending(G).seats[0]!==0||TB.pending(G).kind!=='menu','Done ends it')});
+test('Influence ledger: every change is booked with a reason and the ledger sums to the score (30 AI games)',()=>{require('./src/ai.js');
+  for(let g=0;g<30;g++){const G=game(2+g%3,null,{seed:900+g});for(const P of G.pl)P.ai=['easy','normal'][g%2];let n=0;
+    while(G.phase!=='over'&&n++<5000){const p=TB.pending(G);const s=p.seats[0];TB.apply(G,TB.AI.choose(G,s,G.pl[s].ai))}
+    ok(G.infl,'G.infl exists');for(const P of G.pl){const L=G.infl[P.seat];let sum=0;for(const k in L){ok(k&&k!=='undefined','reason');sum+=L[k]}eq(sum,P.inf,'game '+g+' seat '+P.seat+' ledger '+JSON.stringify(L))}}});
+test('Clash breakdown: the parts listed for each side add up to its total',()=>{require('./src/ai.js');let seen=0;
+  for(let g=0;g<12;g++){const G=game(2+g%3,null,{seed:300+g});let n=0;const I=TB.internal;
+    while(G.phase!=='over'&&n++<5000){const p=TB.pending(G);const s=p.seats[0];TB.apply(G,TB.AI.choose(G,s,'normal'));
+      for(const e of G.log.slice(-30))if(e.m&&e.m.k==='tally'&&!e._chk){e._chk=1;seen++;for(const s2 in e.m.tot){const parts=e.m.brk[s2]||[];const sum=parts.reduce((a,b)=>a+b.n,0);eq(sum,e.m.tot[s2],'breakdown of seat '+s2+' '+JSON.stringify(parts))}}}}
+  ok(seen>50,'tallies seen '+seen)});
+test('Elimination: the log names the card that did it and why (Deadly)',()=>{const G=game(2,null,{order:[0,1]});scene(G,{place:{0:[c(0,C9),c(0,F1),c(0,F2)],1:[c(1,AGENT),c(1,F3),c(1,F4)]}});
+  runClashes(G,[0,1,2]);const e=G.log.find(x=>x.m&&x.m.k==='elim'&&x.m.ids.includes(c(0,C9)));ok(e,'elimination event');ok(e.m.by.includes(c(1,AGENT)),'by the agent');ok(/Deadly/.test(e.t)&&/eliminates/.test(e.t),'sentence: '+(e&&e.t))});
 //__MORE__
 if(require.main===module){
   const t0=Date.now();for(const [name,fn] of tests){try{fn();pass++}catch(e){fail++;fails.push([name,e])}}

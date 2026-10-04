@@ -65,6 +65,26 @@ const RULES=[['Ambush','ambush'],['Retreat','retreat'],['Flank','flank'],['Rally
 RULES.push(['Invulnerable (prevents Elimination)','invulnerable'],['Resilient (Eliminated card to Discard)','resilient'],['Pathfinder (Journey card to Discard)','pathfinder'],['Supporters add Strength','supporterStrength'],['Tied Clash starts a new Clash','reclash'],['Deploy tokens decay in Winter','tokenDecay'],['Hand size clamp (3..8)','hsClamp']);
 for(const [name,key] of RULES)run({cat:'Rule',name,steps:6000,prefer:null,setup(G){if(key==='hsClamp'){G.pl[0].hs=8;T.giveKC(G,0,17,G.pl[0].hand.find(id=>id%100!==13),0)}},fired(G){return !!G.stats[key]}});
 run({cat:'Rule',name:'Empty Site of Power: Lore becomes Influence at game end',steps:6000,setup(G){G.pl[0].lore=6;for(const id of G.pl[0].site.slice())T.put(G,id,'disc')},fired(G){return !!G.stats.loreToInfluence}});
+// ---------------------------------------------------------------- causes (CLARITY-PLAN A/J): every Influence change and every card that lands in a
+// public pile (Lost Pile, Burned, a Discard Pile) must come with a log event that names a cause; the Influence ledger must sum to the score.
+const CAUSE_GAMES=+(process.argv[3]||200);let cInf=0,cCards=0,cBad=0,cLedger=0;const cProb=[];
+function piles(G){const m=new Map();for(const id of G.lost)m.set(id,'lost');for(const id of G.burned)m.set(id,'burn');for(const P of G.pl)for(const id of P.disc)m.set(id,'disc');return m}
+for(let g=0;g<CAUSE_GAMES;g++){const np=2+g%3;const facs=[];for(let i=0;i<np;i++)facs.push(F[(g+i)%4]);
+  const G=TB.newGame({players:facs.map((f,i)=>({faction:f,name:'P'+i,ai:['easy','normal'][(g+i)%2]})),seed:50000+g,length:['short','standard','extended'][g%3]});let n=0;
+  while(G.phase!=='over'&&n++<6000){const p=TB.pending(G);if(!p){cProb.push('game '+g+': stall');break}const s=p.seats[0];
+    const inf0=G.pl.map(P=>P.inf),pl0=piles(G),l0=G.logN;const r=TB.apply(G,TB.AI.choose(G,s,G.pl[s].ai));if(!r.ok){cProb.push('game '+g+': '+r.err);break}
+    const nl=G.log.filter(e=>e.i>l0);const d=G.pl.map(()=>0);
+    for(const e of nl){const m=e.m;if(!m)continue;
+      if(m.k==='inf'){d[m.s]+=m.n;cInf++;if(!m.why||!/\(/.test(e.t)&&m.why!=='Leftover Lore (empty Site of Power)'){cBad++;cProb.push('no cause: '+e.t)}}
+      if(m.k==='steal'){d[m.s]+=m.n;d[m.v]-=m.n;cInf++;if(!m.why){cBad++;cProb.push('steal without cause: '+e.t)}}}
+    G.pl.forEach((P,i)=>{if(P.inf-inf0[i]!==d[i]){cBad++;if(cProb.length<30)cProb.push('game '+g+' seat '+i+': Influence '+inf0[i]+'->'+P.inf+' but events explain '+d[i]+' ('+nl.map(e=>e.t).join(' / ').slice(0,300)+')')}});
+    const pl1=piles(G);const why=new Map();for(const e of nl){const m=e.m;if(m&&(m.k==='rm'||m.k==='elim')&&m.why)for(const id of m.ids)why.set(id,m.why)}
+    for(const [id,z] of pl1){if(pl0.get(id)===z)continue;cCards++;if(!why.has(id)){cBad++;if(cProb.length<30)cProb.push('game '+g+': '+TB.cardName(G,id)+' ('+id+') went to '+z+' with no cause event after '+(p.kind)+' ('+nl.map(e=>e.t).join(' / ').slice(0,300)+')')}}}
+  if(G.phase!=='over')cProb.push('game '+g+' did not end');
+  for(const P of G.pl){const L=(G.infl||[])[P.seat]||{};const sum=Object.values(L).reduce((a,b)=>a+b,0);cLedger++;if(sum!==P.inf){cBad++;cProb.push('game '+g+' seat '+P.seat+': breakdown sums to '+sum+', score '+P.inf)}}}
+console.log('CAUSES  '+CAUSE_GAMES+' games: '+cInf+' Influence changes and '+cCards+' cards into public piles checked, '+cLedger+' end breakdowns checked, '+cBad+' without a cause or not summing');
+for(const x of cProb.slice(0,15))console.log('  CAUSE PROBLEM '+x);
+if(cBad||cProb.length)problems.push('cause check: '+cBad+' problems');
 // ---------------------------------------------------------------- report
 const cats={};for(const r of results){(cats[r.cat]=cats[r.cat]||{n:0,ok:0,miss:[]});cats[r.cat].n++;if(r.fired)cats[r.cat].ok++;else cats[r.cat].miss.push(r.name)}
 console.log('COVERAGE  (item counts as fired when the engine counter for it moved; invariants checked after every apply)');
