@@ -63,7 +63,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-row.no{animation:bfShake .4s}
 .bf-row.wq .bf-wall{box-shadow:0 0 0 3px #ffc63a;border-radius:6px}
 .bf-bd{position:absolute;left:2px;top:50%;transform:translateY(-50%);z-index:2;min-width:22px;height:22px;border-radius:11px;padding:0 5px;font:900 13px/22px var(--ff);text-align:center;color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4)}
-.bf-bd.rec{background:#e0a020;color:#fff;font-size:14px}.bf-bd.r2{left:28px}
+.bf-bd.rec{background:#e0a020;color:#fff;font-size:12px}.bf-bd.r2{left:44px}
 .bf-bd.bad{background:#c0392b}.bf-bd.good{background:#2f8a4a}
 .bf-c em{position:absolute;inset:0;display:grid;place-items:center;font:900 calc(var(--cs)*.42) var(--ff);font-style:normal;color:#1d5a2a;text-shadow:0 0 3px #fff,0 0 3px #fff;z-index:2}
 .bf-c.clash{box-shadow:inset 0 0 0 3px #e0402a,0 0 10px #ff6a50;z-index:2}
@@ -98,7 +98,8 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-table .bf-t.nud{transform:translate(var(--nx),var(--ny)) scale(.9);opacity:.6}
 .bf-t.nofit>svg{opacity:.5;filter:grayscale(.6)}
 .bf-t.nofit::after{content:'✗';position:absolute;right:-12%;top:-12%;width:46%;height:46%;border-radius:50%;background:#c0392b;color:#fff;font:900 11px/1 var(--ff);display:grid;place-items:center;box-shadow:0 0 0 1.5px #fff}
-.bf-t.adv::before{content:'★';position:absolute;left:-10%;top:-14%;z-index:2;font:900 13px/1 var(--ff);color:#ffd24a;text-shadow:0 0 3px #000,0 0 2px #000}
+.bf-t.adv{outline:3px solid #ffd24a;outline-offset:1px;border-radius:4px;animation:bfReady 1.2s ease-in-out infinite}
+.bf-t.adv::before{content:none;position:absolute;left:-10%;top:-14%;z-index:2;font:900 13px/1 var(--ff);color:#ffd24a;text-shadow:0 0 3px #000,0 0 2px #000}
 .bf-t.sun{border-radius:50%;box-shadow:0 0 0 2px #fff6c0,0 0 10px #ffd24a}
 .bf-t.deal{animation:bfDeal .5s cubic-bezier(.3,1.5,.5,1) both}
 @keyframes bfDeal{0%{transform:translateY(-70%) scale(1.5);opacity:0}100%{transform:none;opacity:1}}
@@ -301,7 +302,7 @@ function bfRing(W,H,n){const cx=W/2,cy=H/2;let ks=Math.min(W,H)*(n<=5?.32:n<=7?.
   const ax=Math.max(10,W/2-ks/2-6),ay=Math.max(10,H/2-ks/2-6);const K=[];for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;K.push({x:cx+Math.cos(a)*ax,y:cy+Math.sin(a)*ay})}
   return {ks,K,cx,cy,pw:Math.max(70,2*(ax-ks*.6)),ph:Math.max(54,2*(ay-ks*.6))}}
 function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R.ks*.33;const live=!BF.busy;const sel=live&&hp&&G.phase==='offer'?UI.sel:null;const can=live&&hp&&G.phase==='offer'&&!sel;
-  const am=can&&UI.coach&&BF.seen.took&&G.round<=1?bfAdvice(hp):null;const isAdv=(src,t)=>am&&am.act==='take'&&am.src===src&&(t===am.c);
+  const am=can&&UI.coach&&BF.seen.took?bfAdvice(hp):null;const isAdv=(src,t)=>am&&am.act==='take'&&am.src===src&&(t===am.c);
   const nofit=new Set();if(can)for(let c=0;c<NC;c++){let ok=false;for(let r=0;r<5;r++)if(lineOk(G,hp,r,c))ok=true;if(!ok)nofit.add(c)}const nf=t=>nofit.has(t)?' nofit':'';
   let h=`<div class="bf-pool${can&&S.ctr.length?' can':''}" data-bfsrc="-1" style="left:${R.cx-R.pw/2}px;top:${R.cy-R.ph/2}px;width:${R.pw}px;height:${R.ph}px"></div>`;
   S.fac.forEach((a,i)=>{const K=R.K[i];const dx=R.cx-K.x,dy=R.cy-K.y,dl=Math.hypot(dx,dy)||1;
@@ -321,7 +322,7 @@ function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i
   for(let r=0;r<5;r++){const o=ok[r],X=o&&o.X;let rk='';
     for(let col=0;col<5;col++){const k=4-col;if(k>=cap(r)){rk+='<b class="bf-c no"></b>';continue}const key=`l${pi}_${r}_${k}`;const t=p.lines[r][k];let inner='';
       if(t!=null)inner=bfTile(t,key);else if(X){const g=X.pv.ghost.find(g=>g.sl===key);if(g)inner=bfTile(g.k,null,'gh')}rk+=`<b class="bf-c" data-s="${key}">${inner}</b>`}
-    const badge=(rec===r?'<span class="bf-bd rec">★</span>':'')+(X&&X.tp?`<span class="bf-bd ${X.net<0?'bad':'good'}${rec===r?' r2':''}">${X.net<0?'−'+(-X.net):'+'+X.net}</span>`:'');
+    const badge=(rec===r?'<span class="bf-bd rec">best</span>':'')+(X&&X.tp?`<span class="bf-bd ${X.net<0?'bad':'good'}${rec===r?' r2':''}">${X.net<0?'−'+(-X.net):'+'+X.net}</span>`:'');
     const tc=X&&X.pv.full&&!S.ex.gray?(()=>{const c0=sel.c<NC?sel.c:lineColour(p.lines[r]);return c0>=0?WALLCOL(c0,r):-1})():-1;
     const blk=sel&&!o?phReason(p,r,sel.c):'';const clashC=blk.startsWith('mosaic')&&sel.c<NC?WALLCOL(sel.c,r):-1;
     let wl='';for(let c=0;c<5;c++){const key=`w${pi}_${r}_${c}`;const v=p.wall[r][c];let inner=v>=0?bfTile(v<5?v:PRISM,key):S.ex.gray?'':`<i class="pr">${bfUse(WALLC(r,c))}</i>`;let cls='';
@@ -332,7 +333,7 @@ function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i
       wl+=`<b class="bf-c${cls}" data-s="${key}"${cls===' pick'?` data-bfcell="${r},${c}" role="button" aria-label="Row ${r+1}, column ${c+1}"`:''}>${inner}</b>`}
     h+=`<div class="bf-row${sel?(o?' ok':' dim'):''}${blk.startsWith('holds')?' rclash':''}${wq&&wq.r===r?' wq':''}" data-bfrow="${r}"${o?` role="button" aria-label="Rack ${r+1}"`:''}><div class="bf-rack">${badge}${rk}</div><i class="bf-ar"></i><div class="bf-wall">${wl}</div></div>`}
   let fl='';for(let k=0;k<7;k++){const key=`x${pi}_${k}`;const t=p.floor[k];fl+=`<b class="bf-c" data-s="${key}">${t!=null?bfTile(t,key,t===SUN?'':'cr'):`<span>${String(FLOOR[k]).replace('-','−')}</span>`}</b>`}
-  let fb=p.floor.length&&!sel?`<span class="bf-bd bad fbd">${String(floorPenalty(Math.min(7,p.floor.length))).replace('-','−')}</span>`:'';if(rec===5)fb+='<span class="bf-bd rec fbr">★</span>';if(sel){const m5=movesFor(sel).find(m=>m.line===5);if(m5){try{const pv=preview(m5,pi);fb=`<span class="bf-bd bad fbd">${String(pv.pen).replace('-','−')}</span>`}catch(e){}}}
+  let fb=p.floor.length&&!sel?`<span class="bf-bd bad fbd">${String(floorPenalty(Math.min(7,p.floor.length))).replace('-','−')}</span>`:'';if(rec===5)fb+='<span class="bf-bd rec fbr">best</span>';if(sel){const m5=movesFor(sel).find(m=>m.line===5);if(m5){try{const pv=preview(m5,pi);fb=`<span class="bf-bd bad fbd">${String(pv.pen).replace('-','−')}</span>`}catch(e){}}}
   h+=`<div class="bf-floor${sel?' ok':''}" data-bfrow="5"${sel?' role="button" aria-label="Floor: break them"':''}><div class="bf-fl">${fl}</div><span class="bf-fll">floor</span>${fb}</div>`;return h}
 // what each score will be after this round's tiling and breakage, so the round end is never a surprise
 function bfProj(S,p){let pts=0;if(!S.ex.gray){const w=p.wall.map(r=>r.slice());for(let r=0;r<5;r++){const L=p.lines[r];if(L.length!==cap(r))continue;const lc=lineColour(L);if(lc<0)continue;const c=WALLCOL(lc,r);if(w[r][c]>=0)continue;pts+=adjPts2(w,r,c);w[r][c]=lc}}
