@@ -36,6 +36,9 @@ function resultHTML(R,plain){const a=ship(R.a),d=ship(R.d);if(!a||!d)return '';c
   let h=`<b>${an}</b> ${R.dmg||R.crits.length?(yours?'hit':'hits'):(yours?'missed':'misses')} <b>${dn}</b>`;
   if(R.dmg){const parts=[];if(R.sh0!==R.sh1)parts.push(`shields ${R.sh0} → ${R.sh1}`);if(R.hp0!==R.hp1)parts.push(`hull ${R.hp0} → ${R.hp1}`);h+=`: <b>${R.dmg} damage</b>${parts.length?' ('+parts.join(', ')+')':''}.`}
   else h+=R.rolled===0?': no hits rolled.':': every hit was cancelled by evade results.';
+  // the arithmetic, so a cancelled shot is never a mystery: hits and crits rolled against evades rolled
+  {const c=(L,f)=>(L||[]).filter(x=>x===f).length;const hi=c(R.dice,'hit'),cr=c(R.dice,'crit'),ev=c(R.def,'evade');
+    if(R.rolled!==0)h+=` <span class="sum">(${hi} hit${hi===1?'':'s'}${cr?` + ${cr} crit${cr>1?'s':''}`:''} vs ${ev} evade${ev===1?'':'s'}${R.def&&R.def.length?` from ${R.def.length} defence ${R.def.length===1?'die':'dice'}`:''}; each evade cancels one)</span>`}
   if(plain)return h+(R.crits.length?' Crit: '+R.crits.map(c=>DAMAGE[c].n).join(', ')+'.':'')+(R.dead?' Destroyed!':'');
   for(const c of R.crits)h+=`<div class="crit">✸ CRIT <b>${esc(DAMAGE[c].n)}</b>: ${you?'your ':esc(d.name)+'’s '}${esc(critPlain(c,d))}</div>`;
   if(R.dead)h+=`<div class="bad"><b>${you?'You are':esc(d.name)+' is'} destroyed!</b></div>`;

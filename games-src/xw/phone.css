@@ -32,7 +32,7 @@ html.ph .viewbar,html.ph .legend,html.ph .lgbtn{display:none!important}
 html.ph #coachtag{display:none!important}
 /* compact ship tags on phones: short name + hull/shields/stress, so you can tell ships apart and see who is hurt */
 html.ph #tags .tag{font-size:10px;line-height:1.15;padding:0 4px;border-radius:6px}html.ph #tags .tag b{font-size:10px;max-width:64px;overflow:hidden;text-overflow:ellipsis}
-html.ph #tags .tag .ps,html.ph #tags .tag .l,html.ph #tags .tag .dl,html.ph #tags .tag .f,html.ph #tags .tag .e{display:none}
+html.ph #tags .tag .ps,html.ph #tags .tag .dl{display:none}
 html.ph .stage canvas{touch-action:none}
 /* the dock: control row, roadmap, then one panel (strip / step card / pop-up) */
 html.ph .gx-dock{border:0;border-top:2px solid var(--gold);box-shadow:none;max-height:none!important;visibility:visible!important;display:flex;flex-direction:column;position:relative;min-height:0;padding-bottom:0;border-radius:0}
@@ -202,3 +202,14 @@ html.ph.ph-p .gx-board{justify-self:center}
 html.ph #prompt .acts.col:has(>.btn.rec:not(.primary))>.btn.primary{position:static;box-shadow:none}
 html.ph .pm-leg .rkl{color:#ff6b6b}
 .race{margin:0 0 6px;font-size:12px;color:var(--muted)}.race b{color:#fff}.race .h{color:#ffd0a0}.race .sh{color:#7fd4ff}
+/* dice steps (html.ph-dice): smaller mat, compact dice rows, no legend or race line, nothing pinned over the dice */
+html.ph.ph-p.ph-dice .gx-app{grid-template-rows:calc(44px + var(--sat,0px)) calc(var(--bs,100vw)*.6) minmax(0,1fr)}
+html.ph.ph-p.ph-dice .gx-board{width:calc(var(--bs,100vw)*.6);height:calc(var(--bs,100vw)*.6)}
+html.ph.ph-dice #prompt .race,html.ph.ph-dice #prompt .dleg{display:none}
+html.ph.ph-dice #prompt .drow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}html.ph.ph-dice #prompt .drow .dl{flex:0 0 100%}
+html.ph.ph-dice #prompt .dice .die,html.ph.ph-dice #prompt .die{width:38px;height:48px}
+html.ph.ph-dice #prompt .btn.primary,html.ph.ph-dice #prompt .acts.col>.btn.primary{position:static;box-shadow:none}
+/* your action / target / question steps: a slightly smaller mat so every choice fits */
+html.ph.ph-p.ph-act .gx-app{grid-template-rows:calc(44px + var(--sat,0px)) calc(var(--bs,100vw)*.78) minmax(0,1fr)}
+html.ph.ph-p.ph-act .gx-board{width:calc(var(--bs,100vw)*.78);height:calc(var(--bs,100vw)*.78)}
+html.ph.ph-act #prompt .dleg{display:none}

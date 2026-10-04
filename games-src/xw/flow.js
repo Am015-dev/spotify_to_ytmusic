@@ -24,7 +24,7 @@ const youTag=s=>mine(s)&&soloSide()>=0?' (you)':'';
 function renderRoad(){const el=$('steps');if(!el)return;if(!G){el.innerHTML='';return}const st=stepShown(),R=roundShown();
   let h=`<div class="road" role="list" aria-label="Round roadmap"><span class="rn">${G.round===0?'Setup':G.winner?'Over':'Round '+R}</span>`;
   PHASES.forEach((p,i)=>{const k=i+1;const cls=G.winner||k<st?'done':k===st?'on':'next';
-    h+=`<button class="ph ${cls}" data-road="${i}" role="listitem" aria-current="${k===st?'step':'false'}" aria-expanded="${UI.roadInfo===i}"><b><span class="lg">${p.n}</span><span class="sh">${['Plan','Act','Combat','End'][i]||p.n}</span></b><i>${cls==='done'?'<span class="mk">✓</span><span class="tx"> done</span>':cls==='on'?'<span class="mk">●</span><span class="tx"> now</span>':'<span class="tx">'+p.sub+'</span>'}</i></button>`});
+    h+=`<button class="ph ${cls}" data-road="${i}" role="listitem" aria-current="${k===st?'step':'false'}" aria-expanded="${UI.roadInfo===i}"><b><span class="lg">${p.n}</span><span class="sh">${['Plan','Act','Combat','End'][i]||p.n}</span></b><i>${cls==='done'?'<span class="mk">✓</span><span class="tx"> finished</span>':cls==='on'?'<span class="mk">●</span><span class="tx"> now</span>':'<span class="tx">'+p.sub+'</span>'}</i></button>`});
   h+='</div>';
   const info=UI.roadInfo!=null?PHASES[UI.roadInfo].t:G.round===0?'<b>Setup:</b> place the asteroids and the ships, then round 1 starts. Every round has the same 4 phases.':'';
   if(info)h+=`<p class="roadinfo">${info}${UI.roadInfo!=null?' <button class="linkb" data-road="x" aria-label="Close explanation">✕</button>':''}</p>`;
@@ -188,7 +188,7 @@ function hpMark(){if(!G)return;flowSync();const H=UI.hpAt=UI.hpAt||{};if(H[G.rou
 function hpText(s){const h=Math.max(0,s.hull-hullDmg(s));return `${h}/${s.hull} hull${s.shMax?` · ${s.sh}/${s.shMax} shield${s.shMax===1?'':'s'}`:''}`}
 // log lines of round R about damage that didn't come from a shot (newest-first log, between "Round R:" and the next round's line)
 function roundHarm(R,side){const L=G.log;let a=L.findIndex(l=>l.s===-1&&l.t.startsWith(`Round ${R}:`));if(a<0)a=L.length;let b=L.findIndex(l=>l.s===-1&&l.t.startsWith(`Round ${R+1}:`));if(b<0)b=-1;
-  return L.slice(b+1,a).filter(l=>l.s===side&&/asteroid: rolls|critical hit|cockpit fire|hull breach|secondary blast|is shaken|concussed|detonates|flies off|loses its/.test(l.t)).map(l=>l.t).reverse()}
+  return L.slice(b+1,a).filter(l=>l.s===side&&/asteroid: rolls|critical hit|cockpit fire|hull breach|secondary blast|is shaken|concussed|detonates|flies off|loses its|restores a shield|patches it up|repair/.test(l.t)).map(l=>l.t).reverse()}
 function summaryHTML(){const R=G.round-1,me=soloSide()>=0?soloSide():planSide();const g=guided();
   const res=UI.results.filter(r=>r.r===R).reverse();const side=id=>{const s=ship(id);return s?s.side:-1};
   const dealt=res.filter(r=>side(r.a)===me).reduce((a,r)=>a+r.dmg,0);let taken=res.filter(r=>side(r.d)===me).reduce((a,r)=>a+r.dmg,0);hpMark();
@@ -199,7 +199,7 @@ function summaryHTML(){const R=G.round-1,me=soloSide()>=0?soloSide():planSide();
   h+=`<div class="sumgrid"><div><b>${dealt}</b><span>damage dealt</span></div><div class="${taken?'hurt':''}"><b>${taken}</b><span>damage taken</span></div><div class="${stress?'hurt':''}"><b>${stress}</b><span>stress on your ship${my.length>1?'s':''}</span></div></div>`;
   const ev=[];for(const r of res)ev.push('🎯 '+resultHTML(r,true));
   for(const n of (UI.notes[R]||[]))if(n.kind!=='red'||!(UI.notes[R]||[]).some(x=>x.id===n.id&&x.kind==='stressed'))ev.push((n.lost||n.kind==='noshot'?'⚠ ':'')+n.t);
-  for(const t of roundHarm(R,me))ev.push('💥 '+esc(t));
+  for(const t of roundHarm(R,me))ev.push((/restores|patches|repair/.test(t)?'✚ ':'💥 ')+esc(t));
   if(!res.length)ev.push('No shots were fired this round.');
   h+=`<h4>What happened</h4><ul class="sumlist">${ev.slice(0,8).map(x=>`<li>${x}</li>`).join('')}</ul>`;
   h+=`<h4>Your ship${my.length>1?'s':''} now</h4><ul class="sumlist">${my.map(s=>s.alive?`<li><b>${nm(s)}</b>: hull ${s.hull-hullDmg(s)}/${s.hull} · shields ${s.sh}/${s.shMax}${s.stress?` · <span class="warn">stress ${s.stress}</span>`:''}${s.dmg.filter(x=>x.up).map(x=>` · <span class="crit">${esc(DAMAGE[x.c].n)}: ${esc(critPlain(x.c,s))}</span>`).join('')}</li>`:`<li class="muted"><b>${nm(s)}</b>: destroyed</li>`).join('')}</ul>`;

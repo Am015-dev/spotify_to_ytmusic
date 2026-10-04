@@ -35,7 +35,10 @@ function suggestDial(s){const dk=alive().filter(x=>x.side===s.side&&x!==s&&UI.dr
   const save=G.rng;const enemyPoses=enemiesOf(s).map(e=>[e,enemyGuess(e,lv.samples)]);let best=0,bv=-1e9;const sc=[];
   dialOf(s).forEach((m,i)=>{const p=finalPose(s,B(s),m),c=exColor(s,m);let v=scorePose(s,p,c,enemyPoses,friends,lv);
     // a suggestion must be safe first: never a blocked red, an asteroid only when every move touches one, and don't park beside a rock (next round's moves would all clip it)
-    if(c.c==='r'&&s.stress)v-=1e6;const rk=rockHits(s,m);if(rk)v-=40*rk;
+    if(c.c==='r'&&s.stress)v-=1e6;
+    // bumping costs the action: avoid enemies that are still parked there (they move after us) or likely to arrive first
+    {const P=corners(p,B(s));for(const [e,poses] of enemyPoses){if(psOf(e)>=psOf(s)){if(polyOverlap(P,corners(e,B(e))))v-=8}else v-=8*poses.filter(q=>polyOverlap(P,corners(q,B(e)))).length/Math.max(1,poses.length)}}
+const rk=rockHits(s,m);if(rk)v-=40*rk;
     else{const P=corners(p,B(s));const near=Math.min(...G.rocks.map(o=>{const R=rockPoly(o);return Math.min(...P.map(q=>polyPointDist(q,R)))}),1e9);if(near<30)v-=(30-near)/6}
     sc[i]=v;if(v>bv){bv=v;best=i}});G.rng=save;
   UI.sugCache={k:G.round+'|'+s.id+'|'+dk,v:best,sc};return best}
