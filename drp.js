@@ -13,7 +13,7 @@ window.__dr={edge:DR_edge,
    let k=i;while(k<P.length-1&&cum[k]-cum[i]<9+Math.abs(R.v)*.35)k++;let a=Math.atan2(P[k][0]-R.x,P[k][1]-R.z)-R.h;a=Math.atan2(Math.sin(a),Math.cos(a));const vt=40*Math.max(.35,1-Math.abs(a)*.9);
    K.ArrowLeft=a>.035;K.ArrowRight=a<-.035;K.ArrowUp=R.v<vt;K.ArrowDown=R.v>vt+6;const s0=HUB.smashed;const v0=Math.abs(R.v);M.roamSim(1);const v1=Math.abs(R.v);if(HUB.smashed>s0&&v0>5)minRet=Math.min(minRet,v1/v0);
    sv+=v1;if(v1<2)st++;else st=0;mst=Math.max(mst,st);if(v1<4)slow++;if(i>=P.length-3)break}
-  K.ArrowLeft=K.ArrowRight=K.ArrowUp=K.ArrowDown=false;const n=t+1;return{len:Math.round(cum[cum.length-1]),s:+(n/60).toFixed(1),kmh:+(sv/n*3.6).toFixed(1),vavg:+(sv/n*3.6).toFixed(1),stuck:+(mst/60).toFixed(1),slowS:+(slow/60).toFixed(1),smash:(HUB.smashed||0)-sm0,minRet:+minRet.toFixed(3),done:i>=P.length-3}},
+  K.ArrowLeft=K.ArrowRight=K.ArrowUp=K.ArrowDown=false;const n=t+1;return{len:Math.round(cum[cum.length-1]),s:+(n/60).toFixed(1),kmh:+(sv/n*3.6).toFixed(1),vavg:+(sv/n*3.6).toFixed(1),stuck:+(mst/60).toFixed(1),slowS:+(slow/60).toFixed(1),smash:(HUB.smashed||0)-sm0,minRet:+minRet.toFixed(3),done:i>=P.length-3,why:i>=P.length-3?undefined:{hp:Math.round(R.hp),wk:R.wk,fr:R.frozen,st:M.state,ch:!!R.ch,card:!!R.card,x:Math.round(R.x),z:Math.round(R.z),v:+R.v.toFixed(1),hit:!!M.roamHitAt(R.x,R.z,1.5),sol:window.__drFix?__drFix.inSolid(R.x,R.z):null}}},
  dist(n){const D=(typeof DIST_R!=='undefined'?DIST_R:[]).find(d=>d.name===n);return D&&[(D.x0+D.x1)/2,(D.z0+D.z1)/2]},
  dists(){return typeof DIST_R!=='undefined'?[...new Set(DIST_R.map(d=>d.name))]:[]},
  bounds(){return{HX0,HX1,HZS,HZN}},
