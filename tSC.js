@@ -77,7 +77,7 @@ async function shot(p,name,T){await p.evaluate(T=>{const M=__mho,R=M.RO,K=M.K,P=
    // ---- pSC2: humans, verge, weave, drift
    const hu=await p.evaluate(()=>__sc.humans());row.humans=hu;const vg=await p.evaluate(()=>__sc.verge(3));row.verge=vg;
    if(!sc)STREETS=await p.evaluate(()=>__sc.streets(5,150));let wb=0;const wv=[];for(const S of STREETS){const r=await weave(p,S,20);wb+=r.b;wv.push(r)}row.weave={hits:wb,runs:wv};
-   const dr=await drift(p,STREETS.concat(await p.evaluate(()=>__sc.streets(12,120))),20);row.drift=dr;
+   const dr=await drift(p,STREETS.concat(await p.evaluate(()=>__sc.streets(12,120))),20);// streets() keeps 40 m inside the loaded Athens districtrow.drift=dr;
    console.log(`${tag} ${mode} humans ${JSON.stringify(hu)} · verge ${JSON.stringify(vg)} · weave ${JSON.stringify(row.weave)} · drift ${JSON.stringify(dr)}`);
    if(sc){const bf=table[tag+' before'];const H=REF.ped;
     ok(hu.ped/H>=.95&&hu.ped/H<=1.2&&hu.fig/H>=.95&&hu.fig/H<=1.2,`${tag}: pedestrian ${hu.ped} m / minifig ${hu.fig} m ≈ 1.8 m (≤1.2×)`,hu);
