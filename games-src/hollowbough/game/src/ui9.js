@@ -80,6 +80,7 @@ function stripTabs() {
   t.appendChild(h('button.tab' + (city ? '' : '.on'), { 'data-a': 'tab', 'data-v': 'hand', type: 'button', 'aria-pressed': String(!city) }, (v >= 0 ? 'Your hand ' + hn + '/8' : 'Hand')));
   t.appendChild(h('button.tab' + (city ? '.on' : '') + (cityOk && !city ? '.glow' : ''), { 'data-a': 'tab', 'data-v': 'city', type: 'button', 'aria-pressed': String(city) }, (s === v ? 'Your city ' : p.name + "'s city ") + HB.cityCount(G, s) + '/15'));
 }
+document.addEventListener('click', ev => { const b = ev.target.closest('#ptsb'); if (b) { b.hidden = true; ev.stopPropagation(); return; } }, true);
 document.addEventListener('click', ev => { const t = ev.target.closest('[data-a=tab]'); if (!t) return; UI.tab = t.dataset.v; renderDock(); });
 // ---- one-card board map (guided game, and once at the start of every other game you play)
 function boardMap() {
@@ -105,6 +106,6 @@ function raceEl() {
   const me = rows.find(r => r.s === v), others = rows.filter(r => r !== me).sort((a, b) => b.t - a.t);
   const show = [me].concat(others.slice(0, G.np > 2 ? 1 : 2)).filter(Boolean);
   const e = h('span.race', { 'aria-label': 'Points so far: ' + rows.map(r => r.n + ' ' + r.t).join(', ') });
-  show.forEach((r, k) => e.appendChild(h('span', '★' + r.t + ' ' + r.n, r.out ? h('i', ' (done)') : null)));
+  show.forEach((r, k) => e.appendChild(h('span', '★' + r.t + ' ' + r.n, r.out ? h('i', ' ✓') : null)));
   return e;
 }

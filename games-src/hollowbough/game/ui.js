@@ -245,7 +245,7 @@ function renderBoard() {
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) return v; if (UI.focus != null && UI.focus < G.np) return UI.focus; return Math.max(0, G.phase === 'over' ? 0 : Math.min(G.np - 1, G.cur)); }
 // phone cards shrink so a full hand of 8 fits across the dock without sideways scrolling
-function stripW() { if (!isPh()) return 58; const d = $('#dock'), w = (d && d.clientWidth) || innerWidth, v = viewSeat(); const n = Math.max(6, v >= 0 ? G.players[v].hand.length : 6, UI.tab === 'city' ? G.players[focusSeat()].city.length : 0); return Math.max(44, Math.min(56, Math.floor((w - 16 - (n - 1) * 4) / n))); }
+function stripW() { if (!isPh()) return 58; const d = $('#dock'), w = (d && d.clientWidth) || innerWidth, v = viewSeat(); const n = Math.max(6, v >= 0 ? G.players[v].hand.length : 6, UI.tab === 'city' ? G.players[focusSeat()].city.length : 0); return Math.max(44, Math.min(56, Math.floor((w - 18 - (n - 1) * 2) / n))); }
 function promptText() {
   if (!G) return '';
   if (G.phase === 'over') return 'The game is over.';
@@ -435,12 +435,13 @@ function openTile(kind, i) {
     if (kind === 'journey') {
       p.appendChild(popHead('Place a worker on the Long Road?', 'Autumn only'));
       body.appendChild(h('p', 'Discard cards from your hand equal to the spot number. The worker stays for the rest of the game and scores that many points at the end. A spot with a pawn is taken.'));
+      const jg = h('div.jgrid'); body.appendChild(jg);
       for (let j = 0; j < 4; j++) {
         const jj = D.journey[j], m = mm.find(x => x.k === 'journey' && x.i === j), ws = workersAt('journey', j).length;
         const ws2 = G.players.some(pl => pl.dep.some(d => d.k === 'journey' && d.i === j)) || (G.grim && G.grim.ji === j);
         const lab = h('span', h('b', 'Spot ' + jj.points), ' · discard ' + jj.discard + ' · scores ' + jj.points + (jj.shared ? ' (shared)' : ''));
-        if (m) body.appendChild(moveBtn(m, lab));
-        else body.appendChild(h('button.btn.go.dis', { disabled: true, type: 'button' }, lab, h('span.sm', ws2 && !jj.shared ? 'taken' : (v >= 0 && G.players[v].season < 3 ? 'autumn only' : 'not enough cards'))));
+        if (m) jg.appendChild(moveBtn(m, lab));
+        else jg.appendChild(h('button.btn.go.dis', { disabled: true, type: 'button' }, lab, h('span.sm', ws2 && !jj.shared ? 'taken' : (v >= 0 && G.players[v].season < 3 ? 'autumn only' : 'not enough cards'))));
       }
     } else {
       const nm = info.name;
@@ -555,7 +556,7 @@ function openPrep() {
     const ul = h('ul.need');
     ul.appendChild(h('li', 'Your ' + p.dep.filter(d => !d.perm).length + ' placed workers come home (a worker on the Long Road stays there for good).'));
     ul.appendChild(h('li', 'You get ' + [1, 1, 2][p.season] + ' new worker' + ([1, 1, 2][p.season] > 1 ? 's' : '') + ' (' + (p.workers + [1, 1, 2][p.season]) + ' in total).'));
-    ul.appendChild(h('li', nx === 2 ? 'Take up to 2 cards from the meadow.' : 'All your green Production cards gather their goods, in any order you like.'));
+    ul.appendChild(h('li', nx === 2 ? 'Take up to 2 cards from the meadow' + (p.hand.length >= 8 ? ' (your hand is full, so you get none: play a card first).' : p.hand.length === 7 ? ' (your hand has room for only 1).' : '.') : 'All your green Production cards gather their goods, in any order you like.'));
     if (nx === 3) ul.appendChild(h('li', 'Autumn is the last season. The Long Road opens.'));
     body.appendChild(ul); body.appendChild(moveBtn(m, 'Prepare for ' + SEASN[nx]));
     if (UI.rec && sameM(UI.rec.m, m)) body.appendChild(reasonBox(why(m, v)));
@@ -1149,6 +1150,7 @@ function stripTabs() {
   t.appendChild(h('button.tab' + (city ? '' : '.on'), { 'data-a': 'tab', 'data-v': 'hand', type: 'button', 'aria-pressed': String(!city) }, (v >= 0 ? 'Your hand ' + hn + '/8' : 'Hand')));
   t.appendChild(h('button.tab' + (city ? '.on' : '') + (cityOk && !city ? '.glow' : ''), { 'data-a': 'tab', 'data-v': 'city', type: 'button', 'aria-pressed': String(city) }, (s === v ? 'Your city ' : p.name + "'s city ") + HB.cityCount(G, s) + '/15'));
 }
+document.addEventListener('click', ev => { const b = ev.target.closest('#ptsb'); if (b) { b.hidden = true; ev.stopPropagation(); return; } }, true);
 document.addEventListener('click', ev => { const t = ev.target.closest('[data-a=tab]'); if (!t) return; UI.tab = t.dataset.v; renderDock(); });
 // ---- one-card board map (guided game, and once at the start of every other game you play)
 function boardMap() {
@@ -1174,6 +1176,6 @@ function raceEl() {
   const me = rows.find(r => r.s === v), others = rows.filter(r => r !== me).sort((a, b) => b.t - a.t);
   const show = [me].concat(others.slice(0, G.np > 2 ? 1 : 2)).filter(Boolean);
   const e = h('span.race', { 'aria-label': 'Points so far: ' + rows.map(r => r.n + ' ' + r.t).join(', ') });
-  show.forEach((r, k) => e.appendChild(h('span', '★' + r.t + ' ' + r.n, r.out ? h('i', ' (done)') : null)));
+  show.forEach((r, k) => e.appendChild(h('span', '★' + r.t + ' ' + r.n, r.out ? h('i', ' ✓') : null)));
   return e;
 }

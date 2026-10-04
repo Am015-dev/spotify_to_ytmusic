@@ -100,12 +100,13 @@ function openTile(kind, i) {
     if (kind === 'journey') {
       p.appendChild(popHead('Place a worker on the Long Road?', 'Autumn only'));
       body.appendChild(h('p', 'Discard cards from your hand equal to the spot number. The worker stays for the rest of the game and scores that many points at the end. A spot with a pawn is taken.'));
+      const jg = h('div.jgrid'); body.appendChild(jg);
       for (let j = 0; j < 4; j++) {
         const jj = D.journey[j], m = mm.find(x => x.k === 'journey' && x.i === j), ws = workersAt('journey', j).length;
         const ws2 = G.players.some(pl => pl.dep.some(d => d.k === 'journey' && d.i === j)) || (G.grim && G.grim.ji === j);
         const lab = h('span', h('b', 'Spot ' + jj.points), ' · discard ' + jj.discard + ' · scores ' + jj.points + (jj.shared ? ' (shared)' : ''));
-        if (m) body.appendChild(moveBtn(m, lab));
-        else body.appendChild(h('button.btn.go.dis', { disabled: true, type: 'button' }, lab, h('span.sm', ws2 && !jj.shared ? 'taken' : (v >= 0 && G.players[v].season < 3 ? 'autumn only' : 'not enough cards'))));
+        if (m) jg.appendChild(moveBtn(m, lab));
+        else jg.appendChild(h('button.btn.go.dis', { disabled: true, type: 'button' }, lab, h('span.sm', ws2 && !jj.shared ? 'taken' : (v >= 0 && G.players[v].season < 3 ? 'autumn only' : 'not enough cards'))));
       }
     } else {
       const nm = info.name;
@@ -220,7 +221,7 @@ function openPrep() {
     const ul = h('ul.need');
     ul.appendChild(h('li', 'Your ' + p.dep.filter(d => !d.perm).length + ' placed workers come home (a worker on the Long Road stays there for good).'));
     ul.appendChild(h('li', 'You get ' + [1, 1, 2][p.season] + ' new worker' + ([1, 1, 2][p.season] > 1 ? 's' : '') + ' (' + (p.workers + [1, 1, 2][p.season]) + ' in total).'));
-    ul.appendChild(h('li', nx === 2 ? 'Take up to 2 cards from the meadow.' : 'All your green Production cards gather their goods, in any order you like.'));
+    ul.appendChild(h('li', nx === 2 ? 'Take up to 2 cards from the meadow' + (p.hand.length >= 8 ? ' (your hand is full, so you get none: play a card first).' : p.hand.length === 7 ? ' (your hand has room for only 1).' : '.') : 'All your green Production cards gather their goods, in any order you like.'));
     if (nx === 3) ul.appendChild(h('li', 'Autumn is the last season. The Long Road opens.'));
     body.appendChild(ul); body.appendChild(moveBtn(m, 'Prepare for ' + SEASN[nx]));
     if (UI.rec && sameM(UI.rec.m, m)) body.appendChild(reasonBox(why(m, v)));

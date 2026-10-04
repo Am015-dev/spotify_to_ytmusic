@@ -235,6 +235,8 @@ html.lefty #acts{flex-direction:row-reverse}
 .gx-ref-pic .its{display:flex;flex-wrap:wrap;gap:2px;justify-content:center}
 .gx-ref-pic.big .its{gap:8px}
 /* clarity pass */
+html.ph #handRow,html.ph #cityRow{gap:2px}html.ph .strip{padding:2px}
+.jgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.jgrid .btn{min-height:52px;flex-direction:column;align-items:flex-start;font-size:13px}
 .qo.ghost{opacity:.3;filter:grayscale(1);cursor:default}
 #barstat .race{display:inline-flex!important;gap:6px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:44vw}
 #barstat .race i{font-style:normal;opacity:.75;font-weight:600}
@@ -252,7 +254,7 @@ html.ph .strip{height:auto;min-height:60px}
 #stabs .tab.on{background:#fff8e6;border-color:var(--ink)}#stabs .tab.glow{box-shadow:0 0 0 2px var(--gold),0 0 8px 2px rgba(255,214,90,.9)}
 .strip.off{display:none!important}
 html.ph #stabs:not([hidden])~.strip .slab{display:none}
-#ptsb{position:absolute;left:6px;right:6px;top:4px;z-index:13;display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:10px;border:2px solid var(--ink);background:#fff3c4;box-shadow:0 3px 10px rgba(0,0,0,.35);font-size:14px;line-height:1.25;pointer-events:none}
+#ptsb{position:absolute;left:6px;right:6px;top:4px;z-index:13;display:flex;gap:8px;align-items:center;padding:6px 10px;border-radius:10px;border:2px solid var(--ink);background:#fff3c4;box-shadow:0 3px 10px rgba(0,0,0,.35);font-size:14px;line-height:1.25;cursor:pointer}
 #ptsb[hidden]{display:none}#ptsb.down{background:#f6d6cc}#ptsb b{font-size:18px;white-space:nowrap}
 #pc>.cbtns{flex:0 0 auto;margin:0;padding:6px 10px calc(8px + env(safe-area-inset-bottom,0px));background:var(--paper);border-top:1px solid rgba(60,40,20,.2)}
 html.ph #pc>.cbtns{position:static;box-shadow:none}

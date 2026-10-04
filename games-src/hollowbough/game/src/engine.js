@@ -456,7 +456,7 @@ function doAction(seat, m) {
     lg(p.name + ' prepares for ' + SEASONS[p.season + 1] + '.');
     now('prepare', { seat });
   } else if (m.type === 'pass') {
-    p.passed = true; lg(p.name + ' passes.');
+    p.passed = true; lg(p.name + ' passes and takes no more turns (their game is over).');
   } else throw new Error('bad move');
 }
 H.endTurn = d => {
