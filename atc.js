@@ -59,7 +59,7 @@ const ATC_DEF={
   hi:'Drakos wants a flag on Lycabettus so all Athens can see it. Take the hill and hold it.',win:'Your flag over Athens. Even Drakos can see it from Marousi.',lose:'They pushed you off the hill. Hold the summit!',
   d2:'Climb the Lycabettus road, hold the summit zone for 60 s against Drakos’ cars, then wreck his lieutenant.',ph:['The Climb','Hold the Summit','The Lieutenant'],
   build(c){const A=ATC_P(1420,420),Sm=ATC_P(1552,643);c.st.push({t:'go',ph:1,cp:1,ring:1,x:A.x,z:A.z,r:16,txt:'Up the Lycabettus road',ic:'⛰',T:90,scene:'atc_lyka'},{t:'go',ph:1,ring:1,x:Sm.x,z:Sm.z,r:16,txt:'Reach the summit',ic:'🚩',T:90},
-   {t:'survive',ph:2,cp:1,dur:60,max:4,koth:{x:Sm.x,z:Sm.z,r:80},txt:'Hold the summit 60 s · stay inside the zone',ic:'👑',T:120,x2:50},{t:'goons',ph:3,cp:1,wave:[['lt',1]],need:1,txt:'Drakos’ lieutenant: 4 HP, drops mines',ic:'😈',T:80,x2:30})}},
+   {t:'survive',ph:2,cp:1,dur:60,max:4,koth:{x:Sm.x,z:Sm.z,r:120},txt:'Hold the summit 60 s · stay inside the zone',ic:'👑',T:120,x2:50},{t:'goons',ph:3,cp:1,wave:[['lt',1]],need:1,txt:'Drakos’ lieutenant: 4 HP, drops mines',ic:'😈',T:80,x2:30})}},
  atc_lambrou:{name:'Street Duel: Katerina Lambrou',npc:'Katerina Lambrou',who:'LAMBROU',em:'🏎',col:'#4ab0e8',g:[260,310,380],story:1,race:1,ch:2,d:'B',at:[900,-90],items:1,rv:{n:'LAMBROU',col:'#4ab0e8',base:39,lose:'LAMBROU WON THE DUEL'},
   hi:'I know every lane from Syntagma to the Hilton. Vasilissis Sofias, the long way. Items on.',win:'Clean driving. Take this, you will need it against Drakos.',lose:'Sofias is my avenue. Come back faster.',
   d2:'Race Katerina Lambrou down Vasilissis Sofias past the Hilton and the Megaro, back by Kolonaki. Item boxes on.',ph:['Vasilissis Sofias','Megaro','Kolonaki Sprint'],
@@ -132,7 +132,8 @@ chStart=(f=>function(m,o){if(m&&m.atc&&!M1.restoring){const D=ATC_DEF[m.ev.mid];
 chEnd=(f=>function(v){const ch=RO.ch,a=ATC_isA(ch),id=a&&ch.m.ev.mid;f(v);if(a&&v!=null)ATC_done(id)})(chEnd);
 qvFail=(f=>function(ch,why){if(ATC_isA(ch)){const D=ATC_DEF[ch.m.ev.mid];why=String(why||'').replace('LUCA ROSSI WON THE DUEL',D.rv?D.rv.lose:'YOUR RIVAL WON').replace('KAISER’S CREW','DRAKOS’ CREW').replace('KAISER GOT AWAY','THE COURIER GOT AWAY')}return f(ch,why)})(qvFail);
 hitPop=(f=>function(t,col){if(ATC_isA(RO.ch)&&typeof t==='string'){const D=ATC_DEF[RO.ch.m.ev.mid];if(D.rv)t=t.replace('ROSSI',D.rv.n)}return f(t,col)})(hitPop);
-qvTgt=(f=>function(ch){if(ATC_isA(ch)&&ch.v2){const S=ch.v2.L.st[ch.v2.si];if(S&&S.t==='atcGate'&&S.x!=null){const tg=ch.v2.tg;tg.x=S.x;tg.z=S.z;return tg}}return f(ch)})(qvTgt);
+qvTgt=(f=>function(ch){if(ATC_isA(ch)&&ch.v2){const S=ch.v2.L.st[ch.v2.si],tg=ch.v2.tg;if(S&&S.t==='atcGate'&&S.x!=null){tg.x=S.x;tg.z=S.z;return tg}
+  if(S&&S.koth){const t=f(ch);if(!t||Math.hypot(t.x-S.koth.x,t.z-S.koth.z)>S.koth.r*.7||Math.hypot(RO.x-S.koth.x,RO.z-S.koth.z)>S.koth.r*.6){tg.x=S.koth.x;tg.z=S.koth.z;return tg}return t}}return f(ch)})(qvTgt);
 qvEnter=(f=>function(ch,i){f(ch,i);if(ATC_isA(ch)&&ch.v2){const S=ch.v2.L.st[ch.v2.si];if(S&&S.t==='atcGate'&&!S.gs){S.gs=1;ATC_gateSetup(ch,S)}}})(qvEnter);
 // ---------- the DRIVE TO gate inside a mission
 function ATC_gateSetup(ch,S){const G=(HUB.gates||[]).filter(g=>g.to===S.to);const ref=S.aim||{x:RO.x,z:RO.z};let b=null,bd=1e18;for(const g of G){const d=Math.hypot(g.x-RO.x,g.z-RO.z)+Math.hypot(g.x-ref.x,g.z-ref.z)*.6;if(d<bd){bd=d;b=g}}

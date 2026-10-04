@@ -29,7 +29,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));const T0=Date.now();
   const st0=await ev(()=>__atc.stages());let cross=0;
   for(let k=0;k<300;k++){let r;try{r=await ev(()=>__m1bot(50,40,{}))}catch(e){r={on:false,nav:1}}
    if(!r.on){let pend=null;try{pend=await ev(()=>__atc.st().pend)}catch(e){pend={nav:1}}
-    if(pend){cross++;xfers++;await reloadWait();const q=await ev(()=>({d:__mho.athd(),on:!!__mho.RO.ch,si:__atc.si(),st:__atc.stages(),res:__atc.resumed(),pend:__atc.st().pend}));
+    if(pend){cross++;xfers++;await reloadWait();for(let w=0;w<60;w++){if(await ev(()=>{__mho.roamSim(5);return !!__mho.RO.ch}))break;await sleep(200)}const q=await ev(()=>({d:__mho.athd(),on:!!__mho.RO.ch,si:__atc.si(),st:__atc.stages(),res:__atc.resumed(),pend:__atc.st().pend}));
      const S=q.st&&q.st[q.si];ok(q.on&&q.res>=1&&S&&S.dd===q.d&&q.si>0&&q.st[q.si-1].t==='atcGate'&&!q.pend,`${id}: crossed the DRIVE TO gate, reloaded into ${q.d} and resumed at stage ${q.si}`,{d:q.d,si:q.si,t:S&&S.t});
      if(shots<3){shots++;await ev(()=>__mho.roamSim(30));await shot(`atc_${id}_arrive_${q.d}`)}continue}break}
    }
