@@ -30,7 +30,7 @@ svg{display:block}
 #bd>*:not(#pxc){position:relative;z-index:1}
 /* ---- other divers ---- */
 #opp{flex:0 0 auto;display:flex;gap:4px;padding:5px 5px 2px;align-items:stretch;justify-content:center;flex-wrap:wrap}
-.op{flex:1 1 0;min-width:0;max-width:210px;position:relative;display:flex;flex-direction:column;align-items:stretch;gap:1px;padding:3px 3px 4px;border-radius:12px;background:rgba(7,28,58,.62);border:2px solid rgba(160,205,255,.25);color:inherit;font:inherit;text-align:left;cursor:pointer;min-height:44px}
+.op{flex:1 1 0;min-width:0;max-width:260px;position:relative;display:flex;flex-direction:column;align-items:stretch;gap:1px;padding:3px 3px 4px;border-radius:12px;background:rgba(7,28,58,.62);border:2px solid rgba(160,205,255,.25);color:inherit;font:inherit;text-align:left;cursor:pointer;min-height:44px}
 .op.act{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,216,115,.45),0 0 14px rgba(255,216,115,.5)}
 .op .top{display:flex;align-items:center;gap:5px;min-width:0}
 .op .av{position:relative;flex:0 0 auto;width:var(--av,38px);height:var(--av,38px)}
@@ -53,6 +53,13 @@ svg{display:block}
 .op .jc{white-space:normal;min-height:28px;padding:1px 4px;line-height:1.05;cursor:inherit;overflow-wrap:anywhere}
 .op .jobs{min-height:calc(var(--jr,1)*31px)}
 .jc.opp .sm{width:14px;height:14px}.jc.opp .sm svg{width:9px;height:9px}
+#jobsum{display:flex;flex-direction:column;gap:5px}
+.jsh{font-size:13px;font-weight:900;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em}
+.jsr{appearance:none;display:flex;align-items:center;gap:8px;text-align:left;background:rgba(255,255,255,.06);border:2px solid var(--line);border-radius:12px;padding:5px 8px;min-height:44px;color:inherit;font:inherit;cursor:pointer}
+.jsr.ok{border-color:var(--ok);background:rgba(53,194,123,.14)}.jsr.bad{border-color:var(--bad);background:rgba(224,88,60,.16)}
+.jsr .jav{flex:0 0 32px;width:32px;height:32px}.jsr .jav svg{width:100%;height:100%}
+.jsr .jtx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}.jsr .jtx b{font-size:13px}.jsr .jtx span{font-size:14px}
+.jsr .jst{flex:0 0 22px;width:22px;height:22px;color:var(--ink)}
 #dockpile{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 #dockpile #pile,#dockpile #lead{position:static}
 .op .jc .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;text-overflow:clip}
@@ -161,7 +168,7 @@ svg{display:block}
 .kv{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:3px 0;border-bottom:1px dotted var(--line);align-items:center}.kv b{text-align:right}
 .cbtns{display:flex;gap:8px;flex-wrap:wrap}.cbtns .btn{flex:1 1 120px}
 .tipcard{background:rgba(255,216,115,.14);border:2px solid var(--gold);border-radius:12px;padding:7px 9px;display:flex;flex-direction:column;gap:5px}
-.tipcard b{font-size:15px;color:var(--gold)}.tipcard p{margin:0;font-size:14px;line-height:1.35}
+.tipcard b{font-size:15px;color:var(--gold)}.tipcard p{margin:0;font-size:14px;line-height:1.35;white-space:pre-line}
 .tipcard .tr{display:flex;gap:6px;justify-content:flex-end}
 .rules h3{margin:12px 0 4px;font-size:1.08rem;color:var(--gold)}.rules p,.rules li{font-size:14.5px;line-height:1.45}.rules ul,.rules ol{padding-left:20px;margin:4px 0}
 .logl .ll{font-size:14px;padding:3px 0;border-bottom:1px dotted var(--line)}.lt{display:inline-block;min-width:30px;opacity:.6;font-size:13px}
@@ -271,6 +278,8 @@ html.ph .setup .sgo{position:static;margin:0;padding:0;background:none}
 .emo{position:absolute;z-index:6;font-size:26px;pointer-events:none;animation:emo 2.2s ease-out forwards;text-shadow:0 2px 4px #000}
 @keyframes emo{0%{opacity:0;transform:translateY(8px) scale(.6)}15%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-22px)}}
 @media (max-width:999px){html:not(.ph) .gx-dock{max-height:43dvh}}
+html:not(.ph) .jc{font-size:14.5px}html:not(.ph) .op .jc{min-height:30px}html:not(.ph) .op .nm,html:not(.ph) .op .cnt{font-size:14px}
+html:not(.ph) .jcard b{font-size:16px}html:not(.ph) .jcard span{font-size:14.5px}html:not(.ph) .jcard{width:min(31%,230px)}
 /* ================= PHONE (html.ph) ================= */
 html.ph{--gx-bar-h:44px;--gx-dock-w:0px;--dockh:132px;--rail:clamp(236px,31vw,292px);font-size:14px}
 html.ph .gx-bar{min-height:44px;height:44px;padding:0 6px;padding-top:env(safe-area-inset-top,0px);box-sizing:content-box;gap:4px}

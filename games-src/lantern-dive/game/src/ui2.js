@@ -127,7 +127,7 @@ function renderFelt(v) {
   pool.hidden = !assign || !G.tasks.some(t => t.owner < 0); slots.hidden = assign && !pool.hidden;
   // status line
   let line = '';
-  if (assign) line = 'Jobs on the table: ' + G.tasks.filter(t => t.owner < 0).length + ' left';
+  if (assign) line = 'Jobs left: ' + G.tasks.filter(t => t.owner < 0).length + ' · the jobs add up to ' + G.mission.d + ' points';
   else if (G.phase === 'play' || G.phase === 'signal') line = 'Trick ' + Math.min(G.ntr, G.tricks.length + 1) + ' of ' + G.ntr + (G.phase === 'signal' ? ' · signal round' : '');
   else if (G.phase === 'distress') line = 'The jobs are taken. Before the dive: the distress flare';
   else if (G.phase === 'pass') line = 'Everyone passes one card';
@@ -138,7 +138,7 @@ function renderFelt(v) {
     G.tasks.forEach((t, i) => {
       if (t.owner >= 0) return; const d = TASKS[t.id], mineTurn = iMustAct() && G.phase === 'assign';
       const c = h('button.jcard' + (UI.job === i ? '.sel' : '') + (mineTurn ? '' : '.off'), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, 'aria-pressed': UI.job === i ? 'true' : 'false' });
-      const dd = h('span.dd', 'Worth ' + jobDiff(i) + ' ', ...Array.from({ length: jobDiff(i) }, () => h('i')));
+      const dd = h('span.dd', { title: 'Difficulty points: all the jobs on the table add up to the dive\'s difficulty' }, 'Worth ' + jobDiff(i) + (jobDiff(i) === 1 ? ' point ' : ' points '), ...Array.from({ length: jobDiff(i) }, () => h('i')));
       c.append(h('b', d.s), h('span', d.t), dd);
       if (!d.cap) c.append(h('span', { style: 'font-weight:800;color:#8a3a10' }, 'Not for the Commander'));
       pool.append(c);
@@ -321,6 +321,13 @@ function renderDock(v) {
   ac.classList.toggle('many', M.acts.length > 6); ac.innerHTML = ''; M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
   // who is still deciding (simultaneous phases)
   ro.innerHTML = ''; if (G.phase === 'pass' || (G.phase === 'assign' && G.as.mode === 'vote')) { const pend = new Set(LD.pending(G)); G.players.filter(p => !p.helper).forEach(p => ro.append(h('span.rchip' + (pend.has(p.seat) ? '.w' : '.r'), { html: avatarS(p.seat, 48) }, p.name + (pend.has(p.seat) ? ' …' : ' ✓')))); }
+  // desktop: the dock lists every job (who has it, done / failed / open) instead of sitting empty
+  const js = $('#jobsum'); if (js) { js.innerHTML = ''; js.hidden = isPh() || !G.tasks.length; if (!js.hidden) {
+    js.append(h('div.jsh', 'All jobs' + (G.mission.d ? ' · difficulty ' + G.mission.d : '')));
+    G.tasks.forEach((t, i) => { const st = jobSt(i), own = t.owner; js.append(h('button.jsr' + (st > 0 ? '.ok' : st < 0 ? '.bad' : ''), { type: 'button', 'data-a': 'job', 'data-i': i, 'aria-label': jobShort(i) },
+      h('span.jav', { html: own >= 0 ? avatarS(own, 48) : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="#b9d2ee" stroke-width="2" stroke-dasharray="3 3"/></svg>' }),
+      h('span.jtx', h('b', own >= 0 ? pname(own) : 'On the table'), h('span', TASKS[t.id].t)),
+      h('span.jst', { html: st > 0 ? KIT.iconSVG('tick', 22) : st < 0 ? KIT.iconSVG('cross', 22) : '' }))); }); } }
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = M.cls === 'mine' ? 'Your turn' : 'What is happening';
   const bp = $('#barprompt'); if (bp && !bp.contains(pr)) { /* desktop: prompt stays in the dock */ }
   renderTip();

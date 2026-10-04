@@ -3,6 +3,7 @@
 const TIPS = [
   { id: 'welcome', when: () => UI.mode === 'guided' && G.phase === 'assign' && G.tricks.length === 0, title: 'Welcome aboard', body: 'You are a diver in a team. You win together or lose together. On the table lie job cards: each job is something ONE diver has to do with the tricks that diver wins.', btn: 'Next' },
   { id: 'commander', when: () => G.phase === 'assign' && G.cap >= 0, title: () => G.cap === viewSeat() ? 'You are the Commander' : pname(G.cap) + ' is the Commander', body: () => (G.cap === viewSeat() ? 'You hold Lantern 4, the strongest card. So you pick a job first, and you lead the first trick.' : pname(G.cap) + ' holds Lantern 4, the strongest card. The Commander picks a job first, then it goes clockwise, and the Commander leads the first trick.') },
+  { id: 'legend', when: () => G.phase === 'assign' && G.cap >= 0, title: 'Reading the table', body: 'Top bar: Jobs lists every job, Log tells the dive so far, Rules explains the game, Menu has the options.\nGreen ring under a name: that diver\'s signal token is ready. Red crossed ring: it is used.\nA small triangle on a shown card says it is that diver\'s highest or lowest card of the colour.\nDots on a job are its difficulty: the jobs on the table add up to the dive\'s difficulty.' },
   { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card on the table to read it in the panel, then press "Take this job". Choose one you think your own cards can do. With fewer jobs than divers you may pass.' },
   { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'The distress flare', body: 'Optional help: light the flare and every diver passes one card (not a Lantern) to a neighbour. It makes the dive count one extra attempt. You can always say "No flare".' },
   { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signals', body: 'You may show ONE card of yours to the team, once per dive. It must be your highest, your lowest or your only card of a colour. The token on it tells which. Lanterns cannot be shown. Press "Signal…", or skip.' },
@@ -24,7 +25,7 @@ function coachCheck() {
   const light = UI.coach.level === 'light';
   for (const t of TIPS) {
     if (UI.coach.seen[t.id]) continue; if (light && seenEver(t.id)) continue;
-    if (light && !['flare', 'signal', 'follow', 'nofollow', 'trump', 'commander'].includes(t.id)) continue;
+    if (light && !['flare', 'signal', 'follow', 'nofollow', 'trump', 'commander', 'legend'].includes(t.id)) continue;
     let ok = false; try { ok = t.when(); } catch (e) { }
     if (!ok) continue;
     const title = typeof t.title === 'function' ? t.title() : t.title, body = typeof t.body === 'function' ? t.body() : t.body;

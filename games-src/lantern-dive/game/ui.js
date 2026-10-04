@@ -228,7 +228,7 @@ function renderFelt(v) {
   pool.hidden = !assign || !G.tasks.some(t => t.owner < 0); slots.hidden = assign && !pool.hidden;
   // status line
   let line = '';
-  if (assign) line = 'Jobs on the table: ' + G.tasks.filter(t => t.owner < 0).length + ' left';
+  if (assign) line = 'Jobs left: ' + G.tasks.filter(t => t.owner < 0).length + ' · the jobs add up to ' + G.mission.d + ' points';
   else if (G.phase === 'play' || G.phase === 'signal') line = 'Trick ' + Math.min(G.ntr, G.tricks.length + 1) + ' of ' + G.ntr + (G.phase === 'signal' ? ' · signal round' : '');
   else if (G.phase === 'distress') line = 'The jobs are taken. Before the dive: the distress flare';
   else if (G.phase === 'pass') line = 'Everyone passes one card';
@@ -239,7 +239,7 @@ function renderFelt(v) {
     G.tasks.forEach((t, i) => {
       if (t.owner >= 0) return; const d = TASKS[t.id], mineTurn = iMustAct() && G.phase === 'assign';
       const c = h('button.jcard' + (UI.job === i ? '.sel' : '') + (mineTurn ? '' : '.off'), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, 'aria-pressed': UI.job === i ? 'true' : 'false' });
-      const dd = h('span.dd', 'Worth ' + jobDiff(i) + ' ', ...Array.from({ length: jobDiff(i) }, () => h('i')));
+      const dd = h('span.dd', { title: 'Difficulty points: all the jobs on the table add up to the dive\'s difficulty' }, 'Worth ' + jobDiff(i) + (jobDiff(i) === 1 ? ' point ' : ' points '), ...Array.from({ length: jobDiff(i) }, () => h('i')));
       c.append(h('b', d.s), h('span', d.t), dd);
       if (!d.cap) c.append(h('span', { style: 'font-weight:800;color:#8a3a10' }, 'Not for the Commander'));
       pool.append(c);
@@ -338,7 +338,7 @@ function dockModel(v) {
     case 'assign': {
       const A = G.as; const left = G.tasks.filter(t => t.owner < 0).length;
       if (A.mode === 'vote') {
-        if (must && mv.length) { M.p = 'Vote: which diver takes every job?'; M.sub = 'No talk about cards. A tie goes to the Commander\'s vote.'; M.cls = 'mine'; G.players.filter(p => !p.helper).forEach(p => btn(p.name + (p.seat === v ? ' (me)' : ''), 'vote', { f: p.seat })); }
+        if (must && mv.length) { M.p = 'Vote: which diver takes every job?'; M.sub = 'No talk about cards. A tie goes to the Commander\'s vote.'; M.cls = 'mine'; G.players.filter(p => !p.helper).forEach(p => btn(p.seat === v && p.name !== 'You' ? p.name + ' (you)' : p.name, 'vote', { f: p.seat })); }
         else { M.p = 'Waiting for the other votes…'; }
         return M;
       }
@@ -422,6 +422,13 @@ function renderDock(v) {
   ac.classList.toggle('many', M.acts.length > 6); ac.innerHTML = ''; M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
   // who is still deciding (simultaneous phases)
   ro.innerHTML = ''; if (G.phase === 'pass' || (G.phase === 'assign' && G.as.mode === 'vote')) { const pend = new Set(LD.pending(G)); G.players.filter(p => !p.helper).forEach(p => ro.append(h('span.rchip' + (pend.has(p.seat) ? '.w' : '.r'), { html: avatarS(p.seat, 48) }, p.name + (pend.has(p.seat) ? ' …' : ' ✓')))); }
+  // desktop: the dock lists every job (who has it, done / failed / open) instead of sitting empty
+  const js = $('#jobsum'); if (js) { js.innerHTML = ''; js.hidden = isPh() || !G.tasks.length; if (!js.hidden) {
+    js.append(h('div.jsh', 'All jobs' + (G.mission.d ? ' · difficulty ' + G.mission.d : '')));
+    G.tasks.forEach((t, i) => { const st = jobSt(i), own = t.owner; js.append(h('button.jsr' + (st > 0 ? '.ok' : st < 0 ? '.bad' : ''), { type: 'button', 'data-a': 'job', 'data-i': i, 'aria-label': jobShort(i) },
+      h('span.jav', { html: own >= 0 ? avatarS(own, 48) : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="#b9d2ee" stroke-width="2" stroke-dasharray="3 3"/></svg>' }),
+      h('span.jtx', h('b', own >= 0 ? pname(own) : 'On the table'), h('span', TASKS[t.id].t)),
+      h('span.jst', { html: st > 0 ? KIT.iconSVG('tick', 22) : st < 0 ? KIT.iconSVG('cross', 22) : '' }))); }); } }
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = M.cls === 'mine' ? 'Your turn' : 'What is happening';
   const bp = $('#barprompt'); if (bp && !bp.contains(pr)) { /* desktop: prompt stays in the dock */ }
   renderTip();
@@ -676,6 +683,7 @@ function loadSave() {
 const TIPS = [
   { id: 'welcome', when: () => UI.mode === 'guided' && G.phase === 'assign' && G.tricks.length === 0, title: 'Welcome aboard', body: 'You are a diver in a team. You win together or lose together. On the table lie job cards: each job is something ONE diver has to do with the tricks that diver wins.', btn: 'Next' },
   { id: 'commander', when: () => G.phase === 'assign' && G.cap >= 0, title: () => G.cap === viewSeat() ? 'You are the Commander' : pname(G.cap) + ' is the Commander', body: () => (G.cap === viewSeat() ? 'You hold Lantern 4, the strongest card. So you pick a job first, and you lead the first trick.' : pname(G.cap) + ' holds Lantern 4, the strongest card. The Commander picks a job first, then it goes clockwise, and the Commander leads the first trick.') },
+  { id: 'legend', when: () => G.phase === 'assign' && G.cap >= 0, title: 'Reading the table', body: 'Top bar: Jobs lists every job, Log tells the dive so far, Rules explains the game, Menu has the options.\nGreen ring under a name: that diver\'s signal token is ready. Red crossed ring: it is used.\nA small triangle on a shown card says it is that diver\'s highest or lowest card of the colour.\nDots on a job are its difficulty: the jobs on the table add up to the dive\'s difficulty.' },
   { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card on the table to read it in the panel, then press "Take this job". Choose one you think your own cards can do. With fewer jobs than divers you may pass.' },
   { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'The distress flare', body: 'Optional help: light the flare and every diver passes one card (not a Lantern) to a neighbour. It makes the dive count one extra attempt. You can always say "No flare".' },
   { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signals', body: 'You may show ONE card of yours to the team, once per dive. It must be your highest, your lowest or your only card of a colour. The token on it tells which. Lanterns cannot be shown. Press "Signal…", or skip.' },
@@ -697,7 +705,7 @@ function coachCheck() {
   const light = UI.coach.level === 'light';
   for (const t of TIPS) {
     if (UI.coach.seen[t.id]) continue; if (light && seenEver(t.id)) continue;
-    if (light && !['flare', 'signal', 'follow', 'nofollow', 'trump', 'commander'].includes(t.id)) continue;
+    if (light && !['flare', 'signal', 'follow', 'nofollow', 'trump', 'commander', 'legend'].includes(t.id)) continue;
     let ok = false; try { ok = t.when(); } catch (e) { }
     if (!ok) continue;
     const title = typeof t.title === 'function' ? t.title() : t.title, body = typeof t.body === 'function' ? t.body() : t.body;
@@ -878,7 +886,7 @@ function renderMenu() {
   if (!NET.on) row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const gg = gfxPref(); row('Graphics' + (PX.on ? (gg === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (gg === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': gg === v ? 'true' : 'false' }, n))); }
-  let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
+  let sp = ''; try { sp = /[?&]perf=1/.test(location.search) && window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }   // Show speed / Test speed only behind ?perf=1
   row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'ref', type: 'button' }, 'Cards, jobs, dives'), h('span.tinyc', { html: sp }));
   if (NET.on) row('Emotes (no card talk)', ...['👍', '👋', '👏', '🫧'].map(e => h('button.btn.alt', { 'data-a': 'emote', 'data-v': e, type: 'button', 'aria-label': 'Emote ' + e }, e)));
   b.appendChild(h('p.sm', 'Lantern Dive is an original deep-sea co-op trick game. Names, job text and art are original; the audio credits are in How to play.'));
@@ -896,7 +904,7 @@ function missionLine(o) {
   if (kind === 'job') return 'Job practice · ' + TASKS[Math.max(0, Math.min(95, (o.job | 0) - 1))].s;
   return 'Deep dive · difficulty ' + o.deep;
 }
-function tableLine(o) { const nm = o.seats.map(c => D.names[c]); return 'You + ' + nameList(nm) + ' · ' + o.np + ' divers' + (o.np === 2 ? ' + drone' : ''); }
+function tableLine(o) { const nm = o.seats.map(c => D.names[c]); return 'You + ' + nameList(nm) + ' · ' + o.np + ' players' + (o.np === 2 ? ' + a drone' : ''); }
 function renderStart() {
   const s = $('#start'); s.hidden = false; s.innerHTML = '';
   const rs = $('#rs'); if (rs && !UI.rsOpen) { rs.hidden = true; }
@@ -936,7 +944,7 @@ function diveCfg(o) {
   if (kind === 'log') {
     const cur = Math.min(32, o.mission | 0 || p.cur || 1);
     out.push(h('p.ssub', missionLine(Object.assign({}, o, { mission: cur }))));
-    const g = h('div.lgrid'); D.missions.forEach(m => { const dn = p.done[m.id], lock = m.id > Math.max(p.cur, 1) + 0 && false; g.append(h('button.lcell' + (cur === m.id ? '.cur' : '') + (dn ? '.dn' : ''), { 'data-a': 'pickdive', 'data-v': m.id, type: 'button' }, h('b', m.id + '. ' + m.name), h('span', (m.sel === 'fixed' ? 'Fixed jobs' : 'Difficulty ' + m.d) + (m.cmt !== 'normal' || m.timer ? ' · ' + (m.timer ? 'clock' : m.cmt) : '')), dn ? h('span.at', 'Done in ' + dn + ' attempt' + (dn === 1 ? '' : 's')) : (p.tries[m.id] ? h('span.at', p.tries[m.id] + ' failed') : null))); });
+    const g = h('div.lgrid'); D.missions.forEach(m => { const dn = p.done[m.id], lock = m.id > Math.max(p.cur, 1) + 0 && false; g.append(h('button.lcell' + (cur === m.id ? '.cur' : '') + (dn ? '.dn' : ''), { 'data-a': 'pickdive', 'data-v': m.id, type: 'button' }, h('b', m.id + '. ' + m.name), h('span', (m.sel === 'fixed' ? 'Fixed jobs' : 'Difficulty ' + m.d) + (m.cmt !== 'normal' || m.timer ? ' · ' + (m.timer ? 'timed' : ({ murky: 'murky water', narc: 'narcosis', unknown: 'unknown waters', none: 'no signals' }[m.cmt] || m.cmt)) : '')), dn ? h('span.at', 'Done in ' + dn + ' attempt' + (dn === 1 ? '' : 's')) : (p.tries[m.id] ? h('span.at', p.tries[m.id] + ' failed') : null))); });
     out.push(g);
     if (m32done(p)) out.push(h('p.sm', 'All 32 dives logged! The Deep Dive keeps going from difficulty 18.'));
   } else if (kind === 'free') {
@@ -964,7 +972,7 @@ function setupEl() {
   const go = h('div.sgo',
     h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the dive'), h('span', missionLine(o))),
     h('div.sgrid3',
-      h('button.sbtn', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first dive'), h('span', 'You and two divers, with tips')),
+      h('button.sbtn', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first dive'), h('span', 'You + 2 computer divers, with tips')),
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', o.np + ' people, one device')),
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch'), h('span', 'the divers play'))));
   return h('div.setup.scard', head, ph ? sum : h('p.ssub', 'Choose the dive and who comes along. Each computer diver has a temper; change their level if you like.'), cfg, go);
@@ -1180,8 +1188,8 @@ async function pxTextures() {
   PX.tex.cardShadow = mk(80, 108, (x, w, h) => { x.filter = 'blur(6px)'; x.fillStyle = 'rgba(0,6,20,.6)'; x.beginPath(); x.roundRect ? x.roundRect(12, 12, w - 24, h - 24, 8) : x.rect(12, 12, w - 24, h - 24); x.fill(); });
   PX.tex.cardGlow = mk(96, 124, (x, w, h) => { x.filter = 'blur(8px)'; x.fillStyle = 'rgba(255,216,115,.95)'; x.beginPath(); x.roundRect ? x.roundRect(14, 14, w - 28, h - 28, 10) : x.rect(14, 14, w - 28, h - 28); x.fill(); });
   PX.tex.handgrad = mk(4, 64, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(2,10,24,0)'); g.addColorStop(.3, 'rgba(2,10,24,.5)'); g.addColorStop(1, 'rgba(2,10,24,.6)'); x.fillStyle = g; x.fillRect(0, 0, w, h); });
-  PX.tex.caustic = mk(256, 256, (x, w, h) => { x.fillStyle = 'rgba(0,0,0,0)'; x.clearRect(0, 0, w, h); x.strokeStyle = 'rgba(190,240,255,.22)'; x.lineWidth = 2.4; x.lineCap = 'round'; let s = 7; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
-    for (let i = 0; i < 26; i++) { const cx = r() * w, cy = r() * h, rr = 14 + r() * 30; x.beginPath(); for (let k = 0; k <= 10; k++) { const a = k / 10 * Math.PI * 2, rj = rr * (.7 + r() * .6); const px = cx + Math.cos(a) * rj, py = cy + Math.sin(a) * rj * .7; k ? x.lineTo(px, py) : x.moveTo(px, py); } x.stroke(); } });
+  // caustics: soft light pools only (filled radial blobs, no outlines)
+  PX.tex.caustic = mk(256, 256, (x, w, h) => { x.clearRect(0, 0, w, h); let s = 7; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; for (let i = 0; i < 16; i++) { const cx = r() * w, cy = r() * h, rr = 22 + r() * 40; for (const [ox, oy] of [[0, 0], [w, 0], [-w, 0], [0, h], [0, -h]]) { const g = x.createRadialGradient(cx + ox, cy + oy, 0, cx + ox, cy + oy, rr); g.addColorStop(0, 'rgba(170,230,255,.16)'); g.addColorStop(1, 'rgba(170,230,255,0)'); x.fillStyle = g; x.beginPath(); x.ellipse(cx + ox, cy + oy, rr, rr * .7, 0, 0, 7); x.fill(); } } });
 }
 function svgImgP(svg) { return pxLoadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)); }
 // a card face at w CSS px, drawn straight on a canvas (no SVG decoding, so it is ready at once): paper, frame, the painted emblem, crisp numerals
