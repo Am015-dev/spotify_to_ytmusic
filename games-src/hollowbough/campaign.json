@@ -1,0 +1,1056 @@
+{
+  "game": "hollowbough",
+  "title": "The Long Winter of Hollowbough",
+  "version": 1,
+  "cast": {
+    "hazel": {
+      "name": "Hazel Quickpaw",
+      "portrait": "camp-hazel.webp",
+      "emoji": "🐇",
+      "color": "#7a9a4a"
+    },
+    "bramble": {
+      "name": "Bramble",
+      "portrait": "camp-bramble.webp",
+      "emoji": "🦔",
+      "color": "#a0673a"
+    },
+    "fern": {
+      "name": "Fern",
+      "portrait": "camp-fern.webp",
+      "emoji": "🐭",
+      "color": "#4f8a5b"
+    },
+    "quill": {
+      "name": "Quill",
+      "portrait": "camp-quill.webp",
+      "emoji": "🐦‍⬛",
+      "color": "#3d4a6b"
+    },
+    "thistle": {
+      "name": "Thistle",
+      "portrait": "camp-thistle.webp",
+      "emoji": "🐿️",
+      "color": "#8a3f6e"
+    },
+    "grim": {
+      "name": "Old Grimbeard",
+      "portrait": "camp-grimbeard.webp",
+      "emoji": "🦡",
+      "color": "#5b5048"
+    }
+  },
+  "acts": [
+    {
+      "act": 1,
+      "title": "Thaw",
+      "blurb": "Found your city and learn the woods."
+    },
+    {
+      "act": 2,
+      "title": "Midsummer",
+      "blurb": "Sharper neighbours, fewer clearings, a proud regent."
+    },
+    {
+      "act": 3,
+      "title": "First Frost",
+      "blurb": "Hard rivals and Thistle's gate before the winter."
+    }
+  ],
+  "twists": [
+    {
+      "id": "thin-forest",
+      "where": "setup",
+      "how": "After HB.newGame returns, set G.forest = G.forest.slice(0, param) so only param forest locations are open to every seat."
+    },
+    {
+      "id": "boss-extra-hand",
+      "where": "setup",
+      "how": "After HB.newGame returns, the boss seat draws param extra cards from the deck into hand (never above the hand limit of 8)."
+    },
+    {
+      "id": "boss-pantry",
+      "where": "setup",
+      "how": "After HB.newGame returns, add param to the boss seat's res.twig, res.resin and res.berry (pebbles unchanged)."
+    }
+  ],
+  "chapters": [
+    {
+      "id": "c1",
+      "act": 1,
+      "title": "First Roots",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hazel",
+          "text": "Welcome to Hollowbough. The snow is melting and the valley needs a new city."
+        },
+        {
+          "who": "hazel",
+          "text": "On your turn, place a worker on a spot to gather twigs, resin, berries or pebbles."
+        },
+        {
+          "who": "bramble",
+          "text": "I'm Bramble! I'll build next door. Don't worry, I mostly grab whatever's shiny."
+        }
+      ],
+      "outro": [
+        {
+          "who": "hazel",
+          "text": "Workers gather, cards build. That's the whole heart of it."
+        },
+        {
+          "who": "bramble",
+          "text": "You beat me fair and square. Neighbours?"
+        }
+      ],
+      "opponent": {
+        "name": "Bramble",
+        "portrait": "camp-bramble.webp",
+        "emoji": "🦔",
+        "cast": "bramble",
+        "personality": "Cheerful and scatterbrained; grabs whatever is closest.",
+        "aiLevel": "easy",
+        "aiStyle": null
+      },
+      "setup": {
+        "mode": "vs",
+        "np": 2,
+        "level": "easy",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the game against Bramble."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Win the game",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Build 8 or more cards in your city",
+          "test": {
+            "k": "city",
+            "op": ">=",
+            "v": 8
+          }
+        },
+        {
+          "text": "Score 30 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 30
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Bramble plays even more gently and the tips stay on."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "bramble",
+          "text": "Bramble's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "act": 1,
+      "title": "Room for a Lodger",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hazel",
+          "text": "Every critter names a building it loves. Build that first, and the critter moves in free."
+        },
+        {
+          "who": "hazel",
+          "text": "Look for the little link on each card. A free card is a whole turn of gathering saved."
+        },
+        {
+          "who": "fern",
+          "text": "I'm Fern. I count every twig twice. Let's see who settles more lodgers."
+        }
+      ],
+      "outro": [
+        {
+          "who": "hazel",
+          "text": "Free lodgers are how a small city grows fast."
+        },
+        {
+          "who": "fern",
+          "text": "Hm. I'll pair my buildings better next time."
+        }
+      ],
+      "opponent": {
+        "name": "Fern",
+        "portrait": "camp-fern.webp",
+        "emoji": "🐭",
+        "cast": "fern",
+        "personality": "Careful and thrifty; never wastes a resource, rarely takes risks.",
+        "aiLevel": "easy",
+        "aiStyle": null
+      },
+      "setup": {
+        "mode": "vs",
+        "np": 2,
+        "level": "easy",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "custom",
+        "value": 2,
+        "text": "Win with at least 2 critters moved in for free."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Win with 2+ free critters",
+          "test": {
+            "k": "occupied",
+            "op": ">=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Move in 3 or more free critters",
+          "test": {
+            "k": "occupied",
+            "op": ">=",
+            "v": 3
+          }
+        },
+        {
+          "text": "Win by 10 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 10
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Only 1 free critter is needed and Fern plays gently."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "fern",
+          "text": "Fern's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "act": 1,
+      "title": "The Spring Harvest",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hazel",
+          "text": "Green cards are farms and mills. They pay out when played, and again each spring and autumn."
+        },
+        {
+          "who": "hazel",
+          "text": "Plant them early and Prepare for Season will fill your larder for you."
+        },
+        {
+          "who": "bramble",
+          "text": "Fern and I are both here this time. Three cities, one meadow!"
+        },
+        {
+          "who": "fern",
+          "text": "Try not to trample my berry patch."
+        }
+      ],
+      "outro": [
+        {
+          "who": "hazel",
+          "text": "An early green engine feeds you all year."
+        },
+        {
+          "who": "bramble",
+          "text": "Your city hums like a beehive."
+        }
+      ],
+      "opponent": {
+        "name": "Bramble",
+        "portrait": "camp-bramble.webp",
+        "emoji": "🦔",
+        "cast": "bramble",
+        "personality": "Bramble and Fern together: one grabby, one careful.",
+        "aiLevel": "easy",
+        "aiStyle": null
+      },
+      "setup": {
+        "mode": "vs",
+        "np": 3,
+        "level": "easy",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "custom",
+        "value": 3,
+        "text": "Win with at least 3 green Production cards in your city."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Win with 3+ green cards",
+          "test": {
+            "k": "green",
+            "op": ">=",
+            "v": 3
+          }
+        },
+        {
+          "text": "Have 5 or more green cards",
+          "test": {
+            "k": "green",
+            "op": ">=",
+            "v": 5
+          }
+        },
+        {
+          "text": "Score 40 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 40
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "np": 2
+        },
+        "maxStars": 2,
+        "text": "Only Bramble plays, so the meadow is less crowded."
+      },
+      "unlock": [
+        {
+          "type": "cardback",
+          "id": "sprout",
+          "text": "Sprout card back"
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "act": 1,
+      "title": "The Grumbling Hill",
+      "boss": true,
+      "intro": [
+        {
+          "who": "hazel",
+          "text": "Old Grimbeard has grumbled on the hill for longer than the oak has stood."
+        },
+        {
+          "who": "grim",
+          "text": "New cities. Noisy. I'll take the best cards before you've woken up."
+        },
+        {
+          "who": "hazel",
+          "text": "He follows a fixed routine and rolls for meadow cards. Beat his total by even 1 point."
+        },
+        {
+          "who": "hazel",
+          "text": "Events help: four basic ones sit open on the board for whoever meets them first."
+        }
+      ],
+      "outro": [
+        {
+          "who": "grim",
+          "text": "Hmph. Fine city. Too many lanterns."
+        },
+        {
+          "who": "hazel",
+          "text": "The valley has noticed you. Summer brings sharper neighbours."
+        }
+      ],
+      "opponent": {
+        "name": "Old Grimbeard",
+        "portrait": "camp-grimbeard.webp",
+        "emoji": "🦡",
+        "cast": "grim",
+        "personality": "Grumpy, set in his ways; follows his routine and rolls for the meadow.",
+        "aiLevel": "Grumpy",
+        "aiStyle": "solo-rival",
+        "taunt": "Too slow. Come back when your roots go deeper.",
+        "praise": "Hmph. You may stay on my hill. For now."
+      },
+      "setup": {
+        "mode": "solo",
+        "solo": 1,
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Beat Old Grimbeard on Grumpy by at least 1 point."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Beat Old Grimbeard",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Claim 2 or more events",
+          "test": {
+            "k": "events",
+            "op": ">=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Win by 8 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 8
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "mode": "vs",
+          "np": 2,
+          "level": "easy"
+        },
+        "maxStars": 2,
+        "text": "Grimbeard sends an easy computer player to sit in for him."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "grim",
+          "text": "Old Grimbeard's portrait"
+        },
+        {
+          "type": "act",
+          "id": "act2",
+          "text": "Act 2: Midsummer"
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "act": 2,
+      "title": "A Stranger in the Meadow",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hazel",
+          "text": "Summer. Quill has flown in from the far ridge, and Quill doesn't play gently."
+        },
+        {
+          "who": "quill",
+          "text": "Ooh, what a lovely meadow. Shame if someone took the best card from it."
+        },
+        {
+          "who": "hazel",
+          "text": "Watch the meadow: whatever you leave there, Quill will snatch."
+        }
+      ],
+      "outro": [
+        {
+          "who": "quill",
+          "text": "Lucky draw. Next time I'll pick cleaner."
+        },
+        {
+          "who": "hazel",
+          "text": "You held your ground against a real player."
+        }
+      ],
+      "opponent": {
+        "name": "Quill",
+        "portrait": "camp-quill.webp",
+        "emoji": "🐦‍⬛",
+        "cast": "quill",
+        "personality": "Sly and quick; snatches the best meadow cards before you can.",
+        "aiLevel": "normal",
+        "aiStyle": null
+      },
+      "setup": {
+        "mode": "vs",
+        "np": 2,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the game against Quill."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Win the game",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Score 45 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 45
+          }
+        },
+        {
+          "text": "Win by 10 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 10
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "level": "easy"
+        },
+        "maxStars": 2,
+        "text": "Quill plays at the easy level."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "quill",
+          "text": "Quill's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c6",
+      "act": 2,
+      "title": "The Thin Woods",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hazel",
+          "text": "A late frost closed part of the forest. Fewer clearings, and everyone wants them."
+        },
+        {
+          "who": "fern",
+          "text": "Quill and I both heard about the events. First to qualify claims each one."
+        },
+        {
+          "who": "hazel",
+          "text": "Plan your colours: each event wants a certain mix of cards in your city."
+        }
+      ],
+      "outro": [
+        {
+          "who": "hazel",
+          "text": "Events are points nobody can take back."
+        },
+        {
+          "who": "fern",
+          "text": "You read the board better than I did."
+        }
+      ],
+      "opponent": {
+        "name": "Fern",
+        "portrait": "camp-fern.webp",
+        "emoji": "🐭",
+        "cast": "fern",
+        "personality": "Fern and Quill together: one patient, one greedy.",
+        "aiLevel": "normal",
+        "aiStyle": null
+      },
+      "setup": {
+        "mode": "vs",
+        "np": 3,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": {
+        "id": "thin-forest",
+        "param": 2,
+        "text": "Chapter rule: only 2 forest clearings are open this game, for everyone."
+      },
+      "goal": {
+        "type": "custom",
+        "value": 2,
+        "text": "Win and claim at least 2 events."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Win with 2+ events",
+          "test": {
+            "k": "events",
+            "op": ">=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Claim 3 or more events",
+          "test": {
+            "k": "events",
+            "op": ">=",
+            "v": 3
+          }
+        },
+        {
+          "text": "Score 50 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 50
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "level": "easy"
+        },
+        "maxStars": 2,
+        "text": "Both rivals play easy and the full forest is open."
+      },
+      "unlock": [
+        {
+          "type": "table",
+          "id": "frostwood",
+          "text": "Frostwood table"
+        }
+      ]
+    },
+    {
+      "id": "c7",
+      "act": 2,
+      "title": "The Regent's Visit",
+      "boss": true,
+      "intro": [
+        {
+          "who": "thistle",
+          "text": "I am Thistle, and every road in this valley ends at my gate."
+        },
+        {
+          "who": "thistle",
+          "text": "I bring a full satchel of plans. You bring... a sketch."
+        },
+        {
+          "who": "hazel",
+          "text": "Thistle builds big and scores at the end. Close off the events before her city fills."
+        },
+        {
+          "who": "hazel",
+          "text": "Reach 40 points and win. Take the Long Road in autumn if your hand is heavy."
+        }
+      ],
+      "outro": [
+        {
+          "who": "thistle",
+          "text": "Impressive. Enjoy the summer, settler. Frost comes for all of us."
+        },
+        {
+          "who": "hazel",
+          "text": "She'll be back. And she won't come alone."
+        }
+      ],
+      "opponent": {
+        "name": "Thistle",
+        "portrait": "camp-thistle.webp",
+        "emoji": "🐿️",
+        "cast": "thistle",
+        "personality": "Proud and patient; hoards cards and plans for a huge final score.",
+        "aiLevel": "normal",
+        "aiStyle": null,
+        "taunt": "A sketch, as I said. My gate stays shut.",
+        "praise": "Well built. I shall remember your name."
+      },
+      "setup": {
+        "mode": "vs",
+        "np": 2,
+        "level": "normal",
+        "seed": null
+      },
+      "twist": {
+        "id": "boss-extra-hand",
+        "param": 2,
+        "text": "Boss rule: Thistle starts with 2 extra cards in hand."
+      },
+      "goal": {
+        "type": "score",
+        "value": 40,
+        "text": "Win with at least 40 points."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Win with 40+ points",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 40
+          }
+        },
+        {
+          "text": "Score 5+ points on the Long Road",
+          "test": {
+            "k": "journey",
+            "op": ">=",
+            "v": 5
+          }
+        },
+        {
+          "text": "Win by 10 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 10
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "level": "easy"
+        },
+        "maxStars": 2,
+        "text": "Thistle plays easy and starts with a normal hand."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "thistle",
+          "text": "Thistle's portrait"
+        },
+        {
+          "type": "act",
+          "id": "act3",
+          "text": "Act 3: First Frost"
+        }
+      ]
+    },
+    {
+      "id": "c8",
+      "act": 3,
+      "title": "Frost on the Bough",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hazel",
+          "text": "Autumn. Fern has stopped being careful and started being clever."
+        },
+        {
+          "who": "fern",
+          "text": "I've studied every game we played. I won't waste a single turn now."
+        },
+        {
+          "who": "hazel",
+          "text": "No tricks this time. Just a sharp rival and a fair board."
+        }
+      ],
+      "outro": [
+        {
+          "who": "fern",
+          "text": "You out-planned me. I didn't think anyone could."
+        },
+        {
+          "who": "hazel",
+          "text": "Now the hill, and then the gate."
+        }
+      ],
+      "opponent": {
+        "name": "Fern",
+        "portrait": "camp-fern.webp",
+        "emoji": "🐭",
+        "cast": "fern",
+        "personality": "Methodical; looks two moves ahead and never wastes a worker.",
+        "aiLevel": "hard",
+        "aiStyle": null
+      },
+      "setup": {
+        "mode": "vs",
+        "np": 2,
+        "level": "hard",
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win the game against Fern at the hard level."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Win the game",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Score 55 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 55
+          }
+        },
+        {
+          "text": "Claim 3 or more events",
+          "test": {
+            "k": "events",
+            "op": ">=",
+            "v": 3
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "level": "normal"
+        },
+        "maxStars": 2,
+        "text": "Fern plays at the normal level."
+      },
+      "unlock": [
+        {
+          "type": "cardback",
+          "id": "frost",
+          "text": "Frost card back"
+        }
+      ]
+    },
+    {
+      "id": "c9",
+      "act": 3,
+      "title": "Grimbeard Grows Gruff",
+      "boss": false,
+      "intro": [
+        {
+          "who": "grim",
+          "text": "You again. I've been practising. Rolled a lot of dice this summer."
+        },
+        {
+          "who": "hazel",
+          "text": "Each special event nobody claims is worth 6 points to him now. Claim them first."
+        },
+        {
+          "who": "hazel",
+          "text": "Beat his total by at least 1 point."
+        }
+      ],
+      "outro": [
+        {
+          "who": "grim",
+          "text": "...Gruff, they call me. Gruffly, I say: well played."
+        },
+        {
+          "who": "hazel",
+          "text": "Only Thistle's gate is left."
+        }
+      ],
+      "opponent": {
+        "name": "Old Grimbeard",
+        "portrait": "camp-grimbeard.webp",
+        "emoji": "🦡",
+        "cast": "grim",
+        "personality": "Gruff and relentless; scores heavily for every special event left unclaimed.",
+        "aiLevel": "Gruff",
+        "aiStyle": "solo-rival"
+      },
+      "setup": {
+        "mode": "solo",
+        "solo": 2,
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Beat Old Grimbeard on Gruff by at least 1 point."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Beat Old Grimbeard",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Claim 2 or more special events",
+          "test": {
+            "k": "specialEvents",
+            "op": ">=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Win by 5 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 5
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "Grumpy",
+        "twist": null,
+        "setup": {
+          "solo": 1
+        },
+        "maxStars": 2,
+        "text": "Grimbeard plays as his Grumpy self."
+      },
+      "unlock": [
+        {
+          "type": "title",
+          "id": "beard-trimmer",
+          "text": "Title: Beard Trimmer"
+        }
+      ]
+    },
+    {
+      "id": "c10",
+      "act": 3,
+      "title": "The Gate of Thistle",
+      "boss": true,
+      "intro": [
+        {
+          "who": "thistle",
+          "text": "Winter is coming, and my larder is full. Quill flies for me now."
+        },
+        {
+          "who": "quill",
+          "text": "Nothing personal. She pays in berries."
+        },
+        {
+          "who": "hazel",
+          "text": "Thistle starts with a stocked pantry. Two hard rivals, one meadow. Build fast and claim early."
+        },
+        {
+          "who": "hazel",
+          "text": "Win this and the valley is yours."
+        }
+      ],
+      "outro": [
+        {
+          "who": "thistle",
+          "text": "The gate is open. Hollowbough is yours to keep."
+        },
+        {
+          "who": "quill",
+          "text": "I always did like the winning side."
+        },
+        {
+          "who": "hazel",
+          "text": "Rest now. The oak will wake again in spring."
+        }
+      ],
+      "opponent": {
+        "name": "Thistle",
+        "portrait": "camp-thistle.webp",
+        "emoji": "🐿️",
+        "cast": "thistle",
+        "personality": "Proud and patient, now ruthless; plays hard with Quill as her ally.",
+        "aiLevel": "hard",
+        "aiStyle": null,
+        "taunt": "My pantry, my valley, my winter. Go home, settler.",
+        "praise": "You've built something I never could. The valley chose well."
+      },
+      "setup": {
+        "mode": "vs",
+        "np": 3,
+        "level": "hard",
+        "seed": null
+      },
+      "twist": {
+        "id": "boss-pantry",
+        "param": 2,
+        "text": "Boss rule: Thistle starts with 2 extra twigs, resin and berries."
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Win against Thistle and Quill at the hard level."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Win the game",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Score 60 or more",
+          "test": {
+            "k": "score",
+            "op": ">=",
+            "v": 60
+          }
+        },
+        {
+          "text": "Win by 8 or more",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 8
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "level": "normal"
+        },
+        "maxStars": 2,
+        "text": "Both rivals play normal and Thistle starts with no extra pantry."
+      },
+      "unlock": [
+        {
+          "type": "title",
+          "id": "warden",
+          "text": "Title: Warden of Hollowbough"
+        },
+        {
+          "type": "table",
+          "id": "elderheart",
+          "text": "Elderheart table"
+        }
+      ]
+    }
+  ]
+}
