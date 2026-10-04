@@ -174,7 +174,7 @@ function oppEl(s, act) {
   if (p.helper) return droneEl(s, act);
   const b = h('button.op' + (act === s ? '.act' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'data-key': 'seat' + s, 'aria-label': p.name + (cm ? ', Commander' : '') + ', ' + p.hand.length + ' cards' });
   const av = h('span.av', { html: avatarS(s, 80) }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 19 }), title: 'Commander' }));
-  const top = h('span.top', av, h('span.who', h('span.nm', p.name), h('span.cnt', h('span', h('b', p.hand.length), ' cards'), won ? h('span', h('b', won), won === 1 ? ' trick' : ' tricks') : null)));
+  const top = h('span.top', av, h('span.who', h('span.nm', p.name), h('span.cnt', h('span', h('b', p.hand.length), p.hand.length === 1 ? ' card' : ' cards'), h('span', h('b', won), won === 1 ? ' trick' : ' tricks'))));
   b.append(top);
   const pg = h('span.pg'); const t = pingTok(s, 22); if (t) pg.append(t); const sh = shownEl(s); if (sh) pg.append(sh);
   if (pg.childNodes.length) b.append(pg);
@@ -187,7 +187,7 @@ function droneEl(s, act) {
   const p = G.players[s], v = viewSeat();
   const b = h('div.op.drone' + (act === s ? '.act' : ''), { 'data-seat': s, 'data-key': 'seat' + s });
   const av = h('span.av', { html: avatarS(s, 80) });
-  const top = h('span.top', av, h('span.who', h('span.nm', p.name + ' (drone)'), h('span.cnt', h('span', h('b', p.hand.length), ' cards'), tricksWon()[s] ? h('span', h('b', tricksWon()[s]), tricksWon()[s] === 1 ? ' trick' : ' tricks') : null)));
+  const top = h('span.top', av, h('span.who', h('span.nm', p.name + ' (drone)'), h('span.cnt', h('span', h('b', p.hand.length), ' cards'), h('span', h('b', tricksWon()[s]), tricksWon()[s] === 1 ? ' trick' : ' tricks'))));
   const js = jobs(s); const jb = h('span.jobs', { style: 'flex:1;min-width:0;flex-direction:row;flex-wrap:wrap;gap:3px;margin-left:6px' });
   js.slice(0, 3).forEach(i => { const c = jobChip(i); c.style.width = 'auto'; jb.append(c); }); if (js.length > 3) jb.append(h('span.jc.more', '+' + (js.length - 3)));
   const head = h('div', { style: 'display:flex;align-items:center;gap:4px' }, h('button.op', { type: 'button', 'data-a': 'seat', 'data-seat': s, style: 'flex:0 0 auto;max-width:none;background:transparent;border-color:transparent;padding:0', 'aria-label': 'Drone ' + p.name }, top), jb);
@@ -749,7 +749,7 @@ function hintFor(d) {
 }
 function openSeat(s) {
   if (!G) return; const p = G.players[s], kids = [];
-  kids.push(h('div', { style: 'display:flex;gap:10px;align-items:center' }, h('span', { style: 'width:56px;height:56px;display:block', html: avatarS(s, 96) }), h('div', h('b', p.name + (s === G.cap ? ' (Commander)' : '')), h('div.sm', p.helper ? 'The drone: ' + pname(G.cap) + ' flies it and decides without talking.' : (p.ai ? 'Computer diver (' + p.ai + ')' : (NET.on && s === NET.mySeat ? 'You' : 'Diver'))))));
+  kids.push(h('div', { style: 'display:flex;gap:10px;align-items:center' }, h('span.av56', { style: 'width:56px;height:56px;flex:0 0 56px;display:block', html: avatarS(s, 96) }), h('div', h('b', p.name + (s === G.cap ? ' (Commander)' : '')), h('div.sm', p.helper ? 'The drone: ' + pname(G.cap) + ' flies it and decides without talking.' : (p.ai ? 'Computer diver (' + p.ai + ')' : (NET.on && s === NET.mySeat ? 'You' : 'Diver'))))));
   kids.push(h('div.kv', h('span', 'Cards in hand'), h('b', p.hand.length)));
   kids.push(h('div.kv', h('span', 'Tricks won'), h('b', tricksWon()[s])));
   if (!p.helper) kids.push(h('div.kv', h('span', 'Ping'), h('b', G.comm === 'none' ? 'No signalling in this dive' : G.comm === 'narc' ? 'Shared pool: ' + G.pool + ' left' : (p.pingUsed ? 'Used' : 'Ready'))));

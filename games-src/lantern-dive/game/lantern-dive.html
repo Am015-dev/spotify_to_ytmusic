@@ -88,7 +88,7 @@ svg{display:block}
 .op .av .cm svg{width:100%;height:100%}
 .op .who{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.1}
 .op .nm{font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.op .cnt{display:flex;align-items:center;flex-wrap:wrap;gap:0 6px;font-size:13px;font-weight:800;color:var(--ink2);white-space:normal}
+.op .cnt{display:flex;flex-direction:column;align-items:flex-start;gap:0;font-size:13px;font-weight:800;color:var(--ink2);white-space:nowrap}
 .op .cnt b{color:var(--ink)}
 .op .pg{flex:0 0 auto;display:flex;align-items:center;gap:3px;min-height:22px}
 .op .pg .tok{width:22px;height:22px}
@@ -214,6 +214,7 @@ svg{display:block}
 .ph-t{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}.ph-t b{font-size:16px}.ph-t span{font-size:13px;opacity:.8}
 .px{appearance:none;border:2px solid var(--line);background:rgba(255,255,255,.08);border-radius:10px;width:44px;height:44px;font-size:26px;line-height:1;cursor:pointer;flex:0 0 auto;color:var(--ink)}
 .ph-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding:8px 10px 10px;display:flex;flex-direction:column;gap:7px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.av56 svg{width:100%;height:100%}
 .ph-body p{margin:0;font-size:14px;line-height:1.4}.sm{font-size:13px;opacity:.9;line-height:1.3}
 .kv{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:3px 0;border-bottom:1px dotted var(--line);align-items:center}.kv b{text-align:right}
 .cbtns{display:flex;gap:8px;flex-wrap:wrap}.cbtns .btn{flex:1 1 120px}
@@ -341,9 +342,8 @@ html.ph.ph-l .ppop{position:fixed;z-index:50}
 html.ph .ppop .ph-body{max-height:calc(62dvh - 60px)}
 html.ph.ph-l .ppop{left:auto;right:0;width:var(--rail);top:calc(44px + env(safe-area-inset-top,0px));bottom:0;max-height:none;border-radius:0}
 html.ph .gx-dock{position:relative}
-/* a pop-up on a portrait phone grows the dock (the board shrinks a little) and fills it, scrolling inside if it must */
-html.ph.ph-p.popon .gx-main{grid-template-rows:minmax(0,1fr) min(340px,44dvh)}
-html.ph.ph-p .ppop{position:absolute;left:0;right:0;top:0;bottom:0;height:auto;max-height:none;border-radius:0}
+/* a pop-up on a portrait phone is a sheet over the hand and the dock (never over the felt, so no played card is hidden); it scrolls inside */
+html.ph.ph-p .ppop{position:fixed;left:0;right:0;top:auto;bottom:0;height:min(44dvh,340px);max-height:none;border-radius:14px 14px 0 0;z-index:50}
 html.ph.ph-p .ppop .ph-body{max-height:none;flex:1 1 auto;min-height:0;overflow:auto}
 html.ph .ppop .kv{padding:2px 0;font-size:13.5px}
 html.ph .ppop p{margin:2px 0}
@@ -5471,7 +5471,7 @@ function oppEl(s, act) {
   if (p.helper) return droneEl(s, act);
   const b = h('button.op' + (act === s ? '.act' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'data-key': 'seat' + s, 'aria-label': p.name + (cm ? ', Commander' : '') + ', ' + p.hand.length + ' cards' });
   const av = h('span.av', { html: avatarS(s, 80) }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 19 }), title: 'Commander' }));
-  const top = h('span.top', av, h('span.who', h('span.nm', p.name), h('span.cnt', h('span', h('b', p.hand.length), ' cards'), won ? h('span', h('b', won), won === 1 ? ' trick' : ' tricks') : null)));
+  const top = h('span.top', av, h('span.who', h('span.nm', p.name), h('span.cnt', h('span', h('b', p.hand.length), p.hand.length === 1 ? ' card' : ' cards'), h('span', h('b', won), won === 1 ? ' trick' : ' tricks'))));
   b.append(top);
   const pg = h('span.pg'); const t = pingTok(s, 22); if (t) pg.append(t); const sh = shownEl(s); if (sh) pg.append(sh);
   if (pg.childNodes.length) b.append(pg);
@@ -5484,7 +5484,7 @@ function droneEl(s, act) {
   const p = G.players[s], v = viewSeat();
   const b = h('div.op.drone' + (act === s ? '.act' : ''), { 'data-seat': s, 'data-key': 'seat' + s });
   const av = h('span.av', { html: avatarS(s, 80) });
-  const top = h('span.top', av, h('span.who', h('span.nm', p.name + ' (drone)'), h('span.cnt', h('span', h('b', p.hand.length), ' cards'), tricksWon()[s] ? h('span', h('b', tricksWon()[s]), tricksWon()[s] === 1 ? ' trick' : ' tricks') : null)));
+  const top = h('span.top', av, h('span.who', h('span.nm', p.name + ' (drone)'), h('span.cnt', h('span', h('b', p.hand.length), ' cards'), h('span', h('b', tricksWon()[s]), tricksWon()[s] === 1 ? ' trick' : ' tricks'))));
   const js = jobs(s); const jb = h('span.jobs', { style: 'flex:1;min-width:0;flex-direction:row;flex-wrap:wrap;gap:3px;margin-left:6px' });
   js.slice(0, 3).forEach(i => { const c = jobChip(i); c.style.width = 'auto'; jb.append(c); }); if (js.length > 3) jb.append(h('span.jc.more', '+' + (js.length - 3)));
   const head = h('div', { style: 'display:flex;align-items:center;gap:4px' }, h('button.op', { type: 'button', 'data-a': 'seat', 'data-seat': s, style: 'flex:0 0 auto;max-width:none;background:transparent;border-color:transparent;padding:0', 'aria-label': 'Drone ' + p.name }, top), jb);
@@ -6046,7 +6046,7 @@ function hintFor(d) {
 }
 function openSeat(s) {
   if (!G) return; const p = G.players[s], kids = [];
-  kids.push(h('div', { style: 'display:flex;gap:10px;align-items:center' }, h('span', { style: 'width:56px;height:56px;display:block', html: avatarS(s, 96) }), h('div', h('b', p.name + (s === G.cap ? ' (Commander)' : '')), h('div.sm', p.helper ? 'The drone: ' + pname(G.cap) + ' flies it and decides without talking.' : (p.ai ? 'Computer diver (' + p.ai + ')' : (NET.on && s === NET.mySeat ? 'You' : 'Diver'))))));
+  kids.push(h('div', { style: 'display:flex;gap:10px;align-items:center' }, h('span.av56', { style: 'width:56px;height:56px;flex:0 0 56px;display:block', html: avatarS(s, 96) }), h('div', h('b', p.name + (s === G.cap ? ' (Commander)' : '')), h('div.sm', p.helper ? 'The drone: ' + pname(G.cap) + ' flies it and decides without talking.' : (p.ai ? 'Computer diver (' + p.ai + ')' : (NET.on && s === NET.mySeat ? 'You' : 'Diver'))))));
   kids.push(h('div.kv', h('span', 'Cards in hand'), h('b', p.hand.length)));
   kids.push(h('div.kv', h('span', 'Tricks won'), h('b', tricksWon()[s])));
   if (!p.helper) kids.push(h('div.kv', h('span', 'Ping'), h('b', G.comm === 'none' ? 'No signalling in this dive' : G.comm === 'narc' ? 'Shared pool: ' + G.pool + ' left' : (p.pingUsed ? 'Used' : 'Ready'))));

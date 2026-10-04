@@ -112,7 +112,7 @@ async function layout(x, tag) {
     if (!st) bad.push('no badge'); else { if (ov(st, board)) bad.push('badge over board'); if (st[0] < -.5 || st[2] > innerWidth + .5) bad.push('badge off screen'); if (st[3] - st[1] < (document.documentElement.classList.contains('ph') ? 43.9 : 28)) bad.push('badge too small ' + (st[3] - st[1]));
       for (const b of document.querySelectorAll('.gx-bar button:not(#netst)')) { const r = b.getBoundingClientRect(); if (r.width && ov(st, [r.left, r.top, r.right, r.bottom])) bad.push('badge overlaps ' + (b.dataset.gx || b.id)); } }
     for (const e of document.querySelectorAll('#acts button')) { const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2; const hit = document.elementFromPoint(x, y); if (!hit || !e.contains(hit)) bad.push('covered ' + (e.dataset.a || 'btn')); }
-    const pr = document.querySelector('#prompt'); const prr = pr && pr.getBoundingClientRect(); if (!prr || prr.width < 40) bad.push('prompt too narrow ' + (prr && prr.width));
+    const pr = document.querySelector('#prompt'); const prr = pr && pr.getBoundingClientRect(); const qb = document.querySelector('#qbox'); if ((!prr || prr.width < 40) && !(qb && !qb.hidden)) bad.push('prompt too narrow ' + (prr && prr.width));
     return { bad: bad.slice(0, 6), w: document.documentElement.scrollWidth, vw: innerWidth, h: document.documentElement.scrollHeight, vh: innerHeight, pw: prr && Math.round(prr.width), txt: (document.querySelector('#netst') || {}).textContent };
   });
   const probs = [...r.bad]; if (r.w > r.vw + 1 || r.h > r.vh + 1) probs.push('page scroll ' + r.w + 'x' + r.h); console.log('layout', tag, x.label, JSON.stringify(r), probs.length ? 'PROBLEMS ' + probs : 'ok'); return probs;
