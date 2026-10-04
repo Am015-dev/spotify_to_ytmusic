@@ -330,7 +330,7 @@ function renderBelt() {
   const m = Math.max(G.hand, 1), avail = beltWidth() - 20;
   const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? 74 : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
   // a tall phone: two rows of plates instead of a belt that scrolls sideways and hides plates off the edge
-  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 56 && boardSize().h >= 440 && m > 5;
+  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 56 && boardSize().h >= 440 && m > 5 && hand.length > 0 && G.phase !== 'over';
   if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(74, Math.floor((avail - (k - 1) * 6) / k))); }
   else if (ph && one < hw && one >= 44) hw = one;   // shrink a little rather than hide plates past the edge
   belt.classList.toggle('two', !!two);
