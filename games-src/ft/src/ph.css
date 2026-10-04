@@ -16,7 +16,7 @@ html.ph #dockmsg{position:absolute;left:8px;right:8px;top:6px;z-index:9;margin:0
 html.ph .gx-bar h1{display:none}
 html.ph .gx-bar .gx-ibtn{display:none;min-width:44px;min-height:44px;padding:0 8px}
 html.ph .gx-bar .gx-ibtn>span{display:none}
-html.ph .gx-bar .adv-btn,html.ph .gx-bar [data-gx=logd],html.ph .gx-bar [data-gx=menud],html.ph .gx-bar #pausebtn{display:inline-flex!important}
+html.ph .gx-bar .adv-btn,html.ph .gx-bar [data-gx=logd],html.ph .gx-bar [data-gx=setd],html.ph .gx-bar .gx-refbtn,html.ph .gx-bar #pausebtn{display:inline-flex!important}
 html.ph .gx-bar #pausebtn[hidden]{display:none!important}
 html.ph .pchip{flex:1 1 auto;min-width:0;font-weight:700;font-size:14px;color:#ffe8c0;background:rgba(43,26,16,.78);border:1px solid rgba(240,190,110,.5);border-radius:999px;padding:0 12px;line-height:34px;height:34px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html.ph .gx-bar .gx-sp{display:none}

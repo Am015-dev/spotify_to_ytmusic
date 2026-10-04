@@ -91,7 +91,7 @@ function saveOk(g){return !!(g&&g.v===1&&Array.isArray(g.pl)&&g.pl.length>=2&&Ar
 // one step at a time, each with a "why", and one glowing button (the suggested move). From round 2 the suggestions stay, the steps stop.
 const GUIDED={seed:2024,lv:'easy'};
 function startGuided(){UI.setup={np:2,seats:['human','ai','ai','ai','ai'],lv:['normal',GUIDED.lv,'normal','normal','normal'],ex:{artisans:false,sultan:false,thieves:false,promos:false}};
-  setSeed(GUIDED.seed);UI.coach=true;beginGame();G.guided=true;G.gstep={};DEFSEED=null;refresh()}
+  setSeed(GUIDED.seed);UI.coach=true;if(typeof PHONE!=='undefined')PHONE.tips=Object.assign({},PHONE.tips,{bid:1,move:1,hand:1});beginGame();G.guided=true;G.gstep={};DEFSEED=null;refresh()}
 const TRIBE_WHY={vizier:'Advisors are 1 point each, and 10 more for every rival who ends with fewer. A big lead in Advisors is worth a lot.',
   elder:'Sages are 2 points each, and two of them summon a djinn at a Shrine: djinns are worth points and give powers.',
   merchant:'Goods score in sets of different kinds (1, 3, 7, 13… points), so new kinds are worth the most.',
@@ -130,15 +130,19 @@ function glowTarget(root){if(!root)return null;const g=guideStep();if(!g||g.ok)r
   return root.querySelector('.btn.go')}
 function placeGuide(){for(const e of document.querySelectorAll('.gglow:not([data-ui=gok])'))e.classList.remove('gglow');
   const old=document.getElementById('gcoach');const h=guideHTML();
-  let host=null;if(PHONE&&PHONE.on){const pc=document.getElementById('pc'),pp=document.getElementById('ppop');host=pc&&!pc.hidden?pc.querySelector('.pp-b'):pp&&!pp.hidden?pp.querySelector('.pp-b'):document.getElementById('ps')}
+  let host=null;if(PHONE&&PHONE.on){const pc=document.getElementById('pc'),pp=document.getElementById('ppop');const intro=pc&&!pc.hidden&&/^(chapter|tip-|over)/.test(pc.dataset.k||'');
+    host=intro?null:pc&&!pc.hidden?pc.querySelector('.pp-b'):pp&&!pp.hidden?pp.querySelector('.pp-b'):document.getElementById('ps')}
   else host=document.getElementById('dockbody');
   if(!h||!host){if(old)old.remove();return}
-  if(!old||old.parentNode!==host||old.outerHTML!==h){if(old)old.remove();host.insertAdjacentHTML('afterbegin',h)}
-  const t=glowTarget(PHONE&&PHONE.on?document.querySelector('#pc:not([hidden]),#ppop:not([hidden])')||document.getElementById('ps'):document.getElementById('dockbody'));if(t)t.classList.add('gglow')}
+  if(!old||old.parentNode!==host||old.outerHTML!==h){if(old)old.remove();const after=host.id==='ps'?host.querySelector('.ps-main'):null;if(after)after.insertAdjacentHTML('afterend',h);else host.insertAdjacentHTML('afterbegin',h)}
+  const t=glowTarget(PHONE&&PHONE.on?document.querySelector('#pc:not([hidden]),#ppop:not([hidden])')||document.getElementById('ps'):document.getElementById('dockbody'));if(t){t.classList.add('gglow');if(PHONE&&PHONE.on&&UI.glowAt!==guideKey()){UI.glowAt=guideKey();try{t.scrollIntoView({block:'nearest'})}catch(e){}}}}
+const guideKey=()=>G?[G.round,G.phase,G.step,G.logN,!!G.q].join():'';
 // ---------------------------------------------------------------- render hooks
 (function(){const o=renderDock;renderDock=function(){o();const pr=document.querySelector('#dockbody .prompt');if(pr&&!G.over)pr.insertAdjacentHTML('beforeend',undoRow());
   // the guided coach box says it once: drop the prompt's own long intro while a guided step is shown
+  if(pr&&G.over&&!online()&&!pr.querySelector('[data-ui=again]')){const a=document.querySelector('#dockbody .acts');if(a)a.insertAdjacentHTML('afterbegin','<button class="btn go" data-ui="again">Play again</button>')}
   const g=guideStep();if(pr&&g&&g.n)for(const e of pr.querySelectorAll(':scope>p:not(.small):not(.flav)'))e.remove()}})();
+(function(){const o=phRender;phRender=function(){o();try{if(G){placeRecap();placeGuide()}}catch(e){console.error(e)}}})();
 (function(){const o=phStrip;phStrip=function(hp,pop,card){return '<div class="ps-recap"></div>'+o(hp,pop,card)}})();
 (function(){const o=render;render=function(){o();try{if(G){const h=G.pl.filter(p=>p.human);const s=sideToAct();if(s>=0&&P(s).human)GX.recap.view(s);else if(h.length===1)GX.recap.view(h[0].i)}placeRecap();placeGuide()}catch(e){console.error(e)}}})();
 // ---------------------------------------------------------------- boot
@@ -152,6 +156,7 @@ document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest
   else if(a==='kitref'){GX.close();GX.show('gx-refd')}
   else if(a==='kitsave'){refresh();toast('Game saved. Continue it from the start screen.')}
   else if(a==='guided'){GX.close();startGuided()}
+  else if(a==='again'){if(G&&G.guided)startGuided();else{UI.modal=null;beginGame()}}
   else if(a==='gok'){if(G){G.gdone=1;refresh()}}});
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!GX.open&&GX.undo.can()){e.preventDefault();GX.undo.undo()}});
 if(UI.kitLate)kitBoot();

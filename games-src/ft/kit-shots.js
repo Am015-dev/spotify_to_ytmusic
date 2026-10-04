@@ -20,7 +20,7 @@ process.on('exit', () => { try { srv.kill(); } catch (e) { } });
     const fail = (c, d) => { bad++; console.log('FAIL', t, c, d || ''); };
     const shot = async (n, scrolls) => { const r = await p.evaluate(() => ({ h: document.documentElement.scrollHeight, w: document.documentElement.scrollWidth, vh: innerHeight, vw: innerWidth })); if ((!scrolls && r.h > r.vh + 1) || r.w > r.vw + 1 || r.vw !== W) fail('page scrolls at ' + n, JSON.stringify(r)); await p.screenshot({ path: path.join(OUT, `${t}_${n}.png`) }); };
     const ev = (f, a) => p.evaluate(f, a);
-    const glow = async () => { const g = await p.$('.gglow'); if (!g) return false; await g.scrollIntoViewIfNeeded().catch(() => { }); await g.click({ force: true }).catch(() => { }); await p.waitForTimeout(250); return true; };
+    const glow = async () => { const g = await p.$('.gglow:visible'); if (!g) return false; await g.scrollIntoViewIfNeeded().catch(() => { }); await g.click({ force: true }).catch(() => { }); await p.waitForTimeout(250); return true; };
     const waitMine = async (ms) => { const t0 = Date.now(); while (Date.now() - t0 < ms) { if (await ev(() => !!(G && (G.over || (me() && !UI.autoPlan))))) return true; await p.waitForTimeout(150); } return false; };
     await p.goto(BASE + 'sands-of-qamar-next/index.html');
     await ev(() => localStorage.clear()); await p.reload(); await p.waitForTimeout(1500); await shot('01-title');
@@ -30,13 +30,14 @@ process.on('exit', () => { try { srv.kill(); } catch (e) { } });
     const steps = {};
     for (let k = 0; k < 40; k++) {
       if (!(await waitMine(8000))) break;
+      const intro = await p.$('#pc:not([hidden]) [data-ph=cont]'); if (intro) { await intro.click(); await p.waitForTimeout(250); continue; }
       const s = await ev(() => { const g = guideStep(); return g ? (g.n || g.k) + ':' + G.phase + '/' + G.step : 'none'; });
       if (s === 'none' || /^lead/.test(s)) break;
-      const n = s.split(':')[0]; if (!steps[n]) { steps[n] = 1; await shot('02-guide-step' + n); if (!(await p.$('.gglow'))) fail('no glowing button at guide step ' + s); }
+      const n = s.split(':')[0]; if (!steps[n]) { steps[n] = 1; await shot('02-guide-step' + n); if (!(await p.$('.gglow:visible'))) fail('no glowing button at guide step ' + s); }
       // undo once, on the tribe or tile step: take the step, then take it back
       if (!steps.undo && /turn\/(tile|sell)/.test(s) && (await ev(() => GX.undo.can()))) {
         steps.undo = 1; await shot('03-undo-ready'); const before = await ev(() => JSON.stringify(G));
-        const ub = await p.$('[data-ui=kitundo]'); if (!ub) fail('no undo button'); else { await ub.click({ force: true }); await p.waitForTimeout(400); const after = await ev(() => JSON.stringify(G)); if (after === before) fail('undo changed nothing'); }
+        const ub = await p.$('[data-ui=kitundo]:visible'); if (!ub) fail('no undo button'); else { await ub.click({ force: true }); await p.waitForTimeout(400); const after = await ev(() => JSON.stringify(G)); if (after === before) fail('undo changed nothing'); }
       }
       if (!(await glow())) { await ev(() => { const a = advice(); if (a && a.move) go(a.move); else if (a && a.plan) { UI.autoPlan = a.plan; runPlan(); } }); await p.waitForTimeout(250); }
     }
@@ -45,7 +46,7 @@ process.on('exit', () => { try { srv.kill(); } catch (e) { } });
     await waitMine(15000); await p.waitForTimeout(300);
     const rc = await ev(() => { const r = document.querySelector('.gx-recap'); return r && !r.hidden ? r.textContent.slice(0, 80) : ''; });
     if (!rc) console.log(t, 'recap: empty right now'); await shot('04-recap');
-    if (await p.$('[data-ui=gok]')) { await shot('04b-now-you-lead'); await p.click('[data-ui=gok]', { force: true }); await p.waitForTimeout(200); }
+    if (await p.$('[data-ui=gok]:visible')) { await shot('04b-now-you-lead'); await p.click('[data-ui=gok]:visible', { force: true }); await p.waitForTimeout(200); }
     // reference
     await p.click('.gx-bar [data-gx="gx-refd"]'); await p.waitForTimeout(400); await shot('05-reference');
     const n = await ev(() => document.querySelectorAll('.gx-ref-it').length); if (n < 80) fail('reference has only ' + n + ' entries');

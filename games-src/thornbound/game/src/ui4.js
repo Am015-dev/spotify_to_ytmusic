@@ -23,7 +23,7 @@ function renderRivals(){const el=$('#rivals');if(!el)return;const V=UI.V;const h
     return '<button class="rv'+(s===me?' me':'')+(turn?' turn':'')+'" data-a="rival" data-s="'+s+'" style="--fc:'+kfac.main+'" aria-label="'+esc(P.name)+': '+P.inf+' influence, '+P.hand.length+' cards in hand. Tap for details">'+
       '<span class="rv-e">'+emb(s,26)+'<i class="gx-cbm" aria-hidden="true">'+GX.mark(s)+'</i></span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'<u>You</u> · ':'')+esc(shortName(s).replace(' (you)',''))+'</b><small><i>'+P.inf+'</i> Influence'+(G.np<3?' · '+P.hand.length+' cards':'')+'</small>'+(s===me&&!hot?meChips(s,P):'')+'</span>'+favs+'</button>'}).join('')}
 function meChips(s,P){const kc=(P.ks||[]).filter(Boolean).length,tl=(P.tac||[]).filter(t=>!t.ex&&!t.burn).length;
-  return '<span class="me-chips" aria-label="Your board"><span>KC '+kc+'</span><span>Sup '+P.supp.b+'</span><span>Tac '+tl+'/'+(P.tac||[]).length+'</span>'+(P.lore?'<span>Lore '+P.lore+'</span>':'')+'</span>'}
+  return '<span class="me-chips" aria-label="Your board: '+kc+' Kingdom Cards, '+P.supp.b+' Supporters at home, '+tl+' Tactics left'+(P.lore?', '+P.lore+' Lore':'')+'">KC '+kc+' · Sup '+P.supp.b+' · Tac '+tl+'/'+(P.tac||[]).length+(P.lore?' · Lore '+P.lore:'')+'</span>'}
 // ---------------------------------------------------------------- pop-ups (live in the dock zone, never over the board)
 function openPop(kind,arg){if(!G)return;UI.pop=kind;UI.popArg=arg||{};renderPop();applyHl();if(typeof sfx==='function')sfx('tap')}
 function closePop(quiet){if(!UI.pop)return;UI.pop=null;UI.popArg=null;UI.hand=null;const p=$('#ppop');if(p){p.hidden=true;p.innerHTML=''}applyHl();if(!quiet)renderAll()}
