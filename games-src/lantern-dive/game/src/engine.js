@@ -648,7 +648,7 @@ function stripView(G, seat) {
   seat = Number.isInteger(seat) && seat >= 0 && seat < G.np ? seat : -1;
   const mine = seat >= 0 ? ctl(G, seat) : -1;     // the Commander also controls the drone
   v.players.forEach((p, i) => {
-    if (p.helper) { p.stacks = p.stacks.map(st => [st[0], st[1] >= 0 ? -3 : st[1]]); p.hand = p.hand.map(x => x); const up = new Set(p.stacks.map(st => st[0]).filter(x => x >= 0)); p.hand = p.hand.map(x => up.has(x) ? x : -1); }
+    if (p.helper) { p.stacks = p.stacks.map(st => [st[0], st[1] >= 0 ? -3 : st[1]]); p.hand = p.hand.map(x => x); const up = p.stacks.map(st => st[0]).filter(x => x >= 0).sort((a, b) => a - b); const hidden = p.hand.length - up.length; p.hand = up.concat(new Array(Math.max(0, hidden)).fill(-1)); }
     else if (i !== seat) { p.hand = p.hand.map(() => -1); p.mem = {}; }
   });
   v.tasks.forEach((t, i) => { const d = TASKS[t.id]; if (d.k === 'pred' && !d.open && t.pn >= 0 && !(seat >= 0 && ctl(G, t.owner) === seat) && G.phase !== 'over') t.pn = -2; });
@@ -668,13 +668,13 @@ function checkInvariants(G) {
   const e = [], seen = new Array(40).fill(0);
   for (const p of G.players) for (const c of p.hand) { if (c < 0 || c > 39) e.push('bad card in hand ' + c); else seen[c]++; }
   for (const k of G.tricks) for (const p of k.plays) seen[p.c]++;
-  if (G.trick && G.trick.plays.length < G.np) for (const p of G.trick.plays) seen[p.c]++;
+  if (G.trick && G.trick.n === G.tricks.length) for (const p of G.trick.plays) seen[p.c]++;
   for (let c = 0; c < 40; c++) if (seen[c] !== 1) e.push('card ' + c + ' appears ' + seen[c] + ' times');
   if (G.phase !== 'assign') for (const t of G.tasks) if (t.owner < 0 || t.owner >= G.np) e.push('task without owner');
   const col = G.np - 3; const sm = G.tasks.reduce((a, t) => a + TASKS[t.id].d[col], 0);
   if (G.mission.sel !== 'fixed' && sm !== G.mission.d) e.push('job difficulty ' + sm + ' != ' + G.mission.d);
   if (G.two) { const H = G.players[G.helper]; if (H.hand.length !== H.stacks.filter(s => s[0] >= 0).length + H.stacks.filter(s => s[1] >= 0).length) e.push('drone stacks mismatch'); }
-  const total = G.players.reduce((a, p) => a + p.hand.length, 0) + G.tricks.length * G.np + (G.trick && G.trick.plays.length < G.np ? G.trick.plays.length : 0);
+  const total = G.players.reduce((a, p) => a + p.hand.length, 0) + G.tricks.length * G.np + (G.trick && G.trick.n === G.tricks.length ? G.trick.plays.length : 0);
   if (total !== 40) e.push('card total ' + total);
   if (G.phase === 'play' && G.trick.plays.length === 0) { const sz = G.players.map(p => p.hand.length); if (Math.max(...sz) - Math.min(...sz) > 1) e.push('hand sizes ' + sz); }
   G.tricks.forEach((k, i) => { if (k.plays.length !== G.np) e.push('trick size'); if (trickWinner(k.plays, k.ls) !== k.w) e.push('winner mismatch'); });

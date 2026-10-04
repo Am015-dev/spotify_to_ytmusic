@@ -21,7 +21,7 @@ const OUT = path.join(__dirname, 'shots'); fs.mkdirSync(OUT, { recursive: true }
   await ev('UI.seed=21'); await ck('[data-start=guided]'); await p.waitForTimeout(300);
   if (want('guided')) await shot('10guided');
   await ev('AIDELAY=0'); await ev('UI.tip=null;UI.coach.level="off";renderTip();');
-  const drawN = async n => { for (let i = 0; i < n; i++) { const b = await p.$('#acts .drawb'); if (!b) break; await b.click(); await p.waitForTimeout(120); } };
+  const drawN = async n => { for (let i = 0; i < n; i++) { if (!(await p.$('#acts .drawb'))) break; await p.click('#acts .drawb',{timeout:4000}).catch(()=>{}); await p.waitForTimeout(150); } };
   if (want('turn') || want('mid') || want('all')) { await drawN(3); await shot('11turn'); await drawN(3); await shot('12mid'); }
   if (want('boom') || want('all')) { await drawN(12); await shot('13afterdraws'); }
   await p.waitForTimeout(300);

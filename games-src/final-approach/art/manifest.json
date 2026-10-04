@@ -7,7 +7,27 @@
   "dial": "dial",
   "planefront": "planefront",
   "gauge": "gauge",
-  "pillbar": "pillbar"
+  "pillbar": "pillbar",
+  "plate": "plate",
+  "frame": "frame",
+  "sky-dawn": "sky-dawn",
+  "sky-day": "sky-day",
+  "sky-dusk": "sky-dusk",
+  "sky-night": "sky-night",
+  "ter-mountain": "ter-mountain",
+  "ter-water": "ter-water",
+  "ter-city": "ter-city",
+  "ter-ice": "ter-ice",
+  "ter-plain": "ter-plain",
+  "tray": "tray",
+  "screen": "screen",
+  "planeside": "planeside",
+  "planegear": "planegear",
+  "crew-0": "crew-0",
+  "crew-1": "crew-1",
+  "title": "title",
+  "end-land": "end-land",
+  "end-crash": "end-crash"
  },
  "size": {
   "dice": [
@@ -37,6 +57,86 @@
   "pillbar": [
    256,
    48
+  ],
+  "plate": [
+   1024,
+   640
+  ],
+  "frame": [
+   256,
+   128
+  ],
+  "sky-dawn": [
+   1024,
+   192
+  ],
+  "sky-day": [
+   1024,
+   192
+  ],
+  "sky-dusk": [
+   1024,
+   192
+  ],
+  "sky-night": [
+   1024,
+   192
+  ],
+  "ter-mountain": [
+   1024,
+   96
+  ],
+  "ter-water": [
+   1024,
+   96
+  ],
+  "ter-city": [
+   1024,
+   96
+  ],
+  "ter-ice": [
+   1024,
+   96
+  ],
+  "ter-plain": [
+   1024,
+   96
+  ],
+  "tray": [
+   512,
+   128
+  ],
+  "screen": [
+   512,
+   192
+  ],
+  "planeside": [
+   512,
+   200
+  ],
+  "planegear": [
+   512,
+   200
+  ],
+  "crew-0": [
+   256,
+   256
+  ],
+  "crew-1": [
+   256,
+   256
+  ],
+  "title": [
+   1440,
+   810
+  ],
+  "end-land": [
+   1280,
+   720
+  ],
+  "end-crash": [
+   1280,
+   720
   ]
  },
  "atlas": {
