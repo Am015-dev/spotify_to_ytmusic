@@ -1,13 +1,13 @@
 # Nebula Aces: rules notes
 
-A browser adaptation of the mechanics of *Star Wars: X-Wing Miniatures Game* (1st edition, 2012; BGG 103885). Every name, ship design, card text and piece of art is original, for copyright reasons. The numbers and rules follow the 1st-edition game.
+A browser adaptation of the mechanics of the original game (1st edition, 2012). Every name, ship design, card text and piece of art is original, for copyright reasons. The numbers and rules follow the 1st-edition game.
 
 **Sources:**
-- Ship, pilot, upgrade and damage-deck numbers come from `guidokessels/xwing-data`.
-- Template geometry comes from the 1e Tabletop Simulator mod (`tjakubo2/xwing_traj`) and the Vassal module code.
+- Ship, pilot, upgrade and damage-deck numbers come from an open-source data set (source kept in the private research repo).
+- Template geometry comes from a 1e Tabletop Simulator mod and a Vassal module's code (sources kept in the private research repo).
 - Rules text comes from a transcribed 1e rules summary.
 
-The official FFG PDFs and BoardGameGeek were blocked by the network proxy, so the rulebook wasn't read directly. Tags: **[confirmed]** means two sources agree; **[H]** means my interpretation; **[orig]** means an original design.
+The original publisher's official PDFs and the board-game catalogue site were blocked by the network proxy, so the rulebook wasn't read directly. Tags: **[confirmed]** means two sources agree; **[H]** means my interpretation; **[orig]** means an original design.
 
 ## Geometry [confirmed]
 - **[G1] Play area:** 914 mm square. Bases are 40 mm (small) and 80 mm (large).
@@ -43,7 +43,7 @@ The official FFG PDFs and BoardGameGeek were blocked by the network proxy, so th
 
 ## Setup [27]
 1. **Initiative** is settled first (above).
-2. **Asteroids:** the players take turns placing the 6 asteroids, the initiative player first (tournament order; the core booklet has the Imperial player start). Each must be beyond range 2 of every edge and beyond range 1 of every other asteroid (tournament spacing rule).
+2. **Asteroids:** the players take turns placing the 6 asteroids, the initiative player first (tournament order; the core booklet has one fixed faction start). Each must be beyond range 2 of every edge and beyond range 1 of every other asteroid (tournament spacing rule).
    - **[H]** A human places each asteroid on one of 25 grid spots (5 × 5 over the legal centre area); the computer places its own at a random legal spot. Shapes are original irregular polygons 44–80 mm across **[orig]**.
 3. **Deployment:** ships are placed one at a time in ascending pilot skill, the initiative player first on ties, each entirely within range 1 of its own edge.
    - **[H]** A human picks one of 9 positions along the edge; ships face straight at the enemy (1e allows any facing). The computer uses evenly spaced positions.
@@ -89,7 +89,7 @@ The official FFG PDFs and BoardGameGeek were blocked by the network proxy, so th
   - Weapon Glitch (−1 primary; repair roll).
 - Each card has a Ship or Pilot trait, matching the original deck.
 
-## Core set content (original names, 1e numbers)
+## Core set content (our names, 1e numbers)
 - **Lancer heavy fighter:** 3 attack, 2 agility, 3 hull, 2 shields. Actions: focus and target lock. Its dial matches the heavy fighter's dial exactly.
 - **Talon light fighter:** 2 attack, 3 agility, 3 hull, 0 shields. Actions: focus, barrel roll and evade.
 - **Pilots:** 10, each keeping the original pilot skill, points and ability:
@@ -143,21 +143,21 @@ Every ship has 1 modification slot; ships with a title card also get a title slo
 - **Bombs:** dropped behind the ship with the straight-1 template. Quake charges and plasma bombs detonate at the end of the Activation phase (range 1). A plasma bomb deals its faceup card straight to the ship, past its shields. A contact mine detonates when a base or template touches it (3 attack dice).
 - **One of each action per round:** a ship can't perform the same action twice in a round, including free actions (a free focus, Wing Leader's or Lark Castellan's gift, Tarn Vessor's move, Snap Roll's barrel roll, Redline).
 - **Target locks:** acquiring a lock replaces the old one. With Fire-Control Tech a ship keeps 2 (1 per enemy); a new lock replaces the older one **[H]**, and the tech's second lock on a different ship is optional. Brannoc Dale's friend and the Tracking Computer *acquire* locks (not an action), so stress doesn't stop them.
-- **Unique characters:** a pilot and a crew card of the same character (the Luke, Chewbacca and Vader figures) share one name, so only one of them can be in a squadron.
+- **Unique characters:** a pilot and a crew card of the same character (three such characters in the original sets) share one name, so only one of them can be in a squadron.
 
 **Every optional choice is the player's.** Human players are asked (through the same question mechanism the tests drive); the computer decides for its own ships with the heuristics in `ai.js`. That covers:
 - reveal-time choices (Early Warning Sensors, bomb drops, Bram Voss's bank switch, Navigator, Adrenaline), the opponent's pick for a stressed ship, the Spotter's peek;
 - which dice to reroll (target lock, Horace Venn, "Wailer", Krell Tavish, Iveth Sarn, Captain Joren, Flight Instructor) and which die Slippery forces;
 - free actions (Nightjar, Lark Castellan and his chosen ship, Wing Leader's ship, Tarn Vessor, Redline), Snap Roll's lock removal;
 - who gets a passed token or boost (Garrick Dray, Kellan Stroud, Colonel Varek, Quill Marren, Pack Tactics, Brannoc Dale and its lock), Juno Arlen's extra die, Captain Orrin taking a friend's stress;
-- paying a lock cost with focus (Snapshot Eye), Fire-Control Tech's second lock, the Tracking Computer, Take the Heat, Inquisitor Vell, the gunners' bonus attack and its target, Maarek-style card choice, Brakk, Munitions Jam's weapon, Mech "Scrapper".
+- paying a lock cost with focus (Snapshot Eye), Fire-Control Tech's second lock, the Tracking Computer, Take the Heat, Inquisitor Vell, the gunners' bonus attack and its target, Varn Kessik's damage-card choice, Brakk, Munitions Jam's weapon, Mech "Scrapper".
 
 **What is still interpreted or simplified [H]:**
-- **Damage outside attacks:** Brakk (Chewbacca crew), the Munitions Jam weapon and a flipped Saboteur card are asked only for damage from attacks. For damage from asteroids, bombs, mines, fire and similar, the owner's choice is made by the computer heuristic (Brakk is kept for a nasty faceup card or a killing blow).
-- **Captain Orrin (Yorr):** a human is asked at the next safe point (after the maneuver, action, dice step or attack in which the stress arrived), not in the middle of dealing damage.
-- **Sorin Vael (Soontir Fel)** always takes the focus token: the card says "may", but there is no downside. Mech "Tinker" (R2-D2) always recovers the shield for the same reason.
+- **Damage outside attacks:** Brakk, the Munitions Jam weapon and a flipped Saboteur card are asked only for damage from attacks. For damage from asteroids, bombs, mines, fire and similar, the owner's choice is made by the computer heuristic (Brakk is kept for a nasty faceup card or a killing blow).
+- **Captain Orrin:** a human is asked at the next safe point (after the maneuver, action, dice step or attack in which the stress arrived), not in the middle of dealing damage.
+- **Sorin Vael** always takes the focus token: the card says "may", but there is no downside. Mech "Tinker" always recovers the shield for the same reason.
 - **After-attack order:** automatic effects, then the second Swarm Missiles attack (against the same ship), then the Tracking Computer, Inquisitor Vell, Tarn Vessor's move, and last a gunner's bonus attack. With Swarm Missiles the optional after-attack effects are offered once, after the second attack.
-- **Redline** (Push the Limit) is offered only in the ship's own action step, not after free actions granted at other times.
+- **Redline** is offered only in the ship's own action step, not after free actions granted at other times.
 - **Wing Leader** chooses a friendly ship, and the chosen ship can't use Wing Leader itself (no chains).
 - **Early Warning Sensors:** the computer never uses it (it keeps its action for after the move).
 - **Tomas Brink** uses the 2012 wording, without the later once-per-game errata.

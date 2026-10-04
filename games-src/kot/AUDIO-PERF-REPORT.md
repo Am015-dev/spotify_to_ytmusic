@@ -49,7 +49,7 @@ None of them moves on hover now. They keep the stronger shadow and get a slight 
   - `musicStart()` calls `GA.music('main',{vol:.6})` ("Funked Up" by Joth), and `musicStop()` calls `GA.music(null)`.
   - The synth groove stays as a fallback. It returns early while `GA.playing()` is true, so it only plays before decoding finishes or if decoding fails.
   - Music starts only after a gesture: `audioInit` and GA unlock happen only on pointerdown or keydown.
-  - Ducking: GA's default list covers roar, smash, stomp, ko and win; `mindbug` and `evolve` duck too.
+  - Ducking: GA's default list covers roar, smash, stomp, ko and win; `brainjack` and `evolve` duck too.
 - The toggles keep their buttons and storage. Sound off silences samples and GA music (just as the old master gain muted everything). Music off stops the GA track. Both settings persist.
 - Sound stays local to each page. `net.js` is unchanged, clients already call `snd()` from their own state diff, and nothing about audio is added to `G` or sent over the network.
 - The game has no ambient loops, so nothing needed starting or stopping.
@@ -72,7 +72,7 @@ None of them moves on hover now. They keep the stronger shadow and get a slight 
 | win | 0.8 | |
 | whoosh | 0.8 | |
 | buy | 0.85 | |
-| heal, mindbug, evolve | 0.7 | |
+| heal, brainjack, evolve | 0.7 | |
 | star | 0.65 | |
 | energy | 0.5 | 0.9 s zap, kept low |
 | turn | 0.5 | plays every turn, so kept soft |

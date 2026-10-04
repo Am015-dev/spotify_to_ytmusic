@@ -6,7 +6,7 @@ let ok=0,bad=0;const T=(n,c)=>{if(c)ok++;else{bad++;console.log('FAIL',n)}};
 {const w=fresh([[{p:'jax',u:['u_snap']}],[{p:'slate',u:[]}]]);// large ship barrel roll via Snap Roll
   const r=w.eval("(()=>{const s=G.ships[0];Object.assign(s,{x:457,y:457,h:Math.PI/2});G.ships[1].x=100;G.ships[1].y=850;return rollOptions(s).map(o=>[o.dir,o.sh,Math.round(o.p.x-457)])})()");
   T('large roll 10 options',r.length===10);T('large roll moves 100 mm',r.every(o=>Math.abs(o[2])===100));T('large slide +-20',r.some(o=>o[1]===20)&&r.some(o=>o[1]===-20))}
-{const w=fresh([[{p:'kael',u:[]}],[{p:'bram',u:[]}]]);T('Slave I title adds torpedo slot',w.eval("upgradesFor('bram',{w1:1,w2:1,w3:1}).includes('u_plasma')"));T('no torpedo on other pilots of ... check lancer ok',w.eval("upgradesFor('kael',{}).includes('u_plasma')"));
+{const w=fresh([[{p:'kael',u:[]}],[{p:'bram',u:[]}]]);T('Iron Warden title adds torpedo slot',w.eval("upgradesFor('bram',{w1:1,w2:1,w3:1}).includes('u_plasma')"));T('no torpedo on other pilots of ... check lancer ok',w.eval("upgradesFor('kael',{}).includes('u_plasma')"));
   T('unique character pilot+crew',w.eval("(()=>{for(let i=0;i<300;i++){const sq=randomSquad(0,100,{w1:1,w2:1,w3:1});const n=[];sq.forEach(e=>{if(PILOTS[e.p].uniq)n.push(uname(PILOTS[e.p]));e.u.forEach(u=>{if(UPGRADES[u].uniq)n.push(uname(UPGRADES[u]))})});if(new Set(n).size!==n.length)return false}return true})()"))}
 {const w=fresh([[{p:'kael',u:[]}],[{p:'slate',u:[]}]]);// simultaneous destruction: initiative wins
   const r=w.eval("(()=>{G.winner=null;G.phase='combat';G.ships.forEach(s=>{s.alive=false});return checkWin()&&G.winner==='P'+(G.init+1)})()");T('simultaneous: initiative wins',r)}
@@ -27,7 +27,7 @@ let ok=0,bad=0;const T=(n,c)=>{if(c)ok++;else{bad++;console.log('FAIL',n)}};
   T('human deploy asked',w.eval("G.phase==='ask'&&G.q.key==='deploy'"))}
 {const w=fresh([[{p:'kael',u:[]}],[{p:'slate',u:[]}]]);// destroyed ship's cards go to the discard pile
   const r=w.eval("(()=>{const s=G.ships[1];const d0=G.disc.length;dealDamage(s,3,0,null);return [!s.alive,s.dmg.length===0,G.disc.length===d0+3]})()");T('destroyed cards discarded',r.every(Boolean))}
-{const w=fresh([[{p:'kael',u:['u_tinker']}],[{p:'hex',u:[]}]]);// Dark Curse blocks the Snapshot-style focus use and focus spending
+{const w=fresh([[{p:'kael',u:['u_tinker']}],[{p:'hex',u:[]}]]);// "Hex" blocks the Snapshot-style focus use and focus spending
   const r=w.eval("(()=>{const a=G.ships[0],d=G.ships[1];a.focus=1;return exWeaponNeedOK(a,{need:'F',spend:'F'},d)})()");T('no focus-cost weapon at Hex',r===false)}
 {const w=fresh([[{p:'tamsin',u:['u_snapeye','u_shock']}],[{p:'slate',u:[]}]],[{human:true},{human:false}]);// Snapshot Eye with lock and focus: player picks how to pay
   const r=w.eval("(()=>{G.q=null;const a=G.ships[0],d=G.ships[1];Object.assign(a,{x:457,y:200,h:Math.PI/2});Object.assign(d,{x:457,y:450,h:-Math.PI/2});a.tl=d.id;a.focus=1;G.phase='target';G.cur=a.id;G.inCombat=true;const w=weaponsFor(a).find(x=>x.k!=='P');declare(a,w.k,d.id);const k=G.q&&G.q.key;performMove({act:'ask',k:'f'},0);return [k,a.tl===d.id,a.focus]})()");

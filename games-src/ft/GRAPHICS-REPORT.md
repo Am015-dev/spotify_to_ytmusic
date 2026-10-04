@@ -60,7 +60,7 @@ SP = `games-src`. All screenshots are in `SP/ft/gfx/`.
 - Pressable gradient buttons with hover and press states, and fade/slide transitions on drawers, the modal and the scrim.
 - **Card faces in the Card list and Djinn popups:** a framed card with a title bar, an SVG art window (pawn, tile, djinn lamp or goods), a type line and a text box.
 - Framed goods and djinn chips, and a brass chip and banner.
-- A new golden-hour opening illustration: sun rays, three layers of skyline with onion domes and minarets, a caravan, and the five tribes as turned pawns.
+- A new golden-hour opening illustration: sun rays, three layers of skyline with onion domes and minarets, a caravan, and the five pawn colours as turned pawns.
 
 **Two small UI robustness fixes** found by the tests. The rules, engine and AI are untouched (their files are unchanged since before this work).
 1. `go()` now clears a stale advisor suggestion. Its old "step" button could be clicked after the board changed and caused "illegal move" errors in `click.js`.
