@@ -40,7 +40,13 @@ function wzNeeds(){const need=eatersNeed(),have=food(),planF=plannedFood();const
   const mates=mateHtml();if(mates)h+=mates;
   return h}
 // the goal, its progress and how to work on it today: first thing on the planning page
-function goalCard(){const S=SCENARIOS[G.scen];let how='',btn='';
+// the chapter's own checkpoint and how to reach it (story campaign)
+const CAMP_HOW={surviveDays:'Keep everyone alive: food for every night (fish and birds on the map), and rest anyone low on life.',build:'Build the <b>Shelter</b> (a job in Build). It costs wood, so gather wood first, and put 2 pawns on it to make it certain.',explored:'Send pawns to the ❔ places next to the land you know (Explore). Two pawns make it certain.',crosses:'Raise a <b>Cross</b> (a job in Build, 2 wood) on a different tile each time.',temple:'Explore until you find the temple, then search it (a Scenario job).'};
+function campCard(){const g=G.cmp.goal;const cp=campParts();const d=typeof campDef==='function'&&campDef();const v=g.value;const by=v.byDay||v.surviveDays;
+  const parts=cp.map(([l,h,n])=>`<li class="${(n===true?h:h>=n)?'ok':''}">${esc(l)} ${n===true?(h?'✓':'✗'):`${Math.min(h,n)}/${n}`}</li>`).join('');
+  const how=Object.keys(CAMP_HOW).filter(k=>v[k]).map(k=>CAMP_HOW[k]).join(' ');
+  return `<div class="daycard goal1"><div class="dk">📖 ${d?esc(d.title)+' · ':''}chapter goal · day ${G.round}${by?' of '+by:''}</div><b>${esc(g.text)}</b><ul class="cgp">${parts}</ul><p>${how}</p></div>`}
+function goalCard(){if(G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom')return campCard();const S=SCENARIOS[G.scen];let how='',btn='';
   if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();const w=pileWhy(1);
     how=`${has('fire')?'Fire is built.':'Build <b>Fire</b> (a job in Build).'} Add wood to the <b>signal pile</b> one stage a day (1, 2, 3, 4, then 5 wood): it must be full on day 10, 11 or 12.`;
     const fw=Math.max(0,G.res.wood-committed().wood);btn=room?`<button class="btn sm pileb" data-a="pilemax" ${w?'aria-disabled="true"':''}>Add ${Math.max(1,Math.min(room,fw))} wood to the pile${fw<room&&fw>0?` (${room} finish today’s stage)`:''}</button>${w?`<small>${esc(w==='no spare wood'?`needs ${room} spare wood`:w)}</small>`:''}`:G.sc.pile>=15?'':'<small>Today’s pile stage is done.</small>'}

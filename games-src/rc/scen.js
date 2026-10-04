@@ -69,3 +69,30 @@ function fogHarm(p){const t=tileAt(p);let h=0;if(p===G.camp.pos)h+=20;if(t){h+=5
 function blackMarkers(){const o=[];for(const m of G.map){const t=tileAt(m.id);if(!t)continue;if(m.waste)o.push({p:m.id,w:1});for(const i in m.exh)o.push({p:m.id,i})}return o}
 FN.reclaimPick=fr=>{const o=blackMarkers().map(b=>({l:b.w?`Place ${b.p+1}: barren land becomes usable`:`Place ${b.p+1}: ${tileAt(b.p).src[b.i]||'extra'} source recovers`,frames:[{f:'fn',k:'reclaim',b}]}));ask('team','Which black marker is removed?',o,{kind:'reclaim'})};
 FN.reclaim=fr=>{const b=fr.b;if(b.w)delete G.map[b.p].waste;else delete G.map[b.p].exh[b.i];lg('The land recovers.','good')};
+
+// ---------- story campaign: chapter twists and checkpoint goals (only when a chapter is played; normal games never set G.cmp) ----------
+// cmp = {id, goal:{type,value,text}, twist:{id,param}|null}. Twists change the starting position only; a day's rules never change.
+function campSetup(cmp){G.cmp={id:cmp.id,goal:cmp.goal||null,twist:cmp.twist||null};const t=cmp.twist;if(!t)return;
+  if(t.id==='early-threat'){const k=G.ev.deck.shift();if(k)G.ev.threat[0]=k}
+  else if(t.id==='low-morale')G.morale=Math.max(-3,-(t.param||1));
+  else if(t.id==='ada-adrift'&&G.scen==='stranded')G.sc.ada=t.param||0}
+// the checkpoint's parts: [label, have, need] (need===true: a yes/no part)
+function campParts(){const v=G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom'&&G.cmp.goal.value;if(!v)return null;const o=[];
+  if(v.surviveDays)o.push(['day',G.round,v.surviveDays]);
+  if(v.build==='shelter')o.push(['shelter',hasShelter()?1:0,true]);
+  if(v.explored)o.push(['tiles explored',G.stats.explored,v.explored]);
+  if(v.temple)o.push(['temple searched',G.sc.templeDone?1:0,true]);
+  if(v.crosses)o.push(['crosses',(G.sc.crosses||[]).length,v.crosses]);
+  return o}
+function campMet(){const v=G.cmp.goal.value;const ok=[];
+  if(v.surviveDays)ok.push(G.round>=v.surviveDays&&!G.chars.some(c=>c.dead&&!c.npc));
+  if(v.build==='shelter')ok.push(hasShelter());
+  if(v.explored)ok.push(G.stats.explored>=v.explored);
+  if(v.temple)ok.push(!!G.sc.templeDone);
+  if(v.crosses)ok.push((G.sc.crosses||[]).length>=v.crosses);
+  return ok.length>0&&ok.every(Boolean)}
+// end of a day: a met checkpoint wins the chapter; a missed deadline loses it. true when the game is over.
+function campCheck(){const g=G.cmp.goal;if(!g||g.type!=='custom'||!g.value)return false;
+  if(campMet()){G.over={win:true,why:'Chapter goal reached: '+g.text.replace(/\.$/,'')+'.'};lg('🏆 '+G.over.why,'big');fx('win');return true}
+  const by=g.value.byDay||g.value.surviveDays;if(by&&G.round>=by){G.over={win:false,why:'Day '+by+' ended before the chapter goal: '+g.text.replace(/\.$/,'')+'.'};lg(G.over.why,'bad');fx('lose');return true}
+  return false}

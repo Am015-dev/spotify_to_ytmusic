@@ -71,6 +71,11 @@ function allPriorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.
   // near death: the hard rule
   for(const c of living()){if(c.npc||c.out)continue;const life=lifeLeft(c);if(!nearDeath(c))continue;
     add({w:100,red:true,icon:'😴',title:`${c.nm} must rest: ${life} ${life>1?'wounds':'wound'} from death`,why:`${c.human?'Put one of '+c.nm+'’s pawns on Rest':hum(c)?c.nm+'’s player should put a pawn on Rest':c.nm+' (computer) rests by itself'}: rest heals 1. If anyone dies, you all lose.`,act:{type:'rest',tgt:null},lead:c.i,done:restPlanned(c.i),confirm:`⚠ ${c.nm} is ${life} ${life>1?'wounds':'wound'} from death and not resting.`})}
+  // the story chapter's checkpoint (campaign only)
+  if(G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom'){const v=G.cmp.goal.value;const late=v.byDay&&G.round>=v.byDay-1;
+    if(v.build==='shelter'&&!hasShelter())add({w:92,red:late,icon:'📖',title:'Chapter goal: build the Shelter',why:`Build ▸ Shelter by the end of day ${v.byDay}. It costs wood: gather some first if you are short. Two pawns make it certain.`,act:{type:'build',tgt:{k:'shelter'}},done:G.plan.acts.some(x=>x.type==='build'&&x.tgt&&x.tgt.k==='shelter')});
+    if(v.explored&&G.stats.explored<v.explored){let t=null;try{const r=catRows('explore').find(x=>!x.why);if(r)t=r.tgt}catch(e){}
+      add({w:91,red:late,icon:'📖',title:`Chapter goal: explore (${G.stats.explored}/${v.explored} places)`,why:`Explore ${v.explored-G.stats.explored} more place${v.explored-G.stats.explored>1?'s':''} by the end of day ${v.byDay}. Each explored ❔ place turns over a new tile.`,act:t!=null?{type:'explore',tgt:t}:null,cant:t==null?'no unexplored place in reach':null,done:G.plan.acts.some(x=>x.type==='explore')})}}
   // food for tonight
   // rain above the roof ruins food before supper: count the likely loss too
   const wxl=wxFoodLoss();const short=need+wxl-have-planF;
@@ -175,7 +180,7 @@ function tutHtml(){if(UI.tut>=99||!G||G.round>1||!planOpen()||allAI())return '';
 // ---------- the guided first game: one idea per screen, each shown once ----------
 UI.guide={on:false,seen:{}};
 const GUIDE={
-  plan1:'<b>Guided game.</b> Every day you <b>plan</b> first, then <b>watch the day play out</b>. This page shows what the camp needs tonight: <b>red rows are trouble</b>. Your goal is in the bar under the island (🎯). In the top bar, ♥ is the life of your most hurt castaway. Press <b>Next</b>.',
+  plan1:'<b>How a day works.</b> Every day you <b>plan</b> first, then <b>watch the day play out</b>. This page shows what the camp needs tonight: <b>red rows are trouble</b>. Your goal is in the bar under the island (🎯). In the top bar, ♥ is the life of your most hurt castaway. Press <b>Next</b>.',
   plan2:'<b>Give every pawn a job.</b> Each castaway has 2 pawns (workers); Friday and the dog are helpers. The <b>recommended job</b> comes with a reason: tap ✔ if you agree.',
   plan3:'<b>Risks.</b> One pawn on a job rolls the dice (it can fail or hurt). Two pawns make it <b>certain</b>. Anything red is not covered today.',
   plan4:'<b>Start the day.</b> The plan is fixed after this, and the day plays out scene by scene.',
@@ -188,6 +193,6 @@ const GUIDE={
   morning:'<b>Morale.</b> Each morning the first player (★) gains or loses <b>✊ determination</b>, the points you spend on skills. Low morale costs ✊; anyone who can’t pay takes a wound.',
   prod:'<b>Production.</b> Your camp’s place gives its food and wood every morning, for free.',
   daysum:'<b>End of the day:</b> what changed and why, and the one thing to do first tomorrow. <b>If any castaway dies, you all lose.</b>'};
-function guideTip(k){if(!UI.guide.on||UI.guide.seen[k]||!GUIDE[k]||!G||G.round>3)return '';return `<div class="coach gtip" role="note"><div class="cn">First game · tip</div><p>${GUIDE[k]}</p><div class="cb"><button class="btn xs" data-gtip="${k}">Got it</button><button class="btn xs ghost" data-gtip="off">No more tips</button></div></div>`}
+function guideTip(k){if(!UI.guide.on||UI.guide.seen[k]||!GUIDE[k]||!G||G.round>3)return '';return `<div class="coach gtip" role="note"><div class="cn">Tip</div><p>${GUIDE[k]}</p><div class="cb"><button class="btn xs" data-gtip="${k}">Got it</button><button class="btn xs ghost" data-gtip="off">No more tips</button></div></div>`}
 function tutAdvance(to){if(UI.tut<99)UI.tut=Math.max(UI.tut,to)}
 function tutDone(){UI.tut=99;try{localStorage.setItem('swi_tut','done')}catch(e){}}
