@@ -245,7 +245,7 @@ function renderBoard() {
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) return v; if (UI.focus != null && UI.focus < G.np) return UI.focus; return Math.max(0, G.phase === 'over' ? 0 : Math.min(G.np - 1, G.cur)); }
 // phone cards shrink so a full hand of 8 fits across the dock without sideways scrolling
-function stripW() { if (!isPh()) return 58; const d = $('#dock'), w = (d && d.clientWidth) || innerWidth, v = viewSeat(); const n = Math.max(6, v >= 0 ? G.players[v].hand.length : 6, UI.tab === 'city' ? G.players[focusSeat()].city.length : 0); return Math.max(44, Math.min(56, Math.floor((w - 18 - (n - 1) * 2) / n))); }
+function stripW() { if (!isPh()) return 58; const d = $('#dock'), w = (d && d.clientWidth) || innerWidth, v = viewSeat(); const n = Math.max(6, v >= 0 ? G.players[v].hand.length : 6, UI.tab === 'city' ? G.players[focusSeat()].city.length : 0); return Math.max(40, Math.min(52, Math.floor((w - 18 - (n - 1) * 2) / n) - 4)); }
 function promptText() {
   if (!G) return '';
   if (G.phase === 'over') return 'The game is over.';
@@ -395,8 +395,8 @@ function placePop() {
   const p = $('#ppop'), dock = $('#dock'); if (!p || p.hidden) return;
   const dr = dock.getBoundingClientRect(); let top = 0, bottom = 0;
   const t = UI.pop && UI.pop.trig;
-  if (t === 'hand') { const r = $('#handS').getBoundingClientRect(); bottom = Math.max(0, dr.bottom - r.top); }
-  else if (t === 'city') { const r = $('#cityS').getBoundingClientRect(); top = Math.max(0, r.bottom - dr.top); }
+  // on phones a card sheet gets the whole dock (above the hand strip it would be too short to read); elsewhere it sits above the hand
+  if ((t === 'hand' || t === 'city') && !isPh()) { const r = $('#handS').getBoundingClientRect(); if (r.height) bottom = Math.max(0, dr.bottom - r.top); }
   p.style.top = top + 'px'; p.style.bottom = bottom + 'px';
 }
 function setPop(o, build) {
@@ -527,7 +527,7 @@ function openCard(src, id, seat, slot, trig) {
     const ent = src === 'city' ? G.players[seat].city.find(e => e.id === id) : null;
     const left = h('div.cardbox', cardEl(id, w, { entry: ent }));
     const right = h('div.cinfo', h('div.cc', h('b', 'Cost '), costEl(c.cost, 16), h('b', ' · ' + c.pts + ' pt')), h('p.ct', c.text), h('p.sm', TYPEHELP[c.type]));
-    if (c.kind === 'critter') { const lk = D.cards.find(x => x.key === c.linked); right.appendChild(h('p.sm', 'Free if you own ' + (c.linked === 'any' ? 'the Elderheart Oak' : lk ? lk.name : '?') + ' with no token on it.')); }
+    if (c.kind === 'critter' && (c.linked === 'any' || D.cards.some(x => x.key === c.linked))) { const lk = D.cards.find(x => x.key === c.linked); right.appendChild(h('p.sm', 'Free if you own ' + (c.linked === 'any' ? 'the Elderheart Oak' : lk.name) + ' with no token on it.')); }
     if (ent) { const l = []; if (ent.occ) l.push('occupied'); if (ent.tok) l.push(ent.tok + ' point token(s)'); if (ent.pris && ent.pris.length) l.push(ent.pris.length + ' prisoner(s)'); if (ent.w) l.push(ent.w + ' worker(s) inside'); if (ent.stock) l.push('stock ' + costText(ent.stock)); if (l.length) right.appendChild(h('p.sm', l.join(', '))); }
     const cw = h('div.cwrap', left, right);
     const acts = h('div.pacts');
@@ -1131,8 +1131,9 @@ function gainParts(b, s) {
 }
 function gainBanner(b, s, pts) {
   const x = pts.find(y => y.seat === s), g = gainParts(b, s);
-  if (!x && !g.length) return;
-  ptsBanner(x ? x.d : 0, (x ? x.parts : []).concat(g));
+  const others = pts.filter(y => y.seat !== s).map(y => pname(y.seat) + ' ' + sgn(y.d) + ' ★ (' + y.parts.join(', ') + ')');
+  if (!x && !g.length && !others.length) return;
+  ptsBanner(x ? x.d : 0, (x ? x.parts : []).concat(g, others));
 }
 function ptsBanner(d, parts) {
   const e = $('#ptsb'); if (!e) return;
@@ -1150,9 +1151,11 @@ function stripTabs() {
   if (!ph) return;
   t.innerHTML = '';
   const hn = v >= 0 ? G.players[v].hand.length : 0;
+  const rec = UI.rec && UI.rec.m, recCity = !!(rec && rec.type === 'worker' && rec.k === 'dest' && s === v);
+  if (recCity && UI.recTab !== UI.recKey) { UI.recTab = UI.recKey; if (UI.tab !== 'city') { UI.tab = 'city'; return renderDock(); } }
   const cityOk = $$('#cityRow .sc.ok,#cityRow .sc.rec').length;
   t.appendChild(h('button.tab' + (city ? '' : '.on'), { 'data-a': 'tab', 'data-v': 'hand', type: 'button', 'aria-pressed': String(!city) }, (v >= 0 ? 'Your hand ' + hn + '/8' : 'Hand')));
-  t.appendChild(h('button.tab' + (city ? '.on' : '') + (cityOk && !city ? '.glow' : ''), { 'data-a': 'tab', 'data-v': 'city', type: 'button', 'aria-pressed': String(city) }, (s === v ? 'Your city ' : p.name + "'s city ") + HB.cityCount(G, s) + '/15'));
+  t.appendChild(h('button.tab' + (city ? '.on' : '') + (cityOk && !city ? '.glow' : ''), { 'data-a': 'tab', 'data-v': 'city', type: 'button', 'aria-pressed': String(city) }, (recCity ? '★ ' : '') + (s === v ? 'Your city ' : p.name + "'s city ") + HB.cityCount(G, s) + '/15'));
 }
 document.addEventListener('click', ev => { const b = ev.target.closest('#ptsb'); if (b) { b.hidden = true; ev.stopPropagation(); return; } }, true);
 document.addEventListener('click', ev => { const t = ev.target.closest('[data-a=tab]'); if (!t) return; UI.tab = t.dataset.v; renderDock(); });
@@ -1163,7 +1166,8 @@ function boardMap() {
     row(ic('twig', 20), 'Brown and green tiles:', 'places for your workers. The icons show what you get. Glowing = open to you now.'),
     row(ic('flag', 20), 'Flags and stars:', 'events. Get the cards they ask for, then a worker claims the points. A ? star scores a varying amount: tap it to read how.'),
     row(ic('road', 20), 'Long Road:', 'opens in your last season (Autumn): a worker there scores 2–5 points.'),
-    row(ic('deck', 20), 'Big cards:', 'the meadow. Anyone can buy them, just like cards in your hand.')),
+    row(ic('deck', 20), 'Big cards:', 'the meadow. Anyone can buy them, just like cards in your hand.'),
+    row(ic('point', 20), 'Your row:', 'twigs, resin, pebbles, berries, point tokens (1 point each) and free workers.')),
     h('p.sm', 'Tap anything to see what it does. Hint suggests a move and says why.'));
 }
 function mapCard() {

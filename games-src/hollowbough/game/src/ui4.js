@@ -59,8 +59,8 @@ function placePop() {
   const p = $('#ppop'), dock = $('#dock'); if (!p || p.hidden) return;
   const dr = dock.getBoundingClientRect(); let top = 0, bottom = 0;
   const t = UI.pop && UI.pop.trig;
-  if (t === 'hand') { const r = $('#handS').getBoundingClientRect(); bottom = Math.max(0, dr.bottom - r.top); }
-  else if (t === 'city') { const r = $('#cityS').getBoundingClientRect(); top = Math.max(0, r.bottom - dr.top); }
+  // on phones a card sheet gets the whole dock (above the hand strip it would be too short to read); elsewhere it sits above the hand
+  if ((t === 'hand' || t === 'city') && !isPh()) { const r = $('#handS').getBoundingClientRect(); if (r.height) bottom = Math.max(0, dr.bottom - r.top); }
   p.style.top = top + 'px'; p.style.bottom = bottom + 'px';
 }
 function setPop(o, build) {
@@ -191,7 +191,7 @@ function openCard(src, id, seat, slot, trig) {
     const ent = src === 'city' ? G.players[seat].city.find(e => e.id === id) : null;
     const left = h('div.cardbox', cardEl(id, w, { entry: ent }));
     const right = h('div.cinfo', h('div.cc', h('b', 'Cost '), costEl(c.cost, 16), h('b', ' · ' + c.pts + ' pt')), h('p.ct', c.text), h('p.sm', TYPEHELP[c.type]));
-    if (c.kind === 'critter') { const lk = D.cards.find(x => x.key === c.linked); right.appendChild(h('p.sm', 'Free if you own ' + (c.linked === 'any' ? 'the Elderheart Oak' : lk ? lk.name : '?') + ' with no token on it.')); }
+    if (c.kind === 'critter' && (c.linked === 'any' || D.cards.some(x => x.key === c.linked))) { const lk = D.cards.find(x => x.key === c.linked); right.appendChild(h('p.sm', 'Free if you own ' + (c.linked === 'any' ? 'the Elderheart Oak' : lk.name) + ' with no token on it.')); }
     if (ent) { const l = []; if (ent.occ) l.push('occupied'); if (ent.tok) l.push(ent.tok + ' point token(s)'); if (ent.pris && ent.pris.length) l.push(ent.pris.length + ' prisoner(s)'); if (ent.w) l.push(ent.w + ' worker(s) inside'); if (ent.stock) l.push('stock ' + costText(ent.stock)); if (l.length) right.appendChild(h('p.sm', l.join(', '))); }
     const cw = h('div.cwrap', left, right);
     const acts = h('div.pacts');

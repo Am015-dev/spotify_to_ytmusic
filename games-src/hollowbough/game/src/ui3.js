@@ -2,7 +2,7 @@
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) return v; if (UI.focus != null && UI.focus < G.np) return UI.focus; return Math.max(0, G.phase === 'over' ? 0 : Math.min(G.np - 1, G.cur)); }
 // phone cards shrink so a full hand of 8 fits across the dock without sideways scrolling
-function stripW() { if (!isPh()) return 58; const d = $('#dock'), w = (d && d.clientWidth) || innerWidth, v = viewSeat(); const n = Math.max(6, v >= 0 ? G.players[v].hand.length : 6, UI.tab === 'city' ? G.players[focusSeat()].city.length : 0); return Math.max(44, Math.min(56, Math.floor((w - 18 - (n - 1) * 2) / n))); }
+function stripW() { if (!isPh()) return 58; const d = $('#dock'), w = (d && d.clientWidth) || innerWidth, v = viewSeat(); const n = Math.max(6, v >= 0 ? G.players[v].hand.length : 6, UI.tab === 'city' ? G.players[focusSeat()].city.length : 0); return Math.max(40, Math.min(52, Math.floor((w - 18 - (n - 1) * 2) / n) - 4)); }
 function promptText() {
   if (!G) return '';
   if (G.phase === 'over') return 'The game is over.';

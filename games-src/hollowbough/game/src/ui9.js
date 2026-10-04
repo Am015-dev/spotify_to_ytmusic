@@ -57,8 +57,9 @@ function gainParts(b, s) {
 }
 function gainBanner(b, s, pts) {
   const x = pts.find(y => y.seat === s), g = gainParts(b, s);
-  if (!x && !g.length) return;
-  ptsBanner(x ? x.d : 0, (x ? x.parts : []).concat(g));
+  const others = pts.filter(y => y.seat !== s).map(y => pname(y.seat) + ' ' + sgn(y.d) + ' ★ (' + y.parts.join(', ') + ')');
+  if (!x && !g.length && !others.length) return;
+  ptsBanner(x ? x.d : 0, (x ? x.parts : []).concat(g, others));
 }
 function ptsBanner(d, parts) {
   const e = $('#ptsb'); if (!e) return;
@@ -76,9 +77,11 @@ function stripTabs() {
   if (!ph) return;
   t.innerHTML = '';
   const hn = v >= 0 ? G.players[v].hand.length : 0;
+  const rec = UI.rec && UI.rec.m, recCity = !!(rec && rec.type === 'worker' && rec.k === 'dest' && s === v);
+  if (recCity && UI.recTab !== UI.recKey) { UI.recTab = UI.recKey; if (UI.tab !== 'city') { UI.tab = 'city'; return renderDock(); } }
   const cityOk = $$('#cityRow .sc.ok,#cityRow .sc.rec').length;
   t.appendChild(h('button.tab' + (city ? '' : '.on'), { 'data-a': 'tab', 'data-v': 'hand', type: 'button', 'aria-pressed': String(!city) }, (v >= 0 ? 'Your hand ' + hn + '/8' : 'Hand')));
-  t.appendChild(h('button.tab' + (city ? '.on' : '') + (cityOk && !city ? '.glow' : ''), { 'data-a': 'tab', 'data-v': 'city', type: 'button', 'aria-pressed': String(city) }, (s === v ? 'Your city ' : p.name + "'s city ") + HB.cityCount(G, s) + '/15'));
+  t.appendChild(h('button.tab' + (city ? '.on' : '') + (cityOk && !city ? '.glow' : ''), { 'data-a': 'tab', 'data-v': 'city', type: 'button', 'aria-pressed': String(city) }, (recCity ? '★ ' : '') + (s === v ? 'Your city ' : p.name + "'s city ") + HB.cityCount(G, s) + '/15'));
 }
 document.addEventListener('click', ev => { const b = ev.target.closest('#ptsb'); if (b) { b.hidden = true; ev.stopPropagation(); return; } }, true);
 document.addEventListener('click', ev => { const t = ev.target.closest('[data-a=tab]'); if (!t) return; UI.tab = t.dataset.v; renderDock(); });
@@ -89,7 +92,8 @@ function boardMap() {
     row(ic('twig', 20), 'Brown and green tiles:', 'places for your workers. The icons show what you get. Glowing = open to you now.'),
     row(ic('flag', 20), 'Flags and stars:', 'events. Get the cards they ask for, then a worker claims the points. A ? star scores a varying amount: tap it to read how.'),
     row(ic('road', 20), 'Long Road:', 'opens in your last season (Autumn): a worker there scores 2–5 points.'),
-    row(ic('deck', 20), 'Big cards:', 'the meadow. Anyone can buy them, just like cards in your hand.')),
+    row(ic('deck', 20), 'Big cards:', 'the meadow. Anyone can buy them, just like cards in your hand.'),
+    row(ic('point', 20), 'Your row:', 'twigs, resin, pebbles, berries, point tokens (1 point each) and free workers.')),
     h('p.sm', 'Tap anything to see what it does. Hint suggests a move and says why.'));
 }
 function mapCard() {
