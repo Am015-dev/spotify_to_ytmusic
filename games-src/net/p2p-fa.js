@@ -148,6 +148,7 @@ async function layout(x, tag) {
     else if (SC === 'touch') {
       const { H, C } = await setup({ sc: 'g2' }); const P = [H, ...C]; await startHost(H); for (const x of P) await seatOf(x); const c = C[0]; const out = {};
       for (let k = 0; k < 100 && !(await c.p.evaluate(() => NET.mySeat === 1 && UI.started)); k++) await sleep(150);
+      { const sc = await c.p.$('#rs.story [data-a=rsclose]'); if (sc) { await sc.tap(); await sleep(300); } } await H.p.evaluate(() => { const c = document.querySelector('#rs.story [data-a=rsclose]'); if (c) c.click(); });
       const r0 = await c.p.evaluate(() => { const r = document.querySelector('#netst').getBoundingClientRect(); return [r.width, r.height]; }); out.badge = r0; await c.p.tap('#netst'); await sleep(300); out.lobbyOpen = await c.p.evaluate(() => !document.getElementById('netbox').hidden);
       const xr = await c.p.evaluate(() => { const r = document.querySelector('#netbox .lbx').getBoundingClientRect(); return [r.width, r.height]; }); out.xSize = xr; await c.p.tap('#netbox .lbx'); await sleep(300); out.lobbyClosed = await c.p.evaluate(() => document.getElementById('netbox').hidden);
       let moves = 0; const n0 = await H.p.evaluate(() => NET.remote);

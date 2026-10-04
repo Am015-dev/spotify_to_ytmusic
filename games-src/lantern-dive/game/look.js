@@ -23,10 +23,10 @@ const [W, H] = (process.argv[2] || '390x763').split('x').map(Number); const PH =
     const st = await p.evaluate(() => ({ ph: G.phase, tr: G.tricks.length, pl: G.trick ? G.trick.plays.length : 0 }));
     if (st.ph !== ph0 && ['distress', 'pass', 'signal'].includes(st.ph)) { await p.waitForTimeout(700); await sh('2' + st.ph); }
     ph0 = st.ph;
-    if (st.ph === 'play' && st.tr === 1 && st.pl === 0 && shots < 3) { shots = 3; await p.waitForTimeout(900); await sh('3play'); await p.evaluate(() => { const c = document.querySelector('.jc'); if (c) c.click(); }); await p.waitForTimeout(500); await sh('4pop'); await p.evaluate(() => closePop()); await p.evaluate(() => { document.querySelector('#pile [data-a=last]') && document.querySelector('#pile [data-a=last]').click(); }); await p.waitForTimeout(500); await sh('5last'); await p.evaluate(() => closePop()); }
+    if (st.ph === 'play' && st.tr >= 1 && shots < 3) { shots = 3; await p.waitForTimeout(900); await sh('3play'); await p.evaluate(() => { const c = document.querySelector('.jc'); if (c) c.click(); }); await p.waitForTimeout(500); await sh('4pop'); await p.evaluate(() => closePop()); await p.evaluate(() => { document.querySelector('#pile [data-a=last]') && document.querySelector('#pile [data-a=last]').click(); }); await p.waitForTimeout(500); await sh('5last'); await p.evaluate(() => closePop()); }
     await p.evaluate(() => { const ph = G.phase, mv = myMoves(); const pick = (ph === 'assign' && (mv.find(m => m.t === 'take') || mv.find(m => m.t === 'pass'))) || (ph === 'play' && mv.find(m => m.t === 'play')) || mv.find(m => m.t === 'dist' && m.on && m.dir === 1) || mv.find(m => m.t === 'give') || mv.find(m => m.t === 'nosig') || mv.find(m => m.t === 'predict') || mv[0]; if (pick) doMove(pick); });
     await p.waitForTimeout(250);
-    if (st.ph === 'play' && st.tr === 3 && shots < 4) { shots = 4; await p.waitForTimeout(900); await sh('6mid'); }
+    if (st.ph === 'play' && st.tr >= 3 && shots < 4) { shots = 4; await p.waitForTimeout(900); await sh('6mid'); }
   }
   console.log('errors', JSON.stringify(errs)); await b.close();
 })().catch(e => { console.error('FATAL', e); process.exit(1); });
