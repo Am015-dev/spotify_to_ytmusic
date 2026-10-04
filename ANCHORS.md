@@ -14,3 +14,9 @@ Function rebinds in ob.js (no anchors): `debris`, `studBurst`, `FL_burst`, `roam
 |---|---|
 | `window.__mho={` | prepend ob_euro.js |
 | the `{const L=LM_BY['Euro-Skulptur'],x=L.x,z=L.z;box(3,3,3,…reg('Euro-Skulptur',17,[x,z+0])}` block in lmBuildAll | `{…E=OB_euroBuild(bt,BM,x,z);hit(x,z,E.hw,E.hd,E.gy+14);reg('Euro-Skulptur',E.gy+14,[x,z+0])}` |
+
+## pOB3.py (road network repair + audit) — module ob_roads.js
+| anchor | change |
+|---|---|
+| `const CITY_G=new Map();CITY_S.forEach(` | prepend ob_roads.js (runs OB_fix() on CITY_S before grid/junctions/meshes/GPS graph are built); anchor re-emitted unchanged |
+Function rebind (no anchor): `rfGrid` wrapped to repair the Frankfurt filler grid once.

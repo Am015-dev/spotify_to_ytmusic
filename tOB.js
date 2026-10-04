@@ -40,4 +40,5 @@ const weave=p=>p.evaluate(()=>{const M=__mho,R=M.RO,res=[];const ox=R.x,oz=R.z;
  if(ONLY.includes('euro')){const p=await open(b,'fra');const e=await p.evaluate(()=>window.__ob&&__ob.euro&&__ob.euro());console.log('INFO euro',JSON.stringify(e));
   ok(!!e,'€ sculpture exists (Willy-Brandt-Platz)');if(e){const h=e.size[1];ok(h>13&&h<15,`€ sculpture is about 14 m tall`,e.size);ok((e.extraDrawCalls??e.drawCalls)<=1,'€ sculpture is merged geometry',e)}
   if(!process.env.NOSHOT)console.log('INFO € screenshot: node tOB_euro.js → shots/ob_euro_after.jpg');await p.context().close()}
+ if(ONLY.includes('roads')){const r=require('child_process').spawnSync('node',['tOB_roads.js'],{stdio:'inherit',env:{...process.env,NOSHOT:process.env.NOSHOT||'1'}});ok(r.status===0,'road audit (tOB_roads.js): all cities/districts meet the targets')}
  console.log(fails?`FAILED ${fails}`:'ALL PASS');await b.close();process.exit(fails?1:0)})();
