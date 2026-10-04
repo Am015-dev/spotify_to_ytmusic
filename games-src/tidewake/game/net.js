@@ -23,12 +23,12 @@ async function netJoin(role,code){if(NET.busy||!NET.lobby)return;NET.err='';code
   if(!code){NET.err='Type the invite code first.';netRender();return}
   NET.busy=true;netRender();let room;
   try{if(NET.room){try{await NET.room.leave()}catch(e){}NET.room=null}room=await NET.lobby.join('tw-'+code)}catch(e){NET.busy=false;NET.err='Could not open the game room.';netRender();return}
-  Object.assign(NET,{busy:false,code,role,on:true,room,mySeat:-1,hostPeer:null,parts:{},applied:0,lastRx:0,gid:null,hostGone:false,peer:room.self,peers:[],opt:null,seatPeer:[],seatUid:[],pend:-1,queue:[]});
+  Object.assign(NET,{busy:false,t0:Date.now(),code,role,on:true,room,mySeat:-1,hostPeer:null,parts:{},applied:0,lastRx:0,gid:null,hostGone:false,peer:room.self,peers:[],opt:null,seatPeer:[],seatUid:[],pend:-1,queue:[]});
   if(G||UI.started)netIdle();
   room.presence({role,uid:NET.uid,name:NET.myName||''}).catch(()=>{});
   room.on('st',onNetState);room.on('act',onNetAct);room.on('rej',onNetRej);
   room.onPeers(onNetPeers);room.onConnection(c=>{NET.conn=c;netRender()});
-  if(role==='client'){hideStart();idleDock()}
+  if(role==='client'){hideStart();idleDock();clearTimeout(NET.slowT);NET.slowT=setTimeout(()=>{if(isClient()&&!NET.hostPeer){netRender();netDock()}},20500)}
   if(GX.open)GX.close();UI.netOpen=true;netRender();if(role==='host'){if(!UI.setup)UI.setup=defaultSetup();netPush(true);renderStart()}}
 async function netLeave(){const r=NET.room;const was=NET.on;Object.assign(NET,{on:false,role:null,room:null,mySeat:-1,hostPeer:null,err:'',hostGone:false,peers:[],gid:null,opt:null,seatPeer:[],seatUid:[],queue:[]});
   try{if(r)await r.leave()}catch(e){}if(!was)return;UI.netOpen=false;netIdle();showStart();netRender()}
@@ -170,7 +170,7 @@ function netDrain(){if(!isHost()||!NET.queue.length)return;
 function netStatus(){const n=NET.peers.length;
   if(NET.hostGone||NET.err)return `<span class="warn">${esc(NET.err||'The host left.')}</span>`;
   if(NET.conn===false)return 'Connecting...';
-  if(isClient()&&!NET.hostPeer)return 'Looking for the host...';
+  if(isClient()&&!NET.hostPeer)return NET.t0&&Date.now()-NET.t0>20000?'<span class="warn">Still no host after 20 s.</span> Check the code with your friend and keep their game open. Some Wi-Fi and office networks block direct connections: try mobile data, or leave and join again.':'Looking for the host...';
   if(isClient()&&NET.lastRx&&Date.now()-NET.lastRx>12000)return 'Reconnecting...';
   if(n<=1)return 'Looking for players...';return `${n} players connected`}
 function netDock(){const el=$('#netst');if(!el)return;if(!NET.on||!G){el.hidden=true;return}el.hidden=false;

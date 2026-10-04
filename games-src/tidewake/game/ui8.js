@@ -85,7 +85,7 @@ function kitBoot(){
   const st=lsGet('tw_set',{});UI.turbo=!!st.turbo;UI.wakeTap=!!st.wakeTap;
   // settings saved before the shared menu (speed 0.5-5, animations on/off) keep working until the player picks a new speed
   if(st.speed!=null||st.anim!=null)UI.legacy={speed:st.speed,anim:st.anim};
-  kitSettings();kitReference();kitUndo();kitRecap();
+  kitReference();kitSettings();kitUndo();kitRecap(); // reference first: its bar button is only added while no other [data-gx=gx-refd] exists
   GNS.achievements(GAME_ID,ACH);twSpeed();
   GX.onPref(k=>{if(k==='anim'&&UI.legacy){UI.legacy=null;saveSettings()}if(k==='ai'||k==='anim'||k==='reduce'||typeof k==='object')twSpeed();if(k==='master'||typeof k==='object')sndMaster();if((k==='cb'||k==='text')&&G&&UI.started){OV.sig='';render()}});
   sndMaster();GX.offline({sw:'../sw.js',scope:'../'})}
@@ -113,3 +113,6 @@ document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.clos
   if(a==='cfg'){UI.cfgOpen=true;renderStart();const st=$('#start');if(st)st.scrollTop=0}
   else if(a==='cfgback'){UI.cfgOpen=false;renderStart()}
   else if(a==='tonl'){UI.cfgOpen=true;UI.onl=true;renderStart();const o=$('#onl');if(o){o.open=true;try{o.scrollIntoView({block:'start'})}catch(e){}}}});
+// ---- phones: a captains strip under the controls (the bottom half of a tall phone was empty)
+function phCrewHTML(){if(!G||!UI.started||G.phase==='over'&&false)return '';const now=UI.busy&&UI.curTurn!=null?UI.curTurn:sideToAct();const me=viewSeat();
+  return `<div class="ps-crew" aria-label="Captains">${G.order.map(i=>{const s=G.ships[i];return `<span class="pc-c${i===now&&!G.over?' now':''}${s.alive?'':' out'}">${dot(i)}<b>${i===me?'You':esc(nm(i))}</b><small>${s.alive?G.hands[i].length+' tile'+(G.hands[i].length===1?'':'s'):'sunk'}</small></span>`}).join('')}</div>`}

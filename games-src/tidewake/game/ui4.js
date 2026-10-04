@@ -111,7 +111,8 @@ document.addEventListener('keydown',e=>{if(!G||!UI.started||GX.open||!$('#start'
 // ---------- popups ----------
 function renderOpenDrawer(){const id=GX.open;if(id==='crewd')renderCrew();else if(id==='logd')renderLog();}
 function rewindLast(){if(NET.on)return;if(GX.undo.undo()){GX.close();sfx('click')}}
-function renderLog(){const b=$('#logbody');if(!G){b.innerHTML='<p>Start a game first.</p>';return}b.innerHTML=G.log.slice(0,200).map(l=>`<div class="logl ${l.c}">${esc(l.t)}</div>`).join('')}
+function renderLog(){const b=$('#logbody');if(!G){b.innerHTML='<p>Start a game first.</p>';return}const L=G.log.slice(0,200),grp=[];for(const l of L){const g=grp[grp.length-1];if(g&&g.turn===l.turn)g.ls.push(l);else grp.push({turn:l.turn,ls:[l]})}
+  b.innerHTML=grp.map(g=>g.ls.reverse().map(l=>`<div class="logl ${l.c}">${esc(l.t)}</div>`).join('')).join('')} // newest turn first, each turn read top to bottom
 function crewCards(h,own){return h.map(c=>isCur(c)?`<img alt="" width="54" height="54" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[c]],{uid:'x'+Math.random().toString(36).slice(2,6),size:54})}">`:`<b>${isGate(c)?'Rift Gate':'Cannon'}</b> `).join('')}
 function renderCrew(){const b=$('#crewbody');if(!G){b.innerHTML='<p>Start a game first.</p>';return}const watch=!humans().length;const L=G.mons.filter(m=>m.k==='L').length;
   let h=`<table class="lg2"><tr><th>Captain</th><th>Status</th><th>Tiles</th></tr>`+G.order.map(i=>{const s=G.ships[i];const see=watch&&UI.xray;

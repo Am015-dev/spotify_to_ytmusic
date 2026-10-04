@@ -24,5 +24,5 @@ function boot(){phApply();GX.init({key:'tw'});const st=lsGet('tw_set',{});if(st.
   $('#rulesbody').innerHTML=RULES_HTML;
   GX.onShow=id=>{sfx('open');renderOpenDrawer()};GX.onClose=()=>sfx('close');
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!GX.open&&G&&UI.started&&UI.confirm){UI.confirm=null;renderCoach()}});
-  netInit();kitBoot();showStart();OV.raf=requestAnimationFrame(ovLoop)}
+  kitBoot();netInit();showStart();OV.raf=requestAnimationFrame(ovLoop)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
