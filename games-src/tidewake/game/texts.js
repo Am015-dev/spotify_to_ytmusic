@@ -29,16 +29,16 @@ const RULES_HTML=`
 <details class="guess"><summary>Our guesses (the published rules did not say)</summary><ul><li>Easy solo starts with four leviathans (our variant).</li><li>The board is 6 by 6 squares (the dice only reach 6).</li><li>The 56 currents are the 35 different layouts plus 21 repeats we spread evenly (the real repeats are unknown).</li><li>The arrows on the leviathan tiles, their order numbers and gold tie-breakers are our own design.</li><li>Collisions: a junk "passing through" another is fine, but two junks forced to end on one wake in one direction both sink; head-on wakes sink both.</li><li>Rift Gate during another captain's turn is placed on a free square beside the doomed junk; Deck Cannon range on your own turn is the leviathans orthogonally next to your front square or tile.</li><li>Rogue Wave strength 2, then 3, then 4 from the fourth round.</li><li>Easy solo ends after 24 turns because a 6 by 6 board can never hold the whole pile.</li></ul></details>
 <h3>Credits</h3><p>Names, card text and art are original. <button class="btn small" data-gx="credd">Full credits</button></p>`;
 const COACH=[
- {id:'start',t:'Welcome aboard',x:'Each captain sails one junk. The last junk afloat wins. First, tap a gold mark on the edge of the board to put your junk there. The numbers 1 to 6 along the edges just name the marks: each number has two (left and right, or upper and lower). The dice come later, they only decide when the leviathans move.'},
- {id:'cur',t:'Currents',x:'Each tile holds four wake lines. Your junk is carried along the line it enters, through every connected tile, until it reaches an empty square. Pick a tile and turn it: the gold line is exactly where you will sail.'},
- {id:'edge',t:'The edge',x:'A wake that leads off the board sinks you. The preview turns red when that would happen, and the dock tells you. Tiles that point inward are safer early on.'},
- {id:'coll',t:'Collisions',x:'If two junks end up on the same wake heading the same way, both sink. When you lay a tile, any junk waiting on that square sails too, so check where they go as well.'},
- {id:'lev',t:'Leviathans',x:'The sea serpents block squares. A wake that ends in one sinks you; one that lands on your tile sinks you and smashes the tile. Keep your junk away from them.'},
- {id:'roll',t:'The roll',x:'Every turn starts with two dice. The two dice are added together. A total of 6, 7 or 8 wakes every leviathan: each rolls one die and follows its printed arrow.'},
- {id:'move',t:'Leviathans move',x:'Watch their tiles: the arrows tell where a leviathan may go for a roll of 1 to 5. A 6 means it stays and another one rises. When one swims off the board it is gone for good.'},
- {id:'sunk',t:'A junk goes down',x:'Sunk captains are out. Their tiles go back to the pile. If your tile sank someone, you may swap tiles with their hand. Fewer rivals means fewer wakes to dodge.'},
- {id:'min3',t:'Leviathans refill',x:'There are always at least three leviathans. If they drop below three, the next captain skips the roll and new ones rise instead.'},
- {id:'end',t:'Nicely sailed',x:'You have seen the whole game: lay a current, sail the wake, dodge the edge, junks and leviathans. Turn the guide to Light to keep only the warnings, or start a bigger game from the menu.'}];
+ {id:'start',t:'Welcome aboard',x:'You sail one junk; the last junk afloat wins. After this card, tap Best start (or an edge square, then a gold mark) to put your junk on the board.'},
+ {id:'cur',t:'Your move',x:'Each turn you lay one tile on the square in front of your junk, and it sails along that tile\'s line. A tick means safe, a cross means you would sink. Press Turn to change the route.'},
+ {id:'edge',t:'The edge',x:'Sailing off the edge of the board sinks you. Early on, pick routes that point back inward.'},
+ {id:'coll',t:'Collisions',x:'Two junks that end on the same line heading the same way both sink. A junk already waiting on your square sails too.'},
+ {id:'lev',t:'Leviathans',x:'The sea serpents sink any junk that sails into them, or that they swim onto. Keep a square of space between you and them.'},
+ {id:'roll',t:'The roll',x:'Every turn starts with two dice added together. 6, 7 or 8 wakes the leviathans and each one moves; any other total is calm.'},
+ {id:'move',t:'How leviathans move',x:'Each leviathan rolls its own die and follows the arrow with that number on its tile. On a 6 it stays and a new one rises. Tap a leviathan to read its arrows.'},
+ {id:'sunk',t:'A junk goes down',x:'A sunk captain is out of the game. The card says exactly why it sank. Fewer rivals means fewer wakes to dodge.'},
+ {id:'min3',t:'Leviathans refill',x:'There are always at least three leviathans. When fewer are left, the next captain skips the roll and new ones rise.'},
+ {id:'end',t:'Nicely sailed',x:'That is the whole game: lay a tile, sail its line, dodge the edge, other junks and leviathans. Start a bigger game from the Menu.'}];
 const GLOSS_HTML='';
 function dirName(a){return ['north','east','south','west'][a]}
 const ARR_TXT={N:'north',E:'east',S:'south',W:'west'};

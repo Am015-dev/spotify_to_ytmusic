@@ -18,7 +18,7 @@ KIT_PATCHES=[
  # 6. FRAMING: the whole board (frame, edge numbers, ships on the start marks and the raised creatures) must fit; the default region cropped the sides and the top row
  ("var x0 = -HALF - .12, x1 = HALF + .12, z0 = -HALF - .08, z1 = HALF + .1;","var x0 = -HALF - (global.TW_PADX || .55), x1 = HALF + (global.TW_PADX || .55), z0 = -HALF - (global.TW_PADT || 1.0), z1 = HALF + (global.TW_PADB || .5);"),
 ]
-kit=rd(os.path.join(SP,'tots','kit','kit.js'))
+kit=rd(os.path.join(SP,'tidewake','kit','kit.js'))
 miss=[a for a,_ in KIT_PATCHES if a not in kit]
 if miss:print('WARNING kit patch anchors not found:',miss,file=sys.stderr)
 for a,z in KIT_PATCHES:kit=kit.replace(a,z)
@@ -26,12 +26,12 @@ for a,z in KIT_PATCHES:kit=kit.replace(a,z)
 open(os.path.join(D,'ui.js'),'w',encoding='utf-8').write(''.join(rd(os.path.join(D,'ui%d.js'%i)) for i in range(1,8)))
 T=os.path.join(SP,'node_modules','three','build','three.min.js')
 SRC={'shell.js':os.path.join(SP,'shell','shell.js'),'perfhud.js':os.path.join(SP,'perf','perfhud.js'),
-     'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(SP,'audio','tidewake','audio-data.js'),
+     'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(SP,'tidewake','audio','audio-data.js'),
      'data.js':os.path.join(D,'src','data.js'),'engine.js':os.path.join(D,'src','engine.js'),'ai.js':os.path.join(D,'src','ai.js'),'netstrip.js':os.path.join(D,'src','netstrip.js'),
      'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js')}
 ORDER=['shell.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','kit.js','data.js','engine.js','ai.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js']
 h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css')))
-body=rd(os.path.join(D,'body.html')).replace('<!--CREDITS-->',rd(os.path.join(SP,'audio','tidewake','credits.html')))
+body=rd(os.path.join(D,'body.html')).replace('<!--CREDITS-->',rd(os.path.join(SP,'tidewake','audio','credits.html')))
 for f in ORDER:
     tag=f'<script src="{f}"></script>';assert tag in body,f
     if f=='three.min.js':

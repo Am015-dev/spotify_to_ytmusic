@@ -80,18 +80,18 @@ function say(text,cls,sub){UI.res={text,cls:cls||'',sub:sub||''};renderRes();con
 async function kitWait(p,max){if(!p||!p.then)return;await Promise.race([p,sleep(max||2500)])}
 function stepsLen(steps){return steps.length}
 async function playEvents(evs,gen){
-  UI.skip=false;UI.mphLive=true;
+  UI.skip=!!UI.skipAll;UI.mphLive=true;
   for(const e of evs){if(UI.skip||UI.gen!==gen||!UI.started)break;if(e.t!=='arrive')UI.arrow=null;try{await playEv(e,gen)}catch(x){console.error(x)}ovUpdate()}
   UI.mphLive=false;UI.hiMon=null;UI.arrow=null;
   if(UI.gen===gen){UI.res=null}
 }
 async function playEv(e,gen){
   switch(e.t){
-  case 'log':{if(e.skip)break;if(/^Turn \d+/.test(e.text)){say(e.text,'');await sleep(260)}else{say(e.text,e.c==='bad'?'bad':e.c==='big'?'big':'');await sleep(e.c==='bad'?950:720)}break}
-  case 'turn':{UI.curTurn=e.seat;renderRoad();break}
-  case 'dice':{if(!UI.mph||UI.mph.d!==e.d&&(UI.mph.d[0]!==e.d[0]||UI.mph.d[1]!==e.d[1]))UI.mph={d:e.d.slice(),total:e.d[0]+e.d[1],wake:e.d[0]+e.d[1]>=6&&e.d[0]+e.d[1]<=8,lines:[],seat:e.seat,shown:0};
-    UI.mph.roll=true;UI.mph.shown=0;UI.trig.roll=1;sfx('dice_roll');renderRes();await sleep(750);UI.mph.roll=false;renderRes();sfx(UI.mph.wake?'leviathan_roar':'click');await sleep(UI.mph.wake?1100:800);break}
-  case 'monact':{if(UI.mph&&e.ln!=null){UI.mph.shown=e.ln+1;UI.hiMon=e.id;const m0=monById(e.id);renderRes();ovUpdate();await sleep(1000)}if(e.turned){const m=monById(e.id);if(m&&KS.mons[m.x+','+m.y]){TWKit.placeLeviathan(m.x,m.y,{arrows:levArrows(m.id),rot:m.r,animate:false});KS.mons[m.x+','+m.y]=m.id+':'+m.r;sfx('splash');await sleep(350)}}UI.trig.move=1;break}
+  case 'log':{if(e.skip)break;if(/^Turn \d+/.test(e.text)){say(e.text,'');await sleep(260)}else{say(e.text,e.c==='bad'?'bad':e.c==='big'?'big':'');await sleep(e.c==='bad'?950:560)}break}
+  case 'turn':{UI.curTurn=e.seat;UI.curTurnN=e.n;renderRoad();renderBar();break}
+  case 'dice':{const nx=UI.mphNext;if(nx&&nx.d[0]===e.d[0]&&nx.d[1]===e.d[1]){UI.mph=nx;UI.mphNext=null}if(!UI.mph||UI.mph.d!==e.d&&(UI.mph.d[0]!==e.d[0]||UI.mph.d[1]!==e.d[1]))UI.mph={d:e.d.slice(),total:e.d[0]+e.d[1],wake:e.d[0]+e.d[1]>=6&&e.d[0]+e.d[1]<=8,lines:[],seat:e.seat,shown:0};
+    UI.mph.roll=true;UI.mph.shown=0;UI.trig.roll=1;sfx('dice_roll');renderRes();await sleep(600);UI.mph.roll=false;renderRes();sfx(UI.mph.wake?'leviathan_roar':'click');await sleep(UI.mph.wake?900:450);break}
+  case 'monact':{if(UI.mph&&e.ln!=null){UI.mph.shown=e.ln+1;UI.hiMon=e.id;const m0=monById(e.id);renderRes();ovUpdate();await sleep(700)}if(e.turned){const m=monById(e.id);if(m&&KS.mons[m.x+','+m.y]){TWKit.placeLeviathan(m.x,m.y,{arrows:levArrows(m.id),rot:m.r,animate:false});KS.mons[m.x+','+m.y]=m.id+':'+m.r;sfx('splash');await sleep(350)}}UI.trig.move=1;break}
   case 'place':{const k=e.x+','+e.y;sfx('tile_place');KS.tiles[k]=e.card[0]+':'+e.card[1];TWKit.ghost(null);await kitWait(TWKit.placeTile(e.x,e.y,{paths:pathsOf(e.card[0],e.card[1])}),1800);await sleep(120);break}
   case 'sail':{const id=sid(e.seat),k=KS.ships[id];if(!k||!e.steps.length)break;
     sfx('ship_creak');sfx('ship_glide',{at:.1});if(e.steps.length>2)sfx('wake_swish',{at:.2});
@@ -100,7 +100,7 @@ async function playEv(e,gen){
   case 'warp':{const id=sid(e.seat);if(!KS.ships[id])break;const a=e.from||[e.to[0],e.to[1]];sfx('rift_gate');await kitWait(TWKit.riftWarp(id,{c:a[0],r:a[1]},{c:e.to[0],r:e.to[1]},{port:0}),3000);KS.ships[id]={c:e.to[0],r:e.to[1],port:0};say(`${nm(e.seat)} is carried through the Rift Gate!`,'big');await sleep(500);break}
   case 'gate':{say(`A Rift Gate opens at column ${e.x+1}, row ${e.y+1}. Junks and leviathans that touch it are thrown to a rolled square.`,'big');sfx('rift_gate');KS.gates[e.x+','+e.y]=1;await kitWait(TWKit.riftGate(e.x,e.y,true,{color:'violet'}),1500);break}
   case 'arrive':{const key=e.x+','+e.y;if(UI.mph&&e.ln!=null){UI.mph.shown=e.ln+1;renderRes()}
-    if(e.from){UI.arrow={a:sqW(e.from[0],e.from[1]),b:sqW(e.x,e.y)};UI.hiMon=e.id;ovUpdate();await sleep(520)}else if(e.spawn){UI.hiMon=e.id}
+    if(e.from){UI.arrow={a:sqW(e.from[0],e.from[1]),b:sqW(e.x,e.y)};UI.hiMon=e.id;ovUpdate();await sleep(400)}else if(e.spawn){UI.hiMon=e.id}
     if(e.k==='M'){if(!e.from)say(`The Maelstrom rises at column ${e.x+1}, row ${e.y+1}. It moves on calm rolls and destroys what it enters.`,'big');if(e.from){TWKit.maelstrom(e.from[0],e.from[1],false);delete KS.mael[e.from[0]+','+e.from[1]]}sfx('maelstrom');if(KS.tiles[key]){TWKit.destroyTile(e.x,e.y);delete KS.tiles[key]}TWKit.maelstrom(e.x,e.y,true);KS.mael[key]=1;await sleep(900);break}
     if(e.from){TWKit.removeLeviathan(e.from[0],e.from[1],{silent:true});delete KS.mons[e.from[0]+','+e.from[1]]}
     if(KS.tiles[key]){sfx('tile_destroyed');TWKit.destroyTile(e.x,e.y);delete KS.tiles[key];await sleep(450)}
@@ -130,7 +130,7 @@ function traceSteps(B,x,y,e,over){const st=[];let cx=x,cy=y,ce=e,n=0;
 // what a placement does, straight from the engine's own path rules (simPlace / follow)
 function analyse(K,seat,m){const S=K.ships[m.s],tile=K.hands[seat][m.t];const sim=simPlace(K,S.x,S.y,tile,m.r);const mine=sim.res[m.s];
   const A={st:mine.st,coll:sim.coll.includes(m.s),mons:[],steps:traceSteps(K,S.x,S.y,S.e,[tile,m.r]),others:[]};
-  if(mine.st==='ok'){A.end=[mine.x,mine.y];A.n=mine.path.length;for(const mo of K.mons){if(mo.k!=='L')continue;const near=[[mine.x,mine.y]];if(mine.on)near.push(mine.on);if(near.some(q=>Math.abs(q[0]-mo.x)+Math.abs(q[1]-mo.y)===1))A.mons.push(mo.id)}}
+  if(mine.st==='ok'){A.end=[mine.x,mine.y];A.on=mine.on||null;A.n=mine.path.length;for(const mo of K.mons){if(mo.k!=='L')continue;const near=[[mine.x,mine.y]];if(mine.on)near.push(mine.on);if(near.some(q=>Math.abs(q[0]-mo.x)+Math.abs(q[1]-mo.y)===1))A.mons.push(mo.id)}}
   else if(mine.st==='mon')A.mon=mine.id;
   A.others=sim.movers.filter(i=>i!==m.s).map(i=>({i,st:sim.res[i].st,coll:sim.coll.includes(i)}));
   A.bad=A.st==='edge'||A.st==='mon'||A.coll;return A}
@@ -172,7 +172,10 @@ function questionHTML(d,K){const q=G.q;let extra='';const you=d===viewSeat()||hu
   return `<div class="prompt ${q.kind==='doom'?'alert':'ask'}" data-qkind="${q.kind}"><h4>${q.kind==='doom'?'Quick: '+(you?'your':esc(nm(d))+"'s")+' junk is in danger!':q.kind==='cannonDraw'?(you?'You':esc(nm(d)))+' drew a Deck Cannon':'Choose'}</h4><p>${esc(title)}</p>${extra}<div class="opts">${q.opts.map((o,i)=>`<button class="btn${/Accept/.test(o.l)?' warn':''}" data-a="q" data-i="${i}">${esc(o.l)}</button>`).join('')}</div>${timed?`<div class="qtimer" title="Time left"><i id="qbar"></i></div><p class="cd" id="qtxt">${UI.qTime>0?UI.qTime:25} s to decide, then the computer's best advice is used.</p>`:''}</div>`}
 function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='place'),gts=mv.filter(m=>m.a==='gate'),cns=mv.filter(m=>m.a==='cannon'),pas=mv.find(m=>m.a==='pass');
   const hand=K.hands[d];let sel=UI.sel;const fronts=[...new Set(pl.map(m=>m.s))];
-  if(pl.length){if(!sel||!pl.some(m=>m.t===sel.t)||!fronts.includes(sel.s)){const f=pl.find(m=>m.s===d)||pl[0];sel=UI.sel={t:f.t,r:(sel&&sel.r)||0,s:f.s}}}
+  if(pl.length){if(!sel||!pl.some(m=>m.t===sel.t)||!fronts.includes(sel.s)){const own=pl.filter(m=>m.s===d);let f=own[0]||pl[0];
+    // start on a tile that is safe (and not in a leviathan's reach) rather than tile 1 unturned, which could be a red cross with Place greyed out
+    try{let best=-1;for(const m of own){const A=analyse(K,d,m);const v=A.bad?0:(typeof phRisk==='function'&&phRisk(K,A))?1:2;if(v>best){best=v;f=m}if(v===2)break}}catch(e){}
+    sel=UI.sel={t:f.t,r:f.r!=null?f.r:0,s:f.s};UI.rots=[]}}
   UI.canPlace=pl.length>0;UI.moves=mv;
   const full=UI.guide==='full',multi=hotSeat()||humans().length>1;
   let outcome='',m=null,A=null,btn='',err='';
@@ -218,9 +221,9 @@ function oppHTML(d){const now=UI.busy&&UI.curTurn!=null&&G.seats[UI.curTurn]?UI.
 function goalHTML(){if(!G)return '';const L=G.mons.filter(m=>m.k==='L').length,toRise=G.mdeck.filter(x=>x<10).length;
   if(G.variant==='solo')return `<div class="goal"><b>Goal:</b> outlast every leviathan. ${toRise} still to rise, ${L} on the board; you win when none are left.</div>`;
   if(G.variant==='easysolo')return `<div class="goal"><b>Goal:</b> stay afloat for ${G.opts.goal} turns (turn ${G.turn} now), or play out the whole tile pile.</div>`;return ''}
-function mainHTML(){const gh=goalHTML();const h=mainHTML0();return G.over||!h?h:gh+h}
+function mainHTML(){const gh=goalHTML();const h=mainHTML0();return G.over&&!UI.busy||!h?h:gh+h}
 function mainHTML0(){
-  if(G.over)return overHTML();const d=sideToAct(),vs=viewSeat();
+  if(G.over&&!UI.busy)return overHTML();const d=sideToAct(),vs=viewSeat();
   if(UI.busy)return oppHTML(d)+handStrip(vs,false);
   if(d<0)return '';const dh=G.seats[d].human;
   if(NET.on&&dh&&d!==NET.mySeat)return netWaitHTML(d,vs);
@@ -244,7 +247,7 @@ function renderRes(){const el=$('#res');if(!el)return;let h='';
   if(UI.mph)h+=mphHTML();
   if(UI.res)h+=`<div class="res ${UI.res.cls}">${esc(UI.res.text)}</div>`;el.innerHTML=h;el.hidden=!h}
 function lessonHTML(c){const g=UI.guide==='full';return `<div class="coach"><h4>${esc(c.t)}<button class="gsw full" data-a="guidetoggle" title="Turn the guide down" aria-label="Guide is Full: tap to turn it down">Guide: Full &#9662; tap to turn down</button></h4><p>${esc(c.x)}</p><button class="btn small" data-a="coachok">Got it</button></div>`}
-function nextLesson(){for(const c of COACH){if(c.id==='start'&&G&&G.phase!=='setup')UI.seen.start=1;if(UI.trig[c.id]&&!UI.seen[c.id])return c}return null}
+function nextLesson(){for(const c of COACH){if(c.id==='start'&&G&&G.phase!=='setup')UI.seen.start=1;if(UI.trig[c.id]&&!UI.seen[c.id]){if(G&&G.phase==='play'&&UI.lessonT===G.turn&&c.id!=='end')return null;return c}}return null}
 function coachTriggers(){if(!G||G.over&&false)return;const d=sideToAct();const mine=d>=0&&G.seats[d].human&&!UI.busy&&!mustPass(d);
   if(mine&&G.phase==='setup')UI.trig.start=1;
   if(mine&&G.phase==='play'&&G.step==='act'&&!G.q){UI.trig.cur=1;if(UI.seen.cur){if(UI.A&&UI.A.st==='edge'||G.turn>=3)UI.trig.edge=1;if(UI.seen.edge&&(G.turn>=4||(UI.A&&UI.A.coll)))UI.trig.coll=1}
@@ -268,6 +271,7 @@ function render(){if(!G||!UI.started)return;try{if(window.PerfHUD)PerfHUD.wake()
   if(!UI.busy&&UI.canPlace&&UI.sel){const pl=UI.moves.filter(m=>m.a==='place');UI.fronts=[...new Set(pl.map(m=>m.s))];const c=G.hands[d][UI.sel.t];if(c!=null&&isCur(c)&&UI.A){const S=G.ships[UI.sel.s];UI.gh={x:S.x,y:S.y,card:c,rot:UI.sel.r,valid:!UI.A.bad,trace:UI.A.steps};try{UI.route=routeDesc(UI.A,S)}catch(e){console.error(e)}}}
   if(key!==UI.lastKey){UI.lastKey=key;if(!UI.busy&&d>=0&&G.seats[d].human&&!mustPass(d)&&!G.over)sfx('turn')}
   if(!UI.busy&&d>=0&&G.seats[d].human&&!G.over&&!mustPass(d))GX.showDock();
+  if(!UI.busy&&(G.over||d>=0&&G.seats[d].human))UI.skipAll=false;
   coachTriggers();renderBar();renderRoad();renderSteps();renderRes();renderCards();renderCoach();kitOverlay();musicEval();ovUpdate();
   const t=$('#chip');if(t)t.textContent=!UI.busy&&G.phase==='setup'&&d>=0&&G.seats[d].human&&!mustPass(d)?'Tap a gold mark on the edge':'';
   if(GX.open)renderOpenDrawer();qTimerSync();netAfter()}
@@ -287,9 +291,9 @@ function act(m,seat){if(NET.on){const nr=netAct(m,seat);if(nr!==undefined)return
   for(const e of evs){if(e.t==='dice')UI.lastRoll=e.d}
   afterMove(evs);return true}
 function afterMove(evs){saveAll();UI.stepNow=0;
-  const mp=mphBuild(evs);if(mp)UI.mph=mp;
+  const mp=mphBuild(evs);const anim=ANIM&&evs.some(e=>e.t!=='log')&&UI.started;UI.mphNext=null;if(mp){if(anim){UI.mphNext=mp;UI.mph=null}else UI.mph=mp}
   if(NET.on&&isHost())netEvents(evs);
-  const finish=()=>{UI.busy=false;UI.dice=null;UI.res=null;if(UI.mph){UI.mph.roll=false;UI.mph.shown=UI.mph.lines.length}if(!G.q)KS.hold={};for(const e of evs)if(e.t==='sink')sunkAdd(e);kitSync();render();overCheck();schedule();if(NET.on)netDrain()};
+  const finish=()=>{if(UI.mphNext){UI.mph=UI.mphNext;UI.mphNext=null}UI.busy=false;UI.dice=null;UI.res=null;if(UI.mph){UI.mph.roll=false;UI.mph.shown=UI.mph.lines.length}if(!G.q)KS.hold={};for(const e of evs)if(e.t==='sink')sunkAdd(e);kitSync();render();overCheck();schedule();if(NET.on)netDrain()};
   if(ANIM&&evs.some(e=>e.t!=='log')&&UI.started){const gen=UI.gen;UI.busy=true;render();playEvents(evs,gen).then(()=>{if(UI.gen!==gen)return;finish()})}
   else finish()}
 function overCheck(){if(G&&G.over&&!UI.overSeen){UI.overSeen=1;const w=G.over.win||[];musicStop(.4);sndLoop('sea_loop',false);const mine=w.some(i=>G.seats[i].human)||!humans().length&&w.length;sfx(mine?'win':'lose');UI.trig.end=1;clearSave()}}
@@ -307,7 +311,7 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   if(netClick(a,t))return;
   if(['card','rot','sugg','place','startmark'].indexOf(a)<0)sfx('click');
   switch(a){
-  case 'card':{if(!UI.sel||UI.busy)break;const ti=+D.t;if(UI.sel.t===ti&&isCur(G.hands[d][ti]))UI.sel.r=(UI.sel.r+1)%4;else{UI.sel.t=ti}sfx('tile_rotate');render();break}
+  case 'card':{if(!UI.sel||UI.busy)break;const ti=+D.t;if(UI.sel.t===ti&&isCur(G.hands[d][ti]))UI.sel.r=(UI.sel.r+1)%4;else if(typeof phSelTile==='function')phSelTile(ti);else{UI.sel.t=ti}sfx('tile_rotate');render();break}
   case 'rot':{if(!UI.sel)break;UI.sel.r=(UI.sel.r+(+D.d)+4)%4;sfx('tile_rotate');render();break}
   case 'place':doPlace();break;
   case 'target':if(UI.sel){UI.sel.s=+D.s;render()}break;
@@ -317,13 +321,13 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   case 'cannon':act({a:'cannon',t:+D.t,m:+D.m,s:+D.s},d);break;
   case 'pass':act({a:'pass'},d);break;
   case 'take':sfx('confirm');UI.holder=+D.seat;render();break;
-  case 'skip':UI.skip=true;break;
+  case 'skip':UI.skip=true;if(humans().length===1&&!NET.on)UI.skipAll=true;break;
   case 'pause':UI.pause=!UI.pause;if(!UI.pause)schedule();render();break;
   case 'hint':UI.hint=true;{const m=recMove(d);if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s}}}render();break;
   case 'sugg':{const m=UI.recM||recMove(d);UI.hint=true;if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s};sfx('tile_rotate')}render();break}
   case 'sunkok':{const id=D.id;UI.sunk=(UI.sunk||[]).filter(c=>c.id!==id);UI.marks=(UI.marks||[]).filter(c=>c.id!==id);renderCards();ovUpdate();break}
   case 'rewind':rewindLast();break;
-  case 'coachok':{const c=nextLesson();if(c){UI.seen[c.id]=1;saveAll();render()}break}
+  case 'coachok':{const c=nextLesson();if(c){UI.seen[c.id]=1;if(G&&G.phase==='play')UI.lessonT=G.turn;saveAll();render()}break}
   case 'guidetoggle':UI.confirm=UI.guide==='full'?'light':'full';renderCoach();break;
   case 'guideyes':UI.guide=UI.confirm;UI.confirm=null;saveAll();render();break;
   case 'guideno':UI.confirm=null;render();break;
@@ -345,7 +349,7 @@ document.addEventListener('keydown',e=>{if(!G||!UI.started||GX.open||!$('#start'
 // ---------- popups ----------
 function renderOpenDrawer(){const id=GX.open;if(id==='crewd')renderCrew();else if(id==='logd')renderLog();else if(id==='setd')renderSettings();else if(id==='piecesd')renderPiecesNow()}
 function renderPiecesNow(){const e=$('#piecesnow');if(e)e.innerHTML=piecesNowHTML()}
-function rewindLast(){if(!UI.snap||NET.on)return;let g;try{g=JSON.parse(UI.snap.json)}catch(e){return}UI.gen++;clearTimeout(UI.tm);kitReset();G=g;UI.sel=null;UI.hint=false;UI.busy=false;UI.pause=false;UI.overSeen=0;UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;UI.lastKey='';UI.qKey=null;UI.curTurn=null;UI.res=null;UI.holder=humans().length===1?humans()[0]:-1;UI.snap=null;
+function rewindLast(){if(!UI.snap||NET.on)return;let g;try{g=JSON.parse(UI.snap.json)}catch(e){return}UI.gen++;clearTimeout(UI.tm);kitReset();G=g;UI.sel=null;UI.hint=false;UI.busy=false;UI.pause=false;UI.overSeen=0;UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;UI.lastKey='';UI.qKey=null;UI.curTurn=null;UI.res=null;UI.myLogI=null;UI.mphNext=null;UI.holder=humans().length===1?humans()[0]:-1;UI.snap=null;
   kitSync();SND.mood='calm';try{sndLoop('sea_loop',true);if(SND.gesture)musicStart()}catch(e){}saveAll();render();schedule()}
 function renderLog(){const b=$('#logbody');if(!G){b.innerHTML='<p>Start a game first.</p>';return}b.innerHTML=G.log.slice(0,200).map(l=>`<div class="logl ${l.c}">${esc(l.t)}</div>`).join('')}
 function crewCards(h,own){return h.map(c=>isCur(c)?`<img alt="" width="54" height="54" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[c]],{uid:'x'+Math.random().toString(36).slice(2,6),size:54})}">`:`<b>${isGate(c)?'Rift Gate':'Cannon'}</b> `).join('')}
@@ -386,7 +390,7 @@ function renderStart(){const el=$('#start');const s=UI.setup=UI.setup||defaultSe
   const ex=[['rift','Rift Gate','A portal tile that rescues a junk or flings pieces across the sea.'],['wave','Rogue Wave','A wave that sweeps a row or column and can capsize junks.'],['maelstrom','Maelstrom','A whirlpool that moves on calm turns and destroys what it enters.'],['cannon','Deck Cannon','Five cannons in the tile pile: shoot a leviathan about to sink you.']];
   const cont=savedGame();
   el.innerHTML=`<div class="stin"><h1><svg class="ico" viewBox="0 0 24 24" style="width:44px;height:44px;stroke:#e3b24b"><path d="M3 17c3 2 6 2 9 0s6-2 9 0M12 3v11M12 4l6 7h-6M12 6l-5 6h5"/></svg>Tidewake</h1><p class="tag">Lay currents, steer your junk, outlast the leviathans. 1 to 8 captains, computers and hot-seat.</p>
-  <div class="stcard"><h2>Quick start</h2><div class="row">${NET.on?'':'<button class="btn pri" data-a="guided">Guided first game (you vs an easy computer)</button>'}${cont&&!NET.on?`<button class="btn" data-a="cont">Continue saved game</button>`:''}<button class="btn" data-a="start" id="quickgo">Start with these settings</button></div><p class="tiny">${NET.on?'':'New here? The guided game explains currents, edges, collisions and leviathans one step at a time.'}</p></div>
+  <div class="stcard"><h2>Quick start</h2><div class="row">${NET.on?'':'<button class="btn pri" data-a="guided">Guided first game (you vs an easy computer)</button>'}${cont&&!NET.on?`<button class="btn" data-a="cont">Continue saved game</button>`:''}<button class="btn" data-a="start" id="quickgo">${(()=>{const n=s.variant==='solo'||s.variant==='easysolo'?1:teamN(s);const c=s.seats.slice(0,n).filter(x=>!x.h).length;return n===1?'Play now (solo)':c===n-1?`Play now: you vs ${c} computer${c>1?'s':''}`:'Play now (settings below)'})()}</button></div><p class="tiny">${NET.on?'':'New here? The guided game explains currents, edges, collisions and leviathans one step at a time.'}</p></div>
   <div class="stcard"><h2>Play with friends</h2>${onlineBlock()}</div>
   <div class="stcols"><div class="stcard"><h2>How to play</h2><div class="row">${onl?'<span class="tiny">Online game: captains take seats in join order.</span>':seg('mode',mode,[['me','Me vs computers'],['hot','Hot-seat'],['watch','Watch']])}</div><p class="tiny">${onl?'Seats without an online captain are computers.':mode==='me'?'You are the first captain; the others are computers.':mode==='hot'?'Everyone shares this screen. Hands are hidden between players behind a pass screen.':'The computers play each other. Sit back.'}</p>
    <h2 style="margin-top:8px">Variant</h2><div class="row">${seg('var',s.variant||'std',[['std','Standard'],['solo','Solo'],['easysolo','Easy solo'],['teams','Teams']])}</div><p class="tiny">${s.variant==='solo'?'One junk, six leviathans. Goal: survive until all ten leviathans have risen and are gone. The top bar counts how many are still to rise.':s.variant==='easysolo'?'Easy solo (our variant): one junk, 4 leviathans to start, 24 turns. Survive 24 turns or play out the whole pile. Destroyed tiles are discarded.':s.variant==='teams'?'Two equal teams (every other seat); you may lay a tile for a teammate. 4, 6 or 8 captains.':'Last junk afloat wins.'}</p>
@@ -419,7 +423,7 @@ function startGame(s,o){o=o||{};if(isClient())return;let plan=null;if(isHost()){
   seats.forEach((x,i)=>{SHIP_NAMES[i]=COL[x.col].name});UI.cols=seats.map(x=>x.col);
   newGame({players:np,seats:seats.map(x=>x.h?'human':'ai'),lv:seats.map(x=>x.lv),exp:Object.assign({},s.exp),variant:s.variant||null,noMon:!!s.noMon});if(plan)netBound(plan);
   UI.lastSetup=s;UI.guided=!!o.guided;UI.guide=o.guided?'full':(lsGet('tw_set',{}).guide||'light');UI.seen=o.guided?{}:UI.seen;if(o.guided)UI.trig={};else UI.trig={};
-  UI.sel=null;UI.hint=false;UI.busy=false;UI.pause=false;UI.dice=null;UI.res=null;UI.lastRoll=null;UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;UI.snap=null;UI.hiMon=null;UI.arrow=null;UI.overSeen=0;UI.confirm=null;UI.lastKey='';UI.qKey=null;UI.curTurn=null;
+  UI.sel=null;UI.hint=false;UI.busy=false;UI.pause=false;UI.dice=null;UI.res=null;UI.lastRoll=null;UI.myLogI=null;UI.curTurnN=null;UI.mphNext=null;UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;UI.snap=null;UI.hiMon=null;UI.arrow=null;UI.overSeen=0;UI.confirm=null;UI.lastKey='';UI.qKey=null;UI.curTurn=null;
   const h=humans();UI.holder=h.length===1?h[0]:-1;UI.started=true;hideStart();GX.close();
   try{if(window.PerfHUD)PerfHUD.hitch()}catch(e){}
   kitSync();SND.mood='calm';sndLoop('sea_loop',true);if(SND.gesture)musicStart();else SND.wantMusic=1;
@@ -555,7 +559,7 @@ function sunkNames(seats){const me=youSeat();const l=seats.map(i=>i===me?'Your j
 function renderCards(){const el=$('#cards');if(!el)return;if(!G||!UI.sunk||!UI.sunk.length){el.innerHTML='';el.hidden=true;return}el.hidden=false;
   const me=youSeat();
   el.innerHTML=UI.sunk.map(c=>{const mine=c.seats.includes(me);const who=sunkNames(c.seats);const dots=c.seats.map(dot).join('');
-    return `<div class="prompt sunk${mine?' mine':''}" data-sunk="${c.seats.join(',')}"><h4><span class="x">&#10006;</span> Sunk! ${dots} ${esc(who)}</h4><p><b>Because</b> ${esc(c.t)}</p><p class="tiny">${c.k==='collision'?'Both junks are out.':''} It happened during ${esc(nm(c.cur))}'s turn${c.actor!=null&&c.actor!==c.cur?` (${esc(nm(c.actor))} answered)`:''}. The red mark on the board shows where.${mine?' You are out, but you can watch the rest of the game.':''}</p><button class="btn small" data-a="sunkok" data-id="${c.id}">Got it</button></div>`}).join('')}
+    return `<div class="prompt sunk${mine?' mine':''}" data-sunk="${c.seats.join(',')}"><h4><span class="x">&#10006;</span> Sunk! ${dots} ${esc(who)}</h4><p><b>Because</b> ${esc(c.t)}</p><p class="tiny">${c.k==='collision'?'Both junks are out.':''} It happened on ${c.cur===youSeat()&&!hotSeat()?'your':esc(nm(c.cur))+"'s"} turn. The red mark on the board shows where.${mine?' You are out, but you can watch the rest of the game.':''}</p><button class="btn small" data-a="sunkok" data-id="${c.id}">Got it</button></div>`}).join('')}
 function sunkClear(){UI.sunk=[];UI.marks=[];UI.sunkSeen={};renderCards()}
 // ---------- the monster-phase card ----------
 // builds the card's lines from the recorded events: roll, then one line per leviathan move / rise / swim-off, in the order they happen
@@ -567,16 +571,18 @@ function mphBuild(evs){let mp=null;
       e.ln=mp.lines.length;mp.lines.push({id:e.id,txt:`rolled ${e.die}: ${txt}`,nm:nmx})}
     else if(mp&&e.t==='arrive'&&(e.spawn||e.k==='M')){const pr=evs[i-1];const txt=pr&&pr.t==='log'?pr.text:(e.k==='M'?'The Maelstrom moves':levName(e.id)+' rises');if(pr&&pr.t==='log')pr.skip=true;
       e.ln=mp.lines.length;mp.lines.push({id:e.id,txt:txt.replace(/\.$/,''),nm:'',plain:1,maelstrom:e.k==='M'})}
+    else if(mp&&mp.lines.length&&e.t==='destroy'){const l=mp.lines[mp.lines.length-1];if(!/smashes/.test(l.txt))l.txt+=` and smashes the tile at column ${e.x+1}, row ${e.y+1}`}
+    else if(mp&&mp.lines.length&&e.t==='sink'){const l=mp.lines[mp.lines.length-1];l.txt+=`: ${e.seat===youSeat()&&!hotSeat()?'your':nm(e.seat)+"'s"} junk sinks!`;l.bad=1}
     else if(mp&&e.t==='log'&&/^The Maelstrom (churns|drains)/.test(e.text)){e.skip=true;mp.lines.push({id:-1,txt:e.text.replace(/\.$/,''),nm:'',plain:1});e.ln=mp.lines.length-1}}
   return mp}
 function mphHTML(){const mp=UI.mph;if(!mp||G&&G.over&&!UI.busy)return '';
   const sc=[];for(let n=2;n<=12;n++)sc.push(`<span class="${n>=6&&n<=8?'w':''}${!mp.roll&&n===mp.total?' cur':''}">${n}</span>`);
   const verdict=mp.roll?'Rolling...':mp.wake?'6, 7 or 8: the leviathans stir!':'Not 6, 7 or 8: calm, nothing moves.';
   const shown=mp.lines.slice(0,mp.shown);
-  return `<div class="mph ${mp.wake&&!mp.roll?'wake':''}"><div class="mh"><b>Monster wake roll</b> <span class="tiny">two dice added together${G&&G.seats[mp.seat]?' ('+esc(nm(mp.seat))+' rolled)':''}</span></div>
+  return `<div class="mph ${mp.wake&&!mp.roll?'wake':''}"><div class="mh"><b>${G&&G.seats[mp.seat]?(mp.seat===youSeat()&&!hotSeat()?'Your':esc(nm(mp.seat))+"'s")+' roll':'The roll'}</b> <span class="tiny">two dice added: 6, 7 or 8 wakes the leviathans</span></div>
   <div class="dice"><span class="die g${mp.roll?' roll':''}">${mp.roll?'?':mp.d[0]}</span><span class="die b${mp.roll?' roll':''}">${mp.roll?'?':mp.d[1]}</span><span class="tot">${mp.roll?'':'= '+mp.total}</span><span class="verdict">${verdict}</span></div>
   <div class="scale" aria-label="Leviathans wake on a total of 6, 7 or 8">${sc.join('')}</div>
-  ${shown.length?`<ol class="mlines">${shown.map((l,i)=>`<li class="${i===shown.length-1&&UI.mphLive?'now':''}">${l.plain?'':`<b data-mon="${l.id}">${esc(l.nm)}</b> `}${esc(l.txt)}</li>`).join('')}</ol>`:''}</div>`}
+  ${shown.length?`<ol class="mlines">${shown.map((l,i)=>`<li class="${i===shown.length-1&&UI.mphLive?'now':''}${l.bad?' bad':''}">${l.plain?'':`<b data-mon="${l.id}">${esc(l.nm)}</b> `}${esc(l.txt)}</li>`).join('')}</ol>`:''}</div>`}
 // ---------- the overlay descriptors ----------
 function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];const busy=UI.busy;const me=youSeat();const d=sideToAct();const myTurn=!busy&&!G.over&&d>=0&&G.seats[d].human&&!mustPass(d);
   const near=new Set();let dq=null;if(G.q&&G.q.kind==='doom'&&G.q.ctx&&G.q.ctx.cause&&G.q.ctx.cause.id!=null&&G.q.who===me)dq=G.q.ctx.cause.id;if(myTurn&&G.phase==='play'){const S=G.ships[d];if(S&&S.x!=null)for(const id of adjMons(G,S))near.add(id)}
@@ -675,33 +681,60 @@ function phZoomBtn(){const c3=$('#c3');if(!c3||c3.hidden)return '';return `<butt
 function phHint(){if(UI.res&&UI.res.text)return esc(UI.res.text);return ''}
 // ---------- the control strip ----------
 function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoomBtn();
-  if(G.over)return `<div class="ps-main"><div class="ps-msg"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
-  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' <b>'+esc(nm(now))+'</b> is playing':'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">Skip</button>${zb}</div></div><div class="ps-hint">${phHint()}</div>`}
+  if(G.over&&!UI.busy)return `<div class="ps-main"><div class="ps-msg"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
+  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div><div class="ps-hint">${phHint()}</div>`}
   if(d<0)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const dh=G.seats[d].human;
   if(NET.on&&dh&&d!==NET.mySeat)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>${esc(nm(d))}</b> is deciding...</div><div class="ps-ctl">${zb}</div></div>`;
   if(dh&&mustPass(d))return `<div class="ps-main"><div class="ps-msg">Pass the device to <b>${esc(nm(d))}</b></div><div class="ps-ctl">${zb}</div></div>`;
-  if(!dh)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>${esc(nm(d))}</b> is thinking...</div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-hint">${phHint()}</div>`;
+  if(!dh)return `<div class="ps-main"><div class="ps-msg">${dot(d)} ${phWhose(d)} <small>(computer)</small></div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-hint">${phHint()}</div>`;
   if(G.q)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>Decide</b> in the card</div><div class="ps-ctl">${zb}</div></div>`;
   if(G.phase==='setup'){let best='';try{const info=startInfo(d),adv=startAdvice(knowledge(d),d,info);if(adv)best=`<button class="pb pri" data-a="startmark" data-x="${adv.o.m.x}" data-y="${adv.o.m.y}" data-e="${adv.o.m.e}" title="${esc(adv.why)}">Best start</button>`}catch(e){}
-    return `<div class="ps-main"><div class="ps-msg"><b>Choose your start.</b> Tap an edge square, then a gold mark.</div><div class="ps-ctl">${best}${zb}</div></div>`}
+    return `<div class="ps-main"><div class="ps-msg">${hotSeat()?'<b>'+esc(nm(d))+',</b> choose':'You sail the '+dot(d)+' <b>'+esc(colOf(d).name||nm(d))+'</b> junk. <b>Choose</b>'} your start: tap <b>Best start</b>, or an edge square and then a gold mark.</div><div class="ps-ctl">${best}${zb}</div></div>`}
   const c=phPlaceCtx();if(!c)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';
   hand.forEach((card,t)=>{const on=can&&sel.t===t;
-    if(isCur(card)){const r=sel?sel.r:0;let bd='',lab='';if(can){const A=analyse(K,dd,{a:'place',t,r,s:sel.s});bd=`<i class="bd ${A.bad?'sink':'safe'}">${A.bad?'&#10007;':'&#10003;'}</i>`;lab=A.bad?', sinks':', safe'}
+    if(isCur(card)){const r=sel?(sel.t===t?sel.r:phRot(t)):0;let bd='',lab='';if(can){const A=analyse(K,dd,{a:'place',t,r,s:sel.s});const rk=!!phRisk(K,A);bd=`<i class="bd ${A.bad?'sink':rk?'risk':'safe'}">${A.bad?'&#10007;':rk?'!':'&#10003;'}</i>`;lab=A.bad?', sinks':rk?', safe now but a leviathan could swim onto your path next roll':', safe'}
       tiles+=`<button class="pt${on?' sel':''}" data-a="card" data-t="${t}" data-owner="${dd}" data-up="1" aria-label="Tile ${t+1}${lab}"><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[card]],{rot:r,size:80,uid:'s'+t})}">${bd}</button>`}
     else tiles+=`<button class="pt sp${on?' sel':''}" data-a="card" data-t="${t}" data-owner="${dd}" data-up="1" aria-label="${isGate(card)?'Rift Gate':'Deck Cannon'}">${isGate(card)?gateArt():cannonArt()}</button>`});
   let ctl='';if(can&&isCur(hand[sel.t])){const m={a:'place',t:sel.t,r:sel.r,s:sel.s},err=legal(m,dd);
-    ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}</button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}</button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
-  const hint=PH.pop==='tiles'?'':(can?`Tap the glowing square in front of ${hotSeat()||humans().length>1?esc(nm(dd))+"'s":'your'} ship to see your tiles.`:'Nothing can be laid: pick an option.');
+    ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}<span class="lbl">Turn</span></button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}<span class="lbl">Turn</span></button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
+  const hint=PH.pop==='tiles'?'':(can?phTileHint(K,dd,hand,sel):'Nothing can be laid: pick an option.');
   return `<div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-hint">${PH.toast?esc(PH.toast):hint}</div>`}
-function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML():'';if(h!==PH.strip){PH.strip=h;el.innerHTML=h}}
+function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+phFeed()):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){PH.strip=h;el.innerHTML=h}}
+// "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
+function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];let safe=1;for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length){out.push({id,f});safe*=1-f.length/6}}
+  if(!out.length)return null;out.pct=Math.round(16/36*(1-safe)*100);return out.pct>=14?out:null}
+// each tile keeps its own turn (Turn used to turn all three previews at once)
+function phRot(t){return (UI.rots&&UI.rots[t])||0}
+function phSelTile(t){if(!UI.sel)return;UI.rots=UI.rots||[];UI.rots[UI.sel.t]=UI.sel.r;UI.sel.t=t;UI.sel.r=phRot(t)}
+// whose turn it is, in plain words
+function phWhose(i){const me=youSeat();return i===me&&me>=0&&!hotSeat()?'<b>Your turn</b>'+(UI.busy?': the dice roll first':''):'<b>'+esc(nm(i))+"'s turn</b>"}
+// what to do with the tiles: pick, turn, place; and when every tile sinks this way round, say that turning can fix it
+function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const cs=hand[sel.t];if(isCur(cs))risk=phRisk(K,analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s}))}catch(e){}
+  if(risk){const r=risk[0];let calm=false;try{calm=hand.some((c,t)=>isCur(c)&&[0,1,2,3].some(rr=>{const A=analyse(K,d,{a:'place',t,r:rr,s:sel.s});return !A.bad&&!phRisk(K,A)}))}catch(e){}
+    return `<b>!</b> Safe now, but if the dice total 6, 7 or 8, <b>${esc(levName(r.id))}</b> swims onto your path on its roll of ${r.f.join(' or ')}${risk.length>1?' (and '+(risk.length-1)+' more)':''}: about a ${risk.pct}% chance before your next turn. ${calm?'Another tile or turn gives a &#10003;.':'No &#10003; this turn: every route is within a leviathan\'s reach.'}`}
+  try{hand.forEach((c,t)=>{if(!isCur(c))return;if(!analyse(K,d,{a:'place',t,r:sel.r,s:sel.s}).bad)safeNow++;else if([0,1,2,3].some(r=>!analyse(K,d,{a:'place',t,r,s:sel.s}).bad))safeTurn++})}catch(e){}
+  try{const A=analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s});const hit=(A.others||[]).filter(o=>o.coll||o.st==='edge'||o.st==='mon');if(!A.bad&&hit.length)return `<b>Good move:</b> this tile also carries ${hit.map(o=>esc(nm(o.i))).join(' and ')} along its line, and ${hit.length>1?'they sink':'it sinks'}!`}catch(e){}
+  if(safeNow)return 'Pick a tile, turn it if you like, then press Place. &#10003; safe &middot; <b>!</b> a leviathan could reach you next roll &middot; &#10007; sinks. The gold line is your route.';
+  if(safeTurn)return 'Every tile sinks you this way round. Press Turn to find a &#10003;.';
+  return 'Every tile sinks you: pick the one that does least harm.'}
+// the goal and the race, always on screen: who is still afloat
+function phGoal(){if(!G||!UI.started||UI.busy||G.phase==='setup'&&!G.turn)return '';const so=G.variant==='solo',es=G.variant==='easysolo';const me=youSeat();
+  if(so||es){const toRise=G.mdeck.filter(x=>x<10).length,L=G.mons.filter(m=>m.k==='L').length;return `<div class="ps-goal">${so?`Goal: outlast every leviathan &middot; ${toRise} still to rise, ${L} on the board`:`Goal: stay afloat until turn ${G.opts.goal} (now ${G.turn})`}</div>`}
+  const lab=i=>`<i style="background:${colOf(i).sail}"></i>${i===me&&me>=0&&!hotSeat()?'You':esc(nm(i))}`;const up=G.order.filter(i=>G.ships[i].alive),dn=G.order.filter(i=>!G.ships[i].alive);
+  return `<div class="ps-goal">Last junk afloat wins. <b>Afloat:</b>${up.map(lab).join('')}${dn.length?` &middot; <b>Sunk:</b><s>${dn.map(lab).join('')}</s>`:''}</div>`}
+// what happened since your last move, in order, so nothing changes off-screen (the replay can be skipped or missed)
+function phFeed(){if(!G||!UI.started||UI.busy||G.over||G.phase==='setup'||UI.myLogI==null)return '';
+  const L=G.log.filter(l=>l.i>UI.myLogI&&!/^Turn \d+/.test(l.t)&&!/ draws? /.test(l.t)).reverse();if(!L.length)return '';
+  const keep=L.slice(-6),more=L.length-keep.length;const me=youSeat(),mn=me>=0&&!hotSeat()?nm(me):null;const you=t=>mn?esc(t).split(esc(mn)).join(esc(mn)+' (you)'):esc(t);
+  return `<div class="ps-feed"><h5>Since your last move</h5><ol>${keep.map(l=>`<li class="${l.c==='bad'?'bad':l.c==='big'?'big':''}">${you(l.t)}</li>`).join('')}</ol>${more?`<p class="tiny">${more} earlier line${more>1?'s':''} in the Log.</p>`:''}</div>`}
 // ---------- the pop-up: tiles / info / start marks (lives in the free zone next to the board, never over it) ----------
 function phTilesHTML(c){const {d,K,hand,sel,pl}=c;if(!pl.length||!sel)return '';const multi=hotSeat()||humans().length>1;
   const m={a:'place',t:sel.t,r:sel.r,s:sel.s};let selA=null,tiles='';
   hand.forEach((card,t)=>{const on=sel.t===t;
-    if(isCur(card)){const A=analyse(K,d,{a:'place',t,r:sel.r,s:sel.s});if(on)selA=A;
-      tiles+=`<button class="ph-t${on?' sel':''}" data-ph="pcard" data-t="${t}" data-owner="${d}" data-up="1" aria-label="Tile ${t+1}: ${A.bad?'sinks':'safe'}, ${phWhy(A)}">${phMini(card,sel.r,A)}<span class="bd ${A.bad?'sink':'safe'}">${A.bad?'SINKS':'SAFE'}</span><small>${esc(phWhy(A))}</small></button>`}
+    if(isCur(card)){const rr=on?sel.r:phRot(t);const A=analyse(K,d,{a:'place',t,r:rr,s:sel.s});if(on)selA=A;
+      tiles+=`<button class="ph-t${on?' sel':''}" data-ph="pcard" data-t="${t}" data-owner="${d}" data-up="1" aria-label="Tile ${t+1}: ${A.bad?'sinks':'safe'}, ${phWhy(A)}">${phMini(card,rr,A)}<span class="bd ${A.bad?'sink':phRisk(K,A)?'risk':'safe'}">${A.bad?'SINKS':phRisk(K,A)?'RISKY':'SAFE'}</span><small>${esc(phWhy(A))}</small></button>`}
     else tiles+=`<button class="ph-t sp${on?' sel':''}" data-ph="pcard" data-t="${t}" data-owner="${d}" data-up="1" aria-label="${isGate(card)?'Rift Gate':'Deck Cannon'}">${isGate(card)?gateArt():cannonArt()}<span class="bd">${isGate(card)?'GATE':'CANNON'}</span></button>`});
   const cur=isCur(hand[sel.t]);const err=cur?legal(m,d):'';
   return `<div class="ph-head"><b>${multi?esc(nm(d))+': lay':'Lay'} a current</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div>
@@ -740,10 +773,10 @@ function phOpen(kind,pd){PH.pop=kind;PH.pd=pd||null;PH.toast='';phPopup();phStri
 // ---------- cards: coach tips, wake roll, Sunk!, interrupts, pass screen, end card ----------
 function phNeed(){if(!G||!UI.started)return null;const d=sideToAct();
   if(!G.over&&d>=0&&G.seats[d].human&&mustPass(d)&&!(NET.on))return 'pass';
-  if(G.over&&PH.ovHide!==G.over)return 'over';
   if(!G.over&&!UI.busy&&G.q&&d>=0&&G.seats[d].human&&!mustPass(d)&&!(NET.on&&d!==NET.mySeat))return 'q';
   if(UI.sunk&&UI.sunk.length)return 'sunk';
-  if(UI.mph&&PH.mphHide!==UI.mph&&!(G.over&&!UI.busy))return 'mph';
+  if(G.over&&!UI.busy&&PH.ovHide!==G.over)return 'over';
+  if(UI.mph&&PH.mphHide!==UI.mph&&(UI.mph.wake||UI.mph.lines.length)&&!UI.skipAll&&!(G.over&&!UI.busy))return 'mph';
   if(!UI.busy&&!G.over&&(UI.confirm||UI.guide==='full'&&nextLesson()))return 'coach';
   return null}
 const PH_SRC={pass:'#main .passbox',over:'#main [data-over]',q:'#main [data-qkind]',sunk:'#cards > *',mph:'#res .mph',coach:'#coach .coach:not(.light)'};
@@ -753,7 +786,8 @@ function phCards(){const pc=$('#pc');if(!pc)return;const kind=PH.on?phNeed():nul
   if(src){if(kind==='q'){const w=document.createElement('div');w.className='pc-in';w.appendChild(src);pc.replaceChildren(w);PH.cur={kind,html:'q'+G.logN}}
     else{const w=document.createElement('div');w.className='pc-in';const cl=src.cloneNode(true);w.appendChild(cl);
       for(const b of cl.querySelectorAll('[data-a=sunkok],[data-a=coachok]'))b.textContent='Continue';
-      if(kind==='mph'||kind==='over'){const r=document.createElement('div');r.className='row';r.innerHTML=`<button class="btn pri" data-ph="dismiss">Continue</button>`;w.appendChild(r)}
+      if(kind==='over'){const rw=cl.querySelector('.row');if(rw){const sb=document.createElement('button');sb.className='btn';sb.dataset.ph='dismiss';sb.textContent='See the board';rw.appendChild(sb)}}
+      if(kind==='mph'){const r=document.createElement('div');r.className='row';r.innerHTML=`<button class="btn pri" data-ph="dismiss">Continue</button>`;w.appendChild(r)}
       html=w.innerHTML;if(!PH.cur||PH.cur.kind!==kind||PH.cur.html!==html){const fresh=pc.hidden||!PH.cur||PH.cur.kind!==kind;pc.replaceChildren(w);PH.cur={kind,html};if(fresh){pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}}}}
   else if(!PH.cur||PH.cur.kind!==kind){pc.hidden=true;pc.innerHTML='';PH.cur=null;return}
   pc.hidden=false;PH.cur.block=true;
@@ -771,8 +805,9 @@ function phAfter(){if(!PH.on)return;try{phCards();phPopup();phStrip();phZoom()}c
  const _rb=renderBar;renderBar=function(){_rb.apply(this,arguments);if(!PH.on||!G)return;const el=$('#barstat');if(!el)return;
    if(G.phase==='setup'){el.innerHTML='<span class="chip" aria-label="Choose start marks"><b>Pick a start</b></span>';return}
    const L=G.mons.filter(m=>m.k==='L').length,toRise=G.mdeck.filter(x=>x<10).length,es=G.variant==='easysolo',so=G.variant==='solo';
-   el.innerHTML=`<span class="chip" role="status" aria-label="Turn ${G.turn}${es?' of '+G.opts.goal:''}, ${G.deck.length} tiles left, ${L} monsters on the board${so?', '+toRise+' still to rise':''}"><b>T${G.turn}${es?'/'+G.opts.goal:''}</b><span title="Tiles left">${PH_ICO.tile}${G.deck.length}</span><span title="Monsters on the board">${PH_ICO.mon}${L}${so?'<small>+'+toRise+'</small>':''}</span></span>`};
- const _act=act;act=function(m,s){const p=PH.pop,pd=PH.pd;PH.pop=null;PH.pd=null;PH.toast='';const r=_act.apply(this,arguments);if(r===false&&PH.on&&G&&!G.over){PH.pop=p;PH.pd=pd;phAfter()}return r};
+   const T=UI.busy&&UI.curTurnN!=null?UI.curTurnN:G.turn;
+   el.innerHTML=`<span class="chip" role="status" aria-label="Turn ${T}${es?' of '+G.opts.goal:''}, ${G.deck.length} tiles left, ${L} monsters on the board${so?', '+toRise+' still to rise':''}"><span class="c2"><b>Turn ${T}${es?'/'+G.opts.goal:''}</b><small>${L} monster${L===1?'':'s'}${so?' (+'+toRise+')':''} &middot; ${G.deck.length} tiles</small></span></span>`};
+ const _act=act;act=function(m,s){if(G&&G.seats[s]&&G.seats[s].human&&m&&m.a!=='q')UI.myLogI=G.logN;const p=PH.pop,pd=PH.pd;PH.pop=null;PH.pd=null;PH.toast='';const r=_act.apply(this,arguments);if(r===false&&PH.on&&G&&!G.over){PH.pop=p;PH.pd=pd;phAfter()}return r};
  const _onPick=onPick;PH.orig=_onPick;onPick=function(p){if(!PH.on)return _onPick(p);phPick(p)}}
 function phPick(p){if(!G||!UI.started)return;if(PH.cur&&PH.cur.block&&PH.cur.kind!=='coach'&&PH.cur.kind!=='mph'&&PH.cur.kind!=='sunk'&&PH.cur.kind!=='q')return;
   const d=sideToAct(),mine=!UI.busy&&!G.over&&d>=0&&G.seats[d].human&&!mustPass(d)&&!(NET.on&&d!==NET.mySeat);
@@ -798,7 +833,7 @@ document.addEventListener('click',e=>{if(!PH.on)return;
   const t=e.target.closest&&e.target.closest('[data-ph]');
   if(t){const a=t.dataset.ph;e.stopPropagation();
     if(a==='pclose')phClose();
-    else if(a==='pcard'){if(UI.sel&&!UI.busy){UI.sel.t=+t.dataset.t;sfx('tile_rotate');render()}}
+    else if(a==='pcard'){if(UI.sel&&!UI.busy){phSelTile(+t.dataset.t);sfx('tile_rotate');render()}}
     else if(a==='zoom'){PH.zoom=!PH.zoom;PH.zk='?';sfx('click');phAfter()}
     else if(a==='dismiss'){const k=PH.cur&&PH.cur.kind;if(k==='mph')PH.mphHide=UI.mph;else if(k==='over')PH.ovHide=G.over;sfx('click');phAfter();phStrip()}
     else if(a==='showover'){PH.ovHide=null;phAfter()}
