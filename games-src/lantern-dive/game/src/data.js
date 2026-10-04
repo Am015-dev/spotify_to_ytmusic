@@ -116,7 +116,11 @@ const TASKS = [
   /* 94 */ J([1, 1, 1], 'Win more Sunstar cards than Tide cards (no Tide at all is fine).', { k: 'morecol', a: SU, b: TI }),
   /* 95 */ J([1, 1, 1], 'Win more Coral cards than Kelp cards (no Kelp at all is fine).', { k: 'morecol', a: CO, b: KE })
 ];
-TASKS.forEach((t, i) => { t.id = i; });
+const SHORT = ['Most tricks', 'More than all others', 'Fewest tricks', 'More than Commander', 'Fewer than Commander', 'Same as Commander', 'Trick all below 7', 'Trick all above 5', 'Win with a 6', 'Win with a 5', 'Win with a 3', 'Win a 5 with a 7', 'Win an 8 with a 4', 'Win a 6 with a 6', 'Win with a 2',
+  'Coral 3', 'Sunstar 1', 'Tide 4', 'Kelp 6', 'All four 3s', 'Three or more 5s', 'Three or more 9s', 'Two or more 7s', 'All four 9s', 'Exactly three 6s', 'Exactly two 9s', 'Tide 1, 2, 3', 'Tide 6 + Sunstar 7', 'Coral 5 + Sunstar 6', 'Kelp 5 + Tide 8', 'Tide 5 + Coral 8', 'Coral 9 + Sunstar 8', 'Coral 1 + Kelp 7', 'Sunstar 9 + Tide 7', 'Kelp 3, Sunstar 4+5', 'Kelp 2 in last trick',
+  'One Coral, one Kelp', '7+ Sunstar cards', '5+ Coral cards', 'Exactly 2 Kelp', 'Exactly 2 Tide', 'Exactly 1 Coral', 'No Coral', 'One of each colour', 'A whole colour', 'Trick of evens', 'Trick of odds', 'Rich trick', 'Poor trick', 'Trick of 22 or 23', 'Exactly one Lantern', 'Lantern 1 only', 'Lantern 2 only', 'Lantern 3', 'Exactly two Lanterns', 'Exactly three Lanterns', 'No Lanterns', 'Coral 7 by Lantern', 'Kelp 9 by Lantern',
+  'Lead no Coral/Sun/Tide', 'Lead no Coral/Kelp', 'No Kelp', 'No Sunstar', 'No Coral or Tide', 'No Sunstar or Kelp', 'No 8s or 9s', 'No 9s', 'No 5s', 'No 1s', 'No 1s, 2s, 3s', 'None of first four', 'None of first three', 'None of first five', 'No tricks', 'Never two in a row', 'The last trick', 'First three tricks', 'First two tricks', 'The first trick', 'First and last', 'Only the last', 'Only the first', 'Exactly 1 trick', 'Exactly 2 tricks', '2 tricks in a row', '3 tricks in a row', 'Exactly 4 tricks', 'Exactly 3 in a row', 'Exactly 2 in a row', 'Predict (open)', 'Predict (secret)', 'Coral = Sunstar', 'Kelp = Sunstar in a trick', 'Coral = Tide in a trick', 'Sunstar over Tide', 'Coral over Kelp'];
+TASKS.forEach((t, i) => { t.id = i; t.s = SHORT[i]; });
 
 // ---- the 32 dives. d = overall difficulty (job cards are drawn until the 3/4/5-diver values add up to exactly d)
 // cmt: normal | murky (show a card, no token) | narc (shared pool of players-2 tokens) | unknown (draw a colour card: 1-3 normal, 4-6 murky, 7-9 narc) | none

@@ -1,0 +1,8 @@
+normal g1 green Port Alder                    38/50  76% avg rounds 7.0 {"checks:flaps":3,"spin":3,"speed":1,"checks:axis":4,"mandatory":1} 609ms/game
+normal g2 green Foxmere                       13/50  26% avg rounds 7.0 {"spin":4,"checks:gear+axis":3,"checks:planes":2,"checks:gear":3,"short":3,"checks:gear+flaps+axis":1,"speed":3,"mandatory":5,"checks:axis":3,"checks:planes+axis":2,"checks:flaps":5,"checks:gear+flaps":1,"checks:planes+gear+axis":1,"checks:planes+gear":1} 494ms/game
+normal g3 green Seabright Bay                 16/50  32% avg rounds 6.8 {"short":6,"mandatory":2,"checks:axis":3,"speed":4,"spin":8,"collision":2,"checks:planes+axis":1,"checks:flaps+axis":2,"corridor":2,"checks:flaps":2,"checks:gear+flaps":1,"checks:gear+axis":1} 347ms/game
+normal g4 green Lake Orrin                    14/50  28% avg rounds 6.9 {"fuel":14,"speed":12,"checks:axis":2,"checks:flaps":2,"checks:gear":1,"mandatory":2,"short":1,"spin":1,"checks:gear+flaps+axis":1} 512ms/game
+normal g5 green Grand Crossing                23/50  46% avg rounds 6.3 {"checks:planes":2,"speed":6,"spin":6,"collision":2,"checks:flaps":1,"mandatory":5,"checks:gear":1,"checks:flaps+axis":1,"short":2,"checks:intern":1} 379ms/game
+normal g6 green Castlemoor                    12/50  24% avg rounds 6.8 {"fuel":26,"checks:gear+axis":1,"spin":2,"checks:flaps+axis":1,"short":2,"speed":5,"checks:axis":1} 589ms/game
+BAND normal green 116/300 38.7%
+errors 0 stalls 0 time 146.6s
