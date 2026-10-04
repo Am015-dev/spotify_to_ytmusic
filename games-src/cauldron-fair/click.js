@@ -75,6 +75,7 @@ function run(cf, seed) {
                 return fin({ over: w.eval('({w:G.winners,s:G.players.map(p=>p.vp)})'), round: G.round });
               }
               const take = d.querySelector('#rs [data-a=take]'); if (take) { click(take); seen.add('pass->take'); clicks++; return; }
+              const hg = d.querySelector('#rs [data-a=hotgo]'); if (hg) { click(hg); seen.add('hot shared report'); clicks++; return; }
               const cont = d.querySelector('#rs [data-a=rscont]:not([disabled])'); if (cont && R() < .8) { seen.add('report'); click(cont); clicks++; return; }
               // decisions inside the report
               const shopB = q('#rs [data-a=shopsel]'); if (shopB.length) { const k = Math.floor(R() * 3); for (let i = 0; i < k; i++) { const b = rnd(q('#rs [data-a=shopsel]')); if (b) click(b); } if (R() < .1) { const cl = d.querySelector('#rs [data-a=shopclear]'); if (cl) click(cl); } const buy = d.querySelector('#rs [data-a=shopbuy]'); if (buy) { click(buy); seen.add('shop'); clicks++; } return; }

@@ -18,7 +18,7 @@ L.autoStep = p => p.evaluate(() => {
   const click = e => e.dispatchEvent(new MouseEvent('click', { bubbles: true }));
   if (G && G.phase === 'over' && !document.querySelector('#rs').hidden) return 'over';
   if (!document.querySelector('#rs').hidden) {
-    const take = q('#rs [data-a=take]')[0]; if (take) { click(take); return 'did'; }
+    const take = q('#rs [data-a=take],#rs [data-a=hotgo]')[0]; if (take) { click(take); return 'did'; }
     const cont = q('#rs [data-a=rscont]')[0]; if (cont) { click(cont); return 'did'; }
     const buy = q('#rs [data-a=shopbuy]')[0]; if (buy) { const s = q('#rs [data-a=shopsel]')[0]; if (s && !(UI.shopSel && UI.shopSel.length) && Math.random() < .8) { click(s); return 'did'; } click(buy); return 'did'; }
     const o = q('#rs .dec [data-a=mv]')[0]; if (o) { click(o); return 'did'; }
@@ -36,7 +36,7 @@ L.finishGame = (p, ms) => p.evaluate(ms2 => new Promise(res => {
   const iv = setInterval(() => {
     if (G && G.phase === 'over' && !document.querySelector('#rs').hidden && document.querySelector('#rs .win')) { clearInterval(iv); return res('over'); }
     if (Date.now() - t0 > ms2) { clearInterval(iv); return res('timeout'); }
-    if (!document.querySelector('#rs').hidden) { const take = q('#rs [data-a=take]')[0]; if (take) return click(take); const cont = q('#rs [data-a=rscont]')[0]; if (cont) return click(cont); const buy = q('#rs [data-a=shopbuy]')[0]; if (buy) { const s = q('#rs [data-a=shopsel]')[0]; if (s && !(UI.shopSel && UI.shopSel.length) && Math.random() < .8) return click(s); return click(buy); } const o = q('#rs .dec [data-a=mv]')[0]; if (o) return click(o); return; }
+    if (!document.querySelector('#rs').hidden) { const take = q('#rs [data-a=take],#rs [data-a=hotgo]')[0]; if (take) return click(take); const cont = q('#rs [data-a=rscont]')[0]; if (cont) return click(cont); const buy = q('#rs [data-a=shopbuy]')[0]; if (buy) { const s = q('#rs [data-a=shopsel]')[0]; if (s && !(UI.shopSel && UI.shopSel.length) && Math.random() < .8) return click(s); return click(buy); } const o = q('#rs .dec [data-a=mv]')[0]; if (o) return click(o); return; }
     const tip = q('#pc [data-a=tipok]')[0]; if (tip) return click(tip); const take = q('#pc [data-a=take]')[0]; if (take) return click(take);
     const acts = q('#acts [data-a=mv],#qbox [data-a=mv]'); if (acts.length) { const d = acts.find(b => /Draw/.test(b.textContent)), s = acts.find(b => /^Stop/.test(b.textContent.trim())); click(d && s ? (Math.random() < .7 ? d : s) : acts[0]); }
   }, 4);
