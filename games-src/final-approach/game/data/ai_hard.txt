@@ -1,9 +1,0 @@
-hard g1 green Port Alder                      10/12  83% avg rounds 7.0 {"checks:flaps":1,"speed":1} 19947ms/game
-hard g2 green Foxmere                          7/12  58% avg rounds 7.0 {"speed":2,"short":1,"checks:planes":2} 16951ms/game
-hard g3 green Seabright Bay                    6/12  50% avg rounds 7.0 {"checks:planes+gear+axis":1,"spin":1,"mandatory":2,"speed":1,"checks:flaps+axis":1} 15763ms/game
-hard g4 green Lake Orrin                       9/12  75% avg rounds 7.0 {"fuel":2,"checks:flaps":1} 20368ms/game
-hard g5 green Grand Crossing                   8/12  67% avg rounds 7.0 {"mandatory":3,"checks:flaps":1} 14887ms/game
-hard g6 green Castlemoor                       2/12  17% avg rounds 7.0 {"speed":1,"checks:flaps":4,"fuel":4,"mandatory":1} 18170ms/game
-hard y1 yellow Foxmere                         5/12  42% avg rounds 7.0 {"checks:flaps":3,"checks:flaps+axis":1,"spin":1,"mandatory":1,"checks:planes+flaps":1} 11967ms/game
-hard y2 yellow Bowlrock                        0/12   0% avg rounds 6.4 {"fuel":5,"checks:planes+flaps":1,"mandatory":1,"spin":2,"short":1,"collision":1,"corridor":1} 12644ms/game
-hard y3 yellow Palmreach                       2/12  17% avg rounds 6.8 {"mandatory":2,"speed":3,"checks:planes+flaps":1,"checks:planes":1,"spin":2,"short":1} 13391ms/game

@@ -179,3 +179,5 @@ playlists.json
 
 # AI tuning logs (large, regenerable)
 games-src/*/game/data/*.jsonl
+games-src/*/game/data/ai_*.txt
+games-src/*/game/data/ai.done
