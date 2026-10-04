@@ -47,7 +47,7 @@ const sleep=ms=>new Promise(r=>setTimeout(r,ms));const T0=Date.now();
  }
  const fin=await ev(()=>({st:__atc.st(),flag:JSON.parse(localStorage.getItem('mho_flags.ath@1')||localStorage.getItem('mho_flags@1')||'{}').DRAKOS}));
  if(START<12)ok(fin.st.step===12,'campaign complete: all 12 steps done',{step:fin.st.step,rw:fin.st.rw});
- ok(xfers>=3,'district transfers during missions (amphora A→B, metro B→A, Kifisias C→D)',xfers);
+ if(START===0)ok(xfers>=3,'district transfers during missions (amphora A→B, metro B→A, Kifisias C→D)',xfers);
  ok(errs.length===0,'zero page/console errors',errs.slice(0,5));
  console.log('game seconds per mission',JSON.stringify(times));
  console.log(`tATC ${fail?'FAILED':'PASS'} · ${pass} pass / ${fail} fail · ${Math.round((Date.now()-T0)/1000)} s`);await b.close();process.exit(fail?1:0)})();
