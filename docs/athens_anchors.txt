@@ -1,0 +1,104 @@
+pB1.py
+  function polySamples(pts,step){
+  {const raw=RF.streets.map(([id,name,cls,w,pts])=>({id,name,cls,w,pts:p
+  for(const r of raw){const S=polySamples(r.pts,8),P=S.pts;let run=[];co
+  const JUNC=[];{const add=(x,z,r,a,b)=>{
+    for(const S of CITY_S){const P=S.pts,w=S.r.w,mt=S.r.cls==='ped'?pm:s
+  function abStrip(P,i0,i1,oa,ob,ya,yb,uvL){
+  const SCH=CITY_S.map(S=>{if(S.r.cls==='ped'||S.r.cls==='hill')return[[
+    for(const C of CH)for(const ids of C)for(const e of[ids[0],ids[ids.l
+    for(const J of JUNC){const L=[];for(const si of J.ids)for(const ids 
+  {const RR=hubRoads();for(let t=0;t<420;t++){if(rnd()<.35){
+  cover:(x,z,r=60)=>
+  {const RR=hubRoads();for(let i=0;i<60;i++){const r=pick(RR);if(r.L<140
+pB2.py
+  function buildHub(){for(const _ of buildHubG());}
+  if(CID!=='fra')athOuter();
+    HUB.props=L;const by={};
+  window.__mho={qv:
+  for(const c of HUB.cull)c.o.visible=Math.hypot(c.x-cx,c.z-cz)-c.r<(c.s
+  athRR:(x,z)=>
+pB3.py
+    CITY_S.forEach((S,si)=>{const P=S.pts;for(let i=1;i<P.length-1;i++){
+  window.__mho={athB:
+  function buildHub(){for(const _ of buildHubG());}
+  if(rnd()<pc)add(pick(['car','car2','car3','car4']),
+pB4.py
+  const SHELF=new Map();if(CID!=='fra')for(const S of CITY_S){if(S.r.cls
+  let mx=0;for(let i=0;i<n;i++){mx=Math.max(mx,sm[i]);P[i].y=mx}
+  mt=c==='ped'?pm:c==='res'||c==='link'?rm:sm,yy=c==='hill'?.22:.045;
+  window.__mho={inA:
+pB5.py
+  const one=(a,b)=>{if(a!==b&&!N[a].nb.includes(b))N[a].nb.push(b)},link
+  const CH=[],chain=(pts,lo,w,pw,extra)=>{const out=[];for(const dir of[
+  return chain(sel,lo,S.r.w,S.r.w/2+3.2-lo,CID!=='fra'&&TRL.includes(S.r
+    N.ng=N.length;
+      const A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1;
+pB6.py
+  if(CID!=='fra')for(const g of GARAGES){if(g.x==null)continue;const q=c
+  {const ath=CID==='ath',L=LM_BY[ath?'Garaz Psyrri':'Werkstatt Konstable
+  sign.translate(gx,13,gz-17.6);
+  if(ath)for(const k of[-1,1])bt.add(cbox(5,16.6,1.2,gx+k*30,8.3,gz-17.4
+  window.__mho={hillFit:
+pB7.py
+  pl2.querySelector('b').textContent=RO.dist||districtAt(RO.x,RO.z)||'Fr
+  const DIST_R=RF.districts.map(
+pB8.py
+  const CITYCFG={fra:{id:'fra'
+  flight:'A3 840 · 2 h 55 min',gnd:'#c9bc8e'}},CCF=CITYCFG[CID];
+  if(CID!=='fra')for(const q of athNetDecode()){const pts=q.pts.map(p=>W
+  const m=q.pts[q.pts.length>>1],cmp=m[0]<RF_E0||m[0]>RF_E1||m[1]<RF_N0|
+  function athBiomes(){const RB=id=>{
+  RO.gbs=spots.slice(0,30).map(([x,z,y],i)=>{const m=new THREE.Mesh(geo,
+  function athGbSpots(){const out=[],add=(x,z)=>{
+  <div><b>${gbn}/${RO.gbs?RO.gbs.length:30}</b>
+  function roamCatalog(){const GL=GARAGES.map(
+  if(CID!=='fra')return[...GL,FL];
+  function districtStep(){HUB.df=(HUB.df||0)+1;if(HUB.df%30)return;
+  roamFaceOpen();RO.v=0;RO.vy=0;
+    if(CID!=='fra')athTerrainBuild(bt,BM,M,grp,G);
+  function toggleMap(on){RO.mapOpen=on??!RO.mapOpen;$('#roamMap').hidden
+  window.__mho={athGar:
+pB9.py
+  function buildHub(){for(const _ of buildHubG());}
+    if(CID!=='fra')athTerrainBuild(bt,BM,M,grp,G);
+  const LMX=RF.lm.map(([id,name,e,n,r,fx])=>{
+  pl2.querySelector('b').textContent=RO.dist||districtAt(RO.x,RO.z)||CCF
+  window.__mho={athd:
+pB10.py
+  if(h.shape==='dome')return q>=1?0:h.H*(1-q)*(1-q);const r=Math.sqrt(q)
+  let mx=0;for(let i=0;i<n;i++){mx=S.r.cls==='hill'?Math.max(mx,sm[i]):s
+  function shelfY(x,z,h){
+  window.__mho={lmk:
+  if(CID!=='fra')athHillFit();const SHELF=new Map();if(CID!=='fra')for(c
+  function shelfY(x,z,h){
+  if(!onRamp&&!(RO.y>g2+.05||RO.vy>0))RO.lastRamp=null;
+pB11.py
+  function drawRoamMap(){
+  if(zm>=1.6){g.font=`800 ${Math.round(11*dpr)}px system-ui`;g.fillStyle
+  g.textAlign='center';g.textBaseline='middle';g.font=`italic 900 ${Math
+pB12.py
+    const fit=(x,z,w,d,ry)=>{for(let s=1;s>.45;s-=.08)if(athRectClr(x,z,
+  if(have('mosque')){const[x,z]=W2(46,-15),y=0;
+  if(have('arch')){const[x,z]=W2(572,-656),y=0;
+  if(have('hadrianlib')){const[x,z]=W2(94,-78),
+  if(have('parliament')){const[x0,z0]=W2(1030,-95),
+  if(have('zappeion')){const[x,z]=W2(947,-508),
+  if(have('stoa')){const[x0,z0]=W2(-114,-111),
+  if(have('hilton')){const[x,z]=W2(2348,-42),q=cityAt(x,z),ry=q?Math.ata
+  if(have('athenstower')){const[x,z]=W2(3099,943),
+  if(have('megaro')){const[x,z]=W2(2512,553),q=cityAt(x,z),ry=q?Math.ata
+  const tx=fx+18,tz=z0;
+  for(const sd of[-1,1]){const px=gx+q.tz*sd*(w/2+1.5),pz=gz-q.tx*sd*(w/
+  if(best){g.x=best.x;g.z=best.z;g.h=best.h;used.push([best.hx,best.hz])
+  const sx=Math.sin(G.h),sz=Math.cos(G.h),hx=G.x-sx*36,hz=G.z-sz*36,
+  function athHilly(a,b,c,d){
+  mats:{w:M.walk,g:M.grass},hilly:CID!=='fra'?athHilly:
+  :(x,z)=>[[0,0],[-30,-30],[30,-30],[-30,30],[30,30]].filter(([a,b])=>at
+  M.jn=(()=>{
+  RO.y>g2&&RO.y-g2<=Math.abs(RO.v)*dt*.25+.05)RO.y=g2;
+    RO.athLm=[];for(const L of HUB.lmk||[]){
+  function shelfY(x,z,h){const L=SHELF.get(
+  function athHilly(a,b,c,d){
+  window.__mho={hillRoads:
+  if(CID!=='fra')for(const H of HILLS){for(let i=0;i<H.trees*.6;i++){
