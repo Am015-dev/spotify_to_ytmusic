@@ -13,3 +13,13 @@ SIZE 390x763 problems 0
 390x664 errors []
 PROBLEMS 0
 SIZE 390x664 problems 0
+375x553 board {"w":375,"h":400,"vw":375,"vh":553,"mode":"P","k":0.468} webgl
+375x553 placements by touch 8
+375x553 errors []
+PROBLEMS 0
+SIZE 375x553 problems 0
+412x780 board {"w":412,"h":440,"vw":412,"vh":780,"mode":"P","k":0.515} webgl
+412x780 placements by touch 8
+412x780 errors []
+PROBLEMS 0
+SIZE 412x780 problems 0
