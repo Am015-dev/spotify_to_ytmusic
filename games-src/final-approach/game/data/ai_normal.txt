@@ -15,3 +15,12 @@ normal r1 red Cloudspire                       2/60   3% avg rounds 6.5 {"fuel":
 normal r2 red Seabright Bay                    0/60   0% avg rounds 6.3 {"short":13,"fuel":18,"collision":3,"corridor":9,"checks:planes+flaps":1,"spin":3,"speed":7,"mandatory":4,"checks:gear":1,"checks:flaps":1} 1751ms/game
 normal r3 red Palmreach                        6/60  10% avg rounds 5.8 {"collision":22,"short":8,"speed":3,"mandatory":9,"checks:gear+flaps":1,"spin":5,"checks:planes+flaps+axis":1,"checks:gear+axis":2,"checks:planes":1,"fuel":1,"checks:flaps+axis":1} 1915ms/game
 normal r4 red Lake Orrin                       1/60   2% avg rounds 7.0 {"checks:ice":24,"short":4,"fuel":3,"spin":8,"mandatory":2,"speed":11,"checks:axis+ice":3,"checks:flaps+axis+ice":1,"checks:flaps+ice":3} 3615ms/game
+normal r5 red Bowlrock                         2/60   3% avg rounds 5.4 {"corridor":12,"mandatory":7,"collision":10,"fuel":18,"speed":2,"short":4,"checks:planes+flaps":1,"spin":3,"checks:planes+flaps+axis":1} 2040ms/game
+normal b1 black Frostmere                      0/60   0% avg rounds 6.6 {"speed":28,"mandatory":13,"spin":6,"short":7,"collision":5,"corridor":1} 2915ms/game
+normal b2 black Twin Spires                    0/60   0% avg rounds 6.4 {"short":28,"corridor":14,"fuel":7,"mandatory":6,"checks:gear":1,"collision":1,"speed":1,"spin":1,"checks:planes+flaps":1} 2676ms/game
+normal b3 black Cloudspire                     0/60   0% avg rounds 6.3 {"short":18,"mandatory":5,"collision":11,"fuel":14,"corridor":11,"speed":1} 2402ms/game
+BAND normal green 187/360 51.9%
+BAND normal yellow 68/420 16.2%
+BAND normal red 11/300 3.7%
+BAND normal black 0/180 0.0%
+errors 0 stalls 0 time 3672.2s
