@@ -8,7 +8,7 @@ R("const tH=CID==='fra'?(x,z)=>hillH(x,z)+tauH(x,z):(x,z)=>hillH(x,z);","const t
 R('lim=.055*Math.max(L,1)','lim=TR_GJ*Math.max(L,1)')
 R('const G=.06;for(let it=0;it<3;it++)','const G=TR_GR;for(let it=0;it<3;it++)')
 R('gy=hillH(cx,cz)-.3;','gy=groundY(cx,cz)-.3;')
-R("hillRoads:()=>{const L=CITY_S.filter(S=>(S.prof||S.r.cls==='hill')&&S.L>120)","hillRoads:()=>{const L=CITY_S.filter(S=>(S.prof||S.r.cls==='hill')&&S.L>120&&S.pts.every(p=>p.x>WX0+80&&p.x<WX1-80&&p.z>WZS+80&&p.z<WZN-80&&!(HUB.gates||[]).some(g=>Math.hypot(g.x-p.x,g.z-p.z)<90)))")
+R("hillRoads:()=>{const L=CITY_S.filter(S=>(S.prof||S.r.cls==='hill')&&S.L>120)","hillRoads:()=>{const L=CITY_S.filter(S=>(S.prof||S.r.cls==='hill')&&S.L>120&&S.r.cls!=='ped'&&S.pts.every(p=>p.x>WX0+80&&p.x<WX1-80&&p.z>WZS+80&&p.z<WZN-80&&!(HUB.gates||[]).some(g=>Math.hypot(g.x-p.x,g.z-p.z)<90)))")
 R('if(Math.abs(P[i].y||0)>.25||Math.abs(P[i-1].y||0)>.25)cap(','if(TR_dev(P[i])>1.5||TR_dev(P[i-1])>1.5)cap(')
 R('window.__mho={',open('tr_game.js').read()+'\nwindow.__mho={')
 save()

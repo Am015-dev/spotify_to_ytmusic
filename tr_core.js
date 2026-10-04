@@ -38,7 +38,17 @@ function TR_grad(x,z,e=1.5){return[(groundY(x+e,z)-groundY(x-e,z))/(2*e),(ground
 athBlurH=(x,z)=>{let a=TR_G(x,z)*2,c=2;for(let k=0;k<8;k++){const t=k/8*Math.PI*2;a+=TR_G(x+Math.cos(t)*24,z+Math.sin(t)*24);c++}return a/c};
 athShelfMark=()=>{for(const S of CITY_S)if(S.r.cls!=='hill')S.hs=1};
 {const _p=athRoadProfiles;athRoadProfiles=()=>{for(const S of CITY_S){if(S.r.cls!=='hill')continue;const P=S.pts,n=P.length,raw=P.map(p=>TR_G(p.x,p.z));
-    for(let i=0;i<n;i++){let a=0,c=0;for(let k=-4;k<=4;k++){const j=i+k;if(j<0||j>=n)continue;a+=raw[j];c++}P[i].y=a/c}for(let i=0;i<n;i++){const a=P[Math.max(0,i-1)],b=P[Math.min(n-1,i+1)];P[i].dy=(b.y-a.y)/Math.max(1,b.s-a.s)}}_p()}}
+    for(let i=0;i<n;i++){let a=0,c=0;for(let k=-4;k<=4;k++){const j=i+k;if(j<0||j>=n)continue;a+=raw[j];c++}P[i].y=a/c}for(let i=0;i<n;i++){const a=P[Math.max(0,i-1)],b=P[Math.min(n-1,i+1)];P[i].dy=(b.y-a.y)/Math.max(1,b.s-a.s)}}_p();
+  // wider shelf lookup (feathers up to 60 m), see athShelfY below
+  SHELF.clear();for(const S of CITY_S){if(!(S.r.cls==='hill'||S.hs))continue;const Rr=S.r.w/2+70;
+    S.pts.forEach((p,i)=>{for(let kx=Math.floor((p.x-Rr)/32);kx<=Math.floor((p.x+Rr)/32);kx++)for(let kz=Math.floor((p.z-Rr)/32);kz<=Math.floor((p.z+Rr)/32);kz++){const k=kx*100000+kz;let L=SHELF.get(k);if(!L)SHELF.set(k,L=[]);L.push(S,i)}})}}}
+// road shelves blend back to the real ground over 3x the cut/fill height (18..60 m), so cuts and embankments stay <= ~27 deg
+athShelfY=(x,z,h)=>{const L=SHELF.get(Math.floor(x/32)*100000+Math.floor(z/32));if(!L)return h;const st=++TR_sst;let sw=0,sy=0,im=0;
+  for(let j=0;j<L.length;j+=2){const S=L[j],Q=S.pts,i=L[j+1],hw=S.r.w/2;for(let a=i-1;a<=i;a++){if(a<0||a+1>=Q.length)continue;const A=Q[a];if(A._st===st)continue;A._st=st;
+    const Bq=Q[a+1],dx=Bq.x-A.x,dz=Bq.z-A.z,l2=dx*dx+dz*dz||1e-9;let t=((x-A.x)*dx+(z-A.z)*dz)/l2;t=t<0?0:t>1?1:t;const ex=A.x+dx*t-x,ez=A.z+dz*t-z,lat=Math.sqrt(ex*ex+ez*ez);if(lat>=hw+66)continue;
+    const ay=A.y??0,y=ay+((Bq.y??0)-ay)*t,F=Math.min(60,Math.max(18,3*Math.abs(y-h))),u=(lat-hw-6)/F;if(u>=1)continue;const tt=u<0?0:u,I=1-tt*tt*(3-2*tt),o=lat>hw?lat-hw+1:1,w=I/(o*o);sw+=w;sy+=y*w;if(I>im)im=I}}
+  if(!sw)return h;const y=sy/sw;return y+(h-y)*(1-im)};
+let TR_sst=0;
 // the Acropolis keeps its real plateau height in akro.H (walls, temples), but every placement mask still sees the original hill values
 {const _h1=athHill1;athHill1=(h,x,z)=>{const v=_h1(h,x,z);return h.trH0?v*h.trH0/h.H:v}}
 // how far a street profile leaves the real ground (cut/fill); building placement keeps clear only of real cuts/embankments
