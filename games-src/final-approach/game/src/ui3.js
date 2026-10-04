@@ -14,7 +14,8 @@ function newGame(mode, o) {
   if (mode === 'guided') { G.script = GUIDED_SCRIPT.slice(); }
   UI.mode = mode; UI.seat = mode === 'guided' ? 0 : cfg.role; UI.holder = mode === 'hot' ? -1 : UI.seat; UI.started = true; UI.sel = -1; UI.cof = 0; UI.hint = null; UI.over = null; UI.overShown = false; UI.rrm = [false, false, false, false];
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.prefs.guide || 'off'), seen: {}, tip: '', queue: [] }; UI.lastPlace = null; UI.rt = G.mods.real ? { left: 60000, last: 0 } : null;
-  const st = $('#start'); if (st) st.hidden = true; closeRS(); try { GX.close(); } catch (e) { } closePass();
+  const st = $('#start'); if (st) st.hidden = true; closeRS(); try { GX.close(); } catch (e) { } closePass(); hideRecap();
+  { const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } }   // a tip left over from the last flight
   clearSave(); render(); sndMusic(); coachTick(); schedule();
   if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false) showStory();
 }
@@ -60,7 +61,7 @@ function dieTap(s, d) {
   if (G.pend && G.pend.h === 'wt' && G.pend.d.a !== s) { const m = { t: 'wt2', d }; if (FA.validMoves(G, s).some(x => x.t === 'wt2' && x.d === d)) commit(s, m); return; }
   if (G.turn !== s && !(G.pend && (G.pend.h === 'intern' || G.pend.h === 'sync'))) { toast('Not your move yet.'); return; }
   if (G.dice[s][d] && G.dice[s][d].u && d !== 'p') return;
-  UI.sel = UI.sel === d ? -1 : d; UI.cof = 0; UI.hint = null; UI.warnK = null; snd('click'); render();
+  UI.sel = UI.sel === d ? -1 : d; UI.cof = 0; UI.hint = null; UI.warnK = null; snd('click'); render(); coachTick();
 }
 function slotTap(k) {
   const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v)) { if (G && !G.result) toast('Wait for your turn.'); return; }
@@ -133,12 +134,14 @@ setInterval(() => {
   if (!G || !UI.started || G.result || !UI.rt || G.phase !== 'place') return; if (UI.mode === 'net' && typeof isClient === 'function' && isClient()) { return; }
   const now = Date.now(); if (!UI.rt.last) { UI.rt.last = now; return; } const dt = now - UI.rt.last; UI.rt.last = now;
   const seats = FA.pending(G), human = seats.some(s => !G.ai[s]); if (!human) return; if (UI.mode === 'hot' && UI.holder < 0) return;
-  UI.rt.left -= dt; const e = $('#rtleft'); if (e) e.textContent = '⏱ ' + Math.max(0, Math.ceil(UI.rt.left / 1000)) + ' s';
+  UI.rt.left -= dt; const sec = Math.max(0, Math.ceil(UI.rt.left / 1000));
+  for (const e of $$('.rtleft')) { e.textContent = '⏱ ' + sec + ' s'; e.classList.toggle('low', sec <= 10); e.setAttribute('aria-label', sec + ' seconds left this round'); }
+  if (sec <= 10 && sec !== UI.rtBeep) { UI.rtBeep = sec; try { snd('click'); } catch (e) { } }
   if (UI.rt.left <= 0) { UI.rt = null; toast('Time is up: unplaced dice are ignored.'); commit(seats[0], { t: 'timeout' }); }
 }, 250);
 // ---- the end
 function onEnd() {
-  if (UI.overShown) return; UI.overShown = true; clearSave();
+  if (UI.overShown) return; UI.overShown = true; clearSave(); hideRecap();   // no round card over the ending picture
   const win = G.result.win; try { if (win) { UI.won[G.sid] = 1; savePrefs(); } snd(win ? 'win' : 'lose'); } catch (e) { }
   if (typeof pxEnd === 'function' && ANIM && typeof PX !== 'undefined' && PX.on) { pxEnd(win, () => showFinal()); } else setTimeout(showFinal, ANIM ? 500 : 0);
 }

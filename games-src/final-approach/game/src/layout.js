@@ -22,8 +22,8 @@ function build(mode, LW, LH, mods, me) {
     slot('ax0', 434, A); slot('ax1', 686, A); r.dial = R(560, A, 104, 104);
     slot('fl0', 776, A); slot('fl1', 872, A); slot('fl2', 968, A); slot('fl3', 1064, A);
     // brakes (or the icy-runway columns) on the left with the brake readout (r.brk) right after them; the fuel space sits in the bottom row so the readout has room
-    if (ice) { for (let i = 0; i < 4; i++) { slot('it' + i, 52 + i * 96, B); slot('ib' + i, 52 + i * 96, C); } r.brk = R(450, C, 92, 44); }
-    else { slot('br0', 52, B); slot('br1', 148, B); slot('br2', 244, B); r.brk = R(341, B, 92, 44); if (mods.kero) slot('ke', 52, C); }
+    if (ice) { for (let i = 0; i < 4; i++) { slot('it' + i, 52 + i * 96, B); slot('ib' + i, 52 + i * 96, C); } r.brk = R(450, C, 116, 84); }
+    else { slot('br0', 52, B); slot('br1', 148, B); slot('br2', 244, B); r.brk = R(339, B, 96, 84); if (mods.kero) slot('ke', 52, C); }
     slot('en0', 434, B); slot('en1', 686, B); r.gauge = R(560, B + 4, 162, 92);
     slot('ra1', 776, B); slot('ra2', 872, B); r.rerolls = R(1010, B, 130, 60);
     const cx = ice ? 656 : 560; slot('co0', cx - 96, C); slot('co1', cx, C); slot('co2', cx + 96, C); r.coffee = R(cx, C + 62, 290, 24);
@@ -45,7 +45,7 @@ function build(mode, LW, LH, mods, me) {
     slot('ra0', X(0), P1); slot('lg0', X(1), P1); slot('lg1', X(2), P1); slot('lg2', X(3), P1);
     if (ice) { for (let i = 0; i < 4; i++) { slot('it' + i, X(i), P2); slot('ib' + i, X(i), P2 + 100); } }
     else { slot('br0', X(0), P2); slot('br1', X(1), P2); slot('br2', X(2), P2); }
-    r.brk = ice ? R(X(3) + 48 + 50, P2 + 100, 92, 44) : R(X(2) + 48 + 50, P2, 92, 44);
+    r.brk = ice ? R(X(3) + 48 + 80, P2 + 100, 150, 84) : R(X(2) + 48 + 80, P2, 150, 84);   // two lines ("Brakes" over the value) in their own box, clear of the brake slots
     slot('fl0', X(4), P1); slot('fl1', X(5), P1); slot('fl2', X(6), P1); slot('fl3', X(7), P1);
     slot('ra1', X(6), P2); slot('ra2', X(7), P2);
     const R3 = P2 + (ice ? 200 : 100); let C2 = R3;

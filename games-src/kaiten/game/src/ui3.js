@@ -37,6 +37,7 @@ function schedule() {
   clearTimeout(UI.tm);
   if (!G || !UI.started) return;
   if (G.phase === 'over') return;
+  try { autoSave(); } catch (e) { }
   if (UI.busy) return;
   if (isClient()) { try { coachCheck(); } catch (e) { } return; }
   if (UI.cards.length && !NET.on) return;
@@ -202,14 +203,21 @@ function afterRound(ge) {
   snd('slide', { vol: .5 }); schedule(); drainQ(); if (NET.on && isHost()) netPush(true);
 }
 // ---------- save / load (local games only) ----------
+// SAVE_V goes up whenever G or the save layout changes: an older save is then refused politely instead of resuming a broken meal
+const SAVE_V = 2;
 function hasSave() { return !!lsGet('kk_save'); }
+function saveInfo() { try { const o = JSON.parse(lsGet('kk_save')); if (o && o.sv === SAVE_V && o.G && o.G.phase !== 'over') return { round: o.G.round, np: o.G.np, mode: o.mode }; } catch (e) { } return null; }
 function save() {
-  if (NET.on || !G || !UI.started) return false;
-  try { lsSet('kk_save', JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
+  if (NET.on || !G || !UI.started || G.phase === 'over') return false;
+  try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
 }
+// autosave: after every resolved turn (schedule runs after each one) and when the page is hidden or closed (iPhone app switch)
+function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
+function flushSave() { UI.svk = ''; autoSave(); }
 function loadSave() {
   if (NET.on) return false;
   let o; try { o = JSON.parse(lsGet('kk_save')); } catch (e) { return false; }
+  if (o && o.G && o.sv !== SAVE_V) { lsSet('kk_save', ''); toast('That saved meal is from an older version of the game, so it could not be resumed.'); if (!G) renderStart(); return 'old'; }
   if (!o || !o.G || !Array.isArray(o.G.players) || o.G.v !== 1) return false;
   clearTimeout(UI.tm); UI.seq++;
   G = o.G; try { if (KK.checkInvariants(G).length) { G = null; return false; } } catch (e) { return false; }

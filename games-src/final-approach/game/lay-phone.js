@@ -55,6 +55,8 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     await p.goto('https://gns.test/' + (DOM ? '?px=0' : '')); await p.waitForTimeout(1500); await scroll('title'); await shot('0title'); await targets('title');
     const phc = await p.evaluate(() => document.documentElement.className); if (!/\bph\b/.test(phc)) fail('phone class missing', phc);
     { const bt = await p.evaluate(() => [...document.querySelectorAll('#start button')].filter(e => e.offsetParent).map(b => b.dataset.a).join()); if (!/play/.test(bt) || !/online/.test(bt)) fail('title buttons', bt); }
+    // the title's How to play must open the rules on top of the title (it used to open behind it)
+    { await p.tap('#start .tlink[data-a=rules]'); await p.waitForTimeout(450); const r = await p.evaluate(() => { const d = document.getElementById('rulesd'); const b = d.getBoundingClientRect(); const h = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return { on: d.classList.contains('on'), top: !!h && d.contains(h) }; }); if (!r.on || !r.top) fail('title How to play is hidden or dead', JSON.stringify(r)); await p.tap('.gx-drawer.on .gx-x'); await p.waitForTimeout(300); }
     await p.tap('[data-a=play]'); await p.waitForTimeout(350); await scroll('setup'); await shot('0setup'); await targets('setup'); await clipped('setup');
     await p.tap('[data-a=cfgopen]'); await p.waitForTimeout(300); await shot('0config'); await targets('configure'); await clipped('configure');
     { const st = await p.evaluate(() => ({ open: !document.querySelector('#cfg').hidden })); if (!st.open) fail('Configure sheet did not open'); }
@@ -67,6 +69,10 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     const m = await p.evaluate(() => { const b = document.querySelector('#bd').getBoundingClientRect(); return { w: b.width, h: b.height, vw: innerWidth, vh: innerHeight, mode: UI.LY && UI.LY.mode, k: UI.LY && +UI.LY.k.toFixed(3) }; }); log('board', JSON.stringify(m), await gx());
     { const short = Math.min(m.vw, m.vh), port = m.vw < m.vh, side = port ? m.w : m.h, sh = FIT.share(m.vw, m.vh); if (side < sh * short) fail('board share', side + ' < ' + sh * short); if (port && m.h < .75 * m.w) fail('board height < 0.75 width', JSON.stringify(m)); if (!port && m.w < .85 * m.vh) fail('board width in landscape', JSON.stringify(m)); }
     { const o = await p.$('#pc:not([hidden]) [data-a=tipoff]'); if (o) { await o.tap(); await p.waitForTimeout(300); } else fail('no No-more-tips button reachable in the tip card'); }
+    { const r = await p.evaluate(() => { const A = document.querySelector('#acts').getBoundingClientRect(), B = document.querySelector('#dockbody').getBoundingClientRect(), bad = [];
+        for (const e of document.querySelectorAll('#says .say,#says .srule')) { const r = e.getBoundingClientRect(); if (!r.height) continue; const t = Math.max(r.top, B.top), b = Math.min(r.bottom, B.bottom, innerHeight); if (b - t < 2) continue;   // scrolled out of the dock: fine
+          for (const y of [t + 1, (t + b) / 2, b - 1]) { const h = document.elementFromPoint(r.left + r.width / 2, y); if (!h || !e.contains(h)) { bad.push('covered by ' + (h && (h.dataset.a || h.id || h.className)) + ': ' + e.textContent.slice(0, 24)); break; } } }
+        return bad.slice(0, 3); }); if (r.length) fail('briefing phrases', JSON.stringify(r)); await shot('1brief-dock'); }
     await p.evaluate(() => { const b = document.querySelector('#acts [data-a=ready]'); if (b) b.click(); }); await p.waitForTimeout(2600); await scroll('rolled'); await shot('2rolled'); await panel('rolled'); await targets('rolled'); await clipped('rolled'); await fit('rolled');
     let placed = 0;
     for (let k = 0; k < TURNS * 6 && placed < TURNS; k++) {
@@ -75,7 +81,9 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
       const d = await p.$('#pz .die:not([disabled]):not(.used)'); if (!d) { const rd = await p.$('#acts [data-a=ready]'); if (rd) { await rd.tap(); await p.waitForTimeout(1800); } else await p.waitForTimeout(250); continue; }
       await d.tap(); await p.waitForTimeout(200);
       const sl = await p.$('#pz .slot.legal'); if (!sl) { fail('no glowing space after tapping a die'); break; }
-      if (placed === 1) { await shot('3picked'); await panel('picked'); await targets('picked'); }
+      if (placed === 1) { await shot('3picked'); await panel('picked'); await targets('picked');
+        const r = await p.evaluate(() => { const si = document.querySelector('#selinfo'), B = document.querySelector('#dockbody').getBoundingClientRect(), A = document.querySelector('#acts').getBoundingClientRect(); if (!si || si.hidden || getComputedStyle(si).display === 'none') return 'no die card'; const r = si.getBoundingClientRect(); return r.top >= B.top - 1 && r.bottom <= B.bottom + 1 && r.bottom <= A.top + 1 && r.bottom <= innerHeight + 1 ? 'ok' : 'cut ' + JSON.stringify([r.top, r.bottom, B.top, B.bottom, A.top].map(Math.round)); });
+        if (r !== 'ok') fail('die card not fully shown', r); }
       await sl.tap(); await p.waitForTimeout(700); placed++;
       if (placed === 3) { await scroll('midgame'); await shot('4mid'); await panel('mid'); await targets('mid'); await clipped('mid'); await fit('mid'); }
     }
@@ -89,6 +97,13 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     await p.waitForTimeout(500); await shot('6final'); await scroll('final'); await targets('final'); await clipped('final'); await fit('final');
     { const rr = await rect('.rsbox'); if (!rr) fail('no final card'); else if (rr[0] < -1 || rr[2] > W + 1 || rr[3] > H + 1) fail('final card does not fit', JSON.stringify(rr)); }
     await p.tap('#rs [data-a=rsclose]'); await p.waitForTimeout(250);
+    // ---- Against the Clock: the 60 s clock must be on screen
+    { await p.evaluate(() => { const sc = D.scenarios.find(x => x.mods.includes('real')); UI.prefs.story = false; UI.prefs.guide = 'off'; AIDELAY = 400; newGame('vs', { scenario: sc.id, role: 0 }); }); await p.waitForTimeout(500);
+      await p.evaluate(() => { const b = document.querySelector('#acts [data-a=ready]'); if (b) b.click(); }); await p.waitForTimeout(2500);
+      const r = await p.evaluate(() => { const e = document.querySelector('.rtleft'); if (!e) return 'missing'; const b = e.getBoundingClientRect(); for (let a = e; a && a !== document.body; a = a.parentElement) a.style.pointerEvents = 'auto';   // the HUD ignores taps: make it hit-testable to see that nothing covers it
+        const h = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return b.width && b.top >= 0 && b.bottom <= innerHeight && b.right <= innerWidth && (h === e || e.contains(h) || (h && h.closest && h.closest('.w'))) ? 'ok ' + e.textContent : 'hidden ' + JSON.stringify([b.left, b.top, b.right, b.bottom].map(Math.round)); });
+      if (!/^ok/.test(r)) fail('clock not visible in a timed scenario', r); else { log('clock', r); await shot('9clock'); }
+      await p.evaluate(() => { UI.prefs.story = true; }); }
     // ---- story card of a normal flight
     await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.tap('[data-a=play]'); await p.waitForTimeout(150); await p.tap('[data-start=vs]'); await p.waitForTimeout(900);
     { const st = await p.evaluate(() => !!document.querySelector('#rs.story .stbox')); if (!st) fail('no story card at the start of a flight'); else { await shot('8story'); await scroll('story'); await targets('story'); await clipped('story'); await fit('story'); const rr = await rect('.stbox'); if (rr[0] < -1 || rr[2] > W + 1 || rr[3] > H + 1) fail('story card does not fit', JSON.stringify(rr)); await p.tap('#rs [data-a=rsclose]'); await p.waitForTimeout(300); } }

@@ -32,7 +32,7 @@ function run(cf, seed) {
     const w = dom.window, d = w.document;
     const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
     let s0 = seed * 7919 + 13; const R = () => { s0 = (s0 * 16807) % 2147483647; return (s0 - 1) / 2147483646; }; const rnd = a => a[Math.floor(R() * a.length)];
-    const seen = new Set(); let overWait = 0, hidden = 0, clicks = 0, steps = 0, stall = 0, last = '', replayed = 0, picks = 0; const t0 = Date.now(); let iv;
+    const seen = new Set(); let resumed = 0, overWait = 0, hidden = 0, clicks = 0, steps = 0, stall = 0, last = '', replayed = 0, picks = 0; const t0 = Date.now(); let iv;
     const fin = r => { clearInterval(iv); res(Object.assign({ cf, errs, seen, clicks, hidden, picks, secs: Math.round((Date.now() - t0) / 1000) }, r || {})); try { w.close(); } catch (e) { } };
     w.addEventListener('load', () => {
       try {
@@ -69,10 +69,21 @@ function run(cf, seed) {
                 seen.add('final');
                 if (!replayed && R() < .25 && cf.start !== 'ai') { replayed = 1; click(fin2); seen.add('again'); if (w.eval('G.phase') === 'over') errs.push('again did not start'); return; }
                 const ov = w.eval('G.final'); if (!ov) errs.push('over without final');
+                if (w.localStorage.getItem('kk_save')) errs.push('save not cleared at the end of the meal');
                 return fin({ over: w.eval('({w:G.winner,s:G.final.totals,p:G.final.pudding})'), turns: G.turn, round: G.round });
               }
               const sk = d.querySelector('#rs [data-a=rsskip]:not([hidden])'); if (sk && R() < .3) { click(sk); seen.add('rsskip'); return; }
               const nx = d.querySelector('#rs [data-a=rsnext]'); if (nx && (R() < .6 || steps % 3 === 0)) { click(nx); seen.add('rsnext'); clicks++; return; }
+              return;
+            }
+            // autosave + resume: in round 2 the page is "left" (pagehide), sent to the title, and Resume must bring the same meal back
+            if (!resumed && G.round === 2 && G.phase === 'pick' && !w.eval('UI.busy') && !w.eval('UI.cards.length')) {
+              resumed = 1; w.dispatchEvent(new w.Event('pagehide'));
+              let sv = null; try { sv = JSON.parse(w.localStorage.getItem('kk_save')); } catch (e) { }
+              if (!sv || !sv.G || sv.G.round !== G.round || sv.G.turn !== G.turn) errs.push('autosave missing or stale: ' + (sv && sv.G ? sv.G.round + '.' + sv.G.turn : 'none') + ' vs ' + G.round + '.' + G.turn);
+              const k0 = JSON.stringify([G.round, G.turn, G.players.map(p => p.hand.length + ':' + p.table.length)]);
+              w.eval('showStart()'); const rb = d.querySelector('#start .ttl [data-a=loadsave]');
+              if (!rb) errs.push('no Resume on the title after an autosave'); else { click(rb); seen.add('resume'); const G2 = w.eval('G'); const k1 = JSON.stringify([G2.round, G2.turn, G2.players.map(p => p.hand.length + ':' + p.table.length)]); if (!w.eval('UI.started') || !d.querySelector('#start').hidden || k1 !== k0) errs.push('Resume did not restore the meal ' + k0 + ' -> ' + k1); }
               return;
             }
             if (G.phase === 'over') { if (!w.eval('UI.busy') && ++overWait > 400) { errs.push('over but no final modal'); fin({}); } return; }

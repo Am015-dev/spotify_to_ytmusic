@@ -60,6 +60,12 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     const phc = await p.evaluate(() => document.documentElement.className); if (!/\bph\b/.test(phc)) fail('phone class missing', phc);
     const inVP = sel => p.evaluate(s => { const e = document.querySelector(s); if (!e) return 'missing'; const r = e.getBoundingClientRect(); const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.top >= -1 && r.bottom <= innerHeight + 1 && r.left >= -1 && r.right <= innerWidth + 1 && e.contains(h) ? 'ok' : 'off ' + JSON.stringify([r.left, r.top, r.right, r.bottom].map(Math.round)) + ' hit ' + (h && (h.className || h.id)); }, sel);
     { const t = await p.evaluate(() => [...document.querySelectorAll('#start .tbtns button')].map(b => b.dataset.a).join()); if (t !== 'play,online') fail('title buttons', t); for (const a of ['play', 'online']) { const r = await inVP(`#start [data-a=${a}]`); if (r !== 'ok') fail('title button ' + a, r); } }
+    // the title's How to play must open the rules ON TOP of the title (it used to open behind it), and close again
+    { const tap = async s => { try { await p.tap(s); } catch (e) { await p.click(s); } };
+      await tap('#start .tlink[data-a=rules]'); await p.waitForTimeout(450);
+      const r = await p.evaluate(() => { const d = document.getElementById('rulesd'); const b = d.getBoundingClientRect(); const h = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return { on: d.classList.contains('on'), top: !!h && d.contains(h), hit: h && (h.id || h.className) }; });
+      if (!r.on || !r.top) fail('title How to play is hidden or dead', JSON.stringify(r)); else await shot('0title-rules');
+      await p.keyboard.press('Escape'); await p.waitForTimeout(300); }
     // ---- setup: one summary line + Configure; the sheet holds the diner cards
     await p.tap('[data-a=play]'); await p.waitForTimeout(300); await scroll('setup'); await shot('0setup'); await targets('setup');
     { const st = await p.evaluate(() => ({ line: (document.querySelector('.ssum .sline') || {}).textContent, cfgHidden: document.querySelector('#cfg').hidden })); if (!/^You \+ .+ · 3 diners$/.test(st.line || '')) fail('setup summary line', st.line); if (!st.cfgHidden) fail('Configure sheet open by default on a phone'); const r = await inVP('[data-start=vs]'); if (r !== 'ok') fail('Start button', r); const c = await inVP('[data-a=cfgopen]'); if (c !== 'ok') fail('Configure button', c); }

@@ -37,7 +37,7 @@ function coachCheck() {
   const turn = G.round + '.' + G.turn; if (UI.coach.turn === turn) return false;
   const seen = UI.coach.seen, p = G.players[v];
   if (!seen.welcome) { coachTip('welcome', 'Welcome to the belt', 'You are a diner at a conveyor-belt sushi bar. Over three rounds you collect plates for points. The highest score at the end wins.'); return true; }
-  if (!seen.pick) { coachTip('pick', 'Everyone picks at once', 'Pick one plate from your belt and serve it: tap to lift it, tap again to serve. When everyone has chosen, all plates are revealed together, then every hand slides to the player on your left.'); return true; }
+  if (!seen.pick) { coachTip('pick', 'Everyone picks at once', 'Pick one plate from your belt and serve it: tap to lift it, ' + (UI.prefs.tap2 ? 'tap it again' : 'then press Serve') + ' to serve. When everyone has chosen, all plates are revealed together, then every hand slides to the player on your left.'); return true; }
   const types = Array.from(new Set(p.hand.map(tkey))).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
   if (lv === 'full' || lv === 'light') {
     for (const t of types) { if (seen[t]) continue; if (lv === 'light' && !['wasabi', 'chop', 'pudding'].includes(t)) continue; coachTip(t, TY[t].name, (D.types.find(x => x.id === t) || {}).text + ' ' + (TIP_EXTRA[t] || ''), t); return true; }
@@ -50,12 +50,12 @@ function coachCheck() {
 }
 // ---- round score pad
 const CATROWS = [
-  { k: 'maki', l: 'Seaweed rolls', ic: ['most', 'roll1'], sub: s => s.icons + ' icon' + (s.icons === 1 ? '' : 's') },
-  { k: 'tempura', l: 'Crispy Prawns', ic: ['pair', 'tempura'], sub: null },
-  { k: 'sashimi', l: 'Fish Slices', ic: ['set', 'sashimi'], sub: null },
-  { k: 'dumpling', l: 'Steam Buns', ic: ['ladder', 'dumpling'], sub: null },
-  { k: 'nigiri', l: 'Nigiri', ic: ['v2', 'salmon'], sub: null },
-  { k: 'wasabi', l: 'Fire Paste bonus', ic: ['x3', 'wasabi'], sub: null }];
+  { k: 'maki', l: 'Seaweed rolls', ic: ['most', 'roll1'], sub: s => s.icons + ' icon' + (s.icons === 1 ? '' : 's'), tip: 'Roll race: most roll icons scores 6, second most 3.' },
+  { k: 'tempura', l: 'Crispy Prawns', ic: ['pair', 'tempura'], sub: null, tip: '5 points for every pair.' },
+  { k: 'sashimi', l: 'Fish Slices', ic: ['set', 'sashimi'], sub: null, tip: '10 points for every set of three.' },
+  { k: 'dumpling', l: 'Steam Buns', ic: ['ladder', 'dumpling'], sub: null, tip: '1, 3, 6, 10, 15 points for 1 to 5 or more buns.' },
+  { k: 'nigiri', l: 'Nigiri', ic: ['v2', 'salmon'], sub: null, tip: 'Sunset 2, Moon 3, Sun 1 point each.' },
+  { k: 'wasabi', l: 'Fire Paste bonus', ic: ['x3', 'wasabi'], sub: null, tip: 'The extra points a nigiri scored by landing on Fire Paste (triple).' }];
 function padRows(upToRound, withPud) {
   const bank = G.players.map((p, i) => G.rs.map(r => r[i].total));
   return G.players.map((p, i) => ({ i, name: p.name, rounds: [0, 1, 2].map(r => r < upToRound ? bank[i][r] : null), dessert: withPud ? G.final.puddingPts[i] : null, total: bank[i].slice(0, upToRound).reduce((a, b) => a + b, 0) + (withPud ? G.final.puddingPts[i] : 0), you: i === viewSeat() }));
@@ -78,7 +78,7 @@ function showRound(sc, ge) {
   tb.appendChild(hr);
   const cells = [];
   CATROWS.forEach(r => {
-    const tr = h('tr'); tr.appendChild(h('td', h('div.lc', { html: iconS(r.ic[0], 26, r.ic[1]) }, r.l)));
+    const tr = h('tr', { title: r.tip }); tr.appendChild(h('td', h('div.lc', { html: iconS(r.ic[0], 26, r.ic[1]) }, r.l)));
     sc.seats.forEach(s => { const td = h('td.n.z', { 'data-v': s[r.k] }, '·'); if (r.sub) td.appendChild(h('span.sub', r.sub(s))); tr.appendChild(td); cells.push(td); });
     tb.appendChild(tr);
   });
@@ -137,7 +137,9 @@ function showFinal() {
   const bs = NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again' }, { label: 'Look at the table', a: 'cont', cls: 'alt' }, { label: 'Menu', a: 'menu', cls: 'alt' }];
   box.appendChild(h('div.cbtns', bs.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a === 'cont' ? 'rsclose' : b.a }, b.label))));
   rs.appendChild(box);
-  if (iWin || !NET.on) { snd('win', { duck: true }); celebrate(box); } else snd('round', { duck: true });
+  // confetti only when a person at this device won (or shares the win); otherwise a softer line
+  const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
+  if (humanWin) { snd('win', { duck: true }); celebrate(box); } else { snd('round', { duck: true }); if (humans().length || NET.on) wn.after(h('p.wp', 'Well played! Another meal?')); }
   UI.overShown = true;
   if (UI.mode !== 'net') lsSet('kk_save', '');
 }
