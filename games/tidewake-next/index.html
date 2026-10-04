@@ -405,6 +405,7 @@ html.ph .pcard .row{margin-top:6px}
 html.ph .otag{display:none!important}
 html.ph .otag.ship.me{display:inline-flex!important}
 html.ph #ps>*{flex-shrink:0}
+@media (max-height:700px){html.ph-p .ph-t .mini,html.ph-p .ph-t svg.cardart{max-width:58px}html.ph-p .ph-t small{min-height:0}html.ph-p .ph-head{min-height:36px}html.ph-p .ph-tiles{gap:6px}}
 html.ph .bd.risk{background:#e3a21a;color:#14232b}html.ph .pt .bd.risk{background:#e3a21a;color:#14232b}
 html.ph .gx-bar .gx-ibtn{flex-direction:column;gap:0}html.ph .gx-bar .gx-ibtn>span{display:block!important;font:700 .56rem/1 var(--fb);margin-top:1px;letter-spacing:.01em}html.ph .gx-bar .gx-ibtn .ico{width:20px;height:20px}
 html.ph .ps-feed{margin:8px 4px 0;padding:8px 10px;border-radius:12px;background:rgba(8,30,37,.72);border:1px solid rgba(227,178,75,.35);font:500 .86rem/1.3 var(--fb);color:#dcefeb}
@@ -2596,7 +2597,7 @@ const RULES_HTML=`
 <details class="guess"><summary>Our guesses (the published rules did not say)</summary><ul><li>Easy solo starts with four leviathans (our variant).</li><li>The board is 6 by 6 squares (the dice only reach 6).</li><li>The 56 currents are the 35 different layouts plus 21 repeats we spread evenly (the real repeats are unknown).</li><li>The arrows on the leviathan tiles, their order numbers and gold tie-breakers are our own design.</li><li>Collisions: a junk "passing through" another is fine, but two junks forced to end on one wake in one direction both sink; head-on wakes sink both.</li><li>Rift Gate during another captain's turn is placed on a free square beside the doomed junk; Deck Cannon range on your own turn is the leviathans orthogonally next to your front square or tile.</li><li>Rogue Wave strength 2, then 3, then 4 from the fourth round.</li><li>Easy solo ends after 24 turns because a 6 by 6 board can never hold the whole pile.</li></ul></details>
 <h3>Credits</h3><p>Names, card text and art are original. <button class="btn small" data-gx="credd">Full credits</button></p>`;
 const COACH=[
- {id:'start',t:'Welcome aboard',x:'You sail one junk; the last junk afloat wins. Tap Best start (or an edge square, then a gold mark) to put your junk on the board.'},
+ {id:'start',t:'Welcome aboard',x:'You sail one junk; the last junk afloat wins. After this card, tap Best start (or an edge square, then a gold mark) to put your junk on the board.'},
  {id:'cur',t:'Your move',x:'Each turn you lay one tile on the square in front of your junk, and it sails along that tile\'s line. A tick means safe, a cross means you would sink. Press Turn to change the route.'},
  {id:'edge',t:'The edge',x:'Sailing off the edge of the board sinks you. Early on, pick routes that point back inward.'},
  {id:'coll',t:'Collisions',x:'Two junks that end on the same line heading the same way both sink. A junk already waiting on your square sails too.'},
@@ -3386,7 +3387,7 @@ function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='plac
   if(pl.length){if(!sel||!pl.some(m=>m.t===sel.t)||!fronts.includes(sel.s)){const own=pl.filter(m=>m.s===d);let f=own[0]||pl[0];
     // start on a tile that is safe (and not in a leviathan's reach) rather than tile 1 unturned, which could be a red cross with Place greyed out
     try{let best=-1;for(const m of own){const A=analyse(K,d,m);const v=A.bad?0:(typeof phRisk==='function'&&phRisk(K,A))?1:2;if(v>best){best=v;f=m}if(v===2)break}}catch(e){}
-    sel=UI.sel={t:f.t,r:f.r!=null?f.r:0,s:f.s}}}
+    sel=UI.sel={t:f.t,r:f.r!=null?f.r:0,s:f.s};UI.rots=[]}}
   UI.canPlace=pl.length>0;UI.moves=mv;
   const full=UI.guide==='full',multi=hotSeat()||humans().length>1;
   let outcome='',m=null,A=null,btn='',err='';
@@ -3522,7 +3523,7 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   if(netClick(a,t))return;
   if(['card','rot','sugg','place','startmark'].indexOf(a)<0)sfx('click');
   switch(a){
-  case 'card':{if(!UI.sel||UI.busy)break;const ti=+D.t;if(UI.sel.t===ti&&isCur(G.hands[d][ti]))UI.sel.r=(UI.sel.r+1)%4;else{UI.sel.t=ti}sfx('tile_rotate');render();break}
+  case 'card':{if(!UI.sel||UI.busy)break;const ti=+D.t;if(UI.sel.t===ti&&isCur(G.hands[d][ti]))UI.sel.r=(UI.sel.r+1)%4;else if(typeof phSelTile==='function')phSelTile(ti);else{UI.sel.t=ti}sfx('tile_rotate');render();break}
   case 'rot':{if(!UI.sel)break;UI.sel.r=(UI.sel.r+(+D.d)+4)%4;sfx('tile_rotate');render();break}
   case 'place':doPlace();break;
   case 'target':if(UI.sel){UI.sel.s=+D.s;render()}break;
@@ -3893,7 +3894,7 @@ function phHint(){if(UI.res&&UI.res.text)return esc(UI.res.text);return ''}
 // ---------- the control strip ----------
 function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoomBtn();
   if(G.over&&!UI.busy)return `<div class="ps-main"><div class="ps-msg"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
-  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on?'Skip to my turn':'Skip'}</button>${zb}</div></div><div class="ps-hint">${phHint()}</div>`}
+  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div><div class="ps-hint">${phHint()}</div>`}
   if(d<0)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const dh=G.seats[d].human;
   if(NET.on&&dh&&d!==NET.mySeat)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>${esc(nm(d))}</b> is deciding...</div><div class="ps-ctl">${zb}</div></div>`;
@@ -3905,23 +3906,28 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   const c=phPlaceCtx();if(!c)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';
   hand.forEach((card,t)=>{const on=can&&sel.t===t;
-    if(isCur(card)){const r=sel?sel.r:0;let bd='',lab='';if(can){const A=analyse(K,dd,{a:'place',t,r,s:sel.s});const rk=!!phRisk(K,A);bd=`<i class="bd ${A.bad?'sink':rk?'risk':'safe'}">${A.bad?'&#10007;':rk?'!':'&#10003;'}</i>`;lab=A.bad?', sinks':rk?', safe now but a leviathan could swim onto your path next roll':', safe'}
+    if(isCur(card)){const r=sel?(sel.t===t?sel.r:phRot(t)):0;let bd='',lab='';if(can){const A=analyse(K,dd,{a:'place',t,r,s:sel.s});const rk=!!phRisk(K,A);bd=`<i class="bd ${A.bad?'sink':rk?'risk':'safe'}">${A.bad?'&#10007;':rk?'!':'&#10003;'}</i>`;lab=A.bad?', sinks':rk?', safe now but a leviathan could swim onto your path next roll':', safe'}
       tiles+=`<button class="pt${on?' sel':''}" data-a="card" data-t="${t}" data-owner="${dd}" data-up="1" aria-label="Tile ${t+1}${lab}"><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[card]],{rot:r,size:80,uid:'s'+t})}">${bd}</button>`}
     else tiles+=`<button class="pt sp${on?' sel':''}" data-a="card" data-t="${t}" data-owner="${dd}" data-up="1" aria-label="${isGate(card)?'Rift Gate':'Deck Cannon'}">${isGate(card)?gateArt():cannonArt()}</button>`});
   let ctl='';if(can&&isCur(hand[sel.t])){const m={a:'place',t:sel.t,r:sel.r,s:sel.s},err=legal(m,dd);
     ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}<span class="lbl">Turn</span></button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}<span class="lbl">Turn</span></button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
   const hint=PH.pop==='tiles'?'':(can?phTileHint(K,dd,hand,sel):'Nothing can be laid: pick an option.');
   return `<div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-hint">${PH.toast?esc(PH.toast):hint}</div>`}
-function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+phGoal()+phFeed():'';if(h!==PH.strip){PH.strip=h;el.innerHTML=h}}
+function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+(PH.pop?'':phGoal()+phFeed()):''; /* the pop-up covers the strip: keep the strip short under it so the pop-up's Place stays on screen */if(h!==PH.strip){PH.strip=h;el.innerHTML=h}}
 // "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
-function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length)out.push({id,f})}return out.length?out:null}
+function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];let safe=1;for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length){out.push({id,f});safe*=1-f.length/6}}
+  if(!out.length)return null;out.pct=Math.round(16/36*(1-safe)*100);return out.pct>=14?out:null}
+// each tile keeps its own turn (Turn used to turn all three previews at once)
+function phRot(t){return (UI.rots&&UI.rots[t])||0}
+function phSelTile(t){if(!UI.sel)return;UI.rots=UI.rots||[];UI.rots[UI.sel.t]=UI.sel.r;UI.sel.t=t;UI.sel.r=phRot(t)}
 // whose turn it is, in plain words
 function phWhose(i){const me=youSeat();return i===me&&me>=0&&!hotSeat()?'<b>Your turn</b>'+(UI.busy?': the dice roll first':''):'<b>'+esc(nm(i))+"'s turn</b>"}
 // what to do with the tiles: pick, turn, place; and when every tile sinks this way round, say that turning can fix it
 function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const cs=hand[sel.t];if(isCur(cs))risk=phRisk(K,analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s}))}catch(e){}
   if(risk){const r=risk[0];let calm=false;try{calm=hand.some((c,t)=>isCur(c)&&[0,1,2,3].some(rr=>{const A=analyse(K,d,{a:'place',t,r:rr,s:sel.s});return !A.bad&&!phRisk(K,A)}))}catch(e){}
-    return `<b>!</b> Safe now, but if the dice total 6, 7 or 8, <b>${esc(levName(r.id))}</b> swims onto your path on its roll of ${r.f.join(' or ')}${risk.length>1?' (and '+(risk.length-1)+' more)':''}. ${calm?'Another tile or turn gives a &#10003;.':'No &#10003; this turn: every route is within a leviathan\'s reach.'}`}
+    return `<b>!</b> Safe now, but if the dice total 6, 7 or 8, <b>${esc(levName(r.id))}</b> swims onto your path on its roll of ${r.f.join(' or ')}${risk.length>1?' (and '+(risk.length-1)+' more)':''}: about a ${risk.pct}% chance before your next turn. ${calm?'Another tile or turn gives a &#10003;.':'No &#10003; this turn: every route is within a leviathan\'s reach.'}`}
   try{hand.forEach((c,t)=>{if(!isCur(c))return;if(!analyse(K,d,{a:'place',t,r:sel.r,s:sel.s}).bad)safeNow++;else if([0,1,2,3].some(r=>!analyse(K,d,{a:'place',t,r,s:sel.s}).bad))safeTurn++})}catch(e){}
+  try{const A=analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s});const hit=(A.others||[]).filter(o=>o.coll||o.st==='edge'||o.st==='mon');if(!A.bad&&hit.length)return `<b>Good move:</b> this tile also carries ${hit.map(o=>esc(nm(o.i))).join(' and ')} along its line, and ${hit.length>1?'they sink':'it sinks'}!`}catch(e){}
   if(safeNow)return 'Pick a tile, turn it if you like, then press Place. &#10003; safe &middot; <b>!</b> a leviathan could reach you next roll &middot; &#10007; sinks. The gold line is your route.';
   if(safeTurn)return 'Every tile sinks you this way round. Press Turn to find a &#10003;.';
   return 'Every tile sinks you: pick the one that does least harm.'}
@@ -3939,8 +3945,8 @@ function phFeed(){if(!G||!UI.started||UI.busy||G.over||G.phase==='setup'||UI.myL
 function phTilesHTML(c){const {d,K,hand,sel,pl}=c;if(!pl.length||!sel)return '';const multi=hotSeat()||humans().length>1;
   const m={a:'place',t:sel.t,r:sel.r,s:sel.s};let selA=null,tiles='';
   hand.forEach((card,t)=>{const on=sel.t===t;
-    if(isCur(card)){const A=analyse(K,d,{a:'place',t,r:sel.r,s:sel.s});if(on)selA=A;
-      tiles+=`<button class="ph-t${on?' sel':''}" data-ph="pcard" data-t="${t}" data-owner="${d}" data-up="1" aria-label="Tile ${t+1}: ${A.bad?'sinks':'safe'}, ${phWhy(A)}">${phMini(card,sel.r,A)}<span class="bd ${A.bad?'sink':phRisk(K,A)?'risk':'safe'}">${A.bad?'SINKS':phRisk(K,A)?'RISKY':'SAFE'}</span><small>${esc(phWhy(A))}</small></button>`}
+    if(isCur(card)){const rr=on?sel.r:phRot(t);const A=analyse(K,d,{a:'place',t,r:rr,s:sel.s});if(on)selA=A;
+      tiles+=`<button class="ph-t${on?' sel':''}" data-ph="pcard" data-t="${t}" data-owner="${d}" data-up="1" aria-label="Tile ${t+1}: ${A.bad?'sinks':'safe'}, ${phWhy(A)}">${phMini(card,rr,A)}<span class="bd ${A.bad?'sink':phRisk(K,A)?'risk':'safe'}">${A.bad?'SINKS':phRisk(K,A)?'RISKY':'SAFE'}</span><small>${esc(phWhy(A))}</small></button>`}
     else tiles+=`<button class="ph-t sp${on?' sel':''}" data-ph="pcard" data-t="${t}" data-owner="${d}" data-up="1" aria-label="${isGate(card)?'Rift Gate':'Deck Cannon'}">${isGate(card)?gateArt():cannonArt()}<span class="bd">${isGate(card)?'GATE':'CANNON'}</span></button>`});
   const cur=isCur(hand[sel.t]);const err=cur?legal(m,d):'';
   return `<div class="ph-head"><b>${multi?esc(nm(d))+': lay':'Lay'} a current</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div>
@@ -3982,7 +3988,7 @@ function phNeed(){if(!G||!UI.started)return null;const d=sideToAct();
   if(!G.over&&!UI.busy&&G.q&&d>=0&&G.seats[d].human&&!mustPass(d)&&!(NET.on&&d!==NET.mySeat))return 'q';
   if(UI.sunk&&UI.sunk.length)return 'sunk';
   if(G.over&&!UI.busy&&PH.ovHide!==G.over)return 'over';
-  if(UI.mph&&PH.mphHide!==UI.mph&&(UI.mph.wake||UI.mph.lines.length)&&!(G.over&&!UI.busy))return 'mph';
+  if(UI.mph&&PH.mphHide!==UI.mph&&(UI.mph.wake||UI.mph.lines.length)&&!UI.skipAll&&!(G.over&&!UI.busy))return 'mph';
   if(!UI.busy&&!G.over&&(UI.confirm||UI.guide==='full'&&nextLesson()))return 'coach';
   return null}
 const PH_SRC={pass:'#main .passbox',over:'#main [data-over]',q:'#main [data-qkind]',sunk:'#cards > *',mph:'#res .mph',coach:'#coach .coach:not(.light)'};
@@ -4039,7 +4045,7 @@ document.addEventListener('click',e=>{if(!PH.on)return;
   const t=e.target.closest&&e.target.closest('[data-ph]');
   if(t){const a=t.dataset.ph;e.stopPropagation();
     if(a==='pclose')phClose();
-    else if(a==='pcard'){if(UI.sel&&!UI.busy){UI.sel.t=+t.dataset.t;sfx('tile_rotate');render()}}
+    else if(a==='pcard'){if(UI.sel&&!UI.busy){phSelTile(+t.dataset.t);sfx('tile_rotate');render()}}
     else if(a==='zoom'){PH.zoom=!PH.zoom;PH.zk='?';sfx('click');phAfter()}
     else if(a==='dismiss'){const k=PH.cur&&PH.cur.kind;if(k==='mph')PH.mphHide=UI.mph;else if(k==='over')PH.ovHide=G.over;sfx('click');phAfter();phStrip()}
     else if(a==='showover'){PH.ovHide=null;phAfter()}

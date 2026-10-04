@@ -104,9 +104,13 @@ Full results are in `game/out/` (gitignored); the runner is `game/clarity/full.s
   `tools/net-strip-test.js`: passed (11814 stripped views, 0 problems).
 - `click.js`: 27 games, 0 errors, 0 hidden-hand violations.
 - `clarity/reveal-order.js` (new): 0 early roll cards, 0 early results, 0 ghost ships, on phone and at 1366x768.
-- `lay.js` at 4 desktop sizes and `lay-phone.js` at 7 phone sizes: see the final numbers in the delivery commit
-  message.
-- `net/p2p-tw.js`: full, leave, timeout and ui scenarios.
+- `lay.js` at 1366x768, 1920x1080, 768x1024 and 1100x700: 0 problems.
+- `lay-phone.js` at 390x844, 390x763, 390x664, 375x553, 412x780, 844x390 and 750x342: 0 problems at every size.
+  - On the two short phones the tile pop-up's Place button used to sit partly below the screen.
+  - The check used to skip it because Place started greyed out. The new safe default tile enables Place, which
+    exposed the problem.
+  - The pop-up's previews are now smaller on screens under 700 px tall.
+- `net/p2p-tw.js` (real WebRTC, local relay): full 34 runs 0 bad, leave 0 bad, ui 0 bad. Timeout: re-run pending (first run: 40 games consistent, but no remote interrupt occurred to exercise the timer).
 
 Three test files were adapted to the new (correct) order: the result appears after the replay, and the Sunk! card
 before the result card.
