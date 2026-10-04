@@ -406,7 +406,8 @@ function checkReport() {
   if (UI.rsMode === 'pass') closeRS(true);
   if (UI.rsMode === 'final') return;
   const R = G.rep;
-  if (R && UI.repSeen !== R.round && (G.phase === 'eval' || G.round > R.round || G.phase === 'over')) { UI.repSeen = R.round; UI.rsOpen = true; UI.rsMode = 'report'; }
+  const v0 = viewSeat(), needs = G.phase === 'eval' && v0 >= 0 && G.players[v0].q && EVAL_Q[G.players[v0].q.h];   // a decision of mine is waiting: its report must be open (hot-seat: after the pass card, online: after a rejoin)
+  if (R && ((UI.repSeen !== R.round && (G.phase === 'eval' || G.round > R.round || G.phase === 'over')) || (needs && !UI.rsOpen))) { UI.repSeen = R.round; UI.rsOpen = true; UI.rsMode = 'report'; }
   if (UI.rsOpen && UI.rsMode === 'report') renderReport();
 }
 function checkFinal() {

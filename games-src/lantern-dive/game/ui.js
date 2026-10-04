@@ -724,6 +724,7 @@ function openPop(title, sub, body) {
   const p = $('#ppop'); if (!p) return; UI.pop = { title }; document.documentElement.classList.add('popon');
   p.innerHTML = ''; p.hidden = false;
   p.append(h('div.ph-head', h('div.ph-t', h('b', title), sub ? h('span', sub) : null), h('button.px', { 'data-a': 'popx', type: 'button', 'aria-label': 'Close' }, '×')), h('div.ph-body', body));
+  if (document.documentElement.classList.contains('ph-p')) { const fe = $('#felt'); if (fe) { const fr = fe.getBoundingClientRect(); p.style.height = Math.round(Math.max(200, Math.min(innerHeight * .55, innerHeight - fr.bottom))) + 'px'; } } else p.style.height = '';
 }
 function openJob(i) {
   if (!G || !G.tasks[i]) return; const t = G.tasks[i], d = TASKS[t.id], st = jobSt(i);
