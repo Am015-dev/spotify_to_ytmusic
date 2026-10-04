@@ -78,10 +78,9 @@ function stripTabs() {
   t.innerHTML = '';
   const hn = v >= 0 ? G.players[v].hand.length : 0;
   const rec = UI.rec && UI.rec.m, recCity = !!(rec && rec.type === 'worker' && rec.k === 'dest' && s === v);
-  if (recCity && UI.recTab !== UI.recKey) { UI.recTab = UI.recKey; if (UI.tab !== 'city') { UI.tab = 'city'; return renderDock(); } }
   const cityOk = $$('#cityRow .sc.ok,#cityRow .sc.rec').length;
   t.appendChild(h('button.tab' + (city ? '' : '.on'), { 'data-a': 'tab', 'data-v': 'hand', type: 'button', 'aria-pressed': String(!city) }, (v >= 0 ? 'Your hand ' + hn + '/8' : 'Hand')));
-  t.appendChild(h('button.tab' + (city ? '.on' : '') + (cityOk && !city ? '.glow' : ''), { 'data-a': 'tab', 'data-v': 'city', type: 'button', 'aria-pressed': String(city) }, (recCity ? '★ ' : '') + (s === v ? 'Your city ' : p.name + "'s city ") + HB.cityCount(G, s) + '/15'));
+  t.appendChild(h('button.tab' + (city ? '.on' : '') + ((cityOk || recCity) && !city ? '.glow' : ''), { 'data-a': 'tab', 'data-v': 'city', type: 'button', 'aria-pressed': String(city) }, (recCity && !city ? '★ ' : '') + (s === v ? 'Your city ' : p.name + "'s city ") + HB.cityCount(G, s) + '/15'));
 }
 document.addEventListener('click', ev => { const b = ev.target.closest('#ptsb'); if (b) { b.hidden = true; ev.stopPropagation(); return; } }, true);
 document.addEventListener('click', ev => { const t = ev.target.closest('[data-a=tab]'); if (!t) return; UI.tab = t.dataset.v; renderDock(); });
@@ -97,7 +96,7 @@ function boardMap() {
     h('p.sm', 'Tap anything to see what it does. Hint suggests a move and says why.'));
 }
 function mapCard() {
-  if (UI.mode === 'guided' || UI.mapShown || viewSeat() < 0 || UI.coach.level === 'off') return false;
+  if (UI.mode === 'guided' || UI.mode === 'net' || NET.on || UI.mapShown || viewSeat() < 0 || UI.coach.level === 'off') return false;
   UI.mapShown = true;
   pushCard({ kind: 'coach', title: 'How to win', sub: 'Most points when everyone has passed', body: () => h('div', h('p', 'Each turn do one thing: place a worker, play a card, or Prepare for the next season once all your workers are out.'), boardMap()), buttons: [{ label: 'Got it', a: 'cont' }] });
   return true;

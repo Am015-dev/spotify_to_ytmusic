@@ -72,7 +72,7 @@ function schedule() {
   if (UI.coachOn ? coachCheck() : mapCard()) return;
   // guided game: the order of several effects that fire together rarely matters, so take the helper's order instead of asking every time
   if (UI.mode === 'guided' && G.q && G.q.kind === 'trigger' && G.q.who === a && !isClient()) { let m = null; try { m = HB.AI.choose(G, a, 'normal'); } catch (e) { } if (m) { UI.tm = setTimeout(() => { if (G && G.q && G.q.kind === 'trigger') { act(m); toast('Effects that fired together were resolved one after another.'); } }, ANIM ? 300 : 0); return; } }
-  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
+  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; if (UI.tab === 'city') { UI.tab = 'hand'; renderDock(); } snd('turn', { vol: .6 }); GX.buzz(15); }
   // suggestions show by themselves in your first two seasons; after that only when you press Hint
   if (!UI.noRec && p.season < 2) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
 }

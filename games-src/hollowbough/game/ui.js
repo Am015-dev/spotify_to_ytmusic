@@ -395,12 +395,12 @@ function placePop() {
   const p = $('#ppop'), dock = $('#dock'); if (!p || p.hidden) return;
   const dr = dock.getBoundingClientRect(); let top = 0, bottom = 0;
   const t = UI.pop && UI.pop.trig;
-  // on phones a card sheet gets the whole dock (above the hand strip it would be too short to read); elsewhere it sits above the hand
-  if ((t === 'hand' || t === 'city') && !isPh()) { const r = $('#handS').getBoundingClientRect(); if (r.height) bottom = Math.max(0, dr.bottom - r.top); }
+  // the hand and city strips sit at the bottom of the dock: open the sheet above the visible one, so the tapped card stays in view
+  if (t === 'hand' || t === 'city') { const r = $(t === 'city' && !$('#cityS').classList.contains('off') ? '#cityS' : '#handS').getBoundingClientRect(); if (r.height) bottom = Math.max(0, dr.bottom - r.top); }
   p.style.top = top + 'px'; p.style.bottom = bottom + 'px';
 }
 function setPop(o, build) {
-  UI.pop = o; const p = $('#ppop'); p.hidden = false; p.innerHTML = ''; p.setAttribute('data-pop', o.kind);
+  UI.pop = o; const p = $('#ppop'); p.hidden = false; { const b = $('#ptsb'); if (b) b.hidden = true; } p.innerHTML = ''; p.setAttribute('data-pop', o.kind);
   build(p); placePop(); setTimeout(moreCue, 0);
   const bd = p.querySelector('.ph-body'); if (bd) bd.scrollTop = 0;
 }
@@ -717,7 +717,7 @@ function schedule() {
   if (UI.coachOn ? coachCheck() : mapCard()) return;
   // guided game: the order of several effects that fire together rarely matters, so take the helper's order instead of asking every time
   if (UI.mode === 'guided' && G.q && G.q.kind === 'trigger' && G.q.who === a && !isClient()) { let m = null; try { m = HB.AI.choose(G, a, 'normal'); } catch (e) { } if (m) { UI.tm = setTimeout(() => { if (G && G.q && G.q.kind === 'trigger') { act(m); toast('Effects that fired together were resolved one after another.'); } }, ANIM ? 300 : 0); return; } }
-  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
+  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; if (UI.tab === 'city') { UI.tab = 'hand'; renderDock(); } snd('turn', { vol: .6 }); GX.buzz(15); }
   // suggestions show by themselves in your first two seasons; after that only when you press Hint
   if (!UI.noRec && p.season < 2) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
 }
@@ -1155,10 +1155,9 @@ function stripTabs() {
   t.innerHTML = '';
   const hn = v >= 0 ? G.players[v].hand.length : 0;
   const rec = UI.rec && UI.rec.m, recCity = !!(rec && rec.type === 'worker' && rec.k === 'dest' && s === v);
-  if (recCity && UI.recTab !== UI.recKey) { UI.recTab = UI.recKey; if (UI.tab !== 'city') { UI.tab = 'city'; return renderDock(); } }
   const cityOk = $$('#cityRow .sc.ok,#cityRow .sc.rec').length;
   t.appendChild(h('button.tab' + (city ? '' : '.on'), { 'data-a': 'tab', 'data-v': 'hand', type: 'button', 'aria-pressed': String(!city) }, (v >= 0 ? 'Your hand ' + hn + '/8' : 'Hand')));
-  t.appendChild(h('button.tab' + (city ? '.on' : '') + (cityOk && !city ? '.glow' : ''), { 'data-a': 'tab', 'data-v': 'city', type: 'button', 'aria-pressed': String(city) }, (recCity ? '★ ' : '') + (s === v ? 'Your city ' : p.name + "'s city ") + HB.cityCount(G, s) + '/15'));
+  t.appendChild(h('button.tab' + (city ? '.on' : '') + ((cityOk || recCity) && !city ? '.glow' : ''), { 'data-a': 'tab', 'data-v': 'city', type: 'button', 'aria-pressed': String(city) }, (recCity && !city ? '★ ' : '') + (s === v ? 'Your city ' : p.name + "'s city ") + HB.cityCount(G, s) + '/15'));
 }
 document.addEventListener('click', ev => { const b = ev.target.closest('#ptsb'); if (b) { b.hidden = true; ev.stopPropagation(); return; } }, true);
 document.addEventListener('click', ev => { const t = ev.target.closest('[data-a=tab]'); if (!t) return; UI.tab = t.dataset.v; renderDock(); });
@@ -1174,7 +1173,7 @@ function boardMap() {
     h('p.sm', 'Tap anything to see what it does. Hint suggests a move and says why.'));
 }
 function mapCard() {
-  if (UI.mode === 'guided' || UI.mapShown || viewSeat() < 0 || UI.coach.level === 'off') return false;
+  if (UI.mode === 'guided' || UI.mode === 'net' || NET.on || UI.mapShown || viewSeat() < 0 || UI.coach.level === 'off') return false;
   UI.mapShown = true;
   pushCard({ kind: 'coach', title: 'How to win', sub: 'Most points when everyone has passed', body: () => h('div', h('p', 'Each turn do one thing: place a worker, play a card, or Prepare for the next season once all your workers are out.'), boardMap()), buttons: [{ label: 'Got it', a: 'cont' }] });
   return true;

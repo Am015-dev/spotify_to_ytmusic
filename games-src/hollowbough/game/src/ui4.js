@@ -59,12 +59,12 @@ function placePop() {
   const p = $('#ppop'), dock = $('#dock'); if (!p || p.hidden) return;
   const dr = dock.getBoundingClientRect(); let top = 0, bottom = 0;
   const t = UI.pop && UI.pop.trig;
-  // on phones a card sheet gets the whole dock (above the hand strip it would be too short to read); elsewhere it sits above the hand
-  if ((t === 'hand' || t === 'city') && !isPh()) { const r = $('#handS').getBoundingClientRect(); if (r.height) bottom = Math.max(0, dr.bottom - r.top); }
+  // the hand and city strips sit at the bottom of the dock: open the sheet above the visible one, so the tapped card stays in view
+  if (t === 'hand' || t === 'city') { const r = $(t === 'city' && !$('#cityS').classList.contains('off') ? '#cityS' : '#handS').getBoundingClientRect(); if (r.height) bottom = Math.max(0, dr.bottom - r.top); }
   p.style.top = top + 'px'; p.style.bottom = bottom + 'px';
 }
 function setPop(o, build) {
-  UI.pop = o; const p = $('#ppop'); p.hidden = false; p.innerHTML = ''; p.setAttribute('data-pop', o.kind);
+  UI.pop = o; const p = $('#ppop'); p.hidden = false; { const b = $('#ptsb'); if (b) b.hidden = true; } p.innerHTML = ''; p.setAttribute('data-pop', o.kind);
   build(p); placePop(); setTimeout(moreCue, 0);
   const bd = p.querySelector('.ph-body'); if (bd) bd.scrollTop = 0;
 }
