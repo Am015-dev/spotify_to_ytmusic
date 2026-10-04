@@ -7564,7 +7564,7 @@ window.__cv={CV,st:CV_st,walk:CV_walk,
    · speed blur / speed lines inside the mission caps · wind + road rumble                      · split-screen: no hit-stop, no camera punch */
 const JU={on:true,hold:false,rt:1/60,hs:0,hsCd:0,frz:false,off:0,clk:0,ev:{n:0,m:0,lm:0,last:0,gap:0,k:{}},sm0:0,cr0:0,
   kick:0,la:0,drop:0,fx:0,sq:0,airT0:0,dropT:0,nmF:0,co:new THREE.Vector3(),cf:0,v0:new THREE.Vector3(),v1:new THREE.Vector3(),Y:new THREE.Vector3(0,1,0)};
-const JU_C={tierK:.55,tierT:[.5,1.1,2],turbo:[.8,1.6,2.6],bm:[8,18,32],hsTd:.09,hsBig:.075,hsSmall:.065,deadT:5,airMin:.8};
+const JU_C={tierK:.55,tierT:[.5,1.1,2],turbo:[.8,1.6,2.6],bm:[8,18,32],hsTd:.09,hsBig:.075,hsSmall:.065,deadT:Infinity,airMin:.8};
 const JU_TC=[new THREE.Color(.6,1.6,2.6),new THREE.Color(2.6,1.2,.3),new THREE.Color(1.8,.6,2.6)];
 function JU_ev(k){const E=JU.ev;E.n++;if(JU.clk-E.lm>.3||!E.m)E.m++;E.lm=JU.clk;E.k[k]=(E.k[k]||0)+1;const g=JU.clk-E.last;if(g>E.gap)E.gap=g;E.last=JU.clk}
 function JU_roam(){return state==='roam'&&!!pl}
