@@ -26,7 +26,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
   // 1. start screen
   await scroll('start');await shot('0start');
   // start screen panes scroll inside themselves only
-  await p.click('[data-a=job][data-n="9"]');await p.waitForTimeout(200);await p.click('[data-a=np][data-v="3"]');await p.click('[data-a=preset][data-v=solo]');await p.waitForTimeout(150);await shot('0start_job9');
+  await p.click('[data-a=stplay]');await p.waitForTimeout(150);await p.click('[data-a=job][data-n="9"]');await p.waitForTimeout(200);await p.click('[data-a=np][data-v="3"]');await p.click('[data-a=preset][data-v=solo]');await p.waitForTimeout(150);await shot('0start_job9');
   await p.click('[data-a=start]');await p.evaluate(()=>{const b=document.querySelector('[data-a=briefok]');if(b)b.click()});await p.waitForTimeout(2500);await scroll('setup q');const c1=await cover('setup q');await dockOn('setup q');await shot('1q');
   // 2. answer the opening token by button
   for(let k=0;k<6;k++){const q=await p.$('#main [data-a=q]');if(!q)break;await q.click();await p.waitForTimeout(500)}
@@ -50,11 +50,11 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
     else await p.waitForTimeout(500)}
   await scroll('later');await cover('later');await shot('7later');
   // 7. a hot-seat pass screen
-  await p.evaluate(()=>{showStart();UI.setup.job=4;UI.setup.np=2;UI.setup.seats=['human','human'];renderStart()});await p.waitForTimeout(300);await p.click('[data-a=start]');await p.evaluate(()=>{const b=document.querySelector('[data-a=briefok]');if(b)b.click()});await p.waitForTimeout(1800);
+  await p.evaluate(()=>{showStart();UI.sv='setup';UI.setup.job=4;UI.setup.np=2;UI.setup.seats=['human','human'];renderStart()});await p.waitForTimeout(300);await p.click('[data-a=start]');await p.evaluate(()=>{const b=document.querySelector('[data-a=briefok]');if(b)b.click()});await p.waitForTimeout(1800);
   await scroll('pass');await cover('pass');await dockOn('pass');await shot('8pass');
   await p.click('#main [data-a=take]');await p.waitForTimeout(1200);await shot('8pass_taken');
   // 8. a timed job (countdown in the dock), paused and resumed
-  await p.evaluate(()=>{showStart();UI.setup.job=19;UI.setup.np=3;UI.setup.seats=['human','ai','ai'];renderStart()});await p.waitForTimeout(300);await p.click('[data-a=start]');await p.evaluate(()=>{const b=document.querySelector('[data-a=briefok]');if(b)b.click()});await p.waitForTimeout(1500);
+  await p.evaluate(()=>{showStart();UI.sv='setup';UI.setup.job=19;UI.setup.np=3;UI.setup.seats=['human','ai','ai'];renderStart()});await p.waitForTimeout(300);await p.click('[data-a=start]');await p.evaluate(()=>{const b=document.querySelector('[data-a=briefok]');if(b)b.click()});await p.waitForTimeout(1500);
   for(let k=0;k<6;k++){const q=await p.$('#main [data-a=q]');if(!q)break;await q.click();await p.waitForTimeout(500)}
   await p.waitForTimeout(3500);const tp=await p.evaluate(()=>{const e=document.getElementById('timerpill');return e?e.textContent:null});if(!tp){bad++;log('NO TIMER in a timed job')}
   await p.click('#pausebtn');await p.waitForTimeout(300);const c0=await p.evaluate(()=>G.clock);await p.waitForTimeout(2200);const c1b=await p.evaluate(()=>G.clock);if(c1b!==c0){bad++;log('PAUSE did not stop the clock',c0,c1b)}

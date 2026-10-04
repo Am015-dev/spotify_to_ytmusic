@@ -285,6 +285,9 @@ button{font-family:inherit}
 #start .tbtn span{display:flex;flex-direction:column;line-height:1.15}
 #start .tbtn small{font-weight:700;font-size:.78rem;opacity:.85}
 #start .tlink{appearance:none;background:none;border:0;font:800 1rem var(--fb);color:var(--navy);text-decoration:underline;min-height:44px;cursor:pointer}
+#start .tonl .online{margin:0;background:#fff;border:2.5px solid var(--ink);border-radius:12px;box-shadow:0 3px 0 var(--ink)}
+#start .tonl .online>summary{min-height:52px;display:flex;align-items:center;padding:0 12px;font-weight:900;cursor:pointer}
+#start .tonl #netblock{padding:0 10px 10px}
 #start .sback{min-width:44px;min-height:44px;padding:0;justify-content:center}
 #start .st-body.one{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
 #start .brief .bt{display:flex;align-items:center;gap:8px}
@@ -618,6 +621,8 @@ html.ph-l #start .pane{padding:6px 10px}
 .gx-refbtn svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* the kit's chips are 36 px tall; on phones every tap target is 44 px */
 html.ph .gx-chip{min-height:44px}
+/* the Menu's section chips keep their width and the row scrolls sideways (they shrank and overlapped at 390 px) */
+.gx-set-nav .gx-chip{flex:0 0 auto}
 .earned{background:#fff3c4;border:2px solid #e0a31c;border-radius:10px;padding:6px 10px;margin:6px 0}
 .palist{margin:6px 0 2px;font-size:.9rem}.palist summary{cursor:pointer;font-weight:800;min-height:32px;display:flex;align-items:center}
 .parow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:3px 0}.parow b{min-width:5.5em;font-size:.85rem}.parow span{display:flex;flex-wrap:wrap;gap:4px}
@@ -3697,7 +3702,7 @@ function dualMiss(d){const seat=d.seat;const T=d.us.map(u=>findU(u));const owner
   G.stats.miss++;for(const x of T){for(const v of d.vals)if(!x.sl.not.includes(v))x.sl.not.push(v)}
   const boom=hookAny('missExplode',{seat,owner,d});if(boom&&!damper){explode(boom);return}
   let steps=conFlag(seat,'double')?2:1;steps+=hookAny('missExtra',{seat,owner,d})||0;
-  lg(`Miss: none of those is ${d.vals.map(VN).join(' or ')}.`,'bad');
+  lg(d.us.length===1?`Miss: that wire is not ${d.vals.map(VN).join(' or ')}.`:`Miss: none of those is ${d.vals.map(VN).join(' or ')}.`,'bad');
   const silent=conFlag(seat,'silent')||conFlag(owner,'silent');
   const nonRed=T.filter(x=>!isRed(x.sl.id));
   const fin=()=>{if(damper)lg('The Damper holds the fuse still.','good');else advance(steps,'missed cut',{miss:1});if(G.over)return;afterMiss({seat,v:d.v,kind:'dual'});if(!G.q&&!G.over)endAction();else if(!G.over)G.tfx.endAfterQ=1};
@@ -6203,6 +6208,7 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=camp();const sav
   const onl=isHost(),nOnl=onl?Math.min(s.np,NET.peers.length||1):0;const seats=[];for(let i=0;i<s.np;i++)seats.push(`<div class="seat" style="--sc:${SEATC[i]}"><span class="dot"></span><span class="nm">${onl&&i<nOnl?`<b>${esc(netPlan(s).names&&netPlan(s).names[i]||'Player')}</b>`:`<input data-nm="${i}" value="${esc(s.names[i])}" aria-label="Name of seat ${i+1}" maxlength="14" style="width:7.5em;font:800 .9rem var(--fb);border:2px solid var(--ink);border-radius:8px;padding:3px 5px;background:#fff7e8">`}<select data-ch="${i}" aria-label="Crew card for seat ${i+1}"><option value="">Crew: random</option>${ok.map(id=>`<option value="${id}"${s.chars[i]===id?' selected':''}>${esc(CHARS[id].n)} (${esc(ITEMS[CHARS[id].item].n)})</option>`).join('')}</select></span>${onl?`<span class="tag${i<nOnl?' b':''}">${i<nOnl?ico('user')+'Online player':ico('robot')+'Computer'}</span>`:`<button class="btn small${s.seats[i]==='human'?' on':''}" data-a="seatkind" data-i="${i}">${s.seats[i]==='human'?ico('user')+'Human':ico('robot')+'Computer'}</button>`}</div>`);
   const nh=s.seats.slice(0,s.np).filter(x=>x==='human').length;
   // title -> setup; on narrow screens the mission board is its own full-screen view (UI.sv: 'title' | 'setup' | 'board')
+  if(NET.on&&(UI.sv||'title')==='title')UI.sv='setup';
   const narrow=startNarrow(),sv=UI.sv||'title';
   const head=`<div class="st-head">${sv!=='title'?`<button class="btn small sback" data-a="${sv==='board'&&narrow?'stsetup':'sttitle'}" aria-label="Back">${ico('back')}</button>`:''}<svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">${ICO.bomb}</svg><div><h1>Short Fuse</h1><p>A cartoon demolition crew defuses rigged charges together. 2-5 players, 66 jobs.</p></div><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back to the job</button>':''}</div>
   `;
@@ -6230,7 +6236,7 @@ function titleHTML(saved){const first=!lsGet('sf_guided_done',false)&&!Object.ke
   <div class="tbtns">${saved?b('resume',' go','play','Continue','Job '+saved.G.mission+', turn '+saved.G.turn):''}
   ${first?b('tutorial',saved?'':' go','info','Guided first game','Job 1 with a coach, one step at a time'):''}
   ${b('stplay',!saved&&!first?' go':'','map','Play','Pick a job: computer crew, hot-seat or watch')}
-  ${b('stonline','','user','Play online','With friends, free, peer to peer')}
+  <div class="tonl">${onlineBlock()}</div>
   ${first?'':b('tutorial','','info','Guided first game','Job 1 with a coach')}</div>
   <button class="tlink" data-a="strules">How to play</button></div></div>`}
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}

@@ -38,7 +38,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
   const metersFor=async tag=>{const m=await metrics();log(tag,JSON.stringify(m));return m};
   // 0. start screen (is the page usable?)
   await scroll('start');await shot('0start');
-  if(BEFORE){await p.evaluate(([j,n])=>{showStart();UI.setup.job=j;UI.setup.np=n;UI.setup.seats=['human','ai','ai','ai','ai'];renderStart()},[JOB,NP]);await p.waitForTimeout(300);await p.click('[data-a=start]');await p.waitForTimeout(2000);
+  if(BEFORE){await p.evaluate(([j,n])=>{showStart();UI.sv='setup';UI.setup.job=j;UI.setup.np=n;UI.setup.seats=['human','ai','ai','ai','ai'];renderStart()},[JOB,NP]);await p.waitForTimeout(300);await p.click('[data-a=start]');await p.waitForTimeout(2000);
     await p.evaluate(()=>{const b=document.querySelector('[data-a=briefok]');if(b)b.click()});await p.waitForTimeout(1200);for(let k=0;k<6;k++){const qq=await p.$('#main [data-a=q]');if(!qq)break;await qq.click();await p.waitForTimeout(500)}
     for(let k=0;k<80;k++){const s=await p.evaluate(()=>!!(UI.V&&UI.V.legal&&decider()===UI.V.seat)||!!G.over);if(s)break;await p.waitForTimeout(300)}
     const m=await p.evaluate(()=>{const K=SFKit._K;SFKit.renderOnce();const cv=document.querySelector('#c3');const C=cv.getBoundingClientRect();const v=new THREE.Vector3();const pj=(x,y,z)=>{v.set(x,y,z).project(K.cam);return [C.left+(v.x+1)/2*C.width,C.top+(1-v.y)/2*C.height]};
@@ -49,7 +49,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
       return {W:innerWidth,H:innerHeight,short:Math.min(innerWidth,innerHeight),board:[Math.round(C.width),Math.round(C.height)],ring:[Math.round(x1-x0),Math.round(y1-y0)],oppWireMin:+(opp[0]||0).toFixed(1),oppWireMed:+(opp[opp.length>>1]||0).toFixed(1),smallestTap:[Math.round(sm),sw],mode:K.layout.mode}});
     log('BEFORE',JSON.stringify(m));rep.push({t,m});await shot('before');await ctx.close();continue}
   // 1. a solo job: briefing card, opening token question card, then my turn
-  await p.evaluate(([j,n,hot])=>{showStart();UI.setup.job=j;UI.setup.np=n;UI.setup.seats=hot?['human','human','human','ai','ai'].slice(0,n):['human','ai','ai','ai','ai'];renderStart()},[JOB,NP,HOT]);await p.waitForTimeout(300);
+  await p.evaluate(([j,n,hot])=>{showStart();UI.sv='setup';UI.setup.job=j;UI.setup.np=n;UI.setup.seats=hot?['human','human','human','ai','ai'].slice(0,n):['human','ai','ai','ai','ai'];renderStart()},[JOB,NP,HOT]);await p.waitForTimeout(300);
   await p.tap('[data-a=start]');await p.waitForTimeout(1800);await scroll('brief');
   const brief=await p.evaluate(()=>({card:!document.querySelector('#pc').hidden,k:PX.card&&PX.card.kind,txt:document.querySelector('#pc').textContent.slice(0,40)}));if(!brief.card||brief.k!=='brief')prob('no briefing card',JSON.stringify(brief));
   await shot('1brief');await targets('brief');await cards(HOT?['brief']:null);await p.waitForTimeout(500);

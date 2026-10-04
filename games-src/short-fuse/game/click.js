@@ -1,6 +1,6 @@
 // Random clicker (jsdom, no WebGL -> the kit's 2D board): human seats play ONLY through the page's buttons and board tiles.
 // node click.js [from] [to]   (config indices)   -> one line per game, then TOTAL errors
-const {JSDOM,VirtualConsole}=require('../../node_modules/jsdom');const fs=require('fs');
+const {JSDOM,VirtualConsole}=(()=>{try{return require('../../node_modules/jsdom')}catch(e){return require('jsdom')}})();const fs=require('fs');
 const html=fs.readFileSync(__dirname+'/shortfuse.html','utf8');
 const CONF=[
  {name:'tutorial job1 solo',tut:1,anim:0},
@@ -33,7 +33,7 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
   const seen=new Set();let hidden=0,clicks=0;
   w.addEventListener('load',()=>{try{w.eval(`AIDELAY=${cf.anim?15:0};ANIM=${cf.anim?1:0};UI.speed=${cf.anim?40:1};UI.tickRate=25;setSeed(${seed});setAiSeed(${seed})`);
     if(cf.tut){click(d.querySelector('[data-a=tutorial]'))}
-    else{click(d.querySelector(`[data-a=job][data-n="${cf.job}"]`));click(d.querySelector(`[data-a=np][data-v="${cf.np}"]`));click(d.querySelector(`[data-a=preset][data-v="${cf.seats}"]`));
+    else{click(d.querySelector('[data-a=stplay]'));{const cb=d.querySelector('[data-a=stboard]');if(cb)click(cb)}click(d.querySelector(`[data-a=job][data-n="${cf.job}"]`));click(d.querySelector(`[data-a=np][data-v="${cf.np}"]`));click(d.querySelector(`[data-a=preset][data-v="${cf.seats}"]`));
       if(cf.seats==='solo'&&R()<.5)click(d.querySelector('[data-a=lv][data-v=easy]'));
       const sel=d.querySelector('[data-ch="1"]');if(sel&&sel.options.length>2&&R()<.5){sel.value=sel.options[2].value;sel.dispatchEvent(new w.Event('change',{bubbles:true}))}
       click(d.querySelector('[data-a=start]'))}

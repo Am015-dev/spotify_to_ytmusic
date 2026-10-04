@@ -197,7 +197,7 @@ function promptText() {
     const nm = hotSeat() ? pname(v) + ', ' : '';
     if (UI.twin) return nm + 'Twin Sticks: pick two plates, then serve them.';
     if (UI.sel.length) return nm + (UI.prefs.tap2 ? 'Tap it again, or press Serve.' : isPh() ? 'Now press Serve.' : 'Press Serve to send it to your seat.');
-    if (tutStep()) return 'Take the glowing ' + TY[tutStep().take].name + '.';
+    if (tutStep()) return isPh() ? 'Take the glowing plate.' : 'Take the glowing ' + TY[tutStep().take].name + '.';
     return nm + 'pick a plate: tap it to lift it.';
   }
   return '';

@@ -648,7 +648,7 @@ function dualMiss(d){const seat=d.seat;const T=d.us.map(u=>findU(u));const owner
   G.stats.miss++;for(const x of T){for(const v of d.vals)if(!x.sl.not.includes(v))x.sl.not.push(v)}
   const boom=hookAny('missExplode',{seat,owner,d});if(boom&&!damper){explode(boom);return}
   let steps=conFlag(seat,'double')?2:1;steps+=hookAny('missExtra',{seat,owner,d})||0;
-  lg(`Miss: none of those is ${d.vals.map(VN).join(' or ')}.`,'bad');
+  lg(d.us.length===1?`Miss: that wire is not ${d.vals.map(VN).join(' or ')}.`:`Miss: none of those is ${d.vals.map(VN).join(' or ')}.`,'bad');
   const silent=conFlag(seat,'silent')||conFlag(owner,'silent');
   const nonRed=T.filter(x=>!isRed(x.sl.id));
   const fin=()=>{if(damper)lg('The Damper holds the fuse still.','good');else advance(steps,'missed cut',{miss:1});if(G.over)return;afterMiss({seat,v:d.v,kind:'dual'});if(!G.q&&!G.over)endAction();else if(!G.over)G.tfx.endAfterQ=1};

@@ -247,9 +247,8 @@ html.ph.ph-p .gx-app{grid-template-rows:calc(44px + env(safe-area-inset-top,0px)
 html.ph.ph-p .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) calc(var(--dockh) + env(safe-area-inset-bottom,0px))}
 html.ph.ph-p .gx-dock{max-height:none;height:auto}
 html.ph.ph-p #barprompt{display:block}
-/* portrait phones: a lesson or tip card grows up over the belt instead of squeezing its text into the dock */
-html.ph.ph-p .pcard[data-card=coach]{position:fixed;top:auto;bottom:0;max-height:min(78vh,calc(100% - 52px));z-index:30;border-radius:14px 14px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
-html.ph.ph-p .pcard[data-card=coach] .ph-body{flex:0 1 auto}
+/* portrait phones: while a lesson or tip card is up the dock grows (the table shrinks) so its text is never squeezed */
+html.ph.ph-p.kk-tip .gx-main{grid-template-rows:minmax(0,1fr) calc(min(58vh,380px) + env(safe-area-inset-bottom,0px))}
 html.ph.ph-p #prompt{font-size:13px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 html.ph.ph-p #promptDock,html.ph.ph-p #rt{display:none}
 html.ph.ph-p .gx-bar .gx-sp,html.ph.ph-p #barstat{display:none}
@@ -302,6 +301,8 @@ html.gx-reduce .hc.tut::after,html.gx-reduce .btn.tut{animation:none}
 .refbig{align-self:flex-start;min-height:44px;font-size:14px;padding:2px 12px}
 /* the kit's chips are 36 px tall; on phones every tap target is 44 px */
 html.ph .gx-chip{min-height:44px}
+/* the Menu's section chips keep their width and the row scrolls sideways (they shrank and overlapped at 390 px) */
+.gx-set-nav .gx-chip{flex:0 0 auto}
 .earned{background:#fff3c4;border:2px solid #e0a31c;border-radius:10px;padding:6px 10px;font-size:14px;text-align:center;margin:4px 0}
 /* ---- painted table (PixiJS canvas under the DOM buttons) ---- */
 #pxc{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;display:block}

@@ -601,6 +601,7 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=camp();const sav
   const onl=isHost(),nOnl=onl?Math.min(s.np,NET.peers.length||1):0;const seats=[];for(let i=0;i<s.np;i++)seats.push(`<div class="seat" style="--sc:${SEATC[i]}"><span class="dot"></span><span class="nm">${onl&&i<nOnl?`<b>${esc(netPlan(s).names&&netPlan(s).names[i]||'Player')}</b>`:`<input data-nm="${i}" value="${esc(s.names[i])}" aria-label="Name of seat ${i+1}" maxlength="14" style="width:7.5em;font:800 .9rem var(--fb);border:2px solid var(--ink);border-radius:8px;padding:3px 5px;background:#fff7e8">`}<select data-ch="${i}" aria-label="Crew card for seat ${i+1}"><option value="">Crew: random</option>${ok.map(id=>`<option value="${id}"${s.chars[i]===id?' selected':''}>${esc(CHARS[id].n)} (${esc(ITEMS[CHARS[id].item].n)})</option>`).join('')}</select></span>${onl?`<span class="tag${i<nOnl?' b':''}">${i<nOnl?ico('user')+'Online player':ico('robot')+'Computer'}</span>`:`<button class="btn small${s.seats[i]==='human'?' on':''}" data-a="seatkind" data-i="${i}">${s.seats[i]==='human'?ico('user')+'Human':ico('robot')+'Computer'}</button>`}</div>`);
   const nh=s.seats.slice(0,s.np).filter(x=>x==='human').length;
   // title -> setup; on narrow screens the mission board is its own full-screen view (UI.sv: 'title' | 'setup' | 'board')
+  if(NET.on&&(UI.sv||'title')==='title')UI.sv='setup';
   const narrow=startNarrow(),sv=UI.sv||'title';
   const head=`<div class="st-head">${sv!=='title'?`<button class="btn small sback" data-a="${sv==='board'&&narrow?'stsetup':'sttitle'}" aria-label="Back">${ico('back')}</button>`:''}<svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">${ICO.bomb}</svg><div><h1>Short Fuse</h1><p>A cartoon demolition crew defuses rigged charges together. 2-5 players, 66 jobs.</p></div><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back to the job</button>':''}</div>
   `;
@@ -628,7 +629,7 @@ function titleHTML(saved){const first=!lsGet('sf_guided_done',false)&&!Object.ke
   <div class="tbtns">${saved?b('resume',' go','play','Continue','Job '+saved.G.mission+', turn '+saved.G.turn):''}
   ${first?b('tutorial',saved?'':' go','info','Guided first game','Job 1 with a coach, one step at a time'):''}
   ${b('stplay',!saved&&!first?' go':'','map','Play','Pick a job: computer crew, hot-seat or watch')}
-  ${b('stonline','','user','Play online','With friends, free, peer to peer')}
+  <div class="tonl">${onlineBlock()}</div>
   ${first?'':b('tutorial','','info','Guided first game','Job 1 with a coach')}</div>
   <button class="tlink" data-a="strules">How to play</button></div></div>`}
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}

@@ -352,7 +352,7 @@ function promptText() {
     const nm = hotSeat() ? pname(v) + ', ' : '';
     if (UI.twin) return nm + 'Twin Sticks: pick two plates, then serve them.';
     if (UI.sel.length) return nm + (UI.prefs.tap2 ? 'Tap it again, or press Serve.' : isPh() ? 'Now press Serve.' : 'Press Serve to send it to your seat.');
-    if (tutStep()) return 'Take the glowing ' + TY[tutStep().take].name + '.';
+    if (tutStep()) return isPh() ? 'Take the glowing plate.' : 'Take the glowing ' + TY[tutStep().take].name + '.';
     return nm + 'pick a plate: tap it to lift it.';
   }
   return '';
@@ -687,6 +687,7 @@ function nextCard() { UI.cards.shift(); drawCard(); if (!UI.cards.length) { rend
 function drawCard() {
   const pc = $('#pc'); if (!pc) return;
   const c = UI.cards[0];
+  document.documentElement.classList.toggle('kk-tip', !!c && c.kind === 'coach');
   if (!c) { pc.hidden = true; pc.innerHTML = ''; pc.dataset.card = ''; return; }
   closePop(); pc.hidden = false; pc.innerHTML = ''; pc.dataset.card = c.kind;
   const bs = (c.buttons || [{ label: 'Got it', a: 'cont' }]).map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a }, b.label));

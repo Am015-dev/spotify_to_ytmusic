@@ -1,7 +1,7 @@
 // Random clicker for the PHONE layout (jsdom, ?phone=1, no WebGL -> the kit's 2D board): human seats play ONLY through the phone UI:
 // board tiles (the 2D board), the strip (#ps), the pop-up (#ppop) and the cards (#pc). Never the hidden dock.
 // node click-phone.js [from] [to]   -> one line per game, then TOTAL errors ; also checks hidden wires (2D board backs) and the strip rack owner.
-const {JSDOM,VirtualConsole}=require('../../node_modules/jsdom');const fs=require('fs');
+const {JSDOM,VirtualConsole}=(()=>{try{return require('../../node_modules/jsdom')}catch(e){return require('jsdom')}})();const fs=require('fs');
 const html=fs.readFileSync(__dirname+'/shortfuse.html','utf8');
 const CONF=[
  {name:'PHONE tutorial job1 solo',tut:1,anim:0},
@@ -30,7 +30,7 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
   w.addEventListener('load',()=>{try{w.eval(`AIDELAY=${cf.anim?15:0};ANIM=${cf.anim?1:0};UI.speed=${cf.anim?40:1};UI.tickRate=25;setSeed(${seed});setAiSeed(${seed})`);
     if(!w.eval('PX.on'))errs.push('phone layout not on');
     if(cf.tut){click(d.querySelector('[data-a=tutorial]'))}
-    else{click(d.querySelector(`[data-a=job][data-n="${cf.job}"]`));click(d.querySelector(`[data-a=np][data-v="${cf.np}"]`));click(d.querySelector(`[data-a=preset][data-v="${cf.seats}"]`));
+    else{click(d.querySelector('[data-a=stplay]'));{const cb=d.querySelector('[data-a=stboard]');if(cb)click(cb)}click(d.querySelector(`[data-a=job][data-n="${cf.job}"]`));click(d.querySelector(`[data-a=np][data-v="${cf.np}"]`));click(d.querySelector(`[data-a=preset][data-v="${cf.seats}"]`));
       if(cf.seats==='solo'&&R()<.5)click(d.querySelector('[data-a=lv][data-v=easy]'));
       click(d.querySelector('[data-a=start]'))}
     const s=w.eval('UI.lastSetup');if(!cf.tut&&(s.job!==cf.job||s.np!==cf.np))errs.push('setup clicks failed '+JSON.stringify([s.job,s.np]));go()}catch(e){errs.push('BOOT '+e.stack);res({cf,errs,seen})}});

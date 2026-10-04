@@ -4,6 +4,7 @@ function nextCard() { UI.cards.shift(); drawCard(); if (!UI.cards.length) { rend
 function drawCard() {
   const pc = $('#pc'); if (!pc) return;
   const c = UI.cards[0];
+  document.documentElement.classList.toggle('kk-tip', !!c && c.kind === 'coach');
   if (!c) { pc.hidden = true; pc.innerHTML = ''; pc.dataset.card = ''; return; }
   closePop(); pc.hidden = false; pc.innerHTML = ''; pc.dataset.card = c.kind;
   const bs = (c.buttons || [{ label: 'Got it', a: 'cont' }]).map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a }, b.label));
