@@ -163,6 +163,7 @@ function renderQ(p, legal, qb) {
   const opts = h('div.opts' + (legal.length > 3 ? '.g2' : ''));
   legal.forEach(m => opts.appendChild(moveBtn(m, p)));
   qb.append(opts);
+  if (typeof sugMark === 'function') sugMark(qb, p, q, legal);
 }
 function renderBar() {
   const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
