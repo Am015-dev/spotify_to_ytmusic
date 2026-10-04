@@ -192,10 +192,15 @@ function renderDock() {
   // roadmap
   const rt = $('#rt'); if (rt) { rt.innerHTML = ''; const n = D.rounds - G.row0; for (let i = 0; i < n; i++) rt.appendChild(h('span.rd' + (i === G.round ? '.cur' : (i < G.round ? '.done' : '')), { 'aria-label': 'Round ' + (i + 1) }, String(i + 1))); rt.appendChild(h('span', G.phase === 'brief' ? 'Briefing' : G.result ? 'Done' : 'Placing dice')); }
   // briefing phrases
-  const sy = $('#says'); if (sy) { sy.innerHTML = ''; if (G.phase === 'brief') {
-    if (isPh() && document.documentElement.classList.contains('ph-p')) sy.appendChild(h('p.srule', 'After the roll: silence. Your placed dice do the talking.'));
+  const sy = $('#says'); if (sy) { sy.innerHTML = ''; if (G.phase !== 'brief') UI.sayAll = false; if (G.phase === 'brief') {
+    if (isPh() && document.documentElement.classList.contains('ph-p')) sy.appendChild(h('p.srule', 'After the roll: silence. Your placed dice do the talking.' + (G.ai[1 - (typeof v === 'number' && v >= 0 ? v : 0)] ? ' ' + name(1 - (typeof v === 'number' && v >= 0 ? v : 0)) + ' (computer) goes by the panel, not by phrases.' : '')));
     for (const s of [0, 1]) for (const c of G.say[s]) sy.appendChild(h('span.sbub.' + (s ? 'c' : 'p'), (who(s) === 'You' ? 'You said' : name(s) + ' says') + ': “' + SAYT[c] + '”'));   // what was said first, so a tapped phrase never just vanishes
-    if (typeof v === 'number' && v >= 0 && mayAct(v)) { const mv = FA.validMoves(G, v); for (const m of mv) if (m.t === 'say') sy.appendChild(h('button.say', { type: 'button', 'data-a': 'say', 'data-c': m.c }, SAYT[m.c])); } } }
+    // the phrases that fit this round first (the same advice the computer crew would give), at most four unless "More phrases" is open
+    if (typeof v === 'number' && v >= 0 && mayAct(v)) { const mv = FA.validMoves(G, v).filter(m => m.t === 'say').map(m => m.c); let top = []; try { top = FA.AI.say(G, v).filter(c => mv.includes(c)); } catch (e) { }
+      const all = top.concat(mv.filter(c => !top.includes(c))), show = UI.sayAll ? all : all.slice(0, isPh() ? 3 : 4);
+      for (const c of show) sy.appendChild(h('button.say' + (top.includes(c) ? '.rec' : ''), { type: 'button', 'data-a': 'say', 'data-c': c }, SAYT[c]));
+      if (all.length > show.length) sy.appendChild(h('button.say.more', { type: 'button', 'data-a': 'saymore' }, 'More phrases…'));
+    } } }
   // roster (+ the landing checklist button on phones)
   const ro = $('#roster'); if (ro) { ro.innerHTML = ''; for (const s of [0, 1]) { const st = G.result ? (G.result.win ? 'landed' : 'flight over') : G.phase === 'brief' ? (G.ready[s] ? 'ready' : 'briefing') : (FA.pending(G).includes(s) ? 'deciding' : 'waiting'); ro.appendChild(h('div.chip.' + (s ? 'c' : 'p') + (v === s ? '.me' : '') + (st === 'deciding' || st === 'briefing' ? '.wt' : '') + (st === 'ready' ? '.rdy' : ''), h('span.cav', ART['crew-' + s] ? h('img', { src: ART['crew-' + s], alt: '' }) : ''), h('span.ct', h('b', name(s)), h('i', pname(s) + (G.ai[s] ? ' (computer)' : '') + ' · ' + FA.unusedDice(G, s).length + ' dice · ' + st)))); }
   }
@@ -251,16 +256,25 @@ function goalEl() {
   const size = trackOf().sp.length, pos = G.pl.pos, left = FA.planesOnTrack(G), ax = G.pl.axis, bv = FA.brakeVal(G), last = D.rounds - G.row0;
   const gs = G.pl.sw.lg.reduce((a, x) => a + x, 0), fs = G.pl.sw.fl.reduce((a, x) => a + x, 0), fin = FA.isFinal(G);
   const moves = last - 1 - G.round - (G.slots.en0 && G.slots.en1 ? 1 : 0);   // rounds in which the engines can still move the plane (not the landing round)
-  const route = fin ? 'Landing round: the plane stays, speed must be ≤ brakes' : pos >= size ? 'At the airport: hold (keep the engine sum ≤ ' + G.pl.aeroB + ')' : 'Airport ' + (size - pos) + ' space' + (size - pos > 1 ? 's' : '') + ' ahead · ' + Math.max(0, moves) + ' more move' + (moves === 1 ? '' : 's') + ' to get there';
+  const need = size - pos, route = fin ? 'Landing now: the plane stays put, speed must be ≤ brakes' : pos >= size ? 'At the airport: hold here (engine sum ≤ ' + G.pl.aeroB + ') until round ' + last : need + ' space' + (need > 1 ? 's' : '') + ' to the airport, ' + Math.max(0, moves) + ' round' + (moves === 1 ? '' : 's') + ' left to fly there' + (need > 2 * Math.max(0, moves) ? ' (too far!)' : need > Math.max(0, moves) ? ' (some 2-space moves needed)' : '');
   const c = (ok, t, warn) => h('span.c' + (ok ? '.ok' : warn ? '.bad' : ''), t + (ok ? ' ✓' : ''));
   const chips = [c(left === 0, left === 0 ? 'No planes' : left + ' plane' + (left > 1 ? 's' : '') + ' to clear'), c(gs === 3, 'Gear ' + gs + '/3'), c(fs === 4, 'Flaps ' + fs + '/4'),
     c(ax === 0, ax === 0 ? 'Level' : 'Tilt ' + Math.abs(ax) + (ax < 0 ? ' left' : ' right') + ' (3 = spin)', Math.abs(ax) >= 2), c(false, 'Brakes ' + bv, fin && bv < 2)];
   if (G.mods.intern) chips.push(c(G.intern.length === 0, 'Trainee ' + (6 - G.intern.length) + '/6')); if (G.mods.ice) chips.push(c(G.pl.ice === 4, 'Ice ' + G.pl.ice + '/4'));
   if (G.mods.fuel || G.mods.leak) chips.push(c(false, 'Fuel ' + G.pl.kero, G.pl.kero < 8));
   // the one trap that kills most new crews: a plane on your own space when the engines are about to move you
-  const here = !fin && pos <= size && G.planes[pos - 1] > 0 && !(G.slots.en0 && G.slots.en1) && G.phase !== 'brief' ? 'A plane is on your space: radio it away (a 1 on a Radio) before both engine dice are down, or keep the engine sum ≤ ' + G.pl.aeroB + ' so you stay put.' : '';
-  return h('button.goalb' + (UI.ckOpen ? '.on' : ''), { type: 'button', 'data-a': 'ckopen', 'aria-expanded': UI.ckOpen ? 'true' : 'false', 'aria-label': 'Goal: ' + route + '. To land at the end of round ' + last + ': ' + chips.map(x => x.textContent).join(', ') + '. Tap for the full checklist.' },
-    h('span.gr', h('b', 'Land in round ' + last + ' · '), route), h('span.gc', ...chips), here ? h('span.dg', '⚠ ' + here) : null);
+  const here = !fin && pos <= size && G.planes[pos - 1] > 0 && !(G.slots.en0 && G.slots.en1) ? 'A plane is on your space: radio it away (a 1 on a Radio) before both engine dice are down, or keep the engine sum ≤ ' + G.pl.aeroB + ' so you stay put.' : '';
+  const late = behind();
+  return h('button.goalb' + (UI.ckOpen ? '.on' : ''), { type: 'button', 'data-a': 'ckopen', 'aria-expanded': UI.ckOpen ? 'true' : 'false', 'aria-label': 'Goal: be on the airport when round ' + last + ' starts. ' + route + '. To land at the end of round ' + last + ': ' + chips.map(x => x.textContent).join(', ') + '. Tap for the full checklist.' },
+    h('span.gr', h('b', fin ? 'Round ' + last + ' · ' : 'Be at the airport by round ' + last + ' · '), route), h('span.gc', ...chips), here || late ? h('span.dg', '⚠ ' + (here || late)) : null);
+}
+// gear / flaps that can no longer wait: each needs its own die, gear and flaps take only certain values, flaps strictly in order
+function behind() {
+  if (G.result || FA.isFinal(G)) return ''; const rl = D.rounds - G.row0 - G.round, fl = G.pl.sw.fl.indexOf(0), gl = G.pl.sw.lg.filter(x => !x).length, fLeft = fl < 0 ? 0 : 4 - fl;
+  const FV = ['1-2', '2-3', '4-5', '5-6'], out = [];
+  if (fLeft && fLeft >= rl - 1) out.push('Flaps ' + (4 - fLeft) + '/4 with ' + rl + ' rounds left: ' + (UI.seat === 1 && UI.mode !== 'hot' ? 'you need' : name(1) + ' needs') + ' a ' + FV[fl] + ' for the next flap (they go in order). Coffee tokens can bend a die into range.');
+  if (gl && gl >= rl - 1) out.push('Gear ' + (3 - gl) + '/3 with ' + rl + ' rounds left: ' + (UI.seat === 0 && UI.mode !== 'hot' ? 'you need' : name(0) + ' needs') + ' the missing gear values (1-2, 3-4, 5-6).');
+  return out.join(' ');
 }
 // placing this die here ends the flight at once (collision, overshoot, spin, too fast, missing Axis/Engines): try it on a copy of the public state
 function lossIf(v, m) {
@@ -280,7 +294,7 @@ function effectLine(v, val) {
   if (last && !G.slots['en' + v]) { const bv = FA.brakeVal(G), wm = FA.windMod(G); parts.push('Landing speed: ' + val + (en ? ' + ' + en.v + (wm ? ' + wind ' + wm : '') + ' = ' + (val + en.v + wm) + (val + en.v + wm <= bv ? ', within' : ', above') + ' the brakes ' + bv : ' + ?' + (wm ? ' + wind ' + wm : '') + ' must be no more than the brakes ' + bv)); }
   else if (!G.slots['en' + v]) { const sm = en ? val + en.v + FA.windMod(G) : 0, adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2;
     parts.push('Engines: ' + val + (en ? ' + ' + en.v + ' = ' + sm + (FA.windMod(G) ? ' with wind' : '') + ': the plane ' + (adv ? 'moves ' + adv + ' space' + (adv > 1 ? 's' : '') + ' right away' : 'stays put') : ' + ' + name(o) + '’s die: up to ' + G.pl.aeroB + ' stays, up to ' + G.pl.aeroO + ' moves 1, more moves 2')); }
-  if (legalHas(v, val, 'radio')) { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0, air = at === G.planes.length; parts.push('Radio: a ' + val + ' reaches ' + (val === 1 ? 'your own space' : (val - 1) + ' ahead, ' + (air ? 'the airport' : 'space ' + at)) + (n ? ': clears a plane' : ': no plane there')); }
+  if (legalHas(v, val, 'radio')) { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0, air = at === G.planes.length; parts.push('Radio: a ' + val + ' reaches ' + (val === 1 ? 'your own space' : (val - 1) + ' ahead, ' + (air ? 'the airport' : 'space ' + at)) + (n ? ': clears a plane' : ': no plane there') + (!(G.slots.en0 && G.slots.en1) && !FA.isFinal(G) ? ' (counted from where the plane is now; the engines may move it later)' : '')); }
   for (const g of ['gear', 'flaps', 'brakes']) { const sw = G.pl.sw[g === 'gear' ? 'lg' : g === 'flaps' ? 'fl' : 'br'], k = legalKeys(v, val).find(k => FA.SLOT[k].grp === g); if (k && sw[FA.SLOT[k].ix]) parts.push(SLOTG[g] + ' ' + (FA.SLOT[k].ix + 1) + ' is already done: a die there changes nothing'); }
   if (!G.slots['ax' + v] && ax) { const nx = G.pl.axis + (v === 0 ? ax.v - val : val - ax.v); parts.push('Axis: ' + val + ' against ' + ax.v + (nx === G.pl.axis ? ' keeps it' : ' makes it ' + (nx === 0 ? 'level' : Math.abs(nx) + (nx < 0 ? ' left' : ' right'))) + (Math.abs(nx) >= 3 ? ' (spin!)' : '')); }
   return parts.join(' · ');
@@ -299,7 +313,7 @@ function actions(v) {
   if (G.pend) return f;
   const selD = typeof UI.sel === 'number' && UI.sel >= 0;
   // free actions (any time, also on the partner's turn)
-  if (has('rr').length) b('Reroll (' + G.rrHand + ')', 'rr', 'alt', { title: 'Spend a reroll token: both crew may reroll any unplaced dice once' });
+  if (has('rr').length) b(UI.rrAsk ? 'Spend 1 of ' + G.rrHand + ' rerolls?' : 'Reroll (' + G.rrHand + ')', 'rr', UI.rrAsk ? 'go' : 'alt', { title: 'Spend a reroll token: both crew may reroll any unplaced dice once' });
   if (has('adapt').length && selD) b('Flip this die', 'adapt', 'alt');
   if (has('wt').length && selD) b('Hand-over with this die', 'wt', 'alt');
   if (G.turn !== v) return f;

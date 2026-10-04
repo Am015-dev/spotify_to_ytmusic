@@ -86,7 +86,8 @@ function doAction(a, t) {
   switch (a) {
     case 'ready': sendMove(v, { t: 'ready' }); break;
     case 'say': sendMove(v, { t: 'say', c: t.dataset.c }); break;
-    case 'rr': sendMove(v, { t: 'rr' }); break;
+    case 'rr': if (!UI.rrAsk) { UI.rrAsk = true; render(); toast('A reroll token lets both of you reroll any unplaced dice once. Tap again to spend it.'); clearTimeout(UI.rrAskT); UI.rrAskT = setTimeout(() => { UI.rrAsk = false; if (G && UI.started) render(); }, 5000); break; }
+      UI.rrAsk = false; sendMove(v, { t: 'rr' }); break;
     case 'rrpick': sendMove(v, { t: 'rrpick', m: UI.rrm.slice() }); break;
     case 'antic': case 'adapt': case 'wt': case 'toss': if (typeof UI.sel === 'number' && UI.sel >= 0) sendMove(v, { t: a, d: UI.sel }); break;
     case 'cof': UI.cof = +t.dataset.c; render(); break;

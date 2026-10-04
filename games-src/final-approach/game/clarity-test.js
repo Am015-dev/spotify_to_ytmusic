@@ -4,7 +4,7 @@
 //  deadly   a die that would end the flight at once (collision) is marked and the first tap only warns
 //  coffee   the coffee + button does not move after a press (the second + landed on -)
 //  recap    the round summary has a real close button
-//  tipsoff  "No more tips" survives "Fly again" in the guided flight
+//  tipsoff  "No more tips" survives "Fly again" after the guided flight (which then becomes a normal flight with new dice)
 //  rrwho    when the crewmate spends a reroll token, the prompt says who did it and what to do
 //  hint     the Hint reason is visible on screen (it was pushed below the fold)
 const PW = (() => { try { return require('playwright'); } catch (e) { return require(process.env.PW || (require('child_process').execSync('npm root -g').toString().trim() + '/playwright')); } })();
@@ -63,8 +63,20 @@ const [W, H] = (process.argv[2] || '390x763').split('x').map(Number);
   // tipsoff: guided flight, "No more tips", then "Fly again"
   { const r = await p.evaluate(() => { UI.prefs.guide = 'full'; newGame('guided'); clearTimeout(UI.tm); const off = document.querySelector('#pc [data-a=tipoff]'); if (!off) return { off: false }; off.click();
       const a = document.createElement('button'); a.dataset.a = 'again'; document.body.appendChild(a); a.click(); a.remove(); clearTimeout(UI.tm); return { off: true, mode: UI.mode, level: UI.coach.level, tip: !document.querySelector('#pc').hidden }; });
-    if (!r.off || r.level !== 'off' || r.tip) fail('tipsoff', JSON.stringify(r)); else ok('tipsoff'); }
+    if (!r.off || r.level !== 'off' || r.tip || r.mode !== 'vs') fail('tipsoff', JSON.stringify(r)); else ok('tipsoff'); }
 
+  // deadline: the goal names the real deadline (on the airport when the last round starts), not "land in round 7"
+  await fresh();
+  { const t = await p.evaluate(() => document.querySelector('#goal').innerText); if (!/airport by round 7/i.test(t) || /Land in round/.test(t)) fail('deadline', t); else ok('deadline'); }
+  // rr2tap: the Reroll button explains first and spends on the second tap
+  await fresh();
+  { const r = await p.evaluate(() => { G.rrHand = 1; render(); const b = () => document.querySelector('#acts [data-a=rr]'); b().click(); const after1 = G.rrHand; b().click(); return { after1, after2: G.rrHand }; });
+    if (r.after1 !== 1 || r.after2 !== 0) fail('rr2tap', JSON.stringify(r)); else ok('rr2tap'); }
+  // phrases: during the briefing every phrase button is on screen and tappable (they were under the Roll bar)
+  { const r = await p.evaluate(() => { UI.prefs.story = false; newGame('vs', { scenario: 'g1', role: 0, level: 'normal' }); clearTimeout(UI.tm); G.ai = [null, 'normal']; render();
+      const bs = [...document.querySelectorAll('#says button')]; return { n: bs.length, off: bs.filter(b => { const q = b.getBoundingClientRect(), t = document.elementFromPoint(q.left + q.width / 2, q.top + q.height / 2); return q.bottom > innerHeight || !(t === b || b.contains(t)); }).map(b => b.innerText) }; });
+    await p.screenshot({ path: path.join(OUT, `${W}x${H}_brief.png`) });
+    if (!r.n || r.n > 5 || r.off.length) fail('phrases', JSON.stringify(r)); else ok('phrases'); }
   if (errs.length) fail('page errors', errs.slice(0, 3).join(' | '));
   console.log('PROBLEMS', bad); await b.close(); process.exit(bad ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });
