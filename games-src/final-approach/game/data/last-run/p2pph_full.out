@@ -1,7 +1,7 @@
 host {"avail":true,"trystero":"object"}
-lobby after 2099 ms host sees ["Hosty","Friend1"]
-layout mid-start host {"bad":[],"w":390,"vw":390,"h":844,"vh":844,"txt":"Room SNGTZ · 2 crew online2"} ok
-layout mid-start guest {"bad":[],"w":390,"vw":390,"h":844,"vh":844,"txt":"Room SNGTZ · 2 crew online2"} ok
-{"tag":"flight 1","host":{"over":true,"win":false,"why":"speed","round":6,"logN":123,"seat":0,"shown":true},"guests":[{"seat":1,"over":true}],"agree":true,"exactStrip":true,"finalCardEverywhere":true,"stats":{"remote":40,"rejected":12,"inv":0},"nErrors":0,"errors":[],"clicks":95,"remoteClicks":55,"checks":28,"viol":[],"secs":82}
-{"tag":"flight 2 (Play again)","host":{"over":true,"win":false,"why":"checks","round":6,"logN":122,"seat":0,"shown":true},"guests":[{"seat":1,"over":true}],"agree":true,"exactStrip":true,"finalCardEverywhere":true,"stats":{"remote":80,"rejected":27,"inv":0},"nErrors":0,"errors":[],"clicks":103,"remoteClicks":60,"checks":28,"viol":[],"secs":66}
+lobby after 1822 ms host sees ["Hosty","Friend1"]
+layout mid-start host {"bad":[],"w":390,"vw":390,"h":844,"vh":844,"txt":"Room XRJY4 · 2 crew online2"} ok
+layout mid-start guest {"bad":[],"w":390,"vw":390,"h":844,"vh":844,"txt":"Room XRJY4 · 2 crew online2"} ok
+{"tag":"flight 1","host":{"over":true,"win":true,"why":"landed","round":6,"logN":123,"seat":0,"shown":true},"guests":[{"seat":1,"over":true}],"agree":true,"exactStrip":true,"finalCardEverywhere":true,"stats":{"remote":39,"rejected":21,"inv":0},"nErrors":0,"errors":[],"clicks":100,"remoteClicks":61,"checks":28,"viol":[],"secs":38}
+{"tag":"flight 2 (Play again)","host":{"over":true,"win":false,"why":"spin","round":6,"logN":124,"seat":0,"shown":true},"guests":[{"seat":1,"over":true}],"agree":true,"exactStrip":true,"finalCardEverywhere":true,"stats":{"remote":77,"rejected":40,"inv":0},"nErrors":0,"errors":[],"clicks":102,"remoteClicks":59,"checks":28,"viol":[],"secs":39}
 SUMMARY full phone 2 runs, 0 bad

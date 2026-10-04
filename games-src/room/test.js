@@ -159,7 +159,7 @@ for(const [w,h] of VPS)for(const scheme of ['light','dark']){
   ok((await p.evaluate(()=>document.getElementById('frame').src)).endsWith('doorkick-dungeon/index.html'),tag+' list play');
   await backFromGame(p);
   await p.click('#viewbtn');await p.waitForTimeout(200);
-  ok(await p.locator('.boxbtn').count()===12,tag+' back to room');
+  ok(await p.locator('.boxbtn').count()===BOARD.length,tag+' back to room');
   ok(p.errs.length===0,`${tag} page errors ${p.errs}`);
   await c.close();
 }

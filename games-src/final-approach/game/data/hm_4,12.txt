@@ -1,2 +1,0 @@
-hard g2 green Foxmere                         11/20  55% avg rounds 7.0 {"spin":2,"speed":1,"checks:flaps":3,"checks:flaps+axis":1,"checks:gear":1,"checks:planes+gear":1} 24104ms/game
-hard g3 green Seabright Bay                   11/20  55% avg rounds 7.0 {"mandatory":2,"checks:gear+flaps":2,"speed":1,"collision":1,"checks:flaps":1,"spin":1,"checks:flaps+axis":1} 25055ms/game

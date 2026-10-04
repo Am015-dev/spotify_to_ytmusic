@@ -1,5 +1,5 @@
 host {"avail":true,"trystero":"object"}
-lobby after 2139 ms host sees ["Hosty","Friend1"]
-layout touch guest {"bad":[],"w":390,"vw":390,"h":844,"vh":844,"txt":"Room 5PV7X · 2 crew online2"} ok
+lobby after 1812 ms host sees ["Hosty","Friend1"]
+layout touch guest {"bad":[],"w":390,"vw":390,"h":844,"vh":844,"txt":"Room HMB5T · 2 crew online2"} ok
 TOUCH {"badge":[44,44],"lobbyOpen":true,"xSize":[44,44],"lobbyClosed":true,"touchMoves":6,"hostRemote":8,"probs":[]}
 SUMMARY touch phone 1 runs, 0 bad

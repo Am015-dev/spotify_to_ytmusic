@@ -150,6 +150,7 @@ s = sub1(r"^const BAYS=.*;$", lambda m: 'const BAYS=' + BAYS + ';', s, 'BAYS', r
 n_games = len(re.findall(r"^  \{id:'", s[s.index('const GAMES=['):s.index('/* box look')], re.M))
 s = sub1(r'(<span class="tally" id="tally">)\d+( games on the shelf</span>)', lambda m: '%s%d%s' % (m.group(1), n_games, m.group(2)), s, 'tally text')
 # phone shelf: boxes per row. 2 per row at 390 px left a lone box on the last row with 15 games; widen by one box when that makes every row full.
+s = s.replace('html.ph .f.left b,html.ph .f.bot b{font-size:13px}', 'html.ph .f.left b,html.ph .f.bot b{font-size:13px!important}')   # inline em sizes shrank below 13px with 3 boxes per row
 if 'function phPer(' not in s:
     s = sub1(r"function renderRoom\(ph\)\{", lambda m: "/* phone shelf: boxes per row (2 under 400 px, 3 under 620, else 4), widened by one when that makes every row full: 15 games = 3 / 3 / 3 / 3 / 3 at 390 px, not 7 pairs and a lone box */\n"
              "function phPer(n){const w=innerWidth,p=w<400?2:w<620?3:4;return n%p===0?p:n%(p+1)===0?p+1:p}\n" + m.group(0), s, 'renderRoom')
@@ -202,16 +203,19 @@ say('reference.html: tabs ' + ', '.join(g[1] for g in data['G']))
 
 # ---------------------------------------------------------------- 8. tests (games-src)
 p = os.path.join(HERE, 'test.js'); s = rd(p)
-if 'GAMES_DIR' not in s:
-    s = s.replace("const URL='file:///home/user/spotify_to_ytmusic/games/index.html';",
-                  "const GAMES_DIR=process.env.GAMES_DIR||'/home/user/spotify_to_ytmusic/games',SHOTS=process.env.SHOTS||'shots';   // GAMES_DIR=<copy of games/> tests a copy\nconst URL='file://'+GAMES_DIR+'/index.html',SHELF_PATH=GAMES_DIR+'/index.html';")
-    s = s.replace("'**/games/*/index.html'", "u=>/\\/[^\\/]+\\/index\\.html$/.test(u.pathname)&&u.pathname!==SHELF_PATH")   # any <slug>/index.html, wherever the folder is
-    s = s.replace("`shots/", "`${SHOTS}/").replace("'shots/", "SHOTS+'/")
-    s = s.replace("readFileSync('/home/user/spotify_to_ytmusic/games/index.html','utf8')", "readFileSync(GAMES_DIR+'/index.html','utf8')")
-    s = s.replace("==='14 games on the shelf'", "===GAMES.length+' games on the shelf'")
-    s = s.replace(".count()===12,tag+' 12 boxes (board games only)'", ".count()===BOARD.length,tag+' '+BOARD.length+' boxes (board games only)'")
-    s = s.replace("#listview li').count()===14", "#listview li').count()===GAMES.length")
-    s = s.replace("[['Board games',12],['Video games',2]]", "[['Board games',BOARD.length],['Video games',GAMES.length-BOARD.length]]")
+# every replacement below is a no-op when it was already applied, so this block is safe to repeat
+s = s.replace("const URL='file:///home/user/spotify_to_ytmusic/games/index.html';",
+              "const GAMES_DIR=process.env.GAMES_DIR||'/home/user/spotify_to_ytmusic/games',SHOTS=process.env.SHOTS||'shots';   // GAMES_DIR=<copy of games/> tests a copy\nconst URL='file://'+GAMES_DIR+'/index.html';")
+s = s.replace("const URL='file://'+GAMES_DIR+'/index.html';", "const URL='file://'+GAMES_DIR+'/index.html',SHELF_PATH=GAMES_DIR+'/index.html';")
+s = s.replace("'**/games/*/index.html'", "u=>/\\/[^\\/]+\\/index\\.html$/.test(u.pathname)&&u.pathname!==SHELF_PATH")   # any <slug>/index.html, wherever the folder is
+s = s.replace("`shots/", "`${SHOTS}/").replace("'shots/", "SHOTS+'/")
+s = s.replace("readFileSync('/home/user/spotify_to_ytmusic/games/index.html','utf8')", "readFileSync(GAMES_DIR+'/index.html','utf8')")
+s = s.replace("==='14 games on the shelf'", "===GAMES.length+' games on the shelf'")
+s = s.replace(".count()===12,tag+' 12 boxes (board games only)'", ".count()===BOARD.length,tag+' '+BOARD.length+' boxes (board games only)'")
+s = s.replace(".count()===12,tag+' back to room'", ".count()===BOARD.length,tag+' back to room'")
+s = s.replace("#listview li').count()===14", "#listview li').count()===GAMES.length")
+s = s.replace("[['Board games',12],['Video games',2]]", "[['Board games',BOARD.length],['Video games',GAMES.length-BOARD.length]]")
+s = s.replace('u.pathname!==new URL(URL).pathname', 'u.pathname!==SHELF_PATH')   # an earlier version of this script
 s = re.sub(r"\['(?:%s)','[a-z-]+/index\.html'\]," % ID_RE, '', s)
 s = sub1(r"\['kaiten','kaiten-kitchen/index\.html'\],", lambda m: m.group(0) + ''.join("['%s','%s/index.html']," % (g['id'], g['slug']) for g in GAMES), s, 'kaiten in test GAMES')
 if "'The Crew'" not in s:   # names of the originals must never reach the shelf

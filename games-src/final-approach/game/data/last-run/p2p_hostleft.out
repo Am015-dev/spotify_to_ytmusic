@@ -1,5 +1,5 @@
 host {"avail":true,"trystero":"object"}
-lobby after 1818 ms host sees ["Hosty","Friend1"]
-{"tag":"host leaves","msg":"The host left. The flight is over.","vis":{"modal":true,"text":"×Online flightInvite code: dqnimCopy linkYour friend opens the link, or taps Play online and types the code. Nobody can see the other crew member’s dice.The host left. The flight is over.Back to the s"},"agree":true,"errors":[],"nErrors":0}
+lobby after 1824 ms host sees ["Hosty","Friend1"]
+{"tag":"host leaves","msg":"The host left. The flight is over.","vis":{"modal":true,"text":"×Online flightInvite code: ezjztCopy linkYour friend opens the link, or taps Play online and types the code. Nobody can see the other crew member’s dice.The host left. The flight is over.Back to the s"},"agree":true,"errors":[],"nErrors":0}
 after leave {"on":false,"start":true}
 SUMMARY hostleft desktop 1 runs, 0 bad
