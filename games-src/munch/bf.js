@@ -171,7 +171,7 @@ function bfEnd(e,cancel){const D=BF.drag;BF.down=null;if(!D)return;BF.drag=null;
   if(z){const r=g.getBoundingClientRect();g.remove();document.querySelectorAll('.bf-lift').forEach(x=>x.classList.remove('bf-lift'));bfDrop(D.id,z,r)}
   else{const src=document.querySelector(`.mine [data-card="${D.id}"]`);const r=src&&src.getBoundingClientRect();
     if(r&&BF.motion()){const a=g.animate([{transform:g.style.transform},{transform:`translate(${r.left}px,${r.top}px) scale(1)`}],{duration:220,easing:'ease-out'});a.onfinish=()=>g.remove()}else g.remove();
-    document.querySelectorAll('.bf-lift').forEach(x=>x.classList.remove('bf-lift'));bfMark()}}
+    document.querySelectorAll('.bf-lift').forEach(x=>x.classList.remove('bf-lift'));bfMark();if(!cancel){bfSay('Not there: drop it on a glow');const l=document.querySelector('#prompt .bfline');if(l&&BF.motion())l.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:240,iterations:2})}}}
 document.addEventListener('pointerup',e=>bfEnd(e,false));document.addEventListener('pointercancel',e=>bfEnd(e,true));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(BF.pick!=null||BF.ask)){BF.pick=null;BF.ask=null;bfMark()}});
 
