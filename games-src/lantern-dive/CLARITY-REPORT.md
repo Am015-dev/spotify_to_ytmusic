@@ -123,5 +123,4 @@ Fixed after round 2, but **not re-tested blind**:
 
 ## Tests (final run)
 
-See the commit message for the numbers from the final full run: rules, clarity, hidden, net-strip, click (both
-modes), px, lay at 4 desktop sizes, lay-phone at 7 sizes, and p2p.
+Final full run (after the round-2 fixes): rules 99/99, clarity 7/7, hidden-test 0 leaks (30 games, 201 checks), net-strip 0 problems (2690 views), click 18 games 0 errors 0 stalls (instant and animated), px-test 0 problems, lay (4 desktop sizes) 0 problems, lay-phone (all 7 sizes) 0 problems, p2p-ld full desktop and phone 0 bad.
