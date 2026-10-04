@@ -17,7 +17,7 @@ Note: the devkit base.html is now "live v82" (v81 + ownerbugs + cityvar + juice 
 | tools/tBF.js | 9/1 (BF3, known harmless) |
 | tDR.js (od-drive) | 19/0 |
 | tOG.js (otg2) | 43/0 |
-| tOB.js (ownerbugs) | first run 57/3 → test fix, rerun: PENDING |
+| tOB.js (ownerbugs) | 59/0 (after the test fix below; first run 57/3) |
 
 tOB: the stud-trail phantom bursts are gone (pRL2). The 3 remaining "uncaused" bursts were otg2's real events, `OG_pick` (collectible pickup, ≤ 5 m) and `OG_boom` (driving through an event gate, ≤ 3 m). tOB predates otg2, so both are now listed as real causes in tOB.js.
 
