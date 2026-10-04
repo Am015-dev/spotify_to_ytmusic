@@ -586,7 +586,7 @@ function buildRules() {
     'Spend rubies if you like, then the next day begins. Everything you drew goes back in your bag together with what you bought.'])));
   sec('Brewing and explosions', h('p', 'The white chips (Fizzpods) are dangerous. If the white numbers in your cauldron add up to more than 7, the cauldron explodes. The last chip stays, you must stop, and you must choose later: take the victory points of your space or shop with its coins, not both. Only white chips count towards the limit.'),
     h('p', 'Your flask can put the last white chip back into the bag (not the chip that exploded you), once per day. It stays empty until you refill it with 2 rubies.'),
-    h('p', 'In the last day everybody reveals draw or stop together. You can also draw at the same moment on every other day: the computers draw while you think.'));
+    h('p', 'In the last day everybody secretly chooses Draw or Stop, and all choices are revealed together (Stir!). You can also draw at the same moment on every other day: the computers draw while you think.'));
   sec('The spiral', h('p', 'Your scoring space is the one right after your last chip. It shows coins (the big number, for shopping), victory points (the small brown number) and sometimes a ruby. Reach the last space and you get the spoon: 15 points and 35 coins.'));
   sec('Counting the day', h('ol', ...li([
     'Bonus die: of the cauldrons that did not explode, the one on the highest coin number rolls (if several spaces show the same number the farther one wins; exactly equal spaces all roll). It gives 1 or 2 points, a ruby, a droplet step or a Marrow chip.',

@@ -21,6 +21,7 @@ let checks = 0, viewDiff = 0, moveDiff = 0, aiDiff = 0, leaks = 0, selfDiff = 0,
 const leakCheck = (V, G, seat) => {
   const e = [];
   V.players.forEach((p, i) => { if (i !== seat) { if (p.bag.some(x => x !== 0)) e.push('bag of seat ' + i + ' visible'); if (p.hold.some(x => x !== 0)) e.push('held chips of ' + i + ' visible'); } else if (p.bag.some(x => typeof x !== 'object')) e.push('own bag hidden'); });
+  if (V.players.some(p => p.h9 !== undefined)) e.push('day-9 choice visible');
   if (V.fdeck.length) e.push('fortune deck visible');
   if (V.rng !== 0 || V.seed !== 0 || V.players.some(p => p.rng !== 0)) e.push('seed visible');
   return e;

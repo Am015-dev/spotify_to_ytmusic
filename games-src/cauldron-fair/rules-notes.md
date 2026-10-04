@@ -179,19 +179,19 @@ tie-break by furthest in the last round, fortune cards as described by the fan t
 effects match what I remember of the box).
 
 **Guessed or interpreted** (all are single constants or small functions in the engine, listed in the report):
-1. Bonus die faces: the rules list five outcomes for six faces. We use 1 VP, 2 VP, ruby, ruby, droplet, orange.
+1. Bonus die faces: the rules list five outcomes for six faces. We use 1 VP, 1 VP, 2 VP, ruby, droplet, orange (the fan tool's reading: the repeated face is 1 VP). Unverified; check against the physical die.
 2. Rat tails beyond the picture (after space 27): assumed to continue after every even number.
 3. Rat stone: always moved the full distance (the rules say "can"). An optional "fewer" stepper exists before the
    first draw.
 4. A player must draw at least one chip before stopping.
 5. Left neighbour = the next seat clockwise (also used for "Spilled Brew").
-6. "Any 2-chip / any 4-chip / any 1-chip" fortune picks exclude white; only colours whose book is out are offered.
+6. "Any 2-chip / any 4-chip / any 1-chip" fortune picks exclude white; only colours whose book is out are offered. Haggler's Hour only upgrades coloured chips; with none it gives a Mossback 1 (also at 2 or 3 players, where white 2s are in the supply).
 7. Twice Rolled: both die results count (the text only says "roll it twice").
 8. Limit changes add up: Thick Skin (9) plus Sunroot set 3 (+1 or +2).
 9. Yellow set 2 doubles the printed number, extra spaces from other powers are added after doubling.
 10. Cinder Moth needs at least one black chip in your cauldron to count as "more or equal".
-11. Do-Over is offered only right after the 5th chip (also after an explosion on it); Frothing Pot only right after
-    the first white chip.
+11. Do-Over is offered only right after the 5th chip and NOT when that chip explodes (fixed after the audit); Frothing Pot only
+    right after the first white chip.
 12. Ties in the round-9 tie-break use the position of the last chip even for an exploded cauldron.
 13. Green set 3 cost 18 for the 4-chip (final almanac text) rather than 21 (early draft).
 14. Purple set 3 counts the space of each purple chip (index of the space it sits on, 0 to 52).
@@ -210,3 +210,16 @@ effects match what I remember of the box).
   is signed off.
 * **Expansion 2 (alchemists):** flask board with an essence track, essence cards, patient cards, cauldron
   variants. Only a third-party summary was found, so it is not reliable yet.
+
+## Audit fixes (round 1 of the rules audit)
+* Trade wind (purple set 2): the purple chips handed in (1, 2 or 3 per reward) are discarded to the supply.
+* Upgrade sigh (purple set 4) and Trade wind never change the scoring space: it is fixed when the powers start (only the green set 3
+  slide moves it).
+* Clear the Pods: its 4 points are applied before the rat tails are counted (the rat stone is set after the last answer).
+* Second Chances (Do-Over): not offered after an exploding 5th chip.
+* Day 9 "Stir!": every cauldron that can still draw secretly commits to draw or stop; when all have committed the choices are
+  applied together, start player first. Other days are not held back. The choice is never sent to other seats (only `lock: true`).
+* Chip powers may be declined or lowered: Gentle sigh (purple set 1) asks which reward (best, middle, lowest) when 2 or more purples; Lucky-seven moss
+  (green set 3) may be declined when sliding would lose the ruby on the scoring space (otherwise the slide is always better and
+  automatic). Ruby moss, Cinder Moth and the other automatic powers have no downside.
+* Bonus die: see guess 1 (unverified).

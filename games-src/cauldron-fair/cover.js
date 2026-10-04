@@ -37,7 +37,7 @@ for (let g = 0; g < N; g++) {
 const REQUIRED = [];
 for (const f of CF.DATA.FORTUNE) REQUIRED.push('fortune ' + f.id);
 for (const c of ['G', 'B', 'R', 'Y', 'P', 'O', 'K']) REQUIRED.push('bought ' + c);
-REQUIRED.push('event boom', 'event flask', 'event refill', 'event rat', 'event peek', 'event restart', 'event slide', 'event extraWhite', 'event bookOut', 'event scored', 'event gameEnd',
+REQUIRED.push('event boom', 'event flask', 'event refill', 'event rat', 'event peek', 'event restart', 'event slide', 'event extraWhite', 'event lock', 'event stir', 'used stir', 'event bookOut', 'event scored', 'event gameEnd',
   'used explode', 'used explodeSafe', 'used flask', 'used doover', 'used rubySpace', 'used spoon', 'players 2', 'players 3', 'players 4');
 for (const f of CF.DATA.DIE) REQUIRED.push('die ' + f);
 const need = [...new Set(REQUIRED)];

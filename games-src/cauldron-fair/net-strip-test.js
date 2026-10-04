@@ -5,7 +5,7 @@ const CF = require('./src/engine.js'); require('./src/ai.js'); global.CF = CF; c
 const N = +process.argv[2] || 12; let views = 0, bad = 0; const probs = []; const P = m => { bad++; if (probs.length < 10) probs.push('FAIL: ' + m); };
 const J = JSON.stringify;
 const ALLOWED = new Set(['v', 'np', 'round', 'phase', 'start', 'sets', 'supply', 'fdeckN', 'fcard', 'fdisc', 'logN', 'evN', 'hist', 'rep', 'over', 'winner', 'winners', 'winText', 'ev', 'shopSeat', 'opts', 'players', 'log', 'events', 'rng', 'seed']);
-const PL_ALLOWED = ['seat', 'name', 'ai', 'char', 'vp', 'rubies', 'droplet', 'flask', 'rat', 'ratTails', 'bag', 'bagN', 'pot', 'side', 'hold', 'holdN', 'newChips', 'q', 'postq', 'acts', 'st', 'boom', 'prot', 'f', 'res', 'last9', 'ver', 'endVp'];
+const PL_ALLOWED = ['seat', 'name', 'ai', 'char', 'vp', 'rubies', 'droplet', 'flask', 'rat', 'ratTails', 'bag', 'bagN', 'pot', 'side', 'hold', 'holdN', 'newChips', 'q', 'postq', 'acts', 'st', 'boom', 'prot', 'f', 'res', 'last9', 'ver', 'endVp', 'lock'];
 function poison(g, seat) {
   const c = JSON.parse(J(g)); let s = 12345; const r = n => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s % n; };
   const sh = a => { for (let i = a.length - 1; i > 0; i--) { const j = r(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
