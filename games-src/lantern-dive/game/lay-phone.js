@@ -47,7 +47,7 @@ const SIZES = arg.split(',').filter(Boolean).map(s => s.split('x').map(Number));
       const gap = await p.evaluate(() => { const hd = document.querySelector('#hand'); return hd && hd.dataset.pitch ? +hd.dataset.pitch : 999; });
       if (gap < 44) prob('hand cards: only ' + gap + 'px of each card visible ' + tag);
     };
-    const tap = async x => { try { if (typeof x === 'string') await p.tap(x, { timeout: 5000 }); else await x.tap({ timeout: 5000 }); } catch (e) { } await p.waitForTimeout(80); };
+    const tap = async x => { try { if (typeof x === 'string') await p.tap(x, { timeout: 5000 }); else await x.tap({ timeout: 5000 }); } catch (e) { if (process.env.LPDBG) log('tap error', String(x).slice(0, 60), e.message.split('\n').slice(0, 6).join(' | ').slice(0, 400)); } await p.waitForTimeout(80); };
     const step = LIB.stepper(p, tap);
     const dockOf = () => rect('#dock');
     const inVP = sel => p.evaluate(s => { const e = document.querySelector(s); if (!e) return 'missing'; const r = e.getBoundingClientRect(); const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.top >= -1 && r.bottom <= innerHeight + 1 && r.left >= -1 && r.right <= innerWidth + 1 && e.contains(h) ? 'ok' : 'off ' + JSON.stringify([r.left, r.top, r.right, r.bottom].map(Math.round)) + ' hit ' + (h && (h.className || h.id)); }, sel);

@@ -6,20 +6,20 @@ ok   co-pilot dice show their back (?)
 ok   die flies tray -> slot 1 tweens
 ok   die landed (squash + dust) nLand 1
 ok   die sprite sits in the slot 
-ok   canvas painted 0.964
-ok   level low res 0.8 painted 0.964
-ok   level medium res 0.8 painted 0.964
-ok   level high res 0.8 painted 0.964
+ok   canvas painted 0.975
+ok   level low res 1 painted 0.964
+ok   level medium res 1 painted 0.964
+ok   level high res 1 painted 0.964
 ok   PerfHUD present true
 ok   ending animation ran 
 ok   final card follows the ending 
 ok   Again clears the ending overlay 
 ok   context loss -> DOM view {"on":false,"cls":false,"die":8}
 ok   canvas renderer canvas
-ok   canvas renderer paints 0.979
+ok   canvas renderer paints 0.968
 ok   ?px=0 -> plain DOM 
 ok   DOM view shows the dice {"dice":8,"cls":false}
 ok   placing works in the DOM view 
 ok   phone 390x763 painted q low res 1 0.985
-ok   phone 844x390 painted q low res 0.8 0.954
+ok   phone 844x390 painted q low res 1 0.988
 PX TEST PASSED

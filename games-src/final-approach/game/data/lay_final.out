@@ -4,3 +4,6 @@
 1920x1080 errors []
 768x1024 renderer {"kind":"webgl","ok":0.965}
 768x1024 errors []
+1100x700 renderer {"kind":"webgl","ok":0.96}
+1100x700 errors []
+PROBLEMS 0
