@@ -67,6 +67,8 @@ KIT_PATCHES=[
  # 15. phone camera; the phone module can take over the camera (zoom to one rack) and gets a callback after every refit
  ("var el = (col ? 60 : 54) * Math.PI / 180;","var el = (global.SF_PHONE ? (col ? (K.st.n >= 5 ? 58 : 72) : 64) : col ? 60 : 54) * Math.PI / 180;"),
  ("if (K.focusT && !instant) {","if (K.phCam && !instant) { K.camState.ready = true; K.phCam(); applyCam(); return; } if (K.focusT && !instant) {"),
+ # 16. the fonts are embedded in the page (../fonts, SIL OFL): never add the font-server stylesheet; still wait for the fonts before painting labels
+ ("if (!document.querySelector('link[data-sf-fonts]')) {","if (false) {"),
 ]
 kit=rd(os.path.join(SP,'short-fuse','kit','kit.js'))
 miss=[a for a,_ in KIT_PATCHES if a not in kit]
@@ -74,13 +76,22 @@ if miss:print('WARNING kit patch anchors not found:',miss,file=sys.stderr)
 for a,z in KIT_PATCHES:kit=kit.replace(a,z)
 
 # ---------- the game ----------
-T=os.path.join(SP,'node_modules','three','build','three.min.js')
-SRC={'shell.js':os.path.join(SP,'shell','shell.js'),'perfhud.js':os.path.join(SP,'perf','perfhud.js'),
+# three.js r158 from games-src/node_modules (npm i); THREE_JS=<path to three.min.js> points the build at another copy
+T=os.environ.get('THREE_JS') or os.path.join(SP,'node_modules','three','build','three.min.js')
+SRC={'shell.js':os.path.join(SP,'shell','shell.js'),'gx-kit.js':os.path.join(SP,'shell','gx-kit.js'),'refdata.js':os.path.join(D,'refdata.js'),'kitsf.js':os.path.join(D,'kitsf.js'),'perfhud.js':os.path.join(SP,'perf','perfhud.js'),
      'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(SP,'short-fuse','audio','audio-data.js'),
      'data.js':os.path.join(D,'src','data.js'),'engine.js':os.path.join(D,'src','engine.js'),'ai.js':os.path.join(D,'src','ai.js'),'netstrip.js':os.path.join(D,'src','netstrip.js'),
      'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js')}
-ORDER=['shell.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','kit.js','data.js','engine.js','ai.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js','phone.js']
-h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css')))
+ORDER=['shell.js','gx-kit.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','kit.js','data.js','engine.js','ai.js','netstrip.js','texts.js','refdata.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js','phone.js','kitsf.js']
+# fonts (SIL OFL, files and licences in ../fonts): embedded so the page never calls a font server and looks the same offline
+import base64
+def font_css():
+    F=os.path.join(SP,'short-fuse','fonts');out=[]
+    for fam,fn,w in [('Lilita One','lilita-one-latin-400-normal.woff2','400'),('Nunito','nunito-latin-wght-normal.woff2','200 1000')]:
+        b64=base64.b64encode(open(os.path.join(F,fn),'rb').read()).decode('ascii')
+        out.append("@font-face{font-family:'%s';font-style:normal;font-weight:%s;font-display:swap;src:url(data:font/woff2;base64,%s) format('woff2')}"%(fam,w,b64))
+    return '\n'.join(out)
+h=rd(os.path.join(D,'head.html')).replace('/*SF_FONTS*/',font_css()).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css'))+'\n'+rd(os.path.join(SP,'shell','gx-kit.css')))
 body=rd(os.path.join(D,'body.html'))
 body=body.replace('<!--CREDITS-->',rd(os.path.join(SP,'short-fuse','audio','credits.html')))
 for f in ORDER:

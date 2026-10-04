@@ -250,7 +250,8 @@ function canTarget(seat,si,k,ctx){const s=G.st[si];if(!s)return 'no stand';const
   return hookAny('target',seat,si,k,ctx)||''}
 // ---------- tools ----------
 function itemOf(seat){const c=SP(seat).ch;return c?CHARS[c].item:null}
-function itemOK(seat,item){const p=SP(seat);if(itemOf(seat)!==item||p.noItem||p.chDown)return false;if(p.chUsed&&!(item==='dd'&&hasRule(G.mission,'unlimitedDD')))return false;
+// job 1 is the training job with no equipment: personal tools are off for everyone (the page never offered them to people; now the computer crew follows the same card)
+function itemOK(seat,item){const p=SP(seat);if(G.mission===1||itemOf(seat)!==item||p.noItem||p.chDown)return false;if(p.chUsed&&!(item==='dd'&&hasRule(G.mission,'unlimitedDD')))return false;
   if(conFlag(seat,'noTools'))return false;return !hookAny('itemBan',seat,item)}
 function eqEntry(id){return G.eq.find(e=>e.id===id&&e.st==='ready'&&!e.down)}
 function eqOK(seat,id){const e=eqEntry(id);if(!e)return false;const T=EQUIP[id].timing;if(T==='instant')return false;

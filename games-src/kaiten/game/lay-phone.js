@@ -125,7 +125,7 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     }
     log('human picks by touch', prog); if (prog < Math.min(TURNS, 5)) fail('too few picks by touch', prog);
     // finish the meal fast, then check the final card
-    await p.evaluate(() => { AIDELAY = 0; ANIM = 0; });
+    await p.evaluate(() => { AIDELAY = 0; ANIM = 0; UI.prefs.undo = "off"; });
     for (let k = 0; k < 600; k++) { const st = await p.evaluate(() => ({ fin: G.phase === 'over' && UI.overShown, rs: !document.querySelector('#rs').hidden, pk: canPick(), pc: !document.querySelector('#pc').hidden })); if (st.fin) break; if (st.rs) { await p.evaluate(() => { const n = document.querySelector('#rs [data-a=rsnext]'); if (n) n.click(); }); } else if (st.pc) await cards(); else if (st.pk) await p.evaluate(() => { UI.sel = [0]; serveSel(); }); await p.waitForTimeout(50); }
     await p.waitForTimeout(400); await shot('13final'); await scroll('final'); await targets('final'); { const rr = await rect('.rsbox'); if (!rr) fail('no final result'); else if (!insideVP(rr)) fail('final result does not fit', JSON.stringify(rr)); }
     await p.tap('#rs [data-a=rsclose]'); await p.waitForTimeout(250); await scroll('after final'); await boardCheck('after final');
@@ -138,7 +138,7 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
       if (!pass.card) fail('no pass-the-device card in hot-seat'); if (pass.hand) fail('hand visible before the pass card is taken'); const pr = await rect('#pc'), br = await rect('#bd'); if (pr && ov(pr, br)) fail('pass card over the board'); await shot('15pass'); await scroll('pass'); await targets('pass');
       await p.tap('#pc [data-a=take]'); await p.waitForTimeout(400); const hh = await p.evaluate(() => ({ n: document.querySelectorAll('#belt [data-up="1"]').length, own: [...new Set([...document.querySelectorAll('#belt [data-owner]')].map(e => e.dataset.owner))].join(',') })); if (!hh.n) fail('hand not shown after taking the device'); await boardCheck('hot'); }
     // ---- watch computers to the end
-    await p.evaluate(() => { showStart(); }); await p.waitForTimeout(200); await p.evaluate(() => { ANIM = 0; AIDELAY = 0; }); await p.tap('[data-a=play]'); await p.waitForTimeout(150); await p.tap('[data-start=ai]'); await p.waitForTimeout(300);
+    await p.evaluate(() => { showStart(); }); await p.waitForTimeout(200); await p.evaluate(() => { ANIM = 0; AIDELAY = 0; UI.prefs.undo = "off"; }); await p.tap('[data-a=play]'); await p.waitForTimeout(150); await p.tap('[data-start=ai]'); await p.waitForTimeout(300);
     for (let k = 0; k < 800; k++) { const st = await p.evaluate(() => ({ fin: G.phase === 'over' && UI.overShown, rs: !document.querySelector('#rs').hidden })); if (st.fin) break; if (st.rs) await p.evaluate(() => { const n = document.querySelector('#rs [data-a=rsnext]'); if (n) n.click(); }); await p.waitForTimeout(120); }
     { const ok = await p.evaluate(() => G.phase === 'over' && !document.querySelector('#rs').hidden); if (!ok) fail('watch game did not reach the final card'); }
     log('errors', JSON.stringify(errs.slice(0, 3))); bad += errs.length; if (errs.length) console.log('FAIL', t, 'console errors', errs.length);

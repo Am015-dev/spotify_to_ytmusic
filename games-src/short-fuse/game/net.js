@@ -21,6 +21,7 @@ async function netJoin(role,code){if(NET.busy||!NET.lobby)return;NET.err='';code
   try{if(NET.room){try{await NET.room.leave()}catch(e){}NET.room=null}room=await NET.lobby.join('sf-'+code)}catch(e){NET.busy=false;NET.err='Could not open the game room.';netRender();return}
   Object.assign(NET,{busy:false,code,role,on:true,room,mySeat:-1,hostPeer:null,parts:{},applied:0,lastRx:0,gid:null,hostGone:false,peer:room.self,peers:[],opt:null,seatPeer:[],seatUid:[],pend:-1});
   if(G||UI.started)netIdle();
+  NET.t0=Date.now();setTimeout(()=>{if(NET.on&&NET.room===room)netRender()},15500);
   room.presence({role,uid:NET.uid,name:NET.myName||''}).catch(()=>{});
   room.on('st',onNetState);room.on('act',onNetAct);room.on('rej',onNetRej);
   room.onPeers(onNetPeers);room.onConnection(c=>{NET.conn=c;netRender()});
@@ -107,8 +108,10 @@ function onNetAct(msg){if(!isHost()||!G||msg.isMe)return;const d=msg.data;if(!d|
 // ---- status, dock strip, lobby, start-screen panel ----
 function netStatus(){const n=NET.peers.length;
   if(NET.hostGone||NET.err)return `<span class="warn">${esc(NET.err||'The host left.')}</span>`;
-  if(NET.conn===false)return 'Connecting…';
-  if(isClient()&&!NET.hostPeer)return 'Looking for the host…';
+  // after 15 s without a connection, say so and what to try, instead of waiting forever
+  const slow=Date.now()-(NET.t0||Date.now())>15000;
+  if(NET.conn===false)return slow?'<span class="warn">Cannot connect yet. Try Wi-Fi instead of mobile data, or leave and join again.</span>':'Connecting…';
+  if(isClient()&&!NET.hostPeer)return slow?'<span class="warn">Cannot reach the host yet. Check the code, try Wi-Fi, or leave and join again.</span>':'Looking for the host…';
   if(isClient()&&NET.lastRx&&Date.now()-NET.lastRx>12000)return 'Reconnecting…';
   if(n<=1)return 'Looking for players…';return `${n} players connected`}
 function netDock(){const el=$('#netst');if(!el)return;if(!NET.on||!G){el.hidden=true;return}el.hidden=false;

@@ -57,7 +57,7 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
     let revealShot = false; for (let k = 0; k < 40; k++) { const st = await p.evaluate(() => ({ lift: !!document.querySelector('.kk-cloche.kk-lift'), can: canPick() })); if (st.lift && !revealShot) { revealShot = true; await shot('6reveal'); } if (st.can) break; await p.waitForTimeout(150); }
     await reach('after reveal'); await shot('7landed');
     // play on fast to the end of round 1 (taps through the real belt)
-    await p.evaluate(() => { AIDELAY = 0; ANIM = 0; });
+    await p.evaluate(() => { AIDELAY = 0; ANIM = 0; UI.prefs.undo = "off"; });
     let rsShot = false;
     for (let k = 0; k < 500; k++) {
       const st = await p.evaluate(() => ({ rs: !document.querySelector('#rs').hidden, pk: canPick(), over: G.phase === 'over' && UI.overShown, pc: !document.querySelector('#pc').hidden }));

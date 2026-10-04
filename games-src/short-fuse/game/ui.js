@@ -374,9 +374,9 @@ function turnHTML(V){const L=V.legal,sel=UI.sel;let h='';
   if(sel&&sel.mode==='flipown'){const fus=[...new Set(L.flip.map(m=>m.fu))];return `<div class="card you"><h3>Which flipped wire?</h3><p>You cannot see your flipped wires. Pick the one you want to cut with this dual cut.</p><div class="row">${fus.map(u=>{const f=findU(u);return `<button class="btn" data-a="fu" data-u="${u}">${esc(wireName(f.s,f.k,V))}</button>`}).join('')}<button class="btn small" data-a="cancel">Cancel</button></div></div>`}
   const step=!sel||!sel.tg.length?1:sel.v==null?2:3;
   h+=`<div class="card you"><h3>${ico('cut')} Dual cut</h3><div class="steps"><span class="${step===1?'on':'ok'}">1 Point</span><span class="${step===2?'on':step>2?'ok':''}">2 Say a value</span><span class="${step===3?'on':''}">3 Snip</span></div>`;
-  if(step===1)h+=`<p>Tap a <b>glowing wire</b> of a crewmate: you will say a value you hold.</p>`;
+  if(step===1)h+=`<p>Tap a <b>glowing wire</b> of a crewmate: you will say a value you hold.</p>`+pointList(V,null);
   else{const t=sel.tg[0];h+=`<p>Pointing at <b>${esc(sel.tg.length>1?nm(ownerOf(t.st))+'\'s wires '+sel.tg.map(x=>LET(x.k)).join(', '):wireName(t.st,t.k,V))}</b>${sel.tool?' with the <b>'+esc(toolName(sel.tool))+'</b>':''}. <button class="btn small" data-a="untarget">Change</button></p>`;
-    const need=toolN(sel.tool);if(need>1&&need<99&&sel.tg.length<need)h+=`<p class="hint">The ${esc(toolName(sel.tool))} points at ${need} wires on one stand: tap ${need-sel.tg.length} more.</p>`;
+    const need=toolN(sel.tool);if(need>1&&need<99&&sel.tg.length<need)h+=`<p class="hint">The ${esc(toolName(sel.tool))} points at ${need} wires on one stand: tap ${need-sel.tg.length} more.</p>`+pointList(V,t.st);
     const vs=dualVals(sel);h+=`<div class="vals">${vs.map(v=>`<button class="vb${v==='Y'?' y':''}${sel.v===v?' sel':''}" data-a="v" data-v="${v}">${v==='Y'?'⚡':v}<small>you hold ${heldCount(V,v)}</small></button>`).join('')}</div>`;
     if(sel.two&&sel.v!=null){h+=`<p class="hint">Second value for the ${esc(toolName(sel.two))}:</p><div class="vals">${vs.filter(v=>v!==sel.v).map(v=>`<button class="vb${v==='Y'?' y':''}${sel.v2===v?' sel':''}" data-a="v2" data-v="${v}">${v==='Y'?'⚡':v}</button>`).join('')}</div>`}
     if(sel.v!=null){const m=buildDual(sel);const err=legal(m,V.seat);let risk='';if(UI.help&&sel.tg.length===1){const W=wwk(V);const sl=W&&W.slots.find(x=>x.st===t.st&&x.k===t.k);if(sl){const p=sl.prob[String(sel.v==='Y'?'yellow':sel.v)]||0;const pr=sl.prob.red||0;risk=`<p class="why">Chance it is ${esc(VNm(sel.v))}: <b>${Math.round(p*100)}%</b>${pr>0?` · red: <b>${Math.round(pr*100)}%</b>`:''}</p>`}}
@@ -399,6 +399,15 @@ function turnHTML(V){const L=V.legal,sel=UI.sel;let h='';
   // equipment
   const eqm=noGear()?[]:L.eq.concat(coffee);h+=gearButtons(eqm,false,V);const og=otherGearHTML(V);if(og)h+=`<div class="card">${og}</div>`;
   return h+annHTML(V)}
+// the same choice as tapping a glowing wire on the table, as a list of buttons (keyboard, screen readers, tiny racks)
+function tokLabel(x){const t=x.tok&&x.tok[0];if(!t)return '';const v=t.v==='Y'?'yellow':t.v;return t.t==='n'||t.t==='y'?String(v):t.t==='p'?(t.v==='e'?'even':'odd'):t.t==='c'?'×'+t.v:t.t==='f'?'not '+t.v:''}
+function pointList(V,onlySt){const L=V.legal;if(!L)return '';const by=new Map();
+  for(const m of L.plain){if(onlySt!=null&&m.st!==onlySt)continue;const k=m.ks[0];const key=m.st+':'+k;if(UI.sel&&UI.sel.tg&&UI.sel.tg.some(t=>t.st===m.st&&t.k===k))continue;
+    const own=ownerOf(m.st);if(!by.has(own))by.set(own,new Map());const sm=by.get(own);if(!sm.has(m.st))sm.set(m.st,new Set());sm.get(m.st).add(k)}
+  if(!by.size)return '';let rows='';
+  for(const [own,sm] of by){for(const [si,ks] of sm){const two=seatStands(own).length>1;const st=V.stands.find(x=>x.i===si);
+    rows+=`<div class="parow"><b>${esc(nm(own))}${two?' · stand '+(seatStands(own).indexOf(si)+1):''}</b><span>${[...ks].sort((a,b)=>a-b).map(k=>{const x=st&&st.slots[k];const tl=x?tokLabel(x):'';return `<button class="pa" data-a="pointat" data-st="${si}" data-k="${k}" aria-label="Point at ${esc(wireName(si,k,V))}${tl?', token '+esc(tl):''}">${LET(k)}${tl?`<small>${esc(tl)}</small>`:''}</button>`}).join('')}</span></div>`}}
+  return `<details class="palist"${document.documentElement.classList.contains('ph')?'':' open'}><summary>Point from a list</summary>${rows}</details>`}
 function multiName(k){return ({red3:'Grab the three reds',four:'Point at all four',sevens:'Cut the four 7s',y3:'Point at the three yellows',lever:'Pull the lever (two yellows)',rush:'Yellow rush'})[k]||'All at once'}
 function gearButtons(moves,off,V){if(!moves.length)return '';const groups={};for(const m of moves){const k=moveKey(m);(groups[k]=groups[k]||[]).push(m)}
   let h=`<div class="card"><h3>${ico('gear')} ${off?'Any-time gear':'Gear you can use'}</h3><div class="gear">`;
@@ -437,6 +446,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'v2':{const v=b.dataset.v==='Y'?'Y':+b.dataset.v;UI.sel.v2=v;sfx('select');refresh();return}
   case 'dual':{const m=buildDual(UI.sel);if(m)act(m,V.seat);return}
   case 'untarget':UI.sel.tg=[];UI.sel.v=null;refresh();return;
+  case 'pointat':onTile(+b.dataset.st,+b.dataset.k);return;
   case 'cancel':UI.sel=null;refresh();return;
   case 'tool':{const t=b.dataset.t;const s=UI.sel||(UI.sel={mode:'dual',tool:null,tg:[],v:null,v2:null,two:null,fu:null});s.tool=s.tool===t?null:t;s.fu=null;if(s.v==='Y')s.v=null;
     if(s.tg.length){const st=s.tg[0].st;s.tg=s.tool==='eq5'?eq5Slots(st).map(k=>({st,k})):s.tg.slice(0,1)}refresh();return}
@@ -474,7 +484,13 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'newgame':GX.close();showStart();return;
   case 'restart':GX.close();if(UI.lastSetup)startJob(UI.lastSetup);return;
   // start screen
-  case 'job':UI.setup.job=+b.dataset.n;fixSetup();renderStart();sfx('select');return;
+  case 'job':UI.setup.job=+b.dataset.n;fixSetup();if(UI.sv==='board')UI.sv='setup';renderStart();sfx('select');return;
+  case 'sttitle':UI.sv='title';renderStart();return;
+  case 'stplay':UI.sv='setup';renderStart();return;
+  case 'stonline':UI.sv='setup';UI.onl=true;renderStart();return;
+  case 'stboard':UI.sv='board';renderStart();return;
+  case 'stsetup':UI.sv='setup';renderStart();return;
+  case 'strules':GX.show('rulesd');return;
   case 'np':UI.setup.np=+b.dataset.v;fixSetup();renderStart();return;
   case 'seatkind':{const i=+b.dataset.i;UI.setup.seats[i]=UI.setup.seats[i]==='human'?'ai':'human';renderStart();return}
   case 'lv':UI.setup.lv=b.dataset.v;renderStart();return;
@@ -576,7 +592,7 @@ function recordResult(){if(!humans().length)return;const c=camp();const n=G.miss
 function defaultSetup(){const s=lsGet('sf_setup',null);const d={job:1,np:3,seats:['human','ai','ai','ai','ai'],lv:'normal',chars:[],names:DEFNAMES.slice(),help:true};if(s)Object.assign(d,s,{helpTouched:0},{names:(s.names||DEFNAMES).slice()});fixSetup(d);return d}
 function fixSetup(s){s=s||UI.setup;const M=MISSIONS[s.job];if(!M.pl.includes(s.np))s.np=M.pl.find(x=>x>=s.np)||M.pl[M.pl.length-1];if(!s.helpTouched)s.help=true;const ok=allowedChars(s.job,s.np);s.chars=s.chars||[];for(let i=0;i<5;i++)if(s.chars[i]&&!ok.includes(s.chars[i]))s.chars[i]='';return s}
 function preset(v){const s=UI.setup;if(v==='solo')s.seats=['human','ai','ai','ai','ai'];if(v==='hot')s.seats=['human','human','human','human','human'];if(v==='watch')s.seats=['ai','ai','ai','ai','ai'];renderStart()}
-function showStart(){if(isClient()){hideStart();return}clearTimeout(UI.aiT);UI.aiT=null;UI.setup=UI.setup||defaultSetup();sndLoop('hum',true);musicStop(.8);$('#start').hidden=false;renderStart();sndLoop('clock_loop',false)}
+function showStart(){if(isClient()){hideStart();return}clearTimeout(UI.aiT);UI.aiT=null;UI.setup=UI.setup||defaultSetup();if(G||UI.onl||NET.on)UI.sv=UI.sv==='board'?'board':'setup';sndLoop('hum',true);musicStop(.8);$('#start').hidden=false;renderStart();sndLoop('clock_loop',false)}
 function hideStart(){$('#start').hidden=true;sndLoop('hum',false)}
 function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=camp();const saved=savedGame();
   let jobs='';for(const [a,b,label] of BOXES){jobs+=`<div class="box">${esc(label)}</div><div class="jobs">`;for(let k=a;k<=b;k++){const j=c.jobs[k];const lk=!unlocked(k);
@@ -584,17 +600,37 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=camp();const sav
   const j=c.jobs[n];const chips=ruleChips(n);const ok=allowedChars(n,s.np);
   const onl=isHost(),nOnl=onl?Math.min(s.np,NET.peers.length||1):0;const seats=[];for(let i=0;i<s.np;i++)seats.push(`<div class="seat" style="--sc:${SEATC[i]}"><span class="dot"></span><span class="nm">${onl&&i<nOnl?`<b>${esc(netPlan(s).names&&netPlan(s).names[i]||'Player')}</b>`:`<input data-nm="${i}" value="${esc(s.names[i])}" aria-label="Name of seat ${i+1}" maxlength="14" style="width:7.5em;font:800 .9rem var(--fb);border:2px solid var(--ink);border-radius:8px;padding:3px 5px;background:#fff7e8">`}<select data-ch="${i}" aria-label="Crew card for seat ${i+1}"><option value="">Crew: random</option>${ok.map(id=>`<option value="${id}"${s.chars[i]===id?' selected':''}>${esc(CHARS[id].n)} (${esc(ITEMS[CHARS[id].item].n)})</option>`).join('')}</select></span>${onl?`<span class="tag${i<nOnl?' b':''}">${i<nOnl?ico('user')+'Online player':ico('robot')+'Computer'}</span>`:`<button class="btn small${s.seats[i]==='human'?' on':''}" data-a="seatkind" data-i="${i}">${s.seats[i]==='human'?ico('user')+'Human':ico('robot')+'Computer'}</button>`}</div>`);
   const nh=s.seats.slice(0,s.np).filter(x=>x==='human').length;
-  $('#start').innerHTML=`<div class="st-head"><svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">${ICO.bomb}</svg><div><h1>Short Fuse</h1><p>A cartoon demolition crew defuses rigged charges together. 2-5 players, 66 jobs.</p></div><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back to the job</button>':''}</div>
-  <div class="st-body"><div class="pane"><div class="quick"><button class="btn blue" data-a="tutorial">${ico('info')}Guided first game<small>Job 1 with a coach: best for new players</small></button>${saved?`<button class="btn go" data-a="resume">${ico('play')}Continue<small>Job ${saved.G.mission}, turn ${saved.G.turn}</small></button>`:`<button class="btn" data-a="preset" data-v="solo">${ico('user')}Me + computers<small>one human seat</small></button>`}<button class="btn" data-a="preset" data-v="${saved?'solo':'hot'}">${ico(saved?'user':'swap')}${saved?'Me + computers':'Hot-seat'}<small>${saved?'one human seat':'pass the device'}</small></button></div>
-    ${onlineBlock()}<h2>${ico('map')} Mission board</h2><p class="tiny">Win a job to unlock the next. Every job can still be played at any time. ✓ = defused, ⏱ = timed.</p>${jobs}</div>
-   <div class="pane"><div class="brief"><div class="bt"><b>${n}</b><h3>${esc(M.nm)}</h3></div><p class="flav">${esc(BRIEFS[n]||'')}</p>
-    <div class="tags"><span class="tag b">${mixHTML(n,s.np)}</span><span class="tag">${ico('fuse')}Fuse ${fuseStart(n,s.np)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?`<span class="tag t">${ico('clock')}Timed</span>`:''}<span class="tag">${M.pl[0]}-${M.pl[M.pl.length-1]} players</span>${j&&j.w?`<span class="tag e">${ico('check')}Defused ${j.w}×${j.best&&j.best.left!=null?', best: '+j.best.left+' fuse left':''}</span>`:j&&j.p?`<span class="tag r">Tried ${j.p}×</span>`:''}</div>
-    <p class="tiny">${esc(M.text)}</p>${chips.map(c=>`<span class="tag" style="margin:2px 2px 0 0">${ico(c[0])}${esc(c[1])}</span>`).join('')}</div>
-    <div class="setup"><div><div class="lbl">Crew size</div><div class="seg">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div></div>
+  // title -> setup; on narrow screens the mission board is its own full-screen view (UI.sv: 'title' | 'setup' | 'board')
+  const narrow=startNarrow(),sv=UI.sv||'title';
+  const head=`<div class="st-head">${sv!=='title'?`<button class="btn small sback" data-a="${sv==='board'&&narrow?'stsetup':'sttitle'}" aria-label="Back">${ico('back')}</button>`:''}<svg viewBox="0 0 24 24" width="42" height="42" aria-hidden="true">${ICO.bomb}</svg><div><h1>Short Fuse</h1><p>A cartoon demolition crew defuses rigged charges together. 2-5 players, 66 jobs.</p></div><span style="flex:1"></span>${G&&!G.over?'<button class="btn small" data-a="closestart">Back to the job</button>':''}</div>
+  `;
+  const quick=`<div class="quick"><button class="btn blue" data-a="tutorial">${ico('info')}Guided first game<small>Job 1 with a coach: best for new players</small></button>${saved?`<button class="btn go" data-a="resume">${ico('play')}Continue<small>Job ${saved.G.mission}, turn ${saved.G.turn}</small></button>`:`<button class="btn" data-a="preset" data-v="solo">${ico('user')}Me + computers<small>one human seat</small></button>`}<button class="btn" data-a="preset" data-v="${saved?'solo':'hot'}">${ico(saved?'user':'swap')}${saved?'Me + computers':'Hot-seat'}<small>${saved?'one human seat':'pass the device'}</small></button></div>
+    `,board=`<h2>${ico('map')} Mission board</h2><p class="tiny">Win a job to unlock the next. Every job can still be played at any time. ✓ = defused, ⏱ = timed.</p>${jobs}`,setup=`<div class="setup"><div><div class="lbl">Crew size</div><div class="seg">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div></div>
     <div><div class="lbl">Seats</div>${onl?`<p class="tiny">Online: seats go to the players in the lobby in join order; the rest are played by the computer.</p>`:`<div class="seg" style="margin-bottom:4px"><button class="btn small" data-a="preset" data-v="solo">Me + computers</button><button class="btn small" data-a="preset" data-v="hot">All human (hot-seat)</button><button class="btn small" data-a="preset" data-v="watch">Watch the computer</button></div>`}${seats.join('')}</div>
     <div><div class="lbl">Computer level</div><div class="seg">${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div></div>
     ${nh||onl?`<div><button class="swt${s.help?' on':''}" role="switch" aria-checked="${!!s.help}" data-a="helpset"><i></i>Suggested move: ${s.help?'On':'Off'}</button><p class="tiny">Shows a good move and why, on every turn of yours.</p></div>`:''}
-    <button class="btn go wide" data-a="start">${ico('play')}${onl?'Start job '+n+' online ('+nOnl+' player'+(nOnl>1?'s':'')+')':nh===0?'Watch job '+n:nh===1?'Start job '+n:'Start job '+n+' (hot-seat, '+nh+' humans)'}</button></div></div></div>`;paintIcons($('#start'))}
+    <button class="btn go wide" data-a="start">${ico('play')}${onl?'Start job '+n+' online ('+nOnl+' player'+(nOnl>1?'s':'')+')':nh===0?'Watch job '+n:nh===1?'Start job '+n:'Start job '+n+' (hot-seat, '+nh+' humans)'}</button></div>`;
+  const brief=`<div class="brief"><div class="bt"><b>${n}</b><h3>${esc(M.nm)}</h3>${narrow?`<span style="flex:1"></span><button class="btn small" data-a="stboard">${ico('map')}Change job</button>`:''}</div><p class="flav">${esc(BRIEFS[n]||'')}</p>
+    <div class="tags"><span class="tag b">${mixHTML(n,s.np)}</span><span class="tag">${ico('fuse')}Fuse ${fuseStart(n,s.np)}</span>${MISSIONS[n].audio||hasRule(n,'timer')?`<span class="tag t">${ico('clock')}Timed</span>`:''}<span class="tag">${M.pl[0]}-${M.pl[M.pl.length-1]} players</span>${j&&j.w?`<span class="tag e">${ico('check')}Defused ${j.w}×${j.best&&j.best.left!=null?', best: '+j.best.left+' fuse left':''}</span>`:j&&j.p?`<span class="tag r">Tried ${j.p}×</span>`:''}</div>
+    <p class="tiny">${esc(M.text)}</p>${chips.map(c=>`<span class="tag" style="margin:2px 2px 0 0">${ico(c[0])}${esc(c[1])}</span>`).join('')}</div>
+    `;
+  let h;
+  if(sv==='title')h=titleHTML(saved);
+  else if(narrow&&sv==='board')h=head+`<div class="st-body one"><div class="pane">${board}</div></div>`;
+  else if(narrow)h=head+`<div class="st-body one"><div class="pane">${UI.onl||NET.on?onlineBlock():''}${brief}${setup}</div></div>`;
+  else h=head+`<div class="st-body"><div class="pane">${quick}${onlineBlock()}${board}</div>\n   <div class="pane">${brief}${setup}</div></div>`;
+  $('#start').dataset.v=sv==='title'?'title':narrow?'one':'two';$('#start').innerHTML=h;paintIcons($('#start'))}
+function startNarrow(){return innerWidth<=820&&innerHeight>=innerWidth*.9}
+// the first screen: what to do now in one tap (a saved job first, the guided game first for a new player)
+function titleHTML(saved){const first=!lsGet('sf_guided_done',false)&&!Object.keys(camp().jobs).length;
+  const b=(a,cls,ic,t,sub,extra)=>`<button class="tbtn btn${cls}" data-a="${a}"${extra||''}>${ico(ic)}<span><b>${t}</b><small>${sub}</small></span></button>`;
+  return `<div class="ttl"><div class="ttl-in"><svg class="ttl-bomb" viewBox="0 0 24 24" aria-hidden="true">${ICO.bomb}</svg><h1>Short Fuse</h1><p class="ttag">Cut every wire before the fuse burns down. A co-op deduction game for 2 to 5 players.</p>
+  <div class="tbtns">${saved?b('resume',' go','play','Continue','Job '+saved.G.mission+', turn '+saved.G.turn):''}
+  ${first?b('tutorial',saved?'':' go','info','Guided first game','Job 1 with a coach, one step at a time'):''}
+  ${b('stplay',!saved&&!first?' go':'','map','Play','Pick a job: computer crew, hot-seat or watch')}
+  ${b('stonline','','user','Play online','With friends, free, peer to peer')}
+  ${first?'':b('tutorial','','info','Guided first game','Job 1 with a coach')}</div>
+  <button class="tlink" data-a="strules">How to play</button></div></div>`}
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}
 function realtimeJob(n){const M=MISSIONS[n];return !!(M.audio||hasRule(n,'timer'))}
 function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats=plan.seats;s.names=plan.names;fixSetup(s)}

@@ -29,7 +29,7 @@ const [W, H] = (process.argv[2] || '1366x768').split('x').map(Number); const PH 
   await idle(); await p.waitForTimeout(600); await sh('15mid');
   await p.evaluate(() => { const g = document.querySelector('#tbl .seat.me .grp'); if (g) g.click(); }); await p.waitForTimeout(300); await sh('16groupinfo'); await p.evaluate(() => closePop());
   // finish round 1 quickly, shoot the score pad once the counting is done
-  await p.evaluate(() => { AIDELAY = 0; ANIM = 0; });
+  await p.evaluate(() => { AIDELAY = 0; ANIM = 0; UI.prefs.undo = "off"; });
   for (let k = 0; k < 200; k++) { const o = await p.evaluate(() => ({ rs: !$('#rs').hidden, pk: canPick() })); if (o.rs) break; if (o.pk) await p.evaluate(() => { UI.sel = [0]; serveSel(); }); await p.waitForTimeout(80); }
   await p.waitForTimeout(800); await sh('20roundpad');
   for (let k = 0; k < 400; k++) { const o = await p.evaluate(() => ({ rs: !$('#rs').hidden, pk: canPick(), over: G.phase === 'over' && UI.overShown })); if (o.over) break; if (o.rs) { await p.evaluate(() => { const n = document.querySelector('#rs [data-a=rsnext]'); if (n) n.click(); }); } else if (o.pk) await p.evaluate(() => { UI.sel = [0]; serveSel(); }); await p.waitForTimeout(60); }

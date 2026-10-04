@@ -8,17 +8,17 @@ const html = fs.readFileSync(path.join(__dirname, 'kaiten.html'), 'utf8');
 const ANIMON = process.argv.includes('--anim');
 const CONF = [
   { name: 'guided', start: 'guided' },
-  { name: 'vs 2p normal', start: 'vs', np: 2 },
+  { name: 'vs 2p normal (take-back on)', start: 'vs', np: 2, undo: 1 },
   { name: 'vs 3p easy', start: 'vs', np: 3, level: 'easy' },
   { name: 'vs 4p hard', start: 'vs', np: 4, level: 'hard' },
   { name: 'vs 5p normal', start: 'vs', np: 5 },
-  { name: 'hot 2p', start: 'hot', np: 2 },
+  { name: 'hot 2p (take-back on)', start: 'hot', np: 2, undo: 1 },
   { name: 'hot 4p', start: 'hot', np: 4 },
   { name: 'hot 5p', start: 'hot', np: 5 },
   { name: 'watch 3p', start: 'ai', np: 3 },
   { name: 'watch 5p hard', start: 'ai', np: 5, level: 'hard' },
   { name: 'PHONE guided', start: 'guided', phone: 1 },
-  { name: 'PHONE vs 3p', start: 'vs', np: 3, phone: 1 },
+  { name: 'PHONE vs 3p (take-back on)', start: 'vs', np: 3, phone: 1, undo: 1 },
   { name: 'PHONE hot 3p', start: 'hot', np: 3, phone: 1 },
   { name: 'PHONE vs 5p', start: 'vs', np: 5, phone: 1 },
   { name: 'PHONE vs 2p landscape', start: 'vs', np: 2, phone: 1, land: 1 },
@@ -36,7 +36,8 @@ function run(cf, seed) {
     const fin = r => { clearInterval(iv); res(Object.assign({ cf, errs, seen, clicks, hidden, picks, secs: Math.round((Date.now() - t0) / 1000) }, r || {})); try { w.close(); } catch (e) { } };
     w.addEventListener('load', () => {
       try {
-        w.eval(`ANIM=${ANIMON ? 1 : 0};AIDELAY=${ANIMON ? 40 : 0};UI.seed=${seed};UI.noRec=${R() < .7 ? 'true' : 'false'}`);
+        // the take-back window (Menu → Take back a plate) holds every serve ~1 s: on in a few configurations (and its Undo button is clicked), off in the rest to keep the run short
+        w.eval(`ANIM=${ANIMON ? 1 : 0};AIDELAY=${ANIMON ? 40 : 0};UI.seed=${seed};UI.noRec=${R() < .7 ? 'true' : 'false'};UI.prefs.undo='${cf.undo ? 'short' : 'off'}'`);
         // title -> setup (on phones the table options sit behind Configure)
         if (!d.querySelector('#start .ttl [data-a=play]')) errs.push('no Play button on the title');
         if (d.querySelector('#start [data-a=loadsave]')) errs.push('Resume shown without a save');

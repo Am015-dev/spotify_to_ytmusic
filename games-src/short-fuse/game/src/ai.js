@@ -177,7 +177,7 @@ function sampleMasks(K,Z){if(Z._masks)return Z._masks;const base=new Int32Array(
   const out=Z.samples.map(s=>{const m=Int32Array.from(base);for(let j=0;j<hs.length;j+=2){const c=s[hs[j]];if(c)m[hs[j+1]]|=1<<c}return m});
   if(!out.length)out.push(Int32Array.from(base));Z._masks=out;return out}
 function pHolds(masks,seat,mask){let n=0;for(const m of masks)if(m[seat]&mask)n++;return n/masks.length}
-function myTools(K){const me=K.seats[K.seat];const it=me.ch&&typeof CHARS!=='undefined'&&CHARS[me.ch]?CHARS[me.ch].item:null;return {dd:it==='dd'&&!me.chUsed&&!me.noItem&&!me.chDown}}
+function myTools(K){const me=K.seats[K.seat];const it=me.ch&&typeof CHARS!=='undefined'&&CHARS[me.ch]?CHARS[me.ch].item:null;return {dd:K.mission!==1&&it==='dd'&&!me.chUsed&&!me.noItem&&!me.chDown}}
 // my best single dual cut (or Twin Probe) of value v, from my own knowledge
 function bestFor(K,Z,v,tools){const code=CODE(v);const R=(K.tot[v]||0)-(K.cut[v]||0);const held=heldCounts(K)[v]||0;if(held&&held===R&&(R===2||R===4))return {p:1,pr:0,solo:1};
   const flipJob=K.rules.includes('flip');let best={p:0,pr:0};
