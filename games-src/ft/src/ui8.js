@@ -92,7 +92,7 @@ function phHandPop(hp){const mv=G.move,vm=validMoves(hp.i),by=a=>vm.filter(m=>m.
    <p class="small">${UI.autoPlan?'Following your plan…':mv.hand.length===1?'<b>Last one:</b> it must land on a tile with its own colour.':'Tap a glowing tile (or one below) to leave the chosen colour.'}</p>
    ${UI.autoPlan?'':`<div class="drops">${ds}</div>`}
    <p class="small path">${path.join(' → ')}</p>
-   ${plans.length?`<h4>Plans from here</h4><div class="acts">${plans.map(x=>`<button class="btn sm go" data-plando="${x.i}">▶ ${esc(MNAME[x.o.c])} → ${esc(tileName(G.board[x.o.e]))} · +${Math.max(0,Math.round(x.o.v))}★</button>`).join('')}</div>`:''}
+   ${plans.length?`<h4>Plans from here</h4><div class="acts">${plans.map(x=>`<button class="btn sm" data-plando="${x.i}">▶ ${esc(MNAME[x.o.c])} → ${esc(tileName(G.board[x.o.e]))} · +${Math.max(0,Math.round(x.o.v))}★</button>`).join('')}</div>`:''}
    <div class="acts">${undo}</div>`}}
 function phGainPop(hp){const pr=phDock('.prompt');if(!pr)return null;let log=G.log.slice(0,2).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('');
   const pw=phDock('.powers');return {key:'gain',title:G.step==='tribe'?'Tribe action':G.step==='tile'?'Tile action':G.step==='sell'?'End of turn':'Your choice',x:false,body:`${phClean(pr,1)}${log?`<ol class="mini">${log}</ol>`:''}${pw?`<div class="powers">${pw.innerHTML}</div>`:''}`}}
