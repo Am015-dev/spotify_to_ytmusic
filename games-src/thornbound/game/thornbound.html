@@ -4663,7 +4663,9 @@ function advise(s,mv){if(!G||!G.q||!mv||!mv.length)return null;const q=G.q,k=q.k
   if(q.t==='menu'){const ph=menuPhase(q);return ph==='Day'?adviseDay(s,mv):adviseMenu(s,mv,ph)}
   if(k==='occupier'){const ids=mv.filter(m=>m.id!=null).map(m=>m.id);if(!ids.length)return null;const sc=id=>{const i=cinfo(id);return i.strength*10+i.votes+i.lore};const w=ids.slice().sort((a,b)=>sc(a)-sc(b))[0];const m=mv.find(x=>x.id===w);
     return {m,why:cinfo(w).name+' ('+cinfo(w).strength+') is your weakest card: a card under a Kingdom Card cannot fight. (A stronger one would make the Kingdom Card harder to steal.)'}}
-  if(k==='slot'||k==='order'||k==='applause'||k==='discardDown'||k==='discardPick')return null;
+  if(k==='slot'){const P=G.pl[s];const sc=m=>{const T=P.ks[m.slot];return T?cinfo(T.occ).strength:-1};const m=mv.filter(x=>x.slot!=null).sort((a,b)=>sc(b)-sc(a))[0];if(!m)return null;const T=P.ks[m.slot];
+    return {m,why:'Your board has room for two of these Kingdom Cards. Replacing '+TB.kingdomInfo(T.kc).name+' gives you back '+cinfo(T.occ).name+' ('+cinfo(T.occ).strength+'), your strongest tucked card, to fight with.'}}
+  if(k==='order'||k==='applause'||k==='discardDown'||k==='discardPick')return null;
   if(k==='clashOrder')return adviseOrder(s,mv);
   const m=suggest(s);if(!m)return null;const why=reasonFor(s,m);return why?{m,why}:null}
 function reasonFor(s,m){const q=G.q,k=q.kind;
