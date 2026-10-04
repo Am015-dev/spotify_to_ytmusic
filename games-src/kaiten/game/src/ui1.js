@@ -2,7 +2,7 @@
 var ANIM = 1, AIDELAY = 650;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, seq: 0, rec: null, noRec: false, over: null,
-  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: null, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
+  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: null, grab1: true, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
 const D = KK.DATA;
 const KIT = KKKit;
 const TY = KIT.TYPES;
@@ -150,7 +150,8 @@ function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return n
 function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
 function loadPrefs() { try { const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
 function savePrefs() { lsSet('kk_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
-const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35))) : Promise.resolve();
+// UI.fast: the player tapped the table to hurry this reveal / pass along
+const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35) * (UI.fast ? .3 : 1))) : Promise.resolve();
 // ---- "what just happened": after every reveal, one line per diner with the score change and its cause
 const CATN = { maki: 'roll race', tempura: 'prawn pair', sashimi: 'fish set', dumpling: 'buns', nigiri: 'nigiri', wasabi: 'Fire Paste ×3' };
 function buildNews(before, after, picks, scored) {

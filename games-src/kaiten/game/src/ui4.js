@@ -12,26 +12,22 @@ function drawCard() {
 }
 // ---- guide: short tips that explain each card the first time it appears
 const TIP_EXTRA = {
-  tempura: 'They score in pairs: two make 5 points, a lone one scores nothing.',
-  sashimi: 'They score in sets of three: three make 10 points, one or two score nothing. Go for it only if more are coming.',
-  dumpling: 'Each bun is worth more than the last: 1, 3, 6, 10, then 15 points for five.',
-  roll1: 'A roll race: whoever has the most roll icons when the round ends scores 6, second most 3. This one has 1 icon.',
-  roll2: 'A roll race: whoever has the most roll icons when the round ends scores 6, second most 3. This one has 2 icons.',
-  roll3: 'A roll race: whoever has the most roll icons when the round ends scores 6, second most 3. This one has 3 icons.',
-  salmon: 'Worth 2 points at once, or 6 if it lands on your Fire Paste.',
-  squid: 'The best nigiri: 3 points, or 9 if it lands on your Fire Paste.',
-  egg: 'The smallest nigiri: 1 point, or 3 on Fire Paste.',
-  wasabi: 'Scores nothing by itself: the next nigiri you serve lands on it and scores triple.',
-  chop: 'Keep them: on a later turn you may serve two plates at once. The sticks then go back into the hand and pass on with it.',
-  pudding: 'Kept for the whole game. At the end, whoever has the most gets 6' + ' and the fewest loses 6 (no loss with 2 diners).'
+  tempura: 'Two make a pair: 5 points.',
+  sashimi: 'Three make a set: 10 points.',
+  dumpling: 'Each bun scores more: 1, 3, 6, 10, 15.',
+  roll1: 'Most roll icons this round: 6. Second: 3.',
+  roll2: 'Most roll icons this round: 6. Second: 3.',
+  roll3: 'Most roll icons this round: 6. Second: 3.',
+  salmon: '2 points now. Triple on Fire Paste.',
+  squid: '3 points now. Triple on Fire Paste.',
+  egg: '1 point now. Triple on Fire Paste.',
+  wasabi: 'Your next nigiri on it scores triple.',
+  chop: 'Later, tap them to grab two dishes.',
+  pudding: 'Kept to the end: most +6, fewest −6.'
 };
-// tips sit in the dock beside the belt (never over the hand) and need no "Got it"; only the opening one is a card
+// tips sit on the board beside the dish they explain (ui8: two short lines, no "Got it"); a ghost finger shows the first grab
 function coachTip(key, title, text, type) {
   UI.coach.seen[key] = 1; UI.coach.turn = G.round + '.' + G.turn;
-  if (key === 'welcome') {
-    const body = h('div', h('p', h('b', 'Goal: '), 'the most points after 3 rounds wins.'), h('p', h('b', 'Each turn: '), 'tap a plate on your belt, press Serve. Everyone reveals at the same time, then every hand passes to the next diner ("passes to …" under the table).'), h('p', h('b', 'Scoring: '), 'plates score in pairs, sets and races. The green +N on a plate is what it scores you right now.'));
-    pushCard({ kind: 'coach', title, sub: 'How it works', body, buttons: [{ label: 'Let\'s eat', a: 'cont' }] }); return;
-  }
   UI.tip = { key, title, text, type, turn: UI.coach.turn }; render();
 }
 function coachCheck() {
@@ -39,16 +35,15 @@ function coachCheck() {
   const v = viewSeat(); if (v < 0 || !canPick() || UI.cards.length) return false;
   const turn = G.round + '.' + G.turn; if (UI.coach.turn === turn) return false;
   const seen = UI.coach.seen, p = G.players[v];
-  if (!seen.welcome && lv === 'full') { coachTip('welcome', 'Welcome to the belt', ''); return true; }
-  if (!seen.pick && lv === 'full') { coachTip('pick', 'Your move:', 'tap a plate to lift it and read what it does, then press Serve.'); return true; }
+  if (!seen.welcome && lv === 'full') { coachTip('welcome', 'Grab dishes that score.', 'Most points after 3 rounds wins.'); return true; }
   const PRI = ['wasabi', 'chop', 'pudding']; const types = Array.from(new Set(p.hand.map(tkey))).sort((a, b) => (PRI.indexOf(b) - PRI.indexOf(a)) || (ORDER.indexOf(a) - ORDER.indexOf(b)));
-  if (lv === 'full' || lv === 'light') {
-    for (const t of types) { const tk = ICONS[t] ? 'roll' : t; if (seen[tk]) continue; if (lv === 'light' && !['wasabi', 'chop', 'pudding'].includes(t)) continue; coachTip(tk, 'New: ' + TY[t].name + '.', TIP_EXTRA[t] || '', t); return true; }
-  }
   const c = KK.tableCounts(p.table);
-  if (!seen.pasteReady && c.wasabiUnused && p.hand.some(id => NIG[tkey(id)])) { coachTip('pasteReady', 'Fire Paste is waiting:', 'serve a nigiri now and it lands on your paste and scores triple (look for +3, +6 or +9).', 'wasabi'); return true; }
-  if (!seen.twinReady && c.chop && p.hand.length >= 2) { coachTip('twinReady', 'Twin Sticks ready:', 'press "Use Twin Sticks" to serve two plates this turn. The sticks then go back into the hand and pass on.', 'chop'); return true; }
-  if (!seen.endRound && G.turn >= G.hand) { coachTip('endRound', 'Last plate of the round:', 'then the round is scored, including the roll race. Everything but custard is cleared and new hands are dealt.'); return true; }
+  if (!seen.twinReady && c.chop && p.hand.length >= 2) { coachTip('twinReady', 'Twin Sticks ready!', 'Tap them, then two dishes.', 'chop'); return true; }
+  if (!seen.pasteReady && c.wasabiUnused && p.hand.some(id => NIG[tkey(id)])) { coachTip('pasteReady', 'Fire Paste waiting:', 'a nigiri now scores triple.', p.hand.map(tkey).find(k => NIG[k])); return true; }
+  if (lv === 'full' || lv === 'light') {
+    for (const t of types) { const tk = ICONS[t] ? 'roll' : t; if (seen[tk]) continue; if (lv === 'light' && !['wasabi', 'chop', 'pudding'].includes(t)) continue; coachTip(tk, TY[t].name + ':', TIP_EXTRA[t] || '', t); return true; }
+  }
+  if (!seen.endRound && G.turn >= G.hand && lv === 'full') { coachTip('endRound', 'Last dish this round.', 'Then the round is scored.'); return true; }
   return false;
 }
 // ---- round score pad
