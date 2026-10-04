@@ -110,3 +110,4 @@ html.bf #tags .tag .tgl{display:none}
 .bfleg{position:absolute;top:32px;left:50%;transform:translateX(-50%);font:600 11.5px/1 "Exo 2",sans-serif;color:#dde;background:rgba(6,6,20,.72);border-radius:999px;padding:4px 10px;white-space:nowrap;pointer-events:none}
 .bfleg .g{color:#46f08a}.bfleg .r{color:#ff5a5a}.bfleg .rk{background:#ff5a5a;color:#fff;border-radius:50%;padding:0 4px}
 #bfdice .dice .die:nth-child(2){animation-delay:.12s;animation-fill-mode:backwards}#bfdice .dice .die:nth-child(3){animation-delay:.24s;animation-fill-mode:backwards}#bfdice .dice .die:nth-child(4){animation-delay:.36s;animation-fill-mode:backwards}#bfdice .dice .die:nth-child(5){animation-delay:.48s;animation-fill-mode:backwards}
+.bfm.danger{opacity:.6;border-style:dashed}

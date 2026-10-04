@@ -94,9 +94,11 @@ function item(html,cls,o){const el=document.createElement(o&&o.tag||'button');if
 function pathW(pts,cls,h){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('class',cls);svg.appendChild(p);BF.paths.push({el:p,pts,h:h||.4});return p}
 function sideCol(s){return s.side===me()?'mine':'foe'}
 function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('bf',on);if(!on){R.classList.remove('bf-play','bf-sheet');if(ov)ov.hidden=true;if(BF.wave)release()}requestAnimationFrame(()=>{try{resize3D()}catch(e){}BF.key='';BF.fkey='';if(BF.on)bfRender()})}
-  if(!on)return;build();if(!ov)return;ov.hidden=false;const play=playing();R.classList.toggle('bf-play',play);
+  if(!on)return;build();if(!ov)return;ov.hidden=false;if(G&&G.winner){if(BF.overG!==G){BF.overG=G;BF.wantStats=false}if(UI.stats&&!BF.wantStats){UI.stats=false;setTimeout(render,0)}}const play=playing();R.classList.toggle('bf-play',play);
   if(!play){R.classList.remove('bf-sheet');clear();BF.key='';bar.hidden=true;top.innerHTML='';top._h='';fing.hidden=true;return}bar.hidden=false;
   maybeRelease();
+  // my ship had nobody to shoot: say so on the board, with the fix
+  {const N=(UI.notes&&UI.notes[G.round])||[];for(const n of N){if(n.kind==='noshot'&&!n.bf){n.bf=1;const s=ship(n.id);if(s&&mineS(s))banner(`<b>No enemy ahead</b><span>${esc(shortName(s))} can only shoot forward. Pick a 🎯 move.</span>`,2600)}}}
   // the round summary between rounds is a board banner here, not a page of text
   if(sumPending()){UI.sumSeen=G.round-1;banner(`<b>Round ${G.round}</b>`,1100)}
   const k=ctx();if(k!=='plan')BF.sel=null;if(k!=='sub'&&k!=='action')BF.sub=null;
@@ -126,7 +128,7 @@ function planUI(){const ps=planSide();const my=alive().filter(s=>s.side===ps);co
     if(s.id!==BF.sel){const it=item('','bfring'+(pk==null?' need':' done'),{ship:s.id,data:{bfship:s.id},label:s.name+(pk==null?': plan its move':': change its move'),ring:true});if(pk==null&&!BF.fingT){BF.fingT=it.el}}}
   if(BF.sel){const s=ship(BF.sel);const b=B(s),d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI.draft[s.id];
     d.forEach((m,i)=>{const c=exColor(s,m).c;if(c==='r'&&s.stress)return;const tp=tplPoints(s,b,m,4);pathW(tp,'bfp '+c+(pick===i?' on':'')+(sug===i&&pick==null?' sug':''));
-      const p=finalPose(s,b,m);const rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m)+(sug===i?'<em class="st">★</em>':'')+(rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':''),{x:p.x,y:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
+      const p=finalPose(s,b,m);const rk=rockHits(s,m);let aim=false;try{aim=!rk&&inArcOf(s,p).length>0}catch(e){}const it=item(mvLabel(m)+(sug===i?'<em class="st">★</em>':'')+(rk?'<em class="rk">!</em>':'')+(aim?'<em class="tg">🎯</em>':''),'bfm '+c+(pick===i?' on':'')+(sug===i?' sug':'')+(rk?' danger':''),{x:p.x,y:p.y,data:{bfm:i},label:mvWords(m)+(sug===i?', suggested':'')+(rk?', hits an asteroid':'')+(aim?', ends with an enemy in your sights':''),relax:true});
       if(sug===i&&pick==null)BF.fingT=it.el});
     item('','bfring sel',{ship:s.id,ring:true,tag:'div'});legend('<b class="g">●</b> easy <b class="r">●</b> hard · 🎯 enemy ahead · <b class="rk">!</b> rock');
     setHint(pick==null?`Tap where ${esc(shortName(s))} flies`:all?'Ready? Tap <b>Fly</b>':'Tap your next ship')}
@@ -182,7 +184,7 @@ function resUI(){const R=UI.hold.R;{const el=document.createElement('div');el.cl
 function noteUI(){const n=UI.hold.n;const s=n&&ship(n.id);setHint(s?`${esc(shortName(s))}: ${n.kind==='noshot'?'no enemy to shoot':'…'}`:'');setBtns('')}
 function autoHold(k){if(BF.holdT)return;const ms=k==='res'?3200:1500;BF.holdT=setTimeout(()=>{BF.holdT=0;if(UI.hold&&BF.on)releaseHold()},ANIM?ms*(UI.speed==='slow'?1.5:UI.speed==='fast'?.6:1):0)}
 function overUI(){const w=winLine();const k0=me();const won=G.winner==='P'+(k0+1);banner(`<b>${won?'VICTORY!':G.winner==='draw'?'DRAW':'DEFEAT'}</b><span>${esc(w)}</span>`,1e9);setHint('');
-  setBtns(`<button class="btn" data-a="stats">Debrief</button><button class="btn primary big" data-a="new">Play again</button>`)}
+  setBtns(`<button class="btn" data-bf="stats">Debrief</button><button class="btn primary big" data-a="new">Play again</button>`)}
 function askUI(){const q=G.q;setHint(esc(q.title));let any=false;q.opts.forEach((o,i)=>{if(!o.p)return;any=true;item('◎','bfm w',{x:o.p.x,y:o.p.y,data:{bfq:o.k},label:o.l,relax:true})});setBtns('')}
 function watchUI(s){const st=G.step;let t='';if(G.phase==='plan')t='Waiting for the other player…';else if(s&&!mineS(s))t=st===3?`⏳ Enemy turn: ${esc(shortName(s))} aims`:`⏳ Enemy turn: ${esc(shortName(s))} moves`;else if(st===3)t='Combat!';
   setHint(t);setBtns(UI.paused?`<button class="btn primary" data-a="pause">▶ Resume</button>`:'')}
@@ -191,6 +193,7 @@ function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq
   if(ds.bf==='brief'||ds.bf==='briefset'){BF.seenBrief=G.seed;PHN.briefSeen=G.seed;ban.hidden=true;if(ds.bf==='brief'&&G.round===0&&G.phase==='ask'&&humanTurn()){autoPlaceAll();banner('<b>Asteroids placed</b>',900)}else bfRender();return}
   if(ds.bf==='auto'){alive().filter(s=>s.side===planSide()).forEach(s=>UI.draft[s.id]=suggestDial(s));BF.sel=null;render();return}
   if(ds.bf==='fly'){const ps=planSide();if(ps<0)return;const my=alive().filter(s=>s.side===ps);if(!my.every(s=>UI.draft[s.id]!=null))return;BF.sel=null;speedUp();banner('<b>Dials revealed…</b>',900);const b=document.querySelector('[data-a="lock"]');lockIn();return}
+  if(ds.bf==='stats'){BF.wantStats=true;UI.stats=true;render();return}
   if(ds.bf==='back'){BF.sub=null;render();return}
   if(ds.bfship!=null){selShip(ds.bfship);return}
   if(ds.bfm!=null){const s=ship(BF.sel);if(!s)return;UI.draft[s.id]=+ds.bfm;UI.sel=s.id;sfx('token');const my=alive().filter(x=>x.side===s.side);const nx=my.find(x=>UI.draft[x.id]==null);BF.sel=nx?nx.id:null;render();return}
