@@ -45,6 +45,7 @@ const RUNS = ONLY >= 0 ? [RUNS0[ONLY]] : RUNS0;
     const check = async tag => {
       const r = await p.evaluate(() => {
         const out = [], B = document.querySelector('#bd').getBoundingClientRect(), S = PX.on ? PX.state() : null, v = viewSeat();
+        if (hotSeat() && UI.holder < 0) { const n = document.querySelectorAll('#hand .hc').length; return { out: n ? ['hand cards in the DOM while the device is being passed: ' + n] : [], n: 0, q: S && S.q, blur: S && S.blur, parts: S && S.parts, paint: S && S.canvasOK, res: S && S.res, nPlay: S ? S.nPlay : 0, nSweep: S ? S.nSweep : 0 }; }
         const rel = e => { const r = e.getBoundingClientRect(); return [r.left - B.left, r.top - B.top, r.width]; };
         const near = (a, b, t) => Math.abs(a - b) <= (t || 1.2);
         const els = [...document.querySelectorAll('#bd [data-px=card]')];
