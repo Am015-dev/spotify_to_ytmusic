@@ -144,7 +144,6 @@ svg{display:block}
 #dockbody>*{flex-shrink:0}
 #promptDock{min-height:2.7em}
 #prompt.mine{color:#b5361c}
-html.ph.ph-p #prompt,html.ph.ph-p #prompt.mine{color:#fbf0da}
 #rt{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px}
 #rt svg{flex:0 0 auto}
 #roster{display:flex;flex-wrap:wrap;gap:5px}
@@ -277,19 +276,26 @@ html.ph .gx-dock-head,html.ph .gx-reopen{display:none!important}
 html.ph .gx-dock{border-left:0;border-top:3px solid var(--wood2);max-height:none;padding-bottom:env(safe-area-inset-bottom,0px)}
 html.ph .gx-dock-body{padding:5px 6px 0;gap:5px;overflow-x:hidden;overflow-y:auto}
 html.ph #acts{position:sticky;bottom:0;background:var(--paper);padding:3px 0 5px;z-index:2;margin-top:auto}
-html.ph .chip{flex:0 0 auto;padding:2px 4px;gap:3px;min-width:44px;max-width:62px;flex-direction:column;justify-content:center;text-align:center;border-width:2px}
-html.ph .chip .ct{align-items:center;flex:0 0 auto}
-html.ph .chip .ct b{display:none}
+html.ph #roster{flex-wrap:wrap;gap:4px}
+html.ph .chip{flex:1 1 0;padding:1px 6px;gap:6px;min-width:44px;min-height:44px;border-width:2px}
+html.ph .chip .ct{flex-direction:row;gap:6px;align-items:baseline}
+html.ph .chip .ct b{font-size:13px}
+html.ph .chip .ct i{font-size:13px;font-weight:800;opacity:1}
 html.ph .chip .cav{width:24px;height:24px}
 html.ph #acts .btn{font-size:14px}
 html.ph .ph-body{padding:6px 8px}
 html.ph.ph-p .gx-app{grid-template-rows:calc(44px + env(safe-area-inset-top,0px)) minmax(0,1fr)}
 html.ph.ph-p .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) calc(var(--dockh) + env(safe-area-inset-bottom,0px))}
 html.ph.ph-p .gx-dock{max-height:none;height:auto}
-html.ph.ph-p #barprompt{display:block}
-html.ph.ph-p #prompt{font-size:13px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-html.ph.ph-p #promptDock,html.ph.ph-p #rt{display:none}
-html.ph.ph-p .gx-bar .gx-sp,html.ph.ph-p #barstat{display:none}
+html.ph.ph-p #promptDock{min-height:0;display:flex;align-items:center;gap:8px}
+html.ph.ph-p #promptDock #prompt{flex:1;min-width:0}
+#hintb{flex:0 0 auto;min-height:44px;padding:0 14px}
+html.ph.ph-p .gx-bar .gx-sp{display:none}
+html.ph .chip.nn .ct b{display:none}
+html.ph.ph-p #prompt{font-size:15px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html.ph.ph-p #prompt.mine{color:#b5361c}
+html.ph.ph-p #rt{display:none}
+html.ph.ph-p #barstat{font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 html.ph.ph-l .gx-app{grid-template-columns:minmax(0,1fr) var(--rail);grid-template-rows:calc(44px + env(safe-area-inset-top,0px)) minmax(0,1fr)}
 html.ph.ph-l .gx-main{display:contents}
 html.ph.ph-l .gx-board{grid-column:1;grid-row:1/3}
@@ -318,7 +324,7 @@ html.ph #netst{min-width:44px;min-height:44px;padding:0 8px;justify-content:cent
 html.ph.ph-l.net #barstat{display:none}
 html.ph #beltz .lab{font-size:13px;padding:1px 6px 0;min-height:17px}
 html.ph #belt{padding:24px 6px 4px;gap:5px}
-html.ph.ph-p.kk-sel #roster,html.ph.ph-p.kk-short.kk-sel #rt{display:none}
+html.ph.ph-p.kk-short.kk-sel #roster,html.ph.ph-p.kk-short.kk-sel #rt{display:none}
 html.ph .rsbox{padding:8px;gap:6px}
 html.ph .cat td.n{font-size:15px;min-width:34px}
 #acts .btn,.cbtns .btn{flex-shrink:0}
@@ -396,6 +402,24 @@ html.ph .dgrid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px
 html.ph .dcard{padding:8px;gap:6px}html.ph .dimg{width:64px;height:64px}
 html.ph.ph-l .setup.scard{width:min(820px,100%)}
 @media (prefers-reduced-motion:reduce){.tbtn:active{transform:none}}
+
+/* clarity pass: race, last-turn feed, inline tips, wrapped counters, score change badges, two-row belt */
+.pudl{flex:1 1 100%;font-size:13px;font-weight:700;line-height:1.2;opacity:.9}
+#selinfo.feed{flex-direction:column;gap:4px;align-items:stretch;border-style:solid;background:#fff8e6}
+#selinfo .tip{display:flex;gap:7px;align-items:flex-start;font-size:13px;line-height:1.3;background:#fff1c2;border:1px solid #c98a10;border-radius:8px;padding:4px 6px}
+#selinfo .tip .tcard{flex:0 0 30px;height:30px}#selinfo .tip .tcard svg{width:30px;height:30px}
+#selinfo .news{display:flex;flex-direction:column;gap:2px;font-size:13px;line-height:1.25}
+#selinfo .news .nh{font-weight:800;opacity:.7}
+#selinfo .news .nn{font-weight:900}
+#selinfo .news .nd{font-weight:900;padding:0 4px;border-radius:5px;background:#eee3c8}
+#selinfo .news .nd.up{background:#d8f1c9;color:#22662b}#selinfo .news .nd.down{background:#ffd6c9;color:#9b2b14}
+.seat.wrap .ctr{flex-wrap:wrap!important;align-content:center;overflow:hidden}
+.seat.wrap{align-self:stretch}
+.sh .dl{position:absolute;left:50%;top:-14px;transform:translateX(-50%);background:#2e8a3a;color:#fff;font-weight:900;font-size:14px;border-radius:10px;padding:0 6px;z-index:3;animation:kkdl 2.6s ease-out forwards;pointer-events:none;white-space:nowrap}
+.sh .dl.neg{background:#b5361c}
+@keyframes kkdl{0%{opacity:0;transform:translate(-50%,6px)}12%{opacity:1;transform:translate(-50%,0)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-8px)}}
+#belt.two{flex-wrap:wrap;overflow-x:hidden;row-gap:6px;align-content:flex-end;justify-content:center;min-height:calc(var(--hw)*2.8 + 40px)}
+@media (prefers-reduced-motion:reduce){.sh .dl{animation:none;opacity:0}}
 </style></head>
 <body>
 <div class="gx-app">
@@ -4641,6 +4665,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
  *   GA.loop(name, {vol, fade}) / GA.stopLoop(name, {fade})         ambience beds
  *   GA.music(name|null, {vol, fade})                                 cross-fading background track
  *   GA.setSfx(on) GA.setMusic(on) GA.setVolume('sfx'|'music', 0..1)  persisted in localStorage
+ *   GA.setVolume('master', 0..1)  one level over everything (the shared settings panel sets it; default 1)
  *   GA.has(name) GA.playing() GA.state() GA.unlock() GA.names() GA.duration(name)
  * Samples are decoded lazily on the first user gesture (atob -> ArrayBuffer -> decodeAudioData, no fetch).
  */
@@ -4650,7 +4675,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
   var S = {
     inited: false, key: 'ga', src: {}, kind: {}, buf: {}, failed: {}, pending: {},
     ctx: null, ctxOpt: null, out: null, sfxBus: null, musBus: null, duckBus: null,
-    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, last: {}, loops: {},
+    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, masterVol: 1, last: {}, loops: {},
     cur: null, curName: null, wantMusic: null, duckSet: {}, duckUntil: 0, unlocked: false, decoding: false
   };
   var DEFAULT_DUCK = ['win', 'lose', 'levelup', 'level', 'boom', 'ko', 'thunder', 'roar', 'smash', 'stomp', 'door', 'death', 'crit', 'crumble'];
@@ -4695,6 +4720,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
     var t = S.ctx.currentTime;
     S.sfxBus.gain.setTargetAtTime(S.sfxOn ? S.sfxVol : 0, t, 0.02);
     S.musBus.gain.setTargetAtTime(S.musOn ? S.musVol : 0, t, 0.08);
+    S.out.gain.setTargetAtTime(S.masterVol, t, 0.02);
   }
 
   // Loops: skip encoder padding / near-silence at the edges so MP3 loops don't gap.
@@ -4770,6 +4796,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
     S.sfxOn = lsGet('sfx', '1') !== '0'; S.musOn = lsGet('mus', '1') !== '0';
     S.sfxVol = clamp(lsGet('sfxvol', o.sfxVol != null ? o.sfxVol : 0.8), 0, 1);
     S.musVol = clamp(lsGet('musvol', o.musVol != null ? o.musVol : 0.5), 0, 1);
+    S.masterVol = clamp(lsGet('mastervol', 1), 0, 1);
     if (!S.inited && root.document && root.document.addEventListener) {
       ['pointerdown', 'keydown', 'touchstart', 'mousedown'].forEach(function (ev) {
         root.document.addEventListener(ev, onGesture, { capture: true, passive: true });
@@ -4881,11 +4908,11 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
   }
   function setVolume(kind, v) {
     v = clamp(v, 0, 1);
-    if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
+    if (kind === 'master') { S.masterVol = v; lsSet('mastervol', v); } else if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
     applyVol(); return v;
   }
   function state() {
-    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, audio: !!S.ctx,
+    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, masterVol: S.masterVol, audio: !!S.ctx,
       ctxState: S.ctx ? S.ctx.state : 'none', decoded: Object.keys(S.buf).length, failed: Object.keys(S.failed),
       total: Object.keys(S.src).length, playing: S.curName, loops: Object.keys(S.loops) };
   }
@@ -5319,18 +5346,18 @@ const ORD = ['', '1st', '2nd'];
 function groupsOf(s, tab, sc) {
   const t = tab[s], c = KK.tableCounts(t), out = [];
   const mk = (k, o) => out.push(Object.assign({ k, seat: s }, o));
-  if (c.tempura) { const n = c.tempura, p = Math.floor(n / 2) * 5; mk('tempura', { type: 'tempura', n, pts: p, hint: n % 2 === 0 ? '= ' + p : (p ? p + ' +1/2' : '1 of 2'), cls: p ? 'ok' : 'wait', tip: n + ' Crispy Prawn' + (n > 1 ? 's' : '') + ': every pair is worth 5 points' + (n % 2 ? ', one more would make another pair.' : '.') }); }
-  if (c.sashimi) { const n = c.sashimi, p = Math.floor(n / 3) * 10, r = n % 3; mk('sashimi', { type: 'sashimi', n, pts: p, hint: r === 0 ? '= ' + p : (p ? p + ' +' + r + '/3' : r + ' of 3'), cls: p ? 'ok' : 'wait', tip: n + ' Fish Slice' + (n > 1 ? 's' : '') + ': each set of three is worth 10 points' + (r ? '; ' + (3 - r) + ' more would finish another set.' : '.') }); }
+  if (c.tempura) { const n = c.tempura, p = Math.floor(n / 2) * 5; mk('tempura', { type: 'tempura', n, pts: p, hint: n % 2 === 0 ? '= ' + p : (p ? '= ' + p + ', need 1' : 'need 1 more'), cls: p ? 'ok' : 'wait', tip: n + ' Crispy Prawn' + (n > 1 ? 's' : '') + ': every pair is worth 5 points' + (n % 2 ? ', one more would make another pair.' : '.') }); }
+  if (c.sashimi) { const n = c.sashimi, p = Math.floor(n / 3) * 10, r = n % 3; mk('sashimi', { type: 'sashimi', n, pts: p, hint: r === 0 ? '= ' + p : (p ? '= ' + p + ', need ' + (3 - r) : 'need ' + (3 - r) + ' more'), cls: p ? 'ok' : 'wait', tip: n + ' Fish Slice' + (n > 1 ? 's' : '') + ': each set of three is worth 10 points' + (r ? '; ' + (3 - r) + ' more would finish another set.' : '.') }); }
   if (c.dumpling) { const n = c.dumpling, p = KK.dumplingPts(n); mk('dumpling', { type: 'dumpling', n, pts: p, hint: '= ' + p, cls: 'ok', tip: n + ' Steam Bun' + (n > 1 ? 's' : '') + ' = ' + p + ' points' + (n < 5 ? ' (the next bun makes it ' + KK.dumplingPts(n + 1) + ').' : ' (five or more is the top of the ladder).') }); }
-  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? ORD[rk.rank] + ' +' + rk.pts : 'no rank', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons this round: ' + (rk.rank === 1 ? 'most icons right now (' + rk.pts + ' points).' : rk.rank === 2 ? 'second most right now (' + rk.pts + ' points).' : 'not scoring yet. Most icons scores 6, second most 3.') }); }
+  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? ORD[rk.rank] + ' now +' + rk.pts : 'behind', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons this round: ' + (rk.rank === 1 ? 'most icons right now (' + rk.pts + ' points).' : rk.rank === 2 ? 'second most right now (' + rk.pts + ' points).' : 'not scoring yet. Most icons scores 6, second most 3.') + ' The race is only settled when the round ends, so this can still change.' }); }
   const by = { salmon: [0, 0], squid: [0, 0], egg: [0, 0] };
   for (const e of t) { const k = tkey(e.id); if (NIG[k]) by[k][e.w >= 0 ? 1 : 0]++; }
   for (const k of ['salmon', 'squid', 'egg']) {
     if (by[k][0]) mk('n-' + k, { type: k, n: by[k][0], pts: NIG[k] * by[k][0], hint: '= ' + NIG[k] * by[k][0], cls: 'ok', tip: by[k][0] + ' ' + TY[k].name + ': ' + NIG[k] + ' point' + (NIG[k] > 1 ? 's' : '') + ' each.' });
     if (by[k][1]) mk('pn-' + k, { type: 'wasabi', on: k, n: by[k][1], pts: 3 * NIG[k] * by[k][1], hint: '= ' + 3 * NIG[k] * by[k][1], cls: 'ok', tip: by[k][1] + ' ' + TY[k].name + ' on Fire Paste: tripled to ' + 3 * NIG[k] + ' each.' });
   }
-  if (c.wasabiUnused) mk('wasabi', { type: 'wasabi', n: c.wasabiUnused, pts: 0, hint: 'waiting', cls: 'wait', pulse: true, tip: c.wasabiUnused + ' Fire Paste waiting for a nigiri: your next nigiri lands on it and scores triple. With none it scores nothing.' });
-  if (c.chop) mk('chop', { type: 'chop', n: c.chop, pts: 0, hint: 'ready', cls: 'ok', tip: 'Twin Sticks on the table: on a later turn you may serve two plates from your hand, then the sticks go back into that hand.' });
+  if (c.wasabiUnused) mk('wasabi', { type: 'wasabi', n: c.wasabiUnused, pts: 0, hint: '×3 next nigiri', cls: 'wait', pulse: true, tip: c.wasabiUnused + ' Fire Paste waiting for a nigiri: your next nigiri lands on it and scores triple. With none it scores nothing.' });
+  if (c.chop) mk('chop', { type: 'chop', n: c.chop, pts: 0, hint: 'serve 2 later', cls: 'ok', tip: 'Twin Sticks on the table: on a later turn you may serve two plates from your hand, then the sticks go back into that hand and move on to the next diner with it.' });
   const pud = t.filter(e => tkey(e.id) === 'pudding').length;
   return { list: out, pudNow: pud };
 }
@@ -5373,6 +5400,35 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
 function loadPrefs() { try { const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
 function savePrefs() { lsSet('kk_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
 const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35))) : Promise.resolve();
+// ---- "what just happened": after every reveal, one line per diner with the score change and its cause
+const CATN = { maki: 'roll race', tempura: 'prawn pair', sashimi: 'fish set', dumpling: 'buns', nigiri: 'nigiri', wasabi: 'Fire Paste ×3' };
+function buildNews(before, after, picks) {
+  const a = liveScores(before), b = liveScores(after), mkA = makiRank(a.map(r => r.icons)), mkB = makiRank(b.map(r => r.icons));
+  const lines = picks.map(pk => {
+    const s = pk.seat, d = b[s].total - a[s].total, keys = pk.cards.map(c => c.key), why = [];
+    const served = pk.cards.map(c => TY[c.key].name + (NIG[c.key] && c.w >= 0 ? ' on Fire Paste' : '')).join(' + ');
+    const plays = keys.some(k => ICONS[k]);
+    for (const k of ['tempura', 'sashimi', 'dumpling', 'nigiri', 'wasabi']) { const x = b[s][k] - a[s][k]; if (x) why.push((x > 0 ? '+' : '−') + Math.abs(x) + ' ' + CATN[k]); }
+    const mx = b[s].maki - a[s].maki;
+    if (mx) why.push((mx > 0 ? '+' : '−') + Math.abs(mx) + ' roll race' + (mkB[s].rank ? ' (now ' + ORD[mkB[s].rank] + ')' : ' (lost the lead)') + (!plays ? ': someone else served rolls' : ''));
+    const notes = [];
+    if (keys.includes('wasabi') && !pk.cards.some(c => NIG[c.key])) notes.push('the Fire Paste waits to triple ' + (s === viewSeat() ? 'your' : 'their') + ' next nigiri');
+    if (keys.includes('chop') && keys.length === 1) notes.push('Twin Sticks: two plates on a later turn');
+    if (keys.length === 2 && G.players[s]) notes.push('used Twin Sticks to serve two');
+    if (keys.includes('pudding')) notes.push('custard is counted at the end of the game');
+    if (!d && !why.length && keys.some(k => k === 'tempura' || k === 'sashimi')) notes.push('scores when the set is complete');
+    return { s, d, served, why, notes };
+  });
+  return { t: Date.now(), round: G.round, turn: G.turn, lines };
+}
+function newsDelta(s) { const n = UI.news; if (!n || Date.now() - n.t > 2600) return 0; const l = n.lines.find(x => x.s === s); return l ? l.d : 0; }
+function newsSig(s) { const d = newsDelta(s); return d ? UI.news.t + ':' + d : ''; }
+function newsEl() {
+  const n = UI.news; if (!n) return null;
+  const box = h('div.news');
+  n.lines.forEach((l, i) => box.appendChild(h('div.nl', i ? null : h('span.nh', 'Last turn: '), h('span.nn', { style: 'color:' + pcol(l.s).c }, pname(l.s)), ' ', h('span.nd' + (l.d > 0 ? '.up' : l.d < 0 ? '.down' : ''), l.d > 0 ? '+' + l.d : l.d < 0 ? '−' + -l.d : '±0'), ' ' + l.served + (l.why.length ? ' · ' + l.why.join(', ') : '') + (l.notes.length ? ' · ' + l.notes.join('; ') : ''))));
+  return box;
+}
 // ===================== part 2: rendering (table, belt, dock) =====================
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) UI.focus = v; return UI.focus || 0; }
@@ -5386,7 +5442,7 @@ function render() {
 function renderBar() {
   const s = $('#barstat'); if (!s) return;
   const re = UI.fz && UI.fz.roundEnd, rd = re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round;
-  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? 'Round ' + rd + ' of ' + D.rounds + ' · scoring' : 'Round ' + G.round + ' of ' + D.rounds + ' · Turn ' + G.turn + ' of ' + G.hand;
+  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? 'Round ' + rd + ' of ' + D.rounds + ' · scoring' : (isPh() ? 'Round ' + G.round + '/' + D.rounds + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + D.rounds + ' · Turn ' + G.turn + ' of ' + G.hand + ' · most points after round 3 wins');
 }
 function bankedOf(s) {
   const fzEnd = UI.fz && UI.fz.tables && UI.fz.roundEnd;
@@ -5429,8 +5485,13 @@ function renderTable() {
     const av = Math.max(34, Math.min(isMe ? 60 : 52, Math.round(rowH * .46)));
     const cmp = rowH < 88, shw = av + 14, sl = Math.max(30, Math.min(58, Math.round((rowH - (cmp ? 12 : 36)) / 1.4)));
     const ctrW = cw - shw - sl - 25;
-    let pd = Math.min(rowH - (isMe ? 34 : 32), ctrW / (isMe ? 7.2 : 5.6) - 6, isMe ? 84 : 68); pd = Math.max(24, Math.round(pd));
-    const dm = { av, shw, sl, pd, cmp };
+    // plates on the counter: one row, or two rows of bigger plates when the seat is tall enough (nothing clipped, labels readable)
+    const ng = groupsOf(s, tab, info).list.length + 1, cap = isMe ? 84 : 68, slotW = p => Math.max(p + 12, 66);
+    const fit = (rows, hgt) => { const k = Math.ceil(ng / rows); let p = Math.min(hgt, cap); if (k * slotW(p) > ctrW) p = Math.max(24, (ctrW / k) - 12); return slotW(p) * k > ctrW + 4 ? Math.min(p, 24) : p; };
+    const pd1 = fit(1, rowH - (isMe ? 34 : 32)), pd2 = ng > 2 ? fit(2, (rowH - 12) / 2 - 30) : 0;
+    const wrap = pd2 > pd1 + 4;
+    let pd = Math.max(24, Math.round(wrap ? pd2 : pd1));
+    const dm = { av, shw, sl, pd, cmp, wrap };
     const sg = seatSig(s, tab, info, pcs, isMe, dm) + '|' + sigAll;
     const old = oldSeats[s];
     if (old && old.dataset.sg === sg) { els.push(old); continue; }
@@ -5445,21 +5506,22 @@ function renderTable() {
 function seatSig(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots, sl = fz ? JSON.stringify(fz[s]) : (G.phase === 'pick' ? (p.picked ? 'p' : 'w') : 'x');
   const lnd = UI.land ? [...UI.land].filter(x => x.startsWith(s + '|')).join(',') : '';
-  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs[s], sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' : '', G.phase].join('|');
+  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs[s], sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, dm.wrap ? 1 : 0, newsSig(s), p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' : '', G.phase].join('|');
 }
 function seatEl(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], col = pcol(s), picking = G.phase === 'pick' && !p.picked && !UI.fz;
   const gs = groupsOf(s, tab, info), total = totalOf(s, info);
-  const el = h('section.seat' + (isMe ? '.me' : '') + (picking ? '.choose' : ''), { 'data-seat': s, 'aria-label': p.name + (p.ai ? ', computer' : '') + ', ' + total + ' points' });
+  const el = h('section.seat' + (isMe ? '.me' : '') + (picking ? '.choose' : '') + (dm.wrap ? '.wrap' : ''), { 'data-seat': s, 'aria-label': p.name + (p.ai ? ', computer' : '') + ', ' + total + ' points' });
   el.style.setProperty('--pd', dm.pd + 'px'); el.style.setProperty('--shw', dm.shw + 'px'); el.style.setProperty('--av', dm.av + 'px'); el.style.setProperty('--sl', dm.sl + 'px'); el.style.setProperty('--ctr', counterURL(s));
   const av = h('div.av' + (picking ? '.act' : '')); av.appendChild(avN(s, 96));
   av.appendChild(h('span.sc', String(total)));
+  { const nd = newsDelta(s); if (nd) av.appendChild(h('span.dl' + (nd > 0 ? '' : '.neg'), (nd > 0 ? '+' : '−') + Math.abs(nd))); }
   const sh = h('button.sh', { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer ' + p.ai + ')' : '') + ': ' + total + ' points. Open details.' }, av, h('span.nm', p.name));
   el.appendChild(sh);
   const ctr = h('div.ctr');
   const land = UI.land || new Set();
   for (const g of gs.list) ctr.appendChild(grpEl(g, dm.pd, land.has(s + '|' + g.k)));
-  ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));
+  if (isMe || pcs[s] || !(dm.cmp && isPh())) ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));   // a cramped rival seat drops the empty custard spot (the dock lists custard)
   if (!gs.list.length && !pcs[s]) ctr.insertBefore(h('span.none', G.phase === 'pick' ? 'Nothing served yet' : ''), ctr.firstChild);
   el.appendChild(ctr);
   el.appendChild(slotEl(s, dm.sl, dm.cmp));
@@ -5515,7 +5577,12 @@ function renderBelt() {
   const hand = v >= 0 ? dispHand() : (G.phase === 'over' ? [] : new Array(UI.fz && UI.fz.backN != null ? UI.fz.backN : G.players[f].hand.length).fill(-1));
   const hidden = v < 0;
   const m = Math.max(G.hand, 1), avail = beltWidth() - 20;
-  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? 74 : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); const hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
+  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? 74 : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
+  // a tall phone: two rows of plates instead of a belt that scrolls sideways and hides plates off the edge
+  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 56 && boardSize().h >= 440 && m > 5;
+  if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(74, Math.floor((avail - (k - 1) * 6) / k))); }
+  else if (ph && one < hw && one >= 44) hw = one;   // shrink a little rather than hide plates past the edge
+  belt.classList.toggle('two', !!two);
   $('#bd').style.setProperty('--hw', hw + 'px');
   if (!belt.__bt) { belt.__bt = 1; try { const bt = KIT.beltEl({ h: 72, period: 96, seconds: 6 }); bt.style.height = '60px'; $('#beltw').insertBefore(bt, belt); bt.style.bottom = '8px'; } catch (e) { } }
   const frag = [], oldC = new Map(); for (const c of belt.children) if (c.dataset && c.dataset.rk) oldC.set(c.dataset.rk, c);
@@ -5567,26 +5634,29 @@ function promptText() {
 }
 function placePrompt() {
   const p = $('#prompt'); if (!p) return;
-  const tgt = document.documentElement.classList.contains('ph-p') ? $('#barprompt') : $('#promptDock');
+  const tgt = $('#promptDock');
   if (tgt && p.parentNode !== tgt) tgt.appendChild(p);
 }
 function renderDock() {
   const pr = $('#prompt'); if (pr) { const t = promptText(); pr.textContent = t; const v = viewSeat(); pr.className = canPick() && v >= 0 ? 'mine' : ''; }
+  { const pd = $('#promptDock'), hb = $('#hintb'), want = document.documentElement.classList.contains('ph-p') && canPick() && viewSeat() >= 0 && !UI.sel.length;
+    if (want && !hb && pd) pd.appendChild(h('button.btn.alt#hintb', { 'data-a': 'hint', type: 'button' }, 'Hint')); else if (!want && hb) hb.remove(); }
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' ? 'Game over' : (canPick() ? 'Your turn' : 'Table');
   // round track
   const rt = $('#rt'); if (rt) { const re = UI.fz && UI.fz.roundEnd; rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · pass left')); }
   // roster chips
   const ro = $('#roster'); if (ro) {
     const tab = tables(), info = seatScoreInfo(tab), v = viewSeat(), f = focusSeat();
-    const rsg = [v, f, G.phase, isPh() ? 1 : 0, UI.fz && UI.fz.slots ? 1 : 0].concat(G.players.map((p, s) => [p.name, p.picked ? 1 : 0, totalOf(s, info)].join(':')).concat([UI.fz ? 'f' : ''])).join('|');
+    const rsg = [v, f, G.phase, isPh() ? 1 : 0, UI.fz && UI.fz.slots ? 1 : 0, pudCounts().join(',')].concat(G.players.map((p, s) => [p.name, p.picked ? 1 : 0, totalOf(s, info)].join(':')).concat([UI.fz ? 'f' : ''])).join('|');
     if (ro.dataset.sg !== rsg) { ro.dataset.sg = rsg; ro.replaceChildren();
     for (let k = 0; k < G.np; k++) {
       const s = (f + k) % G.np, p = G.players[s], busyFz = !!UI.fz, rdy = G.phase === 'pick' && p.picked && !busyFz, tot = totalOf(s, info);
       const ph = isPh();
-      const ch = h('button.chip' + (s === v ? '.me' : '') + (rdy ? '.rd' : G.phase === 'pick' && !busyFz ? '.wt' : ''), { type: 'button', 'data-a': 'chip', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer)' : '') + ': ' + tot + ' points, ' + (G.phase !== 'pick' || busyFz ? '' : rdy ? 'has chosen' : 'is choosing') },
-        (() => { const e = h('span.cav'); e.appendChild(avN(s, 96)); return e; })(), h('span.ct', h('b', p.name + (s === v && p.name !== 'You' ? ' (you)' : '')), h('i', (rdy ? '✓ ' : G.phase === 'pick' && !busyFz ? '… ' : '') + (ph ? tot : tot + ' pts' + (rdy ? ' · ready' : G.phase === 'pick' && !busyFz ? ' · choosing' : '')))));
+      const ch = h('button.chip' + (s === v ? '.me' : '') + (G.np >= 4 ? '.nn' : '') + (rdy ? '.rd' : G.phase === 'pick' && !busyFz ? '.wt' : ''), { type: 'button', 'data-a': 'chip', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer)' : '') + ': ' + tot + ' points, ' + (G.phase !== 'pick' || busyFz ? '' : rdy ? 'has chosen' : 'is choosing') },
+        (() => { const e = h('span.cav'); e.appendChild(avN(s, 96)); return e; })(), h('span.ct', h('b', p.name + (s === v && p.name !== 'You' ? ' (you)' : '')), h('i', (rdy ? '✓ ' : '') + (ph ? tot + (G.np <= 2 ? ' pts' : '') : tot + ' pts' + (rdy ? ' · ready' : G.phase === 'pick' && !busyFz ? ' · choosing' : '')))));
       ro.appendChild(ch);
     }
+    const pc = pudCounts(); if (pc.some(x => x > 0)) ro.appendChild(h('div.pudl', { title: 'Custard Cups are counted at the end of the game: most +6' + (G.np > 2 ? ', fewest −6' : '') + '.' }, 'Custard, scored at the end (most +6' + (G.np > 2 ? ', fewest −6' : '') + '): ' + G.players.map((q, i) => q.name + ' ' + pc[i]).join(', ')));
     }
   }
   renderSel(); renderActs(); renderCheat();
@@ -5611,6 +5681,15 @@ function renderSel() {
     }
   }
   el.className = 'idle';
+  // a newcomer's dock: the tip for this turn, then what happened last turn (cause -> effect), then the goal on the first turn
+  if (v >= 0 && G.phase === 'pick' && !(UI.cards.length && UI.cards[0].kind === 'pass') && (UI.tip || UI.news || (G.round === 1 && G.turn <= 2))) {
+    el.className = 'idle feed';
+    const tp = UI.tip && UI.tip.turn === G.round + '.' + G.turn && canPick() ? UI.tip : null;
+    if (tp) el.appendChild(h('div.tip', tp.type ? h('div.tcard', { html: plateS(tp.type, 30) }) : null, h('div', h('b', tp.title), ' ', tp.text)));
+    const ne = newsEl(); if (ne && !(UI.fz && UI.fz.slots)) el.appendChild(ne);
+    if (!tp && !ne) el.appendChild(h('div.si', h('span', h('b', 'Goal: '), 'the most points after 3 rounds wins. Each turn everyone picks one plate, then the hands pass left. The green +N on a plate is what it scores you right now.')));
+    return;
+  }
   let t;
   if (UI.cards.length && UI.cards[0].kind === 'pass') t = 'The hands are hidden until the device is passed.';
   else if (watching()) t = 'Sit back: the computers play all three rounds. Hands slide to the left every turn.';
@@ -5627,8 +5706,8 @@ function renderActs() {
     const p = G.players[v], chop = KK._.hasChop(p) && p.hand.length >= 2;
     const n = UI.sel.length;
     if (n) { const ids = UI.sel.map(i => p.hand[i]); const g = gainOf(v, ids); a.appendChild(h('button.btn.go', { 'data-a': 'serve', type: 'button' }, n === 2 ? 'Serve both' + (g > 0 ? ' (+' + g + ')' : '') : 'Serve' + (g > 0 ? ' (+' + g + ')' : ''))); }
-    if (chop) a.appendChild(h('button.btn' + (UI.twin ? '.on' : '.alt'), { 'data-a': 'twin', type: 'button', 'aria-pressed': UI.twin ? 'true' : 'false' }, UI.twin ? 'Twin Sticks: on' : 'Use Twin Sticks'));
-    a.appendChild(h('button.btn.alt', { 'data-a': 'hint', type: 'button' }, 'Hint'));
+    if (chop) a.appendChild(h('button.btn' + (UI.twin ? '.on' : '.alt'), { 'data-a': 'twin', type: 'button', 'aria-pressed': UI.twin ? 'true' : 'false' }, UI.twin ? 'Twin Sticks: pick 2' : 'Use Twin Sticks (serve 2)'));
+    if (!(n === 0 && document.documentElement.classList.contains('ph-p'))) a.appendChild(h('button.btn.alt', { 'data-a': 'hint', type: 'button' }, 'Hint'));
     if (n) a.appendChild(h('button.btn.alt', { 'data-a': 'unsel', type: 'button', 'aria-label': 'Put the plate back' }, 'Cancel'));
   }
 }
@@ -5675,8 +5754,8 @@ function newGame(mode, o) {
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
   G = KK.newGame({ players: np, seed, names, ai });
-  Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
-  UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && UI.coach.keep ? 'full' : 'off'), seen: {}, turn: '', keep: UI.coach.keep };
+  UI.news = null; UI.tip = null; Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
+  UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && UI.coach.keep ? 'full' : UI.coach.userOff ? 'off' : 'light'), seen: {}, turn: '', keep: UI.coach.keep, userOff: UI.coach.userOff };
   if (mode === 'guided') UI.coach.level = 'full';
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
@@ -5812,6 +5891,7 @@ async function playResolve(evs, preHand) {
     if (ANIM) { snd('cloche'); const hosts = $$('#tbl .hostc'); try { pxReveal(); await KIT.revealAll(hosts, { stagger: 110 }); } catch (e) { } await wait(850); } if (tok !== UI.seq) return;
     // 3: plates land on the counters
     const land = new Set(); rv.picks.forEach(p => p.cards.forEach(c => land.add(p.seat + '|' + keyOfCard(c)))); UI.land = land;
+    try { UI.news = buildNews(before, T, rv.picks); } catch (e) { UI.news = null; }
     UI.fz.slots = null; UI.fz.tables = T; UI.fz.say = ps ? 'The plates land. Hands slide to the left…' : 'The plates land. The round is over!';
     if (sc) { UI.fz.roundEnd = true; UI.fz.hand = []; UI.fz.backN = 0; }
     render(); snd('clink'); await wait(750); if (tok !== UI.seq) return;
@@ -5871,7 +5951,7 @@ function loadSave() {
   if (!o || !o.G || !Array.isArray(o.G.players) || o.G.v !== 1) return false;
   clearTimeout(UI.tm); UI.seq++;
   G = o.G; try { if (KK.checkInvariants(G).length) { G = null; return false; } } catch (e) { return false; }
-  Object.assign(UI, { started: true, mode: o.mode || 'vs', cfg: o.cfg || null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, enter: 'deal', focus: 0, evN: G.evN, over: null });
+  UI.news = null; UI.tip = null; Object.assign(UI, { started: true, mode: o.mode || 'vs', cfg: o.cfg || null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, enter: 'deal', focus: 0, evN: G.evN, over: null });
   if (o.coach) UI.coach = o.coach;
   UI.chefs = Array.isArray(o.chefs) && o.chefs.length === G.np ? o.chefs : null;
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
@@ -5894,40 +5974,43 @@ function drawCard() {
 }
 // ---- guide: short tips that explain each card the first time it appears
 const TIP_EXTRA = {
-  tempura: 'Two of them make a pair worth 5. Collect them in pairs.',
-  sashimi: 'Fish Slices only score in sets of three (10 points). One or two are worth nothing, so go for it only if more are coming.',
-  dumpling: 'Each Steam Bun you stack is worth more than the last: 1, 3, 6, 10 and 15 points for five.',
-  roll1: 'Roll icons race: the most icons this round scores 6, second most 3. This one has one icon.',
-  roll2: 'Roll icons race: the most icons this round scores 6, second most 3. This one has two icons.',
-  roll3: 'Roll icons race: the most icons this round scores 6, second most 3. This one has three icons, the best for the race.',
-  salmon: 'A nigiri is worth its number straight away. Put it on Fire Paste for triple.',
-  squid: 'The best nigiri: 3 points, or 9 on Fire Paste.',
+  tempura: 'They score in pairs: two make 5 points, a lone one scores nothing.',
+  sashimi: 'They score in sets of three: three make 10 points, one or two score nothing. Go for it only if more are coming.',
+  dumpling: 'Each bun is worth more than the last: 1, 3, 6, 10, then 15 points for five.',
+  roll1: 'A roll race: whoever has the most roll icons when the round ends scores 6, second most 3. This one has 1 icon.',
+  roll2: 'A roll race: whoever has the most roll icons when the round ends scores 6, second most 3. This one has 2 icons.',
+  roll3: 'A roll race: whoever has the most roll icons when the round ends scores 6, second most 3. This one has 3 icons.',
+  salmon: 'Worth 2 points at once, or 6 if it lands on your Fire Paste.',
+  squid: 'The best nigiri: 3 points, or 9 if it lands on your Fire Paste.',
   egg: 'The smallest nigiri: 1 point, or 3 on Fire Paste.',
-  wasabi: 'Serve Fire Paste first, then a nigiri: the nigiri lands on it and scores triple. Fire Paste with no nigiri scores nothing.',
-  chop: 'Twin Sticks stay on your counter. On a later turn you can serve two plates at once, then the sticks go back into your hand.',
-  pudding: 'Custard is kept for the whole meal. At the end the diner with the most gets 6, the one with the fewest loses 6.'
+  wasabi: 'Scores nothing by itself: the next nigiri you serve lands on it and scores triple.',
+  chop: 'Keep them: on a later turn you may serve two plates at once. The sticks then go back into the hand and pass on with it.',
+  pudding: 'Kept for the whole game. At the end, whoever has the most gets 6' + ' and the fewest loses 6 (no loss with 2 diners).'
 };
+// tips sit in the dock beside the belt (never over the hand) and need no "Got it"; only the opening one is a card
 function coachTip(key, title, text, type) {
   UI.coach.seen[key] = 1; UI.coach.turn = G.round + '.' + G.turn;
-  const cw = isPh() ? 52 : 108;
-  const body = type ? h('div.cwrap', h('div.cardbox', cardDiv(type, cw)), h('div.cinfo', h('p', text))) : h('p', text);
-  pushCard({ kind: 'coach', title, sub: 'Tip', body, buttons: [{ label: 'Got it', a: 'cont' }] });
+  if (key === 'welcome') {
+    const body = h('div', h('p', h('b', 'Goal: '), 'the most points after 3 rounds wins.'), h('p', h('b', 'Each turn: '), 'tap a plate on your belt, press Serve. Everyone reveals at the same time, then every hand passes one seat to the left.'), h('p', h('b', 'Scoring: '), 'plates score in pairs, sets and races. The green +N on a plate is what it scores you right now. Tips appear in the panel below as new plates show up.'));
+    pushCard({ kind: 'coach', title, sub: 'How it works', body, buttons: [{ label: 'Let\'s eat', a: 'cont' }] }); return;
+  }
+  UI.tip = { key, title, text, type, turn: UI.coach.turn }; render();
 }
 function coachCheck() {
   const lv = UI.coach.level; if (lv === 'off' || !G || G.phase !== 'pick') return false;
   const v = viewSeat(); if (v < 0 || !canPick() || UI.cards.length) return false;
   const turn = G.round + '.' + G.turn; if (UI.coach.turn === turn) return false;
   const seen = UI.coach.seen, p = G.players[v];
-  if (!seen.welcome) { coachTip('welcome', 'Welcome to the belt', 'You are a diner at a conveyor-belt sushi bar. Over three rounds you collect plates for points. The highest score at the end wins.'); return true; }
-  if (!seen.pick) { coachTip('pick', 'Everyone picks at once', 'Pick one plate from your belt and serve it: tap to lift it, ' + (UI.prefs.tap2 ? 'tap it again' : 'then press Serve') + ' to serve. When everyone has chosen, all plates are revealed together, then every hand slides to the player on your left.'); return true; }
+  if (!seen.welcome && lv === 'full') { coachTip('welcome', 'Welcome to the belt', ''); return true; }
+  if (!seen.pick && lv === 'full') { coachTip('pick', 'Your move:', 'tap a plate to lift it and read what it does, then press Serve.'); return true; }
   const types = Array.from(new Set(p.hand.map(tkey))).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
   if (lv === 'full' || lv === 'light') {
-    for (const t of types) { if (seen[t]) continue; if (lv === 'light' && !['wasabi', 'chop', 'pudding'].includes(t)) continue; coachTip(t, TY[t].name, (D.types.find(x => x.id === t) || {}).text + ' ' + (TIP_EXTRA[t] || ''), t); return true; }
+    for (const t of types) { if (seen[t]) continue; if (lv === 'light' && !['wasabi', 'chop', 'pudding'].includes(t)) continue; coachTip(t, 'New: ' + TY[t].name + '.', TIP_EXTRA[t] || '', t); return true; }
   }
   const c = KK.tableCounts(p.table);
-  if (!seen.pasteReady && c.wasabiUnused && p.hand.some(id => NIG[tkey(id)])) { coachTip('pasteReady', 'Fire Paste is waiting', 'You have Fire Paste on your counter. Serve a nigiri now and it lands on the paste and scores triple. The plates marked +6 or +9 are the nigiri that do it.', 'wasabi'); return true; }
-  if (!seen.twinReady && c.chop && p.hand.length >= 2) { coachTip('twinReady', 'Use your Twin Sticks', 'You have Twin Sticks on your counter. Press "Use Twin Sticks", pick two plates and serve both. Then the sticks go back into your hand and move on.', 'chop'); return true; }
-  if (!seen.endRound && G.turn >= G.hand) { coachTip('endRound', 'Last plate of the round', 'When the belt runs empty the round is scored: sets, ladders, nigiri and the roll race. Everything except Custard is cleared away, then a new hand is dealt.'); return true; }
+  if (!seen.pasteReady && c.wasabiUnused && p.hand.some(id => NIG[tkey(id)])) { coachTip('pasteReady', 'Fire Paste is waiting:', 'serve a nigiri now and it lands on your paste and scores triple (look for +3, +6 or +9).', 'wasabi'); return true; }
+  if (!seen.twinReady && c.chop && p.hand.length >= 2) { coachTip('twinReady', 'Twin Sticks ready:', 'press "Use Twin Sticks" to serve two plates this turn. The sticks then go back into the hand and pass on.', 'chop'); return true; }
+  if (!seen.endRound && G.turn >= G.hand) { coachTip('endRound', 'Last plate of the round:', 'then the round is scored, including the roll race. Everything but custard is cleared and new hands are dealt.'); return true; }
   return false;
 }
 // ---- round score pad
@@ -6022,7 +6105,7 @@ function showFinal() {
   // confetti only when a person at this device won (or shares the win); otherwise a softer line
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
   if (humanWin) { snd('win', { duck: true }); celebrate(box); } else { snd('round', { duck: true }); if (humans().length || NET.on) wn.after(h('p.wp', 'Well played! Another meal?')); }
-  UI.overShown = true;
+  UI.overShown = true; if (humans().length || NET.on) lsSet('kk_done', '1');
   if (UI.mode !== 'net') lsSet('kk_save', '');
 }
 function celebrate(box) {
@@ -6168,10 +6251,14 @@ function setupEl() {
     h('div.dgrid', [1, 2, 3, 4].map(c => dinerCard(c, o))),
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
   const n = o.np - 1;
+  // until a first meal is finished, the guided game is the big button
+  const first = !lsGet('kk_done');
+  const bMeal = cls => h('button.sbtn' + cls, { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', first ? 'Normal game' : 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
+  const bGuide = cls => h('button.sbtn' + cls, { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', first ? 'Start: guided first game' : 'Guided first game'), h('span', 'You and ' + PN[o.seats[0]] + ', with tips' + (first ? ' (recommended)' : '')));
   const go = h('div.sgo',
-    h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c])))),
+    first ? bGuide('.big') : bMeal('.big'),
     h('div.sgrid3',
-      h('button.sbtn', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and ' + PN[o.seats[0]] + ', with tips')),
+      first ? bMeal('') : bGuide(''),
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', o.np + ' people, one device')),
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch'), h('span', 'the chefs play'))));
   return h('div.setup.scard', head, ph ? sum : h('p.ssub', 'Invite the chefs you want at the belt. Each one has a temper; change their level if you like.'), cfg, go);
@@ -6221,7 +6308,7 @@ document.addEventListener('click', ev => {
     case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
-    case 'guide': UI.coach.level = d.v; UI.coach.keep = d.v === 'full'; renderMenu(); break;
+    case 'guide': UI.coach.level = d.v; UI.coach.keep = d.v === 'full'; UI.coach.userOff = d.v === 'off'; if (d.v === 'off') UI.tip = null; renderMenu(); break;
     case 'hints': UI.prefs.hint = !UI.prefs.hint; savePrefs(); renderMenu(); if (G) render(); break;
     case 'tap2': UI.prefs.tap2 = !UI.prefs.tap2; savePrefs(); renderMenu(); if (G) render(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
@@ -6237,7 +6324,7 @@ function applyPhone() {
   const r = document.documentElement.classList, was = r.contains('ph');
   r.toggle('ph', ph); if (UI.prefs.tap2 == null) UI.prefs.tap2 = !ph;   // phones: Serve button only by default (no accidental second tap)
   try { const bb = document.querySelector('.gx-bar').getBoundingClientRect(); document.documentElement.style.setProperty('--kkbar', Math.max(0, Math.round(bb.bottom)) + 'px'); } catch (e) { }
-  document.documentElement.style.setProperty('--dockh', Math.max(146, Math.min(178, Math.round(hh * .22))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  document.documentElement.style.setProperty('--dockh', Math.max(160, Math.min(240, Math.round(hh * .31))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !NET.on && UI.sv === 'setup') renderStart(); }
 }
 let rzT = 0;
