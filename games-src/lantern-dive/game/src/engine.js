@@ -42,7 +42,7 @@ function trickOK(S, t, d) {
     case 'odd': return cs.every(c => suit(c) < 4 && val(c) % 2 === 1);
     case 'sumgt': return cs.every(c => suit(c) < 4) && cs.reduce((a, c) => a + val(c), 0) > d.th[col];
     case 'sumlt': return cs.every(c => suit(c) < 4) && cs.reduce((a, c) => a + val(c), 0) < d.th[col];
-    case 'sumeq': return d.vs.includes(cs.reduce((a, c) => a + val(c), 0));
+    case 'sumeq': return cs.every(c => suit(c) < 4) && d.vs.includes(cs.reduce((a, c) => a + val(c), 0));
   }
   return false;
 }
@@ -109,7 +109,7 @@ const KIND = {
     if (d.only) {
       const cu = L1 + d.only - 1, got = w.includes(cu), other = w.some(x => x !== cu), wb = wonBy(S, cu);
       if (other || (wb >= 0 && wb !== o)) return -1;
-      if (got && remL === 0) return 1; return end ? -1 : 0;
+      if (got) return 1; return end ? -1 : 0;
     }
     if (w.length > d.n || w.length + remL < d.n) return -1;
     if (end) return w.length === d.n ? 1 : -1; return w.length === d.n && remL === 0 ? 1 : 0;
@@ -154,11 +154,12 @@ function jobStatus(S, ti) { const t = S.tasks[ti], d = TASKS[t.id]; return KIND[
 // mission rules that hold for the whole dive. Returns a text (broken) or '' (fine). Called after every trick.
 function condBroken(S) {
   const m = S.mission;
-  if (m.gap) { const c = new Array(S.np).fill(0); for (const k of S.tricks) for (const p of k.plays) if (suit(p.c) < 4 && val(p.c) === m.gap.v && true) c[k.w]++; if (Math.max(...c) - Math.min(...c) >= m.gap.gap) return 'A diver has won two more ' + m.gap.v + 's than another diver.'; }
+  if (m.gap) { const c = new Array(S.np).fill(0); for (const k of S.tricks) for (const p of k.plays) if (suit(p.c) < 4 && val(p.c) === m.gap.v) c[k.w]++; if (Math.max(...c) - Math.min(...c) >= m.gap.gap) return 'A diver has won two more ' + m.gap.v + 's than another diver.'; }
   if (m.m23 && S.tricks.length) { const w0 = S.tricks[0].w, w = tw(S); for (let i = 0; i < S.np; i++) if (i !== w0 && w[i] >= w[w0]) return 'The first trick winner no longer has more tricks than everybody else.'; }
   return '';
 }
-const holdsMission = m => !!(m.gap || m.m23 || m.m12 || m.m27);
+// only dive 27 must be played to the last card (its Sunstar 5 rule needs the final card); every other dive ends the moment the last job is done
+const holdsMission = m => !!m.m27;
 
 // ---------- helpers on the state ----------
 const ctl = (G, s) => G.players[s].helper ? G.cap : s;
@@ -186,7 +187,10 @@ function dealHands(G) {
 // impossible deals for some Lantern jobs: new deal, no attempt counted
 function needRedeal(G) {
   for (const t of G.tasks) {
-    const r = TASKS[t.id].redeal; if (!r) continue;
+    const dd = TASKS[t.id];
+    // 'win card X with a Lantern': impossible when one diver holds all four Lanterns and X (p.17)
+    if (dd.k === 'wsub') for (const p of G.players) if (!p.helper && [0, 1, 2, 3].every(x => p.hand.includes(L1 + x)) && p.hand.includes(dd.c)) return true;
+    const r = dd.redeal; if (!r) continue;
     for (const p of G.players) {
       const h = x => p.hand.includes(L1 + x - 1);
       if (r === 'all4' && h(1) && h(2) && h(3) && h(4)) return true;
@@ -204,7 +208,17 @@ function claims(id) {
   if (d.k === 'cards') { d.cs.forEach(c => cards.add(c)); if (d.last) pos.add('L'); }
   if (d.k === 'wsub') cards.add(d.c);
   if (d.k === 'valn' && d.op === 'ex' && d.n === 4) vals.add(d.v);
-  return { pos, cards, vals };
+  // two divers can never both have "the most tricks" / "fewer than every other diver"
+  const tok = new Set(); if (d.k === 'cmp' && d.op === 'more' && (d.vs === 'each' || d.vs === 'all')) tok.add('most'); if (d.k === 'cmp' && d.op === 'fewer' && d.vs === 'each') tok.add('fewest');
+  return { pos, cards, vals, tok };
+}
+// the least number of copies of one value (or of Lanterns) a diver must win to meet the job: used to see that two jobs on
+// different divers would need more than the four copies that exist
+function needCopies(id) {
+  const d = TASKS[id];
+  if (d.k === 'valn' && (d.op === 'ge' || d.op === 'ex')) return { v: d.v, n: d.n };
+  if (d.k === 'subx') return { v: 'L', n: d.only ? 1 : d.n };
+  return null;
 }
 function conflict(a, b) {
   const A = claims(a), B = claims(b);
@@ -213,14 +227,25 @@ function conflict(a, b) {
   const withVal = (id, v) => { const d = TASKS[id]; return (d.k === 'valn' && d.v === v) || (d.k === 'with' && (d.v === v || d.cp === v)) || (d.k === 'cards' && d.cs.some(c => suit(c) < 4 && val(c) === v)); };
   for (const v of A.vals) if (withVal(b, v)) return true;
   for (const v of B.vals) if (withVal(a, v)) return true;
+  for (const x of A.tok) if (B.tok.has(x)) return true;
+  const na = needCopies(a), nb = needCopies(b);
+  if (na && nb && na.v === nb.v && na.n + nb.n > 4) return true;
   return false;
+}
+// a job the dive's own limit (no diver two more Ns than another) can never allow: the owner needs n copies, each other diver n - gap + 1
+function limitBlocks(G, id) {
+  const g = G.mission.gap; if (!g) return false;
+  const nc = needCopies(id); if (!nc || nc.v !== g.v) return false;
+  return nc.n + (G.np - 1) * Math.max(0, nc.n - g.gap + 1) > 4;
 }
 // can the jobs be split among the seats the way the draft needs? (every seat gets one when there are enough jobs)
 function splitOK(G, ids) {
-  const n = ids.length; if (n < G.np) return true;
+  const n = ids.length;
   const par = ids.map((_, i) => i); const f = x => par[x] === x ? x : (par[x] = f(par[x]));
   for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) if (conflict(ids[i], ids[j])) par[f(i)] = f(j);
   const comps = new Set(ids.map((_, i) => f(i))).size;
+  // fewer jobs than divers: each job goes to a different diver in one round, so no conflicting pair may be drawn at all
+  if (n < G.np) return ['draft', 'hard', 'cmdnone', 'two'].includes(G.mission.sel) ? comps >= n : true;
   if (G.mission.sel === 'two') return comps >= 2 || n < 2;
   if (G.mission.sel === 'draft' || G.mission.sel === 'hard') return comps >= G.np;
   if (G.mission.sel === 'cmdnone') return comps >= G.np - 1;
@@ -235,7 +260,7 @@ function drawTasks(G) {
     while (sum < target && guard++ < 400) {
       if (!G.tdeck.length) { G.tdeck = shuffle(G, G.tdisc.concat(skipped.splice(0)).filter(x => !out.includes(x))); G.tdisc = []; if (!G.tdeck.length) G.tdeck = shuffle(G, Array.from({ length: 96 }, (_, i) => i).filter(x => !out.includes(x))); }
       const id = G.tdeck.shift(), d = TASKS[id].d[col];
-      if (sum + d > target || (noCap && !TASKS[id].cap)) { skipped.push(id); continue; }
+      if (sum + d > target || (noCap && !TASKS[id].cap) || limitBlocks(G, id)) { skipped.push(id); continue; }
       out.push(id); sum += d;
     }
     G.tdeck = G.tdeck.concat(skipped);
@@ -300,8 +325,10 @@ function initAssign(G) {
   if (K === 0) { endAssign(G); return; }
   if (A.mode === 'draft' && K < G.np) A.pass = true;
 }
-function hardest(G) { const col = G.np - 3; let b = -1; for (const i of rem(G)) b = Math.max(b, TASKS[G.tasks[i].id].d[col]); return rem(G).filter(i => TASKS[G.tasks[i].id].d[col] === b); }
-function canTake(G, s, i) { return G.tasks[i].owner < 0 && !(s === G.cap && !TASKS[G.tasks[i].id].cap); }
+// the hardest job the diver `s` may take (the Commander never takes a Commander-comparison job); without s: the hardest of all
+function hardest(G, s) { const col = G.np - 3, R = rem(G).filter(i => s == null || canTake(G, s, i)); let b = -1; for (const i of R) b = Math.max(b, TASKS[G.tasks[i].id].d[col]); return R.filter(i => TASKS[G.tasks[i].id].d[col] === b); }
+// the Commander may not take a Commander-comparison job, and neither may the drone he or she flies
+function canTake(G, s, i) { return G.tasks[i].owner < 0 && !((s === G.cap || G.players[s].helper) && !TASKS[G.tasks[i].id].cap); }
 function assignMoves(G, c) {
   const A = G.as, out = [];
   const act = A.actor; if (A.mode !== 'vote' && (act < 0 || ctl(G, act) !== c)) return out;
@@ -316,7 +343,7 @@ function assignMoves(G, c) {
       else if (!tk.length) out.push(Object.assign({ t: 'pass' }, as));
       break;
     }
-    case 'hardfirst': for (const i of hardest(G).filter(i => canTake(G, act, i))) out.push({ t: 'take', i }); if (!out.length) for (const i of hardest(G)) out.push({ t: 'take', i }); break;
+    case 'hardfirst': for (const i of hardest(G, act)) out.push({ t: 'take', i }); break;
     case 'free': {
       for (const i of R.filter(i => canTake(G, act, i))) out.push(Object.assign({ t: 'take', i }, as));
       const must = A.idle >= A.order.length - 1 && R.length;
@@ -568,7 +595,6 @@ function doPlay(G, s, c) {
   afterTrick(G, k);
 }
 // public state view for the status functions: S.tricks is the tricks list
-Object.defineProperty(Object.prototype, '__ld', { value: 0, enumerable: false, writable: true, configurable: true });
 // jobStatus / condBroken read S.tricks: provide it as an alias of G.tricks without a second copy
 function view(G) { return G; }
 

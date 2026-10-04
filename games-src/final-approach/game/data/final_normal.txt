@@ -18,3 +18,9 @@ normal r4 red Lake Orrin                       0/30   0% avg rounds 7.0 {"checks
 normal r5 red Bowlrock                         1/30   3% avg rounds 6.0 {"spin":1,"fuel":12,"short":5,"corridor":2,"mandatory":3,"speed":3,"collision":3} 5875ms/game
 normal b1 black Frostmere                      0/30   0% avg rounds 6.5 {"speed":12,"mandatory":9,"spin":3,"short":3,"collision":3} 5748ms/game
 normal b2 black Twin Spires                    2/30   7% avg rounds 6.6 {"short":13,"fuel":11,"corridor":3,"mandatory":1} 4411ms/game
+normal b3 black Cloudspire                     0/30   0% avg rounds 6.1 {"fuel":13,"spin":1,"short":8,"mandatory":2,"collision":3,"corridor":3} 3317ms/game
+BAND normal green 87/180 48.3%
+BAND normal yellow 34/210 16.2%
+BAND normal red 5/150 3.3%
+BAND normal black 2/90 2.2%
+errors 0 stalls 0 time 2534.6s

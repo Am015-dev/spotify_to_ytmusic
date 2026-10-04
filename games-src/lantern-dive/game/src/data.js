@@ -68,7 +68,7 @@ const TASKS = [
   /* 46 */ J([2, 4, 5], 'Win a trick that holds only odd numbers (1, 3, 5, 7, 9).', { k: 'trick', p: 'odd' }),
   /* 47 */ J([3, 3, 4], 'Win a trick worth more than 23 / 28 / 31 (3 / 4 / 5 divers), no Lanterns.', { k: 'trick', p: 'sumgt', th: [23, 28, 31] }),
   /* 48 */ J([3, 3, 4], 'Win a trick worth less than 8 / 12 / 16 (3 / 4 / 5 divers), no Lanterns.', { k: 'trick', p: 'sumlt', th: [8, 12, 16] }),
-  /* 49 */ J([3, 3, 4], 'Win a trick whose card values add up to 22 or 23.', { k: 'trick', p: 'sumeq', vs: [22, 23] }),
+  /* 49 */ J([3, 3, 4], 'Win a trick whose card values add up to 22 or 23 (no Lanterns in it).', { k: 'trick', p: 'sumeq', vs: [22, 23] }),
   /* 50 */ J([3, 3, 3], 'Win exactly one Lantern.', { k: 'subx', n: 1, redeal: 'all4' }),
   /* 51 */ J([3, 3, 3], 'Win the Lantern 1 and no other Lantern.', { k: 'subx', n: 1, only: 1, redeal: 'l1' }),
   /* 52 */ J([3, 3, 3], 'Win the Lantern 2 and no other Lantern.', { k: 'subx', n: 1, only: 2, redeal: 'l2' }),
