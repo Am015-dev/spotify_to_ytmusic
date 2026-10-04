@@ -97,7 +97,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-table .bf-t.up{transform:translateY(-16%) scale(1.2);z-index:4;filter:drop-shadow(0 0 6px #fff7b0) drop-shadow(0 6px 4px rgba(0,0,0,.5))}
 .bf-table .bf-t.nud{transform:translate(var(--nx),var(--ny)) scale(.9);opacity:.6}
 .bf-t.nofit>svg{opacity:.5;filter:grayscale(.6)}
-.bf-t.nofit::after{content:'✗';position:absolute;right:-12%;top:-12%;width:46%;height:46%;border-radius:50%;background:#c0392b;color:#fff;font:900 11px/1 var(--ff);display:grid;place-items:center;box-shadow:0 0 0 1.5px #fff}
+.bf-t.nofit::after{content:'✗';position:absolute;right:4%;top:4%;width:38%;height:38%;border-radius:50%;background:#c0392b;color:#fff;font:900 11px/1 var(--ff);display:grid;place-items:center;box-shadow:0 0 0 1.5px #fff}
 .bf-t.adv{outline:3px solid #ffd24a;outline-offset:1px;border-radius:4px;animation:bfReady 1.2s ease-in-out infinite}
 .bf-t.adv::before{content:none;position:absolute;left:-10%;top:-14%;z-index:2;font:900 13px/1 var(--ff);color:#ffd24a;text-shadow:0 0 3px #000,0 0 2px #000}
 .bf-t.sun{border-radius:50%;box-shadow:0 0 0 2px #fff6c0,0 0 10px #ffd24a}
