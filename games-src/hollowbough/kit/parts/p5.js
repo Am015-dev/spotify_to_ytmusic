@@ -51,10 +51,10 @@ function plaque(kind, o) {
   for (let i = 0; i < slots; i++) { const x = W / 2 + (i - (slots - 1) / 2) * 17, y = H - 20; s += `<circle cx="${f1(x)}" cy="${y}" r="6.2" fill="${i < taken ? '#fbf4e2' : '#000'}" fill-opacity="${i < taken ? 1 : .22}" stroke="${INK}" stroke-width="1" ${i < taken ? '' : 'stroke-dasharray="2 1.6"'}/>`; }
   return svgWrap(o.w || W, (o.w || W) * H / W, `0 0 ${W} ${H}`, s, ` data-plaque="${kind}"`);
 }
-// ---- evertree ----
+// ---- elderheart ----
 const TREE_SLOTS = [{ season: 'winter', x: .20, y: .79 }, { season: 'spring', x: .17, y: .34 }, { season: 'summer', x: .50, y: .09 }, { season: 'autumn', x: .83, y: .34 }];
-function evertreeInner(cur) {
-  const r = rng('evertree'); let s = '';
+function elderheartInner(cur) {
+  const r = rng('elderheart'); let s = '';
   s += `<g filter="url(#hb-bleed)" opacity=".55">${blob(300, 380, 270, 330, '#cfe3b4', .9, r)}${blob(300, 640, 280, 70, '#a9c58a', .9, r)}</g>`;
   s += `<g filter="url(#hb-wc)"><g stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">`;
   s += ell(300, 662, 230, 40, '#8fb372', .85, NS0);

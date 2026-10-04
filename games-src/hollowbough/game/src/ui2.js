@@ -1,4 +1,4 @@
-// ===================== part 2: the board (shared Evertree area): layout + render =====================
+// ===================== part 2: the board (shared Elderheart area): layout + render =====================
 const FIC = {
   forest_berry_thicket: [['berry', 2], ['card', 1]], forest_foragers_crossing: [['any', 2]], forest_rummage_hollow: [['discard', '*'], ['card', '2ea']],
   forest_echoing_meadow: [['copy', ''], ['card', 1]], forest_quarry_burrow: [['pebble', 1], ['card', 3]], forest_mixed_glade: [['twig', 1], ['resin', 1], ['berry', 1]],

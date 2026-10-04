@@ -278,13 +278,13 @@ const CONS = {
   crane: ['stone', () => stones(14, 44, 30, 14, '#b0a898') + box(60, 46, 14, 12, '#c9bea6') + `<path d="M30 58 V16 M20 58 L30 24 M40 58 L30 24" stroke="#8a5a36" stroke-width="2" fill="none"/>` + `<path d="M14 18 L82 12" stroke="#7a4a2c" stroke-width="2.6" stroke-linecap="round"/>` + `<path d="M30 16 L14 18 M30 16 L70 12" stroke="#c9a46a" stroke-width=".5"/>` + `<circle cx="68" cy="12.6" r="2.4" fill="#7d858c" stroke-width=".6"/>` + `<path d="M68 15 V30" stroke="#6a4a2a" stroke-width=".8"/>` + box(62, 30, 14, 9, '#cfc8b6') + `<path d="M62 34 h14" stroke="#000" stroke-opacity=".15" stroke-width=".4"/>` + `<path d="M12 18 q-3 4 0 8" stroke="#6a4a2a" stroke-width=".8" fill="none"/>` + box(8, 24, 8, 6, '#6a5a50') + flag(30, 16, '#c2493a')],
   storehouse: ['autumn', () => box(10, 28, 80, 28, '#b8854e') + roof(8, 14, 84, 14, '#7a4a30') + [0, 1, 2, 3, 4, 5, 6, 7, 8].map(i => `<path d="M${14 + i * 8.5} 28 V56" stroke="#7a4a2c" stroke-width=".4" stroke-opacity=".7"/>`).join('') + box(34, 32, 32, 24, '#8a5a36') + `<path d="M50 32 V56 M34 32 L50 56 M66 32 L50 56" stroke="#5a3a1e" stroke-width=".6"/>` + [[18, 56, 1.2], [26, 54, 1], [78, 55, 1.2], [86, 56, 1]].map(b => barrel(b[0], b[1], b[2])).join('') + ell(72, 59, 5, 2.8, '#e0c88a', null, ' stroke-width=".4"') + win(46, 16, 8, 8, '#2f2a44')],
   dungeon: ['night', () => stones(8, 12, 84, 50, '#6a7078') + pa('M26 62 V30 Q50 4 74 30 V62Z', '#1c1a22') + [32, 38, 44, 50, 56, 62, 68].map(x => `<path d="M${x} ${62}V${22 + Math.abs(x - 50) * .5}" stroke="#6a6468" stroke-width="1.4"/>`).join('') + `<path d="M26 44 H74 M26 54 H74" stroke="#6a6468" stroke-width="1.2"/>` + [[44, 40], [58, 40]].map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="1.6" fill="#ffd36a" stroke="none"/><circle cx="${p[0]}" cy="${p[1]}" r="3.4" fill="#ffd36a" fill-opacity=".25" stroke="none"/>`).join('') + [14, 86].map(x => rc(x - 1, 30, 2, 12, '#8a6240', 0, ' stroke-width=".4"') + `<path d="M${x} 28 q-3 -4 0 -8 q3 4 0 8Z" fill="#f6a830" stroke-width=".4"/><circle cx="${x}" cy="26" r="7" fill="#ffb84a" fill-opacity=".25" stroke="none"/>`).join('') + `<path d="M10 14 q4 6 0 12 M90 14 q-4 6 0 12" stroke="#2a2a2e" stroke-width=".8" fill="none"/>`],
-  evertree: ['meadow', () => { let s = ell(50, 55, 40, 7, '#7aa869', .9, NS0); s += `<circle cx="50" cy="26" r="30" fill="${gold}" fill-opacity=".25" stroke="none"/>`; s += pa('M42 62 Q46 48 44 36 Q43 30 38 24 L42 24 Q47 28 48 32 Q50 22 49 12 L53 12 Q52 22 52 32 Q54 28 58 24 L62 24 Q57 30 56 36 Q54 48 60 62Z', '#8a6240'); s += `<path d="M46 56 q2 -10 0 -18 M54 58 q-2 -10 1 -20" stroke="#5a3a1e" stroke-width=".5" fill="none"/>`; const r = rng('ev'); [[50, 14, 15, 11], [34, 20, 12, 9], [66, 20, 12, 9], [26, 30, 9, 7], [74, 30, 9, 7], [50, 26, 16, 10]].forEach((b, i) => { s += ell(b[0], b[1], b[2], b[3], ['#79b25e', '#5f9a52', '#8cc46a'][i % 3]); }); for (let i = 0; i < 16; i++) s += `<ellipse cx="${f1(20 + r() * 60)}" cy="${f1(8 + r() * 28)}" rx="1.8" ry="1" fill="${['#f0c43a', '#fff0a0', '#f3b6c4'][i % 3]}" stroke="none" transform="rotate(${f1(r() * 180)} 50 20)"/>`; s += `<circle cx="50" cy="38" r="3" fill="#fff6b0"/><circle cx="50" cy="38" r="7" fill="#fff6b0" fill-opacity=".3" stroke="none"/>`; return s; }],
+  elderheart: ['meadow', () => { let s = ell(50, 55, 40, 7, '#7aa869', .9, NS0); s += `<circle cx="50" cy="26" r="30" fill="${gold}" fill-opacity=".25" stroke="none"/>`; s += pa('M42 62 Q46 48 44 36 Q43 30 38 24 L42 24 Q47 28 48 32 Q50 22 49 12 L53 12 Q52 22 52 32 Q54 28 58 24 L62 24 Q57 30 56 36 Q54 48 60 62Z', '#8a6240'); s += `<path d="M46 56 q2 -10 0 -18 M54 58 q-2 -10 1 -20" stroke="#5a3a1e" stroke-width=".5" fill="none"/>`; const r = rng('ev'); [[50, 14, 15, 11], [34, 20, 12, 9], [66, 20, 12, 9], [26, 30, 9, 7], [74, 30, 9, 7], [50, 26, 16, 10]].forEach((b, i) => { s += ell(b[0], b[1], b[2], b[3], ['#79b25e', '#5f9a52', '#8cc46a'][i % 3]); }); for (let i = 0; i < 16; i++) s += `<ellipse cx="${f1(20 + r() * 60)}" cy="${f1(8 + r() * 28)}" rx="1.8" ry="1" fill="${['#f0c43a', '#fff0a0', '#f3b6c4'][i % 3]}" stroke="none" transform="rotate(${f1(r() * 180)} 50 20)"/>`; s += `<circle cx="50" cy="38" r="3" fill="#fff6b0"/><circle cx="50" cy="38" r="7" fill="#fff6b0" fill-opacity=".3" stroke="none"/>`; return s; }],
   windmill: ['autumn', () => pa('M38 58 L42 24 H58 L62 58Z', '#e0d2b2') + pg([39, 24, 50, 12, 61, 24], '#a8603c') + door(46, 46, 8, 12) + win(46, 32, 8, 8, '#ffd36a') + `<g transform="translate(50 20)"><circle r="2" fill="#6a4a2a"/>${[0, 90, 180, 270].map(a => `<g transform="rotate(${a + 20})"><path d="M0 0 L0 -20" stroke="#7a5638" stroke-width="1"/><path d="M1 -6 h8 v13 h-8Z" fill="#f6ecd6" stroke-width=".5"/><path d="M1 -2 h8 M1 2 h8" stroke="${INK}" stroke-width=".25"/></g>`).join('')}</g>` + [[18, 54, 1.2], [84, 52, 1]].map(p => tree(p[0], p[1] + 6, p[2], '#d9843a')).join('')]
 };
 function construction(key) {
   const [bg, fn] = CONS[key];
   let s = scene(bg, key);
-  if (!['barge', 'theatre', 'dungeon', 'cemetery'].includes(key) && key !== 'evertree') s += ell(50, 59, 44, 4, '#2f3a2a', .16, NS0);
+  if (!['barge', 'theatre', 'dungeon', 'cemetery'].includes(key) && key !== 'elderheart') s += ell(50, 59, 44, 4, '#2f3a2a', .16, NS0);
   return s + fn();
 }
 // ---------- art registry + card ----------
@@ -413,10 +413,10 @@ function plaque(kind, o) {
   for (let i = 0; i < slots; i++) { const x = W / 2 + (i - (slots - 1) / 2) * 17, y = H - 20; s += `<circle cx="${f1(x)}" cy="${y}" r="6.2" fill="${i < taken ? '#fbf4e2' : '#000'}" fill-opacity="${i < taken ? 1 : .22}" stroke="${INK}" stroke-width="1" ${i < taken ? '' : 'stroke-dasharray="2 1.6"'}/>`; }
   return svgWrap(o.w || W, (o.w || W) * H / W, `0 0 ${W} ${H}`, s, ` data-plaque="${kind}"`);
 }
-// ---- evertree ----
+// ---- elderheart ----
 const TREE_SLOTS = [{ season: 'winter', x: .20, y: .79 }, { season: 'spring', x: .17, y: .34 }, { season: 'summer', x: .50, y: .09 }, { season: 'autumn', x: .83, y: .34 }];
-function evertreeInner(cur) {
-  const r = rng('evertree'); let s = '';
+function elderheartInner(cur) {
+  const r = rng('elderheart'); let s = '';
   s += `<g filter="url(#hb-bleed)" opacity=".55">${blob(300, 380, 270, 330, '#cfe3b4', .9, r)}${blob(300, 640, 280, 70, '#a9c58a', .9, r)}</g>`;
   s += `<g filter="url(#hb-wc)"><g stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">`;
   s += ell(300, 662, 230, 40, '#8fb372', .85, NS0);
@@ -515,8 +515,8 @@ const HB = {
   worker: (i, s) => { s = s || 32; return _mee(typeof i === 'number' ? i : Math.max(0, PLAYER.findIndex(p => p.name === i)), [s * .8, s]); },
   season: (name, s) => _sea(name, sq(s || 48)),
   plaque: (kind, o) => { mount(); return parse(plaque(kind, o)); },
-  evertree: (o) => { mount(); o = o || {}; const w = o.w || 600; return parse(svgWrap(w, w * 1.2, '0 0 600 720', evertreeInner(o.season), ' data-evertree="1"')); },
-  evertreeSlots: TREE_SLOTS,
+  elderheart: (o) => { mount(); o = o || {}; const w = o.w || 600; return parse(svgWrap(w, w * 1.2, '0 0 600 720', elderheartInner(o.season), ' data-elderheart="1"')); },
+  elderheartSlots: TREE_SLOTS,
   table: (w, h, mood) => { mount(); return parse(svgWrap(w, h, `0 0 ${w} ${h}`, tableSVG(w, h, mood))); },
   tableURL: (mood, w, h) => toURL(svgWrap(w || 1200, h || 800, `0 0 ${w || 1200} ${h || 800}`, DEFS2 + tableSVG(w || 1200, h || 800, mood))),
   applyTable: (el, mood) => { el.style.backgroundColor = mood === 'forest' ? '#6f8f5c' : '#efe3c6'; el.style.backgroundImage = `url("${HB.tableURL(mood)}")`; el.style.backgroundSize = 'cover'; el.style.backgroundPosition = 'center'; },

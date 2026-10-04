@@ -131,7 +131,7 @@ function openInfo(which) {
       p.appendChild(popHead('Seasons'));
       body.appendChild(h('p.sm', 'Each player moves through the seasons on their own. You may Prepare for the next season only when all your workers are placed.'));
       G.players.forEach((pl, s) => { const nx = pl.season < 3 ? SEASN[pl.season + 1] : null; body.appendChild(h('div.kv', h('span', pawn(s, 16), ' ' + pl.name), h('b', HBKit.season(SEAS[pl.season], 20), ' ' + SEASN[pl.season] + ' · ' + pl.workers + ' workers'))); });
-      body.appendChild(h('div.tree', HBKit.evertree({ w: 150, season: SEAS[Math.max(0, focusSeat() >= 0 ? G.players[focusSeat()].season : 0)] })));
+      body.appendChild(h('div.tree', HBKit.elderheart({ w: 150, season: SEAS[Math.max(0, focusSeat() >= 0 ? G.players[focusSeat()].season : 0)] })));
     }
     p.appendChild(body); body.appendChild(h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Close'));
   });
@@ -171,7 +171,7 @@ function openCard(src, id, seat, slot, trig) {
     const ent = src === 'city' ? G.players[seat].city.find(e => e.id === id) : null;
     const left = h('div.cardbox', cardEl(id, w, { entry: ent }));
     const right = h('div.cinfo', h('div.cc', h('b', 'Cost '), costEl(c.cost, 16), h('b', ' · ' + c.pts + ' pt')), h('p.ct', c.text), h('p.sm', TYPEHELP[c.type]));
-    if (c.kind === 'critter') { const lk = D.cards.find(x => x.key === c.linked); right.appendChild(h('p.sm', 'Free if you own ' + (c.linked === 'any' ? 'the Ever Tree' : lk ? lk.name : '?') + ' with no token on it.')); }
+    if (c.kind === 'critter') { const lk = D.cards.find(x => x.key === c.linked); right.appendChild(h('p.sm', 'Free if you own ' + (c.linked === 'any' ? 'the Elderheart Oak' : lk ? lk.name : '?') + ' with no token on it.')); }
     if (ent) { const l = []; if (ent.occ) l.push('occupied'); if (ent.tok) l.push(ent.tok + ' point token(s)'); if (ent.pris && ent.pris.length) l.push(ent.pris.length + ' prisoner(s)'); if (ent.w) l.push(ent.w + ' worker(s) inside'); if (ent.stock) l.push('stock ' + costText(ent.stock)); if (l.length) right.appendChild(h('p.sm', l.join(', '))); }
     const cw = h('div.cwrap', left, right);
     const acts = h('div.pacts');
