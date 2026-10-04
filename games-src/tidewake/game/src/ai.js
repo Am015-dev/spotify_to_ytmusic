@@ -7,7 +7,8 @@
 //  * edges are avoided; safe options for the next turn are counted from my remaining tiles (normal) and, for hard, also the odds that the tile I
 //    draw gives a safe option, plus a one-turn look-ahead and a push on rivals toward the edge
 // easy: often picks a random non-suicidal move, ignores monster risk. normal: 1-ply. hard: adds the look-ahead and rival pressure.
-const AILV={easy:{noise:30,rnd:.45,rk:0,mob:2,look:0,kill:250,push:0,draw:0},normal:{noise:4,rnd:.2,rk:420,mob:7,look:0,kill:320,push:0,draw:1},hard:{noise:0,rnd:0,rk:420,mob:7,look:0,kill:380,push:0,draw:1,mc:40}};
+// easy leaves visible risky openings (more random safe-looking moves, no thought for next turn); measured: normal beats it 57-43, hard 50-50 vs normal (luck dominates)
+const AILV={easy:{noise:60,rnd:.8,rk:0,mob:0,look:0,kill:250,push:0,draw:0},normal:{noise:4,rnd:.2,rk:420,mob:7,look:0,kill:320,push:0,draw:1},hard:{noise:0,rnd:0,rk:420,mob:7,look:0,kill:380,push:0,draw:1,mc:40}};
 let AISALT=12345;function setAiSeed(s){AISALT=s>>>0}
 function mkRng(seed){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return ((t^t>>>14)>>>0)/4294967296}}
 function kHash(K){let h=AISALT^(K.seat*2654435761);const mix=x=>{h=Math.imul(h^x,2246822519)>>>0;h^=h>>>13};mix(K.turn);mix(K.sp);mix(K.mons.length);

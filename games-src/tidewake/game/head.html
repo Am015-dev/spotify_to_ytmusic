@@ -5,12 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tidewake</title>
 <meta name="description" content="Tidewake: lantern-ship captains steer junks along wake currents on a haunted 6x6 sea, dodging leviathans. A tile-laying survival game for 1-8 players with computer captains, hot-seat and a guided first game.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
 /*SHELL_CSS*/
 [hidden]{display:none!important}
 :root{--ink:#14232b;--ink2:#2a4650;--paper:#f3e6bf;--paper2:#e7d39a;--teal:#1d7c83;--teal2:#0f4f5b;--deep:#0b2a33;--gold:#e3b24b;--gold2:#b98a23;--red:#c8432f;--green:#2f9b64;--viol:#8a56c4;
-  --fd:'IM Fell English SC','Cormorant Garamond',Georgia,serif;--fb:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --fd:'Palatino Linotype','Book Antiqua',Palatino,'URW Palladio L',Georgia,serif;--fb:Georgia,'Palatino Linotype','Book Antiqua',Palatino,'Times New Roman',serif;
   --gx-bg:#0b2a33;--gx-bar:#0b2a33;--gx-panel:#f3e6bf;--gx-ink:#14232b;--gx-line:rgba(20,35,43,.28);--gx-accent:#e3b24b;--gx-dock-w:clamp(330px,29vw,430px);--gx-bar-h:50px;--gx-radius:14px;--gx-shadow:0 18px 50px rgba(0,0,0,.55)}
 body{font-family:var(--fb);font-weight:600;font-size:17px;line-height:1.25;color:var(--ink);background:var(--gx-bg);-webkit-tap-highlight-color:transparent}
 button{font-family:inherit;font-weight:700;font-size:inherit;color:inherit}
@@ -365,5 +364,25 @@ html.ph .omark{margin:-13px 0 0 -13px}
 html.ph .omark b{width:26px;height:26px;font-size:.85rem;border-width:2px}
 html.ph .gx-drawer{top:auto}
 @media (prefers-reduced-motion:reduce){html.ph .ppop.in,html.ph .pcard.in{animation:none}}
+/* shared kit (part 8): colour-blind symbols, text size, phone name tags, achievements */
+i.sd .gx-cbm,.otag i .gx-cbm{font:700 9px/1 system-ui,sans-serif;color:#fff;text-shadow:0 0 2px #000,0 0 1px #000}
+html.cb i.sd,html.cb .otag i{display:inline-flex!important;align-items:center;justify-content:center;width:15px!important;height:15px!important;border-radius:4px!important;vertical-align:-3px}
+html.cb .otag.ship i{width:14px!important;height:14px!important}
+.achv{margin:8px 0;padding:6px 10px;border-radius:10px;background:#f3d77a;color:#3a2412;font-weight:700}
+#dockbody>.prompt,#dockbody #main,#dockbody #coach,#dockbody #res,#pc .pcb,#ppop .ph-body,#ps,#logbody,#crewbody,#rulesbody,#credbody{zoom:var(--gx-text,1)}
+.gx-recap{margin:6px 8px 2px;color:var(--ink)}
+.gx-refbtn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.gx-ref-pic img{border-radius:8px}
+.gx-drawer .gx-set,.gx-drawer .gx-ref{font-family:var(--fb)}
+/* phones: short name tags on leviathans and expansion pieces (the text names them); ships only with colour-blind help */
+html.ph .otag.mon,html.ph .otag.piece{display:inline-flex!important;font-size:.56rem;padding:0 3px;border-radius:5px;max-width:64px;overflow:hidden;white-space:nowrap}
+html.ph.cb .otag.ship{display:inline-flex!important;font-size:0;padding:1px;gap:0}
+.ttl{max-width:560px}.ttl h1{justify-content:center;margin-top:min(8vh,40px)}.ttl .tag{text-align:center}
+.tmenu{display:flex;flex-direction:column;gap:8px;padding:12px}
+.tmenu .btn.big{display:flex;flex-direction:column;align-items:flex-start;text-align:left;min-height:52px;padding:8px 14px;font-size:1.1rem;width:100%}
+.tmenu .btn.big small{font-weight:600;font-size:.86rem;opacity:.8;margin-top:2px}
+.tmenu .row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.tmenu .row .btn{flex:1 1 auto}
+.stin .btn.back{margin:4px 0 0}
+.tmenu .online{background:rgba(255,255,255,.35);border:2px solid #7a5a14;border-radius:10px;padding:0 10px}.tmenu .online>summary{min-height:48px;display:flex;align-items:center;font-size:1.1rem;cursor:pointer}
 </style>
 </head>

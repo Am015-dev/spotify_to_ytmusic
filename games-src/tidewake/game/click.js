@@ -38,7 +38,7 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
   const seen=new Set();let hidden=0,clicks=0,mism=0,mm=0;
   w.addEventListener('load',()=>{try{w.eval(`AIDELAY=${cf.anim?10:0};ANIM=${cf.anim?1:0};UI.speed=${cf.anim?40:1};UI.qTime=${cf.qt||0};UI.tickRate=${cf.qt?60:1};setSeed(${seed});setAiSeed(${seed});TWKit.setSpeed(${cf.anim?40:1})`);
     if(cf.guided)click(d.querySelector('[data-a=guided]'));
-    else{if(cf.variant)click(d.querySelector(`[data-a=var][data-v=${cf.variant}]`));click(d.querySelector(`[data-a=mode][data-v=${cf.mode}]`));
+    else{click(d.querySelector('[data-a=cfg]'));if(cf.variant)click(d.querySelector(`[data-a=var][data-v=${cf.variant}]`));click(d.querySelector(`[data-a=mode][data-v=${cf.mode}]`));
       if(cf.np&&!cf.variant)click(d.querySelector(`[data-a=np][data-v="${cf.np}"]`));
       for(const k of cf.exp||[]){const c=d.querySelector(`[data-a=exp][data-k=${k}]`);c.checked=true;c.dispatchEvent(new w.Event('change',{bubbles:true}))}
       if(cf.noMon){const c=d.querySelector('[data-a=nomon]');c.checked=true;c.dispatchEvent(new w.Event('change',{bubbles:true}))}

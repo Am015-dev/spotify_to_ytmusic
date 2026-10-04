@@ -52,10 +52,10 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(TWO?'_2d':'');const ctx=await b.newCo
   // 5. dock collapsed and back
   await p.evaluate(()=>GX.toggleDock(false));await p.waitForTimeout(500);await whole('dock min');await shot('8dockmin');await p.evaluate(()=>GX.toggleDock(true));await p.waitForTimeout(300);
   // 6. hot-seat pass screen
-  await p.evaluate(()=>{showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=hot]');await p.click('[data-a=np][data-v="3"]');await p.click('#startbtn');await p.waitForTimeout(1200);
+  await p.evaluate(()=>{UI.cfgOpen=true;showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=hot]');await p.click('[data-a=np][data-v="3"]');await p.click('#startbtn');await p.waitForTimeout(1200);
   await scroll('pass');await whole('pass');await dockOn('pass');await shot('9pass');await p.click('#dockbody [data-a=take]');await p.waitForTimeout(500);await shot('9pass_taken');
   // 7. a busy 8-captain game with every expansion: ships on every edge, leviathans, gate, wave, maelstrom
-  await p.evaluate(()=>{showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=watch]');await p.click('[data-a=np][data-v="8"]');
+  await p.evaluate(()=>{UI.cfgOpen=true;showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=watch]');await p.click('[data-a=np][data-v="8"]');
   for(const k of['rift','wave','maelstrom','cannon']){await p.evaluate(k=>{const c=document.querySelector(`[data-a=exp][data-k=${k}]`);if(!c.checked){c.checked=true;c.dispatchEvent(new Event('change',{bubbles:true}))}},k)}
   await p.evaluate(()=>{setSeed(11);AIDELAY=0;ANIM=0});await p.click('#startbtn');await p.waitForTimeout(1500);await p.evaluate(()=>{let n=0;while(!G.over&&n++<60&&G.turn<8){const st=aiStep();if(!st)break;act(st.m,st.seat)}});await p.waitForTimeout(1500);
   await scroll('busy');const c3=await whole('busy 8p');await shot('10busy8');

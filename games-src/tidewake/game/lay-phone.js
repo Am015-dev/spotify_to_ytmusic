@@ -40,7 +40,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
   const targets=async tag=>{const r=await p.evaluate(()=>{const o=[];for(const e of document.querySelectorAll('.gx-bar button,#ps button,#ppop button,#pc button,#netst button')){const R=e.getBoundingClientRect();if(!R.width||!R.height)continue;const cs=getComputedStyle(e);if(cs.visibility==='hidden')continue;if(R.width<43.5||R.height<43.5)o.push((e.dataset.a||e.dataset.ph||e.className||e.tagName)+':'+Math.round(R.width)+'x'+Math.round(R.height))}return o});if(r.length)prob(tag,'SMALL TAP TARGETS',JSON.stringify(r.slice(0,6)))};
   const overlap=(A,B)=>A[0]<B[2]&&A[2]>B[0]&&A[1]<B[3]&&A[3]>B[1];
   // 0. start screen then guided game
-  await scroll('start');await p.click('[data-a=guided]');await p.waitForTimeout(1500);await waitHuman();
+  await scroll('start');await shot('00title');await p.click('[data-a=guided]');await p.waitForTimeout(1500);await waitHuman();
   if(BEFORE){await p.waitForTimeout(500);const m=await metrics();log('BEFORE metrics',JSON.stringify(m));rep.push({t,m});await shot('0setup');await ctx.close();continue}
   await scroll('setup');await shot('0setup_card');await dismissCards();await p.waitForTimeout(300);
   const m0=await metrics();const side=m0.nums;const need=FIT.share(W,H)*(m0.short-(m0.rect[2]===m0.W&&m0.rect[3]<m0.H?0:0));
@@ -101,15 +101,15 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
   // drawers
   for(const id of['setd','crewd']){await p.tap(`.gx-bar [data-gx="${id}"]`);await p.waitForTimeout(600);await scroll('drawer '+id);if(id==='setd')await shot('11menu');await p.keyboard.press('Escape');await p.waitForTimeout(350)}
   // hot-seat pass screen
-  await p.evaluate(()=>{showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=hot]');await p.click('[data-a=np][data-v="3"]');await p.click('#startbtn');await p.waitForTimeout(1200);
+  await p.evaluate(()=>{UI.cfgOpen=true;showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=hot]');await p.click('[data-a=np][data-v="3"]');await p.click('#startbtn');await p.waitForTimeout(1200);
   await scroll('pass');await shot('12pass');const pass=await p.evaluate(()=>({card:!document.querySelector('#pc').hidden&&!!document.querySelector('#pc [data-a=take]'),hand:!!document.querySelector('#ps [data-owner]')}));if(!pass.card)prob('no pass card in hot-seat',JSON.stringify(pass));if(pass.hand)prob('hand visible before pass screen taken');
   await p.tap('#pc [data-a=take]');await p.waitForTimeout(500);await whole('hot setup');await shot('13hot');
   // busy 8 captain game + game over card
-  await p.evaluate(()=>{showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=watch]');await p.click('[data-a=np][data-v="8"]');
+  await p.evaluate(()=>{UI.cfgOpen=true;showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=watch]');await p.click('[data-a=np][data-v="8"]');
   for(const k of['rift','wave','maelstrom','cannon']){await p.evaluate(k=>{const c=document.querySelector(`[data-a=exp][data-k=${k}]`);if(!c.checked){c.checked=true;c.dispatchEvent(new Event('change',{bubbles:true}))}},k)}
   await p.evaluate(()=>{setSeed(11);AIDELAY=0;ANIM=0});await p.click('#startbtn');await p.waitForTimeout(1500);await p.evaluate(()=>{let n=0;while(!G.over&&n++<60&&G.turn<8){const st=aiStep();if(!st)break;act(st.m,st.seat)}});await p.waitForTimeout(1500);
   await scroll('busy');await whole('busy 8p');await shot('14busy8');
-  await p.evaluate(()=>{showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=watch]');await p.click('[data-a=np][data-v="4"]');for(const k of['rift','wave','maelstrom','cannon']){await p.evaluate(k=>{const c=document.querySelector(`[data-a=exp][data-k=${k}]`);if(c.checked){c.checked=false;c.dispatchEvent(new Event('change',{bubbles:true}))}},k)}await p.evaluate(()=>{setSeed(11);AIDELAY=0;ANIM=0});await p.click('#startbtn');await p.waitForTimeout(1200);
+  await p.evaluate(()=>{UI.cfgOpen=true;showStart()});await p.waitForTimeout(300);await p.click('[data-a=mode][data-v=watch]');await p.click('[data-a=np][data-v="4"]');for(const k of['rift','wave','maelstrom','cannon']){await p.evaluate(k=>{const c=document.querySelector(`[data-a=exp][data-k=${k}]`);if(c.checked){c.checked=false;c.dispatchEvent(new Event('change',{bubbles:true}))}},k)}await p.evaluate(()=>{setSeed(11);AIDELAY=0;ANIM=0});await p.click('#startbtn');await p.waitForTimeout(1200);
   await p.evaluate(()=>{ANIM=0;let n=0;while(!G.over&&n++<8000){const st=aiStep();if(!st)break;performMove(st.m,st.seat)}refresh();overCheck&&overCheck()});await p.waitForTimeout(1500);await scroll('over');await shot('15over');
   const ov=await p.evaluate(()=>({card:!document.querySelector('#pc').hidden&&!!document.querySelector('#pc [data-over]'),cont:!!document.querySelector('#pc [data-ph=dismiss]')}));if(!ov.card||!ov.cont)prob('end card missing',JSON.stringify(ov));
   await p.tap('#pc [data-ph=dismiss]');await p.waitForTimeout(400);await whole('over dismissed');await shot('16over_board');

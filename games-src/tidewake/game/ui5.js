@@ -4,16 +4,16 @@ function perfHooks(){const PH=window.PerfHUD;if(!PH||!TWKit._K||!TWKit._K.on)ret
   PH.register({game:'Tidewake',renderer:K.r,levels:['high','medium','low'],names:{high:'High',medium:'Medium',low:'Low'},anchor:'.gx-board',corner:'bl',
     getLevel:()=>TWKit.getQuality().active,isAuto:()=>TWKit.getQuality().pref==='auto',autoTop:()=>window.TW_SOFTGPU?'low':(Math.min(innerWidth,innerHeight)<600?'medium':'high'),
     setLevel:(l,why)=>{if(why==='apply')TWKit.setQuality(l);else TWKit._applyQ(l);if(GX.open==='setd')renderSettings()},
-    basePR:()=>Math.min(window.devicePixelRatio||1,DPR[TWKit.getQuality().active]||1),onPixelRatio:v=>{K.r.setPixelRatio(v);const b=GX.boardSize();TWKit.resize(b.w,b.h)},
+    basePR:()=>Math.max(1,Math.min(window.devicePixelRatio||1,DPR[TWKit.getQuality().active]||1)),onPixelRatio:v=>{K.r.setPixelRatio(Math.max(1,v));const b=GX.boardSize();TWKit.resize(b.w,b.h)},
     orbit:t=>{const C=K.cs;if(!C)return;if(t==null){if(UI.orb0){C.pos.copy(UI.orb0.p);C.look.copy(UI.orb0.l);UI.orb0=null}return}if(!UI.orb0)UI.orb0={p:C.pos.clone(),l:C.look.clone()};const a=Math.sin(t*Math.PI*2)*.5;const d=UI.orb0.p.clone().sub(UI.orb0.l);const x=d.x*Math.cos(a)-d.z*Math.sin(a),z=d.x*Math.sin(a)+d.z*Math.cos(a);C.pos.set(UI.orb0.l.x+x,UI.orb0.p.y,UI.orb0.l.z+z)},
     isAnimating:()=>{try{return TWKit.isAnimating()||UI.busy}catch(e){return false}},beforeTest:()=>GX.close()})}
 // board framing: the whole chart (frame, edge numbers, ships on the marks) must stay inside the board area at any aspect
 function frame(w,h){const a=w/h;window.TW_PADX=a<1.2?.3:.15;window.TW_PADT=a<.8?.55:.6;window.TW_PADB=.2}
-function boot(){phApply();GX.init({key:'tw'});const st=lsGet('tw_set',{});if(st.speed)UI.speed=st.speed;if(st.guide)UI.guide=st.guide;if(st.anim===false){UI.anim=false;ANIM=0}
+function boot(){phApply();GX.init({key:'tw'});const st=lsGet('tw_set',{});if(st.guide)UI.guide=st.guide;
   window.TW_SOFTGPU=detectSoftGPU();installRecorders();
   const cv=$('#c3'),fb=$('#fb');const P=new URLSearchParams(location.search);let res={ok:false};
   {const b=GX.boardSize();frame(b.w,b.h)}
-  try{res=TWKit.init(cv,{fallback:fb,force2D:P.has('2d')})}catch(e){console.error(e)}
+  try{res=TWKit.init(cv,{fallback:fb,force2D:P.has('2d'),fonts:false})}catch(e){console.error(e)}
   try{TWKit.setSpeed(UI.speed)}catch(e){}
   const on2d=()=>{cv.hidden=true;fb.hidden=false;if(!fb._wired){fb._wired=1;fb.addEventListener('click',e=>{let p=null;try{p=TWKit.pick(e.clientX,e.clientY)}catch(x){}if(!p||!isFinite(e.clientX)||!e.clientX&&!e.clientY)p=TWKit.pick2D(e.target)||p;if(p)onPick(p)})}};
   if(!res.ok)on2d();
@@ -22,7 +22,7 @@ function boot(){phApply();GX.init({key:'tw'});const st=lsGet('tw_set',{});if(st.
     cv.addEventListener('click',e=>{if(down&&Math.abs(e.clientX-down.x)+Math.abs(e.clientY-down.y)>8)return;onPick(TWKit.pick(e.clientX,e.clientY))});perfHooks()}
   const tiltFor=(w,h)=>PH.on?89:w<700?82:(w/h<.8?76:61),regFor=()=>PH.on?PH_REGION:null;GX.onResize((w,h)=>{try{frame(w,h);TWKit.resize(w,h);TWKit.setView({tilt:tiltFor(w,h),region:regFor(),immediate:true});PH.zk='?';phZoom();TWKit.renderOnce()}catch(e){}});{const b=GX.boardSize();try{TWKit.resize(b.w,b.h);TWKit.setView({tilt:tiltFor(b.w,b.h),region:regFor(),immediate:true})}catch(e){}}
   $('#rulesbody').innerHTML=RULES_HTML;
-  GX.onShow=id=>{sfx('open');if(id==='piecesd'&&!$('#piecesbody').firstChild)$('#piecesbody').innerHTML=piecesHTML();renderOpenDrawer()};GX.onClose=()=>sfx('close');
+  GX.onShow=id=>{sfx('open');renderOpenDrawer()};GX.onClose=()=>sfx('close');
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!GX.open&&G&&UI.started&&UI.confirm){UI.confirm=null;renderCoach()}});
-  netInit();showStart();OV.raf=requestAnimationFrame(ovLoop)}
+  netInit();kitBoot();showStart();OV.raf=requestAnimationFrame(ovLoop)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();

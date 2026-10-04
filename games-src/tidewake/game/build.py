@@ -9,8 +9,8 @@ KIT_PATCHES=[
  ("function raf(fn) { return (global.requestAnimationFrame ||","function raf(fn) { return ((global.PerfHUD && global.PerfHUD.raf) || global.requestAnimationFrame ||"),
  # 2. PerfHUD owns the automatic step-down (the kit's own watchdog would fight it)
  ("if (K.pref === 'auto' && fr.hist.length >= 60)","if (!global.PerfHUD && K.pref === 'auto' && fr.hist.length >= 60)"),
- # 3. pixel ratio through PerfHUD's cap
- ("r.setPixelRatio(Math.min(global.devicePixelRatio || 1, c.dpr));","r.setPixelRatio(global.PerfHUD ? PerfHUD.pixelRatio(Math.min(global.devicePixelRatio || 1, c.dpr)) : Math.min(global.devicePixelRatio || 1, c.dpr));"),
+ # 3. pixel ratio through PerfHUD's cap, never below one device pixel per CSS pixel (a blurry board reads as cheap)
+ ("r.setPixelRatio(Math.min(global.devicePixelRatio || 1, c.dpr));","r.setPixelRatio(Math.max(1, global.PerfHUD ? PerfHUD.pixelRatio(Math.min(global.devicePixelRatio || 1, c.dpr)) : Math.min(global.devicePixelRatio || 1, c.dpr)));"),
  # 4. Auto = Low on a software GPU (the game sets TW_SOFTGPU before init)
  ("function autoQ() { var small = false;","function autoQ() { if (global.TW_SOFTGPU) return 'low'; var small = false;"),
  # 5. apply-only quality (PerfHUD's auto / test changes must not be saved)
@@ -23,14 +23,14 @@ miss=[a for a,_ in KIT_PATCHES if a not in kit]
 if miss:print('WARNING kit patch anchors not found:',miss,file=sys.stderr)
 for a,z in KIT_PATCHES:kit=kit.replace(a,z)
 # ui.js is the join of ui1..ui5.js (kept in parts for editing)
-open(os.path.join(D,'ui.js'),'w',encoding='utf-8').write(''.join(rd(os.path.join(D,'ui%d.js'%i)) for i in range(1,8)))
+open(os.path.join(D,'ui.js'),'w',encoding='utf-8').write(''.join(rd(os.path.join(D,'ui%d.js'%i)) for i in range(1,9)))
 T=os.path.join(SP,'node_modules','three','build','three.min.js')
-SRC={'shell.js':os.path.join(SP,'shell','shell.js'),'perfhud.js':os.path.join(SP,'perf','perfhud.js'),
+SRC={'shell.js':os.path.join(SP,'shell','shell.js'),'gx-kit.js':os.path.join(SP,'shell','gx-kit.js'),'refdata.js':os.path.join(D,'src','refdata.js'),'perfhud.js':os.path.join(SP,'perf','perfhud.js'),
      'gameaudio.js':os.path.join(SP,'audio','gameaudio.js'),'audio-data.js':os.path.join(D,'..','audio','audio-data.js'),
      'data.js':os.path.join(D,'src','data.js'),'engine.js':os.path.join(D,'src','engine.js'),'ai.js':os.path.join(D,'src','ai.js'),'netstrip.js':os.path.join(D,'src','netstrip.js'),
      'trystero.min.js':os.path.join(SP,'net','trystero.min.js'),'netroom.js':os.path.join(SP,'net','netroom.js')}
-ORDER=['shell.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','kit.js','data.js','engine.js','ai.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js']
-h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css')))
+ORDER=['shell.js','gx-kit.js','perfhud.js','trystero.min.js','netroom.js','three.min.js','kit.js','data.js','refdata.js','engine.js','ai.js','netstrip.js','texts.js','gameaudio.js','audio-data.js','sound.js','net.js','ui.js']
+h=rd(os.path.join(D,'head.html')).replace('/*SHELL_CSS*/',rd(os.path.join(SP,'shell','shell.css'))+'\n'+rd(os.path.join(SP,'shell','gx-kit.css')))
 body=rd(os.path.join(D,'body.html')).replace('<!--CREDITS-->',rd(os.path.join(D,'..','audio','credits.html')))
 for f in ORDER:
     tag=f'<script src="{f}"></script>';assert tag in body,f
