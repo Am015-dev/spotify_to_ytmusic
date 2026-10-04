@@ -150,7 +150,7 @@ function pxSync() {
     o.sh.x = o.sp.x + csz * .07; o.sh.y = o.sp.y + csz * .12; o.sh.width = csz * 1.15; o.sh.height = csz * 1.05;
   }
   // droplet, rat stone, the ring on the scoring space
-  const dp = pxPos(p.droplet); pxMoveMark(PX.drop, dp.x, dp.y, csz * .86, snapAll);
+  PX.drop.visible = true; const dp = pxPos(p.droplet); pxMoveMark(PX.drop, dp.x, dp.y, csz * .86, snapAll);
   const hasRat = p.rat > 0 && p.rat > p.droplet; PX.rat.visible = hasRat; if (hasRat) { const rp = pxPos(p.rat); pxMoveMark(PX.rat, rp.x, rp.y - csz * .08, csz * 1.0, snapAll); }
   PX.ringAt = p.pot.length ? pxPos(CF.spaceOf(p)) : null; PX.ring.visible = !!PX.ringAt;
   PX.boomNow = !!p.boom; PX.boardSp.tint = p.boom ? 0xffb090 : 0xffffff;

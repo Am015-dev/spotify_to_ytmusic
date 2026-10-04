@@ -118,6 +118,7 @@ html.px #cwrap svg.pot{visibility:hidden}
 #prompt.mine{color:#a0301c}
 #acts{display:flex;gap:7px;flex-wrap:wrap}
 #acts .btn{flex:1 1 90px}
+#acts .btn.sec{flex:1 1 100%;min-height:44px;font-size:14px;justify-content:flex-start}
 #acts .btn.drawb,#acts .btn.stopb{flex:1 1 130px;min-height:60px;font-size:19px}
 #qbox{display:flex;flex-direction:column;gap:6px}
 #qbox .qt{font-size:14px;line-height:1.35}
@@ -5082,7 +5083,7 @@ function renderActs() {
   if (G.phase !== 'brew' || p.st !== 'draw' || p.q) return;
   const mk = (t, cls, label, icon) => { const m = legal.find(x => x.t === t); if (!m) return null; return h('button.btn' + cls, { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button' }, icon ? h('span', { html: icon }) : null, label); };
   const draw = mk('draw', '.drawb', 'Draw', ico('bag', 26)), stop = mk('stop', '.stopb', 'Stop');
-  const rowTop = [mk('flask', '.alt', 'Flask: put the last white back', ico('flask', 22, true)), mk('froth', '.alt', 'Put the first white back (free)'), mk('restart', '.alt', 'Do-over: start the day again')].filter(Boolean);
+  const rowTop = [mk('flask', '.alt.sec', 'Flask: put the last white chip back', ico('flask', 22, true)), mk('froth', '.alt.sec', 'Put the first white chip back (free)'), mk('restart', '.alt.sec', 'Do-over: start the day again')].filter(Boolean);
   if (rowTop.length) rowTop.forEach(b => a.appendChild(b));
   const rat = legal.filter(m => m.t === 'ratset');
   if (rat.length) { const d = h('details', { style: 'flex:1 1 100%' }, h('summary.sm', { style: 'min-height:44px;display:flex;align-items:center;cursor:pointer' }, 'Rat stone: ' + (p.rat - p.droplet) + ' spaces ahead. Use fewer?')); const row = h('div', { style: 'display:flex;gap:6px;flex-wrap:wrap' }); rat.forEach(m => row.appendChild(h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button' }, m.n + ''))); d.appendChild(row); a.appendChild(d); }
@@ -5784,7 +5785,7 @@ function pxSync() {
     o.sh.x = o.sp.x + csz * .07; o.sh.y = o.sp.y + csz * .12; o.sh.width = csz * 1.15; o.sh.height = csz * 1.05;
   }
   // droplet, rat stone, the ring on the scoring space
-  const dp = pxPos(p.droplet); pxMoveMark(PX.drop, dp.x, dp.y, csz * .86, snapAll);
+  PX.drop.visible = true; const dp = pxPos(p.droplet); pxMoveMark(PX.drop, dp.x, dp.y, csz * .86, snapAll);
   const hasRat = p.rat > 0 && p.rat > p.droplet; PX.rat.visible = hasRat; if (hasRat) { const rp = pxPos(p.rat); pxMoveMark(PX.rat, rp.x, rp.y - csz * .08, csz * 1.0, snapAll); }
   PX.ringAt = p.pot.length ? pxPos(CF.spaceOf(p)) : null; PX.ring.visible = !!PX.ringAt;
   PX.boomNow = !!p.boom; PX.boardSp.tint = p.boom ? 0xffb090 : 0xffffff;
