@@ -435,7 +435,7 @@ html.ph .pcard .btn.go{font-size:1rem}
 /* real usable heights: the strip scrolls instead of clipping, its action row stays pinned; cards pin their primary row */
 html.ph #ps{overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
 html.ph-l .ps-acts{flex-wrap:wrap;overflow-x:visible}
-html.ph-p .ps-acts{flex-wrap:wrap;overflow-x:visible}
+@media (min-height:640px){html.ph-p .ps-acts{flex-wrap:wrap;overflow-x:visible}}
 html.ph .ps-chips .pchl{flex:0 0 auto;align-self:center;font:800 .68rem var(--fb);color:var(--ink);opacity:.75;white-space:nowrap}
 html.ph .ppop :is(.pb.pri.big,.pb.pri):not(:disabled){position:sticky;bottom:2px;z-index:3;box-shadow:0 0 0 5px #f7e2b9,0 2px 0 #0a3a42}
 html.ph .ps-msg{max-height:none;overflow:visible}
