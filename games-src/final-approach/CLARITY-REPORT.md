@@ -103,20 +103,19 @@ New: `game/clarity-test.js` (Playwright; `node clarity-test.js [WxH]`). It has o
 coffee, recap, rrwho, hint, tipsoff, deadline, rr2tap, phrases. Six of the checks (goal, deadly, coffee, recap, rrwho, tipsoff)
 failed on the build the round-0 testers played and pass now. The others were added with round-2 fixes.
 
-The final run on the shipped build is in the PR description and in the table below. Tests were run from `game/`, and the p2p tests
-from `games-src/`.
+Final run on the shipped build (from `game/`; p2p from `games-src/`):
 
 | test | result |
 |---|---|
-| `clarity-test.js` 390x763 / 844x390 | see below |
-| `rules-test.js` | see below |
-| `hidden-test.js 40` | see below |
-| `net-strip-test.js 24` | see below |
-| `click.js` (ANIM=0 and ANIM=1) | see below |
-| `lay.js` (4 desktop sizes) | see below |
-| `lay-phone.js` (7 phone sizes) | see below |
-| `px-test.js` | see below |
-| `net/p2p-fa.js` full / leave / ui / hostleft, `net/p2p-fa-phone.js` full / touch | see below |
+| `clarity-test.js` 390x763 and 844x390 | **10/10 ok** at each size (PROBLEMS 0) |
+| `rules-test.js` | **68 passed, 0 failed** |
+| `hidden-test.js 40` | 40 games, 1 841 checks, **0 problems** |
+| `net-strip-test.js 24` | 24 games, 2 253 stripped views, **0 problems** |
+| `click.js` (jsdom, 18 configurations) | ANIM=0: 18 games, **0 errors, 0 stalls**, 0 hidden-dice violations. ANIM=1: the same |
+| `lay.js` 1366x768, 1920x1080, 768x1024, 1100x700 | **PROBLEMS 0** |
+| `lay-phone.js` 390x844, 390x763, 390x664, 375x553, 412x780, 844x390, 750x342 | **PROBLEMS 0** at every size (the first sweep found 8 on the short and landscape sizes; fixed by a compact die card and goal strip there) |
+| `px-test.js` | **PASSED** |
+| `net/p2p-fa.js` full / leave / ui / hostleft, `net/p2p-fa-phone.js` full / touch | **Not verified in this sandbox.** Every run reports "bad" because the guest never reaches the host's lobby ("host sees [Hosty]" only). The **unchanged original build fails in exactly the same way** (same `ui` run, same result), so this is the sandbox's WebRTC/relay environment, not this change. `net.js`, `netstrip.js` and the online flow were not edited; `net-strip-test` passes. Re-run on a machine where the p2p test worked before. |
 
 ## Still weak (honest notes)
 
@@ -141,5 +140,5 @@ from `games-src/`.
   dice in hand.
 - "Debrief" on the loss screen reopens the same card, and "a reroll token comes aboard" gives no reason (the altitude row carries
   it). Both are small.
-- Round-2 fixes after the test, which no tester has seen: the shorter engine and radio wording, "level it to land" on the axis chip,
-  and the landing-round axis warning.
+- Changes made after the last test, which no tester has seen: the shorter engine and radio wording, "level it to land" on the axis
+  chip, the landing-round axis warning, and the landscape goal strip and briefing.
