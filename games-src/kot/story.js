@@ -146,7 +146,7 @@ const RECAP={snap:null,n:0};
 function recapMe(){if(!G||G.mode!=='solo')return -1;return G.pl.findIndex(q=>q.human)}
 function recapHTML(){const me=recapMe();if(me<0||!RECAP.snap)return '';
   const parts=[];G.pl.forEach((q,k)=>{const s=RECAP.snap[k];if(!s)return;const d=[];
-    if(s.alive&&!q.alive){d.push('knocked out')}else{if(q.vp!==s.vp)d.push(`${q.vp>s.vp?'+':'−'}${Math.abs(q.vp-s.vp)}★`);if(q.hp!==s.hp)d.push(`${q.hp>s.hp?'+':'−'}${Math.abs(q.hp-s.hp)}♥`)}
+    if(s.alive&&!q.alive){d.push('knocked out')}else{if(q.vp!==s.vp)d.push(`${q.vp>s.vp?'+':'−'}${Math.abs(q.vp-s.vp)}★`);if(q.hp!==s.hp)d.push(`${q.hp>s.hp?'+':'−'}${Math.abs(q.hp-s.hp)}♥`);if(k===me&&s.en!==undefined&&q.en!==s.en)d.push(`${q.en>s.en?'+':'−'}${Math.abs(q.en-s.en)}⚡`)}
     if(s.city!==(G.city===k)&&q.alive)d.push(G.city===k?'👑in':'👑out');
     if(d.length)parts[k===me?'unshift':'push'](`<b>${k===me?'You':esc(mname(q))}</b> ${d.join(' ')}`)});
   const ev=G.log.filter(l=>l.n>RECAP.n).reverse().map(l=>`<li>${esc(l.t)}</li>`);
@@ -154,7 +154,7 @@ function recapHTML(){const me=recapMe();if(me<0||!RECAP.snap)return '';
   return `⏪ <b>While you waited:</b> ${parts.length?parts.join(' · '):'nothing changed'}${ev.length?` <span class="more">· tap: how</span><ol class="recap">${ev.join('')}</ol>`:''}`}
 {const _st=startTurn;startTurn=function(){
   const me=recapMe();const nxt=G&&!G.winner?cur():null;
-  if(me>=0&&nxt&&nxt.i!==me&&!RECAP.snap){RECAP.snap=G.pl.map((q,k)=>({hp:q.hp,vp:q.vp,alive:q.alive,city:G.city===k}));RECAP.n=G.lseq||0}
+  if(me>=0&&nxt&&nxt.i!==me&&!RECAP.snap){RECAP.snap=G.pl.map((q,k)=>({hp:q.hp,vp:q.vp,en:q.en,alive:q.alive,city:G.city===k}));RECAP.n=G.lseq||0}
   RECAP.turnN=G?G.lseq||0:0;
   const r=_st.apply(this,arguments);
   if(me>=0&&G&&!G.winner&&G.active===me&&RECAP.snap){const h=recapHTML();RECAP.snap=null;if(h){UI.banner=h;try{render()}catch(e){}}}
