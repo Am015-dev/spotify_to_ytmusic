@@ -1077,6 +1077,7 @@ async function pxInit() {
     for (const k of ['felt', 'amb', 'hand', 'trick', 'fly', 'fx']) st.addChild(PX.L[k]);
     PX.L.hand.sortableChildren = true; PX.L.trick.sortableChildren = true;
     PX.handMask = new PIXI.Graphics(); st.addChild(PX.handMask); PX.L.hand.mask = PX.handMask;
+    PX.handBg = new PIXI.Sprite(PX.tex.handgrad); PX.L.felt.addChild(PX.handBg);
     PX.mat = new PIXI.Graphics(); PX.L.felt.addChild(PX.mat);
     PX.caus = new PIXI.TilingSprite({ texture: PX.tex.caustic, width: 10, height: 10 }); PX.caus.alpha = .5; PX.L.felt.addChild(PX.caus);
     PX.on = true; PX.ready = true; document.documentElement.classList.add('ldpx');
@@ -1118,6 +1119,7 @@ async function pxTextures() {
   PX.tex.ring = mk(96, 96, (x, w, h) => { x.strokeStyle = 'rgba(255,224,130,.95)'; x.lineWidth = 6; x.beginPath(); x.arc(w / 2, h / 2, 40, 0, Math.PI * 2); x.stroke(); });
   PX.tex.cardShadow = mk(80, 108, (x, w, h) => { x.filter = 'blur(6px)'; x.fillStyle = 'rgba(0,6,20,.6)'; x.beginPath(); x.roundRect ? x.roundRect(12, 12, w - 24, h - 24, 8) : x.rect(12, 12, w - 24, h - 24); x.fill(); });
   PX.tex.cardGlow = mk(96, 124, (x, w, h) => { x.filter = 'blur(8px)'; x.fillStyle = 'rgba(255,216,115,.95)'; x.beginPath(); x.roundRect ? x.roundRect(14, 14, w - 28, h - 28, 10) : x.rect(14, 14, w - 28, h - 28); x.fill(); });
+  PX.tex.handgrad = mk(4, 64, (x, w, h) => { const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(2,10,24,0)'); g.addColorStop(.3, 'rgba(2,10,24,.5)'); g.addColorStop(1, 'rgba(2,10,24,.6)'); x.fillStyle = g; x.fillRect(0, 0, w, h); });
   PX.tex.caustic = mk(256, 256, (x, w, h) => { x.fillStyle = 'rgba(0,0,0,0)'; x.clearRect(0, 0, w, h); x.strokeStyle = 'rgba(190,240,255,.22)'; x.lineWidth = 2.4; x.lineCap = 'round'; let s = 7; const r = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
     for (let i = 0; i < 26; i++) { const cx = r() * w, cy = r() * h, rr = 14 + r() * 30; x.beginPath(); for (let k = 0; k <= 10; k++) { const a = k / 10 * Math.PI * 2, rj = rr * (.7 + r() * .6); const px = cx + Math.cos(a) * rj, py = cy + Math.sin(a) * rj * .7; k ? x.lineTo(px, py) : x.moveTo(px, py); } x.stroke(); } });
 }
@@ -1211,6 +1213,7 @@ function pxSync() {
     }
     pxTween(o, { a: 0, y: o.y + 18 }, 240, 'in', () => pxKill(o));
   }
+  if (PX.handR && PX.handBg) { PX.handBg.x = PX.handR.x; PX.handBg.y = PX.handR.y; PX.handBg.width = PX.handR.w; PX.handBg.height = PX.handR.h; }
   if (PX.handR) { PX.handMask.clear(); PX.handMask.rect(PX.handR.x, PX.handR.y - 40, PX.handR.w, PX.handR.h + 44).fill(0xffffff); }
   // ripples and sparks requested by the UI
   if (UI.pxPing != null) { const sr = pxSeatRect(UI.pxPing, B); UI.pxPing = null; if (sr) pxRipple(sr.x + sr.w / 2, sr.y + sr.h / 2); }
@@ -1303,7 +1306,7 @@ function pxFrame(ts) {
     const tex = o.flip ? o.backT : o.face; if (tex && o.sp.texture !== tex) o.sp.texture = tex;
     const sc = (o.s || 1) * (1 + o.lift * .05);
     o.sp.width = w * sc; o.sp.height = h * sc; o.sp.alpha = tex ? 1 : 0;
-    o.sp.tint = o.dim && !o.detached && o.layer === 'hand' ? 0x8fa4c4 : 0xffffff;
+    o.sp.tint = o.dim && !o.detached && o.layer === 'hand' ? 0xa9b8d0 : 0xffffff;
     o.sh.width = w * 1.25; o.sh.height = h * 1.18; o.sh.x = 3 + o.lift * 4; o.sh.y = 5 + o.lift * 8; o.sh.alpha = tex ? .55 + o.lift * .2 : 0;
     const lan = o.id >= 36, pulse = .8 + .2 * Math.sin(PX.t * 3 + o.id);
     o.gl.width = w * 1.5; o.gl.height = h * 1.35; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .8 : 0)) * pulse : 0;

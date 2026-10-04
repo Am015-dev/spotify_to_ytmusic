@@ -50,6 +50,8 @@ svg{display:block}
 .op .jobs{display:flex;flex-direction:column;gap:2px;margin-top:2px;min-height:0}
 .jc{display:flex;align-items:center;gap:4px;min-height:22px;border-radius:7px;padding:0 5px 0 4px;font-size:13px;font-weight:800;line-height:1.1;background:#fbf3dd;color:#2b2a22;border:2px solid #0b1f3a;white-space:nowrap;overflow:hidden;cursor:pointer;font-family:inherit;text-align:left;width:100%}
 .jc .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.op .jc{white-space:normal;min-height:26px;padding:1px 4px;line-height:1.05}
+.op .jc .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;text-overflow:clip}
 .jc .sm{flex:0 0 auto;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1;font-weight:900;color:#fff;background:var(--gold2);border:1.5px solid #0b1f3a}
 .jc .sm svg{width:11px;height:11px;stroke:#fff;stroke-width:3.4}
 .jc.ok{background:#dff3e4}.jc.ok .sm{background:var(--ok)}
@@ -318,4 +320,5 @@ html.ph .cfghead,html.ph .cfgfoot{display:flex}
 html.ldpx #bd .hc svg.card,html.ldpx #bd .tc svg.card,html.ldpx #bd .dc svg.card{visibility:hidden}
 html.ldpx #bd{background-image:none}
 html.ldpx .hc{transition:none!important}
+html.ldpx #handz{background:none}
 </style></head>

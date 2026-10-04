@@ -27,6 +27,7 @@ const FN = ['pairA_n', 'pairA_f', 'pairE_n', 'pairE_f', 'sched', 'planes', 'immi
 const W0 = { pairA_n: 1, pairA_f: 1, pairE_n: 1, pairE_f: 1, sched: 1, planes: 1, imminent: 0.5, flaps: 1, gear: 1, brake: 1, intern: 1, axisBal: 1, fuel: 1, tab: 1, overload: 0.9, coffee: -0.1, coffeeLate: -0.05, reroll: -0.15, bias: 0 };
 AI.FN = FN; AI.W0 = W0;
 AI.w = Object.assign({}, W0, (FA.AIW && FA.AIW.w) || {});
+if (FA.AIW && FA.AIW.c) Object.assign(W, FA.AIW.c);
 const PS = new Array(14).fill(0); for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) PS[a + b] += 1 / 36;
 const cdf = x => { let s = 0; for (let i = 2; i <= Math.min(12, Math.floor(x)); i++) s += PS[i]; return s; };
 const nats = p => -Math.log(Math.max(p, 1e-3));
