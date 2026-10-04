@@ -29,7 +29,10 @@ html.ph .gx-more .btn{min-height:44px}
 /* the board */
 html.ph .gx-board{overflow:hidden;background:#05040f}
 html.ph .viewbar,html.ph .legend,html.ph .lgbtn{display:none!important}
-html.ph #tags .tag,html.ph #coachtag{display:none!important}
+html.ph #coachtag{display:none!important}
+/* compact ship tags on phones: short name + hull/shields/stress, so you can tell ships apart and see who is hurt */
+html.ph #tags .tag{font-size:10px;line-height:1.15;padding:0 4px;border-radius:6px}html.ph #tags .tag b{font-size:10px;max-width:64px;overflow:hidden;text-overflow:ellipsis}
+html.ph #tags .tag .ps,html.ph #tags .tag .l,html.ph #tags .tag .dl,html.ph #tags .tag .f,html.ph #tags .tag .e{display:none}
 html.ph .stage canvas{touch-action:none}
 /* the dock: control row, roadmap, then one panel (strip / step card / pop-up) */
 html.ph .gx-dock{border:0;border-top:2px solid var(--gold);box-shadow:none;max-height:none!important;visibility:visible!important;display:flex;flex-direction:column;position:relative;min-height:0;padding-bottom:0;border-radius:0}
@@ -194,3 +197,8 @@ html.ph #prompt>.acts:has(>.btn.primary.big){background:var(--panel);bottom:-8px
 html.ph.ph-l #prompt .acts.col>.btn.primary,html.ph.ph-l #prompt .acts.col:not(:has(>.btn.primary))>.btn.rec,html.ph.ph-l #prompt>.acts:has(>.btn.primary.big),html.ph.ph-l .acts.main{bottom:0}
 html.ph .acts.main>.btn.primary{flex:1 1 100%;width:100%}
 html.ph.ph-p .gx-board{justify-self:center}
+
+/* a ★ choice above the pinned button must never sit under it: unpin the button when a suggested choice is listed */
+html.ph #prompt .acts.col:has(>.btn.rec:not(.primary))>.btn.primary{position:static;box-shadow:none}
+html.ph .pm-leg .rkl{color:#ff6b6b}
+.race{margin:0 0 6px;font-size:12px;color:var(--muted)}.race b{color:#fff}.race .h{color:#ffd0a0}.race .sh{color:#7fd4ff}

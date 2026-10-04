@@ -9,7 +9,7 @@ function announce(t){const el=$('live');if(el)el.textContent=t}
 function planSide(){if(!G||G.phase!=='plan')return -1;const net=(typeof NET!=='undefined'&&NET.on);for(const k of [0,1])if(isHuman(k)&&!planDone(k)&&(!net||k===NET.mySide))return k;return -1}
 function humanTurn(){const k=sideToAct();return k>=0&&isHuman(k)&&(typeof NET==='undefined'||!NET.on||k===NET.mySide)}
 function refresh(){render();schedule()}
-function render(){if(typeof netTick==='function')netTick();
+function render(){if(typeof netTick==='function')netTick();try{hpMark()}catch(e){}
   if(G&&G.winner&&UI.wonSnd!==G.seed){UI.wonSnd=G.seed;sfx('win');if(G.sortie!=null&&soloSide()===0&&G.winner==='P1'){const c=campaign();c.i=Math.max(c.i,Math.min(SORTIES.length,G.sortie+1));c.won++;saveCampaign(c)}if(ANIM)setTimeout(()=>{UI.stats=true;render()},2200)}
   attackWatch();flowWatch();trackStats();if(V3.on)sync3D();else render2D();renderFlow();renderPrompt();renderShipCard();renderRoster();renderLog();renderModal();renderDock();renderCoach()}
 // ---- step bar ----
@@ -24,9 +24,21 @@ function dialGrid(s,sug){const d=dialOf(s);const pick=UI.draft[s.id];const has=C
       row+=`<td><button class="mv ${m.c} ${pick===i?'on':''} ${sug===i&&UI.hints?'sugg':''}" data-dial="${i}" data-ship="${s.id}" title="${bad?'Stressed ships cannot fly red maneuvers':mvWords(m)+' · '+colWords(m.c)}" aria-label="${mvWords(m)}, ${m.c==='r'?'red':m.c==='g'?'green':'white'}${sug===i&&UI.hints?', recommended':''}">${ic}<small>${sp}</small>${sug===i&&UI.hints?'<em class="rs">★</em>':''}</button></td>`}
     if(any)h+=`<tr><th>${sp}</th>${row}</tr>`}
   return h+'</tbody></table>'}
-function suggestDial(s){if(UI.sugCache&&UI.sugCache.k===G.round+s.id)return UI.sugCache.v;const lv={samples:6,noise:0,look:0};
-  const save=G.rng;const enemyPoses=enemiesOf(s).map(e=>[e,enemyGuess(e,lv.samples)]);let best=0,bv=-1e9;const sc=[];dialOf(s).forEach((m,i)=>{const v=scorePose(s,finalPose(s,B(s),m),m,enemyPoses,[],lv);sc[i]=v;if(v>bv){bv=v;best=i}});G.rng=save;
-  UI.sugCache={k:G.round+s.id,v:best,sc};return best}
+// the result line for the player reading it: "You win/lose: …" in a solo or online game, the neutral line in hot-seat or watch
+function winLine(){const me=soloSide();if(!G||!G.winner||me<0||G.winner==='draw')return G?G.winText:'';const won=G.winner==='P'+(me+1);
+  const why=/both squadrons/.test(G.winText)?`both squadrons fell together, and ${won?'you':sideName(1-me)} had initiative`:/^Time/.test(G.winText)?'on points destroyed when time ran out':won?'every enemy ship is destroyed':'all your ships are destroyed';
+  return `${won?'You win':'You lose'}: ${why}.`}
+function suggestDial(s){const dk=alive().filter(x=>x.side===s.side&&x!==s&&UI.draft[x.id]!=null).map(x=>x.id+':'+UI.draft[x.id]).join(',');
+  if(UI.sugCache&&UI.sugCache.k===G.round+'|'+s.id+'|'+dk)return UI.sugCache.v;const lv={samples:6,noise:0,look:0};
+  // wingmen whose dials are already set: don't suggest ending on top of them
+  const friends=alive().filter(x=>x.side===s.side&&x!==s&&UI.draft[x.id]!=null).map(x=>({s:x,p:finalPose(x,B(x),dialOf(x)[UI.draft[x.id]])}));
+  const save=G.rng;const enemyPoses=enemiesOf(s).map(e=>[e,enemyGuess(e,lv.samples)]);let best=0,bv=-1e9;const sc=[];
+  dialOf(s).forEach((m,i)=>{const p=finalPose(s,B(s),m),c=exColor(s,m);let v=scorePose(s,p,c,enemyPoses,friends,lv);
+    // a suggestion must be safe first: never a blocked red, an asteroid only when every move touches one, and don't park beside a rock (next round's moves would all clip it)
+    if(c.c==='r'&&s.stress)v-=1e6;const rk=rockHits(s,m);if(rk)v-=40*rk;
+    else{const P=corners(p,B(s));const near=Math.min(...G.rocks.map(o=>{const R=rockPoly(o);return Math.min(...P.map(q=>polyPointDist(q,R)))}),1e9);if(near<30)v-=(30-near)/6}
+    sc[i]=v;if(v>bv){bv=v;best=i}});G.rng=save;
+  UI.sugCache={k:G.round+'|'+s.id+'|'+dk,v:best,sc};return best}
 function poseReport(s,m){const p=finalPose(s,B(s),m);const b=B(s);const bits=[];if(offBoard(p,b))return '<b class="bad">Flies off the battlefield: the ship would be destroyed!</b>';
   if(G.rocks.some(o=>polyOverlap(corners(p,b),rockPoly(o))))bits.push('<b class="bad">lands on an asteroid (damage roll, no action, no shot)</b>');
   else if(tplPoints(s,b,m,4).some(q=>G.rocks.some(o=>polyPointDist(q,rockPoly(o))<=TPL_W/2)))bits.push('<b class="bad">clips an asteroid (damage roll, no action)</b>');
@@ -34,10 +46,15 @@ function poseReport(s,m){const p=finalPose(s,B(s),m);const b=B(s);const bits=[];
   if(m.c==='r')bits.push('red: you take a stress token (no action this turn)');if(m.c==='g'&&s.stress)bits.push('green: clears a stress token');
   return 'If enemies stayed put: '+(bits.join(' · ')||'no enemies in reach')}
 // ---- prompt: always one sentence of what to do, then the buttons ----
+// the goal and the race, always on top of the dock: who has how many ships and how much hull + shields left
+function raceHTML(){if(!G||G.round<1||G.winner)return '';const me=soloSide();const k0=me>=0?me:0;
+  const side=k=>{const a=G.ships.filter(s=>s.side===k&&s.alive);const h=a.reduce((x,s)=>x+Math.max(0,s.hull-hullDmg(s)),0),sh=a.reduce((x,s)=>x+s.sh,0);
+    return `<b>${me>=0?(k===me?'You':'Enemy'):esc(sideName(k))}</b> ${a.length} ship${a.length===1?'':'s'} <span class="h">♥${h}</span>${sh?` <span class="sh">◈${sh}</span>`:''}`};
+  return `<p class="race" title="♥ hull left · ◈ shields left (shields go first)">🎯 Destroy every enemy ship · ${side(k0)} vs ${side(1-k0)}</p>`}
 function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='';return}
-  if(G.winner){el.innerHTML=`<h2>${esc(G.winText)}</h2><div class="acts"><button class="btn primary" data-a="stats">Debrief</button>${nextSortieBtn()}<button class="btn" data-a="new">New battle</button></div>`;return}
-  if(sumPending()){el.innerHTML=summaryHTML();return}
-  if(UI.hold){if(humanTurn()||planSide()>=0){const ks=UI.holdK.splice(0);UI.hold=null;if(ks.length)setTimeout(()=>{for(const k of ks)k()},0)}else{el.innerHTML=holdHTML();return}}
+  if(G.winner){el.innerHTML=`<h2>${esc(winLine())}</h2><div class="acts"><button class="btn primary" data-a="stats">Debrief</button>${nextSortieBtn()}<button class="btn" data-a="new">New battle</button></div>`;return}
+  if(sumPending()){el.innerHTML=raceHTML()+summaryHTML();return}
+  if(UI.hold){if(humanTurn()||planSide()>=0){const ks=UI.holdK.splice(0);UI.hold=null;if(ks.length)setTimeout(()=>{for(const k of ks)k()},0)}else{el.innerHTML=raceHTML()+holdHTML();return}}
   const me=humanTurn();let h='';
   if(G.phase==='plan'){const ps=planSide();h=ps<0?watchHTML():planHTML(ps)}
   else if(G.phase==='action'){h=me?actionHTML(ship(G.cur)):watchHTML()}
@@ -47,16 +64,16 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
     if(humanTurn())h+=`<div class="acts col">${exDAMods().map(m=>`<button class="btn" data-act="damod" data-k="${m.k}">${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="damod" data-k="done">Let the attack stand</button></div>`;else h+=`<p class="small muted">${esc(d.name)} is reacting…</p>`}
   else if(G.phase==='amod'||G.phase==='dmod'){const A=G.atk,a=ship(A.a),d=ship(A.d);const r=preview(A);const rk=me?recMod():null;
     h=diceHead(A)+diceRows(A)+`<p class="preview">Right now: <b>${r.hits} hit${r.hits===1?'':'s'}</b>${r.crits?`, <b>${r.crits} crit${r.crits>1?'s':''}</b>`:''}${A.step==='amod'?' before the defence roll':(r.hits+r.crits===1?' gets through':' get through')}${A.step==='amod'?'':` (${r.hits+r.crits?`${esc(shortName(d))} loses ${r.hits+r.crits} shield${r.hits+r.crits===1?'':'s'} or hull`:'no damage'})`}.</p>`;
-    if(me){const mods=G.phase==='amod'?atkMods():defMods();h+=`<div class="acts col">${mods.map(m=>`<button class="btn${m.k===rk?' rec':''}" data-act="${G.phase}" data-k="${m.k}">${m.k===rk?'★ ':''}${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Done: the defender rolls':'Done: take the damage'}${rk==='done'?'<small>★ recommended: nothing left to improve</small>':''}</button></div>`}
+    if(me){const mods=G.phase==='amod'?atkMods():defMods();const rkFirst=(x,y)=>(y.k===rk)-(x.k===rk);h+=`<div class="acts col">${mods.slice().sort(rkFirst).map(m=>`<button class="btn${m.k===rk?' rec':''}" data-act="${G.phase}" data-k="${m.k}">${m.k===rk?'★ ':''}${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Done: the defender rolls':'Done: take the damage'}${rk==='done'?'<small>★ recommended: nothing left to improve</small>':''}</button></div>`}
     else h+=`<p class="small muted">${G.phase==='amod'?esc(a.name)+' is modifying its attack…':esc(d.name)+' is defending…'}</p>`;
     h+=DLEG}
   else h=watchHTML();
-  el.innerHTML=(typeof netWaitHTML==='function'?netWaitHTML():'')+h}
+  el.innerHTML=(typeof netWaitHTML==='function'?netWaitHTML():'')+raceHTML()+h}
 function sugTip(s,sug){const m=dialOf(s)[sug];const si=sugInfo(s,sug);let h=`<p class="tip">💡 <b>${mText(m)}</b> (dashed outline): ${si.why}. <span class="${exColor(s,m).c==='r'?'warn':''}">${si.cost}</span>`;
   if(exColor(s,m).c==='r'){const alt=saferAlt(s);if(alt!=null&&alt!==sug)h+=` Safer: <b>${mText(dialOf(s)[alt])}</b> (${exColor(s,dialOf(s)[alt]).c==='g'?'green':'white'}).`}return h+'</p>'}
 function setupText(q){const r=recOpt(q);const rock=q.key==='rock';
   return `<div class="acts"><button class="btn primary big" data-a="autoplace">✨ Auto-place (recommended)<small>Places your ${rock?'asteroids and ship':'ships'} in sensible spots. In a first game it doesn't matter much.</small></button></div>
-  ${rock?'<p class="small">Asteroids: flying through one damages you and skips your action; shooting past one gives the defender +1 die.</p>':''}
+  ${rock&&G.rocks.length?`<p class="small">The two sides take turns placing 6 asteroids; ${G.rocks.length} ${G.rocks.length===1?'is':'are'} already down (the grey rocks).</p>`:''}${rock?'<p class="small">Asteroids: flying through one damages you and skips your action; shooting past one gives the defender +1 die.</p>':''}
   <p class="small muted"><b>Or place ${rock?'it':'it'} yourself:</b> tap an outlined spot on the mat, or pick one below (${rock?'columns A-E from your left, rows 1-5 from your edge':'spots 1-9 along your edge, left to right'}). ★ <b>${esc(r.o.l)}</b> is suggested: ${r.why}.</p>`}
 // long lists of short choices (asteroid spots A1…E5 and the like) become a compact grid; the spots are laid out like the mat
 function askButtons(q){const rk=(q.key==='rock'||q.key==='deploy')?recOpt(q).o.k:null;const pri=(o,i)=>rk?(o.k===rk?'primary rec':''):(q.opts.some(x=>x.pri)?o.pri:i===0)?'primary':'';const short=q.opts.length>6&&q.opts.every(o=>String(o.l).length<=14);

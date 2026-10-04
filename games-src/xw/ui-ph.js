@@ -81,8 +81,8 @@ function dialPopHTML(s){const d=dialOf(s),sug=UI.hints?suggestDial(s):-1,pick=UI
     if(cells.includes('data-pd'))g+=`<span class="pm-sp">${sp}</span>${cells}`}
   const read=pick!=null?moveRead(s,pick):`<span class="muted">Tap a maneuver: the ghost on the mat shows where ${nm(s)} ends. Rows are speed, arrows the direction.${sug>=0?` ★ is recommended.`:''}</span>`;
   return `<div class="pp-h"><b>${nm(s)} · set the dial</b><span class="pp-n">${my.length>1?`ship ${idx+1}/${my.length}`:''}</span><button class="gx-x" data-ph="x" aria-label="Close">×</button></div>
-  <div class="pp-b"><div class="pm-grid" role="group" aria-label="Maneuver dial">${g}</div><div class="pm-leg"><span class="sw g"></span>easy <span class="sw w"></span>normal <span class="sw r"></span>hard (stress)${s.stress?' · <span class="warn">stressed: red is blocked</span>':''}</div><p class="pm-read">${read}</p></div>
-  <div class="pp-f">${sug>=0&&pick!==sug?`<button class="btn" data-ph="rec">★ Use recommended</button>`:''}<button class="btn primary" data-ph="set" ${pick==null?'disabled':''}>Set</button></div>`}
+  <div class="pp-b"><div class="pm-grid" role="group" aria-label="Maneuver dial">${g}</div><div class="pm-leg"><span class="sw g"></span>easy <span class="sw w"></span>normal <span class="sw r"></span>hard (stress)${sug>=0?' · ★ suggested':''}${d.some(m=>rockHits(s,m))?' · <b class="rkl">!</b> hits an asteroid':''}${s.stress?' · <span class="warn">stressed: red is blocked</span>':''}</div><p class="pm-read">${read}</p></div>
+  <div class="pp-f">${sug>=0&&pick!==sug?`<button class="btn" data-ph="rec">★ Use suggested</button>`:''}<button class="btn primary" data-ph="set" ${pick==null?'disabled':''}>Set</button></div>`}
 function atkPopHTML(d){const s=ship(G.cur);const rows=[];for(const w of weaponsFor(s))for(const t of w.targets)if(t.id===d.id){const sd=shotDice(s,w,t,d);rows.push({w,t,sd,e:expDmg(sd.atk,sd.def,s.focus>0||s.tl===d.id,d.focus>0)})}
   const best=rows.slice().sort((a,b)=>b.e-a.e)[0];const t0=rows[0];const tl=s.tl===d.id||s.tl2===d.id;
   const mods=[s.focus?'◉ your focus token turns focus results into hits':'',tl?'⌖ target lock: you may reroll dice':'',t0&&t0.t.rg===1?'range 1: +1 attack die':'',t0&&t0.t.rg===3?'range 3: +1 defence die':'',t0&&t0.t.obstructed?'a rock is in the way: +1 defence die':'',d.focus?'defender holds a focus token':'',d.evade?'defender holds an evade token':''].filter(Boolean);
@@ -103,7 +103,7 @@ function infoPopHTML(s){const T=SHIPS[s.type],P=PILOTS[s.pilot];const hp=s.hull-
 // ---- strip (planning): which ships still need a dial, recommended-for-all, lock ----
 function stripHTML(){const ps=planSide();const my=alive().filter(s=>s.side===ps);const nset=my.filter(s=>UI.draft[s.id]!=null).length,all=nset===my.length;const g=guided();
   const chips=my.map(s=>{const i=UI.draft[s.id];const set=i!=null;const m=set?dialOf(s)[i]:null;return `<button class="ps-chip ${set?'set':'need'} ${UI.sel===s.id?'on':''}" data-ph="ship" data-id="${s.id}" aria-label="${esc(s.name)}: ${set?'dial set, '+mvWords(m):'needs a dial'}"><b>${esc(shortName(s))}</b><span>${set?'✓ '+esc(mvWords(m)):'needs a dial'}</span></button>`}).join('');
-  return `<p class="ps-t">${all?'All dials set. Lock them in.':g?`Tap ${my.length>1?'a ship':'your ship'} (on the board or below) to open its dial. A ghost shows where it would end.`:`Tap ${my.length>1?'a ship':'your ship'} to set its dial.`} <span class="muted">${all?'':`${my.length-nset} still need${my.length-nset>1?'':'s'} a maneuver.`}</span></p>
+  return raceHTML()+`<p class="ps-t">${all?'All dials set. Lock them in.':g?`Tap ${my.length>1?'a ship':'your ship'} (on the board or below) to open its dial. A ghost shows where it would end.`:`Tap ${my.length>1?'a ship':'your ship'} to set its dial.`} <span class="muted">${all?'':`${my.length-nset} still need${my.length-nset>1?'':'s'} a maneuver.`}</span></p>
   <div class="ps-chips">${chips}</div><div class="ps-btns"><button class="btn" data-a="autodial">★ Recommended${my.length>1?' for all':''}</button><button class="btn primary" data-a="lock" ${all?'':'disabled'}>Lock in dials</button></div>`}
 // ---- the render hook ----
 function stage(){if(!G)return 'none';if(UI.info)return 'start';return 'game'}
@@ -145,10 +145,11 @@ const _render=render;render=function(){_render();try{phRender()}catch(e){console
 // ---- events (capture phase, so they run before the game's own delegated handlers) ----
 document.addEventListener('click',e=>{if(!PHN.on)return;const t=e.target.closest('[data-ph],[data-pd]');
   if(t&&t.dataset.pd!=null){e.stopImmediatePropagation();e.preventDefault();const s=PHN.pop&&ship(PHN.pop.id);if(!s)return;UI.draft[s.id]=+t.dataset.pd;UI.sel=s.id;UI.hoverDial=null;sfx('click');render();if(PHN.focusOn){/* keep the frame */}return}
-  if(t&&t.dataset.ph){const a=t.dataset.ph;e.stopImmediatePropagation();e.preventDefault();
+  if(t&&t.dataset.ph){let a=t.dataset.ph;e.stopImmediatePropagation();e.preventDefault();
     if(a==='x'){PHN.closePop();return}
     if(a==='ship'){const s=ship(t.dataset.id);if(s){UI.sel=s.id;PHN.openPop('dial',s.id)}return}
-    if(a==='rec'){const s=PHN.pop&&ship(PHN.pop.id);if(s){UI.draft[s.id]=suggestDial(s);render()}return}
+    if(a==='rec'){const s=PHN.pop&&ship(PHN.pop.id);if(!s)return;UI.draft[s.id]=suggestDial(s);a='set'}// one tap: pick the suggestion and move on to the next ship
+
     if(a==='set'){const s=PHN.pop&&ship(PHN.pop.id);if(!s||UI.draft[s.id]==null)return;sfx('token');const my=alive().filter(x=>x.side===s.side);const nxt=my.find(x=>UI.draft[x.id]==null);PHN.pop=null;if(nxt){UI.sel=nxt.id;PHN.pop={kind:'dial',id:nxt.id};PHN.popSig=sigNow()}render();return}
     if(a==='focus'){PHN.focus();return}if(a==='zin'){PHN.zoom(.72);return}if(a==='zout'){PHN.zoom(1.38);return}if(a==='fit'){PHN.focus(false);return}
     if(a==='zoomto'){const s=ship(t.dataset.id);if(s){PHN.focusOn=true;PHN.fkey=fkey();frame([W(s.x,s.y,0),W(s.x+fwd(s.h).x*RANGE,s.y+fwd(s.h).y*RANGE,0)],8);syncCtl();PHN.closePop()}return}
