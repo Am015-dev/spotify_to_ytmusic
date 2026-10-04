@@ -12,7 +12,7 @@ Base: devkit v80 (`alex/overdrive-devkit` @ 259a4cf). Rebuild: `./reapply.sh pAU
   CPU: one shared 16th-note clock; only buses that are audible (or fading) get notes; every note is a short-lived node that disconnects itself when it ends.
 - **Volume sliders**: the existing Master / Music / Effects sliders now drive the new buses (via `AU.mus` / `AU.fx`) and persist through `SET`.
 - **SFX**: engine pitch follows a 6-gear model (rpm saw per gear, shift tick), turbo whistle, throttle-lift blow-off, boost whoosh layered on `nitro`/`boost`,
-  tyre squeal while drifting (roam `RO.dDir`, race `driftT`), brick clatter scaled by the smashed prop's stud count (more and lower clicks plus a thump for big props),
+  tyre squeal while drifting (roam `RO.dDir`, race `driftT`), brick clatter scaled by the smashed prop’s stud count (more and lower clicks plus a thump for big props; thinned to 3 clicks when more than 90 voices are already playing),
   takedown crunch, bell-like collectible chime (`pick`), and a UI click on every button. The existing item sounds (rocket, missile, mine, shield…) are kept.
 - **Feedback**: roam screen shake capped at 0.45 and **off in missions**; the studs from a smash now shoot up like a fountain; speed lines are brighter and faster while boosting;
   sustained FOV kick while boosting; chunky 2K-style `TAKEDOWN!` pop (roam via `#hitPop`, moved down to 28 % so it clears the NEXT bar; races via `#auPop`); `+COMBO ×n` pop on chain-multiplier increases;

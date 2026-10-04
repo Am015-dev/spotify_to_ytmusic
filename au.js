@@ -75,7 +75,7 @@ AU.sched=function(){const a=this.a;if(!a)return;AU_build();AU_tick();if(paused)r
 // ---- SFX: size-aware brick clatter, takedown crunch, chime, whoosh, UI click
 {const sfx0=AU.sfx.bind(AU);AU.sfx=function(n,x){const a=this.a;if(!a)return;AU_build();const t=a.currentTime,F=this.fx,rnd=Math.random;
   switch(n){
-    case'brick':{const sz=Math.max(1,x??AU_M.sb),big=sz>5,k=Math.min(14,3+Math.round(sz*1.3));AU_M.sb=0;for(let i=0;i<k;i++)this.noise(t+i*(.018+rnd()*.022),big?.05:.025,(.2+rnd()*.14)*(big?1.15:1),(big?1300:2500)+rnd()*(big?1500:2600),F,'bandpass');
+    case'brick':{const sz=Math.max(1,x??AU_M.sb),big=sz>5,k=Math.min(AU_M.live>90?3:14,3+Math.round(sz*1.3)); // voice cap: thin the clatter when many voices already playAU_M.sb=0;for(let i=0;i<k;i++)this.noise(t+i*(.018+rnd()*.022),big?.05:.025,(.2+rnd()*.14)*(big?1.15:1),(big?1300:2500)+rnd()*(big?1500:2600),F,'bandpass');
       if(big){this.osc(t,'sine',95,.26,.5,F,42);this.noise(t,.2,.32,650,F)}else this.osc(t+.03,'triangle',AU_F(88+(rnd()*8|0)),.06,.08,F);return}
     case'takedown':sfx0('takedown');this.noise(t,.4,.7,2200,F,'lowpass',180);this.osc(t,'square',62,.3,.25,F,28);for(let i=0;i<5;i++)this.noise(t+.04+i*.03,.03,.25,1800+rnd()*2400,F,'bandpass');AU_pop('TAKEDOWN!','#ff2d55');return;
     case'pick':{const f=AU_F(88+(rnd()<.5?0:3));for(const[m,v,d]of[[1,.14,.5],[2.76,.04,.25],[2,.06,.35]]){const g=this.osc(t,'sine',f*m,d,v,F);if(m===1)g.connect(this.dly)}this.osc(t+.07,'sine',f*1.5,.4,.08,F);return}
