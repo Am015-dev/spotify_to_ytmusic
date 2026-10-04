@@ -117,7 +117,7 @@ function layoutVars() {
   const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), land = ph && innerWidth > innerHeight;
   let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(60, Math.round(H * .092)))) : Math.max(60, Math.min(104, Math.round(H * .125)));
   const np = G ? G.np : 4, opp = np - 1;
-  let cw = ph ? Math.max(42, Math.min(56, Math.round(hw * .95))) : Math.max(60, Math.min(124, Math.round(Math.min(H * .165, W * .1))));
+  let cw = ph ? Math.max(40, Math.min(56, Math.round(hw * .95))) : Math.max(60, Math.min(124, Math.round(Math.min(H * .165, W * .1))));
   const dw = ph ? Math.max(40, Math.min(46, Math.floor((W - 16) / 7) - 4)) : Math.max(46, Math.min(60, Math.floor((W - 40) / 7) - 6));
   const short = ph && !land && innerHeight < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
   const av = ph ? (land || short ? 30 : 34) : 44;
@@ -220,9 +220,9 @@ function renderOpp(v) {
   for (const s of seatsClockwise(from)) box.append(oppEl(s, act));
 }
 // ---- the felt: trick slots, the pool of jobs, status lines ----
-function slotPos(rel, n, W, H) {
+function slotPos(rel, n, W, H, ch) {
   // rel 0 = the bottom seat (me); seats go clockwise (to the left first). Returns centre in px.
-  const th = rel * 2 * Math.PI / n, rx = Math.max(40, W * (n > 4 ? .36 : .31)), ry = Math.max(28, H * .27);
+  const th = rel * 2 * Math.PI / n, rx = Math.max(40, W * (n > 4 ? .36 : .31)), ry = Math.max(20, Math.min(H * .27, ch ? (H - ch) / 2 : 999));
   return [W / 2 - Math.sin(th) * rx, H / 2 + (n > 2 ? Math.cos(th) * ry : Math.cos(th) * ry)];
 }
 function playsShown() { if (UI.fz && UI.fz.plays) return UI.fz.plays; return G && G.phase === 'play' && G.trick ? G.trick.plays : (G && G.phase === 'over' && G.trick ? G.trick.plays : []); }
@@ -255,9 +255,9 @@ function renderFelt(v) {
   const W = felt.clientWidth || 300, H = felt.clientHeight || 160, n = G.np;
   const shown = playsShown(), act = G.phase === 'play' && G.trick && !UI.fz ? G.trick.turn : -1;
   const winS = UI.fz && UI.fz.winner != null && UI.fz.win ? UI.fz.winner : -1;
-  const strip = isPh() && W > (felt.closest('#bd') ? felt.closest('#bd').clientHeight : 0) ? 0 : 46, top = 20;   // the bottom strip holds Last trick / Won (never over a played card)
+  const small = document.documentElement.classList.contains('ph-short'), strip = (isPh() && innerWidth > innerHeight) || small ? 0 : 46, top = small ? 26 : 20;   // small phones: Last trick sits in the felt's top corner, not in a bottom strip   // the bottom strip holds Last trick / Won (never over a played card)
   for (let rel = 0; rel < n; rel++) {
-    const s = (from + rel) % n; const [x, y0] = slotPos(rel, n, W, Math.max(60, H - strip - top)), y = y0 + top;
+    const s = (from + rel) % n; const [x, y0] = slotPos(rel, n, W, Math.max(60, H - strip - top), (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 56) * 1.4 + 4), y = y0 + top;
     const slot = h('div.tslot' + (act === s ? '.turn' : '') + (winS === s ? '.win' : ''), { 'data-seat': s, style: 'left:' + x + 'px;top:' + y + 'px' });
     const pl = shown.find(p => p.s === s);
     if (pl) { const tc = h('div.tc', { 'data-px': 'card', 'data-id': pl.c, 'data-pk': 't:' + pl.c, 'data-seat': s, role: 'img', 'aria-label': pname(s) + ' played ' + cname(pl.c) }); tc.append(cardN(pl.c, 80)); slot.append(tc); }
@@ -269,7 +269,6 @@ function renderLead(lead, pile, v) {
   if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 22) }), h('span', ls === 4 ? 'Lanterns led: follow with a Lantern' : 'Follow ' + D.suits[ls].name)); }
   else if (G.phase === 'play' && G.trick) { lead.append(h('span', pname(G.trick.turn) === 'You' ? 'You lead' : pname(G.trick.turn) + ' leads')); }
   if (G.tricks.length) pile.append(h('button.pbtn', { type: 'button', 'data-a': 'last' }, 'Last trick'));
-  const mw = v >= 0 ? tricksWon()[v] : 0; if (v >= 0 && G.tricks.length) pile.append(h('span.pbtn', { style: 'cursor:default', title: 'Tricks you have won' }, 'Won ' + mw));
 }
 // ---- my seat and my jobs ----
 function renderMine(v) {
@@ -506,7 +505,7 @@ function newGame(mode, o) {
 }
 function guidedStack() {
   const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }, h = t => t.split(' ').map(x => D.card(L[x[0]], +x.slice(1)));
-  return { tasks: D.guided.tasks.slice(), hands: D.guided.hands.map(h) };
+  return { tasks: D.guided.tasks.slice(), hands: D.guided.hands.map(h), nopass: true };
 }
 function nextAttempt(same) {
   if (!G || G.phase !== 'over') return;

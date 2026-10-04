@@ -332,7 +332,7 @@ function initAssign(G) {
   if (m.sel === 'free') { A.mode = 'free'; }
   if (A.mode === 'draft' || A.mode === 'free') A.actor = A.order[0];
   if (K === 0) { endAssign(G); return; }
-  if (A.mode === 'draft' && K < G.np) A.pass = true;
+  if (A.mode === 'draft' && K < G.np && !(G.stack && G.stack.nopass)) A.pass = true;   // the guided deal cannot be passed: the Commander takes the one job
 }
 // the hardest job the diver `s` may take (the Commander never takes a Commander-comparison job); without s: the hardest of all
 function hardest(G, s) { const col = G.np - 3, R = rem(G).filter(i => s == null || canTake(G, s, i)); let b = -1; for (const i of R) b = Math.max(b, TASKS[G.tasks[i].id].d[col]); return R.filter(i => TASKS[G.tasks[i].id].d[col] === b); }
@@ -347,7 +347,8 @@ function assignMoves(G, c) {
     case 'draft': {
       const tk = R.filter(i => canTake(G, act, i));
       for (const i of tk) out.push(Object.assign({ t: 'take', i }, as));
-      const after = A.order.length - 1 - (A.i % A.order.length);
+      // may pass only if the divers still to come this round can take what is left (the drone and the Commander cannot take Commander-comparison jobs)
+      const after = A.order.slice((A.i % A.order.length) + 1).filter(q => R.some(i => canTake(G, q, i))).length;
       if (A.pass && (R.length <= after || !tk.length)) out.push(Object.assign({ t: 'pass' }, as));
       else if (!tk.length) out.push(Object.assign({ t: 'pass' }, as));
       break;

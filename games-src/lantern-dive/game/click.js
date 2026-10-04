@@ -73,9 +73,11 @@ function run(cf, seed) {
               if (G.phase !== 'over') return;
               attempts = attempts || 0;
               const ok = G.result.ok; seen.add('result:' + (ok ? 'won' : 'lost'));
+              if (!ok) { const bad = [...d.querySelectorAll('#rs .rjob.bad')]; if (!bad.length && G.result.tasks.some(x => x < 0)) errs.push('lost dive: no red job row'); for (const r of bad) if (!r.querySelector('.why') || !/Trick \d+|could not be met/.test(r.textContent)) errs.push('failed job without an explanation: ' + r.textContent.slice(0, 80)); const open = [...d.querySelectorAll('#rs .rjob.open')].every(r => /Not finished/.test(r.textContent)); if (!open) errs.push('open job row without "Not finished"'); if (G.result.tasks.some((x, i) => x === 0) && !d.querySelector('#rs .rjob.open')) errs.push('open job shown as failed'); seen.add('explained-loss'); }
+              if (ok && cf.start === 'guided' && !d.querySelector('#rs .debrief')) errs.push('guided win without a debrief'); if (ok && cf.start === 'guided') seen.add('guided-debrief');
               if (!ok && attempts < 2 && cf.start !== 'ai') { attempts++; const b = d.querySelector('#rs [data-a=' + (R() < .5 ? 'retrysame' : 'retrynew') + ']'); if (!b) { errs.push('no retry button'); return fin({}); } click(b); seen.add('retry'); if (w.eval('G.phase') === 'over') errs.push('retry did not start a new attempt'); return; }
               if (ok && !attempts && R() < .3 && cf.start !== 'ai' && !cf.phone) { attempts = 9; const b = d.querySelector('#rs [data-a=nextdive]'); if (b) { click(b); seen.add('nextdive'); if (w.eval('G.phase') === 'over') errs.push('next dive did not start'); return; } }
-              return fin({ over: { ok, att: G.att, why: G.result.why.slice(0, 40) } });
+              return fin({ over: { ok, att: G.att, why: G.result.why.slice(0, 40), jobs: process.env.DBGJ ? G.tasks.map(t => t.id + ':' + t.owner).join(',') + ' hands0 ' + JSON.stringify(G.players[0].hand) + ' log ' + JSON.stringify(G.log.slice(-8).map(l => l.t)) : undefined } });
             }
             if (G.phase === 'over') { if (!w.eval('UI.busy') && ++stall > 400) { errs.push('over but no result card'); fin({}); } return; }
             const tip = q('#tip [data-a=tipok]'); if (tip.length) { click(tip[0]); seen.add('tip'); clicks++; return; }
@@ -125,7 +127,7 @@ function run(cf, seed) {
 (async () => {
   const a = +(process.argv[2] && !process.argv[2].startsWith('--') ? process.argv[2] : 0), b = +(process.argv[3] && !process.argv[3].startsWith('--') ? process.argv[3] : CONF.length - 1), NS = +(process.argv[4] && !process.argv[4].startsWith('--') ? process.argv[4] : 1);
   const all = new Set(); let bad = 0, n = 0, hid = 0, stalls = 0, notOver = 0; const T = Date.now();
-  for (let i = a; i <= b && i < CONF.length; i++) for (let sd = 0; sd < NS; sd++) {
+  for (let i = a; i <= b && i < CONF.length; i++) for (let sd = (+process.env.ONLYSD || 0); sd < ((process.env.ONLYSD ? +process.env.ONLYSD + 1 : NS)); sd++) {
     const cf = CONF[i]; const r = await run(cf, 100 + i + sd * 1000); n++; r.seen.forEach(x => all.add(x)); bad += r.errs.length; hid += r.hidden || 0; stalls += r.errs.filter(e => /^STALL/.test(e)).length; if (!r.over) notOver++;
     console.log(`[${i}.${sd}] ${cf.name}${ANIMON ? ' (anim)' : ''}: ${r.over ? JSON.stringify(r.over) : 'NOT OVER'} plays ${r.plays} clicks ${r.clicks} ${r.secs}s hidden ${r.hidden} errors ${r.errs.length} ${JSON.stringify(r.errs.slice(0, 3))}`);
   }

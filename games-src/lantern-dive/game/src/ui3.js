@@ -48,7 +48,7 @@ function newGame(mode, o) {
 }
 function guidedStack() {
   const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }, h = t => t.split(' ').map(x => D.card(L[x[0]], +x.slice(1)));
-  return { tasks: D.guided.tasks.slice(), hands: D.guided.hands.map(h) };
+  return { tasks: D.guided.tasks.slice(), hands: D.guided.hands.map(h), nopass: true };
 }
 function nextAttempt(same) {
   if (!G || G.phase !== 'over') return;
