@@ -76,6 +76,7 @@ async function play(P,H,secs,hook){let clicks=0,remoteClicks=0,checks=0;const vi
     if(hook&&!global.HOOK_FIRST)await hook(g,n);await sleep(global.DELAY||40)}
   return {clicks,remoteClicks,checks,viol,secs:Math.round((Date.now()-t0)/1000)}}
 async function games(P,H,tag,max,secs,done,hook){const out=[];for(let g=0;g<max;g++){dbg.game=g;const pr=await play(P,H,secs,hook);const r=await finish(P,H,tag+' #'+(g+1),pr);out.push(r);if(done()||!r.agree)break;
+    await H.p.waitForFunction(()=>!UI.busy&&document.querySelector('[data-a=again]'),null,{timeout:60000}).catch(()=>{}); // the result (and Play again) waits until the replay has shown the last sinking
     await H.p.evaluate(()=>document.querySelector('[data-a=again]').click());
     for(let k=0;k<80;k++){await sleep(250);const ok=await Promise.all(P.filter(x=>!x.dead&&x!==H).map(x=>x.p.evaluate(()=>G&&!G.over&&G.turn<=1&&UI.started).catch(()=>false)));if(ok.every(Boolean))break}}return out}
 const seatOf=async x=>{x.seat=await x.p.evaluate(()=>NET.mySeat).catch(()=>-2);return x.seat};
