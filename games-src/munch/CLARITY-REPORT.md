@@ -72,7 +72,20 @@ The logs are in `playtest/` (`r1-*` is the live game before any change, `r2-*` a
   - A monster played from your hand on an empty room ("look for trouble") is a real rule, but newcomers find it odd.
   - So is giving your extra cards to the lowest-level rival.
 - **On the 375x553 phone** the table gets very small during a fight. This was already true before, and the taller action panel makes it slightly worse.
-- **The desktop board test fails** at its first phone size. At 390x844 it tries to click the desktop "hide panel" button, which phones hide. See the test table for whether the live build fails the same way.
+- **The desktop board test fails** at its first phone size. At 390x844 it tries to click the desktop "hide panel" button, which phones hide. The live build fails in exactly the same way. All 4 desktop sizes pass.
+- **The random clicker rejected one sell** ("you can't sell those now") in some long hot-seat games. The live build does the same (2 in 3 runs).
 
-## Tests (final run)
-See the bottom of this file.
+## Tests (final run, preview build)
+| Test | Result |
+|---|---|
+| `clarity-test.js` (new) | 8 passed, 0 failed (6 of them fail on the live build) |
+| `rules-test.js` | 46 passed, 0 failed |
+| `click.js` (vs computer + hot-seat, with and without animation) | 0 errors; 1 rejected sell in one hot-seat game (also on the live build) |
+| `click-ph.js` (phone) | 0 errors; 1 rejected sell in one hot-seat game (also on the live build) |
+| `warn-check.js 30` | 304 situations, 304 warned, 0 missed, 0 false alarms |
+| `cover.js` | 10 games, 0 errors, 0 invariant failures |
+| `force.js` | 147 cards, 0 problems |
+| `gauntlet.js 40` | 0 errors, average 36 turns (capped at 42) |
+| `lay-phone.js` at 390x844, 390x763, 390x664, 375x553, 412x780, 844x390, 750x342 | 0 problems at every size |
+| `board-test.js` at 1366x768, 1920x1080, 768x1024 (light and dark) | ok; crashes at the 390x844 phone size exactly as the live build does |
+| Hidden-info, net-strip and p2p tests | none exist for this game (online play is not in it) |
