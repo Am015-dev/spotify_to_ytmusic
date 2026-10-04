@@ -25,11 +25,15 @@ function ghostTarget() {
   if (UI.tip && UI.tip.key === 'twinReady' && UI.tip.turn === t && !UI.twin) return $('#tbl .grp.usable');
   // a hint, or the very first grab of a newcomer: point at a good dish
   const first = !lsGet('kk_grab') && !UI.coach.seen.grabbed && UI.coach.level !== 'off';
+  // the guided game: a good dish glows every turn (the finger only shows the very first grab)
+  if (!first && UI.coach.level === 'full' && !(UI.rec && UI.rec.turn === t)) {
+    try { const mv = KK.AI.choose(G, v, 'normal'); if (mv && mv.pick.length === 1) { UI.rec = { ids: mv.ids.slice(), pick: mv.pick.slice(), turn: t, auto: 2 }; renderBelt(); } } catch (e) { }
+  }
   if (first && !(UI.rec && UI.rec.turn === t)) {
     // the first grab: the dish with the biggest green +N (the idea to copy)
     try { const hand = G.players[v].hand; let bi = 0, bg = -1; hand.forEach((id, i) => { const g = gainOf(v, [id]); if (g > bg) { bg = g; bi = i; } }); UI.rec = { ids: [hand[bi]], pick: [bi], turn: t, auto: 1 }; renderBelt(); } catch (e) { }
   }
-  if (!(UI.rec && UI.rec.turn === t)) return null;
+  if (!(UI.rec && UI.rec.turn === t) || UI.rec.auto === 2) return null;
   if (UI.rec.pick.length === 2 && !UI.twin) return $('#tbl .grp.usable');
   const hand = G.players[v].hand, idx = UI.rec.pick.find(i => UI.sel.indexOf(i) < 0);
   return idx == null ? null : document.querySelector('#belt .hc[data-i="' + idx + '"]');
@@ -130,7 +134,7 @@ function anim(el, kf, o) { if (!el.animate) return Promise.resolve(); const a = 
 // ---- the reveal stage: every diner's covered dish in a row in the middle of the table, a drum roll, all covers up at once
 function stageOK() { return !!$('#tbl') && !!document.body.animate && !pxRM(); }
 function stageClear() { const s = $('#stage'); if (s) s.remove(); }
-async function stageReveal(picks, tok) {
+async function stageReveal(picks, tok, gains) {
   stageClear();
   const bd = $('#bd'), tbl = $('#tbl'), B = bd.getBoundingClientRect(), T = tbl.getBoundingClientRect();
   const f = focusSeat(), np = picks.length, order = []; for (let k = 0; k < np; k++) order.push((f + k) % np);
@@ -160,12 +164,17 @@ async function stageReveal(picks, tok) {
   if (tok !== UI.seq) return stageClear();
   // drum roll: the covers rattle
   st.classList.add('wob');
-  for (let k = 0; k < 3; k++) { snd('tick', { rate: 1 + k * .15, vol: .5 }); await wait(190); if (tok !== UI.seq) return stageClear(); }
+  const rolls = G.turn <= 3 && G.round === 1 ? 3 : 1;   // a full drum roll while the game is new, then quicker
+  for (let k = 0; k < rolls; k++) { snd('tick', { rate: 1 + k * .15, vol: .5 }); await wait(190); if (tok !== UI.seq) return stageClear(); }
   st.classList.remove('wob'); st.classList.add('up'); UI.fz.slots = picks.map(p => ({ mode: 'faces', cards: p.cards })); renderDock(); renderLabActs();
   snd('cloche');
   await Promise.all(covers.map(c => c.lift({ delay: 0 })));
   if (tok !== UI.seq) return stageClear();
-  await wait(800); if (tok !== UI.seq) return stageClear();
+  // what each dish just did to its diner's score, big, over the dish (the reveal's payoff)
+  if (gains) { let best = 0; pods.forEach(p => { best = Math.max(best, gains[p.s] || 0); });
+    pods.forEach((p, i) => { const d = gains[p.s] || 0; const g = h('div.sgain' + (d < 0 ? '.neg' : d === 0 ? '.z' : '') + (d > 0 && d === best ? '.top' : ''), d > 0 ? '+' + d : d < 0 ? '−' + -d : '+0'); g.style.animationDelay = (i * 90) + 'ms'; p.host.appendChild(g); });
+    if (best > 0) snd('coin', { vol: .5 }); }
+  await wait(rolls > 1 ? 800 : 650); if (tok !== UI.seq) return stageClear();
   // each dish goes home to its diner's counter
   UI.fz.slots = picks.map(() => ({ mode: 'gone' }));
   await Promise.all(pods.map((p, i) => {
@@ -188,7 +197,7 @@ function scorePops(before, after) {
         const el = document.querySelector('#tbl .grp[data-seat="' + s + '"][data-k="' + g.k + '"]'); if (!el) continue;
         const r = el.getBoundingClientRect(); if (!r.width) continue;
         const p = h('div.fpop' + (d < 0 ? '.neg' : ''), (d > 0 ? '+' : '−') + Math.abs(d) + (d < 0 && g.k === 'roll' ? ' roll race' : ''));
-        p.style.left = Math.round(r.left + r.width / 2) + 'px'; p.style.top = Math.round(r.top + 6) + 'px'; document.body.appendChild(p);
+        p.style.left = Math.round(Math.max(60, Math.min(innerWidth - 60, r.left + r.width / 2))) + 'px'; p.style.top = Math.round(Math.max(4, r.top + 6)) + 'px'; document.body.appendChild(p);
         setTimeout(() => p.remove(), 2200);
       }
     }

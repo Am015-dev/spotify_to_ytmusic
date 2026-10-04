@@ -78,7 +78,7 @@ function renderTable() {
 function seatSig(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots, sl = fz ? JSON.stringify(fz[s]) : (G.phase === 'pick' ? (p.picked ? 'p' : 'w') : 'x');
   const lnd = UI.land ? [...UI.land].filter(x => x.startsWith(s + '|')).join(',') : '';
-  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs[s], sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, dm.wrap ? 1 : 0, newsSig(s), p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' + (twinReady() ? 't' + (UI.twin ? 1 : 0) : '') : '', G.phase].join('|');
+  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs.join('/'), sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, dm.wrap ? 1 : 0, newsSig(s), p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' + (twinReady() ? 't' + (UI.twin ? 1 : 0) : '') : '', G.phase].join('|');
 }
 function seatEl(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], col = pcol(s), picking = G.phase === 'pick' && !p.picked && !UI.fz;
@@ -115,8 +115,16 @@ function shelfEl(s, n, pd, landing) {
   const tip = n + ' Custard Cup' + (n === 1 ? '' : 's') + ' kept for the end of the game (most scores 6, fewest loses 6; no penalty with 2 players).';
   const b = h('button.grp.shelf' + (landing ? '.land' : ''), { type: 'button', 'data-a': 'grp', 'data-seat': s, 'data-k': 'pud', 'data-type': 'pudding', 'data-n': n, 'data-pts': 0, 'aria-label': tip, title: tip });
   const pl = h('div.pl'); pl.appendChild(plateN('pudding', pd)); if (!n) pl.style.opacity = '.45';
-  b.appendChild(pl); b.appendChild(h('span.bg', String(n))); b.appendChild(h('span.hn', 'custard'));
+  const st = pudStand(s); b.appendChild(pl); b.appendChild(h('span.bg', String(n))); b.appendChild(h('span.hn' + (st[0] === '−' ? '.neg' : st[0] === '+' ? '.pos' : ''), st));
   return b;
+}
+// the custard race as it stands now (scored at the end of the game): most +6, fewest −6
+function pudStand(s) {
+  const pc = pudCounts(), mx = Math.max(...pc), mn = Math.min(...pc), n = pc[s];
+  if (mx === mn) return 'custard';
+  if (n === mx) return '+6 at end';
+  if (n === mn && G.np > 2) return '−6 at end';
+  return 'custard';
 }
 function slotEl(s, sl, cmp) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots;
@@ -153,9 +161,9 @@ function renderBelt() {
   const m = Math.max(G.hand, 1), avail = beltWidth() - 20;
   const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? (land ? 74 : 84) : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
   // a tall phone: two rows of plates instead of a belt that scrolls sideways and hides plates off the edge
-  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 56 && boardSize().h >= 440 && m > 5 && hand.length > 0 && G.phase !== 'over' && hand.length * 66 > avail + 6;   // back to one row once the hand fits
+  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 56 && boardSize().h >= 440 && m > 5 && G.phase !== 'over';   // sized for a full hand all round: the belt and the dishes never jump between turns
   if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(boardSize().h < 500 ? 62 : 80, Math.floor((avail - (k - 1) * 6) / k))); }
-  else if (ph && hand.length) { const fitN = Math.floor((avail - (hand.length - 1) * 6) / hand.length); if (fitN < hw) hw = Math.max(44, fitN); }   // shrink a little rather than hide plates past the edge
+  else if (ph && hand.length && land) { const fitN = Math.floor((avail - (hand.length - 1) * 6) / hand.length); if (fitN < hw) hw = Math.max(44, fitN); }   // shrink a little rather than hide plates past the edge
   // the belt never takes more than about half the board: the counters stay readable on short phones
   if (ph && !land) { const H2 = boardSize().h * .5, cap = Math.floor(two ? (H2 - 92) / 2.8 : (H2 - 84) / 1.4); if (cap < hw) hw = Math.max(44, cap); }
   belt.classList.toggle('two', !!two);
@@ -194,11 +202,12 @@ function pudLead(v) { const pc = pudCounts(); return pc.every((n, i) => i === v 
 // a dish that scores nothing yet shows what it is building towards instead of a bare 0
 function zeroTag(v, ty) {
   const c = KK.tableCounts(tables()[v]);
-  if (ty === 'tempura') return ((c.tempura + 1) % 2 || 2) + '/2';
-  if (ty === 'sashimi') return ((c.sashimi + 1) % 3 || 3) + '/3';
+  const pips = (n, of) => '●'.repeat(n) + '○'.repeat(of - n);   // how far this dish takes the set
+  if (ty === 'tempura') return pips((c.tempura + 1) % 2 || 2, 2);
+  if (ty === 'sashimi') return pips((c.sashimi + 1) % 3 || 3, 3);
   if (ty === 'wasabi') return '×3';
   if (ty === 'chop') return '×2';
-  if (ICONS[ty]) return 'race';
+  if (ICONS[ty]) return '0';
   return '0';
 }
 // ---------- the dock ----------

@@ -165,7 +165,8 @@ async function playResolve(evs, preHand) {
     UI.fast = false; render(); await wait(300); if (tok !== UI.seq) return;
     // 2: the covers lift together, big, in the middle of the table (ui8: the reveal stage); without it, in the seats
     UI.fz.say = 'Reveal! ' + rv.picks.map(p => pname(p.seat) + ': ' + p.cards.map(c => TY[c.key].name).join(' + ')).join(' · ');
-    if (ANIM && stageOK()) { try { await stageReveal(rv.picks, tok); } catch (e) { console.error(e); stageClear(); } }
+    const gains = (() => { try { const a = liveScores(before), b = liveScores(T); return b.map((x, s) => x.total - a[s].total); } catch (e) { return null; } })();
+    if (ANIM && stageOK()) { try { await stageReveal(rv.picks, tok, gains); } catch (e) { console.error(e); stageClear(); } }
     else {
       UI.fz.slots = rv.picks.map(p => ({ mode: 'faces', cards: p.cards }));
       render();
