@@ -34,10 +34,10 @@ function state(){if(!G||typeof UI==='undefined')return 'none';if(UI.modal==='sta
   if(G.over&&!UI.overSeen&&!storyActive())return 'over';if(storyActive())return 'story';
   if(planOpen()&&!allAI())return pstep()===2?'plan2':'plan';return 'wait'}
 function lowLife(){let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded')continue;if(c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m}
-function chipHtml(){let o={};withView(()=>{const need=eatersNeed(),have=food();o={d:G.round,r:G.rounds,f:have,need,w:G.res.wood,fur:G.res.fur,low:lowLife(),roof:G.camp.roof,pal:G.camp.pal,wp:G.weapon,sh:hasShelter()}});
+function chipHtml(){let o={};withView(()=>{const need=eatersNeed(),have=food();o={d:G.round,r:G.rounds,f:have,need,w:G.res.wood,fur:G.res.fur,low:lowLife(),roof:G.camp.roof,pal:G.camp.pal,wp:G.weapon,sh:hasShelter(),mo:G.morale}});
   const bad=(c,t)=>`<i class="${c?'bad':''}">${t}</i>`;
-  return {h:`<b>D${o.d}</b>${bad(o.f<o.need,'🍖'+o.f)}${bad(false,'🪵'+o.w)}${bad(o.low<=3,'♥'+o.low)}<i class="c-x">☂${o.roof}</i>`,
-    a:`Day ${o.d} of ${o.r}. Food ${o.f} (${o.need} needed tonight), wood ${o.w}, fur ${o.fur}. Lowest life ${o.low}. Roof ${o.roof}, palisade ${o.pal}, weapon ${o.wp}, ${o.sh?'shelter built':'no shelter'}. Tap for details.`,warn:o.f<o.need||o.low<=3}}
+  return {h:`<b>D${o.d}</b>${bad(o.f<o.need,'🍖'+o.f)}${bad(false,'🪵'+o.w)}${bad(o.low<=3,'♥'+o.low)}${o.mo<0?bad(true,'☹'+o.mo):`<i class="c-x">☂${o.roof}</i>`}`,
+    a:`Day ${o.d} of ${o.r}. Food ${o.f} (${o.need} needed tonight), wood ${o.w}, fur ${o.fur}. Lowest life ${o.low}. Morale ${o.mo}${o.mo<0?': the first player loses determination each morning, and wounds when they can’t pay':''}. Roof ${o.roof}, palisade ${o.pal}, weapon ${o.wp}, ${o.sh?'shelter built':'no shelter'}. Tap for details.`,warn:o.f<o.need||o.low<=3}}
 // the goal, short enough for the bar under the island
 function goalShort(){const s=G.sc||{};switch(G.scen){case 'marooned':return `fire ${has('fire')?'✓':'✗'} · pile ${s.pile||0}/15`;case 'hexed':return `crosses ${(s.crosses||[]).length}/5`;
   case 'stranded':return `raft ${has('jraft')?'✓':'✗'} · Ada ${s.rescued?'safe':'waiting'} · boat ${has('lifeboat')?'✓':'✗'}`;case 'settlers':return `home ${[hasShelter(),G.camp.roof>=1,G.camp.pal>=1,G.weapon>=1].filter(Boolean).length}/4 · tools ${(s.goals||[]).filter(has).length}/${(s.goals||[]).length}`}return ''}

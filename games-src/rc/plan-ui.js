@@ -43,7 +43,7 @@ function wzNeeds(){const need=eatersNeed(),have=food(),planF=plannedFood();const
 function goalCard(){const S=SCENARIOS[G.scen];let how='',btn='';
   if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();const w=pileWhy(1);
     how=`${has('fire')?'Fire is built.':'Build <b>Fire</b> (a job in Build).'} Add wood to the <b>signal pile</b> one stage a day (1, 2, 3, 4, then 5 wood): it must be full on day 10, 11 or 12.`;
-    btn=room?`<button class="btn sm go" data-a="pilemax" ${w?'aria-disabled="true"':''}>Add ${room} wood to the pile</button>${w?`<small>${esc(w==='no spare wood'?`needs ${room} spare wood`:w)}</small>`:''}`:G.sc.pile>=15?'':'<small>Today’s pile stage is done.</small>'}
+    const fw=Math.max(0,G.res.wood-committed().wood);btn=room?`<button class="btn sm pileb" data-a="pilemax" ${w?'aria-disabled="true"':''}>Add ${Math.max(1,Math.min(room,fw))} wood to the pile${fw<room&&fw>0?` (${room} finish today’s stage)`:''}</button>${w?`<small>${esc(w==='no spare wood'?`needs ${room} spare wood`:w)}</small>`:''}`:G.sc.pile>=15?'':'<small>Today’s pile stage is done.</small>'}
   else how=esc(S.x);
   return `<div class="daycard goal1"><div class="dk">🎯 Your goal · day ${G.round} of ${G.rounds}</div><b>${esc(SC().goal?SC().goal():S.x)}</b><p>${how}</p>${btn?`<div class="gb">${btn}</div>`:''}</div>`}
 // ---------- step 2: one pawn at a time ----------

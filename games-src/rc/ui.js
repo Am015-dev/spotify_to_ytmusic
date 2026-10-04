@@ -209,7 +209,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   if(d.ans!=null){sfx('click');answer(+d.ans);return}
   if(d.do!=null){const p=priorities()[+d.do];if(p&&p.act){const before=placedIds();const r=p.can?doJob(p.act.type,p.act.tgt,p.act.alt,p.lead):p.move?applyMove(p):(p.cant||'Not possible now.');
       if(r)toast(r);else{sfx('place');tutAdvance(2);const who=[];for(const a of G.plan.acts){const ids=a.pw.filter(id=>!before.has(id));if(ids.length)who.push(`${pawnGroup(ids)} → ${actLabel(a)}`)}refresh();toast('Planned: '+who.join(' · ')+(p.move?` (${p.move.nm} left “${p.move.label}”)`:''),4000);return}}refresh();return}
-  if(d.cat){UI.cat=UI.cat===d.cat?null:d.cat;render();return}
+  if(d.cat){UI.cat=UI.cat===d.cat?null:d.cat;render();if(UI.cat){const c=document.querySelector('#ppop .catbody')||document.querySelector('#panel .catbody');if(c&&c.scrollIntoView)c.scrollIntoView({block:'nearest',behavior:'smooth'})}return}
   if(d.phx){UI.phx=UI.phx===d.phx?null:d.phx;renderRoadmap();return}
   if(d.pgo){setPStep(+d.pgo);render();return}
   if(d.pq!=null){const p=priorities()[+d.pq];const cur=curPawn();if(p&&p.act&&cur){const e=place(cur.id,p.act.type,p.act.tgt,p.act.alt);if(e)toast(e);else{sfx('place');UI.sugWhy[JSON.stringify([p.act.type,p.act.tgt])]=p.title;UI.sel=null;wizPlaced();refresh()}}return}
