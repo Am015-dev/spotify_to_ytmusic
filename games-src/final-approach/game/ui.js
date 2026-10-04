@@ -274,7 +274,7 @@ function renderDock() {
     for (const s of [0, 1]) for (const c of G.say[s]) sy.appendChild(h('span.sbub.' + (s ? 'c' : 'p'), (who(s) === 'You' ? 'You said' : name(s) + ' says') + ': “' + SAYT[c] + '”'));   // what was said first, so a tapped phrase never just vanishes
     // the phrases that fit this round first (the same advice the computer crew would give), at most four unless "More phrases" is open
     if (typeof v === 'number' && v >= 0 && mayAct(v)) { const mv = FA.validMoves(G, v).filter(m => m.t === 'say').map(m => m.c); let top = []; try { top = FA.AI.say(G, v).filter(c => mv.includes(c)); } catch (e) { }
-      const all = top.concat(mv.filter(c => !top.includes(c))), show = UI.sayAll ? all : all.slice(0, isPh() ? 3 : 4);
+      const all = top.concat(mv.filter(c => !top.includes(c))), show = UI.sayAll ? all : all.slice(0, !isPh() ? 4 : document.documentElement.classList.contains('ph-p') ? 3 : 1);
       for (const c of show) sy.appendChild(h('button.say' + (top.includes(c) ? '.rec' : ''), { type: 'button', 'data-a': 'say', 'data-c': c }, SAYT[c]));
       if (all.length > show.length) sy.appendChild(h('button.say.more', { type: 'button', 'data-a': 'saymore' }, 'More phrases…'));
     } } }
@@ -343,7 +343,7 @@ function goalEl() {
   const here = !fin && pos <= size && G.planes[pos - 1] > 0 && !(G.slots.en0 && G.slots.en1) ? 'A plane is on your space: radio it away (a 1 on a Radio) before both engine dice are down, or keep the engine sum ≤ ' + G.pl.aeroB + ' so you stay put.' : '';
   const late = behind();
   return h('button.goalb' + (UI.ckOpen ? '.on' : ''), { type: 'button', 'data-a': 'ckopen', 'aria-expanded': UI.ckOpen ? 'true' : 'false', 'aria-label': 'Goal: be on the airport when round ' + last + ' starts. ' + route + '. To land at the end of round ' + last + ': ' + chips.map(x => x.textContent).join(', ') + '. Tap for the full checklist.' },
-    h('span.gr', h('b', fin ? 'Round ' + last + ' · ' : 'Be at the airport by round ' + last + ' · '), route), h('span.gc', ...chips), here || late ? h('span.dg', '⚠ ' + (here || late)) : null);
+    h('span.gr', h('b', fin ? 'Round ' + last + ' · ' : 'Be at the airport by round ' + last + ' · '), route), h('span.grs', h('b', fin ? 'Landing round' : 'Airport by round ' + last), fin ? '' : ': ' + (pos >= size ? 'there, hold' : (size - pos) + ' spaces, ' + Math.max(0, moves) + ' rounds')), h('span.gc', ...chips), here || late ? h('span.dg', '⚠ ' + (here || late)) : null);
 }
 // gear / flaps that can no longer wait: each needs its own die, gear and flaps take only certain values, flaps strictly in order
 function behind() {
