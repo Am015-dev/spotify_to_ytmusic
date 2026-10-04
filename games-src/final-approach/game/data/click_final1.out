@@ -13,3 +13,8 @@
 [12.0] watch r1 hard (anim): {"win":false,"why":"mandatory","round":6} placed 0 clicks 1 12s hidden 0 errors 0 []
 [13.0] PHONE guided (anim): {"win":false,"why":"mandatory","round":6} placed 28 clicks 40 9s hidden 0 errors 0 []
 [14.0] PHONE vs g2 (anim): {"win":false,"why":"mandatory","round":6} placed 33 clicks 50 8s hidden 0 errors 0 []
+[15.0] PHONE hot y3 (anim): {"win":false,"why":"collision","round":5} placed 102 clicks 282 17s hidden 0 errors 0 []
+[16.0] PHONE vs r4 landscape (anim): {"win":false,"why":"fuel","round":6} placed 31 clicks 44 9s hidden 0 errors 0 []
+[17.0] PHONE vs b1 landscape (anim): {"win":false,"why":"speed","round":6} placed 30 clicks 42 9s hidden 0 errors 0 []
+TOTAL games 18 errors 0 stalls 0 not finished 0 hidden-dice violations 0 time 174s (ANIM=1)
+seen: again | coffee chip | configure | die | drawer:crewd | drawer:logd | drawer:rulesd | drawer:setd | final | hint | pass card | place | place (suggested) | ready | reroll | reroll confirm | say | space | tip | title->setup
