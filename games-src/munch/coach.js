@@ -143,7 +143,7 @@ function scanLog(){if(!G)return;if(UI.gid!==G.gid){UI.gid=G.gid;UI.ln=G.ln||0;UI
     if(human){const e=nm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');const re=new RegExp(`curses ${e}:|from ${e}'s hand|from ${e}\\.|^${e} loses|^💀 ${e} dies|^${e} discards \\d|backstabs ${e}|: ${e} now has to fight|steals a level from ${e}|^${e} drops to|^${e} is hit by a curse|^${e} is now|^${e} can no longer`);
       if(re.test(t)&&!/charity|charms|a bribe|thrown for the hound|snack|to make room|takes off/.test(t))hits.push(youify(t,nm));
       if(l.s===me&&/^Bad Stuff from /.test(t))hits.push(t)}}
-  if(hits.length){UI.toast={t:hits.slice(0,4).join(' '),until:now+7000};if(ANIM&&AIDELAY>0)UI.hold=now+1800}}
+  if(hits.length){UI.toast={t:hits.slice(0,4).join(" "),until:now+15000};if(ANIM&&AIDELAY>0)UI.hold=now+1800}}
 function toastHTML(){const t=UI.toast;if(!t||t.until<Date.now())return '';const fresh=UI.toastSeen!==t;UI.toastSeen=t;return `<div class="toast${fresh?' fresh':''}" role="alert"><b>💥 Ouch!</b> ${esc(t.t)}</div>`}
 function barkOf(i){const b=UI.bark&&UI.bark[i];return b&&b.until>Date.now()?b.t:''}
 // narrated fight outcome (the table caption and the dock)
@@ -174,3 +174,42 @@ function introHTML(n,mode){const names=(UI.names||HERO_NAMES).slice(0,n);const m
 function autoPass(){if(G&&G.mode==='net')return;for(let k=0;k<12&&G&&!G.winner;k++){const s=sideToAct();if(s<0||!P(s).human)return;
   if(!(G.phase==='window'||(G.phase==='combat'&&G.cb&&G.cb.stage==='others'))||G.q)return;const vm=validMoves(s);if(vm.length!==1||vm[0].act!=='pass')return;if(G.cb&&winThreat(G.cb))return;
   const r=performMove(vm[0],s);if(!r.success)return}}
+// ---- "While you waited": what changed since your last turn, each change with the diary line that caused it ----
+function sinceTrack(me){if(!G||me<0||!P(me)||!P(me).human||G.mode==='ai'||G.winner)return;const p=P(me);UI.snBy=UI.snBy||{};
+  if(!UI.snBy[me]||UI.snBy[me].gid!==G.gid)UI.snBy[me]={gid:G.gid,ln:0,lv:G.pl.map(()=>1),eq:[],tr:[],lim:handLimit(p),cu:[]};
+  if(G.active!==me||G.phase==='setup')return;const k=G.gid+':'+me+':'+G.turn;
+  if(UI.snAct!==k){UI.snAct=k;const sn=UI.snBy[me];UI.since=sn&&sn.gid===G.gid&&G.phase!=='setup'?sinceDiff(me,sn):null}
+  UI.snBy[me]={gid:G.gid,ln:G.ln||0,lv:G.pl.map(x=>x.lvl),eq:p.eq.map(e=>e.id),tr:p.race.concat(p.cls),lim:handLimit(p),cu:p.curse.slice()}}
+function sinceDiff(me,sn){const p=P(me),nm=p.nm,out=[];const lines=G.log.filter(l=>l.n>sn.ln).reverse();
+  const yo=t=>youify(t,nm);const skip=/^— |kicks open the door and finds|goes looking for trouble|won't chase|agrees to help|refuses to help|asks /;
+  const why=(test,max)=>lines.filter(l=>!skip.test(l.t)&&test(l.t)).slice(-max).map(l=>yo(l.t));
+  G.pl.forEach(x=>{const a=sn.lv[x.i],b=x.lvl;if(a==null||a===b)return;const who=x.i===me?'You':esc(x.nm);const n=x.nm;
+    const r=why(t=>t.includes(n)&&/defeats|level|dies|sells|steals|curse|Bad Stuff/.test(t),2);
+    out.push(`<b>${who}: level ${a} → ${b}</b>${r.length?` <span class="muted">(${r.map(esc).join(' ')})</span>`:''}`)});
+  const lost=sn.eq.filter(id=>!p.eq.some(e=>e.id===id));
+  if(lost.length){const r=why(t=>lost.some(id=>t.includes(cname(id)))||/^💀/.test(t)&&t.includes(nm),2);out.push(`<b>You lost ${lost.map(id=>esc(cname(id))).join(', ')}</b>${r.length?` <span class="muted">(${r.map(esc).join(' ')})</span>`:''}`)}
+  const tr=sn.tr.filter(id=>!p.race.concat(p.cls).includes(id));
+  if(tr.length){const r=why(t=>t.includes(nm)&&/curse|Hex|lose|loses/.test(t),1);out.push(`<b>You are no longer ${tr.map(id=>esc(cname(id))).join(' or ')}</b>${r.length?` <span class="muted">(${r.map(esc).join(' ')})</span>`:''}`)}
+  const lim=handLimit(p);if(lim!==sn.lim)out.push(`Your hand limit is now <b>${lim}</b> (it was ${sn.lim}).`);
+  const cu=p.curse.filter(id=>!sn.cu.includes(id));if(cu.length)out.push(`<b>Curse on you:</b> ${cu.map(id=>esc(cname(id))+': '+esc(cd(id).x||'')).join(' ')}`);
+  return out.length?out:null}
+function sinceHTML(me){if(!UI.since||!G||G.active!==me||!['window','main'].includes(G.phase)||G.cb)return '';
+  return `<div class="since" role="status"><b>While you waited</b><ul>${UI.since.slice(0,5).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}
+// ---- learn as you play: one short idea, the first time it matters (only in a "teach me" game) ----
+const LESSONS={
+  setup:'<b>Goal:</b> be the first hero to <b>level 10</b>. Your <b>strength</b> is your level + your items. Tap a glowing card in your hand to play it, then press Ready.',
+  main:'<b>Your turn:</b> kick open the door. A monster behind it means a fight: beat it to go up a level and take its treasure.',
+  win:'<b>You are stronger</b> than the monster (your number on the left, its number on the right). Press Fight to win. Rivals get one last chance to meddle first.',
+  lose:'<b>The monster is stronger.</b> Play a one-shot card from your hand, ask a rival to help for a share of the treasure, or run: roll 5 or more on a die to escape. If you fail, its Bad Stuff hits you.',
+  after:'<b>No monster this time.</b> Take a free face-down door card (Loot), or fight a monster from your hand to earn a level.',
+  post:'<b>Tidy up:</b> wear any new items, sell items worth 1,000 gold for a level, then end your turn.',
+  charity:'<b>Hand limit:</b> you may keep 5 cards (a Dwarf keeps 6). The rules give the extra cards to the lowest-level hero, so give away what helps them least. Then your turn ends.',
+  meddle:'<b>A rival’s fight.</b> You may meddle: make their monster stronger, curse them, or help. Or just let it be.',
+  window:'<b>Before a rival kicks their door</b> you may curse them or play a level-up on yourself. Or let them go on.'};
+function learnSet(){try{return new Set(JSON.parse(localStorage.getItem('dkd_learned')||'[]'))}catch(e){return new Set(UI.learnedMem||[])}}
+function learnDone(k){const s=learnSet();s.add(k);UI.learnedMem=[...s];try{localStorage.setItem('dkd_learned',JSON.stringify([...s]))}catch(e){}}
+function lessonKey(me){if(!G||!G.learn||me<0||sideToAct()!==me||G.q)return null;const cb=G.cb;
+  if(G.phase==='combat'&&cb)return cb.stage==='act'&&cb.who===me?(winning(cb)?'win':'lose'):cb.stage!=='act'?'meddle':null;
+  return {setup:'setup',main:'main',after:'after',post:'post',charity:'charity',window:'window'}[G.phase]||null}
+function lessonHTML(me){const k=lessonKey(me);UI.lessonNow=null;if(!k||learnSet().has(k))return '';UI.lessonNow=k;
+  return `<div class="lesson" role="note">${LESSONS[k]} <button class="btn lbtn" data-a="learned" data-k="${k}">Got it</button></div>`}

@@ -19,7 +19,7 @@ const PH={on:false,
     const mp=me>=0&&G.pl[me]?G.pl[me]:null;
     return (mp?chip(mp,true):'')+G.pl.filter(p=>p.i!==me).map(p=>chip(p,false)).join('')},
   after(){if(!this.on)return;const o=document.getElementById('phopps');if(o){const sl=o.scrollLeft;const h=emo(this.chips());if(o._h!==h){o._h=h;o.innerHTML=h;o.scrollLeft=sl}}
-    const c=document.getElementById('phchip');if(c&&typeof G!=='undefined'){const t=!G?'Doorkick Dungeon':dockTitle(viewSeat()).replace(/^(.*) · turn (\d+)$/,'T$2 · $1');if(c.textContent!==t)c.textContent=t}
+    const c=document.getElementById('phchip');if(c&&typeof G!=='undefined'){const me=viewSeat();const t=!G?'Doorkick Dungeon':(me>=0&&G.pl[me]&&G.mode!=='ai'?`Lv ${G.pl[me].lvl}/10 · `:'')+dockTitle(me).replace(/ · turn \d+$/,'').replace(/ is thinking…$/,'’s turn').replace(/’s move$/,'’s turn');if(c.textContent!==t)c.textContent=t}
     this.metrics()}};
 (function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{PH.after()}catch(e){UI.lastErr='ph '+e}return x};
   let rt=0;const re=()=>{clearTimeout(rt);rt=setTimeout(()=>{PH.apply();PH.after()},60)};addEventListener('resize',re);addEventListener('orientationchange',re);

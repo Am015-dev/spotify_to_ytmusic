@@ -409,9 +409,15 @@ html.baked[data-gfx="high"] .felt::before{display:block;background:radial-gradie
 .nwl{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .nwc{font-size:.82rem;padding:1px 8px;border-radius:99px;border:1px solid var(--c);background:#fff;color:var(--ink);box-shadow:inset 4px 0 0 var(--c)}
 .nwc.ok{opacity:.7;background:#e9f5e3}
+/* clarity: what changed while you waited, first-time lessons */
+.since{background:#fff8e1;color:#2b2233;border:1px solid #e0b84a;border-left:5px solid #e0a800;border-radius:8px;padding:5px 8px;margin:4px 0;font-size:.92em;line-height:1.3}
+.since ul{margin:2px 0 0;padding-left:1.1em}.since li{margin:1px 0}.since .muted{color:#5c4a3a}
+.lesson{background:#e7f5ff;color:#10263e;border:1px solid #4a86c0;border-left:5px solid #1c7ed6;border-radius:8px;padding:5px 8px;margin:4px 0;font-size:.92em;line-height:1.3}
+.lesson .lbtn{min-height:34px;padding:2px 10px;margin-left:4px;font-size:.9em}
+.btn.learn{display:block;width:100%;text-align:left;margin:8px 0 2px}.btn.learn.on{background:#d3f9d8;color:#1b4332}
 /* ===== phone layout: every rule starts with html.ph (desktop and the 768x1024 tablet are untouched) ===== */
 .ph-chip,.phopps{display:none}
-html.ph{--ph-bar:44px;--ph-rail:clamp(290px,41vw,340px);--ph-dock:clamp(172px,23dvh,226px);--ph-tb:62dvh}
+html.ph{--ph-bar:44px;--ph-rail:clamp(290px,41vw,340px);--ph-dock:clamp(150px,30dvh,270px);--ph-tb:62dvh}
 html.ph .gx-app{padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px)}
 /* top bar: status chip + 3 icon buttons (44 px) */
 html.ph .gx-bar{height:calc(var(--ph-bar) + env(safe-area-inset-top,0px));min-height:0;padding:env(safe-area-inset-top,0px) 6px 0;gap:6px;overflow:hidden;align-items:center}
@@ -440,7 +446,7 @@ html.ph .pile{gap:3px}html.ph .pile .lbl{font-size:13px}
 html.ph .pile .lbl{font-size:13px}
 html.ph .arena{--cw:clamp(56px,calc((100cqh - var(--res,110px))/1.42),230px)}
 html.ph .arena .vs{font-size:14px}
-html.ph .score .sl{display:none}html.ph .score .num{font-size:1.1rem}
+html.ph .score .sl{font-size:13px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}html.ph .score .num{font-size:1.1rem}
 html.ph .arena .mon>.small,html.ph .arena .small{font-size:13px}
 html.ph .empty{font-size:15px}html.ph .empty.small{font-size:13px}
 html.ph .outcome{padding:6px 14px}html.ph .outcome .oh{font-size:1.2rem}html.ph .outcome .os,html.ph .outcome .story{font-size:14px}
@@ -545,5 +551,26 @@ html.ph #prompt .asks>div:last-child{position:sticky;bottom:calc(-10px - env(saf
 @media (max-height:420px){html.ph-l #prompt .acts.main{flex-wrap:wrap;gap:6px}html.ph-l #prompt .acts .btn{flex:1 1 calc(50% - 6px);min-width:0;min-height:44px;font-size:14px;padding:4px 6px}html.ph-l #prompt p{margin:1px 0 3px;font-size:14px}}
 /* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
 html.ph .mbox,html.ph .dlg{box-sizing:border-box}
+/* clarity: the action buttons always sit at the top of the action card, then the lesson / recap, then the hint */
+html.ph #prompt{display:flex;flex-direction:column}
+html.ph #prompt>.acts.main{order:-3}
+html.ph #prompt>.toast{order:-4}
+html.ph #prompt>.since,html.ph #prompt>.lesson{order:-1;font-size:14px}
+html.ph #prompt>.say{order:-2}
+html.ph #prompt .acts .btn.good{font-size:15px}
+html.ph .hint .hl{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+html.ph .dlg.start .cast{display:none}
+html.ph .rollbox .small{white-space:normal;overflow:visible}
+html.ph .dlg.start .intro{display:none}
+html.ph .dlg.start h2{font-size:1.6rem!important;margin:0 0 4px}
+html.ph .dlg.start>p{margin:0 0 6px;font-size:14px;line-height:1.3}
+html.ph .dlg.start h3{margin:6px 0 3px;font-size:15px}
+html.ph .dlg.start .seg .btn{min-height:44px;padding:4px 10px;font-size:15px}
+html.ph .dlg.start .btn.learn{min-height:44px;padding:4px 10px;font-size:14px;white-space:normal}
+html.ph .dlg.start .acts{flex-wrap:nowrap;gap:6px}
+html.ph .dlg.start .acts .btn{flex:1 1 0;min-width:0;padding:4px 6px;font-size:14px;white-space:normal;line-height:1.15}
+html.ph #prompt:has(>.lesson) .hint{display:none}
+html.ph #prompt .acts .btn[disabled]{display:none}
+html.ph .lesson .lbtn{font-size:14px;min-height:44px;padding:2px 12px}
 </style>
 </head>

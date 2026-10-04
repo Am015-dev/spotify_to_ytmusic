@@ -10,7 +10,7 @@ const ptok=i=>`<span class="ptok" style="--c:${PCOL[i]}" aria-hidden="true">${PS
 const EMO={'💡':'hint','⚠':'warn','☁':'cloud','⚔':'sword','💰':'coin','✋':'hand','💀':'skull','🏆':'trophy','✨':'spark','🎉':'party','🎒':'bag','♂':'male','♀':'female','⏸':'pause','🐢':'slow','⏩':'fast','📜':'scroll','📖':'book','🤖':'bot','💬':'chat','✓':'check','✗':'cross','🧬':'race','🎓':'cls','🪖':'helm','👢':'boot','🛡':'shield','🗡':'sword','✦':'spark','⇆':'swap','🚪':'door','🏃':'run','🙋':'help','📉':'down','💥':'star','🔊':'sound','🔇':'mute','🎵':'music','▶':'play'};
 const EMORE=new RegExp('('+Object.keys(EMO).join('|')+')\uFE0F?','gu');
 function emo(h){if(typeof ic!=='function'||!h)return h;return h.replace(/(<[^>]*>)|([^<]+)/g,(m,tag,txt)=>tag?tag:txt.replace(EMORE,(x,e)=>ic(EMO[e])))}
-UI.speed=0.5;try{UI.hints=localStorage.getItem('dkd_hints')!=='0';UI.speed=+(localStorage.getItem('dkd_speed2')||0.5)}catch(e){}
+UI.speed=1;try{UI.hints=localStorage.getItem('dkd_hints')!=='0';UI.speed=+(localStorage.getItem('dkd_speed3')||1)}catch(e){}
 const SPEEDN=v=>emo(v<1?'🐢 slow':v>1?'⏩ fast':'▶ normal');
 function refresh(){if(G&&G.mode==='net'&&typeof netWindow==='function')netWindow();if(G&&!G.winner)autoPass();if(G&&!G.winner){try{if(G.mode!=='net')localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}else{try{localStorage.removeItem(SAVE)}catch(e){}}
   render();schedule();sounds();if(G&&G.mode==='net'&&typeof netPush==='function')netPush()}
@@ -44,7 +44,7 @@ function cardHTML(id,o){o=o||{};const c=cd(id);const cls=['card',c.d==='door'?'d
 // ---- panels ----
 function render(){const root=$('#app');if(!root)return;syncMenu();if(typeof netRender==='function')netRender();
   if(!G){setHTML(root,'');setHTML($('#side'),'<div id="prompt"><p>Set up a game to start.</p></div>');$('#docktitle').textContent='Doorkick Dungeon';setHTML($('#modal'),startHTML());$('#modal').hidden=false;if(GX.open&&GX.open!=='dkRules'&&GX.open!=='dkNet')GX.close();return}
-  scanLog();const me=viewSeat();const s=sideToAct();if(UI.sell&&!(me>=0&&validMoves(me).some(m=>m.act==='sell')))UI.sell=null;
+  scanLog();const me=viewSeat();sinceTrack(me);const s=sideToAct();if(UI.sell&&!(me>=0&&validMoves(me).some(m=>m.act==='sell')))UI.sell=null;
   if(UI.menu&&UI.menu.ask&&!(me>=0&&validMoves(me).some(m=>m.act==='ask')))UI.menu=null;
   // hot-seat: hide the hand while the device passes between human players
   if(G.mode==='hot'&&s>=0&&P(s).human&&UI.lastSeat!==s&&!G.winner){UI.pass=s}
@@ -143,7 +143,7 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
   if(!p){return h+'</div>'}
   const warn=G.cb?winWarnHTML(me):'';h+=warn;
   h+=`<div class="who">${ptok(p.i)} ${esc(p.nm)}${mine?' · your move':''}</div>`;
-  if(!mine){h+=`<p>${P(s).human?'Waiting for '+esc(p.nm)+'…':esc(p.nm)+' is thinking…'}</p>${G.cb?fightNote(G.cb):''}</div>`;return h}
+  if(!mine){h+=`<p>${P(s).human?'Waiting for '+esc(p.nm)+'…':G.cb&&G.cb.who!==s&&G.cb.help!==s?esc(p.nm)+' decides whether to meddle in '+nmY(G.cb.who)+'’s fight…':esc(p.nm)+' is thinking…'}</p>${G.cb?fightNote(G.cb):''}</div>`;return h}
   const co=coach(me);const recK=UI.hints&&co.rec?mvKey(co.rec):null;
   const cb=G.cb;const by=a=>vm.filter(m=>m.act===a);const btn=(m,label,cl)=>`<button class="btn ${cl||''}${recK&&mvKey(m)===recK?' rec':''}" data-mv='${esc(JSON.stringify(m))}'>${label}</button>`;
   let say='',ol=[],tip='',acts='',extra=[];
@@ -156,23 +156,31 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
     if(q.kind==='lawyer'){say='The lizards won’t sue a Thief. Swap 2 treasures from your hand for 2 new ones?';acts=btn({act:'opt',opt:'yes'},'Swap','good')+btn({act:'opt',opt:'no'},'Keep them')}
     if(q.kind==='fetch'){say=`Throw your ${esc(cname(q.card))} for the hound to escape automatically?`;acts=btn({act:'opt',opt:'yes'},'Throw it','good')+btn({act:'opt',opt:'no'},'Roll instead')}}
   else switch(G.phase){
-  case 'setup':say='Set up your hero before the first door.';ol=['Play a race or class card from your hand (tap it).','Play items: they go on automatically if you can use them.','Press Ready when done.'];acts=btn({act:'ready'},'Ready','primary pulse');break;
+  case 'setup':say='Set up your hero before the first door.';ol=['Play a race or class card from your hand (tap it).','Play items: they go on automatically if you can use them.','Press Ready when done.'];acts=autoBtn(me,co)+btn({act:'ready'},'Ready',autoN(me,co)?'':'primary pulse');break;
   case 'window':say=`Before ${esc(curPl().nm)} kicks the door, you may play a curse or a level-up (tap it in your hand).`;acts=btn({act:'pass'},`Let ${esc(curPl().nm)} go on`,'primary');break;
-  case 'main':say='Get ready, then kick open the door.';ol=['Play races, classes and items; wear your best gear.','Sell items worth 1,000 gold for a level.','Kick open the door!'];acts=btn({act:'kick'},'🚪 Kick open the door','primary pulse')+sellBtn(vm,me);tip=`Your combat strength is ${pStr(P(me))}.`+(by('resurrect').length?' As a Cleric you can instead take the top door discard: tap a card to discard for it.':'');break;
-  case 'after':say='No monster behind the door.';ol=['Look for trouble: fight a monster from your hand, or','Loot the room: draw a face-down door card.'];acts=btn({act:'loot'},'Loot the room','primary')+sellBtn(vm,me)+(by('trouble').length?'<span class="small muted">or tap a monster in your hand to look for trouble.</span>':'');extra.push(co.low);break;
-  case 'post':{const over=P(me).hand.length-handLimit(P(me));say='Tidy up, then end your turn.';ol=['Play or wear new items, sell for levels.',over>0?`End your turn: you hold ${over} card${plural(over)} too many and will give ${over===1?'it':'them'} away.`:'End your turn.'];acts=btn({act:'end'},'End turn','primary pulse')+sellBtn(vm,me);break}
-  case 'charity':{const t=charityTargets(P(me));say=`Too many cards: ${P(me).hand.length} of ${handLimit(P(me))}.`;ol=[t.length?`Tap cards to give them to ${t.map(i=>esc(P(i).nm)).join(' or ')} (the lowest level).`:'You are the lowest level, so tap cards to discard them.'];break}
+  case 'main':say='Get ready, then kick open the door.';ol=['Play races, classes and items; wear your best gear.','Sell items worth 1,000 gold for a level.','Kick open the door!'];acts=autoBtn(me,co)+btn({act:'kick'},'🚪 Kick open the door',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);tip=`Your combat strength is ${pStr(P(me))}.`+(by('resurrect').length?' As a Cleric you can instead take the top door discard: tap a card to discard for it.':'');break;
+  case 'after':say='No monster behind the door.';ol=['Look for trouble: fight a monster from your hand, or','Loot the room: draw a face-down door card.'];acts=btn({act:'loot'},'Loot the room (free card)','primary')+by('trouble').map(m=>{const rk=riskyCard(me,m.card);return btn(m,`⚔ Fight ${esc(cname(m.card))} from your hand (level ${cd(m.card).lvl})${rk?' ⚠ you’d lose':''}`,rk?'':'good')}).join('')+sellBtn(vm,me);extra.push(co.low);break;
+  case 'post':{const over=P(me).hand.length-handLimit(P(me));say='Tidy up, then end your turn.';ol=['Play or wear new items, sell for levels.',over>0?`End your turn: you hold ${over} card${plural(over)} too many and will give ${over===1?'it':'them'} away.`:'End your turn.'];acts=autoBtn(me,co)+btn({act:'end'},'End turn',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);break}
+  case 'charity':{const t=charityTargets(P(me));const ex=P(me).hand.length-handLimit(P(me));say=`You hold ${P(me).hand.length} cards but may keep only ${handLimit(P(me))}. ${t.length?`Tap ${ex} card${plural(ex)} to give to ${t.map(i=>esc(P(i).nm)).join(' or ')}: extra cards go to the lowest-level hero.`:`You are the lowest level, so tap ${ex} card${plural(ex)} to discard.`} Then your turn ends.`;break}
   case 'combat':{const win=winning(cb);
     if(cb.stage==='act'){say=win?`You are winning, ${sideStr(cb)} to ${monStr(cb)}.`:`You are losing, ${sideStr(cb)} to ${monStr(cb)}.`;
       ol=win?['Add more one-shots for safety, or','Fight: others get one last chance to interfere.']:['Play one-shots or powers, ask someone to help, or','Run away: roll 5 or more on a die for each monster.'];
       const askRec=UI.hints&&co.rec&&co.rec.act==='ask';
-      acts=(by('fight').length?btn({act:'fight'},'⚔ Fight!','primary pulse'):'')+(by('run').length?btn({act:'run'},'🏃 Run away',co.rec&&co.rec.act==='run'?'primary':''):'')+(by('ask').length?`<button class="btn${askRec?' rec primary':''}" data-a="askmenu">🙋 Ask for help</button>`:'')+abilityBtns(vm,recK);
+      acts=(by('fight').length?btn({act:'fight'},'⚔ Fight!','primary pulse'):'')+(by('run').length?btn({act:'run'},'🏃 Run away'+runLabel(me,cb),co.rec&&co.rec.act==='run'?'primary':''):'')+(by('ask').length?`<button class="btn${askRec?' rec primary':''}" data-a="askmenu">🙋 Ask for help</button>`:'')+abilityBtns(vm,recK);
       tip=monTips(cb)}
     else{say=`${nmY(cb.who)} is fighting (${sideStr(cb)} vs ${monStr(cb)}). Anything to play?`;ol=['Tap a monster boost or one-shot in your hand to change the fight,','or let it be.'];acts=btn({act:'pass'},'Let it be',co.threat&&co.rec&&co.rec.act!=='pass'?'':'primary')+abilityBtns(vm,recK)}
     break}}
   if(co.plan&&co.plan.length&&UI.hints){const pl=co.plan.map(x=>`<b>${x.label}</b>${x.why?` <span class="muted">(${x.why})</span>`:''}`);co.why=co.why||(co.plan.length>1?'Suggested: '+pl.join(' → '):'Suggested: '+pl[0])}
   if(co.catchup)extra.push('📉 '+co.catchup);
-  h+=`${UI.sell&&me>=0?sellBar(P(me)):''}${UI.menu&&UI.menu.ask?askHTML(me):''}<p>${say}</p>${acts?`<div class="acts main">${acts}</div>`:''}${co.threat?'':hintBox(co,extra)}${ol.length?`<ol>${ol.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}${G.cb?fightNote(G.cb):''}${tip?`<div class="tip">${tip}</div>`:''}</div>`;return h}
+  h+=`${UI.sell&&me>=0?sellBar(P(me)):''}${UI.menu&&UI.menu.ask?askHTML(me):''}${autoNoteHTML()}${sinceHTML(me)}${lessonHTML(me)}<p class="say">${say}</p>${acts?`<div class="acts main">${acts}</div>`:''}${co.threat?'':hintBox(co,extra)}${ol.length?`<ol>${ol.map(x=>`<li>${x}</li>`).join('')}</ol>`:''}${G.cb?fightNote(G.cb):''}${tip?`<div class="tip">${tip}</div>`:''}</div>`;return h}
+// one tap plays every card the suggestion would play now (races, classes, items, level-ups): the casual player's shortcut
+const AUTOACTS=['play','equip','sell'];
+function autoN(me,co){if(!UI.hints||!co||!co.plan)return 0;let n=0;for(const x of co.plan){if(!x.m||!AUTOACTS.includes(x.m.act)||x.m.act==='play'&&(cd(x.m.card).t==='curse'||cd(x.m.card).t==='monster'))break;n++}return n}
+function autoBtn(me,co){const n=autoN(me,co);return n?`<button class="btn primary pulse" data-a="autoplay">✨ Play suggested card${n>1?'s':''} (${n})</button>`:''}
+function autoPlay(me){const s0=pStr(P(me)),l0=P(me).lvl,did=[];for(let k=0;k<12;k++){const co=coach(me);const x=co.plan&&co.plan[0];const m=x&&x.m;if(!m||!autoN(me,co)||sideToAct()!==me)break;const before=G.ln;const lab=x.label;uiAct(m);if(G.ln===before)break;did.push(lab)}
+  if(did.length)UI.autoNote={ln:G.ln,t:`You played: ${did.join(', ')}. Strength ${s0} → ${pStr(P(me))}${P(me).lvl!==l0?`, level ${l0} → ${P(me).lvl}`:''}.`};render()}
+function autoNoteHTML(){const a=UI.autoNote;return a&&G&&a.ln===G.ln?`<div class="since" role="status">${a.t}</div>`:''}
+function runLabel(me,cb){if(typeof runOdds!=='function')return '';try{const o=runOdds(P(me),cb);if(o.rows.length===1){const r=o.rows[0];return r.pr===0?' (impossible)':r.pr===1?' (sure)':` (need ${r.need}+: ${pct(o.all)})`}return ` (${pct(o.all)})`}catch(e){return ''}}
 function sellBtn(vm,me){if(vm.some(m=>m.act==='sell'))return `<button class="btn" data-a="sellmode">💰 Sell items</button>`;const p=me>=0?P(me):null;if(!p)return '';const g=maxSell(p);
   return `<button class="btn" disabled title="Sell items worth ${R.SELL} gold at once for a level">💰 Sell (${p.lvl>=R.WIN-1?'not at level '+(R.WIN-1):g?`${g} of ${R.SELL} gold`:'no items yet'})</button>`}
 function monTips(cb){const t=[];for(const m of cb.mons){const c=mdef(m);t.push(`<b>${esc(c.n)}</b>: ${esc(c.x||'')} <i>Bad Stuff: ${esc(c.badt||'lose a level')}</i>`)}return t.join('<br>')}
@@ -210,6 +218,7 @@ function endHTML(){const ps=G.pl.slice().sort((a,b)=>b.lvl-a.lvl);const me=viewS
 function startHTML(){const n=UI.n||DEFN;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}const net=typeof netAvail==='function'&&netAvail();if(UI.mode==='net'&&!net)UI.mode='F';const online=UI.mode==='net';const guest=online&&typeof isClient==='function'&&isClient();
   return `<div class="dlg paper start"${typeof NET!=='undefined'&&NET.on?' style="animation:none"':''}><h2 style="font-size:2rem">Doorkick <span style="color:var(--red)">Dungeon</span></h2><p>Kick open doors, fight monsters, grab the loot and stab your friends in the back. First hero to <b>level 10</b> wins, and the last level only comes from killing a monster.</p>${online?'':introHTML(n,UI.mode||'F')}
    <h3>Who plays?</h3><div class="seg">${[['F','Me vs computer'],['hot','Friends on one device'],['ai','Watch the computer']].concat(net?[['net','🌐 Play online']]:[]).map(([k,l])=>`<button class="btn ${ (UI.mode||'F')===k?'on':''}" data-set="mode" data-v="${k}">${l}</button>`).join('')}</div>
+   ${online||UI.mode==='ai'?'':`<button class="btn learn ${UI.learn!==false?'on':''}" data-a="learnon" aria-pressed="${UI.learn!==false}">${UI.learn!==false?'✓':'○'} Teach me as I play <span class="small">(short tips the first time each thing happens)</span></button>`}
    ${online?`<h3>🌐 Play online</h3>${onlineBlock()}`:''}${guest?'<p class="small muted">The host chooses the seats, the computer skill and the expansions.</p>':startOpts(n,online)}
    <div class="acts" style="margin-top:12px">${online?'':`<button class="btn primary pulse" data-start="${UI.mode||'F'}">Start</button>${saved?'<button class="btn" data-a="load">Continue saved game</button>':''}`}<button class="btn" data-a="rules">How to play</button></div>${!net&&typeof onlineBlock==='function'?onlineBlock():''}</div>`}
 function startOpts(n,online){return `<h3>${online?'Seats (friends first, the computer fills the rest)':'Heroes at the table'}</h3><div class="seg">${[3,4,5,6].map(k=>`<button class="btn ${n===k?'on':''}" data-set="n" data-v="${k}">${k}</button>`).join('')}</div>
@@ -217,12 +226,15 @@ function startOpts(n,online){return `<h3>${online?'Seats (friends first, the com
    ${EXPS.length?`<h3>Expansions</h3><div class="grid2">${EXPS.map(e=>`<button class="btn ${DEFEX[e.k]?'on':''}" data-set="ex" data-v="${e.k}" title="${esc(e.d)}"><b>${esc(e.n)}</b><br><span class="small">${esc(e.d)}</span></button>`).join('')}</div>`:''}`}
 function rulesHTML(){return RULES_HTML}
 // ---- input ----
-function uiAct(m){const me=viewSeat();const s=m.seat!=null?m.seat:me;UI.menu=null;if(m.act==='sell')UI.sell=null;if(G&&G.mode==='net'&&typeof netAct==='function'){netAct(m);render();return}const ok=gameAct(m,s);if(!ok)render()}
+function uiAct(m){if(UI.lessonNow){learnDone(UI.lessonNow);UI.lessonNow=null}const me=viewSeat();const s=m.seat!=null?m.seat:me;UI.menu=null;if(m.act==='sell')UI.sell=null;if(G&&G.mode==='net'&&typeof netAct==='function'){netAct(m);render();return}const ok=gameAct(m,s);if(!ok)render()}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-a],[data-card],[data-start],[data-set],[data-opp]');if(!t)return;
   if(t.dataset.mv){uiAct(JSON.parse(t.dataset.mv));return}
   const a=t.dataset.a;
   if(typeof netClick==='function'&&(a&&/^net/.test(a)||(a==='new'&&G&&G.mode==='net'))){netClick(a==='new'?'netnew':a);return}
   if(a==='close'){UI.menu=null;UI.zoom=null;UI.rules=false;if(GX.open==='dkCard')GX.close();render();return}
+  if(a==='autoplay'){const me=viewSeat();if(me>=0)autoPlay(me);return}
+  if(a==='learned'){learnDone(t.dataset.k);UI.lessonNow=null;render();return}
+  if(a==='learnon'){UI.learn=!(UI.learn!==false);render();return}
   if(a==='askmenu'){UI.menu={ask:true};render();return}
   if(a==='sellmode'){UI.sell=[];render();return}
   if(a==='sellx'){UI.sell=null;render();return}
@@ -233,13 +245,13 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='load'){try{G=JSON.parse(localStorage.getItem(SAVE));UI.pass=null;UI.lastSeat=-1;refresh()}catch(e){G=null;render()}return}
   if(a==='gfx'&&typeof GFX!=='undefined'){GFX.cycle();syncGfxBtn();return}
   if(a==='pause'){UI.pause=!UI.pause;$('#pausebtn').innerHTML=ic(UI.pause?'play':'pause');syncMenu();if(!UI.pause)schedule();return}
-  if(a==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed2',UI.speed)}catch(e){};$('#speedbtn').innerHTML=SPEEDN(UI.speed);syncMenu();return}
+  if(a==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed3',UI.speed)}catch(e){};$('#speedbtn').innerHTML=SPEEDN(UI.speed);syncMenu();return}
   if(a==='hints'){UI.hints=!UI.hints;try{localStorage.setItem('dkd_hints',UI.hints?'1':'0')}catch(e){};$('#hintbtn').innerHTML=ic('hint')+' '+(UI.hints?'On':'Off');syncMenu();render();return}
   if(a==='snd'&&typeof toggleSound==='function'){toggleSound();syncMenu();return}
   if(a==='mus'&&typeof toggleMusic==='function'){toggleMusic();syncMenu();return}
   if(t.dataset.set){const k=t.dataset.set,v=t.dataset.v;if(k==='n')UI.n=+v;else if(k==='mode')UI.mode=v;else if(k==='lvl')UI.lvl=v;else if(k==='ex'){DEFEX[v]=!DEFEX[v];try{localStorage.setItem('dkd_ex',JSON.stringify(DEFEX))}catch(e){}}render();return}
   if(t.dataset.opp!=null&&t.dataset.card===undefined){UI.oppView=+t.dataset.opp;render();GX.show('dkOpp');const d=$('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0;return}
-  if(t.dataset.start){UI.pass=null;UI.lastSeat=-1;newGame(t.dataset.start,UI.n||DEFN);return}
+  if(t.dataset.start){UI.pass=null;UI.lastSeat=-1;newGame(t.dataset.start,UI.n||DEFN);if(G){G.learn=UI.learn!==false&&t.dataset.start!=='ai';render()}return}
   if(t.dataset.card!==undefined&&G){const id=+t.dataset.card;const me=viewSeat();
     if(t.closest('.dlg')||t.closest('#dkCard')){return}
     if(UI.sell){if(me>=0&&sellable(P(me)).includes(id)){const i=UI.sell.indexOf(id);if(i>=0)UI.sell.splice(i,1);else UI.sell.push(id);render()}return}
