@@ -62,8 +62,20 @@ camera, tiny tiles in the full-map view, and a late game with no followers. It i
     less.
 11. "Spots 1/3" became "Next 1/3", with "8 spots fit (3 places: tap Next)". The tile counter reads "last" on the last tile.
 
-## Tests (final build)
-See the table at the end (filled from the final run).
+## Tests (final build, 2,452,393 bytes after the copyright stamp)
+| Test | Result |
+|---|---|
+| `clarity-test.js` (new: who scored, bar name, farm advice = button, tip once, last-tile wording) | 223–316 checks, 0 failed (40 failed before the fixes) |
+| `graph_test.js` (rules: feature graph and every scoring rule) | 77 passed, 0 failed |
+| `geo_test.js` | 85 tiles, 0 drawing errors, 0 adjacency warnings |
+| `cover.js 48` (invariants after every move, every rule fires) | MISSING TOTAL 0 |
+| `gauntlet.js 20 2 river,ic,tb` | 20/20 done, 0 errors, 0 stalls |
+| `click.js` (16 games, desktop and phone, guided and hot-seat) | TOTAL errors 0 |
+| `lay.js` 1366x768, 1920x1080, 768x1024, 1100x700 | PROBLEMS 0 |
+| `lay-phone.js` 390x844, 390x763, 390x664, 375x553, 412x780, 844x390, 750x342 | 0 problems at each size (the last CSS fix re-checked at 750x342, 390x664 and 844x390) |
+| `net/p2p-carc.js` (real WebRTC, local relay; hidden-info and net strip are covered here) | A, B, C: PASS, bad 0 |
+| `p2p-carc-phone.js` | A, B, C: PASS |
+
 
 ## Still weak (honest)
 - **Fun is about 3.0–3.4, not 3.5.** All four later testers lost to the normal computer by 10–40 points and blamed the
