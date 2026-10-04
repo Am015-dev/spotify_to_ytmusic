@@ -105,13 +105,7 @@ html.ph .ptile.bcard .go{position:absolute;left:50%;bottom:-10px;transform:trans
 @keyframes bmPulse2{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.12)}}
 html.ph .ptile.bcard.shake{animation:bShake .4s}
 @keyframes bShake{0%,100%{translate:0}25%{translate:-6px}50%{translate:6px}75%{translate:-3px}}
-/* ---- landscape keeps its rail; the chips sit in the bar too ---- */
-html.ph-l header.gx-bar .gx-ibtn.btn:not([data-gx="dr-menu"]):not(#pausebtn){display:none}
-html.ph-l header.gx-bar #pchips{display:grid;flex:1;min-width:0;grid-template-columns:repeat(var(--cc,4),minmax(0,1fr));gap:3px;align-self:stretch;padding:2px 0}
-html.ph-l header.gx-bar .pchip{min-height:0;padding:0 3px;border-top-width:4px;box-shadow:none}
-html.ph-l header.gx-bar .pchip b,html.ph-l header.gx-bar .pchip span{font-size:13px;letter-spacing:-.5px}
-html.ph-l header.gx-bar #pchips[style*="--cc: 5"] .pchip b,html.ph-l header.gx-bar #pchips[style*="--cc: 6"] .pchip b{display:none}
-html.ph-l header.gx-bar .pchip .pn,html.ph-l header.gx-bar .pchip u{display:none}
+/* ---- landscape keeps its rail and bar buttons ---- */
 html.ph-l .gx-dock[data-bf] #banner,html.ph-l .gx-dock[data-bf] #pfeed{display:none!important}
 html.ph .gx-dock[data-bf="resolving"] #pshop,html.ph .gx-dock[data-bf="resolving"] #pacts>*,html.ph .gx-dock[data-bf="resolving"] #dicewrap{visibility:hidden}
 #bko{display:none}
@@ -122,8 +116,6 @@ html.ph .bfintro .you svg{width:64px;height:64px;flex:none}
 html.ph .bfintro .you b{font:400 28px/1 Bangers,Impact,sans-serif;letter-spacing:.04em;color:var(--mc);-webkit-text-stroke:1.2px #1a1320}
 html.ph #choice .bfintro .goal{font-size:18px;line-height:1.3;margin:6px 0}
 html.ph-p header.gx-bar .pchip.me b{padding-right:24px}
-html.ph-l header.gx-bar .pchip b{display:none}
-html.ph-l header.gx-bar .pchip span{flex-wrap:wrap;row-gap:0}
 html.ph #choice.bfpoke{animation:bfPoke .5s}
 @keyframes bfPoke{0%,100%{transform:none}30%{transform:translateY(-8px)}60%{transform:translateY(2px)}}
 html.ph-p .gx-dock[data-card="choice"] #choice h2{font-size:1.6rem}

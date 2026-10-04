@@ -7,7 +7,7 @@ let pass=0,fail=0;const ok=(c,m)=>{if(c){pass++;console.log('PASS',m)}else{fail+
 const click=(w,el)=>el.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
 const words=t=>t.trim().split(/\s+/).filter(x=>x&&!/^[·★⚡♥]$/.test(x)).length;
 // 1. the score strip lives in the top bar
-{const w=mk(3);const d=w.document;ok(d.querySelector('header.gx-bar #pchips .pchip'),'monster chips sit in the top bar (score strip)');
+{const w=mk(3);const d=w.document;w.eval('PHONE.land=false;render()');ok(d.querySelector('header.gx-bar #pchips .pchip'),'portrait: monster chips sit in the top bar (score strip)');w.eval('PHONE.land=true;render()');ok(d.querySelector('.gx-dock > #pchips .pchip'),'landscape: the chips go back to the rail');
   ok(d.querySelectorAll('#menuwrap [data-bfm]').length===4,'the menu holds Cards, Yours, Monsters and Log');w.close()}
 // 2. buying is tapping the card in the market: a tap shows a card, a tap on the shown (or starred) card buys it; a card you cannot afford never buys
 {const w=mk(11);const d=w.document;w.eval(`while(!humanTurn()){G.active=(G.active+1)%G.pl.length}G.phase='buy';G.step=4;cur().en=20;render()`);

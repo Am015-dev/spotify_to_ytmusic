@@ -29,7 +29,7 @@ function bfBuild(){if($bf('bfx'))return;const fx=document.createElement('div');f
     const tp=document.createElement('div');tp.id='btip';tp.setAttribute('aria-live','polite');b.appendChild(tp)}
   const f=document.createElement('div');f.id='bfinger';f.setAttribute('aria-hidden','true');f.innerHTML='<i></i>';document.body.appendChild(f);
   // the score strip lives in the top bar; the menu gets the rows the hidden bar buttons used to open
-  const bar=document.querySelector('header.gx-bar'),ch=$bf('pchips');if(bar&&ch&&ch.parentNode!==bar){bar.insertBefore(ch,bar.querySelector('[data-gx="dr-menu"]'))}
+
   const menu=document.querySelector('#menuwrap .menu');if(menu&&!menu.querySelector('[data-bfm]')){const rows=[['dr-market','🃏 Cards for sale','Every card in the shop, with its full text'],['dr-mine','🎴 Your cards','What you own and what it does'],['dr-mons','👾 Monsters','Every monster’s cards and stats'],['dr-log','📰 What happened','Every event, newest first']];
     menu.insertAdjacentHTML('afterbegin',rows.map(([g,t,s])=>`<button class="btn mrow" data-gx="${g}" data-bfm="1">${t}<small>${s}</small></button>`).join(''))}}
 // ---- the one line on the board ----
@@ -141,7 +141,10 @@ function bfFinger(){const f=$bf('bfinger');if(!f)return;let el=null;
    <p class="goal">First to <b>20 ★</b> wins.<br>Or be the last monster standing.</p>
    <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn?'<small>First you pick a secret power</small>':''}</button></div></div>`}}
 // ---- render hook ----
-function bfRender(){if(!phOn())return;bfBuild();bfRollWatch();bfSlowAgain();if(BF.sel>=0&&!phShopOK())BF.sel=-1;
+// the score strip: in the top bar in portrait; landscape keeps its bar buttons and the chips stay in the rail
+function bfPlaceChips(){const bar=document.querySelector('header.gx-bar'),ch=$bf('pchips'),dk=document.querySelector('.gx-dock');if(!bar||!ch||!dk)return;
+  if(!PHONE.land){if(ch.parentNode!==bar)bar.insertBefore(ch,bar.querySelector('[data-gx="dr-menu"]'))}else if(ch.parentNode!==dk)dk.insertBefore(ch,$bf('pshop'))}
+function bfRender(){if(!phOn())return;bfBuild();bfPlaceChips();bfRollWatch();bfSlowAgain();if(BF.sel>=0&&!phShopOK())BF.sel=-1;
   const dk=document.querySelector('.gx-dock');const hold=!!(BF.cap&&bfNow()<BF.until);
   if(hold){clearTimeout(BF.holdT);BF.holdT=setTimeout(phRender,BF.until-bfNow()+40)}
   if(dk)dk.dataset.bf=G&&!G.winner?(hold?'resolving':humanTurn()?G.phase:'watch'):'';
