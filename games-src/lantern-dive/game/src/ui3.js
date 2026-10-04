@@ -149,6 +149,8 @@ function doHint() {
 function hotNext() {
   if (!hotSeat() || UI.cards.length || UI.busy) return;
   const pend = LD.pending(G).filter(s => !G.players[s].ai); if (!pend.length) return;
+  // the flare decision needs no hidden information: nobody has to take the device, and the hand stays hidden meanwhile
+  if (G.phase === 'distress') { if (UI.holder >= 0) { UI.holder = -1; render(); } return; }
   if (UI.holder >= 0 && pend.includes(UI.holder)) return;
   const nx = pend[0]; UI.holder = -1; UI.sel = -1; UI.job = -1; UI.pingSel = false; UI.giveSel = -1;
   pushCard({ kind: 'pass', seat: nx, title: 'Pass the device to ' + pname(nx), body: 'Hand the device to ' + pname(nx) + '. Their cards stay hidden until they press the button.', btn: pname(nx) + ' is ready' });

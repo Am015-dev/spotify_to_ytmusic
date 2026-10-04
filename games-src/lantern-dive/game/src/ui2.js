@@ -232,7 +232,7 @@ function dockModel(v) {
   if (!G) return M;
   if (ph === 'over') { M.p = G.result && G.result.ok ? 'Dive complete!' : 'The dive failed.'; M.sub = G.result ? G.result.why : ''; btn('Result', 'result'); return M; }
   if (UI.busy) { M.p = 'The cards move…'; return M; }
-  if (hotSeat() && UI.holder < 0) { M.p = 'Pass the device on.'; return M; }
+  if (hotSeat() && UI.holder < 0 && G.phase !== 'distress') { M.p = 'Pass the device on.'; return M; }
   switch (ph) {
     case 'assign': {
       const A = G.as; const left = G.tasks.filter(t => t.owner < 0).length;
@@ -261,12 +261,13 @@ function dockModel(v) {
       return M;
     }
     case 'distress': {
-      if (!must) { M.p = who + ' decides about the distress flare…'; return M; }
+      if (!must) { M.p = (who === 'You' ? 'You' : 'The Commander, ' + who) + ' decides about the flare…'; M.sub = 'If it is lit, every diver passes one card. Nobody else has to choose yet.'; return M; }
       M.cls = 'mine'; const lit = G.distress;
       M.p = lit ? 'Pass cards again this attempt?' : 'Light the distress flare?'; M.sub = lit ? 'The flare stays lit until the dive is won.' : 'Every diver passes one card (not a Lantern). The dive then counts one extra attempt.';
       btn(lit ? 'No passing' : 'No flare', 'dist', { on: false, cls: 'alt' });
-      const two = G.hn === 2; if (two) btn(lit ? 'Pass a card' : 'Light the flare', 'dist', { on: true, dir: 1, cls: 'go' });
-      else { btn('Pass left', 'dist', { on: true, dir: 1, cls: 'go' }); btn('Pass right', 'dist', { on: true, dir: -1, cls: 'go' }); }
+      M.eq = 1;
+      const two = G.hn === 2; if (two) btn(lit ? 'Pass a card' : 'Light the flare', 'dist', { on: true, dir: 1, cls: 'alt' });
+      else { btn('Pass left', 'dist', { on: true, dir: 1, cls: 'alt' }); btn('Pass right', 'dist', { on: true, dir: -1, cls: 'alt' }); }
       return M;
     }
     case 'pass': {

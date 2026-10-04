@@ -50,7 +50,7 @@ const avN = (s, size) => svgEl(avatarS(s, size));
 const humans = () => G ? G.players.map((p, i) => (p.ai || p.helper) ? -1 : i).filter(i => i >= 0) : [];
 const hotSeat = () => !!G && !NET.on && humans().length > 1;
 const watching = () => !!G && humans().length === 0;
-function viewSeat() { if (!G) return -1; if (NET.on) return NET.mySeat; if (hotSeat()) return UI.holder; const hs = humans(); return hs.length ? hs[0] : -1; }
+function viewSeat() { if (!G) return -1; if (NET.on) return NET.mySeat; if (hotSeat()) { if (UI.holder < 0 && G.phase === 'distress' && !UI.cards.length) { const p = LD.pending(G).find(s => !G.players[s].ai && !G.players[s].helper); return p != null ? p : -1; } return UI.holder; } const hs = humans(); return hs.length ? hs[0] : -1; }
 const pname = s => G && G.players[s] ? G.players[s].name : '?';
 const nameList = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
 const ntrOf = () => G ? G.ntr : 10;

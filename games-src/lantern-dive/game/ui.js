@@ -50,7 +50,7 @@ const avN = (s, size) => svgEl(avatarS(s, size));
 const humans = () => G ? G.players.map((p, i) => (p.ai || p.helper) ? -1 : i).filter(i => i >= 0) : [];
 const hotSeat = () => !!G && !NET.on && humans().length > 1;
 const watching = () => !!G && humans().length === 0;
-function viewSeat() { if (!G) return -1; if (NET.on) return NET.mySeat; if (hotSeat()) return UI.holder; const hs = humans(); return hs.length ? hs[0] : -1; }
+function viewSeat() { if (!G) return -1; if (NET.on) return NET.mySeat; if (hotSeat()) { if (UI.holder < 0 && G.phase === 'distress' && !UI.cards.length) { const p = LD.pending(G).find(s => !G.players[s].ai && !G.players[s].helper); return p != null ? p : -1; } return UI.holder; } const hs = humans(); return hs.length ? hs[0] : -1; }
 const pname = s => G && G.players[s] ? G.players[s].name : '?';
 const nameList = a => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
 const ntrOf = () => G ? G.ntr : 10;
@@ -333,7 +333,7 @@ function dockModel(v) {
   if (!G) return M;
   if (ph === 'over') { M.p = G.result && G.result.ok ? 'Dive complete!' : 'The dive failed.'; M.sub = G.result ? G.result.why : ''; btn('Result', 'result'); return M; }
   if (UI.busy) { M.p = 'The cards move…'; return M; }
-  if (hotSeat() && UI.holder < 0) { M.p = 'Pass the device on.'; return M; }
+  if (hotSeat() && UI.holder < 0 && G.phase !== 'distress') { M.p = 'Pass the device on.'; return M; }
   switch (ph) {
     case 'assign': {
       const A = G.as; const left = G.tasks.filter(t => t.owner < 0).length;
@@ -362,12 +362,13 @@ function dockModel(v) {
       return M;
     }
     case 'distress': {
-      if (!must) { M.p = who + ' decides about the distress flare…'; return M; }
+      if (!must) { M.p = (who === 'You' ? 'You' : 'The Commander, ' + who) + ' decides about the flare…'; M.sub = 'If it is lit, every diver passes one card. Nobody else has to choose yet.'; return M; }
       M.cls = 'mine'; const lit = G.distress;
       M.p = lit ? 'Pass cards again this attempt?' : 'Light the distress flare?'; M.sub = lit ? 'The flare stays lit until the dive is won.' : 'Every diver passes one card (not a Lantern). The dive then counts one extra attempt.';
       btn(lit ? 'No passing' : 'No flare', 'dist', { on: false, cls: 'alt' });
-      const two = G.hn === 2; if (two) btn(lit ? 'Pass a card' : 'Light the flare', 'dist', { on: true, dir: 1, cls: 'go' });
-      else { btn('Pass left', 'dist', { on: true, dir: 1, cls: 'go' }); btn('Pass right', 'dist', { on: true, dir: -1, cls: 'go' }); }
+      M.eq = 1;
+      const two = G.hn === 2; if (two) btn(lit ? 'Pass a card' : 'Light the flare', 'dist', { on: true, dir: 1, cls: 'alt' });
+      else { btn('Pass left', 'dist', { on: true, dir: 1, cls: 'alt' }); btn('Pass right', 'dist', { on: true, dir: -1, cls: 'alt' }); }
       return M;
     }
     case 'pass': {
@@ -599,6 +600,8 @@ function doHint() {
 function hotNext() {
   if (!hotSeat() || UI.cards.length || UI.busy) return;
   const pend = LD.pending(G).filter(s => !G.players[s].ai); if (!pend.length) return;
+  // the flare decision needs no hidden information: nobody has to take the device, and the hand stays hidden meanwhile
+  if (G.phase === 'distress') { if (UI.holder >= 0) { UI.holder = -1; render(); } return; }
   if (UI.holder >= 0 && pend.includes(UI.holder)) return;
   const nx = pend[0]; UI.holder = -1; UI.sel = -1; UI.job = -1; UI.pingSel = false; UI.giveSel = -1;
   pushCard({ kind: 'pass', seat: nx, title: 'Pass the device to ' + pname(nx), body: 'Hand the device to ' + pname(nx) + '. Their cards stay hidden until they press the button.', btn: pname(nx) + ' is ready' });
