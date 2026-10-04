@@ -306,6 +306,8 @@ function buildStatic(){const sc=V3.scene;if(V3.stat)for(const m of V3.stat)sc.re
   if(!V3.kilnGeo)V3.kilnGeo=lathe([[1.5,0],[1.56,.02],[1.6,.1],[1.61,.2],[1.58,.265],[1.53,.29],[1.48,.285],[1.44,.24],[1.4,.175],[1.34,.155]],56);
   L.kilns.forEach((K,i)=>{const g=new THREE.Group();const body=new THREE.Mesh(V3.kilnGeo,clayMat());body.castShadow=body.receiveShadow=true;g.add(body);
     const fl=new THREE.Mesh(new THREE.CircleGeometry(1.36,48),kilnFloorMat(i));fl.rotation.x=-Math.PI/2;fl.position.y=.155;fl.receiveShadow=true;g.add(fl);
+    {const c=mkCanvas(128,128),x=c.getContext('2d');x.fillStyle='#f4ead2';x.beginPath();x.arc(64,64,58,0,7);x.fill();x.strokeStyle='#23407a';x.lineWidth=8;x.stroke();x.fillStyle='#23407a';x.font='800 80px Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText(String(i+1),64,70);
+      const nm=new THREE.Mesh(new THREE.CircleGeometry(.36,32),mat(new THREE.MeshBasicMaterial({map:texOf(c,true),transparent:true,depthWrite:false})));nm.rotation.x=-Math.PI/2;nm.position.set(0,.3,1.62);nm.renderOrder=3;g.add(nm)}// the kiln's number, as the log and recap name it
     const sh=shadowPlane(4,4,.8,V3.T.blob);sh.position.y=.006;g.add(sh);g.position.set(K.x,0,K.z);add(g);body.userData.hit={k:'kiln',i};fl.userData.hit={k:'kiln',i};V3.hits.push(body,fl)});
   // the clay sack and the shard box
   const bag=add(V3.sack||(V3.sack=sackMesh()));bag.position.set(L.bag.x,0,L.bag.z);
