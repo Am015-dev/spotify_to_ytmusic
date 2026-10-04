@@ -127,7 +127,7 @@ function recentHtml(){return `<h3>Latest</h3><ol class="log">${G.log.slice(0,12)
 // ---------- modal: questions, reports, start, cards, rules, game over ----------
 function renderModal(){const m=$('#modal');if(!m)return;let h='';
   if(typeof NET!=='undefined'&&NET.gone)h=goneHTML();else if(typeof NET!=='undefined'&&NET.on&&NET.inLobby&&UI.modal!=='start')h=lobbyHTML();else if(UI.modal==='start')h=startHtml();else if(false)h=`<div class="mbox wide"><button class="x" data-a="close" aria-label="Close">×</button>${RULES_HTML}</div>`;
-  else if(!G)h='';else if(G.over&&!UI.overSeen&&!storyActive())h=overHtml();
+  else if(!G)h='';else if(G.over&&!UI.overSeen&&!storyActive()){if(typeof campOver==='function'&&campOver())h='';else h=overHtml()}
   m.hidden=!h;if(m.dataset.h!==h){m.innerHTML=h;m.dataset.h=h;const f=m.querySelector('[autofocus]')||m.querySelector('button.opt');if(f)f.focus()}}
 function questionHtml(){const q=G.q;let ctx='';
   if(q.kind==='dice'){const d=q.dice;ctx=`<div class="dice">${die('wound',d.w)}${die('success',d.s)}${die('adventure',d.q)}</div>`}
@@ -151,7 +151,8 @@ function closeMenu(){const m=$('#moremenu');if(m&&m.classList.contains('open')){
 const SCEN_ORDER=['marooned','hexed','stranded','settlers'];
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">A co-operative survival game for 1–4 castaways. Plan every day together, build a camp, explore the island and hold out against the weather until your goal is done.</p>
-   <div class="mb guided"><button class="btn go big" data-a="guided">New here? Play a guided first game ▶</button><small>Marooned on the Easier setting, with a short tip on each new screen.</small></div>
+   <div class="mb guided"><button class="btn go big" data-a="story">📖 Story: learn the island chapter by chapter ▶</button><small>New here? Start with chapter 1: survive three days. Each chapter adds one new idea. ${typeof campLine==='function'?campLine():''}</small></div>
+   <h3 class="orfull">Or set up a full game</h3>
    ${saved?`<div class="mb"><button class="btn go" data-a="continue">Continue the saved game</button></div>`:''}
    ${typeof onlineBlock==='function'?onlineBlock():''}
    <h3>Scenario</h3><div class="scens">${SCEN_ORDER.map((k,ix)=>{const S=SCENARIOS[k];return `<button class="scen ${o.scen===k?'on':''}" data-scen="${k}"><b>${ix+1}. ${esc(S.n)}</b><small>${S.rounds} rounds</small><span>${esc(S.x)}</span></button>`}).join('')}</div>
@@ -214,7 +215,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   if(d.pgo){setPStep(+d.pgo);render();return}
   if(d.pq!=null){const p=priorities()[+d.pq];const cur=curPawn();if(p&&p.act&&cur){const e=place(cur.id,p.act.type,p.act.tgt,p.act.alt);if(e)toast(e);else{sfx('place');UI.sugWhy[JSON.stringify([p.act.type,p.act.tgt])]=p.title;UI.sel=null;wizPlaced();refresh()}}return}
   if(d.tut){if(d.tut==='off')tutDone();else UI.tut++;render();return}
-  if(d.gtip){if(d.gtip==='off')UI.guide.on=false;else UI.guide.seen[d.gtip]=1;sfx('click');refresh();return}
+  if(d.gtip){if(d.gtip==='off'){UI.guide.on=false;UI.guideOff=true}else UI.guide.seen[d.gtip]=1;sfx('click');refresh();return}
   if(d.place){const o=JSON.parse(decodeURIComponent(d.place));doPlace(o.type,o.tgt,o.alt);return}
   if(d.rm){unplace(d.rm);UI.sel=null;refresh();return}
   if(d.pawn&&b.closest('.pawnrow')&&placedIds().has(d.pawn)&&planOpen()){unplace(d.pawn);UI.sel=d.pawn;UI.ps.pick=true;refresh();return}
@@ -251,7 +252,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'moveask':G.moveAsk=b.checked?1:0;return;
   case 'okreport':UI.report=null;render();return;
   case 'overok':UI.overSeen=true;render();return;
-  case 'new':openStart();return;case 'start':UI.guide.on=false;beginGame();return;case 'guided':Object.assign(UI.setup,{scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:true,items:4,diff:'easy'});UI.guide={on:true,seen:{}};beginGame();return;case 'continue':loadSaved();return;
+  case 'new':openStart();return;case 'start':UI.guide.on=false;UI.cmpDef=null;beginGame();return;case 'story':campOpen();return;case 'guided':Object.assign(UI.setup,{scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:true,items:4,diff:'easy'});UI.guide={on:true,seen:{}};UI.cmpDef=null;beginGame();return;case 'continue':loadSaved();return;
   case 'rulesstart':UI.modal=null;$('#modal').hidden=true;$('#modal').dataset.h='';GX.show('rulesd');UI.backToStart=!G;return;
   case 'cards':GX.show('cardsd');renderCards();return;case 'rules':GX.show('rulesd');return;case 'close':UI.modal=G?null:'start';if(!G)$('#modal').dataset.h='';render();return;
   case 'snd':toggleSound();return;case 'mus':toggleMusic();return;
@@ -269,7 +270,7 @@ document.addEventListener('focusin',e=>{const t=e.target.closest&&e.target.close
 UI.setup={scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:false,items:2,diff:'standard'};
 function openStart(){UI.modal='start';UI.overSeen=false;render();const m=$('#modal');m.hidden=false;m.innerHTML=startHtml();m.dataset.h=''}
 function beginGame(){const s=UI.setup;resetPlanSteps();UI.modal=null;UI.report=null;UI.overSeen=false;UI.sel=null;UI.tileSel=null;UI.fx.length=0;UI.fxSeen=0;
-  const all=s.chars.every(k=>s.ai[k]);newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff});UI.reportMark=G.logN;V3.layout=null;
+  const all=s.chars.every(k=>s.ai[k]);UI.cmpDone=false;newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff,cmp:UI.cmpDef?{id:UI.cmpDef.id,goal:UI.cmpDef.goal,twist:UI.cmpDef.twist}:null,noIntro:!!UI.cmpDef});UI.reportMark=G.logN;V3.layout=null;
   for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};refresh()}
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;resetPlanSteps();UI.beats.length=0;UI.shown=-1;beat('dawn',{round:G.round});UI.modal=null;UI.reportMark=G.logN;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};if(G.scen==='stranded'&&!CHARS.ada)CHARS.ada={n:'Ada',die:11,arrows:[],skills:[],npc:1};refresh()}catch(e){toast('No saved game found.');openStart()}}
 function boot(){GX.init({key:'swi'});if(typeof PHO!=='undefined')PHO.boot();GX.onClose=id=>{if(id==='rulesd'&&UI.backToStart){UI.backToStart=false;openStart()}};GX.onShow=id=>{if(!G&&id!=='rulesd'&&id!=='cardsd'){GX.close();return}if(id==='cardsd')renderCards();if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(G)render()};paintIcons();try{init3D()}catch(e){console.error(e)}gfxBtn();soundBtns&&soundBtns();openStart()}
