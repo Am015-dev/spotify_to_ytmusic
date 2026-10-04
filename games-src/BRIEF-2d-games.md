@@ -98,3 +98,9 @@ audio bundle and every test script, and adapt them. Read `SP/kaiten/PLAN.md`, `g
 Files, file size, a table of every test with numbers, screenshot paths, what's confirmed vs. guessed in the
 rules, what's not done, honest weaknesses (art, AI strength, untested real devices), and proposed patches to
 shared modules if any.
+
+## Art plan (Oct 2026)
+The owner will generate the final art in Google Flow later. Keep every picture swappable by file name through
+the art manifest, and keep `ART-PROMPTS.md` complete and ordered by impact (board, cards/chips, characters,
+title). Code-drawn art is a placeholder until then. The renderer adds little on its own (a DOM-fallback
+screenshot looked the same as the WebGL one); motion and real art are what show.
