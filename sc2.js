@@ -3,8 +3,8 @@
    · humans: pavement peds + quest/passenger minifigs ~1.85 m; the garage driver in world ships (seated) ~1.6 m standing height;
      Chapter-1 goon cars capped at 5.6 m long, the moped goon 2.2 m with a 1.85 m rider
    · setback: building footprints keep ≥ 3 m from the road edge (Athens per street class, Frankfurt footprint check), colliders follow
-   · walls: a glancing hit (< 35°) slides along the wall at ≥ 85% speed and turns the car a little back toward the road; only steeper hits bounce */
-Object.assign(SC_K,{ped:.44,fig:.46,drv:2,glance:35,slide:.85,away:.09,goonL:5.6,moped:.62,
+   · walls: a glancing hit (< 35°) slides along the wall at ≥ 90% speed and turns the car a little back toward the road; only steeper hits bounce */
+Object.assign(SC_K,{ped:.44,fig:.46,drv:2,glance:35,slide:.9,away:.14,goonL:5.6,moped:.62,
   sbA:{ped:3,res:3.6,link:3.6,sec:3.8,main:4,arterial:4.5,hill:3}, // Athens: road reserve beyond the half width (was ped 1.2 · res 2.2 · sec 3 · main 3.2)
   sbF:4});                                                          // Frankfurt: footprint sample points ≥ this beyond the half width (was 2.5)
 SC_S.ng=0;
