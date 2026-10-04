@@ -77,7 +77,16 @@ short news), `ui4.js` (report cards, choice tiles, short tips), `ui5.js` (the pu
   where the engine says).
 - `lay-phone.js`: PROBLEMS 0 at all 7 sizes (390x844, 390x763, 390x664, 375x553, 412x780, 844x390, 750x342); the baseline had 2 landscape failures. The test now opens Log and Cards through the Menu on phones, because they left the
   header.
+- `lay.js` (desktop/tablet, 4 sizes): PROBLEMS 0. The test used to hang on the build before this rework too: it tapped a rival's
+  cauldron, then auto-played without going back. It now taps "Back to your cauldron" first.
 - `bf-shot.js` (new): a real-tap walk-through of two days at any size: `node bf-shot.js 390x763 bf [--vs]`.
+
+## Found on a real iPhone after publishing
+
+- The tip card and the question sheet showed **under** the painted cauldron. iOS Safari puts the fixed children of a touch-scrolling
+  container (`-webkit-overflow-scrolling:touch` on the dock body) in that container's own layer, below the board's canvas. Fix: the dock
+  sits above the board (`z-index:4`) and the legacy touch scrolling is off. On portrait phones the dock also keeps its height, so the
+  cauldron no longer jumps when a question sheet opens. Desktop Chromium never showed this, so check it on the phone itself.
 
 ## Still open
 

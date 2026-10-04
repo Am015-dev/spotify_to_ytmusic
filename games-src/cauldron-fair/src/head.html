@@ -480,5 +480,10 @@ html.ph .rsbox.fix{height:auto}html.ph .rsbox.fix:has(.shop){height:100%}
 .rsfoot .cbtns .btn.go{flex:1 1 auto;min-height:56px;font-size:19px}
 html.ph #risk{display:none}
 .deckon #promptDock{display:none}
+/* iOS Safari: a touch-scrolling dock body traps its fixed children (tip card, question sheet) in its own layer, under the painted
+   cauldron canvas. Lift the whole dock above the board and drop the legacy touch scrolling. */
+.gx-dock{z-index:4}
+html.ph.ph-p .gx-dock{min-height:var(--dockh)}
+.gx-dock-body{-webkit-overflow-scrolling:auto}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 </style></head>
