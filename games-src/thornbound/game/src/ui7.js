@@ -62,7 +62,7 @@ const GLOSS=[
  ['exhausted',/\bExhausted\b/,'Exhausted','A used Tactic. It cannot be used again unless something refreshes it.'],
  ['heir',/\bHeirs?\b/,'Heir','Your strongest basic card (Strength 10), the one you start with. Some cards and Kingdom Cards give Heirs extra powers.'],
  ['captain',/\bCaptains?\b/,'Captain','A card type (Strength 6 to 9). It has no ability of its own; some powers name Captains.'],
- ['follower',/\bFollowers?\b/,'Follower','A card type (Strength 1 to 4). Followers are Invulnerable, and an enemy Poison Physician-type Agent dies when it meets one.'],
+ ['follower',/\bFollowers?\b/,'Follower','A card type (Strength 1 to 4). Followers are Invulnerable, and the basic Agent eliminates itself when it meets one.'],
  ['agent',/\bAgents?\b/,'Agent','A card type. The basic Agent is Deadly, but it eliminates itself if an opposing Follower is in the same Clash.'],
  ['cavalry',/\bCavalry\b/,'Cavalry','A card type of riders; the basic one can Flank.'],
  ['war machine',/\bWar [Mm]achines?\b/,'War machine','A card type: a big Invulnerable engine that can Deploy.'],
@@ -104,17 +104,22 @@ document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.datas
 const GUIDED={seed:98,ai:9,faction:'clans',rival:'nobility'};
 const isGuided=()=>!!(UI.cfg&&UI.cfg.guided&&!NET.on);
 const COACH_INFO=[
- {id:'goal',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'Your goal',text:()=>'Hold the most Influence when round '+G.rounds+' ends. Influence is the score: you and the Gilded Court both start at 0 (the chips at the bottom).',hl:'#rivals'},
- {id:'map',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'The kingdom',text:()=>'The map has three regions with two locations each. Every round each region has one Clash: the strongest side wins it and claims one of its two locations, which pays Influence. The numbers round the edge are the Influence track.',locs:[0,1,2,3,4,5]},
- {id:'round',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'One round, five steps',text:()=>'Bid for a Kingdom Card, place your Herald, hide one card at each region, fight the three Clashes, then count Influence. Let\'s play round 1 together: tap the glowing button each time.',btn:'Let\'s start'},
- {id:'own',when:()=>G.round===2&&G.q,title:'Now you lead',text:()=>'You have seen a whole round. From now on the ★ suggestion shows a good move and why, but every choice is yours. Tap any underlined word to read what it means.',btn:'Play on'}];
+ {id:'goal',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'Your goal',text:()=>'Win by having the most Influence when round '+G.rounds+' ends. Influence is the score: the bar at the bottom shows you and the Gilded Court, both at 0.',hl:'#rivals'},
+ {id:'map',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'The kingdom',text:()=>'The map has three regions with two locations each. Every round each region has one Clash: the strongest side wins it and claims one of its two locations, which pays Influence. The button in the map\'s corner makes the map bigger.',locs:[0,1,2,3,4,5]},
+ {id:'round',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'One round, six steps',text:()=>'1 Bid a card for a Kingdom Card. 2 Take your Kingdom Card. 3 Place your Herald. 4 Hide one card at each region. 5 Send Supporters. 6 The three Clashes. Round 1 is only this; new powers come in rounds 2 and 3. Tap the glowing button each time.',btn:'Let\'s start'},
+ {id:'own',when:()=>G.round===2&&G.q,title:'Round 2: two new things',text:()=>'Card abilities: some of your cards can Flank, Ambush, Retreat or Rally (the card says when). Autumn: after the Clashes you may send a card on a Journey for Lore, and Lore buys stronger cards. The ★ suggestion still shows a good move and why.',btn:'Play on'},
+ {id:'r3',when:()=>G.round===3&&G.q,title:'Round 3: the full game',text:()=>'Now everything is in play: your faction\'s Tactics, the Kingdom\'s Favour, and Govern (a card with votes goes into a Council for a lasting power). Each one is explained the first time you can use it.',btn:'Play on'}];
 function coachGate(){if(!G||!G.q||UI.coachInfo)return !!UI.coachInfo;if(!isGuided())return false;UI.coachDone=UI.coachDone||{};
-  const st=COACH_INFO.find(c=>!UI.coachDone[c.id]&&c.when());if(!st)return false;UI.coachInfo={id:st.id,title:st.title,text:st.text(),btn:st.btn,hl:st.hl,hlLocs:st.locs};return true}
+  const st=COACH_INFO.find(c=>!UI.coachDone[c.id]&&c.when());if(st){UI.coachInfo={id:st.id,title:st.title,text:st.text(),btn:st.btn,hl:st.hl,hlLocs:st.locs};return true}
+  // the guided game skips a season for you when nothing you have learnt yet can be used in it
+  const s=viewSeatForQ();if(s!=null&&G.q.t==='menu'&&G.round<3&&menuPhase(G.q)!=='Day'){const mv=legal(s);if(!visibleActs(mv).some(m=>m.t==='act')){const d=mv.find(m=>m.t==='done');if(d){if(!UI._skipT)UI._skipT=setTimeout(()=>{UI._skipT=0;humanMove(d.k)},0);return true}}}
+  return false}
 function coachOk(){const c=UI.coachInfo;if(!c)return;UI.coachDone=UI.coachDone||{};UI.coachDone[c.id]=1;UI.coachInfo=null;$$('.coachhl').forEach(e=>e.classList.remove('coachhl'));saveGame();pump()}
 function coachInfoHTML(c){setTimeout(()=>{$$('.coachhl').forEach(e=>e.classList.remove('coachhl'));if(c.hl){const e=$(c.hl);if(e)e.classList.add('coachhl')}},0);
   const n=COACH_INFO.findIndex(x=>x.id===c.id);return '<div class="step"><h3 class="st">'+esc(c.title)+'</h3><p class="coach info">'+gloss(c.text)+'</p>'+(n>=0&&n<3?'<p class="hint">'+(n+1)+' of 3 before you play</p>':'')+'</div>'}
 const menuPhase=q=>((q.title||'').match(/(Spring|Day|Autumn)/)||[])[1]||'';
 const byLabel=(mv,txt)=>mv.find(m=>(m.label||'').indexOf(txt)>=0);
+const BONUSK=['castle','wilderness','harvest','shrine','ossuary'];
 // teaching moves for round 1 (falls back to the normal suggestion when the scripted card is not there)
 function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
   if(G.round===1){
@@ -122,43 +127,47 @@ function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
     if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return riv?mv.find(m=>m.loc===riv.herald):byLabel(mv,'Cairn Field')}
     if(k==='place'){const P=G.pl[s];const heir=P.hand.find(id=>cinfo(id).archetype==='heir');if(heir!=null)return mv.find(m=>m.id===heir&&m.r===1);const big=P.hand.slice().sort((a,b)=>cinfo(b).strength-cinfo(a).strength);
       if(big.length)return mv.find(m=>m.id===big[0]&&m.r===0)||mv.find(m=>m.id===big[0]);return null}
-    if(k==='clashOrder')return mv.find(m=>m.order&&m.order.join()==='2,1,0')||null;
-    if(q.t==='menu'){const ph=menuPhase(q);if(ph==='Spring'&&G.pl[s].supp.r[1]===0){const m=mv.find(x=>x.a==='supp'&&x.p.r===1&&x.p.n===2);if(m)return m}return mv.find(m=>m.t==='done')}}
-  if(G.round===2&&q.t==='menu'&&menuPhase(q)==='Autumn'&&!UI.coachDone.au2){return mv.find(m=>m.a==='journey')||null}
+    if(q.t==='menu'){const ph=menuPhase(q);if(ph==='Spring'&&G.pl[s].supp.r[1]===0){const m=mv.find(x=>x.a==='supp'&&x.p.r===1&&x.p.n===2);if(m)return m}return mv.find(m=>m.t==='done')}
+    if(k==='harvest')return mv.find(m=>m.yes)||null;
+    if(BONUSK.includes(k))return mv.find(m=>m.skip||m.t==='seldone')||null}
   return null}
 const STEPN=(n,t)=>'Step '+n+' of 6 · '+t;
-// the coach line that replaces the prompt in round 1 (and the first time a few things appear later)
-function coachFor(s,mv,rm){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind,R=G.round;UI.coachDone=UI.coachDone||{};
+const NEWK={cmd:['Card abilities','Some of your cards have a power printed on them (Flank, Ambush, Retreat, Rally, Deploy). The card says when it works. Why you\'d want it: move a card to where it wins, or save it for later.'],
+  lore:['Journey','Send a hand card away to gain its Lore. Why you\'d want it: Lore buys your Site of Power cards, which are stronger than your basic cards.'],
+  tactic:['Tactics','Four special powers of your faction. Most work once per game, some once a round. Why you\'d want them: one well-timed Tactic can turn a Clash.'],
+  favour:['The Kingdom\'s Favour','A faction power with three uses, from the Gleaning Meadow. Why you\'d want it: an extra push when you need it, and it wins ties at the end.'],
+  govern:['Govern and Councils','Put a hand card with votes into a Council. Why you\'d want it: each Council gives a lasting power (Influence, Supporters back, or location bonuses).'],
+  council:['Councils','Your cards in a Council give you a power. Why you\'d want it: it works every round while the cards stay there.'],
+  kc:['Kingdom Card powers','Some Kingdom Cards and HQ cards have a power you choose when to use. Why you\'d want it: each row says what it costs and what it gives.']};
+// the coach line that replaces the prompt in round 1 (and the first time something new appears later)
+function coachFor(s,mv,rm){UI._coachShown=null;if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind,R=G.round;UI.coachDone=UI.coachDone||{};
   const nm=id=>cinfo(id).name+' ('+cinfo(id).strength+')';
   if(R===1){
-    if(k==='bid')return {title:STEPN(1,'Bid'),pulse:1,noRec:1,text:'Pick a hand card as a secret bid: the higher bid picks a Kingdom Card first.'+(rm?' '+nm(rm.id)+' is fair and keeps your big cards for the Clashes.':'')};
+    if(k==='bid')return {title:STEPN(1,'Bid'),pulse:1,noRec:1,text:'Pick a hand card as a secret bid: the higher bid picks a Kingdom Card first, and your bid card is tucked under it.'+(rm?' '+nm(rm.id)+' is a fair bid that keeps your big cards for the Clashes.':'')};
     if(k==='bidRes')return {title:STEPN(2,'Take a Kingdom Card'),pulse:1,noRec:1,text:'A Kingdom Card is a lasting power; your bid card stays tucked under it.'+(rm&&rm.kc?' Take '+TB.kingdomInfo(rm.kc).name+' (tap it to read it).':'')};
     if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return {title:STEPN(3,'Place your Herald'),pulse:1,noRec:1,text:'Win the region where your Herald stands and claim its location: +1 Influence, and you take 1 from each rival Herald there.'+(riv&&rm?' The Court is on '+LOCN[riv.herald]+': join it.':'')}}
     if(k==='place'){const n=UI.V.reg.reduce((a,R2)=>a+R2.down.filter(id=>id>=0&&ownerOf(id)===s).length,0);
       return {title:STEPN(4,'Hide a card at each region'),pulse:1,noRec:1,text:'Card '+Math.min(3,n+1)+' of 3, hidden until the Clash. '+(rm?nm(rm.id)+' to '+REG[rm.r]+(cinfo(rm.id).archetype==='heir'?': your strongest card where both Heralds wait.':'.'):'Choose a card for each region.')}}
-    if(q.t==='menu'&&menuPhase(q)==='Spring'){const sent=G.pl[s].supp.r[1]>0;return {title:STEPN(5,'Send Supporters'),pulse:1,noRec:1,text:sent?'Two Supporters stand with your Heir. Now finish Spring.':'Each Supporter you send adds +1 Strength in a region\'s first Clash. Send 2 to the Tablelands to back your Heir.'}}
-    if(k==='clashOrder')return {title:'Choose the Clash order',pulse:1,noRec:1,text:'The player with the least Influence decides which region fights first. Any order works: take the suggested one.'};
-    if(q.t==='menu'&&menuPhase(q)==='Day')return {title:'Day actions',pulse:1,noRec:1,text:'Cards are face up. Some have Day abilities like Ambush or Flank; you need none now.'};
-    if(k==='location')return {title:STEPN(6,'Claim a location'),pulse:1,noRec:1,text:'You won this Clash! Pick one of the region\'s two locations.'+(rm?' '+whyFor(s,rm):'')};
+    if(q.t==='menu'&&menuPhase(q)==='Spring'){const sent=G.pl[s].supp.r[1]>0;return {title:STEPN(5,'Send Supporters'),pulse:1,noRec:1,text:sent?'Two Supporters stand with your Heir. Now tap Done with Spring.':'Each Supporter you send adds +1 Strength in a region\'s first Clash, but it is gone after this round. Send 2 to the Tablelands to back your Heir.'}}
+    if(k==='clashOrder')return {title:STEPN(6,'The Clashes'),pulse:1,noRec:1,text:'You are last in turn order, so you choose which region fights first. Any order works: take the suggested one.'};
+    if(q.t==='menu'&&menuPhase(q)==='Day')return {title:STEPN(6,'The Clash in '+(G.clash?REG[G.clash.r]:'a region')),pulse:1,noRec:1,text:'The cards are face up: the box shows each side\'s Strength. Later you can use Day powers here; for now tap Done and the Clash is fought.'};
+    if(k==='location')return {title:'You won: claim a location',pulse:1,noRec:1,text:'Pick one of the region\'s two locations.'+(rm?' '+whyFor(s,rm):'')};
     if(k==='tie')return {title:'A tie!',pulse:1,text:'Both sides have the same total. Each of you may add one more hidden card, or pass. If nobody adds one, nobody wins here.'};
-    if(q.t==='menu'&&menuPhase(q)==='Autumn')return {title:'Autumn',pulse:1,noRec:1,text:'In Autumn you may Govern and Journey. We try that next round; finish Autumn for now.'};
-    if(q.t==='sel'||q.t==='pick')return {title:'A location bonus',pulse:1,text:'The location you claimed gives a bonus. '+(rm?'The suggestion is fine: '+recBtnText(rm)+'.':'Choose one.')}}
-  if(R===2&&q.t==='menu'&&menuPhase(q)==='Autumn'&&!UI.coachDone.au2){if(rm&&rm.a==='journey')return {title:'Autumn: Journey and Govern',pulse:1,text:'Journey sends a hand card away for Lore, which buys your faction\'s Site of Power cards. Govern puts a card with votes into a Council for a lasting bonus. Try a Journey now.'};UI.coachDone.au2=1}
-  if(R===2&&k==='siteBuy'&&!UI.coachDone.sb){return {title:'Spend Lore?',pulse:1,text:'Lore buys your Site of Power cards: strong extra cards for your deck. Keep it if nothing is affordable yet.'}}
+    if(BONUSK.includes(k))return {title:'Location bonus: '+(QNAME[k]||'a bonus'),pulse:1,noRec:1,text:({castle:'The Spire Court lets you put a card into a Council. Councils come in round 3: skip it for now.',wilderness:'Thornwild lets you send a card on a Journey for Lore. Lore comes in round 2: skip it for now.',harvest:'The Gleaning Meadow gives you the Kingdom\'s Favour: a power for later, and it wins ties. Claim it.',shrine:'Moss Altar lets you put cards at the bottom of your deck. Choose none for now.',ossuary:'You drew cards back from your Discard Pile. You may also discard some: choose none for now.'})[k]}}
+  if(q.t==='menu'){const L=visibleActs(mv).filter(m=>m.t==='act');for(const K of ['cmd','lore','tactic','favour','govern','council','kc']){if(UI.coachDone['new_'+K])continue;if(L.some(m=>actKind(m.a)===K)){UI._coachShown='new_'+K;return {title:'New: '+NEWK[K][0],text:NEWK[K][1]}}}}
+  if(k==='siteBuy'&&!UI.coachDone.new_site){UI._coachShown='new_site';return {title:'New: spend Lore',text:'Lore buys your Site of Power cards. A card with a Strength goes to your hand; an HQ card is a permanent power that stays in front of you. Keep the Lore if nothing fits yet.'}}
   return null}
 function coachEvent(ev){if(!isGuided())return '';UI.coachDone=UI.coachDone||{};const k='ev_'+ev.t;
-  if(ev.t==='bids'&&G.round===1){const me=humans()[0];const b=ev.bids.find(x=>x.seat===me);const tac=G.log.filter(e=>e.r===1&&e.s!==me&&/ plays /.test(e.t)).map(e=>e.t)[0];
-    if(b&&tac&&b.str<cinfo(b.id).strength)return 'The Court played a Tactic (a once-only power): '+tac.replace(/^.*? plays /,'').replace(/\.$/,'')+'. So your bid counts as '+b.str+' and the Court chooses first. Tactics come back later; for now just watch.';
-    return 'Both bids are revealed. The higher bid chooses first; a tie goes to whoever is higher on the Order Track.'}
-  if(ev.t==='clash'&&G.round===1&&!UI.coachDone[k+ev.r]){return ev.idx===0?'The hidden cards are flipped. Each side adds the Strength of its cards, +1 per Supporter. The higher total wins the region.':''}
-  if(ev.t==='summary'&&ev.round===1){const me=humans()[0];const a=ev.inf1[me],b=Math.max(...ev.inf1.filter((_,i)=>i!==me));return 'Scoring: you have '+a+' Influence, the Court has '+b+'. '+(a>b?'You lead!':'Keep going.')+' The leader acts first next round. '+(G.rounds-1)+' rounds to go.'}
+  if(ev.t==='bids'&&G.round===1)return 'Both bids are revealed. The higher bid chooses first; a tie goes to whoever is higher on the Order Track.';
+  if(ev.t==='clash'&&G.round===1&&!UI.coachDone[k+ev.r]){return ev.idx===0?'The hidden cards are flipped. Each side adds the Strength of its cards and +1 per Supporter (the list under the cards). The higher total wins the region.':''}
+  if(ev.t==='summary'&&ev.round===1){const me=humans()[0];const a=ev.inf1[me],b=Math.max(...ev.inf1.filter((_,i)=>i!==me));return 'Scoring: you have '+a+' Influence, the Court has '+b+'. '+(a>b?'You lead!':a===b?'Level.':'Keep going.')+' The leader acts first next round. '+(G.rounds-1)+' rounds to go.'}
   return ''}
-// guided: mark the Autumn coach as done once the player acts in round 2 Autumn
-(function(){const o=humanMove;humanMove=function(k){if(G)UI.nowMark=G.logN;const was=G&&G.q&&G.q.t==='menu'&&menuPhase(G.q)==='Autumn'&&G.round===2;if(G&&G.q&&G.q.kind==='siteBuy'&&UI.coachDone)UI.coachDone.sb=1;const r=o(k);if(was&&r&&UI.coachDone)UI.coachDone.au2=1;return r}})();
+// guided: a "New: ..." line counts as read once you act on that screen
+(function(){const o=humanMove;humanMove=function(k){if(G)UI.nowMark=G.logN;const sh=UI._coachShown;const r=o(k);if(r&&sh&&UI.coachDone)UI.coachDone[sh]=1;return r}})();
 // end screen: where the Influence came from (from the engine's own counters; a client without them shows nothing)
-function overBreakdown(){if(!G.stats||NET.on)return '';const rows=G.pl.map(p=>{const parts=[];for(const k in G.stats){const m=k.match(/^src:([a-z]+):(.*)$/);if(m&&m[1]===p.fac)parts.push([m[2],G.stats[k]])}
-  parts.sort((a,b)=>b[1]-a[1]);return '<li style="--fc:'+fcol(p.seat)+'"><b>'+esc(shortName(p.seat))+'</b><span>'+(parts.length?parts.slice(0,5).map(x=>esc(x[0])+' '+x[1]).join(', '):'none')+'</span></li>'}).join('');
-  return '<h4 class="bdh">Where the Influence came from</h4><ul class="rank bd2">'+rows+'</ul><p class="sub small">Steals by Heralds are not listed; they move Influence between players.</p>'}
+function overBreakdown(){if(!G.infl)return '';const rows=youFirst(G.pl.map(p=>p.seat)).map(s=>{const L=G.infl[s]||{};const parts=Object.keys(L).map(k=>[k,L[k]]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]);
+  return '<li style="--fc:'+fcol(s)+'"><b>'+esc(s===vs()?'You':sideName(s))+'</b><span>'+(parts.length?parts.map(x=>gloss(x[0])+' '+(x[1]>0?'+':'−')+Math.abs(x[1])).join(', '):'nothing')+'</span><em>= '+G.pl[s].inf+'</em></li>'}).join('');
+  return '<h4 class="bdh">Where the Influence came from</h4><ul class="rank bd2">'+rows+'</ul>'}
 // ---------------------------------------------------------------- title + setup
 const STORY={
  nobility:{story:'The old court still dresses for dinner in a palace with no king. Its stewards count every coin and every vote, and they mean to crown one of their own before the frost.',enjoy:'Choose the Gilded Court if you enjoy steady income, sturdy cards and winning the Councils.',tag:'Defence and votes · easy to learn'},
@@ -196,7 +205,7 @@ function hideStart(){$('#start').hidden=true;document.body.classList.remove('in-
 function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=el.scrollTop;
   const view=NET.on?'online':(UI.sv||'title');el.dataset.v=view;
   if(view==='title'){const sav=hasSave();
-    el.innerHTML='<div class="ttl"><div class="ttl-art">'+titleArt()+'</div><div class="ttl-in"><h1 class="logo"><small>THE</small>Thornbound Throne</h1><p class="tag">The king is dead. Four factions reach for his crown.</p><div class="tmid"></div><div class="tbtns">'+
+    el.innerHTML='<div class="ttl"><div class="ttl-art">'+titleArt()+'</div><div class="ttl-in"><h1 class="logo"><small>THE</small>Thornbound Throne</h1><p class="tag">The king is dead. Four factions reach for his crown.</p><p class="tag goal">Win by holding the most Influence when the last round ends.</p><div class="tmid"></div><div class="tbtns">'+
       '<button class="tbtn go" data-a="play"><b>Play</b><span>'+(firstTime()?'new here? a guided first game is ready':'against the computer')+'</span></button>'+
       '<button class="tbtn" data-a="online"><b>Online</b><span>with friends, free, no sign-up</span></button>'+
       (sav?'<button class="tbtn" data-a="cont"><b>Resume</b><span>your game, round '+Math.max(1,sav.G.round)+' of '+sav.G.rounds+'</span></button>':'')+
@@ -210,13 +219,13 @@ function seatRows(ONL,plan){const n=ONL?plan.np:sv.np;const rest=FIDS.filter(f=>
   for(let i=0;i<n;i++){const f=i===0?sv.faction:rest[i-1];const k=TBKit.FACTIONS[FK[f]];const human=ONL?i<plan.hum.length:i===0;
     h+='<div class="seat" style="--fc:'+k.main+'">'+TBKit.token('influence',{faction:FK[f]},30).outerHTML+'<span class="sn"><b>'+esc(k.short)+'</b><small>'+(human?(ONL?'Online: '+esc(plan.hum[i].nm)+(i===0?' (you)':''):'You'):'Computer')+'</small></span>'+(human?'':levelSeg(i))+'</div>'}
   return '<div class="seats">'+h+'</div>'}
-function levelSeg(i){return '<div class="seg" role="radiogroup" aria-label="Computer level">'+['easy','normal','hard'].map(l=>'<button class="'+(sv.levels[i]===l?'on':'')+'" data-a="lv" data-i="'+i+'" data-v="'+l+'" aria-pressed="'+(sv.levels[i]===l)+'">'+l[0].toUpperCase()+l.slice(1)+'</button>').join('')+'</div>'}
+function levelSeg(i){return '<div class="seg" role="radiogroup" aria-label="Computer level">'+['easy','normal','hard'].map(l=>'<button class="'+(sv.levels[i]===l?'on':'')+'" data-a="lv" data-i="'+i+'" data-v="'+l+'" aria-pressed="'+(sv.levels[i]===l)+'">'+(l==='easy'?'Easy (for learning)':l[0].toUpperCase()+l.slice(1))+'</button>').join('')+'</div>'}
 function optionsHTML(ONL,plan){return '<div class="opts2">'+(ONL?'':'<div class="row"><span>Players</span><div class="seg">'+[2,3,4].map(n=>'<button class="'+(sv.np===n?'on':'')+'" data-a="np" data-v="'+n+'">'+n+'</button>').join('')+'</div></div>')+
   '<div class="row"><span>Length</span><div class="seg">'+[['short','4 rounds'],['standard','5 rounds'],['extended','6 rounds']].map(([v,l])=>'<button class="'+(sv.length===v?'on':'')+'" data-a="len" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+
   '<div class="row"><span>Tips</span><div class="seg">'+[['full','Full'],['light','Light'],['off','Off']].map(([v,l])=>'<button class="'+(sv.guide===v?'on':'')+'" data-a="gd" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+seatRows(ONL,plan)+'</div>'}
-function sumLine(){const n=sv.np-1;return 'You lead <b>'+esc(DD.FSHORT[sv.faction])+'</b> against '+n+' computer'+(n>1?'s':'')+' · '+({short:4,standard:5,extended:6}[sv.length])+' rounds'}
+function sumLine(){const n=sv.np-1,R=({short:4,standard:5,extended:6}[sv.length]);return 'You lead <b>'+esc(DD.FSHORT[sv.faction])+'</b> against '+n+' computer'+(n>1?'s':'')+' · most Influence after round '+R+' wins'}
 function setupHTML(){const ph=UI.phone;const k=TBKit.FACTIONS[FK[sv.faction]];
-  const guide='<div class="guidebox"><p><b>First time?</b> The guided game teaches one step at a time: you lead the Heathbound Clans against an easy Gilded Court for 4 rounds (about 15 minutes).</p></div>';
+  const guide='<div class="guidebox"><p><b>First time?</b> The guided game teaches one step at a time: you lead the Heathbound Clans against the Gilded Court (Easy, for learning) for 4 rounds, about 15 minutes. Normal games start at Normal.</p></div>';
   const ft=firstTime();const gbtn='<button class="sbtn'+(ft?' big':'')+'" data-a="guided" data-start="guided"><b>'+(ft?'Guided first game':'Guided game')+'</b><span>'+(ft?'recommended: learn one step at a time':'learn step by step')+'</span></button>';
   const go='<div class="sgo">'+(ft?gbtn:'')+'<button class="sbtn'+(ft?'':' big')+'" data-a="start" data-start="go"><b>Start the game</b><span>'+sumLine().replace(/<[^>]+>/g,'')+'</span></button><div class="sgrid3">'+(ft?'<button class="sbtn" data-a="rules"><b>How to play</b><span>the rules in short</span></button>':gbtn)+
     '<button class="sbtn" data-a="mode" data-v="hot" data-go="1" data-start="hot"><b>Hot-seat</b><span>'+sv.np+' people, one device</span></button>'+
