@@ -31,7 +31,7 @@ function phFx(f){if(!PHN.on||!G)return;const x=f.x;
   else if(f.t==='round'&&G.round>1&&G.rsum&&G.pl.some(p=>p.human)){PHN.sum={last:PHN.lastTake,round:G.round-1,final:false,walls:PHN.walls.slice(),rs:G.rsum.map(r=>Object.assign({},r)),sc:G.pl.map(p=>p.score),first:G.first};PHN.walls=[]}
   else if(f.t==='round')PHN.walls=[];
   else if(f.t==='win'&&PHN.walls.length&&G.pl.some(p=>p.human)){PHN.sum={round:G.round,final:true,walls:PHN.walls.slice(),rs:(G.rsum||[]).map(r=>Object.assign({},r)),sc:G.pl.map(p=>p.score-p.st.rows-p.st.cols-p.st.colours),first:-1};PHN.walls=[]}}
-const phHold=()=>PHN.on&&!NET.on&&!!PHN.sum;
+const phHold=()=>(PHN.on&&!NET.on&&!!PHN.sum)||(typeof bfHold==='function'&&bfHold());
 // ---------- small SVG pieces ----------
 // racks + mosaic + breakage in one picture (viewBox 1076 x 624); used by the strip and the board pop-up
 function phBoardSVG(p,o){o=o||{};const U=100,X0=44,XW=X0+5*U+36;let s='';
