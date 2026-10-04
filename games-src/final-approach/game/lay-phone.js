@@ -95,6 +95,9 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     // ---- hot-seat pass card
     await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.tap('[data-a=play]'); await p.waitForTimeout(150);
     await p.tap('[data-start=hot]'); await p.waitForTimeout(900); { const cl = await p.$('#rs.story [data-a=rsclose]'); if (cl) { await cl.tap(); await p.waitForTimeout(300); } }
+    // the briefing needs nobody's dice: both crew get ready on the shared screen (no pass card), then the device is handed to the first player
+    { const pre = await p.evaluate(() => !document.querySelector('#pass').hidden); if (pre) fail('pass card shown during the briefing (no hidden dice yet)'); }
+    for (let k = 0; k < 2; k++) { const rd = await p.$('#acts [data-a=ready]'); if (rd) { await rd.tap(); await p.waitForTimeout(500); } }
     { const pass = await p.evaluate(() => ({ card: !document.querySelector('#pass').hidden, dice: [...document.querySelectorAll('#pz .die .dv')].filter(e => /^[1-6]$/.test(e.textContent)).length })); if (!pass.card) fail('no pass-the-device card in hot-seat'); if (pass.dice) fail('dice values visible before the pass card is taken'); await shot('7pass'); await targets('pass'); await clipped('pass'); await fit('pass'); }
     log('errors', JSON.stringify(errs.slice(0, 3))); bad += errs.length; if (errs.length) console.log('FAIL', t, 'console errors', errs.length);
     await ctx.close();

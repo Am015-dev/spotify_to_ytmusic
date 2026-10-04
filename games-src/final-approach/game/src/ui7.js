@@ -80,7 +80,8 @@ function pxDie(key, dv, rect, ctx) {
   if (o.fresh) {
     o.x = cx; o.y = cy;
     if (ctx.slot) {
-      const vi = PX.vanished.findIndex(v => v.col === o.col && v.val === o.val); const from = vi >= 0 ? PX.vanished.splice(vi, 1)[0] : null;
+      // the die that left a tray flies to the slot; the partner's hidden die ('?') flies too, so their placements are seen, not just appear
+      let vi = PX.vanished.findIndex(v => v.col === o.col && v.val === o.val); if (vi < 0) vi = PX.vanished.findIndex(v => v.col === o.col && v.val === '?'); const from = vi >= 0 ? PX.vanished.splice(vi, 1)[0] : null;
       if (from && ANIM && !pxRM()) { o.x = from.x; o.y = from.y; o.size0 = from.size; pxTween(o, { x: [from.x, cx], y: [from.y, cy], rot: [0, (from.x < cx ? 1 : -1) * .35 * 0], s: [1.25, 1] }, 360, 0, () => { o.sq = 1; pxLanded(o); }, true); }
       else if (ANIM) { o.sq = 0; }
     } else if (ANIM && !pxRM() && ctx.roll) {
@@ -118,13 +119,15 @@ function pxSync() {
       const o = pxObj('pl:' + si + ':' + k, 'tok', () => { const s = new PIXI.Sprite(tx('tokens:plane')); s.anchor.set(.5); PX.L.plane.addChild(s); return { c: s, s0: s, x: cx, y: cy, size: sz, a: 1, s: 1, rot: 0 }; }); o.tx = cx; o.ty = cy; o.size = sz; if (o.fresh) { o.x = cx; o.y = cy; }
     });
   });
+  // traffic-die icons on the approach strip (the DOM keeps the "×n" count)
+  pz.querySelectorAll('.sp .tfd').forEach((e, i) => { const r = pxRect(e), sz = Math.max(14, Math.min(22, r.h + 2)); const o = pxObj('tf:' + i, 'tok', () => { const sp = new PIXI.Sprite(tx('dice:k5')); sp.anchor.set(.5); PX.L.plane.addChild(sp); return { c: sp, s0: sp, x: 0, y: 0, a: 1, s: 1, rot: 0 }; }); o.tx = r.x + r.w / 2; o.ty = r.y + r.h / 2; o.size = sz; if (o.fresh) { o.x = o.tx; o.y = o.ty; } });
   if (youEl) { const r = pxRect(youEl), sz = Math.min(r.w * .9, 58), cx = r.x + r.w / 2, cy = r.y + r.h * .5; const o = pxObj('you', 'tok', () => { const s = new PIXI.Sprite(tx('tokens:you')); s.anchor.set(.5); PX.L.plane.addChild(s); return { c: s, s0: s, x: cx, y: cy, size: sz, a: 1, s: 1, rot: 0 }; }); o.tx = cx; o.ty = cy; o.size = sz; if (o.fresh) { o.x = cx; o.y = cy; } o.bob = 1; }
   // wells under every slot, gold ring on the legal ones, switches
   const slotDice = [];
   pz.querySelectorAll('.slot').forEach(b => {
     const k = b.dataset.slot, r = pxRect(b), cls = b.classList.contains('p') ? 'wellB' : b.classList.contains('c') ? 'wellO' : 'wellN';
     const o = pxObj('well:' + k, 'well', () => { const c = new PIXI.Container(), w = pxSprite(c, 'tokens:' + cls), g = new PIXI.Sprite(tx('glow')); g.anchor.set(.5); c.addChild(g); PX.L.well.addChild(c); return { c, w, g, x: 0, y: 0, s: 1, a: 1 }; });
-    o.tx = o.x = r.x + r.w / 2; o.ty = o.y = r.y + r.h / 2; o.size = r.w; o.w.width = o.w.height = r.w; o.legal = b.classList.contains('legal'); o.g.width = o.g.height = r.w * 1.7;
+    o.tx = o.x = r.x + r.w / 2; o.ty = o.y = r.y + r.h / 2; o.size = r.w; o.w.width = o.w.height = r.w; o.legal = b.classList.contains('legal') && !b.classList.contains('dim'); o.g.width = o.g.height = r.w * 1.45;
     o.c.x = o.x; o.c.y = o.y;
     const sw = b.querySelector('.sw');
     if (sw) { const rr = pxRect(sw), on = sw.classList.contains('on'); const so = pxObj('sw:' + k, 'sw', () => { const s = new PIXI.Sprite(tx('tokens:swoff')); s.anchor.set(.5); PX.L.mark.addChild(s); return { c: s, s0: s, x: 0, y: 0, a: 1, s: 1, rot: 0, on }; }); so.tx = so.x = rr.x + rr.w / 2; so.ty = so.y = rr.y + rr.h / 2; so.size = Math.max(22, rr.w); so.s0.texture = tx(on ? 'tokens:swon' : 'tokens:swoff'); if (!so.fresh && so.on !== on && ANIM) pxTween(so, { s: [1.5, 1] }, 260, 0, null, false); so.on = on; }
@@ -152,7 +155,7 @@ function pxSync() {
     else { const o = pxObj('wind', 'tok', () => { const s = new PIXI.Sprite(tx('tokens:wind')); s.anchor.set(.5); PX.L.mark.addChild(s); return { c: s, s0: s, x: 0, y: 0, a: 1, s: 1, rot: 0 }; }); o.tx = o.x = r.x + r.w / 2; o.ty = o.y = r.y + r.h / 2; o.size = r.w * 1.05; }
   });
   { const g = pz.querySelector('.gau'); if (g) { const r = pxRect(g), o = pxObj('gauge', 'gauge', () => { const c = new PIXI.Container(), f = pxSprite(c, 'gauge', 0), n = new PIXI.Graphics(); c.addChild(n); PX.L.mark.addChild(c); return { c, f, n }; }); o.c.x = r.x; o.c.y = r.y; o.f.width = r.w; o.f.height = r.h; o.f.x = 0; o.f.y = 0; o.r = r;
-    const m = /markers (\d+) \| (\d+)/.exec(g.textContent); o.b = m ? +m[1] : 4; o.o = m ? +m[2] : 8; o.dirty = 1; } }
+    o.b = +g.dataset.b || 4; o.o = +g.dataset.o || 8; o.dirty = 1; } }
   { const b = pz.querySelector('.bar'); if (b) { const r = pxRect(b), i = b.querySelector('i'), f = i ? parseFloat(i.style.width) / 100 : 0; const o = pxObj('fuel', 'bar', () => { const c = new PIXI.Container(), g = new PIXI.Graphics(), fr = new PIXI.NineSliceSprite({ texture: tx('pillbar'), leftWidth: 20, rightWidth: 20, topHeight: 12, bottomHeight: 12 }); c.addChild(g, fr); PX.L.mark.addChild(c); return { c, g, fr }; }); o.c.x = r.x; o.c.y = r.y; o.fr.width = r.w; o.fr.height = r.h; o.g.clear(); o.g.roundRect(5, 4, Math.max(2, (r.w - 10) * f), r.h - 8, (r.h - 8) / 2).fill(f < .3 ? 0xe8553a : 0x2fc4b2); } }
   pz.querySelectorAll('.chipr .tk').forEach((e, i) => { const r = pxRect(e), off = e.classList.contains('off'); const o = pxObj('cf' + i, 'tok', () => { const s = new PIXI.Sprite(tx('tokens:coffee')); s.anchor.set(.5); PX.L.mark.addChild(s); return { c: s, s0: s, x: 0, y: 0, a: 1, s: 1, rot: 0 }; }); o.tx = o.x = r.x + r.w / 2; o.ty = o.y = r.y + r.h / 2; o.size = Math.max(26, r.w * 1.5); o.a = off ? .28 : 1; });
   { const e = pz.querySelector('.badge .tk.rr'); if (e) { const r = pxRect(e); const o = pxObj('rr', 'tok', () => { const s = new PIXI.Sprite(tx('tokens:reroll')); s.anchor.set(.5); PX.L.mark.addChild(s); return { c: s, s0: s, x: 0, y: 0, a: 1, s: 1, rot: 0 }; }); o.tx = o.x = r.x + r.w / 2; o.ty = o.y = r.y + r.h / 2; o.size = Math.max(28, r.w * 1.4); } }

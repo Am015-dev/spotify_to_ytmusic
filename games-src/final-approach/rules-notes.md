@@ -48,7 +48,7 @@ research repository (`final-approach-research/`), never here. Names, text and ar
 - **Brakes (optional, Pilot).** Three spaces needing exactly 2, then 4, then 6, in order. The brake value becomes 2, 4, then 6. Brakes only matter in the last round.
 - **Concentration (optional, either).** Any die, any value. Take a coffee token (never more than 3 held; if you already hold 3 the die is just spent).
 - **Coffee.** When placing any die you may spend any number of coffee tokens, each one adding or subtracting 1 (the result stays within 1 to 6, no wrapping). Either player may spend any token. Unspent tokens stay for later rounds. Trainee tokens cannot be changed.
-- **Reroll.** At any moment you may spend a reroll token: both players may reroll any of their unplaced dice (including none), once, behind their screens.
+- **Reroll.** At any time during the placement phase, either player (also off their turn, and also a player who has already placed all four dice) may spend a reroll token while at least one die is unplaced: both players may reroll any of their unplaced dice (including none), once, behind their screens. A player with no unplaced die is not asked. Not during the briefing (nothing is rolled yet) and not while another question (hand-over, trainee token, cross-check die) is open.
 
 ## 4. Winning and losing
 
@@ -65,17 +65,18 @@ the last row reached while not at the airport, a last-round speed above the brak
 - **Tail wind.** A 20-position dial starting at position 10. After the axis resolves every round, advance the dial by the current axis tilt (negative tilts go backwards, it wraps).
   The dial position gives a modifier added to the engine sum in every round, last round included: positions 9-11: +3; 7, 8, 12, 13: +2; 6, 14: +1; 5, 15: 0; 4, 16: -1; 2, 3, 17, 18: -2; 0, 1, 19: -3. It starts at +3.
 - **Trainee.** Six tokens valued 1 to 6 in a random row. Each player has a trainee space of their colour. Put a die of any value other than the next token's value there, take the next token from your end of the row, and place it immediately as a die of that value on any legal space
-  except Concentration and the trainee spaces (coffee cannot change it). All six must be used by the end of the game or you lose.
+  except Concentration and the trainee spaces (coffee cannot change it). All six must be used by the end of the game or you lose. If the token has no legal space at all (every space it could take is full) it goes back to the end of the row it came from and does not count as trained; the die on the trainee space is spent.
 - **Icy runway.** Replaces the brakes: four columns valued 2, 3, 4, 5. Each column has a Pilot-only upper space and a lower space for either player, both needing exactly the column value. Only the next column may be used.
   When both are filled in the same round the brake value becomes that number and the next column opens (several columns may be finished in one round). A lone die in a column is wasted at round end. All four columns must be done by the end, and the last-round speed must not exceed the brake value.
 - **Against the clock.** 60-second timer per round that starts after the roll; unplaced dice are ignored when it ends. In the app the timer counts only while someone is deciding.
 
 ## 6. Ability cards (a scenario names how many you may take, 0 to 2)
 
-Second look (first player rerolls one die before their first placement each round), Flip side (once per game each player turns one unplaced die to 7 minus its value),
+Second look (first player rerolls one die before their first placement each round), Flip side (once per game each player turns one unplaced die to 7 minus its value, at any time, also off their turn),
 Twin thrust (equal engine dice: gain a reroll token if one is left in the box), Steady hands (equal axis dice: gain a coffee token if one is left),
 Cross-check (once a round, once a gear die and a flap die are down, roll the traffic die; the co-pilot places it as an extra action on any empty space of either colour),
-Hand-over (once a round either player puts an unplaced die there and the other must too; swap the two values, take the dice back).
+Hand-over (once a round, at any time, either player puts an unplaced die there and the other must too; swap the two values, take the dice back).
+`newGame` keeps only known card ids, drops duplicates and keeps at most the scenario's count (0, 1 or 2), so a forged online setup cannot add cards.
 
 ## 7. Scenarios in this version
 
@@ -90,19 +91,20 @@ coffee rules, reroll rules, the end-of-round order, the last-round and landing c
 corridor-tab rule, fuel rules (20, minus 6 when unused, leak formula), wind dial rules, trainee rules, icy-runway rules, real-time rule, the six ability texts, the list and difficulty of all 21 scenarios and which modules each uses,
 the tokens in the box (12 planes, 3 coffee, reroll tokens).
 
-**Taken from a second source (a published digital implementation of the same game) and cross-checked against two printed strips:** every number on the approach strips (planes per space, traffic-die icons, corridor-tab positions),
+**Taken from a second source (a published digital implementation of the same game), compared with a second fan dataset (0 differences over 21 strips) but NOT yet with the printed box strips (the two printed strips we compared earlier were promo airports, not box strips):** every number on the approach strips (planes per space, traffic-die icons, corridor-tab positions),
 the red/black altitude side (reroll on 6000 only, first-player order), the landing-gear and flap value pairs, the wind dial's modifier table and starting position, the exact flow of the advance procedure (tab check, then collision, then step),
-that kerosene below 0 (not 0) is the loss, that the third reroll token sits in the box (3 in total) and the plane supply is 12 minus those placed at setup. Two printed strips were compared with its data and matched space for space.
+that kerosene below 0 (not 0) is the loss, that the third reroll token sits in the box (3 in total) and the plane supply is 12 minus those placed at setup. (The earlier claim that two printed strips matched referred to promo airports, not box strips; see item 8 below.)
 
 **Guessed / our rulings (flagged in the UI where relevant):**
-1. Trainee token placement is immediate (same turn) rather than "later in the round".
+1. Trainee token placement is immediate (same turn) rather than "later in the round" (matches the rules app and the digital implementation). A token with nowhere to go returns to its end of the row (fan ruling; very rare).
 2. A die with no legal place may be thrown away as the turn (very rare).
-3. Reroll can be spent on your own turn before you place (the rules allow "at any time"; we do not interrupt the other player's turn).
+3. Reroll, Flip side and Hand-over can be used at any time by either player while no other question is open (fixed in the audit round; earlier builds only allowed them on your own turn). The app waits for the move in progress to finish: a free action never interrupts a die that is half placed.
 4. Cross-check (traffic die ability) fires once per round, when the second of (a gear die, a flap die) is down; coffee may modify the extra die.
 5. Hand-over uses one die from each player and swaps values; both players learn the two values afterwards, which is natural.
 6. The strategy-talk presets are an app invention for online play; the computer crew mate also says what it is worried about (never dice).
 7. Against the clock: the app timer pauses on pass-the-device screens and while the computer plays.
-8. Space-by-space strip data is complete for the box but was transcribed by someone else; a typo in one space would change one scenario's difficulty. The test `rules-test.js` checks plane totals and shapes.
+8. Space-by-space strip data is complete for the box but was transcribed by someone else; a typo in one space would change one scenario's difficulty. The test `rules-test.js` checks plane totals and shapes. A person with the box should spot-check at least the Grand Crossing green strip (4 traffic icons on space 1), the Castlemoor yellow strip (12 planes) and the corridor tabs on the black Twin Spires and red Bowlrock strips.
+9. Last-round speed against the brakes: the booklet says the speed must be "less than" the brake marker, but the marker stands between two numbers (after the 4 it sits between 4 and 5), so it is the same as "no more than the last brake value reached". All texts in the app say "no more than"; the digital implementation agrees.
 
 ## 9. Later phase: the 2025 expansion (not built)
 

@@ -20,9 +20,11 @@ function titleEl() {
 }
 function roleCard(s) {
   const o = optObj(), c = D.crew[s], on = o.role === s;
-  return h('button.rcardx' + (on ? '.on' : ''), { type: 'button', 'data-a': 'role', 'data-r': s, style: '--dc:' + SEATC[s], 'aria-pressed': on ? 'true' : 'false' }, h('div.top', ART['crew-' + s] ? h('img', { src: ART['crew-' + s], alt: '' }) : null, h('h3', c.role + ': ' + c.name.split(' ').slice(-1)[0] + (on ? ' ✓' : ''))), h('p', c.story), h('p.enjoy', c.enjoy));
+  return h('button.rcardx' + (on ? '.on' : ''), { type: 'button', 'data-a': 'role', 'data-r': s, style: '--dc:' + SEATC[s], 'aria-pressed': on ? 'true' : 'false' }, h('div.top', ART['crew-' + s] ? h('img', { src: ART['crew-' + s], alt: '' }) : null, h('h3', c.role + ': ' + c.short + (on ? ' ✓' : ''))), h('p', c.story), h('p.enjoy', c.enjoy));
 }
-function scLine(sc) { const ex = sc.mods.map(m => D.mods[m].name).concat(sc.ab ? [sc.ab + ' ability card' + (sc.ab > 1 ? 's' : '')] : []); return D.airports[sc.ap].name + (ex.length ? ' · ' + ex.join(', ') : ' · no extras'); }
+// the same extras the story card and the rules list: scenario modules, plus Busy Sky / Tight Corridor when the airport's strip has traffic icons / corridor tabs
+function scExtras(sc) { const t = D.tracks[sc.trk]; return sc.mods.map(m => D.mods[m].name).concat(t.sp.some(x => x[1]) ? [D.mods.traffic.name] : []).concat(t.sp.some(x => x[2]) ? [D.mods.turns.name] : []); }
+function scLine(sc) { const ex = scExtras(sc).concat(sc.ab ? [sc.ab + ' ability card' + (sc.ab > 1 ? 's' : '')] : []); return D.airports[sc.ap].name + (ex.length ? ' · ' + ex.join(', ') : ' · no extras'); }
 function setupEl() {
   const o = optObj(), ph = isPh(), open = !!UI.cfgOpen, sc = FA.scen(o.scenario);
   const head = h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Choose your flight'));
@@ -57,6 +59,10 @@ document.addEventListener('click', ev => {
     case 'die': dieTap(+d.s, d.d === 'p' ? 'p' : +d.d); break;
     case 'slot': slotTap(d.slot); break;
     case 'ready': case 'say': case 'rr': case 'rrpick': case 'antic': case 'adapt': case 'wt': case 'toss': case 'cof': case 'hint': doAction(a, t); break;
+    case 'tipmore': tipMore(); break;
+    case 'ckopen': UI.ckOpen = !UI.ckOpen; render(); break;
+    case 'recapx': hideRecap(); break;
+    case 'altinfo': { const R = altRows()[G.round + G.row0]; toast('Altitude ' + R[0] + ' ft, round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0) + '. Blue rows: ' + name(0) + ' (Pilot) places first; orange rows: ' + name(1) + ' (Co-pilot). A purple dot brings a reroll token.'); break; }
     case 'space': { const i = +d.i, s = trackOf().sp[i]; toast('Space ' + (i + 1) + (i === trackOf().sp.length - 1 ? ' (airport)' : '') + ': ' + G.planes[i] + ' plane' + (G.planes[i] === 1 ? '' : 's') + (s[1] ? ', ' + s[1] + ' traffic die roll' + (s[1] > 1 ? 's' : '') + ' when a round starts here' : '') + (s[2] && G.mods.tabs ? ', corridor: axis must be ' + tabText(s[2]) + ' to leave' : '')); break; }
     case 'take': takeDevice(+d.s); break;
     case 'tipok': tipOk(); break;
@@ -87,7 +93,7 @@ document.addEventListener('click', ev => {
     case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
   }
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.rsOpen && G && G.result) closeRS(); else if (UI.sel !== -1 && UI.sel != null) { UI.sel = -1; UI.cof = 0; render(); } } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { hideRecap(); if (UI.rsOpen && G && G.result) closeRS(); else if (UI.sel !== -1 && UI.sel != null) { UI.sel = -1; UI.cof = 0; render(); } } });
 // ---------- phone mode ----------
 function applyPhone() {
   const q = /[?&]phone=(\d)/.exec(location.search), w = innerWidth, hh = innerHeight, short = Math.min(w, hh);

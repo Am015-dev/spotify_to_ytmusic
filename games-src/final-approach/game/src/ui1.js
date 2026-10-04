@@ -35,7 +35,8 @@ const SAYT = { adv0: 'Hold position this round', adv1: 'Move one space', adv2: '
 const SLOTG = { axis: 'Axis', engines: 'Engines', radio: 'Radio', gear: 'Landing gear', flaps: 'Flaps', brakes: 'Brakes', conc: 'Concentration', kero: 'Fuel', intern: 'Trainee', ice: 'Icy-runway brakes' };
 function slotName(k) { const S = FA.SLOT[k]; return SLOTG[S.grp] + (S.grp === 'gear' || S.grp === 'flaps' || S.grp === 'brakes' ? ' ' + (S.ix + 1) : S.grp === 'ice' ? ' column ' + (S.ix + 1) + (S.row ? ' (lower)' : ' (upper)') : ''); }
 function slotNeed(k) { const S = FA.SLOT[k]; if (S.vals) return S.vals.length === 1 ? 'needs a ' + S.vals[0] : 'needs ' + S.vals.join(' or '); return 'any die'; }
-const name = s => (G && G.names && G.names[s]) || SEATN[s];
+const name = s => (D.crew[s] && D.crew[s].short) || SEATN[s];   // one short name everywhere in play (tips, log lines, dock, cards); the full name only on the story / crew cards
+const fullName = s => (G && G.names && G.names[s]) || D.crew[s].name;
 const pname = s => SEATN[s];
 // ---------- who sees what ----------
 // viewSeat: the seat whose dice are shown face up. 'all' for watching computers, -1 when nobody may look (pass screen, spectators).
@@ -46,15 +47,21 @@ function viewSeat() {
   if (UI.mode === 'watch') return 'all';
   return UI.seat;
 }
+// hot-seat: decisions that need nobody's hidden dice (the briefing, placing the public trainee token or cross-check die) are made on the shared
+// screen without a pass card; the device is only handed over when the next decision needs a player's own dice.
+function hiddenFree() { return !!G && !G.result && (G.phase === 'brief' || !!(G.pend && (G.pend.h === 'intern' || G.pend.h === 'sync'))); }
+function sharedSeat() { if (!G || UI.mode !== 'hot' || UI.holder >= 0 || !hiddenFree()) return -1; const p = FA.pending(G).filter(s => !G.ai[s]); return p.length ? p[0] : -1; }
+// actSeat: the seat this device acts for now (the viewer, or in hot-seat the seat deciding on the shared screen)
+function actSeat() { const v = viewSeat(); if (UI.mode === 'hot' && (typeof v !== 'number' || v < 0)) { const s = sharedSeat(); if (s >= 0) return s; } return v; }
 const isHuman = s => !!G && !G.ai[s];
 function mayAct(s) {      // may this device make seat s's moves right now?
   if (!G || G.result || !UI.started) return false;
   if (UI.mode === 'net') return typeof NET !== 'undefined' && NET.mySeat === s && !G.ai[s];
-  if (UI.mode === 'hot') return !G.ai[s] && UI.holder === s;
+  if (UI.mode === 'hot') return !G.ai[s] && (UI.holder === s || (UI.holder < 0 && sharedSeat() === s));
   if (UI.mode === 'watch') return false;
   return s === UI.seat && !G.ai[s];
 }
-const mySeatMoves = () => { const v = viewSeat(); return typeof v === 'number' && v >= 0 && mayAct(v) ? FA.validMoves(G, v) : []; };
+const mySeatMoves = () => { const v = actSeat(); return typeof v === 'number' && v >= 0 && mayAct(v) ? FA.validMoves(G, v) : []; };
 function prefs() { try { const p = JSON.parse(localStorage.getItem('fa_prefs') || '{}'); Object.assign(UI.prefs, p.prefs || {}); if (p.speed) AIDELAY = p.speed; UI.won = p.won || {}; } catch (e) { } }
 function savePrefs() { try { localStorage.setItem('fa_prefs', JSON.stringify({ prefs: UI.prefs, speed: AIDELAY, won: UI.won })); } catch (e) { } }
 function saveGame() { try { if (G && !G.result && UI.mode !== 'net') { localStorage.setItem('fa_save', JSON.stringify({ G, mode: UI.mode, seat: UI.seat, holder: UI.holder, cfg: UI.cfg })); return true; } } catch (e) { } return false; }
@@ -66,5 +73,5 @@ const scenOf = () => FA.scen(G.sid);
 function altRows() { return D.alt[G.alt]; }
 function dieFace(v, hidden) { return hidden ? '?' : String(v); }
 // legal slots for the selected die with the selected coffee change
-function legalSlotsFor(d, c) { return FA.validMoves(G, viewSeat()).filter(m => m.t === 'place' && m.d === d && (m.c || 0) === c).map(m => m.to); }
-function pendFor() { const v = viewSeat(); return G && G.pend && typeof v === 'number' ? G.pend : null; }
+function legalSlotsFor(d, c) { return FA.validMoves(G, actSeat()).filter(m => m.t === 'place' && m.d === d && (m.c || 0) === c).map(m => m.to); }
+function pendFor() { const v = actSeat(); return G && G.pend && typeof v === 'number' ? G.pend : null; }

@@ -14,7 +14,7 @@ function netStrip(G, seat) {
     dice: [G.dice[0].map(d => own(0, d)), G.dice[1].map(d => own(1, d))],
     slots: Object.fromEntries(Object.keys(G.slots).map(k => [k, { s: G.slots[k].s, v: G.slots[k].v, k: G.slots[k].k }])), keys: G.keys.slice(), pend,
     fl: { antic: !!G.fl.antic, sync: !!G.fl.sync, wt: !!G.fl.wt, keroUsed: !!G.fl.keroUsed }, adaptUsed: G.adaptUsed.slice(), intern: G.intern.slice(), internUsed: G.internUsed,
-    speed: G.speed, landSpeed: G.landSpeed, result: G.result ? { win: !!G.result.win, why: G.result.why, msg: G.result.msg, checks: Object.assign({}, G.result.checks) } : null,
+    speed: G.speed, landSpeed: G.landSpeed, result: G.result ? Object.assign({ win: !!G.result.win, why: G.result.why, msg: G.result.msg, checks: Object.assign({}, G.result.checks) }, Array.isArray(G.result.miss) ? { miss: G.result.miss.filter(k => /^(ax|en)[01]$/.test(k)) } : {}) : null,
     log: G.log.slice(-60).map(l => ({ i: l.i, r: l.r, t: l.t })), logN: G.logN, events: [], evN: G.evN, used: Object.assign({}, G.used), nolog: false
   };
 }
