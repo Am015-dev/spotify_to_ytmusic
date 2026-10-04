@@ -1,6 +1,6 @@
 # Short Fuse: engine report (stage 1)
 
-Stage 1 of the browser version of the co-op deduction game BGG 413246, here called **Short Fuse** (a cartoon demolition crew defusing rigged charges). It covers the rules engine, all 66 jobs, the computer crew and headless tests, plus a minimal 2D debug page. All names and texts are our own; the real card names stay in the research files' `ref` fields and appear nowhere in `src/` or `debug.html`.
+Stage 1 of the browser version of the original co-op deduction game, here called **Short Fuse** (a cartoon demolition crew defusing rigged charges). It covers the rules engine, all 66 jobs, the computer crew and headless tests, plus a minimal 2D debug page. All names and texts are our own; the real card names are not kept in this repo and appear nowhere in `src/` or `debug.html`.
 
 ## Files
 

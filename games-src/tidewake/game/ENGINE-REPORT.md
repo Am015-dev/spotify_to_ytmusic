@@ -1,6 +1,6 @@
 # Tidewake: engine report (stage 1)
 
-Rules engine, computer captains and headless tests for Tidewake (Tsuro of the Seas + Veterans of the Seas, renamed). No UI. All names are ours (currents, leviathans, junks, Rift Gate, Rogue Wave, Maelstrom, Deck Cannon); real names live only in `rules-notes.md`.
+Rules engine, computer captains and headless tests for Tidewake (the original game + its original expansion, renamed). No UI. All names are ours (currents, leviathans, junks, Rift Gate, Rogue Wave, Maelstrom, Deck Cannon); real names are not kept in this repo.
 
 ## Files
 | File | What |
@@ -18,7 +18,7 @@ Squares `(x,y)` x = column 0-5 (gold die - 1), y = row 0-5 (blue die - 1). Ports
 ## API
 | Call | Meaning |
 |---|---|
-| `newGame({players 2-8, seats?, level?/lv[], exp:{rift,wave,maelstrom,cannon}, variant:'solo'\|'easysolo'\|'teams', first?, seed?, noMon?, goalTurns?, soloLev?})` | `seats` = array of `'human'`/`'ai'`. Teams: seat%2, 4, 6 or 8 players only (others are rounded to 4/6). Solo/easysolo force 1 player. `noMon` = the official "no daikaiju" option. Phase `setup` first (ships choose start marks, in play order, before any tile) |
+| `newGame({players 2-8, seats?, level?/lv[], exp:{rift,wave,maelstrom,cannon}, variant:'solo'\|'easysolo'\|'teams', first?, seed?, noMon?, goalTurns?, soloLev?})` | `seats` = array of `'human'`/`'ai'`. Teams: seat%2, 4, 6 or 8 players only (others are rounded to 4/6). Solo/easysolo force 1 player. `noMon` = the official "no leviathans" option. Phase `setup` first (ships choose start marks, in play order, before any tile) |
 | `sideToAct()` | seat the game waits for: start-mark chooser, the question owner (`G.q.who`, may be an interrupter on someone else's turn), or the active player; -1 when over |
 | `validMoves(seat)` | `{a:'start',x,y,e}` \| `{a:'place',t,r,s}` (hand index, rotation 0-3, ship seat; 4 rotations per tile; prohibited placements only when nothing else is legal) \| `{a:'gate',t,s}` \| `{a:'cannon',t,m,s}` \| `{a:'pass'}` \| `{a:'q',i,l}` (answer to `G.q`) |
 | `legal(m,seat)` | `''` or a reason; `performMove(m,seat)` -> `{success,error}` (calls global `refresh()` if defined and `UI.sim` is 0) |
@@ -34,7 +34,7 @@ State is one JSON-safe `G` (no functions): `phase` setup/play/over, `step` act/n
 
 ## Choices and guesses (flagged)
 - 21 duplicate currents: `EXTRA_TYPES` (even spread). Leviathan arrow layouts and numbers: ours (two gold tie-breaks); setup draws N tiles (6/5/4) and every one counts, the Rogue Wave / Maelstrom drawn on the way included (literal rule); if that leaves fewer than 3 leviathans, set-up tops up to 3 at once (minimum-3 rule).
-- Collision: rules notes say ships pass through each other, but two ships forced onto one wake end in the same direction both sink (Tsuro rule; that placement is otherwise prohibited). A head-on link of two wakes sends each back along the other's wake (to the other's start edge), so both sink.
+- Collision: rules notes say ships pass through each other, but two ships forced onto one wake end in the same direction both sink (base-game rule; that placement is otherwise prohibited). A head-on link of two wakes sends each back along the other's wake (to the other's start edge), so both sink.
 - Rift Gate interrupt placement: an empty square next to the doomed ship's last tile; own-turn play: on the front square. Transport rolls 2 dice (re-rolling squares with leviathans, gates, or empty with no tile to place), asks for a tile (empty target) then the wake and direction (not onto another ship's end if avoidable, no more than 2 gate loops). A gate on a front square sweeps every ship waiting there.
 - Deck Cannon own-turn range: leviathans orthogonally adjacent to the front square or the ship's tile. Interrupt: any ship about to be lost to that leviathan (tile landing, path into its tile, blocked front, spawn). Not usable on the Maelstrom or Wave.
 - Rogue Wave strength 2 / 3 after its first move / 4 from the fourth round; rolls for the active ship after its own move, when the wave moves, and for any ship moved through the row by a tile; a ship's square = its tile (start ships: front square).

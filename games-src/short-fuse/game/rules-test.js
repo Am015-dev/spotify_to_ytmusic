@@ -38,7 +38,7 @@ T('all four in hand: legal; three in hand with one elsewhere: illegal',()=>{game
 T('last two after two were cut: legal; two in hand with two uncut elsewhere: illegal',()=>{game(4,4);toAct();rig([[B(5,0),B(5,1),B(6,0),B(6,1)],[B(5,2),B(5,3),B(6,2),B(6,3)],[B(10)],[B(11)]]);slots(1)[0].cut=1;slots(1)[1].cut=1;act(0);bad({a:'solo',v:6});must({a:'solo',v:5})});
 T('yellow solo: both yellows in play in one hand',()=>{game(4,4);toAct();rig([[YL(2),YL(6),B(1)],[B(5)],[B(10)],[B(11)]]);act(0);must({a:'solo',v:'Y'});eq(cutN(0),2)});
 T('a dual cut can never be made with a value you do not hold',()=>{game(4,4);toAct();rig([[B(2),B(3)],[B(5),B(9)],[B(10)],[B(11)]]);act(0);bad({a:'dual',st:1,ks:[0],v:5},0,'hold')});
-console.log('--- 3. Twin Probe (Double Detector) and red wires');
+console.log('--- 3. Twin Probe and red wires');
 T('one red and one non-match: no explosion, the token goes on the non-red wire, one step burns',()=>{game(4,4);toAct();rig([[B(9),B(1)],[RD(3),B(4),B(10)],[B(11)],[B(12)]]);act(0);const d0=X.G.dial;must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});ok(!X.G.over,'no boom');eq(X.G.dial,d0-1);eq(slots(1)[1].tok.map(t=>t.v),[4]);eq(slots(1)[0].tok.length,0)});
 T('both pointed wires red: explosion',()=>{game(4,4);toAct();rig([[B(9),B(1)],[RD(3),RD(5),B(10)],[B(11)],[B(12)]]);act(0);must({a:'dual',st:1,ks:[0,1],v:9,tool:'dd'});ok(X.G.over&&!X.G.over.win)});
 T('the Twin Probe never names yellow',()=>{game(4,4);toAct();rig([[YL(2),B(1)],[YL(3),B(4),B(10)],[B(11)],[B(12)]]);act(0);bad({a:'dual',st:1,ks:[0,1],v:'Y',tool:'dd'},0,'yellow')});

@@ -36,7 +36,7 @@ Screenshots: `audit-shots/` (JPEG, 12 files).
 ### P0 (blocks paying users)
 
 1. **The original game's title, designer and publisher are in the public repo.** `rules-notes.md` (first line and
-   the facts table), `sources.md`, `RESUME.md`, `research/README.md` (rulebook and BGG URLs), `research/card-notes.txt`,
+   the facts table), `sources.md`, `RESUME.md`, `research/README.md` (rulebook and catalogue URLs), `research/card-notes.txt`,
    `research/gen/missions.py` / `cards.py`, and the `ref` fields of `missions.json` (67), `equipment.json` (18),
    `characters.json` (14). The brief's hard rules say research stays in the private repo and real names appear only
    in private research data. The deployed page itself is clean (checked).

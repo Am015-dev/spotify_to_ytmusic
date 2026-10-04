@@ -1,4 +1,4 @@
-# Short Fuse (Bomb Busters-style co-op) — work in progress
+# Short Fuse (co-op adaptation of the original game) — work in progress
 
 Snapshot saved before a pause. Not on the shelf yet.
 

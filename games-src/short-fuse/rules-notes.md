@@ -1,25 +1,25 @@
-# Bomb Busters: rules notes for implementation
+# Short Fuse: rules notes for implementation
 
-These notes restate the rules of *Bomb Busters* (Hisashi Hayashi, Cocktail Games / Pegasus Spiele, 2024, BGG id 413246) in our own words, for a faithful browser build. Mechanics and numbers are exact where marked **[C]** (confirmed from a primary source: rulebook, official FAQ, or the printed card faces). Points marked **[G]** are our interpretation; they are all listed again in the "Confirmed vs. guessed" section at the end. Source keys such as RB, FAQ and CARD are defined in `sources.md`.
+These notes restate the rules of the original game (the original designer and publishers, 2024) in our own words, for a faithful browser build. Mechanics and numbers are exact where marked **[C]** (confirmed from a primary source: rulebook, official FAQ, or the printed card faces). Points marked **[G]** are our interpretation; they are all listed again in the "Confirmed vs. guessed" section at the end. Source keys such as RB, FAQ and CARD are defined in `sources.md`.
 
-Original card and component names appear only as `ref` values in the JSON files. Here we use our own working names with the reference in brackets the first time a card is named.
+Original card and component names are not kept in this repo. Here we use our own working names throughout.
 
 ---
 
-## 0. Game facts (BGG and other listings)
+## 0. Game facts (catalogue and other listings)
 
 | Field | Value | Source |
 |---|---|---|
-| Players | 2 to 5 (box). Some listings mention a 1-player variant (one person runs 2 stands); it is not in the rulebook | BGG listing via search snippet, Board Game Oracle, axross doc |
-| Play time | about 30 min per mission | BGG snippet, Board Game Oracle |
+| Players | 2 to 5 (box). Some listings mention a 1-player variant (one person runs 2 stands); it is not in the rulebook | catalogue listing via search snippet, Board Game Oracle, axross doc |
+| Play time | about 30 min per mission | catalogue snippet, Board Game Oracle |
 | Age | 10+ | Board Game Oracle |
-| Weight | 2.0 / 5 (2.01) | BGG snippet, Board Game Oracle |
-| Mechanics | Communication Limits, Cooperative Game, Deduction, Memory, Once-Per-Game Abilities, Real-Time, Scenario/Mission/Campaign Game, Sudden Death Ending | Board Game Oracle (BGG mirror), BGG snippet |
+| Weight | 2.0 / 5 (2.01) | catalogue snippet, Board Game Oracle |
+| Mechanics | Communication Limits, Cooperative Game, Deduction, Memory, Once-Per-Game Abilities, Real-Time, Scenario/Mission/Campaign Game, Sudden Death Ending | Board Game Oracle (catalogue mirror), catalogue snippet |
 | Category | Deduction | Board Game Oracle |
-| Designer / artist | Hisashi Hayashi / Dom2D (Dominique Ferland) | RB credits |
+| Designer / artist | the original designer / the original artist | RB credits |
 | Campaign | 66 numbered missions: 8 in the open box, 58 in 5 sealed "surprise" boxes | RB, CARD 8/19/30/42/54 |
 
-The BGG page itself returns 403 to automated fetches and the XML API now needs a token, so the BGG numbers come from search snippets and a BGG-data mirror. **[C-ish: two consistent secondary sources]**
+The catalogue page itself returns 403 to automated fetches and its XML API now needs a token, so the catalogue numbers come from search snippets and a catalogue-data mirror. **[C-ish: two consistent secondary sources]**
 
 ---
 
@@ -33,7 +33,7 @@ The BGG page itself returns 403 to automated fetches and the XML API now needs a
 | Tile stands (racks) | 5 | |
 | Board with a detonator dial | 1 | Has a 1–12 validation track with marker slots between the numbers, a row of equipment slots and a spot for the mission card (bottom left) |
 | Equipment cards | 12 | values 1–12, one each (section 6) |
-| Character cards | 5 | 1 "Captain" + 4 others, all with the Double Detector (section 7) |
+| Character cards | 5 | 1 "Captain" + 4 others, all with the Twin Probe (section 7) |
 | Mission cards (large) | 8 | missions 1–8 |
 | Info tokens | 26 | 2 per value 1–12 (24) + 2 "yellow" tokens [C: RB count + FAQ "the 2 existing tokens"] |
 | Validation tokens | 12 | one per value |
@@ -71,7 +71,7 @@ The decimals exist only so that a stand can be sorted: a red 7.5 sits between th
 | Constraint cards | 12 (A–L) | M31 | section 8.2 |
 | Challenge cards | 10 (numbered 1–10) | M55 | section 8.3 |
 | Oxygen tokens | ≥30 [G: M63 with 5 players hands out 30] | M44 | |
-| Robot standee ("Nano") | 1 | M43 | walks along the 1–12 validation track |
+| Robot standee | 1 | M43 | walks along the 1–12 validation track |
 | Bunker card | 1, two-sided (2 floors of 3×4 squares) | M66 | |
 | Rule stickers | 3 (A, B, C) | | A: yellow-unlock equipment joins the pile from M9 in missions with yellow wires. B: from M31, non-captains may use the new characters. C: from M55, the double-number equipment joins the pile and needs all 4 wires of its value cut |
 
@@ -89,7 +89,7 @@ Model it as an integer "fuse" counter:
 * Each "advance" step does fuse −= 1. **At fuse = 0 the bomb explodes.** So with N players the team survives N−1 advances, and the Nth one ends the game.
 * "Move back" steps do fuse += 1. The maximum is 6, the purple segment. **[G]**: we assume nothing can go past 6, and that ordinary missions cap at 5 as the TTS script does. The card text never says whether the rewind equipment can go past the starting segment, so allow it up to 6.
 
-This agrees with the Tabletop Simulator script (Brawlboxgaming): position = player count, −1 per mistake, 0 = "KABOOM", missions 41/55/60/62 set to 1, mission 51 with 5 players set to 6. The bdiffuser repository uses max = player count, which is the same thing. A review's phrase "as many mistakes as players" is consistent if "mistakes" counts the fatal one.
+This agrees with the Tabletop Simulator script (Brawlboxgaming): position = player count, −1 per mistake, 0 = "KABOOM", missions 41/55/60/62 set to 1, mission 51 with 5 players set to 6. An open-source implementation uses max = player count, which is the same thing. A review's phrase "as many mistakes as players" is consistent if "mistakes" counts the fatal one.
 
 ---
 
@@ -159,7 +159,7 @@ This agrees with the Tabletop Simulator script (Brawlboxgaming): position = play
 
 * Yellows are cut like blues (dual or solo) under the shared value "yellow". To dual-cut a yellow you must hold one; point at a teammate's wire and say "yellow".
 * A failed cut on a yellow wire (someone said a number but it was yellow) gets the **yellow info token**.
-* The dual/triple/super detector variants may **not** name yellow (FAQ and card text). The two-value probe (#10) **may** include yellow as one of its two values.
+* The Twin Probe / Triple Probe / Full Scan variants may **not** name yellow (FAQ and card text). The two-value probe (#10) **may** include yellow as one of its two values.
 
 ---
 
@@ -186,35 +186,35 @@ Full card data is in `equipment.json`.
   * "on your turn"
   * "at the start of your turn" (the stabiliser, #9)
   * "instant" (the lightning icon on 3-3, 10-10 and the yellow card): the effect fires **immediately when the card unlocks** **[G: inferred from the icon; it has no other trigger]**
-* Combination: the two-value probe (#10) can be stacked with the double, triple or super detector to name 2 values against several wires. [C]
+* Combination: the two-value probe (#10) can be stacked with the Twin Probe, Triple Probe or Full Scan to name 2 values against several wires. [C]
 
 ### 6.2 Base cards 1–12 [C card text + FAQ]
 
 | # | Our name (ref) | Timing | Effect |
 |---|---|---|---|
-| 1 | Unequal Tag (ref "Label ≠") | any time | Put the ≠ token between 2 adjacent wires (of your own, [G]) that have different values. One of them may already be cut. Two reds or two yellows always count as equal, so they can never be tagged ≠. Only one ≠ token exists. |
-| 2 | Handsets (ref "Walkie-Talkies") | any time | Wire swap: you give one of your uncut wires face down to a teammate; that teammate gives you one of theirs face down; each inserts the new wire into sorted position. A 2-stand player puts the incoming wire on the stand the outgoing wire left. Any uncut wire may be swapped, red and yellow included. Everyone sees which slot each wire left and entered. An info token travels with its wire (FAQ), except in M24, where it is discarded (FAQ). You may not ask for a particular value. |
-| 3 | Triple Probe (ref "Triple Detector") | your turn | As the Double Detector, but point at 3 wires on one teammate's stand. Not "yellow". |
-| 4 | Sticky Note (ref "Post-It") | any time | Put a true info token in front of one of **your own blue** wires. |
-| 5 | Full Scan (ref "Super Detector") | your turn | As the Double Detector, but the target is a teammate's **entire** stand. Not "yellow". |
-| 6 | Rewind (ref "Rewinder") | any time | Dial back 1 space. |
-| 7 | Recharge (ref "Emergency Batteries") | any time | Turn 1 or 2 **used** character cards face up again; their personal item can be used once more this mission. |
-| 8 | Sweep (ref "General Radar") | any time | Name a number 1–12. Every player (including you) says "yes" if they have at least one **uncut blue** wire of that value. 2-stand players answer per stand. Do not say how many or where. Red/yellow never count. |
-| 9 | Damper (ref "Stabilizer") | start of your turn | Turn it face down before a dual cut this turn. If that cut fails, the dial does not move; if it hits a red, the bomb does not explode. On a wrong non-red wire the teammate still places the info token. On a red wire no info token is placed (FAQ). |
-| 10 | Two-Value Probe (ref "X or Y ray") | your turn | During a dual cut, name **2 values** (yellow allowed) for one wire. You must hold both values. If the wire is either one, the cut succeeds and you cut your matching wire, which shows teammates you also hold the other value. The values need not be consecutive (FAQ). |
-| 11 | Coffee Break (ref "Coffee Mug") | your turn | Skip your turn and choose (alone, without discussion) who goes next; play then continues clockwise from that player. |
-| 12 | Equal Tag (ref "Label =") | any time | Put the = token between 2 of **your** adjacent wires with the same value. One may already be cut. Any 2 yellows or any 2 reds count as the same. |
+| 1 | Unequal Tag | any time | Put the ≠ token between 2 adjacent wires (of your own, [G]) that have different values. One of them may already be cut. Two reds or two yellows always count as equal, so they can never be tagged ≠. Only one ≠ token exists. |
+| 2 | Handsets | any time | Wire swap: you give one of your uncut wires face down to a teammate; that teammate gives you one of theirs face down; each inserts the new wire into sorted position. A 2-stand player puts the incoming wire on the stand the outgoing wire left. Any uncut wire may be swapped, red and yellow included. Everyone sees which slot each wire left and entered. An info token travels with its wire (FAQ), except in M24, where it is discarded (FAQ). You may not ask for a particular value. |
+| 3 | Triple Probe | your turn | As the Twin Probe, but point at 3 wires on one teammate's stand. Not "yellow". |
+| 4 | Sticky Note | any time | Put a true info token in front of one of **your own blue** wires. |
+| 5 | Full Scan | your turn | As the Twin Probe, but the target is a teammate's **entire** stand. Not "yellow". |
+| 6 | Rewind | any time | Dial back 1 space. |
+| 7 | Recharge | any time | Turn 1 or 2 **used** character cards face up again; their personal item can be used once more this mission. |
+| 8 | Sweep | any time | Name a number 1–12. Every player (including you) says "yes" if they have at least one **uncut blue** wire of that value. 2-stand players answer per stand. Do not say how many or where. Red/yellow never count. |
+| 9 | Damper | start of your turn | Turn it face down before a dual cut this turn. If that cut fails, the dial does not move; if it hits a red, the bomb does not explode. On a wrong non-red wire the teammate still places the info token. On a red wire no info token is placed (FAQ). |
+| 10 | Two-Value Probe | your turn | During a dual cut, name **2 values** (yellow allowed) for one wire. You must hold both values. If the wire is either one, the cut succeeds and you cut your matching wire, which shows teammates you also hold the other value. The values need not be consecutive (FAQ). |
+| 11 | Coffee Break | your turn | Skip your turn and choose (alone, without discussion) who goes next; play then continues clockwise from that player. |
+| 12 | Equal Tag | any time | Put the = token between 2 of **your** adjacent wires with the same value. One may already be cut. Any 2 yellows or any 2 reds count as the same. |
 
 ### 6.3 Campaign cards [C card text + rule stickers]
 
 | Unlock | Our name (ref) | Timing | Effect | Joins the random pile |
 |---|---|---|---|---|
-| a yellow pair cut | Hidden Compartment (ref "False Bottom") | instant | Draw 2 more equipment cards and add them to the mission. They may unlock at once if their values are already cut. | from M9, **only in missions that use yellow wires** |
-| all four 2s cut | Lone Tag (ref "Single Wire Label") | any time | Place a ×1 token in front of one of your blue wires (cut or uncut): that value appears only once on that stand, counting cut wires. | from M55 |
-| all four 3s cut | Supply Drop (ref "Emergency Drop") | instant | All used equipment cards turn face up and can be used again this mission. | from M55 |
-| all four 9s cut | Express Pass (ref "Fast Pass Card") | your turn | Solo-cut 2 identical wires from your hand even if they are not the last of that value. | from M55 |
-| all four 10s cut | Vaporiser (ref "Disintegrator") | instant | Draw a random info token from the supply and reveal it. Every player cuts all their remaining wires of that value. [G: if the yellow token or an exhausted value comes up, redraw] | from M55 |
-| all four 11s cut | Hook Line (ref "Grappling Hook") | any time | Point at a teammate's wire and take it unseen into your hand in sorted position (a 2-stand player chooses the stand, per FAQ). Everyone sees where it came from and went. | from M55 |
+| a yellow pair cut | Hidden Compartment | instant | Draw 2 more equipment cards and add them to the mission. They may unlock at once if their values are already cut. | from M9, **only in missions that use yellow wires** |
+| all four 2s cut | Lone Tag | any time | Place a ×1 token in front of one of your blue wires (cut or uncut): that value appears only once on that stand, counting cut wires. | from M55 |
+| all four 3s cut | Supply Drop | instant | All used equipment cards turn face up and can be used again this mission. | from M55 |
+| all four 9s cut | Express Pass | your turn | Solo-cut 2 identical wires from your hand even if they are not the last of that value. | from M55 |
+| all four 10s cut | Vaporiser | instant | Draw a random info token from the supply and reveal it. Every player cuts all their remaining wires of that value. [G: if the yellow token or an exhausted value comes up, redraw] | from M55 |
+| all four 11s cut | Hook Line | any time | Point at a teammate's wire and take it unseen into your hand in sorted position (a 2-stand player chooses the stand, per FAQ). Everyone sees where it came from and went. | from M55 |
 
 Double-number unlock rule: "4 wires of the same value have to be cut". [C sticker C]
 
@@ -223,7 +223,7 @@ Double-number unlock rule: "4 wires of the same value have to be cut". [C sticke
 ## 7. Characters [C]
 
 * Every character card carries one **personal item**, usable **once per mission**. Turn the card face down when used. The recharge equipment (#7) restores it.
-* **Base 5 cards** (one is marked Captain): all have the **Double Detector**.
+* **Base 5 cards** (one is marked Captain): all have the **Twin Probe**.
 * **4 new cards** (from M31, for non-captains only), each with a personal copy of an equipment effect, once per mission:
   * radar (#8, "any time")
   * handsets/swap (#2, "any time")
@@ -232,7 +232,7 @@ Double-number unlock rule: "4 wires of the same value have to be cut". [C sticke
 
   Rules follow the matching equipment card. Several missions ban the two-value-probe character (M44, 45, 47, 49, 51, 54, 59, 63, 65). M58 bans all new characters.
 
-**Double Detector** (the base personal item) [C RB + FAQ]:
+**Twin Probe** (the base personal item) [C RB + FAQ]:
 
 * During a dual cut, name a number value (1–12 only, never yellow or red) and point at **2 wires on the same stand** of one teammate. The wires need not be adjacent. If the teammate has 2 stands, both wires must be on one stand.
 * **Success** if at least one of the two is V. If both are V, the teammate picks which one to cut and says nothing more. The active player cuts one of their own V wires.
@@ -318,7 +318,7 @@ A standee moves along the 1–12 board track, or along a line of Number cards in
 * general strategy;
 * whether and when to use equipment;
 * reminding each other of special rules;
-* telling a teammate to use their Double Detector or other gear.
+* telling a teammate to use their Twin Probe or other gear.
 
 The info tokens, the face-up cut wires, the validation tokens and the board markers are the shared memory. In a digital build, show them permanently; the board state is public anyway.
 
@@ -354,7 +354,7 @@ Mission overrides:
 
 ## 11. Confirmed vs. guessed
 
-Confirmed means taken from the rulebook (RB), the official Pegasus FAQ of 11 July 2025, or the printed card faces (CARD, read from scans of every mission card front and back, all equipment, character, constraint and challenge cards, the bunker card and the rule stickers). Mission audio was machine-transcribed (AUDIO); see the mission notes for its reliability.
+Confirmed means taken from the rulebook (RB), the official FAQ of 11 July 2025, or the printed card faces (CARD, read from scans of every mission card front and back, all equipment, character, constraint and challenge cards, the bunker card and the rule stickers). Mission audio was machine-transcribed (AUDIO); see the mission notes for its reliability.
 
 ### Confirmed (high confidence)
 
@@ -364,7 +364,7 @@ Confirmed means taken from the rulebook (RB), the official Pegasus FAQ of 11 Jul
 * Dual, solo and reveal-red mechanics; yellow handling; the failure consequences.
 * Equipment unlock (2 wires) and once-per-mission use; the timing labels on cards.
 * All 18 equipment texts.
-* The Double Detector details, including the red cases (FAQ).
+* The Twin Probe details, including the red cases (FAQ).
 * All constraint texts (A–L) and challenge texts (1–10).
 * The rule stickers A/B/C.
 * Communication rules; win/loss.
@@ -376,7 +376,7 @@ Confirmed means taken from the rulebook (RB), the official Pegasus FAQ of 11 Jul
 1. **Dial arithmetic** (start = N, explode at 0, max 6). We are fairly sure: the card art and the TTS implementation agree, and one review agrees loosely. The rulebook text itself never states the count.
 2. **Where dealing starts** and who gets the extra tiles when the deal is uneven.
 3. **"Instant" equipment** fires automatically when it unlocks.
-4. **Triple and full-scan red handling** (explode only if all pointed wires are red; the teammate tags a non-red wire on failure). This extends the Double Detector FAQ.
+4. **Triple and full-scan red handling** (explode only if all pointed wires are red; the teammate tags a non-red wire on failure). This extends the Twin Probe FAQ.
 5. **The ≠ tag goes on the user's own wires.** The card does not say "your", unlike the = card.
 6. **Vaporiser** (10-10) when the drawn token is yellow, or a value with no wires left: redraw.
 7. **Constraint vs. yellow** (A–F). Yellow has no number.
