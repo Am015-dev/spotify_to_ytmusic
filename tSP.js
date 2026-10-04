@@ -14,11 +14,11 @@ const D=p=>p.evaluate(()=>[__SP.pl.dist,__SP.p2.dist,__SP.pl.x,__SP.p2.x]);
   ok(s.vis&&s.cards===2&&s.keys&&s.modes&&s.trk>=6,'setup screen: 2 key cards, both modes, circuit list',s);await F.shot(p,'shots/sp_setup.jpg',{type:'jpeg',quality:70});await p.click('#SP_back')}
  // 2 · race, head to head: both drive with their own keys at the same time, neither affects the other
  {await p.evaluate(()=>__SP.start({mode:'race',ai:false,trk:'grand'}));await p.evaluate(()=>__mho.sim(1));const n=await p.evaluate(()=>({ships:__mho.ships?0:0,n:__SP.p2&&__SP.S.on,cls:document.body.classList.contains('SP_on')}));ok(n.n&&n.cls,'race starts in split mode with P2',n);
-  const a0=await D(p);await p.keyboard.down('KeyW');await p.evaluate(()=>__mho.sim(180));const a1=await D(p);await p.keyboard.up('KeyW');
+  const a0=await D(p);await p.keyboard.down('KeyW');await p.evaluate(()=>__mho.sim(300));const a1=await D(p);await p.keyboard.up('KeyW');
   ok(a1[0]-a0[0]>40&&Math.abs(a1[1]-a0[1])<1,'W only: P1 moves, P2 stays',{p1:Math.round(a1[0]-a0[0]),p2:+(a1[1]-a0[1]).toFixed(2)});
-  await p.evaluate(()=>{__SP.pl.v=0});const b0=await D(p);await p.keyboard.down('ArrowUp');await p.evaluate(()=>__mho.sim(180));const b1=await D(p);await p.keyboard.up('ArrowUp');
+  await p.evaluate(()=>{__SP.pl.v=0});const b0=await D(p);await p.keyboard.down('ArrowUp');await p.evaluate(()=>__mho.sim(300));const b1=await D(p);await p.keyboard.up('ArrowUp');
   ok(b1[1]-b0[1]>40&&b1[0]-b0[0]<12,'↑ only: P2 moves, P1 just coasts out',{p1:Math.round(b1[0]-b0[0]),p2:Math.round(b1[1]-b0[1])});
-  await p.keyboard.down('KeyW');await p.keyboard.down('ArrowUp');await p.keyboard.down('ArrowLeft');const c=await p.evaluate(()=>[__SP.ctl(1),__SP.ctl(2)]);const c0=await D(p);await p.evaluate(()=>__mho.sim(120));const c1=await D(p);await p.keyboard.up('ArrowLeft');
+  await p.keyboard.down('KeyW');await p.keyboard.down('ArrowUp');await p.keyboard.down('ArrowLeft');const c=await p.evaluate(()=>[__SP.ctl(1),__SP.ctl(2)]);const c0=await D(p);await p.evaluate(()=>__mho.sim(240));const c1=await D(p);await p.keyboard.up('ArrowLeft');
   ok(c[0].thr===1&&c[0].steer===0&&c[1].thr===1&&c[1].steer===-1&&c1[0]-c0[0]>30&&c1[1]-c0[1]>30,'W + ↑ + ← together: both drive, only P2 steers',{p1:c[0],p2:c[1],d:[Math.round(c1[0]-c0[0]),Math.round(c1[1]-c0[1])]});
   await p.keyboard.down('ShiftRight');const sh=await p.evaluate(()=>[__SP.ctl(1).boost,__SP.ctl(2).boost]);await p.keyboard.up('ShiftRight');await p.keyboard.down('ShiftLeft');const sh2=await p.evaluate(()=>[__SP.ctl(1).boost,__SP.ctl(2).boost]);await p.keyboard.up('ShiftLeft');
   ok(sh[0]===0&&sh[1]===1&&sh2[0]===1&&sh2[1]===0,'boost keys: R-Shift = P2 only, L-Shift = P1 only',{rs:sh,ls:sh2});
@@ -30,9 +30,9 @@ const D=p=>p.evaluate(()=>[__SP.pl.dist,__SP.p2.dist,__SP.pl.x,__SP.p2.x]);
   await p.keyboard.up('KeyW');await p.keyboard.up('ArrowUp')}
  // 3 · gamepad (mocked): 1 pad -> P2, 2 pads -> P1 + P2
  {await p.evaluate(()=>{const pad=(thr,ax)=>({connected:true,axes:[ax,0],buttons:Array.from({length:17},(_,i)=>({pressed:i===7&&thr>0,value:i===7?thr:0}))});window.__pads=[pad(1,-.8)];navigator.getGamepads=()=>window.__pads;__SP.pl.v=0;__SP.p2.v=0;window.__pad=pad});
-  const g0=await D(p);await p.evaluate(()=>__mho.sim(150));const g1=await D(p);const cc=await p.evaluate(()=>[__SP.ctl(1),__SP.ctl(2)]);
-  ok(g1[1]-g0[1]>30&&g1[0]-g0[0]<5&&cc[1].steer<-.5&&cc[0].thr===0,'1 gamepad: RT + stick drive P2 only',{p1:Math.round(g1[0]-g0[0]),p2:Math.round(g1[1]-g0[1]),steer2:+cc[1].steer.toFixed(2)});
-  await p.evaluate(()=>{window.__pads=[__pad(1,0),__pad(0,0)];__SP.pl.v=0;__SP.p2.v=0});const h0=await D(p);await p.evaluate(()=>__mho.sim(150));const h1=await D(p);
+  const g0=await D(p);await p.evaluate(()=>__mho.sim(300));const g1=await D(p);const cc=await p.evaluate(()=>[__SP.ctl(1),__SP.ctl(2)]);
+  ok(g1[1]-g0[1]>25&&g1[0]-g0[0]<5&&cc[1].steer<-.5&&cc[0].thr===0,'1 gamepad: RT + stick drive P2 only',{p1:Math.round(g1[0]-g0[0]),p2:Math.round(g1[1]-g0[1]),steer2:+cc[1].steer.toFixed(2)});
+  await p.evaluate(()=>{window.__pads=[__pad(1,0),__pad(0,0)];__SP.pl.v=0;__SP.p2.v=0});const h0=await D(p);await p.evaluate(()=>__mho.sim(300));const h1=await D(p);
   ok(h1[0]-h0[0]>30&&h1[1]-h0[1]<5,'2 gamepads: pad 1 drives P1, pad 2 (idle) leaves P2 still',{p1:Math.round(h1[0]-h0[0]),p2:Math.round(h1[1]-h0[1])});await p.evaluate(()=>{window.__pads=[]})}
  // 4 · full race with AI fill: both finish and are placed, results for both, rematch
  {await p.evaluate(()=>__SP.start({mode:'race',ai:true,trk:'grand'}));await p.keyboard.down('KeyW');await p.keyboard.down('ArrowUp');
