@@ -38,7 +38,7 @@ function render(){renderModal();if(!G){try{phRender()}catch(e){console.error(e)}
   const pb=$('#pausebtn');if(pb){pb.hidden=human();const h=IC(UI.pause?'play':'pause');if(pb.dataset.h!==h){pb.innerHTML=h;pb.dataset.h=h}}const sb=$('#speedbtn');if(sb){const h=IC('speed')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';if(sb.dataset.h!==h){sb.innerHTML=h;sb.dataset.h=h}}
   const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',!!UI.coach);
   const ch=$('#chip');if(ch){const s=sideToAct();ch.textContent=G.over?'The king’s judgement':`${innerWidth<700?'Round '+G.round:chapter(G.round)} · ${G.phase==='wall'?'setting the mosaics':s>=0?P(s).nm+' to play':''}`}}
-function scoresHtml(){const s=sideToAct();return `<div class="scores">${G.pl.map(p=>`<span class="sc ${p.i===s?'cur':''}" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''} ★${p.score}${G.markerIn===p.i?' ☀':''}</span>`).join('')}</div>`}
+function scoresHtml(){const s=sideToAct();return `<div class="scores">${G.pl.map(p=>`<span class="sc ${p.i===s?'cur':''}" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''} ★${p.score}${phBonus(p)?` <small title="End bonus earned so far">+${phBonus(p)} bonus</small>`:''}${G.markerIn===p.i?' ☀':''}</span>`).join('')}</div>`}
 function thumbsHtml(){const f=focusSeat();const narrow=V3.on?(V3.L&&V3.L.name==='focus'):innerWidth<700;if(!narrow)return '';
   return `<div class="thumbs">${G.pl.filter(p=>p.i!==f).map(p=>`<button class="thumb" data-gx="plrd" style="--pc:${PCOL[p.i]}" aria-label="Open ${esc(p.nm)}'s board">${esc(p.nm)} ★${p.score}<svg viewBox="0 0 1240 940">${boardG(p,{})}</svg></button>`).join('')}</div>`}
 function btn(m,label,cls,extra){return `<button class="btn ${cls||''}" data-mv='${esc(JSON.stringify(m))}'${extra||''}>${label}</button>`}
@@ -133,8 +133,8 @@ function storyPic(){const tiles=[];for(let i=0;i<14;i++)tiles.push(tileSVG(i%5,4
   ${tiles.join('')}${arch(40)}${arch(245)}${arch(450)}<rect x="0" y="300" width="600" height="30" fill="#c9794a"/><ellipse cx="300" cy="306" rx="80" ry="12" fill="#2f6f8a"/><path d="M300 300q-8-40 0-60q8 20 0 60" fill="#9fd3e6" opacity=".8"/>
   <rect x="190" y="248" width="16" height="52" fill="#7a4a2a"/><circle cx="198" cy="238" r="12" fill="#e0674a"/><rect x="204" y="262" width="30" height="8" rx="2" fill="#1d4aa3"/></svg>`}
 function storyHtml(){const names=G?G.pl.filter(p=>p.human).map(p=>p.nm):[];return `<div class="mbox story">${storyPic()}<p class="q">The Sun King has come home to his summer palace, and its courtyard walls stand bare.</p>
-  <p>He has summoned the finest glaziers${names.length?`, ${esc(names.join(' and '))} among them,`:''} to dress the walls in tile. Every morning the kilns are opened and you draft your glazes.</p>
-  <p>Dry them on your racks, set them into your mosaic so each new tile touches the others, and waste nothing: every broken tile costs you.</p><p>When the first mosaic row is finished, the king will walk the courtyard and judge.</p>
+  <p>He has summoned the finest glaziers${names.length?`, ${esc(names.join(' and '))} among them,`:''} to tile its walls.</p>
+  <ul class="win"><li><b>Most ★ wins.</b> The game ends after a round in which someone completes a mosaic row.</li><li>Each tile you set scores 1 for every tile in the lines it joins.</li><li>At the end: full row <b>+2</b>, full column <b>+7</b>, all 5 tiles of one glaze <b>+10</b>.</li><li>Broken tiles cost points.</li></ul>
   <div class="acts"><button class="btn go" data-ui="story-ok">Enter the courtyard ▶</button></div></div>`}
 // ---------- input ----------
 function on3DPick(h){const p=me();if(!p||!G||G.over)return;if(!h&&!PHN.on)return;

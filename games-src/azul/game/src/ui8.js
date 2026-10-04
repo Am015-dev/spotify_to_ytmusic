@@ -76,10 +76,11 @@ function phWhy(x){const m=x.m,pv=x.pv,n=x.n;const brk=x.tp?`, ${n} break (${x.tp
   return `Rack ${m.line+1}: ${pv.cnt} of ${cap(m.line)} so far${brk}. Fill it later to score.`}
 function phPtsWhy(run){if(!run)return '';const [h,v]=run;if(h===1&&v===1)return 'alone';const b=[];if(h>1)b.push(h+' across');if(v>1)b.push(v+' down');return '= '+b.join(' + ')}
 // how the game is won and how close the end is (any complete mosaic row ends the game after that round)
+function phBonus(p){const b=endBonus(p);return b.rows*BONUS.row+b.cols*BONUS.col+b.colours*BONUS.colour}
 function phGoalHTML(){let best=null;for(const p of G.pl)for(let r=0;r<5;r++){const n=p.wall[r].filter(v=>v>=0).length;const ready=p.lines[r].length===cap(r)&&!rowHas(p,r,lineColour(p.lines[r]))?1:0;
     if(!best||n+ready>best.n+best.ready||(n+ready===best.n+best.ready&&ready>best.ready))best={p,r,n,ready}}
   const warn=best&&best.n+best.ready>=5?`<b class="bad">Last round: ${esc(best.p.nm)}${isYou(best.p.i)?' (you)':''} will complete mosaic row ${best.r+1}.</b>`:best&&best.n>=4?`<b>${esc(best.p.nm)}${isYou(best.p.i)?' (you)':''} has 4 of 5 in mosaic row ${best.r+1}.</b>`:'';
-  return `<div class="ph-goal">${IC('trophy')}<span><span class="gl">Most ★ wins. The game ends after a round in which someone completes a mosaic row.</span><span class="gs">Most ★ wins · ends after a mosaic row is full.</span> ${warn}</span></div>`}
+  return `<div class="ph-goal">${IC('trophy')}<span><span class="gl">Most ★ wins. The game ends after a round in which someone completes a mosaic row. Then: full row +2, full column +7, all 5 of a glaze +10.</span><span class="gs">Most ★ wins · ends after a mosaic row is full · end bonus: row +2, column +7, glaze +10</span> ${warn}</span></div>`}
 function phTakeHTML(hp){const sel=UI.sel,src=sel?sel.src:PHN.src;const a=src<0?G.ctr:G.fac[src];if(!a||!a.length)return '';
   const cnt={};for(const t of a)cnt[t]=(cnt[t]||0)+1;const keys=Object.keys(cnt).map(Number).sort((x,y)=>x-y);const nj=cnt[PRISM]||0;
   const chips=keys.map(c=>{const on=sel&&sel.c===c;return `<button class="ph-g${on?' on':''}" data-ph="pick" data-pick='${JSON.stringify({src,c,j:c===PRISM?1:0})}' aria-pressed="${!!on}" aria-label="${cnt[c]} ${TNAME[c]}">${tileChip(c,cnt[c])}<span>${TNAME[c]}</span></button>`}).join('');
@@ -117,8 +118,8 @@ function phStripHTML(){const f=focusSeat(),fp=P(f),hp=me(),s=sideToAct();const p
   a=`<div class="ph-a"><span class="ph-msg">${left}</span>${right}</div>`;
   const net=NET.on?netDockHtml():'';
   const sack='';
-  const mine=`<button class="ph-mine" data-ph="board" data-i="${f}" style="--pc:${PCOL[f]}" aria-label="Open ${esc(fp.nm)}'s board"><span class="ph-mh"><i></i><b>${esc(fp.nm)}${isYou(f)?' (you)':''}</b><b class="ph-sc">★${fp.score}</b>${G.markerIn===f?'<span title="Sun token">☀</span>':''}${sack}</span><span class="ph-ms">${phBoardSVG(fp)}</span></button>`;
-  const rivals=G.pl.filter(q=>q.i!==f).map(q=>`<button class="ph-rv${q.i===s?' cur':''}" data-ph="board" data-i="${q.i}" style="--pc:${PCOL[q.i]}" aria-label="Open ${esc(q.nm)}'s board, ${q.score} points"><i></i><b>${esc(q.nm)}</b><span>★${q.score}</span>${G.markerIn===q.i?'<span>☀</span>':''}${q.floor.length?`<small>✗${q.floor.filter(t=>t!==SUN).length}</small>`:''}</button>`).join('');
+  const mine=`<button class="ph-mine" data-ph="board" data-i="${f}" style="--pc:${PCOL[f]}" aria-label="Open ${esc(fp.nm)}'s board"><span class="ph-mh"><i></i><b>${esc(fp.nm)}${isYou(f)?' (you)':''}</b><b class="ph-sc">★${fp.score}</b>${phBonus(fp)?`<small class="ph-bn" title="End bonus earned so far">+${phBonus(fp)} end bonus</small>`:''}${G.markerIn===f?'<span title="Sun token">☀</span>':''}${sack}</span><span class="ph-ms">${phBoardSVG(fp)}</span></button>`;
+  const rivals=G.pl.filter(q=>q.i!==f).map(q=>`<button class="ph-rv${q.i===s?' cur':''}" data-ph="board" data-i="${q.i}" style="--pc:${PCOL[q.i]}" aria-label="Open ${esc(q.nm)}'s board, ${q.score} points"><i></i><b>${esc(q.nm)}</b><span>★${q.score}</span>${phBonus(q)?`<small class="ph-bn">+${phBonus(q)} end bonus</small>`:''}${G.markerIn===q.i?'<span>☀</span>':''}${q.floor.length?`<small>✗${q.floor.filter(t=>t!==SUN).length}</small>`:''}</button>`).join('');
   const rc=UI.recap.length&&!G.over?`<div class="ph-recap" aria-label="Recent moves">${UI.recap.slice(0,hp?Math.max(1,G.np-1):3).map(t=>`<div>${t}</div>`).join('')}</div>`:'';
   return net+a+(G.over?'':phGoalHTML())+mine+rc+`<div class="ph-rvs">${rivals}</div>`}
 // ---------- cards: one at a time, always with Continue ----------
