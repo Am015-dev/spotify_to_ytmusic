@@ -55,7 +55,7 @@
 .gx-ref-nav{display:inline-flex;align-items:center;gap:6px}
 .gx-ref-big:focus{outline:none}
 /* recap strip */
-.gx-recap{margin:6px 8px;border-radius:12px;background:rgba(0,0,0,.07);border:1px solid var(--gx-line)}
+.gx-recap{box-sizing:border-box;min-width:0;max-width:calc(100% - 16px);align-self:stretch;margin:6px 8px;border-radius:12px;background:rgba(0,0,0,.07);border:1px solid var(--gx-line)}
 .gx-recap[hidden]{display:none}
 .gx-recap-top{display:flex;align-items:stretch}
 .gx-recap-h{appearance:none;flex:1;min-width:0;display:flex;align-items:center;gap:8px;font:inherit;color:inherit;background:transparent;border:0;padding:6px 10px;min-height:44px;text-align:left;cursor:pointer}

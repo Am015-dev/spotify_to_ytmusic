@@ -74,5 +74,5 @@ process.on('exit', () => { try { srv.kill(); } catch (e) { } });
     errs.forEach(e => fail('console', e));
     await ctx.close();
   }
-  await b.close(); console.log('PROBLEMS', bad);
-})();
+  await b.close(); console.log('PROBLEMS', bad); srv.kill(); process.exit(bad ? 1 : 0);
+})().catch(e => { console.error('FATAL', e); srv.kill(); process.exit(2); });

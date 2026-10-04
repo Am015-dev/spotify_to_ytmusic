@@ -715,7 +715,7 @@ function flushAfter() {
 // ---- end of game: one card per player, then the result
 function queueOver() {
   const ov = G.over; if (!ov) return;
-  GX.undo.clear(); kitResult();
+  GX.undo.clear(); GX.recap.clear(); kitResult();
   const rows = (sc, name, s) => {
     const l = [['Printed card points', sc.cards], ['Point tokens', sc.tokens], ['Prosperity bonuses', sc.bonus], ['Events', sc.events], ['The Long Road', sc.journey]];
     const t = h('div.score');

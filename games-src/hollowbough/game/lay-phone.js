@@ -8,7 +8,9 @@ const TURNS=+((process.argv.find(a=>a.startsWith('--turns='))||'').slice(8))||14
 (async()=>{const b=await PW.chromium.launch();let bad=0;
 for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport:{width:W,height:H},deviceScaleFactor:1,isMobile:true,hasTouch:true});
   await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
-  const p=await ctx.newPage();p.setDefaultTimeout(30000);const errs=[];p.on('pageerror',e=>errs.push('pageerror '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load/.test(m.text()))errs.push(m.text())});
+  const p=await ctx.newPage();
+  // the dock re-renders while the test waits: a saved element handle can be detached by the time it is tapped; then tap the fresh element
+  {const $o=p.$.bind(p);p.$=async sel=>{const el=await $o(sel);if(!el)return el;const t=el.tap.bind(el);el.tap=async o=>{try{return await t(o)}catch(e){if(!/not attached/.test(String(e&&e.message)))throw e;const e2=await $o(sel);if(e2)return e2.tap(o)}};return el}}p.setDefaultTimeout(30000);const errs=[];p.on('pageerror',e=>errs.push('pageerror '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load/.test(m.text()))errs.push(m.text())});
   const fail=(c,d)=>{bad++;console.log('FAIL',t,c,d||'')};const log=(...a)=>console.log(t,...a);
   const FIT=require('../../phfit.js');const shot=async n=>{(await FIT.run(p)).forEach(m=>fail('FIT '+n+': '+m));await p.screenshot({path:path.join(OUT,`${t}_${n}.png`)})};
   const scroll=async tag=>{const r=await p.evaluate(()=>({h:document.documentElement.scrollHeight,w:document.documentElement.scrollWidth,vh:innerHeight,vw:innerWidth,b:document.body.scrollHeight}));if(r.h>r.vh+1||r.w>r.vw+1)fail('scroll '+tag,JSON.stringify(r))};
