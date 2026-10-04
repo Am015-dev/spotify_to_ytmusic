@@ -28,7 +28,7 @@ function toggleZoom(){UI.zoom=!UI.zoom;document.documentElement.classList.toggle
 // map-centred decisions (Herald, hidden cards, claiming, ties, the map lesson) get the big map; lists, menus and result cards get the room instead
 function wantSmall(){if(!G)return false;const c=UI.card;if(c&&c.kind==='pass')return false;if(c&&(c.kind==='event'||c.kind==='over'))return true;
   if(UI.coachInfo)return UI.coachInfo.id!=='map';const s=viewSeatForQ();if(s==null||!G.q)return UI.boardSmall;
-  return !['herald','place','location','tie','clashOrder'].includes(G.q.kind)}
+  return !['herald','place','location','tie'].includes(G.q.kind)}
 let _rz=0;addEventListener('resize',()=>{clearTimeout(_rz);_rz=setTimeout(()=>{const l=UI.land,p=UI.phone;phApply();if(G&&UI.started)renderAll()},120)});
 addEventListener('orientationchange',()=>setTimeout(()=>{phApply();if(G)renderAll()},200));
 // ---------------------------------------------------------------- boot

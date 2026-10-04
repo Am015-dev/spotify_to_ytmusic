@@ -101,7 +101,7 @@ function mapReveal(ev){if(!MAP.m||!ANIM)return Promise.resolve();const a=LOCID[2
 function mapResetReveal(r){try{MAP.m&&MAP.m.resetReveal(LOCID[2*r])}catch(e){}MAP.slotDirty=true}
 // strength chips per region: what you know of each side (your hidden cards, revealed cards, Supporters; a rival's hidden card is "?"),
 // the live preview during a Clash, and the final totals (crown = winner) once it is fought
-const CHIPPOS=[[500,312],[232,962],[768,962]];
+const CHIPPOS=[[500,312],[296,822],[704,822]];
 function regionChips(f){if(!G||!UI.V||G.phase==='setup')return;const V=UI.V,me=vs();const live=G.clash&&['day','night','tally'].includes(G.step)?preview(V):null;
   for(let r=0;r<3;r++){const R=V.reg[r];const res=UI.clashRes[r];const anySup=V.pl.some(p=>p.supp.r[r]);if(!R.down.length&&!R.up.length&&!anySup&&!res)continue;if(R.done&&!res)continue;
     const seats=youFirst(V.pl.map(p=>p.seat));const pills=[];
@@ -111,7 +111,7 @@ function regionChips(f){if(!G||!UI.V||G.phase==='setup')return;const V=UI.V,me=v
       else{let known=0,unk=0;for(const id of R.up)if(ownerOf(id)===s&&!R.took.includes(id))known+=TB.cardInfo(G,id).strength;for(const id of R.down)if(ownerOf(id)===s){if(id>=0)known+=TB.cardInfo(G,id).strength;else unk++}
         const sp=V.pl[s].supp.r[r]*(G.rm&&G.rm.masonry&&G.rm.masonry.includes(s)?2:1);if(!unk&&!known&&!sp)continue;txt=unk?'?'+(known+sp?'+'+(known+sp):''):String(known+sp)}
       pills.push({s,txt,win})}
-    if(!pills.length)continue;const fs=58,pw=p=>Math.max(78,p.txt.length*fs*.62+34),ph=74,gap=10;const tot=pills.reduce((a,p)=>a+pw(p),0)+gap*(pills.length-1);
+    if(!pills.length)continue;const fs=pills.length<=2?58:pills.length===3?48:40,pw=p=>Math.max(fs*1.3,p.txt.length*fs*.62+fs*.55),ph=Math.round(fs*1.28),gap=8;const tot=pills.reduce((a,p)=>a+pw(p),0)+gap*(pills.length-1);
     let x=CHIPPOS[r][0]-tot/2;const y=CHIPPOS[r][1];
     f.push('<g class="rchip" data-reg="'+r+'">'+pills.map(p=>{const w=pw(p);const g='<g transform="translate('+Math.round(x)+' '+(y-ph/2)+')"><rect width="'+Math.round(w)+'" height="'+ph+'" rx="'+ph/2+'" fill="'+fcol(p.s)+'" stroke="'+(p.win?'#ffd24a':'#fff3c4')+'" stroke-width="'+(p.win?8:3)+'"/>'+
       '<text x="'+Math.round(w/2)+'" y="'+(ph/2+fs*.36)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#fff" stroke="#000" stroke-opacity=".45" stroke-width="3" paint-order="stroke">'+esc(p.txt)+(p.s===me?'':'')+'</text></g>';x+=w+gap;return g}).join('')+'</g>')}}

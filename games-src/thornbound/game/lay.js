@@ -18,7 +18,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
  await p.click('#start .tlink');await p.waitForTimeout(450);{const ok=await p.evaluate(()=>{const d=document.querySelector('.gx-drawer.on');if(!d)return false;const r=d.getBoundingClientRect();return d.contains(document.elementFromPoint(r.left+r.width/2,r.top+r.height/2))});if(!ok)FAIL('how to play hidden behind the title')}await p.keyboard.press('Escape');await p.waitForTimeout(300);
  await p.click('#start [data-a=play]');await p.waitForTimeout(300);await scroll('setup');await shot('0setup');
  await p.click('#start [data-a=guided]');await p.waitForTimeout(900);
- for(let i=0;i<20;i++){const st=await p.evaluate(()=>({c:UI.card&&UI.card.kind,co:!!UI.coachInfo,s:G.q&&viewSeatForQ()}));if(st.co){if(i===0)await shot('1coach');await p.click('#act [data-a=coachok]');await p.waitForTimeout(200)}else if(st.c){await p.click('#pc .btn.pri');await p.waitForTimeout(200)}else if(st.s!=null){break}else await p.waitForTimeout(200)}
+ for(let i=0;i<20;i++){const st=await p.evaluate(()=>({c:UI.card&&UI.card.kind,co:!!UI.coachInfo,s:G.q&&viewSeatForQ()}));if(st.co){if(i===0)await shot('1coach');await p.click('#act [data-a=coachok]');await p.waitForTimeout(200)}else if(st.c){await p.click(st.c==='news'?'#news [data-a=newsok]':'#pc .btn.pri');await p.waitForTimeout(200)}else if(st.s!=null){break}else await p.waitForTimeout(200)}
  await scroll('game');const r=await board('bid');console.log(t,'map',r.map,'share',r.share);await shot('1bid');
  const dock=await p.evaluate(()=>{const d=document.querySelector('.gx-dock').getBoundingClientRect();return d.width>250&&d.right<=innerWidth+1&&d.bottom<=innerHeight+1&&d.top>=0});if(!dock)FAIL('dock not visible');
  // hand card -> pop-up, close
@@ -27,7 +27,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
  const cv=async(...sels)=>{for(const q of sels){const l=p.locator(q+':visible').first();if(await l.count()){await l.click({timeout:4000}).catch(()=>{});return true}}return false};
  for(let i=0;i<60;i++){await p.waitForTimeout(120);const st=await p.evaluate(()=>({o:!!G.over,c:UI.card&&UI.card.kind,s:G.q&&viewSeatForQ(),k:G.q&&G.q.kind,r:G.round}));if(process.env.DBG)console.log('step',i,JSON.stringify(st));if(st.o||st.r>1)break;
   if(await p.evaluate(()=>!!UI.coachInfo)){await p.click('#act [data-a=coachok]').catch(()=>{});continue}
-  if(st.c){await cv('#pc .btn.pri');continue}if(st.s==null)continue;
+  if(st.c){await cv(st.c==='news'?'#news [data-a=newsok]':'#pc .btn.pri');continue}if(st.s==null)continue;
   if(['bid','place','tie'].includes(st.k)){await cv('#handw .hc');await p.waitForTimeout(150);const ok=await p.$('#ppop [data-a=mv]');if(ok)await cv('#ppop [data-a=mv]');else await cv('#act [data-a=mv].pri','#main [data-a=mv]')}
   else if(st.k==='herald'){await cv('#main [data-a=loc]');await p.waitForTimeout(150);await cv('#ppop [data-a=mv]')}
   else await cv('#act [data-a=mv].pri','#act [data-a=mv]','#main [data-a=mv]')}

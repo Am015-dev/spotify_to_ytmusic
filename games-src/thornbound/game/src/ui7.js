@@ -7,14 +7,14 @@ function verbYou(w){const l=w.toLowerCase();if(l==='has')return 'have';if(l==='i
 function plain(t){const n=myName();if(!n||!t)return t;let subj=false;
   let out=t.replace(new RegExp(escRe(n)+"('s)?(?=\\W|$)( [A-Za-z]+)?",'g'),(m,poss,w,off,str)=>{const start=off===0||/[.:!?]\s*$/.test(str.slice(0,off));if(off===0)subj=true;
     const you=start?(poss?'Your':'You'):(poss?'your':'you');if(poss)return you+(w||'');if(!w)return you;if(!start&&off>0)return you+w;return you+' '+verbYou(w.trim())});
-  if(subj)out=out.replace(/\btheir\b/,'your');return out}
+  if(subj)out=out.replace(/\btheir\b/,'your').replace(/^(You [^.]*?) and has /,'$1 and have ').replace(/^(You [^.]*?) and is /,'$1 and are ');return out}
 // ---------------------------------------------------------------- "what's happening": the newest public event, in plain words
 const PHASEN={spring:'Spring',summer:'Day',autumn:'Autumn'};
 function aiFallback(s,q,mv){const N=G.pl[s].name;const k=q.kind;
   if(k==='bid')return N+' chooses a secret bid.';if(k==='place'&&mv.r!=null)return N+' hides a card next to '+REG[mv.r]+'.';
-  if(q.t==='menu'&&mv.t==='done'){const ph=(q.title.match(/(Spring|Day|Autumn)/)||[])[1];return N+' is done with '+(ph?ph+' ':'')+'actions.'}
-  if(k==='edict'||k==='statue'||k==='harvest')return N+' decides about '+(k==='edict'?'a Tactic':'a card')+'.';
-  return N+' makes a choice.'}
+  if(q.t==='menu'&&mv.t==='done')return null;   // trivia: not narrated
+  if(k==='edict')return mv.yes?N+' plays a Tactic.':null;if(k==='statue'||k==='harvest')return N+' decides about a card.';
+  return null}
 function renderNow(){const el=$('#now');if(!el||!G)return;if(UI.coachInfo){el.innerHTML='';return}
   let t=null,s=-1;const f=UI.nowT;const last=G.log[G.log.length-1];
   if(f&&f.at===G.logN){t=f.t;s=f.s}else if(last){t=last.t;s=last.s}
@@ -26,7 +26,7 @@ function renderNow(){const el=$('#now');if(!el||!G)return;if(UI.coachInfo){el.in
 // wrap the computer step: a move that writes no log line still gets a line
 (function(){const o=aiStep;aiStep=function(w){const s=w.ai[0],q=G.q,l0=G.logN;let mv=null;const oc=aiChoose;
   aiChoose=function(a,b){mv=oc(a,b);return mv};try{o(w)}finally{aiChoose=oc}
-  if(G.logN===l0&&q&&mv)UI.nowT={at:G.logN,s,t:aiFallback(s,q,mv)}}})();
+  if(G.logN===l0&&q&&mv){const t=aiFallback(s,q,mv);if(t)UI.nowT={at:G.logN,s,t}}}})();
 // ---------------------------------------------------------------- glossary: every game word can be tapped for its meaning
 const GLOSS=[
  ['influence',/\bInfluence\b/,'Influence','The score. Whoever holds the most Influence when the last round ends wins the throne. You gain it by winning Clashes and claiming locations.'],
@@ -89,8 +89,12 @@ const GLOSS=[
 ];
 const GL={};GLOSS.forEach(g=>GL[g[0]]=g);
 // escape + wrap the first appearance of each term in this text with a tappable chip
-function gloss(text){if(text==null)return '';text=String(text);const hits=[];
-  for(const [k,re] of GLOSS){const m=re.exec(text);if(m)hits.push({i:m.index,n:m[0].length,k})}
+// card and Kingdom Card names are never split into glossary words ("Night Ferry Captain" stays a name)
+let _nameRe=null;function nameRe(){if(_nameRe)return _nameRe;const D=TB.DATA,n=[];for(const f in D.BASICNAMES)n.push(...D.BASICNAMES[f]);for(const f in D.SITE)for(const c of D.SITE[f])n.push(c.nm);for(const k of D.KC)n.push(k.nm);for(const t in D.TACTICS)for(const x of D.TACTICS[t])n.push(x.nm);for(const f in D.FAVOUR)n.push(D.FAVOUR[f].nm);
+  const u=[...new Set(n)].filter(Boolean).sort((a,b)=>b.length-a.length).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));_nameRe=new RegExp('('+u.join('|')+')','g');return _nameRe}
+function gloss(text){if(text==null)return '';text=String(text);const hits=[];const masked=[];{const re=nameRe();re.lastIndex=0;let m;while((m=re.exec(text)))masked.push([m.index,m.index+m[0].length])}
+  const inName=(i,n)=>masked.some(([a,b])=>i<b&&i+n>a);
+  for(const [k,re] of GLOSS){const g=new RegExp(re.source,re.flags.replace('g','')+'g');let m;while((m=g.exec(text))){if(!inName(m.index,m[0].length)){hits.push({i:m.index,n:m[0].length,k});break}}}
   hits.sort((a,b)=>a.i-b.i||b.n-a.n);let out='',p=0;
   for(const h of hits){if(h.i<p)continue;out+=esc(text.slice(p,h.i));const nw=!(UI.glSeen&&UI.glSeen[h.k]);out+='<button type="button" class="gl'+(nw?' new':'')+'" data-a="gloss" data-t="'+esc(h.k)+'" aria-label="'+esc(text.substr(h.i,h.n))+': what does it mean?">'+esc(text.substr(h.i,h.n))+'</button>';p=h.i+h.n}
   return out+esc(text.slice(p))}
@@ -99,9 +103,9 @@ function showGloss(k){const g=GL[k];const el=$('#gdef');if(!g||!el)return;UI.glS
 function hideGloss(){const el=$('#gdef');if(el){el.hidden=true;el.innerHTML=''}}
 document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.dataset.more)UI.moreOpen=d.open},true);
 // ---------------------------------------------------------------- the guided first game: fixed deal, one thing per step
-// Deal: you lead the Heathbound Clans against the Gilded Court (easy), 4 rounds, seed 98 (found by a node search over seeds with the in-game names). With the suggested moves you meet the Court's Herald on
+// Deal: you lead the Heathbound Clans against the Gilded Court (Easy), 4 rounds, seed 23 (picked with the seed search in the clarity pass: round 1 has no elimination, one Clash lost, one won with Supporters on the contested Herald location, so the +1 and the steal happen).
 // Cairn Field and win there with your Heir and two Supporters: the +2, the Herald's +1 and the steal all happen in round 1.
-const GUIDED={seed:98,ai:9,faction:'clans',rival:'nobility'};
+const GUIDED={seed:23,lastNormal:0,ai:9,faction:'clans',rival:'nobility'};
 const isGuided=()=>!!(UI.cfg&&UI.cfg.guided&&!NET.on);
 const COACH_INFO=[
  {id:'goal',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'Your goal',text:()=>'Win by having the most Influence when round '+G.rounds+' ends. Influence is the score: the bar at the bottom shows you and the Gilded Court, both at 0.',hl:'#rivals'},
@@ -124,6 +128,8 @@ const BONUSK=['castle','wilderness','harvest','shrine','ossuary'];
 function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
   if(G.round===1){
     if(k==='bid')return byLabel(mv,'Sailing Hall');
+    if(k==='bidRes'){const takes=mv.filter(m=>m.t==='take');const pref=[11,13,17,5,46,51,14,39];for(const n of pref){const m=takes.find(x=>x.kc===n);if(m)return m}
+      return takes.find(m=>!/Tactic|Favour|Council|Lore|Govern|Journey|SETUP/.test(TB.kingdomInfo(m.kc).text))||null}
     if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return riv?mv.find(m=>m.loc===riv.herald):byLabel(mv,'Cairn Field')}
     if(k==='place'){const P=G.pl[s];const heir=P.hand.find(id=>cinfo(id).archetype==='heir');if(heir!=null)return mv.find(m=>m.id===heir&&m.r===1);const big=P.hand.slice().sort((a,b)=>cinfo(b).strength-cinfo(a).strength);
       if(big.length)return mv.find(m=>m.id===big[0]&&m.r===0)||mv.find(m=>m.id===big[0]);return null}
@@ -227,11 +233,11 @@ function sumLine(){const n=sv.np-1,R=({short:4,standard:5,extended:6}[sv.length]
 function setupHTML(){const ph=UI.phone;const k=TBKit.FACTIONS[FK[sv.faction]];
   const guide='<div class="guidebox"><p><b>First time?</b> The guided game teaches one step at a time: you lead the Heathbound Clans against the Gilded Court (Easy, for learning) for 4 rounds, about 15 minutes. Normal games start at Normal.</p></div>';
   const ft=firstTime();const gbtn='<button class="sbtn'+(ft?' big':'')+'" data-a="guided" data-start="guided"><b>'+(ft?'Guided first game':'Guided game')+'</b><span>'+(ft?'recommended: learn one step at a time':'learn step by step')+'</span></button>';
-  const go='<div class="sgo">'+(ft?gbtn:'')+'<button class="sbtn'+(ft?'':' big')+'" data-a="start" data-start="go"><b>Start the game</b><span>'+sumLine().replace(/<[^>]+>/g,'')+'</span></button><div class="sgrid3">'+(ft?'<button class="sbtn" data-a="rules"><b>How to play</b><span>the rules in short</span></button>':gbtn)+
+  const go='<div class="sgo">'+(ft?gbtn:'')+'<button class="sbtn'+(ft?'':' big')+'" data-a="start" data-start="go"><b>Start the game</b><span>'+esc(DD.FSHORT[sv.faction])+' vs '+(sv.np-1)+' computer'+(sv.np>2?'s':'')+' ('+sv.levels.slice(1,sv.np).map(l=>l==='easy'?'Easy':l==='hard'?'Hard':'Normal').filter((x,i,a)=>a.indexOf(x)===i).join('/')+') · '+({short:4,standard:5,extended:6}[sv.length])+' rounds</span></button><div class="sgrid3">'+(ft?'<button class="sbtn" data-a="rules"><b>How to play</b><span>the rules in short</span></button>':gbtn)+
     '<button class="sbtn" data-a="mode" data-v="hot" data-go="1" data-start="hot"><b>Hot-seat</b><span>'+sv.np+' people, one device</span></button>'+
     '<button class="sbtn" data-a="mode" data-v="watch" data-go="1" data-start="watch"><b>Watch</b><span>the computers play</span></button></div></div>';
-  const head='<div class="shead"><button class="sback" data-a="title" aria-label="Back to the title">‹</button><h2>Choose your faction</h2></div>';
-  if(ph)return head+(firstTime()?guide:'')+'<div class="ssum" style="--fc:'+k.main+'"><span class="fe">'+TBKit.token('influence',{faction:FK[sv.faction]},40).outerHTML+'</span><span class="sline">'+sumLine()+'</span><button class="btn" data-a="cfgopen">Configure</button></div><p class="ssub">'+esc(STORY[sv.faction].enjoy)+'</p>'+go;
+  const head='<div class="shead"><button class="sback" data-a="title" aria-label="Back to the title">‹</button><h2>'+(ph?'New game':'Choose your faction')+'</h2></div>';
+  if(ph)return head+(firstTime()?guide:'')+'<div class="ssum" style="--fc:'+k.main+'"><span class="fe">'+TBKit.token('influence',{faction:FK[sv.faction]},40).outerHTML+'</span><span class="sline">'+sumLine()+'</span><button class="btn" data-a="cfgopen" aria-label="Change faction, players, length and levels">Change</button></div><p class="ssub">'+esc(STORY[sv.faction].enjoy)+'</p>'+go;
   return head+'<p class="ssub">Each faction plays the same rules with its own cards and powers. Pick the story you like.</p>'+(firstTime()?guide:'')+'<div class="fgrid">'+FIDS.map(f=>facCard(f,f===sv.faction)).join('')+'</div>'+optionsHTML(false)+go}
 function cfgDialogHTML(){return '<div class="cfgdlg" role="dialog" aria-label="Configure the game"><div class="cfghead"><b>Configure</b><button class="btn" data-a="cfgclose">Done</button></div><div class="cfgbody"><div class="fgrid">'+FIDS.map(f=>facCard(f,f===sv.faction)).join('')+'</div>'+optionsHTML(false)+'</div><div class="cfgfoot"><button class="btn pri big" data-a="cfgclose">Done</button></div></div>'}
 function onlineSetupHTML(){const host=NET.on&&isHost(),plan=host?netPlan():null;
