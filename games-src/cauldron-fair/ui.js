@@ -60,7 +60,7 @@ const holdN = p => p.holdN != null ? p.holdN : p.hold.length;
 function seatState(p) {
   if (G.phase === 'over') return 'over';
   if (G.phase === 'prep') return p.q ? 'choose' : 'ready';
-  if (G.phase === 'brew') { if (p.st === 'done') return p.boom ? 'boom' : 'done'; if (p.st === 'post') return 'post'; return p.q ? 'choose' : 'draw'; }
+  if (G.phase === 'brew') { if (p.st === 'done') return p.boom ? 'boom' : 'done'; if (p.st === 'post') return 'post'; return p.q ? 'choose' : p.lock ? 'locked' : 'draw'; }
   return p.q ? 'choose' : 'wait';
 }
 function isMine(s) { const v = viewSeat(); return v >= 0 && s === v; }
@@ -119,13 +119,15 @@ const QINFO = {
   gift: ['Spilled Brew', () => 'A neighbour\'s cauldron exploded. Take any 2-chip.'],
   g2: ['Mossback gift', () => 'Choose the free chip this green chip earns.'],
   g4: ['Drip moss', (p, d) => 'Pay 1 ruby per green chip for a droplet step (up to ' + d.max + ').'],
-  p2: ['Trade wind', () => 'Hand in purple chips for rewards. Each reward once.'],
-  p4: ['Upgrade sigh', () => 'Swap one chip of your pot for a bigger one of the same colour.'],
+  p1: ['Gentle sigh', d => 'You may take any of the rewards up to your ' + d.n + ' purple chips. Pass up the best one if the lower one suits you.'],
+  g3: ['Lucky-seven moss', d => 'Your white chips total exactly 7. Slide the last chip ' + d.s + ' spaces, or stay and keep the ruby on your space.'],
+  p2: ['Trade wind', () => 'Hand in purple chips for rewards (they are discarded). Each reward once; you may keep your chips instead.'],
+  p4: ['Upgrade sigh', () => 'Swap one chip of your pot for a bigger one of the same colour. The new chip goes into your bag; today your scoring space stays as it is.'],
   de: ['Your cauldron exploded', (p, d) => 'Choose: take the ' + d.vp + ' victory point' + (d.vp === 1 ? '' : 's') + ' on your space, or shop with its ' + d.coins + ' coins.'],
   shop: ['The fair stalls', (p, d) => 'You have ' + d.coins + ' coins. Buy one or two chips of different colours.'],
   ruby: ['Rubies', () => 'Spend 2 rubies for a droplet step or to refill your flask, or keep them.']
 };
-const EVAL_Q = { gift: 1, g2: 1, g4: 1, p2: 1, p4: 1, de: 1, shop: 1, ruby: 1 };
+const EVAL_Q = { gift: 1, g2: 1, g4: 1, p1: 1, g3: 1, p2: 1, p4: 1, de: 1, shop: 1, ruby: 1 };
 function qKeys(m, p) {   // chips to show on an option button
   const out = [];
   if (m.items) m.items.forEach(k => out.push(k));
@@ -148,7 +150,8 @@ function promptInfo() {
   if (hotSeat() && UI.holder < 0) return { text: 'Pass the device.' };
   if (p.q && !EVAL_Q[p.q.h]) return { text: QINFO[p.q.h][0] + ': ' + QINFO[p.q.h][1](p, p.q.d), mine: true };
   if (G.phase === 'brew') {
-    if (p.st === 'draw') { const rk = CF.risk(G, v); return { text: p.pot.length ? 'Draw another chip, or stop and keep your score.' : 'Tap Draw to pull your first chip from the bag.', mine: true }; }
+    if (p.st === 'draw' && p.lock) return { text: 'You have decided. ' + (wn.length ? 'Waiting for ' + nameList(G.players.filter(q => q.st === 'draw' && !q.lock && !isMine(q.seat)).map(q => q.name)) + ', then everybody reveals together (Stir!).' : 'Revealing...') };
+    if (p.st === 'draw') { const rk = CF.risk(G, v); return { text: (G.round === 9 ? 'Last day: choose Draw or Stop. Nobody sees your choice until everybody has chosen. ' : '') + (p.pot.length ? 'Draw another chip, or stop and keep your score.' : 'Tap Draw to pull your first chip from the bag.'), mine: true }; }
     return { text: (p.boom ? 'Your cauldron exploded. ' : 'You stopped. ') + (wn.length ? 'Waiting for ' + nameList(wn) + '...' : 'Everyone is done.') };
   }
   if (G.phase === 'prep') return { text: wn.length ? 'Waiting for ' + nameList(wn) + ' to choose...' : 'The day begins.' };
@@ -157,7 +160,7 @@ function promptInfo() {
 }
 function placePrompt() { }
 function stateLabel(p) {
-  switch (seatState(p)) { case 'draw': return 'drawing'; case 'done': return 'stopped'; case 'boom': return 'exploded'; case 'post': return 'finishing'; case 'choose': return 'choosing'; case 'ready': return 'ready'; case 'wait': return 'waiting'; default: return ''; }
+  switch (seatState(p)) { case 'draw': return 'drawing'; case 'locked': return 'decided'; case 'done': return 'stopped'; case 'boom': return 'exploded'; case 'post': return 'finishing'; case 'choose': return 'choosing'; case 'ready': return 'ready'; case 'wait': return 'waiting'; default: return ''; }
 }
 function seatCls(p) { const s = seatState(p); return s === 'draw' || s === 'choose' || s === 'post' ? 'dr' : s === 'boom' ? 'bm' : s === 'done' ? 'dn' : ''; }
 function potOpts(p, mini) {

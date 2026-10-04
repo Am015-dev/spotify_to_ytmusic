@@ -3165,7 +3165,7 @@ var FORTUNE = [
 ];
 
 // ---- bonus die: six faces (one repeated; which one is repeated is a guess, see rules-notes)
-var DIE = ['vp1', 'vp2', 'ruby', 'ruby', 'drop', 'orange'];
+var DIE = ['vp1', 'vp1', 'vp2', 'ruby', 'drop', 'orange'];   // guessed: the rules list five outcomes for six faces; the fan tool repeats 1 VP
 var DIE_TEXT = { vp1: '1 victory point', vp2: '2 victory points', ruby: '1 ruby', drop: 'droplet one space', orange: 'a Marrow chip in your bag' };
 
 // ---- the four fair-goers. Colours are the player colours of the box (green, yellow, blue, red).
@@ -3270,7 +3270,7 @@ function newGame(o) {
 // ---------- round start ----------
 function resetSeat(G, p) {
   shuffleP(p, p.bag);
-  p.pot = []; p.hold = []; p.q = null; p.postq = []; p.acts = []; p.st = 'draw'; p.boom = false; p.prot = false; p.res = null; p.rat = 0; p.ratTails = 0;
+  p.pot = []; p.hold = []; p.q = null; p.lock = false; p.h9 = null; p.postq = []; p.acts = []; p.st = 'draw'; p.boom = false; p.prot = false; p.res = null; p.rat = 0; p.ratTails = 0;
   p.f = { dbl: false, safe: 0, doUsed: false, frOpen: false, frUsed: false, canFlask: false, whites: 0, spill: false };
 }
 function startRound(G) {
@@ -3281,14 +3281,16 @@ function startRound(G) {
   const card = FORT[id]; use(G, 'fortune_' + id);
   ev(G, { t: 'round', round: G.round, start: G.start }); ev(G, { t: 'fortune', id });
   lg(G, 'Day ' + G.round + ' of 9. ' + pn(G, G.start) + ' turns up the fortune card "' + card.name + '": ' + card.text);
-  if (G.round >= 2) {
-    const lead = leaderVp(G);
-    for (const p of G.players) {
-      const t = p.vp < lead ? D.ratTails(p.vp, lead) : 0; p.ratTails = t;
-      if (t > 0) { p.rat = Math.min(LASTC, p.droplet + t); ev(G, { t: 'rat', seat: p.seat, tails: t, pos: p.rat }); lg(G, nm(G, p) + ' trails by ' + t + ' rat tail' + (t > 1 ? 's' : '') + ': the rat stone starts ' + t + ' space' + (t > 1 ? 's' : '') + ' ahead.'); use(G, 'rat'); }
-    }
-  }
+  if (id !== 'clear') setRats(G);          // Clear the Pods gives points first: the rat tails are counted after the answers (see H 'clear')
   purple(G, id);
+}
+function setRats(G) {
+  if (G.round < 2) return;
+  const lead = leaderVp(G);
+  for (const p of G.players) {
+    const t = p.vp < lead ? D.ratTails(p.vp, lead) : 0; p.ratTails = t;
+    if (t > 0) { p.rat = Math.min(LASTC, p.droplet + t); ev(G, { t: 'rat', seat: p.seat, tails: t, pos: p.rat }); lg(G, nm(G, p) + ' trails by ' + t + ' rat tail' + (t > 1 ? 's' : '') + ': the rat stone starts ' + t + ' space' + (t > 1 ? 's' : '') + ' ahead.'); use(G, 'rat'); }
+  }
 }
 
 // ---------- purple fortune cards (and the questions they raise) ----------
@@ -3319,7 +3321,7 @@ function purple(G, id) {
     case 'haggle': for (const p of P) {
       const ch = []; const n = Math.min(4, p.bag.length); for (let i = 0; i < n; i++) ch.push(p.bag.pop()); p.hold = ch;
       ev(G, { t: 'peek', seat: p.seat, chips: ch.map(c => ({ i: c.i, c: c.c, v: c.v })) });
-      if (upgrades(G, p.hold).length) ask(G, p, 'haggle'); else { give(G, p, 'G1', true); lg(G, nm(G, p) + ' cannot swap anything and takes a Mossback 1.'); p.hold.forEach(c => bagInsert(p, c)); p.hold = []; }
+      if (upgrades(G, p.hold, true).length) ask(G, p, 'haggle'); else { give(G, p, 'G1', true); lg(G, nm(G, p) + ' cannot swap anything and takes a Mossback 1.'); p.hold.forEach(c => bagInsert(p, c)); p.hold = []; }
     } break;
     default: break;
   }
@@ -3392,7 +3394,7 @@ function explode(G, p, covered) {
 function enterPost(G, p) {
   if (p.st === 'post' || p.st === 'done') return;
   p.st = 'post'; p.postq = [];
-  if (G.fcard === 'doover' && !p.f.doUsed && p.pot.length === 5) p.postq.push({ h: 'restart' });
+  if (G.fcard === 'doover' && !p.f.doUsed && p.pot.length === 5 && !p.boom) p.postq.push({ h: 'restart' });   // an exploding 5th chip ends the day: no do-over
   if (G.fcard === 'peek' && !p.boom) p.postq.push({ h: 'peek' });
   for (const c of p.side) p.postq.push({ h: 'side', d: { id: c.i } });
   ev(G, { t: 'stop', seat: p.seat, boom: p.boom });
@@ -3441,6 +3443,7 @@ function moves(G, seat) {
   if (!G || !Number.isInteger(seat) || seat < 0 || seat >= G.np || G.phase === 'over') return [];
   const p = G.players[seat], out = [];
   if (G.phase === 'brew' && p.st === 'draw' && !p.q) {
+    if (p.lock) return out;           // day 9: already committed, waiting for the others (Stir!)
     const f = p.f;
     if (p.bag.length > 0) out.push(L({ t: 'draw' }, 'Draw a chip'));
     if (p.pot.length > 0) out.push(L({ t: 'stop' }, 'Stop here'));
@@ -3464,7 +3467,7 @@ function moves(G, seat) {
     case 'bribe': for (let n = 0; n <= d.max; n++) out.push(L({ t: 'bribe', n }, n ? 'Move the rat stone back ' + n + ' for ' + n + ' ruby' + (n > 1 ? 'ies' : '') : 'Keep the rat stone')); break;
     case 'bounty': for (const k of chipsOfValue(G, 4)) out.push(L({ t: 'bounty', o: k }, 'Take a ' + nameOf(k))); out.push(L({ t: 'bounty', o: 'vp' }, 'Score ' + bountyVp(G, p) + ' point' + (bountyVp(G, p) === 1 ? '' : 's') + ' for the rat tails')); break;
     case 'fork': out.push(L({ t: 'fork', o: 'drop' }, 'Droplet 2 spaces')); if (bookOut(G, 'P') && G.supply.P1 > 0) out.push(L({ t: 'fork', o: 'P1' }, 'Take a Dusk Sigh')); break;
-    case 'haggle': out.push(L({ t: 'haggle', idx: -1 }, 'Keep all as they are')); for (const u of upgrades(G, p.hold)) out.push(L({ t: 'haggle', idx: u.idx }, 'Swap the ' + nameOf(u.from) + ' for a ' + nameOf(u.to))); break;
+    case 'haggle': out.push(L({ t: 'haggle', idx: -1 }, 'Keep all as they are')); for (const u of upgrades(G, p.hold, true)) out.push(L({ t: 'haggle', idx: u.idx }, 'Swap the ' + nameOf(u.from) + ' for a ' + nameOf(u.to))); break;
     case 'crow': out.push(L({ t: 'crow', idx: -1 }, 'Place none, put them all back')); p.hold.forEach((c, i) => out.push(L({ t: 'crow', idx: i }, 'Place the ' + nameOf(ck(c))))); break;
     case 'y1': out.push(L({ t: 'y1', yes: true }, 'Put the white chip back in the bag'), L({ t: 'y1', yes: false }, 'Leave it')); break;
     case 'restart': out.push(L({ t: 'restart', yes: true }, 'Tip everything back and start again'), L({ t: 'restart', yes: false }, 'Keep my pot')); break;
@@ -3476,6 +3479,8 @@ function moves(G, seat) {
     case 'gift': for (const k of chipsOfValue(G, 2)) out.push(L({ t: 'gift', o: k }, 'Take a ' + nameOf(k))); break;
     case 'g2': for (const k of d.opts) out.push(L({ t: 'g2', o: k }, 'Take a ' + nameOf(k))); out.push(L({ t: 'g2', o: '' }, 'Take nothing')); break;
     case 'g4': for (let n = 0; n <= d.max; n++) out.push(L({ t: 'g4', n }, n ? 'Pay ' + n + ' ruby' + (n > 1 ? 'ies' : '') + ' for ' + n + ' droplet step' + (n > 1 ? 's' : '') : 'Pay nothing')); break;
+    case 'p1': for (let k = d.n; k >= 1; k--) out.push(L({ t: 'p1', k }, k === 1 ? 'Gentle sigh, lowest: 1 point' : k === 2 ? 'Gentle sigh, middle: 1 point and a ruby' : 'Gentle sigh, best: 2 points and a droplet step')); break;
+    case 'g3': out.push(L({ t: 'g3', yes: true }, 'Slide the last chip ' + d.s + ' spaces'), L({ t: 'g3', yes: false }, 'Stay (keep the ruby on this space)')); break;
     case 'p2': for (const s of d.sets) out.push(L({ t: 'p2', set: s }, s.length ? 'Trade ' + s.map(k => k + ' purple').join(' + ') : 'Keep my purples')); break;
     case 'p4': out.push(L({ t: 'p4', from: '', to: '' }, 'No upgrade')); for (const u of d.opts) out.push(L({ t: 'p4', from: u.from, to: u.to }, 'Swap a ' + nameOf(u.from) + ' for a ' + nameOf(u.to))); break;
     case 'de': out.push(L({ t: 'de', o: 'vp' }, 'Take ' + d.vp + ' victory point' + (d.vp === 1 ? '' : 's')), L({ t: 'de', o: 'buy' }, 'Go shopping with ' + d.coins + ' coins')); break;
@@ -3493,12 +3498,35 @@ function apply(G, seat, mv) {
   if (!Number.isInteger(seat) || seat < 0 || seat >= G.np) return { ok: false, error: 'bad seat' };
   if (!mv || typeof mv !== 'object' || typeof mv.t !== 'string') return { ok: false, error: 'bad move' };
   const p = G.players[seat];
+  // the last day: every cauldron secretly commits to "draw" or "stop", then all are revealed together ("Stir!")
+  if (G.round === D.rounds && G.phase === 'brew' && p.st === 'draw' && !p.q && (mv.t === 'draw' || mv.t === 'stop')) {
+    if (p.lock) return { ok: false, error: 'you have already chosen; wait for the others' };
+    if (!moves(G, seat).some(x => x.t === mv.t)) return { ok: false, error: mv.t === 'stop' ? 'draw at least one chip first' : 'the bag is empty' };
+    p.lock = true; p.h9 = mv.t; p.ver++; ev(G, { t: 'lock', seat }); lg(G, nm(G, p) + ' has decided.');
+    stir(G); adv(G); return { ok: true };
+  }
+  if (p.lock && G.phase === 'brew') return { ok: false, error: 'you have already chosen; wait for the others' };
   const err = H(G, p, mv);
   if (err) return { ok: false, error: err };
   p.ver++;
   settle(G, p);
+  stir(G);
   adv(G);
   return { ok: true };
+}
+// day 9: when every cauldron that can still draw has committed, reveal all choices at once, starting with the start player
+function stir(G) {
+  if (G.round !== D.rounds || G.phase !== 'brew') return;
+  const P = G.players, ready = P.filter(p => p.lock);
+  if (!ready.length) return;
+  if (P.some(p => p.st === 'draw' && !p.lock && (p.q || moves(G, p.seat).some(x => x.t === 'draw' || x.t === 'stop')))) return;
+  lg(G, 'Stir! Everybody shows their choice.'); ev(G, { t: 'stir' }); use(G, 'stir');
+  for (let i = 0; i < G.np; i++) {
+    const p = P[(G.start + i) % G.np]; if (!p.lock) continue;
+    const t = p.h9; p.lock = false; p.h9 = null;
+    if (p.st !== 'draw' || p.q) continue;
+    const err = H(G, p, { t }); if (!err) settle(G, p);
+  }
 }
 // returns an error string, or null when the move was legal and has been performed
 function H(G, p, m) {
@@ -3555,7 +3583,7 @@ function H(G, p, m) {
       if (m.o === 'vp') addVp(G, p, 4, 'Clear the Pods');
       else if (m.o === 'white') { const i = p.bag.findIndex(c => c.c === 'W' && c.v === 1); if (i < 0) return 'no white 1 in the bag'; putBack(G, p.bag.splice(i, 1)[0]); lg(G, nm(G, p) + ' removes a white 1 from the bag.'); }
       else return 'bad choice';
-      p.q = null; break;
+      p.q = null; if (G.phase === 'prep' && !G.players.some(x => x.q && x.q.h === 'clear')) setRats(G); break;
     }
     case 'bribe': {
       if (!Number.isInteger(m.n) || m.n < 0 || m.n > d.max) return 'bad number';
@@ -3576,7 +3604,7 @@ function H(G, p, m) {
     }
     case 'haggle': {
       if (!Number.isInteger(m.idx) || m.idx < -1 || m.idx >= p.hold.length) return 'bad index';
-      if (m.idx >= 0) { const u = upgrades(G, p.hold).find(x => x.idx === m.idx); if (!u) return 'cannot upgrade that'; const old = p.hold[m.idx]; putBack(G, old); p.hold[m.idx] = take(G, u.to); lg(G, nm(G, p) + ' swaps a ' + nameOf(u.from) + ' for a ' + nameOf(u.to) + '.'); ev(G, { t: 'gainChip', seat: p.seat, chip: { i: p.hold[m.idx].i, c: p.hold[m.idx].c, v: p.hold[m.idx].v } }); }
+      if (m.idx >= 0) { const u = upgrades(G, p.hold, true).find(x => x.idx === m.idx); if (!u) return 'cannot upgrade that'; const old = p.hold[m.idx]; putBack(G, old); p.hold[m.idx] = take(G, u.to); lg(G, nm(G, p) + ' swaps a ' + nameOf(u.from) + ' for a ' + nameOf(u.to) + '.'); ev(G, { t: 'gainChip', seat: p.seat, chip: { i: p.hold[m.idx].i, c: p.hold[m.idx].c, v: p.hold[m.idx].v } }); }
       returnHold(G, p); p.q = null; break;
     }
     case 'crow': case 'peek': {
@@ -3609,10 +3637,16 @@ function H(G, p, m) {
       if (!Number.isInteger(m.n) || m.n < 0 || m.n > d.max) return 'bad number';
       if (m.n) { p.rubies -= m.n; drop(G, p, m.n, 'Drip moss'); } p.q = null; break;
     }
+    case 'p1': { if (!Number.isInteger(m.k) || m.k < 1 || m.k > d.n) return 'bad choice'; p1reward(G, p, m.k); p.q = null; break; }
+    case 'g3': { if (m.yes === true) slideLast(G, p, d.s); else if (m.yes !== false) return 'bad choice'; p.q = null; break; }
     case 'p2': {
       const s = m.set; if (!Array.isArray(s)) return 'bad set';
       const ok = d.sets.some(x => JSON.stringify(x) === JSON.stringify(s)); if (!ok) return 'bad set';
-      for (const k of s) p2reward(G, p, k); p.q = null; break;
+      let n = s.reduce((x, y) => x + y, 0);
+      for (const k of s) p2reward(G, p, k);
+      for (let i = p.pot.length - 1; i >= 0 && n > 0; i--) if (p.pot[i].c === 'P') { putBack(G, p.pot.splice(i, 1)[0]); n--; }     // the handed-in purple chips are discarded (the scoring space is already fixed)
+      if (s.length) lg(G, nm(G, p) + ' hands in ' + s.reduce((x, y) => x + y, 0) + ' purple chip' + (s.reduce((x, y) => x + y, 0) > 1 ? 's' : '') + '.');
+      p.q = null; break;
     }
     case 'p4': {
       if (m.from === '' && m.to === '') { p.q = null; break; }
@@ -3655,6 +3689,7 @@ function placeChipPost(G, p, chip) {
   chip.pos = Math.min(LASTC, lastPos(p) + chip.v); p.pot.push(chip);
   ev(G, { t: 'place', seat: p.seat, chip: { i: chip.i, c: chip.c, v: chip.v }, pos: chip.pos, mv: chip.v, how: 'side', ruby: !!D.RUBY[chip.pos] });
 }
+function p1reward(G, p, k) { if (k === 1) addVp(G, p, 1, 'Gentle sigh'); else if (k === 2) { addVp(G, p, 1, 'Gentle sigh'); addRuby(G, p, 1, 'Gentle sigh'); } else if (k === 3) { addVp(G, p, 2, 'Gentle sigh'); drop(G, p, 1, 'Gentle sigh'); } }
 function p2reward(G, p, k) {
   if (k === 1) { give(G, p, 'K1', false); addVp(G, p, 1, 'Trade wind'); addRuby(G, p, 1, 'Trade wind'); }
   else if (k === 2) { give(G, p, 'G1', false); give(G, p, 'B2', false); addVp(G, p, 3, 'Trade wind'); drop(G, p, 1, 'Trade wind'); }
@@ -3698,7 +3733,7 @@ function evalStep(G) {
     case 'die': {
       const cand = P.filter(p => !p.boom);
       if (cand.length) { const w = bestTie(G, cand); for (const p of w) { p.res.rolled = true; rollDie(G, p, 'furthest'); } use(G, 'dieRound'); }
-      E.step = 'acts'; E.i = 0; for (const p of P) p.acts = buildActs(G, p); return 'go';
+      E.step = 'acts'; E.i = 0; for (const p of P) { p.acts = buildActs(G, p); p.res.space = spaceOf(p); p.res.pos = lastPos(p); } return 'go';   // the scoring space is fixed now: only the green set 3 slide may move it
     }
     case 'acts': {
       for (; E.i < order.length; E.i++) {
@@ -3709,7 +3744,6 @@ function evalStep(G) {
     }
     case 'ruby': {
       for (const p of P) {
-        p.res.space = spaceOf(p); p.res.pos = lastPos(p);
         if (D.RUBY[p.res.space]) { addRuby(G, p, 1, 'ruby space'); p.res.ruby++; use(G, 'rubySpace'); if (G.fcard === 'spark') { addRuby(G, p, 1, 'Red Spark'); p.res.ruby++; } }
       }
       E.step = 'de'; for (const p of P) { const s = p.res.space; p.res.coins = D.COINS[s]; p.res.vp = D.VP[s]; p.res.spoon = s === SPOON; if (s === SPOON) use(G, 'spoon'); }
@@ -3780,11 +3814,15 @@ function runActs(G, p) {
       p.gq = null; p.acts.shift(); continue;
     }
     if (a === 'g3') {
-      p.acts.shift(); if (whiteSum(p) === 7) { const s = p.pot.filter(c => c.c === 'G').reduce((x, c) => x + c.v, 0); const l = p.pot[p.pot.length - 1]; l.pos = Math.min(LASTC, l.pos + s); ev(G, { t: 'slide', seat: p.seat, chip: l.i, pos: l.pos }); lg(G, nm(G, p) + ' slides the last chip ' + s + ' spaces (Lucky-seven moss).'); use(G, 'g3hit'); }
+      p.acts.shift(); if (whiteSum(p) === 7) {
+        const s = p.pot.filter(c => c.c === 'G').reduce((x, c) => x + c.v, 0), l = p.pot[p.pot.length - 1], np2 = Math.min(LASTC, l.pos + s);
+        if (np2 !== l.pos && D.RUBY[p.res.space] && !D.RUBY[Math.min(np2 + 1, SPOON)]) { ask(G, p, 'g3', { s, to: np2 }); return false; }   // sliding would lose the ruby on this space: may be declined
+        slideLast(G, p, s);
+      }
       continue;
     }
     if (a === 'g4') { p.acts.shift(); const n = lastTwo(p).filter(c => c.c === 'G').length, mx = Math.min(n, p.rubies); if (mx > 0) { ask(G, p, 'g4', { max: mx }); return false; } continue; }
-    if (a === 'p1') { p.acts.shift(); const n = count(p.pot, 'P'); if (n === 1) addVp(G, p, 1, 'Gentle sigh'); else if (n === 2) { addVp(G, p, 1, 'Gentle sigh'); addRuby(G, p, 1, 'Gentle sigh'); } else if (n >= 3) { addVp(G, p, 2, 'Gentle sigh'); drop(G, p, 1, 'Gentle sigh'); } continue; }
+    if (a === 'p1') { p.acts.shift(); const n = count(p.pot, 'P'); if (n >= 2) { ask(G, p, 'p1', { n: Math.min(3, n) }); return false; } if (n === 1) p1reward(G, p, 1); continue; }
     if (a === 'p2') {
       p.acts.shift(); const n = count(p.pot, 'P'), sets = [[]];
       const subs = [[1], [2], [3], [1, 2], [1, 3], [2, 3], [1, 2, 3]];
@@ -3802,6 +3840,10 @@ function runActs(G, p) {
     p.acts.shift();
   }
   return true;
+}
+function slideLast(G, p, s) {
+  const l = p.pot[p.pot.length - 1]; l.pos = Math.min(LASTC, l.pos + s); p.res.pos = l.pos; p.res.space = Math.min(l.pos + 1, SPOON);
+  ev(G, { t: 'slide', seat: p.seat, chip: l.i, pos: l.pos }); lg(G, nm(G, p) + ' slides the last chip ' + s + ' spaces (Lucky-seven moss).'); use(G, 'g3hit');
 }
 function rewardOk(G, k) { const need = k === 1 ? ['K1'] : k === 2 ? ['G1', 'B2'] : ['Y4']; return need.every(x => G.supply[x] > 0) || true; }
 function blackAct(G, p) {
@@ -3842,7 +3884,7 @@ function finish(G) {
 // ---------- reports ----------
 function pending(G) {
   if (!G || G.phase === 'over') return [];
-  if (G.phase === 'brew') return G.players.filter(p => p.st !== 'done').map(p => p.seat);
+  if (G.phase === 'brew') return G.players.filter(p => p.st !== 'done' && !p.lock).map(p => p.seat);
   return G.players.filter(p => p.q).map(p => p.seat);
 }
 function sideToAct(G) { const p = pending(G); return p.length ? p[0] : -1; }
@@ -3875,7 +3917,7 @@ function checkInvariants(G) {
 function stripView(G, seat) {
   const v = clone(G); v.seed = 0; v.rng = 0; v.fdeckN = v.fdeck.length; v.fdeck = [];
   for (const p of v.players) {
-    p.rng = 0;
+    p.rng = 0; delete p.h9;
     if (p.seat === seat) { p.bag.sort((a, b) => a.c < b.c ? -1 : a.c > b.c ? 1 : a.v - b.v || a.i - b.i); }
     else { p.bagN = p.bag.length; p.bag = new Array(p.bag.length).fill(0); p.holdN = p.hold.length; p.hold = new Array(p.hold.length).fill(0); }
   }
@@ -4115,7 +4157,7 @@ function choose(G, seat, level) {
     case 'bribe': { const spaceV = 0.3 + CW[r] * 0.9; return bestBy(legal, m => m.n * (RW[r] - 0 * spaceV) - m.n * spaceV * 0.6 * 0 + (m.n ? 0 : 0) + (RW[r] > spaceV ? m.n : -m.n * 0.01)); }
     case 'bounty': return bestBy(legal, m => m.o === 'vp' ? (p.ratTails || 0) : chipVal(G, p, m.o, LV.base));
     case 'fork': return bestBy(legal, m => m.o === 'drop' ? 2 * DW[r] : chipVal(G, p, m.o, LV.base) * 1.2);
-    case 'haggle': return bestBy(legal, m => m.idx < 0 ? 0 : chipVal(G, p, p.hold[m.idx].c + (CF.upgrades(G, p.hold).find(u => u.idx === m.idx).to.slice(1)), LV.base) - chipVal(G, p, ck(p.hold[m.idx]), LV.base) - (p.hold[m.idx].c === 'W' ? 5 : 0));
+    case 'haggle': return bestBy(legal, m => m.idx < 0 ? 0 : chipVal(G, p, p.hold[m.idx].c + (CF.upgrades(G, p.hold, true).find(u => u.idx === m.idx).to.slice(1)), LV.base) - chipVal(G, p, ck(p.hold[m.idx]), LV.base) - (p.hold[m.idx].c === 'W' ? 5 : 0));
     case 'crow': case 'peek': {
       const S = S0(); S.counts = Object.assign({}, S.counts); const dep = Math.max(depth - 1, 0);
       const bagCounts = S.counts;
@@ -4135,6 +4177,8 @@ function choose(G, seat, level) {
     case 'gift': return bestBy(legal, m => chipVal(G, p, m.o, LV.base));
     case 'g2': return bestBy(legal, m => m.o === '' ? -1 : chipVal(G, p, m.o, LV.base));
     case 'g4': return bestBy(legal, m => m.n * (DW[r] - 2 * RW[r] * 0.5 - 0.2 * 0) * (DW[r] > RW[r] * 1.2 ? 1 : -1) - 0.0001 * m.n);
+    case 'p1': return bestBy(legal, m => m.k === 1 ? 1 : m.k === 2 ? 1 + RW[r] : 2 + DW[r]);
+    case 'g3': { const D0 = CF.DATA, s0 = p.res.space, s1 = Math.min(d.to + 1, D0.SPOON); return legal.find(m => m.yes === ((D0.COINS[s1] - D0.COINS[s0]) * CW[r] + (D0.VP[s1] - D0.VP[s0]) > RW[r])) || legal[0]; }
     case 'p2': return bestBy(legal, m => m.set.reduce((a, k) => a + (k === 1 ? 1 + RW[r] + 0.6 : k === 2 ? 3 + DW[r] + 2.2 : 6 + RW[r] + 2 * DW[r] + 3.2), 0));
     case 'p4': return bestBy(legal, m => m.from === '' ? 0 : chipVal(G, p, m.to, LV.base) - chipVal(G, p, m.from, LV.base) + 0.3);
     case 'de': {
@@ -4293,7 +4337,7 @@ var CF_CREDITS = "<!-- Credits snippet for Cauldron Fair. Generated 2026-10-04. 
 // copy answers CF.moves(seat) / CF.AI.choose for its own seat the same as the real state (tools: net-strip-test.js).
 // seat -1 = a watcher (every bag hidden). Pure function: no DOM.
 const NET_TOP = ['v', 'np', 'round', 'phase', 'start', 'sets', 'supply', 'fdeckN', 'fcard', 'fdisc', 'logN', 'evN', 'hist', 'rep', 'over', 'winner', 'winners', 'winText', 'ev', 'shopSeat', 'opts'];
-const NET_PL = ['seat', 'name', 'ai', 'char', 'vp', 'rubies', 'droplet', 'flask', 'rat', 'ratTails', 'bag', 'bagN', 'pot', 'side', 'hold', 'holdN', 'newChips', 'q', 'postq', 'acts', 'st', 'boom', 'prot', 'f', 'res', 'last9', 'ver', 'endVp'];
+const NET_PL = ['seat', 'name', 'ai', 'char', 'vp', 'rubies', 'droplet', 'flask', 'rat', 'ratTails', 'bag', 'bagN', 'pot', 'side', 'hold', 'holdN', 'newChips', 'q', 'postq', 'acts', 'st', 'boom', 'prot', 'f', 'res', 'last9', 'ver', 'endVp', 'lock'];
 function netStrip(g, seat) {
   const v = CF.stripView(g, Number.isInteger(seat) && seat >= 0 && seat < g.np ? seat : -1);
   const cp = o => o == null ? o : JSON.parse(JSON.stringify(o));
@@ -4950,7 +4994,7 @@ const holdN = p => p.holdN != null ? p.holdN : p.hold.length;
 function seatState(p) {
   if (G.phase === 'over') return 'over';
   if (G.phase === 'prep') return p.q ? 'choose' : 'ready';
-  if (G.phase === 'brew') { if (p.st === 'done') return p.boom ? 'boom' : 'done'; if (p.st === 'post') return 'post'; return p.q ? 'choose' : 'draw'; }
+  if (G.phase === 'brew') { if (p.st === 'done') return p.boom ? 'boom' : 'done'; if (p.st === 'post') return 'post'; return p.q ? 'choose' : p.lock ? 'locked' : 'draw'; }
   return p.q ? 'choose' : 'wait';
 }
 function isMine(s) { const v = viewSeat(); return v >= 0 && s === v; }
@@ -5009,13 +5053,15 @@ const QINFO = {
   gift: ['Spilled Brew', () => 'A neighbour\'s cauldron exploded. Take any 2-chip.'],
   g2: ['Mossback gift', () => 'Choose the free chip this green chip earns.'],
   g4: ['Drip moss', (p, d) => 'Pay 1 ruby per green chip for a droplet step (up to ' + d.max + ').'],
-  p2: ['Trade wind', () => 'Hand in purple chips for rewards. Each reward once.'],
-  p4: ['Upgrade sigh', () => 'Swap one chip of your pot for a bigger one of the same colour.'],
+  p1: ['Gentle sigh', d => 'You may take any of the rewards up to your ' + d.n + ' purple chips. Pass up the best one if the lower one suits you.'],
+  g3: ['Lucky-seven moss', d => 'Your white chips total exactly 7. Slide the last chip ' + d.s + ' spaces, or stay and keep the ruby on your space.'],
+  p2: ['Trade wind', () => 'Hand in purple chips for rewards (they are discarded). Each reward once; you may keep your chips instead.'],
+  p4: ['Upgrade sigh', () => 'Swap one chip of your pot for a bigger one of the same colour. The new chip goes into your bag; today your scoring space stays as it is.'],
   de: ['Your cauldron exploded', (p, d) => 'Choose: take the ' + d.vp + ' victory point' + (d.vp === 1 ? '' : 's') + ' on your space, or shop with its ' + d.coins + ' coins.'],
   shop: ['The fair stalls', (p, d) => 'You have ' + d.coins + ' coins. Buy one or two chips of different colours.'],
   ruby: ['Rubies', () => 'Spend 2 rubies for a droplet step or to refill your flask, or keep them.']
 };
-const EVAL_Q = { gift: 1, g2: 1, g4: 1, p2: 1, p4: 1, de: 1, shop: 1, ruby: 1 };
+const EVAL_Q = { gift: 1, g2: 1, g4: 1, p1: 1, g3: 1, p2: 1, p4: 1, de: 1, shop: 1, ruby: 1 };
 function qKeys(m, p) {   // chips to show on an option button
   const out = [];
   if (m.items) m.items.forEach(k => out.push(k));
@@ -5038,7 +5084,8 @@ function promptInfo() {
   if (hotSeat() && UI.holder < 0) return { text: 'Pass the device.' };
   if (p.q && !EVAL_Q[p.q.h]) return { text: QINFO[p.q.h][0] + ': ' + QINFO[p.q.h][1](p, p.q.d), mine: true };
   if (G.phase === 'brew') {
-    if (p.st === 'draw') { const rk = CF.risk(G, v); return { text: p.pot.length ? 'Draw another chip, or stop and keep your score.' : 'Tap Draw to pull your first chip from the bag.', mine: true }; }
+    if (p.st === 'draw' && p.lock) return { text: 'You have decided. ' + (wn.length ? 'Waiting for ' + nameList(G.players.filter(q => q.st === 'draw' && !q.lock && !isMine(q.seat)).map(q => q.name)) + ', then everybody reveals together (Stir!).' : 'Revealing...') };
+    if (p.st === 'draw') { const rk = CF.risk(G, v); return { text: (G.round === 9 ? 'Last day: choose Draw or Stop. Nobody sees your choice until everybody has chosen. ' : '') + (p.pot.length ? 'Draw another chip, or stop and keep your score.' : 'Tap Draw to pull your first chip from the bag.'), mine: true }; }
     return { text: (p.boom ? 'Your cauldron exploded. ' : 'You stopped. ') + (wn.length ? 'Waiting for ' + nameList(wn) + '...' : 'Everyone is done.') };
   }
   if (G.phase === 'prep') return { text: wn.length ? 'Waiting for ' + nameList(wn) + ' to choose...' : 'The day begins.' };
@@ -5047,7 +5094,7 @@ function promptInfo() {
 }
 function placePrompt() { }
 function stateLabel(p) {
-  switch (seatState(p)) { case 'draw': return 'drawing'; case 'done': return 'stopped'; case 'boom': return 'exploded'; case 'post': return 'finishing'; case 'choose': return 'choosing'; case 'ready': return 'ready'; case 'wait': return 'waiting'; default: return ''; }
+  switch (seatState(p)) { case 'draw': return 'drawing'; case 'locked': return 'decided'; case 'done': return 'stopped'; case 'boom': return 'exploded'; case 'post': return 'finishing'; case 'choose': return 'choosing'; case 'ready': return 'ready'; case 'wait': return 'waiting'; default: return ''; }
 }
 function seatCls(p) { const s = seatState(p); return s === 'draw' || s === 'choose' || s === 'post' ? 'dr' : s === 'boom' ? 'bm' : s === 'done' ? 'dn' : ''; }
 function potOpts(p, mini) {

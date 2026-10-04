@@ -53,4 +53,11 @@ T.finish = (G, ans) => {
     let m = ans && ans(s, p.q, ms); if (!m) m = ms[0]; const o = Object.assign({}, m); delete o.label; T.ok(G, s, o);
   }
 };
+// day 9 (everybody commits, then all reveal): plan[seat] = how many chips that seat draws before it stops; answers nothing else
+T.run9 = (G, plan) => {
+  for (let g = 0; G.phase === 'brew' && g < 200; g++) for (const p of G.players) {
+    if (p.st === 'draw' && !p.q && !p.lock) { const wantMore = p.pot.length < plan[p.seat] && p.bag.length; T.ok(G, p.seat, { t: wantMore ? 'draw' : 'stop' }); }
+    else if (p.q && G.phase === 'brew') { const ms = CF.moves(G, p.seat); const o = Object.assign({}, ms[0]); delete o.label; T.ok(G, p.seat, o); }
+  }
+};
 module.exports = T;
