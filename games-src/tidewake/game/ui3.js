@@ -51,7 +51,7 @@ function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='plac
   if(pl.length){if(!sel||!pl.some(m=>m.t===sel.t)||!fronts.includes(sel.s)){const own=pl.filter(m=>m.s===d);let f=own[0]||pl[0];
     // start on a tile that is safe (and not in a leviathan's reach) rather than tile 1 unturned, which could be a red cross with Place greyed out
     try{let best=-1;for(const m of own){const A=analyse(K,d,m);const v=A.bad?0:(typeof phRisk==='function'&&phRisk(K,A))?1:2;if(v>best){best=v;f=m}if(v===2)break}}catch(e){}
-    sel=UI.sel={t:f.t,r:f.r!=null?f.r:0,s:f.s}}}
+    sel=UI.sel={t:f.t,r:f.r!=null?f.r:0,s:f.s};UI.rots=[]}}
   UI.canPlace=pl.length>0;UI.moves=mv;
   const full=UI.guide==='full',multi=hotSeat()||humans().length>1;
   let outcome='',m=null,A=null,btn='',err='';
