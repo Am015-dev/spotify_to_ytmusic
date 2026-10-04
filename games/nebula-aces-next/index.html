@@ -353,7 +353,7 @@ html.ph .gx-board{overflow:hidden;background:#05040f}
 html.ph .viewbar,html.ph .legend,html.ph .lgbtn{display:none!important}
 html.ph #coachtag{display:none!important}
 /* compact ship tags on phones: short name + hull/shields/stress, so you can tell ships apart and see who is hurt */
-html.ph #tags .tag{font-size:10px;line-height:1.15;padding:0 4px;border-radius:6px}html.ph #tags .tag b{font-size:10px;max-width:64px;overflow:hidden;text-overflow:ellipsis}
+html.ph #tags .tag{font-size:13px;line-height:1.15;padding:0 4px;border-radius:6px}html.ph #tags .tag b{font-size:13px;max-width:80px;overflow:hidden;text-overflow:ellipsis}
 html.ph #tags .tag .ps,html.ph #tags .tag .dl{display:none}
 html.ph .stage canvas{touch-action:none}
 /* the dock: control row, roadmap, then one panel (strip / step card / pop-up) */
@@ -523,18 +523,16 @@ html.ph.ph-p .gx-board{justify-self:center}
 /* a ★ choice above the pinned button must never sit under it: unpin the button when a suggested choice is listed */
 html.ph #prompt .acts.col:has(>.btn.rec:not(.primary))>.btn.primary{position:static;box-shadow:none}
 html.ph .pm-leg .rkl{color:#ff6b6b}
-.race{margin:0 0 6px;font-size:12px;color:var(--muted)}.race b{color:#fff}.race .h{color:#ffd0a0}.race .sh{color:#7fd4ff}
+.race{margin:0 0 6px;font-size:13px;color:var(--muted)}.race b{color:#fff}.race .h{color:#ffd0a0}.race .sh{color:#7fd4ff}
 /* dice steps (html.ph-dice): smaller mat, compact dice rows, no legend or race line, nothing pinned over the dice */
-html.ph.ph-p.ph-dice .gx-app{grid-template-rows:calc(44px + var(--sat,0px)) calc(var(--bs,100vw)*.6) minmax(0,1fr)}
-html.ph.ph-p.ph-dice .gx-board{width:calc(var(--bs,100vw)*.6);height:calc(var(--bs,100vw)*.6)}
+html.ph.ph-p.ph-dice .gx-app{grid-template-rows:calc(44px + var(--sat,0px)) min(var(--bs,100vw),75vw) minmax(0,1fr)}
+html.ph.ph-p.ph-dice .gx-board{width:min(var(--bs,100vw),75vw);height:min(var(--bs,100vw),75vw)}
 html.ph.ph-dice #prompt .race,html.ph.ph-dice #prompt .dleg{display:none}
 html.ph.ph-dice #prompt .drow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}html.ph.ph-dice #prompt .drow .dl{flex:0 0 100%}
 html.ph.ph-dice #prompt .dice .die,html.ph.ph-dice #prompt .die{width:38px;height:48px}
 html.ph.ph-dice #prompt .btn.primary,html.ph.ph-dice #prompt .acts.col>.btn.primary{position:static;box-shadow:none}
-/* your action / target / question steps: a slightly smaller mat so every choice fits */
-html.ph.ph-p.ph-act .gx-app{grid-template-rows:calc(44px + var(--sat,0px)) calc(var(--bs,100vw)*.78) minmax(0,1fr)}
-html.ph.ph-p.ph-act .gx-board{width:calc(var(--bs,100vw)*.78);height:calc(var(--bs,100vw)*.78)}
-html.ph.ph-act #prompt .dleg{display:none}
+html.ph #tags .tag .tgl{font-size:13px}
+@media (max-height:600px){html.ph #ps .race{display:none}}
 
 </style>
 </head>
@@ -3595,6 +3593,9 @@ function suggestDial(s){const dk=alive().filter(x=>x.side===s.side&&x!==s&&UI.dr
   dialOf(s).forEach((m,i)=>{const p=finalPose(s,B(s),m),c=exColor(s,m);let v=scorePose(s,p,c,enemyPoses,friends,lv);
     // a suggestion must be safe first: never a blocked red, an asteroid only when every move touches one, and don't park beside a rock (next round's moves would all clip it)
     if(c.c==='r'&&s.stress)v-=1e6;
+    // a suggestion for a new player should look for a fight: reward ending with an enemy (where it is now) inside the arc, closer is better; a red move costs next round's action
+    {let best=0;for(const e of enemiesOf(s)){const r=arcReach(p,B(s),e,B(e),s.arc);if(r){const rg=rangeOf(r.d);if(rg<=3)best=Math.max(best,rg===1?3:rg===2?2.5:1.5)}}v+=best;if(c.c==='r')v-=1.5}
+
     // bumping costs the action: avoid enemies that are still parked there (they move after us) or likely to arrive first
     {const P=corners(p,B(s));for(const [e,poses] of enemyPoses){if(psOf(e)>=psOf(s)){if(polyOverlap(P,corners(e,B(e))))v-=8}else v-=8*poses.filter(q=>polyOverlap(P,corners(q,B(e)))).length/Math.max(1,poses.length)}}
 const rk=rockHits(s,m);if(rk)v-=40*rk;
@@ -3626,7 +3627,7 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
     if(humanTurn())h+=`<div class="acts col">${exDAMods().map(m=>`<button class="btn" data-act="damod" data-k="${m.k}">${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="damod" data-k="done">Let the attack stand</button></div>`;else h+=`<p class="small muted">${esc(d.name)} is reacting…</p>`}
   else if(G.phase==='amod'||G.phase==='dmod'){const A=G.atk,a=ship(A.a),d=ship(A.d);const r=preview(A);const rk=me?recMod():null;
     h=diceHead(A)+diceRows(A)+`<p class="preview">Right now: <b>${r.hits} hit${r.hits===1?'':'s'}</b>${r.crits?`, <b>${r.crits} crit${r.crits>1?'s':''}</b>`:''}${A.step==='amod'?' before the defence roll':(r.hits+r.crits===1?' gets through':' get through')}${A.step==='amod'?'':` (${r.hits+r.crits?`${esc(shortName(d))} loses ${r.hits+r.crits} shield${r.hits+r.crits===1?'':'s'} or hull`:'no damage'})`}.</p>`;
-    if(me){const mods=G.phase==='amod'?atkMods():defMods();const rkFirst=(x,y)=>(y.k===rk)-(x.k===rk);h+=`<div class="acts col">${mods.slice().sort(rkFirst).map(m=>`<button class="btn${m.k===rk?' rec':''}" data-act="${G.phase}" data-k="${m.k}">${m.k===rk?'★ ':''}${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Done: the defender rolls':'Done: take the damage'}${rk==='done'?'<small>★ recommended: nothing left to improve</small>':''}</button></div>`}
+    if(me){const mods=G.phase==='amod'?atkMods():defMods();const rkFirst=(x,y)=>(y.k===rk)-(x.k===rk);const recMain=rk&&rk!=='done';h+=`<div class="acts col">${mods.slice().sort(rkFirst).map(m=>`<button class="btn${m.k===rk?' rec primary':''}" data-act="${G.phase}" data-k="${m.k}">${m.k===rk?'★ ':''}${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn${recMain?'':' primary'}" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Done: the defender rolls':'Done: take the damage'}${rk==='done'?'<small>★ recommended: nothing left to improve</small>':''}</button></div>`}
     else h+=`<p class="small muted">${G.phase==='amod'?esc(a.name)+' is modifying its attack…':esc(d.name)+' is defending…'}</p>`;
     h+=DLEG}
   else h=watchHTML();
@@ -3969,9 +3970,10 @@ function phRender(){if(!PHN.on)return;PHN.build();const dock=document.querySelec
     else if(ok&&k==='atk')ok=G.phase==='target'&&humanTurn()&&validTarget(s);
     else if(ok&&k==='info')ok=PHN.popSig===sigNow();
     if(!ok)PHN.pop=null}
-  // dice steps: shrink the mat so the dice, the result and every button fit on screen without scrolling (testers got stuck with Done below the fold)
-  {const dz=!!(play&&(['amod','dmod','damod'].includes(G.phase)||(G.phase==='ask'&&G.atk&&humanTurn())));const da=!dz&&!!(play&&humanTurn()&&['action','target','ask'].includes(G.phase)&&!(G.q&&['rock','deploy'].includes(G.q.key)));
-    if(R.classList.contains('ph-dice')!==dz||R.classList.contains('ph-act')!==da){R.classList.toggle('ph-dice',dz);R.classList.toggle('ph-act',da);if(typeof resize3D==='function')requestAnimationFrame(()=>{try{resize3D()}catch(e){}})}}
+  // dice steps: if the dice, result and buttons don't fit, shrink the mat (never below 3/4) so nothing sits below the fold (testers got stuck with Done off-screen)
+  {const dz=!!(play&&(['amod','dmod','damod'].includes(G.phase)||(G.phase==='ask'&&G.atk&&humanTurn())));
+    if(!dz){if(R.classList.contains('ph-dice')){R.classList.remove('ph-dice');if(typeof resize3D==='function')requestAnimationFrame(()=>{try{resize3D()}catch(e){}})}}
+    else if(!R.classList.contains('ph-dice')&&!PHN.diceChk){PHN.diceChk=1;requestAnimationFrame(()=>{PHN.diceChk=0;const dk=document.querySelector('.gx-dock');if(dk&&dk.scrollHeight>dk.clientHeight+4&&!PHN.land){R.classList.add('ph-dice');if(typeof resize3D==='function')requestAnimationFrame(()=>{try{resize3D()}catch(e){}})}})}}
   const strip=play&&G.phase==='plan'&&planSide()>=0&&!sumPending()&&!UI.hold;R.classList.toggle('ph-ps',strip);
   if(ps){ps.hidden=!strip;if(strip){const h=stripHTML();if(ps._h!==h){ps._h=h;ps.innerHTML=h}}else if(ps._h){ps._h=null;ps.innerHTML=''}}
   const card=play?cardHTML():null;

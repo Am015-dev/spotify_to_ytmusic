@@ -111,10 +111,19 @@ The commands, the 7 phone sizes and the 4 desktop sizes are as in the brief. The
 
 | Test | Result |
 |---|---|
-| `clarity-test.js` (new) | see final run |
-| `unit.js` (rules) | see final run |
-| `gxw2.js nebula.html 20` (computer vs computer) | see final run |
-| `click-ph.js nebula.html solo na_tour` (solo and `PRE="UI.mode='hot'"`) | see final run |
-| `lay-phone.js` (7 sizes) | see final run |
-| `lay-desk.js` (4 sizes) | see final run |
-| `net/p2p-xw.js`, `net/p2p-xw-phone.js` | see final run |
+| `clarity-test.js` (new) | 6 ok, 0 failed (5 of them failed before the fixes) |
+| `unit.js` (rules) | 27 ok, 0 failed |
+| `gxw2.js nebula.html 20` (computer vs computer) | 0 errors, 12–8 split |
+| `click-ph.js` solo, and hot-seat via `PRE="UI.mode='hot'"` | 0 errors in each |
+| `lay-desk.js` 1366x768, 1920x1080, 768x1024, 1100x700 | PROBLEMS 0 |
+| `lay-phone.js` 412x780, 844x390, 750x342 | PROBLEMS 0 |
+| `lay-phone.js` 390x844, 390x763, 390x664, 375x553 | 0 after the last fix (hide the goal line in the planning strip below 600 px tall). See below. |
+| `net/p2p-xw.js` / `net/p2p-xw-phone.js` (real WebRTC, local relay) | errors [] in both; 163 and 448 remote clicks |
+
+**On the 390x844 / 375x553 row:**
+- The full run reported 3 problems:
+  - "focus did not zoom" at 390x844 and at 375x553;
+  - the Lock button clipped at 375x553.
+- The Lock button was fixed. The re-run at 390x844 and 375x553 gave PROBLEMS 0.
+- "Focus did not zoom" also fails on the unchanged live game at 390x844, so it is an existing, flaky check.
+- The other two sizes (390x763, 390x664) showed 0 problems in the full run.

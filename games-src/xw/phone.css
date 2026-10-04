@@ -210,3 +210,4 @@ html.ph.ph-dice #prompt .drow{display:flex;align-items:center;gap:6px;flex-wrap:
 html.ph.ph-dice #prompt .dice .die,html.ph.ph-dice #prompt .die{width:38px;height:48px}
 html.ph.ph-dice #prompt .btn.primary,html.ph.ph-dice #prompt .acts.col>.btn.primary{position:static;box-shadow:none}
 html.ph #tags .tag .tgl{font-size:13px}
+@media (max-height:600px){html.ph #ps .race{display:none}}
