@@ -117,7 +117,7 @@ function ATC_st(){if(ATC.slot!==SLOT){ATC.slot=SLOT;ATC.s=null;ATC.mk=0}if(!ATC.
 function ATC_save(){store.set('mho_atc',ATC.s)}
 const ATC_isA=ch=>!!(ch&&ch.m&&ch.m.atc),ATC_chN=id=>ATC_DEF[id]?ATC_DEF[id].ch:0;
 // ---------- marks (only the current story step, only in its start district)
-function ATC_mkMark(id){const D=ATC_DEF[id],a=ATC_P(D.at[0],D.at[1],300);const ev={id:id,mid:id,kind:'m1',npc:D.npc,name:D.name,em:D.em,col:D.col,hi:D.hi,win:D.win,lose:D.lose,d:D.d2,items:D.items};QAV[ev.id]=M1_av(D.who);
+function ATC_mkMark(id){const D=ATC_DEF[id],a=D.d0===ATHD?ATC_P(D.at[0],D.at[1],300):M1_P(RO.x,RO.z,300);const ev={id:id,mid:id,kind:'m1',npc:D.npc,name:D.name,em:D.em,col:D.col,hi:D.hi,win:D.win,lose:D.lose,d:D.d2,items:D.items};QAV[ev.id]=M1_av(D.who);
  const m=qvMk({kind:'quest',m1:1,atc:1,ev,x:a.x,z:a.z,h:0,icon:D.em,col:D.col});const r2=new THREE.Mesh(new THREE.TorusGeometry(12,.5,8,48),neonMat('#ffd400',2.6));r2.rotation.x=Math.PI/2;r2.position.y=.6;m.g.add(r2);if(RO.ch||RO.sp)m.g.visible=false;return m}
 const ATC_mark=id=>RO.marks.find(m=>m.atc&&m.ev.mid===id);
 function ATC_marks(){for(const m of RO.marks.filter(q=>q.atc)){RO.marks.splice(RO.marks.indexOf(m),1);RO.grp.remove(m.g)}ATC.mk=1;if(CID!=='ath')return;const s=ATC_st(),id=ATC_ORDER[s.step];if(!id||s.pend)return;if(ATC_DEF[id].d0===ATHD)ATC_mkMark(id)}
