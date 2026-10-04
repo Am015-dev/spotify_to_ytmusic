@@ -60,7 +60,7 @@ const holdN = p => p.holdN != null ? p.holdN : p.hold.length;
 function seatState(p) {
   if (G.phase === 'over') return 'over';
   if (G.phase === 'prep') return p.q ? 'choose' : 'ready';
-  if (G.phase === 'brew') { if (p.st === 'done') return p.boom ? 'boom' : 'done'; if (p.st === 'post') return 'post'; return p.q ? 'choose' : 'draw'; }
+  if (G.phase === 'brew') { if (p.st === 'done') return p.boom ? 'boom' : 'done'; if (p.st === 'post') return 'post'; return p.q ? 'choose' : p.lock ? 'locked' : 'draw'; }
   return p.q ? 'choose' : 'wait';
 }
 function isMine(s) { const v = viewSeat(); return v >= 0 && s === v; }

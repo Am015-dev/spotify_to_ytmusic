@@ -5,7 +5,7 @@
 // copy answers CF.moves(seat) / CF.AI.choose for its own seat the same as the real state (tools: net-strip-test.js).
 // seat -1 = a watcher (every bag hidden). Pure function: no DOM.
 const NET_TOP = ['v', 'np', 'round', 'phase', 'start', 'sets', 'supply', 'fdeckN', 'fcard', 'fdisc', 'logN', 'evN', 'hist', 'rep', 'over', 'winner', 'winners', 'winText', 'ev', 'shopSeat', 'opts'];
-const NET_PL = ['seat', 'name', 'ai', 'char', 'vp', 'rubies', 'droplet', 'flask', 'rat', 'ratTails', 'bag', 'bagN', 'pot', 'side', 'hold', 'holdN', 'newChips', 'q', 'postq', 'acts', 'st', 'boom', 'prot', 'f', 'res', 'last9', 'ver', 'endVp'];
+const NET_PL = ['seat', 'name', 'ai', 'char', 'vp', 'rubies', 'droplet', 'flask', 'rat', 'ratTails', 'bag', 'bagN', 'pot', 'side', 'hold', 'holdN', 'newChips', 'q', 'postq', 'acts', 'st', 'boom', 'prot', 'f', 'res', 'last9', 'ver', 'endVp', 'lock'];
 function netStrip(g, seat) {
   const v = CF.stripView(g, Number.isInteger(seat) && seat >= 0 && seat < g.np ? seat : -1);
   const cp = o => o == null ? o : JSON.parse(JSON.stringify(o));

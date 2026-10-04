@@ -96,7 +96,7 @@ var FORTUNE = [
 ];
 
 // ---- bonus die: six faces (one repeated; which one is repeated is a guess, see rules-notes)
-var DIE = ['vp1', 'vp2', 'ruby', 'ruby', 'drop', 'orange'];
+var DIE = ['vp1', 'vp1', 'vp2', 'ruby', 'drop', 'orange'];   // guessed: the rules list five outcomes for six faces; the fan tool repeats 1 VP
 var DIE_TEXT = { vp1: '1 victory point', vp2: '2 victory points', ruby: '1 ruby', drop: 'droplet one space', orange: 'a Marrow chip in your bag' };
 
 // ---- the four fair-goers. Colours are the player colours of the box (green, yellow, blue, red).

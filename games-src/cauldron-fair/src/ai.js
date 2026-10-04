@@ -218,7 +218,7 @@ function choose(G, seat, level) {
     case 'bribe': { const spaceV = 0.3 + CW[r] * 0.9; return bestBy(legal, m => m.n * (RW[r] - 0 * spaceV) - m.n * spaceV * 0.6 * 0 + (m.n ? 0 : 0) + (RW[r] > spaceV ? m.n : -m.n * 0.01)); }
     case 'bounty': return bestBy(legal, m => m.o === 'vp' ? (p.ratTails || 0) : chipVal(G, p, m.o, LV.base));
     case 'fork': return bestBy(legal, m => m.o === 'drop' ? 2 * DW[r] : chipVal(G, p, m.o, LV.base) * 1.2);
-    case 'haggle': return bestBy(legal, m => m.idx < 0 ? 0 : chipVal(G, p, p.hold[m.idx].c + (CF.upgrades(G, p.hold).find(u => u.idx === m.idx).to.slice(1)), LV.base) - chipVal(G, p, ck(p.hold[m.idx]), LV.base) - (p.hold[m.idx].c === 'W' ? 5 : 0));
+    case 'haggle': return bestBy(legal, m => m.idx < 0 ? 0 : chipVal(G, p, p.hold[m.idx].c + (CF.upgrades(G, p.hold, true).find(u => u.idx === m.idx).to.slice(1)), LV.base) - chipVal(G, p, ck(p.hold[m.idx]), LV.base) - (p.hold[m.idx].c === 'W' ? 5 : 0));
     case 'crow': case 'peek': {
       const S = S0(); S.counts = Object.assign({}, S.counts); const dep = Math.max(depth - 1, 0);
       const bagCounts = S.counts;
@@ -238,6 +238,8 @@ function choose(G, seat, level) {
     case 'gift': return bestBy(legal, m => chipVal(G, p, m.o, LV.base));
     case 'g2': return bestBy(legal, m => m.o === '' ? -1 : chipVal(G, p, m.o, LV.base));
     case 'g4': return bestBy(legal, m => m.n * (DW[r] - 2 * RW[r] * 0.5 - 0.2 * 0) * (DW[r] > RW[r] * 1.2 ? 1 : -1) - 0.0001 * m.n);
+    case 'p1': return bestBy(legal, m => m.k === 1 ? 1 : m.k === 2 ? 1 + RW[r] : 2 + DW[r]);
+    case 'g3': { const D0 = CF.DATA, s0 = p.res.space, s1 = Math.min(d.to + 1, D0.SPOON); return legal.find(m => m.yes === ((D0.COINS[s1] - D0.COINS[s0]) * CW[r] + (D0.VP[s1] - D0.VP[s0]) > RW[r])) || legal[0]; }
     case 'p2': return bestBy(legal, m => m.set.reduce((a, k) => a + (k === 1 ? 1 + RW[r] + 0.6 : k === 2 ? 3 + DW[r] + 2.2 : 6 + RW[r] + 2 * DW[r] + 3.2), 0));
     case 'p4': return bestBy(legal, m => m.from === '' ? 0 : chipVal(G, p, m.to, LV.base) - chipVal(G, p, m.from, LV.base) + 0.3);
     case 'de': {
