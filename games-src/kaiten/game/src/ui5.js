@@ -33,7 +33,9 @@ function buildRules() {
     ['Roll race', 'the Seaweed Roll contest: add up the roll icons on each counter. Most icons scores 6, second most 3.'],
     ['Nigiri', 'the Sunset, Moon and Sun plates. They score their number straight away.'],
     ['Fire Paste bonus', 'a nigiri served onto a waiting Fire Paste scores triple; the extra points show as this row on the score pad.'],
-    ['Sweets', 'Custard Cups. They stay on your counter until the end of the meal.'],
+    ['Custard', 'Custard Cups. They stay on your counter until the end of the meal, then most scores 6 and fewest loses 6.'],
+    ['Last turn', 'the lines in the panel after every reveal: what each diner served and why their score went up or down.'],
+    ['Live score', 'the number on each diner during a round: what their counter would score if the round ended now. The roll race can still change it.'],
     ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
     ['+N', 'the small green number on a plate: what serving it would score you right now.']].map(([t, d]) => [h('dt', t), h('dd', d)]).flat()));
   root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: &ldquo;Jazz Slower&rdquo; by Pro Sensory (OpenGameArt, CC0). Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
