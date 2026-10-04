@@ -2,7 +2,7 @@
 
 Browser board games, published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/.
 Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `games-src/HANDOFF.md`.
-Full method: the `boardgame-builder` skill (`skills/boardgame-builder.zip`; read `references/board-first-play.md`).
+Full method: the project skill `.claude/skills/boardgame-builder/` (loads automatically; read `references/board-first-play.md`).
 
 ## Hard rules
 - Never write an original game's, publisher's or designer's name in this repo or on the site. No model names in
