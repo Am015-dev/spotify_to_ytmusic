@@ -479,7 +479,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'choose':{const rem=selRemaining(UI.sel);if(rem[0])act(rem[0],V.seat);return}
   case 'hint1':if(spendHint())refresh();return;
   case 'sugg':{if(!spendHint())return;const W=wwk(V);const m=W&&W.suggestion&&W.suggestion.m;if(!m)return;if(m.a==='dual'){UI.sel={mode:'dual',tool:m.tool||null,tg:m.ks.map(k=>({st:m.st,k})),v:m.v,v2:m.v2!=null?m.v2:null,two:m.two||null,fu:m.fu!=null?m.fu:null}}else if(m.a==='multi'){UI.sel={mode:'multi',kind:m.kind,n:m.tg.length,tg:m.tg.slice()}}else{act(m,V.seat);return}refresh();return}
-  case 'coach':UI.tut.done[b.dataset.id]=1;refresh();return;
+  case 'coach':UI.tut.done[b.dataset.id]=1;{const k=lsGet('sf_tipsdone',{});k[b.dataset.id]=1;lsSet('sf_tipsdone',k)}refresh();return;
   case 'zoom':zoomNext();return;
   case 'coachask':UI.coach=false;UI.coachAsk=false;toast('Tips are off. "Resume lesson" in this panel turns them back on.');refresh();return;
   case 'coachkeep':UI.coachAsk=false;refresh();return;
@@ -628,7 +628,7 @@ function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names
   if(!plan&&!s.tutorial)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names,help:s.help});UI.lastSetup=s;
   const seats=s.seats.slice(0,s.np);const chars={};let any=0;for(let i=0;i<s.np;i++)if(s.chars[i]){chars[i]=s.chars[i];any=1}
   UI.rt=realtimeJob(s.job);UI.started=false;clearTimeout(UI.aiT);UI.aiT=null;UI.sel=null;UI.res=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.kitSig={};UI.wwk=null;UI.myLastTurn=null;UI.hintTurn=-1;UI.hintsLeft=HINTS;UI.guided=!!s.tutorial;UI.lastPrompt=null;UI.pause=false;UI.dockSig=null;
-  UI.help=s.help!==false;UI.tut=s.tutorial?{done:{}}:(s.job<=3?{done:{hello:1,stand:1}}:null);if(s.tutorial)UI.coach=true;UI.coachAsk=false;UI.myRes=null;UI.myAck=true;UI.aiNotBefore=0;UI.brief=(NET.on||isHost()||s.tutorial)?null:{n:s.job};
+  UI.help=s.help!==false;UI.tut=s.tutorial?{done:{}}:(s.job<=3?{done:Object.assign({hello:1,stand:1},lsGet('sf_tipsdone',{}))}:null);if(s.tutorial)UI.coach=true;UI.coachAsk=false;UI.myRes=null;UI.myAck=true;UI.aiNotBefore=0;UI.brief=(NET.on||isHost()||s.tutorial)?null:{n:s.job};
   const o={np:s.np,mission:s.job,seats,level:s.lv,names:s.names.slice(0,s.np),realtime:UI.rt};if(any){try{const ch=[];for(let i=0;i<s.np;i++)ch[i]=chars[i]||null;o.chars=ch}catch(e){}}if(s.captain!=null&&s.captain<s.np)o.captain=s.captain;if(s.seed!=null)o.seed=s.seed;
   kitReset();UI.started=true;hideStart();NET.starting=true;try{try{newGame(o)}catch(e){try{delete o.chars;newGame(o)}catch(e2){console.error(e2);UI.started=false;showStart();return}}
   if(plan)netBound(plan)}finally{NET.starting=false}
