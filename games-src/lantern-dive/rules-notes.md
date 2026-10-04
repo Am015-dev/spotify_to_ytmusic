@@ -93,17 +93,25 @@ entry by entry; they were not checked against a physical card. The rulebook conf
 Guessed (the sources do not say; chosen to be fair and to keep the real game's feel):
 1. Difficulty of dives **4, 8, 12, 14, 15, 21, 23 and 27** could not be read (they are symbols in the logbook): 4, 6, 6, 4, 5, 10, 11 and 12
    (`guess:1` in `src/data.js`). Dive 14 and 15 follow the increasing real-time pattern 4, 5, 6.
-2. Dive 21's "two more 1s" limit is copied from dive 20 (the retailer text repeats it).
+2. (now confirmed by the retailer logbook text, audit row 15) Dive 21 has the same "two more 1s" limit as dive 20.
 3. A card that is the only one of its suit may only be shown with the "only" mark.
 4. Following suit for the drone uses only its face-up cards.
 5. The distress pass with two divers is a swap between the two divers (the drone does not take part).
-6. In a 2-diver game narcosis has one token (3 seats minus 2).
+6. In a 2-diver game narcosis has one token (3 seats minus 2): the audit keeps this (the drone counts as a crew member for jobs; with 0 tokens narcosis dives would allow no signalling).
 7. Free briefing is played as: each diver in turn may take any number of jobs and then ends the turn; a full round of passes forces the next diver to take one.
 8. The crew vote (dive 6): every diver votes, the computer votes for itself when the jobs fit its hand, ties go to the Commander's vote.
-9. Jobs that compare with the Commander are never drawn in dives where one diver must take everything (the Commander could be forced to).
-10. Sum jobs (a trick worth more than / less than a limit) do not allow Lanterns; the 22-or-23 job counts Lantern values; parity jobs do not allow Lanterns.
-11. Dives with a limit that holds for the whole dive (8, 12, 20, 21, 23, 27) are always played to the last trick, even if all jobs are done early.
+9. Jobs that compare with the Commander are never drawn in dives where one diver must take everything (the Commander could be forced to). The audit keeps this filter (stricter than the rules for dives 6, 10, 13, 26, but it keeps 14-16 playable).
+10. Ruled by the audit (rulebook p.18): every job that looks at the total value of a trick (more than, less than AND exactly 22 or 23) allows no Lantern in the trick; so do the parity jobs. Job 49's text says so.
+11. REVERSED (audit, rulebook p.10): the dive is won the moment every job is done. Only dive 27 is still played to its final card (its Sunstar 5 rule needs it). Dives 8, 12, 20, 21, 23 end as soon as the last job is done.
 12. When a dive says "all communication before the first trick" (dives 10/13 after a hand-over) pings are blocked once the first trick is complete.
 13. The first trick's signal round is played in turn from the Commander (each diver pings or passes) instead of free-form; later tricks allow a
     ping any time between tricks for any diver (hot-seat: only for the diver whose turn it is to lead).
 14. A job counts as failed the moment it can no longer be met from public information (e.g. its card was won by someone else), so the dive stops at once.
+
+## Rulings added after the independent audit (AUDIT-RULES.md)
+- Job 49 allows no Lantern in the trick (row 1). Jobs 51/52 are done when the named Lantern is won, even if the card never played in a 3-diver dive is another Lantern (row 2).
+- Dive 19: the Commander is offered the hardest job he or she may take, never a Commander-comparison job (row 3).
+- Jobs 57/58 ("win card X using a Lantern"): re-deal, no attempt counted, if one diver holds all four Lanterns and card X (row 4, p.17).
+- Impossible job pairs are replaced at draw time: two "most tricks" jobs, two "fewest tricks" jobs, any two jobs that together need more than four copies of one value or of the Lanterns (3+ nines with exactly two nines, exactly 2 with exactly 3 Lanterns), as well as the older shared-position / shared-card pairs. With fewer jobs than divers every job goes to a different diver, so no conflicting pair may be drawn at all (row 5).
+- A job the dive's own limit makes impossible is never drawn (dive 8: jobs 21 and 23, job 25 at 4+ divers, the owner needs n copies and each other diver n - gap + 1) (row 6).
+- The drone may not be given a Commander-comparison job (row 8).

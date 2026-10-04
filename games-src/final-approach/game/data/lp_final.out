@@ -13,3 +13,9 @@ SIZE 390x763 problems 0
 390x664 errors []
 PROBLEMS 0
 SIZE 390x664 problems 0
+FAIL 375x553 FIT guided brief PRIMARY BUTTON NOT FULLY IN VIEWPORT [10,519,184,563] .btn.go "Got it"
+375x553 board {"w":375,"h":400,"vw":375,"vh":553,"mode":"P","k":0.468} webgl
+375x553 placements by touch 8
+375x553 errors []
+PROBLEMS 1
+SIZE 375x553 problems 1

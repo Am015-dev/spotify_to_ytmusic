@@ -330,7 +330,8 @@ html.ph .cfgfoot{position:sticky;bottom:0;background:var(--paper);padding:6px 0 
 html.ph #netst{min-width:44px;min-height:44px;padding:0 8px;justify-content:center;border-radius:10px}html.ph #netst .nl{display:none}html.ph #netst .ns{display:inline;font-weight:800}
 html.ph .rsbox{padding:8px;gap:6px}
 html.ph .gau{line-height:1.1;padding-bottom:3px}html.ph .gau span{white-space:normal}
-html.ph .pcard .cbtns{position:sticky;bottom:-10px;background:var(--paper);padding:6px 0 6px;margin-top:auto;z-index:3}
+html.ph.ph-p .pcard{position:fixed;top:auto;bottom:0;left:0;right:0;height:auto;max-height:58vh;z-index:90;padding-bottom:env(safe-area-inset-bottom,0px)}
+html.ph .pcard .cbtns{position:sticky;bottom:0;background:var(--paper);padding:6px 0 6px;margin-top:auto;z-index:3}
 @media (prefers-reduced-motion:reduce){.slot.legal{animation:none}}
 </style></head>
 <body>
