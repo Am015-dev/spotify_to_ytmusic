@@ -13,7 +13,7 @@ const PH={on:false,
   chips(){if(typeof G==='undefined'||!G||!G.pl)return '';const me=viewSeat();
     const chip=(p,mine)=>{const act=p.i===G.active;const nm=esc(p.nm);
       const lab=`${p.nm}${mine?' (you)':''}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play${act?', their turn':''}`;
-      const inner=`<span class="n">${ptok(p.i)}<b>${nm}</b></span><span class="s" aria-hidden="true"><i class="l">Lv ${p.lvl}</i> ⚔${pStr(p)} ✋${p.hand.length}${p.curse&&p.curse.length?' ☁'+p.curse.length:''}${p.dead?' 💀':''}</span>`;
+      const inner=`<span class="n">${ptok(p.i)}<b>${mine?'You':nm}</b></span><span class="s" aria-hidden="true"><i class="l">Lv ${p.lvl}</i> ⚔${pStr(p)}<span class="hc"> ✋${p.hand.length}</span>${p.curse&&p.curse.length?' ☁'+p.curse.length:''}${p.dead?' 💀':''}</span>`;
       return mine?`<div class="phc me ${act?'act':''}" style="--c:${PCOL[p.i]}" role="group" aria-label="${esc(lab)}">${inner}</div>`
         :`<button class="phc ${act?'act':''}" data-opp="${p.i}" style="--c:${PCOL[p.i]}" aria-label="${esc(lab)}. Tap for their cards.">${inner}</button>`};
     const mp=me>=0&&G.pl[me]?G.pl[me]:null;

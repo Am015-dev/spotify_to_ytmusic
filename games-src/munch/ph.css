@@ -19,7 +19,6 @@ html.ph .phc .s{font-size:13px;line-height:1.2;color:var(--cream2);white-space:n
 html.ph .phc .s .ic{width:1em;height:1em;vertical-align:-.12em}
 html.ph .phc.act{outline:2px solid #ffd76a;outline-offset:1px}
 html.ph .phc.me{cursor:default;background:linear-gradient(#6a3a1c,#44230f)}
-html.ph-p .phc.me{display:none}
 /* table first */
 html.ph .gx-board{padding:4px;gap:4px}
 html.ph #app .opps{display:none}
@@ -155,3 +154,6 @@ html.ph .dlg.start .acts .btn{flex:1 1 0;min-width:0;padding:4px 6px;font-size:1
 html.ph #prompt:has(>.lesson) .hint{display:none}
 html.ph #prompt .acts .btn[disabled]{display:none}
 html.ph .lesson .lbtn{font-size:14px;min-height:44px;padding:2px 12px}
+html.ph-p .phc{flex:1 0 86px;padding:3px 5px 3px 9px}
+html.ph-p .phc .s{font-size:13px}
+html.ph-p .phc .hc{display:none}
