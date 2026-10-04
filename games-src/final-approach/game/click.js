@@ -53,6 +53,7 @@ function run(cf, seed) {
         iv = setInterval(() => {
           try {
             const G = w.eval('G'); if (!G) return; steps++;
+            if (process.env.CLICKDBG && steps % 400 === 0) console.log('dbg', cf.name, 'steps', steps, 'round', G.round, 'phase', G.phase, 'pend', JSON.stringify(G.pend && G.pend.h), 'turn', G.turn, 'ready', JSON.stringify(G.ready), 'clicks', clicks, 'placed', placed, 'rs', !d.querySelector('#rs').hidden, 'busy', w.eval('UI.busy'), 'mode', w.eval('UI.mode'), 'secs', Math.round((Date.now() - t0) / 1000));
             const v = w.eval('viewSeat()'), hot = w.eval("UI.mode === 'hot'"), holder = w.eval('UI.holder');
             // hidden dice: a die face with a number must belong to the viewer (or everyone is shown in watch mode)
             for (const el of d.querySelectorAll('#pz .die')) { const s = +el.getAttribute('data-s'), dv = el.querySelector('.dv'); if (dv && /^[1-6]$/.test(dv.textContent) && v !== 'all' && s !== v) { hidden++; if (errs.length < 6) errs.push('HIDDEN die of seat ' + s + ' visible to ' + v); } if (dv && /^[1-6]$/.test(dv.textContent) && hot && holder < 0) { hidden++; errs.push('die shown with no holder'); } }
