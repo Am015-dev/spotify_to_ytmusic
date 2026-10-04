@@ -86,7 +86,6 @@ The fixes after round 3 (M–Q below) have not been blind-tested.
   - the round card's lines add up to the score change, and every "a across + b down" adds up to its points;
   - the goal line is present.
 - Before the fixes: 258 failures in 4 games (best 13, sun 36, why 90, sum 16, goal 103). After: 0.
-- Final numbers are in the table below (filled in from the final run).
 
 | Test | Result |
 |---|---|
@@ -94,11 +93,9 @@ The fixes after round 3 (M–Q below) have not been blind-tested.
 | cover.js 60 games | 60 finished, 5,088 moves, 0 errors, 0 invariant fails, 19/19 rule scenarios |
 | click.js (7 configs, desktop jsdom) | 0 errors |
 | click-phone.js | 0 errors |
-| lay.js 4 desktop sizes | see FINAL below |
-| lay-phone.js 7 phone sizes (2p) + 4p at 390x763 and 375x553 | see FINAL below |
-| net/p2p-sunglaze.js full1/full2/leave/migrate + p2p-sunglaze-phone.js | see FINAL below |
-
-FINAL: (filled in after the full run)
+| lay.js 1366x768, 1920x1080, 768x1024, 1100x700 | PROBLEMS 0 (lay.js's own default 4th size, 390x844, times out in its drawer step on the original build too; that size is covered by lay-phone) |
+| lay-phone.js 390x844, 390x763, 390x664, 375x553, 412x780, 844x390, 750x342 (2p) + 4p at 390x763 and 375x553 | PROBLEMS 0 at every size (412x780 first showed 3: the round card's score table overflowed; fixed, then rerun) |
+| net/p2p-sunglaze.js full1 / full2 / leave / migrate + p2p-sunglaze-phone.js | 0 bad in every scenario (6 runs); hosts and clients agree |
 
 ## What's still weak
 - **Fun is 3/5 for four testers in a row.** The low points they named:
