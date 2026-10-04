@@ -19,6 +19,8 @@ const clone = o => JSON.parse(JSON.stringify(o));
 // ---------- rng ----------
 function rnd(G, n) { let t = (G.rng = (G.rng + 0x6D2B79F5) | 0); t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return Math.floor(((t ^ t >>> 14) >>> 0) / 4294967296 * n); }
 function shuffle(G, a) { for (let i = a.length - 1; i > 0; i--) { const j = rnd(G, i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+// 'You' is a name like any other: pick the right verb form ("You hold", "Nerea holds")
+function sv(G, s, third, first) { const nm = G.players[s].name; return nm + ' ' + (nm === 'You' ? first : third); }
 function lg(G, t) { if (G.nolog) return; G.logN++; G.log.push({ i: G.logN, att: G.att, t }); if (G.log.length > 300) G.log.splice(0, 80); }
 function ev(G, e) { if (!G.nolog) { e.n = ++G.evN; G.events.push(e); } }
 const cn = D.cardName;
@@ -304,7 +306,7 @@ function startAttempt(G, o) {
   G.events = []; G.pl = new Array(40).fill(0); G.pings = []; G.tricks = [];
   Object.assign(G, { phase: 'assign', result: null, trick: null, left: -1, offered: false, ntr: ntrOf(G.np), firstW: -1, lastCard: -1, clockRun: false });
   ev(G, { t: 'deal', att: G.att, cap: G.cap, comm: G.comm, unk: G.unk, tasks: G.tasks.map(t => t.id) });
-  lg(G, 'Attempt ' + G.att + ' of dive ' + (G.mission.kind === 'log' ? G.mission.id : G.mission.name) + '. ' + G.players[G.cap].name + ' holds Lantern 4 and is the Commander.');
+  lg(G, 'Attempt ' + G.att + ' of dive ' + (G.mission.kind === 'log' ? G.mission.id : G.mission.name) + '. ' + sv(G, G.cap, 'holds', 'hold') + ' Lantern 4 and ' + (G.players[G.cap].name === 'You' ? 'are' : 'is') + ' the Commander.');
   initAssign(G);
 }
 // a fixed deal for the guided first dive: stack = { tasks: [job ids], hands: [[card ids] per seat] }, used again on every retry
@@ -384,7 +386,7 @@ function assignMoves(G, c) {
   }
   return out;
 }
-function take(G, s, i) { G.tasks[i].owner = s; ev(G, { t: 'take', i, seat: s }); lg(G, G.players[s].name + ' takes the job: ' + TASKS[G.tasks[i].id].t); }
+function take(G, s, i) { G.tasks[i].owner = s; ev(G, { t: 'take', i, seat: s }); lg(G, sv(G, s, 'takes', 'take') + ' the job: ' + TASKS[G.tasks[i].id].t); }
 function assignApply(G, c, m) {
   const A = G.as, R = rem(G);
   const acts = assignMoves(G, c); const ok = acts.find(x => x.t === m.t && (m.i === undefined || x.i === m.i) && (m.f === undefined || x.f === m.f));
@@ -399,24 +401,24 @@ function assignApply(G, c, m) {
       else if (A.mode === 'free') A.idle = 0;
       else if (A.mode === 'split') { if (rem(G).length) { const k = A.owners.indexOf(act); A.actor = A.owners[(k + 1) % A.owners.length]; } }
       break;
-    case 'pass': lg(G, G.players[act].name + ' passes.'); ev(G, { t: 'pass', seat: act }); adv(); break;
+    case 'pass': lg(G, sv(G, act, 'passes', 'pass') + '.'); ev(G, { t: 'pass', seat: act }); adv(); break;
     case 'done': A.idle++; if (A.mode === 'split') { const k = A.owners.indexOf(act); A.actor = A.owners[(k + 1) % A.owners.length]; } else adv(); break;
-    case 'keep': for (const t of G.tasks) t.owner = G.cap; lg(G, G.players[G.cap].name + ' keeps every job.'); break;
+    case 'keep': for (const t of G.tasks) t.owner = G.cap; lg(G, sv(G, G.cap, 'keeps', 'keep') + ' every job.'); break;
     case 'offer': A.stage = 'ask'; A.cands = orderFrom(G, (G.cap + 1) % G.np).filter(s => s !== G.cap && isDiver(G, s)); A.ci = 0; A.actor = A.cands[0]; ev(G, { t: 'offer' }); break;
-    case 'accept': for (const t of G.tasks) t.owner = act; G.offered = true; lg(G, G.players[act].name + ' takes every job. All signalling happens before the first trick.'); break;
-    case 'decline': A.ci++; if (A.ci >= A.cands.length) { for (const t of G.tasks) t.owner = G.cap; lg(G, 'Nobody volunteers: ' + G.players[G.cap].name + ' keeps every job.'); } else A.actor = A.cands[A.ci]; break;
+    case 'accept': for (const t of G.tasks) t.owner = act; G.offered = true; lg(G, sv(G, act, 'takes', 'take') + ' every job. All signalling happens before the first trick.'); break;
+    case 'decline': A.ci++; if (A.ci >= A.cands.length) { for (const t of G.tasks) t.owner = G.cap; lg(G, 'Nobody volunteers: ' + sv(G, G.cap, 'keeps', 'keep') + ' every job.'); } else A.actor = A.cands[A.ci]; break;
     case 'vote': {
       A.votes[c] = m.f; const voters = G.players.filter(p => isDiver(G, p.seat)).map(p => p.seat);
       if (voters.every(v => A.votes[v] !== undefined)) {
         const cnt = {}; voters.forEach(v => { cnt[A.votes[v]] = (cnt[A.votes[v]] || 0) + 1; }); const best = Math.max(...Object.values(cnt));
         let win = Object.keys(cnt).map(Number).filter(k => cnt[k] === best);
         const w = win.length > 1 ? (win.includes(A.votes[G.cap]) ? A.votes[G.cap] : orderFrom(G, G.cap).find(s => win.includes(s))) : win[0];
-        for (const t of G.tasks) t.owner = w; A.winner = w; lg(G, G.players[w].name + ' takes every job (team vote).');
+        for (const t of G.tasks) t.owner = w; A.winner = w; lg(G, sv(G, w, 'takes', 'take') + ' every job (team vote).');
       }
       break;
     }
-    case 'yes': A.vol.push(act); lg(G, G.players[act].name + ' volunteers.'); if (A.vol.length >= A.need) { finishVol(G); break; } A.ci++; A.actor = A.cands[A.ci]; break;
-    case 'no': lg(G, G.players[act].name + ' does not volunteer.'); A.ci++; A.actor = A.cands[A.ci]; break;
+    case 'yes': A.vol.push(act); lg(G, sv(G, act, 'volunteers', 'volunteer') + '.'); if (A.vol.length >= A.need) { finishVol(G); break; } A.ci++; A.actor = A.cands[A.ci]; break;
+    case 'no': lg(G, sv(G, act, 'does not', 'do not') + ' volunteer.'); A.ci++; A.actor = A.cands[A.ci]; break;
   }
   if (!rem(G).length) endAssign(G);
   return '';
@@ -495,7 +497,7 @@ function doPing(G, s, m) {
   const p = G.players[s]; if (G.comm === 'narc') G.pool--; else p.pingUsed = 1;
   G.pings.push({ seat: s, c: m.c, k: m.k, n: G.tricks.length });
   ev(G, { t: 'ping', seat: s, c: m.c, k: m.k });
-  lg(G, p.name + ' shows ' + cn(m.c) + (m.k === 'high' ? ' as their highest of the suit' : m.k === 'low' ? ' as their lowest of the suit' : m.k === 'only' ? ' as their only card of the suit' : ' (murky water: no token mark)') + '.');
+  lg(G, sv(G, s, 'shows', 'show') + ' ' + cn(m.c) + (m.k === 'high' ? ' as ' + (p.name === 'You' ? 'your' : 'their') + ' highest of the suit' : m.k === 'low' ? ' as ' + (p.name === 'You' ? 'your' : 'their') + ' lowest of the suit' : m.k === 'only' ? ' as ' + (p.name === 'You' ? 'your' : 'their') + ' only card of the suit' : ' (murky water: no token mark)') + '.');
   if (G.phase === 'signal') { G.sig.pass = []; nextSignal(G, s); }
 }
 function sigOrder(G) { return orderFrom(G, G.cap).filter(s => isDiver(G, s)); }
@@ -619,7 +621,7 @@ function doPlay(G, s, c) {
   const k = { n: T.n, lead: T.lead, ls: T.ls, plays: T.plays.map(p => ({ s: p.s, c: p.c })), w, wc };
   G.tricks.push(k);
   ev(G, { t: 'trick', n: k.n, w, wc, plays: k.plays });
-  lg(G, G.players[w].name + ' wins trick ' + (k.n + 1) + ' with ' + cn(wc) + '.');
+  lg(G, sv(G, w, 'wins', 'win') + ' trick ' + (k.n + 1) + ' with ' + cn(wc) + '.');
   if (G.firstW < 0) G.firstW = w;
   if (T.bad) { finish(G, false, 'A trick was led with a Coral card or a Lantern.'); return; }
   if (T.bad27) { finish(G, false, 'The Sunstar 5 was played too early.'); return; }
@@ -683,7 +685,7 @@ function apply(G, seat, m) {
     }
     case 'predict': {
       const t = G.tasks[m.i]; t.pn = m.n; ev(G, { t: 'predict', i: m.i, seat: t.owner, open: TASKS[t.id].open ? m.n : -1 });
-      if (TASKS[t.id].open) lg(G, G.players[t.owner].name + ' predicts ' + m.n + ' trick' + (m.n === 1 ? '' : 's') + '.'); else lg(G, G.players[t.owner].name + ' writes down a secret prediction.');
+      if (TASKS[t.id].open) lg(G, sv(G, t.owner, 'predicts', 'predict') + ' ' + m.n + ' trick' + (m.n === 1 ? '' : 's') + '.'); else lg(G, sv(G, t.owner, 'writes', 'write') + ' down a secret prediction.');
       afterDistress(G); return { ok: true };
     }
     case 'signal':

@@ -145,6 +145,7 @@ async function layout(x, tag) {
           if (!st.drawing) return;
           ev.bad = true; global.FREEZE = 1; await sleep(900);
           const cur = await C[1].p.evaluate(() => { const p = G.players[NET.mySeat]; return { ver: p.ver, drawing: G.phase === 'brew' && p.st === 'draw' && !p.q }; });
+          if (!cur.drawing && (ev.tries = (ev.tries || 0) + 1) < 12) { ev.bad = false; global.FREEZE = 0; return; }
           const before = await H.p.evaluate(s => ({ n: G.logN, rej: NET.rejected, remote: NET.remote, pot: G.players.map(p => p.pot.length), bag: G.players[s].bag.length }), st.seat);
           await C[1].p.evaluate(v => { const R = NET.room, h = NET.hostPeer; const junk = [null, 5, 'x', [1, 2], { m: null }, { m: 'x' }, { m: [] }, { m: {} }, { m: { t: 5 }, v }, { m: { t: 'zzzzzzzzzzzzzzzz' }, v }, { m: { t: 'draw' } }, { m: { t: 'draw' }, v: -5 }, { m: { t: 'draw' }, v: 'x' }, { m: { t: 'draw' }, v: v + 7 }, { m: { t: 'buy', items: ['O1', 'O1', 'O1'] }, v }, { m: { t: 'stop', a: 1, b: 2, c: 3, d: 4, e: 5, f: 6 }, v }, { m: { t: 'nonsense' }, v },
             JSON.parse('{"m":{"__proto__":{"x":1},"t":"nonsense"},"v":' + v + '}'), { m: { t: 'draw', items: 'x'.repeat(500) }, v }, { hi: 1 }, { m: { t: 'choose', i: 99 }, v }]; for (const j of junk) { R.sendTo(h, 'act', j); R.emit('act', j); } R.emit('st', { s: 1e9, i: 0, n: 1, d: 'zzzz' }); R.emit('st', { junk: 1 }); R.sendTo(h, 'st', { s: 1e9, i: 0, n: 1, d: 'zzzz' }); }, cur.ver);

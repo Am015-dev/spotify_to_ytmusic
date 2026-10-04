@@ -237,7 +237,7 @@ function dockModel(v) {
     case 'assign': {
       const A = G.as; const left = G.tasks.filter(t => t.owner < 0).length;
       if (A.mode === 'vote') {
-        if (must && mv.length) { M.p = 'Vote: which diver takes every job?'; M.sub = 'No talk about cards. A tie goes to the Commander\'s vote.'; M.cls = 'mine'; G.players.filter(p => !p.helper).forEach(p => btn(p.name + (p.seat === v ? ' (me)' : ''), 'vote', { f: p.seat })); }
+        if (must && mv.length) { M.p = 'Vote: which diver takes every job?'; M.sub = 'No talk about cards. A tie goes to the Commander\'s vote.'; M.cls = 'mine'; G.players.filter(p => !p.helper).forEach(p => btn(p.seat === v && p.name !== 'You' ? p.name + ' (you)' : p.name, 'vote', { f: p.seat })); }
         else { M.p = 'Waiting for the other votes…'; }
         return M;
       }
