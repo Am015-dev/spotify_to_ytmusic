@@ -12,7 +12,7 @@ var SC_K={
   carL:{def:4.9,van:5.9,delivery:5.9,truck:6.6,'garbage-truck':7}, // length caps (m)
   ped:.48,       // pavement minifigs (was .66 = 2.6 m) → 1.9 m
   fig:.5,        // quest-giver / passenger minifigs (was 1.7 = 6.8 m) → 2.0 m
-  cam:.8,        // chase camera distances/heights × this (base + juice offsets)
+  cam:.72,       // chase camera distances/heights × this (base + juice offsets): keeps v82 framing (car length / distance)
   rad:1.15,      // collision: centre circle radius (half width 1.12)
   off:1.35,      // collision: nose / tail circles at ± this along the heading, radius rad (5.0 m long)
   skid:[.9,1.7] // skid marks: half track, behind the centre
