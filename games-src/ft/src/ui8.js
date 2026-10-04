@@ -20,11 +20,31 @@ function phApply(){const R=document.documentElement,was=PHONE.on;PHONE.on=phDete
   R.classList.toggle('ph-l',PHONE.land);R.classList.toggle('ph-p',!PHONE.land);
   R.style.setProperty('--bw',Math.floor(bw)+'px');R.style.setProperty('--bh',Math.floor(bh)+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');
   for(const [s,l] of [['.adv-btn','Advise me'],['[data-gx=logd]','Log'],['[data-gx=menud]','Menu'],['#pausebtn','Pause']]){const b=document.querySelector('.gx-bar '+s);if(b&&!b.getAttribute('aria-label'))b.setAttribute('aria-label',l)}
-  if(V3&&V3.on){V3.pawnScale=PHONE.pawn;V3.zoom=1;V3.orbit.e=PHONE.e;V3.orbit.a=0;try{resize3D(true);if(G)sync3D()}catch(e){}}
+  if(V3&&V3.on){phGestures();phZoomUi();V3.pawnScale=PHONE.pawn;V3.zoom=1;V3.orbit.e=PHONE.e;V3.orbit.a=0;try{resize3D(true);if(G)sync3D()}catch(e){}}
   return true}
 // the camera: near top-down, the tile grid (not the carved frame) fills the board
 function phFit(){const cam=V3.cam,a=cam.aspect,e=PHONE.e,u=2.2+.12,W=BW()*u+PHONE.mx,D=BH()*u+PHONE.mx;const vf=cam.fov*Math.PI/180,hf=2*Math.atan(Math.tan(vf/2)*a);
-  const needH=(D*Math.sin(e)+1.2*Math.cos(e))/2,needW=W/2;V3.orbit.d=Math.max(needH/Math.tan(vf/2),needW/Math.tan(hf/2))*1.01;V3.orbit.e=e;V3.orbit.a=0;V3.pawnScale=PHONE.pawn}
+  const needH=(D*Math.sin(e)+1.2*Math.cos(e))/2,needW=W/2;V3.orbit.d=Math.max(needH/Math.tan(vf/2),needW/Math.tan(hf/2))*1.01/(PHONE.z||1);V3.orbit.e=e;V3.orbit.a=0;V3.pawnScale=PHONE.pawn;
+  phClampPan();V3.lookT=V3.lookT||new THREE.Vector3();V3.lookT.set(PHONE.px||0,0,PHONE.pz||0);V3.dirty=true}
+// ---------- phone zoom: pinch, drag to pan when zoomed, + / − buttons, follow your own move ----------
+PHONE.z=1;PHONE.px=0;PHONE.pz=0;PHONE.follow=-1;
+function phClampPan(){const u=2.2+.12,W=BW()*u,D=BH()*u,f=1-1/(PHONE.z||1);PHONE.px=Math.max(-W/2*f,Math.min(W/2*f,PHONE.px||0));PHONE.pz=Math.max(-D/2*f,Math.min(D/2*f,PHONE.pz||0))}
+function phWorldPerPx(){const cv=V3.r.domElement;return (BW()*(2.2+.12)+PHONE.mx)/(PHONE.z||1)/Math.max(50,cv.clientWidth)}
+function phSetZoom(z,at){PHONE.z=Math.max(1,Math.min(3,z));if(at!=null&&typeof tilePos==='function'){const p=tilePos(at);PHONE.px=p.x;PHONE.pz=p.z}if(PHONE.z<=1.02){PHONE.z=1;PHONE.px=0;PHONE.pz=0}
+  if(V3&&V3.on)phFit();phZoomUi()}
+function phFocusTile(){if(!G)return null;if(G.move&&G.move.path.length)return G.move.path[G.move.path.length-1];if(G.act&&G.act.tile!=null&&G.phase==='turn')return G.act.tile;return null}
+function phZoomUi(){const z=document.querySelector('.gx-bar [data-phz]');if(!z)return;const on=PHONE.on&&V3&&V3.on;z.hidden=!on;const t=PHONE.z>1?'⤢':'🔍';if(z.textContent!==t)z.textContent=t;
+  z.setAttribute('aria-label',PHONE.z>1?'Show the whole board':'Zoom in on the board');z.classList.toggle('on',PHONE.z>1)}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-phz]');if(!b||!PHONE.on)return;if(PHONE.z>1&&G&&G.move){PHONE.userFit=true;PHONE.autoZ=false}phSetZoom(PHONE.z>1?1:2.2,PHONE.z>1?null:phFocusTile())});
+function phGestures(){const cv=V3&&V3.r&&V3.r.domElement;if(!cv||cv._phg)return;cv._phg=1;const pts=new Map();let pinch=null,pan=null;
+  cv.addEventListener('pointerdown',e=>{if(!PHONE.on)return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===2){const [a,b]=[...pts.values()];pinch={d:Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)),z:PHONE.z};pan=null;if(V3.drag)V3.drag.moved=true}
+    else if(pts.size===1)pan={x:e.clientX,y:e.clientY,px:PHONE.px,pz:PHONE.pz}});
+  addEventListener('pointermove',e=>{if(!PHONE.on||!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pinch&&pts.size>=2){const [a,b]=[...pts.values()];phSetZoom(pinch.z*Math.hypot(a.x-b.x,a.y-b.y)/pinch.d);if(V3.drag)V3.drag.moved=true}
+    else if(pan&&PHONE.z>1){const dx=e.clientX-pan.x,dy=e.clientY-pan.y;if(Math.abs(dx)+Math.abs(dy)>6){const s=phWorldPerPx();PHONE.px=pan.px-dx*s;PHONE.pz=pan.pz-dy*s;phFit()}}});
+  const up=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;if(!pts.size)pan=null};addEventListener('pointerup',up);addEventListener('pointercancel',up);
+  cv.style.touchAction='none'}
 (function(){let t=null;const f=()=>{clearTimeout(t);t=setTimeout(()=>{phApply();if(G)phRender()},60)};addEventListener('resize',f);addEventListener('orientationchange',f);phApply()})();
 
 // ---------- helpers ----------
@@ -116,18 +136,21 @@ function phStrip(hp,pop,card){const m=phMine();const s=sideToAct();let msg='',ac
   else if(!hp){const p=s>=0?P(s):null;msg=p?`${pChip(p)} ${online()&&p.human?'is deciding…':G.phase==='bid'?'is bidding…':'is playing…'}`:'';}
   else if(UI.pendDj){msg=`Tap a glowing tile for <b>${esc(DJ[UI.pendDj.k].n)}</b>`;acts=`<button class="btn sm" data-ui="cancelpw">Cancel</button>`}
   else if(G.phase==='bid'){msg='<b>Bid for turn order</b>'}
-  else if(G.step==='move'&&!G.move){msg='<b>Your move.</b> Tap a glowing tile.';const pl=curPlans(hp);if(pl&&pl[0])acts=`<button class="btn go" data-plando="0">Best plan ▶ <small>${planBadge(hp,pl[0])}</small></button><button class="btn" data-ph="open" data-k="plans">Plans</button>`}
+  else if(G.step==='move'&&!G.move){msg='<b>Your move.</b> Tap a glowing tile. 🔍 or pinch to zoom.';const pl=curPlans(hp);if(pl&&pl[0]){acts=`<button class="btn go" data-plando="0">Best plan ▶ <small>${planBadge(hp,pl[0])}</small></button><button class="btn" data-ph="open" data-k="plans">Plans</button>`;
+      const mx=Math.max(...pl.slice(0,5).map(o=>planPoints(hp,o).total)),own=planPoints(hp,pl[0]).total;
+      PHONE.why=`<p class="ps-why">Best plan: ${esc(planGains(hp,pl[0]).filter(x=>!x.startsWith('(')).join(', '))}.${mx>own?` Other plans score more right now (up to +${mx}), but this one sets up more points for later.`:''}</p>`}}
   else if(G.step==='move'&&G.move){msg=`<b>${G.move.hand.length} in hand.</b> Tap a glowing tile.`;if(!pop)acts=`<button class="btn go" data-ph="reopen">Open</button>`}
   else {msg=`<b>${phStep()}</b>`;if(!pop&&!card)acts=`<button class="btn go" data-ph="reopen">Open</button>`}
   const chips=[];
   if(m)chips.push(`<button class="pk wide" data-ph="open" data-k="mine" aria-label="Your things"><span class="pkn">${esc(m.nm)}</span><span class="pkv">★ <b>${shownTotal(m)}</b> · 🪙 <b>${m.coins}</b> · 🐪 <b>${m.camels}</b></span><span class="pks">🧺 ${m.res.length} goods · ${mdot('vizier')} ${m.vz} Advisors · ${mdot('elder')} ${m.el} Sages${m.fk?' · 🔮 '+m.fk+' Mystics':''}</span></button>`);
-  chips.push(`<button class="pk" data-ph="open" data-k="feed" aria-label="Score race: why the points changed"><span class="pkn">★ Most points wins</span><span class="pkv">${G.pl.map(p=>`<i class="pd" style="--pc:${PCOL[p.i]}"></i>${p===m?'You':esc(p.nm)} ${shownTotal(p)}`).join(' ')}</span></button>`);
+  chips.push(`<button class="pk wide" data-ph="open" data-k="feed" aria-label="Score race: why the points changed"><span class="pkn">★ Most points wins</span><span class="pkv">${G.pl.map(p=>`<i class="pd" style="--pc:${PCOL[p.i]}"></i>${p===m?'You':esc(p.nm)} ${shownTotal(p)}`).join(' ')}</span></button>`);
   chips.push(`<button class="pk" data-ph="open" data-k="market" aria-label="Market"><span class="pkn">🛒 Market</span><span class="pkv">${G.market.map(r=>RICON[r]).join('')||'–'}</span></button>`);
   chips.push(`<button class="pk" data-ph="open" data-k="djinns" aria-label="Djinns on offer"><span class="pkn">🧞 Djinns</span><span class="pkv">${G.djRow.length} on offer</span></button>`);
   if(hp&&!G.over&&phDock('.powers')&&!UI.pendDj)acts+=`<button class="btn sm" data-ph="open" data-k="powers">✨ Powers</button>`;
   const mk=m?((UI.feedMark||{})[m.i]||0):0;const fresh=(UI.feed||[]).filter(e=>e.n>mk&&(!hp||e.actor!==m.i));
   let last='';if(!hp&&!G.over){last=(G.log[0]?`<p class="ps-log">${esc(G.log[0].t)}</p>`:'')+fresh.slice(-2).map(e=>`<p class="ps-log fd">${feedLine(e)}</p>`).join('')}
   else if(hp&&fresh.length)last=`<p class="ps-log fd">Since your last turn: <b>${feedSum(fresh)}</b> <button class="btn xs" data-ph="open" data-k="feed">Why?</button></p>`;
+  if(hp&&G.step==='move'&&!G.move&&PHONE.why)last=PHONE.why+last;PHONE.why='';
   const cw=!G.over?camelWarn():'';if(cw)last=`<p class="ps-warn">⏳ ${cw}</p>`+last;
   return `<div class="ps-main"><div class="ps-msg">${msg}</div><div class="ps-ctl">${acts}</div></div>${last}<div class="ps-chips">${chips.join('')}</div>`}
 
@@ -136,7 +159,11 @@ function phRender(){const ps=$('#ps'),pp=$('#ppop'),pc=$('#pc');if(!ps)return;
   if(!PHONE.on||!G){for(const e of [ps,pp,pc])if(e)e.hidden=true;return}
   const bk=G.W+'x'+G.H;if(PHONE.k!==bk){PHONE.k=bk;phApply()}
   const hp=me(),sig=phSig();if(PHONE.pop&&PHONE.pop.sig!==sig)PHONE.pop=null;if(PHONE.hideAuto&&PHONE.hideAuto!==sig)PHONE.hideAuto='';
-  phChip();let card=null,pop=null;
+  phChip();phZoomUi();
+  // portrait: while you drop people, the board zooms onto your hand and follows it; it zooms back out when the move ends
+  if(hp&&G.move&&!PHONE.land&&PHONE.z===1&&!PHONE.userFit&&V3&&V3.on){PHONE.autoZ=true;phSetZoom(1.9,phFocusTile())}
+  if(!G.move&&PHONE.autoZ){PHONE.autoZ=false;PHONE.userFit=false;phSetZoom(1)}if(!G.move)PHONE.userFit=false;
+  if(PHONE.z>1&&hp){const f=phFocusTile();if(f!=null&&f!==PHONE.follow){PHONE.follow=f;phSetZoom(PHONE.z,f)}}else if(!hp)PHONE.follow=-1;let card=null,pop=null;
   try{card=phCard(hp);pop=PHONE.pop?phPop(PHONE.pop,hp):PHONE.hideAuto?null:phAuto(hp);if(PHONE.pop&&!pop)PHONE.pop=null}catch(e){console.error(e)}
   ps.hidden=false;const h=phStrip(hp,pop,card);if(ps.dataset.h!==h){ps.innerHTML=h;ps.dataset.h=h}
   phPanel(pp,pop);phPanel(pc,card);document.documentElement.classList.toggle('ph-pop',!!pop&&!card);document.documentElement.classList.toggle('ph-card',!!card)}

@@ -259,7 +259,7 @@ function stepAnims(dt){for(let k=V3.anims.length-1;k>=0;k--){const o=V3.anims[k]
     if(u>=1){o.position.y=a.base.y;if(a.kind==='pop')o.scale.setScalar(o.userData.s0||1);delete o.userData.anim;V3.anims.splice(k,1)}}}
 function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);const raw=V3.clock.getDelta();const dt=Math.min(.05,raw);V3.t+=dt;const t=V3.t;
   // camera eases to its target orbit
-  const c=V3.cur,o=V3.orbit,k=1-Math.exp(-dt*(V3.drag?16:6));c.a+=(o.a-c.a)*k;c.e+=(o.e-c.e)*k;c.d+=(o.d-c.d)*k;placeCam();
+  const c=V3.cur,o=V3.orbit,k=1-Math.exp(-dt*(V3.drag?16:6));c.a+=(o.a-c.a)*k;c.e+=(o.e-c.e)*k;c.d+=(o.d-c.d)*k;if(V3.lookT)V3.look.lerp(V3.lookT,k);placeCam();
   stepPieces(dt,t);stepAnims(dt);stepFx(dt);
   let lifting=false;for(const id in V3.tiles){const o=V3.tiles[id];const i=+id;const hot=V3.pick.includes(i);const hv=V3.hover===i&&hot;const top=o.g.userData.top;
     const lt=hv?.07:0;const l=(V3.lift[i]||0)+(lt-(V3.lift[i]||0))*Math.min(1,dt*12);if(Math.abs(lt-l)>.002)lifting=true;V3.lift[i]=l;o.g.position.y=l;
