@@ -2526,6 +2526,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-row.no{animation:bfShake .4s}
 .bf-row.wq .bf-wall{box-shadow:0 0 0 3px #ffc63a;border-radius:6px}
 .bf-bd{position:absolute;left:2px;top:50%;transform:translateY(-50%);z-index:2;min-width:22px;height:22px;border-radius:11px;padding:0 5px;font:900 13px/22px var(--ff);text-align:center;color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.bf-bd.rec{background:#e0a020;color:#fff;font-size:14px}.bf-bd.r2{left:28px}
 .bf-bd.bad{background:#c0392b}.bf-bd.good{background:#2f8a4a}
 .bf-c em{position:absolute;inset:0;display:grid;place-items:center;font:900 calc(var(--cs)*.42) var(--ff);font-style:normal;color:#1d5a2a;text-shadow:0 0 3px #fff,0 0 3px #fff;z-index:2}
 .bf-c.clash{box-shadow:inset 0 0 0 3px #e0402a,0 0 10px #ff6a50;z-index:2}
@@ -2539,7 +2540,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-floor .bf-c{background:#ecd3c7;box-shadow:inset 0 0 0 2px #a8493a}
 .bf-floor .bf-c span{position:absolute;inset:0;display:grid;place-items:center;font:900 calc(var(--cs)*.42) var(--ff);color:#a8302a}
 .bf-floor.ok .bf-fl{box-shadow:0 0 0 3px #ff7a4a,0 0 12px 2px rgba(255,110,70,.7)}
-.bf-floor{position:relative}.bf-bd.fbd{left:auto;right:2px}
+.bf-floor{position:relative}.bf-bd.fbd{left:auto;right:2px}.bf-bd.fbr{left:auto;right:34px}
 .bf-fll{font:italic 700 13px var(--ff);color:#8a4a2a}
 .bf-t.cr::after{content:'';position:absolute;inset:0;background:no-repeat center/100% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M18 0 L44 38 L30 56 L58 100 M44 38 L82 26 L100 34 M30 56 L6 70' stroke='%23fff' stroke-width='6' fill='none' stroke-linejoin='round'/%3E%3Cpath d='M18 0 L44 38 L30 56 L58 100 M44 38 L82 26 L100 34 M30 56 L6 70' stroke='%23000' stroke-opacity='.5' stroke-width='2' fill='none'/%3E%3C/svg%3E")}
 .bf-t.crash{animation:bfCrash .6s cubic-bezier(.3,.6,.4,1)}
@@ -2767,11 +2768,12 @@ function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R
   return h}
 function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i===pi&&G.phase==='offer'?UI.sel:null;const ok={};
   if(sel)for(const m of movesFor(sel)){try{ok[m.line]={m,X:phNow(m,pi)}}catch(e){ok[m.line]={m,X:null}}}
+  let rec=-1;if(sel&&UI.coach){try{const ms=movesFor(sel);if(ms.length>1){const R=phRec(ms,pi);if(R)rec=R.m.line}}catch(e){}}
   const wq=live&&hp&&hp.i===pi&&G.phase==='wall'&&G.wt&&G.wt.q&&G.wt.q.p===pi?G.wt.q:null;let h='';
   for(let r=0;r<5;r++){const o=ok[r],X=o&&o.X;let rk='';
     for(let col=0;col<5;col++){const k=4-col;if(k>=cap(r)){rk+='<b class="bf-c no"></b>';continue}const key=`l${pi}_${r}_${k}`;const t=p.lines[r][k];let inner='';
       if(t!=null)inner=bfTile(t,key);else if(X){const g=X.pv.ghost.find(g=>g.sl===key);if(g)inner=bfTile(g.k,null,'gh')}rk+=`<b class="bf-c" data-s="${key}">${inner}</b>`}
-    const badge=X&&(X.n||X.pv.full)?`<span class="bf-bd ${X.n?'bad':'good'}">${X.n?'✗'+X.n:'✓'}</span>`:'';
+    const badge=(rec===r?'<span class="bf-bd rec">★</span>':'')+(X&&(X.n||X.pv.full)?`<span class="bf-bd ${X.n?'bad':'good'}${rec===r?' r2':''}">${X.n?'✗'+X.n:'✓'}</span>`:'');
     const tc=X&&X.pv.full&&!S.ex.gray?(()=>{const c0=sel.c<NC?sel.c:lineColour(p.lines[r]);return c0>=0?WALLCOL(c0,r):-1})():-1;
     const blk=sel&&!o?phReason(p,r,sel.c):'';const clashC=blk.startsWith('mosaic')&&sel.c<NC?WALLCOL(sel.c,r):-1;
     let wl='';for(let c=0;c<5;c++){const key=`w${pi}_${r}_${c}`;const v=p.wall[r][c];let inner=v>=0?bfTile(v<5?v:PRISM,key):S.ex.gray?'':`<i class="pr">${bfUse(WALLC(r,c))}</i>`;let cls='';
@@ -2781,7 +2783,7 @@ function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i
       wl+=`<b class="bf-c${cls}" data-s="${key}"${cls===' pick'?` data-bfcell="${r},${c}" role="button" aria-label="Row ${r+1}, column ${c+1}"`:''}>${inner}</b>`}
     h+=`<div class="bf-row${sel?(o?' ok':' dim'):''}${blk.startsWith('holds')?' rclash':''}${wq&&wq.r===r?' wq':''}" data-bfrow="${r}"${o?` role="button" aria-label="Rack ${r+1}"`:''}><div class="bf-rack">${badge}${rk}</div><i class="bf-ar"></i><div class="bf-wall">${wl}</div></div>`}
   let fl='';for(let k=0;k<7;k++){const key=`x${pi}_${k}`;const t=p.floor[k];fl+=`<b class="bf-c" data-s="${key}">${t!=null?bfTile(t,key,t===SUN?'':'cr'):`<span>${String(FLOOR[k]).replace('-','−')}</span>`}</b>`}
-  let fb='';if(sel){const m5=movesFor(sel).find(m=>m.line===5);if(m5){try{const pv=preview(m5,pi);fb=`<span class="bf-bd bad fbd">${String(pv.pen).replace('-','−')}</span>`}catch(e){}}}
+  let fb='';if(rec===5)fb+='<span class="bf-bd rec fbr">★</span>';if(sel){const m5=movesFor(sel).find(m=>m.line===5);if(m5){try{const pv=preview(m5,pi);fb=`<span class="bf-bd bad fbd">${String(pv.pen).replace('-','−')}</span>`}catch(e){}}}
   h+=`<div class="bf-floor${sel?' ok':''}" data-bfrow="5"${sel?' role="button" aria-label="Floor: break them"':''}><div class="bf-fl">${fl}</div><span class="bf-fll">floor</span>${fb}</div>`;return h}
 function bfTopHTML(S){const s=BF.busy?BF.actor:sideToAct();
   return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points"><i></i><b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?'<em>☀</em>':''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span></button>`).join('')}</div><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
