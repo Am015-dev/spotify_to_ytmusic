@@ -86,7 +86,7 @@ audio bundle and every test script, and adapt them. Read `SP/kaiten/PLAN.md`, `g
   (e.g. `lay-phone.js 390x763,844x390`). Run the full 7-size phone sweep, the 4 desktop sizes and all p2p
   scenarios once at the end, not after every edit. One phone size takes ~80 s; the full sweep ~10 min.
 - **Queue heavy jobs:** prefix every Playwright, gauntlet, cover and p2p run with `games-src/scripts/heavy`
-  (e.g. `games-src/scripts/heavy node lay-phone.js 390x763`). It allows 3 heavy jobs machine-wide (4 cores);
+  (e.g. `games-src/scripts/heavy node lay-phone.js 390x763`). It allows 4 busy jobs machine-wide (4 cores; long-lived browser "servers" you drive step by step run outside the queue);
   more only makes everyone slower.
 - **Don't sleep-poll.** Run long jobs with `run_in_background` and wait for the completion notice (or use the
   Monitor tool), instead of `sleep 120` loops. Don't start a job just to watch it time out at 2 minutes:

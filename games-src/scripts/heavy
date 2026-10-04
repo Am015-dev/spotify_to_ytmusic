@@ -1,8 +1,11 @@
 #!/bin/bash
 # Run a heavy test (Playwright, gauntlet, p2p) with at most $HEAVY_SLOTS of them machine-wide.
-# The box has 4 cores; more than ~3 heavy jobs at once makes every job slower and timeouts look like bugs.
+# The box has 4 cores; more than ~3 busy jobs at once makes every job slower and timeouts look like bugs.
 #   games-src/scripts/heavy node lay-phone.js 390x763
-SLOTS=${HEAVY_SLOTS:-3}; DIR=/tmp/gns-heavy; mkdir -p "$DIR"
+# Long-lived interactive helpers (a browser "server" a reviewer drives step by step) are mostly idle:
+# they must NOT hold a slot, or they starve everyone. Such commands run straight away.
+case " $* " in *srv*|*server*|*serve.js*) exec "$@";; esac
+SLOTS=${HEAVY_SLOTS:-4}; DIR=/tmp/gns-heavy; mkdir -p "$DIR"
 while :; do
   for i in $(seq 1 "$SLOTS"); do
     exec 9>"$DIR/slot$i"
