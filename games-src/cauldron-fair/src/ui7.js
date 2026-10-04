@@ -121,7 +121,7 @@ function pxSync() {
   if (PX.texKey !== keyT) { PX.texKey = keyT; try { if (PX.boardSp.texture && PX.boardSp.texture !== PIXI.Texture.EMPTY) PX.boardSp.texture.destroy(true); } catch (e) { } PX.boardSp.texture = pxBuildBoard(S); }
   PX.S = S; PX.cx = cx; PX.cy = cy; PX.k = S / (2 * KIT.GEO.R);
   PX.boardSp.visible = true; PX.boardSp.width = PX.boardSp.height = S; PX.boardSp.x = cx - S / 2; PX.boardSp.y = cy - S / 2;
-  const bi = $('#bagi'); if (bi) { const b = bi.getBoundingClientRect(); PX.bag = { x: b.left - B.left + 18, y: b.top - B.top + 20 }; }
+  const bi = $('#bagi'), bb = document.querySelector('#acts .bagb'); if (bb && bb.getBoundingClientRect().width > 4) { const b = bb.getBoundingClientRect(); PX.bag = { x: Math.max(10, Math.min(B.width - 10, b.left - B.left + b.width / 2)), y: Math.min(B.height - 8, b.top - B.top + b.height * .3) }; } else if (bi && bi.getBoundingClientRect().width > 4) { const b = bi.getBoundingClientRect(); PX.bag = { x: b.left - B.left + 18, y: b.top - B.top + 20 }; } else PX.bag = { x: B.width / 2, y: B.height - 8 };
   const csz = .98 * PX.k;
   if (PX.seat !== f) { pxClearChips(); PX.seat = f; PX.snap = true; }
   // chips: reconcile sprites with the pot
@@ -141,8 +141,9 @@ function pxSync() {
     if (!o) {
       o = pxMakeChip(w.c); PX.chips.set(id, o); o.pos = w.c.pos;
       const fly = PX.flyIds[id]; delete PX.flyIds[id];
-      if (fly && !snapAll) { o.sp.x = PX.bag.x; o.sp.y = PX.bag.y; o.sp.scale.set(csz / 128 * 1.5); o.sp.rotation = -.6; o.sp.alpha = 0; o.sh.visible = false; o.flying = true; o.tx = tp.x; o.ty = tp.y;
-        PX.nFly = (PX.nFly || 0) + 1; PX.tweens.push({ t0: performance.now(), dur: 520, from: { x: PX.bag.x, y: PX.bag.y, s: csz / 128 * 1.5, r: -.6 }, to: { x: tp.x, y: tp.y, s: csz / 128, r: 0 }, arc: -PX.k * 2.6, obj: o, ease: pxEase, land: true }); }
+      if (fly && !snapAll) { const L0 = typeof BF !== 'undefined' && BF.launch && Date.now() - BF.launch.t < 1500 ? BF.launch : PX.bag, dl = typeof fly === 'number' && fly > 1 ? fly * .9 : 0; if (L0 === (typeof BF !== 'undefined' && BF.launch)) BF.launch = null;
+        o.sp.x = L0.x; o.sp.y = L0.y; o.sp.scale.set(csz / 128 * 1.5); o.sp.rotation = -.6; o.sp.alpha = 0; o.sh.visible = false; o.flying = true; o.tx = tp.x; o.ty = tp.y;
+        PX.nFly = (PX.nFly || 0) + 1; PX.tweens.push({ t0: performance.now() + dl, dur: 520, from: { x: L0.x, y: L0.y, s: csz / 128 * 1.7, r: dl ? 0 : -.6 }, to: { x: tp.x, y: tp.y, s: csz / 128, r: 0 }, arc: -PX.k * 2.6, obj: o, ease: pxEase, land: true }); }
       else { o.sp.x = tp.x; o.sp.y = tp.y; o.sp.scale.set(csz / 128); }
     } else if (o.pos !== w.c.pos) {
       o.pos = w.c.pos; if (snapAll) { o.sp.x = tp.x; o.sp.y = tp.y; } else PX.tweens.push({ t0: performance.now(), dur: 380, from: { x: o.sp.x, y: o.sp.y, s: o.sp.scale.x }, to: { x: tp.x, y: tp.y, s: csz / 128 }, obj: o, ease: pxEase });
@@ -177,7 +178,7 @@ function pxEvent(e) {
   if (e.t === 'place' || e.t === 'side') { if (e.t === 'place') PX.flyIds[e.chip.i] = 1; }
   else if (e.t === 'flask') { PX.backIds[e.chip.i] = 1; }
   else if (e.t === 'restart') { const p = G.players[f]; p.pot.forEach(c => { PX.backIds[c.i] = 1; }); }
-  else if (e.t === 'boom') { if (ANIM && !UI.sim) { PX.nBoom = (PX.nBoom || 0) + 1; PX.boomSeat = f; PX.flash = 1; PX.shake = .65; if (q.parts) for (let i = 0; i < Math.round(12 * q.parts); i++) pxPuff(PX.cx + (Math.random() - .5) * PX.S * .3, PX.cy + (Math.random() - .5) * PX.S * .3, i); } }
+  else if (e.t === 'boom') { if (ANIM && !UI.sim) { PX.nBoom = (PX.nBoom || 0) + 1; PX.boomSeat = f; PX.flash = 1.4; PX.shake = 1.1; if (q.parts) for (let i = 0; i < Math.round(22 * q.parts); i++) pxPuff(PX.cx + (Math.random() - .5) * PX.S * .3, PX.cy + (Math.random() - .5) * PX.S * .3, i); } }
   else if (e.t === 'gain') { if (e.k === 'ruby' || e.k === 'vp') pxFloat((e.k === 'ruby' ? '+' + e.n + ' ruby' : '+' + e.n + ' VP'), e.k === 'ruby' ? 0xff7a8a : 0xffe08a); }
   pxDirty();
 }
@@ -201,7 +202,7 @@ function pxStepTweens(now) {
     sp.x = tw.from.x + (tw.to.x - tw.from.x) * e; sp.y = tw.from.y + (tw.to.y - tw.from.y) * e + (tw.arc ? tw.arc * Math.sin(Math.PI * e) : 0);
     if (tw.from.s != null && tw.to.s != null) sp.scale.set(tw.from.s + (tw.to.s - tw.from.s) * e);
     if (tw.from.r != null) sp.rotation = tw.from.r + (tw.to.r - tw.from.r) * e;
-    if (tw.land) { sp.alpha = Math.min(1, u * 5); }
+    if (tw.land) { sp.alpha = tw.from.r === 0 ? 1 : Math.min(1, u * 5); }
     if (tw.kill) sp.alpha = 1 - e * e;
     if (o.sh && !o.sh.destroyed) { o.sh.x = sp.x + 3; o.sh.y = sp.y + 6; }
     if (u < 1) keep.push(tw);
@@ -226,11 +227,11 @@ function pxStepParts(dt) {
   PX.parts = keep;
 }
 function pxAmbient(dt) {
-  const q = PXQ[PX.q]; const want = q.parts && PX.on && G && UI.started && !UI.sim ? Math.round((3 + Math.min(14, (PX.chipsN || 0) * 1.1)) * q.parts) : 0;
+  const q = PXQ[PX.q]; const HT = typeof BF !== 'undefined' ? BF.heat || 0 : 0; const want = q.parts && PX.on && G && UI.started && !UI.sim ? Math.round(Math.min(16, 3 + Math.min(6, (PX.chipsN || 0) * .6) + 10 * HT) * Math.max(.6, q.parts)) : 0;
   while (PX.amb.length < want && PX.amb.length < 16 && PX.tex.bubble) { const b = new PIXI.Sprite(PX.tex.bubble); b.anchor.set(.5); b.__ph = Math.random(); b.__a = Math.random() * 6.28; b.__r = Math.sqrt(Math.random()) * .8; b.__sp = .25 + Math.random() * .4; PX.L.amb.addChild(b); PX.amb.push(b); }
   while (PX.amb.length > want) { const b = PX.amb.pop(); try { b.destroy(); } catch (e) { } }
-  const hot = PX.boomNow ? 1.8 : 1;
-  for (const b of PX.amb) { b.__ph += dt * b.__sp * hot; if (b.__ph > 1) { b.__ph = 0; b.__a = Math.random() * 6.28; b.__r = Math.sqrt(Math.random()) * .8; } const u = b.__ph, rr = b.__r * KIT.GEO.R * PX.k; b.x = PX.cx + Math.cos(b.__a) * rr; b.y = PX.cy + Math.sin(b.__a) * rr - u * PX.k * .4; const s = Math.sin(Math.PI * u); b.scale.set(PX.k * (.12 + .26 * s) / 96); b.alpha = .55 * s; b.tint = PX.boomNow ? 0xffc89a : 0xffffff; }
+  const hot = PX.boomNow ? 1.8 : 1 + 2.4 * HT;
+  for (const b of PX.amb) { b.__ph += dt * b.__sp * hot; if (b.__ph > 1) { b.__ph = 0; b.__a = Math.random() * 6.28; b.__r = Math.sqrt(Math.random()) * .8; } const u = b.__ph, rr = b.__r * KIT.GEO.R * PX.k; b.x = PX.cx + Math.cos(b.__a) * rr; b.y = PX.cy + Math.sin(b.__a) * rr - u * PX.k * .4; const s = Math.sin(Math.PI * u); b.scale.set(PX.k * (.12 + (.26 + .22 * HT) * s) / 96); b.alpha = (.55 + .3 * HT) * s; b.tint = PX.boomNow ? 0xffc89a : HT > .7 ? 0xffd2b0 : 0xffffff; }
 }
 function pxFrame(ts) {
   if (!PX.on) return;
@@ -241,8 +242,11 @@ function pxFrame(ts) {
   // the scoring ring pulses; the pot "pops" when a chip lands; shake and flash after an explosion
   if (PX.ring && PX.ring.visible && PX.ringAt) { const a = .65 + .3 * Math.sin(PX.t * 4); PX.ring.clear(); PX.ring.circle(PX.ringAt.x, PX.ringAt.y, PX.k * .62).stroke({ width: Math.max(2.5, PX.k * .11), color: 0xf2b81e, alpha: q.fx ? a : .9 }); if (q.fx) moving = true; }
   if (PX.pulse > 0) { PX.pulse = Math.max(0, PX.pulse - dt * 3); const s = 1 + .018 * PX.pulse; PX.L.board.scale.set(s); PX.L.board.pivot.set(PX.cx, PX.cy); PX.L.board.position.set(PX.cx, PX.cy); moving = true; if (PX.pulse === 0) { PX.L.board.scale.set(1); PX.L.board.pivot.set(0, 0); PX.L.board.position.set(0, 0); } }
-  if (PX.shake > 0) { PX.shake = Math.max(0, PX.shake - dt); PX.root.x = (Math.random() - .5) * 10 * PX.shake / .65; PX.root.y = (Math.random() - .5) * 8 * PX.shake / .65; moving = true; if (PX.shake === 0) { PX.root.x = 0; PX.root.y = 0; } }
-  if (PX.flash > 0) { PX.flash = Math.max(0, PX.flash - dt * 2.4); moving = true; PX.flashG.clear(); if (PX.flash > 0) PX.flashG.circle(PX.cx, PX.cy, PX.S / 2 - 2).fill({ color: 0xff5030, alpha: PX.flash * .5 }); else PX.flashG.clear(); }
+  const ht = typeof BF !== 'undefined' ? BF.heat || 0 : 0;
+  if (PX.shake > 0) { PX.shake = Math.max(0, PX.shake - dt); PX.root.x = (Math.random() - .5) * 18 * PX.shake; PX.root.y = (Math.random() - .5) * 14 * PX.shake; moving = true; if (PX.shake === 0) { PX.root.x = 0; PX.root.y = 0; } }
+  else if (ht > .6 && q.fx && !snap && !PX.boomNow) { const a = (ht - .6) * 4; PX.root.x = Math.sin(PX.t * 37) * a; PX.root.y = Math.cos(PX.t * 29) * a * .7; moving = true; }
+  else if (PX.root.x || PX.root.y) { PX.root.x = 0; PX.root.y = 0; }
+  if (PX.flash > 0) { PX.flash = Math.max(0, PX.flash - dt * 2.4); moving = true; PX.flashG.clear(); if (PX.flash > 0) PX.flashG.circle(PX.cx, PX.cy, PX.S / 2 - 2).fill({ color: 0xff5030, alpha: Math.min(1, PX.flash) * .6 }); else PX.flashG.clear(); }
   PX.moving = moving;
   if (moving || PX.dirty || PerfHUDtesting()) { PX.dirty = false; try { PX.app.renderer.render(PX.app.stage); PX.frames = (PX.frames || 0) + 1; } catch (e) { pxOff('render: ' + (e && e.message)); } }
 }
