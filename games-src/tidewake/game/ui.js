@@ -847,7 +847,9 @@ const TW_MARK={start:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="
 function junkSVG(){return `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#14606b"/>${[0,1,2,3].map(i=>`<path d="M${7+i*9} 30l4-14 4 14z" fill="${COL[i].sail}" stroke="#fff" stroke-width="1"/>`).join('')}<path d="M5 32h38l-4 6H9z" fill="#5a3a1e"/></svg>`}
 function diceSVG(){return `<svg viewBox="0 0 48 48"><rect x="3" y="12" width="20" height="20" rx="4" fill="#e3b24b"/><rect x="25" y="16" width="20" height="20" rx="4" fill="#3c7bd0"/><circle cx="9" cy="18" r="2" fill="#14232b"/><circle cx="17" cy="26" r="2" fill="#14232b"/><circle cx="35" cy="26" r="2" fill="#fff"/></svg>`}
 function refPic(it,big){const p=it.pic||{},px=big?168:52;
-  try{if(p.cur!=null)return TWKit.cardURL(BASE_PATHS[p.cur],{uid:(big?'rb':'rs')+p.cur,size:px});if(p.lev!=null)return TWKit.leviathanURL(levArrows(p.lev),{uid:(big?'lb':'ls')+p.lev,size:px})}catch(e){return null}
+  // inline SVG, not an <img> data URL: lazily decoded images left unpainted tiles in the drawer over the WebGL board (Chromium)
+  const im=u=>{const m=/^data:image\/svg\+xml[^,]*,(.*)$/.exec(u);if(!m){const i=new Image(px,px);i.alt='';i.src=u;return i}const sv=decodeURIComponent(m[1]).replace(/<\?xml[^>]*>/,'');return sv.replace('<svg','<svg aria-hidden="true" focusable="false"')};
+  try{if(p.cur!=null)return im(TWKit.cardURL(BASE_PATHS[p.cur],{uid:(big?'rb':'rs')+p.cur,size:px}));if(p.lev!=null)return im(TWKit.leviathanURL(levArrows(p.lev),{uid:(big?'lb':'ls')+p.lev,size:px}))}catch(e){return null}
   if(p.ex)return TW_EX[p.ex];if(p.mark)return TW_MARK[p.mark];if(p.junk)return junkSVG();if(p.dice)return diceSVG();return null}
 function refInGame(it){if(!G)return true;const id=it.id,E=G.exp||{};
   if(id==='gate')return !!E.rift;if(id==='wave')return !!E.wave;if(id==='mael')return !!E.maelstrom;if(id==='cannon')return !!E.cannon;
