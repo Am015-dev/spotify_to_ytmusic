@@ -22,7 +22,7 @@ function buildRules() {
     h('p', 'In the last day everybody secretly chooses Draw or Stop, and all choices are revealed together (Stir!). You can also draw at the same moment on every other day: the computers draw while you think.'));
   sec('The spiral', h('p', 'Your scoring space is the one right after your last chip. It shows coins (the big number, for shopping), victory points (the small brown number) and sometimes a ruby. Reach the last space and you get the spoon: 15 points and 35 coins.'));
   sec('Counting the day', h('ol', ...li([
-    'Bonus die: of the cauldrons that did not explode, the one on the highest coin number rolls (if several spaces show the same number the farther one wins; exactly equal spaces all roll). It gives 1 or 2 points, a ruby, a droplet step or a Marrow chip.',
+    'Bonus die: among the cauldrons that did not explode, the one whose space has the most coins rolls the die (a tie on coins goes to the one further along the path; if even that is equal, they all roll). It gives 1 or 2 points, a ruby, one step further on for your droplet (your start marker), or a Marrow chip.',
     'Chip powers: black, green and purple chips act now (books say how).',
     'Rubies: a ruby on your scoring space gives you 1 ruby, even if you exploded.',
     'Points: you score the victory points of your space (exploded players choose points or shopping).',

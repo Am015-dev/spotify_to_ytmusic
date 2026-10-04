@@ -100,10 +100,10 @@ async function finish(P, H, tag, extra) {
   const hs = await H.p.evaluate(sum); const cs = await Promise.all(alive.filter(x => x !== H).map(x => x.p.evaluate(sum).catch(() => null)));
   const agree = cs.every(c => c && c.over && c.winners === hs.winners && c.totals === hs.totals && c.winText === hs.winText && c.logN === hs.logN && c.hist === hs.hist);
   const exact = await Promise.all(alive.filter(x => x !== H).map(async x => { const j = await x.p.evaluate(() => JSON.stringify(G)); const eq = await H.p.evaluate(([j, s]) => { const a = JSON.stringify(netStrip(G, s)); if (a === j) return true; let i = 0; while (i < a.length && a[i] === j[i]) i++; return 'diff@' + i + ' host:' + a.slice(Math.max(0, i - 60), i + 80) + ' | client:' + j.slice(Math.max(0, i - 60), i + 80); }, [j, x.seat]); if (eq !== true) dbg.exactInfo = eq; return eq === true; }));
-  const stats = await H.p.evaluate(() => ({ remote: NET.remote, rejected: NET.rejected, rejLog: NET.rejLog.slice(-6), inv: CF.checkInvariants(G).length })); const errors = P.flatMap(x => x.errs);
+  const stats = await H.p.evaluate(() => ({ remote: NET.remote, rejected: NET.rejected, rejLog: NET.rejLog.slice(-6), inv: CF.checkInvariants(G).length, stir: G.used.stir || 0 })); const errors = P.flatMap(x => x.errs);
   const finals = cs.every(c => c && c.shown) && hs.shown;
   const r = Object.assign({ tag, host: { winners: hs.winners, totals: hs.totals, names: hs.names }, clients: cs.map(c => c && { seat: c.seat, over: c.over }), agree, exactStrip: exact.every(Boolean), exactInfo: dbg.exactInfo, finalCardEverywhere: finals, hostStats: stats }, extra || {}, { errors: errors.slice(0, 10), nErrors: errors.length });
-  if (stats.inv) r.nErrors++; console.log(JSON.stringify(r)); return r;
+  if (stats.inv) r.nErrors++; if (!stats.stir) { r.nErrors++; r.errors.push('day 9 Stir never happened'); } console.log(JSON.stringify(r)); return r;
 }
 async function layout(x, tag) {
   const r = await x.p.evaluate(() => {
