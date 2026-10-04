@@ -152,10 +152,10 @@ function phStrip(hp,pop,card){const m=phMine();const s=sideToAct();let msg='',ac
   const mk=m?((UI.feedMark||{})[m.i]||0):0;const fresh=(UI.feed||[]).filter(e=>e.n>mk&&(!hp||e.actor!==m.i));
   let last='';if(!hp&&!G.over){last=(G.log[0]?`<p class="ps-log">${esc(G.log[0].t)}</p>`:'')+fresh.slice(-2).map(e=>`<p class="ps-log fd">${feedLine(e)}</p>`).join('')}
   else if(hp&&fresh.length){const big=fresh.filter(e=>Math.abs(e.d)>=3).slice(-3).reverse();
-    last=`<p class="ps-log fd">Since your last turn: <b>${feedSum(fresh)}</b> <button class="btn xs" data-ph="open" data-k="feed">Why?</button></p>`+big.map(e=>`<p class="ps-log fd">${feedLine(e)}</p>`).join('')}
+    last=`<p class="ps-log fd">Since your last turn: <b>${feedSum(fresh)}</b> <button class="btn xs" data-ph="open" data-k="feed">Why?</button></p>${big.length?'<p class="ps-log small">Biggest changes:</p>':''}`+big.map(e=>`<p class="ps-log fd">${feedLine(e)}</p>`).join('')}
   if(hp&&G.step==='move'&&!G.move&&PHONE.why)last=PHONE.why+last;PHONE.why='';
   const cw=!G.over?camelWarn():'';if(cw)last=`<p class="ps-warn">⏳ ${cw}</p>`+last;
-  return `<div class="ps-main"><div class="ps-msg">${msg}</div><div class="ps-ctl">${acts}</div></div>${last}<div class="ps-chips">${chips.join('')}</div>`}
+  return `<div class="ps-main"><div class="ps-msg">${msg}</div><div class="ps-ctl">${acts}</div></div><div class="ps-chips">${chips.join('')}</div>${last}`}
 
 // ---------- render ----------
 function phRender(){const ps=$('#ps'),pp=$('#ppop'),pc=$('#pc');if(!ps)return;

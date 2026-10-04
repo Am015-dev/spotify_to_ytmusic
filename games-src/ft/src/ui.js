@@ -70,7 +70,7 @@ function renderDock(){const el=$('#dockbody');if(!el)return;const s=sideToAct();
 function tribeButtons(p,vm){const tr=vm.filter(m=>m.act==='tribe');const a=G.act;let h='';
   for(const m of vm.filter(m=>m.act==='thief'))h+=btn(m,`🦹 Send the ${esc(THIEVES[m.k].n)} first`,'warn');
   if(a.color==='builder'){const blues=AROUND(a.tile).filter(i=>G.board[i].blue&&!G.board[i].block).length;return h+tr.map(m=>btn(m,`Earn ${(a.n+(m.fk||0))*blues*(G.turnFx.qirsh?2:1)}🪙${m.fk?` (use ${m.fk}🔮)`:''}`,m.fk?'':'go')).join('')}
-  if(a.color==='assassin'){if(tr[0]&&tr[0].none)return h+btn(tr[0],'No target: carry on','go');return h+`<p class="muted small">Tap a glowing tile, or choose:</p>`+tr.map(m=>btn(m,killLabel(m.kill))).join('')}
+  if(a.color==='assassin'){if(tr[0]&&tr[0].none)return h+btn(tr[0],'No target: carry on','go');return h+`<p class="muted small">Tap a glowing tile, or choose. Taking a rival's kept Advisor or Sage costs them points directly.</p>`+tr.slice().sort((a,b)=>(b.kill.pl!=null)-(a.kill.pl!=null)).map(m=>btn(m,killLabel(m.kill))).join('')}
   return h+btn(tr[0],a.color==='merchant'?`Take ${G.market.slice(0,a.n).map(r=>RICON[r]+' '+RNAME[r]).join(', ')||'nothing (market empty)'}`:a.color==='artisan'?'Keep them and draw items':'Keep them','go')}
 function killLabel(k){const two=k.c2?` and a ${MNAME[k.c2]}`:'';if(k.pl!=null)return `🗡 ${esc(P(k.pl).nm)}'s ${MNAME[k.c]}${two}`;return `🗡 ${MNAME[k.c]}${two} on ${esc(tileName(G.board[k.tile]))}${k.fk?` (+${k.fk}🔮 range)`:''}`}
 function tileButtons(p,vm,t){let tm=vm.filter(m=>m.act==='tile');let h='';
@@ -80,7 +80,8 @@ function tileButtons(p,vm,t){let tm=vm.filter(m=>m.act==='tile');let h='';
   const allBad=buys.length&&buys2.every(x=>x.n<=0);
   if(buys.length){tm=tm.filter(m=>!m.take);
     h+=`<p class="small">Goods only pay off in <b>sets of different kinds</b> (1, 3, 7, 13, 21… points), and every coin spent is a point lost.${allBad?' <b>Every purchase here loses points: skip it.</b>':''}</p>`;
-    for(const x of buys2.slice(0,8))h+=btn(x.m,`Buy ${x.m.take.map(j=>RICON[G.market[j]]+' '+RNAME[G.market[j]]).join(' + ')} · −${cost}🪙 · net ${x.n>0?'+':''}${x.n} ★`,x.n>0&&x===buys2[0]?'go':'')}
+    if(allBad){const sk=tm.find(m=>m.skip);if(sk){h+=btn(sk,'Skip (best choice)','go');tm=tm.filter(m=>m!==sk)}}
+    for(const x of buys2.slice(0,allBad?3:8))h+=btn(x.m,`Buy ${x.m.take.map(j=>RICON[G.market[j]]+' '+RNAME[G.market[j]]).join(' + ')} · −${cost}🪙 · net ${x.n>0?'+':''}${x.n} ★`,x.n>0&&x===buys2[0]?'go':'')}
   if(t.k==='sacred'&&!tm.some(m=>m.dj||m.thief))h+=`<p class="small">You can't summon here yet: you need 2 Sages, or 1 Sage and 1 Mystic card. You have ${p.el} Sage${p.el===1?'':'s'} and ${p.fk} Mystic${p.fk===1?'':'s'}.</p>`;
   for(const m of tm){if(m.skip){h+=btn(m,allBad||!tm.some(x=>!x.skip)&&!buys.length?'Skip (best choice)':'Skip',allBad||(!buys.length&&tm.length===1)?'go':'ghost');continue}
     if(m.place!=null)h+=btn(m,`${t.k==='village'?'🏰 Palace':'🌴 Palm'} on ${esc(tileName(G.board[m.place]))}${m.place===t.i?'':' (neighbour)'}`,m.place===t.i?'go':'');

@@ -16,15 +16,18 @@ for(const [W,H] of L.SIZES){if(process.env.ONLY&&!process.env.ONLY.split(',').in
   const st=()=>pg.evaluate(()=>({g:!!G,me:!!(G&&me()),ph:G&&G.phase,step:G&&G.step,mv:G&&G.move?G.move.hand.length:-1,q:G&&!!G.q,over:G&&!!G.over,turn:G&&G.turn,cur:G&&G.cur,
     card:(()=>{const e=document.getElementById('pc');return e&&!e.hidden?e.dataset.k:''})(),pop:(()=>{const e=document.getElementById('ppop');return e&&!e.hidden?e.dataset.k:''})(),modal:UI.modal||'',pick:UI.pick.slice(),auto:!!UI.autoPlan,pend:!!UI.pendDj}));
   // ---- generic geometry checks, run at every stage ----
-  const geo=async(where,o)=>{o=o||{};const g=await pg.evaluate(()=>{const bd=document.querySelector('.gx-board').getBoundingClientRect(),cv=V3.r.domElement,rc=cv.getBoundingClientRect();V3.cam.updateMatrixWorld();
+  const geo=async(where,o)=>{o=o||{};
+    // the phone board zooms onto your hand during a move: wait for the camera to settle, then check only the tiles in view
+    await pg.waitForFunction(()=>Math.abs(V3.cur.d-V3.orbit.d)<.05&&(!V3.lookT||V3.look.distanceTo(V3.lookT)<.05),null,{timeout:5000}).catch(()=>{});
+    const g=await pg.evaluate(()=>{const ZOOM=typeof PHONE!=='undefined'&&PHONE.z>1;const bd=document.querySelector('.gx-board').getBoundingClientRect(),cv=V3.r.domElement,rc=cv.getBoundingClientRect();V3.cam.updateMatrixWorld();
       const pj=(x,y,z)=>{const v=new THREE.Vector3(x,y,z).project(V3.cam);return [rc.left+(v.x+1)/2*rc.width,rc.top+(1-v.y)/2*rc.height]};
       const out={sw:document.documentElement.scrollWidth,sh:document.documentElement.scrollHeight,bsw:document.body.scrollWidth,bsh:document.body.scrollHeight,vw:innerWidth,vh:innerHeight,board:[bd.left,bd.top,bd.width,bd.height],bad:[],ovl:[]};
       const W=BW(),Hh=BH();let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9,tmin=1e9;
       for(let i=0;i<W*Hh;i++){const p=tilePos(i);const c=pj(p.x,TH,p.z);
         for(const [dx,dz] of [[-1,-1],[1,-1],[1,1],[-1,1]]){const q=pj(p.x+dx*TS/2,TH,p.z+dz*TS/2);x0=Math.min(x0,q[0]);x1=Math.max(x1,q[0]);y0=Math.min(y0,q[1]);y1=Math.max(y1,q[1])}
         const a=pj(p.x-TS/2,TH,p.z),b=pj(p.x+TS/2,TH,p.z),c1=pj(p.x,TH,p.z-TS/2),d=pj(p.x,TH,p.z+TS/2);tmin=Math.min(tmin,Math.hypot(a[0]-b[0],a[1]-b[1]),Math.hypot(c1[0]-d[0],c1[1]-d[1]));
-        const e=document.elementFromPoint(c[0],c[1]);if(!(c[0]>=bd.left&&c[0]<=bd.right&&c[1]>=bd.top&&c[1]<=bd.bottom&&e===cv))out.bad.push('tile'+i+':'+(e?(e.id||e.className||e.tagName):'none'))}
-      for(const id in V3.stacks){const s=V3.stacks[id];if(s.hand||!s.to)continue;const c=pj(s.to.x,TH+.2,s.to.z);const e=document.elementFromPoint(c[0],c[1]);if(!(c[0]>=bd.left&&c[0]<=bd.right&&c[1]>=bd.top&&c[1]<=bd.bottom&&e===cv))out.bad.push('meeple'+id+':'+(e?(e.id||e.className||e.tagName):'none'))}
+        const e=document.elementFromPoint(c[0],c[1]);const inB=c[0]>=bd.left&&c[0]<=bd.right&&c[1]>=bd.top&&c[1]<=bd.bottom;if(!(ZOOM&&!inB)&&!(inB&&e===cv))out.bad.push('tile'+i+':'+(e?(e.id||e.className||e.tagName):'none'))}
+      for(const id in V3.stacks){const s=V3.stacks[id];if(s.hand||!s.to)continue;const c=pj(s.to.x,TH+.2,s.to.z);const e=document.elementFromPoint(c[0],c[1]);const inB=c[0]>=bd.left&&c[0]<=bd.right&&c[1]>=bd.top&&c[1]<=bd.bottom;if(!(ZOOM&&!inB)&&!(inB&&e===cv))out.bad.push('meeple'+id+':'+(e?(e.id||e.className||e.tagName):'none'))}
       out.bazaar=[x1-x0,y1-y0];out.tile=tmin;
       for(const sel of ['#ppop','#pc','#ps']){const e=document.querySelector(sel);if(!e||e.hidden||getComputedStyle(e).display==='none')continue;const r=e.getBoundingClientRect();if(r.width<2)continue;const ix=Math.max(0,Math.min(r.right,bd.right)-Math.max(r.left,bd.left)),iy=Math.max(0,Math.min(r.bottom,bd.bottom)-Math.max(r.top,bd.top));if(ix*iy>2)out.ovl.push(sel);if(r.right>innerWidth+1||r.bottom>innerHeight+1||r.left<-1||r.top<-1)out.ovl.push(sel+'-offscreen')}
       return out},null);
