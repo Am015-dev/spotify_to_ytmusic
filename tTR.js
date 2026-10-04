@@ -1,0 +1,45 @@
+// tTR: real terrain. Per map (Frankfurt, Athens A-D):
+//  1) heights vs the Terrarium source at known points (and the world ground = (h - datum) x exaggeration there),
+//  2) a keyboard bot (real controls, 1/60 s steps) drives 8 GPS routes: 0 airborne frames, never stuck > 3 s, never below the ground,
+//  3) Athens A/B: the bot climbs Filopappou / Lycabettus off-road to the summit (viewpoint bonus claimed),
+//  4) buildings: none floats > 0.3 m (incl. plinth) or is buried > 1 m (door level vs highest corner).   MAPS=fra,A,B,C,D node tTR.js
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const U='http://127.0.0.1:8766/'+(process.env.PAGE||'local_dbg.html');
+// [name, lat, lon, source height (Terrarium z14, bilinear, unsmoothed), known real height (approx.)]
+const PTS={fra:[['Römer',50.1106,8.6821,106.7,100],['Henninger Turm (Sachsenhausen)',50.0975,8.6936,125.7,130],['Hauptbahnhof',50.107,8.6625,112.6,100]],
+ A:[['Parthenon (Acropolis)',37.97153,23.72664,146.5,150],['Filopappou',37.96792,23.72163,134.3,147],['Monastiraki',37.9761,23.7255,68.2,65],['Omonia',37.9841,23.728,84.8,85]],
+ B:[['Lycabettus',37.98186,23.74331,251.3,277],['Syntagma',37.97553,23.7348,102.2,85],['Strefi',37.9868,23.7388,125.5,140]]};
+const O={fra:[50.1106,8.6821],ath:[37.9761,23.7255]};
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let fails=0,npts=0;const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)fails++};
+for(const map of (process.env.MAPS||'fra,A,B,C,D').split(',')){const city=map==='fra'?'fra':'ath';const p=await (await b.newContext({viewport:{width:640,height:360}})).newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.setDefaultTimeout(1200000);
+ await p.goto(U);await p.waitForFunction(()=>window.__mho&&window.__mho.state==='menu');
+ await p.evaluate(([city,d])=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_city@1',city);if(d)localStorage.setItem('mho_athd@1',d);for(const k of['mho_roam@1','mho_roam.ath@1'])localStorage.setItem(k,'{"tut":1,"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}');localStorage.setItem('mho_story@1','{"ath":1,"seen":1}')},[city,city==='ath'?map:'']);
+ await p.reload();await p.waitForFunction(()=>window.__mho&&window.__mho.state==='menu');await p.evaluate(()=>{__dbg.composer.render=()=>{};__mho.enterRoam()});await p.waitForFunction(()=>__mho.state==='roam');await p.evaluate(()=>{try{__mho.storyClose()}catch(e){}});
+ // 1) heights
+ for(const[name,la,lo,src,real]of PTS[map]||[]){const[l0,o0]=O[city],e=(lo-o0)*111320*Math.cos(l0*Math.PI/180),n=(la-l0)*111320;const r=await p.evaluate(([e,n])=>{const T=__tr,[x,z]=T.WP(e,n);return{h:T.real(e,n),g:T.Y(x,z),G:T.G(x,z),datum:T.datum,ex:T.ex}},[e,n]);npts++;
+  const want=(r.h-r.datum)*r.ex;ok(Math.abs(r.h-src)<=12&&Math.abs(r.h-real)<=Math.max(30,real*.12)&&Math.abs(r.g-want)<=Math.max(3,want*.05),`${map} height ${name}: grid ${r.h.toFixed(1)} m (source ${src}, real ~${real}), ground ${r.g.toFixed(1)} m above datum ${r.datum} x${r.ex} (expected ${want.toFixed(1)})`)}
+ // 2) routes + 3) climbs
+ const R=await p.evaluate(map=>{const M=__mho,RO=M.RO,K=M.K,res=[];let sd=map.charCodeAt(0)*7919;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;
+  const keys=(a,vt)=>{K.ArrowLeft=a>.035;K.ArrowRight=a<-.035;K.ArrowUp=RO.v<vt;K.ArrowDown=RO.v>vt+6};
+  const drive=(pts,max,vmax)=>{const cum=[0];for(let k=1;k<pts.length;k++)cum.push(cum[k-1]+Math.hypot(pts[k][0]-pts[k-1][0],pts[k][1]-pts[k-1][1]));let wd=0,wy=RO.y,lastTO=RO.takeoff,jump=0,i=0,t,air=0,below=0,st=0,mst=0,dist=0,px=RO.x,pz=RO.z,maxG=0,worst=null;
+   for(t=0;t<max;t++){let bj=i,bd=1e9;for(let k=i;k<Math.min(pts.length,i+60);k++){const dd=Math.hypot(pts[k][0]-RO.x,pts[k][1]-RO.z);if(dd<bd){bd=dd;bj=k}}i=bj;const LA=9+Math.abs(RO.v)*.35;let k=i;while(k<pts.length-1&&cum[k]-cum[i]<LA)k++;
+    let a=Math.atan2(pts[k][0]-RO.x,pts[k][1]-RO.z)-RO.h;a=Math.atan2(Math.sin(a),Math.cos(a));keys(a,vmax*Math.max(.4,1-Math.abs(a)*.9));const y0=RO.y;M.roamSim(1);
+    const sdd=Math.hypot(RO.x-px,RO.z-pz);dist+=sdd;const nr=(RO.ramps||[]).some(q=>Math.hypot(q.x-RO.x,q.z-RO.z)<90);if(nr){wd=0;wy=RO.y}else wd+=sdd;if(wd>=4){const gr=Math.abs(RO.y-wy)/wd;if(gr>maxG){maxG=gr;window.__gw=[Math.round(RO.x),Math.round(RO.z),+wy.toFixed(2),+RO.y.toFixed(2)]}wd=0;wy=RO.y}px=RO.x;pz=RO.z;const g=M.gnd(RO.x,RO.z,RO.y+.3);if(RO.takeoff&&RO.takeoff!==lastTO){lastTO=RO.takeoff;jump=1}let land=0;if(jump&&RO.y<=g+.06){jump=0;land=1}const ramp=land||jump||(RO.ramps||[]).some(q=>Math.hypot(q.x-RO.x,q.z-RO.z)<60)||RO.lastRamp;
+    if(!ramp&&RO.y>g+.5){air++;if(!worst)worst=['air',Math.round(RO.x),Math.round(RO.z),+(RO.y-g).toFixed(2)]}if(RO.y<g-.05){below++;if(!worst)worst=['below',Math.round(RO.x),Math.round(RO.z),+(RO.y-g).toFixed(2),M.state,RO.on,!!RO.wk,RO.ch&&RO.ch.kind,!!RO.sp,!!RO.card,!!RO.story]}
+    if(Math.abs(RO.v)<2)st++;else st=0;mst=Math.max(mst,st);if(i>=pts.length-3)break}
+   K.ArrowLeft=K.ArrowRight=K.ArrowUp=K.ArrowDown=false;return{t:+(t/60).toFixed(1),dist:Math.round(dist),air,below,stuck:+(mst/60).toFixed(1),done:i>=pts.length-3,grade:+maxG.toFixed(3),gw:window.__gw,worst}};
+  let tries=0;while(res.length<8&&tries<60){tries++;const Bx=__tr.B,x0=Bx[0]+(Bx[1]-Bx[0])*rnd(),z0=Bx[2]+(Bx[3]-Bx[2])*rnd(),x1=Bx[0]+(Bx[1]-Bx[0])*rnd(),z1=Bx[2]+(Bx[3]-Bx[2])*rnd();
+   const q0=M.rsnap(x0,z0,300),q1=M.rsnap(x1,z1,300);if(!q0||!q1||Math.hypot(q1[0]-q0[0],q1[1]-q0[1])<700)continue;const P=M.qv.path(q0[0],q0[1],q1[0],q1[1]).P;if(!P||P.length<20)continue;
+   M.warp(P[0][0],P[0][1],Math.atan2(P[2][0]-P[0][0],P[2][1]-P[0][1]));M.roamSim(3);res.push({route:[Math.round(q0[0]),Math.round(q0[1]),Math.round(q1[0]),Math.round(q1[1])],...drive(P,160*60,45)})}
+  const climbs=[];for(const S of __tr.summits()){const h=S;let best=null;for(let k=0;k<12;k++){const a=k/12*Math.PI*2,x=S.x+Math.sin(a)*420,z=S.z+Math.cos(a)*420;if(__tr.hit(x,z))continue;let mx=0;for(let r=0;r<420;r+=10){const g1=__tr.Y(S.x+Math.sin(a)*r,S.z+Math.cos(a)*r),g2=__tr.Y(S.x+Math.sin(a)*(r+10),S.z+Math.cos(a)*(r+10));mx=Math.max(mx,(g1-g2)/10)}if(mx<Math.tan(31/57.3)&&(!best||mx>best.mx))best={x,z,mx,a}}
+   M.warp(best.x,best.z,best.a+Math.PI);M.roamSim(3);const y0=RO.y;let t=0,top=1e9;for(t=0;t<75*60;t++){const d=Math.hypot(S.x-RO.x,S.z-RO.z);top=Math.min(top,d);if(d<12)break;let a=Math.atan2(S.x-RO.x,S.z-RO.z)-RO.h;a=Math.atan2(Math.sin(a),Math.cos(a));keys(a,30);M.roamSim(1)}
+   K.ArrowLeft=K.ArrowRight=K.ArrowUp=K.ArrowDown=false;climbs.push({id:S.id,t:+(t/60).toFixed(1),d:+top.toFixed(1),rise:+(RO.y-y0).toFixed(1),y:+RO.y.toFixed(1),sy:+S.y.toFixed(1),steep:+(Math.atan(best.mx)*57.3).toFixed(1),vp:!!__tr.vp()[S.id]})}
+  const B0=__tr.blds().filter(b=>b[8]&&b[2]>-1&&b[9]<=30&&b[10]<=30),cliff=B0.filter(b=>b[3]-b[2]>6),B=B0.filter(b=>b[3]-b[2]<=6),fl=B.map(b=>b[5]-b[2]),bu=B.map(b=>b[3]-b[6]);return{res,climbs,cliff:cliff.map(b=>b.slice(0,4)),nb:B.length,lift:B.filter(b=>b[7]).length,flo:B.filter((_,i)=>fl[i]>.3).length,bur:B.filter((_,i)=>bu[i]>1).length,mf:Math.max(0,...fl).toFixed(2),mb:Math.max(0,...bu).toFixed(2),
+   wf:B.find((_,i)=>fl[i]>.3),wb:B.find((_,i)=>bu[i]>1),bstat:__tr.bstat()}},map).catch(e=>({err:e.message}));
+ if(R.err){ok(false,map+' bot error '+R.err);continue}
+ for(const q of R.res)ok(q.air===0&&q.below===0&&q.stuck<=3&&q.dist>300,`${map} route ${q.route.join(',')}: ${q.dist} m in ${q.t} s${q.done?'':' (time out)'}, airborne frames ${q.air}, below-ground frames ${q.below}, longest stop ${q.stuck} s, max grade over 4 m ${(q.grade*100).toFixed(1)} % ${q.grade>.2?JSON.stringify(q.gw):''} ${q.worst?JSON.stringify(q.worst):''}`);
+ ok(R.res.length===8,`${map}: 8 routes driven (${R.res.length})`);
+ for(const c of R.climbs)ok(c.d<12&&c.vp,`${map} off-road climb ${c.id}: reached ${c.d} m from the summit in ${c.t} s, rose ${c.rise} m (car ${c.y} / summit ${c.sy}), steepest stretch ${c.steep}°, viewpoint ${c.vp?'claimed':'missed'}`);
+ ok(R.flo===0&&R.bur===0,`${map} buildings: ${R.nb} checked, ${R.lift} lifted onto the terrain, floating >0.3 m: ${R.flo} (max ${R.mf}), buried >1 m: ${R.bur} (max ${R.mb}) ${R.wf?JSON.stringify(R.wf):''} ${R.wb?JSON.stringify(R.wb):''}`);if(R.cliff.length)console.log(`INFO ${map}: ${R.cliff.length} collider(s) straddle a cliff (>6 m relief under the footprint), not counted: ${JSON.stringify(R.cliff)}`);
+ ok(!errs.length,`${map}: no page errors ${JSON.stringify(errs.slice(0,2))}`);await p.context().close()}
+console.log(`height points checked: ${npts}`);console.log(fails?`FAILED ${fails}`:'ALL PASS');await b.close();process.exit(fails?1:0)})();
