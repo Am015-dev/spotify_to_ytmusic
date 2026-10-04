@@ -425,8 +425,9 @@ function dayRow(p, R) {
 function renderReport() {
   const rs = $('#rs'); if (!rs || !G || !G.rep) return; const R = G.rep; rs.hidden = false;
   const v = viewSeat(), me = v >= 0 ? G.players[v] : null, myq = me && me.q && EVAL_Q[me.q.h] ? me.q : null;
-  const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Day ' + R.round + ' report' });
+  const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Day ' + R.round + ' report' }); UI.rsFoot = null;
   box.appendChild(h('h2', h('span', { html: ico('coin', 30) }), 'Day ' + R.round + ' report'));
+  const body = h('div.rsbody');
   const tab = h('table.rt-tab'); tab.appendChild(h('tr', h('th', 'Cauldron'), h('th', 'Reached'), h('th', 'Result'), h('th', '+VP'), h('th', 'Total')));
   for (const p of G.players) {
     const r = dayRow(p, R); if (!r) continue; const sp = r.space;
@@ -434,16 +435,20 @@ function renderReport() {
     tab.appendChild(h('tr' + (p.seat === v ? '.me' : ''), h('td', h('span.nm', h('span', { html: avHTML(p.seat, 28) }), p.seat === v ? 'You' : p.name)),
       h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', r.gain >= 0 ? '+' + r.gain : r.gain)), h('td', h('b', p.vp))));
   }
-  box.appendChild(tab);
-  const lines = G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo)); if (lines.length) { const ev = h('div.evlog', { role: 'log', 'aria-label': 'What happened' }); lines.forEach(l => ev.appendChild(h('div', l.t))); box.appendChild(ev); setTimeout(() => { ev.scrollTop = ev.scrollHeight; }, 0); }
-  if (myq) box.appendChild(decisionBox(me, myq));
-  else if (G.phase === 'eval') { const w = G.players.filter(p => p.q && p.seat !== v).map(p => p.name); box.appendChild(h('p.sm', w.length ? 'Waiting for ' + nameList(w) + '...' : 'Counting up...')); }
+  body.appendChild(tab);
+  const lines = G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo)); if (lines.length) { const ev = h('div.evlog', { role: 'log', 'aria-label': 'What happened' }); lines.forEach(l => ev.appendChild(h('div', l.t))); body.appendChild(ev); setTimeout(() => { ev.scrollTop = ev.scrollHeight; }, 0); }
+  if (myq) body.appendChild(decisionBox(me, myq));
+  else if (G.phase === 'eval') { const w = G.players.filter(p => p.q && p.seat !== v).map(p => p.name); body.appendChild(h('p.sm', w.length ? 'Waiting for ' + nameList(w) + '...' : 'Counting up...')); }
   const done = G.phase !== 'eval' && !myq;
   const next = G.phase === 'over' ? 'See the final scores' : 'On to day ' + G.round;
-  const btns = h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap' });
-  btns.appendChild(h('button.btn.go', { 'data-a': 'rscont', type: 'button', disabled: done ? null : true }, done ? next : 'Decide first'));
-  if (typeof NET !== 'undefined' && NET.on && done) btns.appendChild(h('span.sm', 'Closes by itself in a moment.'));
-  box.appendChild(btns);
+  box.appendChild(body);
+  const foot = h('div.rsfoot');
+  if (UI.rsFoot) UI.rsFoot.forEach(e => foot.appendChild(e));
+  else { const btns = h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' });
+    btns.appendChild(h('button.btn.go', { 'data-a': 'rscont', type: 'button', disabled: done ? null : true }, done ? next : 'Decide first'));
+    if (typeof NET !== 'undefined' && NET.on && done) btns.appendChild(h('span.sm', 'Closes by itself in a moment.'));
+    foot.appendChild(btns); }
+  box.appendChild(foot);
   rs.innerHTML = ''; rs.appendChild(box);
   if (UI.mode === 'guided') tipCheck();
   if (typeof NET !== 'undefined' && NET.on && done && !UI.repAuto) { UI.repAuto = setTimeout(() => { UI.repAuto = 0; if (UI.rsMode === 'report' && G.phase !== 'eval') repContinue(); }, 30000); }
@@ -487,8 +492,7 @@ function shopUI(p, q, legal) {
   }
   wrap.appendChild(books);
   const cart = h('div.cart', h('span', 'Cart:'), sel.length ? sel.map(k => h('span.cb', chipN(k, 28), CF.price(G, k[0], +k.slice(1)))) : h('span.sm', 'nothing yet'), h('span', cost + ' of ' + coins + ' coins'));
-  wrap.appendChild(cart);
-  wrap.appendChild(h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap;margin-top:6px' }, h('button.btn.go', { 'data-a': 'shopbuy', type: 'button' }, sel.length ? 'Buy ' + sel.length + (sel.length > 1 ? ' chips' : ' chip') : 'Buy nothing'), sel.length ? h('button.btn.alt', { 'data-a': 'shopclear', type: 'button' }, 'Clear') : null));
+  UI.rsFoot = [cart, h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, h('button.btn.go', { 'data-a': 'shopbuy', type: 'button' }, sel.length ? 'Buy ' + sel.length + (sel.length > 1 ? ' chips' : ' chip') : 'Buy nothing'), sel.length ? h('button.btn.alt', { 'data-a': 'shopclear', type: 'button' }, 'Clear') : null)];
   wrap.appendChild(h('p.sm', 'Leftover coins are lost. Bought chips go into your bag.'));
   return wrap;
 }
@@ -510,18 +514,19 @@ function showFinal() {
   const rs = $('#rs'); if (!rs || !G) return; rs.hidden = false; UI.rsMode = 'final'; UI.rsOpen = true;
   const order = G.players.slice().sort((a, b) => b.vp - a.vp || b.last9 - a.last9);
   const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Final scores' });
-  const wn = G.winners.map(s => pname(s));
-  box.appendChild(h('div.win', h('span', { html: avHTML(G.winners[0], 52) }), h('div', G.winText)));
+  const body = h('div.rsbody'); const wn = G.winners.map(s => pname(s));
+  body.appendChild(h('div.win', h('span', { html: avHTML(G.winners[0], 52) }), h('div', G.winText)));
   const t = h('table.fin-tab'); const head = h('tr', h('th', 'Cauldron')); for (let r = 1; r <= D.rounds; r++) head.appendChild(h('th', 'D' + r)); head.append(h('th', 'Extra'), h('th', 'Total')); t.appendChild(head);
   for (const p of order) {
     const gains = []; let sum = 0; for (let r = 1; r <= D.rounds; r++) { const hh = G.hist.find(x => x.round === r && x.seat === p.seat); const gn = hh ? hh.gain : 0; gains.push(gn); sum += gn; }
     const row = h('tr' + (G.winners.indexOf(p.seat) >= 0 ? '.w' : ''), h('td', p.name)); gains.forEach(x => row.appendChild(h('td', x))); row.append(h('td', p.vp - sum), h('td', h('b', p.vp))); t.appendChild(row);
   }
-  box.appendChild(h('div', { style: 'overflow-x:auto' }, t));
-  box.appendChild(h('p.sm', 'D1 to D9 are the points each day brought. Extra: fortune cards, the 2 rubies for 1 point conversion at the end and points before the brewing began. Tie: the cauldron that went furthest on the last day wins.'));
+  body.appendChild(h('div', { style: 'overflow-x:auto' }, t));
+  body.appendChild(h('p.sm', 'D1 to D9 are the points each day brought. Extra: fortune cards, the 2 rubies for 1 point conversion at the end and points before the brewing began. Tie: the cauldron that went furthest on the last day wins.'));
   const cfg = UI.cfg || {};
   const online = typeof NET !== 'undefined' && NET.on;
-  box.appendChild(h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, (!online || isHost()) ? h('button.btn.go', { 'data-a': 'again', type: 'button' }, 'Play again') : h('span.sm', 'The host can start a new game.'), h('button.btn.alt', { 'data-a': 'look', type: 'button' }, 'Look at the table'), h('button.btn.alt', { 'data-a': 'menu', type: 'button' }, online ? 'Lobby' : 'Menu')));
+  box.appendChild(body);
+  box.appendChild(h('div.rsfoot', h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, (!online || isHost()) ? h('button.btn.go', { 'data-a': 'again', type: 'button' }, 'Play again') : h('span.sm', 'The host can start a new game.'), h('button.btn.alt', { 'data-a': 'look', type: 'button' }, 'Look at the table'), h('button.btn.alt', { 'data-a': 'menu', type: 'button' }, online ? 'Lobby' : 'Menu'))));
   const conf = h('div.conf'); const cols = ['#f2b81e', '#d6392f', '#3fa04a', '#3b82d6', '#8a55c4']; for (let i = 0; i < 26; i++) { const c = h('i'); c.style.cssText = 'left:' + Math.random() * 100 + '%;background:' + cols[i % 5] + ';animation-delay:' + Math.random() * 2 + 's;animation-duration:' + (2 + Math.random() * 2) + 's'; conf.appendChild(c); }
   rs.innerHTML = ''; rs.appendChild(box); if (!UI.sim) rs.appendChild(conf);
 }
@@ -938,7 +943,7 @@ function pxSync() {
       o = pxMakeChip(w.c); PX.chips.set(id, o); o.pos = w.c.pos;
       const fly = PX.flyIds[id]; delete PX.flyIds[id];
       if (fly && !snapAll) { o.sp.x = PX.bag.x; o.sp.y = PX.bag.y; o.sp.scale.set(csz / 128 * 1.5); o.sp.rotation = -.6; o.sp.alpha = 0; o.sh.visible = false; o.flying = true; o.tx = tp.x; o.ty = tp.y;
-        PX.tweens.push({ t0: performance.now(), dur: 520, from: { x: PX.bag.x, y: PX.bag.y, s: csz / 128 * 1.5, r: -.6 }, to: { x: tp.x, y: tp.y, s: csz / 128, r: 0 }, arc: -PX.k * 2.6, obj: o, ease: pxEase, land: true }); }
+        PX.nFly = (PX.nFly || 0) + 1; PX.tweens.push({ t0: performance.now(), dur: 520, from: { x: PX.bag.x, y: PX.bag.y, s: csz / 128 * 1.5, r: -.6 }, to: { x: tp.x, y: tp.y, s: csz / 128, r: 0 }, arc: -PX.k * 2.6, obj: o, ease: pxEase, land: true }); }
       else { o.sp.x = tp.x; o.sp.y = tp.y; o.sp.scale.set(csz / 128); }
     } else if (o.pos !== w.c.pos) {
       o.pos = w.c.pos; if (snapAll) { o.sp.x = tp.x; o.sp.y = tp.y; } else PX.tweens.push({ t0: performance.now(), dur: 380, from: { x: o.sp.x, y: o.sp.y, s: o.sp.scale.x }, to: { x: tp.x, y: tp.y, s: csz / 128 }, obj: o, ease: pxEase });
@@ -973,13 +978,13 @@ function pxEvent(e) {
   if (e.t === 'place' || e.t === 'side') { if (e.t === 'place') PX.flyIds[e.chip.i] = 1; }
   else if (e.t === 'flask') { PX.backIds[e.chip.i] = 1; }
   else if (e.t === 'restart') { const p = G.players[f]; p.pot.forEach(c => { PX.backIds[c.i] = 1; }); }
-  else if (e.t === 'boom') { if (ANIM && !UI.sim) { PX.boomSeat = f; PX.flash = 1; PX.shake = .65; if (q.parts) for (let i = 0; i < Math.round(12 * q.parts); i++) pxPuff(PX.cx + (Math.random() - .5) * PX.S * .3, PX.cy + (Math.random() - .5) * PX.S * .3, i); } }
+  else if (e.t === 'boom') { if (ANIM && !UI.sim) { PX.nBoom = (PX.nBoom || 0) + 1; PX.boomSeat = f; PX.flash = 1; PX.shake = .65; if (q.parts) for (let i = 0; i < Math.round(12 * q.parts); i++) pxPuff(PX.cx + (Math.random() - .5) * PX.S * .3, PX.cy + (Math.random() - .5) * PX.S * .3, i); } }
   else if (e.t === 'gain') { if (e.k === 'ruby' || e.k === 'vp') pxFloat((e.k === 'ruby' ? '+' + e.n + ' ruby' : '+' + e.n + ' VP'), e.k === 'ruby' ? 0xff7a8a : 0xffe08a); }
   pxDirty();
 }
 function pxPuff(x, y, i) { if (!PX.tex.puff) return; const sp = new PIXI.Sprite(PX.tex.puff); sp.anchor.set(.5); sp.x = x; sp.y = y; sp.alpha = 0; const s0 = PX.k * (.8 + Math.random() * .5); sp.scale.set(s0 / 160 * 1.2); PX.L.fx.addChild(sp); PX.parts.push({ sp, kind: 'puff', t: -i * .04, life: 1.1 + Math.random() * .5, vx: (Math.random() - .5) * PX.k * 2.6, vy: -PX.k * (1 + Math.random() * 2), s0: s0 / 160, s1: s0 / 160 * (2.2 + Math.random()) }); }
 function pxSplash(x, y) {
-  const q = PXQ[PX.q]; if (!q.parts || !PX.tex.splash) return; const sp = new PIXI.Sprite(PX.tex.splash); sp.anchor.set(.5); sp.x = x; sp.y = y; sp.alpha = .95; sp.scale.set(PX.k * .6 / 160); PX.L.fx.addChild(sp);
+  const q = PXQ[PX.q]; if (!q.parts || !PX.tex.splash) return; PX.nSplash = (PX.nSplash || 0) + 1; const sp = new PIXI.Sprite(PX.tex.splash); sp.anchor.set(.5); sp.x = x; sp.y = y; sp.alpha = .95; sp.scale.set(PX.k * .6 / 160); PX.L.fx.addChild(sp);
   PX.parts.push({ sp, kind: 'splash', t: 0, life: .55, s0: PX.k * .6 / 160, s1: PX.k * 2.4 / 160 });
   const nb = Math.round(4 * q.parts); for (let i = 0; i < nb; i++) { if (!PX.tex.bubble) break; const b = new PIXI.Sprite(PX.tex.bubble); b.anchor.set(.5); b.x = x + (Math.random() - .5) * PX.k * .8; b.y = y + (Math.random() - .5) * PX.k * .4; b.alpha = .9; const s0 = PX.k * (.16 + Math.random() * .2) / 96; b.scale.set(s0); PX.L.fx.addChild(b); PX.parts.push({ sp: b, kind: 'bub', t: -Math.random() * .12, life: .8 + Math.random() * .5, vy: -PX.k * (.9 + Math.random() * 1.2), vx: (Math.random() - .5) * PX.k, s0, s1: s0 * 1.6 }); }
 }
@@ -1002,7 +1007,7 @@ function pxStepTweens(now) {
     if (o.sh && !o.sh.destroyed) { o.sh.x = sp.x + 3; o.sh.y = sp.y + 6; }
     if (u < 1) keep.push(tw);
     else {
-      if (tw.land) { o.flying = false; sp.alpha = 1; sp.rotation = 0; o.sh.visible = true; pxSplash(sp.x, sp.y); PX.pulse = 1; }
+      if (tw.land) { PX.nLand = (PX.nLand || 0) + 1; o.flying = false; sp.alpha = 1; sp.rotation = 0; o.sh.visible = true; pxSplash(sp.x, sp.y); PX.pulse = 1; }
       if (tw.kill) pxKill(o);
     }
   }
@@ -1064,3 +1069,8 @@ function pxPerfReg() {
 PX.sprites = () => Array.from(PX.chips.values()).filter(o => !o.dead && !o.gone).map(o => ({ id: o.id, key: o.key, x: Math.round(o.sp.x), y: Math.round(o.sp.y), visible: o.sp.visible, alpha: o.sp.alpha }));
 PX.busy = () => PX.tweens.length > 0 || PX.parts.some(p => p.kind !== 'bub' && p.kind !== 'splash') || PX.flying;
 PX.target = i => { const p = pxPos(i); return { x: Math.round(p.x), y: Math.round(p.y) }; };
+
+PX.state = () => ({ pend: !!pxQueued || !!PX.dirty, on: PX.on, kind: PX.kind, q: PX.q, res: PX.res, tweens: PX.tweens.length, parts: PX.parts.filter(p => p.kind !== 'bub').length, amb: PX.amb.length, nFly: PX.nFly || 0, nLand: PX.nLand || 0, nBoom: PX.nBoom || 0, nSplash: PX.nSplash || 0, frames: PX.frames || 0,
+  objs: Array.from(PX.chips.values()).filter(o => !o.dead && !o.gone).map(o => ({ id: o.id, key: o.key, x: o.sp.x, y: o.sp.y, tx: o.tx, ty: o.ty, visible: o.sp.visible, alpha: o.sp.alpha, flying: !!o.flying })),
+  drop: PX.drop ? { x: PX.drop.x, y: PX.drop.y, vis: PX.drop.visible } : null, filters: [PX.root, PX.L.board, PX.L.chips, PX.L.amb, PX.L.fx, PX.L.mark].filter(c => c && c.filters && c.filters.length).length, S: PX.S, cx: PX.cx, cy: PX.cy });
+PX.canvasInk = () => { try { const c = PX.app.renderer.extract.canvas(PX.app.stage); const x = c.getContext('2d'), w = c.width, h = c.height; const d = x.getImageData(0, 0, w, h).data; let n = 0, tot = 0; for (let i = 3; i < d.length; i += 4 * 37) { tot++; if (d[i] > 20) n++; } return n / Math.max(1, tot); } catch (e) { return -1; } };

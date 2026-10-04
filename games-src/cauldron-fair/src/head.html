@@ -134,8 +134,10 @@ html.px #cwrap svg.pot{visibility:hidden}
 #toast.on{opacity:1}
 /* ---- the day report / shop / end ---- */
 #rs{position:fixed;inset:0;z-index:55;background:rgba(36,23,48,.66);display:flex;align-items:center;justify-content:center;padding:8px}
-.rsbox{background:var(--paper);border:3px solid var(--ink);border-radius:16px;width:min(680px,100%);max-height:100%;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 14px 44px rgba(0,0,0,.55);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
-.rsbox h2{margin:0;font-size:1.3rem;font-weight:900;display:flex;gap:8px;align-items:center}
+.rsbox{background:var(--paper);border:3px solid var(--ink);border-radius:16px;width:min(780px,100%);max-height:100%;overflow:hidden;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 14px 44px rgba(0,0,0,.55);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.rsbody{flex:1 1 auto;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:8px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-right:2px}
+.rsfoot{flex:0 0 auto;display:flex;flex-direction:column;gap:6px;border-top:2px solid rgba(58,36,56,.25);padding-top:8px}
+.rsbox h2{flex:0 0 auto;margin:0;font-size:1.3rem;font-weight:900;display:flex;gap:8px;align-items:center}
 .rsbox h3{margin:4px 0 2px;font-size:1.02rem}
 .rt-tab{width:100%;border-collapse:collapse;font-size:14px}
 .rt-tab th,.rt-tab td{padding:3px 5px;text-align:center;border-bottom:1px dotted rgba(58,36,56,.3);vertical-align:middle}
@@ -149,7 +151,7 @@ html.px #cwrap svg.pot{visibility:hidden}
 .dieb svg{width:26px;height:26px}
 .dieb.roll svg{animation:dieRoll .7s ease-out}
 @keyframes dieRoll{0%{transform:rotate(-360deg) scale(.4)}70%{transform:rotate(20deg) scale(1.15)}100%{transform:none}}
-.evlog{background:#fff8e6;border:1px solid rgba(58,36,56,.3);border-radius:10px;padding:5px 8px;font-size:13.5px;line-height:1.4;max-height:130px;overflow:auto}
+.evlog{flex:0 0 auto;min-height:44px;background:#fff8e6;border:1px solid rgba(58,36,56,.3);border-radius:10px;padding:5px 8px;font-size:13.5px;line-height:1.4;max-height:130px;overflow:auto}
 .evlog div{padding:1px 0}
 .dec{background:#f1e8fb;border:2px solid #7a4ab5;border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px}
 .dec h3{margin:0}

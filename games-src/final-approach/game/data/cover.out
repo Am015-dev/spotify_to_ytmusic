@@ -1,0 +1,4 @@
+cover: 700 games, 23455 moves, 17 landed, 0 problems, scenarios 21
+fired: abil_adapt=102 abil_antic=49 abil_control=94 abil_mastery=51 abil_sync=49 abil_together=123 adv0=298 adv1=662 adv2=250 axisMove=942 brakes=214 coffeeGain=2530 coffeeSpend=2348 flaps=572 gear=688 iceCol=1 internTrain=225 keroDie=468 lose_checks=18 lose_collision=60 lose_corridor=31 lose_fuel=23 lose_mandatory=466 lose_short=19 lose_speed=14 lose_spin=52 place_axis=2879 place_brakes=215 place_conc=2532 place_engines=2880 place_flaps=573 place_gear=711 place_ice=15 place_intern=225 place_kero=468 place_radio=2708 radioClear=2431 rerollUse=373 timeout=11 toss=1 trafficRoll=1960 win=17
+NEVER FIRED: lose_overshoot
+COVER FAILED

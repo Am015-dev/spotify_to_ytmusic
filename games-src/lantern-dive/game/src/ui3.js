@@ -153,7 +153,7 @@ function drawCard() {
   const pa = $('#pass'); if (!pa) return; const c = UI.cards[0];
   if (!c) { pa.hidden = true; pa.innerHTML = ''; return; }
   pa.hidden = false; pa.innerHTML = '';
-  pa.append(h('div.pbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': c.title }, h('h2', c.title), h('p', c.body), h('button.btn.go', { type: 'button', 'data-a': 'take' }, c.btn || 'Continue')));
+  pa.append(h('div.pbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': c.title }, h('h2', c.title), h('p', c.body), h('button.btn.go', { type: 'button', 'data-a': 'takedev' }, c.btn || 'Continue')));
 }
 function takeDevice() { const c = UI.cards[0]; if (!c || c.kind !== 'pass') return; UI.cards.shift(); UI.holder = c.seat; drawCard(); render(); schedule(); }
 // ---------- the event sequences: cards fly to the table, the trick is swept to its winner ----------

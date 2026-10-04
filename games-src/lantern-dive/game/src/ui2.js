@@ -41,7 +41,7 @@ function placePrompt() {
 function jobChip(i, o) {
   o = o || {}; const st = jobSt(i), d = jobDef(i);
   const b = h('button.jc' + (st > 0 ? '.ok' : st < 0 ? '.bad' : '') + (o.me ? '.me' : ''), { type: 'button', 'data-a': 'job', 'data-i': i, 'aria-label': jobShort(i) + (st > 0 ? ', done' : st < 0 ? ', failed' : ', open') });
-  const sm = h('span.sm'); if (st > 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5L9.5 18L20 6"/></svg>'; else if (st < 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>'; else sm.textContent = '·';
+  const sm = h('span.sm'); if (st > 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5L9.5 18L20 6"/></svg>'; else if (st < 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>'; else sm.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="none"/></svg>';
   b.append(sm, h('span.t', d.s));
   if (o.me) { const df = h('span.df'); for (let k = 0; k < jobDiff(i); k++) df.append(h('i')); b.append(df); }
   return b;
@@ -258,7 +258,7 @@ function dockModel(v) {
     }
     case 'signal': {
       if (!must) { M.p = who + ' may signal…'; M.sub = 'Signal round: each diver can show a card or skip.'; return M; }
-      M.cls = 'mine'; M.p = 'Signal round: show a card with your ping, or skip.'; M.sub = 'Show your highest, lowest or only card of a colour. Once per dive.';
+      M.cls = 'mine'; M.p = 'Signal: show a card, or skip.'; M.sub = 'Show your highest, lowest or only card of a colour. Once per dive.';
       const pm = mv.filter(m => m.t === 'ping');
       if (UI.pingSel) { const sel = UI.sel >= 0 ? pm.find(m => m.c === UI.sel) : null; M.p = sel ? 'Show ' + cname(sel.c) + (sel.k === 'high' ? ' as your highest?' : sel.k === 'low' ? ' as your lowest?' : sel.k === 'only' ? ' as your only one?' : '?') : 'Tap the card you want to show.'; M.sub = 'The green-ringed cards can be shown.'; btn(sel ? 'Show it' : 'Show the card', 'doping', { dis: !sel, cls: 'go' }); btn('Cancel', 'noping', { cls: 'alt' }); }
       else { if (pm.length) btn('Signal…', 'signal', { cls: 'go' }); btn('No signal', 'nosig', { cls: pm.length ? 'alt' : 'go' }); }
@@ -290,9 +290,9 @@ function dockModel(v) {
 function renderDock(v) {
   const pr = $('#prompt'), ac = $('#acts'), inf = $('#info'), ro = $('#roster'); if (!pr) return;
   const M = dockModel(v); pr.className = M.cls || '';
-  pr.innerHTML = ''; pr.append(M.p || ''); if (M.sub) pr.append(h('small', M.sub));
+  pr.innerHTML = ''; pr.append(M.p || ''); const ps = $('#psub'), phn = isPh(); if (M.sub && !phn) pr.append(h('small', M.sub)); if (ps) { ps.innerHTML = ''; ps.hidden = !(phn && M.sub); if (phn && M.sub) ps.textContent = M.sub; }
   inf.hidden = !M.info; inf.className = M.info ? 'why' : ''; inf.innerHTML = M.info || '';
-  ac.innerHTML = ''; M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
+  ac.classList.toggle('many', M.acts.length > 6); ac.innerHTML = ''; M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
   // who is still deciding (simultaneous phases)
   ro.innerHTML = ''; if (G.phase === 'pass' || (G.phase === 'assign' && G.as.mode === 'vote')) { const pend = new Set(LD.pending(G)); G.players.filter(p => !p.helper).forEach(p => ro.append(h('span.rchip' + (pend.has(p.seat) ? '.w' : '.r'), { html: avatarS(p.seat, 48) }, p.name + (pend.has(p.seat) ? ' …' : ' ✓')))); }
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = M.cls === 'mine' ? 'Your turn' : 'What is happening';
@@ -300,7 +300,7 @@ function renderDock(v) {
   renderTip();
 }
 function renderTip() {
-  const t = $('#tip'); if (!t) return; t.innerHTML = '';
+  const t = $('#tip'); if (!t) return; t.innerHTML = ''; document.documentElement.classList.toggle('tipon', !!UI.tip);
   if (!UI.tip) return;
   const c = h('div.tipcard', h('b', UI.tip.title), h('p', UI.tip.body), h('div.tr', h('button.btn.small', { type: 'button', 'data-a': 'tipok' }, UI.tip.btn || 'Got it')));
   t.append(c);

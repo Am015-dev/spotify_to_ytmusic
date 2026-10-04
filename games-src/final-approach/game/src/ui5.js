@@ -93,7 +93,7 @@ function applyPhone() {
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(172, Math.min(212, Math.round(hh * .25))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', (ph && w < hh ? Math.max(124, Math.min(320, Math.round(hh - 44 - FA.layoutLogical('P', 0, (G && G.mods) || {}, 0).ch * w / 800))) : Math.max(172, Math.min(212, Math.round(hh * .25)))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !(typeof NET !== 'undefined' && NET.on) && UI.sv === 'setup') renderStart(); }
 }
 let rzT = 0;

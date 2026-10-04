@@ -118,7 +118,7 @@ function pxPrewarm() {
 }
 // ---- the layout read: one pass over the DOM after each render ----
 let pxQueued = false;
-function pxDirty() { if (!PX.on || pxQueued) return; pxQueued = true; requestAnimationFrame(() => { pxQueued = false; try { pxSync(); } catch (e) { console.error(e); } }); }
+function pxDirty() { if (!PX.on || pxQueued) return; try { if (window.PerfHUD && PerfHUD.wake) PerfHUD.wake(); } catch (e) { } pxQueued = true; requestAnimationFrame(() => { pxQueued = false; try { pxSync(); } catch (e) { console.error(e); } }); }
 function pxResize(force) {
   if (!PX.app) return; const bd = $('#bd'); const w = Math.max(16, bd.clientWidth), h = Math.max(16, bd.clientHeight);
   if (force || w !== PX.w || h !== PX.h) { PX.w = w; PX.h = h; try { PX.app.renderer.resize(w, h, PX.res); } catch (e) { } PX.dirty = true; }
@@ -283,7 +283,7 @@ function pxPerfReg() {
       getLevel: () => PX.q, isAuto: () => gfxPref() === 'auto',
       setLevel: (l, why) => { if (why === 'apply') setGfx(l); else { PX.autoQ = l; pxApplyQ(); } try { if (GX.open === 'setd') renderMenu(); } catch (e) { } },
       basePR: () => { const d = window.devicePixelRatio || 1; return Math.min((PXQ[PX.q] || PXQ.high).pr, d); }, onPixelRatio: v => pxSetRes(v),
-      isAnimating: () => !!UI.busy || !!PX.tweens.length || !!PX.parts.length, idleMode: PX.on ? 'throttle' : 'demand', idleFps: 10 });
+      isAnimating: () => !!UI.busy || !!PX.tweens.length || !!PX.parts.length || !!PX.moving, idleMode: PX.on ? 'throttle' : 'demand', idleFps: 10 });
   } catch (e) { }
 }
 // share of painted (non-transparent) pixels in the canvas: the table is never blank

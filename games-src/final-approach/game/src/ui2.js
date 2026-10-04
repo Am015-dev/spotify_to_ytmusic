@@ -3,7 +3,7 @@ const PLANE_SVG = '<svg viewBox="0 0 24 24" width="12" height="12"><path d="M12 
 function tabText(a) { return a.slice().sort((x, y) => x - y).map(n => n === 0 ? 'C' : (n < 0 ? 'L' : 'R') + Math.abs(n)).join(' '); }
 function css(el, r) { el.style.left = r.x + 'px'; el.style.top = r.y + 'px'; el.style.width = r.w + 'px'; el.style.height = r.h + 'px'; return el; }
 // the plain look of a die: a number in a rounded square
-function dvEl(v, cls) { return h('span.dv' + (cls ? '.' + cls : ''), String(v)); }
+function dvEl(v, cls) { return h('span.dv' + (cls ? '.' + cls.trim().replace(/ +/g, '.') : ''), String(v)); }
 const SLOTLAB = k => { const S = FA.SLOT[k]; if (S.grp === 'gear' || S.grp === 'flaps') return S.vals.join('-'); if (S.grp === 'brakes' || S.grp === 'ice') return String(S.vals[0]); return ''; };
 function selectedLegal() {
   const v = viewSeat(); if (typeof v !== 'number' || !mayAct(v)) return [];
@@ -15,15 +15,17 @@ function selectedLegal() {
 function render() {
   if (!G || !UI.started) return;
   const bd = $('#bd'), pz = $('#pz'); if (!bd || !pz) return;
+  if (isPh()) applyPhone();
   const W = bd.clientWidth, Hh = bd.clientHeight; if (W < 10 || Hh < 10) return;
-  const LY = UI.LY = FA.layout(W, Hh, { mods: G.mods }); UI.W = W;
-  const v = viewSeat(), me = typeof v === 'number' ? v : -1, legal = selectedLegal(), r = LY.r, rows = altRows(), tr = trackOf(), size = tr.sp.length;
+  const v = viewSeat(), me = typeof v === 'number' ? v : -1;
+  const LY = UI.LY = FA.layout(W, Hh, { mods: G.mods, me }); UI.W = W;
+  const legal = selectedLegal(), r = LY.r, rows = altRows(), tr = trackOf(), size = tr.sp.length;
   pz.innerHTML = '';
   const dieSz = Math.max(30, Math.min(LY.k * 72, 80));
   // ---- approach window
-  { const w = css(h('div.w.appr', { 'aria-label': 'Approach track' }, h('span.tl', 'Approach')), r.appr), cw = Math.max(Math.min(r.appr.w / size, 130), 54), tot = cw * size;
+  { const w = css(h('div.w.appr', { 'aria-label': 'Approach track' }, h('span.tl', 'Approach')), r.appr), cw = Math.max(Math.min((r.appr.w - 4) / size, 130), 46), tot = cw * size;
     const strip = h('div.strip', { style: 'position:absolute;left:0;top:0;bottom:0;width:' + tot + 'px;transition:transform .5s ease' });
-    const off = tot <= r.appr.w ? (r.appr.w - tot) / 2 : -Math.max(0, Math.min(tot - r.appr.w, (G.pl.pos - 1.4) * cw)); strip.style.transform = 'translateX(' + Math.round(off) + 'px)'; UI.stripOff = off; UI.cw = cw;
+    const off = tot <= r.appr.w - 4 ? (r.appr.w - 4 - tot) / 2 : -Math.max(0, Math.min(tot - r.appr.w, (G.pl.pos - 1.4) * cw)); strip.style.transform = 'translateX(' + Math.round(off) + 'px)'; UI.stripOff = off; UI.cw = cw;
     for (let i = 0; i < size; i++) {
       const s = tr.sp[i], n = G.planes[i], b = h('button.sp' + (i + 1 === G.pl.pos ? '.you' : '') + (i === size - 1 ? '.air' : ''), { type: 'button', 'data-a': 'space', 'data-i': i, style: 'left:' + i * cw + 'px;width:' + cw + 'px', 'aria-label': 'Space ' + (i + 1) + (i === size - 1 ? ' (airport)' : '') + ', ' + n + ' plane' + (n === 1 ? '' : 's') + (s[1] ? ', traffic die x' + s[1] : '') + (s[2] ? ', corridor ' + tabText(s[2]) : '') + (i + 1 === G.pl.pos ? ', your plane is here' : '') });
       const pls = h('div.pls'); for (let k = 0; k < n; k++) pls.appendChild(h('i.pl', { html: PLANE_SVG }));
@@ -34,7 +36,7 @@ function render() {
   }
   // ---- altitude window
   { const w = css(h('div.w.altw', { 'aria-label': 'Altitude track' }, h('span.tl', 'Altitude')), r.alt), n = rows.length - G.row0, cw = r.alt.w / n;
-    for (let i = 0; i < n; i++) { const R = rows[i + G.row0]; const el = h('div.ar' + (i === G.round ? '.cur' : (i < G.round ? '.past' : '')), { style: 'left:' + i * cw + 'px;width:' + cw + 'px;top:' + (r.alt.h > 100 ? 12 : 10) + 'px;bottom:0' }, h('span', R[0] + ' ft', R[2] ? h('i.rr', { title: 'reroll token' }) : null), h('small', 'first: ', h('span.fp.' + (R[1] ? 'c' : 'p'), R[1] ? 'Co' : 'Pi'))); w.appendChild(el); }
+    for (let i = 0; i < n; i++) { const R = rows[i + G.row0]; const el = h('div.ar' + (i === G.round ? '.cur' : (i < G.round ? '.past' : '')), { style: 'left:' + i * cw + 'px;width:' + cw + 'px;top:' + (isPh() ? 3 : 12) + 'px;bottom:0' }, h('span', String(R[0]), h('u', ' ft'), R[2] ? h('i.rr', { title: 'reroll token' }) : null), h('small', h('i.fx', 'first: '), h('span.fp.' + (R[1] ? 'c' : 'p'), R[1] ? 'Co' : 'Pi'))); w.appendChild(el); }
     pz.appendChild(w); }
   // ---- slots
   for (const k of G.keys) {
@@ -51,7 +53,7 @@ function render() {
     const lastSpd = G.speed >= 0 ? 'speed ' + G.speed : '';
     pz.appendChild(css(h('div.gau', { 'aria-label': 'Speed gauge' }, h('span', 'markers ' + G.pl.aeroB + ' | ' + G.pl.aeroO + (G.mods.wind ? ' · wind ' + (FA.windMod(G) >= 0 ? '+' : '') + FA.windMod(G) : '') + (lastSpd ? ' · ' + lastSpd : ''))), r.gauge));
     const bv = FA.brakeVal(G);
-    const brk = r.br1 || r.it1; if (brk) pz.appendChild(css(h('div.badge', 'Brakes ' + bv), { x: (r.br0 || r.it0).x, y: (r.br0 || r.it0).y - 22, w: Math.max(70, 70), h: 20 }));
+    const lastB = r.br2 || r.ib3; if (lastB) pz.appendChild(css(h('div.badge.brk', 'Brakes ' + bv), { x: lastB.x + lastB.w + 4, y: lastB.y + lastB.h / 2 - 11, w: 82, h: 22 }));
   }
   // ---- coffee, rerolls
   { const cf = h('div.chipr'); for (let i = 0; i < 3; i++) cf.appendChild(h('i.tk.cf' + (i < G.coffee ? '' : '.off'))); pz.appendChild(css(cf, r.coffee));
@@ -61,19 +63,19 @@ function render() {
   if (G.mods.intern && r.tokens) { const t = h('div.tokrow', { 'aria-label': 'Trainee tokens left: ' + G.intern.join(', ') }); G.intern.forEach(x => t.appendChild(h('i.ch', String(x)))); pz.appendChild(css(t, r.tokens)); }
   // ---- trays
   for (const s of [0, 1]) {
-    const q = s === 0 ? r.trayP : r.trayC, show = v === 'all' || v === s, nd = 4, gap = 6, ds = Math.min(dieSz * 1.05, (q.w - 12 - gap * (nd - 1)) / nd, q.h - 14);
-    const tr2 = css(h('div.tray.' + (s === 0 ? 'p' : 'c'), { 'aria-label': pname(s) + "'s dice" + (show ? '' : ' (hidden behind the screen)') }, h('span.who', pname(s) + (show ? '' : ' · hidden'))), q);
+    const q = s === 0 ? r.trayP : r.trayC, show = v === 'all' || v === s, nd = 4, gap = 6, ds = Math.min(80, (q.w - 12 - gap * (nd - 1)) / nd, q.h - 8);
+    const tr2 = css(h('div.tray.' + (s === 0 ? 'p' : 'c'), { 'aria-label': pname(s) + "'s dice" + (show ? '' : ' (hidden behind the screen)') }, h('span.who', pname(s))), q);
     const rrmode = G.pend && G.pend.h === 'rr' && me === s && mayAct(s) && !G.pend.d.m[s];
     for (let i = 0; i < 4; i++) {
       const d = G.dice[s][i], used = d.u || G.phase !== 'place';
-      const b = h('button.die' + (used ? '.used' : '') + (show && !used && mayAct(s) ? '' : '.cover') + (UI.sel === i && me === s ? '.sel' : '') + (rrmode && UI.rrm[i] ? '.rrm' : ''), { type: 'button', 'data-a': 'die', 'data-s': s, 'data-d': i, style: 'width:' + ds + 'px;height:' + ds + 'px', 'aria-label': used ? 'used' : (show ? pname(s) + ' die showing ' + d.v : pname(s) + ' die, hidden'), disabled: used ? true : null });
+      const b = h('button.die' + (used ? '.used' : '') + (show && !used && mayAct(s) ? '' : '.cover') + (UI.sel === i && me === s ? '.sel' : '') + (rrmode && UI.rrm[i] ? '.rrm' : ''), { type: 'button', 'data-a': 'die', 'data-s': s, 'data-d': i, style: 'width:' + ds + 'px;height:' + ds + 'px', 'aria-label': used ? 'used' : (show ? pname(s) + ' die showing ' + d.v : pname(s) + ' die, hidden'), disabled: (used || !(show && mayAct(s))) ? true : null });
       b.appendChild(dvEl(show ? d.v : '?', (s === 0 ? 'b' : 'o') + (show ? '' : ' q'))); tr2.appendChild(b);
     }
     if (G.pend && (G.pend.h === 'intern' && G.pend.d.seat === s || G.pend.h === 'sync' && s === 1) && (show)) { const val = G.pend.d.val; tr2.appendChild(h('button.die' + (UI.sel === 'p' ? '.sel' : ''), { type: 'button', 'data-a': 'die', 'data-s': s, 'data-d': 'p', style: 'width:' + ds + 'px;height:' + ds + 'px', 'aria-label': (G.pend.h === 'intern' ? 'Trainee token ' : 'Traffic die ') + val }, dvEl(val, G.pend.h === 'intern' ? 't' : 'k'))); }
     pz.appendChild(tr2);
   }
   // ---- hud
-  { const row = rows[G.round + G.row0]; pz.appendChild(css(h('div.hudc', h('b', 'Round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0) + ' · ' + row[0] + ' ft'), h('span', G.result ? 'Flight over' : G.phase === 'brief' ? 'Briefing' : (G.pend ? pendLabel() : (G.turn === 0 ? 'Pilot' : 'Co-pilot') + ' places')), UI.rt && G.mods.real ? h('span', { id: 'rtleft' }, '⏱ ' + Math.ceil(UI.rt.left / 1000) + ' s') : null), r.hud)); }
+  if (r.hud) { const row = rows[G.round + G.row0]; pz.appendChild(css(h('div.hudc', h('b', 'Round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0) + ' · ' + row[0] + ' ft'), h('span', G.result ? 'Flight over' : G.phase === 'brief' ? 'Briefing' : (G.pend ? pendLabel() : (G.turn === 0 ? 'Pilot' : 'Co-pilot') + ' places')), UI.rt && G.mods.real ? h('span', { id: 'rtleft' }, '⏱ ' + Math.ceil(UI.rt.left / 1000) + ' s') : null), r.hud)); }
   renderDock(); renderBar();
   if (typeof pxSync === 'function') pxSync();
   if (typeof netRenderHook === 'function') netRenderHook();
@@ -85,7 +87,7 @@ function promptText() {
   if (G.result) return G.result.win ? 'Landed! Well flown.' : 'The flight is over.';
   const v = viewSeat(), pend = FA.pending(G);
   if (G.phase === 'brief') {
-    if (typeof v === 'number' && mayAct(v)) return G.ready[v] ? 'Waiting for your crewmate to be ready.' : 'Briefing: talk strategy (never dice values), then press Roll.';
+    if (typeof v === 'number' && mayAct(v)) return G.ready[v] ? 'Waiting for your crewmate to be ready.' : 'Talk strategy, no dice values. Then Roll.';
     return G.ready.every(Boolean) ? 'Rolling...' : 'Briefing: ' + pend.map(name).join(' and ') + ' getting ready.';
   }
   if (G.pend) {

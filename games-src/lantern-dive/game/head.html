@@ -84,7 +84,7 @@ svg{display:block}
 .pbtn{appearance:none;border:2px solid var(--line);background:rgba(7,28,58,.7);color:var(--ink);border-radius:12px;min-height:44px;min-width:44px;padding:2px 10px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px}
 #lead{position:absolute;left:6px;bottom:4px;display:flex;gap:6px;align-items:center;font-size:13px;font-weight:800;color:var(--ink2)}
 /* the pool of jobs on the table while they are being handed out */
-#pool{position:absolute;inset:4px 6px;display:flex;flex-wrap:wrap;gap:6px 8px;justify-content:center;align-content:center;overflow-y:auto;overscroll-behavior:contain}
+#pool{position:absolute;inset:4px 6px;display:flex;flex-wrap:wrap;gap:6px 8px;justify-content:center;align-content:center;align-content:safe center;overflow-y:auto;overscroll-behavior:contain}
 .jcard{appearance:none;position:relative;width:min(48%,168px);min-height:64px;border-radius:12px;background:#fbf3dd;color:#27261f;border:3px solid #0b1f3a;padding:6px 8px 6px 12px;text-align:left;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:3px;box-shadow:0 4px 10px rgba(0,0,0,.45)}
 .jcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:7px;border-radius:9px 0 0 9px;background:var(--gold2)}
 .jcard b{font-size:14px;line-height:1.2;font-weight:900}
@@ -270,11 +270,20 @@ html.ph .gx-ibtn{min-width:44px;min-height:44px;padding:0;border-radius:10px}
 html.ph .gx-dock-head,html.ph .gx-reopen{display:none!important}
 html.ph .ppop,html.ph .pcard{position:fixed;left:0;right:0;top:auto;bottom:0;max-height:62dvh;height:auto;border-radius:14px 14px 0 0;z-index:50}
 html.ph .ppop .ph-body{max-height:calc(62dvh - 60px)}
-html.ph.ph-l .ppop{left:auto;width:min(420px,100vw);max-height:80dvh}
+html.ph.ph-l .ppop{left:auto;right:0;width:var(--rail);top:calc(44px + env(safe-area-inset-top,0px));bottom:0;max-height:none;border-radius:0}
+html.ph.ph-p .ppop{height:calc(var(--dockh) + env(safe-area-inset-bottom,0px));max-height:none}
+html.ph.ph-p .ppop .ph-body{max-height:none;flex:1 1 auto;min-height:0;overflow:auto}
+html.ph .ppop .kv{padding:2px 0;font-size:13.5px}
+html.ph .ppop p{margin:2px 0}
 html.ph .gx-dock{border-left:0;border-top:3px solid #1d4f8c;max-height:none;padding-bottom:env(safe-area-inset-bottom,0px)}
 html.ph .gx-dock-body{padding:5px 6px 0;gap:5px;overflow-x:hidden;overflow-y:auto}
 html.ph #acts{position:sticky;bottom:0;background:var(--panel);padding:3px 0 5px;z-index:2;margin-top:auto}
 html.ph #acts .btn{font-size:14px}
+html.ph #acts.many .btn{flex:1 1 calc(16% - 6px);min-height:44px;padding:0}
+html.ph.tipon #acts,html.ph.tipon #psub,html.ph.tipon #roster{display:none}
+html.ph.ph-p.tipon .gx-main{grid-template-rows:minmax(0,1fr) auto}
+html.ph.ph-p.tipon .gx-dock{max-height:min(330px,46dvh)}
+html.ph.ph-p.tipon .gx-dock-body{overflow:auto}
 html.ph .ph-body{padding:6px 8px}
 html.ph.ph-p .gx-app{grid-template-rows:calc(44px + env(safe-area-inset-top,0px)) minmax(0,1fr)}
 html.ph.ph-p .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) calc(var(--dockh) + env(safe-area-inset-bottom,0px))}
@@ -282,6 +291,9 @@ html.ph.ph-p .gx-dock{max-height:none;height:auto}
 html.ph.ph-p #barprompt{display:block}
 html.ph.ph-p #prompt{font-size:13px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 html.ph.ph-p #promptDock{display:none}
+#psub{font-size:13.5px;line-height:1.3;font-weight:600;color:var(--ink2);padding:2px 2px 4px}
+html.ph .op .jc{min-height:44px}
+html.ph #mine .mjobs .jc{min-height:44px}
 html.ph.ph-p .gx-bar .gx-sp,html.ph.ph-p #barstat{display:none}
 html.ph.ph-l .gx-app{grid-template-columns:minmax(0,1fr) var(--rail);grid-template-rows:calc(44px + env(safe-area-inset-top,0px)) minmax(0,1fr)}
 html.ph.ph-l .gx-main{display:contents}

@@ -142,7 +142,7 @@ function placePrompt() {
 function jobChip(i, o) {
   o = o || {}; const st = jobSt(i), d = jobDef(i);
   const b = h('button.jc' + (st > 0 ? '.ok' : st < 0 ? '.bad' : '') + (o.me ? '.me' : ''), { type: 'button', 'data-a': 'job', 'data-i': i, 'aria-label': jobShort(i) + (st > 0 ? ', done' : st < 0 ? ', failed' : ', open') });
-  const sm = h('span.sm'); if (st > 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5L9.5 18L20 6"/></svg>'; else if (st < 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>'; else sm.textContent = '·';
+  const sm = h('span.sm'); if (st > 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5L9.5 18L20 6"/></svg>'; else if (st < 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>'; else sm.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="none"/></svg>';
   b.append(sm, h('span.t', d.s));
   if (o.me) { const df = h('span.df'); for (let k = 0; k < jobDiff(i); k++) df.append(h('i')); b.append(df); }
   return b;
@@ -359,7 +359,7 @@ function dockModel(v) {
     }
     case 'signal': {
       if (!must) { M.p = who + ' may signal…'; M.sub = 'Signal round: each diver can show a card or skip.'; return M; }
-      M.cls = 'mine'; M.p = 'Signal round: show a card with your ping, or skip.'; M.sub = 'Show your highest, lowest or only card of a colour. Once per dive.';
+      M.cls = 'mine'; M.p = 'Signal: show a card, or skip.'; M.sub = 'Show your highest, lowest or only card of a colour. Once per dive.';
       const pm = mv.filter(m => m.t === 'ping');
       if (UI.pingSel) { const sel = UI.sel >= 0 ? pm.find(m => m.c === UI.sel) : null; M.p = sel ? 'Show ' + cname(sel.c) + (sel.k === 'high' ? ' as your highest?' : sel.k === 'low' ? ' as your lowest?' : sel.k === 'only' ? ' as your only one?' : '?') : 'Tap the card you want to show.'; M.sub = 'The green-ringed cards can be shown.'; btn(sel ? 'Show it' : 'Show the card', 'doping', { dis: !sel, cls: 'go' }); btn('Cancel', 'noping', { cls: 'alt' }); }
       else { if (pm.length) btn('Signal…', 'signal', { cls: 'go' }); btn('No signal', 'nosig', { cls: pm.length ? 'alt' : 'go' }); }
@@ -391,9 +391,9 @@ function dockModel(v) {
 function renderDock(v) {
   const pr = $('#prompt'), ac = $('#acts'), inf = $('#info'), ro = $('#roster'); if (!pr) return;
   const M = dockModel(v); pr.className = M.cls || '';
-  pr.innerHTML = ''; pr.append(M.p || ''); if (M.sub) pr.append(h('small', M.sub));
+  pr.innerHTML = ''; pr.append(M.p || ''); const ps = $('#psub'), phn = isPh(); if (M.sub && !phn) pr.append(h('small', M.sub)); if (ps) { ps.innerHTML = ''; ps.hidden = !(phn && M.sub); if (phn && M.sub) ps.textContent = M.sub; }
   inf.hidden = !M.info; inf.className = M.info ? 'why' : ''; inf.innerHTML = M.info || '';
-  ac.innerHTML = ''; M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
+  ac.classList.toggle('many', M.acts.length > 6); ac.innerHTML = ''; M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
   // who is still deciding (simultaneous phases)
   ro.innerHTML = ''; if (G.phase === 'pass' || (G.phase === 'assign' && G.as.mode === 'vote')) { const pend = new Set(LD.pending(G)); G.players.filter(p => !p.helper).forEach(p => ro.append(h('span.rchip' + (pend.has(p.seat) ? '.w' : '.r'), { html: avatarS(p.seat, 48) }, p.name + (pend.has(p.seat) ? ' …' : ' ✓')))); }
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = M.cls === 'mine' ? 'Your turn' : 'What is happening';
@@ -401,7 +401,7 @@ function renderDock(v) {
   renderTip();
 }
 function renderTip() {
-  const t = $('#tip'); if (!t) return; t.innerHTML = '';
+  const t = $('#tip'); if (!t) return; t.innerHTML = ''; document.documentElement.classList.toggle('tipon', !!UI.tip);
   if (!UI.tip) return;
   const c = h('div.tipcard', h('b', UI.tip.title), h('p', UI.tip.body), h('div.tr', h('button.btn.small', { type: 'button', 'data-a': 'tipok' }, UI.tip.btn || 'Got it')));
   t.append(c);
@@ -570,7 +570,7 @@ function drawCard() {
   const pa = $('#pass'); if (!pa) return; const c = UI.cards[0];
   if (!c) { pa.hidden = true; pa.innerHTML = ''; return; }
   pa.hidden = false; pa.innerHTML = '';
-  pa.append(h('div.pbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': c.title }, h('h2', c.title), h('p', c.body), h('button.btn.go', { type: 'button', 'data-a': 'take' }, c.btn || 'Continue')));
+  pa.append(h('div.pbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': c.title }, h('h2', c.title), h('p', c.body), h('button.btn.go', { type: 'button', 'data-a': 'takedev' }, c.btn || 'Continue')));
 }
 function takeDevice() { const c = UI.cards[0]; if (!c || c.kind !== 'pass') return; UI.cards.shift(); UI.holder = c.seat; drawCard(); render(); schedule(); }
 // ---------- the event sequences: cards fly to the table, the trick is swept to its winner ----------
@@ -776,7 +776,7 @@ function buildRules() {
   sec('Special dives', ul(['Commander\'s call (dives 10, 13): the Commander takes all jobs or hands them to a willing diver. If handed over, all signalling happens before the first trick.', 'One diver takes all jobs: by crew vote (dive 6) or by volunteering in turn, answering only yes or no (dives 14, 15, 16; two volunteers in dive 26).', 'Open briefing (dives 17, 28-31, deep dives): talk freely about the jobs, never about cards.', 'Limits: some dives forbid winning two more 9s (or 1s) than another diver, leading Coral or a Lantern, and more. The rule of each dive is in the panel when you start it.', 'Real-time dives (14, 15, 16, 26): beat a clock, or play without it and use the alternative rule shown with the dive. Turn the clock on in the setup screen.']));
   sec('Two divers and the drone', h('p', 'With two divers a drone joins as a third crew member. Its 14 cards lie in a double row, 7 face up on top of 7 face down. The Commander takes jobs for it, plays its face-up cards and decides without talking. A face-down card turns up only after the card on top of it was played, between tricks.'));
   sec('On your phone', ul(['Tap a card to lift it, tap it again (or press Play) to play. Dim cards are not allowed now. Tap a diver or a job chip for details; "Last trick" shows the previous trick.', 'The panel at the bottom always says what to do now. The Hint button shows a suggestion with the reason.', 'Hot-seat: a pass-the-device screen hides every hand. Online: you only ever see your own cards. There is no chat, only the pings and a few neutral emotes.']));
-  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Sound effects and music are real CC0 recordings (see the audio list in the game files); they were trimmed, loudness-normalised and converted for this game. Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, job text and art are original; the paintings were made for this game.</p></section>' }));
+  root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Audio, all public-domain (CC0): music &ldquo;Underwater Theme&rdquo; by Spring Spring and ambience &ldquo;Underwater Ambient Pad&rdquo; by isaiah658 (OpenGameArt); sound effects from the Casino Audio, Impact Sounds, Interface Sounds, Music Jingles and UI Audio packs by Kenney (kenney.nl). They were trimmed, loudness-normalised and converted for this game. Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, job text and art are original; the paintings were made for this game.</p></section>' }));
   return root;
 }
 // ---- reference drawer: every card, job and dive, with counts ----
@@ -1025,10 +1025,22 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 // SND_MAP: one line per event. s:null means silent (a sample may be re-tuned by ear later: change s / vol here).
 const SND_MAP = { click: { s: 'click', vol: .5 }, play: { s: 'play', vol: .7 }, slide: { s: 'slide', vol: .55 }, pass: { s: 'pass', vol: .6 }, take: { s: 'take', vol: .65 }, ping: { s: 'ping', vol: .7 }, trick: { s: 'trick', vol: .65 },
   done: { s: 'done', vol: .7 }, fail: { s: 'fail', vol: .7 }, deal: { s: 'deal', vol: .6 }, tick: { s: 'tick', vol: .4 }, win: { s: 'win', vol: .8 }, lose: { s: 'lose', vol: .75 }, error: { s: 'error', vol: .5 } };
+// fallback when the sample bundle is missing (or Web Audio samples did not load): a few quiet oscillator notes
+let SYN = null;
+const SYN_N = { click: [[660, .04, 'square', .03]], play: [[220, .07, 'triangle', .08]], slide: [[300, .1, 'sine', .04]], pass: [[260, .12, 'sine', .04]], take: [[520, .08, 'triangle', .06]], ping: [[880, .3, 'sine', .1], [1320, .25, 'sine', .04]],
+  trick: [[330, .08, 'triangle', .07], [440, .1, 'triangle', .07]], done: [[523, .1, 'sine', .08], [784, .18, 'sine', .08]], fail: [[300, .15, 'sawtooth', .05], [200, .3, 'sawtooth', .05]], deal: [[400, .05, 'square', .02]], tick: [[1200, .02, 'square', .02]],
+  win: [[523, .14, 'triangle', .1], [659, .14, 'triangle', .1], [784, .3, 'triangle', .1]], lose: [[392, .2, 'sine', .09], [294, .4, 'sine', .09]], error: [[140, .12, 'square', .05]] };
+function synth(name, vol) {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext; if (!AC || /jsdom/i.test(navigator.userAgent || '')) return; const seq = SYN_N[name]; if (!seq) return;
+    if (!SYN) SYN = new AC(); if (SYN.state === 'suspended') SYN.resume(); let t = SYN.currentTime;
+    seq.forEach(([f, d, w, g]) => { const o = SYN.createOscillator(), a = SYN.createGain(); o.type = w; o.frequency.value = f; a.gain.setValueAtTime(0, t); a.gain.linearRampToValueAtTime(g * vol, t + .01); a.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(a); a.connect(SYN.destination); o.start(t); o.stop(t + d + .02); t += Math.min(d, .12); });
+  } catch (e) { }
+}
 function snd(name, o) {
   try {
     if (UI.prefs && UI.prefs.sound === false) return;
-    const m = SND_MAP[name] || { s: name, vol: 1 }; if (!m.s || !window.GA || !GA.has(m.s)) return;
+    const m = SND_MAP[name] || { s: name, vol: 1 }; if (!m.s) return; if (!window.GA || !GA.has(m.s)) { synth(name, (o && o.vol != null ? o.vol : 1) * (m.vol != null ? m.vol : 1)); return; }
     const oo = Object.assign({}, o || {}); oo.vol = (oo.vol != null ? oo.vol : 1) * (m.vol != null ? m.vol : 1); GA.play(m.s, oo);
   } catch (e) { }
 }
@@ -1160,7 +1172,7 @@ function pxPrewarm() {
 }
 // ---- the layout read: one pass over the DOM after each render ----
 let pxQueued = false;
-function pxDirty() { if (!PX.on || pxQueued) return; pxQueued = true; requestAnimationFrame(() => { pxQueued = false; try { pxSync(); } catch (e) { console.error(e); } }); }
+function pxDirty() { if (!PX.on || pxQueued) return; try { if (window.PerfHUD && PerfHUD.wake) PerfHUD.wake(); } catch (e) { } pxQueued = true; requestAnimationFrame(() => { pxQueued = false; try { pxSync(); } catch (e) { console.error(e); } }); }
 function pxResize(force) {
   if (!PX.app) return; const bd = $('#bd'); const w = Math.max(16, bd.clientWidth), h = Math.max(16, bd.clientHeight);
   if (force || w !== PX.w || h !== PX.h) { PX.w = w; PX.h = h; try { PX.app.renderer.resize(w, h, PX.res); } catch (e) { } PX.dirty = true; }
@@ -1325,7 +1337,7 @@ function pxPerfReg() {
       getLevel: () => PX.q, isAuto: () => gfxPref() === 'auto',
       setLevel: (l, why) => { if (why === 'apply') setGfx(l); else { PX.autoQ = l; pxApplyQ(); } try { if (GX.open === 'setd') renderMenu(); } catch (e) { } },
       basePR: () => { const d = window.devicePixelRatio || 1; return Math.min((PXQ[PX.q] || PXQ.high).pr, d); }, onPixelRatio: v => pxSetRes(v),
-      isAnimating: () => !!UI.busy || !!PX.tweens.length || !!PX.parts.length, idleMode: PX.on ? 'throttle' : 'demand', idleFps: 10 });
+      isAnimating: () => !!UI.busy || !!PX.tweens.length || !!PX.parts.length || !!PX.moving, idleMode: PX.on ? 'throttle' : 'demand', idleFps: 10 });
   } catch (e) { }
 }
 // share of painted (non-transparent) pixels in the canvas: the table is never blank

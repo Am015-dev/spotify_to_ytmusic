@@ -8,14 +8,14 @@
 const FA = g.FA = g.FA || {};
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const R = (cx, cy, w, h) => ({ x: cx - w / 2, y: cy - h / 2, w, h });
-function build(mode, LW, LH, mods) {
-  const r = {}, S = 88;   // slot size
+function build(mode, LW, LH, mods, me) {
+  const r = {}, S = mode === 'L' ? 88 : 96;   // slot size
   mods = mods || {};
   const slot = (k, cx, cy) => { r[k] = R(cx, cy, S, S); };
   if (mode === 'L') {
     const e = (LH - 620) / 280;   // 0 (compact) .. 1 (tall)
-    const wh = 82 + 40 * e;                                  // window height
-    const A = wh + 98, sp = clamp((LH - 170 - A) / 2, 108, 150), B = A + sp, C = B + sp;   // row centres
+    const wh = 94 + 34 * e;                                  // window height
+    const A = wh + 90, sp = clamp((LH - 170 - A) / 2, 108, 150), B = A + sp, C = B + sp;   // row centres
     r.appr = { x: 20, y: 10, w: 700, h: wh }; r.alt = { x: 740, y: 10, w: 640, h: wh };
     // pilot side
     slot('ra0', 90, A); slot('lg0', 150, B); slot('lg1', 250, B); slot('lg2', 350, B);
@@ -35,33 +35,32 @@ function build(mode, LW, LH, mods) {
     if (mods.wind) r.wind = R(mods.kero ? 270 : 330, A, 96, 96);
     if (mods.intern) { slot('in0', 1010, C); slot('in1', 1310, C); r.tokens = { x: 1050, y: C - 24, w: 220, h: 48 }; }
     // trays (dice behind the screens)
-    const T = Math.min(LH - 56, C + (mods.ice ? 150 : 128)); r.ch = T + 56;
-    r.trayP = { x: 30, y: T - 48, w: 440, h: 96 }; r.trayC = { x: 930, y: T - 48, w: 440, h: 96 };
+    const T = Math.min(LH - 56, C + (mods.ice ? 150 : 128)); r.ch = T + 58;
+    r.trayP = { x: 30, y: T - 52, w: 440, h: 104 }; r.trayC = { x: 930, y: T - 52, w: 440, h: 104 };
     r.hud = R(700, T, 380, 90);
     r.lw = LW; r.lh = r.ch;
   } else {
-    const e = (LH - 1050) / 450;
-    const wh = 96;
-    const A = 300 + 20 * e, B = A + 150 + 22 * e, Cc = B + 150 + 22 * e;
-    r.appr = { x: 14, y: 8, w: LW - 28, h: wh }; r.alt = { x: 14, y: 112, w: LW - 28, h: 74 };
-    slot('ax0', 230, A); slot('ax1', 570, A); r.dial = R(400, A, 170, 170);
-    slot('en0', 230, B); slot('en1', 570, B); r.gauge = R(400, B + 6, 240, 120);
-    // pilot column (left) / co-pilot column (right)
-    const P1 = Cc + 10, P2 = P1 + 100;
-    slot('ra0', 60, P1); slot('lg0', 160, P1); slot('lg1', 260, P1); slot('lg2', 360, P1);
-    if (mods.ice) { for (let i = 0; i < 4; i++) { slot('it' + i, 60 + i * 100, P2); slot('ib' + i, 60 + i * 100, P2 + 100); } }
-    else { slot('br0', 60, P2); slot('br1', 160, P2); slot('br2', 260, P2); }
-    slot('fl0', 440, P1); slot('fl1', 540, P1); slot('fl2', 640, P1); slot('fl3', 740, P1);
-    slot('ra1', 640, P2); slot('ra2', 740, P2);
-    const C2 = P2 + (mods.ice ? 200 : 100);
-    slot('co0', 300, C2); slot('co1', 400, C2); slot('co2', 500, C2); r.coffee = R(400, C2 + 56, 300, 24); r.rerolls = R(660, C2, 150, 60);
-    if (mods.kero) { slot('ke', 440, P2); r.fuel = { x: 20, y: C2 - 12, w: 220, h: 24 }; } else if (mods.leak) r.fuel = { x: 20, y: C2 - 12, w: 220, h: 24 };
-    if (mods.wind) r.wind = R(mods.ice ? 130 : 130, C2, 90, 90);
-    if (mods.intern) { slot('in0', 440, P2 + (mods.kero ? 100 : 0)); slot('in1', 740, P2 + (mods.kero ? 100 : 0)); r.tokens = { x: 480, y: P2 + (mods.kero ? 100 : 0) - 22, w: 220, h: 44 }; }
-    const T = LH - 58;
-    r.trayP = { x: 14, y: T - 50, w: 380, h: 100 }; r.trayC = { x: 406, y: T - 50, w: 380, h: 100 };
-    r.hud = R(400, T - 112, 380, 50);
-    r.lw = LW; r.lh = LH;
+    const ice = !!mods.ice, wh = 100;
+    r.appr = { x: 14, y: 8, w: LW - 28, h: wh }; r.alt = { x: 14, y: wh + 14, w: LW - 28, h: 62 };
+    const A = wh + 14 + 62 + 14 + 48, B = A + 106;
+    slot('ax0', 230, A); slot('ax1', 570, A); r.dial = R(400, A, 120, 120);
+    slot('en0', 230, B); slot('en1', 570, B); r.gauge = R(400, B + 8, 230, 108);
+    // pilot column (left) / co-pilot column (right): eight slots across the 800 wide panel
+    const P1 = B + 106, P2 = P1 + 100;
+    slot('ra0', 50, P1); slot('lg0', 150, P1); slot('lg1', 250, P1); slot('lg2', 350, P1);
+    if (ice) { for (let i = 0; i < 4; i++) { slot('it' + i, 50 + i * 100, P2); slot('ib' + i, 50 + i * 100, P2 + 100); } }
+    else { slot('br0', 50, P2); slot('br1', 150, P2); slot('br2', 250, P2); }
+    slot('fl0', 450, P1); slot('fl1', 550, P1); slot('fl2', 650, P1); slot('fl3', 750, P1);
+    slot('ra1', 650, P2); slot('ra2', 750, P2);
+    const R3 = P2 + (ice ? 200 : 100); let C2 = R3;
+    if (mods.kero) slot('ke', 450, P2);
+    if (mods.intern) { slot('in0', 150, R3); slot('in1', 650, R3); r.tokens = { x: 220, y: R3 - 22, w: 360, h: 44 }; C2 = R3 + 100; }
+    slot('co0', 300, C2); slot('co1', 400, C2); slot('co2', 500, C2); r.coffee = R(400, C2 + 62, 300, 24); r.rerolls = R(680, C2 + 6, 150, 60);
+    if (mods.wind) r.wind = R(110, C2, 90, 90);
+    if (mods.kero || mods.leak) r.fuel = { x: 14, y: C2 + 52, w: 230, h: 26 };
+    const T = C2 + 148; r.ch = T + 64;
+    const wm = 490, wo = 292, th = 124; if (me === 0) { r.trayP = { x: 8, y: T - 62, w: wm, h: th }; r.trayC = { x: 8 + wm + 6, y: T - 62, w: wo, h: th }; } else if (me === 1) { r.trayP = { x: 8, y: T - 62, w: wo, h: th }; r.trayC = { x: 8 + wo + 6, y: T - 62, w: wm, h: th }; } else { r.trayP = { x: 8, y: T - 62, w: 388, h: th }; r.trayC = { x: 404, y: T - 62, w: 388, h: th }; }
+    r.lw = LW; r.lh = r.ch;
   }
   return r;
 }
@@ -69,17 +68,18 @@ function layout(W, H, opt) {
   opt = opt || {}; W = Math.max(60, W); H = Math.max(60, H);
   const mode = opt.mode || (W / H >= 1.08 ? 'L' : 'P');
   let LW, minH, maxH;
-  if (mode === 'L') { LW = 1400; minH = 610; maxH = 820; } else { LW = 800; minH = 1060; maxH = 1500; }
+  if (mode === 'L') { LW = 1400; minH = 610; maxH = 820; } else { LW = 800; minH = 300; maxH = 3000; }
   // widest scale that fits: width-limited first, then height-limited
   let k = W / LW, LH = H / k;
   if (LH < minH) { k = H / minH; LH = minH; }
   if (LH > maxH) LH = maxH;
-  const lw = LW, ox = (W - lw * k) / 2;
-  const rl = build(mode, lw, LH, opt.mods), r = {};
-  if (rl.ch) LH = Math.min(LH, rl.ch); const oy = (H - LH * k) / 2;
+  const lw = LW;
+  let rl = build(mode, lw, LH, opt.mods, opt.me); const r = {};
+  if (rl.ch > LH + .5) { LH = rl.ch; k = Math.min(k, H / LH); rl = build(mode, lw, LH, opt.mods, opt.me); }
+  if (rl.ch) LH = Math.min(LH, rl.ch); const oy = (H - LH * k) / 2, ox = (W - lw * k) / 2;
   for (const n of Object.keys(rl)) { const q = rl[n]; if (q && typeof q === 'object') r[n] = { x: ox + q.x * k, y: oy + q.y * k, w: q.w * k, h: q.h * k }; }
   return { mode, k, ox, oy, lw, lh: LH, r, die: 72 * k, logical: rl, W, H };
 }
-FA.layout = layout; FA.layoutLogical = (mode, LH, mods) => build(mode, mode === 'L' ? 1400 : 800, LH, mods);
+FA.layout = layout; FA.layoutLogical = (mode, LH, mods, me) => build(mode, mode === 'L' ? 1400 : 800, LH, mods, me);
 if (typeof module === 'object' && module.exports) module.exports = FA;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

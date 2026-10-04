@@ -4,8 +4,8 @@ exports.stepper = (p, tap, log) => {
   const first = async sel => (await vis(sel))[0];
   let nth = 0;
   return async function step() {
-    const st = await p.evaluate(() => ({ ph: G.phase, must: iMustAct() && canAct(), job: UI.job, sel: UI.sel, pingSel: UI.pingSel, giveSel: UI.giveSel, tip: !!document.querySelector('#tip [data-a=tipok]'), pass: !!document.querySelector('#pass:not([hidden]) [data-a=take]'), rs: !document.querySelector('#rs').hidden }));
-    if (st.pass) { await tap('#pass [data-a=take]'); return 'pass'; }
+    const st = await p.evaluate(() => ({ ph: G.phase, must: iMustAct() && canAct(), job: UI.job, sel: UI.sel, pingSel: UI.pingSel, giveSel: UI.giveSel, tip: !!document.querySelector('#tip [data-a=tipok]'), pass: !!document.querySelector('#pass:not([hidden]) [data-a=takedev]'), rs: !document.querySelector('#rs').hidden }));
+    if (st.pass) { await tap('#pass [data-a=takedev]'); return 'pass'; }
     if (st.tip) { await tap('#tip [data-a=tipok]'); return 'tip'; }
     if (!st.must) return null;
     nth++;

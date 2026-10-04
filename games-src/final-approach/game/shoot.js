@@ -19,6 +19,12 @@ const [W, H] = (process.argv[2] || '1366x768').split('x').map(Number); const PH 
   await p.waitForTimeout(1200); await sh('10brief');
   await p.evaluate(() => { const b = document.querySelector('#acts [data-a=ready]'); if (b) b.click(); }); await p.waitForTimeout(1800); await sh('11rolled');
   await p.evaluate(() => { const d = document.querySelector('.tray .die:not(.cover):not(.used)'); if (d) d.click(); }); await p.waitForTimeout(400); await sh('12picked');
+  if (process.argv[7] !== 'short') {
+    await p.evaluate(() => { const k = document.querySelector('.tipx,[data-a=tipclose],[data-a=tipoff]'); if (k) k.click(); G.ai = [true, true]; AIDELAY = 500; schedule(); });
+    await p.waitForTimeout(9000); await sh('20mid');
+    for (let i = 0; i < 40; i++) { const o = await p.evaluate(() => !!(G && G.result)); if (o) break; await p.waitForTimeout(1500); }
+    await p.waitForTimeout(1200); await sh('30ending'); await p.waitForTimeout(4000); await sh('31end');
+  }
   console.log(t, 'errors', JSON.stringify(errs));
   await b.close();
 })().catch(e => { console.error('FATAL', e); process.exit(1); });

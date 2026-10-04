@@ -20,7 +20,7 @@ const LIB = require('./laylib.js');
       const r = await p.evaluate(() => { const bad = []; for (const e of document.querySelectorAll('#hand .hc:not(.dim),#opp .op,#acts button,.gx-bar button,#roster .chip,#pool .jcard')) { if (e.closest('[hidden]')) continue; const r = e.getBoundingClientRect(); if (!r.width) continue; const x = r.left + r.width / 2, y = r.top + r.height / 2; const nm = e.dataset.a || e.dataset.gx || e.className; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) { bad.push('offscreen ' + nm); continue; } const h = document.elementFromPoint(x, y); if (!h || !e.contains(h)) bad.push('covered ' + nm + ' by ' + (h && (h.id || (h.className && h.className.baseVal) || h.className))); } return bad.slice(0, 6); });
       if (r.length) fail('unreachable ' + tag, JSON.stringify(r));
     };
-    const tap = async x => { if (typeof x === 'string') await p.click(x); else await x.click(); await p.waitForTimeout(80); };
+    const tap = async x => { try { if (typeof x === 'string') await p.click(x, { timeout: 5000 }); else await x.click({ timeout: 5000 }); } catch (e) { /* the page re-rendered under the click: the next step looks again */ } await p.waitForTimeout(80); };
     const step = LIB.stepper(p, tap);
     await p.goto('https://gns.test/'); await p.waitForTimeout(1500); await scroll('start'); await shot('0start');
     { const r = await p.evaluate(() => { const bs = [...document.querySelectorAll('#start .tbtns button')]; return { acts: bs.map(b => b.dataset.a), bad: bs.filter(b => { const r = b.getBoundingClientRect(); const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.bottom > innerHeight + 1 || r.top < 0 || r.height < 40 || !b.contains(h); }).map(b => b.dataset.a), art: !!document.querySelector('#start img.ttl-bg') }; });
@@ -54,7 +54,7 @@ const LIB = require('./laylib.js');
     await p.click('#rs [data-a=rsclose]').catch(() => fail('result card has no close')); await p.waitForTimeout(300); await scroll('after final');
     // hot-seat pass card
     await p.evaluate(() => { showStart(); }); await p.waitForTimeout(300); await p.click('[data-a=play]'); await p.evaluate(() => { setNp(3); renderStart(); }); await p.click('[data-start=hot]'); await p.waitForTimeout(900);
-    if (await p.evaluate(() => document.querySelector('#pass').hidden || !document.querySelector('#pass [data-a=take]'))) fail('no pass-the-device card'); else { await shot('7pass'); if (await p.evaluate(() => document.querySelectorAll('#hand .hc').length)) fail('hand visible behind the pass card'); await scroll('pass'); }
+    if (await p.evaluate(() => document.querySelector('#pass').hidden || !document.querySelector('#pass [data-a=takedev]'))) fail('no pass-the-device card'); else { await shot('7pass'); if (await p.evaluate(() => document.querySelectorAll('#hand .hc').length)) fail('hand visible behind the pass card'); await scroll('pass'); }
     // the painted table exists
     { const px = await p.evaluate(() => ({ on: PX.on, q: PX.q, err: PX.err, cv: !!document.querySelector('canvas') })); console.log(t, 'pixi', JSON.stringify(px)); }
     if (errs.length) fail('console errors', JSON.stringify(errs.slice(0, 3)));

@@ -11,7 +11,7 @@ const [W, H] = (process.argv[2] || '1366x768').split('x').map(Number); const PH 
   const p = await ctx.newPage(); const errs = []; p.on('pageerror', e => errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load/.test(m.text())) errs.push(m.text()); });
   const t = `${W}x${H}`; const sh = n => p.screenshot({ path: path.join(OUT, `s_${t}_${n}.png`) });
   const human = () => p.evaluate(() => iMustAct() && canAct());
-  const idle = async (max = 200) => { for (let k = 0; k < max; k++) { if (await p.evaluate(() => (iMustAct() && !UI.busy && !UI.tip) || G.phase === 'over')) return; await p.evaluate(() => { const c = document.querySelector('#pass:not([hidden]) [data-a=take]'); if (c) c.click(); }); await p.waitForTimeout(100); } };
+  const idle = async (max = 200) => { for (let k = 0; k < max; k++) { if (await p.evaluate(() => (iMustAct() && !UI.busy && !UI.tip) || G.phase === 'over')) return; await p.evaluate(() => { const c = document.querySelector('#pass:not([hidden]) [data-a=takedev]'); if (c) c.click(); }); await p.waitForTimeout(100); } };
   await p.goto('https://gns.test/'); await p.waitForTimeout(1800);
   await p.evaluate(g => { try { localStorage.clear(); } catch (e) { } if (PX.on) setGfx(g); }, GFX);
   await sh('00title');

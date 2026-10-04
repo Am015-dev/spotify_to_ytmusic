@@ -68,7 +68,7 @@ function run(cf, seed) {
             const rsOpen = !d.querySelector('#rs').hidden;
             const q = s => [...d.querySelectorAll(s)].filter(b => !b.disabled && !b.closest('[hidden]'));
             const inv = w.eval('LD.checkInvariants(G)'); if (inv.length && errs.length < 5) errs.push('INV ' + inv[0]);
-            const pcb = q('#pass [data-a=take]'); if (pcb.length) { click(pcb[0]); seen.add('pass-screen'); clicks++; return; }
+            const pcb = q('#pass [data-a=takedev]'); if (pcb.length) { click(pcb[0]); seen.add('pass-screen'); clicks++; return; }
             if (rsOpen) {
               if (G.phase !== 'over') return;
               attempts = attempts || 0;
