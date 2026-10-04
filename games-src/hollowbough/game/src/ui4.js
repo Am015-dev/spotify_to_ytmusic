@@ -262,6 +262,7 @@ function qHint(k) {
 }
 function renderQ() {
   const pc = $('#pc');
+  if (!G || !G.q) UI.qPrev = null;
   if (!G || G.phase === 'over' || !G.q || UI.cards.length) { if (!UI.cards.length) { pc.hidden = true; pc.innerHTML = ''; } return; }
   const q = G.q, v = viewSeat();
   if (q.who !== v || G.players[q.who].ai) { pc.hidden = true; return; }
@@ -272,7 +273,22 @@ function renderQ() {
   const rm = UI.rec && UI.rec.m && UI.rec.m.type === 'choose' ? UI.rec.m : null;
   const hasCards = q.opts.some(o => o.card !== undefined), hasRes = q.opts.some(o => o.res !== undefined);
   const grid = h('div.qgrid' + (hasCards ? '.cards' : '') + (hasRes ? '.res' : ''));
-  q.opts.forEach((o, i) => {
+  // keep card choices where they were between picks (a discarded card leaves a gap instead of the next card sliding under your finger);
+  // plain buttons such as Done go first so they are never below the fold
+  const idx = q.opts.map((o, i) => i);
+  if (hasCards) idx.sort((a, b) => (q.opts[a].card !== undefined) - (q.opts[b].card !== undefined));
+  const prev = UI.qPrev && UI.qPrev.kind === q.kind && UI.qPrev.who === q.who ? UI.qPrev.cards : null;
+  let slots = idx;
+  if (prev && hasCards) {
+    const txt = idx.filter(i => q.opts[i].card === undefined), byCard = new Map(); idx.forEach(i => { if (q.opts[i].card !== undefined && !byCard.has(q.opts[i].card)) byCard.set(q.opts[i].card, i); });
+    const used = new Set(); slots = txt.slice();
+    prev.forEach(c => { if (byCard.has(c)) { slots.push(byCard.get(c)); used.add(c); } else slots.push({ ghost: c }); });
+    idx.forEach(i => { const c = q.opts[i].card; if (c !== undefined && !used.has(c)) { slots.push(i); used.add(c); } });
+  }
+  UI.qPrev = hasCards ? { kind: q.kind, who: q.who, cards: slots.map(i => typeof i === 'object' ? i.ghost : q.opts[i].card).filter(c => c !== undefined) } : null;
+  slots.forEach(i => {
+    if (typeof i === 'object') { grid.appendChild(h('button.qo.qcard.ghost', { type: 'button', disabled: true, 'aria-label': 'Already picked' }, cardEl(i.ghost, isPh() ? 56 : 70), h('span.ql', 'picked'))); return; }
+    const o = q.opts[i];
     let b;
     const star = rm && rm.i === i;
     if (o.card !== undefined) b = h('button.qo.qcard' + (star ? '.rec' : ''), { 'data-a': 'q', 'data-i': i, type: 'button' }, cardEl(o.card, isPh() ? 56 : 70), h('span.ql', o.label));
@@ -284,4 +300,5 @@ function renderQ() {
   body.appendChild(grid);
   if (rm) body.appendChild(h('p.sm', '★ = what the computer helper would choose.'));
   pc.appendChild(body);
+  const st = body.querySelector('.qo.rec'); if (st && st.scrollIntoView) try { st.scrollIntoView({ block: 'nearest' }); } catch (e) { }
 }
