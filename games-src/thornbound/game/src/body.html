@@ -13,7 +13,8 @@
   <main class="gx-board" id="board" aria-label="The kingdom map"><div id="mapwrap"></div></main>
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet"></span><span class="gx-dt">What to do now</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">&#8677;</button></div>
-    <div class="gx-dock-body" id="dockbody"><div id="netst" class="netst" hidden></div><div id="road"></div><div id="main"></div><div id="handw" hidden></div><div id="rivals"></div></div>
+    <div class="gx-dock-body" id="dockbody"><div id="netst" class="netst" hidden></div><div id="now" aria-live="polite"></div><div id="road"></div><div id="main"></div><div id="act" role="group" aria-label="Actions"></div><div id="handw" hidden></div><div id="rivals"></div></div>
+    <div id="gdef" hidden role="note"></div>
     <div id="ppop" class="ppop" hidden role="dialog" aria-label="Details"></div>
     <div id="pc" class="pcard" hidden role="dialog" aria-label="Message"></div>
   </aside>

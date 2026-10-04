@@ -1,5 +1,5 @@
 // Random clicker (jsdom): humans play ONLY through the page's buttons, hand cards, board taps and pop-ups. node click.js [from] [to] [seeds]
-const {JSDOM,VirtualConsole}=require('../../node_modules/jsdom');const fs=require('fs');
+const {JSDOM,VirtualConsole}=(()=>{try{return require('../../node_modules/jsdom')}catch(e){return require('jsdom')}})();const fs=require('fs');
 const html=fs.readFileSync(__dirname+'/thornbound.html','utf8');
 const CONF=[
  {name:'guided 2p',guided:1},
@@ -18,7 +18,7 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
  const seen=new Set();let hidden=0,clicks=0,steps=0,stall=0,last='';const t0=Date.now();
  w.addEventListener('load',()=>{setTimeout(()=>{try{
   w.eval(`AIDELAY=0;ANIM=${cf.anim?1:0};UI.speed=40;setSeed(${seed})`);
-  if(cf.guided)click(d.querySelector('[data-a=guided]'));else w.eval(`newGame(${JSON.stringify(cf.mode)},${JSON.stringify({np:cf.np,seed,length:cf.length,levels:cf.levels})})`);
+  if(cf.guided){click(d.querySelector('#start [data-a=play]'));click(d.querySelector('#start [data-a=guided]'))}else w.eval(`newGame(${JSON.stringify(cf.mode)},${JSON.stringify({np:cf.np,seed,length:cf.length,levels:cf.levels})})`);
   if(!w.eval('UI.started'))errs.push('not started');
   if(cf.phone&&!d.documentElement.classList.contains('ph'))errs.push('phone mode not on');
   const iv=setInterval(()=>{try{steps++;const G=w.eval('G');
@@ -31,10 +31,12 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
    if(R()<.02){const t=rnd([...d.querySelectorAll('.gx-bar [data-gx]')]);click(t);seen.add('drawer:'+t.dataset.gx);const x=d.querySelector('.gx-drawer.on .gx-x');if(x)click(x);return}
    if(R()<.03){const rv=rnd([...d.querySelectorAll('#rivals [data-a=rival]')]);if(rv){click(rv);seen.add('rival');click(d.querySelector('#ppop [data-a=pclose]'));return}}
    if(R()<.03){const loc=d.querySelector('.tb-loc[data-id="'+rnd(['castle','wilderness','harvest_field','battlefield','shrine','necropolis','throne'])+'"]');if(loc){click(loc);seen.add('loctap');if(!w.eval('UI.pop'))errs.push('loc tap no popup');else if(R()<.5)click(d.querySelector('#ppop [data-a=pclose]'));return}}
+   const co=d.querySelector('#act [data-a=coachok]');if(co){click(co);seen.add('coach');clicks++;return}
+   if(R()<.03){const gl=d.querySelector('#main [data-a=gloss]');if(gl){click(gl);seen.add('gloss');if(d.querySelector('#gdef').hidden)errs.push('gloss chip opened nothing');click(d.querySelector('#gdef [data-a=gclose]'));return}}
    if(w.eval('G.q')&&w.eval('viewSeatForQ()')!=null){const k=G.q.kind;
     if(['bid','place','tie'].includes(k)&&R()<.7){const hc=[...d.querySelectorAll('#handw .hc')];if(hc.length){click(rnd(hc));seen.add('hand');const mv=[...d.querySelectorAll('#ppop [data-a=mv]')];if(mv.length){click(rnd(mv));clicks++;seen.add('hand-act:'+k)}return}}
     if(k==='herald'){const lb=rnd([...d.querySelectorAll('#main [data-a=loc]')]);if(lb){click(lb);const pm=d.querySelector('#ppop [data-a=mv]');if(!pm)errs.push('herald popup has no Place button');else{click(pm);clicks++;seen.add('herald-popup')}return}}
-    const b=[...d.querySelectorAll('#main [data-a=mv]')].filter(x=>!x.disabled);
+    const b=[...d.querySelectorAll('#main [data-a=mv],#act [data-a=mv]')].filter(x=>!x.disabled);
     if(b.length){const pri=b.filter(x=>x.classList.contains('pri'));click(R()<.5&&pri.length?pri[0]:rnd(b));clicks++;seen.add('mv:'+k);return}}
    const sig=JSON.stringify([G.logN,G.q&&G.q.kind,w.eval('!!UI.card')]);if(sig===last)stall++;else{stall=0;last=sig}
    const inv=w.eval('TB.invariants(G)');if(inv.length&&errs.length<5)errs.push('INV '+inv[0]);

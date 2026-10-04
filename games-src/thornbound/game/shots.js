@@ -1,4 +1,4 @@
-const PW=require(require('child_process').execSync('npm root -g').toString().trim()+'/playwright');const fs=require('fs');
+const PW=require('playwright');const fs=require('fs');
 const html=fs.readFileSync(__dirname+'/thornbound.html');const [W,H]=(process.argv[2]||'390x844').split('x').map(Number);const tag=process.argv[3]||'a';
 (async()=>{const b=await PW.chromium.launch();const ctx=await b.newContext({viewport:{width:W,height:H},isMobile:W<700,hasTouch:W<700});
 await ctx.route('**/*',r=>new URL(r.request().url()).host==='gns.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());

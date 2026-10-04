@@ -46,7 +46,7 @@ const tick=()=>{const d=document,rnd=a=>a[Math.floor(Math.random()*a.length)];
   if(UI.card&&UI.card.kind==='pass'){window.__bad++;window.__badWhat.push('pass screen')}
   if(UI.card&&UI.card.kind!=='over'){const b=d.querySelector('#pc [data-a=evok],#pc [data-a=tipok]');if(b){b.click();return 0}}
   const asked=!!(G.q&&G.q.seats.includes(me)&&!G.pl[me].ai);
-  const mvb=[...d.querySelectorAll('#main [data-a=mv]')].filter(b=>!b.disabled);
+  const mvb=[...d.querySelectorAll('#main [data-a=mv],#act [data-a=mv]')].filter(b=>!b.disabled);
   if(!asked&&mvb.length){window.__bad++;if(window.__badWhat.length<5)window.__badWhat.push('clickable move while seat '+me+' is not asked: '+(G.q&&G.q.kind))}
   if(!asked)return 0;
   if(UI.card&&UI.card.kind==='over')return 0;
@@ -59,7 +59,7 @@ const final=()=>G&&{w:G.over&&G.over.winner,scores:G.over&&G.over.scores,rank:G.
 async function clk(P,sel){const ok=await P.p.evaluate(s=>{const b=document.querySelector(s);if(!b||b.disabled)return false;b.click();return true},sel);if(!ok)throw new Error('no button '+sel+' on '+P.tag)}
 async function shot(P,name,vp){if(vp)await P.p.setViewportSize(vp);await P.p.evaluate(()=>{const b=document.querySelector('#pc [data-a=tipok]');if(b)b.click()}).catch(()=>{});await sleep(600);await P.p.screenshot({path:path.join(OUT,name+'.png')});log('shot',name)}
 async function waitFor(P,fn,ms,arg){const t0=Date.now();while(Date.now()-t0<ms){if(await P.p.evaluate(fn,arg).catch(()=>false))return true;await sleep(150)}return false}
-async function openOnl(P){await P.p.evaluate(()=>{const d=document.getElementById('onl');if(d&&!d.open)d.querySelector('summary').click()});await sleep(200)}
+async function openOnl(P){await P.p.evaluate(()=>{if(!document.getElementById('onl')){const b=document.querySelector('#start [data-a=online]');if(b)b.click()}});await sleep(200);await P.p.evaluate(()=>{const d=document.getElementById('onl');if(d&&!d.open)d.querySelector('summary').click()});await sleep(200)}
 async function hostRoom(H,name){await openOnl(H);await H.p.fill('#netname',name);await clk(H,'[data-a="nethost"]');await waitFor(H,()=>NET.on&&NET.code,10000);return await H.p.evaluate(()=>NET.code)}
 async function joinRoom(C,name,code){await openOnl(C);await C.p.fill('#netname',name);await C.p.fill('#joincode',code);await clk(C,'[data-a="netjoin"]')}
 (async()=>{const relay=spawn('node',[__dirname+'/relay.js',''+PORT]);await sleep(600);
@@ -95,7 +95,7 @@ if(MODE==='ui'){
   await shot(C[0],'client-start');await shot(H,'host-start');
   // a latecomer (never seated) watches: no hand, no buttons, still gets state
   const SP=await mkPage('spectator');await joinRoom(SP,'Watcher',code);res.spectator=await waitFor(SP,()=>G&&UI.started&&NET.mySeat===-1,30000);await sleep(1500);
-  res.spectatorView=await SP.p.evaluate(()=>({seat:NET.mySeat,hand:!document.querySelector('#handw .hc'),moveButtons:document.querySelectorAll('#main [data-a=mv]').length,faceUpOfOthers:document.querySelectorAll('[data-owner][data-up="1"]').length,status:(document.getElementById('netst')||{}).textContent.trim().slice(0,70)}));await shot(SP,'spectator');
+  res.spectatorView=await SP.p.evaluate(()=>({seat:NET.mySeat,hand:!document.querySelector('#handw .hc'),moveButtons:document.querySelectorAll('#main [data-a=mv],#act [data-a=mv]').length,faceUpOfOthers:document.querySelectorAll('[data-owner][data-up="1"]').length,status:(document.getElementById('netst')||{}).textContent.trim().slice(0,70)}));await shot(SP,'spectator');
   res.spectatorPacketLeaks=await H.p.evaluate(()=>__leak);
   // host closes the tab: the client says so
   await H.c.close();H.closed=true;res.hostLeftMsg=await waitFor(C[0],()=>NET.hostGone&&/host left/i.test((document.querySelector('#netbox')||{}).textContent||''),30000);

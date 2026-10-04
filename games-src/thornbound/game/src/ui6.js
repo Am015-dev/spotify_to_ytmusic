@@ -12,12 +12,20 @@ function musicFor(){try{if(!window.GA||!UI.music)return;GA.music(G&&G.round>=G.r
 // ---------------------------------------------------------------- phone mode
 function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
   const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
+// The board gives up space so the dock (now-line, prompt, pinned action row, hand, rivals) always fits: portrait phones keep the square map
+// at most as big as the height leaves after the dock's minimum; landscape phones put the map left at the full height.
+function dockNeed(H){return H>=820?380:H>=760?396:H>=700?370:H>=640?350:H>=580?330:330}
 function phApply(){const was=UI.phone;const on=phDetect();const root=document.documentElement;
-  UI.phone=on;UI.land=innerWidth>innerHeight;root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);
-  if(on){const W=innerWidth,H=innerHeight,bar=44;const bs=UI.land?H:Math.min(W,Math.max(Math.round(W*.75),H-bar-270));root.style.setProperty('--bs',bs+'px');root.style.setProperty('--bar','44px')}
+  UI.phone=on;UI.land=innerWidth>innerHeight;const W=innerWidth,H=innerHeight;UI.short=on&&(UI.land?H<370:H<600);
+  root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);root.classList.toggle('short',!!UI.short);
+  if(on){const big=Math.max(150,Math.min(W,H-44-dockNeed(H)));const bs=UI.land?Math.min(H,Math.round(W*.52)):(UI.boardSmall?Math.max(150,Math.min(big,Math.round(big-Math.max(90,H*.15)))):big);root.style.setProperty('--bs',bs+'px');UI.bs=bs}
   else root.style.removeProperty('--bs');
   if(was!==on&&G){UI.mapReset=true;renderAll()}}
 function phoneRefresh(){}
+// map-centred decisions (Herald, hidden cards, claiming, ties, the map lesson) get the big map; lists, menus and result cards get the room instead
+function wantSmall(){if(!G)return false;const c=UI.card;if(c&&c.kind==='pass')return false;if(c&&(c.kind==='event'||c.kind==='over'))return true;
+  if(UI.coachInfo)return UI.coachInfo.id!=='map';const s=viewSeatForQ();if(s==null||!G.q)return UI.boardSmall;
+  return !['herald','place','location','tie','clashOrder'].includes(G.q.kind)}
 let _rz=0;addEventListener('resize',()=>{clearTimeout(_rz);_rz=setTimeout(()=>{const l=UI.land,p=UI.phone;phApply();if(G&&UI.started)renderAll()},120)});
 addEventListener('orientationchange',()=>setTimeout(()=>{phApply();if(G)renderAll()},200));
 // ---------------------------------------------------------------- boot
