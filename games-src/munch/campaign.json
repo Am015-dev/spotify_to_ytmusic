@@ -1,0 +1,1241 @@
+{
+  "game": "doorkick",
+  "title": "The Golden Boot",
+  "version": 1,
+  "cast": {
+    "hobb": {
+      "name": "Old Hobb the Doorwarden",
+      "portrait": "camp-hobb.webp",
+      "emoji": "🧙",
+      "color": "#8a5a2b"
+    },
+    "pip": {
+      "name": "Pip the Plucky",
+      "portrait": "camp-pip.webp",
+      "emoji": "🐿️",
+      "color": "#d08a2e"
+    },
+    "tansy": {
+      "name": "Tansy the Lucky",
+      "portrait": "camp-tansy.webp",
+      "emoji": "🍀",
+      "color": "#4f8a3c"
+    },
+    "bodkin": {
+      "name": "Bodkin the Braggart",
+      "portrait": "camp-bodkin.webp",
+      "emoji": "📣",
+      "color": "#b5622a"
+    },
+    "grub": {
+      "name": "Grub the Mercenary",
+      "portrait": "camp-grub.webp",
+      "emoji": "🪓",
+      "color": "#6b6e3a"
+    },
+    "morwen": {
+      "name": "Morwen the Grudge-Keeper",
+      "portrait": "camp-morwen.webp",
+      "emoji": "📜",
+      "color": "#5b3a78"
+    },
+    "wrenna": {
+      "name": "Wrenna the Schemer",
+      "portrait": "camp-wrenna.webp",
+      "emoji": "🕸️",
+      "color": "#8c3f5e"
+    }
+  },
+  "acts": [
+    {
+      "act": 1,
+      "title": "The Cellar Doors",
+      "blurb": "Learn to kick, fight and run in the shallow cellars under Crookhill."
+    },
+    {
+      "act": 2,
+      "title": "The Long Corridor",
+      "blurb": "Four heroes, sharper rivals: curses, deals and back-stabs."
+    },
+    {
+      "act": 3,
+      "title": "The Vault of the Golden Boot",
+      "blurb": "The cleverest heroes in the dungeon, and every trick they own."
+    }
+  ],
+  "twists": [
+    {
+      "id": "boss-head-start",
+      "where": "setup",
+      "how": "After newGame deals the opening hands, set the boss seat's lvl to 1 + param (never above 9) before the setup phase begins."
+    },
+    {
+      "id": "boss-extra-treasure",
+      "where": "setup",
+      "how": "After newGame deals the opening hands, call drawTo(P(bossSeat),'treasure',param) so the boss starts with param extra treasure cards."
+    },
+    {
+      "id": "boss-first",
+      "where": "setup",
+      "how": "After the opening roll in newGame, set G.active, G.first and G.setupOrd so the boss seat takes the first turn."
+    },
+    {
+      "id": "light-pack",
+      "where": "setup",
+      "how": "After newGame deals the opening hands, discard param random treasure cards from the human seat's hand (into G.td) so you start with fewer treasures."
+    }
+  ],
+  "chapters": [
+    {
+      "id": "c1",
+      "act": 1,
+      "title": "The First Door",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hobb",
+          "text": "Welcome to the Delve, rookie. Every year the doors open and heroes race to level 10."
+        },
+        {
+          "who": "hobb",
+          "text": "Kick a door. If a monster jumps out, fight it. Win and you go up a level."
+        },
+        {
+          "who": "pip",
+          "text": "Hi! I'm Pip. I'm new too. Let's kick doors together!"
+        }
+      ],
+      "outro": [
+        {
+          "who": "hobb",
+          "text": "Ten levels, and the last from a kill. You've got the knack."
+        },
+        {
+          "who": "hobb",
+          "text": "Next, I'll show you how to wear what you find."
+        }
+      ],
+      "opponent": {
+        "name": "Pip",
+        "portrait": "camp-pip.webp",
+        "emoji": "🐿️",
+        "cast": "pip",
+        "personality": "Cheerful, first through every door, rarely first out. Plays gently.",
+        "aiLevel": "easy",
+        "aiStyle": "plucky"
+      },
+      "setup": {
+        "mode": "F",
+        "n": 3,
+        "lvl": "easy",
+        "lvmix": [
+          "easy",
+          "easy",
+          "easy"
+        ],
+        "names": [
+          null,
+          "Pip",
+          "Tansy"
+        ],
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Reach level 10 before Pip and Tansy do."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Reach level 10 first",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Kill 4 or more monsters",
+          "test": {
+            "k": "kills",
+            "op": ">=",
+            "v": 4
+          }
+        },
+        {
+          "text": "Win before round 20",
+          "test": {
+            "k": "rounds",
+            "op": "<",
+            "v": 20
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "n": 3
+        },
+        "maxStars": 2,
+        "text": "Pip and Tansy play gently and the suggestions stay on."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "pip",
+          "text": "Pip's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "act": 1,
+      "title": "Dress for the Fight",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hobb",
+          "text": "Your strength is your level plus everything you wear. Items win fights."
+        },
+        {
+          "who": "hobb",
+          "text": "Equip a helmet, armor, boots and weapons from your treasure cards before you kick."
+        },
+        {
+          "who": "tansy",
+          "text": "I just trip over treasure. You'll have to actually wear yours!"
+        }
+      ],
+      "outro": [
+        {
+          "who": "tansy",
+          "text": "All that shiny gear! No wonder the monsters ran."
+        },
+        {
+          "who": "hobb",
+          "text": "Good. Now let's talk about when NOT to fight."
+        }
+      ],
+      "opponent": {
+        "name": "Tansy",
+        "portrait": "camp-tansy.webp",
+        "emoji": "🍀",
+        "cast": "tansy",
+        "personality": "Lucky and scatter-brained; picks up everything, plans nothing.",
+        "aiLevel": "easy",
+        "aiStyle": "lucky"
+      },
+      "setup": {
+        "mode": "F",
+        "n": 3,
+        "lvl": "easy",
+        "lvmix": [
+          "easy",
+          "easy",
+          "easy"
+        ],
+        "names": [
+          null,
+          "Tansy",
+          "Pip"
+        ],
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "custom",
+        "value": 4,
+        "text": "Win the race to level 10 with at least 4 items worn at the end."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Win wearing 4 or more items",
+          "test": {
+            "k": "wornWin",
+            "op": ">=",
+            "v": 4
+          }
+        },
+        {
+          "text": "Win the race to level 10",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Never die",
+          "test": {
+            "k": "deaths",
+            "op": "<=",
+            "v": 0
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {},
+        "maxStars": 2,
+        "text": "Just win; 3 items worn is enough."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "tansy",
+          "text": "Tansy's portrait"
+        },
+        {
+          "type": "cardback",
+          "id": "cellar-oak",
+          "text": "Cellar oak card back"
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "act": 1,
+      "title": "Grub's Toll",
+      "boss": true,
+      "intro": [
+        {
+          "who": "grub",
+          "text": "This cellar's mine, rookie. Want past? Pay me, or beat me to level 10."
+        },
+        {
+          "who": "hobb",
+          "text": "Grub helps anyone for a treasure. Ask him for help when a fight looks too big."
+        },
+        {
+          "who": "hobb",
+          "text": "And if you can't win, run! Roll 5 or 6 and you get away."
+        }
+      ],
+      "outro": [
+        {
+          "who": "grub",
+          "text": "Hmph. Fine fighting. My axe is for hire whenever you're buying."
+        },
+        {
+          "who": "hobb",
+          "text": "The cellar is yours. The Long Corridor waits below."
+        }
+      ],
+      "opponent": {
+        "name": "Grub",
+        "portrait": "camp-grub.webp",
+        "emoji": "🪓",
+        "cast": "grub",
+        "personality": "Helps anyone for a price; curses only when nobody paid him not to.",
+        "aiLevel": "easy",
+        "aiStyle": "mercenary",
+        "taunt": "Business is business, rookie. Pay up next time.",
+        "praise": "You earned that boot-print. No charge for the lesson."
+      },
+      "setup": {
+        "mode": "F",
+        "n": 3,
+        "lvl": "easy",
+        "lvmix": [
+          "easy",
+          "easy",
+          "easy"
+        ],
+        "names": [
+          null,
+          "Grub",
+          "Pip"
+        ],
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Reach level 10 before Grub does."
+      },
+      "hints": true,
+      "stars": [
+        {
+          "text": "Reach level 10 before Grub",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Try to run away at least once",
+          "test": {
+            "k": "runs",
+            "op": ">=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Win a fight with a helper",
+          "test": {
+            "k": "helpedKills",
+            "op": ">=",
+            "v": 1
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "names": [
+            null,
+            "Grub",
+            "Pip"
+          ]
+        },
+        "maxStars": 2,
+        "text": "Grub still plays gently; the extra stars are optional."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "grub",
+          "text": "Grub's portrait"
+        },
+        {
+          "type": "title",
+          "id": "cellar-sweeper",
+          "text": "Title: Cellar Sweeper"
+        },
+        {
+          "type": "act",
+          "id": "2",
+          "text": "Act 2: The Long Corridor"
+        }
+      ]
+    },
+    {
+      "id": "c4",
+      "act": 2,
+      "title": "Four at the Table",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hobb",
+          "text": "Four heroes now, and they all play to win. Watch the leader, not just the monster."
+        },
+        {
+          "who": "bodkin",
+          "text": "Stand back, everyone. Bodkin the Magnificent has arrived!"
+        },
+        {
+          "who": "hobb",
+          "text": "When someone is about to win a fight, curse them or boost the monster."
+        }
+      ],
+      "outro": [
+        {
+          "who": "bodkin",
+          "text": "A fluke! A cosmic fluke! ...Well played, I suppose."
+        },
+        {
+          "who": "hobb",
+          "text": "You stopped the leader. That's half of this game."
+        }
+      ],
+      "opponent": {
+        "name": "Bodkin",
+        "portrait": "camp-bodkin.webp",
+        "emoji": "📣",
+        "cast": "bodkin",
+        "personality": "Loud, proud and usually wrong; fights big monsters to show off.",
+        "aiLevel": "normal",
+        "aiStyle": "braggart"
+      },
+      "setup": {
+        "mode": "F",
+        "n": 4,
+        "lvl": "normal",
+        "lvmix": [
+          "normal",
+          "normal",
+          "easy",
+          "easy"
+        ],
+        "names": [
+          null,
+          "Bodkin",
+          "Pip",
+          "Tansy"
+        ],
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Reach level 10 first at a table of four."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Reach level 10 first",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Play at least 2 curses on rivals",
+          "test": {
+            "k": "cursesPlayed",
+            "op": ">=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Win before round 18",
+          "test": {
+            "k": "rounds",
+            "op": "<",
+            "v": 18
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "lvl": "easy",
+          "lvmix": [
+            "easy",
+            "easy",
+            "easy",
+            "easy"
+          ]
+        },
+        "maxStars": 2,
+        "text": "Bodkin plays at the easy level."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "bodkin",
+          "text": "Bodkin's portrait"
+        }
+      ]
+    },
+    {
+      "id": "c5",
+      "act": 2,
+      "title": "Gold for Glory",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hobb",
+          "text": "Items worth 1,000 gold can be sold for a level on your own turn, outside a fight."
+        },
+        {
+          "who": "hobb",
+          "text": "Selling can't give you level 10, but it gets you to 9 fast."
+        },
+        {
+          "who": "grub",
+          "text": "Coin talks. Let's see if you listen."
+        }
+      ],
+      "outro": [
+        {
+          "who": "grub",
+          "text": "Now that's a hero who knows the price of things."
+        },
+        {
+          "who": "hobb",
+          "text": "Gold, gear and grudges. Morwen keeps all three. She's next."
+        }
+      ],
+      "opponent": {
+        "name": "Grub",
+        "portrait": "camp-grub.webp",
+        "emoji": "🪓",
+        "cast": "grub",
+        "personality": "The mercenary again, now at full strength. Sells junk early.",
+        "aiLevel": "normal",
+        "aiStyle": "mercenary"
+      },
+      "setup": {
+        "mode": "F",
+        "n": 4,
+        "lvl": "normal",
+        "lvmix": [
+          "normal",
+          "normal",
+          "normal",
+          "easy"
+        ],
+        "names": [
+          null,
+          "Grub",
+          "Tansy",
+          "Pip"
+        ],
+        "seed": null
+      },
+      "twist": {
+        "id": "boss-extra-treasure",
+        "param": 2,
+        "text": "Twist: Grub starts with 2 extra treasure cards to sell."
+      },
+      "goal": {
+        "type": "custom",
+        "value": 1,
+        "text": "Win the race to level 10 after selling items for at least 1 level."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Win after selling for 1+ level",
+          "test": {
+            "k": "soldWin",
+            "op": ">=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Win the race to level 10",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Sell for 3 or more levels",
+          "test": {
+            "k": "soldLevels",
+            "op": ">=",
+            "v": 3
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "lvl": "easy",
+          "lvmix": [
+            "easy",
+            "easy",
+            "easy",
+            "easy"
+          ]
+        },
+        "maxStars": 2,
+        "text": "Everyone plays at the easy level."
+      },
+      "unlock": [
+        {
+          "type": "cardback",
+          "id": "corridor-brass",
+          "text": "Corridor brass card back"
+        }
+      ]
+    },
+    {
+      "id": "c6",
+      "act": 2,
+      "title": "Morwen's List",
+      "boss": true,
+      "intro": [
+        {
+          "who": "morwen",
+          "text": "I keep a list of everyone who ever beat me. Your name is about to go on it."
+        },
+        {
+          "who": "hobb",
+          "text": "Morwen saves her curses for whoever leads. Don't lead too early."
+        },
+        {
+          "who": "hobb",
+          "text": "She starts one level up. Climb quietly, then strike."
+        }
+      ],
+      "outro": [
+        {
+          "who": "morwen",
+          "text": "Fine. You're on the list now. Top of it."
+        },
+        {
+          "who": "hobb",
+          "text": "The corridor ends at the Vault. Only the sharpest go further."
+        }
+      ],
+      "opponent": {
+        "name": "Morwen",
+        "portrait": "camp-morwen.webp",
+        "emoji": "📜",
+        "cast": "morwen",
+        "personality": "Never forgets a curse and always pays it back; targets the leader.",
+        "aiLevel": "normal",
+        "aiStyle": "grudge",
+        "taunt": "Oh, you wanted to WIN that? How sad.",
+        "praise": "Nothing personal. Well... a little. Well fought."
+      },
+      "setup": {
+        "mode": "F",
+        "n": 4,
+        "lvl": "normal",
+        "lvmix": [
+          "normal",
+          "normal",
+          "normal",
+          "normal"
+        ],
+        "names": [
+          null,
+          "Morwen",
+          "Bodkin",
+          "Tansy"
+        ],
+        "seed": null
+      },
+      "twist": {
+        "id": "boss-head-start",
+        "param": 1,
+        "text": "Boss rule: Morwen starts at level 2."
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Reach level 10 before Morwen, who starts at level 2."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Reach level 10 before Morwen",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Win by 2 or more levels",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Win before round 16",
+          "test": {
+            "k": "rounds",
+            "op": "<",
+            "v": 16
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "easy",
+        "twist": null,
+        "setup": {
+          "lvmix": [
+            "normal",
+            "easy",
+            "easy",
+            "easy"
+          ]
+        },
+        "maxStars": 2,
+        "text": "Morwen starts at level 1 and the table plays gently."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "morwen",
+          "text": "Morwen's portrait"
+        },
+        {
+          "type": "title",
+          "id": "corridor-runner",
+          "text": "Title: Corridor Runner"
+        },
+        {
+          "type": "act",
+          "id": "3",
+          "text": "Act 3: The Vault"
+        }
+      ]
+    },
+    {
+      "id": "c7",
+      "act": 3,
+      "title": "Vault Gate",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hobb",
+          "text": "The Vault rivals play hard: they keep a safety margin and save tricks for the end."
+        },
+        {
+          "who": "pip",
+          "text": "I've been practising! I won't be so easy this time."
+        },
+        {
+          "who": "hobb",
+          "text": "Just one sharp rival here. Find your feet before the deep doors."
+        }
+      ],
+      "outro": [
+        {
+          "who": "pip",
+          "text": "You're really good now. I'll stop calling you rookie."
+        },
+        {
+          "who": "hobb",
+          "text": "Next door, five at the table. Pace yourself."
+        }
+      ],
+      "opponent": {
+        "name": "Pip",
+        "portrait": "camp-pip.webp",
+        "emoji": "🐿️",
+        "cast": "pip",
+        "personality": "Pip grown up: still bold, now careful with the last level.",
+        "aiLevel": "hard",
+        "aiStyle": "plucky"
+      },
+      "setup": {
+        "mode": "F",
+        "n": 4,
+        "lvl": "hard",
+        "lvmix": [
+          "normal",
+          "hard",
+          "normal",
+          "normal"
+        ],
+        "names": [
+          null,
+          "Pip",
+          "Bodkin",
+          "Tansy"
+        ],
+        "seed": null
+      },
+      "twist": null,
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Reach level 10 first against a hard Pip."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Reach level 10 first",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Die no more than once",
+          "test": {
+            "k": "deaths",
+            "op": "<=",
+            "v": 1
+          }
+        },
+        {
+          "text": "Win by 2 or more levels",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 2
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "lvl": "normal",
+          "lvmix": [
+            "normal",
+            "normal",
+            "easy",
+            "easy"
+          ]
+        },
+        "maxStars": 2,
+        "text": "Pip plays at the normal level."
+      },
+      "unlock": [
+        {
+          "type": "table",
+          "id": "vault-stone",
+          "text": "Vault stone table"
+        }
+      ]
+    },
+    {
+      "id": "c8",
+      "act": 3,
+      "title": "Crowded Crypt",
+      "boss": false,
+      "intro": [
+        {
+          "who": "hobb",
+          "text": "Five heroes, five sets of curses. Everyone gangs up on whoever leads."
+        },
+        {
+          "who": "bodkin",
+          "text": "Five?! More witnesses to my greatness."
+        },
+        {
+          "who": "hobb",
+          "text": "Help others when it's cheap. Kill when it counts."
+        }
+      ],
+      "outro": [
+        {
+          "who": "bodkin",
+          "text": "I let you win. Obviously. For morale."
+        },
+        {
+          "who": "hobb",
+          "text": "Morwen is waiting in the next crypt. She remembers you."
+        }
+      ],
+      "opponent": {
+        "name": "Bodkin",
+        "portrait": "camp-bodkin.webp",
+        "emoji": "📣",
+        "cast": "bodkin",
+        "personality": "Still loud, now hard: he fights only what he can beat.",
+        "aiLevel": "hard",
+        "aiStyle": "braggart"
+      },
+      "setup": {
+        "mode": "F",
+        "n": 5,
+        "lvl": "hard",
+        "lvmix": [
+          "hard",
+          "hard",
+          "normal",
+          "normal",
+          "normal"
+        ],
+        "names": [
+          null,
+          "Bodkin",
+          "Grub",
+          "Tansy",
+          "Pip"
+        ],
+        "seed": null
+      },
+      "twist": {
+        "id": "boss-first",
+        "param": null,
+        "text": "Vault rule: Bodkin always takes the first turn."
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Reach level 10 first at a table of five."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Reach level 10 first",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Help win 2 or more fights",
+          "test": {
+            "k": "helps",
+            "op": ">=",
+            "v": 2
+          }
+        },
+        {
+          "text": "Win before round 15",
+          "test": {
+            "k": "rounds",
+            "op": "<",
+            "v": 15
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "n": 4,
+          "lvl": "normal",
+          "lvmix": [
+            "normal",
+            "normal",
+            "normal",
+            "normal"
+          ],
+          "names": [
+            null,
+            "Bodkin",
+            "Grub",
+            "Tansy"
+          ]
+        },
+        "maxStars": 2,
+        "text": "Four at the table, all at the normal level."
+      },
+      "unlock": [
+        {
+          "type": "cardback",
+          "id": "crypt-bone",
+          "text": "Crypt bone card back"
+        }
+      ]
+    },
+    {
+      "id": "c9",
+      "act": 3,
+      "title": "Morwen Remembers",
+      "boss": false,
+      "intro": [
+        {
+          "who": "morwen",
+          "text": "Top of my list, remember? I brought friends, and they all play hard."
+        },
+        {
+          "who": "hobb",
+          "text": "Every rival here is sharp, and you start with two fewer treasures."
+        },
+        {
+          "who": "hobb",
+          "text": "Spend your door cards well: races and classes cost nothing."
+        }
+      ],
+      "outro": [
+        {
+          "who": "morwen",
+          "text": "Twice now. I'll need a longer list."
+        },
+        {
+          "who": "hobb",
+          "text": "Only Wrenna stands between you and the Golden Boot."
+        }
+      ],
+      "opponent": {
+        "name": "Morwen",
+        "portrait": "camp-morwen.webp",
+        "emoji": "📜",
+        "cast": "morwen",
+        "personality": "Holding a grudge at full strength; curses whoever leads, hard.",
+        "aiLevel": "hard",
+        "aiStyle": "grudge"
+      },
+      "setup": {
+        "mode": "F",
+        "n": 4,
+        "lvl": "hard",
+        "lvmix": [
+          "hard",
+          "hard",
+          "hard",
+          "hard"
+        ],
+        "names": [
+          null,
+          "Morwen",
+          "Grub",
+          "Tansy"
+        ],
+        "seed": null
+      },
+      "twist": {
+        "id": "light-pack",
+        "param": 2,
+        "text": "Vault rule: you start with 2 fewer treasure cards."
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Reach level 10 first against three hard rivals, starting light."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Reach level 10 first",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Kill 6 or more monsters",
+          "test": {
+            "k": "kills",
+            "op": ">=",
+            "v": 6
+          }
+        },
+        {
+          "text": "Never die",
+          "test": {
+            "k": "deaths",
+            "op": "<=",
+            "v": 0
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "lvl": "normal",
+          "lvmix": [
+            "normal",
+            "normal",
+            "normal",
+            "normal"
+          ]
+        },
+        "maxStars": 2,
+        "text": "Full starting hand and the rivals play at the normal level."
+      },
+      "unlock": [
+        {
+          "type": "title",
+          "id": "grudge-breaker",
+          "text": "Title: Grudge-Breaker"
+        }
+      ]
+    },
+    {
+      "id": "c10",
+      "act": 3,
+      "title": "The Golden Boot",
+      "boss": true,
+      "intro": [
+        {
+          "who": "wrenna",
+          "text": "Darling, I planned this game three turns before you sat down."
+        },
+        {
+          "who": "hobb",
+          "text": "Wrenna starts at level 3, and every rival here plays hard."
+        },
+        {
+          "who": "hobb",
+          "text": "Hold your one-shots for the last fight. She will hold hers."
+        }
+      ],
+      "outro": [
+        {
+          "who": "wrenna",
+          "text": "That... was not in the plan. Enjoy the boot. For now."
+        },
+        {
+          "who": "hobb",
+          "text": "The Golden Boot is yours. The doors slam shut for another year."
+        },
+        {
+          "who": "hobb",
+          "text": "Same time next year, Legend?"
+        }
+      ],
+      "opponent": {
+        "name": "Wrenna",
+        "portrait": "camp-wrenna.webp",
+        "emoji": "🕸️",
+        "cast": "wrenna",
+        "personality": "Smiles sweetly, plans three turns ahead, saves every trick for your winning fight.",
+        "aiLevel": "hard",
+        "aiStyle": "schemer",
+        "taunt": "All part of the plan, darling. Better luck next Delve.",
+        "praise": "Exactly as... no. Not as planned. The boot is yours, Legend."
+      },
+      "setup": {
+        "mode": "F",
+        "n": 4,
+        "lvl": "hard",
+        "lvmix": [
+          "hard",
+          "hard",
+          "hard",
+          "hard"
+        ],
+        "names": [
+          null,
+          "Wrenna",
+          "Morwen",
+          "Grub"
+        ],
+        "seed": null
+      },
+      "twist": {
+        "id": "boss-head-start",
+        "param": 2,
+        "text": "Boss rule: Wrenna starts at level 3."
+      },
+      "goal": {
+        "type": "win",
+        "value": null,
+        "text": "Reach level 10 before Wrenna, who starts at level 3."
+      },
+      "hints": false,
+      "stars": [
+        {
+          "text": "Reach level 10 before Wrenna",
+          "test": {
+            "k": "won"
+          }
+        },
+        {
+          "text": "Win by 3 or more levels",
+          "test": {
+            "k": "margin",
+            "op": ">=",
+            "v": 3
+          }
+        },
+        {
+          "text": "Win before round 14",
+          "test": {
+            "k": "rounds",
+            "op": "<",
+            "v": 14
+          }
+        }
+      ],
+      "easier": {
+        "aiLevel": "normal",
+        "twist": null,
+        "setup": {
+          "lvl": "normal",
+          "lvmix": [
+            "normal",
+            "hard",
+            "normal",
+            "normal"
+          ]
+        },
+        "maxStars": 2,
+        "text": "Wrenna starts at level 1 and her friends play at the normal level."
+      },
+      "unlock": [
+        {
+          "type": "portrait",
+          "id": "wrenna",
+          "text": "Wrenna's portrait"
+        },
+        {
+          "type": "title",
+          "id": "golden-boot",
+          "text": "Title: Keeper of the Golden Boot"
+        },
+        {
+          "type": "table",
+          "id": "golden-vault",
+          "text": "Golden vault table"
+        }
+      ]
+    }
+  ]
+}
