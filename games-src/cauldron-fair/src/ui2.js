@@ -153,21 +153,7 @@ function renderActs() {
   if (p.q && !EVAL_Q[p.q.h]) { renderQ(p, legal, qb); return; }
   if (focusSeat() !== v) { a.appendChild(h('button.btn.go.backb', { 'data-a': 'focus', 'data-seat': v, type: 'button' }, 'Back to your cauldron')); return; }
   if (G.phase !== 'brew' || p.st !== 'draw' || p.q) return;
-  const mk = (t, cls, label, icon) => { const m = legal.find(x => x.t === t); if (!m) return null; return h('button.btn' + cls, { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button' }, icon ? h('span', { html: icon }) : null, label); };
-  const draw = mk('draw', '.drawb', 'Draw', ico('bag', 26)), stop = mk('stop', '.stopb', 'Stop') || (draw ? h('button.btn.stopb.off', { type: 'button', disabled: true, title: 'Draw your first chip first' }, 'Stop') : null);   // Stop keeps its place so Draw never moves
-  if (!p.lock) {   // the one line that matters: how likely is the next chip to explode, and what am I worth right now
-    const r = CF.risk(G, v), pct = Math.round(r.pBoom * 100), lv = pct < 15 ? 'lo' : pct < 30 ? 'mid' : 'hi', sp = CF.spaceOf(p), ln = limitNote(p);
-    const fm = legal.find(x => x.t === 'flask');
-    const sr = h('div.sumrow', { 'data-priv': v }, h('span.s1', 'Next chip: ', h('b.' + lv, pct + '%'), ' to explode'), h('span.s2', { title: 'If you stop now' }, h('span', { html: ico('coin', 16) }), h('b', D.COINS[sp]), h('span', { html: ico('vp', 16) }), h('b', D.VP[sp]), D.RUBY[sp] ? h('span', { html: ico('ruby', 16) }) : null),
-      fm ? h('button.btn.alt.flb', { 'data-a': 'mv', 'data-i': legal.indexOf(fm), type: 'button', 'aria-label': 'Flask: put the last white chip back in the bag', title: 'Flask: put the last white chip back' }, h('span', { html: ico('flask', 20, true) }), 'Flask') : null,
-      ln ? h('div.s3', ln + ': it explodes above ' + r.limit + '.') : null);
-    a.appendChild(sr);
-  }
-  const rowTop = [mk('froth', '.alt.sec', 'Put the first white chip back (free)'), mk('restart', '.alt.sec', 'Do-over (today\'s fortune, once): tip your 5 chips back and start again')].filter(Boolean);
-  if (rowTop.length) rowTop.forEach(b => a.appendChild(b));
-  const rat = legal.filter(m => m.t === 'ratset');
-  if (rat.length) { const k = p.rat - p.droplet; const d = h('details.ratd', { style: 'flex:1 1 100%' }, h('summary.sm', { style: 'min-height:44px;display:flex;align-items:center;cursor:pointer' }, h('span', h('b', 'Head start: '), 'you trail the leader, so your first chip lands ' + plural(k, 'space') + ' further on (the grey rat). ', h('u', 'Use less')))); const row = h('div', { style: 'display:flex;gap:6px;flex-wrap:wrap' }); rat.forEach(m => row.appendChild(h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button' }, m.n ? 'Only ' + plural(m.n, 'space') : 'No head start'))); d.appendChild(row); a.appendChild(d); }
-  if (draw) a.appendChild(draw); if (stop) a.appendChild(stop);
+  a.appendChild(brewDeck(p, v, legal));
 }
 function renderQ(p, legal, qb) {
   const q = p.q, info = QINFO[q.h]; qb.hidden = false;
@@ -181,6 +167,8 @@ function renderQ(p, legal, qb) {
 function renderBar() {
   const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
   if (!G) return; bs.append(h('span.dayn', isPh() ? 'Day ' + G.round + '/' + D.rounds : 'Day ' + G.round + ' of ' + D.rounds));
+  const v0 = viewSeat(), f0 = focusSeat(), q0 = G.players[f0 >= 0 ? f0 : 0];
+  if (isPh() && q0) bs.append(h('span.bst', { title: (f0 === v0 ? 'Your' : q0.name + '\'s') + ' points, rubies and flask' }, h('span.bav', { html: avHTML(f0, 24) }), h('span', { html: ico('vp', 17) }), h('b', q0.vp), h('span', { html: ico('ruby', 16) }), h('b', q0.rubies), h('span.bfl', { html: ico('flask', 17, q0.flask) })));
   const dt = document.querySelector('.gx-dt'); if (dt) { const v = viewSeat(); dt.textContent = G.phase === 'over' ? 'Game over' : (v >= 0 && (G.phase === 'brew' ? G.players[v].st === 'draw' : !!G.players[v].q)) ? 'Your turn' : 'Waiting'; }
 }
 let rndT = 0;
@@ -191,6 +179,7 @@ function render() {
     renderBar(); renderOthers(); renderMe(); renderStage(); renderActs(); renderRisk(); renderFort(); renderRoster();
     const pi = promptInfo(), pr = $('#prompt'); if (pr) { pr.textContent = pi.text; pr.className = pi.mine ? 'mine' : ''; }
     renderHint(); renderLegend(); renderBlg(); renderDrawers(); renderNetBadge && renderNetBadge();
+    bfHeat(); const db = $('#dockbody'); if (db) db.classList.toggle('deckon', !!document.querySelector('#acts .bdeck')); requestAnimationFrame(bfGhost);
   } catch (e) { console.error(e); if (window.__cfErr) window.__cfErr.push(String(e.stack || e)); }
 }
 function renderHint() { const e = $('#hint'); if (e) { e.hidden = true; e.innerHTML = ''; } }  // tips live in #pc (the tip card)

@@ -92,7 +92,7 @@ function renderMenu() {
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const gp = typeof gfxPref === 'function' ? gfxPref() : 'auto'; row('Graphics' + (typeof PX !== 'undefined' && PX.on ? (gp === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (gp === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': gp === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
-  row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('span.tinyc', { html: sp }));
+  row('Info', h('button.btn.alt', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'logd', type: 'button' }, 'Log'), h('button.btn.alt', { 'data-a': 'drawer', 'data-v': 'refd', type: 'button' }, 'Chips and cards'), h('span.tinyc', { html: sp }));
   b.appendChild(h('p.sm', 'Cauldron Fair is an original game. Names, text and art are original; the audio credits are in How to play.'));
 }
 // ---------- start screens: painted title -> setup (character cards) / online ----------
@@ -169,12 +169,16 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'mv': {
-      const v = viewSeat(); const m = (UI.legal[v] || [])[+d.i];
+      const v = viewSeat(); if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
+      const m = (UI.legal[v] || [])[+d.i];
       if (m) {
         if (m.t === 'flask') { const pl = G.players[v], wc = pl.pot.filter(c => c.c === 'W').length; if (wc <= 1 && UI.flaskArm !== pl.ver) { UI.flaskArm = pl.ver; toast('That is your only white chip. Tap Flask again to put it back.'); break; } }
         if (m.t === 'draw') UI.drawT = Date.now();
         else if (t.closest && t.closest('#qbox') && Date.now() - (UI.drawT || 0) < 600) break;   // a second quick tap on Draw must not pick the option that just appeared under the finger
         if (UI.tip && !UI.tip.modal && (m.t === 'draw' || m.t === 'stop')) { UI.tip = null; UI.tipMark = { round: G.round, log: G.logN }; renderTip(); }
+        if (m.t === 'draw' && !UI.prefs.drew) { UI.prefs.drew = true; savePrefs(); }
+        if (m.t === 'stop' && !UI.prefs.stopped) { UI.prefs.stopped = true; savePrefs(); }
+        if (m.t === 'draw') { bfPull(m, v); break; }
         act(m, v);
       }
       break;
@@ -208,6 +212,7 @@ document.addEventListener('click', ev => {
     case 'opt': { const o = optObj(); if (d.k === 'np') setNp(+d.v); else if (d.k === 'sets') o.sets = d.v === 'random' ? 'random' : +d.v; renderStart(); break; }
     case 'lv': { const o = optObj(); o.lvBy = Object.assign({}, o.lvBy); o.lvBy[+d.c] = d.v; renderStart(); break; }
     case 'rules': GX.show('rulesd'); break;
+    case 'drawer': GX.show(d.v); break;
     case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
@@ -234,7 +239,7 @@ function applyPhone() {
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  const shortP = ph && w < hh && hh < 600; r.toggle('ph', ph); r.toggle('ph-short', shortP); document.documentElement.style.setProperty('--dockh', (shortP ? 140 : Math.max(150, Math.min(196, Math.round(hh * .25)))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  const shortP = ph && w < hh && hh < 600; r.toggle('ph', ph); r.toggle('ph-short', shortP); document.documentElement.style.setProperty('--dockh', (shortP ? 156 : Math.max(176, Math.min(214, Math.round(hh * .27)))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   document.documentElement.style.setProperty('--rail', Math.max(220, Math.min(292, Math.round(w * .33))) + 'px');
   document.documentElement.style.setProperty('--gx-sheet-h', (ph ? 'var(--dockh)' : '46dvh'));
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !(typeof NET !== 'undefined' && NET.on) && UI.sv === 'setup') renderStart(); }

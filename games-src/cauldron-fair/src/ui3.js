@@ -59,7 +59,12 @@ function newsLines(first) {
   if (v < 0 || hotSeat() || G.phase === 'eval' || G.phase === 'over' || UI.rsOpen) return;   // the report tells those; today's news waits until it closes
   UI.newsN = G.logN;
   const nm = G.players[v].name, out = G.log.filter(l => l.i > from && l.round === G.round && (l.t.indexOf(nm) >= 0 || /^Day \d/.test(l.t)) && !/ draws a | has decided| places the | stops\.$|^Stir!|^Everyone brews/.test(l.t)).map(l => youText(l.t));
-  if (out.length) toast(out.slice(-3).join(' '));
+  if (!out.length) return;
+  if (isPh()) {   // phones: a short headline, the full lines stay in the log
+    const sh = out.map(t => { let m = /fortune card "([^"]+)"/.exec(t); if (m) return '\u2728 ' + m[1]; m = /head start of (\d+) space/.exec(t); if (m) return '\ud83d\udc00 Head start +' + m[1]; if (/^Day \d/.test(t)) return ''; return t.length <= 48 ? t : ''; }).filter(Boolean);
+    if (sh.length) toast(sh.slice(-3).join('  \u00b7  ')); return;
+  }
+  toast(out.slice(-3).join(' '));
 }
 function playEvents(first) {
   newsLines(first);
@@ -68,9 +73,9 @@ function playEvents(first) {
     try {
       switch (e.t) {
         case 'draw': if (e.how !== 'side') snd('draw'); break;
-        case 'place': snd(e.ruby ? 'ruby' : 'plop'); setTimeout(() => snd('splash'), 120); if (typeof pxEvent === 'function') pxEvent(e); break;
+        case 'place': if (typeof bfEvent === 'function') bfEvent(e); { const dl = typeof PX !== 'undefined' && e.chip && typeof PX.flyIds[e.chip.i] === 'number' ? PX.flyIds[e.chip.i] : 0; const rb = e.ruby; setTimeout(() => snd(rb ? 'ruby' : 'plop'), dl); setTimeout(() => snd('splash'), 120 + dl); } if (typeof pxEvent === 'function') pxEvent(e); break;
         case 'side': if (typeof pxEvent === 'function') pxEvent(e); break;
-        case 'boom': snd('boom'); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim) { const bp = G.players[e.seat]; toast((e.prot ? 'Boom! But safe harbour saves your points. ' : 'Your cauldron exploded! ') + 'White total ' + CF.whiteSum(bp) + ' is over the limit of ' + CF.limitOf(G, bp) + '.'); } break;
+        case 'boom': snd('boom'); if (typeof bfEvent === 'function') bfEvent(e); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !(typeof bfAnim === 'function' && bfAnim())) { const bp = G.players[e.seat]; toast((e.prot ? 'Boom! But safe harbour saves your points. ' : 'Your cauldron exploded! ') + 'White total ' + CF.whiteSum(bp) + ' is over the limit of ' + CF.limitOf(G, bp) + '.'); } break;
         case 'flask': snd('flask'); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !e.free) toast('Flask used: the white chip went back into your bag. Rubies can refill the flask after the day.'); break;
         case 'restart': snd('page'); if (typeof pxEvent === 'function') pxEvent(e); break;
         case 'die': snd('die'); break;
