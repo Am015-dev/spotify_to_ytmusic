@@ -198,9 +198,42 @@ function features(S, me) {
   return f;
 }
 const dot = f => { let c = 0; const w = AI.w; for (const k of FN) c += (w[k] || 0) * f[k]; return c; };
-// cost (lower = better) of a state for seat `me`
+
+// ---------- learned value: P(landing) from the public state + this seat's own dice (fitted on self-play, see vgen.js / vfit.py) ----------
+const ABIL = ['antic', 'adapt', 'mastery', 'control', 'sync', 'together'];
+function raw(S, me) {
+  const sp = trk(S).sp, size = sp.length, pos = S.pl.pos, f = [], push = (...a) => { for (const x of a) f.push(x); };
+  const inPlace = S.phase === 'place', rem = D.rounds - S.row0 - S.round, o = 1 - me, mand = s => (S.slots['ax' + s] ? 0 : 1) + (S.slots['en' + s] ? 0 : 1);
+  push(S.round, rem, FA.isFinal(S) ? 1 : 0, inPlace ? 1 : 0, size - pos);
+  for (let q = 0; q < 6; q++) push(S.planes[pos - 1 + q] || 0);
+  let ptot = 0; for (let i = pos - 1; i < size; i++) ptot += S.planes[i]; push(ptot);
+  const lg = S.pl.sw.lg.reduce((a, x) => a + x, 0), fl = S.pl.sw.fl.reduce((a, x) => a + x, 0), br = S.pl.sw.br.reduce((a, x) => a + x, 0);
+  push(lg, fl, br, S.pl.ice, S.pl.axis, Math.abs(S.pl.axis), S.pl.aeroB, S.pl.aeroO, S.mods.wind ? wm(S) : 0, S.pl.kero, S.intern.length, S.coffee, S.rrHand, S.rrTaken);
+  for (const k of ['ax0', 'ax1', 'en0', 'en1']) push(S.slots[k] ? 1 : 0, S.slots[k] ? S.slots[k].v : 0);
+  push(mand(me), mand(o), inPlace ? unplaced(S, me) : 4, inPlace ? unplaced(S, o) : 4);
+  const mine = inPlace ? FA.unusedDice(S, me).map(i => S.dice[me][i].v).sort((a, b) => a - b) : []; for (let i = 0; i < 4; i++) push(mine[i] || 0);
+  for (let v = 1; v <= 6; v++) push(mine.filter(x => x === v).length);
+  push(me, S.mods.kero ? 1 : 0, S.mods.leak ? 1 : 0, S.mods.wind ? 1 : 0, S.mods.intern ? 1 : 0, S.mods.ice ? 1 : 0, S.mods.tabs ? 1 : 0, S.mods.traffic ? 1 : 0, S.mods.real ? 1 : 0);
+  const cur = sp[Math.min(pos, size) - 1]; push(S.mods.tabs && cur && cur[2] ? (cur[2].includes(S.pl.axis) ? 1 : -1) : 0, cur ? cur[1] : 0, (sp[pos] || [0, 0])[1]);
+  push(S.fl.keroUsed ? 1 : 0, S.slots.ke ? S.slots.ke.v : 0, S.slots.it0 ? 1 : 0);
+  for (const a of ABIL) push(S.abil.includes(a) ? 1 : 0);
+  return f;
+}
+function netV(x) {
+  const V = FA.AIW && FA.AIW.v; if (!V) return null;
+  let h = new Array(x.length); for (let i = 0; i < x.length; i++) h[i] = (x[i] - V.mu[i]) / V.sd[i];
+  for (let l = 0; l < V.W.length; l++) {
+    const W = V.W[l], b = V.b[l], n = b.length, out = new Array(n), last = l === V.W.length - 1;
+    for (let j = 0; j < n; j++) { let a = b[j]; const w = W[j]; for (let i = 0; i < h.length; i++) a += w[i] * h[i]; out[j] = last ? a : (a > 0 ? a : 0); }
+    h = out;
+  }
+  return h[0];
+}
+AI.raw = raw; AI.netV = netV;
+// cost (lower = better) of a state for seat `me`: nats of failure (minus log of the landing probability)
 function cost(S, me) {
   if (S.result) return S.result.win ? -50 : 100;
+  if (AI.useV !== false && FA.AIW && FA.AIW.v) { const f = features(S, me), z = netV(raw(S, me).concat(FN.map(k => f[k]))); return Math.log(1 + Math.exp(-z)); }
   return dot(features(S, me));
 }
 
