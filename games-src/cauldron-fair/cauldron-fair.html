@@ -317,7 +317,7 @@ html.ph.ph-p.tipon .gx-dock{max-height:calc(var(--dockh) + 64px)}
 .bk .pr button .pc{display:inline-flex;align-items:center;gap:2px}
 #legend{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;font-size:13px;font-weight:800;color:#f8eed8;padding:2px 8px;flex:0 0 auto}
 #legend .lg{display:inline-flex;align-items:center;gap:4px;background:rgba(0,0,0,.3);border-radius:10px;padding:1px 8px 1px 5px;min-height:24px}
-#legend .lgb{display:inline-block;background:#7a4a1a;color:#fff6dc;border:1px solid #fff6dc;border-radius:5px;padding:0 5px;font-size:12px;font-weight:900}
+#legend .lgb{display:inline-block;background:#7a4a1a;color:#fff6dc;border:1px solid #fff6dc;border-radius:5px;padding:0 5px;font-size:13px;font-weight:900}
 #legend .lgn{display:inline-block;background:#f3efd0;color:#4a2a22;border-radius:10px;min-width:22px;text-align:center;font-weight:900;font-size:14px}
 #legend .lgx{appearance:none;border:0;background:rgba(255,255,255,.15);color:#fff;border-radius:50%;width:44px;height:28px;font-size:16px;cursor:pointer}
 html.ph-short #legend{display:none}
@@ -5415,7 +5415,7 @@ function renderReport() {
   const tab = h('table.rt-tab'); tab.appendChild(h('tr', h('th', 'Cauldron'), h('th', 'Reached'), h('th', 'Result'), h('th', '+VP'), h('th', 'Total')));
   for (const p of G.players) {
     const r = dayRow(p, R); if (!r) continue; const sp = r.space;
-    const res = r.boom ? (r.prot ? [h('span.ok', 'exploded, safe')] : [h('span.bad', 'exploded'), h('div.sm', (r.mode === 'buy' ? 'went shopping' : r.mode === 'vp' ? 'took points' : '...') + ' (white ' + r.white + ' went over the limit)')]) : [h('span.ok', 'stopped'), r.die && r.die.length ? h('div.sm.dieb' + (r.live ? '.roll' : ''), { title: 'Bonus die' }, r.die.map(f => h('span', { html: KIT.ICON.die(24, f) }))) : null];
+    const res = r.boom ? (r.prot ? [h('span.ok', 'exploded, safe')] : [h('span.bad', 'exploded'), h('div.sm', (r.mode === 'buy' ? 'went shopping' : r.mode === 'vp' ? 'took points' : 'choosing') + ' (white ' + r.white + ' went over the limit)')]) : [h('span.ok', 'stopped'), r.die && r.die.length ? h('div.sm.dieb' + (r.live ? '.roll' : ''), { title: 'Bonus die' }, r.die.map(f => h('span', { html: KIT.ICON.die(24, f) }))) : null];
     tab.appendChild(h('tr' + (p.seat === v ? '.me' : ''), h('td', h('span.nm', h('span', { html: avHTML(p.seat, 28) }), p.seat === v ? 'You' : p.name)),
       h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', r.gain >= 0 ? '+' + r.gain : r.gain)), h('td', h('b', p.vp))));
   }
