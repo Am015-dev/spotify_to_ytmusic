@@ -3,7 +3,7 @@
    through (tJU.js measures before/after on one build). No per-frame allocations: scratch vectors are made once below.
    · camera: lower + tighter at speed, look-ahead into turns, FOV curve, punch on impacts      · hit-stop 65–90 ms on takedowns / big smashes
    · drift tiers paced 0.5/1.1/2.0 s with a tier-up cue, payout grows per tier               · near miss at city speeds
-   · air bonus + landing squash · combo: pulse per link, big pop on cash-out · stud trail when nothing happened for 5.5 s
+   · landing squash + kick · combo: pulse per link, big pop on cash-out · stud trail when nothing happened for 5.5 s
    · speed blur / speed lines inside the mission caps · wind + road rumble                      · split-screen: no hit-stop, no camera punch */
 const JU={on:true,hold:false,rt:1/60,hs:0,hsCd:0,frz:false,off:0,clk:0,ev:{n:0,m:0,lm:0,last:0,gap:0,k:{}},sm0:0,cr0:0,
   kick:0,la:0,drop:0,fx:0,sq:0,airT0:0,dropT:0,nmF:0,co:new THREE.Vector3(),cf:0,v0:new THREE.Vector3(),v1:new THREE.Vector3(),Y:new THREE.Vector3(0,1,0)};
@@ -43,8 +43,8 @@ roamStep=(f=>function(dt){const busy=JU_busy();if(!busy)JU.clk+=dt;if(!JU.on||!p
   // near miss: a traffic car passes 5–8 m beside us at ≥ 15 m/s (the base one needs 45 m/s); shares the base cooldown c.nm
   if(sp>=15&&!s.air&&!busy&&(JU.nmF=(JU.nmF+1)&1)===0){const fx=Math.sin(RO.vh??RO.h),fz=Math.cos(RO.vh??RO.h);for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z;if(dx*dx+dz*dz>144){c.jpa=null;continue}const al=dx*fx+dz*fz,lat=Math.abs(dx*fz-dz*fx);
     if(c.jpa!=null&&c.jpa>0&&al<=0&&lat>4.8&&lat<8&&Math.abs((c.y||0)-RO.y)<3&&!(c.nm>0)){c.nm=3;award(s,'NEAR MISS',6,100,'#4ceaff');AU.sfx('near');comboAdd(2)}c.jpa=al}}
-  // air: bonus from 0.8 s (a plain hop is ~0.65 s), squash on landing, a slight stretch in the air
-  if(s.air&&!a0)JU.airT0=JU.clk;else if(!s.air&&a0){const at=JU.clk-JU.airT0;JU.sq=Math.min(.24,.14+at*.1);if(at>=JU_C.airMin){award(s,`AIR ${at.toFixed(1)} s`,Math.min(15,Math.round(4+at*6)),Math.round(at*300),'#5dffb0');comboAdd(1+Math.floor(at));AU.sfx('style');JU.kick=Math.max(JU.kick,.3*fxK())}}
+  // air: the base already pays an air bonus over 1 s (roamLanded); here: squash on landing, camera kick on big landings, slight stretch in the air
+  if(s.air&&!a0)JU.airT0=JU.clk;else if(!s.air&&a0){const at=JU.clk-JU.airT0;JU.sq=Math.min(.24,.14+at*.1);if(at>=JU_C.airMin)JU.kick=Math.max(JU.kick,Math.min(.45,at*.3)*fxK())}
   JU.sq=Math.max(0,JU.sq-dt*1.1);{const q=s.air?-.05:JU.sq*Math.min(1,JU.sq*8),m=s.mesh.scale;if(Math.abs(m.y-(1-q))>1e-4)m.set(1+q*.45,1-q,1+q*.45)}
   // stud trail: nothing rewarding for 5.5 s while driving → a fountain of studs on the road ahead (pooled stud meshes)
   JU.dropT=Math.max(0,JU.dropT-dt);if(!busy&&sp>8&&JU.dropT<=0&&JU.clk-JU.ev.last>JU_C.deadT){JU.dropT=3;const sg=Math.sign(RO.v||1),fx=Math.sin(RO.h)*sg,fz=Math.cos(RO.h)*sg,ahead=Math.min(45,14+sp*.7);JU.v0.set(fx,0,fz);

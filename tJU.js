@@ -40,7 +40,7 @@ const LIB=`window.__jl={
  accel(){const R=__mho.RO,J=__ju,B=this.straight();if(!B)return null;const Q=B.Q;this.warpTo(Q);R.v=0;J.step(20);const vs=[];this.drive(Q,{up:1},14*60,()=>vs.push(R.v));
   const pl=Math.max(...vs.slice(-90)),t95=vs.findIndex(v=>v>=.95*pl)/60;
   this.warpTo(Q);R.v=pl*.97;J.setBm(100);J.step(1);const fov0=J.cam().fov;let fovB=fov0;const bv=[];this.drive(Q,{up:1,b:1},5*60,()=>{if(J.car().paused)return;bv.push(Math.abs(R.v));fovB=Math.max(fovB,J.cam().fov)});
-  const bp=Math.max(...bv),tb=bv.findIndex(v=>v>=pl+.95*(bp-pl))/60;return{plateau:+pl.toFixed(1),kmh:Math.round(pl*3.6),t95:+t95.toFixed(2),boostPeak:+bp.toFixed(1),boostMul:+(bp/pl).toFixed(2),tBoost95:+tb.toFixed(2),boostLen:+(bv.length/60).toFixed(1),fovCruise:fov0,fovBoost:+fovB.toFixed(1),straightness:+B.tc.toFixed(2)}},
+  const bp=Math.max(...bv),tb=bv.findIndex(v=>v>=pl+.95*(bp-pl))/60,t25=bv.findIndex(v=>v>=pl*1.25)/60;return{plateau:+pl.toFixed(1),kmh:Math.round(pl*3.6),t95:+t95.toFixed(2),boostPeak:+bp.toFixed(1),boostMul:+(bp/pl).toFixed(2),tBoost95:+tb.toFixed(2),tBoost25:+t25.toFixed(2),boostLen:+(bv.length/60).toFixed(1),fovCruise:fov0,fovBoost:+fovB.toFixed(1),straightness:+B.tc.toFixed(2)}},
  // drift held hard left at 30 m/s: time of each tier; then per tier, release just after it: boost bar and turbo payout
  drift(){const R=__mho.RO,J=__ju;const B=this.straight();if(!B)return null;const Q=B.Q;
   const run=hold=>{this.warpTo(Q);R.v=30;J.setBm(20);J.step(2);const bm0=J.car().bm;let tiers=[null,null,null],turbo=0,end=0,bmPre=0,bmJump=0;
@@ -95,15 +95,24 @@ async function perf(b){const res={};for(const mode of ['off','on']){const p=awai
  const sum=(a,k)=>a.reduce((x,y)=>x+y[k],0),dOn=sum(res.on.dc,'on'),dOff=sum(res.on.dc,'off');
  ok(res.on.growth<=Math.max(1.5,res.off.growth+1),`heap after GC over 2 min: on +${res.on.growth} MB vs off +${res.off.growth} MB (${res.on.heap.join(' → ')})`);
  ok(dOn<=dOff*1.03,`draw calls at 6 poses: on ${dOn} vs off ${dOff} (${((dOn/dOff-1)*100).toFixed(1)} %)`);fs.writeFileSync(`${OUT}/perf.json`,JSON.stringify(res,null,1))}
+// missions: an M1 story mission with JU on: boost at speed + traffic smash; the mission FX caps hold and hit-stop still lands
+async function mission(b){const p=await open(b,'fra');await p.evaluate(LIB);
+ const r=await p.evaluate(()=>{const J=__ju;J.on(true);const M1=__m1;const okS=M1.start('heist');for(let i=0;i<40&&M1.cs();i++){M1.skip();J.step(2)}J.step(30);const inM=!!__mho.qv.ch();let mx={uBoost:0,uSpeed:0,speedFx:0,hitFx:0,uCA:0},hs=0,hit=0;
+  const B=__jl.straight();if(B){__jl.warpTo(B.Q);__mho.RO.v=55;J.setBm(100);__jl.drive(B.Q,{up:1,b:1},150,()=>{const x=J.fx();for(const k in mx)mx[k]=Math.max(mx[k],x[k])})}
+  for(let t=0;t<4&&!hit;t++){const at=J.aimTraffic(38);if(!at)break;const s0=J.stats().k.chain||0;for(let f=0;f<120;f++){__jl.keys({up:1,b:1});J.step(1);const x=J.fx();for(const k in mx)mx[k]=Math.max(mx[k],x[k]);if(J.car().paused)hs++;if((J.stats().k.chain||0)>s0&&!hit)hit=1}}
+  __jl.keys({});return{started:okS,inMission:inM&&!!__mho.qv.ch(),mx,hitstopMs:Math.round(hs/60*1000),hit}});
+ console.log('INFO mission',JSON.stringify(r));ok(r.inMission,'mission: M1 heist running with JU on');ok(r.mx.uBoost<=.1501&&r.mx.uSpeed<=.2501&&r.mx.speedFx<=.3001&&r.mx.hitFx<=.3001,`mission: FX caps hold (uBoost ${r.mx.uBoost.toFixed(3)} ≤ .15, uSpeed ${r.mx.uSpeed.toFixed(3)} ≤ .25, speed lines ${r.mx.speedFx} ≤ .3, hitFx ${r.mx.hitFx.toFixed(2)} ≤ .3)`);
+ ok(!r.hit||(r.hitstopMs>=60&&r.hitstopMs<=180),`mission: traffic smash hit-stop ${r.hitstopMs} ms (one or two hits)`);ok(!p.errs.length,'mission: no page errors '+JSON.stringify(p.errs.slice(0,2)));await p.context().close()}
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const all=[];
  for(const city of CITIES)for(const mode of MODES){const p=await open(b,city);const r=await measure(p,mode,city);all.push(r);console.log('INFO',JSON.stringify(r));fs.writeFileSync(`${OUT}/metrics_${city}_${mode}.json`,JSON.stringify(r,null,1));await p.context().close()}
+ if(process.env.MIS!=='0'&&MODES.includes('on'))await mission(b);
  if(process.env.SHOTS){await shots(b)}
  if(process.env.PERF){await perf(b)}
  const g=(r,path)=>path.split('.').reduce((o,k)=>o==null?o:o[k],r);
- const ROWS=[['time to top speed (s)','accel.t95','4–6',v=>v>=4&&v<=6],['top speed (km/h)','accel.kmh','—',null],['boost speed ×','accel.boostMul','≥ 1.3',v=>v>=1.3],['time to boost peak (s)','accel.tBoost95','≤ 3',v=>v<=3],
+ const ROWS=[['time to top speed (s)','accel.t95','4–6',v=>v>=4&&v<=6],['top speed (km/h)','accel.kmh','—',null],['boost speed ×','accel.boostMul','≥ 1.3',v=>v>=1.3],['boost surge: time to +25 % (s)','accel.tBoost25','≤ 1.0',v=>v>=0&&v<=1],['time to boost peak (s)','accel.tBoost95','— (1.75× takes ~3 s)',null],
   ['drift tier 1 / 2 / 3 at (s)','drift.t','0.5 / 1.1 / 2.0 ±0.15',v=>v&&v.every((x,i)=>x!=null&&Math.abs(x-[.5,1.1,2][i])<=.15)],['drift payout: turbo s / bar per tier','drift.pay','0.8 / 1.6 / 2.6 s · +8 / 18 / 32 %',v=>v&&v.every((x,i)=>x&&Math.abs(x.turbo-[.8,1.6,2.6][i])<.15&&Math.abs(x.bm-[8,18,32][i])<=2.5)],
   ['takedown hit-stop (ms)','takedown.hitstopMs','60–90',v=>v>=60&&v<=90],['takedown camera FOV kick (°)','takedown.fovKick','≥ 3',v=>v>=3],['takedown shake (cap 1.0)','takedown.shakeMax','≤ 1',v=>v<=1],['takedown colour fringe uCA','takedown.caMax','≤ 0.035',v=>v<=.035],
-  ['near miss at 30 m/s, 6 m beside','near.near','1 event, no damage',(v,r)=>v===1&&r.near.dmg<1],['hop landing squash','air.squash','0.15–0.25',v=>v>=.15&&v<=.25],['big air (1 s+) bonus pop','bigAir.air','1',v=>v===1],
+  ['near miss at 30 m/s, 6 m beside','near.near','1 event, no damage',(v,r)=>v===1&&r.near.dmg<1],['hop landing squash','air.squash','0.15–0.25',v=>v>=.15&&v<=.25],['big air (1 s+): air bonus (base) / squash','bigAir.air','1 bonus, no duplicate',v=>v===1],['big air landing squash','bigAir.squash','0.15–0.25',v=>v>=.15&&v<=.25],
   ['FOV cruise → fast (°)','cam.fovCruise','',null],['FOV fast','cam.fovFast','cruise + 8–11',(v,r)=>v-r.cam.fovCruise>=7.5&&v-r.cam.fovCruise<=11.5],['FOV boosting','cam.fovBoost','fast + ≥ 1',(v,r)=>v-r.cam.fovFast>=1],
   ['camera height cruise (m)','cam.hCruise','',null],['camera height fast (m)','cam.hFast','cruise − ≥ 0.6',(v,r)=>r.cam.hCruise-v>=.6],['camera back cruise (m)','cam.backCruise','',null],['camera back fast (m)','cam.backFast','≤ 26',v=>v<=26],
   ['look-ahead in turns (°)','cam.laTurn','≥ 3 (≈ 2–5 m at 20 m)',v=>v>=3],
