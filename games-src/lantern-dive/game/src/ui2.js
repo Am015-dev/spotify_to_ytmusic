@@ -30,12 +30,18 @@ function renderBar() {
     if (G.distress) bs.append(h('span', { html: KIT.flareSVG({ size: 20, on: true }), title: 'Distress flare is lit' }));
     if (G.clock) { const t = h('span.tm' + (UI.clockLeft != null && UI.clockLeft < 20 ? '.low' : ''), clockText()); t.id = 'clk'; bs.append(t); }
   }
-  placePrompt();
+  placePrompt(); placePile();
 }
 function clockText() { const s = Math.max(0, Math.round(UI.clockLeft != null ? UI.clockLeft : (G ? G.clock : 0))); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
 function placePrompt() {
   const bp = $('#barprompt'), pr = $('#prompt'); if (!bp || !pr) return;
   if (document.documentElement.classList.contains('ph-p')) { if (pr.parentNode !== bp) bp.appendChild(pr); } else { const pd = $('#promptDock'); if (pd && pr.parentNode !== pd) pd.appendChild(pr); }
+}
+// Last trick / Won buttons and the "Follow ..." line live in the felt's bottom strip; on a landscape phone they move into the dock so they can never cover a card
+function placePile() {
+  const pile = $('#pile'), lead = $('#lead'), felt = $('#felt'), dp = $('#dockpile'); if (!pile || !lead || !felt || !dp) return;
+  const into = document.documentElement.classList.contains('ph-l') ? dp : felt;
+  if (pile.parentNode !== into) { into.appendChild(lead); into.appendChild(pile); }
 }
 // ---- job chips ----
 function jobChip(i, o) {
@@ -154,7 +160,7 @@ function renderFelt(v) {
 }
 function renderLead(lead, pile, v) {
   if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 22) }), h('span', ls === 4 ? 'Lanterns led: follow with a Lantern' : 'Follow ' + D.suits[ls].name)); }
-  else if (G.phase === 'play' && G.trick) { lead.append(h('span', G.trick.turn === v && pname(G.trick.turn) === 'You' ? 'You lead' : pname(G.trick.turn) + ' leads')); }
+  else if (G.phase === 'play' && G.trick) { lead.append(h('span', pname(G.trick.turn) === 'You' ? 'You lead' : pname(G.trick.turn) + ' leads')); }
   if (G.tricks.length) pile.append(h('button.pbtn', { type: 'button', 'data-a': 'last' }, 'Last trick'));
   const mw = v >= 0 ? tricksWon()[v] : 0; if (v >= 0 && G.tricks.length) pile.append(h('span.pbtn', { style: 'cursor:default', title: 'Tricks you have won' }, 'Won ' + mw));
 }

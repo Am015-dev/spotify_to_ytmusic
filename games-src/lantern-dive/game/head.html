@@ -39,7 +39,7 @@ svg{display:block}
 .op .av .cm svg{width:100%;height:100%}
 .op .who{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.1}
 .op .nm{font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.op .cnt{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--ink2);white-space:nowrap}
+.op .cnt{display:flex;align-items:center;flex-wrap:wrap;gap:0 6px;font-size:13px;font-weight:800;color:var(--ink2);white-space:normal}
 .op .cnt b{color:var(--ink)}
 .op .pg{flex:0 0 auto;display:flex;align-items:center;gap:3px;min-height:22px}
 .op .pg .tok{width:22px;height:22px}
@@ -50,7 +50,11 @@ svg{display:block}
 .op .jobs{display:flex;flex-direction:column;gap:2px;margin-top:2px;min-height:0}
 .jc{display:flex;align-items:center;gap:4px;min-height:22px;border-radius:7px;padding:0 5px 0 4px;font-size:13px;font-weight:800;line-height:1.1;background:#fbf3dd;color:#2b2a22;border:2px solid #0b1f3a;white-space:nowrap;overflow:hidden;cursor:pointer;font-family:inherit;text-align:left;width:100%}
 .jc .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.op .jc{white-space:normal;min-height:26px;padding:1px 4px;line-height:1.05}
+.op .jc{white-space:normal;min-height:28px;padding:1px 4px;line-height:1.05;cursor:inherit;overflow-wrap:anywhere}
+.op .jobs{min-height:calc(var(--jr,1)*31px)}
+.jc.opp .sm{width:14px;height:14px}.jc.opp .sm svg{width:9px;height:9px}
+#dockpile{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#dockpile #pile,#dockpile #lead{position:static}
 .op .jc .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;text-overflow:clip}
 .jc .sm{flex:0 0 auto;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1;font-weight:900;color:#fff;background:var(--gold2);border:1.5px solid #0b1f3a}
 .jc .sm svg{width:11px;height:11px;stroke:#fff;stroke-width:3.4}
@@ -298,7 +302,6 @@ html.ph.ph-p #barprompt{display:block}
 html.ph.ph-p #prompt{font-size:13px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 html.ph.ph-p #promptDock{display:none}
 #psub{font-size:13.5px;line-height:1.3;font-weight:600;color:var(--ink2);padding:2px 2px 4px}
-html.ph .op .jc{min-height:44px}
 html.ph #mine .mjobs .jc{min-height:44px}
 html.ph.ph-p .gx-bar .gx-sp,html.ph.ph-p #barstat{display:none}
 html.ph.ph-l .gx-app{grid-template-columns:minmax(0,1fr) var(--rail);grid-template-rows:calc(44px + env(safe-area-inset-top,0px)) minmax(0,1fr)}

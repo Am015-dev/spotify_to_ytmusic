@@ -115,9 +115,9 @@ function actorSeat() {
 // ---- sizes: hand card width, trick card width, drone card width, portrait size (CSS variables) ----
 function layoutVars() {
   const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), land = ph && W > H;
-  let hw = ph ? Math.max(46, Math.min(land ? 54 : 62, Math.round(H * (land ? .13 : .085)))) : Math.max(60, Math.min(96, Math.round(H * .115)));
+  let hw = ph ? (land ? Math.max(40, Math.min(48, Math.round(H * .12))) : Math.max(48, Math.min(60, Math.round(H * .092)))) : Math.max(60, Math.min(104, Math.round(H * .125)));
   const np = G ? G.np : 4, opp = np - 1;
-  let cw = ph ? Math.max(42, Math.min(56, Math.round(hw * .95))) : Math.max(56, Math.min(90, Math.round(hw * .95)));
+  let cw = ph ? Math.max(42, Math.min(56, Math.round(hw * .95))) : Math.max(60, Math.min(124, Math.round(Math.min(H * .165, W * .1))));
   const dw = ph ? Math.max(40, Math.min(46, Math.floor((W - 16) / 7) - 4)) : Math.max(46, Math.min(60, Math.floor((W - 40) / 7) - 6));
   const av = ph ? (land ? 30 : 34) : 44;
   const r = document.documentElement.style; r.setProperty('--hw', hw + 'px'); r.setProperty('--cw', cw + 'px'); r.setProperty('--dw', dw + 'px'); r.setProperty('--av', av + 'px');
@@ -131,17 +131,25 @@ function renderBar() {
     if (G.distress) bs.append(h('span', { html: KIT.flareSVG({ size: 20, on: true }), title: 'Distress flare is lit' }));
     if (G.clock) { const t = h('span.tm' + (UI.clockLeft != null && UI.clockLeft < 20 ? '.low' : ''), clockText()); t.id = 'clk'; bs.append(t); }
   }
-  placePrompt();
+  placePrompt(); placePile();
 }
 function clockText() { const s = Math.max(0, Math.round(UI.clockLeft != null ? UI.clockLeft : (G ? G.clock : 0))); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
 function placePrompt() {
   const bp = $('#barprompt'), pr = $('#prompt'); if (!bp || !pr) return;
   if (document.documentElement.classList.contains('ph-p')) { if (pr.parentNode !== bp) bp.appendChild(pr); } else { const pd = $('#promptDock'); if (pd && pr.parentNode !== pd) pd.appendChild(pr); }
 }
+// Last trick / Won buttons and the "Follow ..." line live in the felt's bottom strip; on a landscape phone they move into the dock so they can never cover a card
+function placePile() {
+  const pile = $('#pile'), lead = $('#lead'), felt = $('#felt'), dp = $('#dockpile'); if (!pile || !lead || !felt || !dp) return;
+  const into = document.documentElement.classList.contains('ph-l') ? dp : felt;
+  if (pile.parentNode !== into) { into.appendChild(lead); into.appendChild(pile); }
+}
 // ---- job chips ----
 function jobChip(i, o) {
   o = o || {}; const st = jobSt(i), d = jobDef(i);
-  const b = h('button.jc' + (st > 0 ? '.ok' : st < 0 ? '.bad' : '') + (o.me ? '.me' : ''), { type: 'button', 'data-a': 'job', 'data-i': i, 'aria-label': jobShort(i) + (st > 0 ? ', done' : st < 0 ? ', failed' : ', open') });
+  // chips on another diver's panel are plain text (the panel itself is the tap target and opens that diver's jobs); only your own chips are buttons
+  const cls = '.jc' + (st > 0 ? '.ok' : st < 0 ? '.bad' : '') + (o.me ? '.me' : '') + (o.opp ? '.opp' : '');
+  const b = o.opp ? h('span' + cls, { 'aria-label': jobShort(i) + (st > 0 ? ', done' : st < 0 ? ', failed' : ', open') }) : h('button' + cls, { type: 'button', 'data-a': 'job', 'data-i': i, 'aria-label': jobShort(i) + (st > 0 ? ', done' : st < 0 ? ', failed' : ', open') });
   const sm = h('span.sm'); if (st > 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5L9.5 18L20 6"/></svg>'; else if (st < 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>'; else sm.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="none"/></svg>';
   b.append(sm, h('span.t', d.s));
   if (o.me) { const df = h('span.df'); for (let k = 0; k < jobDiff(i); k++) df.append(h('i')); b.append(df); }
@@ -165,20 +173,20 @@ function oppEl(s, act) {
   if (p.helper) return droneEl(s, act);
   const b = h('button.op' + (act === s ? '.act' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'data-key': 'seat' + s, 'aria-label': p.name + (cm ? ', Commander' : '') + ', ' + p.hand.length + ' cards' });
   const av = h('span.av', { html: avatarS(s, 80) }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 19 }), title: 'Commander' }));
-  const top = h('span.top', av, h('span.who', h('span.nm', p.name), h('span.cnt', h('span', 'cards ', h('b', p.hand.length)), won ? h('span', 'tricks ', h('b', won)) : null)));
+  const top = h('span.top', av, h('span.who', h('span.nm', p.name), h('span.cnt', h('span', h('b', p.hand.length), ' cards'), won ? h('span', h('b', won), won === 1 ? ' trick' : ' tricks') : null)));
   b.append(top);
   const pg = h('span.pg'); const t = pingTok(s, 22); if (t) pg.append(t); const sh = shownEl(s); if (sh) pg.append(sh);
   if (pg.childNodes.length) b.append(pg);
   const js = jobs(s); const jb = h('span.jobs');
-  const shown = js.slice(0, 2); shown.forEach(i => jb.append(jobChip(i))); if (js.length > 2) jb.append(h('span.jc.more', '+' + (js.length - 2) + ' more'));
-  if (js.length) b.append(jb);
+  const shown = js.slice(0, 2); shown.forEach(i => jb.append(jobChip(i, { opp: 1 }))); if (js.length > 2) jb.append(h('span.jc.more', '+' + (js.length - 2) + ' more'));
+  b.append(jb);
   return b;
 }
 function droneEl(s, act) {
   const p = G.players[s], v = viewSeat();
   const b = h('div.op.drone' + (act === s ? '.act' : ''), { 'data-seat': s, 'data-key': 'seat' + s });
   const av = h('span.av', { html: avatarS(s, 80) });
-  const top = h('span.top', av, h('span.who', h('span.nm', p.name + ' (drone)'), h('span.cnt', h('span', 'cards ', h('b', p.hand.length)), tricksWon()[s] ? h('span', 'tricks ', h('b', tricksWon()[s])) : null)));
+  const top = h('span.top', av, h('span.who', h('span.nm', p.name + ' (drone)'), h('span.cnt', h('span', h('b', p.hand.length), ' cards'), tricksWon()[s] ? h('span', h('b', tricksWon()[s]), tricksWon()[s] === 1 ? ' trick' : ' tricks') : null)));
   const js = jobs(s); const jb = h('span.jobs', { style: 'flex:1;min-width:0;flex-direction:row;flex-wrap:wrap;gap:3px;margin-left:6px' });
   js.slice(0, 3).forEach(i => { const c = jobChip(i); c.style.width = 'auto'; jb.append(c); }); if (js.length > 3) jb.append(h('span.jc.more', '+' + (js.length - 3)));
   const head = h('div', { style: 'display:flex;align-items:center;gap:4px' }, h('button.op', { type: 'button', 'data-a': 'seat', 'data-seat': s, style: 'flex:0 0 auto;max-width:none;background:transparent;border-color:transparent;padding:0', 'aria-label': 'Drone ' + p.name }, top), jb);
@@ -200,6 +208,7 @@ function droneEl(s, act) {
 }
 function renderOpp(v) {
   const box = $('#opp'); box.innerHTML = ''; if (!G) return;
+  box.style.setProperty('--jr', String(Math.min(2, Math.max(1, Math.ceil(G.tasks.length / Math.max(1, G.np))))));
   const act = G.phase === 'play' && G.trick ? G.trick.turn : actorSeat();
   const from = v >= 0 ? v : 0;
   for (const s of seatsClockwise(from)) box.append(oppEl(s, act));
@@ -240,8 +249,9 @@ function renderFelt(v) {
   const W = felt.clientWidth || 300, H = felt.clientHeight || 160, n = G.np;
   const shown = playsShown(), act = G.phase === 'play' && G.trick && !UI.fz ? G.trick.turn : -1;
   const winS = UI.fz && UI.fz.winner != null && UI.fz.win ? UI.fz.winner : -1;
+  const strip = isPh() && W > (felt.closest('#bd') ? felt.closest('#bd').clientHeight : 0) ? 0 : 46, top = 20;   // the bottom strip holds Last trick / Won (never over a played card)
   for (let rel = 0; rel < n; rel++) {
-    const s = (from + rel) % n; const [x, y] = slotPos(rel, n, W, H);
+    const s = (from + rel) % n; const [x, y0] = slotPos(rel, n, W, Math.max(60, H - strip - top)), y = y0 + top;
     const slot = h('div.tslot' + (act === s ? '.turn' : '') + (winS === s ? '.win' : ''), { 'data-seat': s, style: 'left:' + x + 'px;top:' + y + 'px' });
     const pl = shown.find(p => p.s === s);
     if (pl) { const tc = h('div.tc', { 'data-px': 'card', 'data-id': pl.c, 'data-pk': 't:' + pl.c, 'data-seat': s, role: 'img', 'aria-label': pname(s) + ' played ' + cname(pl.c) }); tc.append(cardN(pl.c, 80)); slot.append(tc); }
@@ -251,7 +261,7 @@ function renderFelt(v) {
 }
 function renderLead(lead, pile, v) {
   if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 22) }), h('span', ls === 4 ? 'Lanterns led: follow with a Lantern' : 'Follow ' + D.suits[ls].name)); }
-  else if (G.phase === 'play' && G.trick) { lead.append(h('span', pname(G.trick.turn) + ' leads')); }
+  else if (G.phase === 'play' && G.trick) { lead.append(h('span', pname(G.trick.turn) === 'You' ? 'You lead' : pname(G.trick.turn) + ' leads')); }
   if (G.tricks.length) pile.append(h('button.pbtn', { type: 'button', 'data-a': 'last' }, 'Last trick'));
   const mw = v >= 0 ? tricksWon()[v] : 0; if (v >= 0 && G.tricks.length) pile.append(h('span.pbtn', { style: 'cursor:default', title: 'Tricks you have won' }, 'Won ' + mw));
 }
@@ -261,7 +271,7 @@ function renderMine(v) {
   const s = v >= 0 ? v : 0, p = G.players[s], act = (G.phase === 'play' && G.trick ? G.trick.turn : actorSeat()), cm = s === G.cap;
   const me = h('button.me' + (act === s ? '.act' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'data-key': 'seat' + s, 'aria-label': 'Your seat' });
   const av = h('span.av', { html: avatarS(s, 80) }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 18 }) }));
-  me.append(av, h('span.who', h('span.nm', v >= 0 && (UI.mode !== 'hot' && !NET.on) ? 'You' : p.name), h('span.cnt', 'tricks ' + tricksWon()[s])));
+  me.append(av, h('span.who', h('span.nm', v >= 0 && (UI.mode !== 'hot' && !NET.on) ? 'You' : p.name), h('span.cnt', tricksWon()[s] + (tricksWon()[s] === 1 ? ' trick' : ' tricks'))));
   box.append(me);
   const t = pingTok(s, 30); if (t) box.append(t);
   if (G.comm === 'narc') box.append(h('span.pbtn', { style: 'cursor:default' }, 'Pool ' + G.pool));
@@ -282,24 +292,38 @@ function legalCards(v) {
 }
 const ctlSeat = s => G.players[s].helper ? G.cap : s;
 function renderHand(v) {
-  const box = $('#hand'); box.innerHTML = ''; if (!G) return;
+  const box = $('#hand'); box.innerHTML = ''; box.style.height = ''; box.style.minHeight = ''; box.classList.remove('two'); if (!G) return;
   if (v < 0 || (hotSeat() && UI.holder < 0)) { box.append(h('div.handnote', G.phase === 'over' ? 'The dive is over.' : (watching() ? 'Watching the computer divers.' : 'Waiting for the next diver to take the device.'))); return; }
   const hand = G.players[v].hand; if (!hand.length) { box.append(h('div.handnote', G.phase === 'over' ? '' : 'No cards left.')); return; }
   const legal = legalCards(v), pinged = new Set(G.pings.filter(p => p.seat === v && !G.pl[p.c]).map(p => p.c)); const pk = new Map(G.pings.filter(p => p.seat === v).map(p => [p.c, p.k]));
-  let prev = -1;
+  // the card(s) that came to me in the distress pass: the difference between my hand while passing and my hand afterwards
+  if (G.phase === 'pass') UI.passSnap = { key: G.seed + ':' + G.att + ':' + v, hand: hand.slice() };
+  let got = new Set(); if (UI.passSnap && UI.passSnap.key === G.seed + ':' + G.att + ':' + v && G.phase !== 'pass' && G.phase !== 'assign' && G.phase !== 'distress' && !G.tricks.length && !(G.trick && G.trick.plays.some(p => p.s === v))) got = new Set(hand.filter(c => !UI.passSnap.hand.includes(c)));
+  const btns = [];
   hand.forEach((c, i) => {
-    const su = suitOf(c); const dim = legal && !legal.has(c);
-    const cls = 'hc' + (UI.sel === c ? '.sel' : '') + (dim ? '.dim' : '') + (su !== prev && prev >= 0 ? '.gap' : '') + (pinged.has(c) ? '.pinged' : '') + (UI.pingSel && legal && legal.has(c) ? '.pk' : '') + (UI.giveSel === c ? '.sel' : '');
-    const b = h('button.' + cls.split('.').filter(Boolean).join('.'), { type: 'button', 'data-a': 'hcard', 'data-id': c, 'data-px': 'card', 'data-pk': 'h:' + c, 'aria-label': cname(c) + (dim ? ', not allowed now' : '') + (pinged.has(c) ? ', shown to the team' : ''), 'aria-pressed': UI.sel === c ? 'true' : 'false' });
+    const dim = legal && !legal.has(c);
+    const cls = 'hc' + (UI.sel === c ? '.sel' : '') + (dim ? '.dim' : '') + (pinged.has(c) ? '.pinged' : '') + (UI.pingSel && legal && legal.has(c) ? '.pk' : '') + (UI.giveSel === c ? '.sel' : '') + (got.has(c) ? '.got' : '');
+    const b = h('button.' + cls.split('.').filter(Boolean).join('.'), { type: 'button', 'data-a': 'hcard', 'data-id': c, 'data-px': 'card', 'data-pk': 'h:' + c, 'aria-label': cname(c) + (dim ? ', not allowed now' : '') + (pinged.has(c) ? ', shown to the team' : '') + (got.has(c) ? ', you got this card in the flare pass' : ''), 'aria-pressed': UI.sel === c ? 'true' : 'false' });
     b.append(cardN(c, 84));
     if (pinged.has(c)) b.append(h('span.rm', { html: KIT.pingSVG({ size: 26, k: pk.get(c) }), title: 'You showed this card' }));
-    box.append(b); prev = su;
+    if (got.has(c)) b.append(h('span.gotb', 'New'));
+    btns.push(b);
   });
-  // overlap: fit the hand when it can, otherwise scroll sideways (cards stay >= 44 px wide)
-  const hw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hw')) || 60, W = box.clientWidth - 16, n = hand.length;
-  let ov = -.34; if (n > 1) { const need = (W - hw - 9 * 4) / (n - 1) / hw - 1; ov = Math.max(-.62, Math.min(.06, need)); if (need < -.62) ov = -.62; }
-  box.style.setProperty('--ov', ov.toFixed(3));
-  if (UI.sel >= 0) { const sb = box.querySelector('.hc.sel'); if (sb && sb.scrollIntoView) { try { sb.scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch (e) { } } }
+  // Layout (absolute): one row when every card keeps >= 44 px (and >= 55 % of its width) visible, else two rows. A tap in the middle of a card always lands on that card.
+  const hw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hw')) || 60, W = Math.max(200, box.clientWidth - 12), n = hand.length, ch = hw * 1.4;
+  const need = Math.max(44, hw * .55), maxP = hw * 1.04;
+  const pitchFor = m => m > 1 ? Math.min(maxP, (W - hw) / (m - 1)) : 0;
+  const rows = n > 1 && pitchFor(n) < need && n >= 7 ? 2 : 1, per = rows === 2 ? Math.ceil(n / 2) : n, pitch = pitchFor(per);
+  const rowStep = Math.round(ch * .5), padTop = 20;
+  box.classList.toggle('two', rows === 2);
+  box.style.height = Math.round(padTop + ch + (rows === 2 ? rowStep : 0) + 4) + 'px'; box.style.minHeight = box.style.height;
+  btns.forEach((b, i) => {
+    const r = rows === 2 && i >= per ? 1 : 0, k = r ? i - per : i, m = r ? n - per : per;
+    const rowW = hw + (m - 1) * pitch, x = Math.round((box.clientWidth - rowW) / 2 + k * pitch), y = padTop + r * rowStep;
+    b.style.left = x + 'px'; b.style.top = y + 'px'; b.style.zIndex = String(1 + i); box.append(b);
+  });
+  box.dataset.rows = rows; box.dataset.pitch = Math.round(pitch);
+  if (UI.sel >= 0) { const sb = box.querySelector('.hc.sel'); if (sb) sb.style.zIndex = '40'; }
 }
 // ---- the dock: what to do now ----
 function dockModel(v) {
@@ -467,7 +491,7 @@ function newGame(mode, o) {
 }
 function guidedStack() {
   const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }, h = t => t.split(' ').map(x => D.card(L[x[0]], +x.slice(1)));
-  return { tasks: [53], hands: [h('L4 L3 C2 C6 C9 T3 T7 K1 K5 K8 S2 S6 S9'), h('L2 C1 C4 C8 T1 T5 T9 K2 K6 K9 S1 S4 S7'), h('L1 C3 C5 C7 T2 T4 T6 T8 K3 K4 K7 S3 S5 S8')] };
+  return { tasks: D.guided.tasks.slice(), hands: D.guided.hands.map(h) };
 }
 function nextAttempt(same) {
   if (!G || G.phase !== 'over') return;
@@ -1083,7 +1107,7 @@ document.addEventListener('click', e => { const t = e.target.closest('button'); 
 // to its slot, other divers' cards fly from their portrait, a finished trick is swept to the winner. Sprites only mirror what the DOM shows,
 // so hidden hands stay hidden: a sprite exists only for a card the DOM shows face up.
 const PX = { on: false, app: null, q: 'high', res: 1, kind: '', B: null, cv: null, L: {}, objs: new Map(), tweens: [], parts: [], tex: {}, img: {}, faceP: {}, dirty: true, t: 0, last: 0, err: '', ready: false, raf: 0, nPlay: 0, nSweep: 0 };
-const PXQ = { high: { pr: 2, fx: 1, blur: true, parts: 1, bub: 1 }, medium: { pr: 1.5, fx: .55, blur: false, parts: .5, bub: .6 }, low: { pr: 1, fx: 0, blur: false, parts: 0, bub: 0 } };
+const PXQ = { high: { pr: 2, fx: 1, blur: true, parts: 1, bub: 1 }, medium: { pr: 1.5, fx: .55, blur: false, parts: .5, bub: .6 }, low: { pr: 1.5, fx: 0, blur: false, parts: 0, bub: 0 } };
 const pxRM = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
 function gfxAuto() { const n = navigator.hardwareConcurrency || 4, mem = navigator.deviceMemory || 4, ph = isPh(); if (n <= 2 || mem <= 2) return 'low'; if (PX.soft) return 'low'; return ph ? 'medium' : 'high'; }
 function gfxPref() { return UI.prefs.gfx || 'auto'; }
@@ -1162,7 +1186,7 @@ async function pxTextures() {
 function svgImgP(svg) { return pxLoadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)); }
 // a card face at w CSS px, drawn straight on a canvas (no SVG decoding, so it is ready at once): paper, frame, the painted emblem, crisp numerals
 function pxFace(id, w) {
-  const r = Math.min(2, Math.max(1, PX.res)), key = id + '|' + w + '|' + r;
+  const r = Math.min(2, Math.max(1, window.devicePixelRatio || 1)), key = id + '|' + w + '|' + r;   // faces are always drawn at the screen's own sharpness (2x phones), whatever the graphics level
   if (PX.tex['f:' + key]) return PX.tex['f:' + key];
   const s = suitOf(id), v = valOf(id), lan = s === 4, su = D.suits[s], H = Math.round(w * 1.4);
   const c = document.createElement('canvas'); c.width = Math.round(w * r); c.height = Math.round(H * r); const x = c.getContext('2d'); x.scale(r, r);
@@ -1346,7 +1370,7 @@ function pxFrame(ts) {
     o.sp.tint = o.dim && !o.detached && o.layer === 'hand' ? 0xa9b8d0 : 0xffffff;
     o.sh.width = w * 1.25; o.sh.height = h * 1.18; o.sh.x = 3 + o.lift * 4; o.sh.y = 5 + o.lift * 8; o.sh.alpha = tex ? .55 + o.lift * .2 : 0;
     const lan = o.id >= 36, pulse = .8 + .2 * Math.sin(PX.t * 3 + o.id);
-    o.gl.width = w * 1.5; o.gl.height = h * 1.35; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .8 : 0)) * pulse : 0;
+    o.gl.width = w * (o.pk ? 1.14 : 1.5); o.gl.height = h * (o.pk ? 1.1 : 1.35); o.gl.tint = o.pk ? 0x35c27b : 0xffffff; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .55 : 0)) * pulse : 0;
     o.lg.width = w * 1.9; o.lg.height = w * 1.9; o.lg.alpha = lan && q.fx && !o.dim ? .28 * pulse : 0;
     if (o.lift > .01 && o.lift < .99) moving = true; if (o.pk || (lan && q.fx)) moving = true;
   }
