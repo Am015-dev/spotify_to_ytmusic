@@ -1,6 +1,6 @@
 // ---------- the rules, in plain words ----------
 const RULES_HTML=`<div class="rules">
-<p>The old sultan is gone and the sultanate of Qamar is up for grabs. Shift its five tribes from tile to tile, claim land with your camels, summon djinns and trade in the bazaar. <b>The most points at the end wins.</b></p>
+<p>The old sultan is gone and the sultanate of Qamar is up for grabs. Shift its tribes from tile to tile, claim land with your camels, summon djinns and trade in the bazaar. <b>The most points at the end wins.</b></p>
 <h3>1. Bid for turn order</h3>
 <p>Each round starts with a bid. In the order of the last round, each player puts a marker on a free spot of the turn-order track and pays its price: 0, 0, 0, 1, 3, 5, 8, 12 or 18 coins. Dearer spots play earlier. If two players sit on spots with the same price, the one who bid later plays first. With 2 players, each of you has two markers and so takes two turns a round.</p>
 <h3>2. Your turn: move, then act</h3>
