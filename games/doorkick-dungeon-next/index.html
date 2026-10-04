@@ -620,11 +620,14 @@ html.ph .dlg.start .btn.learn{min-height:44px;padding:4px 10px;font-size:14px;wh
 html.ph .dlg.start .acts{flex-wrap:nowrap;gap:6px}
 html.ph .dlg.start .acts .btn{flex:1 1 0;min-width:0;padding:4px 6px;font-size:14px;white-space:normal;line-height:1.15}
 html.ph #prompt:has(>.lesson) .hint{display:none}
-html.ph #prompt .acts .btn[disabled]{display:none}
+html.ph #prompt>.acts .btn[disabled]{display:none}
 html.ph .lesson .lbtn{font-size:14px;min-height:44px;padding:2px 12px}
 html.ph-p .phc{flex:1 0 86px;padding:3px 5px 3px 9px}
 html.ph-p .phc .s{font-size:13px}
 html.ph-p .phc .hc{display:none}
+html.ph #prompt>.sellbar{order:-5;margin:2px 0}
+html.ph #prompt:has(>.sellbar)>:is(.acts.main,.hint,.since,.lesson,.say){display:none}
+html.ph #prompt>.sellbar .acts{display:flex;gap:8px;margin-top:6px}html.ph #prompt>.sellbar .btn{flex:1 1 0;min-height:48px}
 </style>
 </head>
 <body>
@@ -3396,7 +3399,7 @@ function mineHTML(me){if(me<0||!G.pl[me])return `<div class="mine paper box"><di
     <div class="gear" aria-label="In play: tap to wear, take off or sell"><span class="gl">In play:</span>${gear||'<span class="small muted">nothing yet: items you play from your hand appear here.</span>'}</div>
     <div class="hand${p.hand.length>3?' many':''}" aria-label="Your hand, ${p.hand.length} cards${p.hand.length>3?', scroll sideways for more':''}">${p.hand.map((id,i)=>{const n=p.hand.length,q=i-(n-1)/2;const fan=`style="--rot:${Math.max(-6,Math.min(6,q*1.7)).toFixed(1)}deg;--arc:${Math.min(10,q*q*.9).toFixed(1)}px"`;if(sellSet)return cardHTML(id,{cls:selc(id),attr:fan});const pl=playable.has(id);const rk=pl&&UI.hints?riskyCard(me,id):'';
       return cardHTML(id,{cls:(pl?(rk?'play risky ':'play '):''),badge:sug===id?badge:'',risk:rk,attr:fan})}).join('')||'<span class="small muted">No cards.</span>'}</div></section>`}
-function sellBar(p){const ids=UI.sell;const v=sellValue(p,ids);const lv=Math.min(R.WIN-1-p.lvl,Math.floor(v/R.SELL));return `<div class="tip"><b>Selling:</b> tap cards in your hand or in play to pick them.<br> ${ids.length} card${ids.length===1?'':'s'}, ${v} gold${isRace(p,'halfling')&&!p.halfT?' (Halfling double on the priciest)':''}. ${v>=R.SELL?`That buys ${lv} level${lv===1?'':'s'}.`:`Need ${R.SELL}.`}<div class="acts"><button class="btn primary" data-mv='${esc(JSON.stringify({act:'sell',cards:ids.join(',')}))}' ${v>=R.SELL?'':'disabled'}>Sell</button><button class="btn" data-a="sellx">Cancel</button></div></div>`}
+function sellBar(p){const ids=UI.sell;const v=sellValue(p,ids);const lv=Math.min(R.WIN-1-p.lvl,Math.floor(v/R.SELL));return `<div class="tip sellbar"><b>Selling:</b> tap cards in your hand or in play to pick them.<br> ${ids.length} card${ids.length===1?'':'s'}, ${v} gold${isRace(p,'halfling')&&!p.halfT?' (Halfling double on the priciest)':''}. ${v>=R.SELL?`That buys ${lv} level${lv===1?'':'s'}.`:`Need ${R.SELL}.`}<div class="acts"><button class="btn primary" data-mv='${esc(JSON.stringify({act:'sell',cards:ids.join(',')}))}' ${v>=R.SELL?'':'disabled'}>Sell</button><button class="btn" data-a="sellx">Cancel</button></div></div>`}
 function myMoves(me){if(!G||me<0)return[];if(!P(me).human)return[];return validMoves(me)}
 const STEPS=[['main','Get ready'],['kick','Kick the door'],['combat','Fight or flee'],['after','Trouble or loot'],['post','Tidy up'],['charity','Charity']];
 function stepIdx(){const ph=G.phase;return ph==='setup'||ph==='window'||ph==='main'?0:ph==='combat'?2:ph==='after'?3:ph==='post'?4:ph==='charity'?5:0}
@@ -3416,7 +3419,7 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
   if(G.q){const q=G.q;
     if(q.kind==='help'){const f=P(q.from);say=`${esc(f.nm)} asks you to help against ${cb.mons.map(m=>esc(cname(m.id))).join(' and ')}, offering ${q.n} treasure${q.n===1?'':'s'}.`;tip=`With you: ${sideStr(cb)+pStr(P(me))} vs ${monStr(cb)}. If you lose, you both run away.`;acts=btn({act:'opt',opt:'yes'},'Help','good')+btn({act:'opt',opt:'no'},'Refuse')}
     if(q.kind==='rescue'){say='Caught! You can still get away.';ol=['Use an escape card, or take the Bad Stuff.'];acts=by('use').map(m=>btn(m,'Use '+esc(cname(m.card)),'good')).join('')+btn({act:'opt',opt:'no'},'Take the Bad Stuff','danger')}
-    if(q.kind==='pick'){say=q.text||'Choose one.';acts=q.opts.map((v,i)=>v==='hand'?btn({act:'pick',opt:i},'A random card from their hand'):v==='lvl'?btn({act:'pick',opt:i},'Lose the levels'):typeof v==='number'?`<button class="btn opt${recK&&mvKey({act:'pick',opt:i})===recK?' rec':''}" data-mv='${esc(JSON.stringify({act:'pick',opt:i}))}' style="padding:2px">${cardHTML(v,{size:'xs',attr:'tabindex="-1"',notitle:1}).replace('<button','<span').replace(/<\/button>$/,'</span>')}</button>`:btn({act:'pick',opt:i},v==='hand'?'Discard my hand':esc(v))).join('');if(q.why==='handOr')acts=btn({act:'pick',opt:0},'Discard my whole hand')+btn({act:'pick',opt:1},'Lose '+q.cont.n+' levels')}
+    if(q.kind==='pick'){say=q.text||'Choose one.';acts=q.opts.map((v,i)=>v==='hand'?btn({act:'pick',opt:i},'A random card from their hand'):v==='lvl'?btn({act:'pick',opt:i},'Lose the levels'):typeof v==='number'?`<button class="btn opt${recK&&mvKey({act:'pick',opt:i})===recK?' rec':''}" data-mv='${esc(JSON.stringify({act:'pick',opt:i}))}' style="padding:2px">${cardHTML(v,{size:'xs',attr:'tabindex="-1"',notitle:1}).replace('<button','<span').replace(' data-card=',' data-pcard=').replace(/<\/button>$/,'</span>')}</button>`:btn({act:'pick',opt:i},v==='hand'?'Discard my hand':esc(v))).join('');if(q.why==='handOr')acts=btn({act:'pick',opt:0},'Discard my whole hand')+btn({act:'pick',opt:1},'Lose '+q.cont.n+' levels')}
     if(q.kind==='ward'){say=`A curse is coming: ${esc(cname(q.curse))}. ${esc(cd(q.curse).x)}`;ol=['Cancel it with your '+esc(cname(q.ring))+'?'];acts=btn({act:'opt',opt:'yes'},'Cancel the curse','good')+btn({act:'opt',opt:'no'},'Let it happen')}
     if(q.kind==='glue'){const r=G.cb.runs[q.run];say=`${esc(P(r.w).nm)} got away from ${esc(mdef(runMon(r)).n)}. Make them roll again with your Sticky Paste?`;acts=btn({act:'opt',opt:'yes'},'Stick them!','danger')+btn({act:'opt',opt:'no'},'Let them go')}
     if(q.kind==='lawyer'){say='The lizards won’t sue a Thief. Swap 2 treasures from your hand for 2 new ones?';acts=btn({act:'opt',opt:'yes'},'Swap','good')+btn({act:'opt',opt:'no'},'Keep them')}

@@ -569,10 +569,13 @@ html.ph .dlg.start .btn.learn{min-height:44px;padding:4px 10px;font-size:14px;wh
 html.ph .dlg.start .acts{flex-wrap:nowrap;gap:6px}
 html.ph .dlg.start .acts .btn{flex:1 1 0;min-width:0;padding:4px 6px;font-size:14px;white-space:normal;line-height:1.15}
 html.ph #prompt:has(>.lesson) .hint{display:none}
-html.ph #prompt .acts .btn[disabled]{display:none}
+html.ph #prompt>.acts .btn[disabled]{display:none}
 html.ph .lesson .lbtn{font-size:14px;min-height:44px;padding:2px 12px}
 html.ph-p .phc{flex:1 0 86px;padding:3px 5px 3px 9px}
 html.ph-p .phc .s{font-size:13px}
 html.ph-p .phc .hc{display:none}
+html.ph #prompt>.sellbar{order:-5;margin:2px 0}
+html.ph #prompt:has(>.sellbar)>:is(.acts.main,.hint,.since,.lesson,.say){display:none}
+html.ph #prompt>.sellbar .acts{display:flex;gap:8px;margin-top:6px}html.ph #prompt>.sellbar .btn{flex:1 1 0;min-height:48px}
 </style>
 </head>
