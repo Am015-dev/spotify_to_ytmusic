@@ -21,7 +21,7 @@ const LIB=`window.__jl={
  ang(Q,i,dist){const R=__mho.RO,{P,c}=Q;let k=i;while(k<P.length-1&&c[k]-c[i]<dist)k++;let a=Math.atan2(P[k][0]-R.x,P[k][1]-R.z)-R.h;return Math.atan2(Math.sin(a),Math.cos(a))},
  near(Q,i){const R=__mho.RO,P=Q.P;let bj=i,bd=1e9;for(let k=i;k<Math.min(P.length,i+60);k++){const d=Math.hypot(P[k][0]-R.x,P[k][1]-R.z);if(d<bd){bd=d;bj=k}}return bj},
  warpTo(Q){const M=__mho,P=Q.P;M.warp(P[0][0],P[0][1],Math.atan2(P[2][0]-P[0][0],P[2][1]-P[0][1]));__ju.step(3)},
- route(T,smp,calm){const R=__mho.RO,out=[],J=__ju;let Q=null,i=0,n=0,dr=0,drT=0,st=0,rev=0,k=0,boostF=0,driftN=0,frames=0;const hist=[];
+ route(T,smp,calm){const R=__mho.RO,out=[],J=__ju;let Q=null,i=0,n=0,dist=0,px=R.x,pz=R.z,dr=0,drT=0,st=0,rev=0,k=0,boostF=0,driftN=0,frames=0;const hist=[];
   while(frames<T*60){if(!Q||i>=Q.P.length-4){Q=this.path(900,k++);i=0;if(!Q){this.keys({});J.step(1);frames++;continue}}
    i=this.near(Q,i);const v=Math.abs(R.v),a=this.ang(Q,i,9+v*.35),ca=Math.max(Math.abs(this.ang(Q,i,28)),Math.abs(this.ang(Q,i,45)));const car=J.car();
    const o={up:true};if(rev>0){rev-=1/60;o.up=false;o.dn=true;o.l=a<0;o.r=a>0}else{
@@ -29,29 +29,31 @@ const LIB=`window.__jl={
     if(!calm&&!dr&&ca>.55&&v>24&&Math.abs(a)>.2){dr=Math.sign(a);drT=0;driftN++}
     if(dr){drT+=1/60;o.d=true;o.l=dr>0;o.r=dr<0;if((drT>.7&&Math.abs(a)<.15)||drT>3||v<20)dr=0}else{o.l=a>.035;o.r=a<-.035}
     o.b=!calm&&!dr&&car.bm>30&&Math.abs(a)<.12&&ca<.3}
-   if(car.boosting)boostF++;this.keys(o);J.step(1);frames++;
+   if(car.boosting)boostF++;this.keys(o);J.step(1);frames++;dist+=Math.min(5,Math.hypot(R.x-px,R.z-pz));px=R.x;pz=R.z;
    if(v<2&&!rev){st+=1/60;if(st>1.5){rev=.9;st=0}}else st=Math.max(0,st-1/60);if(rev<=0&&st===0&&frames%600===0&&hist.length&&Math.hypot(R.x-hist[0][0],R.z-hist[0][1])<15){Q=null}
    if(frames%60===0){hist.unshift([R.x,R.z]);hist.length=Math.min(hist.length,10)}
    if(smp&&frames%15===0)out.push({t:+(frames/60).toFixed(2),v:+v.toFixed(1),...J.cam(),la:+(J.JU.la*57.3).toFixed(1),b:car.boosting?1:0,d:car.dDir?1:0,top:car.top})}
-  this.keys({});return{samples:out,boostUp:boostF/frames,drifts:driftN}},
+  this.keys({});return{samples:out,boostUp:boostF/frames,drifts:driftN,dist:Math.round(dist)}},
  // straight-ish path, standstill → full throttle (steer only): time to 95 % of the plateau; then, fresh on the same path, a full boost bar from the plateau
- straight(){let best=null;for(let k=0;k<8;k++){const Q=this.path(800,40+k*3);if(!Q)continue;let tc=0;for(let i=2;i<Q.P.length-2;i++){if(Q.c[i]>500)break;const a1=Math.atan2(Q.P[i][0]-Q.P[i-1][0],Q.P[i][1]-Q.P[i-1][1]),a2=Math.atan2(Q.P[i+1][0]-Q.P[i][0],Q.P[i+1][1]-Q.P[i][1]);tc+=Math.abs(Math.atan2(Math.sin(a2-a1),Math.cos(a2-a1)))}if(!best||tc<best.tc)best={Q,tc}}return best},
+ straight(skip=0){const L=[];for(let k=0;k<10;k++){const Q=this.path(800,40+k*3);if(!Q)continue;let tc=0;for(let i=2;i<Q.P.length-2;i++){if(Q.c[i]>500)break;const a1=Math.atan2(Q.P[i][0]-Q.P[i-1][0],Q.P[i][1]-Q.P[i-1][1]),a2=Math.atan2(Q.P[i+1][0]-Q.P[i][0],Q.P[i+1][1]-Q.P[i][1]);tc+=Math.abs(Math.atan2(Math.sin(a2-a1),Math.cos(a2-a1)))}L.push({Q,tc})}L.sort((a,b)=>a.tc-b.tc);return L[Math.min(skip,L.length-1)]||null},
  drive(Q,o,n,cb){const R=__mho.RO;let i=0,f=0;for(;f<n;f++){i=this.near(Q,i);const a=this.ang(Q,i,9+Math.abs(R.v)*.35);this.keys({...o,l:a>.035,r:a<-.035});__ju.step(1);if(cb)cb(f);if(i>=Q.P.length-4)break}this.keys({});return f},
- accel(){const R=__mho.RO,J=__ju,B=this.straight();if(!B)return null;const Q=B.Q;this.warpTo(Q);R.v=0;J.step(20);const vs=[];this.drive(Q,{up:1},14*60,()=>vs.push(R.v));
-  const pl=Math.max(...vs.slice(-90)),t95=vs.findIndex(v=>v>=.95*pl)/60;
-  this.warpTo(Q);R.v=pl*.97;J.setBm(100);J.step(1);const fov0=J.cam().fov;let fovB=fov0;const bv=[];this.drive(Q,{up:1,b:1},5*60,()=>{if(J.car().paused)return;bv.push(Math.abs(R.v));fovB=Math.max(fovB,J.cam().fov)});
-  const bp=Math.max(...bv),tb=bv.findIndex(v=>v>=pl+.95*(bp-pl))/60,t25=bv.findIndex(v=>v>=pl*1.25)/60;return{plateau:+pl.toFixed(1),kmh:Math.round(pl*3.6),t95:+t95.toFixed(2),boostPeak:+bp.toFixed(1),boostMul:+(bp/pl).toFixed(2),tBoost95:+tb.toFixed(2),tBoost25:+t25.toFixed(2),boostLen:+(bv.length/60).toFixed(1),fovCruise:fov0,fovBoost:+fovB.toFixed(1),straightness:+B.tc.toFixed(2)}},
- // drift held hard left at 30 m/s: time of each tier; then per tier, release just after it: boost bar and turbo payout
- drift(){const R=__mho.RO,J=__ju;const B=this.straight();if(!B)return null;const Q=B.Q;
-  const run=hold=>{this.warpTo(Q);R.v=30;J.setBm(20);J.step(2);const bm0=J.car().bm;let tiers=[null,null,null],turbo=0,end=0,bmPre=0,bmJump=0;
-   for(let f=0;f<(hold+1.2)*60;f++){const holding=f<hold*60;this.keys({up:1,d:holding,l:holding});if(holding)R.v=Math.max(R.v,26);if(!holding&&!end)bmPre=J.car().bm;J.step(1);if(!holding&&!end)bmJump=J.car().bm-bmPre;const tr=J.tier();for(let q=0;q<3;q++)if(tr>q&&tiers[q]==null)tiers[q]=+(f/60).toFixed(2);if(!holding&&!end){end=1;turbo=J.car().turbo}}
-   this.keys({});return{tiers,bmGain:+bmJump.toFixed(1),turbo:+turbo.toFixed(2)}};
-  const full=run(3.4),pay=[];for(let q=0;q<3;q++){if(full.tiers[q]==null){pay.push(null);continue}const r=run(full.tiers[q]+.05);pay.push({bm:r.bmGain,turbo:r.turbo})}return{t:full.tiers,pay}},
+ // standstill → full throttle (steer only) on the straightest paths: a run counts only if speed never drops > 12 % before the plateau (no crash); then a full boost bar
+ accel(){const R=__mho.RO,J=__ju;let best=null;for(let s=0;s<5;s++){const B=this.straight(s);if(!B)break;const Q=B.Q;this.warpTo(Q);R.v=0;J.step(20);const vs=[];this.drive(Q,{up:1},12*60,()=>vs.push(R.v));
+   let mx=0,drop=false,pl=0;for(const v of vs){if(v<mx*.88&&mx>15){drop=true;break}mx=Math.max(mx,v)}pl=mx;const t95=vs.findIndex(v=>v>=.95*pl)/60;const run={Q,B,pl,t95,clean:!drop,len:vs.length};if(!best||(run.clean&&!best.clean)||(run.clean===best.clean&&run.pl>best.pl))best=run;if(run.clean&&run.len>=11*60)break}
+  const {Q,B,pl,t95}=best;this.warpTo(Q);R.v=pl*.97;J.setBm(100);J.step(1);const fov0=J.cam().fov;let fovB=fov0;const bv=[];this.drive(Q,{up:1,b:1},5*60,()=>{if(J.car().paused)return;bv.push(Math.abs(R.v));fovB=Math.max(fovB,J.cam().fov)});
+  const bp=Math.max(...bv),tb=bv.findIndex(v=>v>=pl+.95*(bp-pl))/60,t25=bv.findIndex(v=>v>=pl*1.25)/60;return{plateau:+pl.toFixed(1),kmh:Math.round(pl*3.6),t95:+t95.toFixed(2),clean:best.clean,boostPeak:+bp.toFixed(1),boostMul:+(bp/pl).toFixed(2),tBoost95:+tb.toFixed(2),tBoost25:+t25.toFixed(2),fovCruise:fov0,fovBoost:+fovB.toFixed(1),straightness:+B.tc.toFixed(2)}},
+ // drift held hard left at 30 m/s: time of each tier; then per tier, release just after it (retry on the next path if a wall cut the drift short)
+ drift(){const R=__mho.RO,J=__ju;
+  const run=(Q,hold)=>{this.warpTo(Q);R.v=30;J.setBm(20);J.step(2);let tiers=[null,null,null],turbo=0,end=0,bmPre=0,bmJump=0,relT=0;
+   for(let f=0;f<(hold+1.2)*60;f++){const holding=f<hold*60;this.keys({up:1,d:holding,l:holding});if(holding)R.v=Math.max(R.v,26);if(!holding&&!end){bmPre=J.car().bm;relT=J.tier()}J.step(1);if(!holding&&!end)bmJump=J.car().bm-bmPre;const tr=J.tier();for(let q=0;q<3;q++)if(tr>q&&tiers[q]==null)tiers[q]=+(f/60).toFixed(2);if(!holding&&!end){end=1;turbo=J.car().turbo}}
+   this.keys({});return{tiers,relT,bmGain:+bmJump.toFixed(1),turbo:+turbo.toFixed(2)}};
+  let full=null,FQ=null;for(let s=0;s<5&&!full;s++){const B=this.straight(s);if(!B)break;const r=run(B.Q,3.4);if(r.tiers[2]!=null){full=r;FQ=B.Q}}if(!full)return{t:[null,null,null],pay:[null,null,null]};
+  const pay=[];for(let q=0;q<3;q++){let got=null;for(let s=0;s<5&&!got;s++){const B=s?this.straight(s):{Q:FQ};if(!B)break;const r=run(B.Q,full.tiers[q]+.05);if(r.relT===q+1)got={bm:r.bmGain,turbo:r.turbo}}pay.push(got)}return{t:full.tiers,pay}},
  // takedown: line up behind a traffic car at 38 m/s and ram it; frame log for hit-stop, camera kick and shake
  takedown(log){const J=__ju;const at=J.aimTraffic(38);if(!at)return null;J.step(1);const fr=[];const s0=J.stats().k.chain||0;let hit=-1;
-  for(let f=0;f<150;f++){this.keys({up:1});J.step(1);const c=J.car(),m=J.cam(),x=J.fx();fr.push({f,paused:c.paused?1:0,v:+c.v.toFixed(1),fov:m.fov,back:m.back,h:m.h,shake:+c.shake.toFixed(3),ca:+x.uCA.toFixed(4)});if(hit<0&&(J.stats().k.chain||0)>s0)hit=f;if(hit>=0&&f>hit+60)break}
+  for(let f=0;f<150;f++){this.keys({up:1});J.step(1);const c=J.car(),m=J.cam(),x=J.fx();fr.push({f,paused:c.paused?1:0,kick:+(J.JU.kick*5).toFixed(2),v:+c.v.toFixed(1),fov:m.fov,back:m.back,h:m.h,shake:+c.shake.toFixed(3),ca:+x.uCA.toFixed(4)});if(hit<0&&(J.stats().k.chain||0)>s0)hit=f;if(hit>=0&&f>hit+60)break}
   this.keys({});if(hit<0)return{hit:false};const W=fr.slice(hit,hit+40),hsF=W.filter(q=>q.paused).length,fovMax=Math.max(...W.map(q=>q.fov)),fov0=fr[Math.max(0,hit-1)].fov;
-  return{hit:true,hitFrame:hit,hitstopMs:Math.round(hsF/60*1000),fovKick:+(fovMax-fov0).toFixed(1),shakeMax:Math.max(...W.map(q=>q.shake)),caMax:Math.max(...W.map(q=>q.ca)),frames:log?fr.slice(Math.max(0,hit-2),hit+12):undefined}}
+  return{hit:true,hitFrame:hit,hitstopMs:Math.round(hsF/60*1000),fovKick:+Math.max(fovMax-fov0,...W.map(q=>q.kick)).toFixed(1),shakeMax:Math.max(...W.map(q=>q.shake)),caMax:Math.max(...W.map(q=>q.ca)),frames:log?fr.slice(Math.max(0,hit-2),hit+12):undefined}}
 };`;
 async function measure(p,mode,city){await p.evaluate(LIB);await p.evaluate(m=>__ju.on(m==='on'),mode);
  const acc=await p.evaluate(()=>__jl.accel());
@@ -68,12 +70,12 @@ async function measure(p,mode,city){await p.evaluate(LIB);await p.evaluate(m=>__
  await p.evaluate(()=>{const Q=__jl.path(900,1);if(Q)__jl.warpTo(Q);__ju.reset()});
  const rt=await p.evaluate(T=>{const r=__jl.route(T,true);return{...r,stats:__ju.stats()}},ROUTE_S);
  await p.evaluate(()=>{const Q=__jl.path(900,7);if(Q)__jl.warpTo(Q);__ju.reset()});
- const calm=await p.evaluate(T=>{const r=__jl.route(T,false,true);const s=__ju.stats();return{secs:s.t,events:s.ev,moments:s.moments,perMin:+(s.moments/(s.t/60)).toFixed(1),deadMax:s.gap,kinds:s.k,smash:s.smash}},CALM_S);
+ const calm=await p.evaluate(T=>{const r=__jl.route(T,false,true);const s=__ju.stats();return{km:+(r.dist/1000).toFixed(2),secs:s.t,events:s.ev,moments:s.moments,perMin:+(s.moments/(s.t/60)).toFixed(1),deadMax:s.gap,kinds:s.k,smash:s.smash}},CALM_S);
  const S=rt.samples,sp=S.map(s=>s.v),vmax=Math.max(...sp),by=f=>S.filter(f),avg=a=>a.length?+(a.reduce((x,y)=>x+y,0)/a.length).toFixed(2):null;
  const cruise=by(s=>!s.b&&s.v>8&&s.v<vmax*.5),fast=by(s=>!s.b&&s.v>=vmax*.75),boosting=by(s=>s.b),turn=by(s=>s.d||Math.abs(s.yaw)>4);
  const cam={fovCruise:avg(cruise.map(s=>s.fov)),fovFast:avg(fast.map(s=>s.fov)),fovBoost:avg(boosting.map(s=>s.fov)),hCruise:avg(cruise.map(s=>s.h)),hFast:avg(fast.map(s=>s.h)),backCruise:avg(cruise.map(s=>s.back)),backFast:avg(fast.map(s=>s.back)),yawTurn:avg(turn.map(s=>Math.abs(s.yaw))),laTurn:avg(turn.map(s=>Math.abs(s.la))),fx:await p.evaluate(()=>__ju.fx())};
  const st=rt.stats,min=st.t/60;
- return{city,mode,accel:acc,drift:dr,takedown:td,air,bigAir:big,near:nm,route:{secs:st.t,events:st.ev,moments:st.moments,perMin:+(st.moments/min).toFixed(1),kinds:st.k,deadMax:st.gap,smash:st.smash,smashPerMin:+(st.smash/min).toFixed(1),studs:st.studs,boostUptime:+(rt.boostUp*100).toFixed(1),drifts:rt.drifts,vmax:+vmax.toFixed(1)},cam,calm,errs:p.errs.slice(0,4)}}
+ return{city,mode,accel:acc,drift:dr,takedown:td,air,bigAir:big,near:nm,route:{secs:st.t,events:st.ev,moments:st.moments,perMin:+(st.moments/min).toFixed(1),kinds:st.k,deadMax:st.gap,smash:st.smash,smashPerMin:+(st.smash/min).toFixed(1),studs:st.studs,boostUptime:+(rt.boostUp*100).toFixed(1),drifts:rt.drifts,km:+(rt.dist/1000).toFixed(2),vmax:+vmax.toFixed(1)},cam,calm,errs:p.errs.slice(0,4)}}
 // before/after screenshots at speed + a 10-frame strip of a takedown with hit-stop (Frankfurt)
 async function shots(b){const p=await open(b,'fra');await p.evaluate(LIB);
  const pose=async(mode,name)=>{await p.evaluate(m=>{__ju.on(m==='on');const B=__jl.straight();__jl.warpTo(B.Q);__mho.RO.v=48;__ju.setBm(100);__jl.drive(B.Q,{up:1},90);__jl.drive(B.Q,{up:1,b:1},70)},mode);await F.shot(p,`${OUT}/${name}.jpg`,{type:'jpeg',quality:75})};
@@ -109,15 +111,15 @@ async function mission(b){const p=await open(b,'fra');await p.evaluate(LIB);
  if(process.env.SHOTS){await shots(b)}
  if(process.env.PERF){await perf(b)}
  const g=(r,path)=>path.split('.').reduce((o,k)=>o==null?o:o[k],r);
- const ROWS=[['time to top speed (s)','accel.t95','4–6',v=>v>=4&&v<=6],['top speed (km/h)','accel.kmh','—',null],['boost speed ×','accel.boostMul','≥ 1.3',v=>v>=1.3],['boost surge: time to +25 % (s)','accel.tBoost25','≤ 1.0',v=>v>=0&&v<=1],['time to boost peak (s)','accel.tBoost95','— (1.75× takes ~3 s)',null],
+ const ROWS=[['time to top speed (s)','accel.t95','4–6 (crash-free run)',(v,r)=>v>=4&&v<=6&&r.accel.clean],['top speed (km/h)','accel.kmh','—',null],['boost speed ×','accel.boostMul','≥ 1.3',v=>v>=1.3],['boost surge: time to +25 % (s)','accel.tBoost25','≤ 1.0',v=>v>=0&&v<=1],['time to boost peak (s)','accel.tBoost95','— (1.75× takes ~3 s)',null],
   ['drift tier 1 / 2 / 3 at (s)','drift.t','0.5 / 1.1 / 2.0 ±0.15',v=>v&&v.every((x,i)=>x!=null&&Math.abs(x-[.5,1.1,2][i])<=.15)],['drift payout: turbo s / bar per tier','drift.pay','0.8 / 1.6 / 2.6 s · +8 / 18 / 32 %',v=>v&&v.every((x,i)=>x&&Math.abs(x.turbo-[.8,1.6,2.6][i])<.15&&Math.abs(x.bm-[8,18,32][i])<=2.5)],
   ['takedown hit-stop (ms)','takedown.hitstopMs','60–90',v=>v>=60&&v<=90],['takedown camera FOV kick (°)','takedown.fovKick','≥ 3',v=>v>=3],['takedown shake (cap 1.0)','takedown.shakeMax','≤ 1',v=>v<=1],['takedown colour fringe uCA','takedown.caMax','≤ 0.035',v=>v<=.035],
   ['near miss at 30 m/s, 6 m beside','near.near','1 event, no damage',(v,r)=>v===1&&r.near.dmg<1],['hop landing squash','air.squash','0.15–0.25',v=>v>=.15&&v<=.25],['big air (1 s+): air bonus (base) / squash','bigAir.air','1 bonus, no duplicate',v=>v===1],['big air landing squash','bigAir.squash','0.15–0.25',v=>v>=.15&&v<=.25],
-  ['FOV cruise → fast (°)','cam.fovCruise','',null],['FOV fast','cam.fovFast','cruise + 8–11',(v,r)=>v-r.cam.fovCruise>=7.5&&v-r.cam.fovCruise<=11.5],['FOV boosting','cam.fovBoost','fast + ≥ 1',(v,r)=>v-r.cam.fovFast>=1],
+  ['FOV cruise → fast (°)','cam.fovCruise','',null],['FOV fast','cam.fovFast','cruise + 8–11',(v,r)=>v-r.cam.fovCruise>=7.5&&v-r.cam.fovCruise<=11.5],['FOV boosting (route)','cam.fovBoost','—',null],['FOV cruise → full boost (accel run, °)','accel.fovBoost','cruise + ≥ 8',(v,r)=>v-r.accel.fovCruise>=8],
   ['camera height cruise (m)','cam.hCruise','',null],['camera height fast (m)','cam.hFast','cruise − ≥ 0.6',(v,r)=>r.cam.hCruise-v>=.6],['camera back cruise (m)','cam.backCruise','',null],['camera back fast (m)','cam.backFast','≤ 26',v=>v<=26],
   ['look-ahead in turns (°)','cam.laTurn','≥ 3 (≈ 2–5 m at 20 m)',v=>v>=3],
-  ['route: feedback moments / min','route.perMin','≥ 12',v=>v>=12],['route: longest dead time (s)','route.deadMax','≤ 8',v=>v<=8],['route: smashes / min','route.smashPerMin','—',null],['route: studs earned','route.studs','—',null],['route: boost uptime %','route.boostUptime','15–35 (bot boosts greedily)',null],
-  ['calm 30 m/s: moments / min','calm.perMin','≥ 12',v=>v>=12],['calm 30 m/s: longest dead time (s)','calm.deadMax','≤ 8',v=>v<=8]];
+  ['route: feedback moments / min','route.perMin','≥ 12',v=>v>=12],['route: longest dead time (s)','route.deadMax','≤ 8',v=>v<=8],['route: distance (km)','route.km','—',null],['route: smashes / min','route.smashPerMin','—',null],['route: studs earned','route.studs','—',null],['route: boost uptime %','route.boostUptime','15–35 (bot boosts greedily)',null],
+  ['calm 30 m/s: distance (km)','calm.km','—',null],['calm 30 m/s: moments / min','calm.perMin','≥ 12',v=>v>=12],['calm 30 m/s: longest dead time (s)','calm.deadMax','≤ 8',v=>v<=8]];
  const fmt=v=>v==null?'—':Array.isArray(v)?v.map(x=>x&&typeof x==='object'?`${x.turbo}s/+${x.bm}%`:x).join(' / '):typeof v==='object'?JSON.stringify(v):v;
  const md=['| metric | target | '+all.map(r=>`${r.city} ${r.mode==='on'?'after':'before'}`).join(' | ')+' |','|---|---|'+all.map(()=>'---|').join('')];
  for(const[n,path,tg,chk]of ROWS){md.push(`| ${n} | ${tg} | `+all.map(r=>{const v=g(r,path);const pass=chk&&r.mode==='on'?(chk(v,r)?' ✅':' ❌'):'';return fmt(v)+pass}).join(' | ')+' |');for(const r of all)if(chk&&r.mode==='on')ok(chk(g(r,path),r),`${r.city}: ${n} = ${fmt(g(r,path))} (target ${tg})`)}

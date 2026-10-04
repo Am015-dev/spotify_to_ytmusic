@@ -68,8 +68,8 @@ roamCam=(f=>function(dt){const c=camera;c.position.sub(JU.co);c.fov-=JU.cf;JU.co
 AU.engine=(f=>function(s,thr,on){f.call(this,s,thr,on);if(!JU.on||!this.a||state!=='roam'||!this.wind)return;const t=this.a.currentTime,x=clamp(Math.abs(RO.v)/Math.max(30,RO.top||60),0,1.3);
   if(!this.juR){try{const a=this.a,src=a.createBufferSource();src.buffer=this.nb;src.loop=true;const lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=110;const g=a.createGain();g.gain.value=0;src.connect(lp);lp.connect(g);g.connect(this.fx);src.start();this.juR=g}catch(e){this.juR={gain:{setTargetAtTime(){}}}}}
   this.wind.g.gain.setTargetAtTime(on?x*x*.3+(s.nitro?.1:0)+(s.air?.1:0):0,t,.1);this.wind.f.frequency.setTargetAtTime(500+x*2200,t,.1);this.juR.gain.setTargetAtTime(on&&!s.air?Math.min(.35,x*.3+JU.sq):0,t,.08)})(AU.engine);
-// one deterministic roam frame at 1/60 s, the same order as frame(): hit-stop gate, sim, camera, decays
-function JU_step1(){const h=1/60;JU.rt=h;let dt=(paused||JU_gate(h))?0:h;if(dt&&slowmo>0){slowmo-=dt;dt*=.35}if(!RO.frozen)roamStep(dt);roamCam(dt);shake=Math.max(0,shake-dt*3);flash=Math.max(0,flash-dt*2.2);hitFx=Math.max(0,hitFx-dt*2.5);FX.uniforms.uCA.value=hitFx*.035+flash*.02}
+// one deterministic roam frame at 1/60 s (tests), the same order as frame(): hit-stop gate, sim, camera, particles, decays
+function JU_step1(){const h=1/60;JU.rt=h;let dt=(paused||JU_gate(h))?0:h;if(dt&&slowmo>0){slowmo-=dt;dt*=.35}T+=dt;if(!RO.frozen)roamStep(dt);roamCam(dt);updPool(SPARK,dt,20);updPool(FIRE,dt,-2);updPool(SMOKE,dt,-1.5);updPool(FIREB,dt,-3);updDebris(dt);updPool(WATER,dt,24);updPool(GLOWP,0);shake=Math.max(0,shake-dt*3);flash=Math.max(0,flash-dt*2.2);hitFx=Math.max(0,hitFx-dt*2.5);FX.uniforms.uCA.value=hitFx*.035+flash*.02}
 window.__ju={get JU(){return JU},C:JU_C,on:b=>{JU.on=!!b;if(!JU.on&&pl)pl.mesh.scale.set(1,1,1)},hold:b=>{JU.hold=!!b;JU.ln=null},
   tier:()=>{const d=RO.dDir?RO.dT||0:0;return JU.on?JU_tier(d):d>2?3:d>1.1?2:d>.5?1:0},setBm:v=>{if(pl)pl.bm=v},
   step:n=>{for(let i=0;i<n;i++)JU_step1()},
