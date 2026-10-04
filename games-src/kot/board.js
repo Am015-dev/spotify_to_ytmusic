@@ -41,6 +41,7 @@ function bfLineText(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI.
     if(G.rolls<=0||!nk)return 'No rolls left: tap Done';
     if(!G.dice.some(d=>d.k))return 'Tap dice to keep them, then Roll';
     return `Roll the other ${nk}, or tap Done`}
+  if(G.phase==='buy'&&!G.bug&&p.vp>=20)return '20★ reached: tap Done to win';
   if(G.phase==='buy'){if(BF.sel>=0&&G.market[BF.sel]!==undefined&&!canBuy(p,BF.sel))return whyNot(p,G.market[BF.sel])||'Can’t buy this one';
     const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or Done to save ⚡':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to see it':'Not enough ⚡: tap Done'}
   return ''}
