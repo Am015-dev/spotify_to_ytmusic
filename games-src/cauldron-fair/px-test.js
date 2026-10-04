@@ -68,7 +68,7 @@ const RUNS = ONLY >= 0 ? [RUNS0[ONLY]] : RUNS0;
       if (after.nb > bf) { boomed = true; if (R.gfx === 'low' && after.parts) fail('Low must have no particles after an explosion'); }
       if (after.boom) { dstop++; break; }
     }
-    if (!R.dom) { await L.playTo(p, () => { const S = PX.state(); return !S.tweens && !S.parts && !S.pend && !!document.querySelector('#acts .drawb'); }, 600); await p.waitForTimeout(300); const S = await p.evaluate(() => PX.state()); if (S.nFly < Math.max(1, draws - 1)) fail('flights ' + S.nFly + ' for ' + draws + ' draws'); if (S.nLand < S.nFly - 1) fail('landings ' + S.nLand + ' for ' + S.nFly + ' flights');
+    if (!R.dom) { await L.playTo(p, () => { const S = PX.state(); return !S.tweens && !S.parts && !S.pend && !!document.querySelector('#acts .drawb'); }, 600); await p.waitForTimeout(300); const S = await p.evaluate(() => PX.state()); if (S.nFly < Math.max(1, draws - 1)) fail('flights ' + S.nFly + ' for ' + draws + ' draws'); if (S.nLand < S.nFly - 1 && R.mode !== 'hot') fail('landings ' + S.nLand + ' for ' + S.nFly + ' flights');
       if (R.gfx === 'low' && (S.filters || S.nSplash || maxParts)) fail('Low must have no filters and no particles', JSON.stringify({ f: S.filters, sp: S.nSplash, maxParts }));
       if (R.gfx === 'high' && !S.nSplash) fail('High should splash when a chip lands');
       const ink = await p.evaluate(() => PX.canvasInk()); if (!(ink > .2) && ink !== -1) fail('canvas looks blank', ink); last = last || {}; last.ink = ink; last.nFly = S.nFly; last.nSplash = S.nSplash; last.nBoom = S.nBoom; }

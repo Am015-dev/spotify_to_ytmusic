@@ -271,6 +271,8 @@ html.fapx .dv.cof::after{display:none}
 html.ph .stbox .stimg{height:64px}
 #rs{position:fixed;inset:0;z-index:55;background:rgba(8,16,24,.55);display:flex;align-items:flex-end;justify-content:center;padding:8px}
 .rsbox{background:var(--paper);border:3px solid #14202c;border-radius:16px;width:min(560px,100%);max-height:100%;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 14px 44px rgba(0,0,0,.55);overscroll-behavior:contain}
+.rsbox .cbtns{position:sticky;bottom:-8px;background:var(--paper);padding:6px 0 8px;margin-top:auto;z-index:2}
+html.ph-l .rsbox .kv{display:none}
 .rsbox h2{margin:0;font-size:1.35rem;font-weight:900}
 .rsbox.win{border-color:#2f9a4a}.rsbox.lose{border-color:#d8402c}
 .chk{display:flex;align-items:center;gap:8px;font-size:14px;padding:3px 0;border-bottom:1px dotted rgba(0,0,0,.2)}
@@ -5424,8 +5426,8 @@ function pxEnd(win, cb) {
 function pxEndTick(dt) {
   const a = PX.endA; a.t += dt; const t = a.t, W = a.W, H = a.H;
   a.bg.alpha = Math.min(1, t / .6);
-  if (a.win) { const p = Math.min(1, Math.max(0, (t - .3) / 2.2)), e = ease(p); a.plane.x = W * (.18 + .55 * e); a.plane.y = H * (.22 + .5 * e); a.plane.rotation = -.12 * (1 - e) + .02; a.plane.scale.x = a.plane.scale.y = Math.abs(a.plane.scale.x) * 1; a.plane.alpha = 1 - Math.max(0, (t - 2.3) / .5) * 0; if (t > 3.0 && !a.done) { a.done = true; PX.endA = null; PX.L.end.removeChildren(); a.cb(); } }
-  else { const p = Math.min(1, Math.max(0, (t - .3) / 1.4)), e = p * p; a.plane.x = W * (.2 + .45 * p); a.plane.y = H * (.2 + .55 * e); a.plane.rotation = .1 + .9 * e; a.flash.alpha = t > 1.7 ? Math.max(0, .6 - (t - 1.7) * 1.2) : 0; if (t > 1.7 && q_fx()) { PX.L.end.x = (Math.random() - .5) * 8 * Math.max(0, 1 - (t - 1.7)); PX.L.end.y = (Math.random() - .5) * 8 * Math.max(0, 1 - (t - 1.7)); } if (t > 3.0 && !a.done) { a.done = true; PX.endA = null; PX.L.end.x = PX.L.end.y = 0; PX.L.end.removeChildren(); a.cb(); } }
+  if (a.win) { const p = Math.min(1, Math.max(0, (t - .3) / 2.2)), e = ease(p); a.plane.x = W * (.18 + .55 * e); a.plane.y = H * (.22 + .5 * e); a.plane.rotation = -.12 * (1 - e) + .02; a.plane.scale.x = a.plane.scale.y = Math.abs(a.plane.scale.x) * 1; a.plane.alpha = 1 - Math.max(0, (t - 2.3) / .5) * 0; if (t > 3.0 && !a.done) { a.done = true; PX.endA = null; a.cb(); } }   // the picture stays until the next flight (pxClearEnd)
+  else { const p = Math.min(1, Math.max(0, (t - .3) / 1.4)), e = p * p; a.plane.x = W * (.2 + .45 * p); a.plane.y = H * (.2 + .55 * e); a.plane.rotation = .1 + .9 * e; a.flash.alpha = t > 1.7 ? Math.max(0, .6 - (t - 1.7) * 1.2) : 0; if (t > 1.7 && q_fx()) { PX.L.end.x = (Math.random() - .5) * 8 * Math.max(0, 1 - (t - 1.7)); PX.L.end.y = (Math.random() - .5) * 8 * Math.max(0, 1 - (t - 1.7)); } if (t > 3.0 && !a.done) { a.done = true; PX.endA = null; PX.L.end.x = PX.L.end.y = 0; a.cb(); } }
 }
 const q_fx = () => PXQ[PX.q].fx > 0;
 function pxClearEnd() { PX.endA = null; try { $('#bd').classList.remove('ending'); } catch (e) { } try { PX.L.end.removeChildren(); PX.L.end.x = PX.L.end.y = 0; } catch (e) { } }

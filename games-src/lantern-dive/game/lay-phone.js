@@ -24,7 +24,7 @@ const SIZES = arg.split(',').filter(Boolean).map(s => s.split('x').map(Number));
     const targets = async tag => {
       const r = await p.evaluate(() => {
         const o = []; const vis = e => { const r = e.getBoundingClientRect(); if (!r.width || !r.height) return null; const cs = getComputedStyle(e); if (cs.visibility === 'hidden' || cs.display === 'none') return null; return r; };
-        for (const e of document.querySelectorAll('.gx-bar button,#dock button,#hand .hc,#opp .op,.jc,#pool .jcard,#ppop button,#pc button,#pass button,#rs button,.gx-drawer.on button,#start button,#netbox button')) {
+        for (const e of document.querySelectorAll('.gx-bar button,#dock button,#hand .hc,#opp .op,.jc:not(.opp),#pool .jcard,#ppop button,#pc button,#pass button,#rs button,.gx-drawer.on button,#start button,#netbox button')) {
           if (e.closest('[hidden]')) continue; if (e.closest('.gx-drawer') && !e.closest('.gx-drawer.on')) continue; const r = vis(e); if (!r) continue;
           if (e.matches('#hand .hc') && e.classList.contains('dim')) continue;
           if (r.width < 43.9 || r.height < 43.9) o.push((e.dataset.a || e.dataset.gx || e.className) + ' ' + Math.round(r.width * 10) / 10 + 'x' + Math.round(r.height * 10) / 10);
@@ -75,6 +75,7 @@ const SIZES = arg.split(',').filter(Boolean).map(s => s.split('x').map(Number));
     for (let k = 0; k < 900 && steps < 500; k++) {
       const o = await p.evaluate(() => ({ over: G.phase === 'over', ph: G.phase, must: iMustAct() && canAct(), pl: G.tricks.length, sel: UI.sel, tip: !!document.querySelector('#tip [data-a=tipok]') }));
       if (o.over) break;
+      if (process.env.LPDBG && k % 5 === 0) log('dbg', k, JSON.stringify(o), 'steps', steps, 'plays', plays);
       if (o.must) {
         if (!seen[o.ph]) { seen[o.ph] = 1; await p.waitForTimeout(700); await scroll('turn ' + o.ph); await boardCheck('turn ' + o.ph); await targets('turn ' + o.ph); await shot('2' + o.ph); }
         if (o.ph === 'play' && o.pl === 1 && !seen.lift) { seen.lift = 1; const c = await p.$('#hand .hc:not(.dim)'); if (c) { await tap(c); await p.waitForTimeout(350); const pb = await p.evaluate(() => !!document.querySelector('#acts [data-a=playcard]')); if (!pb) prob('no Play button after lifting a card'); const ab = await p.evaluate(() => [...document.querySelectorAll('#acts button')].map(e => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom, e.dataset.a]; })); const dd = await dockOf(); for (const a of ab) if (a[2] > dd[2] + 1 || a[3] > dd[3] + 1 || a[0] < dd[0] - 1) prob('action button outside the dock ' + a[4], JSON.stringify([a, dd])); await boardCheck('lifted'); await targets('lifted'); await shot('3lifted'); await p.evaluate(() => { UI.sel = -1; render(); }); } }

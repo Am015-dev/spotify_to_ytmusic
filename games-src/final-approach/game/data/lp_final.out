@@ -8,18 +8,16 @@ SIZE 390x844 problems 0
 390x763 errors []
 PROBLEMS 0
 SIZE 390x763 problems 0
-FAIL 390x664 clipped text guided brief ["clipped dock: Welcome aboard","clipped dock: ×"]
 390x664 board {"w":390,"h":416,"vw":390,"vh":664,"mode":"P","k":0.487} webgl
-390x664 placements by touch 6
+390x664 placements by touch 8
 390x664 errors []
-PROBLEMS 1
-SIZE 390x664 problems 1
-FAIL 375x553 clipped text guided brief ["clipped dock: Welcome aboard","clipped dock: First flight, step 1","clipped dock: ×"]
+PROBLEMS 0
+SIZE 390x664 problems 0
 375x553 board {"w":375,"h":400,"vw":375,"vh":553,"mode":"P","k":0.468} webgl
-375x553 placements by touch 6
+375x553 placements by touch 8
 375x553 errors []
-PROBLEMS 1
-SIZE 375x553 problems 1
+PROBLEMS 0
+SIZE 375x553 problems 0
 412x780 board {"w":412,"h":440,"vw":412,"vh":780,"mode":"P","k":0.515} webgl
 412x780 placements by touch 8
 412x780 errors []
@@ -31,8 +29,8 @@ SIZE 412x780 problems 0
 PROBLEMS 0
 SIZE 844x390 problems 0
 750x342 board {"w":570,"h":342,"vw":750,"vh":342,"mode":"L","k":0.509} webgl
-750x342 placements by touch 6
+750x342 placements by touch 8
 750x342 errors []
 PROBLEMS 0
 SIZE 750x342 problems 0
-PROBLEMS 2
+PROBLEMS 0

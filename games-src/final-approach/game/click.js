@@ -39,6 +39,7 @@ function run(cf, seed) {
     w.addEventListener('load', () => {
       try {
         w.eval(`ANIM=${ANIMON ? 1 : 0};AIDELAY=${ANIMON ? 40 : 0};UI.seed=${seed};FA.AI.NMC={top:2,samples:1};FA.AI.HMC={top:2,samples:2}`);   // smaller Monte Carlo: this test is about the page, not the AI's strength
+        if (process.env.CLICKDBG) w.eval(`var __c=closeRS; closeRS=function(){ if(G&&G.result) console.log('closeRS during result: '+new Error().stack.split('\\n').slice(2,5).join(' | ')); return __c.apply(this, arguments)}`);
         if (!d.querySelector('#start [data-a=play]')) errs.push('no Play button on the title');
         if (d.querySelector('#start [data-a=loadsave]')) errs.push('Resume shown without a save');
         click(d.querySelector('[data-a=play]')); seen.add('title->setup');
@@ -68,7 +69,7 @@ function run(cf, seed) {
               }
               const cl = d.querySelector('#rs [data-a=rsclose]'); if (cl && !G.result) click(cl); return;
             }
-            if (G.result) { if (!w.eval('UI.busy') && ++overWait > 400) { errs.push('over but no final modal'); fin({}); } return; }
+            if (G.result) { if (!w.eval('UI.busy') && ++overWait > 400) { errs.push('over but no final modal: overShown=' + w.eval('UI.overShown') + ' rsOpen=' + w.eval('UI.rsOpen') + ' rsHidden=' + d.querySelector('#rs').hidden + ' rsClass=' + d.querySelector('#rs').className + ' mode=' + w.eval('UI.mode') + ' started=' + w.eval('UI.started') + ' why=' + (G.result && G.result.why)); fin({}); } return; }
             const pass = q('#pass [data-a=take]'); if (pass.length) { click(pass[0]); seen.add('pass card'); clicks++; return; }
             const tip = q('#pc [data-a=tipok],#pc [data-a=tipoff]'); if (tip.length) { click(R() < .8 ? tip[0] : tip[tip.length - 1]); seen.add('tip'); clicks++; return; }
             const seats = w.eval('FA.pending(G).filter(s => !G.ai[s])');

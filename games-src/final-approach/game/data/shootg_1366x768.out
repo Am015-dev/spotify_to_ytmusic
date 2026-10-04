@@ -1,0 +1,7 @@
+FATAL page.evaluate: TypeError: Cannot set properties of null (setting 'ai')
+    at eval (eval at evaluate (:311:30), <anonymous>:1:109)
+    at UtilityScript.evaluate (<anonymous>:313:16)
+    at UtilityScript.<anonymous> (<anonymous>:1:44)
+    at /home/user/spotify_to_ytmusic/games-src/final-approach/game/shoot.js:24:13 {
+  log: []
+}

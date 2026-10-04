@@ -416,9 +416,9 @@ function why(G, seat, card) {
   }
   const out = []; const n = Math.max(1, wl.length);
   if (lines.w) { const best = Object.keys(lines.w).sort((a, b) => lines.w[b] - lines.w[a])[0]; out.push(+best === seat ? 'You most likely win this trick' : G.players[best].name + ' most likely wins this trick'); }
-  for (const k in lines) if (k[0] === 'd' && lines[k] >= n / 2) out.push('finishes: ' + TASKS[G.tasks[+k.slice(1)].id].t);
-  for (const k in lines) if (k[0] === 'f' && lines[k] >= n / 3) out.push('risk: breaks "' + TASKS[G.tasks[+k.slice(1)].id].t + '"');
-  return out.join('. ');
+  for (const k in lines) if (k[0] === 'd' && lines[k] >= n / 2) out.push('finishes: ' + TASKS[G.tasks[+k.slice(1)].id].t.replace(/\.$/, ''));
+  for (const k in lines) if (k[0] === 'f' && lines[k] >= n / 3) out.push('risk: breaks "' + TASKS[G.tasks[+k.slice(1)].id].t.replace(/\.$/, '') + '"');
+  return out.join('. ') + (out.length ? '.' : '');
 }
 // Does EVERY card the diver may play now break one of his or her own jobs (or the dive's rule)? Played out on sampled worlds (the fair view):
 // only when it breaks in all of them for all legal cards. Returns { job: index | -1 for the dive rule } or null. Used for the prompt line.
