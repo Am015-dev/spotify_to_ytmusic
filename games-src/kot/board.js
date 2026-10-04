@@ -87,9 +87,12 @@ function bfEnd(){if(!BF.cap&&!BF.snap)return;BF.cap=null;BF.snap=null;BF.rel={};
 function bfSlot(gap){const t=Math.max(bfNow(),BF.next);BF.next=t+(gap||140);return t-bfNow()}
 function bfFaceSrc(f){const c=BF.cap;return c.dice.map((d,k)=>({d,k})).filter(o=>o.d.f[0]===f&&o.d.xy)}
 function bfDieHTML(o){return `<div class="bdie ${o.d.t?'sp-'+o.d.t:''}">${o.d.html}</div>`}
+function bfNarrate(k,e){if(!G||humanTurn()||!phOn())return;const m=/^([+-])(\d+)(♥|⚡|★)$/.exec(e.t||'');if(!m)return;const me=meSeat(),a=G.active;if(me<0)return;
+  if(k===me&&m[1]==='-'&&m[3]==='♥')bfFlash(`${mname(G.pl[a])} hits you −${m[2]}♥`,1800);
+  else if(k===a&&m[1]==='+'&&m[3]==='★')bfFlash(`${mname(G.pl[a])} +${m[2]}★`,1400)}
 function bfPlay(k,e,orig){const c=BF.cap,a=c.a,m=/^([+-])(\d+)(♥|⚡|★)$/.exec(e.t||'');const sound=()=>{const was=c.live;c.live=false;try{fxSound(e.t,e.c)}finally{c.live=was}};
   const fld=m?{'♥':'h','★':'v','⚡':'e'}[m[3]]:null;
-  const done=()=>{if(fld){BF.rel[k+fld]=1;phChips();bfBump(k,fld)}orig(k,e);sound()};
+  const done=()=>{if(fld){BF.rel[k+fld]=1;phChips();bfBump(k,fld)}orig(k,e);sound();bfNarrate(k,e)};
   let flights=[],to=null,burst='',dieTo=null;
   if(m&&m[1]==='-'&&fld==='h'&&k!==a){flights=bfFaceSrc('C');to=bfMonXY(k,2.6);burst='hit';if(!flights.length&&bfMonXY(a))flights=[{src:bfMonXY(a),html:'<div class="btok claw">'+faceSVG('C')+'</div>'}]}
   else if(m&&m[1]==='+'&&fld==='h'&&k===a){flights=bfFaceSrc('H');to=bfMonXY(k,2.6);burst='heal'}
@@ -157,7 +160,7 @@ function bfRender(){if(!phOn())return;bfBuild();bfRollWatch();bfSlowAgain();if(B
    const e=pa.querySelector('[data-act="end"]');if(e&&G.phase==='buy'){const win=!G.bug&&cur().vp>=20;e.innerHTML=`<span class="bl">✔ ${G.bug?'Finish turn':'Done'}</span><small>${win?'end your turn to win':'end your turn'}</small>`}
    const s=pa.querySelector('[data-act="sweep"]');if(s&&G.phase==='buy'){s.innerHTML='<span class="bl">♻</span><small>new · 2⚡</small>';s.setAttribute('aria-label','Throw these 3 cards away and deal 3 new ones, 2 energy')}};
  const _res=resolve;resolve=function(){if(G&&G.phase==='roll')try{bfCapture()}catch(e){}return _res.apply(this,arguments)};
- const _f3=fx3D;fx3D=function(k,e){if(BF.cap&&BF.cap.live&&bfNow()-BF.cap.t<5000)return bfPlay(k,e,_f3);_f3(k,e);
+ const _f3=fx3D;fx3D=function(k,e){if(BF.cap&&BF.cap.live&&bfNow()-BF.cap.t<5000)return bfPlay(k,e,_f3);_f3(k,e);bfNarrate(k,e);
    const m=/^\+(\d+)(★|⚡|♥)$/.exec(e.t||'');if(m&&phOn()&&bfAnim()){const f={'♥':'h','★':'v','⚡':'e'}[m[2]];const tok={'★':'<div class="btok star">★</div>','⚡':'<div class="btok en">⚡</div>','♥':'<div class="btok hp">♥</div>'}[m[2]];
      bfFly(tok,bfMonXY(k,3),bfChipXY(k),{dur:650,delay:250,size:34,spin:0,end:.6,burst:{'h':'heal','v':'star','e':'energy'}[f],land:()=>bfBump(k,f)})}};
  const _fs=fxSound;fxSound=function(t,c){if(BF.cap&&BF.cap.live&&bfNow()-BF.cap.t<5000)return;return _fs(t,c)};
