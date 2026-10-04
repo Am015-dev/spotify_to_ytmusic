@@ -61,6 +61,12 @@ function drive(w, stop, max) {
     const all = ['queen', 'inn', 'university', 'cemetery', 'copy', 'trigger'].map(k => w.eval('qHint(' + JSON.stringify(k) + ')')).join(' ');
     const hit = bad.filter(b => all.indexOf(b) >= 0); ok(!hit.length, 'original names: ' + hit.join(', '));
   });
+  await test('every board tile opens its pop-up without an error (events included)', async () => {
+    const { w, d, errs } = await page(1);
+    w.eval("newGame('vs',{np:2,level:'normal'})"); drive(w, () => w.eval('HB.actor(G)===0&&!UI.cards.length&&!G.q'));
+    for (const t of d.querySelectorAll('.tile')) { click(w, t); const pop = d.querySelector('#ppop'); ok(!pop.hidden, 'no pop-up for ' + t.dataset.k + t.dataset.i); if (/basic|forest/.test(t.dataset.k)) ok(/You gain/.test(pop.textContent), 'no gain line on ' + t.dataset.k); w.eval('closePop()'); }
+    ok(!errs.length, errs[0]);
+  });
   console.log('\nclarity-test: ' + pass + ' passed, ' + fail + ' failed');
   process.exit(fail ? 1 : 0);
 })();

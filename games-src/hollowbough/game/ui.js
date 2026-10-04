@@ -186,9 +186,9 @@ function tileFace(t, big) {
     case 'basic': f.appendChild(items(basicItems(t.i), px)); break;
     case 'forest': f.appendChild(items(FIC[D.forest[G.forest[t.i]].key] || [['any', '']], px)); break;
     case 'haven': f.appendChild(items([['haven', ''], ['any', '']], px)); break;
-    case 'journey': f.appendChild(items([['road', ''], ['point', '2-5']], px)); if (!big) f.appendChild(h('div.tl', 'Long Road')); break;
-    case 'deck': f.appendChild(h('div.its', h('span.it', ic('deck', px), h('b', G.deck.length)))); if (!big) f.appendChild(h('div.tl', 'draw pile')); break;
-    case 'disc': f.appendChild(h('div.its', h('span.it', ic('discard', px), h('b', G.discard.length)))); if (!big) f.appendChild(h('div.tl', 'discards')); break;
+    case 'journey': f.appendChild(items([['road', ''], ['point', '2-5']], px)); break;
+    case 'deck': f.appendChild(h('div.its', h('span.it', ic('deck', px), h('b', G.deck.length)))); break;
+    case 'disc': f.appendChild(h('div.its', h('span.it', ic('discard', px), h('b', G.discard.length)))); break;
     case 'tree': { const s = G.players[Math.max(0, viewSeat() >= 0 ? viewSeat() : (G.phase === 'over' ? 0 : HB.actor(G)))]; f.appendChild(h('div.its', h('span.it', HBKit.season(SEAS[s ? s.season : 0], px + 4)))); break; }
     case 'bev': { const e = G.bev[t.i], dd = D.basicEvents[e.k], need = Object.keys(dd.need)[0]; const col = HBKit.TYPES[need] ? HBKit.TYPES[need].c : '#888'; f.style.setProperty('--ec', col); f.appendChild(h('div.its', h('span.it', ic('flag', px), h('b', dd.pts)))); break; }
     case 'sev': { const e = G.sev[t.i], dd = D.specialEvents[e.k]; f.style.setProperty('--ec', '#7f5496'); f.appendChild(h('div.its', h('span.it', ic('star', px), dd.pts ? h('b', dd.pts) : h('b', '?')))); break; }
@@ -245,7 +245,7 @@ function renderBoard() {
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) return v; if (UI.focus != null && UI.focus < G.np) return UI.focus; return Math.max(0, G.phase === 'over' ? 0 : Math.min(G.np - 1, G.cur)); }
 // phone cards shrink so a full hand of 8 fits across the dock without sideways scrolling
-function stripW() { if (!isPh()) return 58; const d = $('#dock'), w = (d && d.clientWidth) || innerWidth, v = viewSeat(); const n = Math.max(6, v >= 0 ? G.players[v].hand.length : 6, UI.tab === 'city' ? G.players[focusSeat()].city.length : 0); return Math.max(36, Math.min(56, Math.floor((w - 16 - (n - 1) * 4) / n))); }
+function stripW() { if (!isPh()) return 58; const d = $('#dock'), w = (d && d.clientWidth) || innerWidth, v = viewSeat(); const n = Math.max(6, v >= 0 ? G.players[v].hand.length : 6, UI.tab === 'city' ? G.players[focusSeat()].city.length : 0); return Math.max(44, Math.min(56, Math.floor((w - 16 - (n - 1) * 4) / n))); }
 function promptText() {
   if (!G) return '';
   if (G.phase === 'over') return 'The game is over.';
@@ -448,9 +448,10 @@ function openTile(kind, i) {
       const isEv = kind === 'bev' || kind === 'sev';
       const evo = isEv ? (kind === 'bev' ? G.bev : G.sev)[i] : null;
       p.appendChild(popHead(isEv ? nm : 'Place a worker here?', isEv ? 'Event' : nm));
-      if (!isEv) body.appendChild(h('div.gain', h('b', 'You gain: '), info.text.replace(/ Shared\.$/, '')));
-      if (!isEv && v >= 0 && /card/i.test(info.text) && G.players[v].hand.length >= 8) body.appendChild(reasonBox('Your hand is full (8/8): any cards from here are lost.'));
-      else {
+      if (!isEv) {
+        body.appendChild(h('div.gain', h('b', 'You gain: '), info.text.replace(/ Shared\.$/, '')));
+        if (v >= 0 && /card/i.test(info.text) && G.players[v].hand.length >= 8) body.appendChild(reasonBox('Your hand is full (8/8): any cards from here are lost.'));
+      } else {
         body.appendChild(h('p', info.text));
         const need = h('ul.need');
         if (kind === 'bev') { const nd = D.basicEvents[G.bev[i].k].need; for (const c in nd) { const have = v >= 0 ? G.players[v].city.filter(e => cdef(e.id).type === c).length : 0; need.appendChild(h('li' + (have >= nd[c] ? '.y' : '.n'), (have >= nd[c] ? '✓ ' : '✗ ') + nd[c] + ' ' + (HBKit.TYPES[c] ? HBKit.TYPES[c].label : c) + ' cards in your city (you have ' + have + ')')); } }

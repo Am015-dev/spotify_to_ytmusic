@@ -113,9 +113,10 @@ function openTile(kind, i) {
       const isEv = kind === 'bev' || kind === 'sev';
       const evo = isEv ? (kind === 'bev' ? G.bev : G.sev)[i] : null;
       p.appendChild(popHead(isEv ? nm : 'Place a worker here?', isEv ? 'Event' : nm));
-      if (!isEv) body.appendChild(h('div.gain', h('b', 'You gain: '), info.text.replace(/ Shared\.$/, '')));
-      if (!isEv && v >= 0 && /card/i.test(info.text) && G.players[v].hand.length >= 8) body.appendChild(reasonBox('Your hand is full (8/8): any cards from here are lost.'));
-      else {
+      if (!isEv) {
+        body.appendChild(h('div.gain', h('b', 'You gain: '), info.text.replace(/ Shared\.$/, '')));
+        if (v >= 0 && /card/i.test(info.text) && G.players[v].hand.length >= 8) body.appendChild(reasonBox('Your hand is full (8/8): any cards from here are lost.'));
+      } else {
         body.appendChild(h('p', info.text));
         const need = h('ul.need');
         if (kind === 'bev') { const nd = D.basicEvents[G.bev[i].k].need; for (const c in nd) { const have = v >= 0 ? G.players[v].city.filter(e => cdef(e.id).type === c).length : 0; need.appendChild(h('li' + (have >= nd[c] ? '.y' : '.n'), (have >= nd[c] ? '✓ ' : '✗ ') + nd[c] + ' ' + (HBKit.TYPES[c] ? HBKit.TYPES[c].label : c) + ' cards in your city (you have ' + have + ')')); } }

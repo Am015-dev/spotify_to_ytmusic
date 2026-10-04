@@ -56,7 +56,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
   // hand card popup
   const hc=await p.$('#handRow .sc');if(!hc)fail('no hand card');else{const cr=await hc.evaluate(e=>{const r=e.getBoundingClientRect();return [r.left,r.top,r.right,r.bottom]});await hc.tap();await p.waitForTimeout(300);const pr=await rect('#ppop');if(ov(pr,cr))fail('hand popup over its card',JSON.stringify([pr,cr]));const br=await rect('#board');if(ov(pr,br))fail('hand popup over board');await shot('4handpop');await targets('handpop');await p.tap('#ppop [data-a=popx]')}
   // rival chip -> drawer
-  await p.tap('#chips .chip:nth-child(2)');await p.waitForTimeout(500);await scroll('drawer');await shot('5rival');await targets('rival drawer');await p.keyboard.press('Escape');await p.waitForTimeout(300);
+  await p.tap((await p.$('#chips .chip:nth-child(2):visible'))?'#chips .chip:nth-child(2)':'.gx-bar [data-gx=rivald]');await p.waitForTimeout(500);await scroll('drawer');await shot('5rival');await targets('rival drawer');await p.keyboard.press('Escape');await p.waitForTimeout(300);
   // hint
   await waitHuman();const hb=await p.$('#acts [data-a=hint]:not([disabled])');if(hb){await hb.tap();await p.waitForTimeout(700);await shot('6hint');await targets('hint');if(!(await p.evaluate(()=>!!document.querySelector('#ppop [data-a=do]'))))fail('hint has no Do it button');await p.tap('#ppop [data-a=popx]')}
   // play a card by touch (resources granted through the test hook so a card is affordable)
