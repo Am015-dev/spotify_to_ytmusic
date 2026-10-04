@@ -83,11 +83,11 @@ AU.sched=function(){const a=this.a;if(!a)return;AU_build();AU_tick();if(paused)r
     case'ui':this.osc(t,'square',1250,.035,.05,F,0,3000);this.osc(t,'triangle',2500,.025,.04,F);return}
   return sfx0(n)}}
 // ---- feedback polish
-const AU_CSS=`#auPop{position:absolute;left:50%;top:24%;transform:translate(-50%,-50%);z-index:30;pointer-events:none;font:italic 900 clamp(34px,9vw,72px) var(--hud,system-ui);color:#ff2d55;-webkit-text-stroke:3px #141413;text-shadow:0 6px 0 #141413,0 0 24px rgba(255,210,0,.6);white-space:nowrap;letter-spacing:.02em}
+const AU_CSS=`#auPop{position:fixed;left:50%;top:24%;transform:translate(-50%,-50%);z-index:9998;pointer-events:none;font:italic 900 clamp(34px,9vw,72px) var(--hud,system-ui);color:#ff2d55;-webkit-text-stroke:3px #141413;text-shadow:0 6px 0 #141413,0 0 24px rgba(255,210,0,.6);white-space:nowrap;letter-spacing:.02em}
 #auPop.on{animation:auPop .9s cubic-bezier(.2,1.7,.4,1) forwards}@keyframes auPop{0%{transform:translate(-50%,-50%) scale(.2) rotate(-12deg);opacity:0}18%{transform:translate(-50%,-50%) scale(1.25) rotate(-4deg);opacity:1}35%{transform:translate(-50%,-50%) scale(1) rotate(-4deg)}80%{opacity:1}100%{transform:translate(-50%,-70%) scale(1.05) rotate(-4deg);opacity:0}}
 #hitPop.au2k{font-size:clamp(34px,8vw,60px);-webkit-text-stroke:3px #141413;text-shadow:0 6px 0 #141413,0 0 20px rgba(255,210,0,.5)}
 body.auBoost #speedFx{filter:brightness(1.5) contrast(1.2);animation-duration:.18s!important}
-#auConf{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:60}#auConf i{position:absolute;top:-4vh;width:12px;height:8px;border-radius:2px;animation:auFall linear forwards}
+#auConf{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9999}#auConf i{position:absolute;top:-4vh;width:12px;height:8px;border-radius:2px;animation:auFall linear forwards}
 #auConf i:nth-child(3n){width:10px;height:10px;border-radius:50%}@keyframes auFall{to{transform:translate(var(--dx),112vh) rotate(var(--r))}}
 @media (orientation:portrait){body.touch:not(.portraitOk) #rotateHint{top:auto!important;bottom:calc(36% + env(safe-area-inset-bottom,0px));animation:hintOut .4s 2.6s forwards}}`;
 {const st=document.createElement('style');st.textContent=AU_CSS;document.head.appendChild(st)}

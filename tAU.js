@@ -22,9 +22,9 @@ const only=(g,k)=>g[k]>.8&&['fra','ath','race','mission','cut'].every(j=>j===k||
   ok(only(g,'cut'),'cutscene: crossfades to the cutscene bus (stinger on entry)',g);ok(g.duck<.4,'music ducks under dialogue',{duck:g.duck});
   await p.evaluate(()=>{__mho.roamSim(1);__au.csEnd()});await p.waitForTimeout(1200);g=await buses(p);ok(g.duck>.9,'duck releases after the dialogue',{duck:g.duck});
   // screenshots: rendering one frame takes seconds here, so freeze the pop / confetti mid-animation for the picture
-  await p.evaluate(()=>{__au.pop('TAKEDOWN!','#ff2d55');const e=document.getElementById('hitPop'),k=e.cloneNode(true);k.id='auHold1';k.className='au2k';k.hidden=false;k.style.animation='none';k.style.transform='translateX(-50%) rotate(-4deg)';e.parentNode.appendChild(k)});
-  await F.shot(p,'shots/au_takedown.jpg',{type:'jpeg',quality:70});await p.evaluate(()=>document.getElementById('auHold1').remove());
-  await p.evaluate(async()=>{__au.confetti();await new Promise(r=>setTimeout(r,1000));const c=document.getElementById('auConf'),k=c.cloneNode(false);k.id='auHold2';k.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:60';
+  await p.evaluate(()=>{__au.pop('TAKEDOWN!','#ff2d55');const e=document.getElementById('hitPop');e.classList.add('au2k');e.style.animation='none';e.style.display='block';e.style.transform='translateX(-50%) rotate(-4deg)'});
+  await F.shot(p,'shots/au_takedown.jpg',{type:'jpeg',quality:70});await p.evaluate(()=>{const e=document.getElementById('hitPop');e.style.cssText='';e.hidden=true;e.classList.remove('au2k')});
+  await p.evaluate(async()=>{__au.confetti();await new Promise(r=>setTimeout(r,1000));const c=document.getElementById('auConf'),k=c.cloneNode(false);k.id='auHold2';k.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:9999';
     for(const i of c.children){const j=i.cloneNode(false),r=i.getBoundingClientRect();j.style.cssText=`position:absolute;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;background:${i.style.background};border-radius:2px`;k.appendChild(j)}document.body.appendChild(k)});
   await F.shot(p,'shots/au_confetti.jpg',{type:'jpeg',quality:70});await p.evaluate(()=>document.getElementById('auHold2').remove());
   // 5 min of sim (keyboard bot: throttle, steer, drift, boost) while the scheduler keeps playing: live audio sources must stay flat
