@@ -87,7 +87,7 @@ They still lost life every day to systems they couldn't see how to prevent, main
 | Test | Result |
 |---|---|
 | `rules-test.js` | 26 pass, 0 fail (2 new: card and threat wounds name their cause; both failed before the fix) |
-| `click.js` / `click-phone.js` (jsdom, real buttons, every mode) | see the commit that adds this table |
+| `click.js` / `click-phone.js` (jsdom, real buttons, every mode) | 0 errors (desktop 398 s, phone 427 s) |
 | `lay-phone.js` at 390x844, 390x763, 390x664, 375x553, 412x780, 844x390, 750x342 | 0 problems at every size |
 | `lay.js` at 1366x768, 1920x1080, 768x1024, 1100x700 | all pass. The extra 390x844 entry times out clicking the Camp button, which the phone layout hides. It fails the same way on the old build, so the problem is in the test. |
 | `net/p2p-rc.js` (real WebRTC, host + client) | states agree, 0 errors (398 s) |
