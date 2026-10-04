@@ -106,6 +106,8 @@ function startRound(G) {
 }
 function rollDice(G) {
   for (let s = 0; s < 2; s++) for (let i = 0; i < 4; i++) { const d = G.dice[s][i]; d.v = d6(G); d.u = false; }
+  // guided flights use made-up hands so each lesson has a die to teach with: G.script[round] = [[pilot x4], [co-pilot x4]]
+  if (G.script && G.script[G.round]) for (let s = 0; s < 2; s++) for (let i = 0; i < 4; i++) G.dice[s][i].v = G.script[G.round][s][i];
   G.phase = 'place'; G.turn = G.first;
   ev(G, { t: 'roll' }); lg(G, 'Both crew roll their dice behind the screens. Silence in the cockpit.');
 }
@@ -357,7 +359,7 @@ function same(a, b) {
 // ---------- hidden information ----------
 // What a seat may know: its own dice values, everything public (slots, tracks, tokens, who has dice left, who has chosen a reroll).
 function stripView(G, seat) {
-  const V = clone(G); V.rng = 0; V.seed = 0;
+  const V = clone(G); V.rng = 0; V.seed = 0; delete V.script;
   for (let s = 0; s < 2; s++) if (s !== seat) { for (const d of V.dice[s]) d.v = 0; }
   if (V.pend && V.pend.h === 'rr') V.pend.d.m = V.pend.d.m.map((m, s) => s === seat ? m : (m ? [] : null));
   if (V.pend && V.pend.h === 'wt' && V.pend.d.a !== seat) V.pend.d.ai = -1;
