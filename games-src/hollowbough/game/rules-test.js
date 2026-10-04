@@ -639,5 +639,12 @@ test('invariants hold after a long random game with every pending decision answe
   ok(G.phase === 'over', 'finishes');
 });
 
+test('log speaks to "You" in the second person (You place / You prepare / You pass, never "You places")', () => {
+  const G = HB.newGame({ players: [{ name: 'You' }, { name: 'Bramble' }], seed: 5 }); let n = 0, r = 9;
+  while (G.phase !== 'over' && n++ < 3000) { const a = HB.actor(G); const ms = HB.moves(G, a); r = (r * 1103515245 + 12345) >>> 0; const nm = ms.filter(m => m.type !== 'pass'); HB.apply(G, nm.length && n < 2500 ? nm[r % nm.length] : ms[0]); }
+  const bad = G.log.map(x => x.t).filter(t => /\bYou (?!pass\b)\w+s\b/.test(t) && !/\bYou (has|is)\b/.test(t) || /\bYou (has|is|wins|goes)\b/.test(t));
+  ok(!bad.length, 'third-person verbs for You: ' + bad.slice(0, 3).join(' | '));
+});
+
 console.log('\nrules-test: ' + pass + ' passed, ' + fail + ' failed (' + (pass + fail) + ' tests)');
 process.exit(fail ? 1 : 0);

@@ -186,9 +186,9 @@ function tileFace(t, big) {
     case 'basic': f.appendChild(items(basicItems(t.i), px)); break;
     case 'forest': f.appendChild(items(FIC[D.forest[G.forest[t.i]].key] || [['any', '']], px)); break;
     case 'haven': f.appendChild(items([['haven', ''], ['any', '']], px)); break;
-    case 'journey': f.appendChild(items([['road', ''], ['point', '2-5']], px)); break;
-    case 'deck': f.appendChild(h('div.its', h('span.it', ic('deck', px), h('b', G.deck.length)))); break;
-    case 'disc': f.appendChild(h('div.its', h('span.it', ic('discard', px), h('b', G.discard.length)))); break;
+    case 'journey': f.appendChild(items([['road', ''], ['point', '2-5']], px)); if (!big) f.appendChild(h('div.tl', 'Long Road')); break;
+    case 'deck': f.appendChild(h('div.its', h('span.it', ic('deck', px), h('b', G.deck.length)))); if (!big) f.appendChild(h('div.tl', 'draw pile')); break;
+    case 'disc': f.appendChild(h('div.its', h('span.it', ic('discard', px), h('b', G.discard.length)))); if (!big) f.appendChild(h('div.tl', 'discards')); break;
     case 'tree': { const s = G.players[Math.max(0, viewSeat() >= 0 ? viewSeat() : (G.phase === 'over' ? 0 : HB.actor(G)))]; f.appendChild(h('div.its', h('span.it', HBKit.season(SEAS[s ? s.season : 0], px + 4)))); break; }
     case 'bev': { const e = G.bev[t.i], dd = D.basicEvents[e.k], need = Object.keys(dd.need)[0]; const col = HBKit.TYPES[need] ? HBKit.TYPES[need].c : '#888'; f.style.setProperty('--ec', col); f.appendChild(h('div.its', h('span.it', ic('flag', px), h('b', dd.pts)))); break; }
     case 'sev': { const e = G.sev[t.i], dd = D.specialEvents[e.k]; f.style.setProperty('--ec', '#7f5496'); f.appendChild(h('div.its', h('span.it', ic('star', px), dd.pts ? h('b', dd.pts) : h('b', '?')))); break; }
@@ -244,19 +244,20 @@ function renderBoard() {
 // ===================== part 3: the dock (chips, resources, city and hand strips, prompt) =====================
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) return v; if (UI.focus != null && UI.focus < G.np) return UI.focus; return Math.max(0, G.phase === 'over' ? 0 : Math.min(G.np - 1, G.cur)); }
-function stripW() { return isPh() ? 46 : 58; }
+// phone cards shrink so a full hand of 8 fits across the dock without sideways scrolling
+function stripW() { if (!isPh()) return 58; const d = $('#dock'), w = (d && d.clientWidth) || innerWidth, v = viewSeat(); const n = Math.max(6, v >= 0 ? G.players[v].hand.length : 6, UI.tab === 'city' ? G.players[focusSeat()].city.length : 0); return Math.max(36, Math.min(56, Math.floor((w - 16 - (n - 1) * 4) / n))); }
 function promptText() {
   if (!G) return '';
   if (G.phase === 'over') return 'The game is over.';
   const a = HB.actor(G), p = G.players[a];
-  if (UI.cards.length) return 'Read the card, then Continue.';
+  if (UI.cards.length) return 'Read the card below, then tap its button.';
   if (NET.on && !p.ai && a !== viewSeat()) return p.name + ' is deciding…';
   if (hotSeat() && UI.holder !== a && !p.ai) return 'Pass the device to ' + p.name + '.';
   if (p.ai) { const l = G.log.length ? G.log[G.log.length - 1].t : ''; return p.name + ' is playing… ' + (UI.lastAi || ''); }
   if (G.q) return G.q.title;
   const n = availW(p);
   const pre = NET.on ? 'Your turn. ' : hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
-  return pre + (n > 0 ? 'Tap a place for a worker (' + n + ' free) or a card to play.' : 'No workers left: play a card, Prepare for ' + (p.season < 3 ? SEASN[p.season + 1] : 'the end') + ', or Pass.');
+  return pre + (n > 0 ? 'Tap a glowing place for a worker (' + n + ' free) or a card to play.' : p.season < 3 ? 'All workers are out: play a card or Prepare for ' + SEASN[p.season + 1] + ' to get them back.' : 'Last season, no workers left: play a card, or Pass when you are done.');
 }
 function chipEl(s) {
   const grim = s === 'G', p = grim ? null : G.players[s];
@@ -266,7 +267,7 @@ function chipEl(s) {
   const turn = G.phase !== 'over' && !grim && HB.actor(G) === s;
   const e = h('button.chip' + (turn ? '.turn' : '') + (s === viewSeat() ? '.me' : ''), { 'data-a': 'chip', 'data-seat': s, type: 'button', 'aria-label': pname(s) + ': ' + pts + ' points, ' + cards + ' cards in city' + (grim ? '' : ', ' + wk + ' workers free') });
   e.style.borderColor = pcolor(s).c;
-  e.appendChild(h('span.cn', pawn(s, 15), h('b', pname(s)), p ? h('span.cs', HBKit.season(SEAS[p.season], 16)) : null, p && p.passed ? h('i', 'out') : null));
+  e.appendChild(h('span.cn', pawn(s, 15), h('b', pname(s)), p ? h('span.cs', HBKit.season(SEAS[p.season], 16)) : null, p && p.passed ? h('i', 'done') : null));
   e.appendChild(h('span.cl', h('span', '★' + pts), h('span', '▢' + cards), p ? h('span', '⚑' + wk) : h('span', 'solo')));
   return e;
 }
@@ -291,7 +292,9 @@ function renderActs() {
   const prep = ms.find(m => m.type === 'prepare'), pass = ms.find(m => m.type === 'pass');
   const rec = UI.rec && UI.rec.m;
   a.appendChild(h('button.btn' + (prep ? '' : '.dis') + (rec && rec.type === 'prepare' ? '.rec' : ''), { 'data-a': 'prep', type: 'button', disabled: prep ? null : true }, prep ? 'Prepare: ' + SEASN[p.season + 1] : (mine && p.season >= 3 ? 'Last season' : 'Prepare')));
-  a.appendChild(h('button.btn' + (pass ? '' : '.dis') + (rec && rec.type === 'pass' ? '.rec' : ''), { 'data-a': 'pass', type: 'button', disabled: pass ? null : true }, 'Pass'));
+  // Pass ends your game: keep it quiet until it is the only sensible thing left (no workers, last season)
+  const passMain = pass && p.season >= 3 && availW(p) === 0;
+  a.appendChild(h('button.btn' + (passMain ? '' : '.quiet') + (pass ? '' : '.dis') + (rec && rec.type === 'pass' ? '.rec' : ''), { 'data-a': 'pass', type: 'button', disabled: pass ? null : true }, passMain ? 'Pass (end my game)' : 'Pass'));
   a.appendChild(h('button.btn.alt' + (mine ? '' : '.dis'), { 'data-a': 'hint', type: 'button', disabled: mine ? null : true }, 'Hint'));
   if (GX.undo.can() && !p.ai && act === viewSeat()) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶ Undo'));
 }
@@ -321,8 +324,8 @@ function renderDock() {
   if (!G) return;
   $('#prompt').textContent = promptText();
   $('#prompt').classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai && (!NET.on || HB.actor(G) === viewSeat())));
-  renderChips(); renderRes(); renderActs(); renderStrips();
-  const t = $('#barstat'); if (t) { const p = G.players[Math.max(0, focusSeat())]; t.innerHTML = ''; t.appendChild(HBKit.season(SEAS[p.season], 22)); t.appendChild(h('span', SEASN[p.season] + (G.phase === 'over' ? ' · over' : ''))); }
+  renderChips(); renderRes(); renderActs(); renderStrips(); stripTabs();
+  const t = $('#barstat'); if (t) { const p = G.players[Math.max(0, focusSeat())]; t.innerHTML = ''; t.appendChild(HBKit.season(SEAS[p.season], 22)); t.appendChild(h('span', SEASN[p.season] + (G.phase === 'over' ? ' · over' : ''))); t.appendChild(raceEl()); }
 }
 // place the prompt: in the bar on phones, in the dock otherwise
 function placePrompt() {
@@ -346,6 +349,7 @@ function why(m, seat) {
   const p = G.players[seat];
   if (m.type === 'prepare') return 'All your workers are out. Preparing brings them home' + (p.season === 0 ? ', gives you a new worker and runs your production cards.' : p.season === 1 ? ', gives you a new worker and lets you take 2 cards from the meadow.' : ', gives you 2 new workers and runs your production cards.');
   if (m.type === 'pass') return 'There is little left worth doing, so ending your game now is reasonable.';
+  if (m.type === 'worker' && m.k !== 'event' && m.k !== 'journey') { const u = unlocks(m, seat); if (u) return u; }
   if (m.type === 'worker') {
     if (m.k === 'basic') { const b = D.basic[m.i]; return 'A solid, simple gain: ' + b.text.replace(/ Shared\.$/, '').toLowerCase() + (b.shared ? ' (it never fills up).' : ' (only one worker fits, so it may be gone next turn).'); }
     if (m.k === 'forest') return D.forest[G.forest[m.i]].text + ' This forest place is only open to one worker.';
@@ -365,6 +369,22 @@ function why(m, seat) {
     return s;
   }
   if (m.type === 'choose' && G.q) return 'The computer helper would pick this one.';
+  return '';
+}
+// the honest reason for a gathering move: which cards (hand or meadow) it lets you pay for that you can't pay for now
+function unlocks(m, seat) {
+  try {
+    const p = G.players[seat], G2 = JSON.parse(JSON.stringify(G)); G2.nolog = true;
+    if (!HB.apply(G2, m).ok || G2.q) return '';
+    const r2 = G2.players[seat].res, can = (c, r) => RESK.every(k => (c.cost[k] || 0) <= r[k]);
+    const pool = p.hand.concat(G.meadow.filter(id => id >= 0));
+    const room = HB.cityCount(G, seat) < 15;
+    const nu = [...new Set(pool.filter(id => room && !can(cdef(id), p.res) && can(cdef(id), r2) && !(cdef(id).unique && p.city.some(e => cdef(e.id).key === cdef(id).key))).map(cname))];
+    const gain = RESK.map(k => r2[k] - p.res[k]).reduce((a, b) => a + b, 0), cards = G2.players[seat].hand.length - p.hand.length;
+    const what = (gain ? gain + ' resource' + (gain > 1 ? 's' : '') : '') + (gain && cards > 0 ? ' and ' : '') + (cards > 0 ? cards + ' card' + (cards > 1 ? 's' : '') : '');
+    if (nu.length) return 'It gets you ' + (what || 'what you need') + '. Then you can pay for ' + nu.slice(0, 3).join(', ') + (nu.length > 3 ? ' and more' : '') + ', which you cannot afford now.';
+    if (what) return 'It gets you ' + what + '. Nothing new becomes affordable yet, but the helper rates this the best move right now.';
+  } catch (e) { }
   return '';
 }
 // ---- popup shell
@@ -429,6 +449,7 @@ function openTile(kind, i) {
       const evo = isEv ? (kind === 'bev' ? G.bev : G.sev)[i] : null;
       p.appendChild(popHead(isEv ? nm : 'Place a worker here?', isEv ? 'Event' : nm));
       if (!isEv) body.appendChild(h('div.gain', h('b', 'You gain: '), info.text.replace(/ Shared\.$/, '')));
+      if (!isEv && v >= 0 && /card/i.test(info.text) && G.players[v].hand.length >= 8) body.appendChild(reasonBox('Your hand is full (8/8): any cards from here are lost.'));
       else {
         body.appendChild(h('p', info.text));
         const need = h('ul.need');
@@ -531,7 +552,7 @@ function openPrep() {
     const body = h('div.ph-body');
     body.appendChild(h('div.seasonrow', HBKit.season(SEAS[p.season], 34), h('span', '→'), HBKit.season(SEAS[nx], 44)));
     const ul = h('ul.need');
-    ul.appendChild(h('li', 'Your ' + p.dep.filter(d => !d.perm).length + ' placed workers come home (workers on the Long Road, Abbey and Rest stay).'));
+    ul.appendChild(h('li', 'Your ' + p.dep.filter(d => !d.perm).length + ' placed workers come home (a worker on the Long Road stays there for good).'));
     ul.appendChild(h('li', 'You get ' + [1, 1, 2][p.season] + ' new worker' + ([1, 1, 2][p.season] > 1 ? 's' : '') + ' (' + (p.workers + [1, 1, 2][p.season]) + ' in total).'));
     ul.appendChild(h('li', nx === 2 ? 'Take up to 2 cards from the meadow.' : 'All your green Production cards gather their goods, in any order you like.'));
     if (nx === 3) ul.appendChild(h('li', 'Autumn is the last season. The Long Road opens.'));
@@ -572,7 +593,7 @@ function openHint() {
 }
 // ---- pending decision card (one at a time)
 function qHint(k) {
-  return ({ discard: 'Tap a card to discard it. Tap Done when you have finished.', resource: 'Pick the resource you want.', meadow: 'Tap a card to take it.', production: 'Production cards run one after another. Pick the next one.', ruins: 'The razed card goes away and you get its cost back.', recipient: 'Pick which rival receives it.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Several effects fired at once. Choose the order.', queen: 'The Queen plays a cheap card for free.', inn: 'The Inn plays a meadow card for 3 fewer resources.', university: 'The University disbands one of your cards and refunds it.', cemetery: 'Reveal cards from the pile, then play one for free.', copy: 'Pick which location to copy.' })[k] || '';
+  return ({ discard: 'Tap a card to discard it. Tap Done when you have finished.', resource: 'Pick the resource you want.', meadow: 'Tap a card to take it.', production: 'Every one of them will run. Just pick which goes next.', ruins: 'The razed card goes away and you get its cost back.', recipient: 'Pick which rival receives it.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Several effects fired at once. Choose the order.', queen: 'The Thistle Regent plays a cheap card for free.', inn: 'The Lantern Rest plays a meadow card for 3 fewer resources.', university: 'The Lorewood College disbands one of your cards and refunds it.', cemetery: 'Reveal cards from the pile, then play one for free.', copy: 'Pick which location to copy.' })[k] || '';
 }
 function renderQ() {
   const pc = $('#pc');
@@ -617,7 +638,7 @@ function newGame(mode, o) {
   else { players = [{ name: 'You', ai: null }]; for (let i = 1; i < cfg.np; i++) players.push({ name: PNAMES[i - 1], ai: (o.levels && o.levels[i - 1]) || cfg.level }); }
   G = HB.newGame({ players, solo, seed: UI.seed != null ? UI.seed : undefined });
   UI.seed = null;
-  UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
+  UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0; UI.mapShown = false; UI.scoreAudit = { n: 0, miss: [] };
   UI.holder = hotSeat() ? -1 : -1;
   UI.coach = { level: UI.coach && UI.coach.level || 'full', seen: {} };
   if (mode !== 'guided') UI.coachOn = false; else UI.coachOn = true;
@@ -653,7 +674,7 @@ function renderCard() {
   const body = h('div.ph-body'); const b = typeof c.body === 'function' ? c.body() : c.body; add(body, b);
   const btns = h('div.cbtns');
   (c.buttons || [{ label: 'Continue', a: 'cont' }]).forEach(x => btns.appendChild(h('button.btn.go' + (x.cls ? '.' + x.cls : ''), Object.assign({ 'data-a': x.a, type: 'button' }, x.at || {}), x.label)));
-  body.appendChild(btns); pc.appendChild(body);
+  pc.appendChild(body); pc.appendChild(btns);
 }
 function nextCard() { const c = UI.cards.shift(); if (c && c.onDone) c.onDone(); render(); schedule(); }
 function takeDevice() { const c = UI.cards.shift(); UI.holder = c && c.seat != null ? c.seat : HB.actor(G); render(); schedule(); }
@@ -670,21 +691,21 @@ function schedule() {
     pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', p.name + ', take the device. Nobody else should look at the screen. Your hand and resources appear when you tap the button.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
     return;
   }
-  if (UI.coachOn && coachCheck()) return;
+  if (UI.coachOn ? coachCheck() : mapCard()) return;
   if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
   if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
 }
 function aiStep() {
   UI.tm = 0; if (isClient() || !G || G.phase === 'over' || (UI.cards.length && !NET.on)) return;
   const a = HB.actor(G); if (a < 0) return; const p = G.players[a]; if (!p.ai) { schedule(); return; }
-  const n0 = G.logN; let m;
+  const n0 = G.logN, b4 = ptsSnap(); let m;
   try { m = HB.AI.choose(G, a); } catch (e) { m = HB.moves(G, a)[0]; console.error('AI error', e); }
   const pre = sndPre();
   let r = HB.apply(G, m);
   if (r.ok) sndPost(pre, m, a);
   if (!r.ok) { const ms = HB.moves(G, a); r = HB.apply(G, ms[0]); }
   const ls = logSince(n0); UI.lastAi = ls.length ? ls[0].replace(/^[^ ]+ /, '') : '';
-  GX.recap.push(ls, a);
+  GX.recap.push(ls.concat(ptsShow(ptsExplain(b4), a)), a);
   afterMove();
 }
 function afterMove() { save(); render(); sndMusic(); schedule(); if (NET.on) netPush(); }
@@ -692,15 +713,15 @@ function act(m) {
   if (!G || !m) return; const a = HB.actor(G);
   if (isClient()) { netAct(m); return; }
   if (NET.on && a !== NET.mySeat) return;
-  const n0 = G.logN;
-  if (m.type === 'prepare' && !NET.on) UI.after.push({ kind: 'season', seat: a, from: n0 });
+  const n0 = G.logN, b4 = ptsSnap();
+  if (m.type === 'prepare' && !NET.on) UI.after.push({ kind: 'season', seat: a, from: n0, b4 });
   const pre = sndPre();
   if (!G.players[a].ai) GX.undo.snap(m.label || m.type);
   const r = HB.apply(G, m);
   closePop(); UI.rec = null;
   if (r.ok) sndPost(pre, m, a);
   if (!r.ok) { snd('error'); UI.after.pop(); GX.undo.drop(); toast(r.error || 'That move is not allowed.'); render(); return; }
-  GX.undo.check(revealed); GX.recap.mark(a); GX.recap.push(logSince(n0), a);
+  GX.undo.check(revealed); GX.recap.mark(a); { const px = ptsExplain(b4); GX.recap.push(logSince(n0).concat(ptsShow(px, a)), a); if (a === viewSeat() && !G.q) gainBanner(UI.b4q || b4, a, ptsExplain(UI.b4q || b4)); if (G.q) { UI.b4q = UI.b4q || b4; } else UI.b4q = null; }
   UI.lastAi = ''; afterMove();
 }
 function choose(i) { const a = HB.actor(G); const m = movesFor(a).find(x => x.type === 'choose' && x.i === i); if (m) act(m); }
@@ -709,7 +730,7 @@ function flushAfter() {
   const lines = G.log.filter(x => x.i > e.from).map(x => x.t).slice(-14);
   const p = G.players[e.seat];
   const s = p.season;
-  pushCard({ kind: 'season', title: SEASN[s] + ' has come', sub: p.name + ' prepared for ' + SEASN[s], body: () => h('div', h('div.seasonrow', HBKit.season(SEAS[s], 56)), h('ul.need', lines.map(t => h('li', t)))), });
+  pushCard({ kind: 'season', title: SEASN[s] + ' has come', sub: p.name + ' prepared for ' + SEASN[s], body: () => { const g = e.b4 ? gainParts(e.b4, e.seat) : []; return h('div', h('div.seasonrow', HBKit.season(SEAS[s], 56)), g.length ? h('div.gain', h('b', 'You got: '), g.join(', ')) : null, h('ul.need', lines.map(t => h('li', t)))); }, });
   return true;
 }
 // ---- end of game: one card per player, then the result
@@ -742,7 +763,7 @@ function loadSave() {
   try {
     const s = JSON.parse(localStorage.getItem(SAVEKEY)); if (!s || !s.G) return false;
     G = s.G; UI.mode = s.mode; UI.cfg = s.cfg; UI.coach = s.coach || { level: 'full', seen: {} }; UI.coachOn = !!s.coachOn;
-    UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.overShown = false; UI.started = true; UI.holder = -1; UI.lastAi = ''; UI.focus = 0;
+    UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.overShown = false; UI.started = true; UI.holder = -1; UI.lastAi = ''; UI.focus = 0; UI.mapShown = true;
     const st = $('#start'); if (st) st.hidden = true; try { GX.close(); } catch (e) { }
     kitNewGame();
     render(); schedule(); return true;
@@ -750,7 +771,8 @@ function loadSave() {
 }
 // ===================== part 6: coach, drawers (log, rules, menu, rivals), start screen, events, phone mode, boot =====================
 const COACH = [
-  { id: 'welcome', light: 1, t: 'Welcome to Hollowbough', x: 'You lead a small band of woodland creatures. Over the game you build a city of up to 15 cards and send workers out to gather. When everyone has finished, the city with the most points wins.' },
+  { id: 'welcome', light: 1, t: 'Welcome to Hollowbough', x: 'You build a woodland city of up to 15 cards. Most points when everyone has passed wins. Every change to your points pops up with its reason.' },
+  { id: 'map', light: 1, t: 'The board, top to bottom', x: () => boardMap() },
   { id: 'turn', light: 1, t: 'One thing per turn', x: 'On your turn you do exactly one thing: place a worker on a location, play a card, or Prepare for the next season. You start with 2 workers.' },
   { id: 'board', t: 'The shared board', x: 'The glowing places are open to you. Tap one to see what it gives, then place a worker. Most places hold only one worker, so the good ones can be taken before your next turn.', when: (p, v) => myMoves().some(m => m.type === 'worker') },
   { id: 'cards', t: 'Cards', x: 'Tap a card in your hand, or one of the eight in the meadow on the board, to see its price. Pay with resources, or play a critter free when you already own its matching building (it is named on the card).', when: (p) => p.dep.length > 0 && p.hand.length > 0 },
@@ -769,7 +791,7 @@ function coachCheck() {
     if (UI.coach.seen[c.id]) continue; if (lv === 'light' && !c.light) continue;
     if (c.when && !c.when(p, v)) continue;
     UI.coach.seen[c.id] = 1;
-    pushCard({ kind: 'coach', title: c.t, sub: 'Guide', body: h('p', c.x), buttons: [{ label: 'Got it', a: 'cont' }] });
+    pushCard({ kind: 'coach', title: c.t, sub: 'Guide', body: typeof c.x === 'function' ? c.x() : h('p', c.x), buttons: [{ label: 'Got it', a: 'cont' }] });
     return true;
   }
   return false;
@@ -1027,3 +1049,113 @@ document.addEventListener('click', ev => {
   else if (a === 'refcard') { closePop(); GX.refOpen(refCardId(+t.dataset.id)); }
 });
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !GX.open && GX.undo.can()) { e.preventDefault(); doUndo(); } });
+// ===================== part 9: clarity (every point change gets a cause, hand/city tabs on phones) =====================
+// ---- points: snapshot every seat's score before a move, then say what changed and why
+function ptsSnap() {
+  return G.players.map((p, s) => { const sc = score(s); return { sc, res: Object.assign({}, p.res), hand: p.hand.length, workers: p.workers, city: p.city.map(e => e.id), bonus: Object.fromEntries((sc.detail || []).map(d => [d.card, d.bonus])), bev: G.bev.map(e => e.o), sev: G.sev.map(e => e.o) }; });
+}
+const sgn = n => (n > 0 ? '+' : '−') + Math.abs(n);
+// returns [{seat, d, parts:[text...]}] for every seat whose total changed
+function ptsExplain(before) {
+  if (!before || !G) return [];
+  const out = [];
+  G.players.forEach((p, s) => {
+    const a = before[s], sc = score(s); if (!a) return;
+    const d = sc.total - a.sc.total; if (!d) return;
+    const parts = []; let acc = 0;
+    // printed points of cards that came or went
+    const now = p.city.map(e => e.id), was = a.city.slice();
+    const added = now.filter(id => { const i = was.indexOf(id); if (i >= 0) { was.splice(i, 1); return false; } return true; });
+    added.forEach(id => { const v = cdef(id).pts; if (v) { parts.push(sgn(v) + ' ' + cname(id) + ' (printed points)'); acc += v; } });
+    was.forEach(id => { const v = cdef(id).pts; if (v) { parts.push(sgn(-v) + ' ' + cname(id) + ' left the city'); acc -= v; } });
+    const rest = (sc.cards - a.sc.cards) - acc; if (rest) { parts.push(sgn(rest) + ' printed card points'); acc += rest; }
+    const tk = sc.tokens - a.sc.tokens; if (tk) { parts.push(sgn(tk) + ' point token' + (Math.abs(tk) > 1 ? 's' : '')); acc += tk; }
+    const nb = Object.fromEntries((sc.detail || []).map(x => [x.card, x.bonus])); let bacc = 0;
+    new Set(Object.keys(nb).concat(Object.keys(a.bonus))).forEach(k => { const v = (nb[k] || 0) - (a.bonus[k] || 0); if (v) { parts.push(sgn(v) + ' ' + cname(+k) + ' bonus (purple card)'); bacc += v; } });
+    if (sc.bonus - a.sc.bonus - bacc) parts.push(sgn(sc.bonus - a.sc.bonus - bacc) + ' purple card bonus');
+    acc += sc.bonus - a.sc.bonus;
+    const ev = sc.events - a.sc.events;
+    if (ev) {
+      const names = []; G.bev.forEach((e, i) => { if (e.o === s && a.bev[i] !== s) names.push(D.basicEvents[e.k].name); }); G.sev.forEach((e, i) => { if (e.o === s && a.sev[i] !== s) names.push(D.specialEvents[e.k].name); });
+      parts.push(sgn(ev) + ' event' + (names.length ? ': ' + names.join(', ') : '')); acc += ev;
+    }
+    const jr = sc.journey - a.sc.journey; if (jr) { parts.push(sgn(jr) + ' the Long Road (that worker stays and scores)'); acc += jr; }
+    if (acc !== d) parts.push(sgn(d - acc) + ' other');
+    out.push({ seat: s, d, parts });
+  });
+  return out;
+}
+function ptsLine(x) { return pname(x.seat) + ' ' + sgn(x.d) + ' ★ (' + x.parts.join('; ') + ')'; }
+// show the changes: your own as a points banner, the others' inside the "Since your turn" list
+function ptsShow(list, mover) {
+  UI.scoreAudit = UI.scoreAudit || { n: 0, miss: [] };
+  const lines = [];
+  for (const x of list) {
+    UI.scoreAudit.n++;
+    if (!x.parts.length || x.parts.some(t => / other$/.test(t))) UI.scoreAudit.miss.push(ptsLine(x));
+    lines.push(ptsLine(x));
+  }
+  if (!lines.length) return [];
+  return lines;
+}
+// what the move did for the player who made it: resources, cards, workers (and points, with their causes)
+function gainParts(b, s) {
+  const p = G.players[s], a = b[s], o = [];
+  for (const k of RESK) { const d = p.res[k] - a.res[k]; if (d) o.push(sgn(d) + ' ' + rname(k, Math.abs(d))); }
+  const hd = p.hand.length - a.hand; if (hd) o.push(sgn(hd) + ' card' + (Math.abs(hd) > 1 ? 's' : '') + ' in hand');
+  const wd = p.workers - a.workers; if (wd) o.push(sgn(wd) + ' worker' + (wd > 1 ? 's' : '') + ' (' + p.workers + ' now)');
+  return o;
+}
+function gainBanner(b, s, pts) {
+  const x = pts.find(y => y.seat === s), g = gainParts(b, s);
+  if (!x && !g.length) return;
+  ptsBanner(x ? x.d : 0, (x ? x.parts : []).concat(g));
+}
+function ptsBanner(d, parts) {
+  const e = $('#ptsb'); if (!e) return;
+  e.innerHTML = ''; e.className = d < 0 ? 'down' : 'up';
+  e.appendChild(h('b', d ? (d > 0 ? '+' : '−') + Math.abs(d) + ' ★' : 'You:')); e.appendChild(h('span', parts.join(' · ')));
+  e.hidden = false; clearTimeout(UI.ptsT); UI.ptsT = setTimeout(() => { e.hidden = true; }, 4200);
+}
+// ---- phones: one strip at a time (Hand or City), switched by two tabs
+function stripTabs() {
+  const t = $('#stabs'); if (!t) return;
+  const ph = isPh(); t.hidden = !ph;
+  const s = focusSeat(), v = viewSeat(), p = G.players[s];
+  const city = ph && UI.tab === 'city';
+  $('#cityS').classList.toggle('off', ph && !city); $('#handS').classList.toggle('off', ph && city);
+  if (!ph) return;
+  t.innerHTML = '';
+  const hn = v >= 0 ? G.players[v].hand.length : 0;
+  const cityOk = $$('#cityRow .sc.ok,#cityRow .sc.rec').length;
+  t.appendChild(h('button.tab' + (city ? '' : '.on'), { 'data-a': 'tab', 'data-v': 'hand', type: 'button', 'aria-pressed': String(!city) }, (v >= 0 ? 'Your hand ' + hn + '/8' : 'Hand')));
+  t.appendChild(h('button.tab' + (city ? '.on' : '') + (cityOk && !city ? '.glow' : ''), { 'data-a': 'tab', 'data-v': 'city', type: 'button', 'aria-pressed': String(city) }, (s === v ? 'Your city ' : p.name + "'s city ") + HB.cityCount(G, s) + '/15'));
+}
+document.addEventListener('click', ev => { const t = ev.target.closest('[data-a=tab]'); if (!t) return; UI.tab = t.dataset.v; renderDock(); });
+// ---- one-card board map (guided game, and once at the start of every other game you play)
+function boardMap() {
+  const row = (ico, b, t) => h('li', h('span.mapi', ico), h('span', h('b', b), ' ' + t));
+  return h('div', h('ul.map',
+    row(ic('twig', 20), 'Brown and green tiles:', 'places for your workers. The icons show what you get. Glowing = open to you now.'),
+    row(ic('flag', 20), 'Flags and stars:', 'events. Get the cards they ask for, then a worker claims the points.'),
+    row(ic('road', 20), 'Long Road:', 'opens in your last season (Autumn): a worker there scores 2–5 points.'),
+    row(ic('deck', 20), 'Big cards:', 'the meadow. Anyone can buy them, just like cards in your hand.')),
+    h('p.sm', 'Tap anything to see what it does. Hint suggests a move and says why.'));
+}
+function mapCard() {
+  if (UI.mode === 'guided' || UI.mapShown || viewSeat() < 0 || UI.coach.level === 'off') return false;
+  UI.mapShown = true;
+  pushCard({ kind: 'coach', title: 'How to win', sub: 'Most points when everyone has passed', body: () => h('div', h('p', 'Each turn do one thing: place a worker, play a card, or Prepare for the next season once all your workers are out.'), boardMap()), buttons: [{ label: 'Got it', a: 'cont' }] });
+  return true;
+}
+// ---- the score race, always visible in the top bar: you, then the leader among the others
+function raceEl() {
+  const v = viewSeat() >= 0 ? viewSeat() : focusSeat();
+  const rows = G.players.map((p, s) => ({ s, n: s === viewSeat() ? 'You' : p.name, t: score(s).total, out: p.passed }));
+  if (G.grim) rows.push({ s: 'G', n: D.soloName.split(' ').pop(), t: HB.grimScore(G).total });
+  const me = rows.find(r => r.s === v), others = rows.filter(r => r !== me).sort((a, b) => b.t - a.t);
+  const show = [me].concat(others.slice(0, G.np > 2 ? 1 : 2)).filter(Boolean);
+  const e = h('span.race', { 'aria-label': 'Points so far: ' + rows.map(r => r.n + ' ' + r.t).join(', ') });
+  show.forEach((r, k) => e.appendChild(h('span', '★' + r.t + ' ' + r.n, r.out ? h('i', ' (done)') : null)));
+  return e;
+}

@@ -16,7 +16,7 @@ function newGame(mode, o) {
   else { players = [{ name: 'You', ai: null }]; for (let i = 1; i < cfg.np; i++) players.push({ name: PNAMES[i - 1], ai: (o.levels && o.levels[i - 1]) || cfg.level }); }
   G = HB.newGame({ players, solo, seed: UI.seed != null ? UI.seed : undefined });
   UI.seed = null;
-  UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
+  UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0; UI.mapShown = false; UI.scoreAudit = { n: 0, miss: [] };
   UI.holder = hotSeat() ? -1 : -1;
   UI.coach = { level: UI.coach && UI.coach.level || 'full', seen: {} };
   if (mode !== 'guided') UI.coachOn = false; else UI.coachOn = true;
@@ -52,7 +52,7 @@ function renderCard() {
   const body = h('div.ph-body'); const b = typeof c.body === 'function' ? c.body() : c.body; add(body, b);
   const btns = h('div.cbtns');
   (c.buttons || [{ label: 'Continue', a: 'cont' }]).forEach(x => btns.appendChild(h('button.btn.go' + (x.cls ? '.' + x.cls : ''), Object.assign({ 'data-a': x.a, type: 'button' }, x.at || {}), x.label)));
-  body.appendChild(btns); pc.appendChild(body);
+  pc.appendChild(body); pc.appendChild(btns);
 }
 function nextCard() { const c = UI.cards.shift(); if (c && c.onDone) c.onDone(); render(); schedule(); }
 function takeDevice() { const c = UI.cards.shift(); UI.holder = c && c.seat != null ? c.seat : HB.actor(G); render(); schedule(); }
@@ -69,21 +69,21 @@ function schedule() {
     pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', p.name + ', take the device. Nobody else should look at the screen. Your hand and resources appear when you tap the button.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
     return;
   }
-  if (UI.coachOn && coachCheck()) return;
+  if (UI.coachOn ? coachCheck() : mapCard()) return;
   if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
   if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
 }
 function aiStep() {
   UI.tm = 0; if (isClient() || !G || G.phase === 'over' || (UI.cards.length && !NET.on)) return;
   const a = HB.actor(G); if (a < 0) return; const p = G.players[a]; if (!p.ai) { schedule(); return; }
-  const n0 = G.logN; let m;
+  const n0 = G.logN, b4 = ptsSnap(); let m;
   try { m = HB.AI.choose(G, a); } catch (e) { m = HB.moves(G, a)[0]; console.error('AI error', e); }
   const pre = sndPre();
   let r = HB.apply(G, m);
   if (r.ok) sndPost(pre, m, a);
   if (!r.ok) { const ms = HB.moves(G, a); r = HB.apply(G, ms[0]); }
   const ls = logSince(n0); UI.lastAi = ls.length ? ls[0].replace(/^[^ ]+ /, '') : '';
-  GX.recap.push(ls, a);
+  GX.recap.push(ls.concat(ptsShow(ptsExplain(b4), a)), a);
   afterMove();
 }
 function afterMove() { save(); render(); sndMusic(); schedule(); if (NET.on) netPush(); }
@@ -91,15 +91,15 @@ function act(m) {
   if (!G || !m) return; const a = HB.actor(G);
   if (isClient()) { netAct(m); return; }
   if (NET.on && a !== NET.mySeat) return;
-  const n0 = G.logN;
-  if (m.type === 'prepare' && !NET.on) UI.after.push({ kind: 'season', seat: a, from: n0 });
+  const n0 = G.logN, b4 = ptsSnap();
+  if (m.type === 'prepare' && !NET.on) UI.after.push({ kind: 'season', seat: a, from: n0, b4 });
   const pre = sndPre();
   if (!G.players[a].ai) GX.undo.snap(m.label || m.type);
   const r = HB.apply(G, m);
   closePop(); UI.rec = null;
   if (r.ok) sndPost(pre, m, a);
   if (!r.ok) { snd('error'); UI.after.pop(); GX.undo.drop(); toast(r.error || 'That move is not allowed.'); render(); return; }
-  GX.undo.check(revealed); GX.recap.mark(a); GX.recap.push(logSince(n0), a);
+  GX.undo.check(revealed); GX.recap.mark(a); { const px = ptsExplain(b4); GX.recap.push(logSince(n0).concat(ptsShow(px, a)), a); if (a === viewSeat() && !G.q) gainBanner(UI.b4q || b4, a, ptsExplain(UI.b4q || b4)); if (G.q) { UI.b4q = UI.b4q || b4; } else UI.b4q = null; }
   UI.lastAi = ''; afterMove();
 }
 function choose(i) { const a = HB.actor(G); const m = movesFor(a).find(x => x.type === 'choose' && x.i === i); if (m) act(m); }
@@ -108,7 +108,7 @@ function flushAfter() {
   const lines = G.log.filter(x => x.i > e.from).map(x => x.t).slice(-14);
   const p = G.players[e.seat];
   const s = p.season;
-  pushCard({ kind: 'season', title: SEASN[s] + ' has come', sub: p.name + ' prepared for ' + SEASN[s], body: () => h('div', h('div.seasonrow', HBKit.season(SEAS[s], 56)), h('ul.need', lines.map(t => h('li', t)))), });
+  pushCard({ kind: 'season', title: SEASN[s] + ' has come', sub: p.name + ' prepared for ' + SEASN[s], body: () => { const g = e.b4 ? gainParts(e.b4, e.seat) : []; return h('div', h('div.seasonrow', HBKit.season(SEAS[s], 56)), g.length ? h('div.gain', h('b', 'You got: '), g.join(', ')) : null, h('ul.need', lines.map(t => h('li', t)))); }, });
   return true;
 }
 // ---- end of game: one card per player, then the result
@@ -141,7 +141,7 @@ function loadSave() {
   try {
     const s = JSON.parse(localStorage.getItem(SAVEKEY)); if (!s || !s.G) return false;
     G = s.G; UI.mode = s.mode; UI.cfg = s.cfg; UI.coach = s.coach || { level: 'full', seen: {} }; UI.coachOn = !!s.coachOn;
-    UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.overShown = false; UI.started = true; UI.holder = -1; UI.lastAi = ''; UI.focus = 0;
+    UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.overShown = false; UI.started = true; UI.holder = -1; UI.lastAi = ''; UI.focus = 0; UI.mapShown = true;
     const st = $('#start'); if (st) st.hidden = true; try { GX.close(); } catch (e) { }
     kitNewGame();
     render(); schedule(); return true;

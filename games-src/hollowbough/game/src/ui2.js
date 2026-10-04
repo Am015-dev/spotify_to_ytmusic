@@ -90,9 +90,9 @@ function tileFace(t, big) {
     case 'basic': f.appendChild(items(basicItems(t.i), px)); break;
     case 'forest': f.appendChild(items(FIC[D.forest[G.forest[t.i]].key] || [['any', '']], px)); break;
     case 'haven': f.appendChild(items([['haven', ''], ['any', '']], px)); break;
-    case 'journey': f.appendChild(items([['road', ''], ['point', '2-5']], px)); break;
-    case 'deck': f.appendChild(h('div.its', h('span.it', ic('deck', px), h('b', G.deck.length)))); break;
-    case 'disc': f.appendChild(h('div.its', h('span.it', ic('discard', px), h('b', G.discard.length)))); break;
+    case 'journey': f.appendChild(items([['road', ''], ['point', '2-5']], px)); if (!big) f.appendChild(h('div.tl', 'Long Road')); break;
+    case 'deck': f.appendChild(h('div.its', h('span.it', ic('deck', px), h('b', G.deck.length)))); if (!big) f.appendChild(h('div.tl', 'draw pile')); break;
+    case 'disc': f.appendChild(h('div.its', h('span.it', ic('discard', px), h('b', G.discard.length)))); if (!big) f.appendChild(h('div.tl', 'discards')); break;
     case 'tree': { const s = G.players[Math.max(0, viewSeat() >= 0 ? viewSeat() : (G.phase === 'over' ? 0 : HB.actor(G)))]; f.appendChild(h('div.its', h('span.it', HBKit.season(SEAS[s ? s.season : 0], px + 4)))); break; }
     case 'bev': { const e = G.bev[t.i], dd = D.basicEvents[e.k], need = Object.keys(dd.need)[0]; const col = HBKit.TYPES[need] ? HBKit.TYPES[need].c : '#888'; f.style.setProperty('--ec', col); f.appendChild(h('div.its', h('span.it', ic('flag', px), h('b', dd.pts)))); break; }
     case 'sev': { const e = G.sev[t.i], dd = D.specialEvents[e.k]; f.style.setProperty('--ec', '#7f5496'); f.appendChild(h('div.its', h('span.it', ic('star', px), dd.pts ? h('b', dd.pts) : h('b', '?')))); break; }

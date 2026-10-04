@@ -14,6 +14,7 @@ function why(m, seat) {
   const p = G.players[seat];
   if (m.type === 'prepare') return 'All your workers are out. Preparing brings them home' + (p.season === 0 ? ', gives you a new worker and runs your production cards.' : p.season === 1 ? ', gives you a new worker and lets you take 2 cards from the meadow.' : ', gives you 2 new workers and runs your production cards.');
   if (m.type === 'pass') return 'There is little left worth doing, so ending your game now is reasonable.';
+  if (m.type === 'worker' && m.k !== 'event' && m.k !== 'journey') { const u = unlocks(m, seat); if (u) return u; }
   if (m.type === 'worker') {
     if (m.k === 'basic') { const b = D.basic[m.i]; return 'A solid, simple gain: ' + b.text.replace(/ Shared\.$/, '').toLowerCase() + (b.shared ? ' (it never fills up).' : ' (only one worker fits, so it may be gone next turn).'); }
     if (m.k === 'forest') return D.forest[G.forest[m.i]].text + ' This forest place is only open to one worker.';
@@ -33,6 +34,22 @@ function why(m, seat) {
     return s;
   }
   if (m.type === 'choose' && G.q) return 'The computer helper would pick this one.';
+  return '';
+}
+// the honest reason for a gathering move: which cards (hand or meadow) it lets you pay for that you can't pay for now
+function unlocks(m, seat) {
+  try {
+    const p = G.players[seat], G2 = JSON.parse(JSON.stringify(G)); G2.nolog = true;
+    if (!HB.apply(G2, m).ok || G2.q) return '';
+    const r2 = G2.players[seat].res, can = (c, r) => RESK.every(k => (c.cost[k] || 0) <= r[k]);
+    const pool = p.hand.concat(G.meadow.filter(id => id >= 0));
+    const room = HB.cityCount(G, seat) < 15;
+    const nu = [...new Set(pool.filter(id => room && !can(cdef(id), p.res) && can(cdef(id), r2) && !(cdef(id).unique && p.city.some(e => cdef(e.id).key === cdef(id).key))).map(cname))];
+    const gain = RESK.map(k => r2[k] - p.res[k]).reduce((a, b) => a + b, 0), cards = G2.players[seat].hand.length - p.hand.length;
+    const what = (gain ? gain + ' resource' + (gain > 1 ? 's' : '') : '') + (gain && cards > 0 ? ' and ' : '') + (cards > 0 ? cards + ' card' + (cards > 1 ? 's' : '') : '');
+    if (nu.length) return 'It gets you ' + (what || 'what you need') + '. Then you can pay for ' + nu.slice(0, 3).join(', ') + (nu.length > 3 ? ' and more' : '') + ', which you cannot afford now.';
+    if (what) return 'It gets you ' + what + '. Nothing new becomes affordable yet, but the helper rates this the best move right now.';
+  } catch (e) { }
   return '';
 }
 // ---- popup shell
@@ -97,6 +114,7 @@ function openTile(kind, i) {
       const evo = isEv ? (kind === 'bev' ? G.bev : G.sev)[i] : null;
       p.appendChild(popHead(isEv ? nm : 'Place a worker here?', isEv ? 'Event' : nm));
       if (!isEv) body.appendChild(h('div.gain', h('b', 'You gain: '), info.text.replace(/ Shared\.$/, '')));
+      if (!isEv && v >= 0 && /card/i.test(info.text) && G.players[v].hand.length >= 8) body.appendChild(reasonBox('Your hand is full (8/8): any cards from here are lost.'));
       else {
         body.appendChild(h('p', info.text));
         const need = h('ul.need');
@@ -199,7 +217,7 @@ function openPrep() {
     const body = h('div.ph-body');
     body.appendChild(h('div.seasonrow', HBKit.season(SEAS[p.season], 34), h('span', '→'), HBKit.season(SEAS[nx], 44)));
     const ul = h('ul.need');
-    ul.appendChild(h('li', 'Your ' + p.dep.filter(d => !d.perm).length + ' placed workers come home (workers on the Long Road, Abbey and Rest stay).'));
+    ul.appendChild(h('li', 'Your ' + p.dep.filter(d => !d.perm).length + ' placed workers come home (a worker on the Long Road stays there for good).'));
     ul.appendChild(h('li', 'You get ' + [1, 1, 2][p.season] + ' new worker' + ([1, 1, 2][p.season] > 1 ? 's' : '') + ' (' + (p.workers + [1, 1, 2][p.season]) + ' in total).'));
     ul.appendChild(h('li', nx === 2 ? 'Take up to 2 cards from the meadow.' : 'All your green Production cards gather their goods, in any order you like.'));
     if (nx === 3) ul.appendChild(h('li', 'Autumn is the last season. The Long Road opens.'));
@@ -240,7 +258,7 @@ function openHint() {
 }
 // ---- pending decision card (one at a time)
 function qHint(k) {
-  return ({ discard: 'Tap a card to discard it. Tap Done when you have finished.', resource: 'Pick the resource you want.', meadow: 'Tap a card to take it.', production: 'Production cards run one after another. Pick the next one.', ruins: 'The razed card goes away and you get its cost back.', recipient: 'Pick which rival receives it.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Several effects fired at once. Choose the order.', queen: 'The Queen plays a cheap card for free.', inn: 'The Inn plays a meadow card for 3 fewer resources.', university: 'The University disbands one of your cards and refunds it.', cemetery: 'Reveal cards from the pile, then play one for free.', copy: 'Pick which location to copy.' })[k] || '';
+  return ({ discard: 'Tap a card to discard it. Tap Done when you have finished.', resource: 'Pick the resource you want.', meadow: 'Tap a card to take it.', production: 'Every one of them will run. Just pick which goes next.', ruins: 'The razed card goes away and you get its cost back.', recipient: 'Pick which rival receives it.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Several effects fired at once. Choose the order.', queen: 'The Thistle Regent plays a cheap card for free.', inn: 'The Lantern Rest plays a meadow card for 3 fewer resources.', university: 'The Lorewood College disbands one of your cards and refunds it.', cemetery: 'Reveal cards from the pile, then play one for free.', copy: 'Pick which location to copy.' })[k] || '';
 }
 function renderQ() {
   const pc = $('#pc');

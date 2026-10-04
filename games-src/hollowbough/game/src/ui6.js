@@ -1,6 +1,7 @@
 // ===================== part 6: coach, drawers (log, rules, menu, rivals), start screen, events, phone mode, boot =====================
 const COACH = [
-  { id: 'welcome', light: 1, t: 'Welcome to Hollowbough', x: 'You lead a small band of woodland creatures. Over the game you build a city of up to 15 cards and send workers out to gather. When everyone has finished, the city with the most points wins.' },
+  { id: 'welcome', light: 1, t: 'Welcome to Hollowbough', x: 'You build a woodland city of up to 15 cards. Most points when everyone has passed wins. Every change to your points pops up with its reason.' },
+  { id: 'map', light: 1, t: 'The board, top to bottom', x: () => boardMap() },
   { id: 'turn', light: 1, t: 'One thing per turn', x: 'On your turn you do exactly one thing: place a worker on a location, play a card, or Prepare for the next season. You start with 2 workers.' },
   { id: 'board', t: 'The shared board', x: 'The glowing places are open to you. Tap one to see what it gives, then place a worker. Most places hold only one worker, so the good ones can be taken before your next turn.', when: (p, v) => myMoves().some(m => m.type === 'worker') },
   { id: 'cards', t: 'Cards', x: 'Tap a card in your hand, or one of the eight in the meadow on the board, to see its price. Pay with resources, or play a critter free when you already own its matching building (it is named on the card).', when: (p) => p.dep.length > 0 && p.hand.length > 0 },
@@ -19,7 +20,7 @@ function coachCheck() {
     if (UI.coach.seen[c.id]) continue; if (lv === 'light' && !c.light) continue;
     if (c.when && !c.when(p, v)) continue;
     UI.coach.seen[c.id] = 1;
-    pushCard({ kind: 'coach', title: c.t, sub: 'Guide', body: h('p', c.x), buttons: [{ label: 'Got it', a: 'cont' }] });
+    pushCard({ kind: 'coach', title: c.t, sub: 'Guide', body: typeof c.x === 'function' ? c.x() : h('p', c.x), buttons: [{ label: 'Got it', a: 'cont' }] });
     return true;
   }
   return false;

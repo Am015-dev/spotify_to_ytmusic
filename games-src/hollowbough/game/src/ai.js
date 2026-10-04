@@ -232,11 +232,14 @@ function fixPass(ranks, W0, seat) {
 }
 
 // ---------- levels ----------
+// easy: a gentle but real rival. Most turns it plays like normal with a lot of noise; some turns it
+// just does something that looks reasonable. It never rushes the seasons or gives up early.
 function chooseEasy(G, seat, rng) {
   const ms = HB.moves(G, seat);
   if (ms.length === 1) return ms[0];
+  if (rng() < EASY_SMART) { try { return chooseNoisy(G, seat, rng, EASY_NOISE); } catch (e) { } }
   if (G.q) return ms[Math.floor(rng() * ms.length)];
-  const w = ms.map(m => m.type === 'prepare' ? 4 : m.type === 'play' ? (m.how === 'occupy' ? 3 : 2) : m.type === 'worker' ? 1 : 0.01);
+  const w = ms.map(m => m.type === 'prepare' ? 1 : m.type === 'play' ? (m.how === 'occupy' ? 3 : 2) : m.type === 'worker' ? 1.5 : 0.01);
   let tot = 0; for (const x of w) tot += x; let r = rng() * tot;
   for (let i = 0; i < ms.length; i++) { r -= w[i]; if (r <= 0) return ms[i]; }
   return ms[ms.length - 1];
@@ -245,6 +248,16 @@ function pickBest(ranks, G, rng, noise) {
   let bi = 0, bv = -1e9;
   ranks.forEach((r, i) => { const v = r.v + (noise ? (rng() - 0.5) * noise : 0) - (isPass(r.m) ? 0.25 : 0); if (v > bv) { bv = v; bi = i; } });
   return bi;
+}
+let EASY_SMART = 0.6, EASY_NOISE = 1.2;
+function chooseNoisy(G, seat, rng, noise) {
+  const ms = HB.moves(G, seat);
+  const W0 = world(G, seat, rng);
+  const wm = HB.moves(W0, seat);
+  if (G.q && wm.length > 16) return ms[quickQ(W0, seat)];
+  const ranks = rankMoves(W0, seat, wm);
+  if (!G.q) fixPass(ranks, W0, seat);
+  return ms[pickBest(ranks, G, rng, noise)];
 }
 function chooseNormal(G, seat, rng) {
   const ms = HB.moves(G, seat);

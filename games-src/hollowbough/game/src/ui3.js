@@ -1,19 +1,20 @@
 // ===================== part 3: the dock (chips, resources, city and hand strips, prompt) =====================
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) return v; if (UI.focus != null && UI.focus < G.np) return UI.focus; return Math.max(0, G.phase === 'over' ? 0 : Math.min(G.np - 1, G.cur)); }
-function stripW() { return isPh() ? 46 : 58; }
+// phone cards shrink so a full hand of 8 fits across the dock without sideways scrolling
+function stripW() { if (!isPh()) return 58; const d = $('#dock'), w = (d && d.clientWidth) || innerWidth, v = viewSeat(); const n = Math.max(6, v >= 0 ? G.players[v].hand.length : 6, UI.tab === 'city' ? G.players[focusSeat()].city.length : 0); return Math.max(36, Math.min(56, Math.floor((w - 16 - (n - 1) * 4) / n))); }
 function promptText() {
   if (!G) return '';
   if (G.phase === 'over') return 'The game is over.';
   const a = HB.actor(G), p = G.players[a];
-  if (UI.cards.length) return 'Read the card, then Continue.';
+  if (UI.cards.length) return 'Read the card below, then tap its button.';
   if (NET.on && !p.ai && a !== viewSeat()) return p.name + ' is deciding…';
   if (hotSeat() && UI.holder !== a && !p.ai) return 'Pass the device to ' + p.name + '.';
   if (p.ai) { const l = G.log.length ? G.log[G.log.length - 1].t : ''; return p.name + ' is playing… ' + (UI.lastAi || ''); }
   if (G.q) return G.q.title;
   const n = availW(p);
   const pre = NET.on ? 'Your turn. ' : hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
-  return pre + (n > 0 ? 'Tap a place for a worker (' + n + ' free) or a card to play.' : 'No workers left: play a card, Prepare for ' + (p.season < 3 ? SEASN[p.season + 1] : 'the end') + ', or Pass.');
+  return pre + (n > 0 ? 'Tap a glowing place for a worker (' + n + ' free) or a card to play.' : p.season < 3 ? 'All workers are out: play a card or Prepare for ' + SEASN[p.season + 1] + ' to get them back.' : 'Last season, no workers left: play a card, or Pass when you are done.');
 }
 function chipEl(s) {
   const grim = s === 'G', p = grim ? null : G.players[s];
@@ -23,7 +24,7 @@ function chipEl(s) {
   const turn = G.phase !== 'over' && !grim && HB.actor(G) === s;
   const e = h('button.chip' + (turn ? '.turn' : '') + (s === viewSeat() ? '.me' : ''), { 'data-a': 'chip', 'data-seat': s, type: 'button', 'aria-label': pname(s) + ': ' + pts + ' points, ' + cards + ' cards in city' + (grim ? '' : ', ' + wk + ' workers free') });
   e.style.borderColor = pcolor(s).c;
-  e.appendChild(h('span.cn', pawn(s, 15), h('b', pname(s)), p ? h('span.cs', HBKit.season(SEAS[p.season], 16)) : null, p && p.passed ? h('i', 'out') : null));
+  e.appendChild(h('span.cn', pawn(s, 15), h('b', pname(s)), p ? h('span.cs', HBKit.season(SEAS[p.season], 16)) : null, p && p.passed ? h('i', 'done') : null));
   e.appendChild(h('span.cl', h('span', '★' + pts), h('span', '▢' + cards), p ? h('span', '⚑' + wk) : h('span', 'solo')));
   return e;
 }
@@ -48,7 +49,9 @@ function renderActs() {
   const prep = ms.find(m => m.type === 'prepare'), pass = ms.find(m => m.type === 'pass');
   const rec = UI.rec && UI.rec.m;
   a.appendChild(h('button.btn' + (prep ? '' : '.dis') + (rec && rec.type === 'prepare' ? '.rec' : ''), { 'data-a': 'prep', type: 'button', disabled: prep ? null : true }, prep ? 'Prepare: ' + SEASN[p.season + 1] : (mine && p.season >= 3 ? 'Last season' : 'Prepare')));
-  a.appendChild(h('button.btn' + (pass ? '' : '.dis') + (rec && rec.type === 'pass' ? '.rec' : ''), { 'data-a': 'pass', type: 'button', disabled: pass ? null : true }, 'Pass'));
+  // Pass ends your game: keep it quiet until it is the only sensible thing left (no workers, last season)
+  const passMain = pass && p.season >= 3 && availW(p) === 0;
+  a.appendChild(h('button.btn' + (passMain ? '' : '.quiet') + (pass ? '' : '.dis') + (rec && rec.type === 'pass' ? '.rec' : ''), { 'data-a': 'pass', type: 'button', disabled: pass ? null : true }, passMain ? 'Pass (end my game)' : 'Pass'));
   a.appendChild(h('button.btn.alt' + (mine ? '' : '.dis'), { 'data-a': 'hint', type: 'button', disabled: mine ? null : true }, 'Hint'));
   if (GX.undo.can() && !p.ai && act === viewSeat()) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶ Undo'));
 }
@@ -78,8 +81,8 @@ function renderDock() {
   if (!G) return;
   $('#prompt').textContent = promptText();
   $('#prompt').classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai && (!NET.on || HB.actor(G) === viewSeat())));
-  renderChips(); renderRes(); renderActs(); renderStrips();
-  const t = $('#barstat'); if (t) { const p = G.players[Math.max(0, focusSeat())]; t.innerHTML = ''; t.appendChild(HBKit.season(SEAS[p.season], 22)); t.appendChild(h('span', SEASN[p.season] + (G.phase === 'over' ? ' · over' : ''))); }
+  renderChips(); renderRes(); renderActs(); renderStrips(); stripTabs();
+  const t = $('#barstat'); if (t) { const p = G.players[Math.max(0, focusSeat())]; t.innerHTML = ''; t.appendChild(HBKit.season(SEAS[p.season], 22)); t.appendChild(h('span', SEASN[p.season] + (G.phase === 'over' ? ' · over' : ''))); t.appendChild(raceEl()); }
 }
 // place the prompt: in the bar on phones, in the dock otherwise
 function placePrompt() {

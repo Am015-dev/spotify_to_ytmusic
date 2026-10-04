@@ -30,7 +30,10 @@ const SEASONS = ['Winter', 'Spring', 'Summer', 'Autumn'];
 function rnd(n) { let t = (G.rng = (G.rng + 0x6D2B79F5) | 0); t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return Math.floor(((t ^ t >>> 14) >>> 0) / 4294967296 * n); }
 function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 const clone = o => JSON.parse(JSON.stringify(o));
-function lg(t) { if (G.nolog) return; G.logN++; G.log.push({ i: G.logN, turn: G.turn, t }); if (G.log.length > 600) G.log.splice(0, 200); }
+// "You" is the human's name: speak to them in the second person ("You place", not "You places")
+const YOU_IRR = { has: 'have', is: 'are', goes: 'go', does: 'do' };
+function youVerb(t) { return t.replace(/\bYou (\w+)/g, (all, v) => { if (YOU_IRR[v]) return 'You ' + YOU_IRR[v]; if (/(ss|sh|ch|x|zz)es$/.test(v)) return 'You ' + v.slice(0, -2); if (/[^aeiou]ies$/.test(v)) return 'You ' + v.slice(0, -3) + 'y'; if (/[^s]s$/.test(v) && v.length > 3) return 'You ' + v.slice(0, -1); return all; }).replace(/^(You [^.]*?)\btheir\b/, '$1your'); }
+function lg(t) { if (G.nolog) return; t = youVerb(t); G.logN++; G.log.push({ i: G.logN, turn: G.turn, t }); if (G.log.length > 600) G.log.splice(0, 200); }
 function use(t) { G.used[t] = (G.used[t] || 0) + 1; }
 const P = s => G.players[s];
 const pn = s => s === 'G' ? DATA.soloName : G.players[s].name;
