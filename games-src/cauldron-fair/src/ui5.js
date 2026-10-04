@@ -161,6 +161,7 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'mv': { const v = viewSeat(); const m = (UI.legal[v] || [])[+d.i]; if (m) { if (UI.mode === 'guided' && UI.tip && UI.tip.block) { tipOk(); } act(m, v); } break; }
+    case 'fort': t.classList.toggle('open'); break;
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
     case 'rscont': repContinue(); break;
     case 'shopsel': shopToggle(d.k); break;

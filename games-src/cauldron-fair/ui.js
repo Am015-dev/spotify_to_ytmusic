@@ -155,10 +155,7 @@ function promptInfo() {
   if (G.phase === 'eval') return { text: p.q ? QINFO[p.q.h][1](p, p.q.d) : (wn.length ? 'Waiting for ' + nameList(wn) + '...' : 'Counting the day.'), mine: !!p.q };
   return { text: '' };
 }
-function placePrompt() {
-  const pr = $('#prompt'); if (!pr) return; const ph = document.documentElement.classList.contains('ph-p');
-  const dest = ph ? $('#barprompt') : $('#promptDock'); if (dest && pr.parentNode !== dest) dest.appendChild(pr);
-}
+function placePrompt() { }
 function stateLabel(p) {
   switch (seatState(p)) { case 'draw': return 'drawing'; case 'done': return 'stopped'; case 'boom': return 'exploded'; case 'post': return 'finishing'; case 'choose': return 'choosing'; case 'ready': return 'ready'; case 'wait': return 'waiting'; default: return ''; }
 }
@@ -220,7 +217,7 @@ function renderRisk() {
     rk.append(h('div.rk', h('span', { html: ico('bag', 18) }), h('b', r.n), ' chips in the bag: ', h('b', r.whites), ' white'), bar,
       h('div.rk', 'Next chip explodes it: ', h('span.big.' + lv, pct + '%'), h('span.sm', ' (' + nb + ' of ' + r.n + ')'), h('span.sm', ' · white total ' + r.ws + ' of ' + r.limit)), here);
     const fl = p.flask ? (p.f.canFlask && p.pot.length && p.pot[p.pot.length - 1].c === 'W' ? 'The flask can put your last white chip back.' : 'Flask ready: it can put back a white chip you just drew.') : 'Flask used this day.';
-    rk.append(h('div.sm', fl));
+    rk.append(h('div.sm.fl', fl));
   } else {
     const cs = bagCounts(p), parts = Object.keys(cs).sort().map(k => h('span.cb', chipN(k, 20), '×' + cs[k]));
     rk.append(h('div.rk', h('span', { html: ico('bag', 18) }), h('b', bagN(p)), ' chips in your bag:'), h('div.rk', parts), here);
@@ -229,7 +226,7 @@ function renderRisk() {
 function renderFort() {
   const e = $('#fort'); if (!e) return; const c = D.FORTUNE.find(x => x.id === G.fcard);
   if (!c || G.phase === 'over') { e.hidden = true; return; } e.hidden = false; e.className = c.kind;
-  e.innerHTML = ''; e.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name), h('span.fx', c.text)));
+  e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', c.text)));
 }
 function renderRoster() {
   const r = $('#roster'); if (!r) return; r.innerHTML = '';
@@ -265,7 +262,7 @@ function renderQ(p, legal, qb) {
 }
 function renderBar() {
   const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
-  if (!G) return; bs.append(h('span.dayn', 'Day ' + G.round + ' of ' + D.rounds));
+  if (!G) return; bs.append(h('span.dayn', isPh() ? 'Day ' + G.round + '/' + D.rounds : 'Day ' + G.round + ' of ' + D.rounds));
   const dt = document.querySelector('.gx-dt'); if (dt) { const v = viewSeat(); dt.textContent = G.phase === 'over' ? 'Game over' : (v >= 0 && (G.phase === 'brew' ? G.players[v].st === 'draw' : !!G.players[v].q)) ? 'Your turn' : 'Waiting'; }
 }
 let rndT = 0;
@@ -731,6 +728,7 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'mv': { const v = viewSeat(); const m = (UI.legal[v] || [])[+d.i]; if (m) { if (UI.mode === 'guided' && UI.tip && UI.tip.block) { tipOk(); } act(m, v); } break; }
+    case 'fort': t.classList.toggle('open'); break;
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
     case 'rscont': repContinue(); break;
     case 'shopsel': shopToggle(d.k); break;

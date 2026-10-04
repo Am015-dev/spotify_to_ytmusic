@@ -1122,18 +1122,26 @@ async function pxTextures() {
     for (let i = 0; i < 26; i++) { const cx = r() * w, cy = r() * h, rr = 14 + r() * 30; x.beginPath(); for (let k = 0; k <= 10; k++) { const a = k / 10 * Math.PI * 2, rj = rr * (.7 + r() * .6); const px = cx + Math.cos(a) * rj, py = cy + Math.sin(a) * rj * .7; k ? x.lineTo(px, py) : x.moveTo(px, py); } x.stroke(); } });
 }
 function svgImgP(svg) { return pxLoadImg('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)); }
-// a card face at w CSS px: the kit's paper + frame, the painted emblem, the kit's numerals (so the numbers stay crisp)
+// a card face at w CSS px, drawn straight on a canvas (no SVG decoding, so it is ready at once): paper, frame, the painted emblem, crisp numerals
 function pxFace(id, w) {
   const r = Math.min(2, Math.max(1, PX.res)), key = id + '|' + w + '|' + r;
   if (PX.tex['f:' + key]) return PX.tex['f:' + key];
-  if (!PX.faceP[key]) PX.faceP[key] = (async () => {
-    const [m, t] = await Promise.all([svgImgP(KIT.cardSVG(id, { w, standalone: true, part: 'mat' })), svgImgP(KIT.cardSVG(id, { w, standalone: true, part: 'top' }))]);
-    const H = Math.round(w * 1.4), c = document.createElement('canvas'); c.width = Math.round(w * r); c.height = Math.round(H * r); const x = c.getContext('2d'); x.scale(r, r);
-    x.drawImage(m, 0, 0, w, H); const im = PX.img['emb' + suitOf(id)]; if (im) { const ew = w * .56; x.drawImage(im, (w - ew) / 2, H * .5 - ew * .5, ew, ew); }
-    x.drawImage(t, 0, 0, w, H);
-    const tex = PIXI.Texture.from(c); PX.tex['f:' + key] = tex; PX.dirty = true; pxDirty(); return tex;
-  })().catch(() => null);
-  return null;
+  const s = suitOf(id), v = valOf(id), lan = s === 4, su = D.suits[s], H = Math.round(w * 1.4);
+  const c = document.createElement('canvas'); c.width = Math.round(w * r); c.height = Math.round(H * r); const x = c.getContext('2d'); x.scale(r, r);
+  const rad = w * .085, bw = Math.max(1.6, w * .026), INK = '#0b1f3a';
+  const rr = (X, Y, W2, H2, R) => { x.beginPath(); if (x.roundRect) x.roundRect(X, Y, W2, H2, R); else x.rect(X, Y, W2, H2); };
+  const g = x.createLinearGradient(0, 0, w, H); g.addColorStop(0, lan ? '#16336b' : '#fffaf0'); g.addColorStop(1, lan ? '#0a1730' : '#e9dfc2');
+  rr(bw / 2, bw / 2, w - bw, H - bw, rad); x.fillStyle = g; x.fill(); x.lineWidth = bw; x.strokeStyle = INK; x.stroke();
+  rr(w * .05, w * .05, w * .9, H - w * .1, rad * .7); x.lineWidth = Math.max(1.2, w * .02); x.strokeStyle = lan ? '#d9b04a' : su.c; x.globalAlpha = .85; x.stroke(); x.globalAlpha = 1;
+  if (lan) { x.fillStyle = '#9fd0ff'; for (let i = 0; i < 9; i++) { x.globalAlpha = .5; x.beginPath(); x.arc(w * (.12 + ((i * 37) % 76) / 100), H * (.1 + ((i * 53) % 80) / 100), w * (.008 + (i % 3) * .004), 0, 7); x.fill(); } x.globalAlpha = 1; }
+  const im = PX.img['emb' + s]; const ew = w * .56;
+  if (im) x.drawImage(im, (w - ew) / 2, H * .5 - ew * .5, ew, ew);
+  const FAM = "Nunito,'Trebuchet MS','Segoe UI',system-ui,'DejaVu Sans',sans-serif";
+  const corner = rot => { x.save(); if (rot) { x.translate(w / 2, H / 2); x.rotate(Math.PI); x.translate(-w / 2, -H / 2); }
+    x.font = '900 ' + (w * .3) + 'px ' + FAM; x.textBaseline = 'alphabetic'; x.textAlign = 'left'; x.lineJoin = 'round'; x.lineWidth = w * .04; x.strokeStyle = lan ? INK : '#fff'; x.strokeText(String(v), w * .15, w * .36); x.fillStyle = lan ? '#ffd873' : su.dk; x.fillText(String(v), w * .15, w * .36);
+    if (im) x.drawImage(im, w * .1, w * .41, w * .2, w * .2); x.restore(); };
+  corner(false); corner(true);
+  const tex = PIXI.Texture.from(c); PX.tex['f:' + key] = tex; return tex;
 }
 function pxBack(w) {
   const r = Math.min(2, Math.max(1, PX.res)), key = 'bk|' + w + '|' + r; if (PX.tex[key]) return PX.tex[key];
@@ -1146,7 +1154,7 @@ function pxBack(w) {
 function pxPrewarm() {
   if (!PX.on) return; const hw = Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hw')) || 60), cw = Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 50), dw = Math.round(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--dw')) || 44);
   const key = hw + '|' + cw + '|' + dw + '|' + PX.res; if (PX.warm === key) return; PX.warm = key; const ws = [...new Set([hw, cw, dw])]; let i = 0; const all = []; for (const w of ws) for (let id = 0; id < 40; id++) all.push([id, w]);
-  const step = () => { if (!PX.on || PX.warm !== key) return; for (let k = 0; k < 6 && i < all.length; k++, i++) pxFace(all[i][0], all[i][1]); if (i < all.length) setTimeout(step, 30); }; step();
+  const step = () => { if (!PX.on || PX.warm !== key) return; for (let k = 0; k < 14 && i < all.length; k++, i++) pxFace(all[i][0], all[i][1]); if (i < all.length) setTimeout(step, 16); }; step();
 }
 // ---- the layout read: one pass over the DOM after each render ----
 let pxQueued = false;
