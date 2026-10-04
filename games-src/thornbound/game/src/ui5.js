@@ -1,13 +1,15 @@
 // ===================== part 5: render loop, clicks, drawers (rules, log, board, menu), start screen =====================
 function renderAll(){if(!G||!UI.started)return;
   try{UI.V=isClient()?G:TB.stripView(G,isPassing()?-1:vs())}catch(e){console.error('view '+e.message);return}  // a client's G is already its own stripped copy
+  if(UI.phone&&!UI.land){const sm=!!wantSmall();if(sm!==!!UI.boardSmall){UI.boardSmall=sm;phApply()}}
   if(isPassing()){if(GX.open)GX.close();const bb=$('#boardbody');if(bb)bb.innerHTML='';if(UI.pop)closePop(true)}
   if(!(UI.card&&UI.card.kind==='event'))renderMap();else if(!MAP.m)renderMap();
-  renderBar();renderRoad();renderMain();renderHand();renderRivals();renderCard();renderPop();updateLive();
+  renderBar();renderRoad();renderNow();renderMain();renderHand();renderRivals();setHB();renderCard();renderPop();updateLive();
   document.documentElement.dataset.step=String(roadIdx());
   if(typeof phoneRefresh==='function')phoneRefresh();
   netAfter();
   const lb=$('#logbody');if(lb&&GX.open==='logd')renderLog()}
+function setHB(){const d=$('.gx-dock'),hw=$('#handw'),rv=$('#rivals');if(!d)return;d.style.setProperty('--hb',((hw&&!hw.hidden?hw.offsetHeight:0)+(rv?rv.offsetHeight:0))+'px')}
 function updateLive(){const l=$('#live');if(!l)return;const last=G.log[G.log.length-1];if(last&&UI._liveN!==last.i){UI._liveN=last.i;l.textContent=last.t}}
 // ---------------------------------------------------------------- clicks
 document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-a]');
@@ -25,20 +27,29 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
    case 'pclose':closePop();break;
    case 'take':{const s=+t.dataset.s;UI.holder=s;UI.passed=s;UI.card=null;UI._cardKey=null;UI.pop=null;pump();break}
    case 'evok':{UI.card=null;UI._cardKey=null;UI.noAnim=false;if(UI._cp)UI._cp=null;UI.mapReset=false;MAP.slotDirty=true;pump();break}
-   case 'tipok':UI.card=null;UI._cardKey=null;pump();break;
-   case 'tipoff':UI.guide='light';UI.card=null;UI._cardKey=null;pump();break;
+   case 'tipx':UI.tip[t.dataset.k]='x';renderAll();break;
+   case 'coachok':coachOk();break;
+   case 'gloss':showGloss(t.dataset.t);break;
+   case 'gclose':hideGloss();break;
+   case 'nowlog':GX.show('logd');break;
+   case 'title':UI.sv='title';renderStart();break;
+   case 'play':UI.sv='setup';UI.cfgOpen=false;renderStart();break;
+   case 'online':UI.sv='online';UI.onl=true;renderStart();break;
+   case 'cfgopen':UI.cfgOpen=true;renderStart();break;
+   case 'cfgclose':UI.cfgOpen=false;renderStart();break;
+   case 'lv':sv.levels[+t.dataset.i]=t.dataset.v;renderStart();break;
    case 'again':{clearSave();const c=UI.cfg;startFromCfg(c);break}
    case 'menu':showStart();break;
    case 'wpause':UI.watchPaused=!UI.watchPaused;if(!UI.watchPaused)pump();else renderAll();break;
    case 'wstep':{if(UI.mode==='watch'&&G.q){const w=whoActs();if(w.ai.length){aiStep(w)}}pump();break}
    case 'wspeed':UI.speed=UI.speed>=4?1:UI.speed*2;renderAll();break;
    // start screen
-   case 'mode':sv.mode=t.dataset.v;renderStart();break;
+   case 'mode':sv.mode=t.dataset.v;if(t.dataset.go){startFromSetup();break}renderStart();break;
    case 'np':sv.np=+t.dataset.v;renderStart();break;
    case 'fac':sv.faction=t.dataset.v;renderStart();break;
    case 'len':sv.length=t.dataset.v;renderStart();break;
    case 'gd':sv.guide=t.dataset.v;renderStart();break;
-   case 'start':startFromSetup();break;
+   case 'start':sv.mode='me';startFromSetup();break;
    case 'guided':newGame('guided');break;
    case 'cont':{const s=loadSave();if(s){hideStart();resumeGame(s);afterStart()}break}
    case 'rules':GX.show('rulesd');break;
@@ -53,28 +64,7 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   }});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pop&&!GX.open){closePop();e.preventDefault()}});
 function toast(t){UI.toast=t;const l=$('#live');if(l)l.textContent=t}
-// ---------------------------------------------------------------- start screen
-const sv={mode:'me',np:3,faction:'nobility',length:'standard',guide:'full',levels:['normal','normal','normal','normal']};
-function showStart(){$('#start').hidden=false;document.body.classList.add('in-start');renderStart();const f=$('#start [data-a=guided]');if(f)try{f.focus({preventScroll:true})}catch(e){}}
-function hideStart(){$('#start').hidden=true;document.body.classList.remove('in-start')}
-function renderStart(){const el=$('#start');if(!el||el.hidden)return;const sav=loadSave();
-  const lvl=(i)=>'<select class="sel" data-a="lv" data-i="'+i+'" aria-label="Computer level, seat '+(i+1)+'">'+['easy','normal','hard'].map(l=>'<option value="'+l+'"'+(sv.levels[i]===l?' selected':'')+'>'+l[0].toUpperCase()+l.slice(1)+'</option>').join('')+'</select>';
-  const ONL=NET.on&&isHost(),plan=ONL?netPlan():null;const nSeats=ONL?plan.np:sv.np;let seats='';
-  const fac=FIDS.slice();const mine=sv.faction;const rest=fac.filter(f=>f!==mine);
-  for(let i=0;i<nSeats;i++){const pm=ONL?'me':sv.mode;const f=pm==='me'?(i===0?mine:rest[i-1]):FIDS[i];const k=TBKit.FACTIONS[FK[f]];const human=ONL?i<plan.hum.length:(sv.mode==='hot'||(sv.mode==='me'&&i===0));
-    seats+='<div class="seat" style="--fc:'+k.main+'">'+TBKit.token('influence',{faction:FK[f]},30).outerHTML+'<span class="sn"><b>'+esc(k.short)+'</b><small>'+(human?(ONL?'Online: '+esc(plan.hum[i].nm)+(i===0?' (you)':''):sv.mode==='hot'?'Player '+(i+1):'You'):'Computer')+'</small></span>'+(human?'':lvl(i))+'</div>'}
-  el.innerHTML='<div class="st-box"><h1 class="st-t">The Thornbound Throne</h1><p class="st-s">An area-control card game for 2 to 4. Win clashes in three regions, place your Herald where you will be, and hold the most Influence when the last round ends.</p>'+
-   (ONL?'':'<div class="st-bt"><button class="btn pri big" data-a="guided">Guided first game</button>'+(sav?'<button class="btn big" data-a="cont">Continue saved game (round '+sav.G.round+')</button>':'')+'</div>')+onlineBlock()+
-   '<h2>'+(ONL?'Game setup':'Or set up a game')+'</h2>'+(ONL?'':'<div class="seg" role="radiogroup" aria-label="Mode">'+[['me','Play the computer'],['hot','Hot-seat (pass the device)'],['watch','Watch computers']].map(([v,l])=>'<button role="radio" aria-checked="'+(sv.mode===v)+'" class="'+(sv.mode===v?'on':'')+'" data-a="mode" data-v="'+v+'" data-start="'+v+'">'+l+'</button>').join('')+'</div>')+
-   '<div class="row"><span>Players</span><div class="seg">'+[2,3,4].map(n=>'<button class="'+(sv.np===n?'on':'')+'" data-a="np" data-v="'+n+'">'+n+'</button>').join('')+'</div><span>Length</span><div class="seg">'+[['short','4 rounds'],['standard','5 rounds'],['extended','6 rounds']].map(([v,l])=>'<button class="'+(sv.length===v?'on':'')+'" data-a="len" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+
-   ((sv.mode==='me'||ONL)?'<div class="row"><span>Your side</span><div class="seg fseg">'+FIDS.map(f=>{const k=TBKit.FACTIONS[FK[f]];return '<button class="'+(sv.faction===f?'on':'')+'" data-a="fac" data-v="'+f+'" style="--fc:'+k.main+'">'+esc(k.short)+'</button>'}).join('')+'</div></div>':'')+
-   '<div class="seats">'+seats+'</div><div class="row"><span>Guide</span><div class="seg">'+[['full','Full tips'],['light','Light'],['off','Off']].map(([v,l])=>'<button class="'+(sv.guide===v?'on':'')+'" data-a="gd" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+
-   '<div class="st-bt"><button class="btn pri big" data-a="start" data-start="go">'+(ONL?'Start online game':'Start game')+'</button>'+(NET.on&&G&&UI.started?'<button class="btn big" data-a="netback">Back to the game</button>':'')+'<button class="btn big" data-a="rules">How to play</button></div><p class="st-c">Original art drawn in code. Fonts: Cinzel and EB Garamond (SIL OFL). Based on the mechanics of a published game; names and text are our own.</p></div>';
-  $$('#start [data-a=lv]').forEach(s=>s.addEventListener('change',()=>{sv.levels[+s.dataset.i]=s.value}))}
-function startFromSetup(){hideStart();const lv=sv.levels.slice();
-  const o={np:sv.np,length:sv.length,faction:sv.faction,levels:lv,guide:sv.guide};
-  // seat i (i>0) uses level[i]; the human seat 0 ignores its slot
-  newGame(sv.mode==='watch'?'ai':sv.mode,o)}
+// start screens (title, setup, online): see part 7
 function startFromCfg(c){hideStart();const o={np:c.np,length:c.length,faction:c.faction,levels:c.levels,guide:c.guide,seatFactions:c.seats.map(s=>s.faction),humanSeats:c.humanSeats};
   if(c.guided)newGame('guided',o);else newGame(c.mode==='watch'?'ai':c.mode,o)}
 function afterStart(){closePop(true);GX.close();UI.mapReset=true;renderAll();pump()}
@@ -96,7 +86,15 @@ function renderBoardDrawer(){const el=$('#boardbody');if(!el||!G)return;const s=
   h+='<h5>Discard pile ('+P.disc.length+')</h5><div class="piles">'+P.disc.map(id=>'<span class="th" data-owner="'+s+'" data-up="1">'+cardEl(id,48).outerHTML+'</span>').join('')+'</div>';
   const lost=UI.V.lost;h+='<h5>Lost Pile ('+lost.length+', shared)</h5><div class="piles">'+lost.map(id=>'<span class="th">'+cardEl(id,48).outerHTML+'</span>').join('')+'</div>';
   el.innerHTML=h}
-const RULES_HTML=`<div class="rules">
+const RULES_HTML=()=>`<div class="rules">
+<div class="quick"><h3>In two minutes</h3><p><b>Goal:</b> hold the most <b>Influence</b> (points) when the last round ends.</p><ol>
+<li><b>Bid</b> a hand card in secret. The highest bid picks a <b>Kingdom Card</b>: a lasting power.</li>
+<li>Put your <b>Herald</b> on one of six locations. It pays only if you win there.</li>
+<li><b>Hide one card</b> at each of the three regions. Send <b>Supporters</b> (+1 each) if you like.</li>
+<li><b>Clashes:</b> cards flip; the highest total Strength in a region wins and claims one of its two locations (its Influence, plus +1 and a steal if your Herald stands there).</li>
+<li><b>Autumn, then Winter:</b> optional Govern and Journey, then played cards are discarded and a new round begins.</li></ol>
+<p>The guided first game walks you through this once. Underlined words in the game can be tapped for their meaning.</p></div>
+<details><summary>The full rules</summary>
 <h3>The goal</h3><p>You lead one of four factions competing for the throne. The game lasts a fixed number of rounds (4, 5 or 6). When the last round ends, the player with the most <b>Influence</b> wins. Ties go to whoever holds the Kingdom's Favour, then to the better place on the Order Track.</p>
 <h3>How a round goes</h3><ol class="rl">
 <li><b>Start of the year.</b> Everyone refills their hand to their hand size. Players are ranked by Influence: the leader acts first.</li>
@@ -114,10 +112,12 @@ const RULES_HTML=`<div class="rules">
 <h3>Attrition</h3><p>If you must draw and your deck is empty, your discard pile becomes your new deck and your hand size drops by one (never below 3, never above 8). A short game of 4 or 5 rounds usually hits this around round 3.</p>
 <h3>The Kingdom's Favour</h3><p>A disc with three uses. Claim it at the Gleaning Meadow. While you hold it you may use your faction's Favour action; each use spends one of three charges.</p>
 <h3>Reading your cards</h3><p>Top left: Strength. Top right: the Lore cost (Site of Power cards only). Bottom line: votes and lore. Invulnerable cards cannot be eliminated, Resilient cards go to the discard instead of the Lost Pile, Pathfinder cards go to the discard when used for a Journey.</p>
-<h3>On this screen</h3><p>The map is the game. Tap a location or a region's card slots for details; tap the throne for the Great Road and Councils. Tap a card in your hand for a large view and its actions. The step list under the map always shows where you are in the round, and the highlighted button is the recommendation of a strong computer player.</p>
+<h3>On this screen</h3><p>Tap a location or a region's card slots for details; tap the throne for the Great Road and Councils. Tap a card in your hand for a large view and its actions. The dots in the top bar show the seven steps of a round. The gold button at the bottom of the panel is the suggestion of a strong computer player, and the line above it says why.</p>
+</details>
+<details><summary>Words used in the game</summary><dl>${GLOSS.map(g=>'<dt>'+g[2]+'</dt><dd>'+g[3]+'</dd>').join('')}</dl></details>
 </div>`;
 function setupDrawers(){
-  GX.drawer('rulesd','How to play',(()=>{const d=document.createElement('div');d.innerHTML=RULES_HTML;return d})(),true);
+  GX.drawer('rulesd','How to play',(()=>{const d=document.createElement('div');d.innerHTML=RULES_HTML();return d})(),true);
   GX.drawer('logd','Log',(()=>{const d=document.createElement('div');d.id='logbody';return d})());
   GX.drawer('boardd','My board and piles',(()=>{const d=document.createElement('div');d.id='boardbody';return d})());
   GX.drawer('setd','Menu',(()=>{const d=document.createElement('div');d.id='setbody';return d})());

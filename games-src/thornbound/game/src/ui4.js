@@ -6,9 +6,10 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   if(!G||s<0||isPassing()||G.over){el.innerHTML='';el.hidden=true;return}
   el.hidden=false;const V=UI.V,P=V.pl[s];const ids=P.hand.filter(id=>id>=0).sort((a,b)=>cinfo(b).strength-cinfo(a).strength||a-b);
   const mv=G.q&&G.q.seats.includes(s)&&!G.pl[s].ai?legal(s):[];const use=new Set();for(const m of mv){if(m.id!=null)use.add(m.id);if(m.v!=null&&typeof m.v==='number')use.add(m.v)}
-  const W=Math.max(200,el.clientWidth||$('#dockbody').clientWidth||360)-8;const cw=UI.phone?(UI.land?50:(innerHeight<600?46:56)):66,ch=Math.round(cw*1.4308);
+  const W=Math.max(200,el.clientWidth||$('#dockbody').clientWidth||360)-8;const cw=UI.phone?(UI.land?42:(innerHeight<600?44:innerHeight<700?48:54)):66,ch=Math.round(cw*1.4308);
   const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
-  let h='<div class="hand-h"><span>Hand <b>'+ids.length+'</b>/'+P.hs+'</span><span>Deck '+P.deck.length+'</span><span>Discard '+P.disc.length+'</span>'+(P.lore?'<span>Lore '+P.lore+'</span>':'')+'</div>';
+  const hh='<div class="hand-h"><span>Hand <b>'+ids.length+'</b>/'+P.hs+'</span><span>Deck '+P.deck.length+'</span><span>Discard '+P.disc.length+'</span>'+(P.lore?'<span>Lore '+P.lore+'</span>':'')+'</div>';
+  let h=UI.phone?'':hh;
   h+='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+14)+'px">';
   ids.forEach((id,i)=>{const on=UI.hand===id,pl=use.has(id);
     h+='<button class="hc'+(on?' on':'')+(pl?' pl':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+'" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'">'+cardEl(id,cw).outerHTML+'</button>'});
@@ -20,7 +21,7 @@ function renderRivals(){const el=$('#rivals');if(!el)return;const V=UI.V;const h
   el.innerHTML=ordSeats.map(s=>{const P=V.pl[s];const kfac=TBKit.FACTIONS[FK[P.fac]];const turn=act.has(s);
     const favs=V.fav.h===s?'<span class="rv-f" title="Holds the Kingdom\'s Favour ('+V.fav.u+' uses left)">'+ico('star')+'</span>':'';
     return '<button class="rv'+(s===me?' me':'')+(turn?' turn':'')+'" data-a="rival" data-s="'+s+'" style="--fc:'+kfac.main+'" aria-label="'+esc(P.name)+': '+P.inf+' influence, '+P.hand.length+' cards in hand. Tap for details">'+
-      '<span class="rv-e">'+emb(s,26)+'</span><span class="rv-t"><b>'+esc(shortName(s).replace(' (you)',''))+(s===me&&(NET.on||humans().length===1)?' <u>you</u>':'')+'</b><small><i>'+P.inf+'</i> inf · '+P.hand.length+' cards</small></span>'+favs+'</button>'}).join('')}
+      '<span class="rv-e">'+emb(s,26)+'</span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'<u>You</u> · ':'')+esc(shortName(s).replace(' (you)',''))+'</b><small><i>'+P.inf+'</i> Influence'+(G.np<3?' · '+P.hand.length+' cards':'')+'</small></span>'+favs+'</button>'}).join('')}
 // ---------------------------------------------------------------- pop-ups (live in the dock zone, never over the board)
 function openPop(kind,arg){if(!G)return;UI.pop=kind;UI.popArg=arg||{};renderPop();applyHl();if(typeof sfx==='function')sfx('tap')}
 function closePop(quiet){if(!UI.pop)return;UI.pop=null;UI.popArg=null;UI.hand=null;const p=$('#ppop');if(p){p.hidden=true;p.innerHTML=''}applyHl();if(!quiet)renderAll()}
@@ -54,11 +55,11 @@ function popLoc(l){const s=vs();const L=DD.LOCS[l],V=UI.V;const q=G.q;let h='';
   const mk=V.pl.map((p,i)=>p.mk[l]?esc(shortName(i))+' '+p.mk[l]:'').filter(Boolean);if(mk.length)h+='<p class="lc-h"><b>Whisper markers:</b> '+mk.join(', ')+'</p>';
   if(V.loc[l].kc.length)h+='<p class="lc-h"><b>Kingdom Cards here:</b> '+V.loc[l].kc.map(k=>esc(TB.kingdomInfo(k.n).name)+' ('+esc(nameOf(k.o))+')').join(', ')+'</p>';
   if(l===2)h+='<p class="lc-h"><b>Favour:</b> '+(V.fav.h>=0?esc(nameOf(V.fav.h))+' holds it ('+V.fav.u+' uses left)':'on the board')+'</p>';
-  const mv=s>=0&&q&&q.seats.includes(s)&&!G.pl[s].ai?legal(s):[];
+  const mv=s>=0&&q&&q.seats.includes(s)&&!G.pl[s].ai?legal(s):[];const info=h;h='';
   if(q&&q.kind==='herald'){const m=mv.find(x=>x.loc===l);if(m){const rec=recK()===m.k;h+='<div class="pp-act"><button class="btn pri" data-a="mv" data-k="'+esc(m.k)+'">Place my Herald here'+(rec?' (recommended)':'')+'</button></div>';h+='<p class="why">'+ico('star')+'<span><b>'+(rec?'Why this one':'Think about it')+':</b> '+esc(whyFor(s,m))+'</span></p>'}}
   else if(q&&q.kind==='location'){const m=mv.find(x=>x.loc===l);if(m){const rec=recK()===m.k;h+='<div class="pp-act"><button class="btn pri" data-a="mv" data-k="'+esc(m.k)+'">Claim '+esc(LOCN[l])+(rec?' (recommended)':'')+'</button></div>'}}
   else if(q&&(q.kind==='place'||q.kind==='tie')&&mv.some(x=>x.r===l>>1)){h+='<p class="lc-h"><b>Play a face-down card in '+esc(REG[l>>1])+':</b></p>'+cardPicker(s,mv.filter(x=>x.r===l>>1||q.kind==='tie'))}
-  return popShell(esc(LOCN[l]),h,'loc-b')}
+  return popShell(esc(LOCN[l]),h+info,'loc-b')}
 function cardPicker(s,mv){const ids=[...new Set(mv.filter(m=>m.id!=null).map(m=>m.id))];return '<div class="picker">'+ids.map(id=>'<button class="hc pk" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" aria-label="'+esc(cinfo(id).name)+'">'+cardEl(id,52).outerHTML+'</button>').join('')+'</div>'}
 function popRegion(r){const s=vs(),V=UI.V,q=G.q;let h='';
   h+='<p class="lc-r">Locations: <button class="lk" data-a="loc" data-l="'+2*r+'">'+esc(LOCN[2*r])+'</button> and <button class="lk" data-a="loc" data-l="'+(2*r+1)+'">'+esc(LOCN[2*r+1])+'</button></p>';
@@ -88,45 +89,49 @@ function popKingdom(){const V=UI.V;let h='';
 function shouldShowEvent(ev){if(ev.t==='clash')return true;if(ev.t==='bids')return true;if(ev.t==='summary')return true;return false}
 function showEvent(ev){UI.card={kind:'event',ev};if(ev.t==='clash'){UI.noAnim=true}}
 function showOver(){if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave()}
-const TIPS={bid:['Bids','Each round starts with a secret bid. Tap a hand card for its details, or use the suggested button. The strongest bid chooses first. Whatever Kingdom Card you take sits on your board with your bid card tucked under it.'],
-  herald:['Heralds','Your Herald is public. Tap a location on the map to read its reward. Winning there pays you and steals from every rival Herald standing on it. A bluff is fine: place it where you do NOT plan to win, or where you do.'],
-  place:['Face-down cards','Place one card next to each of the three regions. Nobody sees them until the clash. Put big cards where the prize matters and spare cards elsewhere.'],
-  menu:['Actions','This list shows what your cards and Kingdom Cards allow right now. Sending Supporters adds +1 Strength each in a region (only the first clash there). Finish with the last button.'],
-  clashOrder:['Clash order','The player furthest behind sets the order of the three clashes. Think about which region your rivals are weakest in.'],
-  location:['Winning','The winner claims one of the region\'s two locations: its Influence plus a bonus effect. A Herald there is a swing of +1 for you and -1 for each rival Herald.'],
-  bidRes:['Your bid','Take a Kingdom Card from the Great Road, steal one a rival holds (you need a strictly higher bid than their occupying card) or take your card back.']};
-function maybeTip(){if(UI.guide!=='full'||!G.q)return false;const k=G.q.kind;if(UI.tip[k]||!TIPS[k])return false;UI.tip[k]=1;UI.card={kind:'tip',k};return true}
+const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid picks a Kingdom Card first; the card you bid then sits under it and cannot fight.'],
+  herald:['Heralds','Your Herald is public. If you win a region and claim the location where your Herald stands, you gain +1 Influence and take 1 from every rival Herald there.'],
+  place:['Hidden cards','You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere.'],
+  menu:['Actions','Supporters add +1 Strength each in a region\'s first Clash. Open the list for other actions, or finish the step.'],
+  clashOrder:['Clash order','The player with the least Influence chooses the order of the three Clashes.'],
+  location:['Winning','The winner claims one of the region\'s two locations: its Influence and its bonus.'],
+  bidRes:['Your bid','Take a Kingdom Card from the Great Road, steal one a rival holds (your bid must beat the card under it), or take your card back.']};
+function maybeTip(){return typeof coachGate==='function'&&coachGate()}
 function renderCard(){const el=$('#pc');if(!el)return;const c=UI.card;
   if(!c){el.hidden=true;el.innerHTML='';UI._cardKey=null;return}
   const key=JSON.stringify(c.kind==='event'?[c.ev.t,c.ev.r,c.ev.n,c.ev.round]:[c.kind,c.seat,c.k]);
   if(UI._cardKey===key&&!el.hidden)return;UI._cardKey=key;
   el.hidden=false;el.classList.remove('in');void el.offsetWidth;el.classList.add('in');el.dataset.kind=c.kind==='event'?c.ev.t:c.kind;
   let h='';
-  if(c.kind==='pass'){const s=c.seat;h='<div class="cd cd-pass" style="--fc:'+fcol(s)+'"><div class="cd-e">'+emb(s,56)+'</div><h3>Pass the device to '+esc(nameOf(s))+'</h3><p>Everyone else look away. Your hand and face-down cards appear when you tap the button.</p><button class="btn pri big" data-a="take" data-s="'+s+'">I am '+esc(shortName(s))+'. Show my cards</button></div>'}
-  else if(c.kind==='tip'){const t=TIPS[c.k];h='<div class="cd cd-tip"><h3>'+esc(t[0])+'</h3><p>'+esc(t[1])+'</p><div class="btnrow"><button class="btn pri" data-a="tipok">Got it</button><button class="btn" data-a="tipoff">Hide tips</button></div></div>'}
+  if(c.kind==='pass'){const s=c.seat;h='<div class="cd cd-pass" style="--fc:'+fcol(s)+'"><div class="cd-sc"><div class="cd-e">'+emb(s,56)+'</div><h3>Pass the device to '+esc(nameOf(s))+'</h3><p>Everyone else look away. Your hand and hidden cards appear when you tap the button.</p></div><div class="cd-ft"><button class="btn pri big" data-a="take" data-s="'+s+'">I am '+esc(shortName(s))+': show my cards</button></div></div>'}
   else if(c.kind==='over'){h=overHTML()}
   else if(c.kind==='event')h=eventHTML(c.ev);
   el.innerHTML=h;
   if(c.kind==='event'&&c.ev.t==='clash')playClash(c.ev,el);
   const b=el.querySelector('.btn.pri');if(b)try{b.focus({preventScroll:true})}catch(e){}}
-function eventHTML(ev){
+function cdWrap(cls,body,foot){return '<div class="cd '+cls+'"><div class="cd-sc">'+body+'</div><div class="cd-ft">'+foot+'</div></div>'}
+function eventHTML(ev){const note=typeof coachEvent==='function'?coachEvent(ev):'';const cn=note?'<p class="coach">'+gloss(note)+'</p>':'';
   if(ev.t==='bids'){const rows=ev.bids.slice().sort((a,b)=>b.str-a.str||ev.order.indexOf(a.seat)-ev.order.indexOf(b.seat));
-    return '<div class="cd cd-bids"><h3>Bids revealed</h3><p class="sub">Highest bid chooses first.</p><div class="bidrow">'+rows.map((b,i)=>'<div class="bd" style="--fc:'+fcol(b.seat)+'"><span class="bd-n">'+(i+1)+'</span><span class="bd-c">'+TBKit.card(cardSpec(b.id),UI.phone?52:64).outerHTML+'</span><span class="bd-t"><b>'+esc(shortName(b.seat))+'</b><small>'+esc(TB.cardName(G,b.id))+'</small><i>'+b.str+'</i></span></div>').join('')+'</div><button class="btn pri" data-a="evok">Continue</button></div>'}
+    return cdWrap('cd-bids','<h3>Bids revealed</h3>'+(cn?'':'<p class="sub">'+gloss('The highest bid chooses first. A tie goes to whoever is higher on the Order Track.')+'</p>')+'<div class="bidrow">'+rows.map((b,i)=>'<div class="bd" style="--fc:'+fcol(b.seat)+'"><span class="bd-n">'+(i+1)+'</span><span class="bd-c">'+TBKit.card(cardSpec(b.id),UI.phone?(UI.short?40:52):64).outerHTML+'</span><span class="bd-t"><b>'+esc(shortName(b.seat))+'</b><small>'+esc(TB.cardName(G,b.id))+'</small><i>'+b.str+(b.str!==cinfo(b.id).strength?' <small>(printed '+cinfo(b.id).strength+')</small>':'')+'</i></span></div>').join('')+'</div>'+cn,'<button class="btn pri" data-a="evok">Continue</button>')}
   if(ev.t==='clash'){const w=ev.winner,tie=w<0;const names=ev.parts.map(s=>'<b>'+esc(shortName(s))+'</b> '+ev.tot[s]).join(' · ');
-    return '<div class="cd cd-clash"><h3>Clash '+(ev.idx>=0?['I','II','III'][ev.idx]:'')+': '+esc(REG[ev.r])+(ev.n>1?' (new clash)':'')+'</h3><div class="cl-panel" id="clp"></div><p class="cl-res" id="clres" hidden>'+(tie?'Tied: '+names:'<b>'+esc(shortName(w))+'</b> wins, '+names)+'</p><ul class="cl-log" id="cllog" hidden>'+ev.logs.filter(t=>!/^(.* reveals |Strength in |Clash )/.test(t)).slice(0,9).map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul><div class="cl-inf" id="clinf" hidden>'+infChips(ev.inf0,ev.inf1)+'</div><button class="btn pri" data-a="evok" id="clok" hidden>Continue</button></div>'}
-  if(ev.t==='summary'){return '<div class="cd cd-sum"><h3>End of round '+ev.round+(ev.last?' (the last)':'')+'</h3><table class="sumt"><thead><tr><th></th><th>This round</th><th>Total</th></tr></thead><tbody>'+ev.inf1.map((v,s)=>'<tr style="--fc:'+fcol(s)+'"><td><b>'+esc(shortName(s))+'</b></td><td>'+sgn(v-ev.inf0[s])+'</td><td><b>'+v+'</b></td></tr>').join('')+'</tbody></table>'+(ev.warns.length?'<ul class="cl-log warn">'+ev.warns.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'')+'<p class="sub">'+(ev.last?'The final count follows.':'Next round the player with the most Influence picks first; Heralds go home and Supporters are lost.')+'</p><button class="btn pri" data-a="evok">'+(ev.last?'See the result':'Next round')+'</button></div>'}
+    return cdWrap('cd-clash','<h3>Clash '+(ev.idx>=0?['I','II','III'][ev.idx]:'')+': '+esc(REG[ev.r])+(ev.n>1?' (replay)':'')+'</h3><div class="cl-panel" id="clp"></div><p class="cl-res" id="clres" hidden>'+(tie?'A tie: '+names+'. Nobody wins here.':'<b>'+esc(shortName(w))+'</b> wins: '+names)+'</p>'+cn+'<ul class="cl-log" id="cllog" hidden>'+ev.logs.filter(t=>!/^(.* reveals |Strength in |Clash )/.test(t)).slice(0,9).map(t=>'<li>'+esc(plain(t))+'</li>').join('')+'</ul><div class="cl-inf" id="clinf" hidden>'+infChips(ev.inf0,ev.inf1)+'</div>','<button class="btn pri" data-a="evok" id="clok" hidden>Continue</button>')}
+  if(ev.t==='summary'){return cdWrap('cd-sum','<h3>End of round '+ev.round+' of '+ev.rounds+'</h3><table class="sumt"><thead><tr><th></th><th>This round</th><th>Influence</th></tr></thead><tbody>'+ev.inf1.map((v,s)=>'<tr style="--fc:'+fcol(s)+'"><td><b>'+esc(shortName(s))+'</b></td><td>'+sgn(v-ev.inf0[s])+'</td><td><b>'+v+'</b></td></tr>').join('')+'</tbody></table>'+cn+(ev.warns.length?'<ul class="cl-log warn">'+ev.warns.map(t=>'<li>'+gloss(plain(t))+'</li>').join('')+'</ul>':'')+'<p class="sub">'+(ev.last?'That was the last round: the final count follows.':gloss('Winter: Heralds go home, Supporters on the map are spent, played cards go to the discard pile. Next round the leader acts first.'))+'</p>','<button class="btn pri" data-a="evok">'+(ev.last?'See the result':'Start round '+(ev.round+1))+'</button>')}
   return ''}
 function infChips(a,b){return a.map((v,s)=>b[s]!==v?'<span style="--fc:'+fcol(s)+'">'+esc(shortName(s))+' '+sgn(b[s]-v)+'</span>':'').join('')}
 function playClash(ev,root){const panel=root.querySelector('#clp');if(!panel)return;const w=ev.winner;
   const items=ev.parts.map(s=>{const ids=(ev.cardsF&&ev.cardsF[s])||ev.cards[s]||[];const best=ids.slice().sort((a,b)=>cinfo(b).strength-cinfo(a).strength)[0];
     const spec=best!=null?cardSpec(best):{faction:FK[G.pl[s].fac],title:'Supporters only',value:0,type:'ploy',art:'banner',text:'No cards here: only Supporters count.'};
     return {faction:FK[G.pl[s].fac],name:shortName(s)+(ids.length>1?' (+'+(ids.length-1)+')':'')+(ev.supp[s]?' +'+ev.supp[s]+' sup.':''),card:spec,strength:ev.tot[s],winner:w===s}});
-  const sz=Math.max(70,Math.min(110,Math.floor((root.clientWidth-30)/Math.max(2,items.length))-14,UI.land?84:110));
+  const sc=root.querySelector('.cd-sc')||root;let rest=0;for(const c of sc.children)if(c!==panel&&!c.hidden)rest+=c.offsetHeight+8;const sz=Math.max(48,Math.min(110,Math.floor((root.clientWidth-30)/Math.max(2,items.length))-14,Math.floor((sc.clientHeight-rest-30-70)/1.43/1.08)));
   const cp=TBKit.clashPanel(panel,items,{size:sz,tie:w<0});UI._cp=cp;
   const fin=()=>{['#clres','#cllog','#clinf','#clok'].forEach(q=>{const e=root.querySelector(q);if(e)e.hidden=false});UI.clashRes[ev.r]={winner:w,tot:ev.tot};
     const b=root.querySelector('#clok');if(b)try{b.focus({preventScroll:true})}catch(e){}if(typeof sfx==='function')sfx(w<0?'tie':'win')};
   if(!ANIM){cp.el.querySelectorAll('.tb-flipcard').forEach(f=>f.classList.add('tb-up'));cp.el.querySelectorAll('.tb-clash-col').forEach(c=>c.classList.add('tb-shown'));fin();return}
   mapReveal(ev);
   setTimeout(()=>{const key=UI._cardKey;cp.play().then(()=>{if(UI._cardKey===key)fin()})},350)}
-function overHTML(){const o=G.over,sc=TB.scores(G);const rk=o.ranking;const win=o.winner;
-  return '<div class="cd cd-over"><h3>'+(NET.on?(win===vs()?'You win the throne!':esc(nameOf(win))+' takes the throne'):humans().length&&!G.pl[win].ai&&humans().length===1?'You win the throne!':esc(nameOf(win))+' takes the throne')+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+esc(nameOf(s))+'</b><span>'+G.pl[s].inf+(o.bonus&&o.bonus[s]?' <small>(includes +'+o.bonus[s]+' from emptying the Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(NET.on?(isHost()?'<div class="btnrow"><button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="netopen">Lobby</button></div>':'<p class="sub">The host can start another game.</p><div class="btnrow"><button class="btn" data-a="netleave">Leave</button></div>'):'<div class="btnrow"><button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="menu">Main menu</button></div>')+'</div>'}
+function overHTML(){const o=G.over;const rk=o.ranking;const win=o.winner;const me=vs();const iWon=(NET.on||humans().length===1)&&win===me;
+  const head=iWon?'You win the throne!':esc(nameOf(win).replace(/^You$/,'You'))+' takes the throne';
+  const body='<h3>'+head+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+(i+1)+'. '+esc(shortName(s))+'</b><span>'+G.pl[s].inf+' Influence'+(o.bonus&&o.bonus[s]?' <small>(+'+o.bonus[s]+' from the emptied Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(typeof overBreakdown==='function'?overBreakdown():'');
+  const foot=NET.on?(isHost()?'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="netopen">Lobby</button>':'<button class="btn" data-a="netleave">Leave</button>'):'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="menu">Main menu</button>';
+  const gnote=typeof isGuided==='function'&&isGuided()?'<p class="coach">'+gloss('You have played a whole game. Next time try a full game from Play: choose the faction whose story you like, 3 players, 5 rounds. The suggestions stay on if you want them.')+'</p>':'';
+  return cdWrap('cd-over',body+gnote+(NET.on&&!isHost()?'<p class="sub">The host can start another game.</p>':''),foot)}

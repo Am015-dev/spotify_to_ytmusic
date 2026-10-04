@@ -76,13 +76,14 @@ function hookEngine(){const I=TB.internal;if(!I||!I.AG||I.__hooked)return;I.__ho
   const wrap=(h,before,after)=>{const o=AG[h];if(!o)return;AG[h]=function(d){const mine=(()=>{const g=TB.internal.G;if(!G)G=g;return g===G})();try{mine&&before&&before(d)}catch(e){console.warn('hook',h,e.message)}const r=o.call(this,d);try{mine&&after&&after(d)}catch(e){console.warn('hook',h,e.message)}return r}};
   const flush=()=>{if(EV.cur&&EV.cur.t==='clash'&&EV.cur.tot){const c=EV.cur;c.logs=logSince(c.log0).map(e=>e.t);c.inf1=snapInf();pushEv(c)}EV.cur=null};
   wrap('roundStart',()=>{flush()},()=>{UI.rs0=snapInf();UI.rsLog=G.logN;UI.clashRes={};UI.placed=[]});
-  wrap('bidReveal',null,()=>{pushEv({t:'bids',round:G.round,bids:G.pl.map(p=>({seat:p.seat,id:p.bid,str:G.bstr[p.seat]})).filter(b=>b.id!=null),order:G.order.slice()})});
+  wrap(I.AG.bidOrder?'bidOrder':'bidReveal',null,()=>{pushEv({t:'bids',round:G.round,bids:G.pl.map(p=>({seat:p.seat,id:p.bid,str:G.bstr[p.seat]})).filter(b=>b.id!=null),order:G.order.slice()})});
   wrap('clashReveal',()=>{if(EV.cur&&EV.cur.tot)flush()},()=>{const c=G.clash;if(!c)return;if(!EV.cur)EV.cur={t:'clash',r:c.r,idx:G.cord.indexOf(c.r),rounds:0,log0:G.logN-c.parts.length,inf0:snapInf()};
     EV.cur.n=c.n;EV.cur.cards={};for(const s of c.parts)EV.cur.cards[s]=(c.cards[s]||[]).slice();EV.cur.supp={};for(const s of c.parts)EV.cur.supp[s]=G.pl[s].supp.r[c.r];EV.cur.parts=c.parts.slice();EV.cur.tot=null});
   wrap('clashTally',null,()=>{const c=G.clash;if(!c||!EV.cur)return;EV.cur.tot=Object.assign({},c.tot);EV.cur.winner=c.winner;EV.cur.tied=c.tied?c.tied.slice():null;
     EV.cur.cardsF={};for(const s in EV.cur.cards)EV.cur.cardsF[s]=EV.cur.cards[s].slice();
     const ci=G.clash.cards;for(const s in ci)EV.cur.cardsF[s]=ci[s].slice();
-    EV.cur.str={};for(const s in EV.cur.cardsF)EV.cur.str[s]=EV.cur.cardsF[s].map(id=>cinfo(id).strength)});
+    EV.cur.str={};for(const s in EV.cur.cardsF)EV.cur.str[s]=EV.cur.cardsF[s].map(id=>cinfo(id).strength);
+    flush()});  // the result card comes right after the tally, before the winner is asked to claim a location
   wrap('regionDone',()=>{flush()});
   wrap('cleanup',()=>{if(UI.rs0)pushEv({t:'summary',round:G.round,rounds:G.rounds,inf0:UI.rs0,inf1:snapInf(),order:G.order.slice(),warns:logSince(UI.rsLog||0).filter(e=>e.c==='warn').map(e=>e.t),big:logSince(UI.rsLog||0).filter(e=>e.c==='big').map(e=>e.t).slice(-8),last:G.round>=G.rounds})});
   if(PK&&PK.bidRes){const o=PK.bidRes;PK.bidRes=function(seat,opt,d){const r=o.call(this,seat,opt,d);try{UI.toast=G.log.length?G.log[G.log.length-1].t:''}catch(e){}return r}}}
@@ -118,24 +119,24 @@ function mkSeats(cfg){const n=cfg.np,seats=[];const fac=FIDS.slice();
   return seats}
 function newGame(mode,o){o=o||{};mode=mode||'me';
   const cfg={mode:mode==='ai'?'watch':mode,np:o.np||(mode==='guided'?2:3),length:o.length||(mode==='guided'?'short':'standard'),faction:o.faction||'nobility',levels:o.levels||[],seed:o.seed,humanSeats:o.humanSeats,guide:o.guide};
-  if(mode==='guided'){cfg.mode='me';cfg.guided=true;cfg.guide='full';cfg.levels=['easy']}
+  if(mode==='guided'){cfg.mode='me';cfg.guided=true;cfg.guide='full';cfg.levels=['easy','easy'];cfg.np=2;cfg.length='short';cfg.faction=GUIDED.faction;cfg.seed=GUIDED.seed;o.seatFactions=[GUIDED.faction,GUIDED.rival];UI.aiSeed=GUIDED.ai}
   const seats=mkSeats(cfg);
   const hn=cfg.mode==='hot'?(cfg.humanSeats||seats.map((_,i)=>i)):cfg.mode==='watch'?[]:[0];
   seats.forEach((s,i)=>{s.human=hn.includes(i);s.level=cfg.levels[i]||cfg.levels[0]||'normal'});
   if(o.seatFactions)o.seatFactions.forEach((f,i)=>{if(seats[i])seats[i].faction=f});
   const cnt={};const pl=seats.map((s,i)=>{const base=DD.FSHORT[s.faction];
-    return {faction:s.faction,name:s.human?(cfg.mode==='hot'||hn.length>1?'Player '+(i+1)+' ('+base+')':'You ('+base+')'):base,ai:s.human?null:s.level}});
+    return {faction:s.faction,name:s.human&&(cfg.mode==='hot'||hn.length>1)?'Player '+(i+1)+' ('+DD.FSHORT[s.faction].replace('Gilded Court','Court').replace('Heathbound Clans','Clans').replace('Lantern Rising','Lanterns').replace('Pale Choir','Choir')+')':base,ai:s.human?null:s.level}});
   cfg.seats=seats;UI.cfg=cfg;UI.mode=cfg.mode;UI.guide=cfg.guide||(UI.guide||'full');
   hookEngine();
   G=null;const g=TB.newGame({players:pl,length:cfg.length,seed:cfg.seed!=null?cfg.seed:(o.seed!=null?o.seed:undefined)});
-  G=g;resetUI();UI.started=true;UI.holder=hn[0]!=null?hn[0]:0;
+  G=g;resetUI();UI.coachDone={};UI.started=true;UI.holder=hn[0]!=null?hn[0]:0;
   UI.rs0=snapInf();UI.rsLog=0;
-  saveGame();hideStart();afterStart();return G}
-function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
-function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,t:Date.now()}))}catch(e){}}
+  try{localStorage.setItem('tb_played','1')}catch(e){}saveGame();hideStart();afterStart();return G}
+function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.coachInfo=null;UI.nowT=null;UI.moreOpen=false;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
+function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,coach:UI.coachDone||{},tip:UI.tip,t:Date.now()}))}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem('tb_save');return s?JSON.parse(s):null}catch(e){return null}}
 function clearSave(){try{localStorage.removeItem('tb_save')}catch(e){}}
-function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI.holder=sv.holder||0;UI.guide=sv.guide||'full';UI.aiSeed=sv.ai||1;resetUI();UI.started=true;UI.rs0=snapInf();UI.rsLog=G.logN;return G}
+function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI.holder=sv.holder||0;UI.guide=sv.guide||'full';UI.aiSeed=sv.ai||1;resetUI();UI.coachDone=sv.coach||{};UI.tip=sv.tip||{};UI.started=true;UI.rs0=snapInf();UI.rsLog=G.logN;return G}
 // ---------------------------------------------------------------- applying moves
 function doMove(mv){if(!G||!G.q)return false;const was=G.round,l0=G.logN;
   const res=TB.apply(G,mv);
@@ -265,11 +266,15 @@ function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=
     const n=G.np,cols=S.cols>=n?n:S.cols,rows=Math.ceil(n/cols),sw=UI.phone?44:38,sh=UI.phone?62:54,gap=6,tw=cols*sw+(cols-1)*gap,th=rows*sh+(rows-1)*gap;
     for(let s=0;s<n;s++){const sp=V.pl[s].supp,cnt=sp.r[r]+sp.x[r];if(!cnt)continue;const c=s%cols,rw=Math.floor(s/cols);const x=S.cx-tw/2+c*(sw+gap)+sw/2,y=S.cy-th/2+rw*(sh+gap)+sh+(UI.phone?10:9);
       f.push('<g transform="translate('+x+' '+y+')"><circle r="'+(UI.phone?11:10)+'" fill="'+fcol(s)+'" stroke="#fff3c4" stroke-width="2"/><text y="5" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="'+TBKit.fonts.display+'">'+cnt+'</text></g>')}}
+  if(UI.phone&&(UI.bs||0)>=250){ // phones: the kit's banners are hidden, so every location gets a short name tag of its own
+    for(let l=0;l<6;l++){const P=LOCPOS[l],name=LOCN[l],fs=36,words=name.split(' ');const lines=name.length>8&&words.length>1?[words[0],words.slice(1).join(' ')]:[name];
+      const wd=Math.max(...lines.map(t=>t.length))*fs*.6+18,ht=lines.length*fs+8;const cx=Math.max(wd/2+4,Math.min(996-wd/2,P[0])),top=P[1]+52;
+      f.push('<g class="locname"><rect x="'+Math.round(cx-wd/2)+'" y="'+top+'" width="'+Math.round(wd)+'" height="'+ht+'" rx="10" fill="#1d120b" fill-opacity=".82"/>'+lines.map((t,i)=>'<text x="'+Math.round(cx)+'" y="'+Math.round(top+(i+1)*fs-4)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#f6e6b4">'+esc(t)+'</text>').join('')+'</g>')}}
   ov.innerHTML=f.join('')}
 function setHl(ids){MAP.hl=ids||[]}
 function applyHl(){const m=MAP.m;if(!m)return;const sel=UI.pop==='loc'&&UI.popArg?LOCID[UI.popArg.l]:null;m.highlight(MAP.hl.map(l=>LOCID[l]));m.select(sel);drawSelName()}
 // Phones: the kit's name banners are hidden (they were clipped and overlapped the region labels and reward coins). A tapped location shows its name here instead, in a spot with nothing else: below the circle in the top row and the upper half of the side columns, above it in the lower half.
-function drawSelName(){const g=MAP.sg;if(!g)return;if(!UI.phone||UI.pop!=='loc'||!UI.popArg||UI.popArg.l==null){g.innerHTML='';return}
+function drawSelName(){const g=MAP.sg;if(!g)return;if(UI.phone){g.innerHTML='';return}if(!UI.phone||UI.pop!=='loc'||!UI.popArg||UI.popArg.l==null){g.innerHTML='';return}
   const l=UI.popArg.l,P=LOCPOS[l],name=LOCN[l],fs=34,words=name.split(' ');let lines=[name];if(name.length>9&&words.length>1){const h=Math.ceil(words.length/2);lines=[words.slice(0,h).join(' '),words.slice(h).join(' ')]}
   const wd=Math.max(...lines.map(t=>t.length))*fs*.66+30,ht=lines.length*(fs+8)+14,below=l<2||l===2||l===4;let cx=P[0];cx=Math.max(wd/2+8,Math.min(1000-wd/2-8,cx));const top=below?P[1]+60:P[1]-60-ht;
   g.innerHTML='<g><rect x="'+Math.round(cx-wd/2)+'" y="'+Math.round(top)+'" width="'+Math.round(wd)+'" height="'+ht+'" rx="14" fill="#1d120b" fill-opacity=".92" stroke="#e8c867" stroke-width="3"/>'+lines.map((t,i)=>'<text x="'+Math.round(cx)+'" y="'+Math.round(top+7+(i+1)*(fs+8)-6)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#f6e6b4">'+esc(t)+'</text>').join('')+'</g>'}
@@ -291,112 +296,159 @@ const STEP_HELP=[
  'Summer, Clashes. Regions are resolved one by one. Cards are revealed, Day and Night abilities fire, the strongest total wins and claims one of the region\'s two locations.',
  'Autumn. Once each you may Govern (move a hand card with votes into a Council) and Journey (spend a hand card for Lore to buy Site of Power cards), plus any Autumn abilities.',
  'Winter. Heralds go home, Supporters are lost, played cards go to the discard pile, and the next round starts. Running out of deck shrinks your hand size (Attrition).'];
-const KIND_NAME={bid:'Choose your bid',bidRes:'Resolve your bid',herald:'Place your Herald',place:'Play a face-down card',menu:'Your actions',clashOrder:'Order the clashes',location:'Claim a location',tie:'Break the tie?'};
+const KIND_NAME={bid:'Choose your bid',bidRes:'Use your bid',herald:'Place your Herald',place:'Hide your cards',clashOrder:'Order the Clashes',location:'Claim a location',tie:'A tie!'};
 // ---------------------------------------------------------------- top bar status chip
 function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;
-  const ri=roadIdx();const r=Math.max(1,G.round);
-  el.innerHTML='<span class="chip" aria-label="Round '+r+' of '+G.rounds+', step '+ROAD[ri]+'"><span class="chip-r">'+ico('round')+'<b>'+r+'</b><small>/'+G.rounds+'</small></span><span class="chip-s">'+esc(ROAD[ri])+'</span></span>'}
+  const ev=UI.card&&UI.card.kind==='event'?UI.card.ev:null;const ri=ev&&ev.t==='summary'?6:ev&&ev.t==='clash'?4:roadIdx();const r=ev&&ev.round?ev.round:Math.max(1,G.round);
+  el.innerHTML='<span class="chip" aria-label="Round '+r+' of '+G.rounds+', step '+(ri+1)+' of 7: '+ROAD[ri]+'"><span class="chip-t"><small>Round</small><b>'+r+'</b><small>of '+G.rounds+'</small><span class="chip-s">'+esc(ROAD[ri])+'</span></span><span class="chip-d" aria-hidden="true">'+ROAD.map((_,i)=>'<i class="'+(i<ri?'done':i===ri?'on':'')+'"></i>').join('')+'</span></span>'}
 const ICO={round:'<path d="M5 20V9l7-5 7 5v11M9 20v-6h6v6"/>',book:'<path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v13"/>',log:'<path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/>',users:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-4 3-6 6-6s6 2 6 6M15 14c3 0 6 1.5 6 5"/>',crown:'<path d="M3 18h18l-1.5-9-4.5 4-3-7-3 7-4.5-4z"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',card:'<rect x="6" y="3" width="12" height="18" rx="2"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',inf:'<circle cx="12" cy="12" r="8"/><path d="M8 14l1-5 3 3 3-3 1 5z"/>',eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',star:'<path d="M12 3l2.6 6 6.4.6-4.9 4.2 1.5 6.3L12 17l-5.6 3.1 1.5-6.3L3 9.6 9.4 9z"/>',road:'<path d="M5 20L9 4M19 20L15 4M12 6v3M12 12v3M12 18v2"/>'};
 function ico(n,c){return '<svg class="ico '+(c||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(ICO[n]||'')+'</svg>'}
 // ---------------------------------------------------------------- roadmap
 function renderRoad(){const el=$('#road');if(!el)return;const ri=roadIdx();
   el.innerHTML='<div class="road-h"><b>Round '+Math.max(1,G.round)+' of '+G.rounds+'</b><span class="road-n">step '+(ri+1)+' of 7</span></div><ol class="road-l" aria-label="Round roadmap">'+ROAD.map((n,i)=>'<li class="'+(i<ri?'done':i===ri?'on':'')+'"'+(i===ri?' aria-current="step"':'')+'><i>'+(i+1)+'</i><span>'+n+'</span></li>').join('')+'</ol>'}
-// ---------------------------------------------------------------- recommended move
-function getRec(s,mv){const key=G.logN+':'+(G.q?G.q.kind:'')+':'+s+':'+(G.q&&G.q.chosen?G.q.chosen.length:'')+':'+(mv?mv.length:0);
-  if(UI._rk===key)return UI._rec;UI._rk=key;let r=null;try{r=suggest(s)}catch(e){}UI._rec=r;return r}
+// ---------------------------------------------------------------- recommended move (+ the guided script may choose a simpler teaching move)
+function getRec(s,mv){const key=G.logN+':'+(G.q?G.q.kind:'')+':'+s+':'+(G.q&&G.q.chosen?G.q.chosen.length:'')+':'+(mv?mv.length:0)+':'+(UI.cfg&&UI.cfg.guided?1:0);
+  if(UI._rk===key)return UI._rec;UI._rk=key;let r=null;try{r=(typeof coachRec==='function'&&coachRec(s,mv))||suggest(s)}catch(e){}UI._rec=r;return r}
 const recK=()=>UI._rec&&UI._rec.k;
 function whyFor(s,mv){if(!mv)return '';const q=G.q,k=q.kind;
   if(k==='bid'){const i=cinfo(mv.id);const hand=G.pl[s].hand.map(id=>cinfo(id).strength).sort((a,b)=>b-a);
     const rank=hand.indexOf(i.strength)+1;
-    return i.strength>=hand[Math.min(1,hand.length-1)]?'A high bid ('+i.strength+') should be among the first to choose from the Great Road, but the card will sit under whatever you take.':
-      rank>=hand.length-1?'A cheap bid ('+i.strength+'): it keeps your strong cards for the clashes. You may be late to choose, or just take the card back.':
-      'A middle bid ('+i.strength+'): good enough to pick a Kingdom Card, while your strongest cards stay free for the clashes.'}
-  if(k==='herald'){const l=mv.loc,inf=DD.LOCS[l][2];const riv=G.pl.filter(p=>p.seat!==s&&p.herald===l).map(p=>p.name);
-    return LOCN[l]+' pays +'+inf+' Influence'+(DD.LOCS[l][3]?' and '+lcFirst(DD.LOCS[l][3]):'')+'. '+(riv.length?riv.join(', ')+(riv.length>1?' have':' has')+' a Herald here: if you win here you take 1 Influence from each.':'No rival Herald is here yet, so your swing is a clean +1.')}
-  if(k==='place'||k==='tie'){if(mv.pass)return 'Passing keeps your cards. If everyone passes the tie ends with no winner.';const i=cinfo(mv.id);const r=mv.r!=null?REG[mv.r]:'the tied region';
-    return 'Strength '+i.strength+' in '+r+(i.strength>=7?': a strong card for a region you want to win.':i.strength<=2?': a cheap card, useful as a bluff or to save better ones.':': a solid middle card.')}
-  if(k==='bidRes'){if(mv.t==='return')return 'Taking the card back keeps your hand full if nothing on offer helps.';if(mv.t==='steal')return 'Stealing takes a Kingdom Card away from a rival and returns their occupying card to their hand.';return 'This Kingdom Card fits your hand: it takes effect while your bid card sits under it.'}
-  if(k==='location'){return LOCN[mv.loc]+' pays +'+DD.LOCS[mv.loc][2]+' Influence'+(DD.LOCS[mv.loc][3]?' and '+lcFirst(DD.LOCS[mv.loc][3]):'.')+(G.pl.some(p=>p.seat!==s&&p.herald===mv.loc)?' Rival Heralds there lose 1 each if yours is there too.':'')}
-  if(G.q.t==='menu'){return mv.t==='done'?'Nothing else is worth doing right now.':'Worth doing before you finish.'}
-  return 'The computer at its strongest would pick this.'}
+    return i.strength>=hand[Math.min(1,hand.length-1)]?'A high bid ('+i.strength+') chooses early, but this card then sits under the Kingdom Card and cannot fight.':
+      rank>=hand.length-1?'A cheap bid ('+i.strength+') keeps your strong cards for the Clashes. You may choose late, or simply take it back.':
+      'A middle bid ('+i.strength+') can still win a good Kingdom Card while your strongest cards stay free for the Clashes.'}
+  if(k==='herald'){const l=mv.loc,inf=DD.LOCS[l][2];const riv=G.pl.filter(p=>p.seat!==s&&p.herald===l).map(p=>shortName(p.seat));
+    return LOCN[l]+' pays +'+inf+' Influence'+(DD.LOCS[l][3]?' and '+lcFirst(DD.LOCS[l][3]):'')+'. '+(riv.length?riv.join(', ')+(riv.length>1?' have':' has')+' a Herald here: win here and you take 1 Influence from each.':'Win this region and claim it, and your Herald earns +1.')}
+  if(k==='place'||k==='tie'){if(mv.pass)return 'Passing keeps your cards. If everyone passes, nobody wins this region.';const i=cinfo(mv.id);const r=mv.r!=null?REG[mv.r]:'the tied region';
+    return 'Strength '+i.strength+' in '+r+(i.strength>=7?': a strong card where the prize is worth it.':i.strength<=2?': a cheap card, a bluff that saves better ones.':': a solid middle card.')}
+  if(k==='bidRes'){if(mv.t==='return')return 'Nothing on offer is worth a card: take it back and keep your hand full.';if(mv.t==='steal')return 'Stealing takes a Kingdom Card from a rival; their card under it goes back to their hand.';const kk=TB.kingdomInfo(mv.kc);return 'It works for you every round you keep it: '+lcFirst(kk.text)+'.'}
+  if(k==='location'){return LOCN[mv.loc]+' pays +'+DD.LOCS[mv.loc][2]+' Influence'+(DD.LOCS[mv.loc][3]?' and '+lcFirst(DD.LOCS[mv.loc][3]):'')+'.'+(G.pl[s].herald===mv.loc?' Your Herald is here: +1 more, and you take 1 from each rival Herald here.':'')}
+  if(k==='clashOrder')return 'Fight first where you are strongest, so your wins come before rivals can react.';
+  if(G.q.t==='menu')return menuWhy(mv);
+  if(G.q.t==='sel'){if(mv.t==='seldone')return 'Nothing more here is worth it right now.';
+    if(k==='siteBuy')return 'Site of Power cards are stronger than your basic cards; buying one now makes your deck better for the rest of the game.';
+    if(k==='shrine')return 'Cards at the bottom of your deck come back later, after a reshuffle; weak cards there leave room for better draws.';
+    if(k==='ossuary')return 'It brings a useful card back from your discard pile.';
+    if(k==='rally'||k==='brine')return 'Taking strong cards back to your hand saves them from Winter\'s discard.';
+    return 'Of the choices here this one gains you the most.'}
+  if(k==='occupier')return 'The card under a Kingdom Card cannot fight, so tuck your weakest useful card there.';
+  if(k==='slot')return 'The Kingdom Card you replace is the one that helps you least now.';
+  if(k==='councilOut')return 'A card back in your hand can fight again next round.';
+  if(k==='flank'||k==='journeyDest')return 'Your card does more good there.';
+  if(k==='castle'||k==='wilderness')return mv.skip||/^Skip/.test(mv.label||'')?'No card here is worth giving up.':'This card is worth less in your hand than what you gain.';
+  if(q.t==='pick'&&mv.yes!=null)return mv.yes?'Using it now gains more than saving it.':'Saving it for a better moment is worth more.';
+  return 'Of the choices here this one gains you the most.'}
+function menuWhy(m){if(m.t==='done')return 'Nothing else here helps right now, so finish this step.';const a=m.a||'';
+  if(a==='supp')return 'Each Supporter adds +1 Strength in that region\'s first Clash (they are spent in Winter).';
+  if(a==='govern')return 'A card in a Council gives a lasting bonus every round.';
+  if(a==='journey')return 'Lore buys your faction\'s Site of Power cards: stronger cards for later rounds.';
+  if(a.startsWith('t:'))return 'A Tactic is a once-only faction power; now is a good moment to spend it.';
+  if(a.startsWith('fav:'))return 'Your Favour power has limited uses; this is a good one.';
+  if(a.startsWith('council:'))return 'Your Council cards allow this once a round.';
+  if(a==='cmd:rally')return 'Rally brings strong cards back to your hand before Winter discards them.';
+  if(a==='cmd:ambush')return 'Ambush adds a hidden card from your hand to this Clash.';
+  if(a==='cmd:retreat')return 'Retreat saves your cards from a Clash you cannot win.';
+  if(a==='cmd:flank')return 'Flank moves this card to a region where it does more good.';
+  if(a==='cmd:deploy')return 'Deploy puts a card on the map that stays through Winter.';
+  return 'Worth doing before you finish this step.'}
 const lcFirst=t=>t?t.charAt(0).toLowerCase()+t.slice(1).replace(/\.$/,''):''
-// ---------------------------------------------------------------- the main prompt
-function recapHTML(){const c=G.clash;if(!c)return '';const parts=c.parts,V=UI.V;
+// ---------------------------------------------------------------- the main prompt: body (#main, scrolls) + the action row (#act, pinned)
+function recapHTML(){const c=G.clash;if(!c)return '';const parts=c.parts;
   const rows=parts.map(s=>{const ids=(c.cards[s]||[]);const tot=c.tot&&c.tot[s]!=null?c.tot[s]:null;
-    return '<span class="rc-s" style="--fc:'+fcol(s)+'"><b>'+esc(shortName(s))+'</b> '+ids.map(id=>cinfo(id).strength).join('+')+(G.pl[s].supp.r[c.r]?' +'+G.pl[s].supp.r[c.r]+' supporter'+(G.pl[s].supp.r[c.r]>1?'s':''):'')+(tot!=null?' = <b>'+tot+'</b>':'')+'</span>'}).join('');
-  return '<div class="recap" aria-label="Current clash"><span class="rc-t">Clash in '+esc(REG[c.r])+(c.n>1?' (round '+c.n+')':'')+'</span>'+rows+'</div>'}
-const shortName=s=>kf(s).short.replace('Gilded Court','Gilded').replace('Heathbound Clans','Heath').replace('Lantern Rising','Lantern').replace('Pale Choir','Choir')+(!G.pl[s].ai&&(NET.on?s===vs():humans().length===1)?' (you)':'');
+    return '<span class="rc-s" style="--fc:'+fcol(s)+'"><b>'+esc(shortName(s))+'</b> '+(ids.map(id=>cinfo(id).strength).join('+')||'0')+(G.pl[s].supp.r[c.r]?' +'+G.pl[s].supp.r[c.r]+' Supporter'+(G.pl[s].supp.r[c.r]>1?'s':''):'')+(tot!=null?' = <b>'+tot+'</b>':'')+'</span>'}).join('');
+  return '<div class="recap" aria-label="Current clash"><span class="rc-t">Clash in '+esc(REG[c.r])+(c.n>1?' (replay '+c.n+')':'')+'</span>'+rows+'</div>'}
+const shortName=s=>(hotSeat()&&!G.pl[s].ai?G.pl[s].name.replace(/ \(.*$/,'').replace('Player ','P')+' · ':'')+kf(s).short.replace('Gilded Court','Court').replace('Heathbound Clans','Clans').replace('Lantern Rising','Lanterns').replace('Pale Choir','Choir')+(!G.pl[s].ai&&(NET.on?s===vs():humans().length===1)?' (you)':'');
 function waitingHTML(){const q=G.q;let who='';
-  if(q){const names=q.seats.map(s=>shortName(s));who=NET.on?decidingLine():names.join(', ')+(q.seats.length>1?' are':' is')+' deciding'}
-  const cur=G.log.slice(-3).map(e=>'<li>'+esc(e.t)+'</li>').join('');
-  return '<div class="wait"><p class="w-t">'+(UI.mode==='watch'?'Watching the computers play.':NET.on&&vs()<0?'You are watching.':'Waiting for the others.')+' '+esc(who)+'.</p><ul class="w-log">'+cur+'</ul>'+(UI.mode==='watch'?watchControls():'')+'</div>'}
-function watchControls(){return '<div class="btnrow"><button class="btn" data-a="wpause" aria-pressed="'+UI.watchPaused+'">'+(UI.watchPaused?'Resume':'Pause')+'</button><button class="btn" data-a="wstep">Step</button><button class="btn" data-a="wspeed">Speed x'+UI.speed+'</button></div>'}
-function optBtn(m,cls,extra){const rec=recK()===m.k;return '<button class="opt'+(cls?' '+cls:'')+(rec?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+(extra||'')+'<span class="ot">'+esc(m.label)+'</span>'+(rec?'<span class="rtag">'+ico('star')+'Recommended</span>':'')+'</button>'}
+  if(q){const names=q.seats.map(s=>shortName(s).replace(' (you)',''));who=NET.on?decidingLine():names.join(', ')+(q.seats.length>1?' are':' is')+' deciding'}
+  const cur=G.log.slice(-4).map(e=>'<li>'+esc(plain(e.t))+'</li>').join('');
+  return '<div class="wait"><p class="w-t">'+(UI.mode==='watch'?'Watching the computers play.':NET.on&&vs()<0?'You are watching.':'Waiting for the others.')+' '+esc(who)+'.</p><ul class="w-log">'+cur+'</ul></div>'}
+function watchControls(){return '<button class="btn" data-a="wpause" aria-pressed="'+UI.watchPaused+'">'+(UI.watchPaused?'Resume':'Pause')+'</button><button class="btn" data-a="wstep">Step</button><button class="btn" data-a="wspeed">Speed x'+UI.speed+'</button>'}
+function optBtn(m,cls,extra){const rec=recK()===m.k;return '<button class="opt'+(cls?' '+cls:'')+(rec?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+(extra||'')+'<span class="ot">'+esc(m.label)+'</span>'+(rec?'<span class="rtag">'+ico('star')+'Suggested</span>':'')+'</button>'}
 function thumbFor(m){if(m.id!=null&&m.id>=0&&m.t!=='sel')return '<span class="th"'+(ownerOf(m.id)===vs()?' data-owner="'+ownerOf(m.id)+'" data-up="1"':'')+'>'+cardEl(m.id,44).outerHTML+'</span>';
   if(m.kc)return '<span class="th">'+kcEl(m.kc,44).outerHTML+'</span>';return ''}
-function renderMain(){const el=$('#main');if(!el)return;const q=G.q;
-  if(G.over){el.innerHTML='<div class="step"><h3>The reign is over</h3></div>';return}
+const pbtn=(m,txt,pulse)=>'<button class="btn pri'+(pulse?' pulse':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+esc(txt)+'</button>';
+function recBtnText(m){const k=G.q.kind;if(!m)return '';
+  if(k==='bid')return 'Bid '+cinfo(m.id).name+' ('+cinfo(m.id).strength+')';
+  if(k==='herald')return 'Herald to '+LOCN[m.loc];
+  if(k==='place')return 'Play '+cinfo(m.id).name+' ('+cinfo(m.id).strength+') at '+REG[m.r].replace('The ','');
+  if(k==='tie')return m.pass?'Pass':'Play '+cinfo(m.id).name;
+  if(k==='location')return 'Claim '+LOCN[m.loc];
+  if(k==='bidRes')return m.t==='return'?'Take my card back':(m.t==='steal'?'Steal ':'Take ')+TB.kingdomInfo(m.kc).name;
+  if(m.t==='done'||m.t==='seldone')return m.label.replace(/^End my /,'End ');
+  const L=m.label.replace(/\s*\([^)]*\)\s*$/,'');return L.length>48?L.slice(0,46)+'…':L}
+function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q;let foot='';
+  const qk=(q?q.kind+'|'+q.title+'|'+G.logN:'')+'|'+(UI.coachInfo?UI.coachInfo.id:'');const set=(h,f)=>{el.innerHTML=h;if(ft)ft.innerHTML=f||'';if(UI._qk!==qk){UI._qk=qk;el.scrollTop=0}};
+  if(G.over){set('<div class="step"><h3 class="st">The reign is over</h3></div>');return}
+  if(UI.coachInfo){set(coachInfoHTML(UI.coachInfo),'<button class="btn pri pulse" data-a="coachok">'+esc(UI.coachInfo.btn||'Continue')+'</button>');setHl(UI.coachInfo.hlLocs||[]);return}
   const s=viewSeatForQ();
-  if(!q||s==null||UI.card&&UI.card.kind==='pass'){el.innerHTML=waitingHTML();setHl([]);return}
+  if(!q||s==null||UI.card&&UI.card.kind==='pass'){set(waitingHTML(),UI.mode==='watch'?watchControls():'');setHl([]);return}
   const mv=legal(s);const rec=getRec(s,mv);const rm=rec?mv.find(m=>m.k===rec.k):null;
-  let h='';const help=tipLine(q.kind);
-  h+='<div class="step" data-q="'+q.kind+'"><h3 class="st">'+esc(KIND_NAME[q.kind]||q.title.replace(/^[^:]*:\s*/,''))+'</h3>';
-  h+='<p class="pr">'+esc(promptText(q))+'</p>';
+  const co=typeof coachFor==='function'?coachFor(s,mv,rm):null;
+  let h='';
+  h+='<div class="step" data-q="'+q.kind+'"><h3 class="st">'+esc(co&&co.title||KIND_NAME[q.kind]||titleOf(q))+'</h3>';
+  if(co)h+='<p class="coach">'+gloss(co.text)+'</p>';
+  else{h+=tipLine(q.kind)+'<p class="pr">'+gloss(promptText(q))+'</p>'}
   if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Everyone decides at the same time. Still to choose: '+esc(oth.map(seatWho).join(', '))+'.</p>'}
   if(G.clash&&['day','night','tally'].includes(G.step)||G.clash&&q.kind==='location'||G.clash&&['castle','wilderness','harvest','shrine','ossuary','tie'].includes(q.kind))h+=recapHTML();
-  const hl=[];
+  if(!co||!co.noRec)h+=recLine(s,rm);
+  const pulse=!!(co&&co.pulse);const hl=[];
   switch(q.kind){
-   case 'bid':{h+=recLine(s,rm);h+='<div class="btnrow">'+(rm?'<button class="btn pri" data-a="mv" data-k="'+esc(rm.k)+'">Bid '+esc(cinfo(rm.id).name)+' ('+cinfo(rm.id).strength+')</button>':'')+'<button class="btn" data-a="road4">Great Road</button></div>';h+='<p class="hint">Or tap any card in your hand.</p>';break}
-   case 'bidRes':{h+=recLine(s,rm);h+=bidResHTML(s,mv);break}
-   case 'herald':{h+=recLine(s,rm);h+='<div class="locgrid">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="loc" data-l="'+m.loc+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' '+esc(REG[m.loc>>1])+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';h+='<p class="hint">Tap a location on the map, or here, to see its reward and place your Herald.</p>';mv.forEach(m=>hl.push(m.loc));break}
-   case 'place':{h+=placeInfo(s,mv);const rs=[...new Set(mv.map(m=>m.r))];rs.forEach(r=>{hl.push(2*r,2*r+1)});h+=recLine(s,rm);if(rm)h+='<div class="btnrow"><button class="btn pri" data-a="mv" data-k="'+esc(rm.k)+'">Play '+esc(cinfo(rm.id).name)+' ('+cinfo(rm.id).strength+') at '+esc(REG[rm.r])+'</button></div>';h+='<p class="hint">Tap a card in your hand to play it face-down'+(rs.length>1?' (choose the region)':' next to '+esc(REG[rs[0]]))+'.</p>';break}
-   case 'tie':{h+=recLine(s,rm);h+='<div class="btnrow">'+mv.filter(m=>m.pass).map(m=>'<button class="btn" data-a="mv" data-k="'+esc(m.k)+'">Pass</button>').join('')+(rm&&!rm.pass?'<button class="btn pri" data-a="mv" data-k="'+esc(rm.k)+'">Play '+esc(cinfo(rm.id).name)+'</button>':'')+'</div><p class="hint">Or tap a hand card to play it face-down into the tied clash.</p>';break}
-   case 'location':{h+=recLine(s,rm);h+='<div class="locgrid two">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+(DD.LOCS[m.loc][3]?' and '+esc(lcFirst(DD.LOCS[m.loc][3])):'')+'</small>'+heraldDots(m.loc)+(recK()===m.k?'<span class="rtag">'+ico('star')+'Recommended</span>':'')+'</button>').join('')+'</div>';mv.forEach(m=>hl.push(m.loc));break}
-   case 'clashOrder':{h+=recLine(s,rm);h+='<div class="opts">'+mv.map(m=>optBtn(m,'ord',orderChips(m.order))).join('')+'</div>';break}
-   default:{ // generic pick / sel / menu
-     if(q.t==='menu')h+=menuHTML(s,mv,rm);
-     else if(q.t==='sel')h+=selHTML(s,mv,rm,q);
-     else{h+=recLine(s,rm);h+='<div class="opts">'+mv.map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>'}}}
-  h+='</div>';el.innerHTML=h;setHl(hl)}
-function tipLine(k){return ''}
+   case 'bid':{h+='<p class="hint">Or tap any card in your hand to read it first. <button class="lk" data-a="road4">See the Great Road</button></p>';if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
+   case 'bidRes':{h+=bidResHTML(s,mv);if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
+   case 'herald':{h+='<div class="locgrid">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="loc" data-l="'+m.loc+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' · '+esc(REG[m.loc>>1].replace('The ',''))+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';h+='<p class="hint">Tap a location to read its reward first.</p>';mv.forEach(m=>hl.push(m.loc));if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
+   case 'place':{const rs=[...new Set(mv.map(m=>m.r))];rs.forEach(r=>{hl.push(2*r,2*r+1)});h+='<p class="hint">Or tap a hand card to choose it yourself'+(rs.length>1?' (then pick the region)':'')+'.</p>';if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
+   case 'tie':{h+='<p class="hint">Or tap a hand card to play it face-down into the tied Clash.</p>';const ps=mv.find(m=>m.pass);foot=(ps&&!(rm&&rm.pass)?'<button class="btn" data-a="mv" data-k="'+esc(ps.k)+'">Pass</button>':'')+(rm?pbtn(rm,recBtnText(rm),pulse):'');break}
+   case 'location':{h+='<div class="locgrid two">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' Influence'+(DD.LOCS[m.loc][3]?', '+esc(lcFirst(DD.LOCS[m.loc][3])):'')+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';mv.forEach(m=>hl.push(m.loc));if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
+   case 'clashOrder':{h+='<div class="opts">'+mv.map(m=>optBtn(m,'ord',orderChips(m.order))).join('')+'</div>';if(rm)foot=pbtn(rm,'Use the suggested order',pulse);break}
+   default:{
+     if(q.t==='menu'){const r=menuHTML(s,mv,rm,pulse);h+=r.h;foot=r.f}
+     else if(q.t==='sel'){const r=selHTML(s,mv,rm,q,pulse);h+=r.h;foot=r.f}
+     else{h+='<div class="opts">'+mv.map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)foot=pbtn(rm,recBtnText(rm),pulse)}}}
+  h+='</div>';set(h,foot);setHl(hl)}
+const QNAME={flank:'Flank',castle:'Govern',wilderness:'Journey',siteBuy:'Spend Lore',ossuary:'Ossuary bonus',shrine:'Moss Altar bonus',harvest:'The Favour',rally:'Rally',retreat:'Retreat',ambushCard:'Ambush',occupier:'Choose the occupier',slot:'Choose a slot',placeRegion:'Choose a region',placeLoc:'Choose a location',journeyDest:'Journey',brine:'Brine-Hardened',edict:'A Tactic',relics:'Council of Coin',order:'Turn order'};
+function titleOf(q){if(q.t==='menu'){const ph=menuPhase(q);return ph?ph+' actions':'Your actions'}if(QNAME[q.kind])return QNAME[q.kind];const t=(q.title||'').replace(/^[^:]*:\s*/,'');return t.length>28?'Your choice':t}
+function tipLine(k){if(k==='bid'||k==='place'||UI.guide!=='full'||!TIPS[k]||UI.tip[k]==='x'||G.round>2)return '';UI.tip[k]=UI.tip[k]||1;return '<p class="tipl">'+ico('book')+'<span>'+gloss(TIPS[k][1])+'</span><button class="lk" data-a="tipx" data-k="'+k+'">Hide</button></p>'}
 function promptText(q){const t=q.title||'';
-  switch(q.kind){case 'bid':return 'Pick one card from your hand as a secret bid. Its Strength is your bid.';
-    case 'herald':return 'Choose the location where your Herald waits. Everyone sees it.';
-    case 'place':return t.indexOf('fewer')>=0?t:'Place one face-down card next to each region: '+placeProgress();
-    case 'location':return t;case 'clashOrder':return 'You place the Clash Markers. Choose which region is resolved first.';
-    default:return t}}
+  switch(q.kind){case 'bid':return 'Pick one hand card as a secret bid. Its Strength is your bid: the highest bid chooses a Kingdom Card first.';
+    case 'herald':return 'Put your Herald on a location. Everyone sees it.';
+    case 'place':return t.indexOf('fewer')>=0?t:'Hide one card face-down next to each region ('+placeProgress()+'). The strongest total in a region wins its Clash.';
+    case 'bidRes':return 'Your turn to use your bid: take a Kingdom Card, steal one, or take your card back.';
+    case 'location':return 'You won the Clash. Claim one of the two locations of '+(G.clash?REG[G.clash.r]:'this region')+'.';
+    case 'clashOrder':return 'You have the least Influence, so you choose the order of the three Clashes.';
+    default:if(q.t==='menu'){const ph=menuPhase(q);return (ph?ph+': ':'')+'these actions are optional. The suggestion is below; the rest are under the list.'}return plain(t)}}
 function placeProgress(){const me=vs();let n=0;for(const R of UI.V.reg)for(const id of R.down)if(id>=0&&ownerOf(id)===me)n++;
   const mv=me>=0?legal(me):[];const rs=[...new Set(mv.map(m=>m.r))];return 'card '+Math.min(3,n+1)+' of 3'+(rs.length===1?', for '+REG[rs[0]]:'')}
-function recLine(s,rm){if(!rm)return '';return '<p class="rec-l">'+ico('star')+'<span><b>Suggestion:</b> '+esc(shortRec(rm))+'</span></p>'}
-function shortRec(m){const q=G.q;if(q.kind==='bid')return cinfo(m.id).name+' (strength '+cinfo(m.id).strength+').';if(q.kind==='herald')return LOCN[m.loc]+'.';if(q.kind==='place'||q.kind==='tie')return m.pass?'pass.':cinfo(m.id).name+(m.r!=null?' at '+REG[m.r]:'')+'.';if(q.kind==='location')return LOCN[m.loc]+'.';return m.label}
+function recLine(s,rm){if(!rm)return '';return '<p class="rec-l">'+ico('star')+'<span><b>Suggested:</b> '+esc(shortRec(rm))+' <span class="why2">'+gloss(whyFor(s,rm))+'</span></span></p>'}
+function shortRec(m){const q=G.q;if(q.kind==='bid')return cinfo(m.id).name+' ('+cinfo(m.id).strength+').';if(q.kind==='herald')return LOCN[m.loc]+'.';if(q.kind==='place'||q.kind==='tie')return m.pass?'pass.':cinfo(m.id).name+(m.r!=null?' at '+REG[m.r]:'')+'.';if(q.kind==='location')return LOCN[m.loc]+'.';if(m.t==='done')return 'finish this step.';return m.label.replace(/\.$/,'')+'.'}
 function heraldDots(l){const o=G.pl.filter(p=>p.herald===l);return o.length?'<span class="hd">'+o.map(p=>'<i style="background:'+fcol(p.seat)+'" title="'+esc(p.name)+'"></i>').join('')+'</span>':''}
 function orderChips(o){return '<span class="oc">'+o.map((r,i)=>'<i>'+['I','II','III'][i]+'</i>'+esc(REG[r].replace('The ',''))).join('<em>›</em>')+'</span>'}
-function placeInfo(s,mv){return ''}
 // Kingdom Card offers (bid resolution)
 function bidResHTML(s,mv){let h='<div class="offers">';
   const take=mv.filter(m=>m.t==='take'),steal=mv.filter(m=>m.t==='steal'),ret=mv.filter(m=>m.t==='return');
   for(const m of take.concat(steal)){const k=TB.kingdomInfo(m.kc);const rec=recK()===m.k;
-    h+='<div class="offer'+(rec?' rec':'')+'"><button class="kcth" data-a="kc" data-n="'+m.kc+'" aria-label="Read '+esc(k.name)+'">'+kcEl(m.kc,52).outerHTML+'</button><div class="ob"><b>'+esc(k.name)+'</b> <em>'+SUIT_N[k.suit]+'</em><p>'+esc(k.text)+'</p>'+(m.t==='steal'?'<p class="st-n">Steal it from '+esc(nameOf(m.s2))+'.</p>':'')+'<button class="btn'+(rec?' pri':'')+'" data-a="mv" data-k="'+esc(m.k)+'">'+(m.t==='steal'?'Steal':'Take')+(rec?' (recommended)':'')+'</button></div></div>'}
-  for(const m of ret){h+='<div class="offer ret'+(recK()===m.k?' rec':'')+'"><div class="ob"><b>Keep your card</b><p>Take your bidding card back into your hand and take nothing.</p><button class="btn'+(recK()===m.k?' pri':'')+'" data-a="mv" data-k="'+esc(m.k)+'">Take it back'+(recK()===m.k?' (recommended)':'')+'</button></div></div>'}
+    h+='<div class="offer'+(rec?' rec':'')+'"><button class="kcth" data-a="kc" data-n="'+m.kc+'" aria-label="Read '+esc(k.name)+'">'+kcEl(m.kc,52).outerHTML+'</button><div class="ob"><b>'+esc(k.name)+'</b> <em>'+SUIT_N[k.suit]+'</em>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+'<p>'+esc(k.text)+'</p>'+(m.t==='steal'?'<p class="st-n">Steal it from '+esc(nameOf(m.s2))+'.</p>':'')+(rec?'':'<button class="btn" data-a="mv" data-k="'+esc(m.k)+'">'+(m.t==='steal'?'Steal':'Take')+'</button>')+'</div></div>'}
+  for(const m of ret){const rec=recK()===m.k;h+='<div class="offer ret'+(rec?' rec':'')+'"><div class="ob"><b>Keep your card</b><p>Take your bid card back into your hand and take nothing.</p>'+(rec?'':'<button class="btn" data-a="mv" data-k="'+esc(m.k)+'">Take it back</button>')+'</div></div>'}
   return h+'</div>'}
-// Action menus (Spring / Day / Autumn): grouped; "done" always last
-function menuHTML(s,mv,rm){let h=recLine(s,rm);const acts=mv.filter(m=>m.t==='act'),done=mv.find(m=>m.t==='done');
-  const groups={};const order=[];for(const m of acts){const g=m.a;if(!groups[g]){groups[g]=[];order.push(g)}groups[g].push(m)}
-  h+='<div class="opts">';
-  for(const g of order){const L=groups[g];
-    if(g==='supp'){const byR={};for(const m of L){(byR[m.p.r]=byR[m.p.r]||[]).push(m)}
-      h+='<div class="grp"><b>Send Supporters</b> <small>(+1 Strength each in a region; lost in Winter)</small>';
-      for(const r in byR){h+='<div class="sup-r"><span>'+esc(REG[r])+'</span>'+byR[r].map(m=>'<button class="nb" data-a="mv" data-k="'+esc(m.k)+'" aria-label="Place '+m.p.n+' in '+esc(REG[r])+'">'+m.p.n+'</button>').join('')+'</div>'}
-      h+='</div>';continue}
-    for(const m of L)h+=optBtn(m,'act',actIcon(m))}
-  h+='</div>';
-  if(done)h+='<div class="btnrow"><button class="btn'+(acts.length?'':' pri')+(recK()===done.k?' rec':'')+'" data-a="mv" data-k="'+esc(done.k)+'">'+esc(done.label)+'</button></div>';
-  return h}
-const actIcon=m=>''
-function selHTML(s,mv,rm,q){const items=mv.filter(m=>m.t==='sel'),dn=mv.find(m=>m.t==='seldone');let h='';
+// Action menus (Spring / Day / Autumn): the suggestion and "End" are always visible; everything else is folded into groups
+const MGROUP=[['supp','Send Supporters','Each adds +1 Strength in a region\'s first Clash; all are spent in Winter.'],['govern','Govern','Put a hand card with votes into a Council (once a round).'],['journey','Journey','Send a hand card away for Lore (once a round).'],['cmd','Card abilities','Commands printed on your cards.'],['t','Tactics','Your faction\'s once-only powers.'],['fav','Kingdom\'s Favour','Your faction\'s Favour power.'],['council','Councils','What your Council cards allow.'],['kc','Kingdom Cards','Powers of the Kingdom Cards you hold.'],['other','Other','']];
+function mgroup(a){if(a==='supp'||a==='govern'||a==='journey')return a;const p=a.split(':')[0];if(p==='cmd'||p==='t'||p==='fav'||p==='council')return p;if(/^kc\d/.test(a))return 'kc';return 'other'}
+function menuHTML(s,mv,rm,pulse){let h='';const acts=mv.filter(m=>m.t==='act'),done=mv.find(m=>m.t==='done');let f='';
+  const byG={};for(const m of acts){(byG[mgroup(m.a)]=byG[mgroup(m.a)]||[]).push(m)}
+  if(!acts.length)h+='<p class="hint">Nothing to do in this step: finish it.</p>';
+  if(acts.length){h+='<details class="more"'+(UI.moreOpen?' open':'')+' data-more="1"><summary>'+(rm&&rm.t==='act'?'Other actions':'Actions')+' ('+acts.length+')</summary>';
+    for(const [g,nmG,dsc] of MGROUP){const L=byG[g];if(!L)continue;h+='<p class="grp-h">'+gloss(nmG)+'</p>'+(dsc?'<p class="grp-n">'+gloss(dsc)+'</p>':'');
+      if(g==='supp'){const byR={};for(const m of L){(byR[m.p.r]=byR[m.p.r]||[]).push(m)}
+        for(const r in byR){h+='<div class="sup-r"><span>'+esc(REG[r])+'</span>'+byR[r].map(m=>'<button class="nb'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'" aria-label="Send '+m.p.n+' to '+esc(REG[r])+'">'+m.p.n+'</button>').join('')+'</div>'}continue}
+      h+='<div class="opts">'+L.map(m=>optBtn(m,'act','')).join('')+'</div>'}
+    h+='</details>'}
+  if(done)f+='<button class="btn'+(rm&&rm.k===done.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(done.k)+'">'+esc(recBtnText(done))+'</button>';
+  if(rm&&rm.t==='act')f+=pbtn(rm,recBtnText(rm),pulse);
+  return {h,f}}
+function selHTML(s,mv,rm,q,pulse){const items=mv.filter(m=>m.t==='sel'),dn=mv.find(m=>m.t==='seldone');let h='',f='';
   const ch=(q.chosen||[]).map(v=>chipFor(v));h+=(ch.length?'<p class="chosen">Chosen: '+ch.join(' ')+'</p>':'')+(q.max!=null&&q.max<items.length+ch.length?'<p class="hint">Choose up to '+q.max+(q.min?' (at least '+q.min+')':'')+'.</p>':'');
   h+='<div class="opts">'+items.map(m=>optBtn(m,'',typeof m.v==='number'&&m.v<10000&&ownerOf(m.v)===s?'<span class="th" data-owner="'+s+'" data-up="1">'+cardEl(m.v,44).outerHTML+'</span>':'')).join('')+'</div>';
-  if(dn)h+='<div class="btnrow"><button class="btn pri" data-a="mv" data-k="'+esc(dn.k)+'">'+esc(dn.label)+'</button></div>';return h}
+  if(dn)f+='<button class="btn'+(rm&&rm.k===dn.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(dn.k)+'">'+esc(dn.label)+'</button>';
+  if(rm&&rm.t==='sel')f+=pbtn(rm,recBtnText(rm),pulse);
+  return {h,f}}
 function cardOwnerOK(id){const o=ownerOf(id);return o===vs()||G.pl[o]&&(G.reg.some(R=>R.up.includes(id)))}
 function chipFor(v){try{if(typeof v==='number'&&v<10000)return '<span class="chp">'+esc(TB.cardName(G,v))+'</span>'}catch(e){}return '<span class="chp">'+esc(v)+'</span>'}
 // ===================== part 4: hand, rivals, pop-ups, one-at-a-time cards =====================
@@ -407,9 +459,10 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   if(!G||s<0||isPassing()||G.over){el.innerHTML='';el.hidden=true;return}
   el.hidden=false;const V=UI.V,P=V.pl[s];const ids=P.hand.filter(id=>id>=0).sort((a,b)=>cinfo(b).strength-cinfo(a).strength||a-b);
   const mv=G.q&&G.q.seats.includes(s)&&!G.pl[s].ai?legal(s):[];const use=new Set();for(const m of mv){if(m.id!=null)use.add(m.id);if(m.v!=null&&typeof m.v==='number')use.add(m.v)}
-  const W=Math.max(200,el.clientWidth||$('#dockbody').clientWidth||360)-8;const cw=UI.phone?(UI.land?50:(innerHeight<600?46:56)):66,ch=Math.round(cw*1.4308);
+  const W=Math.max(200,el.clientWidth||$('#dockbody').clientWidth||360)-8;const cw=UI.phone?(UI.land?42:(innerHeight<600?44:innerHeight<700?48:54)):66,ch=Math.round(cw*1.4308);
   const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
-  let h='<div class="hand-h"><span>Hand <b>'+ids.length+'</b>/'+P.hs+'</span><span>Deck '+P.deck.length+'</span><span>Discard '+P.disc.length+'</span>'+(P.lore?'<span>Lore '+P.lore+'</span>':'')+'</div>';
+  const hh='<div class="hand-h"><span>Hand <b>'+ids.length+'</b>/'+P.hs+'</span><span>Deck '+P.deck.length+'</span><span>Discard '+P.disc.length+'</span>'+(P.lore?'<span>Lore '+P.lore+'</span>':'')+'</div>';
+  let h=UI.phone?'':hh;
   h+='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+14)+'px">';
   ids.forEach((id,i)=>{const on=UI.hand===id,pl=use.has(id);
     h+='<button class="hc'+(on?' on':'')+(pl?' pl':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+'" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'">'+cardEl(id,cw).outerHTML+'</button>'});
@@ -421,7 +474,7 @@ function renderRivals(){const el=$('#rivals');if(!el)return;const V=UI.V;const h
   el.innerHTML=ordSeats.map(s=>{const P=V.pl[s];const kfac=TBKit.FACTIONS[FK[P.fac]];const turn=act.has(s);
     const favs=V.fav.h===s?'<span class="rv-f" title="Holds the Kingdom\'s Favour ('+V.fav.u+' uses left)">'+ico('star')+'</span>':'';
     return '<button class="rv'+(s===me?' me':'')+(turn?' turn':'')+'" data-a="rival" data-s="'+s+'" style="--fc:'+kfac.main+'" aria-label="'+esc(P.name)+': '+P.inf+' influence, '+P.hand.length+' cards in hand. Tap for details">'+
-      '<span class="rv-e">'+emb(s,26)+'</span><span class="rv-t"><b>'+esc(shortName(s).replace(' (you)',''))+(s===me&&(NET.on||humans().length===1)?' <u>you</u>':'')+'</b><small><i>'+P.inf+'</i> inf · '+P.hand.length+' cards</small></span>'+favs+'</button>'}).join('')}
+      '<span class="rv-e">'+emb(s,26)+'</span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'<u>You</u> · ':'')+esc(shortName(s).replace(' (you)',''))+'</b><small><i>'+P.inf+'</i> Influence'+(G.np<3?' · '+P.hand.length+' cards':'')+'</small></span>'+favs+'</button>'}).join('')}
 // ---------------------------------------------------------------- pop-ups (live in the dock zone, never over the board)
 function openPop(kind,arg){if(!G)return;UI.pop=kind;UI.popArg=arg||{};renderPop();applyHl();if(typeof sfx==='function')sfx('tap')}
 function closePop(quiet){if(!UI.pop)return;UI.pop=null;UI.popArg=null;UI.hand=null;const p=$('#ppop');if(p){p.hidden=true;p.innerHTML=''}applyHl();if(!quiet)renderAll()}
@@ -455,11 +508,11 @@ function popLoc(l){const s=vs();const L=DD.LOCS[l],V=UI.V;const q=G.q;let h='';
   const mk=V.pl.map((p,i)=>p.mk[l]?esc(shortName(i))+' '+p.mk[l]:'').filter(Boolean);if(mk.length)h+='<p class="lc-h"><b>Whisper markers:</b> '+mk.join(', ')+'</p>';
   if(V.loc[l].kc.length)h+='<p class="lc-h"><b>Kingdom Cards here:</b> '+V.loc[l].kc.map(k=>esc(TB.kingdomInfo(k.n).name)+' ('+esc(nameOf(k.o))+')').join(', ')+'</p>';
   if(l===2)h+='<p class="lc-h"><b>Favour:</b> '+(V.fav.h>=0?esc(nameOf(V.fav.h))+' holds it ('+V.fav.u+' uses left)':'on the board')+'</p>';
-  const mv=s>=0&&q&&q.seats.includes(s)&&!G.pl[s].ai?legal(s):[];
+  const mv=s>=0&&q&&q.seats.includes(s)&&!G.pl[s].ai?legal(s):[];const info=h;h='';
   if(q&&q.kind==='herald'){const m=mv.find(x=>x.loc===l);if(m){const rec=recK()===m.k;h+='<div class="pp-act"><button class="btn pri" data-a="mv" data-k="'+esc(m.k)+'">Place my Herald here'+(rec?' (recommended)':'')+'</button></div>';h+='<p class="why">'+ico('star')+'<span><b>'+(rec?'Why this one':'Think about it')+':</b> '+esc(whyFor(s,m))+'</span></p>'}}
   else if(q&&q.kind==='location'){const m=mv.find(x=>x.loc===l);if(m){const rec=recK()===m.k;h+='<div class="pp-act"><button class="btn pri" data-a="mv" data-k="'+esc(m.k)+'">Claim '+esc(LOCN[l])+(rec?' (recommended)':'')+'</button></div>'}}
   else if(q&&(q.kind==='place'||q.kind==='tie')&&mv.some(x=>x.r===l>>1)){h+='<p class="lc-h"><b>Play a face-down card in '+esc(REG[l>>1])+':</b></p>'+cardPicker(s,mv.filter(x=>x.r===l>>1||q.kind==='tie'))}
-  return popShell(esc(LOCN[l]),h,'loc-b')}
+  return popShell(esc(LOCN[l]),h+info,'loc-b')}
 function cardPicker(s,mv){const ids=[...new Set(mv.filter(m=>m.id!=null).map(m=>m.id))];return '<div class="picker">'+ids.map(id=>'<button class="hc pk" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" aria-label="'+esc(cinfo(id).name)+'">'+cardEl(id,52).outerHTML+'</button>').join('')+'</div>'}
 function popRegion(r){const s=vs(),V=UI.V,q=G.q;let h='';
   h+='<p class="lc-r">Locations: <button class="lk" data-a="loc" data-l="'+2*r+'">'+esc(LOCN[2*r])+'</button> and <button class="lk" data-a="loc" data-l="'+(2*r+1)+'">'+esc(LOCN[2*r+1])+'</button></p>';
@@ -489,58 +542,64 @@ function popKingdom(){const V=UI.V;let h='';
 function shouldShowEvent(ev){if(ev.t==='clash')return true;if(ev.t==='bids')return true;if(ev.t==='summary')return true;return false}
 function showEvent(ev){UI.card={kind:'event',ev};if(ev.t==='clash'){UI.noAnim=true}}
 function showOver(){if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave()}
-const TIPS={bid:['Bids','Each round starts with a secret bid. Tap a hand card for its details, or use the suggested button. The strongest bid chooses first. Whatever Kingdom Card you take sits on your board with your bid card tucked under it.'],
-  herald:['Heralds','Your Herald is public. Tap a location on the map to read its reward. Winning there pays you and steals from every rival Herald standing on it. A bluff is fine: place it where you do NOT plan to win, or where you do.'],
-  place:['Face-down cards','Place one card next to each of the three regions. Nobody sees them until the clash. Put big cards where the prize matters and spare cards elsewhere.'],
-  menu:['Actions','This list shows what your cards and Kingdom Cards allow right now. Sending Supporters adds +1 Strength each in a region (only the first clash there). Finish with the last button.'],
-  clashOrder:['Clash order','The player furthest behind sets the order of the three clashes. Think about which region your rivals are weakest in.'],
-  location:['Winning','The winner claims one of the region\'s two locations: its Influence plus a bonus effect. A Herald there is a swing of +1 for you and -1 for each rival Herald.'],
-  bidRes:['Your bid','Take a Kingdom Card from the Great Road, steal one a rival holds (you need a strictly higher bid than their occupying card) or take your card back.']};
-function maybeTip(){if(UI.guide!=='full'||!G.q)return false;const k=G.q.kind;if(UI.tip[k]||!TIPS[k])return false;UI.tip[k]=1;UI.card={kind:'tip',k};return true}
+const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid picks a Kingdom Card first; the card you bid then sits under it and cannot fight.'],
+  herald:['Heralds','Your Herald is public. If you win a region and claim the location where your Herald stands, you gain +1 Influence and take 1 from every rival Herald there.'],
+  place:['Hidden cards','You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere.'],
+  menu:['Actions','Supporters add +1 Strength each in a region\'s first Clash. Open the list for other actions, or finish the step.'],
+  clashOrder:['Clash order','The player with the least Influence chooses the order of the three Clashes.'],
+  location:['Winning','The winner claims one of the region\'s two locations: its Influence and its bonus.'],
+  bidRes:['Your bid','Take a Kingdom Card from the Great Road, steal one a rival holds (your bid must beat the card under it), or take your card back.']};
+function maybeTip(){return typeof coachGate==='function'&&coachGate()}
 function renderCard(){const el=$('#pc');if(!el)return;const c=UI.card;
   if(!c){el.hidden=true;el.innerHTML='';UI._cardKey=null;return}
   const key=JSON.stringify(c.kind==='event'?[c.ev.t,c.ev.r,c.ev.n,c.ev.round]:[c.kind,c.seat,c.k]);
   if(UI._cardKey===key&&!el.hidden)return;UI._cardKey=key;
   el.hidden=false;el.classList.remove('in');void el.offsetWidth;el.classList.add('in');el.dataset.kind=c.kind==='event'?c.ev.t:c.kind;
   let h='';
-  if(c.kind==='pass'){const s=c.seat;h='<div class="cd cd-pass" style="--fc:'+fcol(s)+'"><div class="cd-e">'+emb(s,56)+'</div><h3>Pass the device to '+esc(nameOf(s))+'</h3><p>Everyone else look away. Your hand and face-down cards appear when you tap the button.</p><button class="btn pri big" data-a="take" data-s="'+s+'">I am '+esc(shortName(s))+'. Show my cards</button></div>'}
-  else if(c.kind==='tip'){const t=TIPS[c.k];h='<div class="cd cd-tip"><h3>'+esc(t[0])+'</h3><p>'+esc(t[1])+'</p><div class="btnrow"><button class="btn pri" data-a="tipok">Got it</button><button class="btn" data-a="tipoff">Hide tips</button></div></div>'}
+  if(c.kind==='pass'){const s=c.seat;h='<div class="cd cd-pass" style="--fc:'+fcol(s)+'"><div class="cd-sc"><div class="cd-e">'+emb(s,56)+'</div><h3>Pass the device to '+esc(nameOf(s))+'</h3><p>Everyone else look away. Your hand and hidden cards appear when you tap the button.</p></div><div class="cd-ft"><button class="btn pri big" data-a="take" data-s="'+s+'">I am '+esc(shortName(s))+': show my cards</button></div></div>'}
   else if(c.kind==='over'){h=overHTML()}
   else if(c.kind==='event')h=eventHTML(c.ev);
   el.innerHTML=h;
   if(c.kind==='event'&&c.ev.t==='clash')playClash(c.ev,el);
   const b=el.querySelector('.btn.pri');if(b)try{b.focus({preventScroll:true})}catch(e){}}
-function eventHTML(ev){
+function cdWrap(cls,body,foot){return '<div class="cd '+cls+'"><div class="cd-sc">'+body+'</div><div class="cd-ft">'+foot+'</div></div>'}
+function eventHTML(ev){const note=typeof coachEvent==='function'?coachEvent(ev):'';const cn=note?'<p class="coach">'+gloss(note)+'</p>':'';
   if(ev.t==='bids'){const rows=ev.bids.slice().sort((a,b)=>b.str-a.str||ev.order.indexOf(a.seat)-ev.order.indexOf(b.seat));
-    return '<div class="cd cd-bids"><h3>Bids revealed</h3><p class="sub">Highest bid chooses first.</p><div class="bidrow">'+rows.map((b,i)=>'<div class="bd" style="--fc:'+fcol(b.seat)+'"><span class="bd-n">'+(i+1)+'</span><span class="bd-c">'+TBKit.card(cardSpec(b.id),UI.phone?52:64).outerHTML+'</span><span class="bd-t"><b>'+esc(shortName(b.seat))+'</b><small>'+esc(TB.cardName(G,b.id))+'</small><i>'+b.str+'</i></span></div>').join('')+'</div><button class="btn pri" data-a="evok">Continue</button></div>'}
+    return cdWrap('cd-bids','<h3>Bids revealed</h3>'+(cn?'':'<p class="sub">'+gloss('The highest bid chooses first. A tie goes to whoever is higher on the Order Track.')+'</p>')+'<div class="bidrow">'+rows.map((b,i)=>'<div class="bd" style="--fc:'+fcol(b.seat)+'"><span class="bd-n">'+(i+1)+'</span><span class="bd-c">'+TBKit.card(cardSpec(b.id),UI.phone?(UI.short?40:52):64).outerHTML+'</span><span class="bd-t"><b>'+esc(shortName(b.seat))+'</b><small>'+esc(TB.cardName(G,b.id))+'</small><i>'+b.str+(b.str!==cinfo(b.id).strength?' <small>(printed '+cinfo(b.id).strength+')</small>':'')+'</i></span></div>').join('')+'</div>'+cn,'<button class="btn pri" data-a="evok">Continue</button>')}
   if(ev.t==='clash'){const w=ev.winner,tie=w<0;const names=ev.parts.map(s=>'<b>'+esc(shortName(s))+'</b> '+ev.tot[s]).join(' · ');
-    return '<div class="cd cd-clash"><h3>Clash '+(ev.idx>=0?['I','II','III'][ev.idx]:'')+': '+esc(REG[ev.r])+(ev.n>1?' (new clash)':'')+'</h3><div class="cl-panel" id="clp"></div><p class="cl-res" id="clres" hidden>'+(tie?'Tied: '+names:'<b>'+esc(shortName(w))+'</b> wins, '+names)+'</p><ul class="cl-log" id="cllog" hidden>'+ev.logs.filter(t=>!/^(.* reveals |Strength in |Clash )/.test(t)).slice(0,9).map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul><div class="cl-inf" id="clinf" hidden>'+infChips(ev.inf0,ev.inf1)+'</div><button class="btn pri" data-a="evok" id="clok" hidden>Continue</button></div>'}
-  if(ev.t==='summary'){return '<div class="cd cd-sum"><h3>End of round '+ev.round+(ev.last?' (the last)':'')+'</h3><table class="sumt"><thead><tr><th></th><th>This round</th><th>Total</th></tr></thead><tbody>'+ev.inf1.map((v,s)=>'<tr style="--fc:'+fcol(s)+'"><td><b>'+esc(shortName(s))+'</b></td><td>'+sgn(v-ev.inf0[s])+'</td><td><b>'+v+'</b></td></tr>').join('')+'</tbody></table>'+(ev.warns.length?'<ul class="cl-log warn">'+ev.warns.map(t=>'<li>'+esc(t)+'</li>').join('')+'</ul>':'')+'<p class="sub">'+(ev.last?'The final count follows.':'Next round the player with the most Influence picks first; Heralds go home and Supporters are lost.')+'</p><button class="btn pri" data-a="evok">'+(ev.last?'See the result':'Next round')+'</button></div>'}
+    return cdWrap('cd-clash','<h3>Clash '+(ev.idx>=0?['I','II','III'][ev.idx]:'')+': '+esc(REG[ev.r])+(ev.n>1?' (replay)':'')+'</h3><div class="cl-panel" id="clp"></div><p class="cl-res" id="clres" hidden>'+(tie?'A tie: '+names+'. Nobody wins here.':'<b>'+esc(shortName(w))+'</b> wins: '+names)+'</p>'+cn+'<ul class="cl-log" id="cllog" hidden>'+ev.logs.filter(t=>!/^(.* reveals |Strength in |Clash )/.test(t)).slice(0,9).map(t=>'<li>'+esc(plain(t))+'</li>').join('')+'</ul><div class="cl-inf" id="clinf" hidden>'+infChips(ev.inf0,ev.inf1)+'</div>','<button class="btn pri" data-a="evok" id="clok" hidden>Continue</button>')}
+  if(ev.t==='summary'){return cdWrap('cd-sum','<h3>End of round '+ev.round+' of '+ev.rounds+'</h3><table class="sumt"><thead><tr><th></th><th>This round</th><th>Influence</th></tr></thead><tbody>'+ev.inf1.map((v,s)=>'<tr style="--fc:'+fcol(s)+'"><td><b>'+esc(shortName(s))+'</b></td><td>'+sgn(v-ev.inf0[s])+'</td><td><b>'+v+'</b></td></tr>').join('')+'</tbody></table>'+cn+(ev.warns.length?'<ul class="cl-log warn">'+ev.warns.map(t=>'<li>'+gloss(plain(t))+'</li>').join('')+'</ul>':'')+'<p class="sub">'+(ev.last?'That was the last round: the final count follows.':gloss('Winter: Heralds go home, Supporters on the map are spent, played cards go to the discard pile. Next round the leader acts first.'))+'</p>','<button class="btn pri" data-a="evok">'+(ev.last?'See the result':'Start round '+(ev.round+1))+'</button>')}
   return ''}
 function infChips(a,b){return a.map((v,s)=>b[s]!==v?'<span style="--fc:'+fcol(s)+'">'+esc(shortName(s))+' '+sgn(b[s]-v)+'</span>':'').join('')}
 function playClash(ev,root){const panel=root.querySelector('#clp');if(!panel)return;const w=ev.winner;
   const items=ev.parts.map(s=>{const ids=(ev.cardsF&&ev.cardsF[s])||ev.cards[s]||[];const best=ids.slice().sort((a,b)=>cinfo(b).strength-cinfo(a).strength)[0];
     const spec=best!=null?cardSpec(best):{faction:FK[G.pl[s].fac],title:'Supporters only',value:0,type:'ploy',art:'banner',text:'No cards here: only Supporters count.'};
     return {faction:FK[G.pl[s].fac],name:shortName(s)+(ids.length>1?' (+'+(ids.length-1)+')':'')+(ev.supp[s]?' +'+ev.supp[s]+' sup.':''),card:spec,strength:ev.tot[s],winner:w===s}});
-  const sz=Math.max(70,Math.min(110,Math.floor((root.clientWidth-30)/Math.max(2,items.length))-14,UI.land?84:110));
+  const sc=root.querySelector('.cd-sc')||root;let rest=0;for(const c of sc.children)if(c!==panel&&!c.hidden)rest+=c.offsetHeight+8;const sz=Math.max(48,Math.min(110,Math.floor((root.clientWidth-30)/Math.max(2,items.length))-14,Math.floor((sc.clientHeight-rest-30-70)/1.43/1.08)));
   const cp=TBKit.clashPanel(panel,items,{size:sz,tie:w<0});UI._cp=cp;
   const fin=()=>{['#clres','#cllog','#clinf','#clok'].forEach(q=>{const e=root.querySelector(q);if(e)e.hidden=false});UI.clashRes[ev.r]={winner:w,tot:ev.tot};
     const b=root.querySelector('#clok');if(b)try{b.focus({preventScroll:true})}catch(e){}if(typeof sfx==='function')sfx(w<0?'tie':'win')};
   if(!ANIM){cp.el.querySelectorAll('.tb-flipcard').forEach(f=>f.classList.add('tb-up'));cp.el.querySelectorAll('.tb-clash-col').forEach(c=>c.classList.add('tb-shown'));fin();return}
   mapReveal(ev);
   setTimeout(()=>{const key=UI._cardKey;cp.play().then(()=>{if(UI._cardKey===key)fin()})},350)}
-function overHTML(){const o=G.over,sc=TB.scores(G);const rk=o.ranking;const win=o.winner;
-  return '<div class="cd cd-over"><h3>'+(NET.on?(win===vs()?'You win the throne!':esc(nameOf(win))+' takes the throne'):humans().length&&!G.pl[win].ai&&humans().length===1?'You win the throne!':esc(nameOf(win))+' takes the throne')+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+esc(nameOf(s))+'</b><span>'+G.pl[s].inf+(o.bonus&&o.bonus[s]?' <small>(includes +'+o.bonus[s]+' from emptying the Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(NET.on?(isHost()?'<div class="btnrow"><button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="netopen">Lobby</button></div>':'<p class="sub">The host can start another game.</p><div class="btnrow"><button class="btn" data-a="netleave">Leave</button></div>'):'<div class="btnrow"><button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="menu">Main menu</button></div>')+'</div>'}
+function overHTML(){const o=G.over;const rk=o.ranking;const win=o.winner;const me=vs();const iWon=(NET.on||humans().length===1)&&win===me;
+  const head=iWon?'You win the throne!':esc(nameOf(win).replace(/^You$/,'You'))+' takes the throne';
+  const body='<h3>'+head+'</h3><p class="sub">'+esc(DD.FNAME[G.pl[win].fac])+' ends with <b>'+G.pl[win].inf+'</b> Influence'+(o.tieBreak?' (tie broken by '+(o.tieBreak==='favour'?'the Kingdom\'s Favour':'turn order')+')':'')+'.</p><ol class="rank">'+rk.map((s,i)=>'<li style="--fc:'+fcol(s)+'"><b>'+(i+1)+'. '+esc(shortName(s))+'</b><span>'+G.pl[s].inf+' Influence'+(o.bonus&&o.bonus[s]?' <small>(+'+o.bonus[s]+' from the emptied Site of Power)</small>':'')+'</span></li>').join('')+'</ol>'+(typeof overBreakdown==='function'?overBreakdown():'');
+  const foot=NET.on?(isHost()?'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="netopen">Lobby</button>':'<button class="btn" data-a="netleave">Leave</button>'):'<button class="btn pri" data-a="again">Play again</button><button class="btn" data-a="menu">Main menu</button>';
+  const gnote=typeof isGuided==='function'&&isGuided()?'<p class="coach">'+gloss('You have played a whole game. Next time try a full game from Play: choose the faction whose story you like, 3 players, 5 rounds. The suggestions stay on if you want them.')+'</p>':'';
+  return cdWrap('cd-over',body+gnote+(NET.on&&!isHost()?'<p class="sub">The host can start another game.</p>':''),foot)}
 // ===================== part 5: render loop, clicks, drawers (rules, log, board, menu), start screen =====================
 function renderAll(){if(!G||!UI.started)return;
   try{UI.V=isClient()?G:TB.stripView(G,isPassing()?-1:vs())}catch(e){console.error('view '+e.message);return}  // a client's G is already its own stripped copy
+  if(UI.phone&&!UI.land){const sm=!!wantSmall();if(sm!==!!UI.boardSmall){UI.boardSmall=sm;phApply()}}
   if(isPassing()){if(GX.open)GX.close();const bb=$('#boardbody');if(bb)bb.innerHTML='';if(UI.pop)closePop(true)}
   if(!(UI.card&&UI.card.kind==='event'))renderMap();else if(!MAP.m)renderMap();
-  renderBar();renderRoad();renderMain();renderHand();renderRivals();renderCard();renderPop();updateLive();
+  renderBar();renderRoad();renderNow();renderMain();renderHand();renderRivals();setHB();renderCard();renderPop();updateLive();
   document.documentElement.dataset.step=String(roadIdx());
   if(typeof phoneRefresh==='function')phoneRefresh();
   netAfter();
   const lb=$('#logbody');if(lb&&GX.open==='logd')renderLog()}
+function setHB(){const d=$('.gx-dock'),hw=$('#handw'),rv=$('#rivals');if(!d)return;d.style.setProperty('--hb',((hw&&!hw.hidden?hw.offsetHeight:0)+(rv?rv.offsetHeight:0))+'px')}
 function updateLive(){const l=$('#live');if(!l)return;const last=G.log[G.log.length-1];if(last&&UI._liveN!==last.i){UI._liveN=last.i;l.textContent=last.t}}
 // ---------------------------------------------------------------- clicks
 document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-a]');
@@ -558,20 +617,29 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
    case 'pclose':closePop();break;
    case 'take':{const s=+t.dataset.s;UI.holder=s;UI.passed=s;UI.card=null;UI._cardKey=null;UI.pop=null;pump();break}
    case 'evok':{UI.card=null;UI._cardKey=null;UI.noAnim=false;if(UI._cp)UI._cp=null;UI.mapReset=false;MAP.slotDirty=true;pump();break}
-   case 'tipok':UI.card=null;UI._cardKey=null;pump();break;
-   case 'tipoff':UI.guide='light';UI.card=null;UI._cardKey=null;pump();break;
+   case 'tipx':UI.tip[t.dataset.k]='x';renderAll();break;
+   case 'coachok':coachOk();break;
+   case 'gloss':showGloss(t.dataset.t);break;
+   case 'gclose':hideGloss();break;
+   case 'nowlog':GX.show('logd');break;
+   case 'title':UI.sv='title';renderStart();break;
+   case 'play':UI.sv='setup';UI.cfgOpen=false;renderStart();break;
+   case 'online':UI.sv='online';UI.onl=true;renderStart();break;
+   case 'cfgopen':UI.cfgOpen=true;renderStart();break;
+   case 'cfgclose':UI.cfgOpen=false;renderStart();break;
+   case 'lv':sv.levels[+t.dataset.i]=t.dataset.v;renderStart();break;
    case 'again':{clearSave();const c=UI.cfg;startFromCfg(c);break}
    case 'menu':showStart();break;
    case 'wpause':UI.watchPaused=!UI.watchPaused;if(!UI.watchPaused)pump();else renderAll();break;
    case 'wstep':{if(UI.mode==='watch'&&G.q){const w=whoActs();if(w.ai.length){aiStep(w)}}pump();break}
    case 'wspeed':UI.speed=UI.speed>=4?1:UI.speed*2;renderAll();break;
    // start screen
-   case 'mode':sv.mode=t.dataset.v;renderStart();break;
+   case 'mode':sv.mode=t.dataset.v;if(t.dataset.go){startFromSetup();break}renderStart();break;
    case 'np':sv.np=+t.dataset.v;renderStart();break;
    case 'fac':sv.faction=t.dataset.v;renderStart();break;
    case 'len':sv.length=t.dataset.v;renderStart();break;
    case 'gd':sv.guide=t.dataset.v;renderStart();break;
-   case 'start':startFromSetup();break;
+   case 'start':sv.mode='me';startFromSetup();break;
    case 'guided':newGame('guided');break;
    case 'cont':{const s=loadSave();if(s){hideStart();resumeGame(s);afterStart()}break}
    case 'rules':GX.show('rulesd');break;
@@ -586,28 +654,7 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   }});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pop&&!GX.open){closePop();e.preventDefault()}});
 function toast(t){UI.toast=t;const l=$('#live');if(l)l.textContent=t}
-// ---------------------------------------------------------------- start screen
-const sv={mode:'me',np:3,faction:'nobility',length:'standard',guide:'full',levels:['normal','normal','normal','normal']};
-function showStart(){$('#start').hidden=false;document.body.classList.add('in-start');renderStart();const f=$('#start [data-a=guided]');if(f)try{f.focus({preventScroll:true})}catch(e){}}
-function hideStart(){$('#start').hidden=true;document.body.classList.remove('in-start')}
-function renderStart(){const el=$('#start');if(!el||el.hidden)return;const sav=loadSave();
-  const lvl=(i)=>'<select class="sel" data-a="lv" data-i="'+i+'" aria-label="Computer level, seat '+(i+1)+'">'+['easy','normal','hard'].map(l=>'<option value="'+l+'"'+(sv.levels[i]===l?' selected':'')+'>'+l[0].toUpperCase()+l.slice(1)+'</option>').join('')+'</select>';
-  const ONL=NET.on&&isHost(),plan=ONL?netPlan():null;const nSeats=ONL?plan.np:sv.np;let seats='';
-  const fac=FIDS.slice();const mine=sv.faction;const rest=fac.filter(f=>f!==mine);
-  for(let i=0;i<nSeats;i++){const pm=ONL?'me':sv.mode;const f=pm==='me'?(i===0?mine:rest[i-1]):FIDS[i];const k=TBKit.FACTIONS[FK[f]];const human=ONL?i<plan.hum.length:(sv.mode==='hot'||(sv.mode==='me'&&i===0));
-    seats+='<div class="seat" style="--fc:'+k.main+'">'+TBKit.token('influence',{faction:FK[f]},30).outerHTML+'<span class="sn"><b>'+esc(k.short)+'</b><small>'+(human?(ONL?'Online: '+esc(plan.hum[i].nm)+(i===0?' (you)':''):sv.mode==='hot'?'Player '+(i+1):'You'):'Computer')+'</small></span>'+(human?'':lvl(i))+'</div>'}
-  el.innerHTML='<div class="st-box"><h1 class="st-t">The Thornbound Throne</h1><p class="st-s">An area-control card game for 2 to 4. Win clashes in three regions, place your Herald where you will be, and hold the most Influence when the last round ends.</p>'+
-   (ONL?'':'<div class="st-bt"><button class="btn pri big" data-a="guided">Guided first game</button>'+(sav?'<button class="btn big" data-a="cont">Continue saved game (round '+sav.G.round+')</button>':'')+'</div>')+onlineBlock()+
-   '<h2>'+(ONL?'Game setup':'Or set up a game')+'</h2>'+(ONL?'':'<div class="seg" role="radiogroup" aria-label="Mode">'+[['me','Play the computer'],['hot','Hot-seat (pass the device)'],['watch','Watch computers']].map(([v,l])=>'<button role="radio" aria-checked="'+(sv.mode===v)+'" class="'+(sv.mode===v?'on':'')+'" data-a="mode" data-v="'+v+'" data-start="'+v+'">'+l+'</button>').join('')+'</div>')+
-   '<div class="row"><span>Players</span><div class="seg">'+[2,3,4].map(n=>'<button class="'+(sv.np===n?'on':'')+'" data-a="np" data-v="'+n+'">'+n+'</button>').join('')+'</div><span>Length</span><div class="seg">'+[['short','4 rounds'],['standard','5 rounds'],['extended','6 rounds']].map(([v,l])=>'<button class="'+(sv.length===v?'on':'')+'" data-a="len" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+
-   ((sv.mode==='me'||ONL)?'<div class="row"><span>Your side</span><div class="seg fseg">'+FIDS.map(f=>{const k=TBKit.FACTIONS[FK[f]];return '<button class="'+(sv.faction===f?'on':'')+'" data-a="fac" data-v="'+f+'" style="--fc:'+k.main+'">'+esc(k.short)+'</button>'}).join('')+'</div></div>':'')+
-   '<div class="seats">'+seats+'</div><div class="row"><span>Guide</span><div class="seg">'+[['full','Full tips'],['light','Light'],['off','Off']].map(([v,l])=>'<button class="'+(sv.guide===v?'on':'')+'" data-a="gd" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+
-   '<div class="st-bt"><button class="btn pri big" data-a="start" data-start="go">'+(ONL?'Start online game':'Start game')+'</button>'+(NET.on&&G&&UI.started?'<button class="btn big" data-a="netback">Back to the game</button>':'')+'<button class="btn big" data-a="rules">How to play</button></div><p class="st-c">Original art drawn in code. Fonts: Cinzel and EB Garamond (SIL OFL). Based on the mechanics of a published game; names and text are our own.</p></div>';
-  $$('#start [data-a=lv]').forEach(s=>s.addEventListener('change',()=>{sv.levels[+s.dataset.i]=s.value}))}
-function startFromSetup(){hideStart();const lv=sv.levels.slice();
-  const o={np:sv.np,length:sv.length,faction:sv.faction,levels:lv,guide:sv.guide};
-  // seat i (i>0) uses level[i]; the human seat 0 ignores its slot
-  newGame(sv.mode==='watch'?'ai':sv.mode,o)}
+// start screens (title, setup, online): see part 7
 function startFromCfg(c){hideStart();const o={np:c.np,length:c.length,faction:c.faction,levels:c.levels,guide:c.guide,seatFactions:c.seats.map(s=>s.faction),humanSeats:c.humanSeats};
   if(c.guided)newGame('guided',o);else newGame(c.mode==='watch'?'ai':c.mode,o)}
 function afterStart(){closePop(true);GX.close();UI.mapReset=true;renderAll();pump()}
@@ -629,7 +676,15 @@ function renderBoardDrawer(){const el=$('#boardbody');if(!el||!G)return;const s=
   h+='<h5>Discard pile ('+P.disc.length+')</h5><div class="piles">'+P.disc.map(id=>'<span class="th" data-owner="'+s+'" data-up="1">'+cardEl(id,48).outerHTML+'</span>').join('')+'</div>';
   const lost=UI.V.lost;h+='<h5>Lost Pile ('+lost.length+', shared)</h5><div class="piles">'+lost.map(id=>'<span class="th">'+cardEl(id,48).outerHTML+'</span>').join('')+'</div>';
   el.innerHTML=h}
-const RULES_HTML=`<div class="rules">
+const RULES_HTML=()=>`<div class="rules">
+<div class="quick"><h3>In two minutes</h3><p><b>Goal:</b> hold the most <b>Influence</b> (points) when the last round ends.</p><ol>
+<li><b>Bid</b> a hand card in secret. The highest bid picks a <b>Kingdom Card</b>: a lasting power.</li>
+<li>Put your <b>Herald</b> on one of six locations. It pays only if you win there.</li>
+<li><b>Hide one card</b> at each of the three regions. Send <b>Supporters</b> (+1 each) if you like.</li>
+<li><b>Clashes:</b> cards flip; the highest total Strength in a region wins and claims one of its two locations (its Influence, plus +1 and a steal if your Herald stands there).</li>
+<li><b>Autumn, then Winter:</b> optional Govern and Journey, then played cards are discarded and a new round begins.</li></ol>
+<p>The guided first game walks you through this once. Underlined words in the game can be tapped for their meaning.</p></div>
+<details><summary>The full rules</summary>
 <h3>The goal</h3><p>You lead one of four factions competing for the throne. The game lasts a fixed number of rounds (4, 5 or 6). When the last round ends, the player with the most <b>Influence</b> wins. Ties go to whoever holds the Kingdom's Favour, then to the better place on the Order Track.</p>
 <h3>How a round goes</h3><ol class="rl">
 <li><b>Start of the year.</b> Everyone refills their hand to their hand size. Players are ranked by Influence: the leader acts first.</li>
@@ -647,10 +702,12 @@ const RULES_HTML=`<div class="rules">
 <h3>Attrition</h3><p>If you must draw and your deck is empty, your discard pile becomes your new deck and your hand size drops by one (never below 3, never above 8). A short game of 4 or 5 rounds usually hits this around round 3.</p>
 <h3>The Kingdom's Favour</h3><p>A disc with three uses. Claim it at the Gleaning Meadow. While you hold it you may use your faction's Favour action; each use spends one of three charges.</p>
 <h3>Reading your cards</h3><p>Top left: Strength. Top right: the Lore cost (Site of Power cards only). Bottom line: votes and lore. Invulnerable cards cannot be eliminated, Resilient cards go to the discard instead of the Lost Pile, Pathfinder cards go to the discard when used for a Journey.</p>
-<h3>On this screen</h3><p>The map is the game. Tap a location or a region's card slots for details; tap the throne for the Great Road and Councils. Tap a card in your hand for a large view and its actions. The step list under the map always shows where you are in the round, and the highlighted button is the recommendation of a strong computer player.</p>
+<h3>On this screen</h3><p>Tap a location or a region's card slots for details; tap the throne for the Great Road and Councils. Tap a card in your hand for a large view and its actions. The dots in the top bar show the seven steps of a round. The gold button at the bottom of the panel is the suggestion of a strong computer player, and the line above it says why.</p>
+</details>
+<details><summary>Words used in the game</summary><dl>${GLOSS.map(g=>'<dt>'+g[2]+'</dt><dd>'+g[3]+'</dd>').join('')}</dl></details>
 </div>`;
 function setupDrawers(){
-  GX.drawer('rulesd','How to play',(()=>{const d=document.createElement('div');d.innerHTML=RULES_HTML;return d})(),true);
+  GX.drawer('rulesd','How to play',(()=>{const d=document.createElement('div');d.innerHTML=RULES_HTML();return d})(),true);
   GX.drawer('logd','Log',(()=>{const d=document.createElement('div');d.id='logbody';return d})());
   GX.drawer('boardd','My board and piles',(()=>{const d=document.createElement('div');d.id='boardbody';return d})());
   GX.drawer('setd','Menu',(()=>{const d=document.createElement('div');d.id='setbody';return d})());
@@ -669,12 +726,20 @@ function musicFor(){try{if(!window.GA||!UI.music)return;GA.music(G&&G.round>=G.r
 // ---------------------------------------------------------------- phone mode
 function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
   const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
+// The board gives up space so the dock (now-line, prompt, pinned action row, hand, rivals) always fits: portrait phones keep the square map
+// at most as big as the height leaves after the dock's minimum; landscape phones put the map left at the full height.
+function dockNeed(H){return H>=820?380:H>=760?396:H>=700?370:H>=640?350:H>=580?330:330}
 function phApply(){const was=UI.phone;const on=phDetect();const root=document.documentElement;
-  UI.phone=on;UI.land=innerWidth>innerHeight;root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);
-  if(on){const W=innerWidth,H=innerHeight,bar=44;const bs=UI.land?H:Math.min(W,Math.max(Math.round(W*.75),H-bar-270));root.style.setProperty('--bs',bs+'px');root.style.setProperty('--bar','44px')}
+  UI.phone=on;UI.land=innerWidth>innerHeight;const W=innerWidth,H=innerHeight;UI.short=on&&(UI.land?H<370:H<600);
+  root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);root.classList.toggle('short',!!UI.short);
+  if(on){const big=Math.max(150,Math.min(W,H-44-dockNeed(H)));const bs=UI.land?Math.min(H,Math.round(W*.52)):(UI.boardSmall?Math.max(150,Math.min(big,Math.round(big-Math.max(90,H*.15)))):big);root.style.setProperty('--bs',bs+'px');UI.bs=bs}
   else root.style.removeProperty('--bs');
   if(was!==on&&G){UI.mapReset=true;renderAll()}}
 function phoneRefresh(){}
+// map-centred decisions (Herald, hidden cards, claiming, ties, the map lesson) get the big map; lists, menus and result cards get the room instead
+function wantSmall(){if(!G)return false;const c=UI.card;if(c&&c.kind==='pass')return false;if(c&&(c.kind==='event'||c.kind==='over'))return true;
+  if(UI.coachInfo)return UI.coachInfo.id!=='map';const s=viewSeatForQ();if(s==null||!G.q)return UI.boardSmall;
+  return !['herald','place','location','tie','clashOrder'].includes(G.q.kind)}
 let _rz=0;addEventListener('resize',()=>{clearTimeout(_rz);_rz=setTimeout(()=>{const l=UI.land,p=UI.phone;phApply();if(G&&UI.started)renderAll()},120)});
 addEventListener('orientationchange',()=>setTimeout(()=>{phApply();if(G)renderAll()},200));
 // ---------------------------------------------------------------- boot
@@ -687,3 +752,210 @@ function boot(){
   document.addEventListener('pointerdown',()=>{try{if(window.GA)GA.unlock();if(UI.music)musicFor()}catch(e){}},{once:true})}
 function startUiReady(){return TBKit.ready}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+// ===================== part 7: plain words (log lines, glossary), the guided first game, title + setup screens =====================
+// ---------------------------------------------------------------- plain log lines: "Heathbound Clans gains 2" -> "You gain 2" for the local player
+function myName(){if(!G)return null;if(NET.on){const m=NET.mySeat;return m>=0?G.pl[m].name:null}if(hotSeat()||UI.mode==='watch')return null;const h=humans();return h.length===1?G.pl[h[0]].name:null}
+const escRe=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function verbYou(w){const l=w.toLowerCase();if(l==='has')return 'have';if(l==='is')return 'are';if(l==='was')return 'were';if(l==='does')return 'do';
+  if(/[^aeiou]ies$/i.test(w))return w.slice(0,-3)+'y';if(/(ss|sh|ch|x|z)es$/i.test(w))return w.slice(0,-2);if(/[^s]s$/i.test(w)&&w.length>3)return w.slice(0,-1);return w}
+function plain(t){const n=myName();if(!n||!t)return t;let subj=false;
+  let out=t.replace(new RegExp(escRe(n)+"('s)?(?=\\W|$)( [A-Za-z]+)?",'g'),(m,poss,w,off,str)=>{const start=off===0||/[.:!?]\s*$/.test(str.slice(0,off));if(off===0)subj=true;
+    const you=start?(poss?'Your':'You'):(poss?'your':'you');if(poss)return you+(w||'');if(!w)return you;if(!start&&off>0)return you+w;return you+' '+verbYou(w.trim())});
+  if(subj)out=out.replace(/\btheir\b/,'your');return out}
+// ---------------------------------------------------------------- "what's happening": the newest public event, in plain words
+const PHASEN={spring:'Spring',summer:'Day',autumn:'Autumn'};
+function aiFallback(s,q,mv){const N=G.pl[s].name;const k=q.kind;
+  if(k==='bid')return N+' chooses a secret bid.';if(k==='place'&&mv.r!=null)return N+' hides a card next to '+REG[mv.r]+'.';
+  if(q.t==='menu'&&mv.t==='done'){const ph=(q.title.match(/(Spring|Day|Autumn)/)||[])[1];return N+' is done with '+(ph?ph+' ':'')+'actions.'}
+  if(k==='edict'||k==='statue'||k==='harvest')return N+' decides about '+(k==='edict'?'a Tactic':'a card')+'.';
+  return N+' makes a choice.'}
+function renderNow(){const el=$('#now');if(!el||!G)return;if(UI.coachInfo){el.innerHTML='';return}
+  let t=null,s=-1;const f=UI.nowT;const last=G.log[G.log.length-1];
+  if(f&&f.at===G.logN){t=f.t;s=f.s}else if(last){t=last.t;s=last.s}
+  if(!t){el.innerHTML='';return}
+  // an Influence change that touches you since your last decision is never lost behind later lines
+  const n=myName();let mine=null;if(n){const from=UI.nowMark||0;for(let i=G.log.length-1;i>=0&&G.log[i].i>from;i--){const e=G.log[i];if(/Influence/.test(e.t)&&e.t.indexOf(n)>=0&&/steals|loses|gains/.test(e.t)){mine=e;break}}}
+  const row=(tx,ss,cls)=>'<span class="nr'+(cls?' '+cls:'')+'"><i style="background:'+(ss>=0&&G.pl[ss]?fcol(ss):'#777')+'" aria-hidden="true"></i>'+esc(plain(tx))+'</span>';
+  el.innerHTML=(mine&&mine.t!==t?row(mine.t,mine.s,'me'):'')+row(t,s)}
+// wrap the computer step: a move that writes no log line still gets a line
+(function(){const o=aiStep;aiStep=function(w){const s=w.ai[0],q=G.q,l0=G.logN;let mv=null;const oc=aiChoose;
+  aiChoose=function(a,b){mv=oc(a,b);return mv};try{o(w)}finally{aiChoose=oc}
+  if(G.logN===l0&&q&&mv)UI.nowT={at:G.logN,s,t:aiFallback(s,q,mv)}}})();
+// ---------------------------------------------------------------- glossary: every game word can be tapped for its meaning
+const GLOSS=[
+ ['influence',/\bInfluence\b/,'Influence','The score. Whoever holds the most Influence when the last round ends wins the throne. You gain it by winning Clashes and claiming locations.'],
+ ['kingdom card',/\bKingdom Cards?\b/,'Kingdom Card','A shared power card. Win one with your bid: it sits on your board with your bid card tucked under it, and its power works for you as long as you keep it (at most two).'],
+ ['great road',/\bGreat Road\b/,'Great Road','The row of four face-up Kingdom Cards you can bid for. Cards nobody takes slide along, and the oldest is thrown away each round.'],
+ ['herald',/\bHeralds?\b/,'Herald','Your one public envoy. Put it on a location in Spring. If you then win that region and claim that location, you gain +1 Influence and take 1 from every rival Herald standing there.'],
+ ['supporter',/\bSupporters?\b/,'Supporter','Small followers waiting on your board. Each one you send to a region adds +1 Strength there for its first Clash. All Supporters on the map are spent in Winter.'],
+ ['clash',/\bClash(es)?\b/,'Clash','The fight in one region. Everyone\'s hidden cards there are flipped, abilities are used, and the highest total Strength (cards + Supporters) wins the region.'],
+ ['strength',/\bStrength\b/,'Strength','The big number at the top left of a card. In a Clash you add up the Strength of your cards there, +1 per Supporter.'],
+ ['region',/\bregions?\b/i,'Region','One of the three areas of the map: the Uplands, the Tablelands and the Sinks. Each has two locations and one Clash per round.'],
+ ['location',/\blocations?\b/i,'Location','One of the six places on the map. The winner of a region\'s Clash claims one of its two locations: its Influence plus its bonus.'],
+ ['bid',/\bbids?\b/i,'Bid','A card you choose secretly at the start of a round. Its Strength is the bid: the highest bid picks a Kingdom Card first.'],
+ ['tactic',/\bTactics?\b/,'Tactic','Four special powers of your faction. Each can be used once; then it is Exhausted (some cards can refresh them).'],
+ ['lore',/\bLore\b/,'Lore','A second currency. You gain it by a Journey and spend it on your faction\'s Site of Power cards.'],
+ ['site of power',/\bSite of Power\b/,'Site of Power','Your faction\'s five extra cards, bought with Lore. If you buy them all, your leftover Lore turns into Influence at the end.'],
+ ['govern',/\bGovern\b/,'Govern','An Autumn action, once a round: move a hand card that shows votes into one of the three Councils.'],
+ ['journey',/\bJourney\b/,'Journey','An Autumn action, once a round: send away a hand card that shows Lore, and gain that much Lore.'],
+ ['council',/\bCouncils?\b/,'Council','Three Councils (Coin, Whispers, Pledges). Cards with votes placed there give you a lasting benefit every round.'],
+ ['attrition',/\bAttrition\b/,'Attrition','When you must draw and your deck is empty, your discard pile becomes a new deck and your hand size drops by one (never below 3).'],
+ ['favour',/\b(Kingdom's )?Favour\b/,'Kingdom\'s Favour','A disc you claim at the Gleaning Meadow. While you hold it you may use your faction\'s Favour power (three uses), and it breaks ties at the end.'],
+ ['order track',/\bOrder Track\b/,'Order Track','The turn order. At the start of each round the player with the most Influence goes first.'],
+ ['winter',/\bWinter\b/,'Winter','The end of a round: Heralds go home, Supporters on the map are spent, and played cards go to the discard pile.'],
+ ['autumn',/\bAutumn\b/,'Autumn','After the Clashes: once each you may Govern and Journey, and use Autumn abilities.'],
+ ['ambush',/\bAmbush\b/,'Ambush','A Day ability: add a hidden card from your hand to this Clash.'],
+ ['retreat',/\bRetreat\b/,'Retreat','A Day ability: pull your cards, Herald or Supporters out of this region.'],
+ ['flank',/\bFlank\b/,'Flank','A Day ability: move this card to a region that has not fought yet.'],
+ ['deadly',/\bDeadly\b/,'Deadly','A Night effect: every opposing card in the Clash is Eliminated (sent to the Lost Pile) unless it is protected.'],
+ ['rally',/\bRally\b/,'Rally','An Autumn ability: take your cards on the map back into your hand before Winter discards them.'],
+ ['deploy',/\bDeploy\b/,'Deploy','An Autumn ability: put a card face up next to a region; it stays through the next Winter(s).'],
+ ['lost pile',/\bLost Pile\b/,'Lost Pile','Where Eliminated cards and spent Supporters go. They do not come back when your deck is reshuffled.'],
+ ['hand size',/\bhand size\b/i,'Hand size','How many cards you draw up to each round (6 at the start). Attrition lowers it.'],
+ ['occupier',/\boccup(ier|ying)\b/i,'Occupier','The faction card tucked under a Kingdom Card. A rival can steal the Kingdom Card with a bid stronger than its occupier.'],
+ ['exhausted',/\bExhausted\b/,'Exhausted','A used Tactic. It cannot be used again unless something refreshes it.'],
+];
+const GL={};GLOSS.forEach(g=>GL[g[0]]=g);
+// escape + wrap the first appearance of each term in this text with a tappable chip
+function gloss(text){if(text==null)return '';text=String(text);const hits=[];
+  for(const [k,re] of GLOSS){const m=re.exec(text);if(m)hits.push({i:m.index,n:m[0].length,k})}
+  hits.sort((a,b)=>a.i-b.i||b.n-a.n);let out='',p=0;
+  for(const h of hits){if(h.i<p)continue;out+=esc(text.slice(p,h.i));const nw=!(UI.glSeen&&UI.glSeen[h.k]);out+='<button type="button" class="gl'+(nw?' new':'')+'" data-a="gloss" data-t="'+esc(h.k)+'" aria-label="'+esc(text.substr(h.i,h.n))+': what does it mean?">'+esc(text.substr(h.i,h.n))+'</button>';p=h.i+h.n}
+  return out+esc(text.slice(p))}
+function showGloss(k){const g=GL[k];const el=$('#gdef');if(!g||!el)return;UI.glSeen=UI.glSeen||{};UI.glSeen[k]=1;
+  el.innerHTML='<p><b>'+esc(g[2])+'</b>: '+esc(g[3])+'</p><button class="pp-x" data-a="gclose" aria-label="Close">'+ico('x')+'</button>';el.hidden=false;if(typeof sfx==='function')sfx('tap')}
+function hideGloss(){const el=$('#gdef');if(el){el.hidden=true;el.innerHTML=''}}
+document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.dataset.more)UI.moreOpen=d.open},true);
+// ---------------------------------------------------------------- the guided first game: fixed deal, one thing per step
+// Deal: you lead the Heathbound Clans against the Gilded Court (easy), 4 rounds, seed 98 (found by a node search over seeds with the in-game names). With the suggested moves you meet the Court's Herald on
+// Cairn Field and win there with your Heir and two Supporters: the +2, the Herald's +1 and the steal all happen in round 1.
+const GUIDED={seed:98,ai:9,faction:'clans',rival:'nobility'};
+const isGuided=()=>!!(UI.cfg&&UI.cfg.guided&&!NET.on);
+const COACH_INFO=[
+ {id:'goal',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'Your goal',text:()=>'Hold the most Influence when round '+G.rounds+' ends. Influence is the score: you and the Gilded Court both start at 0 (the chips at the bottom).',hl:'#rivals'},
+ {id:'map',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'The kingdom',text:()=>'The map has three regions with two locations each. Every round each region has one Clash: the strongest side wins it and claims one of its two locations, which pays Influence. The numbers round the edge are the Influence track.',locs:[0,1,2,3,4,5]},
+ {id:'round',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'One round, five steps',text:()=>'Bid for a Kingdom Card, place your Herald, hide one card at each region, fight the three Clashes, then count Influence. Let\'s play round 1 together: tap the glowing button each time.',btn:'Let\'s start'},
+ {id:'own',when:()=>G.round===2&&G.q,title:'Now you lead',text:()=>'You have seen a whole round. From now on the ★ suggestion shows a good move and why, but every choice is yours. Tap any underlined word to read what it means.',btn:'Play on'}];
+function coachGate(){if(!G||!G.q||UI.coachInfo)return !!UI.coachInfo;if(!isGuided())return false;UI.coachDone=UI.coachDone||{};
+  const st=COACH_INFO.find(c=>!UI.coachDone[c.id]&&c.when());if(!st)return false;UI.coachInfo={id:st.id,title:st.title,text:st.text(),btn:st.btn,hl:st.hl,hlLocs:st.locs};return true}
+function coachOk(){const c=UI.coachInfo;if(!c)return;UI.coachDone=UI.coachDone||{};UI.coachDone[c.id]=1;UI.coachInfo=null;$$('.coachhl').forEach(e=>e.classList.remove('coachhl'));saveGame();pump()}
+function coachInfoHTML(c){setTimeout(()=>{$$('.coachhl').forEach(e=>e.classList.remove('coachhl'));if(c.hl){const e=$(c.hl);if(e)e.classList.add('coachhl')}},0);
+  const n=COACH_INFO.findIndex(x=>x.id===c.id);return '<div class="step"><h3 class="st">'+esc(c.title)+'</h3><p class="coach info">'+gloss(c.text)+'</p>'+(n>=0&&n<3?'<p class="hint">'+(n+1)+' of 3 before you play</p>':'')+'</div>'}
+const menuPhase=q=>((q.title||'').match(/(Spring|Day|Autumn)/)||[])[1]||'';
+const byLabel=(mv,txt)=>mv.find(m=>(m.label||'').indexOf(txt)>=0);
+// teaching moves for round 1 (falls back to the normal suggestion when the scripted card is not there)
+function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
+  if(G.round===1){
+    if(k==='bid')return byLabel(mv,'Sailing Hall');
+    if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return riv?mv.find(m=>m.loc===riv.herald):byLabel(mv,'Cairn Field')}
+    if(k==='place'){const P=G.pl[s];const heir=P.hand.find(id=>cinfo(id).archetype==='heir');if(heir!=null)return mv.find(m=>m.id===heir&&m.r===1);const big=P.hand.slice().sort((a,b)=>cinfo(b).strength-cinfo(a).strength);
+      if(big.length)return mv.find(m=>m.id===big[0]&&m.r===0)||mv.find(m=>m.id===big[0]);return null}
+    if(k==='clashOrder')return mv.find(m=>m.order&&m.order.join()==='2,1,0')||null;
+    if(q.t==='menu'){const ph=menuPhase(q);if(ph==='Spring'&&G.pl[s].supp.r[1]===0){const m=mv.find(x=>x.a==='supp'&&x.p.r===1&&x.p.n===2);if(m)return m}return mv.find(m=>m.t==='done')}}
+  if(G.round===2&&q.t==='menu'&&menuPhase(q)==='Autumn'&&!UI.coachDone.au2){return mv.find(m=>m.a==='journey')||null}
+  return null}
+const STEPN=(n,t)=>'Step '+n+' of 6 · '+t;
+// the coach line that replaces the prompt in round 1 (and the first time a few things appear later)
+function coachFor(s,mv,rm){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind,R=G.round;UI.coachDone=UI.coachDone||{};
+  const nm=id=>cinfo(id).name+' ('+cinfo(id).strength+')';
+  if(R===1){
+    if(k==='bid')return {title:STEPN(1,'Bid'),pulse:1,noRec:1,text:'Pick a hand card as a secret bid: the higher bid picks a Kingdom Card first.'+(rm?' '+nm(rm.id)+' is fair and keeps your big cards for the Clashes.':'')};
+    if(k==='bidRes')return {title:STEPN(2,'Take a Kingdom Card'),pulse:1,noRec:1,text:'A Kingdom Card is a lasting power; your bid card stays tucked under it.'+(rm&&rm.kc?' Take '+TB.kingdomInfo(rm.kc).name+' (tap it to read it).':'')};
+    if(k==='herald'){const riv=G.pl.find(p=>p.seat!==s&&p.herald>=0);return {title:STEPN(3,'Place your Herald'),pulse:1,noRec:1,text:'Win the region where your Herald stands and claim its location: +1 Influence, and you take 1 from each rival Herald there.'+(riv&&rm?' The Court is on '+LOCN[riv.herald]+': join it.':'')}}
+    if(k==='place'){const n=UI.V.reg.reduce((a,R2)=>a+R2.down.filter(id=>id>=0&&ownerOf(id)===s).length,0);
+      return {title:STEPN(4,'Hide a card at each region'),pulse:1,noRec:1,text:'Card '+Math.min(3,n+1)+' of 3, hidden until the Clash. '+(rm?nm(rm.id)+' to '+REG[rm.r]+(cinfo(rm.id).archetype==='heir'?': your strongest card where both Heralds wait.':'.'):'Choose a card for each region.')}}
+    if(q.t==='menu'&&menuPhase(q)==='Spring'){const sent=G.pl[s].supp.r[1]>0;return {title:STEPN(5,'Send Supporters'),pulse:1,noRec:1,text:sent?'Two Supporters stand with your Heir. Now finish Spring.':'Each Supporter you send adds +1 Strength in a region\'s first Clash. Send 2 to the Tablelands to back your Heir.'}}
+    if(k==='clashOrder')return {title:'Choose the Clash order',pulse:1,noRec:1,text:'The player with the least Influence decides which region fights first. Any order works: take the suggested one.'};
+    if(q.t==='menu'&&menuPhase(q)==='Day')return {title:'Day actions',pulse:1,noRec:1,text:'Cards are face up. Some have Day abilities like Ambush or Flank; you need none now.'};
+    if(k==='location')return {title:STEPN(6,'Claim a location'),pulse:1,noRec:1,text:'You won this Clash! Pick one of the region\'s two locations.'+(rm?' '+whyFor(s,rm):'')};
+    if(k==='tie')return {title:'A tie!',pulse:1,text:'Both sides have the same total. Each of you may add one more hidden card, or pass. If nobody adds one, nobody wins here.'};
+    if(q.t==='menu'&&menuPhase(q)==='Autumn')return {title:'Autumn',pulse:1,noRec:1,text:'In Autumn you may Govern and Journey. We try that next round; finish Autumn for now.'};
+    if(q.t==='sel'||q.t==='pick')return {title:'A location bonus',pulse:1,text:'The location you claimed gives a bonus. '+(rm?'The suggestion is fine: '+recBtnText(rm)+'.':'Choose one.')}}
+  if(R===2&&q.t==='menu'&&menuPhase(q)==='Autumn'&&!UI.coachDone.au2){if(rm&&rm.a==='journey')return {title:'Autumn: Journey and Govern',pulse:1,text:'Journey sends a hand card away for Lore, which buys your faction\'s Site of Power cards. Govern puts a card with votes into a Council for a lasting bonus. Try a Journey now.'};UI.coachDone.au2=1}
+  if(R===2&&k==='siteBuy'&&!UI.coachDone.sb){return {title:'Spend Lore?',pulse:1,text:'Lore buys your Site of Power cards: strong extra cards for your deck. Keep it if nothing is affordable yet.'}}
+  return null}
+function coachEvent(ev){if(!isGuided())return '';UI.coachDone=UI.coachDone||{};const k='ev_'+ev.t;
+  if(ev.t==='bids'&&G.round===1){const me=humans()[0];const b=ev.bids.find(x=>x.seat===me);const tac=G.log.filter(e=>e.r===1&&e.s!==me&&/ plays /.test(e.t)).map(e=>e.t)[0];
+    if(b&&tac&&b.str<cinfo(b.id).strength)return 'The Court played a Tactic (a once-only power): '+tac.replace(/^.*? plays /,'').replace(/\.$/,'')+'. So your bid counts as '+b.str+' and the Court chooses first. Tactics come back later; for now just watch.';
+    return 'Both bids are revealed. The higher bid chooses first; a tie goes to whoever is higher on the Order Track.'}
+  if(ev.t==='clash'&&G.round===1&&!UI.coachDone[k+ev.r]){return ev.idx===0?'The hidden cards are flipped. Each side adds the Strength of its cards, +1 per Supporter. The higher total wins the region.':''}
+  if(ev.t==='summary'&&ev.round===1){const me=humans()[0];const a=ev.inf1[me],b=Math.max(...ev.inf1.filter((_,i)=>i!==me));return 'Scoring: you have '+a+' Influence, the Court has '+b+'. '+(a>b?'You lead!':'Keep going.')+' The leader acts first next round. '+(G.rounds-1)+' rounds to go.'}
+  return ''}
+// guided: mark the Autumn coach as done once the player acts in round 2 Autumn
+(function(){const o=humanMove;humanMove=function(k){if(G)UI.nowMark=G.logN;const was=G&&G.q&&G.q.t==='menu'&&menuPhase(G.q)==='Autumn'&&G.round===2;if(G&&G.q&&G.q.kind==='siteBuy'&&UI.coachDone)UI.coachDone.sb=1;const r=o(k);if(was&&r&&UI.coachDone)UI.coachDone.au2=1;return r}})();
+// end screen: where the Influence came from (from the engine's own counters; a client without them shows nothing)
+function overBreakdown(){if(!G.stats||NET.on)return '';const rows=G.pl.map(p=>{const parts=[];for(const k in G.stats){const m=k.match(/^src:([a-z]+):(.*)$/);if(m&&m[1]===p.fac)parts.push([m[2],G.stats[k]])}
+  parts.sort((a,b)=>b[1]-a[1]);return '<li style="--fc:'+fcol(p.seat)+'"><b>'+esc(shortName(p.seat))+'</b><span>'+(parts.length?parts.slice(0,5).map(x=>esc(x[0])+' '+x[1]).join(', '):'none')+'</span></li>'}).join('');
+  return '<h4 class="bdh">Where the Influence came from</h4><ul class="rank bd2">'+rows+'</ul><p class="sub small">Steals by Heralds are not listed; they move Influence between players.</p>'}
+// ---------------------------------------------------------------- title + setup
+const STORY={
+ nobility:{story:'The old court still dresses for dinner in a palace with no king. Its stewards count every coin and every vote, and they mean to crown one of their own before the frost.',enjoy:'Choose the Gilded Court if you enjoy steady income, sturdy cards and winning the Councils.',tag:'Defence and votes · easy to learn'},
+ clans:{story:'From the cold coasts the clans ride in with the tide. They move fast, bring many hands, and strike where the valley folk least expect them.',enjoy:'Choose the Heathbound Clans if you enjoy big swings, riders that switch regions and crowds of Supporters.',tag:'Speed and numbers · easy to learn'},
+ uprising:{story:'In the dockside alleys, printers and ferrymen pass notes by lantern-light. They cannot win a fair fight, so they never fight fair.',enjoy:'Choose the Lantern Rising if you enjoy bluffs, ambushes and knocking your rivals\' cards out of the game.',tag:'Tricks and ambushes · medium'},
+ gathering:{story:'Under the moon the Choir sings to what others threw away. Lost cards return to them, small cards win their fights, and patience is their weapon.',enjoy:'Choose the Pale Choir if you enjoy clever combinations and playing the long game.',tag:'Combos and patience · harder'}};
+const sv={mode:'me',np:3,faction:'clans',length:'standard',guide:'full',levels:['normal','normal','normal','normal']};
+function titleArt(){return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs>'+
+ '<linearGradient id="tsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#140a1c"/><stop offset=".45" stop-color="#3a1a30"/><stop offset=".72" stop-color="#8a3c3a"/><stop offset=".86" stop-color="#d98a52"/><stop offset="1" stop-color="#f2c27a"/></linearGradient>'+
+ '<radialGradient id="tmoon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff6d6"/><stop offset=".55" stop-color="#f6e2a8" stop-opacity=".9"/><stop offset="1" stop-color="#f6e2a8" stop-opacity="0"/></radialGradient>'+
+ '<linearGradient id="tgold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a0"/><stop offset="1" stop-color="#9a6a1c"/></linearGradient>'+
+ '<filter id="tblur" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>'+
+ '<filter id="tpaint"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 .5  0 0 0 0 .35  0 0 0 0 .25  0 0 0 .22 0"/><feComposite in2="SourceGraphic" operator="in"/></filter></defs>'+
+ '<rect width="1200" height="800" fill="url(#tsky)"/>'+
+ [[120,80],[260,150],[410,60],[530,120],[700,40],[860,110],[1010,70],[1120,160],[330,230],[960,220],[620,190],[80,260]].map(([x,y],i)=>'<circle cx="'+x+'" cy="'+y+'" r="'+(i%3?1.6:2.4)+'" fill="#fff3d0" opacity="'+(.5+(i%4)*.12)+'"/>').join('')+
+ '<circle cx="860" cy="210" r="170" fill="url(#tmoon)" opacity=".55"/><circle cx="860" cy="210" r="62" fill="#fbecc0"/><circle cx="842" cy="196" r="12" fill="#e9d29a" opacity=".6"/><circle cx="880" cy="228" r="8" fill="#e9d29a" opacity=".5"/>'+
+ '<path d="M0 470 L120 400 L210 430 L320 360 L430 420 L520 380 L640 440 L760 370 L880 430 L1000 380 L1110 420 L1200 390 L1200 800 L0 800Z" fill="#4a2338" opacity=".85"/>'+
+ '<path d="M0 520 C150 470 260 500 380 480 C520 455 600 520 760 500 C900 482 1020 450 1200 490 L1200 800 L0 800Z" fill="#2c1424"/>'+
+ '<g fill="#1d0d18"><path d="M930 470 L930 400 L945 385 L960 400 L960 430 L985 430 L985 380 L1003 360 L1021 380 L1021 430 L1045 430 L1045 405 L1060 390 L1075 405 L1075 470Z"/><rect x="999" y="395" width="8" height="12" fill="#ffcf7a" opacity=".8"/><rect x="941" y="412" width="7" height="10" fill="#ffcf7a" opacity=".6"/></g>'+
+ '<ellipse cx="600" cy="560" rx="700" ry="60" fill="#f2c27a" opacity=".16" filter="url(#tblur)"/>'+
+ '<path d="M0 620 C200 570 380 600 600 585 C820 570 1000 600 1200 575 L1200 800 L0 800Z" fill="#170a12"/>'+
+ // the throne, wrapped in thorns
+ '<g transform="translate(600 640)"><path d="M-110 0 L-110 -210 L-128 -240 L-92 -265 L-70 -330 L-40 -300 L0 -380 L40 -300 L70 -330 L92 -265 L128 -240 L110 -210 L110 0Z" fill="#120810" stroke="url(#tgold)" stroke-width="5" stroke-linejoin="round"/>'+
+ '<path d="M-150 0 L-150 -80 L-118 -96 L118 -96 L150 -80 L150 0Z" fill="#1a0c14" stroke="url(#tgold)" stroke-width="5"/><path d="M-118 -96 L-110 -130 L110 -130 L118 -96Z" fill="#2a1420" stroke="url(#tgold)" stroke-width="4"/>'+
+ '<circle cx="0" cy="-300" r="14" fill="#c23a48" stroke="#ffe7a0" stroke-width="3"/>'+
+ '<g fill="none" stroke="#3d7a3a" stroke-width="7" stroke-linecap="round"><path d="M-160 -10 C-60 -60 -170 -140 -90 -190 C-20 -235 -120 -290 -40 -330"/><path d="M160 -20 C70 -70 175 -150 95 -200 C30 -240 120 -300 30 -350"/><path d="M-140 -60 C-40 -120 60 -40 140 -110"/></g>'+
+ '<g fill="#5aa04f">'+[[-150,-28],[-102,-70],[-128,-140],[-82,-200],[-74,-262],[-44,-318],[150,-40],[110,-90],[128,-160],[88,-215],[86,-276],[44,-336],[-80,-96],[20,-78],[110,-104]].map(([x,y],i)=>'<path d="M'+x+' '+y+' l'+(i%2?9:-9)+' -7 l2 11Z"/>').join('')+'</g>'+
+ '<g fill="#c23a48"><circle cx="-96" cy="-192" r="9"/><circle cx="98" cy="-202" r="8"/><circle cx="-40" cy="-108" r="7"/></g></g>'+
+ '<g fill="#2a1a10" opacity=".9"><path d="M0 800 L0 700 C60 690 120 720 180 705 L240 800Z"/><path d="M1200 800 L1200 690 C1140 684 1080 716 1010 700 L960 800Z"/></g>'+
+ '<rect width="1200" height="800" filter="url(#tpaint)" fill="#fff" opacity="'+(UI.lowGfx?0:1)+'"/></svg>'}
+function hasSave(){const s=loadSave();return s&&s.G&&!s.G.over?s:null}
+function showStart(){try{GX.close()}catch(e){}closePop(true);hideGloss();const el=$('#start');el.hidden=false;document.body.classList.add('in-start');if(!NET.on){if(UI.joinCode&&!UI.linkShown){UI.linkShown=1;UI.sv='online'}else UI.sv=UI.onl&&UI.sv==='online'?'online':'title'}UI.cfgOpen=false;renderStart();
+  const f=$('#start .tbtn.go,#start .sbtn.big');if(f)try{f.focus({preventScroll:true})}catch(e){}}
+function hideStart(){$('#start').hidden=true;document.body.classList.remove('in-start')}
+function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=el.scrollTop;
+  const view=NET.on?'online':(UI.sv||'title');el.dataset.v=view;
+  if(view==='title'){const sav=hasSave();
+    el.innerHTML='<div class="ttl"><div class="ttl-art">'+titleArt()+'</div><div class="ttl-in"><h1 class="logo"><small>THE</small>Thornbound Throne</h1><p class="tag">The king is dead. Four factions reach for his crown.</p><div class="tmid"></div><div class="tbtns">'+
+      '<button class="tbtn go" data-a="play"><b>Play</b><span>'+(firstTime()?'new here? a guided first game is ready':'against the computer')+'</span></button>'+
+      '<button class="tbtn" data-a="online"><b>Online</b><span>with friends, free, no sign-up</span></button>'+
+      (sav?'<button class="tbtn" data-a="cont"><b>Resume</b><span>your game, round '+Math.max(1,sav.G.round)+' of '+sav.G.rounds+'</span></button>':'')+
+      '</div><button class="tlink" data-a="rules">How to play</button></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
+  const ONL=view==='online';
+  el.innerHTML='<div class="setup"><div class="bgart">'+titleArt()+'</div>'+(ONL?onlineSetupHTML():setupHTML())+'</div>'+(UI.phone&&UI.cfgOpen&&!ONL?cfgDialogHTML():'');
+  el.scrollTop=top}
+function firstTime(){try{return !localStorage.getItem('tb_played')}catch(e){return true}}
+function facCard(f,on){const k=TBKit.FACTIONS[FK[f]],S=STORY[f];return '<button class="fcard'+(on?' on':'')+'" data-a="fac" data-v="'+f+'" style="--fc:'+k.main+'" aria-pressed="'+on+'"><span class="ft"><span class="fe">'+TBKit.token('influence',{faction:FK[f]},44).outerHTML+'</span><span><b>'+esc(DD.FNAME[f])+'</b><small>'+esc(S.tag)+'</small></span></span><p>'+esc(S.story)+'</p><p class="enj">'+esc(S.enjoy)+'</p>'+(on?'<span class="fpick">Your faction ✓</span>':'')+'</button>'}
+function seatRows(ONL,plan){const n=ONL?plan.np:sv.np;const rest=FIDS.filter(f=>f!==sv.faction);let h='';
+  for(let i=0;i<n;i++){const f=i===0?sv.faction:rest[i-1];const k=TBKit.FACTIONS[FK[f]];const human=ONL?i<plan.hum.length:i===0;
+    h+='<div class="seat" style="--fc:'+k.main+'">'+TBKit.token('influence',{faction:FK[f]},30).outerHTML+'<span class="sn"><b>'+esc(k.short)+'</b><small>'+(human?(ONL?'Online: '+esc(plan.hum[i].nm)+(i===0?' (you)':''):'You'):'Computer')+'</small></span>'+(human?'':levelSeg(i))+'</div>'}
+  return '<div class="seats">'+h+'</div>'}
+function levelSeg(i){return '<div class="seg" role="radiogroup" aria-label="Computer level">'+['easy','normal','hard'].map(l=>'<button class="'+(sv.levels[i]===l?'on':'')+'" data-a="lv" data-i="'+i+'" data-v="'+l+'" aria-pressed="'+(sv.levels[i]===l)+'">'+l[0].toUpperCase()+l.slice(1)+'</button>').join('')+'</div>'}
+function optionsHTML(ONL,plan){return '<div class="opts2">'+(ONL?'':'<div class="row"><span>Players</span><div class="seg">'+[2,3,4].map(n=>'<button class="'+(sv.np===n?'on':'')+'" data-a="np" data-v="'+n+'">'+n+'</button>').join('')+'</div></div>')+
+  '<div class="row"><span>Length</span><div class="seg">'+[['short','4 rounds'],['standard','5 rounds'],['extended','6 rounds']].map(([v,l])=>'<button class="'+(sv.length===v?'on':'')+'" data-a="len" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+
+  '<div class="row"><span>Tips</span><div class="seg">'+[['full','Full'],['light','Light'],['off','Off']].map(([v,l])=>'<button class="'+(sv.guide===v?'on':'')+'" data-a="gd" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+seatRows(ONL,plan)+'</div>'}
+function sumLine(){const n=sv.np-1;return 'You lead <b>'+esc(DD.FSHORT[sv.faction])+'</b> against '+n+' computer'+(n>1?'s':'')+' · '+({short:4,standard:5,extended:6}[sv.length])+' rounds'}
+function setupHTML(){const ph=UI.phone;const k=TBKit.FACTIONS[FK[sv.faction]];
+  const guide='<div class="guidebox"><p><b>First time?</b> The guided game teaches one step at a time: you lead the Heathbound Clans against an easy Gilded Court for 4 rounds (about 15 minutes).</p></div>';
+  const ft=firstTime();const gbtn='<button class="sbtn'+(ft?' big':'')+'" data-a="guided" data-start="guided"><b>'+(ft?'Guided first game':'Guided game')+'</b><span>'+(ft?'recommended: learn one step at a time':'learn step by step')+'</span></button>';
+  const go='<div class="sgo">'+(ft?gbtn:'')+'<button class="sbtn'+(ft?'':' big')+'" data-a="start" data-start="go"><b>Start the game</b><span>'+sumLine().replace(/<[^>]+>/g,'')+'</span></button><div class="sgrid3">'+(ft?'<button class="sbtn" data-a="rules"><b>How to play</b><span>the rules in short</span></button>':gbtn)+
+    '<button class="sbtn" data-a="mode" data-v="hot" data-go="1" data-start="hot"><b>Hot-seat</b><span>'+sv.np+' people, one device</span></button>'+
+    '<button class="sbtn" data-a="mode" data-v="watch" data-go="1" data-start="watch"><b>Watch</b><span>the computers play</span></button></div></div>';
+  const head='<div class="shead"><button class="sback" data-a="title" aria-label="Back to the title">‹</button><h2>Choose your faction</h2></div>';
+  if(ph)return head+(firstTime()?guide:'')+'<div class="ssum" style="--fc:'+k.main+'"><span class="fe">'+TBKit.token('influence',{faction:FK[sv.faction]},40).outerHTML+'</span><span class="sline">'+sumLine()+'</span><button class="btn" data-a="cfgopen">Configure</button></div><p class="ssub">'+esc(STORY[sv.faction].enjoy)+'</p>'+go;
+  return head+'<p class="ssub">Each faction plays the same rules with its own cards and powers. Pick the story you like.</p>'+(firstTime()?guide:'')+'<div class="fgrid">'+FIDS.map(f=>facCard(f,f===sv.faction)).join('')+'</div>'+optionsHTML(false)+go}
+function cfgDialogHTML(){return '<div class="cfgdlg" role="dialog" aria-label="Configure the game"><div class="cfghead"><b>Configure</b><button class="btn" data-a="cfgclose">Done</button></div><div class="cfgbody"><div class="fgrid">'+FIDS.map(f=>facCard(f,f===sv.faction)).join('')+'</div>'+optionsHTML(false)+'</div><div class="cfgfoot"><button class="btn pri big" data-a="cfgclose">Done</button></div></div>'}
+function onlineSetupHTML(){const host=NET.on&&isHost(),plan=host?netPlan():null;
+  return '<div class="shead"><button class="sback" data-a="title" aria-label="Back to the title">‹</button><h2>Play online</h2></div><p class="ssub">Host a room and send friends the code or link. Every browser connects directly, nobody sees another hand, and empty seats go to the computer.</p>'+onlineBlock()+
+   (host?'<h2 class="sh2">Your faction</h2><div class="fgrid">'+FIDS.map(f=>facCard(f,f===sv.faction)).join('')+'</div>'+optionsHTML(true,plan)+'<div class="sgo"><button class="sbtn big" data-a="start" data-start="go"><b>Start online game</b></button>'+(G&&UI.started?'<button class="sbtn" data-a="netback"><b>Back to the game</b></button>':'')+'</div>':'')}
+function startFromSetup(){hideStart();try{localStorage.setItem('tb_played','1')}catch(e){}const lv=sv.levels.slice();
+  const o={np:sv.np,length:sv.length,faction:sv.faction,levels:lv.map((l,i)=>i===0?l:sv.levels[i]),guide:sv.guide};
+  newGame(sv.mode==='watch'?'ai':sv.mode,o)}
