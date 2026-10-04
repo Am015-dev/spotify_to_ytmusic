@@ -60,6 +60,8 @@ document.addEventListener('click', ev => {
     case 'slot': slotTap(d.slot); break;
     case 'ready': case 'say': case 'rr': case 'rrpick': case 'antic': case 'adapt': case 'wt': case 'toss': case 'cof': case 'hint': doAction(a, t); break;
     case 'tipmore': tipMore(); break;
+    case 'unsel': UI.sel = -1; UI.cof = 0; UI.warnK = null; render(); break;
+    case 'debrief': showFinal(); break;
     case 'ckopen': UI.ckOpen = !UI.ckOpen; render(); break;
     case 'recapx': hideRecap(); break;
     case 'altinfo': { const R = altRows()[G.round + G.row0]; toast('Altitude ' + R[0] + ' ft, round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0) + '. Blue rows: ' + name(0) + ' (Pilot) places first; orange rows: ' + name(1) + ' (Co-pilot). A purple dot brings a reroll token.'); break; }

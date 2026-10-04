@@ -25,6 +25,12 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
     // title: Play and Online, Resume only with a save; the three buttons sit inside the screen and are not covered
     { const t = await p.evaluate(() => { const bs = [...document.querySelectorAll('#start .tbtns button')]; return { n: bs.length, acts: bs.map(b => b.dataset.a), bad: bs.filter(b => { const r = b.getBoundingClientRect(); const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.bottom > innerHeight + 1 || r.top < 0 || r.height < 44 || !b.contains(h); }).map(b => b.dataset.a), art: !!document.querySelector('#start img.ttl-bg') }; });
       if (t.acts.join() !== 'play,online') fail('title buttons', JSON.stringify(t)); if (t.bad.length) fail('title button off screen or covered', JSON.stringify(t.bad)); if (!t.art) fail('no title painting'); }
+    // the title's How to play must open the rules ON TOP of the title (it used to open behind it), and close again
+    { const tap = async s => { try { await p.tap(s); } catch (e) { await p.click(s); } };
+      await tap('#start .tlink[data-a=rules]'); await p.waitForTimeout(450);
+      const r = await p.evaluate(() => { const d = document.getElementById('rulesd'); const b = d.getBoundingClientRect(); const h = document.elementFromPoint(b.left + b.width / 2, b.top + b.height / 2); return { on: d.classList.contains('on'), top: !!h && d.contains(h), hit: h && (h.id || h.className) }; });
+      if (!r.on || !r.top) fail('title How to play is hidden or dead', JSON.stringify(r)); else await shot('0title-rules');
+      await p.keyboard.press('Escape'); await p.waitForTimeout(300); }
     await p.click('[data-a=play]'); await p.waitForTimeout(300); await scroll('setup'); await shot('0setup');
     { const st = await p.evaluate(() => ({ cards: document.querySelectorAll('#start .dcard').length, on: document.querySelectorAll('#start .dcard.on').length, cfg: !document.querySelector('#cfg').hidden, start: (() => { const b = document.querySelector('[data-start=vs]'); const r = b.getBoundingClientRect(); return r.bottom <= innerHeight + 1 && r.top >= 0; })(), enjoy: [...document.querySelectorAll('.dcard .enjoy')].every(e => /^Choose \w+ if you enjoy /.test(e.textContent)) }));
       if (st.cards !== 4 || st.on !== 2 || !st.cfg || !st.enjoy) fail('setup cards', JSON.stringify(st)); if (!st.start) fail('Start button not visible without scrolling', JSON.stringify(st)); }

@@ -2,7 +2,7 @@
 var ANIM = 1, AIDELAY = 650;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, seq: 0, rec: null, noRec: false, over: null,
-  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: true, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
+  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: null, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
 const D = KK.DATA;
 const KIT = KKKit;
 const TY = KIT.TYPES;

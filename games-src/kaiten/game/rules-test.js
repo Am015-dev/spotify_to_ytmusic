@@ -241,7 +241,7 @@ test('winner: tie on points is broken by the most puddings', () => {
   // totals after pudding points: seat0 20+6 (3 puds) vs seat1 26+0... build equal: 3p, puds [2,1,0] -> pts [6,0,-6]
   const G = finishWith(3, [20, 26, 40], [2, 1, 0]); eq(G.final.totals, [27, 27, 35]); eq(G.winners, [2]);
   const H = finishWith(2, [20, 26], [3, 2]); eq(H.final.totals, [27, 27], 'sanity'); // 20+1+6 vs 26+1+0
-  eq(H.winners, [0]); ok(/on puddings/.test(H.winText), H.winText);
+  eq(H.winners, [0]); ok(/\(more Custard Cups\)/.test(H.winText), H.winText);
 });
 test('winner: a fully equal result is shared (G.winner -1, both listed)', () => { const G = finishWith(2, [30, 30], [1, 1]); eq(G.winners, [0, 1]); eq(G.winner, -1); ok(/share the win/.test(G.winText), G.winText); });
 test('game end: after round 3 the phase is over, no moves, scoring summary complete', () => {

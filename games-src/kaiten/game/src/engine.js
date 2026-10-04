@@ -158,8 +158,9 @@ function resolve(G) {
     if (used) { p.hand.push(chopId); use(G, 'chopUsed'); }
     picks.push({ seat: p.seat, cards, chop: chopId });
     if (!G.nolog) {
-      if (used) lg(G, p.name + ' uses Twin Sticks: takes ' + cards.map(c => cname(c.id)).join(' and ') + '.');
-      else lg(G, p.name + ' takes ' + cname(cards[0].id) + (cards[0].w >= 0 ? ' on Fire Paste (x3)' : '') + '.');
+      const you = p.name === 'You';
+      if (used) lg(G, p.name + (you ? ' use Twin Sticks: take ' : ' uses Twin Sticks: takes ') + cards.map(c => cname(c.id)).join(' and ') + '.');
+      else lg(G, p.name + (you ? ' take ' : ' takes ') + cname(cards[0].id) + (cards[0].w >= 0 ? ' on Fire Paste (x3)' : '') + '.');
     }
     p.pick = null; p.picked = false;
   }
@@ -209,7 +210,7 @@ function finish(G) {
   if (w.length > 1) { const bp = Math.max(...w.map(i => counts[i])); const w2 = w.filter(i => counts[i] === bp); if (w2.length < w.length) { w = w2; tie = true; use(G, 'tieBreak'); } }
   G.winners = w; G.winner = w.length === 1 ? w[0] : -1;
   const nm = i => G.players[i].name;
-  G.winText = w.length === 1 ? nm(w[0]) + ' wins with ' + best + ' points' + (tie ? ' (on puddings)' : '') + '.' : w.map(nm).join(' and ') + ' share the win with ' + best + ' points.';
+  G.winText = w.length === 1 ? nm(w[0]) + (nm(w[0]) === 'You' ? ' win with ' : ' wins with ') + best + ' points' + (tie ? ' (more Custard Cups)' : '') + '.' : w.map(nm).join(' and ') + ' share the win with ' + best + ' points.';
   if (w.length > 1) use(G, 'sharedWin');
   ev(G, { t: 'gameEnd', pudding: counts, puddingPts: pts, totals, winners: w, text: G.winText });
   lg(G, 'Puddings: ' + G.players.map((p, i) => p.name + ' ' + counts[i] + ' (' + (pts[i] > 0 ? '+' : '') + pts[i] + ')').join(', ') + '.');

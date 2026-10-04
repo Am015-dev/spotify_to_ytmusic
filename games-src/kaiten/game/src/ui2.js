@@ -154,7 +154,7 @@ function renderBelt() {
     const g = UI.prefs.hint && can ? gainOf(v, [id]) : null;
     const key = 'c' + id, sg = [id, idx, selPos, rec.indexOf(id) >= 0 ? 1 : 0, can ? 1 : 0, g, UI.twin ? 1 : 0, hw, UI.prefs.tap2 ? 1 : 0].join('|');
     const o = oldC.get(key); if (o && o.dataset.sg === sg && !enter) { frag.push(o); return; }
-    const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked'), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? '. Tap to lift it' + (selPos >= 0 ? ', tap again to serve' : '') : '') });
+    const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked'), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? '. Tap to lift it' + (selPos >= 0 ? (UI.prefs.tap2 ? ', tap again to serve' : ', then press Serve') : '') : '') });
     b.style.setProperty('--k', k);
     b.appendChild(cardNode(ty, hw));
     if (g != null) b.appendChild(h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : '0'));

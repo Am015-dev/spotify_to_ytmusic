@@ -2,7 +2,7 @@
 var ANIM = 1, AIDELAY = 650;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, seq: 0, rec: null, noRec: false, over: null,
-  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: true, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
+  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: null, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
 const D = KK.DATA;
 const KIT = KKKit;
 const TY = KIT.TYPES;
@@ -307,7 +307,7 @@ function renderBelt() {
     const g = UI.prefs.hint && can ? gainOf(v, [id]) : null;
     const key = 'c' + id, sg = [id, idx, selPos, rec.indexOf(id) >= 0 ? 1 : 0, can ? 1 : 0, g, UI.twin ? 1 : 0, hw, UI.prefs.tap2 ? 1 : 0].join('|');
     const o = oldC.get(key); if (o && o.dataset.sg === sg && !enter) { frag.push(o); return; }
-    const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked'), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? '. Tap to lift it' + (selPos >= 0 ? ', tap again to serve' : '') : '') });
+    const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked'), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? '. Tap to lift it' + (selPos >= 0 ? (UI.prefs.tap2 ? ', tap again to serve' : ', then press Serve') : '') : '') });
     b.style.setProperty('--k', k);
     b.appendChild(cardNode(ty, hw));
     if (g != null) b.appendChild(h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : '0'));
@@ -465,6 +465,7 @@ function schedule() {
   clearTimeout(UI.tm);
   if (!G || !UI.started) return;
   if (G.phase === 'over') return;
+  try { autoSave(); } catch (e) { }
   if (UI.busy) return;
   if (isClient()) { try { coachCheck(); } catch (e) { } return; }
   if (UI.cards.length && !NET.on) return;
@@ -630,14 +631,21 @@ function afterRound(ge) {
   snd('slide', { vol: .5 }); schedule(); drainQ(); if (NET.on && isHost()) netPush(true);
 }
 // ---------- save / load (local games only) ----------
+// SAVE_V goes up whenever G or the save layout changes: an older save is then refused politely instead of resuming a broken meal
+const SAVE_V = 2;
 function hasSave() { return !!lsGet('kk_save'); }
+function saveInfo() { try { const o = JSON.parse(lsGet('kk_save')); if (o && o.sv === SAVE_V && o.G && o.G.phase !== 'over') return { round: o.G.round, np: o.G.np, mode: o.mode }; } catch (e) { } return null; }
 function save() {
-  if (NET.on || !G || !UI.started) return false;
-  try { lsSet('kk_save', JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
+  if (NET.on || !G || !UI.started || G.phase === 'over') return false;
+  try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
 }
+// autosave: after every resolved turn (schedule runs after each one) and when the page is hidden or closed (iPhone app switch)
+function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
+function flushSave() { UI.svk = ''; autoSave(); }
 function loadSave() {
   if (NET.on) return false;
   let o; try { o = JSON.parse(lsGet('kk_save')); } catch (e) { return false; }
+  if (o && o.G && o.sv !== SAVE_V) { lsSet('kk_save', ''); toast('That saved meal is from an older version of the game, so it could not be resumed.'); if (!G) renderStart(); return 'old'; }
   if (!o || !o.G || !Array.isArray(o.G.players) || o.G.v !== 1) return false;
   clearTimeout(UI.tm); UI.seq++;
   G = o.G; try { if (KK.checkInvariants(G).length) { G = null; return false; } } catch (e) { return false; }
@@ -689,7 +697,7 @@ function coachCheck() {
   const turn = G.round + '.' + G.turn; if (UI.coach.turn === turn) return false;
   const seen = UI.coach.seen, p = G.players[v];
   if (!seen.welcome) { coachTip('welcome', 'Welcome to the belt', 'You are a diner at a conveyor-belt sushi bar. Over three rounds you collect plates for points. The highest score at the end wins.'); return true; }
-  if (!seen.pick) { coachTip('pick', 'Everyone picks at once', 'Pick one plate from your belt and serve it: tap to lift it, tap again to serve. When everyone has chosen, all plates are revealed together, then every hand slides to the player on your left.'); return true; }
+  if (!seen.pick) { coachTip('pick', 'Everyone picks at once', 'Pick one plate from your belt and serve it: tap to lift it, ' + (UI.prefs.tap2 ? 'tap it again' : 'then press Serve') + ' to serve. When everyone has chosen, all plates are revealed together, then every hand slides to the player on your left.'); return true; }
   const types = Array.from(new Set(p.hand.map(tkey))).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
   if (lv === 'full' || lv === 'light') {
     for (const t of types) { if (seen[t]) continue; if (lv === 'light' && !['wasabi', 'chop', 'pudding'].includes(t)) continue; coachTip(t, TY[t].name, (D.types.find(x => x.id === t) || {}).text + ' ' + (TIP_EXTRA[t] || ''), t); return true; }
@@ -702,12 +710,12 @@ function coachCheck() {
 }
 // ---- round score pad
 const CATROWS = [
-  { k: 'maki', l: 'Seaweed rolls', ic: ['most', 'roll1'], sub: s => s.icons + ' icon' + (s.icons === 1 ? '' : 's') },
-  { k: 'tempura', l: 'Crispy Prawns', ic: ['pair', 'tempura'], sub: null },
-  { k: 'sashimi', l: 'Fish Slices', ic: ['set', 'sashimi'], sub: null },
-  { k: 'dumpling', l: 'Steam Buns', ic: ['ladder', 'dumpling'], sub: null },
-  { k: 'nigiri', l: 'Nigiri', ic: ['v2', 'salmon'], sub: null },
-  { k: 'wasabi', l: 'Fire Paste bonus', ic: ['x3', 'wasabi'], sub: null }];
+  { k: 'maki', l: 'Seaweed rolls', ic: ['most', 'roll1'], sub: s => s.icons + ' icon' + (s.icons === 1 ? '' : 's'), tip: 'Roll race: most roll icons scores 6, second most 3.' },
+  { k: 'tempura', l: 'Crispy Prawns', ic: ['pair', 'tempura'], sub: null, tip: '5 points for every pair.' },
+  { k: 'sashimi', l: 'Fish Slices', ic: ['set', 'sashimi'], sub: null, tip: '10 points for every set of three.' },
+  { k: 'dumpling', l: 'Steam Buns', ic: ['ladder', 'dumpling'], sub: null, tip: '1, 3, 6, 10, 15 points for 1 to 5 or more buns.' },
+  { k: 'nigiri', l: 'Nigiri', ic: ['v2', 'salmon'], sub: null, tip: 'Sunset 2, Moon 3, Sun 1 point each.' },
+  { k: 'wasabi', l: 'Fire Paste bonus', ic: ['x3', 'wasabi'], sub: null, tip: 'The extra points a nigiri scored by landing on Fire Paste (triple).' }];
 function padRows(upToRound, withPud) {
   const bank = G.players.map((p, i) => G.rs.map(r => r[i].total));
   return G.players.map((p, i) => ({ i, name: p.name, rounds: [0, 1, 2].map(r => r < upToRound ? bank[i][r] : null), dessert: withPud ? G.final.puddingPts[i] : null, total: bank[i].slice(0, upToRound).reduce((a, b) => a + b, 0) + (withPud ? G.final.puddingPts[i] : 0), you: i === viewSeat() }));
@@ -730,7 +738,7 @@ function showRound(sc, ge) {
   tb.appendChild(hr);
   const cells = [];
   CATROWS.forEach(r => {
-    const tr = h('tr'); tr.appendChild(h('td', h('div.lc', { html: iconS(r.ic[0], 26, r.ic[1]) }, r.l)));
+    const tr = h('tr', { title: r.tip }); tr.appendChild(h('td', h('div.lc', { html: iconS(r.ic[0], 26, r.ic[1]) }, r.l)));
     sc.seats.forEach(s => { const td = h('td.n.z', { 'data-v': s[r.k] }, '·'); if (r.sub) td.appendChild(h('span.sub', r.sub(s))); tr.appendChild(td); cells.push(td); });
     tb.appendChild(tr);
   });
@@ -789,7 +797,9 @@ function showFinal() {
   const bs = NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again' }, { label: 'Look at the table', a: 'cont', cls: 'alt' }, { label: 'Menu', a: 'menu', cls: 'alt' }];
   box.appendChild(h('div.cbtns', bs.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a === 'cont' ? 'rsclose' : b.a }, b.label))));
   rs.appendChild(box);
-  if (iWin || !NET.on) { snd('win', { duck: true }); celebrate(box); } else snd('round', { duck: true });
+  // confetti only when a person at this device won (or shares the win); otherwise a softer line
+  const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
+  if (humanWin) { snd('win', { duck: true }); celebrate(box); } else { snd('round', { duck: true }); if (humans().length || NET.on) wn.after(h('p.wp', 'Well played! Another meal?')); }
   UI.overShown = true;
   if (UI.mode !== 'net') lsSet('kk_save', '');
 }
@@ -807,7 +817,7 @@ function buildRules() {
   sec('The goal', h('p', 'You are a diner at a conveyor-belt sushi bar. Collect plates over three rounds and score points for sets, pairs, ladders and races. The highest total after the third round wins. Ties go to the diner with more Custard Cups.'));
   sec('How a round goes', h('ol', ...[
     'Everyone is dealt a hand: 10 plates with 2 diners, 9 with 3, 8 with 4 and 7 with 5.',
-    'All diners secretly pick one plate from their hand at the same time. On your phone or computer: tap a plate to lift it, tap it again (or press Serve) to confirm.',
+    'All diners secretly pick one plate from their hand at the same time. On your phone or computer: tap a plate to lift it, then press Serve to confirm (with "Tap twice to serve" on in the menu, a second tap on the plate serves it too).',
     'When everyone has chosen, the covers lift together and the plates land on your counters.',
     'Then every hand slides one seat to the left, around the table. You pick again from the hand you just received.',
     'When the hands are empty the round is scored. Everything except Custard is cleared away and a new hand is dealt.'].map(t => h('li', t))));
@@ -825,7 +835,18 @@ function buildRules() {
     'The small green +N on a plate is what serving it scores you right now (switch it off in the menu).',
     'The glowing seat shows who is still choosing. Covered plates on the right of each counter mean that diner has chosen.',
     'Tap a group of plates on any counter to see what it is worth right now. Tap a chef to see their whole table.',
-    'Hot-seat: the hands are hidden between diners, with a "pass the device" screen. Online: friends see only their own hand.'].map(t => h('li', t))));
+    'Hot-seat: the hands are hidden between diners, with a "pass the device" screen. Online: friends see only their own hand.',
+    'Your meal is saved after every turn. If you close the page or switch apps, choose Resume on the title screen.'].map(t => h('li', t))));
+  sec('Words used in the game', h('dl.gloss', ...[
+    ['Belt', 'the hand of plates you are holding this turn. It moves on to the next diner after every pick.'],
+    ['Counter', 'the plates you have served this round, in front of your seat.'],
+    ['Serve', 'confirm the plate you lifted. Everybody serves at the same time, then the covers lift.'],
+    ['Roll race', 'the Seaweed Roll contest: add up the roll icons on each counter. Most icons scores 6, second most 3.'],
+    ['Nigiri', 'the Sunset, Moon and Sun plates. They score their number straight away.'],
+    ['Fire Paste bonus', 'a nigiri served onto a waiting Fire Paste scores triple; the extra points show as this row on the score pad.'],
+    ['Sweets', 'Custard Cups. They stay on your counter until the end of the meal.'],
+    ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
+    ['+N', 'the small green number on a plate: what serving it would score you right now.']].map(([t, d]) => [h('dt', t), h('dd', d)]).flat()));
   root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: &ldquo;Jazz Slower&rdquo; by Pro Sensory (OpenGameArt, CC0). Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
   return root;
 }
@@ -894,15 +915,16 @@ function renderStart() {
   s.appendChild(setupEl());
 }
 function titleEl() {
+  // a saved meal comes first: Resume leads the buttons
   const bg = KIT.ART.title ? h('img.ttl-bg', { src: KIT.ART.title, alt: '' }) : h('div.ttl-bg.ttl-plain');
   const sv = hasSave();
   return h('div.ttl', bg, h('div.ttl-in',
     h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Kaiten Kitchen')),
     h('p.tag', 'Grab a plate, pass the belt.'),
     h('div.tbtns',
-      h('button.tbtn.go', { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer chefs')),
-      h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')),
-      sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved meal')) : null),
+      sv ? h('button.tbtn.go', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', (si => si ? 'your meal, round ' + si.round + ' of ' + D.rounds + ' · ' + si.np + ' diners' : 'your saved meal')(saveInfo()))) : null,
+      h('button.tbtn' + (sv ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', sv ? 'New game' : 'Play'), h('span', 'against the computer chefs')),
+      h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free'))),
     h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
 }
 function dinerCard(c, o) {
@@ -991,7 +1013,9 @@ function applyPhone() {
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(146, Math.min(178, Math.round(hh * .22))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  r.toggle('ph', ph); if (UI.prefs.tap2 == null) UI.prefs.tap2 = !ph;   // phones: Serve button only by default (no accidental second tap)
+  try { const bb = document.querySelector('.gx-bar').getBoundingClientRect(); document.documentElement.style.setProperty('--kkbar', Math.max(0, Math.round(bb.bottom)) + 'px'); } catch (e) { }
+  document.documentElement.style.setProperty('--dockh', Math.max(146, Math.min(178, Math.round(hh * .22))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !NET.on && UI.sv === 'setup') renderStart(); }
 }
 let rzT = 0;
@@ -1006,6 +1030,8 @@ function boot() {
   GX.onShow = id => { renderDrawers(); };
   loadPrefs(); applyPhone();
   addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
+  addEventListener('pagehide', () => { try { flushSave(); } catch (e) { } });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') try { flushSave(); } catch (e) { } });
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { clearTimeout(rzT); rzT = setTimeout(() => { if (G && UI.started) render(); }, 40); } }).observe(bd);
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'kk' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); } } catch (e) { }
   pxPerfReg();
