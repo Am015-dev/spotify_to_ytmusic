@@ -1,0 +1,2 @@
+easy g1 green Port Alder                      23/60  38% avg rounds 7.0 {"checks:flaps":7,"speed":14,"spin":2,"checks:axis":4,"mandatory":5,"checks:gear+axis":1,"checks:gear":2,"short":1,"checks:flaps+axis":1} 946ms/game
+easy g2 green Foxmere                          8/60  13% avg rounds 6.7 {"collision":3,"speed":15,"checks:flaps":4,"checks:gear+flaps":1,"short":2,"checks:axis":1,"checks:flaps+axis":2,"mandatory":10,"spin":6,"checks:planes":2,"checks:planes+axis":2,"checks:planes+gear+axis":1,"checks:gear+flaps+axis":1,"checks:gear":1,"checks:planes+flaps":1} 392ms/game

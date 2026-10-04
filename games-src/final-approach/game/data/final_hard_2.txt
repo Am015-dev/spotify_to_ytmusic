@@ -1,2 +1,3 @@
 hard y2 yellow Bowlrock                        0/12   0% avg rounds 6.7 {"spin":1,"fuel":8,"speed":2,"short":1} 89124ms/game
 hard y3 yellow Palmreach                       2/12  17% avg rounds 6.9 {"speed":3,"mandatory":5,"spin":1,"checks:gear":1} 54155ms/game
+hard y4 yellow Frostmere                       0/12   0% avg rounds 7.0 {"checks:axis+ice":1,"checks:ice":5,"speed":5,"spin":1} 61549ms/game
