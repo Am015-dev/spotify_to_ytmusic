@@ -45,7 +45,8 @@ const CAMP_HOW={surviveDays:'Keep everyone alive: food for every night (fish and
 function campCard(){const g=G.cmp.goal;const cp=campParts();const d=typeof campDef==='function'&&campDef();const v=g.value;const by=v.byDay||v.surviveDays;
   const parts=cp.map(([l,h,n])=>`<li class="${(n===true?h:h>=n)?'ok':''}">${esc(l)} ${n===true?(h?'✓':'✗'):`${Math.min(h,n)}/${n}`}</li>`).join('');
   const how=Object.keys(CAMP_HOW).filter(k=>v[k]).map(k=>CAMP_HOW[k]).join(' ');
-  return `<div class="daycard goal1"><div class="dk">📖 ${d?esc(d.title)+' · ':''}chapter goal · day ${G.round}${by?' of '+by:''}</div><b>${esc(g.text)}</b><ul class="cgp">${parts}</ul><p>${how}</p></div>`}
+  const st=d&&d.stars?`<p class="cst">Stars: ${d.stars.slice(0,d.maxStars||3).map(s=>'☆ '+esc(s.text)).join(' · ')}</p>`:'';
+  return `<div class="daycard goal1"><div class="dk">📖 ${d?esc(d.title)+' · ':''}chapter goal · day ${G.round}${by?' of '+by:''}</div><b>${esc(g.text)}</b><ul class="cgp">${parts}</ul><p>${how}</p>${st}</div>`}
 function goalCard(){if(G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom')return campCard();const S=SCENARIOS[G.scen];let how='',btn='';
   if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();const w=pileWhy(1);
     how=`${has('fire')?'Fire is built.':'Build <b>Fire</b> (a job in Build).'} Add wood to the <b>signal pile</b> one stage a day (1, 2, 3, 4, then 5 wood): it must be full on day 10, 11 or 12.`;
@@ -113,7 +114,7 @@ function planLine(a){const n=actNeed(a);const k=a.pw.length;const dt=dtype(a);le
   return `<div class="pl" ${posAttr(a)}><span class="pli">${ACT_ICON[a.type]||'•'}</span><div class="plt"><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')} ${chance} ${cost?`<span class="cost">${cost}</span>`:''} ${payT}</div></div></div>`}
 function catCount(k){try{return catRows(k).filter(r=>!r.why).length}catch(e){return 0}}
 // every job in a category: {type,tgt,alt,title,sub,why}
-function catRows(k){const o=[];const add=(type,tgt,title,sub,alt)=>{const why=targetWhy(type,tgt,alt||0,null);o.push({type,tgt,alt:alt||0,title,sub,why:why==='already planned'&&MULTI.includes(type)?null:why})};
+function catRows(k){const o=[];const add=(type,tgt,title,sub,alt)=>{const why=targetWhy(type,tgt,alt||0,null);const pl=why==='already planned'&&findAct(type,tgt);o.push({type,tgt,alt:alt||0,title,sub,why:why==='already planned'&&(MULTI.includes(type)||pl&&pl.pw.length<actNeed(pl).max)?null:why})};
   if(k==='build'){const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];
     add('build',{k:'shelter'},'🏠 Shelter',`${tb.wood} wood or ${tb.fur} fur · no more wounds for sleeping outside`);add('build',{k:'roof'},'☂️ Roof +1',`${tb.wood+G.cost.roof} wood or ${tb.fur} fur · keeps 1 cloud off`);add('build',{k:'pal'},'🧱 Palisade +1',`${tb.wood+G.cost.pal} wood or ${tb.fur} fur · walls against beasts and storms`);add('build',{k:'weapon'},'🗡️ Weapon +1',`${1+G.cost.weapon} wood · for hunting and fights`);
     const invs=[...new Set(G.inv.board.concat(Object.keys(SCENARIOS[G.scen].invs||{})).concat(Object.keys(INVENTIONS).filter(x=>INVENTIONS[x].kind==='personal'&&G.chars.some(c=>c.k===INVENTIONS[x].owner&&!c.dead))))].filter(x=>x!=='cross'&&(!has(x)||invReq(x).multi));

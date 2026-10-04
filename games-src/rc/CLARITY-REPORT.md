@@ -93,3 +93,56 @@ They still lost life every day to systems they couldn't see how to prevent, main
 | `net/p2p-rc.js` (real WebRTC, host + client) | states agree, 0 errors (398 s) |
 
 Also fixed: the internal ref of the Settlers scenario contained the original scenario's name, and the live file still ships it. The ref is now `scen-6-settlers`, and the preview contains none of the original names.
+
+## Story campaign (added after the owner's verdict: "very low score, no story mode to learn the game")
+
+The title screen's first button is now **📖 Story: learn the island chapter by chapter**. It opens the shared chapter map (`shell/gx-campaign.js`) with this game's `campaign.json`: 10 chapters in 3 acts. Bosses end each act.
+
+**Act 1 teaches one idea per chapter.** Every Act 1 chapter is Marooned on Easier, with tips on.
+- c1: survive 3 days.
+- c2: build the Shelter by day 5.
+- c3: explore 4 places by day 6.
+- c4 (boss): the full Marooned game.
+
+**How it is wired:**
+- Chapter twists (`early-threat`, `low-morale`, `ada-adrift`) and checkpoint goals are in `scen.js` (`campSetup`, `campCheck`). They only apply when a chapter sets `G.cmp`; the normal game's rules are unchanged.
+- The chapter goal shows in three places:
+  - the bar under the island (for example "shelter ✗ · by day 5");
+  - a goal card at the top of planning page 1, with how to reach it and the chapter's stars;
+  - a "Do it" priority.
+- A chapter skips the scenario's own intro, so only the chapter's intro is shown.
+- It ends with "Chapter goal reached!" or "Chapter lost", then the campaign result screen.
+
+**Headless AI ("Plan for me" alone) wins:**
+
+| Chapter | Wins |
+|---|---|
+| c1 | 10/10 |
+| c2 | 10/10 |
+| c3 | 10/10 |
+| c5 | 8/10 |
+
+c3 is often won on day 1–2 and is probably too easy.
+
+**Blind test of chapters 1–3** (log: `playtest/story-c1c3.md`):
+- Result: won all three. **Fun 3/5.** The three rounds before the campaign averaged 2–2.5.
+- The tester wanted to play on after chapters 1 and 3.
+
+Fixed after the test:
+- the old scenario intro repeating;
+- the "Rescued!" ending on checkpoint chapters;
+- the night card saying "under the shelter" with none built;
+- tips repeating every chapter after "No more tips";
+- the map refusing a second pawn on a planned job;
+- stars that weren't shown during play.
+
+**Still weak:**
+- "Plan for me" can win Act 1 almost by itself, so the player isn't forced to decide.
+- Text mismatches remain in flavour ("Day four" on day 1).
+- No retest after these fixes.
+
+**Tests:**
+- `campaign-test.js`: 32 pass. Every chapter starts with its setup and twist, an AI win marks c1 beaten, and c2 loses after its deadline or wins with the shelter.
+- rules: 26 pass.
+- click and click-phone: 0 errors.
+- phone layout, 7 sizes: 0 problems.

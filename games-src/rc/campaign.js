@@ -7,7 +7,7 @@ function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
   GXC.init({game:'shipwreck',data:window.CAMPAIGN,
     startChapter(def){const s=def.setup||{};const chars=(s.chars||['carpenter','cook']).slice();
       UI.setup=Object.assign({},UI.setup,{scen:s.scen||'marooned',chars,ai:{},friday:s.friday!=null?s.friday:chars.length<=2,dog:!!s.dog,items:s.items!=null?s.items:2,diff:s.diff||'standard'});
-      UI.cmpDef=def;UI.guide={on:!!def.hints,seen:{}};beginGame()},
+      UI.cmpDef=def;UI.guide={on:!!def.hints&&!UI.guideOff,seen:UI.guide.seen||{}};beginGame()},
     isWon:g=>!!(g.over&&g.over.win),
     metrics:campMetrics,
     onExit(){openStart()},

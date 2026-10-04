@@ -215,7 +215,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   if(d.pgo){setPStep(+d.pgo);render();return}
   if(d.pq!=null){const p=priorities()[+d.pq];const cur=curPawn();if(p&&p.act&&cur){const e=place(cur.id,p.act.type,p.act.tgt,p.act.alt);if(e)toast(e);else{sfx('place');UI.sugWhy[JSON.stringify([p.act.type,p.act.tgt])]=p.title;UI.sel=null;wizPlaced();refresh()}}return}
   if(d.tut){if(d.tut==='off')tutDone();else UI.tut++;render();return}
-  if(d.gtip){if(d.gtip==='off')UI.guide.on=false;else UI.guide.seen[d.gtip]=1;sfx('click');refresh();return}
+  if(d.gtip){if(d.gtip==='off'){UI.guide.on=false;UI.guideOff=true}else UI.guide.seen[d.gtip]=1;sfx('click');refresh();return}
   if(d.place){const o=JSON.parse(decodeURIComponent(d.place));doPlace(o.type,o.tgt,o.alt);return}
   if(d.rm){unplace(d.rm);UI.sel=null;refresh();return}
   if(d.pawn&&b.closest('.pawnrow')&&placedIds().has(d.pawn)&&planOpen()){unplace(d.pawn);UI.sel=d.pawn;UI.ps.pick=true;refresh();return}
@@ -270,7 +270,7 @@ document.addEventListener('focusin',e=>{const t=e.target.closest&&e.target.close
 UI.setup={scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:false,items:2,diff:'standard'};
 function openStart(){UI.modal='start';UI.overSeen=false;render();const m=$('#modal');m.hidden=false;m.innerHTML=startHtml();m.dataset.h=''}
 function beginGame(){const s=UI.setup;resetPlanSteps();UI.modal=null;UI.report=null;UI.overSeen=false;UI.sel=null;UI.tileSel=null;UI.fx.length=0;UI.fxSeen=0;
-  const all=s.chars.every(k=>s.ai[k]);UI.cmpDone=false;newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff,cmp:UI.cmpDef?{id:UI.cmpDef.id,goal:UI.cmpDef.goal,twist:UI.cmpDef.twist}:null});UI.reportMark=G.logN;V3.layout=null;
+  const all=s.chars.every(k=>s.ai[k]);UI.cmpDone=false;newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff,cmp:UI.cmpDef?{id:UI.cmpDef.id,goal:UI.cmpDef.goal,twist:UI.cmpDef.twist}:null,noIntro:!!UI.cmpDef});UI.reportMark=G.logN;V3.layout=null;
   for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};refresh()}
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;resetPlanSteps();UI.beats.length=0;UI.shown=-1;beat('dawn',{round:G.round});UI.modal=null;UI.reportMark=G.logN;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};if(G.scen==='stranded'&&!CHARS.ada)CHARS.ada={n:'Ada',die:11,arrows:[],skills:[],npc:1};refresh()}catch(e){toast('No saved game found.');openStart()}}
 function boot(){GX.init({key:'swi'});if(typeof PHO!=='undefined')PHO.boot();GX.onClose=id=>{if(id==='rulesd'&&UI.backToStart){UI.backToStart=false;openStart()}};GX.onShow=id=>{if(!G&&id!=='rulesd'&&id!=='cardsd'){GX.close();return}if(id==='cardsd')renderCards();if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(G)render()};paintIcons();try{init3D()}catch(e){console.error(e)}gfxBtn();soundBtns&&soundBtns();openStart()}
