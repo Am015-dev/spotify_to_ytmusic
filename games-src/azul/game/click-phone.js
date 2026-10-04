@@ -27,7 +27,7 @@ function run(cfg,seed){return new Promise(res=>{const dom=new JSDOM(html,{runScr
       const sel=E('UI.sel');
       if(!sel){if(r<.1){const k=[...d.querySelectorAll('#bf [data-bfsrc]')];if(k.length){click(rnd(k));seen.add('kiln-tap');return}}
         const t=[...d.querySelectorAll('#bf .bf-table [data-k^="f"],#bf .bf-table [data-k^="c_"]')];if(t.length){click(rnd(t));seen.add('tile');if(!E('UI.sel'))errs.push('tile tap did not lift anything');return}return}
-      const up=d.querySelectorAll('#bf .bf-table .bf-t.up').length;const want=E(`(()=>{const a=UI.sel.src<0?G.ctr:G.fac[UI.sel.src];return a.filter(t=>t===UI.sel.c||(t===PRISM&&UI.sel.j)).length})()`);if(up!==want)errs.push(`lifted ${up} of ${want}`);
+      const up=d.querySelectorAll('#bf .bf-table .bf-t.up:not(.sun)').length;const want=E(`(()=>{const a=UI.sel.src<0?G.ctr:G.fac[UI.sel.src];return a.filter(t=>t===UI.sel.c||(t===PRISM&&UI.sel.j)).length})()`);if(up!==want)errs.push(`lifted ${up} of ${want}`);
       const okRows=[...d.querySelectorAll('#bf .bf-row.ok')].map(e=>+e.dataset.bfrow);const legal=E('[...new Set(movesFor(UI.sel).map(m=>m.line))].filter(r=>r<5)');if(JSON.stringify(okRows.sort())!==JSON.stringify(legal.sort()))errs.push('glowing racks '+okRows+' but legal '+legal);
       if(r<.06){const pz=d.querySelector('#bf [data-bf=prism]');if(pz){click(pz);seen.add('prism-toggle');return}}
       if(r<.1){const dim=[...d.querySelectorAll('#bf .bf-row.dim')];if(dim.length){const n=G.logN;click(rnd(dim));if(E('G.logN')!==n)errs.push('a dim rack took tiles');seen.add('dim-rack');return}}
