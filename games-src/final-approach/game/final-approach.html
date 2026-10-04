@@ -3933,7 +3933,7 @@ function move(G0, seat, level, opt) {
     if (rand() < 0.35) return pool[Math.min(pool.length - 1, Math.floor(rand() * 4))].m;
     return pool[0].m;
   }
-  if (level === 'hard' && scored.length > 1 && !opt.noMC) return monteCarlo(G, seat, scored, rand, opt);
+  if ((level === 'hard' || level === 'normal') && scored.length > 1 && !opt.noMC) return monteCarlo(G, seat, scored, rand, Object.assign(level === 'hard' ? { top: AI.HMC.top, samples: AI.HMC.samples } : { top: AI.NMC.top, samples: AI.NMC.samples }, opt));
   return scored[0].m;
 }
 function freeAction(G, seat, cand, base) {
@@ -3995,6 +3995,8 @@ function monteCarlo(G, seat, scored, rand, opt) {
   return top[bi].m;
 }
 
+AI.NMC = AI.NMC || { top: 3, samples: 3 };   // normal: a small Monte Carlo over the partner's unknown dice
+AI.HMC = AI.HMC || { top: 5, samples: 8 };   // hard: a bigger one
 AI.move = move; AI.say = (G, seat) => sayCodes(G, seat); AI.cost = cost; AI.features = features; AI.schedCost = schedCost; AI.score = cost;
 if (typeof module === 'object' && module.exports) module.exports = FA;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
