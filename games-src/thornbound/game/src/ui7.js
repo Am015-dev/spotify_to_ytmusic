@@ -79,7 +79,7 @@ const GUIDED={seed:98,ai:9,faction:'clans',rival:'nobility'};
 const isGuided=()=>!!(UI.cfg&&UI.cfg.guided&&!NET.on);
 const COACH_INFO=[
  {id:'goal',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'Your goal',text:()=>'Hold the most Influence when round '+G.rounds+' ends. Influence is the score: you and the Gilded Court both start at 0 (the chips at the bottom).',hl:'#rivals'},
- {id:'map',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'The kingdom',text:()=>'The map has three regions with two locations each. Every round each region has one Clash: the strongest side wins it and claims one of its two locations, which pays Influence.',locs:[0,1,2,3,4,5]},
+ {id:'map',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'The kingdom',text:()=>'The map has three regions with two locations each. Every round each region has one Clash: the strongest side wins it and claims one of its two locations, which pays Influence. The numbers round the edge are the Influence track.',locs:[0,1,2,3,4,5]},
  {id:'round',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'One round, five steps',text:()=>'Bid for a Kingdom Card, place your Herald, hide one card at each region, fight the three Clashes, then count Influence. Let\'s play round 1 together: tap the glowing button each time.',btn:'Let\'s start'},
  {id:'own',when:()=>G.round===2&&G.q,title:'Now you lead',text:()=>'You have seen a whole round. From now on the ★ suggestion shows a good move and why, but every choice is yours. Tap any underlined word to read what it means.',btn:'Play on'}];
 function coachGate(){if(!G||!G.q||UI.coachInfo)return !!UI.coachInfo;if(!isGuided())return false;UI.coachDone=UI.coachDone||{};
@@ -164,7 +164,7 @@ function titleArt(){return '<svg viewBox="0 0 1200 800" preserveAspectRatio="xMi
  '<g fill="#2a1a10" opacity=".9"><path d="M0 800 L0 700 C60 690 120 720 180 705 L240 800Z"/><path d="M1200 800 L1200 690 C1140 684 1080 716 1010 700 L960 800Z"/></g>'+
  '<rect width="1200" height="800" filter="url(#tpaint)" fill="#fff" opacity="'+(UI.lowGfx?0:1)+'"/></svg>'}
 function hasSave(){const s=loadSave();return s&&s.G&&!s.G.over?s:null}
-function showStart(){try{GX.close()}catch(e){}closePop(true);hideGloss();const el=$('#start');el.hidden=false;document.body.classList.add('in-start');if(!NET.on)UI.sv=UI.onl&&UI.sv==='online'?'online':'title';UI.cfgOpen=false;renderStart();
+function showStart(){try{GX.close()}catch(e){}closePop(true);hideGloss();const el=$('#start');el.hidden=false;document.body.classList.add('in-start');if(!NET.on){if(UI.joinCode&&!UI.linkShown){UI.linkShown=1;UI.sv='online'}else UI.sv=UI.onl&&UI.sv==='online'?'online':'title'}UI.cfgOpen=false;renderStart();
   const f=$('#start .tbtn.go,#start .sbtn.big');if(f)try{f.focus({preventScroll:true})}catch(e){}}
 function hideStart(){$('#start').hidden=true;document.body.classList.remove('in-start')}
 function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=el.scrollTop;

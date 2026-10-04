@@ -15,7 +15,7 @@ const STEP_HELP=[
 const KIND_NAME={bid:'Choose your bid',bidRes:'Use your bid',herald:'Place your Herald',place:'Hide your cards',clashOrder:'Order the Clashes',location:'Claim a location',tie:'A tie!'};
 // ---------------------------------------------------------------- top bar status chip
 function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;
-  const ri=roadIdx();const r=Math.max(1,G.round);
+  const ev=UI.card&&UI.card.kind==='event'?UI.card.ev:null;const ri=ev&&ev.t==='summary'?6:ev&&ev.t==='clash'?4:roadIdx();const r=ev&&ev.round?ev.round:Math.max(1,G.round);
   el.innerHTML='<span class="chip" aria-label="Round '+r+' of '+G.rounds+', step '+(ri+1)+' of 7: '+ROAD[ri]+'"><span class="chip-t"><small>Round</small><b>'+r+'</b><small>of '+G.rounds+'</small><span class="chip-s">'+esc(ROAD[ri])+'</span></span><span class="chip-d" aria-hidden="true">'+ROAD.map((_,i)=>'<i class="'+(i<ri?'done':i===ri?'on':'')+'"></i>').join('')+'</span></span>'}
 const ICO={round:'<path d="M5 20V9l7-5 7 5v11M9 20v-6h6v6"/>',book:'<path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v13"/>',log:'<path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/>',users:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-4 3-6 6-6s6 2 6 6M15 14c3 0 6 1.5 6 5"/>',crown:'<path d="M3 18h18l-1.5-9-4.5 4-3-7-3 7-4.5-4z"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',card:'<rect x="6" y="3" width="12" height="18" rx="2"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',inf:'<circle cx="12" cy="12" r="8"/><path d="M8 14l1-5 3 3 3-3 1 5z"/>',eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',star:'<path d="M12 3l2.6 6 6.4.6-4.9 4.2 1.5 6.3L12 17l-5.6 3.1 1.5-6.3L3 9.6 9.4 9z"/>',road:'<path d="M5 20L9 4M19 20L15 4M12 6v3M12 12v3M12 18v2"/>'};
 function ico(n,c){return '<svg class="ico '+(c||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(ICO[n]||'')+'</svg>'}
@@ -40,8 +40,19 @@ function whyFor(s,mv){if(!mv)return '';const q=G.q,k=q.kind;
   if(k==='location'){return LOCN[mv.loc]+' pays +'+DD.LOCS[mv.loc][2]+' Influence'+(DD.LOCS[mv.loc][3]?' and '+lcFirst(DD.LOCS[mv.loc][3]):'')+'.'+(G.pl[s].herald===mv.loc?' Your Herald is here: +1 more, and you take 1 from each rival Herald here.':'')}
   if(k==='clashOrder')return 'Fight first where you are strongest, so your wins come before rivals can react.';
   if(G.q.t==='menu')return menuWhy(mv);
-  if(G.q.t==='sel')return mv.t==='seldone'?'Nothing more here helps you right now.':'This helps you most of the choices here.';
-  return 'A strong player would pick this.'}
+  if(G.q.t==='sel'){if(mv.t==='seldone')return 'Nothing more here is worth it right now.';
+    if(k==='siteBuy')return 'Site of Power cards are stronger than your basic cards; buying one now makes your deck better for the rest of the game.';
+    if(k==='shrine')return 'Cards at the bottom of your deck come back later, after a reshuffle; weak cards there leave room for better draws.';
+    if(k==='ossuary')return 'It brings a useful card back from your discard pile.';
+    if(k==='rally'||k==='brine')return 'Taking strong cards back to your hand saves them from Winter\'s discard.';
+    return 'Of the choices here this one gains you the most.'}
+  if(k==='occupier')return 'The card under a Kingdom Card cannot fight, so tuck your weakest useful card there.';
+  if(k==='slot')return 'The Kingdom Card you replace is the one that helps you least now.';
+  if(k==='councilOut')return 'A card back in your hand can fight again next round.';
+  if(k==='flank'||k==='journeyDest')return 'Your card does more good there.';
+  if(k==='castle'||k==='wilderness')return mv.skip||/^Skip/.test(mv.label||'')?'No card here is worth giving up.':'This card is worth less in your hand than what you gain.';
+  if(q.t==='pick'&&mv.yes!=null)return mv.yes?'Using it now gains more than saving it.':'Saving it for a better moment is worth more.';
+  return 'Of the choices here this one gains you the most.'}
 function menuWhy(m){if(m.t==='done')return 'Nothing else here helps right now, so finish this step.';const a=m.a||'';
   if(a==='supp')return 'Each Supporter adds +1 Strength in that region\'s first Clash (they are spent in Winter).';
   if(a==='govern')return 'A card in a Council gives a lasting bonus every round.';
@@ -61,7 +72,7 @@ function recapHTML(){const c=G.clash;if(!c)return '';const parts=c.parts;
   const rows=parts.map(s=>{const ids=(c.cards[s]||[]);const tot=c.tot&&c.tot[s]!=null?c.tot[s]:null;
     return '<span class="rc-s" style="--fc:'+fcol(s)+'"><b>'+esc(shortName(s))+'</b> '+(ids.map(id=>cinfo(id).strength).join('+')||'0')+(G.pl[s].supp.r[c.r]?' +'+G.pl[s].supp.r[c.r]+' Supporter'+(G.pl[s].supp.r[c.r]>1?'s':''):'')+(tot!=null?' = <b>'+tot+'</b>':'')+'</span>'}).join('');
   return '<div class="recap" aria-label="Current clash"><span class="rc-t">Clash in '+esc(REG[c.r])+(c.n>1?' (replay '+c.n+')':'')+'</span>'+rows+'</div>'}
-const shortName=s=>(hotSeat()&&!G.pl[s].ai?G.pl[s].name.replace(/ \(.*$/,'')+' · ':'')+kf(s).short.replace('Gilded Court','Court').replace('Heathbound Clans','Clans').replace('Lantern Rising','Lanterns').replace('Pale Choir','Choir')+(!G.pl[s].ai&&(NET.on?s===vs():humans().length===1)?' (you)':'');
+const shortName=s=>(hotSeat()&&!G.pl[s].ai?G.pl[s].name.replace(/ \(.*$/,'').replace('Player ','P')+' · ':'')+kf(s).short.replace('Gilded Court','Court').replace('Heathbound Clans','Clans').replace('Lantern Rising','Lanterns').replace('Pale Choir','Choir')+(!G.pl[s].ai&&(NET.on?s===vs():humans().length===1)?' (you)':'');
 function waitingHTML(){const q=G.q;let who='';
   if(q){const names=q.seats.map(s=>shortName(s).replace(' (you)',''));who=NET.on?decidingLine():names.join(', ')+(q.seats.length>1?' are':' is')+' deciding'}
   const cur=G.log.slice(-4).map(e=>'<li>'+esc(plain(e.t))+'</li>').join('');
@@ -79,7 +90,7 @@ function recBtnText(m){const k=G.q.kind;if(!m)return '';
   if(k==='location')return 'Claim '+LOCN[m.loc];
   if(k==='bidRes')return m.t==='return'?'Take my card back':(m.t==='steal'?'Steal ':'Take ')+TB.kingdomInfo(m.kc).name;
   if(m.t==='done'||m.t==='seldone')return m.label.replace(/^End my /,'End ');
-  return m.label.length>48?m.label.slice(0,46)+'…':m.label}
+  const L=m.label.replace(/\s*\([^)]*\)\s*$/,'');return L.length>48?L.slice(0,46)+'…':L}
 function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q;let foot='';
   const qk=(q?q.kind+'|'+q.title+'|'+G.logN:'')+'|'+(UI.coachInfo?UI.coachInfo.id:'');const set=(h,f)=>{el.innerHTML=h;if(ft)ft.innerHTML=f||'';if(UI._qk!==qk){UI._qk=qk;el.scrollTop=0}};
   if(G.over){set('<div class="step"><h3 class="st">The reign is over</h3></div>');return}
@@ -111,7 +122,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q
   h+='</div>';set(h,foot);setHl(hl)}
 const QNAME={flank:'Flank',castle:'Govern',wilderness:'Journey',siteBuy:'Spend Lore',ossuary:'Ossuary bonus',shrine:'Moss Altar bonus',harvest:'The Favour',rally:'Rally',retreat:'Retreat',ambushCard:'Ambush',occupier:'Choose the occupier',slot:'Choose a slot',placeRegion:'Choose a region',placeLoc:'Choose a location',journeyDest:'Journey',brine:'Brine-Hardened',edict:'A Tactic',relics:'Council of Coin',order:'Turn order'};
 function titleOf(q){if(q.t==='menu'){const ph=menuPhase(q);return ph?ph+' actions':'Your actions'}if(QNAME[q.kind])return QNAME[q.kind];const t=(q.title||'').replace(/^[^:]*:\s*/,'');return t.length>28?'Your choice':t}
-function tipLine(k){if(UI.guide!=='full'||!TIPS[k]||UI.tip[k]==='x'||G.round>2)return '';UI.tip[k]=UI.tip[k]||1;return '<p class="tipl">'+ico('book')+'<span>'+gloss(TIPS[k][1])+'</span><button class="lk" data-a="tipx" data-k="'+k+'">Hide</button></p>'}
+function tipLine(k){if(k==='bid'||k==='place'||UI.guide!=='full'||!TIPS[k]||UI.tip[k]==='x'||G.round>2)return '';UI.tip[k]=UI.tip[k]||1;return '<p class="tipl">'+ico('book')+'<span>'+gloss(TIPS[k][1])+'</span><button class="lk" data-a="tipx" data-k="'+k+'">Hide</button></p>'}
 function promptText(q){const t=q.title||'';
   switch(q.kind){case 'bid':return 'Pick one hand card as a secret bid. Its Strength is your bid: the highest bid chooses a Kingdom Card first.';
     case 'herald':return 'Put your Herald on a location. Everyone sees it.';
@@ -119,7 +130,7 @@ function promptText(q){const t=q.title||'';
     case 'bidRes':return 'Your turn to use your bid: take a Kingdom Card, steal one, or take your card back.';
     case 'location':return 'You won the Clash. Claim one of the two locations of '+(G.clash?REG[G.clash.r]:'this region')+'.';
     case 'clashOrder':return 'You have the least Influence, so you choose the order of the three Clashes.';
-    default:return t}}
+    default:if(q.t==='menu'){const ph=menuPhase(q);return (ph?ph+': ':'')+'these actions are optional. The suggestion is below; the rest are under the list.'}return plain(t)}}
 function placeProgress(){const me=vs();let n=0;for(const R of UI.V.reg)for(const id of R.down)if(id>=0&&ownerOf(id)===me)n++;
   const mv=me>=0?legal(me):[];const rs=[...new Set(mv.map(m=>m.r))];return 'card '+Math.min(3,n+1)+' of 3'+(rs.length===1?', for '+REG[rs[0]]:'')}
 function recLine(s,rm){if(!rm)return '';return '<p class="rec-l">'+ico('star')+'<span><b>Suggested:</b> '+esc(shortRec(rm))+' <span class="why2">'+gloss(whyFor(s,rm))+'</span></span></p>'}
