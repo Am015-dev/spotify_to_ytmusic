@@ -1,0 +1,12 @@
+[7.0] vs ice brakes (y4) (anim): NOT OVER placed 36 clicks 64 13s hidden 0 errors 1 ["over but no final modal: overShown=true rsOpen=false rsHidden=true rsClass= mode=vs started=true why=mandatory"]
+[7.1] vs ice brakes (y4) (anim): {"win":false,"why":"spin","round":6} placed 31 clicks 56 11s hidden 0 errors 0 []
+[7.2] vs ice brakes (y4) (anim): NOT OVER placed 65 clicks 99 25s hidden 0 errors 1 ["over but no final modal: overShown=true rsOpen=false rsHidden=true rsClass= mode=vs started=true why=checks"]
+[7.3] vs ice brakes (y4) (anim): {"win":false,"why":"speed","round":6} placed 29 clicks 42 14s hidden 0 errors 0 []
+[7.4] vs ice brakes (y4) (anim): {"win":false,"why":"mandatory","round":6} placed 32 clicks 50 11s hidden 0 errors 0 []
+[7.5] vs ice brakes (y4) (anim): NOT OVER placed 38 clicks 58 16s hidden 0 errors 1 ["over but no final modal: overShown=true rsOpen=false rsHidden=true rsClass= mode=vs started=true why=spin"]
+[7.6] vs ice brakes (y4) (anim): {"win":false,"why":"speed","round":6} placed 30 clicks 51 13s hidden 0 errors 0 []
+[7.7] vs ice brakes (y4) (anim): {"win":false,"why":"checks","round":6} placed 30 clicks 51 11s hidden 0 errors 0 []
+[7.8] vs ice brakes (y4) (anim): {"win":false,"why":"speed","round":6} placed 32 clicks 55 11s hidden 0 errors 0 []
+[7.9] vs ice brakes (y4) (anim): {"win":false,"why":"speed","round":6} placed 32 clicks 47 11s hidden 0 errors 0 []
+TOTAL games 10 errors 3 stalls 0 not finished 3 hidden-dice violations 0 time 145s (ANIM=1)
+seen: again | coffee chip | configure | die | drawer:logd | drawer:rulesd | drawer:setd | final | hint | place | place (suggested) | ready | reroll | reroll confirm | say | space | tip | title->setup

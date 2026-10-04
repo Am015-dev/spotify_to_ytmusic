@@ -9,3 +9,4 @@ normal y2 yellow Bowlrock                      3/30  10% avg rounds 6.7 {"checks
 normal y3 yellow Palmreach                     4/30  13% avg rounds 6.3 {"collision":2,"speed":9,"mandatory":9,"spin":2,"short":3,"checks:planes":1} 2623ms/game
 normal y4 yellow Frostmere                     0/30   0% avg rounds 7.0 {"spin":4,"speed":12,"checks:ice":12,"checks:flaps+axis+ice":1,"mandatory":1} 3834ms/game
 normal y5 yellow Castlemoor                    9/30  30% avg rounds 6.9 {"checks:flaps+axis":1,"spin":4,"checks:planes+axis":3,"short":1,"checks:planes":2,"checks:axis":2,"mandatory":5,"checks:gear":1,"fuel":1,"checks:flaps":1} 2720ms/game
+normal y6 yellow Twin Spires                  10/30  33% avg rounds 7.0 {"fuel":9,"speed":5,"mandatory":2,"spin":1,"short":1,"checks:flaps":1,"checks:gear":1} 3607ms/game

@@ -34,7 +34,7 @@ function run(cf, seed) {
     const w = dom.window, d = w.document;
     const click = el => el.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
     let s0 = seed * 7919 + 13; const R = () => { s0 = (s0 * 16807) % 2147483647; return (s0 - 1) / 2147483646; }; const rnd = a => a[Math.floor(R() * a.length)];
-    const seen = new Set(); let overWait = 0, hidden = 0, clicks = 0, steps = 0, stall = 0, last = '', replayed = 0, placed = 0; const t0 = Date.now(); let iv;
+    const seen = new Set(); let overSince = 0, overWait = 0, hidden = 0, clicks = 0, steps = 0, stall = 0, last = '', replayed = 0, placed = 0; const t0 = Date.now(); let iv;
     const fin = r => { clearInterval(iv); res(Object.assign({ cf, errs, seen, clicks, hidden, placed, secs: Math.round((Date.now() - t0) / 1000) }, r || {})); try { w.close(); } catch (e) { } };
     w.addEventListener('load', () => {
       try {
@@ -53,7 +53,7 @@ function run(cf, seed) {
         if (cf.phone && !d.documentElement.classList.contains('ph')) errs.push('phone class missing');
         iv = setInterval(() => {
           try {
-            const G = w.eval('G'); if (!G) return; steps++;
+            const G = w.eval('G'); if (!G) return; steps++; if (!G.result) overSince = 0;
             if (process.env.CLICKDBG && steps % 400 === 0) console.log('dbg', cf.name, 'steps', steps, 'round', G.round, 'phase', G.phase, 'pend', JSON.stringify(G.pend && G.pend.h), 'turn', G.turn, 'ready', JSON.stringify(G.ready), 'clicks', clicks, 'placed', placed, 'rs', !d.querySelector('#rs').hidden, 'busy', w.eval('UI.busy'), 'mode', w.eval('UI.mode'), 'secs', Math.round((Date.now() - t0) / 1000));
             const v = w.eval('viewSeat()'), hot = w.eval("UI.mode === 'hot'"), holder = w.eval('UI.holder');
             // hidden dice: a die face with a number must belong to the viewer (or everyone is shown in watch mode)
@@ -69,7 +69,7 @@ function run(cf, seed) {
               }
               const cl = d.querySelector('#rs [data-a=rsclose]'); if (cl && !G.result) click(cl); return;
             }
-            if (G.result) { if (!w.eval('UI.busy') && ++overWait > 400) { errs.push('over but no final modal: overShown=' + w.eval('UI.overShown') + ' rsOpen=' + w.eval('UI.rsOpen') + ' rsHidden=' + d.querySelector('#rs').hidden + ' rsClass=' + d.querySelector('#rs').className + ' mode=' + w.eval('UI.mode') + ' started=' + w.eval('UI.started') + ' why=' + (G.result && G.result.why)); fin({}); } return; }
+            if (G.result) { if (!overSince) overSince = Date.now(); if (!w.eval('UI.busy') && Date.now() - overSince > 4000) { errs.push('over but no final modal: overShown=' + w.eval('UI.overShown') + ' rsOpen=' + w.eval('UI.rsOpen') + ' rsHidden=' + d.querySelector('#rs').hidden + ' rsClass=' + d.querySelector('#rs').className + ' mode=' + w.eval('UI.mode') + ' started=' + w.eval('UI.started') + ' why=' + (G.result && G.result.why)); fin({}); } return; }
             const pass = q('#pass [data-a=take]'); if (pass.length) { click(pass[0]); seen.add('pass card'); clicks++; return; }
             const tip = q('#pc [data-a=tipok],#pc [data-a=tipoff]'); if (tip.length) { click(R() < .8 ? tip[0] : tip[tip.length - 1]); seen.add('tip'); clicks++; return; }
             const seats = w.eval('FA.pending(G).filter(s => !G.ai[s])');
