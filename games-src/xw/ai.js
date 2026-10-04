@@ -61,7 +61,7 @@ function aiAction(s,acts){acts=acts||actionsFor(s);if(!acts.length)return ['skip
   if(threats.length&&has('E'))return ['E'];if(has('F'))return ['F'];if(has('E'))return ['E'];if(has('TL'))return ['TL',has('TL').targets[0]];
   const other=acts.find(a=>!['BR','BO','EH','DD','PM','SB','PA','EX'].includes(a.a)&&!a.targets&&!a.opts);if(other)return [other.a];return ['skip']}
 // a free action someone offers this ship; null declines
-function aiFree(s,acts,why){if(why==='turr'){// after attacking: only move if it gets clearly safer or lines up a better position
+function aiFree(s,acts,why){if(why==='tarn'){// after attacking: only move if it gets clearly safer or lines up a better position
     const here={x:s.x,y:s.y,h:s.h};const v=p=>enemiesOf(s).reduce((t,e)=>t-threatTo(e,e,s,p),0);let best=null,bv=v(here)+.2;
     for(const a of acts)(a.opts||[]).forEach((o,i)=>{const x=v(o.p);if(x>bv){bv=x;best=[a.a,i]}});return best}
   const c=aiAction(s,acts);return c[0]==='skip'?null:c}
@@ -71,12 +71,12 @@ function aiPickFocus(fr){return aiPickFriend(fr)}
 function aiPickPS(fr){if(!fr.length)return null;const shot=o=>enemiesOf(o).some(e=>{const r=arcReach(o,B(o),e,B(e),o.arc);return r&&rangeOf(r.d)<=3});return fr.slice().sort((a,b)=>(shot(b)-shot(a))||(psOf(a)-psOf(b)))[0]}
 function aiLockPick(f,ts){const t=ts.map(ship);const inArc=o=>{const r=arcReach(f,B(f),o,B(o),f.arc);return r&&rangeOf(r.d)<=3};return t.sort((a,b)=>(inArc(b)-inArc(a))||(remaining(a)-remaining(b)))[0]}
 function aiJan(j,s,d){return j.alive&&!j.stress}// an extra attack die is worth her stress token
-function aiYorr(y,s){return y.stress===0}// take a friend's stress only while unstressed
+function aiOrrin(y,s){return y.stress===0}// take a friend's stress only while unstressed
 function aiBrakk(d,c,faceup){const D=DAMAGE[c];if(hullDmg(d)+(faceup&&D.k==='direct'?2:1)>=d.hull)return true;return faceup&&critRank(c)>=2}// save it for a nasty crit or a killing blow
 function critRank(c){return ({direct:5,cockpit:4,blinded:3,weak:3,engine:2,frame:2,fire:2,noact:2,wounded:2,breach:2,stunned:1}[DAMAGE[c].k]||1)}
 function aiMaarek(three){let b=0;three.forEach((c,i)=>{if(critRank(c)>critRank(three[b]))b=i});return b}
 // dice the computer rerolls: blanks, and focus results it can't turn into anything
-function aiRerollAtk(s,pool,max){const A=G.atk,d=ship(A.d);const canF=(s.focus>0&&!pilotHas(d,'curse'))||(s.flags.dead&&!A.used.includes('dead'));
+function aiRerollAtk(s,pool,max){const A=G.atk,d=ship(A.d);const canF=(s.focus>0&&!pilotHas(d,'hex'))||(s.flags.dead&&!A.used.includes('dead'));
   const bad=i=>A.dice[i]==='blank'||(A.dice[i]==='focus'&&!canF);return pool.filter(bad).sort((a,b)=>(A.dice[a]==='blank'?0:1)-(A.dice[b]==='blank'?0:1)).slice(0,max)}
 function aiRerollDef(d,pool){const A=G.atk;const b=pool.find(i=>A.def[i]==='blank');if(b!=null)return [b];const f=pool.find(i=>A.def[i]==='focus');if(f!=null&&!d.focus)return [f];return []}
 function aiSlipDie(pool){const A=G.atk;const c=pool.find(i=>A.dice[i]==='crit');if(c!=null)return [c];const h=pool.find(i=>A.dice[i]==='hit');return [h!=null?h:pool[0]]}
@@ -86,13 +86,13 @@ function aiTarget(s){const ws=weaponsFor(s);if(!ws.length)return ['skip'];let be
     if(v>bv){bv=v;best=[w.k,t.id]}}
   return best||['skip']}
 function aiAmod(){const A=G.atk,s=ship(A.a);const mods=atkMods();const has=k=>mods.find(m=>m.k===k);
-  for(const k of ['horton','howl','jonus','krassis','ibt'])if(has(k)&&aiRerollAtk(s,rerollPool(k),REROLL_MAX[k]).length)return k;
-  if(has('han')&&cnt(A.dice,'hit')+cnt(A.dice,'crit')<A.dice.length/3)return 'han';
+  for(const k of ['horace','wailer','joren','krell','iveth'])if(has(k)&&aiRerollAtk(s,rerollPool(k),REROLL_MAX[k]).length)return k;
+  if(has('jax')&&cnt(A.dice,'hit')+cnt(A.dice,'crit')<A.dice.length/3)return 'jax';
   if(has('tl')&&aiRerollAtk(s,rerollPool('tl'),99).length)return 'tl';
-  for(const k of ['gundark','hired','b2h','b2f','rook','f2c','dead'])if(has(k))return k;
+  for(const k of ['gutter','hired','b2h','b2f','rook','f2c','dead'])if(has(k))return k;
   if(has('focus'))return 'focus';return 'done'}
 function aiDmod(){const A=G.atk,d=ship(A.d);const mods=defMods();const r=preview(A);if(r.hits+r.crits===0)return 'done';
-  for(const k of ['instr','ibtd'])if(mods.find(m=>m.k===k)&&aiRerollDef(d,defPool(k)).length)return k;if(mods.find(m=>m.k==='luke'))return 'luke';
+  for(const k of ['instr','ibtd'])if(mods.find(m=>m.k===k)&&aiRerollDef(d,defPool(k)).length)return k;if(mods.find(m=>m.k==='kael'))return 'kael';
   const incoming=r.hits+r.crits;
   if(mods.find(m=>m.k==='focus')&&(d.fired||incoming>=1))return 'focus';if(mods.find(m=>m.k==='evade'))return 'evade';return 'done'}
 function aiStep(){if(!G||G.winner||UI.paused)return;if(typeof NET!=='undefined'&&NET.on&&NET.role==='client')return;const k=sideToAct();if(k<0||isHuman(k))return;

@@ -99,7 +99,7 @@ function planDone(k){return alive().filter(s=>s.side===k).every(s=>s.dial!=null)
 function setDial(s,mi){s.dial=mi;if([0,1].every(planDone))beginActivation();else refresh()}
 function psOrder(asc){const I=s=>s.side===G.init?0:1;return alive().slice().sort((a,b)=>asc?(psOf(a)-psOf(b))||(I(a)-I(b)):(psOf(b)-psOf(a))||(I(a)-I(b)))}// [R3]
 function beginActivation(){G.phase='activate';G.step=2;G.order=psOrder(true).map(s=>s.id);G.oi=0;lg(-1,'All dials set. Ships move from lowest pilot skill up.');
-  seqEach(alive().filter(s=>hasUp(s,'u_spot')),(s,nx)=>exIntel(s,nx),()=>{G.phase='activate';nextActivation()})}// Intelligence Agent: start of the Activation phase [#14]
+  seqEach(alive().filter(s=>hasUp(s,'u_spot')),(s,nx)=>exIntel(s,nx),()=>{G.phase='activate';nextActivation()})}// Spotter: start of the Activation phase [#14]
 function nextActivation(){if(G.winner)return;
   while(G.oi<G.order.length&&!ship(G.order[G.oi]).alive)G.oi++;
   if(G.oi>=G.order.length){beginCombat();return}
@@ -146,12 +146,12 @@ function afterMove(s,m){if(!s.alive){endActivation(s);return}
   if(green){if(s.stress>0){s.stress--;lg(s.side,`${sname(s)} flies a green maneuver and clears a stress token.`)}
     if(hasUp(s,'u_tinker')&&s.sh<s.shMax){s.sh++;mark('tinker');lg(s.side,`${sname(s)}'s mech "Tinker" restores a shield.`);fx('shield',{id:s.id,n:0})}}
   flushStress(()=>{if(!s.alive)return endActivation(s);
-    const nbeast=nx=>green&&pilotHas(s,'nbeast')?offerFree(s,a=>a.a==='F','nbeast',`${s.name}: free focus`,`After a green maneuver ${s.name} may take a free focus action (it then can't focus again this round).`,ok=>{if(ok)mark('nbeast');nx()}):nx();
-    nbeast(()=>exLando(s,green,()=>actionStep(s)))})}
+    const nightjar=nx=>green&&pilotHas(s,'nightjar')?offerFree(s,a=>a.a==='F','nightjar',`${s.name}: free focus`,`After a green maneuver ${s.name} may take a free focus action (it then can't focus again this round).`,ok=>{if(ok)mark('nightjar');nx()}):nx();
+    nightjar(()=>exLark(s,green,()=>actionStep(s)))})}
 function actionStep(s){if(!s.alive||s.flags.skipAct)return endActivation(s);
   const stressed=s.stress>0&&!exCanActStressed(s);
   if(s.bumped||s.rockHit||stressed||!actionsFor(s).length){if(stressed&&!s.bumped&&!s.rockHit)lg(s.side,`${sname(s)} is stressed and can't take an action.`);endActivation(s);return}
-  if(s.stress>0)mark('tycho');G.phase='action';G.cur=s.id;refresh()}
+  if(s.stress>0)mark('tamsin');G.phase='action';G.cur=s.id;refresh()}
 function endActivation(s){s.acted=true;s.flags.redlining=false;G.phase='activate';G.oi++;refresh();nextActivationLater()}
 function nextActivationLater(){if(!ANIM)nextActivation();else setTimeout(()=>{if(G)nextActivation()},Math.max(350,AIDELAY*.6))}
 // ---- actions [R8]. A ship can't perform the same action twice in a round, free or not [#10]: s.doneR ----
@@ -185,9 +185,9 @@ function doAction(s,act,arg){if(G.phase!=='action'||G.cur!==s.id)return false;
   return applyAction(s,act,arg,()=>postAction(s,act))}
 // perform one action (in the action step or as a free action); calls k when it is fully resolved, possibly after questions
 function applyAction(s,act,arg,k){const rec=()=>{mark('act:'+act.replace(/\d+$/,''));(s.doneR=s.doneR||[]).push(act)};
-  if(act==='F'){rec();s.focus+=hasUp(s,'u_scout')?2:1;if(hasUp(s,'u_scout'))mark('scout');lg(s.side,`${sname(s)} focuses.`);fx('token',{id:s.id,k2:'focus'});k();return true}// Recon Specialist: every focus action, free ones too [#25]
+  if(act==='F'){rec();s.focus+=hasUp(s,'u_scout')?2:1;if(hasUp(s,'u_scout'))mark('scout');lg(s.side,`${sname(s)} focuses.`);fx('token',{id:s.id,k2:'focus'});k();return true}// Scout Specialist: every focus action, free ones too [#25]
   if(act==='E'){rec();s.evade++;lg(s.side,`${sname(s)} readies an evade.`);fx('token',{id:s.id,k:'evade'});k();return true}
-  if(act==='TL'){const t=ship(arg);if(!t||!lockTargets(s).includes(arg))return false;rec();if(pilotHas(t,'kagi'))mark('kagi');if(rangeOf(baseDist(s,B(s),t,B(t)))>3)mark('writ');lg(s.side,`${sname(s)} locks onto ${sname(t)}.`);acquireLock(s,t,k);return true}
+  if(act==='TL'){const t=ship(arg);if(!t||!lockTargets(s).includes(arg))return false;rec();if(pilotHas(t,'kade'))mark('kade');if(rangeOf(baseDist(s,B(s),t,B(t)))>3)mark('writ');lg(s.side,`${sname(s)} locks onto ${sname(t)}.`);acquireLock(s,t,k);return true}
   if(act==='BR'){const o=rollOptions(s)[arg];if(!o)return false;rec();const from={x:s.x,y:s.y,h:s.h};Object.assign(s,{x:o.p.x,y:o.p.y});lg(s.side,`${sname(s)} barrel rolls ${o.dir<0?'left':'right'}.`);fx('move',{id:s.id,path:[from,{x:s.x,y:s.y,h:s.h}],dur:ANIM?420:0,roll:true});k();return true}
   if(act==='BO'){const o=boostOptions(s)[arg];if(!o)return false;rec();const from={x:s.x,y:s.y,h:s.h};Object.assign(s,{x:o.p.x,y:o.p.y,h:normA(o.p.h)});lg(s.side,`${sname(s)} boosts.`);fx('move',{id:s.id,path:[from,{x:s.x,y:s.y,h:s.h}],dur:ANIM?420:0});k();return true}
   if(act==='JK'){rec();s.flags.juke=true;lg(s.side,`${sname(s)}'s mech boosts its agility this round.`);fx('token',{id:s.id,k2:'evade'});k();return true}
@@ -199,7 +199,7 @@ function applyAction(s,act,arg,k){const rec=()=>{mark('act:'+act.replace(/\d+$/,
 function postAction(s,act){flushStress(()=>{
   if(s.flags.redlining){s.flags.redlining=false;addStress(s);mark('redline');lg(s.side,`${sname(s)} redlines: a second action for a stress token.`);return flushStress(()=>endActivation(s))}
   if(!s.alive)return endActivation(s);
-  if(canAct(s)&&pilotHas(s,'vader')&&!s.flags.second&&actionsFor(s).length){s.flags.second=true;mark('vader');lg(s.side,`${sname(s)} takes a second action.`);G.phase='action';refresh();return}
+  if(canAct(s)&&pilotHas(s,'castigan')&&!s.flags.second&&actionsFor(s).length){s.flags.second=true;mark('castigan');lg(s.side,`${sname(s)} takes a second action.`);G.phase='action';refresh();return}
   if(canAct(s)&&talentOn(s,'u_redline')&&!s.flags.redline&&!crit(s,'noact')){s.flags.redline=true;s.flags.redlining=true;
     if(actionsFor(s).length&&(isHuman(s.side)||aiWantsRedline(s))){G.phase='action';refresh();return}s.flags.redlining=false}
   endActivation(s)})}
@@ -209,7 +209,7 @@ function offerFree(s,allow,why,title,text,k){const acts=freeActs(s,allow);if(!ac
   const run=(a,arg)=>{if(!applyAction(s,a,arg,()=>flushStress(()=>k(true))))k(false)};
   if(isHuman(s.side)){const opts=actOpts(s,acts);return ask(s.side,'free',title,text,opts.concat([{k:'-',l:'No action'}]),ans=>{if(ans==='-')return k(false);const o=opts.find(o=>o.k===ans);run(o.a,o.arg)})}
   const c=aiFree(s,acts,why);if(!c||c[0]==='skip')return k(false);run(c[0],c[1])}
-// target locks: acquiring one replaces the old one (Fire-Control Tech keeps 2), then Fire-Control Tech's second lock and "Dutch" Vander's shared lock
+// target locks: acquiring one replaces the old one (Fire-Control Tech keeps 2), then Fire-Control Tech's second lock and Brannoc Dale's shared lock
 function acquireLock(s,t,k){k=k||(()=>{});
   if(!hasUp(s,'u_fct')){s.tl=t.id;s.tl2=null}else if(s.tl!==t.id){const old=s.tl;s.tl=t.id;if(old)s.tl2=old;else if(s.tl2===t.id)s.tl2=null}
   fx('lock',{id:s.id,to:t.id});exAfterLock(s,t,k)}
@@ -236,13 +236,13 @@ function weaponsFor(s){if(s.flags.noAtk||crit(s,'noatk'))return [];const out=[];
       if(!(G.again&&w.ui!=null)&&!exWeaponNeedOK(s,w,o))continue;
       const obstructed=G.rocks.some(q=>segHitsPoly(r.q,r.p,rockPoly(q)));t.push({id:o.id,rg,obstructed,p:r.p,q:r.q})}
     // a guardian pilot (Brink): friends at range 1 of it can't be attacked if the attacker could attack the guardian instead
-    const guard=t.filter(x=>pilotHas(ship(x.id),'biggs'));const ft=t.filter(x=>!guard.some(g=>g.id!==x.id&&ship(g.id).side===ship(x.id).side&&baseDist(ship(g.id),B(ship(g.id)),ship(x.id),B(ship(x.id)))<=RANGE));
+    const guard=t.filter(x=>pilotHas(ship(x.id),'brink'));const ft=t.filter(x=>!guard.some(g=>g.id!==x.id&&ship(g.id).side===ship(x.id).side&&baseDist(ship(g.id),B(ship(g.id)),ship(x.id),B(ship(x.id)))<=RANGE));
     if(ft.length)out.push(Object.assign({},w,{targets:ft}))}
   return out}
 // the dice an attack would roll before optional effects (shown on the target buttons and used by the AI) [#34]
-function shotDice(s,w,t,d){const atk=Math.max(0,w.atk+(w.bonus&&t.rg===1?1:0)+(pilotHas(s,'mauler')&&t.rg===1?1:0)+(s.flags.bonus||0)+exAtkBonus(s,d,w,t));
+function shotDice(s,w,t,d){const atk=Math.max(0,w.atk+(w.bonus&&t.rg===1?1:0)+(pilotHas(s,'knife')&&t.rg===1?1:0)+(s.flags.bonus||0)+exAtkBonus(s,d,w,t));
   return {atk,def:defDice(s,d,w.bonus,t.rg,t.obstructed)}}
-function defDice(s,d,bonus,rg,obs){let a=agility(d);if(pilotHas(s,'wedge'))a=Math.max(0,a-1);// [#15] Wedge lowers the agility value itself, before any bonus dice
+function defDice(s,d,bonus,rg,obs){let a=agility(d);if(pilotHas(s,'wren'))a=Math.max(0,a-1);// [#15] Wren Talvo lowers the agility value itself, before any bonus dice
   return a+(bonus&&rg===3?1:0)+(obs?1:0)}
 function declare(s,wk,tid){if(G.phase!=='target'||G.cur!==s.id)return false;
   if(wk==='skip'){G.bonus=null;G.again=false;lg(s.side,`${sname(s)} holds fire.`);afterAttackDone(s);return true}
@@ -266,22 +266,22 @@ function pickDice(side,which,title,pool,max,fn,sel){sel=sel||[];const A=G.atk,fa
   return ask(side,'dice',title,`Tick ${max>=pool.length?'any of the':'up to '+max} dice, then confirm. A die can only be rerolled once per attack.`,pool.map(i=>({k:'t'+i,l:(sel.includes(i)?'☑ ':'☐ ')+lab(i)})).concat([{k:'ok',l:`Confirm (${sel.length} chosen)`,pri:1},{k:'x',l:'Cancel'}]),a=>{
     if(a==='x')return fn(null);if(a==='ok')return fn(sel.length?sel:null);const i=+a.slice(1);pickDice(side,which,title,pool,max,fn,sel.includes(i)?sel.filter(j=>j!==i):sel.length<max?sel.concat([i]):sel)})}
 // attacker modification options [R11]
-function atkMods(){const A=G.atk,s=ship(A.a),d=ship(A.d),out=[];const hex=pilotHas(d,'curse');
+function atkMods(){const A=G.atk,s=ship(A.a),d=ship(A.d),out=[];const hex=pilotHas(d,'hex');
   if(!hex&&(s.tl===A.d||s.tl2===A.d)&&rerollPool('tl').length)out.push({k:'tl',l:'Spend target lock: reroll',d:'Choose any of your dice and reroll them.'});
   if(A.w!=='P'&&UPGRADES[s.ups[A.ups].id].wpn.f2c&&!A.used.includes('f2c')&&cnt(A.dice,'focus'))out.push({k:'f2c',l:'Torpedo: focus → crit',d:'Change 1 focus result to a crit.'});
   if(s.flags.dead&&!A.used.includes('dead')&&cnt(A.dice,'focus'))out.push({k:'dead',l:'Deadshot focus',d:'Change 1 focus to a crit and the other focus results to hits.'});
   if(!hex&&s.focus>0&&cnt(A.dice,'focus'))out.push({k:'focus',l:'Spend focus',d:`Turn ${cnt(A.dice,'focus')} focus into hits.`});
   exAMods(out);
   return out}
-const REROLL_MAX={tl:99,horton:99,howl:1,krassis:1,ibt:1,jonus:2};
-function rerollPool(k){const A=G.atk;const idx=A.dice.map((f,i)=>i).filter(i=>!A.rr[i]);if(k==='horton')return idx.filter(i=>A.dice[i]==='blank');return idx}
+const REROLL_MAX={tl:99,horace:99,wailer:1,krell:1,iveth:1,joren:2};
+function rerollPool(k){const A=G.atk;const idx=A.dice.map((f,i)=>i).filter(i=>!A.rr[i]);if(k==='horace')return idx.filter(i=>A.dice[i]==='blank');return idx}
 function applyAtkMod(k,sel){const A=G.atk,s=ship(A.a);const back=()=>{G.phase='amod';fx('mod',{id:s.id});refresh()};
   if(REROLL_MAX[k]){const pool=rerollPool(k);
     if(!sel){if(isHuman(s.side))return pickDice(s.side,'atk',(atkMods().find(m=>m.k===k)||{l:'Reroll'}).l,pool,REROLL_MAX[k],x=>x?applyAtkMod(k,x):back());sel=aiRerollAtk(s,pool,REROLL_MAX[k])}
     mark('amod:'+k);A.used.push(k);if(k==='tl'){if(s.tl===A.d)s.tl=null;else s.tl2=null;A.lockSpent=true}
     for(const i of sel){A.dice[i]=ATK_FACES[rnd(8)];A.rr[i]=true}lg(s.side,`${sname(s)} ${k==='tl'?'spends its lock and ':''}rerolls ${sel.length} ${sel.length===1?'die':'dice'}: ${diceText(A.dice)}.`);return back()}
   mark('amod:'+k);
-  if(k==='han'){A.used.push('han');const pool=rerollPool('han');for(const i of pool){A.dice[i]=ATK_FACES[rnd(8)];A.rr[i]=true}lg(s.side,`${sname(s)} rerolls everything: ${diceText(A.dice)}.`);return back()}
+  if(k==='jax'){A.used.push('jax');const pool=rerollPool('jax');for(const i of pool){A.dice[i]=ATK_FACES[rnd(8)];A.rr[i]=true}lg(s.side,`${sname(s)} rerolls everything: ${diceText(A.dice)}.`);return back()}
   if(k==='focus'){A.dice=A.dice.map(f=>f==='focus'?'hit':f);lg(s.side,`${sname(s)} spends focus: ${diceText(A.dice)}.`);return spendFocus(s,back)}
   if(k==='f2c'){A.used.push('f2c');const i=A.dice.indexOf('focus');if(i>=0)A.dice[i]='crit';lg(s.side,`${sname(s)} primes the torpedo: ${diceText(A.dice)}.`)}
   else if(k==='dead'){A.used.push('dead');let one=false;A.dice=A.dice.map(f=>f==='focus'?(one?'hit':(one=true,'crit')):f);lg(s.side,`${sname(s)} takes the deadshot: ${diceText(A.dice)}.`)}
@@ -293,54 +293,54 @@ function atkDone(){const A=G.atk,s=ship(A.a),d=ship(A.d);const n=defDice(s,d,A.b
   A.def=rollN(DEF_FACES,n);A.defN=n;A.step='dmod';lg(d.side,`${sname(d)} rolls ${n} defense ${n===1?'die':'dice'}: ${diceText(A.def)}.`);G.phase='dmod';refresh()}
 function defMods(){const A=G.atk,d=ship(A.d),out=[];if(d.focus>0&&cnt(A.def,'focus'))out.push({k:'focus',l:'Spend focus',d:`Turn ${cnt(A.def,'focus')} focus into evades.`});
   if(d.evade>0&&!A.noEvade)out.push({k:'evade',l:'Spend evade token',d:'Add one evade result.'});
-  if(pilotHas(d,'luke')&&!A.used.includes('luke')&&cnt(A.def,'focus'))out.push({k:'luke',l:`${d.name}: focus → evade`,d:'Change 1 of your focus results to an evade (free).'});
+  if(pilotHas(d,'kael')&&!A.used.includes('kael')&&cnt(A.def,'focus'))out.push({k:'kael',l:`${d.name}: focus → evade`,d:'Change 1 of your focus results to an evade (free).'});
   exDMods(out);return out}
 function applyDefMod(k,sel){const A=G.atk,d=ship(A.d);const back=()=>{G.phase='dmod';fx('mod',{id:d.id});refresh()};
   if(k==='focus'){mark('dmod:focus');A.def=A.def.map(f=>f==='focus'?'evade':f);lg(d.side,`${sname(d)} spends focus: ${diceText(A.def)}.`);return spendFocus(d,back)}
   if(k==='evade'){mark('dmod:evade');d.evade--;A.def.push('evade');lg(d.side,`${sname(d)} spends an evade token.`);return back()}
-  if(k==='luke'){mark('dmod:luke');A.used.push('luke');const i=A.def.indexOf('focus');if(i>=0)A.def[i]='evade';lg(d.side,`${sname(d)} jinks: ${diceText(A.def)}.`);return back()}
+  if(k==='kael'){mark('dmod:kael');A.used.push('kael');const i=A.def.indexOf('focus');if(i>=0)A.def[i]='evade';lg(d.side,`${sname(d)} jinks: ${diceText(A.def)}.`);return back()}
   exApplyDMod(k,sel,back)}
 // what the attack would do right now (for the live preview)
 function preview(A){if(typeof exPreview==='function')return exPreview(A);let hits=cnt(A.dice,'hit'),crits=cnt(A.dice,'crit');let ev=cnt(A.def||[],'evade');const c1=Math.min(ev,hits);hits-=c1;ev-=c1;crits-=Math.min(ev,crits);return {hits,crits}}
 // the attack hits if at least one hit or crit is left uncancelled; an ion hit is a hit too [#3]
-function defDone(){const A=G.atk,s=ship(A.a),d=ship(A.d);const r=preview(A);A.hit=r.hits+r.crits>0;if(pilotHas(s,'tennumb')&&cnt(A.dice,'crit')&&cnt(A.def,'evade'))mark('tennumb');G.stats[s.id]=G.stats[s.id]||{shots:0,dmg:0};G.stats[s.id].shots++;G.phase='combat';
+function defDone(){const A=G.atk,s=ship(A.a),d=ship(A.d);const r=preview(A);A.hit=r.hits+r.crits>0;if(pilotHas(s,'oren')&&cnt(A.dice,'crit')&&cnt(A.def,'evade'))mark('oren');G.stats[s.id]=G.stats[s.id]||{shots:0,dmg:0};G.stats[s.id].shots++;G.phase='combat';
   if(A.ion){if(A.hit){d.ion++;mark('ion');G.stats[s.id].dmg++;lg(d.side,`${sname(d)} is hit by ion fire: 1 damage and an ion token; the other dice are cancelled.`);return dealDamage(d,1,0,s,()=>exAfterAttack(s,d,A))}
     lg(d.side,`${sname(d)} evades the ion blast.`);return exAfterAttack(s,d,A)}
   if(!A.hit){lg(d.side,`${sname(d)} evades every shot.`);fx('miss',{id:d.id});return exAfterAttack(s,d,A)}
-  const go=()=>{lg(s.side,`${sname(s)} hits ${sname(d)}: ${r.hits} damage${r.crits?` and ${r.crits} critical`:''}.`);G.stats[s.id].dmg+=r.hits+r.crits;dealDamage(d,r.hits,r.crits,s,()=>exAfterAttack(s,d,A),{maarek:true})};
+  const go=()=>{lg(s.side,`${sname(s)} hits ${sname(d)}: ${r.hits} damage${r.crits?` and ${r.crits} critical`:''}.`);G.stats[s.id].dmg+=r.hits+r.crits;dealDamage(d,r.hits,r.crits,s,()=>exAfterAttack(s,d,A),{varn:true})};
   const h=r.crits>0&&friendsOf(d).find(o=>talentOn(o,'u_heat')&&within(o,d,1));if(!h)return go();
   const take=()=>{r.crits--;mark('heat');lg(h.side,`${sname(h)} takes the heat: 1 crit meant for ${sname(d)}.`);dealDamage(h,0,1,s,go)};
   if(isHuman(h.side))return ask(h.side,'heat','Take the Heat',`${d.name} is about to take ${r.crits} crit${r.crits>1?'s':''}. Should ${h.name} suffer 1 of them instead?`,[{k:'y',l:'Take the heat'},{k:'n',l:'No'}],a=>a==='y'?take():go());
   remaining(h)>remaining(d)?take():go()}
 function afterAttackDone(s){G.atk=null;G.phase='combat';s.fired=true;G.oi++;refresh();if(checkWin())return;nextAttackerLater()}
-// damage: shields first, then cards; crits face up [R12]. With k the damage may stop for questions (Maarek Stele's choice, Chewbacca crew,
-// Munitions Failure) and k runs when it is done; without k it resolves at once and those choices are decided by the heuristics.
+// damage: shields first, then cards; crits face up [R12]. With k the damage may stop for questions (Varn Kessik's choice, Brakk crew,
+// Munitions Jam) and k runs when it is done; without k it resolves at once and those choices are decided by the heuristics.
 function dealDamage(d,hits,crits,src,k,o){o=o||{};if(!d.alive&&d.flags.dyingPS==null){if(k)k();return}
   let sh=Math.min(d.sh,hits+crits);const shH=Math.min(sh,hits);hits-=shH;sh-=shH;const shC=Math.min(sh,crits);crits-=shC;d.sh-=shH+shC;
   if(shH+shC)fx('shield',{id:d.id,n:shH+shC});
   const cards=[];for(let i=0;i<hits;i++)cards.push(false);for(let i=0;i<crits;i++)cards.push(true);let i=0;
   const next=()=>{if(i)destroyCheck(d,src);// destroyed as soon as the damage reaches the hull
     if(i<cards.length&&(d.alive||d.flags.dyingPS!=null))return dealOne(d,cards[i++],src,!!k,o,next);if(cards.length)fx('hull',{id:d.id,n:cards.length});if(k)k()};next()}
-// one faceup damage card dealt straight to the ship, past its shields (Proton Bombs) [#6]
+// one faceup damage card dealt straight to the ship, past its shields (Plasma Bombs) [#6]
 function dealCardDirect(d,src){if(!d.alive)return;dealOne(d,true,src,false,{},()=>{fx('hull',{id:d.id,n:1});destroyCheck(d,src)})}
 // drawn cards wait in G.limbo while a question about them is open, so the deck count stays whole
 const hold=c=>{(G.limbo=G.limbo||[]).push(c);return c},unhold=c=>{const i=(G.limbo||[]).indexOf(c);if(i>=0)G.limbo.splice(i,1);return c};
 function dealOne(d,faceup,src,inter,o,k){const human=side=>inter&&isHuman(side);
   const place=c=>{
     const keep=()=>{unhold(c);if(!faceup){d.dmg.push({c,up:false});return k()}const D=DAMAGE[c];
-      if(pilotHas(d,'chewie')){mark('chewie');lg(d.side,`${sname(d)} shrugs it off: ${D.n} goes facedown.`);d.dmg.push({c,up:false});return k()}
+      if(pilotHas(d,'grawl')){mark('grawl');lg(d.side,`${sname(d)} shrugs it off: ${D.n} goes facedown.`);d.dmg.push({c,up:false});return k()}
       if(D.tr==='Pilot'&&talentOn(d,'u_will')){mark('will');G.disc.push(c);lg(d.side,`${sname(d)}'s iron will shrugs off ${D.n}.`);return k()}
       const x={c,up:true,r:G.round};d.dmg.push(x);lg(d.side,`${sname(d)} suffers a critical hit: ${D.n}. ${D.t}`);fx('crit',{id:d.id,c});critNow(d,x,inter,k)};
     if(hasUp(d,'u_brakk')){const use=()=>{unhold(c);mark('brakk');useUp(d,'u_brakk');G.disc.push(c);if(d.sh<d.shMax)d.sh++;lg(d.side,`${sname(d)}'s copilot Brakk patches it up: the damage card is discarded and a shield recovered.`);k()};
       if(human(d.side))return ask(d.side,'brakk','Brakk',`${d.name} is dealt ${faceup?'a faceup card: '+DAMAGE[c].n+' ('+DAMAGE[c].t+')':'a facedown damage card'}. Discard it with Brakk (and recover 1 shield)? Brakk is then discarded.`,[{k:'y',l:'Discard it with Brakk'},{k:'n',l:'Keep Brakk for later'}],a=>a==='y'?use():keep());
       if(aiBrakk(d,c,faceup))return use()}
     keep()};
-  if(faceup&&o.maarek&&src&&pilotHas(src,'maarek')){const three=[hold(drawDamage()),hold(drawDamage()),hold(drawDamage())];
-    const pick=j=>{const c=three.splice(j,1)[0];three.forEach(unhold);G.disc.push(...three);mark('maarek');lg(src.side,`${sname(src)} draws 3 damage cards and deals ${DAMAGE[c].n}.`);place(c)};
-    if(human(src.side))return ask(src.side,'maarek',src.name,`Choose which of the 3 drawn damage cards to deal faceup to ${d.name}; the others are discarded.`,three.map((c,j)=>({k:''+j,l:`${DAMAGE[c].n}: ${DAMAGE[c].t}`})),a=>pick(+a));
+  if(faceup&&o.varn&&src&&pilotHas(src,'varn')){const three=[hold(drawDamage()),hold(drawDamage()),hold(drawDamage())];
+    const pick=j=>{const c=three.splice(j,1)[0];three.forEach(unhold);G.disc.push(...three);mark('varn');lg(src.side,`${sname(src)} draws 3 damage cards and deals ${DAMAGE[c].n}.`);place(c)};
+    if(human(src.side))return ask(src.side,'varn',src.name,`Choose which of the 3 drawn damage cards to deal faceup to ${d.name}; the others are discarded.`,three.map((c,j)=>({k:''+j,l:`${DAMAGE[c].n}: ${DAMAGE[c].t}`})),a=>pick(+a));
     return pick(aiMaarek(three))}
   place(hold(drawDamage()))}
-function destroyCheck(d,src){if(hullDmg(d)>=d.hull&&d.alive&&exDelayDeath(d)){if(!d.flags.doomed){d.flags.doomed=true;mark('felswrath');lg(d.side,`${sname(d)} is crippled but keeps fighting until the end of combat!`)}return}
+function destroyCheck(d,src){if(hullDmg(d)>=d.hull&&d.alive&&exDelayDeath(d)){if(!d.flags.doomed){d.flags.doomed=true;mark('grudge');lg(d.side,`${sname(d)} is crippled but keeps fighting until the end of combat!`)}return}
   if(hullDmg(d)>=d.hull&&d.alive){const same=G.inCombat&&!!src&&psOf(src)===psOf(d);destroy(d,`${sname(d)} is destroyed!`,same)}}
 function critNow(d,x,inter,k){k=k||(()=>{});const K=DAMAGE[x.c].k;
   if(K==='minor'){x.up=false;const f=ATK_FACES[rnd(8)];lg(d.side,`${sname(d)}: secondary blast rolls ${f}.`);if(f==='hit')dealDamage(d,1,0,null);return k()}
