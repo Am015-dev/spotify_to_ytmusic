@@ -1,0 +1,4 @@
+host {"avail":true,"trystero":"object"}
+lobby after 1781 ms host sees ["Hosty","Friend1"]
+layout mid-start host {"bad":[],"w":390,"vw":390,"h":844,"vh":844,"txt":"Room HDDVF · 2 crew online2"} ok
+layout mid-start guest {"bad":[],"w":390,"vw":390,"h":844,"vh":844,"txt":"Room HDDVF · 2 crew online2"} ok

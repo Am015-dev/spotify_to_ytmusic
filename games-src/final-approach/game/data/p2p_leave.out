@@ -1,2 +1,4 @@
 host {"avail":true,"trystero":"object"}
 lobby after 1815 ms host sees ["Hosty","Friend1"]
+{"tag":"forged messages, leave, rejoin","host":{"over":true,"win":true,"why":"landed","round":6,"logN":123,"seat":0,"shown":true},"guests":[{"seat":1,"over":true}],"agree":true,"exactStrip":true,"finalCardEverywhere":true,"stats":{"remote":35,"rejected":44,"inv":0},"nErrors":0,"errors":[],"clicks":83,"remoteClicks":46,"checks":25,"viol":[],"secs":120,"bad":{"junkRejected":37,"stateUnchanged":true,"invariants":0,"protoPolluted":false},"leave":{"aiTookOver":true},"rejoin":{"prefilled":{"code":"xevra","field":"xevra"},"back":true,"mine":{"seat":1,"g":true,"started":true}},"remoteMovesAfterRejoin":20}
+SUMMARY leave desktop 1 runs, 0 bad

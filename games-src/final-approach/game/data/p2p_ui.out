@@ -1,4 +1,4 @@
 host {"avail":true,"trystero":"object"}
-lobby after 1897 ms host sees ["Hosty","Friend1"]
-UI {"openAtStart":true,"afterEsc":false,"reopened":true,"afterBackdrop":false,"afterX":false,"copy":{"copied":true},"link":"https://gns.test/#join-scj7q","code":"scj7q","clientEsc":false,"players":["Hosty (you) · host · Pilot","Friend1 · Co-pilot"],"noDevOnline":true}
+lobby after 1896 ms host sees ["Hosty","Friend1"]
+UI {"openAtStart":true,"afterEsc":false,"reopened":true,"afterBackdrop":false,"afterX":false,"copy":{"copied":true},"link":"https://gns.test/#join-addhq","code":"addhq","clientEsc":false,"players":["Hosty (you) · host · Pilot","Friend1 · Co-pilot"],"noDevOnline":true}
 SUMMARY ui desktop 1 runs, 0 bad

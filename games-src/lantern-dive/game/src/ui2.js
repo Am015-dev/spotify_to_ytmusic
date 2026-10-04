@@ -18,7 +18,8 @@ function layoutVars() {
   const np = G ? G.np : 4, opp = np - 1;
   let cw = ph ? Math.max(42, Math.min(56, Math.round(hw * .95))) : Math.max(60, Math.min(124, Math.round(Math.min(H * .165, W * .1))));
   const dw = ph ? Math.max(40, Math.min(46, Math.floor((W - 16) / 7) - 4)) : Math.max(46, Math.min(60, Math.floor((W - 40) / 7) - 6));
-  const av = ph ? (land ? 30 : 34) : 44;
+  const short = ph && !land && H < 470; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
+  const av = ph ? (land || short ? 30 : 34) : 44;
   const r = document.documentElement.style; r.setProperty('--hw', hw + 'px'); r.setProperty('--cw', cw + 'px'); r.setProperty('--dw', dw + 'px'); r.setProperty('--av', av + 'px');
   if (KIT.ART.table && !document.documentElement.style.getPropertyValue('--tableimg')) r.setProperty('--tableimg', 'url("' + KIT.ART.table + '")');
 }
@@ -213,7 +214,7 @@ function renderHand(v) {
   const need = Math.max(44, hw * .55), maxP = hw * 1.04;
   const pitchFor = m => m > 1 ? Math.min(maxP, (W - hw) / (m - 1)) : 0;
   const rows = n > 1 && pitchFor(n) < need && n >= 7 ? 2 : 1, per = rows === 2 ? Math.ceil(n / 2) : n, pitch = pitchFor(per);
-  const rowStep = Math.round(ch * .5), padTop = 20;
+  const rowStep = Math.round(ch * .5), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
   box.classList.toggle('two', rows === 2);
   box.style.height = Math.round(padTop + ch + (rows === 2 ? rowStep : 0) + 4) + 'px'; box.style.minHeight = box.style.height;
   btns.forEach((b, i) => {
