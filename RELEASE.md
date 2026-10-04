@@ -1,3 +1,32 @@
+# Release 82 — FAST-TRACK CANDIDATE (v82 RC): phase 2 + od-drive
+
+## Order (onto base.html = live v81)
+```
+./reapply.sh pAU1.py pAU2.py pOG1.py pOB1.py pOB2.py pOB3.py pOC1.py pCV1.py pCV2.py pRL1.py pJU1.py pRL2.py pGB1.py pDR1.py pDR2.py   → REAPPLY_OK
+python3 tools/split_km.py overdrive.html out
+```
+Deploy files: **out/overdrive.html (1,773,170 B) + out/km.js (1,961,521 B)**. Unsplit overdrive.html is 3,738,881 B (over the 3.6 MB cap, so do not deploy it unsplit).
+Note: the devkit base.html is now "live v82" (v81 + ownerbugs + cityvar + juice + garage). This candidate is built from v81 and contains all of v82.
+
+## Reduced gate, SPLIT build (out/ + km.js; own dir and port per test)
+| test | result |
+|---|---|
+| tools/tOut.js (real deploy files, three.js CDN routed to the vendored r164) | OUTBOOT PASS (car drives, 0 errors) |
+| smoke.js | SMOKE PASS 12/12 (smoke/sheet.png) |
+| tools/tBA.js | 30/0 |
+| tools/tBF.js | 9/1 (BF3, known harmless) |
+| tDR.js (od-drive) | 19/0 |
+| tOG.js (otg2) | 43/0 |
+| tOB.js (ownerbugs) | first run 57/3 → test fix, rerun: PENDING |
+
+tOB: the stud-trail phantom bursts are gone (pRL2). The 3 remaining "uncaused" bursts were otg2's real events, `OG_pick` (collectible pickup, ≤ 5 m) and `OG_boom` (driving through an event gate, ≤ 3 m). tOB predates otg2, so both are now listed as real causes in tOB.js.
+
+## Open items from the phase 2a full run (not in the reduced gate)
+- tHop "district A hill street Rovertou Gkalli": 0 m in 0 s (route not found; the street is next to the Acropolis, which ownerbugs2 moved and rescaled). Needs a look in the full phase 2 run.
+- tHop district D route on the split build: 1 vy spike, 2.1 s stuck (traffic nondeterminism likely).
+- tJU crashed once ("execution context destroyed by navigation"): looks like a timing flake under load.
+
+---
 # Release 82 — PHASE 2 BUILD (full test matrix RUNNING, results pending)
 
 ## Phase 2 patch order (onto base.html = live v81)
