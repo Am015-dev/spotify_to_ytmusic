@@ -95,7 +95,7 @@ function bestFigNow(s,lvIn){const lv=lvIn||lvOf(s);const T=G.tiles[G.cur.k];let 
 // ---------- the advisor: the normal computer's choice, in plain words ----------
 function adviceText(plan,s){const bits=[];const nm=i=>P(i).nm;
   for(const w of plan.why){if(w.k==='close'){const others=w.win.filter(i=>i!==s);bits.push(`closes the ${FEAT[w.ty]} for ${Math.round(w.pts)} points${w.win.includes(s)?'':' (for '+others.map(nm).join(' & ')+')'}${w.mine?` and frees your follower${w.mine>1?'s':''}`:''}`)}
-    else if(w.k==='grow'){const g=w.g;bits.push(`grows your ${FEAT[w.ty]}${g.tiles?` to ${g.tiles} tiles`:''}${g.oe&&g.oe.length?` (${g.oe.length} open side${g.oe.length>1?'s':''} left)`:''}`)}
+    else if(w.k==='grow'){const g=w.g;bits.push(`grows the ${FEAT[w.ty]} you already hold${g.tiles?` to ${g.tiles} tiles`:''}${g.oe&&g.oe.length?` (${g.oe.length} open side${g.oe.length>1?'s':''} left)`:''}`)}
     else if(w.k==='hurt')bits.push(`makes ${w.who.map(nm).join(' & ')}’s ${FEAT[w.ty]} harder to finish`);
     else if(w.k==='priory')bits.push('surrounds your priory for 9 points')}
   if(plan.bonus)bits.push('your mason earns an extra turn');
@@ -103,5 +103,5 @@ function adviceText(plan,s){const bits=[];const nm=i=>P(i).nm;
     if(f.k==='bld')bits.push(`puts your mason on the ${FEAT[g.ty]}: each later tile that extends it gives you an extra turn`);
     else if(f.k==='pig')bits.push('puts your hog with your farmer: +1 per finished town at the end');
     else{const d=descGroup(g,plan.pr,'normal');const w=Math.round(worth(d,'normal'));
-      bits.push(g.done?`scores at once with a ${role} (${w} points) and gets it back`:g.ty==='F'?`sends a farmer into the field (about ${w} points at the end)`:`sets a ${role} on the ${FEAT[g.ty]} (worth about ${w} if it is finished)`)}}
+      bits.push(g.done?`scores at once with a ${role} (${w} points) and gets it back`:g.ty==='F'?`sends a farmer into the field (it pays 3 per finished town beside it at the end)`:`sets a ${role} on the ${FEAT[g.ty]} (about ${w} points once it is finished)`)}}
   if(!bits.length)bits.push('a quiet spot that gives nothing away');const t=bits.join('; ');return t.charAt(0).toUpperCase()+t.slice(1)+'.'}

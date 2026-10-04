@@ -35,7 +35,7 @@ const human=()=>G&&G.pl.some(p=>p.human);
 function refresh(){if(G&&!NET.on){try{if(!G.over&&human())localStorage.setItem(SAVE,JSON.stringify(G));else if(G.over)localStorage.removeItem(SAVE)}catch(e){}}
   if(!G){render();return}computeUI();playFx();netTurnCue();render();try{sync3D();autoFit()}catch(e){console.error(e)}schedule()}
 // at the start of a human placement, make sure every glowing square is on screen
-function autoFit(){if(!V3.on||!me()||G.step!=='place'||UI.fitTurn===G.turn)return;UI.fitTurn=G.turn;const R=V3.r.domElement;const off=(PHN.on&&PHN.tilePx()<PHN.MIN*.9)||UI.cells.some(k=>{const [x,y]=unkey(k);const v=screenOf(cellWorld(x,y));return !v.in||v.x<50||v.y<50||v.x>R.clientWidth-50||v.y>R.clientHeight-50});if(off)fitAll(false)}
+function autoFit(){if(!V3.on||!me()||G.step!=='place'||UI.fitTurn===G.turn)return;UI.fitTurn=G.turn;const R=V3.r.domElement;const off=(PHN.on&&PHN.tilePx()<PHN.MIN*.9)||(PHN.on?UI.cells.every:UI.cells.some).call(UI.cells,k=>{const [x,y]=unkey(k);const v=screenOf(cellWorld(x,y));return !v.in||v.x<50||v.y<50||v.x>R.clientWidth-50||v.y>R.clientHeight-50});if(off)fitAll(false)}
 // what glows for the human now
 function computeUI(){const p=me();UI.cells=[];UI.spotOpts=[];
   if(!p){UI.ghost=null;UI.advice=null;return}
@@ -139,7 +139,7 @@ function playersHtml(){const fs=finalScores();return G.pl.map(p=>{const a=fs.add
   ${G.over?'':`<div class="small muted">If the game ended now: +${endNow} (roads ${a.road}, towns ${a.town}, priories ${a.priory}, farmers ${a.field}${G.ex.tb?', goods '+a.goods:''}) → ${p.score+endNow}.</div>`}
   <div class="small"><b>On the map:</b> ${G.figs.filter(f=>f.p===p.i).map(f=>`${f.k==='f'?ROLE[G.fd[find(f.s)].ty]:FIGN[f.k]} (${FEAT[G.fd[find(f.s)].ty]})`).join(', ')||'nobody'}</div></section>`}).join('')}
 // ---------- start screen, story, tile list ----------
-UI.setup={np:2,seats:['human','ai','ai','ai','ai','ai'],lv:['normal','normal','normal','normal','normal','normal'],ex:{river:true,ic:false,tb:false}};
+UI.setup={np:2,seats:['human','ai','ai','ai','ai','ai'],lv:['normal','normal','normal','normal','normal','normal'],ex:{river:false,ic:false,tb:false}};
 function renderModal(){const m=$('#modal');if(!m)return;if(UI.modal==='lobby'&&!NET.on)UI.modal=G?null:'start';const h=UI.modal==='start'?startHtml():UI.modal==='story'?storyHtml():UI.modal==='lobby'?lobbyHtml():'';m.hidden=!h;
   if(m.dataset.h!==h){const ae=document.activeElement,aid=ae&&m.contains(ae)&&ae.id,sel=aid&&ae.selectionStart;m.innerHTML=iconize(h);m.dataset.h=h;if(aid){const n=document.getElementById(aid);if(n){n.focus({preventScroll:true});try{n.setSelectionRange(sel,sel)}catch(e){}}}}}
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
@@ -167,7 +167,7 @@ function tileFacts(t){const d=TT[t],b=[];const tw=d.C.map(c=>`town ${c.e.length=
 function refHtml(){const sets=[['base','Base game: 72 tiles (one is the starting tile)'],['river','The Riverlands: 12 river tiles'],['ic','Taverns & Basilicas: 18 tiles'],['tb','Merchants & Masons: 24 tiles']];
   let h=`<p class="muted small">Every tile in the box, drawn as it looks in the game. The count is how many copies there are.${G?` In this game: ${tilesLeft()} tiles still in the bag.`:''}</p>`;
   for(const [k,n] of sets){h+=`<h3>${n}</h3><div class="tgrid">${TT.map((d,t)=>d.set!==k?'':`<div class="tcell">${tileCard(t,0)}<div><b>${esc(d.n)}</b> <small>×${d.c}</small><br><small>${tileFacts(t)}</small></div></div>`).join('')}</div>`}
-  h+=`<h3>Figures (each colour)</h3><div class="cgrid">${[['♟ Follower','7','Placed on a road (wayfarer), town (warden), priory (brother) or field (farmer) of the tile you just laid. Comes home when its feature is finished; farmers stay.'],['♜ Champion','1 (Taverns & Basilicas)','A follower that counts as two when deciding who holds a feature. Scores the same as one follower.'],['🔨 Mason','1 (Merchants & Masons)','Goes on a road or town where you already have a follower. Whenever a later tile of yours extends that feature, you take one extra turn at once (never two in a row). Comes home with the feature.'],['🐖 Hog','1 (Merchants & Masons)','Goes in a field where you already have a farmer. If you hold that field at the end, it pays 4 per finished town instead of 3.']].map(([n,c,x])=>`<div class="card"><h4>${n} <small>×${c}</small></h4><p>${x}</p></div>`).join('')}</div>`;
+  h+=`<h3>Figures (each colour)</h3><div class="cgrid">${[['♟ Follower','7','Placed on a road, town, priory or field (then called a farmer) of the tile you just laid. Comes home when its feature is finished; farmers stay.'],['♜ Champion','1 (Taverns & Basilicas)','A follower that counts as two when deciding who holds a feature. Scores the same as one follower.'],['🔨 Mason','1 (Merchants & Masons)','Goes on a road or town where you already have a follower. Whenever a later tile of yours extends that feature, you take one extra turn at once (never two in a row). Comes home with the feature.'],['🐖 Hog','1 (Merchants & Masons)','Goes in a field where you already have a farmer. If you hold that field at the end, it pays 4 per finished town instead of 3.']].map(([n,c,x])=>`<div class="card"><h4>${n} <small>×${c}</small></h4><p>${x}</p></div>`).join('')}</div>`;
   h+=`<h3>Goods tokens (Merchants & Masons)</h3><div class="cgrid">${[['🍷 Wine',9],['🌾 Grain',6],['🧵 Cloth',5]].map(([n,c])=>`<div class="card"><h4>${n} <small>×${c}</small></h4><p>One per symbol in a town. Whoever lays the tile that finishes the town takes them, even with no follower there. At the end, the most of each kind scores 10 (ties: all score 10).</p></div>`).join('')}</div>`;
   h+=`<h3>Scoring</h3><div class="tw"><table class="st"><tr><th>Feature</th><th>Finished (at once)</th><th>Unfinished (at the end)</th></tr>
    <tr><td>Road</td><td>1 per tile</td><td>1 per tile</td></tr><tr><td>Road with a tavern</td><td>2 per tile</td><td>0</td></tr>
@@ -201,10 +201,17 @@ function go(m){if(NET.on){if(isClient()){if(!me())return;sfx&&sfx('click');netSe
 function toast(t){if(PHN.on){PHN.toast(t);return}const el=$('#dockmsg');if(!el)return;el.textContent=t;el.hidden=false;GX.showDock();clearTimeout(UI.tt);UI.tt=setTimeout(()=>el.hidden=true,3200)}
 function advise(){const p=me();if(!p)return;if(G.step==='place'){const plan=aiPlan(p.i,'normal');UI.advice={turn:G.turn+':'+G.step,place:plan.place,fig:plan.fig,text:adviceText(plan,p.i)};const k=key(plan.place.x,plan.place.y);
     UI.ghost={k,r:plan.place.r,rots:legalPlacements(G.cur.t).filter(q=>key(q.x,q.y)===k).map(q=>q.r),t:G.cur.t,turn:G.turn};focusCell(k)}
-  else if(G.step==='fig'){const m=bestFigNow(p.i,'normal');let text;if(m.act==='skip')text='Keep your followers: nothing here is worth one right now.';else{const T=G.tiles[G.cur.k];const s=TSEG[T.t][m.l];const r=find(T.s0+m.l);const d=descRoot(r,'normal');const w=Math.round(worth(d,'normal'));
-      text=m.k==='bld'?`Put your mason on the ${FEAT[s.ty]}: extra turns whenever you extend it.`:m.k==='pig'?'Put your hog beside your farmer for +1 per town.':G.fd[r].done?`A ${m.k==='big'?'champion':ROLE[s.ty]} scores the finished ${FEAT[s.ty]} at once (${w}) and comes straight home.`:`A ${m.k==='big'?'champion':ROLE[s.ty]} on the ${FEAT[s.ty]} is worth about ${w} points.`}
+  else if(G.step==='fig'){const m=bestFigNow(p.i,'normal');const text=figAdviceText(m,p.i);
     UI.kind=m.k||UI.kind;UI.advice={turn:G.turn+':'+G.step,fig:m,text}}
   sfx&&sfx('click');refreshUI()}
+// the follower advice in the same numbers the buttons show
+// a road / town / priory that the tile just laid completes (it scores right after the follower step)
+function closesNow(F){return F.ty==='M'?nbrCount(F.x,F.y)===9:(F.ty==='C'||F.ty==='R')&&F.oe&&F.oe.length===0}
+function figAdviceText(m,pi){if(m.act==='skip')return 'Keep your followers: nothing here is worth one right now.';const T=G.tiles[G.cur.k];const s=TSEG[T.t][m.l];const r=find(T.s0+m.l);const fl=featLine(s.ty,G.fd[r],figsIn(r),pi);
+  if(m.k==='bld')return `Put your mason on the ${FEAT[s.ty]}: extra turns whenever you extend it.`;if(m.k==='pig')return 'Put your hog beside your farmer for +1 per finished town.';
+  if(s.ty==='F')return `A farmer here pays +${fl.end} at the end as things stand (3 per finished town beside this field), more as nearby towns get finished.`;
+  const who=m.k==='big'?'champion':'follower';if(G.fd[r].done||closesNow(G.fd[r]))return `A ${who} scores the finished ${FEAT[s.ty]} at once (+${fl.now}) and comes straight home.`;
+  return `A ${who} on the ${FEAT[s.ty]}: +${fl.now} if you finish it as it is, more as it grows; you get the ${who} back when it is finished.`}
 function applyAdvice(){const a=UI.advice;if(!a)return;if(G.step==='place'&&a.place){const fig=a.fig;go(a.place);if(me()&&G.step==='fig'&&fig&&isLegal(fig,sideToAct()))go(fig)}else if(G.step==='fig'&&a.fig)go(a.fig);UI.advice=null}
 document.addEventListener('click',e=>{const b=e.target.closest('button,[data-cell],[data-spot],input[type=checkbox]');if(!b)return;const d=b.dataset;
   if(d.mv){const m=JSON.parse(d.mv);sfx&&sfx('click');return go(m)}
@@ -228,7 +235,7 @@ function uiAct(a){switch(a){case 'start':beginGame();return;case 'continue':load
 document.addEventListener('keydown',e=>{if(!me()||UI.modal||GX.open)return;if(e.key==='r'||e.key==='R')rotGhost(1);else if(e.key==='Enter'&&UI.ghost&&G.step==='place'){e.preventDefault();uiAct('confirm')}else if(e.key==='Escape'&&UI.ghost){UI.ghost=null;refreshUI()}});
 function openStart(){UI.modal='start';render()}
 function beginGame(){if(NET.on)netLeave(true);const o=UI.setup;UI.fx.length=0;UI.fxSeen=0;UI.recap=null;UI.advice=null;UI.ghost=null;const seats=o.seats.slice(0,o.np);
-  newGame({np:o.np,seats,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex,o.np===6?{ic:true}:{})});resetScene();UI.modal=human()&&ANIM?'story':null;refresh();fitAll(true)}
+  newGame({np:o.np,seats,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex,o.np===6?{ic:true}:{})});resetScene();UI.modal=human()&&ANIM&&UI.guide?'story':null;refresh();fitAll(true)}
 function loadSaved(){if(NET.on)netLeave(true);try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;resetScene();refresh();fitAll(true)}catch(e){openStart()}}
 // after each move: recap computer turns in one line and show where they played
 function onMoveDone(m,s,before){if(UI.sim)return;const p=P(before.p);const mineP=p.human&&(!NET.on||p.i===NET.mySeat);if(m.act==='place'&&!mineP&&V3.on){const [x,y]=[m.x,m.y];const sp=screenOf(cellWorld(x,y));const R=V3.r.domElement;if(!sp.in||sp.x<R.clientWidth*.12||sp.x>R.clientWidth*.88||sp.y<R.clientHeight*.12||sp.y>R.clientHeight*.88){if(human())focusCell(key(x,y));else fitAll(false)}}
@@ -239,7 +246,9 @@ function moveRecaps(before){const p=P(before.p);const sc=before.scored.filter(x=
   const f=before.figPlaced;const T=G.tiles[before.k];let t=`<b style="color:${PCOL[p.i]}">${esc(p.nm)}</b> placed ${esc(tileWords(before.t))}`;
   if(f){const ty=TSEG[T.t][f.l].ty;t+=` and set a ${f.k==='f'?ROLE[ty]:FIGN[f.k]} on the ${FEAT[ty]}`}else t+=' and kept its followers';
   if(sc.length)t+='. '+sc.map(x=>`${x.win.map(i=>P(i).nm).join(' & ')} +${x.pts} (${FEAT[x.ty]})`).join(', ');
-  if(before.bonusEarned)t+='. Its mason earns an extra turn';return {mine,recap:{html:t+'.',n:G.turn}}}
+  if(before.bonusEarned)t+='. Its mason earns an extra turn';
+  let sh=`<b style="color:${PCOL[p.i]}">${esc(p.nm)}</b> `+(f?`put a ${f.k==='f'?(TSEG[T.t][f.l].ty==='F'?'farmer in a field':'follower on a '+FEAT[TSEG[T.t][f.l].ty]):FIGN[f.k]}`:'laid a tile, no follower');if(sc.length)sh+=': '+sc.map(x=>`${x.win.map(i=>P(i).nm).join(' & ')} +${x.pts}`).join(', ');
+  return {mine,recap:{html:t+'.',short:sh+'.',n:G.turn}}}
 // ---------- the computer ----------
 let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||PHN.blocking()||(UI.modal&&!(isHost()&&UI.modal!=='story'))||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;
   aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!isHost())||isClient())return;if(PHN.blocking()){return}const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.step);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*(G.step==='fig'?.7:1)))}

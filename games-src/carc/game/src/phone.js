@@ -45,10 +45,11 @@ Object.assign(PHN,{
   zoom(f){if(!V3.cam)return;const c=V3.camTo;V3.camTo={look:(c?c.look:V3.look).clone(),dist:clampDist((c?c.dist:V3.dist)*f),t:0};V3.userMoved=true},
   spots(){if(!V3.cam)return;const gs=this.groups();if(!gs.length){this.last();return}this.focusGroup(gs.length>1?this.gi+1:0,false)},
   // bring a scored feature into view (only when its middle is off screen)
-  focusFeat(r){try{if(!V3.on||!G.fd[r]||!G.fd[r].tiles||!G.fd[r].tiles.length)return;let sx=0,sz=0;const ks=G.fd[r].tiles;for(const k of ks){const [x,y]=unkey(k);sx+=x;sz+=y}const cx=sx/ks.length,cz=sz/ks.length;const v=screenOf(cellWorld(cx,cz)),R=V3.r.domElement;
-    if(!v.in||v.x<R.clientWidth*.1||v.x>R.clientWidth*.9||v.y<R.clientHeight*.1||v.y>R.clientHeight*.9){this.go(cellWorld(cx,cz),Math.min(V3.dist,this.distFor(this.MIN*1.1)),false);V3.userMoved=true}}catch(e){}},
+  focusFeat(r){try{const ks=phFeatKeys(r);if(!V3.on||!ks||!ks.length)return;const xs=ks.map(k=>unkey(k)[0]),ys=ks.map(k=>unkey(k)[1]);const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);const R=V3.r.domElement;
+    const vis=[[x0-.5,y0-.5],[x1+.5,y0-.5],[x0-.5,y1+.5],[x1+.5,y1+.5]].every(([x,y])=>{const v=screenOf(cellWorld(x,y));return v.in&&v.x>=0&&v.x<=R.clientWidth&&v.y>=0&&v.y<=R.clientHeight});
+    if(!vis){const px=Math.max(this.MIN*.8,Math.min(115,R.clientWidth/(x1-x0+1.6),R.clientHeight/((y1-y0+1.6)*.94)));this.go(cellWorld((x0+x1)/2,(y0+y1)/2),this.distFor(px),false);V3.userMoved=true}}catch(e){}},
   last(){if(!V3.cam||!G)return;const [x,y]=this.lastXY();this.go(cellWorld(x,y),Math.min(V3.camTo?V3.camTo.dist:V3.dist,this.distFor(this.MIN*1.25)),false);V3.userMoved=true},
-  figFrame(){if(!V3.cam||!G||!G.cur||!G.cur.k)return;const [x,y]=unkey(G.cur.k),R=V3.r.domElement;const px=Math.min(Math.min(R.clientWidth,R.clientHeight*.94)*.62,200);this.go(cellWorld(x,y),this.distFor(px),false);this.figZ=true}
+  figFrame(){if(!V3.cam||!G||!G.cur||!G.cur.k)return;const [x,y]=unkey(G.cur.k),R=V3.r.domElement;const px=Math.min(Math.min(R.clientWidth,R.clientHeight*.94)*.46,150);this.go(cellWorld(x,y),this.distFor(px),false);this.figZ=true}
 });
 // ---------- what the player sees ----------
 function phWhere(k,l){return segWhere(k,l).trim()}
@@ -56,14 +57,15 @@ function phFeatName(ty){return ty==='F'?'Farm':phCap(FEAT[ty])}
 function phFeatIc(ty){return ty==='F'?'grain':ty==='C'?'town':ty==='R'?'road':'priory'}
 function phRecFig(hp){const key=G.turn+':'+G.step+':'+hp.i;if(PHN.recK!==key){PHN.recK=key;try{PHN.rec=bestFigNow(hp.i,'normal')}catch(e){PHN.rec=null}}return PHN.rec}
 function phPts(m,F,s,fl){if(m.k==='bld')return 'extra turn when you extend it';if(m.k==='pig')return `+1 per town (${fieldCities(F).size} now)`;
-  if(s.ty==='F')return `end +${fl.end} · ${fieldCities(F).size} town${fieldCities(F).size===1?'':'s'}`;
-  if(F.done)return `scores +${fl.now} now`;return `done +${fl.now} · open +${fl.end}`}
+  if(s.ty==='F'){const n=fieldCities(F).size;return `+${fl.end} at the end · ${n} finished town${n===1?'':'s'}`}
+  if(F.done||closesNow(F))return `+${fl.now} now, finished by this tile`;if(fl.now===fl.end)return `+${fl.now} · back when finished`;return `+${fl.now} if finished · +${fl.end} if not`}
 function phOptHTML(m,hp,rec){const T=G.tiles[G.cur.k],s=TSEG[T.t][m.l],r=find(T.s0+m.l),F=G.fd[r],fl=featLine(s.ty,F,figsIn(r),hp.i);const w=phWhere(G.cur.k,m.l);
   const kind=m.k==='f'?'':m.k==='big'?'Champion · ':m.k==='bld'?'Mason · ':'Hog · ';
   return `<button class="pb opt${rec?' rec':''}" data-mv='${esc(JSON.stringify(m))}' aria-label="${esc(kind+phFeatName(s.ty)+(w?' '+w:'')+', '+phPts(m,F,s,fl)+(rec?', suggested':''))}"><span class="oi">${phI(m.k==='f'?phFeatIc(s.ty):m.k==='big'?'champ':m.k==='bld'?'mason':'hog')}</span><span class="ot"><b>${kind}${phFeatName(s.ty)}${w?' <small>'+esc(w)+'</small>':''}${rec?`<em class="star">${phI('star')}</em>`:''}</b><small>${esc(phPts(m,F,s,fl))}</small></span></button>`}
 function phFigPopup(hp){const ms=figMoves(hp.i).filter(m=>m.act==='fig');const kinds=[...new Set(ms.map(m=>m.k))];const rec=phRecFig(hp)||{act:'skip'};const many=kinds.length>2;
   const tabs=kinds.length>1?`<div class="ph-tabs${many?' icons':''}">${kinds.map(k=>{const nm={f:'Follower',big:'Champion',bld:'Mason',pig:'Hog'}[k];return `<button class="pb tab${UI.kind===k?' on':''}" data-kind="${k}" aria-pressed="${UI.kind===k}" aria-label="${nm}${rec.k===k&&rec.act==='fig'?' (suggested)':''}">${phI({f:'meeple',big:'champ',bld:'mason',pig:'hog'}[k])}<span>${nm}</span>${rec.k===k&&rec.act==='fig'?`<em class="star">${phI('star')}</em>`:''}</button>`}).join('')}</div>`:'';
   return `<div class="ph-head${tabs?' hastabs':''}"><div class="ph-ht"><b>Follower?</b><small>${G.cur.bonus?'extra turn · ':''}<em class="star">${phI('star')}<span class="sg"> suggested</span></em></small></div>${tabs}<button class="pb skip${rec.act==='skip'?' rec':''}" data-mv='{"act":"skip"}'>${rec.act==='skip'?`<em class="star">${phI('star')}</em>`:''}Skip</button><button class="ph-x" data-ph="figx" aria-label="Close">${phI('close')}</button></div>
+   <p class="ph-why"><em class="star">${phI('star')}</em> ${esc(figAdviceText(rec,hp.i))}</p>
    <div class="ph-opts">${ms.filter(m=>m.k===UI.kind).map(m=>phOptHTML(m,hp,rec.act==='fig'&&same(rec,m))).join('')}</div>`}
 function phPlacePopup(hp){const gh=UI.ghost,t=G.cur.t;const pv=placementPreview(t,gh.r,...unkey(gh.k),hp.i);const multi=gh.rots.length>1;const adv=UI.advice&&UI.advice.place&&same({x:UI.advice.place.x,y:UI.advice.place.y,r:UI.advice.place.r},{x:unkey(gh.k)[0],y:unkey(gh.k)[1],r:gh.r});
   return `<div class="ph-head"><b>${adv?'Suggested spot':'Place here?'}</b><button class="ph-x" data-ui="cancel" aria-label="Cancel">${phI('close')}</button></div>
@@ -82,21 +84,35 @@ function phInfoPopup(){const I=PHN.info;if(!I||!G.tiles[I.k])return null;const T
   return `<div class="ph-head"><span class="oi big">${phI(phFeatIc(s.ty))}</span><b>${phFeatName(s.ty)}${w?' <small>'+esc(w)+'</small>':''}</b><button class="ph-x" data-ph="pclose" aria-label="Close">${phI('close')}</button></div>
    <div class="ph-body"><p>${esc(phCap(fl.size))}.</p><p>${esc(pts)}</p><p><b>Held by:</b> ${fg}${figs.length?' · '+esc(fl.who):''}</p></div>`}
 // ---------- cards: scoring events, coach tips, the final count. One at a time, each with Continue ----------
-function phScoreCard(x){const F=G.fd[x.r];if(!F)return null;const ty=F.ty,n=F.tiles?F.tiles.length:0;
-  const size=ty==='C'?`${n} tile${n>1?'s':''}${F.pen?`, ${F.pen} banner${F.pen>1?'s':''}`:''}${F.cat?', basilica':''}`:ty==='R'?`${n} tile${n>1?'s':''}${F.inn?', tavern':''}`:'the tile and all 8 around it';
-  return {id:'s'+x.r+':'+G.turn,root:x.r,h:`<div class="pc-in"><div class="pc-h">${phI(phFeatIc(ty),'big')}<div><b>${phCap(FEAT[ty])} finished</b><small>${esc(size)}</small></div></div>
-   <div class="pc-rows">${x.win.map(i=>`<div class="pc-row" style="--pc:${PCOL[i]}"><i></i><b>${esc(P(i).nm)}</b><span>+${x.pts}</span></div>`).join('')}</div><p class="pc-t">The followers there go home.</p>
+// whose turn a card belongs to, in the reader's words
+const PH_TOP=()=>document.documentElement.classList.contains('ph-p');
+function phWho(i,pos){const p=P(i);const mine=p.human&&(!NET.on||i===NET.mySeat)&&G.pl.filter(q=>q.human).length===1;return mine?(pos?'Your':'You'):esc(p.nm)+(pos?'’s':'')}
+function phSumLine(F,pts){const n=F.tiles?F.tiles.length:0,pl=k=>k>1?'s':'';
+  if(F.ty==='C'){const m=F.cat?3:2;return `${n} tile${pl(n)} × ${m}${F.pen?` + ${F.pen} banner${pl(F.pen)} × ${m}`:''} = ${pts}${F.cat?' (basilica)':''}`}
+  if(F.ty==='R'){const m=F.inn?2:1;return `${n} tile${pl(n)} × ${m} = ${pts}${F.inn?' (tavern)':''}`}
+  return `surrounded by 8 tiles = ${pts}`}
+// holders of a feature: who has how many followers there (a champion counts 2), and who wins it
+function phHolders(fs,win,pts){const by={};for(const [p,k] of fs){if(k==='bld'||k==='pig')continue;by[p]=(by[p]||0)+(k==='big'?2:1)}
+  return Object.keys(by).map(Number).sort((a,b)=>by[b]-by[a]).map(i=>`<div class="pc-row${win.includes(i)?'':' lose'}" style="--pc:${PCOL[i]}"><i></i><b>${esc(P(i).nm)}</b><small>${by[i]} follower${by[i]>1?'s':''}</small><span>${win.includes(i)?'+'+pts:'0'}</span></div>`).join('')}
+function phScoreCard(x){const F=G.fd[x.r];if(!F)return null;const ty=F.ty,by=x.by!=null?x.by:x.win[0],fs=x.fs||x.win.map(i=>[i,'f']);
+  const lose=fs.some(([p,k])=>!x.win.includes(p)&&k!=='bld'&&k!=='pig');
+  return {id:'s'+x.r+':'+G.turn,root:x.r,by,hl:phFeatKeys(x.r),h:`<div class="pc-in"><div class="pc-h">${phI(phFeatIc(ty),'big')}<div><b>${phWho(by,1)} tile finished a ${FEAT[ty]}</b><small>${esc(phSumLine(F,x.pts))}</small></div></div>
+   <div class="pc-rows">${phHolders(fs,x.win,x.pts)}</div><p class="pc-t">${ty==='C'&&F.pen?`Each banner (the little flag) adds ${F.cat?3:2}. `:''}${lose?'Most followers there wins it (a tie pays everyone tied). ':''}Followers in it come home.</p>
    <button class="pb pri cont" data-ph="cont">Continue</button></div>`}}
-function phGoodsCard(pi){const l=G.log.find(e=>e.t&&e.t.indexOf('🧺')===0);return {id:'g'+G.turn+':'+pi,h:`<div class="pc-in"><div class="pc-h">${phI('wine','big')}<div><b>Goods</b><small>${esc(P(pi).nm)} closed the town</small></div></div><p class="pc-t">${esc(l?l.t.replace('🧺 ',''):'')}</p><button class="pb pri cont" data-ph="cont">Continue</button></div>`}}
+// the tiles to light up for a feature (a priory lights its 3x3 block)
+function phFeatKeys(r){const F=G.fd[r];if(!F)return null;if(F.ty==='M'){const o=[];for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const k=key(F.x+dx,F.y+dy);if(G.tiles[k])o.push(k)}return o}return F.tiles?F.tiles.slice():null}
+function phGoodsCard(pi){const l=G.log.find(e=>e.t&&e.t.indexOf('🧺')===0);return {id:'g'+G.turn+':'+pi,by:pi,h:`<div class="pc-in"><div class="pc-h">${phI('wine','big')}<div><b>Goods</b><small>${esc(P(pi).nm)} closed the town</small></div></div><p class="pc-t">${esc(l?l.t.replace('🧺 ',''):'')}</p><button class="pb pri cont" data-ph="cont">Continue</button></div>`}}
 function phCoachCard(id,txt){return {id:'c'+id,coach:1,h:`<div class="pc-in"><div class="pc-h">${phI('guide','big')}<div><b>Tip</b></div></div><p class="pc-t">${txt}</p><button class="pb pri cont" data-ph="cont">Got it</button></div>`}}
 function phEndCards(){const out=[];const {add,det}=finalScores();const nm=i=>esc(P(i).nm);const open=det.filter(d=>d.ty!=='F');const farms=det.filter(d=>d.ty==='F'&&d.n);
   const skip=`<button class="pb skipall" data-ph="skipall">Skip to the result</button>`;
-  if(open.length)out.push({id:'e-open',end:1,h:`<div class="pc-in"><div class="pc-h">${phI('scroll','big')}<div><b>Unfinished features</b><small>they score a little at the end</small></div></div><div class="pc-rows">${open.map(d=>{const F=G.fd[d.r];const z=d.pts===0?' <small>(0: tavern or basilica left open)</small>':'';return `<div class="pc-row2"><span>${phCap(FEAT[d.ty])} (${F.tiles?F.tiles.length:'1'} tile${F.tiles&&F.tiles.length>1?'s':''})${z}</span><span>${d.win.map(i=>`<b style="color:${PCOL[i]}">${nm(i)}</b> +${d.pts}`).join(', ')}</span></div>`}).join('')}</div><div class="pc-b"><button class="pb pri cont" data-ph="cont">Continue</button>${skip}</div></div>`});
-  farms.forEach((d,i)=>{const pig=w=>figsIn(d.r).some(f=>f.p===w&&f.k==='pig');out.push({id:'e-f'+d.r,end:1,root:d.r,h:`<div class="pc-in"><div class="pc-h">${phI('grain','big')}<div><b>Farm ${i+1} of ${farms.length}</b><small>${d.n} finished town${d.n>1?'s':''} beside it</small></div></div><div class="pc-rows">${d.win.map(w=>`<div class="pc-row" style="--pc:${PCOL[w]}"><i></i><b>${nm(w)}</b><span>+${d.n*(pig(w)?4:3)}</span></div>`).join('')}</div>${d.win.some(pig)?'<p class="pc-t">The hog is worth 4 per town instead of 3.</p>':''}<div class="pc-b"><button class="pb pri cont" data-ph="cont">Continue</button>${skip}</div></div>`})});
+  if(open.length)out.push({id:'e-open',end:1,h:`<div class="pc-in"><div class="pc-h">${phI('scroll','big')}<div><b>Unfinished features</b><small>they score a little at the end</small></div></div><div class="pc-rows">${G.pl.map(p=>{const t=open.filter(d=>d.win.includes(p.i)).reduce((a,d)=>a+d.pts,0);return `<div class="pc-row" style="--pc:${PCOL[p.i]}"><i></i><b>${nm(p.i)}</b><small>all unfinished</small><span>+${t}</span></div>`}).join('')}${open.map(d=>{const F=G.fd[d.r];const z=d.pts===0?' <small>(0: tavern or basilica left open)</small>':'';return `<div class="pc-row2"><span>${phCap(FEAT[d.ty])} (${d.ty==='M'?nbrCount(F.x,F.y)+' of 9 tiles':F.tiles.length+' tile'+(F.tiles.length>1?'s':'')})${z}</span><span>${d.win.map(i=>`<b style="color:${PCOL[i]}">${nm(i)}</b> +${d.pts}`).join(', ')}</span></div>`}).join('')}</div><div class="pc-b"><button class="pb pri cont" data-ph="cont">Continue</button>${skip}</div></div>`});
+  farms.forEach((d,i)=>{const pig=w=>figsIn(d.r).some(f=>f.p===w&&f.k==='pig');out.push({id:'e-f'+d.r,end:1,root:d.r,hl:phFeatKeys(d.r),h:`<div class="pc-in"><div class="pc-h">${phI('grain','big')}<div><b>Farm ${i+1} of ${farms.length}</b><small>${d.n} finished town${d.n>1?'s':''} beside it × 3 = ${d.n*3}</small></div></div><div class="pc-rows">${phFarmRows(d,pig)}</div><p class="pc-t">The glowing field: whoever has the most farmers in it scores.</p>${d.win.some(pig)?'<p class="pc-t">The hog is worth 4 per town instead of 3.</p>':''}<div class="pc-b"><button class="pb pri cont" data-ph="cont">Continue</button>${skip}</div></div>`})});
   if(G.ex.tb&&G.pl.some(p=>p.end&&p.end.goods))out.push({id:'e-goods',end:1,h:`<div class="pc-in"><div class="pc-h">${phI('wine','big')}<div><b>Goods</b><small>10 points for the most of each kind</small></div></div><div class="pc-rows">${G.pl.filter(p=>p.end.goods).map(p=>`<div class="pc-row" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>+${p.end.goods}</span></div>`).join('')}</div><div class="pc-b"><button class="pb pri cont" data-ph="cont">Continue</button>${skip}</div></div>`});
   out.push(phResultCard());return out}
+function phFarmRows(d,pig){const by={};for(const f of figsIn(d.r)){if(f.k==='pig')continue;by[f.p]=(by[f.p]||0)+(f.k==='big'?2:1)}
+  return Object.keys(by).map(Number).sort((a,b)=>by[b]-by[a]).map(i=>`<div class="pc-row${d.win.includes(i)?'':' lose'}" style="--pc:${PCOL[i]}"><i></i><b>${esc(P(i).nm)}</b><small>${by[i]} farmer${by[i]>1?'s':''}</small><span>${d.win.includes(i)?'+'+d.n*(pig(i)?4:3):'0'}</span></div>`).join('')}
 function phResultCard(){const top=Math.max(...G.pl.map(p=>p.score));const order=G.pl.slice().sort((a,b)=>b.score-a.score);
-  return {id:'e-result',end:1,final:1,h:`<div class="pc-in"><div class="pc-h">${phI('trophy','big')}<div><b>${esc(G.winText||'Game over')}</b></div></div><div class="pc-rows">${order.map(p=>`<div class="pc-row${p.score===top?' win':''}" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>${p.score}</span></div>`).join('')}</div><div class="pc-b"><button class="pb pri cont" data-ph="cont">Close</button><button class="pb" data-a="new">New game</button></div></div>`}}
+  return {id:'e-result',end:1,final:1,h:`<div class="pc-in"><div class="pc-h">${phI('trophy','big')}<div><b>${esc(G.winText||'Game over')}</b></div></div><div class="pc-rows">${order.map(p=>{const e=p.end||{};const fin=(e.road||0)+(e.town||0)+(e.priory||0),fa=e.field||0,gd=e.goods||0;return `<div class="pc-row${p.score===top?' win':''}" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><small>${p.score-fin-fa-gd} in play + ${fin} unfinished + ${fa} farms${G.ex.tb?' + '+gd+' goods':''}</small><span>${p.score}</span></div>`}).join('')}</div><div class="pc-b"><button class="pb pri cont" data-ph="cont">Close</button><button class="pb" data-a="new">New game</button></div></div>`}}
 Object.assign(PHN,{
   blocking(){return this.on&&!NET.on&&human()&&this.cards.length>0},
   add(c){if(!c||!this.on)return;if(!human()&&!c.end)return;if(this.cards.some(x=>x.id===c.id))return;this.cards.push(c)},
@@ -112,27 +128,30 @@ Object.assign(PHN,{
     if(!w)return false;const f=phFeatAt(k,w);if(!f)return false;this.info=f;this.pop='info';this.render(true);return true}
 });
 // ---------- strip, chips, bar ----------
-function phChips(){if(!G)return '';const cur=sideToAct();return G.pl.map(p=>`<button class="pchip${cur===p.i&&!G.over?' cur':''}" style="--pc:${PCOL[p.i]}" data-gx="plrd" aria-label="${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''}: ${p.score} points, ${p.sup.f} followers left. Tap for all scores"><span class="pn"><i></i>${esc(p.nm.charAt(0))}</span><b>${p.score}</b><span class="pf">${ico('meeple')}${p.sup.f}</span></button>`).join('')}
-function phBarHTML(){if(!G)return '';const s=sideToAct();const ns=NET.on&&!NET.inLobby?`<span class="netst${NET.hostGone?' bad':''}" title="Online">${esc(netStatus())}</span>`:'';
-  return `<span class="pb-n" aria-label="${tilesLeft()} tiles left">${ico('tile')}<b>${tilesLeft()}</b></span>`+(G.over?'<span class="pb-t"><b>Game over</b></span>':s>=0?`<span class="pb-t"><i style="background:${PCOL[s]}"></i><b>${esc(P(s).nm)}</b>${NET.on&&s===NET.mySeat?' <small>(you)</small>':''}</span>`:'')+ns}
+function phChips(){if(!G)return '';const cur=sideToAct();let add=null;try{add=finalScores().add}catch(e){}const long=G.pl.length<=2&&document.documentElement.classList.contains('ph-p');
+  return G.pl.map(p=>{const a=add&&add[p.i];const proj=p.score+(a?a.road+a.town+a.priory+a.field+a.goods:0);
+    return `<button class="pchip${cur===p.i&&!G.over?' cur':''}" style="--pc:${PCOL[p.i]}" data-gx="plrd" aria-label="${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''}: ${p.score} points, ${proj} if the game ended now, ${p.sup.f} followers left. Tap for all scores"><span class="pn"><i></i>${esc(long?p.nm:p.nm.charAt(0))}</span><b>${p.score}</b><span class="pf">${ico('meeple')}${p.sup.f}</span>${G.over?'':`<small class="pe">${long?'if it ended: ':'→'}${proj}</small>`}</button>`}).join('')}
+function phBarHTML(){if(!G)return '';const c0=PHN.cards[0];const s=c0&&c0.by!=null&&!G.over?c0.by:sideToAct();const ns=NET.on&&!NET.inLobby?`<span class="netst${NET.hostGone?' bad':''}" title="Online">${esc(netStatus())}</span>`:'';
+  const tl=tilesLeft()||(G.step==='place'&&!G.over?'last':0);return `<span class="pb-n" aria-label="${tilesLeft()} tiles left after this one">${ico('tile')}<b>${tl}</b></span>`+(G.over?'<span class="pb-t"><b>Game over</b></span>':s>=0?`<span class="pb-t"><i style="background:${PCOL[s]}"></i><b>${esc(P(s).nm)}</b>${NET.on&&s===NET.mySeat?' <small>(you)</small>':''}</span>`:'')+ns}
 function phZoomRow(){if(!V3.on)return '';const g=PHN.groups();const lab=g.length>1?`<small>${PHN.gi+1}/${g.length}</small>`:'';
-  return `<div class="ps-zoom"><button class="pb sq" data-ph="zout" aria-label="Zoom out">${phI('minus')}</button><button class="pb sq" data-ph="zin" aria-label="Zoom in">${phI('plus')}</button><button class="pb sq" data-ph="all" aria-label="Show the whole valley">${phI('fit')}</button>${me()&&G.step==='place'?`<button class="pb sq wide" data-ph="spots" aria-label="Go to the glowing squares${g.length>1?', group '+(PHN.gi+1)+' of '+g.length:''}">${phI('target')}<span>Spots</span>${lab}</button>`:''}<button class="pb sq wide" data-ph="last" aria-label="Go to the last tile">${phI('last')}<span>Last</span></button></div>`}
+  return `<div class="ps-zoom"><button class="pb sq" data-ph="zout" aria-label="Zoom out">${phI('minus')}</button><button class="pb sq" data-ph="zin" aria-label="Zoom in">${phI('plus')}</button><button class="pb sq" data-ph="all" aria-label="Show the whole valley">${phI('fit')}</button>${me()&&G.step==='place'?`<button class="pb sq wide" data-ph="spots" aria-label="Go to the glowing squares${g.length>1?', group '+(PHN.gi+1)+' of '+g.length:''}">${phI('target')}<span>${g.length>1?'Next':'Spots'}</span>${lab}</button>`:''}<button class="pb sq wide" data-ph="last" aria-label="Go to the last tile">${phI('last')}<span>Last</span></button></div>`}
+function phLastOther(){const r=UI.recap;return r&&r.n>=G.turn-G.pl.length?'<b>Last:</b> '+(r.short||r.html):''}
 function phStripHTML(){if(!G)return '';const hp=me(),s=sideToAct(),p=s>=0?P(s):null;const hint=PHN.tst;
   if(G.over)return `<div class="ps-row"><div class="ps-msg"><b>Game over</b><span>${esc(G.winText||'')}</span></div></div><div class="ps-row"><button class="pb pri" data-ph="results">Result</button><button class="pb" data-a="new">New game</button></div>${phZoomRow()}`;
   if(NET.on&&NET.hostGone)return `<div class="ps-row"><div class="ps-msg"><b>The host left</b><span>The game is over.</span></div></div><div class="ps-row"><button class="pb pri" data-net="leave">Back to the start</button></div>`;
   if(!hp){const wait=NET.on&&p&&p.human?(p.i===NET.mySeat?'Sending your move…':'Waiting for '+esc(p.nm)+'…'):'';
     return `<div class="ps-row"><div class="ps-msg"><b>${p?`<i class="dot" style="background:${PCOL[p.i]}"></i>${esc(p.nm)} is ${G.step==='place'?'placing':'choosing'}…`:''}</b><span>${wait||(UI.recap?UI.recap.html:'')}</span></div>${human()?'':`<button class="pb sq" data-a="pause" aria-label="${UI.pause?'Resume':'Pause'}">${ico(UI.pause?'play':'pause')}</button>`}</div>${phZoomRow()}`}
   if(G.step==='place'){const gh=UI.ghost,t=G.cur.t,r=gh?gh.r:PHN.rot,n=UI.cells.length;
-    return `<div class="ps-row r1"><div class="ps-tile">${tileCard(t,r,1)}</div><div class="ps-mid"><b>${esc(phCap(tileWords(t)))}</b><span>${n} spot${n===1?'':'s'} fit${n===1?'s':''} · ${tilesLeft()} left${G.cur.bonus?' · mason’s extra turn':''}</span></div><div class="ph-rb"><button class="pb sq" data-ph="rot" data-d="-1" aria-label="Turn tile left">${phI('rotl')}</button><button class="pb sq" data-ph="rot" data-d="1" aria-label="Turn tile right">${phI('rotr')}</button></div></div>${phZoomRow()}<div class="ps-hint">${hint?esc(hint):'Tap a glowing square to try your tile there.'}</div>`}
+    return `<div class="ps-row r1"><div class="ps-tile">${tileCard(t,r,1)}</div><div class="ps-mid"><b>${esc(phCap(tileWords(t)))}</b><span>${n} spot${n===1?'':'s'} fit${n===1?'s':''}${V3.on&&PHN.groups().length>1?` (${PHN.groups().length} places: tap Next)`:''} · ${tilesLeft()?tilesLeft()+' more after this':'last tile!'}${G.cur.bonus?' · mason’s extra turn':''}</span></div><div class="ph-rb"><button class="pb sq" data-ph="rot" data-d="-1" aria-label="Turn tile left">${phI('rotl')}</button><button class="pb sq" data-ph="rot" data-d="1" aria-label="Turn tile right">${phI('rotr')}</button></div></div>${phZoomRow()}<div class="ps-hint">${hint?esc(hint):phLastOther()||'Tap a glowing square to try your tile there.'}</div>`}
   if(G.step==='fig')return `<div class="ps-row"><div class="ps-msg"><b>Place a follower?</b><span>${hp.sup.f} left${G.cur.bonus?' · extra turn':''}</span></div><button class="pb pri" data-ph="figshow">Choose</button><button class="pb" data-mv='{"act":"skip"}'>Skip</button></div>${phZoomRow()}<div class="ps-hint">${hint?esc(hint):''}</div>`;
   return ''}
 function phPopHTML(){if(!G)return '';if(PHN.cards.length)return '';const hp=me();
   if(PHN.pop==='menu')return phMenuPopup();if(PHN.pop==='info')return phInfoPopup()||'';
   if(hp&&G.step==='place'&&UI.ghost)return phPlacePopup(hp);
   if(hp&&G.step==='fig'&&PHN.figHide!==G.turn+':'+G.step)return phFigPopup(hp);return ''}
-function phCoachTip(){if(!UI.guide||!G||!me()||UI.modal||PHN.cards.length)return;const hp=me(),k=(x)=>'ph_'+x;const once=(key,txt)=>{if(UI.seen[k(key)])return false;UI.seen[k(key)]=G.turn;saveSeen();PHN.add(phCoachCard(key,txt));return true};
-  if(G.step==='place'){once('place',`Tap a glowing square to try your tile there. Edges must match: town to town, road to road, field to field${G.rv?', river to river':''}. Drag the map to move it, pinch or use + and - to zoom.`);
-    if(hp.sup.f===0)once('nof'+G.turn,'<b>No followers left.</b> They come home when their road, town or priory is finished (farmers never do), so try to finish what you started.')}
+function phCoachTip(){if(!UI.guide||!G||!me()||UI.modal||PHN.cards.length)return;const hp=me(),k=(x)=>'ph_'+x;const tk=G.turn+':'+G.step;const once=(key,txt)=>{if(UI.seen[k(key)]||PHN.tipK===tk)return false;PHN.tipK=tk;UI.seen[k(key)]=G.turn;saveSeen();PHN.add(phCoachCard(key,txt));return true};
+  if(G.step==='place'){once('place',`<b>Goal:</b> most points when the tiles run out (“if it ended” or → is the score if the game ended now). Tap a glowing square to try your tile: edges must match${G.rv?', river to river':''}.`);
+    if(hp.sup.f===0)once('nof','<b>No followers left.</b> They come home when their road, town or priory is finished (farmers never do), so try to finish what you started.')}
   else if(G.step==='fig'){once('fig','You may put ONE follower on the tile you just laid, only where nobody stands yet. It scores and comes home when its road, town or priory is finished. Skip if you want to keep it.');
     const ms=figMoves(hp.i).filter(m=>m.act==='fig');if(ms.some(m=>TSEG[G.tiles[G.cur.k].t][m.l].ty==='F'))once('farm','<b>Farmers</b> never come home. At the end a field pays 3 per finished town it touches to whoever has most farmers there.');
     if(ms.some(m=>m.k==='big'))once('big','<b>Champion:</b> counts as two followers.');if(ms.some(m=>m.k==='bld'))once('bld','<b>Mason:</b> goes where you already have a follower; extend that road or town later for an extra turn.');if(ms.some(m=>m.k==='pig'))once('pig','<b>Hog:</b> joins your farmer; the field pays 4 per town instead of 3.');
@@ -152,10 +171,14 @@ Object.assign(PHN,{
     // my turn: bring the new tile's spots / rings into view
     const hp=me();const fk=hp&&G.step==='fig'?G.turn+':fig':'';if(fk&&this.figK!==fk&&V3.on&&!this.cards.length){this.figK=fk;this.figFrame()}if(!fk)this.figK='';
     if(hp&&G.step==='place'&&this.figZ&&V3.on){this.figZ=false;this.gi=0;fitAll(false)}
+    if(hp&&G.step==='place'&&!UI.ghost&&!this.cards.length){const L=legalPlacements(G.cur.t);if(L.length&&L.every(q=>q.x===L[0].x&&q.y===L[0].y)){const k=key(L[0].x,L[0].y);UI.ghost={k,r:L[0].r,rots:L.map(q=>q.r),t:G.cur.t,turn:G.turn};if(typeof syncOverlays==='function'&&V3.on)syncOverlays()}}
     phCoachTip();
     const card=this.cards[0];const ch=card?card.h:'';const pc=document.getElementById('pc');
     if(card&&card.root!=null&&this.focusK!==card.id){this.focusK=card.id;this.focusFeat(card.root)}if(!card)this.focusK='';
-    if(ch!==this.cardH||force){this.cardH=ch;pc.innerHTML=ch;pc.hidden=!ch;pc.classList.toggle('in',!!ch)}
+    {const hl=card&&card.hl||null;if(JSON.stringify(hl)!==JSON.stringify(UI.hl||null)){UI.hl=hl;if(typeof syncOverlays==='function'&&V3.on){syncOverlays();V3.dirty=true}}}
+    {const tall=!!(me()&&G.step==='fig'&&!this.cards.length&&this.pop==null&&PHN.figHide!==G.turn+':'+G.step&&figMoves(me().i).filter(m=>m.act==='fig'&&m.k===UI.kind).length>2);document.documentElement.classList.toggle('ph-tall',tall)}
+    {const pcs=document.getElementById('pchips');if(pc&&pcs&&PH_TOP()&&card&&card.by!=null){pc.style.top=pcs.offsetHeight+'px'}else if(pc)pc.style.top=''}
+    if(ch!==this.cardH||force){if(ch&&ch!==this.cardH)this.cardAt=Date.now();this.cardH=ch;pc.innerHTML=ch;pc.hidden=!ch;pc.classList.toggle('in',!!ch)}
     const chips=phChips();if(chips!==this.chips){this.chips=chips;document.getElementById('pchips').innerHTML=chips}
     const bar=phBarHTML();if(bar!==this.bar){this.bar=bar;document.getElementById('pbar').innerHTML=bar}
     const sh=phStripHTML();if(sh!==this.strip){this.strip=sh;ps.innerHTML=sh}
@@ -170,7 +193,7 @@ document.addEventListener('click',e=>{if(!PHN.on)return;const b=e.target.closest
   else if(a==='pclose'){PHN.pop=null;PHN.info=null;PHN.render(true)}
   else if(a==='figx'){PHN.figHide=G.turn+':'+G.step;PHN.render(true)}
   else if(a==='figshow'){PHN.figHide='';PHN.render(true)}
-  else if(a==='cont')PHN.cont();
+  else if(a==='cont'){if(AIDELAY>0&&Date.now()-(PHN.cardAt||0)<450)return;PHN.cont()}
   else if(a==='skipall'){PHN.cards=PHN.cards.filter(c=>!c.end||c.final);PHN.render(true)}
   else if(a==='results'){PHN.add(phResultCard());PHN.render(true)}
   else if(a==='rot'){const d=+b.dataset.d;if(UI.ghost)rotGhost(d);else{PHN.rot=(PHN.rot+d+4)%4;PHN.render(true)}}
