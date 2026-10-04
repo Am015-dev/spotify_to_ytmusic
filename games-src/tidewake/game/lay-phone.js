@@ -35,7 +35,8 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(BEFORE?'_before':'')+(TWO?'_2d':'');c
   const sqPt=async(c,r)=>p.evaluate(([c,r])=>__P()(c-2.5,0,r-2.5),[c,r]);
   const tapSq=async(c,r)=>{const [x,y]=await sqPt(c,r);await p.touchscreen.tap(x,y);await p.waitForTimeout(350)};
   const waitHuman=async()=>{let ok=0;for(let k=0;k<120&&ok<3;k++){const s=await p.evaluate(()=>{const d=sideToAct();return !!G.over||(d>=0&&G.seats[d].human&&!UI.busy&&!document.querySelector('#pc [data-a=take]'))});ok=s?ok+1:0;await p.waitForTimeout(250)}};
-  const dismissCards=async()=>{for(let k=0;k<8;k++){try{const l=p.locator('#pc:not([hidden]) [data-a=coachok],#pc:not([hidden]) [data-a=sunkok],#pc:not([hidden]) [data-ph=dismiss]').first();if(!(await l.count()))break;await l.tap({timeout:4000})}catch(e){}await p.waitForTimeout(250)}};
+  const dismissCards=async()=>{await p.waitForFunction(()=>!UI.busy,null,{timeout:60000}).catch(()=>{}); // result cards wait for the replay to end
+    for(let k=0;k<8;k++){try{const l=p.locator('#pc:not([hidden]) [data-a=coachok],#pc:not([hidden]) [data-a=sunkok],#pc:not([hidden]) [data-ph=dismiss]').first();if(!(await l.count()))break;await l.tap({timeout:4000})}catch(e){}await p.waitForTimeout(250)}};
   // tap targets >= 44
   const targets=async tag=>{const r=await p.evaluate(()=>{const o=[];for(const e of document.querySelectorAll('.gx-bar button,#ps button,#ppop button,#pc button,#netst button')){const R=e.getBoundingClientRect();if(!R.width||!R.height)continue;const cs=getComputedStyle(e);if(cs.visibility==='hidden')continue;if(R.width<43.5||R.height<43.5)o.push((e.dataset.a||e.dataset.ph||e.className||e.tagName)+':'+Math.round(R.width)+'x'+Math.round(R.height))}return o});if(r.length)prob(tag,'SMALL TAP TARGETS',JSON.stringify(r.slice(0,6)))};
   const overlap=(A,B)=>A[0]<B[2]&&A[2]>B[0]&&A[1]<B[3]&&A[3]>B[1];

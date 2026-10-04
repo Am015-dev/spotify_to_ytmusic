@@ -45,7 +45,7 @@ function phHint(){if(UI.res&&UI.res.text)return esc(UI.res.text);return ''}
 // ---------- the control strip ----------
 function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoomBtn();
   if(G.over&&!UI.busy)return `<div class="ps-main"><div class="ps-msg"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
-  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">Skip</button>${zb}</div></div><div class="ps-hint">${phHint()}</div>`}
+  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on?'Skip to my turn':'Skip'}</button>${zb}</div></div><div class="ps-hint">${phHint()}</div>`}
   if(d<0)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const dh=G.seats[d].human;
   if(NET.on&&dh&&d!==NET.mySeat)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>${esc(nm(d))}</b> is deciding...</div><div class="ps-ctl">${zb}</div></div>`;
@@ -57,7 +57,7 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   const c=phPlaceCtx();if(!c)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';
   hand.forEach((card,t)=>{const on=can&&sel.t===t;
-    if(isCur(card)){const r=sel?sel.r:0;let bd='',lab='';if(can){const A=analyse(K,dd,{a:'place',t,r,s:sel.s});bd=`<i class="bd ${A.bad?'sink':'safe'}">${A.bad?'&#10007;':'&#10003;'}</i>`;lab=A.bad?', sinks':', safe'}
+    if(isCur(card)){const r=sel?sel.r:0;let bd='',lab='';if(can){const A=analyse(K,dd,{a:'place',t,r,s:sel.s});const rk=!!phRisk(K,A);bd=`<i class="bd ${A.bad?'sink':rk?'risk':'safe'}">${A.bad?'&#10007;':rk?'!':'&#10003;'}</i>`;lab=A.bad?', sinks':rk?', safe now but a leviathan could swim onto your path next roll':', safe'}
       tiles+=`<button class="pt${on?' sel':''}" data-a="card" data-t="${t}" data-owner="${dd}" data-up="1" aria-label="Tile ${t+1}${lab}"><img alt="" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[card]],{rot:r,size:80,uid:'s'+t})}">${bd}</button>`}
     else tiles+=`<button class="pt sp${on?' sel':''}" data-a="card" data-t="${t}" data-owner="${dd}" data-up="1" aria-label="${isGate(card)?'Rift Gate':'Deck Cannon'}">${isGate(card)?gateArt():cannonArt()}</button>`});
   let ctl='';if(can&&isCur(hand[sel.t])){const m={a:'place',t:sel.t,r:sel.r,s:sel.s},err=legal(m,dd);
@@ -65,18 +65,23 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   const hint=PH.pop==='tiles'?'':(can?phTileHint(K,dd,hand,sel):'Nothing can be laid: pick an option.');
   return `<div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-hint">${PH.toast?esc(PH.toast):hint}</div>`}
 function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+phGoal()+phFeed():'';if(h!==PH.strip){PH.strip=h;el.innerHTML=h}}
+// "safe now, but...": a leviathan whose own arrows can bring it onto the square in front of where you stop, or onto your tile, on its next wake roll
+function phRisk(K,A){if(!A||A.bad||!A.end)return null;const sq=[A.end];if(A.on)sq.push(A.on);const out=[];for(const id of A.mons||[]){const m=K.mons.find(x=>x.id===id&&x.k==='L');const f=m?monHits(m,sq):[];if(f.length)out.push({id,f})}return out.length?out:null}
 // whose turn it is, in plain words
-function phWhose(i){const me=youSeat();return i===me&&me>=0&&!hotSeat()?'<b>Your turn</b>':'<b>'+esc(nm(i))+"'s turn</b>"}
+function phWhose(i){const me=youSeat();return i===me&&me>=0&&!hotSeat()?'<b>Your turn</b>'+(UI.busy?': the dice roll first':''):'<b>'+esc(nm(i))+"'s turn</b>"}
 // what to do with the tiles: pick, turn, place; and when every tile sinks this way round, say that turning can fix it
-function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0;try{hand.forEach((c,t)=>{if(!isCur(c))return;if(!analyse(K,d,{a:'place',t,r:sel.r,s:sel.s}).bad)safeNow++;else if([0,1,2,3].some(r=>!analyse(K,d,{a:'place',t,r,s:sel.s}).bad))safeTurn++})}catch(e){}
-  if(safeNow)return 'Pick a tile (&#10003; safe, &#10007; sinks), turn it if you like, then press Place. The gold line on the board is your route.';
+function phTileHint(K,d,hand,sel){let safeNow=0,safeTurn=0,risk=null;try{const cs=hand[sel.t];if(isCur(cs))risk=phRisk(K,analyse(K,d,{a:'place',t:sel.t,r:sel.r,s:sel.s}))}catch(e){}
+  if(risk){const r=risk[0];let calm=false;try{calm=hand.some((c,t)=>isCur(c)&&[0,1,2,3].some(rr=>{const A=analyse(K,d,{a:'place',t,r:rr,s:sel.s});return !A.bad&&!phRisk(K,A)}))}catch(e){}
+    return `<b>!</b> Safe now, but if the dice total 6, 7 or 8, <b>${esc(levName(r.id))}</b> swims onto your path on its roll of ${r.f.join(' or ')}${risk.length>1?' (and '+(risk.length-1)+' more)':''}. ${calm?'Another tile or turn gives a &#10003;.':'No &#10003; this turn: every route is within a leviathan\'s reach.'}`}
+  try{hand.forEach((c,t)=>{if(!isCur(c))return;if(!analyse(K,d,{a:'place',t,r:sel.r,s:sel.s}).bad)safeNow++;else if([0,1,2,3].some(r=>!analyse(K,d,{a:'place',t,r,s:sel.s}).bad))safeTurn++})}catch(e){}
+  if(safeNow)return 'Pick a tile, turn it if you like, then press Place. &#10003; safe &middot; <b>!</b> a leviathan could reach you next roll &middot; &#10007; sinks. The gold line is your route.';
   if(safeTurn)return 'Every tile sinks you this way round. Press Turn to find a &#10003;.';
   return 'Every tile sinks you: pick the one that does least harm.'}
 // the goal and the race, always on screen: who is still afloat
-function phGoal(){if(!G||!UI.started||G.phase==='setup'&&!G.turn)return '';const so=G.variant==='solo',es=G.variant==='easysolo';const me=youSeat();
+function phGoal(){if(!G||!UI.started||UI.busy||G.phase==='setup'&&!G.turn)return '';const so=G.variant==='solo',es=G.variant==='easysolo';const me=youSeat();
   if(so||es){const toRise=G.mdeck.filter(x=>x<10).length,L=G.mons.filter(m=>m.k==='L').length;return `<div class="ps-goal">${so?`Goal: outlast every leviathan &middot; ${toRise} still to rise, ${L} on the board`:`Goal: stay afloat until turn ${G.opts.goal} (now ${G.turn})`}</div>`}
-  const live=G.ships.filter(s=>s.alive).length;
-  return `<div class="ps-goal">Last junk afloat wins &middot; ${G.order.map(i=>{const s=G.ships[i];const n=i===me&&me>=0&&!hotSeat()?'You':esc(nm(i));return `<i style="background:${colOf(i).sail}"></i>${s.alive?n:'<s>'+n+'</s>'}`}).join(' ')} <small>(${live} afloat)</small></div>`}
+  const lab=i=>`<i style="background:${colOf(i).sail}"></i>${i===me&&me>=0&&!hotSeat()?'You':esc(nm(i))}`;const up=G.order.filter(i=>G.ships[i].alive),dn=G.order.filter(i=>!G.ships[i].alive);
+  return `<div class="ps-goal">Last junk afloat wins. <b>Afloat:</b>${up.map(lab).join('')}${dn.length?` &middot; <b>Sunk:</b><s>${dn.map(lab).join('')}</s>`:''}</div>`}
 // what happened since your last move, in order, so nothing changes off-screen (the replay can be skipped or missed)
 function phFeed(){if(!G||!UI.started||UI.busy||G.over||G.phase==='setup'||UI.myLogI==null)return '';
   const L=G.log.filter(l=>l.i>UI.myLogI&&!/^Turn \d+/.test(l.t)&&!/ draws? /.test(l.t)).reverse();if(!L.length)return '';
@@ -87,7 +92,7 @@ function phTilesHTML(c){const {d,K,hand,sel,pl}=c;if(!pl.length||!sel)return '';
   const m={a:'place',t:sel.t,r:sel.r,s:sel.s};let selA=null,tiles='';
   hand.forEach((card,t)=>{const on=sel.t===t;
     if(isCur(card)){const A=analyse(K,d,{a:'place',t,r:sel.r,s:sel.s});if(on)selA=A;
-      tiles+=`<button class="ph-t${on?' sel':''}" data-ph="pcard" data-t="${t}" data-owner="${d}" data-up="1" aria-label="Tile ${t+1}: ${A.bad?'sinks':'safe'}, ${phWhy(A)}">${phMini(card,sel.r,A)}<span class="bd ${A.bad?'sink':'safe'}">${A.bad?'SINKS':'SAFE'}</span><small>${esc(phWhy(A))}</small></button>`}
+      tiles+=`<button class="ph-t${on?' sel':''}" data-ph="pcard" data-t="${t}" data-owner="${d}" data-up="1" aria-label="Tile ${t+1}: ${A.bad?'sinks':'safe'}, ${phWhy(A)}">${phMini(card,sel.r,A)}<span class="bd ${A.bad?'sink':phRisk(K,A)?'risk':'safe'}">${A.bad?'SINKS':phRisk(K,A)?'RISKY':'SAFE'}</span><small>${esc(phWhy(A))}</small></button>`}
     else tiles+=`<button class="ph-t sp${on?' sel':''}" data-ph="pcard" data-t="${t}" data-owner="${d}" data-up="1" aria-label="${isGate(card)?'Rift Gate':'Deck Cannon'}">${isGate(card)?gateArt():cannonArt()}<span class="bd">${isGate(card)?'GATE':'CANNON'}</span></button>`});
   const cur=isCur(hand[sel.t]);const err=cur?legal(m,d):'';
   return `<div class="ph-head"><b>${multi?esc(nm(d))+': lay':'Lay'} a current</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div>
@@ -139,7 +144,8 @@ function phCards(){const pc=$('#pc');if(!pc)return;const kind=PH.on?phNeed():nul
   if(src){if(kind==='q'){const w=document.createElement('div');w.className='pc-in';w.appendChild(src);pc.replaceChildren(w);PH.cur={kind,html:'q'+G.logN}}
     else{const w=document.createElement('div');w.className='pc-in';const cl=src.cloneNode(true);w.appendChild(cl);
       for(const b of cl.querySelectorAll('[data-a=sunkok],[data-a=coachok]'))b.textContent='Continue';
-      if(kind==='mph'||kind==='over'){const r=document.createElement('div');r.className='row';r.innerHTML=`<button class="btn pri" data-ph="dismiss">Continue</button>`;w.appendChild(r)}
+      if(kind==='over'){const rw=cl.querySelector('.row');if(rw){const sb=document.createElement('button');sb.className='btn';sb.dataset.ph='dismiss';sb.textContent='See the board';rw.appendChild(sb)}}
+      if(kind==='mph'){const r=document.createElement('div');r.className='row';r.innerHTML=`<button class="btn pri" data-ph="dismiss">Continue</button>`;w.appendChild(r)}
       html=w.innerHTML;if(!PH.cur||PH.cur.kind!==kind||PH.cur.html!==html){const fresh=pc.hidden||!PH.cur||PH.cur.kind!==kind;pc.replaceChildren(w);PH.cur={kind,html};if(fresh){pc.classList.remove('in');void pc.offsetWidth;pc.classList.add('in')}}}}
   else if(!PH.cur||PH.cur.kind!==kind){pc.hidden=true;pc.innerHTML='';PH.cur=null;return}
   pc.hidden=false;PH.cur.block=true;

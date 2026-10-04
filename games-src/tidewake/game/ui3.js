@@ -6,7 +6,7 @@ function traceSteps(B,x,y,e,over){const st=[];let cx=x,cy=y,ce=e,n=0;
 // what a placement does, straight from the engine's own path rules (simPlace / follow)
 function analyse(K,seat,m){const S=K.ships[m.s],tile=K.hands[seat][m.t];const sim=simPlace(K,S.x,S.y,tile,m.r);const mine=sim.res[m.s];
   const A={st:mine.st,coll:sim.coll.includes(m.s),mons:[],steps:traceSteps(K,S.x,S.y,S.e,[tile,m.r]),others:[]};
-  if(mine.st==='ok'){A.end=[mine.x,mine.y];A.n=mine.path.length;for(const mo of K.mons){if(mo.k!=='L')continue;const near=[[mine.x,mine.y]];if(mine.on)near.push(mine.on);if(near.some(q=>Math.abs(q[0]-mo.x)+Math.abs(q[1]-mo.y)===1))A.mons.push(mo.id)}}
+  if(mine.st==='ok'){A.end=[mine.x,mine.y];A.on=mine.on||null;A.n=mine.path.length;for(const mo of K.mons){if(mo.k!=='L')continue;const near=[[mine.x,mine.y]];if(mine.on)near.push(mine.on);if(near.some(q=>Math.abs(q[0]-mo.x)+Math.abs(q[1]-mo.y)===1))A.mons.push(mo.id)}}
   else if(mine.st==='mon')A.mon=mine.id;
   A.others=sim.movers.filter(i=>i!==m.s).map(i=>({i,st:sim.res[i].st,coll:sim.coll.includes(i)}));
   A.bad=A.st==='edge'||A.st==='mon'||A.coll;return A}
@@ -48,7 +48,10 @@ function questionHTML(d,K){const q=G.q;let extra='';const you=d===viewSeat()||hu
   return `<div class="prompt ${q.kind==='doom'?'alert':'ask'}" data-qkind="${q.kind}"><h4>${q.kind==='doom'?'Quick: '+(you?'your':esc(nm(d))+"'s")+' junk is in danger!':q.kind==='cannonDraw'?(you?'You':esc(nm(d)))+' drew a Deck Cannon':'Choose'}</h4><p>${esc(title)}</p>${extra}<div class="opts">${q.opts.map((o,i)=>`<button class="btn${/Accept/.test(o.l)?' warn':''}" data-a="q" data-i="${i}">${esc(o.l)}</button>`).join('')}</div>${timed?`<div class="qtimer" title="Time left"><i id="qbar"></i></div><p class="cd" id="qtxt">${UI.qTime>0?UI.qTime:25} s to decide, then the computer's best advice is used.</p>`:''}</div>`}
 function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='place'),gts=mv.filter(m=>m.a==='gate'),cns=mv.filter(m=>m.a==='cannon'),pas=mv.find(m=>m.a==='pass');
   const hand=K.hands[d];let sel=UI.sel;const fronts=[...new Set(pl.map(m=>m.s))];
-  if(pl.length){if(!sel||!pl.some(m=>m.t===sel.t)||!fronts.includes(sel.s)){const f=pl.find(m=>m.s===d)||pl[0];sel=UI.sel={t:f.t,r:(sel&&sel.r)||0,s:f.s}}}
+  if(pl.length){if(!sel||!pl.some(m=>m.t===sel.t)||!fronts.includes(sel.s)){const own=pl.filter(m=>m.s===d);let f=own[0]||pl[0];
+    // start on a tile that is safe (and not in a leviathan's reach) rather than tile 1 unturned, which could be a red cross with Place greyed out
+    try{let best=-1;for(const m of own){const A=analyse(K,d,m);const v=A.bad?0:(typeof phRisk==='function'&&phRisk(K,A))?1:2;if(v>best){best=v;f=m}if(v===2)break}}catch(e){}
+    sel=UI.sel={t:f.t,r:f.r!=null?f.r:0,s:f.s}}}
   UI.canPlace=pl.length>0;UI.moves=mv;
   const full=UI.guide==='full',multi=hotSeat()||humans().length>1;
   let outcome='',m=null,A=null,btn='',err='';
