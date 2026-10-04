@@ -58,10 +58,17 @@ if(want('gate')){const p=await (await b.newContext({viewport:{width:960,height:5
   M.warp(P[0][0],P[0][1],Math.atan2(P[2][0]-P[0][0],P[2][1]-P[0][1]));M.roamSim(3);window.__P=P;window.__G=G;return{x:G.x|0,z:G.z|0}});
  let last=null;for(let k=0;k<30&&!(last&&last.out);k++)last=await p.evaluate(()=>{const M=__mho,R=M.RO,K=M.K,P=__P,G=__G;for(let t=0;t<60;t++){let bi=0,bd=1e9;for(let i=0;i<P.length;i++){const d=Math.hypot(P[i][0]-R.x,P[i][1]-R.z);if(d<bd){bd=d;bi=i}}
    const tg=bi>=P.length-2?[G.x+(G.x-P[P.length-3][0])*3,G.z+(G.z-P[P.length-3][1])*3]:P[Math.min(P.length-1,bi+2)];let a=Math.atan2(tg[0]-R.x,tg[1]-R.z)-R.h;a=Math.atan2(Math.sin(a),Math.cos(a));K.ArrowLeft=a>.04;K.ArrowRight=a<-.04;K.ArrowUp=R.v<20;M.roamSim(1);
-   if(!R.on){K.ArrowLeft=K.ArrowRight=K.ArrowUp=false;return{x:R.x,z:R.z,h:R.h,v:R.v,out:1}}}return{x:R.x,z:R.z,v:R.v}});
+   if(!R.on){K.ArrowLeft=K.ArrowRight=K.ArrowUp=false;return{x:R.x,z:R.z,h:R.h,v:R.v,out:1}}
+   if(window.__sm&&__sm.on&&M.athd()==='B'){K.ArrowLeft=K.ArrowRight=K.ArrowUp=false;return{x:R.x,z:R.z,h:R.h,v:R.v,out:1,seamless:1,on:R.on,ld:!document.querySelector('#ld2').hidden}}}return{x:R.x,z:R.z,v:R.v}});
+ if(last&&last.seamless){ // seamless Athens (pSM1): one map, the border is crossed without a reload or a loading screen
+  ok(last.on&&!last.ld,'gate: keyboard drive across the A→B border switches the district seamlessly (no reload, no loading screen)',{...g,v:+last.v.toFixed(1)});
+  const a=await p.evaluate(()=>{const M=__mho,R=M.RO;M.roamSim(30);return{v:+R.v.toFixed(1),d:M.athd(),air:+(R.y-M.gnd(R.x,R.z,R.y+.3)).toFixed(2),on:R.on}});
+  ok(a.d==='B'&&a.on&&a.v>5&&a.air<.5,'gate: in district B, still rolling, on the ground',a);
+  const mv=await p.evaluate(()=>{const M=__mho,R=M.RO,K=M.K,x=R.x,z=R.z;K.ArrowUp=true;M.roamSim(120);K.ArrowUp=false;return Math.round(Math.hypot(R.x-x,R.z-z))});ok(mv>20,'gate: car drives on after the switch',mv);await p.context().close()}
+ else{
  ok(last&&last.out,'gate: keyboard drive through the DRIVE TO gate A→B triggers the district switch',g);
  await p.waitForFunction(()=>window.__mho&&__mho.state==='roam'&&__mho.RO.on&&__mho.athd()==='B',null,{timeout:600000,polling:1000});await F.on(p);
  const a=await p.evaluate(()=>{const M=__mho,R=M.RO;return{x:R.x,z:R.z,h:R.h,v:R.v,d:M.athd(),air:+(R.y-M.gnd(R.x,R.z,R.y+.3)).toFixed(2)}});
  const dp=Math.hypot(a.x-last.x,a.z-last.z);ok(a.d==='B'&&dp<5&&Math.abs(a.h-last.h)<.1&&a.v>last.v*.8&&a.air<.5,'gate: arrives in district B at the same spot, heading and speed, on the ground',{dp:+dp.toFixed(1),v:[+last.v.toFixed(1),+a.v.toFixed(1)],air:a.air});
- const mv=await p.evaluate(()=>{const M=__mho,R=M.RO,K=M.K,x=R.x,z=R.z;K.ArrowUp=true;M.roamSim(120);K.ArrowUp=false;return Math.round(Math.hypot(R.x-x,R.z-z))});ok(mv>20,'gate: car drives on after the switch',mv);await p.context().close()}
+ const mv=await p.evaluate(()=>{const M=__mho,R=M.RO,K=M.K,x=R.x,z=R.z;K.ArrowUp=true;M.roamSim(120);K.ArrowUp=false;return Math.round(Math.hypot(R.x-x,R.z-z))});ok(mv>20,'gate: car drives on after the switch',mv);await p.context().close()}}
 ok(!errs.length,'no page / console errors',errs.slice(0,4));console.log(`${fails?'FAILED '+fails:'ALL PASS'} · ${pass} passed`);await b.close();process.exit(fails?1:0)})();
