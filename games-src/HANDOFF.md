@@ -11,6 +11,14 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Don't edit the Mainhattan / Overdrive games; other sessions own them. Ticket to Ride is on hold.
 - Read the root `CLAUDE.md` (lessons learnt + cost rules), then `games-src/BRIEF-2d-games.md`.
 
+## NOW (4 Oct, evening) — start here
+- Goal of the next session: finish **Sunglaze** then **Cauldron Fair** to the blind-tester bar in `CLAUDE.md`.
+  Their board-first work is on branches `board/sunglaze` (preview `games/sunglaze-next/`, fun 2.93) and
+  `board/cauldron-fair` (PR #47 open; preview `games/cauldron-fair/`).
+- All other cloud sessions are archived and all scheduled triggers deleted. Unfinished board-first branches (do not
+  touch this round): board/kaiten-kitchen, board/nebula-aces, board/short-fuse, board/crown-city-smash,
+  board/shipwreck-isle, board/doorkick-dungeon.
+
 ## Where things stand (4 Oct 2026)
 - **Thornbound** is the quality pilot. It has blind playtests (`games-src/thornbound/playtest-1/`) and the spec
   `games-src/thornbound/CLARITY-PLAN.md`. A redesign is being built into `games/thornbound-new/`. Next: run 3 NEW
