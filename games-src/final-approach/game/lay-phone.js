@@ -77,7 +77,7 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
       if (placed === 3) { await scroll('midgame'); await shot('4mid'); await panel('mid'); await targets('mid'); await clipped('mid'); }
     }
     log('placements by touch', placed); if (placed < Math.min(TURNS, 3)) fail('too few placements by touch', placed);
-    { const cl = await p.$('#rs:not([hidden]) [data-a=rsclose]'); if (cl) { await cl.tap(); await p.waitForTimeout(250); } }
+    { const over = await p.evaluate(() => !!G.result); if (over) { await shot('5over'); for (let k = 0; k < 20 && !(await p.$('#rs:not([hidden]) [data-a=rsclose]')); k++) await p.waitForTimeout(400); } const cl = await p.$('#rs:not([hidden]) [data-a=rsclose]'); if (cl) { await cl.tap(); await p.waitForTimeout(400); } }
     for (const id of ['logd', 'rulesd', 'setd', 'crewd']) { await p.tap(`.gx-bar [data-gx=${id}]`); await p.waitForTimeout(450); await scroll('drawer ' + id); if (!(await p.evaluate(i => document.getElementById(i).classList.contains('on'), id))) fail('drawer did not open', id); if (id === 'setd') { await shot('5menu'); await targets('menu'); } await p.tap('.gx-drawer.on .gx-x'); await p.waitForTimeout(250); }
     // ---- finish with computers on both seats, then look at the end screen
     await p.evaluate(() => { const k = document.querySelector('#pc [data-a=tipoff]'); if (k) k.click(); G.ai = [true, true]; AIDELAY = 0; schedule(); });

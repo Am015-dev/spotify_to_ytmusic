@@ -237,3 +237,7 @@ CC0 (optional thanks, shown in every game): Kenney; Pro Sensory, LEGIT Audio (Op
 
 Kenney zips: the "Continue without donating" link on each asset page (kenney.nl/media/pages/assets/<pack>/.../kenney_<pack>.zip).
 
+
+## Final Approach (reuse only)
+`final-approach/` ships 15 sfx and 1 music track that are copied, unchanged, from samples already listed above (no new source files, no new licences):
+click, error, hum (= engine_loop), switch (= token), beep (= lock), engine, boom, alarm (= stress), round (= turn), win, lose from `nebula/`; dieland (= clack), roll (= shake), whoosh from `crown/`; coffee (= coins) from `rampart/`; `music.main` = `shipwreck/music.calm` ("Seaside Village" by KarateStudios, CC0). Mapping, sizes and credits: `final-approach/ASSETS.md`, `final-approach/MAP.md`, `final-approach/credits.html`; licence snapshots copied to `final-approach/licence-snapshots/`.
