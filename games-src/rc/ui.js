@@ -151,6 +151,7 @@ function closeMenu(){const m=$('#moremenu');if(m&&m.classList.contains('open')){
 const SCEN_ORDER=['marooned','hexed','stranded','settlers'];
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">A co-operative survival game for 1–4 castaways. Plan every day together, build a camp, explore the island and hold out against the weather until your goal is done.</p>
+   <div class="mb guided"><button class="btn go big" data-a="guided">New here? Play a guided first game ▶</button><small>Marooned on the Easier setting, with a short tip on each new screen.</small></div>
    ${saved?`<div class="mb"><button class="btn go" data-a="continue">Continue the saved game</button></div>`:''}
    ${typeof onlineBlock==='function'?onlineBlock():''}
    <h3>Scenario</h3><div class="scens">${SCEN_ORDER.map((k,ix)=>{const S=SCENARIOS[k];return `<button class="scen ${o.scen===k?'on':''}" data-scen="${k}"><b>${ix+1}. ${esc(S.n)}</b><small>${S.rounds} rounds</small><span>${esc(S.x)}</span></button>`}).join('')}</div>
@@ -213,6 +214,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   if(d.pgo){setPStep(+d.pgo);render();return}
   if(d.pq!=null){const p=priorities()[+d.pq];const cur=curPawn();if(p&&p.act&&cur){const e=place(cur.id,p.act.type,p.act.tgt,p.act.alt);if(e)toast(e);else{sfx('place');UI.sugWhy[JSON.stringify([p.act.type,p.act.tgt])]=p.title;UI.sel=null;wizPlaced();refresh()}}return}
   if(d.tut){if(d.tut==='off')tutDone();else UI.tut++;render();return}
+  if(d.gtip){if(d.gtip==='off')UI.guide.on=false;else UI.guide.seen[d.gtip]=1;sfx('click');refresh();return}
   if(d.place){const o=JSON.parse(decodeURIComponent(d.place));doPlace(o.type,o.tgt,o.alt);return}
   if(d.rm){unplace(d.rm);UI.sel=null;refresh();return}
   if(d.pawn&&b.closest('.pawnrow')&&placedIds().has(d.pawn)&&planOpen()){unplace(d.pawn);UI.sel=d.pawn;UI.ps.pick=true;refresh();return}
@@ -249,7 +251,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'moveask':G.moveAsk=b.checked?1:0;return;
   case 'okreport':UI.report=null;render();return;
   case 'overok':UI.overSeen=true;render();return;
-  case 'new':openStart();return;case 'start':beginGame();return;case 'continue':loadSaved();return;
+  case 'new':openStart();return;case 'start':UI.guide.on=false;beginGame();return;case 'guided':Object.assign(UI.setup,{scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:true,items:4,diff:'easy'});UI.guide={on:true,seen:{}};beginGame();return;case 'continue':loadSaved();return;
   case 'rulesstart':UI.modal=null;$('#modal').hidden=true;$('#modal').dataset.h='';GX.show('rulesd');UI.backToStart=!G;return;
   case 'cards':GX.show('cardsd');renderCards();return;case 'rules':GX.show('rulesd');return;case 'close':UI.modal=G?null:'start';if(!G)$('#modal').dataset.h='';render();return;
   case 'snd':toggleSound();return;case 'mus':toggleMusic();return;

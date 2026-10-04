@@ -9,7 +9,7 @@ function planHtml(){
   const bar=`<div class="wz-steps" aria-label="Planning: step ${st} of 4">${titles.map((t,k)=>`<button class="wz-s ${k+1<st?'done':k+1===st?'now':''}" data-pgo="${k+1}" ${k+1===st?'aria-current="step"':''}><i>${k+1<st?'✓':k+1}</i><span>${t}</span></button>`).join('')}</div>`;
   const head=`<h3 class="wz-t">${st}. ${titles[st-1]}</h3>`;
   const body=st===1?wzNeeds():st===2?wzAssign():st===3?wzReview():wzConfirm();
-  return `<div class="wz">${bar}${typeof netPlanBar==='function'?netPlanBar():''}${head}${body}</div>`}
+  return `<div class="wz">${bar}${typeof netPlanBar==='function'?netPlanBar():''}${guideTip('plan'+st)}${head}${body}</div>`}
 // ---------- plan step state ----------
 UI.ps={round:0,step:1,skip:[],pick:false};
 function pstep(){if(!G)return 1;if(UI.ps.round!==G.round){UI.ps={round:G.round,step:1,skip:[],pick:false};UI.sugWhy={}}return UI.ps.step}
@@ -28,7 +28,7 @@ function wzNeeds(){const need=eatersNeed(),have=food(),planF=plannedFood();const
   const low=living().filter(c=>!c.npc).sort((a,b)=>lifeLeft(a)-lifeLeft(b))[0];
   let h=`<p class="wz-p">Before you give out jobs, look at what the camp needs today. Red means trouble tonight.</p>`;
   const ml=morningLines();if(ml.length)h+=`<div class="morn"><b>This morning:</b><ul>${ml.map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ul></div>`;
-  h+=`<div class="needs">`+row(have+planF>=need,'Food for tonight',`${have+planF} of ${need}`,`Everyone eats 1 food at night. Hungry: 2 wounds each.${planF?` (${planF} of it is planned.)`:''}`)
+  h+=`<div class="needs">`+row(have+planF>=need+wxFoodLoss(),'Food for tonight',`${have+planF} of ${need}${wxFoodLoss()?' +'+wxFoodLoss():''}`,`Everyone eats 1 food at night. Hungry: 2 wounds each.${planF?` (${planF} of it is planned.)`:''}${wxFoodLoss()?` Rain above your roof will likely ruin about ${wxFoodLoss()} food first.`:''}`)
     +row(hasShelter(),'Shelter',hasShelter()?'yes':'none',hasShelter()?'Keeps you from sleeping in the open.':'Tonight everyone loses 1 life without one.')
     +row(cl.est<=G.camp.roof,'Roof',`${G.camp.roof}`,`Weather tonight: ${cl.dice.length?cl.dice.map(d=>dieN[d]).join(', '):'calm'}${G.wx.rain?` +${G.wx.rain} rain`:''}${G.wx.snow?` +${G.wx.snow} snow`:''}${G.wx.storm?' + a storm':''}. Each cloud above the roof ruins 1 food and 1 wood.`)
     +row(!G.ev.wait||BEAST[G.ev.wait].str<=G.weapon,'Weapon',`${G.weapon}`,G.ev.wait?`A ${BEAST[G.ev.wait].n} (strength ${BEAST[G.ev.wait].str}) attacks at dawn.`:'Used when you hunt or a beast attacks.')
@@ -116,7 +116,7 @@ function catRows(k){const o=[];const add=(type,tgt,title,sub,alt)=>{const why=ta
 const CAT_TIP={gather:'1 pawn rolls the dice (it may fail or hurt); 1 more pawn makes it sure. Places 2 steps from camp need +1 pawn. Numbers are the places on the map.',explore:'Explore a ❔ place next to the land you know. 1 pawn rolls the dice, 1 more makes it sure; 2 steps from camp: +1 pawn.',build:'Building rolls the dice with 1 pawn (4-in-6 wound risk!); 2 pawns make it sure.',threat:'Threat cards strike at the next dawn if they are still in the left slot. Dealing with one needs no dice.'};
 function catHtml(k){const rows=catRows(k);const ok=rows.filter(r=>!r.why),no=rows.filter(r=>r.why);const tip=CAT_TIP[k]?`<p class="cattip">ℹ️ ${CAT_TIP[k]}</p>`:'';
   const line=r=>{const key=encodeURIComponent(JSON.stringify({type:r.type,tgt:r.tgt,alt:r.alt}));const planned=findActAny(r.type,r.tgt,r.alt);const sel=UI.sel;const pw=sel&&!r.why?placeWhy(sel,r.type,r.tgt,r.alt):null;
-    return `<div class="job ${r.why?'no':''} ${planned?'has':''}" ${posAttr({type:r.type,tgt:r.tgt})}><div class="jt"><b>${esc(r.title)}</b><span>${esc(r.sub)}${r.why?` <em>(${esc(r.why)})</em>`:''}</span></div>${r.why?'':`<button class="btn add" data-place="${key}" ${pw?'disabled':''} title="${esc(pw||'Put '+(sel?pawnLabel(pawnInfo(sel)):'a pawn')+' on this')}">+</button>`}</div>`};
+    return `<div class="job ${r.why?'no':''} ${planned?'has':''}" ${posAttr({type:r.type,tgt:r.tgt})}><div class="jt"><b>${esc(r.title)}</b><span>${esc(r.sub)}${r.why?` <em>(${esc(r.why)})</em>`:''}</span></div>${r.why?'':`<button class="btn add" data-place="${key}" ${pw?'aria-disabled="true"':''} title="${esc(pw||'Put '+(sel?pawnLabel(pawnInfo(sel)):'a pawn')+' on this')}">+</button>`}</div>`};
   return tip+(ok.length?ok.map(line).join(''):'<p class="muted small">Nothing possible here right now.</p>')+(no.length?`<details class="later"><summary>Not possible yet (${no.length})</summary>${no.map(line).join('')}</details>`:'')}
 
 // the day so far, never ahead of the story

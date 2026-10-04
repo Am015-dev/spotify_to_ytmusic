@@ -18,7 +18,9 @@ function storyActive(){return storyIdx()>=0}
 function viewState(){const i=storyIdx();if(i<0||i>=UI.beats.length-1)return null;const b=UI.beats[i];if(!b.snap)return null;if(!b.obj)b.obj=JSON.parse(b.snap);return b.obj}
 function withView(fn){const s=viewState();if(!s)return fn();const b=UI.beats[storyIdx()];const real=G;G=Object.assign({},s,{log:real.log,stk:[],phase:b.phase==='start'?'event':b.phase,round:b.round});try{return fn()}finally{G=real}}
 function storyNext(){const i=storyIdx();if(i<0)return;if(i===UI.beats.length-1&&humanQ())return;UI.shown=i;UI.seenBeat=null;sfx('click');refresh()}
-function storySkip(){if(humanQ())UI.shown=UI.beats.length-2;else UI.shown=UI.beats.length-1;UI.seenBeat=null;refresh()}
+// skip ahead, but stop at the next scene that costs you something (a wound, lost food...) or the day's summary, so nothing hurts you unseen
+function skipStop(i){for(let k=i+1;k<UI.beats.length-1;k++){if(skippable(k))continue;const b=UI.beats[k];if(b.kind==='daysum'||b.kind==='over'||beatLines(k).some(l=>l.c==='bad'))return k}return -1}
+function storySkip(){const i=storyIdx();const k=i<0?-1:skipStop(i);if(k>=0)UI.shown=k-1;else if(humanQ())UI.shown=UI.beats.length-2;else UI.shown=UI.beats.length-1;UI.seenBeat=null;refresh()}
 function charBark(ci,kind,seed){const c=ci!=null&&ci>=0?P(ci):null;if(!c)return '';const f=FL().chars&&FL().chars[c.k];const l=f&&pickL(f[kind],seed);return l?`<div class="bark" style="--pc:${PCOL[c.i%6]}"><b>${esc(c.nm)}:</b> “${esc(l)}”</div>`:''}
 const KIND_ICON={prod:'🧺',daysum:'📋',go:'🧭',finds:'🎒',intro:'🏝️',dawn:'🌅',event:'📜',threat:'⚠️',morning:'☀️',act:'🧭',adventure:'❓',mystery:'🗝️',fight:'⚔️',weather:'⛈️',night:'🌙',over:'🏁'};
 const ACT_ICON={threat:'⚠️',hunt:'🏹',build:'🔨',gather:'🧺',explore:'🧭',camp:'🏕️',rest:'😴',special:'⭐',tmap:'🗺️'};
@@ -37,9 +39,10 @@ function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines
   case 'prod':{kicker='Morning';title='What the camp gives';story=esc(pickL((F.phase||{}).prod,b.id));break}
   case 'daysum':{const s=daySumHtml(i);kicker=s.kicker;title=s.title;card=s.body;break}
   case 'act':{const c=d.actor>=0?P(d.actor):null;icon=ACT_ICON[d.type]||icon;kicker=c?esc(c.nm):'Friday';title=esc(d.label);
-    const ok=lines.some(l=>l.c==='good'||l.c==='big')&&!lines.some(l=>/fails\./.test(l.t));const failed=lines.some(l=>/fails\./.test(l.t));
+    const ok=lines.some(l=>l.c==='good'||l.c==='big')&&!lines.some(l=>/fails\./.test(l.t));const failed=lines.some(l=>/fails\./.test(l.t))||!!(d.dice&&!d.dice.s);
     if(d.type==='explore'){const t=lines.find(l=>/New land/.test(l.t));const terr=t&&/place \d+: (\w+)/.exec(t.t);story=esc(terr?((F.phase||{}).explore||{})[terr[1]]||'':pickL((F.phase||{}).exploreFail,b.id));if(terr&&terr[1]==='mountains'&&G.scen==='marooned')story+=' From the peak we can see the shipping lane: this is where a signal fire could be seen.'}
     else if(d.type==='build')story=esc(failed?'':pickL((F.phase||{}).build,b.id));else if(d.type==='gather')story=esc(failed?'':pickL((F.phase||{}).gather,b.id));else if(d.type==='threat')story=esc(((F.ev||{})[d.card]||{}).t||pickL((F.phase||{}).threatDone,b.id));
+    if(d.dice&&!d.dice.s&&!lines.some(l=>/fails\./.test(l.t)))story=esc('The dice went against us. It is not done yet.');
     {const k0=jobNo(i);const res=failed?'<div class="outcome bad">Result: it failed.</div>':ok?'<div class="outcome good">Result: it worked.</div>':'';
      extra=`<div class="jobhd">${k0?`Job ${k0.k} of ${k0.n} · `:''}${d.dice?'Too few pawns to be sure: the dice were rolled.':'Enough pawns: certain, no dice.'}</div>`+(d.dice?diceHtml(d.dice,b.id):'')+res}
     extra+=charBark(d.actor,lines.some(l=>/wound/.test(l.t)&&l.c==='bad')?'hurt':failed?'fail':'success',b.id);break}
@@ -67,10 +70,13 @@ function renderStory(){const el=$('#story');if(!el)return;if(!G||UI.modal==='sta
   const outs=auto?`<div class="result"><b>Result</b>${res.length?`<ul>${res.map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ul>`:`<p>Nothing happened.</p>`}</div>`:h.chips?`<ul class="outs">${h.chips}</ul>`:'';
   const last=i>=UI.beats.length-1;const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';const jn=b.kind==='act'?jobNo(i):null;
   const qk=b.kind==='daysum'?`<label class="chk qk"><input type="checkbox" data-a="quick" ${UI.quick?'checked':''}> Quick days: from day 2, skip the automatic steps (Morale, Production, Weather)</label>`:'';
-  const body=`${phaseHeadHtml(i)}<div class="sk">${h.icon} ${h.kicker}</div><h2>${h.title}</h2>${h.story?`<p class="story">${h.story}</p>`:''}${h.card}${h.extra}${outs}${qk}
-    ${q?`<div class="qbox">${who}<div class="qk">Your choice</div><h3>${esc(q.title)}</h3>${qd}<div class="opts">${q.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${esc(o.l)}</button>`).join('')}</div></div>`:
-     (typeof netStoryCtl==='function'&&netStoryCtl(i,nextL,jn))||`<div class="sctl"><button class="btn go" data-a="next" autofocus>${nextL}</button>${allAI()?'':`<button class="btn ghost ${UI.auto?'on':''}" data-a="auto" title="Play the scenes by themselves, one after another">▶▶ Play by itself: ${UI.auto?'on':'off'}</button>`}${i<UI.beats.length-2?`<button class="btn ghost" data-a="skip" title="Jump straight to your next decision (everything is still in the Log)">Skip to my next choice</button>`:''}${jn?`<span class="prog">Job ${jn.k} of ${jn.n}</span>`:''}</div>`}`;
-  const sig=b.id+':'+(q?q.title:'')+':'+G.logN+':'+UI.auto+(typeof netSig==='function'?netSig():'');el.hidden=false;if(el.dataset.id!==sig){el.dataset.id=sig;el.innerHTML=`<div class="scene ${b.kind}">${body}</div>`;const f=el.querySelector('[autofocus],.opt');if(f&&!UI.noFocus)f.focus({preventScroll:true})}
+  // a choice comes first, right under the title: the card text and results that explain it follow below
+  const qb=q?`<div class="qbox first">${who}<div class="qk">Your choice</div><h3>${esc(q.title)}</h3>${qd}<div class="opts">${q.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${esc(o.l)}</button>`).join('')}</div>${h.card||h.extra||outs?'<p class="qmore">The card and what happened so far are below.</p>':''}</div>`:'';
+  const gk=q?'choice':b.kind==='act'?(b.data.dice?'dice':'act'):b.kind;const gt=typeof guideTip==='function'?guideTip(gk==='dice'&&UI.guide.seen.dice?'act':gk):'';
+  const body=`${gt}${phaseHeadHtml(i)}<div class="sk">${h.icon} ${h.kicker}</div><h2>${h.title}</h2>${h.story?`<p class="story">${h.story}</p>`:''}${qb}${h.card}${h.extra}${outs}${qk}
+    ${q?'':
+     (typeof netStoryCtl==='function'&&netStoryCtl(i,nextL,jn))||`<div class="sctl"><button class="btn go" data-a="next" autofocus>${nextL}</button>${allAI()?'':`<button class="btn ghost ${UI.auto?'on':''}" data-a="auto" title="Play the scenes by themselves, one after another">▶▶ Play by itself: ${UI.auto?'on':'off'}</button>`}${i<UI.beats.length-2?`<button class="btn ghost" data-a="skip" title="Jump ahead. It stops at anything that hurts you, at your next choice and at the end of the day">Skip ahead ⏭</button>`:''}${jn?`<span class="prog">Job ${jn.k} of ${jn.n}</span>`:''}</div>`}`;
+  const sig=b.id+':'+(q?q.title:'')+':'+G.logN+':'+gt.length+':'+UI.auto+(typeof netSig==='function'?netSig():'');el.hidden=false;if(el.dataset.id!==sig){el.dataset.id=sig;el.innerHTML=`<div class="scene ${b.kind}">${body}</div>`;const f=el.querySelector('[autofocus],.opt');if(f&&!UI.noFocus)f.focus({preventScroll:true})}
   if(UI.toTop){UI.toTop=0;const bd=document.querySelector('.gx-dock-body');if(bd)bd.scrollTop=0}
   clearTimeout(UI.autoT);if(!q&&(UI.auto||allAI())&&!UI.pause&&!(typeof isClient==='function'&&isClient())&&!(typeof netOn==='function'&&netOn()&&G.q&&i>=UI.beats.length-1)){const n=beatLines(i).length;UI.autoT=setTimeout(storyNext,(1600+Math.min(8,n)*380)/(UI.speed||1))}}
 function lastPlanBeat(i){for(let k=i;k>=0;k--)if(UI.beats[k].kind==='go'||UI.beats[k].kind==='plan')return k;return -1}

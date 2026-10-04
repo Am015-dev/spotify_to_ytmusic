@@ -48,7 +48,8 @@ function daySumData(i){const b=UI.beats[i];const r=b.data.round;let k0=-1;for(le
   const A=k0>=0?beatState(k0):null;const B=beatState(i);return {r,A,B}}
 function daySumHtml(i){const {r,A,B}=daySumData(i);const S=SCENARIOS[G.scen];const ch=[];
   if(A&&B){const nm={food:'Food',pfood:'Dry food',wood:'Wood',fur:'Fur'};for(const k of ['food','pfood','wood','fur']){const a=A.res[k]+(A.fut&&A.fut[k]||0),z=B.res[k];if(a!==z)ch.push({t:`${nm[k]}: ${a} → ${z}`,c:z>a?'good':'bad'})}
-    B.chars.forEach((c,j)=>{const o=A.chars[j];if(!o||c.npc&&G.scen!=='stranded')return;const la=lifeOf(A,o),lz=lifeOf(B,c);if(c.dead&&!o.dead)ch.push({t:`${c.nm} died`,c:'bad'});else if(la!==lz)ch.push({t:`${c.nm}: ${la} → ${lz} life`,c:lz>la?'good':'bad'})});
+    const why=dayWhy(r);B.chars.forEach((c,j)=>{const o=A.chars[j];if(!o||c.npc&&G.scen!=='stranded')return;const la=lifeOf(A,o),lz=lifeOf(B,c);const w=why.hurt[c.nm]?` (${why.hurt[c.nm].join(', ')})`:'';if(c.dead&&!o.dead)ch.push({t:`${c.nm} died${w}`,c:'bad'});else if(la!==lz)ch.push({t:`${c.nm}: ${la} → ${lz} life${lz<la?w:''}`,c:lz>la?'good':'bad'})});
+    if(why.food.length){const f=ch.find(x=>/^Food:/.test(x.t));if(f)f.t+=` (${why.food.join(', ')})`}
     if(A.fri&&B.fri&&A.fri.w!==B.fri.w)ch.push({t:`Friday: ${FRIDAY.die-A.fri.w} → ${Math.max(0,FRIDAY.die-B.fri.w)} life`,c:B.fri.w>A.fri.w?'bad':'good'});
     if(A.morale!==B.morale)ch.push({t:`Morale: ${A.morale} → ${B.morale}`,c:B.morale>A.morale?'good':'bad'});
     const sa=withState(A,()=>hasShelter()),sz=withState(B,()=>hasShelter());if(sa!==sz)ch.push({t:sz?'Shelter built':'Shelter lost',c:sz?'good':'bad'});
@@ -63,6 +64,17 @@ function daySumHtml(i){const {r,A,B}=daySumData(i);const S=SCENARIOS[G.scen];con
     body:`<div class="dsum">${!A?'':`<h4>What changed today</h4>`+(ch.length?`<ul class="chg">${ch.map(x=>`<li class="${x.c}">${esc(x.t)}</li>`).join('')}</ul>`:'<p class="muted small">Nothing changed.</p>')}
       <h4>Coming tomorrow (day ${r+1})</h4><ul class="tmr">${tm.lines.map(l=>`<li class="${l.c||''}">${esc(l.t)}</li>`).join('')}</ul>
       <div class="top1"><div class="rk">Most important tomorrow</div><b>${esc(tm.top.t)}</b><span>${esc(tm.top.why)}</span></div></div>`}}
+// why life and food went down on day r, read from the log: {hurt:{name:['no shelter ×2',...]}, food:['eaten 2','spoiled 1',...]}
+function dayWhy(r){const hurt={},food=[];const cnt={};
+  for(const l of G.log.slice().reverse()){if(l.r!==r)continue;let m=/^(.+?) takes (\d+) wounds? \((.+)\)\./.exec(l.t);
+    if(m){const k=m[1]+'|'+m[3];cnt[k]=(cnt[k]||0)+(+m[2]);continue}
+    m=/^☠ (.+?) dies \((.+)\)/.exec(l.t);if(m){const k=m[1]+'|'+m[2];cnt[k]=(cnt[k]||0)+1;continue}
+    if((m=/^Everyone eats \((\d+) food\)/.exec(l.t)))food.push(`eaten ${m[1]}`);
+    else if((m=/^(\d+) food spoils/.exec(l.t)))food.push(`${m[1]} spoiled overnight`);
+    else if((m=/(\d+) food and \d+ wood are ruined/.exec(l.t)))food.push(`${m[1]} ruined by rain`);
+    else if((m=/^Lean season: (\d+) food/.exec(l.t)))food.push(`${m[1]} lost to the lean season`)}
+  for(const k in cnt){const [nm,w]=k.split('|');(hurt[nm]=hurt[nm]||[]).push(`${w}${cnt[k]>1?' ×'+cnt[k]:''}`)}
+  return {hurt,food}}
 // run inside withState(state at the end of day r)
 function tomorrowInfo(r){const S=SCENARIOS[G.scen];const L=[];const n=r+1;const dieN={rain:'rain die',snow:'winter die',animals:'hungry-animals die'};
   if(n>G.rounds)return {lines:[{t:'This was the last day.'}],top:{t:'—',why:''}};
