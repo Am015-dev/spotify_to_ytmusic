@@ -31,6 +31,8 @@
 .gx-ref-q{width:100%;box-sizing:border-box;min-height:44px;font:inherit;padding:6px 12px;border-radius:10px;border:1px solid var(--gx-line);background:rgba(255,255,255,.6);color:inherit}
 .gx-chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:6px 0 0}
 .gx-chips::-webkit-scrollbar{display:none}
+.gx-chips>*{flex:none}
+.gx-ref-list[hidden],.gx-ref-big[hidden]{display:none}
 .gx-ref-n{font-size:.82em;opacity:.75;padding-top:4px}
 .gx-ref-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:8px}
 .gx-ref-it{appearance:none;font:inherit;color:inherit;text-align:left;display:flex;gap:10px;align-items:flex-start;padding:8px;border-radius:12px;border:1px solid var(--gx-line);background:rgba(255,255,255,.35);cursor:pointer;min-height:64px}

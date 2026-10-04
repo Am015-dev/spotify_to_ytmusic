@@ -287,7 +287,7 @@
   // ------------------------------------------------------------------ undo
   // GX.undo.config({get:()=>state, set:state=>{...re-render...}, owner:state=>seat|null, online:()=>bool, allowOnline:false,
   //                 onChange:fn(can)})
-  // snap() before each human move; check() after it (seals when the turn passed to someone else);
+  // snap() before each human move; check() after it (seals when the turn passed to someone else); drop() if the move was refused;
   // seal() when hidden information was revealed or the move is confirmed. undo() restores the last snapshot.
   GX.undo = (function () {
     var C = { get: null, set: null, owner: null, online: null, allowOnline: false, onChange: null, max: 40 }, st = [], ow = null;
@@ -310,6 +310,8 @@
         if (sealIf) { var before; try { before = JSON.parse(st[st.length - 1].s); } catch (e) { before = null; } try { if (sealIf(before, now)) return U.seal('reveal'); } catch (e) { } }
       },
       seal: function (why) { if (st.length) { st = []; U.why = why || 'sealed'; changed(); } return false; },
+      // the move was rejected by the rules: forget its snapshot without restoring anything
+      drop: function () { if (st.length) { st.pop(); changed(); } },
       clear: function () { st = []; ow = null; changed(); },
       can: function () { return U.enabled() && st.length > 0; },
       size: function () { return st.length; },
@@ -422,6 +424,7 @@
   GNS.saved = function (game, has) { var s = LS.json('gns-saves', {}) || {}; if (has) s[game] = Date.now(); else delete s[game]; LS.put('gns-saves', s); };
   GNS.result = function (r) {
     r = r || {}; if (!r.game) return null;
+    if (DEFS[r.game]) GNS.achievements(r.game, DEFS[r.game]); // keep the shelf's list of names even if storage was cleared
     var seats = r.seats || [], me = -1;
     seats.forEach(function (s, i) { if (me < 0 && s && s.me) me = i; });
     var humans = seats.filter(function (s) { return s && !s.ai; }).length;

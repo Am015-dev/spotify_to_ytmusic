@@ -24,7 +24,7 @@ HEAD = '''<!doctype html>
 :root{{--bg:#1d1411;--card:#2b1d17;--ink:#f4ead8;--muted:#bca78c;--brass:#e0a948;--line:#4a3326;color-scheme:dark}}
 @media (prefers-color-scheme:light){{:root{{--bg:#efe3cc;--card:#f8f0e0;--ink:#2a1a10;--muted:#6d5640;--brass:#8a5a0e;--line:#d2bb95;color-scheme:light}}}}
 *{{box-sizing:border-box}}
-body{{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:0 16px calc(32px + env(safe-area-inset-bottom,0px))}}
+body{{margin:0;overflow-wrap:anywhere;background:var(--bg);color:var(--ink);font:17px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:0 16px calc(32px + env(safe-area-inset-bottom,0px))}}
 main{{max-width:46em;margin:0 auto}}
 nav.top{{display:flex;flex-wrap:wrap;gap:4px 14px;max-width:46em;margin:0 auto;padding:calc(12px + env(safe-area-inset-top,0px)) 0 4px}}
 nav.top a,footer a{{color:var(--brass);font-weight:600;display:inline-flex;align-items:center;min-height:44px}}
@@ -40,7 +40,7 @@ th,td{{text-align:left;vertical-align:top;padding:6px 8px;border-bottom:1px soli
 .tw{{overflow-x:auto}}
 details{{background:var(--card);border:1px solid var(--line);border-radius:10px;margin:8px 0}}
 summary{{cursor:pointer;padding:10px 14px;min-height:44px;font-weight:600}}
-pre{{white-space:pre-wrap;word-break:break-word;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;margin:0;padding:0 14px 14px}}
+pre{{white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;margin:0;padding:0 14px 14px}}
 footer{{max-width:46em;margin:36px auto 0;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line);padding-top:8px}}
 a{{color:var(--brass)}}
 </style></head><body>

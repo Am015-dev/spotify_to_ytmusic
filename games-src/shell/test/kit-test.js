@@ -188,6 +188,10 @@ test('undo: seal() on confirm; snapshots are deep copies', () => {
   w.GX.undo.snap(); S.st.hand.push(9); w.GX.undo.undo(); eq(S.st.hand, [1, 2]);
   w.GX.undo.snap(); w.GX.undo.seal('confirm'); ok(!w.GX.undo.can());
 });
+test('undo: drop() forgets a refused move without restoring', () => {
+  const w = page(), S = undoGame(w);
+  w.GX.undo.snap(); S.st.n = 5; w.GX.undo.drop(); ok(!w.GX.undo.can()); eq(S.st.n, 5);
+});
 test('undo: off online unless the game opts in; onChange reports', () => {
   const w = page(); let on = true, seen = [];
   undoGame(w, { online: () => on, onChange: c => seen.push(c) });
