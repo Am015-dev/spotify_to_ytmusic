@@ -251,7 +251,7 @@ function move(G0, seat, level, opt) {
   const base = cost(G, seat);
   const scored = cand.filter(m => m.t === 'place' || m.t === 'toss').map(m => ({ m, s: base - cost(afterMove(G, m, seat), seat) }));
   scored.sort((a, b) => b.s - a.s);
-  if (level !== 'easy') { const free = freeAction(G, seat, cand, base); if (free) return free; }
+  if (level !== 'easy' || rand() < 0.6) { const free = freeAction(G, seat, cand, base); if (free) return free; }
   if (opt.eps && rand() < opt.eps && scored.length > 1) return scored[Math.min(scored.length - 1, 1 + Math.floor(rand() * 2))].m;   // exploration for training data
   if (level === 'easy') {
     // a beginner partner: usually the sensible move, now and then another sensible one (never one that is clearly a disaster)
