@@ -1,4 +1,4 @@
-// clarity checks for the phone screens (jsdom, ?phone=1): node clarity-test.js [games]
+// clarity checks for the older phone panel (?bf=0) (jsdom, ?phone=1): node clarity-test.js [games]
 // Each check is one thing a blind playtester could not follow:
 //  best   the "★ best" rack is never worse right now (fill points minus its own broken tiles) than another rack
 //  sun    a rack's breakage number never hides the Sun token; the token's -1 is shown on its own
@@ -9,7 +9,7 @@
 const {JSDOM}=require('jsdom');const fs=require('fs');const html=fs.readFileSync(__dirname+'/sunglaze.html','utf8');
 const N=+process.argv[2]||6;const fails={};const seen={};let bad=0;
 const fail=(k,msg)=>{fails[k]=(fails[k]||0)+1;if(fails[k]<=3)console.log('FAIL',k,msg);bad++};const ok=k=>seen[k]=(seen[k]||0)+1;
-function run(seed){return new Promise(res=>{const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'http://localhost/?phone=1'});const w=dom.window,d=w.document;
+function run(seed){return new Promise(res=>{const dom=new JSDOM(html,{runScripts:'dangerously',pretendToBeVisual:true,url:'http://localhost/?phone=1&bf=0'});const w=dom.window,d=w.document;
   w.addEventListener('load',()=>{const E=s=>w.eval(s);E(`AIDELAY=0;ANIM=0;setSeed(${seed});try{localStorage.clear()}catch(e){}`);
     d.querySelector('[data-ui=start]').dispatchEvent(new w.MouseEvent('click',{bubbles:true}));const st=d.querySelector('[data-ui=story-ok]');if(st)st.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));
     let guard=0;
