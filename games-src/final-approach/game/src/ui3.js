@@ -13,7 +13,7 @@ function newGame(mode, o) {
   G = FA.newGame({ scenario: sc.id, seed, abil: mode === 'guided' ? [] : abil, names, ai });
   if (mode === 'guided') { G.script = GUIDED_SCRIPT.slice(); }
   UI.mode = mode; UI.seat = mode === 'guided' ? 0 : cfg.role; UI.holder = mode === 'hot' ? -1 : UI.seat; UI.started = true; UI.sel = -1; UI.cof = 0; UI.hint = null; UI.over = null; UI.overShown = false; UI.rrm = [false, false, false, false];
-  UI.coach = { level: mode === 'guided' ? 'full' : (UI.prefs.guide || 'off'), seen: {}, tip: '', queue: [] }; UI.lastPlace = null; UI.rt = G.mods.real ? { left: 60000, last: 0 } : null;
+  UI.coach = { level: o.tipsOff ? 'off' : mode === 'guided' ? 'full' : (UI.prefs.guide || 'off'), seen: {}, tip: '', queue: [] }; UI.lastPlace = null; UI.rt = G.mods.real ? { left: 60000, last: 0 } : null;
   const st = $('#start'); if (st) st.hidden = true; closeRS(); try { GX.close(); } catch (e) { } closePass(); hideRecap();
   { const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } }   // a tip left over from the last flight
   clearSave(); render(); sndMusic(); coachTick(); schedule();
@@ -71,6 +71,8 @@ function slotTap(k) {
   if (FA.validMoves(G, v).some(x => x.t === 'place' && x.d === m.d && x.to === k && (x.c || 0) === m.c)) {
     // the last dice are needed on the empty Axis / Engines: a second tap on the same space places anyway
     const mi = mandInfo(v); if (UI.sel !== 'p' && mi && mi.tight && !mi.lost && !mi.need.includes(k) && UI.warnK !== k) { UI.warnK = k; snd('error'); toast('Careful: the ' + needNames(mi.need) + ' would stay empty and the flight is lost at the end of the round. Tap again to place it anyway.'); return; }
+    // this die here ends the flight at once: the first tap only explains, a second tap places it
+    if (UI.dead && UI.dead[k] && UI.warnK !== k) { UI.warnK = k; snd('error'); toast('Careful: ' + UI.dead[k]); return; }
     UI.warnK = null; sendMove(v, m); return; }
   const val = (UI.sel === 'p' ? G.pend.d.val : G.dice[v][UI.sel].v) + UI.cof; const S = FA.SLOT[k];
   const why = S.s !== null && S.s !== v ? 'That space belongs to the ' + (S.s === 0 ? 'pilot' : 'co-pilot') + '.' : (S.grp === 'flaps' && S.ix > 0 && !G.pl.sw.fl[S.ix - 1]) ? 'Flaps go in order: use the one above first.' : (S.grp === 'brakes' && S.ix > 0 && !G.pl.sw.br[S.ix - 1]) ? 'Brakes go in order: 2, then 4, then 6.' : (S.grp === 'ice' && S.ix !== G.pl.ice) ? 'Only the next icy-runway column can be used.' : (S.grp === 'intern' && G.intern.length && val === (v === 0 ? G.intern[0] : G.intern[G.intern.length - 1])) ? 'The die must differ from the next trainee token.' : S.vals ? slotName(k) + ' ' + slotNeed(k) + ' (your die shows ' + val + ').' : 'That does not fit.';
@@ -108,13 +110,15 @@ function whyMove(m, v) {
   if (m.t !== 'place') return m.t + ' looks useful here.';
   const val = (m.d === 'p' ? G.pend.d.val : G.dice[v][m.d].v) + (m.c || 0), S = FA.SLOT[m.to], pre = m.c ? 'With a coffee making it ' + val + ', ' : 'A ' + val + ' ';
   switch (S.grp) {
-    case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; return n ? pre + 'on the radio clears a plane on space ' + at + '.' : pre + 'on the radio would clear nothing; only use it as a spare die.'; }
-    case 'axis': return pre + 'on the axis ' + (G.slots.ax0 || G.slots.ax1 ? 'finishes the pair and keeps the plane safe (it must end level in the last round).' : 'goes first: a middle value is easy for your crewmate to match.');
-    case 'engines': return pre + 'on the engines ' + (G.slots.en0 || G.slots.en1 ? 'finishes the speed. Check the markers: ' + G.pl.aeroB + ' and ' + G.pl.aeroO + '.' : 'sets the speed for the round; your crewmate completes it.');
+    case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0, sp = at === G.planes.length ? 'the airport' : 'space ' + at; return n ? pre + 'on the radio clears a plane on ' + sp + '.' : pre + 'on the radio would clear nothing; it only gets rid of a spare die.'; }
+    case 'axis': { const o = G.slots['ax' + (1 - v)]; if (o) { const nx = G.pl.axis + (v === 0 ? o.v - val : val - o.v); return pre + 'on the axis against ' + name(1 - v) + '’s ' + o.v + ' leaves the plane ' + (nx === 0 ? 'level' : 'tilted ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right')) + ' (3 is a spin).'; }
+      return pre + 'on the axis goes first. ' + name(1 - v) + ' cannot see it coming and will answer with what their dice allow; a middle value leaves the most room.'; }
+    case 'engines': { const o = G.slots['en' + (1 - v)]; if (o) { const sm = val + o.v + FA.windMod(G), adv = FA.isFinal(G) ? -1 : sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return pre + 'on the engines makes ' + sm + (adv < 0 ? ' for the landing (brakes ' + FA.brakeVal(G) + ').' : ': the plane ' + (adv ? 'moves ' + adv + ' space' + (adv > 1 ? 's' : '') + '.' : 'stays put.')); }
+      return pre + 'on the engines sets half of the speed; ' + name(1 - v) + ' adds the other half (up to ' + G.pl.aeroB + ' stays, up to ' + G.pl.aeroO + ' moves 1, more moves 2).'; }
     case 'gear': return pre + 'lowers a landing gear (needed to land); the blue marker moves up.';
     case 'flaps': return pre + 'extends a flap (needed to land); the orange marker moves up.';
     case 'brakes': case 'ice': return pre + 'sets a brake: the last-round speed must be no more than the brake value.';
-    case 'conc': return pre + 'on Concentration earns a coffee token to bend a later die by one.';
+    case 'conc': return pre + 'on Coffee earns a coffee token: later, either of you can bend a die by one with it.';
     case 'kero': return pre + 'on the fuel space burns ' + val + '; skipping it would burn 6.';
     case 'intern': return pre + 'trains the trainee: take the next token and place it too.';
   }

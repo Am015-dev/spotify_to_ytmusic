@@ -324,7 +324,7 @@ function performMove(G, m, seat, trust) {
       nextTurn(G, G.turn);
       break;
     }
-    case 'rr': G.rrHand--; G.pend = { h: 'rr', d: { m: [0, 1].map(s => unusedDice(G, s).length ? null : [false, false, false, false]), by: seat } }; ev(G, { t: 'rruse', seat }); lg(G, 'A reroll token is spent: both crew may reroll.'); use(G, 'rerollUse'); break;
+    case 'rr': G.rrHand--; G.pend = { h: 'rr', d: { m: [0, 1].map(s => unusedDice(G, s).length ? null : [false, false, false, false]), by: seat } }; ev(G, { t: 'rruse', seat }); lg(G, (seat === 0 ? 'Pilot' : 'Co-pilot') + ' spends a reroll token: both crew may reroll.'); use(G, 'rerollUse'); break;
     case 'rrpick': {
       const mask = m.m.map((b, i) => !!b && !G.dice[seat][i].u); G.pend.d.m[seat] = mask; ev(G, { t: 'rrdone', seat });
       if (G.pend.d.m[0] && G.pend.d.m[1]) {

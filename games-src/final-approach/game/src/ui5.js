@@ -70,7 +70,7 @@ document.addEventListener('click', ev => {
     case 'tipok': tipOk(); break;
     case 'tipoff': UI.coach.level = 'off'; tipOk(); UI.prefs.guide = 'off'; savePrefs(); break;
     case 'rsclose': closeRS(); break;
-    case 'again': { const c = UI.cfg || {}; const m = UI.mode; closeRS(); if (m === 'net') { netStart(); break; } newGame(m, { scenario: c.scenario, role: c.role, level: c.level, abil: c.abil }); break; }
+    case 'again': { const c = UI.cfg || {}; const m = UI.mode, off = UI.coach && UI.coach.level === 'off'; closeRS(); if (m === 'net') { netStart(); break; } newGame(m, { scenario: c.scenario, role: c.role, level: c.level, abil: c.abil, tipsOff: off }); break; }
     case 'nextsc': { const c = UI.cfg || {}, i = D.scenarios.findIndex(s => s.id === c.scenario), n = D.scenarios[(i + 1) % D.scenarios.length]; closeRS(); const m = UI.mode === 'guided' ? 'vs' : UI.mode; UI.opt = Object.assign({}, UI.opt, { scenario: n.id, abil: [] }); newGame(m, { scenario: n.id, role: c.role, level: c.level, abil: [] }); break; }
     case 'play': UI.sv = 'setup'; renderStart(); break;
     case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;

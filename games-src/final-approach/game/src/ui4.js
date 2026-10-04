@@ -34,15 +34,16 @@ function myTurn() { const v = actSeat(); return typeof v === 'number' && v >= 0 
 function coachTick() {
   const c = UI.coach; if (!G || !UI.started || G.result || c.level === 'off') return;
   if (UI.mode === 'net' || UI.mode === 'hot' && UI.holder < 0) return;
+  if (c.tip && c.tipR !== G.round + ':' + G.phase) { c.seen[c.tip] = 1; c.tip = ''; c.more = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } applyHL(); }
   if (c.tip) return;
   const gate = G.round + ':' + myPlaced();
   for (const t of TIPS) { if (c.seen[t.id]) continue; const on = t.g === 0 ? c.level === 'light' && UI.mode !== 'guided' : t.g === 1 ? UI.mode === 'guided' : c.level === 'full' && UI.mode === 'vs'; if (!on) continue;   // g:2, the role-aware set, speaks to one person at one seat
-    if (t.ctl && c.gate === gate) continue; let ok = false; try { ok = t.when(); } catch (e) { } if (ok) { if (t.ctl) c.gate = gate; c.tip = t.id; c.more = false; showTip(t); return; } }
+    if (t.ctl && c.gate === gate) continue; let ok = false; try { ok = t.when(); } catch (e) { } if (ok) { if (t.ctl) c.gate = gate; c.tip = t.id; c.tipR = G.round + ':' + G.phase; c.more = false; showTip(t); return; } }
 }
 function showTip(t) {
   const pc = $('#pc'); if (!pc) return; pc.hidden = false; pc.innerHTML = ''; const c = UI.coach;
   const ids = TIPS.filter(x => x.g === t.g).map(x => x.id), n = ids.indexOf(t.id) + 1;
-  pc.append(h('div.tbr', h('div.tbt', h('div.tbh', h('b', tval(t.t)), h('span', t.g && n ? (t.g === 1 ? 'Step ' : 'Tip ') + n + ' of ' + ids.length : 'Tip')), h('p', tval(c.more ? t.x : t.s))), h('button.btn.go', { type: 'button', 'data-a': 'tipok' }, 'Got it')),
+  pc.append(h('div.tbr', h('div.tbt', h('div.tbh', h('b', tval(t.t)), h('span', t.g === 1 ? 'Guided flight' : 'Tip')), h('p', tval(c.more ? t.x : t.s))), h('button.btn.go', { type: 'button', 'data-a': 'tipok' }, 'Got it')),
     h('div.cbtns', c.more ? null : h('button.btn.alt', { type: 'button', 'data-a': 'tipmore', 'aria-expanded': 'false' }, 'More'), h('button.btn.alt', { type: 'button', 'data-a': 'tipoff' }, 'No more tips')));
   if (typeof renderDock === 'function' && G) renderDock();
   applyHL();
