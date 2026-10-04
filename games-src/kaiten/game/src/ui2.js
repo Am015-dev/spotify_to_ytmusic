@@ -56,11 +56,12 @@ function renderTable() {
     const cmp = rowH < 88, shw = av + 14, sl = Math.max(30, Math.min(58, Math.round((rowH - (cmp ? 12 : 36)) / 1.4)));
     const ctrW = cw - shw - sl - 25;
     // plates on the counter: one row, or two rows of bigger plates when the seat is tall enough (nothing clipped, labels readable)
-    const ng = groupsOf(s, tab, info).list.length + 1, cap = isMe ? 84 : 68, slotW = p => Math.max(p + 12, 66);
-    const fit = (rows, hgt) => { const k = Math.ceil(ng / rows); let p = Math.min(hgt, cap); if (k * slotW(p) > ctrW) p = Math.max(24, (ctrW / k) - 12); return slotW(p) * k > ctrW + 4 ? Math.min(p, 24) : p; };
-    const pd1 = fit(1, rowH - (isMe ? 34 : 32)), pd2 = ng > 2 ? fit(2, (rowH - 12) / 2 - 30) : 0;
-    const wrap = pd2 > pd1 + 4;
-    let pd = Math.max(24, Math.round(wrap ? pd2 : pd1));
+    // (a layout that fits wins over bigger plates that overflow past the edge)
+    const ng = groupsOf(s, tab, info).list.length + (pcs[s] || !isPh() ? 1 : 0), cap = isMe ? 84 : 68, slotW = p => Math.max(p + 12, 60);
+    const fit = (rows, hgt) => { const k = Math.ceil(ng / rows); let p = Math.max(24, Math.min(hgt, cap)); if (k * slotW(p) > ctrW) p = Math.max(24, (ctrW / k) - 12); return { p, ok: slotW(p) * k <= ctrW + 4 && hgt >= 24 }; };
+    const f1 = fit(1, rowH - (isMe ? 34 : 32)), f2 = ng > 2 ? fit(2, (rowH - 12) / 2 - 30) : { p: 0, ok: false };
+    const wrap = f2.ok && (!f1.ok || f2.p > f1.p + 4);
+    let pd = Math.max(24, Math.round(wrap ? f2.p : f1.p));
     const dm = { av, shw, sl, pd, cmp, wrap };
     const sg = seatSig(s, tab, info, pcs, isMe, dm) + '|' + sigAll;
     const old = oldSeats[s];
@@ -91,7 +92,7 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
   const ctr = h('div.ctr');
   const land = UI.land || new Set();
   for (const g of gs.list) ctr.appendChild(grpEl(g, dm.pd, land.has(s + '|' + g.k)));
-  if (isMe || pcs[s] || !(dm.cmp && isPh())) ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));   // a cramped rival seat drops the empty custard spot (the dock lists custard)
+  if (pcs[s] || !isPh()) ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));   // phones: the custard spot appears with the first cup (the dock lists custard)
   if (!gs.list.length && !pcs[s]) ctr.insertBefore(h('span.none', G.phase === 'pick' ? 'Nothing served yet' : ''), ctr.firstChild);
   el.appendChild(ctr);
   el.appendChild(slotEl(s, dm.sl, dm.cmp));
@@ -149,9 +150,9 @@ function renderBelt() {
   const m = Math.max(G.hand, 1), avail = beltWidth() - 20;
   const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? 74 : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
   // a tall phone: two rows of plates instead of a belt that scrolls sideways and hides plates off the edge
-  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 56 && boardSize().h >= 440 && m > 5 && hand.length > 0 && G.phase !== 'over';
+  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 56 && boardSize().h >= 440 && m > 5 && hand.length > 0 && G.phase !== 'over' && hand.length * 66 > avail + 6;   // back to one row once the hand fits
   if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(74, Math.floor((avail - (k - 1) * 6) / k))); }
-  else if (ph && one < hw && one >= 44) hw = one;   // shrink a little rather than hide plates past the edge
+  else if (ph && hand.length) { const fitN = Math.floor((avail - (hand.length - 1) * 6) / hand.length); if (fitN < hw) hw = Math.max(44, fitN); }   // shrink a little rather than hide plates past the edge
   belt.classList.toggle('two', !!two);
   $('#bd').style.setProperty('--hw', hw + 'px');
   if (!belt.__bt) { belt.__bt = 1; try { const bt = KIT.beltEl({ h: 72, period: 96, seconds: 6 }); bt.style.height = '60px'; $('#beltw').insertBefore(bt, belt); bt.style.bottom = '8px'; } catch (e) { } }
@@ -188,9 +189,9 @@ function promptText() {
   if (!G) return '';
   if (G.phase === 'over') return isPh() ? 'The meal is over.' : (G.winText || 'The meal is over.');
   const v = viewSeat();
-  if (UI.fz && UI.fz.say) return isPh() ? (UI.fz.slots ? (UI.fz.slots[0] && UI.fz.slots[0].mode === 'faces' ? 'Reveal!' : 'Plates are covered…') : UI.fz.roundEnd ? 'Round over!' : 'Plates land. Hands pass left.') : UI.fz.say;
+  if (UI.fz && UI.fz.say) return isPh() ? (UI.fz.slots ? (UI.fz.slots[0] && UI.fz.slots[0].mode === 'faces' ? 'Reveal!' : 'Plates are covered…') : UI.fz.roundEnd ? 'Round over!' : 'Plates land. Hands pass on.') : UI.fz.say;
   if (UI.cards.length && UI.cards[0].kind === 'pass') return 'Pass the device to ' + pname(UI.cards[0].seat) + '.';
-  if (UI.busy) return 'The hands pass one seat to the left…';
+  if (UI.busy) return 'The hands pass to the next diner…';
   if (watching()) return 'The computers are choosing a plate…';
   if (hotSeat() && v < 0) return 'Pass the device to the next diner.';
   const pend = KK.pending(G).filter(s => s !== v).map(pname);
@@ -214,7 +215,7 @@ function renderDock() {
     if (want && !hb && pd) pd.appendChild(h('button.btn.alt#hintb', { 'data-a': 'hint', type: 'button' }, 'Hint')); else if (!want && hb) hb.remove(); }
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' ? 'Game over' : (canPick() ? 'Your turn' : 'Table');
   // round track
-  const rt = $('#rt'); if (rt) { const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring); rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · pass left')); }
+  const rt = $('#rt'); if (rt) { const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring); rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · hands pass on')); }
   // roster chips
   const ro = $('#roster'); if (ro) {
     const tab = tables(), info = seatScoreInfo(tab), v = viewSeat(), f = focusSeat();
@@ -258,7 +259,7 @@ function renderSel() {
     const tp = UI.tip && UI.tip.turn === G.round + '.' + G.turn && canPick() ? UI.tip : null;
     if (tp) el.appendChild(h('div.tip', tp.type ? h('div.tcard', { html: plateS(tp.type, 30) }) : null, h('div', h('b', tp.title), ' ', tp.text)));
     const ne = newsEl(); if (ne && !(UI.fz && UI.fz.slots)) el.appendChild(ne);
-    if (!tp && !ne) el.appendChild(h('div.si', h('span', h('b', 'Goal: '), 'the most points after 3 rounds wins. Each turn everyone picks one plate, then the hands pass left. The green +N on a plate is what it scores you right now.')));
+    if (!tp && !ne) el.appendChild(h('div.si', h('span', h('b', 'Goal: '), 'the most points after 3 rounds wins. Each turn everyone picks one plate, then each hand passes to the next diner (shown under the table). The green +N on a plate is what it scores you right now.')));
     return;
   }
   let t;

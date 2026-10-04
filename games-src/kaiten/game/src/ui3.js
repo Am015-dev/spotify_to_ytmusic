@@ -162,7 +162,7 @@ async function playResolve(evs, preHand) {
     if (ANIM) { snd('cloche'); const hosts = $$('#tbl .hostc'); try { pxReveal(); await KIT.revealAll(hosts, { stagger: 110 }); } catch (e) { } await wait(850); } if (tok !== UI.seq) return;
     // 3: plates land on the counters
     const land = new Set(); rv.picks.forEach(p => p.cards.forEach(c => land.add(p.seat + '|' + keyOfCard(c)))); UI.land = land;
-    try { UI.news = buildNews(before, T, rv.picks); } catch (e) { UI.news = null; }
+    try { UI.news = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.news = null; }
     UI.fz.slots = null; UI.fz.tables = T; UI.fz.say = ps ? 'The plates land. Hands slide to the left…' : 'The plates land. The round is over!';
     if (sc) { UI.fz.roundEnd = true; UI.fz.hand = []; UI.fz.backN = 0; }
     render(); snd('clink'); await wait(750); if (tok !== UI.seq) return;

@@ -7,7 +7,7 @@ Format: what I think is happening | what I'd do | confidence 1-5 | confusion | f
 
 - 001 title | tap Play (not How to play) | 5 | the first text tap timed out, tapping by coordinates worked (a driver problem, probably not the game's fault) | 3
 - 003 "Who is at the counter?" | skip the guided game, pick Normal game | 5 | the guided game is the big red recommended button; Normal is the second option, which is fine. Configure is there but I didn't need it | 3
-- 005 R1 T1 table: 3 seat rows, a hand of 9 plates, green +N badges | it's like Sushi Go: pick one, the rest pass on. Took Seaweed Roll +6 | 4 | a faded "custard 0" slot already sits in my row before I've taken anything. What are the bells next to the opponents? The "passes to Odile / from Kofi" arrows are small | 4
+- 005 R1 T1 table: 3 seat rows, a hand of 9 plates, green +N badges | it's like conveyor-sushi drafting: pick one, the rest pass on. Took Seaweed Roll +6 | 4 | a faded "custard 0" slot already sits in my row before I've taken anything. What are the bells next to the opponents? The "passes to Odile / from Kofi" arrows are small | 4
 - 006 lifted card, detail panel, Serve(+6)/Hint/Cancel | Serve | 5 | two taps per pick is fine | 4
 - 008 T2: seats fill with chips ("1st now +6", "=3"), and a "Last turn" log | took Steam Bun | 4 | the +N badges vanished from the hand this turn and only came back once I lifted a card. Turn 1 shows them, later turns don't | 4
 - 011 T3: Odile has "×3 next nigiri" | grab Sunset Nigiri so Odile can't get it | 4 | after a misread I picked by position, fine | 4
