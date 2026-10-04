@@ -33,7 +33,7 @@ html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
 .bf-shake{animation:bfShake .5s linear}
 @keyframes bfShake{0%,100%{translate:0 0}20%{translate:-5px 2px}40%{translate:6px -3px}60%{translate:-4px 3px}80%{translate:3px -1px}}
 /* the reveal */
-.bfrev{position:fixed;inset:0;z-index:110;display:grid;place-items:center;align-content:center;gap:6px;background:radial-gradient(circle at 50% 45%,rgba(40,14,4,.55),rgba(0,0,0,.86));animation:bfIn .18s ease-out;cursor:pointer;overflow:hidden}
+.bfrev{position:fixed;inset:0;z-index:110;pointer-events:none;display:grid;place-items:center;align-content:center;gap:6px;background:radial-gradient(circle at 50% 45%,rgba(40,14,4,.55),rgba(0,0,0,.86));animation:bfIn .18s ease-out;cursor:pointer;overflow:hidden}
 .bfrev.out{opacity:0;transition:opacity .25s}
 .bfrev .bfburst{position:absolute;left:50%;top:45%;width:10px;height:10px;border-radius:50%;translate:-50% -50%;background:radial-gradient(circle,#fff6c8,#ffb03a 40%,rgba(255,80,20,0) 70%);animation:bfBurst .7s .25s ease-out both}
 .bfrev.k-mon .bfburst{background:radial-gradient(circle,#ffe2c8,#ff4a1a 40%,rgba(120,0,0,0) 70%)}
@@ -100,8 +100,8 @@ html.ph-l .hand{padding-top:14px}
 .bfbig .bfbstr{position:absolute;bottom:-12px;left:50%;translate:-50% 0;font:900 26px/1 var(--title);color:#ffd76a;background:#2a1208;border:2px solid #ffd76a;border-radius:20px;padding:4px 12px;text-shadow:0 2px 0 #000;white-space:nowrap}
 .bfbig .bfblv{position:absolute;top:-6px;right:-6px;font:800 15px/1 var(--title);color:#1a0d06;background:#ffd76a;border-radius:14px;padding:5px 8px}
 .bfbig[data-bfl]::after{top:auto;bottom:22%;translate:-50% 0}
-.bfcap{white-space:normal;overflow-wrap:anywhere;padding:0 4px;font:700 17px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;margin-top:16px;text-align:center;max-width:100%}
-.bfdoor.small{cursor:default;height:min(60%,calc(100cqh - 60px));max-width:40%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7)) brightness(.85)}
+.bfcap{position:relative;z-index:3;white-space:normal;overflow-wrap:anywhere;padding:0 4px;font:700 15px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;margin-top:16px;text-align:center;max-width:100%}
+.bfdoor.small{cursor:default;height:clamp(60px,calc(100cqh - 90px),240px);max-width:40%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7)) brightness(.85)}
 .bfdoor.small .bfdi{animation:none}
 .bfcap.sm{font-size:15px;margin-top:4px}
 .bfstage .row .card{--w:var(--cw)}
@@ -120,3 +120,7 @@ html.ph-l .hand{padding-top:14px}
 .bfbub.note{max-width:220px;background:#fff6dc}
 .mine .gear .gchip.eqoff{position:relative;opacity:.8}
 .bfx{font:700 11px/1 var(--ui,system-ui);color:#fff;background:#a23a2a;border-radius:6px;padding:2px 4px;margin-left:4px;white-space:nowrap}
+/* a glow means "good for you, now"; red glow = a card against a rival; dim = not now */
+.mine .hand .card.bf-no{filter:saturate(.55) brightness(.72)}
+html.bf-wait .mine .hand .card{filter:saturate(.7) brightness(.85)}
+.mine .hand .card.play.bf-mean{box-shadow:0 0 0 2px #ff6a5a,0 0 14px rgba(255,90,70,.75)!important}

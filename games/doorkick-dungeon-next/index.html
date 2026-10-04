@@ -664,7 +664,7 @@ html.bf-holding .mine .hand .card:not(.bf-picked){filter:brightness(.7)}
 .bf-shake{animation:bfShake .5s linear}
 @keyframes bfShake{0%,100%{translate:0 0}20%{translate:-5px 2px}40%{translate:6px -3px}60%{translate:-4px 3px}80%{translate:3px -1px}}
 /* the reveal */
-.bfrev{position:fixed;inset:0;z-index:110;display:grid;place-items:center;align-content:center;gap:6px;background:radial-gradient(circle at 50% 45%,rgba(40,14,4,.55),rgba(0,0,0,.86));animation:bfIn .18s ease-out;cursor:pointer;overflow:hidden}
+.bfrev{position:fixed;inset:0;z-index:110;pointer-events:none;display:grid;place-items:center;align-content:center;gap:6px;background:radial-gradient(circle at 50% 45%,rgba(40,14,4,.55),rgba(0,0,0,.86));animation:bfIn .18s ease-out;cursor:pointer;overflow:hidden}
 .bfrev.out{opacity:0;transition:opacity .25s}
 .bfrev .bfburst{position:absolute;left:50%;top:45%;width:10px;height:10px;border-radius:50%;translate:-50% -50%;background:radial-gradient(circle,#fff6c8,#ffb03a 40%,rgba(255,80,20,0) 70%);animation:bfBurst .7s .25s ease-out both}
 .bfrev.k-mon .bfburst{background:radial-gradient(circle,#ffe2c8,#ff4a1a 40%,rgba(120,0,0,0) 70%)}
@@ -731,8 +731,8 @@ html.ph-l .hand{padding-top:14px}
 .bfbig .bfbstr{position:absolute;bottom:-12px;left:50%;translate:-50% 0;font:900 26px/1 var(--title);color:#ffd76a;background:#2a1208;border:2px solid #ffd76a;border-radius:20px;padding:4px 12px;text-shadow:0 2px 0 #000;white-space:nowrap}
 .bfbig .bfblv{position:absolute;top:-6px;right:-6px;font:800 15px/1 var(--title);color:#1a0d06;background:#ffd76a;border-radius:14px;padding:5px 8px}
 .bfbig[data-bfl]::after{top:auto;bottom:22%;translate:-50% 0}
-.bfcap{white-space:normal;overflow-wrap:anywhere;padding:0 4px;font:700 17px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;margin-top:16px;text-align:center;max-width:100%}
-.bfdoor.small{cursor:default;height:min(60%,calc(100cqh - 60px));max-width:40%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7)) brightness(.85)}
+.bfcap{position:relative;z-index:3;white-space:normal;overflow-wrap:anywhere;padding:0 4px;font:700 15px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;margin-top:16px;text-align:center;max-width:100%}
+.bfdoor.small{cursor:default;height:clamp(60px,calc(100cqh - 90px),240px);max-width:40%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7)) brightness(.85)}
 .bfdoor.small .bfdi{animation:none}
 .bfcap.sm{font-size:15px;margin-top:4px}
 .bfstage .row .card{--w:var(--cw)}
@@ -751,6 +751,10 @@ html.ph-l .hand{padding-top:14px}
 .bfbub.note{max-width:220px;background:#fff6dc}
 .mine .gear .gchip.eqoff{position:relative;opacity:.8}
 .bfx{font:700 11px/1 var(--ui,system-ui);color:#fff;background:#a23a2a;border-radius:6px;padding:2px 4px;margin-left:4px;white-space:nowrap}
+/* a glow means "good for you, now"; red glow = a card against a rival; dim = not now */
+.mine .hand .card.bf-no{filter:saturate(.55) brightness(.72)}
+html.bf-wait .mine .hand .card{filter:saturate(.7) brightness(.85)}
+.mine .hand .card.play.bf-mean{box-shadow:0 0 0 2px #ff6a5a,0 0 14px rgba(255,90,70,.75)!important}
 
 </style>
 </head>
@@ -3727,7 +3731,8 @@ function bfZone(m,me){const c=m.card!=null?cd(m.card):null;const cb=G.cb;const i
   return null}
 // self-harm moves (curse yourself, boost your own monster) never glow; they stay in the card's details pop-up
 const bfHarm=m=>/yourself!|against yourself|helps a rival/.test(moveLabel(m));
-function bfMoves(me,id){if(me<0||!G||G.winner)return [];return cardMoves(me,id).filter(m=>m.act!=='sell'&&!bfHarm(m)).map(m=>({m,z:bfZone(m,me)})).filter(x=>x.z)}
+const BFSIDE=['berserk','turn','flight','toss','drop'];
+function bfMoves(me,id){if(me<0||!G||G.winner)return [];return cardMoves(me,id).filter(m=>m.act!=='sell'&&!bfHarm(m)).map(m=>({m,z:bfZone(m,me)})).filter(x=>x.z).sort((a,b)=>BFSIDE.includes(a.m.act)-BFSIDE.includes(b.m.act))}
 function bfEls(z){const q=s=>[...document.querySelectorAll(s)];
   if(z==='hero')return q('.bfbig,.mine .top,.mine .gear');if(z==='fh'){const me=viewSeat();const cb=G.cb;return q('.arena .score.hero'+(cb&&(cb.who===me||cb.help===me)?',.mine .top,.mine .gear':''))}if(z==='ms')return q('.arena .score.mons,.arena .row.mons .mon');
   if(z[0]==='m')return q(`.arena .row.mons .mon:nth-child(${+z.slice(1)+1})`);
@@ -3767,7 +3772,7 @@ function bfReveal(id,who){const c=cd(id);const me=viewSeat();const mine=who===me
   o.innerHTML=`<div class="bfburst"></div><div class="bfdh l">${cardBack('door')}</div><div class="bfdh r">${cardBack('door')}</div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
   document.body.appendChild(o);const dur=mine?1900:1050;
   setTimeout(()=>{if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click')},mine?420:300);
-  const close=()=>{if(!o.isConnected)return;o.classList.add('out');setTimeout(()=>o.remove(),260)};o.addEventListener('pointerdown',close);setTimeout(close,dur);
+  const close=()=>{if(!o.isConnected)return;o.classList.add('out');setTimeout(()=>o.remove(),260)};BF.revClose=close;setTimeout(close,dur);
   if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur)}
 // ---- cause and effect: cards fly from the rival who played them, numbers float up where they changed ----
 function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createElement('div');e.className='bffly';e.innerHTML=cardHTML(id,{attr:'tabindex="-1"',notitle:1});document.body.appendChild(e);
@@ -3775,7 +3780,7 @@ function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createEle
   const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(${quick?1:.6}) rotate(-8deg)`,opacity:1},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-60}px) scale(1.15) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.5)`,opacity:0}],{duration:quick?380:900,easing:'cubic-bezier(.3,.7,.3,1)'});a.onfinish=()=>e.remove()}
 function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;f.style.left=(r.left+r.width/2)+'px';f.style.top=(r.top+r.height/3)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1500)}
 function bfBubble(s,txt){const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),2600)}
-function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-228,r.left))+'px';b.style.top=Math.max(8,r.top-44)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),3600)}
+function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;const tb=document.querySelector('.table');const t=tb?tb.getBoundingClientRect():r;b.style.left='50%';b.style.translate='-50% 0';b.style.top=(t.top+6)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),3600)}
 function bfSnap(){if(!G)return null;const cb=G.cb;const me=viewSeat();const mp=me>=0&&G.pl[me]?P(me):null;return {gid:G.gid,turn:G.turn,kick:G.kicked,me,eq:mp?mp.eq.map(e=>e.id+':'+(e.on?1:0)):[],lvl:G.pl.map(p=>p.lvl),str:G.pl.map(p=>pStr(p)),
   cb:cb?{k:G.turn+':'+cb.who,enh:cb.mons.map(m=>m.enh.length),n:cb.mons.length,os:cb.os.length,help:cb.help,a:sideStr(cb),b:monStr(cb)}:null,ln:G.ln}}
 function bfDiff(S,N){if(!S||!N||S.gid!==N.gid)return;const me=viewSeat();const actor=G.log[0]?G.log[0].s:-1;const chip=s=>document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);
@@ -3837,12 +3842,15 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
   const _mine=mineHTML;mineHTML=function(me){const h=_mine(me);if(me<0||!G.pl[me])return h;const p=P(me);const av=bfAv(p,'bfav');
     return h.replace('<div class="top">',`<div class="top"><span class="bfhero" style="--c:${PCOL[p.i]}">${av}<b class="bfstr" aria-label="strength">⚔${pStr(p)}</b></span>`)};
   const _prompt=promptHTML;promptHTML=function(me){let h=_prompt(me);const line=bfLine(me);
-    h=h.replace('<div id="prompt">',`<div id="prompt" class="${G&&G.q?'bfq':''}">`);
+    h=h.replace('<div id="prompt">',`<div id="prompt" class="${G&&G.q?'bfq':''}">`+(/autonote/.test(h)?'':autoNoteHTML()));
     h=h.replace(/✨ Play suggested cards? \((\d+)\)/,'✨ Auto ($1)').replace(/🏃 Run away \((?:need \d\+: )?([^)]*)\)/,'🏃 Run ($1)').replace('🏃 Run (this monster can’t be escaped)','🏃 Run (no chance)').replace('🙋 Ask for help','🙋 Get help').replace('🚪 Kick open the door','🚪 Kick!').replace('💰 Sell items','💰 Sell');
     const i=h.indexOf('<p class="say">');const tag=`<p class="bfline">${esc(line)}</p>`;
     if(i>=0)h=h.slice(0,i)+tag+h.slice(i);else h=h.replace(/(<div class="who">.*?<\/div>)/,'$1'+tag);return h};
   const _render=render;render=function(){const S=BF.snap;const r=_render.apply(this,arguments);try{bfAfter(S)}catch(e){UI.lastErr='bf '+e}return r}})();
 function bfAfter(S){if(!G){BF.snap=null;BF.pick=null;bfFinger(null);return}
+  {const me=viewSeat();const mine=me>=0&&sideToAct()===me&&!G.winner;document.documentElement.classList.toggle('bf-wait',!mine);
+    document.querySelectorAll('.mine .hand .card.play').forEach(c=>{const ms=mine?bfMoves(me,+c.dataset.card):[];if(!ms.length){c.classList.remove('play','sug');c.classList.add('bf-no');return}
+      const cb=G.cb,myF=cb&&(cb.who===me||cb.help===me);const mean=ms.every(x=>x.z[0]==='p'||(!myF&&(x.z==='ms'||x.z[0]==='m'))||(!myF&&x.z==='fh'&&false));c.classList.toggle('bf-mean',mean)})}
   document.querySelectorAll('.mine .gear .gchip.eqoff').forEach(c=>{if(!c.querySelector('.bfx'))c.insertAdjacentHTML('beforeend','<span class="bfx" aria-hidden="true">✗ not worn</span>')});const N=bfSnap();BF.snap=N;bfMark();bfDiff(S,N);const me=viewSeat();setTimeout(()=>{try{bfTeach(me)}catch(e){}},30)}
 // ---- input: tap to pick up / tap a glowing spot; or drag with a finger or mouse ----
 document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();e.preventDefault();return}
@@ -3858,7 +3866,7 @@ document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();
   const c=t.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell||t.closest('.dlg'))return;const id=+c.dataset.card;const me=viewSeat();
   const ms=bfMoves(me,id);if(!ms.length)return;if(c.closest('.gear')&&!ms.some(x=>x.m.act==='equip'))return;
   e.stopPropagation();e.preventDefault();BF.pick=id;if(typeof sfx==='function')sfx('click');bfFinger(null);bfMark()},true);
-document.addEventListener('pointerdown',e=>{if(!G||e.button>0)return;const c=e.target.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell)return;const id=+c.dataset.card;
+document.addEventListener('pointerdown',e=>{if(BF.revClose){BF.revClose();BF.revClose=null}if(!G||e.button>0)return;const c=e.target.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell)return;const id=+c.dataset.card;
   if(!bfMoves(viewSeat(),id).length)return;BF.down={id,x:e.clientX,y:e.clientY,el:c,pid:e.pointerId}},{passive:true});
 document.addEventListener('pointermove',e=>{const d=BF.down;if(!d||d.pid!==e.pointerId)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;
   if(!BF.drag){if(Math.hypot(dx,dy)<10)return;if(e.pointerType==='touch'&&Math.abs(dx)>Math.abs(dy)*1.2&&d.el.closest('.hand,.gear')){BF.down=null;return}
@@ -3884,6 +3892,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(BF.pick!=null||BF.
     // before a trailing rival's door (lower level than you, not near the win) don't stop for curses either
     const calm=G.phase==='window'&&P(G.active).lvl<P(s).lvl&&P(G.active).lvl<8;if(!calm&&vm.some(m=>m!==pass&&(m.card==null||(!bfHarm(m)&&bfZone(m,s)))))return;
     const r=performMove(pass,s);if(!r||!r.success)return}}})();
+// the "You gave away…" note stays for a few seconds even when skipped prompts move the game on at once
+autoNoteHTML=function(){const a=UI.autoNote;if(!a||!G)return '';if(!a.at)a.at=Date.now();return a.ln===G.ln||Date.now()-a.at<8000?`<div class="since autonote" role="status">${a.t}</div>`:''};
+
+// the status chip: during a rival's fight it is their fight, not "your move"
+(function(){const _dt=dockTitle;dockTitle=function(me){const cb=G&&G.cb;const s=G?sideToAct():-1;if(cb&&!G.winner&&s===me&&me>=0&&cb.who!==me&&cb.help!==me)return P(cb.who).nm+'’s fight: meddle?';if(G&&!G.winner&&G.phase==='window'&&s===me&&G.active!==me)return curPl().nm+'’s door: curse?';return _dt(me)}})();
+// the first game with "teach me" starts against Easy computers (still changeable on the start screen)
+(function(){if(UI.lvl)return;let first=true;try{first=!localStorage.getItem('dkd_learned')&&!localStorage.getItem('dkd_bf')}catch(e){}if(first){UI.lvl='easy';if(!G)render()}})();
 
 </script>
 </body>

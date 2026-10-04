@@ -62,7 +62,7 @@ function bfReveal(id,who){const c=cd(id);const me=viewSeat();const mine=who===me
   o.innerHTML=`<div class="bfburst"></div><div class="bfdh l">${cardBack('door')}</div><div class="bfdh r">${cardBack('door')}</div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
   document.body.appendChild(o);const dur=mine?1900:1050;
   setTimeout(()=>{if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click')},mine?420:300);
-  const close=()=>{if(!o.isConnected)return;o.classList.add('out');setTimeout(()=>o.remove(),260)};o.addEventListener('pointerdown',close);setTimeout(close,dur);
+  const close=()=>{if(!o.isConnected)return;o.classList.add('out');setTimeout(()=>o.remove(),260)};BF.revClose=close;setTimeout(close,dur);
   if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur)}
 // ---- cause and effect: cards fly from the rival who played them, numbers float up where they changed ----
 function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createElement('div');e.className='bffly';e.innerHTML=cardHTML(id,{attr:'tabindex="-1"',notitle:1});document.body.appendChild(e);
@@ -138,6 +138,9 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
     if(i>=0)h=h.slice(0,i)+tag+h.slice(i);else h=h.replace(/(<div class="who">.*?<\/div>)/,'$1'+tag);return h};
   const _render=render;render=function(){const S=BF.snap;const r=_render.apply(this,arguments);try{bfAfter(S)}catch(e){UI.lastErr='bf '+e}return r}})();
 function bfAfter(S){if(!G){BF.snap=null;BF.pick=null;bfFinger(null);return}
+  {const me=viewSeat();const mine=me>=0&&sideToAct()===me&&!G.winner;document.documentElement.classList.toggle('bf-wait',!mine);
+    document.querySelectorAll('.mine .hand .card.play').forEach(c=>{const ms=mine?bfMoves(me,+c.dataset.card):[];if(!ms.length){c.classList.remove('play','sug');c.classList.add('bf-no');return}
+      const cb=G.cb,myF=cb&&(cb.who===me||cb.help===me);const mean=ms.every(x=>x.z[0]==='p'||(!myF&&(x.z==='ms'||x.z[0]==='m'))||(!myF&&x.z==='fh'&&false));c.classList.toggle('bf-mean',mean)})}
   document.querySelectorAll('.mine .gear .gchip.eqoff').forEach(c=>{if(!c.querySelector('.bfx'))c.insertAdjacentHTML('beforeend','<span class="bfx" aria-hidden="true">✗ not worn</span>')});const N=bfSnap();BF.snap=N;bfMark();bfDiff(S,N);const me=viewSeat();setTimeout(()=>{try{bfTeach(me)}catch(e){}},30)}
 // ---- input: tap to pick up / tap a glowing spot; or drag with a finger or mouse ----
 document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();e.preventDefault();return}
@@ -153,7 +156,7 @@ document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();
   const c=t.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell||t.closest('.dlg'))return;const id=+c.dataset.card;const me=viewSeat();
   const ms=bfMoves(me,id);if(!ms.length)return;if(c.closest('.gear')&&!ms.some(x=>x.m.act==='equip'))return;
   e.stopPropagation();e.preventDefault();BF.pick=id;if(typeof sfx==='function')sfx('click');bfFinger(null);bfMark()},true);
-document.addEventListener('pointerdown',e=>{if(!G||e.button>0)return;const c=e.target.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell)return;const id=+c.dataset.card;
+document.addEventListener('pointerdown',e=>{if(BF.revClose){BF.revClose();BF.revClose=null}if(!G||e.button>0)return;const c=e.target.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell)return;const id=+c.dataset.card;
   if(!bfMoves(viewSeat(),id).length)return;BF.down={id,x:e.clientX,y:e.clientY,el:c,pid:e.pointerId}},{passive:true});
 document.addEventListener('pointermove',e=>{const d=BF.down;if(!d||d.pid!==e.pointerId)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;
   if(!BF.drag){if(Math.hypot(dx,dy)<10)return;if(e.pointerType==='touch'&&Math.abs(dx)>Math.abs(dy)*1.2&&d.el.closest('.hand,.gear')){BF.down=null;return}
