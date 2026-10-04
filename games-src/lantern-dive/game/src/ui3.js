@@ -37,12 +37,18 @@ function newGame(mode, o) {
   let mission = mode === 'net' ? (opt.mission && typeof opt.mission === 'object' ? opt.mission : missionFrom(opt)) : missionFrom(opt);
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
   let tries = 0;
-  do { G = LD.newGame({ players: np, seed: seed + tries * 7919, names, ai, mission, timer: !!opt.timer }); tries++; } while (mode === 'guided' && G.cap !== 0 && tries < 80);
+  // the guided first dive is a fixed, stacked deal that cannot be lost: you hold the Commander's Lantern 4 AND the Lantern 3, the job is to win the Lantern 3
+  const gs = mode === 'guided' ? guidedStack() : null;
+  G = LD.newGame({ players: np, seed, names, ai, mission, timer: !!opt.timer, stack: gs });
   G.noProg = mission.kind !== 'log' && mission.kind !== 'deep';
   resetUI(mode, { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null, kind: opt.kind, mission: opt.mission, d: opt.d, cmt: opt.cmt, deep: opt.deep, job: opt.job, timer: !!opt.timer });
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.prefs.guide === 'light' ? 'light' : UI.prefs.guide === 'off' ? 'off' : 'light'), seen: {}, keep: false };
   if (mode === 'guided') UI.coach.level = 'full';
   placePrompt(); render(); sndMusic(); autosave(); schedule();
+}
+function guidedStack() {
+  const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }, h = t => t.split(' ').map(x => D.card(L[x[0]], +x.slice(1)));
+  return { tasks: D.guided.tasks.slice(), hands: D.guided.hands.map(h) };
 }
 function nextAttempt(same) {
   if (!G || G.phase !== 'over') return;

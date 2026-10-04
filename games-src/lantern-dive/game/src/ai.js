@@ -420,6 +420,21 @@ function why(G, seat, card) {
   for (const k in lines) if (k[0] === 'f' && lines[k] >= n / 3) out.push('risk: breaks "' + TASKS[G.tasks[+k.slice(1)].id].t + '"');
   return out.join('. ');
 }
-Object.assign(AI, { choose, step, pingChoice, why, belief, sampleHands, hash, mkrng, soft, worlds, simBase, fillWorld, cloneW, roll, rate, rateAll, fit, greedyCard });
+// Does EVERY card the diver may play now break one of his or her own jobs (or the dive's rule)? Played out on sampled worlds (the fair view):
+// only when it breaks in all of them for all legal cards. Returns { job: index | -1 for the dive rule } or null. Used for the prompt line.
+function allBreak(G, seat) {
+  if (G.phase !== 'play' || !G.trick) return null;
+  const turn = G.trick.turn, V = LD.stripView(G, seat), cards = LD._.playable(G, turn); if (!cards.length) return null;
+  const mine = G.tasks.map((t, i) => t.owner >= 0 && LD.ctl(G, t.owner) === seat ? i : -1).filter(i => i >= 0); if (!mine.length) return null;
+  const wl = worlds(V, seat, 6, 11).W; if (wl.length < 3) return null; let common = null; const n0 = V.tricks.length;
+  for (const c of cards) for (const W0 of wl) {
+    const W = cloneW(W0); LD._.doPlay(W, turn, c); let g = 0;
+    while (W.phase === 'play' && W.tricks.length === n0 && g++ < 12) { const s = W.trick.turn; LD._.doPlay(W, s, greedyCard(W, s)); }
+    const br = new Set(); mine.forEach(i => { if (LD.jobStatus(W, i) < 0) br.add(i); }); if (!br.size && W.phase === 'over' && W.result && !W.result.ok && !W.tasks.some((t, i) => LD.jobStatus(W, i) < 0)) br.add(-1);
+    common = common ? new Set([...common].filter(x => br.has(x))) : br; if (!common.size) return null;
+  }
+  return common && common.size ? { job: [...common][0] } : null;
+}
+Object.assign(AI, { allBreak, choose, step, pingChoice, why, belief, sampleHands, hash, mkrng, soft, worlds, simBase, fillWorld, cloneW, roll, rate, rateAll, fit, greedyCard });
 if (typeof module === 'object' && module.exports) module.exports = AI;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

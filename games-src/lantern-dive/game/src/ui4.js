@@ -6,6 +6,7 @@ const TIPS = [
   { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card on the table to read it in the panel, then press "Take this job". Choose one you think your own cards can do. With fewer jobs than divers you may pass.' },
   { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'The distress flare', body: 'Optional help: light the flare and every diver passes one card (not a Lantern) to a neighbour. It makes the dive count one extra attempt. You can always say "No flare".' },
   { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signals', body: 'You may show ONE card of yours to the team, once per dive. It must be your highest, your lowest or your only card of a colour. The token on it tells which. Lanterns cannot be shown. Press "Signal…", or skip.' },
+  { id: 'gplan', when: () => UI.mode === 'guided' && G.phase === 'play' && G.tricks.length === 0 && iMustAct() && G.trick.plays.length === 0, title: 'Your plan', body: 'Your job is to win the Lantern 3. You also hold Lantern 4, so nobody can beat it: this dive cannot be lost. Play a colour card first to see how a trick works. Play the Lantern 3 when you lead, or when you have none of the colour that was led.' },
   { id: 'lead', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length === 0 && !G.players[G.trick.turn].helper, title: 'You lead the trick', body: 'The leader plays any card. Tap a card to lift it, tap it again (or press Play) to play it. Everybody then plays one card; the highest card of the led colour wins.' },
   { id: 'follow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && !G.players[G.trick.turn].helper && LD.playable(G, G.trick.turn).length < G.players[G.trick.turn].hand.length, title: 'Follow the colour', body: 'You must play a card of the colour that was led, if you have one. The dim cards are not allowed. Winning is never forced: you may play a low card on purpose.' },
   { id: 'nofollow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && G.trick.ls < 4 && !G.players[G.trick.turn].helper && !G.players[G.trick.turn].hand.some(c => suitOf(c) === G.trick.ls), title: 'No card of that colour', body: 'You have none of the led colour, so you may play anything. A card of another colour never wins the trick, but a Lantern does: Lanterns are trumps.' },
@@ -114,7 +115,15 @@ function showResult() {
   bt.append(h('button.btn.alt', { 'data-a': NET.on ? 'netopen' : 'menu', type: 'button' }, NET.on ? 'Lobby' : 'Menu'));
   box.append(bt); rs.append(box); snd(ok ? 'win' : 'lose');
 }
-function guidedWon() { return false; }
+function guidedWon() { return UI.mode === 'guided' && G && G.result && G.result.ok; }
+function guidedDebrief(box) {
+  const me = viewSeat(), mine = tricksWon()[me >= 0 ? me : 0] || 0;
+  box.append(h('div.debrief', h('b', 'What you just learned'), h('ul',
+    h('li', 'A job card tells ONE diver what to do with the tricks that diver wins. Yours: win the Lantern 3.'),
+    h('li', 'Lanterns are trumps: any Lantern beats every colour, and the highest Lantern wins. You held the two highest, so the job was safe.'),
+    h('li', 'The whole team wins when every job is done, and the dive ends at once. It took ' + G.tricks.length + ' trick' + (G.tricks.length === 1 ? '' : 's') + ' and you won ' + mine + '.'),
+    h('li', 'Next dives have jobs for every diver. Watch the job chips under each name, and use the signal token to tell your team one card you hold.'))));
+}
 function closeRS() { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; }
 function nextDive() {
   if (!G || G.phase !== 'over' || NET.on && !isHost()) return;

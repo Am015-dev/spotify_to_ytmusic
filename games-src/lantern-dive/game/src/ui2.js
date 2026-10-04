@@ -274,6 +274,8 @@ function dockModel(v) {
         const sel = UI.sel >= 0 ? UI.sel : -1; const legal = helper ? new Set(LD.playable(G, turn)) : new Set(LD.playable(G, turn));
         M.p = helper ? 'You fly ' + pname(turn) + ': tap one of its face-up cards.' : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play any card.');
         M.sub = T.plays.length ? (T.ls === 4 ? 'Follow with a Lantern if you can.' : 'Follow ' + D.suits[T.ls].name + ' if you can. A Lantern wins every trick.') : '';
+        { const k = G.seed + ':' + G.logN + ':' + G.att + ':' + G.tricks.length + ':' + T.plays.length + ':' + v; if (UI.abk !== k) { UI.abk = k; let r = null; try { r = LD.AI.allBreak(G, v); } catch (e) { } UI.ab = r; }
+          if (UI.ab) { const j = UI.ab.job; M.p = 'Careful: every card you can play breaks ' + (j >= 0 ? 'a job.' : 'the dive rule.'); M.sub = j >= 0 ? 'Whatever you play, \u201c' + TASKS[G.tasks[j].id].t.replace(/\.$/, '') + '\u201d will fail. Try Hint to see the least bad card.' : 'Whatever you play, the dive rule is broken.'; M.warn = 1; } }
         if (UI.hint && UI.hint.c != null) M.info = '<b>Suggestion: ' + esc(cname(UI.hint.c)) + '.</b> ' + esc(UI.hint.why || '');
         btn(sel >= 0 && legal.has(sel) ? 'Play ' + cname(sel) : 'Play the card', 'playcard', { c: sel, dis: !(sel >= 0 && legal.has(sel)), cls: 'go' });
         if (pm.length) btn('Signal…', 'signal', { cls: 'alt' });

@@ -285,7 +285,8 @@ html.ph .setup .sgo{position:static;margin:0;padding:0;background:none}
 .rsbox h2{margin:0;font-size:1.35rem;font-weight:900;display:flex;gap:8px;align-items:center}
 .rsbox .cbtns{position:sticky;bottom:-12px;background:var(--panel);padding:6px 0 4px;z-index:2}
 .rjob{display:flex;align-items:center;gap:8px;border-radius:10px;padding:5px 8px;background:rgba(255,255,255,.06);font-size:14px;line-height:1.3}.rjob .mk{flex:0 0 26px;width:26px;height:26px}.rjob .mk svg{width:100%;height:100%}.rjob b{flex:0 0 auto;color:var(--gold)}
-.rjob.ok{background:rgba(53,194,123,.18)}.rjob.bad{background:rgba(224,88,60,.2)}
+.rjob.ok{background:rgba(53,194,123,.18)}.rjob.bad{background:rgba(224,88,60,.2)}.rjob.open{background:rgba(255,255,255,.06);color:var(--ink2)}.rjob .why{display:block;font-size:13px;font-weight:700;color:#ffd9b0;margin-top:2px}.rjob.open .why{color:var(--ink2)}
+.debrief{background:rgba(255,216,115,.1);border:2px solid #b88410;border-radius:12px;padding:8px 10px;font-size:14px;line-height:1.35}.debrief b{color:var(--gold)}.debrief ul{margin:4px 0 0 18px;padding:0}
 .win{display:flex;align-items:center;gap:10px;background:linear-gradient(180deg,#ffe9a8,#f6c94a);color:#2a1d04;border:2px solid #0b1f3a;border-radius:12px;padding:8px 10px;font-weight:900;font-size:17px}
 .lose{display:flex;align-items:center;gap:10px;background:rgba(224,88,60,.25);border:2px solid var(--bad);border-radius:12px;padding:8px 10px;font-weight:900;font-size:16px}
 #pass{position:fixed;inset:0;z-index:58;background:rgba(2,10,28,.94);display:flex;align-items:center;justify-content:center;padding:14px}
@@ -3173,7 +3174,7 @@ const TASKS = [
   /* 46 */ J([2, 4, 5], 'Win a trick that holds only odd numbers (1, 3, 5, 7, 9).', { k: 'trick', p: 'odd' }),
   /* 47 */ J([3, 3, 4], 'Win a trick worth more than 23 / 28 / 31 (3 / 4 / 5 divers), no Lanterns.', { k: 'trick', p: 'sumgt', th: [23, 28, 31] }),
   /* 48 */ J([3, 3, 4], 'Win a trick worth less than 8 / 12 / 16 (3 / 4 / 5 divers), no Lanterns.', { k: 'trick', p: 'sumlt', th: [8, 12, 16] }),
-  /* 49 */ J([3, 3, 4], 'Win a trick whose card values add up to 22 or 23.', { k: 'trick', p: 'sumeq', vs: [22, 23] }),
+  /* 49 */ J([3, 3, 4], 'Win a trick whose card values add up to 22 or 23 (no Lanterns in it).', { k: 'trick', p: 'sumeq', vs: [22, 23] }),
   /* 50 */ J([3, 3, 3], 'Win exactly one Lantern.', { k: 'subx', n: 1, redeal: 'all4' }),
   /* 51 */ J([3, 3, 3], 'Win the Lantern 1 and no other Lantern.', { k: 'subx', n: 1, only: 1, redeal: 'l1' }),
   /* 52 */ J([3, 3, 3], 'Win the Lantern 2 and no other Lantern.', { k: 'subx', n: 1, only: 2, redeal: 'l2' }),
@@ -3487,7 +3488,7 @@ function trickOK(S, t, d) {
     case 'odd': return cs.every(c => suit(c) < 4 && val(c) % 2 === 1);
     case 'sumgt': return cs.every(c => suit(c) < 4) && cs.reduce((a, c) => a + val(c), 0) > d.th[col];
     case 'sumlt': return cs.every(c => suit(c) < 4) && cs.reduce((a, c) => a + val(c), 0) < d.th[col];
-    case 'sumeq': return d.vs.includes(cs.reduce((a, c) => a + val(c), 0));
+    case 'sumeq': return cs.every(c => suit(c) < 4) && d.vs.includes(cs.reduce((a, c) => a + val(c), 0));
   }
   return false;
 }
@@ -3554,7 +3555,7 @@ const KIND = {
     if (d.only) {
       const cu = L1 + d.only - 1, got = w.includes(cu), other = w.some(x => x !== cu), wb = wonBy(S, cu);
       if (other || (wb >= 0 && wb !== o)) return -1;
-      if (got && remL === 0) return 1; return end ? -1 : 0;
+      if (got) return 1; return end ? -1 : 0;
     }
     if (w.length > d.n || w.length + remL < d.n) return -1;
     if (end) return w.length === d.n ? 1 : -1; return w.length === d.n && remL === 0 ? 1 : 0;
@@ -3599,11 +3600,12 @@ function jobStatus(S, ti) { const t = S.tasks[ti], d = TASKS[t.id]; return KIND[
 // mission rules that hold for the whole dive. Returns a text (broken) or '' (fine). Called after every trick.
 function condBroken(S) {
   const m = S.mission;
-  if (m.gap) { const c = new Array(S.np).fill(0); for (const k of S.tricks) for (const p of k.plays) if (suit(p.c) < 4 && val(p.c) === m.gap.v && true) c[k.w]++; if (Math.max(...c) - Math.min(...c) >= m.gap.gap) return 'A diver has won two more ' + m.gap.v + 's than another diver.'; }
-  if (m.m23 && S.tricks.length) { const w0 = S.tricks[0].w, w = tw(S); for (let i = 0; i < S.np; i++) if (i !== w0 && w[i] >= w[w0]) return 'The first trick winner no longer has more tricks than everybody else.'; }
+  if (m.gap) { const c = new Array(S.np).fill(0); for (const k of S.tricks) for (const p of k.plays) if (suit(p.c) < 4 && val(p.c) === m.gap.v) c[k.w]++; if (Math.max(...c) - Math.min(...c) >= m.gap.gap) return 'After trick ' + S.tricks.length + ' a diver has won two more ' + m.gap.v + 's than another diver.'; }
+  if (m.m23 && S.tricks.length) { const w0 = S.tricks[0].w, w = tw(S); for (let i = 0; i < S.np; i++) if (i !== w0 && w[i] >= w[w0]) return 'After trick ' + S.tricks.length + ' the winner of the first trick no longer has more tricks than everybody else.'; }
   return '';
 }
-const holdsMission = m => !!(m.gap || m.m23 || m.m12 || m.m27);
+// only dive 27 must be played to the last card (its Sunstar 5 rule needs the final card); every other dive ends the moment the last job is done
+const holdsMission = m => !!m.m27;
 
 // ---------- helpers on the state ----------
 const ctl = (G, s) => G.players[s].helper ? G.cap : s;
@@ -3631,7 +3633,10 @@ function dealHands(G) {
 // impossible deals for some Lantern jobs: new deal, no attempt counted
 function needRedeal(G) {
   for (const t of G.tasks) {
-    const r = TASKS[t.id].redeal; if (!r) continue;
+    const dd = TASKS[t.id];
+    // 'win card X with a Lantern': impossible when one diver holds all four Lanterns and X (p.17)
+    if (dd.k === 'wsub') for (const p of G.players) if (!p.helper && [0, 1, 2, 3].every(x => p.hand.includes(L1 + x)) && p.hand.includes(dd.c)) return true;
+    const r = dd.redeal; if (!r) continue;
     for (const p of G.players) {
       const h = x => p.hand.includes(L1 + x - 1);
       if (r === 'all4' && h(1) && h(2) && h(3) && h(4)) return true;
@@ -3649,7 +3654,17 @@ function claims(id) {
   if (d.k === 'cards') { d.cs.forEach(c => cards.add(c)); if (d.last) pos.add('L'); }
   if (d.k === 'wsub') cards.add(d.c);
   if (d.k === 'valn' && d.op === 'ex' && d.n === 4) vals.add(d.v);
-  return { pos, cards, vals };
+  // two divers can never both have "the most tricks" / "fewer than every other diver"
+  const tok = new Set(); if (d.k === 'cmp' && d.op === 'more' && (d.vs === 'each' || d.vs === 'all')) tok.add('most'); if (d.k === 'cmp' && d.op === 'fewer' && d.vs === 'each') tok.add('fewest');
+  return { pos, cards, vals, tok };
+}
+// the least number of copies of one value (or of Lanterns) a diver must win to meet the job: used to see that two jobs on
+// different divers would need more than the four copies that exist
+function needCopies(id) {
+  const d = TASKS[id];
+  if (d.k === 'valn' && (d.op === 'ge' || d.op === 'ex')) return { v: d.v, n: d.n };
+  if (d.k === 'subx') return { v: 'L', n: d.only ? 1 : d.n };
+  return null;
 }
 function conflict(a, b) {
   const A = claims(a), B = claims(b);
@@ -3658,14 +3673,25 @@ function conflict(a, b) {
   const withVal = (id, v) => { const d = TASKS[id]; return (d.k === 'valn' && d.v === v) || (d.k === 'with' && (d.v === v || d.cp === v)) || (d.k === 'cards' && d.cs.some(c => suit(c) < 4 && val(c) === v)); };
   for (const v of A.vals) if (withVal(b, v)) return true;
   for (const v of B.vals) if (withVal(a, v)) return true;
+  for (const x of A.tok) if (B.tok.has(x)) return true;
+  const na = needCopies(a), nb = needCopies(b);
+  if (na && nb && na.v === nb.v && na.n + nb.n > 4) return true;
   return false;
+}
+// a job the dive's own limit (no diver two more Ns than another) can never allow: the owner needs n copies, each other diver n - gap + 1
+function limitBlocks(G, id) {
+  const g = G.mission.gap; if (!g) return false;
+  const nc = needCopies(id); if (!nc || nc.v !== g.v) return false;
+  return nc.n + (G.np - 1) * Math.max(0, nc.n - g.gap + 1) > 4;
 }
 // can the jobs be split among the seats the way the draft needs? (every seat gets one when there are enough jobs)
 function splitOK(G, ids) {
-  const n = ids.length; if (n < G.np) return true;
+  const n = ids.length;
   const par = ids.map((_, i) => i); const f = x => par[x] === x ? x : (par[x] = f(par[x]));
   for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) if (conflict(ids[i], ids[j])) par[f(i)] = f(j);
   const comps = new Set(ids.map((_, i) => f(i))).size;
+  // fewer jobs than divers: each job goes to a different diver in one round, so no conflicting pair may be drawn at all
+  if (n < G.np) return ['draft', 'hard', 'cmdnone', 'two'].includes(G.mission.sel) ? comps >= n : true;
   if (G.mission.sel === 'two') return comps >= 2 || n < 2;
   if (G.mission.sel === 'draft' || G.mission.sel === 'hard') return comps >= G.np;
   if (G.mission.sel === 'cmdnone') return comps >= G.np - 1;
@@ -3680,7 +3706,7 @@ function drawTasks(G) {
     while (sum < target && guard++ < 400) {
       if (!G.tdeck.length) { G.tdeck = shuffle(G, G.tdisc.concat(skipped.splice(0)).filter(x => !out.includes(x))); G.tdisc = []; if (!G.tdeck.length) G.tdeck = shuffle(G, Array.from({ length: 96 }, (_, i) => i).filter(x => !out.includes(x))); }
       const id = G.tdeck.shift(), d = TASKS[id].d[col];
-      if (sum + d > target || (noCap && !TASKS[id].cap)) { skipped.push(id); continue; }
+      if (sum + d > target || (noCap && !TASKS[id].cap) || limitBlocks(G, id)) { skipped.push(id); continue; }
       out.push(id); sum += d;
     }
     G.tdeck = G.tdeck.concat(skipped);
@@ -3695,7 +3721,7 @@ const secs = m => m.timer ? m.timer.sec : 0;
 function newGame(o) {
   o = o || {};
   const hn = Math.max(2, Math.min(5, o.players | 0 || 3)), two = hn === 2, np = two ? 3 : hn;
-  const G = { v: 1, rng: ((o.seed | 0) || 1) | 0, seed: (o.seed | 0) || 1, hn, np, two, helper: two ? 2 : -1, att: 0, logN: 0, evN: 0, log: [], events: [], used: {}, tdeck: [], tdisc: [], timerOn: !!o.timer, nolog: !!o.nolog };
+  const G = { v: 1, rng: ((o.seed | 0) || 1) | 0, seed: (o.seed | 0) || 1, hn, np, two, helper: two ? 2 : -1, stack: o.stack || null, att: 0, logN: 0, evN: 0, log: [], events: [], used: {}, tdeck: [], tdisc: [], timerOn: !!o.timer, nolog: !!o.nolog };
   G.players = [];
   for (let i = 0; i < hn; i++) G.players.push({ seat: i, name: (o.names && o.names[i]) || D.names[i % 5], ai: (o.ai && o.ai[i]) || null, hand: [], stacks: null, pingUsed: 0, mem: {} });
   if (two) G.players.push({ seat: 2, name: D.helper.name, ai: null, helper: 1, hand: [], stacks: [], pingUsed: 1, mem: {} });
@@ -3720,11 +3746,18 @@ function startAttempt(G, o) {
   if (o && o.same && G.tasks && G.tasks.length) G.tasks = G.tasks.map(t => ({ id: t.id, owner: -1, pn: -1 }));
   else { if (G.tasks) G.tdisc = G.tdisc.concat(G.tasks.map(t => t.id)); G.tasks = drawTasks(G).map(id => ({ id, owner: -1, pn: -1 })); }
   for (let tries = 0; tries < 200; tries++) { dealHands(G); if (!needRedeal(G)) break; }
+  if (G.stack) applyStack(G);
   G.events = []; G.pl = new Array(40).fill(0); G.pings = []; G.tricks = [];
   Object.assign(G, { phase: 'assign', result: null, trick: null, left: -1, offered: false, ntr: ntrOf(G.np), firstW: -1, lastCard: -1, clockRun: false });
   ev(G, { t: 'deal', att: G.att, cap: G.cap, comm: G.comm, unk: G.unk, tasks: G.tasks.map(t => t.id) });
   lg(G, 'Attempt ' + G.att + ' of dive ' + (G.mission.kind === 'log' ? G.mission.id : G.mission.name) + '. ' + G.players[G.cap].name + ' holds Lantern 4 and is the Commander.');
   initAssign(G);
+}
+// a fixed deal for the guided first dive: stack = { tasks: [job ids], hands: [[card ids] per seat] }, used again on every retry
+function applyStack(G) {
+  const st = G.stack; G.tasks = st.tasks.map(id => ({ id, owner: -1, pn: -1 }));
+  G.players.forEach((p, i) => { p.hand = st.hands[i].slice(); p.stacks = null; p.pingUsed = 0; p.mem = {}; sortHand(p.hand); });
+  G.cap = G.players.findIndex(p => p.hand.includes(L4));
 }
 function nextAttempt(G, o) { if (G.phase !== 'over') return G; G.events = []; startAttempt(G, o || {}); return G; }
 
@@ -3745,8 +3778,10 @@ function initAssign(G) {
   if (K === 0) { endAssign(G); return; }
   if (A.mode === 'draft' && K < G.np) A.pass = true;
 }
-function hardest(G) { const col = G.np - 3; let b = -1; for (const i of rem(G)) b = Math.max(b, TASKS[G.tasks[i].id].d[col]); return rem(G).filter(i => TASKS[G.tasks[i].id].d[col] === b); }
-function canTake(G, s, i) { return G.tasks[i].owner < 0 && !(s === G.cap && !TASKS[G.tasks[i].id].cap); }
+// the hardest job the diver `s` may take (the Commander never takes a Commander-comparison job); without s: the hardest of all
+function hardest(G, s) { const col = G.np - 3, R = rem(G).filter(i => s == null || canTake(G, s, i)); let b = -1; for (const i of R) b = Math.max(b, TASKS[G.tasks[i].id].d[col]); return R.filter(i => TASKS[G.tasks[i].id].d[col] === b); }
+// the Commander may not take a Commander-comparison job, and neither may the drone he or she flies
+function canTake(G, s, i) { return G.tasks[i].owner < 0 && !((s === G.cap || G.players[s].helper) && !TASKS[G.tasks[i].id].cap); }
 function assignMoves(G, c) {
   const A = G.as, out = [];
   const act = A.actor; if (A.mode !== 'vote' && (act < 0 || ctl(G, act) !== c)) return out;
@@ -3761,7 +3796,7 @@ function assignMoves(G, c) {
       else if (!tk.length) out.push(Object.assign({ t: 'pass' }, as));
       break;
     }
-    case 'hardfirst': for (const i of hardest(G).filter(i => canTake(G, act, i))) out.push({ t: 'take', i }); if (!out.length) for (const i of hardest(G)) out.push({ t: 'take', i }); break;
+    case 'hardfirst': for (const i of hardest(G, act)) out.push({ t: 'take', i }); break;
     case 'free': {
       for (const i of R.filter(i => canTake(G, act, i))) out.push(Object.assign({ t: 'take', i }, as));
       const must = A.idle >= A.order.length - 1 && R.length;
@@ -3968,8 +4003,32 @@ function removeCard(G, s, c) {
   if (p.helper) { const k = p.stacks.findIndex(st => st[0] === c); if (k >= 0) p.stacks[k][0] = -2; }
 }
 function statusAll(G) { return G.tasks.map((t, i) => jobStatus(G, i)); }
+// Which trick, card and diver made a failed job impossible? Replays the tricks one by one on the public information and returns the first
+// trick after which the job reads "failed" (or null when it was broken by something else, or only ran out at the end of the dive).
+function explainJob(G, i) {
+  const d = TASKS[G.tasks[i].id], pl = new Array(40).fill(0);
+  for (let k = 1; k <= G.tricks.length; k++) {
+    const tr = G.tricks[k - 1]; for (const p of tr.plays) pl[p.c] = 1;
+    const S = { tricks: G.tricks.slice(0, k), np: G.np, cap: G.cap, ntr: G.ntr, pl: pl.slice(), tasks: G.tasks, mission: G.mission };
+    if (KIND[d.k](S, G.tasks[i], d, G.tasks[i].owner, k >= G.ntr) < 0) {
+      const lead = d.k === 'nolead', seat = lead ? tr.lead : tr.w, card = lead ? tr.plays[0].c : tr.wc;
+      return { trick: k, seat, card, how: lead ? 'led' : 'won', last: k >= G.ntr };
+    }
+  }
+  return null;
+}
+function explainText(G, e) {
+  if (!e) return '';
+  const nm = G.players[e.seat].name;
+  return 'Trick ' + e.trick + ': ' + nm + (e.how === 'led' ? ' led with ' : ' won it with ') + cn(e.card) + '.';
+}
 function finish(G, ok, why) {
   G.phase = 'over'; G.result = { ok, why: why || '', tasks: G.tasks.map((t, i) => jobStatus(G, i)) };
+  // for every failed job say which trick, card and diver broke it; a job that nothing broke stays "not finished" (status 0)
+  if (!G.nolog) {
+  G.result.det = G.tasks.map((t, i) => (G.result.tasks[i] < 0 && !ok) ? explainText(G, explainJob(G, i)) : '');
+  G.result.nb = G.tasks.map((t, i) => { const e = (G.result.tasks[i] < 0 && !ok) ? explainJob(G, i) : null; return e ? { trick: e.trick, seat: e.seat, c: e.card } : null; });
+  }
   for (const p of G.players) if (p.helper) { /* nothing */ }
   const left = []; for (let c = 0; c < 40; c++) if (!G.pl[c]) left.push(c); G.left = left.length === 1 ? left[0] : -1;
   ev(G, { t: 'over', ok, why: G.result.why });
@@ -3985,7 +4044,7 @@ function afterTrick(G, k) {
   const over = G.tricks.length >= G.ntr;
   if (failed.length) { finish(G, false, 'A job cannot be done any more: ' + TASKS[G.tasks[failed[0]].id].t); return; }
   if (cb) { finish(G, false, cb); return; }
-  if (G.mission.m27 && over && G.lastCard !== SU5) { finish(G, false, 'The Sunstar 5 was not the final card played.'); return; }
+  if (G.mission.m27 && over && G.lastCard !== SU5) { finish(G, false, 'The last card of the dive was not the Sunstar 5.'); return; }
   const done = st.every(x => x > 0);
   if (done && (!G.mission.hold || over)) { finish(G, true); return; }
   if (over) { finish(G, st.every(x => x > 0), st.some(x => x <= 0) ? 'Not every job was finished.' : ''); return; }
@@ -3999,8 +4058,8 @@ function doPlay(G, s, c) {
   removeCard(G, s, c); G.pl[c] = 1; G.lastCard = c;
   T.plays.push({ s, c }); if (first) T.ls = suit(c);
   ev(G, { t: 'play', seat: s, c, n: T.n });
-  if (G.mission.m27 && c === SU5 && !(T.n === G.ntr - 1 && T.plays.length === G.np)) { T.bad27 = 1; finish(G, false, 'The Sunstar 5 must be the very last card played.'); return; }
-  if (T.bad) { finish(G, false, 'A trick was led with a Coral card or a Lantern.'); return; }
+  if (G.mission.m27 && c === SU5 && !(T.n === G.ntr - 1 && T.plays.length === G.np)) { T.bad27 = 1; finish(G, false, 'Trick ' + (T.n + 1) + ': ' + G.players[s].name + ' played the Sunstar 5 too early. It must be the very last card of the dive.'); return; }
+  if (T.bad) { finish(G, false, 'Trick ' + (T.n + 1) + ': ' + G.players[T.lead].name + ' had to lead with ' + cn(T.plays[0].c) + ', but no trick may be led with a Coral card or a Lantern.'); return; }
   if (T.plays.length < G.np) { T.turn = (s + 1) % G.np; return; }
   const w = trickWinner(T.plays, T.ls), wc = T.plays.find(p => p.s === w).c;
   const k = { n: T.n, lead: T.lead, ls: T.ls, plays: T.plays.map(p => ({ s: p.s, c: p.c })), w, wc };
@@ -4013,7 +4072,6 @@ function doPlay(G, s, c) {
   afterTrick(G, k);
 }
 // public state view for the status functions: S.tricks is the tricks list
-Object.defineProperty(Object.prototype, '__ld', { value: 0, enumerable: false, writable: true, configurable: true });
 // jobStatus / condBroken read S.tricks: provide it as an alias of G.tricks without a second copy
 function view(G) { return G; }
 
@@ -4127,7 +4185,7 @@ function checkInvariants(G) {
   if (G.phase === 'play' && G.cap >= 0 && !G.players[G.cap].hand.length && G.tricks.length === 0) e.push('captain lost lantern 4');
   return e;
 }
-Object.assign(LD, { newGame, nextAttempt, moves, apply, pending, stripView, checkInvariants, text, expire, clone, jobStatus, condBroken, suit, val, trickWinner, ntrOf, playable, canPing, pingMoves, ctl, isDiver, diverSeats, orderFrom, conflict, splitOK, claims, needRedeal,
+Object.assign(LD, { newGame, nextAttempt, moves, apply, pending, stripView, checkInvariants, text, expire, clone, jobStatus, condBroken, suit, val, trickWinner, explainJob, explainText, ntrOf, playable, canPing, pingMoves, ctl, isDiver, diverSeats, orderFrom, conflict, splitOK, claims, needRedeal,
   validMoves: moves, performMove: (G, m, s) => apply(G, s, m), sideToAct: pending, render_game_to_text: text,
   _: { rnd, shuffle, KIND, tw, ntrOf, startPlay, finish, afterTrick, dealHands, drawTasks, holdsMission, statusAll, doPlay, playable, remVal, remSuit, wonBy, cardsWon, longestRun, startAttempt, TASKS } });
 // the status functions read S.tricks: make G answer to it
@@ -4559,7 +4617,22 @@ function why(G, seat, card) {
   for (const k in lines) if (k[0] === 'f' && lines[k] >= n / 3) out.push('risk: breaks "' + TASKS[G.tasks[+k.slice(1)].id].t + '"');
   return out.join('. ');
 }
-Object.assign(AI, { choose, step, pingChoice, why, belief, sampleHands, hash, mkrng, soft, worlds, simBase, fillWorld, cloneW, roll, rate, rateAll, fit, greedyCard });
+// Does EVERY card the diver may play now break one of his or her own jobs (or the dive's rule)? Played out on sampled worlds (the fair view):
+// only when it breaks in all of them for all legal cards. Returns { job: index | -1 for the dive rule } or null. Used for the prompt line.
+function allBreak(G, seat) {
+  if (G.phase !== 'play' || !G.trick) return null;
+  const turn = G.trick.turn, V = LD.stripView(G, seat), cards = LD._.playable(G, turn); if (!cards.length) return null;
+  const mine = G.tasks.map((t, i) => t.owner >= 0 && LD.ctl(G, t.owner) === seat ? i : -1).filter(i => i >= 0); if (!mine.length) return null;
+  const wl = worlds(V, seat, 6, 11).W; if (wl.length < 3) return null; let common = null; const n0 = V.tricks.length;
+  for (const c of cards) for (const W0 of wl) {
+    const W = cloneW(W0); LD._.doPlay(W, turn, c); let g = 0;
+    while (W.phase === 'play' && W.tricks.length === n0 && g++ < 12) { const s = W.trick.turn; LD._.doPlay(W, s, greedyCard(W, s)); }
+    const br = new Set(); mine.forEach(i => { if (LD.jobStatus(W, i) < 0) br.add(i); }); if (!br.size && W.phase === 'over' && W.result && !W.result.ok && !W.tasks.some((t, i) => LD.jobStatus(W, i) < 0)) br.add(-1);
+    common = common ? new Set([...common].filter(x => br.has(x))) : br; if (!common.size) return null;
+  }
+  return common && common.size ? { job: [...common][0] } : null;
+}
+Object.assign(AI, { allBreak, choose, step, pingChoice, why, belief, sampleHands, hash, mkrng, soft, worlds, simBase, fillWorld, cloneW, roll, rate, rateAll, fit, greedyCard });
 if (typeof module === 'object' && module.exports) module.exports = AI;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
 
@@ -5571,6 +5644,8 @@ function dockModel(v) {
         const sel = UI.sel >= 0 ? UI.sel : -1; const legal = helper ? new Set(LD.playable(G, turn)) : new Set(LD.playable(G, turn));
         M.p = helper ? 'You fly ' + pname(turn) + ': tap one of its face-up cards.' : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play any card.');
         M.sub = T.plays.length ? (T.ls === 4 ? 'Follow with a Lantern if you can.' : 'Follow ' + D.suits[T.ls].name + ' if you can. A Lantern wins every trick.') : '';
+        { const k = G.seed + ':' + G.logN + ':' + G.att + ':' + G.tricks.length + ':' + T.plays.length + ':' + v; if (UI.abk !== k) { UI.abk = k; let r = null; try { r = LD.AI.allBreak(G, v); } catch (e) { } UI.ab = r; }
+          if (UI.ab) { const j = UI.ab.job; M.p = 'Careful: every card you can play breaks ' + (j >= 0 ? 'a job.' : 'the dive rule.'); M.sub = j >= 0 ? 'Whatever you play, \u201c' + TASKS[G.tasks[j].id].t.replace(/\.$/, '') + '\u201d will fail. Try Hint to see the least bad card.' : 'Whatever you play, the dive rule is broken.'; M.warn = 1; } }
         if (UI.hint && UI.hint.c != null) M.info = '<b>Suggestion: ' + esc(cname(UI.hint.c)) + '.</b> ' + esc(UI.hint.why || '');
         btn(sel >= 0 && legal.has(sel) ? 'Play ' + cname(sel) : 'Play the card', 'playcard', { c: sel, dis: !(sel >= 0 && legal.has(sel)), cls: 'go' });
         if (pm.length) btn('Signal…', 'signal', { cls: 'alt' });
@@ -5650,12 +5725,18 @@ function newGame(mode, o) {
   let mission = mode === 'net' ? (opt.mission && typeof opt.mission === 'object' ? opt.mission : missionFrom(opt)) : missionFrom(opt);
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
   let tries = 0;
-  do { G = LD.newGame({ players: np, seed: seed + tries * 7919, names, ai, mission, timer: !!opt.timer }); tries++; } while (mode === 'guided' && G.cap !== 0 && tries < 80);
+  // the guided first dive is a fixed, stacked deal that cannot be lost: you hold the Commander's Lantern 4 AND the Lantern 3, the job is to win the Lantern 3
+  const gs = mode === 'guided' ? guidedStack() : null;
+  G = LD.newGame({ players: np, seed, names, ai, mission, timer: !!opt.timer, stack: gs });
   G.noProg = mission.kind !== 'log' && mission.kind !== 'deep';
   resetUI(mode, { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null, kind: opt.kind, mission: opt.mission, d: opt.d, cmt: opt.cmt, deep: opt.deep, job: opt.job, timer: !!opt.timer });
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.prefs.guide === 'light' ? 'light' : UI.prefs.guide === 'off' ? 'off' : 'light'), seen: {}, keep: false };
   if (mode === 'guided') UI.coach.level = 'full';
   placePrompt(); render(); sndMusic(); autosave(); schedule();
+}
+function guidedStack() {
+  const L = { C: 0, T: 1, K: 2, S: 3, L: 4 }, h = t => t.split(' ').map(x => D.card(L[x[0]], +x.slice(1)));
+  return { tasks: [53], hands: [h('L4 L3 C2 C6 C9 T3 T7 K1 K5 K8 S2 S6 S9'), h('L2 C1 C4 C8 T1 T5 T9 K2 K6 K9 S1 S4 S7'), h('L1 C3 C5 C7 T2 T4 T6 T8 K3 K4 K7 S3 S5 S8')] };
 }
 function nextAttempt(same) {
   if (!G || G.phase !== 'over') return;
@@ -5843,6 +5924,7 @@ const TIPS = [
   { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card on the table to read it in the panel, then press "Take this job". Choose one you think your own cards can do. With fewer jobs than divers you may pass.' },
   { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'The distress flare', body: 'Optional help: light the flare and every diver passes one card (not a Lantern) to a neighbour. It makes the dive count one extra attempt. You can always say "No flare".' },
   { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signals', body: 'You may show ONE card of yours to the team, once per dive. It must be your highest, your lowest or your only card of a colour. The token on it tells which. Lanterns cannot be shown. Press "Signal…", or skip.' },
+  { id: 'gplan', when: () => UI.mode === 'guided' && G.phase === 'play' && G.tricks.length === 0 && iMustAct() && G.trick.plays.length === 0, title: 'Your plan', body: 'Your job is to win the Lantern 3. You also hold Lantern 4, so nobody can beat it: this dive cannot be lost. Play a colour card first to see how a trick works. Play the Lantern 3 when you lead, or when you have none of the colour that was led.' },
   { id: 'lead', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length === 0 && !G.players[G.trick.turn].helper, title: 'You lead the trick', body: 'The leader plays any card. Tap a card to lift it, tap it again (or press Play) to play it. Everybody then plays one card; the highest card of the led colour wins.' },
   { id: 'follow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && !G.players[G.trick.turn].helper && LD.playable(G, G.trick.turn).length < G.players[G.trick.turn].hand.length, title: 'Follow the colour', body: 'You must play a card of the colour that was led, if you have one. The dim cards are not allowed. Winning is never forced: you may play a low card on purpose.' },
   { id: 'nofollow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && G.trick.ls < 4 && !G.players[G.trick.turn].helper && !G.players[G.trick.turn].hand.some(c => suitOf(c) === G.trick.ls), title: 'No card of that colour', body: 'You have none of the led colour, so you may play anything. A card of another colour never wins the trick, but a Lantern does: Lanterns are trumps.' },
@@ -5925,7 +6007,13 @@ function showResult() {
   box.append(ok ? h('div.win', h('span', { html: KIT.iconSVG('star', 34) }), h('span', 'Dive complete!')) : h('div.lose', h('span', { html: KIT.iconSVG('cross', 30) }), h('span', 'The dive failed.')));
   if (!ok && R.why) box.append(h('p', R.why));
   box.append(h('p.sm', diveLabel() + ' · attempt ' + G.att + (G.distress ? ' · distress flare lit (+1)' : '')));
-  G.tasks.forEach((t, i) => { const st = R.tasks[i]; box.append(h('div.rjob' + (st > 0 ? '.ok' : '.bad'), h('span.mk', { html: st > 0 ? KIT.iconSVG('tick', 24) : KIT.iconSVG('cross', 24) }), h('span', h('b', pname(t.owner) + ': '), jobText(i)))); });
+  // done = tick; broken = cross + which trick, card and diver broke it; never broken (the dive stopped for another reason) = "not finished"
+  G.tasks.forEach((t, i) => {
+    const st = R.tasks[i], det = R.det && R.det[i], nb = ok ? '' : st < 0 ? (det || 'It could not be met by the end of the dive.') : 'Not finished: the dive ended first.';
+    box.append(h('div.rjob' + (st > 0 ? '.ok' : st < 0 ? '.bad' : '.open'), h('span.mk', { html: st > 0 ? KIT.iconSVG('tick', 24) : st < 0 ? KIT.iconSVG('cross', 24) : '<svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 12H18"/></svg>' }), h('span', h('b', pname(t.owner) + ': '), jobText(i), nb ? h('small.why', nb) : null)));
+  });
+  if (!ok && !guidedWon()) box.append(h('p.sm', 'Tip: the red cross marks the job that broke the dive. Grey jobs were still open.'));
+  if (ok && UI.mode === 'guided') guidedDebrief(box);
   if (m.kind === 'log') {
     if (ok) { const n = p.done[m.id]; box.append(h('p', 'Logged in your logbook: dive ' + m.id + ' done in ' + n + ' attempt' + (n === 1 ? '' : 's') + (p.flare[m.id] ? ' (the flare counts one).' : '.'))); }
     else box.append(h('p.sm', 'Attempts so far on this dive: ' + (p.tries[m.id] || 0) + '. If the jobs could not be done from the start, try with new jobs.'));
@@ -5944,6 +6032,15 @@ function showResult() {
   bt.append(h('button.btn.alt', { 'data-a': 'rsclose', type: 'button' }, 'Look at the table'));
   bt.append(h('button.btn.alt', { 'data-a': NET.on ? 'netopen' : 'menu', type: 'button' }, NET.on ? 'Lobby' : 'Menu'));
   box.append(bt); rs.append(box); snd(ok ? 'win' : 'lose');
+}
+function guidedWon() { return UI.mode === 'guided' && G && G.result && G.result.ok; }
+function guidedDebrief(box) {
+  const me = viewSeat(), mine = tricksWon()[me >= 0 ? me : 0] || 0;
+  box.append(h('div.debrief', h('b', 'What you just learned'), h('ul',
+    h('li', 'A job card tells ONE diver what to do with the tricks that diver wins. Yours: win the Lantern 3.'),
+    h('li', 'Lanterns are trumps: any Lantern beats every colour, and the highest Lantern wins. You held the two highest, so the job was safe.'),
+    h('li', 'The whole team wins when every job is done, and the dive ends at once. It took ' + G.tricks.length + ' trick' + (G.tricks.length === 1 ? '' : 's') + ' and you won ' + mine + '.'),
+    h('li', 'Next dives have jobs for every diver. Watch the job chips under each name, and use the signal token to tell your team one card you hold.'))));
 }
 function closeRS() { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; }
 function nextDive() {

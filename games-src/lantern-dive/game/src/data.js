@@ -171,6 +171,7 @@ const BLURBS = [
 ];
 const HELPER = { name: 'Echo', story: 'Echo is the little drone that rides along on two-diver dives. Its cards lie face up in a double row; the Commander flies it.' };
 const DATA = {
+  guided: { tasks: [53], hands: ['L4 L3 C2 C6 C9 T3 T7 K1 K5 K8 S2 S6 S9', 'L2 C1 C4 C8 T1 T5 T9 K2 K6 K9 S1 S4 S7', 'L1 C3 C5 C7 T2 T4 T6 T8 K3 K4 K7 S3 S5 S8'] },
   v: 1, suits: SUITS, tasks: TASKS, missions: MISSIONS, deep: DEEP, names: NAMES, blurbs: BLURBS, helper: HELPER,
   ncards: 40, ntasks: TASKS.length,
   // card value limits: colour 1..9, lanterns 1..4

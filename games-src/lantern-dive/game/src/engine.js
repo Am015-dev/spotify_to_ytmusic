@@ -275,7 +275,7 @@ const secs = m => m.timer ? m.timer.sec : 0;
 function newGame(o) {
   o = o || {};
   const hn = Math.max(2, Math.min(5, o.players | 0 || 3)), two = hn === 2, np = two ? 3 : hn;
-  const G = { v: 1, rng: ((o.seed | 0) || 1) | 0, seed: (o.seed | 0) || 1, hn, np, two, helper: two ? 2 : -1, att: 0, logN: 0, evN: 0, log: [], events: [], used: {}, tdeck: [], tdisc: [], timerOn: !!o.timer, nolog: !!o.nolog };
+  const G = { v: 1, rng: ((o.seed | 0) || 1) | 0, seed: (o.seed | 0) || 1, hn, np, two, helper: two ? 2 : -1, stack: o.stack || null, att: 0, logN: 0, evN: 0, log: [], events: [], used: {}, tdeck: [], tdisc: [], timerOn: !!o.timer, nolog: !!o.nolog };
   G.players = [];
   for (let i = 0; i < hn; i++) G.players.push({ seat: i, name: (o.names && o.names[i]) || D.names[i % 5], ai: (o.ai && o.ai[i]) || null, hand: [], stacks: null, pingUsed: 0, mem: {} });
   if (two) G.players.push({ seat: 2, name: D.helper.name, ai: null, helper: 1, hand: [], stacks: [], pingUsed: 1, mem: {} });
@@ -300,11 +300,18 @@ function startAttempt(G, o) {
   if (o && o.same && G.tasks && G.tasks.length) G.tasks = G.tasks.map(t => ({ id: t.id, owner: -1, pn: -1 }));
   else { if (G.tasks) G.tdisc = G.tdisc.concat(G.tasks.map(t => t.id)); G.tasks = drawTasks(G).map(id => ({ id, owner: -1, pn: -1 })); }
   for (let tries = 0; tries < 200; tries++) { dealHands(G); if (!needRedeal(G)) break; }
+  if (G.stack) applyStack(G);
   G.events = []; G.pl = new Array(40).fill(0); G.pings = []; G.tricks = [];
   Object.assign(G, { phase: 'assign', result: null, trick: null, left: -1, offered: false, ntr: ntrOf(G.np), firstW: -1, lastCard: -1, clockRun: false });
   ev(G, { t: 'deal', att: G.att, cap: G.cap, comm: G.comm, unk: G.unk, tasks: G.tasks.map(t => t.id) });
   lg(G, 'Attempt ' + G.att + ' of dive ' + (G.mission.kind === 'log' ? G.mission.id : G.mission.name) + '. ' + G.players[G.cap].name + ' holds Lantern 4 and is the Commander.');
   initAssign(G);
+}
+// a fixed deal for the guided first dive: stack = { tasks: [job ids], hands: [[card ids] per seat] }, used again on every retry
+function applyStack(G) {
+  const st = G.stack; G.tasks = st.tasks.map(id => ({ id, owner: -1, pn: -1 }));
+  G.players.forEach((p, i) => { p.hand = st.hands[i].slice(); p.stacks = null; p.pingUsed = 0; p.mem = {}; sortHand(p.hand); });
+  G.cap = G.players.findIndex(p => p.hand.includes(L4));
 }
 function nextAttempt(G, o) { if (G.phase !== 'over') return G; G.events = []; startAttempt(G, o || {}); return G; }
 
