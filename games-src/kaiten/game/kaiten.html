@@ -67,7 +67,7 @@ svg{display:block}
 .gx-bar h1 .ic{width:28px;height:28px;display:inline-block}
 .gx-bar .gx-ibtn{color:#fbf0da;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22)}
 .gx-ibtn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-#barstat{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;opacity:.96;white-space:nowrap}
+#barstat{display:block;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:14px;font-weight:700;opacity:.96;white-space:nowrap}
 #barprompt{flex:1;min-width:0;display:none}
 #prompt{font-size:15px;line-height:1.25;font-weight:800}
 .gx-board{background:#e6cf9f}
@@ -4310,7 +4310,7 @@ function finish(G) {
   G.winText = w.length === 1 ? nm(w[0]) + (nm(w[0]) === 'You' ? ' win with ' : ' wins with ') + best + ' points' + (tie ? ' (more Custard Cups)' : '') + '.' : w.map(nm).join(' and ') + ' share the win with ' + best + ' points.';
   if (w.length > 1) use(G, 'sharedWin');
   ev(G, { t: 'gameEnd', pudding: counts, puddingPts: pts, totals, winners: w, text: G.winText });
-  lg(G, 'Puddings: ' + G.players.map((p, i) => p.name + ' ' + counts[i] + ' (' + (pts[i] > 0 ? '+' : '') + pts[i] + ')').join(', ') + '.');
+  lg(G, 'Custard Cups: ' + G.players.map((p, i) => p.name + ' ' + counts[i] + ' (' + (pts[i] > 0 ? '+' : '') + pts[i] + ')').join(', ') + '.');
   lg(G, G.winText);
 }
 
@@ -5349,7 +5349,7 @@ function groupsOf(s, tab, sc) {
   if (c.tempura) { const n = c.tempura, p = Math.floor(n / 2) * 5; mk('tempura', { type: 'tempura', n, pts: p, hint: n % 2 === 0 ? '= ' + p : (p ? '= ' + p + ', need 1' : 'need 1 more'), cls: p ? 'ok' : 'wait', tip: n + ' Crispy Prawn' + (n > 1 ? 's' : '') + ': every pair is worth 5 points' + (n % 2 ? ', one more would make another pair.' : '.') }); }
   if (c.sashimi) { const n = c.sashimi, p = Math.floor(n / 3) * 10, r = n % 3; mk('sashimi', { type: 'sashimi', n, pts: p, hint: r === 0 ? '= ' + p : (p ? '= ' + p + ', need ' + (3 - r) : 'need ' + (3 - r) + ' more'), cls: p ? 'ok' : 'wait', tip: n + ' Fish Slice' + (n > 1 ? 's' : '') + ': each set of three is worth 10 points' + (r ? '; ' + (3 - r) + ' more would finish another set.' : '.') }); }
   if (c.dumpling) { const n = c.dumpling, p = KK.dumplingPts(n); mk('dumpling', { type: 'dumpling', n, pts: p, hint: '= ' + p, cls: 'ok', tip: n + ' Steam Bun' + (n > 1 ? 's' : '') + ' = ' + p + ' points' + (n < 5 ? ' (the next bun makes it ' + KK.dumplingPts(n + 1) + ').' : ' (five or more is the top of the ladder).') }); }
-  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? (sc.rs.filter(r => r.icons === c.icons).length > 1 ? 'tied ' : '') + ORD[rk.rank] + ' now +' + rk.pts : 'behind', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons this round: ' + (rk.rank === 1 ? 'most icons right now (' + rk.pts + ' points).' : rk.rank === 2 ? 'second most right now (' + rk.pts + ' points).' : 'not scoring yet. Most icons scores 6, second most 3.') + (rk.rank && sc.rs.filter(r => r.icons === c.icons).length > 1 ? ' Tied with another diner, so the points are split (rounded down).' : '') + ' The race is only settled when the round ends, so this can still change.' }); }
+  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? (sc.rs.filter(r => r.icons === c.icons).length > 1 ? 'tied ' : '') + ORD[rk.rank] + ' now +' + rk.pts : 'no roll pts', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons this round: ' + (rk.rank === 1 ? 'most icons right now (' + rk.pts + ' points).' : rk.rank === 2 ? 'second most right now (' + rk.pts + ' points).' : 'not scoring yet. Most icons scores 6, second most 3.') + (rk.rank && sc.rs.filter(r => r.icons === c.icons).length > 1 ? ' Tied with another diner, so the points are split (rounded down).' : '') + ' The race is only settled when the round ends, so this can still change.' }); }
   const by = { salmon: [0, 0], squid: [0, 0], egg: [0, 0] };
   for (const e of t) { const k = tkey(e.id); if (NIG[k]) by[k][e.w >= 0 ? 1 : 0]++; }
   for (const k of ['salmon', 'squid', 'egg']) {
@@ -5402,7 +5402,7 @@ function savePrefs() { lsSet('kk_prefs', JSON.stringify(Object.assign({}, UI.pre
 const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35))) : Promise.resolve();
 // ---- "what just happened": after every reveal, one line per diner with the score change and its cause
 const CATN = { maki: 'roll race', tempura: 'prawn pair', sashimi: 'fish set', dumpling: 'buns', nigiri: 'nigiri', wasabi: 'Fire Paste ×3' };
-function buildNews(before, after, picks) {
+function buildNews(before, after, picks, scored) {
   const a = liveScores(before), b = liveScores(after), mkA = makiRank(a.map(r => r.icons)), mkB = makiRank(b.map(r => r.icons));
   const lines = picks.map(pk => {
     const s = pk.seat, d = b[s].total - a[s].total, keys = pk.cards.map(c => c.key), why = [];
@@ -5419,14 +5419,14 @@ function buildNews(before, after, picks) {
     if (!d && !why.length && keys.some(k => k === 'tempura' || k === 'sashimi')) notes.push('scores when the set is complete');
     return { s, d, served, why, notes };
   });
-  return { t: Date.now(), round: G.round, turn: G.turn, lines };
+  return { t: Date.now(), round: scored ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, turn: G.turn, lines };
 }
 function newsDelta(s) { const n = UI.news; if (!n || Date.now() - n.t > 2600) return 0; const l = n.lines.find(x => x.s === s); return l ? l.d : 0; }
 function newsSig(s) { const d = newsDelta(s); return d ? UI.news.t + ':' + d : ''; }
 function newsEl() {
   const n = UI.news; if (!n) return null;
   const box = h('div.news');
-  n.lines.forEach((l, i) => box.appendChild(h('div.nl', i ? null : h('span.nh', 'Last turn: '), h('span.nn', { style: 'color:' + pcol(l.s).c }, pname(l.s)), ' ', h('span.nd' + (l.d > 0 ? '.up' : l.d < 0 ? '.down' : ''), l.d > 0 ? '+' + l.d : l.d < 0 ? '−' + -l.d : '±0'), ' ' + l.served + (l.why.length ? ' · ' + l.why.join(', ') : '') + (l.notes.length ? ' · ' + l.notes.join('; ') : ''))));
+  n.lines.forEach((l, i) => box.appendChild(h('div.nl', i ? null : h('span.nh', n.round !== G.round ? 'Last turn of round ' + n.round + ': ' : 'Last turn: '), h('span.nn', { style: 'color:' + pcol(l.s).c }, pname(l.s)), ' ', h('span.nd' + (l.d > 0 ? '.up' : l.d < 0 ? '.down' : ''), l.d > 0 ? '+' + l.d : l.d < 0 ? '−' + -l.d : '±0'), ' ' + l.served + (l.why.length ? ' · ' + l.why.join(', ') : '') + (l.notes.length ? ' · ' + l.notes.join('; ') : ''))));
   return box;
 }
 // ===================== part 2: rendering (table, belt, dock) =====================
@@ -5487,11 +5487,12 @@ function renderTable() {
     const cmp = rowH < 88, shw = av + 14, sl = Math.max(30, Math.min(58, Math.round((rowH - (cmp ? 12 : 36)) / 1.4)));
     const ctrW = cw - shw - sl - 25;
     // plates on the counter: one row, or two rows of bigger plates when the seat is tall enough (nothing clipped, labels readable)
-    const ng = groupsOf(s, tab, info).list.length + 1, cap = isMe ? 84 : 68, slotW = p => Math.max(p + 12, 66);
-    const fit = (rows, hgt) => { const k = Math.ceil(ng / rows); let p = Math.min(hgt, cap); if (k * slotW(p) > ctrW) p = Math.max(24, (ctrW / k) - 12); return slotW(p) * k > ctrW + 4 ? Math.min(p, 24) : p; };
-    const pd1 = fit(1, rowH - (isMe ? 34 : 32)), pd2 = ng > 2 ? fit(2, (rowH - 12) / 2 - 30) : 0;
-    const wrap = pd2 > pd1 + 4;
-    let pd = Math.max(24, Math.round(wrap ? pd2 : pd1));
+    // (a layout that fits wins over bigger plates that overflow past the edge)
+    const ng = groupsOf(s, tab, info).list.length + (pcs[s] || !isPh() ? 1 : 0), cap = isMe ? 84 : 68, slotW = p => Math.max(p + 12, 60);
+    const fit = (rows, hgt) => { const k = Math.ceil(ng / rows); let p = Math.max(24, Math.min(hgt, cap)); if (k * slotW(p) > ctrW) p = Math.max(24, (ctrW / k) - 12); return { p, ok: slotW(p) * k <= ctrW + 4 && hgt >= 24 }; };
+    const f1 = fit(1, rowH - (isMe ? 34 : 32)), f2 = ng > 2 ? fit(2, (rowH - 12) / 2 - 30) : { p: 0, ok: false };
+    const wrap = f2.ok && (!f1.ok || f2.p > f1.p + 4);
+    let pd = Math.max(24, Math.round(wrap ? f2.p : f1.p));
     const dm = { av, shw, sl, pd, cmp, wrap };
     const sg = seatSig(s, tab, info, pcs, isMe, dm) + '|' + sigAll;
     const old = oldSeats[s];
@@ -5522,7 +5523,7 @@ function seatEl(s, tab, info, pcs, isMe, dm) {
   const ctr = h('div.ctr');
   const land = UI.land || new Set();
   for (const g of gs.list) ctr.appendChild(grpEl(g, dm.pd, land.has(s + '|' + g.k)));
-  if (isMe || pcs[s] || !(dm.cmp && isPh())) ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));   // a cramped rival seat drops the empty custard spot (the dock lists custard)
+  if (pcs[s] || !isPh()) ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));   // phones: the custard spot appears with the first cup (the dock lists custard)
   if (!gs.list.length && !pcs[s]) ctr.insertBefore(h('span.none', G.phase === 'pick' ? 'Nothing served yet' : ''), ctr.firstChild);
   el.appendChild(ctr);
   el.appendChild(slotEl(s, dm.sl, dm.cmp));
@@ -5580,9 +5581,9 @@ function renderBelt() {
   const m = Math.max(G.hand, 1), avail = beltWidth() - 20;
   const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? 74 : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
   // a tall phone: two rows of plates instead of a belt that scrolls sideways and hides plates off the edge
-  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 56 && boardSize().h >= 440 && m > 5 && hand.length > 0 && G.phase !== 'over';
+  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 56 && boardSize().h >= 440 && m > 5 && hand.length > 0 && G.phase !== 'over' && hand.length * 66 > avail + 6;   // back to one row once the hand fits
   if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(74, Math.floor((avail - (k - 1) * 6) / k))); }
-  else if (ph && one < hw && one >= 44) hw = one;   // shrink a little rather than hide plates past the edge
+  else if (ph && hand.length) { const fitN = Math.floor((avail - (hand.length - 1) * 6) / hand.length); if (fitN < hw) hw = Math.max(44, fitN); }   // shrink a little rather than hide plates past the edge
   belt.classList.toggle('two', !!two);
   $('#bd').style.setProperty('--hw', hw + 'px');
   if (!belt.__bt) { belt.__bt = 1; try { const bt = KIT.beltEl({ h: 72, period: 96, seconds: 6 }); bt.style.height = '60px'; $('#beltw').insertBefore(bt, belt); bt.style.bottom = '8px'; } catch (e) { } }
@@ -5619,9 +5620,9 @@ function promptText() {
   if (!G) return '';
   if (G.phase === 'over') return isPh() ? 'The meal is over.' : (G.winText || 'The meal is over.');
   const v = viewSeat();
-  if (UI.fz && UI.fz.say) return isPh() ? (UI.fz.slots ? (UI.fz.slots[0] && UI.fz.slots[0].mode === 'faces' ? 'Reveal!' : 'Plates are covered…') : UI.fz.roundEnd ? 'Round over!' : 'Plates land. Hands pass left.') : UI.fz.say;
+  if (UI.fz && UI.fz.say) return isPh() ? (UI.fz.slots ? (UI.fz.slots[0] && UI.fz.slots[0].mode === 'faces' ? 'Reveal!' : 'Plates are covered…') : UI.fz.roundEnd ? 'Round over!' : 'Plates land. Hands pass on.') : UI.fz.say;
   if (UI.cards.length && UI.cards[0].kind === 'pass') return 'Pass the device to ' + pname(UI.cards[0].seat) + '.';
-  if (UI.busy) return 'The hands pass one seat to the left…';
+  if (UI.busy) return 'The hands pass to the next diner…';
   if (watching()) return 'The computers are choosing a plate…';
   if (hotSeat() && v < 0) return 'Pass the device to the next diner.';
   const pend = KK.pending(G).filter(s => s !== v).map(pname);
@@ -5645,7 +5646,7 @@ function renderDock() {
     if (want && !hb && pd) pd.appendChild(h('button.btn.alt#hintb', { 'data-a': 'hint', type: 'button' }, 'Hint')); else if (!want && hb) hb.remove(); }
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' ? 'Game over' : (canPick() ? 'Your turn' : 'Table');
   // round track
-  const rt = $('#rt'); if (rt) { const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring); rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · pass left')); }
+  const rt = $('#rt'); if (rt) { const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring); rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · hands pass on')); }
   // roster chips
   const ro = $('#roster'); if (ro) {
     const tab = tables(), info = seatScoreInfo(tab), v = viewSeat(), f = focusSeat();
@@ -5689,7 +5690,7 @@ function renderSel() {
     const tp = UI.tip && UI.tip.turn === G.round + '.' + G.turn && canPick() ? UI.tip : null;
     if (tp) el.appendChild(h('div.tip', tp.type ? h('div.tcard', { html: plateS(tp.type, 30) }) : null, h('div', h('b', tp.title), ' ', tp.text)));
     const ne = newsEl(); if (ne && !(UI.fz && UI.fz.slots)) el.appendChild(ne);
-    if (!tp && !ne) el.appendChild(h('div.si', h('span', h('b', 'Goal: '), 'the most points after 3 rounds wins. Each turn everyone picks one plate, then the hands pass left. The green +N on a plate is what it scores you right now.')));
+    if (!tp && !ne) el.appendChild(h('div.si', h('span', h('b', 'Goal: '), 'the most points after 3 rounds wins. Each turn everyone picks one plate, then each hand passes to the next diner (shown under the table). The green +N on a plate is what it scores you right now.')));
     return;
   }
   let t;
@@ -5893,7 +5894,7 @@ async function playResolve(evs, preHand) {
     if (ANIM) { snd('cloche'); const hosts = $$('#tbl .hostc'); try { pxReveal(); await KIT.revealAll(hosts, { stagger: 110 }); } catch (e) { } await wait(850); } if (tok !== UI.seq) return;
     // 3: plates land on the counters
     const land = new Set(); rv.picks.forEach(p => p.cards.forEach(c => land.add(p.seat + '|' + keyOfCard(c)))); UI.land = land;
-    try { UI.news = buildNews(before, T, rv.picks); } catch (e) { UI.news = null; }
+    try { UI.news = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.news = null; }
     UI.fz.slots = null; UI.fz.tables = T; UI.fz.say = ps ? 'The plates land. Hands slide to the left…' : 'The plates land. The round is over!';
     if (sc) { UI.fz.roundEnd = true; UI.fz.hand = []; UI.fz.backN = 0; }
     render(); snd('clink'); await wait(750); if (tok !== UI.seq) return;
@@ -5993,7 +5994,7 @@ const TIP_EXTRA = {
 function coachTip(key, title, text, type) {
   UI.coach.seen[key] = 1; UI.coach.turn = G.round + '.' + G.turn;
   if (key === 'welcome') {
-    const body = h('div', h('p', h('b', 'Goal: '), 'the most points after 3 rounds wins.'), h('p', h('b', 'Each turn: '), 'tap a plate on your belt, press Serve. Everyone reveals at the same time, then every hand passes one seat to the left.'), h('p', h('b', 'Scoring: '), 'plates score in pairs, sets and races. The green +N on a plate is what it scores you right now.'));
+    const body = h('div', h('p', h('b', 'Goal: '), 'the most points after 3 rounds wins.'), h('p', h('b', 'Each turn: '), 'tap a plate on your belt, press Serve. Everyone reveals at the same time, then every hand passes to the next diner ("passes to …" under the table).'), h('p', h('b', 'Scoring: '), 'plates score in pairs, sets and races. The green +N on a plate is what it scores you right now.'));
     pushCard({ kind: 'coach', title, sub: 'How it works', body, buttons: [{ label: 'Let\'s eat', a: 'cont' }] }); return;
   }
   UI.tip = { key, title, text, type, turn: UI.coach.turn }; render();
@@ -6005,9 +6006,9 @@ function coachCheck() {
   const seen = UI.coach.seen, p = G.players[v];
   if (!seen.welcome && lv === 'full') { coachTip('welcome', 'Welcome to the belt', ''); return true; }
   if (!seen.pick && lv === 'full') { coachTip('pick', 'Your move:', 'tap a plate to lift it and read what it does, then press Serve.'); return true; }
-  const types = Array.from(new Set(p.hand.map(tkey))).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
+  const PRI = ['wasabi', 'chop', 'pudding']; const types = Array.from(new Set(p.hand.map(tkey))).sort((a, b) => (PRI.indexOf(b) - PRI.indexOf(a)) || (ORDER.indexOf(a) - ORDER.indexOf(b)));
   if (lv === 'full' || lv === 'light') {
-    for (const t of types) { if (seen[t]) continue; if (lv === 'light' && !['wasabi', 'chop', 'pudding'].includes(t)) continue; coachTip(t, 'New: ' + TY[t].name + '.', TIP_EXTRA[t] || '', t); return true; }
+    for (const t of types) { const tk = ICONS[t] ? 'roll' : t; if (seen[tk]) continue; if (lv === 'light' && !['wasabi', 'chop', 'pudding'].includes(t)) continue; coachTip(tk, 'New: ' + TY[t].name + '.', TIP_EXTRA[t] || '', t); return true; }
   }
   const c = KK.tableCounts(p.table);
   if (!seen.pasteReady && c.wasabiUnused && p.hand.some(id => NIG[tkey(id)])) { coachTip('pasteReady', 'Fire Paste is waiting:', 'serve a nigiri now and it lands on your paste and scores triple (look for +3, +6 or +9).', 'wasabi'); return true; }
@@ -6151,7 +6152,9 @@ function buildRules() {
     ['Roll race', 'the Seaweed Roll contest: add up the roll icons on each counter. Most icons scores 6, second most 3.'],
     ['Nigiri', 'the Sunset, Moon and Sun plates. They score their number straight away.'],
     ['Fire Paste bonus', 'a nigiri served onto a waiting Fire Paste scores triple; the extra points show as this row on the score pad.'],
-    ['Sweets', 'Custard Cups. They stay on your counter until the end of the meal.'],
+    ['Custard', 'Custard Cups. They stay on your counter until the end of the meal, then most scores 6 and fewest loses 6.'],
+    ['Last turn', 'the lines in the panel after every reveal: what each diner served and why their score went up or down.'],
+    ['Live score', 'the number on each diner during a round: what their counter would score if the round ended now. The roll race can still change it.'],
     ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
     ['+N', 'the small green number on a plate: what serving it would score you right now.']].map(([t, d]) => [h('dt', t), h('dd', d)]).flat()));
   root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: &ldquo;Jazz Slower&rdquo; by Pro Sensory (OpenGameArt, CC0). Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
