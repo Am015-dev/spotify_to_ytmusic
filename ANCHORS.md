@@ -5,7 +5,6 @@
 | 2 | `const hb=roamHit(nx,nz,2.2,RO.y);if(hb){const pp=bldPush(hb,nx,nz,2.2)` | roamStep | 3-circle collision hull `SC_hit` / `SC_push` |
 | 3 | `S2=.66;` | pedStep | pedestrian scale `SC_K.ped` |
 | 4 | `g.scale.setScalar(1.7);g.userData={arm,ex}` | minifig() | quest / passenger minifig scale `SC_K.fig` |
-| 5 | `/truck\|delivery\|van/.test(n)?[1.3,3.3]:[1.15,2.4]` | ob.js OB_cdim | car hit boxes follow the scaled cars |
 | 6 | `addScaledVector(fw,-2.6).addScaledVector(rs,sd*2.1)` | roamPose skid marks | `SC_K.skid` |
 | 7 | `JU.drop+=(2.2*JU_ss` | ju.js roamCam wrapper | × `SC_cam()` |
 | 8 | `lim=boost?27:24` | ju.js roamCam wrapper | × `SC_cam()` |
