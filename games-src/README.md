@@ -108,7 +108,7 @@ Tests:
 
 - **Research data** with the original games' real names and card texts: rulebook extracts, card lists, online-implementation and open-source tile data.
 - **Scripts that need that data:**
-  - `ft/build_data.py`, `rc/build_cards.py` and `kot/extract_bga.py`;
+  - `ft/(moved to the private research repo)`, `rc/(moved to the private research repo)` and `kot/(moved to the private research repo)`;
   - `xw/gen.py`;
   - `carc/game/src/gen_data.py` (needs `tiles.json`).
   
