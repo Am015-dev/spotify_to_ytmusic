@@ -257,6 +257,7 @@ function promptText() {
   if (G.q) return G.q.title;
   const n = availW(p);
   const pre = NET.on ? 'Your turn. ' : hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
+  if (UI.rec && p.season < 2 && !G.q) return pre + (n > 0 ? 'Tap a glowing place or a card. Red outline = suggested move.' : 'All workers are out: play a card or Prepare. Red outline = suggested.');
   return pre + (n > 0 ? 'Tap a glowing place for a worker (' + n + ' free) or a card to play.' : p.season < 3 ? 'All workers are out: play a card or Prepare for ' + SEASN[p.season + 1] + ' to get them back.' : 'Last season, no workers left: play a card, or Pass when you are done.');
 }
 function chipEl(s) {
@@ -400,7 +401,7 @@ function placePop() {
 }
 function setPop(o, build) {
   UI.pop = o; const p = $('#ppop'); p.hidden = false; p.innerHTML = ''; p.setAttribute('data-pop', o.kind);
-  build(p); placePop();
+  build(p); placePop(); setTimeout(moreCue, 0);
   const bd = p.querySelector('.ph-body'); if (bd) bd.scrollTop = 0;
 }
 function moveBtn(m, inner, cls) {
@@ -595,7 +596,7 @@ function openHint() {
 }
 // ---- pending decision card (one at a time)
 function qHint(k) {
-  return ({ discard: 'Tap a card to discard it. Tap Done when you have finished.', resource: 'Pick the resource you want.', meadow: 'Tap a card to take it.', production: 'Every one of them will run. Just pick which goes next.', ruins: 'The razed card goes away and you get its cost back.', recipient: 'Pick which rival receives it.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Several effects fired at once. Choose the order.', queen: 'The Thistle Regent plays a cheap card for free.', inn: 'The Lantern Rest plays a meadow card for 3 fewer resources.', university: 'The Lorewood College disbands one of your cards and refunds it.', cemetery: 'Reveal cards from the pile, then play one for free.', copy: 'Pick which location to copy.' })[k] || '';
+  return ({ discard: 'Tap a card to discard it. Tap Done when you have finished.', resource: 'Pick the resource you want.', meadow: 'Tap a card to take it.', production: 'Every one of them will run. Just pick which goes next.', ruins: 'The razed card goes away and you get its cost back.', recipient: 'Pick which rival receives it.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Several of your cards fired at once. All of them happen; just pick which goes first (it rarely matters).', queen: 'The Thistle Regent plays a cheap card for free.', inn: 'The Lantern Rest plays a meadow card for 3 fewer resources.', university: 'The Lorewood College disbands one of your cards and refunds it.', cemetery: 'Reveal cards from the pile, then play one for free.', copy: 'Pick which location to copy.' })[k] || '';
 }
 function renderQ() {
   const pc = $('#pc');
@@ -672,7 +673,7 @@ function render() {
   if (!G || !UI.started) return;
   { const v = viewSeat(); if (v >= 0) GX.recap.view(v); }
   try { if (window.PerfHUD) PerfHUD.wake(); } catch (e) { }
-  renderBoard(); renderDock(); renderQ(); renderCard(); placePop(); markSel(); renderDrawers();
+  renderBoard(); renderDock(); renderQ(); renderCard(); placePop(); markSel(); renderDrawers(); fitRecap(); setTimeout(() => { moreCue(); fitRecap(); }, 0);
   if (NET.on) netRenderHook();
 }
 function markSel() {
@@ -711,8 +712,11 @@ function schedule() {
     return;
   }
   if (UI.coachOn ? coachCheck() : mapCard()) return;
+  // guided game: the order of several effects that fire together rarely matters, so take the helper's order instead of asking every time
+  if (UI.mode === 'guided' && G.q && G.q.kind === 'trigger' && G.q.who === a && !isClient()) { let m = null; try { m = HB.AI.choose(G, a, 'normal'); } catch (e) { } if (m) { UI.tm = setTimeout(() => { if (G && G.q && G.q.kind === 'trigger') { act(m); toast('Effects that fired together were resolved one after another.'); } }, ANIM ? 300 : 0); return; } }
   if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
-  if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
+  // suggestions show by themselves in your first two seasons; after that only when you press Hint
+  if (!UI.noRec && p.season < 2) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
 }
 function aiStep() {
   UI.tm = 0; if (isClient() || !G || G.phase === 'over' || (UI.cards.length && !NET.on)) return;
@@ -749,7 +753,7 @@ function flushAfter() {
   const lines = G.log.filter(x => x.i > e.from).map(x => x.t).slice(-14);
   const p = G.players[e.seat];
   const s = p.season;
-  pushCard({ kind: 'season', title: SEASN[s] + ' has come', sub: p.name + ' prepared for ' + SEASN[s], body: () => { const g = e.b4 ? gainParts(e.b4, e.seat) : []; return h('div', h('div.seasonrow', HBKit.season(SEAS[s], 56)), g.length ? h('div.gain', h('b', 'You got: '), g.join(', ')) : null, h('ul.need', lines.map(t => h('li', t)))); }, });
+  pushCard({ kind: 'season', title: SEASN[s] + ' has come', sub: p.name + ' prepared for ' + SEASN[s], body: () => { const g = e.b4 ? gainParts(e.b4, e.seat) : []; const px = e.b4 ? ptsExplain(e.b4).find(y => y.seat === e.seat) : null; if (px) g.unshift(sgn(px.d) + ' ★ (' + px.parts.join('; ') + ')'); return h('div', h('div.seasonrow', HBKit.season(SEAS[s], 56)), g.length ? h('div.gain', h('b', 'You got: '), g.join(', ')) : null, h('ul.need', lines.map(t => h('li', t)))); }, });
   return true;
 }
 // ---- end of game: one card per player, then the result
@@ -1085,12 +1089,12 @@ function ptsExplain(before) {
     // printed points of cards that came or went
     const now = p.city.map(e => e.id), was = a.city.slice();
     const added = now.filter(id => { const i = was.indexOf(id); if (i >= 0) { was.splice(i, 1); return false; } return true; });
-    added.forEach(id => { const v = cdef(id).pts; if (v) { parts.push(sgn(v) + ' ' + cname(id) + ' (printed points)'); acc += v; } });
+    added.forEach(id => { const v = cdef(id).pts; if (v) { parts.push(sgn(v) + ' ' + cname(id)); acc += v; } });
     was.forEach(id => { const v = cdef(id).pts; if (v) { parts.push(sgn(-v) + ' ' + cname(id) + ' left the city'); acc -= v; } });
     const rest = (sc.cards - a.sc.cards) - acc; if (rest) { parts.push(sgn(rest) + ' printed card points'); acc += rest; }
     const tk = sc.tokens - a.sc.tokens; if (tk) { parts.push(sgn(tk) + ' point token' + (Math.abs(tk) > 1 ? 's' : '')); acc += tk; }
     const nb = Object.fromEntries((sc.detail || []).map(x => [x.card, x.bonus])); let bacc = 0;
-    new Set(Object.keys(nb).concat(Object.keys(a.bonus))).forEach(k => { const v = (nb[k] || 0) - (a.bonus[k] || 0); if (v) { parts.push(sgn(v) + ' ' + cname(+k) + ' bonus (purple card)'); bacc += v; } });
+    new Set(Object.keys(nb).concat(Object.keys(a.bonus))).forEach(k => { const v = (nb[k] || 0) - (a.bonus[k] || 0); if (v) { parts.push(sgn(v) + ' ' + cname(+k) + ' bonus'); bacc += v; } });
     if (sc.bonus - a.sc.bonus - bacc) parts.push(sgn(sc.bonus - a.sc.bonus - bacc) + ' purple card bonus');
     acc += sc.bonus - a.sc.bonus;
     const ev = sc.events - a.sc.events;
@@ -1098,13 +1102,13 @@ function ptsExplain(before) {
       const names = []; G.bev.forEach((e, i) => { if (e.o === s && a.bev[i] !== s) names.push(D.basicEvents[e.k].name); }); G.sev.forEach((e, i) => { if (e.o === s && a.sev[i] !== s) names.push(D.specialEvents[e.k].name); });
       parts.push(sgn(ev) + ' event' + (names.length ? ': ' + names.join(', ') : '')); acc += ev;
     }
-    const jr = sc.journey - a.sc.journey; if (jr) { parts.push(sgn(jr) + ' the Long Road (that worker stays and scores)'); acc += jr; }
+    const jr = sc.journey - a.sc.journey; if (jr) { parts.push(sgn(jr) + ' Long Road'); acc += jr; }
     if (acc !== d) parts.push(sgn(d - acc) + ' other');
     out.push({ seat: s, d, parts });
   });
   return out;
 }
-function ptsLine(x) { return pname(x.seat) + ' ' + sgn(x.d) + ' ★ (' + x.parts.join('; ') + ')'; }
+function ptsLine(x) { return pname(x.seat) + ' ' + sgn(x.d) + ' ★: ' + x.parts.join(', '); }
 // show the changes: your own as a points banner, the others' inside the "Since your turn" list
 function ptsShow(list, mover) {
   UI.scoreAudit = UI.scoreAudit || { n: 0, miss: [] };
@@ -1157,7 +1161,7 @@ function boardMap() {
   const row = (ico, b, t) => h('li', h('span.mapi', ico), h('span', h('b', b), ' ' + t));
   return h('div', h('ul.map',
     row(ic('twig', 20), 'Brown and green tiles:', 'places for your workers. The icons show what you get. Glowing = open to you now.'),
-    row(ic('flag', 20), 'Flags and stars:', 'events. Get the cards they ask for, then a worker claims the points.'),
+    row(ic('flag', 20), 'Flags and stars:', 'events. Get the cards they ask for, then a worker claims the points. A ? star scores a varying amount: tap it to read how.'),
     row(ic('road', 20), 'Long Road:', 'opens in your last season (Autumn): a worker there scores 2–5 points.'),
     row(ic('deck', 20), 'Big cards:', 'the meadow. Anyone can buy them, just like cards in your hand.')),
     h('p.sm', 'Tap anything to see what it does. Hint suggests a move and says why.'));
@@ -1178,4 +1182,23 @@ function raceEl() {
   const e = h('span.race', { 'aria-label': 'Points so far: ' + rows.map(r => r.n + ' ' + r.t).join(', ') });
   show.forEach((r, k) => e.appendChild(h('span', '★' + r.t + ' ' + r.n, r.out ? h('i', ' ✓') : null)));
   return e;
+}
+// ---- sheets that run past the bottom say so ("more below") until you scroll to the end
+function moreCue() {
+  $$('#pc .ph-body,#ppop .ph-body').forEach(b => {
+    const more = b.scrollHeight > b.clientHeight + 6 && b.scrollTop + b.clientHeight < b.scrollHeight - 6;
+    const host = b.parentNode; let cue = host.querySelector(':scope > .morecue');
+    if (more && !cue) { cue = h('div.morecue', { 'aria-hidden': 'true' }, '▼ more below, scroll'); host.insertBefore(cue, b.nextSibling); }
+    else if (!more && cue) cue.remove();
+  });
+}
+document.addEventListener('scroll', ev => { if (ev.target && ev.target.classList && ev.target.classList.contains('ph-body')) moreCue(); }, true);
+// ---- the one-line "Since your turn" preview: cut it to whole words that fit, so no text runs past the panel
+function fitRecap() {
+  $$('.gx-recap-1').forEach(e => {
+    const full = e.textContent; if (!full || e.dataset.fit === full || e.clientWidth <= 0) return;
+    let t = full; e.title = full;
+    while (e.scrollWidth > e.clientWidth + 1 && t.length > 8) { t = t.replace(/\s*\S+\s*$/, ''); e.textContent = t + '…'; }
+    e.dataset.fit = e.textContent;
+  });
 }

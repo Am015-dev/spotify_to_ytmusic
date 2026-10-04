@@ -65,7 +65,7 @@ function placePop() {
 }
 function setPop(o, build) {
   UI.pop = o; const p = $('#ppop'); p.hidden = false; p.innerHTML = ''; p.setAttribute('data-pop', o.kind);
-  build(p); placePop();
+  build(p); placePop(); setTimeout(moreCue, 0);
   const bd = p.querySelector('.ph-body'); if (bd) bd.scrollTop = 0;
 }
 function moveBtn(m, inner, cls) {
@@ -260,7 +260,7 @@ function openHint() {
 }
 // ---- pending decision card (one at a time)
 function qHint(k) {
-  return ({ discard: 'Tap a card to discard it. Tap Done when you have finished.', resource: 'Pick the resource you want.', meadow: 'Tap a card to take it.', production: 'Every one of them will run. Just pick which goes next.', ruins: 'The razed card goes away and you get its cost back.', recipient: 'Pick which rival receives it.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Several effects fired at once. Choose the order.', queen: 'The Thistle Regent plays a cheap card for free.', inn: 'The Lantern Rest plays a meadow card for 3 fewer resources.', university: 'The Lorewood College disbands one of your cards and refunds it.', cemetery: 'Reveal cards from the pile, then play one for free.', copy: 'Pick which location to copy.' })[k] || '';
+  return ({ discard: 'Tap a card to discard it. Tap Done when you have finished.', resource: 'Pick the resource you want.', meadow: 'Tap a card to take it.', production: 'Every one of them will run. Just pick which goes next.', ruins: 'The razed card goes away and you get its cost back.', recipient: 'Pick which rival receives it.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Several of your cards fired at once. All of them happen; just pick which goes first (it rarely matters).', queen: 'The Thistle Regent plays a cheap card for free.', inn: 'The Lantern Rest plays a meadow card for 3 fewer resources.', university: 'The Lorewood College disbands one of your cards and refunds it.', cemetery: 'Reveal cards from the pile, then play one for free.', copy: 'Pick which location to copy.' })[k] || '';
 }
 function renderQ() {
   const pc = $('#pc');

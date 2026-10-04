@@ -31,7 +31,7 @@ function render() {
   if (!G || !UI.started) return;
   { const v = viewSeat(); if (v >= 0) GX.recap.view(v); }
   try { if (window.PerfHUD) PerfHUD.wake(); } catch (e) { }
-  renderBoard(); renderDock(); renderQ(); renderCard(); placePop(); markSel(); renderDrawers();
+  renderBoard(); renderDock(); renderQ(); renderCard(); placePop(); markSel(); renderDrawers(); fitRecap(); setTimeout(() => { moreCue(); fitRecap(); }, 0);
   if (NET.on) netRenderHook();
 }
 function markSel() {
@@ -70,8 +70,11 @@ function schedule() {
     return;
   }
   if (UI.coachOn ? coachCheck() : mapCard()) return;
+  // guided game: the order of several effects that fire together rarely matters, so take the helper's order instead of asking every time
+  if (UI.mode === 'guided' && G.q && G.q.kind === 'trigger' && G.q.who === a && !isClient()) { let m = null; try { m = HB.AI.choose(G, a, 'normal'); } catch (e) { } if (m) { UI.tm = setTimeout(() => { if (G && G.q && G.q.kind === 'trigger') { act(m); toast('Effects that fired together were resolved one after another.'); } }, ANIM ? 300 : 0); return; } }
   if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
-  if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
+  // suggestions show by themselves in your first two seasons; after that only when you press Hint
+  if (!UI.noRec && p.season < 2) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
 }
 function aiStep() {
   UI.tm = 0; if (isClient() || !G || G.phase === 'over' || (UI.cards.length && !NET.on)) return;
@@ -108,7 +111,7 @@ function flushAfter() {
   const lines = G.log.filter(x => x.i > e.from).map(x => x.t).slice(-14);
   const p = G.players[e.seat];
   const s = p.season;
-  pushCard({ kind: 'season', title: SEASN[s] + ' has come', sub: p.name + ' prepared for ' + SEASN[s], body: () => { const g = e.b4 ? gainParts(e.b4, e.seat) : []; return h('div', h('div.seasonrow', HBKit.season(SEAS[s], 56)), g.length ? h('div.gain', h('b', 'You got: '), g.join(', ')) : null, h('ul.need', lines.map(t => h('li', t)))); }, });
+  pushCard({ kind: 'season', title: SEASN[s] + ' has come', sub: p.name + ' prepared for ' + SEASN[s], body: () => { const g = e.b4 ? gainParts(e.b4, e.seat) : []; const px = e.b4 ? ptsExplain(e.b4).find(y => y.seat === e.seat) : null; if (px) g.unshift(sgn(px.d) + ' ★ (' + px.parts.join('; ') + ')'); return h('div', h('div.seasonrow', HBKit.season(SEAS[s], 56)), g.length ? h('div.gain', h('b', 'You got: '), g.join(', ')) : null, h('ul.need', lines.map(t => h('li', t)))); }, });
   return true;
 }
 // ---- end of game: one card per player, then the result

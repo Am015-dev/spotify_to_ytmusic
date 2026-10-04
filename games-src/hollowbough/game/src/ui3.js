@@ -14,6 +14,7 @@ function promptText() {
   if (G.q) return G.q.title;
   const n = availW(p);
   const pre = NET.on ? 'Your turn. ' : hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
+  if (UI.rec && p.season < 2 && !G.q) return pre + (n > 0 ? 'Tap a glowing place or a card. Red outline = suggested move.' : 'All workers are out: play a card or Prepare. Red outline = suggested.');
   return pre + (n > 0 ? 'Tap a glowing place for a worker (' + n + ' free) or a card to play.' : p.season < 3 ? 'All workers are out: play a card or Prepare for ' + SEASN[p.season + 1] + ' to get them back.' : 'Last season, no workers left: play a card, or Pass when you are done.');
 }
 function chipEl(s) {
