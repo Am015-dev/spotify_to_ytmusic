@@ -23,7 +23,7 @@ function bfZone(m,me){const c=m.card!=null?cd(m.card):null;const cb=G.cb;const i
 const bfHarm=m=>/yourself!|against yourself|helps a rival/.test(moveLabel(m));
 function bfMoves(me,id){if(me<0||!G||G.winner)return [];return cardMoves(me,id).filter(m=>m.act!=='sell'&&!bfHarm(m)).map(m=>({m,z:bfZone(m,me)})).filter(x=>x.z)}
 function bfEls(z){const q=s=>[...document.querySelectorAll(s)];
-  if(z==='hero')return q('.bfbig,.mine .top,.mine .gear');if(z==='fh')return q('.arena .score.hero');if(z==='ms')return q('.arena .score.mons,.arena .row.mons .mon');
+  if(z==='hero')return q('.bfbig,.mine .top,.mine .gear');if(z==='fh'){const me=viewSeat();const cb=G.cb;return q('.arena .score.hero'+(cb&&(cb.who===me||cb.help===me)?',.mine .top,.mine .gear':''))}if(z==='ms')return q('.arena .score.mons,.arena .row.mons .mon');
   if(z[0]==='m')return q(`.arena .row.mons .mon:nth-child(${+z.slice(1)+1})`);
   if(z[0]==='p')return q(`#phopps [data-opp="${z.slice(1)}"],#app .opps [data-opp="${z.slice(1)}"]`);
   if(z==='door')return q('.pile.pl,.bfdoor,.arena:not(:has(.vs))');if(z==='disc')return q('.pile.pr');return []}
@@ -38,8 +38,8 @@ function bfMark(){document.querySelectorAll('[data-bfz]').forEach(e=>{e.removeAt
   const id=BF.drag?BF.drag.id:BF.pick;if(id==null)return;const me=viewSeat();const ms=bfMoves(me,id);if(!ms.length){BF.pick=null;return}
   document.documentElement.classList.add('bf-holding');document.querySelectorAll(`.mine [data-card="${id}"]`).forEach(e=>e.classList.add('bf-picked'));
   const seen={};for(const x of ms){if(seen[x.z])continue;seen[x.z]=1;const lab=ms.filter(y=>y.z===x.z).length>1?bfShort(moveLabel(x.m)).replace(/ .*/,'')+'…':bfShort(moveLabel(x.m));
-    bfEls(x.z).forEach((e,k)=>{e.dataset.bfz=x.z;e.classList.add('bf-tgt');if(!k)e.dataset.bfl=lab})}
-  bfSay(BF.drag?'Drop it on a glowing spot':'Tap a glowing spot, or drag')}
+    bfEls(x.z).forEach((e,k)=>{if(e.dataset.bfz)return;e.dataset.bfz=x.z;e.classList.add('bf-tgt');if(!k)e.dataset.bfl=lab})}
+  const l0=bfShort(moveLabel(ms[0].m));bfSay(BF.drag?l0+': drop on the glow':l0+': tap the glow')}
 function bfSay(t){const l=document.querySelector('#prompt .bfline');if(l)l.textContent=t}
 // run the move for a drop on zone z; several moves on one spot (e.g. which item to borrow) open the card's own choice pop-up
 function bfDrop(id,z,at){const me=viewSeat();const ms=bfMoves(me,id).filter(x=>x.z===z);BF.pick=null;BF.drag=null;
@@ -123,7 +123,7 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
   const _arena=arenaHTML;arenaHTML=function(){const me=viewSeat();
     if(G&&!G.cb&&G.phase==='main'&&me>=0&&sideToAct()===me&&G.active===me&&P(me).human&&validMoves(me).some(m=>m.act==='kick')){UI.arRes=40;
       return `<button class="bfdoor" data-a="bfkick" aria-label="Kick open the door"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span><span class="bfkick">KICK!</span><span class="bfboot" aria-hidden="true">🥾</span></button>`}
-    if(G&&!G.cb&&G.phase==='setup'&&me>=0&&P(me).human){const p=P(me);UI.arRes=40;return `<div class="bfstage"><div class="bfbig" style="--c:${PCOL[p.i]}">${bfAv(p,'bfbav')}<b class="bfbstr">⚔ ${pStr(p)}</b><span class="bfblv">Lv ${p.lvl}</span></div><div class="bfcap">Make your hero strong</div></div>`}
+    if(G&&!G.cb&&G.phase==='setup'&&me>=0&&P(me).human){const p=P(me);UI.arRes=40;return `<div class="bfstage"><div class="bfbig" style="--c:${PCOL[p.i]}">${bfAv(p,'bfbav')}<b class="bfbstr">⚔ ${pStr(p)}</b><span class="bfblv">Lv ${p.lvl}</span></div><div class="bfcap">Gear up your hero!</div></div>`}
     if(G&&!G.cb&&G.kicked!=null&&G.phase!=='main'&&!(G.out&&G.out.turn===G.turn&&['after','post','charity'].includes(G.phase))){const c=cd(G.kicked);const a=curPl();const y=isMe(a.i);UI.arRes=60;
       return `<div class="bfstage"><div class="bfcap">${y?'You':esc(a.nm)} found:</div><div class="row">${cardHTML(G.kicked,{})}</div><div class="bfcap sm">${c.t==='curse'?'A curse! It hit '+(y?'you':esc(a.nm)):'It went into '+(y?'your':esc(a.nm)+'’s')+' hand'}</div></div>${rollHTML()}`}
     if(G&&!G.cb&&(G.phase==='main'||G.phase==='window')&&G.kicked==null){const a=curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfdoor small" aria-hidden="true"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span></div><div class="bfcap">${isMe(a.i)?'Your':esc(a.nm)+'’s'} door</div></div>${rollHTML()}`}
@@ -174,5 +174,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(BF.pick!=null||BF.
 // a rival's door or fight: if none of your cards could change anything, don't ask (the card-less "Let it be" was a chore)
 (function(){const _ap=autoPass;autoPass=function(){_ap();if(!G||G.mode==='net')return;
   for(let k=0;k<12&&G&&!G.winner;k++){const s=sideToAct();if(s<0||!P(s).human||G.q)return;if(!(G.phase==='window'||(G.phase==='combat'&&G.cb&&G.cb.stage==='others')))return;if(G.cb&&winThreat(G.cb))return;
-    const vm=validMoves(s);const pass=vm.find(m=>m.act==='pass');if(!pass)return;if(vm.some(m=>m!==pass&&(m.card==null||(!bfHarm(m)&&bfZone(m,s)))))return;
+    const vm=validMoves(s);const pass=vm.find(m=>m.act==='pass');if(!pass)return;
+    // before a trailing rival's door (lower level than you, not near the win) don't stop for curses either
+    const calm=G.phase==='window'&&P(G.active).lvl<P(s).lvl&&P(G.active).lvl<8;if(!calm&&vm.some(m=>m!==pass&&(m.card==null||(!bfHarm(m)&&bfZone(m,s)))))return;
     const r=performMove(pass,s);if(!r||!r.success)return}}})();

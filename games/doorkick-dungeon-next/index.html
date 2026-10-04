@@ -731,7 +731,7 @@ html.ph-l .hand{padding-top:14px}
 .bfbig .bfbstr{position:absolute;bottom:-12px;left:50%;translate:-50% 0;font:900 26px/1 var(--title);color:#ffd76a;background:#2a1208;border:2px solid #ffd76a;border-radius:20px;padding:4px 12px;text-shadow:0 2px 0 #000;white-space:nowrap}
 .bfbig .bfblv{position:absolute;top:-6px;right:-6px;font:800 15px/1 var(--title);color:#1a0d06;background:#ffd76a;border-radius:14px;padding:5px 8px}
 .bfbig[data-bfl]::after{top:auto;bottom:22%;translate:-50% 0}
-.bfcap{font:700 17px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;margin-top:16px;text-align:center;max-width:100%}
+.bfcap{white-space:normal;overflow-wrap:anywhere;padding:0 4px;font:700 17px var(--title);color:#ffe9a8;text-shadow:0 2px 0 #000;margin-top:16px;text-align:center;max-width:100%}
 .bfdoor.small{cursor:default;height:min(60%,calc(100cqh - 60px));max-width:40%;filter:drop-shadow(0 8px 14px rgba(0,0,0,.7)) brightness(.85)}
 .bfdoor.small .bfdi{animation:none}
 .bfcap.sm{font-size:15px;margin-top:4px}
@@ -748,6 +748,9 @@ html.ph-l .hand{padding-top:14px}
   html.ph-p{--ph-dock:calc(96px + env(safe-area-inset-bottom,0px))}
   html.ph .bfline{font-size:15px!important;margin-bottom:4px!important}
 }
+.bfbub.note{max-width:220px;background:#fff6dc}
+.mine .gear .gchip.eqoff{position:relative;opacity:.8}
+.bfx{font:700 11px/1 var(--ui,system-ui);color:#fff;background:#a23a2a;border-radius:6px;padding:2px 4px;margin-left:4px;white-space:nowrap}
 
 </style>
 </head>
@@ -3726,18 +3729,23 @@ function bfZone(m,me){const c=m.card!=null?cd(m.card):null;const cb=G.cb;const i
 const bfHarm=m=>/yourself!|against yourself|helps a rival/.test(moveLabel(m));
 function bfMoves(me,id){if(me<0||!G||G.winner)return [];return cardMoves(me,id).filter(m=>m.act!=='sell'&&!bfHarm(m)).map(m=>({m,z:bfZone(m,me)})).filter(x=>x.z)}
 function bfEls(z){const q=s=>[...document.querySelectorAll(s)];
-  if(z==='hero')return q('.bfbig,.mine .top,.mine .gear');if(z==='fh')return q('.arena .score.hero');if(z==='ms')return q('.arena .score.mons,.arena .row.mons .mon');
+  if(z==='hero')return q('.bfbig,.mine .top,.mine .gear');if(z==='fh'){const me=viewSeat();const cb=G.cb;return q('.arena .score.hero'+(cb&&(cb.who===me||cb.help===me)?',.mine .top,.mine .gear':''))}if(z==='ms')return q('.arena .score.mons,.arena .row.mons .mon');
   if(z[0]==='m')return q(`.arena .row.mons .mon:nth-child(${+z.slice(1)+1})`);
   if(z[0]==='p')return q(`#phopps [data-opp="${z.slice(1)}"],#app .opps [data-opp="${z.slice(1)}"]`);
   if(z==='door')return q('.pile.pl,.bfdoor,.arena:not(:has(.vs))');if(z==='disc')return q('.pile.pr');return []}
 const bfShort=t=>{t=String(t).replace(/<[^>]+>/g,'').replace(/ \(.*\)$/,'');return t.length>26?t.slice(0,25)+'…':t};
 function bfMark(){document.querySelectorAll('[data-bfz]').forEach(e=>{e.removeAttribute('data-bfz');e.removeAttribute('data-bfl');e.classList.remove('bf-tgt','bf-over')});
   document.querySelectorAll('.bf-picked').forEach(e=>e.classList.remove('bf-picked'));document.documentElement.classList.remove('bf-holding');
+  if(BF.ask){const me=viewSeat();const asks=me>=0&&!G.q?validMoves(me).filter(m=>m.act==='ask'):[];if(!asks.length){BF.ask=null}else{document.documentElement.classList.add('bf-holding');
+    const offs=helpOffers(me);BF.askN={};for(const o of offs){const ns=asks.filter(m=>m.tgt===o.i).map(m=>m.opt);BF.askN[o.i]=o.yes!=null?o.yes:Math.max(...ns);
+      const lab=o.yes!=null?`+${o.str} ✓ yes`:o.wins?`+${o.str} (will say no)`:`+${o.str} not enough`;
+      bfEls('p'+o.i).forEach(e=>{e.dataset.bfz='ask'+o.i;e.classList.add('bf-tgt');e.dataset.bfl=lab})}
+    bfSay('Tap a rival to ask for help');return}}
   const id=BF.drag?BF.drag.id:BF.pick;if(id==null)return;const me=viewSeat();const ms=bfMoves(me,id);if(!ms.length){BF.pick=null;return}
   document.documentElement.classList.add('bf-holding');document.querySelectorAll(`.mine [data-card="${id}"]`).forEach(e=>e.classList.add('bf-picked'));
   const seen={};for(const x of ms){if(seen[x.z])continue;seen[x.z]=1;const lab=ms.filter(y=>y.z===x.z).length>1?bfShort(moveLabel(x.m)).replace(/ .*/,'')+'…':bfShort(moveLabel(x.m));
-    bfEls(x.z).forEach((e,k)=>{e.dataset.bfz=x.z;e.classList.add('bf-tgt');if(!k)e.dataset.bfl=lab})}
-  bfSay(BF.drag?'Drop it on a glowing spot':'Tap a glowing spot, or drag')}
+    bfEls(x.z).forEach((e,k)=>{if(e.dataset.bfz)return;e.dataset.bfz=x.z;e.classList.add('bf-tgt');if(!k)e.dataset.bfl=lab})}
+  const l0=bfShort(moveLabel(ms[0].m));bfSay(BF.drag?l0+': drop on the glow':l0+': tap the glow')}
 function bfSay(t){const l=document.querySelector('#prompt .bfline');if(l)l.textContent=t}
 // run the move for a drop on zone z; several moves on one spot (e.g. which item to borrow) open the card's own choice pop-up
 function bfDrop(id,z,at){const me=viewSeat();const ms=bfMoves(me,id).filter(x=>x.z===z);BF.pick=null;BF.drag=null;
@@ -3757,7 +3765,7 @@ function bfReveal(id,who){const c=cd(id);const me=viewSeat();const mine=who===me
   const sub=kind==='mon'?`Level ${c.lvl}`+(G.cb&&!mine?` · ${P(who).nm} must fight`:G.cb?` · you: ${sideStr(G.cb)}`:''):kind==='curse'?esc(c.x||'').slice(0,60):'No monster this time';
   let o=document.getElementById('bfrev');if(o)o.remove();o=document.createElement('div');o.id='bfrev';o.className=`bfrev k-${kind}${mine?' mine':''}`;o.setAttribute('role','status');
   o.innerHTML=`<div class="bfburst"></div><div class="bfdh l">${cardBack('door')}</div><div class="bfdh r">${cardBack('door')}</div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
-  document.body.appendChild(o);const dur=mine?1900:1300;
+  document.body.appendChild(o);const dur=mine?1900:1050;
   setTimeout(()=>{if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click')},mine?420:300);
   const close=()=>{if(!o.isConnected)return;o.classList.add('out');setTimeout(()=>o.remove(),260)};o.addEventListener('pointerdown',close);setTimeout(close,dur);
   if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur)}
@@ -3767,12 +3775,16 @@ function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createEle
   const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(${quick?1:.6}) rotate(-8deg)`,opacity:1},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-60}px) scale(1.15) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.5)`,opacity:0}],{duration:quick?380:900,easing:'cubic-bezier(.3,.7,.3,1)'});a.onfinish=()=>e.remove()}
 function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;f.style.left=(r.left+r.width/2)+'px';f.style.top=(r.top+r.height/3)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1500)}
 function bfBubble(s,txt){const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),2600)}
-function bfSnap(){if(!G)return null;const cb=G.cb;return {gid:G.gid,turn:G.turn,kick:G.kicked,lvl:G.pl.map(p=>p.lvl),str:G.pl.map(p=>pStr(p)),
+function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-228,r.left))+'px';b.style.top=Math.max(8,r.top-44)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),3600)}
+function bfSnap(){if(!G)return null;const cb=G.cb;const me=viewSeat();const mp=me>=0&&G.pl[me]?P(me):null;return {gid:G.gid,turn:G.turn,kick:G.kicked,me,eq:mp?mp.eq.map(e=>e.id+':'+(e.on?1:0)):[],lvl:G.pl.map(p=>p.lvl),str:G.pl.map(p=>pStr(p)),
   cb:cb?{k:G.turn+':'+cb.who,enh:cb.mons.map(m=>m.enh.length),n:cb.mons.length,os:cb.os.length,help:cb.help,a:sideStr(cb),b:monStr(cb)}:null,ln:G.ln}}
 function bfDiff(S,N){if(!S||!N||S.gid!==N.gid)return;const me=viewSeat();const actor=G.log[0]?G.log[0].s:-1;const chip=s=>document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);
   const fromRect=s=>{const c=s>=0&&s!==me?chip(s):null;return c?c.getBoundingClientRect():null};
   if(N.kick!=null&&(N.kick!==S.kick||N.turn!==S.turn)&&BF.motion()){bfReveal(N.kick,G.active);BF.mine=0}
   N.lvl.forEach((l,i)=>{const d=l-S.lvl[i];if(!d)return;const el=i===me?document.querySelector('.mine .bfhero')||document.querySelector('.mine .lv'):chip(i);bfFloat(el,(d>0?'+':'')+d+' Lv',d>0?'up':'down')});
+  if(me>=0&&N.me===S.me){const hero=document.querySelector('.mine .bfhero');const was=new Map(S.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));const now=new Map(N.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));
+    const lost=[...was.keys()].filter(i=>!now.has(i));if(lost.length)bfNote(hero,'Lost: '+lost.map(cname).join(', '),'bad');
+    const off=[...now.keys()].filter(i=>!now.get(i)&&(!was.has(i)||was.get(i)));if(off.length){const p=P(me);const w=equipWhy(p,off[0])||bigWhy(p,off[0])||'';bfNote(hero,`Carried, not worn: ${w||'no free slot'}`,'bad')}}
   if(me>=0&&!N.cb&&N.str[me]!==S.str[me]&&N.lvl[me]===S.lvl[me]){const d=N.str[me]-S.str[me];bfFloat(document.querySelector('.mine .bfhero'),(d>0?'+':'')+d+' ⚔',d>0?'up':'down')}
   const a=S.cb,b=N.cb;if(!a||!b||a.k!==b.k)return;const cb=G.cb;
   b.enh.forEach((n,j)=>{if(n>(a.enh[j]||0)&&j<a.n){const id=cb.mons[j].enh[n-1];const to=document.querySelector(`.arena .row.mons .mon:nth-child(${j+1})`);const fr=fromRect(actor);if(fr&&to)bfFly(id,fr,to.getBoundingClientRect());if(actor>=0&&actor!==me)bfBubble(actor,cd(id).b>0?'Boost the monster!':'Weaken it!')}});
@@ -3805,7 +3817,7 @@ function bfLine(me){const s=sideToAct();if(!G||G.winner)return '';if(s<0)return 
     case 'setup':return cardy?'Drag glowing cards onto your hero':'All set? Tap Ready';
     case 'window':return cardy?'Curse '+curPl().nm+'? Drag a card on them':curPl().nm+' is about to kick the door';
     case 'main':return cardy?'Gear up, then kick the door!':'Kick the door!';
-    case 'after':return 'Empty room: loot it, or fight from hand';
+    case 'after':return vm.some(m=>m.act==='trouble'&&!bfHarm(m))?'Empty room: loot, or drag a monster in':'Empty room: tap Loot';
     case 'post':return cardy?'Gear up, then end your turn':'End your turn';
     case 'charity':{const t=charityTargets(P(me));return t.length?'Too many cards: drag extras onto '+P(t[0]).nm:'Too many cards: drag extras to discard'}
     case 'combat':if(cb.stage==='act'&&(cb.who===me))return winning(cb)?'You’re winning! Tap Fight':'Losing! Add cards, get help, or run';
@@ -3817,7 +3829,7 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
   const _arena=arenaHTML;arenaHTML=function(){const me=viewSeat();
     if(G&&!G.cb&&G.phase==='main'&&me>=0&&sideToAct()===me&&G.active===me&&P(me).human&&validMoves(me).some(m=>m.act==='kick')){UI.arRes=40;
       return `<button class="bfdoor" data-a="bfkick" aria-label="Kick open the door"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span><span class="bfkick">KICK!</span><span class="bfboot" aria-hidden="true">🥾</span></button>`}
-    if(G&&!G.cb&&G.phase==='setup'&&me>=0&&P(me).human){const p=P(me);UI.arRes=40;return `<div class="bfstage"><div class="bfbig" style="--c:${PCOL[p.i]}">${bfAv(p,'bfbav')}<b class="bfbstr">⚔ ${pStr(p)}</b><span class="bfblv">Lv ${p.lvl}</span></div><div class="bfcap">Make your hero strong</div></div>`}
+    if(G&&!G.cb&&G.phase==='setup'&&me>=0&&P(me).human){const p=P(me);UI.arRes=40;return `<div class="bfstage"><div class="bfbig" style="--c:${PCOL[p.i]}">${bfAv(p,'bfbav')}<b class="bfbstr">⚔ ${pStr(p)}</b><span class="bfblv">Lv ${p.lvl}</span></div><div class="bfcap">Gear up your hero!</div></div>`}
     if(G&&!G.cb&&G.kicked!=null&&G.phase!=='main'&&!(G.out&&G.out.turn===G.turn&&['after','post','charity'].includes(G.phase))){const c=cd(G.kicked);const a=curPl();const y=isMe(a.i);UI.arRes=60;
       return `<div class="bfstage"><div class="bfcap">${y?'You':esc(a.nm)} found:</div><div class="row">${cardHTML(G.kicked,{})}</div><div class="bfcap sm">${c.t==='curse'?'A curse! It hit '+(y?'you':esc(a.nm)):'It went into '+(y?'your':esc(a.nm)+'’s')+' hand'}</div></div>${rollHTML()}`}
     if(G&&!G.cb&&(G.phase==='main'||G.phase==='window')&&G.kicked==null){const a=curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfdoor small" aria-hidden="true"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span></div><div class="bfcap">${isMe(a.i)?'Your':esc(a.nm)+'’s'} door</div></div>${rollHTML()}`}
@@ -3830,11 +3842,16 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
     const i=h.indexOf('<p class="say">');const tag=`<p class="bfline">${esc(line)}</p>`;
     if(i>=0)h=h.slice(0,i)+tag+h.slice(i);else h=h.replace(/(<div class="who">.*?<\/div>)/,'$1'+tag);return h};
   const _render=render;render=function(){const S=BF.snap;const r=_render.apply(this,arguments);try{bfAfter(S)}catch(e){UI.lastErr='bf '+e}return r}})();
-function bfAfter(S){if(!G){BF.snap=null;BF.pick=null;bfFinger(null);return}const N=bfSnap();BF.snap=N;bfMark();bfDiff(S,N);const me=viewSeat();setTimeout(()=>{try{bfTeach(me)}catch(e){}},30)}
+function bfAfter(S){if(!G){BF.snap=null;BF.pick=null;bfFinger(null);return}
+  document.querySelectorAll('.mine .gear .gchip.eqoff').forEach(c=>{if(!c.querySelector('.bfx'))c.insertAdjacentHTML('beforeend','<span class="bfx" aria-hidden="true">✗ not worn</span>')});const N=bfSnap();BF.snap=N;bfMark();bfDiff(S,N);const me=viewSeat();setTimeout(()=>{try{bfTeach(me)}catch(e){}},30)}
 // ---- input: tap to pick up / tap a glowing spot; or drag with a finger or mouse ----
 document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();e.preventDefault();return}
   const t=e.target;if(!G)return;const k=t.closest('[data-a="bfkick"]')||(()=>{const b=t.closest('[data-mv]');try{return b&&JSON.parse(b.dataset.mv).act==='kick'?b:null}catch(x){return null}})();
   if(k){e.stopPropagation();e.preventDefault();BF.pick=null;bfKick();return}
+  if(BF.ask){const z=t.closest('[data-bfz^="ask"]');e.stopPropagation();e.preventDefault();BF.ask=null;
+    if(z){const i=+z.dataset.bfz.slice(3);const n=BF.askN&&BF.askN[i];if(n!=null){uiAct({act:'ask',tgt:i,opt:n});return}}bfMark();return}
+  const am=t.closest('[data-a="askmenu"]');if(am){const me=viewSeat();const asks=me>=0?validMoves(me).filter(m=>m.act==='ask'):[];
+    if(asks.length&&!asks.some(m=>P(m.tgt).human)){e.stopPropagation();e.preventDefault();BF.pick=null;BF.ask=true;bfFinger(null);bfMark();return}}
   if(BF.pick!=null){const z=t.closest('[data-bfz]');if(z){e.stopPropagation();e.preventDefault();bfDrop(BF.pick,z.dataset.bfz,null);return}
     const c=t.closest('.mine [data-card]');if(c&&+c.dataset.card===BF.pick){BF.pick=null;bfMark();return}  // second tap: details / choices pop-up (ui.js)
     if(!c){BF.pick=null;bfMark();if(!t.closest('button,[data-a],[data-mv],[data-opp]')){e.stopPropagation();return}}}
@@ -3851,13 +3868,22 @@ document.addEventListener('pointermove',e=>{const d=BF.down;if(!d||d.pid!==e.poi
   D.g.style.visibility='hidden';const u=document.elementFromPoint(e.clientX,e.clientY);D.g.style.visibility='';const z=u&&u.closest('[data-bfz]');
   document.querySelectorAll('.bf-over').forEach(x=>{if(x!==z)x.classList.remove('bf-over')});if(z)z.classList.add('bf-over');D.over=z;if(e.cancelable)e.preventDefault()},{passive:false});
 function bfEnd(e,cancel){const D=BF.drag;BF.down=null;if(!D)return;BF.drag=null;BF.eat=Date.now()+350;
-  const z=!cancel&&D.over&&D.over.isConnected?D.over.dataset.bfz:null;const g=D.g;
+  // the board may have re-rendered during the drag (a computer move): find the target again under the finger
+  let z=null;if(!cancel){g0:{D.g.style.visibility='hidden';const u=e&&e.clientX!=null?document.elementFromPoint(e.clientX,e.clientY):null;D.g.style.visibility='';const t=u&&u.closest('[data-bfz]');if(t){z=t.dataset.bfz;break g0}if(D.over&&D.over.isConnected)z=D.over.dataset.bfz}}const g=D.g;
   if(z){const r=g.getBoundingClientRect();g.remove();document.querySelectorAll('.bf-lift').forEach(x=>x.classList.remove('bf-lift'));bfDrop(D.id,z,r)}
   else{const src=document.querySelector(`.mine [data-card="${D.id}"]`);const r=src&&src.getBoundingClientRect();
     if(r&&BF.motion()){const a=g.animate([{transform:g.style.transform},{transform:`translate(${r.left}px,${r.top}px) scale(1)`}],{duration:220,easing:'ease-out'});a.onfinish=()=>g.remove()}else g.remove();
     document.querySelectorAll('.bf-lift').forEach(x=>x.classList.remove('bf-lift'));bfMark()}}
 document.addEventListener('pointerup',e=>bfEnd(e,false));document.addEventListener('pointercancel',e=>bfEnd(e,true));
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&BF.pick!=null){BF.pick=null;bfMark()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(BF.pick!=null||BF.ask)){BF.pick=null;BF.ask=null;bfMark()}});
+
+// a rival's door or fight: if none of your cards could change anything, don't ask (the card-less "Let it be" was a chore)
+(function(){const _ap=autoPass;autoPass=function(){_ap();if(!G||G.mode==='net')return;
+  for(let k=0;k<12&&G&&!G.winner;k++){const s=sideToAct();if(s<0||!P(s).human||G.q)return;if(!(G.phase==='window'||(G.phase==='combat'&&G.cb&&G.cb.stage==='others')))return;if(G.cb&&winThreat(G.cb))return;
+    const vm=validMoves(s);const pass=vm.find(m=>m.act==='pass');if(!pass)return;
+    // before a trailing rival's door (lower level than you, not near the win) don't stop for curses either
+    const calm=G.phase==='window'&&P(G.active).lvl<P(s).lvl&&P(G.active).lvl<8;if(!calm&&vm.some(m=>m!==pass&&(m.card==null||(!bfHarm(m)&&bfZone(m,s)))))return;
+    const r=performMove(pass,s);if(!r||!r.success)return}}})();
 
 </script>
 </body>
