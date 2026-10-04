@@ -65,7 +65,7 @@ function kitUndo() {
   GX.undo.config({
     get: () => G, owner: g => g && g.phase !== 'over' ? HB.actor(g) : null, online: () => NET.on,
     set: s => { G = s; UI.rec = null; UI.recKey = ''; UI.after = UI.after.filter(e => e.from < G.logN); closePop(); UI.lastAi = ''; save(); render(); schedule(); toast('Step undone.'); },
-    onChange: () => { if (G && UI.started) renderActs(); }
+    onChange: can => { if (can !== UI.undoCan) { UI.undoCan = can; if (G && UI.started) renderActs(); } }
   });
 }
 function doUndo() { if (GX.undo.undo()) snd('click'); }

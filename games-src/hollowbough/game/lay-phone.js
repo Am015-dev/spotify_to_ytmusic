@@ -43,7 +43,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H;const ctx=await b.newContext({viewport
       await shot('2locpop');await targets('locpop');
       await p.tap('#ppop [data-a=popx]');await p.waitForTimeout(150);if(!(await p.evaluate(()=>document.querySelector('#ppop').hidden)))fail('x did not close');
       await p.tap('.tile.ok');await p.waitForTimeout(250);await p.keyboard.press('Escape');await p.waitForTimeout(150);if(!(await p.evaluate(()=>document.querySelector('#ppop').hidden)))fail('Esc did not close');
-      await p.tap('.tile.ok');await p.waitForTimeout(250);{const r=await rect('.gx-bar');await p.touchscreen.tap(r[0]+24,(r[1]+r[3])/2)}await p.waitForTimeout(200);
+      await p.tap('.tile.ok');await p.waitForTimeout(250);{const r=await rect('.gx-bar');const pt=await p.evaluate(()=>{const b=document.querySelector('.gx-bar'),br=b.getBoundingClientRect();for(const s of ['.gx-bar h1','#barstat']){const e=document.querySelector(s),q=e&&e.getBoundingClientRect();if(q&&q.width>8&&q.left>=br.left)return [q.left+q.width/2,q.top+q.height/2]}return [br.left+3,(br.top+br.bottom)/2]});await p.touchscreen.tap(pt[0],pt[1])}await p.waitForTimeout(200);
       if(!(await p.evaluate(()=>document.querySelector('#ppop').hidden)))fail('outside tap did not close');
       await p.tap('.tile.ok');await p.waitForTimeout(250);const n0=await p.evaluate(()=>G.logN);await p.tap('#ppop [data-a=do]');await p.waitForTimeout(500);await waitHuman();
       if(await p.evaluate(()=>G.logN)===n0)fail('placing a worker did nothing')}}
