@@ -110,7 +110,7 @@ Full results are in `game/out/` (gitignored); the runner is `game/clarity/full.s
   - The check used to skip it because Place started greyed out. The new safe default tile enables Place, which
     exposed the problem.
   - The pop-up's previews are now smaller on screens under 700 px tall.
-- `net/p2p-tw.js` (real WebRTC, local relay): full 34 runs 0 bad, leave 0 bad, ui 0 bad. Timeout: re-run pending (first run: 40 games consistent, but no remote interrupt occurred to exercise the timer).
+- `net/p2p-tw.js` (real WebRTC, local relay): full 34 runs 0 bad, leave 0 bad, ui 0 bad. Timeout: 11 runs 0 bad on the re-run, where the host's timer answered the silent client's interrupt. The first run was "40 runs, 1 bad": all 40 games agreed, but no interrupt ever reached the client, so the timer was never exercised (the harness marks that as bad).
 
 Three test files were adapted to the new (correct) order: the result appears after the replay, and the Sunk! card
 before the result card.
