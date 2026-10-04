@@ -26,7 +26,8 @@ function riskWords(a){const n=actNeed(a);const k=a.pw.length;if(k<n.need)return 
 function wzNeeds(){const need=eatersNeed(),have=food(),planF=plannedFood();const cl=clouds();const S=SCENARIOS[G.scen];const dieN={rain:'rain die',snow:'winter die',animals:'hungry-animals die'};
   const row=(ok,label,val,note)=>`<div class="nd ${ok?'ok':'bad'}"><b>${label}</b><span class="v">${val}</span><small>${note}</small></div>`;
   const low=living().filter(c=>!c.npc).sort((a,b)=>lifeLeft(a)-lifeLeft(b))[0];
-  let h=`<p class="wz-p">Before you give out jobs, look at what the camp needs today. Red means trouble tonight.</p>`;
+  let h='';
+  h+=goalCard();
   const ml=morningLines();if(ml.length)h+=`<div class="morn"><b>This morning:</b><ul>${ml.map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ul></div>`;
   h+=`<div class="needs">`+row(have+planF>=need+wxFoodLoss(),'Food for tonight',`${have+planF} of ${need}${wxFoodLoss()?' +'+wxFoodLoss():''}`,`Everyone eats 1 food at night. Hungry: 2 wounds each.${planF?` (${planF} of it is planned.)`:''}${wxFoodLoss()?` Rain above your roof will likely ruin about ${wxFoodLoss()} food first.`:''}`)
     +row(hasShelter(),'Shelter',hasShelter()?'yes':'none',hasShelter()?'Keeps you from sleeping in the open.':'Tonight everyone loses 1 life without one.')
@@ -37,8 +38,14 @@ function wzNeeds(){const need=eatersNeed(),have=food(),planF=plannedFood();const
   h+=th?`<h4>Threat cards</h4>${th}`:`<p class="muted small">No threat cards on the board.</p>`;
   const pr=priorities().filter(p=>!p.done&&!p.info);if(pr.length)h+=`<h4>What matters most today</h4><ol class="plist">${pr.map(p=>`<li class="${p.red?'red':''}" ${posAttr(p.act)}><b>${esc(p.title)}</b><span>${esc(p.why)}</span></li>`).join('')}</ol>`;
   const mates=mateHtml();if(mates)h+=mates;
-  h+=`<div class="daycard"><div class="dk">Your goal</div><b>${esc(SC().goal?SC().goal():S.x)}</b></div>`;
   return h}
+// the goal, its progress and how to work on it today: first thing on the planning page
+function goalCard(){const S=SCENARIOS[G.scen];let how='',btn='';
+  if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();const w=pileWhy(1);
+    how=`${has('fire')?'Fire is built.':'Build <b>Fire</b> (a job in Build).'} Add wood to the <b>signal pile</b> one stage a day (1, 2, 3, 4, then 5 wood): it must be full on day 10, 11 or 12.`;
+    btn=room?`<button class="btn sm go" data-a="pilemax" ${w?'aria-disabled="true"':''}>Add ${room} wood to the pile</button>${w?`<small>${esc(w==='no spare wood'?`needs ${room} spare wood`:w)}</small>`:''}`:G.sc.pile>=15?'':'<small>Today’s pile stage is done.</small>'}
+  else how=esc(S.x);
+  return `<div class="daycard goal1"><div class="dk">🎯 Your goal · day ${G.round} of ${G.rounds}</div><b>${esc(SC().goal?SC().goal():S.x)}</b><p>${how}</p>${btn?`<div class="gb">${btn}</div>`:''}</div>`}
 // ---------- step 2: one pawn at a time ----------
 function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=curPawn();
   const row=`<div class="pawnrow">${list.map((p,k)=>{const a=G.plan.acts.find(x=>x.pw.includes(p.id));const on=cur&&cur.id===p.id;const col=p.c!=null?PCOL[p.c%6]:p.f?'#f3f3f3':'#8d8d8d';

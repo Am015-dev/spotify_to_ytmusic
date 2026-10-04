@@ -59,7 +59,7 @@ function wizSync(){if(planOpen()&&!allAI()){pstep();if(UI.ps.step!==2&&UI.sel&&!
 function stepFoot(){const st=pstep();const cur=st===2?curPawn():null;const list=st===2?wizPawns():[];const red=st===4?uncoveredRed():[];const pb=planProblems();
   const sug=`<button class="btn ghost" data-a="suggest" title="Give every pawn a job following today’s needs (H). You can change anything.">💡 Plan for me</button>`;
   const back=st>1?`<button class="btn ghost" data-a="pback">◀ Back</button>`:`<button class="btn ghost" data-a="clear" title="Take all your pawns off their jobs">Clear</button>`;
-  const txt=st===1?'Step 1 of 4: read what today needs, then give out jobs.':st===2?(cur?`Step 2 of 4 · Pawn ${list.findIndex(p=>p.id===cur.id)+1} of ${list.length}: ${pawnNice(cur)}. Take the recommended job or choose another.`:'Step 2 of 4: every pawn has a job.'):st===3?'Step 3 of 4: check the risk of each job.':pb.length?`Step 4 of 4: not ready yet. ${pb[0]}`:red.length?'Step 4 of 4: something urgent is not covered.':'Step 4 of 4: all set. Start the day!';
+  const txt=st===1?'Planning 1 of 4: read what today needs, then give out jobs.':st===2?(cur?`Planning 2 of 4 · Pawn ${list.findIndex(p=>p.id===cur.id)+1} of ${list.length}: ${pawnNice(cur)}. Take the recommended job or choose another.`:'Planning 2 of 4: every pawn has a job.'):st===3?'Planning 3 of 4: check the risk of each job.':pb.length?`Planning 4 of 4: not ready yet. ${pb[0]}`:red.length?'Planning 4 of 4: something urgent is not covered.':'Planning 4 of 4: all set. Start the day!';
   const next=st===1?`<button class="btn go" data-a="pnext" title="Step 2: give each pawn a job">Next: jobs ▶</button>`:st===2?`<button class="btn go ${cur&&cur.c!=null?'dim':''}" data-a="pnext" title="Step 3: check the risk of each job">Next: check ▶</button>`:st===3?`<button class="btn go ${pb.length?'dim':''}" data-a="pnext" title="Step 4: start the day">Next: start ▶</button>`:
     (typeof netOn==='function'&&netOn()?netStepBtn(pb,red):`<button class="btn go ${pb.length?'dim':''}" data-a="go" ${red.length?'data-force="1"':''} title="Start the day (Enter)">${red.length?'Start anyway ▶':'Start day ▶'}</button>`);
   return `<div class="st-t" id="steptext">${esc(typeof netOn==='function'&&netOn()&&st===4&&!pb.length?netStepText(red):txt)}</div><div class="st-b">${back}${sug}${next}</div>`}
@@ -245,7 +245,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'sofar':e.preventDefault();UI.ps.sofar=!UI.ps.sofar;render();return;
   case 'retry':retryGame(d.easy==='1');return;case 'menu':toggleMenu();return;
   case 'clear':clearPlan(G.chars.filter(c=>c.human).map(c=>c.i));refresh();return;
-  case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const r=pileAdd(SCEN.marooned.pileRoom());if(r)toast(r);return}
+  case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const r=pileAdd(SCEN.marooned.pileRoom());if(r)toast('Can’t add wood now: '+r+'.');else{sfx('place');refresh()}return}
   case 'untile':UI.tileSel=null;render();return;
   case 'later':UI.openLater=!UI.openLater;e.preventDefault();render();return;
   case 'moveask':G.moveAsk=b.checked?1:0;return;

@@ -41,7 +41,7 @@ function chipHtml(){let o={};withView(()=>{const need=eatersNeed(),have=food();o
 // the goal, short enough for the bar under the island
 function goalShort(){const s=G.sc||{};switch(G.scen){case 'marooned':return `fire ${has('fire')?'✓':'✗'} · pile ${s.pile||0}/15`;case 'hexed':return `crosses ${(s.crosses||[]).length}/5`;
   case 'stranded':return `raft ${has('jraft')?'✓':'✗'} · Ada ${s.rescued?'safe':'waiting'} · boat ${has('lifeboat')?'✓':'✗'}`;case 'settlers':return `home ${[hasShelter(),G.camp.roof>=1,G.camp.pal>=1,G.weapon>=1].filter(Boolean).length}/4 · tools ${(s.goals||[]).filter(has).length}/${(s.goals||[]).length}`}return ''}
-function phaseLabel(){let t='';withView(()=>{const f=flowNow();const ph=f&&PHI(f.k)>=0?PH7[PHI(f.k)].n:'';t=`🎯 ${goalShort()} · day ${G.round}/${G.rounds}`});return t}
+function phaseLabel(){let t='';withView(()=>{const f=flowNow();const ph=f&&PHI(f.k)>=0?PH7[PHI(f.k)].n:'';t=`🎯 ${goalShort()}`});return t}
 PHO.sync=function(){if(!PHO.on)return;const dock=q('.gx-dock'),app=q('.gx-app');if(!dock)return;const st=state();PHO.st=st;dock.dataset.phs=st;if(app){app.dataset.phs=st;app.dataset.dec=(st==='plan'||st==='plan2'||PHO.pop&&PHO.pop.k!=='status'||st==='story'&&typeof humanQ==='function'&&humanQ()&&storyIdx()>=UI.beats.length-1)?'1':''}
   const pv=q('#phview'),chip=q('#phchip');const show=!!G&&st!=='none'&&st!=='start';if(pv)pv.hidden=!show;if(chip)chip.hidden=!show;
   if(show){try{const c=chipHtml();if(chip.dataset.h!==c.h){chip.dataset.h=c.h;chip.innerHTML=c.h}chip.setAttribute('aria-label',c.a);chip.classList.toggle('warn',c.warn);
@@ -106,6 +106,7 @@ function closeZoom(){PHO.zoom=false;const z=q('#pzoom');if(z){z.hidden=true;z.in
 function openZoom(el){const z=q('#pzoom');if(!z)return;const c=el.cloneNode(true);c.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));c.removeAttribute('data-pos');
   z.innerHTML=`<div class="zc" role="document"><button class="gx-ibtn zc-x" data-ph="zclose" aria-label="Close the card">×</button><div class="zc-b ${[...el.classList].join(' ')}">${c.innerHTML}</div></div>`;z.hidden=false;PHO.zoom=true}
 function onClick(e){if(!PHO.on)return;const t=e.target;if(!t.closest)return;
+  if(t.closest('#phlabel')&&G){PHO.pop&&PHO.pop.k==='status'?PHO.closePop():PHO.openPop({k:'status'});return}
   const b=t.closest('[data-ph]');
   if(b){const a=b.dataset.ph;
     if(a==='in'||a==='out'){if(typeof V3!=='undefined')phView(a);PHO.sync();return}

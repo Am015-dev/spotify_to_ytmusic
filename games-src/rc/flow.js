@@ -27,7 +27,7 @@ function flowNow(){if(!G)return null;const i=storyIdx();if(i>=0){const b=UI.beat
   if(G.over)return {round:G.round,k:'over'};return {round:G.round,k:phaseKey(G.phase)}}
 function roadmapHtml(){const f=flowNow();if(!f)return '';const idx=PHI(f.k);const all=f.k==='done'||f.k==='over';
   if(UI.phxAt!==f.k+f.round){UI.phxAt=f.k+f.round;UI.phx=null}
-  const right=f.k===null?'The shipwreck':f.k==='over'?'Game over':f.k==='done'?'Day done':`Step ${idx+1} of 7`;
+  const right=f.k===null?'The shipwreck':f.k==='over'?'Game over':f.k==='done'?'Day done':`Part ${idx+1} of 7`;
   const items=PH7.map((p,i)=>{const st=all||i<idx?'done':i===idx?'now':'next';return `<li><button class="rm-p ${st} ${UI.phx===p.k?'open':''}" data-phx="${p.k}" aria-current="${st==='now'?'step':'false'}" title="${esc(p.n)}: ${esc(p.tip)}"><i>${st==='done'?'✓':i+1}</i><span>${p.n}</span></button></li>`}).join('');
   const tp=UI.phx&&PH7[PHI(UI.phx)];
   return `<div class="rm-h"><b>${f.round?`Day ${f.round} of ${G.rounds}`:'Before day 1'}</b><span>${right}${idx>=0&&!all?' · '+PH7[idx].n:''}</span></div><ol class="rm-l" aria-label="The 7 steps of a day">${items}</ol>${tp?`<div class="rm-tip" role="note"><b>${tp.n}:</b> ${esc(tp.tip)} <button class="btn xs ghost" data-phx="${tp.k}" aria-label="Close">✕</button></div>`:''}`}
@@ -38,7 +38,7 @@ function phaseHeadHtml(i){const b=UI.beats[i];const k=beatPhase(b);const ix=PHI(
   let what=p.what;if(k==='event'&&b.round===1)what='There is no event card on the first day. From day 2 a new card is turned over every morning.';
   if(k==='act'){const n=(b.data&&b.data.n)||0;if(n)what=`Your ${n} job${n>1?'s are':' is'} done one at a time. `+p.what.replace(/^Your jobs are done one at a time, in this order\. /,'')}
   const qk=AUTO_PH.includes(k)&&k!=='night'?`<label class="chk qk"><input type="checkbox" data-a="quick" ${UI.quick?'checked':''}> From day 2, skip the automatic steps (Morale, Production, Weather). Their results still show in the day summary.</label>`:'';
-  return `<div class="phead ${AUTO_PH.includes(k)?'auto':''}"><div class="ph-n">Step ${ix+1} of 7 · ${p.n}</div>${short?'':`<p><b>What happens:</b> ${esc(what)}</p><p><b>You decide:</b> ${esc(p.dec)}</p>`}${short?'':qk}</div>`}
+  return `<div class="phead ${AUTO_PH.includes(k)?'auto':''}"><div class="ph-n">Day part ${ix+1} of 7 · ${p.n}</div>${short?'':`<p><b>What happens:</b> ${esc(what)}</p><p><b>You decide:</b> ${esc(p.dec)}</p>`}${short?'':qk}</div>`}
 // ---------- snapshots: the state at a scene ----------
 function beatState(k){const b=UI.beats[k];if(!b)return null;if(k>=UI.beats.length-1||!b.snap)return G;if(!b.obj)b.obj=JSON.parse(b.snap);return b.obj}
 function withState(s,fn){if(!s||s===G)return fn();const real=G;G=Object.assign({},s,{log:real.log,stk:[]});try{return fn()}finally{G=real}}

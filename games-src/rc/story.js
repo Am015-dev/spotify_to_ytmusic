@@ -19,7 +19,7 @@ function viewState(){const i=storyIdx();if(i<0||i>=UI.beats.length-1)return null
 function withView(fn){const s=viewState();if(!s)return fn();const b=UI.beats[storyIdx()];const real=G;G=Object.assign({},s,{log:real.log,stk:[],phase:b.phase==='start'?'event':b.phase,round:b.round});try{return fn()}finally{G=real}}
 function storyNext(){const i=storyIdx();if(i<0)return;if(i===UI.beats.length-1&&humanQ())return;UI.shown=i;UI.seenBeat=null;sfx('click');refresh()}
 // skip ahead, but stop at the next scene that costs you something (a wound, lost food...) or the day's summary, so nothing hurts you unseen
-function skipStop(i){for(let k=i+1;k<UI.beats.length-1;k++){if(skippable(k))continue;const b=UI.beats[k];if(b.kind==='daysum'||b.kind==='over'||beatLines(k).some(l=>l.c==='bad'))return k}return -1}
+function skipStop(i){for(let k=i+1;k<UI.beats.length;k++){if(skippable(k))continue;const b=UI.beats[k];if(b.kind==='daysum'||b.kind==='over'||beatLines(k).some(l=>l.c==='bad'))return k}return -1}
 function storySkip(){const i=storyIdx();const k=i<0?-1:skipStop(i);if(k>=0)UI.shown=k-1;else if(humanQ())UI.shown=UI.beats.length-2;else UI.shown=UI.beats.length-1;UI.seenBeat=null;refresh()}
 function charBark(ci,kind,seed){const c=ci!=null&&ci>=0?P(ci):null;if(!c)return '';const f=FL().chars&&FL().chars[c.k];const l=f&&pickL(f[kind],seed);return l?`<div class="bark" style="--pc:${PCOL[c.i%6]}"><b>${esc(c.nm)}:</b> “${esc(l)}”</div>`:''}
 const KIND_ICON={prod:'🧺',daysum:'📋',go:'🧭',finds:'🎒',intro:'🏝️',dawn:'🌅',event:'📜',threat:'⚠️',morning:'☀️',act:'🧭',adventure:'❓',mystery:'🗝️',fight:'⚔️',weather:'⛈️',night:'🌙',over:'🏁'};
