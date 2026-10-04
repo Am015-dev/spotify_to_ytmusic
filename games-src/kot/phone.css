@@ -170,3 +170,25 @@ html.ph .mbox,html.ph .dlg{box-sizing:border-box}
 
 html.ph #preview{max-height:none;overflow:visible}
 html.ph-p #pacts [data-act="again"]{grid-column:1/-1;grid-row:5;position:sticky;bottom:4px;z-index:3}
+/* clarity pass: the result line and the preview keep a fixed height in portrait, so Roll / Done never jump under a finger;
+   the full text (and the "While you waited" list) opens with a tap on the line */
+@media (min-height:641px){
+  html.ph-p #banner,html.ph-p #banner:empty{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;height:2.75em;max-height:2.75em;box-sizing:border-box;flex-shrink:0}
+  html.ph-p #banner:empty{visibility:hidden}
+  html.ph-p #preview{height:3.1em;max-height:3.1em;box-sizing:border-box;padding-top:2px;padding-bottom:2px;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+}
+html.ph #banner .recap{display:none}
+#banner .recap{display:none}
+.banwrap .recap{display:block;margin:.4rem 0 0 1.1rem;padding:0;font-size:13px;line-height:1.35}
+.banwrap .because{display:block}
+.pairnote{display:block;font-weight:800;color:#8a3b00}
+.intro .goal{margin:.4rem 0}
+html.ph .intro ul.small{display:none}
+#pfeed{display:none}
+html.ph .gx-dock[data-pp="watch"]:not([data-card="choice"]):not([data-card="coach"]):not([data-card="pop"]) #pfeed:not(:empty){display:block;grid-row:6;font-size:13px;line-height:1.3;padding:2px 4px;overflow:hidden;min-height:0}
+#pfeed .fh{display:block;font-weight:900;color:var(--mc);-webkit-text-stroke:.6px #1a1320;margin-bottom:2px}
+#pfeed ol{margin:0;padding-left:1.1rem}#pfeed li{color:#4b3b52}#pfeed li.new{color:#1a1320;font-weight:800}
+#pfeed p{margin:0;color:#4b3b52}
+@media (max-height:700px){#pfeed li:nth-last-child(n+3){display:none}}
+@media (max-height:600px){html.ph-p #pfeed{display:none!important}}
+html.ph-l #pfeed li:nth-last-child(n+3){display:none}

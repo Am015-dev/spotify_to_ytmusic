@@ -47,7 +47,9 @@ function renderNews(){const n=document.getElementById('news'),m=document.getElem
   const last=UI.news&&UI.news[UI.news.length-1];n.innerHTML=last?`<button class="newsbtn" data-gx="dr-log" title="Open the chronicle">${esc(last)}</button>`:'';
   if(UI.moment){m.classList.remove('hidden');m.style.setProperty('--mc',UI.moment.c||'#e63946');m.innerHTML=`<b>${esc(UI.moment.h)}</b><span>${esc(UI.moment.s)}</span>`}else{m.classList.add('hidden');m.innerHTML=''}}
 // the resolve banner, with the reason things happened
-function storyBanner(R){const p=R.p;let h=`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (borrowed roll)':''}: ${R.out.length?esc(R.out.join(' · ')):'nothing useful'}`;const why=[];
+function storyBanner(R){const p=R.p;const out=[...R.out];
+  if(R.forced==='city'||(R.yielders.length&&R.forced))out.push(`moves into Downtown 👑 +1★`);else if(R.forced==='bay')out.push('moves into the Harbor ⚓ +1★');
+  let h=`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (borrowed roll)':''}: ${out.length?esc(out.join(' · ')):'nothing useful'}`;const why=[];
   if(R.out.some(o=>/^smashes /.test(o)))why.push(R.inT?'from the city, claws hit every monster outside':`claws from outside hit whoever holds the city${G.city>=0&&G.city!==p.i&&!R.yielders.length?` (${mname(P(G.city))} 👑)`:''}`);
   if(R.out.includes('claws hit nobody'))why.push('nobody was in the city to hit');
   if(R.out.some(o=>/hearts wasted/.test(o)))why.push('hearts cannot heal you inside the city');
@@ -64,6 +66,7 @@ function introHTML(){const me=meSeat(),q=me>=0?G.pl[me]:null;const names=G.pl.ma
   return `<div class="intro"><h2>📰 Dawn over Crown City</h2><p>The portal over Crown City cracked open at dawn. ${G.pl.length} monsters rose: ${esc(cast)}. Whoever reaches <b>20 ★</b>, or is the <b>last one standing</b>, becomes the city's new King.</p>
    ${q?`<p class="you" style="--mc:${MONS[q.m].c}"><svg viewBox="-66 -70 132 136" aria-hidden="true">${monArt(q.m)}</svg><span>You are <b>${esc(UP(mname(q)))}</b>, ${esc(MONS[q.m].d.charAt(0).toLowerCase()+MONS[q.m].d.slice(1))}.</span></p>`:G.mode==='hot'?'<p>Everyone shares this screen: pass it to the monster whose turn it is.</p>':'<p>Sit back and watch the computer play.</p>'}
 
+   <p class="goal"><b>Your turn:</b> roll 6 dice up to 3 times, keep what you like, then use them. <b>Three of a kind</b> scores stars, claws hit, hearts heal, ⚡ buys cards.</p>
    <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn&&q?'<small>First you pick a secret power</small>':''}</button></div>
    <ul class="small"><li>The <b>glowing plate</b> on the board shows whose turn it is.</li><li><b>👑</b> marks the monster in Downtown: it scores stars but everyone hits it.</li><li>Stuck? <b>🧭 What now?</b> at the top of this panel says what to do and why.</li></ul></div>`}
 
@@ -135,3 +138,25 @@ function statsHTML(){const {order,me,w}=placeOf();const W=w>=0?G.pl[w]:null;cons
   <div class="acts"><button class="btn primary" data-a="new">Play again</button><button class="btn" data-a="closestats">Look at the city</button></div></div>`}
 // sound buttons in the ⚙ menu keep their explanation
 function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.innerHTML=(SND.on?'🔊 Sound on':'🔇 Sound off')+'<small>Dice, smashes and cheers</small>';if(b)b.innerHTML=(SND.music?'🎵 Music on':'🎵 Music off')+'<small>Background music</small>'}
+
+// ---------- "While you waited": what the computer turns did, shown when your turn starts ----------
+// Snapshot ♥ ★ ⚡ and the log position when the first computer turn after yours begins; at your next turn the result
+// line shows the net change per monster, and tapping it lists every logged event since, oldest first.
+const RECAP={snap:null,n:0};
+function recapMe(){if(!G||G.mode!=='solo')return -1;return G.pl.findIndex(q=>q.human)}
+function recapHTML(){const me=recapMe();if(me<0||!RECAP.snap)return '';
+  const parts=[];G.pl.forEach((q,k)=>{const s=RECAP.snap[k];if(!s)return;const d=[];
+    if(s.alive&&!q.alive){d.push('knocked out')}else{if(q.vp!==s.vp)d.push(`★${s.vp}→${q.vp}`);if(q.hp!==s.hp)d.push(`♥${s.hp}→${q.hp}`)}
+    if(s.city!==(G.city===k)&&q.alive)d.push(G.city===k?'took Downtown 👑':'left Downtown');
+    if(d.length)parts.push(`<b>${k===me?'You':esc(mname(q))}</b> ${d.join(' ')}`)});
+  const ev=G.log.filter(l=>l.n>RECAP.n).reverse().map(l=>`<li>${esc(l.t)}</li>`);
+  if(!parts.length&&!ev.length)return '';
+  return `⏪ <b>While you waited:</b> ${parts.length?parts.join(' · '):'nothing changed'}${ev.length?` <span class="more">(tap: how)</span><ol class="recap">${ev.join('')}</ol>`:''}`}
+{const _st=startTurn;startTurn=function(){
+  const me=recapMe();const nxt=G&&!G.winner?cur():null;
+  if(me>=0&&nxt&&nxt.i!==me&&!RECAP.snap){RECAP.snap=G.pl.map((q,k)=>({hp:q.hp,vp:q.vp,alive:q.alive,city:G.city===k}));RECAP.n=G.lseq||0}
+  RECAP.turnN=G?G.lseq||0:0;
+  const r=_st.apply(this,arguments);
+  if(me>=0&&G&&!G.winner&&G.active===me&&RECAP.snap){const h=recapHTML();RECAP.snap=null;if(h){UI.banner=h;try{render()}catch(e){}}}
+  return r}}
+{const _ng=newGame;newGame=function(){RECAP.snap=null;return _ng.apply(this,arguments)}}
