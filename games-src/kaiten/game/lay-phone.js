@@ -91,6 +91,8 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
       await boardCheck('lifted'); await targets('lifted'); await shot('2lifted');
     }
     // tap a group on a counter: details open in the dock, never over the board
+    // (phones show no empty custard spot, so serve one plate first if every counter is still empty)
+    if (!(await p.$('#tbl .grp'))) { await p.evaluate(() => { if (!UI.sel.length) { const b = document.querySelector('#belt .hc'); if (b) b.click(); } const s = document.querySelector('[data-a=serve]'); if (s) s.click(); }); await p.waitForFunction(() => document.querySelector('#tbl .grp') && canPick(), null, { timeout: 30000 }).catch(() => { }); await p.waitForTimeout(300); }
     await p.evaluate(() => { const g = [...document.querySelectorAll('#tbl .grp')].find(e => e.dataset.k !== 'pud'); window.__g = g && g.dataset.seat + '|' + g.dataset.k; });
     {
       const g = await p.$('#tbl .grp'); if (!g) fail('no group on the table'); else {
