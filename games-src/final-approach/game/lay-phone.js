@@ -89,9 +89,12 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     await p.waitForTimeout(500); await shot('6final'); await scroll('final'); await targets('final'); await clipped('final'); await fit('final');
     { const rr = await rect('.rsbox'); if (!rr) fail('no final card'); else if (rr[0] < -1 || rr[2] > W + 1 || rr[3] > H + 1) fail('final card does not fit', JSON.stringify(rr)); }
     await p.tap('#rs [data-a=rsclose]'); await p.waitForTimeout(250);
+    // ---- story card of a normal flight
+    await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.tap('[data-a=play]'); await p.waitForTimeout(150); await p.tap('[data-start=vs]'); await p.waitForTimeout(900);
+    { const st = await p.evaluate(() => !!document.querySelector('#rs.story .stbox')); if (!st) fail('no story card at the start of a flight'); else { await shot('8story'); await scroll('story'); await targets('story'); await clipped('story'); await fit('story'); const rr = await rect('.stbox'); if (rr[0] < -1 || rr[2] > W + 1 || rr[3] > H + 1) fail('story card does not fit', JSON.stringify(rr)); await p.tap('#rs [data-a=rsclose]'); await p.waitForTimeout(300); } }
     // ---- hot-seat pass card
     await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.tap('[data-a=play]'); await p.waitForTimeout(150);
-    await p.tap('[data-start=hot]'); await p.waitForTimeout(900);
+    await p.tap('[data-start=hot]'); await p.waitForTimeout(900); { const cl = await p.$('#rs.story [data-a=rsclose]'); if (cl) { await cl.tap(); await p.waitForTimeout(300); } }
     { const pass = await p.evaluate(() => ({ card: !document.querySelector('#pass').hidden, dice: [...document.querySelectorAll('#pz .die .dv')].filter(e => /^[1-6]$/.test(e.textContent)).length })); if (!pass.card) fail('no pass-the-device card in hot-seat'); if (pass.dice) fail('dice values visible before the pass card is taken'); await shot('7pass'); await targets('pass'); await clipped('pass'); await fit('pass'); }
     log('errors', JSON.stringify(errs.slice(0, 3))); bad += errs.length; if (errs.length) console.log('FAIL', t, 'console errors', errs.length);
     await ctx.close();

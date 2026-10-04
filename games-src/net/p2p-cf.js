@@ -140,7 +140,7 @@ async function layout(x, tag) {
     else if (SC === 'leave') {
       global.DELAY = 120; const { H, C, code } = await setup(2, { np: 4 }); const P = [H, ...C]; await H.p.evaluate(() => { AIDELAY = 200; }); await startHost(H); for (const x of P) await seatOf(x); const ev = {};
       const hook = async (g, n) => {
-        if (!ev.bad && g.round === 1 && n > 8) {
+        if (!ev.bad && g.round <= 4 && n > 2) {
           const st = await C[1].p.evaluate(() => { const p = G.players[NET.mySeat]; return { seat: NET.mySeat, drawing: G.phase === 'brew' && p.st === 'draw' && !p.q && p.bag.length > 2, ver: p.ver }; });
           if (!st.drawing) return;
           ev.bad = true; global.FREEZE = 1; await sleep(900);
@@ -154,7 +154,7 @@ async function layout(x, tag) {
           await sleep(1800); const after = await H.p.evaluate(s => ({ n: G.logN, rej: NET.rejected, remote: NET.remote, inv: CF.checkInvariants(G).length, pol: ({}).x !== undefined, pot: G.players.map(p => p.pot.length), bag: G.players[s].bag.length }), st.seat);
           ev.badResult = { junkRejected: mid.rej - before.rej, junkStateUnchanged: JSON.stringify(mid.pot) === JSON.stringify(before.pot) && mid.remote === before.remote && mid.bag === before.bag, doubleDrawRejected: after.rej - mid.rej, doubleDrawApplied: after.remote - mid.remote, bagDrop: mid.bag - after.bag, invariants: after.inv, protoPolluted: after.pol, wasDrawing: cur.drawing }; global.FREEZE = 0;
         }
-        if (ev.bad && !ev.left && g.round >= 2) { ev.left = true; ev.seat = await C[0].p.evaluate(() => NET.mySeat); ev.uid = await C[0].p.evaluate(() => NetRoom.uid()); await C[0].ctx.close(); C[0].dead = true; let away = false; for (let k = 0; k < 80 && !away; k++) { await sleep(250); away = await H.p.evaluate(s => !!G.players[s].ai && NET.away[s], ev.seat); } ev.leave = { seat: ev.seat, aiTookOver: away }; ev.leftAt = Date.now(); }
+        if (ev.bad && !ev.left && g.round >= 3) { ev.left = true; ev.seat = await C[0].p.evaluate(() => NET.mySeat); ev.uid = await C[0].p.evaluate(() => NetRoom.uid()); await C[0].ctx.close(); C[0].dead = true; let away = false; for (let k = 0; k < 80 && !away; k++) { await sleep(250); away = await H.p.evaluate(s => !!G.players[s].ai && NET.away[s], ev.seat); } ev.leave = { seat: ev.seat, aiTookOver: away }; ev.leftAt = Date.now(); }
         if (ev.left && !ev.rejoin && Date.now() - ev.leftAt > 3000) {
           ev.rejoin = true; const cx = await ctxNew(); await cx.addInitScript(u => { try { localStorage.setItem('gns-uid', u); localStorage.setItem('gns-name', 'Friend1'); } catch (e) { } }, ev.uid); const x = await page(cx, 'c1-again', '#join-' + code);
           const pre = await x.p.evaluate(() => ({ code: UI.joinCode, onl: UI.onl, open: document.querySelector('#onl').open, field: document.getElementById('joincode').value })); await x.p.evaluate(() => { AIDELAY = 80; ANIM = 0; document.querySelector('[data-a=netjoin]').click(); });

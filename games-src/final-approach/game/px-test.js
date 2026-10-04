@@ -11,7 +11,7 @@ let bad = 0; const fail = (c, d) => { bad++; console.log('FAIL', c, d || ''); };
     const p = await ctx.newPage(); p.setDefaultTimeout(40000); p.errs = []; p.on('pageerror', e => p.errs.push(e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load/.test(m.text())) p.errs.push(m.text()); });
     await p.goto('https://gns.test/' + (query || '')); await p.waitForTimeout(1800); return p;
   }
-  const start = async p => { await p.evaluate(() => { try { localStorage.clear(); } catch (e) { } UI.seed = 5; AIDELAY = 60; }); await p.click('[data-a=play]'); await p.waitForTimeout(250); await p.click('[data-start=vs]'); await p.waitForTimeout(900); const t = await p.$('#pc [data-a=tipoff]'); if (t) await t.click(); };
+  const start = async p => { await p.evaluate(() => { try { localStorage.clear(); } catch (e) { } UI.seed = 5; AIDELAY = 60; }); await p.click('[data-a=play]'); await p.waitForTimeout(250); await p.click('[data-start=vs]'); await p.waitForTimeout(900); const sc = await p.$('#rs.story [data-a=rsclose]'); if (sc) await sc.click(); await p.waitForTimeout(300); const t = await p.$('#pc [data-a=tipoff]'); if (t) await t.click(); };
   const roll = async p => { await p.evaluate(() => { const b = document.querySelector('#acts [data-a=ready]'); if (b) b.click(); }); };
   // ---- 1. WebGL
   { const p = await open(''); const st0 = await p.evaluate(() => PX.state()); if (!st0.on) fail('Pixi not on', JSON.stringify({ err: st0.err })); else ok('webgl renderer', st0.kind + ' res ' + st0.res + ' q ' + st0.q);

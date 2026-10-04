@@ -31,7 +31,7 @@ const startHost = H => H.p.evaluate(() => document.querySelector('[data-a=netsta
 const tick = () => {
   if (typeof G === 'undefined' || !G || !UI.started) return 0; const d = document, R = Math.random, rnd = a => a[Math.floor(R() * a.length)], q = s => [...d.querySelectorAll(s)].filter(b => !b.disabled && !b.closest('[hidden]')), click = el => { el.dispatchEvent(new MouseEvent('click', { bubbles: true })); return 1; };
   const nb = d.getElementById('netbox'); if (nb && !nb.hidden && UI.netOpen && R() < .5) { UI.netOpen = false; netRender(); }
-  const rs = d.getElementById('rs'); if (rs && !rs.hidden) return 0; if (G.result) return 0;
+  const rs = d.getElementById('rs'); if (rs && !rs.hidden) { const sc = rs.querySelector('.stbox [data-a=rsclose]'); if (sc) return click(sc); return 0; } if (G.result) return 0;
   const tip = q('#pc [data-a=tipok],#pc [data-a=tipoff]'); if (tip.length) return click(tip[0]);
   const s = NET.mySeat; if (s < 0 || !FA.pending(G).includes(s) || G.ai[s]) return 0;
   if (R() < .03) { const t = rnd(q('.gx-bar [data-gx]')); if (t) { click(t); const x = d.querySelector('.gx-drawer.on .gx-x'); if (x) click(x); return 0; } }

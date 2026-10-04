@@ -38,7 +38,7 @@ function run(cf, seed) {
     const fin = r => { clearInterval(iv); res(Object.assign({ cf, errs, seen, clicks, hidden, placed, secs: Math.round((Date.now() - t0) / 1000) }, r || {})); try { w.close(); } catch (e) { } };
     w.addEventListener('load', () => {
       try {
-        w.eval(`ANIM=${ANIMON ? 1 : 0};AIDELAY=${ANIMON ? 40 : 0};UI.seed=${seed}`);
+        w.eval(`ANIM=${ANIMON ? 1 : 0};AIDELAY=${ANIMON ? 40 : 0};UI.seed=${seed};FA.AI.NMC={top:2,samples:1};FA.AI.HMC={top:2,samples:2}`);   // smaller Monte Carlo: this test is about the page, not the AI's strength
         if (!d.querySelector('#start [data-a=play]')) errs.push('no Play button on the title');
         if (d.querySelector('#start [data-a=loadsave]')) errs.push('Resume shown without a save');
         click(d.querySelector('[data-a=play]')); seen.add('title->setup');

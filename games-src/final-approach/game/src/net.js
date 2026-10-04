@@ -113,7 +113,7 @@ function applyNet(o) {
     Object.assign(UI, { sel: -1, cof: 0, hint: null, over: null, overShown: false, started: true, mode: 'net', seat: seat, holder: seat, rrm: [false, false, false, false], lastPlace: null });
     UI.coach = { level: 'off', seen: {}, tip: '' }; UI.rt = null;
     const st = $('#start'); if (st) st.hidden = true; try { GX.close(); } catch (e) { } UI.netOpen = false;
-    netRender(); render(); sndMusic(); if (g.result) onEnd(); return;
+    netRender(); render(); sndMusic(); if (g.result) onEnd(); else if (g.round === 0 && g.phase === 'brief' && UI.prefs.story !== false) showStory(); return;
   }
   if (prev) { const n0 = Object.keys(prev.slots).length, n1 = Object.keys(g.slots).length; if (n1 > n0) snd('dieland'); if (g.round !== prev.round && !g.result) { snd('round'); UI.sel = -1; UI.cof = 0; } if (g.phase === 'place' && prev.phase === 'brief') snd('roll'); if (prev.pend && !g.pend) { UI.rrm = [false, false, false, false]; } if (UI.sel !== -1 && typeof UI.sel === 'number' && g.dice[seat] && g.dice[seat][UI.sel] && g.dice[seat][UI.sel].u) UI.sel = -1; }
   netRender(); render();

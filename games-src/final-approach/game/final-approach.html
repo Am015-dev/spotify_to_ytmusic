@@ -266,6 +266,9 @@ html.fapx .dv.cof::after{display:none}
 .passbox{background:var(--paper);border:3px solid #14202c;border-radius:18px;padding:18px;width:min(420px,100%);display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.5)}
 .passbox img{width:96px;height:96px;border-radius:50%;object-fit:cover;background:#ccd6df}
 .passbox h2{margin:0;font-size:1.4rem;font-weight:900}.passbox p{margin:0;font-size:14.5px}
+#rs.story{z-index:70}
+.stbox .stimg{width:100%;height:110px;object-fit:cover;border-radius:10px;border:2px solid #14202c}
+html.ph .stbox .stimg{height:64px}
 #rs{position:fixed;inset:0;z-index:55;background:rgba(8,16,24,.55);display:flex;align-items:flex-end;justify-content:center;padding:8px}
 .rsbox{background:var(--paper);border:3px solid #14202c;border-radius:16px;width:min(560px,100%);max-height:100%;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 14px 44px rgba(0,0,0,.55);overscroll-behavior:contain}
 .rsbox h2{margin:0;font-size:1.35rem;font-weight:900}
@@ -3996,7 +3999,7 @@ function monteCarlo(G, seat, scored, rand, opt) {
 }
 
 AI.NMC = AI.NMC || { top: 3, samples: 3 };   // normal: a small Monte Carlo over the partner's unknown dice
-AI.HMC = AI.HMC || { top: 5, samples: 8 };   // hard: a bigger one
+AI.HMC = AI.HMC || { top: 6, samples: 12 };   // hard: a bigger one
 AI.move = move; AI.say = (G, seat) => sayCodes(G, seat); AI.cost = cost; AI.features = features; AI.schedCost = schedCost; AI.score = cost;
 if (typeof module === 'object' && module.exports) module.exports = FA;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
@@ -4416,7 +4419,7 @@ function applyNet(o) {
     Object.assign(UI, { sel: -1, cof: 0, hint: null, over: null, overShown: false, started: true, mode: 'net', seat: seat, holder: seat, rrm: [false, false, false, false], lastPlace: null });
     UI.coach = { level: 'off', seen: {}, tip: '' }; UI.rt = null;
     const st = $('#start'); if (st) st.hidden = true; try { GX.close(); } catch (e) { } UI.netOpen = false;
-    netRender(); render(); sndMusic(); if (g.result) onEnd(); return;
+    netRender(); render(); sndMusic(); if (g.result) onEnd(); else if (g.round === 0 && g.phase === 'brief' && UI.prefs.story !== false) showStory(); return;
   }
   if (prev) { const n0 = Object.keys(prev.slots).length, n1 = Object.keys(g.slots).length; if (n1 > n0) snd('dieland'); if (g.round !== prev.round && !g.result) { snd('round'); UI.sel = -1; UI.cof = 0; } if (g.phase === 'place' && prev.phase === 'brief') snd('roll'); if (prev.pend && !g.pend) { UI.rrm = [false, false, false, false]; } if (UI.sel !== -1 && typeof UI.sel === 'number' && g.dice[seat] && g.dice[seat][UI.sel] && g.dice[seat][UI.sel].u) UI.sel = -1; }
   netRender(); render();
@@ -4807,6 +4810,7 @@ function newGame(mode, o) {
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.prefs.guide || 'off'), seen: {}, tip: '', queue: [] }; UI.lastPlace = null; UI.rt = G.mods.real ? { left: 60000, last: 0 } : null;
   const st = $('#start'); if (st) st.hidden = true; closeRS(); try { GX.close(); } catch (e) { } closePass();
   clearSave(); render(); sndMusic(); coachTick(); schedule();
+  if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false) showStory();
 }
 function suggestAbil(sc) { const order = ['mastery', 'control', 'antic', 'together', 'sync', 'adapt']; return order.slice(0, sc.ab); }
 // ---- applying a move (every route goes through here: a human tap, the computer, a remote player)
@@ -4961,13 +4965,27 @@ function showTip(t) {
 }
 function tipOk() { const c = UI.coach, pc = $('#pc'); if (c.tip) c.seen[c.tip] = 1; c.tip = ''; if (pc) { pc.hidden = true; pc.innerHTML = ''; } setTimeout(coachTick, 150); }
 // ---------- end card ----------
-function closeRS() { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; if (typeof pxClearEnd === 'function' && G && G.result) pxClearEnd(); }
+// ---- the story card at the start of a flight (airport, what is special today, how the colours work)
+function showStory() {
+  const rs = $('#rs'); if (!rs || !G || G.result) return; const sc = scenOf(), ap = D.airports[sc.ap], band = D.diffs[sc.col] || {};
+  UI.rsOpen = true; rs.hidden = false; rs.innerHTML = ''; rs.className = 'story';
+  const mods = sc.mods.map(m => D.mods[m]).concat(G.mods.tabs ? [D.mods.turns] : []).concat(G.mods.traffic ? [D.mods.traffic] : []);
+  const box = h('div.rsbox.stbox', { role: 'dialog', 'aria-label': 'Flight story' },
+    ART['end-land'] ? h('img.stimg', { src: ART['end-land'], alt: '' }) : null,
+    h('h2', ap.name + ': ' + sc.title), h('p.sm.muted', (band.name || sc.col) + ' · ' + ap.wx + ', ' + ap.tod),
+    h('p', sc.text), h('p.sm', ap.blurb),
+    mods.length ? h('div', h('b', 'Today'), ...mods.map(m => h('div.why', h('b', m.name + ': '), m.text))) : h('p.sm', 'No extra rules today: just the panel, the track and each other.'),
+    ...G.abil.map(a => h('div.why', h('b', D.abilities[a].name + ': '), D.abilities[a].text)),
+    h('div.cbtns', h('button.btn.go', { type: 'button', 'data-a': 'rsclose' }, 'To the briefing')));
+  rs.appendChild(box);
+}
+function closeRS() { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; rs.className = ''; } UI.rsOpen = false; if (typeof pxClearEnd === 'function' && G && G.result) pxClearEnd(); }
 function checkRows(c) {
   const rows = [['planes', 'No planes left on the approach track'], ['gear', 'All landing gear down'], ['flaps', 'All flaps out'], ['axis', 'Axis level'], ['speed', 'Speed no more than the brakes'], ['intern', 'Trainee fully trained'], ['ice', 'Icy-runway brakes finished']];
   return rows.filter(r => r[0] in c).map(r => h('div.chk', h('i.' + (c[r[0]] ? 'ok' : 'no'), c[r[0]] ? '✓' : '×'), r[1]));
 }
 function showFinal() {
-  const rs = $('#rs'); if (!rs || !G || !G.result) return; UI.rsOpen = true; rs.hidden = false; rs.innerHTML = '';
+  const rs = $('#rs'); if (!rs || !G || !G.result) return; UI.rsOpen = true; rs.hidden = false; rs.innerHTML = ''; rs.className = '';
   const R = G.result, sc = scenOf(), ap = D.airports[sc.ap];
   const stats = G.used || {};
   const box = h('div.rsbox.' + (R.win ? 'win' : 'lose'), { role: 'dialog', 'aria-label': 'Flight debrief' },
@@ -5021,7 +5039,7 @@ function renderMenu() {
   const tog = (n, on, label) => h('button.btn' + (on ? '' : '.alt'), { 'data-a': n, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, label + ': ' + (on ? 'On' : 'Off'));
   if (typeof NET !== 'undefined' && NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, typeof isHost === 'function' && isHost() ? 'Close the room' : 'Leave the room'));
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New flight'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
-  if (!(typeof NET !== 'undefined' && NET.on)) { row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n))); row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + ((UI.coach.level || UI.prefs.guide) === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1)))); }
+  if (!(typeof NET !== 'undefined' && NET.on)) { row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n))); row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + ((UI.coach.level || UI.prefs.guide) === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1)))); row('Flight story card', ...[[true, 'On'], [false, 'Off']].map(([v, n]) => h('button.btn' + ((UI.prefs.story !== false) === v ? '' : '.alt'), { 'data-a': 'story', 'data-v': v ? '1' : '0', type: 'button' }, n))); }
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const g = UI.prefs.gfx || 'auto'; row('Graphics' + (typeof PX !== 'undefined' && PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
@@ -5111,6 +5129,7 @@ document.addEventListener('click', ev => {
     case 'save': toast(saveGame() ? 'Flight saved.' : 'Could not save.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved flight.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
+    case 'story': UI.prefs.story = d.v === '1'; savePrefs(); renderMenu(); break;
     case 'guide': UI.coach.level = d.v; UI.prefs.guide = d.v; savePrefs(); renderMenu(); coachTick(); break;
     case 'gfx': if (typeof setGfx === 'function') setGfx(d.v); UI.prefs.gfx = d.v; savePrefs(); renderMenu(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;

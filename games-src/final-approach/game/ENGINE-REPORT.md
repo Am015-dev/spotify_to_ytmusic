@@ -31,7 +31,7 @@ trainee token cross-check, ice columns, each ability, real-time, toss, hidden in
   markers will have), planes to clear, gear / flaps / brakes (binomial models of the dice still to come), dice budget of each seat, axis balance, fuel (normal approximation), trainee, ice columns (half-done column credited by the chance the other half arrives this round), coffee / reroll tokens,
   and the expected cost of the half-finished axis / engine pair (own dice known, partner's k dice unknown, uniform d6). On top, a small Monte Carlo: the top 3 candidates are each played to the end of the round in 3 sampled worlds (partner's unknown dice drawn at random,
   everybody continues with the greedy policy) and the best average cost is played. Weights are the hand-set prior (a logistic fit and an SPSA search were tried and did not beat it on a fresh check).
-* **hard:** the same with 5 candidates and 8 sampled worlds.
+* **hard:** the same with 6 candidates and 12 sampled worlds.
 * Briefing: the computer says up to two public worries (planes ahead, gear / flaps / brakes still to do, fuel, trainee, wind) and presses Roll.
 
 ## Hidden information

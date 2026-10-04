@@ -42,6 +42,8 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
     await p.evaluate(() => { const k = document.querySelector('#pc [data-a=tipoff]'); if (k) k.click(); G.ai = [true, true]; AIDELAY = 0; schedule(); });
     for (let k = 0; k < 150; k++) { const o = await p.evaluate(() => !!(G && G.result && UI.overShown && !document.querySelector('#rs').hidden)); if (o) break; await p.waitForTimeout(400); }
     await p.waitForTimeout(500); await shot('6final'); await scroll('final'); { const rr = await rect('.rsbox'); if (!rr) fail('no final card'); else if (rr[0] < -1 || rr[2] > W + 1 || rr[3] > H + 1) fail('final card does not fit', JSON.stringify(rr)); }
+    await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.click('[data-a=play]'); await p.waitForTimeout(250); await p.click('[data-start=vs]'); await p.waitForTimeout(900);
+    { const st = await p.evaluate(() => !!document.querySelector('#rs.story .stbox')); if (!st) fail('no story card at the start of a flight'); else { await shot('7story'); await scroll('story'); const rr = await rect('.stbox'); if (rr[0] < -1 || rr[2] > W + 1 || rr[3] > H + 1) fail('story card does not fit', JSON.stringify(rr)); await p.click('#rs [data-a=rsclose]'); await p.waitForTimeout(300); } }
     { const st = await p.evaluate(() => (typeof PX !== 'undefined' && PX.on) ? { kind: PX.kind, ok: pxPainted() } : { kind: 'dom' }); console.log(t, 'renderer', JSON.stringify(st)); if (st.kind !== 'dom' && !(st.ok > 0.5)) fail('painted canvas looks blank', JSON.stringify(st)); }
     console.log(t, 'errors', JSON.stringify(errs.slice(0, 3))); bad += errs.length; await ctx.close();
   }

@@ -80,6 +80,7 @@ document.addEventListener('click', ev => {
     case 'save': toast(saveGame() ? 'Flight saved.' : 'Could not save.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved flight.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
+    case 'story': UI.prefs.story = d.v === '1'; savePrefs(); renderMenu(); break;
     case 'guide': UI.coach.level = d.v; UI.prefs.guide = d.v; savePrefs(); renderMenu(); coachTick(); break;
     case 'gfx': if (typeof setGfx === 'function') setGfx(d.v); UI.prefs.gfx = d.v; savePrefs(); renderMenu(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;

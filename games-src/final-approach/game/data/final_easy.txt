@@ -1,0 +1,12 @@
+easy g1 green Port Alder                       3/60   5% avg rounds 5.8 {"mandatory":32,"checks:flaps":3,"collision":2,"spin":4,"short":2,"checks:gear+flaps+axis":3,"speed":7,"checks:gear+flaps":1,"checks:flaps+axis":1,"checks:gear+axis":2} 218ms/game
+easy g2 green Foxmere                          0/60   0% avg rounds 5.4 {"collision":4,"spin":3,"mandatory":38,"short":5,"checks:gear+flaps+axis":4,"speed":3,"checks:planes+flaps+axis":1,"checks:flaps+axis":2} 161ms/game
+easy g3 green Seabright Bay                    0/60   0% avg rounds 4.5 {"short":7,"mandatory":32,"collision":6,"spin":6,"corridor":4,"checks:gear+axis":1,"checks:flaps":3,"checks:gear+flaps":1} 117ms/game
+easy g4 green Lake Orrin                       0/60   0% avg rounds 4.7 {"fuel":11,"mandatory":36,"collision":2,"spin":5,"overshoot":1,"speed":2,"checks:flaps":1,"short":1,"checks:flaps+axis":1} 109ms/game
+easy g5 green Grand Crossing                   2/60   3% avg rounds 4.3 {"mandatory":32,"spin":9,"speed":3,"checks:gear+flaps+axis":1,"short":4,"checks:planes":1,"checks:flaps":1,"checks:flaps+axis":2,"checks:axis":1,"collision":3,"checks:planes+flaps+axis":1} 79ms/game
+easy g6 green Castlemoor                       0/60   0% avg rounds 5.0 {"mandatory":28,"fuel":16,"short":5,"corridor":6,"speed":3,"spin":1,"collision":1} 143ms/game
+easy y1 yellow Foxmere                         0/60   0% avg rounds 4.2 {"short":6,"mandatory":31,"collision":11,"spin":9,"checks:flaps":1,"checks:flaps+axis+intern":1,"speed":1} 56ms/game
+easy y2 yellow Bowlrock                        0/60   0% avg rounds 4.1 {"checks:flaps+axis":1,"short":2,"mandatory":25,"fuel":17,"spin":8,"corridor":6,"collision":1} 75ms/game
+easy y3 yellow Palmreach                       0/60   0% avg rounds 3.8 {"mandatory":33,"speed":2,"spin":3,"collision":18,"short":3,"checks:planes+gear":1} 53ms/game
+easy y4 yellow Frostmere                       0/60   0% avg rounds 5.5 {"speed":10,"mandatory":32,"short":10,"collision":2,"spin":6} 116ms/game
+easy y5 yellow Castlemoor                      0/60   0% avg rounds 4.4 {"checks:planes+axis":1,"spin":9,"mandatory":31,"fuel":3,"speed":3,"checks:planes+flaps":1,"checks:planes+flaps+axis":1,"short":5,"collision":5,"checks:gear+flaps+axis":1} 64ms/game
+easy y6 yellow Twin Spires                     0/60   0% avg rounds 4.6 {"short":2,"checks:gear+flaps":1,"fuel":14,"spin":2,"mandatory":27,"corridor":11,"speed":2,"collision":1} 82ms/game

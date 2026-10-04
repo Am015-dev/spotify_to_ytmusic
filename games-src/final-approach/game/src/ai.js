@@ -321,7 +321,7 @@ function monteCarlo(G, seat, scored, rand, opt) {
 }
 
 AI.NMC = AI.NMC || { top: 3, samples: 3 };   // normal: a small Monte Carlo over the partner's unknown dice
-AI.HMC = AI.HMC || { top: 5, samples: 8 };   // hard: a bigger one
+AI.HMC = AI.HMC || { top: 6, samples: 12 };   // hard: a bigger one
 AI.move = move; AI.say = (G, seat) => sayCodes(G, seat); AI.cost = cost; AI.features = features; AI.schedCost = schedCost; AI.score = cost;
 if (typeof module === 'object' && module.exports) module.exports = FA;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
