@@ -1,11 +1,11 @@
 // ===================== part 4: guide tips, pop-ups (job, diver, last trick) and the result card =====================
 // ---------- tips: one at a time, never stacked; the guided dive shows all of them, other dives each tip once per device ----------
 const TIPS = [
-  { id: 'welcome', when: () => UI.mode === 'guided' && G.phase === 'assign' && G.tricks.length === 0 && !seen('assign1'), title: 'Welcome aboard', body: 'You are a diver in a team. You win together or lose together. On the table lie job cards: each job is something ONE diver has to do with the tricks that diver wins.', btn: 'Next' },
+  { id: 'welcome', when: () => UI.mode === 'guided' && G.phase === 'assign' && G.tricks.length === 0, title: 'Welcome aboard', body: 'You are a diver in a team. You win together or lose together. On the table lie job cards: each job is something ONE diver has to do with the tricks that diver wins.', btn: 'Next' },
   { id: 'commander', when: () => G.phase === 'assign' && G.cap >= 0, title: () => G.cap === viewSeat() ? 'You are the Commander' : pname(G.cap) + ' is the Commander', body: () => (G.cap === viewSeat() ? 'You hold Lantern 4, the strongest card. So you pick a job first, and you lead the first trick.' : pname(G.cap) + ' holds Lantern 4, the strongest card. The Commander picks a job first, then it goes clockwise, and the Commander leads the first trick.') },
   { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card on the table to read it in the panel, then press "Take this job". Choose one you think your own cards can do. With fewer jobs than divers you may pass.' },
   { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'The distress flare', body: 'Optional help: light the flare and every diver passes one card (not a Lantern) to a neighbour. It makes the dive count one extra attempt. You can always say "No flare".' },
-  { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signals', body: 'You may show ONE card of yours to the crew, once per dive. It must be your highest, your lowest or your only card of a colour. The token on it tells which. Lanterns cannot be shown. Press "Signal…", or skip.' },
+  { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signals', body: 'You may show ONE card of yours to the team, once per dive. It must be your highest, your lowest or your only card of a colour. The token on it tells which. Lanterns cannot be shown. Press "Signal…", or skip.' },
   { id: 'lead', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length === 0 && !G.players[G.trick.turn].helper, title: 'You lead the trick', body: 'The leader plays any card. Tap a card to lift it, tap it again (or press Play) to play it. Everybody then plays one card; the highest card of the led colour wins.' },
   { id: 'follow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && !G.players[G.trick.turn].helper && LD.playable(G, G.trick.turn).length < G.players[G.trick.turn].hand.length, title: 'Follow the colour', body: 'You must play a card of the colour that was led, if you have one. The dim cards are not allowed. Winning is never forced: you may play a low card on purpose.' },
   { id: 'nofollow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && G.trick.ls < 4 && !G.players[G.trick.turn].helper && !G.players[G.trick.turn].hand.some(c => suitOf(c) === G.trick.ls), title: 'No card of that colour', body: 'You have none of the led colour, so you may play anything. A card of another colour never wins the trick, but a Lantern does: Lanterns are trumps.' },
@@ -27,7 +27,7 @@ function coachCheck() {
     let ok = false; try { ok = t.when(); } catch (e) { }
     if (!ok) continue;
     const title = typeof t.title === 'function' ? t.title() : t.title, body = typeof t.body === 'function' ? t.body() : t.body;
-    UI.tip = { id: t.id, title, body, btn: t.btn || 'Got it' }; renderTip(); if (t.id === 'welcome') UI.coach.seen.assign1 = 0; return;
+    UI.tip = { id: t.id, title, body, btn: t.btn || 'Got it' }; renderTip(); return;
   }
 }
 function tipOk() { if (!UI.tip) return; markSeen(UI.tip.id); UI.tip = null; renderTip(); schedule(); coachCheck(); }

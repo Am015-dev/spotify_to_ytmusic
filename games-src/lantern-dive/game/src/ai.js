@@ -4,7 +4,7 @@
 // Method (determinised Monte Carlo, "perfect information Monte Carlo"): sample worlds for the hidden hands that fit everything it has seen
 // (follow-suit voids, ping marks, passed cards), play each candidate card and finish the dive with a cheap cooperative greedy policy for
 // every seat, and keep the card that finishes the dive most often. The same machinery rates job cards (how well do I fit this job compared
-// with the others?), picks cards to pass and predictions, and decides when a ping helps the crew.
+// with the others?), picks cards to pass and predictions, and decides when a ping helps the team.
 // Randomness is seeded from the view itself, so the same view always gives the same decision (tests prove it with poisoned states).
 (function (g) {
 'use strict';
@@ -182,7 +182,7 @@ function trickU(W, s, c, ori) {
   if (W.mission.m27 && cur.some(x => x.c === 3 * 9 + 4) && !(last && cur[cur.length - 1].c === 3 * 9 + 4)) u -= 50;
   if (W.mission.m12 && T.plays.length === 0 && (suit(c) === 0 || suit(c) === LAN)) u -= 50;
   cur.forEach((x, i) => { W.pl[x.c] = prev[i]; }); W.tricks.pop();
-  // spending power: keep winners when the crew needs wins, dump them when it needs to avoid tricks
+  // spending power: keep winners when the team needs wins, dump them when it needs to avoid tricks
   u -= .15 * ori * powerOf(c) * (w === s ? 0 : 1);
   return u;
 }

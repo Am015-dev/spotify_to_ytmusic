@@ -377,7 +377,7 @@ function assignApply(G, c, m) {
         const cnt = {}; voters.forEach(v => { cnt[A.votes[v]] = (cnt[A.votes[v]] || 0) + 1; }); const best = Math.max(...Object.values(cnt));
         let win = Object.keys(cnt).map(Number).filter(k => cnt[k] === best);
         const w = win.length > 1 ? (win.includes(A.votes[G.cap]) ? A.votes[G.cap] : orderFrom(G, G.cap).find(s => win.includes(s))) : win[0];
-        for (const t of G.tasks) t.owner = w; A.winner = w; lg(G, G.players[w].name + ' takes every job (crew vote).');
+        for (const t of G.tasks) t.owner = w; A.winner = w; lg(G, G.players[w].name + ' takes every job (team vote).');
       }
       break;
     }
@@ -615,7 +615,7 @@ function apply(G, seat, m) {
   switch (G.phase) {
     case 'assign': { const e = assignApply(G, seat, m); if (e) return { ok: false, error: e }; return { ok: true }; }
     case 'distress': {
-      if (!m.on) { lg(G, G.distress ? 'No card passing this attempt.' : 'The crew goes without the distress flare.'); afterDistress(G); return { ok: true }; }
+      if (!m.on) { lg(G, G.distress ? 'No card passing this attempt.' : 'The team goes without the distress flare.'); afterDistress(G); return { ok: true }; }
       G.distress = true; ev(G, { t: 'dist', dir: m.dir }); lg(G, 'The distress flare is lit: this dive will count one extra attempt.');
       G.pass = { dir: m.dir, give: {} }; G.phase = 'pass'; return { ok: true };
     }

@@ -7,8 +7,9 @@
 // Method: apply each candidate to a light copy of the real engine, then judge the resulting state with a feature model
 //   (schedule: can the remaining rounds still deliver the exact distance to the airport at the engine thresholds the markers will have; planes to
 //   clear; gear / flaps / brakes still to deploy; dice budget of each seat; axis balance; fuel; trainee; coffee and reroll tokens; and the expected
-//   cost of the mandatory axis and engine pairs that are still half done). Every feature is "nats of failure"; the weights FA.AIW were fitted by
-//   logistic regression on the outcomes of self-play games (train.js), so the scales are calibrated, not guessed.
+//   cost of the mandatory axis and engine pairs that are still half done). Every feature is "nats of failure" (minus log of the probability that the
+//   task still succeeds), so the scales are principled. The weights are the hand-set prior W0 (FA.AIW is empty): a logistic fit on self-play outcomes (fit.py)
+//   and an SPSA search (tune.js) were both tried and neither beat the prior on a fresh 40-game-per-scenario check, so they are not shipped.
 // 'hard' additionally samples the partner's unknown dice and plays the rest of the round out for the best few candidates.
 (function (g) {
 'use strict';
@@ -141,7 +142,24 @@ function features(S, me) {
   if (fl > 0) f.flaps = nats(binAtLeast(Math.round(W.flapM * Rf), Math.min(0.9, W.flapQ + cb), fl));
   if (gl > 0) f.gear = nats(gearProb(gl, Math.round(W.gearM * Rf), cb));
   let brLeft = 0;
-  if (S.mods.ice) { brLeft = 4 - S.pl.ice; if (brLeft > 0) f.brake = nats(binAtLeast(Math.round(Rf * 2), W.iceP + cb, brLeft)); }
+  if (S.mods.ice) {
+    brLeft = 4 - S.pl.ice;
+    if (brLeft > 0) {
+      const P = (n, R) => n <= 0 ? 1 : binAtLeast(Math.round(R * 2), W.iceP + cb, n);
+      const k = S.pl.ice, tIn = !!S.slots['it' + k], bIn = !!S.slots['ib' + k], half = inPlace && (tIn !== bIn);
+      if (half) {
+        // one half of the current column is down: the other half must come from a die of exactly that value, this round
+        const v = D.iceBrakes[k], reach = Math.min(S.coffee, 3), q = Math.min(0.9, 1 / 6 + 0.11 * reach);
+        const mineHas = s => FA.unusedDice(S, s).some(i => Math.abs(S.dice[s][i].v - v) <= reach);
+        const kOf = s => unplaced(S, s) - ((S.slots['ax' + s] ? 0 : 1) + (S.slots['en' + s] ? 0 : 1));
+        const tryS = s => s === me ? (mineHas(s) ? 0.97 : 0) : 1 - Math.pow(1 - q, Math.max(0, kOf(s)));
+        const needPilot = !tIn;      // the top space is the pilot's
+        const pc = needPilot ? tryS(0) : 1 - (1 - tryS(0)) * (1 - tryS(1));
+        const after = Math.max(0, rem - 1);
+        f.brake = nats(pc * P(brLeft - 1, after) + (1 - pc) * P(brLeft, after));
+      } else f.brake = nats(P(brLeft, Rf));
+    }
+  }
   else { const nb = S.pl.sw.br[0] + S.pl.sw.br[1] + S.pl.sw.br[2]; brLeft = Math.max(0, 2 - nb); if (brLeft > 0) f.brake = nats(binAtLeast(Math.round(W.brakeM * Rf), 1 / 6 + (S.coffee > 0 ? W.brakeCoffee : 0) + cb * 0.5, brLeft)); }
   let internLeft = 0; if (S.mods.intern) { internLeft = S.intern.length; if (internLeft > 0) f.intern = nats(binAtLeast(Math.round(2 * Rf), W.internP, internLeft)); }
   { const after = Math.max(0, rem - 1), mand = s => (S.slots['ax' + s] ? 0 : 1) + (S.slots['en' + s] ? 0 : 1);
@@ -240,7 +258,7 @@ function move(G0, seat, level, opt) {
     if (rand() < 0.35) return pool[Math.min(pool.length - 1, Math.floor(rand() * 4))].m;
     return pool[0].m;
   }
-  if (level === 'hard' && scored.length > 1 && !opt.noMC) return monteCarlo(G, seat, scored, rand, opt);
+  if ((level === 'hard' || level === 'normal') && scored.length > 1 && !opt.noMC) return monteCarlo(G, seat, scored, rand, Object.assign(level === 'hard' ? { top: AI.HMC.top, samples: AI.HMC.samples } : { top: AI.NMC.top, samples: AI.NMC.samples }, opt));
   return scored[0].m;
 }
 function freeAction(G, seat, cand, base) {
@@ -302,6 +320,8 @@ function monteCarlo(G, seat, scored, rand, opt) {
   return top[bi].m;
 }
 
+AI.NMC = AI.NMC || { top: 3, samples: 3 };   // normal: a small Monte Carlo over the partner's unknown dice
+AI.HMC = AI.HMC || { top: 5, samples: 8 };   // hard: a bigger one
 AI.move = move; AI.say = (G, seat) => sayCodes(G, seat); AI.cost = cost; AI.features = features; AI.schedCost = schedCost; AI.score = cost;
 if (typeof module === 'object' && module.exports) module.exports = FA;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

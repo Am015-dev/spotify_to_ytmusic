@@ -202,7 +202,7 @@ function applyPhone() {
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(150, Math.min(196, Math.round(hh * .25))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  const shortP = ph && w < hh && hh < 600; r.toggle('ph', ph); r.toggle('ph-short', shortP); document.documentElement.style.setProperty('--dockh', (shortP ? 140 : Math.max(150, Math.min(196, Math.round(hh * .25)))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   document.documentElement.style.setProperty('--rail', Math.max(220, Math.min(292, Math.round(w * .33))) + 'px');
   document.documentElement.style.setProperty('--gx-sheet-h', (ph ? 'var(--dockh)' : '46dvh'));
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !(typeof NET !== 'undefined' && NET.on) && UI.sv === 'setup') renderStart(); }

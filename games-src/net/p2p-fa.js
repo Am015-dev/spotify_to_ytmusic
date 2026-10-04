@@ -34,11 +34,17 @@ const tick = () => {
   const rs = d.getElementById('rs'); if (rs && !rs.hidden) return 0; if (G.result) return 0;
   const tip = q('#pc [data-a=tipok],#pc [data-a=tipoff]'); if (tip.length) return click(tip[0]);
   const s = NET.mySeat; if (s < 0 || !FA.pending(G).includes(s) || G.ai[s]) return 0;
+  if (R() < .03) { const t = rnd(q('.gx-bar [data-gx]')); if (t) { click(t); const x = d.querySelector('.gx-drawer.on .gx-x'); if (x) click(x); return 0; } }
+  // the page's computer-crew logic proposes a move; it is carried out with taps on the page's own dice, spaces and buttons (a random click now and then keeps the tests honest)
+  const mv = R() < .12 ? null : FA.AI.move(G, s, 'normal');
   if (G.phase === 'brief') { if (R() < .3) { const sy = q('.say'); if (sy.length) click(rnd(sy)); } const rd = q('#acts [data-a=ready]'); return rd.length ? click(rd[0]) : 0; }
-  const rp = q('#acts [data-a=rrpick]'); if (rp.length) { if (R() < .5) { const dd = q('#pz .die'); if (dd.length) return click(rnd(dd)); } return click(rp[0]); }
-  if (G.pend && G.pend.h === 'intern' || G.pend && G.pend.h === 'sync') { }
+  const dieBtn = i => d.querySelector('#pz .die[data-s="' + s + '"][data-d="' + i + '"]:not([disabled])');
+  if (mv && mv.t === 'place') { const b = dieBtn(mv.d); if (b) { click(b); UI.cof = mv.c || 0; render(); const sl = d.querySelector('#pz .slot[data-slot="' + mv.to + '"]'); if (sl) return click(sl); } }
+  else if (mv && mv.t === 'rr') { const b = q('#acts [data-a=rr]'); if (b.length) return click(b[0]); }
+  else if (mv && mv.t === 'rrpick') { mv.m.forEach((on, i) => { if (on !== !!UI.rrm[i]) { const b = dieBtn(i); if (b) click(b); } }); const rp = q('#acts [data-a=rrpick]'); if (rp.length) return click(rp[0]); }
+  else if (mv && (mv.t === 'toss' || mv.t === 'antic' || mv.t === 'adapt' || mv.t === 'wt' || mv.t === 'wt2')) { const b = dieBtn(mv.d); if (b) { click(b); const a = q('#acts [data-a=' + mv.t + ']'); if (a.length) return click(a[0]); } }
+  const rp = q('#acts [data-a=rrpick]'); if (rp.length) return click(rp[0]);
   const sel = UI.sel, legal = q('#pz .slot.legal'); if ((typeof sel === 'number' && sel >= 0 || sel === 'p') && legal.length) return click(rnd(legal));
-  const ab = q('#acts [data-a=toss]'); if (ab.length && (typeof sel === 'number' && sel >= 0)) return click(ab[0]);
   const dice = q('#pz .die'); if (dice.length) return click(rnd(dice)); return 0;
 };
 // ---- hidden-information checks: truth = the host's real G; a page may only hold what its own seat may see ----
@@ -70,12 +76,12 @@ async function play(P, H, secs, hook) {
 const seatOf = async x => { x.seat = await x.p.evaluate(() => NET.mySeat).catch(() => -2); return x.seat; };
 async function finish(P, H, tag, extra) {
   for (let k = 0; k < 80; k++) { const f = await Promise.all(P.filter(x => !x.dead).map(x => x.p.evaluate(() => !!(G && G.result && UI.overShown && !document.querySelector('#rs').hidden)).catch(() => false))); if (f.every(Boolean)) break; await sleep(250); }
-  await sleep(800); const alive = P.filter(x => !x.dead);
+  await sleep(800); const alive = P.filter(x => !x.dead); for (const x of alive) await seatOf(x);
   for (let k = 0; k < 60; k++) { const hs = await H.p.evaluate(() => G.logN); const ok = await Promise.all(alive.filter(x => x !== H).map(x => x.p.evaluate(l => G && !!G.result && G.logN === l, hs).catch(() => false))); if (ok.every(Boolean)) break; await sleep(250); }
   const sum = () => ({ over: !!G.result, win: G.result && G.result.win, why: G.result && G.result.why, round: G.round, logN: G.logN, seat: NET.mySeat, shown: !document.querySelector('#rs').hidden });
   const hs = await H.p.evaluate(sum); const cs = await Promise.all(alive.filter(x => x !== H).map(x => x.p.evaluate(sum).catch(() => null)));
   const agree = cs.every(c => c && c.over && c.win === hs.win && c.why === hs.why && c.logN === hs.logN && c.round === hs.round);
-  const exact = await Promise.all(alive.filter(x => x !== H).map(async x => { const j = await x.p.evaluate(() => JSON.stringify(G)); const eq = await H.p.evaluate(([j, s]) => { const a = JSON.stringify(netStrip(G, s)); if (a === j) return true; let i = 0; while (i < a.length && a[i] === j[i]) i++; window.__diff = a.slice(Math.max(0, i - 40), i + 60) + ' <> ' + j.slice(Math.max(0, i - 40), i + 60); return false; }, [j, x.seat]); if (!eq) dbg.exactInfo = await H.p.evaluate(() => window.__diff); return eq; }));
+  const exact = await Promise.all(alive.filter(x => x !== H).map(async x => { let j = ''; for (let k = 0; k < 40; k++) { j = await x.p.evaluate(() => JSON.stringify(G)); const e0 = await H.p.evaluate(([j, s]) => JSON.stringify(netStrip(G, s)) === j, [j, x.seat]); if (e0) break; await sleep(250); } const eq = await H.p.evaluate(([j, s]) => { const a = JSON.stringify(netStrip(G, s)); if (a === j) return true; let i = 0; while (i < a.length && a[i] === j[i]) i++; window.__diff = 'host strip: ' + a.slice(Math.max(0, i - 30), i + 50) + ' <> guest: ' + j.slice(Math.max(0, i - 30), i + 50) + ' | host dice ' + JSON.stringify(G.dice) + ' seat ' + s; return false; }, [j, x.seat]); if (!eq) dbg.exactInfo = await H.p.evaluate(() => window.__diff); return eq; }));
   const stats = await H.p.evaluate(() => ({ remote: NET.remote, rejected: NET.rejected, inv: FA.checkInvariants(G).length })); const errors = P.flatMap(x => x.errs);
   const finals = cs.every(c => c && c.shown) && hs.shown;
   const r = Object.assign({ tag, host: hs, guests: cs.map(c => c && { seat: c.seat, over: c.over }), agree, exactStrip: exact.every(Boolean), exactInfo: dbg.exactInfo, finalCardEverywhere: finals, stats, nErrors: errors.length + (stats.inv ? 1 : 0), errors: errors.slice(0, 4) }, extra || {});
@@ -117,9 +123,9 @@ async function layout(x, tag) {
       console.log('UI', JSON.stringify(out)); res.push({ tag: 'ui', agree: !!ok, errors: [...H.errs, ...C[0].errs], nErrors: H.errs.length + C[0].errs.length });
     }
     else if (SC === 'leave') {
-      global.DELAY = 200; const { H, C, code } = await setup({ sc: 'g2' }); const P = [H, ...C]; await H.p.evaluate(() => { AIDELAY = 300; }); await startHost(H); for (const x of P) await seatOf(x); const ev = {};
+      global.DELAY = 200; const { H, C, code } = await setup({ sc: 'g2' }); const P = [H, ...C]; await H.p.evaluate(() => { AIDELAY = 1500; }); await startHost(H); for (const x of P) await seatOf(x); const ev = {};
       const hook = async (g, n) => {
-        if (!ev.bad && n > 20) {
+        if (!ev.bad && n > 12) {
           ev.bad = true; global.FREEZE = 1; await sleep(700);
           const before = await H.p.evaluate(() => ({ n: G.logN, rej: NET.rejected, remote: NET.remote, ss: JSON.stringify(Object.keys(G.slots)) }));
           await C[0].p.evaluate(() => { const R = NET.room, h = NET.hostPeer; const junk = [null, 5, 'x', [1, 2], { m: null }, { m: 'x' }, { m: [] }, { m: {} }, { m: { t: 5 } }, { m: { t: 'zzz' } }, { m: { t: 'place', d: 9, to: 'ax0' } }, { m: { t: 'place', d: 0, to: '__proto__' } }, { m: { t: 'place', d: 0, to: 'ax0', c: 99 } }, { m: { t: 'rrpick', m: 'x' } }, { m: { t: 'ready', x: 1 } }, { m: { t: 'say', c: '<img>' } }, { m: { t: 'place', d: 0, to: 'ax0', pad: 'z'.repeat(400) } }, { hi: 1 }];
@@ -127,12 +133,12 @@ async function layout(x, tag) {
           await sleep(1500); const mid = await H.p.evaluate(() => ({ n: G.logN, rej: NET.rejected, remote: NET.remote, inv: FA.checkInvariants(G).length, pol: ({}).x !== undefined }));
           ev.badResult = { junkRejected: mid.rej - before.rej, stateUnchanged: mid.n === before.n || mid.remote === before.remote, invariants: mid.inv, protoPolluted: mid.pol }; global.FREEZE = 0;
         }
-        if (ev.bad && !ev.left && n > 60) { ev.left = true; ev.seat = await C[0].p.evaluate(() => NET.mySeat); ev.uid = await C[0].p.evaluate(() => NetRoom.uid()); await C[0].ctx.close(); C[0].dead = true; ev.leftAt = Date.now(); let away = false; for (let k = 0; k < 80 && !away; k++) { await sleep(250); away = await H.p.evaluate(s => !!G.ai[s], ev.seat); } ev.leave = { aiTookOver: away }; }
+        if (ev.bad && !ev.left && n > 30) { ev.left = true; ev.seat = await C[0].p.evaluate(() => NET.mySeat); ev.uid = await C[0].p.evaluate(() => NetRoom.uid()); await C[0].ctx.close(); C[0].dead = true; ev.leftAt = Date.now(); let away = false; for (let k = 0; k < 80 && !away; k++) { await sleep(250); away = await H.p.evaluate(s => !!G.ai[s], ev.seat); } ev.leave = { aiTookOver: away }; }
         if (ev.left && !ev.rejoin && Date.now() - ev.leftAt > 3000) {
           ev.rejoin = true; const cx = await ctxNew(); await cx.addInitScript(u => { try { localStorage.setItem('gns-uid', u); localStorage.setItem('gns-name', 'Friend1'); } catch (e) { } }, ev.uid); const x = await page(cx, 'guest-again', '#join-' + code);
           const pre = await x.p.evaluate(() => ({ code: UI.joinCode, field: document.getElementById('joincode').value })); await x.p.evaluate(() => { AIDELAY = 80; document.querySelector('[data-a=netjoin]').click(); });
           let back = false; for (let k = 0; k < 200 && !back; k++) { await sleep(250); back = await H.p.evaluate(s => !G.ai[s] && !NET.away, ev.seat); }
-          const mine = await x.p.evaluate(() => ({ seat: NET.mySeat, g: !!G, started: UI.started })); ev.rejoinRes = { prefilled: pre, back, mine }; P.push(x); x.seat = mine.seat; ev.remoteBefore = await H.p.evaluate(() => NET.remote);
+          for (let k = 0; k < 40 && !(await x.p.evaluate(() => NET.mySeat >= 0)); k++) await sleep(250); const mine = await x.p.evaluate(() => ({ seat: NET.mySeat, g: !!G, started: UI.started })); ev.rejoinRes = { prefilled: pre, back, mine }; P.push(x); x.seat = mine.seat; ev.remoteBefore = await H.p.evaluate(() => NET.remote);
         }
       };
       const pr = await play(P, H, 420, hook); const remAfter = await H.p.evaluate(() => NET.remote);

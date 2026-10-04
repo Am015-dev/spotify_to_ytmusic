@@ -46,7 +46,7 @@ function run(cf, seed) {
         if (phm) { const c = d.querySelector('[data-a=cfgopen]'); if (!c) errs.push('no Configure button on the phone setup'); else { click(c); if (d.querySelector('#cfg').hidden) errs.push('Configure did not open'); seen.add('configure'); } }
         else if (d.querySelector('#cfg').hidden) errs.push('setup options hidden on desktop');
         const o = (k, v) => { const b = d.querySelector(`[data-a=opt][data-k=${k}][data-v="${v}"]`); if (b) click(b); };
-        if (cf.np) o('np', cf.np); if (cf.np && w.eval('UI.opt.np') !== cf.np) errs.push('crew size not set: ' + w.eval('UI.opt.np'));
+        if (cf.np) o('np', cf.np); if (cf.np && w.eval('UI.opt.np') !== cf.np) errs.push('team size not set: ' + w.eval('UI.opt.np'));
         if (cf.mission) { const b = d.querySelector(`[data-a=pickdive][data-v="${cf.mission}"]`); if (!b) errs.push('no dive cell ' + cf.mission); else { click(b); seen.add('pickdive'); } if (w.eval('UI.opt.mission') !== cf.mission) errs.push('dive not set'); }
         if (cf.level) w.eval(`UI.opt.level='${cf.level}';UI.opt.lv=['${cf.level}','${cf.level}','${cf.level}','${cf.level}']`);
         if (cf.np === 3 && R() < .5) { const inv = d.querySelector('[data-a=seatchef][aria-pressed=false]'); if (inv) { click(inv); seen.add('invite'); if (w.eval('UI.opt.np') !== 4) errs.push('invite did not add a diver'); click(d.querySelector('[data-a=opt][data-k=np][data-v="3"]')); } }

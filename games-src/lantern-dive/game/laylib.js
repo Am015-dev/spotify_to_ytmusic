@@ -1,9 +1,13 @@
 // Shared helpers for lay.js / lay-phone.js: a human step made only of real clicks/taps on the page's own controls.
+// hand cards fan out and overlap: a real finger taps the visible left part of a card, not its (covered) centre
+exports.posFor = async x => (typeof x !== 'string' && await x.evaluate(e => e.matches && e.matches('#hand .hc')).catch(() => false)) ? { position: { x: 8, y: 40 } } : {};
 exports.stepper = (p, tap, log) => {
   const vis = sel => p.$$(sel).then(async els => { const o = []; for (const e of els) { if (await e.isVisible() && await e.isEnabled()) o.push(e); } return o; });
   const first = async sel => (await vis(sel))[0];
-  let nth = 0;
-  return async function step() {
+  let nth = 0, bad = 0;
+  // a 'stuck' answer is only reported when it repeats (the DOM can lag one render behind the engine for a moment)
+  return async function step() { const r = await step0(); if (r && /^stuck|^no-card/.test(r)) { if (++bad < 30) { await p.waitForTimeout(100); return null; } } else bad = 0; return r; };
+  async function step0() {
     const st = await p.evaluate(() => ({ ph: G.phase, must: iMustAct() && canAct(), job: UI.job, sel: UI.sel, pingSel: UI.pingSel, giveSel: UI.giveSel, tip: !!document.querySelector('#tip [data-a=tipok]'), pass: !!document.querySelector('#pass:not([hidden]) [data-a=takedev]'), rs: !document.querySelector('#rs').hidden }));
     if (st.pass) { await tap('#pass [data-a=takedev]'); return 'pass'; }
     if (st.tip) { await tap('#tip [data-a=tipok]'); return 'tip'; }
@@ -31,5 +35,5 @@ exports.stepper = (p, tap, log) => {
       return 'tap';
     }
     return null;
-  };
+  }
 };

@@ -1,0 +1,11 @@
+FAIL 375x553 tap target <44 guided brief ["slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1"]
+375x553 board {"w":375,"h":385,"vw":375,"vh":553,"mode":"P","k":0.438} webgl
+FAIL 375x553 tap target <44 rolled ["slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1"]
+FAIL 375x553 tap target <44 picked ["slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1"]
+FAIL 375x553 tap target <44 mid ["slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1"]
+375x553 placements by touch 6
+FAIL 375x553 tap target <44 menu ["slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1"]
+FAIL 375x553 tap target <44 final ["slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1"]
+FAIL 375x553 tap target <44 pass ["slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1","slot 42.1x42.1"]
+375x553 errors []
+PROBLEMS 7

@@ -43,7 +43,7 @@ const SIZES = arg.split(',').filter(Boolean).map(s => s.split('x').map(Number));
       const gap = await p.evaluate(() => { const L = [...document.querySelectorAll('#hand .hc')].map(e => e.getBoundingClientRect().left).sort((a, b) => a - b); let m = 999; for (let i = 1; i < L.length; i++) m = Math.min(m, L[i] - L[i - 1]); return L.length > 1 ? Math.round(m) : 999; });
       if (gap < 22) prob('hand cards overlap too much: visible strip ' + gap + 'px ' + tag);
     };
-    const tap = async x => { try { if (typeof x === 'string') await p.tap(x, { timeout: 5000 }); else await x.tap({ timeout: 5000 }); } catch (e) { } await p.waitForTimeout(80); };
+    const tap = async x => { try { if (typeof x === 'string') await p.tap(x, { timeout: 5000 }); else await x.tap(Object.assign({ timeout: 5000 }, await LIB.posFor(x))); } catch (e) { } await p.waitForTimeout(80); };
     const step = LIB.stepper(p, tap);
     const dockOf = () => rect('#dock');
     const inVP = sel => p.evaluate(s => { const e = document.querySelector(s); if (!e) return 'missing'; const r = e.getBoundingClientRect(); const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.top >= -1 && r.bottom <= innerHeight + 1 && r.left >= -1 && r.right <= innerWidth + 1 && e.contains(h) ? 'ok' : 'off ' + JSON.stringify([r.left, r.top, r.right, r.bottom].map(Math.round)) + ' hit ' + (h && (h.className || h.id)); }, sel);

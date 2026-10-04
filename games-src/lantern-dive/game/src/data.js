@@ -1,5 +1,5 @@
 // ===================== Lantern Dive: data (suits, 96 job cards, 32 dives, names) =====================
-// All wording is original. Numbers (difficulty per crew size, counts, thresholds) follow the rules research (rules-notes.md).
+// All wording is original. Numbers (difficulty per team size, counts, thresholds) follow the rules research (rules-notes.md).
 // Suits 0..3 are the colour suits (cards 1-9); suit 4 is the trump suit, the Lanterns (cards 1-4).
 // Job card kinds (see engine.js `jobStatus`): cmp trick pred with cards valn coln colx avoidc avoidv avoidsub allcol onecol
 //   subx nolead skip none ntr pos run pred eqcol morecol.  d = [3 divers, 4 divers, 5 divers] difficulty, cap:0 = the Commander may not take it.
@@ -129,11 +129,11 @@ TASKS.forEach((t, i) => { t.id = i; t.s = SHORT[i]; });
 const M = (id, name, d, o) => Object.assign({ id, name, d, cmt: 'normal', sel: 'draft' }, o);
 const MISSIONS = [
   M(1, 'Shallow Water', 1, { brief: 'Training day in the bay. One small job, then the logbook is yours.' }),
-  M(2, 'The First Tide', 2, { brief: 'Two stone tablets came up in a fishing net. The crew dives to find where they came from.' }),
+  M(2, 'The First Tide', 2, { brief: 'Two stone tablets came up in a fishing net. The team dives to find where they came from.' }),
   M(3, 'Air, Power, Light', 4, { brief: 'A base waits on the sea floor. Learn its three life systems before you move in.' }),
   M(4, 'The Long Descent', 4, { guess: 1, brief: 'You pilot the little submersible down yourselves. Everybody else watches the dark rise past the windows.' }),
   M(5, 'Five Chambers', 5, { brief: 'Walk the five chambers of the base and report that every system hums.' }),
-  M(6, 'One Diver Swims Alone', 5, { sel: 'vote', rule: 'The whole crew agrees, without a word about cards, which one diver takes every job.', brief: 'A porthole was opened too early. Somebody has to fix it, and fast.' }),
+  M(6, 'One Diver Swims Alone', 5, { sel: 'vote', rule: 'The whole team agrees, without a word about cards, which one diver takes every job.', brief: 'A porthole was opened too early. Somebody has to fix it, and fast.' }),
   M(7, 'Mapping the Slope', 6, { brief: 'First proper outing: test the suits and chart the ground around the base.' }),
   M(8, 'Share the Pearls', 6, { guess: 1, gap: { v: 9, gap: 2 }, rule: 'No diver may ever have won two more 9s than any other diver.', brief: 'The pearl rations are disappearing. Time for a talk about sharing.' }),
   M(9, 'The Old Wreck', 7, { cmt: 'murky', rule: 'Murky water: to signal, show a card as usual, but the ping token does not go on it. Put it beside the card, spent side up.', brief: 'A centuries-old ship lies close by. Strong currents blur every message.' }),
@@ -144,7 +144,7 @@ const MISSIONS = [
   M(14, 'Emergency Drill', 4, { guess: 1, sel: 'one', timer: { sec: 210, alt: 'murky' }, rule: 'One volunteer takes all the jobs. Beat the clock (3:30), or play without a clock and use murky water.', brief: 'An alarm drill, at the worst possible moment.' }),
   M(15, 'Jellyfish Bloom', 5, { guess: 1, sel: 'one', timer: { sec: 180, alt: 'narc' }, rule: 'One volunteer takes all the jobs. Beat the clock (3:00), or play without a clock and use deep narcosis.', brief: 'A swarm drifts into the base. One diver is stranded outside and a suit is torn.' }),
   M(16, 'The Leak', 6, { sel: 'one', timer: { sec: 150, alt: 'none' }, rule: 'One volunteer takes all the jobs. Beat the clock (2:30), or play without a clock and without any signalling.', brief: 'The injured diver needs care and the infirmary is flooding. Both at once.' }),
-  M(17, 'The Singing Statues', 9, { sel: 'free', rule: 'Open briefing: talk freely about who takes which job, but never about your cards. One diver may take all jobs.', brief: 'The sculptures seem to be older than anything on record, and the crew works as one.' }),
+  M(17, 'The Singing Statues', 9, { sel: 'free', rule: 'Open briefing: talk freely about who takes which job, but never about your cards. One diver may take all jobs.', brief: 'The sculptures seem to be older than anything on record, and the team works as one.' }),
   M(18, 'The Hollow', 9, { brief: 'The way to the next chamber is close. Something about it feels wrong.' }),
   M(19, 'The Narrow Cave', 9, { sel: 'hard', rule: 'The Commander takes the most difficult job first.', brief: 'A drone found a maze of tunnels, some only one diver wide.' }),
   M(20, 'The Labyrinth', 10, { cmt: 'unknown', gap: { v: 1, gap: 2 }, rule: 'Unknown waters: before dealing, draw a colour card at random. 1-3: normal signalling, 4-6: murky water, 7-9: deep narcosis. No diver may ever have won two more 1s than any other diver.', brief: 'The tunnels fork again and again, and the radio keeps dropping out.' }),
@@ -165,7 +165,7 @@ const DEEP = { start: 18, sel: 'free', note: 'After dive 32: start at difficulty
 const NAMES = ['Nerea', 'Bram', 'Sumi', 'Dag', 'Lio'];
 const BLURBS = [
   { story: 'Nerea trained as a harbour pilot and counts everything twice: air, minutes, and the cards on the table.', enjoy: 'Choose Nerea if you like a careful teammate who plans the whole dive.', lv: 'hard' },
-  { story: 'Bram fixes pumps for a living and trusts his hands more than maps. He plays his cards and hopes for the best.', enjoy: 'Choose Bram if you like a steady crewmate who rarely panics.', lv: 'normal' },
+  { story: 'Bram fixes pumps for a living and trusts his hands more than maps. He plays his cards and hopes for the best.', enjoy: 'Choose Bram if you like a steady teammate who rarely panics.', lv: 'normal' },
   { story: 'Sumi studies deep-sea fish and signals the moment she sees something useful. She loves a good ping.', enjoy: 'Choose Sumi if you like a teammate who talks with her tokens.', lv: 'normal' },
   { story: 'Dag is new to diving and gets every job he can carry. He is learning, and he is cheerful about it.', enjoy: 'Choose Dag if you want a relaxed first dive with room for mistakes.', lv: 'easy' }
 ];

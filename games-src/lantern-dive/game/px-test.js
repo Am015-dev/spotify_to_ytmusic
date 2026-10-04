@@ -29,16 +29,16 @@ const RUNS = ONLY >= 0 ? [RUNS0[ONLY]] : RUNS0;
     await p.evaluate(([np, mission, mode]) => { try { localStorage.clear(); } catch (e) { } UI.seed = 11; AIDELAY = 60; ANIM = 1; const o = optObj(); o.kind = 'log'; o.mission = mission; setNp(np); showStart(); UI.sv = 'setup'; renderStart(); document.querySelector(mode === 'hot' ? '[data-start=hot]' : '[data-start=vs]').click(); }, [R.np, R.mission, R.mode]);
     await p.waitForTimeout(900);
     await p.evaluate(() => { if (UI.coach) UI.coach.level = 'off'; UI.tip = null; if (window.renderTip) renderTip(); });
-    const tap = async x => { try { if (typeof x === 'string') await (R.ph ? p.tap(x, { timeout: 5000 }) : p.click(x, { timeout: 5000 })); else await (R.ph ? x.tap({ timeout: 5000 }) : x.click({ timeout: 5000 })); } catch (e) { } await p.waitForTimeout(50); };
+    const tap = async x => { try { if (typeof x === 'string') await (R.ph ? p.tap(x, { timeout: 5000 }) : p.click(x, { timeout: 5000 })); else { const o = Object.assign({ timeout: 5000 }, await LIB.posFor(x)); await (R.ph ? x.tap(o) : x.click(o)); } } catch (e) { } await p.waitForTimeout(50); };
     const step = LIB.stepper(p, tap);
     const settle = async tag => {
       const t0 = Date.now();
       for (;;) {
-        const s = await p.evaluate(() => ({ must: iMustAct() && canAct(), busy: UI.busy, moving: PX.on ? PX.state().moving : false, over: G.phase === 'over', ph: G.phase, pass: !!document.querySelector('#pass:not([hidden]) [data-a=takedev]') }));
+        const s = await p.evaluate(() => ({ must: iMustAct() && canAct(), busy: UI.busy, moving: PX.on ? (PX.state().moving || PX.state().objs.some(o => !o.face)) : false, over: G.phase === 'over', ph: G.phase, pass: !!document.querySelector('#pass:not([hidden]) [data-a=takedev]') }));
         if (s.over) return 'over';
         if (s.pass) { await step(); continue; }
         if (s.must && !s.busy && !s.moving) return s.ph;
-        if (Date.now() - t0 > 20000) { fail('did not settle ' + tag, JSON.stringify(s)); return 'timeout'; }
+        if (Date.now() - t0 > (+process.env.SETTLE_MS || 20000)) { fail('did not settle ' + tag, JSON.stringify(s)); return 'timeout'; }
         await p.waitForTimeout(60);
       }
     };

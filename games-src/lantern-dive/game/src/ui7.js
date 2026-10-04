@@ -136,6 +136,7 @@ function pxDrawFelt(R) {
 function pxSeatRect(s, B) { const e = document.querySelector('[data-key="seat' + s + '"]'); return e ? pxRect(e, B) : null; }
 function pxSync() {
   if (!PX.on || !G || !UI.started) { if (PX.on) pxClear(); return; }
+  try { if (window.PerfHUD && PerfHUD.wake) PerfHUD.wake(); } catch (e) { }   // a table change must never wait for the idle-frame saver
   const bd = $('#bd'); const B = bd.getBoundingClientRect(); PX.B = B;
   const seen = new Set(), now = performance.now();
   const ent = UI.enter || ''; UI.enter = ''; const exit = UI.pxExit; UI.pxExit = null;

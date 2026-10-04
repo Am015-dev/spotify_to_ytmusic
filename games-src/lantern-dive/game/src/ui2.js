@@ -189,7 +189,7 @@ function renderHand(v) {
   hand.forEach((c, i) => {
     const su = suitOf(c); const dim = legal && !legal.has(c);
     const cls = 'hc' + (UI.sel === c ? '.sel' : '') + (dim ? '.dim' : '') + (su !== prev && prev >= 0 ? '.gap' : '') + (pinged.has(c) ? '.pinged' : '') + (UI.pingSel && legal && legal.has(c) ? '.pk' : '') + (UI.giveSel === c ? '.sel' : '');
-    const b = h('button.' + cls.split('.').filter(Boolean).join('.'), { type: 'button', 'data-a': 'hcard', 'data-id': c, 'data-px': 'card', 'data-pk': 'h:' + c, 'aria-label': cname(c) + (dim ? ', not allowed now' : '') + (pinged.has(c) ? ', shown to the crew' : ''), 'aria-pressed': UI.sel === c ? 'true' : 'false' });
+    const b = h('button.' + cls.split('.').filter(Boolean).join('.'), { type: 'button', 'data-a': 'hcard', 'data-id': c, 'data-px': 'card', 'data-pk': 'h:' + c, 'aria-label': cname(c) + (dim ? ', not allowed now' : '') + (pinged.has(c) ? ', shown to the team' : ''), 'aria-pressed': UI.sel === c ? 'true' : 'false' });
     b.append(cardN(c, 84));
     if (pinged.has(c)) b.append(h('span.rm', { html: KIT.pingSVG({ size: 26, k: pk.get(c) }), title: 'You showed this card' }));
     box.append(b); prev = su;
@@ -220,7 +220,7 @@ function dockModel(v) {
       if (!must || !mv.length) { M.p = who ? who + (A.mode === 'cmd' && A.stage === 'ask' ? ' is deciding whether to take every job…' : ' is choosing…') : 'Handing out the jobs…'; M.sub = left + ' job' + (left === 1 ? '' : 's') + ' left'; return M; }
       M.cls = 'mine';
       if (A.mode === 'cmd') {
-        if (A.stage === 'keep') { M.p = 'Commander\'s call: keep every job, or offer them?'; M.sub = 'If you offer them, a willing diver takes all of them and all signalling happens before the first trick.'; if (mv.some(m => m.t === 'keep')) btn('Keep every job', 'keep', { cls: 'go' }); btn('Offer them to the crew', 'offer'); }
+        if (A.stage === 'keep') { M.p = 'Commander\'s call: keep every job, or offer them?'; M.sub = 'If you offer them, a willing diver takes all of them and all signalling happens before the first trick.'; if (mv.some(m => m.t === 'keep')) btn('Keep every job', 'keep', { cls: 'go' }); btn('Offer them to the team', 'offer'); }
         else { M.p = 'Will you take every job?'; btn('Yes, I take them', 'accept', { cls: 'go' }); btn('No', 'decline', { cls: 'alt' }); }
         return M;
       }

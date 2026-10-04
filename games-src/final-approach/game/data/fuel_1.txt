@@ -1,0 +1,7 @@
+normal g4 green Lake Orrin                    11/24  46% avg rounds 7.0 {"speed":3,"fuel":8,"short":1,"mandatory":1} 4873ms/game
+normal g6 green Castlemoor                     7/24  29% avg rounds 6.9 {"fuel":10,"checks:gear":1,"speed":2,"checks:planes+flaps+axis":1,"mandatory":1,"checks:axis":1,"checks:flaps+axis":1} 4188ms/game
+normal y2 yellow Bowlrock                      1/24   4% avg rounds 6.1 {"checks:flaps":1,"mandatory":2,"speed":1,"fuel":12,"corridor":5,"short":1,"collision":1} 2510ms/game
+normal y6 yellow Twin Spires                   1/24   4% avg rounds 6.8 {"fuel":16,"speed":2,"checks:flaps":1,"mandatory":1,"short":3} 2104ms/game
+BAND normal green 18/48 37.5%
+BAND normal yellow 2/48 4.2%
+errors 0 stalls 0 time 328.3s

@@ -2,6 +2,8 @@
 // Default sizes: 390x844 390x763 390x664 375x553 412x780 844x390 750x342 (isMobile + hasTouch; ?phone=1 is NOT forced: phone mode must switch on by itself).
 // Checks: no page scroll, phone class, tap targets >= 44 px, visible text >= 13 px, no text clipped, slots / dice / windows inside the board and not overlapping,
 // the dock holds the prompt, touch-only play (tap a die, tap a glowing space), drawers, guided tip card, hot-seat pass card, final card fits.
+require('../../phfit.js').guard(2);   // one child process per size, results added up
+const FIT = require('../../phfit.js');
 const PW = (() => { try { return require('playwright'); } catch (e) { return require(process.env.PW || (require('child_process').execSync('npm root -g').toString().trim() + '/playwright')); } })();
 const fs = require('fs'), path = require('path'); const HERE = __dirname, OUT = path.join(HERE, 'shots', 'ph'); fs.mkdirSync(OUT, { recursive: true });
 const html = fs.readFileSync(path.join(HERE, 'final-approach.html'));
@@ -40,6 +42,7 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
         return out.slice(0, 5); });
       if (r.length) fail('clipped text ' + tag, JSON.stringify(r));
     };
+    const fit = async n => { (await FIT.run(p)).concat(await FIT.extra(p)).forEach(m => fail('FIT ' + n, m)); };
     const panel = async tag => {
       const r = await p.evaluate(() => { const B = document.querySelector('#bd').getBoundingClientRect(); const bad = []; const items = [...document.querySelectorAll('#pz .slot,#pz .die:not(.used),#pz .w,#pz .dial,#pz .gau,#pz .tray')].map(e => { const r = e.getBoundingClientRect(); return { n: (e.dataset.slot || (e.dataset.d && 'die' + e.dataset.s + e.dataset.d) || e.className.toString().split(' ')[0]), slot: e.classList.contains('slot'), die: e.classList.contains('die'), r: [r.left, r.top, r.right, r.bottom] }; });
         for (const i of items) { if (i.r[2] <= i.r[0]) continue; if (i.r[0] < B.left - 1 || i.r[2] > B.right + 1 || i.r[1] < B.top - 1 || i.r[3] > B.bottom + 1) bad.push('outside board ' + i.n); }
@@ -60,11 +63,11 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
     await p.evaluate(() => { try { localStorage.clear(); } catch (e) { } UI.seed = 5; AIDELAY = 60; });
     await p.tap('[data-start=guided]'); await p.waitForTimeout(1500); await scroll('guided'); await shot('1guided');
     { const tip = await p.evaluate(() => !document.querySelector('#pc').hidden); if (!tip) fail('guided flight shows no tip card'); else { const pr = await rect('#pc'), br = await rect('#bd'); if (ov(pr, br)) fail('tip card over the board', JSON.stringify([pr, br])); } }
-    await panel('guided brief'); await targets('guided brief'); await clipped('guided brief');
+    await panel('guided brief'); await targets('guided brief'); await clipped('guided brief'); await fit('guided brief');
     const m = await p.evaluate(() => { const b = document.querySelector('#bd').getBoundingClientRect(); return { w: b.width, h: b.height, vw: innerWidth, vh: innerHeight, mode: UI.LY && UI.LY.mode, k: UI.LY && +UI.LY.k.toFixed(3) }; }); log('board', JSON.stringify(m), await gx());
-    if (m.h < .55 * m.vh && m.vw < m.vh) fail('board too small in portrait', JSON.stringify(m)); if (m.w < .5 * m.vw && m.vw > m.vh) fail('board too narrow in landscape', JSON.stringify(m));
+    { const short = Math.min(m.vw, m.vh), port = m.vw < m.vh, side = port ? m.w : m.h, sh = FIT.share(m.vw, m.vh); if (side < sh * short) fail('board share', side + ' < ' + sh * short); if (port && m.h < .75 * m.w) fail('board height < 0.75 width', JSON.stringify(m)); if (!port && m.w < .85 * m.vh) fail('board width in landscape', JSON.stringify(m)); }
     { const o = await p.$('#pc:not([hidden]) [data-a=tipoff]'); if (o) { await o.tap(); await p.waitForTimeout(300); } else fail('no No-more-tips button reachable in the tip card'); }
-    await p.evaluate(() => { const b = document.querySelector('#acts [data-a=ready]'); if (b) b.click(); }); await p.waitForTimeout(2600); await scroll('rolled'); await shot('2rolled'); await panel('rolled'); await targets('rolled'); await clipped('rolled');
+    await p.evaluate(() => { const b = document.querySelector('#acts [data-a=ready]'); if (b) b.click(); }); await p.waitForTimeout(2600); await scroll('rolled'); await shot('2rolled'); await panel('rolled'); await targets('rolled'); await clipped('rolled'); await fit('rolled');
     let placed = 0;
     for (let k = 0; k < TURNS * 6 && placed < TURNS; k++) {
       const st = await p.evaluate(() => ({ over: !!G.result, pend: FA.pending(G).filter(s => !G.ai[s]) })); if (st.over) break;
@@ -74,21 +77,22 @@ const TURNS = +((process.argv.find(a => a.startsWith('--turns=')) || '').slice(8
       const sl = await p.$('#pz .slot.legal'); if (!sl) { fail('no glowing space after tapping a die'); break; }
       if (placed === 1) { await shot('3picked'); await panel('picked'); await targets('picked'); }
       await sl.tap(); await p.waitForTimeout(700); placed++;
-      if (placed === 3) { await scroll('midgame'); await shot('4mid'); await panel('mid'); await targets('mid'); await clipped('mid'); }
+      if (placed === 3) { await scroll('midgame'); await shot('4mid'); await panel('mid'); await targets('mid'); await clipped('mid'); await fit('mid'); }
     }
     log('placements by touch', placed); if (placed < Math.min(TURNS, 3)) fail('too few placements by touch', placed);
     { const over = await p.evaluate(() => !!G.result); if (over) { await shot('5over'); for (let k = 0; k < 20 && !(await p.$('#rs:not([hidden]) [data-a=rsclose]')); k++) await p.waitForTimeout(400); } const cl = await p.$('#rs:not([hidden]) [data-a=rsclose]'); if (cl) { await cl.tap(); await p.waitForTimeout(400); } }
-    for (const id of ['logd', 'rulesd', 'setd', 'crewd']) { await p.tap(`.gx-bar [data-gx=${id}]`); await p.waitForTimeout(450); await scroll('drawer ' + id); if (!(await p.evaluate(i => document.getElementById(i).classList.contains('on'), id))) fail('drawer did not open', id); if (id === 'setd') { await shot('5menu'); await targets('menu'); } await p.tap('.gx-drawer.on .gx-x'); await p.waitForTimeout(250); }
+    for (const id of ['logd', 'rulesd', 'setd', 'crewd']) { await p.tap(`.gx-bar [data-gx=${id}]`); await p.waitForTimeout(450); await scroll('drawer ' + id); if (!(await p.evaluate(i => document.getElementById(i).classList.contains('on'), id))) fail('drawer did not open', id); if (id === 'setd') { await shot('5menu'); await targets('menu'); await fit('menu'); } await p.tap('.gx-drawer.on .gx-x'); await p.waitForTimeout(250); }
     // ---- finish with computers on both seats, then look at the end screen
+    if (await p.evaluate(() => !!G.result)) { await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.tap('[data-a=play]'); await p.waitForTimeout(250); await p.tap('[data-start=vs]'); await p.waitForTimeout(800); }
     await p.evaluate(() => { const k = document.querySelector('#pc [data-a=tipoff]'); if (k) k.click(); G.ai = [true, true]; AIDELAY = 0; schedule(); });
     for (let k = 0; k < 200; k++) { const o = await p.evaluate(() => !!(G && G.result && UI.overShown && !document.querySelector('#rs').hidden)); if (o) break; await p.waitForTimeout(400); }
-    await p.waitForTimeout(500); await shot('6final'); await scroll('final'); await targets('final'); await clipped('final');
+    await p.waitForTimeout(500); await shot('6final'); await scroll('final'); await targets('final'); await clipped('final'); await fit('final');
     { const rr = await rect('.rsbox'); if (!rr) fail('no final card'); else if (rr[0] < -1 || rr[2] > W + 1 || rr[3] > H + 1) fail('final card does not fit', JSON.stringify(rr)); }
     await p.tap('#rs [data-a=rsclose]'); await p.waitForTimeout(250);
     // ---- hot-seat pass card
     await p.evaluate(() => { showStart(); }); await p.waitForTimeout(250); await p.tap('[data-a=play]'); await p.waitForTimeout(150);
     await p.tap('[data-start=hot]'); await p.waitForTimeout(900);
-    { const pass = await p.evaluate(() => ({ card: !document.querySelector('#pass').hidden, dice: [...document.querySelectorAll('#pz .die .dv')].filter(e => /^[1-6]$/.test(e.textContent)).length })); if (!pass.card) fail('no pass-the-device card in hot-seat'); if (pass.dice) fail('dice values visible before the pass card is taken'); await shot('7pass'); await targets('pass'); await clipped('pass'); }
+    { const pass = await p.evaluate(() => ({ card: !document.querySelector('#pass').hidden, dice: [...document.querySelectorAll('#pz .die .dv')].filter(e => /^[1-6]$/.test(e.textContent)).length })); if (!pass.card) fail('no pass-the-device card in hot-seat'); if (pass.dice) fail('dice values visible before the pass card is taken'); await shot('7pass'); await targets('pass'); await clipped('pass'); await fit('pass'); }
     log('errors', JSON.stringify(errs.slice(0, 3))); bad += errs.length; if (errs.length) console.log('FAIL', t, 'console errors', errs.length);
     await ctx.close();
   }

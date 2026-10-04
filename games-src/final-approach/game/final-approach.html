@@ -285,7 +285,7 @@ html.fapx .dv.cof::after{display:none}
 #endv{position:absolute;inset:0;z-index:5;pointer-events:none}
 @media (max-width:999px){html:not(.ph) .gx-dock{max-height:43dvh}}
 /* ================= PHONE (html.ph) ================= */
-html.ph{--gx-bar-h:44px;--gx-dock-w:0px;--dockh:196px;--rail:clamp(220px,28vw,280px);font-size:14px}
+html.ph{--gx-bar-h:44px;--gx-dock-w:0px;--dockh:196px;--rail:clamp(180px,24vw,280px);font-size:14px}
 html.ph .gx-bar{min-height:44px;height:44px;padding:0 6px;padding-top:env(safe-area-inset-top,0px);box-sizing:content-box;gap:4px}
 html.ph .gx-bar h1,html.ph .gx-ibtn span{display:none}
 html.ph .gx-ibtn{min-width:44px;min-height:44px;padding:0;border-radius:10px}
@@ -326,6 +326,7 @@ html.ph .cfghead b{font-size:17px}
 html.ph .cfgfoot{position:sticky;bottom:0;background:var(--paper);padding:6px 0 max(8px,env(safe-area-inset-bottom,0px));display:flex}html.ph .cfgfoot .btn{flex:1}
 html.ph #netst{min-width:44px;min-height:44px;padding:0 8px;justify-content:center;border-radius:10px}html.ph #netst .nl{display:none}html.ph #netst .ns{display:inline;font-weight:800}
 html.ph .rsbox{padding:8px;gap:6px}
+html.ph .gau{line-height:1.1;padding-bottom:3px}html.ph .gau span{white-space:normal}
 html.ph .pcard .cbtns{position:sticky;bottom:-10px;background:var(--paper);padding:6px 0 6px;margin-top:auto;z-index:3}
 @media (prefers-reduced-motion:reduce){.slot.legal{animation:none}}
 </style></head>
@@ -3178,40 +3179,34 @@ function build(mode, LW, LH, mods, me) {
   mods = mods || {};
   const slot = (k, cx, cy) => { r[k] = R(cx, cy, S, S); };
   if (mode === 'L') {
-    const e = (LH - 620) / 280;   // 0 (compact) .. 1 (tall)
-    const wh = 94 + 34 * e;                                  // window height
-    const A = wh + 90, sp = clamp((LH - 170 - A) / 2, 108, 150), B = A + sp, C = B + sp;   // row centres
-    r.appr = { x: 20, y: 10, w: 700, h: wh }; r.alt = { x: 740, y: 10, w: 640, h: wh };
-    // pilot side
-    slot('ra0', 90, A); slot('lg0', 150, B); slot('lg1', 250, B); slot('lg2', 350, B);
-    if (mods.ice) { for (let i = 0; i < 4; i++) { slot('it' + i, 110 + i * 100, C - 40 + 0); slot('ib' + i, 110 + i * 100, C + 62); } }
-    else { slot('br0', 150, C); slot('br1', 250, C); slot('br2', 350, C); }
-    // centre: axis, engines, concentration
-    slot('ax0', 535, A); slot('ax1', 865, A); r.dial = R(700, A, 150, 150);
-    slot('en0', 535, B); slot('en1', 865, B); r.gauge = R(700, B + 6, 240, 120);
-    slot('co0', 600, C); slot('co1', 700, C); slot('co2', 800, C); r.coffee = R(700, C + 62, 300, 30);
-    // co-pilot side
-    slot('ra1', 1190, A); slot('ra2', 1290, A);
-    slot('fl0', 1010, B); slot('fl1', 1110, B); slot('fl2', 1210, B); slot('fl3', 1310, B);
-    // modules
-    r.rerolls = R(1100, C, 150, 60);
-    if (mods.kero) { slot('ke', 400, A); r.fuel = { x: 200, y: A - 12, w: 170, h: 24 }; }
-    else if (mods.leak) r.fuel = { x: 200, y: A - 12, w: 240, h: 24 };
-    if (mods.wind) r.wind = R(mods.kero ? 270 : 330, A, 96, 96);
-    if (mods.intern) { slot('in0', 1010, C); slot('in1', 1310, C); r.tokens = { x: 1050, y: C - 24, w: 220, h: 48 }; }
-    // trays (dice behind the screens)
-    const T = Math.min(LH - 56, C + (mods.ice ? 150 : 128)); r.ch = T + 58;
-    r.trayP = { x: 30, y: T - 52, w: 440, h: 104 }; r.trayC = { x: 930, y: T - 52, w: 440, h: 104 };
-    r.hud = R(700, T, 380, 90);
+    // landscape: both windows across the top (full width), then three rows of controls, then the dice trays. 1120 logical wide:
+    // at the smallest landscape phone (750 wide, a 180 px rail) one logical unit is 0.51 px, so a slot (88) is 44.8 px.
+    const ice = !!mods.ice, wh = 100;
+    r.appr = { x: 10, y: 8, w: LW - 20, h: wh }; r.alt = { x: 10, y: wh + 14, w: LW - 20, h: 62 };
+    const A = wh + 14 + 62 + 14 + 48, sp = 102, B = A + sp, C = B + sp;
+    slot('ra0', 52, A); slot('lg0', 148, A); slot('lg1', 244, A); slot('lg2', 340, A);
+    slot('ax0', 434, A); slot('ax1', 686, A); r.dial = R(560, A, 104, 104);
+    slot('fl0', 776, A); slot('fl1', 872, A); slot('fl2', 968, A); slot('fl3', 1064, A);
+    if (ice) { for (let i = 0; i < 4; i++) { slot('it' + i, 52 + i * 96, B); slot('ib' + i, 52 + i * 96, C); } }
+    else { slot('br0', 52, B); slot('br1', 148, B); slot('br2', 244, B); if (mods.kero) slot('ke', 340, B); }
+    slot('en0', 434, B); slot('en1', 686, B); r.gauge = R(560, B + 4, 162, 92);
+    slot('ra1', 776, B); slot('ra2', 872, B); r.rerolls = R(1010, B, 130, 60);
+    slot('co0', 464, C); slot('co1', 560, C); slot('co2', 656, C); r.coffee = R(560, C + 62, 290, 24);
+    if (mods.intern) { slot('in0', 776, C); slot('in1', 1064, C); r.tokens = { x: 822, y: C - 22, w: 196, h: 44 }; }
+    if (!ice) { if (mods.wind) r.wind = R(70, C, 84, 84); if (mods.kero || mods.leak) r.fuel = { x: mods.wind ? 124 : 30, y: C - 12, w: mods.wind ? 280 : 370, h: 26 }; }
+    else { if (mods.wind) r.wind = R(790, C, 84, 84); if (mods.kero || mods.leak) r.fuel = { x: mods.wind ? 846 : 780, y: C - 12, w: mods.wind ? 250 : 316, h: 26 }; }
+    const T = C + 130; r.ch = T + 58;
+    r.trayP = { x: 12, y: T - 52, w: 460, h: 104 }; r.trayC = { x: 648, y: T - 52, w: 460, h: 104 };
+    r.hud = R(560, T, 170, 100);
     r.lw = LW; r.lh = r.ch;
   } else {
-    const ice = !!mods.ice, wh = 100;
-    r.appr = { x: 14, y: 8, w: LW - 28, h: wh }; r.alt = { x: 14, y: wh + 14, w: LW - 28, h: 62 };
-    const A = wh + 14 + 62 + 14 + 48, B = A + 106;
+    const ice = !!mods.ice, wh = 116;
+    r.appr = { x: 14, y: 8, w: LW - 28, h: wh }; r.alt = { x: 14, y: wh + 10, w: LW - 28, h: 58 };
+    const A = wh + 10 + 58 + 10 + 48, B = A + 104;
     slot('ax0', 230, A); slot('ax1', 570, A); r.dial = R(400, A, 120, 120);
     slot('en0', 230, B); slot('en1', 570, B); r.gauge = R(400, B + 8, 230, 108);
     // pilot column (left) / co-pilot column (right): eight slots across the 800 wide panel
-    const P1 = B + 106, P2 = P1 + 100;
+    const P1 = B + 104, P2 = P1 + 100;
     slot('ra0', 50, P1); slot('lg0', 150, P1); slot('lg1', 250, P1); slot('lg2', 350, P1);
     if (ice) { for (let i = 0; i < 4; i++) { slot('it' + i, 50 + i * 100, P2); slot('ib' + i, 50 + i * 100, P2 + 100); } }
     else { slot('br0', 50, P2); slot('br1', 150, P2); slot('br2', 250, P2); }
@@ -3223,7 +3218,7 @@ function build(mode, LW, LH, mods, me) {
     slot('co0', 300, C2); slot('co1', 400, C2); slot('co2', 500, C2); r.coffee = R(400, C2 + 62, 300, 24); r.rerolls = R(680, C2 + 6, 150, 60);
     if (mods.wind) r.wind = R(110, C2, 90, 90);
     if (mods.kero || mods.leak) r.fuel = { x: 14, y: C2 + 52, w: 230, h: 26 };
-    const T = C2 + 148; r.ch = T + 64;
+    const T = C2 + 140; r.ch = T + 64;
     const wm = 490, wo = 292, th = 124; if (me === 0) { r.trayP = { x: 8, y: T - 62, w: wm, h: th }; r.trayC = { x: 8 + wm + 6, y: T - 62, w: wo, h: th }; } else if (me === 1) { r.trayP = { x: 8, y: T - 62, w: wo, h: th }; r.trayC = { x: 8 + wo + 6, y: T - 62, w: wm, h: th }; } else { r.trayP = { x: 8, y: T - 62, w: 388, h: th }; r.trayC = { x: 404, y: T - 62, w: 388, h: th }; }
     r.lw = LW; r.lh = r.ch;
   }
@@ -3233,19 +3228,19 @@ function layout(W, H, opt) {
   opt = opt || {}; W = Math.max(60, W); H = Math.max(60, H);
   const mode = opt.mode || (W / H >= 1.08 ? 'L' : 'P');
   let LW, minH, maxH;
-  if (mode === 'L') { LW = 1400; minH = 610; maxH = 820; } else { LW = 800; minH = 300; maxH = 3000; }
+  if (mode === 'L') { LW = 1120; minH = 300; maxH = 3000; } else { LW = 800; minH = 300; maxH = 3000; }
   // widest scale that fits: width-limited first, then height-limited
   let k = W / LW, LH = H / k;
   if (LH < minH) { k = H / minH; LH = minH; }
   if (LH > maxH) LH = maxH;
   const lw = LW;
-  let rl = build(mode, lw, LH, opt.mods, opt.me); const r = {};
-  if (rl.ch > LH + .5) { LH = rl.ch; k = Math.min(k, H / LH); rl = build(mode, lw, LH, opt.mods, opt.me); }
+  let rl = build(mode, lw, LH, opt.mods || {}, opt.me); const r = {};
+  if (rl.ch > LH + .5) { LH = rl.ch; k = Math.min(k, H / LH); rl = build(mode, lw, LH, opt.mods || {}, opt.me); }
   if (rl.ch) LH = Math.min(LH, rl.ch); const oy = (H - LH * k) / 2, ox = (W - lw * k) / 2;
   for (const n of Object.keys(rl)) { const q = rl[n]; if (q && typeof q === 'object') r[n] = { x: ox + q.x * k, y: oy + q.y * k, w: q.w * k, h: q.h * k }; }
   return { mode, k, ox, oy, lw, lh: LH, r, die: 72 * k, logical: rl, W, H };
 }
-FA.layout = layout; FA.layoutLogical = (mode, LH, mods, me) => build(mode, mode === 'L' ? 1400 : 800, LH, mods, me);
+FA.layout = layout; FA.layoutLogical = (mode, LH, mods, me) => build(mode, mode === 'L' ? 1120 : 800, LH, mods || {}, me);
 if (typeof module === 'object' && module.exports) module.exports = FA;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
 
@@ -3687,8 +3682,9 @@ if (typeof module === 'object' && module.exports) module.exports = FA;
 // Method: apply each candidate to a light copy of the real engine, then judge the resulting state with a feature model
 //   (schedule: can the remaining rounds still deliver the exact distance to the airport at the engine thresholds the markers will have; planes to
 //   clear; gear / flaps / brakes still to deploy; dice budget of each seat; axis balance; fuel; trainee; coffee and reroll tokens; and the expected
-//   cost of the mandatory axis and engine pairs that are still half done). Every feature is "nats of failure"; the weights FA.AIW were fitted by
-//   logistic regression on the outcomes of self-play games (train.js), so the scales are calibrated, not guessed.
+//   cost of the mandatory axis and engine pairs that are still half done). Every feature is "nats of failure" (minus log of the probability that the
+//   task still succeeds), so the scales are principled. The weights are the hand-set prior W0 (FA.AIW is empty): a logistic fit on self-play outcomes (fit.py)
+//   and an SPSA search (tune.js) were both tried and neither beat the prior on a fresh 40-game-per-scenario check, so they are not shipped.
 // 'hard' additionally samples the partner's unknown dice and plays the rest of the round out for the best few candidates.
 (function (g) {
 'use strict';
@@ -3821,7 +3817,24 @@ function features(S, me) {
   if (fl > 0) f.flaps = nats(binAtLeast(Math.round(W.flapM * Rf), Math.min(0.9, W.flapQ + cb), fl));
   if (gl > 0) f.gear = nats(gearProb(gl, Math.round(W.gearM * Rf), cb));
   let brLeft = 0;
-  if (S.mods.ice) { brLeft = 4 - S.pl.ice; if (brLeft > 0) f.brake = nats(binAtLeast(Math.round(Rf * 2), W.iceP + cb, brLeft)); }
+  if (S.mods.ice) {
+    brLeft = 4 - S.pl.ice;
+    if (brLeft > 0) {
+      const P = (n, R) => n <= 0 ? 1 : binAtLeast(Math.round(R * 2), W.iceP + cb, n);
+      const k = S.pl.ice, tIn = !!S.slots['it' + k], bIn = !!S.slots['ib' + k], half = inPlace && (tIn !== bIn);
+      if (half) {
+        // one half of the current column is down: the other half must come from a die of exactly that value, this round
+        const v = D.iceBrakes[k], reach = Math.min(S.coffee, 3), q = Math.min(0.9, 1 / 6 + 0.11 * reach);
+        const mineHas = s => FA.unusedDice(S, s).some(i => Math.abs(S.dice[s][i].v - v) <= reach);
+        const kOf = s => unplaced(S, s) - ((S.slots['ax' + s] ? 0 : 1) + (S.slots['en' + s] ? 0 : 1));
+        const tryS = s => s === me ? (mineHas(s) ? 0.97 : 0) : 1 - Math.pow(1 - q, Math.max(0, kOf(s)));
+        const needPilot = !tIn;      // the top space is the pilot's
+        const pc = needPilot ? tryS(0) : 1 - (1 - tryS(0)) * (1 - tryS(1));
+        const after = Math.max(0, rem - 1);
+        f.brake = nats(pc * P(brLeft - 1, after) + (1 - pc) * P(brLeft, after));
+      } else f.brake = nats(P(brLeft, Rf));
+    }
+  }
   else { const nb = S.pl.sw.br[0] + S.pl.sw.br[1] + S.pl.sw.br[2]; brLeft = Math.max(0, 2 - nb); if (brLeft > 0) f.brake = nats(binAtLeast(Math.round(W.brakeM * Rf), 1 / 6 + (S.coffee > 0 ? W.brakeCoffee : 0) + cb * 0.5, brLeft)); }
   let internLeft = 0; if (S.mods.intern) { internLeft = S.intern.length; if (internLeft > 0) f.intern = nats(binAtLeast(Math.round(2 * Rf), W.internP, internLeft)); }
   { const after = Math.max(0, rem - 1), mand = s => (S.slots['ax' + s] ? 0 : 1) + (S.slots['en' + s] ? 0 : 1);
@@ -4724,7 +4737,7 @@ function renderDock() {
     if (typeof v === 'number' && v >= 0 && mayAct(v)) { const mv = FA.validMoves(G, v); for (const m of mv) if (m.t === 'say') sy.appendChild(h('button.say', { type: 'button', 'data-a': 'say', 'data-c': m.c }, SAYT[m.c])); }
     for (const s of [0, 1]) for (const c of G.say[s]) sy.appendChild(h('span.sbub.' + (s ? 'c' : 'p'), name(s).split(' ').pop() + ': “' + SAYT[c] + '”')); } }
   // roster
-  const ro = $('#roster'); if (ro) { ro.innerHTML = ''; for (const s of [0, 1]) { const st = G.result ? 'landed' : G.phase === 'brief' ? (G.ready[s] ? 'ready' : 'briefing') : (FA.pending(G).includes(s) ? 'deciding' : 'waiting'); ro.appendChild(h('div.chip.' + (s ? 'c' : 'p') + (v === s ? '.me' : '') + (st === 'deciding' || st === 'briefing' ? '.wt' : '') + (st === 'ready' ? '.rdy' : ''), h('span.cav', ART['crew-' + s] ? h('img', { src: ART['crew-' + s], alt: '' }) : ''), h('span.ct', h('b', name(s)), h('i', pname(s) + (G.ai[s] ? ' (computer)' : '') + ' · ' + FA.unusedDice(G, s).length + ' dice · ' + st)))); } }
+  const ro = $('#roster'); if (ro) { ro.innerHTML = ''; for (const s of [0, 1]) { const st = G.result ? (G.result.win ? 'landed' : 'flight over') : G.phase === 'brief' ? (G.ready[s] ? 'ready' : 'briefing') : (FA.pending(G).includes(s) ? 'deciding' : 'waiting'); ro.appendChild(h('div.chip.' + (s ? 'c' : 'p') + (v === s ? '.me' : '') + (st === 'deciding' || st === 'briefing' ? '.wt' : '') + (st === 'ready' ? '.rdy' : ''), h('span.cav', ART['crew-' + s] ? h('img', { src: ART['crew-' + s], alt: '' }) : ''), h('span.ct', h('b', name(s)), h('i', pname(s) + (G.ai[s] ? ' (computer)' : '') + ' · ' + FA.unusedDice(G, s).length + ' dice · ' + st)))); } }
   // selected die info
   const si = $('#selinfo'); if (si) { si.innerHTML = ''; si.className = 'idle';
     if (typeof v === 'number' && v >= 0 && mayAct(v) && !G.result && G.phase === 'place') {
@@ -5038,7 +5051,7 @@ function roleCard(s) {
   const o = optObj(), c = D.crew[s], on = o.role === s;
   return h('button.rcardx' + (on ? '.on' : ''), { type: 'button', 'data-a': 'role', 'data-r': s, style: '--dc:' + SEATC[s], 'aria-pressed': on ? 'true' : 'false' }, h('div.top', ART['crew-' + s] ? h('img', { src: ART['crew-' + s], alt: '' }) : null, h('h3', c.role + ': ' + c.name.split(' ').slice(-1)[0] + (on ? ' ✓' : ''))), h('p', c.story), h('p.enjoy', c.enjoy));
 }
-function scLine(sc) { return D.airports[sc.ap].name + ' · ' + sc.mods.map(m => D.mods[m].name).join(', ') + (sc.ab ? (sc.mods.length ? ', ' : '') + sc.ab + ' ability card' + (sc.ab > 1 ? 's' : '') : '') || D.airports[sc.ap].name; }
+function scLine(sc) { const ex = sc.mods.map(m => D.mods[m].name).concat(sc.ab ? [sc.ab + ' ability card' + (sc.ab > 1 ? 's' : '')] : []); return D.airports[sc.ap].name + (ex.length ? ' · ' + ex.join(', ') : ' · no extras'); }
 function setupEl() {
   const o = optObj(), ph = isPh(), open = !!UI.cfgOpen, sc = FA.scen(o.scenario);
   const head = h('div.shead', h('button.px.sback', { 'data-a': 'title', type: 'button', 'aria-label': 'Back to the title' }, '‹'), h('h2', 'Choose your flight'));
@@ -5109,7 +5122,7 @@ function applyPhone() {
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', (ph && w < hh ? Math.max(124, Math.min(320, Math.round(hh - 44 - FA.layoutLogical('P', 0, (G && G.mods) || {}, 0).ch * w / 800))) : Math.max(172, Math.min(212, Math.round(hh * .25)))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', (ph && w < hh ? Math.max(108, Math.min(320, Math.round(hh - 44 - FA.layoutLogical('P', 0, (G && G.mods) || {}, 0).ch * w / 800))) : Math.max(172, Math.min(212, Math.round(hh * .25)))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !(typeof NET !== 'undefined' && NET.on) && UI.sv === 'setup') renderStart(); }
 }
 let rzT = 0;

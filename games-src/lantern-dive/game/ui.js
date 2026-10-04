@@ -290,7 +290,7 @@ function renderHand(v) {
   hand.forEach((c, i) => {
     const su = suitOf(c); const dim = legal && !legal.has(c);
     const cls = 'hc' + (UI.sel === c ? '.sel' : '') + (dim ? '.dim' : '') + (su !== prev && prev >= 0 ? '.gap' : '') + (pinged.has(c) ? '.pinged' : '') + (UI.pingSel && legal && legal.has(c) ? '.pk' : '') + (UI.giveSel === c ? '.sel' : '');
-    const b = h('button.' + cls.split('.').filter(Boolean).join('.'), { type: 'button', 'data-a': 'hcard', 'data-id': c, 'data-px': 'card', 'data-pk': 'h:' + c, 'aria-label': cname(c) + (dim ? ', not allowed now' : '') + (pinged.has(c) ? ', shown to the crew' : ''), 'aria-pressed': UI.sel === c ? 'true' : 'false' });
+    const b = h('button.' + cls.split('.').filter(Boolean).join('.'), { type: 'button', 'data-a': 'hcard', 'data-id': c, 'data-px': 'card', 'data-pk': 'h:' + c, 'aria-label': cname(c) + (dim ? ', not allowed now' : '') + (pinged.has(c) ? ', shown to the team' : ''), 'aria-pressed': UI.sel === c ? 'true' : 'false' });
     b.append(cardN(c, 84));
     if (pinged.has(c)) b.append(h('span.rm', { html: KIT.pingSVG({ size: 26, k: pk.get(c) }), title: 'You showed this card' }));
     box.append(b); prev = su;
@@ -321,7 +321,7 @@ function dockModel(v) {
       if (!must || !mv.length) { M.p = who ? who + (A.mode === 'cmd' && A.stage === 'ask' ? ' is deciding whether to take every job…' : ' is choosing…') : 'Handing out the jobs…'; M.sub = left + ' job' + (left === 1 ? '' : 's') + ' left'; return M; }
       M.cls = 'mine';
       if (A.mode === 'cmd') {
-        if (A.stage === 'keep') { M.p = 'Commander\'s call: keep every job, or offer them?'; M.sub = 'If you offer them, a willing diver takes all of them and all signalling happens before the first trick.'; if (mv.some(m => m.t === 'keep')) btn('Keep every job', 'keep', { cls: 'go' }); btn('Offer them to the crew', 'offer'); }
+        if (A.stage === 'keep') { M.p = 'Commander\'s call: keep every job, or offer them?'; M.sub = 'If you offer them, a willing diver takes all of them and all signalling happens before the first trick.'; if (mv.some(m => m.t === 'keep')) btn('Keep every job', 'keep', { cls: 'go' }); btn('Offer them to the team', 'offer'); }
         else { M.p = 'Will you take every job?'; btn('Yes, I take them', 'accept', { cls: 'go' }); btn('No', 'decline', { cls: 'alt' }); }
         return M;
       }
@@ -642,11 +642,11 @@ function loadSave() {
 // ===================== part 4: guide tips, pop-ups (job, diver, last trick) and the result card =====================
 // ---------- tips: one at a time, never stacked; the guided dive shows all of them, other dives each tip once per device ----------
 const TIPS = [
-  { id: 'welcome', when: () => UI.mode === 'guided' && G.phase === 'assign' && G.tricks.length === 0 && !seen('assign1'), title: 'Welcome aboard', body: 'You are a diver in a team. You win together or lose together. On the table lie job cards: each job is something ONE diver has to do with the tricks that diver wins.', btn: 'Next' },
+  { id: 'welcome', when: () => UI.mode === 'guided' && G.phase === 'assign' && G.tricks.length === 0, title: 'Welcome aboard', body: 'You are a diver in a team. You win together or lose together. On the table lie job cards: each job is something ONE diver has to do with the tricks that diver wins.', btn: 'Next' },
   { id: 'commander', when: () => G.phase === 'assign' && G.cap >= 0, title: () => G.cap === viewSeat() ? 'You are the Commander' : pname(G.cap) + ' is the Commander', body: () => (G.cap === viewSeat() ? 'You hold Lantern 4, the strongest card. So you pick a job first, and you lead the first trick.' : pname(G.cap) + ' holds Lantern 4, the strongest card. The Commander picks a job first, then it goes clockwise, and the Commander leads the first trick.') },
   { id: 'pickjob', when: () => G.phase === 'assign' && iMustAct() && UI.mode !== 'net' && !G.players[G.as.actor].helper && G.as.mode === 'draft', title: 'Pick a job', body: 'Tap a job card on the table to read it in the panel, then press "Take this job". Choose one you think your own cards can do. With fewer jobs than divers you may pass.' },
   { id: 'flare', when: () => G.phase === 'distress' && iMustAct(), title: 'The distress flare', body: 'Optional help: light the flare and every diver passes one card (not a Lantern) to a neighbour. It makes the dive count one extra attempt. You can always say "No flare".' },
-  { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signals', body: 'You may show ONE card of yours to the crew, once per dive. It must be your highest, your lowest or your only card of a colour. The token on it tells which. Lanterns cannot be shown. Press "Signal…", or skip.' },
+  { id: 'signal', when: () => G.phase === 'signal' && iMustAct(), title: 'Signals', body: 'You may show ONE card of yours to the team, once per dive. It must be your highest, your lowest or your only card of a colour. The token on it tells which. Lanterns cannot be shown. Press "Signal…", or skip.' },
   { id: 'lead', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length === 0 && !G.players[G.trick.turn].helper, title: 'You lead the trick', body: 'The leader plays any card. Tap a card to lift it, tap it again (or press Play) to play it. Everybody then plays one card; the highest card of the led colour wins.' },
   { id: 'follow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && !G.players[G.trick.turn].helper && LD.playable(G, G.trick.turn).length < G.players[G.trick.turn].hand.length, title: 'Follow the colour', body: 'You must play a card of the colour that was led, if you have one. The dim cards are not allowed. Winning is never forced: you may play a low card on purpose.' },
   { id: 'nofollow', when: () => G.phase === 'play' && iMustAct() && G.trick.plays.length > 0 && G.trick.ls < 4 && !G.players[G.trick.turn].helper && !G.players[G.trick.turn].hand.some(c => suitOf(c) === G.trick.ls), title: 'No card of that colour', body: 'You have none of the led colour, so you may play anything. A card of another colour never wins the trick, but a Lantern does: Lanterns are trumps.' },
@@ -668,7 +668,7 @@ function coachCheck() {
     let ok = false; try { ok = t.when(); } catch (e) { }
     if (!ok) continue;
     const title = typeof t.title === 'function' ? t.title() : t.title, body = typeof t.body === 'function' ? t.body() : t.body;
-    UI.tip = { id: t.id, title, body, btn: t.btn || 'Got it' }; renderTip(); if (t.id === 'welcome') UI.coach.seen.assign1 = 0; return;
+    UI.tip = { id: t.id, title, body, btn: t.btn || 'Got it' }; renderTip(); return;
   }
 }
 function tipOk() { if (!UI.tip) return; markSeen(UI.tip.id); UI.tip = null; renderTip(); schedule(); coachCheck(); }
@@ -767,14 +767,14 @@ function buildRules() {
   const sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
   const ul = a => h('ul', ...a.map(t => h('li', t))), ol = a => h('ol', ...a.map(t => h('li', t)));
   sec('The goal', h('p', 'You are a team of divers on a deep-sea expedition. Each dive lays out job cards. Every job is a condition on the tricks one diver wins. You win the dive together when every job is done, and you lose it together the moment one job cannot be done. Nobody may talk about their cards: you can only use the ping signal.'));
-  sec('How a dive goes', ol(['Everybody is dealt a hand. The diver with Lantern 4 is the Commander.', 'Job cards are drawn until their numbers add up to the dive\'s difficulty (the number for your crew size counts).', 'Jobs are taken: the Commander first, then clockwise, one job at a turn, until none are left.', 'Optionally, light the distress flare to pass cards (see below).', 'Divers may signal once (see below), then the tricks are played. The Commander leads the first trick; each trick is led by the winner of the one before.', 'When every job is done the dive is won. If one job can no longer be done, the attempt is lost: deal again.']));
+  sec('How a dive goes', ol(['Everybody is dealt a hand. The diver with Lantern 4 is the Commander.', 'Job cards are drawn until their numbers add up to the dive\'s difficulty (the number for your team size counts).', 'Jobs are taken: the Commander first, then clockwise, one job at a turn, until none are left.', 'Optionally, light the distress flare to pass cards (see below).', 'Divers may signal once (see below), then the tricks are played. The Commander leads the first trick; each trick is led by the winner of the one before.', 'When every job is done the dive is won. If one job can no longer be done, the attempt is lost: deal again.']));
   sec('The cards', h('p', '40 cards: four colours (Coral, Tide, Kelp, Sunstar) numbered 1 to 9, and four Lanterns numbered 1 to 4. The Lanterns are the trump suit. With 3 divers one diver has 14 cards and one card is never played; 4 divers play 10 tricks, 5 divers 8 tricks.'));
   sec('A trick', ul(['The leader plays any card. Everybody must follow the colour that was led if they can (Lanterns count as a colour too). If you cannot follow, play anything.', 'A Lantern beats every colour; the highest Lantern wins. With no Lantern, the highest card of the led colour wins.', 'You are never forced to win.', 'You may look again at the most recent trick only (the "Last trick" button).']));
   sec('Signals (the ping)', ul(['Once per dive each diver may show one colour card from the hand, face up: it must be their highest, their lowest or their only card of that colour. The token marks which one (top, bottom or middle).', 'Lanterns cannot be shown. Signals only happen between tricks. The mark does not change afterwards, even if it stops being true.', 'Murky water: the card is shown but gets no mark. Deep narcosis: the tokens are in a shared pool (two fewer than divers) and anyone can use one at any time between tricks. Unknown waters: draw a colour card first: 1-3 normal, 4-6 murky, 7-9 narcosis.']));
   sec('Jobs', ul(['A job is done when it is met and can no longer fail. It fails when it can no longer be met.', 'Three jobs compare with the Commander (more, fewer or equally many tricks); the Commander cannot take those.', 'If both "win the first trick" and "win the first two tricks" lie on the table and nobody could take both, one is swapped for another job of the same value.']));
-  sec('The distress flare', h('p', 'Before any signalling, the crew may light the flare. Every diver passes one colour card to the left (or everybody to the right). It stays lit until the dive is won, and the dive counts one extra attempt in your logbook. You may pass again at the start of each later attempt, or not.'));
-  sec('Special dives', ul(['Commander\'s call (dives 10, 13): the Commander takes all jobs or hands them to a willing diver. If handed over, all signalling happens before the first trick.', 'One diver takes all jobs: by crew vote (dive 6) or by volunteering in turn, answering only yes or no (dives 14, 15, 16; two volunteers in dive 26).', 'Open briefing (dives 17, 28-31, deep dives): talk freely about the jobs, never about cards.', 'Limits: some dives forbid winning two more 9s (or 1s) than another diver, leading Coral or a Lantern, and more. The rule of each dive is in the panel when you start it.', 'Real-time dives (14, 15, 16, 26): beat a clock, or play without it and use the alternative rule shown with the dive. Turn the clock on in the setup screen.']));
-  sec('Two divers and the drone', h('p', 'With two divers a drone joins as a third crew member. Its 14 cards lie in a double row, 7 face up on top of 7 face down. The Commander takes jobs for it, plays its face-up cards and decides without talking. A face-down card turns up only after the card on top of it was played, between tricks.'));
+  sec('The distress flare', h('p', 'Before any signalling, the team may light the flare. Every diver passes one colour card to the left (or everybody to the right). It stays lit until the dive is won, and the dive counts one extra attempt in your logbook. You may pass again at the start of each later attempt, or not.'));
+  sec('Special dives', ul(['Commander\'s call (dives 10, 13): the Commander takes all jobs or hands them to a willing diver. If handed over, all signalling happens before the first trick.', 'One diver takes all jobs: by team vote (dive 6) or by volunteering in turn, answering only yes or no (dives 14, 15, 16; two volunteers in dive 26).', 'Open briefing (dives 17, 28-31, deep dives): talk freely about the jobs, never about cards.', 'Limits: some dives forbid winning two more 9s (or 1s) than another diver, leading Coral or a Lantern, and more. The rule of each dive is in the panel when you start it.', 'Real-time dives (14, 15, 16, 26): beat a clock, or play without it and use the alternative rule shown with the dive. Turn the clock on in the setup screen.']));
+  sec('Two divers and the drone', h('p', 'With two divers a drone joins as a third team member. Its 14 cards lie in a double row, 7 face up on top of 7 face down. The Commander takes jobs for it, plays its face-up cards and decides without talking. A face-down card turns up only after the card on top of it was played, between tricks.'));
   sec('On your phone', ul(['Tap a card to lift it, tap it again (or press Play) to play. Dim cards are not allowed now. Tap a diver or a job chip for details; "Last trick" shows the previous trick.', 'The panel at the bottom always says what to do now. The Hint button shows a suggestion with the reason.', 'Hot-seat: a pass-the-device screen hides every hand. Online: you only ever see your own cards. There is no chat, only the pings and a few neutral emotes.']));
   root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Audio, all public-domain (CC0): music &ldquo;Underwater Theme&rdquo; by Spring Spring and ambience &ldquo;Underwater Ambient Pad&rdquo; by isaiah658 (OpenGameArt); sound effects from the Casino Audio, Impact Sounds, Interface Sounds, Music Jingles and UI Audio packs by Kenney (kenney.nl). They were trimmed, loudness-normalised and converted for this game. Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, job text and art are original; the paintings were made for this game.</p></section>' }));
   return root;
@@ -874,10 +874,10 @@ function titleEl() {
 }
 function dinerCard(c, o) {
   const b = D.blurbs[c], on = o.seats.indexOf(c) >= 0, lv = o.lv[c] || b.lv || 'normal', pc = KIT.DIVERS[c];
-  const card = h('article.dcard' + (on ? '.on' : ''), { 'aria-label': D.names[c] + (on ? ', in the crew' : ', not in the crew') });
+  const card = h('article.dcard' + (on ? '.on' : ''), { 'aria-label': D.names[c] + (on ? ', in the team' : ', not in the team') });
   card.style.setProperty('--dc', pc.helm);
   card.append(h('div.dtop', h('div.dimg', { html: avatarC(c, 120) }), h('h3', D.names[c], h('small', on ? lv : 'not invited'))), h('div.dtx', h('p.story', b.story), h('p.enjoy', b.enjoy),
-    h('div.drow2', h('button.chipb.seatb' + (on ? '.on' : ''), { 'data-a': 'seatchef', 'data-c': c, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, on ? 'In the crew ✓' : 'Invite'),
+    h('div.drow2', h('button.chipb.seatb' + (on ? '.on' : ''), { 'data-a': 'seatchef', 'data-c': c, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, on ? 'In the team ✓' : 'Invite'),
       on ? h('span.lvs', ['easy', 'normal', 'hard'].map(v => h('button.chipb' + (lv === v ? '.on' : ''), { 'data-a': 'lv', 'data-seat': c, 'data-v': v, type: 'button', 'aria-pressed': lv === v ? 'true' : 'false', 'aria-label': D.names[c] + ' plays ' + v }, v))) : null)));
   return card;
 }
@@ -910,7 +910,7 @@ function setupEl() {
   const cfg = h('div.cfg#cfg', { hidden: ph && !open ? true : null, role: ph ? 'dialog' : null, 'aria-label': ph ? 'Configure the dive' : null },
     ph ? h('div.cfghead', h('b', 'Configure the dive'), h('button.btn', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null,
     diveCfg(o),
-    h('div.seg', h('span.lbl', 'Crew size'), [2, 3, 4, 5].map(v => h('button.chipb' + (o.np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': o.np === v ? 'true' : 'false' }, v))),
+    h('div.seg', h('span.lbl', 'Team size'), [2, 3, 4, 5].map(v => h('button.chipb' + (o.np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': o.np === v ? 'true' : 'false' }, v))),
     h('div.dgrid', [0, 1, 2, 3].map(c => dinerCard(c, o))),
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
   const go = h('div.sgo',
@@ -1190,6 +1190,7 @@ function pxDrawFelt(R) {
 function pxSeatRect(s, B) { const e = document.querySelector('[data-key="seat' + s + '"]'); return e ? pxRect(e, B) : null; }
 function pxSync() {
   if (!PX.on || !G || !UI.started) { if (PX.on) pxClear(); return; }
+  try { if (window.PerfHUD && PerfHUD.wake) PerfHUD.wake(); } catch (e) { }   // a table change must never wait for the idle-frame saver
   const bd = $('#bd'); const B = bd.getBoundingClientRect(); PX.B = B;
   const seen = new Set(), now = performance.now();
   const ent = UI.enter || ''; UI.enter = ''; const exit = UI.pxExit; UI.pxExit = null;

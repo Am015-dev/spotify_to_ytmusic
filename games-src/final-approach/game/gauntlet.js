@@ -5,6 +5,7 @@
 const T = require('./tlib.js'); require('./src/ai.js'); const { FA, D } = T;
 const af = process.argv.find(a => a.startsWith('--aiw='));
 if (af) { const code = require('fs').readFileSync(af.slice(6), 'utf8'); delete FA.AIW; (0, eval)(code); FA.AI.w = Object.assign({}, FA.AI.W0, (FA.AIW && FA.AIW.w) || {}); }
+for (const [flag, key] of [['--nmc=', 'NMC'], ['--hmc=', 'HMC']]) { const a = process.argv.find(x => x.startsWith(flag)); if (a) { const [t, n] = a.slice(flag.length).split(',').map(Number); FA.AI[key] = { top: t, samples: n }; } }
 const wf = process.argv.find(a => a.startsWith('--W=')); if (wf) Object.assign(FA.AI.W, JSON.parse(wf.slice(4)));
 const arg = process.argv.slice(2).filter(a => !a.startsWith('--')), flags = process.argv.slice(2).filter(a => a.startsWith('--'));
 const which = (arg[0] || 'all'), lv = (arg[1] || 'normal'), N = +(arg[2] || 20), seed0 = +(arg[3] || 1000);

@@ -1,0 +1,53 @@
+390x844 board {"w":390,"h":480,"vw":390,"vh":844,"mode":"P","k":0.487} webgl
+390x844 placements by touch 6
+390x844 errors []
+390x763 board {"w":390,"h":420,"vw":390,"vh":763,"mode":"P","k":0.487} webgl
+390x763 placements by touch 6
+390x763 errors []
+390x664 board {"w":390,"h":420,"vw":390,"vh":664,"mode":"P","k":0.487} webgl
+390x664 placements by touch 6
+390x664 errors []
+FAIL 375x553 tap target <44 guided brief ["space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7"]
+375x553 board {"w":375,"h":385,"vw":375,"vh":553,"mode":"P","k":0.447} webgl
+FAIL 375x553 tap target <44 rolled ["space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7"]
+FAIL 375x553 tap target <44 picked ["space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7"]
+FAIL 375x553 tap target <44 mid ["space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7"]
+375x553 placements by touch 6
+FAIL 375x553 tap target <44 menu ["space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7"]
+FAIL 375x553 tap target <44 final ["space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7"]
+FAIL 375x553 tap target <44 pass ["space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7","space 48.7x40.7"]
+375x553 errors []
+412x780 board {"w":412,"h":444,"vw":412,"vh":780,"mode":"P","k":0.515} webgl
+412x780 placements by touch 6
+412x780 errors []
+FAIL 844x390 tap target <44 guided brief ["slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2"]
+FAIL 844x390 clipped text guided brief ["clipped DIV.w appr: Airport","clipped DIV.w altw: 6000"]
+844x390 board {"w":607.6875,"h":390,"vw":844,"vh":390,"mode":"L","k":0.434} webgl
+FAIL 844x390 tap target <44 rolled ["slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2"]
+FAIL 844x390 clipped text rolled ["clipped DIV.w appr: Airport","clipped DIV.w altw: 6000"]
+FAIL 844x390 tap target <44 picked ["slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2"]
+FAIL 844x390 tap target <44 mid ["slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2"]
+FAIL 844x390 clipped text mid ["clipped DIV.w appr: Airport","clipped DIV.w altw: 6000"]
+844x390 placements by touch 6
+FAIL 844x390 tap target <44 menu ["slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2"]
+FAIL 844x390 tap target <44 final ["slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2"]
+FAIL 844x390 clipped text final ["clipped DIV.w appr: Airport","clipped DIV.w altw: 6000"]
+FAIL 844x390 tap target <44 pass ["slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2","slot 38.2x38.2"]
+FAIL 844x390 clipped text pass ["clipped DIV.w appr: Airport","clipped DIV.w altw: 6000"]
+844x390 errors []
+FAIL 750x342 tap target <44 guided brief ["space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8"]
+FAIL 750x342 clipped text guided brief ["clipped DIV.w appr: Airport","clipped DIV.w altw: 6000"]
+750x342 board {"w":530,"h":342,"vw":750,"vh":342,"mode":"L","k":0.379} webgl
+FAIL 750x342 tap target <44 rolled ["space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8"]
+FAIL 750x342 clipped text rolled ["clipped DIV.w appr: Airport","clipped DIV.w altw: 6000"]
+FAIL 750x342 tap target <44 picked ["space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8"]
+FAIL 750x342 tap target <44 mid ["space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8"]
+FAIL 750x342 clipped text mid ["clipped DIV.w appr: 1","clipped DIV.w appr: Airport","clipped DIV.w altw: 6000"]
+750x342 placements by touch 6
+FAIL 750x342 tap target <44 menu ["space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8"]
+FAIL 750x342 tap target <44 final ["space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8"]
+FAIL 750x342 clipped text final ["outside viewport: 1","clipped DIV.w appr: 1","clipped DIV.w appr: Airport","clipped DIV.w altw: 6000"]
+FAIL 750x342 tap target <44 pass ["space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8","space 46x40.8"]
+FAIL 750x342 clipped text pass ["clipped DIV.w appr: Airport","clipped DIV.w altw: 6000"]
+750x342 errors []
+PROBLEMS 31
