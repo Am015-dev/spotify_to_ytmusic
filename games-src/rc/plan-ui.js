@@ -9,7 +9,7 @@ function planHtml(){
   const bar=`<div class="wz-steps" aria-label="Planning: step ${st} of 4">${titles.map((t,k)=>`<button class="wz-s ${k+1<st?'done':k+1===st?'now':''}" data-pgo="${k+1}" ${k+1===st?'aria-current="step"':''}><i>${k+1<st?'✓':k+1}</i><span>${t}</span></button>`).join('')}</div>`;
   const head=`<h3 class="wz-t">${st}. ${titles[st-1]}</h3>`;
   const body=st===1?wzNeeds():st===2?wzAssign():st===3?wzReview():wzConfirm();
-  return `<div class="wz">${bar}${typeof netPlanBar==='function'?netPlanBar():''}${head}${body}</div>`}
+  return `<div class="wz">${bar}${typeof netPlanBar==='function'?netPlanBar():''}${guideTip('plan'+st)}${head}${body}</div>`}
 // ---------- plan step state ----------
 UI.ps={round:0,step:1,skip:[],pick:false};
 function pstep(){if(!G)return 1;if(UI.ps.round!==G.round){UI.ps={round:G.round,step:1,skip:[],pick:false};UI.sugWhy={}}return UI.ps.step}
@@ -26,9 +26,10 @@ function riskWords(a){const n=actNeed(a);const k=a.pw.length;if(k<n.need)return 
 function wzNeeds(){const need=eatersNeed(),have=food(),planF=plannedFood();const cl=clouds();const S=SCENARIOS[G.scen];const dieN={rain:'rain die',snow:'winter die',animals:'hungry-animals die'};
   const row=(ok,label,val,note)=>`<div class="nd ${ok?'ok':'bad'}"><b>${label}</b><span class="v">${val}</span><small>${note}</small></div>`;
   const low=living().filter(c=>!c.npc).sort((a,b)=>lifeLeft(a)-lifeLeft(b))[0];
-  let h=`<p class="wz-p">Before you give out jobs, look at what the camp needs today. Red means trouble tonight.</p>`;
+  let h='';
+  h+=goalCard();
   const ml=morningLines();if(ml.length)h+=`<div class="morn"><b>This morning:</b><ul>${ml.map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ul></div>`;
-  h+=`<div class="needs">`+row(have+planF>=need,'Food for tonight',`${have+planF} of ${need}`,`Everyone eats 1 food at night. Hungry: 2 wounds each.${planF?` (${planF} of it is planned.)`:''}`)
+  h+=`<div class="needs">`+row(have+planF>=need+wxFoodLoss(),'Food for tonight',`${have+planF} of ${need}${wxFoodLoss()?' +'+wxFoodLoss():''}`,`Everyone eats 1 food at night. Hungry: 2 wounds each.${planF?` (${planF} of it is planned.)`:''}${wxFoodLoss()?` Rain above your roof will likely ruin about ${wxFoodLoss()} food first.`:''}`)
     +row(hasShelter(),'Shelter',hasShelter()?'yes':'none',hasShelter()?'Keeps you from sleeping in the open.':'Tonight everyone loses 1 life without one.')
     +row(cl.est<=G.camp.roof,'Roof',`${G.camp.roof}`,`Weather tonight: ${cl.dice.length?cl.dice.map(d=>dieN[d]).join(', '):'calm'}${G.wx.rain?` +${G.wx.rain} rain`:''}${G.wx.snow?` +${G.wx.snow} snow`:''}${G.wx.storm?' + a storm':''}. Each cloud above the roof ruins 1 food and 1 wood.`)
     +row(!G.ev.wait||BEAST[G.ev.wait].str<=G.weapon,'Weapon',`${G.weapon}`,G.ev.wait?`A ${BEAST[G.ev.wait].n} (strength ${BEAST[G.ev.wait].str}) attacks at dawn.`:'Used when you hunt or a beast attacks.')
@@ -37,8 +38,14 @@ function wzNeeds(){const need=eatersNeed(),have=food(),planF=plannedFood();const
   h+=th?`<h4>Threat cards</h4>${th}`:`<p class="muted small">No threat cards on the board.</p>`;
   const pr=priorities().filter(p=>!p.done&&!p.info);if(pr.length)h+=`<h4>What matters most today</h4><ol class="plist">${pr.map(p=>`<li class="${p.red?'red':''}" ${posAttr(p.act)}><b>${esc(p.title)}</b><span>${esc(p.why)}</span></li>`).join('')}</ol>`;
   const mates=mateHtml();if(mates)h+=mates;
-  h+=`<div class="daycard"><div class="dk">Your goal</div><b>${esc(SC().goal?SC().goal():S.x)}</b></div>`;
   return h}
+// the goal, its progress and how to work on it today: first thing on the planning page
+function goalCard(){const S=SCENARIOS[G.scen];let how='',btn='';
+  if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();const w=pileWhy(1);
+    how=`${has('fire')?'Fire is built.':'Build <b>Fire</b> (a job in Build).'} Add wood to the <b>signal pile</b> one stage a day (1, 2, 3, 4, then 5 wood): it must be full on day 10, 11 or 12.`;
+    const fw=Math.max(0,G.res.wood-committed().wood);btn=room?`<button class="btn sm pileb" data-a="pilemax" ${w?'aria-disabled="true"':''}>Add ${Math.max(1,Math.min(room,fw))} wood to the pile${fw<room&&fw>0?` (${room} finish today’s stage)`:''}</button>${w?`<small>${esc(w==='no spare wood'?`needs ${room} spare wood`:w)}</small>`:''}`:G.sc.pile>=15?'':'<small>Today’s pile stage is done.</small>'}
+  else how=esc(S.x);
+  return `<div class="daycard goal1"><div class="dk">🎯 Your goal · day ${G.round} of ${G.rounds}</div><b>${esc(SC().goal?SC().goal():S.x)}</b><p>${how}</p>${btn?`<div class="gb">${btn}</div>`:''}</div>`}
 // ---------- step 2: one pawn at a time ----------
 function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=curPawn();
   const row=`<div class="pawnrow">${list.map((p,k)=>{const a=G.plan.acts.find(x=>x.pw.includes(p.id));const on=cur&&cur.id===p.id;const col=p.c!=null?PCOL[p.c%6]:p.f?'#f3f3f3':'#8d8d8d';
@@ -66,7 +73,7 @@ function wzReview(){let h=`<p class="wz-p">Each job shows its risk. <b>Certain</
   if(!G.plan.acts.length)return h+`<p class="muted">Nothing planned yet. Go back to step 2, or press 💡 Plan it for me.</p>`;
   const W=UI.sugWhy||{};
   h+=`<div class="review">${G.plan.acts.slice().sort((x,y)=>ORDER_T.indexOf(x.type)-ORDER_T.indexOf(y.type)).map((a,k)=>{const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v} ${RNAME[r]}`).join(' + ');const why=W[JSON.stringify([a.type,a.tgt])];
-    const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)?` <button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">pay with ${a.pay==='fur'?'fur':'wood'}</button>`:'';
+    const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?` <button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">pay with ${a.pay==='fur'?'fur':'wood'}</button>`:'';
     return `<div class="rv" ${posAttr(a)}><div class="rv-n">${k+1}</div><div><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')}</div><div class="rsk">${riskWords(a)}</div>${cost?`<small>Costs ${cost}.${payT}</small>`:''}${why?`<small class="why">Why: ${esc(why)}.</small>`:''}</div></div>`}).join('')}</div>`;
   const pb=planProblems();if(pb.length)h+=`<div class="probs">${pb.slice(0,4).map(x=>`<div>• ${esc(x)}</div>`).join('')}</div>`;
   const open=priorities().filter(p=>!p.done&&!p.info&&p.act);if(open.length)h+=`<div class="notcov"><b>Not covered today:</b> ${open.map(p=>`<span class="${p.red?'red':''}">${esc(p.title)}</span>`).join(' · ')}</div>`;
@@ -96,7 +103,7 @@ function pawnsText(n,far){return n.roll?`${n.need} pawn${n.need>1?'s':''}: dice 
 function planLine(a){const n=actNeed(a);const k=a.pw.length;const dt=dtype(a);let chance;
   if(k<n.need)chance=`<b class="warn">needs ${n.need-k} more</b>`;else if(n.roll&&k<n.max){const o=dt?diceOdds(dt):{s:80,w:1,q:3};chance=`<b class="roll" title="One pawn fewer than sure: the dice decide. Add 1 more pawn for a sure success. A failure gives the leader 2 determination.">🎲 ${o.s}% success · ${o.w}-in-6 wound risk</b>`}else chance='<b class="sure">✔ sure</b>';
   const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v}${RICON[r]}`).join(' ');
-  const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)?`<button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">${a.pay==='fur'?'🧶 fur':'🪵 wood'}</button>`:'';
+  const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?`<button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">${a.pay==='fur'?'🧶 fur':'🪵 wood'}</button>`:'';
   return `<div class="pl" ${posAttr(a)}><span class="pli">${ACT_ICON[a.type]||'•'}</span><div class="plt"><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')} ${chance} ${cost?`<span class="cost">${cost}</span>`:''} ${payT}</div></div></div>`}
 function catCount(k){try{return catRows(k).filter(r=>!r.why).length}catch(e){return 0}}
 // every job in a category: {type,tgt,alt,title,sub,why}
@@ -116,7 +123,7 @@ function catRows(k){const o=[];const add=(type,tgt,title,sub,alt)=>{const why=ta
 const CAT_TIP={gather:'1 pawn rolls the dice (it may fail or hurt); 1 more pawn makes it sure. Places 2 steps from camp need +1 pawn. Numbers are the places on the map.',explore:'Explore a ❔ place next to the land you know. 1 pawn rolls the dice, 1 more makes it sure; 2 steps from camp: +1 pawn.',build:'Building rolls the dice with 1 pawn (4-in-6 wound risk!); 2 pawns make it sure.',threat:'Threat cards strike at the next dawn if they are still in the left slot. Dealing with one needs no dice.'};
 function catHtml(k){const rows=catRows(k);const ok=rows.filter(r=>!r.why),no=rows.filter(r=>r.why);const tip=CAT_TIP[k]?`<p class="cattip">ℹ️ ${CAT_TIP[k]}</p>`:'';
   const line=r=>{const key=encodeURIComponent(JSON.stringify({type:r.type,tgt:r.tgt,alt:r.alt}));const planned=findActAny(r.type,r.tgt,r.alt);const sel=UI.sel;const pw=sel&&!r.why?placeWhy(sel,r.type,r.tgt,r.alt):null;
-    return `<div class="job ${r.why?'no':''} ${planned?'has':''}" ${posAttr({type:r.type,tgt:r.tgt})}><div class="jt"><b>${esc(r.title)}</b><span>${esc(r.sub)}${r.why?` <em>(${esc(r.why)})</em>`:''}</span></div>${r.why?'':`<button class="btn add" data-place="${key}" ${pw?'disabled':''} title="${esc(pw||'Put '+(sel?pawnLabel(pawnInfo(sel)):'a pawn')+' on this')}">+</button>`}</div>`};
+    return `<div class="job ${r.why?'no':''} ${planned?'has':''}" ${posAttr({type:r.type,tgt:r.tgt})}><div class="jt"><b>${esc(r.title)}</b><span>${esc(r.sub)}${r.why?` <em>(${esc(r.why)})</em>`:''}</span></div>${r.why?'':`<button class="btn add" data-place="${key}" ${pw?'aria-disabled="true"':''} title="${esc(pw||'Put '+(sel?pawnLabel(pawnInfo(sel)):'a pawn')+' on this')}">+</button>`}</div>`};
   return tip+(ok.length?ok.map(line).join(''):'<p class="muted small">Nothing possible here right now.</p>')+(no.length?`<details class="later"><summary>Not possible yet (${no.length})</summary>${no.map(line).join('')}</details>`:'')}
 
 // the day so far, never ahead of the story

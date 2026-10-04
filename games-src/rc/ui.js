@@ -59,7 +59,7 @@ function wizSync(){if(planOpen()&&!allAI()){pstep();if(UI.ps.step!==2&&UI.sel&&!
 function stepFoot(){const st=pstep();const cur=st===2?curPawn():null;const list=st===2?wizPawns():[];const red=st===4?uncoveredRed():[];const pb=planProblems();
   const sug=`<button class="btn ghost" data-a="suggest" title="Give every pawn a job following today’s needs (H). You can change anything.">💡 Plan for me</button>`;
   const back=st>1?`<button class="btn ghost" data-a="pback">◀ Back</button>`:`<button class="btn ghost" data-a="clear" title="Take all your pawns off their jobs">Clear</button>`;
-  const txt=st===1?'Step 1 of 4: read what today needs, then give out jobs.':st===2?(cur?`Step 2 of 4 · Pawn ${list.findIndex(p=>p.id===cur.id)+1} of ${list.length}: ${pawnNice(cur)}. Take the recommended job or choose another.`:'Step 2 of 4: every pawn has a job.'):st===3?'Step 3 of 4: check the risk of each job.':pb.length?`Step 4 of 4: not ready yet. ${pb[0]}`:red.length?'Step 4 of 4: something urgent is not covered.':'Step 4 of 4: all set. Start the day!';
+  const txt=st===1?'Planning 1 of 4: read what today needs, then give out jobs.':st===2?(cur?`Planning 2 of 4 · Pawn ${list.findIndex(p=>p.id===cur.id)+1} of ${list.length}: ${pawnNice(cur)}. Take the recommended job or choose another.`:'Planning 2 of 4: every pawn has a job.'):st===3?'Planning 3 of 4: check the risk of each job.':pb.length?`Planning 4 of 4: not ready yet. ${pb[0]}`:red.length?'Planning 4 of 4: something urgent is not covered.':'Planning 4 of 4: all set. Start the day!';
   const next=st===1?`<button class="btn go" data-a="pnext" title="Step 2: give each pawn a job">Next: jobs ▶</button>`:st===2?`<button class="btn go ${cur&&cur.c!=null?'dim':''}" data-a="pnext" title="Step 3: check the risk of each job">Next: check ▶</button>`:st===3?`<button class="btn go ${pb.length?'dim':''}" data-a="pnext" title="Step 4: start the day">Next: start ▶</button>`:
     (typeof netOn==='function'&&netOn()?netStepBtn(pb,red):`<button class="btn go ${pb.length?'dim':''}" data-a="go" ${red.length?'data-force="1"':''} title="Start the day (Enter)">${red.length?'Start anyway ▶':'Start day ▶'}</button>`);
   return `<div class="st-t" id="steptext">${esc(typeof netOn==='function'&&netOn()&&st===4&&!pb.length?netStepText(red):txt)}</div><div class="st-b">${back}${sug}${next}</div>`}
@@ -151,6 +151,7 @@ function closeMenu(){const m=$('#moremenu');if(m&&m.classList.contains('open')){
 const SCEN_ORDER=['marooned','hexed','stranded','settlers'];
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">A co-operative survival game for 1–4 castaways. Plan every day together, build a camp, explore the island and hold out against the weather until your goal is done.</p>
+   <div class="mb guided"><button class="btn go big" data-a="guided">New here? Play a guided first game ▶</button><small>Marooned on the Easier setting, with a short tip on each new screen.</small></div>
    ${saved?`<div class="mb"><button class="btn go" data-a="continue">Continue the saved game</button></div>`:''}
    ${typeof onlineBlock==='function'?onlineBlock():''}
    <h3>Scenario</h3><div class="scens">${SCEN_ORDER.map((k,ix)=>{const S=SCENARIOS[k];return `<button class="scen ${o.scen===k?'on':''}" data-scen="${k}"><b>${ix+1}. ${esc(S.n)}</b><small>${S.rounds} rounds</small><span>${esc(S.x)}</span></button>`}).join('')}</div>
@@ -208,11 +209,12 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   if(d.ans!=null){sfx('click');answer(+d.ans);return}
   if(d.do!=null){const p=priorities()[+d.do];if(p&&p.act){const before=placedIds();const r=p.can?doJob(p.act.type,p.act.tgt,p.act.alt,p.lead):p.move?applyMove(p):(p.cant||'Not possible now.');
       if(r)toast(r);else{sfx('place');tutAdvance(2);const who=[];for(const a of G.plan.acts){const ids=a.pw.filter(id=>!before.has(id));if(ids.length)who.push(`${pawnGroup(ids)} → ${actLabel(a)}`)}refresh();toast('Planned: '+who.join(' · ')+(p.move?` (${p.move.nm} left “${p.move.label}”)`:''),4000);return}}refresh();return}
-  if(d.cat){UI.cat=UI.cat===d.cat?null:d.cat;render();return}
+  if(d.cat){UI.cat=UI.cat===d.cat?null:d.cat;render();if(UI.cat){const c=document.querySelector('#ppop .catbody')||document.querySelector('#panel .catbody');if(c&&c.scrollIntoView)c.scrollIntoView({block:'nearest',behavior:'smooth'})}return}
   if(d.phx){UI.phx=UI.phx===d.phx?null:d.phx;renderRoadmap();return}
   if(d.pgo){setPStep(+d.pgo);render();return}
   if(d.pq!=null){const p=priorities()[+d.pq];const cur=curPawn();if(p&&p.act&&cur){const e=place(cur.id,p.act.type,p.act.tgt,p.act.alt);if(e)toast(e);else{sfx('place');UI.sugWhy[JSON.stringify([p.act.type,p.act.tgt])]=p.title;UI.sel=null;wizPlaced();refresh()}}return}
   if(d.tut){if(d.tut==='off')tutDone();else UI.tut++;render();return}
+  if(d.gtip){if(d.gtip==='off')UI.guide.on=false;else UI.guide.seen[d.gtip]=1;sfx('click');refresh();return}
   if(d.place){const o=JSON.parse(decodeURIComponent(d.place));doPlace(o.type,o.tgt,o.alt);return}
   if(d.rm){unplace(d.rm);UI.sel=null;refresh();return}
   if(d.pawn&&b.closest('.pawnrow')&&placedIds().has(d.pawn)&&planOpen()){unplace(d.pawn);UI.sel=d.pawn;UI.ps.pick=true;refresh();return}
@@ -243,13 +245,13 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'sofar':e.preventDefault();UI.ps.sofar=!UI.ps.sofar;render();return;
   case 'retry':retryGame(d.easy==='1');return;case 'menu':toggleMenu();return;
   case 'clear':clearPlan(G.chars.filter(c=>c.human).map(c=>c.i));refresh();return;
-  case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const r=pileAdd(SCEN.marooned.pileRoom());if(r)toast(r);return}
+  case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const r=pileAdd(SCEN.marooned.pileRoom());if(r)toast('Can’t add wood now: '+r+'.');else{sfx('place');refresh()}return}
   case 'untile':UI.tileSel=null;render();return;
   case 'later':UI.openLater=!UI.openLater;e.preventDefault();render();return;
   case 'moveask':G.moveAsk=b.checked?1:0;return;
   case 'okreport':UI.report=null;render();return;
   case 'overok':UI.overSeen=true;render();return;
-  case 'new':openStart();return;case 'start':beginGame();return;case 'continue':loadSaved();return;
+  case 'new':openStart();return;case 'start':UI.guide.on=false;beginGame();return;case 'guided':Object.assign(UI.setup,{scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:true,items:4,diff:'easy'});UI.guide={on:true,seen:{}};beginGame();return;case 'continue':loadSaved();return;
   case 'rulesstart':UI.modal=null;$('#modal').hidden=true;$('#modal').dataset.h='';GX.show('rulesd');UI.backToStart=!G;return;
   case 'cards':GX.show('cardsd');renderCards();return;case 'rules':GX.show('rulesd');return;case 'close':UI.modal=G?null:'start';if(!G)$('#modal').dataset.h='';render();return;
   case 'snd':toggleSound();return;case 'mus':toggleMusic();return;

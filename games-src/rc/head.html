@@ -162,7 +162,7 @@ body.storying .goal{display:none}
 .dice3{display:flex;gap:8px;margin:8px 0}.d3{width:74px;height:74px;border-radius:14px;display:grid;place-items:center;align-content:center;gap:2px;border:2px solid;background:#fffaf0;animation:tumble .7s cubic-bezier(.2,.8,.3,1.2) both}.d3 span{font-size:1.6rem;line-height:1}.d3 small{font-size:.66rem;text-align:center;line-height:1.1}
 .d3.good{border-color:#6aa55a;background:#eef6e8}.d3.bad{border-color:#c46a5c;background:#fbeae6}
 @keyframes tumble{0%{transform:translateY(-40px) rotate(-200deg) scale(.5);opacity:0}70%{transform:translateY(4px) rotate(12deg)}100%{transform:none;opacity:1}}
-.qbox{margin-top:8px;padding-top:8px;border-top:1px dashed #b99f67}.qbox h3{font:1.1rem var(--title);margin:0 0 6px}.qwho{display:inline-block;border-left:4px solid var(--pc);padding:0 6px;font-size:.85rem;margin-bottom:4px}
+.qbox{margin-top:8px;padding-top:8px;border-top:1px dashed #b99f67}.qbox.first{margin:6px 0 10px;padding:8px 10px;border:2px solid #d98a1e;border-radius:12px;background:#fff6dc}.qbox .qmore{margin:6px 0 0;font-size:.8rem;color:#6b5530}.qbox h3{font:1.1rem var(--title);margin:0 0 6px}.qwho{display:inline-block;border-left:4px solid var(--pc);padding:0 6px;font-size:.85rem;margin-bottom:4px}
 .why{font-weight:700}
 /* island labels */
 #labels{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden}
@@ -172,6 +172,9 @@ body.storying .goal{display:none}
 body.storying #labels .tl{pointer-events:none;opacity:.75}
 /* planning table */
 .daycard{background:#2a2014;color:#fff4d8;border-radius:10px;padding:8px 12px;display:grid;gap:2px}.daycard .dk{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--amber2)}.daycard b{font:1.05rem var(--serif)}.daycard .gl{font-size:.85rem;color:#e9dcc0}
+.btn.add[aria-disabled="true"]{opacity:.45;filter:grayscale(1)}
+.daycard.goal1{margin:0 0 8px}.daycard.goal1 p{margin:4px 0 0;font-size:.9rem}.daycard.goal1 .gb{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}.daycard.goal1 .pileb{background:#d98a1e;border-color:#a8620c;color:#fff}.daycard.goal1 .gb small{color:#ffcf8a}
+.coach .btn{background:#fffaf0;border:1px solid #b99f67;color:#2a2014}.coach .btn:not(.ghost){background:#d98a1e;border-color:#a8620c;color:#fff}.gtip .cb{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.gtip p{margin:2px 0 0}
 .coach{margin:8px 0;padding:8px 10px;border-radius:10px;background:#fff1cf;border:2px solid #d98a1e;position:relative}.coach .cn{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#9a6a12}.coach p{margin:2px 0 6px}.coach .cb{display:flex;gap:6px}
 .prios{display:grid;gap:6px}.prio{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px;border-radius:10px;background:#fffaf0;border:1px solid #c7b183}.prio .pi{font-size:1.4rem;text-align:center}.prio .pt{display:grid;min-width:0}.prio .pt span{font-size:.82rem;color:#5b4a2c}.prio.done{opacity:.6;background:transparent}.prio.cant .pt span{color:#8a5a2a}.prio small{color:#2f7d3a;font-weight:700}
 .plan{display:grid;gap:4px}.pl{display:grid;grid-template-columns:26px minmax(0,1fr);gap:6px;align-items:start;padding:6px;border-radius:8px;background:rgba(255,236,190,.6)}.pli{font-size:1.1rem;text-align:center}.plp{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:2px;font-size:.84rem}.cost{color:#5b4a2c}
@@ -277,6 +280,7 @@ body.storying #hud .rtrack,body.storying #hud .fc{display:none}
 /* start screen: the Wash ashore button stays in view */
 .cp,.scen{align-content:start}
 .mbox.start{display:flex;flex-direction:column;padding-bottom:0}
+.mbox.start .mb.guided{flex-direction:column;align-items:stretch;gap:4px;margin:8px 0 4px}.mbox.start .mb.guided .btn{font-size:1.05rem;min-height:48px;white-space:normal}.mbox.start .mb.guided small{color:#6b5530}
 .mbox.start .mb.sticky{position:sticky;bottom:0;margin:10px -4px 0;padding:10px 4px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(244,236,216,0),var(--paper) 30%);z-index:2}
 .ctl2{display:inline-flex;border:2px solid #5a4320;border-radius:9px;overflow:hidden;justify-self:start}.ctl2 button{appearance:none;border:0;background:#fffaf0;color:#5a4320;font:600 .8rem var(--sans);padding:5px 10px;min-height:32px;cursor:pointer}.ctl2 button.on{background:#5a4320;color:#fff4d8}
 .cp .sks{display:grid;gap:1px;font-size:.74rem;color:#5b4a2c}.cp .sks i{font-style:normal;font-weight:700;color:#3b2c14}
@@ -421,6 +425,8 @@ em.sure,em.roll{font-style:normal;font-size:.75rem;padding:0 6px;border-radius:9
 html.ph .gx-app{padding:var(--sat,0px) var(--sar,0px) 0 var(--sal,0px)}
 html.ph .gx-main{display:contents}
 html.ph.ph-p .gx-app{grid-template-columns:minmax(0,1fr);grid-template-rows:44px var(--bh) auto minmax(0,1fr)}
+/* while the player decides (planning, a choice, a pop-up) the island shrinks so the choices fit above the fold */
+html.ph.ph-p .gx-app[data-dec="1"]{grid-template-rows:44px var(--bhs,var(--bh)) auto minmax(0,1fr)}
 html.ph.ph-l .gx-app{grid-template-columns:var(--bw) minmax(0,1fr);grid-template-rows:44px auto minmax(0,1fr)}
 html.ph .gx-bar{grid-row:1;height:44px;min-height:44px;padding:0 4px;gap:4px;overflow:visible;align-items:center;border-bottom:1px solid var(--line)}
 html.ph .gx-bar h1,html.ph .gx-bar .gx-sp{display:none}
@@ -449,7 +455,7 @@ html.ph #phchip[aria-expanded]{}
 html.ph .gx-bar #phchip{order:-1}
 #phview{display:none}
 html.ph #phview:not([hidden]){display:flex;align-items:center;gap:4px;padding:0 4px;min-height:44px;background:#0b1620;border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--ink)}
-html.ph #phview #phlabel{flex:1;min-width:0;padding:0 8px;font:600 14px/1.2 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph #phview #phlabel{cursor:pointer;flex:1;min-width:0;padding:0 8px;font:600 14px/1.2 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html.ph.ph-l #phview #phlabel{display:none}
 html.ph #phview .gx-ibtn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;flex:0 0 auto;border-color:var(--line);background:var(--slate);color:var(--ink)}
 html.ph #phview .gx-ibtn svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
@@ -562,7 +568,8 @@ html.ph.ph-l #step .st-t{display:none}
 html.ph #story .sctl .btn.go{flex:1 1 100%}html.ph #story .sctl .btn.ghost{flex:1 1 40%;padding:0 6px;font-size:14px}
 html.ph #modal.phcard .mbox{overflow:visible}
 /* real usable heights: the recommended job's button stays pinned while the pawn pop-up scrolls */
-html.ph #ppop .rec .rb{position:sticky;bottom:0;z-index:2;padding:6px 0 8px;margin-bottom:-8px;background:linear-gradient(rgba(255,247,227,0),#fff7e3 10px)}
+html.ph #ppop .rec .rb{padding:6px 0 4px}
+html.ph.ph-l #ppop .rec .rb{position:sticky;bottom:0;z-index:2;padding:6px 0 8px;margin-bottom:-8px;background:#fff7e3}
 @media (max-width:400px){html.ph #phchip:not([hidden]){gap:4px;padding:0 5px!important;font-size:13.5px}}
 /* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
 html.ph .mbox,html.ph .dlg{box-sizing:border-box}
