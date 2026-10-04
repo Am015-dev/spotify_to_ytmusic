@@ -46,8 +46,10 @@ for(const [name,W,H] of SIZES)for(const cs of ['light','dark']){if(cs==='dark'&&
       continue}
     // play through the real buttons: mostly the main action, sometimes a playable card
     const card=await p.$('.mine [data-card].play');const btns=await p.$$('#prompt [data-mv]:not(:disabled)');
-    if(card&&Math.random()<.3){await card.click();await p.waitForTimeout(250);const mv=await p.$('#dkCard.on [data-mv]');if(mv)await mv.click();else if(await p.$('#dkCard.on'))await p.click('#dkCard .gx-x')}
-    else if(btns.length){await btns[0].click()}clicks++;
+    // board-first: a click picks the card up and lights its targets (tap one); the computer may re-render the board meanwhile
+    if(card&&Math.random()<.3){await card.click({timeout:3000}).catch(()=>{});await p.waitForTimeout(250);const tg=await p.$('[data-bfz]');
+      if(tg)await tg.click({timeout:3000}).catch(()=>{});else{const mv=await p.$('#dkCard.on [data-mv]');if(mv)await mv.click({timeout:3000}).catch(()=>{});else if(await p.$('#dkCard.on'))await p.click('#dkCard .gx-x').catch(()=>{})}}
+    else if(btns.length){await btns[0].click({timeout:3000}).catch(()=>{})}clicks++;
     await p.waitForTimeout(120);const r=await check('turn '+st.turn);heights.push(r.sh)}
   const turns=await p.evaluate(t=>G.turn-t,turn0);if(turns<2)bad.push('only '+turns+' turns played');
   await shot('end');
