@@ -1,1 +1,2 @@
 normal g1 green Port Alder                    26/30  87% avg rounds 7.0 {"checks:flaps":2,"checks:gear+axis":1,"checks:axis":1} 5489ms/game
+normal g2 green Foxmere                        9/30  30% avg rounds 7.0 {"checks:planes+flaps":1,"speed":6,"mandatory":2,"short":4,"checks:flaps":4,"spin":3,"checks:axis":1} 4231ms/game
