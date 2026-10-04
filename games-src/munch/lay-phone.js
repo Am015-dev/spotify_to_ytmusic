@@ -92,18 +92,24 @@ for(const [W,H] of SIZES){const land=W>H,short=Math.min(W,H);
     // hand card -> pop-up with buttons (once per size at a playable card; Esc / x / outside)
     const cards=await p.$$('.hand .card.play');
     if(!did.popup&&cards.length){did.popup=true;const id=await cards[0].getAttribute('data-card');
-      await tapAt(`.hand .card[data-card="${id}"]`,'hand card');await p.waitForTimeout(400);
+      // board-first: the first tap picks the card up and lights its targets; the second tap opens its details pop-up
+      await tapAt(`.hand .card[data-card="${id}"]`,'hand card');await p.waitForTimeout(300);
+      const lit=await p.evaluate(()=>({picked:!!document.querySelector('.hand .bf-picked'),tg:document.querySelectorAll('[data-bfz]').length}));
+      if(!lit.picked||!lit.tg)B('hand card tap did not pick the card up and light targets '+JSON.stringify(lit));else{await targets('picked');await shot('2picked')}
+      await tapAt(`.hand .card[data-card="${id}"]`,'hand card second tap');await p.waitForTimeout(400);
       if(await p.evaluate(()=>GX.open==='dkCard')){stats.popups++;await popupChecks('dkCard','card pop-up');await shot(`2cardpopup`);
         const nb=await p.$$('#dkCard .opts button');if(!nb.length)B('card pop-up has no buttons');
         await p.keyboard.press('Escape');await p.waitForTimeout(350);if(await p.evaluate(()=>GX.open))B('card pop-up did not close on Esc');else did.esc=true;
-        await tapAt(`.hand .card[data-card="${id}"]`,'hand card again');await p.waitForTimeout(350);
+        await tapAt(`.hand .card[data-card="${id}"]`,'hand card again');await p.waitForTimeout(200);await tapAt(`.hand .card[data-card="${id}"]`,'hand card again 2');await p.waitForTimeout(350);
         await tapAt('#dkCard .gx-x','close x');await p.waitForTimeout(350);if(await p.evaluate(()=>GX.open))B('x did not close');else did.x=true}
       else B('hand card tap did not open the pop-up');continue}
     if(s.open){await p.keyboard.press('Escape');continue}
-    if(did.popup&&!did.cardplay&&cards.length&&Math.random()<.5){did.cardplay=true;const id=await cards[0].getAttribute('data-card');await tapAt(`.hand .card[data-card="${id}"]`,'hand card to play');await p.waitForTimeout(350);const ob=await p.$('#dkCard .opts button');if(ob){await tapAt('#dkCard .opts button','popup action')}else await p.keyboard.press('Escape');continue}
+    if(did.popup&&!did.cardplay&&cards.length&&Math.random()<.5){did.cardplay=true;const id=await cards[0].getAttribute('data-card');await tapAt(`.hand .card[data-card="${id}"]`,'hand card to play');await p.waitForTimeout(350);const tg=await p.$('[data-bfz]');if(tg){stats.drops=(stats.drops||0)+1;await tapAt('[data-bfz]','glowing target')}else{const ob=await p.$('#dkCard .opts button');if(ob){await tapAt('#dkCard .opts button','popup action')}else await p.keyboard.press('Escape')}continue}
     // ask for help menu once
     if(!did.ask&&await p.$('#prompt [data-a="askmenu"]')&&Math.random()<.7){did.ask=true;await tapAt('#prompt [data-a="askmenu"]','ask');await p.waitForTimeout(900);
       const ar=await p.evaluate(()=>{const a=document.querySelector('#prompt .asks');if(!a)return null;const r=a.getBoundingClientRect();const t=document.querySelector('.table').getBoundingClientRect();return {t:r.top,b:r.bottom,l:r.left,r:r.right,tb:t.bottom,tr:t.right,ih:innerHeight,iw:innerWidth,v:getComputedStyle(document.documentElement).getPropertyValue('--ph-tb')}});
+      const askChips=await p.evaluate(()=>document.querySelectorAll('[data-bfz^="ask"]').length);
+      if(askChips){await targets('ask');await shot('6ask');await tapAt('[data-bfz^="ask"]','ask a glowing rival');continue}  // board-first: rivals glow, tap one to ask
       if(!ar)B('ask menu missing');else{if(ar.b>ar.ih+1||ar.r>ar.iw+1)B('ask menu off screen');if(!land&&ar.t<ar.tb-2)B('ask menu covers the table '+JSON.stringify(ar));await targets('ask');await fonts('#prompt .asks','ask');await shot('6ask')}
       const cancel=await p.$('#prompt .asks [data-a="close"]');if(cancel)await tapAt('#prompt .asks [data-a="close"]','ask cancel');continue}
     // main action: first enabled big button (prefer fight / kick / ready / loot / end), else a card
@@ -112,7 +118,7 @@ for(const [W,H] of SIZES){const land=W>H,short=Math.min(W,H);
       for(const k of pref){const b=bs.find(x=>key(x)===k);if(b){b.setAttribute('data-ph-pick','1');return k}}const b=bs[0];if(b){b.setAttribute('data-ph-pick','1');return key(b)}return ''});
     if(pick){await tapAt('#prompt [data-ph-pick="1"]','action '+pick);await p.evaluate(()=>document.querySelectorAll('[data-ph-pick]').forEach(e=>e.removeAttribute('data-ph-pick')));continue}
     // charity / pick: tap a hand card then its first popup button
-    const c2=await p.$('.hand .card');if(c2){const id=await c2.getAttribute('data-card');await tapAt(`.hand .card[data-card="${id}"]`,'hand card (forced)');await p.waitForTimeout(250);const ob=await p.$('#dkCard.on .opts button');if(ob)await tapAt('#dkCard.on .opts button','forced action');else if(await p.evaluate(()=>GX.open))await p.keyboard.press('Escape')}
+    const c2=await p.$('.hand .card');if(c2){const id=await c2.getAttribute('data-card');await tapAt(`.hand .card[data-card="${id}"]`,'hand card (forced)');await p.waitForTimeout(250);if(await p.$('[data-bfz]')){await tapAt('[data-bfz]','forced target');continue}const ob=await p.$('#dkCard.on .opts button');if(ob)await tapAt('#dkCard.on .opts button','forced action');else if(await p.evaluate(()=>GX.open))await p.keyboard.press('Escape')}
     else await p.waitForTimeout(100)}
   if(humanTurns.size<2)B(`only ${humanTurns.size} human turns played by taps`);
   if(!did.popup)B('never saw a playable card for the pop-up test');
