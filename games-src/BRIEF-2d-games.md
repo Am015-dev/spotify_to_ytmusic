@@ -81,6 +81,19 @@ audio bundle and every test script, and adapt them. Read `SP/kaiten/PLAN.md`, `g
 - **Look at your screenshots yourself** (title, setup, guided turn, mid-game, end, at 1366x768, 390x763 and
   844x390) and fix anything ugly, clipped or overlapping. PROBLEMS 0 is not enough on its own.
 
+## Testing speed rules (measured Oct 2026: ~2–3 h of each 6 h build was waiting on tests)
+- **Tier the tests.** While iterating, run only the test that covers what you changed, at 1–2 sizes
+  (e.g. `lay-phone.js 390x763,844x390`). Run the full 7-size phone sweep, the 4 desktop sizes and all p2p
+  scenarios once at the end, not after every edit. One phone size takes ~80 s; the full sweep ~10 min.
+- **Queue heavy jobs:** prefix every Playwright, gauntlet, cover and p2p run with `games-src/scripts/heavy`
+  (e.g. `games-src/scripts/heavy node lay-phone.js 390x763`). It allows 3 heavy jobs machine-wide (4 cores);
+  more only makes everyone slower.
+- **Don't sleep-poll.** Run long jobs with `run_in_background` and wait for the completion notice (or use the
+  Monitor tool), instead of `sleep 120` loops. Don't start a job just to watch it time out at 2 minutes:
+  give foreground commands a `timeout` that fits (up to 10 min) or run them in the background.
+- **AI tuning in node, small first.** Gauntlets run in node (no browser); start with 20–40 games to compare
+  levers, and only the final table gets the big run. Never run several big hard-AI gauntlets in parallel.
+
 ## Report back
 Files, file size, a table of every test with numbers, screenshot paths, what's confirmed vs. guessed in the
 rules, what's not done, honest weaknesses (art, AI strength, untested real devices), and proposed patches to
