@@ -100,7 +100,23 @@ const SAVEV = 1;
 function hasSave() { try { const s = localStorage.getItem('cf_save'); if (!s) return false; const o = JSON.parse(s); return !!(o && o.v === SAVEV && o.G && o.G.phase !== 'over'); } catch (e) { return false; } }
 function save() { try { if (!G || (typeof NET !== 'undefined' && NET.on) || G.phase === 'over') return false; localStorage.setItem('cf_save', JSON.stringify({ v: SAVEV, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs, focus: UI.focus, holder: UI.holder })); return true; } catch (e) { return false; } }
 function clearSave() { try { localStorage.removeItem('cf_save'); } catch (e) { } }
-function toast(t) { const e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 2400); }
+// log lines name every maker; the viewer reads "You" instead of their maker's name ("Wynne takes" -> "You take")
+function youText(t) {
+  const v = viewSeat(); if (v < 0 || !G || hotSeat()) return t; const nmv = G.players[v].name; if (!nmv || t.indexOf(nmv) < 0) return t;
+  const verb = w => w === 'has' ? 'have' : w === 'is' ? 'are' : w === 'was' ? 'were' : /[^aeiou]ies$/.test(w) ? w.slice(0, -3) + 'y' : /(sh|ch|x|ss)es$/.test(w) ? w.slice(0, -2) : /s$/.test(w) && !/ss$/.test(w) ? w.slice(0, -1) : w;
+  const esc = nmv.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return t.replace(new RegExp('^' + esc + '\'s\\b'), 'Your').replace(new RegExp('\\b' + esc + '\'s\\b', 'g'), 'your')
+    .replace(new RegExp('\\b' + esc + ' ([a-z]+)\\b', 'g'), (a, w) => 'You ' + verb(w)).replace(new RegExp('\\b' + esc + '\\b', 'g'), 'you').replace(/^you\b/, 'You').replace(/([.:!] )you\b/g, '$1You').replace(/^(You [a-z]+ .*? and )(starts|takes|scores|moves|puts)\b/, (a, b, w) => b + w.slice(0, -1));
+}
+// points a maker gained on a day (fortune points before the brew included), and where they came from (from the log)
+function dayStart(seat, round) { const prev = G.hist.find(x => x.seat === seat && x.round === round - 1); return prev ? prev.after : 0; }
+function dayWhy(p, round) {
+  const re = new RegExp('^' + p.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' (scores|loses) (\\d+) points?(?: \\((.*)\\))?'), out = [];
+  const short = r => !r ? 'other' : /scoring space/.test(r) ? 'space' : /bonus die/.test(r) ? 'die' : /coins/.test(r) ? 'coins' : r;
+  for (const l of G.log) if (l.round === round && !/rubies at 2 to 1/.test(l.t)) { const m = re.exec(l.t); if (m) out.push((m[1] === 'loses' ? '-' : '+') + m[2] + ' ' + short(m[3])); }
+  return out;
+}
+function toast(t) { const e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), Math.min(7000, 2000 + 45 * t.length)); }
 // ===================== part 2: render (board, thumbnails, dock, risk, questions) =====================
 // Text for every question the engine can ask (title, explanation). Options come from CF.moves().
 const QINFO = {
@@ -125,7 +141,7 @@ const QINFO = {
   p4: ['Upgrade sigh', () => 'Swap one chip of your pot for a bigger one of the same colour. The new chip goes into your bag; today your scoring space stays as it is.'],
   de: ['Your cauldron exploded', (p, d) => 'Choose: take the ' + d.vp + ' victory point' + (d.vp === 1 ? '' : 's') + ' on your space, or shop with its ' + d.coins + ' coins.'],
   shop: ['The fair stalls', (p, d) => 'You have ' + d.coins + ' coins. Buy one or two chips of different colours.'],
-  ruby: ['Rubies', () => 'Spend 2 rubies for a droplet step or to refill your flask, or keep them.']
+  ruby: ['Rubies', () => 'Spend 2 rubies to move your droplet one space (every later day starts further on) or to refill your flask, or keep them.']
 };
 const EVAL_Q = { gift: 1, g2: 1, g4: 1, p1: 1, g3: 1, p2: 1, p4: 1, de: 1, shop: 1, ruby: 1 };
 function qKeys(m, p) {   // chips to show on an option button
@@ -143,7 +159,7 @@ function moveBtn(m, p, cls) {
 function waitingNames() { return G.players.filter(p => (G.phase === 'brew' ? p.st !== 'done' : !!p.q) && !isMine(p.seat)).map(p => p.name); }
 function promptInfo() {
   if (!G) return { text: '' };
-  if (G.phase === 'over') return { text: UI.rsOpen && UI.rsMode === 'final' ? '' : G.winText };
+  if (G.phase === 'over') return { text: UI.rsOpen && UI.rsMode === 'final' ? '' : youText(G.winText) };
   const v = viewSeat(); const wn = waitingNames();
   if (v < 0) return { text: G.phase === 'brew' ? 'The computers are brewing.' : 'The fair goes on.' };
   const p = G.players[v];
@@ -151,7 +167,7 @@ function promptInfo() {
   if (p.q && !EVAL_Q[p.q.h]) return { text: QINFO[p.q.h][0] + ': ' + QINFO[p.q.h][1](p, p.q.d), mine: true };
   if (G.phase === 'brew') {
     if (p.st === 'draw' && p.lock) return { text: 'You have decided. ' + (wn.length ? 'Waiting for ' + nameList(G.players.filter(q => q.st === 'draw' && !q.lock && !isMine(q.seat)).map(q => q.name)) + ', then everybody reveals together (Stir!).' : 'Revealing...') };
-    if (p.st === 'draw') { const rk = CF.risk(G, v); return { text: (G.round === 9 ? 'Last day: choose Draw or Stop. Nobody sees your choice until everybody has chosen. ' : '') + (p.pot.length ? 'Draw another chip, or stop and keep your score.' : 'Tap Draw to pull your first chip from the bag.'), mine: true }; }
+    if (p.st === 'draw') { const rk = CF.risk(G, v); return { text: (G.round === 9 ? 'Last day, no shop: everyone picks Draw or Stop in secret, then all reveal. At the end 5 coins or 2 rubies = 1 point. ' : '') + (p.pot.length ? 'Draw another chip, or stop and keep your score.' : 'Tap Draw to pull your first chip from the bag.' + (G.round <= 2 ? ' Everyone brews at the same time, so the others are drawing too.' : '')), mine: true }; }
     return { text: (p.boom ? 'Your cauldron exploded. ' : 'You stopped. ') + (wn.length ? 'Waiting for ' + nameList(wn) + '...' : 'Everyone is done.') };
   }
   if (G.phase === 'prep') return { text: wn.length ? 'Waiting for ' + nameList(wn) + ' to choose...' : 'The day begins.' };
@@ -160,7 +176,7 @@ function promptInfo() {
 }
 function placePrompt() { }
 function stateLabel(p) {
-  switch (seatState(p)) { case 'draw': return 'drawing'; case 'locked': return 'decided'; case 'done': return 'stopped'; case 'boom': return 'exploded'; case 'post': return 'finishing'; case 'choose': return 'choosing'; case 'ready': return 'waiting'; case 'wait': return 'waiting'; case 'idle': return 'waiting'; default: return ''; }
+  switch (seatState(p)) { case 'draw': return 'brewing'; case 'locked': return 'decided'; case 'done': return 'finished'; case 'boom': return 'exploded'; case 'post': return 'finishing'; case 'choose': return 'choosing'; case 'ready': return 'waiting'; case 'wait': return 'waiting'; case 'idle': return 'waiting'; default: return ''; }
 }
 // why the white limit is not 7 today (empty when it is 7)
 function limitNote(p) {
@@ -180,7 +196,7 @@ function renderOthers() {
     if (p.seat === f) continue;
     const t = h('button.th' + (seatCls(p) ? '.' + seatCls(p) : ''), { 'data-a': 'focus', 'data-seat': p.seat, type: 'button', 'aria-label': p.name + ': ' + p.vp + ' points, ' + stateLabel(p) + '. Tap to look at this cauldron.' });
     t.append(h('span.av', { html: avHTML(p.seat, 26) }), h('span.tp', { html: KIT.potSVG(potOpts(p, true)).replace(/width="\d+" height="\d+"/, '') }),
-      h('span.ti', h('b', p.name), h('span.tv', h('span', { html: ico('vp', 15) }), p.vp, h('span', { html: ico('ruby', 15) }), p.rubies), h('span.ts', stateLabel(p) + (p.pot.length ? ' · ' + p.pot.length : ''))));
+      h('span.ti', h('b', p.name), h('span.tv', h('span', { html: ico('vp', 15) }), p.vp, h('span', { html: ico('ruby', 15) }), p.rubies), h('span.ts', stateLabel(p) + (p.pot.length && seatState(p) === 'draw' ? ' · ' + plural(p.pot.length, 'chip') : ''))));
     o.appendChild(t);
   }
   o.style.display = G.np > 1 && o.children.length ? '' : 'none';
@@ -212,7 +228,7 @@ function renderRisk() {
   const rk = $('#risk'); if (!rk) return; const f = focusSeat(), v = viewSeat(), p = G.players[f];
   rk.innerHTML = ''; rk.hidden = false; rk.removeAttribute('data-priv');
   const sp = p.pot.length ? CF.spaceOf(p) : null, lim = CF.limitOf(G, p), ws = CF.whiteSum(p);
-  const here = sp != null ? h('div.rk', h('span', { html: ico('coin', 16) }), h('b', D.COINS[sp]), ' coins ', h('span', { html: ico('vp', 16) }), h('b', D.VP[sp]), ' points', D.RUBY[sp] ? [h('span', { html: ico('ruby', 16) }), ' ruby'] : null, h('span.sm', ' (space ' + sp + ')')) : null;
+  const here = sp != null ? h('div.rk', h('span', { html: ico('coin', 16) }), h('b', D.COINS[sp]), ' coins ', h('span', { html: ico('vp', 16) }), h('b', D.VP[sp]), ' points', D.RUBY[sp] ? [h('span', { html: ico('ruby', 16) }), ' ruby'] : null, h('span.sm', ' if you stop now')) : null;
   if (f !== v || v < 0 || p.bag.length && !p.bag[0] && p.bagN != null) {
     rk.append(h('div.rk', h('b', p.name + '\'s cauldron'), ' white ', h('b', ws + ' of ' + lim), ' · ' + plural(bagN(p), 'chip') + ' left in the bag'), ...(here ? [here] : []));
     if (p.boom) rk.append(h('div.rk.hi', 'Exploded.'));
@@ -224,6 +240,7 @@ function renderRisk() {
   if (G.phase === 'brew' && p.st === 'draw') {
     const n = Math.max(1, r.n), nb = r.boom, ny = r.whites - r.boom, nk = r.n - r.whites;
     const bar = h('div.rb', { 'aria-hidden': 'true' }, h('i', { style: 'width:' + (100 * nk / n) + '%;background:#7fd65a' }), h('i', { style: 'width:' + (100 * ny / n) + '%;background:#f2b81e' }), h('i', { style: 'width:' + (100 * nb / n) + '%;background:#d6392f' }));
+    if (isPh()) { rk.append(h('div.rk', h('span', { html: ico('bag', 18) }), h('b', r.n), ' chips in the bag: ', h('b', r.whites), ' white'), bar); return; }
     rk.append(h('div.rk', h('span', { html: ico('bag', 18) }), h('b', r.n), ' chips in the bag: ', h('b', r.whites), ' white'), bar,
       h('div.rk', 'Next chip explodes it: ', h('span.big.' + lv, pct + '%'), h('span.sm', ' (' + nb + ' of ' + r.n + ' chips would explode)'), h('span.sm', ' · white total ' + r.ws + ' of ' + r.limit)), ...(limitNote(p) ? [h('div.rk.hi', limitNote(p) + '.')] : []), ...(here ? [here] : []));
     const fl = p.flask ? (p.f.canFlask && p.pot.length && p.pot[p.pot.length - 1].c === 'W' ? 'The flask can put your last white chip back.' : 'Flask ready: it can put back a white chip you just drew.') : 'Flask used this day.';
@@ -253,26 +270,28 @@ function renderActs() {
   const p = G.players[v]; const legal = mvList(v); UI.legal[v] = legal;
   if (typeof NET !== 'undefined' && NET.on && NET.pend && Date.now() - NET.pendT < 700) { /* a move is in flight */ }
   if (p.q && !EVAL_Q[p.q.h]) { renderQ(p, legal, qb); return; }
+  if (focusSeat() !== v) { a.appendChild(h('button.btn.go.backb', { 'data-a': 'focus', 'data-seat': v, type: 'button' }, 'Back to your cauldron')); return; }
   if (G.phase !== 'brew' || p.st !== 'draw' || p.q) return;
   const mk = (t, cls, label, icon) => { const m = legal.find(x => x.t === t); if (!m) return null; return h('button.btn' + cls, { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button' }, icon ? h('span', { html: icon }) : null, label); };
-  const draw = mk('draw', '.drawb', 'Draw', ico('bag', 26)), stop = mk('stop', '.stopb', 'Stop');
+  const draw = mk('draw', '.drawb', 'Draw', ico('bag', 26)), stop = mk('stop', '.stopb', 'Stop') || (draw ? h('button.btn.stopb.off', { type: 'button', disabled: true, title: 'Draw your first chip first' }, 'Stop') : null);   // Stop keeps its place so Draw never moves
   if (!p.lock) {   // the one line that matters: how likely is the next chip to explode, and what am I worth right now
     const r = CF.risk(G, v), pct = Math.round(r.pBoom * 100), lv = pct < 15 ? 'lo' : pct < 30 ? 'mid' : 'hi', sp = CF.spaceOf(p), ln = limitNote(p);
     const fm = legal.find(x => x.t === 'flask');
-    const sr = h('div.sumrow', { 'data-priv': v }, h('span.s1', h('b.' + lv, pct + '%'), ' to explode'), h('span.s2', { title: 'If you stop now' }, h('span', { html: ico('coin', 16) }), h('b', D.COINS[sp]), h('span', { html: ico('vp', 16) }), h('b', D.VP[sp]), D.RUBY[sp] ? h('span', { html: ico('ruby', 16) }) : null),
+    const sr = h('div.sumrow', { 'data-priv': v }, h('span.s1', 'Next chip: ', h('b.' + lv, pct + '%'), ' to explode'), h('span.s2', { title: 'If you stop now' }, h('span', { html: ico('coin', 16) }), h('b', D.COINS[sp]), h('span', { html: ico('vp', 16) }), h('b', D.VP[sp]), D.RUBY[sp] ? h('span', { html: ico('ruby', 16) }) : null),
       fm ? h('button.btn.alt.flb', { 'data-a': 'mv', 'data-i': legal.indexOf(fm), type: 'button', 'aria-label': 'Flask: put the last white chip back in the bag', title: 'Flask: put the last white chip back' }, h('span', { html: ico('flask', 20, true) }), 'Flask') : null,
       ln ? h('div.s3', ln + ': it explodes above ' + r.limit + '.') : null);
     a.appendChild(sr);
   }
-  const rowTop = [mk('froth', '.alt.sec', 'Put the first white chip back (free)'), mk('restart', '.alt.sec', 'Do-over: start the day again')].filter(Boolean);
+  const rowTop = [mk('froth', '.alt.sec', 'Put the first white chip back (free)'), mk('restart', '.alt.sec', 'Do-over (today\'s fortune, once): tip your 5 chips back and start again')].filter(Boolean);
   if (rowTop.length) rowTop.forEach(b => a.appendChild(b));
   const rat = legal.filter(m => m.t === 'ratset');
-  if (rat.length) { const d = h('details', { style: 'flex:1 1 100%' }, h('summary.sm', { style: 'min-height:44px;display:flex;align-items:center;cursor:pointer' }, 'Rat stone: ' + (p.rat - p.droplet) + ' spaces ahead. Use fewer?')); const row = h('div', { style: 'display:flex;gap:6px;flex-wrap:wrap' }); rat.forEach(m => row.appendChild(h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button' }, m.n + ''))); d.appendChild(row); a.appendChild(d); }
+  if (rat.length) { const k = p.rat - p.droplet; const d = h('details.ratd', { style: 'flex:1 1 100%' }, h('summary.sm', { style: 'min-height:44px;display:flex;align-items:center;cursor:pointer' }, h('span', h('b', 'Head start: '), 'you trail the leader, so your first chip lands ' + plural(k, 'space') + ' further on (the grey rat). ', h('u', 'Use less')))); const row = h('div', { style: 'display:flex;gap:6px;flex-wrap:wrap' }); rat.forEach(m => row.appendChild(h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button' }, m.n ? 'Only ' + plural(m.n, 'space') : 'No head start'))); d.appendChild(row); a.appendChild(d); }
   if (draw) a.appendChild(draw); if (stop) a.appendChild(stop);
 }
 function renderQ(p, legal, qb) {
   const q = p.q, info = QINFO[q.h]; qb.hidden = false;
-  qb.append(h('div.qt', h('b', info[0]), h('div', info[1](p, q.d))));
+  const fromCard = { pick: 1, swap: 1, clear: 1, bribe: 1, bounty: 1, fork: 1, haggle: 1, peek: 1, gift: 1, restart: 1 }[q.h];
+  qb.append(h('div.qt', h('b', (fromCard ? 'Today\'s fortune card: ' : '') + info[0]), h('div', info[1](p, q.d))));
   if (p.hold.length && p.hold[0] && p.hold[0].c) qb.append(h('div.hold', { 'data-priv': p.seat }, p.hold.map((c, i) => h('span.cb', chipN(c.c + c.v, 34)))));
   const opts = h('div.opts' + (legal.length > 3 ? '.g2' : ''));
   legal.forEach(m => opts.appendChild(moveBtn(m, p)));
@@ -350,7 +369,15 @@ function afterApply(first) {
   schedule();
 }
 // ---------- events: sounds, animations, floating numbers ----------
+function newsLines(first) {
+  const v = viewSeat(), from = UI.newsN || 0; if (first || UI.sim) { UI.newsN = G.logN; return; }
+  if (v < 0 || hotSeat() || G.phase === 'eval' || G.phase === 'over' || UI.rsOpen) return;   // the report tells those; today's news waits until it closes
+  UI.newsN = G.logN;
+  const nm = G.players[v].name, out = G.log.filter(l => l.i > from && l.round === G.round && (l.t.indexOf(nm) >= 0 || /^Day \d/.test(l.t)) && !/ draws a | has decided| places the | stops\.$|^Stir!|^Everyone brews/.test(l.t)).map(l => youText(l.t));
+  if (out.length) toast(out.slice(-3).join(' '));
+}
 function playEvents(first) {
+  newsLines(first);
   const evs = G.events.filter(e => e.n > UI.evN); UI.evN = G.evN; if (first || !evs.length) return;
   for (const e of evs) {
     try {
@@ -358,8 +385,8 @@ function playEvents(first) {
         case 'draw': if (e.how !== 'side') snd('draw'); break;
         case 'place': snd(e.ruby ? 'ruby' : 'plop'); setTimeout(() => snd('splash'), 120); if (typeof pxEvent === 'function') pxEvent(e); break;
         case 'side': if (typeof pxEvent === 'function') pxEvent(e); break;
-        case 'boom': snd('boom'); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim) toast(e.prot ? 'Boom! But safe harbour saves your points.' : 'Your cauldron exploded!'); break;
-        case 'flask': snd('flask'); if (typeof pxEvent === 'function') pxEvent(e); break;
+        case 'boom': snd('boom'); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim) { const bp = G.players[e.seat]; toast((e.prot ? 'Boom! But safe harbour saves your points. ' : 'Your cauldron exploded! ') + 'White total ' + CF.whiteSum(bp) + ' is over the limit of ' + CF.limitOf(G, bp) + '.'); } break;
+        case 'flask': snd('flask'); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !e.free) toast('Flask used: the white chip went back into your bag. Rubies can refill the flask after the day.'); break;
         case 'restart': snd('page'); if (typeof pxEvent === 'function') pxEvent(e); break;
         case 'die': snd('die'); break;
         case 'gain': if (e.k === 'ruby') snd('ruby'); else if (e.k === 'vp') snd('coin'); else if (e.k === 'drop') snd('plop'); if (typeof pxEvent === 'function') pxEvent(e); break;
@@ -448,18 +475,29 @@ function renderReport() {
   box.appendChild(h('h2', h('span', { html: ico('coin', 30) }), hotPriv ? 'Day ' + R.round + ': ' + me.name : 'Day ' + R.round + ' report'));
   box.appendChild(h('div#rstip.tipb', { hidden: true }));
   const body = h('div.rsbody');
-  const tab = h('table.rt-tab'); tab.appendChild(h('tr', h('th', 'Cauldron'), h('th', 'Reached'), h('th', 'Result'), h('th', '+VP'), h('th', 'Total')));
+  const tab = h('table.rt-tab'); tab.appendChild(h('tr', h('th', 'Cauldron'), h('th', 'Score space'), h('th', 'Result'), h('th', 'Points today'), h('th', 'Total')));
+  const sumParts = [];
   for (const p of G.players) {
     const r = dayRow(p, R); if (!r) continue; const sp = r.space;
-    const res = r.boom ? (r.prot ? [h('span.ok', 'exploded, safe')] : [h('span.bad', 'exploded'), h('div.sm', (r.mode === 'buy' ? 'went shopping' : r.mode === 'vp' ? 'took points' : 'choosing') + ' (white ' + r.white + ' went over the limit)')]) : [h('span.ok', 'stopped'), r.die && r.die.length ? h('div.sm.dieb' + (r.live ? '.roll' : ''), { title: 'Bonus die' }, r.die.map(f => h('span', { html: KIT.ICON.die(24, f) }))) : null];
+    const gain = (r.live ? p.vp : (G.hist.find(x => x.round === R.round && x.seat === p.seat) || {}).after || p.vp) - dayStart(p.seat, R.round), gTxt = gain >= 0 ? '+' + gain : '' + gain, why = dayWhy(p, R.round);
+    const res = r.boom ? (r.prot ? [h('span.ok', 'exploded, safe')] : [h('span.bad', 'exploded'), h('div.sm', (r.mode === 'buy' ? 'went shopping' : r.mode === 'vp' ? 'took points' : 'choosing') + ' (white ' + r.white + ' was over the limit)')]) : [h('span.ok', 'stopped'), r.die && r.die.length ? h('div.sm.dieb' + (r.live ? '.roll' : ''), { title: 'Bonus die' }, r.die.map(f => h('span', { html: KIT.ICON.die(24, f) }))) : null];
     tab.appendChild(h('tr' + (p.seat === v ? '.me' : ''), h('td', h('span.nm', h('span', { html: avHTML(p.seat, 28) }), p.seat === v ? 'You' : p.name)),
-      h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', r.gain >= 0 ? '+' + r.gain : r.gain)), h('td', h('b', p.vp))));
+      h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', gTxt), why.length ? h('div.sm.why', why.join(' ')) : null), h('td', h('b', p.vp))));
+    sumParts.push((p.seat === v ? 'You' : p.name) + ' ' + gTxt);
   }
-  if (!hotPriv) body.appendChild(tab);
-  const lines = hotPriv ? [] : G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo)); if (lines.length) { const ev = h('div.evlog', { role: 'log', 'aria-label': 'What happened' }); lines.forEach(l => ev.appendChild(h('div', l.t))); body.appendChild(ev); setTimeout(() => { ev.scrollTop = ev.scrollHeight; }, 0); }
-  if (hotShared) body.appendChild(h('p.sm', 'Everybody has seen the table. Next, each maker makes the private choices (shop, rubies) while the others look away.'));
-  else if (myq) body.appendChild(decisionBox(me, myq));
-  else if (G.phase === 'eval') { const w = G.players.filter(p => p.q && p.seat !== v).map(p => p.name); body.appendChild(h('p.sm', w.length ? 'Waiting for ' + nameList(w) + '...' : 'Counting up...')); }
+  if (G.players.some(p => { const r = dayRow(p, R); return r && r.die && r.die.length; })) tab.appendChild(h('tr', h('td.sm', { colspan: '5' }, 'The boxed number is the bonus die: the furthest cauldron that did not explode rolls it (a tie: all of them).')));
+  const lines = hotPriv ? [] : G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo) && !/ has decided\.$|^Stir!/.test(l.t)); let ev = null;
+  if (lines.length) { ev = h('div.evlog', { role: 'log', 'aria-label': 'What happened' }); lines.forEach(l => ev.appendChild(h('div', youText(l.t)))); setTimeout(() => { ev.scrollTop = ev.scrollHeight; }, 0); }
+  const fold = !!myq && !hotShared;   // a choice is waiting: put it first and fold today's results into one line
+  if (fold) {
+    body.appendChild(decisionBox(me, myq));
+    if (!hotPriv) { const d = h('details.rsum', h('summary', h('b', 'Today: '), sumParts.join(' · '), h('span.sm', ' (tap for details)')), tab); if (ev) d.appendChild(ev); body.appendChild(d); }
+  } else {
+    if (!hotPriv) body.appendChild(tab);
+    if (ev) body.appendChild(ev);
+    if (hotShared) body.appendChild(h('p.sm', 'Everybody has seen the table. Next, each maker makes the private choices (shop, rubies) while the others look away.'));
+    else if (G.phase === 'eval') { const w = G.players.filter(p => p.q && p.seat !== v).map(p => p.name); body.appendChild(h('p.sm', w.length ? 'Waiting for ' + nameList(w) + '...' : 'Counting up...')); }
+  }
   const done = G.phase !== 'eval' && !myq && !hotShared;
   const next = G.phase === 'over' ? 'See the final scores' : 'On to day ' + G.round;
   box.appendChild(body);
@@ -478,7 +516,7 @@ function renderReport() {
 }
 function repContinue() {
   if (G.phase === 'eval' && (viewSeat() >= 0 && G.players[viewSeat()].q)) return;
-  closeRS(true); UI.rsMode = ''; if (G.phase === 'over') { checkFinal(); } else { render(); checkReport(); schedule(); }
+  closeRS(true); UI.rsMode = ''; if (G.phase === 'over') { checkFinal(); } else { render(); checkReport(); if (!UI.rsOpen) newsLines(false); schedule(); }
 }
 // ---------- decisions inside the report ----------
 function decisionBox(p, q) {
@@ -486,12 +524,12 @@ function decisionBox(p, q) {
   const box = h('div.dec', h('h3', info[0]), h('div.sm', info[1](p, q.d)));
   if (q.h === 'shop') { box.appendChild(shopUI(p, q, legal)); return box; }
   if (q.h === 'ruby') {
-    box.appendChild(h('div.sm', 'You have ' + p.rubies + ' rubies. Droplet at ' + p.droplet + '. Flask ' + (p.flask ? 'full' : 'empty') + '.'));
+    box.appendChild(h('div.sm', 'You have ' + p.rubies + ' rubies. Your droplet (the drop on the spiral, where your first chip lands) is on space ' + p.droplet + '. Flask ' + (p.flask ? 'full' : 'empty (it puts a white chip back once a day)') + '.'));
     const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p))); box.appendChild(row); return box;
   }
   if (q.h === 'de') {
     const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p)));
-    box.append(h('div.sm', 'Space ' + p.res.space + ': ' + q.d.coins + ' coins or ' + q.d.vp + ' VP.'), row); return box;
+    box.append(h('div.sm', G.round <= 5 ? 'Early in the fair, new chips usually pay off more than a few points: they help on every later day.' : 'Late in the fair there are few days left to use new chips, so points usually matter more.'), row); return box;
   }
   const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p))); box.appendChild(row); return box;
 }
@@ -502,14 +540,13 @@ function shopUI(p, q, legal) {
   for (const c of D.SHOP_COLORS) {
     const out = CF.bookOut(G, c), bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
     const card = h('div.bk' + (out ? '' : '.locked'));
-    card.appendChild(h('div.bh', chipN(c + '1', 34), h('b', D.COLORS[c].name, h('div.sm', c === 'O' || c === 'K' ? bk.title : bk.title + ' (' + D.SET_NAMES[G.sets[c]].toLowerCase() + ')'))));
-    card.appendChild(h('details', h('summary.sm', { style: 'min-height:34px;display:flex;align-items:center;cursor:pointer' }, out ? 'How it works' : 'Opens day ' + D.BOOK_ROUND[c]), h('div.bx', bk.text)));
+    card.appendChild(h('details.bd', h('summary.bh', { 'aria-label': D.COLORS[c].name + ': how it works' }, chipN(c + '1', 34), h('b', D.COLORS[c].name, h('div.sm', out ? bk.title : 'Opens day ' + D.BOOK_ROUND[c])), h('span.bi', { 'aria-hidden': 'true' }, 'i')), h('div.bx', bk.text)));   // tap the stall's name to read its power
     const pr = h('div.pr');
     D.COLORS[c].vals.forEach(val => {
       if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
       const on = sel.indexOf(key) >= 0; const others = sel.filter(k => k[0] !== c).reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
       const dis = !out || left < 1 || price + others > coins;
-      pr.appendChild(h('button' + (on ? '.on' : ''), { 'data-a': 'shopsel', 'data-k': key, type: 'button', disabled: dis && !on ? true : null, 'aria-pressed': on ? 'true' : 'false', 'aria-label': keyName(key) + ' for ' + price + ' coins' + (left < 1 ? ', sold out' : '') }, chipN(key, 24), h('span.pc', h('span', { html: ico('coin', 13) }), price + (left > 0 && left <= 4 ? ' (' + left + ' left)' : left < 1 ? ' sold out' : ''))));
+      pr.appendChild(h('button' + (on ? '.on' : ''), { 'data-a': 'shopsel', 'data-k': key, type: 'button', disabled: dis && !on ? true : null, 'aria-pressed': on ? 'true' : 'false', 'aria-label': keyName(key) + ' for ' + price + ' coins' + (left < 1 ? ', sold out' : '') }, chipN(key, 24), h('span.pc', h('span', { html: ico('coin', 13) }), price + (left < 1 ? ' sold out' : '')), left > 0 && left <= 4 ? h('span.lf', left + ' left') : null));
     });
     card.appendChild(pr); books.appendChild(card);
   }
@@ -538,14 +575,14 @@ function showFinal() {
   const order = G.players.slice().sort((a, b) => b.vp - a.vp || b.last9 - a.last9);
   const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Final scores' });
   const body = h('div.rsbody'); const wn = G.winners.map(s => pname(s));
-  body.appendChild(h('div.win', h('span', { html: avHTML(G.winners[0], 52) }), h('div', G.winText)));
+  body.appendChild(h('div.win', h('span', { html: avHTML(G.winners[0], 52) }), h('div', youText(G.winText))));
   const t = h('table.fin-tab'); const head = h('tr', h('th', 'Cauldron')); for (let r = 1; r <= D.rounds; r++) head.appendChild(h('th', 'D' + r)); head.append(h('th', 'Extra'), h('th', 'Total')); t.appendChild(head);
   for (const p of order) {
-    const gains = []; let sum = 0; for (let r = 1; r <= D.rounds; r++) { const hh = G.hist.find(x => x.round === r && x.seat === p.seat); const gn = hh ? hh.gain : 0; gains.push(gn); sum += gn; }
-    const row = h('tr' + (G.winners.indexOf(p.seat) >= 0 ? '.w' : ''), h('td', p.name)); gains.forEach(x => row.appendChild(h('td', x))); row.append(h('td', p.vp - sum), h('td', h('b', p.vp))); t.appendChild(row);
+    const gains = []; let sum = 0; for (let r = 1; r <= D.rounds; r++) { const hh = G.hist.find(x => x.round === r && x.seat === p.seat); const gn = hh ? hh.after - dayStart(p.seat, r) : 0; gains.push(gn); sum += gn; }
+    const row = h('tr' + (G.winners.indexOf(p.seat) >= 0 ? '.w' : ''), h('td', p.seat === viewSeat() ? 'You' : p.name)); gains.forEach(x => row.appendChild(h('td', x))); row.append(h('td', p.vp - sum), h('td', h('b', p.vp))); t.appendChild(row);
   }
   body.appendChild(h('div', { style: 'overflow-x:auto' }, t));
-  body.appendChild(h('p.sm', 'D1 to D9 are the points each day brought. Extra: fortune cards, the 2 rubies for 1 point conversion at the end and points before the brewing began. Tie: the cauldron that went furthest on the last day wins.'));
+  body.appendChild(h('p.sm', 'D1 to D9 are the points each day brought (fortune cards included). Extra: leftover rubies, 2 rubies for 1 point at the end. Tie: the cauldron that went furthest on the last day wins.'));
   const cfg = UI.cfg || {};
   const online = typeof NET !== 'undefined' && NET.on;
   box.appendChild(body);
@@ -563,7 +600,7 @@ const TIPS = [
   { id: 'stop', t: 'When to stop', x: () => 'Happy with your spiral? Press Stop to keep it. A high space gives coins to shop with and points for the track.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 4; } },
   { id: 'boom', modal: true, light: true, t: 'Boom!', x: () => 'Your cauldron exploded. You still reach a scoring space, but you must choose: take its victory points OR shop with its coins. Not both, and no bonus die.', when: () => { const p = mineP(); return p && p.boom && UI.rsOpen; } },
   { id: 'report', modal: true, t: 'The day report', x: () => 'When everybody has stopped the day is counted: the furthest cauldron that did not explode rolls the bonus die, chip powers happen, rubies on your space are yours, points move you along the track and the coins buy chips.', when: () => UI.rsOpen && UI.rsMode === 'report' },
-  { id: 'shop', modal: true, light: true, t: 'The shop', x: () => 'Coins buy new chips for your bag: pick one or two chips of different colours. Bigger numbers move you further, and every book has its own power: open "How it works" first. Leftover coins are lost.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'shop' && UI.rsOpen; } },
+  { id: 'shop', modal: true, light: true, t: 'The shop', x: () => 'Coins buy new chips for your bag: pick one or two chips of different colours. Bigger numbers move you further, and every colour has its own power: tap a stall\'s name to read it. Leftover coins are lost.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'shop' && UI.rsOpen; } },
   { id: 'rubies', modal: true, t: 'Rubies', x: () => 'Spend 2 rubies to start every day one space further on, or to refill your flask. On the last day 2 rubies are worth a point.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'ruby' && UI.rsOpen; } },
   { id: 'day2', t: 'Rats and new stalls', x: () => 'From day 2 a player behind the leader gets a rat stone: the first chip starts one space further on for every rat tail between you and the leader. The Sunroot stall opens today, the Dusk Sigh stall on day 3.', when: () => G.round === 2 && G.phase !== 'eval' && !UI.rsOpen },
   { id: 'last', t: 'The last day', x: () => 'No shopping today. Everybody secretly chooses Draw or Stop and all choices are revealed together. Every 5 coins and every 2 rubies you hold turn into a victory point.', when: () => G.round === 9 && G.phase !== 'eval' && !UI.rsOpen }
@@ -586,7 +623,8 @@ function tipCheck() {
       if (!guided && lvl === 'full' && t.id === 'welcome') continue;
       if (!!t.modal !== tipInRs()) continue;
       if (!t.modal) { const m = UI.tipMark; if (m && m.round === G.round && G.logN - m.log < 10) continue; if ((UI.tipRound[G.round] || 0) >= (G.round === 1 ? 3 : 1)) continue; }
-      if (tipSafe(t)) { UI.tipShown[t.id] = 1; UI.tip = t; UI.coach.seen[t.id] = 1; if (!t.modal) UI.tipRound[G.round] = (UI.tipRound[G.round] || 0) + 1; break; }
+      if (t.modal && G.rep && UI.tipRep === G.rep.round) continue;
+      if (tipSafe(t)) { if (t.modal && G.rep) UI.tipRep = G.rep.round; UI.tipShown[t.id] = 1; UI.tip = t; UI.coach.seen[t.id] = 1; if (!t.modal) UI.tipRound[G.round] = (UI.tipRound[G.round] || 0) + 1; break; }
     }
   }
   renderTip();
@@ -597,16 +635,16 @@ function renderTip() {
   for (const e of [pc, rt]) if (e && e !== target) { e.hidden = true; e.innerHTML = ''; }
   document.documentElement.classList.toggle('tipon', !!(on && !t.modal));
   if (!target) return;
-  const n = TIPS.filter(x => UI.tipShown[x.id]).length, open = !isPh() || t.modal || !!UI.tipOpen;
+  const n = TIPS.filter(x => UI.tipShown[x.id]).length, open = !isPh() || !!UI.tipOpen;   // phones: one line, More opens it
   target.hidden = false; target.innerHTML = ''; target.className = 'tipb';
   target.appendChild(h('div.tl', h('span.tt', h('b', 'Tip ' + n + ' of ' + TIPS.length + ': ' + t.t)),
-    isPh() && !t.modal ? h('button.btn.alt.tb', { 'data-a': 'tipmore', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, open ? 'Less' : 'More') : null,
+    isPh() ? h('button.btn.alt.tb', { 'data-a': 'tipmore', type: 'button', 'aria-expanded': open ? 'true' : 'false' }, open ? 'Less' : 'More') : null,
     h('button.btn.go.tb', { 'data-a': 'tipok', type: 'button' }, 'Got it')));
   if (open) target.appendChild(h('div.tx', h('p', t.x()), h('button.tlink2', { 'data-a': 'tipoff', type: 'button' }, 'No more tips')));
 }
 function tipOk() { UI.tip = null; UI.tipMark = { round: G.round, log: G.logN }; tipCheck(); render(); schedule(); }
 // ===================== part 5: drawers (scores, log, cards, rules, menu), start screens, events, phone mode, boot =====================
-function logHTML() { const e = h('div.logl'); for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 160); i--) e.appendChild(h('div.ll', h('span.lt', 'D' + G.log[i].round), ' ' + G.log[i].t)); return e; }
+function logHTML() { const e = h('div.logl'); for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 160); i--) e.appendChild(h('div.ll', h('span.lt', 'D' + G.log[i].round), ' ' + youText(G.log[i].t))); return e; }
 function buildRules() {
   const root = h('div.rules');
   const sec = (t, ...k) => { root.appendChild(h('h3', t)); k.forEach(x => root.appendChild(x)); };
@@ -755,7 +793,7 @@ function setupEl() {
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
   const first = !UI.prefs.played;
   const bStart = h('button.sbtn' + (first ? '' : '.big'), { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the fair'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
-  const bGuide = h('button.sbtn' + (first ? '.big' : ''), { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', first ? 'New here? Two makers, beginner books and short tips' : 'Two makers, beginner books, tips'));
+  const bGuide = h('button.sbtn' + (first ? '.big' : ''), { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', first ? 'New here? You and one computer maker, beginner books and short tips' : 'You and one computer maker, beginner books, tips'));
   const go = h('div.sgo', first ? [bGuide, bStart] : [bStart],
     h('div.sgrid3', first ? null : bGuide,
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', o.np + ' people, one device')),
@@ -779,6 +817,8 @@ document.addEventListener('click', ev => {
       const v = viewSeat(); const m = (UI.legal[v] || [])[+d.i];
       if (m) {
         if (m.t === 'flask') { const pl = G.players[v], wc = pl.pot.filter(c => c.c === 'W').length; if (wc <= 1 && UI.flaskArm !== pl.ver) { UI.flaskArm = pl.ver; toast('That is your only white chip. Tap Flask again to put it back.'); break; } }
+        if (m.t === 'draw') UI.drawT = Date.now();
+        else if (t.closest && t.closest('#qbox') && Date.now() - (UI.drawT || 0) < 600) break;   // a second quick tap on Draw must not pick the option that just appeared under the finger
         if (UI.tip && !UI.tip.modal && (m.t === 'draw' || m.t === 'stop')) { UI.tip = null; UI.tipMark = { round: G.round, log: G.logN }; renderTip(); }
         act(m, v);
       }
@@ -826,10 +866,10 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.rsM
 function renderLegend() {
   const e = $('#legend'); if (!e) return; const on = G && UI.started && !UI.prefs.legendOff && (G.round <= 2 || UI.mode === 'guided') && G.phase !== 'over';
   e.hidden = !on; if (!on) { e.innerHTML = ''; return; } if (e.dataset.k) return; e.dataset.k = 1;
-  e.append(h('span.lg', h('span.lgn', '12'), 'coins'), h('span.lg', h('span.lgb', '3'), 'VP'), h('span.lg', h('span', { html: ico('ruby', 16) }), 'ruby'), h('span.lg', 'path \u2192'), h('button.lgx', { 'data-a': 'legx', type: 'button', 'aria-label': 'Hide this key' }, '\u00d7'));
+  e.append(h('span.lg.lgk', 'Spaces:'), h('span.lg', h('span.lgn', '12'), 'coins'), h('span.lg', h('span.lgb', '3'), 'VP'), h('span.lg', h('span', { html: ico('ruby', 16) }), 'ruby'), h('span.lg', 'path \u2192'), h('button.lgx', { 'data-a': 'legx', type: 'button', 'aria-label': 'Hide this key' }, '\u00d7'));
 }
 function renderBlg() {
-  const e = $('#blg'); if (!e) return; const on = G && UI.started && isPh() && !UI.prefs.blgSeen && G.round === 1 && G.phase !== 'over';
+  const e = $('#blg'); if (!e) return; const on = false;   // the header buttons carry their names on phones now
   e.hidden = !on; if (!on || e.dataset.k) return; e.dataset.k = 1;
   e.append(h('div', h('b', 'Top buttons, left to right: '), 'Scores, Log, Chips and cards, How to play, Menu.'), h('button.btn.go', { 'data-a': 'blgx', type: 'button' }, 'OK'));
 }

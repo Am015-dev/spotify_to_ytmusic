@@ -100,4 +100,20 @@ const SAVEV = 1;
 function hasSave() { try { const s = localStorage.getItem('cf_save'); if (!s) return false; const o = JSON.parse(s); return !!(o && o.v === SAVEV && o.G && o.G.phase !== 'over'); } catch (e) { return false; } }
 function save() { try { if (!G || (typeof NET !== 'undefined' && NET.on) || G.phase === 'over') return false; localStorage.setItem('cf_save', JSON.stringify({ v: SAVEV, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs, focus: UI.focus, holder: UI.holder })); return true; } catch (e) { return false; } }
 function clearSave() { try { localStorage.removeItem('cf_save'); } catch (e) { } }
-function toast(t) { const e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 2400); }
+// log lines name every maker; the viewer reads "You" instead of their maker's name ("Wynne takes" -> "You take")
+function youText(t) {
+  const v = viewSeat(); if (v < 0 || !G || hotSeat()) return t; const nmv = G.players[v].name; if (!nmv || t.indexOf(nmv) < 0) return t;
+  const verb = w => w === 'has' ? 'have' : w === 'is' ? 'are' : w === 'was' ? 'were' : /[^aeiou]ies$/.test(w) ? w.slice(0, -3) + 'y' : /(sh|ch|x|ss)es$/.test(w) ? w.slice(0, -2) : /s$/.test(w) && !/ss$/.test(w) ? w.slice(0, -1) : w;
+  const esc = nmv.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return t.replace(new RegExp('^' + esc + '\'s\\b'), 'Your').replace(new RegExp('\\b' + esc + '\'s\\b', 'g'), 'your')
+    .replace(new RegExp('\\b' + esc + ' ([a-z]+)\\b', 'g'), (a, w) => 'You ' + verb(w)).replace(new RegExp('\\b' + esc + '\\b', 'g'), 'you').replace(/^you\b/, 'You').replace(/([.:!] )you\b/g, '$1You').replace(/^(You [a-z]+ .*? and )(starts|takes|scores|moves|puts)\b/, (a, b, w) => b + w.slice(0, -1));
+}
+// points a maker gained on a day (fortune points before the brew included), and where they came from (from the log)
+function dayStart(seat, round) { const prev = G.hist.find(x => x.seat === seat && x.round === round - 1); return prev ? prev.after : 0; }
+function dayWhy(p, round) {
+  const re = new RegExp('^' + p.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ' (scores|loses) (\\d+) points?(?: \\((.*)\\))?'), out = [];
+  const short = r => !r ? 'other' : /scoring space/.test(r) ? 'space' : /bonus die/.test(r) ? 'die' : /coins/.test(r) ? 'coins' : r;
+  for (const l of G.log) if (l.round === round && !/rubies at 2 to 1/.test(l.t)) { const m = re.exec(l.t); if (m) out.push((m[1] === 'loses' ? '-' : '+') + m[2] + ' ' + short(m[3])); }
+  return out;
+}
+function toast(t) { const e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), Math.min(7000, 2000 + 45 * t.length)); }
