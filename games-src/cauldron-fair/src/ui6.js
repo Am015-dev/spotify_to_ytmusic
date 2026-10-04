@@ -70,11 +70,10 @@ function brewDeck(p, v, legal) {
   const deck = h('div.bdeck' + (heat > .7 ? '.hot' : ''));
   deck.appendChild(h('div.bline', { 'aria-live': 'polite' }, bfLine(p, r, fm)));
   deck.appendChild(bfMeter(p, v, p.lock ? null : fm, legal));
-  const extras = [legal.find(x => x.t === 'froth') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'froth')), type: 'button' }, 'Put the first white back (free)') : null,
+  const extras = [legal.find(x => x.t === 'froth') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'froth')), type: 'button' }, '↩ White chip back, free') : null,
     legal.find(x => x.t === 'restart') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'restart')), type: 'button' }, 'Do-over: tip the chips back, once') : null].filter(Boolean);
   const rat = legal.filter(x => x.t === 'ratset');
   if (rat.length) { const k = p.rat - p.droplet; const d = h('details.ratd', h('summary', h('span', { html: ico('rat', 18) }), 'Head start +' + k)); const row = h('div.ratrow'); rat.forEach(x => row.appendChild(h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(x), type: 'button' }, x.n ? 'Only +' + x.n : 'None'))); d.appendChild(row); extras.push(d); }
-  if (extras.length) deck.appendChild(h('div.bextra', extras));
   const bagArt = KIT.ART.bag ? h('img.bagimg', { src: KIT.ART.bag, alt: '' }) : h('span.bagimg', { html: ico('bag', 80) });
   const bag = dm ? h('button.btn.drawb.bagb' + (BF.pulling ? '.pull' : ''), { 'data-a': 'mv', 'data-i': legal.indexOf(dm), type: 'button', 'aria-label': 'Draw: pull a chip from your bag (' + bagN(p) + ' chips inside)' },
     h('span.bagwrap', bagArt, h('span.hand', { html: bfHand() }), h('span.bagn', bagN(p))), h('span.bl', 'Draw'))
@@ -83,6 +82,7 @@ function brewDeck(p, v, legal) {
   const stop = sm ? h('button.btn.stopb', { 'data-a': 'mv', 'data-i': legal.indexOf(sm), type: 'button', disabled: BF.pulling ? true : null, 'aria-label': 'Stop and keep ' + D.VP[sp] + ' points and ' + D.COINS[sp] + ' coins' }, h('b', 'Stop'), keep)
     : h('button.btn.stopb.off', { type: 'button', disabled: true, title: 'Pull your first chip first' }, h('b', 'Stop'), p.pot.length ? keep : h('small.keep', 'after a chip'));
   deck.appendChild(h('div.brow', bag, stop));
+  if (extras.length) deck.appendChild(h('div.bextra', extras));   // below Draw/Stop, so the two big buttons never move
   return deck;
 }
 // ---------- the boil: the pot reacts to the risk (CSS on #cwrap, the painted layer reads BF.heat) ----------
@@ -119,7 +119,7 @@ function bfGhostTarget() {
   if (!G || !UI.started || G.phase === 'over' || hotSeat() || UI.coach.level === 'off') return null;
   const p = mineP(); if (!p) return null; const fresh = UI.mode === 'guided' || !UI.prefs.drew;
   if (UI.rsOpen && UI.rsMode === 'report') {
-    if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && !(UI.shopSel || []).length) return document.querySelector('#rs .tok:not([disabled])');
+    if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && !(UI.shopSel || []).length) return document.querySelector('#rs .tok.sug:not([disabled])') || document.querySelector('#rs .tok:not([disabled])');
     if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && (UI.shopSel || []).length) return document.querySelector('#rs [data-a=shopbuy]');
     return null;
   }

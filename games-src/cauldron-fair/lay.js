@@ -34,7 +34,7 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
     await reach('after draws'); await scroll('after draws'); await shot('4mid');
     for (const id of ['scored', 'logd', 'refd', 'rulesd', 'setd']) { await p.click(`.gx-bar [data-gx=${id}]`); await p.waitForTimeout(450); await scroll('drawer ' + id); const idd = await p.evaluate(i => (document.querySelector('.gx-drawer.on') || {}).id, id); if (!idd) fail('drawer did not open', id); await shot('5' + id); await p.keyboard.press('Escape'); await p.waitForTimeout(300); if (await p.evaluate(() => !!document.querySelector('.gx-drawer.on'))) fail('Esc did not close drawer', id); }
     // thumbnails: focus another cauldron
-    { const th = await p.$('#others .th'); if (th) { await th.click(); await p.waitForTimeout(300); await shot('6focus'); await reach('focus'); await scroll('focus'); } else fail('no thumbnails of the other cauldrons'); }
+    { const th = await p.$('#others .th'); if (th) { await th.click(); await p.waitForTimeout(300); await shot('6focus'); await reach('focus'); await scroll('focus'); const bk = await p.$('#acts .backb'); if (bk) { await bk.click(); await p.waitForTimeout(300); } else fail('no way back to your own cauldron'); } else fail('no thumbnails of the other cauldrons'); }
     // play on: first day report and the final
     await p.evaluate(() => { ANIM = 0; AIDELAY = 0; });
     let r1 = await L.playTo(p, () => !document.querySelector('#rs').hidden && G.phase !== 'over', 3000);

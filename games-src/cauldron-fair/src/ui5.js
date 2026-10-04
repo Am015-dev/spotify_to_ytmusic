@@ -163,13 +163,15 @@ function onlineEl() {
 function showStart() { try { GX.close(); } catch (e) { } UI.sv = 'title'; UI.cfgOpen = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } closeRS(true); Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; renderStart(); }
 // ---------- events ----------
 document.addEventListener('click', ev => {
-  const t = ev.target.closest('[data-a],[data-start]'); if (!t) return;
+  const t = ev.target.closest('[data-a],[data-start]');
+  if (!t) { if (ev.target.closest('#cwrap,#caul')) { const b = document.querySelector('.bagb:not([disabled])'); if (b) b.click(); } return; }   // tapping your own pot pulls a chip too
   const a = t.dataset.a, d = t.dataset;
   if (typeof netClick === 'function' && netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'mv': {
-      const v = viewSeat(); if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
+      const v = viewSeat(); if (UI.qT && Date.now() - UI.qT < 450 && t.closest('#qbox')) break;   // a pop-up that just opened under a finger ignores that tap
+      if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
       const m = (UI.legal[v] || [])[+d.i];
       if (m) {
         if (m.t === 'flask') { const pl = G.players[v], wc = pl.pot.filter(c => c.c === 'W').length; if (wc <= 1 && UI.flaskArm !== pl.ver) { UI.flaskArm = pl.ver; toast('That is your only white chip. Tap Flask again to put it back.'); break; } }

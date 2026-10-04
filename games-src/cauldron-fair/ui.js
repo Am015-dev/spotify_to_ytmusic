@@ -275,13 +275,14 @@ function renderActs() {
   a.appendChild(brewDeck(p, v, legal));
 }
 function renderQ(p, legal, qb) {
-  const q = p.q, info = QINFO[q.h]; qb.hidden = false;
+  const q = p.q, info = QINFO[q.h]; if (qb.hidden) UI.qT = Date.now(); qb.hidden = false;
   const fromCard = { pick: 1, swap: 1, clear: 1, bribe: 1, bounty: 1, fork: 1, haggle: 1, peek: 1, gift: 1, restart: 1 }[q.h];
-  qb.append(h('div.qt', h('b', (fromCard ? 'Today\'s fortune card: ' : '') + info[0]), h('div', info[1](p, q.d))));
+  qb.append(h('div.qt', h('b', (fromCard ? 'Today\'s fortune card: ' : '') + info[0]), h('div.qx', info[1](p, q.d))));
   if (p.hold.length && p.hold[0] && p.hold[0].c) qb.append(h('div.hold', { 'data-priv': p.seat }, p.hold.map((c, i) => h('span.cb', chipN(c.c + c.v, 34)))));
   const opts = h('div.opts' + (legal.length > 3 ? '.g2' : ''));
   legal.forEach(m => opts.appendChild(moveBtn(m, p)));
   qb.append(opts);
+  if (typeof sugMark === 'function') sugMark(qb, p, q, legal);
 }
 function renderBar() {
   const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
@@ -480,7 +481,7 @@ function renderReport() {
       h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', gTxt), why.length ? h('div.sm.why', why.join(' ')) : null), h('td', h('b', p.vp))));
     sumParts.push((p.seat === v ? 'You' : p.name) + ' ' + gTxt);
     cards.appendChild(h('div.dc' + (p.seat === v ? '.me' : '') + (r.boom && !r.prot ? '.bm' : ''), h('span.dav', { html: avHTML(p.seat, 44) }), h('b.dn', p.seat === v ? 'You' : p.name),
-      h('span.dg', { html: ico('vp', 18) + ' ' + esc(gTxt) }), h('span.dr', r.boom ? (r.prot ? 'boom, safe' : 'boom!') : 'stopped'), h('span.dt', 'total ' + p.vp)));
+      h('span.dg', { html: ico('vp', 18) + ' ' + esc(gTxt) }), h('span.dr', r.boom ? (r.prot ? 'boom, safe' : 'boom! ★ or 🪙, not both') : 'stopped'), h('span.dt', 'total ' + p.vp)));
   }
   if (G.players.some(p => { const r = dayRow(p, R); return r && r.die && r.die.length; })) tab.appendChild(h('tr', h('td.sm', { colspan: '5' }, 'The boxed number is the bonus die: the furthest cauldron that did not explode rolls it (a tie: all of them).')));
   const lines = hotPriv ? [] : G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo) && !/ has decided\.$|^Stir!/.test(l.t)); let ev = null;
@@ -501,7 +502,7 @@ function renderReport() {
   if (UI.rsFoot) UI.rsFoot.forEach(e => foot.appendChild(e));
   else if (hotShared) foot.appendChild(h('div.cbtns', h('button.btn.go', { 'data-a': 'hotgo', type: 'button' }, 'Next: private choices')));
   else { const btns = h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' });
-    btns.appendChild(h('button.btn.go' + (done ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done ? null : true }, done ? next : 'Choose above first'));
+    btns.appendChild(h('button.btn.go' + (done ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done ? null : true }, done ? next : (myq ? 'Choose above first' : 'Waiting…')));
     if (typeof NET !== 'undefined' && NET.on && done) btns.appendChild(h('span.sm', 'Closes by itself in a moment.'));
     foot.appendChild(btns); }
   box.appendChild(foot);
@@ -517,7 +518,21 @@ function repContinue() {
 // ---------- decisions inside the report ----------
 const DEC_SHORT = { shop: 'Shop: tap chips for your bag', ruby: 'Spend rubies?', de: 'Boom! Points OR shopping?' };
 function tileBtn(m, p, big, small, icons) { return h('button.btn.alt.tile', { 'data-a': 'mv', 'data-i': UI.legal[p.seat].indexOf(m), type: 'button', 'aria-label': m.label }, h('span.ti1', { html: icons }), h('b.ti2', big), small ? h('span.ti3', small) : null); }
-function decisionBox(p, q) {
+// a glowing "best" on the choice a good maker would take, so no choice screen is a guess
+function sugMark(box, p, q, legal) {
+  try {
+    if (q.h === 'shop') {
+      const keys = CF.AI.shopChoice(G, p, q.d.coins, 'normal', () => 0.5) || []; const left = keys.slice();
+      box.querySelectorAll('.stalls .tok').forEach(b => { const i = left.indexOf(b.dataset.k); if (i >= 0 && !b.disabled) { left.splice(i, 1); b.classList.add('sug'); } });
+      return;
+    }
+    let m = CF.AI.choose(G, p.seat, 'normal'); if (!m) return; if (q.h === 'crow' && m.idx >= 0 && p.hold[m.idx] && p.hold[m.idx].c === 'W') m = legal.find(x => x.idx === -1) || m; const js = JSON.stringify(stripM ? stripM(m) : m);
+    const i = legal.findIndex(x => JSON.stringify(stripM ? stripM(x) : x) === js); if (i < 0) return;
+    const b = box.querySelector('[data-a=mv][data-i="' + i + '"]'); if (b) b.classList.add('sug');
+  } catch (e) {}
+}
+function decisionBox(p, q) { const box = decisionBox0(p, q); sugMark(box, p, q, UI.legal[p.seat] || []); return box; }
+function decisionBox0(p, q) {
   const info = QINFO[q.h], legal = mvList(p.seat); UI.legal[p.seat] = legal;
   const short = DEC_SHORT[q.h];
   const box = h('div.dec.dec-' + q.h, h('h3', short || info[0]), short ? null : h('div.sm', info[1](p, q.d)));
@@ -777,13 +792,15 @@ function onlineEl() {
 function showStart() { try { GX.close(); } catch (e) { } UI.sv = 'title'; UI.cfgOpen = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } closeRS(true); Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; renderStart(); }
 // ---------- events ----------
 document.addEventListener('click', ev => {
-  const t = ev.target.closest('[data-a],[data-start]'); if (!t) return;
+  const t = ev.target.closest('[data-a],[data-start]');
+  if (!t) { if (ev.target.closest('#cwrap,#caul')) { const b = document.querySelector('.bagb:not([disabled])'); if (b) b.click(); } return; }   // tapping your own pot pulls a chip too
   const a = t.dataset.a, d = t.dataset;
   if (typeof netClick === 'function' && netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'mv': {
-      const v = viewSeat(); if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
+      const v = viewSeat(); if (UI.qT && Date.now() - UI.qT < 450 && t.closest('#qbox')) break;   // a pop-up that just opened under a finger ignores that tap
+      if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
       const m = (UI.legal[v] || [])[+d.i];
       if (m) {
         if (m.t === 'flask') { const pl = G.players[v], wc = pl.pot.filter(c => c.c === 'W').length; if (wc <= 1 && UI.flaskArm !== pl.ver) { UI.flaskArm = pl.ver; toast('That is your only white chip. Tap Flask again to put it back.'); break; } }
@@ -952,11 +969,10 @@ function brewDeck(p, v, legal) {
   const deck = h('div.bdeck' + (heat > .7 ? '.hot' : ''));
   deck.appendChild(h('div.bline', { 'aria-live': 'polite' }, bfLine(p, r, fm)));
   deck.appendChild(bfMeter(p, v, p.lock ? null : fm, legal));
-  const extras = [legal.find(x => x.t === 'froth') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'froth')), type: 'button' }, 'Put the first white back (free)') : null,
+  const extras = [legal.find(x => x.t === 'froth') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'froth')), type: 'button' }, '↩ White chip back, free') : null,
     legal.find(x => x.t === 'restart') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'restart')), type: 'button' }, 'Do-over: tip the chips back, once') : null].filter(Boolean);
   const rat = legal.filter(x => x.t === 'ratset');
   if (rat.length) { const k = p.rat - p.droplet; const d = h('details.ratd', h('summary', h('span', { html: ico('rat', 18) }), 'Head start +' + k)); const row = h('div.ratrow'); rat.forEach(x => row.appendChild(h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(x), type: 'button' }, x.n ? 'Only +' + x.n : 'None'))); d.appendChild(row); extras.push(d); }
-  if (extras.length) deck.appendChild(h('div.bextra', extras));
   const bagArt = KIT.ART.bag ? h('img.bagimg', { src: KIT.ART.bag, alt: '' }) : h('span.bagimg', { html: ico('bag', 80) });
   const bag = dm ? h('button.btn.drawb.bagb' + (BF.pulling ? '.pull' : ''), { 'data-a': 'mv', 'data-i': legal.indexOf(dm), type: 'button', 'aria-label': 'Draw: pull a chip from your bag (' + bagN(p) + ' chips inside)' },
     h('span.bagwrap', bagArt, h('span.hand', { html: bfHand() }), h('span.bagn', bagN(p))), h('span.bl', 'Draw'))
@@ -965,6 +981,7 @@ function brewDeck(p, v, legal) {
   const stop = sm ? h('button.btn.stopb', { 'data-a': 'mv', 'data-i': legal.indexOf(sm), type: 'button', disabled: BF.pulling ? true : null, 'aria-label': 'Stop and keep ' + D.VP[sp] + ' points and ' + D.COINS[sp] + ' coins' }, h('b', 'Stop'), keep)
     : h('button.btn.stopb.off', { type: 'button', disabled: true, title: 'Pull your first chip first' }, h('b', 'Stop'), p.pot.length ? keep : h('small.keep', 'after a chip'));
   deck.appendChild(h('div.brow', bag, stop));
+  if (extras.length) deck.appendChild(h('div.bextra', extras));   // below Draw/Stop, so the two big buttons never move
   return deck;
 }
 // ---------- the boil: the pot reacts to the risk (CSS on #cwrap, the painted layer reads BF.heat) ----------
@@ -1001,7 +1018,7 @@ function bfGhostTarget() {
   if (!G || !UI.started || G.phase === 'over' || hotSeat() || UI.coach.level === 'off') return null;
   const p = mineP(); if (!p) return null; const fresh = UI.mode === 'guided' || !UI.prefs.drew;
   if (UI.rsOpen && UI.rsMode === 'report') {
-    if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && !(UI.shopSel || []).length) return document.querySelector('#rs .tok:not([disabled])');
+    if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && !(UI.shopSel || []).length) return document.querySelector('#rs .tok.sug:not([disabled])') || document.querySelector('#rs .tok:not([disabled])');
     if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && (UI.shopSel || []).length) return document.querySelector('#rs [data-a=shopbuy]');
     return null;
   }

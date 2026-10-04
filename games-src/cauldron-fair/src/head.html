@@ -372,7 +372,7 @@ html.ph .gx-dock:has(#qbox:not([hidden])) #promptDock{display:none}
 .meter .mp.lo{color:#9ef07a}.meter .mp.mid{color:#ffd35a}.meter .mp.hi{color:#ff8a76}
 .meter .flb{flex:0 0 auto;appearance:none;border:2px solid #9ad8e6;background:#3e6d80;border-radius:50%;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;margin:-4px -4px -4px 0;animation:flglow 1s ease-in-out infinite alternate}
 @keyframes flglow{to{box-shadow:0 0 10px 3px rgba(154,216,230,.85)}}
-.bextra{display:flex;gap:6px;flex-wrap:wrap}.bextra .btn.sec{flex:1 1 140px;min-height:44px;font-size:13px}
+.bextra{margin-top:6px;display:flex;gap:6px;flex-wrap:wrap}.bextra .btn.sec{flex:1 1 140px;min-height:44px;font-size:13px}
 .ratd summary{display:flex;align-items:center;gap:4px;min-height:44px;font-weight:800;font-size:13px;cursor:pointer;padding:0 8px;border-radius:10px;background:#efdfbd}
 .ratrow{display:flex;gap:5px;flex-wrap:wrap;padding-top:4px}
 .brow{display:flex;gap:8px;align-items:stretch}
@@ -443,6 +443,10 @@ html.pulling #acts .btn.stopb{opacity:.6}
 .tok{appearance:none;flex:1 1 0;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:2px solid transparent;border-radius:10px;cursor:pointer;padding:2px}
 .tok:not([disabled]):hover{background:rgba(242,184,30,.15)}
 .tok.on{border-color:var(--gold);background:#fff0b8}
+.sug{position:relative;box-shadow:0 0 0 3px #ffd24a,0 0 14px 4px rgba(255,210,74,.75)!important;animation:sugP 1.3s ease-in-out infinite}
+.sug::after{content:'best';position:absolute;top:-9px;right:-6px;background:#e0a020;color:#fff;font:900 11px/16px sans-serif;padding:0 5px;border-radius:8px;pointer-events:none;z-index:2}
+.tok.sug::after{content:'buy';right:-2px}.tok.on.sug::after{content:none}
+@keyframes sugP{50%{box-shadow:0 0 0 3px #ffe680,0 0 20px 6px rgba(255,210,74,.9)}}
 .tok[disabled]{opacity:.32;filter:grayscale(.7);cursor:default}
 .tok .pc{display:inline-flex;align-items:center;gap:2px;font-size:13px;font-weight:900}
 .shopfoot{display:flex;align-items:center;gap:8px;width:100%}
@@ -468,6 +472,9 @@ html.ph-short .bagb .bl{font-size:13px}html.ph-short #acts .btn.stopb b{font-siz
 html.ph-short .meter .flb{width:44px;height:44px;margin:-7px -4px -7px 0}
 html.ph .rsbox .dec h3{margin:2px 0}
 html.ph .stalls{grid-template-columns:1fr 1fr}
+html.ph .qt .qx{display:none}
+.stall,.toks{min-width:0}.tok{min-width:0}
+@media (max-width:400px){.tok svg{width:34px;height:34px}.stall{padding:3px 3px 4px}.toks{gap:2px}}
 @media (max-height:600px){.tok{min-height:52px}.tok svg{width:32px;height:32px}.sbimg{width:44px;height:44px}.shopbag{min-height:52px}}
 .dec h3{font-size:18px;text-align:center}
 .tiles{display:flex;gap:8px;flex-wrap:wrap}
@@ -480,5 +487,10 @@ html.ph .rsbox.fix{height:auto}html.ph .rsbox.fix:has(.shop){height:100%}
 .rsfoot .cbtns .btn.go{flex:1 1 auto;min-height:56px;font-size:19px}
 html.ph #risk{display:none}
 .deckon #promptDock{display:none}
+/* iOS Safari: a touch-scrolling dock body traps its fixed children (tip card, question sheet) in its own layer, under the painted
+   cauldron canvas. Lift the whole dock above the board and drop the legacy touch scrolling. */
+.gx-dock{z-index:4}
+html.ph.ph-p .gx-dock{min-height:var(--dockh)}
+.gx-dock-body{-webkit-overflow-scrolling:auto}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 </style></head>

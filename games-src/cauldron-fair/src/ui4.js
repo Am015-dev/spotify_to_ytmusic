@@ -40,7 +40,7 @@ function renderReport() {
       h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', gTxt), why.length ? h('div.sm.why', why.join(' ')) : null), h('td', h('b', p.vp))));
     sumParts.push((p.seat === v ? 'You' : p.name) + ' ' + gTxt);
     cards.appendChild(h('div.dc' + (p.seat === v ? '.me' : '') + (r.boom && !r.prot ? '.bm' : ''), h('span.dav', { html: avHTML(p.seat, 44) }), h('b.dn', p.seat === v ? 'You' : p.name),
-      h('span.dg', { html: ico('vp', 18) + ' ' + esc(gTxt) }), h('span.dr', r.boom ? (r.prot ? 'boom, safe' : 'boom!') : 'stopped'), h('span.dt', 'total ' + p.vp)));
+      h('span.dg', { html: ico('vp', 18) + ' ' + esc(gTxt) }), h('span.dr', r.boom ? (r.prot ? 'boom, safe' : 'boom! ★ or 🪙, not both') : 'stopped'), h('span.dt', 'total ' + p.vp)));
   }
   if (G.players.some(p => { const r = dayRow(p, R); return r && r.die && r.die.length; })) tab.appendChild(h('tr', h('td.sm', { colspan: '5' }, 'The boxed number is the bonus die: the furthest cauldron that did not explode rolls it (a tie: all of them).')));
   const lines = hotPriv ? [] : G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo) && !/ has decided\.$|^Stir!/.test(l.t)); let ev = null;
@@ -61,7 +61,7 @@ function renderReport() {
   if (UI.rsFoot) UI.rsFoot.forEach(e => foot.appendChild(e));
   else if (hotShared) foot.appendChild(h('div.cbtns', h('button.btn.go', { 'data-a': 'hotgo', type: 'button' }, 'Next: private choices')));
   else { const btns = h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' });
-    btns.appendChild(h('button.btn.go' + (done ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done ? null : true }, done ? next : 'Choose above first'));
+    btns.appendChild(h('button.btn.go' + (done ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done ? null : true }, done ? next : (myq ? 'Choose above first' : 'Waiting…')));
     if (typeof NET !== 'undefined' && NET.on && done) btns.appendChild(h('span.sm', 'Closes by itself in a moment.'));
     foot.appendChild(btns); }
   box.appendChild(foot);
@@ -77,7 +77,21 @@ function repContinue() {
 // ---------- decisions inside the report ----------
 const DEC_SHORT = { shop: 'Shop: tap chips for your bag', ruby: 'Spend rubies?', de: 'Boom! Points OR shopping?' };
 function tileBtn(m, p, big, small, icons) { return h('button.btn.alt.tile', { 'data-a': 'mv', 'data-i': UI.legal[p.seat].indexOf(m), type: 'button', 'aria-label': m.label }, h('span.ti1', { html: icons }), h('b.ti2', big), small ? h('span.ti3', small) : null); }
-function decisionBox(p, q) {
+// a glowing "best" on the choice a good maker would take, so no choice screen is a guess
+function sugMark(box, p, q, legal) {
+  try {
+    if (q.h === 'shop') {
+      const keys = CF.AI.shopChoice(G, p, q.d.coins, 'normal', () => 0.5) || []; const left = keys.slice();
+      box.querySelectorAll('.stalls .tok').forEach(b => { const i = left.indexOf(b.dataset.k); if (i >= 0 && !b.disabled) { left.splice(i, 1); b.classList.add('sug'); } });
+      return;
+    }
+    let m = CF.AI.choose(G, p.seat, 'normal'); if (!m) return; if (q.h === 'crow' && m.idx >= 0 && p.hold[m.idx] && p.hold[m.idx].c === 'W') m = legal.find(x => x.idx === -1) || m; const js = JSON.stringify(stripM ? stripM(m) : m);
+    const i = legal.findIndex(x => JSON.stringify(stripM ? stripM(x) : x) === js); if (i < 0) return;
+    const b = box.querySelector('[data-a=mv][data-i="' + i + '"]'); if (b) b.classList.add('sug');
+  } catch (e) {}
+}
+function decisionBox(p, q) { const box = decisionBox0(p, q); sugMark(box, p, q, UI.legal[p.seat] || []); return box; }
+function decisionBox0(p, q) {
   const info = QINFO[q.h], legal = mvList(p.seat); UI.legal[p.seat] = legal;
   const short = DEC_SHORT[q.h];
   const box = h('div.dec.dec-' + q.h, h('h3', short || info[0]), short ? null : h('div.sm', info[1](p, q.d)));
