@@ -96,7 +96,7 @@ function setRats(G) {
   const lead = leaderVp(G);
   for (const p of G.players) {
     const t = p.vp < lead ? D.ratTails(p.vp, lead) : 0; p.ratTails = t;
-    if (t > 0) { p.rat = Math.min(LASTC, p.droplet + t); ev(G, { t: 'rat', seat: p.seat, tails: t, pos: p.rat }); lg(G, nm(G, p) + ' trails by ' + t + ' rat tail' + (t > 1 ? 's' : '') + ': the rat stone starts ' + t + ' space' + (t > 1 ? 's' : '') + ' ahead.'); use(G, 'rat'); }
+    if (t > 0) { p.rat = Math.min(LASTC, p.droplet + t); ev(G, { t: 'rat', seat: p.seat, tails: t, pos: p.rat }); lg(G, nm(G, p) + ' is behind the leader on points (' + t + ' rat tail' + (t > 1 ? 's' : '') + '), so the rat stone gives a head start of ' + t + ' space' + (t > 1 ? 's' : '') + '.'); use(G, 'rat'); }
   }
 }
 
