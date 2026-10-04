@@ -105,6 +105,16 @@ Not met:
   numbers).
 - **Later-job jargon is unexplained** in briefings ("Handsets and Equal Tag are swapped out").
 
-## Tests (full run at the end)
+## Tests (full run at the end, final build)
 
-See the table in the commit/PR. Node tests: `rules-test.js` 100/100 passed and `clarity-test.js` PASS.
+| Test | Result |
+|---|---|
+| `rules-test.js` | 100 passed, 0 failed |
+| `hidden-test.js 2` | 524 games, 8288 poisoned decisions, 0 differences; the peeking control was caught 713/802 times |
+| `tools/net-strip-test.js` | PASS (no differences by job) |
+| `clarity-test.js 10` (new) | PASS: 142 human turns |
+| `click.js` (jsdom, every mode incl. guided and hot-seat) | 24 games, 0 errors |
+| `click-phone.js` | 19 games, 0 errors |
+| `lay.js` 1366x768, 1920x1080, 768x1024, 1100x700 | PROBLEMS 0 each (run with an empty local font cache, so system fonts) |
+| `lay-phone.js` 390x844, 390x763, 390x664, 375x553, 412x780, 844x390, 750x342 | PROBLEMS 0 each. 375x553 first failed (the wrapped action row pushed the strip out of view); fixed by wrapping only on phones at least 640 px tall |
+| `net/p2p-sf.js full1` and `p2p-sf-phone.js full1` (real WebRTC, local relay) | host and client agree on every job, 0 rejected moves |
