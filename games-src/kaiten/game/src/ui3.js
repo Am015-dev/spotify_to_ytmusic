@@ -121,7 +121,7 @@ function hint() {
   UI.rec = { ids: mv.ids.slice(), pick: mv.pick.slice() };
   UI.twin = mv.pick.length === 2; UI.sel = mv.pick.slice(); render();
   const pp = $('#prompt'); const why = whyPick(mv.ids);
-  toast('A good pick: ' + mv.ids.map(cname).join(' + ') + '. ' + why);
+  if (!isPh()) toast('A good pick: ' + mv.ids.map(cname).join(' + ') + '. ' + why);   // phones: the reason shows in the panel, not over the buttons
 }
 // ---------- hot-seat ----------
 function hotNext() {
@@ -152,7 +152,7 @@ async function playResolve(evs, preHand) {
     if (v >= 0 && preHand) { const pk = rv.picks[v]; const gone = new Set(pk.cards.map(c => c.id)); hand = preHand.filter(id => !gone.has(id)); if (pk.chop >= 0) hand.push(pk.chop); }
     const backN = hand ? hand.length : (ps ? ps.sizes[0] : 0);
     const pudSub = sc ? T.map(t => t.filter(e => tkey(e.id) === 'pudding').length) : new Array(np).fill(0);
-    UI.fz = { tables: before, slots: rv.picks.map(() => ({ mode: 'cover' })), hand: hand || (hotSeat() || v < 0 ? null : []), backN, pudSub, roundEnd: false, say: 'Everyone has chosen. The plates are under covers…' };
+    UI.fz = { tables: before, slots: rv.picks.map(() => ({ mode: 'cover' })), hand: hand || (hotSeat() || v < 0 ? null : []), backN, pudSub, roundEnd: false, scoring: !!sc, say: 'Everyone has chosen. The plates are under covers…' };
     if (!hand && v < 0) UI.fz.hand = null;
     UI.sel = []; UI.twin = false; UI.rec = null;
     render(); await wait(450); if (tok !== UI.seq) return;

@@ -108,7 +108,7 @@ function groupsOf(s, tab, sc) {
     if (by[k][1]) mk('pn-' + k, { type: 'wasabi', on: k, n: by[k][1], pts: 3 * NIG[k] * by[k][1], hint: '= ' + 3 * NIG[k] * by[k][1], cls: 'ok', tip: by[k][1] + ' ' + TY[k].name + ' on Fire Paste: tripled to ' + 3 * NIG[k] + ' each.' });
   }
   if (c.wasabiUnused) mk('wasabi', { type: 'wasabi', n: c.wasabiUnused, pts: 0, hint: '×3 next nigiri', cls: 'wait', pulse: true, tip: c.wasabiUnused + ' Fire Paste waiting for a nigiri: your next nigiri lands on it and scores triple. With none it scores nothing.' });
-  if (c.chop) mk('chop', { type: 'chop', n: c.chop, pts: 0, hint: 'serve 2 later', cls: 'ok', tip: 'Twin Sticks on the table: on a later turn you may serve two plates from your hand, then the sticks go back into that hand and move on to the next diner with it.' });
+  if (c.chop) mk('chop', { type: 'chop', n: c.chop, pts: 0, hint: '2 plates later', cls: 'ok', tip: 'Twin Sticks on the table: on a later turn you may serve two plates from your hand, then the sticks go back into that hand and move on to the next diner with it.' });
   const pud = t.filter(e => tkey(e.id) === 'pudding').length;
   return { list: out, pudNow: pud };
 }

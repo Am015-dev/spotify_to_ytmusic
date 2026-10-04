@@ -658,7 +658,7 @@ function roundTrackSVG(cur, o) {
 function scorePadSVG(o) {
   o = o || {}; const rows = o.rows || [], w = o.w || 360, rh = Math.max(34, o.rowH || 36), fs = 14, head = 54, foot = 12;
   const H = head + rows.length * rh + foot + (o.title === false ? -20 : 0);
-  const cols = ['R1', 'R2', 'R3', 'Sweets', 'Total'];
+  const cols = ['R1', 'R2', 'R3', 'Custard', 'Total'];
   const nameW = w * .30, cw = (w - nameW - 20) / 5, cur = o.round || 0;
   let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-pad" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}" role="img" aria-label="Score pad">`;
   if (o.standalone) s += K.defs();

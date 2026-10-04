@@ -10,11 +10,12 @@ function render() {
 }
 function renderBar() {
   const s = $('#barstat'); if (!s) return;
-  const re = UI.fz && UI.fz.roundEnd, rd = re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round;
-  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? 'Round ' + rd + ' of ' + D.rounds + ' · scoring' : (isPh() ? 'Round ' + G.round + '/' + D.rounds + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + D.rounds + ' · Turn ' + G.turn + ' of ' + G.hand + ' · most points after round 3 wins');
+  // fz.scoring: the engine has already scored this round and dealt the next, but the last reveal is still on screen
+  const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring), rd = re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round;
+  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? (isPh() ? 'Round ' + rd + '/' + D.rounds : 'Round ' + rd + ' of ' + D.rounds) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + D.rounds + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + D.rounds + ' · Turn ' + G.turn + ' of ' + G.hand + ' · most points after round 3 wins');
 }
 function bankedOf(s) {
-  const fzEnd = UI.fz && UI.fz.tables && UI.fz.roundEnd;
+  const fzEnd = UI.fz && UI.fz.tables && (UI.fz.roundEnd || UI.fz.scoring);   // that round is already in G.rs: don't count it twice
   const list = fzEnd ? G.rs.slice(0, -1) : G.rs;
   return list.reduce((a, r) => a + r[s].total, 0);
 }
@@ -168,7 +169,7 @@ function renderBelt() {
     const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked'), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? '. Tap to lift it' + (selPos >= 0 ? (UI.prefs.tap2 ? ', tap again to serve' : ', then press Serve') : '') : '') });
     b.style.setProperty('--k', k);
     b.appendChild(cardNode(ty, hw));
-    if (g != null) b.appendChild(h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : '0'));
+    if (g != null) b.appendChild(ty === 'pudding' ? h('span.gn.z', { title: 'Custard scores at the end of the game' }, 'end') : h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : '0'));
     if (UI.twin && selPos >= 0) b.appendChild(h('span.pn', String(selPos + 1)));
     if (enter) b.classList.add('ent-' + enter);
     b.dataset.rk = key; b.dataset.sg = sg;
@@ -189,6 +190,7 @@ function promptText() {
   const v = viewSeat();
   if (UI.fz && UI.fz.say) return isPh() ? (UI.fz.slots ? (UI.fz.slots[0] && UI.fz.slots[0].mode === 'faces' ? 'Reveal!' : 'Plates are covered…') : UI.fz.roundEnd ? 'Round over!' : 'Plates land. Hands pass left.') : UI.fz.say;
   if (UI.cards.length && UI.cards[0].kind === 'pass') return 'Pass the device to ' + pname(UI.cards[0].seat) + '.';
+  if (UI.busy) return 'The hands pass one seat to the left…';
   if (watching()) return 'The computers are choosing a plate…';
   if (hotSeat() && v < 0) return 'Pass the device to the next diner.';
   const pend = KK.pending(G).filter(s => s !== v).map(pname);
@@ -212,7 +214,7 @@ function renderDock() {
     if (want && !hb && pd) pd.appendChild(h('button.btn.alt#hintb', { 'data-a': 'hint', type: 'button' }, 'Hint')); else if (!want && hb) hb.remove(); }
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' ? 'Game over' : (canPick() ? 'Your turn' : 'Table');
   // round track
-  const rt = $('#rt'); if (rt) { const re = UI.fz && UI.fz.roundEnd; rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · pass left')); }
+  const rt = $('#rt'); if (rt) { const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring); rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · pass left')); }
   // roster chips
   const ro = $('#roster'); if (ro) {
     const tab = tables(), info = seatScoreInfo(tab), v = viewSeat(), f = focusSeat();
@@ -244,8 +246,8 @@ function renderSel() {
     const hand = G.players[v].hand, ids = UI.sel.map(i => hand[i]).filter(x => x != null);
     if (ids.length) {
       const cw = ph ? 56 : 92; const box = h('div.sc1'); const rows = h('div.si');
-      if (ids.length === 1) { box.appendChild(cardNode(tkey(ids[0]), cw)); const ty = tkey(ids[0]); const g = gainOf(v, ids); add(rows, [h('b', TY[ty].name), h('span', TY[ty].ruleText), h('span.sm', g > 0 ? 'Scores +' + g + ' for you right now.' : 'Scores nothing yet.'), ph ? null : h('span.why', whyPick(ids))]); }
-      else { const two = h('div'); two.style.cssText = 'display:flex;gap:2px'; ids.forEach(id => two.appendChild(cardNode(tkey(id), Math.round(cw * .7)))); box.appendChild(two); const g = gainOf(v, ids); add(rows, [h('b', 'Twin Sticks: ' + ids.map(i => TY[tkey(i)].l[0]).join(' + ')), h('span.sm', g > 0 ? 'Both together score +' + g + ' for you right now.' : 'Both together score nothing yet.'), ph ? null : h('span.why', whyPick(ids))]); }
+      if (ids.length === 1) { box.appendChild(cardNode(tkey(ids[0]), cw)); const ty = tkey(ids[0]); const g = gainOf(v, ids); add(rows, [h('b', TY[ty].name), h('span', TY[ty].ruleText), h('span.sm', g > 0 ? 'Scores +' + g + ' for you right now.' : 'Scores nothing yet.'), ph && !UI.rec ? null : h('span.why', (UI.rec ? 'Hint: ' : '') + whyPick(ids))]); }
+      else { const two = h('div'); two.style.cssText = 'display:flex;gap:2px'; ids.forEach(id => two.appendChild(cardNode(tkey(id), Math.round(cw * .7)))); box.appendChild(two); const g = gainOf(v, ids); add(rows, [h('b', 'Twin Sticks: ' + ids.map(i => TY[tkey(i)].l[0]).join(' + ')), h('span.sm', g > 0 ? 'Both together score +' + g + ' for you right now.' : 'Both together score nothing yet.'), ph && !UI.rec ? null : h('span.why', (UI.rec ? 'Hint: ' : '') + whyPick(ids))]); }
       el.append(box, rows); return;
     }
   }

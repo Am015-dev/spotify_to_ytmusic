@@ -138,7 +138,7 @@ function setupEl() {
   // until a first meal is finished, the guided game is the big button
   const first = !lsGet('kk_done');
   const bMeal = cls => h('button.sbtn' + cls, { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', first ? 'Normal game' : 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
-  const bGuide = cls => h('button.sbtn' + cls, { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', first ? 'Start: guided first game' : 'Guided first game'), h('span', 'You and ' + PN[o.seats[0]] + ', with tips' + (first ? ' (recommended)' : '')));
+  const bGuide = cls => h('button.sbtn' + cls, { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', first ? 'Start: guided first game' : 'Guided first game'), h('span', '1 on 1 with ' + PN[o.seats[0]] + ', with tips' + (first ? ' (recommended)' : '')));
   const go = h('div.sgo',
     first ? bGuide('.big') : bMeal('.big'),
     h('div.sgrid3',
