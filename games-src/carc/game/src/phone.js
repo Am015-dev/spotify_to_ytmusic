@@ -147,7 +147,7 @@ function phPopHTML(){if(!G)return '';if(PHN.cards.length)return '';const hp=me()
   if(hp&&G.step==='place'&&UI.ghost)return phPlacePopup(hp);
   if(hp&&G.step==='fig'&&PHN.figHide!==G.turn+':'+G.step)return phFigPopup(hp);return ''}
 function phCoachTip(){if(!UI.guide||!G||!me()||UI.modal||PHN.cards.length)return;const hp=me(),k=(x)=>'ph_'+x;const tk=G.turn+':'+G.step;const once=(key,txt)=>{if(UI.seen[k(key)]||PHN.tipK===tk)return false;PHN.tipK=tk;UI.seen[k(key)]=G.turn;saveSeen();PHN.add(phCoachCard(key,txt));return true};
-  if(G.step==='place'){once('place',`<b>Goal:</b> the most points when the tiles run out. The boxes above show each score now and “end”, what it would be if the game ended now. Tap a glowing square to try your tile there. Edges must match: town to town, road to road, field to field${G.rv?', river to river':''}. Drag the map to move it, pinch or use + and - to zoom.`);
+  if(G.step==='place'){once('place',`<b>Goal:</b> most points when the tiles run out (“end” = the score if it ended now). Tap a glowing square to try your tile: edges must match${G.rv?', river to river':''}.`);
     if(hp.sup.f===0)once('nof','<b>No followers left.</b> They come home when their road, town or priory is finished (farmers never do), so try to finish what you started.')}
   else if(G.step==='fig'){once('fig','You may put ONE follower on the tile you just laid, only where nobody stands yet. It scores and comes home when its road, town or priory is finished. Skip if you want to keep it.');
     const ms=figMoves(hp.i).filter(m=>m.act==='fig');if(ms.some(m=>TSEG[G.tiles[G.cur.k].t][m.l].ty==='F'))once('farm','<b>Farmers</b> never come home. At the end a field pays 3 per finished town it touches to whoever has most farmers there.');
