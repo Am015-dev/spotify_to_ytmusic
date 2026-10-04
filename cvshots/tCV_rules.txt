@@ -1,0 +1,30 @@
+PASS fra: signalled junctions with heads · {"sig":24,"heads":78,"yield":441,"edges":1355}
+PASS fra: neighbouring buildings differ · {"n":2562,"df":2556,"frac":0.9976580796252927}
+PASS fra: street types (medians, tiled ped streets, fountains, parks) · {"median":1742,"medTrees":870,"fountains":9,"pedStreets":0,"parks":56,"parkTrees":2101}
+PASS fra: AI car stops on red within 3 m of the line, queue forms, both go on green · [{"si":3,"k":0,"stop":{"front":0.31,"t":3},"q":{"gap":7.5},"go":6.2,"hold":41,"ranRed":0},{"si":4,"k":0,"stop":{"front":0.31,"t":1.6},"q":{"gap":7.5},"go":2.7,"hold":42.4,"ranRed":0},{"si":5,"k":1,"stop":{"front":0.31,"t":2.8},"q":{"gap":7.5},"go":4,"hold":41.2,"ranRed":0}]
+PASS fra: 3 sim-min at busy signals, no AI collisions inside junctions · {"col":0,"pass":39,"recycled":28,"stopFrames":38657,"frames":3420,"pedOK":22,"pedBad":0,"log":[]}
+PASS fra: pedestrians cross only on walk · {"ok":22,"bad":0}
+PASS fra: running a red with the keys pops "+10 studs DAREDEVIL" · {"dd":1,"feed":"+10 studs DAREDEVIL|📍 NEW · SPEED TRAP: MAINKAI|❓ NEW · POLIZEI FRANKFURT · POLICE CHASE","t":1.8,"st":"r"}
+PASS fra: no page errors · []
+PASS athA: signalled junctions with heads · {"sig":16,"heads":38,"yield":702,"edges":2878}
+PASS athA: neighbouring buildings differ · {"n":4452,"df":4452,"frac":1}
+PASS athA: street types (medians, tiled ped streets, fountains, parks) · {"median":84,"medTrees":42,"fountains":11,"pedStreets":171,"parks":7,"parkTrees":427}
+PASS athA: AI car stops on red within 3 m of the line, queue forms, both go on green · [{"si":4,"k":0,"stop":{"front":0.32,"t":3.1},"q":{"gap":7.5},"go":2,"hold":20.3,"ranRed":0},{"si":8,"k":0,"stop":{"front":0.31,"t":1.9},"q":{"gap":7.5},"go":4.5,"hold":25.6,"ranRed":0},{"si":9,"k":0,"stop":{"front":0.31,"t":3.2},"q":{"gap":7.5},"go":6.2,"hold":32.8,"ranRed":0}]
+PASS athA: 3 sim-min at busy signals, no AI collisions inside junctions · {"col":0,"pass":69,"recycled":12,"stopFrames":33547,"frames":3420,"pedOK":34,"pedBad":0,"log":[]}
+PASS athA: pedestrians cross only on walk · {"ok":34,"bad":0}
+PASS athA: running a red with the keys pops "+10 studs DAREDEVIL" · {"dd":1,"feed":"+10 studs DAREDEVIL|STUDS ×6+5|STUDS ×1+10","t":1.9,"st":"r"}
+PASS athA: no page errors · []
+PASS athB: signalled junctions with heads · {"sig":32,"heads":73,"yield":1024,"edges":4214}
+PASS athB: neighbouring buildings differ · {"n":7376,"df":7376,"frac":1}
+PASS athB: street types (medians, tiled ped streets, fountains, parks) · {"median":132,"medTrees":64,"fountains":11,"pedStreets":168,"parks":7,"parkTrees":427}
+PASS athB: no page errors · []
+PASS athC: signalled junctions with heads · {"sig":13,"heads":32,"yield":1105,"edges":4495}
+PASS athC: neighbouring buildings differ · {"n":12786,"df":12786,"frac":1}
+PASS athC: street types (medians, tiled ped streets, fountains, parks) · {"median":133,"medTrees":69,"fountains":11,"pedStreets":53,"parks":7,"parkTrees":427}
+PASS athC: no page errors · []
+PASS athD: signalled junctions with heads · {"sig":5,"heads":12,"yield":864,"edges":3632}
+PASS athD: neighbouring buildings differ · {"n":9618,"df":9618,"frac":1}
+PASS athD: street types (medians, tiled ped streets, fountains, parks) · {"median":144,"medTrees":75,"fountains":11,"pedStreets":37,"parks":7,"parkTrees":427}
+PASS athD: no page errors · []
+tCV ALL PASS
+EXIT 0

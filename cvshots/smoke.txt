@@ -1,0 +1,13 @@
+PASS fra: throttle moves the car · {"v":49.2,"d":145,"dh":1.62}
+PASS fra: steering turns the car · {"v":49.2,"d":145,"dh":1.62}
+PASS fra: 700 m GPS drive, no air, not stuck · {"len":860,"t":28.5,"air":0,"spk":0,"stuck":0,"done":true}
+PASS fra: NEXT objective pill visible
+PASS ath A: boots into the district · {"cid":"ath","d":"A"}
+PASS ath A: 700 m GPS drive, no hop, not stuck · {"len":1491,"t":48.1,"air":0,"spk":0,"stuck":0,"done":true}
+PASS ath B: boots into the district · {"cid":"ath","d":"B"}
+PASS ath B: 700 m GPS drive, no hop, not stuck · {"len":779,"t":25,"air":0,"spk":0,"stuck":0,"done":true}
+PASS race: player covers ground in 30 s (auto/AI-free) · {"st":"race","d":1059}
+PASS phone port: touch buttons on screen, no overlaps · {"n":9,"off":[],"ov":[]}
+PASS phone land: touch buttons on screen, no overlaps · {"n":9,"off":[],"ov":[]}
+PASS no page / console errors · []
+SMOKE PASS · 529 s · sheet /home/user/spotify_to_ytmusic/smoke/sheet.png

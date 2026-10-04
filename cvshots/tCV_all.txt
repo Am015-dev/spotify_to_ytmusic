@@ -1,0 +1,45 @@
+PASS fra: signalled junctions with heads · {"sig":24,"heads":78,"yield":441,"edges":1355}
+PASS fra: neighbouring buildings differ · {"n":2562,"df":2556,"frac":0.9976580796252927}
+PASS fra: street types (medians, tiled ped streets, fountains, parks) · {"median":1742,"medTrees":870,"fountains":9,"pedStreets":0,"parks":56,"parkTrees":2101}
+PASS fra: AI car stops on red within 3 m of the line, queue forms, both go on green · [{"si":3,"k":0,"stop":{"front":0.31,"t":3},"q":{"gap":7.5},"go":2.7,"hold":41,"ranRed":0},{"si":4,"k":0,"stop":{"front":0.31,"t":1.6},"q":{"gap":7.5},"go":8.9,"hold":42.4,"ranRed":0},{"si":5,"k":1,"stop":{"front":0.31,"t":2.8},"q":{"gap":7.5},"go":7.5,"hold":41.2,"ranRed":0}]
+PASS fra: 3 sim-min at busy signals, no AI collisions inside junctions · {"col":0,"pass":39,"recycled":78,"stopFrames":38072,"frames":3420,"pedOK":19,"pedBad":0,"log":[]}
+PASS fra: pedestrians cross only on walk · {"ok":19,"bad":0}
+PASS fra: running a red with the keys pops "+10 studs DAREDEVIL" · {"dd":1,"feed":"+10 studs DAREDEVIL|📍 NEW · SPEED TRAP: MAINKAI","t":1.8,"st":"r"}
+PASS fra: no page errors · []
+PASS athA: signalled junctions with heads · {"sig":16,"heads":38,"yield":702,"edges":2878}
+PASS athA: neighbouring buildings differ · {"n":4452,"df":4452,"frac":1}
+PASS athA: street types (medians, tiled ped streets, fountains, parks) · {"median":84,"medTrees":42,"fountains":11,"pedStreets":171,"parks":7,"parkTrees":427}
+PASS athA: AI car stops on red within 3 m of the line, queue forms, both go on green · [{"si":4,"k":0,"stop":{"front":0.32,"t":3.1},"q":{"gap":7.5},"go":2.3,"hold":20.3,"ranRed":0},{"si":8,"k":0,"stop":{"front":0.31,"t":1.9},"q":{"gap":7.5},"go":4.9,"hold":25.6,"ranRed":0},{"si":9,"k":0,"stop":{"front":0.31,"t":3.2},"q":{"gap":7.5},"go":2.3,"hold":32.8,"ranRed":0}]
+PASS athA: 3 sim-min at busy signals, no AI collisions inside junctions · {"col":0,"pass":79,"recycled":394,"stopFrames":22564,"frames":3420,"pedOK":47,"pedBad":0,"log":[]}
+PASS athA: pedestrians cross only on walk · {"ok":47,"bad":0}
+PASS athA: running a red with the keys pops "+10 studs DAREDEVIL" · {"dd":1,"feed":"+10 studs DAREDEVIL|STUDS ×6+10|STUDS ×1+5|❓ NEW · KYR MANOLIS · STRANDED!","t":1.9,"st":"r"}
+PASS athA: no page errors · []
+PASS athB: signalled junctions with heads · {"sig":32,"heads":73,"yield":1024,"edges":4214}
+PASS athB: neighbouring buildings differ · {"n":7376,"df":7376,"frac":1}
+PASS athB: street types (medians, tiled ped streets, fountains, parks) · {"median":132,"medTrees":64,"fountains":11,"pedStreets":168,"parks":7,"parkTrees":427}
+PASS athB: no page errors · []
+PASS athC: signalled junctions with heads · {"sig":13,"heads":32,"yield":1105,"edges":4495}
+PASS athC: neighbouring buildings differ · {"n":12786,"df":12786,"frac":1}
+PASS athC: street types (medians, tiled ped streets, fountains, parks) · {"median":133,"medTrees":69,"fountains":11,"pedStreets":53,"parks":7,"parkTrees":427}
+PASS athC: no page errors · []
+PASS athD: signalled junctions with heads · {"sig":5,"heads":12,"yield":864,"edges":3632}
+PASS athD: neighbouring buildings differ · {"n":9618,"df":9618,"frac":1}
+PASS athD: street types (medians, tiled ped streets, fountains, parks) · {"median":144,"medTrees":75,"fountains":11,"pedStreets":37,"parks":7,"parkTrees":427}
+PASS athD: no page errors · []
+INFO fra|Bankenviertel calls 627 -> 641 tris 1929549 -> 2224135 2.2%
+INFO fra|Altstadt calls 758 -> 758 tris 2253804 -> 2556044 0.0%
+INFO fra|Westend calls 412 -> 406 tris 1451969 -> 1666125 -1.5%
+INFO fra|Ostend calls 628 -> 637 tris 2082753 -> 2385489 1.4%
+INFO fra|Osthafen calls 777 -> 795 tris 1900236 -> 2027292 2.3%
+INFO fra|Sachsenhausen calls 844 -> 818 tris 2264372 -> 2502190 -3.1%
+PASS fra: draw calls at 6 spots within +10 % · {"before":4046,"after":4055,"pct":0.2}
+INFO ath|Plaka calls 457 -> 454 tris 1167665 -> 1319903 -0.7%
+INFO ath|Anafiotika calls 454 -> 442 tris 1125785 -> 1254957 -2.6%
+INFO ath|Kolonaki calls 404 -> 411 tris 1141583 -> 1252932 1.7%
+INFO ath|Ambelokipi calls 300 -> 309 tris 1027067 -> 1158943 3.0%
+INFO ath|Palaio Psychiko calls 250 -> 260 tris 875065 -> 1001824 4.0%
+INFO ath|Chalandri calls 367 -> 403 tris 1156861 -> 1328034 9.8%
+PASS ath: draw calls at 6 spots within +10 % · {"before":2232,"after":2279,"pct":2.1}
+PASS every spot within +10 % draw calls
+tCV ALL PASS
+EXIT 0
