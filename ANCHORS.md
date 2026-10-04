@@ -76,3 +76,4 @@ New globals are prefixed `AU_` (plus `window.__au` test handle). localStorage: r
 | `'The tower! Full speed! OPA!'` | `'The tower! Full speed! GO!'` | 1 |
 | `win:'OPA! Best plate-smashing ever!'` | `win:'YES! Best plate-smashing ever!'` | 1 |
 | `txt:"Opa! The Akropolis Cup` | `txt:"Bravo! The Akropolis Cup` | 1 |
+| `'Clear streets! Efcharistó.'` | `'Clear streets! Thank you.'` | 1 |

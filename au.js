@@ -16,7 +16,7 @@ function AU_build(){const A=AU,a=A.a;if(!a||AU_M.on)return;AU_M.on=1;
 function AU_want(){if(typeof M1!=='undefined'&&M1.cs)return'cut';
   if(state==='race'||state==='countdown'||state==='finished')return'race';if(state==='results')return'cut';
   if(state==='roam'&&RO&&RO.ch)return'mission';return CID==='ath'?'ath':'fra'}
-function AU_isDlg(){const v=id=>{const e=document.getElementById(id);return!!e&&!e.hidden&&e.offsetParent!==null};return v('npcSay')||v('story')||v('m1Cs')}
+function AU_isDlg(){const v=id=>{const e=document.getElementById(id);return!!e&&!e.hidden&&e.offsetWidth>0};return v('npcSay')||v('story')||v('m1Cs')}
 function AU_tick(){const a=AU.a,t=a.currentTime,w=AU_want();AU_M.sb=0;
   if(w!==AU_M.cur){const prev=AU_M.cur;AU_M.cur=w;for(const k of AU_KEYS){const on=k===w?1:0;AU_M.tg[k]=on;AU_M.bus[k].gain.cancelScheduledValues(t);AU_M.bus[k].gain.setTargetAtTime(on,t,.45);if(!on&&prev===k)AU_M.till[k]=t+2.6}
     if(w==='cut'&&prev)AU_stinger(t)}

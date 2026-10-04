@@ -52,9 +52,9 @@ const only=(g,k)=>g[k]>.8&&['fra','ath','race','mission','cut'].every(j=>j===k||
  // 4 · English UI text: scanned list of former German / Greek strings must be gone; Athens plate reads "Chapter 1 · Welcome to Athens"
  {const src=fs.readFileSync(__dirname+'/local_dbg.html','utf8');
   const BAN=['Kefalaio','Kalos irthes','Ta stena tis','TELOS TOU CHARTI','ENDE DER KARTE',"'Kapitel'",'Neu in Mainhattan','Die Hafenbande','Kaisers Schatten','Das Finale','Los geht','BAUSTELLE',"'Feierabend'","'Rushhour'",'Brücke gesperrt','Letzte Bahn','Takedown-Rausch','Nachtfinale','Hügel Cup','Brückensprint',
-   'Landeanflug','Hinauf in den','Ankunft im','Einfahrt nach','Über die Felder','Einlaufen in','Kräne am','Durch den Stadtwald',"'Zubringer",'Danke','Wunderbar','Ach nein','Ach,','Ach!','Efcharist','Siga siga','Ela!','yiayia drives','Astynomia','Polizei Frankfurt','Kalimera','Opa!','OPA!',"'Umland'","'Athina'","'Attiki'"];
+   'Landeanflug','Hinauf in den','Ankunft im','Einfahrt nach','Über die Felder','Einlaufen in','Kräne am','Durch den Stadtwald',"'Zubringer",'Danke','Wunderbar','Ach nein','Ach,','Ach!','Efcharist','Siga siga','Ela!','yiayia drives','Astynomia','Polizei Frankfurt','Kalimera','Opa!','OPA!',"'Umland'","fb:['Athina'"];
   const left=BAN.filter(w=>src.includes(w));ok(!left.length,`non-English UI strings: ${BAN.length} scanned, none left`,left);
-  const p=await page(b,{width:1280,height:720});await seed(p,'ath','A');await roam(p);await p.evaluate(()=>__mho.roamSim(60));
+  const p=await page(b,{width:1280,height:720});await seed(p,'ath','A');await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');await roam(p);await p.evaluate(()=>__mho.roamSim(60));
   const t=await p.evaluate(()=>({sub:document.querySelector('#roamPlate small').textContent,}));
   ok(t.sub==='Chapter 1 · Welcome to Athens'&&t.edge==='EDGE OF THE MAP','Athens plate subtitle is English',t);
   const g=await (async()=>{await p.keyboard.press('Shift');await p.waitForTimeout(2000);return buses(p)})();ok(only(g,'ath'),'roam (Athens): bouzouki theme bus up',g);
