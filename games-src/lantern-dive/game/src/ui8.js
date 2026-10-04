@@ -43,14 +43,14 @@ function portraitSVG(id, size) {
     '<path d="M18 50 q4 -8 8 0 q4 -8 8 0" stroke="#4b3470" stroke-width="2" fill="none"/>');
 }
 const CURSE = {
-  low: { name: 'Undertow', text: 'This trick the LOWEST card of the led colour wins. Lanterns still win.', short: 'Lowest wins' },
+  low: { name: 'Undertow', text: 'The LOWEST card of the led colour wins the trick. Lanterns still beat colours (the highest Lantern wins as usual).', short: 'Lowest wins' },
   sleep: { name: 'Lantern Sleep', text: 'Lanterns sleep this trick: a Lantern played on a colour wins nothing.', short: 'Lanterns sleep' },
-  any: { name: 'Riptide', text: 'Every colour counts this trick: the highest number wins, whatever its colour. Lanterns still win.', short: 'Any colour wins' }
+  any: { name: 'Riptide', text: 'Every colour counts: the highest number wins, whatever its colour. Lanterns still beat colours.', short: 'Any colour wins' }
 };
 // ---------- the Descent: 4 zones x (3 dives + a boss), 3 oxygen tanks per zone ----------
 const DESC = [   // difficulty tuned with desc-gauntlet.js (all-computer crew, first-try wins: about 70% / 55% / 35% / 25% per zone)
   { id: 'reef', name: 'Sunlit Reef', depth: '10 m', dives: [{ d: 2 }, { d: 3 }, { d: 4 }], boss: { id: 'eel', d: 4, pool: ['low'], every: 2 } },
-  { id: 'kelp', name: 'Kelp Forest', depth: '40 m', dives: [{ d: 5 }, { d: 5, cmt: 'murky' }, { d: 6 }], boss: { id: 'witch', d: 6, pool: ['sleep', 'low'], every: 2 } },
+  { id: 'kelp', name: 'Kelp Forest', depth: '40 m', dives: [{ d: 4 }, { d: 5, cmt: 'murky' }, { d: 5 }], boss: { id: 'witch', d: 6, pool: ['sleep', 'low'], every: 2 } },
   { id: 'twi', name: 'Twilight Trench', depth: '200 m', dives: [{ d: 6 }, { d: 7 }, { d: 7, cmt: 'murky' }], boss: { id: 'angler', d: 7, pool: ['any', 'sleep', 'low'], every: 2 } },
   { id: 'abyss', name: 'The Abyss', depth: '4000 m', dives: [{ d: 8 }, { d: 8, cmt: 'murky' }, { d: 9 }], boss: { id: 'leviathan', d: 8, pool: ['low', 'sleep', 'any'], every: 1 } }
 ];
@@ -74,7 +74,7 @@ function descentEl() {
     const row = h('div.dsteps');
     Z.dives.forEach((x, si) => { const done = zi < p.z || (zi === p.z && si < p.s), here = zi === p.z && si === p.s; row.append(h('span.dstep' + (done ? '.ok' : '') + (here ? '.here' : ''), { title: 'Difficulty ' + x.d }, done ? (p.stars[zi + ':' + si] ? '★' : '✓') : String(si + 1))); });
     const bdone = zi < p.z, bhere = zi === p.z && p.s >= Z.dives.length;
-    row.append(h('span.dstep.boss' + (bdone ? '.ok' : '') + (bhere ? '.here' : ''), { html: portraitSVG(Z.boss.id, 34), title: CHAR[Z.boss.id].name }));
+    row.append(h('span.dstep.boss' + (bdone ? '.ok' : '') + (bhere ? '.here' : ''), { html: portraitSVG(Z.boss.id, 34) + (bdone ? '<b class="bx">\u2714</b>' : ''), title: CHAR[Z.boss.id].name + (bdone ? ' (defeated)' : '') }));
     zc.append(row); map.append(zc);
   });
   box.append(map);
@@ -87,7 +87,12 @@ function descGo() {
   const p = Desc.load(); if (p.z >= DESC.length) { descReset(); return; }
   const st = descStage(p);
   newGame('descent', { np: 4, kind: 'free', d: st.d, cmt: st.cmt, boss: st.bossDef ? { id: st.bossDef.id, pool: st.bossDef.pool, every: st.bossDef.every } : null });
-  if (G) { G.desc = { zi: st.zi, si: st.si }; render(); autosave(); }
+  if (G) {
+    p.tries = p.tries || {}; const key = st.zi + ':' + st.si; p.tries[key] = (p.tries[key] || 0) + 1; Desc.save(p);
+    G.desc = { zi: st.zi, si: st.si, tryN: p.tries[key] }; G.share = 1; G.mission.name = st.Z.name + (st.bossDef ? ' boss' : ' dive ' + (st.si + 1));
+    if (G.log && G.log.length) G.log.forEach(e => { if (e && typeof e.t === 'string') e.t = e.t.replace('Free dive', G.mission.name); });
+    render(); autosave();
+  }
 }
 function descReset() { Desc.save({ v: 1, z: 0, s: 0, o2: O2MAX, stars: {}, best: Desc.load().best || 0, met: Desc.load().met || {} }); UI.sv = 'descent'; renderStart(); }
 function isBoss() { return !!(G && G.boss); }
@@ -103,6 +108,7 @@ function descResult(box, ok) {
     else { p.fail[key] = 1; p.o2--; if (p.o2 <= 0) { p.s = 0; p.o2 = O2MAX; G.descOut = 1; } }
     Desc.save(p);
   }
+  if (B && ok) box.prepend(h('div.bdef', h('span.dpt', { html: portraitSVG(G.boss.id, 64) }), h('div', h('b', B.name + ' defeated!'), h('span', 'Every job hit home. ' + (DESC[p.z] ? DESC[p.z].name + ' is open, tanks refilled.' : 'The sea is yours.')))));
   const say = (who, txt) => box.append(h('div.say', h('span.dpt', { html: portraitSVG(who, 52) }), h('p', h('b', CHAR[who].name + ': '), txt)));
   if (B) say(G.boss.id, ok ? B.lose : B.win);
   if (ok) say('mara', st.boss ? 'You beat ' + B.name + '! Fresh tanks — on to ' + (DESC[p.z] ? DESC[p.z].name : 'the surface, legends') + '.' : 'Well dived! ' + (p.stars[st.zi + ':' + st.si] ? 'First try — that is a star. ' : '') + 'Next: ' + (descStage(p).boss ? 'the boss of this zone.' : 'dive ' + (descStage(p).si + 1) + '.'));
@@ -141,8 +147,11 @@ function storyCheck() {
       if (!B && st.si === 0 && G.att === 1 && once('zone', { who: 'mara', title: st.Z.name + ' · ' + st.Z.depth, body: st.zi === 0 ? 'Shallow and bright. Pick jobs your cards can do, and help the others with theirs.' : st.zi === 1 ? 'Murky water ahead: in some dives a shown card does not tell if it is the highest or lowest.' : st.zi === 2 ? 'The trench is dark and the jobs are many. Use your signal early.' : 'The Abyss. The Leviathan curses EVERY trick. Good luck, diver.', btn: 'Dive' })) return true;
     }
     if (B && G.phase === 'play' && G.trick && G.trick.plays.length === 0 && G.trick.cu) {
-      const C = CURSE[G.trick.cu];
-      if (once('cu' + G.att + ':' + G.tricks.length, { who: G.boss.id, curse: 1, title: B.name + ' casts ' + C.name + '!', body: C.text + ' (Trick ' + (G.tricks.length + 1) + ' only.)', btn: 'Brace!' })) return true;
+      const C = CURSE[G.trick.cu], n = G.tricks.length, nx = G.boss.sched.findIndex((c, i) => i > n && c);
+      const tail = ' This trick only' + (nx >= 0 ? '; the next curse comes on trick ' + (nx + 1) + '.' : '.');
+      // the full pop-up only the first time a curse appears in a fight; later it is a line in the dock and the red tag on the boss bar
+      if (!UI.said['cut' + G.att + G.trick.cu]) { UI.said['cut' + G.att + G.trick.cu] = 1; UI.said['cu' + G.att + ':' + n] = 1; showDlg({ who: G.boss.id, curse: 1, title: B.name + ' casts ' + C.name + '!', body: C.text + tail, btn: 'Brace!' }); return true; }
+      if (!UI.said['cu' + G.att + ':' + n]) { UI.said['cu' + G.att + ':' + n] = 1; UI.hitAt = Date.now(); UI.news = (UI.news || []).concat(['\u2620 Trick ' + (n + 1) + ': ' + B.name + ' casts ' + C.name + ' \u2014 ' + C.short.toLowerCase() + '.']).slice(-3); render(); }
     }
   }
   if (UI.mode === 'guided') return tutCheck(once);
@@ -186,6 +195,6 @@ function tutCheck(once) {
   }
   if (myTurn && G.trick.plays.length > 0 && tutOnly() >= 0 && once('t6', { who: 'mara', title: pname(G.trick.lead) + ' led a Lantern for you!', body: 'Lanterns are trumps: they beat every colour, and the highest Lantern wins. A Lantern lead must be followed with a Lantern. Play your Lantern 3: it beats ' + G.trick.plays.map(p => cname(p.c)).join(' and ') + ', so you win it and finish your job!', btn: 'Play it' })) return true;
   if (myTurn && G.trick.plays.length > 0 && G.trick.ls < 4 && LD.playable(G, v).length < G.players[v].hand.length && once('t4', { who: 'mara', title: 'Follow the colour', body: pname(G.trick.lead) + ' led ' + D.suits[G.trick.ls].name + '. You MUST play ' + D.suits[G.trick.ls].name + ' if you have it — the dim cards are not allowed. You never have to win.', btn: 'OK' })) return true;
-  if (G.tricks.length >= 1 && G.tricks.length < 3 && G.tricks[G.tricks.length - 1].w !== v && once('tl' + G.tricks.length, { who: 'mara', title: pname(G.tricks[G.tricks.length - 1].w) + ' won that trick', body: 'With ' + cname(G.tricks[G.tricks.length - 1].wc) + ', the highest card. That is fine: your job only cares about the Lantern 3.', btn: 'OK' })) return true;
+  if (G.tricks.length >= 1 && G.tricks.length < 3 && G.tricks[G.tricks.length - 1].w !== v && once('tl' + G.tricks.length, { who: 'mara', title: pname(G.tricks[G.tricks.length - 1].w) + ' won that trick', body: 'With ' + cname(G.tricks[G.tricks.length - 1].wc) + ', the highest card. That is fine: your job only cares about the Lantern 3. Teamwork tip: when a teammate is winning a trick, you can throw in a card THEY need for their job.', btn: 'OK' })) return true;
   return false;
 }

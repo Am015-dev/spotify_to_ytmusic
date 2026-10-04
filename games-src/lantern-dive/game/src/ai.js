@@ -294,6 +294,8 @@ function chooseAssign(V, me, level, moves) {
   }
   if (A.mode === 'split') { return best.m; }
   const pass = find('pass');
+  // Descent (G.share): the computer divers leave a job for every human diver who has none yet, when passing is allowed
+  if (pass && V.share) { const left = V.tasks.filter(t => t.owner < 0).length, need = V.players.filter(p => !p.ai && !p.helper && !V.tasks.some(t => t.owner === p.seat)).length; if (need && left <= need) return pass; }
   if (pass && (best.r.mine < .12 || best.r.mine + .15 < best.r.oth)) return pass;
   return best.m;
 }

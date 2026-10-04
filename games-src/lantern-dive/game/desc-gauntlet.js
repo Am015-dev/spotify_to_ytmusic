@@ -1,7 +1,7 @@
 // Descent difficulty curve: win rate of an all-computer crew (normal) for every stage.   node desc-gauntlet.js [games]
 const LD = require('./src/engine.js'); require('./src/ai.js');
 const N = +process.argv[2] || 20;
-const DESC = [[2, 3, 4, ['low', 4, 2]], [5, [5, 'murky'], 6, ['sleep low', 6, 2]], [6, 7, [7, 'murky'], ['any sleep low', 7, 2]], [8, [8, 'murky'], 9, ['low sleep any', 8, 1]]];
+const DESC = [[2, 3, 4, ['low', 4, 2]], [4, [5, 'murky'], 5, ['sleep low', 6, 2]], [6, 7, [7, 'murky'], ['any sleep low', 7, 2]], [8, [8, 'murky'], 9, ['low sleep any', 8, 1]]];
 for (const [zi, Z] of DESC.entries()) {
   const row = [];
   for (const st of Z) {

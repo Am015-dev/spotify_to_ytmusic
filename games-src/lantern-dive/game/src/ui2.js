@@ -27,7 +27,7 @@ function layoutVars() {
 function renderBar() {
   const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
   if (G && UI.started) {
-    bs.append(h('span', diveLabel() + ' · attempt ' + G.att));
+    bs.append(h('span', diveLabel() + (UI.mode === 'descent' ? '' : ' · attempt ' + G.att)));
     if (G.distress) bs.append(h('span', { html: KIT.flareSVG({ size: 20, on: true }), title: 'Distress flare is lit' }));
     if (G.clock) { const t = h('span.tm' + (UI.clockLeft != null && UI.clockLeft < 20 ? '.low' : ''), clockText()); t.id = 'clk'; bs.append(t); }
   }

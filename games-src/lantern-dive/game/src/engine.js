@@ -152,7 +152,13 @@ const KIND = {
     return end ? -1 : 0;
   }
 };
-function jobStatus(S, ti) { const t = S.tasks[ti], d = TASKS[t.id]; return KIND[d.k](S, t, d, t.owner, S.tricks.length >= S.ntr); }
+// Cards in the trick that is still being played are not out of the game yet: a job is judged as if they were still in hand
+// (otherwise "win a 6 by playing another 6" could show a red cross mid-trick and turn green when the trick ends).
+function jobStatus(S, ti) {
+  const t = S.tasks[ti], d = TASKS[t.id];
+  if (S.trick && S.trick.plays && S.trick.plays.length && S.trick.n === S.tricks.length && S.phase === 'play') { const pl = S.pl.slice(); for (const p of S.trick.plays) pl[p.c] = 0; S = Object.assign({}, S, { pl }); }
+  return KIND[d.k](S, t, d, t.owner, S.tricks.length >= S.ntr);
+}
 // mission rules that hold for the whole dive. Returns a text (broken) or '' (fine). Called after every trick.
 function condBroken(S) {
   const m = S.mission;

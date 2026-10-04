@@ -124,3 +124,59 @@ Fixed after round 2, but **not re-tested blind**:
 ## Tests (final run)
 
 Final full run (after the round-2 fixes): rules 99/99, clarity 7/7, hidden-test 0 leaks (30 games, 201 checks), net-strip 0 problems (2690 views), click 18 games 0 errors 0 stalls (instant and animated), px-test 0 problems, lay (4 desktop sizes) 0 problems, lay-phone (all 7 sizes) 0 problems, p2p-ld full desktop and phone 0 bad.
+
+# Round 3: The Descent, bosses and Mara's training (owner: "game is boring, add challenges that get harder with a boss")
+
+The owner picked: a boss with curses, zones with oxygen, and a real tutorial with pop-ups and characters.
+
+## What was added
+- **The Descent** (title screen, big button).
+  - 4 zones: Sunlit Reef, Kelp Forest, Twilight Trench and The Abyss. Each has 3 dives and then a boss.
+  - You play with Nerea, Bram and Sumi.
+  - You have 3 oxygen tanks per zone. A failed dive costs a tank; with none left, you go back to the start of the zone.
+  - A dive won without a failure earns a star. Beating a boss refills the tanks and opens the next zone.
+  - The map shows the zones, stars, tanks and boss portraits, with a tick on beaten bosses.
+  - Difficulty rises zone by zone. In `desc-gauntlet.js` (an all-computer crew, 30 games per stage), first-try wins run about 70% → 55% → 35% → 30%.
+- **Bosses**: Snapjaw the Eel, the Kelp Witch, the Gloom Angler and the Leviathan.
+  - Each has a portrait, a taunt, a health bar (one pip per job) and a hit line when a job is finished.
+  - Beating one shows a "defeated!" banner.
+  - Curses change only who wins a trick, on a public schedule shown on the boss bar:
+    - **Undertow:** the lowest card wins.
+    - **Lantern Sleep:** Lanterns played on a colour win nothing.
+    - **Riptide:** any colour can win.
+  - The first time each curse appears it gets a pop-up; after that it shows as a line in the dock and a red tag on the boss bar.
+  - The rules are in `rules-notes.md` ("Descent mode", our own addition) and in `rules-test.js` (4 curse tests).
+- **Mara, the instructor**, replaces the tip chain in the guided dive with a step-by-step training dive. Pop-ups wait for you, only the card she names can be led, and the dive teaches:
+  - jobs
+  - leading
+  - following the colour
+  - losing on purpose
+  - Lanterns as trumps
+  - feeding a teammate's trick
+
+  The result screen sends you to The Descent.
+- **Teamwork**: in the Descent the computer divers leave a job for you when there are fewer jobs than divers. In round 3 a tester was left without a job in 4 of 5 dives.
+- **Bug fixed (failing test first):** mid-trick, a job could show a red cross that turned green when the trick ended. "Win a 6 by playing another 6" didn't count a 6 lying in the unfinished trick. `jobStatus` now treats the open trick's cards as still in play.
+
+## Round 3 blind playtest (before the round-3 fixes above)
+| Tester | Played | Fun |
+|---|---|---|
+| Casual (training, then The Descent) | training won; reef 3 dives with stars, Snapjaw beaten on the 2nd try, then Kelp dive 1 | 3.5 / 5 |
+| Impatient (straight into The Descent) | reef 3 dives and Snapjaw on the first try, then lost Kelp dive 1 | 4 / 5 |
+
+Both understood the boss and its curses. The impatient tester said "Undertow really changed my choices" and called the boss fight the high point.
+
+What they disliked, and what was done about it:
+- **No job for the player** (casual tester, 4 of 5 dives). Fixed.
+- **The "Brace!" curse pop-up on every second trick.** Now it appears once per curse type.
+- **The boss health bar was tiny and never moved, and beating a boss had no celebration.** The bar is bigger and there is a defeat banner. Short boss fights still end quickly.
+- **No mark for a beaten boss on the map.** A tick is shown now.
+- **A false red cross mid-trick.** Fixed.
+- **"Attempt 1" on every retry, and "Free dive" in the log.** Retries now show "try N", and the log uses the zone name.
+
+**Not yet re-tested blind**, and still weak:
+- The hand jumps when a tip opens in the dock.
+- Tips still chain before the first card in a first normal dive.
+- Short job names on chips.
+- The bosses are code-drawn placeholder art.
+- Zone rewards beyond stars are not built yet.

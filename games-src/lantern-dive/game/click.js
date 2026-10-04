@@ -80,6 +80,7 @@ function run(cf, seed) {
               return fin({ over: { ok, att: G.att, why: G.result.why.slice(0, 40), jobs: process.env.DBGJ ? G.tasks.map(t => t.id + ':' + t.owner).join(',') + ' hands0 ' + JSON.stringify(G.players[0].hand) + ' log ' + JSON.stringify(G.log.slice(-8).map(l => l.t)) : undefined } });
             }
             if (G.phase === 'over') { if (!w.eval('UI.busy') && ++stall > 400) { errs.push('over but no result card'); fin({}); } return; }
+            const dlg = q('#dlg [data-a=dlgok]'); if (dlg.length) { click(dlg[0]); seen.add('dialog'); clicks++; return; }
             const tip = q('#tip [data-a=tipok]'); if (tip.length) { click(tip[0]); seen.add('tip'); clicks++; return; }
             const must = w.eval('iMustAct() && canAct()');
             if (must) {

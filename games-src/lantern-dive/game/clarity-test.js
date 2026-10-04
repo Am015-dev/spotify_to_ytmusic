@@ -98,7 +98,7 @@ test('Descent: the map starts at the Sunlit Reef with 3 oxygen tanks; a lost div
   ok(w.eval('Desc.load().o2') === 3 && w.eval('Desc.load().s') === 0, 'out of air did not restart the zone: ' + w.eval("lsGet('ld_desc')"));
   ok(/Out of air/.test(d.querySelector('#rs').textContent), 'no out-of-air message');
 });
-test('Descent boss: intro dialog, health bar = jobs, a curse dialog before each cursed trick, beating it opens the next zone', async () => {
+test('Descent boss: intro dialog, health bar = jobs, a curse pop-up the first time each curse appears, beating it opens the next zone', async () => {
   const { w, d } = await page(1);
   w.eval(`Desc.save({ v: 1, z: 0, s: 3, o2: 3, stars: {}, best: 0, met: { intro: 1 } }); descGo();`);
   ok(w.eval('!!G.boss') && /Snapjaw/.test(d.querySelector('#dlg').textContent), 'no boss intro');
@@ -108,7 +108,7 @@ test('Descent boss: intro dialog, health bar = jobs, a curse dialog before each 
     if (d.querySelector('#bossbar')) { seenBar = true; ok(d.querySelectorAll('#bossbar .hp i').length === w.eval('G.tasks.length'), 'health bar size'); }
     w.eval("if (!UI.busy && iMustAct()) { const m = LD.AI.choose(G, 0, 'normal'); if (m) doMove(m); }"); await new Promise(r => setTimeout(r, 2));
   }
-  ok(seenBar, 'no boss bar'); const cursed = w.eval('G.tricks.filter(k => k.cu).length'); ok(curses === cursed || curses === cursed + (w.eval('G.trick && G.trick.cu && G.trick.plays.length === 0') ? 1 : 0), 'curse dialogs ' + curses + ' cursed tricks ' + cursed);
+  ok(seenBar, 'no boss bar'); const cursed = w.eval('G.tricks.filter(k => k.cu).length'); const kinds = w.eval('new Set(G.tricks.filter(k => k.cu).map(k => k.cu)).size'); ok(cursed > 0 && curses >= kinds && curses <= kinds + 1, 'curse pop-ups ' + curses + ' for ' + kinds + ' curse kind(s) over ' + cursed + ' cursed tricks (one pop-up per kind)');
   w.eval(`G.result.ok = true; G.descDone = 0; UI.overShown = false; showResult();`);
   ok(w.eval('Desc.load().z') === 1 && w.eval('Desc.load().o2') === 3, 'boss win did not open zone 2: ' + w.eval("lsGet('ld_desc')"));
 });
