@@ -424,7 +424,7 @@ function renderDock(v) {
   const pr = $('#prompt'), ac = $('#acts'), inf = $('#info'), ro = $('#roster'); if (!pr) return;
   const M = dockModel(v); pr.className = M.cls || '';
   pr.innerHTML = ''; pr.append(M.p || ''); const ps = $('#psub'), phn = isPh(); if (M.sub && !phn) pr.append(h('small', M.sub)); if (ps) { ps.innerHTML = ''; ps.hidden = !(phn && M.sub); if (phn && M.sub) ps.textContent = M.sub; }
-  { const nw = $('#news'); if (nw) { const L = (UI.news || []).slice(isPh() ? -1 : -3); nw.innerHTML = ''; nw.hidden = !L.length || G.phase === 'over'; L.forEach((t, k) => nw.append(h('div' + (k === L.length - 1 ? '.nw1' : ''), t))); } }
+  { const nw = $('#news'); if (nw) { const L = (UI.news || []).slice(isPh() ? -1 : -3); nw.innerHTML = ''; nw.hidden = !L.length || G.phase === 'over' || (isPh() && !!(UI.hint && UI.hint.c != null && G.phase === 'play' && iMustAct())); L.forEach((t, k) => nw.append(h('div' + (k === L.length - 1 ? '.nw1' : ''), t))); } }
   inf.hidden = !M.info; inf.className = M.info ? 'why' : ''; inf.innerHTML = M.info || '';
   ac.classList.toggle('many', M.acts.length > 6); ac.innerHTML = ''; M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
   // who is still deciding (simultaneous phases)
@@ -637,7 +637,7 @@ function newsFrom(evs) {
     if (e.t === 'deal') UI.news = [];
     else if (e.t === 'take') out.push((e.seat === viewSeat() ? 'You took ' : pname(e.seat) + ' took ') + q + jobShort(e.i) + qq + '.');
     else if (e.t === 'swap') out.push('Every diver passed one card ' + (G.hn === 2 ? 'to the partner.' : e.dir > 0 ? 'to the left.' : 'to the right.'));
-    else if (e.t === 'ping') out.push(pname(e.seat) + ' showed ' + cname(e.c) + (e.k === 'high' ? ': their highest ' : e.k === 'low' ? ': their lowest ' : e.k === 'only' ? ': their only ' : ' ') + (e.k ? D.suits[suitOf(e.c)].name + '.' : '(highest, lowest or only one?)') + (e.seat === viewSeat() ? '' : ' Their signal is now used (red cross).'));
+    else if (e.t === 'ping') out.push(pname(e.seat) + ' showed ' + cname(e.c) + (e.k ? ': ' + (e.seat === viewSeat() ? 'your' : 'their') + (e.k === 'high' ? ' highest ' : e.k === 'low' ? ' lowest ' : ' only ') : ' ') + (e.k ? D.suits[suitOf(e.c)].name + '.' : '(highest, lowest or only one?)') + (e.seat === viewSeat() ? '' : ' Their signal is now used (red cross).'));
     else if (e.t === 'trick') { const ti = G.tricks.findIndex(k => k.plays[0].c === e.plays[0].c); out.push((ti >= 0 ? 'Trick ' + (ti + 1) + ': ' : '')  + pname(e.w) + ' won with ' + cname(e.wc) + (suitOf(e.wc) === 4 ? (e.plays.filter(p => suitOf(p.c) === 4).length > 1 ? ', the highest Lantern.' : ': a Lantern beats every colour.') : ', the highest ' + D.suits[suitOf(e.wc)].name + '.')); }
     else if (e.t === 'job' && e.st > 0) out.push('✔ ' + pname(G.tasks[e.i].owner) + ' finished ' + q + jobShort(e.i) + qq + '.');
     else if (e.t === 'job' && e.st < 0) out.push('✖ ' + (G.tasks[e.i].owner === viewSeat() ? 'Your' : pname(G.tasks[e.i].owner) + '’s') + ' job ' + q + jobShort(e.i) + qq + ' can no longer be done.');
@@ -801,6 +801,7 @@ function showResult() {
   const box = h('div.rsbox', { role: 'dialog', 'aria-modal': 'true', 'aria-label': ok ? 'Dive complete' : 'Dive failed' });
   box.append(ok ? h('div.win', h('span', { html: KIT.iconSVG('star', 34) }), h('span', 'Dive complete!')) : h('div.lose', h('span', { html: KIT.iconSVG('cross', 30) }), h('span', 'The dive failed.')));
   if (!ok && R.why) box.append(h('p', R.why));
+  if (ok && G.tricks.length < G.ntr && G.mission.id !== 27) box.append(h('p.sm', 'Every job was done after trick ' + G.tricks.length + ', so the dive ended at once. Cards still in hand do not matter.'));
   box.append(h('p.sm', diveLabel() + ' · attempt ' + G.att + (G.distress ? ' · distress flare lit (+1)' : '')));
   // done = tick; broken = cross + which trick, card and diver broke it; never broken (the dive stopped for another reason) = "not finished"
   G.tasks.forEach((t, i) => {
@@ -1001,10 +1002,14 @@ function setupEl() {
     h('div.seg', h('span.lbl', 'Team size'), [2, 3, 4, 5].map(v => h('button.chipb' + (o.np === v ? '.on' : ''), { 'data-a': 'opt', 'data-k': 'np', 'data-v': v, type: 'button', 'aria-pressed': o.np === v ? 'true' : 'false' }, v))),
     h('div.dgrid', [0, 1, 2, 3].map(c => dinerCard(c, o))),
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
+  // first visit (nothing in the logbook yet): the guided dive is the big button, so a player who taps the big button learns first
+  const fresh = (() => { try { return !Object.keys(Prog.load().done || {}).length; } catch (e) { return false; } })();
+  const bStart = (big) => h('button.sbtn' + (big ? '.big' : ''), { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the dive'), ' ', h('span', missionLine(o)));
+  const bGuided = (big) => h('button.sbtn' + (big ? '.big' : ''), { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', big ? 'Guided first dive (start here)' : 'Guided first dive'), ' ', h('span', 'You + 2 computer divers, with tips'));
   const go = h('div.sgo',
-    h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the dive'), ' ', h('span', missionLine(o))),
+    fresh ? bGuided(true) : bStart(true),
     h('div.sgrid3',
-      h('button.sbtn', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first dive'), ' ', h('span', 'You + 2 computer divers, with tips')),
+      fresh ? bStart(false) : bGuided(false),
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), ' ', h('span', o.np + ' people, one device')),
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch'), ' ', h('span', 'the divers play'))));
   return h('div.setup.scard', head, ph ? sum : h('p.ssub', 'Choose the dive and who comes along. Each computer diver has a temper; change their level if you like.'), cfg, go);
