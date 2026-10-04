@@ -48,7 +48,7 @@ party word games, push-your-luck. Size = how big the build is (S small, M medium
 | Doorkick Dungeon | Private build with your own card scans | Personal copy only, never on the public site |
 
 ## In progress now (not new games)
-- Kaiten Kitchen: painted 2D table (PixiJS), flying cards, painted art, simpler title and setup screens
+- Next: bring the painted 2D table (as in Kaiten Kitchen) to the other card games: Doorkick Dungeon, Hollowbough, The Thornbound Throne
 
 ## Done (on the shelf)
 Crown City Smash · Nebula Aces · Doorkick Dungeon · Shipwreck Isle · Sands of Qamar · Sunglaze ·
