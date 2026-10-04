@@ -10,7 +10,8 @@ let KS={tiles:{},mons:{},ships:{},gates:{},mael:{},wave:null,hold:{}};
 const sleep=ms=>new Promise(r=>setTimeout(r,Math.max(0,ms)/(UI.speed||1)));
 const nm=i=>G&&G.seats[i]?G.seats[i].nm:'?';
 const colOf=i=>COL[(UI.cols[i]!=null?UI.cols[i]:i)%8];
-const dot=i=>`<i style="background:${colOf(i).sail}"></i>`;
+const cbi=i=>(UI.cols[i]!=null?UI.cols[i]:i)%8;
+const dot=i=>`<i class="sd" style="background:${colOf(i).sail}"><b class="gx-cbm">${GX.mark(cbi(i))}</b></i>`;
 const sid=i=>'s'+i;
 const humans=()=>G?G.seats.filter(s=>s.human).map(s=>s.i):[];
 const hotSeat=()=>!NET.on&&humans().length>=2;
@@ -208,13 +209,14 @@ function overHTML(){const o=G.over,w=o.win||[];const me=viewSeat();const hs=huma
   if(me>=0&&!watch&&!multi&&!G.ships[me].alive){const c=causeOf(G.ships[me].out);h+=`<p class="warn-l"><b>You were sunk:</b> ${esc(c.t)}</p>`}
   h+=`<p>${w.length?(solo?'':(w.length>1?'Winners: ':'Winner: ')+names):'Nobody survived.'}</p>`;
   if(G.np>1||solo)h+=`<ul class="crews">${G.order.map(i=>{const s=G.ships[i];return `<li>${dot(i)} ${esc(nm(i))}${G.team?' (team '+'AB'[G.team[i]]+')':''}: ${s.alive?'afloat':'sunk ('+({edge:'sailed off the edge',collision:'head-on collision',wave:'capsized by the Rogue Wave',maelstrom:'swallowed by the Maelstrom',block:'blocked in by a leviathan',mon:'ran into a leviathan',crush:'crushed by a leviathan',rift:'lost in the rift'}[causeOf(s.out).k]||'sunk')+')'}</li>`}).join('')}</ul>`;
-  h+=`<p class="tiny">${G.turn} turns, ${G.ships.filter(s=>s.alive).length} junk(s) afloat, ${G.stats.levMove||0} leviathan moves.</p>`;
+  h+=earnedHTML();h+=`<p class="tiny">${G.turn} turns, ${G.ships.filter(s=>s.alive).length} junk(s) afloat, ${G.stats.levMove||0} leviathan moves.</p>`;
   if(!meWin&&!watch&&!multi&&UI.guided)h+=`<p class="tiny">Next time: keep your junk off the edges and corners, and press <b>Show me the safest move</b> before each Place.</p>`;
   if(isClient())h+=`<p class="tiny">Waiting for the host to start another game.</p><div class="row"><button class="btn" data-a="netleave">Leave</button><button class="btn" data-gx="rulesd">Rules</button></div>`;
-  else h+=`<div class="row">${!meWin&&!watch&&!multi&&UI.snap&&!NET.on?'<button class="btn pri" data-a="rewind">Rewind to my last move</button>':''}${UI.guided&&!meWin&&!watch?'<button class="btn" data-a="guided">Try the guided game again</button>':''}<button class="btn${meWin||watch||multi||!UI.snap?' pri':''}" data-a="again">Play again</button><button class="btn" data-a="newgame">New game</button><button class="btn" data-gx="rulesd">Rules</button></div>`;
+  else h+=`<div class="row">${!meWin&&!watch&&!multi&&GX.undo.can()&&!NET.on?'<button class="btn pri" data-a="rewind">Take back my last move</button>':''}${UI.guided&&!meWin&&!watch?'<button class="btn" data-a="guided">Try the guided game again</button>':''}<button class="btn${meWin||watch||multi||!GX.undo.can()?' pri':''}" data-a="again">Play again</button><button class="btn" data-a="newgame">New game</button><button class="btn" data-gx="rulesd">Rules</button></div>`;
   return h+'</div>'}
 function oppHTML(d){const now=UI.busy&&UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;
-  return `<div class="prompt opp"><h4>Opponents</h4><p class="tiny">${now>=0?dot(now)+' <b>'+esc(nm(now))+'</b> is playing':'The sea moves'}. The computers play by themselves; you only act on your turn, in step 2 (Place).</p><div class="row">${UI.busy?'<button class="btn small" data-a="skip">Skip animation</button>':''}${humans().length===0?`<button class="btn small" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}</div></div>`}
+  const mine=now>=0&&now===viewSeat()&&G.seats[now].human;
+  return `<div class="prompt opp"><h4>${mine?'Your roll':'Opponents'}</h4><p class="tiny">${mine?'The dice are rolled for you; the leviathans move first, then you lay your tile.':(now>=0?dot(now)+' <b>'+esc(nm(now))+'</b> is playing':'The sea moves')+'. The computers play by themselves; you only act on your turn, in step 2 (Place).'}</p><div class="row">${UI.busy?'<button class="btn small" data-a="skip">Skip animation</button>':''}${humans().length===0?`<button class="btn small" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}</div></div>`}
 function goalHTML(){if(!G)return '';const L=G.mons.filter(m=>m.k==='L').length,toRise=G.mdeck.filter(x=>x<10).length;
   if(G.variant==='solo')return `<div class="goal"><b>Goal:</b> outlast every leviathan. ${toRise} still to rise, ${L} on the board; you win when none are left.</div>`;
   if(G.variant==='easysolo')return `<div class="goal"><b>Goal:</b> stay afloat for ${G.opts.goal} turns (turn ${G.turn} now), or play out the whole tile pile.</div>`;return ''}
@@ -268,7 +270,7 @@ function render(){if(!G||!UI.started)return;try{if(window.PerfHUD)PerfHUD.wake()
   if(!UI.busy&&UI.canPlace&&UI.sel){const pl=UI.moves.filter(m=>m.a==='place');UI.fronts=[...new Set(pl.map(m=>m.s))];const c=G.hands[d][UI.sel.t];if(c!=null&&isCur(c)&&UI.A){const S=G.ships[UI.sel.s];UI.gh={x:S.x,y:S.y,card:c,rot:UI.sel.r,valid:!UI.A.bad,trace:UI.A.steps};try{UI.route=routeDesc(UI.A,S)}catch(e){console.error(e)}}}
   if(key!==UI.lastKey){UI.lastKey=key;if(!UI.busy&&d>=0&&G.seats[d].human&&!mustPass(d)&&!G.over)sfx('turn')}
   if(!UI.busy&&d>=0&&G.seats[d].human&&!G.over&&!mustPass(d))GX.showDock();
-  coachTriggers();renderBar();renderRoad();renderSteps();renderRes();renderCards();renderCoach();kitOverlay();musicEval();ovUpdate();
+  recapSync();coachTriggers();renderBar();renderRoad();renderSteps();renderRes();renderCards();renderCoach();kitOverlay();musicEval();ovUpdate();
   const t=$('#chip');if(t)t.textContent=!UI.busy&&G.phase==='setup'&&d>=0&&G.seats[d].human&&!mustPass(d)?'Tap a gold mark on the edge':'';
   if(GX.open)renderOpenDrawer();qTimerSync();netAfter()}
 function refresh(){if(!G||!UI.started||UI.acting)return;kitSync();render()}
@@ -279,10 +281,10 @@ setInterval(()=>{try{if(!G||!UI.qKey||UI.pause)return;const q=G.q;if(!q){UI.qKey
   if(left<=0){if(isClient())return;UI.qKey=null;const who=q.who;let m=null;try{m=aiMove(who,'hard')}catch(e){}if(!m||m.a!=='q')m={a:'q',i:q.opts.length-1};say('Time is up: the computer chose for '+nm(who)+'.','bad');NET.autoDecl++;actAs(m,who)}}catch(e){console.error(e)}},200);
 // ---------- acting ----------
 function act(m,seat){if(NET.on){const nr=netAct(m,seat);if(nr!==undefined)return nr}if(!G||UI.busy||G.over)return false;
-  if(!NET.on&&G.seats[seat]&&G.seats[seat].human&&humans().length===1&&m.a!=='q'){try{UI.snap={json:JSON.stringify(G)}}catch(e){}}
+  const mine=G.seats[seat]&&G.seats[seat].human;if(!NET.on&&mine&&humans().length===1&&m.a!=='q')GX.undo.snap(m.a);if(mine)recapMine(seat);
   if(G.seats[seat]&&G.seats[seat].human){UI.sunk=[];UI.marks=[];UI.mph=null}
   UI.rec=[];UI.acting=1;UI.actor=seat;let r;try{r=performMove(m,seat)}finally{UI.acting=0}const evs=UI.rec;UI.rec=null;
-  if(!r.success){sfx('error');say(r.error,'bad');return false}
+  if(!r.success){if(!NET.on&&mine&&humans().length===1&&m.a!=='q')GX.undo.drop();sfx('error');say(r.error,'bad');return false}
   UI.sel=null;UI.hint=false;if(hotSeat()&&G.seats[seat]&&G.seats[seat].human&&sideToAct()!==seat)UI.holder=-1;
   for(const e of evs){if(e.t==='dice')UI.lastRoll=e.d}
   afterMove(evs);return true}
@@ -292,7 +294,7 @@ function afterMove(evs){saveAll();UI.stepNow=0;
   const finish=()=>{UI.busy=false;UI.dice=null;UI.res=null;if(UI.mph){UI.mph.roll=false;UI.mph.shown=UI.mph.lines.length}if(!G.q)KS.hold={};for(const e of evs)if(e.t==='sink')sunkAdd(e);kitSync();render();overCheck();schedule();if(NET.on)netDrain()};
   if(ANIM&&evs.some(e=>e.t!=='log')&&UI.started){const gen=UI.gen;UI.busy=true;render();playEvents(evs,gen).then(()=>{if(UI.gen!==gen)return;finish()})}
   else finish()}
-function overCheck(){if(G&&G.over&&!UI.overSeen){UI.overSeen=1;const w=G.over.win||[];musicStop(.4);sndLoop('sea_loop',false);const mine=w.some(i=>G.seats[i].human)||!humans().length&&w.length;sfx(mine?'win':'lose');UI.trig.end=1;clearSave()}}
+function overCheck(){if(G&&G.over&&!UI.overSeen){UI.overSeen=1;const w=G.over.win||[];musicStop(.4);sndLoop('sea_loop',false);const mine=w.some(i=>G.seats[i].human)||!humans().length&&w.length;sfx(mine?'win':'lose');GX.buzz(mine?[30,60,30]:[80]);UI.trig.end=1;clearSave();kitResult();render()}}
 function schedule(){clearTimeout(UI.tm);if(isClient()||!G||!UI.started||G.over||UI.busy||UI.pause)return;const d=sideToAct();if(d<0||G.seats[d].human)return;UI.tm=setTimeout(aiAct,Math.max(0,(AIDELAY||0)/(UI.speed||1)))}
 function aiAct(){if(isClient()||!G||!UI.started||UI.busy||UI.pause||G.over)return;const d=sideToAct();if(d<0||G.seats[d].human)return;const st=aiStep();if(!st)return;act(st.m,st.seat)}
 function doPlace(){const d=sideToAct();const s=UI.sel;if(!s)return;const m={a:'place',t:s.t,r:s.r,s:s.s};act(m,d)&&sfx('confirm')}
@@ -329,10 +331,8 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   case 'guideno':UI.confirm=null;render();break;
   case 'again':startGame(UI.lastSetup);break;
   case 'newgame':showStart();break;
-  case 'snd':toggleSound();renderSettings();break;case 'mus':toggleMusic();renderSettings();break;
-  case 'speed':UI.speed=+D.v;try{TWKit.setSpeed(UI.speed)}catch(x){}saveSettings();renderSettings();break;
+  case 'snd':toggleSound();break;case 'mus':toggleMusic();break;
   case 'gfx':try{TWKit.setQuality(D.v);if(window.PerfHUD)PerfHUD.hitch()}catch(x){}renderSettings();break;
-  case 'animtog':UI.anim=!UI.anim;ANIM=UI.anim?1:0;saveSettings();renderSettings();break;
   case 'guidemenu':UI.guide=UI.guide==='full'?'light':'full';saveSettings();saveAll();renderSettings();if(G)render();break;
   case 'xray':UI.xray=!UI.xray;renderCrew();break;
   case 'restart':if(UI.lastSetup){GX.close();startGame(UI.lastSetup)}break;
@@ -343,57 +343,43 @@ document.addEventListener('keydown',e=>{if(!G||!UI.started||GX.open||!$('#start'
   if(k>='1'&&k<='3'){const t=+k-1;if(G.hands[d][t]!=null){UI.sel.t=t;render()}}else if(k==='r'){UI.sel.r=(UI.sel.r+1)%4;sfx('tile_rotate');render()}else if(k==='q'){UI.sel.r=(UI.sel.r+3)%4;sfx('tile_rotate');render()}
   else if(k==='enter'&&!(tg==='BUTTON')){doPlace()}});
 // ---------- popups ----------
-function renderOpenDrawer(){const id=GX.open;if(id==='crewd')renderCrew();else if(id==='logd')renderLog();else if(id==='setd')renderSettings();else if(id==='piecesd')renderPiecesNow()}
-function renderPiecesNow(){const e=$('#piecesnow');if(e)e.innerHTML=piecesNowHTML()}
-function rewindLast(){if(!UI.snap||NET.on)return;let g;try{g=JSON.parse(UI.snap.json)}catch(e){return}UI.gen++;clearTimeout(UI.tm);kitReset();G=g;UI.sel=null;UI.hint=false;UI.busy=false;UI.pause=false;UI.overSeen=0;UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;UI.lastKey='';UI.qKey=null;UI.curTurn=null;UI.res=null;UI.holder=humans().length===1?humans()[0]:-1;UI.snap=null;
-  kitSync();SND.mood='calm';try{sndLoop('sea_loop',true);if(SND.gesture)musicStart()}catch(e){}saveAll();render();schedule()}
-function renderLog(){const b=$('#logbody');if(!G){b.innerHTML='<p>Start a game first.</p>';return}b.innerHTML=G.log.slice(0,200).map(l=>`<div class="logl ${l.c}">${esc(l.t)}</div>`).join('')}
+function renderOpenDrawer(){const id=GX.open;if(id==='crewd')renderCrew();else if(id==='logd')renderLog();}
+function rewindLast(){if(NET.on)return;if(GX.undo.undo()){GX.close();sfx('click')}}
+function renderLog(){const b=$('#logbody');if(!G){b.innerHTML='<p>Start a game first.</p>';return}const L=G.log.slice(0,200),grp=[];for(const l of L){const g=grp[grp.length-1];if(g&&g.turn===l.turn)g.ls.push(l);else grp.push({turn:l.turn,ls:[l]})}
+  b.innerHTML=grp.map(g=>g.ls.reverse().map(l=>`<div class="logl ${l.c}">${esc(l.t)}</div>`).join('')).join('')} // newest turn first, each turn read top to bottom
 function crewCards(h,own){return h.map(c=>isCur(c)?`<img alt="" width="54" height="54" src="${TWKit.cardURL(BASE_PATHS[CUR_TYPE[c]],{uid:'x'+Math.random().toString(36).slice(2,6),size:54})}">`:`<b>${isGate(c)?'Rift Gate':'Cannon'}</b> `).join('')}
 function renderCrew(){const b=$('#crewbody');if(!G){b.innerHTML='<p>Start a game first.</p>';return}const watch=!humans().length;const L=G.mons.filter(m=>m.k==='L').length;
   let h=`<table class="lg2"><tr><th>Captain</th><th>Status</th><th>Tiles</th></tr>`+G.order.map(i=>{const s=G.ships[i];const see=watch&&UI.xray;
     return `<tr><td>${dot(i)} <b>${esc(nm(i))}</b>${G.team?' (team '+'AB'[G.team[i]]+')':''}<br><small>${G.seats[i].human?'Human':'Computer, '+G.seats[i].lv}</small></td><td>${s.alive?'afloat':'sunk: '+esc(s.out)}</td><td data-crewhand="${i}" data-up="${see?1:0}">${s.alive?(see?crewCards(G.hands[i]):'<span class="tiny">'+G.hands[i].length+' hidden</span>'):'-'}</td></tr>`}).join('')+`</table>`;
   if(watch)h+=`<p><button class="swt${UI.xray?' on':''}" data-a="xray"><i></i>Show every hand (watch mode)</button></p>`;
-  h+=`<h3>Piles</h3><table class="lg2"><tr><td>Current pile</td><td>${G.deck.length} tiles</td></tr><tr><td>Leviathans on the board</td><td>${L}${G.mons.some(m=>m.k==='M')?' + Maelstrom':''}</td></tr><tr><td>Leviathan pile</td><td>${G.mdeck.length}</td></tr><tr><td>Gone for good</td><td>${G.mgone.length} leviathans, ${G.gone.length} tiles</td></tr>${G.gates.length?'<tr><td>Rift Gate</td><td>on column '+(G.gates[0].x+1)+', row '+(G.gates[0].y+1)+'</td></tr>':''}${G.wave?'<tr><td>Rogue Wave</td><td>column '+(G.wave.x+1)+', row '+(G.wave.y+1)+', strength '+waveStr()+'</td></tr>':''}</table>`;b.innerHTML=h}
-function renderSettings(){const g=(()=>{try{return TWKit.getQuality()}catch(e){return {pref:'auto',active:'2d'}}})();const on3=!!(TWKit._K&&TWKit._K.on);const sp=[[.5,'Slow'],[1,'Normal'],[2,'Fast'],[5,'Very fast']];
-  $('#setbody').innerHTML=`<div class="setgrid">
-  <div><div class="lbl">Sound</div><div class="row"><button class="btn${SND.on?' on':''}" data-a="snd">Sound ${SND.on?'on':'off'}</button><button class="btn${SND.music?' on':''}" data-a="mus">Music ${SND.music?'on':'off'}</button></div></div>
-  <div><div class="lbl">Computer captains' speed</div><div class="row">${sp.map(([v,l])=>`<button class="btn small${UI.speed===v?' on':''}" data-a="speed" data-v="${v}">${l}</button>`).join('')}<button class="btn small${UI.anim?' on':''}" data-a="animtog">Animations ${UI.anim?'on':'off'}</button></div></div>
-  <div><div class="lbl">Graphics ${on3?`(now: ${esc(g.active)})`:'(2D chart: no WebGL here)'}</div><div class="row">${['auto','high','medium','low'].map(q=>`<button class="btn small${g.pref===q?' on':''}" data-a="gfx" data-v="${q}" ${on3?'':'disabled'}>${q[0].toUpperCase()+q.slice(1)}</button>`).join('')}</div><p class="tiny">Auto picks Low on a software graphics driver and steps down by itself if frames drop.</p><div id="perfslot" class="row">${window.PerfHUD&&PerfHUD.buttonsHTML?PerfHUD.buttonsHTML('btn small'):''}</div></div>
-  <div><div class="lbl">Guide</div><div class="row"><button class="swt${UI.guide==='full'?' on':''}" role="switch" aria-checked="${UI.guide==='full'}" data-a="guidemenu"><i></i>Guide: ${UI.guide==='full'?'Full lessons':'Light (warnings only)'}</button></div></div>
-  <div><div class="lbl">Game</div><div class="row">${isClient()?'<button class="btn small" data-a="netleave">Leave the online game</button>':''}${isClient()?'':G&&UI.started?'<button class="btn small" data-a="restart">Restart this setup</button>':''}${isClient()?'':'<button class="btn small" data-a="tonew">New game...</button>'}<button class="btn small" data-gx="credd">Credits</button></div></div></div>`}
-function saveSettings(){lsSet('tw_set',{speed:UI.speed,guide:UI.guide,anim:UI.anim})}
-function saveAll(){try{if(!NET.on&&G&&!G.over){saveGame();lsSet('tw_ui1',{cols:UI.cols,guide:UI.guide,seen:UI.seen,trig:UI.trig,guided:UI.guided,setup:UI.lastSetup})}}catch(e){}}
-function clearSave(){if(NET.on)return;try{localStorage.removeItem(SAVE)}catch(e){}}
+  h+=`<h3>Piles</h3><table class="lg2"><tr><td>Current pile</td><td>${G.deck.length} of ${NCUR} tiles left</td></tr><tr><td>Leviathans on the board</td><td>${L}${G.mons.some(m=>m.k==='M')?' + Maelstrom':''}</td></tr><tr><td>Leviathan pile</td><td>${G.mdeck.length}</td></tr><tr><td>Gone for good</td><td>${G.mgone.length} leviathans, ${G.gone.length} tiles</td></tr>${G.gates.length?'<tr><td>Rift Gate</td><td>on column '+(G.gates[0].x+1)+', row '+(G.gates[0].y+1)+'</td></tr>':''}${G.wave?'<tr><td>Rogue Wave</td><td>column '+(G.wave.x+1)+', row '+(G.wave.y+1)+', strength '+waveStr()+'</td></tr>':''}</table><h3>Expansion pieces now</h3>${piecesNowHTML()}<p><button class="btn small" data-gx="gx-refd">Every tile and piece</button></p>`;b.innerHTML=h}
+function renderSettings(){GX.renderSettings()}
+function saveSettings(){lsSet('tw_set',{guide:UI.guide,turbo:!!UI.turbo,wakeTap:!!UI.wakeTap})}
+function saveAll(){try{if(!NET.on&&G&&!G.over){saveGame();if(!UI.savedFlag){UI.savedFlag=1;GNS.saved(GAME_ID,true)}lsSet('tw_ui1',{cols:UI.cols,guide:UI.guide,seen:UI.seen,trig:UI.trig,guided:UI.guided,setup:UI.lastSetup})}}catch(e){}}
+function clearSave(){if(NET.on)return;try{localStorage.removeItem(SAVE)}catch(e){}UI.savedFlag=0;GNS.saved(GAME_ID,false)}
 function savedGame(){try{const s=localStorage.getItem(SAVE);if(!s)return null;const g=JSON.parse(s);if(!g||g.phase==='over'||!g.seats)return null;return g}catch(e){return null}}
-function piecesHTML(){const cnt=t=>1+(EXTRA_TYPES.indexOf(t)>=0?1:0);
-  const exIcon={gate:`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="16" fill="#6d3fd0" stroke="#e3b24b" stroke-width="4"/><circle cx="24" cy="24" r="7" fill="#c9b3ff"/></svg>`,wave:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#1e4aa0"/><path d="M6 30q6-10 12 0t12 0t12 0M6 20q6-10 12 0t12 0t12 0" fill="none" stroke="#ffe9a8" stroke-width="4" stroke-linecap="round"/></svg>`,mael:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#14606b"/><path d="M24 24m0-4a4 4 0 1 1-4 4a9 9 0 1 1 9 9a14 14 0 1 1-14-14" fill="none" stroke="#bff" stroke-width="3" stroke-linecap="round"/></svg>`,cannon:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#3a3f46"/><rect x="8" y="18" width="26" height="10" rx="5" fill="#14171a" transform="rotate(-18 24 24)"/><circle cx="18" cy="34" r="6" fill="#7a5a14"/><circle cx="38" cy="16" r="3" fill="#ffb347"/></svg>`};
-  return `<div id="piecesnow">${piecesNowHTML()}</div><h3>Current tiles: 56 in the pile</h3><p class="tiny">35 different layouts (every way to join the 8 edge points in 4 pairs). The "x2" ones appear twice: we spread the 21 repeats evenly (our guess, the real list is unknown). A layout can be turned any of 4 ways.</p><div class="pgrid">${Array.from({length:35},(_,t)=>`<div class="pc"><img alt="Current layout ${t+1}" src="${TWKit.cardURL(BASE_PATHS[t],{uid:'pp'+t,size:96})}">${cnt(t)>1?'<span class="x2">x2</span>':''}#${t+1}</div>`).join('')}</div>
-  <h3>Leviathans: 10 in the pile (our own layouts)</h3><p class="tiny">Arrow N on the tile = what die face N does. Arrows are shown for the tile facing north; a leviathan's facing is random when it rises and turns the arrows with it. The diagonal arrow is the quarter-turn. Face 6: it stays and another rises. The number is its move order, "gold" wins ties.</p>
-  <div class="lgrid">${LEV.map(L=>`<div class="lcard"><img alt="${esc(L.nm)}" src="${TWKit.leviathanURL(levArrows(L.id),{uid:'lv'+L.id,size:84})}"><br><b>${esc(L.nm)}</b><br>Order ${L.order}${L.gold?' (gold)':''}<br>${L.arr.map((a,i)=>(i+1)+(a==='R'?(L.rd>0?'&#8635;':'&#8634;'):a)).join(' ')}</div>`).join('')}</div>
-  <h3>Expansion pieces (Deepwater Perils)</h3><div class="xgrid"><div class="xcard">${exIcon.gate}<b>Rift Gate</b> x1<br><small>In the current pile. Stays on its square; sends junks and leviathans to a rolled square.</small></div><div class="xcard">${exIcon.wave}<b>Rogue Wave</b> x1 (+ edge marker)<br><small>In the leviathan pile. Sweeps a row or column; strength 2, then 3, then 4.</small></div><div class="xcard">${exIcon.mael}<b>Maelstrom</b> x1<br><small>In the leviathan pile. Moves on calm turns: 1 E, 2 S, 3 W, 4 N, 5-6 stays. Destroys what it enters.</small></div><div class="xcard">${exIcon.cannon}<b>Deck Cannon</b> x5<br><small>In the current pile, two per hand. Removes a leviathan about to sink you.</small></div></div>
-  <h3>Other things on the board</h3><ul><li><b>Gold marks</b> on the edge: where junks start (two per number).</li><li><b>Gold line</b> on a tile preview: the exact path your junk will sail.</li><li><b>Teal frames</b>: squares you may choose.</li><li><b>Blue strip</b>: the Rogue Wave's row or column.</li></ul>`}
 // ---------- start screen ----------
 function teamN(s){const n=s.np;if(s.variant!=='teams')return n;return [4,6,8].includes(n)?n:n<4?4:n%2?n-1:n}
 function defaultSetup(){const s=lsGet('tw_setup',null);const seats=[];for(let i=0;i<8;i++)seats.push({h:i===0,lv:'normal',col:[0,3,2,1,4,5,6,7][i]});
   return Object.assign({mode:'me',np:3,seats,exp:{rift:0,wave:0,maelstrom:0,cannon:0},variant:null,noMon:false},s&&s.seats&&s.seats.length===8?s:{})}
 function applyMode(s,mode){s.mode=mode;s.seats.forEach((x,i)=>{x.h=mode==='hot'?true:mode==='me'?i===0:false})}
 function modeOf(s){const n=s.variant==='solo'||s.variant==='easysolo'?1:s.np;const h=s.seats.slice(0,n).filter(x=>x.h).length;return h===0?'watch':h===1?'me':'hot'}
-function renderStart(){const el=$('#start');const s=UI.setup=UI.setup||defaultSetup();const solo=s.variant==='solo'||s.variant==='easysolo';const n=solo?1:teamN(s);const mode=modeOf(s);const onl=isHost(),nOnl=onl?Math.min(8,NET.peers.length||1):0,onPlan=onl?netPlan(s):null;
+function renderStart(){const el=$('#start');if(!UI.cfgOpen&&!NET.on){el.innerHTML=titleHTML();return}const s=UI.setup=UI.setup||defaultSetup();const solo=s.variant==='solo'||s.variant==='easysolo';const n=solo?1:teamN(s);const mode=modeOf(s);const onl=isHost(),nOnl=onl?Math.min(8,NET.peers.length||1):0,onPlan=onl?netPlan(s):null;
   const seg=(act,cur,list,extra)=>`<span class="seg">${list.map(([v,l])=>`<button data-a="${act}" data-v="${v}"${extra||''} class="${String(cur)===String(v)?'on':''}">${l}</button>`).join('')}</span>`;
   const sv=(i)=>{const x=s.seats[i];if(onl&&i<nOnl)return `<div class="seat" data-seat="${i}"><span class="sw" style="background:${COL[x.col].sail}"></span><select data-a="col" data-i="${i}" aria-label="Colour of seat ${i+1}">${COL.map((c,k)=>`<option value="${k}"${k===x.col?' selected':''}>${c.name}</option>`).join('')}</select><span class="tag">Online: <b>${esc((onPlan&&onPlan.hum&&onPlan.hum[i]&&onPlan.hum[i].nm)||'Player')}</b></span></div>`;return `<div class="seat" data-seat="${i}"><span class="sw" style="background:${COL[x.col].sail}"></span><select data-a="col" data-i="${i}" aria-label="Colour of seat ${i+1}">${COL.map((c,k)=>`<option value="${k}"${k===x.col?' selected':''}>${c.name}</option>`).join('')}</select>
     <span class="seg">${[['1','Human'],['0','Computer']].map(([v,l])=>`<button data-a="seath" data-i="${i}" data-v="${v}" class="${(x.h?'1':'0')===v?'on':''}">${l}</button>`).join('')}</span>
     ${x.h?'<span></span>':`<select data-a="lv" data-i="${i}" aria-label="Level of seat ${i+1}">${['easy','normal','hard'].map(l=>`<option value="${l}"${x.lv===l?' selected':''}>${l}</option>`).join('')}</select>`}</div>`};
   const ex=[['rift','Rift Gate','A portal tile that rescues a junk or flings pieces across the sea.'],['wave','Rogue Wave','A wave that sweeps a row or column and can capsize junks.'],['maelstrom','Maelstrom','A whirlpool that moves on calm turns and destroys what it enters.'],['cannon','Deck Cannon','Five cannons in the tile pile: shoot a leviathan about to sink you.']];
   const cont=savedGame();
-  el.innerHTML=`<div class="stin"><h1><svg class="ico" viewBox="0 0 24 24" style="width:44px;height:44px;stroke:#e3b24b"><path d="M3 17c3 2 6 2 9 0s6-2 9 0M12 3v11M12 4l6 7h-6M12 6l-5 6h5"/></svg>Tidewake</h1><p class="tag">Lay currents, steer your junk, outlast the leviathans. 1 to 8 captains, computers and hot-seat.</p>
+  el.innerHTML=`<div class="stin">${NET.on?'':'<button class="btn small back" data-a="cfgback">‹ Back</button>'}<h1><svg class="ico" viewBox="0 0 24 24" style="width:44px;height:44px;stroke:#e3b24b"><path d="M3 17c3 2 6 2 9 0s6-2 9 0M12 3v11M12 4l6 7h-6M12 6l-5 6h5"/></svg>Tidewake</h1><p class="tag">Lay currents, steer your junk, outlast the leviathans. 1 to 8 captains, computers and hot-seat.</p>
   <div class="stcard"><h2>Quick start</h2><div class="row">${NET.on?'':'<button class="btn pri" data-a="guided">Guided first game (you vs an easy computer)</button>'}${cont&&!NET.on?`<button class="btn" data-a="cont">Continue saved game</button>`:''}<button class="btn" data-a="start" id="quickgo">Start with these settings</button></div><p class="tiny">${NET.on?'':'New here? The guided game explains currents, edges, collisions and leviathans one step at a time.'}</p></div>
   <div class="stcard"><h2>Play with friends</h2>${onlineBlock()}</div>
   <div class="stcols"><div class="stcard"><h2>How to play</h2><div class="row">${onl?'<span class="tiny">Online game: captains take seats in join order.</span>':seg('mode',mode,[['me','Me vs computers'],['hot','Hot-seat'],['watch','Watch']])}</div><p class="tiny">${onl?'Seats without an online captain are computers.':mode==='me'?'You are the first captain; the others are computers.':mode==='hot'?'Everyone shares this screen. Hands are hidden between players behind a pass screen.':'The computers play each other. Sit back.'}</p>
-   <h2 style="margin-top:8px">Variant</h2><div class="row">${seg('var',s.variant||'std',[['std','Standard'],['solo','Solo'],['easysolo','Easy solo'],['teams','Teams']])}</div><p class="tiny">${s.variant==='solo'?'One junk, six leviathans. Goal: survive until all ten leviathans have risen and are gone. The top bar counts how many are still to rise.':s.variant==='easysolo'?'Easy solo (our variant): one junk, 4 leviathans to start, 24 turns. Survive 24 turns or play out the whole pile. Destroyed tiles are discarded.':s.variant==='teams'?'Two equal teams (every other seat); you may lay a tile for a teammate. 4, 6 or 8 captains.':'Last junk afloat wins.'}</p>
+   <h2 style="margin-top:8px">Variant</h2><div class="row">${seg('var',s.variant||'std',[['std','Standard'],['solo','Solo'],['easysolo','Easy solo'],['teams','Teams']])}</div><p class="tiny">${s.variant==='solo'?'One junk, six leviathans. Goal: survive until all ten leviathans have risen and are gone. The top bar counts how many are still to rise. This is the hardest way to play: our best computer captain wins about 1 game in 20, so try Easy solo first.':s.variant==='easysolo'?'Easy solo (our variant): one junk, 4 leviathans to start, 24 turns. Survive 24 turns or play out the whole pile. Destroyed tiles are discarded. A careful captain wins about 1 game in 3.':s.variant==='teams'?'Two equal teams (every other seat); you may lay a tile for a teammate. 4, 6 or 8 captains.':'Last junk afloat wins.'}</p>
    <label class="opt"><input type="checkbox" data-a="nomon" ${s.noMon?'checked':''}><span>No leviathans (calm seas)<small>The official "no monsters" option.</small></span></label></div>
   <div class="stcard"><h2>Expansions: Deepwater Perils</h2><p class="tiny">Four optional extra pieces that make the sea nastier. <b>Recommended for a first game: none.</b> Add them one at a time later.</p>${ex.map(([k,l,d])=>`<label class="opt"><input type="checkbox" data-a="exp" data-k="${k}" ${s.exp[k]?'checked':''}><span><b>${l}</b><small>${d}</small></span></label>`).join('')}</div></div>
-  <div class="stcard"><h2>Captains ${solo?'(solo: one junk)':''}</h2>${solo?'':`<div class="row" style="margin-bottom:6px"><span>Players:</span>${seg('np',n,(s.variant==='teams'?[4,6,8]:[2,3,4,5,6,7,8]).map(k=>[k,k]))}</div>`}${Array.from({length:Math.max(n,nOnl)},(_,i)=>sv(i)).join('')}</div>
-  <div class="row"><button class="btn pri" data-a="start" id="startbtn">Set sail</button><button class="btn" data-gx="rulesd">Rules</button><button class="btn" data-gx="piecesd">Pieces</button><button class="btn" data-gx="credd">Credits</button></div></div>`}
+  <div class="stcard"><h2>Captains ${solo?'(solo: one junk)':''}</h2>${solo?'':`<div class="row" style="margin-bottom:6px"><span>Players:</span>${seg('np',n,(s.variant==='teams'?[4,6,8]:[2,3,4,5,6,7,8]).map(k=>[k,k]))}</div>`}${Array.from({length:Math.max(n,nOnl)},(_,i)=>sv(i)).join('')}<p class="tiny">Computer levels: <b>easy</b> often takes risky lines, <b>normal</b> plays safe, <b>hard</b> also weighs the leviathans' next rolls. The dice decide many games, so even a hard captain can sink to one bad roll.</p></div>
+  <div class="row"><button class="btn pri" data-a="start" id="startbtn">Set sail</button><button class="btn" data-gx="rulesd">Rules</button><button class="btn" data-gx="gx-refd">Pieces</button><button class="btn" data-gx="credd">Credits</button></div></div>`}
 function showStart(){if(isClient()){hideStart();return}UI.started=false;clearTimeout(UI.tm);UI.gen++;UI.busy=false;try{sndLoop('sea_loop',false);musicStop(.4);TWKit.setLegal([]);TWKit.ghost(null)}catch(e){}$('#start').hidden=false;GX.close();renderStart()}
 function hideStart(){$('#start').hidden=true}
 function startAction(a,t){const s=UI.setup=UI.setup||defaultSetup();const D=t.dataset;
@@ -412,20 +398,20 @@ document.addEventListener('change',e=>{const t=e.target;if(!t.dataset||!t.datase
   else if(t.dataset.a==='lv'){s.seats[+t.dataset.i].lv=t.value}
   else if(t.dataset.a==='exp'){s.exp[t.dataset.k]=t.checked?1:0}
   else if(t.dataset.a==='nomon'){s.noMon=t.checked}});
-function startGuided(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};UI.setup=s;startGame(JSON.parse(JSON.stringify(s)),{guided:true})}
+function startGuided(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};startGame(JSON.parse(JSON.stringify(s)),{guided:true})} // the player's own setup (UI.setup) is left as it was
 function startGame(s,o){o=o||{};if(isClient())return;let plan=null;if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats.forEach((x,i)=>{x.h=i<plan.hum.length});o.guided=false}
   UI.gen++;clearTimeout(UI.tm);kitReset();
   const solo=s.variant==='solo'||s.variant==='easysolo';let np=solo?1:teamN(s);const seats=s.seats.slice(0,np);
   seats.forEach((x,i)=>{SHIP_NAMES[i]=COL[x.col].name});UI.cols=seats.map(x=>x.col);
   newGame({players:np,seats:seats.map(x=>x.h?'human':'ai'),lv:seats.map(x=>x.lv),exp:Object.assign({},s.exp),variant:s.variant||null,noMon:!!s.noMon});if(plan)netBound(plan);
   UI.lastSetup=s;UI.guided=!!o.guided;UI.guide=o.guided?'full':(lsGet('tw_set',{}).guide||'light');UI.seen=o.guided?{}:UI.seen;if(o.guided)UI.trig={};else UI.trig={};
-  UI.sel=null;UI.hint=false;UI.busy=false;UI.pause=false;UI.dice=null;UI.res=null;UI.lastRoll=null;UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;UI.snap=null;UI.hiMon=null;UI.arrow=null;UI.overSeen=0;UI.confirm=null;UI.lastKey='';UI.qKey=null;UI.curTurn=null;
-  const h=humans();UI.holder=h.length===1?h[0]:-1;UI.started=true;hideStart();GX.close();
+  UI.sel=null;UI.hint=false;UI.busy=false;UI.pause=false;UI.dice=null;UI.res=null;UI.lastRoll=null;UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;UI.hiMon=null;UI.arrow=null;UI.overSeen=0;UI.confirm=null;UI.lastKey='';UI.qKey=null;UI.curTurn=null;
+  const h=humans();UI.holder=h.length===1?h[0]:-1;UI.started=true;hideStart();GX.close();kitNewGame();
   try{if(window.PerfHUD)PerfHUD.hitch()}catch(e){}
   kitSync();SND.mood='calm';sndLoop('sea_loop',true);if(SND.gesture)musicStart();else SND.wantMusic=1;
   saveAll();render();schedule()}
 function resumeSaved(){const g=savedGame();if(!g)return;const u=lsGet('tw_ui1',{});kitReset();G=g;UI.cols=u.cols||G.seats.map((_,i)=>i);G.seats.forEach((x,i)=>{SHIP_NAMES[i]=x.nm});
-  UI.guide=u.guide||'light';UI.seen=u.seen||{};UI.trig=u.trig||{};UI.guided=!!u.guided;UI.lastSetup=u.setup||UI.setup;UI.sel=null;UI.busy=false;UI.pause=false;UI.overSeen=0;UI.confirm=null;UI.lastKey='';UI.holder=humans().length===1?humans()[0]:-1;UI.started=true;UI.gen++;hideStart();GX.close();
+  UI.guide=u.guide||'light';UI.seen=u.seen||{};UI.trig=u.trig||{};UI.guided=!!u.guided;UI.lastSetup=u.setup||UI.setup;UI.sel=null;UI.busy=false;UI.pause=false;UI.overSeen=0;UI.confirm=null;UI.lastKey='';UI.holder=humans().length===1?humans()[0]:-1;UI.started=true;UI.gen++;hideStart();GX.close();kitNewGame();
   kitSync();sndLoop('sea_loop',true);if(SND.gesture)musicStart();else SND.wantMusic=1;render();schedule()}
 // ===================== part 5: boot, kit wiring, PerfHUD =====================
 function detectSoftGPU(){if(/jsdom/i.test(navigator.userAgent))return false;try{const c=document.createElement('canvas');const gl=c.getContext('webgl');if(!gl)return false;const e=gl.getExtension('WEBGL_debug_renderer_info');const r=e?gl.getParameter(e.UNMASKED_RENDERER_WEBGL):gl.getParameter(gl.RENDERER);const lose=gl.getExtension('WEBGL_lose_context');if(lose)lose.loseContext();return /swiftshader|llvmpipe|software|softpipe/i.test(String(r))}catch(e){return false}}
@@ -433,16 +419,16 @@ function perfHooks(){const PH=window.PerfHUD;if(!PH||!TWKit._K||!TWKit._K.on)ret
   PH.register({game:'Tidewake',renderer:K.r,levels:['high','medium','low'],names:{high:'High',medium:'Medium',low:'Low'},anchor:'.gx-board',corner:'bl',
     getLevel:()=>TWKit.getQuality().active,isAuto:()=>TWKit.getQuality().pref==='auto',autoTop:()=>window.TW_SOFTGPU?'low':(Math.min(innerWidth,innerHeight)<600?'medium':'high'),
     setLevel:(l,why)=>{if(why==='apply')TWKit.setQuality(l);else TWKit._applyQ(l);if(GX.open==='setd')renderSettings()},
-    basePR:()=>Math.min(window.devicePixelRatio||1,DPR[TWKit.getQuality().active]||1),onPixelRatio:v=>{K.r.setPixelRatio(v);const b=GX.boardSize();TWKit.resize(b.w,b.h)},
+    basePR:()=>Math.max(1,Math.min(window.devicePixelRatio||1,DPR[TWKit.getQuality().active]||1)),onPixelRatio:v=>{K.r.setPixelRatio(Math.max(1,v));const b=GX.boardSize();TWKit.resize(b.w,b.h)},
     orbit:t=>{const C=K.cs;if(!C)return;if(t==null){if(UI.orb0){C.pos.copy(UI.orb0.p);C.look.copy(UI.orb0.l);UI.orb0=null}return}if(!UI.orb0)UI.orb0={p:C.pos.clone(),l:C.look.clone()};const a=Math.sin(t*Math.PI*2)*.5;const d=UI.orb0.p.clone().sub(UI.orb0.l);const x=d.x*Math.cos(a)-d.z*Math.sin(a),z=d.x*Math.sin(a)+d.z*Math.cos(a);C.pos.set(UI.orb0.l.x+x,UI.orb0.p.y,UI.orb0.l.z+z)},
     isAnimating:()=>{try{return TWKit.isAnimating()||UI.busy}catch(e){return false}},beforeTest:()=>GX.close()})}
 // board framing: the whole chart (frame, edge numbers, ships on the marks) must stay inside the board area at any aspect
 function frame(w,h){const a=w/h;window.TW_PADX=a<1.2?.3:.15;window.TW_PADT=a<.8?.55:.6;window.TW_PADB=.2}
-function boot(){phApply();GX.init({key:'tw'});const st=lsGet('tw_set',{});if(st.speed)UI.speed=st.speed;if(st.guide)UI.guide=st.guide;if(st.anim===false){UI.anim=false;ANIM=0}
+function boot(){phApply();GX.init({key:'tw'});const st=lsGet('tw_set',{});if(st.guide)UI.guide=st.guide;
   window.TW_SOFTGPU=detectSoftGPU();installRecorders();
   const cv=$('#c3'),fb=$('#fb');const P=new URLSearchParams(location.search);let res={ok:false};
   {const b=GX.boardSize();frame(b.w,b.h)}
-  try{res=TWKit.init(cv,{fallback:fb,force2D:P.has('2d')})}catch(e){console.error(e)}
+  try{res=TWKit.init(cv,{fallback:fb,force2D:P.has('2d'),fonts:false})}catch(e){console.error(e)}
   try{TWKit.setSpeed(UI.speed)}catch(e){}
   const on2d=()=>{cv.hidden=true;fb.hidden=false;if(!fb._wired){fb._wired=1;fb.addEventListener('click',e=>{let p=null;try{p=TWKit.pick(e.clientX,e.clientY)}catch(x){}if(!p||!isFinite(e.clientX)||!e.clientX&&!e.clientY)p=TWKit.pick2D(e.target)||p;if(p)onPick(p)})}};
   if(!res.ok)on2d();
@@ -451,9 +437,9 @@ function boot(){phApply();GX.init({key:'tw'});const st=lsGet('tw_set',{});if(st.
     cv.addEventListener('click',e=>{if(down&&Math.abs(e.clientX-down.x)+Math.abs(e.clientY-down.y)>8)return;onPick(TWKit.pick(e.clientX,e.clientY))});perfHooks()}
   const tiltFor=(w,h)=>PH.on?89:w<700?82:(w/h<.8?76:61),regFor=()=>PH.on?PH_REGION:null;GX.onResize((w,h)=>{try{frame(w,h);TWKit.resize(w,h);TWKit.setView({tilt:tiltFor(w,h),region:regFor(),immediate:true});PH.zk='?';phZoom();TWKit.renderOnce()}catch(e){}});{const b=GX.boardSize();try{TWKit.resize(b.w,b.h);TWKit.setView({tilt:tiltFor(b.w,b.h),region:regFor(),immediate:true})}catch(e){}}
   $('#rulesbody').innerHTML=RULES_HTML;
-  GX.onShow=id=>{sfx('open');if(id==='piecesd'&&!$('#piecesbody').firstChild)$('#piecesbody').innerHTML=piecesHTML();renderOpenDrawer()};GX.onClose=()=>sfx('close');
+  GX.onShow=id=>{sfx('open');renderOpenDrawer()};GX.onClose=()=>sfx('close');
   document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!GX.open&&G&&UI.started&&UI.confirm){UI.confirm=null;renderCoach()}});
-  netInit();showStart();OV.raf=requestAnimationFrame(ovLoop)}
+  kitBoot();netInit();showStart();OV.raf=requestAnimationFrame(ovLoop)}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 // ===================== part 6: board overlay (labels, route, markers), advisor, sunk cards, monster-phase card =====================
 // ---------- the overlay: HTML/SVG drawn over the board, positioned from the kit's own camera (3D) or the 2D chart ----------
@@ -583,9 +569,9 @@ function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];
   for(const k in KS.mons){const a=k.split(',').map(Number),id=+KS.mons[k].split(':')[0];D.push({k:'tag',id:'m'+id,wx:a[0]-2.5,wy:.95,wz:a[1]-2.5,t:levName(id),cls:'mon'+(UI.hiMon===id||UI.hov===id||dq===id?' hi':'')+(near.has(id)?' near':''),mon:id})}
   for(const k in KS.mael){const a=k.split(',').map(Number);D.push({k:'tag',id:'ma'+k,wx:a[0]-2.5,wy:.5,wz:a[1]-2.5,t:'Maelstrom',cls:'piece mael'})}
   for(const k in KS.gates){const a=k.split(',').map(Number);D.push({k:'tag',id:'g'+k,wx:a[0]-2.5,wy:.55,wz:a[1]-2.5,t:'Rift Gate',cls:'piece gate'})}
-  if(KS.wave&&G.wave){const w=G.wave;D.push({k:'tag',id:'wv',wx:w.x-2.5,wy:.55,wz:w.y-2.5,t:`Rogue Wave: ${(w.r&1)?'column '+(w.x+1):'row '+(w.y+1)}, strength ${waveStr()}`,cls:'piece wave'})}
+  if(KS.wave&&G.wave){const w=G.wave;D.push({k:'tag',id:'wv',wx:w.x-2.5,wy:.55,wz:w.y-2.5,t:PH.on?'Rogue Wave':`Rogue Wave: ${(w.r&1)?'column '+(w.x+1):'row '+(w.y+1)}, strength ${waveStr()}`,cls:'piece wave'})}
   if(!busy)for(const s of G.ships){const p=shipPos(s);if(!p)continue;const w=p.port!=null?pw(p.c,p.r,p.port):sqW(p.c,p.r);const mine=s.i===me&&me>=0;
-    if(!(mine&&UI.route))D.push({k:'tag',id:'s'+s.i,wx:w[0],wy:.5,wz:w[1],t:mine?'You':nm(s.i),cls:'ship'+(mine?' me':'')+(myTurn&&s.i===d?' act':''),sail:colOf(s.i).sail});
+    if(!(mine&&UI.route))D.push({k:'tag',id:'s'+s.i,wx:w[0],wy:.5,wz:w[1],t:mine?'You':nm(s.i),cls:'ship'+(mine?' me':'')+(myTurn&&s.i===d?' act':''),sail:colOf(s.i).sail,cbm:GX.mark(cbi(s.i))});
     if(mine&&myTurn&&G.phase==='play')D.push({k:'ring',id:'r'+s.i,wx:w[0],wz:w[1]})}
   if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);const adv=startAdvice(knowledge(d),d,info);for(const o of info)D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e,wx:o.w[0],wz:o.w[1],t:o.lab,best:!!(adv&&adv.o===o)})}
   if(UI.route&&!busy)D.push({k:'route',id:'rt',pts:UI.route.pts,bad:UI.route.bad,stop:UI.route.stop,label:UI.route.label});
@@ -604,7 +590,7 @@ function ovApply(D){const sig=JSON.stringify(D);if(sig===OV.sig&&OV.items.length
         const s=document.createElement('div');s.className='ostart';s.innerHTML='<span>start</span>';root.appendChild(s);it.el2=s}
       else{const h=document.createElementNS(ns,'polygon');h.setAttribute('class','head');g.appendChild(h);it.head=h}}
     else{const e=document.createElement('div');
-      if(ds.k==='tag'){e.className='otag '+ds.cls;e.textContent=ds.t;if(ds.sail){const i=document.createElement('i');i.style.background=ds.sail;e.prepend(i)}if(ds.mon!=null)e.dataset.mon=ds.mon}
+      if(ds.k==='tag'){e.className='otag '+ds.cls;e.textContent=ds.t;if(ds.sail){const i=document.createElement('i');i.style.background=ds.sail;if(ds.cbm){const b=document.createElement('b');b.className='gx-cbm';b.textContent=ds.cbm;i.appendChild(b)}e.prepend(i)}if(ds.mon!=null)e.dataset.mon=ds.mon}
       else if(ds.k==='ring')e.className='oring';
       else if(ds.k==='pip'){e.className='opip'+(ds.best?' best':'');e.innerHTML=`<b>${esc(ds.t)}</b>${ds.best?'<u>best</u>':''}`}
       else if(ds.k==='mark'){e.className='omark';e.innerHTML=`<b>&#10006;</b><span>${esc(ds.t)}</span>`}
@@ -693,9 +679,9 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
     else tiles+=`<button class="pt sp${on?' sel':''}" data-a="card" data-t="${t}" data-owner="${dd}" data-up="1" aria-label="${isGate(card)?'Rift Gate':'Deck Cannon'}">${isGate(card)?gateArt():cannonArt()}</button>`});
   let ctl='';if(can&&isCur(hand[sel.t])){const m={a:'place',t:sel.t,r:sel.r,s:sel.s},err=legal(m,dd);
     ctl=`<button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}</button><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}</button><button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`}
-  const hint=PH.pop==='tiles'?'':(can?`Tap the glowing square in front of ${hotSeat()||humans().length>1?esc(nm(dd))+"'s":'your'} ship to see your tiles.`:'Nothing can be laid: pick an option.');
+  const hint=PH.pop==='tiles'?'':(can?'Pick a tile and turn it: the gold line shows where you will sail. Then press Place.':'Nothing can be laid: pick an option.');
   return `<div class="ps-main"><div class="ps-tiles">${tiles}</div><div class="ps-ctl">${ctl}${zb}</div></div>${phTargets(c)}<div class="ps-x">${phExtras(c)}</div><div class="ps-hint">${PH.toast?esc(PH.toast):hint}</div>`}
-function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML():'';if(h!==PH.strip){PH.strip=h;el.innerHTML=h}}
+function phStrip(){const el=$('#ps');if(!el)return;const h=PH.on?phStripHTML()+phCrewHTML():'';if(h!==PH.strip){PH.strip=h;el.innerHTML=h}}
 // ---------- the pop-up: tiles / info / start marks (lives in the free zone next to the board, never over it) ----------
 function phTilesHTML(c){const {d,K,hand,sel,pl}=c;if(!pl.length||!sel)return '';const multi=hotSeat()||humans().length>1;
   const m={a:'place',t:sel.t,r:sel.r,s:sel.s};let selA=null,tiles='';
@@ -715,17 +701,17 @@ const phFace=['north','north-east','east','south-east','south','south-west','wes
 function phMonInfo(m){const L=LEV[m.id];const d=sideToAct(),vs=viewSeat();const S=vs>=0?G.ships[vs]:null;
   const faces=L.arr.map((a,i)=>`<li><b>${i+1}</b> ${a==='R'?'quarter turn '+(L.rd>0?'clockwise':'counter-clockwise'):'swims '+DNAME[(DIRN[a]+m.r)%4]}</li>`).join('')+'<li><b>6</b> stays; another leviathan rises</li>';
   let thr='';if(S&&S.alive&&S.x!=null){const f=monHits(m,[[S.x,S.y]]);thr=f.length?`<p class="warn-l">Faces ${f.join(', ')} move it onto the square in front of your junk.</p>`:`<p class="tiny">It cannot reach the square in front of your junk this turn.</p>`}
-  return {t:levName(m.id),at:[m.x,m.y],h:`<div class="ph-info"><img alt="" src="${TWKit.leviathanURL(levArrows(m.id),{rot:m.r,uid:'pi',size:104})}"><div><p><b>A leviathan.</b> When the two dice total 6, 7 or 8 it wakes, rolls one die and swims the way that face points. A junk whose wake ends on its square sinks; so does a tile it swims onto. Move order ${L.order}${L.gold?' (gold: wins ties)':''}.</p></div></div><ul class="ph-faces">${faces}</ul>${thr}`}}
+  return {t:levName(m.id),at:[m.x,m.y],ref:'lev'+m.id,h:`<div class="ph-info"><img alt="" src="${TWKit.leviathanURL(levArrows(m.id),{rot:m.r,uid:'pi',size:104})}"><div><p><b>A leviathan.</b> When the two dice total 6, 7 or 8 it wakes, rolls one die and swims the way that face points. A junk whose wake ends on its square sinks; so does a tile it swims onto. Move order ${L.order}${L.gold?' (gold: wins ties)':''}.</p></div></div><ul class="ph-faces">${faces}</ul>${thr}`}}
 function phInfoData(pd){if(!G||!pd)return null;
   if(pd.k==='ship'){const S=G.ships[pd.i];if(!S)return null;const p=shipPos(S);const me=viewSeat()===pd.i;const sq=S.x!=null?`front square: column ${S.x+1}, row ${S.y+1}`:S.alive?'on a tile':'sunk';
     return {t:(me?'You: ':'')+nm(pd.i)+"'s junk",at:p?[p.c,p.r]:null,h:`<p>${dot(pd.i)} <b>${esc(nm(pd.i))}</b> ${G.seats[pd.i].human?'(human)':'(computer, '+esc(G.seats[pd.i].lv)+')'}${G.team?' team '+'AB'[G.team[pd.i]]:''}.</p><p>${S.alive?'Afloat; '+sq+'.':'Sunk.'} Holds ${G.hands[pd.i].length} tile${G.hands[pd.i].length===1?'':'s'}${S.alive&&S.x!=null?'. Its wake follows the tile laid in front of it, and it sinks if it sails off the edge, into a leviathan, or onto another junk\'s wake.':'.'}</p>`}}
   const m=G.mons.find(x=>x.x===pd.x&&x.y===pd.y);
   if(pd.k==='mon'){if(!m||m.k!=='L')return null;return phMonInfo(m)}
-  if(pd.k==='mael'){if(!m||m.k!=='M')return null;return {t:'Maelstrom',at:[m.x,m.y],h:`<p><b>A whirlpool.</b> On a calm wake roll it moves: 1 east, 2 south, 3 west, 4 north, 5 or 6 stays. It destroys the tile and junk it enters.</p>`}}
-  if(pd.k==='gate'){if(!G.gates.some(g=>g.x===pd.x&&g.y===pd.y))return null;return {t:'Rift Gate',at:[pd.x,pd.y],h:`<p><b>A rift in the sea.</b> It stays on its square. A junk or leviathan that touches it is thrown to a rolled square.</p>`}}
-  if(pd.k==='wave'){const w=G.wave;if(!w)return null;return {t:'Rogue Wave',at:[w.x,w.y],h:`<p><b>A rogue wave</b> sweeping ${(w.r&1)?'column '+(w.x+1):'row '+(w.y+1)}, heading ${DNAME[w.r]}, strength ${waveStr()}. Any junk in that band rolls a die and capsizes if it does not reach ${waveStr()}.</p>`}}
+  if(pd.k==='mael'){if(!m||m.k!=='M')return null;return {t:'Maelstrom',at:[m.x,m.y],ref:'mael',h:`<p><b>A whirlpool.</b> On a calm wake roll it moves: 1 east, 2 south, 3 west, 4 north, 5 or 6 stays. It destroys the tile and junk it enters.</p>`}}
+  if(pd.k==='gate'){if(!G.gates.some(g=>g.x===pd.x&&g.y===pd.y))return null;return {t:'Rift Gate',at:[pd.x,pd.y],ref:'gate',h:`<p><b>A rift in the sea.</b> It stays on its square. A junk or leviathan that touches it is thrown to a rolled square.</p>`}}
+  if(pd.k==='wave'){const w=G.wave;if(!w)return null;return {t:'Rogue Wave',at:[w.x,w.y],ref:'wave',h:`<p><b>A rogue wave</b> sweeping ${(w.r&1)?'column '+(w.x+1):'row '+(w.y+1)}, heading ${DNAME[w.r]}, strength ${waveStr()}. Any junk in that band rolls a die and capsizes if it does not reach ${waveStr()}.</p>`}}
   return null}
-function phInfoHTML(){const I=phInfoData(PH.pd);if(!I)return null;return `<div class="ph-head"><b>${esc(I.t)}</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div><div class="ph-body">${I.h}</div>`}
+function phInfoHTML(){const I=phInfoData(PH.pd);if(!I)return null;return `<div class="ph-head"><b>${esc(I.t)}</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div><div class="ph-body">${I.h}${I.ref?`<p><button class="btn small" data-a="refitem" data-id="${I.ref}">More in Pieces</button></p>`:''}</div>`}
 function phStartHTML(){const d=sideToAct();const pd=PH.pd;let info=[];try{info=startInfo(d).filter(o=>o.m.x===pd.x&&o.m.y===pd.y)}catch(e){}if(!info.length)return null;let adv=null;try{adv=startAdvice(knowledge(d),d,startInfo(d))}catch(e){}
   return `<div class="ph-head"><b>Start here?</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div><div class="ph-body"><p class="tiny">Pick a gold mark on this square. A mark in the middle of an edge is safest; next to a corner you may run out of room.</p><div class="ph-marks">${info.map(o=>`<button class="pb big${adv&&adv.o===o?' pri':''}" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}">${o.edge[0].toUpperCase()+o.edge.slice(1)} ${o.idx}, ${o.sideWord} mark${adv&&adv.o===o?' (best)':''}</button>`).join('')}</div></div>`}
 function phPopup(){const el=$('#ppop');if(!el)return;let h=null;
@@ -759,7 +745,7 @@ function phCards(){const pc=$('#pc');if(!pc)return;const kind=PH.on?phNeed():nul
   pc.hidden=false;PH.cur.block=true;
   if(PH.pop&&(PH.pop!=='info'||kind==='pass'||kind==='over'||kind==='q')){PH.pop=null;PH.pd=null;phPopup()}
   // the wake roll card goes away by itself a few seconds after the animation ends
-  if(kind==='mph'&&!UI.busy&&!PH.tmr){const mp=UI.mph;PH.tmr=setTimeout(()=>{PH.tmr=0;if(UI.mph===mp&&!UI.busy){PH.mphHide=mp;phAfter()}},3500/(UI.tickRate||1))}
+  if(kind==='mph'&&!UI.busy&&!PH.tmr&&!UI.wakeTap){const mp=UI.mph;PH.tmr=setTimeout(()=>{PH.tmr=0;if(UI.mph===mp&&!UI.busy){PH.mphHide=mp;phAfter()}},(mp&&mp.wake?3000:1800)/(UI.tickRate||1))}
   if(kind!=='mph'){clearTimeout(PH.tmr);PH.tmr=0}}
 // ---------- one pass after every render ----------
 function phAfter(){if(!PH.on)return;try{phCards();phPopup();phStrip();phZoom()}catch(e){console.error(e)}}
@@ -812,3 +798,122 @@ document.addEventListener('keydown',e=>{if(!PH.on||e.key!=='Escape'||GX.open)ret
  document.addEventListener('pointerup',e=>{if(!down)return;down=false;if(!PH.on||PH.pop!=='tiles'||!UI.sel||UI.busy)return;const dx=e.clientX-sx,dy=e.clientY-sy;
    if(Math.abs(dx)>=36&&Math.abs(dx)>Math.abs(dy)*1.5&&Date.now()-st<900){PH.swipeT=Date.now();UI.sel.r=(UI.sel.r+(dx>0?1:3))%4;sfx('tile_rotate');render()}})}
 window.addEventListener('resize',()=>{if(!G&&!PH.on&&!phDetect())return;const was=PH.on;phApply();if(PH.on||was){PH.zk='?';PH.strip='';PH.pop_h='';try{if(G&&UI.started)render();else phAfter()}catch(e){}}});
+// ===================== part 8: shared GX kit (settings, reference, take-back, recap, results, offline) =====================
+const GAME_ID='tidewake';
+// ---- achievements (stored by the shelf; shown in Stats & achievements on the home page)
+const ACH=[
+ {id:'first',name:'Maiden voyage',how:'Finish a game.',test:r=>true},
+ {id:'guide',name:'Chart reader',how:'Finish the guided first game.',test:r=>r.mode==='guided'},
+ {id:'win',name:'Last junk afloat',how:'Beat the computer captains.',test:r=>r.won&&(r.mode==='vs'||r.mode==='guided')},
+ {id:'hard',name:'Storm-tested',how:'Beat three or more hard computer captains.',test:(r,s,x)=>r.won&&r.mode==='vs'&&x.extra&&x.extra.hard>=3},
+ {id:'eight',name:'Eight sails',how:'Win a game with eight captains.',test:r=>r.won&&r.np>=8},
+ {id:'solo',name:'Outlasted the deep',how:'Win a solo game.',test:(r,s,x)=>r.won&&x.extra&&x.extra.variant==='solo'},
+ {id:'easysolo',name:'Calm hands',how:'Win an easy solo game.',test:(r,s,x)=>r.won&&x.extra&&x.extra.variant==='easysolo'},
+ {id:'perils',name:'Deepwater survivor',how:'Win with all four expansion pieces on.',test:(r,s,x)=>r.won&&x.extra&&x.extra.exp>=4},
+ {id:'teams',name:'Fleet captain',how:'Win a teams game.',test:(r,s,x)=>r.won&&x.extra&&x.extra.variant==='teams'},
+ {id:'hot',name:'Shared helm',how:'Finish a hot-seat game.',test:r=>r.mode==='hot'}];
+// ---- small DOM helpers for the kit panels
+function kb(a,label,o){const b=document.createElement('button');b.type='button';b.className='gx-sb';if(a)b.dataset.a=a;b.textContent=label;o=o||{};for(const k in o){if(k==='disabled'){if(o[k])b.disabled=true}else b.setAttribute(k,o[k])}return b}
+// ---- speed: the shared "Animations" choice drives the replay speed; "Very fast turns" keeps the old x5 option
+const TW_SPEED={slow:.6,normal:1.4,fast:2.5,off:2.5};
+function twRate(){const a=GX.pref('anim');if(UI.legacy&&UI.legacy.speed)return +UI.legacy.speed;let v=UI.guided?1:(TW_SPEED[a]||1.4);if(UI.turbo&&!UI.guided)v*=2;return v}
+function twSetRate(v){UI.speed=UI.spSet=v;try{TWKit.setSpeed(v)}catch(e){}}
+function twSpeed(){const a=GX.pref('anim');ANIM=a==='off'||GX.reduced()||(UI.legacy&&UI.legacy.anim===false)?0:1;twSetRate(twRate());AIDELAY=GX.aiDelay(500)}
+// a new game only re-reads the rate (guided games replay at the calm speed); a speed set by hand (tests) is kept
+function twGameSpeed(){if(UI.spSet==null||UI.speed===UI.spSet)twSetRate(twRate())}
+// ---- settings: the same sections as every game; Tidewake adds its own rows
+function kitSettings(){
+  GX.settings({id:'setd',title:'Menu',
+    game:S=>{
+      if(isClient())S.appendChild(GX.row('Online',[kb('netleave','Leave the online game')]));
+      else{const r=[];if(G&&UI.started)r.push(kb('restart','Restart this setup'));r.push(kb('tonew','New game…'));S.appendChild(GX.row('This game',r));}
+      if(!NET.on&&G&&UI.started&&humans().length===1)S.appendChild(GX.row('Take back',kb('rewind','Take back my last move',{disabled:!GX.undo.can()}),'Puts the board back to just before your last move (also Ctrl+Z)'));
+    },
+    sound:S=>{S.appendChild(GX.row('Sound effects',GX.onoff(SND.on,()=>toggleSound(),'Sound effects')));S.appendChild(GX.row('Music',GX.onoff(SND.music,()=>toggleMusic(),'Music')))},
+    speed:S=>{S.appendChild(GX.row('Very fast turns',GX.onoff(!!UI.turbo,v=>{UI.turbo=v;UI.legacy=null;saveSettings();twSpeed()},'Very fast turns'),'Doubles the speed of every replay (not in the guided game)'));
+      S.appendChild(GX.row('Wake cards',GX.seg([['auto','Close by themselves'],['tap','Wait for my tap']],UI.wakeTap?'tap':'auto',v=>{UI.wakeTap=v==='tap';saveSettings()},'Wake cards'),'On phones: a calm roll that does not touch you closes after 2 seconds'))},
+    help:S=>{S.appendChild(GX.row('Read',[kb(null,'How to play',{'data-gx':'rulesd'}),kb(null,'Pieces',{'data-gx':'gx-refd'}),kb(null,'Sound credits',{'data-gx':'credd'})]));
+      S.appendChild(GX.row('Guide',GX.seg([['full','Full lessons'],['light','Warnings only']],UI.guide,v=>{UI.guide=v;saveSettings();saveAll();if(G&&UI.started)render()},'Guide'),'Lessons appear one at a time as things happen'))},
+    graphics:S=>{const g=(()=>{try{return TWKit.getQuality()}catch(e){return {pref:'auto',active:'2d'}}})();const on3=!!(TWKit._K&&TWKit._K.on);
+      if(!on3){S.appendChild(GX.row('Graphics','2D chart',"This device has no 3D graphics, so the flat chart is used"));return}
+      S.appendChild(GX.row('Graphics',GX.seg([['auto','Auto'],['high','High'],['medium','Medium'],['low','Low']],g.pref,v=>{try{TWKit.setQuality(v);if(window.PerfHUD)PerfHUD.hitch()}catch(x){}},'Graphics'),'Now: '+g.active+'. Auto steps down by itself if frames drop'))},
+    about:{name:'Tidewake',version:'preview',text:'A tile-laying survival game for 1 to 8 captains. Names, texts, board and ship art are our own; the board is drawn in code. Sounds and music are CC0 recordings; three.js is MIT licensed.'}});
+}
+// ---- component reference (tiles, leviathans, expansion pieces, board)
+const TW_EX={gate:`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="16" fill="#6d3fd0" stroke="#e3b24b" stroke-width="4"/><circle cx="24" cy="24" r="7" fill="#c9b3ff"/></svg>`,wave:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#1e4aa0"/><path d="M6 30q6-10 12 0t12 0t12 0M6 20q6-10 12 0t12 0t12 0" fill="none" stroke="#ffe9a8" stroke-width="4" stroke-linecap="round"/></svg>`,mael:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#14606b"/><path d="M24 24m0-4a4 4 0 1 1-4 4a9 9 0 1 1 9 9a14 14 0 1 1-14-14" fill="none" stroke="#bff" stroke-width="3" stroke-linecap="round"/></svg>`,cannon:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#3a3f46"/><rect x="8" y="18" width="26" height="10" rx="5" fill="#14171a" transform="rotate(-18 24 24)"/><circle cx="18" cy="34" r="6" fill="#7a5a14"/><circle cx="38" cy="16" r="3" fill="#ffb347"/></svg>`};
+const TW_MARK={start:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#14606b"/><path d="M4 44h40" stroke="#e3b24b" stroke-width="5"/><circle cx="16" cy="38" r="5" fill="#e3b24b"/><circle cx="32" cy="38" r="5" fill="#e3b24b"/><text x="24" y="22" text-anchor="middle" font-size="16" font-weight="700" fill="#ffe9a8" font-family="Georgia,serif">3</text></svg>`,
+ route:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#14606b"/><path d="M8 42C8 24 40 26 40 8" fill="none" stroke="#e3b24b" stroke-width="5" stroke-linecap="round"/><path d="M40 8v-4l6 3z" fill="#fff"/></svg>`,
+ frame:`<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#0f4f5b"/><rect x="8" y="8" width="32" height="32" rx="4" fill="none" stroke="#5fe1d6" stroke-width="4"/></svg>`};
+function junkSVG(){return `<svg viewBox="0 0 48 48"><rect width="48" height="48" rx="8" fill="#14606b"/>${[0,1,2,3].map(i=>`<path d="M${7+i*9} 30l4-14 4 14z" fill="${COL[i].sail}" stroke="#fff" stroke-width="1"/>`).join('')}<path d="M5 32h38l-4 6H9z" fill="#5a3a1e"/></svg>`}
+function diceSVG(){return `<svg viewBox="0 0 48 48"><rect x="3" y="12" width="20" height="20" rx="4" fill="#e3b24b"/><rect x="25" y="16" width="20" height="20" rx="4" fill="#3c7bd0"/><circle cx="9" cy="18" r="2" fill="#14232b"/><circle cx="17" cy="26" r="2" fill="#14232b"/><circle cx="35" cy="26" r="2" fill="#fff"/></svg>`}
+function refPic(it,big){const p=it.pic||{},px=big?168:52;
+  try{if(p.cur!=null)return TWKit.cardURL(BASE_PATHS[p.cur],{uid:(big?'rb':'rs')+p.cur,size:px});if(p.lev!=null)return TWKit.leviathanURL(levArrows(p.lev),{uid:(big?'lb':'ls')+p.lev,size:px})}catch(e){return null}
+  if(p.ex)return TW_EX[p.ex];if(p.mark)return TW_MARK[p.mark];if(p.junk)return junkSVG();if(p.dice)return diceSVG();return null}
+function refInGame(it){if(!G)return true;const id=it.id,E=G.exp||{};
+  if(id==='gate')return !!E.rift;if(id==='wave')return !!E.wave;if(id==='mael')return !!E.maelstrom;if(id==='cannon')return !!E.cannon;
+  if(/^lev/.test(id))return !G.noMon;return true}
+function kitReference(){GX.reference(TWRef.sections({BASE_PATHS,EXTRA_TYPES,LEV,SHIP_NAMES:COL.map(c=>c.name)}),{title:'Tiles & pieces',label:'Pieces',picture:refPic,inGame:refInGame,before:'[data-gx="setd"]',search:'Search tiles, leviathans, pieces'})}
+// ---- take-back: a snapshot before each move of the only human in a local game (the old "Rewind to my last move", now any time)
+function kitUndo(){GX.undo.config({get:()=>G,owner:()=>0,online:()=>NET.on,max:20,
+  set:g=>{UI.gen++;clearTimeout(UI.tm);kitReset();G=g;UI.sel=null;UI.hint=false;UI.busy=false;UI.pause=false;UI.overSeen=0;UI.resultDone=false;UI.sunk=[];UI.marks=[];UI.sunkSeen={};UI.mph=null;UI.lastKey='';UI.qKey=null;UI.curTurn=null;UI.res=null;UI.holder=humans().length===1?humans()[0]:-1;UI.rcN=G.logN;GX.recap.mark(UI.holder);
+    kitSync();SND.mood='calm';try{sndLoop('sea_loop',true);if(SND.gesture)musicStart()}catch(e){}saveAll();render();schedule()},
+  onChange:can=>{if(GX.open==='setd')GX.renderSettings()}})}
+// ---- "since your turn" strip: new log lines are pushed when a replay has finished (render), marked when a human decides
+function kitRecap(){GX.recap.attach('#dockbody',{before:true,title:'Since your turn'})}
+function recapReset(){GX.recap.clear();const hs=NET.on?(NET.mySeat>=0?[NET.mySeat]:[]):humans();GX.recap.seats(hs.length?hs:[0]);UI.rcN=G?G.logN:0;UI.rcFrom=null}
+function recapSync(){if(!G||UI.busy)return;if(UI.rcN==null||UI.rcN>G.logN)UI.rcN=G.logN;
+  if(G.logN>UI.rcN){const ls=G.log.filter(l=>l.i>UI.rcN).reverse().map(l=>l.t);UI.rcN=G.logN;const from=UI.rcFrom;UI.rcFrom=null;GX.recap.push(ls,from==null?-1:from)}
+  const v=viewSeat();if(v>=0)GX.recap.view(v)}
+// called from act() for a human decision made on this device
+function recapMine(seat){recapSync();UI.rcFrom=seat;GX.recap.mark(seat)}
+// ---- results, statistics, achievements (once per game over)
+function kitResult(){if(!G||!G.over||UI.resultDone)return;UI.resultDone=true;UI.earned=null;
+  const hs=NET.on?(NET.mySeat>=0?[NET.mySeat]:[]):humans();if(!hs.length)return; // watching computers: not your game
+  const me=NET.on?NET.mySeat:hs.length===1?hs[0]:-1;const w=G.over.win||[];
+  const mode=NET.on?'online':UI.guided?'guided':hs.length>1?'hot':(G.variant==='solo'||G.variant==='easysolo')?'solo':'vs';
+  const seats=G.seats.map((s,i)=>({name:nm(i),ai:s.human?null:(s.lv||'normal'),me:i===me}));
+  const lv=G.seats.filter(s=>!s.human).map(s=>s.lv);const top=lv.includes('hard')?'hard':lv.includes('normal')?'normal':lv.length?'easy':null;
+  const E=G.exp||{};const exp=['rift','wave','maelstrom','cannon'].filter(k=>E[k]).length;
+  try{const r=GNS.result({game:GAME_ID,mode,level:mode==='solo'?G.variant:top,seats,winner:w.length?w:-1,turns:G.turn,ms:UI.t0?Date.now()-UI.t0:0,
+      extra:{variant:G.variant||'std',exp,hard:lv.filter(x=>x==='hard').length,afloat:G.ships.filter(s=>s.alive).length}});
+    if(r&&r.earned.length){UI.earned=r.earned.map(a=>a.name);GX.buzz([30,60,30])}}catch(e){}}
+function earnedHTML(){return UI.earned&&UI.earned.length?`<p class="achv">New achievement${UI.earned.length>1?'s':''}: ${UI.earned.map(esc).join(', ')}</p>`:''}
+// ---- a new game or a loaded one: fresh take-back, recap and clock
+function kitNewGame(){GX.undo.clear();recapReset();UI.t0=Date.now();UI.resultDone=false;UI.earned=null;twGameSpeed()}
+// ---- boot (called at the end of boot() in part 5)
+function kitBoot(){
+  const st=lsGet('tw_set',{});UI.turbo=!!st.turbo;UI.wakeTap=!!st.wakeTap;
+  // settings saved before the shared menu (speed 0.5-5, animations on/off) keep working until the player picks a new speed
+  if(st.speed!=null||st.anim!=null)UI.legacy={speed:st.speed,anim:st.anim};
+  kitReference();kitSettings();kitUndo();kitRecap(); // reference first: its bar button is only added while no other [data-gx=gx-refd] exists
+  GNS.achievements(GAME_ID,ACH);twSpeed();
+  GX.onPref(k=>{if(k==='anim'&&UI.legacy){UI.legacy=null;saveSettings()}if(k==='ai'||k==='anim'||k==='reduce'||typeof k==='object')twSpeed();if(k==='master'||typeof k==='object')sndMaster();if((k==='cb'||k==='text')&&G&&UI.started){OV.sig='';render()}});
+  sndMaster();GX.offline({sw:'../sw.js',scope:'../'})}
+// the code-made sounds (used when a sample is missing) follow the shared master volume too
+function sndMaster(){try{SND.vol=.7*(+GX.pref('master'));if(SND.master)SND.master.gain.value=SND.on?SND.vol:0}catch(e){}}
+document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.closest('[data-a]');if(!t||t.disabled)return;const a=t.dataset.a;
+  if(a==='refitem'){phClose&&phClose();GX.refOpen(t.dataset.id)}});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!GX.open&&GX.undo.can()&&G&&UI.started){e.preventDefault();rewindLast()}});
+// ---- title card: the long setup form now sits behind "Change the setup" (audit: the start screen was a form)
+function setupLine(s){const solo=s.variant==='solo'||s.variant==='easysolo';const n=solo?1:teamN(s);const mode=modeOf(s);const seats=s.seats.slice(0,n);
+  const ai=seats.filter(x=>!x.h),lv=[...new Set(ai.map(x=>x.lv))];const ex=['rift','wave','maelstrom','cannon'].filter(k=>s.exp[k]).length;
+  const who=solo?(mode==='watch'?'A computer captain sails alone':'You sail alone'):mode==='me'?`You vs ${ai.length} computer captain${ai.length>1?'s':''} (${lv.join(', ')})`:mode==='hot'?`${n} captains on this device${ai.length?', '+ai.length+' of them computers':''}`:`${n} computer captains (you watch)`;
+  const v={solo:'Solo',easysolo:'Easy solo',teams:'Teams'}[s.variant]||'Standard';
+  return `${who} · ${v}${s.noMon?' · calm seas':''} · ${ex?ex+' expansion piece'+(ex>1?'s':''):'no expansions'}`}
+function titleHTML(){const s=UI.setup=UI.setup||defaultSetup();const cont=savedGame();
+  return `<div class="stin ttl"><h1><svg class="ico" viewBox="0 0 24 24" style="width:44px;height:44px;stroke:#e3b24b"><path d="M3 17c3 2 6 2 9 0s6-2 9 0M12 3v11M12 4l6 7h-6M12 6l-5 6h5"/></svg>Tidewake</h1><p class="tag">Lay currents, steer your junk, outlast the leviathans.</p>
+  <div class="stcard tmenu">
+   ${cont?'<button class="btn pri big" data-a="cont">Continue saved game</button>':''}
+   <button class="btn${cont?'':' pri'} big" data-a="guided">Guided first game<small>One idea at a time, against an easy computer</small></button>
+   <button class="btn big" data-a="start" id="quickgo">Play<small>${esc(setupLine(s))}</small></button>
+   ${onlineBlock()}
+   <div class="row"><button class="btn" data-a="cfg" id="cfgbtn">Change the setup…</button><button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="gx-refd">Pieces</button><button class="btn" data-gx="setd">Menu</button></div>
+  </div></div>`}
+document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.closest('[data-a]');if(!t||t.disabled)return;const a=t.dataset.a;
+  if(a==='cfg'){UI.cfgOpen=true;renderStart();const st=$('#start');if(st)st.scrollTop=0}
+  else if(a==='cfgback'){UI.cfgOpen=false;renderStart()}
+  else if(a==='tonl'){UI.cfgOpen=true;UI.onl=true;renderStart();const o=$('#onl');if(o){o.open=true;try{o.scrollIntoView({block:'start'})}catch(e){}}}});
+// ---- phones: a captains strip under the controls (the bottom half of a tall phone was empty)
+function phCrewHTML(){if(!G||!UI.started||G.phase==='over'&&false)return '';const now=UI.busy&&UI.curTurn!=null?UI.curTurn:sideToAct();const me=viewSeat();
+  const ord=G.order.concat(G.seats.map((_,i)=>i).filter(i=>G.order.indexOf(i)<0));
+  return `<div class="ps-crew" aria-label="Captains">${ord.map(i=>{const s=G.ships[i];return `<span class="pc-c${i===now&&!G.over?' now':''}${s.alive?'':' out'}">${dot(i)}<b>${i===me?'You':esc(nm(i))}</b><small>${s.alive?G.hands[i].length+' tile'+(G.hands[i].length===1?'':'s'):'sunk'}</small></span>`}).join('')}</div>`}
