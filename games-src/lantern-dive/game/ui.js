@@ -444,7 +444,7 @@ function renderDock(v) {
 function renderTip() {
   const t = $('#tip'); if (!t) return; t.innerHTML = ''; document.documentElement.classList.toggle('tipon', !!UI.tip);
   if (!UI.tip) return;
-  const c = h('div.tipcard', h('b', UI.tip.title), h('p', UI.tip.body), h('div.tr', h('button.btn.small', { type: 'button', 'data-a': 'tipok' }, UI.tip.btn || 'Got it')));
+  const c = h('div.tipcard', h('div.th', h('b', UI.tip.title), h('button.btn.small', { type: 'button', 'data-a': 'tipok' }, UI.tip.btn || 'Got it')), h('p', UI.tip.body));
   t.append(c);
 }
 function render() {

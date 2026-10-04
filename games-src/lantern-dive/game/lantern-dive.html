@@ -223,6 +223,8 @@ svg{display:block}
 .tipcard{background:rgba(255,216,115,.14);border:2px solid var(--gold);border-radius:12px;padding:7px 9px;display:flex;flex-direction:column;gap:5px}
 .tipcard b{font-size:15px;color:var(--gold)}.tipcard p{margin:0;font-size:14px;line-height:1.35;white-space:pre-line}
 .tipcard .tr{display:flex;gap:6px;justify-content:flex-end}
+.tipcard .th{display:flex;align-items:center;justify-content:space-between;gap:8px}.tipcard .th .btn{flex:0 0 auto;min-height:44px;padding:0 14px}
+html.ph-short .tipcard p{font-size:13px;line-height:1.25}html.ph-short .tipcard{padding:4px 8px;gap:2px}
 .rules h3{margin:12px 0 4px;font-size:1.08rem;color:var(--gold)}.rules p,.rules li{font-size:14.5px;line-height:1.45}.rules ul,.rules ol{padding-left:20px;margin:4px 0}
 .logl .ll{font-size:14px;padding:3px 0;border-bottom:1px dotted var(--line)}.lt{display:inline-block;min-width:30px;opacity:.6;font-size:13px}
 .mrow{margin:0 0 12px}.mrow .lbl{font-weight:800;margin-bottom:4px}.mbt{display:flex;gap:6px;flex-wrap:wrap}
@@ -5762,7 +5764,7 @@ function renderDock(v) {
 function renderTip() {
   const t = $('#tip'); if (!t) return; t.innerHTML = ''; document.documentElement.classList.toggle('tipon', !!UI.tip);
   if (!UI.tip) return;
-  const c = h('div.tipcard', h('b', UI.tip.title), h('p', UI.tip.body), h('div.tr', h('button.btn.small', { type: 'button', 'data-a': 'tipok' }, UI.tip.btn || 'Got it')));
+  const c = h('div.tipcard', h('div.th', h('b', UI.tip.title), h('button.btn.small', { type: 'button', 'data-a': 'tipok' }, UI.tip.btn || 'Got it')), h('p', UI.tip.body));
   t.append(c);
 }
 function render() {
