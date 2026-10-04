@@ -104,3 +104,19 @@ The owner will generate the final art in Google Flow later. Keep every picture s
 the art manifest, and keep `ART-PROMPTS.md` complete and ordered by impact (board, cards/chips, characters,
 title). Code-drawn art is a placeholder until then. The renderer adds little on its own (a DOM-fallback
 screenshot looked the same as the WebGL one); motion and real art are what show.
+
+## Cost rules (Oct 2026: about $4,100 spent; 86% of it on re-reading one huge conversation)
+Measured on the main session: cache reads 44%, cache writes 42%, output 14%, input 1%. Each step of a
+460K-token conversation costs about $0.09 just to re-read it. Each time the cache expires (a wake after more than
+5 minutes idle), rebuilding it costs about $2.30. The work itself (writing code, output) was only 14%.
+- **Keep the coordinating session small.** Start a fresh session for each phase (one game, one fix round), from
+  `games-src/HANDOFF.md` plus that game's plan. Never run one conversation for days.
+- **No noise wake-ups.** No PR-activity subscription or hourly check-ins on PRs that are only drafts. Batch commits:
+  one push per finished piece of work, not one per log file. Gitignore anything a running job rewrites.
+- **Heavy work goes in small workers** (cloud sessions or subagents, $5–30 each) with a short written brief. The
+  coordinator only spot-checks: rebuild + cmp, one rules run, one phone size, 2–3 screenshots.
+- **Prove on one game before fanning out.** Never start N parallel sessions until one game has passed the
+  blind-newcomer test and the owner has OK'd it. The paused kit rollout (about $160) was started too early.
+- **Blind-newcomer playtests are the quality gate** (`games-src/scripts/drive-serve.js`, no repo access for the
+  tester). They are cheap ($5–10 each) compared with rebuilding a game that nobody understands.
+- The model and effort level for workers are the owner's choice; ask before changing them.
