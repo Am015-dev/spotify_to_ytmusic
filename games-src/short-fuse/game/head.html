@@ -282,6 +282,29 @@ kbd{font:800 .8rem var(--fb);border:2px solid var(--ink);border-radius:6px;paddi
 @media (max-width:639px){#tip .why{display:none}#tip .card{padding:5px 8px}#tip h3{display:inline;font-size:.95rem}#tip p{margin:2px 0}#tip .row .btn:nth-child(2){display:none}.card.coach p{font-size:.85rem}.card.coach h3{font-size:.95rem}}
 @media (max-width:999px) and (max-height:900px){.gx-app:not(.gx-dock-min) .gx-dock{height:var(--gx-sheet-h)}}
 /* ===== phone layout (html.ph): the table is the screen; tap a rack or wire; choices come in one pop-up / card at a time ===== */
+.tagws{gap:6px;flex-wrap:wrap}
+.btn.tagw{min-width:46px;min-height:58px;padding:4px 6px;flex-direction:column;display:inline-flex;align-items:center;justify-content:center;background:#2f6fe0;color:#fff;border-radius:10px}
+.btn.tagw b{font:1.5rem/1 var(--fd)}.btn.tagw i{font:800 .7rem var(--fb);font-style:normal;opacity:.85}
+.chosen{margin:6px 0;padding:6px 9px;border:2px solid var(--ink);border-radius:10px;background:#e8ffe0;font-size:.85rem}
+.crewl span{white-space:nowrap;border-bottom:3px solid var(--sc)}
+.btn.flash{animation:flashB .9s ease-out 2}
+@keyframes flashB{0%,100%{transform:none}40%{transform:scale(1.06);box-shadow:0 0 0 5px rgba(255,201,40,.8)}}
+/* the feed on the table: goal + race, then one line per move since your last turn (blind playtest: computer turns were invisible) */
+.feed{position:absolute;left:8px;top:36px;z-index:2;pointer-events:none;max-width:min(430px,60%);display:flex;flex-direction:column;gap:3px;font:700 .78rem/1.25 var(--fb)}
+.feed:empty{display:none}
+.feed .goal{align-self:flex-start;background:rgba(28,24,56,.86);color:#fff;border-radius:9px;padding:3px 8px}
+.feed .goal b{color:#ffd23f}
+.feed .recap{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.feed .recap li{background:rgba(255,250,240,.93);color:var(--ink);border-left:5px solid var(--sc,#888);border-radius:7px;padding:2px 7px;box-shadow:0 1px 0 rgba(28,24,56,.3)}
+.feed .recap li.rh{background:none;border:0;box-shadow:none;padding:0 2px;color:var(--ink);font-size:.72rem;text-shadow:0 1px 0 #fff}
+.feed .recap li.good{background:rgba(226,250,220,.95)}.feed .recap li.bad{background:rgba(255,224,224,.96)}
+.feed .recap li.new{animation:feedIn .5s ease-out}
+@keyframes feedIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+html.ph .feed{left:6px;right:6px;top:6px;max-width:none;font-size:.72rem}
+html.ph .feed .recap li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph .pz .feed,html.ph.pz .feed{display:none}
+html.ph-l .feed{left:auto;right:6px;width:46%}
+@media (prefers-reduced-motion:reduce){.feed .recap li.new{animation:none}}
 html:not(.ph) #hud,html:not(.ph) #ps,html:not(.ph) #ppop,html:not(.ph) #pc,html:not(.ph) #zb,html:not(.ph) #zpl,html:not(.ph) #zpr,html:not(.ph) #barstat{display:none!important}
 html.ph{--bar:44px}
 html.ph body{overflow:hidden}
