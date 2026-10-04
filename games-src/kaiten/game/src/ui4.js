@@ -28,7 +28,8 @@ const TIP_EXTRA = {
 // tips sit on the board beside the dish they explain (ui8: two short lines, no "Got it"); a ghost finger shows the first grab
 function coachTip(key, title, text, type) {
   UI.coach.seen[key] = 1; UI.coach.turn = G.round + '.' + G.turn;
-  UI.tip = { key, title, text, type, turn: UI.coach.turn }; render();
+  UI.tip = { key, title, text, type, turn: UI.coach.turn, t0: Date.now() }; render();
+  clearTimeout(UI.tipT); UI.tipT = setTimeout(() => { try { boardFX(); } catch (e) { } }, 6100);   // a tip fades on its own after 6 s
 }
 function coachCheck() {
   const lv = UI.coach.level; if (lv === 'off' || !G || G.phase !== 'pick') return false;

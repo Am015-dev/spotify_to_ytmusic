@@ -773,7 +773,8 @@ const TIP_EXTRA = {
 // tips sit on the board beside the dish they explain (ui8: two short lines, no "Got it"); a ghost finger shows the first grab
 function coachTip(key, title, text, type) {
   UI.coach.seen[key] = 1; UI.coach.turn = G.round + '.' + G.turn;
-  UI.tip = { key, title, text, type, turn: UI.coach.turn }; render();
+  UI.tip = { key, title, text, type, turn: UI.coach.turn, t0: Date.now() }; render();
+  clearTimeout(UI.tipT); UI.tipT = setTimeout(() => { try { boardFX(); } catch (e) { } }, 6100);   // a tip fades on its own after 6 s
 }
 function coachCheck() {
   const lv = UI.coach.level; if (lv === 'off' || !G || G.phase !== 'pick') return false;
@@ -1639,7 +1640,7 @@ function tipTarget(tp) {
 }
 function placeTip() {
   let b = $('#tipb'); const tp = UI.tip;
-  const show = tp && G && UI.started && tp.turn === curTurn() && canPick() && !UI.drag && !UI.cards.length && !UI.rsOpen && UI.coach.level !== 'off';
+  const show = tp && G && UI.started && tp.turn === curTurn() && !(tp.t0 && Date.now() - tp.t0 > 6000) && canPick() && !UI.drag && !UI.cards.length && !UI.rsOpen && UI.coach.level !== 'off';
   if (!show) { if (b) b.hidden = true; return; }
   if (!b) { b = h('div#tipb', { role: 'status', 'data-a': 'tipx' }); document.body.appendChild(b); }
   const key = tp.key + tp.turn; if (b.dataset.k !== key) { b.dataset.k = key; b.replaceChildren(h('b', tp.title), ' ', tp.text); }

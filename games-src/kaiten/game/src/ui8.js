@@ -49,7 +49,7 @@ function tipTarget(tp) {
 }
 function placeTip() {
   let b = $('#tipb'); const tp = UI.tip;
-  const show = tp && G && UI.started && tp.turn === curTurn() && canPick() && !UI.drag && !UI.cards.length && !UI.rsOpen && UI.coach.level !== 'off';
+  const show = tp && G && UI.started && tp.turn === curTurn() && !(tp.t0 && Date.now() - tp.t0 > 6000) && canPick() && !UI.drag && !UI.cards.length && !UI.rsOpen && UI.coach.level !== 'off';
   if (!show) { if (b) b.hidden = true; return; }
   if (!b) { b = h('div#tipb', { role: 'status', 'data-a': 'tipx' }); document.body.appendChild(b); }
   const key = tp.key + tp.turn; if (b.dataset.k !== key) { b.dataset.k = key; b.replaceChildren(h('b', tp.title), ' ', tp.text); }
