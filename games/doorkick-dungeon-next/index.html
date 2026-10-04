@@ -2486,7 +2486,7 @@ function handBoost(p){let b=0;for(const id of p.hand){const c=cd(id);if(c.t==='o
 function isDeadly(c){return (c.bad||[]).some(o=>o[0]==='death'||o[0]==='orcs'||o[0]==='dread')}
 // choose a move for seat s from its legal moves
 function aiMove(s){const p=P(s),vm=validMoves(s);if(!vm.length)return null;const by=a=>vm.filter(m=>m.act===a);
-  if(p.lv==='easy'&&rnd(100)<22){const safe=vm.filter(m=>!['toss','give','pick','use'].includes(m.act)&&!(m.act==='play'&&cd(m.card).t==='curse'&&m.tgt===s)&&!(m.act==='play'&&m.tgt==='m'&&G.cb&&G.cb.who===s));if(safe.length)return safe[rnd(safe.length)]}
+  if(p.lv==='easy'&&rnd(100)<22){const safe=vm.filter(m=>!['toss','give','pick','use','sell'].includes(m.act)&&!(m.act==='play'&&cd(m.card).t==='curse'&&m.tgt===s)&&!(m.act==='play'&&m.tgt==='m'&&G.cb&&G.cb.who===s));if(safe.length)return safe[rnd(safe.length)]}
   if(G.q)return aiAnswer(p,vm);
   const ph=G.phase;
   if(ph==='setup'||ph==='main'||ph==='after'||ph==='post'){const m=aiCalm(p,vm);if(m)return m;
@@ -3881,7 +3881,7 @@ function bfEnd(e,cancel){const D=BF.drag;BF.down=null;if(!D)return;BF.drag=null;
   if(z){const r=g.getBoundingClientRect();g.remove();document.querySelectorAll('.bf-lift').forEach(x=>x.classList.remove('bf-lift'));bfDrop(D.id,z,r)}
   else{const src=document.querySelector(`.mine [data-card="${D.id}"]`);const r=src&&src.getBoundingClientRect();
     if(r&&BF.motion()){const a=g.animate([{transform:g.style.transform},{transform:`translate(${r.left}px,${r.top}px) scale(1)`}],{duration:220,easing:'ease-out'});a.onfinish=()=>g.remove()}else g.remove();
-    document.querySelectorAll('.bf-lift').forEach(x=>x.classList.remove('bf-lift'));bfMark()}}
+    document.querySelectorAll('.bf-lift').forEach(x=>x.classList.remove('bf-lift'));bfMark();if(!cancel){bfSay('Not there: drop it on a glow');const l=document.querySelector('#prompt .bfline');if(l&&BF.motion())l.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'none'}],{duration:240,iterations:2})}}}
 document.addEventListener('pointerup',e=>bfEnd(e,false));document.addEventListener('pointercancel',e=>bfEnd(e,true));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(BF.pick!=null||BF.ask)){BF.pick=null;BF.ask=null;bfMark()}});
 
@@ -3898,7 +3898,7 @@ autoNoteHTML=function(){const a=UI.autoNote;if(!a||!G)return '';if(!a.at)a.at=Da
 // the status chip: during a rival's fight it is their fight, not "your move"
 (function(){const _dt=dockTitle;dockTitle=function(me){const cb=G&&G.cb;const s=G?sideToAct():-1;if(cb&&!G.winner&&s===me&&me>=0&&cb.who!==me&&cb.help!==me)return P(cb.who).nm+'’s fight: meddle?';if(G&&!G.winner&&G.phase==='window'&&s===me&&G.active!==me)return curPl().nm+'’s door: curse?';return _dt(me)}})();
 // the first game with "teach me" starts against Easy computers (still changeable on the start screen)
-(function(){if(UI.lvl)return;let first=true;try{first=!localStorage.getItem('dkd_learned')&&!localStorage.getItem('dkd_bf')}catch(e){}if(first){UI.lvl='easy';if(!G)render()}})();
+(function(){if(UI.lvl||/jsdom/i.test(navigator.userAgent||''))return;let first=true;try{first=!localStorage.getItem('dkd_learned')&&!localStorage.getItem('dkd_bf')}catch(e){}if(first){UI.lvl='easy';if(!G)render()}})();
 
 </script>
 </body>
