@@ -140,9 +140,9 @@ function applyNet(o) {
   G = g; window.G = g; NET.mySeat = seat; NET.pend = 0;
   if (fresh) {
     NET.gid = o.gid; Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; UI.seq++; try { closeRS(true); } catch (e) { }
-    Object.assign(UI, { mode: 'net', started: true, holder: -1, focus: seat >= 0 ? seat : 0, evN: g.evN, over: null, overShown: false, rsOpen: false, rsMode: '', repSeen: g.rep ? g.rep.round : 0, shopSel: [], potSig: '', tip: null });
+    Object.assign(UI, { mode: 'net', started: true, holder: -1, focus: seat >= 0 ? seat : 0, evN: g.evN, over: null, overShown: false, rsOpen: false, rsMode: '', repSeen: (g.rep && g.phase !== 'eval') ? g.rep.round : 0, shopSel: [], potSig: '', tip: null });
     UI.coach = { level: 'off', seen: {} }; const st = $('#start'); if (st) st.hidden = true; try { GX.close(); } catch (e) { } UI.netOpen = false;
-    placePrompt(); netRender(); render(); sndMusic(); if (g.phase === 'over') { UI.overShown = true; showFinal(); } return;
+    placePrompt(); netRender(); render(); sndMusic(); if (g.phase === 'eval') checkReport(); if (g.phase === 'over') { UI.overShown = true; showFinal(); } return;
   }
   playEvents(false);
   netRender(); checkReport(); render(); checkFinal();
