@@ -14,8 +14,8 @@ const [W, H] = (process.argv[2] || '390x763').split('x').map(Number); const PH =
   await p.waitForTimeout(2500);
   await p.evaluate(() => { UI.coach.level = 'off'; UI.tip = null; renderTip(); });
   const must = () => p.evaluate(() => iMustAct() && canAct());
-  const wait = async () => { for (let k = 0; k < 120; k++) { if (await must()) return true; await p.waitForTimeout(150); } return false; };
-  await wait(); await p.waitForTimeout(1500); await sh('1assign');
+  const wait = async () => { for (let k = 0; k < 400; k++) { if (await must()) return true; await p.waitForTimeout(150); } return false; };
+  await wait(); await p.waitForTimeout(1500); await sh('1assign'); await p.evaluate(() => { ANIM = 0; AIDELAY = 30; });
   // job pop-up from my own chip / pool card
   let shots = 0, ph0 = '';
   for (let k = 0; k < 400 && shots < 7; k++) {

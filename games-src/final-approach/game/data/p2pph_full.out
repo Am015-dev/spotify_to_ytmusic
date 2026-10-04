@@ -2,3 +2,4 @@ host {"avail":true,"trystero":"object"}
 lobby after 1781 ms host sees ["Hosty","Friend1"]
 layout mid-start host {"bad":[],"w":390,"vw":390,"h":844,"vh":844,"txt":"Room HDDVF · 2 crew online2"} ok
 layout mid-start guest {"bad":[],"w":390,"vw":390,"h":844,"vh":844,"txt":"Room HDDVF · 2 crew online2"} ok
+{"tag":"flight 1","host":{"over":true,"win":true,"why":"landed","round":6,"logN":123,"seat":0,"shown":true},"guests":[{"seat":1,"over":true}],"agree":true,"exactStrip":true,"finalCardEverywhere":true,"stats":{"remote":39,"rejected":13,"inv":0},"nErrors":0,"errors":[],"clicks":94,"remoteClicks":56,"checks":28,"viol":[],"secs":70}
