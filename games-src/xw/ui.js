@@ -36,6 +36,9 @@ function suggestDial(s){const dk=alive().filter(x=>x.side===s.side&&x!==s&&UI.dr
   dialOf(s).forEach((m,i)=>{const p=finalPose(s,B(s),m),c=exColor(s,m);let v=scorePose(s,p,c,enemyPoses,friends,lv);
     // a suggestion must be safe first: never a blocked red, an asteroid only when every move touches one, and don't park beside a rock (next round's moves would all clip it)
     if(c.c==='r'&&s.stress)v-=1e6;
+    // a suggestion for a new player should look for a fight: reward ending with an enemy (where it is now) inside the arc, closer is better; a red move costs next round's action
+    {let best=0;for(const e of enemiesOf(s)){const r=arcReach(p,B(s),e,B(e),s.arc);if(r){const rg=rangeOf(r.d);if(rg<=3)best=Math.max(best,rg===1?3:rg===2?2.5:1.5)}}v+=best;if(c.c==='r')v-=1.5}
+
     // bumping costs the action: avoid enemies that are still parked there (they move after us) or likely to arrive first
     {const P=corners(p,B(s));for(const [e,poses] of enemyPoses){if(psOf(e)>=psOf(s)){if(polyOverlap(P,corners(e,B(e))))v-=8}else v-=8*poses.filter(q=>polyOverlap(P,corners(q,B(e)))).length/Math.max(1,poses.length)}}
 const rk=rockHits(s,m);if(rk)v-=40*rk;
@@ -67,7 +70,7 @@ function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='
     if(humanTurn())h+=`<div class="acts col">${exDAMods().map(m=>`<button class="btn" data-act="damod" data-k="${m.k}">${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="damod" data-k="done">Let the attack stand</button></div>`;else h+=`<p class="small muted">${esc(d.name)} is reacting…</p>`}
   else if(G.phase==='amod'||G.phase==='dmod'){const A=G.atk,a=ship(A.a),d=ship(A.d);const r=preview(A);const rk=me?recMod():null;
     h=diceHead(A)+diceRows(A)+`<p class="preview">Right now: <b>${r.hits} hit${r.hits===1?'':'s'}</b>${r.crits?`, <b>${r.crits} crit${r.crits>1?'s':''}</b>`:''}${A.step==='amod'?' before the defence roll':(r.hits+r.crits===1?' gets through':' get through')}${A.step==='amod'?'':` (${r.hits+r.crits?`${esc(shortName(d))} loses ${r.hits+r.crits} shield${r.hits+r.crits===1?'':'s'} or hull`:'no damage'})`}.</p>`;
-    if(me){const mods=G.phase==='amod'?atkMods():defMods();const rkFirst=(x,y)=>(y.k===rk)-(x.k===rk);h+=`<div class="acts col">${mods.slice().sort(rkFirst).map(m=>`<button class="btn${m.k===rk?' rec':''}" data-act="${G.phase}" data-k="${m.k}">${m.k===rk?'★ ':''}${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn primary" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Done: the defender rolls':'Done: take the damage'}${rk==='done'?'<small>★ recommended: nothing left to improve</small>':''}</button></div>`}
+    if(me){const mods=G.phase==='amod'?atkMods():defMods();const rkFirst=(x,y)=>(y.k===rk)-(x.k===rk);const recMain=rk&&rk!=='done';h+=`<div class="acts col">${mods.slice().sort(rkFirst).map(m=>`<button class="btn${m.k===rk?' rec primary':''}" data-act="${G.phase}" data-k="${m.k}">${m.k===rk?'★ ':''}${esc(m.l)}<small>${esc(m.d)}</small></button>`).join('')}<button class="btn${recMain?'':' primary'}" data-act="${G.phase}" data-k="done">${G.phase==='amod'?'Done: the defender rolls':'Done: take the damage'}${rk==='done'?'<small>★ recommended: nothing left to improve</small>':''}</button></div>`}
     else h+=`<p class="small muted">${G.phase==='amod'?esc(a.name)+' is modifying its attack…':esc(d.name)+' is defending…'}</p>`;
     h+=DLEG}
   else h=watchHTML();
