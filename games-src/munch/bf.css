@@ -117,3 +117,6 @@ html.ph-l .hand{padding-top:14px}
   html.ph-p{--ph-dock:calc(96px + env(safe-area-inset-bottom,0px))}
   html.ph .bfline{font-size:15px!important;margin-bottom:4px!important}
 }
+.bfbub.note{max-width:220px;background:#fff6dc}
+.mine .gear .gchip.eqoff{position:relative;opacity:.8}
+.bfx{font:700 11px/1 var(--ui,system-ui);color:#fff;background:#a23a2a;border-radius:6px;padding:2px 4px;margin-left:4px;white-space:nowrap}

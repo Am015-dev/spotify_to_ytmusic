@@ -59,7 +59,7 @@ function bfReveal(id,who){const c=cd(id);const me=viewSeat();const mine=who===me
   const sub=kind==='mon'?`Level ${c.lvl}`+(G.cb&&!mine?` · ${P(who).nm} must fight`:G.cb?` · you: ${sideStr(G.cb)}`:''):kind==='curse'?esc(c.x||'').slice(0,60):'No monster this time';
   let o=document.getElementById('bfrev');if(o)o.remove();o=document.createElement('div');o.id='bfrev';o.className=`bfrev k-${kind}${mine?' mine':''}`;o.setAttribute('role','status');
   o.innerHTML=`<div class="bfburst"></div><div class="bfdh l">${cardBack('door')}</div><div class="bfdh r">${cardBack('door')}</div><div class="bfwho">${mine?'You kick':esc(P(who).nm)+' kicks'} the door…</div><div class="bfrc">${cardHTML(id,{attr:'tabindex="-1"',notitle:1})}</div><div class="bfban">${ban}</div><div class="bfsub">${sub}</div>`;
-  document.body.appendChild(o);const dur=mine?1900:1300;
+  document.body.appendChild(o);const dur=mine?1900:1050;
   setTimeout(()=>{if(typeof sfx==='function')sfx(kind==='mon'?'roar':kind==='curse'?'curse':'click')},mine?420:300);
   const close=()=>{if(!o.isConnected)return;o.classList.add('out');setTimeout(()=>o.remove(),260)};o.addEventListener('pointerdown',close);setTimeout(close,dur);
   if(!mine&&typeof UI!=='undefined')UI.hold=Math.max(UI.hold||0,Date.now()+dur)}
@@ -69,12 +69,16 @@ function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createEle
   const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(${quick?1:.6}) rotate(-8deg)`,opacity:1},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-60}px) scale(1.15) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.5)`,opacity:0}],{duration:quick?380:900,easing:'cubic-bezier(.3,.7,.3,1)'});a.onfinish=()=>e.remove()}
 function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;f.style.left=(r.left+r.width/2)+'px';f.style.top=(r.top+r.height/3)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1500)}
 function bfBubble(s,txt){const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),2600)}
-function bfSnap(){if(!G)return null;const cb=G.cb;return {gid:G.gid,turn:G.turn,kick:G.kicked,lvl:G.pl.map(p=>p.lvl),str:G.pl.map(p=>pStr(p)),
+function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-228,r.left))+'px';b.style.top=Math.max(8,r.top-44)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),3600)}
+function bfSnap(){if(!G)return null;const cb=G.cb;const me=viewSeat();const mp=me>=0&&G.pl[me]?P(me):null;return {gid:G.gid,turn:G.turn,kick:G.kicked,me,eq:mp?mp.eq.map(e=>e.id+':'+(e.on?1:0)):[],lvl:G.pl.map(p=>p.lvl),str:G.pl.map(p=>pStr(p)),
   cb:cb?{k:G.turn+':'+cb.who,enh:cb.mons.map(m=>m.enh.length),n:cb.mons.length,os:cb.os.length,help:cb.help,a:sideStr(cb),b:monStr(cb)}:null,ln:G.ln}}
 function bfDiff(S,N){if(!S||!N||S.gid!==N.gid)return;const me=viewSeat();const actor=G.log[0]?G.log[0].s:-1;const chip=s=>document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);
   const fromRect=s=>{const c=s>=0&&s!==me?chip(s):null;return c?c.getBoundingClientRect():null};
   if(N.kick!=null&&(N.kick!==S.kick||N.turn!==S.turn)&&BF.motion()){bfReveal(N.kick,G.active);BF.mine=0}
   N.lvl.forEach((l,i)=>{const d=l-S.lvl[i];if(!d)return;const el=i===me?document.querySelector('.mine .bfhero')||document.querySelector('.mine .lv'):chip(i);bfFloat(el,(d>0?'+':'')+d+' Lv',d>0?'up':'down')});
+  if(me>=0&&N.me===S.me){const hero=document.querySelector('.mine .bfhero');const was=new Map(S.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));const now=new Map(N.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));
+    const lost=[...was.keys()].filter(i=>!now.has(i));if(lost.length)bfNote(hero,'Lost: '+lost.map(cname).join(', '),'bad');
+    const off=[...now.keys()].filter(i=>!now.get(i)&&(!was.has(i)||was.get(i)));if(off.length){const p=P(me);const w=equipWhy(p,off[0])||bigWhy(p,off[0])||'';bfNote(hero,`Carried, not worn: ${w||'no free slot'}`,'bad')}}
   if(me>=0&&!N.cb&&N.str[me]!==S.str[me]&&N.lvl[me]===S.lvl[me]){const d=N.str[me]-S.str[me];bfFloat(document.querySelector('.mine .bfhero'),(d>0?'+':'')+d+' ⚔',d>0?'up':'down')}
   const a=S.cb,b=N.cb;if(!a||!b||a.k!==b.k)return;const cb=G.cb;
   b.enh.forEach((n,j)=>{if(n>(a.enh[j]||0)&&j<a.n){const id=cb.mons[j].enh[n-1];const to=document.querySelector(`.arena .row.mons .mon:nth-child(${j+1})`);const fr=fromRect(actor);if(fr&&to)bfFly(id,fr,to.getBoundingClientRect());if(actor>=0&&actor!==me)bfBubble(actor,cd(id).b>0?'Boost the monster!':'Weaken it!')}});
@@ -132,7 +136,8 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
     const i=h.indexOf('<p class="say">');const tag=`<p class="bfline">${esc(line)}</p>`;
     if(i>=0)h=h.slice(0,i)+tag+h.slice(i);else h=h.replace(/(<div class="who">.*?<\/div>)/,'$1'+tag);return h};
   const _render=render;render=function(){const S=BF.snap;const r=_render.apply(this,arguments);try{bfAfter(S)}catch(e){UI.lastErr='bf '+e}return r}})();
-function bfAfter(S){if(!G){BF.snap=null;BF.pick=null;bfFinger(null);return}const N=bfSnap();BF.snap=N;bfMark();bfDiff(S,N);const me=viewSeat();setTimeout(()=>{try{bfTeach(me)}catch(e){}},30)}
+function bfAfter(S){if(!G){BF.snap=null;BF.pick=null;bfFinger(null);return}
+  document.querySelectorAll('.mine .gear .gchip.eqoff').forEach(c=>{if(!c.querySelector('.bfx'))c.insertAdjacentHTML('beforeend','<span class="bfx" aria-hidden="true">✗ not worn</span>')});const N=bfSnap();BF.snap=N;bfMark();bfDiff(S,N);const me=viewSeat();setTimeout(()=>{try{bfTeach(me)}catch(e){}},30)}
 // ---- input: tap to pick up / tap a glowing spot; or drag with a finger or mouse ----
 document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();e.preventDefault();return}
   const t=e.target;if(!G)return;const k=t.closest('[data-a="bfkick"]')||(()=>{const b=t.closest('[data-mv]');try{return b&&JSON.parse(b.dataset.mv).act==='kick'?b:null}catch(x){return null}})();
@@ -157,10 +162,17 @@ document.addEventListener('pointermove',e=>{const d=BF.down;if(!d||d.pid!==e.poi
   D.g.style.visibility='hidden';const u=document.elementFromPoint(e.clientX,e.clientY);D.g.style.visibility='';const z=u&&u.closest('[data-bfz]');
   document.querySelectorAll('.bf-over').forEach(x=>{if(x!==z)x.classList.remove('bf-over')});if(z)z.classList.add('bf-over');D.over=z;if(e.cancelable)e.preventDefault()},{passive:false});
 function bfEnd(e,cancel){const D=BF.drag;BF.down=null;if(!D)return;BF.drag=null;BF.eat=Date.now()+350;
-  const z=!cancel&&D.over&&D.over.isConnected?D.over.dataset.bfz:null;const g=D.g;
+  // the board may have re-rendered during the drag (a computer move): find the target again under the finger
+  let z=null;if(!cancel){g0:{D.g.style.visibility='hidden';const u=e&&e.clientX!=null?document.elementFromPoint(e.clientX,e.clientY):null;D.g.style.visibility='';const t=u&&u.closest('[data-bfz]');if(t){z=t.dataset.bfz;break g0}if(D.over&&D.over.isConnected)z=D.over.dataset.bfz}}const g=D.g;
   if(z){const r=g.getBoundingClientRect();g.remove();document.querySelectorAll('.bf-lift').forEach(x=>x.classList.remove('bf-lift'));bfDrop(D.id,z,r)}
   else{const src=document.querySelector(`.mine [data-card="${D.id}"]`);const r=src&&src.getBoundingClientRect();
     if(r&&BF.motion()){const a=g.animate([{transform:g.style.transform},{transform:`translate(${r.left}px,${r.top}px) scale(1)`}],{duration:220,easing:'ease-out'});a.onfinish=()=>g.remove()}else g.remove();
     document.querySelectorAll('.bf-lift').forEach(x=>x.classList.remove('bf-lift'));bfMark()}}
 document.addEventListener('pointerup',e=>bfEnd(e,false));document.addEventListener('pointercancel',e=>bfEnd(e,true));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(BF.pick!=null||BF.ask)){BF.pick=null;BF.ask=null;bfMark()}});
+
+// a rival's door or fight: if none of your cards could change anything, don't ask (the card-less "Let it be" was a chore)
+(function(){const _ap=autoPass;autoPass=function(){_ap();if(!G||G.mode==='net')return;
+  for(let k=0;k<12&&G&&!G.winner;k++){const s=sideToAct();if(s<0||!P(s).human||G.q)return;if(!(G.phase==='window'||(G.phase==='combat'&&G.cb&&G.cb.stage==='others')))return;if(G.cb&&winThreat(G.cb))return;
+    const vm=validMoves(s);const pass=vm.find(m=>m.act==='pass');if(!pass)return;if(vm.some(m=>m!==pass&&(m.card==null||(!bfHarm(m)&&bfZone(m,s)))))return;
+    const r=performMove(pass,s);if(!r||!r.success)return}}})();
