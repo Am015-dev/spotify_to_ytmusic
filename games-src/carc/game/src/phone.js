@@ -58,7 +58,7 @@ function phFeatIc(ty){return ty==='F'?'grain':ty==='C'?'town':ty==='R'?'road':'p
 function phRecFig(hp){const key=G.turn+':'+G.step+':'+hp.i;if(PHN.recK!==key){PHN.recK=key;try{PHN.rec=bestFigNow(hp.i,'normal')}catch(e){PHN.rec=null}}return PHN.rec}
 function phPts(m,F,s,fl){if(m.k==='bld')return 'extra turn when you extend it';if(m.k==='pig')return `+1 per town (${fieldCities(F).size} now)`;
   if(s.ty==='F'){const n=fieldCities(F).size;return `+${fl.end} at the end · ${n} finished town${n===1?'':'s'}`}
-  if(F.done)return `+${fl.now} now`;if(fl.now===fl.end)return `+${fl.now} · back when finished`;return `+${fl.now} if finished · +${fl.end} if not`}
+  if(F.done||closesNow(F))return `+${fl.now} now, finished by this tile`;if(fl.now===fl.end)return `+${fl.now} · back when finished`;return `+${fl.now} if finished · +${fl.end} if not`}
 function phOptHTML(m,hp,rec){const T=G.tiles[G.cur.k],s=TSEG[T.t][m.l],r=find(T.s0+m.l),F=G.fd[r],fl=featLine(s.ty,F,figsIn(r),hp.i);const w=phWhere(G.cur.k,m.l);
   const kind=m.k==='f'?'':m.k==='big'?'Champion · ':m.k==='bld'?'Mason · ':'Hog · ';
   return `<button class="pb opt${rec?' rec':''}" data-mv='${esc(JSON.stringify(m))}' aria-label="${esc(kind+phFeatName(s.ty)+(w?' '+w:'')+', '+phPts(m,F,s,fl)+(rec?', suggested':''))}"><span class="oi">${phI(m.k==='f'?phFeatIc(s.ty):m.k==='big'?'champ':m.k==='bld'?'mason':'hog')}</span><span class="ot"><b>${kind}${phFeatName(s.ty)}${w?' <small>'+esc(w)+'</small>':''}${rec?`<em class="star">${phI('star')}</em>`:''}</b><small>${esc(phPts(m,F,s,fl))}</small></span></button>`}

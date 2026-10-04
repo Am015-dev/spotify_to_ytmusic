@@ -205,10 +205,12 @@ function advise(){const p=me();if(!p)return;if(G.step==='place'){const plan=aiPl
     UI.kind=m.k||UI.kind;UI.advice={turn:G.turn+':'+G.step,fig:m,text}}
   sfx&&sfx('click');refreshUI()}
 // the follower advice in the same numbers the buttons show
+// a road / town / priory that the tile just laid completes (it scores right after the follower step)
+function closesNow(F){return F.ty==='M'?nbrCount(F.x,F.y)===9:(F.ty==='C'||F.ty==='R')&&F.oe&&F.oe.length===0}
 function figAdviceText(m,pi){if(m.act==='skip')return 'Keep your followers: nothing here is worth one right now.';const T=G.tiles[G.cur.k];const s=TSEG[T.t][m.l];const r=find(T.s0+m.l);const fl=featLine(s.ty,G.fd[r],figsIn(r),pi);
   if(m.k==='bld')return `Put your mason on the ${FEAT[s.ty]}: extra turns whenever you extend it.`;if(m.k==='pig')return 'Put your hog beside your farmer for +1 per finished town.';
   if(s.ty==='F')return `A farmer here pays +${fl.end} at the end as things stand (3 per finished town beside this field), more as nearby towns get finished.`;
-  const who=m.k==='big'?'champion':'follower';if(G.fd[r].done)return `A ${who} scores the finished ${FEAT[s.ty]} at once (+${fl.now}) and comes straight home.`;
+  const who=m.k==='big'?'champion':'follower';if(G.fd[r].done||closesNow(G.fd[r]))return `A ${who} scores the finished ${FEAT[s.ty]} at once (+${fl.now}) and comes straight home.`;
   return `A ${who} on the ${FEAT[s.ty]}: +${fl.now} if you finish it as it is, more as it grows; you get the ${who} back when it is finished.`}
 function applyAdvice(){const a=UI.advice;if(!a)return;if(G.step==='place'&&a.place){const fig=a.fig;go(a.place);if(me()&&G.step==='fig'&&fig&&isLegal(fig,sideToAct()))go(fig)}else if(G.step==='fig'&&a.fig)go(a.fig);UI.advice=null}
 document.addEventListener('click',e=>{const b=e.target.closest('button,[data-cell],[data-spot],input[type=checkbox]');if(!b)return;const d=b.dataset;
