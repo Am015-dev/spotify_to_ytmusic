@@ -388,10 +388,13 @@ html.ph .race-c .rv-t b{font-size:.8rem}
 .cd-kw{margin:4px 0;padding-left:18px;font-size:.95rem}
 .cd-kw li{margin:2px 0}
 .cd-clash .cl-panel{margin-top:12px}
+html.ph .race-c.many .rv-e{display:none}
+html.ph .race-c.many .rv-n{font-size:1.25rem}
 /* map zoom button */
-.zbtn{position:absolute;right:4px;top:4px;z-index:3;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(20,10,14,.78);color:var(--gold);font-size:22px;line-height:1;cursor:pointer;padding:0}
 html:not(.ph) .zbtn{display:none}
 html.zoom .zbtn{background:var(--gold);color:#2b1808}
+#gdef{max-height:calc(100% - var(--hb,0px) - 76px);overflow:auto;box-sizing:border-box}
+#news{max-height:calc(100% - var(--hb,0px) - 76px);overflow:auto}
 /* buttons wrap instead of cutting words */
 .btn,.opt .ot,.lbtn b{white-space:normal;overflow-wrap:anywhere}
 </style></head>
@@ -401,13 +404,14 @@ html.zoom .zbtn{background:var(--gold);color:#2b1808}
   <h1>Thornbound Throne</h1>
   <span class="barstat" id="barstat"></span>
   <span class="gx-sp"></span>
+  <button class="gx-ibtn zbtn" data-a="zoom" aria-label="Make the map bigger" title="Bigger map" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Map</span></button>
   <button class="gx-ibtn" data-gx="boardd" aria-label="My board and piles" title="My board and piles"><svg class="ico" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/></svg><span>Board</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-label="Log" title="Log"><svg class="ico" viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/></svg><span>Log</span></button>
   <button class="gx-ibtn" data-gx="rulesd" aria-label="How to play" title="How to play"><svg class="ico" viewBox="0 0 24 24"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v13"/></svg><span>Rules</span></button>
   <button class="gx-ibtn" data-gx="setd" aria-label="Menu" title="Menu"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
 </header>
 <div class="gx-main">
-  <main class="gx-board" id="board" aria-label="The kingdom map"><div id="mapwrap"></div><button class="zbtn" data-a="zoom" aria-label="Make the map bigger" aria-pressed="false">&#10530;</button></main>
+  <main class="gx-board" id="board" aria-label="The kingdom map"><div id="mapwrap"></div></main>
   <aside class="gx-dock" aria-label="What to do now">
     <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet"></span><span class="gx-dt">What to do now</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">&#8677;</button></div>
     <div class="gx-dock-body" id="dockbody"><div id="netst" class="netst" hidden></div><div id="now" aria-live="polite"></div><div id="road"></div><div id="main"></div><div id="act" role="group" aria-label="Actions"></div><div id="handw" hidden></div><div id="rivals"></div></div>
@@ -2010,7 +2014,7 @@ function elimWhy(id,marks){const sd=own(id),who=nm(sd)+'\'s '+cname(id)+' ('+str
 AG.clashNight=()=>{const c=G.clash,R=G.reg[c.r];G.step='night';const all=[];for(const s of c.parts)for(const id of (c.cards[s]||[]))all.push(id);
   const E=nightMarks(all);
   const dead=[],kills={};
-  for(const id of all){if(!E[id])continue;if(eff(id).tr.has('inv')){stat('invulnerable');const W=elimWhy(id,E[id]);lg(nm(own(id))+'\'s '+cname(id)+' is Invulnerable: '+W.t.replace(/ eliminates .*$/,'').replace(/ (eliminates itself|is eliminated).*$/,'')+' cannot remove it.',own(id),'',{k:'inv',ids:[id],by:W.by,why:W.why});continue}
+  for(const id of all){if(!E[id])continue;if(eff(id).tr.has('inv')){stat('invulnerable');const W=elimWhy(id,E[id]);lg(nm(own(id))+'\'s '+cname(id)+' is Invulnerable: '+W.t.replace(/ eliminates .*$/,'').replace(/ (eliminates itself|is eliminated).*$/,'')+' cannot remove it.',own(id),'',{k:'inv',ids:[id],by:W.by,why:W.why,r:c.r});continue}
     dead.push(id);for(const x of E[id])if(x.src!==id)kills[x.src]=(kills[x.src]||0)+1}
   if(!dead.length){now('clashTally');return}
   const trig=[];
@@ -3914,7 +3918,7 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q
 function moreCue(){const el=$('#main');if(!el)return;const on=el.scrollHeight>el.clientHeight+8&&el.scrollTop+el.clientHeight<el.scrollHeight-8;el.classList.toggle('more-below',on)}
 document.addEventListener('scroll',e=>{if(e.target&&e.target.id==='main')moreCue()},true);
 function menuTitle(q){const ph=menuPhase(q);if(ph==='Day')return G.clash?'Before the Clash in '+REG[G.clash.r]:'Day';return ph?'Your options this '+ph:'Your options'}
-const QNAME={applause:'Set the turn order',flank:'Flank',castle:'Govern',wilderness:'Journey',siteBuy:'Spend Lore',ossuary:'Ossuary bonus',shrine:'Moss Altar bonus',harvest:'The Favour',rally:'Rally',retreat:'Retreat',ambushCard:'Ambush',occupier:'Choose the occupier',slot:'Choose a slot',placeRegion:'Choose a region',placeLoc:'Choose a location',journeyDest:'Journey',brine:'Brine-Hardened',edict:'A Tactic',relics:'Council of Coin',order:'Turn order'};
+const QNAME={discardPick:'Discard a card',discardDown:'Too many cards',applause:'Set the turn order',flank:'Flank',castle:'Govern',wilderness:'Journey',siteBuy:'Spend Lore',ossuary:'Ossuary bonus',shrine:'Moss Altar bonus',harvest:'The Favour',rally:'Rally',retreat:'Retreat',ambushCard:'Ambush',occupier:'Choose the occupier',slot:'Choose a slot',placeRegion:'Choose a region',placeLoc:'Choose a location',journeyDest:'Journey',brine:'Brine-Hardened',edict:'A Tactic',relics:'Council of Coin',order:'Turn order'};
 function titleOf(q){if(q.t==='menu'){const ph=menuPhase(q);return ph?ph+' actions':'Your actions'}if(QNAME[q.kind])return QNAME[q.kind];const t=(q.title||'').replace(/^[^:]*:\s*/,'');return t.length>28?'Your choice':t}
 function promptText(q,s){const t=q.title||'';
   switch(q.kind){case 'bid':return 'Pick one hand card as a secret bid. The highest bid chooses a Kingdom Card first; the card you bid is tucked under it.';
@@ -3922,6 +3926,7 @@ function promptText(q,s){const t=q.title||'';
     case 'place':return t.indexOf('fewer')>=0?t:'Hide one card face-down next to each region ('+placeProgress()+'). The strongest total in a region wins its Clash.';
     case 'bidRes':return 'Your turn to use your bid: take a Kingdom Card, steal one, or take your card back.';
     case 'location':return 'You won the Clash. Claim one of the two locations of '+(G.clash?REG[G.clash.r]:'this region')+'.';
+    case 'discardPick':{const t2=G.log.slice().reverse().find(e=>e.m&&e.m.k==='tac');return plain(t)+(t2?' This is because '+plain(t2.t).replace(/\.$/,'')+'.':'')}
     case 'applause':return 'Herald of Applause lets you set the turn order for this round. First place wins bid ties and acts first; last place chooses the Clash order.';
     case 'clashOrder':return G.rm&&G.rm.tempests===s?'Your Doctrine of Tempests lets you choose the order of the three Clashes this round.':'You are last in turn order'+(G.round>1?' (the least Influence)':'')+', so you choose the order of the three Clashes.';
     default:if(q.t==='menu'){const ph=menuPhase(q);return ph==='Day'?'The cards here are face up. Use a Day power now, or tap Done and the Clash is fought.':(ph||'These')+' options are optional. Use any of them, then tap Done.'}return plain(t)}}
@@ -3997,7 +4002,7 @@ function renderRivals(){const el=$('#rivals');if(!el)return;const V=UI.V;const h
   const act=G.q?new Set(G.q.seats):new Set();const me=vs();
   const ordSeats=G.pl.map(p=>p.seat);
   const top=Math.max(...V.pl.map(p=>p.inf));const lead=V.pl.filter(p=>p.inf===top).length===1&&top>0;
-  el.innerHTML='<p class="race-g">'+gloss('Most Influence after round '+G.rounds+' wins')+' · round '+Math.max(1,G.round)+' of '+G.rounds+'</p><div class="race-c">'+ordSeats.map(s=>{const P=V.pl[s];const kfac=TBKit.FACTIONS[FK[P.fac]];const turn=act.has(s);
+  el.innerHTML='<p class="race-g">'+gloss('Most Influence after round '+G.rounds+' wins')+' · round '+Math.max(1,G.round)+' of '+G.rounds+'</p><div class="race-c'+(G.np>2?' many':'')+'">'+ordSeats.map(s=>{const P=V.pl[s];const kfac=TBKit.FACTIONS[FK[P.fac]];const turn=act.has(s);
     const favs=V.fav.h===s?'<span class="rv-f" title="Holds the Kingdom\'s Favour ('+V.fav.u+' uses left)">'+ico('star')+'</span>':'';
     return '<button class="rv'+(s===me?' me':'')+(turn?' turn':'')+'" data-a="rival" data-s="'+s+'" style="--fc:'+kfac.main+'" aria-label="'+esc(P.name)+': '+P.inf+' influence, '+P.hand.length+' cards in hand. Tap for details">'+
       '<span class="rv-e">'+emb(s,24)+'</span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'You':esc(shortName(s).replace(' (you)','')))+(lead&&P.inf===top?' <span class="rv-l" title="In the lead">'+ico('crown')+'</span>':'')+'</b><small>'+P.hand.length+' card'+(P.hand.length===1?'':'s')+'</small></span><span class="rv-n">'+P.inf+'</span>'+favs+'</button>'}).join('')+'</div>'}
@@ -4118,7 +4123,7 @@ function playClash(ev,root){const panel=root.querySelector('#clp');if(!panel)ret
   const items=youFirst(ev.parts).map(s=>{const ids=(ev.cardsF&&ev.cardsF[s])||ev.cards[s]||[];const best=ids.slice().sort((a,b)=>cinfo(b).strength-cinfo(a).strength)[0];
     const spec=best!=null?cardSpec(best):{faction:FK[G.pl[s].fac],title:'No card',value:0,type:'ploy',art:'banner',text:'No card fights here: only Supporters count.'};
     const dead=(ev.dead&&ev.dead[s])||[];const spec2=best==null&&dead.length?Object.assign(cardSpec(dead[0]),{text:'Eliminated at Night.'}):spec;
-    return {faction:FK[G.pl[s].fac],name:(s===vs()?'You':sideName(s))+(ids.length>1?' (+'+(ids.length-1)+')':'')+(best==null&&!dead.length?' · no card':''),card:best==null&&dead.length?spec2:spec,strength:ev.tot[s],winner:w===s}});
+    return {faction:FK[G.pl[s].fac],name:(s===vs()?'You':sideName(s))+(ids.length>1?' · '+ids.length+' cards':'')+(best==null&&!dead.length?' · no card':best==null?' · card eliminated':''),card:best==null&&dead.length?spec2:spec,strength:ev.tot[s],winner:w===s}});
   const sc=root.querySelector('.cd-sc')||root;const hid=[...sc.children].filter(c=>c.hidden&&c.id!=='clok');hid.forEach(c=>c.hidden=false);let rest=0;for(const c of sc.children)if(c!==panel)rest+=c.offsetHeight+8;hid.forEach(c=>c.hidden=true);const sz=Math.max(62,Math.min(110,Math.floor((root.clientWidth-30)/Math.max(2,items.length))-14,Math.floor((sc.clientHeight-rest-30-50)/1.43/1.08)));
   const cp=TBKit.clashPanel(panel,items,{size:sz,tie:w<0});UI._cp=cp;
   const fin=()=>{['#clres','#clbk','#cllog','#clinf','#clok'].forEach(q=>{const e=root.querySelector(q);if(e)e.hidden=false});UI.clashRes[ev.r]={winner:w,tot:ev.tot};
@@ -4394,8 +4399,12 @@ const GLOSS=[
 ];
 const GL={};GLOSS.forEach(g=>GL[g[0]]=g);
 // escape + wrap the first appearance of each term in this text with a tappable chip
-function gloss(text){if(text==null)return '';text=String(text);const hits=[];
-  for(const [k,re] of GLOSS){const m=re.exec(text);if(m)hits.push({i:m.index,n:m[0].length,k})}
+// card and Kingdom Card names are never split into glossary words ("Night Ferry Captain" stays a name)
+let _nameRe=null;function nameRe(){if(_nameRe)return _nameRe;const D=TB.DATA,n=[];for(const f in D.BASICNAMES)n.push(...D.BASICNAMES[f]);for(const f in D.SITE)for(const c of D.SITE[f])n.push(c.nm);for(const k of D.KC)n.push(k.nm);for(const t in D.TACTICS)for(const x of D.TACTICS[t])n.push(x.nm);for(const f in D.FAVOUR)n.push(D.FAVOUR[f].nm);
+  const u=[...new Set(n)].filter(Boolean).sort((a,b)=>b.length-a.length).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));_nameRe=new RegExp('('+u.join('|')+')','g');return _nameRe}
+function gloss(text){if(text==null)return '';text=String(text);const hits=[];const masked=[];{const re=nameRe();re.lastIndex=0;let m;while((m=re.exec(text)))masked.push([m.index,m.index+m[0].length])}
+  const inName=(i,n)=>masked.some(([a,b])=>i<b&&i+n>a);
+  for(const [k,re] of GLOSS){const g=new RegExp(re.source,re.flags.replace('g','')+'g');let m;while((m=g.exec(text))){if(!inName(m.index,m[0].length)){hits.push({i:m.index,n:m[0].length,k});break}}}
   hits.sort((a,b)=>a.i-b.i||b.n-a.n);let out='',p=0;
   for(const h of hits){if(h.i<p)continue;out+=esc(text.slice(p,h.i));const nw=!(UI.glSeen&&UI.glSeen[h.k]);out+='<button type="button" class="gl'+(nw?' new':'')+'" data-a="gloss" data-t="'+esc(h.k)+'" aria-label="'+esc(text.substr(h.i,h.n))+': what does it mean?">'+esc(text.substr(h.i,h.n))+'</button>';p=h.i+h.n}
   return out+esc(text.slice(p))}
@@ -4410,7 +4419,7 @@ const GUIDED={seed:23,lastNormal:0,ai:9,faction:'clans',rival:'nobility'};
 const isGuided=()=>!!(UI.cfg&&UI.cfg.guided&&!NET.on);
 const COACH_INFO=[
  {id:'goal',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'Your goal',text:()=>'Win by having the most Influence when round '+G.rounds+' ends. Influence is the score: the bar at the bottom shows you and the Gilded Court, both at 0.',hl:'#rivals'},
- {id:'map',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'The kingdom',text:()=>'The map has three regions with two locations each. Every round each region has one Clash: the strongest side wins it and claims one of its two locations, which pays Influence. The button in the map\'s corner makes the map bigger.',locs:[0,1,2,3,4,5]},
+ {id:'map',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'The kingdom',text:()=>'The map has three regions with two locations each. Every round each region has one Clash: the strongest side wins it and claims one of its two locations, which pays Influence. The Map button at the top makes the map bigger.',locs:[0,1,2,3,4,5]},
  {id:'round',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'One round, six steps',text:()=>'1 Bid a card for a Kingdom Card. 2 Take your Kingdom Card. 3 Place your Herald. 4 Hide one card at each region. 5 Send Supporters. 6 The three Clashes. Round 1 is only this; new powers come in rounds 2 and 3. Tap the glowing button each time.',btn:'Let\'s start'},
  {id:'own',when:()=>G.round===2&&G.q,title:'Round 2: two new things',text:()=>'Card abilities: some of your cards can Flank, Ambush, Retreat or Rally (the card says when). Autumn: after the Clashes you may send a card on a Journey for Lore, and Lore buys stronger cards. The ★ suggestion still shows a good move and why.',btn:'Play on'},
  {id:'r3',when:()=>G.round===3&&G.q,title:'Round 3: the full game',text:()=>'Now everything is in play: your faction\'s Tactics, the Kingdom\'s Favour, and Govern (a card with votes goes into a Council for a lasting power). Each one is explained the first time you can use it.',btn:'Play on'}];
