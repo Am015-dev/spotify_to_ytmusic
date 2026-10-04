@@ -20,7 +20,7 @@ roamBounce=(f=>function(ax,sp,nX,nZ){if(!SC_S.on)return f(ax,sp,nX,nZ);const vx=
   if(Math.abs(angDiff(tf,RO.h))<=Math.PI/2){RO.vh=tf;RO.v=ns;RO.h+=angDiff(tf,RO.h)*.6}else{RO.vh=tf+Math.PI;RO.v=-ns;RO.h+=angDiff(tf+Math.PI,RO.h)*.6}RO.yr*=.5;RO.stkT=0})(roamBounce);
 // ---- test hooks
 Object.assign(window.__sc,{
- ng:()=>SC_S.ng,bh:(x,z)=>!!roamHit(x,z,0,groundY(x,z)+.5),
+ ng:()=>SC_S.ng,figAt:(x,z,h)=>{const f=minifig('#2f7de1');f.userData.ex.visible=false;f.position.set(x,groundY(x,z),z);f.rotation.y=h||0;RO.grp.add(f);return true},bh:(x,z)=>!!roamHit(x,z,0,groundY(x,z)+.5),
  humans:()=>{const o={ped:+(((1.25+.32+1.4+.96+.25)*(SC_S.on?SC_K.ped:.66))).toFixed(2)};{const f=minifig('#f00');f.userData.ex.visible=false;const B=new THREE.Box3();f.updateMatrixWorld(true);f.traverse(c=>{if(c.isMesh)B.expandByObject(c)});o.fig=+(B.max.y-B.min.y).toFixed(2)}
   try{const M=[],L=[];GB_figGeo(GB_figGet(),M,L,false);const B=new THREE.Box3();for(const g of M){g.computeBoundingBox();B.union(g.boundingBox)}const k=pl?pl.mesh.userData.m.scale.y:SHIP_K;o.driver=+((B.max.y-B.min.y)*1.5*(SC_S.on?SC_K.drv:1)*k).toFixed(2)}catch(e){o.driver=null}
   o.moped=+(4.01*.75*(SC_S.on?SC_K.moped:1)).toFixed(2);return o},
