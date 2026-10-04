@@ -125,7 +125,7 @@ html.ph #fab.dim{opacity:.4}
 
   <section class="shelf" id="shelf" aria-label="Games"></section>
 
-  <footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link. Your browsers connect directly, with no account or server. Missing a game, or something bugs you? <a href="suggest.html" style="color:var(--brass)">Drop a card in the suggestion box</a>.<br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
+  <footer>Each game keeps its own save, sound and difficulty settings. Every board game can be played online with friends for free: open it, press Host, and send them the invite code or link. Your browsers connect directly, with no account or server. Missing a game, or something bugs you? <a href="suggest.html" style="color:var(--brass)">Drop a card in the suggestion box</a>.<br><a href="credits.html" style="color:var(--brass)">Credits &amp; licences</a> · <a href="privacy.html" style="color:var(--brass)">Privacy</a> · <a href="terms.html" style="color:var(--brass)">Terms</a><br><small>&copy; 2026 Am015-dev. All rights reserved. Original games inspired by published board games; not affiliated with their designers or publishers.</small><div class="support" id="support" hidden><p>These games are free and ad-free. If they made your game night, you can help cover the hosting and development costs.</p><a class="kofi kofi-link" target="_blank" rel="noopener" href="#">☕ Support on Ko-fi</a></div></footer>
 </div>
 
 <div id="table" hidden>
@@ -142,11 +142,15 @@ html.ph #fab.dim{opacity:.4}
 <div id="iostip" hidden><p>For a full-screen shelf on iPhone: tap <b>Share</b> <span aria-hidden="true">⬆︎</span>, then <b>Add to Home Screen</b>, and open it from there.</p><button type="button" id="iosok">Got it</button></div>
 
 <script>
+/* offline and install: the service worker keeps the shelf (and the games you download) working without internet */
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){let had=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(()=>{});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!document.getElementById('gnsupd')){const b=document.createElement('button');b.type='button';b.id='gnsupd';b.textContent='A new version is ready — tap to reload';b.style.cssText='position:fixed;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:90;min-height:48px;padding:10px 18px;border:0;border-radius:99px;background:#e0a948;color:#1d140b;font:700 1rem system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);cursor:pointer';b.onclick=()=>location.reload();document.body.appendChild(b)}had=true})}
 const GAMES=[
   {id:'crown',cover:'covers/crown.jpg',name:'Crown City Smash',src:'crown-city-smash/index.html',ribbon:'Dice brawl',
    blurb:'Giant monsters roll dice to stomp, heal, charge up and buy power cards. Hold the city for stars and try to be the last monster standing, or the first to 20 stars.',
    stats:[['2–6','players'],['30','minutes'],['8+','ages'],['3D','table']],
-   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Power Up evolutions','Halloween','Cultists','Tower','Anubis','Berserk','Wickedness','Mindbug'],paint:paintCrown},
+   chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Evolutions','Costumes','Cultists','The Tower','Curses','Berserk','Wickedness','Mind Hijack'],paint:paintCrown},
   {id:'nebula',cover:'covers/nebula.jpg',name:'Nebula Aces',src:'nebula-aces/index.html',ribbon:'Starfighter duel',
    blurb:'Set secret maneuver dials, fly your squadron along real templates, then roll attack and defence dice. Build a 100-point squad or fly the learning duel.',
    stats:[['1–2','players'],['45','minutes'],['12+','ages'],['914','mm mat']],

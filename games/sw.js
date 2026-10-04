@@ -8,7 +8,7 @@ const VER = 'v1';
 const SHELF = 'gns-shelf-' + VER;
 const GAMES = 'gns-games-' + VER;
 const SLUGS = ['crown-city-smash', 'nebula-aces', 'doorkick-dungeon', 'shipwreck-isle', 'sands-of-qamar', 'sunglaze', 'rampart-and-vine', 'short-fuse', 'tidewake', 'hollowbough', 'thornbound', 'kaiten-kitchen', 'mainhattan-nightrun', 'mainhattan-overdrive'];
-const PRECACHE = ['./', 'index.html', 'classic.html', 'sync.html', 'suggest.html', 'reference.html', 'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png', 'room/plant.webp', 'room/room-back-day.webp', 'room/room-back-night.webp', 'room/room-front-day.webp', 'room/room-front-night.webp', 'room/suitcase.webp', 'room/velour.webp', 'room/wood.webp'];
+const PRECACHE = ['./', 'index.html', 'classic.html', 'sync.html', 'suggest.html', 'reference.html', 'privacy.html', 'terms.html', 'credits.html', 'manifest.webmanifest', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-512-maskable.png', 'room/plant.webp', 'room/room-back-day.webp', 'room/room-back-night.webp', 'room/room-front-day.webp', 'room/room-front-night.webp', 'room/suitcase.webp', 'room/velour.webp', 'room/wood.webp'];
 const BASE = new URL('./', self.registration.scope).pathname;
 
 self.addEventListener('install', e => {
@@ -52,14 +52,20 @@ async function cacheFirst(req, k) {
   const cache = await caches.open(GAMES);
   const hit = await cache.match(k);
   if (!hit) return null;
-  // refresh behind the scenes; the next open gets the new version
+  const old = hit.clone().text().catch(() => null);
+  // refresh behind the scenes; the next open gets the new version, and open pages hear "a new version is ready"
   fetch(k, { cache: 'no-cache' }).then(async r => {
     if (!r || r.status !== 200) return;
     const b = await r.blob(); // keep the real stored size in a header so the shelf can show it
     await cache.put(k, new Response(b, { status: 200, headers: { 'content-type': r.headers.get('content-type') || 'text/html; charset=utf-8', 'x-gns-size': String(b.size) } }));
+    const was = await old;
+    if (was != null && was !== await b.text()) notify(k);
   }).catch(() => { });
   return hit;
 }
+
+// tell open pages that a newer copy of this file is stored (the shared kit shows "A new version is ready — tap to reload")
+function notify(url) { self.clients.matchAll({ type: 'window' }).then(cs => cs.forEach(c => c.postMessage({ type: 'gns-update', url }))).catch(() => { }); }
 
 function offlinePage(isDoc) {
   if (!isDoc) return new Response('', { status: 504, statusText: 'Offline' });
