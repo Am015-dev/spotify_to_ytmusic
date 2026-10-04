@@ -22,7 +22,7 @@ function wantNews(){return !!ANIM&&!UI.noNews}
 function touchesMe(e,me){if(me<0)return false;const m=e.m;if(!m)return e.s===me;if(m.s===me||m.v===me)return true;if(m.ids&&m.ids.some(id=>ownerOf(id)===me))return true;return false}
 const BIGK=['inf','steal','elim','kcsteal','rm','inv','tac','fav'];
 function newsItem(e,human,me){const t=e.t,m=e.m||{};
-  if(/^(Strength in |Clash [IV]+: |The Thornbound Throne begins|Round \d+ of \d+ begins)/.test(t)||/ reveals /.test(t)||/ bids .*\(Strength/.test(t))return null;
+  if(/^(Strength in |Clash [IV]+: |The Thornbound Throne begins|Round \d+ of \d+ begins|Tie in |Added cards are revealed)/.test(t)||/ wins the Clash in /.test(t)||/ reveals /.test(t)||/ bids .*\(Strength/.test(t))return null;
   if(m.k==='rm'&&m.why==='Winter'||m.k==='supp')return null;            // listed on the end-of-round card
   if(m.k==='tally')return null;
   const mine=touchesMe(e,me);

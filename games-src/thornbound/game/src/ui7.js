@@ -12,9 +12,9 @@ function plain(t){const n=myName();if(!n||!t)return t;let subj=false;
 // ---------------------------------------------------------------- "what's happening": the newest public event, in plain words
 const PHASEN={spring:'Spring',summer:'Day',autumn:'Autumn'};
 function aiFallback(s,q,mv){const N=G.pl[s].name;const k=q.kind;
-  if(k==='bid')return N+' chooses a secret bid.';if(k==='place'&&mv.r!=null)return N+' hides a card next to '+REG[mv.r]+'.';
+  if(k==='bid'||k==='place')return null;   // hidden bids and cards show on the board; no card per opponent
   if(q.t==='menu'&&mv.t==='done')return null;   // trivia: not narrated
-  if(k==='edict')return mv.yes?N+' plays a Tactic.':null;if(k==='statue'||k==='harvest')return N+' decides about a card.';
+  if(k==='edict')return mv.yes?N+' plays a Tactic.':null;
   return null}
 function renderNow(){const el=$('#now');if(!el||!G)return;if(UI.coachInfo){el.innerHTML='';return}
   let t=null,s=-1;const f=UI.nowT;const last=G.log[G.log.length-1];

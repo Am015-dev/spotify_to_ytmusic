@@ -26,8 +26,8 @@ function renderRoad(){const el=$('#road');if(!el)return;const ri=roadIdx();
 function qKey(s,mv){return G.logN+':'+(G.q?G.q.kind:'')+':'+s+':'+(G.q&&G.q.chosen?G.q.chosen.length:'')+':'+(mv?mv.length:0)+':'+(UI.cfg&&UI.cfg.guided?1:0)}
 function getRec(s,mv){const key=qKey(s,mv);if(UI._rk===key)return UI._rec;UI._rk=key;let A=null;try{A=advise(s,mv)}catch(e){console.warn('advise',e.message)}
   UI._adv=A;UI._rec=A?A.m:null;UI._recWhy=A?A.why:'';return UI._rec}
-// suggestions are on in the guided game and in rounds 1-2; later only on request (the "Suggest a move" button)
-function hintsAuto(){return isGuided()||UI.guide!=='off'&&G.round<=2}
+// suggestions are on unless Tips are Off (then only on request: the "Suggest a move" button)
+function hintsAuto(){return isGuided()||UI.guide!=='off'}
 function hintsShown(s,mv){return hintsAuto()||UI.hintQ===qKey(s,mv)}
 const recK=()=>UI._recShown&&UI._rec&&UI._rec.k;
 function whyFor(s,mv){if(!mv)return '';const q=G.q,k=q.kind;
