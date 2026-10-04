@@ -115,4 +115,5 @@ document.addEventListener('click',ev=>{const t=ev.target.closest&&ev.target.clos
   else if(a==='tonl'){UI.cfgOpen=true;UI.onl=true;renderStart();const o=$('#onl');if(o){o.open=true;try{o.scrollIntoView({block:'start'})}catch(e){}}}});
 // ---- phones: a captains strip under the controls (the bottom half of a tall phone was empty)
 function phCrewHTML(){if(!G||!UI.started||G.phase==='over'&&false)return '';const now=UI.busy&&UI.curTurn!=null?UI.curTurn:sideToAct();const me=viewSeat();
-  return `<div class="ps-crew" aria-label="Captains">${G.order.map(i=>{const s=G.ships[i];return `<span class="pc-c${i===now&&!G.over?' now':''}${s.alive?'':' out'}">${dot(i)}<b>${i===me?'You':esc(nm(i))}</b><small>${s.alive?G.hands[i].length+' tile'+(G.hands[i].length===1?'':'s'):'sunk'}</small></span>`}).join('')}</div>`}
+  const ord=G.order.concat(G.seats.map((_,i)=>i).filter(i=>G.order.indexOf(i)<0));
+  return `<div class="ps-crew" aria-label="Captains">${ord.map(i=>{const s=G.ships[i];return `<span class="pc-c${i===now&&!G.over?' now':''}${s.alive?'':' out'}">${dot(i)}<b>${i===me?'You':esc(nm(i))}</b><small>${s.alive?G.hands[i].length+' tile'+(G.hands[i].length===1?'':'s'):'sunk'}</small></span>`}).join('')}</div>`}

@@ -37,6 +37,7 @@ process.on('exit', () => { try { srv.kill(); } catch (e) { } });
     const rc = await ev(() => { const r = document.querySelector('.gx-recap'); return r && !r.hidden ? r.textContent : ''; });
     if (!rc) fail('no recap strip after computer turns'); await shot('02-recap');
     // take-back: make one move, then take it back from the Menu
+    for (let k = 0; k < 60; k++) { if (await ev(() => { const d = sideToAct(); return G.over || (d >= 0 && G.seats[d].human && !UI.busy); })) break; await p.waitForTimeout(250); }
     const u = await ev(() => { const d = sideToAct(); if (G.over || d < 0 || !G.seats[d].human) return 'not my turn'; const before = JSON.stringify(G); const m = aiMove(d, 'hard'); act(m, d); return { can: GX.undo.can(), before }; });
     if (u && u.can) {
       await p.waitForTimeout(400); await p.click('.gx-bar [data-gx=setd]'); await p.waitForTimeout(300); await shot('03-undo-ready');

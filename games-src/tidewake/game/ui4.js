@@ -164,7 +164,7 @@ document.addEventListener('change',e=>{const t=e.target;if(!t.dataset||!t.datase
   else if(t.dataset.a==='lv'){s.seats[+t.dataset.i].lv=t.value}
   else if(t.dataset.a==='exp'){s.exp[t.dataset.k]=t.checked?1:0}
   else if(t.dataset.a==='nomon'){s.noMon=t.checked}});
-function startGuided(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};UI.setup=s;startGame(JSON.parse(JSON.stringify(s)),{guided:true})}
+function startGuided(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};startGame(JSON.parse(JSON.stringify(s)),{guided:true})} // the player's own setup (UI.setup) is left as it was
 function startGame(s,o){o=o||{};if(isClient())return;let plan=null;if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats.forEach((x,i)=>{x.h=i<plan.hum.length});o.guided=false}
   UI.gen++;clearTimeout(UI.tm);kitReset();
   const solo=s.variant==='solo'||s.variant==='easysolo';let np=solo?1:teamN(s);const seats=s.seats.slice(0,np);
