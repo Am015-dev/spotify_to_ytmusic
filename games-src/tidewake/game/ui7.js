@@ -45,7 +45,7 @@ function phHint(){if(UI.res&&UI.res.text)return esc(UI.res.text);return ''}
 // ---------- the control strip ----------
 function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoomBtn();
   if(G.over&&!UI.busy)return `<div class="ps-main"><div class="ps-msg"><b>Game over</b></div><div class="ps-ctl">${PH.ovHide===G.over?'<button class="pb pri" data-ph="showover">Result</button>':''}<button class="pb" data-a="again">Play again</button>${zb}</div></div>`;
-  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on?'Skip to my turn':'Skip'}</button>${zb}</div></div><div class="ps-hint">${phHint()}</div>`}
+  if(UI.busy){const now=UI.curTurn!=null&&G.seats[UI.curTurn]?UI.curTurn:d;return `<div class="ps-main"><div class="ps-msg">${now>=0?dot(now)+' '+phWhose(now):'The sea moves'}</div><div class="ps-ctl"><button class="pb" data-a="skip">${humans().length===1&&!NET.on&&now!==youSeat()?'Skip to my turn':'Skip'}</button>${zb}</div></div><div class="ps-hint">${phHint()}</div>`}
   if(d<0)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const dh=G.seats[d].human;
   if(NET.on&&dh&&d!==NET.mySeat)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>${esc(nm(d))}</b> is deciding...</div><div class="ps-ctl">${zb}</div></div>`;
@@ -139,7 +139,7 @@ function phNeed(){if(!G||!UI.started)return null;const d=sideToAct();
   if(!G.over&&!UI.busy&&G.q&&d>=0&&G.seats[d].human&&!mustPass(d)&&!(NET.on&&d!==NET.mySeat))return 'q';
   if(UI.sunk&&UI.sunk.length)return 'sunk';
   if(G.over&&!UI.busy&&PH.ovHide!==G.over)return 'over';
-  if(UI.mph&&PH.mphHide!==UI.mph&&(UI.mph.wake||UI.mph.lines.length)&&!(G.over&&!UI.busy))return 'mph';
+  if(UI.mph&&PH.mphHide!==UI.mph&&(UI.mph.wake||UI.mph.lines.length)&&!UI.skipAll&&!(G.over&&!UI.busy))return 'mph';
   if(!UI.busy&&!G.over&&(UI.confirm||UI.guide==='full'&&nextLesson()))return 'coach';
   return null}
 const PH_SRC={pass:'#main .passbox',over:'#main [data-over]',q:'#main [data-qkind]',sunk:'#cards > *',mph:'#res .mph',coach:'#coach .coach:not(.light)'};
