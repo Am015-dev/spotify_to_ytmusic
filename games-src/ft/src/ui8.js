@@ -20,11 +20,31 @@ function phApply(){const R=document.documentElement,was=PHONE.on;PHONE.on=phDete
   R.classList.toggle('ph-l',PHONE.land);R.classList.toggle('ph-p',!PHONE.land);
   R.style.setProperty('--bw',Math.floor(bw)+'px');R.style.setProperty('--bh',Math.floor(bh)+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');
   for(const [s,l] of [['.adv-btn','Advise me'],['[data-gx=logd]','Log'],['[data-gx=menud]','Menu'],['#pausebtn','Pause']]){const b=document.querySelector('.gx-bar '+s);if(b&&!b.getAttribute('aria-label'))b.setAttribute('aria-label',l)}
-  if(V3&&V3.on){V3.pawnScale=PHONE.pawn;V3.zoom=1;V3.orbit.e=PHONE.e;V3.orbit.a=0;try{resize3D(true);if(G)sync3D()}catch(e){}}
+  if(V3&&V3.on){phGestures();phZoomUi();V3.pawnScale=PHONE.pawn;V3.zoom=1;V3.orbit.e=PHONE.e;V3.orbit.a=0;try{resize3D(true);if(G)sync3D()}catch(e){}}
   return true}
 // the camera: near top-down, the tile grid (not the carved frame) fills the board
 function phFit(){const cam=V3.cam,a=cam.aspect,e=PHONE.e,u=2.2+.12,W=BW()*u+PHONE.mx,D=BH()*u+PHONE.mx;const vf=cam.fov*Math.PI/180,hf=2*Math.atan(Math.tan(vf/2)*a);
-  const needH=(D*Math.sin(e)+1.2*Math.cos(e))/2,needW=W/2;V3.orbit.d=Math.max(needH/Math.tan(vf/2),needW/Math.tan(hf/2))*1.01;V3.orbit.e=e;V3.orbit.a=0;V3.pawnScale=PHONE.pawn}
+  const needH=(D*Math.sin(e)+1.2*Math.cos(e))/2,needW=W/2;V3.orbit.d=Math.max(needH/Math.tan(vf/2),needW/Math.tan(hf/2))*1.01/(PHONE.z||1);V3.orbit.e=e;V3.orbit.a=0;V3.pawnScale=PHONE.pawn;
+  phClampPan();V3.lookT=V3.lookT||new THREE.Vector3();V3.lookT.set(PHONE.px||0,0,PHONE.pz||0);V3.dirty=true}
+// ---------- phone zoom: pinch, drag to pan when zoomed, + / − buttons, follow your own move ----------
+PHONE.z=1;PHONE.px=0;PHONE.pz=0;PHONE.follow=-1;
+function phClampPan(){const u=2.2+.12,W=BW()*u,D=BH()*u,f=1-1/(PHONE.z||1);PHONE.px=Math.max(-W/2*f,Math.min(W/2*f,PHONE.px||0));PHONE.pz=Math.max(-D/2*f,Math.min(D/2*f,PHONE.pz||0))}
+function phWorldPerPx(){const cv=V3.r.domElement;return (BW()*(2.2+.12)+PHONE.mx)/(PHONE.z||1)/Math.max(50,cv.clientWidth)}
+function phSetZoom(z,at){PHONE.z=Math.max(1,Math.min(3,z));if(at!=null&&typeof tilePos==='function'){const p=tilePos(at);PHONE.px=p.x;PHONE.pz=p.z}if(PHONE.z<=1.02){PHONE.z=1;PHONE.px=0;PHONE.pz=0}
+  if(V3&&V3.on)phFit();phZoomUi()}
+function phFocusTile(){if(!G)return null;if(G.move&&G.move.path.length)return G.move.path[G.move.path.length-1];if(G.act&&G.act.tile!=null&&G.phase==='turn')return G.act.tile;return null}
+function phZoomUi(){const z=document.querySelector('.gx-bar [data-phz]');if(!z)return;const on=PHONE.on&&V3&&V3.on;z.hidden=!on;const t=PHONE.z>1?'⤢':'🔍';if(z.textContent!==t)z.textContent=t;
+  z.setAttribute('aria-label',PHONE.z>1?'Show the whole board':'Zoom in on the board');z.classList.toggle('on',PHONE.z>1)}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-phz]');if(!b||!PHONE.on)return;if(PHONE.z>1&&G&&G.move){PHONE.userFit=true;PHONE.autoZ=false}phSetZoom(PHONE.z>1?1:2.2,PHONE.z>1?null:phFocusTile())});
+function phGestures(){const cv=V3&&V3.r&&V3.r.domElement;if(!cv||cv._phg)return;cv._phg=1;const pts=new Map();let pinch=null,pan=null;
+  cv.addEventListener('pointerdown',e=>{if(!PHONE.on)return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===2){const [a,b]=[...pts.values()];pinch={d:Math.max(20,Math.hypot(a.x-b.x,a.y-b.y)),z:PHONE.z};pan=null;if(V3.drag)V3.drag.moved=true}
+    else if(pts.size===1)pan={x:e.clientX,y:e.clientY,px:PHONE.px,pz:PHONE.pz}});
+  addEventListener('pointermove',e=>{if(!PHONE.on||!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pinch&&pts.size>=2){const [a,b]=[...pts.values()];phSetZoom(pinch.z*Math.hypot(a.x-b.x,a.y-b.y)/pinch.d);if(V3.drag)V3.drag.moved=true}
+    else if(pan&&PHONE.z>1){const dx=e.clientX-pan.x,dy=e.clientY-pan.y;if(Math.abs(dx)+Math.abs(dy)>6){const s=phWorldPerPx();PHONE.px=pan.px-dx*s;PHONE.pz=pan.pz-dy*s;phFit()}}});
+  const up=e=>{pts.delete(e.pointerId);if(pts.size<2)pinch=null;if(!pts.size)pan=null};addEventListener('pointerup',up);addEventListener('pointercancel',up);
+  cv.style.touchAction='none'}
 (function(){let t=null;const f=()=>{clearTimeout(t);t=setTimeout(()=>{phApply();if(G)phRender()},60)};addEventListener('resize',f);addEventListener('orientationchange',f);phApply()})();
 
 // ---------- helpers ----------
@@ -36,28 +56,33 @@ function phChip(){const c=$('#pchip');if(!c||!G)return;const s=sideToAct();const
   const t=G.over?'Game over':`R${G.round} · ${who}${G.phase==='bid'?' · bid':G.phase==='turn'&&G.step&&me()?' · '+({move:'move',tribe:'tribe',tile:'tile',sell:'sell'}[G.step]||''):''}`;
   if(c.textContent!==t)c.textContent=t;c.setAttribute('aria-label',`Round ${G.round}, ${who}${G.phase==='bid'?', bidding':''}${online()?', online':''}`)}
 function phPanel(el,o){if(!el)return;if(!o){if(!el.hidden){el.hidden=true;el.dataset.h=''}return}
-  const h=`<div class="pp-h"><h3>${o.title}</h3>${o.x?`<button class="pp-x" data-ph="close" aria-label="Close">×</button>`:''}</div><div class="pp-b">${o.body}</div>${o.foot?`<div class="pp-f">${o.foot}</div>`:''}`;
-  el.hidden=false;if(el.dataset.h!==h){const sc=el.querySelector('.pp-b'),top=sc&&el.dataset.k===o.key?sc.scrollTop:0;el.innerHTML=h;el.dataset.h=h;el.dataset.k=o.key||'';const b=el.querySelector('.pp-b');if(b)b.scrollTop=top}}
+  const h=`<div class="pp-h"><h3>${o.title}</h3>${o.x?`<button class="pp-x" data-ph="close" aria-label="Close">×</button>`:''}</div><div class="pp-b">${o.body}</div><div class="pp-more" hidden>▼ more below: scroll</div>${o.foot?`<div class="pp-f">${o.foot}</div>`:''}`;
+  el.hidden=false;if(el.dataset.h!==h){const sc=el.querySelector('.pp-b'),top=sc&&el.dataset.k===o.key?sc.scrollTop:0;el.innerHTML=h;el.dataset.h=h;el.dataset.k=o.key||'';const b=el.querySelector('.pp-b');if(b){b.scrollTop=top;b.onscroll=()=>phMore(el)}const mo=el.querySelector('.pp-more');if(mo&&b)mo.onclick=()=>{b.scrollTop+=Math.max(80,b.clientHeight*.7);phMore(el)}}phMore(el)}
+function phMore(el){const b=el.querySelector('.pp-b'),m=el.querySelector('.pp-more');if(b&&m)m.hidden=!(b.scrollHeight>b.clientHeight+6&&b.scrollTop+b.clientHeight<b.scrollHeight-6)}
 // take a prompt from the (hidden) dock, drop the long coach text
 function phDock(sel){const b=$('#dockbody');return b?b.querySelector(sel):null}
 function phClean(n,keepP){if(!n)return '';const c=n.cloneNode(true);for(const e of c.querySelectorAll('.coach,details,.muted.small'))e.remove();if(!keepP)for(const e of c.querySelectorAll('p:not(.small):not(.flav)'))e.remove();return c.innerHTML}
 
 // ---------- cards: one at a time, in priority order ----------
 function phCard(hp){
-  if(G.over){if(PHONE.overDone===G.seed+':'+G.round)return null;const pr=phDock('.prompt');return {key:'over',title:'Result',x:false,body:pr?pr.innerHTML:'',foot:`<button class="btn go" data-ph="cont" data-k="over">Continue</button>${btn({ui:'new'},'New game')}`}}
+  if(G.over){if(PHONE.overDone===G.seed+':'+G.round)return null;const pr=phDock('.prompt');const mp=phMine();const top=mp?(()=>{const sc=G.over.scores.map(x=>({p:P(x.p),t:x.s.total})).sort((a,b)=>b.t-a.t);const won=G.over.win.includes(mp.i);const other=sc.find(x=>x.p!==mp);
+    return `<p class="verdict ${won?'up':'dn'}"><b>${won?(G.over.win.length>1?'You share the win':'You win'):'You lose'}</b>: ${sc.map(x=>`${x.p===mp?'You':esc(x.p.nm)} ${x.t}`).join(' · ')}${other&&!won?` (${sc[0].t-sc.find(x=>x.p===mp).t} behind)`:''}. The table below shows where every point came from.</p>`})():'';
+    let tb='';const tbl=document.querySelector('#dockbody table');if(tbl){const c=tbl.cloneNode(true);const rows=[...c.querySelectorAll('tr')];const tot=rows.find(r=>/Total/.test(r.textContent));const hd=rows[0];if(tot&&hd&&hd.parentNode)hd.parentNode.insertBefore(tot,hd.nextSibling);tb=c.outerHTML}
+    return {key:'over',title:'Result',x:false,body:top+(tb||(pr?pr.innerHTML:'')),foot:`<button class="btn go" data-ph="cont" data-k="over">Continue</button>${btn({ui:'new'},'New game')}`}}
   if(hp&&G.q){const pr=phDock('.prompt');return {key:'q',title:'Your choice',x:false,body:pr?phClean(pr,1):''}}
+  if(hp&&UI.pendDj){const d=DJ[UI.pendDj.k];return {key:'pend',title:`✨ ${esc(d.n)}`,x:false,body:`<p><b>Tap a glowing tile on the board.</b></p><p class="small">${esc(d.x)}</p>`,foot:`<button class="btn" data-ui="cancelpw">Cancel</button>`}}
   const adv=hp&&UI.adv?phDock('.adv'):null;if(adv)return {key:'adv',title:'💡 Advisor',x:false,body:adv.innerHTML.replace(/^\s*<b>💡 Advisor<\/b>/,'')}
   if(PHONE.chapter&&PHONE.chapter.key!==PHONE.chDone&&!UI.modal&&G.phase==='bid'){const c=PHONE.chapter;return {key:'chapter',title:`Round ${c.round}`,x:false,body:`<h3 class="chapt">${esc(c.title)}</h3><p>${c.line}</p>`,foot:`<button class="btn go" data-ph="cont" data-k="chapter">Continue</button>`}}
-  if(hp&&UI.coach){const tip=G.phase==='bid'?'bid':G.step==='move'&&!G.move?'move':G.step==='move'&&G.move?'hand':null;
+  if(hp&&UI.coach&&!UI.autoPlan){const tip=G.phase==='bid'?'bid':G.step==='move'&&!G.move?'move':G.step==='move'&&G.move?'hand':null;
     const T={bid:['Turn order','Pay coins to choose <b>when</b> you play this round. Dearer spots go first and get the best moves; free spots go last. Coins also count as points, so spend them only when a great move is at stake. The bulb in the top bar gives advice.'],
       move:['Your turn','You lift everyone off one tile and lead them across the land, leaving one person on each tile you pass. The last one lands where its own tribe already stands: you collect that tribe and put it to work. Tap a glowing tile to start, or choose a ready-made plan.'],
       hand:['Leaving people behind','Pick which colour to leave, then tap a glowing tile next to you. The last person must land on a tile that already has their colour.']};
     if(tip&&!PHONE.tips[tip])return {key:'tip-'+tip,title:T[tip][0],x:false,body:`<p>${T[tip][1]}</p>`,foot:`<button class="btn go" data-ph="cont" data-k="tip-${tip}">Continue</button>`}}
   if(hp&&G.phase==='bid'){const pr=phDock('.prompt');if(!pr)return null;const c=pr.cloneNode(true);const rec=c.querySelector('.sp.rec .btn');const ro=c.querySelector('.sp.rec');
-    const top=rec&&ro?`<button class="btn go bidrec" data-mv='${esc(rec.dataset.mv)}'>★ Suggested: ${esc(ro.querySelector('.ord').textContent)} spot · ${ro.querySelector('b').textContent}</button>`:'';
+    const rb=c.querySelector('.sp.rec .btn.go')||rec;const top=rb&&ro?`<button class="btn go bidrec" data-mv='${esc(rb.dataset.mv)}'>★ Suggested: ${esc(ro.querySelector('.ord').textContent)} spot · ${esc(rb.textContent.replace('★','').trim()==='Take'?ro.querySelector('b').textContent:rb.textContent.replace('★','').trim())}</button>`:'';
     const worth=[...c.querySelectorAll('p.small')].map(e=>e.textContent).find(t=>/best move/i.test(t));
     for(const e of c.querySelectorAll('.coach,details,h3,p'))e.remove();
-    return {key:'bid',title:'Bid for turn order',x:false,body:`<p class="small">Higher spots play earlier; coins are points too.${worth?' '+esc(worth):''}</p>${top}`+c.innerHTML}}
+    const two=hp.markers>1;return {key:'bid',title:two?`Bid for turn order (${Math.min(2,G.bids.filter(b=>b.mk.p===hp.i).length+1)} of 2)`:'Bid for turn order',x:false,body:`<p class="small">You have <b>${hp.coins}🪙</b> (coins are points too). Earlier spots play first and get the best moves.${two?' With 2 players you place <b>2 markers</b>: you bid twice and play twice this round.':''}${worth?' '+esc(worth):''}</p>${top}`+c.innerHTML}}
   return null}
 
 // ---------- pop-ups (tap a chip or a tile) ----------
@@ -79,8 +104,10 @@ function phMineP(){const p=phMine();if(!p)return {key:'mine',title:'You',x:true,
   return {key:'mine',title:'Your things',x:true,body:`${playerSheet(p)}${items.length?`<h4>Use now</h4><div class="opts">${powerButtons(p,items)}</div>`:''}`}}
 function phPlayers(){return {key:'players',title:'Players',x:true,body:`<div class="stats">${G.pl.map(statusHtml).join('')}${standing()}</div>`}}
 function phPlansP(hp){if(!hp)return null;const all=curPlans(hp);const n=UI.morePlans?12:5;return {key:'plans',title:'Plans',x:true,body:`<p class="small">A plan is a whole move. Tap Show to see its path, Do this to play it.</p><div class="plans">${all.slice(0,n).map((o,i)=>planHtml(hp,o,i)).join('')}</div>${all.length>n?`<div class="acts"><button class="btn sm ghost" data-ui="moreplans">Show more plans (${all.length})</button></div>`:UI.morePlans?`<div class="acts"><button class="btn sm ghost" data-ui="moreplans">Show fewer</button></div>`:''}`}}
+function phFeed(){const p=phMine();const list=(UI.feed||[]).slice(-14);const since=p?feedSince(p.i):[];
+  return {key:'feed',title:'Why the points changed',x:true,body:list.length?`<p class="small">Most points at the end wins. Every change, newest first:</p><ul class="feed">${list.slice().reverse().map(e=>`<li class="${since.includes(e)?'new':''}">${feedLine(e)}</li>`).join('')}</ul>`:'<p class="muted">No points have changed yet.</p>',foot:`<button class="btn sm" data-ph="open" data-k="players">Everyone's points in detail</button>`}}
 function phPowers(hp){const pr=phDock('.powers');return {key:'powers',title:'Powers',x:true,body:pr?pr.innerHTML.replace(/<h4>.*?<\/h4>/,''):'<p class="muted">Nothing to use now.</p>'}}
-function phPop(k,hp){switch(k.kind){case 'info':return phInfo(k.i);case 'market':return phMarket(hp);case 'djinns':return phDjinns(hp);case 'mine':return phMineP();case 'players':return phPlayers();case 'plans':return phPlansP(hp);case 'powers':return phPowers(hp)}return null}
+function phPop(k,hp){switch(k.kind){case 'info':return phInfo(k.i);case 'market':return phMarket(hp);case 'djinns':return phDjinns(hp);case 'mine':return phMineP();case 'players':return phPlayers();case 'plans':return phPlansP(hp);case 'powers':return phPowers(hp);case 'feed':return phFeed()}return null}
 // the decision pop-ups that open by themselves
 function phHandPop(hp){const mv=G.move,vm=validMoves(hp.i),by=a=>vm.filter(m=>m.act===a),steps=by('step');const cols=[...new Set(mv.hand)];
   if(!UI.dropColor||!mv.hand.includes(UI.dropColor))UI.dropColor=cols[0];
@@ -92,10 +119,17 @@ function phHandPop(hp){const mv=G.move,vm=validMoves(hp.i),by=a=>vm.filter(m=>m.
    <p class="small">${UI.autoPlan?'Following your plan…':mv.hand.length===1?'<b>Last one:</b> it must land on a tile with its own colour.':'Tap a glowing tile (or one below) to leave the chosen colour.'}</p>
    ${UI.autoPlan?'':`<div class="drops">${ds}</div>`}
    <p class="small path">${path.join(' → ')}</p>
-   ${plans.length?`<h4>Plans from here</h4><div class="acts">${plans.map(x=>`<button class="btn sm go" data-plando="${x.i}">▶ ${esc(MNAME[x.o.c])} → ${esc(tileName(G.board[x.o.e]))} · +${Math.max(0,Math.round(x.o.v))}★</button>`).join('')}</div>`:''}
+   ${plans.length?`<h4>Plans from here</h4><div class="acts">${plans.map(x=>`<button class="btn sm go" data-plando="${x.i}">▶ ${esc(MNAME[x.o.c])} → ${esc(tileName(G.board[x.o.e]))} · ${planBadge(hp,x.o)}</button>`).join('')}</div>`:''}
    <div class="acts">${undo}</div>`}}
-function phGainPop(hp){const pr=phDock('.prompt');if(!pr)return null;let log=G.log.slice(0,2).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('');
-  const pw=phDock('.powers');return {key:'gain',title:G.step==='tribe'?'Tribe action':G.step==='tile'?'Tile action':G.step==='sell'?'End of turn':'Your choice',x:false,body:`${phClean(pr,1)}${log?`<ol class="mini">${log}</ol>`:''}${pw?`<div class="powers">${pw.innerHTML}</div>`:''}`}}
+// what the normal computer would pick here (cached per decision), shown as a starred option
+function phSuggest(hp){const k=G.logN+'_'+G.step+'_'+hp.i;if(PHONE.sgK===k)return PHONE.sgV;let v='';try{const lv=hp.lv;hp.lv='normal';try{const m=aiMove(hp.i);if(m&&m.act!=='djinn'&&m.act!=='item')v=JSON.stringify(m)}finally{hp.lv=lv}}catch(e){}PHONE.sgK=k;PHONE.sgV=v;return v}
+function phGainPop(hp){const pr=phDock('.prompt');if(!pr)return null;const box=document.createElement('div');box.innerHTML=phClean(pr,1);
+  const sj=hintsOn()?phSuggest(hp):'';const sb=sj&&[...box.querySelectorAll('[data-mv]')].find(b=>b.dataset.mv===sj);
+  if(sb&&box.querySelectorAll('[data-mv]').length>1){const par=sb.parentNode;for(const b of par.querySelectorAll('.btn.go'))if(b!==sb)b.classList.remove('go');sb.classList.add('go');sb.classList.remove('ghost');
+    sb.insertAdjacentHTML('afterbegin','★ ');const first=par.querySelector('[data-mv]');if(first!==sb)par.insertBefore(sb,first);sb.insertAdjacentHTML('beforeend','<small class="sug"> · suggested</small>')}
+  const pw=phDock('.powers');const n=pw?pw.querySelectorAll('[data-mv],[data-pw]').length:0;
+  return {key:'gain',title:G.step==='tribe'?'Tribe action':G.step==='tile'?'Tile action':G.step==='sell'?'End of turn':'Your choice',x:false,body:box.innerHTML,
+    foot:n?`<button class="btn sm" data-ph="open" data-k="powers">✨ Djinn powers you can use (${n})</button>`:''}}
 function phAuto(hp){if(!hp||G.over||G.q||G.phase!=='turn')return null;if(G.step==='move'&&G.move&&G.move.hand&&G.move.hand.length)return phHandPop(hp);if(G.step==='tribe'||G.step==='tile'||G.step==='sell')return phGainPop(hp);return null}
 
 // ---------- the control strip ----------
@@ -104,24 +138,35 @@ function phStrip(hp,pop,card){const m=phMine();const s=sideToAct();let msg='',ac
   else if(!hp){const p=s>=0?P(s):null;msg=p?`${pChip(p)} ${online()&&p.human?'is deciding…':G.phase==='bid'?'is bidding…':'is playing…'}`:'';}
   else if(UI.pendDj){msg=`Tap a glowing tile for <b>${esc(DJ[UI.pendDj.k].n)}</b>`;acts=`<button class="btn sm" data-ui="cancelpw">Cancel</button>`}
   else if(G.phase==='bid'){msg='<b>Bid for turn order</b>'}
-  else if(G.step==='move'&&!G.move){msg='<b>Your move.</b> Tap a glowing tile.';const pl=curPlans(hp);if(pl&&pl[0])acts=`<button class="btn go" data-plando="0">Best plan ▶ <small>+${Math.max(0,Math.round(pl[0].v))}★</small></button><button class="btn" data-ph="open" data-k="plans">Plans</button>`}
+  else if(G.step==='move'&&!G.move){msg='<b>Your move.</b> Tap a glowing tile. 🔍 or pinch to zoom.';const pl=curPlans(hp);if(pl&&pl[0]&&!hintsOn())acts=`<button class="btn go" data-ph="open" data-k="plans">Choose a plan ▶</button>`;else if(pl&&pl[0]){acts=`<button class="btn go" data-plando="0">Best plan ▶ <small>${planBadge(hp,pl[0])}</small></button><button class="btn" data-ph="open" data-k="plans">Plans</button>`;
+      const mx=Math.max(...pl.slice(0,5).map(o=>planPoints(hp,o).total)),own=planPoints(hp,pl[0]).total;
+      PHONE.why=`<p class="ps-why">Best plan: ${esc(planGains(hp,pl[0]).filter(x=>!x.startsWith('(')).join(', '))}.${mx>own?` Other plans score more right now (up to +${mx}), but this one sets up more points for later.`:''}</p>`}}
   else if(G.step==='move'&&G.move){msg=`<b>${G.move.hand.length} in hand.</b> Tap a glowing tile.`;if(!pop)acts=`<button class="btn go" data-ph="reopen">Open</button>`}
   else {msg=`<b>${phStep()}</b>`;if(!pop&&!card)acts=`<button class="btn go" data-ph="reopen">Open</button>`}
   const chips=[];
-  if(m)chips.push(`<button class="pk wide" data-ph="open" data-k="mine" aria-label="Your things"><span class="pkn">${esc(m.nm)}</span><span class="pkv">★ <b>${shownTotal(m)}</b> · 🪙 <b>${m.coins}</b> · 🐪 <b>${m.camels}</b></span><span class="pks">🧺 ${m.res.length} · ${mdot('vizier')}${m.vz} · ${mdot('elder')}${m.el}${m.fk?' · 🔮 '+m.fk:''}</span></button>`);
-  chips.push(`<button class="pk" data-ph="open" data-k="players" aria-label="Players and scores"><span class="pkn">Players</span><span class="pkv">${G.pl.map(p=>`<i class="pd" style="--pc:${PCOL[p.i]}"></i>${shownTotal(p)}`).join(' ')}</span></button>`);
+  if(m)chips.push(`<button class="pk wide" data-ph="open" data-k="mine" aria-label="Your things"><span class="pkn">${esc(m.nm)}</span><span class="pkv">★ <b>${shownTotal(m)}</b> · 🪙 <b>${m.coins}</b> · 🐪 <b>${m.camels}</b></span><span class="pks">🧺 ${m.res.length} goods · ${mdot('vizier')} ${m.vz} Advisors · ${mdot('elder')} ${m.el} Sages${m.fk?' · 🔮 '+m.fk+' Mystics':''}</span></button>`);
+  chips.push(`<button class="pk wide" data-ph="open" data-k="feed" aria-label="Score race: why the points changed"><span class="pkn">★ Most points wins</span><span class="pkv">${G.pl.map(p=>`<i class="pd" style="--pc:${PCOL[p.i]}"></i>${p===m?'You':esc(p.nm)} ${shownTotal(p)}`).join(' ')}</span></button>`);
   chips.push(`<button class="pk" data-ph="open" data-k="market" aria-label="Market"><span class="pkn">🛒 Market</span><span class="pkv">${G.market.map(r=>RICON[r]).join('')||'–'}</span></button>`);
   chips.push(`<button class="pk" data-ph="open" data-k="djinns" aria-label="Djinns on offer"><span class="pkn">🧞 Djinns</span><span class="pkv">${G.djRow.length} on offer</span></button>`);
-  if(hp&&phDock('.powers'))chips.push(`<button class="pk" data-ph="open" data-k="powers"><span class="pkn">✨ Powers</span><span class="pkv">use now</span></button>`);
-  const last=!hp&&!G.over&&G.log[0]?`<p class="ps-log">${esc(G.log[0].t)}</p>`:'';
-  return `<div class="ps-main"><div class="ps-msg">${msg}</div><div class="ps-ctl">${acts}</div></div>${last}<div class="ps-chips">${chips.join('')}</div>`}
+  if(hp&&!G.over&&phDock('.powers')&&!UI.pendDj)acts+=`<button class="btn sm" data-ph="open" data-k="powers">✨ Powers</button>`;
+  const mk=m?((UI.feedMark||{})[m.i]||0):0;const fresh=(UI.feed||[]).filter(e=>e.n>mk&&(!hp||e.actor!==m.i));
+  let last='';if(!hp&&!G.over){last=(G.log[0]?`<p class="ps-log">${esc(G.log[0].t)}</p>`:'')+fresh.slice(-2).map(e=>`<p class="ps-log fd">${feedLine(e)}</p>`).join('')}
+  else if(hp&&fresh.length){const big=fresh.filter(e=>Math.abs(e.d)>=3).slice(-3).reverse();
+    last=`<p class="ps-log fd">Since your last turn: <b>${feedSum(fresh)}</b> <button class="btn xs" data-ph="open" data-k="feed">Why?</button></p>${big.length?'<p class="ps-log small">Biggest changes:</p>':''}`+big.map(e=>`<p class="ps-log fd">${feedLine(e)}</p>`).join('')}
+  if(hp&&G.step==='move'&&!G.move&&PHONE.why)last=PHONE.why+last;PHONE.why='';
+  const cw=!G.over?camelWarn():'';if(cw)last=`<p class="ps-warn">⏳ ${cw}</p>`+last;
+  return `<div class="ps-main"><div class="ps-msg">${msg}</div><div class="ps-ctl">${acts}</div></div><div class="ps-chips">${chips.join('')}</div>${last}`}
 
 // ---------- render ----------
 function phRender(){const ps=$('#ps'),pp=$('#ppop'),pc=$('#pc');if(!ps)return;
   if(!PHONE.on||!G){for(const e of [ps,pp,pc])if(e)e.hidden=true;return}
   const bk=G.W+'x'+G.H;if(PHONE.k!==bk){PHONE.k=bk;phApply()}
   const hp=me(),sig=phSig();if(PHONE.pop&&PHONE.pop.sig!==sig)PHONE.pop=null;if(PHONE.hideAuto&&PHONE.hideAuto!==sig)PHONE.hideAuto='';
-  phChip();let card=null,pop=null;
+  phChip();phZoomUi();
+  // portrait: while you drop people, the board zooms onto your hand and follows it; it zooms back out when the move ends
+  if(hp&&G.move&&!PHONE.land&&PHONE.z===1&&!PHONE.userFit&&V3&&V3.on){PHONE.autoZ=true;phSetZoom(1.9,phFocusTile())}
+  if(!G.move&&PHONE.autoZ){PHONE.autoZ=false;PHONE.userFit=false;phSetZoom(1)}if(!G.move)PHONE.userFit=false;
+  if(PHONE.z>1&&hp){const f=phFocusTile();if(f!=null&&f!==PHONE.follow){PHONE.follow=f;phSetZoom(PHONE.z,f)}}else if(!hp)PHONE.follow=-1;let card=null,pop=null;
   try{card=phCard(hp);pop=PHONE.pop?phPop(PHONE.pop,hp):PHONE.hideAuto?null:phAuto(hp);if(PHONE.pop&&!pop)PHONE.pop=null}catch(e){console.error(e)}
   ps.hidden=false;const h=phStrip(hp,pop,card);if(ps.dataset.h!==h){ps.innerHTML=h;ps.dataset.h=h}
   phPanel(pp,pop);phPanel(pc,card);document.documentElement.classList.toggle('ph-pop',!!pop&&!card);document.documentElement.classList.toggle('ph-card',!!card)}
@@ -133,8 +178,7 @@ on3DTile=function(i){if(!PHONE.on||!G)return phBoardTap(i);const p=me();PHONE.po
   PHONE.pop={kind:'info',i,sig:phSig()};phRender()};
 const phShowChapter=showChapter;
 showChapter=function(){if(!PHONE.on)return phShowChapter();const key=G.round+'_'+G.seed;if(UI.chapterShown===key)return;UI.chapterShown=key;
-  const sc=G.pl.map(p=>({p,t:scoreOf(p).total})).sort((x,y)=>y.t-x.t);const low=G.pl.filter(p=>p.camels<=3);
-  PHONE.chapter={key,round:G.round,title:chapterTitle(G.round),line:G.round===1?'Bid for turn order, then each player takes their turn.':`${esc(sc[0].p.nm)} leads with ${sc[0].t} points.`+(low.length?` Only ${Math.min(...low.map(p=>p.camels))} camels left for ${esc(low[0].nm)}: the end is near.`:'')}};
+  PHONE.chapter={key,round:G.round,title:chapterTitle(G.round),line:chapterLine()}};
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-ph]');if(!b||!PHONE.on)return;const a=b.dataset.ph,d=b.dataset;
   if(a==='open'){PHONE.pop={kind:d.k,sig:phSig()};phRender()}
   else if(a==='close'){if(PHONE.pop)PHONE.pop=null;else PHONE.hideAuto=phSig();phRender()}

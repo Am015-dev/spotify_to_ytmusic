@@ -21,7 +21,7 @@ for(const [w,h] of [[1366,768],[1920,1080],[768,1024]].filter(([w,h])=>!process.
       // click the tile centre in 3D; fall back to the move button if the pick missed
       const before=await p.evaluate(()=>G.logN+'|'+(G.move&&G.move.hand.length)+'|'+G.step);await p.mouse.click(pt.x,pt.y);await p.waitForTimeout(200);const after=await p.evaluate(()=>G.logN+'|'+(G.move&&G.move.hand.length)+'|'+G.step);
       if(before===after){await p.evaluate(i=>on3DTile(i),i)}continue}
-    const bs=await p.$$('#dockbody button[data-mv]:not([disabled])');if(bs.length){await bs[bs.length>1&&Math.random()<.5?1:0].click();await p.waitForTimeout(150);continue}
+    const bs=await p.$$('#dockbody button[data-mv]:not([disabled])');if(bs.length){await bs[bs.length>1&&Math.random()<.5?1:0].click({timeout:3000}).catch(()=>{});await p.waitForTimeout(150);continue}
     await p.waitForTimeout(200);if(shotMove&&shotAct&&k>60)break}
   await p.evaluate(()=>GX.toggleDock(false));await p.waitForTimeout(600);await cover('dockmin');await p.screenshot({path:`shots/${t}_5min.png`});await p.evaluate(()=>GX.toggleDock(true));
   console.log(t,'board',c.area+'% of screen','errors',errs.slice(0,3));if(errs.length)bad++;await p.close()}

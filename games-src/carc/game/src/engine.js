@@ -19,7 +19,7 @@ const HALFSEG=TT.map((d,t)=>{const o=Array(8).fill(-1);TSEG[t].forEach((s,i)=>{i
 const edgeT=(t,r,s)=>TT[t].e[(s-r+4)%4];
 const isRiver=t=>TT[t].V.length>0;
 const FIGN={f:'follower',big:'champion',bld:'mason',pig:'hog'};
-const ROLE={C:'warden',R:'wayfarer',M:'brother',F:'farmer'};
+const ROLE={C:'follower',R:'follower',M:'follower',F:'farmer'};
 const FEAT={C:'town',R:'road',M:'priory',F:'field'};
 const SETN={base:'Base game',river:'The Riverlands',ic:'Taverns & Basilicas',tb:'Merchants & Masons'};
 const GOODS=['wine','grain','cloth'];
@@ -122,7 +122,7 @@ function complete(r){const F=G.fd[r];F.done=1;const fs=figsIn(r),win=majority(fs
   const cat=F.ty==='C'?'town':F.ty==='R'?'road':'priory';G.stats.scored[cat+(F.cat?'+basilica':F.inn?'+tavern':'')]=(G.stats.scored[cat+(F.cat?'+basilica':F.inn?'+tavern':'')]||0)+1;
   const what=F.ty==='C'?`town of ${F.tiles.length} tile${F.tiles.length>1?'s':''}${F.pen?` and ${F.pen} banner${F.pen>1?'s':''}`:''}${F.cat?' with a basilica':''}`:F.ty==='R'?`road of ${F.tiles.length} tile${F.tiles.length>1?'s':''}${F.inn?' with a tavern':''}`:'priory';
   for(const w of win){P(w).score+=pts;P(w).sc[cat==='priory'?'priory':cat]+=pts}
-  if(win.length){lg(`✔ The ${what} is finished: ${win.map(w=>P(w).nm).join(' and ')} score${win.length>1?'':'s'} ${pts}.`,'good');fx('score',{r,pts,win})}
+  if(win.length){lg(`✔ The ${what} is finished: ${win.map(w=>P(w).nm).join(' and ')} score${win.length>1?'':'s'} ${pts}.`,'good');fx('score',{r,pts,win,by:c.p,fs:fs.map(f=>[f.p,f.k])})}
   else if(F.ty!=='M')lg(`The ${what} is finished, but nobody stands in it.`);
   if(F.ty==='C'&&win.length&&pts>=16)storyBeat('bigtown',{win,pts});
   // merchants: whoever closes a town takes its goods
@@ -132,7 +132,7 @@ function complete(r){const F=G.fd[r];F.done=1;const fs=figsIn(r),win=majority(fs
   if(fs.length)fx('home',r);c.scored.push({r,pts,win,ty:F.ty})}
 function storyBeat(kind,d){let t='';
   if(kind==='half')t='Half the tiles are down. Smoke rises from new hearths, and the valley is starting to look like a country.';
-  if(kind==='bigtown')t=`The walls of the great town close: ${d.win.map(w=>P(w).nm).join(' and ')}’s wardens claim ${d.pts} points.`;
+  if(kind==='bigtown')t=`The walls of the great town close: ${d.win.map(w=>P(w).nm).join(' and ')}’s followers claim ${d.pts} points.`;
   G.story.push({t,n:G.turn});lg('📜 '+t,'story');fx('story',t)}
 // ---------- final scoring ----------
 function fieldCities(F){const s=new Set();for(const c of F.ct){const r=find(c);if(G.fd[r].done)s.add(r)}return s}
