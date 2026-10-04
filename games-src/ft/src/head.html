@@ -233,7 +233,7 @@ html.ph.ph-p .gx-app{grid-template-columns:minmax(0,1fr);grid-template-rows:calc
 html.ph.ph-l .gx-app{grid-template-columns:var(--bw) minmax(0,1fr);grid-template-rows:calc(44px + var(--sat,0px)) minmax(0,1fr);grid-template-areas:"board bar" "board zone"}
 html.ph.ph-p .gx-dock{border-top:3px solid var(--brass2,#d9a441)}html.ph.ph-l .gx-dock{border-left:3px solid var(--brass2,#d9a441)}
 html.ph .gx-dock-head,html.ph .gx-dock-body,html.ph .gx-reopen,html.ph #chip,html.ph #banner{display:none!important}
-html.ph #dockmsg{position:absolute;left:8px;right:8px;top:6px;z-index:9;margin:0;font-size:14px}
+html.ph #dockmsg{position:absolute;left:8px;right:8px;top:auto;bottom:calc(8px + var(--sab,0px));z-index:9;margin:0;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.25);pointer-events:none}
 /* top bar: icons + one status chip */
 html.ph .gx-bar h1{display:none}
 html.ph .gx-bar .gx-ibtn{display:none;min-width:44px;min-height:44px;padding:0 8px}

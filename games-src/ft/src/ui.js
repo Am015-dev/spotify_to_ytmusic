@@ -43,8 +43,8 @@ function renderDock(){const el=$('#dockbody');if(!el)return;const s=sideToAct();
   if(!hp){h+=statsH+`<div class="recap"><h4>${p?(online()&&p.human?'Waiting for '+esc(p.nm)+(G.phase==='bid'?' to bid…':'…'):esc(p.nm)+(G.phase==='bid'?' is bidding…':' is playing…')):''}</h4>${recapHtml()}</div>${marketHtml()}${djRowHtml()}`;el.innerHTML=h;return}
   // nothing to decide (a Shrine without Sages, no goods to sell, no powers): say so and move on, no extra screen
   if(!online()&&G.phase==='turn'&&(G.step==='tile'||G.step==='sell')&&!G.q){const vm0=validMoves(hp.i);const only=vm0.filter(m=>m.act!=='djinn'&&m.act!=='item'&&m.act!=='thief');
-    if(only.length===vm0.length&&only.length===1&&(G.step==='tile'?only[0].skip:only[0].act==='end')){const k=G.logN+G.step;if(UI.autoSkip!==k){UI.autoSkip=k;
-      toast(G.step==='tile'?`${tileName(G.board[G.act.tile])}: nothing you can do here, so its action is skipped.`:'No goods to sell: your turn is over.');
+    if(only.length===vm0.length&&only.length===1&&(G.step==='tile'?(only[0].skip||only[0].place!=null):only[0].act==='end')){const k=G.logN+G.step;if(UI.autoSkip!==k){UI.autoSkip=k;
+      toast(G.step==='tile'?(only[0].place!=null?`${G.board[G.act.tile].k==='village'?'🏰 A palace':'🌴 A palm'} goes on ${tileName(G.board[only[0].place])} (it must).`:`${tileName(G.board[G.act.tile])}: nothing you can do here, so its action is skipped.`):'No goods to sell: your turn is over.');
       setTimeout(()=>{if(G&&!G.over&&UI.autoSkip===k&&G.logN+G.step===k&&me())go(only[0])},ANIM?1300:0)}}}
   if(UI.adv&&UI.adv.key!==G.logN+'_'+G.step+'_'+G.phase+'_'+!!G.q)UI.adv=null;
   if(UI.adv)h+=advHtml();
@@ -84,7 +84,7 @@ function tileButtons(p,vm,t){let tm=vm.filter(m=>m.act==='tile');let h='';
   if(t.k==='sacred'&&!tm.some(m=>m.dj||m.thief))h+=`<p class="small">You can't summon here yet: you need 2 Sages, or 1 Sage and 1 Mystic card. You have ${p.el} Sage${p.el===1?'':'s'} and ${p.fk} Mystic${p.fk===1?'':'s'}.</p>`;
   for(const m of tm){if(m.skip){h+=btn(m,allBad||!tm.some(x=>!x.skip)&&!buys.length?'Skip (best choice)':'Skip',allBad||(!buys.length&&tm.length===1)?'go':'ghost');continue}
     if(m.place!=null)h+=btn(m,`${t.k==='village'?'🏰 Palace':'🌴 Palm'} on ${esc(tileName(G.board[m.place]))}${m.place===t.i?'':' (neighbour)'}`,m.place===t.i?'go':'');
-    else if(m.dj)h+=btn(m,`✨ ${esc(DJ[m.dj].n)} (${DJ[m.dj].vp} pts) — pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 Mystic':''}<small class="djx">${esc(DJ[m.dj].x)}</small>`,'');
+    else if(m.dj)h+=btn(m,`✨ ${esc(DJ[m.dj].n)} (${DJ[m.dj].vp} pts) — pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 🔮 Mystic card':''}<small class="djx">${esc(DJ[m.dj].x)}</small>`,'');
     else if(m.thief)h+=btn(m,`🦹 Hire the ${esc(THIEVES[m.thief].n)} — pay ${m.pay.el} Sage${m.pay.el>1?'s':''}${m.pay.fk?' + 1 Mystic':''}`,'');
     else if(m.take)h+=btn(m,`Buy ${m.take.map(j=>RICON[G.market[j]]+' '+RNAME[G.market[j]]).join(' + ')} (${t.k==='small'?3:t.k==='large'?6:4}🪙)`,'');
     else if(m.work)h+=btn(m,m.work==='art'?'Pay 1 Crafter for an item':'Pay 2 Mystics for an item','')}
