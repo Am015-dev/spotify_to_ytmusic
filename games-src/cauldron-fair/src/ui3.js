@@ -34,6 +34,7 @@ const stripM = m => { const o = Object.assign({}, m); delete o.label; return o; 
 function act(m, seat) {
   if (!G || G.phase === 'over') return false;
   seat = seat == null ? viewSeat() : seat; if (seat < 0) return false;
+  if (UI.focus != null && UI.focus !== seat && seat === viewSeat()) { UI.focus = seat; UI.potSig = ''; }   // acting shows your own cauldron again
   if (typeof NET !== 'undefined' && NET.on && !isHost()) { return netAct(stripM(m)); }
   return commit(seat, stripM(m));
 }

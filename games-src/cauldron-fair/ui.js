@@ -270,7 +270,7 @@ function renderActs() {
   const p = G.players[v]; const legal = mvList(v); UI.legal[v] = legal;
   if (typeof NET !== 'undefined' && NET.on && NET.pend && Date.now() - NET.pendT < 700) { /* a move is in flight */ }
   if (p.q && !EVAL_Q[p.q.h]) { renderQ(p, legal, qb); return; }
-  if (focusSeat() !== v) { a.appendChild(h('button.btn.go.backb', { 'data-a': 'focus', 'data-seat': v, type: 'button' }, 'Back to your cauldron')); return; }
+  if (focusSeat() !== v) a.appendChild(h('button.btn.alt.backb', { 'data-a': 'focus', 'data-seat': v, type: 'button' }, 'You are looking at ' + G.players[focusSeat()].name + '\'s cauldron. Back to yours'));   // any move of yours switches back too
   if (G.phase !== 'brew' || p.st !== 'draw' || p.q) return;
   const mk = (t, cls, label, icon) => { const m = legal.find(x => x.t === t); if (!m) return null; return h('button.btn' + cls, { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button' }, icon ? h('span', { html: icon }) : null, label); };
   const draw = mk('draw', '.drawb', 'Draw', ico('bag', 26)), stop = mk('stop', '.stopb', 'Stop') || (draw ? h('button.btn.stopb.off', { type: 'button', disabled: true, title: 'Draw your first chip first' }, 'Stop') : null);   // Stop keeps its place so Draw never moves
@@ -349,6 +349,7 @@ const stripM = m => { const o = Object.assign({}, m); delete o.label; return o; 
 function act(m, seat) {
   if (!G || G.phase === 'over') return false;
   seat = seat == null ? viewSeat() : seat; if (seat < 0) return false;
+  if (UI.focus != null && UI.focus !== seat && seat === viewSeat()) { UI.focus = seat; UI.potSig = ''; }   // acting shows your own cauldron again
   if (typeof NET !== 'undefined' && NET.on && !isHost()) { return netAct(stripM(m)); }
   return commit(seat, stripM(m));
 }
