@@ -38,11 +38,11 @@ function bfLineText(){if(!G)return '';if(G.winner)return '';const p=cur();if(UI.
   if(UI.intro||UI.choice)return '';
   if(!humanTurn()){if(NET.on&&G.pl[G.active].human)return `${mname(p)}’s turn`;return `${mname(p)}’s turn · tap to speed up`}
   if(G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;
-    if(G.rolls<=0||!nk)return 'Tap Done to use your dice';
+    if(G.rolls<=0||!nk)return 'No rolls left: tap Done';
     if(!G.dice.some(d=>d.k))return 'Tap dice to keep them, then Roll';
     return `Roll the other ${nk}, or tap Done`}
   if(G.phase==='buy'){if(BF.sel>=0&&G.market[BF.sel]!==undefined&&!canBuy(p,BF.sel))return whyNot(p,G.market[BF.sel])||'Can’t buy this one';
-    return G.market.some((_,k)=>canBuy(p,k))?'Tap a green card to buy it':'Not enough ⚡: tap Done'}
+    const fk=BF.sel>=0?BF.sel:suggestCard(p);return fk>=0&&canBuy(p,fk)?'Tap BUY, or Done to save ⚡':G.market.some((_,k)=>canBuy(p,k))?'Tap a card to see it':'Not enough ⚡: tap Done'}
   return ''}
 function bfLine(){const el=$bf('bline');if(!el)return;const t=BF.flash&&BF.flash.until>bfNow()?BF.flash.t:bfLineText();if(el.textContent!==t)el.textContent=t;el.classList.toggle('hid',!t);el.classList.toggle('flash',!!(BF.flash&&BF.flash.until>bfNow()))}
 function bfFlash(t,ms){BF.flash={t,until:bfNow()+(ms||2200)};bfLine();clearTimeout(BF.flashT);BF.flashT=setTimeout(bfLine,(ms||2200)+20)}
@@ -113,10 +113,11 @@ function bfShop(){const el=$bf('pshop');if(!el||!G)return;if(!phShopOK()||!G.mar
   const p=cur(),sg=suggestCard(p);if(BF.sel>=G.market.length)BF.sel=-1;
   el.innerHTML=G.market.map((id,k)=>{const C=CARDS[base(id)],c=costOf(p,id),ok=canBuy(p,k);
     return `<button class="ptile bcard ${C.t} ${k===sg?'sugg':''} ${ok?'ok':'no'} ${k===BF.sel?'sel':''}" data-shop="${k}" aria-label="${esc(C.n)}, costs ${c} energy${ok?'':', not affordable'}. ${esc(C.x)} ${k===BF.sel&&ok?'Tap to buy.':'Tap to see it.'}">
-      <span class="cost">${c}</span>${k===sg?'<i class="star">★</i>':''}<span class="art" aria-hidden="true">${cardIcon(id)}</span><b>${esc(C.n)}</b>${ok?'<em class="go">BUY</em>':''}</button>`}).join('');
+      <span class="cost">${c}</span>${k===sg?'<i class="star">★</i>':''}<span class="art" aria-hidden="true">${cardIcon(id)}</span><b>${esc(C.n)}</b>${ok&&k===(BF.sel>=0?BF.sel:sg)?'<em class="go">BUY</em>':''}</button>`}).join('');
   const tip=$bf('btip');if(tip&&BF.tipHold&&BF.tipHold.until>bfNow()){if(tip.innerHTML!==BF.tipHold.html)tip.innerHTML=BF.tipHold.html}else if(tip){const fk=BF.sel>=0?BF.sel:sg>=0?sg:G.market.findIndex((_,j)=>canBuy(p,j));const id=fk>=0?G.market[fk]:undefined;tip.innerHTML=id===undefined?'':`<b>${esc(CARDS[base(id)].n)}</b> ${chipOf(CARDS[base(id)])}<p>${esc(CARDS[base(id)].x)}</p>`}}
 function bfTapCard(k,el){const p=cur();if(!phShopOK())return;
   if(!canBuy(p,k)){BF.sel=k;phRender();const t=document.querySelector(`#pshop [data-shop="${k}"]`);if(t){t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake')}if(typeof sfx==='function')sfx('click');bfFlash(whyNot(p,G.market[k])||'You can’t buy this one',1600);return}
+  const fk=BF.sel>=0?BF.sel:suggestCard(p);if(fk!==k){BF.sel=k;phRender();if(typeof sfx==='function')sfx('click');bfFlash('Tap it again to buy',1400);return}
   const from=el?bfCenter(el):null,to=bfChipXY(meSeat()>=0?meSeat():G.active),html=`<div class="bcard-fly">${cardIcon(G.market[k])}</div>`,nm=CARDS[base(G.market[k])].n;
   BF.sel=-1;bfTut('buy',1);BF.tipHold={html:`<b>${esc(nm)}</b> ${chipOf(CARDS[base(G.market[k])])}<p>${esc(CARDS[base(G.market[k])].x)}</p>`,until:bfNow()+3200};setTimeout(()=>{bfShop()},3300);bfFly(html,from,to,{dur:620,end:.4,spin:0,size:64,burst:'star',arc:-70});uiAct({card:String(k)});bfFlash(`Bought ${nm}!`,1400)}
 // ---- the computer's turn: a tap on the board speeds it up until your next turn ----
@@ -151,7 +152,9 @@ function bfRender(){if(!phOn())return;bfBuild();bfRollWatch();bfSlowAgain();if(B
 // ---- wiring ----
 {const _pr=phRender;phRender=function(){_pr.apply(this,arguments);try{bfRender()}catch(e){console.error(e)}};
  // the chips hold the old numbers until the dice that change them land
- const _pc=phChips;phChips=function(){_pc.apply(this,arguments);const el=$bf('pchips');if(el&&G&&el.parentNode&&el.parentNode.matches&&el.parentNode.matches('header.gx-bar'))el.style.setProperty('--cc',G.pl.length);if(!BF.snap)return;
+ const _pc=phChips;phChips=function(){_pc.apply(this,arguments);const el=$bf('pchips');if(el&&G&&el.parentNode&&el.parentNode.matches&&el.parentNode.matches('header.gx-bar'))el.style.setProperty('--cc',G.pl.length);// names that do not fit are trimmed (never clipped)
+   document.querySelectorAll('header.gx-bar .pchip b').forEach(b=>{if(b.scrollWidth<=b.clientWidth+1)return;const full=b.textContent;let n=full.length;while(n>2&&b.scrollWidth>b.clientWidth+1){n--;b.textContent=full.slice(0,n)+'…'}});
+   if(!BF.snap)return;
    document.querySelectorAll('#pchips .pchip').forEach(c=>{const k=+c.dataset.pm,s=BF.snap[k];if(!s)return;[['h','♥'],['v','★'],['e','⚡']].forEach(([f,sym])=>{if(BF.rel[k+f])return;const em=c.querySelector('em.'+f);if(em)em.textContent=sym+s[f]})})};
  // the tray labels: big words, pips for the rolls left
  const _pa=phActs;phActs=function(){_pa.apply(this,arguments);const pa=$bf('pacts');if(!pa||!G||!humanTurn())return;

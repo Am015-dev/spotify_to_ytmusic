@@ -137,3 +137,7 @@ html.ph-p .gx-dock[data-bf] .die.kept{transform:translateY(-12px);box-shadow:0 0
 html.ph-p header.gx-bar #pchips[style*="--cc: 5"] .pchip span,html.ph-p header.gx-bar #pchips[style*="--cc: 6"] .pchip span{flex-wrap:wrap;row-gap:0;justify-content:center}
 html.ph .bm .no{color:#8a7f90;text-decoration:line-through}
 html.ph .bm .pair{color:#5a2aa8;font-size:15px}
+/* no rolls left: Roll goes away (a grey button was a dead tap), Done takes its place */
+html.ph-p .gx-dock[data-bf="roll"] #pacts [data-act="reroll"][disabled]{display:none}
+html.ph-p .gx-dock[data-bf="roll"] #pacts:has([data-act="reroll"][disabled]) [data-act="resolve"]{grid-column:1/3}
+html.ph .ptile.bcard.sel,html.ph .ptile.bcard:has(.go){transform:translateY(-8px);box-shadow:0 0 0 4px #ffd23f,0 6px 14px rgba(0,0,0,.5)}
