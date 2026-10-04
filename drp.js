@@ -2,7 +2,7 @@
 function DR_edge(x,z){let e=1e9;const q=cityAt(x,z);if(q){e=q.d-q.road.w/2;if(e<6&&e>-.5)e=Math.min(e,CE_roadE(x,z))}const f=fillAt(x,z);if(f)e=Math.min(e,f.d-f.r.w/2);
   if(CID!=='fra'){try{const a=abAt(x,z);if(a)e=Math.min(e,a.d-a.road.w/2)}catch(_){}}try{e=Math.min(e,lzRoadD(x,z))}catch(_){}return e}
 window.__dr={edge:DR_edge,
- props(x,z,R=1e9){const o={total:0,road:0,path:0,side:0,lamp:0,types:{}};for(const p of HUB.props||[]){if(!p.alive&&!(p.rt<1e8))continue;if(R<1e9&&Math.hypot(p.x-x,p.z-z)>R)continue;o.total++;const e=DR_edge(p.x,p.z);if(e<0)o.road++;if(e<2.5){o.path++;o.types[p.t]=(o.types[p.t]||0)+1}else if(e<6)o.side++}return o},
+ props(x,z,R=1e9){const o={total:0,road:0,path:0,side:0,lamp:0,types:{}};for(const p of HUB.props||[]){if(!p.alive&&!(p.rt<1e8))continue;if(R<1e9&&Math.hypot(p.x-x,p.z-z)>R)continue;o.total++;const e=DR_edge(p.x,p.z);if(e<0){o.road++;o.roadT=o.roadT||{};o.roadT[p.t]=(o.roadT[p.t]||0)+1}if(e<2.5){o.path++;o.types[p.t]=(o.types[p.t]||0)+1}else if(e<6)o.side++}return o},
  traffic(R=150){const C=HUB.cars||[];let alive=0,near=0,stop=0;for(const c of C){if(c.dead>0)continue;alive++;if(Math.hypot(c.x-RO.x,c.z-RO.z)<R){near++;if((c.cv??c.v)<.5)stop++}}return{total:C.length,alive,near,stop}},
  objs(){let n=0,m=0,im=0,inst=0;scene.traverse(o=>{n++;if(o.isMesh&&o.visible){m++;if(o.isInstancedMesh){im++;inst+=o.count}}});return{objs:n,meshes:m,instMeshes:im,instances:inst}},
  draws(){renderer.info.autoReset=false;renderer.info.reset();(window.__fastR||composer.render).call(composer);const r={calls:renderer.info.render.calls,tris:renderer.info.render.triangles};renderer.info.autoReset=true;return r},

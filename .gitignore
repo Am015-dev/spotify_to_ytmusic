@@ -7,3 +7,4 @@ __pycache__/
 smoke/*.jpg
 before/
 rel/
+shots/*.json

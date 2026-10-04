@@ -50,7 +50,7 @@ if(DR.on){const st=document.createElement('style');st.textContent=`body.touch #q
 body.touch #qTrk .qh{min-height:24px;padding-right:62px;font-size:12px;pointer-events:auto}body.touch #qTrk .qh i{font-size:14px}
 body.touch #qTrk .qbt{top:3px;right:4px;gap:4px}body.touch #qTrk .qbt button{width:28px;height:24px;font-size:13px;border-radius:7px}
 body.touch:not(.drQOpen) #qTrk p,body.touch:not(.drQOpen) #qTrk .qd{display:none}body.touch #qTrk p{font-size:12px;margin:2px 0}body.touch #qTrk .qd{font-size:11px}body.touch #qTrk .qb{height:5px;margin-top:3px}
-@media (orientation:landscape){body.touch #qTrk{left:calc(112px + env(safe-area-inset-left,0px));top:calc(62px + env(safe-area-inset-top,0px))}
+@media (orientation:landscape){body.touch #qTrk{left:calc(112px + env(safe-area-inset-left,0px))!important}
  body.touch #roamPlate{left:calc(112px + env(safe-area-inset-left,0px))!important;top:calc(112px + env(safe-area-inset-top,0px))!important}
  body.touch.drQOpen #roamPlate{visibility:hidden}}
 @media (orientation:landscape) and (max-height:520px){body.touch #qTrk,body.touch #roamPlate{left:calc(104px + env(safe-area-inset-left,0px))!important}}`;document.head.appendChild(st);

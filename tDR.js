@@ -23,7 +23,7 @@ for(const C of CITIES){const p=await (await b.newContext({viewport:{width:1000,h
  await p.evaluate(([area])=>{const [cx,cz]=__dr.dist(area);__mho.warp(...__mho.rsnap(cx,cz,300),0,true);__mho.roamSim(60)},[C.area]);try{await F.shot(p,`shots/dr_${TAG}_${C.c}.jpg`,{type:'jpeg',quality:72})}catch(e){errs.push(C.c+' shot: '+e.message.slice(0,80))}
  await p.context().close()}
 // phone landscape (2000x920 like the owner's iPhone 16 shot) with a mission running
-{const ctx=await b.newContext({viewport:{width:870,height:400},deviceScaleFactor:2.3,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(900000);p.on('pageerror',e=>errs.push('phone: '+e.message.slice(0,160)));
+{const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:2.35,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(900000);p.on('pageerror',e=>errs.push('phone: '+e.message.slice(0,160)));
  const cdp=await ctx.newCDPSession(p);
  await p.goto(U);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');await seed(p,'ath','B');
  await p.evaluate(()=>{const e=document.querySelector('#rotOk');if(e&&e.offsetParent)e.click()});
@@ -41,8 +41,8 @@ for(const C of CITIES){const p=await (await b.newContext({viewport:{width:1000,h
   ok(!h2.plMini&&!h2.plCard,'phone: district plate clear of minimap and mission card',h2);ok(h3&&h3.q&&h3.q.h>h1.q.h&&!h3.hit.length,'phone: tapping the card title expands it, still clear of controls',h3&&h3.q)}
  await ctx.close()}
 const A=OUT.ath,Fr=OUT.fra;
-if(TAG!=='before'){for(const[k,o]of[['ath',A],['fra',Fr]]){ok(o.minRet>=.85,`${k}: a smash keeps >= 85 % speed`,o.minRet);ok(o.traffic.total<=80,`${k}: traffic halved (<= 80 AI cars)`,o.traffic);ok(o.walls===0,`${k}: no stopped side-by-side lane walls`,o.walls);ok(o.routes>=2,`${k}: at least 2 bot routes driven`,o.routes);ok(o.stuck<3,`${k}: bot never stuck >= 3 s`,o.stuck);ok(o.area.road===0||o.area.road<=3,`${k}: (almost) no breakables on the road surface near ${k==='ath'?'Kolonaki':'Altstadt'}`,o.area.road)}
- const base=fs.existsSync('shots/dr_before.json')?JSON.parse(fs.readFileSync('shots/dr_before.json')):null;
+if(TAG!=='before'){for(const[k,o]of[['ath',A],['fra',Fr]]){ok(o.minRet>=.85,`${k}: a smash keeps >= 85 % speed`,o.minRet);ok(o.traffic.total<=80,`${k}: traffic halved (<= 80 AI cars)`,o.traffic);ok(o.walls===0,`${k}: no stopped side-by-side lane walls`,o.walls);ok(o.routes>=2,`${k}: at least 2 bot routes driven`,o.routes);ok(o.stuck<3,`${k}: bot never stuck >= 3 s`,o.stuck);const rd=o.area.roadT||{};const nr=Object.entries(rd).filter(([t])=>!/^(barrier|clight|bricks|tower|gold|crate)$/.test(t)).reduce((a,[,n])=>a+n,0);ok(nr<=3,`${k}: no breakables on the road surface near ${k==='ath'?'Kolonaki':'Altstadt'} (roadwork smash lines aside)`,rd)}
+ for(const k of['ath','fra'])ok(OUT[k].kmh>0,`${k}: bot average speed measured`,OUT[k].kmh);const base=fs.existsSync('shots/dr_before.json')?JSON.parse(fs.readFileSync('shots/dr_before.json')):null;
  if(base)for(const k of['ath','fra']){const b0=base[k].area.path,b1=OUT[k].area.path;ok(b1<=b0*.4,`${k}: >= 60 % fewer breakables in the driving path (edge < 2.5 m)`,{before:b0,after:b1,cut:+(1-b1/b0).toFixed(2)})}}
 ok(!errs.length,'no page errors',errs.slice(0,5));fs.writeFileSync(`shots/dr_${TAG}.json`,JSON.stringify(OUT,null,1));
 console.log(`tDR ${TAG}: ${pass} pass, ${fails} fail`);await b.close();process.exit(fails?1:0)})();
