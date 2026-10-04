@@ -258,7 +258,7 @@ function validMoves(G, seat) {
     return out;
   }
   if (G.phase !== 'place') return out;
-  if (G.pend) { pendMoves(G, seat, out); if (G.pend.h === 'rr' && G.pend.d.m[seat]) return out; return out; }
+  if (G.pend) { pendMoves(G, seat, out); if (G.mods.real) out.push({ t: 'timeout' }); return out; }
   if (G.turn !== seat) return out;
   const h = unusedDice(G, seat); if (!h.length) return out;
   const start = out.length; placeMoves(G, seat, out);
@@ -289,11 +289,10 @@ function afterPlace(G, seat) {
     if (hasG && hasF) { G.fl.sync = true; const v = D.speedFaces[rnd(G, 6)]; G.pend = { h: 'sync', d: { seat: 1, val: v } }; ev(G, { t: 'sync', v }); lg(G, 'Cross-check: the traffic die shows ' + v + '. The co-pilot places it.'); use(G, 'abil_sync'); }
   }
 }
-function performMove(G, m, seat) {
+function performMove(G, m, seat, trust) {
   if (!G || G.result) return { ok: false, error: 'the game is over' };
   if ((seat !== 0 && seat !== 1) || !m || typeof m !== 'object') return { ok: false, error: 'bad move' };
-  const ok = validMoves(G, seat).find(x => same(x, m));
-  if (!ok) return { ok: false, error: 'illegal move' };
+  if (!trust) { const ok = validMoves(G, seat).find(x => same(x, m)); if (!ok) return { ok: false, error: 'illegal move' }; }
   if (!G.nolog) G.events = [];
   switch (m.t) {
     case 'say': G.say[seat].push(m.c); ev(G, { t: 'say', seat, c: m.c }); break;
@@ -310,13 +309,13 @@ function performMove(G, m, seat) {
       use(G, 'place_' + SLOT[m.to].grp);
       applyEffect(G, seat, m.to, src, val);
       if (!G.result) afterPlace(G, seat);
-      if (!G.result && !G.pend) { if (wasPend && wasPend.h !== 'sync') nextTurn(G, G.turn); else if (wasPend && wasPend.h === 'sync') nextTurn(G, G.turn); else nextTurn(G, seat); }
+      if (!G.result && !G.pend) nextTurn(G, G.turn);
       break;
     }
     case 'toss': {
       if (m.d === 'p') G.pend = null; else G.dice[seat][m.d].u = true;
       ev(G, { t: 'toss', seat, d: m.d }); lg(G, (seat === 0 ? 'Pilot' : 'Co-pilot') + ' has no legal place and puts a die aside.'); use(G, 'toss');
-      if (m.d === 'p') nextTurn(G, G.turn); else nextTurn(G, seat);
+      nextTurn(G, G.turn);
       break;
     }
     case 'rr': G.rrHand--; G.pend = { h: 'rr', d: { m: [null, null], by: seat } }; ev(G, { t: 'rruse', seat }); lg(G, 'A reroll token is spent: both crew may reroll.'); use(G, 'rerollUse'); break;

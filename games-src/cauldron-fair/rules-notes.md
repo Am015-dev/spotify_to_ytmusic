@@ -12,18 +12,17 @@ below was cross-checked against at least two of the other sources or against a w
 
 ## Names
 
-| Real role | Our name | Chip colour |
+| Role | Our name | Chip colour |
 |---|---|---|
-| cherry bomb | Fizzpod | white (values 1, 2, 3) |
-| pumpkin | Marrow | orange (1) |
-| garden spider | Mossback | green (1, 2, 4), end-of-brew power |
-| crow skull | Wren Feather | blue (1, 2, 4), power when drawn |
-| toadstool | Scarlet Cap | red (1, 2, 4), power when drawn |
-| mandrake | Sunroot | yellow (1, 2, 4), power when drawn, in the shop from round 2 |
-| ghost's breath | Dusk Sigh | purple (1), end-of-brew power, in the shop from round 3 |
-| death's-head moth | Cinder Moth | black (1), end-of-brew power |
-| ruby / droplet / flask / rat stone / bonus die | Ruby / Droplet / Flask / Rat stone / Bonus die | |
-| fortune teller | Fortune teller (the fair's seer) | |
+| the explosive chip | Fizzpod | white (values 1, 2, 3) |
+| the plain filler | Marrow | orange (1) |
+| end-of-brew power: rubies and gifts | Mossback | green (1, 2, 4) |
+| power when drawn: extra draws and covers | Wren Feather | blue (1, 2, 4) |
+| power when drawn: extra movement | Scarlet Cap | red (1, 2, 4) |
+| power when drawn: in the shop from round 2 | Sunroot | yellow (1, 2, 4) |
+| end-of-brew power: in the shop from round 3 | Dusk Sigh | purple (1) |
+| end-of-brew power: the neighbour comparison | Cinder Moth | black (1) |
+| Ruby / Droplet / Flask / Rat stone / Bonus die / Fortune teller | same words | |
 
 ## Components (box counts, all confirmed by the publisher rules)
 
