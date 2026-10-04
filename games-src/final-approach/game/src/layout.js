@@ -15,7 +15,7 @@ function build(mode, LW, LH, mods) {
   if (mode === 'L') {
     const e = (LH - 620) / 280;   // 0 (compact) .. 1 (tall)
     const wh = 82 + 40 * e;                                  // window height
-    const A = 170 + 30 * e + (wh - 82) * 0.4, B = A + 110 + 36 * e, C = B + 110 + 36 * e;   // row centres
+    const A = wh + 98, sp = clamp((LH - 170 - A) / 2, 108, 150), B = A + sp, C = B + sp;   // row centres
     r.appr = { x: 20, y: 10, w: 700, h: wh }; r.alt = { x: 740, y: 10, w: 640, h: wh };
     // pilot side
     slot('ra0', 90, A); slot('lg0', 150, B); slot('lg1', 250, B); slot('lg2', 350, B);
@@ -35,10 +35,10 @@ function build(mode, LW, LH, mods) {
     if (mods.wind) r.wind = R(mods.kero ? 270 : 330, A, 96, 96);
     if (mods.intern) { slot('in0', 1010, C); slot('in1', 1310, C); r.tokens = { x: 1050, y: C - 24, w: 220, h: 48 }; }
     // trays (dice behind the screens)
-    const T = LH - 56;
+    const T = Math.min(LH - 56, C + (mods.ice ? 150 : 128)); r.ch = T + 56;
     r.trayP = { x: 30, y: T - 48, w: 440, h: 96 }; r.trayC = { x: 930, y: T - 48, w: 440, h: 96 };
     r.hud = R(700, T, 380, 90);
-    r.lw = LW; r.lh = LH;
+    r.lw = LW; r.lh = r.ch;
   } else {
     const e = (LH - 1050) / 450;
     const wh = 96;
@@ -69,13 +69,14 @@ function layout(W, H, opt) {
   opt = opt || {}; W = Math.max(60, W); H = Math.max(60, H);
   const mode = opt.mode || (W / H >= 1.08 ? 'L' : 'P');
   let LW, minH, maxH;
-  if (mode === 'L') { LW = 1400; minH = 610; maxH = 900; } else { LW = 800; minH = 1060; maxH = 1500; }
+  if (mode === 'L') { LW = 1400; minH = 610; maxH = 820; } else { LW = 800; minH = 1060; maxH = 1500; }
   // widest scale that fits: width-limited first, then height-limited
   let k = W / LW, LH = H / k;
   if (LH < minH) { k = H / minH; LH = minH; }
   if (LH > maxH) LH = maxH;
-  const lw = LW, ox = (W - lw * k) / 2, oy = (H - LH * k) / 2;
+  const lw = LW, ox = (W - lw * k) / 2;
   const rl = build(mode, lw, LH, opt.mods), r = {};
+  if (rl.ch) LH = Math.min(LH, rl.ch); const oy = (H - LH * k) / 2;
   for (const n of Object.keys(rl)) { const q = rl[n]; if (q && typeof q === 'object') r[n] = { x: ox + q.x * k, y: oy + q.y * k, w: q.w * k, h: q.h * k }; }
   return { mode, k, ox, oy, lw, lh: LH, r, die: 72 * k, logical: rl, W, H };
 }

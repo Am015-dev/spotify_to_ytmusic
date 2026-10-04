@@ -28,7 +28,7 @@ function render() {
       const s = tr.sp[i], n = G.planes[i], b = h('button.sp' + (i + 1 === G.pl.pos ? '.you' : '') + (i === size - 1 ? '.air' : ''), { type: 'button', 'data-a': 'space', 'data-i': i, style: 'left:' + i * cw + 'px;width:' + cw + 'px', 'aria-label': 'Space ' + (i + 1) + (i === size - 1 ? ' (airport)' : '') + ', ' + n + ' plane' + (n === 1 ? '' : 's') + (s[1] ? ', traffic die x' + s[1] : '') + (s[2] ? ', corridor ' + tabText(s[2]) : '') + (i + 1 === G.pl.pos ? ', your plane is here' : '') });
       const pls = h('div.pls'); for (let k = 0; k < n; k++) pls.appendChild(h('i.pl', { html: PLANE_SVG }));
       if (s[1]) pls.appendChild(h('i.tf', '⚄' + (s[1] > 1 ? '×' + s[1] : ''))); if (s[2] && G.mods.tabs) pls.appendChild(h('i.tb', tabText(s[2])));
-      b.append(pls, h('span.nm', i === size - 1 ? 'Airport' : String(i + 1)), i + 1 === G.pl.pos ? h('span.nm', { style: 'color:var(--gold)' }, '▲ you') : null); strip.appendChild(b);
+      b.append(pls, h('span.nm', i === size - 1 ? 'Airport' : String(i + 1))); if (i + 1 === G.pl.pos) b.append(h('span.nm.you', { style: 'color:var(--gold)' }, '▲ you')); strip.appendChild(b);
     }
     w.appendChild(strip); pz.appendChild(w);
   }
