@@ -21,7 +21,7 @@ if (!FA.AIW && typeof require === 'function') { try { require('./aiw.js'); } cat
 // ---------- model constants (task success rates per round) ----------
 const W = AI.W = {
   disaster: 7, choice: 2.6,
-  planeS: 0.30, flapQ: 0.333, flapM: 3.0, gearM: 2.6, brakeM: 3.2, brakeCoffee: 0.30, iceP: 0.30, internP: 0.8,
+  planeS: 0.30, flapQ: 0.333, flapM: 3.0, gearM: 2.6, brakeM: 3.2, brakeP: 0.3, brk2: 0.06, brk4: 0.33, brk6: 0.7, brakeCoffee: 0.30, iceP: 0.30, internP: 0.8,
   ax0: 0.86, ax1: 0.66, ax2: 0.42, axR: 0.05, axCoffee: 0.05, axis1: 0.15, axis2: 0.5, tab: 0.5, fuelK: 1.1, leakAvg: 2.5, keroAvg: 2.8, eff: 0.8, lag: 1
 };
 const FN = ['pairA_n', 'pairA_f', 'pairE_n', 'pairE_f', 'sched', 'planes', 'imminent', 'flaps', 'gear', 'brake', 'intern', 'axisBal', 'fuel', 'tab', 'overload', 'coffee', 'coffeeLate', 'reroll', 'burn', 'bias'];
@@ -160,7 +160,20 @@ function features(S, me) {
       } else f.brake = nats(P(brLeft, Rf));
     }
   }
-  else { const nb = S.pl.sw.br[0] + S.pl.sw.br[1] + S.pl.sw.br[2]; brLeft = Math.max(0, 2 - nb); if (brLeft > 0) f.brake = nats(binAtLeast(Math.round(W.brakeM * Rf), 1 / 6 + (S.coffee > 0 ? W.brakeCoffee : 0) + cb * 0.5, brLeft)); }
+  else {
+    // all three brakes matter: the final engine pair must stay at or under the brake value (2, 4 or 6), and P(sum <= 6) is about twice P(sum <= 4)
+    const nb = S.pl.sw.br[0] + S.pl.sw.br[1] + S.pl.sw.br[2]; brLeft = Math.max(0, 2 - nb);
+    if (!(final && inPlace)) {
+      const R = Math.max(0, Math.round(Rf)), pr = Math.min(0.6, W.brakeP + 0.05 * Math.min(S.coffee, 2) + (S.rrHand ? 0.03 : 0));
+      const succ = [0, 0.06, 0.33, 0.55][0], sb = b => b >= 3 ? W.brk6 : b === 2 ? W.brk4 : b === 1 ? W.brk2 : 0;
+      let e = 0, ways = [1]; const need = 3 - nb;
+      // distribution of the number of extra brakes after R rounds, one attempt per round
+      let dist = new Array(need + 1).fill(0); dist[0] = 1;
+      for (let r = 0; r < R; r++) { const nd = new Array(need + 1).fill(0); for (let k = 0; k <= need; k++) { if (!dist[k]) continue; if (k === need) nd[k] += dist[k]; else { nd[k + 1] += dist[k] * pr; nd[k] += dist[k] * (1 - pr); } } dist = nd; }
+      for (let k = 0; k <= need; k++) e += dist[k] * sb(nb + k);
+      f.brake = nats(e);
+    }
+  }
   let internLeft = 0; if (S.mods.intern) { internLeft = S.intern.length; if (internLeft > 0) f.intern = nats(binAtLeast(Math.round(2 * Rf), W.internP, internLeft)); }
   { const after = Math.max(0, rem - 1), mand = s => (S.slots['ax' + s] ? 0 : 1) + (S.slots['en' + s] ? 0 : 1);
     const free = s => Math.max(0, (inPlace ? unplaced(S, s) - mand(s) : 2) + 2 * after);
@@ -260,7 +273,8 @@ function move(G0, seat, level, opt) {
     if (rand() < 0.12) return pool[Math.min(pool.length - 1, Math.floor(rand() * 2))].m;
     return pool[0].m;
   }
-  if ((level === 'hard' || level === 'normal') && scored.length > 1 && !opt.noMC) return monteCarlo(G, seat, scored, rand, Object.assign(level === 'hard' ? { top: AI.HMC.top, samples: AI.HMC.samples } : { top: AI.NMC.top, samples: AI.NMC.samples }, opt));
+  const mcp = level === 'hard' ? AI.HMC : AI.NMC;
+  if ((level === 'hard' || level === 'normal') && scored.length > 1 && !opt.noMC && mcp.samples > 0) return monteCarlo(G, seat, scored, rand, Object.assign(level === 'hard' ? { top: AI.HMC.top, samples: AI.HMC.samples } : { top: AI.NMC.top, samples: AI.NMC.samples }, opt));
   return scored[0].m;
 }
 function freeAction(G, seat, cand, base) {
