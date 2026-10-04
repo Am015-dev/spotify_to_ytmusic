@@ -213,4 +213,23 @@ html.ph.ph-l #promptDock{height:auto;min-height:32px;overflow:visible}html.ph.ph
 .online .nrow{margin:6px 0}.online p{margin:4px 0}
 html.ph #netst{min-width:44px;min-height:44px;padding:0 8px;justify-content:center;border-radius:10px}html.ph #netst .nl{display:none}html.ph #netst .ns{display:inline;font-weight:700}
 html.ph.ph-l.net #barstat{display:none}
+/* shared kit (part 8): pawn symbols for colour-blind help, undo, achievement line, left-handed dock */
+.pawnw{position:relative;display:inline-flex;flex:none;line-height:0}
+.pawnw .gx-cbm{position:absolute;right:-2px;bottom:-2px;min-width:calc(var(--pw,16px)*.62);height:calc(var(--pw,16px)*.62);border-radius:50%;background:#fffaf0;color:#2a1e14;font:700 calc(var(--pw,16px)*.46)/calc(var(--pw,16px)*.62) system-ui,sans-serif;text-align:center;box-shadow:0 0 0 1px #3b2f2a;opacity:1}
+html.cb .pawnw .gx-cbm{display:block}
+#acts .btn.undo{flex:0 0 auto}
+.pacts2{display:flex;gap:6px}.pacts2 .btn{flex:1}
+.achv{margin:8px 0 0;padding:6px 10px;border-radius:10px;background:#f3d77a;color:#3a2412;font-weight:700}
+html.lefty #acts{flex-direction:row-reverse}
+/* text size from the shared settings: the dock and pop-up bodies use px sizes, so scale them as a whole */
+.gx-dock-body{font-size:inherit}
+#dockbody,#pc .ph-body,#ppop .ph-body,.gx-drawer-body .rules,#logbody,#rivalbody{zoom:var(--gx-text,1)}
+#prompt{font-size:calc(1em * var(--gx-text,1))}
+#dockbody .gx-recap{font-size:inherit}
+.ph-head .btn.undo{flex:none;min-height:44px;padding:4px 10px}
+.gx-recap{margin:6px 8px 2px}
+.gx-refbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+.gx-ref-pic .cd{flex:none}
+.gx-ref-pic .its{display:flex;flex-wrap:wrap;gap:2px;justify-content:center}
+.gx-ref-pic.big .its{gap:8px}
 </style></head>

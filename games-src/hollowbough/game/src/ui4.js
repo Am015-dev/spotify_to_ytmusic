@@ -156,8 +156,8 @@ function howLabel(m) {
     case 'occupy': return [h('b', 'Play it free'), h('span.sm', 'occupies ' + cname(m.via))];
     case 'innkeeper': return [h('b', 'Send away ' + cname(m.via)), h('span.sm', 'cuts 3 berries off the price')];
     case 'crane': return [h('b', 'Dismantle ' + cname(m.via)), h('span.sm', 'cuts 3 resources off the price')];
-    case 'dungeon': return [h('b', 'Use a Dungeon'), h('span.sm', 'lock a critter below it, cut 3 resources')];
-    case 'judge': return [h('b', 'Swap one resource'), h('span.sm', 'the judge lets you pay with another kind')];
+    case 'dungeon': return [h('b', 'Use ' + (D.cards.find(x => x.key === 'dungeon') || { name: 'the cells' }).name), h('span.sm', 'lock a critter below it, cut 3 resources')];
+    case 'judge': return [h('b', 'Swap one resource'), h('span.sm', 'the Gavel Marten lets you pay with another kind')];
   }
   return [h('b', 'Play')];
 }
@@ -186,7 +186,7 @@ function openCard(src, id, seat, slot, trig) {
       if (mm.length) { mm.forEach(m => acts.appendChild(moveBtn(m, howLabel(m)))); const rm = UI.rec && UI.rec.m; if (rm && mm.some(m => sameM(m, rm))) acts.appendChild(reasonBox(why(rm, v))); }
       else acts.appendChild(reasonBox(whyNotPlay(id, src)));
     }
-    body.appendChild(acts); body.appendChild(cw); body.appendChild(h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Close'));
+    body.appendChild(acts); body.appendChild(cw); body.appendChild(h('div.pacts2', h('button.btn.alt', { 'data-a': 'refcard', 'data-id': id, type: 'button' }, 'Read it big'), h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Close')));
     p.appendChild(body);
   });
 }
@@ -249,7 +249,7 @@ function renderQ() {
   if (q.who !== v || G.players[q.who].ai) { pc.hidden = true; return; }
   closePop();
   pc.hidden = false; pc.innerHTML = ''; pc.setAttribute('data-card', 'q'); pc.setAttribute('data-kind', q.kind);
-  pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', q.title), h('span', qHint(q.kind) || 'Your choice')), null));
+  pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', q.title), h('span', qHint(q.kind) || 'Your choice')), GX.undo.can() ? h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶ Undo') : null));
   const body = h('div.ph-body.qbody');
   const rm = UI.rec && UI.rec.m && UI.rec.m.type === 'choose' ? UI.rec.m : null;
   const hasCards = q.opts.some(o => o.card !== undefined), hasRes = q.opts.some(o => o.res !== undefined);

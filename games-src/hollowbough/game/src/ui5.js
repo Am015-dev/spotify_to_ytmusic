@@ -22,11 +22,14 @@ function newGame(mode, o) {
   if (mode !== 'guided') UI.coachOn = false; else UI.coachOn = true;
   const st = $('#start'); if (st) st.hidden = true;
   closePop(); try { GX.close(); } catch (e) { }
+  kitNewGame();
   render(); schedule();
   return G;
 }
+function kitNewGame() { GX.undo.clear(); recapSeats(); UI.t0 = Date.now(); UI.resultDone = false; UI.earned = null; }
 function render() {
   if (!G || !UI.started) return;
+  { const v = viewSeat(); if (v >= 0) GX.recap.view(v); }
   try { if (window.PerfHUD) PerfHUD.wake(); } catch (e) { }
   renderBoard(); renderDock(); renderQ(); renderCard(); placePop(); markSel(); renderDrawers();
   if (NET.on) netRenderHook();
@@ -67,7 +70,7 @@ function schedule() {
     return;
   }
   if (UI.coachOn && coachCheck()) return;
-  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); }
+  if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
   if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
 }
 function aiStep() {
@@ -80,6 +83,7 @@ function aiStep() {
   if (r.ok) sndPost(pre, m, a);
   if (!r.ok) { const ms = HB.moves(G, a); r = HB.apply(G, ms[0]); }
   const ls = logSince(n0); UI.lastAi = ls.length ? ls[0].replace(/^[^ ]+ /, '') : '';
+  GX.recap.push(ls, a);
   afterMove();
 }
 function afterMove() { save(); render(); sndMusic(); schedule(); if (NET.on) netPush(); }
@@ -90,10 +94,12 @@ function act(m) {
   const n0 = G.logN;
   if (m.type === 'prepare' && !NET.on) UI.after.push({ kind: 'season', seat: a, from: n0 });
   const pre = sndPre();
+  if (!G.players[a].ai) GX.undo.snap(m.label || m.type);
   const r = HB.apply(G, m);
   closePop(); UI.rec = null;
   if (r.ok) sndPost(pre, m, a);
-  if (!r.ok) { snd('error'); UI.after.pop(); toast(r.error || 'That move is not allowed.'); render(); return; }
+  if (!r.ok) { snd('error'); UI.after.pop(); GX.undo.drop(); toast(r.error || 'That move is not allowed.'); render(); return; }
+  GX.undo.check(revealed); GX.recap.mark(a); GX.recap.push(logSince(n0), a);
   UI.lastAi = ''; afterMove();
 }
 function choose(i) { const a = HB.actor(G); const m = movesFor(a).find(x => x.type === 'choose' && x.i === i); if (m) act(m); }
@@ -108,6 +114,7 @@ function flushAfter() {
 // ---- end of game: one card per player, then the result
 function queueOver() {
   const ov = G.over; if (!ov) return;
+  GX.undo.clear(); kitResult();
   const rows = (sc, name, s) => {
     const l = [['Printed card points', sc.cards], ['Point tokens', sc.tokens], ['Prosperity bonuses', sc.bonus], ['Events', sc.events], ['The Long Road', sc.journey]];
     const t = h('div.score');
@@ -120,15 +127,15 @@ function queueOver() {
   if (G.grim) UI.cards.push({ kind: 'over-score', title: 'Final score: ' + D.soloName, sub: 'Your solo rival', body: () => { const g = ov.grim, t = h('div.score'); [['Cards', g.cardPts], ['Events', g.basic + g.special], ['The Long Road', g.journey], ['Point tokens', g.tokens]].forEach(([k, v]) => t.appendChild(h('div.kv', h('span', k), h('b', v)))); t.appendChild(h('div.kv.tot', h('span', 'Total'), h('b', g.total))); return t; } });
   const order = G.players.map((p, i) => i).sort((a, b) => ov.scores[b].total - ov.scores[a].total);
   UI.cards.push({
-    kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + ' wins!'), sub: 'The game is over',
-    body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); return t; },
+    kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + (G.players[ov.winner].name === 'You' ? ' win!' : ' wins!')), sub: 'The game is over',
+    body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); if (UI.earned && UI.earned.length) t.appendChild(h('p.achv', '★ New achievement' + (UI.earned.length > 1 ? 's' : '') + ': ' + UI.earned.join(', '))); return t; },
     buttons: NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
   });
   clearSave(); render();
 }
 // ---- save / load
-function save() { try { if (!G || G.phase === 'over' || NET.on) return; localStorage.setItem(SAVEKEY, JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, coach: UI.coach, coachOn: UI.coachOn, holder: -1 })); } catch (e) { } }
-function clearSave() { try { localStorage.removeItem(SAVEKEY); } catch (e) { } }
+function save() { try { if (!G || G.phase === 'over' || NET.on) return; localStorage.setItem(SAVEKEY, JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, coach: UI.coach, coachOn: UI.coachOn, holder: -1 })); if (!UI.savedFlag) { UI.savedFlag = 1; GNS.saved(GAME_ID, true); } } catch (e) { } }
+function clearSave() { try { localStorage.removeItem(SAVEKEY); UI.savedFlag = 0; GNS.saved(GAME_ID, false); } catch (e) { } }
 function hasSave() { try { return !!localStorage.getItem(SAVEKEY); } catch (e) { return false; } }
 function loadSave() {
   try {
@@ -136,6 +143,7 @@ function loadSave() {
     G = s.G; UI.mode = s.mode; UI.cfg = s.cfg; UI.coach = s.coach || { level: 'full', seen: {} }; UI.coachOn = !!s.coachOn;
     UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.overShown = false; UI.started = true; UI.holder = -1; UI.lastAi = ''; UI.focus = 0;
     const st = $('#start'); if (st) st.hidden = true; try { GX.close(); } catch (e) { }
+    kitNewGame();
     render(); schedule(); return true;
   } catch (e) { return false; }
 }

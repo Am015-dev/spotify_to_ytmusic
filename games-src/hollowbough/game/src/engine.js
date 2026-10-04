@@ -408,7 +408,7 @@ function playLabel(seat, id, from, h) {
     case 'occupy': return 'Play ' + c.name + ' ' + src + ' free (occupy ' + cn(h.via) + ')';
     case 'innkeeper': return 'Play ' + c.name + ' ' + src + ' (send away ' + cn(h.via) + ' to cut 3 berries)';
     case 'crane': return 'Play ' + c.name + ' ' + src + ' (dismantle ' + cn(h.via) + ' to cut 3 resources)';
-    case 'dungeon': return 'Play ' + c.name + ' ' + src + ' (lock a critter beneath a dungeon, cut 3 resources)';
+    case 'dungeon': return 'Play ' + c.name + ' ' + src + ' (lock a critter beneath ' + CARDS[CIDX.dungeon].name + ', cut 3 resources)';
     case 'judge': return 'Play ' + c.name + ' ' + src + ' (swap one resource using the judge)';
   }
   return 'Play ' + c.name;
