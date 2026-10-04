@@ -3,6 +3,7 @@
 //  1. Job 1: the computers may use the Twin Probe (the rules give every crew card one), so the human must be offered it too.
 //  2. The Suggested move never silently disappears on the human's turn when the helper has a suggestion.
 //  3. Every crewmate turn since the human's last move is shown as one line in the recap ("while you waited").
+//  5. A crewmate's move is never shown as "You played" (a human action with no log line used to leave its actor behind).
 //  4. The goal and the race (wires cut / total, fuse left) are on screen on every human turn.
 const {JSDOM,VirtualConsole}=require('../../node_modules/jsdom');const fs=require('fs');
 const html=fs.readFileSync(__dirname+'/shortfuse.html','utf8');
@@ -26,7 +27,8 @@ function one(seed,phone){const errs=[];const vc=new VirtualConsole();vc.on('jsdo
           const others=w.eval(`(()=>{const me=humans()[0];const last=UI.myLastTurn==null?-1:UI.myLastTurn;return [...new Set(G.log.filter(l=>l.turn>last&&l.turn<G.turn&&l.c!=='turn').map(l=>l.turn))].length})()`);
           if(others>0&&!r.recapHTML)bad(`seed ${seed}${phone?' phone':''}: ${others} crewmate turns since my last move, no recap shown`)}
         const st=w.eval('JSON.stringify(aiMove(humans()[0]))');const m=JSON.parse(st);w.eval(`act(${st},humans()[0]);clearTimeout(UI.aiT);UI.aiT=null`);continue}
-      const st=w.eval('JSON.stringify(aiStep())');if(st==='null'){bad('seed '+seed+': stall');break}const o=JSON.parse(st);if(o.m.tool)probeAI++;w.eval(`applyMove(${JSON.stringify(o.m)},${o.seat});clearTimeout(UI.aiT);UI.aiT=null`)}
+      const st=w.eval('JSON.stringify(aiStep())');if(st==='null'){bad('seed '+seed+': stall');break}const o=JSON.parse(st);if(o.m.tool)probeAI++;const r0=w.eval('UI.myRes&&UI.myRes.t');w.eval(`applyMove(${JSON.stringify(o.m)},${o.seat});clearTimeout(UI.aiT);UI.aiT=null`);
+      checks++;if(w.eval('UI.myRes&&UI.myRes.t')!==r0&&w.eval('turnActor(UI.myRes.lines[UI.myRes.lines.length-1].turn)')!==w.eval('humans()[0]'))bad(`seed ${seed}: a crewmate's move (${o.m.a}) was filed as "You played"`)}
     errs.forEach(e=>bad('seed '+seed+' page error '+e));res({probeSeen,probeAI});w.close()}catch(e){bad('seed '+seed+' '+e.stack.slice(0,300));res({});w.close()}})})}
 (async()=>{let ps=0,pa=0;for(let i=0;i<games;i++){const r=await one(500+i,i%2===1);ps+=r.probeSeen||0;pa+=r.probeAI||0}
   console.log(`clarity-test: ${games} games, ${checks} human turns checked, probe offered on ${ps} turns, AI used it ${pa}×`);why.forEach(x=>console.log('FAIL '+x));console.log(fail?`FAILED ${fail}`:'PASS');process.exit(fail?1:0)})();

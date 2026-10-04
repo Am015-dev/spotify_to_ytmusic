@@ -350,7 +350,7 @@ kbd{font:800 .8rem var(--fb);border:2px solid var(--ink);border-radius:6px;paddi
 .feed .recap li.new{animation:feedIn .5s ease-out}
 @keyframes feedIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 html.ph .feed{left:6px;right:6px;top:6px;max-width:none;font-size:.72rem}
-html.ph .feed .recap li{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph .feed .recap li{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 html.ph .pz .feed,html.ph.pz .feed{display:none}
 html.ph-l .feed{left:auto;right:6px;width:46%}
 @media (prefers-reduced-motion:reduce){.feed .recap li.new{animation:none}}
@@ -484,6 +484,8 @@ html.ph .pcard .btn.go{font-size:1rem}
 /* real usable heights: the strip scrolls instead of clipping, its action row stays pinned; cards pin their primary row */
 html.ph #ps{overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain}
 html.ph-l .ps-acts{flex-wrap:wrap;overflow-x:visible}
+html.ph-p .ps-acts{flex-wrap:wrap;overflow-x:visible}
+html.ph .ps-chips .pchl{flex:0 0 auto;align-self:center;font:800 .68rem var(--fb);color:var(--ink);opacity:.75;white-space:nowrap}
 html.ph .ppop :is(.pb.pri.big,.pb.pri):not(:disabled){position:sticky;bottom:2px;z-index:3;box-shadow:0 0 0 5px #f7e2b9,0 2px 0 #0a3a42}
 html.ph .ps-msg{max-height:none;overflow:visible}
 html.ph .res:not(.mine) p{display:block;-webkit-line-clamp:unset;overflow:visible}
@@ -5109,7 +5111,7 @@ function posOf(s){return G.pos[s]}
 function seatStands(seat){return standsOf(seat).slice().sort((a,b)=>a-b)}
 function wireName(si,k,V){const own=ownerOf(si);const ss=seatStands(own);const two=ss.length>1;const who=V&&own===V.seat?'your':nm(own)+'\'s';return `${who} wire ${LET(k)}${two?' (stand '+(ss.indexOf(si)+1)+')':''}`}
 // engine texts say "stand 3, slot 2": rewrite to the letters on the table
-function nice(t,V){return hintify(t).replace(/stand (\d+),? slots? ([\d,]+)/g,(m,a,b)=>{const si=+a-1;if(!G.st[si])return m;const ks=b.split(',').map(x=>+x-1);return ks.length>1?wireName(si,ks[0],V).replace(/wire [A-Z]/,'wires '+ks.map(LET).join(', ')):wireName(si,ks[0],V)})}
+function nice(t,V){return hintify(t).replace(/Miss: none of those is ([^.]+)\./g,'Miss: wrong number (not $1).').replace(/\b(Cut|Tag) slot (\d+)\b/g,(m,a,b)=>a+' wire '+LET(+b-1)).replace(/stand (\d+),? slots? ([\d,]+)/g,(m,a,b)=>{const si=+a-1;if(!G.st[si])return m;const ks=b.split(',').map(x=>+x-1);return ks.length>1?wireName(si,ks[0],V).replace(/wire [A-Z]/,'wires '+ks.map(LET).join(', ')):wireName(si,ks[0],V)})}
 // ---------- the one entry point for human input (stage 3 intercepts here) ----------
 function act(m,seat){if(!G||G.over)return {success:false,error:'no game'};if(seat==null)seat=viewer();
   if(!isHuman(seat))return {success:false,error:'not a human seat'};
@@ -5121,7 +5123,9 @@ function applyMove(m,seat){const r=performMove(m,seat);if(!r.success){console.er
 // ---------- snapshots: what changed since the last refresh (drives sounds, effects and the result banner) ----------
 function snap(){const cut=new Set(),tok={};for(const s of G.st)for(const x of s.w){if(x.cut)cut.add(x.u);tok[x.u]=x.tok.length}let side=0;for(const s of G.st)side+=s.side.length;
   return {g:G.seed+':'+G.mission,logN:G.logN,dial:G.dial,cut,tok,side,valid:G.valid.length,over:!!G.over,rf:G.ms.rf?G.ms.rf.at:null,turn:G.turn}}
-function diffFx(a,b){if(!a||a.g!==b.g)return;const newLog=G.log.filter(l=>l.i>a.logN).reverse();if(!newLog.length&&b.dial===a.dial)return;
+// whose turn a log turn number was (from the "— X's turn —" line); -1 for the opening
+function turnActor(t){const l=G.log.find(x=>x.turn===t&&x.c==='turn');if(!l)return -1;const m=/— (.+)'s turn —/.exec(l.t);const q=m&&G.seats.find(x=>x.nm===m[1]);return q?q.i:-1}
+function diffFx(a,b){if(!a||a.g!==b.g){UI.lastActor=null;return}const newLog=G.log.filter(l=>l.i>a.logN).reverse();if(!newLog.length&&b.dial===a.dial){if(!G.q||G.q.who!==UI.lastActor)UI.lastActor=null;return}
   const newCut=[...b.cut].filter(u=>!a.cut.has(u));const newTok=Object.keys(b.tok).filter(u=>b.tok[u]>(a.tok[u]||0));
   const txt=newLog.map(l=>l.t).join(' ');const ev={cuts:newCut,toks:newTok,lines:newLog};
   const dialDown=b.dial!=null&&a.dial!=null&&b.dial<a.dial||(b.rf!=null&&a.rf!=null&&b.rf>a.rf&&/miss/i.test(txt)),dialUp=b.dial!=null&&a.dial!=null&&b.dial>a.dial;
@@ -5134,8 +5138,8 @@ function diffFx(a,b){if(!a||a.g!==b.g)return;const newLog=G.log.filter(l=>l.i>a.
   else if(newCut.length)kind='hit';
   else if(dialDown)kind='miss';
   const lines=newLog.filter(l=>l.c!=='turn');
-  if(kind||lines.some(l=>l.c==='eq'||l.c==='good'||l.c==='bad'||l.c==='big'))UI.res={kind:kind||'info',lines:lines.slice(-6),turn:G.turn,actor:UI.lastActor!=null?UI.lastActor:G.actor,t:Date.now()};
-  if(UI.res&&UI.res.kind!=='info'&&modeOf()==='solo'&&UI.lastActor!=null&&UI.lastActor===humans()[0]){UI.myRes=UI.res;UI.myAck=false}
+  const made=!!(kind||lines.some(l=>l.c==='eq'||l.c==='good'||l.c==='bad'||l.c==='big'));if(made)UI.res={kind:kind||'info',lines:lines.slice(-6),turn:G.turn,actor:UI.lastActor!=null?UI.lastActor:G.actor,t:Date.now()};
+  if(made&&UI.res.kind!=='info'&&modeOf()==='solo'&&UI.res.lines.length&&turnActor(UI.res.lines[UI.res.lines.length-1].turn)===humans()[0]){UI.myRes=UI.res;UI.myAck=false}
   UI.lastActor=null;
   if(!ANIM)return;
   const tileAt=u=>tid(u);
@@ -5228,13 +5232,13 @@ function raceText(){const tot=G.st.reduce((a,s)=>a+s.w.length,0),cut=G.st.reduce
 function shortTurn(lines,V){const me=V&&V.seat>=0&&modeOf()==='solo'?nm(V.seat):null;let t=lines.map(l=>l.t).join(' ');
   t=t.replace(/(\S+) points at a wire of (\S+) and says "([^"]+)"([^.]*)\./g,(m,a,b,v,x)=>`${a} → ${b}'s wire: "${v}"${/\(([^)]+)\)/.test(x)?' ('+/\(([^)]+)\)/.exec(x)[1]+')':''}.`)
    .replace(/Hit! \S+'s wire is (\S+?); \S+ cuts a matching \S+ too\./g,'HIT: both $1s cut.').replace(/All four (\S+?)s are cut: validation token \S+ goes on the track\./g,'All four $1s are done ✓.')
-   .replace(/(\S+) solo-cuts (\d+) × (\S+?)\./g,'$1 solo-cuts $2 × $3.').replace(/Miss: none of those is ([^.]+)\./g,'MISS: not $1. Fuse −1.').replace(/(\S+) places an opening token\./g,'$1 shows one wire (opening token).');
-  t=nice(t,V);if(me)t=t.replace(new RegExp("\\b"+me.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"'s wire",'g'),'your wire').replace(new RegExp('^'+me.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\b'),'You');return t}
+   .replace(/(\S+) solo-cuts (\d+) × (\S+?)\./g,'$1 solo-cuts $2 × $3.').replace(/Miss: none of those is ([^.]+)\./g,'MISS: not $1. Fuse −1.').replace(/(\S+) places an opening token\./g,'$1 shows one wire (opening token).').replace(/(.+?) is unlocked\./g,'New gear ready: $1 (anyone may use it; tap its chip to read it).');
+  t=nice(t,V);if(me)t=t.replace(new RegExp("\\b"+me.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+"'s wire",'g'),'your wire');return t}
 function feedHTML(V){if(!G||!UI.started)return '';const R=raceText();
   let h=`<div class="goal"><b>Goal:</b> cut all ${R.tot} wires · <b>${R.cut} cut</b>${R.fuse?' · '+esc(R.fuse):''}</div>`;if(G.over)return h;
   const solo=modeOf()==='solo'&&V&&V.seat>=0;const from=solo&&UI.myLastTurn!=null?UI.myLastTurn:-1;const by={},order=[];
   for(const l of G.log.slice().reverse()){if(l.turn<=from&&solo)continue;if(l.c==='big'&&/fuse is lit|Job \d+:/.test(l.t))continue;if(!(l.turn in by)){by[l.turn]={who:null,lines:[]};order.push(l.turn)}if(l.c==='turn'){const m=/— (.+)'s turn —/.exec(l.t);if(m)by[l.turn].who=m[1];continue}by[l.turn].lines.push(l)}
-  const groups=order.filter(t=>by[t].lines.length).slice(solo?-4:-3);UI.recapN=groups.length;if(!groups.length)return h;
+  const groups=order.filter(t=>by[t].lines.length).slice(-3);UI.recapN=groups.length;if(!groups.length)return h;
   const col=n=>{const q=G.seats.find(x=>x.nm===n);return q?SEATC[posOf(q.i)%5]:'#fff'};
   h+=`<ol class="recap">${solo&&from>=0?'<li class="rh">Since your last turn:</li>':''}${groups.map((t,i)=>{const g=by[t];const txt=shortTurn(g.lines,V);const w=g.who||(/^(\S+)/.exec(g.lines[0].t)||[])[1];
     const cls=g.lines.some(l=>/Miss|BOOM|blows/i.test(l.t))?' bad':g.lines.some(l=>/Hit!|solo-cuts|reveals/.test(l.t))?' good':'';return `<li class="${cls}${i===groups.length-1?' new':''}" style="--sc:${col(w)}">${esc(txt)}</li>`}).join('')}</ol>`;return h}
@@ -5342,7 +5346,7 @@ function setHTML(sel,h){const el=$(sel);if(el._h!==h){el._h=h;el.innerHTML=h}}
 function dockSig(V){return JSON.stringify([G.logN,G.step,G.actor,G.turn,!!G.q,G.q&&G.q.kind,G.q&&G.q.who,V.seat,passTo(),UI.sel,UI.pause,UI.help,UI.coach,!!UI.brief,UI.myAck,UI.hintTurn,!!G.over,G.prompt&&G.prompt.t,UI.holder,modeOf()==='watch'&&UI.xray,UI.wwkN])}
 function resBox(r,V,cls2){const big={hit:'SNIP!',solo:'SNIP SNIP!',reveal:'REVEALED',miss:'BUZZ!',phew:'PHEW!',info:'',win:'DEFUSED!',boom:'BOOM!'}[r.kind];
   const cls={hit:'hit',solo:'hit',reveal:'hit',miss:'miss',phew:'phew',info:'info',win:'win',boom:'boom'}[r.kind];
-  let why='';if(r.kind==='miss'){const line=r.lines.find(l=>/Miss/.test(l.t));const pl=r.lines.find(l=>/ points at | says /.test(l.t));why=`${pl?`<p>${esc(nice(pl.t,V))}</p>`:''}<p>${esc(line?nice(line.t,V):'A miss.')} The fuse burned a step${G.dial!=null?', '+G.dial+' left':''}.</p>`}
+  let why='';if(r.kind==='miss'){const line=r.lines.find(l=>/Miss/.test(l.t));const pl=r.lines.find(l=>/ points at | says /.test(l.t));why=`${pl?`<p>${esc(nice(pl.t,V))}</p>`:''}<p>${esc(line?nice(line.t,V):'A miss.')} The fuse burns one step.</p>`}
   const body=r.lines.filter(l=>!/^Narrator/.test(l.t)).slice(-3).map(l=>`<p class="lg-${l.c}">${esc(nice(l.t,V))}</p>`).join('');
   return {cls,big,html:r.kind==='miss'?why+body.split('</p>').slice(0,0).join(''):body}}
 function resHTML(V){if(!G||G.over)return '';const mine=UI.myRes,r=UI.res;let h='';
@@ -5365,10 +5369,16 @@ function tutStep(V){const T=UI.tut,d=T.done;const me=V.seat;if(me<0)return null;
   {const r=modeOf()==='solo'?UI.myRes:UI.res;if(r&&r.actor===me&&r.turn>=G.turn-1){if(r.kind==='miss'&&!d.miss)return pick('miss');if((r.kind==='hit')&&!d.hit)return pick('hit')}}
   if(V.legal&&decider()===me){const s=UI.sel;if(!s&&!d.dual)return pick('dual');if(V.legal.solo.length&&!d.solo&&!s)return pick('solo')}
   return null}
-function tipHTML(V){if(!UI.help||V.seat<0||G.over||!V.legal)return '';const W=wwk(V);if(!W||!W.suggestion)return '';const S=W.suggestion;if(noGear()&&S.m&&(S.m.a==='eq'||S.m.a==='item'))return '';
+// hints are a resource: unlimited in the guided game, 3 per job otherwise (testers: "Suggest plays the game for me")
+const HINTS=3;function hintsLeft(){return UI.guided?99:UI.hintsLeft==null?HINTS:UI.hintsLeft}function hintOK(){return !!UI.guided||UI.hintTurn===G.turn}
+function spendHint(){if(hintOK())return true;if(hintsLeft()<=0){toast('No hints left in this job: trust the tokens and the sort order.');return false}UI.hintsLeft=hintsLeft()-1;UI.hintTurn=G.turn;return true}
+function hintLbl(){return UI.guided?'':` (${hintsLeft()} left)`}
+function tipHTML(V){if(!UI.help||V.seat<0||G.over||!V.legal)return '';const W=wwk(V);if(!W||!W.suggestion)return '';const S=W.suggestion;
+  if(!hintOK())return hintsLeft()>0?`<div class="card"><button class="btn small" data-a="hint1">${ico('bulb')}Show a hint${hintLbl()}</button></div>`:'';if(noGear()&&S.m&&(S.m.a==='eq'||S.m.a==='item'))return '';
   return `<div class="card"><h3>${ico('bulb')} Suggested move</h3><p><b>${esc(nice(sugText(S.m,V),V))}</b></p><p class="why">${esc(nice(S.why||'',V))}</p><div class="row"><button class="btn small" data-a="sugg">Set it up for me</button><button class="btn small" data-gx="knowd">${ico('bulb')}What we know</button></div></div>`}
 function sugText(m,V){if(!m)return '';switch(m.a){case 'dual':return `Say ${VNm(m.v)}${m.v2!=null?' or '+VNm(m.v2):''} at ${m.ks.length>1?nm(ownerOf(m.st))+'\'s wires '+m.ks.map(LET).join(', '):wireName(m.st,m.ks[0],V)}${m.tool?' with the '+toolName(m.tool):''}`;case 'solo':return `Solo cut your ${VNm(m.v)}s`;case 'reveal':return 'Reveal your reds';
   case 'eq':return 'Use '+EQUIP[m.id].n;case 'item':return 'Use '+ITEMS[m.k].n;case 'multi':return 'Point at '+m.tg.length+' wires at once';default:return keyName(m)}}
+function toolHelp(t){return ({dd:'Twin Probe (once per job): point at 2 wires on one rack and say one number. A hit if either matches.',pt3:'Triple Probe (once per job): point at 3 wires on one rack and say one number. A hit if any matches.',eq3:'Point at 3 wires on one rack and say one number. A hit if any matches.',eq5:'Point at a whole rack and say one number. A hit if any wire matches.',pt10:'Say two numbers at once: a hit if the wire is either.',eq10:'Say two numbers at once: a hit if the wire is either.'})[t]||''}
 function toolName(t){return t==='dd'?'Twin Probe':t==='pt3'?'Pocket Triple Probe':t==='pt10'?'Pocket Two-Value Probe':EQUIP[t]?EQUIP[t].n:t}
 // the cached "what we know" for the current position
 function wwk(V){if(V.seat<0)return null;const key=G.logN+':'+V.seat+':'+G.turn;if(UI.wwk&&UI.wwk.key===key)return UI.wwk.W;let W=null;try{W=whatWeKnow(V.seat,ANIM?80:24)}catch(e){console.error(e)}UI.wwk={key,W};return W}
@@ -5411,11 +5421,11 @@ function turnHTML(V){const L=V.legal,sel=UI.sel;let h='';
     const need=toolN(sel.tool);if(need>1&&need<99&&sel.tg.length<need)h+=`<p class="hint">The ${esc(toolName(sel.tool))} points at ${need} wires on one stand: tap ${need-sel.tg.length} more.</p>`;
     const vs=dualVals(sel);h+=`<div class="vals">${vs.map(v=>`<button class="vb${v==='Y'?' y':''}${sel.v===v?' sel':''}" data-a="v" data-v="${v}">${v==='Y'?'⚡':v}<small>you hold ${heldCount(V,v)}</small></button>`).join('')}</div>`;
     if(sel.two&&sel.v!=null){h+=`<p class="hint">Second value for the ${esc(toolName(sel.two))}:</p><div class="vals">${vs.filter(v=>v!==sel.v).map(v=>`<button class="vb${v==='Y'?' y':''}${sel.v2===v?' sel':''}" data-a="v2" data-v="${v}">${v==='Y'?'⚡':v}</button>`).join('')}</div>`}
-    if(sel.v!=null){const m=buildDual(sel);const err=legal(m,V.seat);let risk='';if(UI.help&&sel.tg.length===1&&!(UI.guided||UI.hintTurn===G.turn))risk=`<button class="btn small" data-a="hint1">${ico('bulb')}Hint: what could it be?</button>`;else if(UI.help&&sel.tg.length===1){const W=wwk(V);const sl=W&&W.slots.find(x=>x.st===t.st&&x.k===t.k);if(sl){const p=sl.prob[String(sel.v==='Y'?'yellow':sel.v)]||0;const pr=sl.prob.red||0;risk=`<p class="why">Chance it is ${esc(VNm(sel.v))}: <b>${Math.round(p*100)}%</b>${pr>0?` · red: <b>${Math.round(pr*100)}%</b>`:''}</p>`}}
+    if(sel.v!=null){const m=buildDual(sel);const err=legal(m,V.seat);let risk='';if(UI.help&&sel.tg.length===1&&!hintOK())risk=hintsLeft()>0?`<button class="btn small" data-a="hint1">${ico('bulb')}Hint: what could it be?${hintLbl()}</button>`:'';else if(UI.help&&sel.tg.length===1){const W=wwk(V);const sl=W&&W.slots.find(x=>x.st===t.st&&x.k===t.k);if(sl){const p=sl.prob[String(sel.v==='Y'?'yellow':sel.v)]||0;const pr=sl.prob.red||0;risk=`<p class="why">Chance it is ${esc(VNm(sel.v))}: <b>${Math.round(p*100)}%</b>${pr>0?` · red: <b>${Math.round(pr*100)}%</b>`:''}</p>`}}
       h+=risk+`<button class="btn go wide" data-a="dual" ${err?'disabled':''}>${ico('cut')}Snip: say ${esc(VNm(sel.v))}${sel.v2!=null?' / '+esc(VNm(sel.v2)):''}</button>${err?`<p class="hint">${esc(err)}</p>`:''}`}}
   // tools and probes
   const T=L.tools,tools=[];for(const t of ['dd','pt3','eq3','eq5'])if(T[t])tools.push(t);const twos=['pt10','eq10'].filter(t=>T[t]);
-  if(tools.length||twos.length||L.flip.length){h+=`<div class="gear" style="margin-top:6px">`+tools.map(t=>`<button class="gbtn tool${sel&&sel.tool===t?' on':''}" data-a="tool" data-t="${t}"><b>${toolN(t)===99?'∀':toolN(t)}</b><span>${esc(toolName(t))}<small>${t==='eq5'?'a whole stand':'point at '+toolN(t)+' wires'}</small></span></button>`).join('')+
+  if(tools.length||twos.length||L.flip.length){h+=`<div class="gear" style="margin-top:6px">`+tools.map(t=>`<button class="gbtn tool${sel&&sel.tool===t?' on':''}" data-a="tool" data-t="${t}"><b>${toolN(t)===99?'∀':toolN(t)}</b><span>${esc(toolName(t))}<small>${t==='eq5'?'a whole stand':'point at '+toolN(t)+' wires, say one number'}${t==='dd'||t==='pt3'?' · once per job':''}</small></span></button>`).join('')+
       twos.map(t=>`<button class="gbtn tool${sel&&sel.two===t?' on':''}" data-a="two" data-t="${t}"><b>2</b><span>${esc(toolName(t))}<small>say two values</small></span></button>`).join('')+(L.flip.length?`<button class="gbtn tool${sel&&sel.fu!=null?' on':''}" data-a="flipmode"><b>↺</b><span>Use my flipped wire<small>you cannot see it</small></span></button>`:'')+`</div>`}
   if(sel)h+=`<div class="row" style="margin-top:6px"><button class="btn small" data-a="cancel">Start again</button></div>`;
   h+='</div>';
@@ -5453,7 +5463,7 @@ function annText(a,V){switch(a.k){case 'sweep':return `Sweep for ${a.v}: `+a.res
 function gearWords(t){const o=[];try{for(const id of Object.keys(EQUIP)){const E=EQUIP[id];if(E&&E.n&&new RegExp('\\b'+E.n+'\\b').test(t)&&shortEq(id))o.push(`<b>${esc(E.n)}</b>: a gear card that unlocks mid-job (${esc(shortEq(id).toLowerCase())}).`)}if(/Twin Probe/.test(t))o.push('<b>Twin Probe</b>: a personal tool on a crew card; it points at two wires at once.')}catch(e){}return o.length?`<p class="tiny">${o.join(' ')}</p>`:''}
 function overHTML(V){const w=G.over.win;const [title,tip]=w?['Every wire is safe.','']:lossHelp(G.over.why);const st=G.stats||{};const n=G.mission;const next=n<66?n+1:null;
   return `<div class="card over ${w?'win':'lose'}"><h3>${w?'DEFUSED!':'BOOM!'}</h3><p><b>${esc(w?G.winText:title)}</b></p>${w?'':`<p class="why"><b>Why it failed:</b> ${esc(G.over.why)}. ${esc(tip)}</p>${gearWords(tip)}`}
-  <div class="statgrid"><div><b>${G.turn}</b>turns</div><div><b>${G.dial!=null?G.dial:'-'}</b>fuse left</div><div><b>${st.miss||0}</b>misses</div><div><b>${st.dualOk||0}/${st.dual||0}</b>dual hits</div><div><b>${st.solo||0}</b>solo cuts</div><div><b>${st.eqUse||0}</b>gear used</div></div>
+  <div class="statgrid"><div><b>${G.turn}</b>turns</div><div><b>${G.dial!=null?G.dial:'-'}</b>fuse left</div><div><b>${st.miss||0}</b>misses</div><div><b>${st.dualOk||0}/${st.dual||0}</b>dual hits</div><div><b>${st.solo||0}</b>solo cuts</div><div><b>${st.eqUse||0}</b>gear + tools used</div></div>
   ${isClient()?'<p class="hint">Waiting for the host to pick the next job.</p>':`<div class="row">${w&&next?`<button class="btn go" data-a="next">${ico('fwd')}Next job: ${next}</button>`:''}<button class="btn ${w?'':'go'}" data-a="again">${ico('flip')}Play job ${n} again</button><button class="btn" data-a="board">${ico('target')}Mission board</button></div>`}</div>`}
 function toast(t){const el=$('#res');if(!el)return;el._h=null;const d=document.createElement('div');d.className='res info';d.innerHTML=`<p>${esc(t)}</p>`;el.innerHTML='';el.appendChild(d);$('#live').textContent=t;GX.showDock()}
 // ---------- dock clicks ----------
@@ -5485,8 +5495,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(!b
   case 'offseat':UI.offSeat=+b.dataset.seat;UI.sel=null;refresh();return;
   case 'offdone':UI.offSeat=null;UI.sel=null;refresh();return;
   case 'choose':{const rem=selRemaining(UI.sel);if(rem[0])act(rem[0],V.seat);return}
-  case 'hint1':UI.hintTurn=G.turn;refresh();return;
-  case 'sugg':{UI.hintTurn=G.turn;const W=wwk(V);const m=W&&W.suggestion&&W.suggestion.m;if(!m)return;if(m.a==='dual'){UI.sel={mode:'dual',tool:m.tool||null,tg:m.ks.map(k=>({st:m.st,k})),v:m.v,v2:m.v2!=null?m.v2:null,two:m.two||null,fu:m.fu!=null?m.fu:null}}else if(m.a==='multi'){UI.sel={mode:'multi',kind:m.kind,n:m.tg.length,tg:m.tg.slice()}}else{act(m,V.seat);return}refresh();return}
+  case 'hint1':if(spendHint())refresh();return;
+  case 'sugg':{if(!spendHint())return;const W=wwk(V);const m=W&&W.suggestion&&W.suggestion.m;if(!m)return;if(m.a==='dual'){UI.sel={mode:'dual',tool:m.tool||null,tg:m.ks.map(k=>({st:m.st,k})),v:m.v,v2:m.v2!=null?m.v2:null,two:m.two||null,fu:m.fu!=null?m.fu:null}}else if(m.a==='multi'){UI.sel={mode:'multi',kind:m.kind,n:m.tg.length,tg:m.tg.slice()}}else{act(m,V.seat);return}refresh();return}
   case 'coach':UI.tut.done[b.dataset.id]=1;refresh();return;
   case 'zoom':zoomNext();return;
   case 'coachask':UI.coach=false;UI.coachAsk=false;toast('Tips are off. "Resume lesson" in this panel turns them back on.');refresh();return;
@@ -5609,7 +5619,7 @@ function recordResult(){if(!humans().length)return;const c=camp();const n=G.miss
 function defaultSetup(){const s=lsGet('sf_setup',null);const d={job:1,np:3,seats:['human','ai','ai','ai','ai'],lv:'normal',chars:[],names:DEFNAMES.slice(),help:true};if(s)Object.assign(d,s,{helpTouched:0},{names:(s.names||DEFNAMES).slice()});fixSetup(d);return d}
 function fixSetup(s){s=s||UI.setup;const M=MISSIONS[s.job];if(!M.pl.includes(s.np))s.np=M.pl.find(x=>x>=s.np)||M.pl[M.pl.length-1];if(!s.helpTouched)s.help=true;const ok=allowedChars(s.job,s.np);s.chars=s.chars||[];for(let i=0;i<5;i++)if(s.chars[i]&&!ok.includes(s.chars[i]))s.chars[i]='';return s}
 function preset(v){const s=UI.setup;if(v==='solo')s.seats=['human','ai','ai','ai','ai'];if(v==='hot')s.seats=['human','human','human','human','human'];if(v==='watch')s.seats=['ai','ai','ai','ai','ai'];s.picked=v;renderStart();
-  try{const b=$('#start [data-a=start]');if(b){b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash');if(b.scrollIntoView)b.scrollIntoView({block:'nearest',behavior:'smooth'})}}catch(e){}}
+  try{const b=$('#start [data-a=start]');if(b){if(b.scrollIntoView)b.scrollIntoView({block:'nearest'})}}catch(e){}}
 function seatMode(s){const k=s.seats.slice(0,s.np).filter(x=>x==='human').length;return k===0?'watch':k===1?'solo':'hot'}
 function showStart(){if(isClient()){hideStart();return}clearTimeout(UI.aiT);UI.aiT=null;UI.setup=UI.setup||defaultSetup();sndLoop('hum',true);musicStop(.8);$('#start').hidden=false;renderStart();sndLoop('clock_loop',false)}
 function hideStart(){$('#start').hidden=true;sndLoop('hum',false)}
@@ -5628,14 +5638,14 @@ function renderStart(){const s=UI.setup,n=s.job,M=MISSIONS[n],c=camp();const sav
     <div class="setup"><div><div class="lbl">Crew size</div><div class="seg">${[2,3,4,5].map(k=>`<button class="btn small${s.np===k?' on':''}" data-a="np" data-v="${k}" ${M.pl.includes(k)?'':'disabled'}>${k}</button>`).join('')}</div></div>
     <div><div class="lbl">Seats</div>${onl?`<p class="tiny">Online: seats go to the players in the lobby in join order; the rest are played by the computer.</p>`:`<div class="seg" style="margin-bottom:4px"><button class="btn small" data-a="preset" data-v="solo">Me + computers</button><button class="btn small" data-a="preset" data-v="hot">All human (hot-seat)</button><button class="btn small" data-a="preset" data-v="watch">Watch the computer</button></div>`}${seats.join('')}</div>
     <div><div class="lbl">Computer level</div><div class="seg">${['easy','normal','hard'].map(l=>`<button class="btn small${s.lv===l?' on':''}" data-a="lv" data-v="${l}">${LV_NAME[l]}</button>`).join('')}</div></div>
-    ${nh||onl?`<div><button class="swt${s.help?' on':''}" role="switch" aria-checked="${!!s.help}" data-a="helpset"><i></i>Suggested move: ${s.help?'On':'Off'}</button><p class="tiny">Shows a good move and why, on every turn of yours.</p></div>`:''}
+    ${nh||onl?`<div><button class="swt${s.help?' on':''}" role="switch" aria-checked="${!!s.help}" data-a="helpset"><i></i>Suggested move: ${s.help?'On':'Off'}</button><p class="tiny">A good move and why, when you ask: 3 hints per job.</p></div>`:''}
     <button class="btn go wide" data-a="start">${ico('play')}${onl?'Start job '+n+' online ('+nOnl+' player'+(nOnl>1?'s':'')+')':nh===0?'Watch job '+n:nh===1?'Start job '+n:'Start job '+n+' (hot-seat, '+nh+' humans)'}</button></div></div></div>`;paintIcons($('#start'))}
 function savedGame(){try{const s=JSON.parse(localStorage.getItem(SAVE)||'null');return s&&s.G&&!s.G.over?s:null}catch(e){return null}}
 function realtimeJob(n){const M=MISSIONS[n];return !!(M.audio||hasRule(n,'timer'))}
 function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names||DEFNAMES).slice();let plan=null;if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats=plan.seats;s.names=plan.names;fixSetup(s)}
   if(!plan&&!s.tutorial)lsSet('sf_setup',{job:s.job,np:s.np,seats:s.seats,lv:s.lv,chars:s.chars,names:s.names,help:s.help});UI.lastSetup=s;
   const seats=s.seats.slice(0,s.np);const chars={};let any=0;for(let i=0;i<s.np;i++)if(s.chars[i]){chars[i]=s.chars[i];any=1}
-  UI.rt=realtimeJob(s.job);UI.started=false;clearTimeout(UI.aiT);UI.aiT=null;UI.sel=null;UI.res=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.kitSig={};UI.wwk=null;UI.myLastTurn=null;UI.hintTurn=-1;UI.guided=!!s.tutorial;UI.lastPrompt=null;UI.pause=false;UI.dockSig=null;
+  UI.rt=realtimeJob(s.job);UI.started=false;clearTimeout(UI.aiT);UI.aiT=null;UI.sel=null;UI.res=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.kitSig={};UI.wwk=null;UI.myLastTurn=null;UI.hintTurn=-1;UI.hintsLeft=HINTS;UI.guided=!!s.tutorial;UI.lastPrompt=null;UI.pause=false;UI.dockSig=null;
   UI.help=s.help!==false;UI.tut=s.tutorial?{done:{}}:(s.job<=3?{done:{hello:1,stand:1}}:null);if(s.tutorial)UI.coach=true;UI.coachAsk=false;UI.myRes=null;UI.myAck=true;UI.aiNotBefore=0;UI.brief=(NET.on||isHost()||s.tutorial)?null:{n:s.job};
   const o={np:s.np,mission:s.job,seats,level:s.lv,names:s.names.slice(0,s.np),realtime:UI.rt};if(any){try{const ch=[];for(let i=0;i<s.np;i++)ch[i]=chars[i]||null;o.chars=ch}catch(e){}}if(s.captain!=null&&s.captain<s.np)o.captain=s.captain;if(s.seed!=null)o.seed=s.seed;
   kitReset();UI.started=true;hideStart();NET.starting=true;try{try{newGame(o)}catch(e){try{delete o.chars;newGame(o)}catch(e2){console.error(e2);UI.started=false;showStart();return}}
@@ -5773,6 +5783,7 @@ function pxCrewHTML(V){if(!G||!V||!V.seats)return '';let h='';
   return h}
 function pxChipsHTML(V){if(!G||!V)return '';let h=`<button class="pchip btn" data-ph="chip" data-k="job" aria-label="Job ${G.mission}: ${esc(MISSIONS[G.mission].nm)}">${ico('target')}<b>Job ${G.mission}</b></button>`;
   if(V.seat>=0){const q=V.seats[V.seat];if(q&&q.ch&&CHARS[q.ch]){h+=`<button class="pchip btn${q.chUsed||q.chDown?' used':''}" data-ph="chip" data-k="crew" aria-label="Your crew card: ${esc(CHARS[q.ch].n)}">${ico('gear')}<b>${esc(CHARS[q.ch].n)}</b></button>`}}
+  if(!noGear()&&V.eq&&V.eq.length)h+='<span class="pchl">Crew gear (anyone):</span>';
   if(!noGear()&&V.eq)V.eq.forEach((e,i)=>{if(e.down||!e.id){h+=`<button class="pchip btn used" data-ph="chip" data-k="eq" data-i="${i}" aria-label="Face-down gear card"><b>?</b></button>`;return}const E=EQUIP[e.id];if(!E)return;
     h+=`<button class="pchip btn eq ${esc(e.st||'')}" data-ph="chip" data-k="eq" data-i="${i}" aria-label="${esc(E.n)} (${esc(e.st||'')})"><em>${E.v==='Y'?'Y':E.v}</em><b>${esc(E.n)}</b></button>`});
   if(G&&UI.started&&(timedJob()||modeOf()==='watch'))h+=`<button class="pchip btn" data-a="pause" aria-label="${UI.pause?'Resume':'Pause'}">${ico(UI.pause?'play':'pause')}<b>${UI.pause?'Resume':'Pause'}</b></button>`;
@@ -5789,7 +5800,7 @@ function pxActsHTML(V){if(!G||!V)return '';let h='';const L=V.legal;
     for(const m of L.special)h+=`<button class="pb" data-a="multi" data-kind="${m.kind}" data-n="${m.tg.length}">${esc(multiName(m.kind))}</button>`;
     const others=L.other.filter(m=>m.a!=='eq'&&!(noGear()&&m.a==='item')),groups={};for(const m of others){const k=moveKey(m);(groups[k]=groups[k]||[]).push(m)}
     for(const k in groups)h+=`<button class="pb" data-a="grp" data-k="${esc(k)}">${esc(keyName(groups[k][0]))}${groups[k].length>1&&!stepsOf(k).length?' ('+groups[k].length+')':''}</button>`;
-    if(UI.help){const W=wwk(V);if(W&&W.suggestion)h+=`<button class="pb" data-a="sugg">${ico('bulb')}Suggest</button>`}
+    if(UI.help&&(hintOK()||hintsLeft()>0)){const W=wwk(V);if(W&&W.suggestion)h+=`<button class="pb" data-a="sugg">${ico('bulb')}Suggest${hintLbl()}</button>`}
     const T=L.tools;for(const t of ['dd','pt3','eq3','eq5'])if(T[t])h+=`<button class="pb${UI.sel&&UI.sel.tool===t?' on':''}" data-a="tool" data-t="${t}">${esc(toolName(t))}</button>`;
     for(const t of ['pt10','eq10'])if(T[t])h+=`<button class="pb${UI.sel&&UI.sel.two===t?' on':''}" data-a="two" data-t="${t}">${esc(toolName(t))}</button>`;
     if(L.flip.length)h+=`<button class="pb${UI.sel&&UI.sel.fu!=null?' on':''}" data-a="flipmode">Use my flipped wire</button>`;
@@ -5829,7 +5840,7 @@ setInterval(()=>{try{if(!PX.on||!G||!UI.started||!timedJob()||G.over||!UI.V)retu
 function pxClone(html){const d=document.createElement('div');d.innerHTML=html;return d}
 function pxCallHTML(V){const sel=UI.sel,L=V.legal;if(!sel||sel.mode!=='dual'||!sel.tg.length||!L)return null;const t=sel.tg[0];const step=sel.v==null?2:3;
   const many=sel.tg.length>1;const tgt=many?nm(ownerOf(t.st))+"'s wires "+sel.tg.map(x=>LET(x.k)).join(', '):wireName(t.st,t.k,V);
-  const vs=dualVals(sel);let W=null,sl=null,best=null;const odds=UI.help&&(UI.guided||UI.hintTurn===G.turn);if(odds){try{W=wwk(V)}catch(e){}if(W&&!many)sl=W.slots.find(x=>x.st===t.st&&x.k===t.k)||null}
+  const vs=dualVals(sel);let W=null,sl=null,best=null;const odds=UI.help&&hintOK();if(odds){try{W=wwk(V)}catch(e){}if(W&&!many)sl=W.slots.find(x=>x.st===t.st&&x.k===t.k)||null}
   if(W&&W.suggestion&&W.suggestion.m&&W.suggestion.m.a==='dual'&&W.suggestion.m.st===t.st&&W.suggestion.m.ks&&W.suggestion.m.ks.includes(t.k)&&W.suggestion.m.v!=null)best=W.suggestion.m.v;
   if(best==null&&sl&&sl.prob){let bp=-1;for(const v of vs){const p=sl.prob[String(v==='Y'?'yellow':v)]||0;if(p>bp){bp=p;best=v}}if(bp<=0)best=null}
   const pct=v=>{if(!sl||!sl.prob)return '';const p=sl.prob[String(v==='Y'?'yellow':v)]||0;return Math.round(p*100)+'%'};
@@ -5837,7 +5848,7 @@ function pxCallHTML(V){const sel=UI.sel,L=V.legal;if(!sel||sel.mode!=='dual'||!s
   if(odds&&sl){const pr=Object.entries(sl.prob||{}).filter(x=>x[0]!=='red').sort((a,b)=>b[1]-a[1]).slice(0,4).filter(x=>x[1]>0);const tk=(G.st[t.st].w[t.k].tok||[]).map(q=>tok2kit(q)).filter(Boolean);
     hint=`<p class="ph-why">${sl.certain!=null?`<b>It must be ${esc(VNm(sl.certain==='yellow'?'Y':sl.certain))}</b>.`:pr.length?'It could be '+pr.map(([v,p])=>`<b>${esc(v==='yellow'?'Y':v)}</b> ${Math.round(p*100)}%`).join(', ')+'.':'No favourite yet.'}${sl.prob&&sl.prob.red>0?` Red: <b>${Math.round(sl.prob.red*100)}%</b>.`:''}${tk.length?' Token: '+esc(tk.join(', '))+'.':''}</p>`}
   if(odds&&W&&W.suggestion&&W.suggestion.why&&W.suggestion.m&&W.suggestion.m.st===t.st&&W.suggestion.m.ks&&W.suggestion.m.ks.includes(t.k))hint+=`<p class="ph-why">&#9733; Suggested because: ${esc(nice(W.suggestion.why,V))}</p>`;
-  else if(UI.help&&!odds)hint=`<button class="pb small ph-hintbtn" data-a="hint1">${ico('bulb')}Hint: what could it be?</button>`;
+  else if(UI.help&&!odds)hint=hintsLeft()>0?`<button class="pb small ph-hintbtn" data-a="hint1">${ico('bulb')}Hint: what could it be?${hintLbl()}</button>`:'';
   else if(!UI.help)hint=`<button class="pb small ph-hintbtn" data-a="help">${ico('bulb')}Show hints</button>`;
   let vals=vs.map(v=>`<button class="vb ph-v${v==='Y'?' y':''}${sel.v===v?' sel':''}${best===v?' best':''}" data-a="v" data-v="${v}" aria-label="Say ${esc(VNm(v))}, you hold ${heldCount(V,v)}${best===v?', recommended':''}"><b>${v==='Y'?'Y':v}</b><small>you hold ${heldCount(V,v)}${pct(v)?' · '+pct(v):''}</small>${best===v?'<s>&#9733;</s>':''}</button>`).join('');
   if(!vs.length)vals='<p class="ph-why">You hold no wire that could match. Pick another wire or another action.</p>';
@@ -5851,7 +5862,7 @@ function pxCallHTML(V){const sel=UI.sel,L=V.legal;if(!sel||sel.mode!=='dual'||!s
   const groups={};for(const m of L.other.filter(m=>m.a!=='eq'&&!(noGear()&&m.a==='item')).concat(noGear()?[]:L.eq)){const k=moveKey(m);(groups[k]=groups[k]||[]).push(m)}
   for(const k in groups)other+=`<button class="pb" data-a="grp" data-k="${esc(k)}">${esc(keyName(groups[k][0]))}</button>`;
   return `<div class="ph-head"><b>Call a value</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div>
-  <p class="ph-tgt">At <b>${esc(tgt)}</b>${sel.tool?' with the <b>'+esc(toolName(sel.tool))+'</b>':''}</p>${hint}
+  <p class="ph-tgt">At <b>${esc(tgt)}</b>${sel.tool?' with the <b>'+esc(toolName(sel.tool))+'</b>':''}</p>${sel.tool||sel.two?`<p class="ph-why">${esc(toolHelp(sel.tool||sel.two))}</p>`:''}${hint}
   <div class="ph-vals" data-owner="${V.seat}" data-up="1">${vals}</div>${two}<div class="ph-go">${go}</div>
   ${tools?`<div class="ph-row">${tools}</div>`:''}${other?`<p class="ph-sub">Or instead:</p><div class="ph-row">${other}</div>`:''}`}
 function pxOwnHTML(){const pd=PX.pd;const V=UI.V;if(!pd||!V||V.seat<0)return null;const st=V.stands[pd.s];if(!st||!st.mine)return null;const x=st.slots[pd.k];if(!x)return null;
