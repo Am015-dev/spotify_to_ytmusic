@@ -517,7 +517,21 @@ function repContinue() {
 // ---------- decisions inside the report ----------
 const DEC_SHORT = { shop: 'Shop: tap chips for your bag', ruby: 'Spend rubies?', de: 'Boom! Points OR shopping?' };
 function tileBtn(m, p, big, small, icons) { return h('button.btn.alt.tile', { 'data-a': 'mv', 'data-i': UI.legal[p.seat].indexOf(m), type: 'button', 'aria-label': m.label }, h('span.ti1', { html: icons }), h('b.ti2', big), small ? h('span.ti3', small) : null); }
-function decisionBox(p, q) {
+// a glowing "best" on the choice a good maker would take, so no choice screen is a guess
+function sugMark(box, p, q, legal) {
+  try {
+    if (q.h === 'shop') {
+      const keys = CF.AI.shopChoice(G, p, q.d.coins, 'normal', () => 0.5) || []; const left = keys.slice();
+      box.querySelectorAll('.stalls .tok').forEach(b => { const i = left.indexOf(b.dataset.k); if (i >= 0 && !b.disabled) { left.splice(i, 1); b.classList.add('sug'); } });
+      return;
+    }
+    const m = CF.AI.choose(G, p.seat, 'normal'); if (!m) return; const js = JSON.stringify(stripM ? stripM(m) : m);
+    const i = legal.findIndex(x => JSON.stringify(stripM ? stripM(x) : x) === js); if (i < 0) return;
+    const b = box.querySelector('[data-a=mv][data-i="' + i + '"]'); if (b) b.classList.add('sug');
+  } catch (e) {}
+}
+function decisionBox(p, q) { const box = decisionBox0(p, q); sugMark(box, p, q, UI.legal[p.seat] || []); return box; }
+function decisionBox0(p, q) {
   const info = QINFO[q.h], legal = mvList(p.seat); UI.legal[p.seat] = legal;
   const short = DEC_SHORT[q.h];
   const box = h('div.dec.dec-' + q.h, h('h3', short || info[0]), short ? null : h('div.sm', info[1](p, q.d)));
