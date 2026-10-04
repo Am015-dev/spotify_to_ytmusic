@@ -22,7 +22,7 @@ function headline(l){if(!l||l.s===undefined||l.s<0||!G||!G.pl[l.s])return null;c
   if(/ yields and flees the city/.test(t))return `🏃 ${N} FLEES THE CITY!`;
   if(m=t.match(/ buys “(.+?)”/))return `🛒 ${N} SNAPS UP “${UP(m[1])}”`;
   if(m=t.match(/ starts in (Downtown|the Harbor) and gains (\d+) stars?/))return `👑 ${N} HOLDS ${UP(m[1])} ANOTHER DAY (+${m[2]}★)`;
-  if(m=t.match(/ MINDBUGS (.+) and resolves/))return `🧠 ${N} HIJACKS ${UP(m[1])}’S ROLL!`;
+  if(m=t.match(/ BRAINJACKS (.+) and resolves/))return `🧠 ${N} HIJACKS ${UP(m[1])}’S ROLL!`;
   if(m=t.match(/ plays its evolution “(.+)”/))return `🧬 ${N} EVOLVES: ${UP(m[1])}!`;
   if(/is crowned|takes the crown|wins anyway|rules the city/.test(t))return `🏆 ${N} IS THE NEW KING OF CROWN CITY!`;
   return null}
@@ -34,7 +34,7 @@ function storyScan(){if(!G)return;if(UI.sgid!==G.gid){UI.sgid=G.gid;UI.lseen=0;U
   for(const l of fresh){const h=headline(l);if(h)UI.news.push(h);
     if(me>=0&&l.s!==me&&l.s>=0){const m=l.t.match(/ smashes (.+)\.$/);if(m){const r=new RegExp(myName+' \\(−(\\d+)');const d=m[1].match(r);if(d){UI.riv[l.s]=(UI.riv[l.s]||0)+ +d[1];
       if(UI.riv[l.s]>=4&&!UI.rivSaid[l.s]){UI.rivSaid[l.s]=1;UI.news.push(`😠 RIVALRY: ${UP(mname(G.pl[l.s]))} HAS SMASHED YOU FOR ${UI.riv[l.s]} ♥. PAYBACK TIME?`)}}}}
-    if(me>=0&&l.s===me&&h){const x=l.t;let sc=0;const st=[...x.matchAll(/(\d+)★ from/g)].reduce((a,y)=>a+ +y[1],0);sc+=st*2;const dm=[...x.matchAll(/\(−(\d+)/g)].reduce((a,y)=>a+ +y[1],0);if(/ smashes /.test(x))sc+=dm*1.3;if(/MINDBUGS/.test(x))sc+=4;if(/STORMS DOWNTOWN/.test(h))sc+=2;
+    if(me>=0&&l.s===me&&h){const x=l.t;let sc=0;const st=[...x.matchAll(/(\d+)★ from/g)].reduce((a,y)=>a+ +y[1],0);sc+=st*2;const dm=[...x.matchAll(/\(−(\d+)/g)].reduce((a,y)=>a+ +y[1],0);if(/ smashes /.test(x))sc+=dm*1.3;if(/BRAINJACKS/.test(x))sc+=4;if(/STORMS DOWNTOWN/.test(h))sc+=2;
       if(sc>0&&(!UI.best||sc>UI.best.sc))UI.best={sc,h,r:G.turn}}
     if(/ is knocked out!$/.test(l.t)&&G.pl[l.s]){const left=G.pl.filter(q=>q.alive).length;UI.moment={h:`💥 ${UP(mname(G.pl[l.s]))} IS DOWN!`,s:left>1?`${left} monsters left in Crown City.`:'The dust settles…',c:MONS[G.pl[l.s].m].c};clearTimeout(UI.momT);UI.momT=setTimeout(()=>{UI.moment=null;if(G)renderPanel()},ANIM?4200:1)}}
   if(!G.winner)G.pl.forEach(q=>{if(!q.alive)return;for(const th of [15,18]){const k=q.i+':'+th;if(q.vp>=th&&!UI.near[k]){UI.near[k]=1;UI.near[q.i+':15']=1;
@@ -55,8 +55,8 @@ function storyBanner(R){const p=R.p;let h=`${R.bug?'🧠 ':''}<b>${esc(mname(p))
   else if(R.forced==='city')why.push(`Downtown was empty, so ${mname(p)} had to move in: +1 ★ (👑 = the monster in Downtown)`);
   else if(R.forced==='bay')why.push(`Downtown was taken and the Harbor was empty, so ${mname(p)} moved into the Harbor: +1 ★`);
   if(why.length)h+=`<div class="because">Why: ${esc(why.join('. '))}.</div>`;return h}
-// first game: keep the human's only Mindbug token on weak rolls before their first own turn
-function mbHold(q){if(!(UI.firstGame&&G.mode==='solo'&&!UI.hadTurn))return false;lg(q.i,`${mname(q)} keeps its Mindbug token for a better roll.`);return true}
+// first game: keep the human's only Brainjack token on weak rolls before their first own turn
+function mbHold(q){if(!(UI.firstGame&&G.mode==='solo'&&!UI.hadTurn))return false;lg(q.i,`${mname(q)} keeps its Brainjack token for a better roll.`);return true}
 
 // ---------- the opening story card ----------
 function introHTML(){const me=meSeat(),q=me>=0?G.pl[me]:null;const names=G.pl.map(x=>mname(x));
@@ -90,18 +90,18 @@ function tourClick(a){const k=TIPORDER[UI.coach];if(k)(UI.tipSeen=UI.tipSeen||{}
 const FNAME={'1':'1','2':'2','3':'3',E:'⚡',C:'claw',H:'heart'};
 function faceList(fs){const c={};fs.forEach(f=>{const k=f==='C2'?'C':f==='E2'?'E':f;c[k]=(c[k]||0)+1});return Object.entries(c).map(([f,n])=>n>1?`${n}× ${FNAME[f]||f}`:(FNAME[f]||f)).join(', ')}
 function rivalLine(){const me=meSeat();const r=G.pl.filter(q=>q.alive&&q.i!==me&&q.vp>=16).sort((a,b)=>b.vp-a.vp)[0];if(!r)return '';
-  return inTokyo(r.i)?`${mname(r)} has ${r.vp} ★ and holds the city: every claw you roll from outside hits it.`:`${mname(r)} has ${r.vp} ★. Hit it with claws from Downtown, or keep it out of the city.`}
+  return inCity(r.i)?`${mname(r)} has ${r.vp} ★ and holds the city: every claw you roll from outside hits it.`:`${mname(r)} has ${r.vp} ★. Hit it with claws from Downtown, or keep it out of the city.`}
 function advise(){if(!G)return {a:'Press ▶ Play now.',w:'The recommended setup is the easiest way to learn.'};if(G.winner)return {a:'Read the front page, then play again.',w:'Try another monster: each has its own secret powers.'};
   if(UI.intro)return {a:'Read the story card, then press ▶ Let\'s smash.',w:'The computer waits until you are ready.'};
   const me=meSeat();const p=cur();const c=UI.choice&&!(NET.on&&c0Remote())?UI.choice:null;const riv=rivalLine();
   if(c){if(c.why)return {a:c.why.split(':')[0]+'.',w:c.why.split(':').slice(1).join(':').trim()||c.text};
-    if(/Stay or yield/.test(c.title)){const q=P(c.who);const th=alive().filter(r=>r.i!==q.i&&!inTokyo(r.i)).length;const y=c.options.find(o=>o.k==='yield'&&/Recommended\./.test(o.d||''));
+    if(/Stay or yield/.test(c.title)){const q=P(c.who);const th=alive().filter(r=>r.i!==q.i&&!inCity(r.i)).length;const y=c.options.find(o=>o.k==='yield'&&/Recommended\./.test(o.d||''));
       return y?{a:'Yield.',w:`${plu(q.hp,'heart')} and ${th} monster${th===1?'':'s'} can hit you: staying is too risky. Staying pays 2 ★ only if you survive a round.`}:{a:'Stay.',w:`With ${plu(q.hp,'heart')} you can likely survive a round, and starting your turn in the city pays 2 ★. Yield once you are at 3 ♥ or less.`}}
     const r=c.options.find(o=>o.rec||/Recommended\./.test(o.d||''));if(r)return {a:`Choose “${r.l}”.`,w:(r.d||'').replace(/ ?Recommended\.?/,'')||'It is the safer option here.'};
     if(typeof c.ai==='function'&&!c.net){if(c._aiK===undefined){try{c._aiK=String(c.ai())}catch(e){c._aiK=null}}const o=c.options.find(x=>String(x.k)===c._aiK);if(o)return {a:`Choose “${o.l}”.`,w:(o.d?o.d+' ':'')+'That is what an experienced monster would pick right now.'}}
     return {a:'Pick one of the options.',w:'The small text under each option says what it does. The computer waits for you.'}}
   if(!humanTurn()){const w=me>=0?`You are ${mname(G.pl[me])}. You will get a pop-up if you can yield the city${mbOn()&&G.pl[me].mb?' or steal this roll with your 🧠':''}.`:'';return {a:`Watch: ${mname(p)} is playing.`,w:(riv?riv+' ':'')+w}}
-  if(G.phase==='roll'){const inT=inTokyo(p.i);const occ=G.city>=0?P(G.city):null;
+  if(G.phase==='roll'){const inT=inCity(p.i);const occ=G.city>=0?P(G.city):null;
     if(G.rolls<=0)return {a:'Press Resolve dice.',w:`No rerolls left. You will get: ${scoreDice(p,G.dice).text}.`};
     const m=suggestMask(p);const keep=G.dice.filter((d,k)=>m[k]).map(d=>d.f);const cnt=countsOf(G.dice);
     let why;if(!inT&&!occ)why='Nobody is in Downtown yet, so claws do nothing now (you will move in anyway). Energy buys cards, and three of a number score stars.';

@@ -86,7 +86,7 @@ function brainIcon(x,y,s,fill){return `<g transform="translate(${x},${y}) scale(
 function burst(x,y,r,fill){let d='';for(let k=0;k<24;k++){const a=k*Math.PI/12,rr=k%2?r*.72:r;d+=(k?'L':'M')+(x+Math.cos(a)*rr).toFixed(1)+' '+(y+Math.sin(a)*rr).toFixed(1)}return `<path d="${d}Z" fill="${fill}" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`}
 // small icon for a power card
 function cardIcon(id){const b=base(id),C=CARDS[b];const x=C.x;let k='dice';
-  if(/Mindbug/.test(x))k='brain';else if(C.kws)k=C.kws[0];else if(/loses? \d+ hearts?|smash|damage/.test(x))k='claw';else if(/[Hh]eal/.test(x))k='heart';else if(/energy/.test(x)&&!/star/.test(x))k='bolt';else if(/star/.test(x))k='star';
+  if(/Brainjack/.test(x))k='brain';else if(C.kws)k=C.kws[0];else if(/loses? \d+ hearts?|smash|damage/.test(x))k='claw';else if(/[Hh]eal/.test(x))k='heart';else if(/energy/.test(x)&&!/star/.test(x))k='bolt';else if(/star/.test(x))k='star';
   const S=`stroke="${INK}" stroke-width="3" stroke-linejoin="round"`;
   const g={brain:brainIcon(0,0,1),star:`<path d="M0 -16 L4.6 -5.4 L16 -4.6 L7 3 L10 14 L0 8 L-10 14 L-7 3 L-16 -4.6 L-4.6 -5.4 Z" fill="#f4a300" ${S}/>`,
    heart:`<path d="M0 14 C-16 2 -18 -6 -12 -11 C-6 -16 -1 -12 0 -7 C1 -12 6 -16 12 -11 C18 -6 16 2 0 14 Z" fill="#e63946" ${S}/>`,
@@ -134,7 +134,7 @@ function renderMap(){const svg=document.getElementById('map');if(!G){svg.innerHT
   s+=`</g>`;
   // seats
   const n=G.pl.length,gap=12,w=Math.min(150,(940-(n-1)*gap)/n),x0=500-(n*w+(n-1)*gap)/2;
-  G.pl.forEach((p,k)=>{const x=x0+k*(w+gap),y=400,h=226,cx=x+w/2,A=k===G.active&&!G.winner,T=inTokyo(p.i);
+  G.pl.forEach((p,k)=>{const x=x0+k*(w+gap),y=400,h=226,cx=x+w/2,A=k===G.active&&!G.winner,T=inCity(p.i);
     s+=`<g class="seat" data-seat="${k}">`;
     if(A)s+=`<rect x="${x-6}" y="${y-6}" width="${w+12}" height="${h+12}" rx="18" fill="#ffd23f" stroke="${INK}" stroke-width="3"/>`;
     s+=`<rect x="${x+4}" y="${y+4}" width="${w}" height="${h}" rx="14" fill="${INK}"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" fill="${p.alive?'#fffaf0':'#9c93a3'}" stroke="${INK}" stroke-width="4"/>

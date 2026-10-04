@@ -19,12 +19,12 @@ function renderPanel(){
   if(G.winner){who='Game over';msg=esc(G.winText);acts=btn('again','Play again','','','primary')}
   else if(!humanTurn()){
     head=G.step===1?`Step 1 · ${esc(mname(p))} is rolling`:G.step<=3?`Step 2 · ${esc(mname(p))} resolves its dice`:`Step 4 · ${esc(mname(p))} is shopping`;
-    msg=G.step===1?'Watch which dice it keeps (they turn yellow).':G.step===4?'It may buy power cards or play evolutions.':'';if(G.bug&&P(G.bug.by))msg+=`<div class="tip bug">🧠 ${esc(mname(P(G.bug.by)))} stole ${esc(mname(P(G.bug.v)))}'s roll with a Mindbug token. ${esc(mname(P(G.bug.v)))} rolls again afterwards.</div>`;
-    if(me){msg+=`<div class="tip">You are <b>${esc(mname(me))}</b>. Nothing to do right now: you will get a pop-up if you can ${mbOn()&&me.mb?'use your <b>Mindbug</b> or ':''}yield the city.</div>`}}
+    msg=G.step===1?'Watch which dice it keeps (they turn yellow).':G.step===4?'It may buy power cards or play evolutions.':'';if(G.bug&&P(G.bug.by))msg+=`<div class="tip bug">🧠 ${esc(mname(P(G.bug.by)))} stole ${esc(mname(P(G.bug.v)))}'s roll with a Brainjack token. ${esc(mname(P(G.bug.v)))} rolls again afterwards.</div>`;
+    if(me){msg+=`<div class="tip">You are <b>${esc(mname(me))}</b>. Nothing to do right now: you will get a pop-up if you can ${mbOn()&&me.mb?'use your <b>Brainjack</b> or ':''}yield the city.</div>`}}
   else if(G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;
     head='Step 1 · Roll the dice';
     msg=!(UI.coach>=0)&&((UI.myTurns||0)<=2||!UI.hadTurn)?`<ol class="how"><li>Tap the dice you want to <b>keep</b> (here, or right in the city). They turn yellow.${UI.hints?' A <span class="bdash">blue dashed outline</span> marks our suggestion.':''}</li><li>Press <b>Reroll</b> to throw the others again (${G.rolls} left).</li><li>Happy with the result? Press <b>Resolve</b>.</li></ol>`:'';
-    msg+=`<div class="tip">You are in <b>${where(p.i)}</b>. ${inTokyo(p.i)?'Your claws hit everyone outside. Hearts do nothing here.':G.city===-1?'Downtown is empty, so you will move in after resolving (+1 ★) and claws hit nobody this time.':`Your claws hit whoever is in the city (${esc(mname(P(G.city)))} 👑).`}</div>`;
+    msg+=`<div class="tip">You are in <b>${where(p.i)}</b>. ${inCity(p.i)?'Your claws hit everyone outside. Hearts do nothing here.':G.city===-1?'Downtown is empty, so you will move in after resolving (+1 ★) and claws hit nobody this time.':`Your claws hit whoever is in the city (${esc(mname(P(G.city)))} 👑).`}</div>`;
     acts=btn('reroll',`Reroll ${nk} ${nk===1?'die':'dice'}`,G.rolls<=0||!nk,G.rolls<=0?'no rerolls left':`${G.rolls} left`,G.rolls>0&&nk?'primary':'')+btn('resolve','Resolve dice','','go to step 2',G.rolls<=0||!nk?'primary':'')+btn('hint','💡 Keep suggested','','keeps the blue-outlined dice');
   }else if(G.phase==='buy'){const sg=suggestCard(p);
     head=`Step 4 · Buy power cards (optional)${G.bug?' · borrowed turn':''}`;
@@ -43,7 +43,7 @@ function renderPanel(){
   const canClick=humanTurn()&&G.phase==='roll';
   const spin=UI.rollAnim!==G.rollId&&ANIM;UI.rollAnim=G.rollId;
   const sug=canClick&&UI.hints&&G.rolls>0?suggestMask(p):null;
-  di.innerHTML=G.dice.map((d,k)=>`<button class="die ${d.k?'kept':''} ${d.x?'extra':''} ${d.t?'sp-'+d.t:''} ${sug&&sug[k]&&!d.k?'sugg':''} ${spin&&!d.k?'spin':''}" title="${fname(d.f)}${d.t==='b'?' (berserk die)':d.t==='f'?' (Die of Fate)':''}" data-die="${k}" ${canClick?'':'disabled'} aria-label="${fname(d.f)}${d.k?' (kept)':''}">${faceSVG(d.f)}</button>`).join('')||'<span class="muted small">No dice rolled yet.</span>';
+  di.innerHTML=G.dice.map((d,k)=>`<button class="die ${d.k?'kept':''} ${d.x?'extra':''} ${d.t?'sp-'+d.t:''} ${sug&&sug[k]&&!d.k?'sugg':''} ${spin&&!d.k?'spin':''}" title="${fname(d.f)}${d.t==='b'?' (rampage die)':d.t==='f'?' (Omen Die)':''}" data-die="${k}" ${canClick?'':'disabled'} aria-label="${fname(d.f)}${d.k?' (kept)':''}">${faceSVG(d.f)}</button>`).join('')||'<span class="muted small">No dice rolled yet.</span>';
   ro.innerHTML=G.phase==='roll'?`Rerolls left: ${Array.from({length:Math.max(G.rolls,rerollsOf(p))},(_,k)=>`<span class="pip ${k<G.rolls?'':'used'}"></span>`).join('')}`:'<span class="muted small">Dice resolved.</span>';
   pv.innerHTML=G.phase==='roll'&&G.dice.length?`<b>${humanTurn()?'If you resolve now':'These dice give'}:</b> ${esc(scoreDice(p,G.dice).text)}.`:'';
   const buyPh=humanTurn()&&G.phase==="buy";const sg=buyPh?suggestCard(p):-1;
@@ -55,12 +55,12 @@ function renderPanel(){
     ...(who2===me||!me||G.mode==='hot'||G.mode==='ai'?who2.hand.map(e=>`<div class="mc E hand"><b>🧬 ${esc(evoName(e))}</b> <i>in hand (${EVO[e].t==='P'?'permanent':'temporary'}${EVO[e].kw?', '+EVO[e].kw:''})</i><br>${esc(evoText(e))}</div>`):[])];
   if(tk.poison||tk.shrink)list.unshift(`<div class="mc B"><b>${tk.poison?'☠ Poison tokens: '+tk.poison+' ':''}${tk.shrink?'🔻 Shrink tokens: '+tk.shrink:''}</b><br>Poison: lose 1 heart per token at the end of your turn. Shrink: roll 1 die fewer per token. A heart die outside the city can remove one token.</div>`);
   if(G.frz&&G.frz.t===who2.i)list.unshift(`<div class="mc E"><b>❄ ${esc(evoName(11))}</b> from ${esc(mname(P(G.frz.o)))}${G.tf&&G.tf.void&&G.active===who2.i?`: your ${esc(fname(G.tf.void))} faces do nothing this turn`:''}</div>`);
-  if(exOn('curse'))list.unshift(`<div class="mc K"><b>𓂀 Curse: ${esc(CURSES[G.curse].n)}</b><br>${esc(CURSES[G.curse].x)}<br><i>Ankh: ${esc(CURSES[G.curse].a)} Snake: ${esc(CURSES[G.curse].s)}</i><br>🪲 Golden Scarab: <b>${scarab()>=0?esc(mname(P(scarab()))):'nobody'}</b></div>`);
-  if(exOn('tower'))list.unshift(`<div class="mc T"><b>🗼 Tokyo Tower levels: ${G.tower.map((o,l)=>`${l+1}: ${o<0?'free':esc(mname(P(o)))}`).join(' · ')}</b><br>Already in the city, resolve four 1s to climb one level. Reaching level 3 wins.</div>`);
-  if(exOn('wick'))list.unshift(`<div class="mc W"><b>😈 Wickedness: ${who2.wk}/10</b> (tiles at 3, 6 and 10)</div>`);
-  if(exOn('bers')&&who2.tok.berserk)list.unshift(`<div class="mc B"><b>😡 BERSERK!</b><br>You roll the berserk die. Heal with hearts to calm down.</div>`);
+  if(exOn('curse'))list.unshift(`<div class="mc K"><b>𓂀 Curse: ${esc(CURSES[G.curse].n)}</b><br>${esc(CURSES[G.curse].x)}<br><i>Ankh: ${esc(CURSES[G.curse].a)} Snake: ${esc(CURSES[G.curse].s)}</i><br>🪲 Brass Beetle: <b>${scarab()>=0?esc(mname(P(scarab()))):'nobody'}</b></div>`);
+  if(exOn('tower'))list.unshift(`<div class="mc T"><b>🗼 Crown Spire levels: ${G.tower.map((o,l)=>`${l+1}: ${o<0?'free':esc(mname(P(o)))}`).join(' · ')}</b><br>Already in the city, resolve four 1s to climb one level. Reaching level 3 wins.</div>`);
+  if(exOn('wick'))list.unshift(`<div class="mc W"><b>😈 Menace: ${who2.wk}/10</b> (tiles at 3, 6 and 10)</div>`);
+  if(exOn('bers')&&who2.tok.berserk)list.unshift(`<div class="mc B"><b>😡 RAMPAGE!</b><br>You roll the rampage die. Heal with hearts to calm down.</div>`);
   if(exOn('cult'))list.unshift(`<div class="mc M"><b>🕯 Cultists: ${who2.cult}</b><br>Four of a kind gains one (per face). Spend one on your turn for a heart, an energy or a reroll.</div>`);
-  if(mbOn())list.unshift(`<div class="mc M"><b>🧠 Mindbug tokens: ${who2.mb}</b><br>When another monster finishes rolling, spend one to resolve its dice as yours and take its Enter and Buy steps; it then rolls again.</div>`);
+  if(mbOn())list.unshift(`<div class="mc M"><b>🧠 Brainjack tokens: ${who2.mb}</b><br>When another monster finishes rolling, spend one to resolve its dice as yours and take its Enter and Buy steps; it then rolls again.</div>`);
   document.getElementById('mine').innerHTML=list.length?list.join(''):'<span class="muted small">No cards yet. Buy them with energy after rolling.</span>';
   const dm=document.getElementById('dr-mine');if(dm)dm.querySelector('h2').textContent=me?`Your cards (${mname(me)})`:`${mname(who2)}'s cards`;
   const yb=document.getElementById('youbox');yb.classList.remove('hidden');
@@ -77,7 +77,7 @@ function monDetail(p){const k=p.i;const hidden=(G.mode==='solo'||G.mode==='net')
   const evo=p.evo.map(e=>`<div class="mc E"><b>🧬 ${esc(evoName(e))}</b> <i>evolution in play</i><br>${esc(evoText(e))}</div>`);
   const hand=p.hand.length?(hidden?[`<div class="mc E hand"><b>🧬 ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand</b> <i>hidden</i></div>`]:p.hand.map(e=>`<div class="mc E hand"><b>🧬 ${esc(evoName(e))}</b> <i>in hand</i><br>${esc(evoText(e))}</div>`)):[];
   const all=[...cards,...evo,...hand];
-  return `<div class="mon ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}" id="mon-${k}"><b style="background:${MONS[p.m].c}">${inTokyo(p.i)?'👑 ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>
+  return `<div class="mon ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}" id="mon-${k}"><b style="background:${MONS[p.m].c}">${inCity(p.i)?'👑 ':''}${esc(mname(p))}${(G.mode==='solo'&&p.human)||(NET.on&&k===NET.mySeat)?' <i>you</i>':''}${pname(p)?' <i>'+esc(pname(p))+'</i>':''}</b>
     <div class="st2">${p.alive?`♥${p.hp}/${maxhp(p)} ★${p.vp} ⚡${p.en}${mbOn()?' 🧠'+p.mb:''}${exIcons(p)} · ${esc(where(p.i))}`:'Knocked out'}</div>
     <div class="small muted" style="padding:0 .5rem .3rem">${esc(MONS[p.m].d)}</div><div class="mine">${all.length?all.join(''):'<span class="muted small">No cards.</span>'}</div></div>`}
 function renderScore(){const el=document.getElementById('score');if(!G){el.innerHTML='<p class="muted">No game yet.</p>';return}
@@ -105,7 +105,7 @@ function renderChoice(on){const el=document.getElementById('choice'),dk=document
   const key=c.title+'|'+c.text;if(UI.choiceShown!==key){UI.choiceShown=key;if(window.GX&&GX.app){GX.showDock();if(GX.open)GX.close()}const b=document.getElementById('dockbody');if(b)b.scrollTop=0;const f=el.querySelector('button');if(f&&document.activeElement&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName))try{f.focus({preventScroll:true})}catch(e){}}}
 function startScreen(){const saved=load();const xp=UI.xp;
   const pool=MONS.map((M,k)=>k).filter(k=>xp!=='base'||k<6);if(!pool.includes(UI.mon))UI.mon=0;
-  const xpn={base:'classic rules',trial:'Mindbug Trial',exp:'Mindbug Experience'}[xp];const lv={easy:'Easy',normal:'Normal',hard:'Hard'}[UI.lvl]||'Normal';
+  const xpn={base:'classic rules',trial:'Brainjack Taster',exp:'Brainjack Full Set'}[xp];const lv={easy:'Easy',normal:'Normal',hard:'Hard'}[UI.lvl]||'Normal';
   return `<div class="dlg start" role="dialog" aria-modal="true"><h2>Crown City Smash</h2>
    <p class="lede">Giant monsters brawl for Crown City. Roll dice, smash your rivals and hold Downtown. First to <b>20 ★</b>, or the <b>last monster standing</b>, is crowned.</p>
    <div class="acts" style="margin:.5rem 0">
@@ -116,8 +116,8 @@ function startScreen(){const saved=load();const xp=UI.xp;
    <div class="monpick">${pool.map(k=>`<button class="${UI.mon===k?'on':''}" data-mon="${k}" title="${esc(MONS[k].d)}">${monPic(k)}<span>${esc(MONS[k].n)}${MONS[k].x?' 🧠':''}</span></button>`).join('')}</div>
    <p class="small muted" style="margin:.2rem 0">${esc(MONS[UI.mon].n)}: ${esc(MONS[UI.mon].d)}.</p>
    <details class="custom" ${UI.custOpen?'open':''}><summary>Customise ▸ <span class="small muted">rules, expansions, players, other ways to play</span></summary>
-   <div class="row"><b>Game:</b>${[['base','Classic'],['trial','Mindbug Trial'],['exp','Mindbug Experience']].map(([k,l])=>`<button class="btn ${xp===k?'on':''}" data-xp="${k}">${l}</button>`).join('')}</div>
-   <p class="small muted" style="margin:.1rem 0 .3rem">${xp==='base'?'The classic game: best for a first game.':xp==='trial'?'Adds Mindbug tokens (steal another monster\'s roll), 3 new monsters and 24 new cards shuffled into the classic deck.':'Mindbug tokens and 3 new monsters, playing with only the 24 new cards.'}</p>
+   <div class="row"><b>Game:</b>${[['base','Classic'],['trial','Brainjack Taster'],['exp','Brainjack Full Set']].map(([k,l])=>`<button class="btn ${xp===k?'on':''}" data-xp="${k}">${l}</button>`).join('')}</div>
+   <p class="small muted" style="margin:.1rem 0 .3rem">${xp==='base'?'The classic game: best for a first game.':xp==='trial'?'Adds Brainjack tokens (steal another monster\'s roll), 3 new monsters and 24 new cards shuffled into the classic deck.':'Brainjack tokens and 3 new monsters, playing with only the 24 new cards.'}</p>
    <p style="margin:.35rem 0 .15rem"><b>Expansions</b> <span class="small muted">(tap to switch on or off)</span> <button class="btn mini" data-preset="none">None</button><button class="btn mini" data-preset="all">All</button></p>
    <div class="exps">${EXPS.map(e=>{const on=e.k==='evo'?UI.evo:!!UI.ex[e.k];return `<button class="ex ${on?'on':''}" data-exk="${e.k}"><b>${on?'✔':'＋'} ${esc(e.n)}</b><small>${esc(e.d)}</small></button>`}).join('')}</div>
    <div class="row"><b>Computer skill:</b>${[['easy','Easy'],['normal','Normal'],['hard','Hard']].map(([k,l])=>`<button class="btn ${UI.lvl===k?'on':''}" data-lvl="${k}">${l}</button>`).join('')}<span class="small muted">${UI.lvl==='hard'?'Thinks ahead about every reroll.':UI.lvl==='easy'?'Makes mistakes. Good for learning.':'A solid, fair opponent.'}</span></div>
@@ -134,16 +134,16 @@ function rulesHTML(){return `<div>
   <li><b>Buy</b> power cards with energy. <b>New cards (2 ⚡)</b> throws the three cards for sale away and deals three fresh ones. <b>ONE-SHOT</b> cards happen at once, <b>PERMANENT</b> cards stay with you, <b>SAVE FOR LATER</b> cards wait for their moment.</li>
   <li><b>End of turn</b> effects happen, then the next monster goes.</li></ol>
   <h3>The city</h3><p><b>👑</b> marks the monster in Downtown. Starting your turn in the city scores 2 stars. You cannot heal with hearts there, and everyone outside is hitting you. When only four monsters remain, the Harbor closes.</p>
-  <h3>Mindbug expansion</h3><ul><li><b>Mindbug tokens</b>: every monster starts with 1. When another monster finishes rolling, you may spend one to resolve its dice as if they were yours. You then do your own Enter and Buy steps, and the Mindbugged monster rolls again from scratch.</li>
+  <h3>Brainjack expansion</h3><ul><li><b>Brainjack tokens</b>: every monster starts with 1. When another monster finishes rolling, you may spend one to resolve its dice as if they were yours. You then do your own Enter and Buy steps, and the Brainjacked monster rolls again from scratch.</li>
   <li><b>Consumable</b> cards: you keep them until the moment their keyword applies, use them once, then discard them. You are asked automatically when you can use one.</li>
-  <li><b>Keywords</b>: ${Object.entries(KWHELP).map(([k,v])=>`<b>${k.toUpperCase()}</b>: ${esc(v)}`).join(' ')}</li>
-  <li><b>Evolutions</b> (Power Up!, optional): each monster has 8. Start with one of two; whenever you resolve three or more hearts (even in the city), look at two more and keep one. <b>Permanent</b> ones stay in play; <b>temporary</b> ones are used once. Some are played from your hand at a special moment: you get a pop-up when you can.</li>
-  <li><b>Trial</b> mixes the 24 new cards into the classic deck. <b>Experience</b> uses only the new cards.</li></ul>
+  <li><b>Keywords</b>: ${Object.entries(KWHELP).map(([k,v])=>`<b>${KWN[k].toUpperCase()}</b>: ${esc(v)}`).join(' ')}</li>
+  <li><b>Evolutions</b> (optional): each monster has 8. Start with one of two; whenever you resolve three or more hearts (even in the city), look at two more and keep one. <b>Permanent</b> ones stay in play; <b>temporary</b> ones are used once. Some are played from your hand at a special moment: you get a pop-up when you can.</li>
+  <li><b>Taster</b> mixes the 24 new cards into the classic deck. <b>Full Set</b> uses only the new cards.</li></ul>
   <h3>More expansions (switch them on at the start)</h3><ul>${EXPS.filter(e=>e.k!=='evo').map(e=>`<li><b>${esc(e.n)}</b>: ${esc(e.d)}</li>`).join('')}</ul>
   <h3>Online play</h3><p class="small">On the start screen press <b>Host a game</b> and share the invite code. Friends open this same page (share it with them as Contributors or Editors first), type the code and press <b>Join a game</b>. The host's page runs the game. If the host leaves, the player in the lowest seat takes over automatically from the last calm moment (at worst, the current roll is replayed). Empty seats are filled with computer monsters, and if someone drops out the computer takes over their monster until they come back.</p>
   <h3>Keyboard shortcuts</h3><p class="small"><b>R</b> reroll · <b>Space</b> resolve / end turn · <b>1–8</b> keep a die · <b>H</b> suggest dice · <b>P</b> pause the computer</p>
   <h3>Winning</h3><p>Reach <b>20 stars</b> and survive your turn, or be the last monster standing. If everyone falls at once, nobody wins.</p>
-  <h3>About this version</h3><p class="small">All 66 classic cards, the 24 Mindbug cards, 72 evolutions, 12 costumes, 24 curses and 10 wickedness tiles follow the published cards, with new names and wording. See the notes shipped with the game for the few interpretations.</p>
+  <h3>About this version</h3><p class="small">All 66 classic cards, the 24 Brainjack cards, 72 evolutions, 12 costumes, 24 curses and 10 menace tiles follow the published cards, with new names and wording.</p>
   <h3>Credits</h3><p class="small">Names, card text and art are original.</p><section class="credits-audio"><h4>Audio</h4><p class="small">With thanks to these public-domain (CC0) creators:</p><ul class="small"><li>Music: &ldquo;Funked Up&rdquo; by Joth (<a href="https://opengameart.org/content/funked-up" target="_blank" rel="noopener">OpenGameArt</a>, CC0)</li><li>Sound effects: Casino Audio, Digital Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio, Sci-fi Sounds, UI Audio by <a href="https://kenney.nl" target="_blank" rel="noopener">Kenney</a> (CC0)</li><li>Sound effects: &ldquo;100 CC0 SFX #2&rdquo; by rubberduck (<a href="https://opengameart.org/content/100-cc0-sfx-2" target="_blank" rel="noopener">OpenGameArt</a>, CC0)</li><li>Sound effects: &ldquo;16 Monster Growls&rdquo; by StarNinjas (<a href="https://opengameart.org/content/16-monster-growls" target="_blank" rel="noopener">OpenGameArt</a>, CC0)</li></ul><p class="small"><small>All sounds were trimmed, loudness-normalised and converted to MP3 for this game.</small></p></section>
   <div class="acts"><button class="btn primary" data-gx="close">Got it</button></div></div>`}
 
@@ -180,7 +180,7 @@ function c0Remote(){const c=UI.choice;return c&&!c.net&&c.who!==undefined&&c.who
 function gameAct(ds,seat){
   if(ds.opt!==undefined){const c=UI.choice;if(!c)return;if(ds.cid!==undefined&&c.cid!==undefined&&String(c.cid)!==String(ds.cid))return;if(NET.on&&c.who!==undefined&&c.who!==seat)return;if(ds.opt==='x'&&!c.cancel)return;UI.choice=null;if(ds.opt==='x'){refresh();return}c.cb(ds.opt);if(!UI.choice)refresh();return}
   if(false){const p=null,hidden=0;
-    UI.choice={title:mname(p),text:`${MONS[p.m].d}. ${p.alive?`${p.hp}/${maxhp(p)} hearts, ${p.vp} stars, ${p.en} energy${mbOn()?`, ${p.mb} Mindbug token${p.mb===1?'':'s'}`:''}, in ${where(p.i)}.`:'Knocked out.'} Cards: ${p.cards.length?p.cards.map(c=>CARDS[base(c)].n+' ('+CARDS[base(c)].x+')').join(' · '):'none'}.${p.evo.length?' Evolutions in play: '+p.evo.map(e=>evoName(e)+' ('+evoText(e)+')').join(' · ')+'.':''}${p.hand.length?` ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand${hidden?' (hidden)':': '+p.hand.map(evoName).join(', ')}.`:''}`,options:[],cancel:true};render();return}
+    UI.choice={title:mname(p),text:`${MONS[p.m].d}. ${p.alive?`${p.hp}/${maxhp(p)} hearts, ${p.vp} stars, ${p.en} energy${mbOn()?`, ${p.mb} Brainjack token${p.mb===1?'':'s'}`:''}, in ${where(p.i)}.`:'Knocked out.'} Cards: ${p.cards.length?p.cards.map(c=>CARDS[base(c)].n+' ('+CARDS[base(c)].x+')').join(' · '):'none'}.${p.evo.length?' Evolutions in play: '+p.evo.map(e=>evoName(e)+' ('+evoText(e)+')').join(' · ')+'.':''}${p.hand.length?` ${p.hand.length} evolution card${p.hand.length===1?'':'s'} in hand${hidden?' (hidden)':': '+p.hand.map(evoName).join(', ')}.`:''}`,options:[],cancel:true};render();return}
   if(!G||G.winner&&ds.act!=='again')return;
   if(ds.act==='again'){UI.info=true;render();return}
   if(!(isHuman(G.active)&&(!NET.on||G.active===seat))||UI.choice||UI.busy)return;

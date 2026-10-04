@@ -1,5 +1,5 @@
 /* ---------- card data. Names and wording are original; cost, type and effect follow the published cards (see audit-inventory.md). ---------- */
-/* t: K keep, D discard (use now), C consumable (Mindbug keyword card), U costume, W wickedness tile. v = computer's rough value of a keep card. */
+/* t: K keep, D discard (use now), C consumable (Brainjack keyword card), U costume, W menace tile. v = computer's rough value of a keep card. */
 const CARDS={
  acid:{n:'Corrosive Drool',c:6,t:'K',v:6,x:'Add a claw to your roll every turn, even when you roll none.'},
  cosmic:{n:'Cosmic Gut',c:3,t:'K',v:4,x:'Power cards cost you 1 energy less.'},
@@ -65,40 +65,42 @@ const CARDS={
  needle:{n:'Sky Needle',c:6,t:'D',x:'Gain 4 stars.'},
  tanks:{n:'Tank Column',c:4,t:'D',x:'Gain 4 stars and lose 3 hearts.'},
  cyclone:{n:'Cyclone',c:6,t:'D',x:'Gain 2 stars. Every other monster loses 1 energy for every 2 it holds.'},
- /* ---- Mindbug expansion: 3 Keep, 4 Discard, 17 Consumables ---- */
- m_free:{n:'Iron Will',c:6,t:'K',v:5,x:'You cannot buy this while you hold a Mindbug token. You get 1 extra reroll each turn.'},
- m_evade:{n:'Slippery Mindbug',c:3,t:'K',v:4,x:'Use this card as a Mindbug token. After using it, give it to the monster you Mindbugged.'},
- m_nobrain:{n:'Empty Skull',c:3,t:'K',v:5,x:'Costs 2 energy more for each Mindbug token you hold. Add a claw to your roll every turn.'},
- m_bug:{n:'Brain Spawn',c:7,t:'D',x:'Gain 1 Mindbug token.'},
- m_dysf:{n:'Faulty Mindbug',c:3,t:'D',x:'Every monster holding at least 1 Mindbug token, you included, loses 3 hearts.'},
+ /* ---- Brainjack expansion: 3 Keep, 4 Discard, 17 Consumables ---- */
+ m_free:{n:'Iron Will',c:6,t:'K',v:5,x:'You cannot buy this while you hold a Brainjack token. You get 1 extra reroll each turn.'},
+ m_evade:{n:'Slippery Brainjack',c:3,t:'K',v:4,x:'Use this card as a Brainjack token. After using it, give it to the monster you Brainjacked.'},
+ m_nobrain:{n:'Empty Skull',c:3,t:'K',v:5,x:'Costs 2 energy more for each Brainjack token you hold. Add a claw to your roll every turn.'},
+ m_bug:{n:'Brain Spawn',c:7,t:'D',x:'Gain 1 Brainjack token.'},
+ m_dysf:{n:'Faulty Brainjack',c:3,t:'D',x:'Every monster holding at least 1 Brainjack token, you included, loses 3 hearts.'},
  m_treas:{n:'Buried Loot',c:3,t:'D',x:'Buy a consumable card from the discard pile for 3 energy less.'},
- m_mirac:{n:'Last-Ditch Mindbug',c:4,t:'D',x:'Buy this only with 3 hearts or fewer. Lose all your stars, go back to 10 hearts and gain 1 Mindbug token.'},
- m_trap:{n:'Gear-Laden Trapper',c:3,t:'C',kws:['Hunter'],x:'HUNTER. If you knock out the hunted monster, gain 5 energy.'},
- m_legend:{n:'Famous Tracker',c:4,t:'C',kws:['Hunter'],x:'HUNTER. If you knock out the hunted monster, gain 4 stars.'},
- m_unrel:{n:'Wobbly Scope',c:2,t:'C',kws:['Hunter'],x:'HUNTER. If you do not knock out the hunted monster, give it this card.'},
- m_alloy:{n:'Shifty Alloy',c:5,t:'C',kws:['Sneaky'],x:'SNEAKY. This turn you may treat one of your 1s as any face.'},
- m_offp:{n:'Assault Routine',c:6,t:'C',kws:['Sneaky'],x:'SNEAKY. Each star the other monsters lose this way also costs them 1 heart.'},
- m_scept:{n:'Occult Rod',c:7,t:'C',kws:['Sneaky'],x:'SNEAKY. Take any consumable card from the discard pile for free.'},
- m_earm:{n:'Charged Plating',c:6,t:'C',kws:['Tough'],x:'TOUGH. Gain 1 energy for each heart you would have lost.'},
- m_strange:{n:'Odd Blueprint',c:3,t:'C',kws:['Tough'],x:'TOUGH. Then lose 2 hearts.'},
- m_ances:{n:'Elder Ward',c:4,t:'C',kws:['Tough'],x:'TOUGH. For the rest of this turn you may pay 2 energy to heal 1 heart, as often as you like.'},
- m_petal:{n:'Venom Blossom',c:5,t:'C',kws:['Poison'],x:'POISON. The attacker also loses 1 star for each heart you lost.'},
- m_cryst:{n:'Blast Geode',c:4,t:'C',kws:['Poison'],x:'POISON. If you are knocked out this turn, the attacker loses twice the hearts you lost.'},
- m_whip:{n:'Shock Lash',c:4,t:'C',kws:['Poison'],x:'POISON. The attacker also loses 1 energy for each heart you lost.'},
- m_bold:{n:'Reckless Charge',c:4,t:'C',kws:['Frenzy'],x:'FRENZY. At the end of your Frenzy turn, lose 5 hearts.'},
- m_gift:{n:'Rigged Present',c:4,t:'C',kws:['Frenzy'],x:'FRENZY. At the end of your Frenzy turn, lose 5 stars.'},
- m_maxe:{n:'All-Out Push',c:4,t:'C',kws:['Frenzy'],x:'FRENZY. After your Frenzy turn, roll 1 die fewer for the rest of the game.'},
- m_shell:{n:'Spiked Carapace',c:4,t:'C',kws:['Poison','Tough'],x:'POISON or TOUGH (you choose when you use it). No other effect.'},
- m_spat:{n:'Void Stalker',c:5,t:'C',kws:['Sneaky','Hunter'],x:'SNEAKY or HUNTER. If you knock out the hunted monster, gain 1 star per heart you made it lose.'}};
-Object.values(CARDS).forEach(C=>{if(C.kws)C.kw=C.kws.join('/')});
+ m_mirac:{n:'Last-Ditch Brainjack',c:4,t:'D',x:'Buy this only with 3 hearts or fewer. Lose all your stars, go back to 10 hearts and gain 1 Brainjack token.'},
+ m_trap:{n:'Gear-Laden Trapper',c:3,t:'C',kws:['Hunter'],x:'LOCK-ON. If you knock out the locked-on monster, gain 5 energy.'},
+ m_legend:{n:'Famous Tracker',c:4,t:'C',kws:['Hunter'],x:'LOCK-ON. If you knock out the locked-on monster, gain 4 stars.'},
+ m_unrel:{n:'Wobbly Scope',c:2,t:'C',kws:['Hunter'],x:'LOCK-ON. If you do not knock out the locked-on monster, give it this card.'},
+ m_alloy:{n:'Shifty Alloy',c:5,t:'C',kws:['Sneaky'],x:'SLINK. This turn you may treat one of your 1s as any face.'},
+ m_offp:{n:'Assault Routine',c:6,t:'C',kws:['Sneaky'],x:'SLINK. Each star the other monsters lose this way also costs them 1 heart.'},
+ m_scept:{n:'Occult Rod',c:7,t:'C',kws:['Sneaky'],x:'SLINK. Take any consumable card from the discard pile for free.'},
+ m_earm:{n:'Charged Plating',c:6,t:'C',kws:['Tough'],x:'HARDENED. Gain 1 energy for each heart you would have lost.'},
+ m_strange:{n:'Odd Blueprint',c:3,t:'C',kws:['Tough'],x:'HARDENED. Then lose 2 hearts.'},
+ m_ances:{n:'Elder Ward',c:4,t:'C',kws:['Tough'],x:'HARDENED. For the rest of this turn you may pay 2 energy to heal 1 heart, as often as you like.'},
+ m_petal:{n:'Venom Blossom',c:5,t:'C',kws:['Poison'],x:'VENOM. The attacker also loses 1 star for each heart you lost.'},
+ m_cryst:{n:'Blast Geode',c:4,t:'C',kws:['Poison'],x:'VENOM. If you are knocked out this turn, the attacker loses twice the hearts you lost.'},
+ m_whip:{n:'Shock Lash',c:4,t:'C',kws:['Poison'],x:'VENOM. The attacker also loses 1 energy for each heart you lost.'},
+ m_bold:{n:'Reckless Charge',c:4,t:'C',kws:['Frenzy'],x:'ENCORE. At the end of your encore turn, lose 5 hearts.'},
+ m_gift:{n:'Rigged Present',c:4,t:'C',kws:['Frenzy'],x:'ENCORE. At the end of your encore turn, lose 5 stars.'},
+ m_maxe:{n:'All-Out Push',c:4,t:'C',kws:['Frenzy'],x:'ENCORE. After your encore turn, roll 1 die fewer for the rest of the game.'},
+ m_shell:{n:'Spiked Carapace',c:4,t:'C',kws:['Poison','Tough'],x:'VENOM or HARDENED (you choose when you use it). No other effect.'},
+ m_spat:{n:'Void Stalker',c:5,t:'C',kws:['Sneaky','Hunter'],x:'SLINK or LOCK-ON. If you knock out the locked-on monster, gain 1 star per heart you made it lose.'}};
 const KWHELP={Hunter:'Use before rolling. Pick any monster, even one in the same place as you: it is the only target of your claws this turn.',
  Sneaky:'Use before rolling. When you resolve your roll, every other monster loses as many stars as your number dice score.',
  Poison:'Use when claws make you lose hearts. The attacker loses as many hearts as you do.',
  Tough:'Use when claws are about to make you lose hearts. You lose none.',
- Frenzy:'Use at the end of your turn. Take another turn right away (a Frenzy turn), with the card’s drawback at the end of it.'};
+ Frenzy:'Use at the end of your turn. Take another turn right away (an encore turn), with the card’s drawback at the end of it.'};
+/* the names the keywords are shown under (the keys above are internal ids) */
+const KWN={Hunter:'Lock-on',Sneaky:'Slink',Poison:'Venom',Tough:'Hardened',Frenzy:'Encore'};
+Object.values(CARDS).forEach(C=>{if(C.kws)C.kw=C.kws.map(w=>KWN[w]).join('/')});
 const BASEDECK=[...Object.keys(CARDS).filter(k=>!k.startsWith('m_')),'skull#2','sirens#2'];
 const MBDECK=Object.keys(CARDS).filter(k=>k.startsWith('m_'));
-/* ---- Halloween costumes (12) ---- */
+/* ---- Costumes (12) ---- */
 const COSTUMES={
  c_astro:{n:'Space Helmet',c:4,t:'U',v:6,x:'If you reach 17 stars, you win.'},
  c_ghost:{n:'Bedsheet Ghost',c:4,t:'U',v:4,x:'At the end of each monster’s turn, if you lost any hearts during it, gain 1 heart.'},
@@ -112,7 +114,7 @@ const COSTUMES={
  c_robot:{n:'Tin Robot Suit',c:4,t:'U',v:4,x:'You may lose energy instead of hearts.'},
  c_statue:{n:'Torch Crown',c:4,t:'U',v:5,x:'You get 1 extra reroll each turn.'},
  c_clown:{n:'Clown Nose',c:3,t:'U',v:3,x:'If your dice show 1, 2, 3, heart, claw and energy, you may change every die to any face.'}};
-/* ---- Dark Edition wickedness tiles (side A: 4 at level 3, 4 at level 6, 2 at level 10) ---- */
+/* ---- Menace tiles (side A: 4 at level 3, 4 at level 6, 2 at level 10) ---- */
 const WTILES={
  w_dev:{n:'Sly',lv:3,t:'W',v:6,x:'You get 1 extra reroll each turn.'},
  w_eter:{n:'Undying',lv:3,t:'W',v:5,x:'At the start of your turn, gain 1 heart.'},
@@ -125,17 +127,17 @@ const WTILES={
  w_anti:{n:'Null Beam',lv:10,t:'W',v:9,x:'Double all your claws.'},
  w_sky:{n:'Sky Lance',lv:10,t:'W',v:7,x:'Gain 1 extra energy for each energy die and 1 extra heart for each heart die.'}};
 Object.assign(CARDS,WTILES,COSTUMES);
-/* ---- Anubis curses (24). x = permanent rule, a = Ankh result, s = Snake result ---- */
+/* ---- Curses (24). x = permanent rule, a = Ankh result, s = Snake result ---- */
 const CURSES={
  k_ego:{n:'Pharaoh’s Pride',x:'No monster can yield the city.',a:'Leave the city; you cannot enter it this turn.',s:'Take over Downtown.'},
- k_isis:{n:'Goddess’s Scorn',x:'Only the Golden Scarab holder can gain hearts.',a:'Take the Golden Scarab.',s:'Lose 1 heart.'},
- k_thot:{n:'Blind Scribe God',x:'Only the Golden Scarab holder can gain energy.',a:'Take the Golden Scarab.',s:'Lose 2 energy.'},
- k_tut:{n:'Boy King’s Hex',x:'Only the Golden Scarab holder can gain stars.',a:'Take the Golden Scarab.',s:'Lose 2 stars.'},
+ k_isis:{n:'Goddess’s Scorn',x:'Only the Brass Beetle holder can gain hearts.',a:'Take the Brass Beetle.',s:'Lose 1 heart.'},
+ k_thot:{n:'Blind Scribe God',x:'Only the Brass Beetle holder can gain energy.',a:'Take the Brass Beetle.',s:'Lose 2 energy.'},
+ k_tut:{n:'Boy King’s Hex',x:'Only the Brass Beetle holder can gain stars.',a:'Take the Brass Beetle.',s:'Lose 2 stars.'},
  k_sand:{n:'Swallowed by Sand',x:'Everyone gets 1 reroll fewer.',a:'Take 1 extra reroll this turn.',s:'Your claws do nothing this turn.'},
  k_flood:{n:'Great Flood',x:'Everyone rolls 1 die fewer.',a:'Add an extra die showing the face of your choice.',s:'Discard 1 of your dice.'},
- k_hotep:{n:'Enforced Truce',x:'Only the Golden Scarab holder can use claws.',a:'Take the Golden Scarab.',s:'Lose 1 energy for each claw you rolled.'},
+ k_hotep:{n:'Enforced Truce',x:'Only the Brass Beetle holder can use claws.',a:'Take the Brass Beetle.',s:'Lose 1 energy for each claw you rolled.'},
  k_set:{n:'Desert Tempest',x:'At the start of your turn, lose 1 heart.',a:'Gain 2 hearts.',s:'Lose 1 heart.'},
- k_build:{n:'Workers’ Revolt',x:'At the start of your turn, lose 2 stars.',a:'If you are outside the city, take another turn after this one, without the Die of Fate.',s:'Lose 2 stars.'},
+ k_build:{n:'Workers’ Revolt',x:'At the start of your turn, lose 2 stars.',a:'If you are outside the city, take another turn after this one, without the Omen Die.',s:'Lose 2 stars.'},
  k_offer:{n:'Stingy Offering',x:'Power cards cost 2 energy more.',a:'Take the top power card of the deck for free.',s:'Discard one of your Keep cards.'},
  k_ra:{n:'Kneel to the Sun',x:'Nobody can have more than 8 hearts.',a:'Gain 2 hearts.',s:'Lose 2 hearts.'},
  k_horus:{n:'Falcon’s Revenge',x:'Nobody can reroll claws.',a:'Gain 1 star for each claw you rolled.',s:'Lose 1 heart for each claw you rolled.'},
@@ -143,17 +145,17 @@ const CURSES={
  k_wealthy:{n:'Trial of Riches',x:'At the start of each turn, the monster(s) with the most stars lose 1 star.',a:'Gain 2 stars.',s:'The monster(s) with the most stars lose 1 star.'},
  k_spirit:{n:'Trial of Spirit',x:'At the start of each turn, the monster(s) with the most energy lose 1 energy.',a:'Gain 2 energy.',s:'The monster(s) with the most energy lose 1 energy.'},
  k_osiris:{n:'Rise of the Dead King',x:'Only monsters in the city can use heart dice.',a:'Take over Downtown.',s:'Leave the city; you cannot enter it this turn.'},
- k_library:{n:'Sealed Archive',x:'Only the Golden Scarab holder can buy power cards.',a:'Take the Golden Scarab.',s:'Discard one of your Keep cards.'},
- k_confuse:{n:'Muddled Senses',x:'After the Die of Fate, the Golden Scarab holder may make you reroll up to 2 of your dice.',a:'Take the Golden Scarab.',s:'The Golden Scarab holder gains the hearts and energy you would gain this turn instead of you.'},
- k_skin:{n:'Gilded Hide',x:'The Golden Scarab holder cannot lose hearts.',a:'Take the Golden Scarab.',s:'Give the Golden Scarab holder 2 of your hearts, energy or stars (any mix).'},
- k_khepri:{n:'Beetle’s Uprising',x:'At the start of each turn, the Golden Scarab holder gives the monster whose turn it is 1 heart, 1 energy or 1 star.',a:'Take the Golden Scarab and give it to any monster.',s:'Take the Golden Scarab.'},
+ k_library:{n:'Sealed Archive',x:'Only the Brass Beetle holder can buy power cards.',a:'Take the Brass Beetle.',s:'Discard one of your Keep cards.'},
+ k_confuse:{n:'Muddled Senses',x:'After the Omen Die, the Brass Beetle holder may make you reroll up to 2 of your dice.',a:'Take the Brass Beetle.',s:'The Brass Beetle holder gains the hearts and energy you would gain this turn instead of you.'},
+ k_skin:{n:'Gilded Hide',x:'The Brass Beetle holder cannot lose hearts.',a:'Take the Brass Beetle.',s:'Give the Brass Beetle holder 2 of your hearts, energy or stars (any mix).'},
+ k_khepri:{n:'Beetle’s Uprising',x:'At the start of each turn, the Brass Beetle holder gives the monster whose turn it is 1 heart, 1 energy or 1 star.',a:'Take the Brass Beetle and give it to any monster.',s:'Take the Brass Beetle.'},
  k_ka:{n:'Body and Soul',x:'Only claw, heart and energy faces can be used.',a:'The curse does not affect you this turn.',s:'The curse is flipped for you this turn: claw, heart and energy faces cannot be used.'},
  k_false:{n:'Poisoned Gift',x:'Everyone rolls 2 extra dice and gets 1 extra reroll, then loses 1 heart for each different face rolled.',a:'Pick up to 2 of your dice and reroll or discard each.',s:'The monster on your left picks 2 of your dice for you to reroll.'},
  k_sphinx:{n:'Stare of the Sphinx',x:'Keep cards and permanent evolutions have no effect.',a:'Draw an evolution card, or gain 3 energy.',s:'Discard an evolution card (from your hand or in play), or lose 3 energy.'},
  k_scribe:{n:'Stubborn Scribe',x:'Nobody can reroll 1s.',a:'Gain 1 energy for each 1 you rolled.',s:'Discard one of your 1s.'}};
-/* ---- Power Up! evolutions: 8 per monster. t: P permanent, T temporary. w: when it is played (see evoUsable). kws: Mindbug keyword. ---- */
+/* ---- Evolutions: 8 per monster. t: P permanent, T temporary. w: when it is played (see evoUsable). kws: Brainjack keyword. ---- */
 const EVO={
- /* Glacyx (Space Penguin) */
+ /* Glacyx */
  11:{n:'Frost Beam',t:'P',w:'perm',x:'When you wound a monster in the city, hand it this card. At the start of its turn you name a die face that does nothing for it that turn. You take the card back at the end of that turn.'},
  12:{n:'Lucky Scoop',t:'P',w:'perm',x:'Once per turn in your buy step, reveal a random card from the discard pile. Buy it for 1 energy less, or put it back.'},
  13:{n:'Ice Plunge',t:'T',w:'now',x:'Look at the top 3 power cards of the deck. Play one of them for free and put the others at the bottom.'},
@@ -162,7 +164,7 @@ const EVO={
  16:{n:'Whiteout',t:'T',w:'now',x:'Until the start of your next turn, every monster gets a single roll and nobody can yield the city.'},
  17:{n:'Black Ice Gem',t:'P',w:'perm',x:'Gain 1 extra star each time you take over the city, or choose to stay in it when you could have yielded.'},
  18:{n:'Mirror Frost',t:'P',w:'perm',x:'Pick a permanent evolution any monster has in play: this card copies it.'},
- /* Squidrik (Alienoid set, re-themed: storm drains) */
+ /* Squidrik (storm drains) */
  21:{n:'Sewer Legend',t:'T',w:'now',x:'Gain 2 stars.'},
  22:{n:'Gutter Treasure',t:'T',w:'now',x:'Turn over deck cards until you find a Keep card costing 4 or less. Play it for free; discard the rest.'},
  23:{n:'Ink Rage',t:'T',w:'now',x:'Gain 1 energy for each heart you lost this turn.'},
@@ -171,7 +173,7 @@ const EVO={
  26:{n:'Extra Tentacles',t:'P',w:'perm',x:'Before rolling you may put 2 energy on this card. If you then roll at least 3 claws, take them back and each monster you wound loses 2 extra hearts. If not, the energy is lost and you lose 2 hearts.'},
  27:{n:'Puddle Tonic',t:'P',w:'perm',x:'Once during your turn, you may pay 1 energy to gain 1 heart.'},
  28:{n:'Barnacle Hoard',t:'P',w:'perm',x:'You may buy Keep cards for half their cost (round up) and put a barnacle token on them. At the start of your turn roll a die for each: discard it on a claw. At most 3 barnacle tokens at a time.'},
- /* Voltusk (Cyber Kitty set, re-themed: power grid) */
+ /* Voltusk (power grid) */
  31:{n:'Blackout Reboot',t:'T',w:'react',x:'When you drop to 0 hearts: discard all your cards and evolutions, lose all energy and stars and leave the city. Then gain 9 hearts and 9 stars and keep playing.'},
  32:{n:'Grid Tax',t:'T',w:'now',x:'Each other monster gives you 1 energy or 1 star, if it has any (it chooses).'},
  33:{n:'Static Burst',t:'T',w:'now',x:'Every other monster loses 1 heart.'},
@@ -180,7 +182,7 @@ const EVO={
  36:{n:'Grid Surge',t:'P',w:'perm',x:'In another monster’s Enter step, if Downtown is empty and you were not in the city at the start of the turn, you may move in instead.'},
  37:{n:'Spark Hunter',t:'P',w:'perm',x:'If you roll at least one 1, gain 1 star.'},
  38:{n:'Tusk Charge',t:'P',w:'perm',x:'If you roll at least one 1, add a claw to your roll.'},
- /* Shroomhulk (The King) */
+ /* Shroomhulk */
  41:{n:'Spore Rush',t:'T',w:'react',x:'When the monster holding Downtown leaves it or is knocked out, move in yourself.'},
  42:{n:'Quick Scurry',t:'T',w:'react',x:'Play when you would lose hearts or when you yield: you lose no hearts this turn.'},
  43:{n:'Rampant Growth',t:'T',w:'react',x:'After your Enter step: if you wounded a monster in the city and did not move in, take another turn after this one.'},
@@ -189,7 +191,7 @@ const EVO={
  46:{n:'Top Fungus',t:'P',w:'perm',x:'On each turn you wound at least one monster, gain 1 star.'},
  47:{n:'Lord of the Rot',t:'P',w:'perm',x:'Gain 1 extra star when you take over the city or start your turn there.'},
  48:{n:'Crown of Mould',t:'P',w:'city',x:'Play while you are in the city. Gain 1 star at the end of every monster’s turn. If you leave the city, discard this card and lose all your stars.'},
- /* Magmaw (Giga Zaur) */
+ /* Magmaw */
  51:{n:'Shed Claw',t:'T',w:'react',x:'Play when you would lose hearts: you lose no hearts this turn.'},
  52:{n:'Magma Bath',t:'T',w:'now',x:'Gain 2 energy and 1 heart.'},
  53:{n:'Lava Roar',t:'T',w:'now',x:'Every other monster loses 2 stars.'},
@@ -198,7 +200,7 @@ const EVO={
  56:{n:'Magma Glare',t:'P',w:'perm',x:'Monsters that wound you lose 1 star.'},
  57:{n:'Fire Spit',t:'P',w:'perm',x:'Once per turn you may turn one of your dice into a claw.'},
  58:{n:'Pincer Sweep',t:'P',w:'perm',x:'Once per turn you may turn one of your dice into a 1 or a 2.'},
- /* Boltbox (Meka Dragon) */
+ /* Boltbox */
  61:{n:'Overdrive Blast',t:'T',w:'roll',x:'Play before resolving: each monster you wound this turn loses 2 extra hearts.'},
  62:{n:'Damage Scan',t:'T',w:'now',x:'Gain 1 energy for each claw you rolled this turn.'},
  63:{n:'Wreck Protocol',t:'P',w:'perm',x:'Gain 3 stars and 2 energy each time another monster drops to 0 hearts.'},
@@ -207,37 +209,37 @@ const EVO={
  66:{n:'Arc Shielding',t:'P',w:'perm',x:'When you lose hearts, roll a die for each heart lost. For each claw, the monster whose turn it is loses 1 heart.'},
  67:{n:'Steel Talons',t:'P',w:'perm',x:'On your turn, a monster you make lose 3 or more hearts loses 1 extra heart.'},
  68:{n:'Lock-On',t:'P',w:'perm',x:'When a monster wounds you, you may give it the target token. The target loses 1 extra heart each time you make it lose hearts.'},
- /* Bramblebat (Gigasnail Hydra set, re-themed: thorns and neon) */
+ /* Bramblebat (thorns and neon) */
  611:{n:'Bramble Regrowth',t:'T',w:'react',x:'When you drop to 0 hearts you are not knocked out: gain 3 hearts, then roll 1 die fewer for the rest of the game.'},
  612:{n:'Bramble Regrowth',t:'P',w:'perm',x:'When you drop to 0 hearts you are not knocked out: gain 3 hearts, then roll 1 die fewer for the rest of the game. Then discard this card.'},
  613:{n:'Sap Surge',t:'P',w:'perm',x:'Once per turn you may pay 1 energy to discard 2 of your dice and add a die showing any face.'},
- 614:{n:'Triple Bark',t:'T',w:'kw',kws:['Tough'],x:'TOUGH. If you must lose exactly 3 hearts, gain 3 hearts instead.'},
+ 614:{n:'Triple Bark',t:'T',w:'kw',kws:['Tough'],x:'HARDENED. If you must lose exactly 3 hearts, gain 3 hearts instead.'},
  615:{n:'Spooky Screech',t:'P',w:'perm',x:'If your roll has exactly three 3s, take 1 star from the monster with the most stars.'},
  616:{n:'Triple Thorns',t:'P',w:'perm',x:'If your roll has exactly 3 identical dice, every other monster loses 1 heart.'},
  617:{n:'Moonlit Brooding',t:'T',w:'roll',x:'Play before resolving. If your roll has exactly 3 hearts, gain 3 hearts and the monster with the fewest hearts gains 1.'},
  618:{n:'Neon Hunger',t:'T',w:'roll',x:'Play before resolving. If your roll has exactly 3 energy, the first power card you buy this turn costs 3 energy less.'},
- /* Cortexa (MasterMindbug) */
- 621:{n:'Brood Purchase',t:'T',w:'now',x:'Pay 6 energy: gain 1 Mindbug token.'},
+ /* Cortexa */
+ 621:{n:'Brood Purchase',t:'T',w:'now',x:'Pay 6 energy: gain 1 Brainjack token.'},
  622:{n:'Cosmic Intellect',t:'P',w:'perm',x:'Once per turn you may reroll all your energy dice.'},
  623:{n:'Big Brain Energy',t:'T',w:'now',x:'From now on, each time another monster gains 4 or more stars at once, gain 1 star.'},
  624:{n:'Rift Gate',t:'P',w:'perm',x:'When you leave the city, gain 2 energy or 2 hearts.'},
  625:{n:'Friendly Parasite',t:'T',w:'react',x:'When another monster resolves its dice, discard this to gain as many hearts and energy as it does.'},
- 626:{n:'Hive Queen',t:'P',w:'perm',x:'At the start of your turn the others may pledge to you. Choose one of them: it gives you 4 stars and gains 1 Mindbug token.'},
+ 626:{n:'Hive Queen',t:'P',w:'perm',x:'At the start of your turn the others may pledge to you. Choose one of them: it gives you 4 stars and gains 1 Brainjack token.'},
  627:{n:'Puppet Master',t:'T',w:'react',x:'When another monster is about to resolve its dice, pick 3 of them to reroll.'},
  628:{n:'Numbing Stare',t:'T',w:'react',x:'When another monster is about to resolve its dice, it must discard all its claws.'},
- /* Clampede (Sharky Crab-dog set, re-themed: clam and legs) */
- 631:{n:'Snap Ambush',t:'T',w:'kw',kws:['Sneaky'],x:'SNEAKY. Monsters in the city lose 1 extra star.'},
+ /* Clampede (clam and legs) */
+ 631:{n:'Snap Ambush',t:'T',w:'kw',kws:['Sneaky'],x:'SLINK. Monsters in the city lose 1 extra star.'},
  632:{n:'Charge Muncher',t:'P',w:'perm',x:'Once per turn, pay 1 energy to turn one of your hearts into a claw.'},
  633:{n:'Portal Mutation',t:'T',w:'now',x:'Draw the top card of another monster’s evolution deck.'},
  634:{n:'Shell Grab',t:'P',w:'perm',x:'When you wound a monster, it must discard all its power cards, but may pay 1 energy for each one it keeps.'},
- 635:{n:'Hard Shell',t:'T',w:'kw',kws:['Tough'],x:'TOUGH. You may also use this against effects that make you lose hearts.'},
- 636:{n:'Chase the Sparks',t:'T',w:'kw',kws:['Hunter'],x:'HUNTER. If you hunt the monster with the most energy, add 2 claws to your roll.'},
- 637:{n:'Stinging Legs',t:'T',w:'kw',kws:['Poison'],x:'POISON. If you lose 3 hearts or more, every other monster loses 1 heart.'},
- 638:{n:'Hundred-Leg Frenzy',t:'T',w:'kw',kws:['Frenzy'],x:'FRENZY. After your Frenzy turn, lose 2 stars, 2 hearts and 2 energy.'}};
-Object.values(EVO).forEach(E=>{if(E.kws)E.kw=E.kws.join('/')});
-/* MONS index -> evolution group (Glacyx=Space Penguin 1, Squidrik=Alienoid 2, Voltusk=Cyber Kitty 3, Shroomhulk=The King 4, Magmaw=Giga Zaur 5, Boltbox=Meka Dragon 6, Cortexa=MasterMindbug 62, Clampede=Sharky Crab-dog 63, Bramblebat=Gigasnail Hydra 61) */
+ 635:{n:'Hard Shell',t:'T',w:'kw',kws:['Tough'],x:'HARDENED. You may also use this against effects that make you lose hearts.'},
+ 636:{n:'Chase the Sparks',t:'T',w:'kw',kws:['Hunter'],x:'LOCK-ON. If you lock on to the monster with the most energy, add 2 claws to your roll.'},
+ 637:{n:'Stinging Legs',t:'T',w:'kw',kws:['Poison'],x:'VENOM. If you lose 3 hearts or more, every other monster loses 1 heart.'},
+ 638:{n:'Hundred-Leg Frenzy',t:'T',w:'kw',kws:['Frenzy'],x:'ENCORE. After your encore turn, lose 2 stars, 2 hearts and 2 energy.'}};
+Object.values(EVO).forEach(E=>{if(E.kws)E.kw=E.kws.map(w=>KWN[w]).join('/')});
+/* MONS index -> evolution group (Glacyx 1, Squidrik 2, Voltusk 3, Shroomhulk 4, Magmaw 5, Boltbox 6, Cortexa 62, Clampede 63, Bramblebat 61) */
 
 /* one-line gist shown in bold above each evolution's full text */
-const EVOG={11:'Hit the city monster and blank one of its dice faces',12:'Buy from the discard pile at 1 ⚡ off',13:'Play one of the top 3 deck cards for free',14:'Everyone else rolls 1 die fewer',15:'Pay 1 ⚡ to protect a die from tampering',16:'One roll each, and nobody can yield',17:'+1 ★ whenever you take or hold the city',18:"Copy another monster's permanent evolution",21:'Gain 2 ★ right now',22:'A free Keep card (cost 4 or less)',23:'1 ⚡ for every heart you lost this turn',24:'3 free swaps of the cards for sale',25:'Three 2s also hit everyone for 1',26:'Bet 2 ⚡ on a big claw roll',27:'Once a turn, 1 ⚡ buys 1 heart',28:'Buy Keep cards at half price (they may fall off)',31:'Come back from a K.O. with 9 ♥ and 9 ★',32:'Everyone pays you 1 ⚡ or 1 ★',33:'Everyone else loses 1 heart',34:'One roll only, but it counts double',35:'Trade some damage for their ★ and ⚡',36:"Sneak into Downtown on someone else's turn",37:'+1 ★ whenever you roll a 1',38:'+1 claw whenever you roll a 1',41:'Take Downtown the moment it empties',42:'Lose no hearts this turn',43:'Hit the city and stay out: take another turn',44:'Gain 2 hearts right now',45:'Force the monsters you hit out of the city',46:'+1 ★ each turn you wound someone',47:'+1 ★ entering or starting in the city',48:'+1 ★ every turn you hold the city (lose all if you leave)',51:'Lose no hearts this turn',52:'Gain 2 ⚡ and 1 heart right now',53:'Everyone else loses 2 ★',54:'Turn all dice of one face into another',55:'Starting in the city costs everyone else 1 ★',56:'Whoever hurts you loses 1 ★',57:'Once a turn, turn a die into a claw',58:'Once a turn, turn a die into a 1 or a 2',61:'Your claws hit 2 harder this turn',62:'1 ⚡ for each claw you rolled',63:'+3 ★ and +2 ⚡ whenever a monster falls',64:'Skip a turn to repair: +4 ♥ and +2 ⚡',65:'Hitting the city also hits the others outside',66:'Hit back when you are hurt',67:'Big hits hit 1 harder',68:'Mark an attacker: it takes +1 from you',611:'Survive one K.O. (then roll one die fewer)',612:'Survive one K.O. (then roll one die fewer)',613:'Pay 1 ⚡: swap 2 dice for one die of any face',614:'Exactly 3 damage heals you instead',615:'Three 3s steal a star from the leader',616:'Three of a kind also hits everyone for 1',617:'Three hearts heal 3 extra',618:'Three energy: your next card is 3 ⚡ cheaper',621:'Pay 6 ⚡ for another 🧠 token',622:'Once a turn, reroll your energy dice',623:'+1 ★ whenever someone scores 4+ ★ at once',624:'Leaving the city pays 2 ⚡ or 2 hearts',625:"Copy another monster's healing and energy",626:'Rivals may pledge 4 ★ to you',627:"Reroll 3 of a rival's dice",628:'A rival loses all its claws',631:'A sneaky strike that also costs the city 1 ★',632:'1 ⚡: turn a heart into a claw',633:"Take a card from a rival's evolution deck",634:'Monsters you wound drop their cards',635:'Shrug off one big heart loss',636:'Hunt the richest monster with 2 extra claws',637:'Big hits on you poison everyone',638:'Take a frenzy turn (costs 2 ★, 2 ♥, 2 ⚡)'};
+const EVOG={11:'Hit the city monster and blank one of its dice faces',12:'Buy from the discard pile at 1 ⚡ off',13:'Play one of the top 3 deck cards for free',14:'Everyone else rolls 1 die fewer',15:'Pay 1 ⚡ to protect a die from tampering',16:'One roll each, and nobody can yield',17:'+1 ★ whenever you take or hold the city',18:"Copy another monster's permanent evolution",21:'Gain 2 ★ right now',22:'A free Keep card (cost 4 or less)',23:'1 ⚡ for every heart you lost this turn',24:'3 free swaps of the cards for sale',25:'Three 2s also hit everyone for 1',26:'Bet 2 ⚡ on a big claw roll',27:'Once a turn, 1 ⚡ buys 1 heart',28:'Buy Keep cards at half price (they may fall off)',31:'Come back from a K.O. with 9 ♥ and 9 ★',32:'Everyone pays you 1 ⚡ or 1 ★',33:'Everyone else loses 1 heart',34:'One roll only, but it counts double',35:'Trade some damage for their ★ and ⚡',36:"Sneak into Downtown on someone else's turn",37:'+1 ★ whenever you roll a 1',38:'+1 claw whenever you roll a 1',41:'Take Downtown the moment it empties',42:'Lose no hearts this turn',43:'Hit the city and stay out: take another turn',44:'Gain 2 hearts right now',45:'Force the monsters you hit out of the city',46:'+1 ★ each turn you wound someone',47:'+1 ★ entering or starting in the city',48:'+1 ★ every turn you hold the city (lose all if you leave)',51:'Lose no hearts this turn',52:'Gain 2 ⚡ and 1 heart right now',53:'Everyone else loses 2 ★',54:'Turn all dice of one face into another',55:'Starting in the city costs everyone else 1 ★',56:'Whoever hurts you loses 1 ★',57:'Once a turn, turn a die into a claw',58:'Once a turn, turn a die into a 1 or a 2',61:'Your claws hit 2 harder this turn',62:'1 ⚡ for each claw you rolled',63:'+3 ★ and +2 ⚡ whenever a monster falls',64:'Skip a turn to repair: +4 ♥ and +2 ⚡',65:'Hitting the city also hits the others outside',66:'Hit back when you are hurt',67:'Big hits hit 1 harder',68:'Mark an attacker: it takes +1 from you',611:'Survive one K.O. (then roll one die fewer)',612:'Survive one K.O. (then roll one die fewer)',613:'Pay 1 ⚡: swap 2 dice for one die of any face',614:'Exactly 3 damage heals you instead',615:'Three 3s steal a star from the leader',616:'Three of a kind also hits everyone for 1',617:'Three hearts heal 3 extra',618:'Three energy: your next card is 3 ⚡ cheaper',621:'Pay 6 ⚡ for another 🧠 token',622:'Once a turn, reroll your energy dice',623:'+1 ★ whenever someone scores 4+ ★ at once',624:'Leaving the city pays 2 ⚡ or 2 hearts',625:"Copy another monster's healing and energy",626:'Rivals may pledge 4 ★ to you',627:"Reroll 3 of a rival's dice",628:'A rival loses all its claws',631:'A slinking strike that also costs the city 1 ★',632:'1 ⚡: turn a heart into a claw',633:"Take a card from a rival's evolution deck",634:'Monsters you wound drop their cards',635:'Shrug off one big heart loss',636:'Lock on to the richest monster with 2 extra claws',637:'Big hits on you poison everyone',638:'Take an encore turn (costs 2 ★, 2 ♥, 2 ⚡)'};
 const MEVO=[3,2,5,4,6,1,62,63,61];
 const evoDeckOf=m=>{const g=MEVO[m];return [1,2,3,4,5,6,7,8].map(k=>g*10+k)};

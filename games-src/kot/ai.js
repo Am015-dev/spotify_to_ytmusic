@@ -2,14 +2,14 @@
 /* what a set of dice would give monster p (for previews and computer decisions); follows resolveCore closely */
 function scoreDice(p,dice){const c=countsOf(dice);const tf=G.tf||{};const act=p.i===G.active;
   if(act&&tf.void)c[tf.void]=0;if(curseOn('k_ka')&&!(act&&tf.kaOff)){c['1']=c['2']=c['3']=0}if(curseOn('k_hotep')&&scarab()!==p.i)c.C=0;if(act&&tf.noClaw)c.C=0;if(act&&tf.catnip)for(const f in c)c[f]*=2;
-  let vp=0,en=0,hl=0,dmg=0,kill=false,targets=[],add=0;const inT=inTokyo(p.i);
+  let vp=0,en=0,hl=0,dmg=0,kill=false,targets=[],add=0;const inT=inCity(p.i);
   for(const f of ['1','2','3'])if(c[f]>=3){vp+=(+f)+(c[f]-3);if(f==='1')vp+=2*has(p,'gourmand')+has(p,'w_skul');if(f==='2')add+=2*has(p,'quills')}
   if(has(p,'omni')&&c['1']&&c['2']&&c['3'])vp+=2*has(p,'omni');if(has(p,'spree')&&FACES.every(f=>c[f]))vp+=9;
   if(c['1']){vp+=hasE(p,37);add+=hasE(p,38)}
   if(c.E)en=c.E*(1+has(p,'w_sky'))+has(p,'kidfan');
   if(c.H&&canHealDice(p))hl=Math.max(0,Math.min(c.H*(1+has(p,'w_sky'))+has(p,'regrow'),maxhp(p)-p.hp));
   const rolled=c.C>0;let amt=c.C+add+has(p,'acid')+has(p,'m_nobrain')+(inT?has(p,'tunnel'):0)+(rolled?has(p,'barbed')+(inT?has(p,'street'):0):0)+(act?tf.cheer||0:0);if(amt>0&&has(p,'w_anti'))amt*=2;
-  if(amt>0){const H=act&&!G.bug?tf.hunt:null;targets=H&&P(H.t).alive&&H.t!==p.i?[P(H.t)]:has(p,'nova')?others(p):inT?others(p).filter(q=>!inTokyo(q.i)):others(p).filter(q=>inTokyo(q.i));
+  if(amt>0){const H=act&&!G.bug?tf.hunt:null;targets=H&&P(H.t).alive&&H.t!==p.i?[P(H.t)]:has(p,'nova')?others(p):inT?others(p).filter(q=>!inCity(q.i)):others(p).filter(q=>inCity(q.i));
     dmg=amt+(act&&has(p,'c_devil')?1:0)+(act&&tf.mecha?2:0);kill=targets.some(q=>q.hp<=dmg&&!has(q,'c_zombie'))}
   const parts=[];if(vp)parts.push(`${vp} star${vp===1?'':'s'}`);if(en)parts.push(`${en} energy`);if(hl)parts.push(`heal ${hl}`);
   if(c.H&&!canHealDice(p))parts.push('hearts wasted');
@@ -17,22 +17,22 @@ function scoreDice(p,dice){const c=countsOf(dice);const tf=G.tf||{};const act=p.
   if(c.H>=3&&G.evoOn)parts.push('an evolution card');
   const val=vp*1.6+en*0.6+hl*(p.hp<=5?1:0.5)+dmg*targets.length*0.7+(kill?5:0)+(c.H>=3&&G.evoOn?2:0);
   return {vp,en,hl,dmg,kill,targets,val,c,text:parts.length?parts.join(', '):'nothing useful'}}
-function tokyoThreat(p){return alive().filter(q=>q.i!==p.i&&!inTokyo(q.i)).length}
+function cityThreat(p){return alive().filter(q=>q.i!==p.i&&!inCity(q.i)).length}
 function aiYield(q,lost){
   if(q.hp<=0)return true;
   if(q.lvl==='easy')return q.hp<=5?Math.random()<.7:Math.random()<.15;
   if(q.lvl==='hard'&&!HYOLD){const pd=pDeath(q);if(q.vp+2+has(q,'street')>=winAt(q))return pd>PDW;if(has(q,'vjets')&&q.hp<=7)return true;return pd>PDY}
-  if((q.lvl==='hard'||q.lvl==='hard0')){const th=alive().filter(r=>r.i!==q.i&&!inTokyo(r.i)).length*1.25;if(q.vp+2+has(q,'street')>=winAt(q)&&q.hp>th+.5)return false;if(has(q,'vjets')&&q.hp<=7)return true;return q.hp<th+HYB}
-  const threat=tokyoThreat(q);
+  if((q.lvl==='hard'||q.lvl==='hard0')){const th=alive().filter(r=>r.i!==q.i&&!inCity(r.i)).length*1.25;if(q.vp+2+has(q,'street')>=winAt(q)&&q.hp>th+.5)return false;if(has(q,'vjets')&&q.hp<=7)return true;return q.hp<th+HYB}
+  const threat=cityThreat(q);
   if(q.vp>=18&&q.hp>Math.min(4,threat+1))return false;
   if(has(q,'vjets')&&q.hp<=7)return true;
   return q.hp<=Math.max(YA,threat+YB)}
 var PDY=0.2,PDW=0.55,PCL=0.24,HYOLD=true;
 // chance that q is knocked out before its next turn if it stays in the city
-function pDeath(q){const A=alive().filter(r=>r.i!==q.i&&!inTokyo(r.i));let n=0,bonus=0;A.forEach(r=>{n+=6+has(r,'skull');bonus+=has(r,'barbed')+has(r,'acid')+(has(r,'nova')?0:0)});
+function pDeath(q){const A=alive().filter(r=>r.i!==q.i&&!inCity(r.i));let n=0,bonus=0;A.forEach(r=>{n+=6+has(r,'skull');bonus+=has(r,'barbed')+has(r,'acid')+(has(r,'nova')?0:0)});
   const hp=q.hp+(has(q,'plated')?.5:0)+(has(q,'wings')&&q.en>=2?3:0);const need=Math.ceil(hp-bonus*.6);if(need<=0)return 1;
   let pr=0,c=1,pk=Math.pow(1-PCL,n);for(let k=0;k<=n;k++){if(k>=need)pr+=pk;pk=pk*(n-k)/(k+1)*PCL/(1-PCL)}return Math.min(1,pr)}
-function aiMindbug(q,roller){if(q.mb<=0&&!has(q,'m_evade'))return false;
+function aiBrainjack(q,roller){if(q.mb<=0&&!has(q,'m_evade'))return false;
   if(q.lvl==='easy')return scoreDice(q,G.dice).val>10&&Math.random()<.5;
   if((q.lvl==='hard'||q.lvl==='hard0')){const mv=evalDice(q,G.dice),tv=evalDice(roller,G.dice);if(q.vp+scoreDice(q,G.dice).vp>=winAt(q))return true;if(tv>=35)return true;return mv+tv*.7>=(q.mb>1?7:9.5)-(G.turn>=6?1.5:0)}
   const mine=scoreDice(q,G.dice),theirs=scoreDice(roller,G.dice);
@@ -43,14 +43,14 @@ function aiMindbug(q,roller){if(q.mb<=0&&!has(q,'m_evade'))return false;
   return mine.val+theirs.val*0.8>=thr}
 function aiWantsClaws(p){
   if(has(p,'nova'))return true;
-  if(inTokyo(p.i))return true;
+  if(inCity(p.i))return true;
   const occ=[G.city,G.bay].filter(i=>i>=0).map(P);
   if(!occ.length)return false;
   const c=counts().C;
   if(occ.some(o=>o.hp<=c+2))return true;
   return p.hp>=5}
 function aiMark(p){
-  const c=counts();const inT=inTokyo(p.i);const miss=maxhp(p)-p.hp;
+  const c=counts();const inT=inCity(p.i);const miss=maxhp(p)-p.hp;
   let hw=inT?0:(p.hp<=5?miss:p.hp<=7?Math.min(miss,3):Math.min(miss,1));
   if(G.evoOn&&p.edeck.length&&c.H>=2&&(inT||hw<3))hw=Math.max(hw,3);
   const claws=aiWantsClaws(p);
@@ -73,7 +73,7 @@ function aiMarkLvl(p){if(p.lvl==='hard'||p.lvl==='hard0'){const sp=G.dice.filter
     if(sp.length||nd>7){const all=G.dice;sp.forEach(d=>{d.k=d.t==='b'?d.f!=='O':(d.f==='FA'||d.f==='FW'||(d.f==='FE'&&curseBad(p)))});G.dice=all.filter(d=>!d.t);
       try{if(nd>7)aiMark(p);else if(p.lvl==='hard0'||nd>6)aiMarkHard0(p);else aiMarkHard(p)}finally{G.dice=all}return}}if(p.lvl==='hard0')aiMarkHard0(p);else if(p.lvl==='hard'&&!ANIM_FASTTEST)aiMarkHard(p);else{aiMark(p);if(p.lvl==='easy')G.dice.forEach(d=>{if(Math.random()<.3)d.k=!d.k})}}
 var ANIM_FASTTEST=false, HYB=1.5, HEW=0.75;
-function evalDice(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const nc=countsOf(dice.filter(d=>!d.t));const inT=inTokyo(p.i);
+function evalDice(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const nc=countsOf(dice.filter(d=>!d.t));const inT=inCity(p.i);
   const need=winAt(p)-p.vp;const others=alive().filter(q=>q.i!==p.i);const lead=others.reduce((a,q)=>q.vp>a.vp?q:a,{vp:-1});
   let v=s.vp*(1.5+(p.vp>=12?0.9:0)+(need<=4?1.2:0));if(s.vp>0&&s.vp>=need)v+=60;
   // energy: worth more when it unlocks a strong card
@@ -82,7 +82,7 @@ function evalDice(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const
   v+=s.hl*(p.hp<=3?2:p.hp<=6?1:0.25);
   if(s.dmg&&s.targets.length){for(const q of s.targets){let w=0.8;if(q.vp>=15)w+=0.9;if(q===lead&&lead.vp>=12)w+=0.4;v+=s.dmg*w;
       if(q.hp<=s.dmg)v+=(others.length<=1?80:6)+q.vp*0.35+(q.vp>=16?12:0)}
-    if(!inT){const occ=s.targets.filter(q=>inTokyo(q.i));const mayEnter=occ.some(q=>q.hp-s.dmg<=Math.max(YA,3));v+=mayEnter?(p.hp>=7?2:(p.hp<=4?-3.5:0)):0}}
+    if(!inT){const occ=s.targets.filter(q=>inCity(q.i));const mayEnter=occ.some(q=>q.hp-s.dmg<=Math.max(YA,3));v+=mayEnter?(p.hp>=7?2:(p.hp<=4?-3.5:0)):0}}
   if(!inT&&G.city===-1)v+=p.hp>=6?0:(p.hp<=3?-1.5:0);
   if(c.H>=3&&G.evoOn&&p.edeck.length)v+=2.2;
   if(exOn('cult')&&Object.values(nc).some(x=>x>=4))v+=2.5;
@@ -110,7 +110,7 @@ function aiMarkHard(p){const dice=G.dice,n=dice.length,R=G.rolls,S=n>7?10:16;let
       tot+=R>=2?bestFinal(p,d1,4):evalDice(p,d1)}
     const avg=tot/S1;if(avg>best){best=avg;bm=m}}
   dice.forEach((d,k)=>d.k=!!(bm>>k&1))}
-function evalDice0(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const nc=countsOf(dice.filter(d=>!d.t));const inT=inTokyo(p.i);
+function evalDice0(p,dice){const s=scoreDice(p,dice);const c=countsOf(dice);const nc=countsOf(dice.filter(d=>!d.t));const inT=inCity(p.i);
   const need=winAt(p)-p.vp;let v=s.vp*(1.5+(p.vp>=12?0.9:0));if(s.vp>0&&s.vp>=need)v+=40;
   v+=s.en*HEW;v+=s.hl*(p.hp<=3?1.8:p.hp<=6?0.9:0.25);
   if(s.dmg&&s.targets.length){v+=s.dmg*s.targets.length*0.8;for(const q of s.targets)if(q.hp<=s.dmg)v+=(alive().length<=2?60:6)+q.vp*0.2;
@@ -194,7 +194,7 @@ function cardValue(p,id){const b=base(id),C=CARDS[b],oth=others(p);
     if(b==='patch')v=Math.min(2,maxhp(p)-p.hp)*1.2;if(b==='reactor')v+=Math.min(3,maxhp(p)-p.hp)*1.1;
     if(b==='sirens')v=oth.reduce((a,q)=>a+Math.min(5,q.vp),0)*0.6+(lead>=15?6:0);
     if(b==='surge')v=9;if(b==='cyclone')v+=oth.reduce((a,q)=>a+Math.floor(q.en/2),0)*0.5;
-    if(b==='rush')v=G.bug?-9:7+(inTokyo(p.i)?2:0);if(b==='skydive')v+=inTokyo(p.i)?-1:(p.hp>=6?4:-2);
+    if(b==='rush')v=G.bug?-9:7+(inCity(p.i)?2:0);if(b==='skydive')v+=inCity(p.i)?-1:(p.hp>=6?4:-2);
     if(b==='m_bug')v=4.5;if(b==='m_dysf'){const hit=alive().filter(q=>q.mb>0);v=hit.filter(q=>q.i!==p.i).length*1.8+hit.filter(q=>q.i!==p.i&&q.hp<=3).length*6+(p.mb>0?hpv(3):0)}
     if(b==='m_treas')v=G.disc.some(x=>CARDS[base(x)].t==='C')?2.5:-5;if(b==='m_mirac')v=p.hp<=3?6-p.vp*0.8:-9;
     return v-cost}
@@ -203,7 +203,7 @@ function cardValue(p,id){const b=base(id),C=CARDS[b],oth=others(p);
     return cv+1-cost-(p.cards.filter(c=>CARDS[base(c)].t==='C').length>=3?2:0)}
   let v=C.v!==undefined?C.v:3;const early=G.turn<=4;
   if(['cosmic','news','kidfan','brain','skull','battery','cell','lab','opp','para'].includes(b))v+=early?1.5:-1;
-  if(b==='carrion')v+=oth.length>=3?1.5:0;if(b==='street'||b==='tunnel')v+=inTokyo(p.i)?1:0;
+  if(b==='carrion')v+=oth.length>=3?1.5:0;if(b==='street'||b==='tunnel')v+=inCity(p.i)?1:0;
   if(b==='growth'||b==='regrow'||b==='mend')v+=p.hp<=6?1.5:0;
   if(b==='egg')v+=p.hp<=5?2:0;if(b==='underdog')v+=p.vp<lead-3?1:0;
   if(b==='m_free'&&p.mb>0)v=-9;if(b==='m_evade')v+=oth.length*0.3;if(b==='m_nobrain')v-=p.mb*0.5;
@@ -228,10 +228,10 @@ function aiBuyStep(p){const U=G.tf.uses;
   endTurn()}
 /* ---- small decisions ---- */
 function aiEvoPick(p,two){return two.slice().sort((a,b)=>(EVOV[b]||(EVO[b].t==='T'?3:3))-(EVOV[a]||3))[0]}
-function aiFreezeFace(o,p){const s=inTokyo(p.i)||inTokyo(o.i)?'C':'H';return p.vp>=14?'1':s}
+function aiFreezeFace(o,p){const s=inCity(p.i)||inCity(o.i)?'C':'H';return p.vp>=14?'1':s}
 function aiMimic(p,t,moving){const cur0=moving&&p.tok.mim?cardKeepValue(p,p.tok.mim.id):-9;const b=t.slice().sort((a,c)=>cardKeepValue(p,c.id)-cardKeepValue(p,a.id))[0];if(moving&&cardKeepValue(p,b.id)<cur0+2)return 'n';return b.o+':'+b.id}
-function aiStartEvo(p,L){if(L.includes(64)&&!inTokyo(p.i)&&p.hp<=5)return 'e64';if(L.includes(34)&&p.lvl!=='easy'&&Math.random()<.35)return 'e34';return 'n'}
-function aiExotic(p){return p.en>=5&&(inTokyo(p.i)||G.city>=0)&&p.hp>=5}
+function aiStartEvo(p,L){if(L.includes(64)&&!inCity(p.i)&&p.hp<=5)return 'e64';if(L.includes(34)&&p.lvl!=='easy'&&Math.random()<.35)return 'e34';return 'n'}
+function aiExotic(p){return p.en>=5&&(inCity(p.i)||G.city>=0)&&p.hp>=5}
 function aiKwStart(p,opts){const lead=mostOf('vp',others(p))[0];for(const o of opts){if(/:Hunter$/.test(o.k)&&lead&&(lead.hp<=4||lead.vp>=13))return o.k;if(/:Sneaky$/.test(o.k)&&Math.random()<.5)return o.k}return 'n'}
 function aiHunt(p,src,id){const oth=others(p);if(src==='e'&&id===636){const m=oth.slice().sort((a,b)=>b.en-a.en)[0];return m.i}return oth.slice().sort((a,b)=>(a.hp-b.vp*0.3)-(b.hp-a.vp*0.3))[0].i}
 function aiIceLock(r){if(!others(r).some(q=>has(q,'probe')||has(q,'c_witch')))return -1;const k=G.dice.findIndex(d=>d.f==='C'||d.f==='C2');return k}

@@ -104,7 +104,7 @@ const P=i=>G.pl[i];
 const cur=()=>G.pl[G.active];
 const has=(p,id)=>p.cards.filter(c=>base(c)===id).length;
 const maxhp=p=>10+2*has(p,'growth');
-const inTokyo=i=>G.city===i||G.bay===i;
+const inCity=i=>G.city===i||G.bay===i;
 const where=i=>G.city===i?'Downtown':G.bay===i?'the Harbor':'the suburbs';
 const alive=()=>G.pl.filter(p=>p.alive);
 const isHuman=i=>G.pl[i].human;
@@ -152,7 +152,7 @@ function startTurn(){
       [{k:'y',l:'Spread wings (pay 2 ⚡)',d:`You have ${q.en} energy.`},{k:'n',l:'Save the energy'}],
       ()=>aiWings(q,p)?'y':'n',k=>{if(k==='y'){q.en-=2;q.tok.shield=true;lg(q.i,`${mname(q)} spreads its wings against ${mname(p)}.`)}next()}),
     ()=>{
-      if(inTokyo(p.i)){const b=2+has(p,'street');gainVP(p,b);lg(p.i,`${mname(p)} starts in ${where(p.i)} and gains ${b} stars.`)}
+      if(inCity(p.i)){const b=2+has(p,'street');gainVP(p,b);lg(p.i,`${mname(p)} starts in ${where(p.i)} and gains ${b} stars.`)}
       const nd=Math.max(1,6+has(p,'skull')-G.less);G.less=0;
       G.dice=[];for(let k=0;k<nd;k++)G.dice.push({f:FACES[rnd(6)],k:false,x:k>=6});
       G.rolls=2+has(p,'brain');G.rollId++;G.phase='roll';G.aiMarked=false;
@@ -168,7 +168,7 @@ function discardCard(p,id){const k=p.cards.findIndex(c=>base(c)===id);if(k>=0)G.
 
 function resolve(){
   const p=cur();G.phase='resolve';UI.busy=true;const c=counts();const nums=[];const out=[];
-  const inT=inTokyo(p.i);
+  const inT=inCity(p.i);
   // numbers
   let q2=false;
   for(const f of ['1','2','3']){const n=c[f];if(n>=3){let v=(+f)+(n-3);if(f==='1'&&has(p,'gourmand'))v+=2*has(p,'gourmand');gainVP(p,v);out.push(`${v}★ from ${n}×${f}`);if(f==='2')q2=true;if(f==='1')G.tf.ones=true}}
@@ -182,17 +182,17 @@ function resolve(){
   amt+=has(p,'acid');
   const hitList=[];
   if(amt>0){
-    let tg=has(p,'nova')?alive().filter(q=>q.i!==p.i):inT?alive().filter(q=>!inTokyo(q.i)):alive().filter(q=>inTokyo(q.i));
+    let tg=has(p,'nova')?alive().filter(q=>q.i!==p.i):inT?alive().filter(q=>!inCity(q.i)):alive().filter(q=>inCity(q.i));
     const extra={};if(claws&&has(p,'scorch')){for(const j of neighbours(p.i))extra[j]=(extra[j]||0)+has(p,'scorch')}
     const all=new Set([...tg.map(q=>q.i),...Object.keys(extra).map(Number)]);
-    for(const j of all){const q=P(j);const a=(tg.includes(q)?amt:0)+(extra[j]||0);const lost=damage(q,a,p);if(tg.includes(q)&&inTokyo(j))hitList.push({j,lost});}
+    for(const j of all){const q=P(j);const a=(tg.includes(q)?amt:0)+(extra[j]||0);const lost=damage(q,a,p);if(tg.includes(q)&&inCity(j))hitList.push({j,lost});}
     if(all.size){out.push(`smashes ${[...all].map(j=>mname(P(j))).join(', ')} for ${amt}`);lg(p.i,`${mname(p)} smashes ${[...all].map(j=>mname(P(j))+' (−'+(tg.map(q=>q.i).includes(j)?amt:0)+(extra[j]?'+'+extra[j]:'')+')').join(', ')}.`);if(claws&&has(p,'alpha'))gainVP(p,has(p,'alpha'))}
     else if(claws)out.push('claws hit nobody');
   }
   if(G.tf.ones&&has(p,'hiccup'))G.tf.hiccup=true;
   UI.banner=`<b>${esc(mname(p))}</b>: ${out.length?esc(out.join(' · ')):'nothing useful'}`;
   if(out.length)lg(p.i,`${mname(p)} resolves: ${out.join(', ')}.`);
-  // yields (only monsters in Tokyo hit by an outside smasher's dice)
+  // yields (only monsters in the city hit by an outside smasher's dice)
   const yielders=[];
   const canAsk=hitList.filter(h=>h.lost>0&&!inT&&(P(h.j).hp>0||has(P(h.j),'vjets')));
   seq(canAsk,(h,next)=>{const q=P(h.j);
@@ -213,7 +213,7 @@ function resolve(){
 }
 function enterStep(p,yielders){
   if(G.bay===p.i&&G.city===-1){G.bay=-1;G.city=p.i;lg(p.i,`${mname(p)} moves up from the Harbor to Downtown.`);return}
-  if(inTokyo(p.i))return;
+  if(inCity(p.i))return;
   let spot=null;if(G.city===-1)spot='city';else if(G.bayOn&&G.bay===-1)spot='bay';
   if(!spot)return;
   if(spot==='city')G.city=p.i;else G.bay=p.i;
@@ -276,7 +276,7 @@ function playDiscard(p,b,done){const others=alive().filter(q=>q.i!==p.i);
     case 'reactor':gainVP(p,2);heal(p,3);break;
     case 'tanks':gainVP(p,4);damage(p,3,null,true);break;
     case 'cyclone':gainVP(p,2);others.forEach(q=>{const d=Math.floor(q.en/2);q.en-=d;if(d)fx(q.i,'-'+d+'⚡','energy')});break;
-    case 'skydive':gainVP(p,2);if(!inTokyo(p.i)){
+    case 'skydive':gainVP(p,2);if(!inCity(p.i)){
       const take=spot=>{const o=spot==='city'?G.city:G.bay;if(o>=0)lg(o,`${mname(P(o))} is stomped out of ${where(o)}.`);if(spot==='city')G.city=p.i;else G.bay=p.i;gainVP(p,1);lg(p.i,`${mname(p)} drops from the sky into ${where(p.i)}!`);done()};
       if(G.city===-1)return take('city');if(G.bayOn&&G.bay===-1)return take('bay');
       if(G.bayOn)return ask(p.i,'Skydive Stomp','Which space do you land on? Its monster is kicked out.',[{k:'city',l:`Downtown (kick out ${mname(P(G.city))})`},{k:'bay',l:`The Harbor (kick out ${mname(P(G.bay))})`}],()=>'city',take);
@@ -311,24 +311,24 @@ function changeDie(kind){const p=cur();
 const fname=f=>({'1':'1','2':'2','3':'3',E:'energy',C:'claw',H:'heart'}[f]);
 
 // ---------- computer players ----------
-function tokyoThreat(p){return alive().filter(q=>q.i!==p.i&&!inTokyo(q.i)).length}
-function aiWings(q,act){if(q.en<2)return false;const hitsMe=has(act,'nova')||(inTokyo(q.i)!==inTokyo(act.i));return hitsMe&&q.hp<=4}
+function cityThreat(p){return alive().filter(q=>q.i!==p.i&&!inCity(q.i)).length}
+function aiWings(q,act){if(q.en<2)return false;const hitsMe=has(act,'nova')||(inCity(q.i)!==inCity(act.i));return hitsMe&&q.hp<=4}
 function aiYield(q,lost){
   if(q.hp<=0)return true;
-  const threat=tokyoThreat(q);
+  const threat=cityThreat(q);
   if(q.vp>=18&&q.hp>Math.min(4,threat+1))return false;
   if(has(q,'vjets')&&q.hp<=7)return true;
   return q.hp<=Math.max(YA,threat+YB)}
 function aiWantsClaws(p){
   if(has(p,'nova'))return true;
-  if(inTokyo(p.i))return true;
+  if(inCity(p.i))return true;
   const occ=[G.city,G.bay].filter(i=>i>=0).map(P);
   if(!occ.length)return false;
   const c=counts().C;
   if(occ.some(o=>o.hp<=c+2))return true;
   return p.hp>=5}
 function aiMark(p){
-  const c=counts();const inT=inTokyo(p.i);const miss=maxhp(p)-p.hp;
+  const c=counts();const inT=inCity(p.i);const miss=maxhp(p)-p.hp;
   let hw=inT?0:(p.hp<=5?miss:p.hp<=7?Math.min(miss,3):Math.min(miss,1));
   const claws=aiWantsClaws(p);
   // choose which number sets to chase: triples always; best pair if dice allow
@@ -359,7 +359,7 @@ function aiRollStep(p){
   if(has(p,'lurker')){const c=counts();if(c['3']>0&&c['3']<3&&G.tf.lurk!==true){G.tf.lurk=true;doReroll('lurker');return}}
   aiTweak(p);resolve()}
 function aiTweak(p){const c=counts();
-  const junk=()=>{let k=G.dice.findIndex(d=>['1','2','3'].includes(d.f)&&c[d.f]===1);if(k<0&&inTokyo(p.i))k=G.dice.findIndex(d=>d.f==='H');return k};
+  const junk=()=>{let k=G.dice.findIndex(d=>['1','2','3'].includes(d.f)&&c[d.f]===1);if(k<0&&inCity(p.i))k=G.dice.findIndex(d=>d.f==='H');return k};
   if(has(p,'pack')&&!G.tf.culler&&c['1']===2){const k=junk();if(k>=0&&G.dice[k].f!=='1'){G.dice[k].f='1';G.tf.culler=true;lg(p.i,`${mname(p)} turns a die into a 1 (Pack Hunter).`);return}}
   for(const f of ['3','2']){if(c[f]===2){const k=junk();if(k<0||G.dice[k].f===f)continue;
     if(has(p,'rubber')&&p.en>=4){G.dice[k].f=f;p.en-=2;lg(p.i,`${mname(p)} bends a die into a ${f} (Rubber Limbs).`);return}
@@ -376,11 +376,11 @@ function cardValue(p,id){const b=base(id),C=CARDS[b],others=alive().filter(q=>q.
     if(b==='patch')v=Math.min(2,maxhp(p)-p.hp)*1.2;if(b==='reactor')v+=Math.min(3,maxhp(p)-p.hp)*1.1;
     if(b==='sirens')v=others.reduce((a,q)=>a+Math.min(5,q.vp),0)*0.6+(lead>=15?6:0);
     if(b==='surge')v=9;if(b==='cyclone')v+=others.reduce((a,q)=>a+Math.floor(q.en/2),0)*0.5;
-    if(b==='rush')v=7+(inTokyo(p.i)?2:0);if(b==='skydive'&&!inTokyo(p.i))v+=p.hp>=6?4:-2;
+    if(b==='rush')v=7+(inCity(p.i)?2:0);if(b==='skydive'&&!inCity(p.i))v+=p.hp>=6?4:-2;
     return v-cost}
   let v=C.v;const early=G.turn<=4;
   if(['cosmic','news','kidfan','brain','skull','battery'].includes(b))v+=early?1.5:-1;
-  if(b==='carrion')v+=others.length>=3?1.5:0;if(b==='street'||b==='tunnel')v+=inTokyo(p.i)?1:0;
+  if(b==='carrion')v+=others.length>=3?1.5:0;if(b==='street'||b==='tunnel')v+=inCity(p.i)?1:0;
   if(b==='growth'||b==='regrow'||b==='mend')v+=p.hp<=6?1.5:0;
   if(b==='egg')v+=p.hp<=5?2:0;if(b==='underdog')v+=p.vp<lead-3?1:0;
   if(late&&!['skull','brain','barbed','acid','nova'].includes(b))v-=2;
@@ -484,7 +484,7 @@ function renderMap(){const svg=document.getElementById('map');if(!G){svg.innerHT
   s+=`</g>`;
   // seats
   const n=G.pl.length,gap=12,w=Math.min(150,(940-(n-1)*gap)/n),x0=500-(n*w+(n-1)*gap)/2;
-  G.pl.forEach((p,k)=>{const x=x0+k*(w+gap),y=400,h=226,cx=x+w/2,A=k===G.active&&!G.winner,T=inTokyo(p.i);
+  G.pl.forEach((p,k)=>{const x=x0+k*(w+gap),y=400,h=226,cx=x+w/2,A=k===G.active&&!G.winner,T=inCity(p.i);
     s+=`<g class="seat" data-seat="${k}" transform="translate(0,0)">`;
     if(A)s+=`<rect x="${x-6}" y="${y-6}" width="${w+12}" height="${h+12}" rx="18" fill="#ffd23f" stroke="${INK}" stroke-width="3"/>`;
     s+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="14" fill="${p.alive?'#fffaf0':'#9c93a3'}" stroke="${INK}" stroke-width="4"/>
@@ -517,7 +517,7 @@ function renderPanel(){
     const me=G.pl.find(q=>q.human);if(me&&G.mode==='solo')msg+=`<br><span class="small muted">You are ${esc(mname(me))}. You will be asked if you get smashed while in the city.</span>`}
   else if(G.phase==='roll'){const nk=G.dice.filter(d=>!d.k).length;
     msg=G.rolls>0?`Click dice to <b>keep</b> them, then reroll the rest. ${G.rolls} reroll${G.rolls===1?'':'s'} left.`:'No rerolls left. Resolve your dice.';
-    msg+=`<br><span class="small muted">You are in ${where(p.i)}. ${inTokyo(p.i)?'Your claws hit everyone outside. Hearts do nothing here.':'Your claws hit whoever is in the city.'}</span>`;
+    msg+=`<br><span class="small muted">You are in ${where(p.i)}. ${inCity(p.i)?'Your claws hit everyone outside. Hearts do nothing here.':'Your claws hit whoever is in the city.'}</span>`;
     acts=btn('reroll',`Reroll ${nk} ${nk===1?'die':'dice'}`,G.rolls<=0||!nk,'','primary')+btn('resolve','Resolve dice','', '', G.rolls<=0?'primary':'');
     if(has(p,'mind'))acts+=btn('mind','Mind Link reroll',p.en<1||!nk,'pay 1 ⚡');
     if(has(p,'smoke')&&p.tok.smoke>0)acts+=btn('smoke','Smoke reroll',!nk,`${p.tok.smoke} puffs left`);
@@ -541,7 +541,7 @@ function renderPanel(){
   const L=document.getElementById('log');L.innerHTML=G.log.slice(0,80).map(l=>`<li class="${l.s>=0&&G.pl[l.s]&&G.pl[l.s].human&&G.mode==='solo'?'me':''}">${esc(l.t)}</li>`).join('');
 }
 function renderScore(){const el=document.getElementById('score');if(!G){el.innerHTML='';return}
-  el.innerHTML=G.pl.map(p=>`<div class="sc ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}"><b style="background:${MONS[p.m].c}">${esc(mname(p))}${p.human&&G.mode==='solo'?' (you)':''}</b><span>♥${p.hp} ★${p.vp} ⚡${p.en}${inTokyo(p.i)?' · city':''}${p.alive?'':' · KO'}</span></div>`).join('')}
+  el.innerHTML=G.pl.map(p=>`<div class="sc ${p.i===G.active&&!G.winner?'on':''} ${p.alive?'':'ko'}"><b style="background:${MONS[p.m].c}">${esc(mname(p))}${p.human&&G.mode==='solo'?' (you)':''}</b><span>♥${p.hp} ★${p.vp} ⚡${p.en}${inCity(p.i)?' · city':''}${p.alive?'':' · KO'}</span></div>`).join('')}
 function renderLegend(){document.getElementById('legend').innerHTML=[
   ['1','Three 1s score 1 star; each extra 1 adds 1 more.'],['2','Three 2s score 2 stars, +1 per extra.'],['3','Three 3s score 3 stars, +1 per extra.'],
   ['E','Energy: 1 each. Spend it on power cards.'],['C','Claw: 1 damage each. From the city you hit everyone outside; from outside you hit the city.'],['H','Heart: heal 1 each (not while in the city). Max 10.']]
