@@ -79,7 +79,7 @@ function placeWall(p,r,c){const L=p.lines[r];const lc=lineColour(L);const k=L.in
   p.wall[r][c]=v;G.lid.push(...L);p.lines[r]=[];const pts=adjPts(p.wall,r,c);p.score+=pts;p.st.place+=pts;if(G.rsum){G.rsum[p.i].place+=pts;G.rsum[p.i].n++}if(pts>G.stats.maxChain)G.stats.maxChain=pts;
   lg(`${p.nm} sets a ${k>=0?'Prism':TNAME[lc]} tile in mosaic row ${r+1}${G.ex.gray||lc<0?', column '+(c+1):''}: +${pts}.`,'good');fx('wall',{p:p.i,r,c,pts,run:runsAt(p.wall,r,c)})}
 function floorPenalty(n){let s=0;for(let i=0;i<Math.min(7,n);i++)s+=FLOOR[i];return s}
-function scoreFloors(){for(const p of G.pl){if(!p.floor.length)continue;const pen=floorPenalty(p.floor.length);const loss=Math.min(p.score,-pen);p.score-=loss;p.st.floor-=loss;if(G.rsum)G.rsum[p.i].floor-=loss;
+function scoreFloors(){for(const p of G.pl){if(!p.floor.length)continue;const pen=floorPenalty(p.floor.length);const loss=Math.min(p.score,-pen);p.score-=loss;p.st.floor-=loss;if(G.rsum){const R=G.rsum[p.i];R.floor-=loss;R.pen=pen;R.nb=p.floor.length;R.sun=p.floor.includes(SUN)}
     if(p.floor.includes(SUN))G.first=p.i;const tiles=p.floor.filter(t=>t!==SUN);G.lid.push(...tiles);
     lg(`${p.nm} loses ${-pen} for breakage${loss<-pen?` (only ${loss}: a score never drops below 0)`:''}.`,'bad');p.floor=[]}
   if(G.markerIn!=='ctr')G.markerIn='ctr'}

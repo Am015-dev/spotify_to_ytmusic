@@ -27,7 +27,8 @@ function phReset(){PHN.src=null;PHN.board=null;PHN.more=false;PHN.sum=null;PHN.e
 // ---------- events from the engine: the round summary is built from the wall fx ----------
 function phFx(f){if(!PHN.on||!G)return;const x=f.x;
   if(f.t==='wall')PHN.walls.push({p:x.p,r:x.r,c:x.c,pts:x.pts,why:phPtsWhy(x.run)});
-  else if(f.t==='round'&&G.round>1&&G.rsum&&G.pl.some(p=>p.human)){PHN.sum={round:G.round-1,final:false,walls:PHN.walls.slice(),rs:G.rsum.map(r=>Object.assign({},r)),sc:G.pl.map(p=>p.score),first:G.first};PHN.walls=[]}
+  else if(f.t==='take')PHN.lastTake=Object.assign({},x);
+  else if(f.t==='round'&&G.round>1&&G.rsum&&G.pl.some(p=>p.human)){PHN.sum={last:PHN.lastTake,round:G.round-1,final:false,walls:PHN.walls.slice(),rs:G.rsum.map(r=>Object.assign({},r)),sc:G.pl.map(p=>p.score),first:G.first};PHN.walls=[]}
   else if(f.t==='round')PHN.walls=[];
   else if(f.t==='win'&&PHN.walls.length&&G.pl.some(p=>p.human)){PHN.sum={round:G.round,final:true,walls:PHN.walls.slice(),rs:(G.rsum||[]).map(r=>Object.assign({},r)),sc:G.pl.map(p=>p.score-p.st.rows-p.st.cols-p.st.colours),first:-1};PHN.walls=[]}}
 const phHold=()=>PHN.on&&!NET.on&&!!PHN.sum;
@@ -62,25 +63,29 @@ function phRackMini(p,m,pv){const n=m.line<5?cap(m.line):7;const L=m.line<5?p.li
     s+=`<rect x="${x}" y="0" width="${cw}" height="${cw}" rx="12" fill="#d8c6a2" stroke="#9a7a4e" stroke-width="4"/>`;if(t!=null)s+=tileSVG(t,x+3,3,cw-6);else if(a!=null)s+=tileSVG(a,x+3,3,cw-6)+`<rect x="${x+1}" y="1" width="${cw-2}" height="${cw-2}" rx="12" fill="none" stroke="#2f7d46" stroke-width="9"/>`}
   return `<svg class="ph-rm" viewBox="0 0 ${n*(cw+8)-8} ${cw}" aria-hidden="true">${s}</svg>`}
 // ---------- the pop-up for taking tiles ----------
-function phReason(p,r,c){const L=p.lines[r];if(L.length>=cap(r))return 'full';const lc=lineColour(L);if(c<NC&&lc>=0&&lc!==c)return 'holds '+TNAME[lc];const Y=c<NC?c:lc;if(Y>=0&&rowHas(p,r,Y))return 'mosaic row has it';return 'no space'}
+function phReason(p,r,c){const L=p.lines[r];if(L.length>=cap(r))return 'full';const lc=lineColour(L);if(c<NC&&lc>=0&&lc!==c)return 'holds '+TNAME[lc];const Y=c<NC?c:lc;if(Y>=0&&rowHas(p,r,Y))return 'mosaic row '+(r+1)+' has '+TNAME[Y];return 'no space'}
 // what a take does right now: the points a filled rack scores, minus the tiles of its own that break (the Sun token is shown apart: it comes with every courtyard take)
 function phNow(m,seat){const pv=preview(m,seat);const f0=P(seat).floor.length;const sp=pv.info.sun?floorPenalty(f0+1)-floorPenalty(f0):0;const tp=pv.pen-sp;
   return {m,pv,sp,tp,n:pv.info.fl+pv.info.lid-(pv.info.sun&&f0>=7?1:0),net:(pv.full&&pv.pts!=null?pv.pts:0)+tp}}
 // the starred rack: best right now; ties go to a filled rack, then more tiles kept, then the computer's look-ahead
-function phRec(ms,seat){if(!ms.length)return null;const R=ms.map(m=>phNow(m,seat));const top=Math.max(...R.map(x=>x.net));let c=R.filter(x=>x.net===top);
+function phRec(ms,seat){if(!ms.length)return null;const R=ms.map(m=>phNow(m,seat));PHN.alt=null;const top=Math.max(...R.map(x=>x.net));let c=R.filter(x=>x.net===top);
   const f=Math.max(...c.map(x=>x.pv.full?1:0));c=c.filter(x=>(x.pv.full?1:0)===f);const k=Math.max(...c.map(x=>x.pv.info.line));c=c.filter(x=>x.pv.info.line===k);
-  if(c.length>1){try{const near=endNear(G),nx=(seat+1)%G.np;let bv=-1e9,b=c[0];for(const x of c){const S=cloneS(G);applyTake(S,seat,x.m);const v=gainOf(G,seat,x.m,near)-.55*(emptyS(S)?0:bestGain(S,nx,near));if(v>bv){bv=v;b=x}}return b}catch(e){}}return c[0]}
+  const pick=x=>{const safe=R.filter(y=>y.m.line<5&&!y.tp&&y!==x).sort((a,b)=>b.net-a.net)[0];PHN.alt=x.tp&&safe?safe:null;PHN.only=R.every(y=>y.m.line===5);return x};
+  if(c.length>1){try{const near=endNear(G),nx=(seat+1)%G.np;let bv=-1e9,b=c[0];for(const x of c){const S=cloneS(G);applyTake(S,seat,x.m);const v=gainOf(G,seat,x.m,near)-.55*(emptyS(S)?0:bestGain(S,nx,near));if(v>bv){bv=v;b=x}}return pick(b)}catch(e){}}return pick(c[0])}
 function phWhy(x){const m=x.m,pv=x.pv,n=x.n;const brk=x.tp?`, ${n} break (${x.tp})`:', nothing breaks';
-  if(m.line===5)return `Breakage: every rack costs more${x.tp?' ('+x.tp+')':''}.`;
-  if(pv.full)return `Rack ${m.line+1} fills: +${pv.pts} at round end${brk}.`;
-  return `Rack ${m.line+1}: ${pv.cnt} of ${cap(m.line)} so far${brk}. Fill it later to score.`}
+  if(m.line===5)return PHN.only?`No rack can take this glaze (each holds another glaze, or its mosaic row has it), so all of it breaks${x.tp?' ('+x.tp+')':''}. Late in a round, leave yourself a rack that can.`:`Breakage: every rack costs more${x.tp?' ('+x.tp+')':''}.`;
+  const alt=PHN.alt?` Still better than rack ${PHN.alt.m.line+1} (${PHN.alt.pv.full?'+'+PHN.alt.pv.pts:'scores nothing yet'}, nothing breaks).`:'';const last=phLast()&&!pv.full?' Last round: a rack that isn’t full scores nothing.':'';
+  if(pv.full)return `Rack ${m.line+1} fills: +${pv.pts} at round end${brk}.${alt}`;
+  return `Rack ${m.line+1}: ${pv.cnt} of ${cap(m.line)} so far${brk}.${last||' Fill it later to score.'}${alt}`}
+function phLast(){for(const p of G.pl)for(let r=0;r<5;r++){const n=p.wall[r].filter(v=>v>=0).length;if(n>=5||(n===4&&p.lines[r].length===cap(r)))return true}return false}
 function phPtsWhy(run){if(!run)return '';const [h,v]=run;if(h===1&&v===1)return 'alone';const b=[];if(h>1)b.push(h+' across');if(v>1)b.push(v+' down');return '= '+b.join(' + ')}
 // how the game is won and how close the end is (any complete mosaic row ends the game after that round)
 function phBonus(p){const b=endBonus(p);return b.rows*BONUS.row+b.cols*BONUS.col+b.colours*BONUS.colour}
 function phGoalHTML(){let best=null;for(const p of G.pl)for(let r=0;r<5;r++){const n=p.wall[r].filter(v=>v>=0).length;const ready=p.lines[r].length===cap(r)&&!rowHas(p,r,lineColour(p.lines[r]))?1:0;
     if(!best||n+ready>best.n+best.ready||(n+ready===best.n+best.ready&&ready>best.ready))best={p,r,n,ready}}
   const warn=best&&best.n+best.ready>=5?`<b class="bad">Last round: ${esc(best.p.nm)}${isYou(best.p.i)?' (you)':''} will complete mosaic row ${best.r+1}.</b>`:best&&best.n>=4?`<b>${esc(best.p.nm)}${isYou(best.p.i)?' (you)':''} has 4 of 5 in mosaic row ${best.r+1}.</b>`:'';
-  return `<div class="ph-goal">${IC('trophy')}<span><span class="gl">Most ★ wins. The game ends after a round in which someone completes a mosaic row. Then: full row +2, full column +7, all 5 of a glaze +10.</span><span class="gs">Most ★ wins · ends after a mosaic row is full · end bonus: row +2, column +7, glaze +10</span> ${warn}</span></div>`}
+  const left=G.ctr.filter(t=>t!==SUN).length+G.fac.reduce((a,f)=>a+f.length,0);const late=G.phase==='offer'&&left>0&&left<=8?`<b>Only ${left} tiles left this round: every tile must be taken, and what fits no rack breaks.</b>`:'';
+  return `<div class="ph-goal">${IC('trophy')}<span><span class="gl">Most ★ wins. The game ends after a round in which someone completes a mosaic row. Then: full row +2, full column +7, all 5 of a glaze +10.</span><span class="gs">Most ★ wins · ends after a mosaic row is full · end bonus: row +2, column +7, glaze +10</span> ${warn||late}${(()=>{const o=G.pl.filter(q=>q.i!==focusSeat()&&phBonus(q));return o.length?` <b class="ph-bn">End bonus so far: ${o.map(q=>esc(q.nm)+' +'+phBonus(q)).join(', ')}.</b>`:''})()}</span></div>`}
 function phTakeHTML(hp){const sel=UI.sel,src=sel?sel.src:PHN.src;const a=src<0?G.ctr:G.fac[src];if(!a||!a.length)return '';
   const cnt={};for(const t of a)cnt[t]=(cnt[t]||0)+1;const keys=Object.keys(cnt).map(Number).sort((x,y)=>x-y);const nj=cnt[PRISM]||0;
   const chips=keys.map(c=>{const on=sel&&sel.c===c;return `<button class="ph-g${on?' on':''}" data-ph="pick" data-pick='${JSON.stringify({src,c,j:c===PRISM?1:0})}' aria-pressed="${!!on}" aria-label="${cnt[c]} ${TNAME[c]}">${tileChip(c,cnt[c])}<span>${TNAME[c]}</span></button>`}).join('');
@@ -98,9 +103,9 @@ function phTakeHTML(hp){const sel=UI.sel,src=sel?sel.src:PHN.src;const a=src<0?G
       const aria=`${lab}: ${r<5?(pv.full?'fills it':pv.cnt+' of '+cap(r)):'all to breakage'}${over>0&&r<5?', '+over+' break':''}${X.tp?', '+X.tp+' points':''}`;
       grid+=`<button class="ph-o${rec===r?' rec':''}${over||r===5?' ov':''}" data-mv='${esc(JSON.stringify(m))}' aria-label="${esc(aria)}"><span class="ph-r">${lab}${rec===r?' <i>★ best</i>':''}</span>${phRackMini(hp,m,pv)}${v}</button>`}
     const sun=sel.src<0&&G.markerIn==='ctr';const f0=hp.floor.length;const sp=floorPenalty(f0+1)-floorPenalty(f0);
-    body=`<div class="ph-grid">${grid}</div>`+(sun?`<div class="ph-sun">☀ First courtyard take: you also get the Sun token, ${sp||'−0'} on any rack, and you start next round.</div>`:'')
+    body=`<div class="ph-grid">${grid}</div>`+(sun?`<div class="ph-sun">☀ First courtyard take: you also get the Sun token: it takes your next breakage space (${String(sp||0).replace('-','−')}) whichever rack you choose, and you start next round.</div>`:'')
       +(RX?`<div class="ph-why">${UI.adv&&UI.adv.m.act==='take'?IC('bulb')+' Suggested glaze. ':''}${rec>=0?'<b>★</b> ':''}${esc(phWhy(RX))}</div>`:'')
-      +(UI.coach?`<div class="ph-teach">Rack 1 holds 1 tile, rack 5 holds 5, one glaze per rack. A full rack sets one tile into your mosaic at round end; tiles that don’t fit break (−1, −1, −2 …).</div>`:'')}
+      +(UI.coach?`<div class="ph-teach">Rack N holds N tiles of one glaze. Full racks score at round end; extra tiles break.</div>`:'')}
   if(!sel)body+=`<div class="ph-teach">Tap a glaze: you take <b>every</b> tile of it here. The rest of a kiln slides to the courtyard.</div>`;
   return `<div class="ph-head"><span class="ph-t">${title}</span><button class="ph-ib" data-ph="boards" aria-label="See the boards">${IC('players')}</button><button class="ph-ib" data-ph="close" aria-label="Close">${PH_X}</button></div>${keys.length>1||!sel||tgS?`<div class="ph-chips${keys.length>4?' many':''}">${keys.length>1||!sel?chips:''}${tgS}</div>`:''}${body}`}
 // ---------- the board pop-up (yours or a rival's, bigger) ----------
@@ -119,7 +124,7 @@ function phStripHTML(){const f=focusSeat(),fp=P(f),hp=me(),s=sideToAct();const p
   const net=NET.on?netDockHtml():'';
   const sack='';
   const mine=`<button class="ph-mine" data-ph="board" data-i="${f}" style="--pc:${PCOL[f]}" aria-label="Open ${esc(fp.nm)}'s board"><span class="ph-mh"><i></i><b>${esc(fp.nm)}${isYou(f)?' (you)':''}</b><b class="ph-sc">★${fp.score}</b>${phBonus(fp)?`<small class="ph-bn" title="End bonus earned so far">+${phBonus(fp)} end bonus</small>`:''}${G.markerIn===f?'<span title="Sun token">☀</span>':''}${sack}</span><span class="ph-ms">${phBoardSVG(fp)}</span></button>`;
-  const rivals=G.pl.filter(q=>q.i!==f).map(q=>`<button class="ph-rv${q.i===s?' cur':''}" data-ph="board" data-i="${q.i}" style="--pc:${PCOL[q.i]}" aria-label="Open ${esc(q.nm)}'s board, ${q.score} points"><i></i><b>${esc(q.nm)}</b><span>★${q.score}</span>${phBonus(q)?`<small class="ph-bn">+${phBonus(q)} end bonus</small>`:''}${G.markerIn===q.i?'<span>☀</span>':''}${q.floor.length?`<small>✗${q.floor.filter(t=>t!==SUN).length}</small>`:''}</button>`).join('');
+  const rivals=G.pl.filter(q=>q.i!==f).map(q=>`<button class="ph-rv${q.i===s?' cur':''}" data-ph="board" data-i="${q.i}" style="--pc:${PCOL[q.i]}" aria-label="Open ${esc(q.nm)}'s board, ${q.score} points"><i></i><b>${esc(q.nm)}</b><span>★${q.score}</span>${G.markerIn===q.i?'<span>☀</span>':''}${q.floor.length?`<small>✗${q.floor.filter(t=>t!==SUN).length}</small>`:''}</button>`).join('');
   const rc=UI.recap.length&&!G.over?`<div class="ph-recap" aria-label="Recent moves">${UI.recap.slice(0,hp?Math.max(1,G.np-1):3).map(t=>`<div>${t}</div>`).join('')}</div>`:'';
   return net+a+(G.over?'':phGoalHTML())+mine+rc+`<div class="ph-rvs">${rivals}</div>`}
 // ---------- cards: one at a time, always with Continue ----------
@@ -128,7 +133,7 @@ function phSumHTML(S){const f=focusSeat();const mine=S.walls.filter(w=>w.p===f);
   const nxt=!S.final&&S.first>=0?`<div class="ph-note">☀ ${esc(P(S.first).nm)} starts round ${S.round+1}.</div>`:'';
   return `<div class="ph-head"><span class="ph-t"><b>${S.final?'The last mosaics are set':'Round '+S.round+': mosaics set'}</b></span></div>
    <div class="ph-sum"><div class="ph-wall">${phWallSVG(P(f),{marks:mine})}</div><div class="ph-sl"><div class="ph-sh"><span></span><span>tiles</span><span>broken</span><span>score</span></div>${rows}${nxt}
-   <div class="ph-exp">${mine.map(w=>`<div class="ph-pts" data-pts="${w.pts}">Row ${w.r+1}: <span class="good">+${w.pts}</span> ${esc(w.why||'')}</div>`).join('')}${(S.rs[f]||{}).floor?`<div class="ph-pts" data-pts="${S.rs[f].floor}">Broken tiles: <span class="bad">${S.rs[f].floor}</span></div>`:''}${!mine.length&&!(S.rs[f]||{}).floor?'<div>No full rack: nothing scored.</div>':''}${UI.coach&&S.round<=2?'<div class="ph-teach">A tile scores 1 for each tile in the lines it joins.</div>':''}</div></div></div>
+   <div class="ph-exp">${S.last?`<div class="muted">Last move: ${esc(P(S.last.p).nm)} took ${S.last.n} ${S.last.c===PRISM?'Prism':TNAME[S.last.c]} → ${S.last.line<5?'rack '+(S.last.line+1):'breakage'}.</div>`:''}${mine.map(w=>`<div class="ph-pts" data-pts="${w.pts}">Row ${w.r+1}: <span class="good">+${w.pts}</span> ${esc(w.why||'')}</div>`).join('')}${(S.rs[f]||{}).floor?(R=>`<div class="ph-pts" data-pts="${R.floor}">Breakage (${R.nb||'?'} space${R.nb===1?'':'s'}${R.sun?', incl. ☀ Sun token':''}): <span class="bad">${R.floor}</span>${R.pen!=null&&R.floor>R.pen?` <small>(${R.pen} due, but a score can’t go below 0)</small>`:''}</div>`)(S.rs[f]):''}${!mine.length&&!(S.rs[f]||{}).floor?'<div>No full rack: nothing scored.</div>':''}${UI.coach&&S.round<=2?'<div class="ph-teach">A tile scores 1 for each tile in the lines it joins.</div>':''}</div></div></div>
    <div class="ph-cont"><button class="ph-go" data-ph="continue">Continue</button></div>`}
 function phWallQHTML(hp){const q=G.wt.q;const L=hp.lines[q.r];const lc=lineColour(L);const isP=L.includes(PRISM);
   const cells=q.cells.map(c=>({r:q.r,c,pts:adjPts2(hp.wall,q.r,c)}));

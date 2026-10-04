@@ -36,7 +36,7 @@ function run(seed){return new Promise(res=>{const dom=new JSDOM(html,{runScripts
         for(const o of opts){if(!o.sun)continue;const b=[...pop.querySelectorAll('.ph-o[data-mv]')].find(e=>JSON.parse(e.dataset.mv).line===o.line);const shown=(b.querySelector('.ph-v').textContent.match(/[−-]\d+/g)||[]).map(x=>-Math.abs(+x.replace('−','-')));
           const tilePen=o.pen-o.sp;const sh=shown.reduce((x,y)=>x+y,0);
           if(sh!==tilePen)fail('sun',`seed ${seed}: rack ${o.line} shows ${sh}, its own tiles cost ${tilePen}`);else ok('sun')}
-        if(opts.some(o=>o.sun)){if(!/☀/.test(pop.textContent)||!/−1/.test(pop.textContent))fail('sun','Sun token cost not shown on its own');else ok('sun')}
+        if(opts.some(o=>o.sun)){const sun=pop.querySelector('.ph-sun');if(!sun||!/☀/.test(sun.textContent)||!/−\d/.test(sun.textContent))fail('sun','Sun token cost not shown on its own');else ok('sun')}
         E('UI.sel=null;UI.tgt=null;PHN.src=null')}
       const m=E(`JSON.stringify(aiMove(${hp.i}))`);E(`go(${m})`);setTimeout(step,0)}catch(e){fail('crash',String(e.stack||e).slice(0,300));w.close();res()}};
     setTimeout(step,0)})})}
