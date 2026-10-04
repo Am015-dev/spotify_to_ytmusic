@@ -34,6 +34,9 @@ Full method: the project skill `.claude/skills/boardgame-builder/` (loads automa
 - **"No story mode":** chapters with bosses and a difficulty curve (`games-src/shell/CAMPAIGN.md`).
 
 ## Cost rules (about $4,000 was spent, mostly waste)
+- **Always set the model on every helper and cloud session.** The default is the most expensive model; all 45 earlier
+  cloud sessions ran on it by accident. Main model: plan, decide, review. Sonnet: build, fix, audits, blind testers.
+  Haiku: downloads, copying, simple loops.
 - One session, at most 2 subagents, 1–2 games finished per session. No new cloud sessions.
 - No PR subscriptions, polling or scheduled wake-ups unless the owner asks.
 - Prove the approach on one game before touching others. Clarity before features.
