@@ -15,7 +15,7 @@ Base: devkit v80 (`alex/overdrive-devkit` @ 259a4cf). Rebuild: `./reapply.sh pAU
   tyre squeal while drifting (roam `RO.dDir`, race `driftT`), brick clatter scaled by the smashed prop's stud count (more and lower clicks plus a thump for big props),
   takedown crunch, bell-like collectible chime (`pick`), and a UI click on every button. The existing item sounds (rocket, missile, mine, shield…) are kept.
 - **Feedback**: roam screen shake capped at 0.45 and **off in missions**; the studs from a smash now shoot up like a fountain; speed lines are brighter and faster while boosting;
-  sustained FOV kick while boosting; chunky 2K-style `TAKEDOWN!` pop (roam via `#hitPop`, races via `#auPop`); `+COMBO ×n` pop on chain-multiplier increases;
+  sustained FOV kick while boosting; chunky 2K-style `TAKEDOWN!` pop (roam via `#hitPop`, moved down to 28 % so it clears the NEXT bar; races via `#auPop`); `+COMBO ×n` pop on chain-multiplier increases;
   confetti + fanfare on race wins (1st place) and on completed missions/activities (bronze or better).
 - **Portrait hint**: shown at most once per device (reuses `mho_portok`). It sits lower on the screen, auto-hides after 3 s, and hides immediately if it touches `#m1Next`, the minimap or the map, or when the map opens.
 
@@ -34,7 +34,7 @@ Kept on purpose, as proper names: street, district and landmark names (Innenstad
   - Non-English strings: a 54-entry list scanned in the built page, none left; Athens plate text is checked live.
   - Zero page errors.
 - `node smoke.js .` → **RESULT_SMOKE**; `smoke/sheet.png` checked (Frankfurt, map, Athens A/B, race, phone portrait and landscape all render normally).
-- Screenshots: `shots/au_takedown.jpg`, `shots/au_confetti.jpg` (the overlays are frozen mid-animation for the picture, because one software-rendered frame takes seconds here), `shots/au_portrait.jpg`.
+- Screenshots: `shots/au_takedown.jpg`, `shots/au_confetti.jpg` (staged: one software-rendered frame takes seconds and the CSS animation clock barely advances here, so the pop is pinned and the confetti pieces are spread down the screen for the picture), `shots/au_portrait.jpg`.
 
 ## Known gaps
 - Nothing here can listen to the mix: levels and timbres are judged only by the numbers above, so they need a by-ear pass on a real device (especially iPhone speaker loudness).
