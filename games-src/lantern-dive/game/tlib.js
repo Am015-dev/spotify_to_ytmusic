@@ -21,6 +21,8 @@ T.setup = (np, hands, tasks, o) => {
   const want = s => G.two ? (s === G.helper ? 14 : 13) : (size + (s < 40 - size * n ? 1 : 0));
   const voidOf = s => (o.void && o.void[s]) || [];
   if (G.two && hs[G.helper].length) { /* explicit drone cards */ }
+  const nv = c => { let k = 0; for (let s = 0; s < n; s++) if (!voidOf(s).includes(D.suitOf(c))) k++; return k; };
+  rest.sort((a, b) => nv(a) - nv(b) || a - b);
   for (const c of rest.slice()) {
     let best = -1, bs = -1e9; for (let s = 0; s < n; s++) { if (hs[s].length >= want(s)) continue; if (G.two && s === G.helper && hs[s].length >= 14) continue; if (voidOf(s).includes(D.suitOf(c))) continue; const sc = want(s) - hs[s].length; if (sc > bs) { bs = sc; best = s; } }
     if (best < 0) for (let s = 0; s < n; s++) if (hs[s].length < want(s)) { best = s; break; }

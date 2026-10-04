@@ -60,7 +60,7 @@ function doc(id, it, imgs) {
     fs.mkdirSync(SHOTS, { recursive: true });
     const files = Object.entries(man.items).map(([k, v]) => [k, path.join(OUT, v + '.webp')]).filter(x => fs.existsSync(x[1]));
     const cells = files.map(([k, f]) => `<figure style="margin:6px;display:inline-block;text-align:center;font:12px sans-serif"><img src="data:image/webp;base64,${fs.readFileSync(f).toString('base64')}" style="max-width:${k === 'title' ? 720 : k === 'table' ? 512 : 192}px;background:#e9d9b8"><figcaption>${k}</figcaption></figure>`).join('');
-    const small = files.filter(([k]) => ITEMS[k].w === CARD).map(([k, f]) => `<img src="data:image/webp;base64,${fs.readFileSync(f).toString('base64')}" style="width:70px;margin:3px;background:#f6ead0">`).join('');
+    const small = files.filter(([k]) => ITEMS[k].w <= 192).map(([k, f]) => `<img src="data:image/webp;base64,${fs.readFileSync(f).toString('base64')}" style="width:70px;margin:3px;background:#f6ead0">`).join('');
     await pg.setViewportSize({ width: 1500, height: 900 }); const p2 = await b.newPage({ deviceScaleFactor: 1 }); await p2.setViewportSize({ width: 1500, height: 900 });
     await p2.setContent(`<body style="margin:0;background:#cdb991">${cells}<div>${small}</div></body>`); await p2.waitForTimeout(300);
     await p2.screenshot({ path: path.join(SHOTS, 'sheet.png'), fullPage: true }); console.log('sheet', path.join(SHOTS, 'sheet.png'));

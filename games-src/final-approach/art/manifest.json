@@ -1,0 +1,119 @@
+{
+ "note": "id -> base file name in this folder. build.py embeds <name>.png if present (a user painting, resized to the size below), else <name>.webp (made by ../paint/paint.js). Atlases (dice, tokens, icons) keep the grid listed under \"atlas\".",
+ "items": {
+  "dice": "dice",
+  "tokens": "tokens",
+  "icons": "icons",
+  "dial": "dial",
+  "planefront": "planefront",
+  "gauge": "gauge",
+  "pillbar": "pillbar"
+ },
+ "size": {
+  "dice": [
+   768,
+   512
+  ],
+  "tokens": [
+   512,
+   512
+  ],
+  "icons": [
+   768,
+   192
+  ],
+  "dial": [
+   320,
+   320
+  ],
+  "planefront": [
+   320,
+   140
+  ],
+  "gauge": [
+   480,
+   260
+  ],
+  "pillbar": [
+   256,
+   48
+  ]
+ },
+ "atlas": {
+  "dice": {
+   "cw": 128,
+   "ch": 128,
+   "cols": 6,
+   "names": [
+    "b1",
+    "b2",
+    "b3",
+    "b4",
+    "b5",
+    "b6",
+    "o1",
+    "o2",
+    "o3",
+    "o4",
+    "o5",
+    "o6",
+    "k2",
+    "k3",
+    "k4",
+    "k5",
+    "bb",
+    "ob",
+    "t1",
+    "t2",
+    "t3",
+    "t4",
+    "t5",
+    "t6"
+   ]
+  },
+  "tokens": {
+   "cw": 128,
+   "ch": 128,
+   "cols": 4,
+   "names": [
+    "coffee",
+    "reroll",
+    "plane",
+    "you",
+    "swoff",
+    "swon",
+    "blue",
+    "orange",
+    "brake",
+    "drop",
+    "wind",
+    "spare",
+    "wellB",
+    "wellO",
+    "wellN",
+    "bezel"
+   ]
+  },
+  "icons": {
+   "cw": 96,
+   "ch": 96,
+   "cols": 8,
+   "names": [
+    "axis",
+    "engines",
+    "radio",
+    "gear",
+    "flaps",
+    "brakes",
+    "conc",
+    "fuel",
+    "intern",
+    "ice",
+    "wind",
+    "clock",
+    "alt",
+    "approach"
+   ]
+  }
+ }
+}
