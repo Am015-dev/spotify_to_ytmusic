@@ -148,7 +148,7 @@ function recapHTML(){const me=recapMe();if(me<0||!RECAP.snap)return '';
   const parts=[];G.pl.forEach((q,k)=>{const s=RECAP.snap[k];if(!s)return;const d=[];
     if(s.alive&&!q.alive){d.push('knocked out')}else{if(q.vp!==s.vp)d.push(`${q.vp>s.vp?'+':'−'}${Math.abs(q.vp-s.vp)}★`);if(q.hp!==s.hp)d.push(`${q.hp>s.hp?'+':'−'}${Math.abs(q.hp-s.hp)}♥`)}
     if(s.city!==(G.city===k)&&q.alive)d.push(G.city===k?'👑in':'👑out');
-    if(d.length)parts.push(`<b>${k===me?'You':esc(mname(q))}</b> ${d.join(' ')}`)});
+    if(d.length)parts[k===me?'unshift':'push'](`<b>${k===me?'You':esc(mname(q))}</b> ${d.join(' ')}`)});
   const ev=G.log.filter(l=>l.n>RECAP.n).reverse().map(l=>`<li>${esc(l.t)}</li>`);
   if(!parts.length&&!ev.length)return '';
   return `⏪ <b>While you waited:</b> ${parts.length?parts.join(' · '):'nothing changed'}${ev.length?` <span class="more">· tap: how</span><ol class="recap">${ev.join('')}</ol>`:''}`}
