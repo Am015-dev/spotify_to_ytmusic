@@ -39,12 +39,13 @@ function newGame(mode, o) {
   let tries = 0;
   // the guided first dive is a fixed, stacked deal that cannot be lost: you hold the Commander's Lantern 4 AND the Lantern 3, the job is to win the Lantern 3
   const gs = mode === 'guided' ? guidedStack() : null;
-  G = LD.newGame({ players: np, seed, names, ai, mission, timer: !!opt.timer, stack: gs });
+  G = LD.newGame({ players: np, seed, names, ai, mission, timer: !!opt.timer, stack: gs, boss: mode === 'descent' ? opt.boss || null : null });
   G.noProg = mission.kind !== 'log' && mission.kind !== 'deep';
   resetUI(mode, { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null, kind: opt.kind, mission: opt.mission, d: opt.d, cmt: opt.cmt, deep: opt.deep, job: opt.job, timer: !!opt.timer });
   UI.news = [];
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.prefs.guide === 'light' ? 'light' : UI.prefs.guide === 'off' ? 'off' : 'light'), seen: {}, keep: false };
-  if (mode === 'guided') UI.coach.level = 'full';
+  if (mode === 'guided') UI.coach.level = 'off'; // Mara's dialogs teach the training dive (ui8.js)
+  UI.said = {}; UI.dlg = null; try { drawDlg(); } catch (e) { }
   placePrompt(); render(); sndMusic(); autosave(); schedule();
 }
 function guidedStack() {
@@ -76,6 +77,7 @@ function schedule() {
   if (isClient()) { try { coachCheck(); } catch (e) { } return; }
   if (UI.cards.length) return;
   if (UI.tip && UI.mode === 'guided') return;
+  try { if (storyCheck()) return; } catch (e) { console.error(e); }
   if (G.clock && G.clockRun && UI.timerAt === 0) { UI.timerAt = Date.now(); UI.clockLeft = G.clock; startClock(); }
   if (aiWants()) {
     const d = AIDELAY <= 0 ? 0 : Math.round(AIDELAY * (.25 + .6 * Math.random()));
@@ -124,6 +126,7 @@ function tapHand(id) {
     const T = G.trick, turn = T.turn;
     if (ctlSeat(turn) !== v || G.players[turn].helper) { toast(G.players[turn].helper ? 'Tap the drone\'s cards to play for it.' : 'Wait for ' + pname(turn) + '.'); return; }
     const legal = LD.playable(G, turn); if (!legal.includes(id)) { snd('error'); const ls = T.ls; toast(T.plays.length ? 'You must follow ' + (ls === 4 ? 'the Lantern lead' : D.suits[ls].name) + ' if you can.' : 'That card cannot lead now.'); return; }
+    if (tutOnly() >= 0 && id !== tutOnly()) { snd('error'); toast('Mara: lead the glowing ' + cname(tutOnly()) + ' this time.'); return; }
     if (UI.sel === id) { playSel(); return; }
     UI.sel = id; UI.hint = null; snd('click', { vol: .4 }); render(); return;
   }
@@ -173,6 +176,14 @@ function drawCard() {
 function takeDevice() { const c = UI.cards[0]; if (!c || c.kind !== 'pass') return; UI.cards.shift(); UI.holder = c.seat; drawCard(); render(); schedule(); }
 // ---------- the event sequences: cards fly to the table, the trick is swept to its winner ----------
 // ---------- "what just happened": one plain line per event that touches the team (jobs taken, tricks won, jobs done or failed, signals) ----------
+function trickWhy(e, cu) {
+  const lan = e.plays.filter(p => suitOf(p.c) === 4).length, ws = suitOf(e.wc);
+  if (ws === 4) return lan > 1 ? ', the highest Lantern.' : ': a Lantern beats every colour.';
+  if (cu === 'low') return ', the lowest ' + D.suits[ws].name + ' (Undertow curse).';
+  if (cu === 'any') return ', the highest number of any colour (Riptide curse).';
+  if (cu === 'sleep' && lan) return ', the highest ' + D.suits[ws].name + ': the Lanterns slept (curse).';
+  return ', the highest ' + D.suits[ws].name + '.';
+}
 function newsFrom(evs) {
   const out = [], q = '“', qq = '”';
   for (const e of evs) {
@@ -180,7 +191,8 @@ function newsFrom(evs) {
     else if (e.t === 'take') out.push((e.seat === viewSeat() ? 'You took ' : pname(e.seat) + ' took ') + q + jobShort(e.i) + qq + '.');
     else if (e.t === 'swap') out.push('Every diver passed one card ' + (G.hn === 2 ? 'to the partner.' : e.dir > 0 ? 'to the left.' : 'to the right.'));
     else if (e.t === 'ping') out.push(pname(e.seat) + ' showed ' + cname(e.c) + (e.k ? ': ' + (e.seat === viewSeat() ? 'your' : 'their') + (e.k === 'high' ? ' highest ' : e.k === 'low' ? ' lowest ' : ' only ') : ' ') + (e.k ? D.suits[suitOf(e.c)].name + '.' : '(highest, lowest or only one?)') + (e.seat === viewSeat() ? '' : ' Their signal is now used (red cross).'));
-    else if (e.t === 'trick') { const ti = G.tricks.findIndex(k => k.plays[0].c === e.plays[0].c); out.push((ti >= 0 ? 'Trick ' + (ti + 1) + ': ' : '')  + pname(e.w) + ' won with ' + cname(e.wc) + (suitOf(e.wc) === 4 ? (e.plays.filter(p => suitOf(p.c) === 4).length > 1 ? ', the highest Lantern.' : ': a Lantern beats every colour.') : ', the highest ' + D.suits[suitOf(e.wc)].name + '.')); }
+    else if (e.t === 'trick') { const ti = G.tricks.findIndex(k => k.plays[0].c === e.plays[0].c); out.push((ti >= 0 ? 'Trick ' + (ti + 1) + ': ' : '')  + pname(e.w) + ' won with ' + cname(e.wc) + trickWhy(e, ti >= 0 ? G.tricks[ti].cu : '')); }
+    else if (e.t === 'job' && e.st > 0 && isBoss()) { UI.hitAt = Date.now(); const B = bossChar(); out.push('\u2714 ' + pname(G.tasks[e.i].owner) + ' finished \u201c' + jobShort(e.i) + '\u201d. ' + B.name + ' takes a hit: \u201c' + B.hit[(G.tasks.filter((t, k) => jobSt(k) > 0).length - 1) % B.hit.length] + '\u201d'); setTimeout(() => { try { bossBar(); } catch (er) { } }, 750); }
     else if (e.t === 'job' && e.st > 0) out.push('✔ ' + pname(G.tasks[e.i].owner) + ' finished ' + q + jobShort(e.i) + qq + '.');
     else if (e.t === 'job' && e.st < 0) out.push('✖ ' + (G.tasks[e.i].owner === viewSeat() ? 'Your' : pname(G.tasks[e.i].owner) + '’s') + ' job ' + q + jobShort(e.i) + qq + ' can no longer be done.');
   }

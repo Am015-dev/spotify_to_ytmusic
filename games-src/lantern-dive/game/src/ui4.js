@@ -18,7 +18,7 @@ function seen(id) { return !!UI.coach.seen[id]; }
 function markSeen(id) { UI.coach.seen[id] = 1; if (UI.coach.level !== 'full') { try { const s = JSON.parse(lsGet('ld_tips') || '{}'); s[id] = 1; lsSet('ld_tips', JSON.stringify(s)); } catch (e) { } } }
 function seenEver(id) { try { return !!JSON.parse(lsGet('ld_tips') || '{}')[id]; } catch (e) { return false; } }
 function coachCheck() {
-  if (!G || !UI.started || UI.coach.level === 'off' || UI.tip || UI.cards.length) return;
+  if (!G || !UI.started || UI.coach.level === 'off' || UI.tip || UI.cards.length || UI.dlg) return;
   if (UI.busy || (G.phase === 'play' && UI.fz)) return;
   if (viewSeat() < 0) return;
   const light = UI.coach.level === 'light';
@@ -102,10 +102,12 @@ function showResult() {
     if (ok) { const n = p.done[m.id]; box.append(h('p', 'Logged in your logbook: dive ' + m.id + ' done in ' + n + ' attempt' + (n === 1 ? '' : 's') + (p.flare[m.id] ? ' (the flare counts one).' : '.'))); }
     else box.append(h('p.sm', 'Attempts so far on this dive: ' + (p.tries[m.id] || 0) + '. If the jobs could not be done from the start, try with new jobs.'));
   } else if (m.kind === 'deep' && ok) box.append(h('p', 'Deep dive ' + m.d + ' complete. The next one is difficulty ' + (m.d + 1) + '.'));
+  if (UI.mode === 'descent') { descResult(box, ok); rs.append(box); snd(ok ? 'win' : 'lose'); return; }
   const bt = h('div.cbtns');
   const host = !NET.on || isHost();
   if (ok) {
-    if (host && m.kind === 'log' && m.id < 32) bt.append(h('button.btn.go', { 'data-a': 'nextdive', type: 'button' }, 'Next dive'));
+    if (UI.mode === 'guided') bt.append(h('button.btn.go', { 'data-a': 'descgo', type: 'button' }, 'Start The Descent'));
+    else if (host && m.kind === 'log' && m.id < 32) bt.append(h('button.btn.go', { 'data-a': 'nextdive', type: 'button' }, 'Next dive'));
     else if (host && m.kind === 'log') bt.append(h('button.btn.go', { 'data-a': 'nextdive', type: 'button' }, 'Deep dive ' + D.deep.start));
     else if (host && m.kind === 'deep') bt.append(h('button.btn.go', { 'data-a': 'nextdive', type: 'button' }, 'Next: deep dive ' + (m.d + 1)));
     else if (host) bt.append(h('button.btn.go', { 'data-a': 'retrysame', type: 'button' }, 'Play again'));
@@ -124,7 +126,8 @@ function guidedDebrief(box) {
     h('li', 'A job card tells ONE diver what to do with the tricks that diver wins. Yours: win the Lantern 3.'),
     h('li', 'Lanterns are trumps: any Lantern beats every colour, and the highest Lantern wins. You held the two highest, so the job was safe.'),
     h('li', 'The whole team wins when every job is done, and the dive ends at once. It took ' + G.tricks.length + ' trick' + (G.tricks.length === 1 ? '' : 's') + ' and you won ' + mine + '.'),
-    h('li', 'Next dives have jobs for every diver. Watch the job chips under each name, and use the signal token to tell your team one card you hold.'))));
+    h('li', 'Next dives have jobs for every diver. Watch the job chips under each name, and use the signal token to tell your team one card you hold.'))),
+    h('div.say', h('span.dpt', { html: portraitSVG('mara', 52) }), h('p', h('b', 'Mara: '), 'You are ready. Now take on The Descent: four zones, and a boss at the bottom of each.')));
 }
 function closeRS() { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; }
 function nextDive() {

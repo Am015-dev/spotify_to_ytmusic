@@ -72,6 +72,7 @@ function canAct() { const v = viewSeat(); return !!G && v >= 0 && !UI.busy && !U
 function iMustAct() { const v = viewSeat(); return v >= 0 && G && !isOver() && LD.pending(G).includes(v); }
 // the dive label in the bar
 function diveLabel() {
+  if (UI.mode === 'descent' && G.desc && typeof DESC !== 'undefined') { const Z = DESC[G.desc.zi]; return Z.name + ' · ' + (G.boss ? CHAR[G.boss.id].name : 'dive ' + (G.desc.si + 1) + ' of 3'); }
   const m = G.mission; if (m.kind === 'log') return 'Dive ' + m.id; if (m.kind === 'deep') return 'Deep dive ' + m.d; return m.name;
 }
 function toast(t) { const el = $('#toast'); if (!el) return; el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2400); }

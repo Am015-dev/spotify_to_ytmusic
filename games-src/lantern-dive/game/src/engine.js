@@ -282,6 +282,8 @@ function newGame(o) {
   for (let i = 0; i < hn; i++) G.players.push({ seat: i, name: (o.names && o.names[i]) || D.names[i % 5], ai: (o.ai && o.ai[i]) || null, hand: [], stacks: null, pingUsed: 0, mem: {} });
   if (two) G.players.push({ seat: 2, name: D.helper.name, ai: null, helper: 1, hand: [], stacks: [], pingUsed: 1, mem: {} });
   G.mission = missionInfo(o.mission);
+  // Descent mode boss (our own addition, not in the original rules): a pool of curses, one on every `every`-th trick from trick 2
+  G.boss = o.boss ? { id: o.boss.id, pool: o.boss.pool.slice(), every: o.boss.every || 2, sched: [] } : null;
   G.tdeck = shuffle(G, Array.from({ length: 96 }, (_, i) => i));
   G.distress = false;
   startAttempt(G, { fresh: true });
@@ -303,6 +305,7 @@ function startAttempt(G, o) {
   else { if (G.tasks) G.tdisc = G.tdisc.concat(G.tasks.map(t => t.id)); G.tasks = drawTasks(G).map(id => ({ id, owner: -1, pn: -1 })); }
   for (let tries = 0; tries < 200; tries++) { dealHands(G); if (!needRedeal(G)) break; }
   if (G.stack) applyStack(G);
+  if (G.boss) { const n = ntrOf(G.np), B = G.boss; B.sched = []; for (let i = 0; i < n; i++) B.sched.push(i >= 1 && (i - 1) % B.every === 0 ? B.pool[rnd(G, B.pool.length)] : ''); }
   G.events = []; G.pl = new Array(40).fill(0); G.pings = []; G.tricks = [];
   Object.assign(G, { phase: 'assign', result: null, trick: null, left: -1, offered: false, ntr: ntrOf(G.np), firstW: -1, lastCard: -1, clockRun: false });
   ev(G, { t: 'deal', att: G.att, cap: G.cap, comm: G.comm, unk: G.unk, tasks: G.tasks.map(t => t.id) });
@@ -516,13 +519,14 @@ function nextSignal(G, from) {
   }
   beginTricks(G);
 }
+function curseAt(G, n) { return G.boss && G.boss.sched ? G.boss.sched[n] || '' : ''; }
 function startPlay(G) {
   ev(G, { t: 'start' });
   if (G.comm === 'none' || G.mission.m23) { beginTricks(G); return; }
   startSignal(G);
 }
 function beginTricks(G) {
-  G.phase = 'play'; G.trick = { n: G.tricks.length, lead: G.tricks.length ? G.trick.lead : G.cap, turn: G.tricks.length ? G.trick.turn : G.cap, plays: [], ls: -1 };
+  G.phase = 'play'; G.trick = { n: G.tricks.length, lead: G.tricks.length ? G.trick.lead : G.cap, turn: G.tricks.length ? G.trick.turn : G.cap, plays: [], ls: -1, cu: curseAt(G, G.tricks.length) };
   ev(G, { t: 'tricks' });
 }
 
@@ -544,12 +548,18 @@ function playMoves(G, c) {
   const as = G.players[s].helper ? { as: s } : {};
   return playable(G, s).map(x => Object.assign({ t: 'play', c: x }, as));
 }
-function trickWinner(plays, ls) {
+// cu = a boss curse on this trick (Descent mode only, our own addition; '' = the normal rule):
+//   'low'   the LOWEST card of the led colour wins (Lanterns still beat colours, the highest Lantern still wins)
+//   'sleep' Lanterns sleep: a Lantern played on a colour lead wins nothing (a Lantern lead is played as usual)
+//   'any'   every colour counts: the highest number wins whatever its colour (Lanterns still beat colours; ties go to the first played)
+function trickWinner(plays, ls, cu) {
   let best = -1, bs = -1;
   for (const p of plays) {
     const su = suit(p.c), v = val(p.c);
     let power;
-    if (su === LAN) power = 100 + v; else if (su === ls) power = v; else power = 0;
+    if (su === LAN) power = cu === 'sleep' && ls !== LAN ? 0 : 100 + v;
+    else if (cu === 'any') power = v;
+    else if (su === ls) power = cu === 'low' ? 10 - v : v; else power = 0;
     if (power > best) { best = power; bs = p.s; }
   }
   return bs;
@@ -606,7 +616,7 @@ function afterTrick(G, k) {
   if (done && (!G.mission.hold || over)) { finish(G, true); return; }
   if (over) { finish(G, st.every(x => x > 0), st.some(x => x <= 0) ? 'Not every job was finished.' : ''); return; }
   // next trick: the winner leads
-  G.trick = { n: G.tricks.length, lead: k.w, turn: k.w, plays: [], ls: -1 };
+  G.trick = { n: G.tricks.length, lead: k.w, turn: k.w, plays: [], ls: -1, cu: curseAt(G, G.tricks.length) };
 }
 function doPlay(G, s, c) {
   const T = G.trick;
@@ -618,8 +628,8 @@ function doPlay(G, s, c) {
   if (G.mission.m27 && c === SU5 && !(T.n === G.ntr - 1 && T.plays.length === G.np)) { T.bad27 = 1; finish(G, false, 'Trick ' + (T.n + 1) + ': ' + G.players[s].name + ' played the Sunstar 5 too early. It must be the very last card of the dive.'); return; }
   if (T.bad) { finish(G, false, 'Trick ' + (T.n + 1) + ': ' + G.players[T.lead].name + ' had to lead with ' + cn(T.plays[0].c) + ', but no trick may be led with a Coral card or a Lantern.'); return; }
   if (T.plays.length < G.np) { T.turn = (s + 1) % G.np; return; }
-  const w = trickWinner(T.plays, T.ls), wc = T.plays.find(p => p.s === w).c;
-  const k = { n: T.n, lead: T.lead, ls: T.ls, plays: T.plays.map(p => ({ s: p.s, c: p.c })), w, wc };
+  const w = trickWinner(T.plays, T.ls, T.cu), wc = T.plays.find(p => p.s === w).c;
+  const k = { n: T.n, lead: T.lead, ls: T.ls, plays: T.plays.map(p => ({ s: p.s, c: p.c })), w, wc, cu: T.cu || '' };
   G.tricks.push(k);
   ev(G, { t: 'trick', n: k.n, w, wc, plays: k.plays });
   lg(G, sv(G, w, 'wins', 'win') + ' trick ' + (k.n + 1) + ' with ' + cn(wc) + '.');
@@ -737,12 +747,12 @@ function checkInvariants(G) {
   const total = G.players.reduce((a, p) => a + p.hand.length, 0) + G.tricks.length * G.np + (G.trick && G.trick.n === G.tricks.length ? G.trick.plays.length : 0);
   if (total !== 40) e.push('card total ' + total);
   if (G.phase === 'play' && G.trick.plays.length === 0) { const sz = G.players.map(p => p.hand.length); if (Math.max(...sz) - Math.min(...sz) > 1) e.push('hand sizes ' + sz); }
-  G.tricks.forEach((k, i) => { if (k.plays.length !== G.np) e.push('trick size'); if (trickWinner(k.plays, k.ls) !== k.w) e.push('winner mismatch'); });
+  G.tricks.forEach((k, i) => { if (k.plays.length !== G.np) e.push('trick size'); if (trickWinner(k.plays, k.ls, k.cu) !== k.w) e.push('winner mismatch'); });
   if (G.pool < 0) e.push('negative pool');
   if (G.phase === 'play' && G.cap >= 0 && !G.players[G.cap].hand.length && G.tricks.length === 0) e.push('captain lost lantern 4');
   return e;
 }
-Object.assign(LD, { newGame, nextAttempt, moves, apply, pending, stripView, checkInvariants, text, expire, clone, jobStatus, condBroken, suit, val, trickWinner, explainJob, explainText, ntrOf, playable, canPing, pingMoves, ctl, isDiver, diverSeats, orderFrom, conflict, splitOK, claims, needRedeal,
+Object.assign(LD, { curseAt, newGame, nextAttempt, moves, apply, pending, stripView, checkInvariants, text, expire, clone, jobStatus, condBroken, suit, val, trickWinner, explainJob, explainText, ntrOf, playable, canPing, pingMoves, ctl, isDiver, diverSeats, orderFrom, conflict, splitOK, claims, needRedeal,
   validMoves: moves, performMove: (G, m, s) => apply(G, s, m), sideToAct: pending, render_game_to_text: text,
   _: { rnd, shuffle, KIND, tw, ntrOf, startPlay, finish, afterTrick, dealHands, drawTasks, holdsMission, statusAll, doPlay, playable, remVal, remSuit, wonBy, cardsWon, longestRun, startAttempt, TASKS } });
 // the status functions read S.tricks: make G answer to it

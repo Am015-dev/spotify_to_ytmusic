@@ -97,7 +97,7 @@ function sampleHands(V, B, rng) {
 // ---------- a simulation state shaped like G (so the real rules run unchanged) ----------
 function simBase(V) {
   const W = {
-    v: 1, np: V.np, hn: V.hn, two: V.two, helper: V.helper, mission: V.mission, comm: V.comm, cap: V.cap, ntr: V.ntr, nolog: true, phase: 'play', att: V.att, logN: 0, evN: 0, log: [], events: [], pool: 0,
+    v: 1, boss: V.boss || null, np: V.np, hn: V.hn, two: V.two, helper: V.helper, mission: V.mission, comm: V.comm, cap: V.cap, ntr: V.ntr, nolog: true, phase: 'play', att: V.att, logN: 0, evN: 0, log: [], events: [], pool: 0,
     pl: V.pl.slice(), tricks: V.tricks.slice(), pings: V.pings, firstW: V.firstW, lastCard: V.lastCard, offered: V.offered, result: null, rng: 1, seed: 1,
     tasks: V.tasks.map(t => ({ id: t.id, owner: t.owner, pn: t.pn, st: 0 })),
     players: V.players.map(p => ({ seat: p.seat, helper: p.helper, hand: [], stacks: null })), trick: null
@@ -117,13 +117,13 @@ function fillWorld(W, V, B, hands) {
     p.hand = hands[s].slice().sort((a, b) => a - b);
   });
   // the Commander's helper in a 2-diver game when I am the Commander: I can see the face-up cards and not the others (handled above)
-  W.trick = V.trick ? { n: V.trick.n, lead: V.trick.lead, turn: V.trick.turn, plays: V.trick.plays.map(p => ({ s: p.s, c: p.c })), ls: V.trick.ls } : null;
+  W.trick = V.trick ? { n: V.trick.n, lead: V.trick.lead, turn: V.trick.turn, plays: V.trick.plays.map(p => ({ s: p.s, c: p.c })), ls: V.trick.ls, cu: V.trick.cu || '' } : null;
 }
 function cloneW(W) {
   return Object.assign({}, W, {
     pl: W.pl.slice(), tricks: W.tricks.slice(), tasks: W.tasks.map(t => ({ id: t.id, owner: t.owner, pn: t.pn, st: t.st })), phase: W.phase, result: null,
     players: W.players.map(p => ({ seat: p.seat, helper: p.helper, hand: p.hand.slice(), stacks: p.stacks ? p.stacks.map(s => s.slice()) : null })),
-    trick: W.trick ? { n: W.trick.n, lead: W.trick.lead, turn: W.trick.turn, plays: W.trick.plays.map(p => ({ s: p.s, c: p.c })), ls: W.trick.ls } : null
+    trick: W.trick ? { n: W.trick.n, lead: W.trick.lead, turn: W.trick.turn, plays: W.trick.plays.map(p => ({ s: p.s, c: p.c })), ls: W.trick.ls, cu: W.trick.cu || '' } : null
   });
 }
 // ---------- soft progress of a job (0..1) and its orientation ----------
@@ -172,7 +172,7 @@ function trickU(W, s, c, ori) {
   const T = W.trick, np = W.np; const cur = T.plays.map(p => ({ s: p.s, c: p.c })); cur.push({ s, c }); const ls = T.plays.length ? T.ls : suit(c);
   let turn = (s + 1) % np; const added = [c];
   while (cur.length < np) { const lc = lowestLegal(W, turn, ls, cur); if (lc < 0) return -99; cur.push({ s: turn, c: lc }); added.push(lc); turn = (turn + 1) % np; }
-  const w = LD.trickWinner(cur, ls), wc = cur.find(p => p.s === w).c;
+  const w = LD.trickWinner(cur, ls, T.cu), wc = cur.find(p => p.s === w).c;
   const k = { n: T.n, lead: T.lead, ls, plays: cur, w, wc };
   const before = W.tasks.map((t, i) => soft(W, i));
   W.tricks.push(k); const prev = []; for (const x of cur) { prev.push(W.pl[x.c]); W.pl[x.c] = 1; }
@@ -192,7 +192,7 @@ function cands(W, s, L, many) {
   for (const c of L) (bySuit[suit(c)] = bySuit[suit(c)] || []).push(c);
   for (const k in bySuit) { const a = bySuit[k].sort((x, y) => val(x) - val(y)); out.add(a[0]); out.add(a[a.length - 1]); if (many && a.length > 2) out.add(a[a.length >> 1]); }
   const T = W.trick;
-  if (T && T.plays.length) { const w = LD.trickWinner(T.plays, T.ls); const wc = T.plays.find(p => p.s === w).c; const win = L.filter(c => LD.trickWinner(T.plays.concat([{ s, c }]), T.ls) === s).sort((a, b) => powerOf(a) - powerOf(b)); if (win.length) out.add(win[0]); }
+  if (T && T.plays.length) { const w = LD.trickWinner(T.plays, T.ls, T.cu); const wc = T.plays.find(p => p.s === w).c; const win = L.filter(c => LD.trickWinner(T.plays.concat([{ s, c }]), T.ls, T.cu) === s).sort((a, b) => powerOf(a) - powerOf(b)); if (win.length) out.add(win[0]); }
   return [...out];
 }
 function greedyCard(W, s) {
@@ -245,7 +245,7 @@ function fit(V, me, ti, owner, K, base) {
     const W = cloneW(W0); W.tasks.forEach((t, i) => { if (i === ti) t.owner = owner; else if (base && base.includes(i) && V.tasks[i].owner >= 0) t.owner = V.tasks[i].owner; else t.owner = -9; });
     W.tasks = W.tasks.filter(t => t.owner !== -9 && t.owner !== -1 || false);
     if (!W.tasks.length) continue;
-    W.phase = 'play'; W.cap = V.cap; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1 }; W.tricks = []; W.pl = new Array(40).fill(0);
+    W.phase = 'play'; W.cap = V.cap; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1, cu: LD.curseAt(W, 0) }; W.tricks = []; W.pl = new Array(40).fill(0);
     roll(W); if (W.result && W.result.ok) ok++; df += doneFrac(W);
   }
   return (ok + .25 * df) / wl.length;
@@ -302,7 +302,7 @@ function rateAll(V, me, level, asOwner) {
   const wl = worlds(V, me, K, 77).W; let ok = 0, ok2 = 0, n = 0;
   for (const W0 of wl) {
     for (const who of [me, V.cap === me ? (me + 1) % V.np : V.cap]) {
-      const W = cloneW(W0); W.tasks.forEach(t => { t.owner = who; }); W.phase = 'play'; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1 }; W.tricks = []; W.pl = new Array(40).fill(0); roll(W);
+      const W = cloneW(W0); W.tasks.forEach(t => { t.owner = who; }); W.phase = 'play'; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1, cu: LD.curseAt(W, 0) }; W.tricks = []; W.pl = new Array(40).fill(0); roll(W);
       if (who === me) { ok += W.result && W.result.ok ? 1 : 0; n++; } else ok2 += W.result && W.result.ok ? 1 : 0;
     }
   }
@@ -322,7 +322,7 @@ function choosePredict(V, me, level, moves) {
   const wl = worlds(V, me, K, 55).W;
   for (const m of moves) {
     if (m.n > Math.ceil(V.ntr * .7)) continue; let ok = 0;
-    for (const W0 of wl) { const W = cloneW(W0); W.tasks.forEach((t, i) => { t.owner = i === ti ? V.tasks[ti].owner : -9; }); W.tasks = W.tasks.filter(t => t.owner !== -9); W.tasks[0].pn = m.n; W.phase = 'play'; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1 }; W.tricks = []; W.pl = new Array(40).fill(0); roll(W); if (W.result && W.result.ok) ok++; }
+    for (const W0 of wl) { const W = cloneW(W0); W.tasks.forEach((t, i) => { t.owner = i === ti ? V.tasks[ti].owner : -9; }); W.tasks = W.tasks.filter(t => t.owner !== -9); W.tasks[0].pn = m.n; W.phase = 'play'; W.trick = { n: 0, lead: V.cap, turn: V.cap, plays: [], ls: -1, cu: LD.curseAt(W, 0) }; W.tricks = []; W.pl = new Array(40).fill(0); roll(W); if (W.result && W.result.ok) ok++; }
     const sc = ok / Math.max(1, wl.length) - .001 * Math.abs(m.n - V.ntr / 3); if (sc > bs) { bs = sc; best = m; }
   }
   return best;

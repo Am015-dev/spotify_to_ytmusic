@@ -115,3 +115,17 @@ Guessed (the sources do not say; chosen to be fair and to keep the real game's f
 - Impossible job pairs are replaced at draw time: two "most tricks" jobs, two "fewest tricks" jobs, any two jobs that together need more than four copies of one value or of the Lanterns (3+ nines with exactly two nines, exactly 2 with exactly 3 Lanterns), as well as the older shared-position / shared-card pairs. With fewer jobs than divers every job goes to a different diver, so no conflicting pair may be drawn at all (row 5).
 - A job the dive's own limit makes impossible is never drawn (dive 8: jobs 21 and 23, job 25 at 4+ divers, the owner needs n copies and each other diver n - gap + 1) (row 6).
 - The drone may not be given a Commander-comparison job (row 8).
+
+## Descent mode (our own addition, not in the published game)
+The owner asked for challenges that grow harder and end in a boss. The Descent is a campaign layered on top of the real rules:
+* 4 zones (Sunlit Reef, Kelp Forest, Twilight Trench, The Abyss), each 3 dives and a boss dive. Crew: you + 3 computer divers (normal).
+  Dives are Free dives of rising difficulty (2-4, 5-6, 6-7, 8-9; some in murky water), tuned with `game/desc-gauntlet.js`.
+* 3 oxygen tanks per zone. A failed dive costs a tank and is played again with new jobs; with no tanks left the zone starts again.
+  A dive won without a failure earns a star. Beating a boss refills the tanks and opens the next zone.
+* Boss dives are normal dives with a boss curse on some tricks (trick 2, 4, 6, … ; the Leviathan curses every trick from trick 2).
+  The schedule is drawn at the deal and is public. A curse only changes who wins that trick (following suit is unchanged):
+  * Undertow (`low`): the lowest card of the led colour wins; Lanterns still win, highest Lantern first.
+  * Lantern Sleep (`sleep`): a Lantern played on a colour lead wins nothing; a Lantern lead is played as usual.
+  * Riptide (`any`): the highest number of any colour wins; Lanterns still win; ties go to the first card played.
+* The boss's health bar is the number of jobs; every finished job is a hit. Mara (the instructor) and the bosses talk in pop-ups.
+* Engine: `G.boss = { id, pool, every, sched }`, `G.trick.cu`, `trickWinner(plays, ls, cu)`; the trick record keeps `cu`.

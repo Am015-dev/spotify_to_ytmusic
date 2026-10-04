@@ -96,6 +96,7 @@ function renderStart() {
   if (UI.sv === 'title') { s.appendChild(titleEl()); return; }
   if (KIT.ART.title) s.appendChild(h('img.ttl-bg.dim', { src: KIT.ART.title, alt: '' }));
   if (UI.sv === 'online') { s.appendChild(onlineEl()); return; }
+  if (UI.sv === 'descent') { s.appendChild(descentEl()); return; }
   s.appendChild(setupEl());
 }
 function titleEl() {
@@ -105,7 +106,9 @@ function titleEl() {
     h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Lantern Dive')),
     h('p.tag', 'Dive together. Say nothing. Trust the lantern.'),
     h('div.tbtns',
-      h('button.tbtn.go', { 'data-a': 'play', type: 'button' }, h('b', 'Play'), ' ', h('span', 'a dive with computer divers')),
+      h('button.tbtn.go', { 'data-a': 'descent', type: 'button' }, h('b', 'The Descent'), ' ', h('span', '4 zones, 4 bosses')),
+      h('button.tbtn', { 'data-a': 'guided', type: 'button' }, h('b', 'Training'), ' ', h('span', 'a dive with Mara, step by step')),
+      h('button.tbtn', { 'data-a': 'play', type: 'button' }, h('b', 'Free play'), ' ', h('span', 'any dive, any crew')),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), ' ', h('span', 'with friends, free')),
       sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), ' ', h('span', 'your saved dive')) : null),
     h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
@@ -168,7 +171,7 @@ function onlineEl() {
     h('p.ssub', 'Host a dive and send friends the code or the link. Every browser connects directly; nobody sees another hand. Empty seats go to the computer divers. There is no chat: talk with the pings only.'),
     h('details.online#onl', { open: true }, h('summary', 'Free, peer to peer'), h('div#netblock', netInner())));
 }
-function showStart() { try { GX.close(); } catch (e) { } closePop(); UI.cards = []; UI.sv = 'title'; UI.cfgOpen = false; clearInterval(UI.clk); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; } closeRS(); clearTimeout(UI.tm); renderStart(); }
+function showStart() { try { GX.close(); } catch (e) { } UI.dlg = null; try { drawDlg(); } catch (e) { } closePop(); UI.cards = []; UI.sv = 'title'; UI.cfgOpen = false; clearInterval(UI.clk); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; } closeRS(); clearTimeout(UI.tm); renderStart(); }
 // ---------- events ----------
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]'); const pop = $('#ppop');
@@ -205,6 +208,11 @@ document.addEventListener('click', ev => {
     case 'rsclose': closeRS(); break;
     case 'takedev': case 'takeDevice': takeDevice(); break;
     case 'play': UI.sv = 'setup'; renderStart(); break;
+    case 'descent': UI.sv = 'descent'; renderStart(); break;
+    case 'descgo': closeRS(); descGo(); break;
+    case 'descmap': closeRS(); showStart(); UI.sv = 'descent'; renderStart(); break;
+    case 'descreset': descReset(); break;
+    case 'dlgok': dlgOk(); break;
     case 'title': UI.sv = 'title'; UI.cfgOpen = false; renderStart(); break;
     case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;
     case 'cfgopen': UI.cfgOpen = true; renderStart(); try { const c = $('#cfg'); if (c) c.querySelector('button').focus({ preventScroll: true }); } catch (e) { } break;

@@ -154,7 +154,7 @@ function renderFelt(v) {
   const W = felt.clientWidth || 300, H = felt.clientHeight || 160, n = G.np;
   const shown = playsShown(), act = G.phase === 'play' && G.trick && !UI.fz ? G.trick.turn : -1;
   const winS = UI.fz && UI.fz.winner != null && UI.fz.win ? UI.fz.winner : -1;
-  const small = document.documentElement.classList.contains('ph-short'), strip = (isPh() && innerWidth > innerHeight) || small ? 0 : 46, top = small ? 26 : 20;   // small phones: Last trick sits in the felt's top corner, not in a bottom strip   // the bottom strip holds Last trick / Won (never over a played card)
+  const small = document.documentElement.classList.contains('ph-short'), strip = (isPh() && innerWidth > innerHeight) || small ? 0 : 46, top = (small ? 26 : 20) + (G.boss && G.phase !== 'assign' ? 46 : 0);   // a boss bar takes the felt's top band   // small phones: Last trick sits in the felt's top corner, not in a bottom strip   // the bottom strip holds Last trick / Won (never over a played card)
   for (let rel = 0; rel < n; rel++) {
     const s = (from + rel) % n; const [x, y0] = slotPos(rel, n, W, Math.max(60, H - strip - top), (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 56) * 1.4 + 4), y = y0 + top;
     const slot = h('div.tslot' + (act === s ? '.turn' : '') + (winS === s ? '.win' : ''), { 'data-seat': s, style: 'left:' + x + 'px;top:' + y + 'px' });
@@ -189,7 +189,7 @@ function renderMine(v) {
 function legalCards(v) {
   if (v < 0 || !G || UI.busy) return null;
   const ph = G.phase;
-  if (ph === 'play' && G.trick && ctlSeat(G.trick.turn) === v && !UI.pingSel) { const own = !G.players[G.trick.turn].helper; return own ? new Set(LD.playable(G, G.trick.turn)) : new Set(); }
+  if (ph === 'play' && G.trick && ctlSeat(G.trick.turn) === v && !UI.pingSel) { const own = !G.players[G.trick.turn].helper; const t1 = tutOnly(); if (own && t1 >= 0) return new Set([t1]); return own ? new Set(LD.playable(G, G.trick.turn)) : new Set(); }
   if (UI.pingSel) return new Set(LD.pingMoves(G, v).map(m => m.c));
   if (ph === 'pass' && LD.moves(G, v).length) return new Set(LD.moves(G, v).map(m => m.c));
   return null;
@@ -350,7 +350,7 @@ function render() {
   if (!G || !UI.started) return;
   layoutVars();
   const v = viewSeat();
-  renderBar(); renderOpp(v); renderFelt(v); renderMine(v); renderHand(v); renderDock(v);
+  renderBar(); renderOpp(v); renderFelt(v); try { bossBar(); } catch (e) { console.error(e); } renderMine(v); renderHand(v); renderDock(v);
   try { netRenderHook(); } catch (e) { }
   try { pxDirty(); } catch (e) { }
   const rg = $('#start'); if (rg && !rg.hidden && UI.started && !NET.on) { /* start screen closes in newGame */ }
