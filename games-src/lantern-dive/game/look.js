@@ -18,7 +18,7 @@ const [W, H] = (process.argv[2] || '390x763').split('x').map(Number); const PH =
   await wait(); await p.waitForTimeout(1500); await sh('1assign');
   // job pop-up from my own chip / pool card
   let shots = 0, ph0 = '';
-  for (let k = 0; k < 140 && shots < 7; k++) {
+  for (let k = 0; k < 400 && shots < 7; k++) {
     if (!(await wait())) break;
     const st = await p.evaluate(() => ({ ph: G.phase, tr: G.tricks.length, pl: G.trick ? G.trick.plays.length : 0 }));
     if (st.ph !== ph0 && ['distress', 'pass', 'signal'].includes(st.ph)) { await p.waitForTimeout(700); await sh('2' + st.ph); }

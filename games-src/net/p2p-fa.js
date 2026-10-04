@@ -107,7 +107,7 @@ async function layout(x, tag) {
   b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }); const res = [];
   try {
     if (SC === 'full') {
-      const { H, C } = await setup({ sc: 'g2' }); const P = [H, ...C]; await startHost(H); for (const x of P) await seatOf(x); const lp = []; await sleep(1500); for (const x of P) lp.push(...await layout(x, 'mid-start'));
+      const { H, C } = await setup({ sc: 'g2' }); const P = [H, ...C]; await startHost(H); for (const x of P) await seatOf(x); const lp = []; await sleep(1500); for (const x of P) await x.p.evaluate(() => { const c = document.querySelector('#rs.story [data-a=rsclose]'); if (c) c.click(); }); await sleep(600); for (const x of P) lp.push(...await layout(x, 'mid-start'));
       let pr = await play(P, H, 420); const r1 = await finish(P, H, 'flight 1', pr); r1.layout = lp; res.push(r1);
       await again(P, H); for (const x of P) await seatOf(x); pr = await play(P, H, 420); res.push(await finish(P, H, 'flight 2 (Play again)', pr));
     }
@@ -178,6 +178,6 @@ async function layout(x, tag) {
     }
   } catch (e) { console.log('HARNESS ERROR', e && e.stack || e); res.push({ tag: 'harness', agree: false, nErrors: 1 }); }
   await b.close(); relay.kill();
-  const bad = res.filter(r => !r.agree || r.nErrors || (r.viol && r.viol.length) || r.exactStrip === false || r.finalCardEverywhere === false);
+  const bad = res.filter(r => !r.agree || r.nErrors || (r.layout && r.layout.length) || (r.viol && r.viol.length) || r.exactStrip === false || r.finalCardEverywhere === false);
   console.log('SUMMARY', SC, PHONE ? 'phone' : 'desktop', res.length, 'runs,', bad.length, 'bad'); process.exit(0);
 })();
