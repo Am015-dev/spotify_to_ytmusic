@@ -154,8 +154,8 @@ function jobStatus(S, ti) { const t = S.tasks[ti], d = TASKS[t.id]; return KIND[
 // mission rules that hold for the whole dive. Returns a text (broken) or '' (fine). Called after every trick.
 function condBroken(S) {
   const m = S.mission;
-  if (m.gap) { const c = new Array(S.np).fill(0); for (const k of S.tricks) for (const p of k.plays) if (suit(p.c) < 4 && val(p.c) === m.gap.v) c[k.w]++; if (Math.max(...c) - Math.min(...c) >= m.gap.gap) return 'A diver has won two more ' + m.gap.v + 's than another diver.'; }
-  if (m.m23 && S.tricks.length) { const w0 = S.tricks[0].w, w = tw(S); for (let i = 0; i < S.np; i++) if (i !== w0 && w[i] >= w[w0]) return 'The first trick winner no longer has more tricks than everybody else.'; }
+  if (m.gap) { const c = new Array(S.np).fill(0); for (const k of S.tricks) for (const p of k.plays) if (suit(p.c) < 4 && val(p.c) === m.gap.v) c[k.w]++; if (Math.max(...c) - Math.min(...c) >= m.gap.gap) return 'After trick ' + S.tricks.length + ' a diver has won two more ' + m.gap.v + 's than another diver.'; }
+  if (m.m23 && S.tricks.length) { const w0 = S.tricks[0].w, w = tw(S); for (let i = 0; i < S.np; i++) if (i !== w0 && w[i] >= w[w0]) return 'After trick ' + S.tricks.length + ' the winner of the first trick no longer has more tricks than everybody else.'; }
   return '';
 }
 // only dive 27 must be played to the last card (its Sunstar 5 rule needs the final card); every other dive ends the moment the last job is done
@@ -550,8 +550,32 @@ function removeCard(G, s, c) {
   if (p.helper) { const k = p.stacks.findIndex(st => st[0] === c); if (k >= 0) p.stacks[k][0] = -2; }
 }
 function statusAll(G) { return G.tasks.map((t, i) => jobStatus(G, i)); }
+// Which trick, card and diver made a failed job impossible? Replays the tricks one by one on the public information and returns the first
+// trick after which the job reads "failed" (or null when it was broken by something else, or only ran out at the end of the dive).
+function explainJob(G, i) {
+  const d = TASKS[G.tasks[i].id], pl = new Array(40).fill(0);
+  for (let k = 1; k <= G.tricks.length; k++) {
+    const tr = G.tricks[k - 1]; for (const p of tr.plays) pl[p.c] = 1;
+    const S = { tricks: G.tricks.slice(0, k), np: G.np, cap: G.cap, ntr: G.ntr, pl: pl.slice(), tasks: G.tasks, mission: G.mission };
+    if (KIND[d.k](S, G.tasks[i], d, G.tasks[i].owner, k >= G.ntr) < 0) {
+      const lead = d.k === 'nolead', seat = lead ? tr.lead : tr.w, card = lead ? tr.plays[0].c : tr.wc;
+      return { trick: k, seat, card, how: lead ? 'led' : 'won', last: k >= G.ntr };
+    }
+  }
+  return null;
+}
+function explainText(G, e) {
+  if (!e) return '';
+  const nm = G.players[e.seat].name;
+  return 'Trick ' + e.trick + ': ' + nm + (e.how === 'led' ? ' led with ' : ' won it with ') + cn(e.card) + '.';
+}
 function finish(G, ok, why) {
   G.phase = 'over'; G.result = { ok, why: why || '', tasks: G.tasks.map((t, i) => jobStatus(G, i)) };
+  // for every failed job say which trick, card and diver broke it; a job that nothing broke stays "not finished" (status 0)
+  if (!G.nolog) {
+  G.result.det = G.tasks.map((t, i) => (G.result.tasks[i] < 0 && !ok) ? explainText(G, explainJob(G, i)) : '');
+  G.result.nb = G.tasks.map((t, i) => { const e = (G.result.tasks[i] < 0 && !ok) ? explainJob(G, i) : null; return e ? { trick: e.trick, seat: e.seat, c: e.card } : null; });
+  }
   for (const p of G.players) if (p.helper) { /* nothing */ }
   const left = []; for (let c = 0; c < 40; c++) if (!G.pl[c]) left.push(c); G.left = left.length === 1 ? left[0] : -1;
   ev(G, { t: 'over', ok, why: G.result.why });
@@ -567,7 +591,7 @@ function afterTrick(G, k) {
   const over = G.tricks.length >= G.ntr;
   if (failed.length) { finish(G, false, 'A job cannot be done any more: ' + TASKS[G.tasks[failed[0]].id].t); return; }
   if (cb) { finish(G, false, cb); return; }
-  if (G.mission.m27 && over && G.lastCard !== SU5) { finish(G, false, 'The Sunstar 5 was not the final card played.'); return; }
+  if (G.mission.m27 && over && G.lastCard !== SU5) { finish(G, false, 'The last card of the dive was not the Sunstar 5.'); return; }
   const done = st.every(x => x > 0);
   if (done && (!G.mission.hold || over)) { finish(G, true); return; }
   if (over) { finish(G, st.every(x => x > 0), st.some(x => x <= 0) ? 'Not every job was finished.' : ''); return; }
@@ -581,8 +605,8 @@ function doPlay(G, s, c) {
   removeCard(G, s, c); G.pl[c] = 1; G.lastCard = c;
   T.plays.push({ s, c }); if (first) T.ls = suit(c);
   ev(G, { t: 'play', seat: s, c, n: T.n });
-  if (G.mission.m27 && c === SU5 && !(T.n === G.ntr - 1 && T.plays.length === G.np)) { T.bad27 = 1; finish(G, false, 'The Sunstar 5 must be the very last card played.'); return; }
-  if (T.bad) { finish(G, false, 'A trick was led with a Coral card or a Lantern.'); return; }
+  if (G.mission.m27 && c === SU5 && !(T.n === G.ntr - 1 && T.plays.length === G.np)) { T.bad27 = 1; finish(G, false, 'Trick ' + (T.n + 1) + ': ' + G.players[s].name + ' played the Sunstar 5 too early. It must be the very last card of the dive.'); return; }
+  if (T.bad) { finish(G, false, 'Trick ' + (T.n + 1) + ': ' + G.players[T.lead].name + ' had to lead with ' + cn(T.plays[0].c) + ', but no trick may be led with a Coral card or a Lantern.'); return; }
   if (T.plays.length < G.np) { T.turn = (s + 1) % G.np; return; }
   const w = trickWinner(T.plays, T.ls), wc = T.plays.find(p => p.s === w).c;
   const k = { n: T.n, lead: T.lead, ls: T.ls, plays: T.plays.map(p => ({ s: p.s, c: p.c })), w, wc };
@@ -708,7 +732,7 @@ function checkInvariants(G) {
   if (G.phase === 'play' && G.cap >= 0 && !G.players[G.cap].hand.length && G.tricks.length === 0) e.push('captain lost lantern 4');
   return e;
 }
-Object.assign(LD, { newGame, nextAttempt, moves, apply, pending, stripView, checkInvariants, text, expire, clone, jobStatus, condBroken, suit, val, trickWinner, ntrOf, playable, canPing, pingMoves, ctl, isDiver, diverSeats, orderFrom, conflict, splitOK, claims, needRedeal,
+Object.assign(LD, { newGame, nextAttempt, moves, apply, pending, stripView, checkInvariants, text, expire, clone, jobStatus, condBroken, suit, val, trickWinner, explainJob, explainText, ntrOf, playable, canPing, pingMoves, ctl, isDiver, diverSeats, orderFrom, conflict, splitOK, claims, needRedeal,
   validMoves: moves, performMove: (G, m, s) => apply(G, s, m), sideToAct: pending, render_game_to_text: text,
   _: { rnd, shuffle, KIND, tw, ntrOf, startPlay, finish, afterTrick, dealHands, drawTasks, holdsMission, statusAll, doPlay, playable, remVal, remSuit, wonBy, cardsWon, longestRun, startAttempt, TASKS } });
 // the status functions read S.tricks: make G answer to it

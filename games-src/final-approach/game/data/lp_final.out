@@ -19,3 +19,8 @@ FAIL 375x553 FIT guided brief PRIMARY BUTTON NOT FULLY IN VIEWPORT [10,519,184,5
 375x553 errors []
 PROBLEMS 1
 SIZE 375x553 problems 1
+412x780 board {"w":412,"h":440,"vw":412,"vh":780,"mode":"P","k":0.515} webgl
+412x780 placements by touch 6
+412x780 errors []
+PROBLEMS 0
+SIZE 412x780 problems 0
