@@ -468,6 +468,8 @@ function laneMesh(a,b,col){const d=b.clone().sub(a);const L=d.length();const g=n
   m.position.copy(a);m.rotation.y=-Math.atan2(d.z,d.x);return m}
 function drawGuides(){clearGuides();if(!G)return;const sel=UI.sel&&ship(UI.sel);
   if(G.phase==='plan'&&sel&&sel.alive&&myPlanShip(sel)&&!(typeof sumPending==='function'&&sumPending())){const b=B(sel);const show=UI.hoverDial!=null?[UI.hoverDial]:UI.draft&&UI.draft[sel.id]!=null?[UI.draft[sel.id]]:sel.dial!=null&&sel.dial!=='set'?[sel.dial]:[];
+    // phones: no fan of every maneuver over the mat (testers found it a jumble); show the suggested one until the player picks
+    if(!show.length&&typeof PHN!=='undefined'&&PHN.on&&UI.hints&&typeof suggestDial==='function')show.push(suggestDial(sel));
     dialOf(sel).forEach((m,i)=>{if(show.length&&!show.includes(i))return;const col=m.c==='r'?0xff4a4a:m.c==='g'?0x4aff8a:0xdfe8ff;const tp=tplPoints(sel,b,m,4);V3.guide.add(ribbon(tp,col,show.length?.85:.2));
       const fp=finalPose(sel,b,m);V3.guide.add(outline(fp,b,col,show.length?.95:.25))});
     if(!show.length&&UI.hints&&typeof suggestDial==='function'){const sg=suggestDial(sel);V3.guide.add(outline(finalPose(sel,b,dialOf(sel)[sg]),b,0x7fd4ff,.95))}}
@@ -479,7 +481,7 @@ function myPlanShip(s){return G.phase==='plan'&&isHuman(s.side)&&s.side===planSi
 // ---- labels ----
 function tags3D(){const box=document.getElementById('tags');if(!box)return;for(const s of G.ships){let el=V3.labels[s.id];if(!el){el=V3.labels[s.id]=document.createElement('div');el.className='tag s'+s.side;box.appendChild(el)}
     if(!s.alive){el.style.display='none';continue}const hp=s.hull-hullDmg(s);
-    el.title=s.name;el.innerHTML=`<b>${esc(typeof shortName==='function'?shortName(s):s.name)}</b><span><em class="ps">${psOf(s)}</em> <em class="h">◆${hp}</em>${s.shMax?` <em class="sh">◈${s.sh}</em>`:''}${s.stress?` <em class="st">!${s.stress}</em>`:''}${s.focus?' <em class="f">◉</em>':''}${s.evade?' <em class="e">✦</em>':''}${[s.tl,s.tl2].filter(x=>x&&ship(x)).map(x=>` <em class="l">⌖${esc(ship(x).name.split(' ')[0])}</em>`).join('')}${s.ion?' <em class="io">ion</em>':''}${G.phase==='plan'&&s.dial!=null?' <em class="dl">▣</em>':''}</span>`;
+    el.title=s.name;el.innerHTML=`<b>${esc(typeof shortName==='function'?shortName(s):s.name)}</b><span><em class="ps">${psOf(s)}</em> <em class="h" title="hull left">♥${hp}</em>${s.shMax?` <em class="sh" title="shields left">◈${s.sh}</em>`:''}${s.stress?` <em class="st">!${s.stress}</em>`:''}${s.focus?' <em class="f">◉</em>':''}${s.evade?' <em class="e">✦</em>':''}${[s.tl,s.tl2].filter(x=>x&&ship(x)).map(x=>` <em class="l">⌖${esc(ship(x).name.split(' ')[0])}</em>`).join('')}${s.ion?' <em class="io">ion</em>':''}${G.phase==='plan'&&s.dial!=null?' <em class="dl">▣</em>':''}</span>`;
     el.classList.toggle('on',G.cur===s.id&&G.phase!=='plan');el.classList.toggle('sel',UI.sel===s.id);
     const tg=G.phase==='target'&&G.cur&&typeof humanTurn==='function'&&humanTurn()&&weaponsFor(ship(G.cur)).some(w=>w.targets.some(t=>t.id===s.id));el.classList.toggle('tgt',!!tg);if(tg)el.insertAdjacentHTML('beforeend','<em class="tgl">can be shot</em>')}}
 // ---- camera: drag to orbit, right-drag or two fingers to pan, wheel/pinch to zoom ----
