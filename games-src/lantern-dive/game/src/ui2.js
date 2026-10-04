@@ -133,8 +133,8 @@ function renderFelt(v) {
   pool.hidden = !assign || !G.tasks.some(t => t.owner < 0); slots.hidden = assign && !pool.hidden;
   // status line
   let line = '';
-  if (assign) line = 'Jobs left: ' + G.tasks.filter(t => t.owner < 0).length + ' · the jobs add up to ' + G.mission.d + ' points';
-  else if (G.phase === 'play' || G.phase === 'signal') line = 'Trick ' + Math.min(G.ntr, G.tricks.length + 1) + ' of ' + G.ntr + (G.phase === 'signal' ? ' · signal round' : '');
+  if (assign) { const n = G.tasks.filter(t => t.owner < 0).length; line = n + ' job' + (n === 1 ? '' : 's') + ' left to hand out · every job must be done'; }
+  else if (G.phase === 'play' || G.phase === 'signal') { const nd = G.tasks.filter((t, i) => jobSt(i) > 0).length; line = 'Trick ' + Math.min(G.ntr, G.tricks.length + 1) + ' of ' + G.ntr + ' · jobs done ' + nd + ' of ' + G.tasks.length + (G.phase === 'signal' ? ' · signal round' : ''); }
   else if (G.phase === 'distress') line = 'The jobs are taken. Before the dive: the distress flare';
   else if (G.phase === 'pass') line = 'Everyone passes one card';
   else if (G.phase === 'predict') line = 'Predictions';
@@ -144,7 +144,7 @@ function renderFelt(v) {
     G.tasks.forEach((t, i) => {
       if (t.owner >= 0) return; const d = TASKS[t.id], mineTurn = iMustAct() && G.phase === 'assign';
       const c = h('button.jcard' + (UI.job === i ? '.sel' : '') + (mineTurn ? '' : '.off'), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, 'aria-pressed': UI.job === i ? 'true' : 'false' });
-      const dd = h('span.dd', { title: 'Difficulty points: all the jobs on the table add up to the dive\'s difficulty' }, 'Worth ' + jobDiff(i) + (jobDiff(i) === 1 ? ' point ' : ' points '), ...Array.from({ length: jobDiff(i) }, () => h('i')));
+      const dd = h('span.dd', { title: 'How hard the job is (dots). The jobs on the table add up to the dive\'s difficulty.' }, 'Difficulty ', ...Array.from({ length: jobDiff(i) }, () => h('i')));
       c.append(h('b', d.s), h('span', d.t), dd);
       if (!d.cap) c.append(h('span', { style: 'font-weight:800;color:#8a3a10' }, 'Not for the Commander'));
       pool.append(c);
@@ -218,13 +218,13 @@ function renderHand(v) {
   const need = Math.max(44, hw * .55), maxP = hw * 1.04;
   const pitchFor = m => m > 1 ? Math.min(maxP, (W - hw) / (m - 1)) : 0;
   const rows = n > 1 && pitchFor(n) < need && n >= 7 ? 2 : 1, per = rows === 2 ? Math.ceil(n / 2) : n, pitch = pitchFor(per);
-  const rowStep = Math.round(ch * .6), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
+  const rowStep = Math.round(ch * .64), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
   box.classList.toggle('two', rows === 2);
   box.style.height = Math.round(padTop + ch + (rows === 2 ? rowStep : 0) + 4) + 'px'; box.style.minHeight = box.style.height;
   btns.forEach((b, i) => {
     const r = rows === 2 && i >= per ? 1 : 0, k = r ? i - per : i, m = r ? n - per : per;
     const rowW = hw + (m - 1) * pitch, x = Math.round((box.clientWidth - rowW) / 2 + k * pitch), y = padTop + r * rowStep;
-    b.style.left = x + 'px'; b.style.top = y + 'px'; b.style.zIndex = String(1 + i); box.append(b);
+    if (r) b.classList.add('r2'); b.style.left = x + 'px'; b.style.top = y + 'px'; b.style.zIndex = String(1 + i); box.append(b);
   });
   box.dataset.rows = rows; box.dataset.pitch = Math.round(pitch);
   if (UI.sel >= 0) { const sb = box.querySelector('.hc.sel'); if (sb) sb.style.zIndex = '40'; }
@@ -259,7 +259,7 @@ function dockModel(v) {
       else if (A.mode === 'split') { M.p = 'Share the jobs with your partner (at least one each).'; }
       else { M.p = act === v || (G.players[act] && G.players[act].helper) ? (G.players[act].helper ? 'Pick a job for the drone.' : 'Your turn: pick a job.') : 'Pick a job.'; M.sub = left + ' job' + (left === 1 ? '' : 's') + ' left. Tap a job card on the table.'; }
       const sel = UI.job >= 0 && G.tasks[UI.job] && G.tasks[UI.job].owner < 0 ? UI.job : -1;
-      if (sel >= 0) { const ok = mv.find(m => m.t === 'take' && m.i === sel); M.info = '<b>' + esc(jobShort(sel)) + '</b>: ' + esc(jobText(sel)) + ' Worth ' + jobDiff(sel) + '.' + (ok ? '' : ' You cannot take this one.'); btn('Take this job', 'take', { i: sel, cls: 'go', dis: !ok }); }
+      if (sel >= 0) { const ok = mv.find(m => m.t === 'take' && m.i === sel); M.info = '<b>' + esc(jobShort(sel)) + '</b>: ' + esc(jobText(sel)) + ' Difficulty ' + jobDiff(sel) + '.' + (ok ? '' : !TASKS[G.tasks[sel].id].cap && act === G.cap ? ' The Commander may not take this job.' : ' You cannot take this one.'); btn('Take this job', 'take', { i: sel, cls: 'go', dis: !ok }); }
       else if (mv.some(m => m.t === 'take')) btn('Take this job', 'take', { dis: true, cls: 'go' });
       if (mv.some(m => m.t === 'pass')) btn('Pass', 'pass', { cls: 'alt' });
       if (mv.some(m => m.t === 'done')) btn('Done', 'done', { cls: 'alt' });
@@ -303,7 +303,7 @@ function dockModel(v) {
         M.cls = 'mine';
         const sel = UI.sel >= 0 ? UI.sel : -1; const legal = helper ? new Set(LD.playable(G, turn)) : new Set(LD.playable(G, turn));
         M.p = helper ? 'You fly ' + pname(turn) + ': tap one of its face-up cards.' : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play any card.');
-        M.sub = T.plays.length ? (T.ls === 4 ? 'Follow with a Lantern if you can.' : 'Follow ' + D.suits[T.ls].name + ' if you can. A Lantern wins every trick.') : '';
+        M.sub = T.plays.length ? (T.ls === 4 ? 'Follow with a Lantern if you can.' : 'Follow ' + D.suits[T.ls].name + ' if you can. With no ' + D.suits[T.ls].name + ' left you may play anything, and a Lantern would win.') : '';
         { const k = G.seed + ':' + G.logN + ':' + G.att + ':' + G.tricks.length + ':' + T.plays.length + ':' + v; if (UI.abk !== k) { UI.abk = k; let r = null; try { r = LD.AI.allBreak(G, v); } catch (e) { } UI.ab = r; }
           if (UI.ab) { const j = UI.ab.job; M.p = 'Careful: every card you can play breaks ' + (j >= 0 ? 'a job.' : 'the dive rule.'); M.sub = j >= 0 ? 'Whatever you play, \u201c' + TASKS[G.tasks[j].id].t.replace(/\.$/, '') + '\u201d will fail. Try Hint to see the least bad card.' : 'Whatever you play, the dive rule is broken.'; M.warn = 1; } }
         if (UI.hint && UI.hint.c != null) M.info = '<b>Suggestion: ' + esc(cname(UI.hint.c)) + '.</b> ' + esc(UI.hint.why || '');
@@ -323,6 +323,7 @@ function renderDock(v) {
   const pr = $('#prompt'), ac = $('#acts'), inf = $('#info'), ro = $('#roster'); if (!pr) return;
   const M = dockModel(v); pr.className = M.cls || '';
   pr.innerHTML = ''; pr.append(M.p || ''); const ps = $('#psub'), phn = isPh(); if (M.sub && !phn) pr.append(h('small', M.sub)); if (ps) { ps.innerHTML = ''; ps.hidden = !(phn && M.sub); if (phn && M.sub) ps.textContent = M.sub; }
+  { const nw = $('#news'); if (nw) { const L = (UI.news || []).slice(isPh() ? -2 : -3); nw.innerHTML = ''; nw.hidden = !L.length || G.phase === 'over'; L.forEach((t, k) => nw.append(h('div' + (k === L.length - 1 ? '.nw1' : ''), t))); } }
   inf.hidden = !M.info; inf.className = M.info ? 'why' : ''; inf.innerHTML = M.info || '';
   ac.classList.toggle('many', M.acts.length > 6); ac.innerHTML = ''; M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
   // who is still deciding (simultaneous phases)

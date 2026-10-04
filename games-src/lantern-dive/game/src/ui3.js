@@ -42,6 +42,7 @@ function newGame(mode, o) {
   G = LD.newGame({ players: np, seed, names, ai, mission, timer: !!opt.timer, stack: gs });
   G.noProg = mission.kind !== 'log' && mission.kind !== 'deep';
   resetUI(mode, { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null, kind: opt.kind, mission: opt.mission, d: opt.d, cmt: opt.cmt, deep: opt.deep, job: opt.job, timer: !!opt.timer });
+  UI.news = [];
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.prefs.guide === 'light' ? 'light' : UI.prefs.guide === 'off' ? 'off' : 'light'), seen: {}, keep: false };
   if (mode === 'guided') UI.coach.level = 'full';
   placePrompt(); render(); sndMusic(); autosave(); schedule();
@@ -109,6 +110,7 @@ function afterApply(evs) {
 // ---------- human actions ----------
 function doMove(mv) {
   const v = viewSeat(); if (v < 0) return false;
+  if (UI.tip) { markSeen(UI.tip.id); UI.tip = null; renderTip(); } // acting answers the tip
   if (isClient()) { netAct(mv); UI.sel = -1; UI.pingSel = false; UI.giveSel = -1; UI.job = -1; render(); return true; }
   return commit(v, mv);
 }
@@ -141,7 +143,12 @@ function playSel() {
 function doHint() {
   const v = viewSeat(); if (!canAct() || !iMustAct()) return;
   let m; try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { return; } if (!m) return;
-  if (m.t === 'play') { let why = ''; try { why = LD.AI.why(G, v, m.c); } catch (e) { } UI.hint = { c: m.c, why }; UI.sel = m.c; render(); toast('Suggestion: ' + cname(m.c)); }
+  // guided first dive: the lesson comes first. While fewer than 3 tricks are played, suggest a colour card so the trick rules can be seen.
+  if (UI.mode === 'guided' && G.phase === 'play' && G.tricks.length < 3 && m.t === 'play' && suitOf(m.c) === 4) {
+    const col = myMoves().filter(x => x.t === 'play' && suitOf(x.c) < 4).sort((a, b) => valOf(a.c) - valOf(b.c));
+    if (col.length) { UI.hint = { c: col[0].c, why: 'Lesson first: play a low colour card and watch how the trick is won. Keep your Lanterns for your job.' }; UI.sel = col[0].c; render(); return; }
+  }
+  if (m.t === 'play') { let why = ''; try { why = LD.AI.why(G, v, m.c); } catch (e) { } UI.hint = { c: m.c, why }; UI.sel = m.c; render(); }
   else if (m.t === 'take') { UI.job = m.i; render(); toast('A good job for you: ' + jobShort(m.i)); }
   else { toast('Suggested: ' + (m.t === 'ping' ? 'signal ' + cname(m.c) : m.t)); }
 }
@@ -165,20 +172,35 @@ function drawCard() {
 }
 function takeDevice() { const c = UI.cards[0]; if (!c || c.kind !== 'pass') return; UI.cards.shift(); UI.holder = c.seat; drawCard(); render(); schedule(); }
 // ---------- the event sequences: cards fly to the table, the trick is swept to its winner ----------
+// ---------- "what just happened": one plain line per event that touches the team (jobs taken, tricks won, jobs done or failed, signals) ----------
+function newsFrom(evs) {
+  const out = [], q = '“', qq = '”';
+  for (const e of evs) {
+    if (e.t === 'deal') UI.news = [];
+    else if (e.t === 'take') out.push((e.seat === viewSeat() ? 'You took ' : pname(e.seat) + ' took ') + q + jobShort(e.i) + qq + '.');
+    else if (e.t === 'swap') out.push('Every diver passed one card ' + (G.hn === 2 ? 'to the partner.' : e.dir > 0 ? 'to the left.' : 'to the right.'));
+    else if (e.t === 'ping') out.push(pname(e.seat) + ' showed ' + cname(e.c) + (e.k === 'high' ? ': their highest ' : e.k === 'low' ? ': their lowest ' : e.k === 'only' ? ': their only ' : ' ') + (e.k ? D.suits[suitOf(e.c)].name + '.' : '(highest, lowest or only one?)'));
+    else if (e.t === 'trick') { const ti = G.tricks.findIndex(k => k.plays[0].c === e.plays[0].c); out.push((ti >= 0 ? 'Trick ' + (ti + 1) + ': ' : '')  + pname(e.w) + ' won with ' + cname(e.wc) + (suitOf(e.wc) === 4 ? (e.plays.filter(p => suitOf(p.c) === 4).length > 1 ? ', the highest Lantern.' : ': a Lantern beats every colour.') : ', the highest ' + D.suits[suitOf(e.wc)].name + '.')); }
+    else if (e.t === 'job' && e.st > 0) out.push('✔ ' + pname(G.tasks[e.i].owner) + ' finished ' + q + jobShort(e.i) + qq + '.');
+    else if (e.t === 'job' && e.st < 0) out.push('✖ ' + (G.tasks[e.i].owner === viewSeat() ? 'Your' : pname(G.tasks[e.i].owner) + '’s') + ' job ' + q + jobShort(e.i) + qq + ' can no longer be done.');
+  }
+  if (out.length) UI.news = (UI.news || []).concat(out).slice(-3);
+}
 function drainQ() { if (UI.rq.length && !UI.busy) { const q = UI.rq.shift(); playEvs(q); } }
 async function playEvs(evs) {
   if (UI.busy) { UI.rq.push(evs); return; }
   const tok = UI.seq; UI.busy = true; closePop();
   try {
     const tr = evs.find(e => e.t === 'trick'), pls = evs.filter(e => e.t === 'play'), sw = evs.find(e => e.t === 'swap'), take = evs.filter(e => e.t === 'take'), pg = evs.filter(e => e.t === 'ping');
+    try { newsFrom(evs); } catch (e) { console.error(e); }
     if (pls.length) snd('play');
     if (pg.length) snd('ping');
     if (sw) { snd('pass'); try { animatePass(); } catch (e) { } }
     if (take.length) snd('take');
     if (tr) {
       UI.fz = { plays: tr.plays.map(p => ({ s: p.s, c: p.c })), winner: tr.w, win: false };
-      render(); await wait(780); if (tok !== UI.seq) return;
-      UI.fz.win = true; render(); snd('trick'); await wait(700); if (tok !== UI.seq) return;
+      render(); await wait(ANIM ? 1000 : 0); if (tok !== UI.seq) return;
+      UI.fz.win = true; render(); snd('trick'); await wait(ANIM ? 1100 : 0); if (tok !== UI.seq) return;
       UI.pxExit = { seat: tr.w }; UI.fz = null; render(); await wait(520); if (tok !== UI.seq) return;
       for (const j of evs.filter(e => e.t === 'job')) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); }
     } else { render(); await wait(pls.length ? 420 : (take.length ? 380 : 220)); if (tok !== UI.seq) return; }

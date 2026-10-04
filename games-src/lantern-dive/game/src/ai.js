@@ -403,22 +403,36 @@ function step(G) {
   }
   return false;
 }
-// a short reason for a card: used by the hint button
+// a short reason for a card: used by the hint button. Every sampled world finishes the current trick (the others play greedily),
+// so there is always a likely winner, and the jobs that trick finishes or breaks are named. Never empty.
 function why(G, seat, card) {
-  const V = LD.stripView(G, seat); const wl = worlds(V, seat, 5, 3).W; const lines = {};
+  const V = LD.stripView(G, seat); const wl = worlds(V, seat, 6, 3).W; const lines = { w: {} }; const who = G.trick.turn; const n0 = V.tricks.length;
   for (const W0 of wl) {
-    const W = cloneW(W0); const who = G.trick.turn; const before = W.tasks.map((t, i) => LD.jobStatus(W, i));
-    LD._.doPlay(W, who, card);
-    if (W.tricks.length > V.tricks.length) {
-      const k = W.tricks[W.tricks.length - 1]; lines.w = lines.w || {}; lines.w[k.w] = (lines.w[k.w] || 0) + 1;
-      W.tasks.forEach((t, i) => { const st = LD.jobStatus(W, i); if (st > 0 && before[i] <= 0) lines['d' + i] = (lines['d' + i] || 0) + 1; if (st < 0) lines['f' + i] = (lines['f' + i] || 0) + 1; });
-    }
+    const W = cloneW(W0); const before = W.tasks.map((t, i) => LD.jobStatus(W, i));
+    LD._.doPlay(W, who, card); let g = 0;
+    while (W.phase === 'play' && W.tricks.length === n0 && g++ < 12) { const s = W.trick.turn; LD._.doPlay(W, s, greedyCard(W, s)); }
+    const k = W.tricks[n0]; if (k) lines.w[k.w] = (lines.w[k.w] || 0) + 1;
+    W.tasks.forEach((t, i) => { const st = LD.jobStatus(W, i); if (st > 0 && before[i] <= 0) lines['d' + i] = (lines['d' + i] || 0) + 1; if (st < 0 && before[i] >= 0) lines['f' + i] = (lines['f' + i] || 0) + 1; });
   }
-  const out = []; const n = Math.max(1, wl.length);
-  if (lines.w) { const best = Object.keys(lines.w).sort((a, b) => lines.w[b] - lines.w[a])[0]; out.push(+best === seat ? 'You most likely win this trick' : G.players[best].name + ' most likely wins this trick'); }
-  for (const k in lines) if (k[0] === 'd' && lines[k] >= n / 2) out.push('finishes: ' + TASKS[G.tasks[+k.slice(1)].id].t.replace(/\.$/, ''));
-  for (const k in lines) if (k[0] === 'f' && lines[k] >= n / 3) out.push('risk: breaks "' + TASKS[G.tasks[+k.slice(1)].id].t.replace(/\.$/, '') + '"');
-  return out.join('. ') + (out.length ? '.' : '');
+  const out = []; const n = Math.max(1, wl.length), nm = s => +s === seat ? 'you' : G.players[s].name;
+  const jt = i => '“' + TASKS[G.tasks[i].id].t.replace(/\.$/, '') + '”';
+  const wk = Object.keys(lines.w).sort((a, b) => lines.w[b] - lines.w[a])[0];
+  for (const k in lines) if (k[0] === 'd' && lines[k] >= n / 2) out.push('it finishes ' + jt(+k.slice(1)));
+  for (const k in lines) if (k[0] === 'f' && lines[k] >= n / 3) out.push('careful, it may break ' + jt(+k.slice(1)));
+  if (wk != null) {
+    const sure = lines.w[wk] >= n * .8 ? '' : 'probably ';
+    const open = G.tasks.map((t, i) => i).filter(i => G.tasks[i].owner >= 0 && LD.ctl(G, G.tasks[i].owner) === LD.ctl(G, +wk) && LD.jobStatus(G, i) === 0);
+    let s = (+wk === seat ? 'You ' + sure + 'win this trick' : nm(wk) + ' ' + sure + 'wins this trick');
+    if (!out.length) {
+      const mine = G.players[seat].hand.filter(c => suit(c) === suit(card)).map(val);
+      if (+wk !== seat && open.length) s += ' (' + nm(wk) + ' still needs ' + jt(open[0]) + ')';
+      else if (+wk !== seat) s += (mine.length > 1 && val(card) === Math.min(...mine) ? '; you give away your lowest ' + D.suits[suit(card)].name + ' and keep the strong cards' : '; nothing you need is in it');
+      else s += (G.tasks.some((t, i) => t.owner >= 0 && LD.ctl(G, t.owner) === seat && LD.jobStatus(G, i) === 0) ? ' and lead the next one' : '; it is safe for every job');
+    }
+    out.unshift(s);
+  }
+  if (!out.length) out.push('The safest card the team found');
+  const t = out.join('; '); return t.charAt(0).toUpperCase() + t.slice(1) + '.';
 }
 // Does EVERY card the diver may play now break one of his or her own jobs (or the dive's rule)? Played out on sampled worlds (the fair view):
 // only when it breaks in all of them for all legal cards. Returns { job: index | -1 for the dive rule } or null. Used for the prompt line.
