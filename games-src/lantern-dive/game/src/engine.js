@@ -554,7 +554,8 @@ function doPlay(G, s, c) {
   removeCard(G, s, c); G.pl[c] = 1; G.lastCard = c;
   T.plays.push({ s, c }); if (first) T.ls = suit(c);
   ev(G, { t: 'play', seat: s, c, n: T.n });
-  if (G.mission.m27 && c === SU5 && !(T.n === G.ntr - 1 && T.plays.length === G.np)) { T.bad27 = 1; }
+  if (G.mission.m27 && c === SU5 && !(T.n === G.ntr - 1 && T.plays.length === G.np)) { T.bad27 = 1; finish(G, false, 'The Sunstar 5 must be the very last card played.'); return; }
+  if (T.bad) { finish(G, false, 'A trick was led with a Coral card or a Lantern.'); return; }
   if (T.plays.length < G.np) { T.turn = (s + 1) % G.np; return; }
   const w = trickWinner(T.plays, T.ls), wc = T.plays.find(p => p.s === w).c;
   const k = { n: T.n, lead: T.lead, ls: T.ls, plays: T.plays.map(p => ({ s: p.s, c: p.c })), w, wc };
@@ -667,13 +668,13 @@ function checkInvariants(G) {
   const e = [], seen = new Array(40).fill(0);
   for (const p of G.players) for (const c of p.hand) { if (c < 0 || c > 39) e.push('bad card in hand ' + c); else seen[c]++; }
   for (const k of G.tricks) for (const p of k.plays) seen[p.c]++;
-  if (G.trick && G.phase === 'play') for (const p of G.trick.plays) seen[p.c]++;
+  if (G.trick && G.trick.plays.length < G.np) for (const p of G.trick.plays) seen[p.c]++;
   for (let c = 0; c < 40; c++) if (seen[c] !== 1) e.push('card ' + c + ' appears ' + seen[c] + ' times');
   if (G.phase !== 'assign') for (const t of G.tasks) if (t.owner < 0 || t.owner >= G.np) e.push('task without owner');
   const col = G.np - 3; const sm = G.tasks.reduce((a, t) => a + TASKS[t.id].d[col], 0);
   if (G.mission.sel !== 'fixed' && sm !== G.mission.d) e.push('job difficulty ' + sm + ' != ' + G.mission.d);
   if (G.two) { const H = G.players[G.helper]; if (H.hand.length !== H.stacks.filter(s => s[0] >= 0).length + H.stacks.filter(s => s[1] >= 0).length) e.push('drone stacks mismatch'); }
-  const total = G.players.reduce((a, p) => a + p.hand.length, 0) + G.tricks.length * G.np + (G.phase === 'play' && G.trick ? G.trick.plays.length : 0);
+  const total = G.players.reduce((a, p) => a + p.hand.length, 0) + G.tricks.length * G.np + (G.trick && G.trick.plays.length < G.np ? G.trick.plays.length : 0);
   if (total !== 40) e.push('card total ' + total);
   if (G.phase === 'play' && G.trick.plays.length === 0) { const sz = G.players.map(p => p.hand.length); if (Math.max(...sz) - Math.min(...sz) > 1) e.push('hand sizes ' + sz); }
   G.tricks.forEach((k, i) => { if (k.plays.length !== G.np) e.push('trick size'); if (trickWinner(k.plays, k.ls) !== k.w) e.push('winner mismatch'); });
