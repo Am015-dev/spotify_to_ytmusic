@@ -1,3 +1,16 @@
+# Release 82 — PHASE 2a BUILD (tests RUNNING, results pending; phase 1 results below are for the old order)
+
+## Phase 2a patch order (onto base.html = live v81)
+```
+./reapply.sh pOB1.py pOB2.py pOB3.py pOC1.py pCV1.py pCV2.py pJU1.py pGB1.py   → REAPPLY_OK
+python3 tools/split_km.py overdrive.html out
+```
+ownerbugs (pOB1–3) → ownerbugs2 (pOC1) → cityvar (pCV1–2) → juice (pJU1) → garage (pGB1). od-otg2 not yet included (it goes first when it is ready).
+Conflict fixed: pOC1 and pCV2 both edit the Athens `const put=(U,x,z,ry,c,s,fr)=>{` line. pCV2.py now accepts either form and inserts `CV_put` after `OC_fix`.
+Sizes: overdrive.html 3,685,528 (over the 3.6 MB cap → split is mandatory) · out/overdrive.html 1,719,979 · out/km.js 1,961,521.
+Deploy files (out/ + km.js) boot check: tools/tOut.js → OUTBOOT PASS (car drives, 0 errors).
+
+---
 # Release 82 (phase 1): v81 + cityvar + juice + garage
 
 ## Patch order (onto base.html = live v81)
