@@ -22,7 +22,7 @@ Untouched, and still covered by smoke: smash fills boost, auto vehicle switch, d
 `./reapply.sh pJU1.py` → REAPPLY_OK. That is one anchor (`window.__mho={`). See `ANCHORS.md` for the anchor and the wrapped functions.
 
 ## Tests
-- **`node smoke.js .`** → SMOKE PASS (12/12, about 620 s). I looked at `smoke/sheet.png`. It flagged the combo pop sitting over the NEXT pill, which is fixed (pop moved to 38 %), and smoke was re-run after the fix.
+- **`node smoke.js .`** → SMOKE PASS (12/12; final build 405 s). I looked at `smoke/sheet.png`. It flagged the combo pop sitting over the NEXT pill, which is fixed (pop moved to 38 %), and smoke was re-run after the fix.
 - **`ROUTE_S=180 CALM_S=90 SHOTS=1 PERF=1 node tJU.js`** → 56 PASS, 0 FAIL. The table is in `docs/ju_shots/table.md`, before = JU off, after = JU on, same build.
   - Real keys through the key map: arrows, Shift boost, X drift, and Space via the keyboard.
   - Deterministic 1/60 s frames.
