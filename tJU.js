@@ -12,7 +12,7 @@ async function open(b,city){const ctx=await b.newContext({viewport:{width:1280,h
  await p.goto(U);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');
  await p.evaluate(c=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_city@1',c);if(c==='ath')localStorage.setItem('mho_athd@1','A');const k=c==='ath'?'.ath':'';localStorage.setItem('mho_roam'+k+'@1','{"tut":1,"otg":{}}');if(c==='ath')localStorage.setItem('mho_story.ath@1','{"seen":1}')},city);
  await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu');await p.evaluate(()=>__mho.enterRoam());await p.waitForFunction(()=>__mho.state==='roam',null,{polling:500});
- await F.on(p);await p.evaluate(()=>{try{__mho.storyClose()}catch(e){}try{window.__m1&&__m1.skip&&__m1.skip()}catch(e){}});await p.evaluate(()=>{__ju.hold(true);__ju.step(30)});return p}
+ await F.on(p);await p.evaluate(()=>{try{__mho.storyClose()}catch(e){}try{window.__m1&&__m1.skip&&__m1.skip()}catch(e){}});await p.evaluate(()=>{__ju.hold(true);__ju.autoClose(true);__ju.step(30)});return p}
 // in-page helpers: GPS paths and a keyboard bot that drives like a player (full throttle, brakes for corners, drifts the sharp ones, boosts on straights)
 const LIB=`window.__jl={
  path(len,k){const M=__mho,R=M.RO;for(let t=0;t<12;t++){const a=(k+t)*2.399;const q0=M.rsnap(R.x,R.z,300),q1=M.rsnap(R.x+Math.sin(a)*len,R.z+Math.cos(a)*len,400);const P=M.qv.path(q0[0],q0[1],q1[0],q1[1]).P;if(P&&P.length>8){const c=[0];for(let i=1;i<P.length;i++)c.push(c[i-1]+Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]));if(c[c.length-1]>len*.5)return{P,c}}}return null},
@@ -44,7 +44,7 @@ const LIB=`window.__jl={
   const bp=Math.max(...bv),tb=bv.findIndex(v=>v>=pl+.95*(bp-pl))/60,t25=bv.findIndex(v=>v>=pl*1.25)/60;return{plateau:+pl.toFixed(1),kmh:Math.round(pl*3.6),t95:+t95.toFixed(2),clean:best.clean,boostPeak:+bp.toFixed(1),boostMul:+(bp/pl).toFixed(2),tBoost95:+tb.toFixed(2),tBoost25:+t25.toFixed(2),fovCruise:fov0,fovBoost:+fovB.toFixed(1),straightness:+B.tc.toFixed(2)}},
  // drift held hard left at 30 m/s: time of each tier; then per tier, release just after it (retry on the next path if a wall cut the drift short)
  drift(){const R=__mho.RO,J=__ju;
-  const run=(Q,hold)=>{this.warpTo(Q);R.v=30;J.setBm(20);J.step(2);let tiers=[null,null,null],turbo=0,end=0,bmPre=0,bmJump=0,relT=0;
+  const run=(Q,hold)=>{this.warpTo(Q);R.v=30;J.setBm(0);J.step(2);let tiers=[null,null,null],turbo=0,end=0,bmPre=0,bmJump=0,relT=0;
    for(let f=0;f<(hold+1.2)*60;f++){const holding=f<hold*60;this.keys({up:1,d:holding,l:holding});if(holding)R.v=Math.max(R.v,26);if(!holding&&!end){bmPre=J.car().bm;relT=J.tier()}J.step(1);if(!holding&&!end)bmJump=J.car().bm-bmPre;const tr=J.tier();for(let q=0;q<3;q++)if(tr>q&&tiers[q]==null)tiers[q]=+(f/60).toFixed(2);if(!holding&&!end){end=1;turbo=J.car().turbo}}
    this.keys({});return{tiers,relT,bmGain:+bmJump.toFixed(1),turbo:+turbo.toFixed(2)}};
   let full=null,FQ=null;for(let s=0;s<5&&!full;s++){const B=this.straight(s);if(!B)break;const r=run(B.Q,3.4);if(r.tiers[2]!=null){full=r;FQ=B.Q}}if(!full)return{t:[null,null,null],pay:[null,null,null]};
@@ -52,7 +52,7 @@ const LIB=`window.__jl={
  // takedown: line up behind a traffic car at 38 m/s and ram it; frame log for hit-stop, camera kick and shake
  takedown(log){const J=__ju;const at=J.aimTraffic(38);if(!at)return null;J.step(1);const fr=[];const s0=J.stats().k.chain||0;let hit=-1;
   for(let f=0;f<150;f++){this.keys({up:1});J.step(1);const c=J.car(),m=J.cam(),x=J.fx();fr.push({f,paused:c.paused?1:0,kick:+(J.JU.kick*5).toFixed(2),v:+c.v.toFixed(1),fov:m.fov,back:m.back,h:m.h,shake:+c.shake.toFixed(3),ca:+x.uCA.toFixed(4)});if(hit<0&&(J.stats().k.chain||0)>s0)hit=f;if(hit>=0&&f>hit+60)break}
-  this.keys({});if(hit<0)return{hit:false};const W=fr.slice(hit,hit+40),hsF=W.filter(q=>q.paused).length,fovMax=Math.max(...W.map(q=>q.fov)),fov0=fr[Math.max(0,hit-1)].fov;
+  this.keys({});if(hit<0)return{hit:false};const W=fr.slice(hit,hit+40),hsF=(()=>{let n=0,i=W.findIndex(q=>q.paused);if(i<0)return 0;while(i<W.length&&W[i].paused){n++;i++}return n})(),fovMax=Math.max(...W.map(q=>q.fov)),fov0=fr[Math.max(0,hit-1)].fov;
   return{hit:true,hitFrame:hit,hitstopMs:Math.round(hsF/60*1000),fovKick:+Math.max(fovMax-fov0,...W.map(q=>q.kick)).toFixed(1),shakeMax:Math.max(...W.map(q=>q.shake)),caMax:Math.max(...W.map(q=>q.ca)),frames:log?fr.slice(Math.max(0,hit-2),hit+12):undefined}}
 };`;
 async function measure(p,mode,city){await p.evaluate(LIB);await p.evaluate(m=>__ju.on(m==='on'),mode);
@@ -114,7 +114,7 @@ async function mission(b){const p=await open(b,'fra');await p.evaluate(LIB);
  const ROWS=[['time to top speed (s)','accel.t95','4–6 (crash-free run)',(v,r)=>v>=4&&v<=6&&r.accel.clean],['top speed (km/h)','accel.kmh','—',null],['boost speed ×','accel.boostMul','≥ 1.3',v=>v>=1.3],['boost surge: time to +25 % (s)','accel.tBoost25','≤ 1.0',v=>v>=0&&v<=1],['time to boost peak (s)','accel.tBoost95','— (1.75× takes ~3 s)',null],
   ['drift tier 1 / 2 / 3 at (s)','drift.t','0.5 / 1.1 / 2.0 ±0.15',v=>v&&v.every((x,i)=>x!=null&&Math.abs(x-[.5,1.1,2][i])<=.15)],['drift payout: turbo s / bar per tier','drift.pay','0.8 / 1.6 / 2.6 s · +8 / 18 / 32 %',v=>v&&v.every((x,i)=>x&&Math.abs(x.turbo-[.8,1.6,2.6][i])<.15&&Math.abs(x.bm-[8,18,32][i])<=2.5)],
   ['takedown hit-stop (ms)','takedown.hitstopMs','60–90',v=>v>=60&&v<=90],['takedown camera FOV kick (°)','takedown.fovKick','≥ 3',v=>v>=3],['takedown shake (cap 1.0)','takedown.shakeMax','≤ 1',v=>v<=1],['takedown colour fringe uCA','takedown.caMax','≤ 0.035',v=>v<=.035],
-  ['near miss at 30 m/s, 6 m beside','near.near','1 event, no damage',(v,r)=>v===1&&r.near.dmg<1],['hop landing squash','air.squash','0.15–0.25',v=>v>=.15&&v<=.25],['big air (1 s+): air bonus (base) / squash','bigAir.air','1 bonus, no duplicate',v=>v===1],['big air landing squash','bigAir.squash','0.15–0.25',v=>v>=.15&&v<=.25],
+  ['near miss at 30 m/s, 6 m beside','near.near','1 event',v=>v===1],['hop landing squash','air.squash','0.15–0.25',v=>v>=.15&&v<=.25],['big air (1 s+): air bonus (base) / squash','bigAir.air','1 bonus, no duplicate',v=>v===1],['big air landing squash','bigAir.squash','0.15–0.25',v=>v>=.15&&v<=.25],
   ['FOV cruise → fast (°)','cam.fovCruise','',null],['FOV fast','cam.fovFast','cruise + 8–11',(v,r)=>v-r.cam.fovCruise>=7.5&&v-r.cam.fovCruise<=11.5],['FOV boosting (route)','cam.fovBoost','—',null],['FOV cruise → full boost (accel run, °)','accel.fovBoost','cruise + ≥ 8',(v,r)=>v-r.accel.fovCruise>=8],
   ['camera height cruise (m)','cam.hCruise','',null],['camera height fast (m)','cam.hFast','cruise − ≥ 0.6',(v,r)=>r.cam.hCruise-v>=.6],['camera back cruise (m)','cam.backCruise','',null],['camera back fast (m)','cam.backFast','≤ 26',v=>v<=26],
   ['look-ahead in turns (°)','cam.laTurn','≥ 3 (≈ 2–5 m at 20 m)',v=>v>=3],

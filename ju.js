@@ -72,7 +72,8 @@ AU.engine=(f=>function(s,thr,on){f.call(this,s,thr,on);if(!JU.on||!this.a||state
 function JU_step1(){const h=1/60;JU.rt=h;let dt=(paused||JU_gate(h))?0:h;if(dt&&slowmo>0){slowmo-=dt;dt*=.35}T+=dt;if(!RO.frozen)roamStep(dt);roamCam(dt);updPool(SPARK,dt,20);updPool(FIRE,dt,-2);updPool(SMOKE,dt,-1.5);updPool(FIREB,dt,-3);updDebris(dt);updPool(WATER,dt,24);updPool(GLOWP,0);shake=Math.max(0,shake-dt*3);flash=Math.max(0,flash-dt*2.2);hitFx=Math.max(0,hitFx-dt*2.5);FX.uniforms.uCA.value=hitFx*.035+flash*.02}
 window.__ju={get JU(){return JU},C:JU_C,on:b=>{JU.on=!!b;if(!JU.on&&pl)pl.mesh.scale.set(1,1,1)},hold:b=>{JU.hold=!!b;JU.ln=null},
   tier:()=>{const d=RO.dDir?RO.dT||0:0;return JU.on?JU_tier(d):d>2?3:d>1.1?2:d>.5?1:0},setBm:v=>{if(pl)pl.bm=v},
-  step:n=>{for(let i=0;i<n;i++)JU_step1()},
+  // tests drive like a player: a popped-up card / story panel is dismissed with its own close control
+  step:n=>{for(let i=0;i<n;i++){if(JU.autoClose&&(RO.card||RO.story||RO.mapOpen)){if(RO.card){const b=document.querySelector('#rcNo');if(b)b.click();else RO.card=null}if(RO.story)try{storyClose()}catch(e){}if(RO.mapOpen)toggleMap(false);JU.closed=(JU.closed||0)+1}JU_step1()}},autoClose:b=>{JU.autoClose=!!b},
   reset:()=>{JU.clk=0;JU.ev={n:0,m:0,lm:0,last:0,gap:0,k:{}};JU.sm0=HUB.smashed||0;JU.cr0=season().cr;JU.dropT=0},
   stats:()=>({t:+JU.clk.toFixed(2),ev:JU.ev.n,moments:JU.ev.m,k:{...JU.ev.k},gap:+Math.max(JU.ev.gap,JU.clk-JU.ev.last).toFixed(2),smash:(HUB.smashed||0)-JU.sm0,studs:season().cr-JU.cr0}),
   cam:()=>{const c=camera.position,dx=c.x-RO.x,dz=c.z-RO.z,fw=new THREE.Vector3();camera.getWorldDirection(fw);const ya=Math.atan2(fw.x,fw.z);return{fov:+camera.fov.toFixed(2),h:+(c.y-RO.y).toFixed(2),back:+Math.hypot(dx,dz).toFixed(2),yaw:+(Math.atan2(Math.sin(ya-RO.h),Math.cos(ya-RO.h))*57.3).toFixed(1)}},
