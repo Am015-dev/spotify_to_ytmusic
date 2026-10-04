@@ -1,3 +1,15 @@
+# v83 (scale + seamless) — BUILT, GATE RUNNING: DO NOT DEPLOY YET
+
+```
+./reapply.sh <v82 candidate order> pSC1.py pSM1.py pSM2.py pSM3.py pSM4.py pSM5.py pSM6.py   → REAPPLY_OK
+python3 tools/split_km.py overdrive.html out83
+```
+v82 candidate order = pAU1 pAU2 pOG1 pOB1 pOB2 pOB3 pOC1 pCV1 pCV2 pRL1 pJU1 pRL2 pGB1 pDR1 pDR2. pSC2 (od-scale: human scale, setback, wall slide) is not in yet; it gets added when it lands.
+Deploy files: out83/overdrive.html (1,793,546 B) + out83/km.js (1,961,521 B). Unsplit 3,759,297 B. The v82 files in out/ are unchanged (deployed from 46e1879).
+tools/tBA.js is now od-seamless's version: an A→B crossing must switch district without a reload; the old branch is kept for non-seamless builds.
+So far: tOut (real out83 deploy files) PASS. Split gate (smoke, tSM, tOB, tOG, tHop, tDR, tSC, tBA, tBF) is RUNNING.
+
+---
 # Release 82 — FAST-TRACK CANDIDATE (v82 RC): phase 2 + od-drive
 
 ## Order (onto base.html = live v81)
