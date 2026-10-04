@@ -1,0 +1,1 @@
+hard g1 green Port Alder                      10/12  83% avg rounds 7.0 {"spin":1,"checks:gear+axis":1} 115975ms/game

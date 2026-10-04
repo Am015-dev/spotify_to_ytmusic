@@ -88,7 +88,13 @@ function showResult() {
   box.append(ok ? h('div.win', h('span', { html: KIT.iconSVG('star', 34) }), h('span', 'Dive complete!')) : h('div.lose', h('span', { html: KIT.iconSVG('cross', 30) }), h('span', 'The dive failed.')));
   if (!ok && R.why) box.append(h('p', R.why));
   box.append(h('p.sm', diveLabel() + ' · attempt ' + G.att + (G.distress ? ' · distress flare lit (+1)' : '')));
-  G.tasks.forEach((t, i) => { const st = R.tasks[i]; box.append(h('div.rjob' + (st > 0 ? '.ok' : '.bad'), h('span.mk', { html: st > 0 ? KIT.iconSVG('tick', 24) : KIT.iconSVG('cross', 24) }), h('span', h('b', pname(t.owner) + ': '), jobText(i)))); });
+  // done = tick; broken = cross + which trick, card and diver broke it; never broken (the dive stopped for another reason) = "not finished"
+  G.tasks.forEach((t, i) => {
+    const st = R.tasks[i], det = R.det && R.det[i], nb = ok ? '' : st < 0 ? (det || 'It could not be met by the end of the dive.') : 'Not finished: the dive ended first.';
+    box.append(h('div.rjob' + (st > 0 ? '.ok' : st < 0 ? '.bad' : '.open'), h('span.mk', { html: st > 0 ? KIT.iconSVG('tick', 24) : st < 0 ? KIT.iconSVG('cross', 24) : '<svg class="ic" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 12H18"/></svg>' }), h('span', h('b', pname(t.owner) + ': '), jobText(i), nb ? h('small.why', nb) : null)));
+  });
+  if (!ok && !guidedWon()) box.append(h('p.sm', 'Tip: the red cross marks the job that broke the dive. Grey jobs were still open.'));
+  if (ok && UI.mode === 'guided') guidedDebrief(box);
   if (m.kind === 'log') {
     if (ok) { const n = p.done[m.id]; box.append(h('p', 'Logged in your logbook: dive ' + m.id + ' done in ' + n + ' attempt' + (n === 1 ? '' : 's') + (p.flare[m.id] ? ' (the flare counts one).' : '.'))); }
     else box.append(h('p.sm', 'Attempts so far on this dive: ' + (p.tries[m.id] || 0) + '. If the jobs could not be done from the start, try with new jobs.'));
@@ -108,6 +114,7 @@ function showResult() {
   bt.append(h('button.btn.alt', { 'data-a': NET.on ? 'netopen' : 'menu', type: 'button' }, NET.on ? 'Lobby' : 'Menu'));
   box.append(bt); rs.append(box); snd(ok ? 'win' : 'lose');
 }
+function guidedWon() { return false; }
 function closeRS() { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; }
 function nextDive() {
   if (!G || G.phase !== 'over' || NET.on && !isHost()) return;

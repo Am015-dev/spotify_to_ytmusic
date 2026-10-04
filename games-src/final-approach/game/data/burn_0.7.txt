@@ -1,1 +1,2 @@
 normal g4 green Lake Orrin                    12/30  40% avg rounds 6.9 {"speed":6,"checks:flaps":1,"spin":1,"collision":2,"checks:gear+flaps":1,"checks:flaps+axis":1,"fuel":2,"checks:axis":2,"mandatory":2} 16851ms/game
+normal g6 green Castlemoor                    10/30  33% avg rounds 7.0 {"speed":6,"checks:planes":1,"spin":4,"checks:flaps":4,"checks:gear":1,"mandatory":2,"checks:axis":1,"checks:planes+gear":1} 11996ms/game
