@@ -131,7 +131,7 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
   const _mine=mineHTML;mineHTML=function(me){const h=_mine(me);if(me<0||!G.pl[me])return h;const p=P(me);const av=bfAv(p,'bfav');
     return h.replace('<div class="top">',`<div class="top"><span class="bfhero" style="--c:${PCOL[p.i]}">${av}<b class="bfstr" aria-label="strength">⚔${pStr(p)}</b></span>`)};
   const _prompt=promptHTML;promptHTML=function(me){let h=_prompt(me);const line=bfLine(me);
-    h=h.replace('<div id="prompt">',`<div id="prompt" class="${G&&G.q?'bfq':''}">`);
+    h=h.replace('<div id="prompt">',`<div id="prompt" class="${G&&G.q?'bfq':''}">`+(/autonote/.test(h)?'':autoNoteHTML()));
     h=h.replace(/✨ Play suggested cards? \((\d+)\)/,'✨ Auto ($1)').replace(/🏃 Run away \((?:need \d\+: )?([^)]*)\)/,'🏃 Run ($1)').replace('🏃 Run (this monster can’t be escaped)','🏃 Run (no chance)').replace('🙋 Ask for help','🙋 Get help').replace('🚪 Kick open the door','🚪 Kick!').replace('💰 Sell items','💰 Sell');
     const i=h.indexOf('<p class="say">');const tag=`<p class="bfline">${esc(line)}</p>`;
     if(i>=0)h=h.slice(0,i)+tag+h.slice(i);else h=h.replace(/(<div class="who">.*?<\/div>)/,'$1'+tag);return h};
@@ -178,3 +178,5 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(BF.pick!=null||BF.
     // before a trailing rival's door (lower level than you, not near the win) don't stop for curses either
     const calm=G.phase==='window'&&P(G.active).lvl<P(s).lvl&&P(G.active).lvl<8;if(!calm&&vm.some(m=>m!==pass&&(m.card==null||(!bfHarm(m)&&bfZone(m,s)))))return;
     const r=performMove(pass,s);if(!r||!r.success)return}}})();
+// the "You gave away…" note stays for a few seconds even when skipped prompts move the game on at once
+autoNoteHTML=function(){const a=UI.autoNote;if(!a||!G)return '';if(!a.at)a.at=Date.now();return a.ln===G.ln||Date.now()-a.at<8000?`<div class="since autonote" role="status">${a.t}</div>`:''};
