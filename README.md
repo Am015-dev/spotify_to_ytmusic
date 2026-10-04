@@ -5,7 +5,7 @@ Single-file three.js LEGO-2K-Drive-style racer. Cities: Frankfurt (real streets)
 
 ## Setup (once per session)
 ```
-./setup.sh        # installs three@0.164.1 locally, starts http server :8766 on this folder, builds the pages
+./setup.sh        # (three.js r164 is vendored in node_modules/three — no npm install) starts http server :8766 on this folder, builds the pages
 ```
 Pages: `http://127.0.0.1:8766/local.html` (game), `local_dbg.html` (adds `window.__dbg` = scene, renderer, composer, THREE…).
 Test/debug API: `window.__mho` (state, enterRoam, roamSim(n) = n×1/60 s sim steps, RO = roam car, K = keys, warp, rsnap, qv.path, gnd,
@@ -38,7 +38,7 @@ Also write and run your own focused test (`t<TAG>.js`) for your feature, through
 
 ## Deliver
 Commit ONLY: your patch scripts, module files, test files, `ANCHORS.md`, `REPORT.md` (short: what changed, patch order, test results with counts, known gaps),
-and `smoke/sheet.png` + a few key screenshots (jpg). Push to the branch you were given. Do not commit base.html changes or generated pages.
+and `smoke/sheet.png` + a few key screenshots (jpg). Push ONLY to the branch you were given (alex/od-<name>) — NEVER push to alex/overdrive-devkit. Do not commit base.html changes or generated pages.
 
 Docs: `docs/fun_redesign.md` (story/activity design: chapters, characters, activities, milestones), `docs/m1_ANCHORS.md` (functions m1.js wraps),
 `docs/athens_anchors.txt` (Athens rebuild anchors).
