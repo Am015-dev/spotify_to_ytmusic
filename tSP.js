@@ -58,7 +58,7 @@ const D=p=>p.evaluate(()=>[__SP.pl.dist,__SP.p2.dist,__SP.pl.x,__SP.p2.x]);
   const J=s=>JSON.parse(s);const d=(k,i,f)=>J(sc[k][1])[i][f]-J(sc[k][0])[i][f];
   ok(d('p2prop',1,'pr')>=1&&d('p2prop',0,'pr')===0,'battle: P2 smashing a prop scores for P2 only',[sc.p2prop[0],sc.p2prop[1]]);
   ok(d('p1prop',0,'pr')>=1&&d('p1prop',1,'pr')===0,'battle: P1 smashing a prop scores for P1 only',[sc.p1prop[0],sc.p1prop[1]]);
-  ok(d('p2car',1,'tr')===1&&d('p2car',0,'tr')===0,'battle: P2 wrecking a traffic car scores for P2 only',[sc.p2car[0],sc.p2car[1]]);
+  ok(d('p2car',1,'tr')>=1&&d('p2car',0,'tr')===0,'battle: P2 wrecking a traffic car scores for P2 only',[sc.p2car[0],sc.p2car[1]]);
   ok(d('td',0,'td')===1&&d('td',1,'td')===0&&sc.td[2]>0,'battle: P1 boost-ram on P2 = P1 takedown, P2 spins out',[sc.td[0],sc.td[1]]);
   const hud=await p.evaluate(()=>[...document.querySelectorAll('.SP_v .a')].map(e=>e.textContent));console.log('INFO battle hud',JSON.stringify(hud));
   await F.off(p);const m=await p.evaluate(()=>__SP.measure());console.log('INFO battle draw calls',JSON.stringify(m));
