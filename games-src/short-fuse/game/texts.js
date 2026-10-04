@@ -131,7 +131,7 @@ const TUTORIAL=[
  {id:'hello',t:'Welcome to the crew!',p:'You defuse the bomb together. <b>Cut every wire</b> on every stand to win. The <b>fuse</b> (top of the panel) burns one step on every miss: when it is gone, boom.'},
  {id:'stand',t:'Your stand',p:'Your wires stand at the front of the table, face up for you and sorted from low to high. Your crewmates see only the backs, and you see only theirs. Their wires are sorted too.'},
  {id:'open',t:'The opening token',p:'Everyone starts by showing one wire to the crew: a token with its number goes in front of it. Pick one of yours.'},
- {id:'dual',t:'A dual cut',p:'On your turn, point at <b>one wire of a crewmate</b> and say a number <b>you hold</b>. If it matches, both wires are cut. Tap a glowing wire on the table to start.'},
+ {id:'dual',t:'Your turn: a dual cut',p:'Tap a <b>glowing wire of a crewmate</b>, then say a number <b>you hold</b>. Right: both wires are cut. Wrong: the fuse burns a step. Clues: the shown numbers, and every rack is sorted low to high.'},
  {id:'value',t:'Say the number',p:'Now pick the number you think it is. You can only say numbers you hold yourself. Tokens and the sort order are your clues.'},
  {id:'confirm',t:'Snip!',p:'Check the summary and press the big button. The "What we know" box suggests a move and says why.'},
  {id:'hit',t:'Both wires are cut',p:'A hit cuts their wire and one of yours of the same value. When all four of a value are cut, a green check goes on the track.'},

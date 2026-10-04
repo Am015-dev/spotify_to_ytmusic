@@ -502,7 +502,7 @@ function checkWin(final){
   if(a.length===0){G.winner='draw';G.winText='Everyone falls: the city wins, nobody is crowned.';G.phase='over';lg(-1,G.winText);return true}
   if(a.length===1){G.winner='P'+(a[0].i+1);G.winText=`Last standing: ${mname(a[0])} is the only monster left and takes the crown!`;G.phase='over';lg(a[0].i,G.winText);return true}
   const ast=a.find(p=>has(p,'c_astro')&&p.vp>=17);if(ast){G.winner='P'+(ast.i+1);G.winText=`Space Helmet: ${mname(ast)} reaches ${ast.vp} stars (only 17 needed) and is crowned!`;G.phase='over';cov('cost:astro');lg(ast.i,G.winText);return true}
-  if(final){const w=a.filter(p=>p.vp>=20);if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=`20 stars: ${mname(w[0])} reaches ${w[0].vp} stars and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
+  if(final){const w=a.filter(p=>p.vp>=20);if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=`${mname(w[0])} reaches ${w[0].vp} stars (20 needed) and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
   return false}
 
 /* ---------- Curses: the Omen Die ---------- */
@@ -566,7 +566,7 @@ function canBuy(p,k){const id=G.market[k];return !!id&&buyOK(p,id)&&p.en>=costOf
 function buyCore(p,k,done){const id=G.market[k];if(!id||!canBuy(p,k)){done();return}
   const full=costOf(p,id);const half=Math.ceil(full/2);
   const pay=(c,ufo)=>{p.en-=c;G.market[k]=null;refill();snd('buy');cov('buy');if(p.i===G.active)G.tf.bought=true;if(ufo){(p.tok.ufo=p.tok.ufo||[]).push(id);cov('evo:28')}
-    lg(p.i,`${mname(p)} buys “${CN(id)}”${ufo?' at half price ('+evoName(28)+')':''}.`);UI.banner=`<b>${esc(mname(p))}</b> buys ${esc(CN(id))}`;acquire(p,id,true,done)};
+    {const C=CARDS[base(id)];const fx1=C&&C.t==='D'?` (one-shot: ${C.x.replace(/\.$/,'')})`:'';lg(p.i,`${mname(p)} buys “${CN(id)}”${ufo?' at half price ('+evoName(28)+')':''}${fx1}.`);UI.banner=`<b>${esc(mname(p))}</b> buys ${esc(CN(id))}${esc(fx1)}`}acquire(p,id,true,done)};
   if(hasE(p,28)&&CARDS[base(id)].t==='K'&&(p.tok.ufo||[]).length<3&&half<full)ask(p.i,evoName(28),`Pay ${half} instead of ${full} and put a barnacle token on it (roll each turn: a claw loses it)?`,[{k:'h',l:`Pay ${half} (saucer)`},{k:'f',l:`Pay ${full}`}],()=>full>=4?'h':'f',k=>pay(k==='h'?half:full,k==='h'));
   else pay(full,false)}
 function buy(k){const p=cur();if(!canBuy(p,k))return;buyCore(p,k,()=>afterBuy(p))}

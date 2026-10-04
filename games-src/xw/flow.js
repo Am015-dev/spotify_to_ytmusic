@@ -5,7 +5,7 @@ const PHASES=[
   {n:'Activation',sub:'move + act',t:'<b>Activation:</b> one ship at a time reveals its dial and moves, <b>lowest pilot skill first</b>. After moving, each ship takes one action.'},
   {n:'Combat',sub:'shoot',t:'<b>Combat:</b> one ship at a time may shoot an enemy inside its arc at range 1-3, <b>highest pilot skill first</b>.'},
   {n:'End',sub:'summary',t:'<b>End:</b> unused focus and evade tokens are removed (target locks and stress stay). Then the next round starts.'}];
-function flowReset(){Object.assign(UI,{notes:{},flowG:G,sumSeen:G&&G.round>=2?G.round-1:0,roadInfo:null,hold:null,holdK:[],resSeen:0,draftR:null})}
+function flowReset(){Object.assign(UI,{notes:{},hpAt:{},flowG:G,sumSeen:G&&G.round>=2?G.round-1:0,roadInfo:null,hold:null,holdK:[],resSeen:0,draftR:null})}
 function flowSync(){if(G&&UI.flowG!==G)flowReset()}
 // ---- guidance level: "full" explains every step, "light" keeps one line. Auto = full for the first round of the first battle ----
 const guideMode=()=>LS.get('na_guide')||'auto';
@@ -24,7 +24,7 @@ const youTag=s=>mine(s)&&soloSide()>=0?' (you)':'';
 function renderRoad(){const el=$('steps');if(!el)return;if(!G){el.innerHTML='';return}const st=stepShown(),R=roundShown();
   let h=`<div class="road" role="list" aria-label="Round roadmap"><span class="rn">${G.round===0?'Setup':G.winner?'Over':'Round '+R}</span>`;
   PHASES.forEach((p,i)=>{const k=i+1;const cls=G.winner||k<st?'done':k===st?'on':'next';
-    h+=`<button class="ph ${cls}" data-road="${i}" role="listitem" aria-current="${k===st?'step':'false'}" aria-expanded="${UI.roadInfo===i}"><b><span class="lg">${p.n}</span><span class="sh">${['Plan','Act','Combat','End'][i]||p.n}</span></b><i>${cls==='done'?'<span class="mk">✓</span><span class="tx"> done</span>':cls==='on'?'<span class="mk">●</span><span class="tx"> now</span>':'<span class="tx">'+p.sub+'</span>'}</i></button>`});
+    h+=`<button class="ph ${cls}" data-road="${i}" role="listitem" aria-current="${k===st?'step':'false'}" aria-expanded="${UI.roadInfo===i}"><b><span class="lg">${p.n}</span><span class="sh">${['Plan','Act','Combat','End'][i]||p.n}</span></b><i>${cls==='done'?'<span class="mk">✓</span><span class="tx"> finished</span>':cls==='on'?'<span class="mk">●</span><span class="tx"> now</span>':'<span class="tx">'+p.sub+'</span>'}</i></button>`});
   h+='</div>';
   const info=UI.roadInfo!=null?PHASES[UI.roadInfo].t:G.round===0?'<b>Setup:</b> place the asteroids and the ships, then round 1 starts. Every round has the same 4 phases.':'';
   if(info)h+=`<p class="roadinfo">${info}${UI.roadInfo!=null?' <button class="linkb" data-road="x" aria-label="Close explanation">✕</button>':''}</p>`;
@@ -167,7 +167,10 @@ function diceHead(A){const a=ship(A.a),d=ship(A.d);const def=G.phase==='dmod'||G
   if(humanTurn()&&g){if(G.phase==='amod')t='Your attack dice are rolled. Spend a token to improve them, then press <b>Done</b>: the defender rolls next.';
     else if(G.phase==='dmod')t='The defence dice are rolled. Each ✦ evade cancels one hit. Spend a token to add evades, then press <b>Done</b> to take the damage that is left.';
     else if(G.phase==='damod')t='Before the attack is final, you may tamper with the attacker\'s dice.'}
-  return `<p class="head">${title}</p>${stepList(['Choose a target',G.phase==='amod'?'Attack dice: modify':'Defence dice: modify','Result'],1)}${t?`<p class="now-t">${t}</p>`:''}`}
+  // cause before effect: why this shot is possible and what the range did to the dice
+  const arcW=a.arc==='T'?'turret (it shoots all round)':a.arc==='A'?'front or rear arc':'front arc';
+  const why=`<p class="small why">${iDef?'You are':esc(shortName(d))+' is'} in ${esc(shortName(a))}'s ${arcW} at range ${A.rg}${A.rg===1?': +1 attack die':A.rg===3?': +1 defence die':''}${A.obs?' · a rock is in the way: +1 defence die':''}.</p>`;
+  return `<p class="head">${title}</p>${why}${stepList(['Choose a target',G.phase==='amod'?'Attack dice: modify':'Defence dice: modify','Result'],1)}${t?`<p class="now-t">${t}</p>`:''}`}
 // the "nothing to do right now" box: who is acting and when it is your turn
 function watchHTML(){const s=G.cur&&ship(G.cur);const st=G.step;let t='',sub='';
   if(G.phase==='plan')return `<p class="head">Planning · waiting for the other pilots</p><p class="now-t">They are setting their dials in secret.</p>`;
@@ -180,15 +183,23 @@ function watchHTML(){const s=G.cur&&ship(G.cur);const st=G.step;let t='',sub='';
   if(guided())sub+=' <span class="muted">Nothing to do: watch the board until it is your turn.</span>';
   return `<p class="head">${t}</p><p class="now-t">${sub}</p>`}
 // ---- the end-of-round summary (it shows at the start of the next round, before any dial is set) ----
+// hull+shields of every ship at the first moment each round is seen, so the summary counts every point of damage (crit cards, asteroids, bombs), not only shots
+function hpMark(){if(!G)return;flowSync();const H=UI.hpAt=UI.hpAt||{};if(H[G.round])return;H[G.round]={};for(const s of G.ships)H[G.round][s.id]=s.alive?s.hull-hullDmg(s)+s.sh:0}
+function hpText(s){const h=Math.max(0,s.hull-hullDmg(s));return `${h}/${s.hull} hull${s.shMax?` · ${s.sh}/${s.shMax} shield${s.shMax===1?'':'s'}`:''}`}
+// log lines of round R about damage that didn't come from a shot (newest-first log, between "Round R:" and the next round's line)
+function roundHarm(R,side){const L=G.log;let a=L.findIndex(l=>l.s===-1&&l.t.startsWith(`Round ${R}:`));if(a<0)a=L.length;let b=L.findIndex(l=>l.s===-1&&l.t.startsWith(`Round ${R+1}:`));if(b<0)b=-1;
+  return L.slice(b+1,a).filter(l=>l.s===side&&/asteroid: rolls|critical hit|cockpit fire|hull breach|secondary blast|is shaken|concussed|detonates|flies off|loses its|restores a shield|patches it up|repair/.test(l.t)).map(l=>l.t).reverse()}
 function summaryHTML(){const R=G.round-1,me=soloSide()>=0?soloSide():planSide();const g=guided();
   const res=UI.results.filter(r=>r.r===R).reverse();const side=id=>{const s=ship(id);return s?s.side:-1};
-  const dealt=res.filter(r=>side(r.a)===me).reduce((a,r)=>a+r.dmg,0),taken=res.filter(r=>side(r.d)===me).reduce((a,r)=>a+r.dmg,0);
+  const dealt=res.filter(r=>side(r.a)===me).reduce((a,r)=>a+r.dmg,0);let taken=res.filter(r=>side(r.d)===me).reduce((a,r)=>a+r.dmg,0);hpMark();
+  const H0=UI.hpAt&&UI.hpAt[R],H1=UI.hpAt&&UI.hpAt[R+1];if(H0&&H1){const lost=k=>G.ships.filter(s=>s.side===k&&H0[s.id]!=null&&H1[s.id]!=null).reduce((a,s)=>a+Math.max(0,H0[s.id]-H1[s.id]),0);taken=Math.max(taken,lost(me))}
   const my=G.ships.filter(s=>s.side===me);const stress=my.filter(s=>s.alive).reduce((a,s)=>a+s.stress,0);
   let h=`<p class="head">Round ${R} summary</p>`;
   if(g)h+=`<p class="now-t">That was one full round: <b>Planning</b> (secret dials) → <b>Activation</b> (move and act, lowest skill first) → <b>Combat</b> (shoot, highest skill first) → <b>End</b>. Every round works the same way.</p>`;
   h+=`<div class="sumgrid"><div><b>${dealt}</b><span>damage dealt</span></div><div class="${taken?'hurt':''}"><b>${taken}</b><span>damage taken</span></div><div class="${stress?'hurt':''}"><b>${stress}</b><span>stress on your ship${my.length>1?'s':''}</span></div></div>`;
   const ev=[];for(const r of res)ev.push('🎯 '+resultHTML(r,true));
   for(const n of (UI.notes[R]||[]))if(n.kind!=='red'||!(UI.notes[R]||[]).some(x=>x.id===n.id&&x.kind==='stressed'))ev.push((n.lost||n.kind==='noshot'?'⚠ ':'')+n.t);
+  for(const t of roundHarm(R,me))ev.push((/restores|patches|repair/.test(t)?'✚ ':'💥 ')+esc(t));
   if(!res.length)ev.push('No shots were fired this round.');
   h+=`<h4>What happened</h4><ul class="sumlist">${ev.slice(0,8).map(x=>`<li>${x}</li>`).join('')}</ul>`;
   h+=`<h4>Your ship${my.length>1?'s':''} now</h4><ul class="sumlist">${my.map(s=>s.alive?`<li><b>${nm(s)}</b>: hull ${s.hull-hullDmg(s)}/${s.hull} · shields ${s.sh}/${s.shMax}${s.stress?` · <span class="warn">stress ${s.stress}</span>`:''}${s.dmg.filter(x=>x.up).map(x=>` · <span class="crit">${esc(DAMAGE[x.c].n)}: ${esc(critPlain(x.c,s))}</span>`).join('')}</li>`:`<li class="muted"><b>${nm(s)}</b>: destroyed</li>`).join('')}</ul>`;

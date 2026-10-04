@@ -27,7 +27,7 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
    if(G.over&&!w.eval('!!(UI.card&&UI.card.kind==="over")')&&!w.eval('UI.card')){w.eval('pump()')}
    if(G.over&&w.eval('!!(UI.card&&UI.card.kind==="over")')){clearInterval(iv);if(!d.querySelector('#pc [data-a=again]'))errs.push('no end card');res({cf,over:G.over,errs,hidden,clicks,round:G.round,secs:Math.round((Date.now()-t0)/1000),seen});w.close();return}
    const card=d.querySelector('#pc:not([hidden]) .btn');
-   if(w.eval('UI.card')){const b=d.querySelector('#pc [data-a=take],#pc [data-a=evok],#pc [data-a=tipok]');if(b){click(b);seen.add('card:'+b.dataset.a);clicks++;return}}
+   if(w.eval('UI.card')){const b=d.querySelector('#pc [data-a=take],#pc [data-a=evok],#pc [data-a=tipok],#news [data-a=newsok]');if(b){click(b);seen.add('card:'+b.dataset.a);clicks++;return}}
    if(R()<.02){const t=rnd([...d.querySelectorAll('.gx-bar [data-gx]')]);click(t);seen.add('drawer:'+t.dataset.gx);const x=d.querySelector('.gx-drawer.on .gx-x');if(x)click(x);return}
    if(R()<.03){const rv=rnd([...d.querySelectorAll('#rivals [data-a=rival]')]);if(rv){click(rv);seen.add('rival');click(d.querySelector('#ppop [data-a=pclose]'));return}}
    if(R()<.03){const loc=d.querySelector('.tb-loc[data-id="'+rnd(['castle','wilderness','harvest_field','battlefield','shrine','necropolis','throne'])+'"]');if(loc){click(loc);seen.add('loctap');if(!w.eval('UI.pop'))errs.push('loc tap no popup');else if(R()<.5)click(d.querySelector('#ppop [data-a=pclose]'));return}}

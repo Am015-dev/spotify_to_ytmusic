@@ -68,7 +68,7 @@ function pxPan(dx){if(!PX.zoom)return;PX.zoom.pan+=dx;pxCamApply(true)}
 function pxZB(){const bar=document.getElementById('zb');if(!bar)return;const row=PX.zoom&&pxRows().find(r=>r.key===PX.zoom.key);
   const bd=document.getElementById('board');if(bd)bd.classList.toggle('pz',!!(PX.on&&row&&G&&UI.started));
   if(!PX.on||!row||!G||!UI.started){if(!bar.hidden){bar.hidden=true;bar.innerHTML=''}for(const id of['zpl','zpr']){const b=document.getElementById(id);if(b)b.hidden=true}PX.zb='';return}
-  const I=pxRowInfo(row);const h=`<button class="zbb" data-ph="zprev" aria-label="Previous rack">&#8249;</button><div class="zt"><b>${esc(I.nm)}${esc(I.part)}</b><small>${I.left} of ${I.total} wires left</small></div><button class="zbb" data-ph="znext" aria-label="Next rack">&#8250;</button><span class="zst">${pxStatHTML(UI.V)}</span><button class="zbb zx" data-ph="zexit" aria-label="Back to the whole table">${ico('eye')}</button>`;
+  const I=pxRowInfo(row);const h=`<button class="zbb" data-ph="zprev" aria-label="Previous rack">&#8249;</button><div class="zt"><b>${esc(I.nm)}${esc(I.part)}</b><small>${I.left} of ${I.total} uncut · sorted low→high from A</small></div><button class="zbb" data-ph="znext" aria-label="Next rack">&#8250;</button><span class="zst">${pxStatHTML(UI.V)}</span><button class="zbb zx" data-ph="zexit" aria-label="Back to the whole table">${ico('eye')}</button>`;
   if(h!==PX.zb){PX.zb=h;bar.innerHTML=h}bar.style.borderBottom='4px solid '+SEATC[posOf(I.seat)%5];bar.hidden=false;
   const half=PX.zoom.half||0;for(const [id,sgn] of [['zpl',-1],['zpr',1]]){const b=document.getElementById(id);if(b){b.hidden=half<.3||(sgn<0?PX.zoom.pan<=-half+.05:PX.zoom.pan>=half-.05)}}}
 function pxCycle(d){const rs=pxRows();if(!rs.length)return;let i=rs.findIndex(r=>r.key===(PX.zoom&&PX.zoom.key)&&PX.zoom.slot>=r.from&&PX.zoom.slot<r.to);if(i<0)i=0;i=(i+d+rs.length)%rs.length;pxZoomTo(rs[i],null)}
@@ -100,6 +100,7 @@ function pxCrewHTML(V){if(!G||!V||!V.seats)return '';let h='';
   return h}
 function pxChipsHTML(V){if(!G||!V)return '';let h=`<button class="pchip btn" data-ph="chip" data-k="job" aria-label="Job ${G.mission}: ${esc(MISSIONS[G.mission].nm)}">${ico('target')}<b>Job ${G.mission}</b></button>`;
   if(V.seat>=0){const q=V.seats[V.seat];if(q&&q.ch&&CHARS[q.ch]){h+=`<button class="pchip btn${q.chUsed||q.chDown?' used':''}" data-ph="chip" data-k="crew" aria-label="Your crew card: ${esc(CHARS[q.ch].n)}">${ico('gear')}<b>${esc(CHARS[q.ch].n)}</b></button>`}}
+  if(!noGear()&&V.eq&&V.eq.length)h+='<span class="pchl">Crew gear (anyone):</span>';
   if(!noGear()&&V.eq)V.eq.forEach((e,i)=>{if(e.down||!e.id){h+=`<button class="pchip btn used" data-ph="chip" data-k="eq" data-i="${i}" aria-label="Face-down gear card"><b>?</b></button>`;return}const E=EQUIP[e.id];if(!E)return;
     h+=`<button class="pchip btn eq ${esc(e.st||'')}" data-ph="chip" data-k="eq" data-i="${i}" aria-label="${esc(E.n)} (${esc(e.st||'')})"><em>${E.v==='Y'?'Y':E.v}</em><b>${esc(E.n)}</b></button>`});
   if(G&&UI.started&&(timedJob()||modeOf()==='watch'))h+=`<button class="pchip btn" data-a="pause" aria-label="${UI.pause?'Resume':'Pause'}">${ico(UI.pause?'play':'pause')}<b>${UI.pause?'Resume':'Pause'}</b></button>`;
@@ -116,8 +117,8 @@ function pxActsHTML(V){if(!G||!V)return '';let h='';const L=V.legal;
     for(const m of L.special)h+=`<button class="pb" data-a="multi" data-kind="${m.kind}" data-n="${m.tg.length}">${esc(multiName(m.kind))}</button>`;
     const others=L.other.filter(m=>m.a!=='eq'&&!(noGear()&&m.a==='item')),groups={};for(const m of others){const k=moveKey(m);(groups[k]=groups[k]||[]).push(m)}
     for(const k in groups)h+=`<button class="pb" data-a="grp" data-k="${esc(k)}">${esc(keyName(groups[k][0]))}${groups[k].length>1&&!stepsOf(k).length?' ('+groups[k].length+')':''}</button>`;
-    if(UI.help){const W=wwk(V);if(W&&W.suggestion)h+=`<button class="pb" data-a="sugg">${ico('bulb')}Suggest</button>`}
-    const T=noGear()?{}:L.tools;for(const t of ['dd','pt3','eq3','eq5'])if(T[t])h+=`<button class="pb${UI.sel&&UI.sel.tool===t?' on':''}" data-a="tool" data-t="${t}">${esc(toolName(t))}</button>`;
+    if(UI.help&&(hintOK()||hintsLeft()>0)){const W=wwk(V);if(W&&W.suggestion)h+=`<button class="pb" data-a="sugg">${ico('bulb')}Suggest${hintLbl()}</button>`}
+    const T=L.tools;for(const t of ['dd','pt3','eq3','eq5'])if(T[t])h+=`<button class="pb${UI.sel&&UI.sel.tool===t?' on':''}" data-a="tool" data-t="${t}">${esc(toolName(t))}</button>`;
     for(const t of ['pt10','eq10'])if(T[t])h+=`<button class="pb${UI.sel&&UI.sel.two===t?' on':''}" data-a="two" data-t="${t}">${esc(toolName(t))}</button>`;
     if(L.flip.length)h+=`<button class="pb${UI.sel&&UI.sel.fu!=null?' on':''}" data-a="flipmode">Use my flipped wire</button>`;
     if(UI.sel&&UI.sel.mode==='dual'&&(UI.sel.tool||UI.sel.two||UI.sel.fu!=null))h+=`<button class="pb" data-a="cancel">Start again</button>`;
@@ -156,27 +157,29 @@ setInterval(()=>{try{if(!PX.on||!G||!UI.started||!timedJob()||G.over||!UI.V)retu
 function pxClone(html){const d=document.createElement('div');d.innerHTML=html;return d}
 function pxCallHTML(V){const sel=UI.sel,L=V.legal;if(!sel||sel.mode!=='dual'||!sel.tg.length||!L)return null;const t=sel.tg[0];const step=sel.v==null?2:3;
   const many=sel.tg.length>1;const tgt=many?nm(ownerOf(t.st))+"'s wires "+sel.tg.map(x=>LET(x.k)).join(', '):wireName(t.st,t.k,V);
-  const vs=dualVals(sel);let W=null,sl=null,best=null;if(UI.help){try{W=wwk(V)}catch(e){}if(W&&!many)sl=W.slots.find(x=>x.st===t.st&&x.k===t.k)||null}
+  const vs=dualVals(sel);let W=null,sl=null,best=null;const odds=UI.help&&hintOK();if(odds){try{W=wwk(V)}catch(e){}if(W&&!many)sl=W.slots.find(x=>x.st===t.st&&x.k===t.k)||null}
   if(W&&W.suggestion&&W.suggestion.m&&W.suggestion.m.a==='dual'&&W.suggestion.m.st===t.st&&W.suggestion.m.ks&&W.suggestion.m.ks.includes(t.k)&&W.suggestion.m.v!=null)best=W.suggestion.m.v;
   if(best==null&&sl&&sl.prob){let bp=-1;for(const v of vs){const p=sl.prob[String(v==='Y'?'yellow':v)]||0;if(p>bp){bp=p;best=v}}if(bp<=0)best=null}
   const pct=v=>{if(!sl||!sl.prob)return '';const p=sl.prob[String(v==='Y'?'yellow':v)]||0;return Math.round(p*100)+'%'};
   let hint='';
-  if(UI.help&&sl){const pr=Object.entries(sl.prob||{}).filter(x=>x[0]!=='red').sort((a,b)=>b[1]-a[1]).slice(0,4).filter(x=>x[1]>0);const tk=(G.st[t.st].w[t.k].tok||[]).map(q=>tok2kit(q)).filter(Boolean);
+  if(odds&&sl){const pr=Object.entries(sl.prob||{}).filter(x=>x[0]!=='red').sort((a,b)=>b[1]-a[1]).slice(0,4).filter(x=>x[1]>0);const tk=(G.st[t.st].w[t.k].tok||[]).map(q=>tok2kit(q)).filter(Boolean);
     hint=`<p class="ph-why">${sl.certain!=null?`<b>It must be ${esc(VNm(sl.certain==='yellow'?'Y':sl.certain))}</b>.`:pr.length?'It could be '+pr.map(([v,p])=>`<b>${esc(v==='yellow'?'Y':v)}</b> ${Math.round(p*100)}%`).join(', ')+'.':'No favourite yet.'}${sl.prob&&sl.prob.red>0?` Red: <b>${Math.round(sl.prob.red*100)}%</b>.`:''}${tk.length?' Token: '+esc(tk.join(', '))+'.':''}</p>`}
+  if(odds&&W&&W.suggestion&&W.suggestion.why&&W.suggestion.m&&W.suggestion.m.st===t.st&&W.suggestion.m.ks&&W.suggestion.m.ks.includes(t.k))hint+=`<p class="ph-why">&#9733; Suggested because: ${esc(nice(W.suggestion.why,V))}</p>`;
+  else if(UI.help&&!odds)hint=hintsLeft()>0?`<button class="pb small ph-hintbtn" data-a="hint1">${ico('bulb')}Hint: what could it be?${hintLbl()}</button>`:'';
   else if(!UI.help)hint=`<button class="pb small ph-hintbtn" data-a="help">${ico('bulb')}Show hints</button>`;
   let vals=vs.map(v=>`<button class="vb ph-v${v==='Y'?' y':''}${sel.v===v?' sel':''}${best===v?' best':''}" data-a="v" data-v="${v}" aria-label="Say ${esc(VNm(v))}, you hold ${heldCount(V,v)}${best===v?', recommended':''}"><b>${v==='Y'?'Y':v}</b><small>you hold ${heldCount(V,v)}${pct(v)?' · '+pct(v):''}</small>${best===v?'<s>&#9733;</s>':''}</button>`).join('');
   if(!vs.length)vals='<p class="ph-why">You hold no wire that could match. Pick another wire or another action.</p>';
   let two='';if(sel.two&&sel.v!=null){two=`<p class="ph-sub">Second value (${esc(toolName(sel.two))}):</p><div class="ph-vals">${vs.filter(v=>v!==sel.v).map(v=>`<button class="vb ph-v${v==='Y'?' y':''}${sel.v2===v?' sel':''}" data-a="v2" data-v="${v}"><b>${v==='Y'?'Y':v}</b></button>`).join('')}</div>`}
   let go='';if(sel.v!=null){const m=buildDual(sel);const err=legal(m,V.seat);go=`<button class="pb pri big" data-a="dual"${err?' disabled':''}>${ico('cut')}Snip: say ${esc(VNm(sel.v))}${sel.v2!=null?' / '+esc(VNm(sel.v2)):''}</button>${err?`<p class="ph-why warn">${esc(err)}</p>`:''}`}
-  else go=`<p class="ph-sub">Tap one of your wires, then Snip.</p>`;
-  const T=noGear()?{}:L.tools;let tools='';for(const k of ['dd','pt3','eq3','eq5'])if(T[k])tools+=`<button class="pb${sel.tool===k?' on':''}" data-a="tool" data-t="${k}">${esc(toolName(k))}</button>`;
+  else go=`<p class="ph-sub">Pick the number you say, then Snip.</p>`;
+  const T=L.tools;let tools='';for(const k of ['dd','pt3','eq3','eq5'])if(T[k])tools+=`<button class="pb${sel.tool===k?' on':''}" data-a="tool" data-t="${k}">${esc(toolName(k))}</button>`;
   for(const k of ['pt10','eq10'])if(T[k])tools+=`<button class="pb${sel.two===k?' on':''}" data-a="two" data-t="${k}">${esc(toolName(k))}</button>`;
   if(L.flip.length)tools+=`<button class="pb${sel.fu!=null?' on':''}" data-a="flipmode">Use my flipped wire</button>`;
   let other='';for(const m of L.solo)other+=`<button class="pb" data-a="solo" data-v="${m.v}" data-ep="${m.ep?1:''}" data-fu="${m.fu!=null?m.fu:''}">Solo cut ${esc(VNm(m.v))}</button>`;
   const groups={};for(const m of L.other.filter(m=>m.a!=='eq'&&!(noGear()&&m.a==='item')).concat(noGear()?[]:L.eq)){const k=moveKey(m);(groups[k]=groups[k]||[]).push(m)}
   for(const k in groups)other+=`<button class="pb" data-a="grp" data-k="${esc(k)}">${esc(keyName(groups[k][0]))}</button>`;
   return `<div class="ph-head"><b>Call a value</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div>
-  <p class="ph-tgt">At <b>${esc(tgt)}</b>${sel.tool?' with the <b>'+esc(toolName(sel.tool))+'</b>':''}</p>${hint}
+  <p class="ph-tgt">At <b>${esc(tgt)}</b>${sel.tool?' with the <b>'+esc(toolName(sel.tool))+'</b>':''}</p>${sel.tool||sel.two?`<p class="ph-why">${esc(toolHelp(sel.tool||sel.two))}</p>`:''}${hint}
   <div class="ph-vals" data-owner="${V.seat}" data-up="1">${vals}</div>${two}<div class="ph-go">${go}</div>
   ${tools?`<div class="ph-row">${tools}</div>`:''}${other?`<p class="ph-sub">Or instead:</p><div class="ph-row">${other}</div>`:''}`}
 function pxOwnHTML(){const pd=PX.pd;const V=UI.V;if(!pd||!V||V.seat<0)return null;const st=V.stands[pd.s];if(!st||!st.mine)return null;const x=st.slots[pd.k];if(!x)return null;
@@ -191,7 +194,7 @@ function pxOwnHTML(){const pd=PX.pd;const V=UI.V;if(!pd||!V||V.seat<0)return nul
   if(x.not&&x.not.length&&!x.cut)body+=`<p class="tiny">Failed probes: it is not ${esc(x.not.map(VNm).join(', '))}.</p>`;
   const wcls=x.cut?'cut':(PX_CLS[x.c]||'u');
   return `<div class="ph-head"><b>${esc(nmw[0].toUpperCase()+nmw.slice(1))}</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div><div class="ph-info"><span class="pw big ${wcls}"><b>${esc(x.cut?'✓':pxWireText(x))}</b><i>${LET(pd.k)}</i></span><div class="ph-body">${body}</div></div>`}
-function pxUseBtn(V,id,label){if(!V||V.seat<0)return '';try{const L=V.legal;if(L&&decider()===V.seat&&!G.q){if(!noGear()&&L.tools&&L.tools[id])return `<button class="pb pri big" data-a="tool" data-t="${id}">Use ${esc(label)}</button>`;
+function pxUseBtn(V,id,label){if(!V||V.seat<0)return '';try{const L=V.legal;if(L&&decider()===V.seat&&!G.q){if(L.tools&&L.tools[id])return `<button class="pb pri big" data-a="tool" data-t="${id}">Use ${esc(label)}</button>`;
     if(L.eq.concat(L.other).some(m=>moveKey(m)===id))return `<button class="pb pri big" data-a="grp" data-k="${esc(id)}">Use ${esc(label)}</button>`}
   if(validMoves(V.seat).some(m=>moveKey(m)===id))return `<button class="pb pri big" data-a="offgrp" data-k="${esc(id)}">Use ${esc(label)}</button>`}catch(e){}return ''}
 function pxChipHTML(){const pd=PX.pd,V=UI.V;if(!pd||!G||!V)return null;
@@ -217,7 +220,7 @@ function pxPopup(){const el=document.getElementById('ppop');if(!el)return;let h=
   if(h!==PX.pops){const fresh=el.hidden;const sc=el.scrollTop;PX.pops=h;el.innerHTML=h;el.hidden=false;el.classList.toggle('in',fresh);if(!fresh)el.scrollTop=sc}}
 function pxPopClose(){PX.pop=null;PX.pd=null;PX.toast='';if(UI.sel&&!UI.sel.off){UI.sel=null;refresh();return}if(UI.sel&&UI.sel.off){UI.sel=null;refresh();return}pxAfter()}
 // ---------- cards: briefing, pass, game over, question, coach tip, my result: ONE at a time, each with its button ----------
-function pxResCard(V){if(!G||G.over||!V||V.seat<0)return null;const r=modeOf()==='solo'&&UI.myRes&&UI.myRes.turn>=G.turn-3?UI.myRes:null;
+function pxResCard(V){if(!G||G.over||!V||V.seat<0)return null;const r=modeOf()==='solo'&&UI.myRes&&UI.myRes.kind!=='info'&&UI.myRes.turn>=G.turn-3?UI.myRes:null;
   if(r&&r!==PX.ackRes){const b=resBox(r,V);return {kind:'res',key:'res'+r.t,html:`<div class="res ${b.cls}" role="status"><p class="who">You played:</p>${b.big?`<big>${b.big}</big>`:''}${b.html}</div>${G.dial===1?'<div class="lastlife">&#9888; Last step on the fuse: the next miss is a BOOM!</div>':''}<div class="row"><button class="pb pri" data-ph="resok">Continue</button></div>`,r}}
   const r2=modeOf()==='hot'&&UI.res&&UI.res.turn>=G.turn-1&&UI.res.actor!==V.seat?UI.res:null;
   if(r2&&r2!==PX.ackRes){const b=resBox(r2,V);return {kind:'res',key:'res'+r2.t,html:`<div class="res ${b.cls}" role="status"><p class="who">${esc(nm(r2.actor))} played:</p>${b.big?`<big>${b.big}</big>`:''}${b.html}</div><div class="row"><button class="pb pri" data-ph="resok">Continue</button></div>`,r:r2}}

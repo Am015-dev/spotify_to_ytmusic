@@ -1,6 +1,6 @@
 // ===================== part 1: core (state, engine adapter, events, AI adapter, turn pump) =====================
 // The engine (TB: newGame/moves/apply/pending/stripView) is never edited. Everything the UI needs on top of it lives here.
-var ANIM=1,AIDELAY=650;
+var ANIM=1,AIDELAY=420;
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const DD=TB.DATA;
@@ -60,11 +60,14 @@ function kcSpec(n){const k=TB.kingdomInfo(n),arts=SUIT_ART[k.suit]||['banner'];
 function cardEl(id,w){return TBKit.card(cardSpec(id),w)}
 function kcEl(n,w){return TBKit.card(kcSpec(n),w)}
 // plain-words detail of a faction card (HTML), used by the enlarged card pop-up
-function cardDetail(id){const i=cinfo(id);const ar=ARCH_LBL[i.archetype]||'';const out=[];
-  const stat=[];if(i.kind!=='hq')stat.push('<b>Strength '+i.strength+'</b>');if(ar)stat.push(ar);if(i.votes)stat.push(i.votes+' vote'+(i.votes>1?'s':'')+' (Govern)');if(i.lore)stat.push(i.lore+' lore (Journey)');if(i.cost)stat.push('costs '+i.cost+' lore');
+function cardDetail(id){const i=cinfo(id);const ar=ARCH_LBL[i.archetype]||'';const out=[];const g=t=>typeof gloss==='function'?gloss(t):esc(t);
+  const stat=[];if(i.kind!=='hq')stat.push('<b>Strength '+i.strength+'</b>');if(ar)stat.push(g(ar));if(i.kind==='hq')stat.push(g('HQ: a permanent power'));if(i.cost)stat.push('costs '+i.cost+' '+g('Lore'));
   out.push('<p class="cd-stat">'+stat.join(' · ')+'</p>');
-  for(const t of i.traits||[])out.push('<p class="cd-tr"><b>'+(TRAIT_N[t]||t)+'.</b> '+((TRAIT_T[t]||'').replace(/^./,c=>c.toUpperCase()))+'.</p>');
-  if(i.text)out.push('<p class="cd-tx">'+esc(i.text)+'</p>');
+  out.push('<p class="cd-tx">'+(i.text?g(i.text):'No special power: it fights with its Strength.')+'</p>');   // the plain effect first
+  const kw=[];for(const t of i.traits||[])kw.push('<b>'+g(TRAIT_N[t]||t)+'</b>: '+esc(TRAIT_T[t]||''));
+  if(i.votes)kw.push('<b>'+i.votes+' '+g(i.votes>1?'votes':'vote')+'</b>: counts in a '+g('Council')+' when you Govern with it');
+  if(i.lore)kw.push('<b>'+i.lore+' '+g('Lore')+'</b>: what a '+g('Journey')+' with it gives you');
+  if(kw.length)out.push('<ul class="cd-kw">'+kw.map(x=>'<li>'+x+'</li>').join('')+'</ul>');
   if(i.tokens)out.push('<p class="cd-tr">Carries '+i.tokens+' Influence token'+(i.tokens>1?'s':'')+': stays on the map '+i.tokens+' more Winter'+(i.tokens>1?'s':'')+'.</p>');
   return out.join('')}
 // ---------------------------------------------------------------- engine event capture (wrappers around engine agenda handlers; silent if the engine changes)
@@ -92,7 +95,7 @@ function hookEngine(){const I=TB.internal;if(!I||!I.AG||I.__hooked)return;I.__ho
   if(PK&&PK.bidRes){const o=PK.bidRes;PK.bidRes=function(seat,opt,d){const r=o.call(this,seat,opt,d);try{UI.toast=G.log.length?G.log[G.log.length-1].t:''}catch(e){}return r}}}
 // ---------------------------------------------------------------- AI adapter (the engine author's TB.ai when present, else a modest fallback)
 function legal(seat){return TB.moves(G,seat)}  // on a client this runs on its own stripped copy (same list as the host's, net-strip-test.js)
-function aiLevel(seat){return G.pl[seat].ai||'normal'}
+function aiLevel(seat){const l=G.pl[seat].ai||'normal';return UI.cfg&&UI.cfg.guided&&!NET.on&&GUIDED.lastNormal&&G.round>=G.rounds&&l==='easy'?'normal':l}  // the guided Court plays Easy while you learn, then Normal in the last round
 function rndAI(){UI.aiSeed=(UI.aiSeed*1664525+1013904223)>>>0;return UI.aiSeed/4294967296}
 function pickR(a){return a[Math.floor(rndAI()*a.length)]}
 function fallbackPick(seat,mv){const q=G.q,k=q.kind;
@@ -113,7 +116,7 @@ function aiChoose(seat,level){const mv=legal(seat);if(!mv.length)return null;if(
   catch(e){console.warn('ai failed, fallback',e.message)}
   return fallbackPick(seat,mv)}
 // "recommended": what the Hard computer would play for the human, from the human's own information only
-function suggest(seat){if(!G||!G.q||!G.q.seats.includes(seat))return null;if(isClient()){const k=NET.rk;return k!=null?(legal(seat).find(m=>m.k===k)||null):null}try{return aiChoose(seat,ANIM?'hard':'normal')}catch(e){return null}}
+function suggest(seat){if(!G||!G.q||!G.q.seats.includes(seat))return null;if(isClient()){const k=NET.rk;return k!=null?(legal(seat).find(m=>m.k===k)||null):null}try{return aiChoose(seat,ANIM&&!(UI.cfg&&UI.cfg.guided)?'hard':'normal')}catch(e){return null}}
 // ---------------------------------------------------------------- game start / save / load
 function mkSeats(cfg){const n=cfg.np,seats=[];const fac=FIDS.slice();
   const mine=cfg.faction&&fac.includes(cfg.faction)?cfg.faction:null;
@@ -180,7 +183,7 @@ function pickHumanSeat(hum){
   const nxt=hum.includes(UI.holder)?UI.holder:hum[0];
   UI.passDelay=null;UI.card={kind:'pass',seat:nxt};UI.passed=null;return null}
 function afterHumanMove(){UI.passed=hotSeat()?UI.passed:null;pump()}
-function humanMove(k){if(NET.on)return netHumanMove(k);const s=viewSeatForQ();if(s==null)return false;const mv=legal(s).find(m=>m.k===k);if(!mv)return false;
+function humanMove(k){if(typeof hideGloss==='function')hideGloss();if(NET.on)return netHumanMove(k);const s=viewSeatForQ();if(s==null)return false;const mv=legal(s).find(m=>m.k===k);if(!mv)return false;
   const ok=doMove(mv);if(ok){UI.sel={};UI.hand=null;closePop(true);if(hotSeat()){ // pass on once this seat has nothing more to decide
       const still=G.q&&G.q.seats.includes(s);if(!still)UI.passed=null}
     pump()}return ok}

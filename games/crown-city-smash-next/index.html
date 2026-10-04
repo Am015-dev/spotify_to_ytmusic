@@ -691,6 +691,41 @@ html.ph .mbox,html.ph .dlg{box-sizing:border-box}
 
 html.ph #preview{max-height:none;overflow:visible}
 html.ph-p #pacts [data-act="again"]{grid-column:1/-1;grid-row:5;position:sticky;bottom:4px;z-index:3}
+/* clarity pass: the result line and the preview keep a fixed height in portrait, so Roll / Done never jump under a finger;
+   the full text (and the "While you waited" list) opens with a tap on the line */
+@media (min-height:641px){
+  html.ph-p #banner,html.ph-p #banner:empty{display:block;overflow:hidden;height:calc(2.5em + 9px);max-height:calc(2.5em + 9px);box-sizing:border-box;flex-shrink:0}
+  html.ph-p #banner:empty{visibility:hidden}
+  html.ph-p #preview{height:3.1em;max-height:3.1em;box-sizing:border-box;padding-top:2px;padding-bottom:2px;overflow:hidden}
+}
+html.ph #banner .recap{display:none}
+#banner .recap{display:none}
+.banwrap .recap{display:block;margin:.4rem 0 0 1.1rem;padding:0;font-size:13px;line-height:1.35}
+.banwrap .because{display:block}
+.pairnote{display:block;font-weight:800;color:#8a3b00}
+.intro .goal{margin:.4rem 0}
+html.ph .intro ul.small{display:none}
+#pfeed{display:none}
+html.ph .gx-dock[data-pp="watch"]:not([data-card="choice"]):not([data-card="coach"]):not([data-card="pop"]) #pfeed:not(:empty){display:block;grid-row:6;font-size:13px;line-height:1.3;padding:2px 4px;overflow:hidden;min-height:0}
+#pfeed .fh{display:block;font-weight:900;color:var(--mc);-webkit-text-stroke:.6px #1a1320;margin-bottom:2px}
+#pfeed ol{margin:0;padding-left:1.1rem}#pfeed li{color:#4b3b52}#pfeed li.new{color:#1a1320;font-weight:800}
+#pfeed p{margin:0;color:#4b3b52}
+@media (max-height:700px){#pfeed li:nth-last-child(n+3){display:none}}
+@media (max-height:600px){html.ph-p #pfeed{display:none!important}}
+html.ph-l #pfeed li:nth-last-child(n+3){display:none}
+html.ph #banner{pointer-events:auto}
+.banwrap .more{display:none}
+/* extra actions (cards you can use now) must fit above the fold: the result line drops to one line, the gaps shrink */
+@media (min-height:641px){
+  html.ph-p .gx-dock[data-xa] #banner,html.ph-p .gx-dock[data-xa] #banner:empty{height:calc(1.25em + 9px);max-height:calc(1.25em + 9px)}
+  html.ph-p .gx-dock[data-xa] #preview{height:2.7em;max-height:2.7em;margin-top:4px;overflow:hidden}
+}
+html.ph-p .gx-dock[data-xa]{gap:4px}
+html.ph-p .gx-dock[data-xa] #pacts>.btn:not([data-act="reroll"]):not([data-act="resolve"]):not([data-act="hint"]):not([data-act="end"]){min-height:44px;padding:0 6px}
+/* a pick with many options: the option list scrolls with the title instead of a sticky block covering it */
+html.ph #choice .acts:has(> .btn:nth-of-type(5)){position:static;margin-bottom:0;padding-bottom:4px}
+@media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #preview{height:1.5em;max-height:1.5em}}
+@media (min-height:641px) and (max-height:700px){html.ph-p .gx-dock[data-xa] #dice{padding-top:0}html.ph-p .gx-dock[data-xa]{gap:3px}}
 
 </style>
 <script>
@@ -1751,7 +1786,7 @@ function checkWin(final){
   if(a.length===0){G.winner='draw';G.winText='Everyone falls: the city wins, nobody is crowned.';G.phase='over';lg(-1,G.winText);return true}
   if(a.length===1){G.winner='P'+(a[0].i+1);G.winText=`Last standing: ${mname(a[0])} is the only monster left and takes the crown!`;G.phase='over';lg(a[0].i,G.winText);return true}
   const ast=a.find(p=>has(p,'c_astro')&&p.vp>=17);if(ast){G.winner='P'+(ast.i+1);G.winText=`Space Helmet: ${mname(ast)} reaches ${ast.vp} stars (only 17 needed) and is crowned!`;G.phase='over';cov('cost:astro');lg(ast.i,G.winText);return true}
-  if(final){const w=a.filter(p=>p.vp>=20);if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=`20 stars: ${mname(w[0])} reaches ${w[0].vp} stars and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
+  if(final){const w=a.filter(p=>p.vp>=20);if(w.length){w.sort((x,y)=>(y.i===G.active)-(x.i===G.active)||y.vp-x.vp);G.winner='P'+(w[0].i+1);G.winText=`${mname(w[0])} reaches ${w[0].vp} stars (20 needed) and is crowned!`;G.phase='over';lg(w[0].i,G.winText);return true}}
   return false}
 
 /* ---------- Curses: the Omen Die ---------- */
@@ -1815,7 +1850,7 @@ function canBuy(p,k){const id=G.market[k];return !!id&&buyOK(p,id)&&p.en>=costOf
 function buyCore(p,k,done){const id=G.market[k];if(!id||!canBuy(p,k)){done();return}
   const full=costOf(p,id);const half=Math.ceil(full/2);
   const pay=(c,ufo)=>{p.en-=c;G.market[k]=null;refill();snd('buy');cov('buy');if(p.i===G.active)G.tf.bought=true;if(ufo){(p.tok.ufo=p.tok.ufo||[]).push(id);cov('evo:28')}
-    lg(p.i,`${mname(p)} buys “${CN(id)}”${ufo?' at half price ('+evoName(28)+')':''}.`);UI.banner=`<b>${esc(mname(p))}</b> buys ${esc(CN(id))}`;acquire(p,id,true,done)};
+    {const C=CARDS[base(id)];const fx1=C&&C.t==='D'?` (one-shot: ${C.x.replace(/\.$/,'')})`:'';lg(p.i,`${mname(p)} buys “${CN(id)}”${ufo?' at half price ('+evoName(28)+')':''}${fx1}.`);UI.banner=`<b>${esc(mname(p))}</b> buys ${esc(CN(id))}${esc(fx1)}`}acquire(p,id,true,done)};
   if(hasE(p,28)&&CARDS[base(id)].t==='K'&&(p.tok.ufo||[]).length<3&&half<full)ask(p.i,evoName(28),`Pay ${half} instead of ${full} and put a barnacle token on it (roll each turn: a claw loses it)?`,[{k:'h',l:`Pay ${half} (saucer)`},{k:'f',l:`Pay ${full}`}],()=>full>=4?'h':'f',k=>pay(k==='h'?half:full,k==='h'));
   else pay(full,false)}
 function buy(k){const p=cur();if(!canBuy(p,k))return;buyCore(p,k,()=>afterBuy(p))}
@@ -3245,6 +3280,7 @@ function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=tru
  *   GA.loop(name, {vol, fade}) / GA.stopLoop(name, {fade})         ambience beds
  *   GA.music(name|null, {vol, fade})                                 cross-fading background track
  *   GA.setSfx(on) GA.setMusic(on) GA.setVolume('sfx'|'music', 0..1)  persisted in localStorage
+ *   GA.setVolume('master', 0..1)  one level over everything (the shared settings panel sets it; default 1)
  *   GA.has(name) GA.playing() GA.state() GA.unlock() GA.names() GA.duration(name)
  * Samples are decoded lazily on the first user gesture (atob -> ArrayBuffer -> decodeAudioData, no fetch).
  */
@@ -3254,7 +3290,7 @@ function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=tru
   var S = {
     inited: false, key: 'ga', src: {}, kind: {}, buf: {}, failed: {}, pending: {},
     ctx: null, ctxOpt: null, out: null, sfxBus: null, musBus: null, duckBus: null,
-    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, last: {}, loops: {},
+    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, masterVol: 1, last: {}, loops: {},
     cur: null, curName: null, wantMusic: null, duckSet: {}, duckUntil: 0, unlocked: false, decoding: false
   };
   var DEFAULT_DUCK = ['win', 'lose', 'levelup', 'level', 'boom', 'ko', 'thunder', 'roar', 'smash', 'stomp', 'door', 'death', 'crit', 'crumble'];
@@ -3299,6 +3335,7 @@ function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=tru
     var t = S.ctx.currentTime;
     S.sfxBus.gain.setTargetAtTime(S.sfxOn ? S.sfxVol : 0, t, 0.02);
     S.musBus.gain.setTargetAtTime(S.musOn ? S.musVol : 0, t, 0.08);
+    S.out.gain.setTargetAtTime(S.masterVol, t, 0.02);
   }
 
   // Loops: skip encoder padding / near-silence at the edges so MP3 loops don't gap.
@@ -3374,6 +3411,7 @@ function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=tru
     S.sfxOn = lsGet('sfx', '1') !== '0'; S.musOn = lsGet('mus', '1') !== '0';
     S.sfxVol = clamp(lsGet('sfxvol', o.sfxVol != null ? o.sfxVol : 0.8), 0, 1);
     S.musVol = clamp(lsGet('musvol', o.musVol != null ? o.musVol : 0.5), 0, 1);
+    S.masterVol = clamp(lsGet('mastervol', 1), 0, 1);
     if (!S.inited && root.document && root.document.addEventListener) {
       ['pointerdown', 'keydown', 'touchstart', 'mousedown'].forEach(function (ev) {
         root.document.addEventListener(ev, onGesture, { capture: true, passive: true });
@@ -3485,11 +3523,11 @@ function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=tru
   }
   function setVolume(kind, v) {
     v = clamp(v, 0, 1);
-    if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
+    if (kind === 'master') { S.masterVol = v; lsSet('mastervol', v); } else if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
     applyVol(); return v;
   }
   function state() {
-    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, audio: !!S.ctx,
+    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, masterVol: S.masterVol, audio: !!S.ctx,
       ctxState: S.ctx ? S.ctx.state : 'none', decoded: Object.keys(S.buf).length, failed: Object.keys(S.failed),
       total: Object.keys(S.src).length, playing: S.curName, loops: Object.keys(S.loops) };
   }
@@ -3893,7 +3931,9 @@ function renderNews(){const n=document.getElementById('news'),m=document.getElem
   const last=UI.news&&UI.news[UI.news.length-1];n.innerHTML=last?`<button class="newsbtn" data-gx="dr-log" title="Open the chronicle">${esc(last)}</button>`:'';
   if(UI.moment){m.classList.remove('hidden');m.style.setProperty('--mc',UI.moment.c||'#e63946');m.innerHTML=`<b>${esc(UI.moment.h)}</b><span>${esc(UI.moment.s)}</span>`}else{m.classList.add('hidden');m.innerHTML=''}}
 // the resolve banner, with the reason things happened
-function storyBanner(R){const p=R.p;let h=`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (borrowed roll)':''}: ${R.out.length?esc(R.out.join(' · ')):'nothing useful'}`;const why=[];
+function storyBanner(R){const p=R.p;const out=[...R.out];
+  if(R.forced==='city'||(R.yielders.length&&R.forced))out.push(`moves into Downtown 👑 +1★`);else if(R.forced==='bay')out.push('moves into the Harbor ⚓ +1★');
+  let h=`${R.bug?'🧠 ':''}<b>${esc(mname(p))}</b>${R.bug?' (borrowed roll)':''}: ${out.length?esc(out.join(' · ')):'nothing useful'}`;const why=[];
   if(R.out.some(o=>/^smashes /.test(o)))why.push(R.inT?'from the city, claws hit every monster outside':`claws from outside hit whoever holds the city${G.city>=0&&G.city!==p.i&&!R.yielders.length?` (${mname(P(G.city))} 👑)`:''}`);
   if(R.out.includes('claws hit nobody'))why.push('nobody was in the city to hit');
   if(R.out.some(o=>/hearts wasted/.test(o)))why.push('hearts cannot heal you inside the city');
@@ -3910,22 +3950,23 @@ function introHTML(){const me=meSeat(),q=me>=0?G.pl[me]:null;const names=G.pl.ma
   return `<div class="intro"><h2>📰 Dawn over Crown City</h2><p>The portal over Crown City cracked open at dawn. ${G.pl.length} monsters rose: ${esc(cast)}. Whoever reaches <b>20 ★</b>, or is the <b>last one standing</b>, becomes the city's new King.</p>
    ${q?`<p class="you" style="--mc:${MONS[q.m].c}"><svg viewBox="-66 -70 132 136" aria-hidden="true">${monArt(q.m)}</svg><span>You are <b>${esc(UP(mname(q)))}</b>, ${esc(MONS[q.m].d.charAt(0).toLowerCase()+MONS[q.m].d.slice(1))}.</span></p>`:G.mode==='hot'?'<p>Everyone shares this screen: pass it to the monster whose turn it is.</p>':'<p>Sit back and watch the computer play.</p>'}
 
+   <p class="goal"><b>Your turn:</b> roll 6 dice up to 3 times, keep what you like, then use them. <b>Three of a kind</b> scores stars, claws hit, hearts heal, ⚡ buys cards.</p>
    <div class="acts"><button class="btn primary" data-a="story">▶ Let's smash${G.evoOn&&q?'<small>First you pick a secret power</small>':''}</button></div>
    <ul class="small"><li>The <b>glowing plate</b> on the board shows whose turn it is.</li><li><b>👑</b> marks the monster in Downtown: it scores stars but everyone hits it.</li><li>Stuck? <b>🧭 What now?</b> at the top of this panel says what to do and why.</li></ul></div>`}
 
 // ---------- four tips, each at the real moment ----------
-const TIPS={dice:{el:'#dicewrap',t:'Your dice',b:'Tap a die to keep it (it turns yellow), then press Reroll to throw the others again. A blue dashed outline marks the dice we suggest keeping: “💡 Keep suggested” keeps them in one tap. The line under the dice says what you would get.'},
- city:{el:'#map',t:'Downtown and 👑',b:'👑 marks the monster in Downtown. It scores stars at the start of each turn but cannot heal, and everyone outside hits it. Claws from outside hit Downtown; claws from Downtown hit everyone outside. If Downtown is empty after you resolve, you must move in (+1 ★).'},
+const TIPS={dice:{el:'#dicewrap',t:'Your dice',b:'Tap a die to keep it (it turns yellow), then Roll the others again. Blue dashed outline = our suggestion (💡 keeps exactly those). The line under the dice says what you would get.'},
+ city:{el:'#map',t:'Downtown and 👑',b:'👑 = the monster in Downtown: +2 ★ at the start of each of its turns, but it cannot heal and every claw from outside hits it. When hit it may yield. If Downtown is empty after your roll, you move in (+1 ★).'},
  buy:{el:'#buymini',t:'Power cards',b:'Spend energy ⚡ on cards. ONE-SHOT cards happen at once, PERMANENT cards stay with you, SAVE FOR LATER cards wait for their moment. A yellow outline marks our suggestion. Saving ⚡ is fine: it carries over.'},
- bar:{el:'header.gx-bar',t:'While the others play',b:'The headline at the top of this panel tells the story. You may get a pop-up to yield Downtown or to steal a roll. Up top: 🃏 Cards for sale, 🎴 Yours, 👾 Monsters, 📰 Log. ⚙ has the rules, sound and speed.'}};
+ bar:{el:'header.gx-bar',t:'While the others play',b:'This panel narrates each computer turn, and your next turn starts with “While you waited” (tap it for every event). Up top: 🃏 cards for sale, 🎴 yours, 👾 monsters, 📰 log, ⚙ rules and speed. 🧭 What now? explains your best move.'}};
 const TIPORDER=['dice','city','buy','bar'];
 function startTour(){UI.tour=true;UI.tipSeen={};UI.coach=-1;checkTips();renderTour()}
 function checkTips(){if(!G||!UI.tour||NET.on||UI.info||UI.intro||G.winner||UI.coach>=0)return;const s=UI.tipSeen||(UI.tipSeen={});const ht=humanTurn(),p=cur();
   let k=null;if(!s.dice&&ht&&G.phase==='roll'&&!G.bug&&G.dice.length&&!UI.choice)k='dice';
-  else if(s.dice&&!s.city&&ht&&!UI.choice&&((G.phase==='roll'&&G.rolls<rerollsOf(p))||G.phase==='buy'))k='city';
+  else if(s.dice&&!s.city&&!ht&&!UI.choice)k='city';
   else if(s.city&&!s.buy&&ht&&!UI.choice&&G.phase==='buy'&&G.market.length)k='buy';
-  else if(s.buy&&!s.bar&&!ht&&!UI.choice)k='bar';
-  if(k){UI.coach=TIPORDER.indexOf(k);UI.freeze=k==='bar'}}
+  else if(s.buy&&s.city&&!s.bar&&!ht&&!UI.choice)k='bar';
+  if(k){UI.coach=TIPORDER.indexOf(k);UI.freeze=k==='bar'||k==='city'}}
 function renderTour(){document.querySelectorAll('.hl').forEach(e=>e.classList.remove('hl'));const el=document.getElementById('coach');if(!el)return;
   if(UI.coach<0){el.classList.add('hidden');el.innerHTML='';return}const k=TIPORDER[UI.coach],st=TIPS[k];el.classList.remove('hidden');
   el.innerHTML=`<h3>Tip ${UI.coach+1} of 4: ${esc(st.t)}</h3><p class="small">${esc(st.b)}</p><div class="acts"><button class="btn primary" data-tour="next">Got it</button><button class="btn" data-tour="skip">No more tips</button></div>`;
@@ -3982,6 +4023,28 @@ function statsHTML(){const {order,me,w}=placeOf();const W=w>=0?G.pl[w]:null;cons
 // sound buttons in the ⚙ menu keep their explanation
 function soundBtns(){const a=document.getElementById('sndbtn'),b=document.getElementById('musbtn');if(a)a.innerHTML=(SND.on?'🔊 Sound on':'🔇 Sound off')+'<small>Dice, smashes and cheers</small>';if(b)b.innerHTML=(SND.music?'🎵 Music on':'🎵 Music off')+'<small>Background music</small>'}
 
+// ---------- "While you waited": what the computer turns did, shown when your turn starts ----------
+// Snapshot ♥ ★ ⚡ and the log position when the first computer turn after yours begins; at your next turn the result
+// line shows the net change per monster, and tapping it lists every logged event since, oldest first.
+const RECAP={snap:null,n:0};
+function recapMe(){if(!G||G.mode!=='solo')return -1;return G.pl.findIndex(q=>q.human)}
+function recapHTML(){const me=recapMe();if(me<0||!RECAP.snap)return '';
+  const parts=[];G.pl.forEach((q,k)=>{const s=RECAP.snap[k];if(!s)return;const d=[];
+    if(s.alive&&!q.alive){d.push('knocked out')}else{if(q.vp!==s.vp)d.push(`${q.vp>s.vp?'+':'−'}${Math.abs(q.vp-s.vp)}★`);if(q.hp!==s.hp)d.push(`${q.hp>s.hp?'+':'−'}${Math.abs(q.hp-s.hp)}♥`);if(k===me&&s.en!==undefined&&q.en!==s.en)d.push(`${q.en>s.en?'+':'−'}${Math.abs(q.en-s.en)}⚡`)}
+    if(s.city!==(G.city===k)&&q.alive)d.push(G.city===k?'👑in':'👑out');
+    if(d.length)parts[k===me?'unshift':'push'](`<b>${k===me?'You':esc(mname(q))}</b> ${d.join(' ')}`)});
+  const ev=G.log.filter(l=>l.n>RECAP.n).reverse().map(l=>`<li>${esc(l.t)}</li>`);
+  if(!parts.length&&!ev.length)return '';
+  return `⏪ <b>While you waited:</b> ${parts.length?parts.join(' · '):'nothing changed'}${ev.length?` <span class="more">· tap: how</span><ol class="recap">${ev.join('')}</ol>`:''}`}
+{const _st=startTurn;startTurn=function(){
+  const me=recapMe();const nxt=G&&!G.winner?cur():null;
+  if(me>=0&&nxt&&nxt.i!==me&&!RECAP.snap){RECAP.snap=G.pl.map((q,k)=>({hp:q.hp,vp:q.vp,en:q.en,alive:q.alive,city:G.city===k}));RECAP.n=G.lseq||0}
+  RECAP.turnN=G?G.lseq||0:0;
+  const r=_st.apply(this,arguments);
+  if(me>=0&&G&&!G.winner&&G.active===me&&RECAP.snap){const h=recapHTML();RECAP.snap=null;if(h){UI.banner=h;try{render()}catch(e){}}}
+  return r}}
+{const _ng=newGame;newGame=function(){RECAP.snap=null;return _ng.apply(this,arguments)}}
+
 </script>
 <script>
 // ---------- panel ----------
@@ -4024,14 +4087,14 @@ function renderPanel(){
     acts+=`<div class="emotes">${EMOTES.map(e=>`<button class="btn mini" data-emo="${e}" aria-label="send ${e}">${e}</button>`).join('')}</div>`}
   pt.innerHTML=`${G.winner?'':stepBar()}<div class="who" style="color:${MONS[p.m].c};-webkit-text-stroke:1.2px #1a1320">${who}${humanTurn()?' · your turn':''}</div>${head?`<div class="head">${head}</div>`:''}${topTip}`;
   pa.innerHTML=acts;pm.innerHTML=msg;
-  document.getElementById('docktitle').textContent=G.winner?'Game over':`R${G.turn} · ${humanTurn()?'Your turn':mname(p)} · ${STEPS[(G.step||1)-1]}`;
+  document.getElementById('docktitle').textContent=G.winner?'Game over':`R${G.turn} · ${humanTurn()?'Your turn':mname(p)} · ${STEPS[(G.step||1)-1]} · 20★ wins`;
   document.getElementById('dicewrap').classList.toggle('off',G.phase==='buy'||!G.dice.length&&G.phase!=='roll');
   const canClick=humanTurn()&&G.phase==='roll';
   const spin=UI.rollAnim!==G.rollId&&ANIM;UI.rollAnim=G.rollId;
   const sug=canClick&&UI.hints&&G.rolls>0?suggestMask(p):null;
   di.innerHTML=G.dice.map((d,k)=>`<button class="die ${d.k?'kept':''} ${d.x?'extra':''} ${d.t?'sp-'+d.t:''} ${sug&&sug[k]&&!d.k?'sugg':''} ${spin&&!d.k?'spin':''}" title="${fname(d.f)}${d.t==='b'?' (rampage die)':d.t==='f'?' (Omen Die)':''}" data-die="${k}" ${canClick?'':'disabled'} aria-label="${fname(d.f)}${d.k?' (kept)':''}">${faceSVG(d.f)}</button>`).join('')||'<span class="muted small">No dice rolled yet.</span>';
   ro.innerHTML=G.phase==='roll'?`Rerolls left: ${Array.from({length:Math.max(G.rolls,rerollsOf(p))},(_,k)=>`<span class="pip ${k<G.rolls?'':'used'}"></span>`).join('')}`:'<span class="muted small">Dice resolved.</span>';
-  pv.innerHTML=G.phase==='roll'&&G.dice.length?`<b>${humanTurn()?'If you resolve now':'These dice give'}:</b> ${esc(scoreDice(p,G.dice).text)}.`:'';
+  pv.innerHTML=G.phase==='roll'&&G.dice.length?`<b>${humanTurn()?'If you resolve now':'These dice give'}:</b> ${esc(scoreDice(p,G.dice).text)}.${humanTurn()?pairNote(G.dice):''}`:'';
   const buyPh=humanTurn()&&G.phase==="buy";const sg=buyPh?suggestCard(p):-1;
   document.getElementById('market').innerHTML=G.market.map((id,k)=>{const C=CARDS[base(id)];const c=costOf(p,id);return `<div class="pc ${C.t} ${k===sg?'sugg':''}"><div class="hd"><span class="nm">${esc(C.n)}</span><span class="cost" aria-label="costs ${c} energy">${c}</span></div><div class="art" aria-hidden="true">${cardIcon(id)}</div><span class="ty">${chipOf(C)}${C.kw?' · '+C.kw.toUpperCase():''}</span><p>${esc(C.x)}</p>${buyPh?`<button class="btn buy ${canBuy(p,k)?'primary':''}" data-card="${k}" ${canBuy(p,k)?'':'disabled'}>${esc(buyLabel(p,k))}</button>`:''}</div>`}).join('')+`<p class="small muted" style="grid-column:1/-1;margin:.2rem 0 0">${G.deck.length} cards in the deck. <b>ONE-SHOT</b> cards happen at once. <b>PERMANENT</b> cards stay with you. <b>SAVE FOR LATER</b> cards wait until their moment (you get a pop-up).</p>`;
   renderBuyMini(p,buyPh,sg);
@@ -4177,7 +4240,7 @@ function gameAct(ds,seat){
   switch(act){
     case 'reroll':if(G.rolls>0)doReroll('roll');break;
     case 'resolve':if(G.phase==='roll')resolve();break;
-    case 'hint':aiMarkHard(p);UI.banner='💡 Kept the suggested dice: they are yellow now. Reroll the rest, or tap any die to change it.';render();break;
+    case 'hint':{const m=suggestMask(p);G.dice.forEach((d,k)=>d.k=!!m[k]);const nk=m.filter(x=>x).length;UI.banner=nk?`💡 Kept the ${nk} outlined ${nk===1?'die':'dice'} (now yellow). Reroll the rest, or tap any die to change it.`:'💡 Nothing here is worth keeping: reroll all the dice.';render();break}
     case 'sweep':if(G.phase==='buy')sweep();break;
     case 'end':if(G.phase==='buy')endTurn();break;
     default:if(act&&actionsFor(p).some(a=>a.a===act&&!a.dis))doAct(p,act);
@@ -4191,6 +4254,8 @@ document.addEventListener('keydown',e=>{
 function saveSetup(){try{localStorage.setItem('ccs_setup',JSON.stringify({ex:UI.ex,evo:UI.evo,lvl:UI.lvl,xp:UI.xp,n:UI.n,mon:UI.mon}))}catch(e){}}
 try{const st=JSON.parse(localStorage.getItem('ccs_setup')||'null');if(st){Object.assign(UI.ex,st.ex||{});if(st.evo!==undefined)UI.evo=st.evo;if(st.lvl)UI.lvl=st.lvl;if(st.xp)UI.xp=st.xp;if(st.n)UI.n=st.n;if(Number.isInteger(st.mon))UI.mon=st.mon}}catch(e){}
 function suggestMask(p){const key=G.rollId+':'+G.rolls+':'+G.dice.map(d=>d.f).join('');if(UI.sugKey===key)return UI.sugMask;const saved=G.dice.map(d=>d.k);aiMarkHard0(p);const m=G.dice.map(d=>d.k);G.dice.forEach((d,k)=>d.k=saved[k]);UI.sugKey=key;UI.sugMask=m;return m}
+// a pair of numbers scores nothing: say so while there is still a reroll to chase the third
+function pairNote(dice){if(G.rolls<=0)return '';const c=countsOf(dice.filter(d=>!d.t));const pr=['1','2','3'].filter(f=>c[f]===2);if(!pr.length||['1','2','3'].some(f=>c[f]>=3))return '';return ` <span class="pairnote">A pair of ${pr.join('s or ')}s scores nothing: numbers need three of a kind.</span>`}
 function exIcons(p){let s='';if(p.tok&&p.tok.poison)s+=' ☠'+p.tok.poison;if(p.tok&&p.tok.shrink)s+=' 🔻'+p.tok.shrink;if(exOn('curse')&&scarab()===p.i)s+=' 🪲';if(exOn('cult')&&p.cult)s+=' 🕯'+p.cult;if(exOn('wick'))s+=' 😈'+p.wk;if(exOn('tower')){const t=G.tower.filter(o=>o===p.i).length;if(t)s+=' 🗼'+t}if(p.tok&&p.tok.berserk)s+=' 😡';return s}
 try{const sp=localStorage.getItem('ccs_speed');if(sp!==null)setSpeed(+sp)}catch(e){}
 function seatInfo(k){if(!G||UI.info)return;renderScore();GX.show('dr-mons');const el=document.getElementById('mon-'+k);if(el){el.scrollIntoView({block:'nearest'});el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash')}}
@@ -4249,7 +4314,7 @@ function phLabels(){for(const b of document.querySelectorAll('header.gx-bar [dat
   const k=document.querySelector('.gx-dock-head [data-gx="dock"]');if(k)k.setAttribute('aria-label','Hide panel')}
 function phBuild(){const dk=document.querySelector('.gx-dock');if(!dk||$ph('pchips'))return;
   const mk=(id,tag,cls)=>{const e=document.createElement(tag||'div');e.id=id;if(cls)e.className=cls;dk.appendChild(e);return e};
-  mk('pchips');mk('pshop');const pc=mk('pcx','section','box');pc.setAttribute('role','dialog');pc.setAttribute('aria-label','Details');
+  mk('pchips');mk('pshop');mk('pfeed').setAttribute('aria-live','polite');const pc=mk('pcx','section','box');pc.setAttribute('role','dialog');pc.setAttribute('aria-label','Details');
   pc.innerHTML='<div class="pcx-h"><b id="pcxt"></b><span id="pcxa"></span><button class="gx-x" data-ph="close" aria-label="Close">×</button></div><div class="pcx-b" id="pcxb"></div>';
   phLabels()}
 // ---- monster chips ----
@@ -4299,7 +4364,7 @@ function phActs(){if(!G)return;const pa=$ph('pacts');if(!pa)return;
     set('[data-act="reroll"]',`<span class="bl">🎲 Roll</span><small>${nk} ${nk===1?'die':'dice'} · ${G.rolls} left</small>`,`Roll the ${nk} unkept ${nk===1?'die':'dice'} again, ${G.rolls} rerolls left`);
     set('[data-act="resolve"]','<span class="bl">✔ Done</span><small>use these dice</small>','Done: resolve these dice');
     set('[data-act="hint"]','<span aria-hidden="true">💡</span>','Keep the suggested dice')}
-  if(humanTurn()&&G.phase==='buy')set('[data-act="end"]',`<span class="bl">✔ ${G.bug?'Finish turn':'End turn'}</span>`,G.bug?'Finish the borrowed turn':'End your turn');
+  if(humanTurn()&&G.phase==='buy'){const win=!G.bug&&cur().vp>=20;set('[data-act="end"]',`<span class="bl">✔ ${G.bug?'Finish turn':'End turn'}</span>${win?`<small>you have ${cur().vp}★ (20 wins): end your turn to win</small>`:G.market.length?'<small>or tap a card above to read and buy it</small>':''}`,G.bug?'Finish the borrowed turn':win?'End your turn: you have 20 stars and win if you survive it':'End your turn')}
   if(PHONE.land&&!pa.querySelector('[data-a="advise"]')){const ab=document.createElement('button');ab.className='btn';ab.dataset.a='advise';ab.setAttribute('aria-label','What should I do now, and why?');ab.setAttribute('aria-expanded',UI.adv?'true':'false');ab.innerHTML='<span aria-hidden="true">🧭</span>';const hb=pa.querySelector('[data-act="hint"]')||pa.querySelector('[data-act="resolve"]')||pa.querySelector('[data-act="end"]');if(hb)hb.after(ab);else pa.prepend(ab)}
   const dk=document.querySelector('.gx-dock');if(!dk)return;
   const n=G.dice.length,land=document.documentElement.classList.contains('ph-l');const railW=dk.clientWidth-16;
@@ -4307,10 +4372,21 @@ function phActs(){if(!G)return;const pa=$ph('pacts');if(!pa)return;
   if(land&&n<=6){side=true;dc=3;dw=Math.max(52,Math.min(60,Math.floor((railW-6-104-12)/3)))}
   else{dc=n>6?4:Math.max(1,n);dw=Math.max(52,Math.min(64,Math.floor((railW-(dc-1)*6)/dc)))}
   dk.style.setProperty('--dc',dc);dk.style.setProperty('--dw',dw+'px');dk.dataset.ps=side?'side':'stack';
-  dk.dataset.pp=(!G.winner&&humanTurn()?G.phase:'watch')}
+  dk.dataset.pp=(!G.winner&&humanTurn()?G.phase:'watch');
+  const xa=pa.querySelectorAll('.btn[data-act]:not([data-act="reroll"]):not([data-act="resolve"]):not([data-act="hint"]):not([data-act="end"]):not([data-act="sweep"]):not([data-act="again"])').length;if(xa)dk.dataset.xa=xa;else delete dk.dataset.xa}
 function phNote(){const c=$ph('choice');if(c&&!c.classList.contains('hidden')){const li=c.querySelector('.intro ul li');if(li&&/glowing plate/.test(li.textContent))li.innerHTML='The <b>chips</b> under the board show every monster\'s ♥ ★ ⚡ and cards. The highlighted one is whose turn it is. Tap a chip or a monster for details.'}}
-function phRender(){if(!phOn())return;phBuild();phLabels();phChips();phTiles();phActs();phNote();phCard();
-  const bn=$ph('banner');if(bn){bn.setAttribute('role','button');bn.tabIndex=bn.textContent.trim()?0:-1}
+// ---- the computer's turn, narrated: every logged event of this turn, oldest first, in the otherwise empty dock ----
+function phFeed(){const el=$ph('pfeed');if(!el)return;if(!G||G.winner||humanTurn()){el.innerHTML='';return}
+  const p=cur(),n0=(typeof RECAP!=='undefined'&&RECAP.turnN)||0;const ev=G.log.filter(l=>l.n>n0).slice(0,6).reverse();
+  el.innerHTML=`<b class="fh" style="--mc:${MONS[p.m].c}">${esc(mname(p))}'s turn</b>`+(ev.length?`<ol>${ev.map((l,k)=>`<li class="${k===ev.length-1?'new':''}">${esc(l.t)}</li>`).join('')}</ol>`:'<p>Rolling…</p>')}
+// ---- fixed-height lines: trim the text (never clip it) so the line fits; the full result opens with a tap ----
+function phTrim(el,tail){if(!el||!el.clientHeight||el.scrollHeight<=el.clientHeight+1)return;const full=el.textContent.replace(/\s+/g,' ').trim();
+  let lo=0,hi=full.length;while(lo<hi){const m=(lo+hi+1)>>1;el.textContent=full.slice(0,m)+'…'+tail;if(el.scrollHeight<=el.clientHeight+1)lo=m;else hi=m-1}
+  el.textContent=full.slice(0,lo)+'…'+tail}
+function phRender(){if(!phOn())return;phBuild();phLabels();phChips();phTiles();phActs();phFeed();phNote();phCard();
+  {const bn=$ph('banner');if(bn){const r=bn.querySelector('.recap');if(r)r.remove();phTrim(bn,UI.banner?' (tap)':'')}phTrim($ph('preview'),'')}
+  const bn=$ph('banner');if(bn&&G&&!G.winner&&humanTurn()&&G.phase==='buy'&&!bn.textContent.trim())bn.innerHTML=`<b>Step 4 · Shop:</b> you have ${cur().en}⚡. Tap a card to read it and buy, or press End turn (⚡ carries over).`;
+  if(bn){bn.setAttribute('role','button');bn.tabIndex=bn.textContent.trim()?0:-1}
   // the camera needs a refit when the Harbor appears (5-6 monsters)
   const key=(G?G.pl.length:0)+':'+(PHONE.land?1:0);if(PHN.fit!==key){PHN.fit=key;try{if(typeof V3!=="undefined"&&V3.on&&window.resize3D)resize3D()}catch(e){}}}
 function phLayout(){document.querySelectorAll('.gx-app.gx-dock-min').forEach(a=>{if(phOn())a.classList.remove('gx-dock-min')});try{if(typeof V3!=="undefined"&&V3.on)resize3D()}catch(e){}phRender()}
@@ -4324,7 +4400,7 @@ document.addEventListener('click',e=>{if(!phOn())return;const t=e.target;
   const ch=t.closest&&t.closest('[data-pm]');if(ch){e.stopPropagation();phSeatInfo(+ch.dataset.pm);return}
   const sh=t.closest&&t.closest('[data-shop]');if(sh){e.stopPropagation();phPop('shop');return}
   const mk=t.closest&&t.closest('[data-gx="dr-market"]');if(mk&&G&&!UI.info){e.stopPropagation();e.preventDefault();if(GX.open)GX.close();if(PHN.pop==='shop')phClose();else phPop('shop');return}
-  const bn=t.closest&&t.closest('#banner');if(bn&&bn.textContent.trim()&&!UI.choice){e.stopPropagation();phPop('banner');return}
+  const bn=t.closest&&t.closest('#banner');if(bn&&UI.banner&&!UI.choice){e.stopPropagation();phPop('banner');return}
   if(t.closest&&t.closest('[data-ph="close"]')){e.stopPropagation();phClose();return}
   // a tap outside the pop-up closes it (the tap itself still works)
   if(PHN.pop&&!(t.closest&&t.closest('#pcx'))){phClose()}},true);
