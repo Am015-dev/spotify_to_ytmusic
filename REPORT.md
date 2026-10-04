@@ -13,8 +13,8 @@
 Page size: 3.38 MB.
 
 ## Tests
-- `node tSP.js` (real keyboard via Playwright, mocked `navigator.getGamepads`): RESULT_TSP
-- Perf (draw calls, same frame): race split / single = DRAW_RACE; battle = DRAW_BATTLE (limit 1.9×).
+- `node tSP.js` (real keyboard via Playwright, mocked `navigator.getGamepads`): **ALL PASS, 24/24** (menu entry + phone hiding, setup key cards, simultaneous independent keys in race and battle, boost-key separation, 1- and 2-pad assignment, full 3-lap race with AI fill where both finish and are placed, both-player results + rematch, per-player battle scoring for props, traffic and takedowns, 3:00 timer → results → rematch reset, back to a plain single-player race, zero console errors)
+- Perf (draw calls, same frame): race split / single = 453 → 720 (**1.59×**); battle = 861 → 1305 (**1.52×**) (limit 1.9×).
 - `node smoke.js .`: **SMOKE PASS** (12/12, 586 s, zero console errors). `smoke/sheet.png` checked: the single-player layout is unchanged.
 - Screenshots: `shots/sp_race.jpg`, `shots/sp_battle.jpg`, `shots/sp_race_results.jpg`, `shots/sp_battle_results.jpg`, `shots/sp_setup.jpg`.
 
