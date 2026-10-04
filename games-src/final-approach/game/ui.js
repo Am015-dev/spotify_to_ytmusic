@@ -277,7 +277,7 @@ function renderDock() {
   const ro = $('#roster'); if (ro) { ro.innerHTML = ''; for (const s of [0, 1]) { const st = G.result ? (G.result.win ? 'landed' : 'flight over') : G.phase === 'brief' ? (G.ready[s] ? 'ready' : 'briefing') : (FA.pending(G).includes(s) ? 'deciding' : 'waiting'); ro.appendChild(h('div.chip.' + (s ? 'c' : 'p') + (v === s ? '.me' : '') + (st === 'deciding' || st === 'briefing' ? '.wt' : '') + (st === 'ready' ? '.rdy' : ''), h('span.cav', ART['crew-' + s] ? h('img', { src: ART['crew-' + s], alt: '' }) : ''), h('span.ct', h('b', name(s)), h('i', pname(s) + (G.ai[s] ? ' (computer)' : '') + ' · ' + FA.unusedDice(G, s).length + ' dice · ' + st)))); }
   }
   // the goal: the route and the landing conditions, always on screen (tap for the full checklist)
-  const gl = $('#goal'); if (gl) { gl.innerHTML = ''; gl.hidden = !!G.result; if (!G.result) gl.appendChild(goalEl()); }
+  const gl = $('#goal'); if (gl) { gl.innerHTML = ''; gl.hidden = !!G.result || (isPh() && !document.documentElement.classList.contains('ph-p') && (!!(UI.coach && UI.coach.tip) || (UI.sel != null && UI.sel !== -1))); if (!G.result) gl.appendChild(goalEl()); }
   // selected die info
   const si = $('#selinfo'); if (si) { si.innerHTML = ''; si.className = 'idle'; si.hidden = !!G.result;
     if (typeof v === 'number' && v >= 0 && mayAct(v) && !G.result && G.phase === 'place') {
