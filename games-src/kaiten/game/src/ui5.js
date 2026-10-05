@@ -115,6 +115,7 @@ function titleEl() {
     h('div.tbtns',
       sv ? h('button.tbtn.go', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', (si => si ? 'your meal, round ' + si.round + ' of ' + D.rounds + ' · ' + si.np + ' diners' : 'your saved meal')(saveInfo()))) : null,
       h('button.tbtn' + (sv ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', sv ? 'New game' : 'Play'), h('span', 'against the computer chefs')),
+      h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', '★ Story'), h('span', campLine())),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free'))),
     h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
 }
@@ -178,6 +179,7 @@ document.addEventListener('click', ev => {
     case 'rsskip': skipCount(); break;
     case 'rsclose': closeRS(); break;
     case 'again': { const m = UI.mode, c = UI.cfg || {}; UI.cards = []; closeRS(); newGame(m === 'net' ? 'vs' : m, { np: c.np, level: c.level, lv: c.lv, seats: c.seats || undefined }); break; }
+    case 'story': campOpen(); break;
     case 'play': UI.sv = 'setup'; renderStart(); break;
     case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;
     case 'title': UI.sv = 'title'; UI.cfgOpen = false; renderStart(); break;
@@ -204,7 +206,7 @@ document.addEventListener('click', ev => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop) closePop(); else if (UI.rsOpen && UI.mode && G && G.phase === 'over' && UI.overShown) closeRS(); } });
 // ---------- phone mode ----------
 function applyPhone() {
-  const q = /[?&]phone=(\d)/.exec(location.search); const w = innerWidth, hh = innerHeight, short = Math.min(w, hh);
+  const q = /[?&]phone=(\d)/.exec(location.search); const vm = GXV.now(), w = vm.w, hh = vm.h, short = Math.min(w, hh);
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
@@ -214,7 +216,6 @@ function applyPhone() {
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !NET.on && UI.sv === 'setup') renderStart(); }
 }
 let rzT = 0;
-function onResize() { clearTimeout(rzT); rzT = setTimeout(() => { applyPhone(); if (G && UI.started) render(); }, 60); }
 // ---------- boot ----------
 function boot() {
   GX.init({ key: 'kk' });
@@ -224,7 +225,7 @@ function boot() {
   GX.drawer('setd', 'Menu', h('div#setbody'));
   GX.onShow = id => { renderDrawers(); };
   loadPrefs(); applyPhone();
-  addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
+  GXV.watch(() => { applyPhone(); if (G && UI.started) render(); });
   addEventListener('pagehide', () => { try { flushSave(); } catch (e) { } });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') try { flushSave(); } catch (e) { } });
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { clearTimeout(rzT); rzT = setTimeout(() => { if (G && UI.started) render(); }, 40); } }).observe(bd);

@@ -71,7 +71,7 @@ function tableCounts(table) {
 // round scores for every seat from the tables
 function roundScores(G) {
   const cs = G.players.map(p => tableCounts(p.table));
-  const mk = makiPoints(cs.map(c => c.icons));
+  const mk = makiPoints(cs.map((c, i) => c.icons + (G.tw && G.tw.id === 'roll-banner' && i === 1 && c.icons > 0 ? G.tw.param : 0)));
   return cs.map((c, i) => {
     const o = { maki: mk[i], tempura: Math.floor(c.tempura / 2) * DATA.tempuraPair, sashimi: Math.floor(c.sashimi / 3) * DATA.sashimiSet, dumpling: dumplingPts(c.dumpling), nigiri: c.nigiri, wasabi: c.wasabiBonus };
     o.total = o.maki + o.tempura + o.sashimi + o.dumpling + o.nigiri + o.wasabi;
@@ -91,6 +91,8 @@ function newGame(o) {
   shuffle(G, G.deck);
   lg(G, 'A new meal begins: ' + np + ' diners, 3 rounds.');
   deal(G);
+  // story-mode twists (campaign only): custard-head-start / roll-banner / boss-head-start apply to the boss seat (seat 1)
+  if (o.twist && o.twist.id) { G.tw = { id: o.twist.id, param: +o.twist.param || 0 }; if (G.tw.id === 'custard-head-start') for (let n = 0; n < G.tw.param; n++) { const i = G.deck.findIndex(c => key(c) === 'pudding'); if (i >= 0) G.players[1].pud.push(G.deck.splice(i, 1)[0]); } }
   return G;
 }
 function deal(G) {
@@ -201,7 +203,7 @@ function makiHadTie(sc) { const m = {}; let max = 0; for (const s of sc) { m[s.i
 function finish(G) {
   G.phase = 'over';
   const counts = G.players.map(p => p.pud.length), pts = puddingPoints(counts, G.np);
-  const totals = G.players.map((p, i) => G.rs.reduce((a, r) => a + r[i].total, 0) + pts[i]);
+  const totals = G.players.map((p, i) => G.rs.reduce((a, r) => a + r[i].total, 0) + pts[i] + (G.tw && G.tw.id === 'boss-head-start' && i === 1 ? G.tw.param : 0));
   G.final = { pudding: counts, puddingPts: pts, totals };
   if (new Set(counts).size > 1) use(G, 'puddingScored');
   if (G.np > 2 && Math.min(...counts) !== Math.max(...counts)) use(G, 'puddingPenalty');

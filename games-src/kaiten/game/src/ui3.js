@@ -24,7 +24,7 @@ function newGame(mode, o) {
   UI.chefs = chefs;
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
-  G = KK.newGame({ players: np, seed, names, ai });
+  G = KK.newGame({ players: np, seed, names, ai, twist: o.twist || null });
   UI.news = null; UI.tip = null; Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && UI.coach.keep ? 'full' : UI.coach.userOff ? 'off' : 'light'), seen: {}, turn: '', keep: UI.coach.keep, userOff: UI.coach.userOff };
   if (mode === 'guided') UI.coach.level = 'full';
@@ -52,7 +52,7 @@ function schedule() {
 function aiPick(seat) {
   if (!G || UI.busy || G.phase !== 'pick') return;
   const p = G.players[seat]; if (!p || p.picked || !p.ai) { schedule(); return; }
-  let mv; try { mv = KK.AI.choose(G, seat); } catch (e) { console.error(e); mv = KK.moves(G, seat)[0]; }
+  let mv; try { mv = KK.AI.choose(G, seat, undefined, UI.camp && UI.camp.twist && UI.camp.twist.id === 'long-think' ? { units: UI.camp.twist.param || 250 } : undefined); } catch (e) { console.error(e); mv = KK.moves(G, seat)[0]; }
   commit(seat, mv);
 }
 function commit(seat, mv) {
