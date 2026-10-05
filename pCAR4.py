@@ -4,7 +4,14 @@ exec(open('P.py').read())
 if 'CR_cityGeo' in s:
     print('OK');raise SystemExit
 assert 'CR_SPEED' in s, 'apply pCAR1 first'
-JS=r'''// ---------- city traffic in LEGO (instanced, body parts in white so each instance's paint tints them)
+JS=r'''
+// wheels stay on the road: each wheel keeps its tyre bottom at a fixed height below the car's root, so pitch/roll moves only the body
+const _crWP=new THREE.Vector3();
+function CR_clamp(w){let R=w.userData.root;if(!R){R=w;while(R.parent&&!R.parent.isScene)R=R.parent;w.userData.root=R}if(R===w||typeof state==='undefined'||state!=='roam')return;
+ const e=w.matrixWorld.elements,s=Math.hypot(e[4],e[5],e[6])||1;w.getWorldPosition(_crWP);let g;try{g=groundY(_crWP.x,_crWP.z)}catch(x){return}if(!(g>-1e4)||Math.abs(g-R.position.y)>4)return;
+ const bot=_crWP.y-w.userData.r*s,d=Math.max(-.35,Math.min(.35,g+.03-bot));if(Math.abs(d)>.004)w.position.y+=d/s;else if(Math.abs(w.position.y-w.userData.by)>.6/s)w.position.y=w.userData.by}
+CR_spin=(f=>function(o){f(o);o.userData.by=o.position.y;const ob=o.onBeforeRender;o.onBeforeRender=function(...a){CR_clamp(this);return ob.apply(this,a)}})(CR_spin);
+// ---------- city traffic in LEGO (instanced, body parts in white so each instance's paint tints them)
 function CR_van(o){const A=[],B=o.body,K=CR_K,add=(t,x,z,r,c,y)=>A.push([t,x,z,r,c,y]),sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},wy=(.12-GB_PC.wM.h*GB_PH/2)/GB_PH;
  add('T8x20',-4,-10,0,K,0);for(const z of[-9,5])sym('arch',-4,z,0,B,0),sym('wM',-4,z,0,K,wy);sym('B1x10',-4,-5,0,B,1);sym('B1x10',-4,-5,0,B,4);sym('B1x1',-4,-10,0,B,1);sym('hl',-4,-10,0,B,3);add('B6x1',-3,-10,0,K,1);add('C8x1',-4,-10,0,B,6);
  add('ws6',-3,-9,0,B,6);sym('B1x14',-4,-9,0,B,6);sym('B1x14',-4,-9,0,B,9);add('B6x11',-3,-6,0,B,6);add('B6x11',-3,-6,0,B,9);add('T8x16',-4,-6,0,B,12);sym('tl',-4,9,2,B,3);add('B6x1',-3,9,0,B,1);sym('B1x1',-4,9,0,B,1);
@@ -63,5 +70,8 @@ R("HUB.grp.add(im);return im});pedInit()}","HUB.grp.add(im);CR_cityPost(im,nm,k,
 R("if(c.dead>0){c.dead-=dt;_m.makeScale(0,0,0);im.setMatrixAt(c.j,_m);","if(c.dead>0){c.dead-=dt;_m.makeScale(0,0,0);im.setMatrixAt(c.j,_m);if(im.userData.w)im.userData.w.setMatrixAt(c.j,_m);if(im.userData.g)im.userData.g.setMatrixAt(c.j,_m);")
 R("_m.makeBasis(_hrt.set(dz,0,-dx),_hup,_hfw.set(dx,0,dz)).setPosition(x,c.y,z);im.setMatrixAt(c.j,_m);","_m.makeBasis(_hrt.set(dz,0,-dx),_hup,_hfw.set(dx,0,dz)).setPosition(x,c.y,z);CR_susp(c,dx,dz,dt,im,_m);")
 R("for(const im of HUB.cim)im.instanceMatrix.needsUpdate=true}","for(const im of HUB.cim){im.instanceMatrix.needsUpdate=true;if(im.userData.w)im.userData.w.instanceMatrix.needsUpdate=true;if(im.userData.g)im.userData.g.instanceMatrix.needsUpdate=true}}")
+# Athens: no parked cars on verges or in grass car parks (traffic stays on the street graph)
+R("const put=(t,x,z,ry,si)=>{","const put=(t,x,z,ry,si)=>{if(t==='CE_car'||t==='CE_car2'||t==='CE_taxi')return false;")
+R("function CE_lots(add,rnd,D){","function CE_lots(add0,rnd,D){const add=(t,...a)=>{if(t==='CE_car'||t==='CE_car2'||t==='CE_taxi')return;return add0(t,...a)};")
 save()
 print('OK')

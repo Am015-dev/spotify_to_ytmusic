@@ -18,8 +18,16 @@ function CR_hud(){const n=document.getElementById('m1Next'),a=document.getElemen
  if(m){let d=n.querySelector('.crD');if(!d){d=document.createElement('em');d.className='crD';n.appendChild(d)}const sp=a.querySelector('span');d.textContent=sp?sp.textContent.trim():''}
  if(pl){const k=pl.textContent;const now=performance.now();if(k!==CR_hudS.k){CR_hudS.k=k;CR_hudS.t=now}pl.classList.toggle('crHide',now-CR_hudS.t>2000||vis(tu))}}
 setInterval(CR_hud,250);
+// tutorial card: keep >= 8 px clear of the touch controls (between ▶ and BRAKE)
+function CR_tutFit(){const t=document.getElementById('roamTut');if(!t||!document.body.classList.contains('touch')||t.hidden||!t.getClientRects().length){return}
+ const bs=[...document.querySelectorAll('button,.tbtn,div')].filter(e=>/^(▶|BRAKE)$/.test((e.textContent||'').trim())&&e.getClientRects().length&&e.offsetWidth>30&&e.offsetWidth<160);
+ const rb=bs.find(e=>e.textContent.trim()==='▶'),bk=bs.find(e=>e.textContent.trim()==='BRAKE');if(!rb||!bk)return;const L=rb.getBoundingClientRect().right+18,Rr=bk.getBoundingClientRect().left-18;
+ if(Rr-L<200)return;const S=(k,v)=>t.style.setProperty(k,v,'important');S('left',L+'px');S('right','auto');S('transform','none');S('max-width',(Rr-L)+'px');S('box-sizing','border-box')}
+setInterval(CR_tutFit,300);
 '''
 i=s.index('const GB_PRE=[')
 s=s[:i]+JS+'\n'+s[i:]
+# wording: it's a car, not a ship
+s=s.replace("Drive! Your ship accelerates by itself","Drive! Your car accelerates by itself").replace("your ship is the weapon","your car is the weapon")
 save()
 print('OK')
