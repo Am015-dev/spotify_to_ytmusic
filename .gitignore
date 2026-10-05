@@ -7,3 +7,4 @@ __pycache__/
 smoke/*.jpg
 v85shots/
 local_ins.html
+local_t.html
