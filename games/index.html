@@ -365,6 +365,15 @@ footer a{color:var(--brass)}
 .controw{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;max-width:min(92vw,720px);width:fit-content;box-sizing:border-box;padding:3px 3px 3px 12px;border-radius:26px;background:var(--hdr);backdrop-filter:blur(3px)}
 .controw .crb{background:transparent}
 .controw[hidden]{display:none}
+.filtrow{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-right:6px}.filtrow::-webkit-scrollbar{display:none}
+.fb{font:700 .8rem var(--body);min-height:36px;padding:0 11px;border-radius:99px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap;flex:none}
+.fb[aria-pressed=true]{background:#f0b04a;border-color:#f0b04a;color:#2a1a0c}
+.fcount{font:700 .78rem var(--body);color:var(--muted);white-space:nowrap;flex:none}
+.boxbtn,#tv{transition:opacity .25s,filter .25s}.boxbtn.dim,#tv.dim{opacity:.2;filter:grayscale(1)}
+#listview li.dim{display:none}
+.stb{position:absolute;right:4%;top:4%;padding:.2em .55em;border-radius:99px;background:#3a2c4a;color:#efe0ff;font:800 .8em/1.2 var(--body);box-shadow:0 .1em .3em rgba(0,0,0,.45)}
+.b3.flat .stb{display:none}
+.cst{font-weight:800!important}.cst.done{background:#cfe9d4!important;color:#163d22!important}.cst.testing{background:#f3e3a8!important;color:#4a3608!important}.cst.progress,.cst.todo{background:#d6e4f2!important;color:#173450!important}.cst.story{background:#e4d6f3!important;color:#34204e!important}
 .controw .cr-l{font:700 .8rem var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-right:2px}
 .crb{font:700 .85rem var(--body);display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 12px 0 4px;border-radius:99px;border:1.5px solid var(--line);background:var(--hdr);color:var(--ink);cursor:pointer;backdrop-filter:blur(3px)}
 .crb img{width:36px;height:36px;border-radius:50%;object-fit:cover}
@@ -487,7 +496,7 @@ html.ph header.top{scroll-snap-align:start}
 <body>
 <div class="roombg" aria-hidden="true"><div class="rb-wall"></div><div class="rb-wain"></div><div class="rb-skirt"></div><div class="rb-floor"></div><div class="rb-rug"></div><div class="rb-glow"></div><div class="rb-floorglow"></div></div>
 <header class="top">
-  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">17 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div><div class="controw" id="controw" role="group" aria-label="Continue a saved game" hidden></div></div>
+  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">17 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div><div class="controw" id="controw" role="group" aria-label="Continue a saved game" hidden></div><div class="controw filtrow" id="filtrow" role="group" aria-label="Filter games by status"></div></div>
   <div class="tools"><button type="button" class="tbtn" id="sndbtn" aria-label="Sound on" aria-pressed="true">🔊</button><button type="button" class="tbtn" id="viewbtn">☰ Plain list</button></div>
 </header>
 <main>
@@ -560,15 +569,15 @@ const GAMES=[
    blurb:'A cartoon demolition crew defuses rigged charges together. Everyone sees only their own wires: point at a teammate\'s wire, call a number and cut as a pair. One red wire and it all goes bang. Play with computer teammates, pass one device around, or online with friends. Preview: the hardest jobs are still being tuned.',
    stats:[['2–5','players'],['30','minutes'],['10+','ages'],['66','jobs']],
    chips:['Preview','Co-op','Computer teammates · 3 levels','Hot-seat','Online with friends','Guided first game','All 66 jobs','Gear & crew powers']},
-  {id:'tidewake',cover:'covers/tidewake.jpg',name:'Tidewake (preview)',src:'tidewake/index.html',ribbon:'Path-laying at sea',ref:false,
+  {id:'tidewake',cover:'covers/tidewake.jpg',name:'Tidewake',src:'tidewake/index.html',ribbon:'Path-laying at sea',ref:false,
    blurb:'Lay sea currents to steer your junk across a painted chart, and keep every rival and every leviathan away from it. Last ship afloat wins. Play against computers, pass one device around, or online with friends. Preview: still being polished.',
    stats:[['1–8','players'],['30','minutes'],['8+','ages'],['56','currents']],
    chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','Solo & teams','Rift Gate','Rogue Wave','Maelstrom','Deck Cannon']},
-  {id:'hollowbough',cover:'covers/hollowbough.jpg',name:'Hollowbough (preview)',src:'hollowbough/index.html',ribbon:'Woodland city-building',ref:false,isNew:true,
+  {id:'hollowbough',cover:'covers/hollowbough.jpg',name:'Hollowbough',src:'hollowbough/index.html',ribbon:'Woodland city-building',ref:false,isNew:true,
    blurb:'Send your critters out across the valley through four seasons, gather twigs, resin, pebbles and berries, and build a city of 15 critters and constructions under the great tree. Play against computers, solo against Old Grimbeard, pass one device around, or online with friends. Preview: still being polished.',
    stats:[['1–4','players'],['60','minutes'],['10+','ages'],['48','cards']],
    chips:['Preview','Vs computer · 3 levels','Solo vs Old Grimbeard','Hot-seat','Online with friends','Guided first game','Four seasons','Events & Long Road']},
-  {id:'thornbound',cover:'covers/thornbound.jpg',name:'The Thornbound Throne (preview)',src:'thornbound/index.html',ribbon:'Card-driven war for a crown',ref:false,isNew:true,
+  {id:'thornbound',cover:'covers/thornbound.jpg',name:'The Thornbound Throne',src:'thornbound/index.html',ribbon:'Card-driven war for a crown',ref:false,isNew:true,
    blurb:'Four heirs fight over an empty throne in an overgrown kingdom. Bid for turn order, send your Herald, play cards face-down beside each region and reveal them in clashes for Influence. Most Influence after five rounds wins. Play against computers, pass one device around, or online with friends. Preview: still being polished; solo mode to come.',
    stats:[['2–4','players'],['90','minutes'],['12+','ages'],['4','factions']],
    chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','4 asymmetric factions','Bluffing & bidding']},
@@ -576,7 +585,7 @@ const GAMES=[
    blurb:'Plates glide past on the conveyor belt: grab one, pass the rest along, and build the tastiest table. Pair the prawns, finish fish sets, race for seaweed rolls and save a custard for dessert. Everyone picks at once, so watch what your neighbours collect. Play against computers, pass one device around, or online with friends.',
    stats:[['2–5','players'],['20','minutes'],['8+','ages'],['3','rounds']],
    chips:['Preview','Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','Simultaneous picks']},
-  {id:'lantern',cover:'covers/lantern.jpg',name:'Lantern Dive (preview)',src:'lantern-dive/index.html',ribbon:'Co-op deep-sea trick-taking',isNew:true,
+  {id:'lantern',cover:'covers/lantern.jpg',name:'Lantern Dive',src:'lantern-dive/index.html',ribbon:'Co-op deep-sea trick-taking',isNew:true,
    blurb:'Dive together, say nothing, trust the lantern. Each diver takes jobs, then the crew plays tricks in silence: Lanterns beat every colour, and every job is a promise about the tricks one diver will win. Each of you may show a single card as a hint, so read your crew. One failed job and the dive is lost. Play with computer divers, pass one device around, or online with friends.',
    stats:[['2–5','players'],['20','minutes'],['10+','ages'],['32','dives']],
    chips:['Preview','Co-op','Computer divers · 3 levels','Hot-seat','Online with friends','Guided first game','32 dives + Deep Dive','96 job cards','Drone for two divers']},
@@ -608,7 +617,24 @@ const $=(s,r=document)=>r.querySelector(s);
 const root=document.documentElement;
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const clean=n=>n.replace(/\s*\(preview\)\s*$/,'');
-const isPrev=g=>/\(preview\)/.test(g.name);
+/* build status for the shelf filter: k = done | testing | progress | todo, st = has story mode */
+const STATUS={sunglaze:['done',1],cauldron:['done',1],doorkick:['done',1],thornbound:['done',1],lantern:['done',1],hollowbough:['done',1],tidewake:['done',1],
+ kaiten:['testing',1],approach:['testing',1],shipwreck:['testing',1],crown:['progress',0],nebula:['progress',0],shortfuse:['todo',0],rampart:['todo',0],sands:['todo',0]};
+const stOf=g=>{const x=STATUS[g.id];return x?{k:x[0],st:!!x[1]}:null};
+const ST_LABEL={done:'Completed',testing:'Under testing',progress:'Being rebuilt',todo:'Story mode coming'};
+const isPrev=g=>{const x=stOf(g);return !!x&&x.k!=='done'};
+const FILTERS=[['all','All'],['story','Story mode'],['done','Completed'],['testing','Under testing'],['soon','Coming soon']];
+let filt=(()=>{try{const v=localStorage.getItem('shelf_filter');return FILTERS.some(f=>f[0]===v)?v:'all'}catch(e){return 'all'}})();
+const fits=g=>{if(filt==='all')return true;const x=stOf(g);if(!x)return false;return filt==='story'?x.st:filt==='soon'?(x.k==='progress'||x.k==='todo'):x.k===filt};
+function applyFilter(){
+  document.querySelectorAll('.boxbtn[data-id],#listview li[data-id]').forEach(el=>{const g=byId(el.dataset.id);el.classList.toggle('dim',!!g&&!fits(g))});
+  const tv=document.getElementById('tv');if(tv)tv.classList.toggle('dim',filt!=='all');
+  const n=BOARD().filter(fits).length;
+  document.querySelectorAll('#filtrow .fb').forEach(b=>b.setAttribute('aria-pressed',b.dataset.flt===filt?'true':'false'));
+  const c=document.getElementById('fcount');if(c)c.textContent=filt==='all'?'':n+' match'}
+function renderFilters(){const r=document.getElementById('filtrow');if(!r)return;
+  r.innerHTML='<span class="cr-l">Show</span>'+FILTERS.map(f=>`<button type="button" class="fb" data-flt="${f[0]}" aria-pressed="false">${f[1]}</button>`).join('')+'<span class="fcount" id="fcount" aria-live="polite"></span>';
+  r.onclick=e=>{const b=e.target.closest('.fb');if(!b)return;e.stopPropagation();filt=b.dataset.flt;try{localStorage.setItem('shelf_filter',filt)}catch(_){}applyFilter()}}
 const byId=id=>GAMES.find(g=>g.id===id);
 const VIDEO=()=>GAMES.filter(g=>g.kind==='video'),BOARD=()=>GAMES.filter(g=>g.kind!=='video');
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -664,7 +690,7 @@ function evalTrophies(owl){const P=getPlays(),tr=jget('room_trophies');const s={
 function backParts(g){
   const P=getPlays()[g.id]|0;
   const head=`<h2>${esc(g.name)}</h2><span class="bk-r">${esc(g.ribbon)}</span>`;
-  const body=`<p>${esc(g.blurb)}</p><div class="stats">${g.stats.map(s=>`<div><b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div><div class="chips">${g.chips.map(c=>`<span>${esc(c)}</span>`).join('')}</div>${P?`<div class="plays">Played ${P} time${P>1?'s':''}</div>`:''}`;
+  const body=`<p>${esc(g.blurb)}</p><div class="stats">${g.stats.map(s=>`<div><b>${s[0]}</b><span>${s[1]}</span></div>`).join('')}</div><div class="chips">${stOf(g)?`<span class="cst ${stOf(g).k}">${ST_LABEL[stOf(g).k]}</span>${stOf(g).st?'<span class="cst story">Story mode</span>':''}`:''}${g.chips.filter(c=>c!=='Preview').map(c=>`<span>${esc(c)}</span>`).join('')}</div>${P?`<div class="plays">Played ${P} time${P>1?'s':''}</div>`:''}`;
   const acts=`<button type="button" class="btn play" data-play="${g.id}">▶ Play</button><a class="btn alt" href="${g.src}" target="_blank" rel="noopener">New tab</a>${g.ref===false?'':`<button type="button" class="btn alt" data-ref="${g.id}">Card list</button>`}`;
   return{head,body,acts}}
 function buildBox(g,dims){
@@ -673,7 +699,7 @@ function buildBox(g,dims){
   const w=wearOf(getPlays()[g.id]|0);
   const b=document.createElement('span');b.className='b3';b.dataset.wear=w;
   b.style.cssText=`--W:${W};--H:${H};--D:${D};--c:${L.c}`;
-  b.innerHTML=`<span class="f front"><img src="${g.cover}" alt="" loading="lazy" decoding="async" draggable="false"><i class="wearov"></i><span class="band">${esc(t)}</span>${isPrev(g)?'<span class="note">Still being tested</span>':''}${g.isNew?'<span class="new">New!</span>':''}</span><span class="f left"><b style="font-size:${fs}em">${esc(t)}</b></span><span class="f right"></span><span class="f top"></span><span class="f bot"><b>${esc(t)}</b></span>`;
+  b.innerHTML=`<span class="f front"><img src="${g.cover}" alt="" loading="lazy" decoding="async" draggable="false"><i class="wearov"></i><span class="band">${esc(t)}</span>${isPrev(g)?`<span class="note">${ST_LABEL[stOf(g).k]}</span>`:''}${stOf(g)&&stOf(g).st&&!g.isNew?'<span class="stb">Story</span>':''}${g.isNew?'<span class="new">New!</span>':''}</span><span class="f left"><b style="font-size:${fs}em">${esc(t)}</b></span><span class="f right"></span><span class="f top"></span><span class="f bot"><b>${esc(t)}</b></span>`;
   return b}
 function boxBtn(g,pose,dims,tw){
   const L=LOOK[g.id],[W,H,D]=dims||[L.W,L.H,L.D];
@@ -826,7 +852,7 @@ function tvStatic(){
 setInterval(()=>{if(document.hidden||!table.hidden||ins||view!=='room'||!$('#tvscreen')||VIDEO().length<2)return;if($('#tv:hover,#tv:focus-within'))return;tvCh++;tvShow(true)},6000);
 function renderList(){
   const lv=$('#listview'),id=store.get('shelf_last');
-  const row=g=>`<li data-id="${g.id}"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><div class="pl-t"><b>${esc(g.name)}</b><span>${esc(g.ribbon)}${id===g.id?' · Played last':''}</span></div><button type="button" class="btn play" data-play="${g.id}" aria-label="Play ${esc(g.name)}">▶ Play</button></li>`;
+  const row=g=>`<li data-id="${g.id}"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><div class="pl-t"><b>${esc(g.name)}</b><span>${stOf(g)?ST_LABEL[stOf(g).k]+(stOf(g).st?' · Story':'')+' · ':''}${esc(g.ribbon)}${id===g.id?' · Played last':''}</span></div><button type="button" class="btn play" data-play="${g.id}" aria-label="Play ${esc(g.name)}">▶ Play</button></li>`;
   const sec=(t,k,a)=>a.length?`<h2 class="lh" id="lh-${k}">${t}</h2><ul class="plist" aria-labelledby="lh-${k}">${a.map(row).join('')}</ul>`:'';
   lv.innerHTML=`<div class="lobj"><button type="button" class="tbtn" data-ref="">📖 Card &amp; token reference</button><a class="tbtn" href="suggest.html">💬 Suggestion box</a><button type="button" class="tbtn" data-inv="1" aria-haspopup="dialog">✉ Play online with friends</button><button type="button" class="tbtn" data-mine="1" aria-haspopup="dialog">★ Stats &amp; achievements</button></div>${sec('Board games','board',BOARD())}${sec('Video games','video',VIDEO())}`}
 function render(){
@@ -837,7 +863,7 @@ function render(){
   $('#viewbtn').textContent=list?'🏠 Room view':'☰ Plain list';
   $('#viewbtn').setAttribute('aria-pressed',list?'true':'false');
   if(list){renderList();renderCont()}else renderRoom(ph);
-  $('#tally').textContent=GAMES.length+' games on the shelf'}
+  $('#tally').textContent=GAMES.length+' games on the shelf';applyFilter()}
 function fit(){
   const cw=root.clientWidth,ph=isPh();
   root.classList.toggle('ph',ph);
@@ -1051,7 +1077,7 @@ document.addEventListener('pointerdown',e=>{if(!fabmenu.hidden&&!fabmenu.contain
 addEventListener('resize',()=>{if(!fab.hidden)placeFab(corner)});
 if(isPh()&&/iPhone|iPod/.test(navigator.userAgent)&&!standalone&&!store.get('shelf_iostip')){const t=document.getElementById('iostip');t.hidden=false;document.getElementById('iosok').onclick=()=>{t.hidden=true;store.set('shelf_iostip','1')}}
 addEventListener('resize',fit);
-fit();render();
+renderFilters();fit();render();
 {const start=GAMES.find(g=>'#'+g.id===location.hash);if(start)openGame(start)}
 
 /* Ko-fi support: set the page name to switch the support links on */
