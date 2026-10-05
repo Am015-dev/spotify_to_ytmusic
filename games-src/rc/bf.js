@@ -34,9 +34,10 @@ function tilePt(id){const ov=q('#bfov');if(!ov)return null;const r0=ov.getBoundi
   const g=q(`#map2d [data-tile="${id}"]`);if(g){const b=g.getBoundingClientRect();return {x:b.left+b.width/2-r0.left,y:b.top+b.height/2-r0.top,ox:r0.left,oy:r0.top,w:r0.width,h:r0.height}}return null}
 BF.tilePt=tilePt;
 // ---------- legal places for the pawn in hand ----------
-function legalRows(id,cur){if(!cur)return [];let rows=[];try{rows=PHO.tileRows(id)}catch(e){}return rows.filter(r=>!r.why&&!placeWhy(cur.id,r.type,r.tgt,r.alt))}
+function legalRows(id,cur){if(!cur)return [];let rows=[];try{rows=PHO.tileRows(id)}catch(e){}return rows.filter(r=>!r.why&&!placeWhy(cur.id,r.type,r.tgt,r.alt)&&(findAct(r.type,r.tgt)||canPay(r,cur)))}
+function canPay(r,cur){try{const a={type:r.type,tgt:r.tgt,alt:r.alt||0,pw:[cur.id]};if(afford(a))return true;if(r.type==='build'&&['shelter','roof','pal'].includes(r.tgt.k)){for(const pay of ['fur','wood']){a.pay=pay;if(afford(a))return true}}return false}catch(e){return true}}
 function legalTiles(cur){if(!cur)return [];const k=planSig()+'|'+cur.id+'|'+G.logN+'|'+JSON.stringify(G.res);if(BF._lk===k)return BF._lt;const out=[];for(const m of MAP)if(legalRows(m.id,cur).length)out.push(m.id);BF._lk=k;BF._lt=out;return out}
-BF.legal=legalTiles;
+BF.legal=legalTiles;window.legalRowsDbg=id=>{const c=curPawn();return legalRows(id,c).map(r=>r.title)};
 function recTile(cur){if(!cur)return null;const rec=recPlan().map[cur.id];if(!rec||placeWhy(cur.id,rec.type,rec.tgt,rec.alt))return null;
   const same=r=>r.type===rec.type&&JSON.stringify(r.tgt)===JSON.stringify(rec.tgt)&&(r.alt||0)===(rec.alt||0);for(const m of MAP)if(legalRows(m.id,cur).some(same))return {id:m.id,rec};return null}
 // ---------- the status line ----------
