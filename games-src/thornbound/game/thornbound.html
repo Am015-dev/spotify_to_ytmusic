@@ -1405,7 +1405,9 @@ TB.map = function (opts) {
     S.locs.forEach(function (l, li) {
       var p = S.pos[l.id], bw = bannerW(l.name), fs = 23, own = S.owners[l.id], oc = own != null && players[own] ? fac(players[own].faction) : null;
       s += '<g class="tb-loc" data-id="' + esc(l.id) + '" transform="translate(' + p.x + ' ' + p.y + ')" tabindex="0" role="button" aria-label="' + esc(l.name) + '">';
-      s += '<rect class="tb-hit" x="' + n2(-98 * cs) + '" y="' + n2(-52 * pu) + '" width="' + n2(196 * cs) + '" height="' + n2((CP ? 140 : 180) * cs) + '" rx="22" fill="transparent"/>';
+      var hx = -98 * cs, hy = -52 * pu, hw = 196 * cs, hh = (CP ? 140 : 180) * cs;   /* keep the tap area inside the map so no button reaches past the screen edge */
+      if (p.x + hx < 0) { hw += p.x + hx; hx = -p.x; } if (p.x + hx + hw > W) hw = W - p.x - hx; if (p.y + hy < 0) { hh += p.y + hy; hy = -p.y; } if (p.y + hy + hh > H) hh = H - p.y - hy;
+      s += '<rect class="tb-hit" x="' + n2(hx) + '" y="' + n2(hy) + '" width="' + n2(hw) + '" height="' + n2(hh) + '" rx="22" fill="transparent"/>';
       s += '<circle class="tb-ring" r="' + n2(56 * pu) + '" fill="none" stroke="#ffe9a0" stroke-width="5" stroke-dasharray="9 7" opacity="0"/><g transform="scale(' + pu + ')">';
       s += '<circle cy="5" r="48" fill="#000" opacity=".5"' + filt('tb-soft') + '/>';
       s += '<circle r="46" fill="' + (oc ? 'url(#tb-f-' + oc.id + ')' : '#2a1c10') + '"/><circle r="44" fill="none" stroke="url(#tb-gold)" stroke-width="4.4"/><circle r="40" fill="#120b07"/>';

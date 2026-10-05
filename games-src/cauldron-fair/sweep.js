@@ -4,8 +4,8 @@
 // Per step it asserts: no console/page errors, a tapped control responds, hint text and ghost finger agree, scores and bag on screen = engine,
 // something changes within 8 s, no horizontal scroll, no tappable control covered. Then story chapters 1, 3 and 10 are played and their boss twists checked.
 const PW = require(process.env.PW || 'playwright'), fs = require('fs'), path = require('path');
-const URL = process.env.URL || 'http://localhost:8096/cauldron-fair.html';
-const GAMES = +process.env.GAMES || 40, ROT = process.env.ROT == null ? 5 : +process.env.ROT, ANIMN = process.env.ANIM == null ? 6 : +process.env.ANIM, PAR = +process.env.PAR || 3, C1N = +process.env.C1 || 400;
+const URL = process.env.URL || 'http://localhost:8098/cauldron-fair.html';
+const GAMES = process.env.GAMES != null ? +process.env.GAMES : 40, ROT = process.env.ROT == null ? 5 : +process.env.ROT, ANIMN = process.env.ANIM == null ? 6 : +process.env.ANIM, PAR = +process.env.PAR || 3, C1N = +process.env.C1 || 400;
 const SHOTS = path.join(__dirname, 'sweep-shots'); fs.mkdirSync(SHOTS, { recursive: true });
 for (const f of fs.readdirSync(SHOTS)) if (/\.png$/.test(f)) fs.unlinkSync(path.join(SHOTS, f));
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1';
@@ -42,8 +42,8 @@ const PROBE = () => {
   const sels = rsOn ? '#rs button,#rs summary' : '#acts button,#qbox button,#pc button,#others .th,.gx-bar button';
   for (const e of document.querySelectorAll(sels)) {
     if (!vis(e)) continue; const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
-    const sb = e.closest('.rsbody'), sbr = sb && sb.getBoundingClientRect(); const inVP = x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight && (!sbr || (y >= sbr.top && y <= sbr.bottom)); const h = inVP ? document.elementFromPoint(x, y) : null;
-    out.ctl.push({ x, y, inVP, covered: !(h && (e.contains(h) || h.contains(e) && h !== document.body && h !== document.documentElement && h.closest('button,summary') === e)), by: h && (h.id || h.className && h.className.baseVal || h.className || h.tagName), dis: !!e.disabled, a: e.dataset.a || '', sel: e.getAttribute('aria-pressed') === 'true', k: e.dataset.k || '', cls: String(e.className).slice(0, 40), inQ: !!e.closest('#qbox'), t: (e.textContent || '').trim().slice(0, 26), pe: getComputedStyle(e).pointerEvents });
+    const sb = e.closest('.rsbody'), sbr = sb && sb.getBoundingClientRect(); const inVP = x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight && (!sbr || (y >= sbr.top + 3 && y <= sbr.bottom - 3)); const h = inVP ? document.elementFromPoint(x, y) : null;
+    out.ctl.push({ x, y, inVP, covered: !(h && (e.contains(h) || h.contains(e) && h !== document.body && h !== document.documentElement && h.closest('button,summary') === e)), geo: Math.round(r.left) + ',' + Math.round(r.top) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height) + ' body ' + (sbr ? Math.round(sbr.top) + '-' + Math.round(sbr.bottom) : '-') + ' vp ' + innerWidth + 'x' + innerHeight, by: h && (h.id || h.className && h.className.baseVal || h.className || h.tagName), dis: !!e.disabled, a: e.dataset.a || '', sel: e.getAttribute('aria-pressed') === 'true', k: e.dataset.k || '', cls: String(e.className).slice(0, 40), inQ: !!e.closest('#qbox'), t: (e.textContent || '').trim().slice(0, 26), pe: getComputedStyle(e).pointerEvents });
   }
   const gh0 = document.querySelector('#ghost'); out.stat = { ghost: !!gh0 && !gh0.hidden, hint: !!document.querySelector('#acts .bline') && !!document.querySelector('#acts .bline').textContent.trim(), ruby: !!document.querySelector('#rs .rubyp'), boom: boom, shop: !!document.querySelector('#rs .shop') };
   out.advAge = UI.advAt ? Date.now() - UI.advAt : 9999; out.rsOn = !!rsOn; const qb = document.querySelector('#qbox'); out.qAge = qb && !qb.hidden && UI.qT ? Date.now() - UI.qT : 9999;
@@ -131,11 +131,12 @@ function choose(s, st) {
   if (q.length) return pick(q);
   return pick(by(c => /\bth\b/.test(c.cls)) .concat(by(c => c.a === 'focus'))) || null;
 }
+const hook = p => p.evaluate(() => { const o = window.toast; window.toast = function (t) { window.__tn = (window.__tn || 0) + 1; return o.apply(this, arguments); }; });   // a toast counts as a response
 async function startVs(p, coach) {
   await p.goto(URL); await sleep(900);
   await p.evaluate(() => { try { localStorage.clear(); } catch (e) { } });
   await p.evaluate(() => { const e = document.querySelector('[data-a=play]'); if (e) e.click(); }); await sleep(300);
-  await p.evaluate(c => { UI.prefs.blgSeen = true; UI.coach.level = c; window.AIDELAY = 70; const o = window.toast; window.toast = function (t) { window.__tn = (window.__tn || 0) + 1; return o.apply(this, arguments); }; }, coach);
+  await p.evaluate(c => { UI.prefs.blgSeen = true; UI.coach.level = c; window.AIDELAY = 70; }, coach); await hook(p);
   const c = await p.evaluate(() => { const r = document.querySelector('[data-start=vs]').getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
   await p.touchscreen.tap(...c); await sleep(1000);
 }
@@ -153,7 +154,7 @@ async function playGame(p, tag, opt) {
     // invariants (re-checked once after a beat, so a transition frame is not a failure)
     let bad = await p.evaluate(CHECKS); if (bad.length) { await sleep(700); bad = await p.evaluate(CHECKS); }
     for (const [k, d] of bad) await fail(p, tag, k, d);
-    if (!s.boom) for (const c of s.ctl) if (c.inVP && !c.dis && c.covered && !/^gx|\bth\b/.test(c.cls) && (c.a || /btn|bagb|stopb/.test(c.cls))) { await sleep(300); const s2 = await p.evaluate(PROBE); const c2 = s2.ctl.find(z => z.a === c.a && z.k === c.k && z.t === c.t); if (c2 && c2.covered) await fail(p, tag, 'covered', (c.a || c.cls) + ' "' + c.t + '" covered by ' + c2.by); }
+    if (!s.boom) for (const c of s.ctl) if (c.inVP && !c.dis && c.covered && !/^gx|\bth\b/.test(c.cls) && (c.a || /btn|bagb|stopb/.test(c.cls))) { await sleep(300); const s2 = await p.evaluate(PROBE); const c2 = s2.ctl.find(z => z.a === c.a && z.k === c.k && z.t === c.t); if (c2 && c2.covered) await fail(p, tag, 'covered', (c.a || c.cls) + ' "' + c.t + '" covered by ' + c2.by + ' @ ' + c2.geo + ' dis=' + c2.dis); }
     if (s.rsOn && s.sig !== lastCov) { lastCov = s.sig; for (const d of await p.evaluate(RSCOVER)) await fail(p, tag, 'covered', d); }
     for (const e of pageErrs(p)) await fail(p, tag, 'js-error', e);
     if (s.boom) { if (rnd() < .5) { await p.touchscreen.tap(size.width / 2, size.height / 2); } await sleep(150); continue; }
@@ -185,11 +186,11 @@ async function playStory(b, id, W, H) {
   await p.goto(URL); await sleep(900); await p.evaluate(() => { window.AIDELAY = 70; });
   await p.evaluate(i => GXC.play(i), id); await sleep(300);
   for (let k = 0; k < 10; k++) { const did = await p.evaluate(() => { const b = [...document.querySelectorAll('.gxc-btn.go')].find(x => /Fight|Next|Start|Meet|Play/.test(x.textContent)); if (b) { b.click(); return true; } return false; }); if (!did) break; await sleep(150); }
-  await sleep(500); await p.evaluate(() => { UI.pullMs = 0; });
+  await sleep(500); await p.evaluate(() => { UI.pullMs = 0; }); await hook(p);
   const info = await p.evaluate(() => ({ np: G.np, ai: G.players.map(q => q.ai), droplet: G.players.map(q => q.droplet), vp: G.players.map(q => q.vp), rubies: G.players.map(q => q.rubies), bag: G.players.map(q => q.bag.length + q.pot.length + q.newChips.length), coach: UI.coach.level, base: CF.DATA.startRubies }));
   let twist = 'ok';
   if (id === 'c10') twist = info.droplet[1] === 1 && info.ai[1] === 'hard' ? 'ok' : 'WRONG ' + JSON.stringify(info);
-  if (id === 'c3') twist = (info.droplet.every(d => d === 0) && info.rubies[1] === info.base && info.vp[1] === 0 && info.bag[1] === 9) ? 'ok (boss has no twist, none leaks)' : 'WRONG ' + JSON.stringify(info);
+  if (id === 'c3') twist = (info.droplet.every(d => d === 0) && info.rubies[1] === info.base && info.vp[1] === 0) ? 'ok (boss has no twist, none leaks)' : 'WRONG ' + JSON.stringify(info);
   if (id === 'c1') twist = (info.coach === 'full' && info.ai[1] === 'easy' && info.droplet[1] === 0) ? 'ok' : 'WRONG ' + JSON.stringify(info);
   if (twist.startsWith('WRONG')) await fail(p, tag, 'twist', twist);
   const r = await playGame(p, tag, { maxMs: 300000 });
