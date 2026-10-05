@@ -32,7 +32,7 @@ function handBoost(p){let b=0;for(const id of p.hand){const c=cd(id);if(c.t==='o
 function isDeadly(c){return (c.bad||[]).some(o=>o[0]==='death'||o[0]==='orcs'||o[0]==='dread')}
 // choose a move for seat s from its legal moves
 function aiMove(s){const p=P(s),vm=validMoves(s);if(!vm.length)return null;const by=a=>vm.filter(m=>m.act===a);
-  if(p.lv==='easy'&&rnd(100)<22){const safe=vm.filter(m=>!['toss','give','pick','use'].includes(m.act)&&!(m.act==='play'&&cd(m.card).t==='curse'&&m.tgt===s)&&!(m.act==='play'&&m.tgt==='m'&&G.cb&&G.cb.who===s));if(safe.length)return safe[rnd(safe.length)]}
+  if(p.lv==='easy'&&rnd(100)<22){const safe=vm.filter(m=>!['toss','give','pick','use','sell'].includes(m.act)&&!(m.act==='play'&&cd(m.card).t==='curse'&&m.tgt===s)&&!(m.act==='play'&&m.tgt==='m'&&G.cb&&G.cb.who===s));if(safe.length)return safe[rnd(safe.length)]}
   if(G.q)return aiAnswer(p,vm);
   const ph=G.phase;
   if(ph==='setup'||ph==='main'||ph==='after'||ph==='post'){const m=aiCalm(p,vm);if(m)return m;
