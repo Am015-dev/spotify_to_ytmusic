@@ -18,6 +18,7 @@ function seen(id) { return !!UI.coach.seen[id]; }
 function markSeen(id) { UI.coach.seen[id] = 1; if (UI.coach.level !== 'full') { try { const s = JSON.parse(lsGet('ld_tips') || '{}'); s[id] = 1; lsSet('ld_tips', JSON.stringify(s)); } catch (e) { } } }
 function seenEver(id) { try { return !!JSON.parse(lsGet('ld_tips') || '{}')[id]; } catch (e) { return false; } }
 function coachCheck() {
+  return; // no tip cards: play happens on the board
   if (!G || !UI.started || UI.coach.level === 'off' || UI.tip || UI.cards.length || UI.dlg) return;
   if (UI.busy || (G.phase === 'play' && UI.fz)) return;
   if (viewSeat() < 0) return;

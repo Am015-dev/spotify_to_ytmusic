@@ -197,15 +197,15 @@ function sinceHTML(me){if(!UI.since||!G||G.active!==me||!['window','main'].inclu
   return `<div class="since" role="status"><b>While you waited</b><ul>${UI.since.slice(0,3).map(x=>`<li>${x}</li>`).join('')}</ul></div>`}
 // ---- learn as you play: one short idea, the first time it matters (only in a "teach me" game) ----
 const LESSONS={
-  setup:'<b>Goal:</b> be the first hero to <b>level 10</b>. Your <b>strength</b> is your level + your items. Tap a glowing card in your hand to play it, then press Ready.',
-  main:'<b>Your turn:</b> kick open the door. A monster behind it means a fight: beat it to go up a level and take its treasure.',
-  win:'<b>You are stronger</b> than the monster (your number on the left, its number on the right). Press Fight to win. Rivals get one last chance to meddle first.',
-  lose:'<b>The monster is stronger.</b> Play a one-shot card from your hand, ask a rival to help for a share of the treasure, or run: roll 5 or more on a die to escape. If you fail, its Bad Stuff hits you.',
-  after:'<b>No monster this time.</b> Take a free face-down door card (Loot), or fight a monster from your hand to earn a level.',
-  post:'<b>Tidy up:</b> wear any new items, sell items worth 1,000 gold for a level, then end your turn.',
-  charity:'<b>Hand limit:</b> you may keep 5 cards (a Dwarf keeps 6). The rules give the extra cards to the lowest-level hero, so give away what helps them least. Then your turn ends.',
-  meddle:'<b>A rival’s fight.</b> You may meddle: make their monster stronger, curse them, or help. Or just let it be.',
-  window:'<b>Before a rival kicks their door</b> you may curse them or play a level-up on yourself. Or let them go on.'};
+  setup:'<b>Goal:</b> reach level 10. Tap glowing cards.',
+  main:'<b>Kick open the door.</b>',
+  win:'<b>You are stronger.</b> Press Fight.',
+  lose:'<b>Monster is stronger.</b> Play a card or run.',
+  after:'<b>No monster.</b> Loot a card, or fight one.',
+  post:'<b>Wear items, sell, end turn.</b>',
+  charity:'<b>Hand limit 5.</b> Give extras away.',
+  meddle:'<b>Their fight.</b> Meddle or let it be.',
+  window:'<b>Curse a rival,</b> or let them go.'};
 function learnSet(){try{return new Set(JSON.parse(localStorage.getItem('dkd_learned')||'[]'))}catch(e){return new Set(UI.learnedMem||[])}}
 function learnDone(k){const s=learnSet();s.add(k);UI.learnedMem=[...s];try{localStorage.setItem('dkd_learned',JSON.stringify([...s]))}catch(e){}}
 function lessonKey(me){if(!G||!G.learn||me<0||sideToAct()!==me||G.q)return null;const cb=G.cb;

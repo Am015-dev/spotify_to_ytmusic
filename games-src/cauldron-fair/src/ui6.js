@@ -180,7 +180,7 @@ function shopUI(p, q, legal) {
   for (const c of D.SHOP_COLORS) {
     const out = CF.bookOut(G, c), bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
     const st = h('div.stall' + (out ? '' : '.locked'));
-    st.appendChild(h('details.sth', h('summary', { 'aria-label': D.COLORS[c].name + ': how it works' }, h('b', D.COLORS[c].name), h('span.bi', { 'aria-hidden': 'true' }, out ? 'i' : 'day ' + D.BOOK_ROUND[c])), h('div.bx', bk.title + ': ' + bk.text)));
+    st.appendChild(h('details.sth', h('summary', { 'aria-label': D.COLORS[c].name + ': how it works' }, h('b', D.COLORS[c].name), h('span.bi', { 'aria-hidden': 'true' }, out ? 'i' : 'day ' + D.BOOK_ROUND[c])), h('div.bx', bk.title + ': ' + bk.text.split(/\s+/).slice(0, Math.max(2, 7 - bk.title.split(/\s+/).length)).join(' '))));
     const row = h('div.toks');
     D.COLORS[c].vals.forEach(val => {
       if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];

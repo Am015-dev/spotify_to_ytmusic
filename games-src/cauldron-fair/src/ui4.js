@@ -38,12 +38,12 @@ function renderReport() {
     const gain = (r.live ? p.vp : (G.hist.find(x => x.round === R.round && x.seat === p.seat) || {}).after || p.vp) - dayStart(p.seat, R.round), gTxt = gain >= 0 ? '+' + gain : '' + gain, why = dayWhy(p, R.round);
     const res = r.boom ? (r.prot ? [h('span.ok', 'exploded, safe')] : [h('span.bad', 'exploded'), h('div.sm', (r.mode === 'buy' ? 'went shopping' : r.mode === 'vp' ? 'took points' : 'choosing') + ' (white ' + r.white + ' was over the limit)')]) : [h('span.ok', 'stopped'), r.die && r.die.length ? h('div.sm.dieb' + (r.live ? '.roll' : ''), { title: 'Bonus die' }, r.die.map(f => h('span', { html: KIT.ICON.die(24, f) }))) : null];
     tab.appendChild(h('tr' + (p.seat === v ? '.me' : ''), h('td', h('span.nm', h('span', { html: avHTML(p.seat, 28) }), p.seat === v ? 'You' : p.name)),
-      h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', gTxt), why.length ? h('div.sm.why', why.join(' ')) : null), h('td', h('b', p.vp))));
+      h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', gTxt), why.length ? h('div.sm.why', why[0].split(/\s+/).slice(0, 7).join(' ')) : null), h('td', h('b', p.vp))));
     sumParts.push((p.seat === v ? 'You' : p.name) + ' ' + gTxt);
     cards.appendChild(h('div.dc' + (p.seat === v ? '.me' : '') + (r.boom && !r.prot ? '.bm' : ''), h('span.dav', { html: avHTML(p.seat, 44) }), h('b.dn', p.seat === v ? 'You' : p.name),
       h('span.dg', { html: ico('vp', 18) + ' ' + esc(gTxt) }), h('span.dr', r.boom ? (r.prot ? 'boom, safe' : 'boom! ★ or 🪙, not both') : 'stopped'), h('span.dt', 'total ' + p.vp)));
   }
-  if (G.players.some(p => { const r = dayRow(p, R); return r && r.die && r.die.length; })) tab.appendChild(h('tr', h('td.sm', { colspan: '5' }, 'The boxed number is the bonus die: the furthest cauldron that did not explode rolls it (a tie: all of them).')));
+  if (G.players.some(p => { const r = dayRow(p, R); return r && r.die && r.die.length; })) tab.appendChild(h('tr', h('td.sm', { colspan: '5' }, 'Boxed number: bonus die')));
   const lines = hotPriv ? [] : G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo) && !/ has decided\.$|^Stir!/.test(l.t)); let ev = null;
   if (lines.length) { ev = h('div.evlog', { role: 'log', 'aria-label': 'What happened' }); lines.forEach(l => ev.appendChild(h('div', youText(l.t)))); setTimeout(() => { ev.scrollTop = ev.scrollHeight; }, 0); }
   const fold = !!myq && !hotShared;   // a choice is waiting: put it first and fold today's results into one line
@@ -52,7 +52,7 @@ function renderReport() {
     if (!hotPriv) { const d = h('details.rsum', h('summary', h('b', 'Today: '), sumParts.join(' · '), h('span.sm', ' (tap for details)')), tab); if (ev) d.appendChild(ev); body.appendChild(d); }
   } else {
     if (!hotPriv) { body.appendChild(cards); const d = h('details.rsum', h('summary', 'Details'), tab); if (ev) d.appendChild(ev); body.appendChild(d); }
-    if (hotShared) body.appendChild(h('p.sm', 'Everybody has seen the table. Next, each maker makes the private choices (shop, rubies) while the others look away.'));
+    if (hotShared) body.appendChild(h('p.sm', 'Next: private choices. Others look away.'));
     else if (G.phase === 'eval') { const w = G.players.filter(p => p.q && p.seat !== v).map(p => p.name); body.appendChild(h('p.sm', w.length ? 'Waiting for ' + nameList(w) + '...' : 'Counting up...')); }
   }
   const done = G.phase !== 'eval' && !myq && !hotShared;

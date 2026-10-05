@@ -404,10 +404,10 @@ function dockModel(v) {
       if (myTurn) {
         M.cls = 'mine';
         const sel = UI.sel >= 0 ? UI.sel : -1; const legal = helper ? new Set(LD.playable(G, turn)) : new Set(LD.playable(G, turn));
-        M.p = helper ? 'You fly ' + pname(turn) + ': tap one of its face-up cards.' : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play any card.');
+        M.p = helper ? 'Tap a face-up card of ' + pname(turn) : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play any card.');
         M.sub = T.plays.length ? (T.ls === 4 ? 'Follow with a Lantern if you can.' : 'Follow ' + D.suits[T.ls].name + ' if you can. With no ' + D.suits[T.ls].name + ' left you may play anything, and a Lantern would win.') : '';
         { const k = G.seed + ':' + G.logN + ':' + G.att + ':' + G.tricks.length + ':' + T.plays.length + ':' + v; if (UI.abk !== k) { UI.abk = k; let r = null; try { r = LD.AI.allBreak(G, v); } catch (e) { } UI.ab = r; }
-          if (UI.ab) { const j = UI.ab.job; M.p = 'Careful: every card you can play breaks ' + (j >= 0 ? 'a job.' : 'the dive rule.'); M.sub = j >= 0 ? 'Whatever you play, \u201c' + TASKS[G.tasks[j].id].t.replace(/\.$/, '') + '\u201d will fail. Try Hint to see the least bad card.' : 'Whatever you play, the dive rule is broken.'; M.warn = 1; } }
+          if (UI.ab) { const j = UI.ab.job; M.p = 'Every card breaks ' + (j >= 0 ? 'a job.' : 'the rule.'); M.sub = j >= 0 ? 'Whatever you play, \u201c' + TASKS[G.tasks[j].id].t.replace(/\.$/, '') + '\u201d will fail. Try Hint to see the least bad card.' : 'Whatever you play, the dive rule is broken.'; M.warn = 1; } }
         if (UI.hint && UI.hint.c != null) M.info = '<b>Suggestion: ' + esc(cname(UI.hint.c)) + '.</b> ' + esc(UI.hint.why || '');
         btn(sel >= 0 && legal.has(sel) ? 'Play ' + cname(sel) : 'Play the card', 'playcard', { c: sel, dis: !(sel >= 0 && legal.has(sel)), cls: 'go' });
         if (pm.length) btn('Signal…', 'signal', { cls: 'alt' });
@@ -424,9 +424,9 @@ function dockModel(v) {
 function renderDock(v) {
   const pr = $('#prompt'), ac = $('#acts'), inf = $('#info'), ro = $('#roster'); if (!pr) return;
   const M = dockModel(v); pr.className = M.cls || '';
-  pr.innerHTML = ''; pr.append(M.p || ''); const ps = $('#psub'), phn = isPh(); if (M.sub && !phn) pr.append(h('small', M.sub)); if (ps) { ps.innerHTML = ''; ps.hidden = !(phn && M.sub); if (phn && M.sub) ps.textContent = M.sub; }
+  pr.innerHTML = ''; pr.append(M.p || ''); const ps = $('#psub'), phn = isPh(); if (M.sub && !phn) void 0; if (ps) { ps.innerHTML = ''; ps.hidden = true; }
   { const nw = $('#news'); if (nw) { const L = (UI.news || []).slice(isPh() ? -1 : -3); nw.innerHTML = ''; nw.hidden = !L.length || G.phase === 'over' || (isPh() && !!(UI.hint && UI.hint.c != null && G.phase === 'play' && iMustAct())); L.forEach((t, k) => nw.append(h('div' + (k === L.length - 1 ? '.nw1' : ''), t))); } }
-  inf.hidden = !M.info; inf.className = M.info ? 'why' : ''; inf.innerHTML = M.info || '';
+  inf.hidden = true; inf.className = ''; inf.innerHTML = '';
   ac.classList.toggle('many', M.acts.length > 6); ac.innerHTML = ''; M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
   // who is still deciding (simultaneous phases)
   ro.innerHTML = ''; if (G.phase === 'pass' || (G.phase === 'assign' && G.as.mode === 'vote')) { const pend = new Set(LD.pending(G)); G.players.filter(p => !p.helper).forEach(p => ro.append(h('span.rchip' + (pend.has(p.seat) ? '.w' : '.r'), { html: avatarS(p.seat, 48) }, p.name + (pend.has(p.seat) ? ' …' : ' ✓')))); }
@@ -743,6 +743,7 @@ function seen(id) { return !!UI.coach.seen[id]; }
 function markSeen(id) { UI.coach.seen[id] = 1; if (UI.coach.level !== 'full') { try { const s = JSON.parse(lsGet('ld_tips') || '{}'); s[id] = 1; lsSet('ld_tips', JSON.stringify(s)); } catch (e) { } } }
 function seenEver(id) { try { return !!JSON.parse(lsGet('ld_tips') || '{}')[id]; } catch (e) { return false; } }
 function coachCheck() {
+  return; // no tip cards: play happens on the board
   if (!G || !UI.started || UI.coach.level === 'off' || UI.tip || UI.cards.length || UI.dlg) return;
   if (UI.busy || (G.phase === 'play' && UI.fz)) return;
   if (viewSeat() < 0) return;
@@ -1650,19 +1651,19 @@ function tutOnly() {
 function tutCheck(once) {
   const v = viewSeat(), myTurn = G.phase === 'play' && G.trick.turn === v;
   if (G.phase === 'assign' && G.tricks.length === 0) {
-    if (once('t0', { who: 'mara', title: 'Welcome, diver!', body: 'I\'m Mara. In Lantern Dive the whole crew wins or loses TOGETHER. Each dive has job cards; each job belongs to ONE diver. Do every job and the dive is won.', btn: 'Show me' })) return true;
-    if (iMustAct() && once('t1', { who: 'mara', title: 'Take a job', body: 'This job says: win the Lantern 3. You will win it when the Lantern 3 is in a trick YOU win. Tap the job card on the table, then press "Take this job".', btn: 'Got it' })) return true;
+    if (once('t0', { who: 'mara', title: 'Welcome, diver!', body: 'Whole crew wins or loses together.', btn: 'Show me' })) return true;
+    if (iMustAct() && once('t1', { who: 'mara', title: 'Take a job', body: 'Win the Lantern 3. Tap the job.', btn: 'Got it' })) return true;
   }
-  if (G.phase === 'distress' && iMustAct() && once('tf', { who: 'mara', title: 'The distress flare', body: 'Optional help: everyone passes one card. We do not need it today — press "No flare".', btn: 'OK' })) return true;
-  if ((G.phase === 'signal' || G.phase === 'play' && G.tricks.length === 0) && iMustAct() && LD.pingMoves(G, v).length && once('ts', { who: 'mara', title: 'Signals', body: 'Once per dive you may SHOW the crew one card: your highest, lowest or only card of a colour. Skip it for now — press "No signal".', btn: 'OK' })) return true;
+  if (G.phase === 'distress' && iMustAct() && once('tf', { who: 'mara', title: 'The distress flare', body: 'Press No flare.', btn: 'OK' })) return true;
+  if ((G.phase === 'signal' || G.phase === 'play' && G.tricks.length === 0) && iMustAct() && LD.pingMoves(G, v).length && once('ts', { who: 'mara', title: 'Signals', body: 'Press No signal.', btn: 'OK' })) return true;
   if (myTurn && G.trick.plays.length === 0) {
-    if (G.tricks.length === 0 && once('t2', { who: 'mara', title: 'Your first trick', body: 'You lead: you play first and choose the colour. Everyone must follow that colour if they can, and the HIGHEST card of it wins. Lead your Coral 9 (it glows).', btn: 'Lead it' })) return true;
-    if (G.tricks.length === 1 && once('t3', { who: 'mara', title: 'You won it!', body: 'The highest Coral took the trick, and the winner leads next. Now lead your Tide 3: a low card loses on purpose. Losing tricks is a tool too.', btn: 'Lead it' })) return true;
-    if (G.tricks.length >= 2 && G.players[v].hand.includes(D.card(4, 3)) && once('t5', { who: 'mara', title: 'Lanterns are trumps', body: 'A Lantern beats every colour, and the highest Lantern wins. Nerea and Bram only hold lower Lanterns. Lead your Lantern 3 now to win it — that finishes your job!', btn: 'Lead it' })) return true;
+    if (G.tricks.length === 0 && once('t2', { who: 'mara', title: 'Your first trick', body: 'Lead your glowing Coral 9.', btn: 'Lead it' })) return true;
+    if (G.tricks.length === 1 && once('t3', { who: 'mara', title: 'You won it!', body: 'Lead your glowing Tide 3.', btn: 'Lead it' })) return true;
+    if (G.tricks.length >= 2 && G.players[v].hand.includes(D.card(4, 3)) && once('t5', { who: 'mara', title: 'Lanterns are trumps', body: 'Lead your glowing Lantern 3.', btn: 'Lead it' })) return true;
   }
-  if (myTurn && G.trick.plays.length > 0 && tutOnly() >= 0 && once('t6', { who: 'mara', title: pname(G.trick.lead) + ' led a Lantern for you!', body: 'Lanterns are trumps: they beat every colour, and the highest Lantern wins. A Lantern lead must be followed with a Lantern. Play your Lantern 3: it beats ' + G.trick.plays.map(p => cname(p.c)).join(' and ') + ', so you win it and finish your job!', btn: 'Play it' })) return true;
-  if (myTurn && G.trick.plays.length > 0 && G.trick.ls < 4 && LD.playable(G, v).length < G.players[v].hand.length && once('t4', { who: 'mara', title: 'Follow the colour', body: pname(G.trick.lead) + ' led ' + D.suits[G.trick.ls].name + '. You MUST play ' + D.suits[G.trick.ls].name + ' if you have it — the dim cards are not allowed. You never have to win.', btn: 'OK' })) return true;
-  if (G.tricks.length >= 1 && G.tricks.length < 3 && G.tricks[G.tricks.length - 1].w !== v && once('tl' + G.tricks.length, { who: 'mara', title: pname(G.tricks[G.tricks.length - 1].w) + ' won that trick', body: 'With ' + cname(G.tricks[G.tricks.length - 1].wc) + ', the highest card. That is fine: your job only cares about the Lantern 3. Teamwork tip: when a teammate is winning a trick, you can throw in a card THEY need for their job.', btn: 'OK' })) return true;
+  if (myTurn && G.trick.plays.length > 0 && tutOnly() >= 0 && once('t6', { who: 'mara', title: pname(G.trick.lead) + ' led a Lantern for you!', body: 'Play your Lantern 3.', btn: 'Play it' })) return true;
+  if (myTurn && G.trick.plays.length > 0 && G.trick.ls < 4 && LD.playable(G, v).length < G.players[v].hand.length && once('t4', { who: 'mara', title: 'Follow the colour', body: 'Follow the colour led.', btn: 'OK' })) return true;
+  if (G.tricks.length >= 1 && G.tricks.length < 3 && G.tricks[G.tricks.length - 1].w !== v && once('tl' + G.tricks.length, { who: 'mara', title: pname(G.tricks[G.tricks.length - 1].w) + ' won that trick', body: 'Fine: your job needs the Lantern 3.', btn: 'OK' })) return true;
   return false;
 }
 // ===================== part 9: Story mode (campaign.json + the shared chapter kit gx-campaign.js) =====================

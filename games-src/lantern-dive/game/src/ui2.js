@@ -302,10 +302,10 @@ function dockModel(v) {
       if (myTurn) {
         M.cls = 'mine';
         const sel = UI.sel >= 0 ? UI.sel : -1; const legal = helper ? new Set(LD.playable(G, turn)) : new Set(LD.playable(G, turn));
-        M.p = helper ? 'You fly ' + pname(turn) + ': tap one of its face-up cards.' : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play any card.');
+        M.p = helper ? 'Tap a face-up card of ' + pname(turn) : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play any card.');
         M.sub = T.plays.length ? (T.ls === 4 ? 'Follow with a Lantern if you can.' : 'Follow ' + D.suits[T.ls].name + ' if you can. With no ' + D.suits[T.ls].name + ' left you may play anything, and a Lantern would win.') : '';
         { const k = G.seed + ':' + G.logN + ':' + G.att + ':' + G.tricks.length + ':' + T.plays.length + ':' + v; if (UI.abk !== k) { UI.abk = k; let r = null; try { r = LD.AI.allBreak(G, v); } catch (e) { } UI.ab = r; }
-          if (UI.ab) { const j = UI.ab.job; M.p = 'Careful: every card you can play breaks ' + (j >= 0 ? 'a job.' : 'the dive rule.'); M.sub = j >= 0 ? 'Whatever you play, \u201c' + TASKS[G.tasks[j].id].t.replace(/\.$/, '') + '\u201d will fail. Try Hint to see the least bad card.' : 'Whatever you play, the dive rule is broken.'; M.warn = 1; } }
+          if (UI.ab) { const j = UI.ab.job; M.p = 'Every card breaks ' + (j >= 0 ? 'a job.' : 'the rule.'); M.sub = j >= 0 ? 'Whatever you play, \u201c' + TASKS[G.tasks[j].id].t.replace(/\.$/, '') + '\u201d will fail. Try Hint to see the least bad card.' : 'Whatever you play, the dive rule is broken.'; M.warn = 1; } }
         if (UI.hint && UI.hint.c != null) M.info = '<b>Suggestion: ' + esc(cname(UI.hint.c)) + '.</b> ' + esc(UI.hint.why || '');
         btn(sel >= 0 && legal.has(sel) ? 'Play ' + cname(sel) : 'Play the card', 'playcard', { c: sel, dis: !(sel >= 0 && legal.has(sel)), cls: 'go' });
         if (pm.length) btn('Signal…', 'signal', { cls: 'alt' });
@@ -322,9 +322,9 @@ function dockModel(v) {
 function renderDock(v) {
   const pr = $('#prompt'), ac = $('#acts'), inf = $('#info'), ro = $('#roster'); if (!pr) return;
   const M = dockModel(v); pr.className = M.cls || '';
-  pr.innerHTML = ''; pr.append(M.p || ''); const ps = $('#psub'), phn = isPh(); if (M.sub && !phn) pr.append(h('small', M.sub)); if (ps) { ps.innerHTML = ''; ps.hidden = !(phn && M.sub); if (phn && M.sub) ps.textContent = M.sub; }
+  pr.innerHTML = ''; pr.append(M.p || ''); const ps = $('#psub'), phn = isPh(); if (M.sub && !phn) void 0; if (ps) { ps.innerHTML = ''; ps.hidden = true; }
   { const nw = $('#news'); if (nw) { const L = (UI.news || []).slice(isPh() ? -1 : -3); nw.innerHTML = ''; nw.hidden = !L.length || G.phase === 'over' || (isPh() && !!(UI.hint && UI.hint.c != null && G.phase === 'play' && iMustAct())); L.forEach((t, k) => nw.append(h('div' + (k === L.length - 1 ? '.nw1' : ''), t))); } }
-  inf.hidden = !M.info; inf.className = M.info ? 'why' : ''; inf.innerHTML = M.info || '';
+  inf.hidden = true; inf.className = ''; inf.innerHTML = '';
   ac.classList.toggle('many', M.acts.length > 6); ac.innerHTML = ''; M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
   // who is still deciding (simultaneous phases)
   ro.innerHTML = ''; if (G.phase === 'pass' || (G.phase === 'assign' && G.as.mode === 'vote')) { const pend = new Set(LD.pending(G)); G.players.filter(p => !p.helper).forEach(p => ro.append(h('span.rchip' + (pend.has(p.seat) ? '.w' : '.r'), { html: avatarS(p.seat, 48) }, p.name + (pend.has(p.seat) ? ' …' : ' ✓')))); }

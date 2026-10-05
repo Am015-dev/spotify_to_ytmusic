@@ -1,28 +1,28 @@
 // ===================== part 2: render (board, thumbnails, dock, risk, questions) =====================
 // Text for every question the engine can ask (title, explanation). Options come from CF.moves().
 const QINFO = {
-  pick: ['Pedlar\'s Pick', () => 'Take one: a Cinder Moth chip, any 2-chip, or 3 rubies.'],
-  swap: ['Swap Stall', () => 'Trade 1 ruby for a 1-chip, or keep your ruby.'],
-  clear: ['Clear the Pods', () => 'Score 4 points, or take one white 1 out of your bag for good.'],
-  bribe: ['Rat Bribe', (p, d) => 'Move your rat stone back (up to ' + d.max + ') and take a ruby for every space.'],
-  bounty: ['Rat Bounty', p => 'Take any 4-chip, or score 1 point for each rat tail you trail the leader by (you trail by ' + (p.ratTails || 0) + ').'],
-  fork: ['Fork in the Road', () => 'Move your droplet 2 spaces, or take a Dusk Sigh chip.'],
-  haggle: ['Haggler\'s Hour', () => 'You drew these chips. You may swap one for the next higher chip of its colour; they all go back in the bag afterwards.'],
-  crow: ['Wren Feather: pick one', () => 'You drew these extra chips. Place one as your next chip (its power works at once) or none; the rest go back in the bag.'],
-  peek: ['Peek and Pick', () => 'You drew these chips. Place one after your last chip, or none.'],
-  y1: ['Kind cut', () => 'Put the white chip before it back in the bag? Its space stays empty and your score stays where it is.'],
-  restart: ['Do-Over', () => 'Tip every chip back into the bag and start the day again? You can do this once.'],
-  side: ['Scarlet Cap beside the pot', () => 'Add it after your last chip, keep it beside the pot for another day, or put it back in the bag.'],
-  gift: ['Spilled Brew', () => 'A neighbour\'s cauldron exploded. Take any 2-chip.'],
-  g2: ['Mossback gift', () => 'Choose the free chip this green chip earns.'],
-  g4: ['Drip moss', (p, d) => 'Pay 1 ruby per green chip for a droplet step (up to ' + d.max + ').'],
-  p1: ['Gentle sigh', d => 'You may take any of the rewards up to your ' + d.n + ' purple chips. Pass up the best one if the lower one suits you.'],
-  g3: ['Lucky-seven moss', d => 'Your white chips total exactly 7. Slide the last chip ' + d.s + ' spaces, or stay and keep the ruby on your space.'],
-  p2: ['Trade wind', () => 'Hand in purple chips for rewards (they are discarded). Each reward once; you may keep your chips instead.'],
-  p4: ['Upgrade sigh', () => 'Swap one chip of your pot for a bigger one of the same colour. The new chip goes into your bag; today your scoring space stays as it is.'],
-  de: ['Your cauldron exploded', (p, d) => 'Choose: take the ' + d.vp + ' victory point' + (d.vp === 1 ? '' : 's') + ' on your space, or shop with its ' + d.coins + ' coins.'],
-  shop: ['The fair stalls', (p, d) => 'You have ' + d.coins + ' coins. Buy one or two chips of different colours.'],
-  ruby: ['Rubies', () => 'Spend 2 rubies to move your droplet one space (every later day starts further on) or to refill your flask, or keep them.']
+  pick: ['Pedlar\'s Pick', () => 'Take a chip or 3 rubies'],
+  swap: ['Swap Stall', () => 'Trade 1 ruby for a chip'],
+  clear: ['Clear the Pods', () => 'Score 4, or drop a white 1'],
+  bribe: ['Rat Bribe', (p, d) => 'Rat back up to ' + d.max + ', rubies each'],
+  bounty: ['Rat Bounty', p => 'Take a 4-chip or points'],
+  fork: ['Fork in the Road', () => 'Droplet +2, or a Dusk Sigh'],
+  haggle: ['Haggler\'s Hour', () => 'Swap one chip for a higher one'],
+  crow: ['Wren Feather: pick one', () => 'Place one as your next chip'],
+  peek: ['Peek and Pick', () => 'Place one chip, or none'],
+  y1: ['Kind cut', () => 'Return the white chip to the bag?'],
+  restart: ['Do-Over', () => 'Restart the day? Once only'],
+  side: ['Scarlet Cap beside the pot', () => 'Add it, keep it, or return it'],
+  gift: ['Spilled Brew', () => 'Take any 2-chip'],
+  g2: ['Mossback gift', () => 'Pick your free chip'],
+  g4: ['Drip moss', (p, d) => '1 ruby per step, up to ' + d.max],
+  p1: ['Gentle sigh', d => 'Take up to ' + d.n + ' rewards'],
+  g3: ['Lucky-seven moss', d => 'Slide ' + d.s + ' spaces, or stay'],
+  p2: ['Trade wind', () => 'Trade purple chips for rewards'],
+  p4: ['Upgrade sigh', () => 'Swap one pot chip for a bigger'],
+  de: ['Your cauldron exploded', (p, d) => 'Take ' + d.vp + ' points or shop'],
+  shop: ['The fair stalls', (p, d) => 'Buy up to 2 chips'],
+  ruby: ['Rubies', () => 'Rubies: move droplet +1']
 };
 const EVAL_Q = { gift: 1, g2: 1, g4: 1, p1: 1, g3: 1, p2: 1, p4: 1, de: 1, shop: 1, ruby: 1 };
 function qKeys(m, p) {   // chips to show on an option button
@@ -47,12 +47,12 @@ function promptInfo() {
   if (hotSeat() && UI.holder < 0) return { text: 'Pass the device.' };
   if (p.q && !EVAL_Q[p.q.h]) return { text: QINFO[p.q.h][0] + ': ' + QINFO[p.q.h][1](p, p.q.d), mine: true };
   if (G.phase === 'brew') {
-    if (p.st === 'draw' && p.lock) return { text: 'You have decided. ' + (wn.length ? 'Waiting for ' + nameList(G.players.filter(q => q.st === 'draw' && !q.lock && !isMine(q.seat)).map(q => q.name)) + ', then everybody reveals together (Stir!).' : 'Revealing...') };
-    if (p.st === 'draw') { const rk = CF.risk(G, v); return { text: (G.round === 9 ? 'Last day, no shop: everyone picks Draw or Stop in secret, then all reveal. At the end 5 coins or 2 rubies = 1 point. ' : '') + (p.pot.length ? 'Draw another chip, or stop and keep your score.' : 'Tap Draw to pull your first chip from the bag.' + (G.round <= 2 ? ' Everyone brews at the same time, so the others are drawing too.' : '')), mine: true }; }
-    return { text: (p.boom ? 'Your cauldron exploded. ' : 'You stopped. ') + (wn.length ? 'Waiting for ' + nameList(wn) + '...' : 'Everyone is done.') };
+    if (p.st === 'draw' && p.lock) return { text: wn.length ? 'Decided. Waiting for others...' : 'Revealing...' };
+    if (p.st === 'draw') return { text: (G.round === 9 ? 'Last day: Draw or Stop, secretly.' : p.pot.length ? 'Draw another, or stop.' : 'Tap Draw for your first chip.'), mine: true };
+    return { text: (p.boom ? 'Your cauldron exploded. ' : 'You stopped. ') + (wn.length ? 'Waiting for others...' : 'Everyone is done.') };
   }
-  if (G.phase === 'prep') return { text: wn.length ? 'Waiting for ' + nameList(wn) + ' to choose...' : 'The day begins.' };
-  if (G.phase === 'eval') return { text: p.q ? QINFO[p.q.h][1](p, p.q.d) : (wn.length ? 'Waiting for ' + nameList(wn) + '...' : 'Counting the day.'), mine: !!p.q };
+  if (G.phase === 'prep') return { text: wn.length ? 'Waiting for others...' : 'The day begins.' };
+  if (G.phase === 'eval') return { text: p.q ? QINFO[p.q.h][1](p, p.q.d) : (wn.length ? 'Waiting for others...' : 'Counting the day.'), mine: !!p.q };
   return { text: '' };
 }
 function placePrompt() { }
@@ -142,7 +142,7 @@ function renderRisk() {
 function renderFort() {
   const e = $('#fort'); if (!e) return; const c = D.FORTUNE.find(x => x.id === G.fcard);
   if (!c || G.phase === 'over') { e.hidden = true; return; } e.hidden = false; e.className = c.kind;
-  e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', c.text)));
+  e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', c.text.split(/\s+/).slice(0, Math.max(2, 6 - c.name.split(/\s+/).length)).join(' ') + '…')));
 }
 function renderRoster() {
   const r = $('#roster'); if (!r) return; r.innerHTML = '';
