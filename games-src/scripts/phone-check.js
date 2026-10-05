@@ -83,8 +83,11 @@ const PAGE_LIB = `(() => {
         const words = (e.innerText || '').replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(w => /[a-z][a-z]/i.test(w));
         if (words.length > 8) wordy.push(words.length + 'w "' + words.slice(0, 6).join(' ') + '…"');
       }
+      // board-first: the element marked [data-board] must fill >=55% of a portrait screen during play
+      let board = null; const bd = document.querySelector('[data-board]');
+      if (bd && H > W) { const r = bd.getBoundingClientRect(); const vw = Math.max(0, Math.min(r.right, W) - Math.max(r.left, 0)), vh = Math.max(0, Math.min(r.bottom, H) - Math.max(r.top, 0)); board = Math.round(100 * vw * vh / (W * H)); }
       const de = document.documentElement;
-      return { wordy, covered, off, hscroll: Math.max(de.scrollWidth, document.body ? document.body.scrollWidth : 0) > W + 1, sw: de.scrollWidth, iw: W };
+      return { board, wordy, covered, off, hscroll: Math.max(de.scrollWidth, document.body ? document.body.scrollWidth : 0) > W + 1, sw: de.scrollWidth, iw: W };
     },
     snap() {
       let h = 0; const s = document.documentElement.outerHTML; h = s.length;
@@ -216,11 +219,12 @@ async function audit(page, st, tag) {
   for (const c of a.covered) st.covered.add(c);
   for (const o of a.off) st.off.add(o);
   if (tag !== 'start') for (const w of a.wordy || []) st.wordy.add(w);
+  if (tag !== 'start' && a.board !== null && a.board < 55) st.smallBoard.add(tag + ' ' + a.board + '%');
   if (a.hscroll) st.hscroll.add(tag + ' ' + a.sw + '>' + a.iw);
 }
 
 async function runScenario(browser, slug, sc, deadline) {
-  const st = { moves: 0, unresp: 0, unrespWhat: [], lat: [], covered: new Set(), off: new Set(), hscroll: new Set(), wordy: new Set(), errors: [], stuck: false, noCandidate: false, started: false, notes: [] };
+  const st = { moves: 0, unresp: 0, unrespWhat: [], lat: [], covered: new Set(), off: new Set(), hscroll: new Set(), wordy: new Set(), smallBoard: new Set(), errors: [], stuck: false, noCandidate: false, started: false, notes: [] };
   const ctx = await browser.newContext({ viewport: { width: sc.start.w, height: sc.start.h }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   page.on('pageerror', e => st.errors.push(String(e.message || e).split('\n')[0].slice(0, 120)));
@@ -282,6 +286,7 @@ function verdict(st) {
   if (st.covered.size) r.push('covered: ' + [...st.covered].slice(0, 2).join(', '));
   if (st.off.size) r.push('off-screen: ' + [...st.off].slice(0, 2).join(', '));
   if (st.hscroll.size) r.push('hscroll ' + [...st.hscroll][0]);
+  if (st.smallBoard.size) r.push('board <55% of screen: ' + [...st.smallBoard][0]);
   if (st.wordy.size) r.push('text >8 words: ' + [...st.wordy].slice(0, 2).join(', '));
   if (st.unresp > 1) r.push(st.unresp + ' dead taps');
   if (st.stuck) r.push('stuck 8s');
