@@ -14,7 +14,6 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
   `git fetch origin alex/brave-carson-rbpmlk && git merge`; never force-push.
 - If a command is blocked, stop and tell the owner; don't work around it.
 - No Co-Authored-By, Claude-Session or any other AI attribution lines in commits or PRs (owner's order, 5 Oct 2026).
-- No new branches (owner's order, 5 Oct 2026): sessions and workers commit only to `alex/brave-carson-rbpmlk`. Parallel workers share the tree and don't run git; the orchestrator commits.
 
 ## Lessons learnt (the owner's verdicts)
 - **"Not like the real game" / "boring":** implement the real rules, and make the real game's fun moment (the bag
