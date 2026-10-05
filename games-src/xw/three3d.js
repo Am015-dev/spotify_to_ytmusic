@@ -47,7 +47,7 @@ function init3D(){const cv=document.getElementById('c3');if(!cv||typeof THREE===
   const u=urlGfx();V3.pinned=!!u||gfxPref()!=='auto';const p=gfxPref();setQuality(u||(p==='auto'?gfxAuto():p));
   resize3D();V3.on=true;document.body.classList.add('three');V3.clock=performance.now();gfxLabel();
   setTimeout(()=>{try{makePortraits()}catch(e){console.warn('portraits off',e)}},300);
-  try{warm3D()}catch(e){console.warn('warm off',e)}
+  /* shader warm-up only where there is no GPU (it stalls start-up for seconds on iPhone); real GPUs compile on first use */if(V3.soft)try{warm3D()}catch(e){console.warn('warm off',e)}
   perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
 // ---- quality levels ----
 function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=V3.r;V3.q=q;const dpr=window.devicePixelRatio||1;
