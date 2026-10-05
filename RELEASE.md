@@ -1,15 +1,33 @@
-# v83 (scale + seamless + QA) — REBUILT, tPlay GATE RUNNING: DO NOT DEPLOY YET
+# v83 — READY (split build in out83/)
 
 ```
-./reapply.sh pAU1 pAU2 pOG1 pOB1 pOB2 pOB3 pOC1 pCV1 pCV2 pRL1 pJU1 pRL2 pGB1 pDR1 pDR2 pSC1 pSC2 pSM1 pSM2 pSM3 pSM4 pSM5 pSM6 pRL3 pRL4 pQA1 pQA2 pQA3 (.py)   → REAPPLY_OK
+./reapply.sh pAU1 pAU2 pOG1 pOB1 pOB2 pOB3 pOC1 pCV1 pCV2 pRL1 pJU1 pRL2 pGB1 pDR1 pDR2 pSC1 pSC2 pSM1 pSM2 pSM3 pSM4 pSM5 pSM6 pRL3 pRL4 pQA1 pQA2 pQA3 pQA7 (.py)   → REAPPLY_OK
 python3 tools/split_km.py overdrive.html out83
 ```
-Deploy files: out83/overdrive.html (1,803,664 B) + out83/km.js (1,961,521 B). Unsplit 3,769,436 B. tOut on out83: OUTBOOT PASS.
-- pSC2 (od-scale): human scale, 3 m road setback, glancing wall hits slide. pQA1–3 (od-qa): round collider corners, phone HUD layout, chase-camera guard (qa.js stays the outermost roamCam wrapper), park only below 15 km/h.
-- pRL4 (integration): while an otg2 event panel or result banner shows, hide the district plate and NEXT card, and right-align the panel in portrait so it clears the minimap. It sits next to pQA2's own rule (which only hides NEXT).
-- pRL3 (otg2 placed once for seamless Athens) IS in, at the coordinator's request. It cut the border-crossing hitch from 1,263 ms to 147 ms (×4 CPU). Caveat: tOG crashed once on it ("reading 'done'"), in the Frankfurt reload check, where pRL3 is inactive. It looks like a timing race in the test but is not proven. With pRL3, more otg2 spots sit near the old district borders, which are no longer gates under seamless.
-- Release gate (owner/coordinator): tools/tPlay.js (real touch/keyboard play) on the split build. It runs on v82 and v83 for comparison, plus smoke, tSC, tSM, tOG, tBA, tBF.
-- Phone comparison shots v82 vs v83: release/phone/.
+Deploy files: **out83/overdrive.html (1,805,608 B) + out83/km.js (1,961,521 B)**. Unsplit 3,771,389 B (over the 3.6 MB cap, so do not deploy it unsplit). The v82 files in out/ are unchanged.
+
+## Gate (split build)
+| check | result |
+|---|---|
+| tools/tOut.js (real out83 files) | OUTBOOT PASS, 0 errors |
+| smoke.js (with pQA7) | SMOKE PASS 12/12 (release/smoke_v83_split.png) |
+| tBA / tBF (before pQA7) | 30/0 · 9/1 (BF3 known) |
+| tSM (before pQA7) | 12/1: worst border-crossing frame 512 ms at ×4 CPU (147 ms with pRL3 alone; this run shared the CPU with two tPlay runs) |
+
+## tPlay (tools/tPlay.js, real touch/keyboard, 5 min per city; v83 run was on the build before pQA7, which only touches touch-state handling)
+| | v82 | QA baseline | **v83** |
+|---|---|---|---|
+| phone fra wall hits/min | 0.49 ✓ | 0.74 ✓ | 0.74 ✓ |
+| phone ath wall hits/min (gate ≤ 1) | 8.34 ✗ | 9.3 ✗ | **5.75 ✗** |
+| desk fra / desk ath wall hits/min | – (did not run) | 0.8 / 6.2 ✗ | **0 / 2.39 ✗** |
+| ath loading screens | 1 ✗ | 0 | 0 ✓ |
+| ath pedestrian scale vs cars | 1.33× ✗ | ok | 0.93× ✓ |
+| HUD over touch controls (phone) | 6 ✗ | 0 | 0 ✓ |
+| stuck / camera in building / console errors | ok / 0.4 % / 0 | ok | 0 % / 0 % / 0 |
+Ship rule (coordinator): smoke passes, 0 console errors, tPlay no worse than the QA baseline (only Athens wall hits fail) → **met**.
+Odd: tPlay reads the player size as 0 in Athens (phone and desk), so the player vehicle wasn't measured there.
+
+Not in v83 (go to v84): pQA4 (mission catch-up), pQA5 (Athens density), pQA6 (pause button, 12 px text), pQA8 (giant clamp, ring thinning). Owner questions still open: far fewer or opt-in activity events, and car-only in the city (you drive the jet "ship" form on city roads).
 
 ---
 # Release 82 — FAST-TRACK CANDIDATE (v82 RC): phase 2 + od-drive
