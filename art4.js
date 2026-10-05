@@ -11,9 +11,10 @@ function ART4_base(s,ud,boat){const host=ud.m;const key=host.uuid+'|'+(ud.gbM?ud
 function ART4_tyres(){if(ART4.ty)return ART4.ty;const im=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:ART_blobTex(),color:0,transparent:true,opacity:.7,depthWrite:false,fog:false,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}),8);im.count=0;im.frustumCulled=false;im.renderOrder=1;im.userData.keep=1;scene.add(im);return ART4.ty=im}
 function ART4_foam(){if(ART4.fm)return ART4.fm;const im=new THREE.InstancedMesh(new THREE.CircleGeometry(1,12).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.75,depthWrite:false,fog:false}),90);im.count=90;im.frustumCulled=false;im.userData.keep=1;ART4.fp=[];for(let i=0;i<90;i++){ART4.fp.push({x:0,y:-999,z:0,a:0,s:0});im.setMatrixAt(i,new THREE.Matrix4().makeScale(0,0,0))}ART4.fi=0;ART4.ft=0;scene.add(im);return ART4.fm=im}
 roamPose=(f=>function(s,dt){f(s,dt);try{const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m||s!==pl)return;const boat=(s.boatK||0)>.5;
-  {const hot=!!s.nitro;for(const rb of ud.ribbons||[])rb.visible=hot&&!boat;for(const f of ud.flares||[])f.visible=hot&&!boat}
+  // no hovercraft thrusters on LEGO vehicles: ribbons, flare sprites and neon nozzle cores stay hidden (boost = orange exhaust flames)
+  for(const rb of ud.ribbons||[])rb.visible=false;for(const f of ud.flares||[])f.visible=false;if(!ud.artNz){ud.artNz=[];ud.m.traverse(o=>{if(o.isMesh&&o.material&&o.material.toneMapped===false&&o.geometry&&(o.geometry.type==='SphereGeometry'||o.geometry.type==='CylinderGeometry'&&o.geometry.parameters&&o.geometry.parameters.openEnded))ud.artNz.push(o)})}for(const o of ud.artNz)o.visible=false;
   if(s.air){if(ART4.ty)ART4.ty.count=0;return}
-  const base=ART4_base(s,ud,boat);const land=(RO.landK||0);ud.m.position.y=base-land*.18+(boat?Math.sin((s.bob||0)*.55)*.08:0);
+  if(!boat){const base=ART4_base(s,ud,false);const land=(RO.landK||0);ud.m.position.y=base-land*.18}
   // front wheels steer (front = -z), spin order keeps the steer axis vertical
   const st=-(CTL.steer||0)*.42;let n=0;const T=ART4_tyres();
   for(const w of ud.gbM||[]){if(!w.userData.r||!ART4_vis(w))continue;if(w.position.z<-.2){w.rotation.order='YXZ';w.rotation.y=st}
@@ -25,4 +26,4 @@ roamPose=(f=>function(s,dt){f(s,dt);try{const ud=s.mesh&&s.mesh.userData;if(!ud|
   // boats: bow up with speed, foam trail from the stern
   if(boat){const F=ART4_foam(),fw=s._fw||V3(Math.sin(RO.h),0,Math.cos(RO.h));ART4.ft+=dt;if(Math.abs(RO.v)>3&&ART4.ft>.06){ART4.ft=0;const p=ART4.fp[ART4.fi++%90];p.x=RO.x-fw.x*3.6+(Math.random()-.5)*1.2;p.z=RO.z-fw.z*3.6+(Math.random()-.5)*1.2;p.y=RO.y+.05;p.a=0;p.s=.9+Math.min(1.6,Math.abs(RO.v)/30)}
    for(let i=0;i<90;i++){const p=ART4.fp[i];if(p.y<-900)continue;p.a+=dt;const k=Math.max(0,1-p.a/2.4);_m.makeScale(p.s*(1+p.a*1.4)*k+.001,1,p.s*(1+p.a*1.4)*k+.001);_m.setPosition(p.x,p.y,p.z);F.setMatrixAt(i,_m)}F.instanceMatrix.needsUpdate=true;F.visible=true;
-   const bow=Math.min(.16,Math.abs(RO.v)*.003);ud.m.rotateX(bow)}else if(ART4.fm)ART4.fm.visible=false}catch(e){}})(roamPose);
+   const bow=Math.min(.06,Math.abs(RO.v)*.001);ud.m.rotateX(bow)}else if(ART4.fm)ART4.fm.visible=false}catch(e){}})(roamPose);

@@ -6004,7 +6004,7 @@ function LK_paint(){if(!pl||!pl.mesh||LK.plM===pl.mesh)return;LK.plM=pl.mesh;con
 {const _db=debris;debris=(at,vel,n,...r)=>{_db(at,vel,n,...r);if(n>=12&&fxK()>0&&typeof SMOKE!=='undefined'&&SMOKE)puff(at,4,new THREE.Color(.16,.15,.17),2.2,7,1.6,.5,1.5,5)}}
 {const _ex=explode;explode=(s,...r)=>{const o=_ex(s,...r);try{if(fxK()>0&&s&&s.mesh){const at=s.mesh.position.clone();puff(at,6,new THREE.Color(.1,.09,.1),3,10,2.4,.55,2,6);fireball(at,4,4,.6)}}catch(e){}return o}}
 const _lkF=new THREE.Vector3();function LK_boost(){if(state!=='roam'||!pl||!pl.nitro||!RO.on||fxK()===0||!FIREB)return;if((LK.bf=(LK.bf||0)+1)%2)return;const fx=Math.sin(RO.h),fz=Math.cos(RO.h);
-  for(const sd of[-1,1])emitS(FIREB,_lkF.set(RO.x-fx*3.2+fz*sd*1.1,RO.y+.9,RO.z-fz*3.2-fx*sd*1.1),V3(-fx*14+rr(-1,1),rr(0,1.5),-fz*14+rr(-1,1)),rr(.12,.22),new THREE.Color(.6,1.4,3.2),.9,.25,.6,false)}
+  for(const sd of[-1,1])emitS(FIREB,_lkF.set(RO.x-fx*3.2+fz*sd*1.1,RO.y+.9,RO.z-fz*3.2-fx*sd*1.1),V3(-fx*5+rr(-.5,.5),rr(0,.8),-fz*5+rr(-.5,.5)),rr(.08,.14),new THREE.Color(2.6,1.3,.35),.5,.18,.35,false)}
 // ---- 5 · HUD polish (paint only: no sizes/positions change, so phone layouts are untouched)
 {const st=document.createElement('style');st.id='lkHud';st.textContent=`#roamGauge b{text-shadow:0 2px 0 rgba(0,0,0,.35),0 0 14px rgba(90,200,255,.35)}
 #rgBar,#rgHull{position:relative;box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}#rgBar::after,#rgHull::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.38),rgba(255,255,255,0) 60%);pointer-events:none}
@@ -8130,11 +8130,11 @@ function CR_cityGeo(nm){if(!nm||nm[0]==='#')return null;if(CR_CG[nm]!==undefined
   case'garbage-truck':A=CR_truck({body:'#2c8a5a'});wid=2.6;break;default:return CR_CG[nm]=null}
   if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A=CR_cab(A);if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A.push(['T1x6',-4,-3,0,K,-1],['T1x6',3,-3,0,K,-1],['T8x1',-4,-8,0,K,-1],['T8x1',-4,7,0,K,-1]);
   const br=A.map(([t,x,z,r,c,y])=>({t,x,z,y,r:r%4,m:0,c})).filter(b=>!['drv','drvR','stw','mir','lp','pipes','flag'].includes(b.t));CR_LO=2;CR_G=[];CR_W=[];const M=[],L=[];for(const b of br)GB_brickGeo(b,M,L);
-  const Wg=CR_W.map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return g});const body=mergeGeometries(M.concat(L)),wheels=mergeGeometries(Wg),glass=CR_G.length?mergeGeometries(CR_G):null;
+  const Wg=CR_W.map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return g});const MD=M.filter(CR_isDark),MB=M.filter(g=>!CR_isDark(g));const body=mergeGeometries(MB.concat(L)),wheels=mergeGeometries(Wg),glass=(CR_G.length||MD.length)?mergeGeometries(CR_G.concat(MD)):null;
   const box=new THREE.Box3().setFromBufferAttribute(body.attributes.position),bw=new THREE.Box3().setFromBufferAttribute(wheels.attributes.position),s=wid/(box.max.x-box.min.x),y0=Math.min(box.min.y,bw.min.y);
   for(const g of[body,wheels,glass].filter(Boolean)){g.translate(0,-y0,0);g.scale(s,s,s);g.rotateY(Math.PI);g.translate(0,.04,0)}return CR_CG[nm]={body,wheels,glass}}
  catch(e){console.warn('CR city',nm,e);return CR_CG[nm]=null}finally{CR_LO=0;CR_G=null;CR_W=null}}
-function CR_cityPost(im,nm,k,n){const G=CR_cityGeo(nm);if(!G)return;const w=new THREE.InstancedMesh(G.wheels,CR_WM||(CR_WM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8,metalness:0,envMapIntensity:.5})),n);w.frustumCulled=false;w.instanceMatrix.setUsage(THREE.DynamicDrawUsage);_m.makeScale(0,0,0);for(let j=0;j<n;j++)w.setMatrixAt(j,_m);im.userData.w=w;im.parent&&im.parent.add(w);if(G.glass){const gl=new THREE.InstancedMesh(G.glass,CR_GM,n);gl.frustumCulled=false;gl.instanceMatrix.setUsage(THREE.DynamicDrawUsage);for(let j=0;j<n;j++)gl.setMatrixAt(j,_m);gl.renderOrder=2;im.userData.g=gl;im.parent&&im.parent.add(gl)}
+function CR_cityPost(im,nm,k,n){const G=CR_cityGeo(nm);if(!G)return;const w=new THREE.InstancedMesh(G.wheels,CR_WM||(CR_WM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8,metalness:0,envMapIntensity:.5})),n);w.frustumCulled=false;w.instanceMatrix.setUsage(THREE.DynamicDrawUsage);_m.makeScale(0,0,0);for(let j=0;j<n;j++)w.setMatrixAt(j,_m);im.userData.w=w;im.parent&&im.parent.add(w);if(G.glass){const gl=new THREE.InstancedMesh(G.glass,CR_WM||(CR_WM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8,metalness:0,envMapIntensity:.5})),n);gl.frustumCulled=false;gl.instanceMatrix.setUsage(THREE.DynamicDrawUsage);for(let j=0;j<n;j++)gl.setMatrixAt(j,_m);gl.renderOrder=2;im.userData.g=gl;im.parent&&im.parent.add(gl)}
  const cc=new THREE.Color();for(let j=0;j<n;j++){cc.set(HCOL[(j*3+k)%HCOL.length]).lerp(new THREE.Color('#ffffff'),.08);im.setColorAt(j,cc)}im.instanceColor&&(im.instanceColor.needsUpdate=true);
  if(nm==='police'||nm==='garbage-truck'||(nm==='taxi'&&CID!=='fra')){const c=new THREE.Color('#ffffff');for(let j=0;j<n;j++)im.setColorAt(j,c);im.instanceColor&&(im.instanceColor.needsUpdate=true)}}
 const _crM=new THREE.Matrix4(),_crR=new THREE.Matrix4(),_crE=new THREE.Euler(),_crT1=new THREE.Matrix4().makeTranslation(0,.45,0),_crT2=new THREE.Matrix4().makeTranslation(0,-.45,0);
@@ -8173,6 +8173,10 @@ function CR_cab(A){const ar=A.find(e=>e[0]==='arch'),B=ar?ar[4]:'#ffffff',D='#1d
  add('B1x3',-3,-1,D,6);add('B1x3',2,-1,D,6);add('P1x3',-3,-1,D,9);add('P1x3',2,-1,D,9);
  add('B1x1',-3,2,B,6);add('B1x1',2,2,B,6);add('P1x1',-3,2,B,9);add('P1x1',2,2,B,9);add('B4x1',-2,2,D,6);add('P4x1',-2,2,D,9);
  add('P1x1',-3,-2,B,9);add('P1x1',2,-2,B,9);add('P4x1',-2,-2,D,9);add('T6x5',-3,-2,B,10);return out}
+
+
+const CR_WIN=new THREE.Color('#1d2630');
+function CR_isDark(g){const c=g.attributes.color;if(!c)return false;const r=c.getX(0),gg=c.getY(0),b=c.getZ(0);if(Math.abs(r-CR_WIN.r)+Math.abs(gg-CR_WIN.g)+Math.abs(b-CR_WIN.b)<.004)return false;return .2126*r+.7152*gg+.0722*b<.035}
 
 const GB_PRE=[['🛣 HOT ROD',CR_ROD,'car'],['⛰ MONSTER',CR_OFF,'4x4'],['🌊 AEGEAN',CR_BOAT,'boat'],['SPEEDSTER',CR_SPEED,'car']];const GB_PRE0=[['RACER',[['spoiler',-2,6,0,0],['exhaust',-2,5,0,10],['exhaust',1,5,0,10],['light',-1,-6,0,2],['b24',-4,0,0,11],['slope',-4,-2,0,0],['b12',-3,3,0,0],['tile',-1,1,0,9],['flag',-5,4,0,9]]],
  ['DOZER',[['b24',-3,-1,0,2],['b24',-5,-1,0,11],['b22',-3,3,0,2],['b24',-3,-1,0,11],['slope',-3,-3,0,2],['b22',-5,3,0,2],['b11',-6,1,0,0],['light',-6,-1,0,9],['exhaust',-1,4,0,10],['round',-4,5,0,11]]],
@@ -8677,7 +8681,7 @@ function ART_step(dt){if(!RO.on){if(ART3.pl)ART3.pl.visible=ART3.tr.visible=fals
 
 // sky light columns: 140 m mission/garage beacons become 1.5 m glowing ground rings; 1600 m searchlight beams are hidden
 function ART_beacons(dt){ART3.bt=(ART3.bt||0)-dt;if(ART3.bt<=0||!ART3.bl){ART3.bt=4;const L=[];scene.traverse(o=>{const m=o.material;if(!o.isMesh||!m||Array.isArray(m)||!m.transparent||!o.geometry||o.geometry.type!=='CylinderGeometry')return;const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();const h=g.boundingBox.max.y-g.boundingBox.min.y;if(h>=100)L.push(o)});ART3.bl=L}
-  for(const o of ART3.bl){const g=o.geometry,b=g.boundingBox,h=b.max.y-b.min.y;if(h>1000){o.visible=false;continue}const u=o.userData;if(o.position.y!==u.artY)u.artB=o.position.y;const k=1.5/h;o.scale.y=k;o.position.y=u.artB+b.min.y*(1-k);u.artY=o.position.y}}
+  for(const o of ART3.bl){const g=o.geometry,b=g.boundingBox,h=b.max.y-b.min.y;if(h>1000){o.visible=false;continue}const u=o.userData;if(o.position.y!==u.artY)u.artB=o.position.y;const k=1.5/h;o.scale.y=k;const wd=b.max.x-b.min.x;if(wd>0){const kx=Math.min(1,3/wd);o.scale.x=o.scale.z=kx}o.position.y=u.artB+b.min.y*(1-k);u.artY=o.position.y}}
 roamStep=(f=>function(dt){f(dt);try{ART_step(dt);ART_beacons(dt)}catch(e){}})(roamStep);
 // HUD skin: minimap N marker, purple NPC card with yellow header + round portrait, thin boost bar bottom-centre, bold italic headings
 {const st=document.createElement('style');st.id='artHud';st.textContent=`
@@ -8707,9 +8711,10 @@ function ART4_base(s,ud,boat){const host=ud.m;const key=host.uuid+'|'+(ud.gbM?ud
 function ART4_tyres(){if(ART4.ty)return ART4.ty;const im=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:ART_blobTex(),color:0,transparent:true,opacity:.7,depthWrite:false,fog:false,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}),8);im.count=0;im.frustumCulled=false;im.renderOrder=1;im.userData.keep=1;scene.add(im);return ART4.ty=im}
 function ART4_foam(){if(ART4.fm)return ART4.fm;const im=new THREE.InstancedMesh(new THREE.CircleGeometry(1,12).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.75,depthWrite:false,fog:false}),90);im.count=90;im.frustumCulled=false;im.userData.keep=1;ART4.fp=[];for(let i=0;i<90;i++){ART4.fp.push({x:0,y:-999,z:0,a:0,s:0});im.setMatrixAt(i,new THREE.Matrix4().makeScale(0,0,0))}ART4.fi=0;ART4.ft=0;scene.add(im);return ART4.fm=im}
 roamPose=(f=>function(s,dt){f(s,dt);try{const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m||s!==pl)return;const boat=(s.boatK||0)>.5;
-  {const hot=!!s.nitro;for(const rb of ud.ribbons||[])rb.visible=hot&&!boat;for(const f of ud.flares||[])f.visible=hot&&!boat}
+  // no hovercraft thrusters on LEGO vehicles: ribbons, flare sprites and neon nozzle cores stay hidden (boost = orange exhaust flames)
+  for(const rb of ud.ribbons||[])rb.visible=false;for(const f of ud.flares||[])f.visible=false;if(!ud.artNz){ud.artNz=[];ud.m.traverse(o=>{if(o.isMesh&&o.material&&o.material.toneMapped===false&&o.geometry&&(o.geometry.type==='SphereGeometry'||o.geometry.type==='CylinderGeometry'&&o.geometry.parameters&&o.geometry.parameters.openEnded))ud.artNz.push(o)})}for(const o of ud.artNz)o.visible=false;
   if(s.air){if(ART4.ty)ART4.ty.count=0;return}
-  const base=ART4_base(s,ud,boat);const land=(RO.landK||0);ud.m.position.y=base-land*.18+(boat?Math.sin((s.bob||0)*.55)*.08:0);
+  if(!boat){const base=ART4_base(s,ud,false);const land=(RO.landK||0);ud.m.position.y=base-land*.18}
   // front wheels steer (front = -z), spin order keeps the steer axis vertical
   const st=-(CTL.steer||0)*.42;let n=0;const T=ART4_tyres();
   for(const w of ud.gbM||[]){if(!w.userData.r||!ART4_vis(w))continue;if(w.position.z<-.2){w.rotation.order='YXZ';w.rotation.y=st}
@@ -8721,7 +8726,7 @@ roamPose=(f=>function(s,dt){f(s,dt);try{const ud=s.mesh&&s.mesh.userData;if(!ud|
   // boats: bow up with speed, foam trail from the stern
   if(boat){const F=ART4_foam(),fw=s._fw||V3(Math.sin(RO.h),0,Math.cos(RO.h));ART4.ft+=dt;if(Math.abs(RO.v)>3&&ART4.ft>.06){ART4.ft=0;const p=ART4.fp[ART4.fi++%90];p.x=RO.x-fw.x*3.6+(Math.random()-.5)*1.2;p.z=RO.z-fw.z*3.6+(Math.random()-.5)*1.2;p.y=RO.y+.05;p.a=0;p.s=.9+Math.min(1.6,Math.abs(RO.v)/30)}
    for(let i=0;i<90;i++){const p=ART4.fp[i];if(p.y<-900)continue;p.a+=dt;const k=Math.max(0,1-p.a/2.4);_m.makeScale(p.s*(1+p.a*1.4)*k+.001,1,p.s*(1+p.a*1.4)*k+.001);_m.setPosition(p.x,p.y,p.z);F.setMatrixAt(i,_m)}F.instanceMatrix.needsUpdate=true;F.visible=true;
-   const bow=Math.min(.16,Math.abs(RO.v)*.003);ud.m.rotateX(bow)}else if(ART4.fm)ART4.fm.visible=false}catch(e){}})(roamPose);
+   const bow=Math.min(.06,Math.abs(RO.v)*.001);ud.m.rotateX(bow)}else if(ART4.fm)ART4.fm.visible=false}catch(e){}})(roamPose);
 /*ART</art4.js>*/
 /*ART<art5.js>*/// ==== ART step 6 · road surfaces follow the physics ground (module art5.js; patch pART5.py): filler-grid streets and crossing squares were flat planes at y=.035,
 // so on hills the ground covered them (green "grass" streets) or they floated; their vertices are now draped onto groundY + offset
