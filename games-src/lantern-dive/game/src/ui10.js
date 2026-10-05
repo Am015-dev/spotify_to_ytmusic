@@ -60,7 +60,7 @@ document.addEventListener('pointerdown', e => { if (UI.pop && e.target.closest &
   const end = e => {
     if (!Dg) return; const d = Dg; Dg = null; const t = $('#table'); if (t) t.classList.remove('drop');
     if (!d.moved) return;
-    UI.noClickUntil = Date.now() + 400;
+    UI.noClickUntil = Date.now() + 120;
     d.el.classList.remove('drag'); d.el.style.transform = ''; d.el.style.zIndex = '';
     if (e.type === 'pointerup' && overTable(e)) { if (d.drone) tapDrone(d.id); else tapHand(d.id); } else { render(); }
   };

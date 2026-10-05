@@ -15,7 +15,7 @@ function missionFrom(opt) {
 }
 function resetUI(mode, cfg) {
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
-  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0 });
+  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0, fingerOn: mode !== 'ai' && (+lsGet('ld_finger') || 0) < 3, holdJobs: null });
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
 }

@@ -162,7 +162,7 @@ document.addEventListener('pointerdown', e => { if (UI.pop && e.target.closest &
   const end = e => {
     if (!Dg) return; const d = Dg; Dg = null; const t = $('#table'); if (t) t.classList.remove('drop');
     if (!d.moved) return;
-    UI.noClickUntil = Date.now() + 400;
+    UI.noClickUntil = Date.now() + 120;
     d.el.classList.remove('drag'); d.el.style.transform = ''; d.el.style.zIndex = '';
     if (e.type === 'pointerup' && overTable(e)) { if (d.drone) tapDrone(d.id); else tapHand(d.id); } else { render(); }
   };
@@ -242,13 +242,13 @@ function seatMarks() {
   if (!G || G.phase === 'over') return m;
   const v = viewSeat();
   if (G.phase === 'assign' && G.as.mode === 'vote' && iMustAct() && !UI.busy) myMoves().forEach(x => { if (x.t === 'vote') m.vote.add(x.f); });
-  if (G.phase === 'pass' || (G.phase === 'assign' && G.as.mode === 'vote')) { const pend = new Set(LD.pending(G)); G.players.forEach(p => { if (p.helper) return; (pend.has(p.seat) ? m.pend : m.ready).add(p.seat); }); }
+  if (G.phase === 'pass') { const pend = new Set(LD.pending(G)); G.players.forEach(p => { if (p.helper) return; (pend.has(p.seat) ? m.pend : m.ready).add(p.seat); }); }
   return m;
 }
 function seatEl(s, act, mk) {
   const p = G.players[s]; if (p.helper) return droneEl(s, act, mk);
   const won = tricksWon()[s], cm = s === G.cap, vote = mk.vote.has(s);
-  const b = h('button.seat' + (act === s ? '.act' : '') + (vote ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && (G.phase === 'pass' || G.phase === 'assign') ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (cm ? ', Commander' : '') + ', ' + p.hand.length + ' cards' });
+  const b = h('button.seat' + (act === s ? '.act' : '') + (vote ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (cm ? ', Commander' : '') + ', ' + p.hand.length + ' cards' });
   const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 17 }), title: 'Commander' }));
   const t = pingTok(s, 18); if (t) { t.classList.add('pk'); av.append(t); }
   b.append(h('span.top', av, h('span.nm', p.name)), h('span.bdgs', h('span.bdg.n', { html: CARD_ICO + '<b>' + p.hand.length + '</b>', title: p.hand.length + ' cards left' }), h('span.bdg.t', { html: TRICK_ICO + '<b>' + won + '</b>', title: won + ' tricks won' })));
@@ -290,7 +290,7 @@ function tableGeo() {
   const compact = side || small;
   const av = side ? 28 : (small ? 28 : 32), jr = Math.min(2, Math.max(1, Math.ceil(G.tasks.length / Math.max(1, G.np))));
   const seatW = side ? 132 : Math.round(Math.min(90, W * .23)), seatH = side ? 76 : (small ? 100 : 116);
-  const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 40 : 54;
+  const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : 54;
   const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, seats: [], slots: [] };
   const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
   geo.dw = dw; geo.droneW = droneW; geo.dh = 44 + Math.round(dw * 1.4) + 14;
@@ -362,7 +362,7 @@ function renderFelt(v) {
     const cols = free <= 1 ? 1 : (pw < 260 ? 2 : (free <= 4 ? 2 : 3)), tw = Math.max(86, Math.min(150, Math.floor((pw - 4 - 8 * (cols - 1)) / cols)));
     G.tasks.forEach((t, i) => {
       if (t.owner >= 0) return; const d = TASKS[t.id], can = mineTurn && mv.some(m => m.t === 'take' && m.i === i);
-      const c = h('button.jcard' + (can ? '.glow' : (mineTurn ? '.no' : '.off')), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, style: 'width:' + tw + 'px', 'aria-label': d.s + ', difficulty ' + jobDiff(i) + (can ? '' : ', not available') });
+      const c = h('button.jcard' + (can ? '.glow' : (mineTurn && mv.some(m => m.t === 'take') ? '.no' : '.off')), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, style: 'width:' + tw + 'px', 'aria-label': d.s + ', difficulty ' + jobDiff(i) + (can ? '' : ', not available') });
       const dd = h('span.dd', ...Array.from({ length: jobDiff(i) }, () => h('i')));
       c.append(h('b', d.s), dd);
       if (!d.cap) c.append(h('span.nocap', { title: 'Not for the Commander', html: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke-width="2.4"/><path d="M6 6L18 18" stroke-width="2.4"/></svg>' }));
@@ -394,7 +394,7 @@ function renderLead(lead, pile, v) {
 function renderMine(v) {
   const box = $('#mine'); box.innerHTML = ''; if (!G) return;
   const s = v >= 0 ? v : 0, p = G.players[s], act = (G.phase === 'play' && G.trick ? G.trick.turn : actorSeat()), cm = s === G.cap, mk = seatMarks();
-  const me = h('button.me' + (act === s ? '.act' : '') + (mk.vote.has(s) ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && (G.phase === 'pass' || G.phase === 'assign') ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': 'Your seat' });
+  const me = h('button.me' + (act === s ? '.act' : '') + (mk.vote.has(s) ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': 'Your seat' });
   const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 18 }) }));
   me.append(av, h('span.who', h('span.nm', v >= 0 && (UI.mode !== 'hot' && !NET.on) ? 'You' : p.name), h('span.bdgs', h('span.bdg.t', { html: TRICK_ICO + '<b>' + tricksWon()[s] + '</b>', title: tricksWon()[s] + ' tricks won' }))));
   box.append(me);
@@ -443,7 +443,7 @@ function renderHand(v) {
   });
   // Layout (absolute): one row when every card keeps >= 44 px (and >= 55 % of its width) visible, else two rows. A tap in the middle of a card always lands on that card.
   const hw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hw')) || 60, W = Math.max(200, box.clientWidth - 12), n = hand.length, ch = hw * 1.4;
-  const need = Math.max(32, hw * .5), maxP = hw * 1.04;
+  const short = document.documentElement.classList.contains('ph-short') || (box.parentNode.parentNode.classList.contains('side')), need = short ? 32 : Math.max(44, hw * .55), maxP = hw * 1.04;
   const pitchFor = m => m > 1 ? Math.min(maxP, (W - hw) / (m - 1)) : 0;
   const rows = n > 1 && pitchFor(n) < need && n >= 7 ? 2 : 1, per = rows === 2 ? Math.ceil(n / 2) : n, pitch = pitchFor(per);
   const rowStep = Math.round(ch * .64), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
@@ -565,7 +565,7 @@ function missionFrom(opt) {
 }
 function resetUI(mode, cfg) {
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
-  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0 });
+  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0, fingerOn: mode !== 'ai' && (+lsGet('ld_finger') || 0) < 3, holdJobs: null });
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
 }

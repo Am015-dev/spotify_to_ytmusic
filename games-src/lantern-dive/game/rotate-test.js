@@ -35,8 +35,8 @@ async function one(browser, gi) {
       for (let k = 0; k < 7; k++) {
         const st = await page.evaluate('({over:G.phase==="over",must:iMustAct(),busy:UI.busy})'); if (st.over) return;
         if (st.must && !st.busy) {
-          const r = await page.evaluate(`(()=>{const q=s=>[...document.querySelectorAll(s)].filter(e=>e.getBoundingClientRect().width>3&&!e.disabled&&!e.closest('[hidden]'));const e=q('#pool .jcard.glow')[0]||q('#hand .hc.glow')[0]||q('#opp .dc.glow')[0]||q('.seat.glow')[0]||q('#acts button')[0];if(!e)return null;const r=e.getBoundingClientRect();const t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {x:r.left+r.width/2,y:r.top+r.height/2,ok:!!t&&(t===e||e.contains(t)||t.contains(e))}})()`);
-          if (r && r.ok) await page.touchscreen.tap(r.x, r.y); else if (r) issues.add('a glowing target is covered after rotating');
+          const r = await page.evaluate(`(()=>{const q=s=>[...document.querySelectorAll(s)].filter(e=>e.getBoundingClientRect().width>3&&!e.disabled&&!e.closest('[hidden]'));const e=q('#pool .jcard.glow')[0]||q('#hand .hc.glow')[0]||q('#opp .dc.glow')[0]||q('.seat.glow')[0]||q('#acts button')[0];if(!e)return null;const r=e.getBoundingClientRect();const t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {x:r.left+r.width/2,y:r.top+r.height/2,ok:!!t&&(t===e||e.contains(t)||t.contains(e)),cov:t?(t.tagName+'#'+t.id+'.'+String(t.className).slice(0,30)+' over '+e.className.slice(0,20)+' '+Math.round(r.left)+','+Math.round(r.top)+' vp='+innerWidth+'x'+innerHeight):'none'}})()`);
+          if (r && r.ok) await page.touchscreen.tap(r.x, r.y); else if (r) issues.add('a glowing target is covered after rotating: ' + r.cov);
         }
         await sleep(260);
       }
