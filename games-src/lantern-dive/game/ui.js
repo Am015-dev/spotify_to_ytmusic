@@ -115,12 +115,12 @@ function actorSeat() {
 }
 // ---- sizes: hand card width, trick card width, drone card width, portrait size (CSS variables) ----
 function layoutVars() {
-  const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), land = ph && innerWidth > innerHeight;
+  const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), land = ph && GXV.now().w > GXV.now().h;
   let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(60, Math.round(H * .092)))) : Math.max(60, Math.min(104, Math.round(H * .125)));
   const np = G ? G.np : 4, opp = np - 1;
   let cw = ph ? Math.max(40, Math.min(56, Math.round(hw * .95))) : Math.max(60, Math.min(124, Math.round(Math.min(H * .165, W * .1))));
   const dw = ph ? Math.max(40, Math.min(46, Math.floor((W - 16) / 7) - 4)) : Math.max(46, Math.min(60, Math.floor((W - 40) / 7) - 6));
-  const short = ph && !land && innerHeight < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
+  const short = ph && !land && GXV.now().h < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
   const av = ph ? (land || short ? 30 : 34) : 44;
   const r = document.documentElement.style; r.setProperty('--hw', hw + 'px'); r.setProperty('--cw', cw + 'px'); r.setProperty('--dw', dw + 'px'); r.setProperty('--av', av + 'px');
   if (KIT.ART.table && !document.documentElement.style.getPropertyValue('--tableimg')) r.setProperty('--tableimg', 'url("' + KIT.ART.table + '")');
@@ -256,7 +256,7 @@ function renderFelt(v) {
   const W = felt.clientWidth || 300, H = felt.clientHeight || 160, n = G.np;
   const shown = playsShown(), act = G.phase === 'play' && G.trick && !UI.fz ? G.trick.turn : -1;
   const winS = UI.fz && UI.fz.winner != null && UI.fz.win ? UI.fz.winner : -1;
-  const small = document.documentElement.classList.contains('ph-short'), strip = (isPh() && innerWidth > innerHeight) || small ? 0 : 46, top = (small ? 26 : 20) + (G.boss && G.phase !== 'assign' ? 46 : 0);   // a boss bar takes the felt's top band   // small phones: Last trick sits in the felt's top corner, not in a bottom strip   // the bottom strip holds Last trick / Won (never over a played card)
+  const small = document.documentElement.classList.contains('ph-short'), strip = (isPh() && GXV.now().w > GXV.now().h) || small ? 0 : 46, top = (small ? 26 : 20) + (G.boss && G.phase !== 'assign' ? 46 : 0);   // a boss bar takes the felt's top band   // small phones: Last trick sits in the felt's top corner, not in a bottom strip   // the bottom strip holds Last trick / Won (never over a played card)
   for (let rel = 0; rel < n; rel++) {
     const s = (from + rel) % n; const [x, y0] = slotPos(rel, n, W, Math.max(60, H - strip - top), (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 56) * 1.4 + 4), y = y0 + top;
     const slot = h('div.tslot' + (act === s ? '.turn' : '') + (winS === s ? '.win' : ''), { 'data-seat': s, style: 'left:' + x + 'px;top:' + y + 'px' });
@@ -827,6 +827,7 @@ function showResult() {
     if (ok) { const n = p.done[m.id]; box.append(h('p', 'Logged in your logbook: dive ' + m.id + ' done in ' + n + ' attempt' + (n === 1 ? '' : 's') + (p.flare[m.id] ? ' (the flare counts one).' : '.'))); }
     else box.append(h('p.sm', 'Attempts so far on this dive: ' + (p.tries[m.id] || 0) + '. If the jobs could not be done from the start, try with new jobs.'));
   } else if (m.kind === 'deep' && ok) box.append(h('p', 'Deep dive ' + m.d + ' complete. The next one is difficulty ' + (m.d + 1) + '.'));
+  if (UI.camp && typeof GXC !== 'undefined' && GXC.active()) { campResult(box, ok); rs.append(box); snd(ok ? 'win' : 'lose'); return; }
   if (UI.mode === 'descent') { descResult(box, ok); rs.append(box); snd(ok ? 'win' : 'lose'); return; }
   const bt = h('div.cbtns');
   const host = !NET.on || isHost();
@@ -973,7 +974,8 @@ function titleEl() {
     h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Lantern Dive')),
     h('p.tag', 'Dive together. Say nothing. Trust the lantern.'),
     h('div.tbtns',
-      h('button.tbtn.go', { 'data-a': 'descent', type: 'button' }, h('b', 'The Descent'), ' ', h('span', '4 zones, 4 bosses')),
+      window.CAMPAIGN ? h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story'), ' ', h('span', campLine())) : null,
+      h('button.tbtn' + (window.CAMPAIGN ? '' : '.go'), { 'data-a': 'descent', type: 'button' }, h('b', 'The Descent'), ' ', h('span', '4 zones, 4 bosses')),
       h('button.tbtn', { 'data-a': 'guided', type: 'button' }, h('b', 'Training'), ' ', h('span', 'a dive with Mara, step by step')),
       h('button.tbtn', { 'data-a': 'play', type: 'button' }, h('b', 'Free play'), ' ', h('span', 'any dive, any crew')),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), ' ', h('span', 'with friends, free')),
@@ -1075,6 +1077,8 @@ document.addEventListener('click', ev => {
     case 'rsclose': closeRS(); break;
     case 'takedev': case 'takeDevice': takeDevice(); break;
     case 'play': UI.sv = 'setup'; renderStart(); break;
+    case 'story': campOpen(); break;
+    case 'campfin': closeRS(); campFinish(); break;
     case 'descent': UI.sv = 'descent'; renderStart(); break;
     case 'descgo': closeRS(); descGo(); break;
     case 'descmap': closeRS(); showStart(); UI.sv = 'descent'; renderStart(); break;
@@ -1109,15 +1113,14 @@ document.addEventListener('click', ev => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop) closePop(); else if (UI.rsOpen && G && G.phase === 'over' && UI.overShown) closeRS(); } });
 // ---------- phone mode ----------
 function applyPhone() {
-  const q = /[?&]phone=(\d)/.exec(location.search); const w = innerWidth, hh = innerHeight, short = Math.min(w, hh);
+  const q = /[?&]phone=(\d)/.exec(location.search); const vm = (window.GXV ? GXV.now() : { w: innerWidth, h: innerHeight }), w = vm.w, hh = vm.h, short = Math.min(w, hh);
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
   r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(108, Math.min(128, Math.round(hh * .15))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !NET.on && UI.sv === 'setup') renderStart(); }
 }
-let rzT = 0;
-function onResize() { clearTimeout(rzT); rzT = setTimeout(() => { applyPhone(); if (G && UI.started) render(); }, 60); }
+function relayout() { applyPhone(); if (G && UI.started) render(); if (typeof pxResize === 'function') { try { pxResize(true); } catch (e) { } } }
 // ---------- boot ----------
 function boot() {
   GX.init({ key: 'ld' });
@@ -1128,8 +1131,7 @@ function boot() {
   GX.drawer('setd', 'Menu', h('div#setbody'));
   GX.onShow = id => { renderDrawers(); };
   loadPrefs(); applyPhone();
-  addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
-  const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { clearTimeout(rzT); rzT = setTimeout(() => { if (G && UI.started) render(); }, 40); } }).observe(bd);
+  GXV.watch(relayout);
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'ld' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); } } catch (e) { }
   pxPerfReg();
   pxInit().then(ok => { if (ok) { pxPerfReg(); if (G && UI.started) render(); } });
@@ -1663,3 +1665,63 @@ function tutCheck(once) {
   if (G.tricks.length >= 1 && G.tricks.length < 3 && G.tricks[G.tricks.length - 1].w !== v && once('tl' + G.tricks.length, { who: 'mara', title: pname(G.tricks[G.tricks.length - 1].w) + ' won that trick', body: 'With ' + cname(G.tricks[G.tricks.length - 1].wc) + ', the highest card. That is fine: your job only cares about the Lantern 3. Teamwork tip: when a teammate is winning a trick, you can throw in a card THEY need for their job.', btn: 'OK' })) return true;
   return false;
 }
+// ===================== part 9: Story mode (campaign.json + the shared chapter kit gx-campaign.js) =====================
+// A chapter is a real logbook dive with its own crew and (at most) one twist. The twists exist only here; the normal rules never change.
+UI.camp = null;
+function campTw(def) { return (def && def.twist && def.twist.id) || ''; }
+function campOk(g) { return !!(g && g.phase === 'over' && g.result && g.result.ok); }
+function campMetrics(g) {
+  const mine = g.tasks.filter(t => t.owner === 0).length, pings = g.pings.filter(p => p.seat === 0).length;
+  return { won: campOk(g), attempts: g.att, flare: g.distress ? 1 : 0, pings, myJobs: mine };
+}
+function campIsWon(g, def) {
+  if (!campOk(g)) return false; const t = def.twist;
+  if (t && t.id === 'no-flare' && g.distress) return false;
+  if (t && t.id === 'air-limit' && g.att > (t.param || 4)) return false;
+  return true;
+}
+// twist limit already broken: no point retrying this dive
+function campDead(g, def) {
+  const t = def && def.twist; if (!t) return false;
+  if (t.id === 'no-flare') return !!g.distress; if (t.id === 'air-limit') return g.att >= (t.param || 4); return false;
+}
+function campStart(def) {
+  const s = def.setup || {}, t = def.twist || null, mates = (t && t.id === 'rookie-mates' ? t.param : s.mates) || 'normal';
+  let np = s.np || 4; if (t && t.id === 'big-team') np = t.param || 5;
+  const o = { camp: def, np, kind: 'log', mission: s.mission || 1, seats: [0, 1, 2, 3], lv: [mates, mates, mates, mates], level: 'normal', timer: !!((t && t.id === 'clock-on') || s.timer) };
+  UI.seed = s.seed != null ? s.seed : null;
+  newGame(s.mode === 'guided' ? 'guided' : 'vs', o);
+  UI.camp = def;
+  if (s.mode !== 'guided') { UI.coach.level = def.hints ? 'full' : 'off'; render(); }
+  try { toast('Goal: ' + def.goal.text); } catch (e) { }
+}
+function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
+function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); GXC.open(); }
+function campOn() { return !!(UI.camp && typeof GXC !== 'undefined' && GXC.active()); }
+// result footer inside a story chapter (called from showResult)
+function campResult(box, ok) {
+  const def = UI.camp, won = campIsWon(G, def), dead = campDead(G, def), bt = h('div.cbtns');
+  if (def.twist && def.twist.text) box.append(h('p.sm', def.twist.text));
+  if (ok && !won) box.append(h('p', 'The boss rule was broken, so the chapter is not won.'));
+  if (!won && !dead) bt.append(h('button.btn.go', { 'data-a': 'retrysame', type: 'button' }, 'Try again (same jobs)'));
+  bt.append(h('button.btn' + (won || dead ? '.go' : '.alt'), { 'data-a': 'campfin', type: 'button' }, won ? 'Continue the story' : 'Leave the dive'));
+  bt.append(h('button.btn.alt', { 'data-a': 'rsclose', type: 'button' }, 'Look at the table'));
+  box.append(bt);
+}
+{ const _ng = newGame; newGame = function (mode, o) { if (!(o && o.camp)) UI.camp = null; return _ng.apply(this, arguments); }; }
+function campLine() {
+  try {
+    if (typeof GXC === 'undefined' || !window.CAMPAIGN) return '';
+    const p = GXC.progress(), ch = window.CAMPAIGN.chapters, n = ch.filter(c => p.ch[c.id] && p.ch[c.id].beaten).length;
+    return n ? n + ' of ' + ch.length + ' chapters done' : 'Ten chapters, three bosses';
+  } catch (e) { return ''; }
+}
+function campInit() {
+  if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
+  GXC.init({
+    game: 'lantern-dive', data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
+    onExit: () => { UI.camp = null; showStart(); },
+    scores: g => g.players.map(() => 0), seats: g => g.players.map((p, i) => ({ name: i === 0 ? 'You' : p.name, me: i === 0, ai: p.ai || undefined }))
+  });
+}
+campInit();

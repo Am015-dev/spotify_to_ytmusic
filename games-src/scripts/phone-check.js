@@ -7,9 +7,11 @@ const fs = require('fs'), path = require('path'), cp = require('child_process');
 const { chromium } = require('playwright');
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const GAMES = path.join(ROOT, 'games');
-const SHOTS = path.join(__dirname, 'phone-check-shots');
-const OUT = path.join(__dirname, 'phone-check-results.md');
+// Env overrides (used by build-all.py): GAMES_DIR = folder holding <slug>/index.html (default games/), PC_OUT_DIR = where results + shots go.
+const GAMES = process.env.GAMES_DIR ? path.resolve(process.env.GAMES_DIR) : path.join(ROOT, 'games');
+const OUT_DIR = process.env.PC_OUT_DIR ? path.resolve(process.env.PC_OUT_DIR) : __dirname;
+const SHOTS = path.join(OUT_DIR, 'phone-check-shots');
+const OUT = path.join(OUT_DIR, 'phone-check-results.md');
 let PORT = +process.env.PORT || 8097;
 const JOBS = +process.env.JOBS || 3;
 const GAME_MS = +process.env.GAME_MS || 180000;
@@ -298,13 +300,14 @@ async function checkGame(slug) {
   return { slug, cells, errs: [...errs] };
 }
 
-async function serverUp() { try { const r = await fetch(`http://127.0.0.1:${PORT}/index.html`); return r.ok; } catch (e) { return false; } }
+async function serverUp() { try { await fetch(`http://127.0.0.1:${PORT}/`); return true; /* any answer (a 404 is fine for a staging folder) */ } catch (e) { return false; } }
 
 (async () => {
   let games = listGames();
   const want = process.argv.slice(2);
   if (want.length) games = want;
   let srv = null;
+  if (!process.env.PORT) PORT = await new Promise(r => { const t = require('net').createServer().listen(0, '127.0.0.1', () => { const q = t.address().port; t.close(() => r(q)); }); }); // free port: never reuse another run's server
   for (let tries = 0; tries < 10 && !srv; tries++, PORT++) { // port may be held by a server for another dir: move on
     const p = cp.spawn('python3', ['-m', 'http.server', String(PORT), '--directory', GAMES], { stdio: 'ignore' });
     let dead = false; p.on('exit', () => { dead = true; });
@@ -325,6 +328,7 @@ async function serverUp() { try { const r = await fetch(`http://127.0.0.1:${PORT
   for (const r of results) md += `| ${r.slug} | ${SCENARIOS.map(s => short(r.cells[s.id]).replace(/\|/g, '/')).join(' | ')} | ${r.errs.length ? r.errs.length + ': ' + r.errs[0].replace(/\|/g, '/') : 'none'} |\n`;
   md += `\n## Detail (moves, median tap latency)\n\n`;
   for (const r of results) { md += `**${r.slug}**\n`; for (const s of SCENARIOS) md += `- ${s.label}: ${r.cells[s.id] ? r.cells[s.id].text : '-'}\n`; if (r.errs.length) md += `- errors: ${r.errs.join(' / ')}\n`; md += '\n'; }
+  fs.mkdirSync(OUT_DIR, { recursive: true });
   fs.writeFileSync(OUT, md);
   const pass = results.filter(r => SCENARIOS.every(s => r.cells[s.id] && r.cells[s.id].ok)).length;
   console.log(`\n${pass}/${results.length} games pass all scenarios. Wrote ${OUT}`);

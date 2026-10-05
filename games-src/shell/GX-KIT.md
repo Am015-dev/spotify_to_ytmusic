@@ -165,6 +165,12 @@ when it ships (then it can be downloaded for offline play on the Saves page), an
 `games/credits.html`, `privacy.html`, `terms.html` are generated: `python3 games-src/legal/gen.py`. The Menu's
 About section links them. When a game adds a library, font or a non-CC0 sound, add it to `gen.py` and re-run.
 
+## 8. Viewport relayout (`gx-viewport.js`)
+Inline `shell/gx-viewport.js` before the game script, then replace every resize / orientationchange / ResizeObserver handler with one call:
+`GXV.watch(m => { applyPhone(); if (G && UI.started) render(); })`. `m = {w, h, safe, key}` is measured from a fixed full-screen probe,
+not innerWidth/innerHeight; fn runs only when the key changes, debounced at 40/120/420 ms, and once at once on `watch`.
+Read sizes in the layout function from `GXV.now()`. `GXV.poke()` forces a relayout. Never add a second resize listener.
+
 ## Checklist per game
 1. build.py + head + body (section 0).
 2. `GX.settings({...})` replaces the old menu; delete Speed tool buttons; `AIDELAY = GX.aiDelay(base)`.

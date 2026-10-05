@@ -13,12 +13,12 @@ function actorSeat() {
 }
 // ---- sizes: hand card width, trick card width, drone card width, portrait size (CSS variables) ----
 function layoutVars() {
-  const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), land = ph && innerWidth > innerHeight;
+  const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), land = ph && GXV.now().w > GXV.now().h;
   let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(60, Math.round(H * .092)))) : Math.max(60, Math.min(104, Math.round(H * .125)));
   const np = G ? G.np : 4, opp = np - 1;
   let cw = ph ? Math.max(40, Math.min(56, Math.round(hw * .95))) : Math.max(60, Math.min(124, Math.round(Math.min(H * .165, W * .1))));
   const dw = ph ? Math.max(40, Math.min(46, Math.floor((W - 16) / 7) - 4)) : Math.max(46, Math.min(60, Math.floor((W - 40) / 7) - 6));
-  const short = ph && !land && innerHeight < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
+  const short = ph && !land && GXV.now().h < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
   const av = ph ? (land || short ? 30 : 34) : 44;
   const r = document.documentElement.style; r.setProperty('--hw', hw + 'px'); r.setProperty('--cw', cw + 'px'); r.setProperty('--dw', dw + 'px'); r.setProperty('--av', av + 'px');
   if (KIT.ART.table && !document.documentElement.style.getPropertyValue('--tableimg')) r.setProperty('--tableimg', 'url("' + KIT.ART.table + '")');
@@ -154,7 +154,7 @@ function renderFelt(v) {
   const W = felt.clientWidth || 300, H = felt.clientHeight || 160, n = G.np;
   const shown = playsShown(), act = G.phase === 'play' && G.trick && !UI.fz ? G.trick.turn : -1;
   const winS = UI.fz && UI.fz.winner != null && UI.fz.win ? UI.fz.winner : -1;
-  const small = document.documentElement.classList.contains('ph-short'), strip = (isPh() && innerWidth > innerHeight) || small ? 0 : 46, top = (small ? 26 : 20) + (G.boss && G.phase !== 'assign' ? 46 : 0);   // a boss bar takes the felt's top band   // small phones: Last trick sits in the felt's top corner, not in a bottom strip   // the bottom strip holds Last trick / Won (never over a played card)
+  const small = document.documentElement.classList.contains('ph-short'), strip = (isPh() && GXV.now().w > GXV.now().h) || small ? 0 : 46, top = (small ? 26 : 20) + (G.boss && G.phase !== 'assign' ? 46 : 0);   // a boss bar takes the felt's top band   // small phones: Last trick sits in the felt's top corner, not in a bottom strip   // the bottom strip holds Last trick / Won (never over a played card)
   for (let rel = 0; rel < n; rel++) {
     const s = (from + rel) % n; const [x, y0] = slotPos(rel, n, W, Math.max(60, H - strip - top), (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 56) * 1.4 + 4), y = y0 + top;
     const slot = h('div.tslot' + (act === s ? '.turn' : '') + (winS === s ? '.win' : ''), { 'data-seat': s, style: 'left:' + x + 'px;top:' + y + 'px' });

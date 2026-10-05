@@ -9,7 +9,7 @@ parts = sorted(f for f in os.listdir(os.path.join(D, 'src')) if re.match(r'ui\d+
 ui = ''.join(rd(os.path.join(D, 'src', f)) for f in parts)
 open(os.path.join(D, 'ui.js'), 'w', encoding='utf-8').write(ui)
 audio = os.path.join(SP, 'audio', 'lantern-dive', 'audio-data.js')
-SRC = {'shell.js': os.path.join(SP, 'shell', 'shell.js'), 'perfhud.js': os.path.join(SP, 'perf', 'perfhud.js'), 'gameaudio.js': os.path.join(SP, 'audio', 'gameaudio.js'),
+SRC = {'shell.js': os.path.join(SP, 'shell', 'shell.js'), 'gx-viewport.js': os.path.join(SP, 'shell', 'gx-viewport.js'), 'gx-campaign.js': os.path.join(SP, 'shell', 'gx-campaign.js'), 'campaign-data.js': '', 'perfhud.js': os.path.join(SP, 'perf', 'perfhud.js'), 'gameaudio.js': os.path.join(SP, 'audio', 'gameaudio.js'),
        'kit.js': os.path.join(KT, 'kit', 'kit.js'), 'art-data.js': '', 'data.js': os.path.join(D, 'src', 'data.js'), 'engine.js': os.path.join(D, 'src', 'engine.js'), 'ai.js': os.path.join(D, 'src', 'ai.js'), 'ui.js': os.path.join(D, 'ui.js'),
        'trystero.min.js': os.path.join(SP, 'net', 'trystero.min.js'), 'netroom.js': os.path.join(SP, 'net', 'netroom.js'), 'netstrip.js': os.path.join(D, 'src', 'netstrip.js'), 'net.js': os.path.join(D, 'src', 'net.js')}
 # ---- painted art: ../art/manifest.json maps id -> base name. <name>.png (a painting dropped in by hand) wins over <name>.webp
@@ -33,15 +33,15 @@ def art_js():
 ART_JS = art_js()
 if os.path.exists(audio): SRC['audio-data.js'] = audio
 else: print('NOTE: audio-data.js missing, silent build', file=sys.stderr)
-ORDER = ['shell.js', 'perfhud.js', 'trystero.min.js', 'netroom.js', 'data.js', 'kit.js', 'art-data.js', 'engine.js', 'ai.js', 'netstrip.js', 'gameaudio.js', 'audio-data.js', 'net.js', 'ui.js']
-h = rd(os.path.join(D, 'head.html')).replace('/*SHELL_CSS*/', rd(os.path.join(SP, 'shell', 'shell.css')))
+ORDER = ['shell.js', 'gx-viewport.js', 'gx-campaign.js', 'campaign-data.js', 'perfhud.js', 'trystero.min.js', 'netroom.js', 'data.js', 'kit.js', 'art-data.js', 'engine.js', 'ai.js', 'netstrip.js', 'gameaudio.js', 'audio-data.js', 'net.js', 'ui.js']
+h = rd(os.path.join(D, 'head.html')).replace('/*SHELL_CSS*/', rd(os.path.join(SP, 'shell', 'shell.css'))).replace('</head>', '<style>\n' + rd(os.path.join(SP, 'shell', 'gx-campaign.css')) + '\n</style>\n</head>', 1)
 body = rd(os.path.join(D, 'body.html'))
 if 'audio-data.js' in SRC: body = body.replace('<script src="ui.js"></script>', '<script src="audio-data.js"></script>\n<script src="ui.js"></script>')
 for f in ORDER:
     tag = '<script src="%s"></script>' % f
     if f not in SRC: continue
     assert tag in body, f
-    src = (ART_JS if f == 'art-data.js' else rd(SRC[f])).replace('</script', '<\\/script')
+    src = (ART_JS if f == 'art-data.js' else ('window.CAMPAIGN = ' + json.dumps(json.load(open(os.path.join(KT, 'campaign.json'), encoding='utf-8')), separators=(',', ':'), ensure_ascii=False) + ';') if f == 'campaign-data.js' else rd(SRC[f])).replace('</script', '<\\/script')
     body = body.replace(tag, '<script>\n' + src + '\n</script>')
 # PixiJS (MIT, licence header kept): stored as text and only run when the page decides to use the WebGL/canvas table
 px = rd(os.path.join(KT, 'vendor', 'pixi.min.js')).replace('//# sourceMappingURL=pixi.min.js.map', '').replace('</script', '<\\/script')
