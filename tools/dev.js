@@ -1,7 +1,8 @@
 // dev.js — persistent phone browser (852x393 touch) with an HTTP control port, so a patch can be tried without re-booting.
 // node tools/dev.js <url> [city] [port]   then: curl -s localhost:9333/eval --data 'js expr' ; /shot?n=name ; /hold?k=gas|L|R|B|N|D&on=1 ; /tick?n=60 ; /tap?s=#sel
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const http=require('http');const fs=require('fs');
-const URL=process.argv[2],city=process.argv[3]||'fra',PORT=+(process.argv[4]||9333);fs.mkdirSync('v85shots',{recursive:true});
+const URL=process.argv[2],city=process.argv[3]||'fra',PORT=+(process.argv[4]||9333);fs.mkdirSync('v85shots',{recursive:true});//cshot = canvas read back right after a render (headless screenshots of the WebGL canvas can be stale)
+
 const INIT=`(()=>{const q=[];let t=performance.now();window.__auto=true;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};
  window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}}return t};
  setInterval(()=>{if(window.__auto)window.__tick(1)},16)})();`;
@@ -28,6 +29,7 @@ http.createServer(async(req,res)=>{const u=new globalThis.URL(req.url,'http://x'
 try{const q=u.searchParams;
  if(u.pathname==='/eval')out=JSON.stringify(await p.evaluate(body)); 
  else if(u.pathname==='/shot'){await p.screenshot({path:`v85shots/${q.get('n')}.png`});out='v85shots/'+q.get('n')+'.png'}
+ else if(u.pathname==='/cshot'){await p.evaluate(()=>{const c=document.querySelector('canvas#c');__tick(1);const url=c.toDataURL('image/png');let im=document.getElementById('__cs');if(!im){im=document.createElement('img');im.id='__cs';document.body.appendChild(im)}const r=c.getBoundingClientRect();Object.assign(im.style,{position:'fixed',left:r.left+'px',top:r.top+'px',width:r.width+'px',height:r.height+'px',zIndex:getComputedStyle(c).zIndex==='auto'?0:getComputedStyle(c).zIndex,pointerEvents:'none'});c.after(im);return new Promise(res=>{im.onload=res;im.src=url})});await p.screenshot({path:`v85shots/${q.get('n')}.png`});await p.evaluate(()=>{const im=document.getElementById('__cs');if(im)im.remove()});out='v85shots/'+q.get('n')+'.png'}
  else if(u.pathname==='/hold'){const k=q.get('k');if(q.get('on')==='0')await up(k);else await down(k,await center(SEL[k]))}
  else if(u.pathname==='/tick')await tick(+q.get('n')||60);
  else if(u.pathname==='/tap')out=String(await tap(q.get('s')));
