@@ -520,7 +520,8 @@ function renderReport() {
   if (UI.rsFoot) UI.rsFoot.forEach(e => foot.appendChild(e));
   else if (hotShared) foot.appendChild(h('div.cbtns', h('button.btn.go', { 'data-a': 'hotgo', type: 'button' }, 'Next: private choices')));
   else { const btns = h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' });
-    btns.appendChild(h('button.btn.go' + (done ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done ? null : true }, done ? next : (myq ? 'Choose above first' : 'Waiting…')));
+    const adv = done && UI.advFor === R.round && !hotSeat() && !(typeof NET !== 'undefined' && NET.on);
+    btns.appendChild(h('button.btn.go' + (done && !adv ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done && !adv ? null : true }, adv ? next + '…' : done ? next : (myq ? 'Choose above first' : 'Waiting…')));
     if (typeof NET !== 'undefined' && NET.on && done) btns.appendChild(h('span.sm', 'Closes by itself in a moment.'));
     foot.appendChild(btns); }
   box.appendChild(foot);
@@ -530,6 +531,7 @@ function renderReport() {
   if (typeof NET !== 'undefined' && NET.on && done && !UI.repAuto) { UI.repAuto = setTimeout(() => { UI.repAuto = 0; if (UI.rsMode === 'report' && G.phase !== 'eval') repContinue(); }, 30000); }
 }
 function repContinue() {
+  UI.advAt = Date.now();
   if (G.phase === 'eval' && (viewSeat() >= 0 && G.players[viewSeat()].q)) return;
   closeRS(true); UI.rsMode = ''; if (G.phase === 'over') { checkFinal(); } else { render(); checkReport(); if (!UI.rsOpen) newsLines(false); schedule(); }
 }
@@ -814,7 +816,8 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'mv': {
-      const v = viewSeat(); if (UI.qT && Date.now() - UI.qT < 450 && t.closest('#qbox')) break;   // a pop-up that just opened under a finger ignores that tap
+      const v = viewSeat(); if (UI.qT && Date.now() - UI.qT < 450 && t.closest('#qbox')) break;   // and so does the first brew screen after the report closed
+      if (UI.advAt && Date.now() - UI.advAt < 450 && t.closest('#acts')) break;   // a pop-up that just opened under a finger ignores that tap
       if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
       const m = (UI.legal[v] || [])[+d.i];
       if (m) {
@@ -1036,8 +1039,8 @@ function bfBoom(e) {
   }
   document.body.appendChild(o);
   const cw = $('#cwrap'), app = document.querySelector('.gx-app'); let done = false;
-  const end = skip => { if (done) return; done = true; o.remove(); if (cw) cw.classList.remove('tense'); if (app) app.classList.remove('quake'); if (skip) { BF.fxUntil = 0; if (typeof checkReport === 'function') checkReport(); } };
-  o.addEventListener('click', () => end(true)); o.style.pointerEvents = 'auto';  // a tap skips it
+  const end = byTap => { if (done) return; done = true; document.removeEventListener('pointerdown', onTap, true); o.remove(); if (cw) cw.classList.remove('tense'); if (app) app.classList.remove('quake'); if (byTap) { BF.fxUntil = 0; if (typeof checkReport === 'function') checkReport(); } };
+  const onTap = () => end(true); document.addEventListener('pointerdown', onTap, true);   // any tap skips it (and still reaches what it hit)
   if (cw) cw.classList.add('tense'); snd('tick'); setTimeout(() => { if (!done) snd('tick'); }, T * .55);
   setTimeout(() => {
     if (done) return; if (cw) cw.classList.remove('tense'); snd('boom'); o.classList.add('bang');
@@ -1095,7 +1098,9 @@ function rubyGo() { const p = mineP(); if (!p) return; UI.rubyAuto = Object.assi
 function autoDecisions() {
   if (!G || !UI.started) return; const v = viewSeat(); if (v < 0) return; const me = G.players[v];
   if (UI.rubyAuto && me.q && me.q.h === 'ruby') { const m = UI.rubyAuto; UI.rubyAuto = null; const L = mvList(v), mm = L.find(x => x.t === 'ruby' && x.drop === m.drop && !!x.flask === !!m.flask) || L.find(x => x.t === 'ruby' && x.drop === 0 && !x.flask); if (mm) act(mm, v); return; }
-  if (UI.advFor && G.rep && UI.advFor === G.rep.round && G.phase !== 'eval' && UI.rsOpen && UI.rsMode === 'report' && !hotSeat() && !(typeof NET !== 'undefined' && NET.on)) { UI.advFor = 0; UI.rubyAuto = null; const sq = UI.seq; setTimeout(() => { if (sq === UI.seq && UI.rsOpen && UI.rsMode === 'report') repContinue(); }, 80); }
+  if (UI.advFor && G.rep && UI.advFor === G.rep.round && G.phase !== 'eval' && UI.rsOpen && UI.rsMode === 'report' && !hotSeat() && !(typeof NET !== 'undefined' && NET.on) && !UI.advT) {
+    UI.rubyAuto = null; const sq = UI.seq; UI.advT = setTimeout(() => { UI.advT = 0; UI.advFor = 0; if (sq === UI.seq && UI.rsOpen && UI.rsMode === 'report') repContinue(); }, 80);
+  }
 }
 // ---------- the shop: tap a chip, it drops into your bag ----------
 function shopUI(p, q, legal) {

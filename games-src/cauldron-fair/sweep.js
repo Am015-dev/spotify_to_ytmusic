@@ -46,7 +46,7 @@ const PROBE = () => {
     out.ctl.push({ x, y, inVP, covered: !(h && (e.contains(h) || h.contains(e) && h !== document.body && h !== document.documentElement && h.closest('button,summary') === e)), by: h && (h.id || h.className && h.className.baseVal || h.className || h.tagName), dis: !!e.disabled, a: e.dataset.a || '', sel: e.getAttribute('aria-pressed') === 'true', k: e.dataset.k || '', cls: String(e.className).slice(0, 40), inQ: !!e.closest('#qbox'), t: (e.textContent || '').trim().slice(0, 26), pe: getComputedStyle(e).pointerEvents });
   }
   const gh0 = document.querySelector('#ghost'); out.stat = { ghost: !!gh0 && !gh0.hidden, hint: !!document.querySelector('#acts .bline') && !!document.querySelector('#acts .bline').textContent.trim(), ruby: !!document.querySelector('#rs .rubyp'), boom: boom, shop: !!document.querySelector('#rs .shop') };
-  out.rsOn = !!rsOn; const qb = document.querySelector('#qbox'); out.qAge = qb && !qb.hidden && UI.qT ? Date.now() - UI.qT : 9999;
+  out.advAge = UI.advAt ? Date.now() - UI.advAt : 9999; out.rsOn = !!rsOn; const qb = document.querySelector('#qbox'); out.qAge = qb && !qb.hidden && UI.qT ? Date.now() - UI.qT : 9999;
   return out;
 };
 const CHECKS = () => {
@@ -108,6 +108,7 @@ async function tapCtl(p, tag, c) {
 }
 function choose(s, st) {
   const ok = s.ctl.filter(c => c.inVP && !c.dis && !c.covered && c.pe !== 'none' && !(c.a === 'rubysel' && c.sel) && !(c.inQ && s.qAge < 600)); if (!ok.length) return null;
+  if (s.advAge < 600) return null;       // the first screen after the report ignores taps for 450 ms on purpose
   if (s.qAge < 600 && s.ctl.some(c => c.inQ)) return null;       // a fresh question ignores the first 450 ms of taps on purpose: look again
   const by = f => ok.filter(f), pick = a => a.length ? a[Math.floor(rnd() * a.length)] : null;
   const bar = by(c => /^gx-|^gx/.test(c.cls) || false);

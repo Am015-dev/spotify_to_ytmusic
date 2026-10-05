@@ -172,7 +172,8 @@ document.addEventListener('click', ev => {
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
     case 'mv': {
-      const v = viewSeat(); if (UI.qT && Date.now() - UI.qT < 450 && t.closest('#qbox')) break;   // a pop-up that just opened under a finger ignores that tap
+      const v = viewSeat(); if (UI.qT && Date.now() - UI.qT < 450 && t.closest('#qbox')) break;   // and so does the first brew screen after the report closed
+      if (UI.advAt && Date.now() - UI.advAt < 450 && t.closest('#acts')) break;   // a pop-up that just opened under a finger ignores that tap
       if (BF.pulling) { if (t.classList.contains('bagb')) BF.fast = true; break; }   // during the pull: a tap on the bag hurries it, nothing else counts
       const m = (UI.legal[v] || [])[+d.i];
       if (m) {

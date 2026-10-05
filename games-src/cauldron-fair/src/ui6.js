@@ -108,8 +108,8 @@ function bfBoom(e) {
   }
   document.body.appendChild(o);
   const cw = $('#cwrap'), app = document.querySelector('.gx-app'); let done = false;
-  const end = skip => { if (done) return; done = true; o.remove(); if (cw) cw.classList.remove('tense'); if (app) app.classList.remove('quake'); if (skip) { BF.fxUntil = 0; if (typeof checkReport === 'function') checkReport(); } };
-  o.addEventListener('click', () => end(true)); o.style.pointerEvents = 'auto';  // a tap skips it
+  const end = byTap => { if (done) return; done = true; document.removeEventListener('pointerdown', onTap, true); o.remove(); if (cw) cw.classList.remove('tense'); if (app) app.classList.remove('quake'); if (byTap) { BF.fxUntil = 0; if (typeof checkReport === 'function') checkReport(); } };
+  const onTap = () => end(true); document.addEventListener('pointerdown', onTap, true);   // any tap skips it (and still reaches what it hit)
   if (cw) cw.classList.add('tense'); snd('tick'); setTimeout(() => { if (!done) snd('tick'); }, T * .55);
   setTimeout(() => {
     if (done) return; if (cw) cw.classList.remove('tense'); snd('boom'); o.classList.add('bang');
@@ -167,7 +167,9 @@ function rubyGo() { const p = mineP(); if (!p) return; UI.rubyAuto = Object.assi
 function autoDecisions() {
   if (!G || !UI.started) return; const v = viewSeat(); if (v < 0) return; const me = G.players[v];
   if (UI.rubyAuto && me.q && me.q.h === 'ruby') { const m = UI.rubyAuto; UI.rubyAuto = null; const L = mvList(v), mm = L.find(x => x.t === 'ruby' && x.drop === m.drop && !!x.flask === !!m.flask) || L.find(x => x.t === 'ruby' && x.drop === 0 && !x.flask); if (mm) act(mm, v); return; }
-  if (UI.advFor && G.rep && UI.advFor === G.rep.round && G.phase !== 'eval' && UI.rsOpen && UI.rsMode === 'report' && !hotSeat() && !(typeof NET !== 'undefined' && NET.on)) { UI.advFor = 0; UI.rubyAuto = null; const sq = UI.seq; setTimeout(() => { if (sq === UI.seq && UI.rsOpen && UI.rsMode === 'report') repContinue(); }, 80); }
+  if (UI.advFor && G.rep && UI.advFor === G.rep.round && G.phase !== 'eval' && UI.rsOpen && UI.rsMode === 'report' && !hotSeat() && !(typeof NET !== 'undefined' && NET.on) && !UI.advT) {
+    UI.rubyAuto = null; const sq = UI.seq; UI.advT = setTimeout(() => { UI.advT = 0; UI.advFor = 0; if (sq === UI.seq && UI.rsOpen && UI.rsMode === 'report') repContinue(); }, 80);
+  }
 }
 // ---------- the shop: tap a chip, it drops into your bag ----------
 function shopUI(p, q, legal) {

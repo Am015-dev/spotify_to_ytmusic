@@ -62,7 +62,8 @@ function renderReport() {
   if (UI.rsFoot) UI.rsFoot.forEach(e => foot.appendChild(e));
   else if (hotShared) foot.appendChild(h('div.cbtns', h('button.btn.go', { 'data-a': 'hotgo', type: 'button' }, 'Next: private choices')));
   else { const btns = h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' });
-    btns.appendChild(h('button.btn.go' + (done ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done ? null : true }, done ? next : (myq ? 'Choose above first' : 'Waiting…')));
+    const adv = done && UI.advFor === R.round && !hotSeat() && !(typeof NET !== 'undefined' && NET.on);
+    btns.appendChild(h('button.btn.go' + (done && !adv ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done && !adv ? null : true }, adv ? next + '…' : done ? next : (myq ? 'Choose above first' : 'Waiting…')));
     if (typeof NET !== 'undefined' && NET.on && done) btns.appendChild(h('span.sm', 'Closes by itself in a moment.'));
     foot.appendChild(btns); }
   box.appendChild(foot);
@@ -72,6 +73,7 @@ function renderReport() {
   if (typeof NET !== 'undefined' && NET.on && done && !UI.repAuto) { UI.repAuto = setTimeout(() => { UI.repAuto = 0; if (UI.rsMode === 'report' && G.phase !== 'eval') repContinue(); }, 30000); }
 }
 function repContinue() {
+  UI.advAt = Date.now();
   if (G.phase === 'eval' && (viewSeat() >= 0 && G.players[viewSeat()].q)) return;
   closeRS(true); UI.rsMode = ''; if (G.phase === 'over') { checkFinal(); } else { render(); checkReport(); if (!UI.rsOpen) newsLines(false); schedule(); }
 }
