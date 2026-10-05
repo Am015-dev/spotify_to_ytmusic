@@ -40,11 +40,12 @@ const STAT=()=>{const Q=__Q,mins=Q.drive/3600,st=Q.stuck+(Q.stEp>120?Q.stEp:0);c
   loads:Q.ld,loadsPerMin:+(Q.ld/Math.max(.01,Q.f/3600)).toFixed(2),camInsidePct:+(100*Q.camIn/Math.max(1,Q.drive/3)).toFixed(1),camInside:Q.camS,smashPerMin:+(Q.smash/Math.max(.01,mins)).toFixed(1),
   traffic120m:+(Q.traf/Math.max(1,Q.trafN)).toFixed(1),missions:Q.ev.slice(0,30),raw:{drive:Q.drive,f:Q.f,stuck:st,vSum:Q.vSum,camIn:Q.camIn,smash:Q.smash,ld:Q.ld,traf:Q.traf,trafN:Q.trafN},allHits:Q.hits,worst:Q.hits.slice().sort((a,b)=>b.drop-a.drop).slice(0,5),monErr:window.__monErr||null}};
 // HUD vs touch-control overlap + tiny text
-const LAYOUT=()=>{const vis=e=>{const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)return false;for(let a=e;a;a=a.parentElement){if(a.hidden)return false;const c=getComputedStyle(a);if(c.display==='none'||+c.opacity<.05)return false}const r=e.getBoundingClientRect();return r.width>4&&r.height>4};
+const LAYOUT=()=>{  // tiny = visible text under 12 px
+const vis=e=>{const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)return false;for(let a=e;a;a=a.parentElement){if(a.hidden)return false;const c=getComputedStyle(a);if(c.display==='none'||+c.opacity<.05)return false}const r=e.getBoundingClientRect();return r.width>4&&r.height>4};
  const ctl=[...document.querySelectorAll('#touch .tbtn')].filter(vis).map(e=>({id:e.id,r:e.getBoundingClientRect()}));const VA=innerWidth*innerHeight;const ov=[],tiny=[];
  for(const e of document.body.querySelectorAll('*')){if(e.closest('#touch')||e.tagName==='CANVAS'||e.tagName==='SCRIPT'||e.tagName==='STYLE')continue;const cs=getComputedStyle(e);
   const own=[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim());if(!own&&cs.position!=='fixed'&&cs.position!=='absolute')continue;if(!vis(e))continue;const r=e.getBoundingClientRect();if(r.width*r.height>VA*.3)continue;
-  if(own&&parseFloat(cs.fontSize)<9.5)tiny.push((e.id||e.className||e.tagName)+':'+cs.fontSize+':'+e.textContent.trim().slice(0,24));
+  if(own&&parseFloat(cs.fontSize)<11.5)tiny.push((e.id||e.className||e.tagName)+':'+cs.fontSize+':'+e.textContent.trim().slice(0,24));
   if(!own&&cs.backgroundColor==='rgba(0, 0, 0, 0)'&&cs.backgroundImage==='none'&&!e.querySelector('canvas,img,svg'))continue;
   for(const c of ctl){const w=Math.min(r.right,c.r.right)-Math.max(r.left,c.r.left),h=Math.min(r.bottom,c.r.bottom)-Math.max(r.top,c.r.top);if(w>6&&h>6)ov.push(c.id+'×'+(e.id?'#'+e.id:e.className?'.'+String(e.className).split(' ')[0]:e.tagName)+(own?'«'+e.textContent.trim().slice(0,16)+'»':''))}}
  // HUD panels overlapping each other (positioned elements with an id, not nested)
@@ -196,6 +197,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    ok(!s.reloads,`${m} ${c}: the page never reloads while playing`,{reloads:s.reloads||0,events:(s.events||[]).filter(e=>/RELOAD/.test(e))});
    if(c==='ath')ok(s.loads===0,`${m} ath: no loading screens while driving`,{loads:s.loads});
    ok(s.scale.pedRel==null||s.scale.pedRel<=1.2,`${m} ${c}: pedestrians ≤ 1.2× adult scale vs cars`,s.scale);
+   if(m==='phone')ok(!s.tiny.length,`${m} ${c}: no HUD text under 12 px`,s.tiny.slice(0,8));
    if(m==='phone')ok(!s.overlap.length,`${m} ${c}: no HUD element over a touch control`,s.overlap.slice(0,8));
    ok(s.road.blocked+s.roadEnd.blocked===0,`${m} ${c}: no collider on the paved road (invisible walls / oversize hulls)`,{pts:s.road.roadPts+s.roadEnd.roadPts,start:s.road.colliders,end:s.roadEnd.colliders,ex:s.road.sample.concat(s.roadEnd.sample).slice(0,3)});
    ok(s.camInsidePct<=2,`${m} ${c}: chase camera inside a building ≤ 2 % of frames`,{camInsidePct:s.camInsidePct,ex:(s.camInside||[]).slice(0,2)});

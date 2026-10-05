@@ -114,6 +114,7 @@ It fails on any of these:
 - any visible HUD element on a touch control (phone)
 - any collider on the paved road
 - the chase camera inside a building in more than 2 % of frames
+- any HUD text under 12 px on the phone
 
 ## Final build check (v83 + pQA1–3, split with tools/split_km.py: page 1,797,344 B + km.js 1,961,521 B)
 - `node smoke.js` on the split pages: **SMOKE PASS 12/12**, 0 console errors (`qa/smoke_sheet_final_split.png`).
