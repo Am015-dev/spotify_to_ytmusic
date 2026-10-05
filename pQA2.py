@@ -14,8 +14,10 @@ body #roam #npcSay{left:calc(124px + env(safe-area-inset-left,0px))!important;ma
  /* tutorial card and pop-up challenge sat on the minimap and the district plate */
  body #roam #roamTut{left:50%!important;right:auto!important;top:auto!important;bottom:calc(36px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;max-width:min(390px,45vw)!important}
  body #roam #roamPop{left:calc(112px + env(safe-area-inset-left,0px))!important;top:calc(146px + env(safe-area-inset-top,0px))!important;transform:none!important}
+ /* "TAP TO OPEN" event prompt sat on HOP and BOOST (right edge, 40 % down): centre it above the tutorial card */
+ body #roam #roamPrompt{left:50%!important;right:auto!important;top:auto!important;bottom:calc(98px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;max-width:min(330px,38vw)!important}
  #roamPause .pp{max-height:calc(100vh - 12px);overflow-y:auto;padding-bottom:10px}#roamPause .pg{grid-template-columns:repeat(3,1fr);gap:6px;padding:6px 10px 0}
- #roamPause .pg button{padding:6px 8px;font-size:13px;white-space:nowrap}#roamPause .pg button.big{font-size:15px}#roamPause .pg button.ev.q{grid-column:auto}}
+ #roamPause .pg button{padding:6px 8px;font-size:12px;line-height:1.1;overflow-wrap:anywhere}#roamPause .pg button.big{font-size:15px}#roamPause .pg button.ev.q{grid-column:auto}}
 '''
 R('</style>',css+'</style>')
 R('window.__mho={',open('qa.js').read()+'\nwindow.__mho={')
