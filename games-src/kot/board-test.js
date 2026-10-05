@@ -29,4 +29,12 @@ const words=t=>t.trim().split(/\s+/).filter(x=>x&&!/^[·★⚡♥]$/.test(x)).le
 // 4. knocked out in a solo game: fast forward and a New game button
 {const w=mk(9);const d=w.document;w.eval(`const me=G.pl[meSeat()];me.hp=0;me.alive=false;G.active=(meSeat()+1)%G.pl.length;render()`);
   ok(d.getElementById('bko')&&!d.getElementById('bko').hidden,'a knocked-out player gets a New game button');ok(w.eval('AIDELAY')<=140,'the rest of the game plays fast');ok(/knocked out/.test(d.getElementById('bline').textContent),'the line says you are knocked out');w.close()}
+// 5. story mode: every chapter sets its table, the rival, the AI level and its twist; winning is read from the game
+{const w=mk(5);const d=w.document;ok(typeof w.GXC==='object'&&w.CAMPAIGN&&w.CAMPAIGN.chapters.length===10,'the story kit and ten chapters are inlined');
+  w.eval('UI.camp=null;UI.info=true;render()');ok(d.querySelector('[data-camp="open"]'),'the start card has a Story mode button');
+  const rows=w.eval(`CAMPAIGN.chapters.map(c=>{campStart(c);const b=G.pl[G.bossSeat],t=c.twist;return {n:G.n===c.setup.n,riv:b.m===c.setup.rival&&!b.human,lvl:G.pl.filter(p=>!p.human).every(p=>p.lvl===c.opponent.aiLevel),hum:G.pl.filter(p=>p.human).length===1,
+    tw:!t||(t.id==='boss-energy'?b.en===t.param:t.id==='boss-in-city'?G.city===b.i:t.id==='extra-brainjack'?b.mb===1+t.param:t.id==='boss-card'?b.cards.some(x=>base(x)===t.param):t.id==='stubborn'?G.twist.id==='stubborn':true)}})`);
+  ok(rows.every(r=>r.n&&r.riv&&r.lvl&&r.hum&&r.tw),'chapters 1-10 set players, rival, AI level and boss rule '+JSON.stringify(rows.map(r=>+(r.n&&r.riv&&r.lvl&&r.hum&&r.tw))));
+  w.eval(`campStart(CAMPAIGN.chapters[0]);const me=G.pl.find(p=>p.human);G.winner='P'+(me.i+1);me.vp=20`);ok(w.eval('campIsWon(G,CAMPAIGN.chapters[0])'),'a win is a win');
+  w.eval(`G.winner='draw'`);ok(!w.eval('campIsWon(G,CAMPAIGN.chapters[0])'),'a draw is not');w.eval('UI.camp=null;newGame("solo");');ok(w.eval('!UI.camp&&!G.camp'),'a normal game leaves story mode');w.close()}
 console.log(`passed ${pass} failed ${fail}`);process.exit(fail?1:0)
