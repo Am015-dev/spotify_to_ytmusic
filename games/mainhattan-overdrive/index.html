@@ -8130,11 +8130,11 @@ function CR_cityGeo(nm){if(!nm||nm[0]==='#')return null;if(CR_CG[nm]!==undefined
   case'garbage-truck':A=CR_truck({body:'#2c8a5a'});wid=2.6;break;default:return CR_CG[nm]=null}
   if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A=CR_cab(A);if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A.push(['T1x6',-4,-3,0,K,-1],['T1x6',3,-3,0,K,-1],['T8x1',-4,-8,0,K,-1],['T8x1',-4,7,0,K,-1]);
   const br=A.map(([t,x,z,r,c,y])=>({t,x,z,y,r:r%4,m:0,c})).filter(b=>!['drv','drvR','stw','mir','lp','pipes','flag'].includes(b.t));CR_LO=2;CR_G=[];CR_W=[];const M=[],L=[];for(const b of br)GB_brickGeo(b,M,L);
-  const Wg=CR_W.map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return g});const body=mergeGeometries(M.concat(L)),wheels=mergeGeometries(Wg),glass=CR_G.length?mergeGeometries(CR_G):null;
+  const Wg=CR_W.map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return g});const MD=M.filter(CR_isDark),MB=M.filter(g=>!CR_isDark(g));const body=mergeGeometries(MB.concat(L)),wheels=mergeGeometries(Wg),glass=(CR_G.length||MD.length)?mergeGeometries(CR_G.concat(MD)):null;
   const box=new THREE.Box3().setFromBufferAttribute(body.attributes.position),bw=new THREE.Box3().setFromBufferAttribute(wheels.attributes.position),s=wid/(box.max.x-box.min.x),y0=Math.min(box.min.y,bw.min.y);
   for(const g of[body,wheels,glass].filter(Boolean)){g.translate(0,-y0,0);g.scale(s,s,s);g.rotateY(Math.PI);g.translate(0,.04,0)}return CR_CG[nm]={body,wheels,glass}}
  catch(e){console.warn('CR city',nm,e);return CR_CG[nm]=null}finally{CR_LO=0;CR_G=null;CR_W=null}}
-function CR_cityPost(im,nm,k,n){const G=CR_cityGeo(nm);if(!G)return;const w=new THREE.InstancedMesh(G.wheels,CR_WM||(CR_WM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8,metalness:0,envMapIntensity:.5})),n);w.frustumCulled=false;w.instanceMatrix.setUsage(THREE.DynamicDrawUsage);_m.makeScale(0,0,0);for(let j=0;j<n;j++)w.setMatrixAt(j,_m);im.userData.w=w;im.parent&&im.parent.add(w);if(G.glass){const gl=new THREE.InstancedMesh(G.glass,CR_GM,n);gl.frustumCulled=false;gl.instanceMatrix.setUsage(THREE.DynamicDrawUsage);for(let j=0;j<n;j++)gl.setMatrixAt(j,_m);gl.renderOrder=2;im.userData.g=gl;im.parent&&im.parent.add(gl)}
+function CR_cityPost(im,nm,k,n){const G=CR_cityGeo(nm);if(!G)return;const w=new THREE.InstancedMesh(G.wheels,CR_WM||(CR_WM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8,metalness:0,envMapIntensity:.5})),n);w.frustumCulled=false;w.instanceMatrix.setUsage(THREE.DynamicDrawUsage);_m.makeScale(0,0,0);for(let j=0;j<n;j++)w.setMatrixAt(j,_m);im.userData.w=w;im.parent&&im.parent.add(w);if(G.glass){const gl=new THREE.InstancedMesh(G.glass,CR_WM||(CR_WM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8,metalness:0,envMapIntensity:.5})),n);gl.frustumCulled=false;gl.instanceMatrix.setUsage(THREE.DynamicDrawUsage);for(let j=0;j<n;j++)gl.setMatrixAt(j,_m);gl.renderOrder=2;im.userData.g=gl;im.parent&&im.parent.add(gl)}
  const cc=new THREE.Color();for(let j=0;j<n;j++){cc.set(HCOL[(j*3+k)%HCOL.length]).lerp(new THREE.Color('#ffffff'),.08);im.setColorAt(j,cc)}im.instanceColor&&(im.instanceColor.needsUpdate=true);
  if(nm==='police'||nm==='garbage-truck'||(nm==='taxi'&&CID!=='fra')){const c=new THREE.Color('#ffffff');for(let j=0;j<n;j++)im.setColorAt(j,c);im.instanceColor&&(im.instanceColor.needsUpdate=true)}}
 const _crM=new THREE.Matrix4(),_crR=new THREE.Matrix4(),_crE=new THREE.Euler(),_crT1=new THREE.Matrix4().makeTranslation(0,.45,0),_crT2=new THREE.Matrix4().makeTranslation(0,-.45,0);
@@ -8173,6 +8173,10 @@ function CR_cab(A){const ar=A.find(e=>e[0]==='arch'),B=ar?ar[4]:'#ffffff',D='#1d
  add('B1x3',-3,-1,D,6);add('B1x3',2,-1,D,6);add('P1x3',-3,-1,D,9);add('P1x3',2,-1,D,9);
  add('B1x1',-3,2,B,6);add('B1x1',2,2,B,6);add('P1x1',-3,2,B,9);add('P1x1',2,2,B,9);add('B4x1',-2,2,D,6);add('P4x1',-2,2,D,9);
  add('P1x1',-3,-2,B,9);add('P1x1',2,-2,B,9);add('P4x1',-2,-2,D,9);add('T6x5',-3,-2,B,10);return out}
+
+
+const CR_WIN=new THREE.Color('#1d2630');
+function CR_isDark(g){const c=g.attributes.color;if(!c)return false;const r=c.getX(0),gg=c.getY(0),b=c.getZ(0);if(Math.abs(r-CR_WIN.r)+Math.abs(gg-CR_WIN.g)+Math.abs(b-CR_WIN.b)<.004)return false;return .2126*r+.7152*gg+.0722*b<.035}
 
 const GB_PRE=[['🛣 HOT ROD',CR_ROD,'car'],['⛰ MONSTER',CR_OFF,'4x4'],['🌊 AEGEAN',CR_BOAT,'boat'],['SPEEDSTER',CR_SPEED,'car']];const GB_PRE0=[['RACER',[['spoiler',-2,6,0,0],['exhaust',-2,5,0,10],['exhaust',1,5,0,10],['light',-1,-6,0,2],['b24',-4,0,0,11],['slope',-4,-2,0,0],['b12',-3,3,0,0],['tile',-1,1,0,9],['flag',-5,4,0,9]]],
  ['DOZER',[['b24',-3,-1,0,2],['b24',-5,-1,0,11],['b22',-3,3,0,2],['b24',-3,-1,0,11],['slope',-3,-3,0,2],['b22',-5,3,0,2],['b11',-6,1,0,0],['light',-6,-1,0,9],['exhaust',-1,4,0,10],['round',-4,5,0,11]]],
