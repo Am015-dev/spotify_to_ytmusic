@@ -105,6 +105,7 @@ function newGame(mode,n,mon){
   if(evoOn)lg(-1,'Evolutions are on: each monster picks a starting evolution, and resolving three hearts lets it pick another.');
   if(G.bayOn)lg(-1,'With 5 or more monsters, the Harbor is open as a second city space.');
   const on=EXPS.filter(e=>e.k!=='evo'&&ex[e.k]).map(e=>e.n);if(on.length)lg(-1,'Expansions: '+on.join(', ')+'.');
+  if(typeof campSetup==='function')campSetup();
   exSetup(()=>{G.ncards=cardTotal();if(evoOn)seq(G.pl.slice(),(p,next)=>pickEvo(p,true,next),()=>startTurn());else startTurn()});
 }
 function cardTotal(){let n=G.deck.length+G.disc.length+G.market.length+(G.limbo||[]).length;G.pl.forEach(p=>n+=p.cards.filter(c=>CARDS[base(c)].t!=='W').length);return n}

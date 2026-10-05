@@ -1,0 +1,3 @@
+/* Story mode entry on the start card (the board is never covered: the map is the shared story overlay) */
+.btn.camp small{display:block;font-weight:400}
+.gxc{--gxc-accent:#ff4fa0}
