@@ -22,5 +22,12 @@ const PH={on:false,
     const c=document.getElementById('phchip');if(c&&typeof G!=='undefined'){const me=viewSeat();const t=!G?'Doorkick Dungeon':(me>=0&&G.pl[me]&&G.mode!=='ai'?`Lv ${G.pl[me].lvl}/10 · `:'')+dockTitle(me).replace(/ · turn \d+$/,'').replace(/ is thinking…$/,'’s turn').replace(/’s move$/,'’s turn');if(c.textContent!==t)c.textContent=t}
     this.metrics()}};
 (function(){const r0=render;render=function(){const x=r0.apply(this,arguments);try{PH.after()}catch(e){UI.lastErr='ph '+e}return x};
-  let rt=0;const re=()=>{clearTimeout(rt);rt=setTimeout(()=>{PH.apply();PH.after()},60)};addEventListener('resize',re);addEventListener('orientationchange',re);
+  // One debounced relayout fed by resize, orientationchange, visualViewport and the table's ResizeObserver; a second pass at ~400 ms because
+  // iOS reports the old size for a moment after a rotation. Only a changed size signature does work.
+  let t1=0,t2=0,sig='';const relayout=force=>{const tb=document.querySelector('.table');const s=innerWidth+'x'+innerHeight+'|'+(tb?tb.clientWidth+'x'+tb.clientHeight:'');
+    if(!force&&s===sig)return;sig=s;try{PH.apply();PH.after()}catch(e){UI.lastErr='ph '+e}};
+  const re=()=>{clearTimeout(t1);clearTimeout(t2);t1=setTimeout(()=>relayout(),60);t2=setTimeout(()=>relayout(),420)};
+  addEventListener('resize',re);addEventListener('orientationchange',re);
+  try{if(window.visualViewport){visualViewport.addEventListener('resize',re)}}catch(e){}
+  try{const tb=document.querySelector('.table');if(tb&&window.ResizeObserver)new ResizeObserver(re).observe(tb)}catch(e){}
   PH.apply();PH.after();requestAnimationFrame(()=>PH.metrics())})();
