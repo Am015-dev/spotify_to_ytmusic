@@ -25,6 +25,7 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 5. **Fix basics before features.** The garage, juice, audio, events and traffic lights were built while driving was broken.
    That made the file bigger, caused anchor conflicts and gave a worse game. Less on screen (rings, breakables, traffic) is better.
 6. **Phone first:** test the iPhone 16 landscape layout, portrait↔landscape rotation, 12 px minimum text, no HUD over the controls.
+7. **LOOK at the screen; scripts can't judge fun.** Alex scored v83 "horrible, uncontrollable": a 15-item HUD covered 40% of the phone, the world was washed-out with no visible road, and steering was twitchy, while every script metric improved. Every build is judged on screenshots someone actually looks at, plus feel. The phone HUD is minimap + speed + one objective line; at most 5 buttons.
 
 ## Cost and speed rules (99.8% of the tokens were context re-reads)
 - Set `model` on EVERY cloud session: `claude-sonnet-5-5` to build, fix, test and integrate; Opus only for hard design calls.
