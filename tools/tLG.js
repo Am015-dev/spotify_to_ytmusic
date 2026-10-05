@@ -1,0 +1,21 @@
+// tLG.js — LEGO preset garage renders (852x393). node tools/tLG.js <outdir> [idx,idx..]; needs `python3 -m http.server 8766` in repo root and local.html (pLG1 build).
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
+const [,,OUT,IDX]=process.argv;fs.mkdirSync(OUT,{recursive:true});
+if(!process.env.NOCOPY)fs.copyFileSync("local.html","local_t.html");
+(async()=>{const br=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const ctx=await br.newContext({viewport:{width:852,height:393},deviceScaleFactor:2,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(600000);
+const errs=[];p.on('pageerror',e=>errs.push(e.message.slice(0,200)));
+await p.goto('http://127.0.0.1:8766/local_t.html');await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
+await p.evaluate(()=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_athpre','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));localStorage.setItem('mho_set@1',JSON.stringify({thr:'auto',thrV:1}));localStorage.setItem('mho_story@1',JSON.stringify({ath:1}))});
+await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
+await p.evaluate(()=>{try{__m1&&__m1.skip&&__m1.skip()}catch(e){}__mho.enterRoam()});await p.waitForFunction(()=>__mho.state==='roam');await p.evaluate(()=>__mho.storyClose&&__mho.storyClose());await p.waitForTimeout(1500);
+const n=await p.evaluate(()=>0);
+await p.evaluate(()=>document.querySelector('#roamPause [data-p="garage"]')?.click()||__mho.pause?.());
+await p.waitForTimeout(500);
+await p.waitForFunction(()=>!document.querySelector('#gbx').hidden,null,{timeout:8000}).catch(async()=>{console.log('garage not open; pausing');await p.keyboard.press('Escape');await p.waitForTimeout(500);await p.evaluate(()=>document.querySelector('#roamPause [data-p="garage"]').click());await p.waitForFunction(()=>!document.querySelector('#gbx').hidden)});
+await p.evaluate(()=>document.querySelector('#gbx .gbTabs [data-t="bricks"]').click());await p.waitForTimeout(1200);
+const names=await p.evaluate(()=>[...document.querySelectorAll('#gbBkT button')].map(b=>{const r=b.getBoundingClientRect();return b.textContent+':'+Math.round(r.width)+'x'+Math.round(r.height)+'@'+Math.round(r.top)+'/'+getComputedStyle(b).fontSize}));console.log(names.join(' | '));
+const N=await p.evaluate(()=>document.querySelectorAll('#gbBkT button[data-a^=pre]').length);
+const want=IDX?IDX.split(',').map(Number):[...Array(N).keys()];
+for(const k of want){const c=await p.evaluate(k=>__gb.preset(k),k);await p.waitForTimeout(700);await p.screenshot({path:`${OUT}/g${k}.png`});if(process.env.WORLD){await p.evaluate(()=>{document.querySelector('#gbBkT [data-a=done]').click();document.querySelector('#gbSave').click()});await p.waitForTimeout(2500);await p.screenshot({path:`${OUT}/w${k}.png`});await p.evaluate(()=>{document.querySelector('#roamPause [data-p="garage"]')?.click()});await p.waitForTimeout(800);await p.evaluate(()=>document.querySelector('#gbx .gbTabs [data-t="bricks"]').click());await p.waitForTimeout(800)}console.log('preset',k,'bricks',c,await p.evaluate(()=>{const U=__gb.mesh().userData;return JSON.stringify({n:(()=>{let n=0,v=0;(U.carG||U.m).traverse(o=>{if(o.isMesh){n++;if(o.visible)v++}});return n+'/'+v})(),root:JSON.stringify(U.gbM.map(o=>o.geometry.attributes.position.count)),bp:__gb.d().bp,hid:(U.gbHid||[]).length,gbM:(U.gbM||[]).length})}))}
+console.log('errs',errs);await br.close()})();
