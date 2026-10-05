@@ -1,7 +1,4 @@
-# pART4 · cars on the road (no hover), nose up on throttle, steering front wheels, tyre shadows; boats in the water with bow rise + foam (module art4.js)
-exec(open('P.py').read())
-if 'ART step 5' in s:
-    print('already');save();raise SystemExit
-R("s.pitch=(s.pitch||0)+(clamp(-acc*.006,-.14,.14)+wP-(s.pitch||0))","s.pitch=(s.pitch||0)+(clamp(acc*.004,-.09,.09)+wP-(s.pitch||0))")
-R('window.__mho={',open('art4.js').read()+'\nwindow.__mho={')
-save()
+# pART4 · player car on the road (per-wheel suspension, body-only pitch), steering front wheels, tyre shadows; boats in the water (module art4.js)
+exec(open('P.py').read());exec(open('artlib.py').read())
+RR("s.pitch=(s.pitch||0)+(clamp(-acc*.006,-.14,.14)+wP-(s.pitch||0))","s.pitch=(s.pitch||0)+(clamp(acc*.004,-.09,.09)+wP-(s.pitch||0))")
+ART_mod('art4.js');save()

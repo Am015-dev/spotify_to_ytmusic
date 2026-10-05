@@ -21,7 +21,7 @@ roamPose=(f=>function(s,dt){f(s,dt);try{const ud=s.mesh&&s.mesh.userData;if(!ud|
   T.count=n;T.instanceMatrix.needsUpdate=true;
   // suspension: each tyre is pushed onto the road under it (body keeps its pitch/roll), travel ±0.35 m
   if(!boat){s.mesh.updateMatrixWorld(true);for(const w of ud.gbM||[]){if(!w.userData.r||!ART4_vis(w))continue;if(w.userData.y0==null)w.userData.y0=w.position.y;w.getWorldPosition(ART4.v);const sc=w.parent?w.parent.getWorldScale(new THREE.Vector3()).y:1,ws=w.getWorldScale(new THREE.Vector3()).y;
-    const g=groundAt(ART4.v.x,ART4.v.z,ART4.v.y+1),bot=ART4.v.y-w.userData.r*ws,dy=(g-bot)/(sc||1);w.position.y=Math.max(w.userData.y0-.35/(sc||1),Math.min(w.userData.y0+.35/(sc||1),w.position.y+dy))}}
+    if(!w.userData.ry){const gb=w.geometry.boundingBox||(w.geometry.computeBoundingBox(),w.geometry.boundingBox);w.userData.ry=(gb.max.y-gb.min.y)/2;w.userData.cy=(gb.max.y+gb.min.y)/2}const g=groundAt(ART4.v.x,ART4.v.z,ART4.v.y+1),bot=ART4.v.y+(w.userData.cy-w.userData.ry)*ws,dy=(g-bot)/(sc||1);w.position.y=Math.max(w.userData.y0-.35/(sc||1),Math.min(w.userData.y0+.35/(sc||1),w.position.y+dy))}}
   // boats: bow up with speed, foam trail from the stern
   if(boat){const F=ART4_foam(),fw=s._fw||V3(Math.sin(RO.h),0,Math.cos(RO.h));ART4.ft+=dt;if(Math.abs(RO.v)>3&&ART4.ft>.06){ART4.ft=0;const p=ART4.fp[ART4.fi++%90];p.x=RO.x-fw.x*3.6+(Math.random()-.5)*1.2;p.z=RO.z-fw.z*3.6+(Math.random()-.5)*1.2;p.y=RO.y+.05;p.a=0;p.s=.9+Math.min(1.6,Math.abs(RO.v)/30)}
    for(let i=0;i<90;i++){const p=ART4.fp[i];if(p.y<-900)continue;p.a+=dt;const k=Math.max(0,1-p.a/2.4);_m.makeScale(p.s*(1+p.a*1.4)*k+.001,1,p.s*(1+p.a*1.4)*k+.001);_m.setPosition(p.x,p.y,p.z);F.setMatrixAt(i,_m)}F.instanceMatrix.needsUpdate=true;F.visible=true;

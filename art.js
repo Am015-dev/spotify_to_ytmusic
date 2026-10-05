@@ -4,12 +4,9 @@ const ART={top:[.02,.12,.62],mid:[.06,.3,.92],hor:[.42,.66,1.0],gnd:[.4,.6,.9],s
 try{if(!localStorage.getItem('mho_art_tod')){localStorage.setItem('mho_art_tod','1');SET.tod='day';saveSet()}}catch(e){}
 function ART_tex(w,h,draw,rep){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;t.generateMipmaps=true;t.minFilter=THREE.LinearMipmapLinearFilter;if(typeof KEEP_TEX!=='undefined')KEEP_TEX.add(t);return t}
 // green baseplate: 8×8 studs per tile with a light rim and soft shadow; mipmaps fade them to flat green in the distance
-function ART_plate(base,lit,dark){return ART_tex(256,256,(g,W)=>{g.fillStyle=base;g.fillRect(0,0,W,W);let r=11;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;
-  for(let i=0;i<600;i++){g.fillStyle=`rgba(${rnd()<.5?'255,255,200':'0,40,0'},.05)`;g.fillRect(rnd()*W,rnd()*W,6,6)}
-  const s=W/16;for(let y=0;y<16;y++)for(let x=0;x<16;x++){const cx=x*s+s/2,cy=y*s+s/2,R=s*.3;
-   g.fillStyle='rgba(0,30,0,.28)';g.beginPath();g.arc(cx+1.5,cy+2,R+1,0,7);g.fill();
-   g.fillStyle=dark;g.beginPath();g.arc(cx,cy,R,0,7);g.fill();
-   const gr=g.createLinearGradient(cx-R,cy-R,cx+R,cy+R);gr.addColorStop(0,lit);gr.addColorStop(1,base);g.fillStyle=gr;g.beginPath();g.arc(cx-.5,cy-.5,R-1.2,0,7);g.fill()}})}
+function ART_plate(base,lit,dark){return ART_tex(512,512,(g,W)=>{g.fillStyle=base;g.fillRect(0,0,W,W);let r=11;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;
+  for(let i=0;i<2600;i++){g.fillStyle=`rgba(${rnd()<.5?'255,255,190':'0,50,0'},.06)`;g.fillRect(rnd()*W,rnd()*W,3+rnd()*5,2+rnd()*3)}
+  const n=40,s=W/n;for(let y=0;y<n;y++)for(let x=0;x<n;x++){const cx=x*s+s/2,cy=y*s+s/2,R=s*.3;g.fillStyle='rgba(0,40,0,.12)';g.beginPath();g.arc(cx+.8,cy+1,R+.6,0,7);g.fill();g.fillStyle=lit;g.globalAlpha=.35;g.beginPath();g.arc(cx-.4,cy-.4,R*.8,0,7);g.fill();g.globalAlpha=1}})}
 // asphalt: mid grey, light kerbs, white edge lines, double yellow centre line
 function ART_road(){return ART_tex(256,512,(g,W,H)=>{g.fillStyle='#55585f';g.fillRect(0,0,W,H);let r=91;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;
   for(let i=0;i<4000;i++){const v=70+rnd()*40|0;g.fillStyle=`rgba(${v},${v+2},${v+6},.45)`;g.fillRect(rnd()*W,rnd()*H,2,2)}
