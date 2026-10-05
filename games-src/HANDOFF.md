@@ -12,20 +12,18 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Read the root `CLAUDE.md` (lessons learnt + cost rules), then `games-src/BRIEF-2d-games.md`.
 
 ## NOW (5 Oct) — start here
-Goal: EVERY shelf game gets story mode and works on a phone in portrait, landscape and after rotating
-(skip Mainhattan/Overdrive and Ticket to Ride).
-- Done: Sunglaze (`sunglaze-next`) and Cauldron Fair (`cauldron-fair`) have story mode and the rotation fix, both live
-  on their previews. Shipwreck Isle (`shipwreck-isle-next`) has story mode.
-- In progress: one-round fixes on Sunglaze (hint, rival scoring, no-fit kilns) and Cauldron Fair (big explosion,
-  rival brew, one after-round screen), each with its own `sweep.js`; `games-src/scripts/phone-check.js` (all games,
-  portrait/landscape/rotation, no AI) → `phone-check-results.md`.
-- Next, 2 helpers at a time, one game each = rotation fix (pattern in CLAUDE.md) + story mode wiring
-  (template: `games-src/azul/game/src/campaign.js`, `games-src/cauldron-fair/src/ui8.js`, `games-src/shell/CAMPAIGN.md`);
-  deploy to the preview only after phone-check passes:
-  1. games failing phone-check that already have `campaign.json` (final-approach, hollowbough, kaiten, lantern-dive,
-     short-fuse, thornbound, tidewake, carc, ft, kot, munch, xw);
-  2. the rest of those;
-  3. games with no campaign yet (write `campaign.json` + `CAMPAIGN-DESIGN.md` first).
+Read `games-src/PLAYBOOK.md` (recipes A new game, B improvement for all games, C bug fix). Finished games go LIVE
+(owner's decision; no previews). Goal: every shelf game has story mode and works in portrait, landscape and rotation.
+- Live with story mode + phone fixes: Sunglaze, Cauldron Fair, Doorkick Dungeon, Thornbound (redesign).
+- In progress: Lantern Dive (also creates the shared `shell/gx-viewport.js`).
+- Next, in order:
+  1. Migration (playbook "One-off migration"): port munch's newer `shell.js` (drawer inert fix) into `games-src/shell/`,
+     then switch the 7 games on stale copies to inline the shared files. After this, recipe B reaches every game.
+  2. Recipe B: add `gx-viewport.js` to every game via the shared kit; `build-all.py --deploy`.
+  3. Story mode for the 10 games without it (one Sonnet worker each, 2 at a time; adapter templates
+     `azul/game/src/campaign.js`, `cauldron-fair/src/ui8.js`); games with no `campaign.json` get one written first.
+  4. Phone-check failures to fix: nebula-aces (portrait start), short-fuse, sands-of-qamar, kaiten-kitchen (rotation).
+- `phone-check.js` is sometimes flaky at game start ("couldn't start"): rerun once before treating it as a failure.
 
 ## Where things stand (4 Oct 2026)
 - **Thornbound** is the quality pilot. It has blind playtests (`games-src/thornbound/playtest-1/`) and the spec

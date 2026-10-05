@@ -3,6 +3,8 @@ name: "game-night-builder"
 description: Turn a published board game into a playable single-file browser game with faithful mechanics, original names and art, a computer opponent for every side, and automated balance testing. Use whenever the user gives a BoardGameGeek link (boardgamegeek.com/boardgame/...), names a board or card game and asks to "make it", "build it", "recreate it", "clone it", "make a playable version", or wants a digital version of a tabletop game, even if they don't say "skill" or "board game". Also use when improving, rebalancing or restyling a game built this way.
 ---
 
+> On the Game Night Shelf repo, follow `games-src/PLAYBOOK.md` (new game, improvement for all games, bug fix).
+
 # Board game builder
 
 Build a fun, faithful, playable browser version of a real board game in one HTML file. Prove it works with automated games and layout checks, then put it on the Game Night Shelf.
