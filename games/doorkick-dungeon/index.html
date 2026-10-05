@@ -714,7 +714,7 @@ html.ph #prompt .acts.main .btn{min-width:0;white-space:nowrap;overflow:hidden;t
 html.ph #prompt .acts.main .btn.pulse{flex:2 1 auto}
 html.ph #prompt .toast,html.ph #prompt .winwarn,html.ph #prompt>.since,html.ph #prompt>.autonote{position:fixed;left:8px;right:8px;top:calc(var(--ph-bar) + 62px + env(safe-area-inset-top,0px));z-index:30;margin:0;font-size:14px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;pointer-events:none;box-shadow:0 4px 14px rgba(0,0,0,.5)}
 html.ph-p:has(#prompt.bfq) #prompt .toast,html.ph-p:has(#prompt.bfq) #prompt .winwarn{position:static}
-html.ph .mine{--hw:clamp(54px,11dvh,80px)}
+html.ph .mine{--hw:clamp(63px,11dvh,80px)}
 html.ph .gear>.small{display:none}
 html.ph .gear:not(:has(.gchip)){min-height:0;padding:0}
 html.ph .mine .top{gap:6px}
@@ -4312,7 +4312,7 @@ function handBoost(p){let b=0;for(const id of p.hand){const c=cd(id);if(c.t==='o
 function isDeadly(c){return (c.bad||[]).some(o=>o[0]==='death'||o[0]==='orcs'||o[0]==='dread')}
 // choose a move for seat s from its legal moves
 function aiMove(s){const p=P(s),vm=validMoves(s);if(!vm.length)return null;const by=a=>vm.filter(m=>m.act===a);
-  if(p.lv==='easy'&&rnd(100)<22){const safe=vm.filter(m=>!['toss','give','pick','use'].includes(m.act)&&!(m.act==='play'&&cd(m.card).t==='curse'&&m.tgt===s)&&!(m.act==='play'&&m.tgt==='m'&&G.cb&&G.cb.who===s));if(safe.length)return safe[rnd(safe.length)]}
+  if(p.lv==='easy'&&rnd(100)<22){const safe=vm.filter(m=>!['toss','give','pick','use','sell'].includes(m.act)&&!(m.act==='play'&&cd(m.card).t==='curse'&&m.tgt===s)&&!(m.act==='play'&&m.tgt==='m'&&G.cb&&G.cb.who===s));if(safe.length)return safe[rnd(safe.length)]}
   if(G.q)return aiAnswer(p,vm);
   const ph=G.phase;
   if(ph==='setup'||ph==='main'||ph==='after'||ph==='post'){const m=aiCalm(p,vm);if(m)return m;
@@ -5731,7 +5731,7 @@ autoNoteHTML=function(){const a=UI.autoNote;if(!a||!G)return '';if(!a.at)a.at=Da
 // the status chip: during a rival's fight it is their fight, not "your move"
 (function(){const _dt=dockTitle;dockTitle=function(me){const cb=G&&G.cb;const s=G?sideToAct():-1;if(cb&&!G.winner&&s===me&&me>=0&&cb.who!==me&&cb.help!==me)return P(cb.who).nm+'’s fight: meddle?';if(G&&!G.winner&&G.phase==='window'&&s===me&&G.active!==me)return curPl().nm+'’s door: curse?';return _dt(me)}})();
 // the first game with "teach me" starts against Easy computers (still changeable on the start screen)
-(function(){if(UI.lvl)return;let first=true;try{first=!localStorage.getItem('dkd_learned')&&!localStorage.getItem('dkd_bf')}catch(e){}if(first){UI.lvl='easy';if(!G)render()}})();
+(function(){if(UI.lvl||/jsdom/i.test(navigator.userAgent||''))return;let first=true;try{first=!localStorage.getItem('dkd_learned')&&!localStorage.getItem('dkd_bf')}catch(e){}if(first){UI.lvl='easy';if(!G)render()}})();
 
 </script>
 <script>
