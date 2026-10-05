@@ -21,7 +21,7 @@ function CR_raceBox(s,ud){const host=ud.m,key=(ud.gbM?ud.gbM.length:0)+'|'+(s.vm
  host.quaternion.copy(q0);host.position.copy(p0);s.mesh.quaternion.copy(mq);if(B.isEmpty())return null;o={k:key,B};CR_RBX.set(s,o);return o}
 posShip=(f=>function(s,dt,snap){f(s,dt,snap);try{if(!s||!s.mesh||(s.wreck&&s.dead>0)||state==='roam')return;const ud=s.mesh.userData;if(!ud.gbM||!ud.gbM.length||!ud.m)return;
   const boat=(s.boatK||0)>.5;CR_raceHide(ud);const o=CR_raceBox(s,ud);if(!o)return;const B=o.B;
-  if(!s.air&&!(s.rollT>0)&&!boat){const tr=clamp((s.latV||0)*.006,-.06,.06);s.crRoll=snap?tr:(s.crRoll||0)+(tr-(s.crRoll||0))*Math.min(1,dt*8);
+  if(!s.air&&!(s.rollT>0)&&!boat){const tr=clamp((s.latV||0)*.004,-.035,.035);s.crRoll=snap?tr:(s.crRoll||0)+(tr-(s.crRoll||0))*Math.min(1,dt*8);
    const cr=Math.cos(s.crRoll),sr=Math.sin(s.crRoll),r2=rs.clone().multiplyScalar(cr).addScaledVector(us,sr),u2=us.clone().multiplyScalar(cr).addScaledVector(rs,-sr);
    ud.m.quaternion.setFromRotationMatrix(_m.makeBasis(r2,u2,fw.clone().negate()));ud.m.position.copy(F.u).multiplyScalar(-B.min.y+.02);ud.shield.position.copy(ud.m.position)}
   const sh=ud.shadow;if(sh){if(!sh.userData.crG){sh.geometry.computeBoundingBox();const g=sh.geometry.boundingBox;sh.userData.crG=[Math.max(.01,g.max.x-g.min.x),Math.max(.01,g.max.y-g.min.y,g.max.z-g.min.z)]}
