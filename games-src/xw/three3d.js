@@ -653,5 +653,5 @@ function warm3D(){if(G||!V3.on||!V3.r)return;const g=new THREE.Group();
     // guide overlays (path ribbons, base outlines, firing lanes, arc fans) use their own shaders
     const pts=[0,1,2].map(i=>({x:10+i*8,y:10,h:0}));
     [()=>ribbon(pts,0xffffff,.5),()=>outline({x:20,y:20,h:0},40,0xffffff,.5),()=>laneMesh(W(0,0,2),W(30,30,2),0xff5566),()=>arcFan({x:20,y:20,h:0,base:'S',type:Object.keys(SHIPS)[0]},'F',3,0xffa24f)].forEach(f=>{try{g.add(f())}catch(e){}});
-    V3.root.add(g);V3.r.compile(V3.scene,V3.camera)}catch(e){console.warn('warm',e)}
+    g.traverse(o=>{o.frustumCulled=false});V3.root.add(g);V3.r.compile(V3.scene,V3.camera);renderFrame()/* uploads the textures and buffers too */}catch(e){console.warn('warm',e)}
   finally{V3.root.remove(g)}}

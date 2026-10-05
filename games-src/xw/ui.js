@@ -10,7 +10,7 @@ function planSide(){if(!G||G.phase!=='plan')return -1;const net=(typeof NET!=='u
 function humanTurn(){const k=sideToAct();return k>=0&&isHuman(k)&&(typeof NET==='undefined'||!NET.on||k===NET.mySide)}
 function refresh(){render();schedule()}
 function render(){if(typeof netTick==='function')netTick();try{hpMark()}catch(e){}
-  if(G&&G.winner&&UI.wonSnd!==G.seed){UI.wonSnd=G.seed;sfx('win');if(G.sortie!=null&&soloSide()===0&&G.winner==='P1'){const c=campaign();c.i=Math.max(c.i,Math.min(SORTIES.length,G.sortie+1));c.won++;saveCampaign(c)}if(ANIM)setTimeout(()=>{UI.stats=true;render()},2200)}
+  if(G&&G.winner&&UI.wonSnd!==G.seed){UI.wonSnd=G.seed;sfx('win');if(G.sortie!=null&&soloSide()===0&&G.winner==='P1'){const c=campaign();c.i=Math.max(c.i,Math.min(SORTIES.length,G.sortie+1));c.won++;saveCampaign(c)}if(typeof campDone==='function'&&campOn()){if(ANIM)setTimeout(campDone,2200);else campDone()}else if(ANIM)setTimeout(()=>{UI.stats=true;render()},2200)}
   attackWatch();flowWatch();trackStats();if(V3.on)sync3D();else render2D();renderFlow();renderPrompt();renderShipCard();renderRoster();renderLog();renderModal();renderDock();renderCoach()}
 // ---- step bar ----
 function renderSteps(){renderRoad()}
@@ -149,6 +149,7 @@ function renderModal(){const el=$('modal');let h=typeof netModalHTML==='function
 const bothHuman=()=>G&&isHuman(0)&&isHuman(1)&&!(typeof NET!=='undefined'&&NET.on);// online games never show the pass-the-device screen
 function startHTML(){const saved=load();const camp=campaign();const campOK=UI.fac[0]===0&&UI.fac[1]===1;return `<div class="dlg start" role="dialog" aria-modal="true"><div class="launchbar"><h1>Nebula Aces</h1>${NET.on?'<button class="btn primary" data-a="netopen">🌐 Lobby ▶</button>':`<button class="btn primary" data-start="${UI.mode}">Launch ▶</button>`}</div><p class="lead">A tactical starfighter duel: secretly plan every maneuver, then watch the squadrons clash.</p>
   <p class="small">First time? Just press <b>Launch</b>: the defaults are a good first battle and the first round is guided. Everything below is optional.</p>
+  ${typeof GXC!=='undefined'&&window.CAMPAIGN&&!NET.on?`<div class="row"><button class="btn primary" data-a="story">📖 Story mode<small>${esc(campLine())}</small></button></div>`:''}
   ${campOK&&UI.mode==='solo'&&camp.i>0&&camp.i<SORTIES.length?`<div class="row"><button class="btn" data-a="sortie" data-k="${camp.i}">▶ Continue the campaign<small>Sortie ${camp.i+1}: ${esc(SORTIES[camp.i].title)}</small></button></div>`:''}
   <h3>Mode</h3><div class="row">${[['solo','Me vs computer'],['hot','Two players, one screen'],['ai','Watch the computer']].map(([k,l])=>`<button class="btn ${UI.mode===k?'on':''}" data-mode="${k}">${l}</button>`).join('')}</div>
   <h3>🌐 Play online</h3>${typeof onlineBlock==='function'?onlineBlock():''}
@@ -241,6 +242,7 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-a],[data-a
   if(ds.a==='recapok'){UI.recapSeen=G.round-1;render();return}if(ds.a==='recapoff'){UI.recapSeen=G.round-1;LS.set('na_recap','off');render();return}
   if(ds.a==='tourskip'){LS.set('na_tour','1');UI.coachOn=null;render();return}
   if(ds.a==='sortie'){startGame('solo',+ds.k);return}
+  if(ds.a==='story'){if(typeof GXC!=='undefined')GXC.open();return}
   if(ds.a==='speed'){const s=['slow','normal','fast'];UI.speed=s[(s.indexOf(UI.speed||'normal')+1)%3];AIDELAY={slow:1100,normal:600,fast:220}[UI.speed];$('speedbtn').textContent='⏩ '+UI.speed;return}
   if(ds.act){uiAct(Object.assign({},ds));return}
   if(ds.ship){uiAct({ship:ds.ship})}});
