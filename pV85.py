@@ -47,6 +47,19 @@ R("fog:'#5a3a52',fogD:.00030,hemi:['#c8a0c8','#3a2030',1.05]","fog:'#8a6450',fog
 R("mid:[.30,.17,.34],hor:[1.15,.46,.26]","mid:[.38,.28,.4],hor:[1.15,.5,.28]")
 R("{k:'speed',name:'SPEED DEMON',goal:3,lim:30,u:'s above 400 km/h'}","{k:'speed',name:'SPEED DEMON',goal:3,lim:30,u:'s above 160 km/h'}")
 R("Math.abs(RO.v)*3.6>400","Math.abs(RO.v)*3.6>160")
+# --- v85e (Alex's race / city feedback)
+# unstick: brake counts as input, and candidate exits must be clear of traffic bodies (a bus in an alley)
+R("if((c.thr||boost)&&!busy&&!air&&mv<dt*5)RO.stkT","if((c.thr||boost||c.brk)&&!busy&&!air&&mv<dt*5)RO.stkT")
+R("roamHit(px,pz,2.4,RO.y))continue;const d=Math.abs(angDiff(ang,RO.h));","roamHit(px,pz,2.4,RO.y)||(HUB.cars||[]).some(q=>!q.dead&&q.x!=null&&Math.hypot(q.x-px,q.z-pz)<5.5))continue;const d=Math.abs(angDiff(ang,RO.h));")
+# studs: about 1 in 12 left (demolition pays out); rings: far fewer markers, spaced wider
+R("const put=(x,z,y,v0)=>{if(roamHit(x,z,1,y))return;","const put=(x,z,y,v0)=>{if(((RO._pc=(RO._pc||0)+1)%12)!==0||roamHit(x,z,1,y))return;")
+R("const OG_N=10,OG_R=105,OG_FADE=[150,270];","const OG_N=3,OG_R=190,OG_FADE=[110,190];")
+R("for(let pass=0;pass<2;pass++)for(const s of smp){if(nearest(s[0],s[1],125))continue;let b=null,bd=1e9;for(const q of smp){const d=(q[0]-s[0])**2+(q[1]-s[1])**2;if(d<bd&&d<130*130&&ok(q[0],q[1])&&!nearest(q[0],q[1],45)){bd=d;b=q}}if(b)addEv(b)}",
+  "for(let pass=0;pass<2;pass++)for(const s of smp){if(nearest(s[0],s[1],240))continue;let b=null,bd=1e9;for(const q of smp){const d=(q[0]-s[0])**2+(q[1]-s[1])**2;if(d<bd&&d<250*250&&ok(q[0],q[1])&&!nearest(q[0],q[1],110)){bd=d;b=q}}if(b)addEv(b)}")
+# race steering: faster ramp + bigger initial kick, quicker yaw response
+R("-(up?rp:10)*H,(up?rp:10)*H","-(up?rp*1.8:16)*H,(up?rp*1.8:16)*H")
+R("[.3,.36,.42,.48,.55]","[.42,.5,.58,.66,.75]")
+R("H*(s.hbDir?8:s.asst?22:14)","H*(s.hbDir?10:s.asst?30:20)")
 # one objective line: "Deliver → 78 m"
 R("${ch?'NEXT':tg.ev||tg.name?markTitle(tg):''} · ${Math.round(Math.hypot(dx,dz))} m","${ch?v85Verb(ch):tg.ev||tg.name?markTitle(tg):''} → ${Math.round(Math.hypot(dx,dz))} m")
 R('window.__mho={',open('v85.js').read()+'\nwindow.__mho={')
