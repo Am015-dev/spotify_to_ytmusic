@@ -28,23 +28,24 @@ await p.evaluate(()=>{const {scene,camera,THREE}=__dbg,GY0=__dbg.GA;let gyRef=0;
 const K=p.keyboard;let si=0;
 const run=n=>p.evaluate(n=>__run(n),n);
 const shot=async()=>{await p.evaluate(()=>__draw());await p.screenshot({path:`${OUT}_f${String(si++).padStart(2,'0')}.png`})};
-const seg=async(frames)=>{for(let k=0;k<frames;k+=30){await run(Math.min(30,frames-k));await shot()}};
-if(MODE==='seq'){await K.down('ArrowUp');await seg(180);const h0=await run(0);await K.down('ArrowRight');
- for(let k=0;k<180;k+=6){const h=await run(6);if(k%30===24)await shot();if(Math.abs(h-h0)>Math.PI/2)break}
+const CRU=+(process.env.CRUISE||0);let up=false;const run6=async n=>{let h;for(let k=0;k<n;k+=6){if(CRU){const v=await p.evaluate(()=>__dbg.RO.v*3.6);const want=v<CRU;if(want!==up){up=want;await(want?K.down('ArrowUp'):K.up('ArrowUp'))}}h=await run(Math.min(6,n-k))}return h};
+const seg=async(frames)=>{for(let k=0;k<frames;k+=30){await run6(Math.min(30,frames-k));await shot()}};
+if(MODE==='seq'){if(!CRU)await K.down('ArrowUp');await seg(180);const h0=await run(0);await K.down('ArrowRight');
+ for(let k=0;k<180;k+=6){const h=await run6(6);if(k%30===24)await shot();if(Math.abs(h-h0)>Math.PI/2)break}
  await K.up('ArrowRight');await shot();await seg(60);for(let i=0;i<6;i++){const k=i%2?'ArrowRight':'ArrowLeft';await K.down(k);await seg(42);await K.up(k)}await K.up('ArrowUp')}
 else{await K.down('ArrowUp');let n=0;for(let t=0;t<7200;){const k=Math.random()<.5?'ArrowLeft':'ArrowRight',hold=Math.round(18+Math.random()*54),gap=Math.round(72+Math.random()*150);await K.down(k);await run(hold);await K.up(k);await run(gap);t+=hold+gap;if(n++%8===0)await shot()}await K.up('ArrowUp')}
 const L=await p.evaluate(()=>window.__dl);
 const ad=(a,b)=>{let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d},deg=r=>r*180/Math.PI;
 // slip in normal (non-drift, grounded) turns
 const hit=L.map((f,i)=>i>0&&(Math.abs(f.v-L[i-1].v)>1.5||f.nb!==L[i-1].nb)),near=i=>hit.slice(Math.max(0,i-30),i+12).some(Boolean);
-const sl=L.filter((f,i)=>!f.d&&!f.air&&Math.abs(f.st)>.2&&Math.abs(f.v)>5&&!near(i)).map(f=>Math.abs(deg(ad(f.h,f.vh)))).sort((a,b)=>a-b);
+const sl=L.filter((f,i)=>!f.d&&!f.air&&!f.bt&&Math.abs(f.st)>.2&&Math.abs(f.v)>5&&!near(i)).map(f=>Math.abs(deg(ad(f.h,f.vh)))).sort((a,b)=>a-b);
 // camera yaw lag: chase bearing (camera->car) vs car heading, best time shift
 const un=a=>{const o=[a[0]];for(let i=1;i<a.length;i++)o.push(o[i-1]+ad(a[i],a[i-1]));return o};const tt=L.map(f=>f.t),H=un(L.map(f=>f.h)),C=un(L.map(f=>Math.atan2(f.x-f.cx,f.z-f.cz)));
 const off=C.map((c,i)=>c-H[i]).sort((a,b)=>a-b)[C.length>>1];const hAt=t=>{let i=tt.findIndex(x=>x>=t);if(i<=0)return H[Math.max(0,i)];if(i<0)return H[H.length-1];const u=(t-tt[i-1])/(tt[i]-tt[i-1]);return H[i-1]+(H[i]-H[i-1])*u};
 let best=[1e9,0];for(let tau=0;tau<=.8;tau+=.01){let e=0,n=0;for(let i=0;i<L.length;i++){if(tt[i]-tau<tt[0])continue;const d=C[i]-off-hAt(tt[i]-tau);e+=d*d;n++}if(n&&e/n<best[0])best=[e/n,tau]}
 // wheel spin: measured rotation per frame vs v*dt/r (rear wheels; front ones are steered too)
-let sr=0,sv=0;const SM={};for(let i=1;i<L.length;i++){const a=L[i-1],b=L[i];if(!a.W.length||a.W.length!==b.W.length||Math.abs(b.v)<2||b.bt||a.bt||near(i))continue;const dt=b.t-a.t,ds=Math.hypot(b.x-a.x,b.z-a.z);for(let k=0;k<b.W.length;k++){if(b.W[k][2]<0)continue;const dr=b.W[k][0]-a.W[k][0];sr+=Math.abs(dr);sv+=ds/b.W[k][1];const o=SM[b.vm]=SM[b.vm]||[0,0];o[0]+=Math.abs(dr);o[1]+=ds/b.W[k][1]}}
-const cl=L.filter(f=>!f.bt).map(f=>f.clr).filter(x=>x!=null),cw=L.filter(f=>!f.bt&&!f.air).map(f=>f.cw).filter(x=>x!=null);const modes={};L.forEach(f=>modes[f.vm]=(modes[f.vm]||0)+1);
+let sr=0,sv=0;const SM={};for(let i=1;i<L.length;i++){const a=L[i-1],b=L[i];if(!a.W.length||a.W.length!==b.W.length||Math.abs(b.v)<2||b.bt||a.bt||a.vm!==b.vm||near(i))continue;const dt=b.t-a.t,ds=Math.hypot(b.x-a.x,b.z-a.z);for(let k=0;k<b.W.length;k++){if(b.W[k][2]<0)continue;const dr=b.W[k][0]-a.W[k][0];sr+=Math.abs(dr);sv+=ds/b.W[k][1];const o=SM[b.vm]=SM[b.vm]||[0,0];o[0]+=Math.abs(dr);o[1]+=ds/b.W[k][1]}}
+const cl=L.filter(f=>!f.bt&&f.vm!=='boat').map(f=>f.clr).filter(x=>x!=null),cw=L.filter(f=>!f.bt&&!f.air).map(f=>f.cw).filter(x=>x!=null);const modes={};L.forEach(f=>modes[f.vm]=(modes[f.vm]||0)+1);
 const R={modes,boatFrames:L.filter(f=>f.bt).length,hits:hit.filter(Boolean).length,city:CITY,mode:MODE,frames:L.length,fps:+(L.length/(tt[tt.length-1]-tt[0])).toFixed(1),slipDeg:{n:sl.length,mean:+(sl.reduce((a,b)=>a+b,0)/Math.max(1,sl.length)).toFixed(2),p95:+(sl[Math.floor(sl.length*.95)]||0).toFixed(2),max:+(sl[sl.length-1]||0).toFixed(2)},
  camLagS:+best[1].toFixed(2),camRms:+deg(Math.sqrt(best[0])).toFixed(1),wheelSpinRatio:+(sr/Math.max(1e-6,sv)).toFixed(2),spinByMode:Object.fromEntries(Object.entries(SM).map(([k,o])=>[k,+(o[0]/Math.max(1e-6,o[1])).toFixed(2)])),minBodyClear:+Math.min(...cl).toFixed(3),minTyreGap:+Math.min(...cw).toFixed(3),maxTyreGap:+Math.max(...cw).toFixed(3),
  tyreGapP50:+cw.sort((a,b)=>a-b)[cw.length>>1].toFixed(3),maxKmh:+(Math.max(...L.map(f=>Math.abs(f.v)))*3.6).toFixed(0),turned:+deg(H[H.length-1]-H[0]).toFixed(0)};

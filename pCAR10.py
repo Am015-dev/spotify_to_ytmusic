@@ -40,9 +40,9 @@ function CR_fx(s,ud){const host=ud.m,boat=(s.boatK||0)>.5;if(ud.under)ud.under.v
  if(ud.crFl&&B){const W=B.max.x-B.min.x,H=B.max.y-B.min.y,L=B.max.z-B.min.z,on=!!s.nitro&&!boat;for(const c of ud.crFl){c.visible=on;if(on){const k=.75+Math.random()*.5;c.position.set((B.min.x+B.max.x)/2+c.userData.sd*W*.2,B.min.y+H*.2,B.max.z-L*.01);c.scale.set(W*.07*k,W*.07*k,L*.2*k)}}}}
 
 // wheels on the ground + spin + steer, body never below the ground (runs every sim step, independent of rendering)
-function CR_carPose(s,dt){const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m)return;CR_fx(s,ud);if((s.boatK||0)>.5)return;const host=ud.m,W=[];
+function CR_carPose(s,dt){const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m)return;CR_fx(s,ud);if((s.boatK||0)>.5){RO.crPX=RO.x;RO.crPZ=RO.z;return}const host=ud.m,W=[];
  host.traverse(w=>{if(!w.isMesh||!w.userData.r)return;let v=true,q=w;while(q&&q!==host){if(!q.visible)v=false;q=q.parent}if(v)W.push(w)});
- if(!W.length)return;if(s.air){for(const w of W){w.userData.crSim=1;w.updateMatrixWorld();w.getWorldScale(_crS);w.rotation.x-=(RO.v||0)*dt/(w.userData.r*_crS.y)}RO.crPX=RO.x;RO.crPZ=RO.z;return}s.mesh.updateMatrixWorld(true);const need=[];let mx=-9;
+ if(!W.length){RO.crPX=RO.x;RO.crPZ=RO.z;return}if(s.air){for(const w of W){w.userData.crSim=1;w.updateMatrixWorld();w.getWorldScale(_crS);w.rotation.x-=(RO.v||0)*dt/(w.userData.r*_crS.y)}RO.crPX=RO.x;RO.crPZ=RO.z;return}s.mesh.updateMatrixWorld(true);const need=[];let mx=-9;
  for(const w of W){w.userData.crSim=1;if(w.userData.by==null)w.userData.by=w.position.y;w.position.y=w.userData.by;w.updateMatrixWorld(true);w.getWorldPosition(_crA);w.getWorldScale(_crS);
   const r=w.userData.r*_crS.y,g=groundAt(_crA.x,_crA.z,_crA.y+1),d=g+.005-(_crA.y-r);need.push([w,d,_crS.y,r]);mx=Math.max(mx,d)}
  let lift=Math.max(Math.min(0,mx),mx-.22);
