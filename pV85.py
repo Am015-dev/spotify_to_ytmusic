@@ -18,6 +18,8 @@ R("const box=(w,h,d,x,y,z,c,ry=0)=>bt.add(cbox(w,h,d,x,y+h/2,z,c,ry),BM.plain),c
 # pedestrian-street paving / median ribbons took the node elevation p.y unclamped: on hill/stair nodes they became giant beige walls. Clamp to ground + 1.2 m.
 R("y1=Math.max(groundY(p.x,p.z),p.y||0)+.075,y2=Math.max(groundY(o.x,o.z),o.y||0)+.075","y1=Math.min(Math.max(groundY(p.x,p.z),p.y||0),groundY(p.x,p.z)+1.2)+.075,y2=Math.min(Math.max(groundY(o.x,o.z),o.y||0),groundY(o.x,o.z)+1.2)+.075")
 R("y1=Math.max(groundY(p.x,p.z),p.y||0)+.16,y2=Math.max(groundY(o.x,o.z),o.y||0)+.16","y1=Math.min(Math.max(groundY(p.x,p.z),p.y||0),groundY(p.x,p.z)+1.2)+.16,y2=Math.min(Math.max(groundY(o.x,o.z),o.y||0),groundY(o.x,o.z)+1.2)+.16")
+# simplify the Athens street network: drop residential streets (70 % of all road length) except near named places
+R("const cmp=false;raw.push({id:q.id,name:q.name,cls:q.cls,one:q.one,","const cmp=false;if(q.cls==='res'&&!(window.__spt||(window.__spt=Object.values(RF.spots).map(sp=>WP(sp[0],sp[1])))).some(([sx,sz])=>pts.some(([x,z])=>(x-sx)**2+(z-sz)**2<4900)))continue;raw.push({id:q.id,name:q.name,cls:q.cls,one:q.one,")
 # dark neutral asphalt with white lane markings; plaza paving no longer near-white
 R("g.fillStyle='#5b5f68';g.fillRect(0,0,256,512);for(let i=0;i<3000;i++){const v=70+r()*40|0;","g.fillStyle='#2c2e34';g.fillRect(0,0,256,512);for(let i=0;i<3000;i++){const v=36+r()*28|0;")
 R("g.fillStyle='#ffc21a';g.fillRect(121,0,5,512);g.fillRect(130,0,5,512);","g.fillStyle='#f4f4f0';for(let y=0;y<512;y+=128)g.fillRect(125,y,6,64);")
