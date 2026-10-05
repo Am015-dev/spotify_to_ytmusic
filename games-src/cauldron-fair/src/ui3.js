@@ -15,12 +15,14 @@ function newGame(mode, o) {
   else if (mode === 'hot') ai = new Array(np).fill(null);
   else if (mode === 'ai') ai = chars.map(ch => lvOf(ch));
   else ai = chars.map((ch, i) => i === 0 ? null : lvOf(ch));
-  const names = chars.map(ch => PN[ch]);
+  const names = chars.map(ch => PN[ch]); if (o.camp && o.camp.opponent && o.camp.opponent.name) names[1] = o.camp.opponent.name.split(' ').pop();   // short name for the table (the boss card shows the full one)
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0; UI.seed = null;
-  G = CF.newGame({ players: np, seed, names, ai, chars, setMode: sets === 'random' ? 'random' : sets, guided: mode === 'guided', firstCard: mode === 'guided' ? 'lucky7' : undefined });
-  UI.mode = mode; UI.cfg = c; UI.started = true; UI.holder = -1; UI.focus = 0; UI.evN = G.evN; UI.over = null; UI.overShown = false; UI.rsOpen = false; UI.repSeen = 0; UI.shopSel = []; UI.potSig = ''; UI.tip = null; UI.tipRound = {}; UI.tipMark = null; UI.tipOpen = false; UI.hotShared = 0; UI.tipq = []; UI.tipShown = {};
+  G = CF.newGame({ players: np, seed, names, ai, chars, setMode: sets === 'random' ? 'random' : sets, guided: mode === 'guided', firstCard: mode === 'guided' ? 'lucky7' : (o.camp && o.camp.setup && o.camp.setup.firstCard) || undefined });
+  if (o.camp) campTwist(G, o.camp.twist);
+  UI.camp = o.camp || null; UI.mode = mode; UI.cfg = c; UI.started = true; UI.holder = -1; UI.focus = 0; UI.evN = G.evN; UI.over = null; UI.overShown = false; UI.rsOpen = false; UI.repSeen = 0; UI.shopSel = []; UI.potSig = ''; UI.tip = null; UI.tipRound = {}; UI.tipMark = null; UI.tipOpen = false; UI.hotShared = 0; UI.tipq = []; UI.tipShown = {};
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && mode !== 'guided' ? 'light' : UI.coach.level), seen: {} };
   if (mode === 'guided' && UI.coach.level === 'off') UI.coach.level = 'full';
+  campCoach(o.camp || null);
   window.G = G; try { const st = $('#start'); if (st) st.hidden = true; } catch (e) { }
   closeRS && closeRS(true); try { GX.close(); } catch (e) { }
   if (mode !== 'ai') save();
@@ -129,7 +131,7 @@ function loadSave() {
   try {
     const o = JSON.parse(localStorage.getItem('cf_save') || 'null'); if (!o || o.v !== SAVEV || !o.G) return false;
     Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; UI.seq++;
-    G = o.G; window.G = G; UI.mode = o.mode || 'vs'; UI.cfg = o.cfg; UI.started = true; UI.holder = -1; UI.focus = o.focus || 0; UI.evN = G.evN; UI.rsOpen = false; UI.repSeen = G.rep ? G.rep.round : 0; UI.over = null; UI.overShown = false; UI.potSig = ''; UI.tip = null; UI.tipq = [];
+    G = o.G; window.G = G; UI.camp = null; UI.mode = o.mode || 'vs'; UI.cfg = o.cfg; UI.started = true; UI.holder = -1; UI.focus = o.focus || 0; UI.evN = G.evN; UI.rsOpen = false; UI.repSeen = G.rep ? G.rep.round : 0; UI.over = null; UI.overShown = false; UI.potSig = ''; UI.tip = null; UI.tipq = [];
     UI.coach = { level: UI.coach.level, seen: {} }; const st = $('#start'); if (st) st.hidden = true; closeRS && closeRS(true);
     afterApply(true); sndMusic(); toast('Welcome back.'); return true;
   } catch (e) { console.error(e); return false; }

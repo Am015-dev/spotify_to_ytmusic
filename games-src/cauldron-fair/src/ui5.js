@@ -120,6 +120,7 @@ function titleEl() {
   return h('div.ttl', bg, h('div.ttl-in',
     h('div', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Cauldron Fair')), h('p.tag', 'Brew bold. Stop wise.')),
     h('div.tbtns',
+      h('button.tbtn.story', { 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story'), h('span', campLine() || 'Ten chapters, three bosses')),
       h('button.tbtn.go', { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')),
       sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved fair')) : null,
@@ -200,6 +201,9 @@ document.addEventListener('click', ev => {
     case 'tipoff': UI.coach.level = 'off'; tipOk(); savePrefs(); break;
     case 'again': { const m = UI.mode, c = UI.cfg || {}; closeRS(true); UI.overShown = false; newGame(m === 'net' ? 'vs' : m, c); break; }
     case 'look': closeRS(true); UI.overShown = true; render(); break;
+    case 'story': campOpen(); break;
+    case 'campfin': closeRS(true); campFinish(); break;
+    case 'campgoal': campGoalToast(); break;
     case 'play': UI.sv = 'setup'; renderStart(); break;
     case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;
     case 'title': UI.sv = 'title'; UI.cfgOpen = false; renderStart(); break;

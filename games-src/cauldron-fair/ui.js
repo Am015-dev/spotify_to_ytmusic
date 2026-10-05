@@ -98,7 +98,7 @@ function savePrefs() { try { localStorage.setItem('cf_prefs', JSON.stringify({ p
 function loadPrefs() { try { const o = JSON.parse(localStorage.getItem('cf_prefs') || 'null'); if (o) { Object.assign(UI.prefs, o.p || {}); if (o.aid != null) AIDELAY = o.aid; if (o.coach) UI.coach.level = o.coach; } } catch (e) { } }
 const SAVEV = 1;
 function hasSave() { try { const s = localStorage.getItem('cf_save'); if (!s) return false; const o = JSON.parse(s); return !!(o && o.v === SAVEV && o.G && o.G.phase !== 'over'); } catch (e) { return false; } }
-function save() { try { if (!G || (typeof NET !== 'undefined' && NET.on) || G.phase === 'over') return false; localStorage.setItem('cf_save', JSON.stringify({ v: SAVEV, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs, focus: UI.focus, holder: UI.holder })); return true; } catch (e) { return false; } }
+function save() { try { if (!G || UI.camp || (typeof NET !== 'undefined' && NET.on) || G.phase === 'over') return false; localStorage.setItem('cf_save', JSON.stringify({ v: SAVEV, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs, focus: UI.focus, holder: UI.holder })); return true; } catch (e) { return false; } }
 function clearSave() { try { localStorage.removeItem('cf_save'); } catch (e) { } }
 // log lines name every maker; the viewer reads "You" instead of their maker's name ("Wynne takes" -> "You take")
 function youText(t) {
@@ -286,9 +286,10 @@ function renderQ(p, legal, qb) {
 }
 function renderBar() {
   const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
-  if (!G) return; bs.append(h('span.dayn', isPh() ? 'Day ' + G.round + '/' + D.rounds : 'Day ' + G.round + ' of ' + D.rounds));
+  if (!G) return; const dtxt = isPh() ? 'Day ' + G.round + '/' + D.rounds : 'Day ' + G.round + ' of ' + D.rounds;
+  bs.append(UI.camp ? h('button.dayn.gchip', { 'data-a': 'campgoal', type: 'button', 'aria-label': 'Day ' + G.round + '. Tap for the chapter goal' }, '\ud83c\udfaf ' + dtxt) : h('span.dayn', dtxt));
   const v0 = viewSeat(), f0 = focusSeat(), q0 = G.players[f0 >= 0 ? f0 : 0];
-  if (isPh() && q0) bs.append(h('span.bst', { title: (f0 === v0 ? 'Your' : q0.name + '\'s') + ' points, rubies and flask' }, h('span.bav', { html: avHTML(f0, 24) }), h('span', { html: ico('vp', 17) }), h('b', q0.vp), h('span', { html: ico('ruby', 16) }), h('b', q0.rubies), h('span.bfl', { html: ico('flask', 17, q0.flask) })));
+  if (isPh() && q0) bs.append(h('span.bst', { title: (f0 === v0 ? 'Your' : q0.name + '\'s') + ' points, rubies and flask' }, UI.camp ? null : h('span.bav', { html: avHTML(f0, 24) }), h('span', { html: ico('vp', 17) }), h('b', q0.vp), h('span', { html: ico('ruby', 16) }), h('b', q0.rubies), h('span.bfl', { html: ico('flask', 17, q0.flask) })));
   const dt = document.querySelector('.gx-dt'); if (dt) { const v = viewSeat(); dt.textContent = G.phase === 'over' ? 'Game over' : (v >= 0 && (G.phase === 'brew' ? G.players[v].st === 'draw' : !!G.players[v].q)) ? 'Your turn' : 'Waiting'; }
 }
 let rndT = 0;
@@ -320,12 +321,14 @@ function newGame(mode, o) {
   else if (mode === 'hot') ai = new Array(np).fill(null);
   else if (mode === 'ai') ai = chars.map(ch => lvOf(ch));
   else ai = chars.map((ch, i) => i === 0 ? null : lvOf(ch));
-  const names = chars.map(ch => PN[ch]);
+  const names = chars.map(ch => PN[ch]); if (o.camp && o.camp.opponent && o.camp.opponent.name) names[1] = o.camp.opponent.name.split(' ').pop();   // short name for the table (the boss card shows the full one)
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0; UI.seed = null;
-  G = CF.newGame({ players: np, seed, names, ai, chars, setMode: sets === 'random' ? 'random' : sets, guided: mode === 'guided', firstCard: mode === 'guided' ? 'lucky7' : undefined });
-  UI.mode = mode; UI.cfg = c; UI.started = true; UI.holder = -1; UI.focus = 0; UI.evN = G.evN; UI.over = null; UI.overShown = false; UI.rsOpen = false; UI.repSeen = 0; UI.shopSel = []; UI.potSig = ''; UI.tip = null; UI.tipRound = {}; UI.tipMark = null; UI.tipOpen = false; UI.hotShared = 0; UI.tipq = []; UI.tipShown = {};
+  G = CF.newGame({ players: np, seed, names, ai, chars, setMode: sets === 'random' ? 'random' : sets, guided: mode === 'guided', firstCard: mode === 'guided' ? 'lucky7' : (o.camp && o.camp.setup && o.camp.setup.firstCard) || undefined });
+  if (o.camp) campTwist(G, o.camp.twist);
+  UI.camp = o.camp || null; UI.mode = mode; UI.cfg = c; UI.started = true; UI.holder = -1; UI.focus = 0; UI.evN = G.evN; UI.over = null; UI.overShown = false; UI.rsOpen = false; UI.repSeen = 0; UI.shopSel = []; UI.potSig = ''; UI.tip = null; UI.tipRound = {}; UI.tipMark = null; UI.tipOpen = false; UI.hotShared = 0; UI.tipq = []; UI.tipShown = {};
   UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && mode !== 'guided' ? 'light' : UI.coach.level), seen: {} };
   if (mode === 'guided' && UI.coach.level === 'off') UI.coach.level = 'full';
+  campCoach(o.camp || null);
   window.G = G; try { const st = $('#start'); if (st) st.hidden = true; } catch (e) { }
   closeRS && closeRS(true); try { GX.close(); } catch (e) { }
   if (mode !== 'ai') save();
@@ -434,7 +437,7 @@ function loadSave() {
   try {
     const o = JSON.parse(localStorage.getItem('cf_save') || 'null'); if (!o || o.v !== SAVEV || !o.G) return false;
     Object.keys(UI.tm).forEach(k => clearTimeout(UI.tm[k])); UI.tm = {}; UI.seq++;
-    G = o.G; window.G = G; UI.mode = o.mode || 'vs'; UI.cfg = o.cfg; UI.started = true; UI.holder = -1; UI.focus = o.focus || 0; UI.evN = G.evN; UI.rsOpen = false; UI.repSeen = G.rep ? G.rep.round : 0; UI.over = null; UI.overShown = false; UI.potSig = ''; UI.tip = null; UI.tipq = [];
+    G = o.G; window.G = G; UI.camp = null; UI.mode = o.mode || 'vs'; UI.cfg = o.cfg; UI.started = true; UI.holder = -1; UI.focus = o.focus || 0; UI.evN = G.evN; UI.rsOpen = false; UI.repSeen = G.rep ? G.rep.round : 0; UI.over = null; UI.overShown = false; UI.potSig = ''; UI.tip = null; UI.tipq = [];
     UI.coach = { level: UI.coach.level, seen: {} }; const st = $('#start'); if (st) st.hidden = true; closeRS && closeRS(true);
     afterApply(true); sndMusic(); toast('Welcome back.'); return true;
   } catch (e) { console.error(e); return false; }
@@ -574,7 +577,7 @@ function showFinal() {
   const cfg = UI.cfg || {};
   const online = typeof NET !== 'undefined' && NET.on;
   box.appendChild(body);
-  box.appendChild(h('div.rsfoot', h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, (!online || isHost()) ? h('button.btn.go', { 'data-a': 'again', type: 'button' }, 'Play again') : h('span.sm', 'The host can start a new game.'), h('button.btn.alt', { 'data-a': 'look', type: 'button' }, 'Look at the table'), h('button.btn.alt', { 'data-a': 'menu', type: 'button' }, online ? 'Lobby' : 'Menu'))));
+  box.appendChild(h('div.rsfoot', h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap' }, UI.camp && typeof GXC !== 'undefined' && GXC.active() ? h('button.btn.go', { 'data-a': 'campfin', type: 'button' }, 'Continue the story') : (!online || isHost()) ? h('button.btn.go', { 'data-a': 'again', type: 'button' }, 'Play again') : h('span.sm', 'The host can start a new game.'), h('button.btn.alt', { 'data-a': 'look', type: 'button' }, 'Look at the table'), (UI.camp ? null : h('button.btn.alt', { 'data-a': 'menu', type: 'button' }, online ? 'Lobby' : 'Menu')))));
   const conf = h('div.conf'); const cols = ['#f2b81e', '#d6392f', '#3fa04a', '#3b82d6', '#8a55c4']; for (let i = 0; i < 26; i++) { const c = h('i'); c.style.cssText = 'left:' + Math.random() * 100 + '%;background:' + cols[i % 5] + ';animation-delay:' + Math.random() * 2 + 's;animation-duration:' + (2 + Math.random() * 2) + 's'; conf.appendChild(c); }
   rs.innerHTML = ''; rs.appendChild(box); if (!UI.sim) rs.appendChild(conf);
 }
@@ -749,6 +752,7 @@ function titleEl() {
   return h('div.ttl', bg, h('div.ttl-in',
     h('div', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Cauldron Fair')), h('p.tag', 'Brew bold. Stop wise.')),
     h('div.tbtns',
+      h('button.tbtn.story', { 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story'), h('span', campLine() || 'Ten chapters, three bosses')),
       h('button.tbtn.go', { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer makers')),
       h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')),
       sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved fair')) : null,
@@ -829,6 +833,9 @@ document.addEventListener('click', ev => {
     case 'tipoff': UI.coach.level = 'off'; tipOk(); savePrefs(); break;
     case 'again': { const m = UI.mode, c = UI.cfg || {}; closeRS(true); UI.overShown = false; newGame(m === 'net' ? 'vs' : m, c); break; }
     case 'look': closeRS(true); UI.overShown = true; render(); break;
+    case 'story': campOpen(); break;
+    case 'campfin': closeRS(true); campFinish(); break;
+    case 'campgoal': campGoalToast(); break;
     case 'play': UI.sv = 'setup'; renderStart(); break;
     case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;
     case 'title': UI.sv = 'title'; UI.cfgOpen = false; renderStart(); break;
@@ -1358,3 +1365,72 @@ PX.state = () => ({ pend: !!pxQueued || !!PX.dirty, on: PX.on, kind: PX.kind, q:
   objs: Array.from(PX.chips.values()).filter(o => !o.dead && !o.gone).map(o => ({ id: o.id, key: o.key, x: o.sp.x, y: o.sp.y, tx: o.tx, ty: o.ty, visible: o.sp.visible, alpha: o.sp.alpha, flying: !!o.flying })),
   drop: PX.drop ? { x: PX.drop.x, y: PX.drop.y, vis: PX.drop.visible } : null, filters: [PX.root, PX.L.board, PX.L.chips, PX.L.amb, PX.L.fx, PX.L.mark].filter(c => c && c.filters && c.filters.length).length, S: PX.S, cx: PX.cx, cy: PX.cy });
 PX.canvasInk = () => { try { const c = PX.app.renderer.extract.canvas(PX.app.stage); const x = c.getContext('2d'), w = c.width, h = c.height; const d = x.getImageData(0, 0, w, h).data; let n = 0, tot = 0; for (let i = 3; i < d.length; i += 4 * 37) { tot++; if (d[i] > 20) n++; } return n / Math.max(1, tot); } catch (e) { return -1; } };
+// ===================== part 8: Story mode (campaign.json + the shared chapter kit gx-campaign.js) =====================
+// A chapter is a normal game with the chapter's table, AI level, books and coach setting, plus one optional twist applied once
+// right after CF.newGame (before any chip is drawn). The twists only exist here: the normal game's rules never change.
+UI.camp = null;
+const CAMP_CHAR = { wynne: 0, odo: 1, tamsin: 2, mirabel: 3, vesper: 2 };      // who sits where (cast id -> maker)
+const CAMP_THIRD = { c5: 'wynne', c9: 'mirabel' };                              // the 3rd pot in the 3-player chapters
+const CAMP_ME = [3, 2, 1, 0];                                                    // your maker: the first one not already a rival
+function campTwist(g, tw) {
+  if (!tw || !tw.id) return;
+  const boss = g.players[1], me = g.players[0], n = tw.param;
+  switch (tw.id) {
+    case 'boss-rubies': boss.rubies += n; break;
+    case 'boss-chip': CF._.give(g, boss, n, true); break;
+    case 'boss-droplet': boss.droplet = n; break;
+    case 'boss-lead': boss.vp = n; break;
+    case 'crowded-bag': for (let k = 0; k < n; k++) CF._.give(g, me, 'W1', true); break;
+  }
+}
+// act 1 teaches with the full coach; later acts have none. The player's own guide setting comes back outside the story.
+function campCoach(def) {
+  if (def) { if (UI.coachPref == null) UI.coachPref = UI.coach.level; UI.coach.level = def.hints ? 'full' : 'off'; }
+  else if (UI.coachPref != null) { UI.coach.level = UI.coachPref; UI.coachPref = null; }
+}
+function campMetrics(g) {
+  const mine = g.hist.filter(x => x.seat === 0), won = g.winner === 0, vp = g.players[0].vp;
+  const best = Math.max.apply(null, g.players.slice(1).map(p => p.vp));
+  return { won, score: vp, margin: vp - best, winScore: won ? vp : 0, booms: mine.filter(x => x.boom).length,
+    best: mine.reduce((a, x) => Math.max(a, x.space || 0), 0), bought: mine.reduce((a, x) => a + ((x.bought && x.bought.length) || 0), 0), rounds: g.round };
+}
+function campIsWon(g, def) {
+  const m = campMetrics(g), gl = def.goal || {}, needWin = !gl.winNotNeeded;
+  if (needWin && !m.won) return false;
+  switch (gl.type) {
+    case 'score': return m.score >= gl.value;
+    case 'margin': return m.margin >= gl.value;
+    case 'custom': return m.bought >= gl.value;      // c2: buy chips
+    default: return m.won;
+  }
+}
+function campStart(def) {
+  const s = def.setup || {}, op = def.opponent || {}, np = s.players || 2, lv = op.aiLevel || 'normal';
+  const rv = [CAMP_CHAR[op.cast] != null ? CAMP_CHAR[op.cast] : 1];
+  if (np > 2) { const t = CAMP_CHAR[CAMP_THIRD[def.id]]; rv.push(t != null && rv.indexOf(t) < 0 ? t : [0, 1, 2, 3].find(c => rv.indexOf(c) < 0)); }
+  const me = CAMP_ME.find(c => rv.indexOf(c) < 0), lvBy = {}; rv.forEach(c => lvBy[c] = lv);
+  UI.seed = s.seed != null ? s.seed : null;
+  return newGame('vs', { camp: def, np, me, seats: rv, lvBy, sets: s.setMode != null ? s.setMode : 1 });
+}
+function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
+function campOpen() { if (typeof GXC === 'undefined') return; GXC.open(); }
+function campGoalToast() { const d = UI.camp; if (d) toast('Goal: ' + d.goal.text + (d.twist ? ' ' + d.twist.text : '')); }
+function campLine() {
+  try {
+    if (typeof GXC === 'undefined' || !window.CAMPAIGN) return '';
+    const p = GXC.progress(), ch = window.CAMPAIGN.chapters, n = ch.filter(c => p.ch[c.id] && p.ch[c.id].beaten).length;
+    return n ? n + ' of ' + ch.length + ' chapters done' : '';
+  } catch (e) { return ''; }
+}
+function campInit() {
+  if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
+  GXC.init({
+    game: 'cauldron', data: window.CAMPAIGN,
+    startChapter: campStart,
+    isWon: campIsWon, metrics: campMetrics,
+    onExit: () => { UI.camp = null; campCoach(null); showStart(); },
+    scores: g => g.players.map(p => p.vp),
+    seats: g => g.players.map((p, i) => ({ name: i === 0 ? 'You' : p.name, me: i === 0, ai: p.ai || undefined }))
+  });
+}
+campInit();
