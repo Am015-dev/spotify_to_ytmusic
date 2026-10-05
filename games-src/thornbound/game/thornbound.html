@@ -774,7 +774,7 @@ function smoothPath(pts, close) {
 function hills(R, y, amp, col, op, w, x0) {
   w = w || 220; x0 = x0 || 0; var pts = [], n = Math.ceil(w / 24) + 1;
   for (var i = 0; i <= n; i++) pts.push([x0 + i * w / n, y - R() * amp]);
-  return '<path d="' + smoothPath(pts, ' V152 H' + x0 + ' V' + n2(pts[0][1]) + 'Z') + '" fill="' + col + '" opacity="' + (op || 1) + '"/>';
+  return '<path d="' + smoothPath(pts, ' V' + (w <= 80 ? 40 : 152) + ' H' + x0 + ' V' + n2(pts[0][1]) + 'Z') + '" fill="' + col + '" opacity="' + (op || 1) + '"/>';
 }
 function blobs(R, n, x0, y0, w, h, rmin, rmax, cols, op) {
   var s = ''; for (var i = 0; i < n; i++) s += '<ellipse cx="' + n2(x0 + R() * w) + '" cy="' + n2(y0 + R() * h) + '" rx="' + n2(rmin + R() * (rmax - rmin)) + '" ry="' + n2((rmin + R() * (rmax - rmin)) * .6) + '" fill="' + cols[Math.floor(R() * cols.length)] + '" opacity="' + n2(op * (.5 + R() * .5)) + '" transform="rotate(' + n2(R() * 40 - 20) + ' ' + n2(x0 + w / 2) + ' ' + n2(y0 + h / 2) + ')"/>'; return s;
