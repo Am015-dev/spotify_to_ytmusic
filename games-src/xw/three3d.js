@@ -51,7 +51,7 @@ function init3D(){const cv=document.getElementById('c3');if(!cv||typeof THREE===
   perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
 // ---- quality levels ----
 function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=V3.r;V3.q=q;const dpr=window.devicePixelRatio||1;
-  {const want=q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1;r.setPixelRatio(PH?PH.pixelRatio(want):want)}
+  {let want=q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1;/* software rendering (no GPU): fewer pixels keeps taps responsive */if(V3.soft)want=Math.min(want,.7);r.setPixelRatio(PH?PH.pixelRatio(want):want)}
   const sh=q!=='low',ms=q==='high'?2048:1024,st=q==='high'?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;
   if(r.shadowMap.enabled!==sh||V3.key.shadow.mapSize.x!==ms||r.shadowMap.type!==st){r.shadowMap.enabled=sh;r.shadowMap.type=st;V3.key.castShadow=sh;V3.key.shadow.mapSize.set(ms,ms);if(V3.key.shadow.map){V3.key.shadow.map.dispose();V3.key.shadow.map=null}
     V3.scene.traverse(o=>{if(o.material)[].concat(o.material).forEach(m=>m.needsUpdate=true)})}
