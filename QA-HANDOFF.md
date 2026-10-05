@@ -37,7 +37,13 @@ pSC2.py, sc2.js, pRL3.py and pRL4.py are copies from alex/od-scale and alex/od-r
      - a wider setback (SC_K.sbA in sc2.js)
      - shrink Athens colliders: `hubAddB({…hw:w/2-.3…})` in the Athens `put`
      - a gentler glance angle (SC_K.glance 35 → 45)
-4. **Giants and rings.** Read the result of the pQA8 check. tPlay gates: tallest humanoid ≤ 2.2 m (from `__qaHumans()`), and ≤ 3 rings on screen while free-roaming. Add the phone screenshot strip of each humanoid type next to the car to QA.md.
+4. **Giants and rings.** Quick check on the full pQA1–8 build (phone, 1 game-minute per city, `qa/tPlay_pQA1-8_phone_quick.json`):
+   - Tallest humanoid: 1.86 m. Pedestrians 1.84 m, seated garage driver 1.6 m, moped goon rider 1.86 m. PASS.
+     No quest/marker minifig was within 160 m during that short drive, so marker figures still need an in-world measurement.
+   - Rings on screen: Frankfurt max 0. **Athens max 4, average 2.7: FAIL.** Find which torus meshes are still visible in Athens (probably ATC/quest marker rings at 12 m, or district gates) and thin them.
+   - Rotation check: PASS. Console errors: 0.
+   - Same quick run: Athens 2.93 wall hits/min, Frankfurt 11.6 % stuck (1 minute only, not significant).
+   The earlier part of this item: tPlay gates: tallest humanoid ≤ 2.2 m (from `__qaHumans()`), and ≤ 3 rings on screen while free-roaming. Add the phone screenshot strip of each humanoid type next to the car to QA.md.
 5. Once all of the above passes, send the integrator the final patch list and the coordinator the tPlay before/after table.
 
 ## Running tPlay (the release gate)
