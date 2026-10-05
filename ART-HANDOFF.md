@@ -1,11 +1,14 @@
-# ART handoff (branch alex/od-art)
-Build: `./art.sh pART1.py pART2.py pART3.py pCAR1.py` (base85.html = v85e overdrive.html, auto-created from commit c7aacb7), then `python3 tools/split_km.py overdrive.html outART`.
-- pART1 / art.js: deep-blue sky; the old 900-box cloud layer (cloudsOn) was a white ceiling → replaced by 22 LEGO brick clouds on a far ring that follows the camera (2 draw calls). Green studded baseplate replaces walk/yard/park paving (both cities). Road texture: grey asphalt, light kerbs, white edge lines, double yellow centre. Roam forced to midday once (SET.tod='day', key mho_art_tod). Sky/light override in ART_light after applyMood/FL_apply. flash/hitFx clamped ≤ 1.
-- pART2 / art2.js: brick trees (Frankfurt props tree/tree2/tree3/bush via ART_trees(D); Athens athTreeGeo + athTreeBy), autumn tints; no geometry studs (the first version had 6–10 M tris). A global MeshStandard hook adds procedural studs on up-facing untextured surfaces (fades with distance), a soft warm rim and gloss ≤ .5.
-- pART3 / art3.js: contact shadow blob under the player car + up to 96 traffic cars (2 draw calls); boost = blue speed lines + FOV kick; HUD skin: purple NPC card with a yellow header and round portrait, thin boost bar at the bottom centre.
-- pCAR1 (alex/od-cars) replaces pLG1 (Alex rejected pLG1).
-Tools: tools/dev.js `/cshot` = canvas read back right after a render. The image viewer shows these PNGs paler than they are, so check colours by sampling pixels (/tmp px.py idea: decode PNG with zlib).
-Open:
-1. Athens giant plain beige wall (tPlay phone_ath_drive2 on art4) is still there. Not a BM.plain box ≥ 9 m (Batch/ABatch wrappers matched 0). Not walk (walk is green now). Suspect: another ribbon/polygon using node elevation p.y (like the v85d fix). Find it by GPU pick at the spot (geometry arrays are freed after upload, so raycasts miss).
-2. Menu: no live 3D garage behind CHOOSE ACTIVITY yet; map screen not brick-styled.
-3. tPlay: phone stuck, rotation and 12 px text fails also appear without art (v85 HUD/controls). Wall hits at 200+ km/h in GO! events: compare the run without art (run/car) against the run with art (run/art5).
+# ART handoff (branch alex/od-art) — last deploy v86h = live 60b4212 (reviewer PASS ddbcff8)
+Build ALWAYS on the current live page: `./art.sh` fetches alex/brave-carson-rbpmlk, takes games/mainhattan-overdrive/index.html body + km.js, applies pART1-5 → overdrive.html. Split = copy overdrive.html + km.js into outART/; `node tools/tOut.js http://127.0.0.1:8798/overdrive.html` must print OUTBOOT PASS. Re-check live HEAD right before tools/deploy.sh. No deploy without a PASS from the reviewer session (session_01Y6FYerWwxv43FuKUcaUT4v).
+Modules sit between /*ART<name>*/ … /*ART</name>*/ markers (artlib.py swaps them in place; anchor edits use RR, which skips edits already applied).
+- art.js (pART1): deep-blue sky + brick-cloud ring, true-scale subtle studded grass (walk/yard/park), grey asphalt with a double yellow line (road, street, resSt, Athens cobble), midday light, day reflection env without neon boxes (no pink water), flash/hitFx clamp ≤ 1.
+- art2.js (pART2): brick trees (Frankfurt props, Athens street trees), procedural 0.32 m studs on up-facing untextured surfaces, plastic rim + gloss.
+- art3.js (pART3): live v86 car contact shadows (kept: the cars session's ground contact depends on them), blue boost lines + FOV kick, HUD skin, beacons ≥ 60 m → 1.5 m ground rings, 1600 m searchlights hidden (rescan every 4 s).
+- pART4: boats only, edited INSIDE live's v86 vehicle block (never remove that block: it holds the cars session's grounding; removing it made the hot rod hover 0.83 m).
+- art5.js (pART5): filler-grid streets + crossing squares draped onto groundY; hill streets at 0.07 m (was 0.22).
+Ownership: the cars session owns the player car (driving, wheels, suspension, ground contact, camera, FX), traffic models and the HUD. ART owns the world, Athens and boats.
+Tools: tools/dev.js `/cshot` (canvas readback); review shot scripts are in /tmp (lost on restart; see git history of this file for the recipe: abandon the mission, warp to an open road via hubRoads, side camera 4 m out at 0.5 m).
+Open (not blocking):
+1. Beacons that stream in after the rescan stay upright for up to 4 s; hook ring conversion on beacon creation.
+2. 11 Alleenring samples are drawn up to 1 m below physics; 109 bridge-deck samples are unconfirmed.
+3. Menu: no live 3D garage background; map not brick-styled.
