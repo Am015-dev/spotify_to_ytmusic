@@ -7,7 +7,8 @@ Full method: the project skill `.claude/skills/boardgame-builder/` (loads automa
 ## Hard rules
 - Never write an original game's, publisher's or designer's name in this repo or on the site. No model names in
   files, commits or PRs. Research and publisher material only in the private repo `Am015-dev/game-night-private`.
-- Publish to a preview (`games/<slug>-next/`). The live `games/<slug>/index.html` changes only after the owner OKs it.
+- **Publish live** (owner's decision, 5 Oct 2026): a finished game goes straight to `games/<slug>/index.html` once its
+  sweep/phone-check passes. No more preview step; `-next` folders are retired.
 - Don't edit the Mainhattan / Overdrive games (other sessions own them). Ticket to Ride is on hold.
 - Run `games-src/scripts/stamp-copyright.py` on deployed files. Before pushing, run
   `git fetch origin alex/brave-carson-rbpmlk && git merge`; never force-push.
@@ -46,5 +47,5 @@ Full method: the project skill `.claude/skills/boardgame-builder/` (loads automa
 - No PR subscriptions, polling or scheduled wake-ups unless the owner asks.
 - Prove the approach on one game before touching others. Clarity before features.
 - Keep context small: hand off to a new session with an updated `games-src/HANDOFF.md`.
-- Merge your own work. Never ask the owner to review PRs. Deploying to preview paths is pre-approved by the owner.
+- Merge your own work. Never ask the owner to review PRs. Live deploys of games that pass their checks are pre-approved by the owner.
 - Update `games/previews.html`, and end with ONE link plus 5 lines (before → after numbers, what's weak).
