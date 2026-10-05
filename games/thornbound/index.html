@@ -59,9 +59,6 @@ button{font:inherit;color:inherit}
 .gx-ibtn{border:1px solid var(--line);color:var(--ink);background:rgba(255,255,255,.06);min-height:40px}
 .gx-ibtn svg.ico,.ico{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 .gx-board{background:radial-gradient(ellipse at center,#1c1218,#0a0608)}
-#mapwrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-#mapwrap .tb-map{width:min(100%,100cqh);max-width:100%;max-height:100%;aspect-ratio:1/1;height:auto}
-.gx-board{container-type:size}
 .gx-dock{background:linear-gradient(#2a1820,#1a0f13);color:var(--ink);border-left:2px solid var(--line)}
 .gx-dock-head{color:var(--gold);font-family:var(--fd)}
 .gx-dock-body{display:flex;flex-direction:column;overflow:hidden}
@@ -126,8 +123,6 @@ button{font:inherit;color:inherit}
 .rv-t small{font-size:.8rem;opacity:.9;white-space:nowrap}.rv-t i{font-style:normal;font-weight:700;color:#fff3c4}
 .rv-f .ico{width:16px;height:16px;fill:#ffd24a;stroke:none}
 /* popup + card layer (in the dock) */
-.gx-dock{position:relative}
-.ppop,.pcard{position:absolute;inset:0;z-index:6;overflow:auto;overscroll-behavior:contain}
 .ppop:not([hidden]){display:flex;flex-direction:column;background:#f3e6bf;color:#231a10;border-top:3px solid #c99a35}
 .ppop.in,.pcard.in{animation:ppin .16s ease-out}@keyframes ppin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .pp-h{display:flex;align-items:center;gap:6px;padding:0 4px 0 12px;min-height:44px;font:700 1.1rem var(--fd);flex:0 0 auto}.pp-h b{flex:1;min-width:0}
@@ -268,25 +263,15 @@ button{font:inherit;color:inherit}
 .cfgfoot{flex:0 0 auto;padding-top:8px}
 /* ===== phone layout (html.ph) ===== */
 html.ph .gx-app{padding:var(--sat) var(--sar) 0 var(--sal);box-sizing:border-box}
-html.ph .gx-main{display:contents}
-html.ph .gx-reopen,html.ph .gx-dock-head,html.ph .gx-bar h1{display:none!important}
 html.ph .gx-bar{box-sizing:border-box;padding:0 4px;min-height:44px;height:44px;gap:2px;overflow:hidden}
 html.ph .gx-bar .gx-ibtn{min-width:44px;width:44px;min-height:44px;height:44px;padding:0;flex:0 0 auto}
 html.ph .gx-bar .gx-ibtn>span{display:none}html.ph .gx-bar .gx-sp{display:none}
 html.ph .barstat{flex:1 1 auto;min-width:0;display:flex;justify-content:center}
 .chip{display:inline-flex;gap:8px;align-items:center;font:700 .95rem var(--fb);border:1.5px solid var(--line);border-radius:14px;padding:3px 10px;min-height:34px;white-space:nowrap;background:rgba(0,0,0,.25)}.chip-r{display:inline-flex;align-items:center;gap:3px}.chip small{opacity:.75;font-size:.8rem}.chip-s{color:var(--gold)}
-html.ph-p .gx-app{grid-template-columns:minmax(0,1fr);grid-template-rows:44px var(--bs) minmax(0,1fr)}
-html.ph-p .gx-bar{grid-row:1}html.ph-p .gx-board{grid-row:2;grid-column:1;justify-self:center;width:var(--bs);height:var(--bs)}html.ph-p .gx-dock{grid-row:3;grid-column:1;border-top:2px solid var(--line)}
-html.ph-l .gx-app{grid-template-columns:var(--bs) minmax(0,1fr);grid-template-rows:44px minmax(0,1fr)}
-html.ph-l .gx-board{grid-column:1;grid-row:1/3;width:var(--bs);height:var(--bs);align-self:center}html.ph-l .gx-bar{grid-column:2;grid-row:1}html.ph-l .gx-dock{grid-column:2;grid-row:2}
-html.ph .gx-app .gx-dock{display:flex;flex-direction:column;max-height:none!important;visibility:visible!important;border-left:0;border-radius:0;overflow:hidden;padding-bottom:0}
-html.ph .gx-app .gx-dock-body{display:flex!important;flex:1 1 auto;min-height:0}
-html.ph #road{display:none}
 html.ph .tb-map .tb-name{display:none!important}
 html.ph .netst{min-height:44px;margin:2px 6px 0}html.ph .netst .btn.small{min-height:44px;min-width:56px;font-size:.85rem}
 html.ph .step h3.st{font-size:1.05rem}html.ph .pr{font-size:.98rem;margin-bottom:4px}
 html.ph #main{padding:4px 10px}
-html.ph .ppop{bottom:var(--hb,0px)}
 html.ph-l .road4{display:none}
 html.ph .hand-h{padding:2px 6px}
 html.ph .sgrid3{grid-template-columns:repeat(3,1fr)}html.ph .sbtn{min-height:52px}html.ph .sbtn b{font-size:.98rem}html.ph .sbtn span{font-size:.8rem}
@@ -296,7 +281,6 @@ html.ph-l .coach{margin-bottom:4px;padding:4px 8px;font-size:.95rem;line-height:
 html.ph-l #act{padding:4px 8px}
 html.ph.short #now{display:none}
 html.ph .ppop:not([hidden]){border-top-width:2px}
-.ppop{bottom:var(--hb,0px)}
 .coachhl{outline:3px solid #ffd24a;outline-offset:-3px;animation:pulse 1.4s ease-in-out infinite}
 .bdh{margin:6px 0 0;font:700 1rem var(--fd);color:var(--gold)}.bd2 li span{font-size:.9rem;text-align:right}
 .sh2{font:700 1.15rem var(--fd);color:var(--gold);margin:6px 0 0}
@@ -396,8 +380,6 @@ html.ph .race-c.many .rv-n{font-size:1.25rem}
 /* map zoom button */
 html:not(.ph) .zbtn{display:none}
 html.zoom .zbtn{background:var(--gold);color:#2b1808}
-#gdef{max-height:calc(100% - var(--hb,0px) - 76px);overflow:auto;box-sizing:border-box}
-#news{max-height:calc(100% - var(--hb,0px) - 76px);overflow:auto}
 /* buttons wrap instead of cutting words */
 .btn,.opt .ot,.lbtn b{white-space:normal;overflow-wrap:anywhere}
 .opt.ord{flex-wrap:wrap}.opt.ord .ot{display:none}.opt.ord .oc{flex:1 1 auto}
@@ -407,7 +389,122 @@ html.zoom .zbtn{background:var(--gold);color:#2b1808}
 .hm-l{font-size:.8rem;opacity:.8;margin-right:2px}
 .hm{min-width:44px;min-height:44px;padding:0 6px;border:2px solid var(--fc);border-radius:8px;background:#f3e6bf;color:#231a10;font:700 1.05rem var(--fd);cursor:pointer}
 html.ph .race-g{font-size:.82rem;line-height:1.1}html.ph #rivals{padding-top:2px}
-html.ph-p .locgrid.two{grid-template-columns:1fr 1fr}
+/* ===== board-first layout (Oct 2026): the map is the screen =====
+   portrait: seats strip / map / tray (action row + hand fan). wide: map on the left, seats + tray on the right. */
+.gx-app{padding:var(--sat) var(--sar) 0 var(--sal);box-sizing:border-box}
+.gx-main{display:grid;min-height:0;position:relative;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;grid-template-areas:"rv" "bd" "dk"}
+#rivals{grid-area:rv;position:relative;z-index:3}
+.gx-board{grid-area:bd;position:relative;min-width:0;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#33202a,#0d0709 78%)}
+.gx-dock{grid-area:dk;position:relative;display:flex;flex-direction:column;overflow:visible;max-height:none;visibility:visible;border:0;border-top:2px solid var(--line);border-radius:0;padding-bottom:var(--sab);background:linear-gradient(#2a1820,#1a0f13);z-index:4}
+.gx-app.gx-dock-min .gx-dock{visibility:visible}
+.gx-dock-head,.gx-reopen,.gx-grab{display:none!important}
+.gx-dock-body{flex:0 0 auto;display:flex;flex-direction:column;overflow:visible;min-height:0}
+html.bf-w .gx-main{grid-template-columns:var(--bs,50vh) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);grid-template-areas:"bd rv" "bd dk"}
+html.bf-w .gx-dock{border-top:0;border-left:2px solid var(--line);justify-content:center}
+html.bf-w #rivals{border-left:2px solid var(--line)}
+#mapwrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+#mapbox{position:relative;flex:0 0 auto;width:var(--ms,360px);height:var(--ms,360px)}
+#mapbox>svg.tb-map{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;max-height:none;aspect-ratio:auto}
+#spots{position:absolute;inset:0;pointer-events:none}
+/* top bar: the one status line */
+.gx-bar{height:var(--barh,48px);min-height:var(--barh,48px);padding-left:6px;padding-right:4px;gap:3px;overflow:hidden}
+.gx-bar .gx-sp{display:none}
+.gx-bar .gx-ibtn{min-width:44px;width:44px;height:44px;padding:0;flex:0 0 auto}.gx-bar .gx-ibtn>span{display:none}
+.barstat{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:6px;justify-content:flex-start}
+.st-r{flex:0 0 auto;font:700 .78rem/1 var(--fb);color:var(--gold);border:1px solid var(--line);border-radius:8px;padding:3px 5px;background:rgba(0,0,0,.3)}
+.st-d{flex:0 0 auto;width:10px;height:10px;border-radius:50%;border:1px solid #fff3c4}
+.st-t{min-width:0;font:700 1rem/1.15 var(--fb);color:#fff3c4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html.ph .gx-bar h1,html.ph .st-r{display:none}
+/* seats: score, hand, supporters and the face-down bid */
+#rivals{display:block;padding:4px 6px 3px;background:rgba(0,0,0,.35);border-bottom:1px solid var(--line)}
+.race-c{display:flex;gap:4px}
+.rv{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:5px;min-height:44px;padding:2px 6px;border:2px solid var(--fc);border-radius:12px;background:rgba(0,0,0,.3);cursor:pointer;text-align:left;position:relative}
+.rv.me{background:rgba(255,255,255,.12)}.rv.turn{box-shadow:0 0 0 2px #ffd24a}
+.rv-e{line-height:0;flex:0 0 auto}
+.rv-t{display:flex;flex-direction:column;min-width:0;flex:1 1 auto;line-height:1.05}
+.rv-t b{font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rv-t small{display:flex;align-items:center;gap:3px;font-size:.82rem;opacity:.95}
+.rv-t small .ico{width:12px;height:12px;stroke:#f6e6b4;stroke-width:2;fill:rgba(255,255,255,.12)}
+.rv-s{margin-left:5px;display:inline-flex;align-items:center;gap:1px;color:#ffe08a;font-weight:700}.rv-s .ico{width:13px;height:13px;stroke:#ffe08a;fill:none}
+.rv-n{margin-left:auto;font:700 1.45rem/1 var(--fd);color:#fff3c4;flex:0 0 auto;transform-origin:50% 60%}
+.rv-n.bump{animation:bump .6s ease-out}@keyframes bump{35%{transform:scale(1.7);color:#ffd24a}}
+.rv-f{position:absolute;right:2px;top:-6px;line-height:0}.rv-f .ico{width:16px;height:16px;fill:#ffd24a;stroke:none}
+.race-c.four .rv-t b{display:none}
+.race-c.many .rv{padding:2px 4px;gap:3px}
+.bidc{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:22px;height:31px;border-radius:4px;border:1.5px solid #e8c867;box-sizing:border-box;transform:rotate(-7deg);box-shadow:0 2px 5px rgba(0,0,0,.6);margin:0 2px}
+.bidc.back{background:repeating-linear-gradient(45deg,var(--fc,#7c1b2c) 0 4px,#120b0e 4px 8px)}
+.bidc.back.new{animation:bpop .45s ease-out}@keyframes bpop{from{transform:translateY(-16px) scale(.4) rotate(-7deg);opacity:0}}
+.bidc.up{background:#f6e6b4;color:#2b1808}.bidc.up b{font:700 .95rem/1 var(--fd)}
+.bidc.up.flip{animation:bflip .5s ease-out}@keyframes bflip{from{transform:rotateY(90deg) scale(1.35) rotate(-7deg)}to{transform:rotate(-7deg)}}
+.bidc.big{width:100%;height:100%;transform:none}
+/* the tray: action row + the hand fan */
+.gx-dock-body{border-top:0}
+#act{flex:0 0 auto;display:flex;gap:8px;align-items:center;justify-content:center;padding:1px 8px;min-height:46px;box-sizing:border-box;border:0;background:transparent}
+#act:empty{display:flex}
+#act .btn{flex:0 1 auto;min-width:92px;min-height:44px;padding:4px 14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap}
+#act .btn.pri{flex:1 1 auto;max-width:280px}
+#act .btn .ico{width:18px;height:18px}
+#act .chipb{min-width:44px;background:rgba(255,255,255,.1);color:#ffe9a0;border-color:#c99a35;box-shadow:none}#act .chipb .ico{fill:#ffd24a;stroke:none}
+#act .btn b{background:#7c1b2c;color:#fff;border-radius:999px;min-width:20px;height:20px;line-height:20px;font-size:.8rem;text-align:center;padding:0 3px}
+#handw{flex:0 0 auto;position:relative;padding:0 4px;height:calc(var(--ch,72px) + 24px);overflow:visible}
+#handw[hidden]{display:block;visibility:hidden}
+.hand{position:relative;margin:0;z-index:0;isolation:isolate}
+.hc{position:absolute;top:10px;padding:0;border:0;background:none;line-height:0;cursor:pointer;touch-action:none;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;transform-origin:50% 140%;transform:translateY(var(--ty,0px)) rotate(var(--rot,0deg));transition:transform .16s,opacity .16s}
+.hc.on{transform:translateY(-16px) scale(1.14) rotate(0deg)}
+.hc.glow svg{filter:drop-shadow(0 0 5px #ffd24a)}
+.hc.dim{opacity:.55}
+.hc.lifted{opacity:.3}
+.hc.rg{transform:translateY(-8px) rotate(var(--rot,0deg))}.hc.rg svg{filter:drop-shadow(0 0 9px #fff2a8) drop-shadow(0 0 4px #ffd24a);animation:rgp 1.1s ease-in-out infinite}
+.hc.rg.on{transform:translateY(-16px) scale(1.14) rotate(0deg)}
+.hc.pk{position:static}
+.roadrow{display:flex;gap:6px;justify-content:center;align-items:center;height:100%}
+.kcb{position:relative;flex:0 0 auto;border:0;background:none;padding:0;line-height:0;border-radius:7px;cursor:pointer;touch-action:manipulation}
+.kcb.glow svg,.kcb.glow>*{filter:drop-shadow(0 0 6px #ffd24a)}
+.kcb.rg>*{filter:drop-shadow(0 0 10px #fff2a8) drop-shadow(0 0 4px #ffd24a);animation:rgp 1.1s ease-in-out infinite}
+.kcb.dim{opacity:.5}
+.kcb{display:flex;flex-direction:column;align-items:center;gap:2px}.kcb .kn{display:block;max-width:100%;font:700 .78rem/1.1 var(--fb);color:#f6e6b4;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kcb.steal{outline:3px solid var(--fc,#c23a48);outline-offset:1px}
+.kcb .stl{position:absolute;right:-4px;top:-6px;width:22px;height:22px;border-radius:50%;background:var(--fc,#c23a48);border:2px solid #fff3c4;display:flex;align-items:center;justify-content:center}.kcb .stl .ico{width:13px;height:13px;stroke:#fff;stroke-width:3}
+/* the decision sheet: only for the rare choices the board cannot show */
+#main{display:none;position:absolute;left:0;right:0;bottom:100%;max-height:min(44dvh,330px);overflow:auto;overscroll-behavior:contain;background:linear-gradient(#2c1a22,#1f1217);border-top:3px solid #c99a35;border-radius:14px 14px 0 0;padding:6px 10px 8px;z-index:8;box-shadow:0 -10px 24px rgba(0,0,0,.5)}
+#main.on{display:block}
+html.bf-w #main.on{position:static;flex:1 1 auto;max-height:none;border-radius:0;box-shadow:none;border-top-width:2px}
+#main .step h3.st{font-size:1.02rem;margin:0 0 2px}
+/* glowing targets on the map */
+.tbx-pan g[data-reg]{cursor:pointer}
+.tbx-pan g.rglow rect{stroke:#ffe9a0;stroke-opacity:1;stroke-dasharray:none;stroke-width:6;fill-opacity:.3;animation:rgl 1.1s ease-in-out infinite}
+.tbx-pan g.rrec rect{stroke:#fff;stroke-width:9;fill:#ffe9a0;fill-opacity:.4}
+@keyframes rgl{50%{stroke-opacity:.45;fill-opacity:.16}}
+.tb-map .tb-loc.glow .tb-ring{opacity:1!important}
+.tb-map .tb-loc.rec .tb-ring{stroke:#fff;stroke-width:8}
+/* the bid spot: a card-sized place on the table */
+.bspot{position:absolute;left:50%;top:79%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;padding:0;border:3px dashed rgba(246,230,180,.85);border-radius:8px;background:rgba(20,10,14,.6);color:#f6e6b4;pointer-events:auto;cursor:pointer;touch-action:manipulation;box-sizing:border-box;line-height:0}
+.bspot .bs-l .ico{width:26px;height:26px;stroke:#f6e6b4;opacity:.8}
+.bspot.full{border-style:solid;border-color:#e8c867;background:none}
+.bspot .bs-c{display:block;line-height:0}
+.bspot.glow{border-color:#ffe9a0;border-style:solid;box-shadow:0 0 0 4px rgba(255,233,160,.45),0 0 20px #ffd24a;animation:spotp 1s ease-in-out infinite}
+.bspot.rec{border-color:#fff;box-shadow:0 0 0 6px rgba(255,255,255,.5),0 0 26px #fff2a8}
+body.over-t .bspot.hot{transform:translate(-50%,-50%) scale(1.2)}
+@keyframes spotp{50%{box-shadow:0 0 0 8px rgba(255,233,160,.15),0 0 8px #ffd24a}}
+/* tooltip, flights, pops, drag ghost, the ghost finger */
+#tip{position:fixed;z-index:50;left:0;top:0;max-width:min(92vw,340px);padding:6px 10px;border-radius:10px;background:#f3e6bf;color:#231a10;border:2px solid #c99a35;font:700 .95rem/1.25 var(--fb);box-shadow:0 6px 18px rgba(0,0,0,.6);pointer-events:none}
+#tip[hidden]{display:none}#tip em{font-style:normal;color:#7c1b2c}
+.td{display:inline-block;width:11px;height:11px;border-radius:50%;border:1px solid #231a10;margin-left:2px;vertical-align:-1px}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:45;overflow:hidden}
+.fly{position:fixed;line-height:0;z-index:46;pointer-events:none}
+.fly .bidc{width:100%;height:100%}
+.pop{position:fixed;transform:translate(-50%,-50%);font:700 1.6rem/1.25 var(--fd);color:#fff;background:var(--fc);border:3px solid #fff3c4;border-radius:999px;padding:0 12px;box-shadow:0 4px 14px rgba(0,0,0,.6);text-shadow:0 1px 2px #000;white-space:nowrap}
+.dragc{position:fixed;left:0;top:0;z-index:60;pointer-events:none;line-height:0;filter:drop-shadow(0 8px 12px rgba(0,0,0,.6))}
+#finger{position:fixed;left:0;top:0;z-index:55;pointer-events:none;width:0;height:0}
+#finger[hidden]{display:none}
+#finger i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
+#finger b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+/* detail sheets (long-press a card, tap a seat or the throne) and the pass / result cards */
+.ppop:not([hidden]){position:fixed;left:0;right:0;bottom:0;top:auto;max-height:min(62dvh,480px);z-index:42;border-radius:14px 14px 0 0;box-shadow:0 -12px 30px rgba(0,0,0,.6);overflow:auto;overscroll-behavior:contain;padding-bottom:var(--sab)}
+html.bf-w .ppop:not([hidden]){left:var(--bs,50vw)}
+.pcard:not([hidden]){position:fixed;inset:0;z-index:56}
+#gdef{position:fixed;left:6px;right:6px;top:calc(var(--barh,44px) + 6px);z-index:57;max-height:50dvh;overflow:auto;box-sizing:border-box}
+@media (prefers-reduced-motion:reduce){.tbx-pan g.rglow rect,.bspot.glow,.hc.rg svg,.kcb.rg>*{animation:none}}
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
   --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
@@ -553,25 +650,26 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
   <h1>Thornbound Throne</h1>
   <span class="barstat" id="barstat"></span>
   <span class="gx-sp"></span>
-  <button class="gx-ibtn zbtn" data-a="zoom" aria-label="Make the map bigger" title="Bigger map" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Map</span></button>
   <button class="gx-ibtn" data-gx="boardd" aria-label="My board and piles" title="My board and piles"><svg class="ico" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2"/></svg><span>Board</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-label="Log" title="Log"><svg class="ico" viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/></svg><span>Log</span></button>
   <button class="gx-ibtn" data-gx="rulesd" aria-label="How to play" title="How to play"><svg class="ico" viewBox="0 0 24 24"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v13"/></svg><span>Rules</span></button>
   <button class="gx-ibtn" data-gx="setd" aria-label="Menu" title="Menu"><svg class="ico" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
 </header>
 <div class="gx-main">
-  <main class="gx-board" id="board" aria-label="The kingdom map"><div id="mapwrap"></div></main>
-  <aside class="gx-dock" aria-label="What to do now">
-    <div class="gx-dock-head"><span class="gx-grab" data-gx="sheet"></span><span class="gx-dt">What to do now</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">&#8677;</button></div>
-    <div class="gx-dock-body" id="dockbody"><div id="netst" class="netst" hidden></div><div id="now" aria-live="polite"></div><div id="road"></div><div id="main"></div><div id="act" role="group" aria-label="Actions"></div><div id="handw" hidden></div><div id="rivals"></div></div>
+  <div id="rivals" aria-label="Scores and bids"></div>
+  <main class="gx-board" id="board" aria-label="The kingdom map"><div id="mapwrap" data-board><div id="mapbox"><div id="spots"></div></div></div><div id="news" class="news" hidden role="status" aria-live="polite"></div></main>
+  <aside class="gx-dock" aria-label="Your move">
+    <div id="main" role="group" aria-label="Choices"></div>
+    <div class="gx-dock-body" id="dockbody"><div id="netst" class="netst" hidden></div><div id="now" aria-live="polite" hidden></div><div id="road" hidden></div><div id="act" role="group" aria-label="Actions"></div><div id="handw" hidden></div></div>
     <div id="gdef" hidden role="note"></div>
-    <div id="news" class="news" hidden role="status" aria-live="polite"></div>
     <div id="ppop" class="ppop" hidden role="dialog" aria-label="Details"></div>
     <div id="pc" class="pcard" hidden role="dialog" aria-label="Message"></div>
   </aside>
-  <button class="gx-ibtn gx-reopen" data-gx="dock">&#9776; Panel</button>
 </div>
 </div>
+<div id="fx" aria-hidden="true"></div>
+<div id="tip" hidden role="tooltip"></div>
+<div id="finger" hidden aria-hidden="true"><i></i><b></b></div>
 <div id="start" role="dialog" aria-label="New game" hidden></div>
 <div id="netbox" hidden></div>
 <div id="live" class="sr" aria-live="polite"></div>
@@ -4071,7 +4169,7 @@ window.CAMPAIGN = {"game": "thornbound", "title": "The Heir of the Heath", "vers
 <script>
 // ===================== part 1: core (state, engine adapter, events, AI adapter, turn pump) =====================
 // The engine (TB: newGame/moves/apply/pending/stripView) is never edited. Everything the UI needs on top of it lives here.
-var ANIM=1,AIDELAY=420;
+var ANIM=1,AIDELAY=1000;
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const DD=TB.DATA;
@@ -4218,7 +4316,7 @@ function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI
 function doMove(mv){if(!G||!G.q)return false;const was=G.round,l0=G.logN;
   const res=TB.apply(G,mv);
   if(!res.ok){console.warn('move rejected',res.err,mv&&mv.k);UI.err=res.err;if(res.exc)console.error('ENGINE '+res.err);return false}
-  UI.lastRes=res;if(typeof snd==='function')snd(mv,res);
+  UI.lastRes=res;UI.nMoves=(UI.nMoves||0)+1;if(typeof snd==='function')snd(mv,res);
   saveGame();return true}
 // ---------------------------------------------------------------- the pump: events -> end -> AI moves -> human decision (one thing at a time)
 function pendingSeats(){return G&&G.q?G.q.seats.slice():[]}
@@ -4243,6 +4341,7 @@ function pump(){clearTimeout(_pumpT);_pumpT=0;if(!G||!UI.started)return;
       const h=pickHumanSeat(w.hum);
       if(h==null){renderAll();return}               // pass-the-device card up
       if(typeof maybeTip==='function'&&maybeTip()){renderAll();return}
+      if(typeof autoSkip==='function'&&autoSkip(h))continue;                 // a season with nothing to use is skipped for you
       renderAll();return}
   }finally{UI.pumping=false}}
 function aiStep(w){const s=w.ai[0];const mv=aiChoose(s);if(!mv){console.warn('AI has no move',s,G.q&&G.q.kind);G.q=null;return}
@@ -4255,7 +4354,7 @@ function pickHumanSeat(hum){
   UI.passDelay=null;UI.card={kind:'pass',seat:nxt};UI.passed=null;return null}
 function afterHumanMove(){UI.passed=hotSeat()?UI.passed:null;pump()}
 function humanMove(k){if(typeof hideGloss==='function')hideGloss();if(NET.on)return netHumanMove(k);const s=viewSeatForQ();if(s==null)return false;const mv=legal(s).find(m=>m.k===k);if(!mv)return false;
-  const ok=doMove(mv);if(ok){UI.sel={};UI.hand=null;closePop(true);if(hotSeat()){ // pass on once this seat has nothing more to decide
+  const ok=doMove(mv);if(ok){UI.sel={};UI.hand=null;UI.sheetOpen=false;UI.ord=[];closePop(true);if(hotSeat()){ // pass on once this seat has nothing more to decide
       const still=G.q&&G.q.seats.includes(s);if(!still)UI.passed=null}
     pump()}return ok}
 function viewSeatForQ(){if(!G||!G.q)return null;if(NET.on){const m=NET.mySeat;return m>=0&&G.q.seats.includes(m)&&!G.pl[m].ai?m:null}const hum=G.q.seats.filter(s=>!G.pl[s].ai);if(!hum.length)return null;if(!hotSeat())return hum[0];return hum.includes(UI.holder)&&UI.passed===UI.holder?UI.holder:null}
@@ -4269,20 +4368,24 @@ const STRIP=[{cx:500,cy:222,cols:4},{cx:305,cy:730,cols:2},{cx:695,cy:730,cols:2
 function mapOpts(){const L=[0,1,2,3,4,5].map(i=>({id:LOCID[i],name:LOCN[i],type:LOC_TYPE[i],x:LOCPOS[i][0],y:LOCPOS[i][1],links:[LOCID[i^1],'throne']}));
   return {players:G.pl.map(p=>({faction:FK[p.fac],name:p.name})),locations:L,w:1000,h:1000,trackLen:40,compact:!!UI.phone,quality:(UI.lowGfx||UI.phone)?'low':undefined,seed:7,onTap:mapTap}}
 function buildMap(){const wrap=$('#mapwrap');if(!wrap)return;
+  let box=$('#mapbox');if(!box){box=document.createElement('div');box.id='mapbox';wrap.appendChild(box)}
+  if(!$('#spots')){const sp=document.createElement('div');sp.id='spots';box.appendChild(sp)}
   if(MAP.m){try{MAP.m.destroy()}catch(e){}}
-  wrap.innerHTML='';
-  MAP.m=TBKit.map(Object.assign({container:wrap},mapOpts()));
+  box.querySelectorAll('svg.tb-map').forEach(e=>e.remove());
+  MAP.m=TBKit.map(Object.assign({container:box},mapOpts()));
+  box.insertBefore(MAP.m.el,box.firstChild);
   MAP.sig=G.pl.map(p=>p.fac).join()+'|'+(UI.phone?1:0);MAP.ov=null;MAP.pan=null;MAP.shown={};MAP.busyHerald={};
   const svg=MAP.m.el;svg.setAttribute('aria-label','Map of the kingdom: three regions of two locations, and the throne');
   const NSS='http://www.w3.org/2000/svg';
   MAP.pan=document.createElementNS(NSS,'g');MAP.pan.setAttribute('class','tbx-pan');svg.insertBefore(MAP.pan,svg.querySelector('.tb-m-locs'));
   MAP.ov=document.createElementNS(NSS,'g');MAP.ov.setAttribute('class','tbx-ov');MAP.ov.setAttribute('pointer-events','none');svg.appendChild(MAP.ov);
   MAP.sg=document.createElementNS(NSS,'g');MAP.sg.setAttribute('class','tbx-selname');MAP.sg.setAttribute('pointer-events','none');svg.appendChild(MAP.sg);
+  svg.addEventListener('click',e=>{const t=e.target;if(!t||!t.closest||t.closest('.tb-loc'))return;const g=t.closest('[data-reg]');if(g&&G&&UI.started)regionTap(+g.getAttribute('data-reg'))});
   drawPanels();relayoutSlots();
   // heralds start "at court" (dimmed, on the throne) until placed
   for(let s=0;s<G.np;s++)MAP.m.setHerald(s,'throne');
   MAP.infl={};for(let s=0;s<G.np;s++){MAP.m.setInfluence(s,G.pl[s].inf,{immediate:true})}
-  MAP.heraldAt={};MAP.slotSig={}}
+  MAP.heraldAt={};MAP.slotSig={};MAP.slotPrev=null}
 function drawPanels(){const f=[];
   REGBOX.forEach((b,r)=>{f.push('<g data-reg="'+r+'"><rect x="'+b.x+'" y="'+b.y+'" width="'+b.w+'" height="'+b.h+'" rx="34" fill="#f4e6b8" fill-opacity=".13" stroke="#e8c867" stroke-opacity=".55" stroke-width="3" stroke-dasharray="4 10" stroke-linecap="round"/>'+
     '<text x="'+b.lab[0]+'" y="'+b.lab[1]+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="22" letter-spacing="3" fill="#f6e6b4" fill-opacity=".85" stroke="#000" stroke-opacity=".6" stroke-width="3" paint-order="stroke">'+esc(REG[r].toUpperCase())+'</text></g>')});
@@ -4296,11 +4399,12 @@ function relayoutSlots(){const m=MAP.m;if(!m)return;const CP=!!UI.phone,sw=CP?44
       el.setAttribute('data-reg',r);el.style.cursor='pointer'}
     const lf=m.locEl(a)&&m.locEl(a).querySelector('.tb-lfx');if(lf)lf.setAttribute('transform','translate('+Math.round(S.cx-pa.x)+' '+Math.round(S.cy-pa.y+ (rows*sh)/2+22)+')')}}
 function mapTap(id,info){if(!G||!UI.started)return;
-  if(UI.card&&UI.card.kind!=='pass'){return}
+  if(UI.card&&UI.card.kind!=='pass'&&UI.card.kind!=='tip'){bfSkip();return}
+  if(UI.pop){closePop(true)}
   if(id==='throne'){openPop('kingdom');return}
   const l=LOCID.indexOf(id);if(l<0)return;
-  if(info&&info.seat!=null){openPop('region',{r:regOfLoc(l)});return}
-  openPop('loc',{l})}
+  if(info&&info.seat!=null){regionTap(regOfLoc(l));return}
+  locTap(l)}
 // ---------------------------------------------------------------- slot content from the (stripped) view
 const ownerOf=id=>id<0?-id-1:(id/100)|0;
 function slotState(V,r,s){const R=V.reg[r];const up=R.up.filter(id=>ownerOf(id)===s),down=R.down.filter(id=>ownerOf(id)===s);
@@ -4325,7 +4429,8 @@ function renderMap(){if(!G||!UI.started)return;const wrap=$('#mapwrap');if(!wrap
   let sig2='';const ss=[];for(let r=0;r<3;r++)for(let s=0;s<G.np;s++){const st=slotState(V,r,s);ss.push([r,s,st]);sig2+=JSON.stringify(st)+'|'}
   sig2+=JSON.stringify(UI.clashRes);
   if(sig2!==MAP.slotSig||MAP.slotDirty){MAP.slotSig=sig2;MAP.slotDirty=false;
-    for(const [r,s,st] of ss){const a=LOCID[2*r];m.setSlot(a,s,st);const el=m.slotEl(a,s);if(el){if(st&&st.mineId!=null){el.setAttribute('data-owner',s);el.setAttribute('data-up','1')}else{el.removeAttribute('data-owner');el.removeAttribute('data-up')}}}}
+    const first=!MAP.slotPrev;MAP.slotPrev=MAP.slotPrev||{};
+    for(const [r,s,st] of ss){const a=LOCID[2*r];const key=r+'|'+s,js=JSON.stringify(st);if(!first&&MAP.slotPrev[key]!==js&&typeof bfSlot==='function'){try{bfSlot(r,s,MAP.slotPrev[key]?JSON.parse(MAP.slotPrev[key]):null,st)}catch(e){}}MAP.slotPrev[key]=js;m.setSlot(a,s,st);const el=m.slotEl(a,s);if(el){if(st&&st.mineId!=null){el.setAttribute('data-owner',s);el.setAttribute('data-up','1')}else{el.removeAttribute('data-owner');el.removeAttribute('data-up')}}}}
   drawOverlay();applyHl()}
 function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=[];
   // location reward coins (+1 / +2) and a favour disc marker
@@ -4336,7 +4441,7 @@ function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=
     // Kingdom Cards that sit on a Location
     const kl=V.loc[l].kc.length;if(kl)f.push('<g transform="translate('+(p.x)+' '+(p.y+52)+')"><rect x="-17" y="-12" width="34" height="24" rx="5" fill="#2a1c10" stroke="#e8c867" stroke-width="2"/><text y="7" text-anchor="middle" font-size="18" font-weight="700" fill="#f6e6b4" font-family="'+TBKit.fonts.display+'">K</text></g>')}
   // clash order markers, supporters
-  for(let r=0;r<3;r++){const S=STRIP[r],B=REGBOX[r];const ci=V.cord?V.cord.indexOf(r):-1;
+  for(let r=0;r<3;r++){const S=STRIP[r],B=REGBOX[r];let ci=V.cord?V.cord.indexOf(r):-1;const oi=(UI.ord||[]).indexOf(r);if(oi>=0&&G.q&&G.q.kind==='clashOrder')ci=oi;
     if(ci>=0){const done=V.reg[r].done,cur=V.clash&&V.clash.r===r;const x=r===0?B.x+34:(r===1?B.x+34:B.x+B.w-34),y=r===0?B.y+34:B.y+34;
       f.push('<g transform="translate('+x+' '+y+')"><circle r="22" fill="'+(cur?'#e8c867':done?'#3a3a3a':'#7c1b2c')+'" stroke="#fff3c4" stroke-width="2.6"/><text y="8.5" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="24" fill="'+(cur?'#2b1808':'#fff3c4')+'">'+['I','II','III'][ci]+'</text></g>')}
     // supporters: little discs in the faction colour under each slot
@@ -4349,8 +4454,11 @@ function drawOverlay(){const ov=MAP.ov,m=MAP.m;if(!ov||!m)return;const V=UI.V,f=
       const wd=Math.max(...lines.map(t=>t.length))*fs*.6+18,ht=lines.length*fs+8;const cx=Math.max(wd/2+4,Math.min(996-wd/2,P[0])),top=P[1]+52;
       f.push('<g class="locname"><rect x="'+Math.round(cx-wd/2)+'" y="'+top+'" width="'+Math.round(wd)+'" height="'+ht+'" rx="10" fill="#1d120b" fill-opacity=".82"/>'+lines.map((t,i)=>'<text x="'+Math.round(cx)+'" y="'+Math.round(top+(i+1)*fs-4)+'" text-anchor="middle" font-family="'+TBKit.fonts.display+'" font-weight="700" font-size="'+fs+'" fill="#f6e6b4">'+esc(t)+'</text>').join('')+'</g>')}}
   ov.innerHTML=f.join('')}
-function setHl(ids){MAP.hl=ids||[]}
-function applyHl(){const m=MAP.m;if(!m)return;const sel=UI.pop==='loc'&&UI.popArg?LOCID[UI.popArg.l]:null;m.highlight(MAP.hl.map(l=>LOCID[l]));m.select(sel);drawSelName()}
+function setHl(ids,regs,rec){MAP.hl=ids||[];MAP.hlR=regs||[];MAP.rec=rec||{};applyHl()}
+function applyHl(){const m=MAP.m;if(!m)return;const sel=null;m.highlight(MAP.hl.map(l=>LOCID[l]));m.select(sel);
+  for(let l=0;l<6;l++){const g=m.locEl(LOCID[l]);if(g){const on=MAP.hl.includes(l);g.classList.toggle('glow',on);g.classList.toggle('rec',on&&MAP.rec.loc===l)}}
+  if(MAP.pan)MAP.pan.querySelectorAll('[data-reg]').forEach(g=>{const r=+g.getAttribute('data-reg');const on=(MAP.hlR||[]).includes(r);g.classList.toggle('rglow',on);g.classList.toggle('rrec',on&&MAP.rec.reg===r)});
+  drawSelName()}
 // Phones: the kit's name banners are hidden (they were clipped and overlapped the region labels and reward coins). A tapped location shows its name here instead, in a spot with nothing else: below the circle in the top row and the upper half of the side columns, above it in the lower half.
 function drawSelName(){const g=MAP.sg;if(!g)return;if(UI.phone){g.innerHTML='';return}if(!UI.phone||UI.pop!=='loc'||!UI.popArg||UI.popArg.l==null){g.innerHTML='';return}
   const l=UI.popArg.l,P=LOCPOS[l],name=LOCN[l],fs=34,words=name.split(' ');let lines=[name];if(name.length>9&&words.length>1){const h=Math.ceil(words.length/2);lines=[words.slice(0,h).join(' '),words.slice(h).join(' ')]}
@@ -4392,14 +4500,40 @@ const STEP_HELP=[
  'Winter. Heralds go home, Supporters are lost, played cards go to the discard pile, and the next round starts. Running out of deck shrinks your hand size (Attrition).'];
 const KIND_NAME={bid:'Choose your bid',bidRes:'Use your bid',herald:'Place your Herald',place:'Hide your cards',clashOrder:'Order the Clashes',location:'Claim a location',tie:'A tie!'};
 // ---------------------------------------------------------------- top bar status chip
-function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;
-  const ev=UI.card&&UI.card.kind==='event'?UI.card.ev:null;const ri=ev&&ev.t==='summary'?6:ev&&ev.t==='clash'?4:roadIdx();const r=ev&&ev.round?ev.round:Math.max(1,G.round);
-  el.innerHTML='<span class="chip" aria-label="Round '+r+' of '+G.rounds+', step '+(ri+1)+' of 7: '+ROAD[ri]+'"><span class="chip-t"><small>Round</small><b>'+r+'</b><small>of '+G.rounds+'</small><span class="chip-s">'+esc(ROAD[ri])+'</span></span><span class="chip-d" aria-hidden="true">'+ROAD.map((_,i)=>'<i class="'+(i<ri?'done':i===ri?'on':'')+'"></i>').join('')+'</span></span>'}
+function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=statusText();const r=Math.max(1,G.round);
+  el.innerHTML='<span class="st-r" aria-hidden="true">R'+r+'/'+G.rounds+'</span>'+(t.seat>=0&&G.pl[t.seat]?'<i class="st-d" style="background:'+fcol(t.seat)+'"></i>':'')+'<span class="st-t" role="status" aria-label="'+esc(t.text)+'">'+esc(t.text)+'</span>'}
+// the one status line (8 words or fewer): what to do now, or what the computer just did
+function words8(x){const w=String(x||'').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'\u2026'}
+function statusText(){const o=t=>({text:words8(t),seat:-1});
+  if(!G)return o('');if(G.over)return o('The reign is over');
+  const c=UI.card;
+  if(c&&c.kind==='pass')return o('Pass the device');
+  if(c&&c.kind==='over')return o('The reign is over');
+  if(c&&c.kind==='news'&&c.items&&c.items[0]){const it=c.items[0];return {text:words8(plain(it.text)),seat:it.s}}
+  if(c&&c.kind==='event'){const e=c.ev;if(e.t==='bids')return o('Bids revealed');if(e.t==='clash')return {text:words8(UI._clashLine||'The Clash'),seat:-1};if(e.t==='summary')return o(e.last?'The last round is over':'Round '+e.round+' is over')}
+  const s=viewSeatForQ();const q=G.q;
+  if(q&&s!=null){const M=UI.bf;const co=UI._coachTitle;if(co)return o(co);
+    if(M&&M.kind){switch(M.kind){
+      case 'bid':return o(UI.hand!=null?'Tap the bid spot':'Pick a card to bid');
+      case 'bidRes':return o('Take a Kingdom Card');
+      case 'herald':return o('Place your Herald');
+      case 'place':return o(UI.hand!=null?'Tap the glowing region':placeProgress());
+      case 'tie':return o('Tie! Add a card or pass');
+      case 'location':return o('Claim a location');
+      case 'clashOrder':return o((UI.ord||[]).length?'Tap the next region':'Tap the first Clash');
+      case 'menu':{const ph=menuPhase(q);if(ph==='Day'){try{const P=preview();if(P&&P.dead.some(d=>ownerOf(d.id)===s))return o('A Deadly card will eliminate yours')}catch(e){}}return o(ph==='Spring'&&M.regs.length?'Tap a region to send Supporters':ph==='Day'?'Use a power, or Done':ph==='Autumn'?'Autumn: use a power, or Done':'Use a power, or Done')}
+      default:return o(promptText(q,s))}}
+    return o(promptText(q,s))}
+  // somebody else is deciding
+  const last=G.log[G.log.length-1];const n=UI.nowT&&UI.nowT.at===G.logN?UI.nowT:null;
+  if(n)return {text:words8(plain(n.t)),seat:n.s};
+  if(q&&q.seats.length){const names=q.seats.map(x=>shortName(x).replace(' (you)',''));return {text:words8(names.join(' and ')+' is deciding'),seat:q.seats[0]}}
+  if(last)return {text:words8(plain(last.t)),seat:last.s};
+  return o('')}
 const ICO={round:'<path d="M5 20V9l7-5 7 5v11M9 20v-6h6v6"/>',book:'<path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v13"/>',log:'<path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/>',users:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-4 3-6 6-6s6 2 6 6M15 14c3 0 6 1.5 6 5"/>',crown:'<path d="M3 18h18l-1.5-9-4.5 4-3-7-3 7-4.5-4z"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',card:'<rect x="6" y="3" width="12" height="18" rx="2"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',inf:'<circle cx="12" cy="12" r="8"/><path d="M8 14l1-5 3 3 3-3 1 5z"/>',eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',star:'<path d="M12 3l2.6 6 6.4.6-4.9 4.2 1.5 6.3L12 17l-5.6 3.1 1.5-6.3L3 9.6 9.4 9z"/>',road:'<path d="M5 20L9 4M19 20L15 4M12 6v3M12 12v3M12 18v2"/>'};
 function ico(n,c){return '<svg class="ico '+(c||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(ICO[n]||'')+'</svg>'}
 // ---------------------------------------------------------------- roadmap
-function renderRoad(){const el=$('#road');if(!el)return;const ri=roadIdx();
-  el.innerHTML='<div class="road-h"><b>Round '+Math.max(1,G.round)+' of '+G.rounds+'</b><span class="road-n">step '+(ri+1)+' of 7</span></div><ol class="road-l" aria-label="Round roadmap">'+ROAD.map((n,i)=>'<li class="'+(i<ri?'done':i===ri?'on':'')+'"'+(i===ri?' aria-current="step"':'')+'><i>'+(i+1)+'</i><span>'+n+'</span></li>').join('')+'</ol>'}
+function renderRoad(){}
 // ---------------------------------------------------------------- recommended move (+ the guided script may choose a simpler teaching move)
 function qKey(s,mv){return G.logN+':'+(G.q?G.q.kind:'')+':'+s+':'+(G.q&&G.q.chosen?G.q.chosen.length:'')+':'+(mv?mv.length:0)+':'+(UI.cfg&&UI.cfg.guided?1:0)}
 function getRec(s,mv){const key=qKey(s,mv);if(UI._rk===key)return UI._rec;UI._rk=key;let A=null;try{A=advise(s,mv)}catch(e){console.warn('advise',e.message)}
@@ -4479,39 +4613,41 @@ function recBtnText(m){const k=G.q.kind;if(!m)return '';
   const t=m.label.replace(/:.*$/,''),vq=viewSeatForQ();if(G.q.t==='menu'&&vq!=null&&legal(vq).filter(x=>x.t==='act'&&(x.label||'').replace(/:.*$/,'')===t).length>1)return m.label.replace(/\.$/,'');
   return m.label.replace(/\s*\([^)]*\)\s*$/,'').replace(/:.*$/,'')}
 function doneText(){const ph=menuPhase(G.q);return ph==='Spring'?'Done with Spring':ph==='Day'?'Done: fight the Clash':ph==='Autumn'?'Done with Autumn':'Done'}
-function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q;let foot='';
-  const qk=(q?q.kind+'|'+q.title+'|'+G.logN:'')+'|'+(UI.coachInfo?UI.coachInfo.id:'')+'|'+(UI.card?UI.card.kind:'');const set=(h,f)=>{el.innerHTML=h;if(ft)ft.innerHTML=f||'';if(UI._qk!==qk){UI._qk=qk;el.scrollTop=0}moreCue()};
-  UI._recShown=false;
-  if(G.over){set('<div class="step"><h3 class="st">The reign is over</h3></div>');return}
-  if(UI.coachInfo){set(coachInfoHTML(UI.coachInfo),'<button class="btn pri pulse" data-a="coachok">'+esc(UI.coachInfo.btn||'Continue')+'</button>');setHl(UI.coachInfo.hlLocs||[]);return}
-  // a card is up (an event, the news, a pass screen): nothing can be decided underneath it
-  if(UI.card&&UI.card.kind!=='tip'){set(UI.card.kind==='news'?'':waitingHTML(),'');setHl([]);return}
+function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const q=G.q;
+  const qk=(q?q.kind+'|'+q.title+'|'+G.logN:'')+'|'+(UI.card?UI.card.kind:'');
+  const set=(h,f,sheet)=>{if(el.innerHTML!==h)el.innerHTML=h;el.classList.toggle('on',!!sheet&&!!h);f=f||'';if(ft._h!==f){ft._h=f;ft.innerHTML=f}ft.classList.toggle('has',!!f);if(UI._qk!==qk){UI._qk=qk;el.scrollTop=0;UI.sheetOpen=false;UI.ord=[]}moreCue()};
+  UI._recShown=false;UI.bf=null;UI._coachTitle='';
+  if(G.over){set('','');setHl([]);return}
+  if(UI.card&&UI.card.kind!=='tip'){set('','');setHl([]);return}
   const s=viewSeatForQ();
-  if(!q||s==null){set(waitingHTML(),UI.mode==='watch'?watchControls():'');setHl([]);return}
+  if(!q||s==null){set('',UI.mode==='watch'?watchControls():'');setHl([]);return}
   const mv=legal(s);const rec=getRec(s,mv);const shown=!!rec&&hintsShown(s,mv);UI._recShown=shown;const rm=shown?mv.find(m=>m.k===rec.k):null;
-  const co=typeof coachFor==='function'?coachFor(s,mv,rm):null;UI._coachOn=!!co;
-  let h='';
-  h+='<div class="step" data-q="'+q.kind+'"><h3 class="st">'+esc(co&&co.title||(q.t==='menu'?menuTitle(q):KIND_NAME[q.kind]||titleOf(q)))+'</h3>';
-  const dayMenu=q.t==='menu'&&menuPhase(q)==='Day';if(dayMenu)h+=previewHTML(preview(),'');
-  h+='<p class="pr">'+gloss(promptText(q,s))+'</p>';
-  if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Waiting: '+esc(shortT(oth.map(seatWho).join(', ')))+'</p>'}
-  if(G.clash&&q.t!=='menu'&&(['location','castle','wilderness','harvest','shrine','ossuary','tie'].includes(q.kind)))h+=recapHTML();
-  
-  const pulse=!!(co&&co.pulse);const hl=[];
-  const hintBtn=!shown&&rec&&UI.guide!=='off'?'<button class="btn" data-a="hint">Suggest a move</button>':'';
-  switch(q.kind){
-   case 'bid':{if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
-   case 'bidRes':{h+=bidResHTML(s,mv);if(rm)foot=rm.t==='steal'?'<button class="btn pri'+(pulse?' pulse':'')+'" data-a="confirm" data-k="'+esc(rm.k)+'">'+esc(recBtnText(rm))+'</button>':pbtn(rm,recBtnText(rm),pulse);break}
-   case 'herald':{h+='<div class="locgrid">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="loc" data-l="'+m.loc+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' · '+esc(REG[m.loc>>1].replace('The ',''))+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';mv.forEach(m=>hl.push(m.loc));if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
-   case 'place':{const rs=[...new Set(mv.map(m=>m.r))];rs.forEach(r=>{hl.push(2*r,2*r+1)});if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
-   case 'tie':{const ps=mv.find(m=>m.pass);foot=(ps&&!(rm&&rm.pass)?'<button class="btn" data-a="mv" data-k="'+esc(ps.k)+'">Pass</button>':'')+(rm?pbtn(rm,recBtnText(rm),pulse):'');break}
-   case 'location':{h+='<div class="locgrid two">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' Influence'+(DD.LOCS[m.loc][3]?', bonus':'')+(G.pl[s].herald===m.loc?' · your Herald: +1 more':'')+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';mv.forEach(m=>hl.push(m.loc));if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
-   case 'clashOrder':{h+='<div class="opts">'+mv.slice().sort((a,b)=>(recK()===b.k)-(recK()===a.k)).map(m=>optBtn(m,'ord',orderChips(m.order))).join('')+'</div>';if(rm)foot=pbtn(rm,'Use the suggested order',pulse);break}
-   default:{
-     if(q.t==='menu'){const r=menuHTML(s,mv,rm,pulse);h+=r.h;foot=r.f}
-     else if(q.t==='sel'){const r=selHTML(s,mv,rm,q,pulse);h+=r.h;foot=r.f}
-     else{h+='<div class="opts">'+mv.map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)foot=pbtn(rm,recBtnText(rm),pulse)}}}
-  h+='</div>';set(h,hintBtn+foot);setHl(hl)}
+  const co=typeof coachFor==='function'?coachFor(s,mv,rm):null;UI._coachOn=!!co;UI._coachTitle=co&&/^New/.test(co.title||'')?co.title:'';
+  const M=bfModel(s,mv,rm);UI.bf=M;const pulse=!!(co&&co.pulse);
+  const hintBtn=!shown&&rec&&UI.guide!=='off'?'<button class="btn chipb hintb" data-a="hint" aria-label="Show a hint">'+ico('star')+'<span>Hint</span></button>':'';
+  let h='',f='',sheet=false;const hl=[],hr=[],recT={};
+  const pass=mv.find(m=>m.pass);
+  switch(M.kind){
+   case 'bid':if(rm&&rm.id!=null)recT.spot=1;break;
+   case 'bidRes':{const ret=mv.find(m=>m.t==='return');if(ret)f+='<button class="btn'+(rm&&rm.k===ret.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(ret.k)+'">'+ico('card')+'<span>Keep my card</span></button>';break}
+   case 'herald':case 'location':M.locs.forEach(l=>hl.push(l));if(rm)recT.loc=rm.loc;break;
+   case 'place':case 'tie':{if(UI.hand!=null)M.regsFor(UI.hand).forEach(r=>hr.push(r));if(rm&&rm.r!=null)recT.reg=rm.r;else if(rm&&q.kind==='tie'&&G.clash)recT.reg=G.clash.r;
+     if(pass)f+='<button class="btn'+(rm&&rm.pass?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(pass.k)+'">Pass</button>';break}
+   case 'clashOrder':{M.nextRegs().forEach(r=>hr.push(r));if(rm&&rm.order){const nx=rm.order[(UI.ord||[]).length];if(nx!=null)recT.reg=nx}
+     if((UI.ord||[]).length)f+='<button class="btn" data-a="ordundo">'+ico('x')+'<span>Undo</span></button>';break}
+   case 'menu':{const done=mv.find(m=>m.t==='done');M.regs.forEach(r=>hr.push(r));if(rm&&rm.a==='supp'&&rm.p)recT.reg=rm.p.r;
+     if(done)f+='<button class="btn'+(rm&&rm.k===done.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(done.k)+'">'+esc(doneText())+'</button>';
+     if(M.powers.length){const rp=rm&&rm.t==='act'&&rm.a!=='supp';f+='<button class="btn'+(rp?' pri'+(pulse?' pulse':''):'')+'" data-a="powers" aria-pressed="'+!!UI.sheetOpen+'">Powers <b>'+M.powers.length+'</b></button>';
+       if(UI.sheetOpen||(rp&&UI.guide==='full'&&G.round>1&&false)){const r=menuHTML(s,mv,rm,pulse);h+='<div class="step" data-q="menu"><h3 class="st">'+esc(menuTitle(q))+'</h3>'+r.h+'</div>';sheet=true}}
+     break}
+   default:{ // anything else: a compact list above the tray
+     h+='<div class="step" data-q="'+q.kind+'"><h3 class="st">'+esc(co&&co.title&&/^New/.test(co.title)?co.title:(KIND_NAME[q.kind]||titleOf(q)))+'</h3>';
+     h+='<p class="pr">'+gloss(promptText(q,s))+'</p>';
+     if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Waiting: '+esc(shortT(oth.map(seatWho).join(', ')))+'</p>'}
+     if(q.t==='sel'){const r=selHTML(s,mv,rm,q,pulse);h+=r.h;f+=r.f}
+     else{h+='<div class="opts">'+mv.map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)f+=pbtn(rm,recBtnText(rm),pulse)}
+     h+='</div>';sheet=true}}
+  set(h,hintBtn+f,sheet);setHl(hl,hr,recT)}
 // a gentle cue when the decision list continues below the visible part
 function moreCue(){const el=$('#main');if(!el)return;const on=el.scrollHeight>el.clientHeight+8&&el.scrollTop+el.clientHeight<el.scrollHeight-8;el.classList.toggle('more-below',on)}
 document.addEventListener('scroll',e=>{if(e.target&&e.target.id==='main')moreCue()},true);
@@ -4558,19 +4694,12 @@ function rowHTML(s,m,day){const I=rowInfo(s,m);const rec=recK()===m.k;let g=I.ga
   const conf=m.a==='t:cln_t3';
   return '<div class="orow'+(rec?' rec':'')+'"><div class="ob"><b>'+gloss(I.title)+'</b>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+(I.eff&&I.eff.split(/\s+/).length<=8?'<span class="oe">'+gloss(I.eff)+'</span>':'')+((I.cost||g)?'<small class="oc2">'+(I.cost?'<em>Cost:</em> '+esc(shortT(I.cost)):'')+(I.cost&&g?' · ':'')+(g?'<em>Gain:</em> '+esc(shortT(g)):'')+'</small>':'')+'</div><button class="btn sm" data-a="'+(conf?'confirm':'mv')+'" data-k="'+esc(m.k)+'">Use</button></div>'}
 function simCached(m){const key=G.logN+'|'+m.k;UI._simc=UI._simc||{};if(UI._simc.n!==G.logN)UI._simc={n:G.logN};if(!(key in UI._simc)){let r=null;try{r=simDay(m)}catch(e){}UI._simc[key]=r}return UI._simc[key]}
-function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day';const acts=visibleActs(mv).filter(m=>m.t==='act'),done=mv.find(m=>m.t==='done');let f='';
+function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day';const acts=visibleActs(mv).filter(m=>m.t==='act'&&m.a!=='supp');
   const byG={};for(const m of acts){(byG[mgroup(m.a)]=byG[mgroup(m.a)]||[]).push(m)}
-  if(!acts.length)h+='<p class="hint">'+(day?'You have no Day powers here.':'Nothing to do now: tap Done.')+'</p>';
-  const rk=recK();for(const g in byG)byG[g].sort((x,y)=>(y.k===rk)-(x.k===rk));   // the Suggested option is the first row of its group, and its group comes first
+  const rk=recK();for(const g in byG)byG[g].sort((x,y)=>(y.k===rk)-(x.k===rk));
   const rg=acts.find(m=>m.k===rk);const GORD=rg?MGROUP.slice().sort((x,y)=>(y[0]===mgroup(rg.a))-(x[0]===mgroup(rg.a))):MGROUP;
-  for(const [g,nmG,dsc] of GORD){const L=byG[g];if(!L)continue;
-    if(g==='supp'){const b=G.pl[s].supp.b;h+='<p class="grp-h">'+gloss('Supporters: '+b+' on your board')+'</p>'+(UI._coachOn?'':'<p class="grp-n">'+gloss('Each adds +1 Strength in that region\'s first Clash. Supporters on the map go to the Lost Pile in Winter.')+'</p>');const byR={};for(const m of L){(byR[m.p.r]=byR[m.p.r]||[]).push(m)}
-      for(const r in byR){const mine=UI.V.reg[r].down.filter(id=>id>=0&&ownerOf(id)===s).map(id=>cinfo(id).strength);const there=G.pl[s].supp.r[r];
-        h+='<div class="sup-r"><span><b>'+esc(REG[r])+'</b><small>'+(mine.length?'your card '+mine.join('+'):'no card of yours')+(there?' · '+there+' Supporter'+(there>1?'s':'')+' there':'')+'</small></span>'+byR[r].map(m=>'<button class="nb'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'" aria-label="Send '+m.p.n+' to '+esc(REG[r])+'">+'+m.p.n+'</button>').join('')+'</div>'}continue}
-    h+='<p class="grp-h">'+gloss(nmG)+'</p>'+(dsc?'<p class="grp-n">'+gloss(dsc)+'</p>':'')+L.map(m=>rowHTML(s,m,day)).join('')}
-  if(done)f+='<button class="btn'+(rm&&rm.k===done.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(done.k)+'">'+esc(doneText())+'</button>';
-  if(rm&&rm.t==='act')f+=rm.a==='t:cln_t3'?'<button class="btn pri'+(pulse?' pulse':'')+'" data-a="confirm" data-k="'+esc(rm.k)+'">'+esc(recBtnText(rm))+'</button>':pbtn(rm,recBtnText(rm),pulse);
-  return {h,f}}
+  for(const [g,nmG] of GORD){const L=byG[g];if(!L)continue;h+='<p class="grp-h">'+gloss(nmG)+'</p>'+L.map(m=>rowHTML(s,m,day)).join('')}
+  return {h,f:''}}
 function selHTML(s,mv,rm,q,pulse){const items=mv.filter(m=>m.t==='sel'),dn=mv.find(m=>m.t==='seldone');let h='',f='';
   const ch=(q.chosen||[]).map(v=>chipFor(v));h+=(ch.length?'<p class="chosen">Chosen: '+ch.join(' ')+'</p>':'')+(q.max!=null&&q.max<items.length+ch.length?'<p class="hint">Choose up to '+q.max+(q.min?' (at least '+q.min+')':'')+'.</p>':'');
   h+='<div class="opts">'+items.map(m=>optBtn(m,'',typeof m.v==='number'&&m.v<10000&&ownerOf(m.v)===s?'<span class="th" data-owner="'+s+'" data-up="1">'+cardEl(m.v,44).outerHTML+'</span>':'')).join('')+'</div>';
@@ -4582,36 +4711,58 @@ function chipFor(v){try{if(typeof v==='number'&&v<10000)return '<span class="chp
 // ===================== part 4: hand, rivals, pop-ups, one-at-a-time cards =====================
 const emb=(s,w)=>TBKit.token('influence',{faction:fk(s)},w||26).outerHTML;
 function isPassing(){return !!(UI.card&&UI.card.kind==='pass')}
-// ---------------------------------------------------------------- hand strip (compact fan; tap a card -> enlarged pop-up)
+// ---------------------------------------------------------------- hand: a fanned strip along the bottom (tap = lift, tap again or drag onto the glowing spot = play; hold = read)
+function cssPx(n,d){try{const v=parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n));return v>0?v:d}catch(e){return d}}
 function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
-  if(!G||s<0||isPassing()||G.over){el.innerHTML='';el.hidden=true;return}
-  el.hidden=false;const V=UI.V,P=V.pl[s];const ids0=P.hand.filter(id=>id>=0).sort((a,b)=>cinfo(b).strength-cinfo(a).strength||a-b);
+  if(!G||s<0||isPassing()||G.over){el.innerHTML='';el._h='';el.hidden=true;return}
+  if(UI.dragging)return;
+  el.hidden=false;const V=UI.V,P=V.pl[s];const M=UI.bf;
+  if(M&&M.kind==='bidRes'){const h=roadRowHTML(s,M);el.classList.add('road');if(el._h!==h){el._h=h;el.innerHTML=h}return}
+  el.classList.remove('road');
+  const ids0=P.hand.filter(id=>id>=0).sort((a,b)=>cinfo(b).strength-cinfo(a).strength||a-b);
   // cards keep their slot while the hand only shrinks (no reflow under the next tap); a new card or a new round lays the hand out again
   const qk=G.q?G.q.kind:'';let HS=UI.handSlots;if(!HS||HS.round!==G.round||HS.seat!==s||HS.kind!==qk||ids0.some(id=>!HS.order.includes(id))||!ids0.length)HS=UI.handSlots={round:G.round,seat:s,kind:qk,order:ids0.slice()};
   const ids=HS.order;const inHand=new Set(ids0);
-  const mv=G.q&&G.q.seats.includes(s)&&!G.pl[s].ai?legal(s):[];let rcId=null;try{if(mv.length){const rr=getRec(s,mv);if(rr&&hintsShown(s,mv)&&rr.id!=null)rcId=rr.id}}catch(e){}const use=new Set();for(const m of mv){if(m.id!=null)use.add(m.id);if(m.v!=null&&typeof m.v==='number')use.add(m.v)}
-  // phones: when this decision does not use the hand, it shrinks to one line of tappable numbers so the choices get the room
-  if(UI.phone&&!UI.land&&!use.size){el.innerHTML='<div class="hand mini" role="list" aria-label="Your hand"><span class="hm-l">Hand</span>'+ids0.map(id=>'<button class="hm" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="--fc:'+fcol(s)+'" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'">'+cinfo(id).strength+'</button>').join('')+(ids0.length?'':'<span class="hm-l">empty</span>')+'</div>';return}
-  const W=Math.max(200,el.clientWidth||$('#dockbody').clientWidth||360)-8;const cw=UI.phone?(UI.land?42:(innerHeight<600?44:innerHeight<820?48:54)):66,ch=Math.round(cw*1.4308);
+  const use=M&&M.use?M.use:new Set();const rcId=M&&M.rec&&M.rec.id!=null?M.rec.id:null;
+  const PAD=16;const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
   const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
-  const hh='<div class="hand-h"><span>Hand <b>'+ids0.length+'</b>/'+P.hs+'</span><span>Deck '+P.deck.length+'</span><span>Discard '+P.disc.length+'</span>'+(P.lore?'<span>Lore '+P.lore+'</span>':'')+'</div>';
-  let h=UI.phone?'':hh;
-  h+='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+14)+'px">';
-  ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);
-    h+='<button class="hc'+(on?' on':'')+(pl?' pl':'')+(rcId===id?' rg':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+'" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'">'+cardEl(id,cw).outerHTML+'</button>'});
-  el.innerHTML=h+'</div>'}
-// ---------------------------------------------------------------- rival chips
-function renderRivals(){const el=$('#rivals');if(!el)return;const V=UI.V;const hot=UI.card&&UI.card.kind==='pass';
-  const act=G.q?new Set(G.q.seats):new Set();const me=vs();
-  const ordSeats=G.pl.map(p=>p.seat);
+  let h='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+24)+'px">';
+  ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1?(i-mid)*Math.min(3.6,22/n):0,ty=n>1?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;
+    h+='<button class="hc'+(on?' on':'')+(pl?' glow pl':'')+(rcId===id?' rg':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(PAD+off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+';--rot:'+rot.toFixed(1)+'deg;--ty:'+ty+'px" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'">'+cardEl(id,cw).outerHTML+'</button>'});
+  h+='</div>';if(el._h!==h){el._h=h;el.innerHTML=h}}
+// bid resolution: the Great Road lies where the hand was; tap a glowing Kingdom Card to take it (a steal asks first)
+function roadRowHTML(s,M){const mv=M.mv;const take=mv.filter(m=>m.t==='take'),steal=mv.filter(m=>m.t==='steal');const V=UI.V;const items=[];
+  for(let i=0;i<V.road.length;i++){const kc=V.road[i];if(!kc)continue;items.push({kc,m:take.find(x=>x.kc===kc&&x.i===i)||null})}
+  for(const m of take)if(m.dk!=null)items.push({kc:m.kc,m,deck:1});
+  for(const m of steal)items.push({kc:m.kc,m,steal:1});
+  if(!items.length)return '<div class="hand roadrow"></div>';
+  const W=Math.max(180,((UI.land?(($('#handw')||{}).clientWidth||innerWidth*.38):innerWidth))-12);const zone=cssPx('--ch',72)+24;const w=Math.max(34,Math.min(60,Math.floor((zone-30)/1.4308),Math.floor(W/items.length)-8));const rk=recK();
+  return '<div class="hand roadrow" role="list" aria-label="The Great Road">'+items.map(it=>{const m=it.m;const rec=m&&rk===m.k;const col=it.steal?fcol(m.s2):'';
+    const att=m?(it.steal?'data-a="confirm" data-k="'+esc(m.k)+'"':'data-a="mv" data-k="'+esc(m.k)+'"'):'data-a="kc" data-n="'+it.kc+'"';
+    return '<button class="kcb'+(m?' glow':' dim')+(rec?' rg':'')+(it.steal?' steal':'')+'" role="listitem" '+att+' data-n="'+it.kc+'" style="width:'+(w+4)+'px'+(col?';--fc:'+col:'')+'"'+' aria-label="'+esc((it.steal?'Steal ':m?'Take ':'')+TB.kingdomInfo(it.kc).name)+'">'+kcEl(it.kc,w).outerHTML+'<span class="kn">'+esc(TB.kingdomInfo(it.kc).name)+'</span>'+(it.steal?'<i class="stl">'+ico('x')+'</i>':'')+'</button>'}).join('')+'</div>'}
+// ---------------------------------------------------------------- the seats: score, hand and the face-down bid, along the top
+function renderRivals(){const el=$('#rivals');if(!el)return;if(!G||!UI.V)return;const V=UI.V;
+  const act=G.q?new Set(G.q.seats):new Set();const me=vs();const n=G.np;
   const top=Math.max(...V.pl.map(p=>p.inf));const lead=V.pl.filter(p=>p.inf===top).length===1&&top>0;
-  el.innerHTML='<p class="race-g">'+gloss('Most Influence after round '+G.rounds+' wins')+(UI.phone?'':' · round '+Math.max(1,G.round)+' of '+G.rounds)+'</p><div class="race-c'+(G.np>2?' many':'')+'">'+ordSeats.map(s=>{const P=V.pl[s];const kfac=TBKit.FACTIONS[FK[P.fac]];const turn=act.has(s);
-    const favs=V.fav.h===s?'<span class="rv-f" title="Holds the Kingdom\'s Favour ('+V.fav.u+' uses left)">'+ico('star')+'</span>':'';
+  const ev=UI.card&&UI.card.kind==='event'&&UI.card.ev.t==='bids'?UI.card:null;
+  const bidNow=G.q&&G.q.kind==='bid';UI._bidSeen=UI._bidSeen||{};if(UI._bidRound!==G.round){UI._bidRound=G.round;UI._bidSeen={}}
+  const chips=G.pl.map(p=>{const s=p.seat,P=V.pl[s];const kfac=TBKit.FACTIONS[FK[P.fac]];const turn=act.has(s)&&!ev;
+    const favs=V.fav.h===s?'<span class="rv-f" title="Holds the Kingdom\'s Favour">'+ico('star')+'</span>':'';
+    let bc='';const b=P.bid;
+    if(b!=null&&b!==false){let up=b>=0&&G.bidRev;let flip='';
+      if(ev){const rk=ev.rank?ev.rank.indexOf(s):-1;up=rk>=0&&rk<(ev.revN||0);flip=up&&rk===(ev.revN||0)-1?' flip':''}
+      else if(s===me&&!G.bidRev)up=false;
+      const isNew=!UI._bidSeen[s]&&bidNow&&s!==me;UI._bidSeen[s]=1;
+      if(s===me&&!G.bidRev&&!ev)bc='';
+      else if(up){const v=(G.bstr&&G.bstr[s]!=null&&G.bstr[s]>=0)?G.bstr[s]:(b>=0?cinfo(b).strength:'?');bc='<span class="bidc up'+flip+'" aria-label="Bid '+v+'"><b>'+v+'</b></span>'}
+      else bc='<span class="bidc back'+(isNew?' new':'')+'" aria-label="Face-down bid"></span>'}
+    const sb=P.supp&&P.supp.b?'<span class="rv-s" title="Supporters at home" aria-label="'+P.supp.b+' Supporters">'+ico('users')+P.supp.b+'</span>':'';
     return '<button class="rv'+(s===me?' me':'')+(turn?' turn':'')+'" data-a="rival" data-s="'+s+'" style="--fc:'+kfac.main+'" aria-label="'+esc(P.name)+': '+P.inf+' influence, '+P.hand.length+' cards in hand. Tap for details">'+
-      '<span class="rv-e">'+emb(s,24)+'</span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'You':esc(shortName(s).replace(' (you)','')))+(lead&&P.inf===top?' <span class="rv-l" title="In the lead">'+ico('crown')+'</span>':'')+'</b><small>'+P.hand.length+' card'+(P.hand.length===1?'':'s')+'</small></span><span class="rv-n">'+P.inf+'</span>'+favs+'</button>'}).join('')+'</div>'}
+      '<span class="rv-e">'+emb(s,22)+'</span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'You':esc(shortName(s).replace(' (you)','')))+(lead&&P.inf===top?' <span class="rv-l" title="In the lead">'+ico('crown')+'</span>':'')+'</b><small>'+ico('card')+P.hand.length+sb+'</small></span>'+bc+'<span class="rv-n" data-s="'+s+'">'+P.inf+'</span>'+favs+'</button>'}).join('');
+  const h='<div class="race-c'+(n>2?' many':'')+(n>3?' four':'')+'">'+chips+'</div>';if(el._h!==h){el._h=h;el.innerHTML=h}}
 // ---------------------------------------------------------------- pop-ups (live in the dock zone, never over the board)
-function openPop(kind,arg){if(!G)return;if(typeof hideGloss==='function')hideGloss();UI.pop=kind;UI.popArg=arg||{};renderPop();applyHl();if(typeof sfx==='function')sfx('tap')}
-function closePop(quiet){if(!UI.pop)return;UI.pop=null;UI.popArg=null;UI.hand=null;const p=$('#ppop');if(p){p.hidden=true;p.innerHTML=''}applyHl();if(!quiet)renderAll()}
+function openPop(kind,arg){if(!G)return;if(typeof hideGloss==='function')hideGloss();UI.pop=kind;UI.popArg=arg||{};renderPop();applyHl();if(typeof bfFinger==='function')bfFinger();if(typeof sfx==='function')sfx('tap')}
+function closePop(quiet){if(!UI.pop)return;UI.pop=null;UI.popArg=null;UI.hand=null;const p=$('#ppop');if(p){p.hidden=true;p.innerHTML=''}applyHl();if(typeof bfFinger==='function')bfFinger();if(!quiet)renderAll()}
 function optsFor(s,id){if(s==null||s<0||!G.q||!G.q.seats.includes(s))return [];return legal(s).filter(m=>m.id===id||(typeof m.v==='number'&&m.v===id))}
 function actLabel(m){if(m.t==='bid')return 'Bid with this card';if(m.t==='place')return 'Play face-down at '+REG[m.r];if(G.q.kind==='tie'&&m.id!=null)return 'Play face-down into the tied clash';if(m.t==='sel')return 'Choose this card';return m.label}
 function popShell(title,body,cls){return '<div class="pp-h"><b>'+title+'</b><button class="pp-x" data-a="pclose" aria-label="Close">'+ico('x')+'</button></div><div class="pp-b '+(cls||'')+'">'+body+'</div>'}
@@ -4685,17 +4836,17 @@ const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid p
   location:['Winning','The winner claims one of the region\'s two locations: its Influence and its bonus.'],
   bidRes:['Your bid','Take a Kingdom Card from the Great Road, steal one a rival holds (your bid must beat the card under it), or take your card back.']};
 function maybeTip(){return typeof coachGate==='function'&&coachGate()}
-function renderCard(){const el=$('#pc');if(!el)return;const c=UI.card;renderNews();
-  if(!c||c.kind==='news'){el.hidden=true;el.innerHTML='';UI._cardKey=null;return}
-  const key=JSON.stringify(c.kind==='event'?[c.ev.t,c.ev.r,c.ev.n,c.ev.round]:[c.kind,c.seat,c.k]);
+function renderCard(){const el=$('#pc');if(!el)return;const c=UI.card;
+  // events, news and bids are played on the board itself (see bfEvent); only the pass screen and the final result use the card layer
+  if(c&&(c.kind==='event'||c.kind==='news')){el.hidden=true;el.innerHTML='';UI._cardKey=null;if(!c._st){c._st=1;if(c.kind==='event')bfEvent(c);else bfNews(c)}return}
+  if(!c){el.hidden=true;el.innerHTML='';UI._cardKey=null;return}
+  const key=JSON.stringify([c.kind,c.seat,c.k]);
   if(UI._cardKey===key&&!el.hidden)return;UI._cardKey=key;
-  el.hidden=false;el.classList.remove('in');void el.offsetWidth;el.classList.add('in');el.dataset.kind=c.kind==='event'?c.ev.t:c.kind;
+  el.hidden=false;el.classList.remove('in');void el.offsetWidth;el.classList.add('in');el.dataset.kind=c.kind;
   let h='';
-  if(c.kind==='pass'){const s=c.seat;h='<div class="cd cd-pass" style="--fc:'+fcol(s)+'"><div class="cd-sc"><div class="cd-e">'+emb(s,56)+'</div><h3>Pass the device to '+esc(nameOf(s))+'</h3><p>Everyone else look away. Your hand and hidden cards appear when you tap the button.</p></div><div class="cd-ft"><button class="btn pri big" data-a="take" data-s="'+s+'">I am '+esc(shortName(s))+': show my cards</button></div></div>'}
+  if(c.kind==='pass'){const s=c.seat;h='<div class="cd cd-pass" style="--fc:'+fcol(s)+'"><div class="cd-sc"><div class="cd-e">'+emb(s,56)+'</div><h3>Pass the device to '+esc(nameOf(s))+'</h3><p>Everyone else look away.</p></div><div class="cd-ft"><button class="btn pri big" data-a="take" data-s="'+s+'">I am '+esc(shortName(s))+': show my cards</button></div></div>'}
   else if(c.kind==='over'){h=overHTML()}
-  else if(c.kind==='event')h=eventHTML(c.ev);
   el.innerHTML=h;
-  if(c.kind==='event'&&c.ev.t==='clash')playClash(c.ev,el);
   const b=el.querySelector('.btn.pri');if(b)try{b.focus({preventScroll:true})}catch(e){}}
 function cdWrap(cls,body,foot){return '<div class="cd '+cls+'"><div class="cd-sc">'+body+'</div><div class="cd-ft">'+foot+'</div></div>'}
 function bidWhy(b){const pr=cinfo(b.id).strength;if(b.str===pr)return '';const ed=G.log.filter(e=>e.r===G.round&&/Crown's Edict/.test(e.t)&&/plays/.test(e.t));
@@ -4743,25 +4894,29 @@ function overHTML(){const o=G.over;const rk=o.ranking;const win=o.winner;const m
 // ===================== part 5: render loop, clicks, drawers (rules, log, board, menu), start screen =====================
 function renderAll(){if(!G||!UI.started)return;
   try{UI.V=isClient()?G:TB.stripView(G,isPassing()?-1:vs())}catch(e){console.error('view '+e.message);return}  // a client's G is already its own stripped copy
-  if(UI.phone&&!UI.land){const sm=!!wantSmall();if(sm!==!!UI.boardSmall){UI.boardSmall=sm;phApply()}}
   if(isPassing()){if(GX.open)GX.close();const bb=$('#boardbody');if(bb)bb.innerHTML='';if(UI.pop)closePop(true)}
   if(!(UI.card&&UI.card.kind==='event'))renderMap();else if(!MAP.m)renderMap();
-  renderBar();renderRoad();renderNow();renderMain();renderHand();renderRivals();setHB();renderCard();renderPop();updateLive();
+  renderMain();renderBar();renderHand();renderRivals();renderSpots();setHB();renderCard();renderPop();updateLive();
   document.documentElement.dataset.step=String(roadIdx());
-  if(typeof phoneRefresh==='function')phoneRefresh();
+  if(typeof bfAfter==='function')bfAfter();
   netAfter();
   const lb=$('#logbody');if(lb&&GX.open==='logd')renderLog()}
-function setHB(){const d=$('.gx-dock'),hw=$('#handw'),rv=$('#rivals');if(!d)return;d.style.setProperty('--hb',((hw&&!hw.hidden?hw.offsetHeight:0)+(rv?rv.offsetHeight:0))+'px')}
+function setHB(){}
 function updateLive(){const l=$('#live');if(!l)return;const last=G.log[G.log.length-1];if(last&&UI._liveN!==last.i){UI._liveN=last.i;l.textContent=last.t}}
 // ---------------------------------------------------------------- clicks
-document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-a]');
-  if(!t){ // tap on the empty board closes a pop-up
-    if(UI.pop&&e.target.closest&&e.target.closest('#mapwrap')&&!e.target.closest('.tb-loc')){closePop();e.stopPropagation()}return}
+document.addEventListener('click',e=>{
+  const t=e.target.closest&&e.target.closest('[data-a]');
+  // an open detail sheet closes on any tap outside it (that tap does nothing else)
+  if(UI.pop&&G&&UI.started&&!(e.target.closest&&e.target.closest('#ppop,.gx-drawer,#start,#netbox'))){closePop();e.stopPropagation();return}
+  if(!t){return}
   const a=t.dataset.a;
   if(netClick(a,t))return;
   switch(a){
    case 'mv':{if(!humanMove(t.dataset.k)){renderAll()}break}
-   case 'hand':{const id=+t.dataset.id;if(UI.pop==='card'&&UI.popArg.id===id&&!t.closest('#ppop')){closePop();break}UI.hand=id;openPop('card',{id});renderHand();break}
+   case 'hand':{handTap(+t.dataset.id);break}
+   case 'spot':spotTap();break;
+   case 'powers':{UI.sheetOpen=!UI.sheetOpen;renderAll();break}
+   case 'ordundo':{UI.ord=[];renderAll();break}
    case 'loc':openPop('loc',{l:+t.dataset.l});break;
    case 'rival':openPop('rival',{s:+t.dataset.s});break;
    case 'kc':openPop('kc',{n:+t.dataset.n});break;
@@ -4770,9 +4925,8 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
    case 'newsok':newsOk();break;
    case 'hint':{const s=viewSeatForQ();if(s!=null){UI.hintQ=qKey(s,legal(s));renderAll()}break}
    case 'confirm':{UI.pop='confirm';UI.popArg={k:t.dataset.k};renderPop();break}
-   case 'zoom':toggleZoom();break;
    case 'take':{const s=+t.dataset.s;UI.holder=s;UI.passed=s;UI.card=null;UI._cardKey=null;UI.pop=null;pump();break}
-   case 'evok':{UI.card=null;UI._cardKey=null;UI.noAnim=false;if(UI._cp)UI._cp=null;UI.mapReset=false;MAP.slotDirty=true;pump();break}
+   case 'evok':{evDone();break}
    case 'tipx':UI.tip[t.dataset.k]='x';renderAll();break;
    case 'coachok':coachOk();break;
    case 'gloss':showGloss(t.dataset.t);break;
@@ -4880,26 +5034,30 @@ function snd(mv,res){if(!mv)return;const t=mv.t,k=G&&G.q?G.q.kind:'';
   if(t==='bid')sfx('bid');else if(t==='place')sfx('place');else if(t==='pick'&&mv.loc!=null&&k==='herald')sfx('herald');else if(t==='take'||t==='steal')sfx('bid');else sfx('tap');
   try{const inf=G.pl.reduce((a,p)=>a+p.inf,0);if(_lastInf!=null&&inf>_lastInf)setTimeout(()=>sfx('inf'),200);_lastInf=inf;if(G.over)setTimeout(()=>sfx(G.pl[G.over.winner].ai?'lose':'fanfare'),300)}catch(e){}}
 function musicFor(){try{if(!window.GA||!UI.music)return;GA.music(G&&G.round>=G.rounds?'tense':'main',{fade:1.5})}catch(e){}}
-// ---------------------------------------------------------------- phone mode
+// ---------------------------------------------------------------- phone mode + board-first layout
 function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
   const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
-// The board gives up space so the dock (now-line, prompt, pinned action row, hand, rivals) always fits: portrait phones keep the square map
-// at most as big as the height leaves after the dock's minimum; landscape phones put the map left at the full height.
-function dockNeed(H){return H>=820?380:H>=760?396:H>=700?370:H>=640?350:H>=580?330:330}
-function phApply(){const was=UI.phone;const on=phDetect();const root=document.documentElement;
-  UI.phone=on;UI.land=innerWidth>innerHeight;const W=innerWidth,H=innerHeight;UI.short=on&&(UI.land?H<370:H<600);
+// Layout (CSS grid in head.html): portrait = seats strip, the map (fills what is left), the tray (action row + hand fan);
+// wide = the map square on the left, seats + tray on the right. The map is always the biggest thing on the screen.
+function phApply(){const was=UI.phone,wasLand=UI.land;const on=phDetect();const root=document.documentElement;
+  const W=innerWidth,H=innerHeight;UI.phone=on;UI.land=W>=H*1.15;UI.short=on?(UI.land?H<370:H<600):H<560;
   root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);root.classList.toggle('short',!!UI.short);
-  if(on){const big=Math.max(150,Math.min(W,H-44-dockNeed(H)));let bs=UI.land?Math.min(H,Math.round(W*.52)):(UI.boardSmall?Math.max(UI.short?96:150,Math.min(big,Math.round(big-Math.max(90,H*.15)))):big);
-    if(UI.zoom)bs=UI.land?Math.min(H,Math.round(W*.62)):Math.max(bs,Math.min(W,H-44-260));root.style.setProperty('--bs',bs+'px');UI.bs=bs}
-  else root.style.removeProperty('--bs');
-  if(was!==on&&G){UI.mapReset=true;renderAll()}}
+  root.classList.toggle('bf-w',UI.land);root.classList.toggle('bf-p',!UI.land);
+  const barH=on?44:48;
+  let cw=UI.land?Math.max(44,Math.min(66,Math.floor((H-barH-52-46-24-16)/1.4308))):(H<600?44:H<820?50:H<1000?56:66);
+  if(!UI.land){ // portrait: the map is as wide as the screen; whatever height is left over goes to a bigger hand
+    const mn=$('.gx-main'),rv=$('#rivals');const Hm=(mn&&mn.clientHeight)||(H-barH),rh=(rv&&rv.offsetHeight)||52;
+    const hh=Hm-rh-46-W-10;cw=Math.max(cw,Math.min(on?64:76,Math.floor((hh-24)/1.4308)))}
+  root.style.setProperty('--cw',cw+'px');root.style.setProperty('--ch',Math.round(cw*1.4308)+'px');root.style.setProperty('--barh',barH+'px');
+  if(UI.land)root.style.setProperty('--bs',Math.max(150,Math.min(H-barH,Math.round(W*.62)))+'px');
+  sizeMap();
+  if((was!==on||wasLand!==UI.land)&&G){UI.mapReset=true;renderAll()}}
+// the map square: as big as the board area allows (portrait: the width; wide: the left column)
+function sizeMap(){const bd=$('#board');if(!bd)return;const W=bd.clientWidth,H=bd.clientHeight;if(!W||!H)return;const S=Math.max(120,Math.floor(Math.min(W,H)));
+  document.documentElement.style.setProperty('--ms',S+'px');UI.bs=S}
 function phoneRefresh(){}
-// tap the corner button to make the map bigger (the dock keeps the rest of the screen); tap again to go back
-function toggleZoom(){UI.zoom=!UI.zoom;document.documentElement.classList.toggle('zoom',!!UI.zoom);const b=$('.zbtn');if(b){b.setAttribute('aria-pressed',String(!!UI.zoom));b.setAttribute('aria-label',UI.zoom?'Make the map smaller':'Make the map bigger')}phApply();if(G)renderAll()}
-// map-centred decisions (Herald, hidden cards, claiming, ties, the map lesson) get the big map; lists, menus and result cards get the room instead
-function wantSmall(){if(!G)return false;const c=UI.card;if(c&&c.kind==='pass')return false;if(c&&(c.kind==='event'||c.kind==='over'))return true;
-  if(UI.coachInfo)return UI.coachInfo.id!=='map';const s=viewSeatForQ();if(s==null||!G.q)return UI.boardSmall;
-  return !['herald','place','location','tie'].includes(G.q.kind)}
+function toggleZoom(){}
+function wantSmall(){return false}
 // One relayout path for resize, orientationchange, visualViewport and the board's ResizeObserver (iOS reports the old size right after rotating, so it re-measures at ~400 ms).
 let _rz=0,_rz2=0,_rzSig='';
 function relayout(force){const bd=$('#board'),sig=innerWidth+'x'+innerHeight+'|'+(bd?bd.clientWidth+'x'+bd.clientHeight:'');if(!force&&sig===_rzSig)return;_rzSig=sig;
@@ -5204,7 +5362,7 @@ function newsSince(l0,seat){const me=vs();const human=seat!=null&&G.pl[seat]&&!G
 (function(){const o=doMove;doMove=function(mv){const q=G&&G.q?{kind:G.q.kind,t:G.q.t,title:G.q.title}:null;const l0=G?G.logN:0,e0=UI.evq.length,seat=mv&&mv.seat;
   const ok=o(mv);if(!ok||!G)return ok;
   const added=UI.evq.splice(e0);let news=[];
-  if(wantNews()){news=newsSince(l0,seat);if(G.logN===l0&&q&&G.pl[seat]&&G.pl[seat].ai){const t=aiFallback(seat,q,mv);if(t)news.push({t:'news',at:l0+.1,s:seat,text:t,k:'narr',big:false})}}
+  if(wantNews()){news=newsSince(l0,seat);}
   // eliminations inside a Clash are told on the Clash card itself (with the breakdown), not twice
   const cl=added.filter(e=>e.t==='clash').map(e=>e.r);news=news.filter(n=>!((n.k==='elim'||n.k==='inv')&&n.m&&cl.includes(n.m.r)));
   const all=added.concat(news).sort((a,b)=>(a.at||0)-(b.at||0));UI.evq.push(...all);return ok}})();
@@ -5217,7 +5375,7 @@ function showNews(first){const items=[first];if(first.big&&infK(first)){while(UI
   const dur=newsDur(c);
   clearTimeout(UI._nt);UI._nt=setTimeout(()=>{if(UI.card===c){UI.card=null;pump()}},dur)}
 // how long a news card stays: short for plain computer moves, longer when it changes Influence or your Clash (a tap always skips)
-function newsDur(c){const sp=Math.max(1,Math.min(UI.speed||1,4));if(c.big)return 3000/sp;const k=c.items.some(x=>x.keep);return Math.max(k?1700:700,600+380*c.items.length)/sp}
+function newsDur(c){const sp=Math.max(1,Math.min(UI.speed||1,4));if(c.big)return 1800/sp;const k=c.items.some(x=>x.keep);return Math.max(k?1300:600,500+300*c.items.length)/sp}
 function newsOk(){const c=UI.card;if(!c||c.kind!=='news')return;clearTimeout(UI._nt);UI.card=null;
   if(!c.big){UI.evq=UI.evq.filter(e=>!(e.t==='news'&&!e.big&&!e.keep))}   // a tap skips the rest of the narration (cards that touch you, Influence changes and moves in your Clash still come)
   pump()}
@@ -5225,10 +5383,7 @@ const NEWSHEAD={inf:'Influence',steal:'Influence stolen',elim:'Eliminated',kcste
 function newsHead(it,items){const me=vs();if(items&&items.length>1&&items.every(infK)){const d={};for(const x of items){const m=x.m;if(m.k==='inf')d[m.s]=(d[m.s]||0)+m.n;else{d[m.s]=(d[m.s]||0)+m.n;d[m.v]=(d[m.v]||0)-m.n}}
     return Object.keys(d).filter(s=>d[s]).sort((a,b)=>(b==me)-(a==me)).map(s=>(+s===me?'You':sideName(+s))+' '+(d[s]>0?'+':'\u2212')+Math.abs(d[s])).join(' \u00b7 ')+' Influence'}
   const m=it.m||{};if(m.k==='inf')return (m.n>0?'+':'−')+Math.abs(m.n)+' Influence';if(m.k==='steal')return m.v===me?'−'+m.n+' Influence: stolen':'+'+m.n+' Influence: stolen';return NEWSHEAD[m.k]||'What happened'}
-function renderNews(){const el=$('#news');if(!el)return;const c=UI.card;if(!c||c.kind!=='news'){if(!el.hidden){el.hidden=true;el.innerHTML=''}return}
-  if(el.dataset.id===String(c.id)&&!el.hidden)return;el.dataset.id=c.id;el.hidden=false;const first=c.items[0];const col=first.s>=0&&G.pl[first.s]?fcol(first.s):'#e8c867';
-  el.className='news'+(c.big?' big':'')+(first.mine?' mine':'');el.style.setProperty('--fc',col);
-  el.innerHTML='<div class="nw" data-a="newsok" role="button" tabindex="0" aria-label="Continue">'+(c.big?'<b class="nw-h">'+esc(newsHead(first,c.items))+'</b>':'')+c.items.map(it=>'<p'+(it.keep?' class="kp"':'')+'><i style="background:'+(it.s>=0&&G.pl[it.s]?fcol(it.s):'#777')+'"></i>'+esc(plain(it.text))+'</p>').join('')+'<small class="nw-t">'+(c.big?'tap to continue':'')+'</small><span class="nw-bar" style="animation-duration:'+newsDur(c)+'ms"></span></div>'}
+function renderNews(){const el=$('#news');if(el&&!el.hidden){el.hidden=true;el.innerHTML=''}}
 // ---------------------------------------------------------------- previews: what the Night step and the tally give if nobody else acts
 function preview(V){try{return TB.clashPreview(V||UI.V)}catch(e){return null}}
 function sideName(s){return shortName(s).replace(' (you)','')}
@@ -5341,6 +5496,201 @@ function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
   GXC.init({game:'thornbound',data:window.CAMPAIGN,startChapter:def=>{hideStart();newGame('me',campOpts(def))},isWon:campIsWon,metrics:campMetrics,
     onExit(){showStart()},scores:g=>g.pl.map(p=>p.inf),seats:g=>g.pl.map((p,i)=>({name:p.name,me:i===0,ai:i?p.ai:undefined}))})}
 campInit();
+// ===================== part 10: board-first play =====================
+// The map is the screen. Pieces sit on it, legal spots glow, you tap or drag the piece itself, and the computer's moves play out on the board.
+// Text: one status line (8 words or fewer) in the top bar. Everything else is shown, not written.
+// ---------------------------------------------------------------- the decision, as the board sees it
+function bfModel(s,mv,rm){const q=G.q,k=q.kind;const M={s,q,mv,rec:rm,kind:'other',use:new Set(),locs:[],regs:[],powers:[]};
+  for(const m of mv){if(m.id!=null&&m.id>=0)M.use.add(m.id);if(typeof m.v==='number'&&m.v>=0&&m.v<10000)M.use.add(m.v)}
+  if(q.t==='menu'){M.kind='menu';M.use=new Set();M.regs=[...new Set(mv.filter(m=>m.t==='act'&&m.a==='supp'&&m.p&&m.p.n===1).map(m=>m.p.r))];M.powers=visibleActs(mv).filter(m=>m.t==='act'&&m.a!=='supp')}
+  else if(k==='bid'||k==='bidRes'||k==='place'||k==='tie'||k==='clashOrder')M.kind=k;
+  else if(k==='herald'||k==='location'){M.kind=k;M.locs=mv.filter(m=>m.loc!=null).map(m=>m.loc)}
+  if(M.kind!=='bid'&&M.kind!=='place'&&M.kind!=='tie'&&M.kind!=='other')M.use=new Set();
+  M.regsFor=id=>{const o=[];for(const m of mv){if(m.id!==id)continue;if(k==='place'&&m.r!=null)o.push(m.r);else if(k==='tie'&&G.clash)o.push(G.clash.r)}return [...new Set(o)]};
+  M.nextRegs=()=>{const o=UI.ord||[];const set=new Set();for(const m of mv)if(m.order&&o.every((r,i)=>m.order[i]===r)&&m.order.length>o.length)set.add(m.order[o.length]);return [...set]};
+  return M}
+function cardMoves(id){const M=UI.bf;if(!M||!M.mv)return [];const out=[];
+  for(const m of M.mv){if(m.id!==id&&!(typeof m.v==='number'&&m.v===id))continue;
+    if(M.kind==='bid')out.push({type:'spot',k:m.k});
+    else if(M.kind==='place')out.push({type:'region',r:m.r,k:m.k});
+    else if(M.kind==='tie')out.push({type:'region',r:G.clash?G.clash.r:null,k:m.k});
+    else if(M.kind==='other')out.push({type:'direct',k:m.k})}
+  return out}
+const cardDriven=M=>!!M&&(M.kind==='bid'||M.kind==='place'||M.kind==='tie');
+// tap a card: it lifts and its targets glow; tap it again (or the glowing spot) to play it
+function handTap(id){const M=UI.bf;const cm=M&&M.kind?cardMoves(id):[];
+  if(!cm.length){UI.hand=null;openPop('card',{id});return}
+  if(cardDriven(M)){
+    if(UI.hand===id){if(cm.length===1){commitCard(id,cm[0]);return}UI.hand=null;renderAll();return}
+    UI.hand=id;if(typeof sfx==='function')sfx('tap');renderAll();return}
+  if(cm.length===1){humanMove(cm[0].k);return}
+  openPop('card',{id})}
+function commitCard(id,c){UI.hand=null;
+  try{const el=$('#handw .hc[data-id="'+id+'"]');let dest=null;if(c.type==='spot'){const sp=$('#spots .bspot');dest=sp&&sp.getBoundingClientRect()}else if(c.type==='region'&&c.r!=null&&MAP.m){const R=regionRect(c.r);dest={left:R.left+R.width/2-14,top:R.top+R.height/2-20,width:28,height:40}}
+    if(el&&dest)flyEl(el.innerHTML,el.getBoundingClientRect(),dest,{ms:380})}catch(e){}
+  humanMove(c.k)}
+// ---------------------------------------------------------------- taps on the map
+function regionTap(r){const M=UI.bf;if(!M||!M.kind||(UI.card&&UI.card.kind!=='tip'))return false;
+  if(M.kind==='place'||M.kind==='tie'){if(UI.hand!=null){const c=cardMoves(UI.hand).find(x=>x.type==='region'&&x.r===r);if(c){commitCard(UI.hand,c);return true}}return false}
+  if(M.kind==='menu'){const m=M.mv.find(x=>x.t==='act'&&x.a==='supp'&&x.p&&x.p.r===r&&x.p.n===1);if(m){bfPopAt(regionRect(r),'+1',fcol(M.s));humanMove(m.k);return true}return false}
+  if(M.kind==='clashOrder'){orderTap(r);return true}
+  return false}
+function locTap(l){const M=UI.bf;if(!M||!M.kind||(UI.card&&UI.card.kind!=='tip'))return false;
+  if(M.kind==='herald'||M.kind==='location'){const m=M.mv.find(x=>x.loc===l);if(m){humanMove(m.k);return true}return false}
+  return regionTap(l>>1)}
+function orderTap(r){const M=UI.bf;if(!M||M.kind!=='clashOrder'||!M.nextRegs().includes(r))return;UI.ord=(UI.ord||[]).concat(r);
+  const o=UI.ord;const cand=M.mv.filter(m=>m.order&&o.every((x,i)=>m.order[i]===x));
+  if(cand.length===1){humanMove(cand[0].k);return}
+  renderAll()}
+// ---------------------------------------------------------------- the bid spot (on the table, bottom of the map)
+function renderSpots(){const el=$('#spots');if(!el)return;if(!G||!UI.V){el.innerHTML='';return}
+  const me=vs(),M=UI.bf,P=me>=0?UI.V.pl[me]:null;const has=P&&P.bid!=null&&P.bid>=0;const asking=!!M&&M.kind==='bid';
+  const showBack=has&&!G.bidRev;
+  if(!P||isPassing()||(!has&&!asking)){if(el._h!==''){el._h='';el.innerHTML=''}return}
+  const S=UI.bs||360;const w=Math.round(Math.max(40,Math.min(60,S*.13))),h=Math.round(w*1.4308);
+  const glow=asking&&UI.hand!=null,rec=asking&&M.rec&&M.rec.id!=null;const retk=M&&M.kind==='bidRes'&&M.mv.some(m=>m.t==='return');
+  const h2='<button class="bspot'+(glow?' glow hot':'')+(glow&&rec?' rec':'')+(has?' full':'')+(retk?' glow':'')+'" id="bidspot" data-a="spot" style="width:'+w+'px;height:'+h+'px" aria-label="'+(has?'Your bid':'Bid spot')+'">'+(has?'<span class="bs-c" data-owner="'+me+'" data-up="1">'+cardEl(P.bid,w).outerHTML+'</span>':'<span class="bs-l">'+ico('crown')+'</span>')+'</button>';
+  if(el._h!==h2){el._h=h2;el.innerHTML=h2}}
+function spotTap(){const M=UI.bf;if(!M)return;
+  if(M.kind==='bid'&&UI.hand!=null){const c=cardMoves(UI.hand).find(x=>x.type==='spot');if(c){commitCard(UI.hand,c)}return}
+  if(M.kind==='bidRes'){const m=M.mv.find(x=>x.t==='return');if(m)humanMove(m.k)}}
+// ---------------------------------------------------------------- effects: flights, score pops
+function flyEl(html,from,to,o){o=o||{};const fx=$('#fx');if(!fx||!ANIM||!from||!to||UI.reduce)return;const ms=(o.ms||420)/Math.max(1,Math.min(UI.speed||1,4));
+  const e=document.createElement('div');e.className='fly '+(o.cls||'');e.innerHTML=html||'';fx.appendChild(e);
+  const w=from.width||40,h=from.height||56;e.style.cssText='left:'+from.left+'px;top:'+from.top+'px;width:'+w+'px;height:'+h+'px';
+  const dx=to.left+(to.width||0)/2-(from.left+w/2),dy=to.top+(to.height||0)/2-(from.top+h/2),sc=Math.max(.3,(to.width||w)/w);
+  const done=()=>{if(e.parentNode)e.remove()};
+  try{const a=e.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:'translate('+dx+'px,'+dy+'px) scale('+sc+')',opacity:o.fade?0.2:1}],{duration:ms,easing:'cubic-bezier(.2,.7,.2,1)'});a.onfinish=done}catch(x){}
+  setTimeout(done,ms+250)}
+const BACK_HTML='<span class="bidc back big"></span>';
+function seatEl(s){return document.querySelector('#rivals .rv[data-s="'+s+'"]')}
+// a score pop: appears where it was earned, then flies to the seat's score chip
+function bfPopAt(rect,txt,col,seat,cb){const fx=$('#fx');if(!fx||!ANIM||!rect)return;
+  const e=document.createElement('div');e.className='pop';e.textContent=txt;e.style.cssText='left:'+(rect.left+rect.width/2)+'px;top:'+(rect.top+rect.height/2)+'px;--fc:'+(col||'#e8c867');fx.appendChild(e);
+  const sp=Math.max(1,Math.min(UI.speed||1,4));const done=()=>{if(e.parentNode)e.remove()};
+  const chip=seat!=null?document.querySelector('#rivals .rv[data-s="'+seat+'"] .rv-n'):null;
+  try{const a=e.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:'translate(-50%,-90%) scale(1.25)',opacity:1,offset:.35},{transform:'translate(-50%,-90%) scale(1.15)',opacity:1,offset:.6},
+      chip?{transform:'translate('+(chip.getBoundingClientRect().left+chip.getBoundingClientRect().width/2-(rect.left+rect.width/2)-0)+'px,'+(chip.getBoundingClientRect().top+8-(rect.top+rect.height/2))+'px) scale(.5)',opacity:.15}:{transform:'translate(-50%,-150%) scale(.8)',opacity:0}],{duration:1150/sp,easing:'ease-in-out'});
+    a.onfinish=()=>{done();if(chip){chip.classList.remove('bump');void chip.offsetWidth;chip.classList.add('bump')}}}catch(x){}
+  setTimeout(done,1400/sp)}
+function locRect(l){try{const p=MAP.m.locPos(LOCID[l]);const c=mapToClient(p.x,p.y);return {left:c.x-10,top:c.y-10,width:20,height:20}}catch(e){return null}}
+function regionRect(r){const b=REGBOX[r];const a=mapToClient(b.x,b.y),c=mapToClient(b.x+b.w,b.y+b.h);return {left:a.x,top:a.y,width:c.x-a.x,height:c.y-a.y}}
+function mapToClient(x,y){const el=MAP.m.el,M=el.getScreenCTM&&el.getScreenCTM();if(!M)return {x:0,y:0};return {x:M.a*x+M.e,y:M.d*y+M.f}}
+function mapPt(cx,cy){try{const M=MAP.m.el.getScreenCTM();return M?{x:(cx-M.e)/M.a,y:(cy-M.f)/M.d}:null}catch(e){return null}}
+function locFromText(t){for(let l=0;l<6;l++)if(t.indexOf(LOCN[l])>=0)return l;return -1}
+function bfNews(c){if(!ANIM)return;
+  for(const it of c.items){const m=it.m;if(!m||(m.k!=='inf'&&m.k!=='steal'))continue;
+    const doPop=(seat,n)=>{if(!n)return;let rect=null;const l=locFromText(it.text||'');if(l>=0)rect=locRect(l);else if(G.clash&&G.clash.r!=null)try{const R=regionRect(G.clash.r);rect={left:R.left+R.width/2,top:R.top+R.height/2,width:0,height:0}}catch(e){}
+      if(!rect){const ch=seatEl(seat);if(ch)rect=ch.getBoundingClientRect()}
+      bfPopAt(rect,(n>0?'+':'−')+Math.abs(n),fcol(seat),seat)};
+    if(m.k==='inf')doPop(m.s,m.n);else{doPop(m.s,m.n);doPop(m.v,-m.n)}}
+  if(typeof sfx==='function'&&c.items.some(infK))sfx('inf')}
+// a computer's card lands on the map: it flies there from its seat
+function bfSlot(r,s,old,nw){if(!ANIM||UI.noAnim||!nw||!nw.faceDown||(old&&old.count>=nw.count)||s===vs())return;
+  const from=seatEl(s),slot=MAP.m.slotEl(LOCID[2*r],s);if(!from||!slot)return;const f=from.getBoundingClientRect(),t=slot.getBoundingClientRect();
+  flyEl(BACK_HTML,{left:f.left+f.width/2-14,top:f.top+f.height/2-20,width:28,height:40},t,{ms:520})}
+// ---------------------------------------------------------------- events played on the board (bids, clashes, round end): no panels, a tap skips
+function evDone(){const c=UI.card;if(!c||c.kind!=='event')return;clearTimeout(UI._evT);UI.card=null;UI._cardKey=null;UI.noAnim=false;UI._cp=null;UI._clashLine='';UI.mapReset=false;MAP.slotDirty=true;pump()}
+function bfSkip(){const c=UI.card;if(!c)return false;if(c.kind==='event'){evDone();return true}if(c.kind==='news'){newsOk();return true}return false}
+const spd=()=>Math.max(1,Math.min(UI.speed||1,4));
+function bfAuto(c,ms){clearTimeout(UI._evT);UI._evT=setTimeout(()=>{if(UI.card===c)evDone()},ANIM?ms/spd():0)}
+function bfEvent(c){const ev=c.ev;if(ev.t==='bids')bfBids(c);else if(ev.t==='clash')bfClash(c);else if(ev.t==='summary')bfSummary(c);else bfAuto(c,300)}
+function bfBids(c){const ev=c.ev;c.rank=ev.bids.slice().sort((a,b)=>a.str-b.str||ev.order.indexOf(b.seat)-ev.order.indexOf(a.seat)).map(b=>b.seat);c.revN=0;
+  const step=()=>{if(UI.card!==c)return;if(c.revN<c.rank.length){c.revN++;if(typeof sfx==='function')sfx('flip');renderRivals();setTimeout(step,ANIM?420/spd():0)}else bfAuto(c,1100)};
+  renderBar();renderRivals();setTimeout(step,ANIM?350/spd():0)}
+function clashLine(ev){const me=vs(),w=ev.winner,reg=REG[ev.r];if(w<0)return 'Tie in '+reg;
+  const best=Math.max(0,...ev.parts.filter(x=>x!==w).map(x=>ev.tot[x]));return (w===me?'You win ':sideName(w)+' wins ')+reg+', '+ev.tot[w]+' to '+best}
+function elimLine(ev){const d=ev.dead||{};const me=vs();const o=Object.keys(d).map(Number).filter(s=>d[s]&&d[s].length);if(!o.length)return '';const s=o.sort((a,b)=>(b===me)-(a===me))[0];const n=d[s].length;
+  return (s===me?'You lose ':sideName(s)+' loses ')+n+' card'+(n>1?'s':'')}
+function bfClash(c){const ev=c.ev;UI.noAnim=true;UI.clashBrk=UI.clashBrk||{};UI.clashBrk[ev.r]={tot:ev.tot,brk:ev.brk,parts:ev.parts};
+  const fin=()=>{if(UI.card!==c)return;UI.clashRes[ev.r]={winner:ev.winner,tot:ev.tot};try{drawOverlay()}catch(e){}UI._clashLine=clashLine(ev);renderBar();if(typeof sfx==='function')sfx(ev.winner<0?'tie':'win');
+    const el=elimLine(ev);const hold=el?1500:1100;
+    if(el)setTimeout(()=>{if(UI.card===c){UI._clashLine=el;renderBar()}},900/spd());
+    bfAuto(c,hold+300)};
+  UI._clashLine='The Clash in '+REG[ev.r];renderBar();
+  if(!ANIM){fin();return}
+  const p=mapReveal(ev);Promise.resolve(p).then(()=>{if(UI.card===c)setTimeout(fin,150/spd())})}
+function bfSummary(c){const ev=c.ev;renderBar();
+  if(ANIM)ev.inf1.forEach((v,s)=>{const d=v-ev.inf0[s];if(d){const ch=seatEl(s);if(ch)bfPopAt(ch.getBoundingClientRect(),(d>0?'+':'−')+Math.abs(d),fcol(s),s)}});
+  bfAuto(c,1400)}
+// a tap on the board or the status line skips the narration
+document.addEventListener('pointerdown',e=>{if(!UI.card||!G)return;if(UI.card.kind!=='event'&&UI.card.kind!=='news')return;
+  if(e.target.closest&&e.target.closest('#board,.gx-bar #barstat,#rivals')){if(bfSkip())UI._nc=1}},true);
+// ---------------------------------------------------------------- long-press: a small tooltip near the thing (8 words or fewer)
+const LOC_SHORT=['Govern','Journey','Favour','','Deck bottom','Recover cards'];
+function tipFor(kind,arg){const V=UI.V;if(!V)return '';
+  if(kind==='loc'){const l=arg;const hd=G.pl.filter(p=>p.herald===l).map(p=>'<i class="td" style="background:'+fcol(p.seat)+'"></i>').join('');return '<b>'+esc(LOCN[l])+'</b> <em>+'+DD.LOCS[l][2]+'</em> '+esc(LOC_SHORT[l])+(hd?' '+hd:'')}
+  if(kind==='region'){const r=arg;const bk=UI.clashBrk&&UI.clashBrk[r];
+    if(bk&&UI.clashRes[r])return '<b>'+esc(REG[r].replace('The ',''))+'</b> '+youFirst(bk.parts).map(s=>esc(s===vs()?'You':sideName(s))+' <b>'+bk.tot[s]+'</b>'+(bk.brk&&bk.brk[s]&&bk.brk[s].length?' = '+bk.brk[s].map(x=>x.n).join('+').replace(/\+-/g,'−'):'')).join(' · ');
+    const R=V.reg[r];const parts=youFirst(V.pl.map(p=>p.seat)).map(s=>{let known=0,unk=0;for(const id of R.up)if(ownerOf(id)===s)known+=cinfo(id).strength;for(const id of R.down)if(ownerOf(id)===s){if(id>=0)known+=cinfo(id).strength;else unk++}
+      const sp=V.pl[s].supp.r[r];const t=known+sp;return (s===vs()?'You':esc(sideName(s)))+' <b>'+(unk?'?'+(t?'+'+t:''):t)+'</b>'});
+    return '<b>'+esc(REG[r].replace('The ',''))+'</b> '+parts.join(' · ')}
+  return ''}
+function showTip(html,rect){const t=$('#tip');if(!t||!html)return;t.innerHTML=html;t.hidden=false;t.style.left='0px';t.style.top='0px';
+  const tw=t.offsetWidth,th=t.offsetHeight;let x=rect.left+rect.width/2-tw/2,y=rect.top-th-8;if(y<(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--barh'))||44)+4)y=rect.top+rect.height+8;
+  x=Math.max(6,Math.min(innerWidth-tw-6,x));t.style.left=Math.round(x)+'px';t.style.top=Math.round(y)+'px';clearTimeout(UI._tipT);UI._tipT=setTimeout(hideTip,3600)}
+function hideTip(){const t=$('#tip');if(t&&!t.hidden){t.hidden=true;t.innerHTML=''}}
+// map: hold a location or a region
+(function(){let d=null;
+  document.addEventListener('pointerdown',e=>{hideTip();const mb=e.target.closest&&e.target.closest('#mapbox');if(!mb||!G||!UI.started||UI.card)return;if(e.target.closest('#spots'))return;
+    d={x:e.clientX,y:e.clientY,pid:e.pointerId,t:setTimeout(()=>{if(!d)return;const p=mapPt(d.x,d.y);if(!p)return;let kind=null,arg=null,rect=null;
+      for(let l=0;l<6;l++)if(Math.hypot(p.x-LOCPOS[l][0],p.y-LOCPOS[l][1])<70){kind='loc';arg=l;rect=locRect(l);break}
+      if(!kind)for(let r=0;r<3;r++){const b=REGBOX[r];if(p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h){kind='region';arg=r;const R=regionRect(r);rect={left:R.left+R.width/2-10,top:R.top+30,width:20,height:20};break}}
+      if(kind){UI._nc=1;showTip(tipFor(kind,arg),rect)}d=null},480)}},true);
+  const end=()=>{if(d){clearTimeout(d.t);d=null}};
+  document.addEventListener('pointerup',end,true);document.addEventListener('pointercancel',end,true);
+  document.addEventListener('pointermove',e=>{if(d&&Math.hypot(e.clientX-d.x,e.clientY-d.y)>12)end()},true)})();
+// hand: hold a card to read it, drag a usable card onto the glowing spot
+(function(){let d=null;
+  const dropAt=(x,y)=>{const sp=$('#spots .bspot');if(sp){const r=sp.getBoundingClientRect();if(x>=r.left-18&&x<=r.right+18&&y>=r.top-18&&y<=r.bottom+18)return {type:'spot'}}
+    const p=mapPt(x,y);if(p)for(let r=0;r<3;r++){const b=REGBOX[r];if(p.x>=b.x-20&&p.x<=b.x+b.w+20&&p.y>=b.y-20&&p.y<=b.y+b.h+20)return {type:'region',r}}return null};
+  document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('#handw .hc');if(!b||(e.button&&e.button>0))return;
+    const id=+b.dataset.id;d={id,b,x:e.clientX,y:e.clientY,drag:false,pid:e.pointerId,g:null};
+    d.lp=setTimeout(()=>{if(d&&!d.drag){const i=d.id;d=null;UI._nc=1;UI.hand=null;openPop('card',{id:i})}},520)},true);
+  document.addEventListener('pointermove',e=>{if(!d||e.pointerId!==d.pid)return;
+    if(!d.drag){if(Math.hypot(e.clientX-d.x,e.clientY-d.y)<12)return;clearTimeout(d.lp);
+      if(!cardDriven(UI.bf)||!cardMoves(d.id).length){d=null;return}
+      d.drag=true;UI.dragging=true;UI.hand=d.id;const g=document.createElement('div');g.className='dragc';const w=cssPx('--cw',50)*1.2;g.innerHTML=cardEl(d.id,w).outerHTML;document.body.appendChild(g);d.g=g;d.b.classList.add('lifted');UI.dragging=false;renderMain();renderSpots();UI.dragging=true}
+    if(d.g){d.g.style.transform='translate('+(e.clientX-30)+'px,'+(e.clientY-70)+'px)';const t=dropAt(e.clientX,e.clientY);document.body.classList.toggle('over-t',!!t)}
+    e.preventDefault()},true);
+  const fin=(e,ok)=>{if(!d)return;clearTimeout(d.lp);const x=d;d=null;if(!x.drag)return;UI.dragging=false;document.body.classList.remove('over-t');if(x.g)x.g.remove();x.b.classList.remove('lifted');UI._ncT=Date.now()+70;
+    if(ok){const t=dropAt(e.clientX,e.clientY);const c=t&&cardMoves(x.id).find(m=>m.type===t.type&&(t.type==='spot'||m.r===t.r));if(c){commitCard(x.id,c);return}}
+    renderAll()};
+  document.addEventListener('pointerup',e=>fin(e,true),true);document.addEventListener('pointercancel',e=>fin(e,false),true)})();
+// ---------------------------------------------------------------- the ghost finger: shows the first move of each kind (and every move while hints are on in the guided game and in Story)
+// a tap that ended a hold, a drag or a skip must not also act
+document.addEventListener('pointerup',()=>{if(UI._nc){UI._nc=0;UI._ncT=Date.now()+70}},true);
+document.addEventListener('click',e=>{if(UI._ncT&&Date.now()<UI._ncT){UI._ncT=0;e.stopPropagation();e.preventDefault()}},true);
+const learnKey=()=>G&&G.q?(G.q.t==='menu'?'menu':G.q.kind):'';
+function lsGetJ(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catch(e){return {}}}
+function fingerWanted(kind){if(isGuided()||UI.camp)return true;return !(lsGetJ('tb_fl')[kind]>=1)}
+(function(){const o=humanMove;humanMove=function(k){const kind=learnKey();const r=o(k);if(r&&kind){try{const L=lsGetJ('tb_fl');L[kind]=(L[kind]||0)+1;localStorage.setItem('tb_fl',JSON.stringify(L))}catch(e){}}return r}})();
+function ctr(r){return r?{x:r.left+r.width/2,y:r.top+r.height/2}:null}
+function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.dragging||!fingerWanted(learnKey()))return null;
+  let from=null,to=null;const el=sel=>{const e=document.querySelector(sel);return e?e.getBoundingClientRect():null};const K=rm.k;
+  try{
+    if(UI.pop){if(UI.pop==='confirm')to=ctr(el('#ppop [data-a=mv]'));else return null}
+    else switch(M.kind){
+    case 'bid':{to=ctr(el('#spots .bspot'));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));break}
+    case 'place':case 'tie':{if(rm.pass){to=ctr(el('#act [data-k="'+K+'"]'));break}const r=rm.r!=null?rm.r:(G.clash?G.clash.r:null);if(r!=null)to=ctr(regionRect(r));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));break}
+    case 'herald':case 'location':{const R=locRect(rm.loc);to=ctr(R);break}
+    case 'bidRes':{to=ctr(el('#handw [data-k="'+K+'"]')||el('#act [data-k="'+K+'"]'));break}
+    case 'clashOrder':{const nx=rm.order&&rm.order[(UI.ord||[]).length];if(nx!=null)to=ctr(regionRect(nx));break}
+    case 'menu':{if(rm.a==='supp'&&rm.p)to=ctr(regionRect(rm.p.r));else if(UI.sheetOpen)to=ctr(el('#main [data-k="'+K+'"]'));else to=ctr(el('#act [data-k="'+K+'"]')||el('#act .btn.pri'));break}
+    default:{to=ctr(el('#act [data-k="'+K+'"]')||el('#main [data-k="'+K+'"]'));break}
+  }}catch(e){return null}
+  return to?{from,to,key:M.kind+'|'+(K||'')+'|'+(UI.hand==null?0:1)+'|'+(UI.pop||'')+'|'+(UI.sheetOpen?1:0)+'|'+Math.round(to.x)+','+Math.round(to.y)}:null}
+function bfFinger(){const f=$('#finger');if(!f)return;const p=ANIM&&!UI.reduce?fingerPlan():null;
+  if(!p){if(!f.hidden){f.hidden=true;try{f._a&&f._a.cancel()}catch(e){}f._k=''}return}
+  if(f._k===p.key&&!f.hidden)return;f._k=p.key;f.hidden=false;try{f._a&&f._a.cancel()}catch(e){}
+  const a=p.from||p.to,b=p.to;const kf=p.from?[{transform:'translate('+a.x+'px,'+a.y+'px) scale(1.25)',opacity:0},{transform:'translate('+a.x+'px,'+a.y+'px) scale(1)',opacity:1,offset:.14},{transform:'translate('+a.x+'px,'+a.y+'px) scale(.9)',opacity:1,offset:.28},{transform:'translate('+b.x+'px,'+b.y+'px) scale(.9)',opacity:1,offset:.72},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.2)',opacity:.9,offset:.86},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.4)',opacity:0}]
+    :[{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.3)',opacity:0},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1)',opacity:1,offset:.3},{transform:'translate('+b.x+'px,'+b.y+'px) scale(.85)',opacity:1,offset:.55},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.35)',opacity:0}];
+  try{f._a=f.animate(kf,{duration:p.from?2300:1500,iterations:Infinity,easing:'ease-in-out'})}catch(e){f.style.transform='translate('+b.x+'px,'+b.y+'px)'}}
+function bfAfter(){bfFinger()}
+// the computer acts at a watchable pace (about 0.6 s per move; tap to skip narration)
+function autoSkip(h){if(NET.on||hotSeat()||!G||!G.q||G.q.t!=='menu')return false;
+  const mv=legal(h);const acts=visibleActs(mv).filter(m=>m.t==='act');const d=mv.find(m=>m.t==='done');if(!d||acts.length)return false;
+  return humanMove(d.k)}
 
 </script>
 </body>

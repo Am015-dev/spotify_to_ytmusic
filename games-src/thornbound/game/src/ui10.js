@@ -77,8 +77,8 @@ function bfPopAt(rect,txt,col,seat,cb){const fx=$('#fx');if(!fx||!ANIM||!rect)re
   setTimeout(done,1400/sp)}
 function locRect(l){try{const p=MAP.m.locPos(LOCID[l]);const c=mapToClient(p.x,p.y);return {left:c.x-10,top:c.y-10,width:20,height:20}}catch(e){return null}}
 function regionRect(r){const b=REGBOX[r];const a=mapToClient(b.x,b.y),c=mapToClient(b.x+b.w,b.y+b.h);return {left:a.x,top:a.y,width:c.x-a.x,height:c.y-a.y}}
-function mapToClient(x,y){const M=MAP.m.el.getScreenCTM();return {x:M.a*x+M.e,y:M.d*y+M.f}}
-function mapPt(cx,cy){try{const M=MAP.m.el.getScreenCTM();return {x:(cx-M.e)/M.a,y:(cy-M.f)/M.d}}catch(e){return null}}
+function mapToClient(x,y){const el=MAP.m.el,M=el.getScreenCTM&&el.getScreenCTM();if(!M)return {x:0,y:0};return {x:M.a*x+M.e,y:M.d*y+M.f}}
+function mapPt(cx,cy){try{const M=MAP.m.el.getScreenCTM();return M?{x:(cx-M.e)/M.a,y:(cy-M.f)/M.d}:null}catch(e){return null}}
 function locFromText(t){for(let l=0;l<6;l++)if(t.indexOf(LOCN[l])>=0)return l;return -1}
 function bfNews(c){if(!ANIM)return;
   for(const it of c.items){const m=it.m;if(!m||(m.k!=='inf'&&m.k!=='steal'))continue;
@@ -168,17 +168,20 @@ function lsGetJ(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catc
 function fingerWanted(kind){if(isGuided()||UI.camp)return true;return !(lsGetJ('tb_fl')[kind]>=1)}
 (function(){const o=humanMove;humanMove=function(k){const kind=learnKey();const r=o(k);if(r&&kind){try{const L=lsGetJ('tb_fl');L[kind]=(L[kind]||0)+1;localStorage.setItem('tb_fl',JSON.stringify(L))}catch(e){}}return r}})();
 function ctr(r){return r?{x:r.left+r.width/2,y:r.top+r.height/2}:null}
-function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.pop||UI.dragging||!fingerWanted(learnKey()))return null;
-  let from=null,to=null;const el=sel=>{const e=document.querySelector(sel);return e?e.getBoundingClientRect():null};
-  try{switch(M.kind){
-    case 'bid':{to=ctr(el('#spots .bspot'));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));else from=null;break}
-    case 'place':case 'tie':{if(rm.pass){to=ctr(el('#act .btn.pri'));break}const r=rm.r!=null?rm.r:(G.clash?G.clash.r:null);if(r!=null)to=ctr(regionRect(r));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));break}
+function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.dragging||!fingerWanted(learnKey()))return null;
+  let from=null,to=null;const el=sel=>{const e=document.querySelector(sel);return e?e.getBoundingClientRect():null};const K=rm.k;
+  try{
+    if(UI.pop){if(UI.pop==='confirm')to=ctr(el('#ppop [data-a=mv]'));else return null}
+    else switch(M.kind){
+    case 'bid':{to=ctr(el('#spots .bspot'));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));break}
+    case 'place':case 'tie':{if(rm.pass){to=ctr(el('#act [data-k="'+K+'"]'));break}const r=rm.r!=null?rm.r:(G.clash?G.clash.r:null);if(r!=null)to=ctr(regionRect(r));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));break}
     case 'herald':case 'location':{const R=locRect(rm.loc);to=ctr(R);break}
-    case 'bidRes':{to=ctr(el('#handw [data-k="'+rm.k+'"]'));break}
+    case 'bidRes':{to=ctr(el('#handw [data-k="'+K+'"]')||el('#act [data-k="'+K+'"]'));break}
     case 'clashOrder':{const nx=rm.order&&rm.order[(UI.ord||[]).length];if(nx!=null)to=ctr(regionRect(nx));break}
-    case 'menu':{if(rm.a==='supp'&&rm.p)to=ctr(regionRect(rm.p.r));else to=ctr(el('#act .btn.pri'));break}
+    case 'menu':{if(rm.a==='supp'&&rm.p)to=ctr(regionRect(rm.p.r));else if(UI.sheetOpen)to=ctr(el('#main [data-k="'+K+'"]'));else to=ctr(el('#act [data-k="'+K+'"]')||el('#act .btn.pri'));break}
+    default:{to=ctr(el('#act [data-k="'+K+'"]')||el('#main [data-k="'+K+'"]'));break}
   }}catch(e){return null}
-  return to?{from,to,key:M.kind+'|'+(rm.k||'')+'|'+(UI.hand==null?0:1)+'|'+Math.round(to.x)+','+Math.round(to.y)}:null}
+  return to?{from,to,key:M.kind+'|'+(K||'')+'|'+(UI.hand==null?0:1)+'|'+(UI.pop||'')+'|'+(UI.sheetOpen?1:0)+'|'+Math.round(to.x)+','+Math.round(to.y)}:null}
 function bfFinger(){const f=$('#finger');if(!f)return;const p=ANIM&&!UI.reduce?fingerPlan():null;
   if(!p){if(!f.hidden){f.hidden=true;try{f._a&&f._a.cancel()}catch(e){}f._k=''}return}
   if(f._k===p.key&&!f.hidden)return;f._k=p.key;f.hidden=false;try{f._a&&f._a.cancel()}catch(e){}

@@ -35,7 +35,7 @@ function statusText(){const o=t=>({text:words8(t),seat:-1});
       case 'tie':return o('Tie! Add a card or pass');
       case 'location':return o('Claim a location');
       case 'clashOrder':return o((UI.ord||[]).length?'Tap the next region':'Tap the first Clash');
-      case 'menu':{const ph=menuPhase(q);return o(ph==='Spring'&&M.regs.length?'Tap a region to send Supporters':ph==='Day'?'Use a power, or Done':ph==='Autumn'?'Autumn: use a power, or Done':'Use a power, or Done')}
+      case 'menu':{const ph=menuPhase(q);if(ph==='Day'){try{const P=preview();if(P&&P.dead.some(d=>ownerOf(d.id)===s))return o('A Deadly card will eliminate yours')}catch(e){}}return o(ph==='Spring'&&M.regs.length?'Tap a region to send Supporters':ph==='Day'?'Use a power, or Done':ph==='Autumn'?'Autumn: use a power, or Done':'Use a power, or Done')}
       default:return o(promptText(q,s))}}
     return o(promptText(q,s))}
   // somebody else is deciding

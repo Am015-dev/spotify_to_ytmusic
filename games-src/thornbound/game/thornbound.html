@@ -429,7 +429,7 @@ html.ph .gx-bar h1,html.ph .st-r{display:none}
 .rv-n{margin-left:auto;font:700 1.45rem/1 var(--fd);color:#fff3c4;flex:0 0 auto;transform-origin:50% 60%}
 .rv-n.bump{animation:bump .6s ease-out}@keyframes bump{35%{transform:scale(1.7);color:#ffd24a}}
 .rv-f{position:absolute;right:2px;top:-6px;line-height:0}.rv-f .ico{width:16px;height:16px;fill:#ffd24a;stroke:none}
-.race-c.four .rv-t b,.race-c.four .rv-e{display:none}
+.race-c.four .rv-t b{display:none}
 .race-c.many .rv{padding:2px 4px;gap:3px}
 .bidc{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:22px;height:31px;border-radius:4px;border:1.5px solid #e8c867;box-sizing:border-box;transform:rotate(-7deg);box-shadow:0 2px 5px rgba(0,0,0,.6);margin:0 2px}
 .bidc.back{background:repeating-linear-gradient(45deg,var(--fc,#7c1b2c) 0 4px,#120b0e 4px 8px)}
@@ -4521,7 +4521,7 @@ function statusText(){const o=t=>({text:words8(t),seat:-1});
       case 'tie':return o('Tie! Add a card or pass');
       case 'location':return o('Claim a location');
       case 'clashOrder':return o((UI.ord||[]).length?'Tap the next region':'Tap the first Clash');
-      case 'menu':{const ph=menuPhase(q);return o(ph==='Spring'&&M.regs.length?'Tap a region to send Supporters':ph==='Day'?'Use a power, or Done':ph==='Autumn'?'Autumn: use a power, or Done':'Use a power, or Done')}
+      case 'menu':{const ph=menuPhase(q);if(ph==='Day'){try{const P=preview();if(P&&P.dead.some(d=>ownerOf(d.id)===s))return o('A Deadly card will eliminate yours')}catch(e){}}return o(ph==='Spring'&&M.regs.length?'Tap a region to send Supporters':ph==='Day'?'Use a power, or Done':ph==='Autumn'?'Autumn: use a power, or Done':'Use a power, or Done')}
       default:return o(promptText(q,s))}}
     return o(promptText(q,s))}
   // somebody else is deciding
@@ -4725,9 +4725,9 @@ function renderHand(){const el=$('#handw');if(!el)return;const s=vs();
   const ids=HS.order;const inHand=new Set(ids0);
   const use=M&&M.use?M.use:new Set();const rcId=M&&M.rec&&M.rec.id!=null?M.rec.id:null;
   const PAD=16;const W=Math.max(160,(el.clientWidth||innerWidth)-8-2*PAD);const cw=cssPx('--cw',50),ch=Math.round(cw*1.4308);
-  const live=ids.filter(id=>inHand.has(id));const n=live.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
+  const n=ids.length,step=n>1?Math.min(cw+6,(W-cw)/(n-1)):0;const tot=n>1?cw+step*(n-1):cw;const off=Math.max(0,(W-tot)/2);
   let h='<div class="hand" role="list" aria-label="Your hand" style="height:'+(ch+24)+'px">';
-  live.forEach((id,i)=>{const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1?(i-mid)*Math.min(3.6,22/n):0,ty=n>1?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;
+  ids.forEach((id,i)=>{if(!inHand.has(id))return;const on=UI.hand===id,pl=use.has(id);const mid=(n-1)/2,rot=n>1?(i-mid)*Math.min(3.6,22/n):0,ty=n>1?Math.round(Math.pow(Math.abs(i-mid)/Math.max(1,mid),2)*4):0;
     h+='<button class="hc'+(on?' on':'')+(pl?' glow pl':'')+(rcId===id?' rg':'')+(use.size&&!pl?' dim':'')+'" role="listitem" data-a="hand" data-id="'+id+'" data-owner="'+s+'" data-up="1" style="left:'+Math.round(PAD+off+i*step)+'px;width:'+cw+'px;height:'+ch+'px;z-index:'+(on?50:i+1)+';--rot:'+rot.toFixed(1)+'deg;--ty:'+ty+'px" aria-label="'+esc(cinfo(id).name)+', strength '+cinfo(id).strength+'">'+cardEl(id,cw).outerHTML+'</button>'});
   h+='</div>';if(el._h!==h){el._h=h;el.innerHTML=h}}
 // bid resolution: the Great Road lies where the hand was; tap a glowing Kingdom Card to take it (a steal asks first)
@@ -4761,8 +4761,8 @@ function renderRivals(){const el=$('#rivals');if(!el)return;if(!G||!UI.V)return;
       '<span class="rv-e">'+emb(s,22)+'</span><span class="rv-t"><b>'+(s===me&&(NET.on||humans().length===1)?'You':esc(shortName(s).replace(' (you)','')))+(lead&&P.inf===top?' <span class="rv-l" title="In the lead">'+ico('crown')+'</span>':'')+'</b><small>'+ico('card')+P.hand.length+sb+'</small></span>'+bc+'<span class="rv-n" data-s="'+s+'">'+P.inf+'</span>'+favs+'</button>'}).join('');
   const h='<div class="race-c'+(n>2?' many':'')+(n>3?' four':'')+'">'+chips+'</div>';if(el._h!==h){el._h=h;el.innerHTML=h}}
 // ---------------------------------------------------------------- pop-ups (live in the dock zone, never over the board)
-function openPop(kind,arg){if(!G)return;if(typeof hideGloss==='function')hideGloss();UI.pop=kind;UI.popArg=arg||{};renderPop();applyHl();if(typeof sfx==='function')sfx('tap')}
-function closePop(quiet){if(!UI.pop)return;UI.pop=null;UI.popArg=null;UI.hand=null;const p=$('#ppop');if(p){p.hidden=true;p.innerHTML=''}applyHl();if(!quiet)renderAll()}
+function openPop(kind,arg){if(!G)return;if(typeof hideGloss==='function')hideGloss();UI.pop=kind;UI.popArg=arg||{};renderPop();applyHl();if(typeof bfFinger==='function')bfFinger();if(typeof sfx==='function')sfx('tap')}
+function closePop(quiet){if(!UI.pop)return;UI.pop=null;UI.popArg=null;UI.hand=null;const p=$('#ppop');if(p){p.hidden=true;p.innerHTML=''}applyHl();if(typeof bfFinger==='function')bfFinger();if(!quiet)renderAll()}
 function optsFor(s,id){if(s==null||s<0||!G.q||!G.q.seats.includes(s))return [];return legal(s).filter(m=>m.id===id||(typeof m.v==='number'&&m.v===id))}
 function actLabel(m){if(m.t==='bid')return 'Bid with this card';if(m.t==='place')return 'Play face-down at '+REG[m.r];if(G.q.kind==='tie'&&m.id!=null)return 'Play face-down into the tied clash';if(m.t==='sel')return 'Choose this card';return m.label}
 function popShell(title,body,cls){return '<div class="pp-h"><b>'+title+'</b><button class="pp-x" data-a="pclose" aria-label="Close">'+ico('x')+'</button></div><div class="pp-b '+(cls||'')+'">'+body+'</div>'}
@@ -5575,8 +5575,8 @@ function bfPopAt(rect,txt,col,seat,cb){const fx=$('#fx');if(!fx||!ANIM||!rect)re
   setTimeout(done,1400/sp)}
 function locRect(l){try{const p=MAP.m.locPos(LOCID[l]);const c=mapToClient(p.x,p.y);return {left:c.x-10,top:c.y-10,width:20,height:20}}catch(e){return null}}
 function regionRect(r){const b=REGBOX[r];const a=mapToClient(b.x,b.y),c=mapToClient(b.x+b.w,b.y+b.h);return {left:a.x,top:a.y,width:c.x-a.x,height:c.y-a.y}}
-function mapToClient(x,y){const M=MAP.m.el.getScreenCTM();return {x:M.a*x+M.e,y:M.d*y+M.f}}
-function mapPt(cx,cy){try{const M=MAP.m.el.getScreenCTM();return {x:(cx-M.e)/M.a,y:(cy-M.f)/M.d}}catch(e){return null}}
+function mapToClient(x,y){const el=MAP.m.el,M=el.getScreenCTM&&el.getScreenCTM();if(!M)return {x:0,y:0};return {x:M.a*x+M.e,y:M.d*y+M.f}}
+function mapPt(cx,cy){try{const M=MAP.m.el.getScreenCTM();return M?{x:(cx-M.e)/M.a,y:(cy-M.f)/M.d}:null}catch(e){return null}}
 function locFromText(t){for(let l=0;l<6;l++)if(t.indexOf(LOCN[l])>=0)return l;return -1}
 function bfNews(c){if(!ANIM)return;
   for(const it of c.items){const m=it.m;if(!m||(m.k!=='inf'&&m.k!=='steal'))continue;
@@ -5666,17 +5666,20 @@ function lsGetJ(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catc
 function fingerWanted(kind){if(isGuided()||UI.camp)return true;return !(lsGetJ('tb_fl')[kind]>=1)}
 (function(){const o=humanMove;humanMove=function(k){const kind=learnKey();const r=o(k);if(r&&kind){try{const L=lsGetJ('tb_fl');L[kind]=(L[kind]||0)+1;localStorage.setItem('tb_fl',JSON.stringify(L))}catch(e){}}return r}})();
 function ctr(r){return r?{x:r.left+r.width/2,y:r.top+r.height/2}:null}
-function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.pop||UI.dragging||!fingerWanted(learnKey()))return null;
-  let from=null,to=null;const el=sel=>{const e=document.querySelector(sel);return e?e.getBoundingClientRect():null};
-  try{switch(M.kind){
-    case 'bid':{to=ctr(el('#spots .bspot'));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));else from=null;break}
-    case 'place':case 'tie':{if(rm.pass){to=ctr(el('#act .btn.pri'));break}const r=rm.r!=null?rm.r:(G.clash?G.clash.r:null);if(r!=null)to=ctr(regionRect(r));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));break}
+function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.dragging||!fingerWanted(learnKey()))return null;
+  let from=null,to=null;const el=sel=>{const e=document.querySelector(sel);return e?e.getBoundingClientRect():null};const K=rm.k;
+  try{
+    if(UI.pop){if(UI.pop==='confirm')to=ctr(el('#ppop [data-a=mv]'));else return null}
+    else switch(M.kind){
+    case 'bid':{to=ctr(el('#spots .bspot'));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));break}
+    case 'place':case 'tie':{if(rm.pass){to=ctr(el('#act [data-k="'+K+'"]'));break}const r=rm.r!=null?rm.r:(G.clash?G.clash.r:null);if(r!=null)to=ctr(regionRect(r));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));break}
     case 'herald':case 'location':{const R=locRect(rm.loc);to=ctr(R);break}
-    case 'bidRes':{to=ctr(el('#handw [data-k="'+rm.k+'"]'));break}
+    case 'bidRes':{to=ctr(el('#handw [data-k="'+K+'"]')||el('#act [data-k="'+K+'"]'));break}
     case 'clashOrder':{const nx=rm.order&&rm.order[(UI.ord||[]).length];if(nx!=null)to=ctr(regionRect(nx));break}
-    case 'menu':{if(rm.a==='supp'&&rm.p)to=ctr(regionRect(rm.p.r));else to=ctr(el('#act .btn.pri'));break}
+    case 'menu':{if(rm.a==='supp'&&rm.p)to=ctr(regionRect(rm.p.r));else if(UI.sheetOpen)to=ctr(el('#main [data-k="'+K+'"]'));else to=ctr(el('#act [data-k="'+K+'"]')||el('#act .btn.pri'));break}
+    default:{to=ctr(el('#act [data-k="'+K+'"]')||el('#main [data-k="'+K+'"]'));break}
   }}catch(e){return null}
-  return to?{from,to,key:M.kind+'|'+(rm.k||'')+'|'+(UI.hand==null?0:1)+'|'+Math.round(to.x)+','+Math.round(to.y)}:null}
+  return to?{from,to,key:M.kind+'|'+(K||'')+'|'+(UI.hand==null?0:1)+'|'+(UI.pop||'')+'|'+(UI.sheetOpen?1:0)+'|'+Math.round(to.x)+','+Math.round(to.y)}:null}
 function bfFinger(){const f=$('#finger');if(!f)return;const p=ANIM&&!UI.reduce?fingerPlan():null;
   if(!p){if(!f.hidden){f.hidden=true;try{f._a&&f._a.cancel()}catch(e){}f._k=''}return}
   if(f._k===p.key&&!f.hidden)return;f._k=p.key;f.hidden=false;try{f._a&&f._a.cancel()}catch(e){}

@@ -8,7 +8,7 @@ function page(phone){return new Promise(res=>{const vc=new VirtualConsole();cons
 // helpers evaluated inside the page
 const HELP=`
 window.T_drive=function(pred,max,level){max=max||6000;for(let i=0;i<max;i++){if(pred())return true;if(!G||G.over||!G.q)return false;const s=G.q.seats[0];const mv=aiChoose(s,level||'normal');if(!mv||!doMove(mv))return false}return pred()};
-window.T_view=function(){UI.card=null;UI.evq=[];UI._rk=null;if(typeof NEWS!=='undefined'){NEWS.q=[];NEWS.cur=null}renderAll();return document.querySelector('#main').textContent+' || '+document.querySelector('#act').textContent};
+window.T_view=function(){UI.card=null;UI.evq=[];UI._rk=null;if(typeof NEWS!=='undefined'){NEWS.q=[];NEWS.cur=null}renderAll();return document.querySelector('#main').textContent+' || '+document.querySelector('#act').textContent+' || '+document.querySelector('#barstat').textContent};
 `;
 const tests=[];const test=(n,f)=>tests.push([n,f]);
 // ---------------------------------------------------------------------------------------------------------------------------
@@ -28,10 +28,11 @@ test('a Tactic with markers is not called "once-only" (Open Waterways can be use
   w.eval(`newGame('me',{np:2,faction:'clans',seed:11})`);const ok=w.eval(`T_drive(()=>G.q&&G.q.t==='menu'&&G.q.seats[0]===0&&TB.moves(G,0).some(m=>m.a==='t:cln_t2'),20000)`);if(!ok)throw new Error('no Open Waterways menu reached');
   w.eval(`UI.moreOpen=true`);const t=w.eval('T_view()')+w.eval(`(typeof GL!=='undefined'&&GL.tactic?GL.tactic[3]:'')`);
   if(/once-only|Each can be used once/i.test(t))throw new Error('text calls Tactics once-only: '+(t.match(/[^.]*(once-only|can be used once)[^.]*/i)||[''])[0])});
-test('buying an HQ card explains that it does not go to the hand',async w=>{
+test('buying an HQ card: the option says HQ and the card sheet explains it does not go to the hand',async w=>{
   w.eval(`newGame('me',{np:2,faction:'clans',seed:3});G.pl[0].lore=4;TB.test.run(G,[['siteBuy',{seat:0}]])`);
-  const t=w.eval('T_view()');if(!/Roving Mission/.test(t))throw new Error('siteBuy screen not shown: '+t.slice(0,120));
-  if(!/(not|never) (go|goes|come|comes) (in)?to your hand|stays in front of you|permanent/i.test(t))throw new Error('HQ purchase is not explained: '+t.slice(0,300))});
+  const t=w.eval('T_view()');if(!/Roving Mission/.test(t)||!/HQ/.test(t))throw new Error('siteBuy screen does not show the HQ option: '+t.slice(0,160));
+  const id=w.eval(`G.pl[0].site.find(id=>TB.cardInfo(G,id).kind==='hq')`);const h=w.eval(`popCard(${id})`);
+  if(!/(not|never) (a card for|go|goes|come|comes) (in)?(to )?your hand|stays in front of you|permanent/i.test(h))throw new Error('HQ card sheet does not explain it: '+h.replace(/<[^>]*>/g,' ').slice(0,200))});
 test('the end-of-round card is not drawn over the next decision (no decision buttons under it)',async w=>{
   w.eval(`newGame('me',{np:3,seed:21})`);const ok=w.eval(`T_drive(()=>UI.evq.some(e=>e.t==='summary'),20000)`);if(!ok)throw new Error('no summary');w.eval(`T_drive(()=>G.q&&G.q.seats.includes(0),200)`);
   w.eval(`UI.evq=UI.evq.filter(e=>e.t==='summary');UI.card=null;pump()`);if(w.eval(`!(UI.card&&UI.card.ev&&UI.card.ev.t==='summary')`))throw new Error('summary card not shown');
@@ -44,7 +45,7 @@ test('hand cards keep their place while you hide cards (no reflow under the next
 test('steal shows "your N vs their M" and waits for a confirm instead of acting at once',async w=>{let found=false;
   for(let g=0;g<12&&!found;g++){w.eval(`newGame('me',{np:3,seed:${600+g}})`);found=w.eval(`T_drive(()=>G.q&&G.q.kind==='bidRes'&&G.q.seats[0]===0&&TB.moves(G,0).some(m=>m.t==='steal'),20000)`)}
   if(!found)throw new Error('no steal offer reached');w.eval('UI.card=null;UI.evq=[];renderAll()');
-  const k=w.eval(`TB.moves(G,0).find(m=>m.t==='steal').k`);const btn=[...w.document.querySelectorAll('#main [data-k],#act [data-k]')].find(b=>b.dataset.k===k);if(!btn)throw new Error('no steal button');
+  const k=w.eval(`TB.moves(G,0).find(m=>m.t==='steal').k`);const btn=[...w.document.querySelectorAll('#main [data-k],#act [data-k],#handw [data-k]')].find(b=>b.dataset.k===k);if(!btn)throw new Error('no steal button');
   const n0=w.eval('G.logN');btn.dispatchEvent(new w.MouseEvent('click',{bubbles:true}));if(w.eval('G.logN')!==n0)throw new Error('the steal happened at once, with no preview');
   const t=w.document.body.textContent;if(!/\d+\s*(vs|against)\s*(their\s*)?\d+/i.test(t)&&!/beats/.test(t))throw new Error('no strength comparison shown')});
 test('guided game: the first suggested bid is not cancelled by the Court',async w=>{

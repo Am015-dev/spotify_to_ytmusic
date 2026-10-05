@@ -27,16 +27,22 @@ function run(cf,seed){return new Promise(res=>{const errs=[];const vc=new Virtua
    if(G.over&&!w.eval('!!(UI.card&&UI.card.kind==="over")')&&!w.eval('UI.card')){w.eval('pump()')}
    if(G.over&&w.eval('!!(UI.card&&UI.card.kind==="over")')){clearInterval(iv);if(!d.querySelector('#pc [data-a=again]'))errs.push('no end card');res({cf,over:G.over,errs,hidden,clicks,round:G.round,secs:Math.round((Date.now()-t0)/1000),seen});w.close();return}
    const card=d.querySelector('#pc:not([hidden]) .btn');
-   if(w.eval('UI.card')){const b=d.querySelector('#pc [data-a=take],#pc [data-a=evok],#pc [data-a=tipok],#news [data-a=newsok]');if(b){click(b);seen.add('card:'+b.dataset.a);clicks++;return}}
+   if(w.eval('UI.card')){const b=d.querySelector('#pc [data-a=take],#pc [data-a=evok],#pc [data-a=tipok],#news [data-a=newsok]');if(b){click(b);seen.add('card:'+b.dataset.a);clicks++}return}
    if(R()<.02){const t=rnd([...d.querySelectorAll('.gx-bar [data-gx]')]);click(t);seen.add('drawer:'+t.dataset.gx);const x=d.querySelector('.gx-drawer.on .gx-x');if(x)click(x);return}
    if(R()<.03){const rv=rnd([...d.querySelectorAll('#rivals [data-a=rival]')]);if(rv){click(rv);seen.add('rival');click(d.querySelector('#ppop [data-a=pclose]'));return}}
-   if(R()<.03){const loc=d.querySelector('.tb-loc[data-id="'+rnd(['castle','wilderness','harvest_field','battlefield','shrine','necropolis','throne'])+'"]');if(loc){click(loc);seen.add('loctap');if(!w.eval('UI.pop'))errs.push('loc tap no popup');else if(R()<.5)click(d.querySelector('#ppop [data-a=pclose]'));return}}
-   const co=d.querySelector('#act [data-a=coachok]');if(co){click(co);seen.add('coach');clicks++;return}
-   if(R()<.03){const gl=d.querySelector('#main [data-a=gloss]');if(gl){click(gl);seen.add('gloss');if(d.querySelector('#gdef').hidden)errs.push('gloss chip opened nothing');click(d.querySelector('#gdef [data-a=gclose]'));return}}
+   if(R()<.03){const loc=d.querySelector('.tb-loc[data-id="'+rnd(['castle','wilderness','harvest_field','battlefield','shrine','necropolis','throne'])+'"]');if(loc){click(loc);seen.add('loctap');return}}
+      if(R()<.03){const gl=d.querySelector('#main [data-a=gloss],#ppop [data-a=gloss]');if(gl){click(gl);seen.add('gloss');if(d.querySelector('#gdef').hidden)errs.push('gloss chip opened nothing');click(d.querySelector('#gdef [data-a=gclose]'));return}}
    if(w.eval('G.q')&&w.eval('viewSeatForQ()')!=null){const k=G.q.kind;
-    if(['bid','place','tie'].includes(k)&&R()<.7){const hc=[...d.querySelectorAll('#handw .hc')];if(hc.length){click(rnd(hc));seen.add('hand');const mv=[...d.querySelectorAll('#ppop [data-a=mv]')];if(mv.length){click(rnd(mv));clicks++;seen.add('hand-act:'+k)}return}}
-    if(k==='herald'){const lb=rnd([...d.querySelectorAll('#main [data-a=loc]')]);if(lb){click(lb);const pm=d.querySelector('#ppop [data-a=mv]');if(!pm)errs.push('herald popup has no Place button');else{click(pm);clicks++;seen.add('herald-popup')}return}}
-    const b=[...d.querySelectorAll('#main [data-a=mv],#act [data-a=mv]')].filter(x=>!x.disabled);
+    if(['bid','place','tie'].includes(k)){const hc=[...d.querySelectorAll('#handw .hc.glow')];
+      if(hc.length&&!(k==='tie'&&R()<.3)){const c=rnd(hc);click(c);seen.add('hand');
+        const rg=[...d.querySelectorAll('.tbx-pan g.rglow rect')];const sp=d.querySelector('#spots .bspot.glow');
+        if(rg.length&&R()<.6)click(rnd(rg));else if(sp&&R()<.6)click(sp);else click(c);
+        clicks++;seen.add('hand-act:'+k);return}}
+    if(k==='herald'||k==='location'){const lb=rnd([...d.querySelectorAll('.tb-loc.glow')]);if(lb){click(lb);clicks++;seen.add(k+'-map');return}else errs.push(k+': no glowing location')}
+    if(k==='clashOrder'){const rg=rnd([...d.querySelectorAll('.tbx-pan g.rglow rect')]);if(rg){click(rg);clicks++;seen.add('order-map');return}else errs.push('clash order: no glowing region')}
+    if(k==='bidRes'&&R()<.7){const kb=rnd([...d.querySelectorAll('#handw .kcb.glow')]);if(kb){click(kb);const cf=d.querySelector('#ppop [data-a=mv]');if(cf)click(cf);clicks++;seen.add('road');return}}
+    if(k==='menu'&&R()<.3){const rg=rnd([...d.querySelectorAll('.tbx-pan g.rglow rect')]);if(rg){click(rg);clicks++;seen.add('supp-map');return}}
+    const b=[...d.querySelectorAll('#main [data-a=mv],#act [data-a=mv],#ppop [data-a=mv]')].filter(x=>!x.disabled);
     if(b.length){const pri=b.filter(x=>x.classList.contains('pri'));click(R()<.5&&pri.length?pri[0]:rnd(b));clicks++;seen.add('mv:'+k);return}}
    const sig=JSON.stringify([G.logN,G.q&&G.q.kind,w.eval('!!UI.card')]);if(sig===last)stall++;else{stall=0;last=sig}
    const inv=w.eval('TB.invariants(G)');if(inv.length&&errs.length<5)errs.push('INV '+inv[0]);

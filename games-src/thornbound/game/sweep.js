@@ -6,7 +6,7 @@
 const PW=(()=>{try{return require('playwright')}catch(e){return require('/opt/node-tools/node_modules/playwright')}})();
 const fs=require('fs');
 const html=fs.readFileSync(__dirname+'/thornbound.html');
-const GAMES=+(process.argv[2]||20);const SIZES=(process.argv[3]||'390x763,375x553').split(',').map(s=>s.split('x').map(Number));const WORKERS=+(process.argv[4]||4);
+const MODE=process.argv[5]||'me';const GAMES=+(process.argv[2]||20);const SIZES=(process.argv[3]||'390x763,375x553').split(',').map(s=>s.split('x').map(Number));const WORKERS=+(process.argv[4]||4);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const probs=[];const note=(tag,msg)=>{if(probs.length<60)probs.push(tag+': '+msg);else if(probs.length===60)probs.push('... more')};
 let totals={games:0,taps:0,hint:0,kinds:{}};
@@ -20,7 +20,7 @@ async function playGame(browser,W,H,gi){
   p.on('console',m=>{if(m.type()==='warning'&&/rejected/.test(m.text()))note(tag,'ENGINE '+m.text().slice(0,200));if(m.type()==='error'&&!/net::|Failed to load|favicon/.test(m.text()))note(tag,'console error '+m.text().slice(0,160))});
   await p.goto('https://gns.test/?phone=1');await sleep(900);
   const np=2+gi%3;const seed=900+gi*7;
-  await p.evaluate(([np,seed,gi])=>{try{localStorage.clear()}catch(e){}newGame('me',{np,seed,length:'short',levels:['normal','normal','easy','hard'].slice(0,np)});UI.speed=8;UI.guide=gi%4===0?'off':'full'},[np,seed,gi]);
+  await p.evaluate(([np,seed,gi,mode])=>{try{localStorage.clear()}catch(e){}newGame(mode==='hot'?'hot':mode==='watch'?'ai':'me',{np:mode==='hot'?2:np,seed,length:'short',levels:['normal','normal','easy','hard'].slice(0,np)});UI.speed=8;UI.guide=gi%4===0?'off':'full'},[np,seed,gi,MODE]);
   await sleep(300);
   let last='',lastT=Date.now(),taps=0,rot=false,rot2=false;const t0=Date.now();
   const state=()=>p.evaluate(()=>({over:!!G.over,k:UI.bf&&UI.bf.kind,q:G.q&&G.q.kind,card:UI.card&&(UI.card.kind+(UI.card.ev?':'+UI.card.ev.t:'')),n:G.logN,r:G.round,
@@ -63,7 +63,7 @@ async function playGame(browser,W,H,gi){
     if(s.sig!==last){last=s.sig;lastT=Date.now()}else if(Date.now()-lastT>8000){note(tag,'stuck for 8 s: q='+s.q+' bf='+s.k+' card='+s.card);await p.screenshot({path:'/tmp/claude-0/stuck_'+W+'_'+gi+'.png'}).catch(()=>{});break}
     // rotations in the middle of the game
     if(!rot&&s.r===2&&s.k){rot=true;await p.setViewportSize({width:H,height:W});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900);await checks('rotated');await p.setViewportSize({width:W,height:H});await p.evaluate(()=>{dispatchEvent(new Event('resize'));dispatchEvent(new Event('orientationchange'))});await sleep(900);await checks('rotated back');continue}
-    if(s.card){if(s.card==='pass'){break}
+    if(s.card){if(s.card==='pass'){const tk=await ctr('#pc [data-a=take]');if(tk){await tapAt(...tk);await sleep(150);continue}break}
       if(i%7===3&&(s.card.startsWith('event')||s.card==='news')){await tapAt(W/2,H*.45)}   // a tap on the board skips the narration
       await sleep(80);continue}
     if(!s.k){await sleep(80);continue}
