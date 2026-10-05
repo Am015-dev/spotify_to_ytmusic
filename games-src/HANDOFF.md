@@ -11,31 +11,25 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Don't edit the Mainhattan / Overdrive games; other sessions own them. Ticket to Ride is on hold.
 - Read the root `CLAUDE.md` (lessons learnt + cost rules), then `games-src/BRIEF-2d-games.md`.
 
-## NOW (5 Oct, end of day) — start here
-Start a FRESH session on **Sonnet** with this prompt (typed by the owner):
-> Owner authorisation: commit, merge and push to `alex/brave-carson-rbpmlk` and deploy games that pass their checks live.
-> Follow games-src/HANDOFF.md and games-src/PLAYBOOK.md. Finish the pending games, two workers at a time, all on Sonnet.
+## NOW (5 Oct, evening) — start here
+Same owner prompt as before (commit, merge, push to `alex/brave-carson-rbpmlk`, deploy games that pass, two Sonnet workers).
+Commits carry NO attribution lines. If `/dev/null` is a symlink (`ls -la /dev/null`), phone-check cannot run: a fresh session fixes it.
 
-Finished games go LIVE once `phone-check.js <slug>` passes 6/6 (rerun once if it fails; a repeat failure is real).
-- **Live with story mode + phone fixes:** sunglaze, cauldron-fair, doorkick-dungeon (incl. its board-first branch),
-  thornbound (redesign), lantern-dive, kaiten-kitchen, final-approach (readable rework), shipwreck-isle, hollowbough.
+- **Live this session:** kaiten-kitchen (board-first merged with story mode), tidewake (story mode; "Skip to my turn" instant).
 - **Pending, in order:**
-  1. tidewake: story mode + GXV done in source (`games-src/tidewake/game/tidewake.html`), but taps are ~1 s slow after
-     rotation (phone-check fails twice). Fix the slow relayout, then deploy.
-  2. kaiten-kitchen: merge `origin/board/kaiten-kitchen` (board-first work never merged; conflicts in game/src/ui8.js,
-     ui.js with the story-mode ui8.js: rename one), rebuild, deploy.
-  3. crown-city-smash: merge `origin/board/crown-city-smash` (conflict in games-src/kot/build.py with the shared-shell
-     migration), then story mode.
-  4. nebula-aces: board-first branch is merged now; add story mode, fix "portrait start" phone failure.
-  5. shipwreck-isle: owner says it still has the old narrative-text style. Board-first rework like final-approach
-     (board ≥60% of portrait, one 8-word line, no text panels, round results animated on the board).
-  6. short-fuse, rampart-and-vine, sands-of-qamar: story mode (+ phone fixes for short-fuse, sands-of-qamar).
-  7. Faster loading for every game (recipe B): show the board first, lazy-load three.js, audio and portraits.
-  8. final-approach: some slot labels overlap their P/C badges.
-- 14 stale local shell.js/shell.css copies (kot, xw, ft, carc, rc, azul, munch) are unused; deleting them was blocked
-  for sessions, the owner can delete them.
-- The owner should add the allow rules listed in the last session's runbook to `.claude/settings.json` (sessions
-  can't); then deploys never stall.
+  1. nebula-aces: live page is ROLLED BACK to the pre-board-first build (owner: new build loads slowly on iPhone). Source now
+     has board-first + story mode + `warm3D()` limited to software GL (the likely slow start). Rebuild, phone-check, deploy,
+     ask the owner to time the load on iPhone.
+  2. crown-city-smash: board-first merged + story mode wired (`kot/campaign.js`, board-test 21/21). Phone-check fails: L>P
+     rotation leaves the full-screen advice card (UI.adv, small X) over the dice; full run takes ~189 s vs 180 s limit
+     (reported as "stuck 8s"), slowness unexplained. Fix both, then deploy.
+  3. shipwreck-isle: board-first rework done in source (`rc/bf.js`, `bf-test.js`; board 66% / 61% of portrait). Needs
+     phone-check, then deploy. Weak: 375x553 camp job list covers the board; landscape unchecked; online keeps old layout.
+  4. short-fuse, rampart-and-vine, sands-of-qamar: story mode (+ phone fixes for short-fuse, sands-of-qamar).
+  5. Faster loading for every game (recipe B): board first, lazy-load three.js, audio and portraits.
+  6. final-approach: some slot labels overlap their P/C badges.
+- Workers running phone-check at the same time slow each other down: wait with `while pgrep -f phone-check.js ...` first.
+- 35 fully merged branches can be deleted by the owner (sessions get 403 on branch deletes).
 
 ## Where things stand (4 Oct 2026)
 - **Thornbound** is the quality pilot. It has blind playtests (`games-src/thornbound/playtest-1/`) and the spec
