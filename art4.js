@@ -6,6 +6,8 @@ function ART4_foam(){if(ART4.fm)return ART4.fm;const im=new THREE.InstancedMesh(
 roamPose=(f=>function(s,dt){f(s,dt);try{const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m||s!==pl)return;const boat=(s.boatK||0)>.5;
   // no hovercraft thrusters on LEGO vehicles: ribbons, flare sprites and neon nozzle cores stay hidden (boost = orange exhaust flames)
   for(const rb of ud.ribbons||[])rb.visible=false;for(const f of ud.flares||[])f.visible=false;if(!ud.artNz){ud.artNz=[];ud.m.traverse(o=>{if(o.isMesh&&o.material&&o.material.toneMapped===false&&o.geometry&&(o.geometry.type==='SphereGeometry'||o.geometry.type==='CylinderGeometry'&&o.geometry.parameters&&o.geometry.parameters.openEnded))ud.artNz.push(o)})}for(const o of ud.artNz)o.visible=false;
+  // the hovercraft-era shadow plane rendered as a pale white/blue disc (white ×.8): make it a soft dark contact shadow
+  if(ud.shadow&&ud.shadow.material&&!ud.shadow.userData.artDark){ud.shadow.userData.artDark=1;ud.shadow.material.color.set(0x000000);ud.shadow.material.opacity=.45;ud.shadow.material.needsUpdate=true}
   if(s.air)return;
   // boats: bow up a little with speed, white foam trail from the stern
   if(boat){const F=ART4_foam(),fw=s._fw||V3(Math.sin(RO.h),0,Math.cos(RO.h));ART4.ft+=dt;if(Math.abs(RO.v)>3&&ART4.ft>.06){ART4.ft=0;const p=ART4.fp[ART4.fi++%90];p.x=RO.x-fw.x*3.6+(Math.random()-.5)*1.2;p.z=RO.z-fw.z*3.6+(Math.random()-.5)*1.2;p.y=RO.y+.05;p.a=0;p.s=.9+Math.min(1.6,Math.abs(RO.v)/30)}
