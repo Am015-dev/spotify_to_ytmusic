@@ -882,8 +882,16 @@ function applyPhone() {
   document.documentElement.style.setProperty('--gx-sheet-h', (ph ? 'var(--dockh)' : '46dvh'));
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !(typeof NET !== 'undefined' && NET.on) && UI.sv === 'setup') renderStart(); }
 }
-let rzT = 0;
-function onResize() { clearTimeout(rzT); rzT = setTimeout(() => { applyPhone(); if (G && UI.started) { UI.potSig = ''; render(); } }, 60); }
+let rzT = 0, rzT2 = 0, rzSig = '';
+// One relayout path for window resize, orientationchange, visualViewport and the board's ResizeObserver. Each event used to cancel the
+// others' timer, so the observer (which only re-rendered) could cancel applyPhone and leave the portrait layout classes on a landscape screen.
+function relayout(force) {
+  const bd = $('#board'), sig = innerWidth + 'x' + innerHeight + '|' + (bd ? bd.clientWidth + 'x' + bd.clientHeight : '');
+  if (!force && sig === rzSig) return; rzSig = sig;
+  applyPhone(); if (G && UI.started) { UI.potSig = ''; render(); }
+  if (typeof pxResize === 'function') { try { pxResize(true); } catch (e) { } }
+}
+function onResize() { clearTimeout(rzT); clearTimeout(rzT2); rzT = setTimeout(() => relayout(), 60); rzT2 = setTimeout(() => relayout(), 420); }   // iOS reports the old size for a moment after orientationchange
 // ---------- boot ----------
 function boot() {
   GX.init({ key: 'cf' });
@@ -895,7 +903,8 @@ function boot() {
   GX.onShow = id => { renderDrawers(); };
   loadPrefs(); applyPhone();
   addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
-  const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { clearTimeout(rzT); rzT = setTimeout(() => { if (G && UI.started) { UI.potSig = ''; render(); } }, 40); } }).observe(bd);
+  const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) onResize(); }).observe(bd);
+  if (window.visualViewport) visualViewport.addEventListener('resize', onResize);
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'cf' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); } } catch (e) { }
   if (typeof pxPerfReg === 'function') pxPerfReg();
   if (typeof pxInit === 'function') pxInit().then(ok => { if (ok) { pxPerfReg(); if (G && UI.started) render(); } });
