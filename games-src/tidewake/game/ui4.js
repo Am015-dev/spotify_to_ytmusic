@@ -86,7 +86,7 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   case 'cannon':act({a:'cannon',t:+D.t,m:+D.m,s:+D.s},d);break;
   case 'pass':act({a:'pass'},d);break;
   case 'take':sfx('confirm');UI.holder=+D.seat;render();break;
-  case 'skip':UI.skip=true;if(humans().length===1&&!NET.on)UI.skipAll=true;break;
+  case 'skip':UI.skip=true;if(humans().length===1&&!NET.on)UI.skipAll=true;sleepFlush();render();break;
   case 'pause':UI.pause=!UI.pause;if(!UI.pause)schedule();render();break;
   case 'hint':UI.hint=true;UI.campHints=(UI.campHints||0)+1;{const m=recMove(d);if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s}}}render();break;
   case 'sugg':{const m=UI.recM||recMove(d);UI.hint=true;UI.campHints=(UI.campHints||0)+1;if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s};sfx('tile_rotate')}render();break}

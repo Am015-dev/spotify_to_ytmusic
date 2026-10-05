@@ -1,0 +1,138 @@
+/* ===== Board-first layer (board.js). Portrait phone: score strip on top, the city fills the screen, the tray at the bottom ===== */
+#bfx{position:fixed;left:0;top:0;width:0;height:0;z-index:60;pointer-events:none}
+#bline,#bmarks,#btip{display:none}
+html.ph #bline{display:block;position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;max-width:calc(100% - 16px);box-sizing:border-box;padding:6px 14px;border-radius:999px;background:rgba(26,19,32,.86);border:2px solid #ffd23f;color:#fff;font:900 15px/1.2 Nunito,sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none;transition:opacity .2s;box-shadow:0 3px 0 rgba(0,0,0,.35)}
+html.ph #bline.hid{opacity:0}
+html.ph #bline.flash{background:#ffd23f;color:#1a1320;border-color:#1a1320}
+html.ph #bmarks{display:block;position:absolute;inset:0;z-index:3;pointer-events:none}
+html.ph .bm{position:absolute;transform:translate(-50%,-100%);display:flex;align-items:center;gap:3px;padding:2px 7px 2px 4px;border-radius:999px;border:2.5px solid #1a1320;background:#fffdf5;color:#1a1320;font:400 18px/1 Bangers,Impact,sans-serif;letter-spacing:.03em;white-space:nowrap;box-shadow:2px 2px 0 rgba(0,0,0,.4);animation:bmIn .25s ease-out}
+html.ph .bm svg{width:22px;height:22px}
+html.ph .bm.hit{background:#e63946;color:#fff;animation:bmIn .25s ease-out,bmPulse 1s ease-in-out .25s infinite}
+html.ph .bm.hit svg{filter:drop-shadow(0 0 0 #fff)}
+html.ph .bm.gain{gap:6px;padding:3px 8px}
+html.ph .bm .h{color:#d62839}html.ph .bm .e{color:#17884f}html.ph .bm .v{color:#a86f00}
+html.ph .bm.city{background:#ffd23f}
+@keyframes bmIn{from{transform:translate(-50%,-60%) scale(.4);opacity:0}to{transform:translate(-50%,-100%) scale(1);opacity:1}}
+@keyframes bmPulse{0%,100%{transform:translate(-50%,-100%) scale(1)}50%{transform:translate(-50%,-108%) scale(1.12)}}
+html.ph #btip{display:block;position:absolute;left:8px;right:8px;bottom:48px;z-index:4;pointer-events:none;background:#fffdf5;border:3px solid #1a1320;border-radius:12px;padding:6px 10px;box-shadow:3px 3px 0 rgba(0,0,0,.4);color:#1a1320}
+html.ph #btip:empty{display:none}
+html.ph #btip b{font:400 19px/1 Bangers,Impact,sans-serif;letter-spacing:.04em}
+html.ph #btip p{margin:3px 0 0;font-size:14px;line-height:1.3}
+/* flights */
+.bfly{position:absolute;left:0;top:0;will-change:transform}
+.bfly .bdie{width:100%;height:100%;box-sizing:border-box;border:3px solid #1a1320;border-radius:12px;background:radial-gradient(circle at 34% 28%,#fff 0%,#f8f1e3 38%,#e7dbc3 100%);display:grid;place-items:center;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.bfly .bdie svg{width:70%;height:70%}
+.bfly.again{opacity:.85}
+.bfly .btok{width:100%;height:100%;border-radius:50%;display:grid;place-items:center;border:3px solid #1a1320}
+.bfly .btok.claw{background:#e63946}.bfly .btok.claw svg{width:70%;height:70%}
+.bfly .btok.star{background:#ffd23f;font:400 26px/1 Bangers,Impact,sans-serif;color:#1a1320}
+.bfly .bcard-fly{width:100%;height:100%;box-sizing:border-box;border:3px solid #1a1320;border-radius:10px;background:#e6d4ff;display:grid;place-items:center;box-shadow:3px 3px 0 rgba(0,0,0,.35)}
+.bfly .bcard-fly svg{width:78%;height:78%}
+.bburst{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;border:4px solid #fff;animation:bBurst .6s ease-out forwards}
+.bburst.hit{border-color:#ff3b3b;box-shadow:0 0 18px #ff3b3b}.bburst.heal{border-color:#ff7aa2}.bburst.energy{border-color:#2fd47a;box-shadow:0 0 14px #2fd47a}.bburst.star{border-color:#ffd23f;box-shadow:0 0 14px #ffd23f}
+@keyframes bBurst{from{transform:scale(.4);opacity:1}to{transform:scale(3.4);opacity:0}}
+html.ph .pchip.bump{animation:chipBump .55s ease-out}
+html.ph .pchip.bump-h em.h,html.ph .pchip.bump-v em.v,html.ph .pchip.bump-e em.e{animation:numPop .55s ease-out}
+@keyframes chipBump{0%{transform:scale(1)}35%{transform:scale(1.14)}100%{transform:scale(1)}}
+@keyframes numPop{0%{transform:scale(1)}35%{transform:scale(1.7)}100%{transform:scale(1)}}
+html.ph .pchip em{display:inline-block}
+/* the reroll: dice tumble in and land one by one */
+html.ph .die.bfroll{animation:bfTumble var(--land,.6s) cubic-bezier(.3,.6,.4,1.15) both}
+html.ph .die.bfroll svg{animation:bfFace var(--land,.6s) steps(1,end) both;animation-delay:inherit}
+@keyframes bfTumble{0%{transform:translateY(-120px) rotate(-560deg) scale(.55)}55%{transform:translateY(-30px) rotate(-120deg) scale(1.12)}82%{transform:translateY(3px) rotate(8deg) scale(1.06)}100%{transform:none}}
+@keyframes bfFace{0%{opacity:.15}80%{opacity:.15}81%{opacity:1}100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){html.ph .die.bfroll,html.ph .die.bfroll svg,html.ph .bm,html.ph .bm.hit{animation:none}}
+/* the ghost finger */
+#bfinger{position:fixed;left:-100px;top:-100px;z-index:59;pointer-events:none;width:0;height:0;opacity:0;transition:opacity .25s,left .35s,top .35s}
+#bfinger.on{opacity:1}
+#bfinger::before{content:"";position:absolute;width:46px;height:46px;left:-23px;top:-23px;border-radius:50%;border:4px solid #ffd23f;animation:fRing 1.2s ease-out infinite}
+#bfinger i{position:absolute;left:-6px;top:-4px;font-style:normal;font-size:40px;line-height:1;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.45));animation:fTap 1.2s ease-in-out infinite}
+#bfinger i::before{content:"👆"}
+@keyframes fRing{0%,30%{transform:scale(.3);opacity:0}45%{opacity:1}100%{transform:scale(1.5);opacity:0}}
+@keyframes fTap{0%,100%{transform:translate(10px,22px)}35%{transform:translate(0,4px) scale(.92)}55%{transform:translate(4px,12px)}}
+
+/* ---- portrait: the bar is the score strip; only the menu button stays ---- */
+html.ph-p header.gx-bar{justify-content:flex-start;gap:4px;padding:1px 4px;border-bottom-width:3px;box-sizing:border-box}
+html.ph-p header.gx-bar .gx-ibtn.btn:not([data-gx="dr-menu"]){display:none}
+html.ph-p header.gx-bar [data-gx="dr-menu"]{width:44px;min-width:44px;height:44px;min-height:44px;margin-left:auto}
+html.ph-p header.gx-bar #pchips{display:grid;flex:1;min-width:0;grid-template-columns:repeat(var(--cc,4),minmax(0,1fr));gap:3px;align-self:stretch}
+html.ph-p header.gx-bar .pchip{min-height:0;height:100%;padding:0 3px 1px;border-width:2px;border-top-width:5px;border-radius:7px;box-shadow:none;justify-content:center;overflow:hidden}
+html.ph-p header.gx-bar .pchip b{font-size:13px;line-height:1.05}
+html.ph-p header.gx-bar .pchip.hasn b{padding-right:0}
+html.ph-p header.gx-bar .pchip span{font-size:13px;gap:2px;letter-spacing:-.6px}
+html.ph-p header.gx-bar .pchip .pn{display:none}
+html.ph-p header.gx-bar .pchip u{top:0;bottom:auto;right:0;font:400 13px/1 Bangers,Impact,sans-serif;padding:1px 3px 0;border-radius:5px 0 4px 0}
+html.ph-p header.gx-bar #pchips[style*="--cc: 5"] .pchip u,html.ph-p header.gx-bar #pchips[style*="--cc: 6"] .pchip u{display:none}
+html.ph-p header.gx-bar .pchip.me{box-shadow:inset 0 0 0 2px #ffd23f}
+html.ph-p header.gx-bar .pchip.on{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--pk)}
+html.ph-p header.gx-bar .pchip.me.on{box-shadow:inset 0 0 0 2px #ffd23f,0 0 0 2px #fff,0 0 0 4px var(--pk)}
+html.ph-p header.gx-bar #pchips[style*="--cc: 5"] .pchip b,html.ph-p header.gx-bar #pchips[style*="--cc: 6"] .pchip b{display:none}
+/* ---- portrait: the tray (dice + Roll / Done, or the shop + Done) ---- */
+html.ph-p .gx-dock[data-bf]{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 64px;align-content:center;gap:10px 6px;padding:8px 8px 10px;background:linear-gradient(#3b1c52,#24112f);border-top:4px solid var(--pk)}
+html.ph-p .gx-dock[data-bf] .gx-dock-head,html.ph-p .gx-dock[data-bf] #banner,html.ph-p .gx-dock[data-bf] #preview,html.ph-p .gx-dock[data-bf] #pfeed{display:none!important}
+html.ph-p .gx-dock[data-bf] #dicewrap{grid-row:1}
+html.ph-p .gx-dock[data-bf] #pshop{grid-row:1}
+html.ph-p .gx-dock[data-bf] #pacts>*{grid-row:3}
+html.ph-p .gx-dock[data-bf] #pacts [data-act="reroll"],html.ph-p .gx-dock[data-bf] #pacts [data-act="resolve"],html.ph-p .gx-dock[data-bf] #pacts [data-act="hint"],html.ph-p .gx-dock[data-bf] #pacts [data-act="end"],html.ph-p .gx-dock[data-bf] #pacts [data-act="again"]{grid-row:2;position:static}
+html.ph-p .gx-dock[data-bf] #pacts [data-act="end"]{grid-column:1/3}
+html.ph-p .gx-dock[data-bf] #pacts [data-act="sweep"]{display:flex;grid-row:2;grid-column:3;min-height:56px;padding:0 2px}
+html.ph-p .gx-dock[data-bf] #pacts [data-act="sweep"] .bl{font-size:20px}
+html.ph-p .gx-dock[data-bf] #pacts [data-act="sweep"] small{font-size:13px}
+html.ph-p .gx-dock[data-bf] #pacts [data-act="reroll"],html.ph-p .gx-dock[data-bf] #pacts [data-act="resolve"],html.ph-p .gx-dock[data-bf] #pacts [data-act="end"]{min-height:58px}
+html.ph-p .gx-dock[data-bf] #pacts [data-act="hint"]{min-height:58px}
+html.ph-p .gx-dock[data-bf] #pacts .bl{font-size:25px}
+html.ph-p .gx-dock[data-bf] #pacts small.pips{display:flex;gap:5px;justify-content:center;margin-top:3px}
+html.ph-p .gx-dock[data-bf] #pacts small.pips i{width:10px;height:10px;border-radius:50%;background:#1a1320;border:2px solid #1a1320}
+html.ph-p .gx-dock[data-bf] #pacts small.pips i.used{background:transparent;opacity:.45}
+html.ph-p .gx-dock[data-bf] #pacts [data-act="reroll"][disabled]{opacity:.45}
+html.ph-p .gx-dock[data-bf] #dice{gap:10px 6px;padding-top:10px}
+html.ph-p .gx-dock[data-bf="watch"] #dice .die[disabled]{opacity:1;filter:saturate(.9)}
+html.ph-p .gx-dock[data-bf="watch"] #dicewrap.off{display:none}
+html.ph-p .gx-dock[data-bf] .die.kept{transform:translateY(-9px)}
+html.ph-p .gx-dock[data-bf] .die{transition:transform .14s ease-out}
+html.ph-p .gx-dock[data-bf] .die:active:not([disabled]){transform:scale(.92)}
+/* the shop: three cards, tap to see, tap again to buy */
+html.ph-p .gx-dock[data-bf] #pshop{gap:8px}
+html.ph .ptile.bcard{flex-direction:column;justify-content:flex-start;align-items:center;gap:2px;min-height:96px;padding:6px 4px 5px;text-align:center;background:#fff6dc;transition:transform .15s}
+html.ph .ptile.bcard.K{background:#efe2ff}html.ph .ptile.bcard.D{background:#ffe6d6}html.ph .ptile.bcard.C{background:#dcefff}
+html.ph .ptile.bcard .cost{position:absolute;left:-6px;top:-8px;width:30px;height:30px;flex:none;z-index:1;font-size:18px}
+html.ph .ptile.bcard .art{width:46px;height:46px;display:block}html.ph .ptile.bcard .art svg{width:100%;height:100%}
+html.ph .ptile.bcard b{font-size:14px;-webkit-line-clamp:2;line-height:1.05}
+html.ph .ptile.bcard.ok{box-shadow:0 0 0 3px #2fd47a,2px 2px 0 var(--shadow)}
+html.ph .ptile.bcard.no{opacity:.55}
+html.ph .ptile.bcard.sel{transform:translateY(-10px) scale(1.04);box-shadow:0 0 0 4px #ffd23f,0 6px 14px rgba(0,0,0,.5)}
+html.ph .ptile.bcard .go{position:absolute;left:50%;bottom:-10px;transform:translateX(-50%);background:#1a1320;color:#ffd23f;font:400 16px/1 Bangers,Impact,sans-serif;letter-spacing:.08em;font-style:normal;padding:3px 10px;border-radius:6px;animation:bmPulse2 .9s ease-in-out infinite}
+@keyframes bmPulse2{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.12)}}
+html.ph .ptile.bcard.shake{animation:bShake .4s}
+@keyframes bShake{0%,100%{translate:0}25%{translate:-6px}50%{translate:6px}75%{translate:-3px}}
+/* ---- landscape keeps its rail and bar buttons ---- */
+html.ph-l .gx-dock[data-bf] #banner,html.ph-l .gx-dock[data-bf] #pfeed{display:none!important}
+html.ph .gx-dock[data-bf="resolving"] #pshop,html.ph .gx-dock[data-bf="resolving"] #pacts>*,html.ph .gx-dock[data-bf="resolving"] #dicewrap{visibility:hidden}
+#bko{display:none}
+html.ph #bko:not([hidden]){display:block;grid-column:1/-1;grid-row:2}
+html.ph #bko .btn{width:100%;min-height:56px;font:400 24px/1 Bangers,Impact,sans-serif;letter-spacing:.04em}
+html.ph .bfintro .you{display:flex;align-items:center;gap:10px;margin:0;font-size:20px}
+html.ph .bfintro .you svg{width:64px;height:64px;flex:none}
+html.ph .bfintro .you b{font:400 28px/1 Bangers,Impact,sans-serif;letter-spacing:.04em;color:var(--mc);-webkit-text-stroke:1.2px #1a1320}
+html.ph #choice .bfintro .goal{font-size:18px;line-height:1.3;margin:6px 0}
+html.ph-p header.gx-bar .pchip.me b{padding-right:24px}
+html.ph #choice.bfpoke{animation:bfPoke .5s}
+@keyframes bfPoke{0%,100%{transform:none}30%{transform:translateY(-8px)}60%{transform:translateY(2px)}}
+html.ph-p .gx-dock[data-card="choice"] #choice h2{font-size:1.6rem}
+html.ph .ptile.bcard.ok .go{animation:none}
+/* the dashed suggestion outline read as "kept": on phones the 💡 button keeps the suggestion, the outline stays off */
+html.ph .gx-dock[data-bf] .die.sugg{outline:none}
+html.ph-p .gx-dock[data-bf="roll"] #dice:has(.die.kept) .die:not(.kept){opacity:.82;transform:scale(.94)}
+html.ph-p .gx-dock[data-bf] .die.kept{transform:translateY(-12px);box-shadow:0 0 0 3px #ffd23f,0 0 16px rgba(255,210,63,.9),3px 9px 0 var(--shadow)}
+
+.bfly .btok.en{background:#2fd47a;font:900 20px/1 Nunito,sans-serif}.bfly .btok.hp{background:#ff7aa2;color:#fff;font:900 20px/1 Nunito,sans-serif}
+html.ph-p header.gx-bar #pchips[style*="--cc: 5"] .pchip span,html.ph-p header.gx-bar #pchips[style*="--cc: 6"] .pchip span{flex-wrap:wrap;row-gap:0;justify-content:center}
+html.ph .bm .no{color:#8a7f90;text-decoration:line-through}
+html.ph .bm .pair{color:#5a2aa8;font-size:15px}
+/* no rolls left: Roll goes away (a grey button was a dead tap), Done takes its place */
+html.ph-p .gx-dock[data-bf="roll"] #pacts [data-act="reroll"][disabled]{display:none}
+html.ph-p .gx-dock[data-bf="roll"] #pacts:has([data-act="reroll"][disabled]) [data-act="resolve"]{grid-column:1/3}
+html.ph .ptile.bcard.sel,html.ph .ptile.bcard:has(.go){transform:translateY(-8px);box-shadow:0 0 0 4px #ffd23f,0 6px 14px rgba(0,0,0,.5)}
+html.ph .pchip.hot{animation:hotPulse 1s ease-in-out infinite}
+html.ph .pchip.hot em.v{color:#e63946}
+@keyframes hotPulse{0%,100%{box-shadow:0 0 0 0 rgba(230,57,70,0)}50%{box-shadow:0 0 0 3px #e63946}}

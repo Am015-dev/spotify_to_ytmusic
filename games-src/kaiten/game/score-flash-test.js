@@ -23,7 +23,7 @@ const path = require('path'); const N = +process.argv[2] || 2;
     for (let i = 0; i < 2000; i++) {
       await p.waitForTimeout(60);
       const st = await p.evaluate(() => { const x = document.querySelector('#pc:not([hidden]) [data-a=cont]'); if (x) x.click(); const n = document.querySelector('#rs:not([hidden]) [data-a=rsnext]'); if (n && UI.rsInfo && UI.rsInfo.done) n.click();
-        if (canPick()) { document.querySelector('#belt .hc').click(); document.querySelector('[data-a=serve]').click(); } return G.phase === 'over' && UI.overShown; });
+        if (canPick()) { document.querySelector('#belt .hc').click(); } return G.phase === 'over' && UI.overShown; });
       if (st) break;
     }
     const r = await p.evaluate(() => ({ bad: __bad.slice(0, 5), nb: __bad.length, n: __n, over: G.phase }));

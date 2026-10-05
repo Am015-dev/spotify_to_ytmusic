@@ -84,10 +84,10 @@ const RUNS = ONLY >= 0 ? [RUNS0[ONLY]] : RUNS0;
         const hb = await p.evaluate(() => { const S = PX.state(); return { faces: S.objs.filter(o => o.kind === 'card' && !o.back).length, holder: UI.holder }; });
         if (hb.holder < 0 && hb.faces) fail('face sprites while the device is being passed', JSON.stringify(hb));
       }
-      // serve a plate with real taps (tap, then tap again or press Serve: phones serve with the button by default); the flight must start and finish
+      // grab a plate with one real tap; the flight must start and finish
       const n = await p.evaluate(() => document.querySelectorAll('#belt .hc[data-up="1"]').length); if (!n) { fail('no plates to tap'); break; }
       const i = (turns * 2 + 1) % n;
-      await p.click(`#belt .hc[data-up="1"] >> nth=${i}`); await p.waitForTimeout(40); if (await p.evaluate(() => UI.prefs.tap2)) await p.click('#belt .hc.sel'); else await p.click('#acts [data-a=serve]');
+      await p.click(`#belt .hc[data-up="1"] >> nth=${i}`); await p.waitForTimeout(40);   // one tap grabs (the flight starts from that tap)
       const fl = await p.evaluate(() => PX.on ? PX.state().nServe : 0); if (!R.dom && fl > flights) flights = fl;
       turns++;
     }

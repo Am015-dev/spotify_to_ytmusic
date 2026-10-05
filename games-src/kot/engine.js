@@ -105,6 +105,7 @@ function newGame(mode,n,mon){
   if(evoOn)lg(-1,'Evolutions are on: each monster picks a starting evolution, and resolving three hearts lets it pick another.');
   if(G.bayOn)lg(-1,'With 5 or more monsters, the Harbor is open as a second city space.');
   const on=EXPS.filter(e=>e.k!=='evo'&&ex[e.k]).map(e=>e.n);if(on.length)lg(-1,'Expansions: '+on.join(', ')+'.');
+  if(typeof campSetup==='function')campSetup();
   exSetup(()=>{G.ncards=cardTotal();if(evoOn)seq(G.pl.slice(),(p,next)=>pickEvo(p,true,next),()=>startTurn());else startTurn()});
 }
 function cardTotal(){let n=G.deck.length+G.disc.length+G.market.length+(G.limbo||[]).length;G.pl.forEach(p=>n+=p.cards.filter(c=>CARDS[base(c)].t!=='W').length);return n}
@@ -379,9 +380,9 @@ function yieldStep(p,R,done){const canYield=!curseOn('k_ego')&&G.bliz<0;if(!canY
       R.yielders.push(q);lg(q.i,`${mname(q)} yields and flees the city.`);fx(q.i,'YIELD','star');next()};
     if(!canAsk){next();return}
     const force=()=>{if(hasE(p,45)&&!inCity(p.i)){ask(p.i,evoName(45),`Force ${mname(q)} to yield the city?`,[{k:'y',l:'Force it out'},{k:'n',l:'Let it choose'}],()=>p.hp>=6?'y':'n',k=>{if(k==='y'){cov('evo:45');lg(p.i,`${mname(p)} bellows spores: ${mname(q)} must leave!`);doYield('force')}else choose()})}else choose()};
-    const choose=()=>{const rec=aiYield(q,h.lost);const opts=[{k:'stay',l:`Stay in ${where(q.i)}`,d:`You keep scoring 2 stars at the start of your turn.${rec?'':' Recommended.'}`},{k:'yield',l:'Yield and run!',d:`You leave the city and ${mname(p)} moves in.${has(q,'vjets')?' Your Vapor Jets cancel the damage.':''}${rec?' Recommended.':''}`}];
+    const choose=()=>{const rec=aiYield(q,h.lost);const opts=[{k:'stay',l:`Stay in ${where(q.i)}`,d:`+2 ★ next turn, but you keep getting hit.${rec?'':' Recommended.'}`},{k:'yield',l:'Yield and run!',d:`Safe outside; ${mname(p)} moves in.${has(q,'vjets')?' Vapor Jets cancel the damage.':''}${rec?' Recommended.':''}`}];
       if(scurry&&!has(q,'vjets'))opts.push({k:'scurry',l:`Yield with ${evoName(42)}`,d:'You lose no hearts this turn.'});
-      ask(q.i,'Stay or yield?',`${mname(p)} smashed you for ${h.lost}. You have ${plu(Math.max(0,q.hp),'heart')} left.`,opts,()=>rec?(scurry&&q.hp<=0?'scurry':'yield'):'stay',k=>{
+      ask(q.i,`Stay or yield? ♥${Math.max(0,q.hp)} left`,`${mname(p)} hit you for ${h.lost}: ${plu(Math.max(0,q.hp),'heart')} left.`,opts,()=>rec?(scurry&&q.hp<=0?'scurry':'yield'):'stay',k=>{
         if(k==='stay'){if(hasE(q,17)){gainVP(q,hasE(q,17));cov('evo:17:stay')}next()}else doYield(k)})};
     force()},done)}
 function enterStep(p,R,done){if(G.winner||!p.alive||inCity(p.i)){done();return}
@@ -742,7 +743,7 @@ function askFrenzy(p,next){if(!p.alive||G.tf.kwFrenzy){next();return}const L=kwC
   ask(p.i,'ENCORE?',KWHELP.Frenzy,[...L.map(c=>({k:c.src+':'+c.id,l:`ENCORE: ${c.C.n}`,d:c.C.x})),{k:'n',l:'Not now'}],()=>aiFrenzy(p,L),k=>{if(k==='n'){next();return}const j=k.indexOf(':');const src=k.slice(0,j),id=src==='c'?k.slice(j+1):+k.slice(j+1);activateKw(p,src,id,'Frenzy',next)})}
 function metamorph(p,next){if(!p.alive||!has(p,'meta')){next();return}
   const loop=()=>{const L=p.cards.filter(c=>CARDS[base(c)].t==='K');if(!L.length){next();return}
-    ask(p.i,CARDS.meta.n,'Discard Keep cards for their full cost in energy?',[{k:'n',l:'Done'},...L.map(c=>({k:c,l:`Discard ${CN(c)} (+${CARDS[base(c)].c} ⚡)`}))],()=>aiMeta(p,L),k=>{if(k==='n'){next();return}
+    ask(p.i,'Sell a card for ⚡?',`${CARDS.meta.n}: discard a Keep card, get its cost back in energy.`,[{k:'n',l:'No, keep them all'},...L.map(c=>({k:c,l:`Discard ${CN(c)} (+${CARDS[base(c)].c} ⚡)`}))],()=>aiMeta(p,L),k=>{if(k==='n'){next();return}
       p.cards.splice(p.cards.indexOf(k),1);G.disc.push(k);onLoseCard(p,k);gainE(p,CARDS[base(k)].c);cov('card:meta');lg(p.i,`${mname(p)} sheds its ${CN(k)} for energy.`);deaths();loop()})};loop()}
 function endEffects(p){
   if(p.alive){

@@ -6,9 +6,9 @@ function buildRules() {
   sec('The goal', h('p', 'You are a diner at a conveyor-belt sushi bar. Collect plates over three rounds and score points for sets, pairs, ladders and races. The highest total after the third round wins. Ties go to the diner with more Custard Cups.'));
   sec('How a round goes', h('ol', ...[
     'Everyone is dealt a hand: 10 plates with 2 diners, 9 with 3, 8 with 4 and 7 with 5.',
-    'All diners secretly pick one plate from their hand at the same time. On your phone or computer: tap a plate to lift it, then press Serve to confirm (with "Tap twice to serve" on in the menu, a second tap on the plate serves it too).',
+    'All diners secretly pick one plate from their hand at the same time. On your phone or computer: tap a dish on the belt to grab it (or drag it up onto the table). Press and hold a dish to read it first. With "One tap grabs" off in the menu, a tap lifts the dish and Serve confirms it.',
     'When everyone has chosen, the covers lift together and the plates land on your counters.',
-    'Then every hand slides one seat to the left, around the table. You pick again from the hand you just received.',
+    'Then every hand moves one seat on, around the table: your dishes ride off the belt to the next diner and the previous diner\'s hand rides in. You pick again from the hand you just received.',
     'When the hands are empty the round is scored. Everything except Custard is cleared away and a new hand is dealt.'].map(t => h('li', t))));
   sec('Every plate', h('div', ...D.types.map(t => {
     const id = t.id; const rule = { tempura: 'pair', sashimi: 'set', dumpling: 'ladder', roll1: 'most', roll2: 'most', roll3: 'most', salmon: 'v2', squid: 'v3', egg: 'v1', wasabi: 'x3', chop: 'swap', pudding: 'dessert' }[id];
@@ -18,7 +18,7 @@ function buildRules() {
     'Crispy Prawn: 5 points for every pair.', 'Fish Slice: 10 points for every set of three.', 'Steam Bun: 1, 3, 6, 10, 15 points for 1, 2, 3, 4, 5 or more buns.',
     'Seaweed Rolls: add up the roll icons on your counter. The most icons scores 6. The second most scores 3. If several diners tie for the most, they split 6 (rounded down) and nobody scores second place. Ties for second split 3. Diners with no icons never score.',
     'Nigiri: Sunset 2, Moon 3, Sun 1 point. Fire Paste: your next nigiri lands on it and scores triple. A Fire Paste with no nigiri scores nothing, and each paste only takes one nigiri.'].map(t => h('li', t))));
-  sec('Twin Sticks', h('p', 'Keep them on your counter. On a later turn you may serve two plates from the hand you are holding: press "Use Twin Sticks", pick two plates and serve them. The sticks then go back into that hand (they are passed on) and you have used them. A Fire Paste and a nigiri served together land on each other.'));
+  sec('Twin Sticks', h('p', 'Keep them on your counter. On a later turn you may serve two plates from the hand you are holding: tap the glowing sticks on your counter (or press "Use Twin Sticks"), then tap two dishes. The sticks then go back into that hand (they are passed on) and you have used them. A Fire Paste and a nigiri served together land on each other.'));
   sec('Custard', h('p', 'Custard Cups are never cleared away. At the end of the third round the diner with the most Custard scores 6 and the diner with the fewest loses 6. Ties split the points (rounded down). With two diners nobody loses points. If everybody has the same number, nobody scores.'));
   sec('Playing it', h('ul', ...[
     'The small green +N on a plate is what serving it scores you right now (switch it off in the menu).',
@@ -29,7 +29,7 @@ function buildRules() {
   sec('Words used in the game', h('dl.gloss', ...[
     ['Belt', 'the hand of plates you are holding this turn. It moves on to the next diner after every pick.'],
     ['Counter', 'the plates you have served this round, in front of your seat.'],
-    ['Serve', 'confirm the plate you lifted. Everybody serves at the same time, then the covers lift.'],
+    ['Grab', 'tap a dish on the belt: it goes to your seat under a cover. When everybody has chosen, the covers lift together.'],
     ['Roll race', 'the Seaweed Roll contest: add up the roll icons on each counter. Most icons scores 6, second most 3.'],
     ['Nigiri', 'the Sunset, Moon and Sun plates. They score their number straight away.'],
     ['Fire Paste bonus', 'a nigiri served onto a waiting Fire Paste scores triple; the extra points show as this row on the score pad.'],
@@ -73,7 +73,7 @@ function renderMenu() {
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New game'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
   if (!NET.on) row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n)));
   if (!NET.on) row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + (UI.coach.level === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1))));
-  row('Help on the belt', tog('hints', UI.prefs.hint, 'Show +N scores'), tog('tap2', UI.prefs.tap2, 'Tap twice to serve'));
+  row('Help on the belt', tog('hints', UI.prefs.hint, 'Show +N scores'), tog('grab1', UI.prefs.grab1 !== false, 'One tap grabs'), UI.prefs.grab1 === false ? tog('tap2', UI.prefs.tap2, 'Tap twice to serve') : null);
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const g = gfxPref(); row('Graphics' + (PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
@@ -198,6 +198,7 @@ document.addEventListener('click', ev => {
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
     case 'guide': UI.coach.level = d.v; UI.coach.keep = d.v === 'full'; UI.coach.userOff = d.v === 'off'; if (d.v === 'off') UI.tip = null; renderMenu(); break;
     case 'hints': UI.prefs.hint = !UI.prefs.hint; savePrefs(); renderMenu(); if (G) render(); break;
+    case 'grab1': UI.prefs.grab1 = UI.prefs.grab1 === false; UI.sel = []; savePrefs(); renderMenu(); if (G) render(); break;
     case 'tap2': UI.prefs.tap2 = !UI.prefs.tap2; savePrefs(); renderMenu(); if (G) render(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
     case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;

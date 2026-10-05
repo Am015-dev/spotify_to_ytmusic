@@ -19,10 +19,11 @@ const [W, H] = (process.argv[2] || '1366x768').split('x').map(Number); const PH 
   await p.evaluate(np => { UI.seed = 7; AIDELAY = 650; UI.opt.np = np; setNp(np); renderStart(); }, NP);
   await p.click('[data-start=vs]'); await p.waitForTimeout(1600); await idle();
   await sh('10turn');
-  await p.click('#belt .hc[data-up="1"] >> nth=2'); await p.waitForTimeout(350); await sh('11lifted');
-  await p.click('#acts [data-a=serve]'); await p.waitForTimeout(260); await sh('12flight');
-  for (let k = 0; k < 40; k++) { if (await p.evaluate(() => !!document.querySelector('.kk-cloche.kk-lift'))) break; await p.waitForTimeout(60); } await p.waitForTimeout(200); await sh('13reveal');
+  await p.click('#belt .hc[data-up="1"] >> nth=2'); await p.waitForTimeout(260); await sh('12flight');   // one tap grabs
+  for (let k = 0; k < 60; k++) { if (await p.evaluate(() => !!document.querySelector('#stage'))) break; await p.waitForTimeout(60); } await p.waitForTimeout(500); await sh('11stage');
+  for (let k = 0; k < 60; k++) { if (await p.evaluate(() => !!document.querySelector('.kk-cloche.kk-lift'))) break; await p.waitForTimeout(60); } await p.waitForTimeout(300); await sh('13reveal');
   for (let k = 0; k < 40; k++) { if (await p.evaluate(() => UI.fz && !UI.fz.slots)) break; await p.waitForTimeout(50); } await p.waitForTimeout(260); await sh('14landing');
+  for (let k = 0; k < 60; k++) { if (await p.evaluate(() => !!document.querySelector('.flyc.pass'))) break; await p.waitForTimeout(50); } await p.waitForTimeout(550); await sh('14pass');
   await idle();
   // play a few turns, then shoot the middle of the round
   for (let turn = 0; turn < 4; turn++) { await idle(); await p.evaluate(() => { UI.sel = [0]; serveSel(); }); await p.waitForTimeout(400); }

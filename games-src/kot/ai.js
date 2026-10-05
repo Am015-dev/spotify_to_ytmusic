@@ -20,6 +20,7 @@ function scoreDice(p,dice){const c=countsOf(dice);const tf=G.tf||{};const act=p.
 function cityThreat(p){return alive().filter(q=>q.i!==p.i&&!inCity(q.i)).length}
 function aiYield(q,lost){
   if(q.hp<=0)return true;
+  if(G.twist&&G.twist.id==='stubborn'&&q.i===G.bossSeat&&q.hp>=G.twist.param)return false;
   if(q.lvl==='easy')return q.hp<=5?Math.random()<.7:Math.random()<.15;
   if(q.lvl==='hard'&&!HYOLD){const pd=pDeath(q);if(q.vp+2+has(q,'street')>=winAt(q))return pd>PDW;if(has(q,'vjets')&&q.hp<=7)return true;return pd>PDY}
   if((q.lvl==='hard'||q.lvl==='hard0')){const th=alive().filter(r=>r.i!==q.i&&!inCity(r.i)).length*1.25;if(q.vp+2+has(q,'street')>=winAt(q)&&q.hp>th+.5)return false;if(has(q,'vjets')&&q.hp<=7)return true;return q.hp<th+HYB}

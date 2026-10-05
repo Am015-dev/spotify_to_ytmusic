@@ -7,7 +7,7 @@ const COL=TWKit.SHIP_COLORS;
 const EDGES=['top','right','bottom','left'];
 Object.assign(UI,{started:false,speed:1,guide:'light',guided:false,seen:{},trig:{},holder:-1,sel:null,busy:false,skip:false,pause:false,xray:false,gen:0,rec:null,acting:0,cols:[],dice:null,log:'',qTime:25,tickRate:1,setup:null,V:null,confirm:null,hint:false,msgs:[],lastKey:'',anim:true});
 let KS={tiles:{},mons:{},ships:{},gates:{},mael:{},wave:null,hold:{}};
-const sleep=ms=>new Promise(r=>setTimeout(r,Math.max(0,ms)/(UI.speed||1)));
+const SLP=new Set();const sleep=ms=>new Promise(r=>{const f=()=>{clearTimeout(t);SLP.delete(f);r()};const t=setTimeout(f,Math.max(0,ms)/(UI.speed||1));SLP.add(f)});const sleepFlush=()=>{for(const f of [...SLP])f()};
 const nm=i=>G&&G.seats[i]?G.seats[i].nm:'?';
 const colOf=i=>COL[(UI.cols[i]!=null?UI.cols[i]:i)%8];
 const dot=i=>`<i style="background:${colOf(i).sail}"></i>`;
