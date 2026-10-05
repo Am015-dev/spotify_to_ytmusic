@@ -1,5 +1,5 @@
 // Phone layout + touch-only play test for Nebula Aces (real WebGL via SwiftShader, isMobile + hasTouch).
-// node lay-phone.js [WxH,...] [--rounds=2] [--anim=0|1] [--file=nebula.html] [--q=?phone=1] [--hot] [--safe=t,r,b,l]
+// node lay-phone.js [WxH,...] [--rounds=2] [--anim=0|1] [--file=nebula.html] [--q=&bf=0 (extra query; portrait sizes need it: the dock interface is behind ?bf=0 since the board-first rework)] [--hot] [--safe=t,r,b,l]
 const PW=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs'),path=require('path');
 const A=process.argv.slice(2);const arg=(k,d)=>{const a=A.find(x=>x.startsWith('--'+k+'='));return a?a.slice(k.length+3):d};
 const SIZES=(A[0]&&!A[0].startsWith('--')?A[0]:'390x844,844x390,360x740,740x360').split(',').map(s=>s.split('x').map(Number));
@@ -10,7 +10,7 @@ for(const [W,H] of SIZES){const t=W+'x'+H+(HOT?'_hot':'');const ctx=await b.newC
   const p=await ctx.newPage();p.setDefaultTimeout(+arg("timeout",90000));const errs=[];p.on('pageerror',e=>errs.push('pageerror '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/net::|Failed to load resource|ERR_/.test(m.text()))errs.push(m.text())});
   const log=(...a)=>console.log(t,...a);const prob=(...a)=>{bad++;console.log('FAIL '+t+' '+a.map(x=>typeof x==='string'?x:JSON.stringify(x)).join(' '))};
   const seen=new Set();const note=k=>seen.add(k);
-  await p.goto('file://'+path.resolve(FILE)+'?phone=1'+(SAFE?'&safe='+SAFE:''));await p.waitForTimeout(1500);
+  await p.goto('file://'+path.resolve(FILE)+'?phone=1'+arg('q','')+(SAFE?'&safe='+SAFE:''));await p.waitForTimeout(1500);
   await p.evaluate(a=>{ANIM=a;AIDELAY=60;try{localStorage.removeItem('na_tour');localStorage.removeItem('na_coach');localStorage.removeItem('na_guide')}catch(e){}},ANIMV);
   const shot=async n=>{if(process.env.AT===n&&process.env.JS){console.log('EVAL',n,JSON.stringify(await p.evaluate(process.env.JS)));if(process.env.AT_EXIT)process.exit(0)}await p.screenshot({path:path.join(OUT,`${t}_${n}.png`)});if(process.env.DUMP)fs.writeFileSync(path.join(OUT,`${t}_${n}.html`),await p.evaluate(()=>['#prompt','#ps','#ppop','#pc'].map(q=>{const e=document.querySelector(q);return e&&!e.hidden?e.outerHTML:''}).join('\n\n')))};
   const info=()=>p.evaluate(()=>({w:innerWidth,h:innerHeight,sw:document.documentElement.scrollWidth,sh:document.documentElement.scrollHeight,ph:document.documentElement.className}));
