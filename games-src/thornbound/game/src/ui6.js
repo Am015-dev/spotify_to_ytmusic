@@ -9,26 +9,30 @@ function snd(mv,res){if(!mv)return;const t=mv.t,k=G&&G.q?G.q.kind:'';
   if(t==='bid')sfx('bid');else if(t==='place')sfx('place');else if(t==='pick'&&mv.loc!=null&&k==='herald')sfx('herald');else if(t==='take'||t==='steal')sfx('bid');else sfx('tap');
   try{const inf=G.pl.reduce((a,p)=>a+p.inf,0);if(_lastInf!=null&&inf>_lastInf)setTimeout(()=>sfx('inf'),200);_lastInf=inf;if(G.over)setTimeout(()=>sfx(G.pl[G.over.winner].ai?'lose':'fanfare'),300)}catch(e){}}
 function musicFor(){try{if(!window.GA||!UI.music)return;GA.music(G&&G.round>=G.rounds?'tense':'main',{fade:1.5})}catch(e){}}
-// ---------------------------------------------------------------- phone mode
+// ---------------------------------------------------------------- phone mode + board-first layout
 function phDetect(){try{const P=new URLSearchParams(location.search);if(P.has('phone'))return P.get('phone')!=='0'}catch(e){}
   const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
-// The board gives up space so the dock (now-line, prompt, pinned action row, hand, rivals) always fits: portrait phones keep the square map
-// at most as big as the height leaves after the dock's minimum; landscape phones put the map left at the full height.
-function dockNeed(H){return H>=820?380:H>=760?396:H>=700?370:H>=640?350:H>=580?330:330}
-function phApply(){const was=UI.phone;const on=phDetect();const root=document.documentElement;
-  UI.phone=on;UI.land=innerWidth>innerHeight;const W=innerWidth,H=innerHeight;UI.short=on&&(UI.land?H<370:H<600);
+// Layout (CSS grid in head.html): portrait = seats strip, the map (fills what is left), the tray (action row + hand fan);
+// wide = the map square on the left, seats + tray on the right. The map is always the biggest thing on the screen.
+function phApply(){const was=UI.phone,wasLand=UI.land;const on=phDetect();const root=document.documentElement;
+  const W=innerWidth,H=innerHeight;UI.phone=on;UI.land=W>=H*1.15;UI.short=on?(UI.land?H<370:H<600):H<560;
   root.classList.toggle('ph',on);root.classList.toggle('ph-p',on&&!UI.land);root.classList.toggle('ph-l',on&&UI.land);root.classList.toggle('short',!!UI.short);
-  if(on){const big=Math.max(150,Math.min(W,H-44-dockNeed(H)));let bs=UI.land?Math.min(H,Math.round(W*.52)):(UI.boardSmall?Math.max(UI.short?96:150,Math.min(big,Math.round(big-Math.max(90,H*.15)))):big);
-    if(UI.zoom)bs=UI.land?Math.min(H,Math.round(W*.62)):Math.max(bs,Math.min(W,H-44-260));root.style.setProperty('--bs',bs+'px');UI.bs=bs}
-  else root.style.removeProperty('--bs');
-  if(was!==on&&G){UI.mapReset=true;renderAll()}}
+  root.classList.toggle('bf-w',UI.land);root.classList.toggle('bf-p',!UI.land);
+  const barH=on?44:48;
+  let cw=UI.land?Math.max(44,Math.min(66,Math.floor((H-barH-52-46-24-16)/1.4308))):(H<600?44:H<820?50:H<1000?56:66);
+  if(!UI.land){ // portrait: the map is as wide as the screen; whatever height is left over goes to a bigger hand
+    const mn=$('.gx-main'),rv=$('#rivals');const Hm=(mn&&mn.clientHeight)||(H-barH),rh=(rv&&rv.offsetHeight)||52;
+    const hh=Hm-rh-46-W-10;cw=Math.max(cw,Math.min(on?64:76,Math.floor((hh-24)/1.4308)))}
+  root.style.setProperty('--cw',cw+'px');root.style.setProperty('--ch',Math.round(cw*1.4308)+'px');root.style.setProperty('--barh',barH+'px');
+  if(UI.land)root.style.setProperty('--bs',Math.max(150,Math.min(H-barH,Math.round(W*.62)))+'px');
+  sizeMap();
+  if((was!==on||wasLand!==UI.land)&&G){UI.mapReset=true;renderAll()}}
+// the map square: as big as the board area allows (portrait: the width; wide: the left column)
+function sizeMap(){const bd=$('#board');if(!bd)return;const W=bd.clientWidth,H=bd.clientHeight;if(!W||!H)return;const S=Math.max(120,Math.floor(Math.min(W,H)));
+  document.documentElement.style.setProperty('--ms',S+'px');UI.bs=S}
 function phoneRefresh(){}
-// tap the corner button to make the map bigger (the dock keeps the rest of the screen); tap again to go back
-function toggleZoom(){UI.zoom=!UI.zoom;document.documentElement.classList.toggle('zoom',!!UI.zoom);const b=$('.zbtn');if(b){b.setAttribute('aria-pressed',String(!!UI.zoom));b.setAttribute('aria-label',UI.zoom?'Make the map smaller':'Make the map bigger')}phApply();if(G)renderAll()}
-// map-centred decisions (Herald, hidden cards, claiming, ties, the map lesson) get the big map; lists, menus and result cards get the room instead
-function wantSmall(){if(!G)return false;const c=UI.card;if(c&&c.kind==='pass')return false;if(c&&(c.kind==='event'||c.kind==='over'))return true;
-  if(UI.coachInfo)return UI.coachInfo.id!=='map';const s=viewSeatForQ();if(s==null||!G.q)return UI.boardSmall;
-  return !['herald','place','location','tie'].includes(G.q.kind)}
+function toggleZoom(){}
+function wantSmall(){return false}
 // One relayout path for resize, orientationchange, visualViewport and the board's ResizeObserver (iOS reports the old size right after rotating, so it re-measures at ~400 ms).
 let _rz=0,_rz2=0,_rzSig='';
 function relayout(force){const bd=$('#board'),sig=innerWidth+'x'+innerHeight+'|'+(bd?bd.clientWidth+'x'+bd.clientHeight:'');if(!force&&sig===_rzSig)return;_rzSig=sig;

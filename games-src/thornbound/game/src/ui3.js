@@ -14,14 +14,40 @@ const STEP_HELP=[
  'Winter. Heralds go home, Supporters are lost, played cards go to the discard pile, and the next round starts. Running out of deck shrinks your hand size (Attrition).'];
 const KIND_NAME={bid:'Choose your bid',bidRes:'Use your bid',herald:'Place your Herald',place:'Hide your cards',clashOrder:'Order the Clashes',location:'Claim a location',tie:'A tie!'};
 // ---------------------------------------------------------------- top bar status chip
-function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;
-  const ev=UI.card&&UI.card.kind==='event'?UI.card.ev:null;const ri=ev&&ev.t==='summary'?6:ev&&ev.t==='clash'?4:roadIdx();const r=ev&&ev.round?ev.round:Math.max(1,G.round);
-  el.innerHTML='<span class="chip" aria-label="Round '+r+' of '+G.rounds+', step '+(ri+1)+' of 7: '+ROAD[ri]+'"><span class="chip-t"><small>Round</small><b>'+r+'</b><small>of '+G.rounds+'</small><span class="chip-s">'+esc(ROAD[ri])+'</span></span><span class="chip-d" aria-hidden="true">'+ROAD.map((_,i)=>'<i class="'+(i<ri?'done':i===ri?'on':'')+'"></i>').join('')+'</span></span>'}
+function renderBar(){const el=$('#barstat');if(!el)return;if(!G)return;const t=statusText();const r=Math.max(1,G.round);
+  el.innerHTML='<span class="st-r" aria-hidden="true">R'+r+'/'+G.rounds+'</span>'+(t.seat>=0&&G.pl[t.seat]?'<i class="st-d" style="background:'+fcol(t.seat)+'"></i>':'')+'<span class="st-t" role="status" aria-label="'+esc(t.text)+'">'+esc(t.text)+'</span>'}
+// the one status line (8 words or fewer): what to do now, or what the computer just did
+function words8(x){const w=String(x||'').replace(/\s+/g,' ').trim().split(' ').filter(Boolean);return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'\u2026'}
+function statusText(){const o=t=>({text:words8(t),seat:-1});
+  if(!G)return o('');if(G.over)return o('The reign is over');
+  const c=UI.card;
+  if(c&&c.kind==='pass')return o('Pass the device');
+  if(c&&c.kind==='over')return o('The reign is over');
+  if(c&&c.kind==='news'&&c.items&&c.items[0]){const it=c.items[0];return {text:words8(plain(it.text)),seat:it.s}}
+  if(c&&c.kind==='event'){const e=c.ev;if(e.t==='bids')return o('Bids revealed');if(e.t==='clash')return {text:words8(UI._clashLine||'The Clash'),seat:-1};if(e.t==='summary')return o(e.last?'The last round is over':'Round '+e.round+' is over')}
+  const s=viewSeatForQ();const q=G.q;
+  if(q&&s!=null){const M=UI.bf;const co=UI._coachTitle;if(co)return o(co);
+    if(M&&M.kind){switch(M.kind){
+      case 'bid':return o(UI.hand!=null?'Tap the bid spot':'Pick a card to bid');
+      case 'bidRes':return o('Take a Kingdom Card');
+      case 'herald':return o('Place your Herald');
+      case 'place':return o(UI.hand!=null?'Tap the glowing region':placeProgress());
+      case 'tie':return o('Tie! Add a card or pass');
+      case 'location':return o('Claim a location');
+      case 'clashOrder':return o((UI.ord||[]).length?'Tap the next region':'Tap the first Clash');
+      case 'menu':{const ph=menuPhase(q);return o(ph==='Spring'&&M.regs.length?'Tap a region to send Supporters':ph==='Day'?'Use a power, or Done':ph==='Autumn'?'Autumn: use a power, or Done':'Use a power, or Done')}
+      default:return o(promptText(q,s))}}
+    return o(promptText(q,s))}
+  // somebody else is deciding
+  const last=G.log[G.log.length-1];const n=UI.nowT&&UI.nowT.at===G.logN?UI.nowT:null;
+  if(n)return {text:words8(plain(n.t)),seat:n.s};
+  if(q&&q.seats.length){const names=q.seats.map(x=>shortName(x).replace(' (you)',''));return {text:words8(names.join(' and ')+' is deciding'),seat:q.seats[0]}}
+  if(last)return {text:words8(plain(last.t)),seat:last.s};
+  return o('')}
 const ICO={round:'<path d="M5 20V9l7-5 7 5v11M9 20v-6h6v6"/>',book:'<path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1zM12 6v13"/>',log:'<path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/>',users:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-4 3-6 6-6s6 2 6 6M15 14c3 0 6 1.5 6 5"/>',crown:'<path d="M3 18h18l-1.5-9-4.5 4-3-7-3 7-4.5-4z"/>',menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',card:'<rect x="6" y="3" width="12" height="18" rx="2"/>',x:'<path d="M6 6l12 12M18 6L6 18"/>',inf:'<circle cx="12" cy="12" r="8"/><path d="M8 14l1-5 3 3 3-3 1 5z"/>',eye:'<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',star:'<path d="M12 3l2.6 6 6.4.6-4.9 4.2 1.5 6.3L12 17l-5.6 3.1 1.5-6.3L3 9.6 9.4 9z"/>',road:'<path d="M5 20L9 4M19 20L15 4M12 6v3M12 12v3M12 18v2"/>'};
 function ico(n,c){return '<svg class="ico '+(c||'')+'" viewBox="0 0 24 24" aria-hidden="true">'+(ICO[n]||'')+'</svg>'}
 // ---------------------------------------------------------------- roadmap
-function renderRoad(){const el=$('#road');if(!el)return;const ri=roadIdx();
-  el.innerHTML='<div class="road-h"><b>Round '+Math.max(1,G.round)+' of '+G.rounds+'</b><span class="road-n">step '+(ri+1)+' of 7</span></div><ol class="road-l" aria-label="Round roadmap">'+ROAD.map((n,i)=>'<li class="'+(i<ri?'done':i===ri?'on':'')+'"'+(i===ri?' aria-current="step"':'')+'><i>'+(i+1)+'</i><span>'+n+'</span></li>').join('')+'</ol>'}
+function renderRoad(){}
 // ---------------------------------------------------------------- recommended move (+ the guided script may choose a simpler teaching move)
 function qKey(s,mv){return G.logN+':'+(G.q?G.q.kind:'')+':'+s+':'+(G.q&&G.q.chosen?G.q.chosen.length:'')+':'+(mv?mv.length:0)+':'+(UI.cfg&&UI.cfg.guided?1:0)}
 function getRec(s,mv){const key=qKey(s,mv);if(UI._rk===key)return UI._rec;UI._rk=key;let A=null;try{A=advise(s,mv)}catch(e){console.warn('advise',e.message)}
@@ -101,39 +127,41 @@ function recBtnText(m){const k=G.q.kind;if(!m)return '';
   const t=m.label.replace(/:.*$/,''),vq=viewSeatForQ();if(G.q.t==='menu'&&vq!=null&&legal(vq).filter(x=>x.t==='act'&&(x.label||'').replace(/:.*$/,'')===t).length>1)return m.label.replace(/\.$/,'');
   return m.label.replace(/\s*\([^)]*\)\s*$/,'').replace(/:.*$/,'')}
 function doneText(){const ph=menuPhase(G.q);return ph==='Spring'?'Done with Spring':ph==='Day'?'Done: fight the Clash':ph==='Autumn'?'Done with Autumn':'Done'}
-function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q;let foot='';
-  const qk=(q?q.kind+'|'+q.title+'|'+G.logN:'')+'|'+(UI.coachInfo?UI.coachInfo.id:'')+'|'+(UI.card?UI.card.kind:'');const set=(h,f)=>{el.innerHTML=h;if(ft)ft.innerHTML=f||'';if(UI._qk!==qk){UI._qk=qk;el.scrollTop=0}moreCue()};
-  UI._recShown=false;
-  if(G.over){set('<div class="step"><h3 class="st">The reign is over</h3></div>');return}
-  if(UI.coachInfo){set(coachInfoHTML(UI.coachInfo),'<button class="btn pri pulse" data-a="coachok">'+esc(UI.coachInfo.btn||'Continue')+'</button>');setHl(UI.coachInfo.hlLocs||[]);return}
-  // a card is up (an event, the news, a pass screen): nothing can be decided underneath it
-  if(UI.card&&UI.card.kind!=='tip'){set(UI.card.kind==='news'?'':waitingHTML(),'');setHl([]);return}
+function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const q=G.q;
+  const qk=(q?q.kind+'|'+q.title+'|'+G.logN:'')+'|'+(UI.card?UI.card.kind:'');
+  const set=(h,f,sheet)=>{if(el.innerHTML!==h)el.innerHTML=h;el.classList.toggle('on',!!sheet&&!!h);f=f||'';if(ft._h!==f){ft._h=f;ft.innerHTML=f}ft.classList.toggle('has',!!f);if(UI._qk!==qk){UI._qk=qk;el.scrollTop=0;UI.sheetOpen=false;UI.ord=[]}moreCue()};
+  UI._recShown=false;UI.bf=null;UI._coachTitle='';
+  if(G.over){set('','');setHl([]);return}
+  if(UI.card&&UI.card.kind!=='tip'){set('','');setHl([]);return}
   const s=viewSeatForQ();
-  if(!q||s==null){set(waitingHTML(),UI.mode==='watch'?watchControls():'');setHl([]);return}
+  if(!q||s==null){set('',UI.mode==='watch'?watchControls():'');setHl([]);return}
   const mv=legal(s);const rec=getRec(s,mv);const shown=!!rec&&hintsShown(s,mv);UI._recShown=shown;const rm=shown?mv.find(m=>m.k===rec.k):null;
-  const co=typeof coachFor==='function'?coachFor(s,mv,rm):null;UI._coachOn=!!co;
-  let h='';
-  h+='<div class="step" data-q="'+q.kind+'"><h3 class="st">'+esc(co&&co.title||(q.t==='menu'?menuTitle(q):KIND_NAME[q.kind]||titleOf(q)))+'</h3>';
-  const dayMenu=q.t==='menu'&&menuPhase(q)==='Day';if(dayMenu)h+=previewHTML(preview(),'');
-  h+='<p class="pr">'+gloss(promptText(q,s))+'</p>';
-  if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Waiting: '+esc(shortT(oth.map(seatWho).join(', ')))+'</p>'}
-  if(G.clash&&q.t!=='menu'&&(['location','castle','wilderness','harvest','shrine','ossuary','tie'].includes(q.kind)))h+=recapHTML();
-  
-  const pulse=!!(co&&co.pulse);const hl=[];
-  const hintBtn=!shown&&rec&&UI.guide!=='off'?'<button class="btn" data-a="hint">Suggest a move</button>':'';
-  switch(q.kind){
-   case 'bid':{if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
-   case 'bidRes':{h+=bidResHTML(s,mv);if(rm)foot=rm.t==='steal'?'<button class="btn pri'+(pulse?' pulse':'')+'" data-a="confirm" data-k="'+esc(rm.k)+'">'+esc(recBtnText(rm))+'</button>':pbtn(rm,recBtnText(rm),pulse);break}
-   case 'herald':{h+='<div class="locgrid">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="loc" data-l="'+m.loc+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' · '+esc(REG[m.loc>>1].replace('The ',''))+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';mv.forEach(m=>hl.push(m.loc));if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
-   case 'place':{const rs=[...new Set(mv.map(m=>m.r))];rs.forEach(r=>{hl.push(2*r,2*r+1)});if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
-   case 'tie':{const ps=mv.find(m=>m.pass);foot=(ps&&!(rm&&rm.pass)?'<button class="btn" data-a="mv" data-k="'+esc(ps.k)+'">Pass</button>':'')+(rm?pbtn(rm,recBtnText(rm),pulse):'');break}
-   case 'location':{h+='<div class="locgrid two">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' Influence'+(DD.LOCS[m.loc][3]?', bonus':'')+(G.pl[s].herald===m.loc?' · your Herald: +1 more':'')+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';mv.forEach(m=>hl.push(m.loc));if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
-   case 'clashOrder':{h+='<div class="opts">'+mv.slice().sort((a,b)=>(recK()===b.k)-(recK()===a.k)).map(m=>optBtn(m,'ord',orderChips(m.order))).join('')+'</div>';if(rm)foot=pbtn(rm,'Use the suggested order',pulse);break}
-   default:{
-     if(q.t==='menu'){const r=menuHTML(s,mv,rm,pulse);h+=r.h;foot=r.f}
-     else if(q.t==='sel'){const r=selHTML(s,mv,rm,q,pulse);h+=r.h;foot=r.f}
-     else{h+='<div class="opts">'+mv.map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)foot=pbtn(rm,recBtnText(rm),pulse)}}}
-  h+='</div>';set(h,hintBtn+foot);setHl(hl)}
+  const co=typeof coachFor==='function'?coachFor(s,mv,rm):null;UI._coachOn=!!co;UI._coachTitle=co&&/^New/.test(co.title||'')?co.title:'';
+  const M=bfModel(s,mv,rm);UI.bf=M;const pulse=!!(co&&co.pulse);
+  const hintBtn=!shown&&rec&&UI.guide!=='off'?'<button class="btn chipb hintb" data-a="hint" aria-label="Show a hint">'+ico('star')+'<span>Hint</span></button>':'';
+  let h='',f='',sheet=false;const hl=[],hr=[],recT={};
+  const pass=mv.find(m=>m.pass);
+  switch(M.kind){
+   case 'bid':if(rm&&rm.id!=null)recT.spot=1;break;
+   case 'bidRes':{const ret=mv.find(m=>m.t==='return');if(ret)f+='<button class="btn'+(rm&&rm.k===ret.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(ret.k)+'">'+ico('card')+'<span>Keep my card</span></button>';break}
+   case 'herald':case 'location':M.locs.forEach(l=>hl.push(l));if(rm)recT.loc=rm.loc;break;
+   case 'place':case 'tie':{if(UI.hand!=null)M.regsFor(UI.hand).forEach(r=>hr.push(r));if(rm&&rm.r!=null)recT.reg=rm.r;else if(rm&&q.kind==='tie'&&G.clash)recT.reg=G.clash.r;
+     if(pass)f+='<button class="btn'+(rm&&rm.pass?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(pass.k)+'">Pass</button>';break}
+   case 'clashOrder':{M.nextRegs().forEach(r=>hr.push(r));if(rm&&rm.order){const nx=rm.order[(UI.ord||[]).length];if(nx!=null)recT.reg=nx}
+     if((UI.ord||[]).length)f+='<button class="btn" data-a="ordundo">'+ico('x')+'<span>Undo</span></button>';break}
+   case 'menu':{const done=mv.find(m=>m.t==='done');M.regs.forEach(r=>hr.push(r));if(rm&&rm.a==='supp'&&rm.p)recT.reg=rm.p.r;
+     if(done)f+='<button class="btn'+(rm&&rm.k===done.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(done.k)+'">'+esc(doneText())+'</button>';
+     if(M.powers.length){const rp=rm&&rm.t==='act'&&rm.a!=='supp';f+='<button class="btn'+(rp?' pri'+(pulse?' pulse':''):'')+'" data-a="powers" aria-pressed="'+!!UI.sheetOpen+'">Powers <b>'+M.powers.length+'</b></button>';
+       if(UI.sheetOpen||(rp&&UI.guide==='full'&&G.round>1&&false)){const r=menuHTML(s,mv,rm,pulse);h+='<div class="step" data-q="menu"><h3 class="st">'+esc(menuTitle(q))+'</h3>'+r.h+'</div>';sheet=true}}
+     break}
+   default:{ // anything else: a compact list above the tray
+     h+='<div class="step" data-q="'+q.kind+'"><h3 class="st">'+esc(co&&co.title&&/^New/.test(co.title)?co.title:(KIND_NAME[q.kind]||titleOf(q)))+'</h3>';
+     h+='<p class="pr">'+gloss(promptText(q,s))+'</p>';
+     if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Waiting: '+esc(shortT(oth.map(seatWho).join(', ')))+'</p>'}
+     if(q.t==='sel'){const r=selHTML(s,mv,rm,q,pulse);h+=r.h;f+=r.f}
+     else{h+='<div class="opts">'+mv.map(m=>optBtn(m,'',thumbFor(m))).join('')+'</div>';if(rm)f+=pbtn(rm,recBtnText(rm),pulse)}
+     h+='</div>';sheet=true}}
+  set(h,hintBtn+f,sheet);setHl(hl,hr,recT)}
 // a gentle cue when the decision list continues below the visible part
 function moreCue(){const el=$('#main');if(!el)return;const on=el.scrollHeight>el.clientHeight+8&&el.scrollTop+el.clientHeight<el.scrollHeight-8;el.classList.toggle('more-below',on)}
 document.addEventListener('scroll',e=>{if(e.target&&e.target.id==='main')moreCue()},true);
@@ -180,19 +208,12 @@ function rowHTML(s,m,day){const I=rowInfo(s,m);const rec=recK()===m.k;let g=I.ga
   const conf=m.a==='t:cln_t3';
   return '<div class="orow'+(rec?' rec':'')+'"><div class="ob"><b>'+gloss(I.title)+'</b>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+(I.eff&&I.eff.split(/\s+/).length<=8?'<span class="oe">'+gloss(I.eff)+'</span>':'')+((I.cost||g)?'<small class="oc2">'+(I.cost?'<em>Cost:</em> '+esc(shortT(I.cost)):'')+(I.cost&&g?' · ':'')+(g?'<em>Gain:</em> '+esc(shortT(g)):'')+'</small>':'')+'</div><button class="btn sm" data-a="'+(conf?'confirm':'mv')+'" data-k="'+esc(m.k)+'">Use</button></div>'}
 function simCached(m){const key=G.logN+'|'+m.k;UI._simc=UI._simc||{};if(UI._simc.n!==G.logN)UI._simc={n:G.logN};if(!(key in UI._simc)){let r=null;try{r=simDay(m)}catch(e){}UI._simc[key]=r}return UI._simc[key]}
-function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day';const acts=visibleActs(mv).filter(m=>m.t==='act'),done=mv.find(m=>m.t==='done');let f='';
+function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day';const acts=visibleActs(mv).filter(m=>m.t==='act'&&m.a!=='supp');
   const byG={};for(const m of acts){(byG[mgroup(m.a)]=byG[mgroup(m.a)]||[]).push(m)}
-  if(!acts.length)h+='<p class="hint">'+(day?'You have no Day powers here.':'Nothing to do now: tap Done.')+'</p>';
-  const rk=recK();for(const g in byG)byG[g].sort((x,y)=>(y.k===rk)-(x.k===rk));   // the Suggested option is the first row of its group, and its group comes first
+  const rk=recK();for(const g in byG)byG[g].sort((x,y)=>(y.k===rk)-(x.k===rk));
   const rg=acts.find(m=>m.k===rk);const GORD=rg?MGROUP.slice().sort((x,y)=>(y[0]===mgroup(rg.a))-(x[0]===mgroup(rg.a))):MGROUP;
-  for(const [g,nmG,dsc] of GORD){const L=byG[g];if(!L)continue;
-    if(g==='supp'){const b=G.pl[s].supp.b;h+='<p class="grp-h">'+gloss('Supporters: '+b+' on your board')+'</p>'+(UI._coachOn?'':'<p class="grp-n">'+gloss('Each adds +1 Strength in that region\'s first Clash. Supporters on the map go to the Lost Pile in Winter.')+'</p>');const byR={};for(const m of L){(byR[m.p.r]=byR[m.p.r]||[]).push(m)}
-      for(const r in byR){const mine=UI.V.reg[r].down.filter(id=>id>=0&&ownerOf(id)===s).map(id=>cinfo(id).strength);const there=G.pl[s].supp.r[r];
-        h+='<div class="sup-r"><span><b>'+esc(REG[r])+'</b><small>'+(mine.length?'your card '+mine.join('+'):'no card of yours')+(there?' · '+there+' Supporter'+(there>1?'s':'')+' there':'')+'</small></span>'+byR[r].map(m=>'<button class="nb'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'" aria-label="Send '+m.p.n+' to '+esc(REG[r])+'">+'+m.p.n+'</button>').join('')+'</div>'}continue}
-    h+='<p class="grp-h">'+gloss(nmG)+'</p>'+(dsc?'<p class="grp-n">'+gloss(dsc)+'</p>':'')+L.map(m=>rowHTML(s,m,day)).join('')}
-  if(done)f+='<button class="btn'+(rm&&rm.k===done.k?' pri'+(pulse?' pulse':''):'')+'" data-a="mv" data-k="'+esc(done.k)+'">'+esc(doneText())+'</button>';
-  if(rm&&rm.t==='act')f+=rm.a==='t:cln_t3'?'<button class="btn pri'+(pulse?' pulse':'')+'" data-a="confirm" data-k="'+esc(rm.k)+'">'+esc(recBtnText(rm))+'</button>':pbtn(rm,recBtnText(rm),pulse);
-  return {h,f}}
+  for(const [g,nmG] of GORD){const L=byG[g];if(!L)continue;h+='<p class="grp-h">'+gloss(nmG)+'</p>'+L.map(m=>rowHTML(s,m,day)).join('')}
+  return {h,f:''}}
 function selHTML(s,mv,rm,q,pulse){const items=mv.filter(m=>m.t==='sel'),dn=mv.find(m=>m.t==='seldone');let h='',f='';
   const ch=(q.chosen||[]).map(v=>chipFor(v));h+=(ch.length?'<p class="chosen">Chosen: '+ch.join(' ')+'</p>':'')+(q.max!=null&&q.max<items.length+ch.length?'<p class="hint">Choose up to '+q.max+(q.min?' (at least '+q.min+')':'')+'.</p>':'');
   h+='<div class="opts">'+items.map(m=>optBtn(m,'',typeof m.v==='number'&&m.v<10000&&ownerOf(m.v)===s?'<span class="th" data-owner="'+s+'" data-up="1">'+cardEl(m.v,44).outerHTML+'</span>':'')).join('')+'</div>';

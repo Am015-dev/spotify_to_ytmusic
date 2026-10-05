@@ -1,25 +1,29 @@
 // ===================== part 5: render loop, clicks, drawers (rules, log, board, menu), start screen =====================
 function renderAll(){if(!G||!UI.started)return;
   try{UI.V=isClient()?G:TB.stripView(G,isPassing()?-1:vs())}catch(e){console.error('view '+e.message);return}  // a client's G is already its own stripped copy
-  if(UI.phone&&!UI.land){const sm=!!wantSmall();if(sm!==!!UI.boardSmall){UI.boardSmall=sm;phApply()}}
   if(isPassing()){if(GX.open)GX.close();const bb=$('#boardbody');if(bb)bb.innerHTML='';if(UI.pop)closePop(true)}
   if(!(UI.card&&UI.card.kind==='event'))renderMap();else if(!MAP.m)renderMap();
-  renderBar();renderRoad();renderNow();renderMain();renderHand();renderRivals();setHB();renderCard();renderPop();updateLive();
+  renderMain();renderBar();renderHand();renderRivals();renderSpots();setHB();renderCard();renderPop();updateLive();
   document.documentElement.dataset.step=String(roadIdx());
-  if(typeof phoneRefresh==='function')phoneRefresh();
+  if(typeof bfAfter==='function')bfAfter();
   netAfter();
   const lb=$('#logbody');if(lb&&GX.open==='logd')renderLog()}
-function setHB(){const d=$('.gx-dock'),hw=$('#handw'),rv=$('#rivals');if(!d)return;d.style.setProperty('--hb',((hw&&!hw.hidden?hw.offsetHeight:0)+(rv?rv.offsetHeight:0))+'px')}
+function setHB(){}
 function updateLive(){const l=$('#live');if(!l)return;const last=G.log[G.log.length-1];if(last&&UI._liveN!==last.i){UI._liveN=last.i;l.textContent=last.t}}
 // ---------------------------------------------------------------- clicks
-document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('[data-a]');
-  if(!t){ // tap on the empty board closes a pop-up
-    if(UI.pop&&e.target.closest&&e.target.closest('#mapwrap')&&!e.target.closest('.tb-loc')){closePop();e.stopPropagation()}return}
+document.addEventListener('click',e=>{
+  const t=e.target.closest&&e.target.closest('[data-a]');
+  // an open detail sheet closes on any tap outside it (that tap does nothing else)
+  if(UI.pop&&G&&UI.started&&!(e.target.closest&&e.target.closest('#ppop,.gx-drawer,#start,#netbox'))){closePop();e.stopPropagation();return}
+  if(!t){return}
   const a=t.dataset.a;
   if(netClick(a,t))return;
   switch(a){
    case 'mv':{if(!humanMove(t.dataset.k)){renderAll()}break}
-   case 'hand':{const id=+t.dataset.id;if(UI.pop==='card'&&UI.popArg.id===id&&!t.closest('#ppop')){closePop();break}UI.hand=id;openPop('card',{id});renderHand();break}
+   case 'hand':{handTap(+t.dataset.id);break}
+   case 'spot':spotTap();break;
+   case 'powers':{UI.sheetOpen=!UI.sheetOpen;renderAll();break}
+   case 'ordundo':{UI.ord=[];renderAll();break}
    case 'loc':openPop('loc',{l:+t.dataset.l});break;
    case 'rival':openPop('rival',{s:+t.dataset.s});break;
    case 'kc':openPop('kc',{n:+t.dataset.n});break;
@@ -28,9 +32,8 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
    case 'newsok':newsOk();break;
    case 'hint':{const s=viewSeatForQ();if(s!=null){UI.hintQ=qKey(s,legal(s));renderAll()}break}
    case 'confirm':{UI.pop='confirm';UI.popArg={k:t.dataset.k};renderPop();break}
-   case 'zoom':toggleZoom();break;
    case 'take':{const s=+t.dataset.s;UI.holder=s;UI.passed=s;UI.card=null;UI._cardKey=null;UI.pop=null;pump();break}
-   case 'evok':{UI.card=null;UI._cardKey=null;UI.noAnim=false;if(UI._cp)UI._cp=null;UI.mapReset=false;MAP.slotDirty=true;pump();break}
+   case 'evok':{evDone();break}
    case 'tipx':UI.tip[t.dataset.k]='x';renderAll();break;
    case 'coachok':coachOk();break;
    case 'gloss':showGloss(t.dataset.t);break;

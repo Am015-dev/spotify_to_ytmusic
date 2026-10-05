@@ -1,6 +1,6 @@
 // ===================== part 1: core (state, engine adapter, events, AI adapter, turn pump) =====================
 // The engine (TB: newGame/moves/apply/pending/stripView) is never edited. Everything the UI needs on top of it lives here.
-var ANIM=1,AIDELAY=420;
+var ANIM=1,AIDELAY=1000;
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const DD=TB.DATA;
@@ -147,7 +147,7 @@ function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI
 function doMove(mv){if(!G||!G.q)return false;const was=G.round,l0=G.logN;
   const res=TB.apply(G,mv);
   if(!res.ok){console.warn('move rejected',res.err,mv&&mv.k);UI.err=res.err;if(res.exc)console.error('ENGINE '+res.err);return false}
-  UI.lastRes=res;if(typeof snd==='function')snd(mv,res);
+  UI.lastRes=res;UI.nMoves=(UI.nMoves||0)+1;if(typeof snd==='function')snd(mv,res);
   saveGame();return true}
 // ---------------------------------------------------------------- the pump: events -> end -> AI moves -> human decision (one thing at a time)
 function pendingSeats(){return G&&G.q?G.q.seats.slice():[]}
@@ -172,6 +172,7 @@ function pump(){clearTimeout(_pumpT);_pumpT=0;if(!G||!UI.started)return;
       const h=pickHumanSeat(w.hum);
       if(h==null){renderAll();return}               // pass-the-device card up
       if(typeof maybeTip==='function'&&maybeTip()){renderAll();return}
+      if(typeof autoSkip==='function'&&autoSkip(h))continue;                 // a season with nothing to use is skipped for you
       renderAll();return}
   }finally{UI.pumping=false}}
 function aiStep(w){const s=w.ai[0];const mv=aiChoose(s);if(!mv){console.warn('AI has no move',s,G.q&&G.q.kind);G.q=null;return}
@@ -184,7 +185,7 @@ function pickHumanSeat(hum){
   UI.passDelay=null;UI.card={kind:'pass',seat:nxt};UI.passed=null;return null}
 function afterHumanMove(){UI.passed=hotSeat()?UI.passed:null;pump()}
 function humanMove(k){if(typeof hideGloss==='function')hideGloss();if(NET.on)return netHumanMove(k);const s=viewSeatForQ();if(s==null)return false;const mv=legal(s).find(m=>m.k===k);if(!mv)return false;
-  const ok=doMove(mv);if(ok){UI.sel={};UI.hand=null;closePop(true);if(hotSeat()){ // pass on once this seat has nothing more to decide
+  const ok=doMove(mv);if(ok){UI.sel={};UI.hand=null;UI.sheetOpen=false;UI.ord=[];closePop(true);if(hotSeat()){ // pass on once this seat has nothing more to decide
       const still=G.q&&G.q.seats.includes(s);if(!still)UI.passed=null}
     pump()}return ok}
 function viewSeatForQ(){if(!G||!G.q)return null;if(NET.on){const m=NET.mySeat;return m>=0&&G.q.seats.includes(m)&&!G.pl[m].ai?m:null}const hum=G.q.seats.filter(s=>!G.pl[s].ai);if(!hum.length)return null;if(!hotSeat())return hum[0];return hum.includes(UI.holder)&&UI.passed===UI.holder?UI.holder:null}
