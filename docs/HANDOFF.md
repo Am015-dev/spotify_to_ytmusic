@@ -1,3 +1,15 @@
+# CURRENT STATE (2026-10-05 05:30 UTC); supersedes the older "worker status" sections below
+- Live: v82 (deployed from alex/od-release-82 @46e1879, live commit e13c83b). Alex scored it **2/10**. Worst: giants, too
+  many rings, crashing into buildings on slight turns, buttons unresponsive after portrait→landscape rotation.
+- v83 = v82 + pSC1 pSC2 pSM1-6 pRL3 pRL4 pQA1-3, in out83/ on alex/od-release-82. The integrator
+  (session_01BWg3b7y5ERWBuwkbXmawGq) is finishing the tPlay gate, may deploy it with tools/deploy.sh, then stops.
+- QA (session_01H6za4q8kX1UWQHeQ79qgdu, alex/od-qa) is finishing pQA4 (rotation), then writes QA-HANDOFF.md and stops.
+- **v84 fixer (session_01JiMj65N2sWZJdSFcMZ4x5o, Sonnet, alex/od-v84)** owns everything left: Athens wall hits, giants
+  (every humanoid type), rings, rotation, winnable missions, Athens density, 12 px phone text, the pause button and od-v82fix.
+  It gates on tPlay and deploys itself.
+- The next coordinator should start fresh (this one passed 380k context), read CLAUDE.md and wait for the v84 fixer's
+  5-line report. After the deploy, ask Alex for a 0–10 score and what felt worst.
+
 # STANDING RULES FROM ALEX (read first, never ask about these again)
 - **Deploy is ALWAYS allowed.** When a build passes the gate, the coordinator deploys it to `alex/brave-carson-rbpmlk`
   and republishes the beta artifact. Never ask Alex for permission to deploy.
