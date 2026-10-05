@@ -1018,8 +1018,8 @@ let TRK=TRACK_DEFS[0],CP=TRK.cp;
 const MOODS=[
  {id:'night',wet:0.55,name:'Neon Night',de:'Nacht',top:[.016,.012,.05],mid:[.07,.04,.17],hor:[.30,.10,.34],gnd:[.03,.02,.06],sun:[0,0,0],star:1,band:1,moon:1,cloud:0,
   fog:'#1c1030',fogD:.00042,hemi:['#6a5ab0','#180e2c',.6],key:['#c9d2ff',.45,[-400,600,-300]],exp:1.12,bloom:[.95,.6],win:1,rain:[1200,.22,140,.3],road:[.42,.3,1],env:.8,lamps:1},
- {id:'dawn',wet:0.18,name:'Dawn',de:'Morgengrauen',top:[.05,.08,.22],mid:[.30,.17,.34],hor:[1.15,.46,.26],gnd:[.07,.05,.07],sun:[1.6,.72,.3],star:.25,band:.15,moon:.35,cloud:0,
-  fog:'#5a3a52',fogD:.00030,hemi:['#c8a0c8','#3a2030',1.05],key:['#ffb070',1.45,[700,170,-900]],exp:1.0,bloom:[.7,.55],win:.5,rain:[0,0,0,0],road:[.38,.3,1.2],env:1.15,lamps:.35},
+ {id:'dawn',wet:0.18,name:'Dawn',de:'Morgengrauen',top:[.05,.08,.22],mid:[.38,.28,.4],hor:[1.15,.5,.28],gnd:[.07,.05,.07],sun:[1.6,.72,.3],star:.25,band:.15,moon:.35,cloud:0,
+  fog:'#8a6450',fogD:.00030,hemi:['#e8c8b0','#3a2030',1.05],key:['#ffb070',1.45,[700,170,-900]],exp:1.0,bloom:[.7,.55],win:.5,rain:[0,0,0,0],road:[.38,.3,1.2],env:1.15,lamps:.35},
  {id:'storm',wet:1.15,name:'Storm',de:'Gewitter',top:[.008,.01,.02],mid:[.03,.035,.06],hor:[.09,.08,.14],gnd:[.02,.02,.03],sun:[0,0,0],star:0,band:0,moon:0,cloud:1,
   fog:'#151b2b',fogD:.00072,hemi:['#4a5a80','#10141c',.5],key:['#9fb0ff',.3,[-300,600,-200]],exp:1.16,bloom:[1.0,.6],win:1.1,rain:[2400,.4,240,1.6],road:[.14,.62,1.7],env:.75,lamps:1,lightning:true},
  {id:'fog',wet:0.45,name:'Fog',de:'Nebel',top:[.05,.045,.1],mid:[.13,.1,.2],hor:[.24,.18,.3],gnd:[.12,.09,.17],sun:[0,0,0],star:.12,band:.08,moon:.3,cloud:0,
@@ -1032,7 +1032,7 @@ MOODS.push({id:'day',wet:0,name:'Day',de:'Tag',top:[.16,.38,.92],mid:[.42,.64,1.
 MOODS.push({id:'golden',wet:0,name:'Golden Hour',de:'Abendsonne',top:[.10,.22,.62],mid:[.38,.48,.86],hor:[1.0,.72,.52],gnd:[.3,.28,.26],sun:[1.1,.75,.42],star:0,band:0,moon:0,cloud:0,
   fog:'#d8c4c0',fogD:.00022,hemi:['#e8ecff','#7a6a5a',1.35],key:['#ffe2c0',2.4,[600,430,-500]],exp:1.0,bloom:[.3,.5],win:.35,rain:[0,0,0,0],road:[.55,.15,.7],env:1.0,lamps:.4});
 const ATHM=(()=>{const b=MOODS.find(m=>m.id==='brick'),A=MOODS.find(m=>m.id==='athens')||{...b,id:'athens',name:'Attic Sun',de:'Attische Sonne',sun:[2.7,2.35,1.7],hor:[.98,.9,.76],mid:[.36,.62,.98],top:[.09,.36,.96],gnd:[.42,.40,.30],fog:'#efe2c8',hemi:['#fff4e0','#9a8a5a',.8],key:['#fff0d6',2.6,[500,800,300]]};
- const D={...b,id:'athdusk',name:'Attic Dusk',de:'Abenddämmerung',top:[.04,.05,.17],mid:[.2,.13,.32],hor:[1.0,.46,.26],gnd:[.07,.05,.06],sun:[1.5,.62,.24],star:.4,band:.12,moon:.6,fog:'#4a3046',fogD:.00036,hemi:['#c49cba','#3a2830',.9],key:['#ffb07a',1.2,[700,160,-900]],exp:1.06,bloom:[.8,.55],win:.85,road:[.4,.28,1.1],env:1,lamps:1};
+ const D={...b,id:'athdusk',name:'Attic Dusk',de:'Abenddämmerung',top:[.04,.05,.17],mid:[.32,.26,.42],hor:[1.0,.5,.28],gnd:[.07,.05,.06],sun:[1.5,.62,.24],star:.4,band:.12,moon:.6,fog:'#7a5a4a',fogD:.00036,hemi:['#e0c0a0','#3a2830',.9],key:['#ffb07a',1.2,[700,160,-900]],exp:1.06,bloom:[.8,.55],win:.85,road:[.4,.28,1.1],env:1,lamps:1};
  const G={...b,id:'athgold',name:'Attic Gold',de:'Goldenes Licht',top:[.12,.26,.66],mid:[.45,.52,.8],hor:[1.05,.74,.45],gnd:[.3,.26,.2],sun:[1.5,.95,.45],fog:'#e2c49a',fogD:.00042,hemi:['#ffe2b8','#7a5a38',1.05],key:['#ffcf90',2.3,[600,380,-500]],exp:.94,bloom:[.32,.5],win:.15,lamps:.2,env:1},
  N2={...b,id:'athnoon',name:'Attic Noon',de:'Mittag',top:[.05,.3,.98],mid:[.34,.6,1],hor:[.95,.95,.92],gnd:[.42,.42,.38],sun:[3,2.8,2.4],fog:'#f2f0ea',fogD:.00032,hemi:['#ffffff','#a09880',1.55],key:['#ffffff',3.3,[200,1000,150]],exp:1.02,bloom:[.12,.4],win:0,lamps:0},
  K={...MOODS.find(m=>m.id==='night'),id:'athnight',name:'Attic Night',de:'Athener Nacht',wet:.25,top:[.01,.012,.04],mid:[.03,.035,.09],hor:[.17,.1,.2],gnd:[.02,.02,.03],fog:'#151628',fogD:.00042,hemi:['#5a6aa0','#141020',.6],key:['#c9d2ff',.42,[-400,600,-300]],exp:1.15,bloom:[.9,.6],win:1,rain:[0,0,0,0],road:[.36,.34,1.1],env:.8,lamps:1};
@@ -2692,7 +2692,7 @@ function tiltZero(){if(TILT.f!=null)TILT.zero=clamp(TILT.f,-25,25)}
 function tiltOn(){if(TILT.asked)return;TILT.asked=true;const go=()=>addEventListener('devicemotion',tiltRead);
   if(window.DeviceMotionEvent&&typeof DeviceMotionEvent.requestPermission==='function')DeviceMotionEvent.requestPermission().then(r=>{if(r==='granted')go()}).catch(()=>{});else go()}
 const TOUCH={dir:0,bz:null,lastTap:{t:-9,d:0},on:false,used:false,brake:false,boost:false,steer:0,target:0,sid:null,lock:0,x0:0,cx:0,cy:0,t0:0,flick:false};
-function tb(id,down,up){const el=$(id);el.addEventListener('touchstart',e=>{e.preventDefault();AU.init();TOUCH.on=TOUCH.used=true;el.classList.add('down');down(e)},{passive:false});const u=e=>{e.preventDefault();el.classList.remove('down');up()};el.addEventListener('touchend',u,{passive:false});el.addEventListener('touchcancel',u)}
+function tb(id,down,up){const el=$(id);let on=false;const dn=e=>{AU.init();TOUCH.on=TOUCH.used=true;el.classList.add('down');if(!on){on=true;down(e)}},uf=e=>{el.classList.remove('down');if(on){on=false;up()}};el.addEventListener('touchstart',e=>{e.preventDefault();dn(e)},{passive:false});el.addEventListener('touchend',e=>{e.preventDefault();uf(e)},{passive:false});el.addEventListener('touchcancel',uf);el.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;try{el.setPointerCapture(e.pointerId)}catch(_){}dn(e)});el.addEventListener('pointerup',uf);el.addEventListener('pointercancel',uf);el.addEventListener('lostpointercapture',uf)}
 if(matchMedia('(pointer:coarse)').matches){TOUCH.on=true;document.body.classList.add('touch')}
 // analog steering pad: the rail appears under the thumb, the knob follows the drag; a quick flick rolls
 const SZ=$('#steerZone'),SR=$('#steerRail'),SK=$('#steerKnob'),SH=$('#steerHint');const steerW=()=>({low:165,normal:130,high:100})[SET.steer]*SENS().drag;
@@ -2711,6 +2711,7 @@ BZ.addEventListener('touchstart',e=>{e.preventDefault();AU.init();TOUCH.on=TOUCH
   if(e.timeStamp-TOUCH.lastTap.t<260&&TOUCH.lastTap.d===d)pressed.roll=d;TOUCH.lastTap={t:e.timeStamp,d};bzSet(d)},{passive:false});
 BZ.addEventListener('touchmove',e=>{e.preventDefault();for(const t of e.changedTouches)if(t.identifier===TOUCH.bz)bzSet(bzSide(t))},{passive:false});
 const bzEnd=e=>{for(const t of e.changedTouches)if(t.identifier===TOUCH.bz){TOUCH.bz=null;bzSet(0)}};BZ.addEventListener('touchend',bzEnd);BZ.addEventListener('touchcancel',bzEnd);
+{let bp=null;const pe=e=>{if(bp===e.pointerId){bp=null;if(TOUCH.bz==null)bzSet(0)}};BZ.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'||bp!=null)return;bp=e.pointerId;try{BZ.setPointerCapture(e.pointerId)}catch(_){}AU.init();TOUCH.on=TOUCH.used=true;bzSet(bzSide(e))});BZ.addEventListener('pointermove',e=>{if(e.pointerId===bp)bzSet(bzSide(e))});BZ.addEventListener('pointerup',pe);BZ.addEventListener('pointercancel',pe);BZ.addEventListener('lostpointercapture',pe)}
 addEventListener('touchstart',()=>{if(SET.touch==='tilt')tiltOn()},{passive:true});
 tb('#tP',()=>togglePause(),()=>{});
 tb('#tB',e=>{const n=e&&e.timeStamp||performance.now();if(TOUCH.park){parkSet(false);TOUCH.bT=n;return}if(state==='roam'&&n-(TOUCH.bT||-1e9)<320&&Math.abs(RO.v)<4.2){parkSet(true);TOUCH.bT=-1e9;return}TOUCH.bT=n;TOUCH.brake=true},()=>TOUCH.brake=false);tb('#tG',()=>{TOUCH.gas=true;if(TOUCH.park)parkSet(false)},()=>TOUCH.gas=false);tb('#tD',()=>TOUCH.hb=true,()=>TOUCH.hb=false);tb('#tF',()=>pressed.fire=true,()=>{});tb('#tN',()=>TOUCH.boost=true,()=>TOUCH.boost=false);
@@ -5324,11 +5325,11 @@ function roamCam(dt){const C=RCAM[SET.rcam]||RCAM.chase;const k1=clamp(Math.abs(
   if(RO.shadowOn){const d=V3(...MOOD.key[2]).normalize();moonL.position.set(RO.x,RO.y,RO.z).addScaledVector(d,400);moonL.target.position.set(RO.x,RO.y,RO.z);moonL.target.updateMatrixWorld()}fovKick*=Math.exp(-6*dt);const fv=68+({narrow:-6,normal:0,wide:8}[SET.fov]||0)+9*clamp(Math.abs(RO.v)/Math.max(30,RO.top||60),0,1.4)+(pl&&pl.nitro?5:0)+fovKick*.6;camera.fov+=(pFov(fv)-camera.fov)*Math.min(1,dt*4);camera.updateProjectionMatrix()}
 let CB={n:0,t:0,best:0};const comboMult=()=>CB.n>=50?5:CB.n>=25?3:CB.n>=10?2:1;
 function comboAdd(k){if(state!=='roam')return;const m0=comboMult();CB.n+=k;CB.t=2.8;const m1=comboMult();if(m1>m0){feed('CHAIN ×'+m1,0,'#ff2d95');AU.sfx('style');fovKick=Math.max(fovKick,4)}}
-const POPS=[{k:'smash',name:'SMASH SPREE',goal:25,lim:25,u:'smashed'},{k:'drift',name:'DRIFT KING',goal:6,lim:25,u:'s of drift'},{k:'air',name:'AIR TIME',goal:3.5,lim:30,u:'s in the air'},{k:'speed',name:'SPEED DEMON',goal:3,lim:30,u:'s above 400 km/h'},{k:'chain',name:'CHAIN REACTION',goal:30,lim:30,u:'chain'}];
+const POPS=[{k:'smash',name:'SMASH SPREE',goal:25,lim:25,u:'smashed'},{k:'drift',name:'DRIFT KING',goal:6,lim:25,u:'s of drift'},{k:'air',name:'AIR TIME',goal:3.5,lim:30,u:'s in the air'},{k:'speed',name:'SPEED DEMON',goal:3,lim:30,u:'s above 160 km/h'},{k:'chain',name:'CHAIN REACTION',goal:30,lim:30,u:'chain'}];
 function popStep(dt,busy){RO.popCd=(RO.popCd??25)-dt;const P=RO.pop;
   if(!P){if(RO.popCd<=0&&!busy&&!RO.ch&&!RO.card&&!RO.sp&&roamSave().tut){const d=POPS[Math.floor(R()*POPS.length)];RO.pop=Object.assign({},d,{t:0,v:0,s0:HUB.smashed,txt(){return `${this.k==='smash'||this.k==='chain'?Math.floor(this.v):this.v.toFixed(1)} / ${this.goal} ${this.u}`}});AU.sfx('go');say(d.name,'POP-UP CHALLENGE · '+d.lim+' s',1.6)}return}
   if(P.done){P.t+=dt;if(P.t>2.2){RO.pop=null;RO.popCd=60+R()*30}return}
-  P.t+=dt;if(P.k==='smash')P.v=HUB.smashed-P.s0;else if(P.k==='drift'){if(RO.dDir)P.v+=dt}else if(P.k==='air'){if(pl&&pl.air)P.v+=dt}else if(P.k==='speed'){if(Math.abs(RO.v)*3.6>400)P.v+=dt}else if(P.k==='chain')P.v=Math.max(P.v,CB.n);
+  P.t+=dt;if(P.k==='smash')P.v=HUB.smashed-P.s0;else if(P.k==='drift'){if(RO.dDir)P.v+=dt}else if(P.k==='air'){if(pl&&pl.air)P.v+=dt}else if(P.k==='speed'){if(Math.abs(RO.v)*3.6>160)P.v+=dt}else if(P.k==='chain')P.v=Math.max(P.v,CB.n);
   if(P.v>=P.goal){P.done=true;P.t=0;const S2=season();S2.cr+=300;saveSeason(S2);addXP(80,P.name.toLowerCase());AU.sfx('finish');say('CHALLENGE COMPLETE','+300 studs',1.8);return}
   if(P.t>=P.lim){RO.pop=null;RO.popCd=50+R()*30;say('','CHALLENGE MISSED',1)}}
 function packInit(grp){const got=packs(),bl=HUB.blocks.filter(b=>b.t==='park'||b.t==='plaza'||b.t==='site'||b.t==='yard'),sp=CID!=='fra'?[WP(1530,610),WP(115,-455)]:[[TAU_SUM.x-35,TAU_SUM.z+45],[TAU_CAS.x-15,TAU_CAS.z+15]];
@@ -5989,7 +5990,7 @@ function LK_inject(sh,water){if(sh.fragmentShader.includes('uLkOn'))return;Objec
   sh.vertexShader=LK_VS+sh.vertexShader.replace('#include <project_vertex>','#include <project_vertex>'+LK_VP);
   let f=LK_FS+sh.fragmentShader;
   // macro patches (~30 m) + fine grain (~1.5 m): breaks up flat plastic colour without a texture fetch; albedo capped at .8 so white paving no longer blows out
-  if(!water)f=f.replace('#include <color_fragment>','#include <color_fragment>\nif(uLkOn>.5){float m1=lkN(vLkW.xz*.033+vLkW.y*.012),m2=lkN(vLkW.xz*.68+vec2(vLkW.y*.68,-vLkW.y*.4));diffuseColor.rgb=min(diffuseColor.rgb*(1.+(m1-.5)*.13+(m2-.5)*.05),vec3(.8));}');
+  if(!water)f=f.replace('#include <color_fragment>','#include <color_fragment>\nif(uLkOn>.5){float m1=lkN(vLkW.xz*.033+vLkW.y*.012),m2=lkN(vLkW.xz*.68+vec2(vLkW.y*.68,-vLkW.y*.4));diffuseColor.rgb=min(diffuseColor.rgb*(1.+(m1-.5)*.13+(m2-.5)*.05),vec3(.8));\n#if defined(USE_COLOR)&&!defined(USE_MAP)\n{vec3 wn=normalize(cross(dFdx(vLkW),dFdy(vLkW)));if(abs(wn.y)<.04&&max(abs(wn.x),abs(wn.z))>.985&&vLkW.y>3.&&diffuseColor.r>.5&&diffuseColor.g>.42&&diffuseColor.b>.3){float u=dot(vLkW.xz,vec2(-wn.z,wn.x))/3.6,v=vLkW.y/3.2;vec2 f=fract(vec2(u,v));float w=step(.2,f.x)*step(f.x,.62)*step(.24,f.y)*step(f.y,.74);float band=step(f.y,.07);diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.15,.2,.27),w*.92);diffuseColor.rgb*=1.-band*.18;}}\n#endif\n}');
   // LEGO plastic sheen: a sky-coloured fresnel rim; water also gets sparkling sun glints (HDR, picked up by bloom)
   f=f.replace('#include <opaque_fragment>','if(uLkOn>.5){vec3 lkV=normalize(vViewPosition);float fr=pow(1.-clamp(dot(normal,lkV),0.,1.),4.);outgoingLight+=uLkSheen*fr'+(water?'*3.;vec3 hH=normalize(lkV+uLkSunV);float sp=pow(max(dot(normal,hH),0.),600.)*step(.55,lkN(vLkW.xz*1.7+uLkT*vec2(.9,.6)));outgoingLight+=vec3(3.2,2.8,2.2)*sp*max(uLkSunV.y+.2,0.)':'')+';}\n#include <opaque_fragment>');
   sh.fragmentShader=f}
@@ -6715,8 +6716,8 @@ const FL_DAY=24*60;if(!SET.tod)SET.tod="cycle";
 function FL_mode(){return SET.tod||'cycle'}
 function FL_keys(){if(FL.K&&FL.K.cid===CID)return FL.K;const f=id=>MOODS.find(m=>m.id===id)||ATHM.find(m=>m.id===id);const day=f(CCF.mood)||f('brick'),ngt=f('night');
   const night={...ngt,id:'flnight',wet:.2,top:[.012,.016,.05],mid:[.04,.05,.13],hor:[.2,.13,.22],gnd:[.04,.035,.05],fog:'#202238',hemi:['#8a90c8','#3a2c26',1.05],key:['#c8d4ff',.7,[-400,600,-300]],exp:1.12,bloom:[.75,.55],win:1,rain:[0,0,0,0],road:[.42,.3,1],env:.85,lamps:1,star:1,moon:1,band:.6,cloud:0,lightning:false};
-  const dawn={...f('dawn'),rain:[0,0,0,0],wet:.1,hemi:['#d8b0c8','#4a3038',1.15],key:['#ffb070',1.7,[700,170,-900]]};
-  const dusk={...f('athdusk'),hemi:['#d0a4bc','#3e2c30',1.05],key:['#ffa070',1.4,[-700,170,-500]]};
+  const dawn={...f('dawn'),rain:[0,0,0,0],wet:.1,hemi:['#ecd4bc','#4a3038',1.15],key:['#ffb070',1.7,[700,170,-900]]};
+  const dusk={...f('athdusk'),hemi:['#e6c8a8','#3e2c30',1.05],key:['#ffa070',1.4,[-700,170,-500]]};
   const gold={...(CID==='ath'?f('athgold'):f('golden')),key:[CID==='ath'?'#ffcf90':'#ffe2c0',2.4,[-600,430,-300]]};
   // key-light direction is fixed across the cycle: shadow frustum (and its draw calls) stays identical day and night
   for(const m of[night,dawn,dusk,gold])m.key=[m.key[0],m.key[1],day.key[2]];const K=[[0,night],[.2,night],[.25,dawn],[.31,day],[.66,day],[.73,gold],[.79,dusk],[.85,night],[1,night]];K.cid=CID;return FL.K=K}
@@ -8181,6 +8182,10 @@ body.v85[data-mode=roam]:not(.v85b) #roamTop,body.v85[data-mode=roam]:not(.v85b)
 body.v85 #roamGauge{background:rgba(10,14,28,.55);border-radius:16px;padding:2px 12px}
 body.v85 #roamArrow{display:flex;align-items:center;gap:6px;font-size:15px!important;font-weight:800;color:#fff;background:rgba(10,14,28,.62);border-radius:14px;padding:4px 14px;max-width:60vw!important;text-shadow:0 1px 2px #000}
 body.v85 #roamArrow i{font-size:15px}
+#touch,#btnZone,.tbtn{touch-action:none}
+body.v85 #roamPop{top:calc(64px + env(safe-area-inset-top,0px));min-width:0;padding:3px 12px;border-radius:14px;background:rgba(10,14,28,.62);box-shadow:none}body.v85 #roamPop h5{display:inline;font-size:12px;margin-right:6px}body.v85 #roamPop span{display:inline;font-size:12px}body.v85 #roamPop div,body.v85 #roamPop small{display:none}
+body.v85 #tL{left:max(28px,calc(16px + env(safe-area-inset-left,0px)))!important}body.v85 #tR{left:calc(max(28px,16px + env(safe-area-inset-left,0px)) + 14px + clamp(68px,24vh,96px))!important}
+body.v85 #tG,body.v85 #tN{right:max(28px,calc(14px + env(safe-area-inset-right,0px)))!important}body.v85 #tB{right:max(40px,calc(28px + env(safe-area-inset-right,0px)))!important}body.v85 #tP{left:max(28px,calc(10px + env(safe-area-inset-left,0px)))!important}
 `;
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);document.body.classList.add('v85');
 // verbs for the one objective line
