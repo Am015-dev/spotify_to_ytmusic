@@ -162,7 +162,7 @@ body.storying .goal{display:none}
 .dice3{display:flex;gap:8px;margin:8px 0}.d3{width:74px;height:74px;border-radius:14px;display:grid;place-items:center;align-content:center;gap:2px;border:2px solid;background:#fffaf0;animation:tumble .7s cubic-bezier(.2,.8,.3,1.2) both}.d3 span{font-size:1.6rem;line-height:1}.d3 small{font-size:.66rem;text-align:center;line-height:1.1}
 .d3.good{border-color:#6aa55a;background:#eef6e8}.d3.bad{border-color:#c46a5c;background:#fbeae6}
 @keyframes tumble{0%{transform:translateY(-40px) rotate(-200deg) scale(.5);opacity:0}70%{transform:translateY(4px) rotate(12deg)}100%{transform:none;opacity:1}}
-.qbox{margin-top:8px;padding-top:8px;border-top:1px dashed #b99f67}.qbox h3{font:1.1rem var(--title);margin:0 0 6px}.qwho{display:inline-block;border-left:4px solid var(--pc);padding:0 6px;font-size:.85rem;margin-bottom:4px}
+.qbox{margin-top:8px;padding-top:8px;border-top:1px dashed #b99f67}.qbox.first{margin:6px 0 10px;padding:8px 10px;border:2px solid #d98a1e;border-radius:12px;background:#fff6dc}.qbox .qmore{margin:6px 0 0;font-size:.8rem;color:#6b5530}.qbox h3{font:1.1rem var(--title);margin:0 0 6px}.qwho{display:inline-block;border-left:4px solid var(--pc);padding:0 6px;font-size:.85rem;margin-bottom:4px}
 .why{font-weight:700}
 /* island labels */
 #labels{position:absolute;inset:0;pointer-events:none;z-index:2;overflow:hidden}
@@ -172,6 +172,10 @@ body.storying .goal{display:none}
 body.storying #labels .tl{pointer-events:none;opacity:.75}
 /* planning table */
 .daycard{background:#2a2014;color:#fff4d8;border-radius:10px;padding:8px 12px;display:grid;gap:2px}.daycard .dk{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--amber2)}.daycard b{font:1.05rem var(--serif)}.daycard .gl{font-size:.85rem;color:#e9dcc0}
+.btn.add[aria-disabled="true"]{opacity:.45;filter:grayscale(1)}
+.daycard.goal1{margin:0 0 8px}.daycard.goal1 p{margin:4px 0 0;font-size:.9rem}.daycard.goal1 .gb{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}.daycard.goal1 .pileb{background:#d98a1e;border-color:#a8620c;color:#fff}.daycard.goal1 .gb small{color:#ffcf8a}
+.daycard .cst{font-size:.8rem;color:#e9d7ae}.daycard .cgp{list-style:none;margin:4px 0 0;padding:0;display:flex;gap:10px;flex-wrap:wrap;font-size:.9rem}.daycard .cgp li{color:#ffcf8a}.daycard .cgp li.ok{color:#9fe08f}.mbox.start .orfull{margin-top:14px}
+.coach .btn{background:#fffaf0;border:1px solid #b99f67;color:#2a2014}.coach .btn:not(.ghost){background:#d98a1e;border-color:#a8620c;color:#fff}.gtip .cb{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.gtip p{margin:2px 0 0}
 .coach{margin:8px 0;padding:8px 10px;border-radius:10px;background:#fff1cf;border:2px solid #d98a1e;position:relative}.coach .cn{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:#9a6a12}.coach p{margin:2px 0 6px}.coach .cb{display:flex;gap:6px}
 .prios{display:grid;gap:6px}.prio{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px;border-radius:10px;background:#fffaf0;border:1px solid #c7b183}.prio .pi{font-size:1.4rem;text-align:center}.prio .pt{display:grid;min-width:0}.prio .pt span{font-size:.82rem;color:#5b4a2c}.prio.done{opacity:.6;background:transparent}.prio.cant .pt span{color:#8a5a2a}.prio small{color:#2f7d3a;font-weight:700}
 .plan{display:grid;gap:4px}.pl{display:grid;grid-template-columns:26px minmax(0,1fr);gap:6px;align-items:start;padding:6px;border-radius:8px;background:rgba(255,236,190,.6)}.pli{font-size:1.1rem;text-align:center}.plp{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:2px;font-size:.84rem}.cost{color:#5b4a2c}
@@ -277,6 +281,7 @@ body.storying #hud .rtrack,body.storying #hud .fc{display:none}
 /* start screen: the Wash ashore button stays in view */
 .cp,.scen{align-content:start}
 .mbox.start{display:flex;flex-direction:column;padding-bottom:0}
+.mbox.start .mb.guided{flex-direction:column;align-items:stretch;gap:4px;margin:8px 0 4px}.mbox.start .mb.guided .btn{font-size:1.05rem;min-height:48px;white-space:normal}.mbox.start .mb.guided small{color:#6b5530}
 .mbox.start .mb.sticky{position:sticky;bottom:0;margin:10px -4px 0;padding:10px 4px calc(10px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(244,236,216,0),var(--paper) 30%);z-index:2}
 .ctl2{display:inline-flex;border:2px solid #5a4320;border-radius:9px;overflow:hidden;justify-self:start}.ctl2 button{appearance:none;border:0;background:#fffaf0;color:#5a4320;font:600 .8rem var(--sans);padding:5px 10px;min-height:32px;cursor:pointer}.ctl2 button.on{background:#5a4320;color:#fff4d8}
 .cp .sks{display:grid;gap:1px;font-size:.74rem;color:#5b4a2c}.cp .sks i{font-style:normal;font-weight:700;color:#3b2c14}
@@ -421,6 +426,8 @@ em.sure,em.roll{font-style:normal;font-size:.75rem;padding:0 6px;border-radius:9
 html.ph .gx-app{padding:var(--sat,0px) var(--sar,0px) 0 var(--sal,0px)}
 html.ph .gx-main{display:contents}
 html.ph.ph-p .gx-app{grid-template-columns:minmax(0,1fr);grid-template-rows:44px var(--bh) auto minmax(0,1fr)}
+/* while the player decides (planning, a choice, a pop-up) the island shrinks so the choices fit above the fold */
+html.ph.ph-p .gx-app[data-dec="1"]{grid-template-rows:44px var(--bhs,var(--bh)) auto minmax(0,1fr)}
 html.ph.ph-l .gx-app{grid-template-columns:var(--bw) minmax(0,1fr);grid-template-rows:44px auto minmax(0,1fr)}
 html.ph .gx-bar{grid-row:1;height:44px;min-height:44px;padding:0 4px;gap:4px;overflow:visible;align-items:center;border-bottom:1px solid var(--line)}
 html.ph .gx-bar h1,html.ph .gx-bar .gx-sp{display:none}
@@ -449,7 +456,7 @@ html.ph #phchip[aria-expanded]{}
 html.ph .gx-bar #phchip{order:-1}
 #phview{display:none}
 html.ph #phview:not([hidden]){display:flex;align-items:center;gap:4px;padding:0 4px;min-height:44px;background:#0b1620;border-top:1px solid var(--line);border-bottom:1px solid var(--line);color:var(--ink)}
-html.ph #phview #phlabel{flex:1;min-width:0;padding:0 8px;font:600 14px/1.2 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+html.ph #phview #phlabel{cursor:pointer;flex:1;min-width:0;padding:0 8px;font:600 14px/1.2 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 html.ph.ph-l #phview #phlabel{display:none}
 html.ph #phview .gx-ibtn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;flex:0 0 auto;border-color:var(--line);background:var(--slate);color:var(--ink)}
 html.ph #phview .gx-ibtn svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
@@ -562,7 +569,8 @@ html.ph.ph-l #step .st-t{display:none}
 html.ph #story .sctl .btn.go{flex:1 1 100%}html.ph #story .sctl .btn.ghost{flex:1 1 40%;padding:0 6px;font-size:14px}
 html.ph #modal.phcard .mbox{overflow:visible}
 /* real usable heights: the recommended job's button stays pinned while the pawn pop-up scrolls */
-html.ph #ppop .rec .rb{position:sticky;bottom:0;z-index:2;padding:6px 0 8px;margin-bottom:-8px;background:linear-gradient(rgba(255,247,227,0),#fff7e3 10px)}
+html.ph #ppop .rec .rb{padding:6px 0 4px}
+html.ph.ph-l #ppop .rec .rb{position:sticky;bottom:0;z-index:2;padding:6px 0 8px;margin-bottom:-8px;background:#fff7e3}
 @media (max-width:400px){html.ph #phchip:not([hidden]){gap:4px;padding:0 5px!important;font-size:13.5px}}
 /* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
 html.ph .mbox,html.ph .dlg{box-sizing:border-box}
@@ -571,6 +579,147 @@ html.ph #ps .pawnrow{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));g
 html.ph #ps .pw{min-height:44px;padding:3px 6px;gap:5px}html.ph #ps .pw span{font-size:13.5px}html.ph #ps .pw i{width:16px;height:16px}
 @media (max-height:640px){html.ph-p #story .sctl{display:contents}html.ph-p #story .sctl .btn{margin-top:6px}html.ph-p #story .sctl .btn.go{position:sticky;bottom:4px;z-index:2;box-shadow:0 0 0 5px #f1e4c0,0 2px 0 #7a4a0a}}
 @media (max-height:640px){html.ph-p #ppop .curp{display:none}html.ph-p #ppop .rec .rb{order:-1}}
+</style>
+<style>
+/* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
+:root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
+  --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
+  --gxc-font:inherit;--gxc-head:inherit}
+.gxc{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;color:var(--gxc-ink);font-family:var(--gxc-font);
+  background:radial-gradient(120% 70% at 50% 0%,#3a2a1c 0%,var(--gxc-bg) 70%);overflow:hidden;
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.gxc[hidden]{display:none}
+.gxc *{box-sizing:border-box}
+.gxc button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.gxc button:focus-visible{outline:3px solid var(--gxc-gold);outline-offset:2px}
+.gxc-screen{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;width:100%;max-width:560px;margin:0 auto}
+.gxc-map-on .gxc-screen{justify-content:flex-start;padding:0;max-width:640px}
+.gxc-dim{color:var(--gxc-dim)}
+.gxc-small{font-size:13px;margin:6px 0 0;text-align:center}
+.gxc-row{display:flex;gap:8px;justify-content:center;margin-top:14px;width:100%}
+.gxc-row.wrap{flex-wrap:wrap}
+.gxc-btn{min-height:46px;min-width:88px;padding:8px 18px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
+.gxc-btn.go{background:linear-gradient(#dc7a3a,var(--gxc-go));border-color:#8f4317;color:var(--gxc-go-ink);box-shadow:0 3px 0 #7a3712,0 6px 14px rgba(0,0,0,.25);flex:1 1 auto;max-width:220px}
+.gxc-btn.go:active{transform:translateY(2px);box-shadow:0 1px 0 #7a3712}
+.gxc-btn.soft{background:#f7e7b8;border-color:#c9a14a}
+.gxc-btn.ghost{background:rgba(255,255,255,.22)}
+.gxc-ib{min-height:44px;min-width:44px;padding:4px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap}
+.gxc-tag{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
+/* portraits: image or emoji badge in a painted ring */
+.gxc-pt{--gxc-pt:64px;--gxc-ptc:#6b4a2b;width:var(--gxc-pt);height:var(--gxc-pt);flex:0 0 var(--gxc-pt);border-radius:50%;overflow:hidden;display:grid;place-items:center;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.45),transparent 55%),var(--gxc-ptc);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.5),0 6px 16px rgba(0,0,0,.3)}
+.gxc-pt img{width:100%;height:100%;object-fit:cover;display:block}
+.gxc-pt-e{font-size:calc(var(--gxc-pt) * .52);line-height:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+/* ---- map ---- */
+.gxc-head{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;flex:0 0 auto;color:#fbefd6}
+.gxc-htitle{flex:1 1 auto;min-width:0;text-align:center;font-family:var(--gxc-head);font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.gxc-score{color:var(--gxc-gold)}
+.gxc-map{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;
+  background:
+    radial-gradient(60% 40% at 20% 15%,rgba(110,150,80,.28),transparent 70%),
+    radial-gradient(50% 35% at 85% 55%,rgba(200,140,60,.22),transparent 70%),
+    radial-gradient(70% 40% at 30% 92%,rgba(150,60,70,.22),transparent 70%),
+    repeating-radial-gradient(circle at 70% 30%,rgba(120,80,30,.035) 0 2px,transparent 2px 9px),
+    linear-gradient(#f1e3c2,var(--gxc-paper2));box-shadow:inset 0 0 40px rgba(90,55,20,.45)}
+.gxc-path{position:relative;width:100%;margin:0 auto;max-width:560px}
+.gxc-road{position:absolute;left:0;top:0;width:100%;pointer-events:none;overflow:visible}
+.gxc-road path{fill:none;stroke-linecap:round}
+.gxc-road-edge{stroke:rgba(90,58,24,.45);stroke-width:26px}
+.gxc-road-fill{stroke:var(--gxc-road);stroke-width:20px}
+.gxc-road-dash{stroke:#f6e6c2;stroke-width:3px;stroke-dasharray:2 10;opacity:.85}
+.gxc-act{position:absolute;left:12px;right:12px;height:38px;margin-top:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(90deg,transparent,rgba(60,38,14,.82) 15%,rgba(60,38,14,.82) 85%,transparent);color:#fbefd6;z-index:2;text-align:center;line-height:1.1}
+.gxc-act b{font-size:14px;letter-spacing:.04em}
+.gxc-act small{font-size:11.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 18px}
+.gxc-node{position:absolute;transform:translateX(-50%);width:64px;height:64px;padding:0;border:0;background:none;z-index:3;display:flex;flex-direction:column;align-items:center}
+.gxc-disc{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff8ec;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%),var(--gxc-a1);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.55),0 5px 10px rgba(0,0,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.gxc-node.a2 .gxc-disc{background-color:var(--gxc-a2);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%)}
+.gxc-node.a3 .gxc-disc{background-color:var(--gxc-a3);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%)}
+.gxc-node.boss .gxc-disc{width:62px;height:62px;margin-top:-3px;border-color:var(--gxc-gold);box-shadow:0 0 0 2px #6b3c10,0 0 0 6px rgba(242,185,59,.35),0 6px 12px rgba(0,0,0,.35)}
+.gxc-node.boss .gxc-disc .gxc-pt{border:0;box-shadow:none;background:transparent}
+.gxc-node.boss .gxc-disc::after{content:'♛';position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:17px;color:var(--gxc-gold);text-shadow:0 1px 2px #000}
+.gxc-node.locked .gxc-disc{filter:grayscale(.85) brightness(.85);opacity:.75}
+.gxc-lock{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+.gxc-node.won .gxc-disc{border-color:var(--gxc-gold)}
+.gxc-node.next .gxc-disc{animation:gxc-pulse 1.6s ease-in-out infinite}
+@keyframes gxc-pulse{0%,100%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 0 rgba(242,185,59,.7)}50%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 10px rgba(242,185,59,0)}}
+.gxc-node .gxc-stars{position:absolute;top:50px;left:50%;transform:translateX(-50%);gap:0;padding:0 4px;border-radius:99px;background:rgba(60,38,14,.75)}
+.gxc-node .gxc-st{font-size:12px}
+.gxc-lab{position:absolute;left:66px;top:14px;width:max-content;max-width:min(150px,38vw);text-align:left;font-size:13.5px;font-weight:700;line-height:1.15;color:var(--gxc-ink);
+  background:rgba(246,230,194,.88);padding:3px 8px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.gxc-node.lab-l .gxc-lab{left:auto;right:66px;text-align:right}
+.gxc-node.locked .gxc-lab{opacity:.65}
+.gxc-stars{display:inline-flex;gap:2px;justify-content:center}
+.gxc-st{font-style:normal;color:rgba(255,255,255,.35);font-size:16px;line-height:1}
+.gxc-st.on{color:var(--gxc-gold);text-shadow:0 0 6px rgba(242,185,59,.6)}
+.gxc-st.cap{opacity:.3}
+.gxc-stars.big .gxc-st{font-size:44px;color:rgba(60,38,14,.2)}
+.gxc-stars.big .gxc-st.on{color:var(--gxc-gold);text-shadow:0 2px 0 #9c6a12,0 0 14px rgba(242,185,59,.7);animation:gxc-pop .4s cubic-bezier(.3,1.6,.5,1) both}
+.gxc-stars.big .gxc-st.on:nth-child(2){animation-delay:.25s}.gxc-stars.big .gxc-st.on:nth-child(3){animation-delay:.5s}
+@keyframes gxc-pop{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:none;opacity:1}}
+/* sheets and toasts sit over the map */
+.gxc-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:88%;overflow-y:auto;z-index:5;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.5);animation:gxc-up .22s ease-out}
+@keyframes gxc-up{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
+.gxc-sheet h3{margin:0 0 4px;font-family:var(--gxc-head);font-size:21px;line-height:1.15}
+.gxc-sh-top{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.gxc-sh-t{min-width:0}.gxc-sh-t small{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--gxc-dim);font-weight:700}
+.gxc-goal,.gxc-twist{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:12px;margin:6px 0;text-align:left;width:100%;font-size:15px;line-height:1.3}
+.gxc-goal{background:rgba(79,138,75,.16);border:1px solid rgba(79,138,75,.45)}
+.gxc-twist{background:rgba(142,59,70,.12);border:1px solid rgba(142,59,70,.5)}
+.gxc-goal b,.gxc-twist b{font-size:12px;text-transform:uppercase;letter-spacing:.07em}
+.gxc-twist b{color:var(--gxc-a3)}
+.gxc-twist.big{font-size:16px;border-width:2px}
+.gxc-slist{list-style:none;margin:8px 0 0;padding:0;width:100%;text-align:left;font-size:14.5px}
+.gxc-slist li{display:flex;gap:8px;align-items:center;padding:4px 0}
+.gxc-slist i{font-style:normal;font-size:18px;color:rgba(60,38,14,.25)}
+.gxc-slist li.on i{color:var(--gxc-gold);text-shadow:0 1px 0 #9c6a12}
+.gxc-rw{list-style:none;padding:0;margin:8px 0}.gxc-rw li{padding:6px 0;border-bottom:1px solid var(--gxc-line)}
+.gxc-toast{position:absolute;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9;background:rgba(30,20,10,.92);color:#fbefd6;padding:10px 16px;border-radius:12px;font-weight:600;max-width:calc(100% - 32px);text-align:center}
+/* ---- story scene ---- */
+.gxc-scene,.gxc-boss,.gxc-res{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;border-radius:var(--gxc-radius);
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto}
+.gxc-sc-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
+.gxc-sc-who{margin-bottom:8px}
+.gxc-sc-name{font-family:var(--gxc-head);font-weight:800;font-size:18px;min-height:1.2em}
+.gxc-sc-text{font-size:18px;line-height:1.4;margin:10px 0 12px;min-height:3.2em;max-width:30em;cursor:pointer}
+.gxc-sc-text.in{animation:gxc-in .3s ease-out}
+@keyframes gxc-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.gxc-dots{display:flex;gap:6px}.gxc-dots i{width:8px;height:8px;border-radius:50%;background:rgba(60,38,14,.2)}.gxc-dots i.was{background:rgba(60,38,14,.45)}.gxc-dots i.on{background:var(--gxc-go)}
+/* ---- boss card ---- */
+.gxc-boss-on{background:radial-gradient(100% 60% at 50% 30%,#5a2230 0%,#1a0d10 75%)}
+.gxc-boss-on.a1{background:radial-gradient(100% 60% at 50% 30%,#2d5a2c 0%,#0f1a0e 75%)}
+.gxc-boss-on.a2{background:radial-gradient(100% 60% at 50% 30%,#6a4318 0%,#1a120a 75%)}
+.gxc-boss{border:3px solid var(--gxc-gold);position:relative;padding-top:14px}
+.gxc-boss-tag{margin-bottom:10px;background:linear-gradient(#f6c552,#c98d17);color:#3a2205;font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:13px;padding:5px 18px;border-radius:99px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.gxc-boss .gxc-pt{border-color:var(--gxc-gold)}
+.gxc-boss h2{margin:12px 0 2px;font-family:var(--gxc-head);font-size:26px;line-height:1.1}
+.gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
+/* ---- result ---- */
+.gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
+.gxc-res-k{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
+.gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
+.gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
+.gxc-quote b{font-size:13px}.gxc-quote p{margin:2px 0 0;font-style:italic;font-size:15px;line-height:1.3}
+.gxc-unl{width:100%;margin-top:10px;text-align:left;padding:10px 12px;border-radius:12px;border:2px dashed #c9a14a;background:rgba(242,185,59,.14)}
+.gxc-unl>b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.gxc-unl-i{padding:3px 0;font-size:15px}
+/* short phones (375x553): tighter scene, smaller portraits */
+@media (max-height:600px){
+  .gxc-screen{padding:8px 12px}
+  .gxc-scene,.gxc-boss,.gxc-res{padding:14px 12px}
+  .gxc-sc-who .gxc-pt{--gxc-pt:84px!important}
+  .gxc-boss .gxc-pt{--gxc-pt:104px!important}
+  .gxc-boss{padding-top:10px}.gxc-boss-tag{margin-bottom:6px}.gxc-boss h2{font-size:22px;margin-top:8px}
+  .gxc-sc-text{font-size:16.5px;margin:6px 0 8px}
+  .gxc-stars.big .gxc-st{font-size:36px}
+  .gxc-res h2{font-size:23px}
+}
+html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -643,6 +792,742 @@ const GX={key:'gx',open:null,
       d.innerHTML=`<div class="gx-drawer-head"><h2></h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"></div>`;document.body.appendChild(d)}
     d.querySelector('h2').textContent=title;if(bodyEl){const b=d.querySelector('.gx-drawer-body');if(bodyEl.parentNode!==b){b.innerHTML='';b.appendChild(bodyEl)}}return d}};
 
+</script>
+<script>
+// ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
+// A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
+//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   GXC.open()            the chapter map (the title's "Story" button)
+//   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
+//   GXC.finish(G, over)   on game over: store stars, GNS.result({mode:'campaign'}), result screen, outro, back to the map
+//   GXC.scene / bossCard / result      the single screens (Promises), used by the flow and by the demo
+//   GXC.active() · progress() · unlocked() · reset() · close() · validate(data)
+// Progress lives in localStorage['gns-campaign-<game>'] and every access is wrapped in try/catch.
+(function (root) {
+  'use strict';
+  var GXC = {};
+  var doc = root && root.document;
+  var LS = {
+    json: function (k, d) { try { var v = JSON.parse(root.localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+    put: function (k, v) { try { root.localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+    del: function (k) { try { root.localStorage.removeItem(k); } catch (e) { } }
+  };
+  var LEVELS = ['easy', 'normal', 'hard'];
+  var O = null, D = null, P = null, CUR = null, OV = null, BUSY = false;
+
+  // ------------------------------------------------------------------ validation (node-safe)
+  var GOALS = ['win', 'score', 'margin', 'before-round', 'survive', 'mission', 'custom'];
+  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter'];
+  function lineText(l) { return typeof l === 'string' ? l : l && l.text; }
+  GXC.validate = function (data) {
+    var bad = [], add = function (m) { bad.push(m); };
+    if (!data || typeof data !== 'object') return ['no data'];
+    ['game', 'title'].forEach(function (k) { if (!data[k]) add('missing ' + k); });
+    var cast = data.cast || {}, twists = {}, ids = {};
+    (data.twists || []).forEach(function (t) { if (!t.id || !t.how) add('twist without id/how'); twists[t.id] = t; });
+    if (!data.acts || data.acts.length !== 3) add('needs 3 acts');
+    var ch = data.chapters || [];
+    if (ch.length < 9 || ch.length > 10) add('needs 9 or 10 chapters (has ' + ch.length + ')');
+    ch.forEach(function (c, i) {
+      var at = 'chapter ' + (c.id || i) + ': ';
+      if (!c.id) add(at + 'no id'); else if (ids[c.id]) add(at + 'duplicate id'); ids[c.id] = 1;
+      if ([1, 2, 3].indexOf(c.act) < 0) add(at + 'act must be 1-3');
+      if (i && c.act < ch[i - 1].act) add(at + 'acts out of order');
+      if (!c.title) add(at + 'no title');
+      var intro = c.intro || [], outro = c.outro || [];
+      if (intro.length < 2 || intro.length > 4) add(at + 'intro needs 2-4 lines');
+      if (outro.length < 1 || outro.length > 3) add(at + 'outro needs 1-3 lines');
+      intro.concat(outro).forEach(function (l) {
+        var t = lineText(l); if (!t) add(at + 'empty line'); else if (t.length > 110) add(at + 'line over 110 chars: ' + t.slice(0, 30) + '…');
+        if (l && l.who && l.who !== 'opponent' && l.who !== 'narrator' && !cast[l.who]) add(at + 'unknown speaker ' + l.who);
+      });
+      var op = c.opponent || {};
+      ['name', 'personality', 'aiLevel'].forEach(function (k) { if (op[k] == null || op[k] === '') add(at + 'opponent.' + k + ' missing'); });
+      if (c.boss && (!op.taunt || !op.praise)) add(at + 'boss needs taunt and praise');
+      if (!c.goal || GOALS.indexOf(c.goal.type) < 0 || !c.goal.text) add(at + 'goal needs a known type and text');
+      if (!c.stars || c.stars.length !== 3) add(at + 'needs exactly 3 stars');
+      else c.stars.forEach(function (s) { if (!s.text || !s.test) add(at + 'star needs text and test'); });
+      if (c.twist) { if (!twists[c.twist.id]) add(at + 'twist ' + c.twist.id + ' not in the twists menu'); if (!c.twist.text) add(at + 'twist needs text'); }
+      if (c.act === 3 && c.boss && !c.twist) add(at + 'act 3 boss needs a twist');
+      if (c.act === 1 && c.hints !== true) add(at + 'act 1 needs hints:true');
+      if (!c.easier) add(at + 'no easier block');
+      (c.unlock || []).forEach(function (u) { if (UNLOCKS.indexOf(u.type) < 0) add(at + 'unknown unlock type ' + u.type); if (!u.text) add(at + 'unlock needs text'); });
+      if (!c.setup || typeof c.setup !== 'object') add(at + 'setup must be an object');
+    });
+    [1, 2, 3].forEach(function (a) {
+      var inAct = ch.filter(function (c) { return c.act === a; });
+      if (!inAct.length) return add('act ' + a + ' has no chapters');
+      if (!inAct[inAct.length - 1].boss) add('act ' + a + ' must end with a boss');
+      if (inAct[0].boss) add('act ' + a + ' starts with a boss');
+    });
+    try { JSON.parse(JSON.stringify(data)); } catch (e) { add('not JSON-safe'); }
+    return bad;
+  };
+
+  // ------------------------------------------------------------------ progress
+  function key() { return 'gns-campaign-' + (O && O.game || 'game'); }
+  function load() { var p = LS.json(key(), null); if (!p || p.v !== 1) p = { v: 1, ch: {}, unlocked: [], last: null }; p.ch = p.ch || {}; p.unlocked = p.unlocked || []; return p; }
+  function save() { LS.put(key(), P); }
+  function rec(id) { return P.ch[id] || (P.ch[id] = { beaten: false, stars: 0, best: null, tries: 0, losses: 0, easy: false }); }
+  function chapters() { return (D && D.chapters) || []; }
+  function byId(id) { var c = chapters(); for (var i = 0; i < c.length; i++) if (c[i].id === id) return c[i]; return null; }
+  function isOpen(c) {
+    var list = chapters(), i = list.indexOf(c);
+    if (c.requires && c.requires.length) return c.requires.every(function (r) { return P.ch[r] && P.ch[r].beaten; });
+    return i <= 0 || !!(P.ch[list[i - 1].id] && P.ch[list[i - 1].id].beaten);
+  }
+  GXC.progress = function () { return JSON.parse(JSON.stringify(P || load())); };
+  GXC.unlocked = function () {
+    var out = [];
+    chapters().forEach(function (c) { if (P.ch[c.id] && P.ch[c.id].beaten) (c.unlock || []).forEach(function (u) { out.push({ type: u.type, id: u.id, text: u.text, from: c.id }); }); });
+    return out;
+  };
+  GXC.reset = function () { LS.del(key()); P = load(); if (OV) GXC.open(); };
+  GXC.active = function () { return CUR; };
+
+  // effective chapter: the "make it a bit easier" offer drops one AI level and the twist, at most 2 stars
+  function resolve(c, easy) {
+    var d = JSON.parse(JSON.stringify(c));
+    d.easy = !!easy; d.maxStars = 3;
+    if (easy) {
+      var e = c.easier || {}, lv = LEVELS.indexOf(c.opponent.aiLevel);
+      d.opponent.aiLevel = e.aiLevel || (lv > 0 ? LEVELS[lv - 1] : c.opponent.aiLevel);
+      d.twist = 'twist' in e ? e.twist : null;
+      if (e.setup) for (var k in e.setup) d.setup[k] = e.setup[k];
+      if (e.hints != null) d.hints = e.hints; else d.hints = true;
+      d.maxStars = e.maxStars || 2;
+    }
+    return d;
+  }
+  GXC.resolve = resolve;
+
+  // ------------------------------------------------------------------ small DOM helpers
+  function el(tag, cls, txt) { var e = doc.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function btn(cls, txt, on) { var b = el('button', cls, txt); b.type = 'button'; if (on) b.addEventListener('click', on); return b; }
+  function overlay() {
+    if (!OV) {
+      OV = el('div', 'gxc'); OV.setAttribute('role', 'dialog'); OV.setAttribute('aria-modal', 'true');
+      doc.body.appendChild(OV);
+      doc.addEventListener('keydown', function (e) { if (OV && OV.parentNode && e.key === 'Escape') { var x = OV.querySelector('[data-gxc-esc]'); if (x) x.click(); } });
+    }
+    OV.hidden = false;
+    return OV;
+  }
+  function screen(cls) { var o = overlay(); o.innerHTML = ''; o.className = 'gxc ' + (cls || ''); var s = el('div', 'gxc-screen'); o.appendChild(s); return s; }
+  GXC.close = function () { if (OV) { OV.hidden = true; OV.innerHTML = ''; } };
+  function castOf(who, def) {
+    if (who === 'opponent' && def) return { name: def.opponent.name, portrait: def.opponent.portrait, emoji: def.opponent.emoji, color: def.opponent.color };
+    if (who && D && D.cast && D.cast[who]) return D.cast[who];
+    if (def && def.opponent && def.opponent.cast === who) return { name: def.opponent.name, portrait: def.opponent.portrait, emoji: def.opponent.emoji };
+    return { name: who === 'narrator' || !who ? '' : who, emoji: '📜' };
+  }
+  // portrait: the game's own hook first, then <img> from artBase (falls back to the emoji), then the emoji badge
+  function portrait(who, size, def) {
+    var c = castOf(who, def), box = el('div', 'gxc-pt');
+    box.style.setProperty('--gxc-pt', size + 'px');
+    if (c.color) box.style.setProperty('--gxc-ptc', c.color);
+    var emo = function () { box.innerHTML = ''; box.appendChild(el('span', 'gxc-pt-e', c.emoji || (c.name ? c.name.charAt(0) : '?'))); };
+    var got = null;
+    try { if (O && O.portrait) got = O.portrait(who, size, c); } catch (e) { got = null; }
+    if (got && got.nodeType) { box.appendChild(got); return box; }
+    var src = typeof got === 'string' ? got : (O && O.artBase && c.portrait ? O.artBase + c.portrait : null);
+    if (src) { var im = el('img'); im.alt = ''; im.src = src; im.onerror = emo; box.appendChild(im); } else emo();
+    return box;
+  }
+  function starRow(n, max, total) {
+    var r = el('div', 'gxc-stars'); r.setAttribute('aria-label', n + ' of ' + (total || 3) + ' stars');
+    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '★'));
+    return r;
+  }
+  // twist text without its 'Boss rule:' prefix (the label shows it), first letter upper-case
+  function ruleText(t) { t = String(t || '').replace(/^(Boss|Special) rule:\s*/i, ''); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function easierText(def) { return ((def.easier && def.easier.text) || 'the computer plays one level gentler and any special rule is off').replace(/[.\s]+$/, ''); }
+  function toast(t) {
+    var o = overlay(), x = el('div', 'gxc-toast', t); o.appendChild(x);
+    setTimeout(function () { if (x.parentNode) x.parentNode.removeChild(x); }, 2200);
+  }
+
+  // ------------------------------------------------------------------ the chapter map
+  GXC.open = function () {
+    if (!D) return;
+    P = load(); CUR = null;
+    var s = screen('gxc-map-on'), list = chapters();
+    var head = el('div', 'gxc-head');
+    var back = btn('gxc-ib', '‹ Back', function () { GXC.close(); if (O.onExit) O.onExit(); }); back.setAttribute('data-gxc-esc', '');
+    head.appendChild(back);
+    var tt = el('div', 'gxc-htitle'); tt.appendChild(el('b', null, D.title || 'Story')); head.appendChild(tt);
+    var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
+    var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
+    sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
+    s.appendChild(head);
+    var map = el('div', 'gxc-map'), path = el('div', 'gxc-path');
+    map.appendChild(path); s.appendChild(map);
+    // nodes zigzag down a winding road; each act gets a banner and its own tint
+    var X = [50, 78, 50, 22], rows = [], y = 0, ROW = 74, BAN = 46, nextOpen = null;
+    list.forEach(function (c, i) {
+      if (!i || c.act !== list[i - 1].act) {
+        var a = (D.acts || []).filter(function (x) { return x.act === c.act; })[0] || { title: 'Act ' + c.act };
+        rows.push({ banner: a, y: y }); y += BAN;
+      }
+      rows.push({ c: c, y: y, x: X[i % 4] }); y += ROW;
+      if (!nextOpen && isOpen(c) && !(P.ch[c.id] && P.ch[c.id].beaten)) nextOpen = c;
+    });
+    var H = y + 20; path.style.height = H + 'px';
+    var pts = rows.filter(function (r) { return r.c; });
+    // the painted road: an SVG in percent units for x, px for y (viewBox stretched horizontally only)
+    var svgNS = 'http://www.w3.org/2000/svg', svg = doc.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'gxc-road'); svg.setAttribute('viewBox', '0 0 100 ' + H); svg.setAttribute('preserveAspectRatio', 'none');
+    svg.style.height = H + 'px';
+    var d = '';
+    pts.forEach(function (p, i) {
+      var cy = p.y + 30;
+      if (!i) d = 'M' + p.x + ' ' + cy; else { var q = pts[i - 1], qy = q.y + 30, my = (qy + cy) / 2; d += ' C' + q.x + ' ' + my + ' ' + p.x + ' ' + my + ' ' + p.x + ' ' + cy; }
+    });
+    ['gxc-road-edge', 'gxc-road-fill', 'gxc-road-dash'].forEach(function (k) { var pa = doc.createElementNS(svgNS, 'path'); pa.setAttribute('d', d); pa.setAttribute('class', k); pa.setAttribute('vector-effect', 'non-scaling-stroke'); svg.appendChild(pa); });
+    path.appendChild(svg);
+    rows.forEach(function (r) {
+      if (r.banner) {
+        var b = el('div', 'gxc-act'); b.style.top = r.y + 'px';
+        b.appendChild(el('b', null, 'Act ' + (r.banner.act || '') + ' · ' + (r.banner.title || '')));
+        if (r.banner.blurb) b.appendChild(el('small', null, r.banner.blurb));
+        path.appendChild(b); return;
+      }
+      var c = r.c, st = P.ch[c.id] || {}, open = isOpen(c), beaten = !!st.beaten;
+      var n = btn('gxc-node a' + c.act + (c.boss ? ' boss' : '') + (beaten ? ' won' : open ? ' open' : ' locked') + (c === nextOpen ? ' next' : ''), null, function () { sheet(c); });
+      n.style.top = r.y + 'px'; n.style.left = r.x + '%';
+      n.setAttribute('aria-label', 'Chapter ' + (list.indexOf(c) + 1) + ': ' + c.title + (c.boss ? ' (boss)' : '') + (beaten ? ', beaten, ' + (st.stars || 0) + ' stars' : open ? ', open' : ', locked'));
+      var disc = el('span', 'gxc-disc', c.boss ? '' : String(list.indexOf(c) + 1));
+      if (c.boss) disc.appendChild(portrait(c.opponent.cast || 'opponent', 40, c));
+      if (!open) disc.appendChild(el('i', 'gxc-lock', '🔒'));
+      n.appendChild(disc);
+      if (beaten) n.appendChild(starRow(st.stars || 0, null, 3));
+      var lab = el('span', 'gxc-lab', c.title); n.appendChild(lab);
+      if (r.x > 60) n.classList.add('lab-l');
+      path.appendChild(n);
+    });
+    // bring the next open chapter into view
+    if (nextOpen) setTimeout(function () { var t = rows.filter(function (r) { return r.c === nextOpen; })[0]; if (t) map.scrollTop = Math.max(0, t.y - map.clientHeight / 2 + 40); }, 0);
+  };
+
+  function rewards() {
+    var o = overlay(), sh = el('div', 'gxc-sheet'), u = GXC.unlocked();
+    var close = function () { if (sh.parentNode) sh.parentNode.removeChild(sh); };
+    sh.appendChild(el('h3', null, 'Rewards'));
+    if (!u.length) sh.appendChild(el('p', 'gxc-dim', 'Beat chapters to unlock portraits, card backs, titles and new acts.'));
+    var ul = el('ul', 'gxc-rw');
+    u.forEach(function (x) { var li = el('li'); li.appendChild(el('span', 'gxc-tag', x.type)); li.appendChild(el('span', null, x.text)); ul.appendChild(li); });
+    sh.appendChild(ul);
+    var b = btn('gxc-btn', 'Close', close); b.setAttribute('data-gxc-esc', ''); sh.appendChild(b);
+    o.appendChild(sh); b.focus();
+  }
+
+  // the chapter's detail sheet: goal, opponent, stars, Play (and the easier offer after 2 losses)
+  function sheet(c) {
+    var o = overlay(), old = o.querySelector('.gxc-sheet'); if (old) old.parentNode.removeChild(old);
+    if (!isOpen(c)) { var i = chapters().indexOf(c); toast('Beat chapter ' + i + ' first.'); return; }
+    var st = rec(c.id), sh = el('div', 'gxc-sheet a' + c.act);
+    var close = function () { if (sh.parentNode) sh.parentNode.removeChild(sh); };
+    var top = el('div', 'gxc-sh-top');
+    top.appendChild(portrait(c.opponent.cast || 'opponent', 64, c));
+    var t = el('div', 'gxc-sh-t');
+    t.appendChild(el('small', null, 'Act ' + c.act + ' · Chapter ' + (chapters().indexOf(c) + 1) + (c.boss ? ' · Boss' : '')));
+    t.appendChild(el('h3', null, c.title));
+    t.appendChild(el('div', 'gxc-dim', (c.boss ? 'Boss: ' : 'Opponent: ') + c.opponent.name));
+    top.appendChild(t); sh.appendChild(top);
+    var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Goal')); g.appendChild(el('span', null, c.goal.text)); sh.appendChild(g);
+    if (c.twist) { var tw = el('div', 'gxc-twist'); tw.appendChild(el('b', null, c.boss ? 'Boss rule' : 'Special rule')); tw.appendChild(el('span', null, ruleText(c.twist.text))); sh.appendChild(tw); }
+    var sl = el('ul', 'gxc-slist');
+    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
+    sh.appendChild(sl);
+    var row = el('div', 'gxc-row');
+    var x = btn('gxc-btn ghost', 'Close', close); x.setAttribute('data-gxc-esc', ''); row.appendChild(x);
+    if (st.losses >= 2 && !st.beaten) row.appendChild(btn('gxc-btn ghost', 'Make it a bit easier', function () { GXC.play(c.id, { easy: true }); }));
+    var go = btn('gxc-btn go', st.beaten ? 'Play again' : 'Play', function () { GXC.play(c.id); }); row.appendChild(go);
+    sh.appendChild(row);
+    if (st.losses >= 2 && !st.beaten) sh.appendChild(el('p', 'gxc-dim gxc-small', 'Easier: ' + easierText(c) + ' (up to 2 stars).'));
+    o.appendChild(sh); go.focus();
+  }
+
+  // ------------------------------------------------------------------ story scene (2-4 lines, always skippable)
+  GXC.scene = function (lines, opts) {
+    opts = opts || {};
+    return new Promise(function (done) {
+      lines = (lines || []).filter(function (l) { return lineText(l); });
+      if (!lines.length || !doc) return done();
+      var s = screen('gxc-scene-on'), i = 0, def = opts.def;
+      var box = el('div', 'gxc-scene');
+      if (opts.title) box.appendChild(el('div', 'gxc-sc-title', opts.title));
+      var who = el('div', 'gxc-sc-who'), name = el('div', 'gxc-sc-name'), txt = el('p', 'gxc-sc-text');
+      txt.setAttribute('aria-live', 'polite');
+      var dots = el('div', 'gxc-dots');
+      lines.forEach(function () { dots.appendChild(el('i')); });
+      var row = el('div', 'gxc-row');
+      var finish = function () { done(); };
+      var skip = btn('gxc-btn ghost', 'Skip', finish); skip.setAttribute('data-gxc-esc', '');
+      var next = btn('gxc-btn go', 'Next', function () { i++; if (i >= lines.length) finish(); else show(); });
+      row.appendChild(skip); row.appendChild(next);
+      box.appendChild(who); box.appendChild(name); box.appendChild(txt); box.appendChild(dots); box.appendChild(row);
+      s.appendChild(box);
+      txt.addEventListener('click', function () { next.click(); });
+      function show() {
+        var l = lines[i], w = typeof l === 'string' ? (opts.who || 'narrator') : (l.who || 'narrator'), c = castOf(w, def);
+        who.innerHTML = ''; who.appendChild(portrait(w, 112, def));
+        name.textContent = c.name || '';
+        txt.textContent = lineText(l);
+        for (var k = 0; k < dots.children.length; k++) dots.children[k].className = k === i ? 'on' : k < i ? 'was' : '';
+        next.textContent = i === lines.length - 1 ? (opts.last || 'Continue') : 'Next';
+        txt.classList.remove('in'); void txt.offsetWidth; txt.classList.add('in');
+        next.focus();
+      }
+      show();
+    });
+  };
+
+  // ------------------------------------------------------------------ boss intro card
+  GXC.bossCard = function (def) {
+    return new Promise(function (done) {
+      if (!doc) return done(true);
+      var s = screen('gxc-boss-on a' + def.act), op = def.opponent, card = el('div', 'gxc-boss');
+      card.appendChild(el('div', 'gxc-boss-tag', def.boss ? 'Boss' : 'Rival'));
+      card.appendChild(portrait(op.cast || 'opponent', 148, def));
+      card.appendChild(el('h2', null, op.name));
+      card.appendChild(el('p', 'gxc-boss-pers', op.personality));
+      if (def.twist && def.twist.text) {
+        var tw = el('div', 'gxc-twist big');
+        tw.appendChild(el('b', null, def.boss ? 'Boss rule' : 'Special rule'));
+        tw.appendChild(el('span', null, ruleText(def.twist.text)));
+        card.appendChild(tw);
+      }
+      var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Your goal')); g.appendChild(el('span', null, def.goal.text)); card.appendChild(g);
+      var lv = el('div', 'gxc-dim gxc-small', 'Computer: ' + op.aiLevel + (op.aiStyle ? ' · ' + op.aiStyle : '') + (def.easy ? ' · made easier' : ''));
+      card.appendChild(lv);
+      var row = el('div', 'gxc-row');
+      var back = btn('gxc-btn ghost', 'Back', function () { done(false); }); back.setAttribute('data-gxc-esc', '');
+      var go = btn('gxc-btn go', 'Fight', function () { done(true); });
+      row.appendChild(back); row.appendChild(go); card.appendChild(row);
+      s.appendChild(card); go.focus();
+    });
+  };
+
+  // ------------------------------------------------------------------ play a chapter
+  GXC.play = function (id, opt) {
+    if (BUSY) return;
+    var c = byId(id); if (!c || !isOpen(c)) return;
+    BUSY = true;
+    var def = resolve(c, opt && opt.easy);
+    var st = rec(c.id); st.tries++; P.last = c.id; save();
+    GXC.scene(c.intro, { def: def, title: c.title, last: c.boss || def.twist ? 'Meet ' + (c.boss ? 'the boss' : 'your rival') : 'Start' }).then(function () {
+      return c.boss || def.twist ? GXC.bossCard(def) : true;
+    }).then(function (go) {
+      BUSY = false;
+      if (!go) { GXC.open(); return; }
+      CUR = def; GXC.close();
+      try { O.startChapter(def); } catch (e) { CUR = null; GXC.open(); throw e; }
+    }, function () { BUSY = false; });
+  };
+
+  // ------------------------------------------------------------------ stars and game over
+  function testOne(t, m) {
+    if (!t || !m) return false;
+    var v = m[t.k], op = t.op || (t.v == null ? 'truthy' : '>=');
+    switch (op) {
+      case '>=': return v >= t.v; case '>': return v > t.v; case '<=': return v <= t.v; case '<': return v < t.v;
+      case '==': case '=': return v === t.v; case '!=': return v !== t.v; default: return !!v;
+    }
+  }
+  GXC.testStar = testOne;
+  function countStars(G, def, won) {
+    if (!won) return 0;
+    var n = 0;
+    if (O.starsEarned) { try { n = O.starsEarned(G, def) | 0; } catch (e) { n = 1; } }
+    else {
+      var m = {}; try { m = O.metrics ? O.metrics(G) || {} : {}; } catch (e) { }
+      if (m.won == null) m.won = won;
+      n = 1; // the first star is the chapter's goal, already met by winning
+      for (var i = 1; i < def.stars.length; i++) if (testOne(def.stars[i].test, m)) n++;
+    }
+    return Math.max(1, Math.min(n, def.maxStars || 3, 3));
+  }
+
+  // over: optional {won, stars} to override the game's callbacks (e.g. a resign counts as a loss)
+  GXC.finish = function (G, over) {
+    var def = CUR; if (!def) return Promise.resolve(null);
+    over = over || {};
+    var won = over.won != null ? !!over.won : (function () { try { return !!O.isWon(G, def); } catch (e) { return false; } })();
+    var stars = over.stars != null ? Math.min(over.stars, def.maxStars || 3) : countStars(G, def, won);
+    var st = rec(def.id), first = won && !st.beaten;
+    if (won) { st.beaten = true; st.stars = Math.max(st.stars || 0, stars); if (def.easy) st.easy = true; st.losses = 0; }
+    else st.losses = (st.losses || 0) + 1;
+    var unl = first ? (byId(def.id).unlock || []) : [];
+    unl.forEach(function (u) { var k = u.type + ':' + (u.id || u.text); if (P.unlocked.indexOf(k) < 0) P.unlocked.push(k); });
+    var list = chapters(), i = list.indexOf(byId(def.id)), nxt = list[i + 1];
+    if (first && nxt && nxt.act !== def.act) unl = unl.concat([{ type: 'act', text: 'Act ' + nxt.act + ' opens' }]);
+    save();
+    if (root.GNS && root.GNS.result) {
+      try {
+        root.GNS.result({ game: O.game, mode: 'campaign', level: def.opponent.aiLevel, won: won, winner: won ? 0 : 1,
+          seats: O.seats ? O.seats(G) : [{ name: 'You', me: true }, { name: def.opponent.name, ai: def.opponent.aiLevel }],
+          scores: O.scores ? O.scores(G) : null, turns: over.turns || 0, ms: over.ms || 0,
+          extra: { chapter: def.id, stars: won ? stars : 0, easy: !!def.easy, boss: !!def.boss } });
+      } catch (e) { }
+    }
+    CUR = null;
+    var res = { won: won, stars: won ? stars : 0, def: def, unlocks: unl, losses: st.losses, best: st.stars, first: first };
+    return GXC.result(res).then(function (pick) {
+      if (pick === 'retry') { GXC.play(def.id); return res; }
+      if (pick === 'easier') { GXC.play(def.id, { easy: true }); return res; }
+      if (pick === 'next' && nxt) { GXC.play(nxt.id); return res; }
+      return (won ? GXC.scene(def.outro, { def: def, title: def.title, last: 'Back to the map' }) : Promise.resolve()).then(function () { GXC.open(); return res; });
+    });
+  };
+
+  // result screen: stars, the boss's taunt or praise, unlocks, and the easier offer after 2 losses
+  GXC.result = function (r) {
+    return new Promise(function (done) {
+      if (!doc) return done('map');
+      var def = r.def, s = screen('gxc-res-on ' + (r.won ? 'won' : 'lost')), box = el('div', 'gxc-res');
+      box.appendChild(el('div', 'gxc-res-k', def.title));
+      box.appendChild(el('h2', null, r.won ? (def.boss ? 'Boss defeated!' : 'Chapter won!') : (def.goal.type === 'mission' || def.goal.type === 'survive' ? 'Mission failed' : 'Not this time')));
+      var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
+      if (r.won && def.easy) box.appendChild(el('div', 'gxc-dim gxc-small', 'Easier mode: up to ' + def.maxStars + ' stars. Play it normally for 3.'));
+      var sl = el('ul', 'gxc-slist');
+      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
+      box.appendChild(sl);
+      var op = def.opponent, line = r.won ? op.praise : op.taunt;
+      if (line) {
+        var q = el('div', 'gxc-quote');
+        q.appendChild(portrait(op.cast || 'opponent', 52, def));
+        var qt = el('div'); qt.appendChild(el('b', null, op.name)); qt.appendChild(el('p', null, '“' + line + '”')); q.appendChild(qt);
+        box.appendChild(q);
+      }
+      if (r.unlocks && r.unlocks.length) {
+        var ul = el('div', 'gxc-unl'); ul.appendChild(el('b', null, 'Unlocked'));
+        r.unlocks.forEach(function (u) { var x = el('div', 'gxc-unl-i'); x.appendChild(el('span', 'gxc-tag', u.type)); x.appendChild(el('span', null, u.text)); ul.appendChild(x); });
+        box.appendChild(ul);
+      }
+      var row = el('div', 'gxc-row wrap');
+      var m = btn('gxc-btn ghost', 'Map', function () { done('map'); }); m.setAttribute('data-gxc-esc', ''); row.appendChild(m);
+      row.appendChild(btn('gxc-btn ' + (r.won ? 'ghost' : 'go'), r.won ? 'Replay' : 'Try again', function () { done('retry'); }));
+      if (!r.won && r.losses >= 2) row.appendChild(btn('gxc-btn soft', 'Make it a bit easier', function () { done('easier'); }));
+      if (r.won) row.appendChild(btn('gxc-btn go', 'Continue', function () { done('continue'); }));
+      box.appendChild(row);
+      if (!r.won && r.losses >= 2) box.appendChild(el('p', 'gxc-dim gxc-small', 'Easier: ' + easierText(def) + ' (up to 2 stars).'));
+      s.appendChild(box);
+      var f = row.querySelector('.go') || m; f.focus();
+    });
+  };
+
+  // ------------------------------------------------------------------ init
+  GXC.init = function (opts) {
+    O = opts || {}; D = O.data || null; P = load();
+    if (!O.startChapter) O.startChapter = function () { };
+    if (!O.isWon) O.isWon = function () { return false; };
+    return GXC;
+  };
+  GXC.data = function () { return D; };
+
+  if (root && root.document) root.GXC = GXC;
+  if (typeof module !== 'undefined' && module.exports) module.exports = GXC;
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+window.CAMPAIGN={
+  "game": "shipwreck",
+  "title": "The Log of the Gull's Wake",
+  "version": 1,
+  "cast": {
+    "log":       { "name": "The Ship's Log", "portrait": "camp-log.webp", "emoji": "📓", "color": "#7a5a34" },
+    "carpenter": { "name": "The Carpenter", "portrait": "camp-carpenter.webp", "emoji": "🪚", "color": "#8a5a2b" },
+    "cook":      { "name": "The Cook", "portrait": "camp-cook.webp", "emoji": "🍲", "color": "#b5462e" },
+    "explorer":  { "name": "The Explorer", "portrait": "camp-explorer.webp", "emoji": "🧭", "color": "#2f6f6a" },
+    "soldier":   { "name": "The Soldier", "portrait": "camp-soldier.webp", "emoji": "🛡️", "color": "#4b5563" },
+    "friday":    { "name": "Friday", "portrait": "camp-friday.webp", "emoji": "🧑🏾", "color": "#a0702a" },
+    "ada":       { "name": "Ada", "portrait": "camp-ada.webp", "emoji": "🧕", "color": "#3f6fa8" },
+    "hunger":    { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "🦴", "color": "#9c7a3c" },
+    "rain":      { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "🌧️", "color": "#4a6a8a" },
+    "prowlers":  { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "🐆", "color": "#5b4a2e" },
+    "horizon":   { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "🌅", "color": "#c9853a" },
+    "whisper":   { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "🌫️", "color": "#7d8a94" },
+    "altar":     { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "🕯️", "color": "#5a2d4a" },
+    "shroud":    { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "👁️", "color": "#3b3f4a" },
+    "gale":      { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "🌪️", "color": "#36506b" },
+    "winter":    { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "❄️", "color": "#6f8fa8" },
+    "undertow":  { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "🌊", "color": "#1f4e6e" }
+  },
+  "acts": [
+    { "act": 1, "title": "Washed Ashore", "blurb": "Eat, build a roof, look around, and light the signal fire." },
+    { "act": 2, "title": "The Hexed Isle", "blurb": "Something on this island keeps the ships away. Break its hold." },
+    { "act": 3, "title": "The Way Home", "blurb": "A gale, a hard season, and one friend still out on the rocks." }
+  ],
+  "twists": [
+    { "id": "early-threat", "where": "setup", "how": "After newGame, put the top card of G.ev.deck into the left threat slot (G.ev.threat[0]), so its threat effect fires when the round-2 event pushes it off." },
+    { "id": "low-morale", "where": "setup", "how": "After newGame, set G.morale to -param (morale still stays inside the normal -3..+3 track)." },
+    { "id": "ada-adrift", "where": "setup", "how": "After the Stranded Friend scenario setup, set G.sc.ada to param, so Ada starts that many wounds down on the rock." }
+  ],
+  "chapters": [
+    {
+      "id": "c1", "act": 1, "title": "Driftwood Dawn", "boss": false,
+      "intro": [
+        { "who": "log", "text": "Day one. The Gull's Wake broke on the reef in the night. Two of us made it to the sand." },
+        { "who": "cook", "text": "Before anything clever: everyone eats one food each night, or takes two wounds." },
+        { "who": "carpenter", "text": "Then let's gather food today and keep our hands whole. Friday and the dog will help." }
+      ],
+      "outro": [
+        { "who": "log", "text": "Three nights, three meals, nobody lost. The beach almost feels like a camp." }
+      ],
+      "opponent": { "name": "Gnawing Hunger", "portrait": "camp-hunger.webp", "emoji": "🦴", "cast": "hunger",
+        "personality": "Quiet and patient. It only bites at night, and only if the food pile is empty.",
+        "aiLevel": "easy", "aiStyle": "starvation" },
+      "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
+      "twist": null,
+      "goal": { "type": "custom", "value": { "surviveDays": 3 }, "text": "Survive to the end of day 3 with everyone alive." },
+      "hints": true,
+      "stars": [
+        { "text": "Survive to the end of day 3", "test": { "k": "won" } },
+        { "text": "Take 3 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 3 } },
+        { "text": "End with at least 1 food in camp", "test": { "k": "food", "op": ">=", "v": 1 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "items": 4, "dog": true }, "maxStars": 2, "text": "Same gentle island; the coach points at the food every morning." },
+      "unlock": [ { "type": "portrait", "id": "carpenter", "text": "The Carpenter's portrait" }, { "type": "portrait", "id": "cook", "text": "The Cook's portrait" } ]
+    },
+    {
+      "id": "c2", "act": 1, "title": "A Roof Overhead", "boss": false,
+      "intro": [
+        { "who": "log", "text": "Day four. Rain clouds over the ridge. Sleeping in the open costs a wound every night." },
+        { "who": "carpenter", "text": "Wood is everything here. Gather it, then put two of us on the Shelter to make it a sure thing." },
+        { "who": "cook", "text": "Two pawns on one build is a sure success. One pawn rolls the dice." }
+      ],
+      "outro": [
+        { "who": "carpenter", "text": "Walls and a floor. The rain can drum on it all it likes." }
+      ],
+      "opponent": { "name": "The Long Rain", "portrait": "camp-rain.webp", "emoji": "🌧️", "cast": "rain",
+        "personality": "Grey and steady. Ruins food and wood that sits above the roof.",
+        "aiLevel": "easy", "aiStyle": "weather" },
+      "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
+      "twist": null,
+      "goal": { "type": "custom", "value": { "build": "shelter", "byDay": 5 }, "text": "Build the Shelter before the end of day 5." },
+      "hints": true,
+      "stars": [
+        { "text": "Build the Shelter by day 5", "test": { "k": "won" } },
+        { "text": "Have it built by day 4", "test": { "k": "rounds", "op": "<=", "v": 4 } },
+        { "text": "Take 4 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 4 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "items": 4, "dog": true }, "maxStars": 2, "text": "The coach reminds you to stack wood first, then build." },
+      "unlock": [ { "type": "portrait", "id": "friday", "text": "Friday's portrait" } ]
+    },
+    {
+      "id": "c3", "act": 1, "title": "Beyond the Treeline", "boss": false,
+      "intro": [
+        { "who": "log", "text": "Day seven. The beach is picked clean. We need to know what else this island holds." },
+        { "who": "carpenter", "text": "Exploring finds new tiles with food, wood and shelter. Two tiles out costs one more pawn." },
+        { "who": "cook", "text": "Mind the eyes in the dark. Something hunts out there, and it will notice us." }
+      ],
+      "outro": [
+        { "who": "log", "text": "A river, a ridge, a grove of good timber. And tracks we will not follow alone." }
+      ],
+      "opponent": { "name": "The Night Prowlers", "portrait": "camp-prowlers.webp", "emoji": "🐆", "cast": "prowlers",
+        "personality": "Curious and hungry. They wait at the edge of every new tile you uncover.",
+        "aiLevel": "easy", "aiStyle": "beasts" },
+      "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
+      "twist": null,
+      "goal": { "type": "custom", "value": { "explored": 4, "byDay": 6 }, "text": "Have 4 island tiles explored (3 new ones) before the end of day 6." },
+      "hints": true,
+      "stars": [
+        { "text": "Explore 4 tiles by day 6", "test": { "k": "won" } },
+        { "text": "Explore 5 tiles or more", "test": { "k": "explored", "op": ">=", "v": 5 } },
+        { "text": "Take 5 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 5 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "items": 4, "dog": true }, "maxStars": 2, "text": "The coach marks the closest unexplored space each morning." },
+      "unlock": [ { "type": "portrait", "id": "prowlers", "text": "The Night Prowlers' portrait" } ]
+    },
+    {
+      "id": "c4", "act": 1, "title": "Smoke on the Hill", "boss": true,
+      "intro": [
+        { "who": "log", "text": "Day ten. A sail passed far out this morning and never turned. We need a fire they can see." },
+        { "who": "carpenter", "text": "Build Fire, then stack the signal pile: 1, 2, 3, 4, 5 wood, one stage a day. Fifteen in all." },
+        { "who": "horizon", "text": "Sail after sail will pass you by. I am very good at being empty." }
+      ],
+      "outro": [
+        { "who": "log", "text": "The ship turned. But her captain swore she'd seen grey fog wrap the island like a hand." },
+        { "who": "log", "text": "She took our letters and promised to return. Then she sailed. The fog came in that night." }
+      ],
+      "opponent": { "name": "The Empty Horizon", "portrait": "camp-horizon.webp", "emoji": "🌅", "cast": "horizon",
+        "personality": "Calm and vast. It never attacks; it simply lets the days run out.",
+        "aiLevel": "easy", "aiStyle": "time-pressure",
+        "taunt": "Day twelve is over. Nothing on the water but me.",
+        "praise": "A column of smoke, and a ship that turns. Fine. I was never yours to keep." },
+      "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": true, "items": 4, "diff": "easy" },
+      "twist": null,
+      "goal": { "type": "mission", "value": "marooned", "text": "Marooned: have Fire and a full 15-wood signal pile in round 10, 11 or 12." },
+      "hints": true,
+      "stars": [
+        { "text": "Get rescued", "test": { "k": "won" } },
+        { "text": "Take 8 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 8 } },
+        { "text": "Finish with morale 0 or higher", "test": { "k": "morale", "op": ">=", "v": 0 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "items": 4, "dog": true, "friday": true }, "maxStars": 2, "text": "The coach watches the signal pile and tells you when a stage is due." },
+      "unlock": [ { "type": "act", "id": "2", "text": "Act 2: The Hexed Isle" }, { "type": "title", "id": "signal-keeper", "text": "Title: Signal Keeper" }, { "type": "portrait", "id": "horizon", "text": "The Empty Horizon's portrait" } ]
+    },
+    {
+      "id": "c5", "act": 2, "title": "Strange Crosses", "boss": false,
+      "intro": [
+        { "who": "log", "text": "The fog has not lifted in a week. The cook found old crosses carved into the cliff." },
+        { "who": "cook", "text": "Every tale I know says the same: crosses on five different tiles break a curse like this." },
+        { "who": "whisper", "text": "Plant your sticks. I will sit on your best ground and make every step cost double." }
+      ],
+      "outro": [
+        { "who": "carpenter", "text": "Two crosses up, and the fog thinned a hand's width. It can be beaten." }
+      ],
+      "opponent": { "name": "The Whispering Fog", "portrait": "camp-whisper.webp", "emoji": "🌫️", "cast": "whisper",
+        "personality": "Sly. Book events bring fog onto tiles, and fog makes every action there cost one more pawn.",
+        "aiLevel": "normal", "aiStyle": "fog" },
+      "setup": { "scen": "hexed", "chars": ["carpenter", "cook"], "friday": true, "dog": false, "items": 2, "diff": "standard" },
+      "twist": null,
+      "goal": { "type": "custom", "value": { "crosses": 2, "byDay": 6 }, "text": "Raise 2 crosses on different tiles before the end of day 6." },
+      "hints": false,
+      "stars": [
+        { "text": "Raise 2 crosses by day 6", "test": { "k": "won" } },
+        { "text": "Raise 3 crosses", "test": { "k": "crosses", "op": ">=", "v": 3 } },
+        { "text": "Take 6 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 6 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "diff": "easy", "items": 4, "dog": true }, "maxStars": 2, "text": "Fewer book events (less fog), the dog joins and you start with 4 items." },
+      "unlock": [ { "type": "portrait", "id": "whisper", "text": "The Whispering Fog's portrait" } ]
+    },
+    {
+      "id": "c6", "act": 2, "title": "The Dark Temple", "boss": false,
+      "intro": [
+        { "who": "log", "text": "The explorer walked out of the fog this morning. She'd been lost since the wreck." },
+        { "who": "explorer", "text": "There is a temple up in the hills. Whatever holds this island, it keeps its treasures there." },
+        { "who": "altar", "text": "Come in, come in. Pay the altar in blood, and the temple pays you back. Maybe." }
+      ],
+      "outro": [
+        { "who": "explorer", "text": "Old tools, a bell, a blade. The temple gave more than it took. This time." }
+      ],
+      "opponent": { "name": "The Altar Shadows", "portrait": "camp-altar.webp", "emoji": "🕯️", "cast": "altar",
+        "personality": "Greedy and theatrical. Totems reveal the temple, a wounding altar and hideouts full of fog.",
+        "aiLevel": "normal", "aiStyle": "totems" },
+      "setup": { "scen": "hexed", "chars": ["carpenter", "cook", "explorer"], "friday": false, "dog": false, "items": 2, "diff": "standard" },
+      "twist": null,
+      "goal": { "type": "custom", "value": { "temple": true, "crosses": 3, "byDay": 8 }, "text": "Search the dark temple and raise 3 crosses before the end of day 8." },
+      "hints": false,
+      "stars": [
+        { "text": "Temple searched and 3 crosses by day 8", "test": { "k": "won" } },
+        { "text": "Explore 6 tiles or more", "test": { "k": "explored", "op": ">=", "v": 6 } },
+        { "text": "Take 8 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 8 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "diff": "easy", "items": 4 }, "maxStars": 2, "text": "Fewer book events and 4 starting items." },
+      "unlock": [ { "type": "portrait", "id": "explorer", "text": "The Explorer's portrait" }, { "type": "table", "id": "temple-ruins", "text": "Table skin: Temple Ruins" } ]
+    },
+    {
+      "id": "c7", "act": 2, "title": "The Fifth Cross", "boss": true,
+      "intro": [
+        { "who": "log", "text": "The soldier came down from the hideouts with a rusted musket and no memory of the last month." },
+        { "who": "soldier", "text": "Five crosses, five tiles. I'll keep the beasts off whoever is carrying the wood." },
+        { "who": "shroud", "text": "I have kept this island for a hundred years. I already took the edge of your first night." }
+      ],
+      "outro": [
+        { "who": "log", "text": "The fifth cross went up at dusk. The fog lifted like a curtain, and out on the reef we saw her:" },
+        { "who": "ada", "text": "Hello the shore! I've been on this rock for days. Please, a boat!" }
+      ],
+      "opponent": { "name": "The Grey Shroud", "portrait": "camp-shroud.webp", "emoji": "👁️", "cast": "shroud",
+        "personality": "Old, cold and certain. It spreads fog, wakes the altar, and lets the clock do the rest.",
+        "aiLevel": "normal", "aiStyle": "curse",
+        "taunt": "Ten days, and still the island is mine. Lie down in the fog.",
+        "praise": "Five crosses. The bell rings and I go quiet. You earned your sky." },
+      "setup": { "scen": "hexed", "chars": ["carpenter", "explorer", "soldier"], "friday": false, "dog": false, "items": 2, "diff": "standard" },
+      "twist": { "id": "early-threat", "param": 1, "text": "Boss rule: the Grey Shroud starts with an event card already in the left threat slot. It fires on day 2 unless you deal with it." },
+      "goal": { "type": "mission", "value": "hexed", "text": "The Hexed Isle: raise a cross on five different tiles within 10 rounds." },
+      "hints": false,
+      "stars": [
+        { "text": "Break the curse", "test": { "k": "won" } },
+        { "text": "Do it by round 9", "test": { "k": "rounds", "op": "<=", "v": 9 } },
+        { "text": "Take 8 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 8 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": { "diff": "easy", "items": 4 }, "maxStars": 2, "text": "No early threat, fewer book events and 4 starting items." },
+      "unlock": [ { "type": "act", "id": "3", "text": "Act 3: The Way Home" }, { "type": "portrait", "id": "soldier", "text": "The Soldier's portrait" }, { "type": "cardback", "id": "cross", "text": "Card back: Driftwood Cross" } ]
+    },
+    {
+      "id": "c8", "act": 3, "title": "Signal in the Gale", "boss": false,
+      "intro": [
+        { "who": "log", "text": "Ada is alive out there, but no raft of ours would survive the autumn sea. We signal again." },
+        { "who": "carpenter", "text": "Same fire, same 15-wood pile. But the weather turns ugly and we kept only one useful item." },
+        { "who": "gale", "text": "Stack your wood. I like a tall pile; it's more to scatter." }
+      ],
+      "outro": [
+        { "who": "log", "text": "The ship came, but the sea was too high to land. She dropped crates and a promise: spring." }
+      ],
+      "opponent": { "name": "The Autumn Gale", "portrait": "camp-gale.webp", "emoji": "🌪️", "cast": "gale",
+        "personality": "Loud and wasteful. More book events, more storms, and nothing kept dry for long.",
+        "aiLevel": "hard", "aiStyle": "storms" },
+      "setup": { "scen": "marooned", "chars": ["carpenter", "cook"], "friday": true, "dog": false, "items": 1, "diff": "hard" },
+      "twist": null,
+      "goal": { "type": "mission", "value": "marooned", "text": "Marooned on Harder: Fire and a full 15-wood signal pile in round 10, 11 or 12." },
+      "hints": false,
+      "stars": [
+        { "text": "Get the ship to turn", "test": { "k": "won" } },
+        { "text": "Take 8 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 8 } },
+        { "text": "Finish with morale 0 or higher", "test": { "k": "morale", "op": ">=", "v": 0 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "diff": "standard", "items": 2 }, "maxStars": 2, "text": "Standard book events and 2 starting items." },
+      "unlock": [ { "type": "portrait", "id": "gale", "text": "The Autumn Gale's portrait" } ]
+    },
+    {
+      "id": "c9", "act": 3, "title": "Hearth and Home", "boss": false,
+      "intro": [
+        { "who": "log", "text": "No ship till spring. Three stowaway children from the lower deck will find us before then." },
+        { "who": "cook", "text": "Each child eats 1 food a night, and if one goes hungry, we've failed. So: a real home." },
+        { "who": "winter", "text": "Bad crops, barren ground, snow on the roof. Let us see how well you plan for the lean days." }
+      ],
+      "outro": [
+        { "who": "cook", "text": "A roof, a fence, a full larder, and three small voices arguing over the last fish." },
+        { "who": "log", "text": "Spring is close. Ada is not. It's time to build a boat." }
+      ],
+      "opponent": { "name": "The Lean Season", "portrait": "camp-winter.webp", "emoji": "❄️", "cast": "winter",
+        "personality": "Thrifty and grim. Halves your harvest, turns land to waste and counts every mouth.",
+        "aiLevel": "hard", "aiStyle": "scarcity" },
+      "setup": { "scen": "settlers", "chars": ["carpenter", "cook", "soldier"], "friday": false, "dog": false, "items": 1, "diff": "hard" },
+      "twist": { "id": "low-morale", "param": 1, "text": "Season rule: the camp is homesick. Morale starts at -1 instead of 0." },
+      "goal": { "type": "mission", "value": "settlers", "text": "Settlers: shelter, roof, palisade and weapon at 1+, and all 9 dealt inventions within 12 rounds." },
+      "hints": false,
+      "stars": [
+        { "text": "Settle the island", "test": { "k": "won" } },
+        { "text": "Take 10 wounds or fewer in all", "test": { "k": "wounds", "op": "<=", "v": 10 } },
+        { "text": "End with 3 or more food in camp", "test": { "k": "food", "op": ">=", "v": 3 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "diff": "standard", "items": 2 }, "maxStars": 2, "text": "Morale starts at 0, standard book events and 2 starting items." },
+      "unlock": [ { "type": "portrait", "id": "winter", "text": "The Lean Season's portrait" }, { "type": "table", "id": "homestead", "text": "Table skin: Homestead" } ]
+    },
+    {
+      "id": "c10", "act": 3, "title": "The Last Rescue", "boss": true,
+      "intro": [
+        { "who": "log", "text": "Spring storms. Ada is weaker than she was, and the sea around her rock is all teeth." },
+        { "who": "explorer", "text": "Rescue Raft first, row out and bring her in, then the Lifeboat. Two wounds a night on that rock." },
+        { "who": "undertow", "text": "She is mine already. Every night I take a little more of her." }
+      ],
+      "outro": [
+        { "who": "ada", "text": "I watched your smoke every day. I knew you would come." },
+        { "who": "log", "text": "The Lifeboat cleared the reef at dawn. Last entry from the island. We are going home." }
+      ],
+      "opponent": { "name": "The Undertow", "portrait": "camp-undertow.webp", "emoji": "🌊", "cast": "undertow",
+        "personality": "Cold, slow and relentless. Storms knock down your palisade while the clock runs on Ada.",
+        "aiLevel": "hard", "aiStyle": "drowning",
+        "taunt": "The rock is empty now. The sea keeps what it takes.",
+        "praise": "A lifeboat with every soul aboard. Go, then. The sea will remember you." },
+      "setup": { "scen": "stranded", "chars": ["carpenter", "cook", "explorer"], "friday": false, "dog": false, "items": 1, "diff": "hard" },
+      "twist": { "id": "ada-adrift", "param": 2, "text": "Boss rule: Ada has spent a long winter on the rock. She starts with 2 wounds." },
+      "goal": { "type": "mission", "value": "stranded", "text": "Stranded Friend: rescue Ada with the Rescue Raft and build the Lifeboat within 8 rounds." },
+      "hints": false,
+      "stars": [
+        { "text": "Sail home with Ada", "test": { "k": "won" } },
+        { "text": "Do it by round 7", "test": { "k": "rounds", "op": "<=", "v": 7 } },
+        { "text": "Ada has 6 wounds or fewer at the end", "test": { "k": "adaWounds", "op": "<=", "v": 6 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "diff": "standard", "items": 2 }, "maxStars": 2, "text": "Ada starts unhurt, standard book events and 2 starting items." },
+      "unlock": [ { "type": "portrait", "id": "ada", "text": "Ada's portrait" }, { "type": "title", "id": "homeward", "text": "Title: Homeward Bound" }, { "type": "cardback", "id": "lifeboat", "text": "Card back: The Lifeboat" } ]
+    }
+  ]
+};
 </script>
 <script>
 // ---------- PerfHUD: one speed tool for every game on the shelf ----------
@@ -1420,7 +2305,7 @@ function newGame(o){o=o||{};const seed=DEFSEED!=null?DEFSEED:Math.floor(Math.ran
   G.beast=shuffle(BEASTS.map(b=>b.k));
   G.discs=shuffle(Object.keys(DISCS).flatMap(k=>Array(DISCS[k].cp).fill(k)));
   const its=shuffle(Object.keys(ITEMS));G.items=its.slice(0,o.items!=null?o.items:2).map(k=>({k,uses:2}));
-  G.first=0;SC().setup&&SC().setup();UI.beats.length=0;UI.shown=-1;const fl=typeof FLAVOR!=='undefined'&&FLAVOR.scen&&FLAVOR.scen[sk];if(!o.noIntro)(fl&&fl.intro||[S.x]).forEach((p,i,a)=>beat('intro',{page:i,of:a.length,text:p}));
+  G.first=0;SC().setup&&SC().setup();if(o.cmp)campSetup(o.cmp);UI.beats.length=0;UI.shown=-1;const fl=typeof FLAVOR!=='undefined'&&FLAVOR.scen&&FLAVOR.scen[sk];if(!o.noIntro)(fl&&fl.intro||[S.x]).forEach((p,i,a)=>beat('intro',{page:i,of:a.length,text:p}));
   lg(`Shipwrecked! ${G.chars.map(c=>c.nm).join(', ')}${G.fri?' and Friday':''}${G.dog?' (with the dog)':''} wash up on the beach. Scenario: ${S.n}.`,'big');
   G.stk.push({f:'round'});run();refresh()}
 // ---------- helpers ----------
@@ -1469,18 +2354,20 @@ function morale(n,arrow){const b=G.morale;G.morale=Math.max(-3,Math.min(3,G.mora
 function gain(r,n,ctx){if(n<=0)return;const box=ctx&&ctx.fut?G.fut:G.res;box[r]+=n;lg(`+${n} ${RNAME[r]}${ctx&&ctx.fut?' (arrives after the actions)':''}.`,'good');fx('res',r)}
 // pay: take from available; food may use non-perishable food; missing units cost wounds to 'who'
 function pay(r,n,whoC,ip,why){let miss=0;if(r==='food'){const a=Math.min(n,G.res.food);G.res.food-=a;const b=Math.min(n-a,G.res.pfood);G.res.pfood-=b;miss=n-a-b}else{const a=Math.min(n,G.res[r]);G.res[r]-=a;miss=n-a}
-  if(n-miss>0)lg(`-${n-miss} ${RNAME[r]}.`);if(miss&&!ip){for(const c of whoC)wound(c,miss,why||`no ${RNAME[r]} to pay`)}return miss}
+  if(n-miss>0)lg(`-${n-miss} ${RNAME[r]}${why&&!/^no /.test(why)?' ('+why.replace(/: no \S+ to pay$/,'')+')':''}.`);if(miss&&!ip){for(const c of whoC)wound(c,miss,why||`no ${RNAME[r]} to pay`)}return miss}
 function roofPal(which,n,needShelter,ip,whoC){if(n>0){if(needShelter&&!hasShelter())return;G.camp[which]+=n;lg(`${which==='roof'?'Roof':'Palisade'} +${n} (now ${G.camp[which]}).`,'good');fx('build');return}
   const d=Math.min(-n,G.camp[which]);G.camp[which]-=d;if(d)lg(`${which==='roof'?'Roof':'Palisade'} -${d} (now ${G.camp[which]}).`,'bad');if(-n>d&&!ip)for(const c of (whoC||living()))wound(c,-n-d,`no ${which==='roof'?'roof':'palisade'} left`)}
 function weapon(n,ip,whoC){if(n>0){G.weapon+=n;lg(`Weapon +${n} (now ${G.weapon}).`,'good');return}const d=Math.min(-n,G.weapon);G.weapon-=d;if(d)lg(`Weapon -${d} (now ${G.weapon}).`,'bad');if(-n>d&&!ip)for(const c of (whoC||living()))wound(c,-n-d,'weapon already at 0')}
 // ---------- the op interpreter (card effects) ----------
+// the cause shown with a wound from a card: its name, and for an ignored threat, that it was ignored
+function opWhy(ctx){const c=ctx&&ctx.card&&typeof CARD!=='undefined'&&CARD[ctx.card];if(!c)return '';return ctx.half==='te'&&c.th?`ignored threat “${c.th.n}”`:`“${c.n}”`}
 function doOp(op,ctx){const [k,a,b,c2]=op;const who=w=>whoList(w,ctx);
   switch(k){
   case 'res':gain(a,b,ctx);break;
   case 'resPer':gain(a,living().length,ctx);break;
-  case 'lose':pay(a,b,ctx.pay?ctx.pay.map(P):living(),!!c2,null);break;
+  case 'lose':pay(a,b,ctx.pay?ctx.pay.map(P):living(),!!c2,ctx.card&&CARD[ctx.card]?`${opWhy(ctx)}: no ${RNAME[a]} to pay`:null);break;
   case 'loseAllRes':for(const r of RES){if(G.res[r])lg(`Lose all ${RNAME[r]} (${G.res[r]}).`,'bad');G.res[r]=0}break;
-  case 'wound':for(const c of who(a))wound(c,b);break;
+  case 'wound':for(const c of who(a))wound(c,b,opWhy(ctx));break;
   case 'det':if(a==='choose'){const c=living().sort((x,y)=>x.det-y.det)[0];gainDet(c,b)}else for(const c of who(a))gainDet(c,b);break;
   case 'ldet':for(const c of who(a))loseDet(c,b);break;
   case 'ldetAll':for(const c of who(a)){if(c.det)lg(`${c.nm} loses all ${c.det} determination.`,'bad');c.det=0}break;
@@ -1959,7 +2846,7 @@ FN.night4=fr=>{if(G.over)return;SC().night&&SC().night();if(G.over)return;
   const keep=has('cellar')||G.kept.m_boxes;let barrel=G.kept.m_barrel&&G.night.barrel?Math.min(2,G.res.food):0;
   if(G.res.food&&!keep){const lost=G.res.food-barrel;if(lost>0)lg(`${lost} food spoils overnight.`,'bad');G.res.food=barrel}
   G.night.pot=0;G.night.fire=0;G.night.barrel=0};
-FN.endRound=fr=>{if(G.over)return;SC().endRound&&SC().endRound();if(G.over)return;
+FN.endRound=fr=>{if(G.over)return;SC().endRound&&SC().endRound();if(G.over)return;if(G.cmp&&campCheck())return;
   if(G.round>=G.rounds){G.over={win:false,why:G.scen==='marooned'?'Time ran out: no ship came.':'Time ran out.'};lg('The last round ends without rescue.','bad');fx('lose');return}
   beat('daysum',{round:G.round});G.round++;if(G.chars.length>1)passFirst();G.stk.push({f:'round'})};
 // ---------- invariants and test hooks ----------
@@ -1981,7 +2868,7 @@ SCENARIOS.stranded={ref:'scen-3-jenny',n:'Stranded Friend',no:3,rounds:8,x:'Your
   finds:[{n:'Soothing Herbs',x:'Heal 1 wound.',ops:[['heal','choose',1]]},{n:'Ruined Hut',x:'Gain 2 wood.',ops:[['res','wood',2]]},{n:'Old Pistol',x:'+3 weapon for one fight.',ops:[['keep','sc_pistol']]},{n:'Tough Vines',x:'Palisade +1.',ops:[['pal',1,'shelter']]}],
   invs:{jraft:{n:'Rescue Raft',kind:'scen',it:['rope'],r:{wood:2},x:'Lets you row out to rescue Ada (an explore action; a "?" means a wound, not an adventure).'},lifeboat:{n:'Lifeboat',kind:'scen',it:['rope','knife'],r:{wood:6,fur:4},x:'With Ada back in camp, you sail away and win.'}},
   book:'storm',totem:'stranded'};
-SCENARIOS.settlers={ref:'scen-6-family-robinson',n:'Settlers',no:6,rounds:12,normals:9,x:'No rescue is coming, so make a home. Build a shelter, get roof, palisade and weapon to 1 or more, and make all 9 inventions dealt at the start. Children arrive in rounds 7, 9 and 11: each eats 1 food a night, and if a child goes hungry you lose.',
+SCENARIOS.settlers={ref:'scen-6-settlers',n:'Settlers',no:6,rounds:12,normals:9,x:'No rescue is coming, so make a home. Build a shelter, get roof, palisade and weapon to 1 or more, and make all 9 inventions dealt at the start. Children arrive in rounds 7, 9 and 11: each eats 1 food a night, and if a child goes hungry you lose.',
   wx:{3:['rain'],4:['rain'],5:['snow'],6:['snow'],7:['rain','animals'],8:['rain','animals'],9:['snow','animals'],10:['snow','animals'],11:['rain','animals'],12:['rain','animals']},wxFood:{7:1,8:1,9:2,10:2,11:3,12:3},
   finds:[{n:'Gunpowder',x:'Reroll the hungry-animals die once.',ops:[['keep','sc_powder']]},{n:'Seeds',x:'Gain 1 dry food.',ops:[['res','pfood',1]]},{n:'Old Tools',x:'Make Rope, Pot or Knife for free.',ops:[['buildFree',['rope','pot','knife']]]},{n:'Plough',x:'Remove 1 black marker from the island.',ops:[['unexhaust','any']]}],
   invs:{fence:{n:'Fence',kind:'scen',it:['shovel'],x:'Palisade +1.'},garden:{n:'Garden',kind:'scen',it:['shovel'],r:{food:2},x:'Gain 4 food.'}},
@@ -2045,6 +2932,33 @@ function fogHarm(p){const t=tileAt(p);let h=0;if(p===G.camp.pos)h+=20;if(t){h+=5
 function blackMarkers(){const o=[];for(const m of G.map){const t=tileAt(m.id);if(!t)continue;if(m.waste)o.push({p:m.id,w:1});for(const i in m.exh)o.push({p:m.id,i})}return o}
 FN.reclaimPick=fr=>{const o=blackMarkers().map(b=>({l:b.w?`Place ${b.p+1}: barren land becomes usable`:`Place ${b.p+1}: ${tileAt(b.p).src[b.i]||'extra'} source recovers`,frames:[{f:'fn',k:'reclaim',b}]}));ask('team','Which black marker is removed?',o,{kind:'reclaim'})};
 FN.reclaim=fr=>{const b=fr.b;if(b.w)delete G.map[b.p].waste;else delete G.map[b.p].exh[b.i];lg('The land recovers.','good')};
+
+// ---------- story campaign: chapter twists and checkpoint goals (only when a chapter is played; normal games never set G.cmp) ----------
+// cmp = {id, goal:{type,value,text}, twist:{id,param}|null}. Twists change the starting position only; a day's rules never change.
+function campSetup(cmp){G.cmp={id:cmp.id,goal:cmp.goal||null,twist:cmp.twist||null};const t=cmp.twist;if(!t)return;
+  if(t.id==='early-threat'){const k=G.ev.deck.shift();if(k)G.ev.threat[0]=k}
+  else if(t.id==='low-morale')G.morale=Math.max(-3,-(t.param||1));
+  else if(t.id==='ada-adrift'&&G.scen==='stranded')G.sc.ada=t.param||0}
+// the checkpoint's parts: [label, have, need] (need===true: a yes/no part)
+function campParts(){const v=G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom'&&G.cmp.goal.value;if(!v)return null;const o=[];
+  if(v.surviveDays)o.push(['day',G.round,v.surviveDays]);
+  if(v.build==='shelter')o.push(['shelter',hasShelter()?1:0,true]);
+  if(v.explored)o.push(['tiles explored',G.stats.explored,v.explored]);
+  if(v.temple)o.push(['temple searched',G.sc.templeDone?1:0,true]);
+  if(v.crosses)o.push(['crosses',(G.sc.crosses||[]).length,v.crosses]);
+  return o}
+function campMet(){const v=G.cmp.goal.value;const ok=[];
+  if(v.surviveDays)ok.push(G.round>=v.surviveDays&&!G.chars.some(c=>c.dead&&!c.npc));
+  if(v.build==='shelter')ok.push(hasShelter());
+  if(v.explored)ok.push(G.stats.explored>=v.explored);
+  if(v.temple)ok.push(!!G.sc.templeDone);
+  if(v.crosses)ok.push((G.sc.crosses||[]).length>=v.crosses);
+  return ok.length>0&&ok.every(Boolean)}
+// end of a day: a met checkpoint wins the chapter; a missed deadline loses it. true when the game is over.
+function campCheck(){const g=G.cmp.goal;if(!g||g.type!=='custom'||!g.value)return false;
+  if(campMet()){G.over={win:true,why:'Chapter goal reached: '+g.text.replace(/\.$/,'')+'.'};lg('🏆 '+G.over.why,'big');fx('win');return true}
+  const by=g.value.byDay||g.value.surviveDays;if(by&&G.round>=by){G.over={win:false,why:'Day '+by+' ended before the chapter goal: '+g.text.replace(/\.$/,'')+'.'};lg(G.over.why,'bad');fx('lose');return true}
+  return false}
 
 </script>
 <script>
@@ -2598,7 +3512,9 @@ function storyActive(){return storyIdx()>=0}
 function viewState(){const i=storyIdx();if(i<0||i>=UI.beats.length-1)return null;const b=UI.beats[i];if(!b.snap)return null;if(!b.obj)b.obj=JSON.parse(b.snap);return b.obj}
 function withView(fn){const s=viewState();if(!s)return fn();const b=UI.beats[storyIdx()];const real=G;G=Object.assign({},s,{log:real.log,stk:[],phase:b.phase==='start'?'event':b.phase,round:b.round});try{return fn()}finally{G=real}}
 function storyNext(){const i=storyIdx();if(i<0)return;if(i===UI.beats.length-1&&humanQ())return;UI.shown=i;UI.seenBeat=null;sfx('click');refresh()}
-function storySkip(){if(humanQ())UI.shown=UI.beats.length-2;else UI.shown=UI.beats.length-1;UI.seenBeat=null;refresh()}
+// skip ahead, but stop at the next scene that costs you something (a wound, lost food...) or the day's summary, so nothing hurts you unseen
+function skipStop(i){for(let k=i+1;k<UI.beats.length;k++){if(skippable(k))continue;const b=UI.beats[k];if(b.kind==='daysum'||b.kind==='over'||beatLines(k).some(l=>l.c==='bad'))return k}return -1}
+function storySkip(){const i=storyIdx();const k=i<0?-1:skipStop(i);if(k>=0)UI.shown=k-1;else if(humanQ())UI.shown=UI.beats.length-2;else UI.shown=UI.beats.length-1;UI.seenBeat=null;refresh()}
 function charBark(ci,kind,seed){const c=ci!=null&&ci>=0?P(ci):null;if(!c)return '';const f=FL().chars&&FL().chars[c.k];const l=f&&pickL(f[kind],seed);return l?`<div class="bark" style="--pc:${PCOL[c.i%6]}"><b>${esc(c.nm)}:</b> “${esc(l)}”</div>`:''}
 const KIND_ICON={prod:'🧺',daysum:'📋',go:'🧭',finds:'🎒',intro:'🏝️',dawn:'🌅',event:'📜',threat:'⚠️',morning:'☀️',act:'🧭',adventure:'❓',mystery:'🗝️',fight:'⚔️',weather:'⛈️',night:'🌙',over:'🏁'};
 const ACT_ICON={threat:'⚠️',hunt:'🏹',build:'🔨',gather:'🧺',explore:'🧭',camp:'🏕️',rest:'😴',special:'⭐',tmap:'🗺️'};
@@ -2617,9 +3533,10 @@ function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines
   case 'prod':{kicker='Morning';title='What the camp gives';story=esc(pickL((F.phase||{}).prod,b.id));break}
   case 'daysum':{const s=daySumHtml(i);kicker=s.kicker;title=s.title;card=s.body;break}
   case 'act':{const c=d.actor>=0?P(d.actor):null;icon=ACT_ICON[d.type]||icon;kicker=c?esc(c.nm):'Friday';title=esc(d.label);
-    const ok=lines.some(l=>l.c==='good'||l.c==='big')&&!lines.some(l=>/fails\./.test(l.t));const failed=lines.some(l=>/fails\./.test(l.t));
+    const ok=lines.some(l=>l.c==='good'||l.c==='big')&&!lines.some(l=>/fails\./.test(l.t));const failed=lines.some(l=>/fails\./.test(l.t))||!!(d.dice&&!d.dice.s);
     if(d.type==='explore'){const t=lines.find(l=>/New land/.test(l.t));const terr=t&&/place \d+: (\w+)/.exec(t.t);story=esc(terr?((F.phase||{}).explore||{})[terr[1]]||'':pickL((F.phase||{}).exploreFail,b.id));if(terr&&terr[1]==='mountains'&&G.scen==='marooned')story+=' From the peak we can see the shipping lane: this is where a signal fire could be seen.'}
     else if(d.type==='build')story=esc(failed?'':pickL((F.phase||{}).build,b.id));else if(d.type==='gather')story=esc(failed?'':pickL((F.phase||{}).gather,b.id));else if(d.type==='threat')story=esc(((F.ev||{})[d.card]||{}).t||pickL((F.phase||{}).threatDone,b.id));
+    if(d.dice&&!d.dice.s&&!lines.some(l=>/fails\./.test(l.t)))story=esc('The dice went against us. It is not done yet.');
     {const k0=jobNo(i);const res=failed?'<div class="outcome bad">Result: it failed.</div>':ok?'<div class="outcome good">Result: it worked.</div>':'';
      extra=`<div class="jobhd">${k0?`Job ${k0.k} of ${k0.n} · `:''}${d.dice?'Too few pawns to be sure: the dice were rolled.':'Enough pawns: certain, no dice.'}</div>`+(d.dice?diceHtml(d.dice,b.id):'')+res}
     extra+=charBark(d.actor,lines.some(l=>/wound/.test(l.t)&&l.c==='bad')?'hurt':failed?'fail':'success',b.id);break}
@@ -2628,11 +3545,11 @@ function beatHtml(i){const b=UI.beats[i];const d=b.data;const F=FL();const lines
   case 'fight':{kicker=d.hunted?'The hunt':'A fight';title=esc(String(d.name||'').replace(/^./,x=>x.toUpperCase()));story=esc(d.beast&&(F.beast||{})[d.beast]||'');const B=d.beast&&BEAST[d.beast];if(B)card=`<div class="scard">Strength <b>${B.str}</b> against our weapon <b>${(viewState()||G).weapon}</b> before the fight. Every point short is a wound; the weapon then loses ${B.wl}. It feeds us ${B.food} food${B.fur?' and '+B.fur+' fur':''}.</div>`;break}
   case 'weather':{const w=(viewState()||G).lastWx;kicker='Weather';const r=w&&w.rain,s=w&&w.snow,st=w&&w.storm,an=w&&w.animal&&w.animal!=='blank';const parts=[st?'A storm':'',r?r+' rain cloud'+(r>1?'s':''):'',s?s+' snow cloud'+(s>1?'s':''):'',an?'hungry animals':''].filter(Boolean);title=parts.length?parts.join(', ').replace(/^./,x=>x.toUpperCase()):'A calm day';story=esc(pickL((F.phase||{})[st?'storm':s?'snow':r?'rain':an?'animals':'calm'],b.id));
     if(w&&(r||s))extra=`<div class="fore">Roof ${(viewState()||G).camp.roof}: every cloud above it ruins 1 food and 1 wood${s?'; each snow cloud also burns 1 wood for warmth':''}.</div>`;break}
-  case 'night':{kicker='Night';const hungry=lines.some(l=>/hunger/.test(l.t)),open=lines.some(l=>/in the open/.test(l.t));const fire=has('fire');title=hungry?'Empty stomachs':open?'Under the open sky':fire?'Around the fire':'Huddled under the shelter';story=esc(pickL((F.phase||{})[hungry?'nightHungry':open?'nightOpen':fire?'nightFire':'nightFed'],b.id));break}
+  case 'night':{kicker='Night';const hungry=lines.some(l=>/hunger/.test(l.t)),open=lines.some(l=>/in the open/.test(l.t))||!hasShelter();const fire=has('fire');title=hungry?'Empty stomachs':open?'Under the open sky':fire?'Around the fire':'Huddled under the shelter';story=esc(pickL((F.phase||{})[hungry?'nightHungry':open?'nightOpen':fire?'nightFire':'nightFed'],b.id));break}
   case 'plan':kicker='Planning';title='Before we set off';break;
   case 'finds':kicker='Evening';title='Back at camp';story='We unpack what the day brought in.';break;
   case 'go':{kicker='Setting off';title='Everyone to work';const st=beatState(i);extra=withState(st,()=>`<ol class="golist">${st.plan.acts.slice().sort((x,y)=>ORDER_T.indexOf(x.type)-ORDER_T.indexOf(y.type)).map(a=>{const n=actNeed(a);const sure=!n.roll||a.pw.length>=n.max;return `<li><b>${esc(actLabel(a))}</b> <small>${esc(pawnGroup(a.pw))}</small> ${sure?'<em class="sure">certain</em>':'<em class="roll">rolls dice</em>'}</li>`}).join('')}</ol>`);break}
-  case 'over':{const w=G.over&&G.over.win;kicker=w?'The end':'The end';title=w?'Rescued!':'Lost on the island';story=esc(endLine());extra=`<p class="why">${esc(G.over?G.over.why:'')}</p>`;break}}
+  case 'over':{const w=G.over&&G.over.win;const ck=G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom';kicker=ck?'End of the chapter':'The end';title=ck?(w?'Chapter goal reached!':'Chapter lost'):w?'Rescued!':'Lost on the island';story=esc(ck?(w?'We did what we set out to do. The island still has more to teach us.':'Not this time. The island keeps its secrets a little longer.'):endLine());extra=`<p class="why">${esc(G.over?G.over.why:'')}</p>`;break}}
   const chips=lines.slice(0,14).map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('');
   return {icon,kicker,title,story,card,extra,chips}}
 function diceHtml(d,seed){const f=[['wound',d.w,d.w?'🩸':'·','wound','no wound'],['success',d.s,d.s?'✔':'✖','success','failure'],['adventure',d.q,d.q?'❓':'·','adventure','no adventure']];
@@ -2647,12 +3564,15 @@ function renderStory(){const el=$('#story');if(!el)return;if(!G||UI.modal==='sta
   const outs=auto?`<div class="result"><b>Result</b>${res.length?`<ul>${res.map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ul>`:`<p>Nothing happened.</p>`}</div>`:h.chips?`<ul class="outs">${h.chips}</ul>`:'';
   const last=i>=UI.beats.length-1;const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';const jn=b.kind==='act'?jobNo(i):null;
   const qk=b.kind==='daysum'?`<label class="chk qk"><input type="checkbox" data-a="quick" ${UI.quick?'checked':''}> Quick days: from day 2, skip the automatic steps (Morale, Production, Weather)</label>`:'';
-  const body=`${phaseHeadHtml(i)}<div class="sk">${h.icon} ${h.kicker}</div><h2>${h.title}</h2>${h.story?`<p class="story">${h.story}</p>`:''}${h.card}${h.extra}${outs}${qk}
-    ${q?`<div class="qbox">${who}<div class="qk">Your choice</div><h3>${esc(q.title)}</h3>${qd}<div class="opts">${q.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${esc(o.l)}</button>`).join('')}</div></div>`:
-     (typeof netStoryCtl==='function'&&netStoryCtl(i,nextL,jn))||`<div class="sctl"><button class="btn go" data-a="next" autofocus>${nextL}</button>${allAI()?'':`<button class="btn ghost ${UI.auto?'on':''}" data-a="auto" title="Play the scenes by themselves, one after another">▶▶ Play by itself: ${UI.auto?'on':'off'}</button>`}${i<UI.beats.length-2?`<button class="btn ghost" data-a="skip" title="Jump straight to your next decision (everything is still in the Log)">Skip to my next choice</button>`:''}${jn?`<span class="prog">Job ${jn.k} of ${jn.n}</span>`:''}</div>`}`;
-  const sig=b.id+':'+(q?q.title:'')+':'+G.logN+':'+UI.auto+(typeof netSig==='function'?netSig():'');el.hidden=false;if(el.dataset.id!==sig){el.dataset.id=sig;el.innerHTML=`<div class="scene ${b.kind}">${body}</div>`;const f=el.querySelector('[autofocus],.opt');if(f&&!UI.noFocus)f.focus({preventScroll:true})}
+  // a choice comes first, right under the title: the card text and results that explain it follow below
+  const qb=q?`<div class="qbox first">${who}<div class="qk">Your choice</div><h3>${esc(q.title)}</h3>${qd}<div class="opts">${q.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${esc(o.l)}</button>`).join('')}</div>${h.card||h.extra||outs?'<p class="qmore">The card and what happened so far are below.</p>':''}</div>`:'';
+  const gk=q?'choice':b.kind==='act'?(b.data.dice?'dice':'act'):b.kind;const gt=typeof guideTip==='function'?guideTip(gk==='dice'&&UI.guide.seen.dice?'act':gk):'';
+  const body=`${gt}${phaseHeadHtml(i)}<div class="sk">${h.icon} ${h.kicker}</div><h2>${h.title}</h2>${h.story?`<p class="story">${h.story}</p>`:''}${qb}${h.card}${h.extra}${outs}${qk}
+    ${q?'':
+     (typeof netStoryCtl==='function'&&netStoryCtl(i,nextL,jn))||`<div class="sctl"><button class="btn go" data-a="next" autofocus>${nextL}</button>${allAI()?'':`<button class="btn ghost ${UI.auto?'on':''}" data-a="auto" title="Play the scenes by themselves, one after another">▶▶ Play by itself: ${UI.auto?'on':'off'}</button>`}${i<UI.beats.length-2?`<button class="btn ghost" data-a="skip" title="Jump ahead. It stops at anything that hurts you, at your next choice and at the end of the day">Skip ahead ⏭</button>`:''}${jn?`<span class="prog">Job ${jn.k} of ${jn.n}</span>`:''}</div>`}`;
+  const sig=b.id+':'+(q?q.title:'')+':'+G.logN+':'+gt.length+':'+UI.auto+(typeof netSig==='function'?netSig():'');el.hidden=false;if(el.dataset.id!==sig){el.dataset.id=sig;el.innerHTML=`<div class="scene ${b.kind}">${body}</div>`;const f=el.querySelector('[autofocus],.opt');if(f&&!UI.noFocus)f.focus({preventScroll:true})}
   if(UI.toTop){UI.toTop=0;const bd=document.querySelector('.gx-dock-body');if(bd)bd.scrollTop=0}
-  clearTimeout(UI.autoT);if(!q&&(UI.auto||allAI())&&!UI.pause&&!(typeof isClient==='function'&&isClient())&&!(typeof netOn==='function'&&netOn()&&G.q&&i>=UI.beats.length-1)){const n=beatLines(i).length;UI.autoT=setTimeout(storyNext,(1600+Math.min(8,n)*380)/(UI.speed||1))}}
+  clearTimeout(UI.autoT);if(!q&&(UI.auto||allAI())&&!UI.pause&&!(UI.auto&&!allAI()&&(gt||b.kind==='daysum'))&&!(typeof isClient==='function'&&isClient())&&!(typeof netOn==='function'&&netOn()&&G.q&&i>=UI.beats.length-1)){const n=beatLines(i).length;UI.autoT=setTimeout(storyNext,(1600+Math.min(8,n)*380)/(UI.speed||1))}}
 function lastPlanBeat(i){for(let k=i;k>=0;k--)if(UI.beats[k].kind==='go'||UI.beats[k].kind==='plan')return k;return -1}
 function beatFx(b){const d=b.data;const s={intro:null,dawn:'round',event:'event',threat:'bad',morning:null,adventure:'mystery',mystery:'mystery',fight:'fight',night:'night'}[b.kind];
   if(s)sfx(s);if(b.kind==='act')sfx(d.dice?'dice':d.type==='build'?'build':d.type==='explore'?'explore':'place');
@@ -2717,7 +3637,7 @@ function flowNow(){if(!G)return null;const i=storyIdx();if(i>=0){const b=UI.beat
   if(G.over)return {round:G.round,k:'over'};return {round:G.round,k:phaseKey(G.phase)}}
 function roadmapHtml(){const f=flowNow();if(!f)return '';const idx=PHI(f.k);const all=f.k==='done'||f.k==='over';
   if(UI.phxAt!==f.k+f.round){UI.phxAt=f.k+f.round;UI.phx=null}
-  const right=f.k===null?'The shipwreck':f.k==='over'?'Game over':f.k==='done'?'Day done':`Step ${idx+1} of 7`;
+  const right=f.k===null?'The shipwreck':f.k==='over'?'Game over':f.k==='done'?'Day done':`Part ${idx+1} of 7`;
   const items=PH7.map((p,i)=>{const st=all||i<idx?'done':i===idx?'now':'next';return `<li><button class="rm-p ${st} ${UI.phx===p.k?'open':''}" data-phx="${p.k}" aria-current="${st==='now'?'step':'false'}" title="${esc(p.n)}: ${esc(p.tip)}"><i>${st==='done'?'✓':i+1}</i><span>${p.n}</span></button></li>`}).join('');
   const tp=UI.phx&&PH7[PHI(UI.phx)];
   return `<div class="rm-h"><b>${f.round?`Day ${f.round} of ${G.rounds}`:'Before day 1'}</b><span>${right}${idx>=0&&!all?' · '+PH7[idx].n:''}</span></div><ol class="rm-l" aria-label="The 7 steps of a day">${items}</ol>${tp?`<div class="rm-tip" role="note"><b>${tp.n}:</b> ${esc(tp.tip)} <button class="btn xs ghost" data-phx="${tp.k}" aria-label="Close">✕</button></div>`:''}`}
@@ -2728,7 +3648,7 @@ function phaseHeadHtml(i){const b=UI.beats[i];const k=beatPhase(b);const ix=PHI(
   let what=p.what;if(k==='event'&&b.round===1)what='There is no event card on the first day. From day 2 a new card is turned over every morning.';
   if(k==='act'){const n=(b.data&&b.data.n)||0;if(n)what=`Your ${n} job${n>1?'s are':' is'} done one at a time. `+p.what.replace(/^Your jobs are done one at a time, in this order\. /,'')}
   const qk=AUTO_PH.includes(k)&&k!=='night'?`<label class="chk qk"><input type="checkbox" data-a="quick" ${UI.quick?'checked':''}> From day 2, skip the automatic steps (Morale, Production, Weather). Their results still show in the day summary.</label>`:'';
-  return `<div class="phead ${AUTO_PH.includes(k)?'auto':''}"><div class="ph-n">Step ${ix+1} of 7 · ${p.n}</div>${short?'':`<p><b>What happens:</b> ${esc(what)}</p><p><b>You decide:</b> ${esc(p.dec)}</p>`}${short?'':qk}</div>`}
+  return `<div class="phead ${AUTO_PH.includes(k)?'auto':''}"><div class="ph-n">Day part ${ix+1} of 7 · ${p.n}</div>${short?'':`<p><b>What happens:</b> ${esc(what)}</p><p><b>You decide:</b> ${esc(p.dec)}</p>`}${short?'':qk}</div>`}
 // ---------- snapshots: the state at a scene ----------
 function beatState(k){const b=UI.beats[k];if(!b)return null;if(k>=UI.beats.length-1||!b.snap)return G;if(!b.obj)b.obj=JSON.parse(b.snap);return b.obj}
 function withState(s,fn){if(!s||s===G)return fn();const real=G;G=Object.assign({},s,{log:real.log,stk:[]});try{return fn()}finally{G=real}}
@@ -2738,7 +3658,8 @@ function daySumData(i){const b=UI.beats[i];const r=b.data.round;let k0=-1;for(le
   const A=k0>=0?beatState(k0):null;const B=beatState(i);return {r,A,B}}
 function daySumHtml(i){const {r,A,B}=daySumData(i);const S=SCENARIOS[G.scen];const ch=[];
   if(A&&B){const nm={food:'Food',pfood:'Dry food',wood:'Wood',fur:'Fur'};for(const k of ['food','pfood','wood','fur']){const a=A.res[k]+(A.fut&&A.fut[k]||0),z=B.res[k];if(a!==z)ch.push({t:`${nm[k]}: ${a} → ${z}`,c:z>a?'good':'bad'})}
-    B.chars.forEach((c,j)=>{const o=A.chars[j];if(!o||c.npc&&G.scen!=='stranded')return;const la=lifeOf(A,o),lz=lifeOf(B,c);if(c.dead&&!o.dead)ch.push({t:`${c.nm} died`,c:'bad'});else if(la!==lz)ch.push({t:`${c.nm}: ${la} → ${lz} life`,c:lz>la?'good':'bad'})});
+    const why=dayWhy(r);B.chars.forEach((c,j)=>{const o=A.chars[j];if(!o||c.npc&&G.scen!=='stranded')return;const la=lifeOf(A,o),lz=lifeOf(B,c);const w=why.hurt[c.nm]?` (${why.hurt[c.nm].join(', ')})`:'';if(c.dead&&!o.dead)ch.push({t:`${c.nm} died${w}`,c:'bad'});else if(la!==lz)ch.push({t:`${c.nm}: ${la} → ${lz} life${lz<la?w:''}`,c:lz>la?'good':'bad'})});
+    if(why.food.length){const f=ch.find(x=>/^Food:/.test(x.t));if(f)f.t+=` (${why.food.join(', ')})`}
     if(A.fri&&B.fri&&A.fri.w!==B.fri.w)ch.push({t:`Friday: ${FRIDAY.die-A.fri.w} → ${Math.max(0,FRIDAY.die-B.fri.w)} life`,c:B.fri.w>A.fri.w?'bad':'good'});
     if(A.morale!==B.morale)ch.push({t:`Morale: ${A.morale} → ${B.morale}`,c:B.morale>A.morale?'good':'bad'});
     const sa=withState(A,()=>hasShelter()),sz=withState(B,()=>hasShelter());if(sa!==sz)ch.push({t:sz?'Shelter built':'Shelter lost',c:sz?'good':'bad'});
@@ -2753,6 +3674,17 @@ function daySumHtml(i){const {r,A,B}=daySumData(i);const S=SCENARIOS[G.scen];con
     body:`<div class="dsum">${!A?'':`<h4>What changed today</h4>`+(ch.length?`<ul class="chg">${ch.map(x=>`<li class="${x.c}">${esc(x.t)}</li>`).join('')}</ul>`:'<p class="muted small">Nothing changed.</p>')}
       <h4>Coming tomorrow (day ${r+1})</h4><ul class="tmr">${tm.lines.map(l=>`<li class="${l.c||''}">${esc(l.t)}</li>`).join('')}</ul>
       <div class="top1"><div class="rk">Most important tomorrow</div><b>${esc(tm.top.t)}</b><span>${esc(tm.top.why)}</span></div></div>`}}
+// why life and food went down on day r, read from the log: {hurt:{name:['no shelter ×2',...]}, food:['eaten 2','spoiled 1',...]}
+function dayWhy(r){const hurt={},food=[];const cnt={};
+  for(const l of G.log.slice().reverse()){if(l.r!==r)continue;let m=/^(.+?) takes (\d+) wounds? \((.+)\)\./.exec(l.t);
+    if(m){const k=m[1]+'|'+m[3];cnt[k]=(cnt[k]||0)+(+m[2]);continue}
+    m=/^☠ (.+?) dies \((.+)\)/.exec(l.t);if(m){const k=m[1]+'|'+m[2];cnt[k]=(cnt[k]||0)+1;continue}
+    if((m=/^Everyone eats \((\d+) food\)/.exec(l.t)))food.push(`eaten ${m[1]}`);
+    else if((m=/^(\d+) food spoils/.exec(l.t)))food.push(`${m[1]} spoiled overnight`);
+    else if((m=/(\d+) food and \d+ wood are ruined/.exec(l.t)))food.push(`${m[1]} ruined by rain`);
+    else if((m=/^Lean season: (\d+) food/.exec(l.t)))food.push(`${m[1]} lost to the lean season`)}
+  for(const k in cnt){const [nm,w]=k.split('|');(hurt[nm]=hurt[nm]||[]).push(`${w}${cnt[k]>1?' ×'+cnt[k]:''}`)}
+  return {hurt,food}}
 // run inside withState(state at the end of day r)
 function tomorrowInfo(r){const S=SCENARIOS[G.scen];const L=[];const n=r+1;const dieN={rain:'rain die',snow:'winter die',animals:'hungry-animals die'};
   if(n>G.rounds)return {lines:[{t:'This was the last day.'}],top:{t:'—',why:''}};
@@ -2852,18 +3784,25 @@ function plannedFood(){let n=0;for(const a of G.plan.acts){if(a.type==='gather')
 function threatAlt(i){const k=G.ev.threat[i];if(!k)return -1;const r=CARD[k].th.req||{};const n=r.alt?r.alt.length:1;for(let al=0;al<n;al++){if(targetWhy('threat',i,al))continue;if(!afford({id:-1,type:'threat',tgt:i,alt:al,pw:[]}))continue;return al}return -1}
 function haveText(r){if(!r)return '';const parts=[];const one=o=>{for(const x of o.items||[])parts.push(has(x)?`a ${(INVENTIONS[x]||{}).n}`:'');if(o.weapon)parts.push(`weapon ${G.weapon}`);for(const k in o.res||{})parts.push(`${G.res[k]-committed()[k]} ${RNAME[k]}`)};(r.alt||[r]).forEach(one);const p=[...new Set(parts.filter(Boolean))];return p.length?`you have ${p.join(', ')}`:"you have none of these"}
 // ---------- what can hurt tonight or at dawn ----------
+function wxFoodLoss(){const c=clouds();return Math.max(0,Math.floor(c.est)-G.camp.roof)}
 function clouds(){const S=SCENARIOS[G.scen];const wx=S.wx[G.round]||[];return {dice:wx,est:wx.filter(x=>x!=='animals').length*1.5+G.wx.rain+G.wx.snow}}
 function allPriorities(){const o=[];if(!planOpen())return o;const S=SCENARIOS[G.scen];const add=p=>{o.push(p);return p};
   const need=eatersNeed(),have=food(),planF=plannedFood();
   // near death: the hard rule
   for(const c of living()){if(c.npc||c.out)continue;const life=lifeLeft(c);if(!nearDeath(c))continue;
     add({w:100,red:true,icon:'😴',title:`${c.nm} must rest: ${life} ${life>1?'wounds':'wound'} from death`,why:`${c.human?'Put one of '+c.nm+'’s pawns on Rest':hum(c)?c.nm+'’s player should put a pawn on Rest':c.nm+' (computer) rests by itself'}: rest heals 1. If anyone dies, you all lose.`,act:{type:'rest',tgt:null},lead:c.i,done:restPlanned(c.i),confirm:`⚠ ${c.nm} is ${life} ${life>1?'wounds':'wound'} from death and not resting.`})}
+  // the story chapter's checkpoint (campaign only)
+  if(G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom'){const v=G.cmp.goal.value;const late=v.byDay&&G.round>=v.byDay-1;
+    if(v.build==='shelter'&&!hasShelter())add({w:92,red:late,icon:'📖',title:'Chapter goal: build the Shelter',why:`Build ▸ Shelter by the end of day ${v.byDay}. It costs wood: gather some first if you are short. Two pawns make it certain.`,act:{type:'build',tgt:{k:'shelter'}},done:G.plan.acts.some(x=>x.type==='build'&&x.tgt&&x.tgt.k==='shelter')});
+    if(v.explored&&G.stats.explored<v.explored){let t=null;try{const r=catRows('explore').find(x=>!x.why);if(r)t=r.tgt}catch(e){}
+      add({w:91,red:late,icon:'📖',title:`Chapter goal: explore (${G.stats.explored}/${v.explored} places)`,why:`Explore ${v.explored-G.stats.explored} more place${v.explored-G.stats.explored>1?'s':''} by the end of day ${v.byDay}. Each explored ❔ place turns over a new tile.`,act:t!=null?{type:'explore',tgt:t}:null,cant:t==null?'no unexplored place in reach':null,done:G.plan.acts.some(x=>x.type==='explore')})}}
   // food for tonight
-  const short=need-have-planF;
-  if(short>0){const fo=foodOpts();const f=fo[0];const enough=f&&f.food>=need-have-planF;
-    const why=`${need} food needed tonight, ${have} in store${planF?`, ${planF} planned`:''}. Anyone who goes hungry takes 2 wounds.`+(f?` Best source: ${f.title}, ${f.pawns} pawn${f.pawns>1?'s':''}${f.type==='gather'?'':' (a sure thing)'}, +${f.food} food${enough?' (enough for tonight)':''}.`:' No fish, birds or food reward in reach yet: explore to find some.');
-    add({w:95,red:true,key:'food',icon:'🍖',title:'Find food for tonight',why,act:f?{type:f.type,tgt:f.tgt,alt:f.alt}:null,cant:f?null:planF?'every food source in reach is already in the plan':'no food source in reach',done:false,confirm:`⚠ Only ${have+planF} of ${need} food for tonight: someone will go hungry (2 wounds).`})}
-  if(short<=0&&planF>0)add({w:95,info:true,done:true,icon:'🍖',title:`Food for tonight: covered (${have+planF} for ${need})`,why:''});
+  // rain above the roof ruins food before supper: count the likely loss too
+  const wxl=wxFoodLoss();const short=need+wxl-have-planF;
+  if(short>0){const fo=foodOpts();const f=fo[0];const enough=f&&f.food>=short;
+    const why=`${need} food needed tonight${wxl?` plus about ${wxl} the rain will likely ruin (clouds above your roof)`:''}, ${have} in store${planF?`, ${planF} planned`:''}. Anyone who goes hungry takes 2 wounds.`+(f?` Best source: ${f.title}, ${f.pawns} pawn${f.pawns>1?'s':''}${f.type==='gather'?'':' (a sure thing)'}, +${f.food} food${enough?' (enough for tonight)':''}.`:' No fish, birds or food reward in reach yet: explore to find some.');
+    add({w:95,red:true,key:'food',icon:'🍖',title:planF&&have+planF>=need?'More food: the rain will ruin some':'Find food for tonight',why,act:f?{type:f.type,tgt:f.tgt,alt:f.alt}:null,cant:f?null:planF?'every food source in reach is already in the plan':'no food source in reach',done:false,confirm:`⚠ Only ${have+planF} of ${need+wxl} food for tonight${wxl?' (with the rain)':''}: someone may go hungry (2 wounds).`})}
+  if(short<=0&&planF>0)add({w:95,info:true,done:true,icon:'🍖',title:`Food for tonight: covered (${have+planF} for ${need}${wxl?`, +${wxl} for rain`:''})`,why:''});
   if(short<=0&&(have+planF>need||G.res.food>0)){const sp=Math.max(0,G.res.food+planF-need);if(sp>0&&!has('cellar')&&!G.kept.m_boxes){const ck=living().find(c=>c.k==='cook');const hurt=living().some(c=>c.w>0);const rem=ck&&hurt&&ck.det>=2;
     add({w:34,info:true,icon:'🥫',title:`${sp} food will spoil tonight`,why:`Fresh food keeps only one night (dry food 🥫 keeps).${rem?` ${ck.nm}: Home Remedy heals 2 wounds for 1 food, and you are offered it at night.`:' Spend pawns on wood or exploring instead of more food.'}`,skill:rem&&ck.human&&!skillWhy(ck.i,'remedy')?`${ck.i}:remedy`:null})}}
   // shelter
@@ -2958,6 +3897,23 @@ function tutHtml(){if(UI.tut>=99||!G||G.round>1||!planOpen()||allAI())return '';
     '<b>The island is yours to read.</b> Every place has a number (❔3 is unexplored place 3). Tap one to see what you can do there.',
     '<b>Give every pawn a job</b> (or tap 💡 Suggest for a full plan), then press <b>Start the day</b>.'];
   const s=Math.min(UI.tut,steps.length-1);return `<div class="coach"><div class="cn">Tip ${s+1} of ${steps.length}</div><p>${steps[s]}</p><div class="cb">${s<steps.length-1?`<button class="btn xs" data-tut="next">Got it</button>`:''}<button class="btn xs ghost" data-tut="off">Hide tips</button></div></div>`}
+// ---------- the guided first game: one idea per screen, each shown once ----------
+UI.guide={on:false,seen:{}};
+const GUIDE={
+  plan1:'<b>How a day works.</b> Every day you <b>plan</b> first, then <b>watch the day play out</b>. This page shows what the camp needs tonight: <b>red rows are trouble</b>. Your goal is in the bar under the island (🎯). In the top bar, ♥ is the life of your most hurt castaway. Press <b>Next</b>.',
+  plan2:'<b>Give every pawn a job.</b> Each castaway has 2 pawns (workers); Friday and the dog are helpers. The <b>recommended job</b> comes with a reason: tap ✔ if you agree.',
+  plan3:'<b>Risks.</b> One pawn on a job rolls the dice (it can fail or hurt). Two pawns make it <b>certain</b>. Anything red is not covered today.',
+  plan4:'<b>Start the day.</b> The plan is fixed after this, and the day plays out scene by scene.',
+  event:'<b>An event card</b> comes every morning. Its <b>threat</b> sits in a slot and strikes later unless you send pawns to deal with it.',
+  act:'<b>Your jobs play out one by one.</b> Food and wood you win arrive in the evening, after every job is done.',
+  dice:'<b>Dice:</b> ✔ or ✖ says whether the job worked, 🩸 is a wound, ❓ draws an adventure card. Two pawns on a job means no dice.',
+  choice:'<b>Your choice.</b> Pick one of the buttons. The card text under it explains what each one does.',
+  weather:'<b>Weather.</b> Each cloud above your roof ruins 1 food and 1 wood. Snow also needs 1 wood each to keep warm.',
+  night:'<b>Night.</b> Everyone eats 1 food; anyone hungry takes 2 wounds. Without a shelter, everyone takes 1 wound.',
+  morning:'<b>Morale.</b> Each morning the first player (★) gains or loses <b>✊ determination</b>, the points you spend on skills. Low morale costs ✊; anyone who can’t pay takes a wound.',
+  prod:'<b>Production.</b> Your camp’s place gives its food and wood every morning, for free.',
+  daysum:'<b>End of the day:</b> what changed and why, and the one thing to do first tomorrow. <b>If any castaway dies, you all lose.</b>'};
+function guideTip(k){if(!UI.guide.on||UI.guide.seen[k]||!GUIDE[k]||!G||G.round>3)return '';return `<div class="coach gtip" role="note"><div class="cn">Tip</div><p>${GUIDE[k]}</p><div class="cb"><button class="btn xs" data-gtip="${k}">Got it</button><button class="btn xs ghost" data-gtip="off">No more tips</button></div></div>`}
 function tutAdvance(to){if(UI.tut<99)UI.tut=Math.max(UI.tut,to)}
 function tutDone(){UI.tut=99;try{localStorage.setItem('swi_tut','done')}catch(e){}}
 
@@ -2974,7 +3930,7 @@ function planHtml(){
   const bar=`<div class="wz-steps" aria-label="Planning: step ${st} of 4">${titles.map((t,k)=>`<button class="wz-s ${k+1<st?'done':k+1===st?'now':''}" data-pgo="${k+1}" ${k+1===st?'aria-current="step"':''}><i>${k+1<st?'✓':k+1}</i><span>${t}</span></button>`).join('')}</div>`;
   const head=`<h3 class="wz-t">${st}. ${titles[st-1]}</h3>`;
   const body=st===1?wzNeeds():st===2?wzAssign():st===3?wzReview():wzConfirm();
-  return `<div class="wz">${bar}${typeof netPlanBar==='function'?netPlanBar():''}${head}${body}</div>`}
+  return `<div class="wz">${bar}${typeof netPlanBar==='function'?netPlanBar():''}${guideTip('plan'+st)}${head}${body}</div>`}
 // ---------- plan step state ----------
 UI.ps={round:0,step:1,skip:[],pick:false};
 function pstep(){if(!G)return 1;if(UI.ps.round!==G.round){UI.ps={round:G.round,step:1,skip:[],pick:false};UI.sugWhy={}}return UI.ps.step}
@@ -2991,9 +3947,10 @@ function riskWords(a){const n=actNeed(a);const k=a.pw.length;if(k<n.need)return 
 function wzNeeds(){const need=eatersNeed(),have=food(),planF=plannedFood();const cl=clouds();const S=SCENARIOS[G.scen];const dieN={rain:'rain die',snow:'winter die',animals:'hungry-animals die'};
   const row=(ok,label,val,note)=>`<div class="nd ${ok?'ok':'bad'}"><b>${label}</b><span class="v">${val}</span><small>${note}</small></div>`;
   const low=living().filter(c=>!c.npc).sort((a,b)=>lifeLeft(a)-lifeLeft(b))[0];
-  let h=`<p class="wz-p">Before you give out jobs, look at what the camp needs today. Red means trouble tonight.</p>`;
+  let h='';
+  h+=goalCard();
   const ml=morningLines();if(ml.length)h+=`<div class="morn"><b>This morning:</b><ul>${ml.map(l=>`<li class="${l.c}">${esc(l.t)}</li>`).join('')}</ul></div>`;
-  h+=`<div class="needs">`+row(have+planF>=need,'Food for tonight',`${have+planF} of ${need}`,`Everyone eats 1 food at night. Hungry: 2 wounds each.${planF?` (${planF} of it is planned.)`:''}`)
+  h+=`<div class="needs">`+row(have+planF>=need+wxFoodLoss(),'Food for tonight',`${have+planF} of ${need}${wxFoodLoss()?' +'+wxFoodLoss():''}`,`Everyone eats 1 food at night. Hungry: 2 wounds each.${planF?` (${planF} of it is planned.)`:''}${wxFoodLoss()?` Rain above your roof will likely ruin about ${wxFoodLoss()} food first.`:''}`)
     +row(hasShelter(),'Shelter',hasShelter()?'yes':'none',hasShelter()?'Keeps you from sleeping in the open.':'Tonight everyone loses 1 life without one.')
     +row(cl.est<=G.camp.roof,'Roof',`${G.camp.roof}`,`Weather tonight: ${cl.dice.length?cl.dice.map(d=>dieN[d]).join(', '):'calm'}${G.wx.rain?` +${G.wx.rain} rain`:''}${G.wx.snow?` +${G.wx.snow} snow`:''}${G.wx.storm?' + a storm':''}. Each cloud above the roof ruins 1 food and 1 wood.`)
     +row(!G.ev.wait||BEAST[G.ev.wait].str<=G.weapon,'Weapon',`${G.weapon}`,G.ev.wait?`A ${BEAST[G.ev.wait].n} (strength ${BEAST[G.ev.wait].str}) attacks at dawn.`:'Used when you hunt or a beast attacks.')
@@ -3002,8 +3959,21 @@ function wzNeeds(){const need=eatersNeed(),have=food(),planF=plannedFood();const
   h+=th?`<h4>Threat cards</h4>${th}`:`<p class="muted small">No threat cards on the board.</p>`;
   const pr=priorities().filter(p=>!p.done&&!p.info);if(pr.length)h+=`<h4>What matters most today</h4><ol class="plist">${pr.map(p=>`<li class="${p.red?'red':''}" ${posAttr(p.act)}><b>${esc(p.title)}</b><span>${esc(p.why)}</span></li>`).join('')}</ol>`;
   const mates=mateHtml();if(mates)h+=mates;
-  h+=`<div class="daycard"><div class="dk">Your goal</div><b>${esc(SC().goal?SC().goal():S.x)}</b></div>`;
   return h}
+// the goal, its progress and how to work on it today: first thing on the planning page
+// the chapter's own checkpoint and how to reach it (story campaign)
+const CAMP_HOW={surviveDays:'Keep everyone alive: food for every night (fish and birds on the map), and rest anyone low on life.',build:'Build the <b>Shelter</b> (a job in Build). It costs wood, so gather wood first, and put 2 pawns on it to make it certain.',explored:'Send pawns to the ❔ places next to the land you know (Explore). Two pawns make it certain.',crosses:'Raise a <b>Cross</b> (a job in Build, 2 wood) on a different tile each time.',temple:'Explore until you find the temple, then search it (a Scenario job).'};
+function campCard(){const g=G.cmp.goal;const cp=campParts();const d=typeof campDef==='function'&&campDef();const v=g.value;const by=v.byDay||v.surviveDays;
+  const parts=cp.map(([l,h,n])=>`<li class="${(n===true?h:h>=n)?'ok':''}">${esc(l)} ${n===true?(h?'✓':'✗'):`${Math.min(h,n)}/${n}`}</li>`).join('');
+  const how=Object.keys(CAMP_HOW).filter(k=>v[k]).map(k=>CAMP_HOW[k]).join(' ');
+  const st=d&&d.stars?`<p class="cst">Stars: ${d.stars.slice(0,d.maxStars||3).map(s=>'☆ '+esc(s.text)).join(' · ')}</p>`:'';
+  return `<div class="daycard goal1"><div class="dk">📖 ${d?esc(d.title)+' · ':''}chapter goal · day ${G.round}${by?' of '+by:''}</div><b>${esc(g.text)}</b><ul class="cgp">${parts}</ul><p>${how}</p>${st}</div>`}
+function goalCard(){if(G.cmp&&G.cmp.goal&&G.cmp.goal.type==='custom')return campCard();const S=SCENARIOS[G.scen];let how='',btn='';
+  if(G.scen==='marooned'){const room=SCEN.marooned.pileRoom();const w=pileWhy(1);
+    how=`${has('fire')?'Fire is built.':'Build <b>Fire</b> (a job in Build).'} Add wood to the <b>signal pile</b> one stage a day (1, 2, 3, 4, then 5 wood): it must be full on day 10, 11 or 12.`;
+    const fw=Math.max(0,G.res.wood-committed().wood);btn=room?`<button class="btn sm pileb" data-a="pilemax" ${w?'aria-disabled="true"':''}>Add ${Math.max(1,Math.min(room,fw))} wood to the pile${fw<room&&fw>0?` (${room} finish today’s stage)`:''}</button>${w?`<small>${esc(w==='no spare wood'?`needs ${room} spare wood`:w)}</small>`:''}`:G.sc.pile>=15?'':'<small>Today’s pile stage is done.</small>'}
+  else how=esc(S.x);
+  return `<div class="daycard goal1"><div class="dk">🎯 Your goal · day ${G.round} of ${G.rounds}</div><b>${esc(SC().goal?SC().goal():S.x)}</b><p>${how}</p>${btn?`<div class="gb">${btn}</div>`:''}</div>`}
 // ---------- step 2: one pawn at a time ----------
 function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=curPawn();
   const row=`<div class="pawnrow">${list.map((p,k)=>{const a=G.plan.acts.find(x=>x.pw.includes(p.id));const on=cur&&cur.id===p.id;const col=p.c!=null?PCOL[p.c%6]:p.f?'#f3f3f3':'#8d8d8d';
@@ -3031,7 +4001,7 @@ function wzReview(){let h=`<p class="wz-p">Each job shows its risk. <b>Certain</
   if(!G.plan.acts.length)return h+`<p class="muted">Nothing planned yet. Go back to step 2, or press 💡 Plan it for me.</p>`;
   const W=UI.sugWhy||{};
   h+=`<div class="review">${G.plan.acts.slice().sort((x,y)=>ORDER_T.indexOf(x.type)-ORDER_T.indexOf(y.type)).map((a,k)=>{const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v} ${RNAME[r]}`).join(' + ');const why=W[JSON.stringify([a.type,a.tgt])];
-    const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)?` <button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">pay with ${a.pay==='fur'?'fur':'wood'}</button>`:'';
+    const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?` <button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">pay with ${a.pay==='fur'?'fur':'wood'}</button>`:'';
     return `<div class="rv" ${posAttr(a)}><div class="rv-n">${k+1}</div><div><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')}</div><div class="rsk">${riskWords(a)}</div>${cost?`<small>Costs ${cost}.${payT}</small>`:''}${why?`<small class="why">Why: ${esc(why)}.</small>`:''}</div></div>`}).join('')}</div>`;
   const pb=planProblems();if(pb.length)h+=`<div class="probs">${pb.slice(0,4).map(x=>`<div>• ${esc(x)}</div>`).join('')}</div>`;
   const open=priorities().filter(p=>!p.done&&!p.info&&p.act);if(open.length)h+=`<div class="notcov"><b>Not covered today:</b> ${open.map(p=>`<span class="${p.red?'red':''}">${esc(p.title)}</span>`).join(' · ')}</div>`;
@@ -3061,11 +4031,11 @@ function pawnsText(n,far){return n.roll?`${n.need} pawn${n.need>1?'s':''}: dice 
 function planLine(a){const n=actNeed(a);const k=a.pw.length;const dt=dtype(a);let chance;
   if(k<n.need)chance=`<b class="warn">needs ${n.need-k} more</b>`;else if(n.roll&&k<n.max){const o=dt?diceOdds(dt):{s:80,w:1,q:3};chance=`<b class="roll" title="One pawn fewer than sure: the dice decide. Add 1 more pawn for a sure success. A failure gives the leader 2 determination.">🎲 ${o.s}% success · ${o.w}-in-6 wound risk</b>`}else chance='<b class="sure">✔ sure</b>';
   const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v}${RICON[r]}`).join(' ');
-  const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)?`<button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">${a.pay==='fur'?'🧶 fur':'🪵 wood'}</button>`:'';
+  const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?`<button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">${a.pay==='fur'?'🧶 fur':'🪵 wood'}</button>`:'';
   return `<div class="pl" ${posAttr(a)}><span class="pli">${ACT_ICON[a.type]||'•'}</span><div class="plt"><b>${esc(actLabel(a))}</b><div class="plp">${a.pw.map(pid=>{const p=pawnInfo(pid);return p?chip(p,{rm:1,placed:1}):''}).join('')} ${chance} ${cost?`<span class="cost">${cost}</span>`:''} ${payT}</div></div></div>`}
 function catCount(k){try{return catRows(k).filter(r=>!r.why).length}catch(e){return 0}}
 // every job in a category: {type,tgt,alt,title,sub,why}
-function catRows(k){const o=[];const add=(type,tgt,title,sub,alt)=>{const why=targetWhy(type,tgt,alt||0,null);o.push({type,tgt,alt:alt||0,title,sub,why:why==='already planned'&&MULTI.includes(type)?null:why})};
+function catRows(k){const o=[];const add=(type,tgt,title,sub,alt)=>{const why=targetWhy(type,tgt,alt||0,null);const pl=why==='already planned'&&findAct(type,tgt);o.push({type,tgt,alt:alt||0,title,sub,why:why==='already planned'&&(MULTI.includes(type)||pl&&pl.pw.length<actNeed(pl).max)?null:why})};
   if(k==='build'){const tb=SRP_COST[Math.min(4,Math.max(2,G.np))];
     add('build',{k:'shelter'},'🏠 Shelter',`${tb.wood} wood or ${tb.fur} fur · no more wounds for sleeping outside`);add('build',{k:'roof'},'☂️ Roof +1',`${tb.wood+G.cost.roof} wood or ${tb.fur} fur · keeps 1 cloud off`);add('build',{k:'pal'},'🧱 Palisade +1',`${tb.wood+G.cost.pal} wood or ${tb.fur} fur · walls against beasts and storms`);add('build',{k:'weapon'},'🗡️ Weapon +1',`${1+G.cost.weapon} wood · for hunting and fights`);
     const invs=[...new Set(G.inv.board.concat(Object.keys(SCENARIOS[G.scen].invs||{})).concat(Object.keys(INVENTIONS).filter(x=>INVENTIONS[x].kind==='personal'&&G.chars.some(c=>c.k===INVENTIONS[x].owner&&!c.dead))))].filter(x=>x!=='cross'&&(!has(x)||invReq(x).multi));
@@ -3081,7 +4051,7 @@ function catRows(k){const o=[];const add=(type,tgt,title,sub,alt)=>{const why=ta
 const CAT_TIP={gather:'1 pawn rolls the dice (it may fail or hurt); 1 more pawn makes it sure. Places 2 steps from camp need +1 pawn. Numbers are the places on the map.',explore:'Explore a ❔ place next to the land you know. 1 pawn rolls the dice, 1 more makes it sure; 2 steps from camp: +1 pawn.',build:'Building rolls the dice with 1 pawn (4-in-6 wound risk!); 2 pawns make it sure.',threat:'Threat cards strike at the next dawn if they are still in the left slot. Dealing with one needs no dice.'};
 function catHtml(k){const rows=catRows(k);const ok=rows.filter(r=>!r.why),no=rows.filter(r=>r.why);const tip=CAT_TIP[k]?`<p class="cattip">ℹ️ ${CAT_TIP[k]}</p>`:'';
   const line=r=>{const key=encodeURIComponent(JSON.stringify({type:r.type,tgt:r.tgt,alt:r.alt}));const planned=findActAny(r.type,r.tgt,r.alt);const sel=UI.sel;const pw=sel&&!r.why?placeWhy(sel,r.type,r.tgt,r.alt):null;
-    return `<div class="job ${r.why?'no':''} ${planned?'has':''}" ${posAttr({type:r.type,tgt:r.tgt})}><div class="jt"><b>${esc(r.title)}</b><span>${esc(r.sub)}${r.why?` <em>(${esc(r.why)})</em>`:''}</span></div>${r.why?'':`<button class="btn add" data-place="${key}" ${pw?'disabled':''} title="${esc(pw||'Put '+(sel?pawnLabel(pawnInfo(sel)):'a pawn')+' on this')}">+</button>`}</div>`};
+    return `<div class="job ${r.why?'no':''} ${planned?'has':''}" ${posAttr({type:r.type,tgt:r.tgt})}><div class="jt"><b>${esc(r.title)}</b><span>${esc(r.sub)}${r.why?` <em>(${esc(r.why)})</em>`:''}</span></div>${r.why?'':`<button class="btn add" data-place="${key}" ${pw?'aria-disabled="true"':''} title="${esc(pw||'Put '+(sel?pawnLabel(pawnInfo(sel)):'a pawn')+' on this')}">+</button>`}</div>`};
   return tip+(ok.length?ok.map(line).join(''):'<p class="muted small">Nothing possible here right now.</p>')+(no.length?`<details class="later"><summary>Not possible yet (${no.length})</summary>${no.map(line).join('')}</details>`:'')}
 
 // the day so far, never ahead of the story
@@ -3695,6 +4665,7 @@ function onClick3D(e){const id=pickTile(e);if(id==null){if(typeof PHO!=='undefin
  *   GA.loop(name, {vol, fade}) / GA.stopLoop(name, {fade})         ambience beds
  *   GA.music(name|null, {vol, fade})                                 cross-fading background track
  *   GA.setSfx(on) GA.setMusic(on) GA.setVolume('sfx'|'music', 0..1)  persisted in localStorage
+ *   GA.setVolume('master', 0..1)  one level over everything (the shared settings panel sets it; default 1)
  *   GA.has(name) GA.playing() GA.state() GA.unlock() GA.names() GA.duration(name)
  * Samples are decoded lazily on the first user gesture (atob -> ArrayBuffer -> decodeAudioData, no fetch).
  */
@@ -3704,7 +4675,7 @@ function onClick3D(e){const id=pickTile(e);if(id==null){if(typeof PHO!=='undefin
   var S = {
     inited: false, key: 'ga', src: {}, kind: {}, buf: {}, failed: {}, pending: {},
     ctx: null, ctxOpt: null, out: null, sfxBus: null, musBus: null, duckBus: null,
-    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, last: {}, loops: {},
+    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, masterVol: 1, last: {}, loops: {},
     cur: null, curName: null, wantMusic: null, duckSet: {}, duckUntil: 0, unlocked: false, decoding: false
   };
   var DEFAULT_DUCK = ['win', 'lose', 'levelup', 'level', 'boom', 'ko', 'thunder', 'roar', 'smash', 'stomp', 'door', 'death', 'crit', 'crumble'];
@@ -3749,6 +4720,7 @@ function onClick3D(e){const id=pickTile(e);if(id==null){if(typeof PHO!=='undefin
     var t = S.ctx.currentTime;
     S.sfxBus.gain.setTargetAtTime(S.sfxOn ? S.sfxVol : 0, t, 0.02);
     S.musBus.gain.setTargetAtTime(S.musOn ? S.musVol : 0, t, 0.08);
+    S.out.gain.setTargetAtTime(S.masterVol, t, 0.02);
   }
 
   // Loops: skip encoder padding / near-silence at the edges so MP3 loops don't gap.
@@ -3824,6 +4796,7 @@ function onClick3D(e){const id=pickTile(e);if(id==null){if(typeof PHO!=='undefin
     S.sfxOn = lsGet('sfx', '1') !== '0'; S.musOn = lsGet('mus', '1') !== '0';
     S.sfxVol = clamp(lsGet('sfxvol', o.sfxVol != null ? o.sfxVol : 0.8), 0, 1);
     S.musVol = clamp(lsGet('musvol', o.musVol != null ? o.musVol : 0.5), 0, 1);
+    S.masterVol = clamp(lsGet('mastervol', 1), 0, 1);
     if (!S.inited && root.document && root.document.addEventListener) {
       ['pointerdown', 'keydown', 'touchstart', 'mousedown'].forEach(function (ev) {
         root.document.addEventListener(ev, onGesture, { capture: true, passive: true });
@@ -3935,11 +4908,11 @@ function onClick3D(e){const id=pickTile(e);if(id==null){if(typeof PHO!=='undefin
   }
   function setVolume(kind, v) {
     v = clamp(v, 0, 1);
-    if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
+    if (kind === 'master') { S.masterVol = v; lsSet('mastervol', v); } else if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
     applyVol(); return v;
   }
   function state() {
-    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, audio: !!S.ctx,
+    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, masterVol: S.masterVol, audio: !!S.ctx,
       ctxState: S.ctx ? S.ctx.state : 'none', decoded: Object.keys(S.buf).length, failed: Object.keys(S.failed),
       total: Object.keys(S.src).length, playing: S.curName, loops: Object.keys(S.loops) };
   }
@@ -4381,13 +5354,13 @@ PHO.boot=function(){PHO.apply();let t=0;const f=()=>{clearTimeout(t);t=setTimeou
   document.addEventListener('click',e=>{PHO._pawn=!!(e.target.closest&&e.target.closest('#ps [data-pawn],#ppop [data-pawn]'))},true);document.addEventListener('click',onClick);document.addEventListener('keydown',e=>{if(!PHO.on||e.key!=='Escape')return;if(PHO.zoom){closeZoom();e.stopImmediatePropagation();return}if(PHO.pop){PHO.closePop();e.stopImmediatePropagation()}},true)};
 PHO.apply=function(){const R=document.documentElement;const was=PHO.on,wasL=PHO.land;PHO.on=detect();R.classList.toggle('ph',PHO.on);
   const app=q('.gx-app');
-  if(!PHO.on){R.classList.remove('ph-l','ph-p');for(const k of['--bw','--bh','--rail','--sat','--sar','--sab','--sal'])R.style.removeProperty(k);
+  if(!PHO.on){R.classList.remove('ph-l','ph-p');for(const k of['--bw','--bh','--bhs','--rail','--sat','--sar','--sab','--sal'])R.style.removeProperty(k);
     if(typeof V3!=='undefined'){V3.ph=false;if(was&&V3.on&&V3.rad){V3.orbit.e=1.12;fitDist();placeCam()}}if(was){const c=q('#phchip');if(c)c.hidden=true;const v=q('#phview');if(v)v.hidden=true}return was}
   const w=innerWidth,h=innerHeight,I=insets();PHO.land=w>h;const aw=w-I.l-I.r;
   let bw,bh,rail=0;
   if(PHO.land){rail=w>=800?300:280;bw=aw-rail;bh=h-I.t-I.b}else{bw=aw;bh=Math.round(Math.max(aw*.75,Math.min(aw*.95,h-I.t-I.b-BAR-VIEW-296)))}
   R.classList.toggle('ph-l',PHO.land);R.classList.toggle('ph-p',!PHO.land);
-  const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--rail',rail);set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
+  const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--bhs',Math.max(170,Math.min(Math.floor(bh),Math.round(aw*.56))));set('--rail',rail);set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
   if(app)app.classList.remove('gx-dock-min','gx-sheet-full');
   // the chip sits in the bar (portrait) or in the view row under the bar (landscape rail)
   const chip=q('#phchip'),bar=q('.gx-bar'),pv=q('#phview');
@@ -4400,12 +5373,16 @@ function state(){if(!G||typeof UI==='undefined')return 'none';if(UI.modal==='sta
   if(G.over&&!UI.overSeen&&!storyActive())return 'over';if(storyActive())return 'story';
   if(planOpen()&&!allAI())return pstep()===2?'plan2':'plan';return 'wait'}
 function lowLife(){let m=99;for(const c of G.chars){if(c.npc&&G.scen!=='stranded')continue;if(c.dead)continue;m=Math.min(m,CHARS[c.k].die-c.w)}return m===99?0:m}
-function chipHtml(){let o={};withView(()=>{const need=eatersNeed(),have=food();o={d:G.round,r:G.rounds,f:have,need,w:G.res.wood,fur:G.res.fur,low:lowLife(),roof:G.camp.roof,pal:G.camp.pal,wp:G.weapon,sh:hasShelter()}});
+function chipHtml(){let o={};withView(()=>{const need=eatersNeed(),have=food();o={d:G.round,r:G.rounds,f:have,need,w:G.res.wood,fur:G.res.fur,low:lowLife(),roof:G.camp.roof,pal:G.camp.pal,wp:G.weapon,sh:hasShelter(),mo:G.morale}});
   const bad=(c,t)=>`<i class="${c?'bad':''}">${t}</i>`;
-  return {h:`<b>D${o.d}</b>${bad(o.f<o.need,'🍖'+o.f)}${bad(false,'🪵'+o.w)}${bad(o.low<=3,'♥'+o.low)}<i class="c-x">☂${o.roof}</i>`,
-    a:`Day ${o.d} of ${o.r}. Food ${o.f} (${o.need} needed tonight), wood ${o.w}, fur ${o.fur}. Lowest life ${o.low}. Roof ${o.roof}, palisade ${o.pal}, weapon ${o.wp}, ${o.sh?'shelter built':'no shelter'}. Tap for details.`,warn:o.f<o.need||o.low<=3}}
-function phaseLabel(){let t='';withView(()=>{const f=flowNow();const ph=f&&PHI(f.k)>=0?PH7[PHI(f.k)].n:'';t=`Day ${G.round}/${G.rounds}`+(storyActive()?(f&&f.k==='done'?' · done':ph?' · '+ph:''):planOpen()?' · plan':'')});return t}
-PHO.sync=function(){if(!PHO.on)return;const dock=q('.gx-dock'),app=q('.gx-app');if(!dock)return;const st=state();PHO.st=st;dock.dataset.phs=st;if(app)app.dataset.phs=st;
+  return {h:`<b>D${o.d}</b>${bad(o.f<o.need,'🍖'+o.f)}${bad(false,'🪵'+o.w)}${bad(o.low<=3,'♥'+o.low)}${o.mo<0?bad(true,'☹'+o.mo):`<i class="c-x">☂${o.roof}</i>`}`,
+    a:`Day ${o.d} of ${o.r}. Food ${o.f} (${o.need} needed tonight), wood ${o.w}, fur ${o.fur}. Lowest life ${o.low}. Morale ${o.mo}${o.mo<0?': the first player loses determination each morning, and wounds when they can’t pay':''}. Roof ${o.roof}, palisade ${o.pal}, weapon ${o.wp}, ${o.sh?'shelter built':'no shelter'}. Tap for details.`,warn:o.f<o.need||o.low<=3}}
+// the goal, short enough for the bar under the island
+function goalShort(){const cp=typeof campParts==='function'&&G.cmp?campParts():null;if(cp){const by=G.cmp.goal.value.byDay;return cp.map(([l,h,n])=>n===true?`${l} ${h?'✓':'✗'}`:`${l} ${Math.min(h,n)}/${n}`).join(' · ')+(by?` · by day ${by}`:'')}
+  const s=G.sc||{};switch(G.scen){case 'marooned':return `fire ${has('fire')?'✓':'✗'} · pile ${s.pile||0}/15`;case 'hexed':return `crosses ${(s.crosses||[]).length}/5`;
+  case 'stranded':return `raft ${has('jraft')?'✓':'✗'} · Ada ${s.rescued?'safe':'waiting'} · boat ${has('lifeboat')?'✓':'✗'}`;case 'settlers':return `home ${[hasShelter(),G.camp.roof>=1,G.camp.pal>=1,G.weapon>=1].filter(Boolean).length}/4 · tools ${(s.goals||[]).filter(has).length}/${(s.goals||[]).length}`}return ''}
+function phaseLabel(){let t='';withView(()=>{const f=flowNow();const ph=f&&PHI(f.k)>=0?PH7[PHI(f.k)].n:'';t=`🎯 ${goalShort()}`});return t}
+PHO.sync=function(){if(!PHO.on)return;const dock=q('.gx-dock'),app=q('.gx-app');if(!dock)return;const st=state();PHO.st=st;dock.dataset.phs=st;if(app){app.dataset.phs=st;app.dataset.dec=(st==='plan'||st==='plan2'||PHO.pop&&PHO.pop.k!=='status'||st==='story'&&typeof humanQ==='function'&&humanQ()&&storyIdx()>=UI.beats.length-1)?'1':''}
   const pv=q('#phview'),chip=q('#phchip');const show=!!G&&st!=='none'&&st!=='start';if(pv)pv.hidden=!show;if(chip)chip.hidden=!show;
   if(show){try{const c=chipHtml();if(chip.dataset.h!==c.h){chip.dataset.h=c.h;chip.innerHTML=c.h}chip.setAttribute('aria-label',c.a);chip.classList.toggle('warn',c.warn);
     const lb=q('#phlabel');if(lb)lb.textContent=phaseLabel();const cm=q('#phcamp');if(cm){const on=typeof V3!=='undefined'&&V3.phMode==='camp';cm.setAttribute('aria-label',on?'Show the whole island':'Centre on camp');cm.setAttribute('aria-pressed',on?'true':'false')}}catch(e){console.error(e)}}
@@ -4423,12 +5400,12 @@ function buildStrip(){const ps=q('#ps');if(!ps)return;if(PHO.st!=='plan2'){ps.hi
   const plan=G.plan.acts.length?`<div class="plan">${G.plan.acts.map(a=>planLine(a)).join('')}</div>`:'';
   const nm=cur?pawnNice(cur):'';
   const hint=cur?`<button class="btn go ps-go" data-ph="pawn">Give ${E(pawnLabel(cur).split(' ')[0])} a job</button><p class="ps-hint">Or tap a place on the island.</p>`:`<p class="ps-hint">Every pawn has a job. Tap a pawn to change its job, or press Next.</p>`;
-  const h=`<div class="ps-h"><b>Plan day ${G.round}</b><span>pawn ${cur?wizPawns().findIndex(p=>p.id===cur.id)+1:wizPawns().length} of ${wizPawns().length}</span></div>${net?net.outerHTML:''}${hint}${row?row.outerHTML:''}${plan?`<h4 class="ps-t">The plan so far</h4>${plan}`:''}`;
+  const h=`${typeof guideTip==='function'?guideTip('plan2'):''}<div class="ps-h"><b>Plan day ${G.round}</b><span>pawn ${cur?wizPawns().findIndex(p=>p.id===cur.id)+1:wizPawns().length} of ${wizPawns().length}</span></div>${net?net.outerHTML:''}${hint}${row?row.outerHTML:''}${plan?`<h4 class="ps-t">The plan so far</h4>${plan}`:''}`;
   ps.hidden=false;if(ps.dataset.h!==h){const t=ps.scrollTop;ps.innerHTML=h;ps.dataset.h=h;ps.scrollTop=t}}
 // ---------- pop-ups (in the free zone, never over the island) ----------
 function jobLine(r,rec){const key=encodeURIComponent(JSON.stringify({type:r.type,tgt:r.tgt,alt:r.alt}));const planned=findActAny(r.type,r.tgt,r.alt);const sel=UI.sel;const pw=sel&&!r.why?placeWhy(sel,r.type,r.tgt,r.alt):null;
   const isRec=rec&&rec.type===r.type&&JSON.stringify(rec.tgt)===JSON.stringify(r.tgt)&&(rec.alt||0)===(r.alt||0);
-  return `<div class="job ${r.why?'no':''} ${planned?'has':''} ${isRec?'rec1':''}" ${posAttr({type:r.type,tgt:r.tgt})}><div class="jt"><b>${isRec?'<u class="star">Recommended</u> ':''}${E(r.title)}</b><span>${E(r.sub)}${r.why?` <em>(${E(r.why)})</em>`:''}</span></div>${r.why?'':`<button class="btn add" data-place="${key}" ${pw?'disabled':''} aria-label="Give ${E(sel?pawnLabel(pawnInfo(sel)):'a pawn')} this job: ${E(r.title)}" title="${E(pw||'Give this job')}">+</button>`}</div>`}
+  return `<div class="job ${r.why?'no':''} ${planned?'has':''} ${isRec?'rec1':''}" ${posAttr({type:r.type,tgt:r.tgt})}><div class="jt"><b>${isRec?'<u class="star">Recommended</u> ':''}${E(r.title)}</b><span>${E(r.sub)}${r.why?` <em>(${E(r.why)})</em>`:''}</span></div>${r.why?'':`<button class="btn add" data-place="${key}" ${pw?'aria-disabled="true"':''} aria-label="Give ${E(sel?pawnLabel(pawnInfo(sel)):'a pawn')} this job: ${E(r.title)}" title="${E(pw||'Give this job')}">+</button>`}</div>`}
 function tileRows(id){const out=[];const cats=id===G.camp.pos?['build','camp','hunt','threat','special']:['gather','explore','build','special'];
   for(const k of cats){let rows=[];try{rows=catRows(k)}catch(e){}for(const r of rows){const onTile=(r.type==='gather'&&r.tgt&&r.tgt.pos===id)||(r.type==='explore'&&r.tgt===id)||(r.type==='build'&&r.tgt&&r.tgt.cross===id)||(r.type==='special'&&id===G.sc.temple&&r.tgt==='temple')||(id===G.camp.pos&&k!=='gather'&&k!=='explore'&&!(r.type==='build'&&r.tgt&&r.tgt.cross!=null));if(onTile)out.push(r)}}return out}
 function tileInfo(id){const t=tileAt(id),m=G.map[id];if(!t){if(m.down)return `<div class="ti"><b>A cut-off place</b><p>This place has broken away and can’t be used.</p></div>`;const reach=MAP[id].adj.some(p=>tileAt(p));
@@ -4438,12 +5415,13 @@ function tileInfo(id){const t=tileAt(id),m=G.map[id];if(!t){if(m.down)return `<d
 function pawnPickRow(){const wz=q('#panel .wz');const row=wz&&wz.querySelector('.pawnrow');return row?row.outerHTML:''}
 function popContent(){const p=PHO.pop;if(!p||!G)return null;
   if(p.k==='status')return {title:'Camp status',cls:'st'};
-  if(p.k==='pawn'){const wz=q('#panel .wz');if(!wz)return null;const c=wz.cloneNode(true);for(const s of['.wz-steps','.wz-t','.pawnrow','.sofar','.alldone','.hint','.netbar','.netturn','.netwait'])c.querySelectorAll(s).forEach(e=>e.remove());
+  if(p.k==='pawn'){const wz=q('#panel .wz');if(!wz)return null;const c=wz.cloneNode(true);for(const s of['.gtip','.wz-steps','.wz-t','.pawnrow','.sofar','.alldone','.hint','.netbar','.netturn','.netwait'])c.querySelectorAll(s).forEach(e=>e.remove());
     const cur=curPawn();return {title:cur?'A job for '+pawnNice(cur):'Jobs',html:c.innerHTML,cls:'pawn'}}
   if(p.k==='tile'){const id=p.id;let h=tileInfo(id);const plan=PHO.st==='plan2';
     if(plan){const cur=curPawn();const rec=cur?recPlan().map[cur.id]:null;const rows=tileRows(id);const ok=rows.filter(r=>!r.why),no=rows.filter(r=>r.why);
-      h+=`<div class="tp-for">${cur?'Giving a job to <b>'+E(pawnNice(cur))+'</b>':'Every pawn has a job'}${cur&&wizPawns().length>1?' · pick another pawn:':''}</div>${wizPawns().length>1?pawnPickRow():''}`;
+      h+=`<div class="tp-for">${cur?'Tap <b>+</b> to give <b>'+E(pawnNice(cur))+'</b> a job here:':'Every pawn has a job. Tap a pawn below to change its job.'}</div>`;
       h+=ok.length?`<div class="tjobs">${ok.map(r=>jobLine(r,rec)).join('')}</div>`:`<p class="muted">No job possible here right now.</p>`;
+      if(wizPawns().length>1)h+=`<div class="tp-for">${cur?'Or give the job to another pawn first:':''}</div>${pawnPickRow()}`;
       if(no.length)h+=`<details class="later"><summary>Not possible yet (${no.length})</summary>${no.map(r=>jobLine(r,rec)).join('')}</details>`}
     const t=tileAt(id);return {title:t?`Place ${id+1} · ${t.terr}`:`Place ${id+1}`,html:h,cls:'tile'}}
   return null}
@@ -4468,6 +5446,7 @@ function closeZoom(){PHO.zoom=false;const z=q('#pzoom');if(z){z.hidden=true;z.in
 function openZoom(el){const z=q('#pzoom');if(!z)return;const c=el.cloneNode(true);c.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));c.removeAttribute('data-pos');
   z.innerHTML=`<div class="zc" role="document"><button class="gx-ibtn zc-x" data-ph="zclose" aria-label="Close the card">×</button><div class="zc-b ${[...el.classList].join(' ')}">${c.innerHTML}</div></div>`;z.hidden=false;PHO.zoom=true}
 function onClick(e){if(!PHO.on)return;const t=e.target;if(!t.closest)return;
+  if(t.closest('#phlabel')&&G){PHO.pop&&PHO.pop.k==='status'?PHO.closePop():PHO.openPop({k:'status'});return}
   const b=t.closest('[data-ph]');
   if(b){const a=b.dataset.ph;
     if(a==='in'||a==='out'){if(typeof V3!=='undefined')phView(a);PHO.sync();return}
@@ -4546,7 +5525,7 @@ function wizSync(){if(planOpen()&&!allAI()){pstep();if(UI.ps.step!==2&&UI.sel&&!
 function stepFoot(){const st=pstep();const cur=st===2?curPawn():null;const list=st===2?wizPawns():[];const red=st===4?uncoveredRed():[];const pb=planProblems();
   const sug=`<button class="btn ghost" data-a="suggest" title="Give every pawn a job following today’s needs (H). You can change anything.">💡 Plan for me</button>`;
   const back=st>1?`<button class="btn ghost" data-a="pback">◀ Back</button>`:`<button class="btn ghost" data-a="clear" title="Take all your pawns off their jobs">Clear</button>`;
-  const txt=st===1?'Step 1 of 4: read what today needs, then give out jobs.':st===2?(cur?`Step 2 of 4 · Pawn ${list.findIndex(p=>p.id===cur.id)+1} of ${list.length}: ${pawnNice(cur)}. Take the recommended job or choose another.`:'Step 2 of 4: every pawn has a job.'):st===3?'Step 3 of 4: check the risk of each job.':pb.length?`Step 4 of 4: not ready yet. ${pb[0]}`:red.length?'Step 4 of 4: something urgent is not covered.':'Step 4 of 4: all set. Start the day!';
+  const txt=st===1?'Planning 1 of 4: read what today needs, then give out jobs.':st===2?(cur?`Planning 2 of 4 · Pawn ${list.findIndex(p=>p.id===cur.id)+1} of ${list.length}: ${pawnNice(cur)}. Take the recommended job or choose another.`:'Planning 2 of 4: every pawn has a job.'):st===3?'Planning 3 of 4: check the risk of each job.':pb.length?`Planning 4 of 4: not ready yet. ${pb[0]}`:red.length?'Planning 4 of 4: something urgent is not covered.':'Planning 4 of 4: all set. Start the day!';
   const next=st===1?`<button class="btn go" data-a="pnext" title="Step 2: give each pawn a job">Next: jobs ▶</button>`:st===2?`<button class="btn go ${cur&&cur.c!=null?'dim':''}" data-a="pnext" title="Step 3: check the risk of each job">Next: check ▶</button>`:st===3?`<button class="btn go ${pb.length?'dim':''}" data-a="pnext" title="Step 4: start the day">Next: start ▶</button>`:
     (typeof netOn==='function'&&netOn()?netStepBtn(pb,red):`<button class="btn go ${pb.length?'dim':''}" data-a="go" ${red.length?'data-force="1"':''} title="Start the day (Enter)">${red.length?'Start anyway ▶':'Start day ▶'}</button>`);
   return `<div class="st-t" id="steptext">${esc(typeof netOn==='function'&&netOn()&&st===4&&!pb.length?netStepText(red):txt)}</div><div class="st-b">${back}${sug}${next}</div>`}
@@ -4614,7 +5593,7 @@ function recentHtml(){return `<h3>Latest</h3><ol class="log">${G.log.slice(0,12)
 // ---------- modal: questions, reports, start, cards, rules, game over ----------
 function renderModal(){const m=$('#modal');if(!m)return;let h='';
   if(typeof NET!=='undefined'&&NET.gone)h=goneHTML();else if(typeof NET!=='undefined'&&NET.on&&NET.inLobby&&UI.modal!=='start')h=lobbyHTML();else if(UI.modal==='start')h=startHtml();else if(false)h=`<div class="mbox wide"><button class="x" data-a="close" aria-label="Close">×</button>${RULES_HTML}</div>`;
-  else if(!G)h='';else if(G.over&&!UI.overSeen&&!storyActive())h=overHtml();
+  else if(!G)h='';else if(G.over&&!UI.overSeen&&!storyActive()){if(typeof campOver==='function'&&campOver())h='';else h=overHtml()}
   m.hidden=!h;if(m.dataset.h!==h){m.innerHTML=h;m.dataset.h=h;const f=m.querySelector('[autofocus]')||m.querySelector('button.opt');if(f)f.focus()}}
 function questionHtml(){const q=G.q;let ctx='';
   if(q.kind==='dice'){const d=q.dice;ctx=`<div class="dice">${die('wound',d.w)}${die('success',d.s)}${die('adventure',d.q)}</div>`}
@@ -4638,6 +5617,8 @@ function closeMenu(){const m=$('#moremenu');if(m&&m.classList.contains('open')){
 const SCEN_ORDER=['marooned','hexed','stranded','settlers'];
 function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getItem(SAVE)}catch(e){}
   return `<div class="mbox wide start"><h2>Shipwreck Isle</h2><p class="lede">A co-operative survival game for 1–4 castaways. Plan every day together, build a camp, explore the island and hold out against the weather until your goal is done.</p>
+   <div class="mb guided"><button class="btn go big" data-a="story">📖 Story: learn the island chapter by chapter ▶</button><small>New here? Start with chapter 1: survive three days. Each chapter adds one new idea. ${typeof campLine==='function'?campLine():''}</small></div>
+   <h3 class="orfull">Or set up a full game</h3>
    ${saved?`<div class="mb"><button class="btn go" data-a="continue">Continue the saved game</button></div>`:''}
    ${typeof onlineBlock==='function'?onlineBlock():''}
    <h3>Scenario</h3><div class="scens">${SCEN_ORDER.map((k,ix)=>{const S=SCENARIOS[k];return `<button class="scen ${o.scen===k?'on':''}" data-scen="${k}"><b>${ix+1}. ${esc(S.n)}</b><small>${S.rounds} rounds</small><span>${esc(S.x)}</span></button>`}).join('')}</div>
@@ -4695,11 +5676,12 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   if(d.ans!=null){sfx('click');answer(+d.ans);return}
   if(d.do!=null){const p=priorities()[+d.do];if(p&&p.act){const before=placedIds();const r=p.can?doJob(p.act.type,p.act.tgt,p.act.alt,p.lead):p.move?applyMove(p):(p.cant||'Not possible now.');
       if(r)toast(r);else{sfx('place');tutAdvance(2);const who=[];for(const a of G.plan.acts){const ids=a.pw.filter(id=>!before.has(id));if(ids.length)who.push(`${pawnGroup(ids)} → ${actLabel(a)}`)}refresh();toast('Planned: '+who.join(' · ')+(p.move?` (${p.move.nm} left “${p.move.label}”)`:''),4000);return}}refresh();return}
-  if(d.cat){UI.cat=UI.cat===d.cat?null:d.cat;render();return}
+  if(d.cat){UI.cat=UI.cat===d.cat?null:d.cat;render();if(UI.cat){const c=document.querySelector('#ppop .catbody')||document.querySelector('#panel .catbody');if(c&&c.scrollIntoView)c.scrollIntoView({block:'nearest',behavior:'smooth'})}return}
   if(d.phx){UI.phx=UI.phx===d.phx?null:d.phx;renderRoadmap();return}
   if(d.pgo){setPStep(+d.pgo);render();return}
   if(d.pq!=null){const p=priorities()[+d.pq];const cur=curPawn();if(p&&p.act&&cur){const e=place(cur.id,p.act.type,p.act.tgt,p.act.alt);if(e)toast(e);else{sfx('place');UI.sugWhy[JSON.stringify([p.act.type,p.act.tgt])]=p.title;UI.sel=null;wizPlaced();refresh()}}return}
   if(d.tut){if(d.tut==='off')tutDone();else UI.tut++;render();return}
+  if(d.gtip){if(d.gtip==='off'){UI.guide.on=false;UI.guideOff=true}else UI.guide.seen[d.gtip]=1;sfx('click');refresh();return}
   if(d.place){const o=JSON.parse(decodeURIComponent(d.place));doPlace(o.type,o.tgt,o.alt);return}
   if(d.rm){unplace(d.rm);UI.sel=null;refresh();return}
   if(d.pawn&&b.closest('.pawnrow')&&placedIds().has(d.pawn)&&planOpen()){unplace(d.pawn);UI.sel=d.pawn;UI.ps.pick=true;refresh();return}
@@ -4730,13 +5712,13 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'sofar':e.preventDefault();UI.ps.sofar=!UI.ps.sofar;render();return;
   case 'retry':retryGame(d.easy==='1');return;case 'menu':toggleMenu();return;
   case 'clear':clearPlan(G.chars.filter(c=>c.human).map(c=>c.i));refresh();return;
-  case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const r=pileAdd(SCEN.marooned.pileRoom());if(r)toast(r);return}
+  case 'pile':{const r=pileAdd(1);if(r)toast(r);return}case 'pilemax':{const r=pileAdd(SCEN.marooned.pileRoom());if(r)toast('Can’t add wood now: '+r+'.');else{sfx('place');refresh()}return}
   case 'untile':UI.tileSel=null;render();return;
   case 'later':UI.openLater=!UI.openLater;e.preventDefault();render();return;
   case 'moveask':G.moveAsk=b.checked?1:0;return;
   case 'okreport':UI.report=null;render();return;
   case 'overok':UI.overSeen=true;render();return;
-  case 'new':openStart();return;case 'start':beginGame();return;case 'continue':loadSaved();return;
+  case 'new':openStart();return;case 'start':UI.guide.on=false;UI.cmpDef=null;beginGame();return;case 'story':campOpen();return;case 'guided':Object.assign(UI.setup,{scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:true,items:4,diff:'easy'});UI.guide={on:true,seen:{}};UI.cmpDef=null;beginGame();return;case 'continue':loadSaved();return;
   case 'rulesstart':UI.modal=null;$('#modal').hidden=true;$('#modal').dataset.h='';GX.show('rulesd');UI.backToStart=!G;return;
   case 'cards':GX.show('cardsd');renderCards();return;case 'rules':GX.show('rulesd');return;case 'close':UI.modal=G?null:'start';if(!G)$('#modal').dataset.h='';render();return;
   case 'snd':toggleSound();return;case 'mus':toggleMusic();return;
@@ -4754,11 +5736,37 @@ document.addEventListener('focusin',e=>{const t=e.target.closest&&e.target.close
 UI.setup={scen:'marooned',chars:['carpenter','cook'],ai:{},friday:true,dog:false,items:2,diff:'standard'};
 function openStart(){UI.modal='start';UI.overSeen=false;render();const m=$('#modal');m.hidden=false;m.innerHTML=startHtml();m.dataset.h=''}
 function beginGame(){const s=UI.setup;resetPlanSteps();UI.modal=null;UI.report=null;UI.overSeen=false;UI.sel=null;UI.tileSel=null;UI.fx.length=0;UI.fxSeen=0;
-  const all=s.chars.every(k=>s.ai[k]);newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff});UI.reportMark=G.logN;V3.layout=null;
+  const all=s.chars.every(k=>s.ai[k]);UI.cmpDone=false;newGame({scen:s.scen,chars:s.chars.slice(),humans:s.chars.map(k=>!s.ai[k]),mode:all?'ai':'solo',friday:s.friday,dog:s.dog,items:s.items,diff:s.diff,cmp:UI.cmpDef?{id:UI.cmpDef.id,goal:UI.cmpDef.goal,twist:UI.cmpDef.twist}:null,noIntro:!!UI.cmpDef});UI.reportMark=G.logN;V3.layout=null;
   for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};refresh()}
 function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;resetPlanSteps();UI.beats.length=0;UI.shown=-1;beat('dawn',{round:G.round});UI.modal=null;UI.reportMark=G.logN;V3.layout=null;for(const k in V3.tiles){V3.scene&&V3.scene.remove(V3.tiles[k].g)}V3.tiles={};if(G.scen==='stranded'&&!CHARS.ada)CHARS.ada={n:'Ada',die:11,arrows:[],skills:[],npc:1};refresh()}catch(e){toast('No saved game found.');openStart()}}
 function boot(){GX.init({key:'swi'});if(typeof PHO!=='undefined')PHO.boot();GX.onClose=id=>{if(id==='rulesd'&&UI.backToStart){UI.backToStart=false;openStart()}};GX.onShow=id=>{if(!G&&id!=='rulesd'&&id!=='cardsd'){GX.close();return}if(id==='cardsd')renderCards();if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(G)render()};paintIcons();try{init3D()}catch(e){console.error(e)}gfxBtn();soundBtns&&soundBtns();openStart()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+
+</script>
+<script>
+// ---------- story campaign: the shared chapter map (gx-campaign.js) wired to this game. Data: campaign.json ----------
+// A chapter is a normal game with the chapter's setup, plus its twist and checkpoint goal (scen.js: campSetup / campCheck).
+UI.cmpDef=null;UI.cmpDone=false;
+function campMetrics(g){return {won:!!(g.over&&g.over.win),rounds:g.round,wounds:g.stats.wounds,morale:g.morale,food:g.res.food+g.res.pfood,
+  explored:g.stats.explored,crosses:(g.sc.crosses||[]).length,adaWounds:g.sc.ada||0}}
+function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
+  GXC.init({game:'shipwreck',data:window.CAMPAIGN,
+    startChapter(def){const s=def.setup||{};const chars=(s.chars||['carpenter','cook']).slice();
+      UI.setup=Object.assign({},UI.setup,{scen:s.scen||'marooned',chars,ai:{},friday:s.friday!=null?s.friday:chars.length<=2,dog:!!s.dog,items:s.items!=null?s.items:2,diff:s.diff||'standard'});
+      UI.cmpDef=def;UI.guide={on:!!def.hints&&!UI.guideOff,seen:UI.guide.seen||{}};beginGame()},
+    isWon:g=>!!(g.over&&g.over.win),
+    metrics:campMetrics,
+    onExit(){openStart()},
+    seats:g=>g.chars.map((c,i)=>({name:c.nm,me:i===0}))})}
+function campOpen(){if(typeof GXC==='undefined')return;UI.modal=null;const m=$('#modal');if(m){m.hidden=true;m.innerHTML='';m.dataset.h=''}GXC.open()}
+// the game is over in a chapter: hand it to the campaign's result screen once
+function campOver(){if(typeof GXC==='undefined'||!GXC.active()||!G||!G.over)return false;if(!UI.cmpDone){UI.cmpDone=true;UI.overSeen=true;const g=G;setTimeout(()=>{try{localStorage.removeItem(SAVE)}catch(e){}GXC.finish(g)},400)}return true}
+// one line for the title: where the story stands
+function campLine(){try{if(typeof GXC==='undefined'||!window.CAMPAIGN)return '';const p=GXC.progress();const ch=window.CAMPAIGN.chapters;const n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;
+  if(!n)return '';const nx=ch.find(c=>!(p.ch[c.id]&&p.ch[c.id].beaten));return `<b>${n} of ${ch.length} chapters done${nx?`, next: “${esc(nx.title)}”`:''}.</b>`}catch(e){return ''}}
+// the chapter being played, for the goal bar and goal card
+function campDef(){return typeof GXC!=='undefined'&&GXC.active&&GXC.active()||null}
+campInit();
 
 </script>
 </body>
