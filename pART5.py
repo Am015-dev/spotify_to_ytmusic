@@ -6,4 +6,7 @@ RR("const g=new THREE.PlaneGeometry(w,L);g.rotateX(-Math.PI/2);const uv=g.attrib
 RR("const g=new THREE.PlaneGeometry(X.wa,X.wb);g.rotateX(-Math.PI/2);g.translate(X.x,.04,X.z);bt.add(g,jm)",
    "const g=new THREE.PlaneGeometry(X.wa,X.wb,Math.max(1,Math.ceil(X.wa/6)),Math.max(1,Math.ceil(X.wb/6)));g.rotateX(-Math.PI/2);g.translate(X.x,0,X.z);ART_drape(g,.04);bt.add(g,jm)")
 RR("yy=c==='hill'||S.hs?.22:.045","yy=c==='hill'||S.hs?.07:.045")
+# Athens crowds: 160 pedestrians spawning 15 m from the car read as a dense crowd at every crossing; same density as Frankfurt
+RR("const PED_N=CID==='fra'?70:160","const PED_N=CID==='fra'?70:70")
+RR("pedPlace(p,CID==='fra'?30:15,CID==='fra'?380:200)","pedPlace(p,30,CID==='fra'?380:260)")
 save()
