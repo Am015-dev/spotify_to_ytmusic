@@ -1915,7 +1915,7 @@ function poseInit(grp,fold){grp.children.forEach((c,i)=>{c.userData.p1=c.positio
 function poseApply(grp,v){grp.visible=v>.001;if(!grp.visible)return;for(const c of grp.children){const u=c.userData;if(!u.p1)continue;const k=clamp(v*1.7-u.ix*.7,0,1),f=k<=0?0:easeBack(k);c.position.lerpVectors(u.p0,u.p1,f);c.scale.copy(u.s1).multiplyScalar(Math.max(.04,f))}}
 function vehMode(s,dt){const ud=s.mesh.userData;if(!ud.carG)return;if(!ud.posed){poseInit(ud.boat,p=>p.set(p.x*.25,p.y+1.8,p.z*.5));poseInit(ud.wheels,p=>p.set(p.x*.3,p.y+1.3,p.z*.6));ud.posed=true}
   const want=s.boatMode?'boat':s.dirtMode?'4x4':'car';
-  if(want!==(s.vmode||'car')){s.vmode=want;if(s.isPlayer||near(s)){const at=s.mesh.position.clone();at.y+=1.4;debris(at,V3(0,6,0),10,teamCols(s.team),.4,at.y-4);burst(SPARK,at,24,14,.35,new THREE.Color(2,1.8,1));if(s.isPlayer){AU.sfx('brick');say('',want==='boat'?'BOAT':want==='4x4'?'4×4':'SHIP',.6)}}}
+  if(want!==(s.vmode||'car')){s.vmode=want;if(s.isPlayer||near(s)){const at=s.mesh.position.clone();at.y+=1.4;debris(at,V3(0,6,0),10,teamCols(s.team),.4,at.y-4);burst(SPARK,at,24,14,.35,new THREE.Color(2,1.8,1));if(s.isPlayer){AU.sfx('brick');say('',want==='boat'?'BOAT':want==='4x4'?'4×4':'CAR',.6)}}}
   const rt=dt*2.6;s.bt=clamp((s.bt||0)+(s.vmode==='boat'?rt:-rt),0,1);s.wt=clamp((s.wt||0)+(s.vmode==='4x4'?rt:-rt),0,1);
   poseApply(ud.boat,s.bt);poseApply(ud.wheels,s.wt);ud.carG.position.y=.6*s.bt+.35*s.wt;ud.under.visible=s.bt<.5&&!(ud.gbHid&&ud.gbHid.length);for(const rb of ud.ribbons)rb.visible=s.bt<.5&&!(ud.gbHid&&ud.gbHid.length);if(ud.gbV)CR_vis(s,ud)}
 function shipMesh(team){const g=new THREE.Group(),m=new THREE.Group();g.add(m);m.scale.setScalar(SHIP_K);
@@ -4814,7 +4814,7 @@ let CLOUDS=null;function cloudsOn(v){if(v&&!CLOUDS){const N=150,per=6,geo=new TH
 // ground layers below the road were only 1-2 cm apart (road 0, pavement -1 cm, grass -3 cm) and z-fought at distance: spread them out
 function hubLayerFix(){if(HUB.layerFixed)return;HUB.layerFixed=1;HUB.grp.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||!o.geometry)return;const g=o.geometry;if(!g.boundingBox)g.computeBoundingBox();const b=g.boundingBox;if(b.max.y-b.min.y>.005)return;const y=b.max.y+o.position.y;if(y<-.0045&&y>-.05)o.position.y+=y*5})}
 let hubShadow=false;function hubEnter(){buildHub();hubLayerFix();if(!HUB.grp.parent)scene.add(HUB.grp);if(ROOT)ROOT.visible=false;HUB.grp.visible=true;for(const o of TRM)for(const key in o)o[key].visible=false;if(typeof trShadow!=='undefined'){trShadow.visible=false;trGlow.visible=false;trLights.visible=false}
-  for(const k in PROP)PROP[k].visible=false;applyMood(CCF.mood);scene.fog.density=SET.q==='high'?.00016:.00024;cloudsOn(true);HUB.cull=null;if(SET.q==='high'){renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;moonL.castShadow=true;moonL.shadow.mapSize.set(2048,2048);const sc=moonL.shadow.camera;sc.left=-110;sc.right=110;sc.top=110;sc.bottom=-110;sc.near=50;sc.far=900;sc.updateProjectionMatrix();moonL.shadow.bias=-.0006;moonL.shadow.normalBias=.6;if(!moonL.target.parent)scene.add(moonL.target);RO.shadowOn=true;if(pl)pl.mesh.traverse(o=>{if(o.isMesh)o.castShadow=true});if(!HUB.shadowSet){HUB.shadowSet=1;HUB.grp.traverse(o=>{if(o.isInstancedMesh&&o.count<2000&&o.geometry.boundingBox&&o.geometry.boundingBox.max.y*(o.userData.ks||1)>2)o.castShadow=true;if(o.isMesh)o.receiveShadow=true})}}camera.far=SET.q==='high'?3400:2600;camera.near=1.2;camera.updateProjectionMatrix()}
+  for(const k in PROP)PROP[k].visible=false;applyMood(CCF.mood);scene.fog.density=SET.q==='high'?.00016:.00024;cloudsOn(true);HUB.cull=null;if(SET.q==='high'){renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;moonL.castShadow=true;moonL.shadow.mapSize.set(2048,2048);const sc=moonL.shadow.camera;sc.left=-110;sc.right=110;sc.top=110;sc.bottom=-110;sc.near=50;sc.far=900;sc.updateProjectionMatrix();moonL.shadow.bias=-.0006;moonL.shadow.normalBias=.6;if(!moonL.target.parent)scene.add(moonL.target);RO.shadowOn=true;if(pl)pl.mesh.traverse(o=>{if(o.isMesh)o.castShadow=true});if(!HUB.shadowSet){HUB.shadowSet=1;HUB.grp.traverse(o=>{if(o.isInstancedMesh&&o.count<2000&&o.geometry.boundingBox&&o.geometry.boundingBox.max.y*(o.userData.ks||1)>2)o.castShadow=true;if(o.isMesh)o.receiveShadow=true})}}camera.far=SET.q==='high'?3400:2600;camera.near=2;camera.updateProjectionMatrix()}
 function hubLeave(){cloudsOn(false);if(RO.shadowOn){moonL.castShadow=false;RO.shadowOn=false;renderer.shadowMap.enabled=false}if(camera.far!==9000||camera.near!==.4){camera.far=9000;camera.near=.4;camera.updateProjectionMatrix()}if(!HUB.grp)return;HUB.grp.visible=false;if(HUB.grp.parent)scene.remove(HUB.grp);if(ROOT)ROOT.visible=true;for(const o of TRM)for(const key in o)o[key].visible=true;if(typeof trShadow!=='undefined'){trShadow.visible=true;trGlow.visible=true;trLights.visible=true}for(const k in PROP)PROP[k].visible=true;if(hubShadow){moonL.castShadow=false;hubShadow=false}}
 function hubFrame(dt){if(!HUB.grp||!HUB.grp.visible)return}
 
@@ -5101,12 +5101,12 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.
     for(const sd of[-1,1])if(R()<.8)emit(SPARK,V3(RO.x-fx0*3+fz0*sd*2.2,RO.y+.3,RO.z-fz0*3-fx0*sd*2.2),V3(rr(-2,2)-fx0*6,rr(1,4),rr(-2,2)-fz0*6),.28,col)}
   // steering assist (touch): with no steering input at speed, gently line the car up with the road it is on
   if(SET.assist!=='off'&&!air&&!busy&&!RO.dDir&&RO.rdT&&RO.v>6&&Math.abs(c.steer)<.05){const a0=Math.atan2(RO.rdT[0],RO.rdT[1]);let e=angDiff(a0,RO.h);if(Math.abs(e)>Math.PI/2)e=angDiff(a0+Math.PI,RO.h);if(Math.abs(e)<.8)ytg+=e*1.5*clamp((sp-6)/14,0,1)*(1-Math.abs(e)/1.1)}
-  RO.yr=(RO.yr||0)+(ytg-(RO.yr||0))*Math.min(1,dt*(c.steer||RO.dDir?6.5:4.5));RO.h+=RO.yr*dt;
+  RO.yr=CR_yaw(c,dt,ytg,maxR,air);RO.h+=RO.yr*dt;
   // pinned (throttle on, barely moving): turn to the nearest open direction and roll off
   {const mv=Math.hypot(RO.x-(RO.stkX??RO.x),RO.z-(RO.stkZ??RO.z));RO.stkX=RO.x;RO.stkZ=RO.z;if((c.thr||boost||c.brk)&&!busy&&!air&&mv<dt*5)RO.stkT=(RO.stkT||0)+dt;else RO.stkT=Math.max(0,(RO.stkT||0)-dt*2);
    if(RO.stkT>.6){let best=null,bd=9;for(let k=1;k<16;k++){const ang=RO.h+(k%2?1:-1)*Math.ceil(k/2)*Math.PI/8,px=RO.x+Math.sin(ang)*7,pz=RO.z+Math.cos(ang)*7,N=roamTerr(px,pz,RO.y+.3);if(N.low||N.g>RO.y+1.4||roamHit(px,pz,2.4,RO.y)||(HUB.cars||[]).some(q=>!q.dead&&q.x!=null&&Math.hypot(q.x-px,q.z-pz)<5.5))continue;const d=Math.abs(angDiff(ang,RO.h));if(d<bd){bd=d;best=ang}}
      if(best!=null){RO.h=RO.vh=best;RO.yr=0;RO.v=Math.max(RO.v,10)}RO.stkT=0}}
-  const grip=(air?.6:terr==='water'?2.6:terr==='dirt'?(veh==='offroad'?8:2.6):13)*(RO.dDir?(terr==='road'?.15:.22):1);RO.vh=(RO.vh??RO.h)+angDiff(RO.h,RO.vh??RO.h)*Math.min(1,dt*grip);s.latV=Math.sin(angDiff(RO.h,RO.vh))*sp;
+  const grip=(air?.6:terr==='water'?2.6:terr==='dirt'?(veh==='offroad'?20:14):40)*(RO.dDir?(terr==='road'?.049:.22):1);RO.vh=(RO.vh??RO.h)+angDiff(RO.h,RO.vh??RO.h)*Math.min(1,dt*grip);s.latV=Math.sin(angDiff(RO.h,RO.vh))*sp;
   if(Math.abs(angDiff(RO.h,RO.vh))>.25&&sp>25&&!air&&(terr!=='road'))RO.v-=RO.v*.25*dt;
   const fx=Math.sin(RO.vh),fz=Math.cos(RO.vh);let nx=RO.x+fx*RO.v*dt,nz=RO.z+fz*RO.v*dt;
   const N=roamTerr(nx,nz,RO.y+.3);
@@ -5303,8 +5303,8 @@ function roamPose(s,dt){const ud=s.mesh.userData,fw=V3(Math.sin(RO.h),0,Math.cos
   s.bob=(s.bob||0)+dt*7;const bk=s.boatK=(s.boatK||0)+((s.boatMode?1:0)-(s.boatK||0))*Math.min(1,dt*5),dk=s.dirtK=(s.dirtK||0)+((s.dirtMode?1:0)-(s.dirtK||0))*Math.min(1,dt*6);
   let wH=0,wP=0,wR=0;if(bk>.02&&!s.air){const t=T,h0=waveH(RO.x,RO.z,t),fx=Math.sin(RO.h),fz=Math.cos(RO.h);wH=h0*bk;wP=Math.atan((waveH(RO.x+fx*3,RO.z+fz*3,t)-h0)/3)*1.6*bk;wR=Math.atan((waveH(RO.x+fz*2,RO.z-fx*2,t)-h0)/2)*1.6*bk}
   const hover=(s.air?0:1.6-1.05*bk-.25*dk+Math.sin(s.bob)*.14*SHIP_K+Math.sin(s.bob*.55)*.12*bk+wH)-(RO.landK||0)*.9;
-  RO.landK=Math.max(0,(RO.landK||0)-dt*3);const acc=(RO.v-(s.pv??RO.v))/Math.max(dt,1e-3);s.pv=RO.v;s.pitch=(s.pitch||0)+(clamp(acc*.004,-.09,.09)+wP-(s.pitch||0))*Math.min(1,dt*5);
-  const target=clamp(-CTL.steer*.32*Math.min(1,s.v/30)+(RO.dDir?RO.dDir*.22:0)+wR,-.6,.6);s.roll=(s.roll||0)+(target-(s.roll||0))*Math.min(1,dt*6);const cr=Math.cos(s.roll),sr=Math.sin(s.roll);
+  RO.landK=Math.max(0,(RO.landK||0)-dt*3);const acc=(RO.v-(s.pv??RO.v))/Math.max(dt,1e-3);s.pv=RO.v;s.pitch=(s.pitch||0)+(clamp(acc*.0012,-.035,.035)+wP-(s.pitch||0))*Math.min(1,dt*5);
+  const target=clamp(bk*(-CTL.steer*.32*Math.min(1,s.v/30)+(RO.dDir?RO.dDir*.22:0))+(1-bk)*CR_roll()+wR,-.6,.6);s.roll=(s.roll||0)+(target-(s.roll||0))*Math.min(1,dt*6);const cr=Math.cos(s.roll),sr=Math.sin(s.roll);
   let r2=rs.clone().multiplyScalar(cr).addScaledVector(us,sr),u2=us.clone().multiplyScalar(cr).addScaledVector(rs,-sr),f2=fw.clone();if(s.air){const pa=clamp(Math.atan2(RO.vy,Math.max(10,s.v))*.7,-.45,.45);const f3=f2.clone().multiplyScalar(Math.cos(pa)).addScaledVector(u2,Math.sin(pa));u2=u2.multiplyScalar(Math.cos(pa)).addScaledVector(f2,-Math.sin(pa));f2=f3}
   if(!s.air&&s.pitch){const pc=Math.cos(s.pitch),ps=Math.sin(s.pitch),f3=f2.clone().multiplyScalar(pc).addScaledVector(u2,ps);u2=u2.clone().multiplyScalar(pc).addScaledVector(f2,-ps);f2=f3}
   ud.m.quaternion.setFromRotationMatrix(_m.makeBasis(r2,u2,f2.clone().negate()));
@@ -5319,9 +5319,12 @@ function roamPose(s,dt){const ud=s.mesh.userData,fw=V3(Math.sin(RO.h),0,Math.cos
 let camSnap=false;
 const RCAM={chase:{b:8.5,bk:1.8,h:2.8,hk:.5,l:14,lk:8,ly:1.5,n:'CHASE'},close:{b:9,bk:3,h:3.2,hk:.8,l:10,lk:6,ly:1.8,n:'CLOSE'},far:{b:22,bk:6,h:7.5,hk:2,l:16,lk:10,ly:2,n:'FAR'},high:{b:16,bk:4,h:26,hk:4,l:10,lk:8,ly:0,n:'HIGH'},low:{b:10,bk:3,h:1.9,hk:.4,l:24,lk:10,ly:3,n:'LOW'}};
 function roamCamCycle(){const k=Object.keys(RCAM),i=(k.indexOf(SET.rcam||'chase')+1)%k.length;SET.rcam=k[i];saveSet();camSnap=true;feed('CAMERA · '+RCAM[k[i]].n,0,'#4ceaff')}
-function roamCam(dt){const C=RCAM[SET.rcam]||RCAM.chase;const k1=clamp(Math.abs(RO.v)/Math.max(30,RO.top||60),0,1.4);RO.camH=camSnap||RO.camH==null?RO.h:RO.camH+angDiff(RO.h,RO.camH)*Math.min(1,dt*(RO.dDir?2:3.4));const fw=V3(Math.sin(RO.camH),0,Math.cos(RO.camH)),p=V3(RO.x,RO.y,RO.z);
-  const bmax=C.b+C.bk*k1;let back=bmax;for(let d=2;d<=bmax;d+=1)if(roamHit(RO.x-fw.x*d,RO.z-fw.z*d,.6,RO.y+3)){back=Math.max(4,d-1.5);break}const want=p.clone().addScaledVector(fw,-back).add(V3(0,C.h+C.hk*k1+(pl&&pl.air?2:0),0));const sn=camSnap,k=sn?1:Math.min(1,dt*6);camSnap=false;camera.position.lerp(want,k);if(camera.position.y<RO.y+2)camera.position.y=RO.y+2;
-  {const vt=RO.vh??RO.h;RO.camL=sn||RO.camL==null?vt:RO.camL+angDiff(vt,RO.camL)*Math.min(1,dt*3);RO.camR=sn?0:(RO.camR||0)+((RO.yr||0)-(RO.camR||0))*Math.min(1,dt*3)}const vf=V3(Math.sin(RO.camL),0,Math.cos(RO.camL));camera.lookAt(p.clone().addScaledVector(vf,C.l+C.lk*k1).add(V3(0,C.ly,0)));camera.rotateZ(clamp(-RO.camR*.02,-.035,.035));if(shake>0){camera.position.x+=rr(-1,1)*shake*.5;camera.position.y+=rr(-1,1)*shake*.35}
+function roamCam(dt){const C=RCAM[SET.rcam]||RCAM.chase;const sn=camSnap;camSnap=false;const k1=clamp(Math.abs(RO.v)/Math.max(30,RO.top||60),0,1.4);
+  RO.camH=sn||RO.camH==null?RO.h:RO.camH+angDiff(RO.h,RO.camH)*Math.min(1,dt*(RO.dDir?3:CR_CAMK));const fw=V3(Math.sin(RO.camH),0,Math.cos(RO.camH)),p=V3(RO.x,RO.y,RO.z);
+  const bmax=C.b+C.bk*k1;let back=bmax;for(let d=2;d<=bmax;d+=.5)if(roamHit(RO.x-fw.x*d,RO.z-fw.z*d,1.5,RO.y+2.5)){back=Math.max(3.5,d-1);break}
+  RO.camB=sn||RO.camB==null||back<RO.camB?back:RO.camB+(back-RO.camB)*Math.min(1,dt*3);RO.camY=sn||RO.camY==null?RO.y:RO.camY+(RO.y-RO.camY)*Math.min(1,dt*10);
+  camera.position.set(RO.x-fw.x*RO.camB,RO.camY+C.h+C.hk*k1+(pl&&pl.air?2:0),RO.z-fw.z*RO.camB);if(camera.position.y<RO.y+2)camera.position.y=RO.y+2;
+  {const vt=RO.vh??RO.h;RO.camL=sn||RO.camL==null?vt:RO.camL+angDiff(vt,RO.camL)*Math.min(1,dt*CR_CAMK);RO.camR=sn?0:(RO.camR||0)+((RO.yr||0)-(RO.camR||0))*Math.min(1,dt*3)}const vf=V3(Math.sin(RO.camL),0,Math.cos(RO.camL));camera.lookAt(p.clone().addScaledVector(vf,C.l+C.lk*k1).add(V3(0,C.ly,0)));camera.rotateZ(clamp(-RO.camR*.02,-.035,.035));if(shake>0){camera.position.x+=rr(-1,1)*shake*.5;camera.position.y+=rr(-1,1)*shake*.35}
   if(RO.shadowOn){const d=V3(...MOOD.key[2]).normalize();moonL.position.set(RO.x,RO.y,RO.z).addScaledVector(d,400);moonL.target.position.set(RO.x,RO.y,RO.z);moonL.target.updateMatrixWorld()}fovKick*=Math.exp(-6*dt);const fv=68+({narrow:-6,normal:0,wide:8}[SET.fov]||0)+9*clamp(Math.abs(RO.v)/Math.max(30,RO.top||60),0,1.4)+(pl&&pl.nitro?5:0)+fovKick*.6;camera.fov+=(pFov(fv)-camera.fov)*Math.min(1,dt*4);camera.updateProjectionMatrix()}
 let CB={n:0,t:0,best:0};const comboMult=()=>CB.n>=50?5:CB.n>=25?3:CB.n>=10?2:1;
 function comboAdd(k){if(state!=='roam')return;const m0=comboMult();CB.n+=k;CB.t=2.8;const m1=comboMult();if(m1>m0){feed('CHAIN ×'+m1,0,'#ff2d95');AU.sfx('style');fovKick=Math.max(fovKick,4)}}
@@ -6003,7 +6006,7 @@ function LK_paint(){if(!pl||!pl.mesh||LK.plM===pl.mesh)return;LK.plM=pl.mesh;con
 {const _em=emit;emit=(pool,p,v,life,c)=>{if(pool===SPARK&&c&&c.isColor&&fxK()>0){c=c.clone().multiplyScalar(1.35);if(GLOWP&&Math.random()<.25)_em(GLOWP,p,v.clone().multiplyScalar(.5),life*.7,new THREE.Color(2.4,1.3,.4))}return _em(pool,p,v,life,c)}}
 {const _db=debris;debris=(at,vel,n,...r)=>{_db(at,vel,n,...r);if(n>=12&&fxK()>0&&typeof SMOKE!=='undefined'&&SMOKE)puff(at,4,new THREE.Color(.16,.15,.17),2.2,7,1.6,.5,1.5,5)}}
 {const _ex=explode;explode=(s,...r)=>{const o=_ex(s,...r);try{if(fxK()>0&&s&&s.mesh){const at=s.mesh.position.clone();puff(at,6,new THREE.Color(.1,.09,.1),3,10,2.4,.55,2,6);fireball(at,4,4,.6)}}catch(e){}return o}}
-const _lkF=new THREE.Vector3();function LK_boost(){if(state!=='roam'||!pl||!pl.nitro||!RO.on||fxK()===0||!FIREB)return;if((LK.bf=(LK.bf||0)+1)%2)return;const fx=Math.sin(RO.h),fz=Math.cos(RO.h);
+const _lkF=new THREE.Vector3();function LK_boost(){return;if(state!=='roam'||!pl||!pl.nitro||!RO.on||fxK()===0||!FIREB)return;if((LK.bf=(LK.bf||0)+1)%2)return;const fx=Math.sin(RO.h),fz=Math.cos(RO.h);
   for(const sd of[-1,1])emitS(FIREB,_lkF.set(RO.x-fx*3.2+fz*sd*1.1,RO.y+.9,RO.z-fz*3.2-fx*sd*1.1),V3(-fx*14+rr(-1,1),rr(0,1.5),-fz*14+rr(-1,1)),rr(.12,.22),new THREE.Color(.6,1.4,3.2),.9,.25,.6,false)}
 // ---- 5 · HUD polish (paint only: no sizes/positions change, so phone layouts are untouched)
 {const st=document.createElement('style');st.id='lkHud';st.textContent=`#roamGauge b{text-shadow:0 2px 0 rgba(0,0,0,.35),0 0 14px rgba(90,200,255,.35)}
@@ -8028,9 +8031,9 @@ function CR_rod(o={}){const A=[],R=o.body||'#d01712',Y=o.acc||'#fe8a18',K=CR_K,C
  sym('wM',-4,-7,0,K,wy('wM',.22));add('bump',-4,-9,0,CH,1);sym('bigl',-3,-8,0,R,3);
  add('P4x2',-2,-8,0,R,3);add('C4x2',-2,-8,0,R,4);add('B4x6',-2,-6,0,R,3);add('eng',-2,-6,0,CH,6);sym('stack',-3,-6,0,CH,3);sym('stack',-3,-4,0,CH,3);
  // cockpit + roll bar
- sym('B1x4',-3,-1,0,R,3);sym('B1x5',-4,-2,0,R,2);sym('flame',-4,-2,2,Y,5);add('drv',-1,-1,0,R,3);add('roll',-3,1,0,K,3);
+ sym('B1x4',-3,-1,0,R,3);sym('B1x5',-4,-2,0,R,2);add('drv',-1,-1,0,R,3);add('roll',-3,1,0,K,3);
  // rear: big wheels in tall arches, flat deck, flames, giant wing at the very back
- sym('arch',-4,3,0,R,1);sym('wL',-4,3,0,K,wy('wL',.36));sym('flame',-4,3,2,Y,7);sym('flame',-3,3,2,o.acc2||'#fac80a',7);
+ sym('arch',-4,3,0,R,1);sym('wL',-5,3,0,K,wy('wL',.36));
  add('B4x5',-2,2,0,R,2);add('P4x5',-2,2,0,R,5);add('T4x5',-2,2,0,R,6);
  add('T8x1',-4,7,0,K,1);sym('B2x1',-4,7,0,R,2);sym('tl',-4,7,2,R,4);sym('B1x1',-3,7,0,R,4);add('diff',-2,7,0,K,2);add('B4x1',-2,7,0,R,4);
  sym('pipes',-3,8,0,K,2);add('wing',-4,6,0,R,7);sym('fender',-4,-7,0,R,2);sym('sidep',-5,-2,0,K,1);add('nitro',-1,2,0,K,7);
@@ -8102,7 +8105,7 @@ const _crWP=new THREE.Vector3();
 function CR_clamp(w){let R=w.userData.root;if(!R){R=w;while(R.parent&&!R.parent.isScene)R=R.parent;w.userData.root=R}if(R===w||typeof state==='undefined'||state!=='roam')return;
  const e=w.matrixWorld.elements,s=Math.hypot(e[4],e[5],e[6])||1;w.getWorldPosition(_crWP);let g;try{g=groundY(_crWP.x,_crWP.z)}catch(x){return}if(!(g>-1e4)||Math.abs(g-R.position.y)>4)return;
  const bot=_crWP.y-w.userData.r*s,d=Math.max(-.35,Math.min(.35,g+.03-bot));if(Math.abs(d)>.004)w.position.y+=d/s;else if(Math.abs(w.position.y-w.userData.by)>.6/s)w.position.y=w.userData.by}
-CR_spin=(f=>function(o){f(o);o.userData.by=o.position.y;const ob=o.onBeforeRender;o.onBeforeRender=function(...a){CR_clamp(this);return ob.apply(this,a)}})(CR_spin);
+CR_spin=(f=>function(o){f(o);o.userData.by=o.position.y;const ob=o.onBeforeRender;o.onBeforeRender=function(...a){if(this.userData.crSim)return;CR_clamp(this);return ob.apply(this,a)}})(CR_spin);
 // ---------- city traffic in LEGO (instanced, body parts in white so each instance's paint tints them)
 function CR_van(o){const A=[],B=o.body,K=CR_K,add=(t,x,z,r,c,y)=>A.push([t,x,z,r,c,y]),sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},wy=(.12-GB_PC.wM.h*GB_PH/2)/GB_PH;
  add('T8x20',-4,-10,0,K,0);for(const z of[-9,5])sym('arch',-4,z,0,B,0),sym('wM',-4,z,0,K,wy);sym('B1x10',-4,-5,0,B,1);sym('B1x10',-4,-5,0,B,4);sym('B1x1',-4,-10,0,B,1);sym('hl',-4,-10,0,B,3);add('B6x1',-3,-10,0,K,1);add('C8x1',-4,-10,0,B,6);
@@ -8216,6 +8219,46 @@ function CR_mhud(){const q=document.getElementById('qTrk'),a=document.getElement
  const pz=document.getElementById('roamPause');if(!pz)return;for(const[k,id]of[['evr','qRst'],['eva','qAbn']]){const b=pz.querySelector(`[data-p="${k}"]`);if(!b)continue;if(on){b.hidden=false;b.dataset.crq=1}else if(b.dataset.crq){b.hidden=true;delete b.dataset.crq}
   if(!b.dataset.crb){b.dataset.crb=1;b.addEventListener('click',e=>{if(!document.body.classList.contains('crQ'))return;e.stopImmediatePropagation();const r=pz.querySelector('[data-p="resume"]');r&&r.click();setTimeout(()=>{const t=document.getElementById(id);t&&t.click()},60)},true)}}}
 setInterval(CR_mhud,250);
+
+
+const CR_WB=2.7,CR_CAMK=1/.15;
+function CR_yaw(c,dt,ytg,maxR,air){const v=RO.v||0,sp=Math.abs(v),st=clamp(c.steer||0,-1,1),base=-st*maxR*Math.sign(v||1),dm=.55/(1+sp/14),tg=st*dm,d0=RO.dl||0;
+ RO.dl=d0+(tg-d0)*Math.min(1,dt*(Math.abs(tg)>Math.abs(d0)&&tg*d0>=0?11:16));
+ if(RO.dDir||air)return(RO.yr||0)+(ytg-(RO.yr||0))*Math.min(1,dt*6.5);
+ const cap=Math.max(.35,maxR);return clamp(-(v/CR_WB)*Math.tan(RO.dl),-cap,cap)+(ytg-base)}
+const CR_roll=()=>clamp(-(RO.yr||0)*(RO.v||0)/26,-1,1)*.055;
+const CR_PS={};
+function CR_bodyPts(ud){const host=ud.m,key=host.uuid+'|'+(ud.gbM?ud.gbM.length:0)+'|'+(typeof CR_MODE!=='undefined'?CR_MODE:'');if(CR_PS.k===key)return CR_PS.p;
+ const inv=new THREE.Matrix4().copy(host.matrixWorld).invert(),B=new THREE.Box3(),bb=new THREE.Box3(),m4=new THREE.Matrix4();host.updateMatrixWorld(true);
+ host.traverse(o=>{if(!o.isMesh||o.userData.r)return;let v=true,q=o;while(q&&q!==host){if(!q.visible)v=false;q=q.parent}if(!v||o.material&&(o.material.transparent||o.material.depthWrite===false))return;
+  if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();bb.copy(o.geometry.boundingBox).applyMatrix4(m4.multiplyMatrices(inv,o.matrixWorld));B.union(bb)});
+ const P=[];if(!B.isEmpty())for(const x of[B.min.x,(B.min.x+B.max.x)/2,B.max.x])for(const z of[B.min.z,(B.min.z+B.max.z)/2,B.max.z])if(x!==(B.min.x+B.max.x)/2||z!==(B.min.z+B.max.z)/2)P.push(new THREE.Vector3(x,B.min.y,z));
+ CR_PS.k=key;CR_PS.p=P;CR_PS.b=B.isEmpty()?null:B.clone();return P}
+const _crA=new THREE.Vector3(),_crS=new THREE.Vector3();
+// no hover-ship leftovers on the player car: underglow, thruster ribbons/flares, stock ship parts and the 7 m ship shadow go;
+// a tight soft contact shadow sits under the body and BOOST lights flames at the tailpipes
+let CR_SH=null;
+function CR_shTex(){const c=document.createElement('canvas');c.width=64;c.height=128;const g=c.getContext('2d');g.shadowColor='rgba(0,0,0,.92)';g.shadowBlur=9;g.shadowOffsetX=400;g.fillStyle='#000';g.fillRect(12-400,12,40,104);const t=new THREE.CanvasTexture(c);if(typeof KEEP_TEX!=='undefined')KEEP_TEX.add(t);return t}
+function CR_fx(s,ud){const host=ud.m,boat=(s.boatK||0)>.5;if(ud.under)ud.under.visible=false;for(const r of ud.ribbons||[])r.visible=false;for(const f of ud.flares||[])f.visible=false;if(ud.shadow)ud.shadow.visible=false;
+ if(ud.carG)for(const o of ud.carG.children)if(o.visible&&!(o.userData.gb||o.userData.gbG||o.userData.crKeep||o===ud.boat||o===ud.wheels||Object.values(ud.gbV||{}).includes(o)))o.visible=false;
+ if(!CR_SH){CR_SH=new THREE.Mesh(new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:CR_shTex(),color:0,transparent:true,opacity:.6,depthWrite:false,fog:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));CR_SH.renderOrder=1;CR_SH.userData.keep=1;CR_SH.frustumCulled=false;scene.add(CR_SH)}
+ if(!CR_SH.parent)scene.add(CR_SH);CR_bodyPts(ud);const B=CR_PS.b;CR_SH.visible=!boat&&!!B&&state==='roam';
+ if(CR_SH.visible){host.getWorldScale(_crS);_crA.set((B.min.x+B.max.x)/2,B.min.y,(B.min.z+B.max.z)/2).applyMatrix4(host.matrixWorld);const g=groundAt(_crA.x,_crA.z,RO.y+1.5);
+  CR_SH.position.set(_crA.x,g+.025,_crA.z);CR_SH.rotation.y=RO.h;CR_SH.scale.set((B.max.x-B.min.x)*_crS.x*1.12,1,(B.max.z-B.min.z)*_crS.z*1.06);CR_SH.material.opacity=.6*clamp(1-(RO.y-g)/5,0,1)}
+ if(B&&!ud.crFl){const m=new THREE.MeshBasicMaterial({color:0xff8a1c,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false,fog:false}),geo=new THREE.ConeGeometry(.5,1,10).rotateX(Math.PI/2).translate(0,0,.5);
+  ud.crFl=[-1,1].map(sd=>{const c=new THREE.Mesh(geo,m);c.userData.crKeep=1;c.userData.sd=sd;c.visible=false;host.add(c);return c})}
+ if(ud.crFl&&B){const W=B.max.x-B.min.x,H=B.max.y-B.min.y,L=B.max.z-B.min.z,on=!!s.nitro&&!boat;for(const c of ud.crFl){c.visible=on;if(on){const k=.75+Math.random()*.5;c.position.set((B.min.x+B.max.x)/2+c.userData.sd*W*.2,B.min.y+H*.2,B.max.z-L*.01);c.scale.set(W*.07*k,W*.07*k,L*.2*k)}}}}
+
+// wheels on the ground + spin + steer, body never below the ground (runs every sim step, independent of rendering)
+function CR_carPose(s,dt){const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m)return;CR_fx(s,ud);if((s.boatK||0)>.5){RO.crPX=RO.x;RO.crPZ=RO.z;return}const host=ud.m,W=[];
+ host.traverse(w=>{if(!w.isMesh||!w.userData.r)return;let v=true,q=w;while(q&&q!==host){if(!q.visible)v=false;q=q.parent}if(v)W.push(w)});
+ if(!W.length){RO.crPX=RO.x;RO.crPZ=RO.z;return}if(s.air){for(const w of W){w.userData.crSim=1;w.updateMatrixWorld();w.getWorldScale(_crS);w.rotation.x-=(RO.v||0)*dt/(w.userData.r*_crS.y)}RO.crPX=RO.x;RO.crPZ=RO.z;return}s.mesh.updateMatrixWorld(true);const need=[];let mx=-9;
+ for(const w of W){w.userData.crSim=1;if(w.userData.by==null)w.userData.by=w.position.y;w.position.y=w.userData.by;w.updateMatrixWorld(true);w.getWorldPosition(_crA);w.getWorldScale(_crS);
+  const r=w.userData.r*_crS.y,g=groundAt(_crA.x,_crA.z,_crA.y+1),d=g+.005-(_crA.y-r);need.push([w,d,_crS.y,r]);mx=Math.max(mx,d)}
+ let lift=Math.max(Math.min(0,mx),mx-.22);
+ for(const p of CR_bodyPts(ud)){_crA.copy(p).applyMatrix4(host.matrixWorld);lift=Math.max(lift,groundAt(_crA.x,_crA.z,_crA.y+1.5)+.02-_crA.y)}
+ lift=clamp(lift,-.3,1.2);const gx=RO.x-(RO.crPX??RO.x),gz=RO.z-(RO.crPZ??RO.z);RO.crPX=RO.x;RO.crPZ=RO.z;let gd=gx*Math.sin(RO.h)+gz*Math.cos(RO.h);if(Math.abs(gd)>5)gd=0;host.position.y+=lift/(s.mesh.scale.y||1);
+ for(const[w,d,sc,r]of need){w.position.y=w.userData.by+clamp(d-lift,-.12,.22)/(sc/(w.scale.y||1));w.rotation.x-=gd/r;if(w.position.z<-.2){w.rotation.order='YXZ';w.rotation.y=-(RO.dl||0)}}}
 
 const GB_PRE=[['🛣 HOT ROD',CR_ROD,'car'],['⛰ MONSTER',CR_OFF,'4x4'],['🌊 AEGEAN',CR_BOAT,'boat'],['SPEEDSTER',CR_SPEED,'car']];const GB_PRE0=[['RACER',[['spoiler',-2,6,0,0],['exhaust',-2,5,0,10],['exhaust',1,5,0,10],['light',-1,-6,0,2],['b24',-4,0,0,11],['slope',-4,-2,0,0],['b12',-3,3,0,0],['tile',-1,1,0,9],['flag',-5,4,0,9]]],
  ['DOZER',[['b24',-3,-1,0,2],['b24',-5,-1,0,11],['b22',-3,3,0,2],['b24',-3,-1,0,11],['slope',-3,-3,0,2],['b22',-5,3,0,2],['b11',-6,1,0,0],['light',-6,-1,0,9],['exhaust',-1,4,0,10],['round',-4,5,0,11]]],
@@ -8765,5 +8808,16 @@ window.__mho={pin:()=>{const p=PIN_S.cur,N=QV.nav,t=PIN_navPt(),G=QV.g;let snap=
   get raceT(){return raceT},kAt:s=>kAt(TD,s),jumpAt:s=>jumpAt(TD,s),tdd,info:()=>({calls:renderer.info.render.calls,tris:renderer.info.render.triangles,progs:renderer.info.programs.length}),
   sim(n){if(state==='countdown'){cdT=0;state='race'}for(let i=0;i<n;i++){stepSim();raceT+=H;lapLogic();if(state!=='race'&&state!=='finished')break}},
   snap(){hitFx=0;flash=0;msgTimer=0;$('#msg').style.opacity=0;$('#sub').style.opacity=0;for(const s of ships)posShip(s,0,true);updateCam(0,true)},toResults(){showResults()},camStep(dt){for(const s of ships)posShip(s,dt);updateCam(dt)},camProbe(){const c=camera.position,p=pl;frameAt(TD,p.dist,F2);const al=c.clone().sub(F2.p).dot(F2.t),f=frameAt(TD,p.dist+al,mkF()),r2=c.clone().sub(f.p),m=p.mesh.position;frameAt(TD,p.dist,F2);return{cam:[c.x,c.y,c.z],l:r2.dot(f.r),up:r2.dot(f.u),ty:f.p.y,car:[m.x,m.y,m.z],ry:F2.p.clone().addScaledVector(F2.r,p.x).y,gy:TRK.city?athH(c.x,c.z):null,carGy:TRK.city?athH(m.x,m.z):null,HALF,air:!!p.air}}};
+
+roamPose=(f=>function(s,dt){f(s,dt);try{if(s===pl&&state==='roam'){CR_carPose(s,dt);const cp=camera.position;for(const st of RO.studs||[])if(st.alive&&st.m&&st.m.visible&&st.m.position.distanceToSquared(cp)<12.25)st.m.visible=false;for(const st of (typeof HUB!=='undefined'&&HUB.studFX)||[])if(st.alive&&st.m.visible){if(st.m.scale.x>.56)st.m.scale.setScalar(.55);if(st.m.position.distanceToSquared(cp)<20.25)st.m.visible=false}}else if(CR_SH&&state!=='roam')CR_SH.visible=false}catch(e){if(!CR_PS.e){CR_PS.e=1;console.warn('CR pose',e)}}})(roamPose);
+
+(()=>{const st=document.createElement('style');st.id='crToast';st.textContent=`
+html body #ogArea{left:auto!important;right:calc(12px + env(safe-area-inset-right,0px))!important;top:calc(10px + env(safe-area-inset-top,0px))!important;transform:none!important;max-width:200px!important;padding:4px 10px!important;border-radius:10px!important;text-align:right!important;font-size:12px!important}
+html body #ogArea b{font-size:13px!important;letter-spacing:.05em!important}html body #ogArea em{font-size:12px!important;display:inline!important;margin-left:6px}
+html body #ogArea .ogBar,html body #ogArea span{display:none!important}
+html body #speedFx#speedFx{filter:opacity(.5) hue-rotate(10deg) saturate(2.2)!important;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 44%,transparent 54%)!important;mask-image:linear-gradient(to bottom,#000 0%,#000 44%,transparent 54%)!important}
+html body #roamPlate#roamPlate{left:auto!important;right:calc(12px + env(safe-area-inset-right,0px))!important;top:calc(44px + env(safe-area-inset-top,0px))!important;transform:none!important;max-width:230px!important;padding:3px 10px!important;border-radius:10px!important;background:rgba(20,20,19,.86)!important;text-align:right!important;min-width:0!important;width:auto!important;height:auto!important}
+html body #roamPlate#roamPlate *{font-size:12px!important;line-height:1.25!important;letter-spacing:0!important}html body #roamPlate::before,html body #roamPlate::after{display:none!important}`;document.head.appendChild(st)})();
+OG_pop=(f=>function(a,first){f(a,first);OG.popT=Math.min(OG.popT||0,2)})(OG_pop);
 </script>
 </body></html>
