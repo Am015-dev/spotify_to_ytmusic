@@ -1959,7 +1959,7 @@ const _tq=new THREE.Quaternion(),_ts=V3(),_te=new THREE.Euler();
 const bxg=(w,h,d,x,y,z,rx=0)=>{const g=new THREE.BoxGeometry(w,h,d);if(rx)g.rotateX(rx);g.translate(x,y,z);return g};
 const cyg=(r1,r2,h,x,y,z,n=10)=>{const g=new THREE.CylinderGeometry(r1,r2,h,n);g.translate(x,y,z);return g};
 const lampG=(g,c)=>colorize(g,new THREE.Color(...c));
-function carParts(k){const P={body:[],glass:[],lamp:[],neon:[]},pods=(x,z,y=.16)=>{for(const sx of[-1,1])for(const sz of[-1,1]){P.body.push(cyg(.34,.28,.32,sx*x,y,sz*z));P.neon.push(cyg(.27,.27,.03,sx*x,y-.17,sz*z))}};
+function carParts(k){try{const q=CR_trParts(k);if(q)return q}catch(e){console.warn('CR traffic',e)}finally{CR_LO=0;CR_G=null;CR_W=null}const P={body:[],glass:[],lamp:[],neon:[]},pods=(x,z,y=.16)=>{for(const sx of[-1,1])for(const sz of[-1,1]){P.body.push(cyg(.34,.28,.32,sx*x,y,sz*z));P.neon.push(cyg(.27,.27,.03,sx*x,y-.17,sz*z))}};
   if(k<2){P.body.push(loft([[-2.5,.75,.16,.62],[-2.3,1.12,.3,.6],[-1.5,1.24,.36,.62],[1.5,1.24,.36,.64],[2.3,1.14,.3,.64],[2.5,.8,.18,.64]],{seg:20,n:3.2,hb:1}));
     P.glass.push(loft([[-1.3,.86,.04,.98],[-.7,1.0,.32,1.0],[.8,1.0,.3,1.0],[1.5,.85,.04,.98]],{seg:16,n:2.6,hb:.2}));pods(.95,1.6);
     P.lamp.push(lampG(bxg(1.9,.1,.08,0,.66,-2.49),[2.4,2.3,2]),lampG(bxg(2,.12,.08,0,.7,2.49),[2.4,.12,.16]));for(const sx of[-1,1])P.neon.push(bxg(.06,.07,3.8,sx*1.24,.36,0));
@@ -1972,7 +1972,7 @@ function carParts(k){const P={body:[],glass:[],lamp:[],neon:[]},pods=(x,z,y=.16)
     P.lamp.push(lampG(bxg(2.6,.16,.1,0,1.15,-6.5),[2.4,2.3,2]),lampG(bxg(3,.18,.1,0,.8,6.3),[2.4,.12,.16]));for(let i=-2;i<=2;i++)P.lamp.push(lampG(bxg(.2,.12,.1,i*.6,3.38,-3.12),[2.4,1.3,.2]));
     for(const sx of[-1,1])P.neon.push(bxg(.05,.55,8.2,sx*1.62,2.35,1.6))}
   const out={};for(const key in P){const gs=P[key].map(g=>{g=g.index?g:g;for(const n of Object.keys(g.attributes))if(!['position','normal','uv','color'].includes(n))g.deleteAttribute(n);if(key==='lamp'&&!g.attributes.color)colorize(g,new THREE.Color(1,1,1));if(key!=='lamp'&&g.attributes.color)g.deleteAttribute('color');return g.index?g.toNonIndexed():g});out[key]=mergeGeometries(gs)}return out}
-function buildTrafficMeshes(){const mats={body:new THREE.MeshStandardMaterial({color:0xffffff,roughness:.28,metalness:.75,envMapIntensity:1.6}),glass:new THREE.MeshStandardMaterial({color:0x0b1522,roughness:.06,metalness:.9,envMapIntensity:2.2,emissive:0x0a1a2a}),
+function buildTrafficMeshes(){const mats={body:new THREE.MeshPhysicalMaterial({color:0xffffff,vertexColors:true,roughness:.3,metalness:0,clearcoat:.8,clearcoatRoughness:.1,envMapIntensity:1.3}),glass:new THREE.MeshStandardMaterial({color:0x3a5a72,roughness:.05,metalness:.3,envMapIntensity:2.2,emissive:0x0a1a2a}),
     lamp:new THREE.MeshBasicMaterial({vertexColors:true,toneMapped:false}),neon:new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false})};
   _m.makeScale(0,0,0);for(let k=0;k<TRT.length;k++){const g=carParts(k),o={};for(const key in g){const im=new THREE.InstancedMesh(g[key],mats[key],TMAX);im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);im.frustumCulled=false;for(let i=0;i<TMAX;i++){im.setMatrixAt(i,_m);if(key==='body'||key==='neon')im.setColorAt(i,new THREE.Color(1,1,1))}scene.add(im);o[key]=im}TRM.push(o)}
   const pg=new THREE.PlaneGeometry(1,1);pg.rotateX(-Math.PI/2);
@@ -5079,7 +5079,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.
   if((RO.hp??100)<35&&R()<.25)puff(s.mesh.position.clone().add(V3(0,2.4,0)),1,_tipC.setRGB(.2,.2,.22),1,4,.9,.5,1,3);if((RO.hp??100)<15&&R()<.2)burst(SPARK,s.mesh.position.clone().add(V3(0,2,0)),4,8,.3,new THREE.Color(2,1.2,.4));
   if(RO.inv>0)s.mesh.visible=Math.floor(RO.inv*10)%2===0;else if(!s.mesh.visible)s.mesh.visible=true;const c=ctlPlayer(dt);CTL=c;const busy=RO.card||RO.mapOpen||RO.story;RO.hitCd=Math.max(0,(RO.hitCd||0)-dt);
   const T0=roamTerr(RO.x,RO.z,RO.y+.3),ground=T0.g,air=RO.y>ground+.5;const terr=FL_terr(T0,ground,dt);
-  const veh=FL_veh();const V85OFF=v85Off(dt);
+  const veh=FL_veh();
   const fit={ship:{road:1,dirt:.72,water:.78},boat:{road:.42,dirt:.38,water:1},offroad:{road:.93,dirt:1,water:.35}}[veh][terr];
   if(((RO.abF=(RO.abF||0)+1)&3)===1){const a=abAt(RO.x,RO.z);RO.onAB=!!a&&!!a.road.ab&&Math.abs(a.lat)<a.road.w/2+1&&RO.y<groundY(RO.x,RO.z)+14;RO.abRoad=RO.onAB?a.road.name:null;const q=RO.onAB?null:cityAt(RO.x,RO.z);RO.inCity=!RO.onAB&&(RO.x>HX0&&RO.x<HX1&&RO.z>HZS&&RO.z<HZN||!!q&&q.d<q.road.w/2+30);const rq=RO.onAB?a:q&&q.d<q.road.w/2+2?q:null;RO.rdT=rq?[rq.p.tx,rq.p.tz]:null}
   const lvl=carStat();const top=s.stats.top*.8*lvl.top,boost=c.boost&&s.bm>1&&!busy;RO.boosting=boost||RO.turbo>0;RO.turbo=Math.max(0,(RO.turbo||0)-dt);
@@ -5087,7 +5087,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.
   // hop: Space / HOP button
   if(pressed.fire){pressed.fire=false;if(!busy&&!air&&RO.vy<=0){RO.tutHop=true;RO.vy=12;RO.y+=.05;AU.sfx('launch');fovKick=Math.max(fovKick,4)}}
   if(air)RO.airT=(RO.airT||0)+dt;
-  if(busy)RO.v*=Math.max(0,1-dt*4);else if(!air){RO.bRamp=clamp((RO.bRamp||0)+(boost?dt*2.5:-dt*4),0,1);const tt=top*(1+(RO.inCity?.5:.3)*RO.bRamp)*(RO.turbo>0?1.25:1)*fit*V85OFF*(RO.onAB?1.22:RO.inCity?.62:.85);if(c.thr||boost||RO.turbo>0)RO.v+=(s.stats.acc*1.15*lvl.acc*Math.max(0,1-RO.v/tt)+20*RO.bRamp+(RO.turbo>0?16:0))*dt;else RO.v-=RO.v*.4*dt;if(c.park){RO.v-=Math.sign(RO.v)*Math.min(Math.abs(RO.v),60*dt);RO.bz=0}else if(c.brk){if(RO.v>0){RO.v=Math.max(0,RO.v-75*dt);RO.bz=0}else{RO.bz=(RO.bz||0)+dt;if(RO.bz>.7||RO.v<0)RO.v-=22*dt}}else RO.bz=0;RO.v=Math.max(-18,RO.v);if(RO.v>tt)RO.v-=(RO.v-tt)*1.5*dt}
+  if(busy)RO.v*=Math.max(0,1-dt*4);else if(!air){RO.bRamp=clamp((RO.bRamp||0)+(boost?dt*2.5:-dt*4),0,1);const tt=top*(1+(RO.inCity?.5:.3)*RO.bRamp)*(RO.turbo>0?1.25:1)*fit*(RO.onAB?1.22:RO.inCity?.62:.85);if(c.thr||boost||RO.turbo>0)RO.v+=(s.stats.acc*1.15*lvl.acc*Math.max(0,1-RO.v/tt)+20*RO.bRamp+(RO.turbo>0?16:0))*dt;else RO.v-=RO.v*.4*dt;if(c.park){RO.v-=Math.sign(RO.v)*Math.min(Math.abs(RO.v),60*dt);RO.bz=0}else if(c.brk){if(RO.v>0){RO.v=Math.max(0,RO.v-75*dt);RO.bz=0}else{RO.bz=(RO.bz||0)+dt;if(RO.bz>.7||RO.v<0)RO.v-=22*dt}}else RO.bz=0;RO.v=Math.max(-18,RO.v);if(RO.v>tt)RO.v-=(RO.v-tt)*1.5*dt}
   // boost pads
   for(const pd of RO.pads||[]){if(!air&&Math.hypot(pd.x-RO.x,pd.z-RO.z)<7&&(RO.padT||0)<=0){RO.turbo=Math.max(RO.turbo,1.8);RO.v=Math.max(RO.v,top*1.05);RO.padT=.8;award(s,'BOOST PAD',8,100,'#ffd12c');comboAdd(1);AU.sfx('boost');fovKick=Math.max(fovKick,10)}}RO.padT=Math.max(0,(RO.padT||0)-dt);
   // steering: target yaw rate eases in; sharper when slow, calmer when fast; velocity heading follows with surface grip (slight slide on dirt/water)
@@ -7858,20 +7858,20 @@ function GB_paint(b){const set=GB_hitBrick(b);if(!set.length)return 0;GB_snap();
 function GB_undo(){if(!GB_.undo.length)return 0;GB.d.bricks=JSON.parse(GB_.undo.pop());GB_refresh();AU.sfx('pick');return 1}
 // ---------- presets (built through the same snapping rules, so they sit on any chassis)
 // ---------- CAR1: LEGO-proportioned part library (1 stud = GB_U, 1 plate = GB_PH), bevelled glossy parts, glass, spinning wheels, Speed-Champions-style preset
-let CR_G=null,CR_W=null;const CR_E=.022,CR_K='#1b2a34',CR_DG='#3a4048';
-const CR_bb=(x0,x1,y0,y1,z0,z1,c,e=CR_E)=>{e=Math.min(e,(x1-x0)/3,(y1-y0)/3,(z1-z0)/3);const sh=new THREE.Shape();sh.moveTo(x0+e,y0+e);sh.lineTo(x1-e,y0+e);sh.lineTo(x1-e,y1-e);sh.lineTo(x0+e,y1-e);sh.closePath();
+let CR_G=null,CR_W=null,CR_LO=0;const CR_E=.022,CR_K='#1b2a34',CR_DG='#3a4048';
+const CR_bb=(x0,x1,y0,y1,z0,z1,c,e=CR_E)=>{if(CR_LO)return GB_box(x0,x1,y0,y1,z0,z1,c);e=Math.min(e,(x1-x0)/3,(y1-y0)/3,(z1-z0)/3);const sh=new THREE.Shape();sh.moveTo(x0+e,y0+e);sh.lineTo(x1-e,y0+e);sh.lineTo(x1-e,y1-e);sh.lineTo(x0+e,y1-e);sh.closePath();
  const g=new THREE.ExtrudeGeometry(sh,{depth:z1-z0-2*e,bevelEnabled:true,bevelThickness:e,bevelSize:e,bevelSegments:1,curveSegments:1});g.translate(0,0,z0+e);return GB_col(g,c)};
 // side profile [z,y] (or ['q',cz,cy,z,y] quadratic) extruded across x0..x1
-function CR_side(P,x0,x1,c,e=CR_E){const sh=new THREE.Shape();let f=1;for(const p of P){if(p[0]==='q'){sh.quadraticCurveTo(-p[1],p[2],-p[3],p[4])}else if(f){sh.moveTo(-p[0],p[1]);f=0}else sh.lineTo(-p[0],p[1])}sh.closePath();
- const g=new THREE.ExtrudeGeometry(sh,{depth:x1-x0-2*e,bevelEnabled:e>0,bevelThickness:e,bevelSize:e*.8,bevelSegments:1,curveSegments:8});g.rotateY(Math.PI/2);g.translate(x0+e,0,0);return GB_col(g,c)}
+function CR_side(P,x0,x1,c,e=CR_E){if(CR_LO)e=0;const sh=new THREE.Shape();let f=1;for(const p of P){if(p[0]==='q'){sh.quadraticCurveTo(-p[1],p[2],-p[3],p[4])}else if(f){sh.moveTo(-p[0],p[1]);f=0}else sh.lineTo(-p[0],p[1])}sh.closePath();
+ const g=new THREE.ExtrudeGeometry(sh,{depth:x1-x0-2*e,bevelEnabled:e>0,bevelThickness:e,bevelSize:e*.8,bevelSegments:1,curveSegments:CR_LO?3:8});g.rotateY(Math.PI/2);g.translate(x0+e,0,0);return GB_col(g,c)}
 // top outline [x,z] extruded y0..y1
-function CR_top(P,y0,y1,c,e=CR_E){const sh=new THREE.Shape();P.forEach((p,i)=>i?sh.lineTo(p[0],p[1]):sh.moveTo(p[0],p[1]));sh.closePath();
+function CR_top(P,y0,y1,c,e=CR_E){if(CR_LO)e=0;const sh=new THREE.Shape();P.forEach((p,i)=>i?sh.lineTo(p[0],p[1]):sh.moveTo(p[0],p[1]));sh.closePath();
  const g=new THREE.ExtrudeGeometry(sh,{depth:y1-y0-2*e,bevelEnabled:true,bevelThickness:e,bevelSize:e*.8,bevelSegments:1,curveSegments:1});g.rotateX(Math.PI/2);g.translate(0,y1-e,0);return GB_col(g,c)}
-const CR_stud=(M,x,y,z,c)=>{M.push(GB_cyl(.18,.11,x,y,z,c,12));M.push(GB_cyl(.15,.02,x,y+.11,z,c,12))};
+const CR_stud=(M,x,y,z,c)=>{if(CR_LO)return;M.push(GB_cyl(.18,.11,x,y,z,c,12));M.push(GB_cyl(.15,.02,x,y+.11,z,c,12))};
 const CR_studs=(M,w,d,y,c,ok)=>{for(let i=0;i<w;i++)for(let j=0;j<d;j++){const x=(i+.5-w/2)*GB_U,z=(j+.5-d/2)*GB_U;if(!ok||ok(x,z))CR_stud(M,x,y,z,c)}};
 const CR_WH={wS:{r:.62,w:.6,rim:.36},wM:{r:.76,w:.72,rim:.46},wL:{r:.9,w:.9,rim:.56},wXL:{r:1.25,w:1.2,rim:.62}};
 const CR_wgeo={};
-function CR_wheel(t){if(CR_wgeo[t])return CR_wgeo[t];const W=CR_WH[t],r=W.r,hw=W.w/2,ri=W.rim,A=[];
+function CR_wheel(t){if(CR_LO){const k=t+'lo';if(CR_wgeo[k])return CR_wgeo[k];const W=CR_WH[t],a=new THREE.CylinderGeometry(W.r,W.r,W.w,10);a.rotateZ(Math.PI/2);const b=new THREE.CylinderGeometry(W.rim,W.rim,W.w*1.02,8);b.rotateZ(Math.PI/2);return CR_wgeo[k]=mergeGeometries([GB_col(a,'#17191c'),GB_col(b,'#a9b0b8')])}if(CR_wgeo[t])return CR_wgeo[t];const W=CR_WH[t],r=W.r,hw=W.w/2,ri=W.rim,A=[];
  // tyre: lathe around x (rounded shoulders, slightly bulged tread)
  const tp=[[ri*.98,-hw*.92],[r*.9,-hw],[r*.985,-hw*.82],[r,-hw*.5],[r,hw*.5],[r*.985,hw*.82],[r*.9,hw],[ri*.98,hw*.92]].map(p=>new THREE.Vector2(p[0],p[1]));
  const ty=new THREE.LatheGeometry(tp,28);ty.rotateZ(Math.PI/2);A.push(GB_col(ty,'#17191c'));
@@ -8092,6 +8092,21 @@ const CR_RB={};
 function CR_rivB(team){const id=team&&team.id;if(!id||id.startsWith('cu_'))return null;if(CR_RB[id])return CR_RB[id];let A;
  if(CR_RIVS[id])A=CR_RIVS[id][1]();else if(team.a){const h=[...id].reduce((a,ch)=>a+ch.charCodeAt(0),0);A=h%2?CR_car({body:team.a,acc:team.b||'#f4f4f4',wing:team.b}):CR_rod({body:team.a,acc:team.b||'#fac80a'})}else return null;
  return CR_RB[id]=A.map(([t,x,z,r,c,y])=>({t:t==='drv'?'drvR':t,x,z,y,r:r%4,m:0,c}))}
+
+// ---------- city traffic in LEGO (instanced, body parts in white so each instance's paint tints them)
+function CR_van(o){const A=[],B=o.body,K=CR_K,add=(t,x,z,r,c,y)=>A.push([t,x,z,r,c,y]),sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},wy=(.12-GB_PC.wM.h*GB_PH/2)/GB_PH;
+ add('T8x20',-4,-10,0,K,0);for(const z of[-9,5])sym('arch',-4,z,0,B,0),sym('wM',-4,z,0,K,wy);sym('B1x10',-4,-5,0,B,1);sym('B1x10',-4,-5,0,B,4);sym('B1x1',-4,-10,0,B,1);sym('hl',-4,-10,0,B,3);add('B6x1',-3,-10,0,K,1);add('C8x1',-4,-10,0,B,6);
+ add('ws6',-3,-9,0,B,6);sym('B1x14',-4,-9,0,B,6);sym('B1x14',-4,-9,0,B,9);add('B6x11',-3,-6,0,B,6);add('B6x11',-3,-6,0,B,9);add('T8x16',-4,-6,0,B,12);sym('tl',-4,9,2,B,3);add('B6x1',-3,9,0,B,1);sym('B1x1',-4,9,0,B,1);
+ add('T6x1',-3,9,0,K,4);return A}
+function CR_truck(o){const A=[],B=o.body,K=CR_K,W='#f4f4f4',add=(t,x,z,r,c,y)=>A.push([t,x,z,r,c,y]),sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},wy=(.12-GB_PC.wL.h*GB_PH/2)/GB_PH;
+ add('T8x32',-4,-16,0,K,0);for(const z of[-15,5,10])sym('arch',-4,z,0,K,0),sym('wL',-4,z,0,K,wy);add('bump',-4,-17,0,'#d8dde4',1);
+ add('B8x6',-4,-16,0,B,1);add('B8x6',-4,-16,0,B,4);add('ws6',-3,-16,0,B,7);sym('B1x3',-4,-16,0,B,7);add('B8x3',-4,-13,0,B,7);add('T8x6',-4,-16,0,B,12);sym('hl',-4,-17,0,B,2);sym('stack',-4,-11,0,'#d8dde4',7);
+ add('B8x21',-4,-10,0,W,3);add('B8x21',-4,-10,0,W,6);add('B8x21',-4,-10,0,W,9);add('B8x21',-4,-10,0,W,12);add('T8x21',-4,-10,0,W,15);sym('tl',-4,11,2,K,1);return A}
+function CR_trParts(k){if(k>3)return null;const T=TRT[k],Wt='#ffffff';let A=k===0?CR_car({body:Wt,acc:Wt,wing:CR_K,noWing:1}):k===1?CR_car({body:Wt,acc:CR_K,noWing:1,x:[['sign',-1,-1,0,'#ffd12c',13]]}):k===2?CR_van({body:Wt}):CR_truck({body:Wt});
+ const br=A.map(([t,x,z,r,c,y])=>({t:t==='drv'?'drvR':t,x,z,y,r:r%4,m:0,c})).filter(b=>!['drvR','stw','mir','lp'].includes(b.t));CR_LO=1;CR_G=[];CR_W=[];const M=[],L=[];for(const b of br)GB_brickGeo(b,M,L);const G=CR_G;CR_G=null;
+ for(const w of CR_W){const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);M.push(g)}CR_W=null;
+ const box=new THREE.Box3().setFromBufferAttribute(mergeGeometries(M).attributes.position),wid=box.max.x-box.min.x,s=T.wid/wid,fix=g=>{g.translate(0,-box.min.y,0);g.scale(s,s,s);return g};
+ CR_LO=0;const tiny=y=>GB_col(new THREE.BoxGeometry(.01,.01,.01).translate(0,y,0),'#ffffff');return{body:fix(mergeGeometries(M)),glass:G.length?fix(mergeGeometries(G)):tiny(-.5),lamp:L.length?fix(mergeGeometries(L)):tiny(-.5),neon:tiny(-.5)}}
 
 const GB_PRE=[['🛣 HOT ROD',CR_ROD,'car'],['⛰ MONSTER',CR_OFF,'4x4'],['🌊 AEGEAN',CR_BOAT,'boat'],['SPEEDSTER',CR_SPEED,'car']];const GB_PRE0=[['RACER',[['spoiler',-2,6,0,0],['exhaust',-2,5,0,10],['exhaust',1,5,0,10],['light',-1,-6,0,2],['b24',-4,0,0,11],['slope',-4,-2,0,0],['b12',-3,3,0,0],['tile',-1,1,0,9],['flag',-5,4,0,9]]],
  ['DOZER',[['b24',-3,-1,0,2],['b24',-5,-1,0,11],['b22',-3,3,0,2],['b24',-3,-1,0,11],['slope',-3,-3,0,2],['b22',-5,3,0,2],['b11',-6,1,0,0],['light',-6,-1,0,9],['exhaust',-1,4,0,10],['round',-4,5,0,11]]],
@@ -8436,16 +8451,6 @@ body.v85 #tL{left:max(28px,calc(16px + env(safe-area-inset-left,0px)))!important
 body.v85 #tG,body.v85 #tN{right:max(28px,calc(14px + env(safe-area-inset-right,0px)))!important}body.v85 #tP{left:max(28px,calc(10px + env(safe-area-inset-left,0px)))!important}
 `;
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);document.body.classList.add('v85');
-// off-road limit while a timed quest or sprint race runs: stay on a street, the quest route, or near a gate
-let v85offT=0;
-function v85Off(dt){let target=1;try{const q=RO.ch&&RO.ch.v2,sp=RO.sp;if((q||sp)&&!RO.onAB&&!(pl&&pl.air)&&!RO.frozen){const x=RO.x,z=RO.z,c=cityAt(x,z);let free=!!c&&c.d<c.road.w/2+9;
-   if(!free&&q){const st=q.L.st[q.si||0],P=st&&st.R&&st.R.P;if(P)for(let i=0;i<P.length-1;i++){const ax=P[i][0],az=P[i][1],bx=P[i+1][0],bz=P[i+1][1],dx=bx-ax,dz=bz-az,l2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-ax)*dx+(z-az)*dz)/l2)),ex=ax+dx*t-x,ez=az+dz*t-z;if(ex*ex+ez*ez<324){free=true;break}}}
-   if(!free&&sp&&sp.G)for(const g of sp.G)if(g&&Number.isFinite(g.x)&&(g.x-x)**2+(g.z-z)**2<900){free=true;break}
-   if(!free)target=.35}}catch(e){}
-  RO.v85o=(RO.v85o==null?1:RO.v85o)+(target-(RO.v85o==null?1:RO.v85o))*Math.min(1,dt*3);
-  if(target<1&&Math.abs(RO.v)>12){v85offT-=dt;if(v85offT<=0){v85offT=3.5;feed('OFF ROUTE · SLOWED',0,'#ff7a3c')}}
-  return RO.v85o}
-window.v85Off=v85Off;
 // verbs for the one objective line
 window.v85Verb=function(ch){if(!ch)return'';const k=ch.kind;return({speed:'Radar',chase:'Catch',drift:'Drift',longjump:'Jump',smash:'Smash',m1:'Deliver'}[k])||'Go'};
 // brief overlays: the mission / district / result cards show for 5 s at start and end, then get out of the way
