@@ -54,6 +54,9 @@ const CHECKS = () => {
   const v = viewSeat(), f = focusSeat(); if (v < 0) return bad; const q = G.players[f];
   const txt = e => e ? e.textContent.trim() : null;
   if (document.documentElement.scrollWidth > innerWidth + 1 || document.body.scrollWidth > innerWidth + 1) bad.push(['hscroll', document.documentElement.scrollWidth + ' > ' + innerWidth]);
+  { const box = document.querySelector('#rs .rsbox'), br = box && !document.querySelector('#rs').hidden ? box.getBoundingClientRect() : null;
+    document.querySelectorAll('#rs button, #acts button, #qbox button').forEach(e => { if (e.closest('[hidden]') || e.closest('.rsbody') && e.closest('.rsbody').scrollWidth <= e.closest('.rsbody').clientWidth && false) return; const r = e.getBoundingClientRect(); if (r.width < 2) return;
+      const inBox = br && e.closest('#rs'); if (r.right > innerWidth + 1 || r.left < -1 || (inBox && (r.right > br.right + 1 || r.left < br.left - 1))) bad.push(['cut-off', (e.dataset.a || e.className) + ' "' + e.textContent.trim().slice(0, 18) + '" ' + Math.round(r.left) + '-' + Math.round(r.right) + (inBox ? ' box ' + Math.round(br.left) + '-' + Math.round(br.right) : '')]); }); }
   if (!document.querySelector('.boomfx')) {
     const me = document.querySelector('#me'); if (me && !hotSeat()) {
       const sv = [...me.querySelectorAll('.st')].find(e => e.title === 'Victory points'), sr = [...me.querySelectorAll('.st')].find(e => e.title === 'Rubies');

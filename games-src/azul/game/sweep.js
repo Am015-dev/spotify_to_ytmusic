@@ -34,7 +34,7 @@ async function turnChecks(p,ctx,o){
   const sc=await p.evaluate(()=>G.pl.map(q=>{const e=document.querySelector(`[data-bfsc="${q.i}"]`);return {want:'★'+q.score,got:e&&e.textContent}}));
   await chk(sc.every(x=>x.want===x.got),'on-screen scores = engine',ctx,'scores '+JSON.stringify(sc),p);
   const cov=await p.evaluate(()=>{const bad=[];for(const e of document.querySelectorAll('.bf-t[role=button],[data-bf],.bf-chip,[data-bfcell],.bf-row[role=button],.bf-k.can')){const r=e.getBoundingClientRect();if(r.width<4||r.height<4)continue;const cs=getComputedStyle(e);if(cs.visibility==='hidden'||cs.display==='none')continue;
-      const x=r.left+r.width/2,y=r.top+r.height/2;if(x<0||y<0||x>innerWidth||y>innerHeight){bad.push('offscreen '+e.className);continue}const t=document.elementFromPoint(x,y);if(!t||!(t===e||e.contains(t)||t.contains(e)))bad.push((e.dataset.k||e.className)+' covered by '+(t?t.tagName+'.'+String(t.className).slice(0,24):'none'))}return bad});
+      const x=r.left+r.width/2,y=r.top+r.height/2;if(x<0||y<0||x>innerWidth||y>innerHeight){bad.push('offscreen '+e.className);continue}const t=document.elementFromPoint(x,y);if(!t||!(t===e||e.contains(t)||t.contains(e))){const q=t&&t.getBoundingClientRect();bad.push((e.dataset.k||e.className)+' '+[r.left,r.top,r.width,r.height].map(Math.round)+' covered by '+(t?t.tagName+'.'+String(t.className).slice(0,24)+' '+t.dataset.k+' '+[q.left,q.top,q.width,q.height].map(Math.round):'none'))}}return bad});
   await chk(!cov.length,'no tappable covered',ctx,cov.slice(0,3).join('; '),p);
   if(o.noGlow){// non-glowing piece: my wall cell in the offer phase must not move the game
     const before=await st(p);await tapEl(p,'.bf-me .bf-wall .bf-c');await sleep(250);const after=await st(p);await chk(sameState(before,after),'tap on non-glowing piece is inert',ctx,'game advanced',p);
@@ -134,13 +134,13 @@ async function storyGame(b,id,vp){const [w,h]=vp;const p=await newPage(b,w,h,CH_
     const e=p.errs.splice(0);await chk(!e.length,'no console/page errors',ctx+' t'+turns,e.join(' | ').slice(0,300),p)}
   const fin=await p.evaluate(()=>({over:!!G.over,inv:checkInvariants(),won:G.over&&G.over.win.includes(0)}));
   await chk(fin.over,'story game finishes',ctx,'not over',p);await chk(!fin.inv.length,'engine invariants',ctx,fin.inv.join('; '),p);
-  if(fin.over){await sleep(2600);const res=await p.evaluate(()=>!!document.querySelector('.gxc-res,[class*=gxc-res]'));await chk(res,'chapter result screen appears',ctx,'no result screen',p)}
+  if(fin.over){let res=false;for(let k=0;k<100&&!res;k++){await sleep(200);res=await p.evaluate(()=>!!document.querySelector('.gxc-res-on .gxc-res'))}await chk(res,'chapter result screen appears',ctx,'no result screen',p)}
   const e=p.errs.splice(0);await chk(!e.length,'no console/page errors',ctx+' end',e.join(' | ').slice(0,300),p);await p.context().close()}
 
 (async()=>{const b=await chromium.launch();const t0=Date.now();
-  const jobs=[];const VPS=[[390,763],[375,553]];
-  for(let i=0;i<(process.env.NOGAMES?0:GAMES);i++)jobs.push(()=>playGame(b,i,VPS[i%2],false));
-  for(let i=0;i<(process.env.NOGAMES?0:ROT);i++)jobs.push(()=>playGame(b,1000+i,VPS[i%2],true));
+  const jobs=[];const VPS=process.env.VP?[process.env.VP.split('x').map(Number)]:[[390,763],[375,553]];
+  for(let i=0;i<(process.env.NOGAMES?0:GAMES);i++)jobs.push(()=>playGame(b,i,VPS[i%VPS.length],false));
+  for(let i=0;i<(process.env.NOGAMES?0:ROT);i++)jobs.push(()=>playGame(b,1000+i,VPS[i%VPS.length],true));
   for(const id of process.env.NOSTORY?[]:process.env.ONLY?process.env.ONLY.split(','):QUICK?['c3']:['c1','c3','c10'])for(const vp of VPS)jobs.push(()=>storyGame(b,id,vp));
   let next=0;const workers=Array.from({length:CONC},async()=>{while(next<jobs.length){const j=jobs[next++];try{await j()}catch(e){await fail('sweep crashed',String(e.message).slice(0,80),e.stack.split('\n').slice(0,3).join(' '),null)}}});
   await Promise.all(workers);await b.close();

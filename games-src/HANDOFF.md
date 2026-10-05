@@ -11,13 +11,21 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Don't edit the Mainhattan / Overdrive games; other sessions own them. Ticket to Ride is on hold.
 - Read the root `CLAUDE.md` (lessons learnt + cost rules), then `games-src/BRIEF-2d-games.md`.
 
-## NOW (4 Oct, evening) — start here
-- Goal of the next session: finish **Sunglaze** then **Cauldron Fair** to the blind-tester bar in `CLAUDE.md`.
-  Their board-first work is on branches `board/sunglaze` (preview `games/sunglaze-next/`, fun 2.93) and
-  `board/cauldron-fair` (PR #47 open; preview `games/cauldron-fair/`).
-- All other cloud sessions are archived and all scheduled triggers deleted. Unfinished board-first branches (do not
-  touch this round): board/kaiten-kitchen, board/nebula-aces, board/short-fuse, board/crown-city-smash,
-  board/shipwreck-isle, board/doorkick-dungeon.
+## NOW (5 Oct) — start here
+Goal: EVERY shelf game gets story mode and works on a phone in portrait, landscape and after rotating
+(skip Mainhattan/Overdrive and Ticket to Ride).
+- Done: Sunglaze (`sunglaze-next`) and Cauldron Fair (`cauldron-fair`) have story mode and the rotation fix, both live
+  on their previews. Shipwreck Isle (`shipwreck-isle-next`) has story mode.
+- In progress: one-round fixes on Sunglaze (hint, rival scoring, no-fit kilns) and Cauldron Fair (big explosion,
+  rival brew, one after-round screen), each with its own `sweep.js`; `games-src/scripts/phone-check.js` (all games,
+  portrait/landscape/rotation, no AI) → `phone-check-results.md`.
+- Next, 2 helpers at a time, one game each = rotation fix (pattern in CLAUDE.md) + story mode wiring
+  (template: `games-src/azul/game/src/campaign.js`, `games-src/cauldron-fair/src/ui8.js`, `games-src/shell/CAMPAIGN.md`);
+  deploy to the preview only after phone-check passes:
+  1. games failing phone-check that already have `campaign.json` (final-approach, hollowbough, kaiten, lantern-dive,
+     short-fuse, thornbound, tidewake, carc, ft, kot, munch, xw);
+  2. the rest of those;
+  3. games with no campaign yet (write `campaign.json` + `CAMPAIGN-DESIGN.md` first).
 
 ## Where things stand (4 Oct 2026)
 - **Thornbound** is the quality pilot. It has blind playtests (`games-src/thornbound/playtest-1/`) and the spec
