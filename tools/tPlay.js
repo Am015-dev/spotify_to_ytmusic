@@ -40,11 +40,12 @@ const STAT=()=>{const Q=__Q,mins=Q.drive/3600,st=Q.stuck+(Q.stEp>120?Q.stEp:0);c
   loads:Q.ld,loadsPerMin:+(Q.ld/Math.max(.01,Q.f/3600)).toFixed(2),camInsidePct:+(100*Q.camIn/Math.max(1,Q.drive/3)).toFixed(1),camInside:Q.camS,smashPerMin:+(Q.smash/Math.max(.01,mins)).toFixed(1),
   traffic120m:+(Q.traf/Math.max(1,Q.trafN)).toFixed(1),missions:Q.ev.slice(0,30),raw:{drive:Q.drive,f:Q.f,stuck:st,vSum:Q.vSum,camIn:Q.camIn,smash:Q.smash,ld:Q.ld,traf:Q.traf,trafN:Q.trafN},allHits:Q.hits,worst:Q.hits.slice().sort((a,b)=>b.drop-a.drop).slice(0,5),monErr:window.__monErr||null}};
 // HUD vs touch-control overlap + tiny text
-const LAYOUT=()=>{const vis=e=>{const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)return false;for(let a=e;a;a=a.parentElement){if(a.hidden)return false;const c=getComputedStyle(a);if(c.display==='none'||+c.opacity<.05)return false}const r=e.getBoundingClientRect();return r.width>4&&r.height>4};
+const LAYOUT=()=>{  // tiny = visible text under 12 px
+const vis=e=>{const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden'||+cs.opacity<.05)return false;for(let a=e;a;a=a.parentElement){if(a.hidden)return false;const c=getComputedStyle(a);if(c.display==='none'||+c.opacity<.05)return false}const r=e.getBoundingClientRect();return r.width>4&&r.height>4};
  const ctl=[...document.querySelectorAll('#touch .tbtn')].filter(vis).map(e=>({id:e.id,r:e.getBoundingClientRect()}));const VA=innerWidth*innerHeight;const ov=[],tiny=[];
  for(const e of document.body.querySelectorAll('*')){if(e.closest('#touch')||e.tagName==='CANVAS'||e.tagName==='SCRIPT'||e.tagName==='STYLE')continue;const cs=getComputedStyle(e);
   const own=[...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim());if(!own&&cs.position!=='fixed'&&cs.position!=='absolute')continue;if(!vis(e))continue;const r=e.getBoundingClientRect();if(r.width*r.height>VA*.3)continue;
-  if(own&&parseFloat(cs.fontSize)<9.5)tiny.push((e.id||e.className||e.tagName)+':'+cs.fontSize+':'+e.textContent.trim().slice(0,24));
+  if(own&&parseFloat(cs.fontSize)<11.5)tiny.push((e.id||e.className||e.tagName)+':'+cs.fontSize+':'+e.textContent.trim().slice(0,24));
   if(!own&&cs.backgroundColor==='rgba(0, 0, 0, 0)'&&cs.backgroundImage==='none'&&!e.querySelector('canvas,img,svg'))continue;
   for(const c of ctl){const w=Math.min(r.right,c.r.right)-Math.max(r.left,c.r.left),h=Math.min(r.bottom,c.r.bottom)-Math.max(r.top,c.r.top);if(w>6&&h>6)ov.push(c.id+'×'+(e.id?'#'+e.id:e.className?'.'+String(e.className).split(' ')[0]:e.tagName)+(own?'«'+e.textContent.trim().slice(0,16)+'»':''))}}
  // HUD panels overlapping each other (positioned elements with an id, not nested)
@@ -112,7 +113,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   for(let i=0;i<30;i++){await tick(30);if(!(await tapThrough()))break}
   await p.evaluate(MON);
   // scale + layout at the start
-  const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny),hudAll=new Set(lay.hud);await shot(city+'_start');
+  const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny),hudAll=new Set(lay.hud);await shot(city+'_start');let rotR=null;if(phone&&city===CITIES[0])rotR=await rotTrip();
   // ---- the drive: human driver
   const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(city==='fra'?11:23);let seenHits=0,hitShots=0,brakeUntil=-1,wob=0,route=null,routeT=-1e9,dest=null,destKind='',lastBrake=-1e9,boostT=0,driftT=0,stuckT=0,revT=0,lastNext=-1e9,events=[],lagged=[];
   const frames=MIN*3600;let f=0,lastLay=0,shotN=0,nextShot=frames/4;let extra={map:null,pause:null,garage:null,otg:null};
@@ -164,10 +165,25 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
     await p.evaluate(()=>{window.__auto=false});await shot(`${city}_reload${reloads}`);await p.evaluate(MON);lastSnap=f;f+=60;continue}}
   await releaseAll();await tick(30);let st=await p.evaluate(STAT);parts.push(st);st=merge(parts,reloads);delete st.raw;delete st.allHits;const roadEnd=await p.evaluate(ROADPROBE);await shot(city+'_end');
   const perf=await p.evaluate(()=>{const r=__dbg.renderer;window.__shooting=1;__dbg.composer.render=window.__fastR||__dbg.composer.render;window.__fastR=null;r.info.autoReset=false;r.info.reset();__tick(1);r.info.autoReset=true;window.__shooting=0;const i=r.info.render;const o={calls:i.calls,tris:i.triangles,jsMs:+__mho.PERF.js.toFixed(1),geoms:r.info.memory.geometries,tex:r.info.memory.textures};window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{};return o});
-  cityRes[city]={...st,scale:sc,road,roadEnd,overlap:[...ovAll],hudOverlap:[...hudAll],tiny:[...tinyAll],extra,events:events.slice(0,12),perf,wallSec:Math.round((Date.now()-T0)/1000)};
+  cityRes[city]={...st,rot:rotR,scale:sc,road,roadEnd,overlap:[...ovAll],hudOverlap:[...hudAll],tiny:[...tinyAll],extra,events:events.slice(0,12),perf,wallSec:Math.round((Date.now()-T0)/1000)};
   console.log(mode,city,JSON.stringify(cityRes[city]));
  }
  // ---- side trips (all through visible UI)
+ // rotation: portrait ↔ landscape 3× mid-drive (iOS order: orientationchange, then the size arrives late), one rotation with GAS held,
+ // then iOS's lost touchcancel (a finger id left behind). Afterwards every control must answer a fresh touch and nothing may stay latched.
+ async function rotTrip(){const r={steps:[]};const L={width:852,height:393},P={width:393,height:852};
+  const rot=async v=>{const land=v.width>v.height;await p.evaluate(()=>dispatchEvent(new Event('orientationchange')));await tick(6);
+   await cdp.send('Emulation.setDeviceMetricsOverride',{width:v.width,height:v.height,deviceScaleFactor:3,mobile:true,screenOrientation:land?{type:'landscapePrimary',angle:90}:{type:'portraitPrimary',angle:0}});
+   await p.evaluate(()=>{dispatchEvent(new Event('resize'));window.visualViewport&&visualViewport.dispatchEvent(new Event('resize'))});await tick(60);await p.waitForTimeout(900);await tick(6)};
+  await down('gas',await center('#tG'));for(let i=0;i<3;i++){await rot(P);await rot(L)}for(const k in F)delete F[k];await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  // iOS: a finger that was down during the rotation never gets touchend/touchcancel → emulate the stale ids it leaves behind
+  await p.evaluate(()=>{const T=__mho.touch;T.bz=7;T.sid=8});await tick(2);
+  const probe=async(sel,read)=>{const xy=await center(sel);if(!xy)return'hidden';const cov=await p.evaluate(([x,y,s])=>{const e=document.querySelector(s),t=document.elementFromPoint(x,y);return t===e||e.contains(t)||(t&&t.id==='btnZone'&&/tL|tR/.test(s))?'':'covered by '+(t&&(t.id||t.className||t.tagName))},[xy[0],xy[1],sel]);
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:xy[0],y:xy[1],id:3}]});await tick(1);const on=await p.evaluate(read);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await tick(2);
+   await p.waitForTimeout(450);return cov||(on?'ok':'NO RESPONSE')};
+  r.ctl={'◀':await probe('#tL',()=>__mho.touch.dir===-1),'▶':await probe('#tR',()=>__mho.touch.dir===1),GAS:await probe('#tG',()=>!!__mho.touch.gas),BRAKE:await probe('#tB',()=>!!__mho.touch.brake||!!__mho.touch.park),BOOST:await probe('#tN',()=>!!__mho.touch.boost),DRIFT:await probe('#tD',()=>!!__mho.touch.hb)};
+  r.stuck=await p.evaluate(()=>{const T=__mho.touch;return['gas','brake','boost','hb'].filter(k=>T[k]).concat(T.dir?['dir']:[],T.bz!=null&&T.bz!==7?['bz']:[])});
+  r.vp=await p.evaluate(()=>[innerWidth,innerHeight,__dbg.renderer.domElement.width,__dbg.renderer.domElement.height]);await shot('after_rotation');return r}
  async function mapTrip(){const r={opened:false,drag:null,pinch:null};if(!(await tap('#roamMapBtn')))return r;await tick(20);r.opened=await p.evaluate(()=>!!__mho.RO.mapOpen);const c=await center('#roamMapC');if(!c)return r;
   const st0=await p.evaluate(()=>({z:__mho.RO.mapZ,c:__mho.RO.mapC&&[Math.round(__mho.RO.mapC.x),Math.round(__mho.RO.mapC.z)]}));
   if(phone){await down('m1',c);for(let i=1;i<=8;i++){await move('m1',[c[0]-i*15,c[1]-i*8]);await tick(2)}await up('m1');await tick(6);
@@ -196,6 +212,8 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    ok(!s.reloads,`${m} ${c}: the page never reloads while playing`,{reloads:s.reloads||0,events:(s.events||[]).filter(e=>/RELOAD/.test(e))});
    if(c==='ath')ok(s.loads===0,`${m} ath: no loading screens while driving`,{loads:s.loads});
    ok(s.scale.pedRel==null||s.scale.pedRel<=1.2,`${m} ${c}: pedestrians ≤ 1.2× adult scale vs cars`,s.scale);
+   if(s.rot)ok(Object.values(s.rot.ctl).every(v=>v==='ok')&&!s.rot.stuck.length,`${m}: after 3 rotations every touch control answers, nothing latched`,s.rot);
+   if(m==='phone')ok(!s.tiny.length,`${m} ${c}: no HUD text under 12 px`,s.tiny.slice(0,8));
    if(m==='phone')ok(!s.overlap.length,`${m} ${c}: no HUD element over a touch control`,s.overlap.slice(0,8));
    ok(s.road.blocked+s.roadEnd.blocked===0,`${m} ${c}: no collider on the paved road (invisible walls / oversize hulls)`,{pts:s.road.roadPts+s.roadEnd.roadPts,start:s.road.colliders,end:s.roadEnd.colliders,ex:s.road.sample.concat(s.roadEnd.sample).slice(0,3)});
    ok(s.camInsidePct<=2,`${m} ${c}: chase camera inside a building ≤ 2 % of frames`,{camInsidePct:s.camInsidePct,ex:(s.camInside||[]).slice(0,2)});
