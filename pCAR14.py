@@ -13,10 +13,20 @@ R("pl.stats.acc=42*m*t.acc;pl.stats.brake=55*m;","pl.stats.acc=8.4*m*t.acc;pl.st
 R("if(s.turbo>0)a+=18*cls.mul;if(s.boost>0)a+=26*cls.mul;if(s.nitro)a+=36*cls.mul;","if(s.turbo>0)a+=4.5*cls.mul;if(s.boost>0)a+=6.5*cls.mul;if(s.nitro)a+=9*cls.mul;")
 R("+(s.boost>0?20*H:0)+(s.nitro?30*cls.mul*H:0)","+(s.boost>0?5*H:0)+(s.nitro?7.5*cls.mul*H:0)")
 R("AI_BRK=52","AI_BRK=14")
+# glow trails under race cars: the radial speed blur smeared each car's colour down the track. Off in races (speed lines stay).
+R("FX.uniforms.uSpeed.value=lerp(FX.uniforms.uSpeed.value,(state==='menu'?.2:spd*.7)*fxK(),Math.min(1,dt*4))","FX.uniforms.uSpeed.value=lerp(FX.uniforms.uSpeed.value,(state==='menu'?.2:0)*fxK(),Math.min(1,dt*4))")
+# softer race roll (pCAR13 pose)
+R("const tr=clamp((s.latV||0)*.006,-.06,.06);","const tr=clamp((s.latV||0)*.004,-.035,.035);")
+# smash studs: small, low glow, pulled to the bumper height (not over the roof), never filling the lens
+R("dy=RO.y+1.4-p.y","dy=RO.y+.6-p.y")
+R("dy=RO.y+1.4-st.m.position.y","dy=RO.y+.6-st.m.position.y")
+R("emissiveIntensity:.8,metalness:.8,roughness:.25","emissiveIntensity:.3,metalness:.8,roughness:.3",2)
+R("if(st.m.scale.x>.56)st.m.scale.setScalar(.55)","if(st.m.scale.x>.41)st.m.scale.setScalar(.4)")
 # race chase camera sized for a 4.6 m LEGO car (was framed for the 7 m hover ship): 10.5 m back, 3.4 m up
 R("back=18.5*tall*cd-(s.nitro?.8:0)","back=10.5*tall*cd-(s.nitro?.5:0)")
 R("addScaledVector(up,5.8*tall*cd-(s.nitro?.4:0))","addScaledVector(up,3.4*tall*cd-(s.nitro?.25:0))")
 JS=r'''
+(()=>{const st=document.createElement('style');st.id='crRaceHud';st.textContent=`html body.touch #itemBox{display:none!important}`;document.head.appendChild(st)})();
 // laps: same race length in time at the lower car speeds
 setupRace=(f=>function(cfg){try{if(cfg&&cfg.laps>1&&cfg.laps<20&&!cfg.crL){cfg=Object.assign({},cfg,{laps:Math.max(1,Math.round(cfg.laps*CR_RK)),crL:1})}}catch(e){}return f(cfg)})(setupRace);
 // race pose: nose dives under braking, squats under throttle
