@@ -295,7 +295,7 @@ function bfEnsure(){if(BF.root)return BF.root;const r=document.createElement('di
   r.innerHTML=`<div class="bf-top"></div><div class="bf-mid"><div class="bf-table"></div><div class="bf-side"><div class="bf-hint" role="status" aria-live="polite"></div><div class="bf-me"></div></div></div><div class="bf-tip" hidden></div><div class="bf-ov" hidden></div><div class="bf-flyl" aria-hidden="true"></div><div class="bf-fing" hidden aria-hidden="true"><svg viewBox="0 0 48 56"><path d="M18 4c2.8 0 5 2.2 5 5v15l2-.4V18c0-2.6 2-4.6 4.6-4.6S34 15.4 34 18v6.6l1.4-.2c2.4 0 4.4 2 4.4 4.4V40c0 8-6 14-14 14h-4c-5 0-8-2.6-10.4-6.2L4.8 38c-1.6-2.4-1-5.4 1.2-7 2.2-1.6 5.2-1 6.8 1.2l.2.4V9c0-2.8 2.2-5 5-5z" fill="#fff" stroke="#3a2a1a" stroke-width="2.4"/></svg></div>`;
   document.body.appendChild(r);BF.root=r;BF.top=r.querySelector('.bf-top');BF.tbl=r.querySelector('.bf-table');BF.hint=r.querySelector('.bf-hint');BF.me=r.querySelector('.bf-me');BF.ov=r.querySelector('.bf-ov');BF.fl=r.querySelector('.bf-flyl');
   r.addEventListener('click',bfClick);r.addEventListener('pointerdown',()=>{if(BF.busy)bfSpeedUp()});return r}
-function bfSizes(){const I=phInsets();const W=innerWidth-I.l-I.r,H=innerHeight-I.t-I.b;const land=W>H*1.1;document.documentElement.classList.toggle('bf-land',land);
+function bfSizes(){const I=phInsets();const V=vpDims(),W=V.w-I.l-I.r,H=V.h-I.t-I.b;const land=W>H*1.1;document.documentElement.classList.toggle('bf-land',land);
   let cs=land?Math.min((H-44-44-24)/6.5,(W*.52-60)/10.45,46):Math.min((W-52)/10.45,(H-44-44)*.43/6.5,48);cs=Math.max(18,Math.floor(cs));BF.cs=cs;BF.root.style.setProperty('--cs',cs+'px');
   const tb=BF.tbl;BF.tw=tb.clientWidth||(land?W*.5:W);BF.th=tb.clientHeight||(land?H-44:H-44-38-6.5*cs-40)}
 function bfRing(W,H,n){const cx=W/2,cy=H/2;let ks=Math.min(W,H)*(n<=5?.32:n<=7?.26:.22);ks=Math.max(44,Math.min(ks,W*(n<=5?.3:n<=7?.25:.21),H*(n<=5?.34:.28),130));
@@ -427,4 +427,4 @@ BF.on=PHN.on&&bfWanted();document.documentElement.classList.toggle('bf',BF.on);
 function bfRender(){if(!BF.on)return;bfEnsure();if(!G){BF.disp=null;bfDraw();return}const fresh=bfSync();
   if(BF.q.length&&!BF.busy&&!UI.modal){bfRun();return}
   if(!BF.busy){BF.disp=bfClone(G);bfDraw(fresh&&G.turn===0?{deal:true}:{})}}
-addEventListener('resize',()=>{try{const was=BF.on;bfApply();if(was&&!BF.on&&G)render()}catch(e){}});
+function bfResize(){const was=BF.on;bfApply();if(was&&!BF.on&&G)render()}

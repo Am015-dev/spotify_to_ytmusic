@@ -3,14 +3,17 @@
 const PHN={on:false,land:false,src:null,board:null,more:false,sum:null,endHide:null,walls:[],seen:{},gk:'',h:{st:'',pop:'',card:''},bs:0,mode:''};
 const PH_X='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 const PH_DOTS='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18.5" cy="12" r="1.6" fill="currentColor"/></svg>';
+// size of the layout viewport, measured from a fixed full-screen probe: iOS Safari fires resize/orientationchange while innerWidth/innerHeight still hold the OLD size
+function vpDims(){try{let p=document.getElementById('vpprobe');if(!p){p=document.createElement('div');p.id='vpprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;visibility:hidden;pointer-events:none';document.body.appendChild(p)}
+  const w=p.offsetWidth,h=p.offsetHeight;if(w>0&&h>0)return {w,h}}catch(e){}return {w:innerWidth,h:innerHeight}}
 function phDetect(){try{const q=new URLSearchParams(location.search);if(q.has('phone'))return q.get('phone')!=='0'}catch(e){}
-  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
+  const V=vpDims(),s=Math.min(V.w,V.h);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
 function phInsets(){try{const q=new URLSearchParams(location.search);if(q.has('safe')){const a=q.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
   let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}
   const c=getComputedStyle(p);return {t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}}catch(e){return {t:0,r:0,b:0,l:0}}}
 function phApply(){const R=document.documentElement;const was=PHN.on,wasL=PHN.land;PHN.on=phDetect();R.classList.toggle('ph',PHN.on);
   if(!PHN.on){R.classList.remove('ph-l','ph-p');for(const k of['--bs','--sat','--sar','--sab','--sal'])R.style.removeProperty(k);if(was){phChrome();try{if(V3.on)relayout()}catch(e){}}return}
-  const w=innerWidth,h=innerHeight,I=phInsets(),bar=44;PHN.land=w>h;const W=w-I.l-I.r,H=h-I.t-I.b;
+  const V=vpDims(),w=V.w,h=V.h,I=phInsets(),bar=44;PHN.land=w>h;const W=w-I.l-I.r,H=h-I.t-I.b;
   const bs=PHN.land?Math.max(Math.min(H,W-280),Math.min(H,Math.ceil(H*.86))):Math.min(W,Math.max(Math.ceil(W*.82),H-bar-340));
   R.classList.toggle('ph-l',PHN.land);R.classList.toggle('ph-p',!PHN.land);PHN.bs=Math.max(200,Math.floor(bs));
   R.style.setProperty('--bs',PHN.bs+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');
@@ -21,8 +24,15 @@ function phChrome(){const bar=document.querySelector('.gx-bar');if(!bar)return;
     const m=document.createElement('button');m.className='gx-ibtn';m.id='ph-more';m.dataset.ph='more';m.setAttribute('aria-label','More: guide, tile list, music, graphics, new game');m.innerHTML=PH_DOTS;bar.appendChild(m)}
   if(PHN.on)for(const [k,l] of [['plrd','Boards and scores'],['logd','Log of every move'],['rulesd','How to play']]){const b=bar.querySelector(`[data-gx="${k}"]`);if(b&&!b.getAttribute('aria-label'))b.setAttribute('aria-label',l)}
   try{if(V3.bagLbl)V3.bagLbl.visible=!PHN.on;if(V3.lidLbl)V3.lidLbl.visible=!PHN.on;V3.dirty=3}catch(e){}}
-addEventListener('resize',()=>{try{phApply()}catch(e){}});addEventListener('orientationchange',()=>setTimeout(()=>{try{phApply()}catch(e){}},60));
-try{phApply()}catch(e){console.error(e)}
+// one debounced, size-keyed re-layout for every rotation signal; re-measured after the iOS rotation animation settles (it often reports stale sizes at first)
+const VPS={k:'',raf:0,tm:[]};
+function vpApply(force){const V=vpDims(),I=phInsets(),k=V.w+'x'+V.h+'/'+I.t+','+I.r+','+I.b+','+I.l;if(!force&&k===VPS.k)return;VPS.k=k;
+  try{phApply()}catch(e){console.error(e)}try{if(typeof bfResize==='function')bfResize()}catch(e){console.error(e)}}
+function vpSchedule(){cancelAnimationFrame(VPS.raf);VPS.raf=requestAnimationFrame(()=>vpApply());VPS.tm.forEach(clearTimeout);VPS.tm=[120,350,800,1500].map(d=>setTimeout(()=>vpApply(),d))}
+addEventListener('resize',vpSchedule);addEventListener('orientationchange',vpSchedule);addEventListener('pageshow',vpSchedule);
+try{if(window.visualViewport)visualViewport.addEventListener('resize',vpSchedule);if(screen.orientation)screen.orientation.addEventListener('change',vpSchedule)}catch(e){}
+try{new ResizeObserver(()=>vpSchedule()).observe(document.documentElement)}catch(e){}
+try{phApply();VPS.k=''}catch(e){console.error(e)}
 function phReset(){PHN.src=null;PHN.board=null;PHN.more=false;PHN.sum=null;PHN.endHide=null;PHN.walls=[];PHN.seen={}}
 // ---------- events from the engine: the round summary is built from the wall fx ----------
 function phFx(f){if(!PHN.on||!G)return;const x=f.x;
