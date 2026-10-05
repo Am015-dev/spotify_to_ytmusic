@@ -7,7 +7,7 @@ const COL=TWKit.SHIP_COLORS;
 const EDGES=['top','right','bottom','left'];
 Object.assign(UI,{started:false,speed:1,guide:'light',guided:false,seen:{},trig:{},holder:-1,sel:null,busy:false,skip:false,pause:false,xray:false,gen:0,rec:null,acting:0,cols:[],dice:null,log:'',qTime:25,tickRate:1,setup:null,V:null,confirm:null,hint:false,msgs:[],lastKey:'',anim:true});
 let KS={tiles:{},mons:{},ships:{},gates:{},mael:{},wave:null,hold:{}};
-const sleep=ms=>new Promise(r=>setTimeout(r,Math.max(0,ms)/(UI.speed||1)));
+const SLP=new Set();const sleep=ms=>new Promise(r=>{const f=()=>{clearTimeout(t);SLP.delete(f);r()};const t=setTimeout(f,Math.max(0,ms)/(UI.speed||1));SLP.add(f)});const sleepFlush=()=>{for(const f of [...SLP])f()};
 const nm=i=>G&&G.seats[i]?G.seats[i].nm:'?';
 const colOf=i=>COL[(UI.cols[i]!=null?UI.cols[i]:i)%8];
 const dot=i=>`<i style="background:${colOf(i).sail}"></i>`;
@@ -321,7 +321,7 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
   case 'cannon':act({a:'cannon',t:+D.t,m:+D.m,s:+D.s},d);break;
   case 'pass':act({a:'pass'},d);break;
   case 'take':sfx('confirm');UI.holder=+D.seat;render();break;
-  case 'skip':UI.skip=true;if(humans().length===1&&!NET.on)UI.skipAll=true;break;
+  case 'skip':UI.skip=true;if(humans().length===1&&!NET.on)UI.skipAll=true;sleepFlush();render();break;
   case 'pause':UI.pause=!UI.pause;if(!UI.pause)schedule();render();break;
   case 'hint':UI.hint=true;UI.campHints=(UI.campHints||0)+1;{const m=recMove(d);if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s}}}render();break;
   case 'sugg':{const m=UI.recM||recMove(d);UI.hint=true;UI.campHints=(UI.campHints||0)+1;if(m&&m.a==='place'&&UI.sel){UI.sel={t:m.t,r:m.r,s:m.s};sfx('tile_rotate')}render();break}
