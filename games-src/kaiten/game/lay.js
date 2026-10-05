@@ -44,7 +44,9 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
     const m = await p.evaluate(() => { const B = document.querySelector('#board').getBoundingClientRect(), D = document.querySelector('#dock').getBoundingClientRect(), T = document.querySelector('#tbl').getBoundingClientRect(); return { board: [Math.round(B.width), Math.round(B.height)], share: +(B.width * B.height / (innerWidth * innerHeight)).toFixed(2), dock: [Math.round(D.width), Math.round(D.height)], tbl: [Math.round(T.width), Math.round(T.height)] }; });
     console.log(t, 'board', JSON.stringify(m)); if (m.share < .5) fail('board share', m.share);
     await shot('1game');
-    // lift a plate: the dock shows it and a Serve button; nothing is covered
+    // one tap grabs by default (checked below); with "One tap grabs" off, a tap lifts the plate: the dock shows it and a Serve button
+    { const pr = await p.evaluate(() => document.querySelector('#prompt').textContent.trim().split(/\s+/).length); if (pr > 8) fail('prompt longer than 8 words', pr); }
+    await p.evaluate(() => { UI.prefs.grab1 = false; });
     await p.click('#belt .hc[data-up="1"] >> nth=1'); await p.waitForTimeout(250);
     if (!(await p.$('#acts [data-a=serve]'))) fail('no Serve button after lifting a plate'); if (!(await p.evaluate(() => document.querySelector('#selinfo').textContent.length > 10))) fail('selinfo empty'); await reach('lifted'); await shot('2lifted');
     // table group pop-up beside the board
@@ -56,6 +58,11 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
     await p.click('#acts [data-a=serve]'); await p.waitForTimeout(500); await shot('5cover'); await scroll('cover');
     let revealShot = false; for (let k = 0; k < 40; k++) { const st = await p.evaluate(() => ({ lift: !!document.querySelector('.kk-cloche.kk-lift'), can: canPick() })); if (st.lift && !revealShot) { revealShot = true; await shot('6reveal'); } if (st.can) break; await p.waitForTimeout(150); }
     await reach('after reveal'); await shot('7landed');
+    // back to one tap: a single click grabs the dish and the reveal stage plays in the middle of the table
+    await p.evaluate(() => { UI.prefs.grab1 = true; });
+    { for (let k = 0; k < 60 && !(await p.evaluate(() => canPick())); k++) await p.waitForTimeout(100);
+      await p.click('#belt .hc[data-up="1"] >> nth=0'); await p.waitForTimeout(100); if (await p.$('#acts [data-a=serve]')) fail('Serve button after a one-tap grab'); if (!(await p.evaluate(() => G.players[0].picked || UI.busy))) fail('one click did not grab');
+      let stg = false; for (let k = 0; k < 60; k++) { if (await p.$('#stage')) { stg = true; await shot('7stage'); break; } await p.waitForTimeout(80); } if (!stg) fail('no reveal stage'); }
     // play on fast to the end of round 1 (taps through the real belt)
     await p.evaluate(() => { AIDELAY = 0; ANIM = 0; });
     let rsShot = false;
@@ -63,7 +70,7 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
       const st = await p.evaluate(() => ({ rs: !document.querySelector('#rs').hidden, pk: canPick(), over: G.phase === 'over' && UI.overShown, pc: !document.querySelector('#pc').hidden }));
       if (st.over) break;
       if (st.rs) { if (!rsShot) { rsShot = true; await p.waitForTimeout(300); await scroll('round pad'); await shot('8roundpad'); const rr = await rect('.rsbox'); if (rr && (rr[0] < 0 || rr[1] < 0 || rr[2] > W + 1 || rr[3] > H + 1)) fail('round pad does not fit', JSON.stringify(rr)); } await p.click('#rs [data-a=rsnext]'); await p.waitForTimeout(100); continue; }
-      if (st.pk) { await p.click('#belt .hc[data-up="1"] >> nth=0'); await p.click('#belt .hc.sel'); } await p.waitForTimeout(40);
+      if (st.pk) await p.click('#belt .hc[data-up="1"] >> nth=0'); await p.waitForTimeout(40);
     }
     await p.waitForTimeout(400); await scroll('final'); await shot('9final'); { const rr = await rect('.rsbox'); if (!rr) fail('no final result'); else if (rr[0] < 0 || rr[1] < 0 || rr[2] > W + 1 || rr[3] > H + 1) fail('final box does not fit', JSON.stringify(rr)); }
     await p.click('#rs [data-a=rsclose]'); await p.waitForTimeout(200); await scroll('after final'); await shot('10after');

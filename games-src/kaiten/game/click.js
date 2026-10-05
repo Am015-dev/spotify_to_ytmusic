@@ -96,14 +96,14 @@ function run(cf, seed) {
               if (r < .04) { const c = q('#roster .chip'); if (c.length) { click(rnd(c)); seen.add('chip'); const x = d.querySelector('.gx-drawer.on .gx-x'); if (x) click(x); } return; }
               if (r < .08) { const g = q('#tbl .grp'); if (g.length) { click(rnd(g)); seen.add('grp'); return; } }
               if (r < .11) { const g = q('#tbl .sh'); if (g.length) { click(rnd(g)); seen.add('seat'); const x = d.querySelector('.gx-drawer.on .gx-x'); if (x) click(x); return; } }
-              if (r < .15) { const hb = q('#acts [data-a=hint]'); if (hb.length) { click(hb[0]); seen.add('hint'); return; } }
-              if (r < .2) { const tw = q('#acts [data-a=twin]'); if (tw.length) { click(tw[0]); seen.add('twin'); return; } }
+              if (r < .15) { const hb = q('#acts [data-a=hint], #labacts [data-a=hint]'); if (hb.length) { click(hb[0]); seen.add('hint'); return; } }
+              if (r < .2) { const tw = q('#tbl .grp.usable'); if (tw.length) { click(tw[0]); seen.add('sticks'); return; } }
               if (r < .23) { const us = q('#acts [data-a=unsel]'); if (us.length) { click(us[0]); seen.add('unsel'); return; } }
               const cards = q('#belt .hc[data-up="1"]');
               if (!cards.length) { errs.push('canPick but no plates on the belt'); return; }
               const sv = q('#acts [data-a=serve]');
               if (sv.length && R() < .55) { click(sv[0]); seen.add('serve'); picks++; clicks++; return; }
-              const c = rnd(cards); click(c); clicks++; seen.add('tap');
+              const c = rnd(cards); click(c); clicks++; seen.add('tap'); if (!w.eval('canPick()')) { picks++; seen.add('grab'); return; }
               if (w.eval('!UI.twin') && R() < .5) { const c2 = d.querySelector(`#belt .hc[data-i="${c.dataset.i}"]`); if (c2 && !w.eval('canPick()') === false) { click(c2); seen.add('tap2'); picks++; } }
               return;
             }

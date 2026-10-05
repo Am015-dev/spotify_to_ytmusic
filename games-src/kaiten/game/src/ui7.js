@@ -272,7 +272,8 @@ function pxServe() {
   const sels = [...document.querySelectorAll('#belt .hc.sel')]; if (!sels.length) return false;
   sels.forEach((el, n) => {
     const o = PX.objs.get('h:' + el.dataset.id); if (!o) return; PX.nServe = (PX.nServe || 0) + 1;
-    o.detached = true; o.c.parent && o.c.parent.removeChild(o.c); PX.L.fly.addChild(o.c);
+    o.detached = true; o.c.parent && o.c.parent.removeChild(o.c); PX.L.fly.addChild(o.c); o.a = 1;
+    if (n === 0 && UI.flyFrom && PX.B) { const F = UI.flyFrom; o.x = F.left - PX.B.left; o.y = F.top - PX.B.top; o.w = F.width; UI.flyFrom = null; }   // dragged: it leaves from the finger
     const S = so.slot, tw = S.w * (n ? .9 : 1);
     pxTween(o, { x: S.x + S.w / 2 - tw / 2 + n * 6, y: S.y + n * 4, w: tw }, 520, 'io', () => { o.sq = .25; pxTween(o, { sq: 0, a: 0 }, 260, 'out', () => pxKill(o)); }, { arc: 46, spin: n ? -.25 : .25, flipAt: .5, delay: n * 70 });
   });

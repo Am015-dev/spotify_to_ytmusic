@@ -76,15 +76,20 @@ function myMoves() { const v = viewSeat(); return v >= 0 && G ? KK.moves(G, v) :
 function tapHand(i) {
   if (!canPick()) { const v = viewSeat(); if (v >= 0 && G && G.players[v].picked) toast('You have served. Waiting for the others.'); return; }
   const hand = G.players[viewSeat()].hand; if (!(i >= 0 && i < hand.length)) return;
-  const cur = UI.sel.slice();
+  const cur = UI.sel.slice(), one = UI.prefs.grab1 !== false;
   if (UI.twin) {
     const k = cur.indexOf(i);
     if (k >= 0) cur.splice(k, 1); else { if (cur.length >= 2) cur.shift(); cur.push(i); }
-    UI.sel = cur; UI.rec = null; render(); return;
+    UI.sel = cur; UI.rec = null;
+    if (one && cur.length === 2) { grabNow(); return; }   // Twin Sticks: the second dish grabs both
+    snd('click', { vol: .4 }); render(); return;
   }
+  if (one) { UI.sel = [i]; UI.rec = null; grabNow(); return; }   // one tap grabs the dish: it flies to your seat under a cover
   if (cur.length === 1 && cur[0] === i && UI.prefs.tap2) { serveSel(); return; }
   UI.sel = [i]; UI.rec = null; snd('click', { vol: .4 }); render();
 }
+// the chosen dishes get .sel on the belt first, so the flight to the seat starts from them
+function grabNow() { for (const b of $$('#belt .hc[data-i]')) b.classList.toggle('sel', UI.sel.indexOf(+b.dataset.i) >= 0); lsSet('kk_grab', '1'); UI.coach.seen.grabbed = 1; serveSel(); }
 function serveSel() {
   const v = viewSeat(); if (!canPick() || !UI.sel.length) return;
   const pick = UI.sel.slice().sort((a, b) => a - b);
@@ -94,7 +99,7 @@ function serveSel() {
 }
 function doPick(seat, mv) {
   // the lifted plate flies to the seat under a cover
-  try { if (ANIM && !pxServe() && document.body.animate) flyPick(); } catch (e) { }
+  try { if (ANIM && !pxServe() && document.body.animate) flyPick(); } catch (e) { } UI.flyFrom = null;
   if (isClient()) { netAct({ pk: mv.pick.join(',') }); UI.sel = []; UI.twin = false; UI.rec = null; snd('pick'); render(); return; }
   commit(seat, mv);
 }
@@ -102,14 +107,15 @@ function flyPick() {
   const sels = $$('#belt .hc.sel'); if (!sels.length) return; const v = viewSeat(); const slot = document.querySelector('.seat[data-seat="' + v + '"] .slot');
   const to = slot ? slot.getBoundingClientRect() : null; if (!to || !to.width) return;
   sels.forEach((b, k) => {
-    const r = b.getBoundingClientRect(); const c = h('div.flyc'); c.style.cssText = 'left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px'; c.innerHTML = KIT.backSVG({ w: Math.round(r.width) }); document.body.appendChild(c);
+    const r = k === 0 && UI.flyFrom ? UI.flyFrom : b.getBoundingClientRect(); const c = h('div.flyc'); c.style.cssText = 'left:' + r.left + 'px;top:' + r.top + 'px;width:' + r.width + 'px;height:' + r.height + 'px'; c.innerHTML = KIT.backSVG({ w: Math.round(r.width) }); document.body.appendChild(c);
     const dx = to.left + to.width / 2 - (r.left + r.width / 2), dy = to.top + to.height / 2 - (r.top + r.height / 2);
     const a = c.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + dx * .6 + 'px,' + (dy * .6 - 30) + 'px) scale(.8)', opacity: 1, offset: .55 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + Math.max(.25, to.width / r.width) + ')', opacity: .85 }], { duration: 480, easing: 'ease-in-out' });
     a.onfinish = () => c.remove(); setTimeout(() => c.remove(), 900);
   });
-  snd('slide', { vol: .5 });
+  snd('slide', { vol: .5 }); UI.flyFrom = null;
 }
 function toggleTwin() {
+  UI.coach.seen.twinUsed = 1;
   const v = viewSeat(); if (!canPick() || !KK._.hasChop(G.players[v]) || G.players[v].hand.length < 2) { UI.twin = false; render(); return; }
   UI.twin = !UI.twin; if (!UI.twin && UI.sel.length > 1) UI.sel = UI.sel.slice(0, 1);
   render();
@@ -118,8 +124,9 @@ function hint() {
   const v = viewSeat(); if (!canPick()) return;
   let mv; try { mv = KK.AI.choose(G, v, 'normal'); } catch (e) { return; }
   if (!mv) return;
-  UI.rec = { ids: mv.ids.slice(), pick: mv.pick.slice() };
-  UI.twin = mv.pick.length === 2; UI.sel = mv.pick.slice(); render();
+  UI.rec = { ids: mv.ids.slice(), pick: mv.pick.slice(), turn: G.round + '.' + G.turn };
+  // one tap grabs: the hint only glows the dish (a ghost finger points at it); otherwise it lifts it as before
+  UI.twin = mv.pick.length === 2; UI.sel = UI.prefs.grab1 === false ? mv.pick.slice() : []; render();
   const pp = $('#prompt'); const why = whyPick(mv.ids);
   if (!isPh()) toast('A good pick: ' + mv.ids.map(cname).join(' + ') + '. ' + why);   // phones: the reason shows in the panel, not over the buttons
 }
@@ -155,22 +162,28 @@ async function playResolve(evs, preHand) {
     UI.fz = { tables: before, slots: rv.picks.map(() => ({ mode: 'cover' })), hand: hand || (hotSeat() || v < 0 ? null : []), backN, pudSub, roundEnd: false, scoring: !!sc, say: 'Everyone has chosen. The plates are under covers…' };
     if (!hand && v < 0) UI.fz.hand = null;
     UI.sel = []; UI.twin = false; UI.rec = null;
-    render(); await wait(450); if (tok !== UI.seq) return;
-    // 2: the covers lift together
-    UI.fz.slots = rv.picks.map(p => ({ mode: 'faces', cards: p.cards })); UI.fz.say = 'Reveal! ' + rv.picks.map(p => pname(p.seat) + ': ' + p.cards.map(c => TY[c.key].name).join(' + ')).join(' · ');
-    render();
-    if (ANIM) { snd('cloche'); const hosts = $$('#tbl .hostc'); try { pxReveal(); await KIT.revealAll(hosts, { stagger: 110 }); } catch (e) { } await wait(850); } if (tok !== UI.seq) return;
+    UI.fast = false; render(); await wait(300); if (tok !== UI.seq) return;
+    // 2: the covers lift together, big, in the middle of the table (ui8: the reveal stage); without it, in the seats
+    UI.fz.say = 'Reveal! ' + rv.picks.map(p => pname(p.seat) + ': ' + p.cards.map(c => TY[c.key].name).join(' + ')).join(' · ');
+    const gains = (() => { try { const a = liveScores(before), b = liveScores(T); return b.map((x, s) => x.total - a[s].total); } catch (e) { return null; } })();
+    if (ANIM && stageOK()) { try { await stageReveal(rv.picks, tok, gains); } catch (e) { console.error(e); stageClear(); } }
+    else {
+      UI.fz.slots = rv.picks.map(p => ({ mode: 'faces', cards: p.cards }));
+      render();
+      if (ANIM) { snd('cloche'); const hosts = $$('#tbl .hostc'); try { pxReveal(); await KIT.revealAll(hosts, { stagger: 110 }); } catch (e) { } await wait(850); }
+    }
+    if (tok !== UI.seq) return;
     // 3: plates land on the counters
     const land = new Set(); rv.picks.forEach(p => p.cards.forEach(c => land.add(p.seat + '|' + keyOfCard(c)))); UI.land = land;
     try { UI.news = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.news = null; }
     UI.fz.slots = null; UI.fz.tables = T; UI.fz.say = ps ? 'The plates land. Hands slide to the left…' : 'The plates land. The round is over!';
     if (sc) { UI.fz.roundEnd = true; UI.fz.hand = []; UI.fz.backN = 0; }
-    render(); snd('clink'); await wait(750); if (tok !== UI.seq) return;
+    render(); stageClear(); snd('clink'); try { scorePops(before, T); } catch (e) { } await wait(800); if (tok !== UI.seq) return;
     if (ps) {
-      // 4: every hand moves one seat to the left
-      if (ANIM) { try { if (PX.on) { snd('pass'); await pxPassOut(); if (!pxPackets(ps.sizes)) animatePass(ps.sizes); } else { await slideOutBelt(); animatePass(ps.sizes); snd('pass'); } } catch (e) { } }
-      UI.fz = null; UI.enter = v >= 0 ? 'pass' : ''; render();
-      await wait(ANIM ? 900 : 0); if (tok !== UI.seq) return;
+      // 4: every hand moves one seat on, visibly: your dishes ride the belt off to the next diner, the next hand rides in
+      if (ANIM) { try { await passAlong(ps.sizes); } catch (e) { console.error(e); } }
+      UI.fz = null; UI.enter = v >= 0 ? 'pass' : ''; render(); passDone();
+      await wait(ANIM ? 450 : 0); if (tok !== UI.seq) return;
       UI.busy = false; render(); schedule(); drainQ(); if (NET.on && isHost()) netPush(true); return;
     }
     if (sc) {
@@ -178,7 +191,7 @@ async function playResolve(evs, preHand) {
       UI.fz = null; UI.enter = 'deal'; UI.busy = false; render(); showRound(sc, ge); schedule(); drainQ(); return;
     }
     UI.fz = null; UI.busy = false; render(); schedule(); drainQ();
-  } catch (e) { console.error(e); UI.fz = null; UI.busy = false; try { render(); schedule(); } catch (x) { } }
+  } catch (e) { console.error(e); UI.fz = null; UI.busy = false; try { stageClear(); passDone(); render(); schedule(); } catch (x) { } }
 }
 function slideOutBelt() {
   const b = $('#belt'); if (!b || !b.animate) return Promise.resolve();
