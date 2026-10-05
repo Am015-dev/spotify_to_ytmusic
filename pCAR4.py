@@ -4,7 +4,8 @@ exec(open('P.py').read())
 if 'CR_cityGeo' in s:
     print('OK');raise SystemExit
 assert 'CR_SPEED' in s, 'apply pCAR1 first'
-JS=r'''
+JS=r'''let CR_park=0;
+
 // wheels stay on the road: each wheel keeps its tyre bottom at a fixed height below the car's root, so pitch/roll moves only the body
 const _crWP=new THREE.Vector3();
 function CR_clamp(w){let R=w.userData.root;if(!R){R=w;while(R.parent&&!R.parent.isScene)R=R.parent;w.userData.root=R}if(R===w||typeof state==='undefined'||state!=='roam')return;
@@ -40,13 +41,13 @@ function CR_cityGeo(nm){if(!nm||nm[0]==='#')return null;if(CR_CG[nm]!==undefined
   const br=A.map(([t,x,z,r,c,y])=>({t,x,z,y,r:r%4,m:0,c})).filter(b=>!['drv','drvR','stw','mir','lp','pipes','flag'].includes(b.t));CR_LO=2;CR_G=[];CR_W=[];const M=[],L=[];for(const b of br)GB_brickGeo(b,M,L);
   const Wg=CR_W.map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return g});const body=mergeGeometries(M.concat(L)),wheels=mergeGeometries(Wg),glass=CR_G.length?mergeGeometries(CR_G):null;
   const box=new THREE.Box3().setFromBufferAttribute(body.attributes.position),bw=new THREE.Box3().setFromBufferAttribute(wheels.attributes.position),s=wid/(box.max.x-box.min.x),y0=Math.min(box.min.y,bw.min.y);
-  for(const g of[body,wheels,glass].filter(Boolean)){g.translate(0,-y0,0);g.scale(s,s,s);g.rotateY(Math.PI);g.translate(0,.04,0)}return CR_CG[nm]={body,wheels,glass}}
+  for(const g of[body,wheels,glass].filter(Boolean)){g.translate(0,-y0,0);g.scale(s,s,s);g.rotateY(Math.PI);g.translate(0,.05,0)}return CR_CG[nm]={body,wheels,glass}}
  catch(e){console.warn('CR city',nm,e);return CR_CG[nm]=null}finally{CR_LO=0;CR_G=null;CR_W=null}}
 function CR_cityPost(im,nm,k,n){const G=CR_cityGeo(nm);if(!G)return;const w=new THREE.InstancedMesh(G.wheels,CR_CM,n);w.frustumCulled=false;w.instanceMatrix.setUsage(THREE.DynamicDrawUsage);_m.makeScale(0,0,0);for(let j=0;j<n;j++)w.setMatrixAt(j,_m);im.userData.w=w;im.parent&&im.parent.add(w);if(G.glass){const gl=new THREE.InstancedMesh(G.glass,CR_GM,n);gl.frustumCulled=false;gl.instanceMatrix.setUsage(THREE.DynamicDrawUsage);for(let j=0;j<n;j++)gl.setMatrixAt(j,_m);gl.renderOrder=2;im.userData.g=gl;im.parent&&im.parent.add(gl)}
  const cc=new THREE.Color();for(let j=0;j<n;j++){cc.set(HCOL[(j*3+k)%HCOL.length]).lerp(new THREE.Color('#ffffff'),.08);im.setColorAt(j,cc)}im.instanceColor&&(im.instanceColor.needsUpdate=true);
  if(nm==='police'||nm==='garbage-truck'||(nm==='taxi'&&CID!=='fra')){const c=new THREE.Color('#ffffff');for(let j=0;j<n;j++)im.setColorAt(j,c);im.instanceColor&&(im.instanceColor.needsUpdate=true)}}
-const _crM=new THREE.Matrix4(),_crR=new THREE.Matrix4(),_crE=new THREE.Euler(),_crT1=new THREE.Matrix4().makeTranslation(0,.45,0),_crT2=new THREE.Matrix4().makeTranslation(0,-.45,0);
-function CR_susp(c,dx,dz,dt,im,M){const w=im.userData.w;if(!w){im.setMatrixAt(c.j,M);return}w.setMatrixAt(c.j,M);const h=Math.atan2(dx,dz);if(c.hh==null)c.hh=h;let dh=h-c.hh;dh=Math.atan2(Math.sin(dh),Math.cos(dh));c.hh=h;const d=Math.max(dt,1e-3),v=c.cv||0,ac=(v-(c.pv??v))/d;c.pv=v;
+const _crM=new THREE.Matrix4(),_crR=new THREE.Matrix4(),_crE=new THREE.Euler(),_crT1=new THREE.Matrix4().makeTranslation(0,.45,0),_crT2=new THREE.Matrix4().makeTranslation(0,-.45,0),_crS=new THREE.Matrix4();
+function CR_susp(c,dx,dz,dt,im,M){if(c.sl)M.multiply(_crS.makeRotationX(-c.sl));const w=im.userData.w;if(!w){im.setMatrixAt(c.j,M);return}w.setMatrixAt(c.j,M);const h=Math.atan2(dx,dz);if(c.hh==null)c.hh=h;let dh=h-c.hh;dh=Math.atan2(Math.sin(dh),Math.cos(dh));c.hh=h;const d=Math.max(dt,1e-3),v=c.cv||0,ac=(v-(c.pv??v))/d;c.pv=v;
  const tr=clamp(dh/d*v*.012,-.06,.06),tp=clamp(-ac*.015,-.045,.045),k=Math.min(1,dt*5);c.rl=(c.rl||0)+(tr-(c.rl||0))*k;c.pt=(c.pt||0)+(tp-(c.pt||0))*k;
  _crR.makeRotationFromEuler(_crE.set(c.pt,0,c.rl));_crM.copy(M).multiply(_crT1).multiply(_crR).multiply(_crT2);im.setMatrixAt(c.j,_crM);if(im.userData.g)im.userData.g.setMatrixAt(c.j,_crM)}
 '''
@@ -71,7 +72,11 @@ R("if(c.dead>0){c.dead-=dt;_m.makeScale(0,0,0);im.setMatrixAt(c.j,_m);","if(c.de
 R("_m.makeBasis(_hrt.set(dz,0,-dx),_hup,_hfw.set(dx,0,dz)).setPosition(x,c.y,z);im.setMatrixAt(c.j,_m);","_m.makeBasis(_hrt.set(dz,0,-dx),_hup,_hfw.set(dx,0,dz)).setPosition(x,c.y,z);CR_susp(c,dx,dz,dt,im,_m);")
 R("for(const im of HUB.cim)im.instanceMatrix.needsUpdate=true}","for(const im of HUB.cim){im.instanceMatrix.needsUpdate=true;if(im.userData.w)im.userData.w.instanceMatrix.needsUpdate=true;if(im.userData.g)im.userData.g.instanceMatrix.needsUpdate=true}}")
 # Athens: no parked cars on verges or in grass car parks (traffic stays on the street graph)
-R("const put=(t,x,z,ry,si)=>{","const put=(t,x,z,ry,si)=>{if(t==='CE_car'||t==='CE_car2'||t==='CE_taxi')return false;")
+R("const put=(t,x,z,ry,si)=>{","const put=(t,x,z,ry,si)=>{if(CR_park){if(nearJ(x,z,9))return false;add(t,x,z,ry);return true}if(t==='CE_car'||t==='CE_car2'||t==='CE_taxi')return false;")
+R("if(t==='CE_car'){const k=CARS[Math.floor(rnd()*CARS.length)];put(k,bx+nx*OFF.CE_car,bz+nz*OFF.CE_car,","if(t==='CE_car'){if(w<12||ped)continue;const k=CARS[Math.floor(rnd()*CARS.length)];CR_park=1;try{put(k,bx-nx*1.15,bz-nz*1.15,")
+R("Math.atan2(p.tx,p.tz)+(sd>0?0:Math.PI),si);continue}","Math.atan2(p.tx,p.tz)+(sd>0?0:Math.PI),si)}finally{CR_park=0}continue}")
+R("c.y=A.ab||gA?groundAt(x,z,(c.y||0)+4):groundY(x,z);","c.y=A.ab||gA?groundAt(x,z,(c.y||0)+4):groundY(x,z);if(((HUB.mf||0)+c.j)%3===0||c.sl==null){const gf=(px,pz)=>A.ab||gA?groundAt(px,pz,c.y+4):groundY(px,pz),sl=Math.atan2(gf(x+dx*2,z+dz*2)-gf(x-dx*2,z-dz*2),4);c.sl=Math.abs(sl)<.6?sl:0}")
+R("lane:R()<.5?.18:.36,","lane:CID==='fra'?(R()<.5?.18:.36):(R()<.5?.12:.25),")
 R("function CE_lots(add,rnd,D){","function CE_lots(add0,rnd,D){const add=(t,...a)=>{if(t==='CE_car'||t==='CE_car2'||t==='CE_taxi')return;return add0(t,...a)};")
 save()
 print('OK')
