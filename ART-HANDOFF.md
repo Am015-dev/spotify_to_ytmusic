@@ -1,4 +1,4 @@
-# ART handoff (branch alex/od-art) — last deploy v86h = live 60b4212 (reviewer PASS ddbcff8)
+# ART handoff (branch alex/od-art) — last deploy v86i = live 594ccf7 (reviewer PASS b0119e9); beta artifact v79
 Build ALWAYS on the current live page: `./art.sh` fetches alex/brave-carson-rbpmlk, takes games/mainhattan-overdrive/index.html body + km.js, applies pART1-5 → overdrive.html. Split = copy overdrive.html + km.js into outART/; `node tools/tOut.js http://127.0.0.1:8798/overdrive.html` must print OUTBOOT PASS. Re-check live HEAD right before tools/deploy.sh. No deploy without a PASS from the reviewer session (session_01Y6FYerWwxv43FuKUcaUT4v).
 Modules sit between /*ART<name>*/ … /*ART</name>*/ markers (artlib.py swaps them in place; anchor edits use RR, which skips edits already applied).
 - art.js (pART1): deep-blue sky + brick-cloud ring, true-scale subtle studded grass (walk/yard/park), grey asphalt with a double yellow line (road, street, resSt, Athens cobble), midday light, day reflection env without neon boxes (no pink water), flash/hitFx clamp ≤ 1.
@@ -9,6 +9,6 @@ Modules sit between /*ART<name>*/ … /*ART</name>*/ markers (artlib.py swaps th
 Ownership: the cars session owns the player car (driving, wheels, suspension, ground contact, camera, FX), traffic models and the HUD. ART owns the world, Athens and boats.
 Tools: tools/dev.js `/cshot` (canvas readback); review shot scripts are in /tmp (lost on restart; see git history of this file for the recipe: abandon the mission, warp to an open road via hubRoads, side camera 4 m out at 0.5 m).
 Open (not blocking):
-1. Beacons that stream in after the rescan stay upright for up to 4 s; hook ring conversion on beacon creation.
-2. 11 Alleenring samples are drawn up to 1 m below physics; 109 bridge-deck samples are unconfirmed.
+1. (done in v86i) beacons are registered at creation via an Object3D.add hook. Athens: 70 pedestrians, spawn ≥ 30 m.
+2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
