@@ -40,16 +40,18 @@ function bfReveal(chip) {
   return 520;
 }
 // ---------- the brew deck: one line, the danger meter, the bag and Stop ----------
-function bfLine(p, r, fm) {
-  if (!p.pot.length) return G.round === 1 ? 'Tap the bag to pull a chip!' : 'Tap the bag to start brewing';
-  if (p.lock) return 'Decided. Waiting for the others…';
-  const pct = Math.round(r.pBoom * 100);
-  if (fm && p.pot[p.pot.length - 1].c === 'W' && CF.whiteSum(p) >= r.limit - 2) return 'Too hot? The flask puts it back';
-  if (pct >= 40) return 'Very risky! Stop now?';
-  if (pct >= 20) return 'Risky… one more, or Stop?';
-  if (pct > 0) return 'Pull again, or Stop and keep it';
-  return 'Safe! Pull another chip';
+// ONE decision object feeds both the hint line and the ghost finger: {act:'draw'|'stop'|'flask'|null, text}. Unsure (middling risk) = no act, no text.
+function bfDecide(p, r, fm) {
+  if (!p || !G || G.phase !== 'brew' || p.st !== 'draw') return { act: null, text: '' };
+  if (p.lock) return { act: null, text: 'Decided. Waiting for the others…' };
+  if (!p.pot.length) return { act: 'draw', text: G.round === 1 ? 'Tap the bag to pull a chip!' : 'Tap the bag to start brewing' };
+  r = r || CF.risk(G, p.seat); const pct = Math.round(r.pBoom * 100);
+  if (fm && p.pot[p.pot.length - 1].c === 'W' && CF.whiteSum(p) >= r.limit - 2 && pct >= 20) return { act: 'flask', text: 'Too hot? Tap the flask' };
+  if (pct >= 40) return { act: 'stop', text: 'Very risky! Tap Stop' };
+  if (pct <= 15) return { act: 'draw', text: pct ? 'Low risk. Pull another chip' : 'Safe! Pull another chip' };
+  return { act: null, text: '' };
 }
+function bfLine(p, r, fm) { return bfDecide(p, r, fm).text; }
 function bfMeter(p, v, fm, legal) {
   const lim = CF.limitOf(G, p), ws = CF.whiteSum(p), r = CF.risk(G, v), pct = Math.round(r.pBoom * 100);
   const prev = BF.lastWs[p.seat + ':' + G.round] || 0; BF.lastWs[p.seat + ':' + G.round] = ws;
@@ -138,10 +140,34 @@ function bfGhostTarget() {
     if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && (UI.shopSel || []).length) return document.querySelector('#rs [data-a=shopbuy]');
     return null;
   }
-  if (UI.rsOpen || G.phase !== 'brew' || p.st !== 'draw' || p.lock || p.q || focusSeat() !== p.seat) return null;
-  if (fresh && !p.pot.length && G.round === 1 && !BF.pulling) return document.querySelector('#acts .bagb:not([disabled])');
-  if (UI.mode === 'guided' && G.round === 1 && !UI.prefs.stopped && p.pot.length >= 3 && CF.risk(G, p.seat).pBoom >= .2 && !BF.pulling) return document.querySelector('#acts .stopb:not([disabled])');
+  if (UI.rsOpen || G.phase !== 'brew' || p.st !== 'draw' || p.lock || p.q || focusSeat() !== p.seat || BF.pulling) return null;
+  const fm = mvList(p.seat).find(x => x.t === 'flask'), dec = bfDecide(p, null, fm);
+  if (dec.act === 'draw' && fresh && !p.pot.length && G.round === 1) return document.querySelector('#acts .bagb:not([disabled])');
+  if (dec.act === 'stop' && UI.mode === 'guided' && G.round === 1 && !UI.prefs.stopped && p.pot.length >= 3) return document.querySelector('#acts .stopb:not([disabled])');
   return null;
+}
+// ---------- rubies, on the same panel as the shop ----------
+const nextLabel = () => G.round >= D.rounds ? 'See final scores' : 'Start day ' + (G.round + 1);
+function rubyOpts(p) { const mx = Math.floor(p.rubies / D.rubySpend), out = []; for (let n = 0; n <= mx; n++) { out.push({ drop: n, flask: false }); if (!p.flask && n < mx) out.push({ drop: n, flask: true }); } return out; }
+function rubyBest(p) { try { const g = JSON.parse(JSON.stringify(G)); g.players[p.seat].q = { h: 'ruby', d: {} }; const m = CF.AI.choose(g, p.seat, 'normal'); if (m && m.t === 'ruby') return { drop: m.drop, flask: !!m.flask }; } catch (e) { } return { drop: 0, flask: false }; }
+const rubyKey = o => o.drop + (o.flask ? 'f' : '');
+function rubyPick(p) { if (UI.rubyFor !== p.seat + ':' + G.round) { UI.rubyFor = p.seat + ':' + G.round; UI.rubySel = rubyBest(p); UI.rubyBest = rubyKey(UI.rubySel); } return UI.rubySel; }
+function rubyUI(p) {
+  const sel = rubyPick(p), w = h('div.rubyp', h('div.rl', h('span', { html: ico('ruby', 20) }), h('b', p.rubies), ' rubies: '), h('div.rtiles'));
+  const row = w.querySelector('.rtiles');
+  rubyOpts(p).forEach(o => { const cost = (o.drop + (o.flask ? 1 : 0)) * D.rubySpend, on = rubyKey(o) === rubyKey(sel);
+    row.appendChild(h('button.rt' + (on ? '.on' : '') + (rubyKey(o) === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': rubyKey(o), type: 'button', 'aria-pressed': on ? 'true' : 'false', 'aria-label': cost ? 'Spend ' + cost + ' rubies' : 'Keep my rubies' },
+      cost ? [h('span', { html: ico('ruby', 14) }), '−' + cost, o.drop ? h('span', { html: ico('drop', 18) }) : null, o.drop ? '+' + o.drop : null, o.flask ? h('span', { html: ico('flask', 18, true) }) : null] : 'Keep'));
+  });
+  return w;
+}
+function rubySelect(k) { const p = mineP(); if (!p) return; const o = rubyOpts(p).find(x => rubyKey(x) === k); if (o) { UI.rubySel = o; snd('click'); renderReport(); bfGhost(); } }
+// the one confirm button: buys the picked chips, spends the picked rubies, and starts the next day
+function rubyGo() { const p = mineP(); if (!p) return; UI.rubyAuto = Object.assign({}, rubyPick(p)); UI.advFor = G.rep ? G.rep.round : 0; autoDecisions(); }
+function autoDecisions() {
+  if (!G || !UI.started) return; const v = viewSeat(); if (v < 0) return; const me = G.players[v];
+  if (UI.rubyAuto && me.q && me.q.h === 'ruby') { const m = UI.rubyAuto; UI.rubyAuto = null; const L = mvList(v), mm = L.find(x => x.t === 'ruby' && x.drop === m.drop && !!x.flask === !!m.flask) || L.find(x => x.t === 'ruby' && x.drop === 0 && !x.flask); if (mm) act(mm, v); return; }
+  if (UI.advFor && G.rep && UI.advFor === G.rep.round && G.phase !== 'eval' && UI.rsOpen && UI.rsMode === 'report' && !hotSeat() && !(typeof NET !== 'undefined' && NET.on)) { UI.advFor = 0; UI.rubyAuto = null; const sq = UI.seq; setTimeout(() => { if (sq === UI.seq && UI.rsOpen && UI.rsMode === 'report') repContinue(); }, 80); }
 }
 // ---------- the shop: tap a chip, it drops into your bag ----------
 function shopUI(p, q, legal) {
@@ -166,7 +192,8 @@ function shopUI(p, q, legal) {
   wrap.appendChild(stalls);
   const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
   const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', 'Tap chips to drop them in')));
-  UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go', { 'data-a': 'shopbuy', type: 'button' }, sel.length ? 'Done' : 'Buy nothing'))];
+  if (p.rubies >= D.rubySpend && G.round < D.rounds) { rubyPick(p); wrap.appendChild(rubyUI(p)); UI.rubyShown = true; } else UI.rubyShown = false;
+  UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go.confirm', { 'data-a': 'shopbuy', type: 'button' }, (sel.length ? 'Buy ' + sel.length + ' · ' : '') + nextLabel()))];
   return wrap;
 }
 function bfFly(fromR, toEl, key, size) {
@@ -186,7 +213,7 @@ function shopToggle(key) {
 }
 function shopBuy() {
   const v = viewSeat(); if (v < 0) return; const items = UI.shopSel.slice();
-  const go = () => { UI.shopSel = []; UI.prefs.shopped = true; savePrefs(); if (!act({ t: 'buy', items }, v)) toast('That purchase did not work.'); };
+  const go = () => { UI.shopSel = []; UI.prefs.shopped = true; savePrefs(); if (UI.rubyShown && mineP()) UI.rubyAuto = Object.assign({}, rubyPick(mineP())); UI.advFor = G.rep ? G.rep.round : 0; if (!act({ t: 'buy', items }, v)) toast('That purchase did not work.'); };
   const cs = $$('#rs .sbc'), img = document.querySelector('#rs .sbimg');
   if (!items.length || !bfAnim() || !cs.length || !img) { go(); return; }
   if (UI.buying) return; UI.buying = true;

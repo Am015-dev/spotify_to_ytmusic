@@ -2,6 +2,7 @@
 function closeRS(quiet) { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; UI.rsMode = ''; if (!quiet && typeof schedule === 'function') schedule(); }
 function checkReport() {
   if (!G || !UI.started) return;
+  if (typeof autoDecisions === 'function') autoDecisions();
   if (typeof BF !== 'undefined' && Date.now() < BF.fxUntil && !UI.rsOpen) { clearTimeout(BF.repT); BF.repT = setTimeout(checkReport, BF.fxUntil - Date.now() + 30); return; }
   if (hotSeat() && UI.pass != null && !(G.phase === 'eval' && G.rep && UI.hotShared !== G.rep.round)) { showPass(UI.pass); return; }
   if (UI.rsMode === 'pass') closeRS(true);
@@ -75,7 +76,7 @@ function repContinue() {
   closeRS(true); UI.rsMode = ''; if (G.phase === 'over') { checkFinal(); } else { render(); checkReport(); if (!UI.rsOpen) newsLines(false); schedule(); }
 }
 // ---------- decisions inside the report ----------
-const DEC_SHORT = { shop: 'Shop: tap chips for your bag', ruby: 'Spend rubies?', de: 'Boom! Points OR shopping?' };
+const DEC_SHORT = { shop: 'Shop: tap chips for your bag', ruby: 'Rubies: pick, then go', de: 'Boom! Points OR shopping?' };
 function tileBtn(m, p, big, small, icons) { return h('button.btn.alt.tile', { 'data-a': 'mv', 'data-i': UI.legal[p.seat].indexOf(m), type: 'button', 'aria-label': m.label }, h('span.ti1', { html: icons }), h('b.ti2', big), small ? h('span.ti3', small) : null); }
 // a glowing "best" on the choice a good maker would take, so no choice screen is a guess
 function sugMark(box, p, q, legal) {
@@ -101,12 +102,7 @@ function decisionBox0(p, q) {
     legal.forEach(m => row.appendChild(m.o === 'vp' ? tileBtn(m, p, '+' + q.d.vp, 'points', ico('vp', 40)) : tileBtn(m, p, q.d.coins, 'coins to shop', ico('coin', 40))));
     box.appendChild(row); return box;
   }
-  if (q.h === 'ruby') {
-    box.appendChild(h('div.rhave', h('span', { html: ico('ruby', 22) }), h('b', p.rubies), h('span', { html: ico('drop', 20) }), 'start ' + p.droplet, h('span', { html: ico('flask', 20, p.flask) }), p.flask ? 'full' : 'empty'));
-    const row = h('div.tiles');
-    legal.forEach(m => { const cost = (m.drop + (m.flask ? 1 : 0)) * 2; row.appendChild(cost ? tileBtn(m, p, '−' + cost, (m.drop ? '+' + m.drop + ' start' : '') + (m.drop && m.flask ? ', ' : '') + (m.flask ? 'refill flask' : ''), ico('ruby', 26) + (m.drop ? ico('drop', 30) : '') + (m.flask ? ico('flask', 30, true) : '')) : tileBtn(m, p, 'Keep', 'my rubies', ico('ruby', 32))); });
-    box.appendChild(row); return box;
-  }
+  if (q.h === 'ruby') { box.appendChild(rubyUI(p)); UI.rsFoot = [h('div.shopfoot', h('button.btn.go.confirm', { 'data-a': 'rubygo', type: 'button' }, nextLabel()))]; return box; }
   const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p))); box.appendChild(row); return box;
 }
 // ---------- pass the device (hot-seat) ----------
@@ -145,10 +141,10 @@ const TIPS = [
   { id: 'risk', t: 'Reading the odds', x: () => 'The meter shows the danger. Red? Think about Stop.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 3 && CF.risk(G, p.seat).pBoom >= .15; } },
   { id: 'flask', t: 'The flask', x: () => 'The flask puts that white chip back. Once a day.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.flask && p.f.canFlask && CF.whiteSum(p) >= 4; } },
   { id: 'stop', t: 'When to stop', x: () => 'Stop keeps the points and coins under the ring.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 4; } },
-  { id: 'boom', modal: true, light: true, t: 'Boom!', x: () => 'Boom! Now choose: the points OR the shopping.', when: () => { const p = mineP(); return p && p.boom && UI.rsOpen; } },
-  { id: 'report', modal: true, t: 'The day report', x: () => 'Everyone stopped. Here is how the day went.', when: () => UI.rsOpen && UI.rsMode === 'report' },
+  { id: 'boom', modal: true, light: true, off: true, t: 'Boom!', x: () => 'Boom! Now choose: the points OR the shopping.', when: () => { const p = mineP(); return p && p.boom && UI.rsOpen; } },
+  { id: 'report', modal: true, off: true, t: 'The day report', x: () => 'Everyone stopped. Here is how the day went.', when: () => UI.rsOpen && UI.rsMode === 'report' },
   { id: 'shop', modal: true, light: true, off: true, t: 'The shop', x: () => 'Tap chips to drop them in your bag.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'shop' && UI.rsOpen; } },
-  { id: 'rubies', modal: true, t: 'Rubies', x: () => 'Rubies: start further on, or refill the flask.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'ruby' && UI.rsOpen; } },
+  { id: 'rubies', modal: true, off: true, t: 'Rubies', x: () => 'Rubies: start further on, or refill the flask.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'ruby' && UI.rsOpen; } },
   { id: 'day2', t: 'Rats and new stalls', x: () => 'Behind? A rat gives you a head start.', when: () => G.round === 2 && G.phase !== 'eval' && !UI.rsOpen },
   { id: 'last', t: 'The last day', x: () => 'Last day: no shop. Leftovers become points.', when: () => G.round === 9 && G.phase !== 'eval' && !UI.rsOpen }
 ];

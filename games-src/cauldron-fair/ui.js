@@ -190,13 +190,21 @@ function potOpts(p, mini) {
   return { pot: p.pot, droplet: p.droplet, rat: p.rat > 0 && p.rat > p.droplet ? p.rat : 0, space: shown && (p.pot.length || !mini) ? CF.spaceOf(p) : null, boom: p.boom, mini: !!mini, uid: p.seat, label: p.name + '\'s cauldron' };
 }
 // ---------- board ----------
+// a computer's brew, draw by draw: its chips as little coins, the newest one pops in
+UI.potN = UI.potN || {};
+function liveChips(p) {
+  const prev = UI.potN[p.seat + ':' + G.round] || 0; UI.potN[p.seat + ':' + G.round] = p.pot.length;
+  const row = h('span.lchips', { 'aria-label': p.name + ' has drawn ' + plural(p.pot.length, 'chip') + ', white ' + CF.whiteSum(p) });
+  p.pot.slice(-6).forEach((c, i, a) => { if (!c || !c.c) return; const d = h('i.lc' + (p.pot.length > prev && i === a.length - 1 ? '.pop' : ''), { html: chipHTML(c.c + c.v, 15) }); row.appendChild(d); });
+  return row;
+}
 function renderOthers() {
   const o = $('#others'); if (!o) return; const f = focusSeat(); o.innerHTML = '';
   for (const p of G.players) {
     if (p.seat === f) continue;
     const t = h('button.th' + (seatCls(p) ? '.' + seatCls(p) : ''), { 'data-a': 'focus', 'data-seat': p.seat, type: 'button', 'aria-label': p.name + ': ' + p.vp + ' points, ' + stateLabel(p) + '. Tap to look at this cauldron.' });
     t.append(h('span.av', { html: avHTML(p.seat, 26) }), h('span.tp', { html: KIT.potSVG(potOpts(p, true)).replace(/width="\d+" height="\d+"/, '') }),
-      h('span.ti', h('b', p.name), h('span.tv', h('span', { html: ico('vp', 15) }), p.vp, h('span', { html: ico('ruby', 15) }), p.rubies), h('span.ts', stateLabel(p) + (p.pot.length && seatState(p) === 'draw' ? ' · ' + plural(p.pot.length, 'chip') : ''))));
+      h('span.ti', h('b', p.name), h('span.tv', h('span', { html: ico('vp', 15) }), p.vp, h('span', { html: ico('ruby', 15) }), p.rubies), h('span.ts', seatState(p) === 'draw' && p.pot.length ? liveChips(p) : stateLabel(p))));
     o.appendChild(t);
   }
   o.style.display = G.np > 1 && o.children.length ? '' : 'none';
@@ -270,7 +278,7 @@ function renderActs() {
   const p = G.players[v]; const legal = mvList(v); UI.legal[v] = legal;
   if (typeof NET !== 'undefined' && NET.on && NET.pend && Date.now() - NET.pendT < 700) { /* a move is in flight */ }
   if (p.q && !EVAL_Q[p.q.h]) { renderQ(p, legal, qb); return; }
-  if (focusSeat() !== v) { a.appendChild(h('button.btn.go.backb', { 'data-a': 'focus', 'data-seat': v, type: 'button' }, 'Back to your cauldron')); return; }
+  if (focusSeat() !== v) { const fp = G.players[focusSeat()]; if (G.phase === 'brew' && fp && fp.ai && fp.st === 'draw' && !fp.boom) a.appendChild(h('div.bline.watch', fp.name + ' draws… tap to hurry')); a.appendChild(h('button.btn.go.backb', { 'data-a': 'focus', 'data-seat': v, type: 'button' }, 'Back to your cauldron')); return; }
   if (G.phase !== 'brew' || p.st !== 'draw' || p.q) return;
   a.appendChild(brewDeck(p, v, legal));
 }
@@ -293,10 +301,16 @@ function renderBar() {
   const dt = document.querySelector('.gx-dt'); if (dt) { const v = viewSeat(); dt.textContent = G.phase === 'over' ? 'Game over' : (v >= 0 && (G.phase === 'brew' ? G.players[v].st === 'draw' : !!G.players[v].q)) ? 'Your turn' : 'Waiting'; }
 }
 let rndT = 0;
+function autoWatch() {   // once I have stopped, watch the computer that is still drawing; go back to my own pot when the day ends
+  const v = viewSeat(); if (v < 0 || hotSeat() || !bfAnim()) return; const me = G.players[v];
+  if (UI.autoF && (G.phase !== 'brew' || UI.autoF !== G.round)) { if (UI.focus !== v && UI.autoF) UI.focus = v; UI.autoF = 0; UI.fastAI = false; return; }
+  if (!UI.autoF && G.phase === 'brew' && (me.lock || me.st === 'done') && UI.focus === v) { const c = G.players.find(q => q.ai && q.st === 'draw' && !q.boom && q.seat !== v); if (c) { UI.focus = c.seat; UI.autoF = G.round; } }
+  if (UI.autoF && UI.focus !== v) { const c = G.players[UI.focus]; if (c && c.st !== 'draw') { const n = G.players.find(q => q.ai && q.st === 'draw' && !q.boom && q.seat !== v); if (n) UI.focus = n.seat; } }
+}
 function render() {
   if (!G || !UI.started) return;
   try {
-    focusSeat(); placePrompt();
+    autoWatch(); focusSeat(); placePrompt();
     renderBar(); renderOthers(); renderMe(); renderStage(); renderActs(); renderRisk(); renderFort(); renderRoster();
     const pi = promptInfo(), pr = $('#prompt'); if (pr) { pr.textContent = pi.text; pr.className = pi.mine ? 'mine' : ''; }
     renderHint(); renderLegend(); renderBlg(); renderDrawers(); renderNetBadge && renderNetBadge();
@@ -407,7 +421,7 @@ function schedule() {
     if (UI.rsOpen && G.phase !== 'eval' && !UI.sim) continue;               // hold the next day until the report is closed
     if (UI.mode === 'guided' && (UI.tip && UI.tip.block) && !UI.sim) continue;
     if (UI.sim) { aiStep(s); continue; }
-    let d = AIDELAY * (0.55 + Math.random() * 0.9); if (G.phase === 'brew' && p.st === 'draw' && p.pot.length === 0) d *= 0.7; if (G.phase !== 'brew') d *= 0.6;
+    let d = AIDELAY * (0.55 + Math.random() * 0.9); if (G.phase === 'brew' && p.st === 'draw' && p.pot.length === 0) d *= 0.7; if (G.phase !== 'brew') d *= 0.6; if (UI.fastAI && G.phase === 'brew') d = 110;
     const seq = UI.seq; UI.tm[s] = setTimeout(() => { UI.tm[s] = 0; if (seq !== UI.seq) return; aiStep(s); }, d);
   }
 }
@@ -446,6 +460,7 @@ function loadSave() {
 function closeRS(quiet) { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; UI.rsMode = ''; if (!quiet && typeof schedule === 'function') schedule(); }
 function checkReport() {
   if (!G || !UI.started) return;
+  if (typeof autoDecisions === 'function') autoDecisions();
   if (typeof BF !== 'undefined' && Date.now() < BF.fxUntil && !UI.rsOpen) { clearTimeout(BF.repT); BF.repT = setTimeout(checkReport, BF.fxUntil - Date.now() + 30); return; }
   if (hotSeat() && UI.pass != null && !(G.phase === 'eval' && G.rep && UI.hotShared !== G.rep.round)) { showPass(UI.pass); return; }
   if (UI.rsMode === 'pass') closeRS(true);
@@ -519,7 +534,7 @@ function repContinue() {
   closeRS(true); UI.rsMode = ''; if (G.phase === 'over') { checkFinal(); } else { render(); checkReport(); if (!UI.rsOpen) newsLines(false); schedule(); }
 }
 // ---------- decisions inside the report ----------
-const DEC_SHORT = { shop: 'Shop: tap chips for your bag', ruby: 'Spend rubies?', de: 'Boom! Points OR shopping?' };
+const DEC_SHORT = { shop: 'Shop: tap chips for your bag', ruby: 'Rubies: pick, then go', de: 'Boom! Points OR shopping?' };
 function tileBtn(m, p, big, small, icons) { return h('button.btn.alt.tile', { 'data-a': 'mv', 'data-i': UI.legal[p.seat].indexOf(m), type: 'button', 'aria-label': m.label }, h('span.ti1', { html: icons }), h('b.ti2', big), small ? h('span.ti3', small) : null); }
 // a glowing "best" on the choice a good maker would take, so no choice screen is a guess
 function sugMark(box, p, q, legal) {
@@ -545,12 +560,7 @@ function decisionBox0(p, q) {
     legal.forEach(m => row.appendChild(m.o === 'vp' ? tileBtn(m, p, '+' + q.d.vp, 'points', ico('vp', 40)) : tileBtn(m, p, q.d.coins, 'coins to shop', ico('coin', 40))));
     box.appendChild(row); return box;
   }
-  if (q.h === 'ruby') {
-    box.appendChild(h('div.rhave', h('span', { html: ico('ruby', 22) }), h('b', p.rubies), h('span', { html: ico('drop', 20) }), 'start ' + p.droplet, h('span', { html: ico('flask', 20, p.flask) }), p.flask ? 'full' : 'empty'));
-    const row = h('div.tiles');
-    legal.forEach(m => { const cost = (m.drop + (m.flask ? 1 : 0)) * 2; row.appendChild(cost ? tileBtn(m, p, '−' + cost, (m.drop ? '+' + m.drop + ' start' : '') + (m.drop && m.flask ? ', ' : '') + (m.flask ? 'refill flask' : ''), ico('ruby', 26) + (m.drop ? ico('drop', 30) : '') + (m.flask ? ico('flask', 30, true) : '')) : tileBtn(m, p, 'Keep', 'my rubies', ico('ruby', 32))); });
-    box.appendChild(row); return box;
-  }
+  if (q.h === 'ruby') { box.appendChild(rubyUI(p)); UI.rsFoot = [h('div.shopfoot', h('button.btn.go.confirm', { 'data-a': 'rubygo', type: 'button' }, nextLabel()))]; return box; }
   const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p))); box.appendChild(row); return box;
 }
 // ---------- pass the device (hot-seat) ----------
@@ -589,10 +599,10 @@ const TIPS = [
   { id: 'risk', t: 'Reading the odds', x: () => 'The meter shows the danger. Red? Think about Stop.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 3 && CF.risk(G, p.seat).pBoom >= .15; } },
   { id: 'flask', t: 'The flask', x: () => 'The flask puts that white chip back. Once a day.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.flask && p.f.canFlask && CF.whiteSum(p) >= 4; } },
   { id: 'stop', t: 'When to stop', x: () => 'Stop keeps the points and coins under the ring.', when: () => { const p = mineP(); return p && p.st === 'draw' && p.pot.length >= 4; } },
-  { id: 'boom', modal: true, light: true, t: 'Boom!', x: () => 'Boom! Now choose: the points OR the shopping.', when: () => { const p = mineP(); return p && p.boom && UI.rsOpen; } },
-  { id: 'report', modal: true, t: 'The day report', x: () => 'Everyone stopped. Here is how the day went.', when: () => UI.rsOpen && UI.rsMode === 'report' },
+  { id: 'boom', modal: true, light: true, off: true, t: 'Boom!', x: () => 'Boom! Now choose: the points OR the shopping.', when: () => { const p = mineP(); return p && p.boom && UI.rsOpen; } },
+  { id: 'report', modal: true, off: true, t: 'The day report', x: () => 'Everyone stopped. Here is how the day went.', when: () => UI.rsOpen && UI.rsMode === 'report' },
   { id: 'shop', modal: true, light: true, off: true, t: 'The shop', x: () => 'Tap chips to drop them in your bag.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'shop' && UI.rsOpen; } },
-  { id: 'rubies', modal: true, t: 'Rubies', x: () => 'Rubies: start further on, or refill the flask.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'ruby' && UI.rsOpen; } },
+  { id: 'rubies', modal: true, off: true, t: 'Rubies', x: () => 'Rubies: start further on, or refill the flask.', when: () => { const p = mineP(); return p && p.q && p.q.h === 'ruby' && UI.rsOpen; } },
   { id: 'day2', t: 'Rats and new stalls', x: () => 'Behind? A rat gives you a head start.', when: () => G.round === 2 && G.phase !== 'eval' && !UI.rsOpen },
   { id: 'last', t: 'The last day', x: () => 'Last day: no shop. Leftovers become points.', when: () => G.round === 9 && G.phase !== 'eval' && !UI.rsOpen }
 ];
@@ -797,7 +807,8 @@ function showStart() { try { GX.close(); } catch (e) { } UI.sv = 'title'; UI.cfg
 // ---------- events ----------
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]');
-  if (!t) { if (ev.target.closest('#cwrap,#caul')) { const b = document.querySelector('.bagb:not([disabled])'); if (b) b.click(); } return; }   // tapping your own pot pulls a chip too
+  if (!t) { if (ev.target.closest('#cwrap,#caul') && G && G.phase === 'brew' && focusSeat() !== viewSeat()) { UI.fastAI = true; return; }
+    if (ev.target.closest('#cwrap,#caul')) { const b = document.querySelector('.bagb:not([disabled])'); if (b) b.click(); } return; }   // tapping your own pot pulls a chip too
   const a = t.dataset.a, d = t.dataset;
   if (typeof netClick === 'function' && netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
@@ -827,6 +838,8 @@ document.addEventListener('click', ev => {
     case 'rscont': repContinue(); break;
     case 'shopsel': shopToggle(d.k); break;
     case 'shopbuy': shopBuy(); break;
+    case 'rubysel': rubySelect(d.k); break;
+    case 'rubygo': rubyGo(); break;
     case 'shopclear': UI.shopSel = []; renderReport(); break;
     case 'take': takeDevice(); break;
     case 'tipok': tipOk(); break;
@@ -955,16 +968,18 @@ function bfReveal(chip) {
   return 520;
 }
 // ---------- the brew deck: one line, the danger meter, the bag and Stop ----------
-function bfLine(p, r, fm) {
-  if (!p.pot.length) return G.round === 1 ? 'Tap the bag to pull a chip!' : 'Tap the bag to start brewing';
-  if (p.lock) return 'Decided. Waiting for the others…';
-  const pct = Math.round(r.pBoom * 100);
-  if (fm && p.pot[p.pot.length - 1].c === 'W' && CF.whiteSum(p) >= r.limit - 2) return 'Too hot? The flask puts it back';
-  if (pct >= 40) return 'Very risky! Stop now?';
-  if (pct >= 20) return 'Risky… one more, or Stop?';
-  if (pct > 0) return 'Pull again, or Stop and keep it';
-  return 'Safe! Pull another chip';
+// ONE decision object feeds both the hint line and the ghost finger: {act:'draw'|'stop'|'flask'|null, text}. Unsure (middling risk) = no act, no text.
+function bfDecide(p, r, fm) {
+  if (!p || !G || G.phase !== 'brew' || p.st !== 'draw') return { act: null, text: '' };
+  if (p.lock) return { act: null, text: 'Decided. Waiting for the others…' };
+  if (!p.pot.length) return { act: 'draw', text: G.round === 1 ? 'Tap the bag to pull a chip!' : 'Tap the bag to start brewing' };
+  r = r || CF.risk(G, p.seat); const pct = Math.round(r.pBoom * 100);
+  if (fm && p.pot[p.pot.length - 1].c === 'W' && CF.whiteSum(p) >= r.limit - 2 && pct >= 20) return { act: 'flask', text: 'Too hot? Tap the flask' };
+  if (pct >= 40) return { act: 'stop', text: 'Very risky! Tap Stop' };
+  if (pct <= 15) return { act: 'draw', text: pct ? 'Low risk. Pull another chip' : 'Safe! Pull another chip' };
+  return { act: null, text: '' };
 }
+function bfLine(p, r, fm) { return bfDecide(p, r, fm).text; }
 function bfMeter(p, v, fm, legal) {
   const lim = CF.limitOf(G, p), ws = CF.whiteSum(p), r = CF.risk(G, v), pct = Math.round(r.pBoom * 100);
   const prev = BF.lastWs[p.seat + ':' + G.round] || 0; BF.lastWs[p.seat + ':' + G.round] = ws;
@@ -1053,10 +1068,34 @@ function bfGhostTarget() {
     if (p.q && p.q.h === 'shop' && !UI.prefs.shopped && (UI.shopSel || []).length) return document.querySelector('#rs [data-a=shopbuy]');
     return null;
   }
-  if (UI.rsOpen || G.phase !== 'brew' || p.st !== 'draw' || p.lock || p.q || focusSeat() !== p.seat) return null;
-  if (fresh && !p.pot.length && G.round === 1 && !BF.pulling) return document.querySelector('#acts .bagb:not([disabled])');
-  if (UI.mode === 'guided' && G.round === 1 && !UI.prefs.stopped && p.pot.length >= 3 && CF.risk(G, p.seat).pBoom >= .2 && !BF.pulling) return document.querySelector('#acts .stopb:not([disabled])');
+  if (UI.rsOpen || G.phase !== 'brew' || p.st !== 'draw' || p.lock || p.q || focusSeat() !== p.seat || BF.pulling) return null;
+  const fm = mvList(p.seat).find(x => x.t === 'flask'), dec = bfDecide(p, null, fm);
+  if (dec.act === 'draw' && fresh && !p.pot.length && G.round === 1) return document.querySelector('#acts .bagb:not([disabled])');
+  if (dec.act === 'stop' && UI.mode === 'guided' && G.round === 1 && !UI.prefs.stopped && p.pot.length >= 3) return document.querySelector('#acts .stopb:not([disabled])');
   return null;
+}
+// ---------- rubies, on the same panel as the shop ----------
+const nextLabel = () => G.round >= D.rounds ? 'See final scores' : 'Start day ' + (G.round + 1);
+function rubyOpts(p) { const mx = Math.floor(p.rubies / D.rubySpend), out = []; for (let n = 0; n <= mx; n++) { out.push({ drop: n, flask: false }); if (!p.flask && n < mx) out.push({ drop: n, flask: true }); } return out; }
+function rubyBest(p) { try { const g = JSON.parse(JSON.stringify(G)); g.players[p.seat].q = { h: 'ruby', d: {} }; const m = CF.AI.choose(g, p.seat, 'normal'); if (m && m.t === 'ruby') return { drop: m.drop, flask: !!m.flask }; } catch (e) { } return { drop: 0, flask: false }; }
+const rubyKey = o => o.drop + (o.flask ? 'f' : '');
+function rubyPick(p) { if (UI.rubyFor !== p.seat + ':' + G.round) { UI.rubyFor = p.seat + ':' + G.round; UI.rubySel = rubyBest(p); UI.rubyBest = rubyKey(UI.rubySel); } return UI.rubySel; }
+function rubyUI(p) {
+  const sel = rubyPick(p), w = h('div.rubyp', h('div.rl', h('span', { html: ico('ruby', 20) }), h('b', p.rubies), ' rubies: '), h('div.rtiles'));
+  const row = w.querySelector('.rtiles');
+  rubyOpts(p).forEach(o => { const cost = (o.drop + (o.flask ? 1 : 0)) * D.rubySpend, on = rubyKey(o) === rubyKey(sel);
+    row.appendChild(h('button.rt' + (on ? '.on' : '') + (rubyKey(o) === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': rubyKey(o), type: 'button', 'aria-pressed': on ? 'true' : 'false', 'aria-label': cost ? 'Spend ' + cost + ' rubies' : 'Keep my rubies' },
+      cost ? [h('span', { html: ico('ruby', 14) }), '−' + cost, o.drop ? h('span', { html: ico('drop', 18) }) : null, o.drop ? '+' + o.drop : null, o.flask ? h('span', { html: ico('flask', 18, true) }) : null] : 'Keep'));
+  });
+  return w;
+}
+function rubySelect(k) { const p = mineP(); if (!p) return; const o = rubyOpts(p).find(x => rubyKey(x) === k); if (o) { UI.rubySel = o; snd('click'); renderReport(); bfGhost(); } }
+// the one confirm button: buys the picked chips, spends the picked rubies, and starts the next day
+function rubyGo() { const p = mineP(); if (!p) return; UI.rubyAuto = Object.assign({}, rubyPick(p)); UI.advFor = G.rep ? G.rep.round : 0; autoDecisions(); }
+function autoDecisions() {
+  if (!G || !UI.started) return; const v = viewSeat(); if (v < 0) return; const me = G.players[v];
+  if (UI.rubyAuto && me.q && me.q.h === 'ruby') { const m = UI.rubyAuto; UI.rubyAuto = null; const L = mvList(v), mm = L.find(x => x.t === 'ruby' && x.drop === m.drop && !!x.flask === !!m.flask) || L.find(x => x.t === 'ruby' && x.drop === 0 && !x.flask); if (mm) act(mm, v); return; }
+  if (UI.advFor && G.rep && UI.advFor === G.rep.round && G.phase !== 'eval' && UI.rsOpen && UI.rsMode === 'report' && !hotSeat() && !(typeof NET !== 'undefined' && NET.on)) { UI.advFor = 0; UI.rubyAuto = null; const sq = UI.seq; setTimeout(() => { if (sq === UI.seq && UI.rsOpen && UI.rsMode === 'report') repContinue(); }, 80); }
 }
 // ---------- the shop: tap a chip, it drops into your bag ----------
 function shopUI(p, q, legal) {
@@ -1081,7 +1120,8 @@ function shopUI(p, q, legal) {
   wrap.appendChild(stalls);
   const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
   const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', 'Tap chips to drop them in')));
-  UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go', { 'data-a': 'shopbuy', type: 'button' }, sel.length ? 'Done' : 'Buy nothing'))];
+  if (p.rubies >= D.rubySpend && G.round < D.rounds) { rubyPick(p); wrap.appendChild(rubyUI(p)); UI.rubyShown = true; } else UI.rubyShown = false;
+  UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go.confirm', { 'data-a': 'shopbuy', type: 'button' }, (sel.length ? 'Buy ' + sel.length + ' · ' : '') + nextLabel()))];
   return wrap;
 }
 function bfFly(fromR, toEl, key, size) {
@@ -1101,7 +1141,7 @@ function shopToggle(key) {
 }
 function shopBuy() {
   const v = viewSeat(); if (v < 0) return; const items = UI.shopSel.slice();
-  const go = () => { UI.shopSel = []; UI.prefs.shopped = true; savePrefs(); if (!act({ t: 'buy', items }, v)) toast('That purchase did not work.'); };
+  const go = () => { UI.shopSel = []; UI.prefs.shopped = true; savePrefs(); if (UI.rubyShown && mineP()) UI.rubyAuto = Object.assign({}, rubyPick(mineP())); UI.advFor = G.rep ? G.rep.round : 0; if (!act({ t: 'buy', items }, v)) toast('That purchase did not work.'); };
   const cs = $$('#rs .sbc'), img = document.querySelector('#rs .sbimg');
   if (!items.length || !bfAnim() || !cs.length || !img) { go(); return; }
   if (UI.buying) return; UI.buying = true;

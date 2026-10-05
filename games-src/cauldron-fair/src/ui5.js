@@ -196,6 +196,8 @@ document.addEventListener('click', ev => {
     case 'rscont': repContinue(); break;
     case 'shopsel': shopToggle(d.k); break;
     case 'shopbuy': shopBuy(); break;
+    case 'rubysel': rubySelect(d.k); break;
+    case 'rubygo': rubyGo(); break;
     case 'shopclear': UI.shopSel = []; renderReport(); break;
     case 'take': takeDevice(); break;
     case 'tipok': tipOk(); break;
