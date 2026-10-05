@@ -1,0 +1,999 @@
+[
+ {
+  "mode": "phone",
+  "cities": {
+   "fra": {
+    "min": 4.07,
+    "hits": 30,
+    "kinds": {
+     "other": 26,
+     "wall": 4
+    },
+    "wallHits": 4,
+    "wallPerMin": 0.98,
+    "hitsPerMin": 7.38,
+    "bigDrop": 13,
+    "stuckPct": 0,
+    "avgKmh": 99.5,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 7.9,
+    "traffic120m": 1.2,
+    "missions": [
+     {
+      "f": 1,
+      "start": "Hot Drop"
+     },
+     {
+      "f": 6341,
+      "end": "HOT DROP★★★A GETAWAY CAR ESCAPEDNo stars this time · try aga"
+     },
+     {
+      "f": 17896,
+      "start": "Hot Drop"
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "MAINHATTAN CAREER",
+      "f": 17818,
+      "v0": 29,
+      "v1": 0,
+      "drop": 1,
+      "kind": "other",
+      "x": -354,
+      "z": -837,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 1749,
+      "v0": 22,
+      "v1": 1,
+      "drop": 0.95,
+      "kind": "other",
+      "x": 1479,
+      "z": -107,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 21722,
+      "v0": 25,
+      "v1": 2,
+      "drop": 0.9,
+      "kind": "other",
+      "x": 1035,
+      "z": -471,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 980,
+      "v0": 22,
+      "v1": 2,
+      "drop": 0.89,
+      "kind": "other",
+      "x": 1715,
+      "z": 1,
+      "dy": 0
+     },
+     {
+      "ctx": "SPEED DEMON",
+      "f": 7819,
+      "v0": 23,
+      "v1": 2,
+      "drop": 0.89,
+      "kind": "other",
+      "x": -329,
+      "z": -835,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "scale": {
+     "pedH": 1.91,
+     "carL": 4.9,
+     "carH": 1.94,
+     "player": {
+      "h": 1.33,
+      "l": 5,
+      "w": 2.29
+     },
+     "pedRel": 0.97,
+     "pedVsPlayer": 0.95,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 898,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 1020,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#npcSay×#raceW",
+     "#npcSay×#roamMini",
+     "#npcSay×#roamPlate",
+     "#roamPlate×#ogArea",
+     "#roamArrow×#npcSay",
+     "#npcSay×#m1Next",
+     "#roamMini×#roamPop",
+     "#roamPlate×#roamPop",
+     "#roamPlate×#ogHud",
+     "#ogArea×#ogHud"
+    ],
+    "tiny": [
+     "SMALL:8px:KM/H",
+     "SMALL:9px:Chapter 1 · New in Mainh",
+     "SMALL:9px:28.5 s",
+     "B:9px:NEXT",
+     "SMALL:9px:23.5 s",
+     "SMALL:9px:18.5 s",
+     "SMALL:9px:13.5 s",
+     "SMALL:9px:8.4 s",
+     "SMALL:9px:3.4 s",
+     "SMALL:9px:YOU"
+    ],
+    "extra": {
+     "map": {
+      "opened": true,
+      "drag": true,
+      "pinch": true,
+      "covers": [
+       "#qTrk",
+       "#qRst",
+       "#qAbn"
+      ],
+      "closed": true
+     },
+     "pause": {
+      "tP_settings": true,
+      "opts": [
+       "Master80",
+       "Music60",
+       "Effects90"
+      ],
+      "opened": true,
+      "frozen": true,
+      "resumed": false
+     },
+     "garage": {
+      "pause": true,
+      "btn": true,
+      "open": [
+       "gbx",
+       "ogArea"
+      ],
+      "refused": false,
+      "closeBtn": "SAVE & DRIVE",
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [
+     "next@7218",
+     "next@7824",
+     "next@8430",
+     "next@12600"
+    ],
+    "perf": {
+     "calls": 418,
+     "tris": 1466148,
+     "jsMs": 15.8,
+     "geoms": 512,
+     "tex": 118
+    },
+    "wallSec": 1147
+   },
+   "ath": {
+    "min": 5.07,
+    "hits": 73,
+    "kinds": {
+     "other": 8,
+     "ped": 1,
+     "wall": 62,
+     "traffic": 2
+    },
+    "wallHits": 62,
+    "wallPerMin": 12.22,
+    "hitsPerMin": 14.39,
+    "bigDrop": 31,
+    "stuckPct": 0.9,
+    "avgKmh": 39,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0.4,
+    "camInside": [
+     {
+      "f": 3576,
+      "car": [
+       1260,
+       -1816,
+       72.6
+      ],
+      "cam": [
+       1264.7,
+       -1824.3,
+       76.1
+      ],
+      "b": {
+       "x": 1268,
+       "z": -1826,
+       "hw": 2.7,
+       "hd": 2.5,
+       "h": 81.6,
+       "y0": 70.1,
+       "rot": true
+      }
+     },
+     {
+      "f": 5028,
+      "car": [
+       1188,
+       -1985,
+       76.4
+      ],
+      "cam": [
+       1183.7,
+       -1980.4,
+       80
+      ],
+      "b": {
+       "x": 1180.3,
+       "z": -1978,
+       "hw": 2.8,
+       "hd": 2.8,
+       "h": 83.4,
+       "y0": 75.2,
+       "rot": true
+      }
+     },
+     {
+      "f": 6369,
+      "car": [
+       1196,
+       -2038,
+       77.3
+      ],
+      "cam": [
+       1203,
+       -2040.6,
+       80.8
+      ],
+      "b": {
+       "x": 1207.9,
+       "z": -2045.6,
+       "hw": 4.2,
+       "hd": 5.1,
+       "h": 84.4,
+       "y0": 76.2,
+       "rot": true
+      }
+     },
+     {
+      "f": 10161,
+      "car": [
+       996,
+       -2076,
+       76.4
+      ],
+      "cam": [
+       990.9,
+       -2082.9,
+       80
+      ],
+      "b": {
+       "x": 997.6,
+       "z": -2084.3,
+       "hw": 5,
+       "hd": 5.2,
+       "h": 89.3,
+       "y0": 74.5,
+       "rot": true
+      }
+     },
+     {
+      "f": 11271,
+      "car": [
+       972,
+       -2049,
+       77.7
+      ],
+      "cam": [
+       970.3,
+       -2045.1,
+       81.2
+      ],
+      "b": {
+       "x": 962,
+       "z": -2084,
+       "hw": 8,
+       "hd": 56,
+       "rot": false
+      }
+     },
+     {
+      "f": 11685,
+      "car": [
+       972,
+       -2072,
+       76.5
+      ],
+      "cam": [
+       969.9,
+       -2066.7,
+       79.9
+      ],
+      "b": {
+       "x": 962,
+       "z": -2084,
+       "hw": 8,
+       "hd": 56,
+       "rot": false
+      }
+     }
+    ],
+    "smashPerMin": 8.9,
+    "traffic120m": 4,
+    "missions": [
+     {
+      "f": 965,
+      "start": "Koulouri Rush"
+     },
+     {
+      "f": 4792,
+      "end": "KOULOURI RUSH★★★THE VAN ESCAPEDNo stars this time · try agai"
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "GO!",
+      "f": 3924,
+      "v0": 28,
+      "v1": 3,
+      "drop": 0.91,
+      "kind": "other",
+      "x": 1251,
+      "z": -1869,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 4706,
+      "v0": 28,
+      "v1": 2,
+      "drop": 0.91,
+      "kind": "wall",
+      "x": 1163,
+      "z": -1960,
+      "dy": 0
+     },
+     {
+      "ctx": "THE VAN ESCAPED",
+      "f": 6888,
+      "v0": 60,
+      "v1": 6,
+      "drop": 0.9,
+      "kind": "wall",
+      "x": 1160,
+      "z": -2041,
+      "dy": 0
+     },
+     {
+      "ctx": "THE VAN ESCAPED",
+      "f": 6851,
+      "v0": 24,
+      "v1": 5,
+      "drop": 0.8,
+      "kind": "traffic",
+      "x": 1160,
+      "z": -2036,
+      "dy": 0
+     },
+     {
+      "ctx": "THE VAN ESCAPED",
+      "f": 7790,
+      "v0": 51,
+      "v1": 12,
+      "drop": 0.77,
+      "kind": "wall",
+      "x": 1013,
+      "z": -2122,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "scale": {
+     "pedH": 1.91,
+     "carL": 4.86,
+     "carH": 1.6,
+     "player": {
+      "h": 1.17,
+      "l": 5.18,
+      "w": 2.56
+     },
+     "pedRel": 0.98,
+     "pedVsPlayer": 0.92,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 649,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 861,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [
+     "tF×#roamPrompt",
+     "tN×#roamPrompt",
+     "tF×B«✈ Flights · Fran»",
+     "tF×SPAN«TAP TO OPEN»",
+     "tN×SPAN«TAP TO OPEN»",
+     "tF×B«Yiayia Froso · K»"
+    ],
+    "hudOverlap": [
+     "#roamMini×#roamTut",
+     "#roamPlate×#ogArea",
+     "#roamTut×#m1Next",
+     "#roamTut×#ogArea",
+     "#roamArrow×#npcSay",
+     "#npcSay×#roamMini",
+     "#npcSay×#roamTut",
+     "#npcSay×#m1Next",
+     "#roamPlate×#roamTut",
+     "#roamMini×#roamPop",
+     "#roamPlate×#roamPop"
+    ],
+    "tiny": [
+     "SMALL:8px:KM/H",
+     "SMALL:9px:Chapter 1 · Welcome to A",
+     "SMALL:9px:TUTORIAL 1/6",
+     "B:9px:NEXT",
+     "SPAN:9px:TAP TO OPEN",
+     "SMALL:9px:TUTORIAL 2/6",
+     "SMALL:9px:TUTORIAL 3/6",
+     "SMALL:9px:TUTORIAL 4/6",
+     "SMALL:9px:TUTORIAL 5/6",
+     "SMALL:9px:TUTORIAL 6/6",
+     "SMALL:9px:24.3 s",
+     "SMALL:9px:19.3 s",
+     "SMALL:9px:14.3 s",
+     "SMALL:9px:9.3 s",
+     "SMALL:9px:4.3 s",
+     "SMALL:9px:24.7 s",
+     "SMALL:9px:19.7 s",
+     "SMALL:9px:14.7 s",
+     "SMALL:9px:9.7 s",
+     "SMALL:9px:4.7 s"
+    ],
+    "extra": {
+     "map": {
+      "opened": true,
+      "drag": true,
+      "pinch": true,
+      "covers": [
+       "#m1Next"
+      ],
+      "closed": true
+     },
+     "pause": {
+      "tP_settings": true,
+      "opts": [
+       "Master80",
+       "Music60",
+       "Effects90"
+      ],
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": true,
+      "btn": true,
+      "open": [
+       "gbx"
+      ],
+      "refused": false,
+      "closeBtn": "SAVE & DRIVE",
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [
+     "next@732",
+     "next@4746",
+     "next@5352"
+    ],
+    "perf": {
+     "calls": 286,
+     "tris": 1228821,
+     "jsMs": 32,
+     "geoms": 1260,
+     "tex": 151
+    },
+    "wallSec": 1383
+   }
+  },
+  "errs": [],
+  "warns": []
+ },
+ {
+  "mode": "desk",
+  "cities": {
+   "fra": {
+    "min": 5.05,
+    "hits": 19,
+    "kinds": {
+     "other": 16,
+     "ped": 1,
+     "wall": 1,
+     "mission-car": 1
+    },
+    "wallHits": 1,
+    "wallPerMin": 0.2,
+    "hitsPerMin": 3.76,
+    "bigDrop": 5,
+    "stuckPct": 0.8,
+    "avgKmh": 107.6,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 5.9,
+    "traffic120m": 1.2,
+    "missions": [
+     {
+      "f": 1,
+      "start": "Hot Drop"
+     },
+     {
+      "f": 5959,
+      "end": "HOT DROP★★★A GETAWAY CAR ESCAPEDNo stars this time · try aga"
+     },
+     {
+      "f": 6577,
+      "start": "Hot Drop"
+     },
+     {
+      "f": 12824,
+      "end": "HOT DROP★★★A GETAWAY CAR ESCAPEDNo stars this time · try aga"
+     },
+     {
+      "f": 13587,
+      "start": "Hot Drop"
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "GO!",
+      "f": 8918,
+      "v0": 52,
+      "v1": 2,
+      "drop": 0.96,
+      "kind": "wall",
+      "x": 1221,
+      "z": -138,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 17200,
+      "v0": 24,
+      "v1": 2,
+      "drop": 0.89,
+      "kind": "other",
+      "x": 960,
+      "z": -479,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 8173,
+      "v0": 33,
+      "v1": 7,
+      "drop": 0.78,
+      "kind": "other",
+      "x": 1429,
+      "z": -102,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 1820,
+      "v0": 49,
+      "v1": 20,
+      "drop": 0.58,
+      "kind": "other",
+      "x": 1332,
+      "z": -119,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 9946,
+      "v0": 49,
+      "v1": 20,
+      "drop": 0.58,
+      "kind": "other",
+      "x": 1135,
+      "z": -353,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "scale": {
+     "pedH": 1.92,
+     "carL": 4.9,
+     "carH": 1.94,
+     "player": {
+      "h": 1.34,
+      "l": 5,
+      "w": 2.29
+     },
+     "pedRel": 0.98,
+     "pedVsPlayer": 0.96,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 898,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 1023,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#roamMini×#roamPlate",
+     "#roamArrow×#chRes",
+     "#npcSay×#chRes",
+     "#chRes×#roamPop",
+     "#chRes×#m1Next",
+     "#roamPop×#m1Next",
+     "#roamArrow×#hitPop",
+     "#roamDist×#hitPop"
+    ],
+    "tiny": [
+     "B:9px:NEXT"
+    ],
+    "extra": {
+     "map": {
+      "opened": true,
+      "drag": true,
+      "pinch": null,
+      "covers": [],
+      "closed": true
+     },
+     "pause": {
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": true,
+      "btn": true,
+      "open": [
+       "gbx"
+      ],
+      "refused": false,
+      "closeBtn": "SAVE & DRIVE",
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [
+     "next@5880",
+     "next@6486",
+     "next@12570",
+     "next@13176"
+    ],
+    "perf": {
+     "calls": 536,
+     "tris": 1870583,
+     "jsMs": 10.2,
+     "geoms": 530,
+     "tex": 120
+    },
+    "wallSec": 990
+   },
+   "ath": {
+    "min": 5.02,
+    "hits": 71,
+    "kinds": {
+     "wall": 40,
+     "ped": 4,
+     "other": 25,
+     "traffic": 2
+    },
+    "wallHits": 40,
+    "wallPerMin": 7.97,
+    "hitsPerMin": 14.14,
+    "bigDrop": 27,
+    "stuckPct": 0,
+    "avgKmh": 93.8,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0.4,
+    "camInside": [
+     {
+      "f": 252,
+      "car": [
+       624,
+       -2314,
+       66.4
+      ],
+      "cam": [
+       631.7,
+       -2315.8,
+       70.2
+      ],
+      "b": {
+       "x": 626,
+       "z": -2332,
+       "hw": 8,
+       "hd": 16,
+       "rot": false
+      }
+     },
+     {
+      "f": 7107,
+      "car": [
+       1225,
+       -1903,
+       75.2
+      ],
+      "cam": [
+       1228.4,
+       -1895.5,
+       78.7
+      ],
+      "b": {
+       "x": 1230.9,
+       "z": -1891.9,
+       "hw": 3.2,
+       "hd": 3.4,
+       "h": 84.9,
+       "y0": 73.4,
+       "rot": true
+      }
+     },
+     {
+      "f": 8691,
+      "car": [
+       1283,
+       -2408,
+       57.7
+      ],
+      "cam": [
+       1277.3,
+       -2408.4,
+       61.2
+      ],
+      "b": {
+       "x": 1275.6,
+       "z": -2410,
+       "hw": 1.8,
+       "hd": 1.3,
+       "h": 76.7,
+       "y0": 56.7,
+       "rot": false
+      }
+     },
+     {
+      "f": 14598,
+      "car": [
+       1220,
+       -2045,
+       77.2
+      ],
+      "cam": [
+       1228,
+       -2040.8,
+       80.7
+      ],
+      "b": {
+       "x": 1231.2,
+       "z": -2035.6,
+       "hw": 4,
+       "hd": 4.5,
+       "h": 83.4,
+       "y0": 75.2,
+       "rot": true
+      }
+     }
+    ],
+    "smashPerMin": 19.9,
+    "traffic120m": 4.4,
+    "missions": [
+     {
+      "f": 4828,
+      "start": "Koulouri Rush"
+     },
+     {
+      "f": 8627,
+      "end": "KOULOURI RUSH★★★THE VAN ESCAPEDNo stars this time · try agai"
+     },
+     {
+      "f": 12004,
+      "start": "Koulouri Rush"
+     },
+     {
+      "f": 15682,
+      "end": "KOULOURI RUSH★★★THE VAN ESCAPEDNo stars this time · try agai"
+     },
+     {
+      "f": 15895,
+      "start": "Taxi Shift"
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "TAXI SHIFT",
+      "f": 15895,
+      "v0": 48,
+      "v1": 6,
+      "drop": 0.87,
+      "kind": "other",
+      "x": 1304,
+      "z": -2528,
+      "dy": 0
+     },
+     {
+      "ctx": "🏺 RED-FIGURE AMPHORA",
+      "f": 10026,
+      "v0": 29,
+      "v1": 4,
+      "drop": 0.86,
+      "kind": "other",
+      "x": 1196,
+      "z": -2045,
+      "dy": 0
+     },
+     {
+      "ctx": "🏺 RED-FIGURE AMPHORA",
+      "f": 9694,
+      "v0": 255,
+      "v1": 43,
+      "drop": 0.83,
+      "kind": "wall",
+      "x": 1203,
+      "z": -2085,
+      "dy": 0.1
+     },
+     {
+      "ctx": "CHAIN REACTION",
+      "f": 2528,
+      "v0": 243,
+      "v1": 43,
+      "drop": 0.82,
+      "kind": "wall",
+      "x": 1286,
+      "z": -2027,
+      "dy": -0.2
+     },
+     {
+      "ctx": "CHAIN REACTION",
+      "f": 3260,
+      "v0": 232,
+      "v1": 43,
+      "drop": 0.81,
+      "kind": "wall",
+      "x": 1473,
+      "z": -1992,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "scale": {
+     "pedH": 1.91,
+     "carL": 4.82,
+     "carH": 1.6,
+     "player": {
+      "h": 0,
+      "l": 0,
+      "w": 0
+     },
+     "pedRel": 0.99,
+     "pedVsPlayer": null,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 61,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 1389,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#roamMini×#roamPlate",
+     "#roamDist×#m1Next",
+     "#roamPop×#m1Next",
+     "#roamArrow×#chRes",
+     "#chRes×#roamPop",
+     "#chRes×#m1Next",
+     "#chRes×#ogArea",
+     "#roamPop×#ogArea",
+     "#roamCombo×#qTrk",
+     "#npcSay×#chRes"
+    ],
+    "tiny": [
+     "B:9px:NEXT"
+    ],
+    "extra": {
+     "map": {
+      "opened": true,
+      "drag": true,
+      "pinch": null,
+      "covers": [],
+      "closed": true
+     },
+     "pause": {
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": true,
+      "btn": false,
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [
+     "next@0",
+     "next@4806",
+     "next@8526",
+     "next@9132",
+     "next@11742",
+     "next@15390"
+    ],
+    "perf": {
+     "calls": 347,
+     "tris": 1345921,
+     "jsMs": 37.3,
+     "geoms": 1196,
+     "tex": 134
+    },
+    "wallSec": 1610
+   }
+  },
+  "errs": [],
+  "warns": []
+ }
+]
