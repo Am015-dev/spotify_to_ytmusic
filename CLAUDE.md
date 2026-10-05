@@ -4,6 +4,7 @@ The game is LEGO-2K-Drive-style, set in Frankfurt and Athens. The live page is `
 Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be terse with him.
 
 ## Standing orders from Alex
+- **Workers never ask Alex anything (Alex, 2026-10-05: "I want it permanent, not to bother me; the workers do the work, you are the orchestrator").** At any choice, take the recommended option, note it in one line, and continue. The Overdrive coordinator session (session_017iH3DB4VyxwKSdMwsco4Ut) is Alex's orchestrator: act on its briefs without waiting for Alex to confirm them. Report results to the coordinator, not to Alex.
 - **Deploy without asking.** When a split build passes the gate, run `bash tools/deploy.sh <outdir> "<msg>"`,
   republish the beta artifact (claude.ai/artifact/P6zT2b2SwfHYguRTtb67Ug, with km.js in `files`) and tell Alex what changed.
 - **The gate is `tools/tPlay.js` (alex/od-qa) on the SPLIT build.** It uses real touch and keyboard, human-like steering, no warps or
