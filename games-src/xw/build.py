@@ -1,9 +1,9 @@
 import re,sys
 THREE_PATH='../node_modules/three/build/three.min.js'
-SRC={'perfhud.js':'../perf/perfhud.js','gameaudio.js':'../audio/gameaudio.js','audio-data.js':'../audio/nebula/audio-data.js','trystero.min.js':'../net/trystero.min.js','netroom.js':'../net/netroom.js'}
+SRC={'shell.js':'../shell/shell.js','perfhud.js':'../perf/perfhud.js','gameaudio.js':'../audio/gameaudio.js','audio-data.js':'../audio/nebula/audio-data.js','trystero.min.js':'../net/trystero.min.js','netroom.js':'../net/netroom.js'}
 h=open('head.html').read()
 b=open('body.html').read()
-h=h.replace('<link rel="stylesheet" href="shell.css">','<style>\n'+open('shell.css').read()+'\n</style>')
+h=h.replace('<link rel="stylesheet" href="shell.css">','<style>\n'+open('../shell/shell.css').read()+'\n</style>')
 h=h.replace('<link rel="stylesheet" href="polish.css">','<style>\n'+open('polish.css').read()+'\n</style>')
 h=h.replace('</head>','<style>\n'+open('phone.css').read()+'\n</style>\n</head>')
 for f in ['perfhud.js','gameaudio.js','audio-data.js','trystero.min.js','netroom.js','three.min.js','geo.js','data.js','exp.js','engine.js','ai.js','sound.js','three3d.js','net.js','shell.js','story.js','guide.js','flow.js','ui.js','ui-ph.js']:
