@@ -5,3 +5,4 @@ chk.mjs
 __pycache__/
 *.log
 smoke/*.jpg
+v85shots/
