@@ -47,11 +47,11 @@ function init3D(){const cv=document.getElementById('c3');if(!cv||typeof THREE===
   const u=urlGfx();V3.pinned=!!u||gfxPref()!=='auto';const p=gfxPref();setQuality(u||(p==='auto'?gfxAuto():p));
   resize3D();V3.on=true;document.body.classList.add('three');V3.clock=performance.now();gfxLabel();
   setTimeout(()=>{try{makePortraits()}catch(e){console.warn('portraits off',e)}},300);
-  setTimeout(()=>{try{warm3D()}catch(e){console.warn('warm off',e)}},700);
+  try{warm3D()}catch(e){console.warn('warm off',e)}
   perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
 // ---- quality levels ----
 function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=V3.r;V3.q=q;const dpr=window.devicePixelRatio||1;
-  {let want=q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1;/* software rendering (no GPU): fewer pixels keeps taps responsive */if(V3.soft)want=Math.min(want,.7);r.setPixelRatio(PH?PH.pixelRatio(want):want)}
+  {let want=q==='high'?Math.min(2,dpr):q==='medium'?Math.min(1.5,dpr):1;/* software rendering (no GPU): fewer pixels keeps taps responsive */if(V3.soft)want=Math.min(want,.5);r.setPixelRatio(PH?PH.pixelRatio(want):want)}
   const sh=q!=='low',ms=q==='high'?2048:1024,st=q==='high'?THREE.PCFSoftShadowMap:THREE.PCFShadowMap;
   if(r.shadowMap.enabled!==sh||V3.key.shadow.mapSize.x!==ms||r.shadowMap.type!==st){r.shadowMap.enabled=sh;r.shadowMap.type=st;V3.key.castShadow=sh;V3.key.shadow.mapSize.set(ms,ms);if(V3.key.shadow.map){V3.key.shadow.map.dispose();V3.key.shadow.map=null}
     V3.scene.traverse(o=>{if(o.material)[].concat(o.material).forEach(m=>m.needsUpdate=true)})}
@@ -574,7 +574,7 @@ function dieMesh(kind,face){const col=kind==='atk'?['#e1283c','#7a0a18','#fff4ea
   const others=kind==='atk'?['hit','focus','crit','blank','hit','blank','focus']:['evade','focus','blank','evade','blank','focus','evade'];let oi=0;const mats=[];
   for(let f=0;f<8;f++){const T=dieFaceTex(kind,f===front?face:others[oi++],col);mats.push(new THREE.MeshPhysicalMaterial({map:T.map,normalMap:T.nor,normalScale:new THREE.Vector2(1.4,1.4),roughness:.22,metalness:0,clearcoat:1,clearcoatRoughness:.08,envMapIntensity:1.2}));g.addGroup(f*3,3,f)}
   return new THREE.Mesh(g,mats)}
-function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=true;const cssR=[],urls=[];const dcam=new THREE.PerspectiveCamera(30,1,.1,50);
+function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=true;if(V3.soft&&!V3.pinned)return;/* software GL: each readback blocks ~0.25 s and delays the first taps; the SVG dice stay */const cssR=[],urls=[];const dcam=new THREE.PerspectiveCamera(30,1,.1,50);
   // find which octahedron face looks at the camera and orient the die so that face is face 0
   for(const kind of ['atk','def'])for(const face of ['hit','crit','focus','evade','blank']){if(kind==='atk'&&face==='evade'||kind==='def'&&(face==='hit'||face==='crit'))continue;const m=dieMesh(kind,face);
     m.rotation.set(-.12,.22,.05);dcam.position.set(0,.3,4.4);dcam.lookAt(0,0,0);const url=portrait(m,dcam,112);m.geometry.dispose();[].concat(m.material).forEach(q=>{q.map.dispose();q.normalMap.dispose();q.dispose()});cssR.push(`.dice3d .die.${kind}.${face}{background-image:url(${url})}`);urls.push(url)}
