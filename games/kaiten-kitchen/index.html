@@ -67,7 +67,7 @@ svg{display:block}
 .gx-bar h1 .ic{width:28px;height:28px;display:inline-block}
 .gx-bar .gx-ibtn{color:#fbf0da;background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22)}
 .gx-ibtn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-#barstat{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;opacity:.96;white-space:nowrap}
+#barstat{display:block;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:14px;font-weight:700;opacity:.96;white-space:nowrap}
 #barprompt{flex:1;min-width:0;display:none}
 #prompt{font-size:15px;line-height:1.25;font-weight:800}
 .gx-board{background:#e6cf9f}
@@ -144,7 +144,6 @@ svg{display:block}
 #dockbody>*{flex-shrink:0}
 #promptDock{min-height:2.7em}
 #prompt.mine{color:#b5361c}
-html.ph.ph-p #prompt,html.ph.ph-p #prompt.mine{color:#fbf0da}
 #rt{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px}
 #rt svg{flex:0 0 auto}
 #roster{display:flex;flex-wrap:wrap;gap:5px}
@@ -193,6 +192,7 @@ html.ph #cheat{display:none}
 .rtabs,.mbt{display:flex;gap:6px;flex-wrap:wrap}.rhead{display:flex;gap:10px;align-items:center}
 .rrow{display:flex;gap:8px;flex-wrap:wrap;padding:4px 0;align-items:center}
 .logl .ll{font-size:14px;padding:3px 0;border-bottom:1px dotted rgba(0,0,0,.2)}.lt{display:inline-block;min-width:34px;opacity:.6;font-size:13px}
+.gloss{margin:4px 0}.gloss dt{font-weight:800;font-size:14.5px}.gloss dd{margin:0 0 6px 14px;font-size:14.5px;line-height:1.4}
 .rules h3{margin:12px 0 4px;font-size:1.08rem}.rules p,.rules li{font-size:14.5px;line-height:1.45}.rules ul{padding-left:20px;margin:4px 0}
 .rcard{display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dotted rgba(0,0,0,.25)}
 .rcard .rt{flex:1;min-width:0;font-size:14px;line-height:1.35}.rcard .rt b{font-size:15px}
@@ -223,8 +223,12 @@ html.ph #cheat{display:none}
 .chipb{appearance:none;border:2px solid var(--ink);background:#fff8e6;border-radius:18px;min-height:44px;min-width:44px;padding:4px 12px;cursor:pointer;font-size:14px;font-weight:700}.chipb.on{background:var(--gold);font-weight:900}
 .srow2{display:flex;gap:8px;flex-wrap:wrap}
 /* ---- round / game end ---- */
-#rs{position:fixed;inset:0;z-index:55;background:rgba(40,22,16,.62);display:flex;align-items:center;justify-content:center;padding:8px}
+/* the round pad and final card sit under the top bar (Log and Diners stay reachable); drawers open above the pad and the title */
+html .gx-scrim{z-index:61}html .gx-drawer{z-index:62}
+html.ph.ph-l #rs{top:0!important}html.ph.ph-l .gx-bar{z-index:56}   /* landscape phones: the bar is a corner of the rail, keep it above the card */
+#rs{position:fixed;inset:0;top:var(--kkbar,0px);z-index:55;background:rgba(40,22,16,.62);display:flex;align-items:center;justify-content:center;padding:8px}
 .rsbox{background:var(--paper);border:3px solid var(--ink);border-radius:16px;width:min(560px,100%);max-height:100%;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:0 14px 44px rgba(0,0,0,.55);overscroll-behavior:contain}
+.rsbox .wp{margin:0;font-weight:800;font-size:15px;text-align:center}
 .rsbox h2{margin:0;font-size:1.35rem;font-weight:900;display:flex;gap:8px;align-items:center}
 .cat{width:100%;border-collapse:collapse;font-size:14px}
 .cat th,.cat td{padding:3px 4px;text-align:center;border-bottom:1px dotted rgba(74,42,34,.3)}
@@ -272,19 +276,26 @@ html.ph .gx-dock-head,html.ph .gx-reopen{display:none!important}
 html.ph .gx-dock{border-left:0;border-top:3px solid var(--wood2);max-height:none;padding-bottom:env(safe-area-inset-bottom,0px)}
 html.ph .gx-dock-body{padding:5px 6px 0;gap:5px;overflow-x:hidden;overflow-y:auto}
 html.ph #acts{position:sticky;bottom:0;background:var(--paper);padding:3px 0 5px;z-index:2;margin-top:auto}
-html.ph .chip{flex:0 0 auto;padding:2px 4px;gap:3px;min-width:44px;max-width:62px;flex-direction:column;justify-content:center;text-align:center;border-width:2px}
-html.ph .chip .ct{align-items:center;flex:0 0 auto}
-html.ph .chip .ct b{display:none}
+html.ph #roster{flex-wrap:wrap;gap:4px}
+html.ph .chip{flex:1 1 0;padding:1px 6px;gap:6px;min-width:44px;min-height:44px;border-width:2px}
+html.ph .chip .ct{flex-direction:row;gap:6px;align-items:baseline}
+html.ph .chip .ct b{font-size:13px}
+html.ph .chip .ct i{font-size:13px;font-weight:800;opacity:1}
 html.ph .chip .cav{width:24px;height:24px}
 html.ph #acts .btn{font-size:14px}
 html.ph .ph-body{padding:6px 8px}
 html.ph.ph-p .gx-app{grid-template-rows:calc(44px + env(safe-area-inset-top,0px)) minmax(0,1fr)}
 html.ph.ph-p .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) calc(var(--dockh) + env(safe-area-inset-bottom,0px))}
 html.ph.ph-p .gx-dock{max-height:none;height:auto}
-html.ph.ph-p #barprompt{display:block}
-html.ph.ph-p #prompt{font-size:13px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-html.ph.ph-p #promptDock,html.ph.ph-p #rt{display:none}
-html.ph.ph-p .gx-bar .gx-sp,html.ph.ph-p #barstat{display:none}
+html.ph.ph-p #promptDock{min-height:0;display:flex;align-items:center;gap:8px}
+html.ph.ph-p #promptDock #prompt{flex:1;min-width:0}
+#hintb{flex:0 0 auto;min-height:44px;padding:0 14px}
+html.ph.ph-p .gx-bar .gx-sp{display:none}
+html.ph .chip.nn .ct b{display:none}
+html.ph.ph-p #prompt{font-size:15px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html.ph.ph-p #prompt.mine{color:#b5361c}
+html.ph.ph-p #rt{display:none}
+html.ph.ph-p #barstat{font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 html.ph.ph-l .gx-app{grid-template-columns:minmax(0,1fr) var(--rail);grid-template-rows:calc(44px + env(safe-area-inset-top,0px)) minmax(0,1fr)}
 html.ph.ph-l .gx-main{display:contents}
 html.ph.ph-l .gx-board{grid-column:1;grid-row:1/3}
@@ -313,7 +324,7 @@ html.ph #netst{min-width:44px;min-height:44px;padding:0 8px;justify-content:cent
 html.ph.ph-l.net #barstat{display:none}
 html.ph #beltz .lab{font-size:13px;padding:1px 6px 0;min-height:17px}
 html.ph #belt{padding:24px 6px 4px;gap:5px}
-html.ph.ph-p.kk-sel #roster,html.ph.ph-p.kk-short.kk-sel #rt{display:none}
+html.ph.ph-p.kk-short.kk-sel #roster,html.ph.ph-p.kk-short.kk-sel #rt{display:none}
 html.ph .rsbox{padding:8px;gap:6px}
 html.ph .cat td.n{font-size:15px;min-width:34px}
 #acts .btn,.cbtns .btn{flex-shrink:0}
@@ -391,7 +402,166 @@ html.ph .dgrid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px
 html.ph .dcard{padding:8px;gap:6px}html.ph .dimg{width:64px;height:64px}
 html.ph.ph-l .setup.scard{width:min(820px,100%)}
 @media (prefers-reduced-motion:reduce){.tbtn:active{transform:none}}
-</style></head>
+
+/* clarity pass: race, last-turn feed, inline tips, wrapped counters, score change badges, two-row belt */
+.pudl{flex:1 1 100%;font-size:13px;font-weight:700;line-height:1.2;opacity:.9}
+#selinfo.feed{flex-direction:column;gap:4px;align-items:stretch;border-style:solid;background:#fff8e6}
+#selinfo .tip{display:flex;gap:7px;align-items:flex-start;font-size:13px;line-height:1.3;background:#fff1c2;border:1px solid #c98a10;border-radius:8px;padding:4px 6px}
+#selinfo .tip .tcard{flex:0 0 30px;height:30px}#selinfo .tip .tcard svg{width:30px;height:30px}
+#selinfo .news{display:flex;flex-direction:column;gap:2px;font-size:13px;line-height:1.25}
+#selinfo .news .nh{font-weight:800;opacity:.7}
+#selinfo .news .nn{font-weight:900}
+#selinfo .news .nd{font-weight:900;padding:0 4px;border-radius:5px;background:#eee3c8}
+#selinfo .news .nd.up{background:#d8f1c9;color:#22662b}#selinfo .news .nd.down{background:#ffd6c9;color:#9b2b14}
+.seat.wrap .ctr{flex-wrap:wrap!important;align-content:center;overflow:hidden}
+.seat.wrap{align-self:stretch}
+.sh .dl{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);background:#2e8a3a;color:#fff;font-weight:900;font-size:14px;border-radius:10px;padding:0 6px;z-index:3;animation:kkdl 2.6s ease-out forwards;pointer-events:none;white-space:nowrap}
+.sh .dl.neg{background:#b5361c}
+@keyframes kkdl{0%{opacity:0;transform:translate(-50%,4px)}12%{opacity:1;transform:translate(-50%,0)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,0)}}
+#belt.two{flex-wrap:wrap;overflow-x:hidden;row-gap:6px;align-content:flex-end;justify-content:center;min-height:calc(var(--hw)*2.8 + 40px)}
+@media (prefers-reduced-motion:reduce){.sh .dl{animation:none;opacity:0}}
+</style><style>
+/* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
+:root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
+  --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
+  --gxc-font:inherit;--gxc-head:inherit}
+.gxc{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;color:var(--gxc-ink);font-family:var(--gxc-font);
+  background:radial-gradient(120% 70% at 50% 0%,#3a2a1c 0%,var(--gxc-bg) 70%);overflow:hidden;
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.gxc[hidden]{display:none}
+.gxc *{box-sizing:border-box}
+.gxc button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.gxc button:focus-visible{outline:3px solid var(--gxc-gold);outline-offset:2px}
+.gxc-screen{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;width:100%;max-width:560px;margin:0 auto}
+.gxc-map-on .gxc-screen{justify-content:flex-start;padding:0;max-width:640px}
+.gxc-dim{color:var(--gxc-dim)}
+.gxc-small{font-size:13px;margin:6px 0 0;text-align:center}
+.gxc-row{display:flex;gap:8px;justify-content:center;margin-top:14px;width:100%}
+.gxc-row.wrap{flex-wrap:wrap}
+.gxc-btn{min-height:46px;min-width:88px;padding:8px 18px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
+.gxc-btn.go{background:linear-gradient(#dc7a3a,var(--gxc-go));border-color:#8f4317;color:var(--gxc-go-ink);box-shadow:0 3px 0 #7a3712,0 6px 14px rgba(0,0,0,.25);flex:1 1 auto;max-width:220px}
+.gxc-btn.go:active{transform:translateY(2px);box-shadow:0 1px 0 #7a3712}
+.gxc-btn.soft{background:#f7e7b8;border-color:#c9a14a}
+.gxc-btn.ghost{background:rgba(255,255,255,.22)}
+.gxc-ib{min-height:44px;min-width:44px;padding:4px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap}
+.gxc-tag{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
+/* portraits: image or emoji badge in a painted ring */
+.gxc-pt{--gxc-pt:64px;--gxc-ptc:#6b4a2b;width:var(--gxc-pt);height:var(--gxc-pt);flex:0 0 var(--gxc-pt);border-radius:50%;overflow:hidden;display:grid;place-items:center;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.45),transparent 55%),var(--gxc-ptc);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.5),0 6px 16px rgba(0,0,0,.3)}
+.gxc-pt img{width:100%;height:100%;object-fit:cover;display:block}
+.gxc-pt-e{font-size:calc(var(--gxc-pt) * .52);line-height:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+/* ---- map ---- */
+.gxc-head{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;flex:0 0 auto;color:#fbefd6}
+.gxc-htitle{flex:1 1 auto;min-width:0;text-align:center;font-family:var(--gxc-head);font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.gxc-score{color:var(--gxc-gold)}
+.gxc-map{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;
+  background:
+    radial-gradient(60% 40% at 20% 15%,rgba(110,150,80,.28),transparent 70%),
+    radial-gradient(50% 35% at 85% 55%,rgba(200,140,60,.22),transparent 70%),
+    radial-gradient(70% 40% at 30% 92%,rgba(150,60,70,.22),transparent 70%),
+    repeating-radial-gradient(circle at 70% 30%,rgba(120,80,30,.035) 0 2px,transparent 2px 9px),
+    linear-gradient(#f1e3c2,var(--gxc-paper2));box-shadow:inset 0 0 40px rgba(90,55,20,.45)}
+.gxc-path{position:relative;width:100%;margin:0 auto;max-width:560px}
+.gxc-road{position:absolute;left:0;top:0;width:100%;pointer-events:none;overflow:visible}
+.gxc-road path{fill:none;stroke-linecap:round}
+.gxc-road-edge{stroke:rgba(90,58,24,.45);stroke-width:26px}
+.gxc-road-fill{stroke:var(--gxc-road);stroke-width:20px}
+.gxc-road-dash{stroke:#f6e6c2;stroke-width:3px;stroke-dasharray:2 10;opacity:.85}
+.gxc-act{position:absolute;left:12px;right:12px;height:38px;margin-top:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(90deg,transparent,rgba(60,38,14,.82) 15%,rgba(60,38,14,.82) 85%,transparent);color:#fbefd6;z-index:2;text-align:center;line-height:1.1}
+.gxc-act b{font-size:14px;letter-spacing:.04em}
+.gxc-act small{font-size:11.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 18px}
+.gxc-node{position:absolute;transform:translateX(-50%);width:64px;height:64px;padding:0;border:0;background:none;z-index:3;display:flex;flex-direction:column;align-items:center}
+.gxc-disc{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff8ec;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%),var(--gxc-a1);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.55),0 5px 10px rgba(0,0,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.gxc-node.a2 .gxc-disc{background-color:var(--gxc-a2);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%)}
+.gxc-node.a3 .gxc-disc{background-color:var(--gxc-a3);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%)}
+.gxc-node.boss .gxc-disc{width:62px;height:62px;margin-top:-3px;border-color:var(--gxc-gold);box-shadow:0 0 0 2px #6b3c10,0 0 0 6px rgba(242,185,59,.35),0 6px 12px rgba(0,0,0,.35)}
+.gxc-node.boss .gxc-disc .gxc-pt{border:0;box-shadow:none;background:transparent}
+.gxc-node.boss .gxc-disc::after{content:'♛';position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:17px;color:var(--gxc-gold);text-shadow:0 1px 2px #000}
+.gxc-node.locked .gxc-disc{filter:grayscale(.85) brightness(.85);opacity:.75}
+.gxc-lock{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+.gxc-node.won .gxc-disc{border-color:var(--gxc-gold)}
+.gxc-node.next .gxc-disc{animation:gxc-pulse 1.6s ease-in-out infinite}
+@keyframes gxc-pulse{0%,100%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 0 rgba(242,185,59,.7)}50%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 10px rgba(242,185,59,0)}}
+.gxc-node .gxc-stars{position:absolute;top:50px;left:50%;transform:translateX(-50%);gap:0;padding:0 4px;border-radius:99px;background:rgba(60,38,14,.75)}
+.gxc-node .gxc-st{font-size:12px}
+.gxc-lab{position:absolute;left:66px;top:14px;width:max-content;max-width:min(150px,38vw);text-align:left;font-size:13.5px;font-weight:700;line-height:1.15;color:var(--gxc-ink);
+  background:rgba(246,230,194,.88);padding:3px 8px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.gxc-node.lab-l .gxc-lab{left:auto;right:66px;text-align:right}
+.gxc-node.locked .gxc-lab{opacity:.65}
+.gxc-stars{display:inline-flex;gap:2px;justify-content:center}
+.gxc-st{font-style:normal;color:rgba(255,255,255,.35);font-size:16px;line-height:1}
+.gxc-st.on{color:var(--gxc-gold);text-shadow:0 0 6px rgba(242,185,59,.6)}
+.gxc-st.cap{opacity:.3}
+.gxc-stars.big .gxc-st{font-size:44px;color:rgba(60,38,14,.2)}
+.gxc-stars.big .gxc-st.on{color:var(--gxc-gold);text-shadow:0 2px 0 #9c6a12,0 0 14px rgba(242,185,59,.7);animation:gxc-pop .4s cubic-bezier(.3,1.6,.5,1) both}
+.gxc-stars.big .gxc-st.on:nth-child(2){animation-delay:.25s}.gxc-stars.big .gxc-st.on:nth-child(3){animation-delay:.5s}
+@keyframes gxc-pop{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:none;opacity:1}}
+/* sheets and toasts sit over the map */
+.gxc-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:88%;overflow-y:auto;z-index:5;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.5);animation:gxc-up .22s ease-out}
+@keyframes gxc-up{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
+.gxc-sheet h3{margin:0 0 4px;font-family:var(--gxc-head);font-size:21px;line-height:1.15}
+.gxc-sh-top{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.gxc-sh-t{min-width:0}.gxc-sh-t small{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--gxc-dim);font-weight:700}
+.gxc-goal,.gxc-twist{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:12px;margin:6px 0;text-align:left;width:100%;font-size:15px;line-height:1.3}
+.gxc-goal{background:rgba(79,138,75,.16);border:1px solid rgba(79,138,75,.45)}
+.gxc-twist{background:rgba(142,59,70,.12);border:1px solid rgba(142,59,70,.5)}
+.gxc-goal b,.gxc-twist b{font-size:12px;text-transform:uppercase;letter-spacing:.07em}
+.gxc-twist b{color:var(--gxc-a3)}
+.gxc-twist.big{font-size:16px;border-width:2px}
+.gxc-slist{list-style:none;margin:8px 0 0;padding:0;width:100%;text-align:left;font-size:14.5px}
+.gxc-slist li{display:flex;gap:8px;align-items:center;padding:4px 0}
+.gxc-slist i{font-style:normal;font-size:18px;color:rgba(60,38,14,.25)}
+.gxc-slist li.on i{color:var(--gxc-gold);text-shadow:0 1px 0 #9c6a12}
+.gxc-rw{list-style:none;padding:0;margin:8px 0}.gxc-rw li{padding:6px 0;border-bottom:1px solid var(--gxc-line)}
+.gxc-toast{position:absolute;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9;background:rgba(30,20,10,.92);color:#fbefd6;padding:10px 16px;border-radius:12px;font-weight:600;max-width:calc(100% - 32px);text-align:center}
+/* ---- story scene ---- */
+.gxc-scene,.gxc-boss,.gxc-res{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;border-radius:var(--gxc-radius);
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto}
+.gxc-sc-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
+.gxc-sc-who{margin-bottom:8px}
+.gxc-sc-name{font-family:var(--gxc-head);font-weight:800;font-size:18px;min-height:1.2em}
+.gxc-sc-text{font-size:18px;line-height:1.4;margin:10px 0 12px;min-height:3.2em;max-width:30em;cursor:pointer}
+.gxc-sc-text.in{animation:gxc-in .3s ease-out}
+@keyframes gxc-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.gxc-dots{display:flex;gap:6px}.gxc-dots i{width:8px;height:8px;border-radius:50%;background:rgba(60,38,14,.2)}.gxc-dots i.was{background:rgba(60,38,14,.45)}.gxc-dots i.on{background:var(--gxc-go)}
+/* ---- boss card ---- */
+.gxc-boss-on{background:radial-gradient(100% 60% at 50% 30%,#5a2230 0%,#1a0d10 75%)}
+.gxc-boss-on.a1{background:radial-gradient(100% 60% at 50% 30%,#2d5a2c 0%,#0f1a0e 75%)}
+.gxc-boss-on.a2{background:radial-gradient(100% 60% at 50% 30%,#6a4318 0%,#1a120a 75%)}
+.gxc-boss{border:3px solid var(--gxc-gold);position:relative;padding-top:14px}
+.gxc-boss-tag{margin-bottom:10px;background:linear-gradient(#f6c552,#c98d17);color:#3a2205;font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:13px;padding:5px 18px;border-radius:99px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.gxc-boss .gxc-pt{border-color:var(--gxc-gold)}
+.gxc-boss h2{margin:12px 0 2px;font-family:var(--gxc-head);font-size:26px;line-height:1.1}
+.gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
+/* ---- result ---- */
+.gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
+.gxc-res-k{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
+.gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
+.gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
+.gxc-quote b{font-size:13px}.gxc-quote p{margin:2px 0 0;font-style:italic;font-size:15px;line-height:1.3}
+.gxc-unl{width:100%;margin-top:10px;text-align:left;padding:10px 12px;border-radius:12px;border:2px dashed #c9a14a;background:rgba(242,185,59,.14)}
+.gxc-unl>b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.gxc-unl-i{padding:3px 0;font-size:15px}
+/* short phones (375x553): tighter scene, smaller portraits */
+@media (max-height:600px){
+  .gxc-screen{padding:8px 12px}
+  .gxc-scene,.gxc-boss,.gxc-res{padding:14px 12px}
+  .gxc-sc-who .gxc-pt{--gxc-pt:84px!important}
+  .gxc-boss .gxc-pt{--gxc-pt:104px!important}
+  .gxc-boss{padding-top:10px}.gxc-boss-tag{margin-bottom:6px}.gxc-boss h2{font-size:22px;margin-top:8px}
+  .gxc-sc-text{font-size:16.5px;margin:6px 0 8px}
+  .gxc-stars.big .gxc-st{font-size:36px}
+  .gxc-res h2{font-size:23px}
+}
+html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+
+</style>
+</head>
 <body>
 <div class="gx-app">
 <header class="gx-bar">
@@ -2819,6 +2989,8 @@ const GX={key:'gx',open:null,
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&this.open){this.close();e.stopImmediatePropagation()}},true);
     // resize hook for boards
     const b=document.querySelector('.gx-board');if(b&&window.ResizeObserver)new ResizeObserver(()=>{for(const f of this._rs)try{f(b.clientWidth,b.clientHeight)}catch(e){}}).observe(b)},
+  // a drawer is modal: the page behind it is inert and hidden from assistive tech, so nothing under the sheet is a live tap target
+  bg(on){const a=this.app;if(!a)return;if(on){a.setAttribute('aria-hidden','true');a.inert=true}else{a.removeAttribute('aria-hidden');a.inert=false}},
   _rs:[],onResize(f){this._rs.push(f)},
   boardSize(){const b=document.querySelector('.gx-board');return b?{w:b.clientWidth,h:b.clientHeight}:{w:innerWidth,h:innerHeight}},
   toggleDock(force){const min=force!=null?!force:!this.app.classList.contains('gx-dock-min');this.app.classList.toggle('gx-dock-min',min);this.app.classList.remove('gx-sheet-full');try{localStorage.setItem(this.key+'_dockmin',min?'1':'0')}catch(e){}},
@@ -2827,15 +2999,490 @@ const GX={key:'gx',open:null,
   showDock(){if(this.app&&this.app.classList.contains('gx-dock-min'))this.toggleDock(true)},
   toggle(id){if(this.open===id)this.close();else this.show(id)},
   show(id){const d=document.getElementById(id);if(!d)return;if(this.open&&this.open!==id){const o=document.getElementById(this.open);if(o)o.classList.remove('on')}
-    this.open=id;d.classList.add('on');this.scrim&&this.scrim.classList.add('on');this._back=document.activeElement;
+    this.open=id;d.classList.add('on');this.scrim&&this.scrim.classList.add('on');this.bg(true);this._back=document.activeElement;
     for(const b of document.querySelectorAll('[data-gx="'+id+'"]'))b.setAttribute('aria-expanded','true');
     const f=d.querySelector('.gx-x');if(f)f.focus({preventScroll:true});if(this.onShow)this.onShow(id)},
-  close(){if(!this.open)return;const id=this.open;const d=document.getElementById(this.open);if(d)d.classList.remove('on');for(const b of document.querySelectorAll('[data-gx="'+this.open+'"]'))b.setAttribute('aria-expanded','false');this.open=null;this.scrim&&this.scrim.classList.remove('on');if(this._back&&this._back.focus)this._back.focus({preventScroll:true});if(this.onClose)this.onClose(id)},
+  close(){if(!this.open)return;const id=this.open;const d=document.getElementById(this.open);if(d)d.classList.remove('on');for(const b of document.querySelectorAll('[data-gx="'+this.open+'"]'))b.setAttribute('aria-expanded','false');this.open=null;this.bg(false);this.scrim&&this.scrim.classList.remove('on');if(this._back&&this._back.focus)this._back.focus({preventScroll:true});if(this.onClose)this.onClose(id)},
   // build a drawer shell around a body element: <div class=gx-drawer id><head><h2>title</h2><button.gx-x></head><body/></div>
   drawer(id,title,bodyEl,wide){let d=document.getElementById(id);if(!d){d=document.createElement('section');d.id=id;d.className='gx-drawer'+(wide?' wide':'');d.setAttribute('role','dialog');d.setAttribute('aria-label',title);
       d.innerHTML=`<div class="gx-drawer-head"><h2></h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"></div>`;document.body.appendChild(d)}
     d.querySelector('h2').textContent=title;if(bodyEl){const b=d.querySelector('.gx-drawer-body');if(bodyEl.parentNode!==b){b.innerHTML='';b.appendChild(bodyEl)}}return d}};
 
+</script>
+<script>
+// gx-viewport.js: one debounced relayout for every game. GXV.watch(fn) calls fn(size) when the visible size or safe-area key changes.
+// Fed by resize, orientationchange, visualViewport resize, ResizeObserver(documentElement) and pageshow; re-measures at 120 and 420 ms
+// (iOS reports the old size for a moment after a rotation). Size comes from a fixed full-screen probe, not innerWidth/innerHeight.
+(function () {
+  var fns = [], key = '', t1 = 0, t2 = 0, t3 = 0, probe = null;
+  function mk() {
+    if (probe || !document.body) return probe;
+    probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100%;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:border-box;z-index:-1';
+    document.body.appendChild(probe); return probe;
+  }
+  function measure() {
+    var p = mk(), w = innerWidth, h = innerHeight, s = '';
+    if (p) { w = p.offsetWidth || w; h = p.offsetHeight || h; var cs = getComputedStyle(p); s = cs.paddingTop + cs.paddingRight + cs.paddingBottom + cs.paddingLeft; }
+    return { w: w, h: h, safe: s, key: w + 'x' + h + '|' + s };
+  }
+  function run(force) {
+    var m = measure(); if (!force && m.key === key) return; key = m.key;
+    fns.forEach(function (f) { try { f(m); } catch (e) { console.error(e); } });
+  }
+  function kick() { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); t1 = setTimeout(function () { run(); }, 40); t2 = setTimeout(function () { run(); }, 120); t3 = setTimeout(function () { run(); }, 420); }
+  var wired = false;
+  function wire() {
+    if (wired) return; wired = true;
+    addEventListener('resize', kick); addEventListener('orientationchange', kick); addEventListener('pageshow', kick);
+    if (window.visualViewport) visualViewport.addEventListener('resize', kick);
+    if (window.ResizeObserver) new ResizeObserver(kick).observe(document.documentElement);
+  }
+  window.GXV = { watch: function (fn) { fns.push(fn); wire(); run(true); return fn; }, now: measure, poke: function () { run(true); } };
+})();
+
+</script>
+<script>
+// ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
+// A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
+//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   GXC.open()            the chapter map (the title's "Story" button)
+//   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
+//   GXC.finish(G, over)   on game over: store stars, GNS.result({mode:'campaign'}), result screen, outro, back to the map
+//   GXC.scene / bossCard / result      the single screens (Promises), used by the flow and by the demo
+//   GXC.active() · progress() · unlocked() · reset() · close() · validate(data)
+// Progress lives in localStorage['gns-campaign-<game>'] and every access is wrapped in try/catch.
+(function (root) {
+  'use strict';
+  var GXC = {};
+  var doc = root && root.document;
+  var LS = {
+    json: function (k, d) { try { var v = JSON.parse(root.localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+    put: function (k, v) { try { root.localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+    del: function (k) { try { root.localStorage.removeItem(k); } catch (e) { } }
+  };
+  var LEVELS = ['easy', 'normal', 'hard'];
+  var O = null, D = null, P = null, CUR = null, OV = null, BUSY = false;
+
+  // ------------------------------------------------------------------ validation (node-safe)
+  var GOALS = ['win', 'score', 'margin', 'before-round', 'survive', 'mission', 'custom'];
+  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter'];
+  function lineText(l) { return typeof l === 'string' ? l : l && l.text; }
+  GXC.validate = function (data) {
+    var bad = [], add = function (m) { bad.push(m); };
+    if (!data || typeof data !== 'object') return ['no data'];
+    ['game', 'title'].forEach(function (k) { if (!data[k]) add('missing ' + k); });
+    var cast = data.cast || {}, twists = {}, ids = {};
+    (data.twists || []).forEach(function (t) { if (!t.id || !t.how) add('twist without id/how'); twists[t.id] = t; });
+    if (!data.acts || data.acts.length !== 3) add('needs 3 acts');
+    var ch = data.chapters || [];
+    if (ch.length < 9 || ch.length > 10) add('needs 9 or 10 chapters (has ' + ch.length + ')');
+    ch.forEach(function (c, i) {
+      var at = 'chapter ' + (c.id || i) + ': ';
+      if (!c.id) add(at + 'no id'); else if (ids[c.id]) add(at + 'duplicate id'); ids[c.id] = 1;
+      if ([1, 2, 3].indexOf(c.act) < 0) add(at + 'act must be 1-3');
+      if (i && c.act < ch[i - 1].act) add(at + 'acts out of order');
+      if (!c.title) add(at + 'no title');
+      var intro = c.intro || [], outro = c.outro || [];
+      if (intro.length < 2 || intro.length > 4) add(at + 'intro needs 2-4 lines');
+      if (outro.length < 1 || outro.length > 3) add(at + 'outro needs 1-3 lines');
+      intro.concat(outro).forEach(function (l) {
+        var t = lineText(l); if (!t) add(at + 'empty line'); else if (t.length > 110) add(at + 'line over 110 chars: ' + t.slice(0, 30) + '…');
+        if (l && l.who && l.who !== 'opponent' && l.who !== 'narrator' && !cast[l.who]) add(at + 'unknown speaker ' + l.who);
+      });
+      var op = c.opponent || {};
+      ['name', 'personality', 'aiLevel'].forEach(function (k) { if (op[k] == null || op[k] === '') add(at + 'opponent.' + k + ' missing'); });
+      if (c.boss && (!op.taunt || !op.praise)) add(at + 'boss needs taunt and praise');
+      if (!c.goal || GOALS.indexOf(c.goal.type) < 0 || !c.goal.text) add(at + 'goal needs a known type and text');
+      if (!c.stars || c.stars.length !== 3) add(at + 'needs exactly 3 stars');
+      else c.stars.forEach(function (s) { if (!s.text || !s.test) add(at + 'star needs text and test'); });
+      if (c.twist) { if (!twists[c.twist.id]) add(at + 'twist ' + c.twist.id + ' not in the twists menu'); if (!c.twist.text) add(at + 'twist needs text'); }
+      if (c.act === 3 && c.boss && !c.twist) add(at + 'act 3 boss needs a twist');
+      if (c.act === 1 && c.hints !== true) add(at + 'act 1 needs hints:true');
+      if (!c.easier) add(at + 'no easier block');
+      (c.unlock || []).forEach(function (u) { if (UNLOCKS.indexOf(u.type) < 0) add(at + 'unknown unlock type ' + u.type); if (!u.text) add(at + 'unlock needs text'); });
+      if (!c.setup || typeof c.setup !== 'object') add(at + 'setup must be an object');
+    });
+    [1, 2, 3].forEach(function (a) {
+      var inAct = ch.filter(function (c) { return c.act === a; });
+      if (!inAct.length) return add('act ' + a + ' has no chapters');
+      if (!inAct[inAct.length - 1].boss) add('act ' + a + ' must end with a boss');
+      if (inAct[0].boss) add('act ' + a + ' starts with a boss');
+    });
+    try { JSON.parse(JSON.stringify(data)); } catch (e) { add('not JSON-safe'); }
+    return bad;
+  };
+
+  // ------------------------------------------------------------------ progress
+  function key() { return 'gns-campaign-' + (O && O.game || 'game'); }
+  function load() { var p = LS.json(key(), null); if (!p || p.v !== 1) p = { v: 1, ch: {}, unlocked: [], last: null }; p.ch = p.ch || {}; p.unlocked = p.unlocked || []; return p; }
+  function save() { LS.put(key(), P); }
+  function rec(id) { return P.ch[id] || (P.ch[id] = { beaten: false, stars: 0, best: null, tries: 0, losses: 0, easy: false }); }
+  function chapters() { return (D && D.chapters) || []; }
+  function byId(id) { var c = chapters(); for (var i = 0; i < c.length; i++) if (c[i].id === id) return c[i]; return null; }
+  function isOpen(c) {
+    var list = chapters(), i = list.indexOf(c);
+    if (c.requires && c.requires.length) return c.requires.every(function (r) { return P.ch[r] && P.ch[r].beaten; });
+    return i <= 0 || !!(P.ch[list[i - 1].id] && P.ch[list[i - 1].id].beaten);
+  }
+  GXC.progress = function () { return JSON.parse(JSON.stringify(P || load())); };
+  GXC.unlocked = function () {
+    var out = [];
+    chapters().forEach(function (c) { if (P.ch[c.id] && P.ch[c.id].beaten) (c.unlock || []).forEach(function (u) { out.push({ type: u.type, id: u.id, text: u.text, from: c.id }); }); });
+    return out;
+  };
+  GXC.reset = function () { LS.del(key()); P = load(); if (OV) GXC.open(); };
+  GXC.active = function () { return CUR; };
+
+  // effective chapter: the "make it a bit easier" offer drops one AI level and the twist, at most 2 stars
+  function resolve(c, easy) {
+    var d = JSON.parse(JSON.stringify(c));
+    d.easy = !!easy; d.maxStars = 3;
+    if (easy) {
+      var e = c.easier || {}, lv = LEVELS.indexOf(c.opponent.aiLevel);
+      d.opponent.aiLevel = e.aiLevel || (lv > 0 ? LEVELS[lv - 1] : c.opponent.aiLevel);
+      d.twist = 'twist' in e ? e.twist : null;
+      if (e.setup) for (var k in e.setup) d.setup[k] = e.setup[k];
+      if (e.hints != null) d.hints = e.hints; else d.hints = true;
+      d.maxStars = e.maxStars || 2;
+    }
+    return d;
+  }
+  GXC.resolve = resolve;
+
+  // ------------------------------------------------------------------ small DOM helpers
+  function el(tag, cls, txt) { var e = doc.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function btn(cls, txt, on) { var b = el('button', cls, txt); b.type = 'button'; if (on) b.addEventListener('click', on); return b; }
+  function overlay() {
+    if (!OV) {
+      OV = el('div', 'gxc'); OV.setAttribute('role', 'dialog'); OV.setAttribute('aria-modal', 'true');
+      doc.body.appendChild(OV);
+      doc.addEventListener('keydown', function (e) { if (OV && OV.parentNode && e.key === 'Escape') { var x = OV.querySelector('[data-gxc-esc]'); if (x) x.click(); } });
+    }
+    OV.hidden = false;
+    return OV;
+  }
+  function screen(cls) { var o = overlay(); o.innerHTML = ''; o.className = 'gxc ' + (cls || ''); var s = el('div', 'gxc-screen'); o.appendChild(s); return s; }
+  GXC.close = function () { if (OV) { OV.hidden = true; OV.innerHTML = ''; } };
+  function castOf(who, def) {
+    if (who === 'opponent' && def) return { name: def.opponent.name, portrait: def.opponent.portrait, emoji: def.opponent.emoji, color: def.opponent.color };
+    if (who && D && D.cast && D.cast[who]) return D.cast[who];
+    if (def && def.opponent && def.opponent.cast === who) return { name: def.opponent.name, portrait: def.opponent.portrait, emoji: def.opponent.emoji };
+    return { name: who === 'narrator' || !who ? '' : who, emoji: '📜' };
+  }
+  // portrait: the game's own hook first, then <img> from artBase (falls back to the emoji), then the emoji badge
+  function portrait(who, size, def) {
+    var c = castOf(who, def), box = el('div', 'gxc-pt');
+    box.style.setProperty('--gxc-pt', size + 'px');
+    if (c.color) box.style.setProperty('--gxc-ptc', c.color);
+    var emo = function () { box.innerHTML = ''; box.appendChild(el('span', 'gxc-pt-e', c.emoji || (c.name ? c.name.charAt(0) : '?'))); };
+    var got = null;
+    try { if (O && O.portrait) got = O.portrait(who, size, c); } catch (e) { got = null; }
+    if (got && got.nodeType) { box.appendChild(got); return box; }
+    var src = typeof got === 'string' ? got : (O && O.artBase && c.portrait ? O.artBase + c.portrait : null);
+    if (src) { var im = el('img'); im.alt = ''; im.src = src; im.onerror = emo; box.appendChild(im); } else emo();
+    return box;
+  }
+  function starRow(n, max, total) {
+    var r = el('div', 'gxc-stars'); r.setAttribute('aria-label', n + ' of ' + (total || 3) + ' stars');
+    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '★'));
+    return r;
+  }
+  // twist text without its 'Boss rule:' prefix (the label shows it), first letter upper-case
+  function ruleText(t) { t = String(t || '').replace(/^(Boss|Special) rule:\s*/i, ''); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function easierText(def) { return ((def.easier && def.easier.text) || 'the computer plays one level gentler and any special rule is off').replace(/[.\s]+$/, ''); }
+  function toast(t) {
+    var o = overlay(), x = el('div', 'gxc-toast', t); o.appendChild(x);
+    setTimeout(function () { if (x.parentNode) x.parentNode.removeChild(x); }, 2200);
+  }
+
+  // ------------------------------------------------------------------ the chapter map
+  GXC.open = function () {
+    if (!D) return;
+    P = load(); CUR = null;
+    var s = screen('gxc-map-on'), list = chapters();
+    var head = el('div', 'gxc-head');
+    var back = btn('gxc-ib', '‹ Back', function () { GXC.close(); if (O.onExit) O.onExit(); }); back.setAttribute('data-gxc-esc', '');
+    head.appendChild(back);
+    var tt = el('div', 'gxc-htitle'); tt.appendChild(el('b', null, D.title || 'Story')); head.appendChild(tt);
+    var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
+    var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
+    sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
+    s.appendChild(head);
+    var map = el('div', 'gxc-map'), path = el('div', 'gxc-path');
+    map.appendChild(path); s.appendChild(map);
+    // nodes zigzag down a winding road; each act gets a banner and its own tint
+    var X = [50, 78, 50, 22], rows = [], y = 0, ROW = 74, BAN = 46, nextOpen = null;
+    list.forEach(function (c, i) {
+      if (!i || c.act !== list[i - 1].act) {
+        var a = (D.acts || []).filter(function (x) { return x.act === c.act; })[0] || { title: 'Act ' + c.act };
+        rows.push({ banner: a, y: y }); y += BAN;
+      }
+      rows.push({ c: c, y: y, x: X[i % 4] }); y += ROW;
+      if (!nextOpen && isOpen(c) && !(P.ch[c.id] && P.ch[c.id].beaten)) nextOpen = c;
+    });
+    var H = y + 20; path.style.height = H + 'px';
+    var pts = rows.filter(function (r) { return r.c; });
+    // the painted road: an SVG in percent units for x, px for y (viewBox stretched horizontally only)
+    var svgNS = 'http://www.w3.org/2000/svg', svg = doc.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'gxc-road'); svg.setAttribute('viewBox', '0 0 100 ' + H); svg.setAttribute('preserveAspectRatio', 'none');
+    svg.style.height = H + 'px';
+    var d = '';
+    pts.forEach(function (p, i) {
+      var cy = p.y + 30;
+      if (!i) d = 'M' + p.x + ' ' + cy; else { var q = pts[i - 1], qy = q.y + 30, my = (qy + cy) / 2; d += ' C' + q.x + ' ' + my + ' ' + p.x + ' ' + my + ' ' + p.x + ' ' + cy; }
+    });
+    ['gxc-road-edge', 'gxc-road-fill', 'gxc-road-dash'].forEach(function (k) { var pa = doc.createElementNS(svgNS, 'path'); pa.setAttribute('d', d); pa.setAttribute('class', k); pa.setAttribute('vector-effect', 'non-scaling-stroke'); svg.appendChild(pa); });
+    path.appendChild(svg);
+    rows.forEach(function (r) {
+      if (r.banner) {
+        var b = el('div', 'gxc-act'); b.style.top = r.y + 'px';
+        b.appendChild(el('b', null, 'Act ' + (r.banner.act || '') + ' · ' + (r.banner.title || '')));
+        if (r.banner.blurb) b.appendChild(el('small', null, r.banner.blurb));
+        path.appendChild(b); return;
+      }
+      var c = r.c, st = P.ch[c.id] || {}, open = isOpen(c), beaten = !!st.beaten;
+      var n = btn('gxc-node a' + c.act + (c.boss ? ' boss' : '') + (beaten ? ' won' : open ? ' open' : ' locked') + (c === nextOpen ? ' next' : ''), null, function () { sheet(c); });
+      n.style.top = r.y + 'px'; n.style.left = r.x + '%';
+      n.setAttribute('aria-label', 'Chapter ' + (list.indexOf(c) + 1) + ': ' + c.title + (c.boss ? ' (boss)' : '') + (beaten ? ', beaten, ' + (st.stars || 0) + ' stars' : open ? ', open' : ', locked'));
+      var disc = el('span', 'gxc-disc', c.boss ? '' : String(list.indexOf(c) + 1));
+      if (c.boss) disc.appendChild(portrait(c.opponent.cast || 'opponent', 40, c));
+      if (!open) disc.appendChild(el('i', 'gxc-lock', '🔒'));
+      n.appendChild(disc);
+      if (beaten) n.appendChild(starRow(st.stars || 0, null, 3));
+      var lab = el('span', 'gxc-lab', c.title); n.appendChild(lab);
+      if (r.x > 60) n.classList.add('lab-l');
+      path.appendChild(n);
+    });
+    // bring the next open chapter into view
+    if (nextOpen) setTimeout(function () { var t = rows.filter(function (r) { return r.c === nextOpen; })[0]; if (t) map.scrollTop = Math.max(0, t.y - map.clientHeight / 2 + 40); }, 0);
+  };
+
+  function rewards() {
+    var o = overlay(), sh = el('div', 'gxc-sheet'), u = GXC.unlocked();
+    var close = function () { if (sh.parentNode) sh.parentNode.removeChild(sh); };
+    sh.appendChild(el('h3', null, 'Rewards'));
+    if (!u.length) sh.appendChild(el('p', 'gxc-dim', 'Beat chapters to unlock portraits, card backs, titles and new acts.'));
+    var ul = el('ul', 'gxc-rw');
+    u.forEach(function (x) { var li = el('li'); li.appendChild(el('span', 'gxc-tag', x.type)); li.appendChild(el('span', null, x.text)); ul.appendChild(li); });
+    sh.appendChild(ul);
+    var b = btn('gxc-btn', 'Close', close); b.setAttribute('data-gxc-esc', ''); sh.appendChild(b);
+    o.appendChild(sh); b.focus();
+  }
+
+  // the chapter's detail sheet: goal, opponent, stars, Play (and the easier offer after 2 losses)
+  function sheet(c) {
+    var o = overlay(), old = o.querySelector('.gxc-sheet'); if (old) old.parentNode.removeChild(old);
+    if (!isOpen(c)) { var i = chapters().indexOf(c); toast('Beat chapter ' + i + ' first.'); return; }
+    var st = rec(c.id), sh = el('div', 'gxc-sheet a' + c.act);
+    var close = function () { if (sh.parentNode) sh.parentNode.removeChild(sh); };
+    var top = el('div', 'gxc-sh-top');
+    top.appendChild(portrait(c.opponent.cast || 'opponent', 64, c));
+    var t = el('div', 'gxc-sh-t');
+    t.appendChild(el('small', null, 'Act ' + c.act + ' · Chapter ' + (chapters().indexOf(c) + 1) + (c.boss ? ' · Boss' : '')));
+    t.appendChild(el('h3', null, c.title));
+    t.appendChild(el('div', 'gxc-dim', (c.boss ? 'Boss: ' : 'Opponent: ') + c.opponent.name));
+    top.appendChild(t); sh.appendChild(top);
+    var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Goal')); g.appendChild(el('span', null, c.goal.text)); sh.appendChild(g);
+    if (c.twist) { var tw = el('div', 'gxc-twist'); tw.appendChild(el('b', null, c.boss ? 'Boss rule' : 'Special rule')); tw.appendChild(el('span', null, ruleText(c.twist.text))); sh.appendChild(tw); }
+    var sl = el('ul', 'gxc-slist');
+    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
+    sh.appendChild(sl);
+    var row = el('div', 'gxc-row');
+    var x = btn('gxc-btn ghost', 'Close', close); x.setAttribute('data-gxc-esc', ''); row.appendChild(x);
+    if (st.losses >= 2 && !st.beaten) row.appendChild(btn('gxc-btn ghost', 'Make it a bit easier', function () { GXC.play(c.id, { easy: true }); }));
+    var go = btn('gxc-btn go', st.beaten ? 'Play again' : 'Play', function () { GXC.play(c.id); }); row.appendChild(go);
+    sh.appendChild(row);
+    if (st.losses >= 2 && !st.beaten) sh.appendChild(el('p', 'gxc-dim gxc-small', 'Easier: ' + easierText(c) + ' (up to 2 stars).'));
+    o.appendChild(sh); go.focus();
+  }
+
+  // ------------------------------------------------------------------ story scene (2-4 lines, always skippable)
+  GXC.scene = function (lines, opts) {
+    opts = opts || {};
+    return new Promise(function (done) {
+      lines = (lines || []).filter(function (l) { return lineText(l); });
+      if (!lines.length || !doc) return done();
+      var s = screen('gxc-scene-on'), i = 0, def = opts.def;
+      var box = el('div', 'gxc-scene');
+      if (opts.title) box.appendChild(el('div', 'gxc-sc-title', opts.title));
+      var who = el('div', 'gxc-sc-who'), name = el('div', 'gxc-sc-name'), txt = el('p', 'gxc-sc-text');
+      txt.setAttribute('aria-live', 'polite');
+      var dots = el('div', 'gxc-dots');
+      lines.forEach(function () { dots.appendChild(el('i')); });
+      var row = el('div', 'gxc-row');
+      var finish = function () { done(); };
+      var skip = btn('gxc-btn ghost', 'Skip', finish); skip.setAttribute('data-gxc-esc', '');
+      var next = btn('gxc-btn go', 'Next', function () { i++; if (i >= lines.length) finish(); else show(); });
+      row.appendChild(skip); row.appendChild(next);
+      box.appendChild(who); box.appendChild(name); box.appendChild(txt); box.appendChild(dots); box.appendChild(row);
+      s.appendChild(box);
+      txt.addEventListener('click', function () { next.click(); });
+      function show() {
+        var l = lines[i], w = typeof l === 'string' ? (opts.who || 'narrator') : (l.who || 'narrator'), c = castOf(w, def);
+        who.innerHTML = ''; who.appendChild(portrait(w, 112, def));
+        name.textContent = c.name || '';
+        txt.textContent = lineText(l);
+        for (var k = 0; k < dots.children.length; k++) dots.children[k].className = k === i ? 'on' : k < i ? 'was' : '';
+        next.textContent = i === lines.length - 1 ? (opts.last || 'Continue') : 'Next';
+        txt.classList.remove('in'); void txt.offsetWidth; txt.classList.add('in');
+        next.focus();
+      }
+      show();
+    });
+  };
+
+  // ------------------------------------------------------------------ boss intro card
+  GXC.bossCard = function (def) {
+    return new Promise(function (done) {
+      if (!doc) return done(true);
+      var s = screen('gxc-boss-on a' + def.act), op = def.opponent, card = el('div', 'gxc-boss');
+      card.appendChild(el('div', 'gxc-boss-tag', def.boss ? 'Boss' : 'Rival'));
+      card.appendChild(portrait(op.cast || 'opponent', 148, def));
+      card.appendChild(el('h2', null, op.name));
+      card.appendChild(el('p', 'gxc-boss-pers', op.personality));
+      if (def.twist && def.twist.text) {
+        var tw = el('div', 'gxc-twist big');
+        tw.appendChild(el('b', null, def.boss ? 'Boss rule' : 'Special rule'));
+        tw.appendChild(el('span', null, ruleText(def.twist.text)));
+        card.appendChild(tw);
+      }
+      var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Your goal')); g.appendChild(el('span', null, def.goal.text)); card.appendChild(g);
+      var lv = el('div', 'gxc-dim gxc-small', 'Computer: ' + op.aiLevel + (op.aiStyle ? ' · ' + op.aiStyle : '') + (def.easy ? ' · made easier' : ''));
+      card.appendChild(lv);
+      var row = el('div', 'gxc-row');
+      var back = btn('gxc-btn ghost', 'Back', function () { done(false); }); back.setAttribute('data-gxc-esc', '');
+      var go = btn('gxc-btn go', 'Fight', function () { done(true); });
+      row.appendChild(back); row.appendChild(go); card.appendChild(row);
+      s.appendChild(card); go.focus();
+    });
+  };
+
+  // ------------------------------------------------------------------ play a chapter
+  GXC.play = function (id, opt) {
+    if (BUSY) return;
+    var c = byId(id); if (!c || !isOpen(c)) return;
+    BUSY = true;
+    var def = resolve(c, opt && opt.easy);
+    var st = rec(c.id); st.tries++; P.last = c.id; save();
+    GXC.scene(c.intro, { def: def, title: c.title, last: c.boss || def.twist ? 'Meet ' + (c.boss ? 'the boss' : 'your rival') : 'Start' }).then(function () {
+      return c.boss || def.twist ? GXC.bossCard(def) : true;
+    }).then(function (go) {
+      BUSY = false;
+      if (!go) { GXC.open(); return; }
+      CUR = def; GXC.close();
+      try { O.startChapter(def); } catch (e) { CUR = null; GXC.open(); throw e; }
+    }, function () { BUSY = false; });
+  };
+
+  // ------------------------------------------------------------------ stars and game over
+  function testOne(t, m) {
+    if (!t || !m) return false;
+    var v = m[t.k], op = t.op || (t.v == null ? 'truthy' : '>=');
+    switch (op) {
+      case '>=': return v >= t.v; case '>': return v > t.v; case '<=': return v <= t.v; case '<': return v < t.v;
+      case '==': case '=': return v === t.v; case '!=': return v !== t.v; default: return !!v;
+    }
+  }
+  GXC.testStar = testOne;
+  function countStars(G, def, won) {
+    if (!won) return 0;
+    var n = 0;
+    if (O.starsEarned) { try { n = O.starsEarned(G, def) | 0; } catch (e) { n = 1; } }
+    else {
+      var m = {}; try { m = O.metrics ? O.metrics(G) || {} : {}; } catch (e) { }
+      if (m.won == null) m.won = won;
+      n = 1; // the first star is the chapter's goal, already met by winning
+      for (var i = 1; i < def.stars.length; i++) if (testOne(def.stars[i].test, m)) n++;
+    }
+    return Math.max(1, Math.min(n, def.maxStars || 3, 3));
+  }
+
+  // over: optional {won, stars} to override the game's callbacks (e.g. a resign counts as a loss)
+  GXC.finish = function (G, over) {
+    var def = CUR; if (!def) return Promise.resolve(null);
+    over = over || {};
+    var won = over.won != null ? !!over.won : (function () { try { return !!O.isWon(G, def); } catch (e) { return false; } })();
+    var stars = over.stars != null ? Math.min(over.stars, def.maxStars || 3) : countStars(G, def, won);
+    var st = rec(def.id), first = won && !st.beaten;
+    if (won) { st.beaten = true; st.stars = Math.max(st.stars || 0, stars); if (def.easy) st.easy = true; st.losses = 0; }
+    else st.losses = (st.losses || 0) + 1;
+    var unl = first ? (byId(def.id).unlock || []) : [];
+    unl.forEach(function (u) { var k = u.type + ':' + (u.id || u.text); if (P.unlocked.indexOf(k) < 0) P.unlocked.push(k); });
+    var list = chapters(), i = list.indexOf(byId(def.id)), nxt = list[i + 1];
+    if (first && nxt && nxt.act !== def.act) unl = unl.concat([{ type: 'act', text: 'Act ' + nxt.act + ' opens' }]);
+    save();
+    if (root.GNS && root.GNS.result) {
+      try {
+        root.GNS.result({ game: O.game, mode: 'campaign', level: def.opponent.aiLevel, won: won, winner: won ? 0 : 1,
+          seats: O.seats ? O.seats(G) : [{ name: 'You', me: true }, { name: def.opponent.name, ai: def.opponent.aiLevel }],
+          scores: O.scores ? O.scores(G) : null, turns: over.turns || 0, ms: over.ms || 0,
+          extra: { chapter: def.id, stars: won ? stars : 0, easy: !!def.easy, boss: !!def.boss } });
+      } catch (e) { }
+    }
+    CUR = null;
+    var res = { won: won, stars: won ? stars : 0, def: def, unlocks: unl, losses: st.losses, best: st.stars, first: first };
+    return GXC.result(res).then(function (pick) {
+      if (pick === 'retry') { GXC.play(def.id); return res; }
+      if (pick === 'easier') { GXC.play(def.id, { easy: true }); return res; }
+      if (pick === 'next' && nxt) { GXC.play(nxt.id); return res; }
+      return (won ? GXC.scene(def.outro, { def: def, title: def.title, last: 'Back to the map' }) : Promise.resolve()).then(function () { GXC.open(); return res; });
+    });
+  };
+
+  // result screen: stars, the boss's taunt or praise, unlocks, and the easier offer after 2 losses
+  GXC.result = function (r) {
+    return new Promise(function (done) {
+      if (!doc) return done('map');
+      var def = r.def, s = screen('gxc-res-on ' + (r.won ? 'won' : 'lost')), box = el('div', 'gxc-res');
+      box.appendChild(el('div', 'gxc-res-k', def.title));
+      box.appendChild(el('h2', null, r.won ? (def.boss ? 'Boss defeated!' : 'Chapter won!') : (def.goal.type === 'mission' || def.goal.type === 'survive' ? 'Mission failed' : 'Not this time')));
+      var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
+      if (r.won && def.easy) box.appendChild(el('div', 'gxc-dim gxc-small', 'Easier mode: up to ' + def.maxStars + ' stars. Play it normally for 3.'));
+      var sl = el('ul', 'gxc-slist');
+      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
+      box.appendChild(sl);
+      var op = def.opponent, line = r.won ? op.praise : op.taunt;
+      if (line) {
+        var q = el('div', 'gxc-quote');
+        q.appendChild(portrait(op.cast || 'opponent', 52, def));
+        var qt = el('div'); qt.appendChild(el('b', null, op.name)); qt.appendChild(el('p', null, '“' + line + '”')); q.appendChild(qt);
+        box.appendChild(q);
+      }
+      if (r.unlocks && r.unlocks.length) {
+        var ul = el('div', 'gxc-unl'); ul.appendChild(el('b', null, 'Unlocked'));
+        r.unlocks.forEach(function (u) { var x = el('div', 'gxc-unl-i'); x.appendChild(el('span', 'gxc-tag', u.type)); x.appendChild(el('span', null, u.text)); ul.appendChild(x); });
+        box.appendChild(ul);
+      }
+      var row = el('div', 'gxc-row wrap');
+      var m = btn('gxc-btn ghost', 'Map', function () { done('map'); }); m.setAttribute('data-gxc-esc', ''); row.appendChild(m);
+      row.appendChild(btn('gxc-btn ' + (r.won ? 'ghost' : 'go'), r.won ? 'Replay' : 'Try again', function () { done('retry'); }));
+      if (!r.won && r.losses >= 2) row.appendChild(btn('gxc-btn soft', 'Make it a bit easier', function () { done('easier'); }));
+      if (r.won) row.appendChild(btn('gxc-btn go', 'Continue', function () { done('continue'); }));
+      box.appendChild(row);
+      if (!r.won && r.losses >= 2) box.appendChild(el('p', 'gxc-dim gxc-small', 'Easier: ' + easierText(def) + ' (up to 2 stars).'));
+      s.appendChild(box);
+      var f = row.querySelector('.go') || m; f.focus();
+    });
+  };
+
+  // ------------------------------------------------------------------ init
+  GXC.init = function (opts) {
+    O = opts || {}; D = O.data || null; P = load();
+    if (!O.startChapter) O.startChapter = function () { };
+    if (!O.isWon) O.isWon = function () { return false; };
+    return GXC;
+  };
+  GXC.data = function () { return D; };
+
+  if (root && root.document) root.GXC = GXC;
+  if (typeof module !== 'undefined' && module.exports) module.exports = GXC;
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+window.CAMPAIGN = {"game":"kaiten","title":"The Golden Plate","version":1,"cast":{"suzu":{"name":"Auntie Suzu","portrait":"camp-suzu.webp","emoji":"🍵","color":"#b5452a"},"mina":{"name":"Mina","portrait":"camp-mina.webp","emoji":"🍣","color":"#e5553a"},"pip":{"name":"Pip","portrait":"camp-pip.webp","emoji":"🥟","color":"#5aa83c"},"kofi":{"name":"Kofi","portrait":"camp-kofi.webp","emoji":"🚌","color":"#7a5ac8"},"odile":{"name":"Odile","portrait":"camp-odile.webp","emoji":"🍮","color":"#e0a31c"},"taro":{"name":"Taro","portrait":"camp-taro.webp","emoji":"🍜","color":"#2a97a0"}},"acts":[{"act":1,"title":"The Lunch Belt","blurb":"Learn what every plate is worth, one dish at a time."},{"act":2,"title":"The Dinner Rush","blurb":"Fuller tables, sharper regulars, and dessert on the line."},{"act":3,"title":"The Midnight Belt","blurb":"Only the night-shift regulars remain. Win the Golden Plate."}],"twists":[{"id":"custard-head-start","where":"setup","how":"Right after the deal, move `param` Custard Cups from the deck into the boss seat's kept cups (p.pud), so they count at the end of the game."},{"id":"boss-head-start","where":"scoring","how":"At the end of the game, add `param` points to the boss seat's final total before the winner is decided."},{"id":"roll-banner","where":"scoring","how":"When each round is scored, the boss seat counts `param` extra roll icons in the roll race (the extra icons alone never score)."},{"id":"roll-fever","where":"ai","how":"While the chapter is played, multiply the computer's roll-race weight (AI.params.makiFut) by `param`, so it chases Seaweed Rolls harder."},{"id":"sweet-tooth","where":"ai","how":"While the chapter is played, multiply the computer's custard weight (AI.params.pudFut) by `param`, so it hoards Custard Cups."},{"id":"long-think","where":"ai","how":"Hard computer seats pass opts.units = `param` (default 250) to KK.AI.choose, so they test more possible hands before each pick."}],"chapters":[{"id":"c1","act":1,"title":"First Plates","boss":false,"intro":[{"who":"suzu","text":"Welcome to the Turning Plate, Mina. Lunch is quiet, so let's practise."},{"who":"suzu","text":"Pick one plate, then pass the rest of your hand along the belt. That's all there is to it."},{"who":"pip","text":"I want one of everything! Hi! Can I sit here?"}],"outro":[{"who":"suzu","text":"See? Steam Buns get better the more you stack. Remember that ladder."},{"who":"pip","text":"You beat me! Next time I'm taking ALL the buns."}],"opponent":{"name":"Pip","portrait":"camp-pip.webp","emoji":"🥟","cast":"pip","personality":"Cheerful and hungry, picks whichever plate looks happiest.","aiLevel":"easy","aiStyle":"standard"},"setup":{"np":2,"seats":[4],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal against Pip."},"hints":true,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score 6 or more from Steam Buns","test":{"k":"bunPts","op":">=","v":6}},{"text":"Score 40 points or more","test":{"k":"score","op":">=","v":40}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Pip is already as gentle as can be; the hints stay on."},"unlock":[{"type":"portrait","id":"pip","text":"Pip's portrait"}]},{"id":"c2","act":1,"title":"Sets of Three","boss":false,"intro":[{"who":"suzu","text":"Fish Slices are fussy: one or two score nothing, three make 10 points."},{"who":"suzu","text":"If you start a set, watch what's coming round. Finish it or don't start it."},{"who":"pip","text":"I don't get it, but fish are pretty."}],"outro":[{"who":"suzu","text":"A finished set is the biggest single plate on the belt. Well timed."}],"opponent":{"name":"Pip","portrait":"camp-pip.webp","emoji":"🥟","cast":"pip","personality":"Grabs what looks nice, so half-built sets often survive the trip round.","aiLevel":"easy","aiStyle":"standard"},"setup":{"np":2,"seats":[4],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":null,"goal":{"type":"custom","value":10,"text":"Win, scoring at least 10 points from Fish Slices."},"hints":true,"stars":[{"text":"Win with 10+ points from Fish Slices","test":{"k":"fishPts","op":">=","v":10}},{"text":"Score 20 or more from Fish Slices","test":{"k":"fishPts","op":">=","v":20}},{"text":"Win by 10 or more","test":{"k":"margin","op":">=","v":10}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Just win the meal; the Fish Slice target becomes a bonus star."},"unlock":[{"type":"title","id":"set-builder","text":"Title: Set Builder"}]},{"id":"c3","act":1,"title":"The Roll Race","boss":false,"intro":[{"who":"kofi","text":"Room for one more? I just finished my bus route and I want rolls!"},{"who":"suzu","text":"Each round, most roll icons scores 6 and second most scores 3. Count the icons, not the cards."},{"who":"suzu","text":"Three diners now: hands pass round faster than you think."}],"outro":[{"who":"kofi","text":"Ha! You out-rolled me. I'm cheering anyway!"},{"who":"suzu","text":"Rolls are a race. Sometimes the smart move is second place for 3."}],"opponent":{"name":"Kofi","portrait":"camp-kofi.webp","emoji":"🚌","cast":"kofi","personality":"Loud, friendly, and he loves a roll race.","aiLevel":"easy","aiStyle":"standard"},"setup":{"np":3,"seats":[3,4],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":null,"goal":{"type":"custom","value":2,"text":"Win, taking the 6-point roll prize in at least 2 of the 3 rounds."},"hints":true,"stars":[{"text":"Take the roll prize in 2 rounds","test":{"k":"rollWins","op":">=","v":2}},{"text":"Score 12 or more from Seaweed Rolls","test":{"k":"rollPts","op":">=","v":12}},{"text":"Score 40 points or more","test":{"k":"score","op":">=","v":40}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"np":2,"seats":[3]},"maxStars":2,"text":"Just you and Kofi, so there is only one rival in the roll race."},"unlock":[{"type":"portrait","id":"kofi","text":"Kofi's portrait"}]},{"id":"c4","act":1,"title":"Kofi's Lunch Rush","boss":true,"intro":[{"who":"kofi","text":"Lunch rush! Everyone on my route comes here. Let's make it a contest."},{"who":"suzu","text":"Fire Paste triples the next nigiri you serve on it. A Moon Nigiri becomes 9."},{"who":"suzu","text":"Kofi will chase rolls. Let him, and feed your paste instead."}],"outro":[{"who":"suzu","text":"You've learned every plate on the lunch belt. The dinner crowd is tougher."},{"who":"kofi","text":"Best lunch of the week, even though I lost. Come for dinner!"}],"opponent":{"name":"Kofi","portrait":"camp-kofi.webp","emoji":"🚌","cast":"kofi","personality":"Bus driver, knows every regular, throws everything at the roll race.","aiLevel":"easy","aiStyle":"roll-fever","taunt":"Ding ding! All aboard the roll express. Better luck next stop!","praise":"Ha! You cleaned me out. That's the best ride I've had all week."},"setup":{"np":2,"seats":[3],"level":"easy","lv":["easy","easy","easy","easy"]},"twist":{"id":"roll-fever","param":1.4,"text":"Boss rule: Kofi chases Seaweed Rolls even harder than usual."},"goal":{"type":"win","value":null,"text":"Win the meal against Kofi."},"hints":true,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Earn 4 or more bonus points from Fire Paste","test":{"k":"pasteBonus","op":">=","v":4}},{"text":"Score 45 points or more","test":{"k":"score","op":">=","v":45}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Kofi plays his usual game; no extra roll chasing."},"unlock":[{"type":"act","id":"2","text":"Act 2: The Dinner Rush"},{"type":"cardback","id":"lunch-belt","text":"Lunch Belt card back"}]},{"id":"c5","act":2,"title":"Dessert First","boss":false,"intro":[{"who":"odile","text":"Young lady, I have never left this belt without dessert. Not once in forty years."},{"who":"suzu","text":"Custard Cups stay with you to the end. With two diners, most cups scores 6."},{"who":"suzu","text":"The dinner regulars play properly. No more gentle passes."}],"outro":[{"who":"odile","text":"Well! You ate your vegetables and your dessert. I approve."}],"opponent":{"name":"Odile","portrait":"camp-odile.webp","emoji":"🍮","cast":"odile","personality":"Retired baker in a tall hat; fair, steady, never skips dessert.","aiLevel":"normal","aiStyle":"standard"},"setup":{"np":2,"seats":[2],"level":"normal","lv":["normal","normal","normal","normal"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal against Odile."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score the 6 custard points","test":{"k":"custardPts","op":">=","v":6}},{"text":"Win by 5 or more","test":{"k":"margin","op":">=","v":5}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Odile is in a generous mood tonight."},"unlock":[{"type":"portrait","id":"odile","text":"Odile's portrait"}]},{"id":"c6","act":2,"title":"Table for Three","boss":false,"intro":[{"who":"kofi","text":"Dinner shift's over. Budge up, Odile!"},{"who":"suzu","text":"Three at the belt again, and now both of them play well."},{"who":"suzu","text":"With three diners, fewest Custard Cups loses 6. Don't end with none."}],"outro":[{"who":"suzu","text":"Forty points at a full dinner table. The midnight crowd has noticed you."}],"opponent":{"name":"Kofi and Odile","portrait":"camp-kofi.webp","emoji":"🚌","cast":"kofi","personality":"Kofi races for rolls while Odile quietly collects dessert.","aiLevel":"normal","aiStyle":"standard"},"setup":{"np":3,"seats":[2,3],"level":"normal","lv":["normal","normal","normal","normal"]},"twist":null,"goal":{"type":"score","value":40,"text":"Win with at least 40 points."},"hints":false,"stars":[{"text":"Win with 40 or more","test":{"k":"score","op":">=","v":40}},{"text":"Don't lose points for fewest Custard Cups","test":{"k":"custardPts","op":">=","v":0}},{"text":"Score 20 or more in a single round","test":{"k":"bestRound","op":">=","v":20}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Kofi and Odile have had a long day and play more loosely."},"unlock":[{"type":"table","id":"dinner-counter","text":"Dinner counter table skin"}]},{"id":"c7","act":2,"title":"Odile's Sweet Table","boss":true,"intro":[{"who":"odile","text":"Tonight I brought my own custard from the bakery. A head start, dear."},{"who":"suzu","text":"She'll hoard cups. You can fight her for them, or out-score the 6 points she wins."},{"who":"suzu","text":"Either way, count her cups before you pass her a hand full of dessert."}],"outro":[{"who":"odile","text":"Forty years, and you are the first to beat me at my own dessert."},{"who":"suzu","text":"There's one regular left. He only comes in after midnight."}],"opponent":{"name":"Odile","portrait":"camp-odile.webp","emoji":"🍮","cast":"odile","personality":"Polite, patient, and utterly unwilling to give up a Custard Cup.","aiLevel":"normal","aiStyle":"sweet-tooth","taunt":"Dessert always wins, dear. Do come again tomorrow.","praise":"Bravo. Take the last custard, you've earned it."},"setup":{"np":2,"seats":[2],"level":"normal","lv":["normal","normal","normal","normal"]},"twist":{"id":"custard-head-start","param":1,"text":"Boss rule: Odile starts the meal with 1 Custard Cup already kept."},"goal":{"type":"win","value":null,"text":"Win the meal against Odile."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score 50 points or more","test":{"k":"score","op":">=","v":50}},{"text":"Win by 8 or more","test":{"k":"margin","op":">=","v":8}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Odile plays gently and leaves her own custard at home."},"unlock":[{"type":"act","id":"3","text":"Act 3: The Midnight Belt"},{"type":"cardback","id":"custard","text":"Custard card back"}]},{"id":"c8","act":3,"title":"The Night Shift","boss":false,"intro":[{"who":"taro","text":"Suzu says you're good. I count every plate. Let's see."},{"who":"suzu","text":"Taro remembers every hand he has seen. Don't leave him easy pairs."},{"who":"suzu","text":"No tricks tonight: just you, him, and a clean belt."}],"outro":[{"who":"taro","text":"Hm. You took the last prawn on purpose. I noticed."}],"opponent":{"name":"Taro","portrait":"camp-taro.webp","emoji":"🍜","cast":"taro","personality":"Quiet noodle cook who eats at midnight and punishes every loose plate.","aiLevel":"hard","aiStyle":"standard"},"setup":{"np":2,"seats":[1],"level":"hard","lv":["hard","hard","hard","hard"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal against Taro."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Score 50 points or more","test":{"k":"score","op":">=","v":50}},{"text":"Never leave Fire Paste unused at a round's end","test":{"k":"wastedPaste","op":"<=","v":0}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"level":"normal","lv":["normal","normal","normal","normal"]},"maxStars":2,"text":"Taro is tired after his shift and plays at normal strength."},"unlock":[{"type":"portrait","id":"taro","text":"Taro's portrait"}]},{"id":"c9","act":3,"title":"Full Belt at Midnight","boss":false,"intro":[{"who":"kofi","text":"Night bus is parked! Is this the big one? I brought Odile and Pip."},{"who":"suzu","text":"Five diners, seven cards each. Plates come back to you far less often."},{"who":"suzu","text":"Taro plays at full strength; the others are here for fun, mostly."}],"outro":[{"who":"pip","text":"That was the loudest dinner ever. You won it!"},{"who":"taro","text":"Tomorrow, the Golden Plate. Just us."}],"opponent":{"name":"Taro and friends","portrait":"camp-taro.webp","emoji":"🍜","cast":"taro","personality":"Taro hunts points while the regulars scramble for rolls and custard.","aiLevel":"hard","aiStyle":"standard"},"setup":{"np":5,"seats":[1,2,3,4],"level":"hard","lv":["hard","normal","normal","easy"]},"twist":null,"goal":{"type":"win","value":null,"text":"Win the meal with all five diners at the belt."},"hints":false,"stars":[{"text":"Win the meal","test":{"k":"won"}},{"text":"Don't lose points for fewest Custard Cups","test":{"k":"custardPts","op":">=","v":0}},{"text":"Win by 5 or more","test":{"k":"margin","op":">=","v":5}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"level":"normal","lv":["normal","normal","easy","easy"]},"maxStars":2,"text":"Taro plays at normal strength and Kofi and Pip play gently."},"unlock":[{"type":"table","id":"midnight-belt","text":"Midnight belt table skin"}]},{"id":"c10","act":3,"title":"The Golden Plate","boss":true,"intro":[{"who":"suzu","text":"Once a year, the best diner at my belt eats from the Golden Plate."},{"who":"taro","text":"I've held it three years. The house gives the champion a little head start."},{"who":"suzu","text":"He's sharp, Mina, but he can only take one plate a turn. Same as you."}],"outro":[{"who":"taro","text":"The plate is yours. I'll be here tomorrow night. And the next."},{"who":"suzu","text":"The Golden Plate, Mina. The whole belt is clapping."}],"opponent":{"name":"Taro","portrait":"camp-taro.webp","emoji":"🍜","cast":"taro","personality":"Three-time champion; silent, exact, never wastes a pick.","aiLevel":"hard","aiStyle":"standard","taunt":"Every plate counted. Every plate mine. Come back next year.","praise":"You counted better than me tonight. Eat well, champion."},"setup":{"np":2,"seats":[1],"level":"hard","lv":["hard","hard","hard","hard"]},"twist":{"id":"boss-head-start","param":3,"text":"Boss rule: the reigning champion Taro adds 3 points to his final total."},"goal":{"type":"win","value":null,"text":"Win the meal against Taro, champion's bonus and all."},"hints":false,"stars":[{"text":"Win the Golden Plate","test":{"k":"won"}},{"text":"Score 55 points or more","test":{"k":"score","op":">=","v":55}},{"text":"Win by 5 or more","test":{"k":"margin","op":">=","v":5}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"level":"normal","lv":["normal","normal","normal","normal"]},"maxStars":2,"text":"Taro plays at normal strength and gets no champion's bonus."},"unlock":[{"type":"title","id":"golden-plate","text":"Title: Keeper of the Golden Plate"},{"type":"cardback","id":"golden","text":"Golden card back"}]}]};
 </script>
 <script>
 // ---------- PerfHUD: one speed tool for every game on the shelf ----------
@@ -3137,7 +3784,7 @@ const TYPES = {
   squid:    { name: 'Moon Nigiri',    l: ['Moon', 'Nigiri'],    c: '#6657c9', rule: 'v3',     ruleText: 'Worth 3 points (x3 on Fire Paste)', rim: 'scallops', group: 'nigiri', v: 3 },
   egg:      { name: 'Sun Nigiri',     l: ['Sun', 'Nigiri'],     c: '#f3c933', rule: 'v1',     ruleText: 'Worth 1 point (x3 on Fire Paste)', rim: 'scallops', group: 'nigiri', v: 1 },
   wasabi:   { name: 'Fire Paste',     l: ['Fire', 'Paste'],     c: '#94c83d', rule: 'x3',     ruleText: 'Your next Nigiri is worth x3', rim: 'zigzag', group: 'wasabi' },
-  chop:     { name: 'Twin Sticks',    l: ['Twin', 'Sticks'],    c: '#9a5b3c', rule: 'swap',   ruleText: 'Later: take 2 cards, pass the sticks back', rim: 'dashes', group: 'chop' },
+  chop:     { name: 'Twin Sticks',    l: ['Twin', 'Sticks'],    c: '#9a5b3c', rule: 'swap',   ruleText: 'Later: serve 2 plates; sticks pass on', rim: 'dashes', group: 'chop' },
   pudding:  { name: 'Custard Cup',    l: ['Custard', 'Cup'],    c: '#f4b6d2', rule: 'dessert',ruleText: 'End of game: most +6, fewest -6', rim: 'dots', group: 'pudding' }
 };
 const ORDER = ['tempura', 'sashimi', 'dumpling', 'roll1', 'roll2', 'roll3', 'salmon', 'squid', 'egg', 'wasabi', 'chop', 'pudding'];
@@ -3737,7 +4384,7 @@ function roundTrackSVG(cur, o) {
 function scorePadSVG(o) {
   o = o || {}; const rows = o.rows || [], w = o.w || 360, rh = Math.max(34, o.rowH || 36), fs = 14, head = 54, foot = 12;
   const H = head + rows.length * rh + foot + (o.title === false ? -20 : 0);
-  const cols = ['R1', 'R2', 'R3', 'Sweets', 'Total'];
+  const cols = ['R1', 'R2', 'R3', 'Custard', 'Total'];
   const nameW = w * .30, cw = (w - nameW - 20) / 5, cur = o.round || 0;
   let s = `<svg xmlns="http://www.w3.org/2000/svg" class="kk-pad" width="${w}" height="${H}" viewBox="0 0 ${w} ${H}" role="img" aria-label="Score pad">`;
   if (o.standalone) s += K.defs();
@@ -4139,7 +4786,7 @@ function tableCounts(table) {
 // round scores for every seat from the tables
 function roundScores(G) {
   const cs = G.players.map(p => tableCounts(p.table));
-  const mk = makiPoints(cs.map(c => c.icons));
+  const mk = makiPoints(cs.map((c, i) => c.icons + (G.tw && G.tw.id === 'roll-banner' && i === 1 && c.icons > 0 ? G.tw.param : 0)));
   return cs.map((c, i) => {
     const o = { maki: mk[i], tempura: Math.floor(c.tempura / 2) * DATA.tempuraPair, sashimi: Math.floor(c.sashimi / 3) * DATA.sashimiSet, dumpling: dumplingPts(c.dumpling), nigiri: c.nigiri, wasabi: c.wasabiBonus };
     o.total = o.maki + o.tempura + o.sashimi + o.dumpling + o.nigiri + o.wasabi;
@@ -4159,6 +4806,8 @@ function newGame(o) {
   shuffle(G, G.deck);
   lg(G, 'A new meal begins: ' + np + ' diners, 3 rounds.');
   deal(G);
+  // story-mode twists (campaign only): custard-head-start / roll-banner / boss-head-start apply to the boss seat (seat 1)
+  if (o.twist && o.twist.id) { G.tw = { id: o.twist.id, param: +o.twist.param || 0 }; if (G.tw.id === 'custard-head-start') for (let n = 0; n < G.tw.param; n++) { const i = G.deck.findIndex(c => key(c) === 'pudding'); if (i >= 0) G.players[1].pud.push(G.deck.splice(i, 1)[0]); } }
   return G;
 }
 function deal(G) {
@@ -4226,8 +4875,9 @@ function resolve(G) {
     if (used) { p.hand.push(chopId); use(G, 'chopUsed'); }
     picks.push({ seat: p.seat, cards, chop: chopId });
     if (!G.nolog) {
-      if (used) lg(G, p.name + ' uses Twin Sticks: takes ' + cards.map(c => cname(c.id)).join(' and ') + '.');
-      else lg(G, p.name + ' takes ' + cname(cards[0].id) + (cards[0].w >= 0 ? ' on Fire Paste (x3)' : '') + '.');
+      const you = p.name === 'You';
+      if (used) lg(G, p.name + (you ? ' use Twin Sticks: take ' : ' uses Twin Sticks: takes ') + cards.map(c => cname(c.id)).join(' and ') + '.');
+      else lg(G, p.name + (you ? ' take ' : ' takes ') + cname(cards[0].id) + (cards[0].w >= 0 ? ' on Fire Paste (x3)' : '') + '.');
     }
     p.pick = null; p.picked = false;
   }
@@ -4268,7 +4918,7 @@ function makiHadTie(sc) { const m = {}; let max = 0; for (const s of sc) { m[s.i
 function finish(G) {
   G.phase = 'over';
   const counts = G.players.map(p => p.pud.length), pts = puddingPoints(counts, G.np);
-  const totals = G.players.map((p, i) => G.rs.reduce((a, r) => a + r[i].total, 0) + pts[i]);
+  const totals = G.players.map((p, i) => G.rs.reduce((a, r) => a + r[i].total, 0) + pts[i] + (G.tw && G.tw.id === 'boss-head-start' && i === 1 ? G.tw.param : 0));
   G.final = { pudding: counts, puddingPts: pts, totals };
   if (new Set(counts).size > 1) use(G, 'puddingScored');
   if (G.np > 2 && Math.min(...counts) !== Math.max(...counts)) use(G, 'puddingPenalty');
@@ -4277,10 +4927,10 @@ function finish(G) {
   if (w.length > 1) { const bp = Math.max(...w.map(i => counts[i])); const w2 = w.filter(i => counts[i] === bp); if (w2.length < w.length) { w = w2; tie = true; use(G, 'tieBreak'); } }
   G.winners = w; G.winner = w.length === 1 ? w[0] : -1;
   const nm = i => G.players[i].name;
-  G.winText = w.length === 1 ? nm(w[0]) + ' wins with ' + best + ' points' + (tie ? ' (on puddings)' : '') + '.' : w.map(nm).join(' and ') + ' share the win with ' + best + ' points.';
+  G.winText = w.length === 1 ? nm(w[0]) + (nm(w[0]) === 'You' ? ' win with ' : ' wins with ') + best + ' points' + (tie ? ' (more Custard Cups)' : '') + '.' : w.map(nm).join(' and ') + ' share the win with ' + best + ' points.';
   if (w.length > 1) use(G, 'sharedWin');
   ev(G, { t: 'gameEnd', pudding: counts, puddingPts: pts, totals, winners: w, text: G.winText });
-  lg(G, 'Puddings: ' + G.players.map((p, i) => p.name + ' ' + counts[i] + ' (' + (pts[i] > 0 ? '+' : '') + pts[i] + ')').join(', ') + '.');
+  lg(G, 'Custard Cups: ' + G.players.map((p, i) => p.name + ' ' + counts[i] + ' (' + (pts[i] > 0 ? '+' : '') + pts[i] + ')').join(', ') + '.');
   lg(G, G.winText);
 }
 
@@ -4635,6 +5285,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
  *   GA.loop(name, {vol, fade}) / GA.stopLoop(name, {fade})         ambience beds
  *   GA.music(name|null, {vol, fade})                                 cross-fading background track
  *   GA.setSfx(on) GA.setMusic(on) GA.setVolume('sfx'|'music', 0..1)  persisted in localStorage
+ *   GA.setVolume('master', 0..1)  one level over everything (the shared settings panel sets it; default 1)
  *   GA.has(name) GA.playing() GA.state() GA.unlock() GA.names() GA.duration(name)
  * Samples are decoded lazily on the first user gesture (atob -> ArrayBuffer -> decodeAudioData, no fetch).
  */
@@ -4644,7 +5295,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
   var S = {
     inited: false, key: 'ga', src: {}, kind: {}, buf: {}, failed: {}, pending: {},
     ctx: null, ctxOpt: null, out: null, sfxBus: null, musBus: null, duckBus: null,
-    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, last: {}, loops: {},
+    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, masterVol: 1, last: {}, loops: {},
     cur: null, curName: null, wantMusic: null, duckSet: {}, duckUntil: 0, unlocked: false, decoding: false
   };
   var DEFAULT_DUCK = ['win', 'lose', 'levelup', 'level', 'boom', 'ko', 'thunder', 'roar', 'smash', 'stomp', 'door', 'death', 'crit', 'crumble'];
@@ -4689,6 +5340,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
     var t = S.ctx.currentTime;
     S.sfxBus.gain.setTargetAtTime(S.sfxOn ? S.sfxVol : 0, t, 0.02);
     S.musBus.gain.setTargetAtTime(S.musOn ? S.musVol : 0, t, 0.08);
+    S.out.gain.setTargetAtTime(S.masterVol, t, 0.02);
   }
 
   // Loops: skip encoder padding / near-silence at the edges so MP3 loops don't gap.
@@ -4764,6 +5416,7 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
     S.sfxOn = lsGet('sfx', '1') !== '0'; S.musOn = lsGet('mus', '1') !== '0';
     S.sfxVol = clamp(lsGet('sfxvol', o.sfxVol != null ? o.sfxVol : 0.8), 0, 1);
     S.musVol = clamp(lsGet('musvol', o.musVol != null ? o.musVol : 0.5), 0, 1);
+    S.masterVol = clamp(lsGet('mastervol', 1), 0, 1);
     if (!S.inited && root.document && root.document.addEventListener) {
       ['pointerdown', 'keydown', 'touchstart', 'mousedown'].forEach(function (ev) {
         root.document.addEventListener(ev, onGesture, { capture: true, passive: true });
@@ -4875,11 +5528,11 @@ if (typeof module === 'object' && module.exports) { module.exports = netStrip; }
   }
   function setVolume(kind, v) {
     v = clamp(v, 0, 1);
-    if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
+    if (kind === 'master') { S.masterVol = v; lsSet('mastervol', v); } else if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
     applyVol(); return v;
   }
   function state() {
-    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, audio: !!S.ctx,
+    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, masterVol: S.masterVol, audio: !!S.ctx,
       ctxState: S.ctx ? S.ctx.state : 'none', decoded: Object.keys(S.buf).length, failed: Object.keys(S.failed),
       total: Object.keys(S.src).length, playing: S.curName, loops: Object.keys(S.loops) };
   }
@@ -5218,7 +5871,7 @@ const GA_DATA={sfx:{
 var ANIM = 1, AIDELAY = 650;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, seq: 0, rec: null, noRec: false, over: null,
-  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: true, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
+  coach: { level: 'full', seen: {}, turn: '' }, prefs: { hint: true, tap2: null, sound: true, music: true, gfx: 'auto' }, enter: '', land: null, tm: null, pend: null, rq: [] };
 const D = KK.DATA;
 const KIT = KKKit;
 const TY = KIT.TYPES;
@@ -5313,18 +5966,18 @@ const ORD = ['', '1st', '2nd'];
 function groupsOf(s, tab, sc) {
   const t = tab[s], c = KK.tableCounts(t), out = [];
   const mk = (k, o) => out.push(Object.assign({ k, seat: s }, o));
-  if (c.tempura) { const n = c.tempura, p = Math.floor(n / 2) * 5; mk('tempura', { type: 'tempura', n, pts: p, hint: n % 2 === 0 ? '= ' + p : (p ? p + ' +1/2' : '1 of 2'), cls: p ? 'ok' : 'wait', tip: n + ' Crispy Prawn' + (n > 1 ? 's' : '') + ': every pair is worth 5 points' + (n % 2 ? ', one more would make another pair.' : '.') }); }
-  if (c.sashimi) { const n = c.sashimi, p = Math.floor(n / 3) * 10, r = n % 3; mk('sashimi', { type: 'sashimi', n, pts: p, hint: r === 0 ? '= ' + p : (p ? p + ' +' + r + '/3' : r + ' of 3'), cls: p ? 'ok' : 'wait', tip: n + ' Fish Slice' + (n > 1 ? 's' : '') + ': each set of three is worth 10 points' + (r ? '; ' + (3 - r) + ' more would finish another set.' : '.') }); }
+  if (c.tempura) { const n = c.tempura, p = Math.floor(n / 2) * 5; mk('tempura', { type: 'tempura', n, pts: p, hint: n % 2 === 0 ? '= ' + p : (p ? '= ' + p + ', need 1' : 'need 1 more'), cls: p ? 'ok' : 'wait', tip: n + ' Crispy Prawn' + (n > 1 ? 's' : '') + ': every pair is worth 5 points' + (n % 2 ? ', one more would make another pair.' : '.') }); }
+  if (c.sashimi) { const n = c.sashimi, p = Math.floor(n / 3) * 10, r = n % 3; mk('sashimi', { type: 'sashimi', n, pts: p, hint: r === 0 ? '= ' + p : (p ? '= ' + p + ', need ' + (3 - r) : 'need ' + (3 - r) + ' more'), cls: p ? 'ok' : 'wait', tip: n + ' Fish Slice' + (n > 1 ? 's' : '') + ': each set of three is worth 10 points' + (r ? '; ' + (3 - r) + ' more would finish another set.' : '.') }); }
   if (c.dumpling) { const n = c.dumpling, p = KK.dumplingPts(n); mk('dumpling', { type: 'dumpling', n, pts: p, hint: '= ' + p, cls: 'ok', tip: n + ' Steam Bun' + (n > 1 ? 's' : '') + ' = ' + p + ' points' + (n < 5 ? ' (the next bun makes it ' + KK.dumplingPts(n + 1) + ').' : ' (five or more is the top of the ladder).') }); }
-  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? ORD[rk.rank] + ' +' + rk.pts : 'no rank', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons this round: ' + (rk.rank === 1 ? 'most icons right now (' + rk.pts + ' points).' : rk.rank === 2 ? 'second most right now (' + rk.pts + ' points).' : 'not scoring yet. Most icons scores 6, second most 3.') }); }
+  if (c.icons) { const rk = sc.mk[s]; mk('roll', { type: 'roll2', n: c.icons, pts: rk.pts, hint: rk.rank ? (sc.rs.filter(r => r.icons === c.icons).length > 1 ? 'tied ' : '') + ORD[rk.rank] + ' now +' + rk.pts : 'no roll pts', cls: rk.rank ? 'ok' : 'wait', tip: c.icons + ' roll icons this round: ' + (rk.rank === 1 ? 'most icons right now (' + rk.pts + ' points).' : rk.rank === 2 ? 'second most right now (' + rk.pts + ' points).' : 'not scoring yet. Most icons scores 6, second most 3.') + (rk.rank && sc.rs.filter(r => r.icons === c.icons).length > 1 ? ' Tied with another diner, so the points are split (rounded down).' : '') + ' The race is only settled when the round ends, so this can still change.' }); }
   const by = { salmon: [0, 0], squid: [0, 0], egg: [0, 0] };
   for (const e of t) { const k = tkey(e.id); if (NIG[k]) by[k][e.w >= 0 ? 1 : 0]++; }
   for (const k of ['salmon', 'squid', 'egg']) {
     if (by[k][0]) mk('n-' + k, { type: k, n: by[k][0], pts: NIG[k] * by[k][0], hint: '= ' + NIG[k] * by[k][0], cls: 'ok', tip: by[k][0] + ' ' + TY[k].name + ': ' + NIG[k] + ' point' + (NIG[k] > 1 ? 's' : '') + ' each.' });
     if (by[k][1]) mk('pn-' + k, { type: 'wasabi', on: k, n: by[k][1], pts: 3 * NIG[k] * by[k][1], hint: '= ' + 3 * NIG[k] * by[k][1], cls: 'ok', tip: by[k][1] + ' ' + TY[k].name + ' on Fire Paste: tripled to ' + 3 * NIG[k] + ' each.' });
   }
-  if (c.wasabiUnused) mk('wasabi', { type: 'wasabi', n: c.wasabiUnused, pts: 0, hint: 'waiting', cls: 'wait', pulse: true, tip: c.wasabiUnused + ' Fire Paste waiting for a nigiri: your next nigiri lands on it and scores triple. With none it scores nothing.' });
-  if (c.chop) mk('chop', { type: 'chop', n: c.chop, pts: 0, hint: 'ready', cls: 'ok', tip: 'Twin Sticks on the table: on a later turn you may serve two plates from your hand, then the sticks go back into that hand.' });
+  if (c.wasabiUnused) mk('wasabi', { type: 'wasabi', n: c.wasabiUnused, pts: 0, hint: '×3 next nigiri', cls: 'wait', pulse: true, tip: c.wasabiUnused + ' Fire Paste waiting for a nigiri: your next nigiri lands on it and scores triple. With none it scores nothing.' });
+  if (c.chop) mk('chop', { type: 'chop', n: c.chop, pts: 0, hint: '2 plates later', cls: 'ok', tip: 'Twin Sticks on the table: on a later turn you may serve two plates from your hand, then the sticks go back into that hand and move on to the next diner with it.' });
   const pud = t.filter(e => tkey(e.id) === 'pudding').length;
   return { list: out, pudNow: pud };
 }
@@ -5367,6 +6020,35 @@ function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
 function loadPrefs() { try { const p = JSON.parse(lsGet('kk_prefs') || '{}'); Object.assign(UI.prefs, p); if (p.speed) AIDELAY = p.speed; } catch (e) { } }
 function savePrefs() { lsSet('kk_prefs', JSON.stringify(Object.assign({}, UI.prefs, { speed: AIDELAY }))); }
 const wait = ms => ANIM ? new Promise(r => setTimeout(r, ms * (AIDELAY > 0 ? Math.max(.35, AIDELAY / 650) : .35))) : Promise.resolve();
+// ---- "what just happened": after every reveal, one line per diner with the score change and its cause
+const CATN = { maki: 'roll race', tempura: 'prawn pair', sashimi: 'fish set', dumpling: 'buns', nigiri: 'nigiri', wasabi: 'Fire Paste ×3' };
+function buildNews(before, after, picks, scored) {
+  const a = liveScores(before), b = liveScores(after), mkA = makiRank(a.map(r => r.icons)), mkB = makiRank(b.map(r => r.icons));
+  const lines = picks.map(pk => {
+    const s = pk.seat, d = b[s].total - a[s].total, keys = pk.cards.map(c => c.key), why = [];
+    const served = pk.cards.map(c => TY[c.key].name + (NIG[c.key] && c.w >= 0 ? ' on Fire Paste' : '')).join(' + ');
+    const plays = keys.some(k => ICONS[k]);
+    for (const k of ['tempura', 'sashimi', 'dumpling', 'nigiri', 'wasabi']) { const x = b[s][k] - a[s][k]; if (x) why.push((x > 0 ? '+' : '−') + Math.abs(x) + ' ' + CATN[k]); }
+    const mx = b[s].maki - a[s].maki;
+    if (mx) why.push((mx > 0 ? '+' : '−') + Math.abs(mx) + ' roll race' + (mkB[s].rank ? ' (now ' + ORD[mkB[s].rank] + ')' : ' (lost the lead)') + (!plays ? ': someone else served rolls' : ''));
+    const notes = [];
+    if (keys.includes('wasabi') && !pk.cards.some(c => NIG[c.key])) notes.push('the Fire Paste waits to triple ' + (s === viewSeat() ? 'your' : 'their') + ' next nigiri');
+    if (keys.includes('chop') && keys.length === 1) notes.push('Twin Sticks: two plates on a later turn');
+    if (keys.length === 2 && G.players[s]) notes.push('used Twin Sticks to serve two');
+    if (keys.includes('pudding')) notes.push('custard is counted at the end of the game');
+    if (!d && !why.length && keys.some(k => k === 'tempura' || k === 'sashimi')) notes.push('scores when the set is complete');
+    return { s, d, served, why, notes };
+  });
+  return { t: Date.now(), round: scored ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, turn: G.turn, lines };
+}
+function newsDelta(s) { const n = UI.news; if (!n || Date.now() - n.t > 2600) return 0; const l = n.lines.find(x => x.s === s); return l ? l.d : 0; }
+function newsSig(s) { const d = newsDelta(s); return d ? UI.news.t + ':' + d : ''; }
+function newsEl() {
+  const n = UI.news; if (!n) return null;
+  const box = h('div.news');
+  n.lines.forEach((l, i) => box.appendChild(h('div.nl', i ? null : h('span.nh', n.round !== G.round ? 'Last turn of round ' + n.round + ': ' : 'Last turn: '), h('span.nn', { style: 'color:' + pcol(l.s).c }, pname(l.s)), ' ', h('span.nd' + (l.d > 0 ? '.up' : l.d < 0 ? '.down' : ''), l.d > 0 ? '+' + l.d : l.d < 0 ? '−' + -l.d : '±0'), ' ' + l.served + (l.why.length ? ' · ' + l.why.join(', ') : '') + (l.notes.length ? ' · ' + l.notes.join('; ') : ''))));
+  return box;
+}
 // ===================== part 2: rendering (table, belt, dock) =====================
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) UI.focus = v; return UI.focus || 0; }
@@ -5379,11 +6061,12 @@ function render() {
 }
 function renderBar() {
   const s = $('#barstat'); if (!s) return;
-  const re = UI.fz && UI.fz.roundEnd, rd = re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round;
-  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? 'Round ' + rd + ' of ' + D.rounds + ' · scoring' : 'Round ' + G.round + ' of ' + D.rounds + ' · Turn ' + G.turn + ' of ' + G.hand;
+  // fz.scoring: the engine has already scored this round and dealt the next, but the last reveal is still on screen
+  const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring), rd = re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round;
+  s.textContent = G.phase === 'over' && !re ? 'Game over' : re ? (isPh() ? 'Round ' + rd + '/' + D.rounds : 'Round ' + rd + ' of ' + D.rounds) + (UI.fz.roundEnd ? ' · scoring' : ' · last turn') : (isPh() ? 'Round ' + G.round + '/' + D.rounds + ' · Turn ' + G.turn + '/' + G.hand : 'Round ' + G.round + ' of ' + D.rounds + ' · Turn ' + G.turn + ' of ' + G.hand + ' · most points after round 3 wins');
 }
 function bankedOf(s) {
-  const fzEnd = UI.fz && UI.fz.tables && UI.fz.roundEnd;
+  const fzEnd = UI.fz && UI.fz.tables && (UI.fz.roundEnd || UI.fz.scoring);   // that round is already in G.rs: don't count it twice
   const list = fzEnd ? G.rs.slice(0, -1) : G.rs;
   return list.reduce((a, r) => a + r[s].total, 0);
 }
@@ -5423,8 +6106,14 @@ function renderTable() {
     const av = Math.max(34, Math.min(isMe ? 60 : 52, Math.round(rowH * .46)));
     const cmp = rowH < 88, shw = av + 14, sl = Math.max(30, Math.min(58, Math.round((rowH - (cmp ? 12 : 36)) / 1.4)));
     const ctrW = cw - shw - sl - 25;
-    let pd = Math.min(rowH - (isMe ? 34 : 32), ctrW / (isMe ? 7.2 : 5.6) - 6, isMe ? 84 : 68); pd = Math.max(24, Math.round(pd));
-    const dm = { av, shw, sl, pd, cmp };
+    // plates on the counter: one row, or two rows of bigger plates when the seat is tall enough (nothing clipped, labels readable)
+    // (a layout that fits wins over bigger plates that overflow past the edge)
+    const ng = groupsOf(s, tab, info).list.length + (pcs[s] || !isPh() ? 1 : 0), cap = isMe ? 84 : 68, slotW = p => Math.max(p + 12, 60);
+    const fit = (rows, hgt) => { const k = Math.ceil(ng / rows); let p = Math.max(24, Math.min(hgt, cap)); if (k * slotW(p) > ctrW) p = Math.max(24, (ctrW / k) - 12); return { p, ok: slotW(p) * k <= ctrW + 4 && hgt >= 24 }; };
+    const f1 = fit(1, rowH - (isMe ? 34 : 32)), f2 = ng > 2 ? fit(2, (rowH - 12) / 2 - 30) : { p: 0, ok: false };
+    const wrap = f2.ok && (!f1.ok || f2.p > f1.p + 4);
+    let pd = Math.max(24, Math.round(wrap ? f2.p : f1.p));
+    const dm = { av, shw, sl, pd, cmp, wrap };
     const sg = seatSig(s, tab, info, pcs, isMe, dm) + '|' + sigAll;
     const old = oldSeats[s];
     if (old && old.dataset.sg === sg) { els.push(old); continue; }
@@ -5439,21 +6128,22 @@ function renderTable() {
 function seatSig(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots, sl = fz ? JSON.stringify(fz[s]) : (G.phase === 'pick' ? (p.picked ? 'p' : 'w') : 'x');
   const lnd = UI.land ? [...UI.land].filter(x => x.startsWith(s + '|')).join(',') : '';
-  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs[s], sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' : '', G.phase].join('|');
+  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs[s], sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, dm.wrap ? 1 : 0, newsSig(s), p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' : '', G.phase].join('|');
 }
 function seatEl(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], col = pcol(s), picking = G.phase === 'pick' && !p.picked && !UI.fz;
   const gs = groupsOf(s, tab, info), total = totalOf(s, info);
-  const el = h('section.seat' + (isMe ? '.me' : '') + (picking ? '.choose' : ''), { 'data-seat': s, 'aria-label': p.name + (p.ai ? ', computer' : '') + ', ' + total + ' points' });
+  const el = h('section.seat' + (isMe ? '.me' : '') + (picking ? '.choose' : '') + (dm.wrap ? '.wrap' : ''), { 'data-seat': s, 'aria-label': p.name + (p.ai ? ', computer' : '') + ', ' + total + ' points' });
   el.style.setProperty('--pd', dm.pd + 'px'); el.style.setProperty('--shw', dm.shw + 'px'); el.style.setProperty('--av', dm.av + 'px'); el.style.setProperty('--sl', dm.sl + 'px'); el.style.setProperty('--ctr', counterURL(s));
   const av = h('div.av' + (picking ? '.act' : '')); av.appendChild(avN(s, 96));
   av.appendChild(h('span.sc', String(total)));
+  { const nd = newsDelta(s); if (nd) av.appendChild(h('span.dl' + (nd > 0 ? '' : '.neg'), (nd > 0 ? '+' : '−') + Math.abs(nd))); }
   const sh = h('button.sh', { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer ' + p.ai + ')' : '') + ': ' + total + ' points. Open details.' }, av, h('span.nm', p.name));
   el.appendChild(sh);
   const ctr = h('div.ctr');
   const land = UI.land || new Set();
   for (const g of gs.list) ctr.appendChild(grpEl(g, dm.pd, land.has(s + '|' + g.k)));
-  ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));
+  if (pcs[s] || !isPh()) ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));   // phones: the custard spot appears with the first cup (the dock lists custard)
   if (!gs.list.length && !pcs[s]) ctr.insertBefore(h('span.none', G.phase === 'pick' ? 'Nothing served yet' : ''), ctr.firstChild);
   el.appendChild(ctr);
   el.appendChild(slotEl(s, dm.sl, dm.cmp));
@@ -5509,7 +6199,12 @@ function renderBelt() {
   const hand = v >= 0 ? dispHand() : (G.phase === 'over' ? [] : new Array(UI.fz && UI.fz.backN != null ? UI.fz.backN : G.players[f].hand.length).fill(-1));
   const hidden = v < 0;
   const m = Math.max(G.hand, 1), avail = beltWidth() - 20;
-  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? 74 : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); const hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
+  const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? 74 : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
+  // a tall phone: two rows of plates instead of a belt that scrolls sideways and hides plates off the edge
+  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 56 && boardSize().h >= 440 && m > 5 && hand.length > 0 && G.phase !== 'over' && hand.length * 66 > avail + 6;   // back to one row once the hand fits
+  if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(74, Math.floor((avail - (k - 1) * 6) / k))); }
+  else if (ph && hand.length) { const fitN = Math.floor((avail - (hand.length - 1) * 6) / hand.length); if (fitN < hw) hw = Math.max(44, fitN); }   // shrink a little rather than hide plates past the edge
+  belt.classList.toggle('two', !!two);
   $('#bd').style.setProperty('--hw', hw + 'px');
   if (!belt.__bt) { belt.__bt = 1; try { const bt = KIT.beltEl({ h: 72, period: 96, seconds: 6 }); bt.style.height = '60px'; $('#beltw').insertBefore(bt, belt); bt.style.bottom = '8px'; } catch (e) { } }
   const frag = [], oldC = new Map(); for (const c of belt.children) if (c.dataset && c.dataset.rk) oldC.set(c.dataset.rk, c);
@@ -5523,10 +6218,10 @@ function renderBelt() {
     const g = UI.prefs.hint && can ? gainOf(v, [id]) : null;
     const key = 'c' + id, sg = [id, idx, selPos, rec.indexOf(id) >= 0 ? 1 : 0, can ? 1 : 0, g, UI.twin ? 1 : 0, hw, UI.prefs.tap2 ? 1 : 0].join('|');
     const o = oldC.get(key); if (o && o.dataset.sg === sg && !enter) { frag.push(o); return; }
-    const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked'), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? '. Tap to lift it' + (selPos >= 0 ? ', tap again to serve' : '') : '') });
+    const b = h('button.hc' + (selPos >= 0 ? '.sel' : '') + (rec.indexOf(id) >= 0 ? '.rec' : '') + (can ? '' : '.locked'), { type: 'button', 'data-a': 'hcard', 'data-i': idx, 'data-id': id, 'data-owner': v, 'data-up': '1', 'aria-pressed': selPos >= 0 ? 'true' : 'false', 'aria-label': TY[ty].name + '. ' + TY[ty].ruleText + (can ? '. Tap to lift it' + (selPos >= 0 ? (UI.prefs.tap2 ? ', tap again to serve' : ', then press Serve') : '') : '') });
     b.style.setProperty('--k', k);
     b.appendChild(cardNode(ty, hw));
-    if (g != null) b.appendChild(h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : '0'));
+    if (g != null) b.appendChild(ty === 'pudding' ? h('span.gn.z', { title: 'Custard scores at the end of the game' }, 'end') : h('span.gn' + (g > 0 ? '' : '.z'), g > 0 ? '+' + g : '0'));
     if (UI.twin && selPos >= 0) b.appendChild(h('span.pn', String(selPos + 1)));
     if (enter) b.classList.add('ent-' + enter);
     b.dataset.rk = key; b.dataset.sg = sg;
@@ -5545,8 +6240,9 @@ function promptText() {
   if (!G) return '';
   if (G.phase === 'over') return isPh() ? 'The meal is over.' : (G.winText || 'The meal is over.');
   const v = viewSeat();
-  if (UI.fz && UI.fz.say) return isPh() ? (UI.fz.slots ? (UI.fz.slots[0] && UI.fz.slots[0].mode === 'faces' ? 'Reveal!' : 'Plates are covered…') : UI.fz.roundEnd ? 'Round over!' : 'Plates land. Hands pass left.') : UI.fz.say;
+  if (UI.fz && UI.fz.say) return isPh() ? (UI.fz.slots ? (UI.fz.slots[0] && UI.fz.slots[0].mode === 'faces' ? 'Reveal!' : 'Plates are covered…') : UI.fz.roundEnd ? 'Round over!' : 'Plates land. Hands pass on.') : UI.fz.say;
   if (UI.cards.length && UI.cards[0].kind === 'pass') return 'Pass the device to ' + pname(UI.cards[0].seat) + '.';
+  if (UI.busy) return 'The hands pass to the next diner…';
   if (watching()) return 'The computers are choosing a plate…';
   if (hotSeat() && v < 0) return 'Pass the device to the next diner.';
   const pend = KK.pending(G).filter(s => s !== v).map(pname);
@@ -5561,26 +6257,29 @@ function promptText() {
 }
 function placePrompt() {
   const p = $('#prompt'); if (!p) return;
-  const tgt = document.documentElement.classList.contains('ph-p') ? $('#barprompt') : $('#promptDock');
+  const tgt = $('#promptDock');
   if (tgt && p.parentNode !== tgt) tgt.appendChild(p);
 }
 function renderDock() {
   const pr = $('#prompt'); if (pr) { const t = promptText(); pr.textContent = t; const v = viewSeat(); pr.className = canPick() && v >= 0 ? 'mine' : ''; }
+  { const pd = $('#promptDock'), hb = $('#hintb'), want = document.documentElement.classList.contains('ph-p') && canPick() && viewSeat() >= 0 && !UI.sel.length;
+    if (want && !hb && pd) pd.appendChild(h('button.btn.alt#hintb', { 'data-a': 'hint', type: 'button' }, 'Hint')); else if (!want && hb) hb.remove(); }
   const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = G.phase === 'over' ? 'Game over' : (canPick() ? 'Your turn' : 'Table');
   // round track
-  const rt = $('#rt'); if (rt) { const re = UI.fz && UI.fz.roundEnd; rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · pass left')); }
+  const rt = $('#rt'); if (rt) { const re = UI.fz && (UI.fz.roundEnd || UI.fz.scoring); rt.innerHTML = KIT.roundTrackSVG(Math.min(re ? (G.phase === 'over' ? D.rounds : G.round - 1) : G.round, D.rounds), { size: isPh() ? 24 : 30 }); rt.appendChild(h('span', G.phase === 'over' && !re ? 'Final' : re ? 'Round scoring' : 'Turn ' + G.turn + ' of ' + G.hand + ' · hands pass on')); }
   // roster chips
   const ro = $('#roster'); if (ro) {
     const tab = tables(), info = seatScoreInfo(tab), v = viewSeat(), f = focusSeat();
-    const rsg = [v, f, G.phase, isPh() ? 1 : 0, UI.fz && UI.fz.slots ? 1 : 0].concat(G.players.map((p, s) => [p.name, p.picked ? 1 : 0, totalOf(s, info)].join(':')).concat([UI.fz ? 'f' : ''])).join('|');
+    const rsg = [v, f, G.phase, isPh() ? 1 : 0, UI.fz && UI.fz.slots ? 1 : 0, pudCounts().join(',')].concat(G.players.map((p, s) => [p.name, p.picked ? 1 : 0, totalOf(s, info)].join(':')).concat([UI.fz ? 'f' : ''])).join('|');
     if (ro.dataset.sg !== rsg) { ro.dataset.sg = rsg; ro.replaceChildren();
     for (let k = 0; k < G.np; k++) {
       const s = (f + k) % G.np, p = G.players[s], busyFz = !!UI.fz, rdy = G.phase === 'pick' && p.picked && !busyFz, tot = totalOf(s, info);
       const ph = isPh();
-      const ch = h('button.chip' + (s === v ? '.me' : '') + (rdy ? '.rd' : G.phase === 'pick' && !busyFz ? '.wt' : ''), { type: 'button', 'data-a': 'chip', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer)' : '') + ': ' + tot + ' points, ' + (G.phase !== 'pick' || busyFz ? '' : rdy ? 'has chosen' : 'is choosing') },
-        (() => { const e = h('span.cav'); e.appendChild(avN(s, 96)); return e; })(), h('span.ct', h('b', p.name + (s === v && p.name !== 'You' ? ' (you)' : '')), h('i', (rdy ? '✓ ' : G.phase === 'pick' && !busyFz ? '… ' : '') + (ph ? tot : tot + ' pts' + (rdy ? ' · ready' : G.phase === 'pick' && !busyFz ? ' · choosing' : '')))));
+      const ch = h('button.chip' + (s === v ? '.me' : '') + (G.np >= 4 ? '.nn' : '') + (rdy ? '.rd' : G.phase === 'pick' && !busyFz ? '.wt' : ''), { type: 'button', 'data-a': 'chip', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer)' : '') + ': ' + tot + ' points, ' + (G.phase !== 'pick' || busyFz ? '' : rdy ? 'has chosen' : 'is choosing') },
+        (() => { const e = h('span.cav'); e.appendChild(avN(s, 96)); return e; })(), h('span.ct', h('b', p.name + (s === v && p.name !== 'You' ? ' (you)' : '')), h('i', (rdy ? '✓ ' : '') + (ph ? tot + (G.np <= 2 ? ' pts' : '') : tot + ' pts' + (rdy ? ' · ready' : G.phase === 'pick' && !busyFz ? ' · choosing' : '')))));
       ro.appendChild(ch);
     }
+    const pc = pudCounts(); if (pc.some(x => x > 0)) ro.appendChild(h('div.pudl', { title: 'Custard Cups are counted at the end of the game: most +6' + (G.np > 2 ? ', fewest −6' : '') + '.' }, 'Custard, scored at the end (most +6' + (G.np > 2 ? ', fewest −6' : '') + '): ' + G.players.map((q, i) => q.name + ' ' + pc[i]).join(', ')));
     }
   }
   renderSel(); renderActs(); renderCheat();
@@ -5599,12 +6298,21 @@ function renderSel() {
     const hand = G.players[v].hand, ids = UI.sel.map(i => hand[i]).filter(x => x != null);
     if (ids.length) {
       const cw = ph ? 56 : 92; const box = h('div.sc1'); const rows = h('div.si');
-      if (ids.length === 1) { box.appendChild(cardNode(tkey(ids[0]), cw)); const ty = tkey(ids[0]); const g = gainOf(v, ids); add(rows, [h('b', TY[ty].name), h('span', TY[ty].ruleText), h('span.sm', g > 0 ? 'Scores +' + g + ' for you right now.' : 'Scores nothing yet.'), ph ? null : h('span.why', whyPick(ids))]); }
-      else { const two = h('div'); two.style.cssText = 'display:flex;gap:2px'; ids.forEach(id => two.appendChild(cardNode(tkey(id), Math.round(cw * .7)))); box.appendChild(two); const g = gainOf(v, ids); add(rows, [h('b', 'Twin Sticks: ' + ids.map(i => TY[tkey(i)].l[0]).join(' + ')), h('span.sm', g > 0 ? 'Both together score +' + g + ' for you right now.' : 'Both together score nothing yet.'), ph ? null : h('span.why', whyPick(ids))]); }
+      if (ids.length === 1) { box.appendChild(cardNode(tkey(ids[0]), cw)); const ty = tkey(ids[0]); const g = gainOf(v, ids); add(rows, [h('b', TY[ty].name), h('span', TY[ty].ruleText), h('span.sm', g > 0 ? 'Scores +' + g + ' for you right now.' : 'Scores nothing yet.'), ph && !UI.rec ? null : h('span.why', (UI.rec ? 'Hint: ' : '') + whyPick(ids))]); }
+      else { const two = h('div'); two.style.cssText = 'display:flex;gap:2px'; ids.forEach(id => two.appendChild(cardNode(tkey(id), Math.round(cw * .7)))); box.appendChild(two); const g = gainOf(v, ids); add(rows, [h('b', 'Twin Sticks: ' + ids.map(i => TY[tkey(i)].l[0]).join(' + ')), h('span.sm', g > 0 ? 'Both together score +' + g + ' for you right now.' : 'Both together score nothing yet.'), ph && !UI.rec ? null : h('span.why', (UI.rec ? 'Hint: ' : '') + whyPick(ids))]); }
       el.append(box, rows); return;
     }
   }
   el.className = 'idle';
+  // a newcomer's dock: the tip for this turn, then what happened last turn (cause -> effect), then the goal on the first turn
+  if (v >= 0 && G.phase === 'pick' && !(UI.cards.length && UI.cards[0].kind === 'pass') && (UI.tip || UI.news || (G.round === 1 && G.turn <= 2))) {
+    el.className = 'idle feed';
+    const tp = UI.tip && UI.tip.turn === G.round + '.' + G.turn && canPick() ? UI.tip : null;
+    if (tp) el.appendChild(h('div.tip', tp.type ? h('div.tcard', { html: plateS(tp.type, 30) }) : null, h('div', h('b', tp.title), ' ', tp.text)));
+    const ne = newsEl(); if (ne && !(UI.fz && UI.fz.slots)) el.appendChild(ne);
+    if (!tp && !ne) el.appendChild(h('div.si', h('span', h('b', 'Goal: '), 'the most points after 3 rounds wins. Each turn everyone picks one plate, then each hand passes to the next diner (shown under the table). The green +N on a plate is what it scores you right now.')));
+    return;
+  }
   let t;
   if (UI.cards.length && UI.cards[0].kind === 'pass') t = 'The hands are hidden until the device is passed.';
   else if (watching()) t = 'Sit back: the computers play all three rounds. Hands slide to the left every turn.';
@@ -5621,8 +6329,8 @@ function renderActs() {
     const p = G.players[v], chop = KK._.hasChop(p) && p.hand.length >= 2;
     const n = UI.sel.length;
     if (n) { const ids = UI.sel.map(i => p.hand[i]); const g = gainOf(v, ids); a.appendChild(h('button.btn.go', { 'data-a': 'serve', type: 'button' }, n === 2 ? 'Serve both' + (g > 0 ? ' (+' + g + ')' : '') : 'Serve' + (g > 0 ? ' (+' + g + ')' : ''))); }
-    if (chop) a.appendChild(h('button.btn' + (UI.twin ? '.on' : '.alt'), { 'data-a': 'twin', type: 'button', 'aria-pressed': UI.twin ? 'true' : 'false' }, UI.twin ? 'Twin Sticks: on' : 'Use Twin Sticks'));
-    a.appendChild(h('button.btn.alt', { 'data-a': 'hint', type: 'button' }, 'Hint'));
+    if (chop) a.appendChild(h('button.btn' + (UI.twin ? '.on' : '.alt'), { 'data-a': 'twin', type: 'button', 'aria-pressed': UI.twin ? 'true' : 'false' }, UI.twin ? 'Twin Sticks: pick 2' : 'Use Twin Sticks (serve 2)'));
+    if (!(n === 0 && document.documentElement.classList.contains('ph-p'))) a.appendChild(h('button.btn.alt', { 'data-a': 'hint', type: 'button' }, 'Hint'));
     if (n) a.appendChild(h('button.btn.alt', { 'data-a': 'unsel', type: 'button', 'aria-label': 'Put the plate back' }, 'Cancel'));
   }
 }
@@ -5668,9 +6376,9 @@ function newGame(mode, o) {
   UI.chefs = chefs;
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
   const seed = UI.seed != null ? UI.seed : (Date.now() ^ (Math.random() * 1e9)) | 0;
-  G = KK.newGame({ players: np, seed, names, ai });
-  Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
-  UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && UI.coach.keep ? 'full' : 'off'), seen: {}, turn: '', keep: UI.coach.keep };
+  G = KK.newGame({ players: np, seed, names, ai, twist: o.twist || null });
+  UI.news = null; UI.tip = null; Object.assign(UI, { started: true, mode, cfg: { np, level: opt.level, lv: (opt.lv || DEF.lv).slice(), seats: chefs ? chefs.slice(1) : null }, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, over: null, enter: 'deal', land: null, focus: 0, overShown: false, evN: G.evN });
+  UI.coach = { level: mode === 'guided' ? 'full' : (UI.coach.level === 'full' && UI.coach.keep ? 'full' : UI.coach.userOff ? 'off' : 'light'), seen: {}, turn: '', keep: UI.coach.keep, userOff: UI.coach.userOff };
   if (mode === 'guided') UI.coach.level = 'full';
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
@@ -5681,6 +6389,7 @@ function schedule() {
   clearTimeout(UI.tm);
   if (!G || !UI.started) return;
   if (G.phase === 'over') return;
+  try { autoSave(); } catch (e) { }
   if (UI.busy) return;
   if (isClient()) { try { coachCheck(); } catch (e) { } return; }
   if (UI.cards.length && !NET.on) return;
@@ -5695,7 +6404,7 @@ function schedule() {
 function aiPick(seat) {
   if (!G || UI.busy || G.phase !== 'pick') return;
   const p = G.players[seat]; if (!p || p.picked || !p.ai) { schedule(); return; }
-  let mv; try { mv = KK.AI.choose(G, seat); } catch (e) { console.error(e); mv = KK.moves(G, seat)[0]; }
+  let mv; try { mv = KK.AI.choose(G, seat, undefined, UI.camp && UI.camp.twist && UI.camp.twist.id === 'long-think' ? { units: UI.camp.twist.param || 250 } : undefined); } catch (e) { console.error(e); mv = KK.moves(G, seat)[0]; }
   commit(seat, mv);
 }
 function commit(seat, mv) {
@@ -5764,7 +6473,7 @@ function hint() {
   UI.rec = { ids: mv.ids.slice(), pick: mv.pick.slice() };
   UI.twin = mv.pick.length === 2; UI.sel = mv.pick.slice(); render();
   const pp = $('#prompt'); const why = whyPick(mv.ids);
-  toast('A good pick: ' + mv.ids.map(cname).join(' + ') + '. ' + why);
+  if (!isPh()) toast('A good pick: ' + mv.ids.map(cname).join(' + ') + '. ' + why);   // phones: the reason shows in the panel, not over the buttons
 }
 // ---------- hot-seat ----------
 function hotNext() {
@@ -5795,7 +6504,7 @@ async function playResolve(evs, preHand) {
     if (v >= 0 && preHand) { const pk = rv.picks[v]; const gone = new Set(pk.cards.map(c => c.id)); hand = preHand.filter(id => !gone.has(id)); if (pk.chop >= 0) hand.push(pk.chop); }
     const backN = hand ? hand.length : (ps ? ps.sizes[0] : 0);
     const pudSub = sc ? T.map(t => t.filter(e => tkey(e.id) === 'pudding').length) : new Array(np).fill(0);
-    UI.fz = { tables: before, slots: rv.picks.map(() => ({ mode: 'cover' })), hand: hand || (hotSeat() || v < 0 ? null : []), backN, pudSub, roundEnd: false, say: 'Everyone has chosen. The plates are under covers…' };
+    UI.fz = { tables: before, slots: rv.picks.map(() => ({ mode: 'cover' })), hand: hand || (hotSeat() || v < 0 ? null : []), backN, pudSub, roundEnd: false, scoring: !!sc, say: 'Everyone has chosen. The plates are under covers…' };
     if (!hand && v < 0) UI.fz.hand = null;
     UI.sel = []; UI.twin = false; UI.rec = null;
     render(); await wait(450); if (tok !== UI.seq) return;
@@ -5805,6 +6514,7 @@ async function playResolve(evs, preHand) {
     if (ANIM) { snd('cloche'); const hosts = $$('#tbl .hostc'); try { pxReveal(); await KIT.revealAll(hosts, { stagger: 110 }); } catch (e) { } await wait(850); } if (tok !== UI.seq) return;
     // 3: plates land on the counters
     const land = new Set(); rv.picks.forEach(p => p.cards.forEach(c => land.add(p.seat + '|' + keyOfCard(c)))); UI.land = land;
+    try { UI.news = buildNews(before, T, rv.picks, !!sc); } catch (e) { UI.news = null; }
     UI.fz.slots = null; UI.fz.tables = T; UI.fz.say = ps ? 'The plates land. Hands slide to the left…' : 'The plates land. The round is over!';
     if (sc) { UI.fz.roundEnd = true; UI.fz.hand = []; UI.fz.backN = 0; }
     render(); snd('clink'); await wait(750); if (tok !== UI.seq) return;
@@ -5846,18 +6556,25 @@ function afterRound(ge) {
   snd('slide', { vol: .5 }); schedule(); drainQ(); if (NET.on && isHost()) netPush(true);
 }
 // ---------- save / load (local games only) ----------
+// SAVE_V goes up whenever G or the save layout changes: an older save is then refused politely instead of resuming a broken meal
+const SAVE_V = 2;
 function hasSave() { return !!lsGet('kk_save'); }
+function saveInfo() { try { const o = JSON.parse(lsGet('kk_save')); if (o && o.sv === SAVE_V && o.G && o.G.phase !== 'over') return { round: o.G.round, np: o.G.np, mode: o.mode }; } catch (e) { } return null; }
 function save() {
-  if (NET.on || !G || !UI.started) return false;
-  try { lsSet('kk_save', JSON.stringify({ G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
+  if (NET.on || !G || !UI.started || G.phase === 'over') return false;
+  try { localStorage.setItem('kk_save', JSON.stringify({ sv: SAVE_V, G, mode: UI.mode, cfg: UI.cfg, chefs: UI.chefs || null, holder: -1, coach: UI.coach })); return true; } catch (e) { return false; }
 }
+// autosave: after every resolved turn (schedule runs after each one) and when the page is hidden or closed (iPhone app switch)
+function autoSave() { if (!G || !UI.started || NET.on || G.phase === 'over') return; const k = G.round + '.' + G.turn + '.' + G.evN + '.' + G.players.map(p => p.picked ? 1 : 0).join(''); if (UI.svk === k) return; if (save()) UI.svk = k; }
+function flushSave() { UI.svk = ''; autoSave(); }
 function loadSave() {
   if (NET.on) return false;
   let o; try { o = JSON.parse(lsGet('kk_save')); } catch (e) { return false; }
+  if (o && o.G && o.sv !== SAVE_V) { lsSet('kk_save', ''); toast('That saved meal is from an older version of the game, so it could not be resumed.'); if (!G) renderStart(); return 'old'; }
   if (!o || !o.G || !Array.isArray(o.G.players) || o.G.v !== 1) return false;
   clearTimeout(UI.tm); UI.seq++;
   G = o.G; try { if (KK.checkInvariants(G).length) { G = null; return false; } } catch (e) { return false; }
-  Object.assign(UI, { started: true, mode: o.mode || 'vs', cfg: o.cfg || null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, enter: 'deal', focus: 0, evN: G.evN, over: null });
+  UI.news = null; UI.tip = null; Object.assign(UI, { started: true, mode: o.mode || 'vs', cfg: o.cfg || null, holder: -1, sel: [], twin: false, pop: null, cards: [], fz: null, busy: false, rec: null, enter: 'deal', focus: 0, evN: G.evN, over: null });
   if (o.coach) UI.coach = o.coach;
   UI.chefs = Array.isArray(o.chefs) && o.chefs.length === G.np ? o.chefs : null;
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; }
@@ -5880,53 +6597,56 @@ function drawCard() {
 }
 // ---- guide: short tips that explain each card the first time it appears
 const TIP_EXTRA = {
-  tempura: 'Two of them make a pair worth 5. Collect them in pairs.',
-  sashimi: 'Fish Slices only score in sets of three (10 points). One or two are worth nothing, so go for it only if more are coming.',
-  dumpling: 'Each Steam Bun you stack is worth more than the last: 1, 3, 6, 10 and 15 points for five.',
-  roll1: 'Roll icons race: the most icons this round scores 6, second most 3. This one has one icon.',
-  roll2: 'Roll icons race: the most icons this round scores 6, second most 3. This one has two icons.',
-  roll3: 'Roll icons race: the most icons this round scores 6, second most 3. This one has three icons, the best for the race.',
-  salmon: 'A nigiri is worth its number straight away. Put it on Fire Paste for triple.',
-  squid: 'The best nigiri: 3 points, or 9 on Fire Paste.',
+  tempura: 'They score in pairs: two make 5 points, a lone one scores nothing.',
+  sashimi: 'They score in sets of three: three make 10 points, one or two score nothing. Go for it only if more are coming.',
+  dumpling: 'Each bun is worth more than the last: 1, 3, 6, 10, then 15 points for five.',
+  roll1: 'A roll race: whoever has the most roll icons when the round ends scores 6, second most 3. This one has 1 icon.',
+  roll2: 'A roll race: whoever has the most roll icons when the round ends scores 6, second most 3. This one has 2 icons.',
+  roll3: 'A roll race: whoever has the most roll icons when the round ends scores 6, second most 3. This one has 3 icons.',
+  salmon: 'Worth 2 points at once, or 6 if it lands on your Fire Paste.',
+  squid: 'The best nigiri: 3 points, or 9 if it lands on your Fire Paste.',
   egg: 'The smallest nigiri: 1 point, or 3 on Fire Paste.',
-  wasabi: 'Serve Fire Paste first, then a nigiri: the nigiri lands on it and scores triple. Fire Paste with no nigiri scores nothing.',
-  chop: 'Twin Sticks stay on your counter. On a later turn you can serve two plates at once, then the sticks go back into your hand.',
-  pudding: 'Custard is kept for the whole meal. At the end the diner with the most gets 6, the one with the fewest loses 6.'
+  wasabi: 'Scores nothing by itself: the next nigiri you serve lands on it and scores triple.',
+  chop: 'Keep them: on a later turn you may serve two plates at once. The sticks then go back into the hand and pass on with it.',
+  pudding: 'Kept for the whole game. At the end, whoever has the most gets 6' + ' and the fewest loses 6 (no loss with 2 diners).'
 };
+// tips sit in the dock beside the belt (never over the hand) and need no "Got it"; only the opening one is a card
 function coachTip(key, title, text, type) {
   UI.coach.seen[key] = 1; UI.coach.turn = G.round + '.' + G.turn;
-  const cw = isPh() ? 52 : 108;
-  const body = type ? h('div.cwrap', h('div.cardbox', cardDiv(type, cw)), h('div.cinfo', h('p', text))) : h('p', text);
-  pushCard({ kind: 'coach', title, sub: 'Tip', body, buttons: [{ label: 'Got it', a: 'cont' }] });
+  if (key === 'welcome') {
+    const body = h('div', h('p', h('b', 'Goal: '), 'the most points after 3 rounds wins.'), h('p', h('b', 'Each turn: '), 'tap a plate on your belt, press Serve. Everyone reveals at the same time, then every hand passes to the next diner ("passes to …" under the table).'), h('p', h('b', 'Scoring: '), 'plates score in pairs, sets and races. The green +N on a plate is what it scores you right now.'));
+    pushCard({ kind: 'coach', title, sub: 'How it works', body, buttons: [{ label: 'Let\'s eat', a: 'cont' }] }); return;
+  }
+  UI.tip = { key, title, text, type, turn: UI.coach.turn }; render();
 }
 function coachCheck() {
   const lv = UI.coach.level; if (lv === 'off' || !G || G.phase !== 'pick') return false;
   const v = viewSeat(); if (v < 0 || !canPick() || UI.cards.length) return false;
   const turn = G.round + '.' + G.turn; if (UI.coach.turn === turn) return false;
   const seen = UI.coach.seen, p = G.players[v];
-  if (!seen.welcome) { coachTip('welcome', 'Welcome to the belt', 'You are a diner at a conveyor-belt sushi bar. Over three rounds you collect plates for points. The highest score at the end wins.'); return true; }
-  if (!seen.pick) { coachTip('pick', 'Everyone picks at once', 'Pick one plate from your belt and serve it: tap to lift it, tap again to serve. When everyone has chosen, all plates are revealed together, then every hand slides to the player on your left.'); return true; }
-  const types = Array.from(new Set(p.hand.map(tkey))).sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
+  if (!seen.welcome && lv === 'full') { coachTip('welcome', 'Welcome to the belt', ''); return true; }
+  if (!seen.pick && lv === 'full') { coachTip('pick', 'Your move:', 'tap a plate to lift it and read what it does, then press Serve.'); return true; }
+  const PRI = ['wasabi', 'chop', 'pudding']; const types = Array.from(new Set(p.hand.map(tkey))).sort((a, b) => (PRI.indexOf(b) - PRI.indexOf(a)) || (ORDER.indexOf(a) - ORDER.indexOf(b)));
   if (lv === 'full' || lv === 'light') {
-    for (const t of types) { if (seen[t]) continue; if (lv === 'light' && !['wasabi', 'chop', 'pudding'].includes(t)) continue; coachTip(t, TY[t].name, (D.types.find(x => x.id === t) || {}).text + ' ' + (TIP_EXTRA[t] || ''), t); return true; }
+    for (const t of types) { const tk = ICONS[t] ? 'roll' : t; if (seen[tk]) continue; if (lv === 'light' && !['wasabi', 'chop', 'pudding'].includes(t)) continue; coachTip(tk, 'New: ' + TY[t].name + '.', TIP_EXTRA[t] || '', t); return true; }
   }
   const c = KK.tableCounts(p.table);
-  if (!seen.pasteReady && c.wasabiUnused && p.hand.some(id => NIG[tkey(id)])) { coachTip('pasteReady', 'Fire Paste is waiting', 'You have Fire Paste on your counter. Serve a nigiri now and it lands on the paste and scores triple. The plates marked +6 or +9 are the nigiri that do it.', 'wasabi'); return true; }
-  if (!seen.twinReady && c.chop && p.hand.length >= 2) { coachTip('twinReady', 'Use your Twin Sticks', 'You have Twin Sticks on your counter. Press "Use Twin Sticks", pick two plates and serve both. Then the sticks go back into your hand and move on.', 'chop'); return true; }
-  if (!seen.endRound && G.turn >= G.hand) { coachTip('endRound', 'Last plate of the round', 'When the belt runs empty the round is scored: sets, ladders, nigiri and the roll race. Everything except Custard is cleared away, then a new hand is dealt.'); return true; }
+  if (!seen.pasteReady && c.wasabiUnused && p.hand.some(id => NIG[tkey(id)])) { coachTip('pasteReady', 'Fire Paste is waiting:', 'serve a nigiri now and it lands on your paste and scores triple (look for +3, +6 or +9).', 'wasabi'); return true; }
+  if (!seen.twinReady && c.chop && p.hand.length >= 2) { coachTip('twinReady', 'Twin Sticks ready:', 'press "Use Twin Sticks" to serve two plates this turn. The sticks then go back into the hand and pass on.', 'chop'); return true; }
+  if (!seen.endRound && G.turn >= G.hand) { coachTip('endRound', 'Last plate of the round:', 'then the round is scored, including the roll race. Everything but custard is cleared and new hands are dealt.'); return true; }
   return false;
 }
 // ---- round score pad
 const CATROWS = [
-  { k: 'maki', l: 'Seaweed rolls', ic: ['most', 'roll1'], sub: s => s.icons + ' icon' + (s.icons === 1 ? '' : 's') },
-  { k: 'tempura', l: 'Crispy Prawns', ic: ['pair', 'tempura'], sub: null },
-  { k: 'sashimi', l: 'Fish Slices', ic: ['set', 'sashimi'], sub: null },
-  { k: 'dumpling', l: 'Steam Buns', ic: ['ladder', 'dumpling'], sub: null },
-  { k: 'nigiri', l: 'Nigiri', ic: ['v2', 'salmon'], sub: null },
-  { k: 'wasabi', l: 'Fire Paste bonus', ic: ['x3', 'wasabi'], sub: null }];
+  { k: 'maki', l: 'Seaweed rolls', ic: ['most', 'roll1'], sub: s => s.icons + ' icon' + (s.icons === 1 ? '' : 's'), tip: 'Roll race: most roll icons scores 6, second most 3.' },
+  { k: 'tempura', l: 'Crispy Prawns', ic: ['pair', 'tempura'], sub: null, tip: '5 points for every pair.' },
+  { k: 'sashimi', l: 'Fish Slices', ic: ['set', 'sashimi'], sub: null, tip: '10 points for every set of three.' },
+  { k: 'dumpling', l: 'Steam Buns', ic: ['ladder', 'dumpling'], sub: null, tip: '1, 3, 6, 10, 15 points for 1 to 5 or more buns.' },
+  { k: 'nigiri', l: 'Nigiri', ic: ['v2', 'salmon'], sub: null, tip: 'Sunset 2, Moon 3, Sun 1 point each.' },
+  { k: 'wasabi', l: 'Fire Paste bonus', ic: ['x3', 'wasabi'], sub: null, tip: 'The extra points a nigiri scored by landing on Fire Paste (triple).' }];
 function padRows(upToRound, withPud) {
   const bank = G.players.map((p, i) => G.rs.map(r => r[i].total));
-  return G.players.map((p, i) => ({ i, name: p.name, rounds: [0, 1, 2].map(r => r < upToRound ? bank[i][r] : null), dessert: withPud ? G.final.puddingPts[i] : null, total: bank[i].slice(0, upToRound).reduce((a, b) => a + b, 0) + (withPud ? G.final.puddingPts[i] : 0), you: i === viewSeat() }));
+  return G.players.map((p, i) => ({ i: chefOf(i), name: p.name, rounds: [0, 1, 2].map(r => r < upToRound ? bank[i][r] : null), dessert: withPud ? G.final.puddingPts[i] : null, total: bank[i].slice(0, upToRound).reduce((a, b) => a + b, 0) + (withPud ? G.final.puddingPts[i] : 0), you: i === viewSeat() }));
 }
 function makiText(sc) {
   const s = sc.seats; const max = Math.max(...s.map(x => x.icons));
@@ -5946,7 +6666,7 @@ function showRound(sc, ge) {
   tb.appendChild(hr);
   const cells = [];
   CATROWS.forEach(r => {
-    const tr = h('tr'); tr.appendChild(h('td', h('div.lc', { html: iconS(r.ic[0], 26, r.ic[1]) }, r.l)));
+    const tr = h('tr', { title: r.tip }); tr.appendChild(h('td', h('div.lc', { html: iconS(r.ic[0], 26, r.ic[1]) }, r.l)));
     sc.seats.forEach(s => { const td = h('td.n.z', { 'data-v': s[r.k] }, '·'); if (r.sub) td.appendChild(h('span.sub', r.sub(s))); tr.appendChild(td); cells.push(td); });
     tb.appendChild(tr);
   });
@@ -6005,8 +6725,10 @@ function showFinal() {
   const bs = NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again' }, { label: 'Look at the table', a: 'cont', cls: 'alt' }, { label: 'Menu', a: 'menu', cls: 'alt' }];
   box.appendChild(h('div.cbtns', bs.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a === 'cont' ? 'rsclose' : b.a }, b.label))));
   rs.appendChild(box);
-  if (iWin || !NET.on) { snd('win', { duck: true }); celebrate(box); } else snd('round', { duck: true });
-  UI.overShown = true;
+  // confetti only when a person at this device won (or shares the win); otherwise a softer line
+  const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
+  if (humanWin) { snd('win', { duck: true }); celebrate(box); } else { snd('round', { duck: true }); if (humans().length || NET.on) wn.after(h('p.wp', 'Well played! Another meal?')); }
+  UI.overShown = true; if (humans().length || NET.on) lsSet('kk_done', '1');
   if (UI.mode !== 'net') lsSet('kk_save', '');
 }
 function celebrate(box) {
@@ -6023,7 +6745,7 @@ function buildRules() {
   sec('The goal', h('p', 'You are a diner at a conveyor-belt sushi bar. Collect plates over three rounds and score points for sets, pairs, ladders and races. The highest total after the third round wins. Ties go to the diner with more Custard Cups.'));
   sec('How a round goes', h('ol', ...[
     'Everyone is dealt a hand: 10 plates with 2 diners, 9 with 3, 8 with 4 and 7 with 5.',
-    'All diners secretly pick one plate from their hand at the same time. On your phone or computer: tap a plate to lift it, tap it again (or press Serve) to confirm.',
+    'All diners secretly pick one plate from their hand at the same time. On your phone or computer: tap a plate to lift it, then press Serve to confirm (with "Tap twice to serve" on in the menu, a second tap on the plate serves it too).',
     'When everyone has chosen, the covers lift together and the plates land on your counters.',
     'Then every hand slides one seat to the left, around the table. You pick again from the hand you just received.',
     'When the hands are empty the round is scored. Everything except Custard is cleared away and a new hand is dealt.'].map(t => h('li', t))));
@@ -6041,7 +6763,20 @@ function buildRules() {
     'The small green +N on a plate is what serving it scores you right now (switch it off in the menu).',
     'The glowing seat shows who is still choosing. Covered plates on the right of each counter mean that diner has chosen.',
     'Tap a group of plates on any counter to see what it is worth right now. Tap a chef to see their whole table.',
-    'Hot-seat: the hands are hidden between diners, with a "pass the device" screen. Online: friends see only their own hand.'].map(t => h('li', t))));
+    'Hot-seat: the hands are hidden between diners, with a "pass the device" screen. Online: friends see only their own hand.',
+    'Your meal is saved after every turn. If you close the page or switch apps, choose Resume on the title screen.'].map(t => h('li', t))));
+  sec('Words used in the game', h('dl.gloss', ...[
+    ['Belt', 'the hand of plates you are holding this turn. It moves on to the next diner after every pick.'],
+    ['Counter', 'the plates you have served this round, in front of your seat.'],
+    ['Serve', 'confirm the plate you lifted. Everybody serves at the same time, then the covers lift.'],
+    ['Roll race', 'the Seaweed Roll contest: add up the roll icons on each counter. Most icons scores 6, second most 3.'],
+    ['Nigiri', 'the Sunset, Moon and Sun plates. They score their number straight away.'],
+    ['Fire Paste bonus', 'a nigiri served onto a waiting Fire Paste scores triple; the extra points show as this row on the score pad.'],
+    ['Custard', 'Custard Cups. They stay on your counter until the end of the meal, then most scores 6 and fewest loses 6.'],
+    ['Last turn', 'the lines in the panel after every reveal: what each diner served and why their score went up or down.'],
+    ['Live score', 'the number on each diner during a round: what their counter would score if the round ended now. The roll race can still change it.'],
+    ['Order slip / score pad', 'the paper that adds up every diner\'s rounds and the custard at the end.'],
+    ['+N', 'the small green number on a plate: what serving it would score you right now.']].map(([t, d]) => [h('dt', t), h('dd', d)]).flat()));
   root.appendChild(h('div', { html: '<section class="credits-audio"><h3>Credits</h3><p>Music: &ldquo;Jazz Slower&rdquo; by Pro Sensory (OpenGameArt, CC0). Ambience: &ldquo;The Shop collection: convenience store drinks fridge drone 2&rdquo; by LEGIT Audio (OpenGameArt, CC0). Sound effects: Casino Audio, Impact Sounds, Interface Sounds, Music Jingles, RPG Audio and UI Audio by Kenney (kenney.nl, CC0). All sounds were trimmed, loudness-normalised and converted for this game.</p><p>Online play uses Trystero (MIT). The painted table is drawn with PixiJS (MIT). Names, card text and art are original; the paintings were made for this game.</p></section>' }));
   return root;
 }
@@ -6110,15 +6845,17 @@ function renderStart() {
   s.appendChild(setupEl());
 }
 function titleEl() {
+  // a saved meal comes first: Resume leads the buttons
   const bg = KIT.ART.title ? h('img.ttl-bg', { src: KIT.ART.title, alt: '' }) : h('div.ttl-bg.ttl-plain');
   const sv = hasSave();
   return h('div.ttl', bg, h('div.ttl-in',
     h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Kaiten Kitchen')),
     h('p.tag', 'Grab a plate, pass the belt.'),
     h('div.tbtns',
-      h('button.tbtn.go', { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'against the computer chefs')),
-      h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free')),
-      sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved meal')) : null),
+      sv ? h('button.tbtn.go', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', (si => si ? 'your meal, round ' + si.round + ' of ' + D.rounds + ' · ' + si.np + ' diners' : 'your saved meal')(saveInfo()))) : null,
+      h('button.tbtn' + (sv ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', sv ? 'New game' : 'Play'), h('span', 'against the computer chefs')),
+      h('button.tbtn.go.story', { 'data-a': 'story', type: 'button' }, h('b', '★ Story'), h('span', campLine())),
+      h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with friends, free'))),
     h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
 }
 function dinerCard(c, o) {
@@ -6140,10 +6877,14 @@ function setupEl() {
     h('div.dgrid', [1, 2, 3, 4].map(c => dinerCard(c, o))),
     ph ? h('div.cfgfoot', h('button.btn.go', { 'data-a': 'cfgclose', type: 'button' }, 'Done')) : null);
   const n = o.np - 1;
+  // until a first meal is finished, the guided game is the big button
+  const first = !lsGet('kk_done');
+  const bMeal = cls => h('button.sbtn' + cls, { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', first ? 'Normal game' : 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c]))));
+  const bGuide = cls => h('button.sbtn' + cls, { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', first ? 'Start: guided first game' : 'Guided first game'), h('span', '1 on 1 with ' + PN[o.seats[0]] + ', with tips' + (first ? ' (recommended)' : '')));
   const go = h('div.sgo',
-    h('button.sbtn.big', { 'data-start': 'vs', 'data-a': 'start', 'data-m': 'vs', type: 'button' }, h('b', 'Start the meal'), h('span', 'You against ' + nameList(o.seats.map(c => PN[c])))),
+    first ? bGuide('.big') : bMeal('.big'),
     h('div.sgrid3',
-      h('button.sbtn', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and ' + PN[o.seats[0]] + ', with tips')),
+      first ? bMeal('') : bGuide(''),
       h('button.sbtn', { 'data-start': 'hot', 'data-a': 'start', 'data-m': 'hot', type: 'button' }, h('b', 'Hot-seat'), h('span', o.np + ' people, one device')),
       h('button.sbtn', { 'data-start': 'ai', 'data-a': 'start', 'data-m': 'ai', type: 'button' }, h('b', 'Watch'), h('span', 'the chefs play'))));
   return h('div.setup.scard', head, ph ? sum : h('p.ssub', 'Invite the chefs you want at the belt. Each one has a temper; change their level if you like.'), cfg, go);
@@ -6177,6 +6918,7 @@ document.addEventListener('click', ev => {
     case 'rsskip': skipCount(); break;
     case 'rsclose': closeRS(); break;
     case 'again': { const m = UI.mode, c = UI.cfg || {}; UI.cards = []; closeRS(); newGame(m === 'net' ? 'vs' : m, { np: c.np, level: c.level, lv: c.lv, seats: c.seats || undefined }); break; }
+    case 'story': campOpen(); break;
     case 'play': UI.sv = 'setup'; renderStart(); break;
     case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;
     case 'title': UI.sv = 'title'; UI.cfgOpen = false; renderStart(); break;
@@ -6193,7 +6935,7 @@ document.addEventListener('click', ev => {
     case 'save': toast(save() ? 'Game saved.' : 'Could not save.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
-    case 'guide': UI.coach.level = d.v; UI.coach.keep = d.v === 'full'; renderMenu(); break;
+    case 'guide': UI.coach.level = d.v; UI.coach.keep = d.v === 'full'; UI.coach.userOff = d.v === 'off'; if (d.v === 'off') UI.tip = null; renderMenu(); break;
     case 'hints': UI.prefs.hint = !UI.prefs.hint; savePrefs(); renderMenu(); if (G) render(); break;
     case 'tap2': UI.prefs.tap2 = !UI.prefs.tap2; savePrefs(); renderMenu(); if (G) render(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
@@ -6203,15 +6945,16 @@ document.addEventListener('click', ev => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop) closePop(); else if (UI.rsOpen && UI.mode && G && G.phase === 'over' && UI.overShown) closeRS(); } });
 // ---------- phone mode ----------
 function applyPhone() {
-  const q = /[?&]phone=(\d)/.exec(location.search); const w = innerWidth, hh = innerHeight, short = Math.min(w, hh);
+  const q = /[?&]phone=(\d)/.exec(location.search); const vm = GXV.now(), w = vm.w, hh = vm.h, short = Math.min(w, hh);
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(146, Math.min(178, Math.round(hh * .22))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  r.toggle('ph', ph); if (UI.prefs.tap2 == null) UI.prefs.tap2 = !ph;   // phones: Serve button only by default (no accidental second tap)
+  try { const bb = document.querySelector('.gx-bar').getBoundingClientRect(); document.documentElement.style.setProperty('--kkbar', Math.max(0, Math.round(bb.bottom)) + 'px'); } catch (e) { }
+  document.documentElement.style.setProperty('--dockh', Math.max(160, Math.min(240, Math.round(hh * .31))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !NET.on && UI.sv === 'setup') renderStart(); }
 }
 let rzT = 0;
-function onResize() { clearTimeout(rzT); rzT = setTimeout(() => { applyPhone(); if (G && UI.started) render(); }, 60); }
 // ---------- boot ----------
 function boot() {
   GX.init({ key: 'kk' });
@@ -6221,7 +6964,9 @@ function boot() {
   GX.drawer('setd', 'Menu', h('div#setbody'));
   GX.onShow = id => { renderDrawers(); };
   loadPrefs(); applyPhone();
-  addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
+  GXV.watch(() => { applyPhone(); if (G && UI.started) render(); });
+  addEventListener('pagehide', () => { try { flushSave(); } catch (e) { } });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') try { flushSave(); } catch (e) { } });
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { clearTimeout(rzT); rzT = setTimeout(() => { if (G && UI.started) render(); }, 40); } }).observe(bd);
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'kk' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); } } catch (e) { }
   pxPerfReg();
@@ -6687,6 +7432,58 @@ function pxPainted() { try { const c = PX.app.renderer.extract.canvas({ target: 
 // test hook: where every sprite is and whether anything still moves (px-test.js)
 PX.state = () => ({ nServe: PX.nServe || 0, nLand: PX.nLand || 0, on: PX.on, kind: PX.kind, q: PX.q, res: PX.res, tweens: PX.tweens.length, parts: PX.parts.length, moving: pxMoving(), frames: PX.frames || 0, err: PX.err, blur: !!(PX.L.fx && PX.L.fx.filters && PX.L.fx.filters.length), canvasOK: pxPainted(),
   objs: [...PX.objs.values()].filter(o => !o.detached).map(o => ({ key: o.key, kind: o.kind, type: o.type || null, x: o.x, y: o.y, w: o.kind === 'plate' ? o.w : o.w, tx: o.tx, ty: o.ty, tw: o.kind === 'plate' ? o.d : o.tw, layers: o.layers || 0, shown: o.kind === 'plate' ? o.sp.filter(s => s.visible).length : 1, back: !!o.back, face: o.kind === 'card' ? (o.sp.texture === o.face && !!o.face) : null, alpha: o.c.alpha, vis: o.vis })) });
+// ===================== part 8: Story mode (campaign.json + the shared chapter kit gx-campaign.js) =====================
+// A chapter is a real 3-round meal against named chefs. Twists exist only here; the normal rules never change.
+UI.camp = null;
+const CAMP_BASE = { makiFut: KK.AI.params.makiFut, pudFut: KK.AI.params.pudFut };
+function campParams(def) {
+  const P = KK.AI.params, t = def && def.twist; P.makiFut = CAMP_BASE.makiFut; P.pudFut = CAMP_BASE.pudFut;
+  if (t && t.id === 'roll-fever') P.makiFut = CAMP_BASE.makiFut * (t.param || 1);
+  if (t && t.id === 'sweet-tooth') P.pudFut = CAMP_BASE.pudFut * (t.param || 1);
+}
+function campMetrics(g) {
+  const sum = f => g.rs.reduce((a, r) => a + (r[0][f] || 0), 0), T = g.final ? g.final.totals : [0, 0];
+  let rollWins = 0; g.rs.forEach(r => { const m = Math.max(...r.map(x => x.maki)); if (m > 0 && r[0].maki === m) rollWins++; });
+  const over = g.phase === 'over';
+  return { won: over && g.winner === 0, score: T[0], margin: T[0] - Math.max(...T.slice(1)), bunPts: sum('dumpling'), fishPts: sum('sashimi'), rollPts: sum('maki'), rollWins,
+    pasteBonus: sum('wasabi'), custardPts: g.final ? g.final.puddingPts[0] : 0, bestRound: Math.max(...g.rs.map(r => r[0].total)), wastedPaste: g.rs.reduce((a, r) => a + (r[0].counts.wasabiUnused || 0), 0) };
+}
+function campIsWon(g, def) {
+  if (!g || g.phase !== 'over' || g.winner !== 0) return false; const m = campMetrics(g), gl = def.goal || {};
+  if (gl.type === 'score') return m.score >= gl.value;
+  if (gl.type === 'custom') { const k = def.id === 'c2' ? m.fishPts : def.id === 'c3' ? m.rollWins : null; return k == null || k >= gl.value; }
+  return true;
+}
+function campStart(def) {
+  const s = def.setup || {}, t = def.twist || null;
+  campParams(def);
+  UI.seed = s.seed != null ? s.seed : null;
+  newGame('vs', { camp: def, np: s.np, seats: s.seats, level: s.level, lv: s.lv, twist: t });
+  UI.camp = def;
+  UI.coach.level = def.hints ? 'full' : 'off'; UI.coach.keep = !!def.hints; UI.coach.userOff = !def.hints; UI.tip = null; render();
+  try { toast('Goal: ' + def.goal.text); } catch (e) { }
+}
+function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
+function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); GXC.open(); }
+function campOn() { return !!(UI.camp && typeof GXC !== 'undefined' && GXC.active()); }
+{ const _ng = newGame; newGame = function (mode, o) { if (!(o && o.camp)) { if (UI.camp) { UI.coach.keep = false; UI.coach.userOff = false; } UI.camp = null; campParams(null); } return _ng.apply(this, arguments); }; }
+{ const _sf = showFinal; showFinal = function () { if (campOn()) { UI.overShown = true; closeRS(); campFinish(); return; } return _sf.apply(this, arguments); }; }
+function campLine() {
+  try {
+    if (typeof GXC === 'undefined' || !window.CAMPAIGN) return '';
+    const p = GXC.progress(), ch = window.CAMPAIGN.chapters, n = ch.filter(c => p.ch[c.id] && p.ch[c.id].beaten).length;
+    return n ? n + ' of ' + ch.length + ' chapters done' : 'Ten chapters, three bosses';
+  } catch (e) { return ''; }
+}
+function campInit() {
+  if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
+  GXC.init({
+    game: 'kaiten', data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
+    onExit: () => { UI.camp = null; campParams(null); showStart(); },
+    scores: g => (g.final ? g.final.totals : g.players.map(() => 0)), seats: g => g.players.map((p, i) => ({ name: i === 0 ? 'You' : p.name, me: i === 0, ai: p.ai || undefined }))
+  });
+}
+campInit();
 
 </script>
 </body>
