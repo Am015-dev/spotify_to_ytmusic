@@ -17,6 +17,17 @@ body.v85 #tL{left:max(28px,calc(16px + env(safe-area-inset-left,0px)))!important
 body.v85 #tG,body.v85 #tN{right:max(28px,calc(14px + env(safe-area-inset-right,0px)))!important}body.v85 #tP{left:max(28px,calc(10px + env(safe-area-inset-left,0px)))!important}
 `;
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);document.body.classList.add('v85');
+
+// off-road limit while a timed quest or sprint race runs: stay on a street, the quest route, or near a gate
+let v85offT=0;
+function v85Off(dt){let target=1;try{const q=RO.ch&&RO.ch.v2,sp=RO.sp;if((q||sp)&&!RO.onAB&&!(pl&&pl.air)&&!RO.frozen){const x=RO.x,z=RO.z,c=cityAt(x,z);let free=!!c&&c.d<c.road.w/2+9;
+   if(!free&&q){const st=q.L.st[q.si||0],P=st&&st.R&&st.R.P;if(P)for(let i=0;i<P.length-1;i++){const ax=P[i][0],az=P[i][1],bx=P[i+1][0],bz=P[i+1][1],dx=bx-ax,dz=bz-az,l2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-ax)*dx+(z-az)*dz)/l2)),ex=ax+dx*t-x,ez=az+dz*t-z;if(ex*ex+ez*ez<324){free=true;break}}}
+   if(!free&&sp&&sp.G)for(const g of sp.G)if(g&&Number.isFinite(g.x)&&(g.x-x)**2+(g.z-z)**2<900){free=true;break}
+   if(!free)target=.35}}catch(e){}
+  RO.v85o=(RO.v85o==null?1:RO.v85o)+(target-(RO.v85o==null?1:RO.v85o))*Math.min(1,dt*3);
+  if(target<1&&Math.abs(RO.v)>12){v85offT-=dt;if(v85offT<=0){v85offT=3.5;feed('OFF ROUTE · SLOWED',0,'#ff7a3c')}}
+  return RO.v85o}
+window.v85Off=v85Off;
 // verbs for the one objective line
 window.v85Verb=function(ch){if(!ch)return'';const k=ch.kind;return({speed:'Radar',chase:'Catch',drift:'Drift',longjump:'Jump',smash:'Smash',m1:'Deliver'}[k])||'Go'};
 // brief overlays: the mission / district / result cards show for 5 s at start and end, then get out of the way

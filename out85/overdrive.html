@@ -5079,7 +5079,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.
   if((RO.hp??100)<35&&R()<.25)puff(s.mesh.position.clone().add(V3(0,2.4,0)),1,_tipC.setRGB(.2,.2,.22),1,4,.9,.5,1,3);if((RO.hp??100)<15&&R()<.2)burst(SPARK,s.mesh.position.clone().add(V3(0,2,0)),4,8,.3,new THREE.Color(2,1.2,.4));
   if(RO.inv>0)s.mesh.visible=Math.floor(RO.inv*10)%2===0;else if(!s.mesh.visible)s.mesh.visible=true;const c=ctlPlayer(dt);CTL=c;const busy=RO.card||RO.mapOpen||RO.story;RO.hitCd=Math.max(0,(RO.hitCd||0)-dt);
   const T0=roamTerr(RO.x,RO.z,RO.y+.3),ground=T0.g,air=RO.y>ground+.5;const terr=FL_terr(T0,ground,dt);
-  const veh=FL_veh();
+  const veh=FL_veh();const V85OFF=v85Off(dt);
   const fit={ship:{road:1,dirt:.72,water:.78},boat:{road:.42,dirt:.38,water:1},offroad:{road:.93,dirt:1,water:.35}}[veh][terr];
   if(((RO.abF=(RO.abF||0)+1)&3)===1){const a=abAt(RO.x,RO.z);RO.onAB=!!a&&!!a.road.ab&&Math.abs(a.lat)<a.road.w/2+1&&RO.y<groundY(RO.x,RO.z)+14;RO.abRoad=RO.onAB?a.road.name:null;const q=RO.onAB?null:cityAt(RO.x,RO.z);RO.inCity=!RO.onAB&&(RO.x>HX0&&RO.x<HX1&&RO.z>HZS&&RO.z<HZN||!!q&&q.d<q.road.w/2+30);const rq=RO.onAB?a:q&&q.d<q.road.w/2+2?q:null;RO.rdT=rq?[rq.p.tx,rq.p.tz]:null}
   const lvl=carStat();const top=s.stats.top*.8*lvl.top,boost=c.boost&&s.bm>1&&!busy;RO.boosting=boost||RO.turbo>0;RO.turbo=Math.max(0,(RO.turbo||0)-dt);
@@ -5087,7 +5087,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.
   // hop: Space / HOP button
   if(pressed.fire){pressed.fire=false;if(!busy&&!air&&RO.vy<=0){RO.tutHop=true;RO.vy=12;RO.y+=.05;AU.sfx('launch');fovKick=Math.max(fovKick,4)}}
   if(air)RO.airT=(RO.airT||0)+dt;
-  if(busy)RO.v*=Math.max(0,1-dt*4);else if(!air){RO.bRamp=clamp((RO.bRamp||0)+(boost?dt*2.5:-dt*4),0,1);const tt=top*(1+(RO.inCity?.5:.3)*RO.bRamp)*(RO.turbo>0?1.25:1)*fit*(RO.onAB?1.22:RO.inCity?.62:.85);if(c.thr||boost||RO.turbo>0)RO.v+=(s.stats.acc*1.15*lvl.acc*Math.max(0,1-RO.v/tt)+20*RO.bRamp+(RO.turbo>0?16:0))*dt;else RO.v-=RO.v*.4*dt;if(c.park){RO.v-=Math.sign(RO.v)*Math.min(Math.abs(RO.v),60*dt);RO.bz=0}else if(c.brk){if(RO.v>0){RO.v=Math.max(0,RO.v-75*dt);RO.bz=0}else{RO.bz=(RO.bz||0)+dt;if(RO.bz>.7||RO.v<0)RO.v-=22*dt}}else RO.bz=0;RO.v=Math.max(-18,RO.v);if(RO.v>tt)RO.v-=(RO.v-tt)*1.5*dt}
+  if(busy)RO.v*=Math.max(0,1-dt*4);else if(!air){RO.bRamp=clamp((RO.bRamp||0)+(boost?dt*2.5:-dt*4),0,1);const tt=top*(1+(RO.inCity?.5:.3)*RO.bRamp)*(RO.turbo>0?1.25:1)*fit*V85OFF*(RO.onAB?1.22:RO.inCity?.62:.85);if(c.thr||boost||RO.turbo>0)RO.v+=(s.stats.acc*1.15*lvl.acc*Math.max(0,1-RO.v/tt)+20*RO.bRamp+(RO.turbo>0?16:0))*dt;else RO.v-=RO.v*.4*dt;if(c.park){RO.v-=Math.sign(RO.v)*Math.min(Math.abs(RO.v),60*dt);RO.bz=0}else if(c.brk){if(RO.v>0){RO.v=Math.max(0,RO.v-75*dt);RO.bz=0}else{RO.bz=(RO.bz||0)+dt;if(RO.bz>.7||RO.v<0)RO.v-=22*dt}}else RO.bz=0;RO.v=Math.max(-18,RO.v);if(RO.v>tt)RO.v-=(RO.v-tt)*1.5*dt}
   // boost pads
   for(const pd of RO.pads||[]){if(!air&&Math.hypot(pd.x-RO.x,pd.z-RO.z)<7&&(RO.padT||0)<=0){RO.turbo=Math.max(RO.turbo,1.8);RO.v=Math.max(RO.v,top*1.05);RO.padT=.8;award(s,'BOOST PAD',8,100,'#ffd12c');comboAdd(1);AU.sfx('boost');fovKick=Math.max(fovKick,10)}}RO.padT=Math.max(0,(RO.padT||0)-dt);
   // steering: target yaw rate eases in; sharper when slow, calmer when fast; velocity heading follows with surface grip (slight slide on dirt/water)
@@ -8192,6 +8192,17 @@ body.v85 #tL{left:max(28px,calc(16px + env(safe-area-inset-left,0px)))!important
 body.v85 #tG,body.v85 #tN{right:max(28px,calc(14px + env(safe-area-inset-right,0px)))!important}body.v85 #tP{left:max(28px,calc(10px + env(safe-area-inset-left,0px)))!important}
 `;
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);document.body.classList.add('v85');
+
+// off-road limit while a timed quest or sprint race runs: stay on a street, the quest route, or near a gate
+let v85offT=0;
+function v85Off(dt){let target=1;try{const q=RO.ch&&RO.ch.v2,sp=RO.sp;if((q||sp)&&!RO.onAB&&!(pl&&pl.air)&&!RO.frozen){const x=RO.x,z=RO.z,c=cityAt(x,z);let free=!!c&&c.d<c.road.w/2+9;
+   if(!free&&q){const st=q.L.st[q.si||0],P=st&&st.R&&st.R.P;if(P)for(let i=0;i<P.length-1;i++){const ax=P[i][0],az=P[i][1],bx=P[i+1][0],bz=P[i+1][1],dx=bx-ax,dz=bz-az,l2=dx*dx+dz*dz||1,t=Math.max(0,Math.min(1,((x-ax)*dx+(z-az)*dz)/l2)),ex=ax+dx*t-x,ez=az+dz*t-z;if(ex*ex+ez*ez<324){free=true;break}}}
+   if(!free&&sp&&sp.G)for(const g of sp.G)if(g&&Number.isFinite(g.x)&&(g.x-x)**2+(g.z-z)**2<900){free=true;break}
+   if(!free)target=.35}}catch(e){}
+  RO.v85o=(RO.v85o==null?1:RO.v85o)+(target-(RO.v85o==null?1:RO.v85o))*Math.min(1,dt*3);
+  if(target<1&&Math.abs(RO.v)>12){v85offT-=dt;if(v85offT<=0){v85offT=3.5;feed('OFF ROUTE · SLOWED',0,'#ff7a3c')}}
+  return RO.v85o}
+window.v85Off=v85Off;
 // verbs for the one objective line
 window.v85Verb=function(ch){if(!ch)return'';const k=ch.kind;return({speed:'Radar',chase:'Catch',drift:'Drift',longjump:'Jump',smash:'Smash',m1:'Deliver'}[k])||'Go'};
 // brief overlays: the mission / district / result cards show for 5 s at start and end, then get out of the way

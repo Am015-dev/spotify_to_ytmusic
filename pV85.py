@@ -26,6 +26,9 @@ i=s.index('function drawRoamMap(){');j=s.index('\nfunction ',i+20);f=s[i:j]
 assert "if(CID==='ath')athMapBase(g,P,W,Hh,sc,zm,dpr,inV);else{" in f
 f=f.replace("if(CID==='ath')athMapBase(g,P,W,Hh,sc,zm,dpr,inV);else{","{").replace("CID==='fra'?","true?").replace("CID==='ath'?","false?")
 s=s[:i]+f+s[j:]
+# anti-cheat: during a quest / sprint race, driving far from any road and from the route is slowed hard (v85Off in v85.js)
+R("const veh=FL_veh();","const veh=FL_veh();const V85OFF=v85Off(dt);")
+R("*fit*(RO.onAB?1.22:RO.inCity?.62:.85)","*fit*V85OFF*(RO.onAB?1.22:RO.inCity?.62:.85)")
 # dark neutral asphalt with white lane markings; plaza paving no longer near-white
 R("g.fillStyle='#5b5f68';g.fillRect(0,0,256,512);for(let i=0;i<3000;i++){const v=70+r()*40|0;","g.fillStyle='#2c2e34';g.fillRect(0,0,256,512);for(let i=0;i<3000;i++){const v=36+r()*28|0;")
 R("g.fillStyle='#ffc21a';g.fillRect(121,0,5,512);g.fillRect(130,0,5,512);","g.fillStyle='#f4f4f0';for(let y=0;y<512;y+=128)g.fillRect(125,y,6,64);")
