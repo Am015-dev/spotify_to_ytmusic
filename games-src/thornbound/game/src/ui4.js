@@ -95,7 +95,7 @@ function popKingdom(){const V=UI.V;let h='';
 // ---------------------------------------------------------------- the one card (events, pass the device, coach tips, game over)
 function shouldShowEvent(ev){if(ev.t==='clash')return true;if(ev.t==='bids')return true;if(ev.t==='summary')return true;if(ev.t==='news')return wantNews();return false}
 function showEvent(ev){if(ev.t==='news'){showNews(ev);return}UI.card={kind:'event',ev};if(ev.t==='clash'){UI.noAnim=true}}
-function showOver(){if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave()}
+function showOver(){if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave();if(typeof campOver==='function')campOver()}
 const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid picks a Kingdom Card first; the card you bid then sits under it and cannot fight.'],
   herald:['Heralds','Your Herald is public. If you win a region and claim the location where your Herald stands, you gain +1 Influence and take 1 from every rival Herald there.'],
   place:['Hidden cards','You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere.'],

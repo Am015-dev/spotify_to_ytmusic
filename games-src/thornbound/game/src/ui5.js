@@ -37,6 +37,7 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
    case 'gclose':hideGloss();break;
    case 'nowlog':GX.show('logd');break;
    case 'title':UI.sv='title';renderStart();break;
+   case 'story':if(typeof GXC!=='undefined')GXC.open();break;
    case 'play':UI.sv='setup';UI.cfgOpen=false;renderStart();break;
    case 'online':UI.sv='online';UI.onl=true;renderStart();break;
    case 'cfgopen':UI.cfgOpen=true;renderStart();break;

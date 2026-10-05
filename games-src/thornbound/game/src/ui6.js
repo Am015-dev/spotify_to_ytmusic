@@ -29,8 +29,14 @@ function toggleZoom(){UI.zoom=!UI.zoom;document.documentElement.classList.toggle
 function wantSmall(){if(!G)return false;const c=UI.card;if(c&&c.kind==='pass')return false;if(c&&(c.kind==='event'||c.kind==='over'))return true;
   if(UI.coachInfo)return UI.coachInfo.id!=='map';const s=viewSeatForQ();if(s==null||!G.q)return UI.boardSmall;
   return !['herald','place','location','tie'].includes(G.q.kind)}
-let _rz=0;addEventListener('resize',()=>{clearTimeout(_rz);_rz=setTimeout(()=>{const l=UI.land,p=UI.phone;phApply();if(G&&UI.started)renderAll()},120)});
-addEventListener('orientationchange',()=>setTimeout(()=>{phApply();if(G)renderAll()},200));
+// One relayout path for resize, orientationchange, visualViewport and the board's ResizeObserver (iOS reports the old size right after rotating, so it re-measures at ~400 ms).
+let _rz=0,_rz2=0,_rzSig='';
+function relayout(force){const bd=$('#board'),sig=innerWidth+'x'+innerHeight+'|'+(bd?bd.clientWidth+'x'+bd.clientHeight:'');if(!force&&sig===_rzSig)return;_rzSig=sig;
+  phApply();if(G&&UI.started)renderAll();else if(typeof renderStart==='function'){const st=$('#start');if(st&&!st.hidden)renderStart()}}
+function onResize(){clearTimeout(_rz);clearTimeout(_rz2);_rz=setTimeout(()=>relayout(),80);_rz2=setTimeout(()=>relayout(),420)}
+addEventListener('resize',onResize);addEventListener('orientationchange',onResize);
+try{if(window.visualViewport)visualViewport.addEventListener('resize',onResize)}catch(e){}
+try{if(window.ResizeObserver){const bd=document.getElementById('board');if(bd)new ResizeObserver(onResize).observe(bd)}}catch(e){}
 // ---------------------------------------------------------------- boot
 function boot(){
   try{UI.sound=localStorage.getItem('tb_snd')!=='0';UI.music=localStorage.getItem('tb_mus')==='1';UI.lowGfx=localStorage.getItem('tb_gfx')==='low'}catch(e){}

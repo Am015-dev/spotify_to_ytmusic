@@ -110,7 +110,7 @@ function fallbackPick(seat,mv){const q=G.q,k=q.kind;
 function aiChoose(seat,level){const mv=legal(seat);if(!mv.length)return null;if(mv.length===1)return mv[0];
   const A=TB.AI||TB.ai;level=level||aiLevel(seat);
   try{if(A){let r=null;
-      if(typeof A.choose==='function')r=A.choose(G,seat,level);else if(typeof A.pick==='function')r=A.pick(G,seat,level);else if(typeof A.move==='function')r=A.move(G,seat,level);else if(typeof A.best==='function')r=A.best(G,seat,level);
+      if(typeof A.choose==='function'){const tw=UI.camp&&UI.camp.twist;r=(tw&&tw.id==='sharp-mind'&&seat===1&&level==='hard')?A.choose(G,seat,level,{budget:(A.budgetMs||200)*(tw.param||2)}):A.choose(G,seat,level)}else if(typeof A.pick==='function')r=A.pick(G,seat,level);else if(typeof A.move==='function')r=A.move(G,seat,level);else if(typeof A.best==='function')r=A.best(G,seat,level);
       if(r&&typeof r==='object'&&r.k!=null){const m=mv.find(x=>x.k===r.k);if(m)return m}
       else if(typeof r==='string'){const m=mv.find(x=>x.k===r);if(m)return m}}}
   catch(e){console.warn('ai failed, fallback',e.message)}
@@ -123,7 +123,7 @@ function mkSeats(cfg){const n=cfg.np,seats=[];const fac=FIDS.slice();
   const rest=fac.filter(f=>f!==mine);
   for(let i=0;i<n;i++){const f=(i===0&&mine)?mine:(rest.shift()||fac[i%4]);seats.push({faction:f,human:false,level:'normal'})}
   return seats}
-function newGame(mode,o){o=o||{};mode=mode||'me';
+function newGame(mode,o){o=o||{};mode=mode||'me';UI.camp=o.camp||null;UI.campDone=false;
   const cfg={mode:mode==='ai'?'watch':mode,np:o.np||(mode==='guided'?2:3),length:o.length||(mode==='guided'?'short':'standard'),faction:o.faction||'nobility',levels:o.levels||[],seed:o.seed,humanSeats:o.humanSeats,guide:o.guide};
   if(mode==='guided'){cfg.mode='me';cfg.guided=true;cfg.guide='full';cfg.levels=['easy','easy'];cfg.np=2;cfg.length='short';cfg.faction=GUIDED.faction;cfg.seed=GUIDED.seed;o.seatFactions=[GUIDED.faction,GUIDED.rival];UI.aiSeed=GUIDED.ai}
   const seats=mkSeats(cfg);
@@ -134,12 +134,12 @@ function newGame(mode,o){o=o||{};mode=mode||'me';
     return {faction:s.faction,name:s.human&&(cfg.mode==='hot'||hn.length>1)?'Player '+(i+1)+' ('+DD.FSHORT[s.faction].replace('Gilded Court','Court').replace('Heathbound Clans','Clans').replace('Lantern Rising','Lanterns').replace('Pale Choir','Choir')+')':base,ai:s.human?null:s.level}});
   cfg.seats=seats;UI.cfg=cfg;UI.mode=cfg.mode;UI.guide=cfg.guide||(UI.guide||'full');
   hookEngine();
-  G=null;const g=TB.newGame({players:pl,length:cfg.length,seed:cfg.seed!=null?cfg.seed:(o.seed!=null?o.seed:undefined)});
-  G=g;resetUI();UI.coachDone={};UI.started=true;UI.holder=hn[0]!=null?hn[0]:0;
+  G=null;const g=TB.newGame({players:pl,length:cfg.length,seed:cfg.seed!=null?cfg.seed:(o.seed!=null?o.seed:undefined),order:o.order});
+  G=g;if(UI.camp&&typeof campApply==='function')campApply(UI.camp);resetUI();UI.coachDone={};UI.started=true;UI.holder=hn[0]!=null?hn[0]:0;
   UI.rs0=snapInf();UI.rsLog=0;
   try{localStorage.setItem('tb_played','1')}catch(e){}saveGame();hideStart();afterStart();return G}
 function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.coachInfo=null;UI.nowT=null;UI.moreOpen=false;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
-function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,coach:UI.coachDone||{},tip:UI.tip,t:Date.now()}))}catch(e){}}
+function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg||UI.camp)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,coach:UI.coachDone||{},tip:UI.tip,t:Date.now()}))}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem('tb_save');return s?JSON.parse(s):null}catch(e){return null}}
 function clearSave(){try{localStorage.removeItem('tb_save')}catch(e){}}
 function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI.holder=sv.holder||0;UI.guide=sv.guide||'full';UI.aiSeed=sv.ai||1;resetUI();UI.coachDone=sv.coach||{};UI.tip=sv.tip||{};UI.started=true;UI.rs0=snapInf();UI.rsInfl=JSON.parse(JSON.stringify(G.infl||[]));UI.rsLog=G.logN;return G}

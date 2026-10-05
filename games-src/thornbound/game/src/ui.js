@@ -110,7 +110,7 @@ function fallbackPick(seat,mv){const q=G.q,k=q.kind;
 function aiChoose(seat,level){const mv=legal(seat);if(!mv.length)return null;if(mv.length===1)return mv[0];
   const A=TB.AI||TB.ai;level=level||aiLevel(seat);
   try{if(A){let r=null;
-      if(typeof A.choose==='function')r=A.choose(G,seat,level);else if(typeof A.pick==='function')r=A.pick(G,seat,level);else if(typeof A.move==='function')r=A.move(G,seat,level);else if(typeof A.best==='function')r=A.best(G,seat,level);
+      if(typeof A.choose==='function'){const tw=UI.camp&&UI.camp.twist;r=(tw&&tw.id==='sharp-mind'&&seat===1&&level==='hard')?A.choose(G,seat,level,{budget:(A.budgetMs||200)*(tw.param||2)}):A.choose(G,seat,level)}else if(typeof A.pick==='function')r=A.pick(G,seat,level);else if(typeof A.move==='function')r=A.move(G,seat,level);else if(typeof A.best==='function')r=A.best(G,seat,level);
       if(r&&typeof r==='object'&&r.k!=null){const m=mv.find(x=>x.k===r.k);if(m)return m}
       else if(typeof r==='string'){const m=mv.find(x=>x.k===r);if(m)return m}}}
   catch(e){console.warn('ai failed, fallback',e.message)}
@@ -123,7 +123,7 @@ function mkSeats(cfg){const n=cfg.np,seats=[];const fac=FIDS.slice();
   const rest=fac.filter(f=>f!==mine);
   for(let i=0;i<n;i++){const f=(i===0&&mine)?mine:(rest.shift()||fac[i%4]);seats.push({faction:f,human:false,level:'normal'})}
   return seats}
-function newGame(mode,o){o=o||{};mode=mode||'me';
+function newGame(mode,o){o=o||{};mode=mode||'me';UI.camp=o.camp||null;UI.campDone=false;
   const cfg={mode:mode==='ai'?'watch':mode,np:o.np||(mode==='guided'?2:3),length:o.length||(mode==='guided'?'short':'standard'),faction:o.faction||'nobility',levels:o.levels||[],seed:o.seed,humanSeats:o.humanSeats,guide:o.guide};
   if(mode==='guided'){cfg.mode='me';cfg.guided=true;cfg.guide='full';cfg.levels=['easy','easy'];cfg.np=2;cfg.length='short';cfg.faction=GUIDED.faction;cfg.seed=GUIDED.seed;o.seatFactions=[GUIDED.faction,GUIDED.rival];UI.aiSeed=GUIDED.ai}
   const seats=mkSeats(cfg);
@@ -134,12 +134,12 @@ function newGame(mode,o){o=o||{};mode=mode||'me';
     return {faction:s.faction,name:s.human&&(cfg.mode==='hot'||hn.length>1)?'Player '+(i+1)+' ('+DD.FSHORT[s.faction].replace('Gilded Court','Court').replace('Heathbound Clans','Clans').replace('Lantern Rising','Lanterns').replace('Pale Choir','Choir')+')':base,ai:s.human?null:s.level}});
   cfg.seats=seats;UI.cfg=cfg;UI.mode=cfg.mode;UI.guide=cfg.guide||(UI.guide||'full');
   hookEngine();
-  G=null;const g=TB.newGame({players:pl,length:cfg.length,seed:cfg.seed!=null?cfg.seed:(o.seed!=null?o.seed:undefined)});
-  G=g;resetUI();UI.coachDone={};UI.started=true;UI.holder=hn[0]!=null?hn[0]:0;
+  G=null;const g=TB.newGame({players:pl,length:cfg.length,seed:cfg.seed!=null?cfg.seed:(o.seed!=null?o.seed:undefined),order:o.order});
+  G=g;if(UI.camp&&typeof campApply==='function')campApply(UI.camp);resetUI();UI.coachDone={};UI.started=true;UI.holder=hn[0]!=null?hn[0]:0;
   UI.rs0=snapInf();UI.rsLog=0;
   try{localStorage.setItem('tb_played','1')}catch(e){}saveGame();hideStart();afterStart();return G}
 function resetUI(){UI.evq=[];UI.card=null;UI.pop=null;UI.popArg=null;UI.busy=false;UI.tip={};UI.seen={};UI.clashRes={};UI.placed=[];UI.sel={};UI.toast='';UI.lastLog=G?G.logN:0;UI.coachInfo=null;UI.nowT=null;UI.moreOpen=false;UI.watchPaused=false;UI.passed=null;UI.lastShown=null;UI.mapReset=true}
-function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,coach:UI.coachDone||{},tip:UI.tip,t:Date.now()}))}catch(e){}}
+function saveGame(){try{if(NET.on||!G||G.over||!UI.cfg||UI.camp)return;localStorage.setItem('tb_save',JSON.stringify({v:1,G,cfg:UI.cfg,holder:UI.holder,guide:UI.guide,ai:UI.aiSeed,coach:UI.coachDone||{},tip:UI.tip,t:Date.now()}))}catch(e){}}
 function loadSave(){try{const s=localStorage.getItem('tb_save');return s?JSON.parse(s):null}catch(e){return null}}
 function clearSave(){try{localStorage.removeItem('tb_save')}catch(e){}}
 function resumeGame(sv){hookEngine();G=sv.G;UI.cfg=sv.cfg;UI.mode=sv.cfg.mode;UI.holder=sv.holder||0;UI.guide=sv.guide||'full';UI.aiSeed=sv.ai||1;resetUI();UI.coachDone=sv.coach||{};UI.tip=sv.tip||{};UI.started=true;UI.rs0=snapInf();UI.rsInfl=JSON.parse(JSON.stringify(G.infl||[]));UI.rsLog=G.logN;return G}
@@ -604,7 +604,7 @@ function popKingdom(){const V=UI.V;let h='';
 // ---------------------------------------------------------------- the one card (events, pass the device, coach tips, game over)
 function shouldShowEvent(ev){if(ev.t==='clash')return true;if(ev.t==='bids')return true;if(ev.t==='summary')return true;if(ev.t==='news')return wantNews();return false}
 function showEvent(ev){if(ev.t==='news'){showNews(ev);return}UI.card={kind:'event',ev};if(ev.t==='clash'){UI.noAnim=true}}
-function showOver(){if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave()}
+function showOver(){if(UI.card&&UI.card.kind==='over')return;UI.card={kind:'over'};clearSave();if(typeof campOver==='function')campOver()}
 const TIPS={bid:['Bids','Every round starts with a secret bid. The highest bid picks a Kingdom Card first; the card you bid then sits under it and cannot fight.'],
   herald:['Heralds','Your Herald is public. If you win a region and claim the location where your Herald stands, you gain +1 Influence and take 1 from every rival Herald there.'],
   place:['Hidden cards','You hide one card at each of the three regions. Put big cards where the prize matters and cheap ones elsewhere.'],
@@ -707,6 +707,7 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
    case 'gclose':hideGloss();break;
    case 'nowlog':GX.show('logd');break;
    case 'title':UI.sv='title';renderStart();break;
+   case 'story':if(typeof GXC!=='undefined')GXC.open();break;
    case 'play':UI.sv='setup';UI.cfgOpen=false;renderStart();break;
    case 'online':UI.sv='online';UI.onl=true;renderStart();break;
    case 'cfgopen':UI.cfgOpen=true;renderStart();break;
@@ -827,8 +828,14 @@ function toggleZoom(){UI.zoom=!UI.zoom;document.documentElement.classList.toggle
 function wantSmall(){if(!G)return false;const c=UI.card;if(c&&c.kind==='pass')return false;if(c&&(c.kind==='event'||c.kind==='over'))return true;
   if(UI.coachInfo)return UI.coachInfo.id!=='map';const s=viewSeatForQ();if(s==null||!G.q)return UI.boardSmall;
   return !['herald','place','location','tie'].includes(G.q.kind)}
-let _rz=0;addEventListener('resize',()=>{clearTimeout(_rz);_rz=setTimeout(()=>{const l=UI.land,p=UI.phone;phApply();if(G&&UI.started)renderAll()},120)});
-addEventListener('orientationchange',()=>setTimeout(()=>{phApply();if(G)renderAll()},200));
+// One relayout path for resize, orientationchange, visualViewport and the board's ResizeObserver (iOS reports the old size right after rotating, so it re-measures at ~400 ms).
+let _rz=0,_rz2=0,_rzSig='';
+function relayout(force){const bd=$('#board'),sig=innerWidth+'x'+innerHeight+'|'+(bd?bd.clientWidth+'x'+bd.clientHeight:'');if(!force&&sig===_rzSig)return;_rzSig=sig;
+  phApply();if(G&&UI.started)renderAll();else if(typeof renderStart==='function'){const st=$('#start');if(st&&!st.hidden)renderStart()}}
+function onResize(){clearTimeout(_rz);clearTimeout(_rz2);_rz=setTimeout(()=>relayout(),80);_rz2=setTimeout(()=>relayout(),420)}
+addEventListener('resize',onResize);addEventListener('orientationchange',onResize);
+try{if(window.visualViewport)visualViewport.addEventListener('resize',onResize)}catch(e){}
+try{if(window.ResizeObserver){const bd=document.getElementById('board');if(bd)new ResizeObserver(onResize).observe(bd)}}catch(e){}
 // ---------------------------------------------------------------- boot
 function boot(){
   try{UI.sound=localStorage.getItem('tb_snd')!=='0';UI.music=localStorage.getItem('tb_mus')==='1';UI.lowGfx=localStorage.getItem('tb_gfx')==='low'}catch(e){}
@@ -1054,7 +1061,7 @@ function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=e
   const view=NET.on?'online':(UI.sv||'title');el.dataset.v=view;
   if(view==='title'){const sav=hasSave();
     el.innerHTML='<div class="ttl"><div class="ttl-art">'+titleArt()+'</div><div class="ttl-in"><h1 class="logo"><small>THE</small>Thornbound Throne</h1><p class="tag">The king is dead. Four factions reach for his crown.</p><p class="tag goal">Win by holding the most Influence when the last round ends.</p><div class="tmid"></div><div class="tbtns">'+
-      '<button class="tbtn go" data-a="play"><b>Play</b><span>'+(firstTime()?'new here? a guided first game is ready':'against the computer')+'</span></button>'+
+      (window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="tbtn go story" data-a="story"><b>Story</b><span>'+campLine()+'</span></button>':'')+'<button class="tbtn'+(window.CAMPAIGN&&typeof GXC!=='undefined'?'':' go')+'" data-a="play"><b>Play</b><span>'+(firstTime()?'new here? a guided first game is ready':'against the computer')+'</span></button>'+
       '<button class="tbtn" data-a="online"><b>Online</b><span>with friends, free, no sign-up</span></button>'+
       (sav?'<button class="tbtn" data-a="cont"><b>Resume</b><span>your game, round '+Math.max(1,sav.G.round)+' of '+sav.G.rounds+'</span></button>':'')+
       '</div><button class="tlink" data-a="rules">How to play</button></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
@@ -1235,3 +1242,30 @@ function confirmHTML(k){const s=viewSeatForQ();if(s==null)return '';const m=lega
   else if(m.a==='t:cln_t3'){const T=G.pl[m.p.s2].ks[m.p.j];body='<p class="cf-p">'+gloss('Riverbank Raiders (a Tactic, once per game): take '+TB.kingdomInfo(T.kc).name+' from '+sideName(m.p.s2)+' with no Strength check. Their '+cinfo(T.occ).name+' goes back to their hand; you tuck a card from your hand under it.')+'</p>'}
   else body='<p class="cf-p">'+esc(m.label)+'</p>';
   return popShell('Before you do it','<div class="cf">'+body+'<div class="pp-act"><button class="btn pri" data-a="mv" data-k="'+esc(k)+'">'+esc(m.t==='steal'?'Steal it':'Do it')+'</button><button class="btn" data-a="pclose">Not now</button></div></div>','cf-b')}
+// ---------------------------------------------------------------- story mode (gx-campaign.js, data: campaign.json)
+// A chapter is a normal game with its own table, computer level and at most one twist. Twists exist only here; seat 1 is always the boss.
+function campOpts(def){const s=def.setup||{};const np=Math.max(2,Math.min(4,s.np||2));const lv=['normal'];for(let i=1;i<np;i++)lv.push(def.opponent.aiLevel||'normal');
+  const o={np,length:s.length||'short',faction:s.faction||'clans',levels:lv,seed:s.seed==null?undefined:s.seed,guide:def.hints?'full':'off',camp:def};
+  if(s.seatFactions)o.seatFactions=s.seatFactions.slice(0,np);
+  const t=def.twist;if(t&&t.id==='boss-first'){const rest=[];for(let i=2;i<np;i++)rest.push(i);for(let i=rest.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[rest[i],rest[j]]=[rest[j],rest[i]]}o.order=[1].concat(rest,[0])}
+  return o}
+// twists that change the opening state: called right after TB.newGame
+function campApply(def){const t=def.twist;if(!t||!G)return;const nm=G.pl[1]?G.pl[1].name:'The boss';
+  if(t.id==='boss-lore'){G.pl[1].lore=t.param==null?2:t.param;lg('Boss rule: '+nm+' starts with '+G.pl[1].lore+' Lore.',1,'big')}
+  else if(t.id==='boss-favour'){G.fav={h:1,u:3};lg('Boss rule: '+nm+' starts holding the Kingdom\'s Favour.',1,'big')}
+  else if(t.id==='boss-first'){lg('Boss rule: '+nm+' acts first this season.',1,'big')}
+  else if(t.id==='sharp-mind'){lg('Boss rule: '+nm+' thinks twice as long before each move.',1,'big')}}
+function campMetrics(g){const me=g.pl[0];const rivals=g.pl.slice(1).map(p=>p.inf);const won=!!(g.over&&g.over.winner===0);
+  const cnt=re=>g.log.filter(e=>e.s===0&&re.test(e.t)).length;
+  let gov=0;try{['relics','secrets','oaths'].forEach(k=>g.council[k].forEach(id=>{if(((id/100)|0)===0)gov++}))}catch(e){}
+  return {won,score:me.inf,margin:me.inf-Math.max.apply(null,rivals),rounds:g.round,clashWins:cnt(/wins the Clash/),heraldHits:(g.infl&&g.infl[0]&&g.infl[0]['Herald Reward'])||0,
+    kingdomCards:(me.ks||[]).filter(x=>x).length,steals:cnt(/ steals .* from | takes .* from /),siteBought:5-(me.site?me.site.length:5),governs:gov,
+    favourUses:g.log.filter(e=>e.m&&e.m.k==='fav'&&e.m.s===0).length,favourHeld:g.fav.h===0,eliminated:g.log.filter(e=>e.m&&e.m.k==='elim'&&e.s===0).length,handSize:me.hs}}
+function campIsWon(g,def){return !!(g.over&&g.over.winner===0)}
+function campOver(){if(!UI.camp||UI.campDone||typeof GXC==='undefined'||!GXC.active())return;UI.campDone=true;const g=G;
+  setTimeout(()=>{if(G===g&&GXC.active()){try{clearSave()}catch(e){}GXC.finish(g)}},window.CAMP_WAIT!=null?window.CAMP_WAIT:2200)}
+function campLine(){try{const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length+' chapters done':'chapters, bosses, three acts'}catch(e){return 'chapters, bosses, three acts'}}
+function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
+  GXC.init({game:'thornbound',data:window.CAMPAIGN,startChapter:def=>{hideStart();newGame('me',campOpts(def))},isWon:campIsWon,metrics:campMetrics,
+    onExit(){showStart()},scores:g=>g.pl.map(p=>p.inf),seats:g=>g.pl.map((p,i)=>({name:p.name,me:i===0,ai:i?p.ai:undefined}))})}
+campInit();

@@ -213,7 +213,7 @@ function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=e
   const view=NET.on?'online':(UI.sv||'title');el.dataset.v=view;
   if(view==='title'){const sav=hasSave();
     el.innerHTML='<div class="ttl"><div class="ttl-art">'+titleArt()+'</div><div class="ttl-in"><h1 class="logo"><small>THE</small>Thornbound Throne</h1><p class="tag">The king is dead. Four factions reach for his crown.</p><p class="tag goal">Win by holding the most Influence when the last round ends.</p><div class="tmid"></div><div class="tbtns">'+
-      '<button class="tbtn go" data-a="play"><b>Play</b><span>'+(firstTime()?'new here? a guided first game is ready':'against the computer')+'</span></button>'+
+      (window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="tbtn go story" data-a="story"><b>Story</b><span>'+campLine()+'</span></button>':'')+'<button class="tbtn'+(window.CAMPAIGN&&typeof GXC!=='undefined'?'':' go')+'" data-a="play"><b>Play</b><span>'+(firstTime()?'new here? a guided first game is ready':'against the computer')+'</span></button>'+
       '<button class="tbtn" data-a="online"><b>Online</b><span>with friends, free, no sign-up</span></button>'+
       (sav?'<button class="tbtn" data-a="cont"><b>Resume</b><span>your game, round '+Math.max(1,sav.G.round)+' of '+sav.G.rounds+'</span></button>':'')+
       '</div><button class="tlink" data-a="rules">How to play</button></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
