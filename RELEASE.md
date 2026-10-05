@@ -1,13 +1,15 @@
-# v83 (scale + seamless) — BUILT, GATE RUNNING: DO NOT DEPLOY YET
+# v83 (scale + seamless + QA) — REBUILT, tPlay GATE RUNNING: DO NOT DEPLOY YET
 
 ```
-./reapply.sh <v82 candidate order> pSC1.py pSM1.py pSM2.py pSM3.py pSM4.py pSM5.py pSM6.py   → REAPPLY_OK
+./reapply.sh pAU1 pAU2 pOG1 pOB1 pOB2 pOB3 pOC1 pCV1 pCV2 pRL1 pJU1 pRL2 pGB1 pDR1 pDR2 pSC1 pSC2 pSM1 pSM2 pSM3 pSM4 pSM5 pSM6 pRL4 pQA1 pQA2 pQA3 (.py)   → REAPPLY_OK
 python3 tools/split_km.py overdrive.html out83
 ```
-v82 candidate order = pAU1 pAU2 pOG1 pOB1 pOB2 pOB3 pOC1 pCV1 pCV2 pRL1 pJU1 pRL2 pGB1 pDR1 pDR2. pSC2 (od-scale: human scale, setback, wall slide) is not in yet; it gets added when it lands.
-Deploy files: out83/overdrive.html (1,793,546 B) + out83/km.js (1,961,521 B). Unsplit 3,759,297 B. The v82 files in out/ are unchanged (deployed from 46e1879).
-tools/tBA.js is now od-seamless's version: an A→B crossing must switch district without a reload; the old branch is kept for non-seamless builds.
-So far: tOut (real out83 deploy files) PASS. Split gate (smoke, tSM, tOB, tOG, tHop, tDR, tSC, tBA, tBF) is RUNNING.
+Deploy files: out83/overdrive.html (1,803,423 B) + out83/km.js (1,961,521 B). Unsplit 3,769,195 B.
+- pSC2 (od-scale): human scale, 3 m road setback, glancing wall hits slide. pQA1–3 (od-qa): round collider corners, phone HUD layout, chase-camera guard (qa.js stays the outermost roamCam wrapper), park only below 15 km/h.
+- pRL4 (integration): while an otg2 event panel or result banner shows, hide the district plate and NEXT card, and right-align the panel in portrait so it clears the minimap. It sits next to pQA2's own rule (which only hides NEXT).
+- pRL3 (otg2 placed once for seamless Athens) is NOT in: it cut the border-crossing hitch from 1,263 ms to 147 ms (×4 CPU), but tOG crashed on it ("reading 'done'"). Still open.
+- Release gate (owner/coordinator): tools/tPlay.js (real touch/keyboard play) on the split build. It runs on v82 and v83 for comparison, plus smoke, tSC, tSM, tOG, tBA, tBF.
+- Phone comparison shots v82 vs v83: release/phone/.
 
 ---
 # Release 82 — FAST-TRACK CANDIDATE (v82 RC): phase 2 + od-drive
