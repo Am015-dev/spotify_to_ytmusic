@@ -1,6 +1,6 @@
 // ---------- Doorkick Dungeon engine: all rules live here. State is G (plain JSON); every move goes through gameAct(ds, seat). ----------
 // Rule ids [R..]/[H..] refer to rules-notes.md.
-var ANIM=1, AIDELAY=700, DEFN=4, DEFEX={}, LVMIX=null, DEFSEED=null;
+var ANIM=1, AIDELAY=600, DEFN=4, DEFEX={}, LVMIX=null, DEFSEED=null;
 const R={WIN:10,HAND:5,DWARF_HAND:6,START:4,RUN:5,SELL:1000,BERSERK:3,TURN:3,TURN_B:3,FLIGHT:3,CAP:400,THEFT:4,MAXTURN:600};
 const SAVE='dkd_save2',TOUR='dkd_tour1';
 let G=null;const UI={menu:null,zoom:null,info:true,rules:false,fx:[],busy:false,pause:false,hints:true,speed:1,pass:null,lastSeat:-1,sell:null};

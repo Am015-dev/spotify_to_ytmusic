@@ -21,7 +21,6 @@ html.ph .phc.act{outline:2px solid #ffd76a;outline-offset:1px}
 html.ph .phc.me{cursor:default;background:linear-gradient(#6a3a1c,#44230f)}
 /* table first */
 html.ph .gx-board{padding:4px;gap:4px}
-html.ph #app .opps{display:none}
 html.ph .table{perspective:none;--sw:clamp(34px,min(15cqh,12cqw),54px)}
 html.ph .felt{transform:none;padding:6px;gap:4px;border-radius:12px}
 html.ph .pile{gap:3px}html.ph .pile .lbl{font-size:13px}

@@ -10,7 +10,7 @@ const PH={on:false,
     this.metrics()},
   metrics(){const h=document.documentElement;if(!this.on){h.style.removeProperty('--ph-tb');return}
     const t=document.querySelector('.table');if(t){const r=t.getBoundingClientRect();h.style.setProperty('--ph-tb',Math.round(r.bottom+4)+'px')}},
-  chips(){if(typeof G==='undefined'||!G||!G.pl)return '';const me=viewSeat();
+  chips(){return '';/* the rival seats are on the table now (ui.js oppsHTML) */const me=viewSeat();
     const chip=(p,mine)=>{const act=p.i===G.active;const nm=esc(p.nm);
       const lab=`${p.nm}${mine?' (you)':''}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play${act?', their turn':''}`;
       const inner=`<span class="n">${ptok(p.i)}<b>${mine?'You':nm}</b></span><span class="s" aria-hidden="true"><i class="l">Lv ${p.lvl}</i> ⚔${pStr(p)}<span class="hc"> ✋${p.hand.length}</span>${p.curse&&p.curse.length?' ☁'+p.curse.length:''}${p.dead?' 💀':''}</span>`;

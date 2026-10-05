@@ -155,7 +155,7 @@ function narrate(o){const f=P(o.who),h=o.help>=0?P(o.help):null;const you=isMe(o
   return `The ${M} is gone. Nobody gets its treasure.`}
 function outcomeHead(o){const you=isMe(o.who);const f=P(o.who);const lost=(o.lost||[]).find(x=>x.i===o.who);
   if(o.won)return {cls:'win',h:you?'🎉 Victory!':`⚔ ${esc(f.nm)} wins the fight`,sub:`+${o.lv} level${plural(o.lv)} · ${o.tr} treasure${plural(o.tr)}${o.help>=0?` (${esc(P(o.help).nm)} helped)`:''}`};
-  if(o.dead&&o.dead.includes(o.who))return {cls:'bad',h:'💀 Killed!',sub:`${you?'You lose':esc(f.nm)+' loses'} every item and card (level and race stay)`};
+  if(o.dead&&o.dead.includes(o.who))return {cls:'bad',h:'💀 Killed!',sub:`${you?'You lose':esc(f.nm)+' loses'} all items and cards`};
   const mine=o.runs.filter(r=>r.w===o.who);if(mine.length){const caught=mine.some(r=>!r.ok);const d=lost&&lost.d<0?`−${-lost.d} level${plural(-lost.d)}`:'';
     return caught?{cls:'bad',h:'💥 Caught: Bad Stuff!',sub:d||'the Bad Stuff hits'}:{cls:'run',h:'🏃 Ran away',sub:d?d+' just for fleeing':'no harm done'}}
   return {cls:'run',h:'The fight is over',sub:'the monsters left: no treasure'}}

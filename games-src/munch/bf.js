@@ -28,6 +28,7 @@ function bfEls(z){const q=s=>[...document.querySelectorAll(s)];
   if(z[0]==='m')return q(`.arena .row.mons .mon:nth-child(${+z.slice(1)+1})`);
   if(z[0]==='p')return q(`#phopps [data-opp="${z.slice(1)}"],#app .opps [data-opp="${z.slice(1)}"]`);
   if(z==='door')return q('.pile.pl,.bfdoor,.arena:not(:has(.vs))');if(z==='disc')return q('.pile.pr');return []}
+const bfCap=(t,n)=>{const w=String(t).split(/\s+/);return w.length>n?w.slice(0,n-1).join(' ')+'…':String(t)};
 const bfShort=t=>{t=String(t).replace(/<[^>]+>/g,'').replace(/ \(.*\)$/,'');return t.length>26?t.slice(0,25)+'…':t};
 function bfMark(){document.querySelectorAll('[data-bfz]').forEach(e=>{e.removeAttribute('data-bfz');e.removeAttribute('data-bfl');e.classList.remove('bf-tgt','bf-over')});
   document.querySelectorAll('.bf-picked').forEach(e=>e.classList.remove('bf-picked'));document.documentElement.classList.remove('bf-holding');
@@ -67,7 +68,7 @@ function bfReveal(id,who){const c=cd(id);const me=viewSeat();const mine=who===me
 // ---- cause and effect: cards fly from the rival who played them, numbers float up where they changed ----
 function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createElement('div');e.className='bffly';e.innerHTML=cardHTML(id,{attr:'tabindex="-1"',notitle:1});document.body.appendChild(e);
   const w=64,sx=fr.left+fr.width/2-w/2,sy=fr.top+fr.height/2-45,tx=to.left+to.width/2-w/2,ty=to.top+to.height/2-45;
-  const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(${quick?1:.6}) rotate(-8deg)`,opacity:1},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-60}px) scale(1.15) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.5)`,opacity:0}],{duration:quick?380:900,easing:'cubic-bezier(.3,.7,.3,1)'});a.onfinish=()=>e.remove()}
+  const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(${quick?1:.6}) rotate(-8deg)`,opacity:1},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-60}px) scale(1.15) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.5)`,opacity:0}],{duration:quick?380:620,easing:'cubic-bezier(.3,.7,.3,1)'});a.onfinish=()=>e.remove()}
 function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;f.style.left=(r.left+r.width/2)+'px';f.style.top=(r.top+r.height/3)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1500)}
 function bfBubble(s,txt){const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),2600)}
 function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;const tb=document.querySelector('.table');const t=tb?tb.getBoundingClientRect():r;b.style.left='50%';b.style.translate='-50% 0';b.style.top=(t.top+6)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),3600)}
@@ -78,8 +79,8 @@ function bfDiff(S,N){if(!S||!N||S.gid!==N.gid)return;const me=viewSeat();const a
   if(N.kick!=null&&(N.kick!==S.kick||N.turn!==S.turn)&&BF.motion()){bfReveal(N.kick,G.active);BF.mine=0}
   N.lvl.forEach((l,i)=>{const d=l-S.lvl[i];if(!d)return;const el=i===me?document.querySelector('.mine .bfhero')||document.querySelector('.mine .lv'):chip(i);bfFloat(el,(d>0?'+':'')+d+' Lv',d>0?'up':'down')});
   if(me>=0&&N.me===S.me){const hero=document.querySelector('.mine .bfhero');const was=new Map(S.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));const now=new Map(N.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));
-    const lost=[...was.keys()].filter(i=>!now.has(i));if(lost.length)bfNote(hero,'Lost: '+lost.map(cname).join(', '),'bad');
-    const off=[...now.keys()].filter(i=>!now.get(i)&&(!was.has(i)||was.get(i)));if(off.length){const p=P(me);const w=equipWhy(p,off[0])||bigWhy(p,off[0])||'';bfNote(hero,`Carried, not worn: ${w||'no free slot'}`,'bad')}}
+    const lost=[...was.keys()].filter(i=>!now.has(i));if(lost.length)bfNote(hero,bfCap('Lost: '+lost.map(cname).join(', '),7),'bad');
+    const off=[...now.keys()].filter(i=>!now.get(i)&&(!was.has(i)||was.get(i)));if(off.length){const p=P(me);const w=equipWhy(p,off[0])||bigWhy(p,off[0])||'';bfNote(hero,bfCap(`Not worn: ${w||'no free slot'}`,8),'bad')}}
   if(me>=0&&!N.cb&&N.str[me]!==S.str[me]&&N.lvl[me]===S.lvl[me]){const d=N.str[me]-S.str[me];bfFloat(document.querySelector('.mine .bfhero'),(d>0?'+':'')+d+' ⚔',d>0?'up':'down')}
   const a=S.cb,b=N.cb;if(!a||!b||a.k!==b.k)return;const cb=G.cb;
   b.enh.forEach((n,j)=>{if(n>(a.enh[j]||0)&&j<a.n){const id=cb.mons[j].enh[n-1];const to=document.querySelector(`.arena .row.mons .mon:nth-child(${j+1})`);const fr=fromRect(actor);if(fr&&to)bfFly(id,fr,to.getBoundingClientRect());if(actor>=0&&actor!==me)bfBubble(actor,cd(id).b>0?'Boost the monster!':'Weaken it!')}});
@@ -125,13 +126,14 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
     if(G&&!G.cb&&G.phase==='main'&&me>=0&&sideToAct()===me&&G.active===me&&P(me).human&&validMoves(me).some(m=>m.act==='kick')){UI.arRes=40;
       return `<button class="bfdoor" data-a="bfkick" aria-label="Kick open the door"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span><span class="bfkick">KICK!</span><span class="bfboot" aria-hidden="true">🥾</span></button>`}
     if(G&&!G.cb&&G.phase==='setup'&&me>=0&&P(me).human){const p=P(me);UI.arRes=40;return `<div class="bfstage"><div class="bfbig" style="--c:${PCOL[p.i]}">${bfAv(p,'bfbav')}<b class="bfbstr">⚔ ${pStr(p)}</b><span class="bfblv">Lv ${p.lvl}</span></div><div class="bfcap">Gear up your hero!</div></div>`}
-    if(G&&!G.cb&&G.kicked!=null&&G.phase!=='main'&&!(G.out&&G.out.turn===G.turn&&['after','post','charity'].includes(G.phase))){const c=cd(G.kicked);const a=curPl();const y=isMe(a.i);UI.arRes=60;
+    if(G&&!G.cb&&G.kicked!=null&&G.phase!=='main'&&!(G.out&&G.out.turn===G.turn&&['after','post','charity'].includes(G.phase))){const c=cd(G.kicked);const a=curPl();const y=isMe(a.i);UI.arRes=104;
       return `<div class="bfstage"><div class="bfcap">${y?'You':esc(a.nm)} found:</div><div class="row">${cardHTML(G.kicked,{})}</div><div class="bfcap sm">${c.t==='curse'?'A curse! It hit '+(y?'you':esc(a.nm)):'It went into '+(y?'your':esc(a.nm)+'’s')+' hand'}</div></div>${rollHTML()}`}
     if(G&&!G.cb&&(G.phase==='main'||G.phase==='window')&&G.kicked==null){const a=curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfdoor small" aria-hidden="true"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span></div><div class="bfcap">${isMe(a.i)?'Your':esc(a.nm)+'’s'} door</div></div>${rollHTML()}`}
     return _arena.apply(this,arguments)};
   const _mine=mineHTML;mineHTML=function(me){const h=_mine(me);if(me<0||!G.pl[me])return h;const p=P(me);const av=bfAv(p,'bfav');
     return h.replace('<div class="top">',`<div class="top"><span class="bfhero" style="--c:${PCOL[p.i]}">${av}<b class="bfstr" aria-label="strength">⚔${pStr(p)}</b></span>`)};
   const _prompt=promptHTML;promptHTML=function(me){let h=_prompt(me);const line=bfLine(me);
+    if(G&&G.cb&&G.phase==='combat'&&G.cb.stage==='act'&&!G.q&&me>=0&&sideToAct()===me&&P(me).human){h=h.replace(/<button class="btn[^"]*" data-mv='\{&quot;act&quot;:&quot;(?:fight|run)&quot;\}'>.*?<\/button>/g,'').replace(/<button class="btn[^"]*" data-a="askmenu">.*?<\/button>/g,'').replace(/<div class="acts main">\s*<\/div>/,'')}
     h=h.replace('<div id="prompt">',`<div id="prompt" class="${G&&G.q?'bfq':''}">`+(/autonote/.test(h)?'':autoNoteHTML()));
     h=h.replace(/✨ Play suggested cards? \((\d+)\)/,'✨ Auto ($1)').replace(/🏃 Run away \((?:need \d\+: )?([^)]*)\)/,'🏃 Run ($1)').replace('🏃 Run (this monster can’t be escaped)','🏃 Run (no chance)').replace('🙋 Ask for help','🙋 Get help').replace('🚪 Kick open the door','🚪 Kick!').replace('💰 Sell items','💰 Sell');
     const i=h.indexOf('<p class="say">');const tag=`<p class="bfline">${esc(line)}</p>`;
@@ -159,7 +161,7 @@ document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();
 document.addEventListener('pointerdown',e=>{if(BF.revClose){BF.revClose();BF.revClose=null}if(!G||e.button>0)return;const c=e.target.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell)return;const id=+c.dataset.card;
   if(!bfMoves(viewSeat(),id).length)return;BF.down={id,x:e.clientX,y:e.clientY,el:c,pid:e.pointerId}},{passive:true});
 document.addEventListener('pointermove',e=>{const d=BF.down;if(!d||d.pid!==e.pointerId)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;
-  if(!BF.drag){if(Math.hypot(dx,dy)<10)return;if(e.pointerType==='touch'&&Math.abs(dx)>Math.abs(dy)*1.2&&d.el.closest('.hand,.gear')){BF.down=null;return}
+  if(!BF.drag){if(Math.hypot(dx,dy)<10)return;if(e.pointerType==='touch'&&Math.abs(dx)>Math.abs(dy)*1.2&&(d.el.closest('.gear')||d.el.closest('.hand.scrolls'))){BF.down=null;return}
     const r=d.el.getBoundingClientRect();const g=d.el.cloneNode(true);g.className+=' bfghost';g.removeAttribute('data-card');g.style.width=r.width+'px';document.body.appendChild(g);
     BF.drag={id:d.id,g,ox:d.x-r.left,oy:d.y-r.top,w:r.width,h:r.height};BF.pick=null;bfFinger(null);bfMark();d.el.classList.add('bf-lift')}
   const D=BF.drag;D.g.style.transform=`translate(${e.clientX-D.w/2}px,${e.clientY-D.h*.75}px) scale(1.12) rotate(${Math.max(-10,Math.min(10,dx/12))}deg)`;
