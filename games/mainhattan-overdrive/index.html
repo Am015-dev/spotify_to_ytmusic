@@ -4594,7 +4594,7 @@ function CE_lots(add,rnd,D){const T0=performance.now(),occ=new Set(),ck=(x,z)=>M
     const sty=athStyleAt(x,z);if(sty!=='town'&&sty!=='villa'&&sty!=='outer'&&rnd()<.6){for(let i=-2;i<=2;i++)for(const r of[-3,3])if(rnd()<.7){const t=C[Math.floor(rnd()*C.length)],lx=i*2.9,lz=r;if(CE_onRoad(x+lx*c+lz*s,z-lx*s+lz*c))continue;add(t,x+lx*c+lz*s,z-lx*s+lz*c,ry+Math.PI/2+(r<0?Math.PI:0));if(HUB.CE_L.length>n)n0[t]=(n0[t]||0)+1}lots++}
     else{for(let k=0;k<4;k++){const t=rnd()<.6?'CE_olive':rnd()<.5?'bush':'CE_cypress';add(t,x+(rnd()-.5)*12,z+(rnd()-.5)*12)}grov++}occ.add(ck(x,z))}
   HUB.CE=Object.assign(HUB.CE||{},{lots,grov,lotMs:Math.round(performance.now()-T0)})}
-function buildHubProps(rnd,rr2,pick){const D=kmProps(propDefs());if(CID!=='fra')athProps(D);CE_defs(D);HUB.ptypes=D;const CT=[performance.now()];const L=[];const add=(t,x,z,ry=rnd()*6.28,y)=>{if(roamHit(x,z,D[t].r*.6))return;if(y==null&&(inRiver(x,z,-1)||onAnyDeck(x,z)))return;L.push({t,x,z,y:y??groundY(x,z),ry,alive:true,rt:0})};
+function buildHubProps(rnd,rr2,pick){const D=kmProps(propDefs());if(CID!=='fra')athProps(D);CE_defs(D);CR_props(D);HUB.ptypes=D;const CT=[performance.now()];const L=[];const add=(t,x,z,ry=rnd()*6.28,y)=>{if(roamHit(x,z,D[t].r*.6))return;if(y==null&&(inRiver(x,z,-1)||onAnyDeck(x,z)))return;L.push({t,x,z,y:y??groundY(x,z),ry,alive:true,rt:0})};
   const lampRy=(vx,vz)=>Math.atan2(vx,vz)-Math.atan2(D.lamp.head.x,D.lamp.head.z);
   // sidewalks (filler roads and real streets): lamps facing the road, trees, benches, bins, dumpsters, hydrants, bus stops, parked cars at the curb
   const side=(px,pz,ux,uz,w,k,boul,self,sid,M7=7,pr=.07,pc=.012)=>{for(const sd of[-1,1]){const nx=uz*sd,nz=-ux*sd,off=w/2+3.2,x=px+nx*off,z=pz+nz*off,ry=Math.atan2(-nx,-nz);
@@ -8107,6 +8107,32 @@ function CR_trParts(k){if(k>3)return null;const T=TRT[k],Wt='#ffffff';let A=k===
  for(const w of CR_W){const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);M.push(g)}CR_W=null;
  const box=new THREE.Box3().setFromBufferAttribute(mergeGeometries(M).attributes.position),wid=box.max.x-box.min.x,s=T.wid/wid,fix=g=>{g.translate(0,-box.min.y,0);g.scale(s,s,s);return g};
  CR_LO=0;const tiny=y=>GB_col(new THREE.BoxGeometry(.01,.01,.01).translate(0,y,0),'#ffffff');return{body:fix(mergeGeometries(M)),glass:G.length?fix(mergeGeometries(G)):tiny(-.5),lamp:L.length?fix(mergeGeometries(L)):tiny(-.5),neon:tiny(-.5)}}
+
+
+// ---------- LEGO street props (instanced like the old ones; white parts take the per-instance tint)
+const CR_PM=new THREE.MeshPhysicalMaterial({vertexColors:true,roughness:.32,metalness:0,clearcoat:.7,clearcoatRoughness:.12,envMapIntensity:1.1});
+const LG={stud:(A,x,y,z,col,r=.13)=>{A.push(GB_col(new THREE.CylinderGeometry(r,r,.09,6).translate(x,y+.045,z),col))},
+ disc:(A,r,y,h,col,seg=12)=>A.push(GB_col(new THREE.CylinderGeometry(r,r,h,seg).translate(0,y+h/2,0),col)),
+ ring:(A,r,y,n,col,a0=0)=>{for(let i=0;i<n;i++){const a=a0+i/n*Math.PI*2;LG.stud(A,Math.cos(a)*r,y,Math.sin(a)*r,col)}},
+ box:(A,w,h,d,x,y,z,col)=>A.push(GB_box(x-w/2,x+w/2,y,y+h,z-d/2,z+d/2,col))};
+function LG_stack(A,R,y0,h,col,studs=1){let y=y0;R.forEach((r,i)=>{LG.disc(A,r,y,h,col);y+=h;const nx=R[i+1];if(studs&&(nx==null||nx<r-.25)){const rr=nx==null?r*.45:(r+nx)/2;LG.ring(A,rr,y,nx==null?4:Math.max(5,Math.round(rr*4)),col,i*.4)}});return y}
+function LG_trunk(A,h,r=.3,col='#6b4a2a'){const n=Math.max(1,Math.round(h/.5));for(let i=0;i<n;i++){LG.disc(A,r,i*h/n,h/n-.02,col,10);LG.disc(A,r*.82,i*h/n+h/n-.03,.03,col,10)}}
+const CR_PROPS={
+ tree:()=>{const A=[];LG_trunk(A,2.4,.34);LG_stack(A,[1.3,1.9,2.3,2.5,2.5,2.3,1.9,1.3],2.4,.6,'#ffffff');return A},
+ tree2:()=>{const A=[];LG_trunk(A,2.6,.4);LG_stack(A,[2.0,2.7,3.1,3.2,3.0,2.5,1.7],2.6,.62,'#ffffff');return A},
+ tree3:()=>{const A=[];LG_trunk(A,1.4);LG_stack(A,[2.2,1.95,1.7,1.45,1.2,.95,.7,.45],1.4,.5,'#ffffff');LG.disc(A,.13,1.4+8*.5,.4,'#ffffff',6);return A},
+ bush:()=>{const A=[];LG_stack(A,[1.1,1.35,1.2,.8],0,.42,'#ffffff');return A},
+ cone:()=>{const A=[];LG.box(A,.8,.12,.8,0,0,0,'#1b2a34');A.push(GB_col(new THREE.CylinderGeometry(.08,.34,.9,10).translate(0,.57,0),'#fe8a18'));A.push(GB_col(new THREE.CylinderGeometry(.21,.26,.16,10).translate(0,.5,0),'#f4f4f4'));LG.stud(A,0,1.02,0,'#fe8a18',.07);return A},
+ barrier:()=>{const A=[];for(const sx of[-1,1])LG.box(A,.3,.9,.7,sx*.9,0,0,'#1b2a34');for(let i=0;i<4;i++)LG.box(A,.5,.4,.22,-.75+i*.5,.55,0,i%2?'#f4f4f4':'#d01712');for(let i=0;i<4;i++)LG.stud(A,-.75+i*.5,.95,0,i%2?'#f4f4f4':'#d01712');return A},
+ planter:()=>{const A=[];LG.box(A,1.6,.6,1.6,0,0,0,'#7a5a3a');for(const[x,z]of[[-.4,-.4],[.4,-.4],[-.4,.4],[.4,.4]])LG.stud(A,x,.6,z,'#7a5a3a');LG_stack(A,[.75,.6,.35],.6,.32,'#3f8a2e');return A},
+ orange:()=>{const A=[];LG_trunk(A,1.8,.26);const top=LG_stack(A,[1.3,1.75,1.85,1.5,.9],1.8,.45,'#3f7a34');for(let i=0;i<9;i++){const a=i*2.4,y=2.2+(i%4)*.45,r=1.85-(i%4==3?.4:0);A.push(GB_col(new THREE.CylinderGeometry(.2,.2,.16,8).rotateZ(Math.PI/2).rotateY(-a).translate(Math.cos(a)*r,y,Math.sin(a)*r),'#ff9a1a'))}return A},
+ olive:()=>{const A=[];LG_trunk(A,2.4,.34,'#6f6250');LG_stack(A,[2.0,2.7,2.6,1.7],2.4,.45,'#7d8a5a');return A},
+ cypress:()=>{const A=[];LG_trunk(A,.8,.3,'#5a4636');LG_stack(A,[1.0,1.2,1.25,1.25,1.2,1.15,1.05,.95,.85,.7,.55,.4],.8,.75,'#2f5a32',1);return A}};
+function CR_props(D){const set=(k,b,extra)=>{if(!D[k])return;try{D[k].g=mergeGeometries(CR_PROPS[b]());D[k].mat=CR_PM;Object.assign(D[k],extra||{})}catch(e){console.warn('CR prop',k,e)}};
+ const G=['#4f9a36','#3f8a2e','#6fb83f','#8cc04a','#3a7a3a'];
+ if(CID==='fra'){set('tree','tree',{tint:G});set('tree2','tree2',{tint:G});set('tree3','tree3',{tint:['#2f6a3a','#3a7a3a','#2a5a32']})}else{set('tree','orange',{tint:null})}
+ set('bush','bush',{tint:['#4f9a36','#3f8a2e','#6fb83f']});set('cone','cone',{tint:null});set('barrier','barrier',{tint:null});set('planter','planter',{tint:null});
+ set('CE_olive','olive',{tint:null});set('CE_cypress','cypress',{tint:null});set('CE_pine','tree3',{tint:['#3a6a34','#4a7a3a']})}
 
 const GB_PRE=[['🛣 HOT ROD',CR_ROD,'car'],['⛰ MONSTER',CR_OFF,'4x4'],['🌊 AEGEAN',CR_BOAT,'boat'],['SPEEDSTER',CR_SPEED,'car']];const GB_PRE0=[['RACER',[['spoiler',-2,6,0,0],['exhaust',-2,5,0,10],['exhaust',1,5,0,10],['light',-1,-6,0,2],['b24',-4,0,0,11],['slope',-4,-2,0,0],['b12',-3,3,0,0],['tile',-1,1,0,9],['flag',-5,4,0,9]]],
  ['DOZER',[['b24',-3,-1,0,2],['b24',-5,-1,0,11],['b22',-3,3,0,2],['b24',-3,-1,0,11],['slope',-3,-3,0,2],['b22',-5,3,0,2],['b11',-6,1,0,0],['light',-6,-1,0,9],['exhaust',-1,4,0,10],['round',-4,5,0,11]]],
