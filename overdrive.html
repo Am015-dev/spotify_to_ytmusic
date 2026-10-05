@@ -7871,7 +7871,7 @@ const CR_stud=(M,x,y,z,c)=>{if(CR_LO===1)return;if(CR_LO){M.push(GB_cyl(.18,.11,
 const CR_studs=(M,w,d,y,c,ok)=>{for(let i=0;i<w;i++)for(let j=0;j<d;j++){const x=(i+.5-w/2)*GB_U,z=(j+.5-d/2)*GB_U;if(!ok||ok(x,z))CR_stud(M,x,y,z,c)}};
 const CR_WH={wS:{r:.62,w:.6,rim:.36},wM:{r:.76,w:.72,rim:.46},wL:{r:.9,w:.9,rim:.56},wXL:{r:1.25,w:1.2,rim:.62}};
 const CR_wgeo={};
-function CR_wheel(t){if(CR_LO){const k=t+'lo';if(CR_wgeo[k])return CR_wgeo[k];const W=CR_WH[t],a=new THREE.CylinderGeometry(W.r,W.r,W.w,12);a.rotateZ(Math.PI/2);const b=new THREE.CylinderGeometry(W.rim,W.rim,W.w*1.04,10);b.rotateZ(Math.PI/2);const h=new THREE.CylinderGeometry(W.rim*.35,W.rim*.35,W.w*1.08,8);h.rotateZ(Math.PI/2);return CR_wgeo[k]=mergeGeometries([GB_col(a,'#17191c'),GB_col(b,'#b9c0c8'),GB_col(h,'#2a2f36')])}if(CR_wgeo[t])return CR_wgeo[t];const W=CR_WH[t],r=W.r,hw=W.w/2,ri=W.rim,A=[];
+function CR_wheel(t){if(CR_LO){const k=t+'lo';if(CR_wgeo[k])return CR_wgeo[k];const W=CR_WH[t],a=new THREE.CylinderGeometry(W.r,W.r,W.w,20);a.rotateZ(Math.PI/2);const b=new THREE.CylinderGeometry(W.rim,W.rim,W.w*1.04,16);b.rotateZ(Math.PI/2);const h=new THREE.CylinderGeometry(W.rim*.35,W.rim*.35,W.w*1.08,12);h.rotateZ(Math.PI/2);return CR_wgeo[k]=mergeGeometries([GB_col(a,'#17191c'),GB_col(b,'#b9c0c8'),GB_col(h,'#2a2f36')])}if(CR_wgeo[t])return CR_wgeo[t];const W=CR_WH[t],r=W.r,hw=W.w/2,ri=W.rim,A=[];
  // tyre: lathe around x (rounded shoulders, slightly bulged tread)
  const tp=[[ri*.98,-hw*.92],[r*.9,-hw],[r*.985,-hw*.82],[r,-hw*.5],[r,hw*.5],[r*.985,hw*.82],[r*.9,hw],[ri*.98,hw*.92]].map(p=>new THREE.Vector2(p[0],p[1]));
  const ty=new THREE.LatheGeometry(tp,28);ty.rotateZ(Math.PI/2);A.push(GB_col(ty,'#17191c'));
@@ -8112,7 +8112,7 @@ function CR_truck(o){const A=[],B=o.body,K=CR_K,W='#f4f4f4',add=(t,x,z,r,c,y)=>A
  add('T8x32',-4,-16,0,K,0);for(const z of[-15,5,10])sym('arch',-4,z,0,K,0),sym('wL',-4,z,0,K,wy);add('bump',-4,-17,0,'#d8dde4',1);
  add('B8x6',-4,-16,0,B,1);add('B8x6',-4,-16,0,B,4);add('ws6',-3,-16,0,B,7);sym('B1x3',-4,-16,0,B,7);add('B8x3',-4,-13,0,B,7);add('T8x6',-4,-16,0,B,12);sym('hl',-4,-17,0,B,2);sym('stack',-4,-11,0,'#d8dde4',7);
  add('B8x21',-4,-10,0,W,3);add('B8x21',-4,-10,0,W,6);add('B8x21',-4,-10,0,W,9);add('B8x21',-4,-10,0,W,12);add('T8x21',-4,-10,0,W,15);sym('tl',-4,11,2,K,1);return A}
-function CR_trParts(k){if(k>3)return null;const T=TRT[k],Wt='#ffffff';let A=k===0?CR_car({body:Wt,acc:Wt,wing:CR_K,noWing:1}):k===1?CR_car({body:Wt,acc:CR_K,noWing:1,x:[['sign',-1,-1,0,'#ffd12c',13]]}):k===2?CR_van({body:Wt}):CR_truck({body:Wt});
+function CR_trParts(k){if(k>3)return null;const T=TRT[k],Wt='#ffffff';let A=k===0?CR_cab(CR_car({body:Wt,acc:Wt,wing:CR_K,noWing:1})):k===1?CR_cab(CR_car({body:Wt,acc:CR_K,noWing:1,x:[['sign',-1,-1,0,'#ffd12c',13]]})):k===2?CR_van({body:Wt}):CR_truck({body:Wt});
  const br=A.map(([t,x,z,r,c,y])=>({t:t==='drv'?'drvR':t,x,z,y,r:r%4,m:0,c})).filter(b=>!['drvR','stw','mir','lp'].includes(b.t));CR_LO=1;CR_G=[];CR_W=[];const M=[],L=[];for(const b of br)GB_brickGeo(b,M,L);const G=CR_G;CR_G=null;
  for(const w of CR_W){const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);M.push(g)}CR_W=null;
  const box=new THREE.Box3().setFromBufferAttribute(mergeGeometries(M).attributes.position),wid=box.max.x-box.min.x,s=T.wid/wid,fix=g=>{g.translate(0,-box.min.y,0);g.scale(s,s,s);return g};
@@ -8128,13 +8128,13 @@ function CR_cityGeo(nm){if(!nm||nm[0]==='#')return null;if(CR_CG[nm]!==undefined
   case'suv':A=CR_car({body:W,acc:K,noWing:1,x:[['T6x4',-3,-2,0,K,13]]});wid=2.15;break;
   case'van':A=CR_van({body:W});wid=2.2;break;case'delivery':A=CR_truck({body:W});wid=2.4;break;case'truck':A=CR_truck({body:W});wid=2.55;break;
   case'garbage-truck':A=CR_truck({body:'#2c8a5a'});wid=2.6;break;default:return CR_CG[nm]=null}
-  if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A.push(['T1x6',-4,-3,0,K,-1],['T1x6',3,-3,0,K,-1],['T8x1',-4,-8,0,K,-1],['T8x1',-4,7,0,K,-1]);
+  if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A=CR_cab(A);if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A.push(['T1x6',-4,-3,0,K,-1],['T1x6',3,-3,0,K,-1],['T8x1',-4,-8,0,K,-1],['T8x1',-4,7,0,K,-1]);
   const br=A.map(([t,x,z,r,c,y])=>({t,x,z,y,r:r%4,m:0,c})).filter(b=>!['drv','drvR','stw','mir','lp','pipes','flag'].includes(b.t));CR_LO=2;CR_G=[];CR_W=[];const M=[],L=[];for(const b of br)GB_brickGeo(b,M,L);
   const Wg=CR_W.map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return g});const body=mergeGeometries(M.concat(L)),wheels=mergeGeometries(Wg),glass=CR_G.length?mergeGeometries(CR_G):null;
   const box=new THREE.Box3().setFromBufferAttribute(body.attributes.position),bw=new THREE.Box3().setFromBufferAttribute(wheels.attributes.position),s=wid/(box.max.x-box.min.x),y0=Math.min(box.min.y,bw.min.y);
   for(const g of[body,wheels,glass].filter(Boolean)){g.translate(0,-y0,0);g.scale(s,s,s);g.rotateY(Math.PI);g.translate(0,.04,0)}return CR_CG[nm]={body,wheels,glass}}
  catch(e){console.warn('CR city',nm,e);return CR_CG[nm]=null}finally{CR_LO=0;CR_G=null;CR_W=null}}
-function CR_cityPost(im,nm,k,n){const G=CR_cityGeo(nm);if(!G)return;const w=new THREE.InstancedMesh(G.wheels,CR_CM,n);w.frustumCulled=false;w.instanceMatrix.setUsage(THREE.DynamicDrawUsage);_m.makeScale(0,0,0);for(let j=0;j<n;j++)w.setMatrixAt(j,_m);im.userData.w=w;im.parent&&im.parent.add(w);if(G.glass){const gl=new THREE.InstancedMesh(G.glass,CR_GM,n);gl.frustumCulled=false;gl.instanceMatrix.setUsage(THREE.DynamicDrawUsage);for(let j=0;j<n;j++)gl.setMatrixAt(j,_m);gl.renderOrder=2;im.userData.g=gl;im.parent&&im.parent.add(gl)}
+function CR_cityPost(im,nm,k,n){const G=CR_cityGeo(nm);if(!G)return;const w=new THREE.InstancedMesh(G.wheels,CR_WM||(CR_WM=new THREE.MeshStandardMaterial({vertexColors:true,roughness:.8,metalness:0,envMapIntensity:.5})),n);w.frustumCulled=false;w.instanceMatrix.setUsage(THREE.DynamicDrawUsage);_m.makeScale(0,0,0);for(let j=0;j<n;j++)w.setMatrixAt(j,_m);im.userData.w=w;im.parent&&im.parent.add(w);if(G.glass){const gl=new THREE.InstancedMesh(G.glass,CR_GM,n);gl.frustumCulled=false;gl.instanceMatrix.setUsage(THREE.DynamicDrawUsage);for(let j=0;j<n;j++)gl.setMatrixAt(j,_m);gl.renderOrder=2;im.userData.g=gl;im.parent&&im.parent.add(gl)}
  const cc=new THREE.Color();for(let j=0;j<n;j++){cc.set(HCOL[(j*3+k)%HCOL.length]).lerp(new THREE.Color('#ffffff'),.08);im.setColorAt(j,cc)}im.instanceColor&&(im.instanceColor.needsUpdate=true);
  if(nm==='police'||nm==='garbage-truck'||(nm==='taxi'&&CID!=='fra')){const c=new THREE.Color('#ffffff');for(let j=0;j<n;j++)im.setColorAt(j,c);im.instanceColor&&(im.instanceColor.needsUpdate=true)}}
 const _crM=new THREE.Matrix4(),_crR=new THREE.Matrix4(),_crE=new THREE.Euler(),_crT1=new THREE.Matrix4().makeTranslation(0,.45,0),_crT2=new THREE.Matrix4().makeTranslation(0,-.45,0);
@@ -8163,6 +8163,16 @@ function CR_tutFit(){const t=document.getElementById('roamTut');if(!t||!document
  const rb=bs.find(e=>e.textContent.trim()==='▶'),bk=bs.find(e=>e.textContent.trim()==='BRAKE');if(!rb||!bk)return;const L=rb.getBoundingClientRect().right+18,Rr=bk.getBoundingClientRect().left-18;
  if(Rr-L<200)return;const S=(k,v)=>t.style.setProperty(k,v,'important');S('left',L+'px');S('right','auto');S('transform','none');S('max-width',(Rr-L)+'px');S('box-sizing','border-box')}
 setInterval(CR_tutFit,300);
+
+let CR_WM=null;
+function CR_cab(A){const ar=A.find(e=>e[0]==='arch'),B=ar?ar[4]:'#ffffff',D='#1d2630',out=A.filter(e=>!['ws6','ws4','bubble'].includes(e[0])&&!((e[0]==='T6x2'||e[0]==='T2x2')&&e[5]>=11));
+ for(const e of out)if(e[5]>=12&&e[0]!=='T6x6')e[5]-=2;
+ for(const e of out){if(e[0]==='T2x4'&&e[5]===5&&(e[2]===-7||e[2]===3))e[0]='P2x4';if(e[0]==='T1x6'&&e[5]===4&&(e[1]===-4||e[1]===3))e[4]='#2a2f36'}
+ const add=(t,x,z,c,y)=>out.push([t,x,z,0,c,y]);
+ add('s21',-3,-3,B,6);add('s21',2,-3,B,6);add('s22',-2,-3,D,6);add('s22',0,-3,D,6);
+ add('B1x3',-3,-1,D,6);add('B1x3',2,-1,D,6);add('P1x3',-3,-1,D,9);add('P1x3',2,-1,D,9);
+ add('B1x1',-3,2,B,6);add('B1x1',2,2,B,6);add('P1x1',-3,2,B,9);add('P1x1',2,2,B,9);add('B4x1',-2,2,D,6);add('P4x1',-2,2,D,9);
+ add('P1x1',-3,-2,B,9);add('P1x1',2,-2,B,9);add('P4x1',-2,-2,D,9);add('T6x5',-3,-2,B,10);return out}
 
 const GB_PRE=[['🛣 HOT ROD',CR_ROD,'car'],['⛰ MONSTER',CR_OFF,'4x4'],['🌊 AEGEAN',CR_BOAT,'boat'],['SPEEDSTER',CR_SPEED,'car']];const GB_PRE0=[['RACER',[['spoiler',-2,6,0,0],['exhaust',-2,5,0,10],['exhaust',1,5,0,10],['light',-1,-6,0,2],['b24',-4,0,0,11],['slope',-4,-2,0,0],['b12',-3,3,0,0],['tile',-1,1,0,9],['flag',-5,4,0,9]]],
  ['DOZER',[['b24',-3,-1,0,2],['b24',-5,-1,0,11],['b22',-3,3,0,2],['b24',-3,-1,0,11],['slope',-3,-3,0,2],['b22',-5,3,0,2],['b11',-6,1,0,0],['light',-6,-1,0,9],['exhaust',-1,4,0,10],['round',-4,5,0,11]]],
@@ -8616,7 +8626,7 @@ function ART_light(){if(!RO.on||!MOOD)return;const n=typeof FL!=='undefined'&&FL
 {const _am=applyMood;applyMood=function(){const r=_am.apply(this,arguments);ART_light();return r}}
 {const _fa=FL_apply;FL_apply=function(){const r=_fa.apply(this,arguments);ART_light();return r}}
 {const _he=hubEnter;hubEnter=function(){const r=_he.apply(this,arguments);ART_hub();ART_light();return r}}
-{const _rc=roamCam;roamCam=function(dt){const r=_rc.apply(this,arguments);try{if(RO.on&&!RO.mapOpen){const c=camera.position,dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz),M=11;if(d>M){const k=M/d;c.x=RO.x+dx*k;c.z=RO.z+dz*k;camera.updateMatrixWorld()}}}catch(e){}return r}}
+{const _rc=roamCam;roamCam=function(dt){const r=_rc.apply(this,arguments);try{if(RO.on&&!RO.mapOpen){const c=camera.position,dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz),M=8;if(d>M){const k=M/d;c.x=RO.x+dx*k;c.z=RO.z+dz*k;camera.updateMatrixWorld()}}}catch(e){}return r}}
 roamStep=(f=>function(dt){f(dt);if(flash>1)flash=1;if(hitFx>1)hitFx=1;if(CLOUDS&&CLOUDS.userData.art)CLOUDS.position.set(camera.position.x,0,camera.position.z);if(!ART.done||HUB.M&&HUB.M.artDone!==CID){ART.done=1;ART_hub();ART_light()}})(roamStep);
 window.__art={get pl(){return pl},gAt:(x,z,y)=>groundAt(x,z,y),gY:(x,z)=>groundY(x,z),get CITY_S(){return typeof CITY_S!=="undefined"?CITY_S:null},hubRoads:()=>hubRoads(),ART,ART_hub,ART_light,get HUB(){return HUB},get MOOD(){return MOOD},get FL(){return FL},SKYU,hemi,moonL,scene,renderer,THREE,get RO(){return RO},get CID(){return CID},LK,get bloom(){return bloom}};
 /*ART</art.js>*/
