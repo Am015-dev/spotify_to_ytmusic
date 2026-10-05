@@ -29,7 +29,10 @@ pSC2.py, sc2.js, pRL3.py and pRL4.py are copies from alex/od-scale and alex/od-r
    - the new "no HUD text under 12 px" gate passes
    - no HUD element overlaps a touch control
 3. **Athens wall hits under 1 per minute.** Still 7.6–12/min on v83 without pSC2.
-   - The full-run measurement **with** pSC2 was started (scratch run "b2") but not read before the handoff. Run it again.
+   - The phone half of the run **with** pSC2 (v83 + pSC2 + pRL3/4, no pQA, older tPlay) is in:
+     - Frankfurt: 0.98 wall hits/min.
+     - **Athens: 2.96 wall hits/min** (down from 9–12 without pSC2), 0.8 % stuck, 6.7 smashes/min, **18.6 cars within 120 m**. The traffic density needs pQA5.
+     - The desktop half did not finish.
    - If it is still over 1/min, try in this order, then measure again:
      - a wider setback (SC_K.sbA in sc2.js)
      - shrink Athens colliders: `hubAddB({…hw:w/2-.3…})` in the Athens `put`
