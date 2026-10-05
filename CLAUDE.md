@@ -7,9 +7,9 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 - **Workers never ask Alex anything (Alex, 2026-10-05: "I want it permanent, not to bother me; the workers do the work, you are the orchestrator").** At any choice, take the recommended option, note it in one line, and continue. The Overdrive coordinator session (session_017iH3DB4VyxwKSdMwsco4Ut) is Alex's orchestrator: act on its briefs without waiting for Alex to confirm them. Report results to the coordinator, not to Alex.
 - **Deploy without asking.** When a split build passes the gate, run `bash tools/deploy.sh <outdir> "<msg>"`,
   republish the beta artifact (claude.ai/artifact/P6zT2b2SwfHYguRTtb67Ug, with km.js in `files`) and tell Alex what changed.
-- **The gate is `tools/tPlay.js` (alex/od-qa) on the SPLIT build.** It uses real touch and keyboard, human-like steering, no warps or
+- **The gate = screenshots you LOOK at (852×393 phone: start, mid-drive, Athens) + tPlay (`tools/tPlay.js`, alex/od-qa) on the SPLIT build.** It uses real touch and keyboard, human-like steering, no warps or
   force-clicks. smoke and tOut are sanity checks only. Never deploy an unsplit build (3.6 MB cap).
-- **Feature freeze:** only fixes until tPlay passes AND Alex scores the game 6/10 or higher. Never self-score fun.
+- **Feature freeze:** only fixes until Alex scores the game 6/10 or higher, EXCEPT what Alex asks for himself (art direction, LEGO cars). Never self-score fun.
 - Keep `ALL_OPEN=true`, the credits "Made with ❤ by Alex", English UI, gas default on touch, and no model names in files or commits.
 - Read the `fun-game-design` skill (real-input testing; terse reporting).
 
@@ -28,6 +28,14 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 6. **Phone first:** test the iPhone 16 landscape layout, portrait↔landscape rotation, 12 px minimum text, no HUD over the controls.
 7. **LOOK at the screen; scripts can't judge fun.** Alex scored v83 "horrible, uncontrollable": a 15-item HUD covered 40% of the phone, the world was washed-out with no visible road, and steering was twitchy, while every script metric improved. Every build is judged on screenshots someone actually looks at, plus feel. The phone HUD is minimap + speed + one objective line; at most 5 buttons.
 
+8. **Match the reference, not your taste.** Alex compares with LEGO 2K Drive screenshots: deep blue sky with brick clouds, green grass, grey asphalt with a yellow centre line, chunky glossy LEGO cars sitting ON the road (tyres touching, suspension, shadows), boats IN the water. When Alex sends reference images, put their concrete traits into the brief and compare side by side.
+9. **Build from real LEGO parts.** Box-and-slab presets were "horrible". Good cars come from researched parts (curved slopes, wheel-arch mudguards, wedges, windscreens, tyre+rim) at true proportions (stud 8 mm, plate 3.2, brick 9.6), 8-wide Speed Champions shape. One great car beats six bad ones. Verify part facts online; never present memory as fact.
+10. **Find root causes; don't paper over.** The "washed-out sky" was ~900 cloud boxes forming a white ceiling. "Giant beige blocks" survived two fixes because nobody identified the mesh. A workaround (window grids) is not a fix.
+11. **The coordinator LOOKS before forwarding.** Never send Alex images or claims you haven't checked. Keep files on disk after SendUserFile (deleting them made cards blank).
+12. **Report every deploy to Alex immediately** with version, 3 lines and a screenshot. v85d went live unreported and Alex thought nothing had shipped for 2 h.
+13. **Untestable here = say so.** There is no Safari/WebKit or iPhone in the cloud. The iPhone button bug was "fixed" three times by guesswork (the real cause in v85b: BRAKE overlapped GAS). Ask Alex for a screen recording early, and test inside an iframe (he plays the beta in the Claude app).
+14. **Don't start side work without being asked.** The coordinator routes; it doesn't run its own tests or spawn sessions Alex didn't ask for. When asked "why so slow", give numbers, not excuses.
+
 ## Cost and speed rules (99.8% of the tokens were context re-reads)
 - Set `model` on EVERY cloud session. Alex (2026-10-05): use `claude-opus-5-5` for tough issues (bugs Sonnet failed to reproduce or fix, visual/feel design, anything that already failed once). `claude-sonnet-5-5` only for routine, well-specified edits. The coordinator stays on Opus. Subagents inherit this: an Opus session must not spawn Sonnet subagents (set `model: "opus"` on Agent calls).
 - Run at most one fix worker plus one integrator at a time. Parallel workers on one 3.7 MB file caused rebuild loops.
@@ -35,4 +43,7 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 - Run a test once in the background and wait for its notification. No `sleep`/`grep` polling loops and no scheduled check-ins.
 - Release candidates: build with `reapply.sh` in the RELEASE.md order, split, run tPlay once, deploy. No 22-run matrices.
 - The fixer deploys its own green build with `tools/deploy.sh`. Don't hand off between sessions just to deploy.
+- Every new session pays ~15 min and ~150k tokens just reading the 3.7 MB file. Prefer ONE long-lived owner session (now: art session) with a queue, over new sessions per request.
+- The coordinator itself must stay under ~200k context (Alex runs /compact). It cost $20 at 312k.
+- Deploys by workers work now (v85–v85d self-deployed). If a deploy is refused, commit the split build and message the coordinator, who deploys.
 - The coordinator only routes feedback; it does no technical work and no unfiltered `list_sessions`.

@@ -1,14 +1,10 @@
-# CURRENT STATE (2026-10-05 05:30 UTC); supersedes the older "worker status" sections below
-- Live: v82 (deployed from alex/od-release-82 @46e1879, live commit e13c83b). Alex scored it **2/10**. Worst: giants, too
-  many rings, crashing into buildings on slight turns, buttons unresponsive after portrait→landscape rotation.
-- v83 = v82 + pSC1 pSC2 pSM1-6 pRL3 pRL4 pQA1-3, in out83/ on alex/od-release-82. The integrator
-  (session_01BWg3b7y5ERWBuwkbXmawGq) is finishing the tPlay gate, may deploy it with tools/deploy.sh, then stops.
-- QA (session_01H6za4q8kX1UWQHeQ79qgdu, alex/od-qa) is finishing pQA4 (rotation), then writes QA-HANDOFF.md and stops.
-- **v84 fixer (session_01JiMj65N2sWZJdSFcMZ4x5o, Sonnet, alex/od-v84)** owns everything left: Athens wall hits, giants
-  (every humanoid type), rings, rotation, winnable missions, Athens density, 12 px phone text, the pause button and od-v82fix.
-  It gates on tPlay and deploys itself.
-- The next coordinator should start fresh (this one passed 380k context), read CLAUDE.md and wait for the v84 fixer's
-  5-line report. After the deploy, ask Alex for a 0–10 score and what felt worst.
+# CURRENT STATE (2026-10-05 11:30 UTC); supersedes everything below
+- Live: v85d (brave-carson 7b1a098): clean phone HUD (minimap, speed, one objective line, 5 buttons), soft steering, dark roads, BRAKE/GAS overlap fixed, giant beige walls clamped.
+- **Owner session: Art direction (Opus) session_018zxcXZaWQxSCR3kmdPxWMZ, branch alex/od-art.** It owns the file and deploys. Built and in test: the LEGO 2K look (blue sky with brick clouds, green studded baseplate, asphalt with a yellow line, brick trees, midday light, boost FX, HUD skin) + pCAR1 SPEEDSTER car (alex/od-cars). Queued: cars/traffic sit ON the road (tyre contact, suspension, shadows, dust), boats IN the water (waterline, bob, wake).
+- Done/archived: v85 worker (alex/od-v85, V85-HANDOFF.md), LEGO presets (pLG1, rejected by Alex), cars worker (pCAR1).
+- Open: iPhone landscape buttons in the Claude-app beta not confirmed fixed (no WebKit in cloud); Athens wall hits; mission winnability.
+- Alex's scores: v82 2/10; v83 "horrible, uncontrollable". Ask for a 0–10 score after the art deploy.
+- Read CLAUDE.md lessons 1–14 first.
 
 # STANDING RULES FROM ALEX (read first, never ask about these again)
 - **Deploy is ALWAYS allowed.** When a build passes the gate, the coordinator deploys it to `alex/brave-carson-rbpmlk`
