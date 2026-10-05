@@ -72,8 +72,18 @@ const PAGE_LIB = `(() => {
         const t = document.elementFromPoint(cx, cy);
         if (t && t !== e && !e.contains(t) && !t.contains(e) && !modalCover(t) && !ghost(t)) covered.push(n + ' <- ' + (t.id ? '#' + t.id : t.tagName.toLowerCase() + (t.className && t.className.baseVal === undefined ? '.' + String(t.className).split(' ')[0] : '')));
       }
+      // wordy: any visible text block over 8 words during play (advice cards, tips, coach panels)
+      const wordy = [];
+      for (const e of document.body ? document.body.querySelectorAll('*') : []) {
+        if (/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|SVG|TEXT|TSPAN)$/i.test(e.tagName) || !vis(e) || hidden(e)) continue;
+        if (getComputedStyle(e).display.startsWith('inline')) continue;
+        if (![...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
+        const r = e.getBoundingClientRect(); if (r.bottom < 0 || r.top > H || r.right < 0 || r.left > W) continue;
+        const words = (e.innerText || '').trim().split(/\s+/).filter(w => /[a-z]{2}/i.test(w));
+        if (words.length > 8) wordy.push(words.length + 'w "' + words.slice(0, 6).join(' ') + '…"');
+      }
       const de = document.documentElement;
-      return { covered, off, hscroll: Math.max(de.scrollWidth, document.body ? document.body.scrollWidth : 0) > W + 1, sw: de.scrollWidth, iw: W };
+      return { wordy, covered, off, hscroll: Math.max(de.scrollWidth, document.body ? document.body.scrollWidth : 0) > W + 1, sw: de.scrollWidth, iw: W };
     },
     snap() {
       let h = 0; const s = document.documentElement.outerHTML; h = s.length;
@@ -204,11 +214,12 @@ async function audit(page, st, tag) {
   if (!a) return;
   for (const c of a.covered) st.covered.add(c);
   for (const o of a.off) st.off.add(o);
+  if (tag !== 'start') for (const w of a.wordy || []) st.wordy.add(w);
   if (a.hscroll) st.hscroll.add(tag + ' ' + a.sw + '>' + a.iw);
 }
 
 async function runScenario(browser, slug, sc, deadline) {
-  const st = { moves: 0, unresp: 0, unrespWhat: [], lat: [], covered: new Set(), off: new Set(), hscroll: new Set(), errors: [], stuck: false, noCandidate: false, started: false, notes: [] };
+  const st = { moves: 0, unresp: 0, unrespWhat: [], lat: [], covered: new Set(), off: new Set(), hscroll: new Set(), wordy: new Set(), errors: [], stuck: false, noCandidate: false, started: false, notes: [] };
   const ctx = await browser.newContext({ viewport: { width: sc.start.w, height: sc.start.h }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' });
   const page = await ctx.newPage();
   page.on('pageerror', e => st.errors.push(String(e.message || e).split('\n')[0].slice(0, 120)));
@@ -270,6 +281,7 @@ function verdict(st) {
   if (st.covered.size) r.push('covered: ' + [...st.covered].slice(0, 2).join(', '));
   if (st.off.size) r.push('off-screen: ' + [...st.off].slice(0, 2).join(', '));
   if (st.hscroll.size) r.push('hscroll ' + [...st.hscroll][0]);
+  if (st.wordy.size) r.push('text >8 words: ' + [...st.wordy].slice(0, 2).join(', '));
   if (st.unresp > 1) r.push(st.unresp + ' dead taps');
   if (st.stuck) r.push('stuck 8s');
   if (st.notes.length) r.push(st.notes[0]);
