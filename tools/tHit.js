@@ -1,0 +1,8 @@
+// tHit.js — landscape touch hit-test of every visible button on the menu (iPhone 17 852x393 / Pro Max 956x440, DPR 3)
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const URL=process.argv[2],VW=+(process.argv[3]||852),VH=+(process.argv[4]||393);
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+const ctx=await b.newContext({viewport:{width:VW,height:VH},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(600000);
+await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});await p.waitForTimeout(3000);
+const r=await p.evaluate(()=>{const bad=[],all=[];for(const e of document.querySelectorAll('button,.go,[role=button],.tbtn')){const cs=getComputedStyle(e);if(cs.display==='none'||cs.visibility==='hidden')continue;let h=false;for(let a=e;a;a=a.parentElement)if(a.hidden||getComputedStyle(a).display==='none'){h=true;break}if(h)continue;const r=e.getBoundingClientRect();if(r.width<6||r.height<6)continue;all.push(e.id||e.textContent.trim().slice(0,14));const x=r.left+r.width/2,y=r.top+r.height/2;if(x<0||y<0||x>innerWidth||y>innerHeight){bad.push((e.id||e.textContent.trim().slice(0,14))+' OFFSCREEN '+Math.round(x)+','+Math.round(y));continue}const t=document.elementFromPoint(x,y);if(!(t===e||e.contains(t)||t&&t.closest&&t.closest('button')===e))bad.push((e.id||e.textContent.trim().slice(0,14))+' covered by '+(t&&(t.id||t.className||t.tagName)))}return{vp:[innerWidth,innerHeight],n:all.length,bad}});
+console.log(JSON.stringify(r));await b.close()})();

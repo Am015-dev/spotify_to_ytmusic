@@ -6,7 +6,7 @@ const INIT=`(()=>{const q=[];let t=performance.now();window.__auto=true;window.r
  window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}}return t};
  setInterval(()=>{if(window.__auto)window.__tick(1)},16)})();`;
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
-const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:+(process.env.DSF||1),isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(600000);
+const ctx=await b.newContext({viewport:{width:+(process.env.VW||852),height:+(process.env.VH||393)},deviceScaleFactor:+(process.env.DSF||1),isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(600000);
 const errs=[];p.on('pageerror',e=>errs.push(e.message.slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});
 await p.addInitScript(INIT);const cdp=await ctx.newCDPSession(p);
 const tick=n=>p.evaluate(n=>__tick(n),n);
@@ -31,6 +31,7 @@ try{const q=u.searchParams;
  else if(u.pathname==='/hold'){const k=q.get('k');if(q.get('on')==='0')await up(k);else await down(k,await center(SEL[k]))}
  else if(u.pathname==='/tick')await tick(+q.get('n')||60);
  else if(u.pathname==='/tap')out=String(await tap(q.get('s')));
+ else if(u.pathname==='/vp'){await p.setViewportSize({width:+q.get('w'),height:+q.get('h')});await tick(5)}
  else if(u.pathname==='/errs')out=JSON.stringify(errs);
  else if(u.pathname==='/boot'){await boot()}
 }catch(e){out='ERR '+e.message.slice(0,300)}res.end(out)}).listen(PORT);
