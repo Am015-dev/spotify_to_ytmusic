@@ -142,7 +142,7 @@ AG.monAct=d=>{const m=monById(d.id);if(!m)return;
   if(a==='R'){m.r=(m.r+LEV[m.id].rd+4)%4;stat('levTurn');lg(`${levName(m.id)} turns ${LEV[m.id].rd>0?'clockwise':'anticlockwise'}.`);return}
   moveTo(m,(DIRN[a]+m.r)%4)};
 function moveTo(m,dir){let tx=m.x+DIR[dir][0],ty=m.y+DIR[dir][1];
-  if(!inB(tx,ty)){removeMon(m.id,'off');stat('monOff');lg(`${levName(m.id)} swims off the edge of the chart.`);return}
+  if(!inB(tx,ty)){removeMon(m.id,'off');stat('monOff');lg(`${levName(m.id)} swims off the chart.`);return}
   if(gateAt(G,tx,ty)){[tx,ty]=rollSq(true);stat('gateMon');lg(`${levName(m.id)} is flung through a Rift Gate.`)}
   stat('levMove');lg(`${levName(m.id)} moves ${DNAME[dir]}.`);
   G.arr={id:m.id,k:m.k,x:tx,y:ty,r:m.r,dead:[],move:1};now('arrive',{})}
