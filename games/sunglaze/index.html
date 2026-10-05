@@ -293,6 +293,171 @@ html.ph.ph-l #ph-z[data-mode=wallq] .ph-head{min-height:30px}html.ph.ph-l #ph-z[
 @media (prefers-reduced-motion:reduce){html.ph .ph-o:active{transform:none}}
 /* real usable heights: dialog boxes count their padding/border inside max-height (they overshot the screen by 28 px) */
 html.ph .mbox,html.ph .dlg{box-sizing:border-box}
+html.ph .ph-why{font-size:13px;line-height:1.3;color:#1d4a2a;background:#eef7ee;border:1px solid #9cc7a4;border-radius:8px;padding:4px 7px;flex:0 0 auto}
+html.ph .ph-sun{font-size:13px;line-height:1.3;color:#6b4a10;background:#fff6d8;border:1px solid var(--gold);border-radius:8px;padding:4px 7px;flex:0 0 auto}
+html.ph .ph-teach{font-size:13px;line-height:1.3;color:var(--gx-ink);border-left:3px solid var(--cobalt);padding:2px 7px;flex:0 0 auto}
+html.ph .ph-goal{display:flex;gap:6px;align-items:flex-start;font-size:13px;line-height:1.3;color:var(--mut);flex:0 0 auto}html.ph .ph-goal .ic{width:16px;height:16px;flex:0 0 16px;margin-top:1px}html.ph .ph-goal b{color:var(--gx-ink)}html.ph .ph-goal b.bad{color:#a0302a}
+html.ph .ph-exp{font-size:13px;line-height:1.35;color:var(--gx-ink);flex:0 0 auto;display:flex;flex-direction:column;gap:1px}html.ph .ph-exp .good{color:#2f7d46;font-weight:800}html.ph .ph-exp .bad{color:#a0302a;font-weight:800}
+html.ph.ph-p .ph-o{min-height:46px;flex-direction:row;flex-wrap:wrap;align-items:center;align-content:center;column-gap:6px;row-gap:1px;padding:2px 7px}
+html.ph.ph-p .ph-o .ph-v{flex:1 0 100%}html.ph.ph-p .ph-o .ph-rm{height:16px;align-self:center}html.ph.ph-p .ph-o .ph-r i{margin-left:4px}
+html.ph.ph-p .ph-chips.many ~ .ph-grid .ph-o{min-height:44px}
+html.ph.ph-p .ph-o{justify-content:flex-start;text-align:left}
+html.ph .ph-end .prompt>p.muted{display:none}html.ph .ph-cont.three{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:6px}html.ph .ph-cont.three .ph-go{min-width:0;padding:0 6px}
+html.ph .ph-sl{overflow:auto}html.ph .ph-sl .ph-exp{margin-top:4px}html.ph .ph-sl .ph-teach{font-size:13px;margin-top:2px}
+html.ph .ph-goal .gs{display:none}@media (max-height:640px){html.ph .ph-goal .gl{display:none}html.ph .ph-goal .gs{display:inline}}
+html.ph .ph-coach p{margin:0 0 6px;font-size:14px;line-height:1.35}
+html.ph #ph-card .ph-coach{flex:1 1 auto;min-height:0;overflow:auto}
+.story ul.win{margin:6px 0 10px;padding-left:20px;text-align:left;line-height:1.4}.story ul.win li{margin:2px 0}html.ph .ph-bn{font-size:13px;color:#2f7d46;font-weight:700}
+html.ph .ph-goal .wq .gl,html.ph .ph-goal .wq .gs{display:none}
+html.ph .ph-sum .ph-sl{align-self:stretch;max-height:100%;justify-content:flex-start}
+
+/* story mode */
+.acts .bigb{flex:1 1 130px;min-height:52px;font-size:1.1rem;font-weight:700}
+.btn.story-btn{background:linear-gradient(180deg,#3b66b8,#1c3a78);border-color:#12285a}.btn.story-btn:hover{background:linear-gradient(180deg,#4a76cc,#244a94)}
+.cmp-line{margin:0;font-size:.9rem;color:#5a3a1a}
+.gxc{font-size:16px}
+html body .gxc-htitle{white-space:normal;font-size:16px;line-height:1.1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:clip}
+</style>
+<style>
+/* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
+:root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
+  --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
+  --gxc-font:inherit;--gxc-head:inherit}
+.gxc{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;color:var(--gxc-ink);font-family:var(--gxc-font);
+  background:radial-gradient(120% 70% at 50% 0%,#3a2a1c 0%,var(--gxc-bg) 70%);overflow:hidden;
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.gxc[hidden]{display:none}
+.gxc *{box-sizing:border-box}
+.gxc button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.gxc button:focus-visible{outline:3px solid var(--gxc-gold);outline-offset:2px}
+.gxc-screen{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;width:100%;max-width:560px;margin:0 auto}
+.gxc-map-on .gxc-screen{justify-content:flex-start;padding:0;max-width:640px}
+.gxc-dim{color:var(--gxc-dim)}
+.gxc-small{font-size:13px;margin:6px 0 0;text-align:center}
+.gxc-row{display:flex;gap:8px;justify-content:center;margin-top:14px;width:100%}
+.gxc-row.wrap{flex-wrap:wrap}
+.gxc-btn{min-height:46px;min-width:88px;padding:8px 18px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
+.gxc-btn.go{background:linear-gradient(#dc7a3a,var(--gxc-go));border-color:#8f4317;color:var(--gxc-go-ink);box-shadow:0 3px 0 #7a3712,0 6px 14px rgba(0,0,0,.25);flex:1 1 auto;max-width:220px}
+.gxc-btn.go:active{transform:translateY(2px);box-shadow:0 1px 0 #7a3712}
+.gxc-btn.soft{background:#f7e7b8;border-color:#c9a14a}
+.gxc-btn.ghost{background:rgba(255,255,255,.22)}
+.gxc-ib{min-height:44px;min-width:44px;padding:4px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap}
+.gxc-tag{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
+/* portraits: image or emoji badge in a painted ring */
+.gxc-pt{--gxc-pt:64px;--gxc-ptc:#6b4a2b;width:var(--gxc-pt);height:var(--gxc-pt);flex:0 0 var(--gxc-pt);border-radius:50%;overflow:hidden;display:grid;place-items:center;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.45),transparent 55%),var(--gxc-ptc);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.5),0 6px 16px rgba(0,0,0,.3)}
+.gxc-pt img{width:100%;height:100%;object-fit:cover;display:block}
+.gxc-pt-e{font-size:calc(var(--gxc-pt) * .52);line-height:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+/* ---- map ---- */
+.gxc-head{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;flex:0 0 auto;color:#fbefd6}
+.gxc-htitle{flex:1 1 auto;min-width:0;text-align:center;font-family:var(--gxc-head);font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.gxc-score{color:var(--gxc-gold)}
+.gxc-map{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;
+  background:
+    radial-gradient(60% 40% at 20% 15%,rgba(110,150,80,.28),transparent 70%),
+    radial-gradient(50% 35% at 85% 55%,rgba(200,140,60,.22),transparent 70%),
+    radial-gradient(70% 40% at 30% 92%,rgba(150,60,70,.22),transparent 70%),
+    repeating-radial-gradient(circle at 70% 30%,rgba(120,80,30,.035) 0 2px,transparent 2px 9px),
+    linear-gradient(#f1e3c2,var(--gxc-paper2));box-shadow:inset 0 0 40px rgba(90,55,20,.45)}
+.gxc-path{position:relative;width:100%;margin:0 auto;max-width:560px}
+.gxc-road{position:absolute;left:0;top:0;width:100%;pointer-events:none;overflow:visible}
+.gxc-road path{fill:none;stroke-linecap:round}
+.gxc-road-edge{stroke:rgba(90,58,24,.45);stroke-width:26px}
+.gxc-road-fill{stroke:var(--gxc-road);stroke-width:20px}
+.gxc-road-dash{stroke:#f6e6c2;stroke-width:3px;stroke-dasharray:2 10;opacity:.85}
+.gxc-act{position:absolute;left:12px;right:12px;height:38px;margin-top:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(90deg,transparent,rgba(60,38,14,.82) 15%,rgba(60,38,14,.82) 85%,transparent);color:#fbefd6;z-index:2;text-align:center;line-height:1.1}
+.gxc-act b{font-size:14px;letter-spacing:.04em}
+.gxc-act small{font-size:11.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 18px}
+.gxc-node{position:absolute;transform:translateX(-50%);width:64px;height:64px;padding:0;border:0;background:none;z-index:3;display:flex;flex-direction:column;align-items:center}
+.gxc-disc{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff8ec;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%),var(--gxc-a1);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.55),0 5px 10px rgba(0,0,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.gxc-node.a2 .gxc-disc{background-color:var(--gxc-a2);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%)}
+.gxc-node.a3 .gxc-disc{background-color:var(--gxc-a3);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%)}
+.gxc-node.boss .gxc-disc{width:62px;height:62px;margin-top:-3px;border-color:var(--gxc-gold);box-shadow:0 0 0 2px #6b3c10,0 0 0 6px rgba(242,185,59,.35),0 6px 12px rgba(0,0,0,.35)}
+.gxc-node.boss .gxc-disc .gxc-pt{border:0;box-shadow:none;background:transparent}
+.gxc-node.boss .gxc-disc::after{content:'♛';position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:17px;color:var(--gxc-gold);text-shadow:0 1px 2px #000}
+.gxc-node.locked .gxc-disc{filter:grayscale(.85) brightness(.85);opacity:.75}
+.gxc-lock{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+.gxc-node.won .gxc-disc{border-color:var(--gxc-gold)}
+.gxc-node.next .gxc-disc{animation:gxc-pulse 1.6s ease-in-out infinite}
+@keyframes gxc-pulse{0%,100%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 0 rgba(242,185,59,.7)}50%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 10px rgba(242,185,59,0)}}
+.gxc-node .gxc-stars{position:absolute;top:50px;left:50%;transform:translateX(-50%);gap:0;padding:0 4px;border-radius:99px;background:rgba(60,38,14,.75)}
+.gxc-node .gxc-st{font-size:12px}
+.gxc-lab{position:absolute;left:66px;top:14px;width:max-content;max-width:min(150px,38vw);text-align:left;font-size:13.5px;font-weight:700;line-height:1.15;color:var(--gxc-ink);
+  background:rgba(246,230,194,.88);padding:3px 8px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.gxc-node.lab-l .gxc-lab{left:auto;right:66px;text-align:right}
+.gxc-node.locked .gxc-lab{opacity:.65}
+.gxc-stars{display:inline-flex;gap:2px;justify-content:center}
+.gxc-st{font-style:normal;color:rgba(255,255,255,.35);font-size:16px;line-height:1}
+.gxc-st.on{color:var(--gxc-gold);text-shadow:0 0 6px rgba(242,185,59,.6)}
+.gxc-st.cap{opacity:.3}
+.gxc-stars.big .gxc-st{font-size:44px;color:rgba(60,38,14,.2)}
+.gxc-stars.big .gxc-st.on{color:var(--gxc-gold);text-shadow:0 2px 0 #9c6a12,0 0 14px rgba(242,185,59,.7);animation:gxc-pop .4s cubic-bezier(.3,1.6,.5,1) both}
+.gxc-stars.big .gxc-st.on:nth-child(2){animation-delay:.25s}.gxc-stars.big .gxc-st.on:nth-child(3){animation-delay:.5s}
+@keyframes gxc-pop{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:none;opacity:1}}
+/* sheets and toasts sit over the map */
+.gxc-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:88%;overflow-y:auto;z-index:5;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.5);animation:gxc-up .22s ease-out}
+@keyframes gxc-up{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
+.gxc-sheet h3{margin:0 0 4px;font-family:var(--gxc-head);font-size:21px;line-height:1.15}
+.gxc-sh-top{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.gxc-sh-t{min-width:0}.gxc-sh-t small{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--gxc-dim);font-weight:700}
+.gxc-goal,.gxc-twist{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:12px;margin:6px 0;text-align:left;width:100%;font-size:15px;line-height:1.3}
+.gxc-goal{background:rgba(79,138,75,.16);border:1px solid rgba(79,138,75,.45)}
+.gxc-twist{background:rgba(142,59,70,.12);border:1px solid rgba(142,59,70,.5)}
+.gxc-goal b,.gxc-twist b{font-size:12px;text-transform:uppercase;letter-spacing:.07em}
+.gxc-twist b{color:var(--gxc-a3)}
+.gxc-twist.big{font-size:16px;border-width:2px}
+.gxc-slist{list-style:none;margin:8px 0 0;padding:0;width:100%;text-align:left;font-size:14.5px}
+.gxc-slist li{display:flex;gap:8px;align-items:center;padding:4px 0}
+.gxc-slist i{font-style:normal;font-size:18px;color:rgba(60,38,14,.25)}
+.gxc-slist li.on i{color:var(--gxc-gold);text-shadow:0 1px 0 #9c6a12}
+.gxc-rw{list-style:none;padding:0;margin:8px 0}.gxc-rw li{padding:6px 0;border-bottom:1px solid var(--gxc-line)}
+.gxc-toast{position:absolute;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9;background:rgba(30,20,10,.92);color:#fbefd6;padding:10px 16px;border-radius:12px;font-weight:600;max-width:calc(100% - 32px);text-align:center}
+/* ---- story scene ---- */
+.gxc-scene,.gxc-boss,.gxc-res{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;border-radius:var(--gxc-radius);
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto}
+.gxc-sc-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
+.gxc-sc-who{margin-bottom:8px}
+.gxc-sc-name{font-family:var(--gxc-head);font-weight:800;font-size:18px;min-height:1.2em}
+.gxc-sc-text{font-size:18px;line-height:1.4;margin:10px 0 12px;min-height:3.2em;max-width:30em;cursor:pointer}
+.gxc-sc-text.in{animation:gxc-in .3s ease-out}
+@keyframes gxc-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.gxc-dots{display:flex;gap:6px}.gxc-dots i{width:8px;height:8px;border-radius:50%;background:rgba(60,38,14,.2)}.gxc-dots i.was{background:rgba(60,38,14,.45)}.gxc-dots i.on{background:var(--gxc-go)}
+/* ---- boss card ---- */
+.gxc-boss-on{background:radial-gradient(100% 60% at 50% 30%,#5a2230 0%,#1a0d10 75%)}
+.gxc-boss-on.a1{background:radial-gradient(100% 60% at 50% 30%,#2d5a2c 0%,#0f1a0e 75%)}
+.gxc-boss-on.a2{background:radial-gradient(100% 60% at 50% 30%,#6a4318 0%,#1a120a 75%)}
+.gxc-boss{border:3px solid var(--gxc-gold);position:relative;padding-top:14px}
+.gxc-boss-tag{margin-bottom:10px;background:linear-gradient(#f6c552,#c98d17);color:#3a2205;font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:13px;padding:5px 18px;border-radius:99px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.gxc-boss .gxc-pt{border-color:var(--gxc-gold)}
+.gxc-boss h2{margin:12px 0 2px;font-family:var(--gxc-head);font-size:26px;line-height:1.1}
+.gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
+/* ---- result ---- */
+.gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
+.gxc-res-k{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
+.gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
+.gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
+.gxc-quote b{font-size:13px}.gxc-quote p{margin:2px 0 0;font-style:italic;font-size:15px;line-height:1.3}
+.gxc-unl{width:100%;margin-top:10px;text-align:left;padding:10px 12px;border-radius:12px;border:2px dashed #c9a14a;background:rgba(242,185,59,.14)}
+.gxc-unl>b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.gxc-unl-i{padding:3px 0;font-size:15px}
+/* short phones (375x553): tighter scene, smaller portraits */
+@media (max-height:600px){
+  .gxc-screen{padding:8px 12px}
+  .gxc-scene,.gxc-boss,.gxc-res{padding:14px 12px}
+  .gxc-sc-who .gxc-pt{--gxc-pt:84px!important}
+  .gxc-boss .gxc-pt{--gxc-pt:104px!important}
+  .gxc-boss{padding-top:10px}.gxc-boss-tag{margin-bottom:6px}.gxc-boss h2{font-size:22px;margin-top:8px}
+  .gxc-sc-text{font-size:16.5px;margin:6px 0 8px}
+  .gxc-stars.big .gxc-st{font-size:36px}
+  .gxc-res h2{font-size:23px}
+}
+html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -380,6 +545,767 @@ const GX={key:'gx',open:null,
       d.innerHTML=`<div class="gx-drawer-head"><h2></h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"></div>`;document.body.appendChild(d)}
     d.querySelector('h2').textContent=title;if(bodyEl){const b=d.querySelector('.gx-drawer-body');if(bodyEl.parentNode!==b){b.innerHTML='';b.appendChild(bodyEl)}}return d}};
 
+</script>
+<script>
+// ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
+// A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
+//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   GXC.open()            the chapter map (the title's "Story" button)
+//   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
+//   GXC.finish(G, over)   on game over: store stars, GNS.result({mode:'campaign'}), result screen, outro, back to the map
+//   GXC.scene / bossCard / result      the single screens (Promises), used by the flow and by the demo
+//   GXC.active() · progress() · unlocked() · reset() · close() · validate(data)
+// Progress lives in localStorage['gns-campaign-<game>'] and every access is wrapped in try/catch.
+(function (root) {
+  'use strict';
+  var GXC = {};
+  var doc = root && root.document;
+  var LS = {
+    json: function (k, d) { try { var v = JSON.parse(root.localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+    put: function (k, v) { try { root.localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+    del: function (k) { try { root.localStorage.removeItem(k); } catch (e) { } }
+  };
+  var LEVELS = ['easy', 'normal', 'hard'];
+  var O = null, D = null, P = null, CUR = null, OV = null, BUSY = false;
+
+  // ------------------------------------------------------------------ validation (node-safe)
+  var GOALS = ['win', 'score', 'margin', 'before-round', 'survive', 'mission', 'custom'];
+  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter'];
+  function lineText(l) { return typeof l === 'string' ? l : l && l.text; }
+  GXC.validate = function (data) {
+    var bad = [], add = function (m) { bad.push(m); };
+    if (!data || typeof data !== 'object') return ['no data'];
+    ['game', 'title'].forEach(function (k) { if (!data[k]) add('missing ' + k); });
+    var cast = data.cast || {}, twists = {}, ids = {};
+    (data.twists || []).forEach(function (t) { if (!t.id || !t.how) add('twist without id/how'); twists[t.id] = t; });
+    if (!data.acts || data.acts.length !== 3) add('needs 3 acts');
+    var ch = data.chapters || [];
+    if (ch.length < 9 || ch.length > 10) add('needs 9 or 10 chapters (has ' + ch.length + ')');
+    ch.forEach(function (c, i) {
+      var at = 'chapter ' + (c.id || i) + ': ';
+      if (!c.id) add(at + 'no id'); else if (ids[c.id]) add(at + 'duplicate id'); ids[c.id] = 1;
+      if ([1, 2, 3].indexOf(c.act) < 0) add(at + 'act must be 1-3');
+      if (i && c.act < ch[i - 1].act) add(at + 'acts out of order');
+      if (!c.title) add(at + 'no title');
+      var intro = c.intro || [], outro = c.outro || [];
+      if (intro.length < 2 || intro.length > 4) add(at + 'intro needs 2-4 lines');
+      if (outro.length < 1 || outro.length > 3) add(at + 'outro needs 1-3 lines');
+      intro.concat(outro).forEach(function (l) {
+        var t = lineText(l); if (!t) add(at + 'empty line'); else if (t.length > 110) add(at + 'line over 110 chars: ' + t.slice(0, 30) + '…');
+        if (l && l.who && l.who !== 'opponent' && l.who !== 'narrator' && !cast[l.who]) add(at + 'unknown speaker ' + l.who);
+      });
+      var op = c.opponent || {};
+      ['name', 'personality', 'aiLevel'].forEach(function (k) { if (op[k] == null || op[k] === '') add(at + 'opponent.' + k + ' missing'); });
+      if (c.boss && (!op.taunt || !op.praise)) add(at + 'boss needs taunt and praise');
+      if (!c.goal || GOALS.indexOf(c.goal.type) < 0 || !c.goal.text) add(at + 'goal needs a known type and text');
+      if (!c.stars || c.stars.length !== 3) add(at + 'needs exactly 3 stars');
+      else c.stars.forEach(function (s) { if (!s.text || !s.test) add(at + 'star needs text and test'); });
+      if (c.twist) { if (!twists[c.twist.id]) add(at + 'twist ' + c.twist.id + ' not in the twists menu'); if (!c.twist.text) add(at + 'twist needs text'); }
+      if (c.act === 3 && c.boss && !c.twist) add(at + 'act 3 boss needs a twist');
+      if (c.act === 1 && c.hints !== true) add(at + 'act 1 needs hints:true');
+      if (!c.easier) add(at + 'no easier block');
+      (c.unlock || []).forEach(function (u) { if (UNLOCKS.indexOf(u.type) < 0) add(at + 'unknown unlock type ' + u.type); if (!u.text) add(at + 'unlock needs text'); });
+      if (!c.setup || typeof c.setup !== 'object') add(at + 'setup must be an object');
+    });
+    [1, 2, 3].forEach(function (a) {
+      var inAct = ch.filter(function (c) { return c.act === a; });
+      if (!inAct.length) return add('act ' + a + ' has no chapters');
+      if (!inAct[inAct.length - 1].boss) add('act ' + a + ' must end with a boss');
+      if (inAct[0].boss) add('act ' + a + ' starts with a boss');
+    });
+    try { JSON.parse(JSON.stringify(data)); } catch (e) { add('not JSON-safe'); }
+    return bad;
+  };
+
+  // ------------------------------------------------------------------ progress
+  function key() { return 'gns-campaign-' + (O && O.game || 'game'); }
+  function load() { var p = LS.json(key(), null); if (!p || p.v !== 1) p = { v: 1, ch: {}, unlocked: [], last: null }; p.ch = p.ch || {}; p.unlocked = p.unlocked || []; return p; }
+  function save() { LS.put(key(), P); }
+  function rec(id) { return P.ch[id] || (P.ch[id] = { beaten: false, stars: 0, best: null, tries: 0, losses: 0, easy: false }); }
+  function chapters() { return (D && D.chapters) || []; }
+  function byId(id) { var c = chapters(); for (var i = 0; i < c.length; i++) if (c[i].id === id) return c[i]; return null; }
+  function isOpen(c) {
+    var list = chapters(), i = list.indexOf(c);
+    if (c.requires && c.requires.length) return c.requires.every(function (r) { return P.ch[r] && P.ch[r].beaten; });
+    return i <= 0 || !!(P.ch[list[i - 1].id] && P.ch[list[i - 1].id].beaten);
+  }
+  GXC.progress = function () { return JSON.parse(JSON.stringify(P || load())); };
+  GXC.unlocked = function () {
+    var out = [];
+    chapters().forEach(function (c) { if (P.ch[c.id] && P.ch[c.id].beaten) (c.unlock || []).forEach(function (u) { out.push({ type: u.type, id: u.id, text: u.text, from: c.id }); }); });
+    return out;
+  };
+  GXC.reset = function () { LS.del(key()); P = load(); if (OV) GXC.open(); };
+  GXC.active = function () { return CUR; };
+
+  // effective chapter: the "make it a bit easier" offer drops one AI level and the twist, at most 2 stars
+  function resolve(c, easy) {
+    var d = JSON.parse(JSON.stringify(c));
+    d.easy = !!easy; d.maxStars = 3;
+    if (easy) {
+      var e = c.easier || {}, lv = LEVELS.indexOf(c.opponent.aiLevel);
+      d.opponent.aiLevel = e.aiLevel || (lv > 0 ? LEVELS[lv - 1] : c.opponent.aiLevel);
+      d.twist = 'twist' in e ? e.twist : null;
+      if (e.setup) for (var k in e.setup) d.setup[k] = e.setup[k];
+      if (e.hints != null) d.hints = e.hints; else d.hints = true;
+      d.maxStars = e.maxStars || 2;
+    }
+    return d;
+  }
+  GXC.resolve = resolve;
+
+  // ------------------------------------------------------------------ small DOM helpers
+  function el(tag, cls, txt) { var e = doc.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function btn(cls, txt, on) { var b = el('button', cls, txt); b.type = 'button'; if (on) b.addEventListener('click', on); return b; }
+  function overlay() {
+    if (!OV) {
+      OV = el('div', 'gxc'); OV.setAttribute('role', 'dialog'); OV.setAttribute('aria-modal', 'true');
+      doc.body.appendChild(OV);
+      doc.addEventListener('keydown', function (e) { if (OV && OV.parentNode && e.key === 'Escape') { var x = OV.querySelector('[data-gxc-esc]'); if (x) x.click(); } });
+    }
+    OV.hidden = false;
+    return OV;
+  }
+  function screen(cls) { var o = overlay(); o.innerHTML = ''; o.className = 'gxc ' + (cls || ''); var s = el('div', 'gxc-screen'); o.appendChild(s); return s; }
+  GXC.close = function () { if (OV) { OV.hidden = true; OV.innerHTML = ''; } };
+  function castOf(who, def) {
+    if (who === 'opponent' && def) return { name: def.opponent.name, portrait: def.opponent.portrait, emoji: def.opponent.emoji, color: def.opponent.color };
+    if (who && D && D.cast && D.cast[who]) return D.cast[who];
+    if (def && def.opponent && def.opponent.cast === who) return { name: def.opponent.name, portrait: def.opponent.portrait, emoji: def.opponent.emoji };
+    return { name: who === 'narrator' || !who ? '' : who, emoji: '📜' };
+  }
+  // portrait: the game's own hook first, then <img> from artBase (falls back to the emoji), then the emoji badge
+  function portrait(who, size, def) {
+    var c = castOf(who, def), box = el('div', 'gxc-pt');
+    box.style.setProperty('--gxc-pt', size + 'px');
+    if (c.color) box.style.setProperty('--gxc-ptc', c.color);
+    var emo = function () { box.innerHTML = ''; box.appendChild(el('span', 'gxc-pt-e', c.emoji || (c.name ? c.name.charAt(0) : '?'))); };
+    var got = null;
+    try { if (O && O.portrait) got = O.portrait(who, size, c); } catch (e) { got = null; }
+    if (got && got.nodeType) { box.appendChild(got); return box; }
+    var src = typeof got === 'string' ? got : (O && O.artBase && c.portrait ? O.artBase + c.portrait : null);
+    if (src) { var im = el('img'); im.alt = ''; im.src = src; im.onerror = emo; box.appendChild(im); } else emo();
+    return box;
+  }
+  function starRow(n, max, total) {
+    var r = el('div', 'gxc-stars'); r.setAttribute('aria-label', n + ' of ' + (total || 3) + ' stars');
+    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '★'));
+    return r;
+  }
+  // twist text without its 'Boss rule:' prefix (the label shows it), first letter upper-case
+  function ruleText(t) { t = String(t || '').replace(/^(Boss|Special) rule:\s*/i, ''); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function easierText(def) { return ((def.easier && def.easier.text) || 'the computer plays one level gentler and any special rule is off').replace(/[.\s]+$/, ''); }
+  function toast(t) {
+    var o = overlay(), x = el('div', 'gxc-toast', t); o.appendChild(x);
+    setTimeout(function () { if (x.parentNode) x.parentNode.removeChild(x); }, 2200);
+  }
+
+  // ------------------------------------------------------------------ the chapter map
+  GXC.open = function () {
+    if (!D) return;
+    P = load(); CUR = null;
+    var s = screen('gxc-map-on'), list = chapters();
+    var head = el('div', 'gxc-head');
+    var back = btn('gxc-ib', '‹ Back', function () { GXC.close(); if (O.onExit) O.onExit(); }); back.setAttribute('data-gxc-esc', '');
+    head.appendChild(back);
+    var tt = el('div', 'gxc-htitle'); tt.appendChild(el('b', null, D.title || 'Story')); head.appendChild(tt);
+    var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
+    var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
+    sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
+    s.appendChild(head);
+    var map = el('div', 'gxc-map'), path = el('div', 'gxc-path');
+    map.appendChild(path); s.appendChild(map);
+    // nodes zigzag down a winding road; each act gets a banner and its own tint
+    var X = [50, 78, 50, 22], rows = [], y = 0, ROW = 74, BAN = 46, nextOpen = null;
+    list.forEach(function (c, i) {
+      if (!i || c.act !== list[i - 1].act) {
+        var a = (D.acts || []).filter(function (x) { return x.act === c.act; })[0] || { title: 'Act ' + c.act };
+        rows.push({ banner: a, y: y }); y += BAN;
+      }
+      rows.push({ c: c, y: y, x: X[i % 4] }); y += ROW;
+      if (!nextOpen && isOpen(c) && !(P.ch[c.id] && P.ch[c.id].beaten)) nextOpen = c;
+    });
+    var H = y + 20; path.style.height = H + 'px';
+    var pts = rows.filter(function (r) { return r.c; });
+    // the painted road: an SVG in percent units for x, px for y (viewBox stretched horizontally only)
+    var svgNS = 'http://www.w3.org/2000/svg', svg = doc.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'gxc-road'); svg.setAttribute('viewBox', '0 0 100 ' + H); svg.setAttribute('preserveAspectRatio', 'none');
+    svg.style.height = H + 'px';
+    var d = '';
+    pts.forEach(function (p, i) {
+      var cy = p.y + 30;
+      if (!i) d = 'M' + p.x + ' ' + cy; else { var q = pts[i - 1], qy = q.y + 30, my = (qy + cy) / 2; d += ' C' + q.x + ' ' + my + ' ' + p.x + ' ' + my + ' ' + p.x + ' ' + cy; }
+    });
+    ['gxc-road-edge', 'gxc-road-fill', 'gxc-road-dash'].forEach(function (k) { var pa = doc.createElementNS(svgNS, 'path'); pa.setAttribute('d', d); pa.setAttribute('class', k); pa.setAttribute('vector-effect', 'non-scaling-stroke'); svg.appendChild(pa); });
+    path.appendChild(svg);
+    rows.forEach(function (r) {
+      if (r.banner) {
+        var b = el('div', 'gxc-act'); b.style.top = r.y + 'px';
+        b.appendChild(el('b', null, 'Act ' + (r.banner.act || '') + ' · ' + (r.banner.title || '')));
+        if (r.banner.blurb) b.appendChild(el('small', null, r.banner.blurb));
+        path.appendChild(b); return;
+      }
+      var c = r.c, st = P.ch[c.id] || {}, open = isOpen(c), beaten = !!st.beaten;
+      var n = btn('gxc-node a' + c.act + (c.boss ? ' boss' : '') + (beaten ? ' won' : open ? ' open' : ' locked') + (c === nextOpen ? ' next' : ''), null, function () { sheet(c); });
+      n.style.top = r.y + 'px'; n.style.left = r.x + '%';
+      n.setAttribute('aria-label', 'Chapter ' + (list.indexOf(c) + 1) + ': ' + c.title + (c.boss ? ' (boss)' : '') + (beaten ? ', beaten, ' + (st.stars || 0) + ' stars' : open ? ', open' : ', locked'));
+      var disc = el('span', 'gxc-disc', c.boss ? '' : String(list.indexOf(c) + 1));
+      if (c.boss) disc.appendChild(portrait(c.opponent.cast || 'opponent', 40, c));
+      if (!open) disc.appendChild(el('i', 'gxc-lock', '🔒'));
+      n.appendChild(disc);
+      if (beaten) n.appendChild(starRow(st.stars || 0, null, 3));
+      var lab = el('span', 'gxc-lab', c.title); n.appendChild(lab);
+      if (r.x > 60) n.classList.add('lab-l');
+      path.appendChild(n);
+    });
+    // bring the next open chapter into view
+    if (nextOpen) setTimeout(function () { var t = rows.filter(function (r) { return r.c === nextOpen; })[0]; if (t) map.scrollTop = Math.max(0, t.y - map.clientHeight / 2 + 40); }, 0);
+  };
+
+  function rewards() {
+    var o = overlay(), sh = el('div', 'gxc-sheet'), u = GXC.unlocked();
+    var close = function () { if (sh.parentNode) sh.parentNode.removeChild(sh); };
+    sh.appendChild(el('h3', null, 'Rewards'));
+    if (!u.length) sh.appendChild(el('p', 'gxc-dim', 'Beat chapters to unlock portraits, card backs, titles and new acts.'));
+    var ul = el('ul', 'gxc-rw');
+    u.forEach(function (x) { var li = el('li'); li.appendChild(el('span', 'gxc-tag', x.type)); li.appendChild(el('span', null, x.text)); ul.appendChild(li); });
+    sh.appendChild(ul);
+    var b = btn('gxc-btn', 'Close', close); b.setAttribute('data-gxc-esc', ''); sh.appendChild(b);
+    o.appendChild(sh); b.focus();
+  }
+
+  // the chapter's detail sheet: goal, opponent, stars, Play (and the easier offer after 2 losses)
+  function sheet(c) {
+    var o = overlay(), old = o.querySelector('.gxc-sheet'); if (old) old.parentNode.removeChild(old);
+    if (!isOpen(c)) { var i = chapters().indexOf(c); toast('Beat chapter ' + i + ' first.'); return; }
+    var st = rec(c.id), sh = el('div', 'gxc-sheet a' + c.act);
+    var close = function () { if (sh.parentNode) sh.parentNode.removeChild(sh); };
+    var top = el('div', 'gxc-sh-top');
+    top.appendChild(portrait(c.opponent.cast || 'opponent', 64, c));
+    var t = el('div', 'gxc-sh-t');
+    t.appendChild(el('small', null, 'Act ' + c.act + ' · Chapter ' + (chapters().indexOf(c) + 1) + (c.boss ? ' · Boss' : '')));
+    t.appendChild(el('h3', null, c.title));
+    t.appendChild(el('div', 'gxc-dim', (c.boss ? 'Boss: ' : 'Opponent: ') + c.opponent.name));
+    top.appendChild(t); sh.appendChild(top);
+    var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Goal')); g.appendChild(el('span', null, c.goal.text)); sh.appendChild(g);
+    if (c.twist) { var tw = el('div', 'gxc-twist'); tw.appendChild(el('b', null, c.boss ? 'Boss rule' : 'Special rule')); tw.appendChild(el('span', null, ruleText(c.twist.text))); sh.appendChild(tw); }
+    var sl = el('ul', 'gxc-slist');
+    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
+    sh.appendChild(sl);
+    var row = el('div', 'gxc-row');
+    var x = btn('gxc-btn ghost', 'Close', close); x.setAttribute('data-gxc-esc', ''); row.appendChild(x);
+    if (st.losses >= 2 && !st.beaten) row.appendChild(btn('gxc-btn ghost', 'Make it a bit easier', function () { GXC.play(c.id, { easy: true }); }));
+    var go = btn('gxc-btn go', st.beaten ? 'Play again' : 'Play', function () { GXC.play(c.id); }); row.appendChild(go);
+    sh.appendChild(row);
+    if (st.losses >= 2 && !st.beaten) sh.appendChild(el('p', 'gxc-dim gxc-small', 'Easier: ' + easierText(c) + ' (up to 2 stars).'));
+    o.appendChild(sh); go.focus();
+  }
+
+  // ------------------------------------------------------------------ story scene (2-4 lines, always skippable)
+  GXC.scene = function (lines, opts) {
+    opts = opts || {};
+    return new Promise(function (done) {
+      lines = (lines || []).filter(function (l) { return lineText(l); });
+      if (!lines.length || !doc) return done();
+      var s = screen('gxc-scene-on'), i = 0, def = opts.def;
+      var box = el('div', 'gxc-scene');
+      if (opts.title) box.appendChild(el('div', 'gxc-sc-title', opts.title));
+      var who = el('div', 'gxc-sc-who'), name = el('div', 'gxc-sc-name'), txt = el('p', 'gxc-sc-text');
+      txt.setAttribute('aria-live', 'polite');
+      var dots = el('div', 'gxc-dots');
+      lines.forEach(function () { dots.appendChild(el('i')); });
+      var row = el('div', 'gxc-row');
+      var finish = function () { done(); };
+      var skip = btn('gxc-btn ghost', 'Skip', finish); skip.setAttribute('data-gxc-esc', '');
+      var next = btn('gxc-btn go', 'Next', function () { i++; if (i >= lines.length) finish(); else show(); });
+      row.appendChild(skip); row.appendChild(next);
+      box.appendChild(who); box.appendChild(name); box.appendChild(txt); box.appendChild(dots); box.appendChild(row);
+      s.appendChild(box);
+      txt.addEventListener('click', function () { next.click(); });
+      function show() {
+        var l = lines[i], w = typeof l === 'string' ? (opts.who || 'narrator') : (l.who || 'narrator'), c = castOf(w, def);
+        who.innerHTML = ''; who.appendChild(portrait(w, 112, def));
+        name.textContent = c.name || '';
+        txt.textContent = lineText(l);
+        for (var k = 0; k < dots.children.length; k++) dots.children[k].className = k === i ? 'on' : k < i ? 'was' : '';
+        next.textContent = i === lines.length - 1 ? (opts.last || 'Continue') : 'Next';
+        txt.classList.remove('in'); void txt.offsetWidth; txt.classList.add('in');
+        next.focus();
+      }
+      show();
+    });
+  };
+
+  // ------------------------------------------------------------------ boss intro card
+  GXC.bossCard = function (def) {
+    return new Promise(function (done) {
+      if (!doc) return done(true);
+      var s = screen('gxc-boss-on a' + def.act), op = def.opponent, card = el('div', 'gxc-boss');
+      card.appendChild(el('div', 'gxc-boss-tag', def.boss ? 'Boss' : 'Rival'));
+      card.appendChild(portrait(op.cast || 'opponent', 148, def));
+      card.appendChild(el('h2', null, op.name));
+      card.appendChild(el('p', 'gxc-boss-pers', op.personality));
+      if (def.twist && def.twist.text) {
+        var tw = el('div', 'gxc-twist big');
+        tw.appendChild(el('b', null, def.boss ? 'Boss rule' : 'Special rule'));
+        tw.appendChild(el('span', null, ruleText(def.twist.text)));
+        card.appendChild(tw);
+      }
+      var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Your goal')); g.appendChild(el('span', null, def.goal.text)); card.appendChild(g);
+      var lv = el('div', 'gxc-dim gxc-small', 'Computer: ' + op.aiLevel + (op.aiStyle ? ' · ' + op.aiStyle : '') + (def.easy ? ' · made easier' : ''));
+      card.appendChild(lv);
+      var row = el('div', 'gxc-row');
+      var back = btn('gxc-btn ghost', 'Back', function () { done(false); }); back.setAttribute('data-gxc-esc', '');
+      var go = btn('gxc-btn go', 'Fight', function () { done(true); });
+      row.appendChild(back); row.appendChild(go); card.appendChild(row);
+      s.appendChild(card); go.focus();
+    });
+  };
+
+  // ------------------------------------------------------------------ play a chapter
+  GXC.play = function (id, opt) {
+    if (BUSY) return;
+    var c = byId(id); if (!c || !isOpen(c)) return;
+    BUSY = true;
+    var def = resolve(c, opt && opt.easy);
+    var st = rec(c.id); st.tries++; P.last = c.id; save();
+    GXC.scene(c.intro, { def: def, title: c.title, last: c.boss || def.twist ? 'Meet ' + (c.boss ? 'the boss' : 'your rival') : 'Start' }).then(function () {
+      return c.boss || def.twist ? GXC.bossCard(def) : true;
+    }).then(function (go) {
+      BUSY = false;
+      if (!go) { GXC.open(); return; }
+      CUR = def; GXC.close();
+      try { O.startChapter(def); } catch (e) { CUR = null; GXC.open(); throw e; }
+    }, function () { BUSY = false; });
+  };
+
+  // ------------------------------------------------------------------ stars and game over
+  function testOne(t, m) {
+    if (!t || !m) return false;
+    var v = m[t.k], op = t.op || (t.v == null ? 'truthy' : '>=');
+    switch (op) {
+      case '>=': return v >= t.v; case '>': return v > t.v; case '<=': return v <= t.v; case '<': return v < t.v;
+      case '==': case '=': return v === t.v; case '!=': return v !== t.v; default: return !!v;
+    }
+  }
+  GXC.testStar = testOne;
+  function countStars(G, def, won) {
+    if (!won) return 0;
+    var n = 0;
+    if (O.starsEarned) { try { n = O.starsEarned(G, def) | 0; } catch (e) { n = 1; } }
+    else {
+      var m = {}; try { m = O.metrics ? O.metrics(G) || {} : {}; } catch (e) { }
+      if (m.won == null) m.won = won;
+      n = 1; // the first star is the chapter's goal, already met by winning
+      for (var i = 1; i < def.stars.length; i++) if (testOne(def.stars[i].test, m)) n++;
+    }
+    return Math.max(1, Math.min(n, def.maxStars || 3, 3));
+  }
+
+  // over: optional {won, stars} to override the game's callbacks (e.g. a resign counts as a loss)
+  GXC.finish = function (G, over) {
+    var def = CUR; if (!def) return Promise.resolve(null);
+    over = over || {};
+    var won = over.won != null ? !!over.won : (function () { try { return !!O.isWon(G, def); } catch (e) { return false; } })();
+    var stars = over.stars != null ? Math.min(over.stars, def.maxStars || 3) : countStars(G, def, won);
+    var st = rec(def.id), first = won && !st.beaten;
+    if (won) { st.beaten = true; st.stars = Math.max(st.stars || 0, stars); if (def.easy) st.easy = true; st.losses = 0; }
+    else st.losses = (st.losses || 0) + 1;
+    var unl = first ? (byId(def.id).unlock || []) : [];
+    unl.forEach(function (u) { var k = u.type + ':' + (u.id || u.text); if (P.unlocked.indexOf(k) < 0) P.unlocked.push(k); });
+    var list = chapters(), i = list.indexOf(byId(def.id)), nxt = list[i + 1];
+    if (first && nxt && nxt.act !== def.act) unl = unl.concat([{ type: 'act', text: 'Act ' + nxt.act + ' opens' }]);
+    save();
+    if (root.GNS && root.GNS.result) {
+      try {
+        root.GNS.result({ game: O.game, mode: 'campaign', level: def.opponent.aiLevel, won: won, winner: won ? 0 : 1,
+          seats: O.seats ? O.seats(G) : [{ name: 'You', me: true }, { name: def.opponent.name, ai: def.opponent.aiLevel }],
+          scores: O.scores ? O.scores(G) : null, turns: over.turns || 0, ms: over.ms || 0,
+          extra: { chapter: def.id, stars: won ? stars : 0, easy: !!def.easy, boss: !!def.boss } });
+      } catch (e) { }
+    }
+    CUR = null;
+    var res = { won: won, stars: won ? stars : 0, def: def, unlocks: unl, losses: st.losses, best: st.stars, first: first };
+    return GXC.result(res).then(function (pick) {
+      if (pick === 'retry') { GXC.play(def.id); return res; }
+      if (pick === 'easier') { GXC.play(def.id, { easy: true }); return res; }
+      if (pick === 'next' && nxt) { GXC.play(nxt.id); return res; }
+      return (won ? GXC.scene(def.outro, { def: def, title: def.title, last: 'Back to the map' }) : Promise.resolve()).then(function () { GXC.open(); return res; });
+    });
+  };
+
+  // result screen: stars, the boss's taunt or praise, unlocks, and the easier offer after 2 losses
+  GXC.result = function (r) {
+    return new Promise(function (done) {
+      if (!doc) return done('map');
+      var def = r.def, s = screen('gxc-res-on ' + (r.won ? 'won' : 'lost')), box = el('div', 'gxc-res');
+      box.appendChild(el('div', 'gxc-res-k', def.title));
+      box.appendChild(el('h2', null, r.won ? (def.boss ? 'Boss defeated!' : 'Chapter won!') : (def.goal.type === 'mission' || def.goal.type === 'survive' ? 'Mission failed' : 'Not this time')));
+      var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
+      if (r.won && def.easy) box.appendChild(el('div', 'gxc-dim gxc-small', 'Easier mode: up to ' + def.maxStars + ' stars. Play it normally for 3.'));
+      var sl = el('ul', 'gxc-slist');
+      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
+      box.appendChild(sl);
+      var op = def.opponent, line = r.won ? op.praise : op.taunt;
+      if (line) {
+        var q = el('div', 'gxc-quote');
+        q.appendChild(portrait(op.cast || 'opponent', 52, def));
+        var qt = el('div'); qt.appendChild(el('b', null, op.name)); qt.appendChild(el('p', null, '“' + line + '”')); q.appendChild(qt);
+        box.appendChild(q);
+      }
+      if (r.unlocks && r.unlocks.length) {
+        var ul = el('div', 'gxc-unl'); ul.appendChild(el('b', null, 'Unlocked'));
+        r.unlocks.forEach(function (u) { var x = el('div', 'gxc-unl-i'); x.appendChild(el('span', 'gxc-tag', u.type)); x.appendChild(el('span', null, u.text)); ul.appendChild(x); });
+        box.appendChild(ul);
+      }
+      var row = el('div', 'gxc-row wrap');
+      var m = btn('gxc-btn ghost', 'Map', function () { done('map'); }); m.setAttribute('data-gxc-esc', ''); row.appendChild(m);
+      row.appendChild(btn('gxc-btn ' + (r.won ? 'ghost' : 'go'), r.won ? 'Replay' : 'Try again', function () { done('retry'); }));
+      if (!r.won && r.losses >= 2) row.appendChild(btn('gxc-btn soft', 'Make it a bit easier', function () { done('easier'); }));
+      if (r.won) row.appendChild(btn('gxc-btn go', 'Continue', function () { done('continue'); }));
+      box.appendChild(row);
+      if (!r.won && r.losses >= 2) box.appendChild(el('p', 'gxc-dim gxc-small', 'Easier: ' + easierText(def) + ' (up to 2 stars).'));
+      s.appendChild(box);
+      var f = row.querySelector('.go') || m; f.focus();
+    });
+  };
+
+  // ------------------------------------------------------------------ init
+  GXC.init = function (opts) {
+    O = opts || {}; D = O.data || null; P = load();
+    if (!O.startChapter) O.startChapter = function () { };
+    if (!O.isWon) O.isWon = function () { return false; };
+    return GXC;
+  };
+  GXC.data = function () { return D; };
+
+  if (root && root.document) root.GXC = GXC;
+  if (typeof module !== 'undefined' && module.exports) module.exports = GXC;
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+window.CAMPAIGN={
+  "game": "sunglaze",
+  "title": "The Sun Palace Mosaics",
+  "version": 1,
+  "cast": {
+    "guide":   { "name": "Mother Ochre", "portrait": "camp-ochre.webp", "emoji": "🧓", "color": "#c27a3a" },
+    "tamsin":  { "name": "Tamsin Reed", "portrait": "camp-tamsin.webp", "emoji": "🧑‍🎨", "color": "#6f8f2e" },
+    "bram":    { "name": "Bram Kettle", "portrait": "camp-bram.webp", "emoji": "🔥", "color": "#b5451b" },
+    "saffra":  { "name": "Saffra Vell, Keeper of the Courtyard", "portrait": "camp-saffra.webp", "emoji": "☀️", "color": "#f0b429" },
+    "cobb":    { "name": "Cobb the Sorter", "portrait": "camp-cobb.webp", "emoji": "📦", "color": "#8a6d4b" },
+    "iris":    { "name": "Iris Prismwright", "portrait": "camp-iris.webp", "emoji": "💎", "color": "#7b5bc4" },
+    "garnet":  { "name": "Master Garnet Hale", "portrait": "camp-garnet.webp", "emoji": "🏺", "color": "#c2362f" },
+    "nell":    { "name": "Nell Frost", "portrait": "camp-nell.webp", "emoji": "❄️", "color": "#1d6f84" },
+    "twins":   { "name": "The Lumen Twins", "portrait": "camp-twins.webp", "emoji": "👯", "color": "#3d5bb8" },
+    "vesper":  { "name": "Vesper Ash", "portrait": "camp-vesper.webp", "emoji": "🌒", "color": "#5a5f6b" },
+    "umbra":   { "name": "Lady Umbra of the Black Kiln", "portrait": "camp-umbra.webp", "emoji": "🖤", "color": "#23252b" }
+  },
+  "acts": [
+    { "act": 1, "title": "Wet Clay", "blurb": "An apprentice at the town atelier. Learn the kilns, the racks and the mosaic." },
+    { "act": 2, "title": "The Guild Kilns", "blurb": "Glaziers of the guild test you: columns, prism tiles and a master's head start." },
+    { "act": 3, "title": "The Sun Palace", "blurb": "The palace mosaic goes to the best glazier alive. The Black Kiln wants it too." }
+  ],
+  "twists": [
+    { "id": "boss-sun", "where": "setup", "how": "After newGame(), set G.first and G.cur to the boss seat so the boss holds the Sun token and makes the first take of round 1." },
+    { "id": "boss-head-start", "where": "setup", "how": "After newGame(), set the boss seat's score to param (P(boss).score = param) before the first take; the param is shown on the boss card." },
+    { "id": "boss-glazed-start", "where": "setup", "how": "After newGame(), for rows 1..param pull one Cobalt tile out of G.bag and set it on the boss mosaic at wall[r][WALLCOL(0,r)] (the Cobalt diagonal, legal on both mosaics)." },
+    { "id": "boss-column-bonus", "where": "scoring", "how": "In finish(), right after endBonus(), add param extra points to the boss for each complete mosaic column, logged as its own 'Boss rule' line." },
+    { "id": "boss-deep-sight", "where": "ai", "how": "While the chapter runs, set LVL.hard.roll = param and LVL.hard.K = 14 so the boss rolls out more futures per take, and restore {K:10, roll:2} on exit." }
+  ],
+  "chapters": [
+    {
+      "id": "c1", "act": 1, "title": "The First Kiln",
+      "boss": false,
+      "intro": [
+        { "who": "guide", "text": "Welcome to the atelier, apprentice. Five kilns, five glazes, one mosaic each." },
+        { "who": "guide", "text": "On your turn, take every tile of ONE glaze from one kiln. The rest slides to the courtyard." },
+        { "who": "tamsin", "text": "I'm new too! Let's just fill some racks and see what happens." }
+      ],
+      "outro": [
+        { "who": "guide", "text": "Every full rack set one tile on your mosaic. That is the whole heartbeat of the craft." }
+      ],
+      "opponent": { "name": "Tamsin Reed", "portrait": "camp-tamsin.webp", "emoji": "🧑‍🎨", "cast": "tamsin",
+        "personality": "Cheerful fellow apprentice who grabs the biggest pile she sees and often slips.",
+        "aiLevel": "easy", "aiStyle": "greedy" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": true,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 15 or more", "test": { "k": "score", "op": ">=", "v": 15 } },
+        { "text": "Lose 6 or fewer points to breakage", "test": { "k": "breakage", "op": "<=", "v": 6 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Tamsin slows down; the coach suggests every take." },
+      "unlock": [ { "type": "portrait", "id": "tamsin", "text": "Tamsin's portrait" } ]
+    },
+    {
+      "id": "c2", "act": 1, "title": "Side by Side",
+      "boss": false,
+      "intro": [
+        { "who": "guide", "text": "A lone tile on the mosaic scores 1. A tile touching others scores the whole line it joins." },
+        { "who": "guide", "text": "Build your tiles next to each other, in rows and down columns." },
+        { "who": "bram", "text": "I stoke the kilns all day. Scoring? I just set tiles wherever they land." }
+      ],
+      "outro": [
+        { "who": "guide", "text": "See how the points grew as your tiles joined up? Neighbours pay." }
+      ],
+      "opponent": { "name": "Bram Kettle", "portrait": "camp-bram.webp", "emoji": "🔥", "cast": "bram",
+        "personality": "Big-handed kiln stoker; takes the largest pile and ignores where it goes.",
+        "aiLevel": "easy", "aiStyle": "greedy" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "score", "value": 20, "text": "Win with at least 20 points." },
+      "hints": true,
+      "stars": [
+        { "text": "Win with at least 20 points", "test": { "k": "score", "op": ">=", "v": 20 } },
+        { "text": "Score 30 or more", "test": { "k": "score", "op": ">=", "v": 30 } },
+        { "text": "Win by 8 or more", "test": { "k": "margin", "op": ">=", "v": 8 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Bram plays gently and the coach points out the best space." },
+      "unlock": [ { "type": "portrait", "id": "bram", "text": "Bram's portrait" } ]
+    },
+    {
+      "id": "c3", "act": 1, "title": "The Courtyard Keeper",
+      "boss": true,
+      "intro": [
+        { "who": "guide", "text": "Tiles that do not fit your racks fall to the breakage line, and each one costs points." },
+        { "who": "saffra", "text": "The Sun token is mine, child. I start every round, and you clean up my leftovers." },
+        { "who": "guide", "text": "Take only what fits. A small take is often better than a big spill." }
+      ],
+      "outro": [
+        { "who": "saffra", "text": "Hm. You waste nothing. The guild will want to see you." },
+        { "who": "guide", "text": "Pack your brushes. The guild kilns are next." }
+      ],
+      "opponent": { "name": "Saffra Vell", "portrait": "camp-saffra.webp", "emoji": "☀️", "cast": "saffra",
+        "personality": "Proud keeper of the courtyard; loves the Sun token and the first pick.",
+        "aiLevel": "easy", "aiStyle": "greedy",
+        "taunt": "The courtyard always favours the one who holds the sun.",
+        "praise": "Fine. Keep the courtyard tidy for me, glazier." },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": { "id": "boss-sun", "param": null, "text": "Boss rule: Saffra holds the Sun token and makes the first take of round 1." },
+      "goal": { "type": "custom", "value": 8, "text": "Win, losing no more than 8 points to breakage." },
+      "hints": true,
+      "stars": [
+        { "text": "Win with 8 or fewer breakage points", "test": { "k": "breakage", "op": "<=", "v": 8 } },
+        { "text": "Score 25 or more", "test": { "k": "score", "op": ">=", "v": 25 } },
+        { "text": "Lose 3 or fewer points to breakage", "test": { "k": "breakage", "op": "<=", "v": 3 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "The boss rule is off: the Sun token starts at random." },
+      "unlock": [
+        { "type": "portrait", "id": "saffra", "text": "Saffra's portrait" },
+        { "type": "act", "id": "2", "text": "Act 2: The Guild Kilns" }
+      ]
+    },
+    {
+      "id": "c4", "act": 2, "title": "Columns of the Guild",
+      "boss": false,
+      "intro": [
+        { "who": "cobb", "text": "Guild rules, apprentice: a full column at the end is worth 7. A row only 2." },
+        { "who": "guide", "text": "The game ends when someone finishes a row. Build down, not across, if you can." },
+        { "who": "cobb", "text": "I sort tiles all day. I also keep an eye on what YOU need." }
+      ],
+      "outro": [
+        { "who": "cobb", "text": "Seven for a column. You were listening." }
+      ],
+      "opponent": { "name": "Cobb the Sorter", "portrait": "camp-cobb.webp", "emoji": "📦", "cast": "cobb",
+        "personality": "Careful guild sorter; weighs his gain against what he leaves you.",
+        "aiLevel": "normal", "aiStyle": "denying" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Complete at least 1 mosaic column", "test": { "k": "cols", "op": ">=", "v": 1 } },
+        { "text": "Score 35 or more", "test": { "k": "score", "op": ">=", "v": 35 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Cobb stops watching your racks." },
+      "unlock": [
+        { "type": "portrait", "id": "cobb", "text": "Cobb's portrait" },
+        { "type": "cardback", "id": "guild-seal", "text": "Guild seal tile backs" }
+      ]
+    },
+    {
+      "id": "c5", "act": 2, "title": "The Prismwright",
+      "boss": false,
+      "intro": [
+        { "who": "iris", "text": "Prism tiles are wild: they join any glaze on a rack. I already set one on my mosaic." },
+        { "who": "guide", "text": "Take prisms with a glaze to finish a rack early. But a prism never counts for a full glaze." }
+      ],
+      "outro": [
+        { "who": "iris", "text": "You bend the light better than I thought. Take this prism as a keepsake." }
+      ],
+      "opponent": { "name": "Iris Prismwright", "portrait": "camp-iris.webp", "emoji": "💎", "cast": "iris",
+        "personality": "Dreamy glass artist; hoards prisms and finishes racks in one go.",
+        "aiLevel": "normal", "aiStyle": "denying" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": true } },
+      "twist": { "id": "boss-glazed-start", "param": 1, "text": "Rival rule: Iris starts with one Cobalt tile already set in mosaic row 1." },
+      "goal": { "type": "score", "value": 30, "text": "Win with at least 30 points." },
+      "hints": false,
+      "stars": [
+        { "text": "Win with at least 30 points", "test": { "k": "score", "op": ">=", "v": 30 } },
+        { "text": "Win by 5 or more", "test": { "k": "margin", "op": ">=", "v": 5 } },
+        { "text": "Lose 4 or fewer points to breakage", "test": { "k": "breakage", "op": "<=", "v": 4 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Iris plays gently and starts with an empty mosaic." },
+      "unlock": [
+        { "type": "portrait", "id": "iris", "text": "Iris's portrait" },
+        { "type": "table", "id": "prism-light", "text": "Prism-light table" }
+      ]
+    },
+    {
+      "id": "c6", "act": 2, "title": "The Master's Head Start",
+      "boss": true,
+      "intro": [
+        { "who": "garnet", "text": "I have glazed for forty summers. I will give you a contest, not a lesson." },
+        { "who": "garnet", "text": "And I begin with points in hand. The guild calls it respect." },
+        { "who": "guide", "text": "Then out-build him. Columns and full glazes pay at the end; he can't hold them all." }
+      ],
+      "outro": [
+        { "who": "garnet", "text": "Forty summers, and an apprentice beats me fairly. The palace needs you." },
+        { "who": "guide", "text": "A letter came, sealed in black. Someone else wants the Sun Palace mosaic." }
+      ],
+      "opponent": { "name": "Master Garnet Hale", "portrait": "camp-garnet.webp", "emoji": "🏺", "cast": "garnet",
+        "personality": "Stern guild master; never wastes a tile and starves your best racks.",
+        "aiLevel": "normal", "aiStyle": "denying",
+        "taunt": "Respect the head start, apprentice. Forty summers are hard to catch.",
+        "praise": "You caught me. Take my seal to the palace gates." },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": { "id": "boss-head-start", "param": 6, "text": "Boss rule: Master Garnet starts the game with 6 points." },
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 45 or more", "test": { "k": "score", "op": ">=", "v": 45 } },
+        { "text": "Earn a full glaze bonus (all 5 of one colour)", "test": { "k": "colours", "op": ">=", "v": 1 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Garnet plays gently and starts at 0 points." },
+      "unlock": [
+        { "type": "portrait", "id": "garnet", "text": "Master Garnet's portrait" },
+        { "type": "title", "id": "journeyman", "text": "Title: Guild Glazier" },
+        { "type": "act", "id": "3", "text": "Act 3: The Sun Palace" }
+      ]
+    },
+    {
+      "id": "c7", "act": 3, "title": "Frost at the Gate",
+      "boss": false,
+      "intro": [
+        { "who": "nell", "text": "The palace gate is mine to guard. Only glaziers who think ahead get through." },
+        { "who": "guide", "text": "Nell reads several turns ahead. Watch what your take leaves in the courtyard." }
+      ],
+      "outro": [
+        { "who": "nell", "text": "Clean work. The gate is open; mind the halls." }
+      ],
+      "opponent": { "name": "Nell Frost", "portrait": "camp-nell.webp", "emoji": "❄️", "cast": "nell",
+        "personality": "Cool, patient gatekeeper; plays out the rest of the round before every take.",
+        "aiLevel": "hard", "aiStyle": "lookahead" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 50 or more", "test": { "k": "score", "op": ">=", "v": 50 } },
+        { "text": "Win by 5 or more", "test": { "k": "margin", "op": ">=", "v": 5 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Nell looks only one take ahead." },
+      "unlock": [ { "type": "portrait", "id": "nell", "text": "Nell's portrait" } ]
+    },
+    {
+      "id": "c8", "act": 3, "title": "Hall of Two Lights",
+      "boss": false,
+      "intro": [
+        { "who": "twins", "text": "Two of us, one of you. Three mosaics, seven kilns, and the courtyard fills fast." },
+        { "who": "guide", "text": "With three at the table, the tile you skip may never come back. Plan for it." }
+      ],
+      "outro": [
+        { "who": "twins", "text": "Both of us beaten! We'll tell the halls about you." }
+      ],
+      "opponent": { "name": "The Lumen Twins", "portrait": "camp-twins.webp", "emoji": "👯", "cast": "twins",
+        "personality": "Two playful lamp-lighters who each chase their own mosaic, hard and fast.",
+        "aiLevel": "hard", "aiStyle": "lookahead" },
+      "setup": { "np": 3, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the 3-player game (beat both twins)." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 45 or more", "test": { "k": "score", "op": ">=", "v": 45 } },
+        { "text": "Complete 2 or more mosaic columns", "test": { "k": "cols", "op": ">=", "v": 2 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "np": 2 }, "maxStars": 2, "text": "Only one twin plays, at normal strength." },
+      "unlock": [
+        { "type": "portrait", "id": "twins", "text": "The Lumen Twins' portrait" },
+        { "type": "cardback", "id": "lamplight", "text": "Lamplight tile backs" }
+      ]
+    },
+    {
+      "id": "c9", "act": 3, "title": "The Unmarked Wall",
+      "boss": false,
+      "intro": [
+        { "who": "vesper", "text": "This wall has no painted colours. You choose each space, so no glaze repeats in a row or column." },
+        { "who": "vesper", "text": "And my columns are blessed by the Black Kiln. Each one pays me extra." },
+        { "who": "guide", "text": "Vesper serves Lady Umbra. Finish the game before his columns fill." }
+      ],
+      "outro": [
+        { "who": "vesper", "text": "My lady will not be pleased. She waits in the throne hall." }
+      ],
+      "opponent": { "name": "Vesper Ash", "portrait": "camp-vesper.webp", "emoji": "🌒", "cast": "vesper",
+        "personality": "Quiet, precise servant of the Black Kiln; builds columns and nothing else.",
+        "aiLevel": "hard", "aiStyle": "lookahead" },
+      "setup": { "np": 2, "ex": { "gray": true, "prism": false } },
+      "twist": { "id": "boss-column-bonus", "param": 3, "text": "Rival rule: Vesper scores 3 extra points for each complete column at the end." },
+      "goal": { "type": "win", "value": null, "text": "Win on the unmarked mosaic." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Win in 6 rounds or fewer", "test": { "k": "rounds", "op": "<=", "v": 6 } },
+        { "text": "Score 45 or more", "test": { "k": "score", "op": ">=", "v": 45 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Vesper plays at normal strength with no column blessing." },
+      "unlock": [
+        { "type": "portrait", "id": "vesper", "text": "Vesper's portrait" },
+        { "type": "table", "id": "unmarked-slate", "text": "Unmarked slate table" }
+      ]
+    },
+    {
+      "id": "c10", "act": 3, "title": "The Black Kiln",
+      "boss": true,
+      "intro": [
+        { "who": "umbra", "text": "The Sun Palace mosaic will be glazed in black. My kiln sees every future." },
+        { "who": "umbra", "text": "I play each take out to the end of the round, again and again. You only guess." },
+        { "who": "guide", "text": "She weighs every pile. Give her none worth taking, and keep your breakage clean." }
+      ],
+      "outro": [
+        { "who": "umbra", "text": "The sun... in my own kiln. Very well. Glaze your palace." },
+        { "who": "guide", "text": "The mosaic is yours, master glazier. The whole town will see it at noon." }
+      ],
+      "opponent": { "name": "Lady Umbra", "portrait": "camp-umbra.webp", "emoji": "🖤", "cast": "umbra",
+        "personality": "Cold mistress of the Black Kiln; deepest look-ahead, denies your best glaze.",
+        "aiLevel": "hard", "aiStyle": "lookahead",
+        "taunt": "Black glaze sets forever. Come back when you can see further.",
+        "praise": "You out-saw the Black Kiln. The palace is yours, Sun Glazier." },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": { "id": "boss-deep-sight", "param": 4, "text": "Boss rule: Lady Umbra studies twice as many futures before every take." },
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 60 or more", "test": { "k": "score", "op": ">=", "v": 60 } },
+        { "text": "Win by 10 or more", "test": { "k": "margin", "op": ">=", "v": 10 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Lady Umbra plays at normal strength and her deep sight is off." },
+      "unlock": [
+        { "type": "portrait", "id": "umbra", "text": "Lady Umbra's portrait" },
+        { "type": "title", "id": "sun-glazier", "text": "Title: Sun Glazier" },
+        { "type": "table", "id": "sun-palace", "text": "Sun Palace table" }
+      ]
+    }
+  ]
+};
 </script>
 <script>
 // ---------- PerfHUD: one speed tool for every game on the shelf ----------
@@ -579,6 +1505,7 @@ const GX={key:'gx',open:null,
  *   GA.loop(name, {vol, fade}) / GA.stopLoop(name, {fade})         ambience beds
  *   GA.music(name|null, {vol, fade})                                 cross-fading background track
  *   GA.setSfx(on) GA.setMusic(on) GA.setVolume('sfx'|'music', 0..1)  persisted in localStorage
+ *   GA.setVolume('master', 0..1)  one level over everything (the shared settings panel sets it; default 1)
  *   GA.has(name) GA.playing() GA.state() GA.unlock() GA.names() GA.duration(name)
  * Samples are decoded lazily on the first user gesture (atob -> ArrayBuffer -> decodeAudioData, no fetch).
  */
@@ -588,7 +1515,7 @@ const GX={key:'gx',open:null,
   var S = {
     inited: false, key: 'ga', src: {}, kind: {}, buf: {}, failed: {}, pending: {},
     ctx: null, ctxOpt: null, out: null, sfxBus: null, musBus: null, duckBus: null,
-    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, last: {}, loops: {},
+    sfxOn: true, musOn: true, sfxVol: 0.8, musVol: 0.5, masterVol: 1, last: {}, loops: {},
     cur: null, curName: null, wantMusic: null, duckSet: {}, duckUntil: 0, unlocked: false, decoding: false
   };
   var DEFAULT_DUCK = ['win', 'lose', 'levelup', 'level', 'boom', 'ko', 'thunder', 'roar', 'smash', 'stomp', 'door', 'death', 'crit', 'crumble'];
@@ -633,6 +1560,7 @@ const GX={key:'gx',open:null,
     var t = S.ctx.currentTime;
     S.sfxBus.gain.setTargetAtTime(S.sfxOn ? S.sfxVol : 0, t, 0.02);
     S.musBus.gain.setTargetAtTime(S.musOn ? S.musVol : 0, t, 0.08);
+    S.out.gain.setTargetAtTime(S.masterVol, t, 0.02);
   }
 
   // Loops: skip encoder padding / near-silence at the edges so MP3 loops don't gap.
@@ -708,6 +1636,7 @@ const GX={key:'gx',open:null,
     S.sfxOn = lsGet('sfx', '1') !== '0'; S.musOn = lsGet('mus', '1') !== '0';
     S.sfxVol = clamp(lsGet('sfxvol', o.sfxVol != null ? o.sfxVol : 0.8), 0, 1);
     S.musVol = clamp(lsGet('musvol', o.musVol != null ? o.musVol : 0.5), 0, 1);
+    S.masterVol = clamp(lsGet('mastervol', 1), 0, 1);
     if (!S.inited && root.document && root.document.addEventListener) {
       ['pointerdown', 'keydown', 'touchstart', 'mousedown'].forEach(function (ev) {
         root.document.addEventListener(ev, onGesture, { capture: true, passive: true });
@@ -819,11 +1748,11 @@ const GX={key:'gx',open:null,
   }
   function setVolume(kind, v) {
     v = clamp(v, 0, 1);
-    if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
+    if (kind === 'master') { S.masterVol = v; lsSet('mastervol', v); } else if (kind === 'music') { S.musVol = v; lsSet('musvol', v); } else { S.sfxVol = v; lsSet('sfxvol', v); }
     applyVol(); return v;
   }
   function state() {
-    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, audio: !!S.ctx,
+    return { sfx: S.sfxOn, music: S.musOn, sfxVol: S.sfxVol, musVol: S.musVol, masterVol: S.masterVol, audio: !!S.ctx,
       ctxState: S.ctx ? S.ctx.state : 'none', decoded: Object.keys(S.buf).length, failed: Object.keys(S.failed),
       total: Object.keys(S.src).length, playing: S.curName, loops: Object.keys(S.loops) };
   }
@@ -1092,6 +2021,8 @@ function doTake(m,seat){const p=P(seat);const info=applyTake(G,seat,m);G.turn++;
 function wallCells(p,r){const L=p.lines[r];const lc=lineColour(L);const o=[];
   if(!G.ex.gray){if(lc>=0){const c=WALLCOL(lc,r);if(p.wall[r][c]<0)o.push(c)}else for(let c=0;c<5;c++)if(p.wall[r][c]<0)o.push(c);return o}
   for(let c=0;c<5;c++){if(p.wall[r][c]>=0)continue;if(lc>=0&&(rowHas(p,r,lc)||p.wall.some(row=>eff(row[c])===lc)))continue;o.push(c)}return o}
+// the row and column lines a set tile joins, for explaining its points
+function runsAt(w,r,c){let h=1,v=1;for(let x=c-1;x>=0&&w[r][x]>=0;x--)h++;for(let x=c+1;x<5&&w[r][x]>=0;x++)h++;for(let y=r-1;y>=0&&w[y][c]>=0;y--)v++;for(let y=r+1;y<5&&w[y][c]>=0;y++)v++;return [h,v]}
 function adjPts(wall,r,c){let h=1,v=1;for(let x=c-1;x>=0&&wall[r][x]>=0;x--)h++;for(let x=c+1;x<5&&wall[r][x]>=0;x++)h++;for(let y=r-1;y>=0&&wall[y][c]>=0;y--)v++;for(let y=r+1;y<5&&wall[y][c]>=0;y++)v++;
   if(h===1&&v===1)return 1;return (h>1?h:0)+(v>1?v:0)}
 function beginWall(){G.phase='wall';const order=[];for(let k=0;k<G.np;k++)order.push((G.first+k)%G.np);G.wt={order,k:0,r:0,q:null};G.rsum=G.pl.map(()=>({place:0,floor:0,n:0}));lg('— The offer is empty: tiles move to the mosaics. —','round');fx('wallphase');runWall()}
@@ -1107,9 +2038,9 @@ function lineToFloor(p,r){const L=p.lines[r];p.lines[r]=[];const info={fl:0,lid:
 function placeWall(p,r,c){const L=p.lines[r];const lc=lineColour(L);const k=L.indexOf(PRISM);let v;
   if(k>=0){L.splice(k,1);v=lc>=0?10+lc:G.ex.gray?15:10+WALLC(r,c)}else{L.pop();v=lc}
   p.wall[r][c]=v;G.lid.push(...L);p.lines[r]=[];const pts=adjPts(p.wall,r,c);p.score+=pts;p.st.place+=pts;if(G.rsum){G.rsum[p.i].place+=pts;G.rsum[p.i].n++}if(pts>G.stats.maxChain)G.stats.maxChain=pts;
-  lg(`${p.nm} sets a ${k>=0?'Prism':TNAME[lc]} tile in mosaic row ${r+1}${G.ex.gray||lc<0?', column '+(c+1):''}: +${pts}.`,'good');fx('wall',{p:p.i,r,c,pts})}
+  lg(`${p.nm} sets a ${k>=0?'Prism':TNAME[lc]} tile in mosaic row ${r+1}${G.ex.gray||lc<0?', column '+(c+1):''}: +${pts}.`,'good');fx('wall',{p:p.i,r,c,pts,run:runsAt(p.wall,r,c)})}
 function floorPenalty(n){let s=0;for(let i=0;i<Math.min(7,n);i++)s+=FLOOR[i];return s}
-function scoreFloors(){for(const p of G.pl){if(!p.floor.length)continue;const pen=floorPenalty(p.floor.length);const loss=Math.min(p.score,-pen);p.score-=loss;p.st.floor-=loss;if(G.rsum)G.rsum[p.i].floor-=loss;
+function scoreFloors(){for(const p of G.pl){if(!p.floor.length)continue;const pen=floorPenalty(p.floor.length);const loss=Math.min(p.score,-pen);p.score-=loss;p.st.floor-=loss;if(G.rsum){const R=G.rsum[p.i];R.floor-=loss;R.pen=pen;R.nb=p.floor.length;R.sun=p.floor.includes(SUN)}
     if(p.floor.includes(SUN))G.first=p.i;const tiles=p.floor.filter(t=>t!==SUN);G.lid.push(...tiles);
     lg(`${p.nm} loses ${-pen} for breakage${loss<-pen?` (only ${loss}: a score never drops below 0)`:''}.`,'bad');p.floor=[]}
   if(G.markerIn!=='ctr')G.markerIn='ctr'}
@@ -1231,7 +2162,7 @@ const RULES_HTML=`<div class="rules">
 <h3>End of the game</h3><p>The game ends after the setting phase of the round in which anyone completes a <b>horizontal row</b> of 5. Then add: <b>+2</b> for each complete row, <b>+7</b> for each complete column, <b>+10</b> for each glaze with all 5 of its tiles on your mosaic. Most points wins; a tie goes to the player with more complete rows, and if that is also tied the win is shared.</p>
 <h3>Variant · Unmarked mosaic</h3><p>Everyone uses a plain grey mosaic. When a rack is full you choose any empty space in that row, but no glaze may appear twice in any row or any column. If a full rack has no legal space, all of its tiles fall to breakage.</p>
 <h3>Variant · Prism tiles (promo)</h3><p>With 2 players take out 1 tile of each glaze and add 5 prism tiles; with 3 or 4 take out 2 of each and add 10. You may take all the prisms from a kiln or the courtyard, and if you do you may also take all the tiles of one other glaze from the same place; everything goes on one rack. A rack may hold one glaze plus prisms. When a rack with a prism is full, a prism is the tile that goes to the mosaic (on that glaze's space; a rack of only prisms may go to any empty space in the row). A prism blocks that glaze in its row and counts for rows and columns, but never for the +10 full-glaze bonus.</p>
-<h3>Not included</h3><p>The Crystal Mosaic boards (C and D sides) are left out: we could not confirm where their coloured spaces sit. The Special Factories promo is left out too: its factory powers are not documented in any source we could reach.</p>
+<h3>Not included</h3><p>The expansion mosaic boards (C and D sides) are left out: we could not confirm where their coloured spaces sit. The special-kiln promo is left out too: its kiln powers are not documented in any source we could reach.</p>
 <h3>Credits</h3>
 <section class="credits-audio">
 <h4>Audio</h4>
@@ -1261,8 +2192,8 @@ const REF=[
   {s:'Scoring',n:'End bonuses',tags:['end of game'],t:'After the last round.',c:null,sub:[`each complete row: +${BONUS.row}`,`each complete column: +${BONUS.col}`,`each glaze with all 5 tiles on the mosaic: +${BONUS.colour}`,'tie: more complete rows wins; still tied: shared win']},
   {s:'Variants',n:'Unmarked mosaic',tags:['official variant'],t:'Grey mosaic: set each tile on any empty space of its row, never repeating a glaze in a row or column. A full rack with no legal space drops all its tiles to breakage.',c:null},
   {s:'Variants',n:'Prism tiles',tags:['promo'],t:'Adds the wild prism tiles (see Tiles).',c:null},
-  {s:'Variants',n:'Crystal Mosaic boards',tags:['expansion','not included'],t:'Not included: the positions of its pre-coloured spaces could not be confirmed from any source we could reach.',c:null},
-  {s:'Variants',n:'Special Factories promo',tags:['promo','not included'],t:'Not included: the special factory powers are undocumented in the sources we could reach.',c:null}];
+  {s:'Variants',n:'Expansion mosaic boards',tags:['expansion','not included'],t:'Not included: the positions of its pre-coloured spaces could not be confirmed from any source we could reach.',c:null},
+  {s:'Variants',n:'Special kilns promo',tags:['promo','not included'],t:'Not included: the special kiln powers are undocumented in the sources we could reach.',c:null}];
 function refHtml(){const secs=[...new Set(REF.map(e=>e.s))];return secs.map(s=>`<h3>${s}</h3><div class="cgrid">${REF.filter(e=>e.s===s).map(e=>{const k=TNAME.indexOf(e.n.replace(' tile',''));
   return `<div class="card"><h4>${k>=0?tileChip(k)+' ':''}${esc(e.n)}${e.c?` <small>×${e.c}</small>`:''}</h4><div>${e.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join(' ')}</div><p>${esc(e.t)}</p>${e.sub&&e.sub.length?`<ul class="sub">${e.sub.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:''}</div>`}).join('')}</div>`).join('')+
   `<h3>Mosaic layout (printed side)</h3><div class="wallref">${[0,1,2,3,4].map(r=>`<div>${[0,1,2,3,4].map(c=>`<svg viewBox="0 0 100 100" width="26" height="26"><use href="#gz${WALLC(r,c)}"/></svg>`).join('')}</div>`).join('')}</div>`}
@@ -1577,6 +2508,8 @@ function buildStatic(){const sc=V3.scene;if(V3.stat)for(const m of V3.stat)sc.re
   if(!V3.kilnGeo)V3.kilnGeo=lathe([[1.5,0],[1.56,.02],[1.6,.1],[1.61,.2],[1.58,.265],[1.53,.29],[1.48,.285],[1.44,.24],[1.4,.175],[1.34,.155]],56);
   L.kilns.forEach((K,i)=>{const g=new THREE.Group();const body=new THREE.Mesh(V3.kilnGeo,clayMat());body.castShadow=body.receiveShadow=true;g.add(body);
     const fl=new THREE.Mesh(new THREE.CircleGeometry(1.36,48),kilnFloorMat(i));fl.rotation.x=-Math.PI/2;fl.position.y=.155;fl.receiveShadow=true;g.add(fl);
+    {const c=mkCanvas(128,128),x=c.getContext('2d');x.fillStyle='#f4ead2';x.beginPath();x.arc(64,64,58,0,7);x.fill();x.strokeStyle='#23407a';x.lineWidth=8;x.stroke();x.fillStyle='#23407a';x.font='800 80px Georgia,serif';x.textAlign='center';x.textBaseline='middle';x.fillText(String(i+1),64,70);
+      const nm=new THREE.Mesh(new THREE.CircleGeometry(.36,32),mat(new THREE.MeshBasicMaterial({map:texOf(c,true),transparent:true,depthWrite:false})));nm.rotation.x=-Math.PI/2;nm.position.set(0,.3,1.62);nm.renderOrder=3;g.add(nm)}// the kiln's number, as the log and recap name it
     const sh=shadowPlane(4,4,.8,V3.T.blob);sh.position.y=.006;g.add(sh);g.position.set(K.x,0,K.z);add(g);body.userData.hit={k:'kiln',i};fl.userData.hit={k:'kiln',i};V3.hits.push(body,fl)});
   // the clay sack and the shard box
   const bag=add(V3.sack||(V3.sack=sackMesh()));bag.position.set(L.bag.x,0,L.bag.z);
@@ -2059,7 +2992,7 @@ function render(){renderModal();if(!G){try{phRender()}catch(e){console.error(e)}
   const pb=$('#pausebtn');if(pb){pb.hidden=human();const h=IC(UI.pause?'play':'pause');if(pb.dataset.h!==h){pb.innerHTML=h;pb.dataset.h=h}}const sb=$('#speedbtn');if(sb){const h=IC('speed')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>';if(sb.dataset.h!==h){sb.innerHTML=h;sb.dataset.h=h}}
   const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',!!UI.coach);
   const ch=$('#chip');if(ch){const s=sideToAct();ch.textContent=G.over?'The king’s judgement':`${innerWidth<700?'Round '+G.round:chapter(G.round)} · ${G.phase==='wall'?'setting the mosaics':s>=0?P(s).nm+' to play':''}`}}
-function scoresHtml(){const s=sideToAct();return `<div class="scores">${G.pl.map(p=>`<span class="sc ${p.i===s?'cur':''}" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''} ★${p.score}${G.markerIn===p.i?' ☀':''}</span>`).join('')}</div>`}
+function scoresHtml(){const s=sideToAct();return `<div class="scores">${G.pl.map(p=>`<span class="sc ${p.i===s?'cur':''}" style="--pc:${PCOL[p.i]}"><i></i>${esc(p.nm)}${NET.on&&p.i===NET.mySeat?' (you)':''} ★${p.score}${phBonus(p)?` <small title="End bonus earned so far">+${phBonus(p)} bonus</small>`:''}${G.markerIn===p.i?' ☀':''}</span>`).join('')}</div>`}
 function thumbsHtml(){const f=focusSeat();const narrow=V3.on?(V3.L&&V3.L.name==='focus'):innerWidth<700;if(!narrow)return '';
   return `<div class="thumbs">${G.pl.filter(p=>p.i!==f).map(p=>`<button class="thumb" data-gx="plrd" style="--pc:${PCOL[p.i]}" aria-label="Open ${esc(p.nm)}'s board">${esc(p.nm)} ★${p.score}<svg viewBox="0 0 1240 940">${boardG(p,{})}</svg></button>`).join('')}</div>`}
 function btn(m,label,cls,extra){return `<button class="btn ${cls||''}" data-mv='${esc(JSON.stringify(m))}'${extra||''}>${label}</button>`}
@@ -2147,15 +3080,15 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
    <h3>Variants</h3><div class="exs"><label class="chk"><input type="checkbox" data-ex="gray" ${o.ex.gray?'checked':''}> <b>Unmarked mosaic</b> <small>choose where each tile goes; no glaze twice in a row or column</small></label>
    <label class="chk"><input type="checkbox" data-ex="prism" ${o.ex.prism?'checked':''}> <b>Prism tiles</b> <small>wild tiles (promo): ${o.np===2?5:10} in the game</small></label>
    <label class="chk"><input type="checkbox" data-coach="1" ${UI.coach?'checked':''}> <b>Guided game</b> <small>the panel explains each step</small></label></div>
-   ${onlineBlock()}<div class="acts">${NET.on?'<button class="btn go" data-a="netopen">Back to the online lobby</button>':'<button class="btn go" data-ui="start">Begin ▶</button>'}<button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div></div>`}
+   ${onlineBlock()}${NET.on||typeof campLine!=='function'?'':campLine()}<div class="acts">${NET.on?'<button class="btn go" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'+(typeof campOpen==='function'&&window.CAMPAIGN?'<button class="btn go bigb story-btn" data-ui="story-map">★ Story</button>':'')}<button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div></div>`}
 function storyPic(){const tiles=[];for(let i=0;i<14;i++)tiles.push(tileSVG(i%5,40+i*38,152,32));const arch=(x)=>`<path d="M${x} 300V210a55 55 0 0 1 110 0V300Z" fill="#5a3a2a" opacity=".85"/><path d="M${x+8} 300V212a47 47 0 0 1 94 0V300Z" fill="url(#shade)"/>`;
   return `<svg viewBox="0 0 600 330" role="img" aria-label="A palace courtyard at sunrise with tiled arches"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7c77c"/><stop offset="1" stop-color="#fde9c4"/></linearGradient><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3f6e"/><stop offset="1" stop-color="#6e4b3a"/></linearGradient></defs>
   <rect width="600" height="330" fill="url(#sky)"/><circle cx="470" cy="70" r="40" fill="#fff1b8"/><circle cx="470" cy="70" r="28" fill="#ffd66b"/><rect x="0" y="120" width="600" height="190" fill="#e9c99a"/><rect x="0" y="120" width="600" height="14" fill="#c98e5a"/>
   ${tiles.join('')}${arch(40)}${arch(245)}${arch(450)}<rect x="0" y="300" width="600" height="30" fill="#c9794a"/><ellipse cx="300" cy="306" rx="80" ry="12" fill="#2f6f8a"/><path d="M300 300q-8-40 0-60q8 20 0 60" fill="#9fd3e6" opacity=".8"/>
   <rect x="190" y="248" width="16" height="52" fill="#7a4a2a"/><circle cx="198" cy="238" r="12" fill="#e0674a"/><rect x="204" y="262" width="30" height="8" rx="2" fill="#1d4aa3"/></svg>`}
 function storyHtml(){const names=G?G.pl.filter(p=>p.human).map(p=>p.nm):[];return `<div class="mbox story">${storyPic()}<p class="q">The Sun King has come home to his summer palace, and its courtyard walls stand bare.</p>
-  <p>He has summoned the finest glaziers${names.length?`, ${esc(names.join(' and '))} among them,`:''} to dress the walls in tile. Every morning the kilns are opened and you draft your glazes.</p>
-  <p>Dry them on your racks, set them into your mosaic so each new tile touches the others, and waste nothing: every broken tile costs you.</p><p>When the first mosaic row is finished, the king will walk the courtyard and judge.</p>
+  <p>He has summoned the finest glaziers${names.length?`, ${esc(names.join(' and '))} among them,`:''} to tile its walls.</p>
+  <ul class="win"><li><b>Most ★ wins.</b> The game ends after a round in which someone completes a mosaic row.</li><li>Each tile you set scores 1 for every tile in the lines it joins.</li><li>At the end: full row <b>+2</b>, full column <b>+7</b>, all 5 tiles of one glaze <b>+10</b>.</li><li>Broken tiles cost points.</li></ul>
   <div class="acts"><button class="btn go" data-ui="story-ok">Enter the courtyard ▶</button></div></div>`}
 // ---------- input ----------
 function on3DPick(h){const p=me();if(!p||!G||G.over)return;if(!h&&!PHN.on)return;
@@ -2181,7 +3114,13 @@ function toast(t){if(!t)return;const el=$('#dockmsg');if(!el)return;el.textConte
 function advise(){const p=me();if(!p)return;if(isClient()){if(!UI.advWait){UI.advWait=true;netSend({act:'advise'})}return}const a=adviceFor(p.i);if(a)showAdvice(a)}
 function showAdvice(a){const m=a.m;if(m.act==='take'){UI.sel={src:m.src,c:m.c,j:m.j};UI.tgt=m.line}UI.adv={m,why:esc(a.why)};upd()}
 // the advice for a seat (the host computes it for its online players too)
-function adviceFor(seat){const p=P(seat);const lv=p.lv;p.lv='normal';let m;try{m=aiMove(p.i)}finally{p.lv=lv}if(!m)return null;let why='';
+// the one best take by immediate net points (the same numbers as the +N/-N row badges); null when it is not clear-cut
+function bestNetTake(seat,teach){const ms=legalTakes(G,seat);if(!ms.length)return null;const R=ms.map(m=>{const x=phNow(m,seat);return {m,net:x.net,full:x.pv.full?1:0,kept:x.pv.info.line,sun:x.pv.info.sun?1:0}});
+  R.sort((a,b)=>b.net-a.net);const top=R[0];if(top.net<0)return null;
+  if(!teach&&R.length>1&&R[1].net>=top.net-1)return null;
+  return R.filter(x=>x.net===top.net).sort((a,b)=>b.full-a.full||a.sun-b.sun||b.kept-a.kept)[0].m}
+function bestWallCell(seat){const q=G.wt&&G.wt.q;if(!q)return null;const p=P(seat);const V=q.cells.map(c=>({c,v:adjPts2(p.wall,q.r,c)})).sort((a,b)=>b.v-a.v);if(V.length>1&&V[0].v-V[1].v<2)return null;return {act:'wall',r:q.r,c:V[0].c}}
+function adviceFor(seat){const p=P(seat);let m;if(G.phase==='wall')m=bestWallCell(seat);else m=bestNetTake(seat,typeof BF!=='undefined'&&!(BF.seen&&BF.seen.took));if(!m)return null;let why='';
   if(m.act==='wall'){why=`Put it in column ${m.c+1}: it scores +${adjPts2(p.wall,m.r,m.c)} now${G.ex.gray?' and keeps your other racks placeable':''}.`}
   else{const a=m.src<0?G.ctr:G.fac[m.src];const n=a.filter(t=>t===m.c).length,nj=a.filter(t=>t===PRISM).length;const pv=preview(m,p.i);
     const what=m.c===PRISM?`the ${nj} prism${nj>1?'s':''}`:`the ${n} ${TNAME[m.c]}${m.j&&nj?` and ${nj} prism${nj>1?'s':''}`:''}`;
@@ -2207,17 +3146,17 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-slo
   switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':openStart();return;case 'coach':setCoach(!UI.coach);if(G)render();return;case 'gfx':gfxCycle();return}});
 function gfxBtn(){const b=$('#gfxbtn');if(!b)return;const h=IC('gfx')+'<span>'+(typeof gfxLabel==='function'?gfxLabel():'Graphics')+'</span>';if(b.dataset.h!==h){b.innerHTML=h;b.dataset.h=h}b.title='Graphics quality: '+(typeof gfxLabel==='function'?gfxLabel():'')+' (Auto picks by device and steps down if frames stutter)'}
 function setCoach(v){UI.coach=!!v;try{localStorage.setItem('sgz_coach',v?'1':'0')}catch(e){}const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach)}
-function uiAct(a){switch(a){case 'start':beginGame();return;case 'continue':loadSaved();return;case 'new':if(NET.on){UI.modal='lobby';render();return}openStart();return;case 'story-ok':UI.modal=null;render();schedule();return;
+function uiAct(a){switch(a){case 'start':beginGame();return;case 'story-map':campOpen();return;case 'continue':loadSaved();return;case 'new':if(NET.on){UI.modal='lobby';render();return}openStart();return;case 'story-ok':UI.modal=null;render();schedule();return;
   case 'unsel':UI.sel=null;UI.tgt=null;UI.adv=null;upd();return;case 'prism':if(UI.sel){UI.sel={src:UI.sel.src,c:UI.sel.c,j:UI.sel.j?0:1};const ms=movesFor(UI.sel);if(!ms.some(m=>m.line===UI.tgt))UI.tgt=null;upd()}return;
   case 'advise':advise();return;case 'noadv':UI.adv=null;upd();return}}
 document.addEventListener('keydown',e=>{if(GX.open||UI.modal||!me())return;if(e.key==='Escape'&&UI.sel){UI.sel=null;UI.tgt=null;upd()}else if(e.key==='Enter'&&UI.sel&&UI.tgt!=null){const m=movesFor(UI.sel).find(m=>m.line===UI.tgt);if(m){e.preventDefault();go(m)}}});
 function openStart(){UI.modal='start';render()}
 function beginGame(){const o=UI.setup;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.lastHuman=null;const seats=o.seats.slice(0,o.np);
   UI.modal=null;newGame({np:o.np,seats,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex),mode:seats.every(s=>s==='ai')?'ai':'x'});UI.modal='story';resetScene();refresh()}
-function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh()}catch(e){openStart()}}
+function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh();if(g.campId&&typeof campResume==='function')campResume()}catch(e){openStart()}}
 function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].m);V3.tiles={};V3.lkey='';relayout()}
 // ---------- the computer ----------
-let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!NET.on)||phHold()||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)&&G.turn>0?2.2:1;
+let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!NET.on)||phHold()||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)?2.6:1.4;
   aiTimer=setTimeout(()=>{aiTimer=null;if(!G||G.over||(UI.modal&&!NET.on)||phHold()||isClient())return;const s2=sideToAct();if(s2<0||P(s2).human)return;const m=aiMove(s2);if(!m){console.error('AI has no move in '+G.phase);return}go(m)},Math.max(0,AIDELAY/(UI.speed||1)*wait))}
 function boot(){$('#defs').innerHTML=glazeDefs();GX.init({key:'sgz'});GX.onShow=id=>{if(id==='rulesd')$('#rulesbody').innerHTML=RULES_HTML;if(id==='refd')$('#refbody').innerHTML=refHtml();if(G)render()};
   try{init3D()}catch(e){console.error(e)}if(!V3.on){V3.qPref=gfxLoadPref();V3.q=V3.qPref==='auto'?gfxAuto():V3.qPref}gfxBtn();soundBtns();setCoach(UI.coach);netInit();openStart()}
@@ -2230,14 +3169,17 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 const PHN={on:false,land:false,src:null,board:null,more:false,sum:null,endHide:null,walls:[],seen:{},gk:'',h:{st:'',pop:'',card:''},bs:0,mode:''};
 const PH_X='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
 const PH_DOTS='<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5.5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18.5" cy="12" r="1.6" fill="currentColor"/></svg>';
+// size of the layout viewport, measured from a fixed full-screen probe: iOS Safari fires resize/orientationchange while innerWidth/innerHeight still hold the OLD size
+function vpDims(){try{let p=document.getElementById('vpprobe');if(!p){p=document.createElement('div');p.id='vpprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:100%;height:100%;visibility:hidden;pointer-events:none';document.body.appendChild(p)}
+  const w=p.offsetWidth,h=p.offsetHeight;if(w>0&&h>0)return {w,h}}catch(e){}return {w:innerWidth,h:innerHeight}}
 function phDetect(){try{const q=new URLSearchParams(location.search);if(q.has('phone'))return q.get('phone')!=='0'}catch(e){}
-  const s=Math.min(innerWidth,innerHeight);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
+  const V=vpDims(),s=Math.min(V.w,V.h);if(s<=500)return true;let c=false;try{c=matchMedia('(pointer:coarse)').matches}catch(e){}return c&&s<=600}
 function phInsets(){try{const q=new URLSearchParams(location.search);if(q.has('safe')){const a=q.get('safe').split(',').map(Number);return {t:a[0]||0,r:a[1]||0,b:a[2]||0,l:a[3]||0}}
   let p=document.getElementById('phprobe');if(!p){p=document.createElement('div');p.id='phprobe';p.setAttribute('aria-hidden','true');p.style.cssText='position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)';document.body.appendChild(p)}
   const c=getComputedStyle(p);return {t:parseFloat(c.paddingTop)||0,r:parseFloat(c.paddingRight)||0,b:parseFloat(c.paddingBottom)||0,l:parseFloat(c.paddingLeft)||0}}catch(e){return {t:0,r:0,b:0,l:0}}}
 function phApply(){const R=document.documentElement;const was=PHN.on,wasL=PHN.land;PHN.on=phDetect();R.classList.toggle('ph',PHN.on);
   if(!PHN.on){R.classList.remove('ph-l','ph-p');for(const k of['--bs','--sat','--sar','--sab','--sal'])R.style.removeProperty(k);if(was){phChrome();try{if(V3.on)relayout()}catch(e){}}return}
-  const w=innerWidth,h=innerHeight,I=phInsets(),bar=44;PHN.land=w>h;const W=w-I.l-I.r,H=h-I.t-I.b;
+  const V=vpDims(),w=V.w,h=V.h,I=phInsets(),bar=44;PHN.land=w>h;const W=w-I.l-I.r,H=h-I.t-I.b;
   const bs=PHN.land?Math.max(Math.min(H,W-280),Math.min(H,Math.ceil(H*.86))):Math.min(W,Math.max(Math.ceil(W*.82),H-bar-340));
   R.classList.toggle('ph-l',PHN.land);R.classList.toggle('ph-p',!PHN.land);PHN.bs=Math.max(200,Math.floor(bs));
   R.style.setProperty('--bs',PHN.bs+'px');R.style.setProperty('--sat',I.t+'px');R.style.setProperty('--sar',I.r+'px');R.style.setProperty('--sab',I.b+'px');R.style.setProperty('--sal',I.l+'px');
@@ -2246,24 +3188,33 @@ function phApply(){const R=document.documentElement;const was=PHN.on,wasL=PHN.la
 function phChrome(){const bar=document.querySelector('.gx-bar');if(!bar)return;
   if(PHN.on&&!document.getElementById('ph-chip')){const c=document.createElement('span');c.id='ph-chip';c.setAttribute('role','status');bar.insertBefore(c,bar.querySelector('.gx-sp'));
     const m=document.createElement('button');m.className='gx-ibtn';m.id='ph-more';m.dataset.ph='more';m.setAttribute('aria-label','More: guide, tile list, music, graphics, new game');m.innerHTML=PH_DOTS;bar.appendChild(m)}
+  if(PHN.on)for(const [k,l] of [['plrd','Boards and scores'],['logd','Log of every move'],['rulesd','How to play']]){const b=bar.querySelector(`[data-gx="${k}"]`);if(b&&!b.getAttribute('aria-label'))b.setAttribute('aria-label',l)}
   try{if(V3.bagLbl)V3.bagLbl.visible=!PHN.on;if(V3.lidLbl)V3.lidLbl.visible=!PHN.on;V3.dirty=3}catch(e){}}
-addEventListener('resize',()=>{try{phApply()}catch(e){}});addEventListener('orientationchange',()=>setTimeout(()=>{try{phApply()}catch(e){}},60));
-try{phApply()}catch(e){console.error(e)}
+// one debounced, size-keyed re-layout for every rotation signal; re-measured after the iOS rotation animation settles (it often reports stale sizes at first)
+const VPS={k:'',raf:0,tm:[]};
+function vpApply(force){const V=vpDims(),I=phInsets(),k=V.w+'x'+V.h+'/'+I.t+','+I.r+','+I.b+','+I.l;if(!force&&k===VPS.k)return;VPS.k=k;
+  try{phApply()}catch(e){console.error(e)}try{if(typeof bfResize==='function')bfResize()}catch(e){console.error(e)}}
+function vpSchedule(){cancelAnimationFrame(VPS.raf);VPS.raf=requestAnimationFrame(()=>vpApply());VPS.tm.forEach(clearTimeout);VPS.tm=[120,350,800,1500].map(d=>setTimeout(()=>vpApply(),d))}
+addEventListener('resize',vpSchedule);addEventListener('orientationchange',vpSchedule);addEventListener('pageshow',vpSchedule);
+try{if(window.visualViewport)visualViewport.addEventListener('resize',vpSchedule);if(screen.orientation)screen.orientation.addEventListener('change',vpSchedule)}catch(e){}
+try{new ResizeObserver(()=>vpSchedule()).observe(document.documentElement)}catch(e){}
+try{phApply();VPS.k=''}catch(e){console.error(e)}
 function phReset(){PHN.src=null;PHN.board=null;PHN.more=false;PHN.sum=null;PHN.endHide=null;PHN.walls=[];PHN.seen={}}
 // ---------- events from the engine: the round summary is built from the wall fx ----------
 function phFx(f){if(!PHN.on||!G)return;const x=f.x;
-  if(f.t==='wall')PHN.walls.push({p:x.p,r:x.r,c:x.c,pts:x.pts});
-  else if(f.t==='round'&&G.round>1&&G.rsum&&G.pl.some(p=>p.human)){PHN.sum={round:G.round-1,final:false,walls:PHN.walls.slice(),rs:G.rsum.map(r=>Object.assign({},r)),sc:G.pl.map(p=>p.score),first:G.first};PHN.walls=[]}
+  if(f.t==='wall')PHN.walls.push({p:x.p,r:x.r,c:x.c,pts:x.pts,why:phPtsWhy(x.run)});
+  else if(f.t==='take')PHN.lastTake=Object.assign({},x);
+  else if(f.t==='round'&&G.round>1&&G.rsum&&G.pl.some(p=>p.human)){PHN.sum={last:PHN.lastTake,round:G.round-1,final:false,walls:PHN.walls.slice(),rs:G.rsum.map(r=>Object.assign({},r)),sc:G.pl.map(p=>p.score),first:G.first};PHN.walls=[]}
   else if(f.t==='round')PHN.walls=[];
   else if(f.t==='win'&&PHN.walls.length&&G.pl.some(p=>p.human)){PHN.sum={round:G.round,final:true,walls:PHN.walls.slice(),rs:(G.rsum||[]).map(r=>Object.assign({},r)),sc:G.pl.map(p=>p.score-p.st.rows-p.st.cols-p.st.colours),first:-1};PHN.walls=[]}}
-const phHold=()=>PHN.on&&!NET.on&&!!PHN.sum;
+const phHold=()=>(PHN.on&&!NET.on&&!!PHN.sum)||(typeof bfHold==='function'&&bfHold());
 // ---------- small SVG pieces ----------
 // racks + mosaic + breakage in one picture (viewBox 1076 x 624); used by the strip and the board pop-up
 function phBoardSVG(p,o){o=o||{};const U=100,X0=44,XW=X0+5*U+36;let s='';
   for(let r=0;r<5;r++){const y=r*U;s+=`<text x="20" y="${y+66}" font-size="46" font-weight="800" fill="#7a3d14" text-anchor="middle">${r+1}</text>`;
     for(let k=0;k<cap(r);k++){const x=X0+(4-k)*U;const t=p.lines[r][k];s+=`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#d8c6a2" stroke="#9a7a4e" stroke-width="4"/>`;if(t!=null)s+=tileSVG(t,x+5,y+5,90)}
     s+=`<path d="M${X0+5*U+8} ${y+30}L${X0+5*U+30} ${y+50}L${X0+5*U+8} ${y+70}Z" fill="#8a5a2b" opacity=".6"/>`;
-    for(let c=0;c<5;c++){const x=XW+c*U,v=p.wall[r][c];s+=G.ex.gray?`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#b9b2a6" stroke="#8e877a" stroke-width="3"/>`:`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#fff" stroke="#c9b99a" stroke-width="3"/>${tileSVG(WALLC(r,c),x+8,y+8,84,' opacity=".28"')}`;
+    for(let c=0;c<5;c++){const x=XW+c*U,v=p.wall[r][c];s+=G.ex.gray?`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#b9b2a6" stroke="#8e877a" stroke-width="3"/>`:`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#fff" stroke="#c9b99a" stroke-width="3"/>${tileSVG(WALLC(r,c),x+14,y+14,72,' opacity=".13"')}`;
       if(v>=0)s+=tileSVG(v<5?v:PRISM,x+5,y+5,90)}}
   const fy=5*U+26;for(let k=0;k<7;k++){const x=X0+k*U,t=p.floor[k];s+=`<rect x="${x+3}" y="${fy+3}" width="94" height="94" rx="12" fill="#e3cfc4" stroke="#a0493a" stroke-width="4"/>`;
     if(t!=null)s+=tileSVG(t,x+5,fy+5,90);else s+=`<text x="${x+50}" y="${fy+66}" font-size="48" font-weight="800" fill="#a0302a" text-anchor="middle">${FLOOR[k]}</text>`}
@@ -2274,7 +3225,7 @@ function phWallSVG(p,o){o=o||{};const U=100;let s='';const cand={};for(const c o
   for(let r=0;r<5;r++){if(o.row===r)s+=`<rect x="-8" y="${r*U-6}" width="${5*U+16}" height="${U+12}" rx="14" fill="#ffd24a" opacity=".28"/>`;
     for(let c=0;c<5;c++){const x=c*U,y=r*U,v=p.wall[r][c],k=r+','+c;const cd=cand[k],m=mk[k];
       s+=`<g ${cd?`data-cell="${k}" class="hit" role="button" aria-label="Row ${r+1}, column ${c+1}${cd.pts!=null?', plus '+cd.pts:''}"`:''}>`;
-      s+=G.ex.gray?`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#b9b2a6" stroke="#8e877a" stroke-width="3"/>`:`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#fff" stroke="#c9b99a" stroke-width="3"/>${tileSVG(WALLC(r,c),x+8,y+8,84,' opacity=".3"')}`;
+      s+=G.ex.gray?`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#b9b2a6" stroke="#8e877a" stroke-width="3"/>`:`<rect x="${x+3}" y="${y+3}" width="94" height="94" rx="12" fill="#fff" stroke="#c9b99a" stroke-width="3"/>${tileSVG(WALLC(r,c),x+14,y+14,72,' opacity=".15"')}`;
       if(v>=0)s+=tileSVG(v<5?v:PRISM,x+5,y+5,90);
       if(m)s+=`<rect x="${x+1}" y="${y+1}" width="98" height="98" rx="13" fill="none" stroke="#2f7d46" stroke-width="7"/><circle cx="${x+78}" cy="${y+22}" r="24" fill="#2f7d46"/><text x="${x+78}" y="${y+33}" font-size="32" font-weight="800" fill="#fff" text-anchor="middle">+${m.pts}</text>`;
       if(cd){const adv=o.adv===cd.c;s+=`<rect x="${x+2}" y="${y+2}" width="96" height="96" rx="13" fill="${adv?'#fff':'#ffd24a'}" fill-opacity="${adv?.35:.22}" stroke="${adv?'#fff':'#ffb400'}" stroke-width="8"><animate attributeName="stroke-opacity" values="1;.4;1" dur="1.2s" repeatCount="indefinite"/></rect>`;
@@ -2288,26 +3239,52 @@ function phRackMini(p,m,pv){const n=m.line<5?cap(m.line):7;const L=m.line<5?p.li
     s+=`<rect x="${x}" y="0" width="${cw}" height="${cw}" rx="12" fill="#d8c6a2" stroke="#9a7a4e" stroke-width="4"/>`;if(t!=null)s+=tileSVG(t,x+3,3,cw-6);else if(a!=null)s+=tileSVG(a,x+3,3,cw-6)+`<rect x="${x+1}" y="1" width="${cw-2}" height="${cw-2}" rx="12" fill="none" stroke="#2f7d46" stroke-width="9"/>`}
   return `<svg class="ph-rm" viewBox="0 0 ${n*(cw+8)-8} ${cw}" aria-hidden="true">${s}</svg>`}
 // ---------- the pop-up for taking tiles ----------
-function phReason(p,r,c){const L=p.lines[r];if(L.length>=cap(r))return 'full';const lc=lineColour(L);if(c<NC&&lc>=0&&lc!==c)return 'holds '+TNAME[lc];const Y=c<NC?c:lc;if(Y>=0&&rowHas(p,r,Y))return 'mosaic row has it';return 'no space'}
-function phRec(ms,seat){if(UI.adv&&UI.adv.m.act==='take'){const a=ms.find(m=>m.line===UI.adv.m.line&&m.src===UI.adv.m.src&&m.c===UI.adv.m.c&&m.j===UI.adv.m.j);if(a)return a.line}
-  try{const near=endNear(G),nx=(seat+1)%G.np;let best=null,bv=-1e9;for(const m of ms){const S=cloneS(G);applyTake(S,seat,m);const v=gainOf(G,seat,m,near)-.55*(emptyS(S)?0:bestGain(S,nx,near));if(v>bv){bv=v;best=m}}return best?best.line:-1}catch(e){return -1}}
+function phReason(p,r,c){const L=p.lines[r];if(L.length>=cap(r))return 'full';const lc=lineColour(L);if(c<NC&&lc>=0&&lc!==c)return 'holds '+TNAME[lc];const Y=c<NC?c:lc;if(Y>=0&&rowHas(p,r,Y))return 'mosaic row '+(r+1)+' has '+TNAME[Y];return 'no space'}
+// what a take does right now: the points a filled rack scores, minus the tiles of its own that break (the Sun token is shown apart: it comes with every courtyard take)
+function phNow(m,seat){const pv=preview(m,seat);const f0=P(seat).floor.length;const sp=pv.info.sun?floorPenalty(f0+1)-floorPenalty(f0):0;const tp=pv.pen-sp;
+  return {m,pv,sp,tp,n:pv.info.fl+pv.info.lid-(pv.info.sun&&f0>=7?1:0),net:(pv.full&&pv.pts!=null?pv.pts:0)+tp}}
+// the starred rack: best right now; ties go to a filled rack, then more tiles kept, then the computer's look-ahead
+function phRec(ms,seat){if(!ms.length)return null;const R=ms.map(m=>phNow(m,seat));PHN.alt=null;const top=Math.max(...R.map(x=>x.net));let c=R.filter(x=>x.net===top);
+  const f=Math.max(...c.map(x=>x.pv.full?1:0));c=c.filter(x=>(x.pv.full?1:0)===f);const k=Math.max(...c.map(x=>x.pv.info.line));c=c.filter(x=>x.pv.info.line===k);
+  const pick=x=>{const safe=R.filter(y=>y.m.line<5&&!y.tp&&y!==x).sort((a,b)=>b.net-a.net)[0];PHN.alt=x.tp&&safe?safe:null;PHN.only=R.every(y=>y.m.line===5);return x};
+  if(c.length>1){try{const near=endNear(G),nx=(seat+1)%G.np;let bv=-1e9,b=c[0];for(const x of c){const S=cloneS(G);applyTake(S,seat,x.m);const v=gainOf(G,seat,x.m,near)-.55*(emptyS(S)?0:bestGain(S,nx,near));if(v>bv){bv=v;b=x}}return pick(b)}catch(e){}}return pick(c[0])}
+function phWhy(x){const m=x.m,pv=x.pv,n=x.n;const brk=x.tp?`, ${n} break (${x.tp})`:', nothing breaks';
+  if(m.line===5)return PHN.only?`No rack can take this glaze (each holds another glaze, or its mosaic row has it), so all of it breaks${x.tp?' ('+x.tp+')':''}. Late in a round, leave yourself a rack that can.`:`Breakage: every rack costs more${x.tp?' ('+x.tp+')':''}.`;
+  const alt=PHN.alt?` Still better than rack ${PHN.alt.m.line+1} (${PHN.alt.pv.full?'+'+PHN.alt.pv.pts:'scores nothing yet'}, nothing breaks).`:'';const last=phLast()&&!pv.full?' Last round: a rack that isn’t full scores nothing.':'';
+  const ends=pv.full&&P(focusSeat()).wall[m.line].filter(v=>v>=0).length===4?` It completes mosaic row ${m.line+1}: the game ends after this round.`:'';
+  if(pv.full)return `Rack ${m.line+1} fills: +${pv.pts} at round end${brk}.${ends}${alt}`;
+  return `Rack ${m.line+1}: ${pv.cnt} of ${cap(m.line)} so far${brk}.${last||' Fill it later to score.'}${alt}`}
+function phLast(){for(const p of G.pl)for(let r=0;r<5;r++){const n=p.wall[r].filter(v=>v>=0).length;if(n>=5||(n===4&&p.lines[r].length===cap(r)))return true}return false}
+function phPtsWhy(run){if(!run)return '';const [h,v]=run;if(h===1&&v===1)return 'alone';const b=[];if(h>1)b.push(h+' across');if(v>1)b.push(v+' down');return '= '+b.join(' + ')}
+// how the game is won and how close the end is (any complete mosaic row ends the game after that round)
+function phBonus(p){const b=endBonus(p);return b.rows*BONUS.row+b.cols*BONUS.col+b.colours*BONUS.colour}
+function phBonusWhy(p){const b=endBonus(p),o=[];if(b.rows)o.push(b.rows+' row'+(b.rows>1?'s':''));if(b.cols)o.push(b.cols+' column'+(b.cols>1?'s':''));if(b.colours)o.push(b.colours+' full glaze'+(b.colours>1?'s':''));return o.join(', ')}
+function phGoalHTML(){let best=null;for(const p of G.pl)for(let r=0;r<5;r++){const n=p.wall[r].filter(v=>v>=0).length;const ready=p.lines[r].length===cap(r)&&!rowHas(p,r,lineColour(p.lines[r]))?1:0;
+    if(!best||n+ready>best.n+best.ready||(n+ready===best.n+best.ready&&ready>best.ready))best={p,r,n,ready}}
+  const warn=best&&best.n+best.ready>=5?`<b class="bad">Last round: ${esc(best.p.nm)}${isYou(best.p.i)?' (you)':''} will complete mosaic row ${best.r+1}.</b>`:best&&best.n>=4?`<b>${esc(best.p.nm)}${isYou(best.p.i)?' (you)':''} has 4 of 5 in mosaic row ${best.r+1}.</b>`:'';
+  const left=G.ctr.filter(t=>t!==SUN).length+G.fac.reduce((a,f)=>a+f.length,0);const late=G.phase==='offer'&&left>0&&left<=8?`<b>Only ${left} tile${left===1?'':'s'} left this round: every tile must be taken, and what fits no rack breaks.</b>`:'';
+  return `<div class="ph-goal">${IC('trophy')}<span${warn||late?' class="wq"':''}><span class="gl">Most ★ wins. The game ends after a round in which someone completes a mosaic row. Then: full row +2, full column +7, all 5 of a glaze +10.</span><span class="gs">Most ★ wins · ends after a mosaic row is full · end bonus: row +2, column +7, glaze +10</span> ${warn||late}${(()=>{const o=G.pl.filter(q=>q.i!==focusSeat()&&phBonus(q));return o.length?` <b class="ph-bn">End bonus so far: ${o.map(q=>esc(q.nm)+' +'+phBonus(q)+' ('+phBonusWhy(q)+')').join(', ')}.</b>`:''})()}</span></div>`}
 function phTakeHTML(hp){const sel=UI.sel,src=sel?sel.src:PHN.src;const a=src<0?G.ctr:G.fac[src];if(!a||!a.length)return '';
   const cnt={};for(const t of a)cnt[t]=(cnt[t]||0)+1;const keys=Object.keys(cnt).map(Number).sort((x,y)=>x-y);const nj=cnt[PRISM]||0;
   const chips=keys.map(c=>{const on=sel&&sel.c===c;return `<button class="ph-g${on?' on':''}" data-ph="pick" data-pick='${JSON.stringify({src,c,j:c===PRISM?1:0})}' aria-pressed="${!!on}" aria-label="${cnt[c]} ${TNAME[c]}">${tileChip(c,cnt[c])}<span>${TNAME[c]}</span></button>`}).join('');
   let title,body='',tgS='';
   if(!sel){title=`<b>${src<0?'Courtyard':'Kiln '+(src+1)}${src<0&&G.markerIn==='ctr'?' ☀':''}</b> <small>choose a glaze to take</small>`;body=`<div class="ph-note">All tiles of the glaze you choose come with you.${src<0&&G.markerIn==='ctr'?' The first courtyard take also gets the Sun token (−1, you start next round).':''}</div>`}
   else{const n=cnt[sel.c]||0;const withJ=sel.c<NC&&sel.j;const tot=sel.c===PRISM?nj:n+(withJ?nj:0);
-    title=`<b>${tileChip(sel.c,null)} take ${tot} ${sel.c===PRISM?'Prism':TNAME[sel.c]}${withJ?' + '+nj+' Prism':''}</b> <small>from ${srcName(src)}</small>`;
-    const ms=movesFor(sel);const by={};for(const m of ms)by[m.line]=m;const rec=ms.length?phRec(ms,hp.i):-1;
+    title=`<b>${tileChip(sel.c,null)} take ${tot} ${sel.c===PRISM?'Prism':TNAME[sel.c]}${withJ?' + '+nj+' Prism':''}</b> <small>from ${srcName(src)}${src<0&&G.markerIn==='ctr'?' + ☀ Sun token':''}</small>`;
+    const ms=movesFor(sel);const by={};for(const m of ms)by[m.line]=m;const RX=phRec(ms,hp.i);const rec=RX&&ms.length>1?RX.m.line:-1;
     const tg=sel.c<NC&&nj?`<button class="ph-tg${sel.j?' on':''}" data-ui="prism" aria-pressed="${!!sel.j}" aria-label="Also take the ${nj} Prism tile${nj>1?'s':''}">${sel.j?'☑':'☐'} + ${nj} Prism${nj>1?'s':''}</button>`:'';tgS=tg;
     let grid='';for(let r=0;r<6;r++){const m=by[r];const lab=r<5?'Rack '+(r+1):'Breakage';
       if(!m){grid+=`<button class="ph-o dis" disabled aria-label="${lab}: not allowed, ${esc(phReason(hp,r,sel.c))}"><span class="ph-r">${lab}</span><span class="ph-v muted">${esc(phReason(hp,r,sel.c))}</span></button>`;continue}
-      const pv=preview(m,hp.i);const over=pv.info.fl+pv.info.lid;let v;
-      if(r===5)v=`<span class="ph-v bad">${pv.info.n} tile${pv.info.n>1?'s':''} ${pv.pen||''}</span>`;
-      else{const good=pv.full?`<span class="good">fills${pv.pts!=null?' +'+pv.pts:''}</span>`:`<span>${pv.cnt}/${cap(r)}</span>`;v=`<span class="ph-v">${good}${over?` <span class="bad">· ${over}✗ ${pv.pen}</span>`:''}</span>`}
-      const aria=`${lab}: ${r<5?(pv.full?'fills it':pv.cnt+' of '+cap(r)):'all to breakage'}${over&&r<5?', '+over+' to breakage':''}${pv.pen?', '+pv.pen+' points':''}`;
+      const X=phNow(m,hp.i),pv=X.pv;const over=X.n;let v;
+      if(r===5)v=`<span class="ph-v bad">${pv.info.n} tile${pv.info.n>1?'s':''} ${X.tp||''}</span>`;
+      else{const good=pv.full?`<span class="good">fills${pv.pts!=null?' +'+pv.pts:''}</span>`:`<span>${pv.cnt}/${cap(r)}</span>`;v=`<span class="ph-v">${good}${over>0?` <span class="bad">· ${over}✗ ${X.tp}</span>`:''}</span>`}
+      const aria=`${lab}: ${r<5?(pv.full?'fills it':pv.cnt+' of '+cap(r)):'all to breakage'}${over>0&&r<5?', '+over+' break':''}${X.tp?', '+X.tp+' points':''}`;
       grid+=`<button class="ph-o${rec===r?' rec':''}${over||r===5?' ov':''}" data-mv='${esc(JSON.stringify(m))}' aria-label="${esc(aria)}"><span class="ph-r">${lab}${rec===r?' <i>★ best</i>':''}</span>${phRackMini(hp,m,pv)}${v}</button>`}
-    body=`<div class="ph-grid">${grid}</div>`+(sel.src<0&&G.markerIn==='ctr'?`<div class="ph-note">Sun token: −1, and you start next round.</div>`:'')+(UI.adv?`<div class="ph-note adv">${IC('bulb')} ${UI.adv.why}</div>`:'')+(UI.coach?`<div class="ph-note">Racks take one glaze each; a full rack sets one tile into your mosaic at round end. Extra tiles break: −1, −1, −2 …</div>`:'')}
+    const sun=sel.src<0&&G.markerIn==='ctr';const f0=hp.floor.length;const sp=floorPenalty(f0+1)-floorPenalty(f0);
+    body=`<div class="ph-grid">${grid}</div>`+(sun?`<div class="ph-sun">☀ First courtyard take: you also get the Sun token: it takes your next breakage space (${String(sp||0).replace('-','−')}) whichever rack you choose, and you start next round.</div>`:'')
+      +(RX?`<div class="ph-why">${UI.adv&&UI.adv.m.act==='take'?IC('bulb')+' Suggested glaze. ':''}${rec>=0?'<b>★</b> ':''}${esc(phWhy(RX))}</div>`:'')
+      +(UI.coach?`<div class="ph-teach">Rack N holds N tiles of one glaze. Full racks score at round end; extra tiles break.</div>`:'')}
+  if(!sel)body+=`<div class="ph-teach">Tap a glaze: you take <b>every</b> tile of it here. The rest of a kiln slides to the courtyard.</div>`;
   return `<div class="ph-head"><span class="ph-t">${title}</span><button class="ph-ib" data-ph="boards" aria-label="See the boards">${IC('players')}</button><button class="ph-ib" data-ph="close" aria-label="Close">${PH_X}</button></div>${keys.length>1||!sel||tgS?`<div class="ph-chips${keys.length>4?' many':''}">${keys.length>1||!sel?chips:''}${tgS}</div>`:''}${body}`}
 // ---------- the board pop-up (yours or a rival's, bigger) ----------
 function phBoardHTML(){const i=PHN.board;const p=P(i);if(!p)return '';const fr=fullRows(p);
@@ -2323,17 +3300,18 @@ function phStripHTML(){const f=focusSeat(),fp=P(f),hp=me(),s=sideToAct();const p
   else{left=s>=0?`${pn(s)} ${NET.on&&P(s).human?'is deciding':'is choosing'}…`:'The mosaics are being set…';if(!human())right=`<button class="ph-b" data-a="pause" aria-label="${UI.pause?'Resume':'Pause'}">${IC(UI.pause?'play':'pause')}</button>`}
   a=`<div class="ph-a"><span class="ph-msg">${left}</span>${right}</div>`;
   const net=NET.on?netDockHtml():'';
-  const sack=`<small class="ph-sk">sack ${G.bag.length} · box ${G.lid.length}</small>`;
-  const mine=`<button class="ph-mine" data-ph="board" data-i="${f}" style="--pc:${PCOL[f]}" aria-label="Open ${esc(fp.nm)}'s board"><span class="ph-mh"><i></i><b>${esc(fp.nm)}${isYou(f)?' (you)':''}</b><b class="ph-sc">★${fp.score}</b>${G.markerIn===f?'<span title="Sun token">☀</span>':''}${sack}</span><span class="ph-ms">${phBoardSVG(fp)}</span></button>`;
+  const sack='';
+  const mine=`<button class="ph-mine" data-ph="board" data-i="${f}" style="--pc:${PCOL[f]}" aria-label="Open ${esc(fp.nm)}'s board"><span class="ph-mh"><i></i><b>${esc(fp.nm)}${isYou(f)?' (you)':''}</b><b class="ph-sc">★${fp.score}</b>${phBonus(fp)?`<small class="ph-bn" title="End bonus earned so far">+${phBonus(fp)} end bonus</small>`:''}${G.markerIn===f?'<span title="Sun token">☀</span>':''}${sack}</span><span class="ph-ms">${phBoardSVG(fp)}</span></button>`;
   const rivals=G.pl.filter(q=>q.i!==f).map(q=>`<button class="ph-rv${q.i===s?' cur':''}" data-ph="board" data-i="${q.i}" style="--pc:${PCOL[q.i]}" aria-label="Open ${esc(q.nm)}'s board, ${q.score} points"><i></i><b>${esc(q.nm)}</b><span>★${q.score}</span>${G.markerIn===q.i?'<span>☀</span>':''}${q.floor.length?`<small>✗${q.floor.filter(t=>t!==SUN).length}</small>`:''}</button>`).join('');
-  const rc=UI.recap.length&&!G.over?`<div class="ph-recap" aria-label="Recent moves">${UI.recap.slice(0,hp?1:3).map(t=>`<div>${t}</div>`).join('')}</div>`:'';
-  return net+a+mine+rc+`<div class="ph-rvs">${rivals}</div>`}
+  const rc=UI.recap.length&&!G.over?`<div class="ph-recap" aria-label="Recent moves">${UI.recap.slice(0,hp?Math.max(1,G.np-1):3).map(t=>`<div>${t}</div>`).join('')}</div>`:'';
+  return net+a+(G.over?'':phGoalHTML())+mine+rc+`<div class="ph-rvs">${rivals}</div>`}
 // ---------- cards: one at a time, always with Continue ----------
 function phSumHTML(S){const f=focusSeat();const mine=S.walls.filter(w=>w.p===f);
   const rows=G.pl.map(p=>{const r=S.rs[p.i]||{place:0,floor:0};return `<div class="ph-sr" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span class="good">+${r.place}</span><span class="${r.floor?'bad':'muted'}">${r.floor?r.floor:'0'}</span><b>★${S.sc[p.i]}</b></div>`}).join('');
   const nxt=!S.final&&S.first>=0?`<div class="ph-note">☀ ${esc(P(S.first).nm)} starts round ${S.round+1}.</div>`:'';
   return `<div class="ph-head"><span class="ph-t"><b>${S.final?'The last mosaics are set':'Round '+S.round+': mosaics set'}</b></span></div>
-   <div class="ph-sum"><div class="ph-wall">${phWallSVG(P(f),{marks:mine})}</div><div class="ph-sl"><div class="ph-sh"><span></span><span>tiles</span><span>broken</span><span>score</span></div>${rows}${nxt}</div></div>
+   <div class="ph-sum"><div class="ph-wall">${phWallSVG(P(f),{marks:mine})}</div><div class="ph-sl"><div class="ph-sh"><span></span><span>tiles</span><span>broken</span><span>score</span></div>${rows}${nxt}
+   <div class="ph-exp">${S.last?`<div class="muted">Last move: ${esc(P(S.last.p).nm)} took ${S.last.n} ${S.last.c===PRISM?'Prism':TNAME[S.last.c]} → ${S.last.line<5?'rack '+(S.last.line+1):'breakage'}.</div>`:''}${mine.map(w=>`<div class="ph-pts" data-pts="${w.pts}">Row ${w.r+1}: <span class="good">+${w.pts}</span> ${esc(w.why||'')}</div>`).join('')}${(S.rs[f]||{}).floor?(R=>`<div class="ph-pts" data-pts="${R.floor}">Breakage (${R.nb||'?'} space${R.nb===1?'':'s'}${R.sun?', incl. ☀ Sun token':''}): <span class="bad">${R.floor}</span>${R.pen!=null&&R.floor>R.pen?` <small>(${R.pen} due, but a score can’t go below 0)</small>`:''}</div>`)(S.rs[f]):''}${G.pl.filter(q=>q.i!==f).map(q=>{const w=S.walls.filter(x=>x.p===q.i);const r=S.rs[q.i]||{};return w.length||r.floor?`<div class="muted">${esc(q.nm)}: ${w.length} tile${w.length===1?'':'s'} +${r.place}${w.length?' (best +'+Math.max(...w.map(x=>x.pts))+')':''}${r.floor?', breakage '+r.floor:''}</div>`:''}).join('')}${!mine.length&&!(S.rs[f]||{}).floor?'<div>No full rack: nothing scored.</div>':''}${UI.coach&&S.round<=2?'<div class="ph-teach">A tile scores 1 for each tile in the lines it joins.</div>':''}</div></div></div>
    <div class="ph-cont"><button class="ph-go" data-ph="continue">Continue</button></div>`}
 function phWallQHTML(hp){const q=G.wt.q;const L=hp.lines[q.r];const lc=lineColour(L);const isP=L.includes(PRISM);
   const cells=q.cells.map(c=>({r:q.r,c,pts:adjPts2(hp.wall,q.r,c)}));
@@ -2346,9 +3324,9 @@ function phMoreHTML(){const nh=!human();
    ${b(IC(SND.music?'music':'nomusic'),'Music: '+(SND.music?'on':'off'),'data-a="mus"')}${b(IC('gfx'),typeof gfxLabel==='function'?gfxLabel():'Graphics','data-a="gfx"')}
    ${nh?b(IC('speed'),'Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'),'data-a="speed"'):''}${nh?b(IC(UI.pause?'play':'pause'),UI.pause?'Resume':'Pause','data-a="pause"'):''}
    ${b(IC('new'),'New game','data-a="new"')}</div>`}
-function phCoachHTML(){const c=$('#dockbody .coach');if(!c)return '';return `<div class="ph-head"><span class="ph-t"><b>${IC('guide')} Guide</b></span></div><div class="ph-coach">${c.innerHTML}</div><div class="ph-cont"><button class="ph-go" data-ph="continue">Continue</button></div>`}
+function phCoachHTML(){return `<div class="ph-head"><span class="ph-t"><b>${IC('guide')} Your first game</b></span></div><div class="ph-coach"><p><b>Win:</b> have the most ★. The game ends after a round in which someone completes a row of their mosaic.</p><p><b>Your turn:</b> tap a kiln, take <b>every</b> tile of one glaze, put them on one rack. The rest slides to the courtyard.</p><p><b>Round end:</b> each full rack sets one tile in your mosaic and scores; racks not yet full wait for the next round. A mosaic row never holds a glaze twice. Tiles that don’t fit break and cost points.</p><p><b>Sun token:</b> the first to take from the courtyard gets it: −1, but they start next round.</p><p><b>Tip:</b> full columns pay +7 each at the end, full rows only +2.</p></div><div class="ph-cont"><button class="ph-go" data-ph="continue">Got it</button></div>`}
 function phEndHTML(){const pr=$('#dockbody .prompt');if(!pr)return '';
-  return `<div class="ph-end">${pr.outerHTML}</div><div class="ph-cont two"><button class="ph-go" data-a="new">New game</button><button class="ph-go ghost" data-ph="endboards">See the mosaics</button><button class="ph-go ghost" data-ph="continue">Continue</button></div>`}
+  return `<div class="ph-end">${pr.outerHTML}</div><div class="ph-cont three"><button class="ph-go" data-a="new">New game</button><button class="ph-go ghost" data-ph="endboards">Mosaics</button><button class="ph-go ghost" data-ph="continue">Close</button></div>`}
 // ---------- which view is up (one at a time) ----------
 function phPlan(){if(!G)return {k:'none'};const hp=me();const gk=G.seed+':'+(G.gid||'');if(gk!==PHN.gk){PHN.gk=gk;phReset()}
   if(!hp||G.phase!=='offer'){PHN.src=null}
@@ -2405,6 +3383,509 @@ document.addEventListener('click',e=>{if(!PHN.on)return;const b=e.target.closest
 document.addEventListener('keydown',e=>{if(!PHN.on||e.key!=='Escape'||GX.open||UI.modal)return;if(PHN.more||PHN.board!=null||UI.sel||PHN.src!=null){e.stopImmediatePropagation();phClose()}},true);
 // tap on the free zone around a pop-up closes it
 document.addEventListener('pointerdown',e=>{if(!PHN.on||!G)return;const z=e.target&&e.target.id==='ph-z'?e.target:null;if(z&&(PHN.mode==='take'||PHN.mode==='board'||PHN.mode==='more')){e.preventDefault();phClose()}},true);
+
+</script>
+<script>
+// ---------- look: the same navy courtyard, terracotta kilns, sand courtyard and cream board as the 3D table ----------
+(function(){const s=document.createElement('style');s.id='bf-css';s.textContent=`
+html.bf .gx-app,html.bf #ph-z{display:none!important}
+html.bf body{background:#13234d;overflow:hidden}
+#bf{position:fixed;inset:0;z-index:30;display:flex;flex-direction:column;box-sizing:border-box;padding:var(--sat,0px) var(--sar,0px) var(--sab,0px) var(--sal,0px);
+  background:radial-gradient(ellipse at 50% 30%,#2a4a94 0%,#1a2f68 45%,#101d44 100%);color:#fff6e0;font-family:var(--ff);-webkit-user-select:none;user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;overflow:hidden}
+#bf[hidden]{display:none}
+#bf.empty .bf-side{visibility:hidden}
+#bf::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.22;background-image:radial-gradient(circle at 20% 30%,#ffe7a0 1px,transparent 1.6px),radial-gradient(circle at 70% 80%,#ffe7a0 1px,transparent 1.6px);background-size:46px 46px,58px 58px}
+.bf-top{position:relative;height:44px;flex:none;display:flex;align-items:center;gap:4px;padding:0 2px;background:linear-gradient(#0c1838,#15275a);border-bottom:2px solid #c99a3e;box-shadow:0 2px 8px rgba(0,0,0,.4);z-index:2}
+.bf-ib{width:44px;height:44px;flex:none;border:0;padding:0;background:none;color:#ffe3a0;display:grid;place-items:center;cursor:pointer;font:700 18px var(--ff)}
+.bf-ib .ic{width:24px;height:24px}
+.bf-chips{flex:1;display:flex;gap:4px;min-width:0}
+.bf-chip{flex:1 1 0;min-width:0;height:36px;border-radius:18px;border:2px solid rgba(255,255,255,.12);background:rgba(255,255,255,.07);color:#fff6e0;display:flex;align-items:center;gap:4px;padding:0 8px;font:800 14px var(--ff);white-space:nowrap;overflow:hidden;cursor:pointer;transition:background .2s,border-color .2s,box-shadow .2s}
+.bf-chip i{width:10px;height:10px;border-radius:50%;background:var(--pc);flex:none;box-shadow:0 0 0 2px rgba(255,255,255,.5)}
+.bf-chip b{overflow:hidden;text-overflow:ellipsis;min-width:0}.bf-chip b:empty{display:none}
+html.bf-land .bf-say{font-size:15px}
+.bf-chip em{font-style:normal;color:#ffd24a}
+.bf-chip .bf-sc{margin-left:auto;font-size:16px;color:#ffd66b;flex:none}.bf-pj{flex:none;margin-left:3px;font:900 13px var(--ff);padding:1px 4px;border-radius:8px;background:#2f8a4a;color:#fff}.bf-pj.dn{background:#c0392b}
+.bf-chip.cur{border-color:var(--pc);background:rgba(255,255,255,.17);box-shadow:0 0 14px var(--pc)}
+.bf-chip.hit{animation:bfHit .5s}
+@keyframes bfHit{30%{transform:scale(1.12)}}
+.bf-mid{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+.bf-table{position:relative;flex:1;min-height:0;margin:2px 6px 0}
+.bf-side{flex:none;display:flex;flex-direction:column;align-items:center;padding:0 6px 6px;position:relative;z-index:1}
+html.bf-land .bf-mid{flex-direction:row}
+html.bf-land .bf-table{margin:4px 0 4px 6px}
+html.bf-land .bf-side{justify-content:center;padding:4px 8px}
+.bf-hint{height:44px;flex:none;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;max-width:100%}
+.bf-say{display:flex;align-items:center;gap:6px;min-width:0;flex:0 1 auto;overflow:hidden;font:800 17px var(--ff);color:#fff1c8;text-shadow:0 1px 2px #000;white-space:nowrap}
+.bf-say>span{overflow:hidden;text-overflow:ellipsis}
+.bf-tipl{color:#ffe08a;font-size:15px;white-space:normal;line-height:1.1;animation:bfTipIn .3s}
+.bf-n{display:inline-flex;align-items:center;gap:2px;flex:none}.bf-n svg{width:24px;height:24px}.bf-n b{font-size:15px;color:#ffd66b}
+.bf-bossb{flex:none;height:30px;padding:0 9px;border-radius:15px;border:0;font:800 12px var(--ff);color:#3a2410;background:linear-gradient(#ffd66b,#e9a93a);box-shadow:0 0 0 2px #7a4a20;cursor:pointer}
+.bf-bosscard{display:flex;flex-direction:column;gap:10px;font-size:17px;text-align:center}
+.bf-bulb{width:44px;height:44px;border-radius:22px;background:rgba(255,214,107,.16);box-shadow:inset 0 0 0 2px rgba(255,214,107,.45)}
+.bf-pz{height:34px;min-width:52px;border-radius:17px;border:2px solid #b9a8dc;background:rgba(255,255,255,.1);color:#fff;display:flex;align-items:center;gap:2px;padding:0 6px;font:800 15px var(--ff)}
+.bf-pz svg{width:22px;height:22px}.bf-pz.on{background:rgba(185,168,220,.35)}
+.bf-b{height:38px;padding:0 14px;border-radius:19px;border:0;background:#e0a948;color:#2a1a08;font:800 15px var(--ff)}
+/* your board */
+.bf-me{--g:2px;background:linear-gradient(#f6ead0,#ead9b4);border-radius:12px;padding:6px 6px 5px;box-shadow:0 6px 18px rgba(0,0,0,.5),inset 0 0 0 2px #b88a4c;color:#3a2410;transition:box-shadow .3s}
+.bf-me.turn{box-shadow:0 6px 18px rgba(0,0,0,.5),inset 0 0 0 2px #b88a4c,0 0 0 3px var(--pc)}
+.bf-me.shake{animation:bfShake .45s}
+@keyframes bfShake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+.bf-row{display:flex;align-items:center;margin-bottom:var(--g);border-radius:8px;cursor:pointer;transition:opacity .2s}
+.bf-rack,.bf-wall,.bf-fl{display:flex;gap:var(--g);position:relative}
+.bf-rack{border-radius:8px;padding:1px}
+.bf-c{width:var(--cs);height:var(--cs);border-radius:6px;position:relative;flex:none;display:block}
+.bf-rack .bf-c{background:#d6c29a;box-shadow:inset 0 0 0 2px #9a7a4e,inset 0 3px 4px rgba(0,0,0,.18)}
+.bf-rack .bf-c.no{background:none;box-shadow:none}
+.bf-ar{width:calc(var(--cs)*.4);height:calc(var(--cs)*.5);margin:0 3px;flex:none;background:#a07040;opacity:.55;clip-path:polygon(0 0,100% 50%,0 100%)}
+.bf-wall .bf-c{background:#fffaf0;box-shadow:inset 0 0 0 1px #cdb995}
+html.gray .bf-wall .bf-c{background:#bdb5a8}
+.bf-c .pr{position:absolute;inset:10%;opacity:.55;display:block;filter:grayscale(.2)}
+.bf-c .pr svg{width:100%;height:100%;display:block}
+.bf-t{position:absolute;display:block;cursor:pointer}
+.bf-c>.bf-t{inset:1px}
+.bf-t svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1.5px 1px rgba(0,0,0,.4))}
+.bf-t.hid{visibility:hidden}
+.bf-t.gh{opacity:.42;animation:bfGh 1.1s ease-in-out infinite}
+@keyframes bfGh{50%{opacity:.22}}
+.bf-row.ok .bf-rack{box-shadow:0 0 0 3px #ffc63a,0 0 14px 2px rgba(255,198,58,.8);animation:bfGlow 1.1s ease-in-out infinite}
+@keyframes bfGlow{50%{box-shadow:0 0 0 3px #fff2b0,0 0 22px 6px rgba(255,214,90,.95)}}
+.bf-row.dim{opacity:.5}
+.bf-row.no{animation:bfShake .4s}
+.bf-row.wq .bf-wall{box-shadow:0 0 0 3px #ffc63a;border-radius:6px}
+.bf-bd{position:absolute;left:2px;top:50%;transform:translateY(-50%);z-index:2;min-width:22px;height:22px;border-radius:11px;padding:0 5px;font:900 13px/22px var(--ff);text-align:center;color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.bf-bd.rec{background:#e0a020;color:#fff;font-size:12px}.bf-bd.r2{left:44px}
+.bf-bd.bad{background:#c0392b}.bf-bd.good{background:#2f8a4a}
+.bf-c em{position:absolute;inset:0;display:grid;place-items:center;font:900 calc(var(--cs)*.42) var(--ff);font-style:normal;color:#1d5a2a;text-shadow:0 0 3px #fff,0 0 3px #fff;z-index:2}
+.bf-c.clash{box-shadow:inset 0 0 0 3px #e0402a,0 0 10px #ff6a50;z-index:2}
+.bf-row.dim.rclash .bf-rack .bf-c:not(.no){box-shadow:inset 0 0 0 2px #e0402a}
+.bf-c.ready{animation:bfReady 1.2s ease-in-out infinite}@keyframes bfReady{50%{box-shadow:0 0 0 2px #ffe680,0 0 12px 3px #ffd24a}}
+.bf-c.tgt{box-shadow:inset 0 0 0 2px #2f8a4a,0 0 8px #6fd38a}
+.bf-c.pick{cursor:pointer;box-shadow:inset 0 0 0 3px #ffb400,0 0 12px #ffd24a;animation:bfGlow 1.1s infinite}
+.bf-c.lit{animation:bfLit .55s ease-out both;animation-delay:var(--d,0ms);z-index:3}
+@keyframes bfLit{0%{box-shadow:0 0 0 0 #fff}40%{transform:scale(1.18);box-shadow:0 0 0 3px #fff,0 0 18px 6px #ffd24a}100%{transform:scale(1.05);box-shadow:0 0 0 3px #ffe680,0 0 12px 3px #ffd24a}}
+.bf-floor{display:flex;align-items:center;gap:6px;margin-top:4px;border-radius:8px;cursor:pointer}
+.bf-floor .bf-fl{padding:1px;border-radius:8px}
+.bf-floor .bf-c{background:#ecd3c7;box-shadow:inset 0 0 0 2px #a8493a}
+.bf-floor .bf-c span{position:absolute;inset:0;display:grid;place-items:center;font:900 calc(var(--cs)*.42) var(--ff);color:#a8302a}
+.bf-floor.ok .bf-fl{box-shadow:0 0 0 3px #ff7a4a,0 0 12px 2px rgba(255,110,70,.7)}
+.bf-floor{position:relative}.bf-bd.fbd{left:auto;right:2px}.bf-bd.fbr{left:auto;right:34px}
+.bf-fll{font:italic 700 13px var(--ff);color:#8a4a2a}
+.bf-t.cr::after{content:'';position:absolute;inset:0;background:no-repeat center/100% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M18 0 L44 38 L30 56 L58 100 M44 38 L82 26 L100 34 M30 56 L6 70' stroke='%23fff' stroke-width='6' fill='none' stroke-linejoin='round'/%3E%3Cpath d='M18 0 L44 38 L30 56 L58 100 M44 38 L82 26 L100 34 M30 56 L6 70' stroke='%23000' stroke-opacity='.5' stroke-width='2' fill='none'/%3E%3C/svg%3E")}
+.bf-t.crash{animation:bfCrash .6s cubic-bezier(.3,.6,.4,1)}
+@keyframes bfCrash{0%{transform:translateY(-40%) rotate(-8deg)}35%{transform:translateY(8%) rotate(10deg) scale(1.08)}55%{transform:translateX(-10%) rotate(-9deg)}75%{transform:translateX(6%) rotate(5deg)}100%{transform:none}}
+.bf-t.gone{animation:bfGone .6s ease-in both;animation-delay:var(--d,0ms)}
+@keyframes bfGone{30%{transform:scale(1.15) rotate(-6deg)}100%{transform:translateY(160%) rotate(40deg) scale(.5);opacity:0}}
+/* the table */
+.bf-k{position:absolute;border-radius:50%;background:radial-gradient(circle at 42% 36%,#e07a52,#b44a2c 55%,#8a3420);box-shadow:0 0 0 3px #e7b660,0 0 0 5px #7a4a20,0 5px 12px rgba(0,0,0,.55);cursor:pointer}
+.bf-k::before{content:'';position:absolute;inset:9%;border-radius:50%;border:1.5px dashed rgba(255,230,180,.45)}
+.bf-k.can{box-shadow:0 0 0 3px #ffd66b,0 0 0 5px #7a4a20,0 0 18px 4px rgba(255,214,107,.6)}
+.bf-k.empty{opacity:.55}
+.bf-pool{position:absolute;border-radius:46%;background:radial-gradient(ellipse at 50% 45%,#f6e6c4,#e0c08e 70%,#c99a62);box-shadow:inset 0 0 0 3px #a0703e,inset 0 0 18px rgba(120,70,20,.4),0 4px 12px rgba(0,0,0,.45);cursor:pointer}
+.bf-pool::after{content:'';position:absolute;inset:12%;border-radius:50%;background:repeating-conic-gradient(rgba(160,100,40,.18) 0 8deg,transparent 8deg 22.5deg);pointer-events:none}
+.bf-pool.can{box-shadow:inset 0 0 0 3px #ffd66b,0 0 18px 4px rgba(255,214,107,.55)}
+.bf-table .bf-t{transition:transform .22s cubic-bezier(.3,1.6,.5,1),opacity .2s,filter .2s}
+.bf-table .bf-t.up{transform:translateY(-16%) scale(1.2);z-index:4;filter:drop-shadow(0 0 6px #fff7b0) drop-shadow(0 6px 4px rgba(0,0,0,.5))}
+.bf-table .bf-t.nud{transform:translate(var(--nx),var(--ny)) scale(.9);opacity:.6}
+.bf-k.allno{opacity:.45;filter:grayscale(.5)}
+.bf-k.allno.can{box-shadow:0 0 0 3px #e7b660,0 0 0 5px #7a4a20,0 5px 12px rgba(0,0,0,.55)}
+.bf-t.nofit>svg{opacity:.5;filter:grayscale(.6)}
+.bf-t.nofit::after{content:'✗';position:absolute;right:4%;top:4%;width:38%;height:38%;border-radius:50%;background:#c0392b;color:#fff;font:900 11px/1 var(--ff);display:grid;place-items:center;box-shadow:0 0 0 1.5px #fff}
+.bf-t.adv{outline:3px solid #ffd24a;outline-offset:1px;border-radius:4px;animation:bfReady 1.2s ease-in-out infinite}
+.bf-t.adv::before{content:none;position:absolute;left:-10%;top:-14%;z-index:2;font:900 13px/1 var(--ff);color:#ffd24a;text-shadow:0 0 3px #000,0 0 2px #000}
+.bf-t.sun{border-radius:50%;box-shadow:0 0 0 2px #fff6c0,0 0 10px #ffd24a}
+.bf-t.deal{animation:bfDeal .5s cubic-bezier(.3,1.5,.5,1) both}
+@keyframes bfDeal{0%{transform:translateY(-70%) scale(1.5);opacity:0}100%{transform:none;opacity:1}}
+.bf-flyl{position:fixed;inset:0;pointer-events:none;z-index:60}
+.bf-fly{position:fixed!important;z-index:61;will-change:transform}
+.bf-pop{position:fixed;z-index:62;pointer-events:none;font:900 24px var(--ff);color:#ffe36b;text-shadow:0 2px 0 #7a3d14,0 0 10px rgba(0,0,0,.9);white-space:nowrap;transform:translate(-50%,-50%)}
+.bf-pop.big{font-size:34px}.bf-pop.cnt{font-size:16px}.bf-pop.chip{font-size:18px}.bf-pop.bad{color:#ff8a7a;text-shadow:0 2px 0 #5a0e08,0 0 10px rgba(0,0,0,.9)}.bf-pop.good{color:#b8ffb0;text-shadow:0 2px 0 #14501f,0 0 10px rgba(0,0,0,.9)}
+.bf-rvw{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:15;width:min(62%,220px);padding:8px;border-radius:14px;background:linear-gradient(#fcf6e8,#f1e3c4);color:#3a2410;box-shadow:0 0 0 2px #c99a3e,0 12px 30px rgba(0,0,0,.55)}
+.bf-rvs{font-style:normal;margin-left:6px;color:#1d7a3a;font-weight:800}
+.bf-rvw svg{width:100%;height:auto;display:block}.bf-rvw .bf-ph{font-size:15px;margin-bottom:4px}
+.bf-ban{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);z-index:20;text-align:center;pointer-events:none}
+.bf-ban b{display:inline-block;padding:6px 22px;border-radius:14px;background:rgba(10,20,50,.78);font:700 34px var(--ff-h);color:#ffe3a0;box-shadow:0 0 0 2px #c99a3e,0 8px 24px rgba(0,0,0,.5)}
+.bf-ban small{display:block;margin-top:6px;font:800 16px var(--ff);color:#fff;text-shadow:0 1px 3px #000}
+.bf-tip{position:fixed;left:50%;top:var(--tipy,60%);transform:translate(-50%,-100%);z-index:25;max-width:min(230px,60vw);padding:6px 12px;border-radius:14px;background:#fff4d6;color:#3a2410;font:800 14px/1.25 var(--ff);text-align:center;box-shadow:0 0 0 2px #c99a3e,0 8px 20px rgba(0,0,0,.45);pointer-events:none;animation:bfTipIn .35s ease-out}
+@keyframes bfTipIn{from{transform:translateY(8px);opacity:0}}
+.bf-fing{position:fixed;z-index:63;pointer-events:none;transform-origin:37% 7%;animation:bfTap 1.15s ease-in-out infinite;filter:drop-shadow(0 4px 6px rgba(0,0,0,.6));transition:left .45s ease,top .45s ease}
+.bf-fing svg{width:100%;height:100%;display:block}
+@keyframes bfTap{0%,100%{transform:translate(10px,14px) scale(1)}45%{transform:translate(0,0) scale(.92)}55%{transform:translate(0,0) scale(.92)}}
+/* pop-ups */
+.bf-ov{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(8,14,36,.55)}
+.bf-ov[hidden]{display:none}
+.bf-card{background:linear-gradient(#fcf6e8,#f1e3c4);color:#3a2410;border-radius:16px;box-shadow:0 0 0 2px #c99a3e,0 20px 50px rgba(0,0,0,.6);padding:12px;max-width:min(420px,100%);max-height:100%;overflow:auto;box-sizing:border-box}
+.bf-menu{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.bf-mi{min-height:48px;border:0;border-radius:12px;background:#fff;box-shadow:inset 0 0 0 1.5px #d3bc92;color:#3a2410;display:flex;align-items:center;gap:8px;padding:0 10px;font:800 15px var(--ff);text-align:left}
+.bf-mi .ic{width:22px;height:22px;flex:none}
+.bf-peek{width:100%}.bf-peek svg{width:100%;height:auto;display:block}
+.bf-ph{display:flex;align-items:center;gap:8px;font:800 18px var(--ff);margin-bottom:6px}.bf-ph i{width:12px;height:12px;border-radius:50%;background:var(--pc)}.bf-ph span{margin-left:auto;color:#a0701a}.bf-ph .bf-ib{color:#3a2410;width:40px;height:40px}
+.bf-pn{font:700 14px var(--ff);color:#2f7d46;text-align:center;margin-top:4px}
+.bf-res{width:100%}
+.bf-rt{display:flex;align-items:center;justify-content:center;gap:8px;font:700 30px var(--ff-h);color:#1d4aa3;margin:2px 0 10px}.bf-rt .ic{width:30px;height:30px}
+.bf-rr,.bf-rk{display:grid;grid-template-columns:12px 1fr 46px 50px 46px 62px;align-items:center;gap:4px;font:800 16px var(--ff);padding:6px 4px;border-bottom:1px solid #e0cba0}
+.bf-rr i{width:12px;height:12px;border-radius:50%;background:var(--pc)}.bf-rr .g{color:#2f7d46;text-align:right}.bf-rr .r{color:#b0302a;text-align:right}.bf-rr .t{text-align:right;color:#a0701a;font-size:19px}
+.bf-rk{border:0;font:700 12px var(--ff);color:#8a6a3a;padding:0 4px}.bf-rk span:nth-child(1){grid-column:3;text-align:right}.bf-rk span{text-align:right}
+.bf-btns{display:flex;gap:8px;margin-top:12px}
+.bf-go{flex:1;min-height:48px;border:0;border-radius:14px;background:linear-gradient(#d9673e,#b04424);color:#fff;font:800 17px var(--ff);box-shadow:0 3px 0 #7a2a12}
+.bf-go.ghost{background:#fff;color:#3a2410;box-shadow:inset 0 0 0 2px #c99a3e}
+.bf-more{margin:10px 0}.bf-more summary{font-weight:800;cursor:pointer;padding:8px 0}
+.bf-story .q{font-size:1.35rem;text-align:center}
+`;document.head.appendChild(s)})();
+// ===================== part 9: board-first phone table (play on the board, not in menus) =====================
+// On phones the whole screen is the table: kilns around the courtyard on top, your racks + mosaic + breakage at the bottom.
+// Tap a colour on a kiln: every tile of it lifts and the racks that can take it glow. Tap a rack: the tiles fly in, the rest
+// of the kiln slides to the courtyard, overflow crashes onto the breakage line. The engine runs unchanged; this layer keeps a
+// mirror of it (BF.disp) and plays each engine event (take, tiling, breakage, refill, end bonus) as an animation, one at a time.
+// ?bf=0 turns it off (the older phone panel comes back).
+const BF={on:false,root:null,disp:null,gk:'',q:[],busy:false,fast:false,hide:new Set(),menu:false,peek:null,resHide:false,say:'',actor:-1,
+  tw:360,th:300,cs:32,seen:{},fingerOn:false,adv:null,advK:'',idleT:null,lastWarn:0,anims:[],errs:[],tipT:null};
+function bfWanted(){try{const q=new URLSearchParams(location.search);if(q.has('bf'))return q.get('bf')!=='0'}catch(e){}return true}
+const bfUse=c=>`<svg viewBox="0 0 100 100" aria-hidden="true"><use href="#${c===SUN?'gzsun':'gz'+c}"/></svg>`;
+const bfQ=s=>BF.root&&BF.root.querySelector(s);
+const bfEl=k=>bfQ(`[data-k="${k}"]`);
+const bfSlot=k=>bfQ(`[data-s="${k}"]`)||bfEl(k);
+function bfR(el){if(!el)return null;const r=el.getBoundingClientRect();return r.width>0?{left:r.left,top:r.top,width:r.width,height:r.height}:null}
+function bfTile(c,key,cls){return `<i class="bf-t${cls?' '+cls:''}${key&&BF.hide.has(key)?' hid':''}"${key?` data-k="${key}"`:''}>${bfUse(c)}</i>`}
+function bfClone(g){return JSON.parse(JSON.stringify({fac:g.fac,ctr:g.ctr,markerIn:g.markerIn,round:g.round,phase:g.phase,first:g.first,np:g.np,ex:g.ex,lid:[],
+  pl:g.pl.map(p=>({i:p.i,nm:p.nm,score:p.score,lines:p.lines,wall:p.wall,floor:p.floor}))}))}
+const bfFocus=()=>{try{return focusSeat()}catch(e){return 0}};
+// ---------- timing: tap anywhere during an animation to speed it up ----------
+function bfAnimOK(){return !!ANIM&&typeof Element!=='undefined'&&!!Element.prototype.animate&&!/jsdom/i.test(navigator.userAgent)}
+function bfD(ms){return ms*(BF.fast?.22:1)/(UI.speed>=3?1.7:UI.speed<1?.75:1)}
+function bfWait(ms){return bfAnimOK()&&ms>0?new Promise(r=>setTimeout(r,bfD(ms))):Promise.resolve()}
+function bfTrack(a){BF.anims.push(a);if(BF.fast)a.playbackRate=4;const done=()=>{const i=BF.anims.indexOf(a);if(i>=0)BF.anims.splice(i,1)};a.finished.then(done,done);return a}
+function bfSpeedUp(){if(BF.fast)return;BF.fast=true;for(const a of BF.anims)try{a.playbackRate=4}catch(e){}}
+// a copy of a tile flies from one screen rect to another (a little arc, a little bigger mid-air)
+function bfFly(c,from,to,o){o=o||{};if(!bfAnimOK()||!from||!to)return Promise.resolve();const d=document.createElement('i');d.className='bf-t bf-fly';d.innerHTML=bfUse(c);
+  Object.assign(d.style,{left:from.left+'px',top:from.top+'px',width:from.width+'px',height:from.height+'px'});BF.fl.appendChild(d);
+  const dx=to.left+to.width/2-(from.left+from.width/2),dy=to.top+to.height/2-(from.top+from.height/2),s=to.width/from.width,lift=o.lift==null?42:o.lift;
+  const a=bfTrack(d.animate([{transform:'translate(0,0) scale(1)'},{transform:`translate(${dx*.5}px,${dy*.5-lift}px) scale(${Math.max(1.12,(1+s)/2*1.18)}) rotate(${o.rot||0}deg)`,offset:.5},{transform:`translate(${dx}px,${dy}px) scale(${s}) rotate(0deg)`}],
+    {duration:bfD(o.dur||540),delay:bfD(o.delay||0),easing:'cubic-bezier(.35,.05,.25,1)',fill:'forwards'}));
+  return a.finished.then(()=>d.remove(),()=>d.remove())}
+// a tile drops off the board (to the shard box)
+function bfDrop(c,from,o){o=o||{};if(!bfAnimOK()||!from)return Promise.resolve();const d=document.createElement('i');d.className='bf-t bf-fly';d.innerHTML=bfUse(c);
+  Object.assign(d.style,{left:from.left+'px',top:from.top+'px',width:from.width+'px',height:from.height+'px'});BF.fl.appendChild(d);const rot=(Math.random()-.5)*70;
+  const a=bfTrack(d.animate([{transform:'none',opacity:1},{transform:`translate(${(Math.random()-.5)*30}px,${from.height*2.2}px) rotate(${rot}deg) scale(.6)`,opacity:0}],{duration:bfD(o.dur||520),delay:bfD(o.delay||0),easing:'cubic-bezier(.5,0,.9,.5)',fill:'forwards'}));
+  return a.finished.then(()=>d.remove(),()=>d.remove())}
+function bfFlip(el,old){if(!bfAnimOK()||!el||!old)return;const r=bfR(el);if(!r)return;const dx=old.left-r.left,dy=old.top-r.top,s=old.width/r.width;if(Math.abs(dx)<1&&Math.abs(dy)<1&&Math.abs(s-1)<.02)return;
+  bfTrack(el.animate([{transform:`translate(${dx}px,${dy}px) scale(${s})`,transformOrigin:'0 0'},{transform:'none',transformOrigin:'0 0'}],{duration:bfD(380),easing:'ease-out'}))}
+function bfShow(k){const el=bfEl(k);if(el)el.classList.remove('hid');BF.hide.delete(k)}
+// floating numbers where points are earned or lost
+function bfPop(txt,at,cls,big){if(!at||!BF.fl)return;const d=document.createElement('div');d.className='bf-pop '+(cls||'');if(big)d.classList.add('big');d.textContent=txt;
+  d.style.left=(at.left+at.width/2)+'px';d.style.top=(at.top+at.height/2)+'px';BF.fl.appendChild(d);
+  if(!bfAnimOK()){setTimeout(()=>d.remove(),10);return}
+  bfTrack(d.animate([{transform:'translate(-50%,-50%) scale(.4)',opacity:0},{transform:'translate(-50%,-80%) scale(1.25)',opacity:1,offset:.25},{transform:'translate(-50%,-160%) scale(1)',opacity:0}],{duration:bfD(big?1500:1150),easing:'ease-out',fill:'forwards'})).finished.then(()=>d.remove(),()=>d.remove())}
+function bfChipR(i){return bfR(bfQ(`[data-bfchip="${i}"]`))}
+function bfChipPop(i,txt,cls){const el=bfQ(`[data-bfchip="${i}"]`);if(!el)return;const r=bfR(el);if(r)r.top+=r.height*.9;bfPop(txt,r,(cls||'')+' chip');el.classList.remove('hit');void el.offsetWidth;el.classList.add('hit')}
+function bfScore(i,v){const el=bfQ(`[data-bfsc="${i}"]`);if(el)el.textContent='★'+v}
+function bfBanner(t,sub){const tb=BF.tbl;if(!tb)return;const d=document.createElement('div');d.className='bf-ban';d.innerHTML=`<b>${esc(t)}</b>${sub?`<small>${esc(sub)}</small>`:''}`;tb.appendChild(d);
+  if(!bfAnimOK()){d.remove();return}
+  bfTrack(d.animate([{opacity:0,transform:'translateY(-50%) scale(.7)'},{opacity:1,transform:'translateY(-50%) scale(1.05)',offset:.18},{opacity:1,transform:'translateY(-50%) scale(1)',offset:.8},{opacity:0,transform:'translateY(-50%) scale(1)'}],{duration:bfD(1500),fill:'forwards'})).finished.then(()=>d.remove(),()=>d.remove())}
+// one idea at a time, in two short lines at most, above the action (guided game only, each once)
+const BF_TIPS={nofit:'Red ✗ colours fit no row.',slide:'Leftovers slid to the middle.',tiling:'Full rows slide onto the wall!',chain:'Touching tiles score more!',
+  floor:'Extra tiles break: minus points.',sun:'☀ costs 1, but you start next.',bonus:'Full column +7 at the end!',
+  end:'A full wall row ends the game.',keep:'Unfinished rows wait for next round.'};
+function bfTip(k,force){if((!UI.coach&&!force)||BF.seen['tip_'+k])return;BF.seen['tip_'+k]=1;BF.tip=BF_TIPS[k];bfHintSet();
+  clearTimeout(BF.tipT);BF.tipT=setTimeout(()=>{BF.tip=null;bfHintSet()},4200)}
+function bfHintSet(){if(!BF.hint||!BF.disp||!G)return;BF.hint.innerHTML=bfHintHTML(BF.disp,BF.busy?null:me())}
+// ---------- the engine's events go into a queue; each is played on the board in turn ----------
+function bfSync(){if(!G)return false;const gk=G.seed+':'+(G.gid||'');if(gk!==BF.gk){BF.gk=gk;BF.q.length=0;BF.disp=bfClone(G);BF.seen={};BF.resHide=false;BF.menu=false;BF.peek=null;BF.lastWarn=0;BF.adv=null;BF.advK='';BF.fingerOn=false;BF.deal=true;return true}return false}
+function bfFx(f){if(!G)return;bfSync();const x=f.x;let e=null;
+  if(f.t==='take')e={t:'take',x:Object.assign({},x)};else if(f.t==='wallphase')e={t:'wallphase'};else if(f.t==='wall')e={t:'wall',x:Object.assign({},x)};
+  else if(f.t==='round')e={t:'round',fac:JSON.parse(JSON.stringify(G.fac)),round:G.round,first:G.first};else if(f.t==='win')e={t:'win'};
+  if(e)BF.q.push(e)}
+const bfHold=()=>BF.on&&(BF.busy||BF.q.length>0);
+async function bfRun(){if(BF.busy)return;BF.busy=true;const gk=BF.gk;clearTimeout(BF.idleT);BF.fingerOn=false;bfFinger(null);
+  try{while(BF.q.length&&BF.gk===gk){const e=BF.q.shift();try{await bfStep(e)}catch(err){BF.errs.push(String(err&&err.message||err));BF.q.length=0;break}}}
+  finally{BF.busy=false;BF.rv=null;BF.fast=false;BF.say='';BF.actor=-1;BF.hide.clear();if(BF.fl)BF.fl.innerHTML='';BF.anims.length=0;if(G&&BF.gk===gk)BF.disp=bfClone(G);bfDraw();try{schedule()}catch(e){}}}
+async function bfStep(e){const S=BF.disp;
+  if(e.t==='take')return bfTake(e.x);
+  if(e.t==='wallphase'){BF.r0=S.pl.map(p=>p.score);S.phase='wall';BF.say='Round over: tiling!';bfDraw();bfBanner('Round over','Full rows tile the wall');sfx('turn');bfTip('tiling');await bfWait(1350);return}
+  if(e.t==='wall')return bfWall(e.x);
+  if(e.t==='round'){if(S.phase==='wall'||S.pl.some(p=>p.floor.length))await bfFloors();
+    S.fac=e.fac;S.ctr=[];S.round=e.round;S.phase='offer';S.markerIn='ctr';S.first=e.first;BF.say='';const first=BF.deal&&e.round===1;BF.deal=false;
+    bfDraw({deal:true});bfBanner('Round '+e.round,first?'Most ★ wins':'');sfx('round');if(e.round===2){const fp=S.pl[bfFocus()];setTimeout(()=>bfTip(fp&&fp.lines.some(l=>l.length)?'keep':'bonus'),bfD(1600))}if(e.round===3)setTimeout(()=>bfTip('bonus'),bfD(1600));
+    await bfWait(Math.min(1500,500+S.fac.length*4*45));return}
+  if(e.t==='win'){await bfFloors();await bfBonus();sfx('win');return}}
+async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!a)throw Error('take: no source');
+  const m={src:x.src,c:x.c,j:(x.nj||x.c===PRISM)?1:0,line:x.line};const pre=x.src<0?'c':'f'+x.src;const picked=[],rest=[];
+  a.forEach((t,k)=>((t===m.c||(t===PRISM&&m.j))?picked:rest).push({t,k,key:pre+'_'+k}));if(picked.length!==x.n)throw Error('take: out of step');
+  const focus=x.p===bfFocus(),pl=P(x.p);BF.actor=x.p;
+  if(!focus||!pl||!pl.human||NET.on){BF.say=`${S.pl[x.p].nm} takes ${x.n} ${x.c===PRISM?'Prism':TNAME[x.c]}`;bfDraw()}
+  // 1. the tiles lift (the player's own selection is already up)
+  let lifted=false;for(const o of picked){const el=bfEl(o.key);if(el&&!el.classList.contains('up')){el.classList.add('up');lifted=true}}
+  for(const o of rest){const el=bfEl(o.key);if(el&&x.src>=0)el.classList.add('nud')}
+  if(lifted){sfx('select');await bfWait(focus?620:900)}
+  picked.forEach(o=>o.r=bfR(bfEl(o.key)));rest.forEach(o=>o.r=bfR(bfEl(o.key)));const ctrOld=S.ctr.map((t,k)=>bfR(bfEl('c_'+k)));const sunR=bfR(bfEl('sun'));
+  // 2. the engine's take on the mirror; work out where each tile lands (glazes before prisms, rack first, then breakage)
+  const p=S.pl[x.p];const f0=p.floor.length,L0=x.line<5?p.lines[x.line].length:0,c0=S.ctr.length;const hadSun=x.src<0&&S.markerIn==='ctr';
+  applyTake(S,x.p,m);
+  const got=picked.slice().sort((u,v)=>u.t-v.t);let li=L0,fi=hadSun?Math.min(7,f0+1):f0;const sunKey=hadSun?`x${x.p}_${Math.min(6,f0)}`:null;
+  for(const o of got){if(x.line<5&&li<cap(x.line))o.to=`l${x.p}_${x.line}_${li++}`;else if(fi<7){o.to=`x${x.p}_${fi++}`;o.brk=1}else{o.to=null;o.brk=1}}
+  const restTo=x.src>=0?rest.map((o,i)=>'c_'+(c0+i)):[];
+  BF.hide=new Set([...got.map(o=>o.to).filter(Boolean),...restTo,...(sunKey?[sunKey]:[])]);bfDraw();
+  // the courtyard re-packs: old tiles glide to their new places
+  if(x.src<0)rest.forEach((o,i)=>bfFlip(bfEl('c_'+i),o.r));else ctrOld.forEach((r,k)=>bfFlip(bfEl('c_'+k),r));
+  // 3. fly: chosen tiles to the rack (or to a rival's chip), the rest slides to the middle
+  const chip=bfChipR(x.p);const fl=[];sfx('take');
+  got.forEach((o,i)=>fl.push(bfFly(o.t,o.r,focus&&o.to?bfR(bfSlot(o.to)):chip,{delay:i*(focus?70:140),dur:focus?600:760,rot:o.brk?18:0}).then(()=>{if(o.to)bfShow(o.to)})));
+  rest.forEach((o,i)=>{if(!restTo[i])return;fl.push(bfFly(o.t,o.r,bfR(bfSlot(restTo[i])),{delay:200+i*60,dur:520,lift:12}).then(()=>{bfShow(restTo[i]);const el=bfEl(restTo[i]);if(el&&bfAnimOK())el.animate([{transform:'scale(1.25)'},{transform:'scale(.92)'},{transform:'scale(1)'}],{duration:bfD(260)});sfx('place')}))});
+  if(hadSun)fl.push(bfFly(SUN,sunR,focus?bfR(bfSlot(sunKey)):chip,{dur:600,lift:60}).then(()=>bfShow(sunKey)));
+  await Promise.all(fl);BF.hide.clear();sfx('place');
+  if(x.src>=0&&rest.length&&focus&&pl&&pl.human)bfTip('slide');
+  if(focus&&x.line<5&&p.lines[x.line].length===cap(x.line)){const rr=bfR(bfQ(`[data-bfrow="${x.line}"] .bf-rack`));bfPop(x.line===4?'Big row full!':'Row full!',rr,'good');sfx('wall',4)}
+  // 4. overflow crashes onto the breakage line
+  const brk=got.filter(o=>o.brk);const pen=floorPenalty(p.floor.length)-floorPenalty(f0);
+  if(brk.length||hadSun){if(focus){for(const o of brk){const el=o.to&&bfEl(o.to);if(el){el.classList.remove('crash');void el.offsetWidth;el.classList.add('crash')}}
+      const fr=bfR(bfQ('.bf-fl'));if(pen)bfPop(String(pen).replace('-','−'),fr,'bad',true);const me=bfQ('.bf-me');if(me&&brk.length){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
+    else if(pen)bfChipPop(x.p,String(pen).replace('-','−'),'bad');
+    if(brk.length)sfx('floor');if(hadSun){sfx('sun');if(focus)bfPop('☀ you start next round',bfR(bfSlot(sunKey)),'good');if(focus&&pl&&pl.human)bfTip('sun')}if(brk.length&&focus&&pl&&pl.human)bfTip('floor');await bfWait(brk.length?820:420)}
+  else if(!focus){bfChipPop(x.p,x.line<5?'row '+(x.line+1)+(p.lines[x.line].length===cap(x.line)?' full':''):'',x.line<5?'':'bad');await bfWait(260)}
+  if(focus&&pl&&pl.human)BF.seen.took=1}
+// end of round: each full rack sends one tile to the wall; the lines it joins light up and the points pop
+function bfRun1(w,r,c){const o=[[r,c]];for(let x=c-1;x>=0&&w[r][x]>=0;x--)o.push([r,x]);for(let x=c+1;x<5&&w[r][x]>=0;x++)o.push([r,x]);
+  for(let y=r-1;y>=0&&w[y][c]>=0;y--)o.push([y,c]);for(let y=r+1;y<5&&w[y][c]>=0;y++)o.push([y,c]);return o}
+async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L||L.length!==cap(x.r))throw Error('wall: rack not full');
+  const focus=x.p===bfFocus();const lc=lineColour(L);const k=L.indexOf(PRISM);const v=k>=0?(lc>=0?10+lc:S.ex.gray?15:10+WALLC(x.r,x.c)):lc;const mc=v<5?v:PRISM;
+  const from=[];for(let i=0;i<L.length;i++)from.push({t:L[i],r:bfR(bfEl(`l${x.p}_${x.r}_${i}`))});
+  p.wall[x.r][x.c]=v;p.lines[x.r]=[];const wk=`w${x.p}_${x.r}_${x.c}`;BF.say=focus?`Row ${x.r+1}: +${x.pts}`:`${p.nm} tiles row ${x.r+1}`;
+  if(!focus){bfDraw();BF.rv=BF.rv&&BF.rv.p===x.p?BF.rv:{p:x.p,marks:[]};BF.rv.marks.push({r:x.r,c:x.c,pts:x.pts});p.score+=x.pts;bfScore(x.p,p.score);bfRival();sfx('wall',Math.min(3,x.pts));await bfWait(300);
+    const sv=BF.tbl&&BF.tbl.querySelector('.bf-rvw svg');if(sv){const b=sv.getBoundingClientRect(),k=b.width/512;bfPop('+'+x.pts,{left:b.left+(x.c*100+6)*k,top:b.top+(x.r*100+6)*k,width:100*k,height:100*k},'good',true)}
+    bfChipPop(x.p,'+'+x.pts,'good');await bfWait(950);return}
+  BF.rv=null;BF.hide=new Set([wk]);bfDraw();
+  const mover=from[0],others=from.slice(1);
+  const fl=[bfFly(mc,mover.r,bfR(bfSlot(wk)),{dur:620,lift:28})];others.forEach((o,i)=>fl.push(bfDrop(o.t,o.r,{delay:240+i*60})));
+  await fl[0];bfShow(wk);await Promise.all(fl);
+  const run=bfRun1(p.wall,x.r,x.c);const step=run.length>1?260:0;
+  for(let i=0;i<run.length;i++){const [r,c]=run[i];const el=bfSlot(`w${x.p}_${r}_${c}`);if(el){el.style.setProperty('--d','0ms');el.classList.add('lit')}
+    const v=Math.max(1,Math.round((i+1)*x.pts/run.length));if(run.length>1&&i<run.length-1)bfPop('+'+v,bfR(el),'good cnt');sfx('wall',Math.min(8,i+1));if(i<run.length-1)await bfWait(step)}
+  bfPop('+'+x.pts,bfR(bfSlot(wk)),'good',true);if(x.pts>1)bfTip('chain');if(x.pts>=3){bfBanner(x.pts>=6?'Great chain! +'+x.pts:'Chain +'+x.pts,'');const me=bfQ('.bf-me');if(me){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
+  await bfWait(700);p.score+=x.pts;bfScore(x.p,p.score);bfChipPop(x.p,'+'+x.pts,'good');await bfWait(520);
+  for(const [r,c] of run){const el=bfSlot(`w${x.p}_${r}_${c}`);if(el)el.classList.remove('lit')}}
+function bfRival(){const tb=BF.tbl;if(!tb||!BF.rv)return;let el=tb.querySelector('.bf-rvw');if(!el){el=document.createElement('div');el.className='bf-rvw';tb.appendChild(el)}const p=BF.disp.pl[BF.rv.p];
+  const sum=BF.rv.marks.reduce((a,m)=>a+m.pts,0);el.innerHTML=`<div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>★${p.score}</span><em class="bf-rvs">+${sum}</em></div>${phWallSVG(p,{marks:BF.rv.marks})}`}
+async function bfFloors(){BF.rv=null;const S=BF.disp;BF.say='Broken tiles cost points';
+  const ls=S.pl.filter(p=>p.floor.length).map(p=>({p,l:Math.min(p.score,-floorPenalty(p.floor.length))})).filter(o=>o.l);
+
+  for(const p of S.pl){if(!p.floor.length)continue;const pen=floorPenalty(p.floor.length);const loss=Math.min(p.score,-pen);const focus=p.i===bfFocus();
+    if(focus){bfDraw();const fr=bfR(bfQ('.bf-fl'));p.floor.forEach((t,k)=>{const el=bfEl(`x${p.i}_${k}`);if(el){el.style.setProperty('--d',bfD(k*70)+'ms');el.classList.add('gone')}});
+      if(loss)bfPop('−'+loss,fr,'bad',true);sfx('floor');await bfWait(1500)}
+    else if(loss){bfChipPop(p.i,'−'+loss+' broken','bad');sfx('floor');await bfWait(800)}
+    p.score-=loss;bfScore(p.i,p.score);if(p.floor.includes(SUN))S.first=p.i;p.floor=[]}
+  S.markerIn='ctr';bfDraw();
+  if(BF.r0){const d=S.pl.map((p,i)=>p.score-(BF.r0[i]||0));BF.r0=null;const f=n=>(n>=0?'+':'−')+Math.abs(n);bfBanner('Round score',S.pl.map((p,i)=>(isYou(p.i)?'You ':S.pl.length>2?'':p.nm+' ')+f(d[i])).join('  ·  '));await bfWait(1300)}
+  await bfWait(200)}
+async function bfBonus(){const S=BF.disp;BF.say='End bonuses';
+  for(const p of S.pl){const b=endBonus(p);const add=b.rows*BONUS.row+b.cols*BONUS.col+b.colours*BONUS.colour;if(!add)continue;const focus=p.i===bfFocus();
+    if(!focus){bfChipPop(p.i,'+'+add,'good');p.score+=add;bfScore(p.i,p.score);await bfWait(500);continue}
+    bfDraw();const lite=(cells,txt)=>{cells.forEach(([r,c],i)=>{const el=bfSlot(`w${p.i}_${r}_${c}`);if(el){el.style.setProperty('--d',bfD(i*70)+'ms');el.classList.add('lit')}});
+      const last=cells[cells.length-1];bfPop(txt,bfR(bfSlot(`w${p.i}_${last[0]}_${last[1]}`)),'good',true);sfx('wall',6)};
+    const clear=()=>{for(const el of BF.root.querySelectorAll('.bf-c.lit'))el.classList.remove('lit')};
+    for(let r=0;r<5;r++)if(p.wall[r].every(v=>v>=0)){lite([0,1,2,3,4].map(c=>[r,c]),'+'+BONUS.row);await bfWait(900);clear()}
+    for(let c=0;c<5;c++)if(p.wall.every(row=>row[c]>=0)){lite([0,1,2,3,4].map(r=>[r,c]),'+'+BONUS.col);await bfWait(900);clear()}
+    for(let k=0;k<NC;k++){const cells=[];for(let r=0;r<5;r++)for(let c=0;c<5;c++)if(p.wall[r][c]===k)cells.push([r,c]);if(cells.length===5){lite(cells,'+'+BONUS.colour);await bfWait(900);clear()}}
+    p.score+=add;bfScore(p.i,p.score);bfChipPop(p.i,'+'+add,'good');await bfWait(300)}}
+// ---------- drawing ----------
+function bfEnsure(){if(BF.root)return BF.root;const r=document.createElement('div');r.id='bf';r.setAttribute('aria-label','The table');
+  r.innerHTML=`<div class="bf-top"></div><div class="bf-mid"><div class="bf-table"></div><div class="bf-side"><div class="bf-hint" role="status" aria-live="polite"></div><div class="bf-me"></div></div></div><div class="bf-tip" hidden></div><div class="bf-ov" hidden></div><div class="bf-flyl" aria-hidden="true"></div><div class="bf-fing" hidden aria-hidden="true"><svg viewBox="0 0 48 56"><path d="M18 4c2.8 0 5 2.2 5 5v15l2-.4V18c0-2.6 2-4.6 4.6-4.6S34 15.4 34 18v6.6l1.4-.2c2.4 0 4.4 2 4.4 4.4V40c0 8-6 14-14 14h-4c-5 0-8-2.6-10.4-6.2L4.8 38c-1.6-2.4-1-5.4 1.2-7 2.2-1.6 5.2-1 6.8 1.2l.2.4V9c0-2.8 2.2-5 5-5z" fill="#fff" stroke="#3a2a1a" stroke-width="2.4"/></svg></div>`;
+  document.body.appendChild(r);BF.root=r;BF.top=r.querySelector('.bf-top');BF.tbl=r.querySelector('.bf-table');BF.hint=r.querySelector('.bf-hint');BF.me=r.querySelector('.bf-me');BF.ov=r.querySelector('.bf-ov');BF.fl=r.querySelector('.bf-flyl');
+  r.addEventListener('click',bfClick);r.addEventListener('pointerdown',()=>{if(BF.busy)bfSpeedUp()});return r}
+function bfSizes(){const I=phInsets();const V=vpDims(),W=V.w-I.l-I.r,H=V.h-I.t-I.b;const land=W>H*1.1;document.documentElement.classList.toggle('bf-land',land);
+  let cs=land?Math.min((H-44-44-24)/6.5,(W*.52-60)/10.45,46):Math.min((W-52)/10.45,(H-44-44)*.43/6.5,48);cs=Math.max(18,Math.floor(cs));BF.cs=cs;BF.root.style.setProperty('--cs',cs+'px');
+  const tb=BF.tbl;BF.tw=tb.clientWidth||(land?W*.5:W);BF.th=tb.clientHeight||(land?H-44:H-44-38-6.5*cs-40)}
+function bfRing(W,H,n){const cx=W/2,cy=H/2;let ks=Math.min(W,H)*(n<=5?.32:n<=7?.26:.22);ks=Math.max(44,Math.min(ks,W*(n<=5?.3:n<=7?.25:.21),H*(n<=5?.34:.28),130));
+  const ax=Math.max(10,W/2-ks/2-6),ay=Math.max(10,H/2-ks/2-6);const K=[];for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;K.push({x:cx+Math.cos(a)*ax,y:cy+Math.sin(a)*ay})}
+  return {ks,K,cx,cy,pw:Math.max(70,2*(ax-ks*.6)),ph:Math.max(54,2*(ay-ks*.6))}}
+function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R.ks*.33;const live=!BF.busy;const sel=live&&hp&&G.phase==='offer'?UI.sel:null;const can=live&&hp&&G.phase==='offer'&&!sel;
+  const am=can&&UI.coach&&BF.seen.took?bfAdvice(hp):null;const isAdv=(src,t)=>am&&am.act==='take'&&am.src===src&&(t===am.c);
+  const nofit=new Set();if(can)for(let c=0;c<NC;c++){let ok=false;for(let r=0;r<5;r++)if(lineOk(G,hp,r,c))ok=true;if(!ok)nofit.add(c)}const nf=t=>nofit.has(t)?' nofit':'';
+  let h=`<div class="bf-pool${can&&S.ctr.length?' can':''}" data-bfsrc="-1" style="left:${R.cx-R.pw/2}px;top:${R.cy-R.ph/2}px;width:${R.pw}px;height:${R.ph}px"></div>`;
+  S.fac.forEach((a,i)=>{const K=R.K[i];const dx=R.cx-K.x,dy=R.cy-K.y,dl=Math.hypot(dx,dy)||1;
+    h+=`<div class="bf-k${can&&a.length?' can':''}${a.length?'':' empty'}${can&&a.length&&a.every(t=>nofit.has(t))?' allno':''}" data-bfsrc="${i}" style="left:${K.x-R.ks/2}px;top:${K.y-R.ks/2}px;width:${R.ks}px;height:${R.ks}px">`;
+    a.forEach((t,k)=>{const key=`f${i}_${k}`;const x=(k%2?.56:-.56)*ts,y=(k<2?-.56:.56)*ts;const up=sel&&sel.src===i&&(t===sel.c||(t===PRISM&&sel.j));const nud=sel&&sel.src===i&&!up;
+      h+=`<i class="bf-t${up?' up':''}${nud?' nud':''}${nf(t)}${isAdv(i,t)?' adv':''}${o.deal?' deal':''}${BF.hide.has(key)?' hid':''}" data-k="${key}" role="button" aria-label="${TNAME[t]}" style="left:${R.ks/2+x-ts/2}px;top:${R.ks/2+y-ts/2}px;width:${ts}px;height:${ts}px;--nx:${dx/dl*ts*.3}px;--ny:${dy/dl*ts*.3}px;${o.deal?`animation-delay:${(i*4+k)*45}ms;`:''}">${bfUse(t)}</i>`});
+    h+='</div>'});
+  const items=S.ctr.map((t,k)=>({t,k})).sort((u,v)=>u.t-v.t||u.k-v.k);if(S.markerIn==='ctr')items.unshift({t:SUN,k:'sun'});const N=items.length;
+  if(N){let b=null;for(let c=1;c<=N;c++){const rr=Math.ceil(N/c);const s=Math.min(ts*1.05,R.pw*.9/c,R.ph*.84/rr);if(!b||s>b.s)b={c,rr,s}}const p=b.s,gx=R.cx-b.c*p/2,gy=R.cy-b.rr*p/2;
+    items.forEach((it,j)=>{const x=gx+(j%b.c)*p,y=gy+Math.floor(j/b.c)*p;const key=it.k==='sun'?'sun':'c_'+it.k;const up=sel&&sel.src<0&&(it.t===SUN||it.t===sel.c||(it.t===PRISM&&sel.j));
+      h+=`<i class="bf-t${up?' up':''}${it.t===SUN?' sun':nf(it.t)+(isAdv(-1,it.t)?' adv':'')}${BF.hide.has(key)?' hid':''}" data-k="${key}"${it.t===SUN?' title="Sun token"':` role="button" aria-label="${TNAME[it.t]}"`} style="left:${x+p*.05}px;top:${y+p*.05}px;width:${p*.9}px;height:${p*.9}px">${bfUse(it.t)}</i>`})}
+  return h}
+function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i===pi&&G.phase==='offer'?UI.sel:null;const ok={};
+  if(sel)for(const m of movesFor(sel)){try{ok[m.line]={m,X:phNow(m,pi)}}catch(e){ok[m.line]={m,X:null}}}
+  let rec=-1;if(sel&&UI.coach){try{const ms=movesFor(sel);if(ms.length>1){const a=bfAdvice(hp);if(a&&a.act==='take'&&a.src===sel.src&&a.c===sel.c&&(!!a.j)===(!!sel.j)&&ms.some(m=>m.line===a.line))rec=a.line}}catch(e){}}
+  const wq=live&&hp&&hp.i===pi&&G.phase==='wall'&&G.wt&&G.wt.q&&G.wt.q.p===pi?G.wt.q:null;let h='';
+  for(let r=0;r<5;r++){const o=ok[r],X=o&&o.X;let rk='';
+    for(let col=0;col<5;col++){const k=4-col;if(k>=cap(r)){rk+='<b class="bf-c no"></b>';continue}const key=`l${pi}_${r}_${k}`;const t=p.lines[r][k];let inner='';
+      if(t!=null)inner=bfTile(t,key);else if(X){const g=X.pv.ghost.find(g=>g.sl===key);if(g)inner=bfTile(g.k,null,'gh')}rk+=`<b class="bf-c" data-s="${key}">${inner}</b>`}
+    const badge=(rec===r?'<span class="bf-bd rec">best</span>':'')+(X&&X.tp?`<span class="bf-bd ${X.net<0?'bad':'good'}${rec===r?' r2':''}">${X.net<0?'−'+(-X.net):'+'+X.net}</span>`:'');
+    const badge2=sel&&!o?'<span class="bf-bd bad">✗</span>':'';
+    const tc=X&&X.pv.full&&!S.ex.gray?(()=>{const c0=sel.c<NC?sel.c:lineColour(p.lines[r]);return c0>=0?WALLCOL(c0,r):-1})():-1;
+    const blk=sel&&!o?phReason(p,r,sel.c):'';const clashC=blk.startsWith('mosaic')&&sel.c<NC?WALLCOL(sel.c,r):-1;
+    let wl='';for(let c=0;c<5;c++){const key=`w${pi}_${r}_${c}`;const v=p.wall[r][c];let inner=v>=0?bfTile(v<5?v:PRISM,key):S.ex.gray?'':`<i class="pr">${bfUse(WALLC(r,c))}</i>`;let cls='';
+      if(c===tc&&v<0){cls=' tgt';if(!X.tp)inner+=`<em>+${X.pv.pts}</em>`}
+      else if(v<0&&!S.ex.gray&&p.lines[r].length===cap(r)&&lineColour(p.lines[r])>=0&&WALLCOL(lineColour(p.lines[r]),r)===c){cls=' ready';inner=bfTile(lineColour(p.lines[r]),null,'gh')}
+      if(S.ex.gray?(blk.startsWith('mosaic')&&v>=0&&(v<5?v:v-10)===sel.c):c===clashC)cls=' clash';
+      if(wq&&wq.r===r&&wq.cells.includes(c)){cls=' pick';inner+=`<em>+${adjPts2(p.wall,r,c)}</em>`}
+      wl+=`<b class="bf-c${cls}" data-s="${key}"${cls===' pick'?` data-bfcell="${r},${c}" role="button" aria-label="Row ${r+1}, column ${c+1}"`:''}>${inner}</b>`}
+    h+=`<div class="bf-row${sel?(o?' ok':' dim'):''}${blk.startsWith('holds')?' rclash':''}${wq&&wq.r===r?' wq':''}" data-bfrow="${r}"${o?` role="button" aria-label="Rack ${r+1}"`:''}><div class="bf-rack">${badge}${badge2}${rk}</div><i class="bf-ar"></i><div class="bf-wall">${wl}</div></div>`}
+  let fl='';for(let k=0;k<7;k++){const key=`x${pi}_${k}`;const t=p.floor[k];fl+=`<b class="bf-c" data-s="${key}">${t!=null?bfTile(t,key,t===SUN?'':'cr'):`<span>${String(FLOOR[k]).replace('-','−')}</span>`}</b>`}
+  let fb=p.floor.length&&!sel?`<span class="bf-bd bad fbd">${String(floorPenalty(Math.min(7,p.floor.length))).replace('-','−')}</span>`:'';if(rec===5)fb+='<span class="bf-bd rec fbr">best</span>';if(sel){const m5=movesFor(sel).find(m=>m.line===5);if(m5){try{const pv=preview(m5,pi);fb=`<span class="bf-bd bad fbd">${String(pv.pen).replace('-','−')}</span>`}catch(e){}}}
+  h+=`<div class="bf-floor${sel?' ok':''}" data-bfrow="5"${sel?' role="button" aria-label="Floor: break them"':''}><div class="bf-fl">${fl}</div><span class="bf-fll">floor</span>${fb}</div>`;return h}
+// what each score will be after this round's tiling and breakage, so the round end is never a surprise
+function bfProj(S,p){let pts=0;if(!S.ex.gray){const w=p.wall.map(r=>r.slice());for(let r=0;r<5;r++){const L=p.lines[r];if(L.length!==cap(r))continue;const lc=lineColour(L);if(lc<0)continue;const c=WALLCOL(lc,r);if(w[r][c]>=0)continue;pts+=adjPts2(w,r,c);w[r][c]=lc}}
+  return Math.max(0,p.score+pts+floorPenalty(Math.min(7,p.floor.length)))}
+function bfTopHTML(S){const s=BF.busy?BF.actor:sideToAct();
+  return `<button class="bf-ib" data-bf="menu" aria-label="Menu">${IC('menu')}</button><div class="bf-chips">${S.pl.map(p=>`<button class="bf-chip${p.i===s?' cur':''}" data-bfchip="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(p.nm)}: ${p.score} points"><i></i><b>${isYou(p.i)?'You':S.pl.length>=4?'':esc(p.nm)}</b>${S.markerIn===p.i?'<em>☀</em>':''}<span class="bf-sc" data-bfsc="${p.i}">★${p.score}</span>${(()=>{if(BF.busy||S.phase!=='offer'||G.over)return '';const v=bfProj(S,p);return v===p.score?'':`<span class="bf-pj ${v<p.score?'dn':'up'}">${v<p.score?'−'+(p.score-v):'+'+(v-p.score)}</span>`})()}</button>`).join('')}</div><button class="bf-ib" data-gx="rulesd" aria-label="How to play">${IC('rules')}</button>`}
+function bfWinLine(){if(!G.over)return '';const w=G.over.win.map(i=>P(i));const sc=G.over.scores.map(s=>s.s.total);const you=w.some(p=>isYou(p.i));
+  return (you?(w.length>1?'You share the win':'You win'):w.map(p=>p.nm).join(' & ')+(w.length>1?' share it':' wins'))+' '+sc.slice(0,2).join(' to ')+'!'}
+function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
+  if(!live)say=BF.say||'';
+  else if(G.over)say=bfWinLine();
+  else if(hp&&G.phase==='wall')say='Tap a glowing wall space';
+  else if(hp&&UI.sel){const a=UI.sel.src<0?G.ctr:G.fac[UI.sel.src]||[];const n=a.filter(t=>t===UI.sel.c||(t===PRISM&&UI.sel.j)).length;chip=`<span class="bf-n">${bfUse(UI.sel.c)}<b>×${n}</b></span>`;say=movesFor(UI.sel).every(m=>m.line===5)?'No room: tap the floor':'Tap a glowing row';
+    const nj=a.filter(t=>t===PRISM).length;if(UI.sel.c<NC&&nj)tg=`<button class="bf-pz${UI.sel.j?' on':''}" data-bf="prism" aria-pressed="${!!UI.sel.j}" aria-label="Also take the prism tiles">${bfUse(PRISM)}${UI.sel.j?'✓':'✗'}</button>`}
+  else if(hp){const allBad=BF.tbl&&!BF.tbl.querySelector('.bf-t[role=button]:not(.nofit)');say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(allBad?'Nothing fits: tap the floor':BF.seen.took?'Your turn: tap a colour':'Tap a colour to grab every tile');}
+  else{const s=sideToAct();say=s>=0?(NET.on&&P(s).human?'Waiting for '+P(s).nm+'…':P(s).nm+' is choosing…'):''}
+  if(BF.tip){say=BF.tip;chip='';tg=''}
+  return `<span class="bf-say${BF.tip?' bf-tipl':''}">${chip}<span>${esc(say)}</span></span>${tg}${UI.cmp&&UI.cmp.twist&&!G.over?`<button class="bf-bossb" data-bf="boss" aria-label="Read the rule">${/^Rival/.test(UI.cmp.twist.text||'')?'Rival':'Boss'} rule ⓘ</button>`:''}${live&&hp&&!G.over?`<button class="bf-ib bf-bulb" data-bf="hint" aria-label="Show me a good move">${IC('bulb')}</button>`:''}${live&&G.over&&BF.resHide?`<button class="bf-b" data-bf="res">Result</button>`:''}`}
+function bfOvHTML(){if(!G)return '';
+  if(BF.boss&&UI.cmp&&UI.cmp.twist)return `<div class="bf-card bf-bosscard" role="dialog" aria-label="Rule"><b>${esc(UI.cmp.twist.text||'')}</b><button class="bf-go" data-bf="close">Got it</button></div>`;
+  if(BF.busy)return '';
+  if(BF.menu){const nh=!human();const b=(ic,lab,attr)=>`<button class="bf-mi" ${attr}>${IC(ic)}<span>${lab}</span></button>`;
+    return `<div class="bf-card bf-menu" role="dialog" aria-label="Menu">${b('rules','How to play','data-gx="rulesd"')}${b('guide','Guide: '+(UI.coach?'on':'off'),'data-a="coach"')}${b(SND.on?'snd':'mute','Sound: '+(SND.on?'on':'off'),'data-a="snd"')}${b(SND.music?'music':'nomusic','Music: '+(SND.music?'on':'off'),'data-a="mus"')}${b('speed','Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'),'data-a="speed"')}${nh?b(UI.pause?'play':'pause',UI.pause?'Resume':'Pause','data-a="pause"'):''}${b('log','Every move','data-gx="logd"')}${b('tiles','Tile list','data-gx="refd"')}${b('new','New game','data-a="new"')}</div>`}
+  if(BF.peek!=null&&P(BF.peek)){const p=P(BF.peek);return `<div class="bf-card bf-peek" role="dialog" aria-label="${esc(p.nm)}'s board"><div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${isYou(p.i)?'You':esc(p.nm)}</b><span>★${p.score}</span>${G.markerIn===p.i?'<em>☀</em>':''}<button class="bf-ib" data-bf="close" aria-label="Close">✕</button></div>${phBoardSVG(p)}${phBonus(p)?`<div class="bf-pn">End bonus so far +${phBonus(p)}</div>`:''}</div>`}
+  if(G.over&&!BF.resHide){const L=G.over.scores;const you=G.over.win.some(i=>isYou(i));
+    return `<div class="bf-card bf-res" role="dialog" aria-label="Result"><div class="bf-rt">${IC('trophy')}<b>${esc(you?(G.over.win.length>1?'You share the win!':'You win!'):G.winner+(G.over.win.length>1?' share the win':' wins'))}</b></div>
+      <div class="bf-rk"><span>tiles</span><span>broken</span><span>bonus</span></div>
+      ${L.map(r=>{const p=P(r.p),s=r.s;const bon=s.rows+s.cols+s.colours;return `<div class="bf-rr" style="--pc:${PCOL[r.p]}"><i></i><b>${isYou(r.p)?'You':esc(p.nm)}</b><span class="g">+${s.place}</span><span class="r">${s.floor?String(s.floor).replace('-','−'):'0'}</span><span class="g">${bon?'+'+bon:''}</span><b class="t">★${s.total}</b></div>`}).join('')}
+      <div class="bf-btns">${isClient()?'':'<button class="bf-go" data-a="new">Play again</button>'}<button class="bf-go ghost" data-bf="close">See boards</button></div></div>`}
+  return ''}
+function bfDraw(o){o=o||{};if(!BF.on)return;bfEnsure();if(!G||!BF.disp){BF.root.classList.add('empty');BF.top.innerHTML='';BF.tbl.innerHTML='';BF.me.innerHTML='';BF.hint.innerHTML='';BF.ov.hidden=true;bfFinger(null);return}
+  BF.root.classList.remove('empty');bfSizes();const S=BF.disp,live=!BF.busy,hp=live?me():null;const f=bfFocus();const fp=S.pl[f]||S.pl[0];
+  BF.top.innerHTML=bfTopHTML(S);BF.tbl.innerHTML=bfTableHTML(S,hp,o);if(BF.rv&&BF.busy)bfRival();BF.hint.innerHTML=bfHintHTML(S,hp);BF.me.innerHTML=bfBoardHTML(S,fp,hp);
+  BF.me.style.setProperty('--pc',PCOL[fp.i]);BF.me.classList.toggle('turn',!!hp);
+  const ov=bfOvHTML();BF.ov.innerHTML=ov;BF.ov.hidden=!ov;
+  if(live)bfGuide(hp)}
+// ---------- the ghost finger: first move of the guided game, the bulb, or after a long pause ----------
+function bfAdvice(hp){const k=G.logN+':'+G.phase+':'+hp.i;if(BF.advK===k)return BF.adv;BF.advK=k;BF.adv=null;if(isClient())return null;try{const a=adviceFor(hp.i);BF.adv=a?a.m:null}catch(e){}return BF.adv}
+function bfFingerTarget(hp){const m=bfAdvice(hp);
+  if(G.phase==='wall'){const q=G.wt&&G.wt.q;if(!q)return null;if(!m||m.act!=='wall')return null;const c=m.c;return bfSlot(`w${hp.i}_${q.r}_${c}`)}
+  if(!UI.sel){if(!m||m.act!=='take')return null;const a=m.src<0?G.ctr:G.fac[m.src];const k=a.findIndex(t=>t===m.c||(m.c===PRISM&&t===PRISM));return k<0?null:bfEl((m.src<0?'c':'f'+m.src)+'_'+k)}
+  const ms=movesFor(UI.sel);let line=null;if(m&&m.act==='take'&&UI.sel.src===m.src&&UI.sel.c===m.c&&ms.some(x=>x.line===m.line))line=m.line;
+  if(line==null)return null;return line<5?bfQ(`[data-bfrow="${line}"] .bf-rack`):bfQ('.bf-fl')}
+function bfFinger(el){const f=bfQ('.bf-fing');if(!f)return;const r=bfR(el);if(!r){f.hidden=true;return}f.hidden=false;const s=Math.max(.8,Math.min(1.2,BF.cs/34));
+  f.style.width=48*s+'px';f.style.height=56*s+'px';f.style.left=(r.left+r.width/2-18*s)+'px';f.style.top=(r.top+r.height/2-4*s)+'px'}
+function bfGuide(hp){clearTimeout(BF.idleT);
+  const guided=UI.coach&&!BF.seen.took&&hp&&G.phase==='offer'&&!G.over;
+  if(hp&&!G.over&&(guided||BF.fingerOn))bfFinger(bfFingerTarget(hp));else bfFinger(null);
+  if(hp&&!G.over&&!BF.fingerOn&&!guided)BF.idleT=setTimeout(()=>{if(!BF.busy&&me()){BF.fingerOn=true;bfDraw()}},UI.coach?9000:16000);
+  if(hp&&G.phase==='offer'&&!G.over){try{if(phLast()&&BF.lastWarn!==G.round){BF.lastWarn=G.round;bfBanner('Last round!','A wall row will be full');bfTip('end',true)}}catch(e){}
+    if(G.markerIn==='ctr'&&G.ctr.length&&BF.seen.took)bfTip('sun');else if(BF.seen.took&&BF.tbl&&BF.tbl.querySelector('.nofit'))bfTip('nofit')}}
+// ---------- input: everything is a tap on the thing itself ----------
+function bfShake(el){if(!el)return;el.classList.remove('no');void el.offsetWidth;el.classList.add('no')}
+function bfClick(e){const t=e.target;const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
+  if(t.closest('[data-a],[data-gx],[data-ui]')){if(BF.menu){BF.menu=false;setTimeout(()=>{if(!BF.busy)bfDraw()},0)}return}
+  if(BF.busy){bfSpeedUp();return}
+  if(BF.menu||BF.peek!=null||BF.boss){BF.menu=false;BF.peek=null;BF.boss=false;bfDraw();return}
+  if(t.closest('.bf-ov')){if(G&&G.over){BF.resHide=true;bfDraw()}return}
+  const chip=t.closest('[data-bfchip]');if(chip){BF.peek=+chip.dataset.bfchip;sfx('click');bfDraw();return}
+  if(!G||G.over)return;const hp=me();if(!hp)return;BF.fingerOn=false;
+  if(G.phase==='wall'){const c=t.closest('[data-bfcell]');if(c){const [r,cc]=c.dataset.bfcell.split(',').map(Number);const m=validMoves(hp.i).find(m=>m.r===r&&m.c===cc);if(m)return go(m)}sfx('bad');BF.fingerOn=true;bfDraw();return}
+  if(G.phase!=='offer')return;
+  let tile=t.closest('[data-k]');
+  if(!tile&&e.clientX!=null){const sc=t.closest('[data-bfsrc]');if(sc){const i=+sc.dataset.bfsrc;let best=null,bd=1e9,tw=0;// a tap anywhere on a kiln (or near a courtyard tile) takes the nearest tile
+      for(const el of BF.tbl.querySelectorAll(`[data-k^="${i<0?'c_':'f'+i+'_'}"]`)){const r=el.getBoundingClientRect();const d=Math.hypot(r.left+r.width/2-e.clientX,r.top+r.height/2-e.clientY);if(d<bd){bd=d;best=el;tw=r.width}}
+      if(best&&(i>=0||bd<tw*1.7))tile=best}}
+  const k=tile&&tile.dataset.k;
+  if(k&&(k[0]==='f'||k[0]==='c')&&k!=='sun'){const s=slotSel(k);if(s){if(s.c<NC){const ar=s.src<0?G.ctr:G.fac[s.src];if(ar.includes(PRISM))s.j=UI.sel&&UI.sel.src===s.src&&UI.sel.c===s.c?UI.sel.j:1}
+      if(UI.sel&&UI.sel.src===s.src&&UI.sel.c===s.c){UI.sel=null;UI.tgt=null;UI.adv=null;sfx('click');upd();return}UI.sel=null;pickSel(s);return}}
+  const src=t.closest('[data-bfsrc]');if(src){const i=+src.dataset.bfsrc;const ar=i<0?G.ctr:G.fac[i];if(ar&&ar.length){const ks=[...new Set(ar)].filter(c=>c<NC);
+      if(ks.length===1&&!(UI.sel&&UI.sel.src===i)){UI.sel=null;return pickSel({src:i,c:ks[0],j:ar.includes(PRISM)?1:0})}if(!ks.length&&!(UI.sel&&UI.sel.src===i)){UI.sel=null;return pickSel({src:i,c:PRISM,j:1})}}
+    if(UI.sel&&UI.sel.src===i)return;}
+  const row=t.closest('[data-bfrow]');if(row){const r=+row.dataset.bfrow;if(!UI.sel){sfx('bad');BF.fingerOn=true;bfDraw();return}const m=movesFor(UI.sel).find(m=>m.line===r);if(m)return go(m);sfx('bad');bfShake(row);if(r<5){const why=phReason(hp,r,UI.sel.c);bfPop(why==='full'?'Row is full':why.startsWith('holds')?'Row holds another colour':'Wall row has it',bfR(row),'bad')}return}
+  if(UI.sel){UI.sel=null;UI.tgt=null;UI.adv=null;upd()}}
+function bfAct(a){switch(a){
+  case 'menu':BF.menu=!BF.menu;BF.peek=null;sfx('click');bfDraw();return;
+  case 'boss':BF.boss=!BF.boss;BF.menu=false;BF.peek=null;sfx('click');bfDraw();return;
+  case 'close':BF.menu=false;BF.peek=null;BF.boss=false;if(G&&G.over)BF.resHide=true;bfDraw();return;
+  case 'res':BF.resHide=false;bfDraw();return;
+  case 'hint':if(isClient()&&G.phase==='offer'){advise()}BF.fingerOn=true;sfx('select');bfDraw();try{const hp=me();if(hp&&!isClient()&&!bfAdvice(hp)){BF.tip='No clear best move: your call';bfHintSet();clearTimeout(BF.tipT);BF.tipT=setTimeout(()=>{BF.tip=null;bfHintSet()},3000)}}catch(e){}return;
+  case 'prism':uiAct('prism');return}}
+// ---------- wiring into the rest of the page ----------
+function bfApply(){const on=PHN.on&&bfWanted();const was=BF.on;BF.on=on;document.documentElement.classList.toggle('bf',on);if(on){bfEnsure();if(G&&!BF.busy){bfSync();BF.disp=bfClone(G)}bfDraw()}else if(was&&BF.root)BF.root.hidden=true;if(on&&BF.root)BF.root.hidden=false}
+try{if(!localStorage.getItem('sgz_guided'))UI.setup.lv=UI.setup.lv.map(()=>'easy')}catch(e){}
+BF.on=PHN.on&&bfWanted();document.documentElement.classList.toggle('bf',BF.on);
+{const _i3=init3D;init3D=function(){if(BF.on)return false;return _i3.apply(this,arguments)};
+ const _pr=phRender;phRender=function(){if(BF.on)return bfRender();return _pr.apply(this,arguments)};
+ const _pf=phFx;phFx=function(f){if(BF.on)return bfFx(f);return _pf.apply(this,arguments)};
+ const _mp=renderMap2D;renderMap2D=function(){if(BF.on){const el=document.getElementById('map2d');if(el)el.hidden=true;return}return _mp.apply(this,arguments)};
+ const _st=storyHtml;storyHtml=function(){if(!BF.on)return _st.apply(this,arguments);return `<div class="mbox story bf-story">${storyPic()}<p class="q">Tile the king’s palace wall.<br><b>Most ★ wins.</b></p><div class="acts"><button class="btn go" data-ui="story-ok">Play ▶</button></div></div>`};
+ const _sh=startHtml;startHtml=function(){let h=_sh.apply(this,arguments);if(!BF.on)return h;const i=h.indexOf('<h3>Variants</h3>'),j=h.indexOf('</div>',h.indexOf('class="exs"'));if(i<0||j<0)return h;return h.slice(0,i)+'<details class="bf-more"><summary>Options</summary>'+h.slice(i+17,j+6)+'</details>'+h.slice(j+6)};
+ const _to=toast;toast=function(t){if(!BF.on)return _to.apply(this,arguments)}}
+function bfRender(){if(!BF.on)return;bfEnsure();if(!G){BF.disp=null;bfDraw();return}const fresh=bfSync();
+  if(BF.q.length&&!BF.busy&&!UI.modal){bfRun();return}
+  if(!BF.busy){BF.disp=bfClone(G);bfDraw(fresh&&G.turn===0?{deal:true}:{})}}
+function bfResize(){const was=BF.on;bfApply();if(was&&!BF.on&&G)render()}
+
+</script>
+<script>
+// ---------- story mode: the shared chapter map (gx-campaign.js) wired to Sunglaze. Data: campaign.json ----------
+// A chapter is a normal game with its own setup, computer level and (at most) one twist. Twists exist only here.
+UI.cmp=null;var CMP_LVL0={alpha:LVL.hard.alpha,K:LVL.hard.K,roll:LVL.hard.roll};var CMP_FIN=null,CMP_OVER=0;
+var CMP_SLIP0=LVL.easy.slip,CMP_SLIP={c1:.8,c2:.6,c3:.45};// act 1 rivals blunder more often (measured: a sensible beginner wins about 8 in 10 of chapter 1)
+var CMP_NAMES={c8:['Lumen','Lux']};
+function campLvlReset(){LVL.easy.slip=CMP_SLIP0;LVL.hard.K=CMP_LVL0.K;LVL.hard.roll=CMP_LVL0.roll;LVL.hard.alpha=CMP_LVL0.alpha}
+function campBossSeat(){return 1}
+function campMetrics(g){const p=g.pl[0];const b=endBonus(p);const rivals=g.pl.slice(1).map(q=>q.score);
+  return {won:!!(g.over&&g.over.win.includes(0)),score:p.score,margin:p.score-Math.max.apply(null,rivals),rounds:g.round,breakage:-p.st.floor,cols:b.cols,colours:b.colours,rows:b.rows}}
+function campIsWon(g,def){const m=campMetrics(g);if(!m.won)return false;const gl=def.goal||{};
+  if(gl.type==='score'&&m.score<gl.value)return false;if(gl.type==='custom'&&gl.value!=null&&m.breakage>gl.value)return false;return true}
+// ---- twists (setup and scoring hooks) ----
+function campApplyTwist(def){const t=def.twist;campLvlReset();if(!t)return;const B=campBossSeat();const nm=def.opponent.name;
+  if(t.id==='boss-sun'){G.first=G.cur=B;lg(`Boss rule: ${nm} holds the Sun token and takes first.`,'big')}
+  else if(t.id==='boss-head-start'){P(B).score=t.param;lg(`Boss rule: ${nm} starts with ${t.param} points.`,'big')}
+  else if(t.id==='boss-glazed-start'){let n=0;for(let r=0;r<t.param;r++){const k=G.bag.indexOf(0);if(k<0)break;G.bag.splice(k,1);P(B).wall[r][WALLCOL(0,r)]=0;n++}
+    lg(`Rival rule: ${nm} starts with ${n} Cobalt tile${n===1?'':'s'} already set.`,'big')}
+  else if(t.id==='boss-column-bonus'){G.camp={colBonus:t.param,seat:B}}
+  else if(t.id==='boss-deep-sight'){LVL.hard.roll=t.param;LVL.hard.K=14;lg(`Boss rule: ${nm} studies every take twice as deep.`,'big')}}
+// scoring twist: after the normal ending, the boss earns extra points per complete column, then the winner is worked out again
+var _campFinish=finish;finish=function(){const had=!!G.over;_campFinish.apply(this,arguments);
+  if(had||!G.over||!G.camp||!G.camp.colBonus)return;const p=P(G.camp.seat);const b=endBonus(p);const extra=b.cols*G.camp.colBonus;if(!extra)return;
+  p.score+=extra;p.st.cols+=extra;lg(`Boss rule: ${p.nm} earns ${extra} extra for ${b.cols} complete column${b.cols===1?'':'s'}.`,'good');
+  const sc=G.pl.slice().sort((a,b)=>b.score-a.score||b.fr-a.fr);const top=sc[0];const winners=sc.filter(q=>q.score===top.score&&q.fr===top.fr);
+  G.over={scores:sc.map(q=>({p:q.i,s:Object.assign({total:q.score,fr:q.fr},q.st)})),win:winners.map(w=>w.i),tie:sc.filter(q=>q.score===top.score).length>1};G.winner=winners.map(w=>w.nm).join(' & ');
+  G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top.score} points.`;lg('🏆 '+G.winText,'big')};
+// ---- starting a chapter ----
+function campStart(def){if(CMP_RES){GXC.scene=CMP_RES.s;GXC.bossCard=CMP_RES.b;const g=CMP_RES.g;CMP_RES=null;campLvlReset();G=g;UI.cmp=def;CMP_OVER=0;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.coach=!!def.hints;
+    const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach);UI.modal=null;const t=def.twist;if(t&&t.id==='boss-deep-sight'){LVL.hard.roll=t.param;LVL.hard.K=14}
+    if(def.opponent.aiLevel==='easy'&&CMP_SLIP[def.id]!=null)LVL.easy.slip=Math.min(.9,CMP_SLIP[def.id]+(def.easy?.15:0));resetScene();refresh();clearInterval(CMP_FIN);CMP_FIN=setInterval(campWatch,400);return}
+  const s=def.setup||{};const np=Math.max(2,Math.min(4,s.np||2));const ex=Object.assign({gray:false,prism:false},s.ex||{});
+  const lv=['normal'];for(let i=1;i<np;i++)lv.push(def.opponent.aiLevel||'normal');const names=['You'].concat(CMP_NAMES[def.id]||(np===2?[def.opponent.name]:[def.opponent.name+' 1',def.opponent.name+' 2']));
+  UI.cmp=def;CMP_OVER=0;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.lastHuman=null;
+  UI.coach=!!def.hints;const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach);
+  UI.modal=null;const seats=['human'];for(let i=1;i<np;i++)seats.push('ai');
+  newGame({np,seats,lv,names,ex,mode:'x'});G.campId=def.id;G.campEasy=!!def.easy;campApplyTwist(def);if(def.opponent.aiLevel==='easy'&&CMP_SLIP[def.id]!=null)LVL.easy.slip=Math.min(.9,CMP_SLIP[def.id]+(def.easy?.15:0));
+  try{localStorage.removeItem(SAVE)}catch(e){}resetScene();refresh();clearInterval(CMP_FIN);CMP_FIN=setInterval(campWatch,400)}
+// a saved story game resumes inside its chapter: GXC.play with its intro and boss card skipped, then campStart restores the saved state
+var CMP_RES=null;
+function campResume(){if(!G||!G.campId||typeof GXC==='undefined'||!window.CAMPAIGN||CMP_RES)return false;if(!window.CAMPAIGN.chapters.some(c=>c.id===G.campId))return false;
+  CMP_RES={g:G,s:GXC.scene,b:GXC.bossCard};GXC.scene=()=>Promise.resolve();GXC.bossCard=()=>Promise.resolve(true);
+  try{GXC.play(G.campId,{easy:!!G.campEasy})}catch(e){}
+  setTimeout(()=>{if(CMP_RES){GXC.scene=CMP_RES.s;GXC.bossCard=CMP_RES.b;CMP_RES=null}},1500);return true}
+function campWatch(){if(!UI.cmp||!G)return;if(!G.over){CMP_OVER=0;return}
+  if(typeof BF!=='undefined'&&BF.busy){CMP_OVER=0;return}
+  if(!CMP_OVER){CMP_OVER=Date.now();return}if(Date.now()-CMP_OVER<(window.CMP_WAIT!=null?window.CMP_WAIT:1800))return;
+  clearInterval(CMP_FIN);const g=G;UI.cmp=null;campLvlReset();try{if(typeof BF!=='undefined')BF.resHide=true;if(BF.on)bfDraw()}catch(e){}
+  if(GXC.active())GXC.finish(g)}
+function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
+  GXC.init({game:'sunglaze',data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+    onExit(){openStart()},scores:g=>g.pl.map(p=>p.score),seats:g=>g.pl.map((p,i)=>({name:p.nm,me:i===0,ai:i?p.lv:undefined}))})}
+function campOpen(){if(typeof GXC==='undefined')return;UI.modal=null;const m=$('#modal');if(m){m.hidden=true;m.innerHTML='';m.dataset.h=''}GXC.open()}
+// a normal game (Begin) leaves story mode and restores the player's own guide setting
+{const _bg=beginGame;beginGame=function(){if(UI.cmp){UI.cmp=null;clearInterval(CMP_FIN);try{UI.coach=localStorage.getItem('sgz_coach')!=='0'}catch(e){UI.coach=true}}campLvlReset();if(G)delete G.camp;return _bg.apply(this,arguments)}}
+function campLine(){try{const p=GXC.progress();const ch=window.CAMPAIGN.chapters;const n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;
+  if(!n)return '';const nx=ch.find(c=>!(p.ch[c.id]&&p.ch[c.id].beaten));return `<p class="cmp-line"><b>Story: ${n} of ${ch.length} chapters done${nx?`, next: “${esc(nx.title)}”`:''}.</b></p>`}catch(e){return ''}}
+campInit();
 
 </script>
 </body>
