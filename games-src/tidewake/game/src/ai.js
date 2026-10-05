@@ -101,7 +101,8 @@ function aiAnswer(K,seat,L,rng){const q=K.q;const opts=q.opts;const hand=K.hands
       opts.forEach((o,k)=>{if(o.h!=='bSwap')return;const g=val(pool[o.d.j])-val(hand[o.d.i])+(isCur(pool[o.d.j])&&isCur(hand[o.d.i])?0:0);if(g>bs+.5){bs=g;best=k}});return best}
     default:return Math.floor(rng()*opts.length)}}
 function posVal(K,seat,r,L){if(r.st==='edge'||r.st==='mon')return -1000;if(r.st==='gate')return -200;const f=[r.x,r.y];const d=Math.min(f[0],f[1],BW-1-f[0],BW-1-f[1]);return -monRisk(K,f,r.on,L,null)*(L.rk||1)-(d===0?26:d===1?7:0)}
-function decide(K,seat,lv){const L=AILV[lv]||AILV.normal;const rng=mkRng(kHash(K));CUR_RNG=rng;MCC={};
+let CAMP_PUSH=null;  // campaign twist 'harrier': {seat,v} makes that seat steer rivals toward the edge
+function decide(K,seat,lv){const L0=AILV[lv]||AILV.normal,L=CAMP_PUSH&&seat===CAMP_PUSH.seat?Object.assign({},L0,{push:CAMP_PUSH.v}):L0;const rng=mkRng(kHash(K));CUR_RNG=rng;MCC={};
   if(K.q){if(K.q.who!==seat)return null;return {a:'q',i:aiAnswer(K,seat,L,rng)}}
   const mv=genMoves(K,seat);if(!mv.length)return null;
   if(K.phase==='setup'){let best=mv[0],bs=-1e9;for(const m of mv){const sc=startScore(K,seat,m,L,rng);if(sc>bs){bs=sc;best=m}}return best}

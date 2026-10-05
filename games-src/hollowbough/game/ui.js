@@ -615,7 +615,9 @@ function newGame(mode, o) {
   else if (mode === 'net') { players = o.players; }
   else if (mode === 'ai') { players = []; for (let i = 0; i < cfg.np; i++) players.push({ name: PNAMES[i], ai: cfg.level }); if (cfg.np < 2) players.push({ name: PNAMES[1], ai: cfg.level }); }
   else { players = [{ name: 'You', ai: null }]; for (let i = 1; i < cfg.np; i++) players.push({ name: PNAMES[i - 1], ai: (o.levels && o.levels[i - 1]) || cfg.level }); }
+  if (o.camp && mode === 'vs') { const cn = o.camp.names || []; players.forEach((p, i) => { if (i > 0 && cn[i - 1]) p.name = cn[i - 1]; }); }
   G = HB.newGame({ players, solo, seed: UI.seed != null ? UI.seed : undefined });
+  if (o.camp) campTwist(o.camp);
   UI.seed = null;
   UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
   UI.holder = hotSeat() ? -1 : -1;
@@ -730,7 +732,7 @@ function queueOver() {
   UI.cards.push({
     kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + (G.players[ov.winner].name === 'You' ? ' win!' : ' wins!')), sub: 'The game is over',
     body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); if (UI.earned && UI.earned.length) t.appendChild(h('p.achv', '★ New achievement' + (UI.earned.length > 1 ? 's' : '') + ': ' + UI.earned.join(', '))); return t; },
-    buttons: NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
+    buttons: NET.on ? netOverButtons() : campOn() ? [{ label: 'Continue the story', a: 'campfin' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }] : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
   });
   clearSave(); render();
 }
@@ -827,6 +829,7 @@ function renderStart() {
     h('h1', h('span', { html: ICO.tree }), 'Hollowbough'),
     h('p.tag', 'Build a woodland city. Place workers, play cards, outlast the winter.'),
     h('button.sbtn.big', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and one gentle computer player; tips appear one at a time.')),
+    window.CAMPAIGN ? h('button.sbtn.big.story', { 'data-start': 'story', 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story: The Long Winter'), h('span', campLine())) : null,
     h('div.opts', seg('Players', 'np', [2, 3, 4]), seg('Computer level', 'level', ['easy', 'normal', 'hard']), seg('Solo rival', 'solo', [1, 2, 3], v => D.soloLevels[v - 1] + (v > 1 ? '*' : ''))),
     h('p.sm', '*Gruff and Ghastly are very hard.'),
     h('div.sgrid',
@@ -861,8 +864,10 @@ document.addEventListener('click', ev => {
     case 'q': choose(+d.i); break;
     case 'cont': nextCard(); break;
     case 'take': takeDevice(); break;
-    case 'again': { const m = UI.mode, c = UI.cfg || {}; UI.cards = []; newGame(m, { np: c.np, level: c.level, solo: c.solo }); break; }
-    case 'menu': showStart(); break;
+    case 'again': { if (campOn()) { const dd = UI.camp; UI.cards = []; GXC.play(dd.id); break; } const m = UI.mode, c = UI.cfg || {}; UI.cards = []; newGame(m, { np: c.np, level: c.level, solo: c.solo }); break; }
+    case 'menu': UI.camp = null; showStart(); break;
+    case 'story': campOpen(); break;
+    case 'campfin': campFinish(); break;
     case 'start': newGame(d.m); break;
     case 'guided': newGame('guided'); break;
     case 'opt': { UI.opt = UI.opt || Object.assign({}, DEF); UI.opt[d.k] = isNaN(+d.v) ? d.v : +d.v; renderStart(); break; }
@@ -877,15 +882,14 @@ document.addEventListener('click', ev => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.pop) closePop(); });
 // ---- phone mode
 function applyPhone() {
-  const q = /[?&]phone=(\d)/.exec(location.search); const w = innerWidth, hh = innerHeight, short = Math.min(w, hh);
+  const q = /[?&]phone=(\d)/.exec(location.search); const vm = (window.GXV ? GXV.now() : { w: innerWidth, h: innerHeight }), w = vm.w, hh = vm.h, short = Math.min(w, hh);
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
   r.toggle('ph', ph); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); }
 }
-let rzT = 0;
-function onResize() { clearTimeout(rzT); rzT = setTimeout(() => { applyPhone(); if (G && UI.started) { renderBoard(); placePop(); } }, 60); }
+function onResize() { applyPhone(); if (G && UI.started) { renderBoard(); placePop(); } }
 // ---- boot
 function boot() {
   GX.init({ key: 'hb' });
@@ -895,7 +899,7 @@ function boot() {
   GX.onShow = id => { renderDrawers(); };
   kitBoot();
   applyPhone();
-  addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
+  if (window.GXV) GXV.watch(onResize); else { addEventListener('resize', onResize); addEventListener('orientationchange', onResize); }
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { renderBoard(); placePop(); } }).observe(bd);
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'hb' }); GX.applyPrefs(); }; } catch (e) { }
   try { if (window.PerfHUD && PerfHUD.register) PerfHUD.register({ game: 'Hollowbough' }); } catch (e) { }
@@ -998,7 +1002,7 @@ function kitRecap() { GX.recap.attach('#dockbody', { before: true, title: 'Since
 function recapSeats() { GX.recap.clear(); const hs = humans(); GX.recap.seats(hs.length ? hs : [0]); }
 // ---- results, statistics, achievements
 function kitResult() {
-  if (!G || !G.over || UI.resultDone) return; UI.resultDone = true;
+  if (!G || !G.over || UI.resultDone) return; UI.resultDone = true; if (UI.camp) return; // story chapters report through GXC.finish
   const hs = humans(); if (!hs.length) return; // watching computers: not your game
   const ov = G.over, me = NET.on ? NET.mySeat : hs.length === 1 ? hs[0] : -1;
   const seats = G.players.map((p, i) => ({ name: p.name, ai: p.ai || null, me: i === me }));
@@ -1027,3 +1031,58 @@ document.addEventListener('click', ev => {
   else if (a === 'refcard') { closePop(); GX.refOpen(refCardId(+t.dataset.id)); }
 });
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !GX.open && GX.undo.can()) { e.preventDefault(); doUndo(); } });
+// ===================== part 9: Story mode (campaign.json + the shared chapter kit gx-campaign.js) =====================
+// Twists exist only here; the normal rules never change. The boss seat is seat 1.
+UI.camp = null;
+function campTwist(def) {
+  const t = def && def.twist; if (!t || !G) return; const n = t.param || 0;
+  if (t.id === 'thin-forest') G.forest = G.forest.slice(0, n);
+  else if (t.id === 'boss-extra-hand' && G.players[1]) { const p = G.players[1]; let k = 0; while (k < n && p.hand.length < HB.HAND && G.deck.length) { p.hand.push(G.deck.pop()); k++; } }
+  else if (t.id === 'boss-pantry' && G.players[1]) { const r = G.players[1].res; r.twig += n; r.resin += n; r.berry += n; }
+}
+function campMetrics(g) {
+  const ov = g.over; if (!ov) return { won: false };
+  const me = ov.scores[0], won = g.grim ? !!ov.win : (ov.winner === 0 && !ov.tie);
+  let best = 0; if (g.grim) best = ov.grim.total; else ov.scores.forEach((s, i) => { if (i) best = Math.max(best, s.total); });
+  const evs = g.bev.filter(e => e.o === 0).length + g.sev.filter(e => e.o === 0).length;
+  const p = g.players[0];
+  return { won, score: me.total, margin: me.total - best, city: HB.cityCount(g, 0), events: evs, specialEvents: g.sev.filter(e => e.o === 0).length,
+    occupied: p.city.filter(e => e.occ).length, green: p.city.filter(e => HB.cardOf(e.id).color === 'green').length, journey: me.journey, left: me.left };
+}
+function campIsWon(g, def) {
+  const m = campMetrics(g); if (!m.won) return false; const gl = def.goal || {};
+  if (gl.type === 'custom' || gl.type === 'score') { const need = gl.value || 0, id = def.id;
+    if (id === 'c2') return m.occupied >= need; if (id === 'c3') return m.green >= need; if (id === 'c6') return m.events >= need; if (id === 'c9') return m.specialEvents >= need;
+    if (gl.type === 'score') return m.score >= need; }
+  return true;
+}
+function campStart(def) {
+  const s = def.setup || {}, names = [def.opponent.name];
+  if (def.id === 'c10') names.push('Quill'); else names.push('Bramble');
+  UI.coach = { level: def.hints ? 'full' : 'off', seen: {} };
+  const o = { camp: Object.assign({}, def, { names }), np: s.np || 2, level: s.level || 'normal', solo: s.solo || 1 };
+  UI.seed = s.seed != null ? s.seed : null;
+  newGame(s.mode === 'solo' ? 'solo' : 'vs', o);
+  UI.camp = def; UI.coach.level = def.hints ? 'full' : 'off';
+  try { toast('Goal: ' + def.goal.text); } catch (e) { }
+}
+function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
+function campOpen() { if (typeof GXC === 'undefined') return; try { GX.close(); } catch (e) { } GXC.open(); }
+function campOn() { return !!(UI.camp && typeof GXC !== 'undefined' && GXC.active()); }
+{ const _ng = newGame; newGame = function (mode, o) { if (!(o && o.camp)) UI.camp = null; return _ng.apply(this, arguments); }; }
+function campLine() {
+  try {
+    if (typeof GXC === 'undefined' || !window.CAMPAIGN) return '';
+    const p = GXC.progress(), ch = window.CAMPAIGN.chapters, n = ch.filter(c => p.ch[c.id] && p.ch[c.id].beaten).length;
+    return n ? n + ' of ' + ch.length + ' chapters done' : 'Ten chapters, three bosses';
+  } catch (e) { return ''; }
+}
+function campInit() {
+  if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
+  GXC.init({
+    game: 'hollowbough', data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
+    onExit: () => { UI.camp = null; showStart(); },
+    scores: g => g.over ? g.over.scores.map(s => s.total) : [], seats: g => g.players.map((p, i) => ({ name: p.name, me: i === 0, ai: p.ai || undefined }))
+  });
+}
+campInit();

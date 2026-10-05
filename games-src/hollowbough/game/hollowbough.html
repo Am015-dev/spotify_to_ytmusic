@@ -137,6 +137,145 @@ html.gx-reduce *,html.gx-reduce *::before,html.gx-reduce *::after,html.gx-noanim
 .gx-cbm{display:none;font-style:normal}
 html.cb .gx-cbm{display:inline}
 
+/* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
+:root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
+  --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
+  --gxc-font:inherit;--gxc-head:inherit}
+.gxc{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;color:var(--gxc-ink);font-family:var(--gxc-font);
+  background:radial-gradient(120% 70% at 50% 0%,#3a2a1c 0%,var(--gxc-bg) 70%);overflow:hidden;
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.gxc[hidden]{display:none}
+.gxc *{box-sizing:border-box}
+.gxc button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.gxc button:focus-visible{outline:3px solid var(--gxc-gold);outline-offset:2px}
+.gxc-screen{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;width:100%;max-width:560px;margin:0 auto}
+.gxc-map-on .gxc-screen{justify-content:flex-start;padding:0;max-width:640px}
+.gxc-dim{color:var(--gxc-dim)}
+.gxc-small{font-size:13px;margin:6px 0 0;text-align:center}
+.gxc-row{display:flex;gap:8px;justify-content:center;margin-top:14px;width:100%}
+.gxc-row.wrap{flex-wrap:wrap}
+.gxc-btn{min-height:46px;min-width:88px;padding:8px 18px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
+.gxc-btn.go{background:linear-gradient(#dc7a3a,var(--gxc-go));border-color:#8f4317;color:var(--gxc-go-ink);box-shadow:0 3px 0 #7a3712,0 6px 14px rgba(0,0,0,.25);flex:1 1 auto;max-width:220px}
+.gxc-btn.go:active{transform:translateY(2px);box-shadow:0 1px 0 #7a3712}
+.gxc-btn.soft{background:#f7e7b8;border-color:#c9a14a}
+.gxc-btn.ghost{background:rgba(255,255,255,.22)}
+.gxc-ib{min-height:44px;min-width:44px;padding:4px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap}
+.gxc-tag{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
+/* portraits: image or emoji badge in a painted ring */
+.gxc-pt{--gxc-pt:64px;--gxc-ptc:#6b4a2b;width:var(--gxc-pt);height:var(--gxc-pt);flex:0 0 var(--gxc-pt);border-radius:50%;overflow:hidden;display:grid;place-items:center;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.45),transparent 55%),var(--gxc-ptc);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.5),0 6px 16px rgba(0,0,0,.3)}
+.gxc-pt img{width:100%;height:100%;object-fit:cover;display:block}
+.gxc-pt-e{font-size:calc(var(--gxc-pt) * .52);line-height:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+/* ---- map ---- */
+.gxc-head{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;flex:0 0 auto;color:#fbefd6}
+.gxc-htitle{flex:1 1 auto;min-width:0;text-align:center;font-family:var(--gxc-head);font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.gxc-score{color:var(--gxc-gold)}
+.gxc-map{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;
+  background:
+    radial-gradient(60% 40% at 20% 15%,rgba(110,150,80,.28),transparent 70%),
+    radial-gradient(50% 35% at 85% 55%,rgba(200,140,60,.22),transparent 70%),
+    radial-gradient(70% 40% at 30% 92%,rgba(150,60,70,.22),transparent 70%),
+    repeating-radial-gradient(circle at 70% 30%,rgba(120,80,30,.035) 0 2px,transparent 2px 9px),
+    linear-gradient(#f1e3c2,var(--gxc-paper2));box-shadow:inset 0 0 40px rgba(90,55,20,.45)}
+.gxc-path{position:relative;width:100%;margin:0 auto;max-width:560px}
+.gxc-road{position:absolute;left:0;top:0;width:100%;pointer-events:none;overflow:visible}
+.gxc-road path{fill:none;stroke-linecap:round}
+.gxc-road-edge{stroke:rgba(90,58,24,.45);stroke-width:26px}
+.gxc-road-fill{stroke:var(--gxc-road);stroke-width:20px}
+.gxc-road-dash{stroke:#f6e6c2;stroke-width:3px;stroke-dasharray:2 10;opacity:.85}
+.gxc-act{position:absolute;left:12px;right:12px;height:38px;margin-top:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(90deg,transparent,rgba(60,38,14,.82) 15%,rgba(60,38,14,.82) 85%,transparent);color:#fbefd6;z-index:2;text-align:center;line-height:1.1}
+.gxc-act b{font-size:14px;letter-spacing:.04em}
+.gxc-act small{font-size:11.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 18px}
+.gxc-node{position:absolute;transform:translateX(-50%);width:64px;height:64px;padding:0;border:0;background:none;z-index:3;display:flex;flex-direction:column;align-items:center}
+.gxc-disc{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff8ec;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%),var(--gxc-a1);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.55),0 5px 10px rgba(0,0,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.gxc-node.a2 .gxc-disc{background-color:var(--gxc-a2);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%)}
+.gxc-node.a3 .gxc-disc{background-color:var(--gxc-a3);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%)}
+.gxc-node.boss .gxc-disc{width:62px;height:62px;margin-top:-3px;border-color:var(--gxc-gold);box-shadow:0 0 0 2px #6b3c10,0 0 0 6px rgba(242,185,59,.35),0 6px 12px rgba(0,0,0,.35)}
+.gxc-node.boss .gxc-disc .gxc-pt{border:0;box-shadow:none;background:transparent}
+.gxc-node.boss .gxc-disc::after{content:'♛';position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:17px;color:var(--gxc-gold);text-shadow:0 1px 2px #000}
+.gxc-node.locked .gxc-disc{filter:grayscale(.85) brightness(.85);opacity:.75}
+.gxc-lock{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+.gxc-node.won .gxc-disc{border-color:var(--gxc-gold)}
+.gxc-node.next .gxc-disc{animation:gxc-pulse 1.6s ease-in-out infinite}
+@keyframes gxc-pulse{0%,100%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 0 rgba(242,185,59,.7)}50%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 10px rgba(242,185,59,0)}}
+.gxc-node .gxc-stars{position:absolute;top:50px;left:50%;transform:translateX(-50%);gap:0;padding:0 4px;border-radius:99px;background:rgba(60,38,14,.75)}
+.gxc-node .gxc-st{font-size:12px}
+.gxc-lab{position:absolute;left:66px;top:14px;width:max-content;max-width:min(150px,38vw);text-align:left;font-size:13.5px;font-weight:700;line-height:1.15;color:var(--gxc-ink);
+  background:rgba(246,230,194,.88);padding:3px 8px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.gxc-node.lab-l .gxc-lab{left:auto;right:66px;text-align:right}
+.gxc-node.locked .gxc-lab{opacity:.65}
+.gxc-stars{display:inline-flex;gap:2px;justify-content:center}
+.gxc-st{font-style:normal;color:rgba(255,255,255,.35);font-size:16px;line-height:1}
+.gxc-st.on{color:var(--gxc-gold);text-shadow:0 0 6px rgba(242,185,59,.6)}
+.gxc-st.cap{opacity:.3}
+.gxc-stars.big .gxc-st{font-size:44px;color:rgba(60,38,14,.2)}
+.gxc-stars.big .gxc-st.on{color:var(--gxc-gold);text-shadow:0 2px 0 #9c6a12,0 0 14px rgba(242,185,59,.7);animation:gxc-pop .4s cubic-bezier(.3,1.6,.5,1) both}
+.gxc-stars.big .gxc-st.on:nth-child(2){animation-delay:.25s}.gxc-stars.big .gxc-st.on:nth-child(3){animation-delay:.5s}
+@keyframes gxc-pop{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:none;opacity:1}}
+/* sheets and toasts sit over the map */
+.gxc-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:88%;overflow-y:auto;z-index:5;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.5);animation:gxc-up .22s ease-out}
+@keyframes gxc-up{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
+.gxc-sheet h3{margin:0 0 4px;font-family:var(--gxc-head);font-size:21px;line-height:1.15}
+.gxc-sh-top{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.gxc-sh-t{min-width:0}.gxc-sh-t small{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--gxc-dim);font-weight:700}
+.gxc-goal,.gxc-twist{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:12px;margin:6px 0;text-align:left;width:100%;font-size:15px;line-height:1.3}
+.gxc-goal{background:rgba(79,138,75,.16);border:1px solid rgba(79,138,75,.45)}
+.gxc-twist{background:rgba(142,59,70,.12);border:1px solid rgba(142,59,70,.5)}
+.gxc-goal b,.gxc-twist b{font-size:12px;text-transform:uppercase;letter-spacing:.07em}
+.gxc-twist b{color:var(--gxc-a3)}
+.gxc-twist.big{font-size:16px;border-width:2px}
+.gxc-slist{list-style:none;margin:8px 0 0;padding:0;width:100%;text-align:left;font-size:14.5px}
+.gxc-slist li{display:flex;gap:8px;align-items:center;padding:4px 0}
+.gxc-slist i{font-style:normal;font-size:18px;color:rgba(60,38,14,.25)}
+.gxc-slist li.on i{color:var(--gxc-gold);text-shadow:0 1px 0 #9c6a12}
+.gxc-rw{list-style:none;padding:0;margin:8px 0}.gxc-rw li{padding:6px 0;border-bottom:1px solid var(--gxc-line)}
+.gxc-toast{position:absolute;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9;background:rgba(30,20,10,.92);color:#fbefd6;padding:10px 16px;border-radius:12px;font-weight:600;max-width:calc(100% - 32px);text-align:center}
+/* ---- story scene ---- */
+.gxc-scene,.gxc-boss,.gxc-res{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;border-radius:var(--gxc-radius);
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto}
+.gxc-sc-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
+.gxc-sc-who{margin-bottom:8px}
+.gxc-sc-name{font-family:var(--gxc-head);font-weight:800;font-size:18px;min-height:1.2em}
+.gxc-sc-text{font-size:18px;line-height:1.4;margin:10px 0 12px;min-height:3.2em;max-width:30em;cursor:pointer}
+.gxc-sc-text.in{animation:gxc-in .3s ease-out}
+@keyframes gxc-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.gxc-dots{display:flex;gap:6px}.gxc-dots i{width:8px;height:8px;border-radius:50%;background:rgba(60,38,14,.2)}.gxc-dots i.was{background:rgba(60,38,14,.45)}.gxc-dots i.on{background:var(--gxc-go)}
+/* ---- boss card ---- */
+.gxc-boss-on{background:radial-gradient(100% 60% at 50% 30%,#5a2230 0%,#1a0d10 75%)}
+.gxc-boss-on.a1{background:radial-gradient(100% 60% at 50% 30%,#2d5a2c 0%,#0f1a0e 75%)}
+.gxc-boss-on.a2{background:radial-gradient(100% 60% at 50% 30%,#6a4318 0%,#1a120a 75%)}
+.gxc-boss{border:3px solid var(--gxc-gold);position:relative;padding-top:14px}
+.gxc-boss-tag{margin-bottom:10px;background:linear-gradient(#f6c552,#c98d17);color:#3a2205;font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:13px;padding:5px 18px;border-radius:99px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.gxc-boss .gxc-pt{border-color:var(--gxc-gold)}
+.gxc-boss h2{margin:12px 0 2px;font-family:var(--gxc-head);font-size:26px;line-height:1.1}
+.gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
+/* ---- result ---- */
+.gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
+.gxc-res-k{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
+.gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
+.gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
+.gxc-quote b{font-size:13px}.gxc-quote p{margin:2px 0 0;font-style:italic;font-size:15px;line-height:1.3}
+.gxc-unl{width:100%;margin-top:10px;text-align:left;padding:10px 12px;border-radius:12px;border:2px dashed #c9a14a;background:rgba(242,185,59,.14)}
+.gxc-unl>b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.gxc-unl-i{padding:3px 0;font-size:15px}
+/* short phones (375x553): tighter scene, smaller portraits */
+@media (max-height:600px){
+  .gxc-screen{padding:8px 12px}
+  .gxc-scene,.gxc-boss,.gxc-res{padding:14px 12px}
+  .gxc-sc-who .gxc-pt{--gxc-pt:84px!important}
+  .gxc-boss .gxc-pt{--gxc-pt:104px!important}
+  .gxc-boss{padding-top:10px}.gxc-boss-tag{margin-bottom:6px}.gxc-boss h2{font-size:22px;margin-top:8px}
+  .gxc-sc-text{font-size:16.5px;margin:6px 0 8px}
+  .gxc-stars.big .gxc-st{font-size:36px}
+  .gxc-res h2{font-size:23px}
+}
+html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+
 :root{--ink:#3b2f2a;--paper:#f6ecd6;--paper2:#ecdcba;--wood:#a67c52;--wood2:#7c5636;--leaf:#5f8f4a;--gold:#e3b02e;--red:#b04a38;--gx-bg:#2c3b27;--gx-bar:#22301f;--gx-panel:#f6ecd6;--gx-ink:#3b2f2a;--gx-accent:#e3b02e;--gx-dock-w:clamp(330px,31vw,430px);--gx-bar-h:48px;
   --font:'Palatino Linotype','Book Antiqua',Palatino,'Iowan Old Style','Hoefler Text',Georgia,'DejaVu Serif',serif}
 html,body{font-family:var(--font);color:var(--ink);font-size:15px;-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
@@ -886,6 +1025,481 @@ const GX={key:'gx',open:null,
   };
 })(typeof window !== 'undefined' ? window : this);
 
+</script>
+<script>
+// gx-viewport.js: one debounced relayout for every game. GXV.watch(fn) calls fn(size) when the visible size or safe-area key changes.
+// Fed by resize, orientationchange, visualViewport resize, ResizeObserver(documentElement) and pageshow; re-measures at 120 and 420 ms
+// (iOS reports the old size for a moment after a rotation). Size comes from a fixed full-screen probe, not innerWidth/innerHeight.
+(function () {
+  var fns = [], key = '', t1 = 0, t2 = 0, t3 = 0, probe = null;
+  function mk() {
+    if (probe || !document.body) return probe;
+    probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100%;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:border-box;z-index:-1';
+    document.body.appendChild(probe); return probe;
+  }
+  function measure() {
+    var p = mk(), w = innerWidth, h = innerHeight, s = '';
+    if (p) { w = p.offsetWidth || w; h = p.offsetHeight || h; var cs = getComputedStyle(p); s = cs.paddingTop + cs.paddingRight + cs.paddingBottom + cs.paddingLeft; }
+    return { w: w, h: h, safe: s, key: w + 'x' + h + '|' + s };
+  }
+  function run(force) {
+    var m = measure(); if (!force && m.key === key) return; key = m.key;
+    fns.forEach(function (f) { try { f(m); } catch (e) { console.error(e); } });
+  }
+  function kick() { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); t1 = setTimeout(function () { run(); }, 40); t2 = setTimeout(function () { run(); }, 120); t3 = setTimeout(function () { run(); }, 420); }
+  var wired = false;
+  function wire() {
+    if (wired) return; wired = true;
+    addEventListener('resize', kick); addEventListener('orientationchange', kick); addEventListener('pageshow', kick);
+    if (window.visualViewport) visualViewport.addEventListener('resize', kick);
+    if (window.ResizeObserver) new ResizeObserver(kick).observe(document.documentElement);
+  }
+  window.GXV = { watch: function (fn) { fns.push(fn); wire(); run(true); return fn; }, now: measure, poke: function () { run(true); } };
+})();
+
+</script>
+<script>
+// ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
+// A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
+//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   GXC.open()            the chapter map (the title's "Story" button)
+//   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
+//   GXC.finish(G, over)   on game over: store stars, GNS.result({mode:'campaign'}), result screen, outro, back to the map
+//   GXC.scene / bossCard / result      the single screens (Promises), used by the flow and by the demo
+//   GXC.active() · progress() · unlocked() · reset() · close() · validate(data)
+// Progress lives in localStorage['gns-campaign-<game>'] and every access is wrapped in try/catch.
+(function (root) {
+  'use strict';
+  var GXC = {};
+  var doc = root && root.document;
+  var LS = {
+    json: function (k, d) { try { var v = JSON.parse(root.localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+    put: function (k, v) { try { root.localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+    del: function (k) { try { root.localStorage.removeItem(k); } catch (e) { } }
+  };
+  var LEVELS = ['easy', 'normal', 'hard'];
+  var O = null, D = null, P = null, CUR = null, OV = null, BUSY = false;
+
+  // ------------------------------------------------------------------ validation (node-safe)
+  var GOALS = ['win', 'score', 'margin', 'before-round', 'survive', 'mission', 'custom'];
+  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter'];
+  function lineText(l) { return typeof l === 'string' ? l : l && l.text; }
+  GXC.validate = function (data) {
+    var bad = [], add = function (m) { bad.push(m); };
+    if (!data || typeof data !== 'object') return ['no data'];
+    ['game', 'title'].forEach(function (k) { if (!data[k]) add('missing ' + k); });
+    var cast = data.cast || {}, twists = {}, ids = {};
+    (data.twists || []).forEach(function (t) { if (!t.id || !t.how) add('twist without id/how'); twists[t.id] = t; });
+    if (!data.acts || data.acts.length !== 3) add('needs 3 acts');
+    var ch = data.chapters || [];
+    if (ch.length < 9 || ch.length > 10) add('needs 9 or 10 chapters (has ' + ch.length + ')');
+    ch.forEach(function (c, i) {
+      var at = 'chapter ' + (c.id || i) + ': ';
+      if (!c.id) add(at + 'no id'); else if (ids[c.id]) add(at + 'duplicate id'); ids[c.id] = 1;
+      if ([1, 2, 3].indexOf(c.act) < 0) add(at + 'act must be 1-3');
+      if (i && c.act < ch[i - 1].act) add(at + 'acts out of order');
+      if (!c.title) add(at + 'no title');
+      var intro = c.intro || [], outro = c.outro || [];
+      if (intro.length < 2 || intro.length > 4) add(at + 'intro needs 2-4 lines');
+      if (outro.length < 1 || outro.length > 3) add(at + 'outro needs 1-3 lines');
+      intro.concat(outro).forEach(function (l) {
+        var t = lineText(l); if (!t) add(at + 'empty line'); else if (t.length > 110) add(at + 'line over 110 chars: ' + t.slice(0, 30) + '…');
+        if (l && l.who && l.who !== 'opponent' && l.who !== 'narrator' && !cast[l.who]) add(at + 'unknown speaker ' + l.who);
+      });
+      var op = c.opponent || {};
+      ['name', 'personality', 'aiLevel'].forEach(function (k) { if (op[k] == null || op[k] === '') add(at + 'opponent.' + k + ' missing'); });
+      if (c.boss && (!op.taunt || !op.praise)) add(at + 'boss needs taunt and praise');
+      if (!c.goal || GOALS.indexOf(c.goal.type) < 0 || !c.goal.text) add(at + 'goal needs a known type and text');
+      if (!c.stars || c.stars.length !== 3) add(at + 'needs exactly 3 stars');
+      else c.stars.forEach(function (s) { if (!s.text || !s.test) add(at + 'star needs text and test'); });
+      if (c.twist) { if (!twists[c.twist.id]) add(at + 'twist ' + c.twist.id + ' not in the twists menu'); if (!c.twist.text) add(at + 'twist needs text'); }
+      if (c.act === 3 && c.boss && !c.twist) add(at + 'act 3 boss needs a twist');
+      if (c.act === 1 && c.hints !== true) add(at + 'act 1 needs hints:true');
+      if (!c.easier) add(at + 'no easier block');
+      (c.unlock || []).forEach(function (u) { if (UNLOCKS.indexOf(u.type) < 0) add(at + 'unknown unlock type ' + u.type); if (!u.text) add(at + 'unlock needs text'); });
+      if (!c.setup || typeof c.setup !== 'object') add(at + 'setup must be an object');
+    });
+    [1, 2, 3].forEach(function (a) {
+      var inAct = ch.filter(function (c) { return c.act === a; });
+      if (!inAct.length) return add('act ' + a + ' has no chapters');
+      if (!inAct[inAct.length - 1].boss) add('act ' + a + ' must end with a boss');
+      if (inAct[0].boss) add('act ' + a + ' starts with a boss');
+    });
+    try { JSON.parse(JSON.stringify(data)); } catch (e) { add('not JSON-safe'); }
+    return bad;
+  };
+
+  // ------------------------------------------------------------------ progress
+  function key() { return 'gns-campaign-' + (O && O.game || 'game'); }
+  function load() { var p = LS.json(key(), null); if (!p || p.v !== 1) p = { v: 1, ch: {}, unlocked: [], last: null }; p.ch = p.ch || {}; p.unlocked = p.unlocked || []; return p; }
+  function save() { LS.put(key(), P); }
+  function rec(id) { return P.ch[id] || (P.ch[id] = { beaten: false, stars: 0, best: null, tries: 0, losses: 0, easy: false }); }
+  function chapters() { return (D && D.chapters) || []; }
+  function byId(id) { var c = chapters(); for (var i = 0; i < c.length; i++) if (c[i].id === id) return c[i]; return null; }
+  function isOpen(c) {
+    var list = chapters(), i = list.indexOf(c);
+    if (c.requires && c.requires.length) return c.requires.every(function (r) { return P.ch[r] && P.ch[r].beaten; });
+    return i <= 0 || !!(P.ch[list[i - 1].id] && P.ch[list[i - 1].id].beaten);
+  }
+  GXC.progress = function () { return JSON.parse(JSON.stringify(P || load())); };
+  GXC.unlocked = function () {
+    var out = [];
+    chapters().forEach(function (c) { if (P.ch[c.id] && P.ch[c.id].beaten) (c.unlock || []).forEach(function (u) { out.push({ type: u.type, id: u.id, text: u.text, from: c.id }); }); });
+    return out;
+  };
+  GXC.reset = function () { LS.del(key()); P = load(); if (OV) GXC.open(); };
+  GXC.active = function () { return CUR; };
+
+  // effective chapter: the "make it a bit easier" offer drops one AI level and the twist, at most 2 stars
+  function resolve(c, easy) {
+    var d = JSON.parse(JSON.stringify(c));
+    d.easy = !!easy; d.maxStars = 3;
+    if (easy) {
+      var e = c.easier || {}, lv = LEVELS.indexOf(c.opponent.aiLevel);
+      d.opponent.aiLevel = e.aiLevel || (lv > 0 ? LEVELS[lv - 1] : c.opponent.aiLevel);
+      d.twist = 'twist' in e ? e.twist : null;
+      if (e.setup) for (var k in e.setup) d.setup[k] = e.setup[k];
+      if (e.hints != null) d.hints = e.hints; else d.hints = true;
+      d.maxStars = e.maxStars || 2;
+    }
+    return d;
+  }
+  GXC.resolve = resolve;
+
+  // ------------------------------------------------------------------ small DOM helpers
+  function el(tag, cls, txt) { var e = doc.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function btn(cls, txt, on) { var b = el('button', cls, txt); b.type = 'button'; if (on) b.addEventListener('click', on); return b; }
+  function overlay() {
+    if (!OV) {
+      OV = el('div', 'gxc'); OV.setAttribute('role', 'dialog'); OV.setAttribute('aria-modal', 'true');
+      doc.body.appendChild(OV);
+      doc.addEventListener('keydown', function (e) { if (OV && OV.parentNode && e.key === 'Escape') { var x = OV.querySelector('[data-gxc-esc]'); if (x) x.click(); } });
+    }
+    OV.hidden = false;
+    return OV;
+  }
+  function screen(cls) { var o = overlay(); o.innerHTML = ''; o.className = 'gxc ' + (cls || ''); var s = el('div', 'gxc-screen'); o.appendChild(s); return s; }
+  GXC.close = function () { if (OV) { OV.hidden = true; OV.innerHTML = ''; } };
+  function castOf(who, def) {
+    if (who === 'opponent' && def) return { name: def.opponent.name, portrait: def.opponent.portrait, emoji: def.opponent.emoji, color: def.opponent.color };
+    if (who && D && D.cast && D.cast[who]) return D.cast[who];
+    if (def && def.opponent && def.opponent.cast === who) return { name: def.opponent.name, portrait: def.opponent.portrait, emoji: def.opponent.emoji };
+    return { name: who === 'narrator' || !who ? '' : who, emoji: '📜' };
+  }
+  // portrait: the game's own hook first, then <img> from artBase (falls back to the emoji), then the emoji badge
+  function portrait(who, size, def) {
+    var c = castOf(who, def), box = el('div', 'gxc-pt');
+    box.style.setProperty('--gxc-pt', size + 'px');
+    if (c.color) box.style.setProperty('--gxc-ptc', c.color);
+    var emo = function () { box.innerHTML = ''; box.appendChild(el('span', 'gxc-pt-e', c.emoji || (c.name ? c.name.charAt(0) : '?'))); };
+    var got = null;
+    try { if (O && O.portrait) got = O.portrait(who, size, c); } catch (e) { got = null; }
+    if (got && got.nodeType) { box.appendChild(got); return box; }
+    var src = typeof got === 'string' ? got : (O && O.artBase && c.portrait ? O.artBase + c.portrait : null);
+    if (src) { var im = el('img'); im.alt = ''; im.src = src; im.onerror = emo; box.appendChild(im); } else emo();
+    return box;
+  }
+  function starRow(n, max, total) {
+    var r = el('div', 'gxc-stars'); r.setAttribute('aria-label', n + ' of ' + (total || 3) + ' stars');
+    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '★'));
+    return r;
+  }
+  // twist text without its 'Boss rule:' prefix (the label shows it), first letter upper-case
+  function ruleText(t) { t = String(t || '').replace(/^(Boss|Special) rule:\s*/i, ''); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function easierText(def) { return ((def.easier && def.easier.text) || 'the computer plays one level gentler and any special rule is off').replace(/[.\s]+$/, ''); }
+  function toast(t) {
+    var o = overlay(), x = el('div', 'gxc-toast', t); o.appendChild(x);
+    setTimeout(function () { if (x.parentNode) x.parentNode.removeChild(x); }, 2200);
+  }
+
+  // ------------------------------------------------------------------ the chapter map
+  GXC.open = function () {
+    if (!D) return;
+    P = load(); CUR = null;
+    var s = screen('gxc-map-on'), list = chapters();
+    var head = el('div', 'gxc-head');
+    var back = btn('gxc-ib', '‹ Back', function () { GXC.close(); if (O.onExit) O.onExit(); }); back.setAttribute('data-gxc-esc', '');
+    head.appendChild(back);
+    var tt = el('div', 'gxc-htitle'); tt.appendChild(el('b', null, D.title || 'Story')); head.appendChild(tt);
+    var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
+    var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
+    sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
+    s.appendChild(head);
+    var map = el('div', 'gxc-map'), path = el('div', 'gxc-path');
+    map.appendChild(path); s.appendChild(map);
+    // nodes zigzag down a winding road; each act gets a banner and its own tint
+    var X = [50, 78, 50, 22], rows = [], y = 0, ROW = 74, BAN = 46, nextOpen = null;
+    list.forEach(function (c, i) {
+      if (!i || c.act !== list[i - 1].act) {
+        var a = (D.acts || []).filter(function (x) { return x.act === c.act; })[0] || { title: 'Act ' + c.act };
+        rows.push({ banner: a, y: y }); y += BAN;
+      }
+      rows.push({ c: c, y: y, x: X[i % 4] }); y += ROW;
+      if (!nextOpen && isOpen(c) && !(P.ch[c.id] && P.ch[c.id].beaten)) nextOpen = c;
+    });
+    var H = y + 20; path.style.height = H + 'px';
+    var pts = rows.filter(function (r) { return r.c; });
+    // the painted road: an SVG in percent units for x, px for y (viewBox stretched horizontally only)
+    var svgNS = 'http://www.w3.org/2000/svg', svg = doc.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'gxc-road'); svg.setAttribute('viewBox', '0 0 100 ' + H); svg.setAttribute('preserveAspectRatio', 'none');
+    svg.style.height = H + 'px';
+    var d = '';
+    pts.forEach(function (p, i) {
+      var cy = p.y + 30;
+      if (!i) d = 'M' + p.x + ' ' + cy; else { var q = pts[i - 1], qy = q.y + 30, my = (qy + cy) / 2; d += ' C' + q.x + ' ' + my + ' ' + p.x + ' ' + my + ' ' + p.x + ' ' + cy; }
+    });
+    ['gxc-road-edge', 'gxc-road-fill', 'gxc-road-dash'].forEach(function (k) { var pa = doc.createElementNS(svgNS, 'path'); pa.setAttribute('d', d); pa.setAttribute('class', k); pa.setAttribute('vector-effect', 'non-scaling-stroke'); svg.appendChild(pa); });
+    path.appendChild(svg);
+    rows.forEach(function (r) {
+      if (r.banner) {
+        var b = el('div', 'gxc-act'); b.style.top = r.y + 'px';
+        b.appendChild(el('b', null, 'Act ' + (r.banner.act || '') + ' · ' + (r.banner.title || '')));
+        if (r.banner.blurb) b.appendChild(el('small', null, r.banner.blurb));
+        path.appendChild(b); return;
+      }
+      var c = r.c, st = P.ch[c.id] || {}, open = isOpen(c), beaten = !!st.beaten;
+      var n = btn('gxc-node a' + c.act + (c.boss ? ' boss' : '') + (beaten ? ' won' : open ? ' open' : ' locked') + (c === nextOpen ? ' next' : ''), null, function () { sheet(c); });
+      n.style.top = r.y + 'px'; n.style.left = r.x + '%';
+      n.setAttribute('aria-label', 'Chapter ' + (list.indexOf(c) + 1) + ': ' + c.title + (c.boss ? ' (boss)' : '') + (beaten ? ', beaten, ' + (st.stars || 0) + ' stars' : open ? ', open' : ', locked'));
+      var disc = el('span', 'gxc-disc', c.boss ? '' : String(list.indexOf(c) + 1));
+      if (c.boss) disc.appendChild(portrait(c.opponent.cast || 'opponent', 40, c));
+      if (!open) disc.appendChild(el('i', 'gxc-lock', '🔒'));
+      n.appendChild(disc);
+      if (beaten) n.appendChild(starRow(st.stars || 0, null, 3));
+      var lab = el('span', 'gxc-lab', c.title); n.appendChild(lab);
+      if (r.x > 60) n.classList.add('lab-l');
+      path.appendChild(n);
+    });
+    // bring the next open chapter into view
+    if (nextOpen) setTimeout(function () { var t = rows.filter(function (r) { return r.c === nextOpen; })[0]; if (t) map.scrollTop = Math.max(0, t.y - map.clientHeight / 2 + 40); }, 0);
+  };
+
+  function rewards() {
+    var o = overlay(), sh = el('div', 'gxc-sheet'), u = GXC.unlocked();
+    var close = function () { if (sh.parentNode) sh.parentNode.removeChild(sh); };
+    sh.appendChild(el('h3', null, 'Rewards'));
+    if (!u.length) sh.appendChild(el('p', 'gxc-dim', 'Beat chapters to unlock portraits, card backs, titles and new acts.'));
+    var ul = el('ul', 'gxc-rw');
+    u.forEach(function (x) { var li = el('li'); li.appendChild(el('span', 'gxc-tag', x.type)); li.appendChild(el('span', null, x.text)); ul.appendChild(li); });
+    sh.appendChild(ul);
+    var b = btn('gxc-btn', 'Close', close); b.setAttribute('data-gxc-esc', ''); sh.appendChild(b);
+    o.appendChild(sh); b.focus();
+  }
+
+  // the chapter's detail sheet: goal, opponent, stars, Play (and the easier offer after 2 losses)
+  function sheet(c) {
+    var o = overlay(), old = o.querySelector('.gxc-sheet'); if (old) old.parentNode.removeChild(old);
+    if (!isOpen(c)) { var i = chapters().indexOf(c); toast('Beat chapter ' + i + ' first.'); return; }
+    var st = rec(c.id), sh = el('div', 'gxc-sheet a' + c.act);
+    var close = function () { if (sh.parentNode) sh.parentNode.removeChild(sh); };
+    var top = el('div', 'gxc-sh-top');
+    top.appendChild(portrait(c.opponent.cast || 'opponent', 64, c));
+    var t = el('div', 'gxc-sh-t');
+    t.appendChild(el('small', null, 'Act ' + c.act + ' · Chapter ' + (chapters().indexOf(c) + 1) + (c.boss ? ' · Boss' : '')));
+    t.appendChild(el('h3', null, c.title));
+    t.appendChild(el('div', 'gxc-dim', (c.boss ? 'Boss: ' : 'Opponent: ') + c.opponent.name));
+    top.appendChild(t); sh.appendChild(top);
+    var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Goal')); g.appendChild(el('span', null, c.goal.text)); sh.appendChild(g);
+    if (c.twist) { var tw = el('div', 'gxc-twist'); tw.appendChild(el('b', null, c.boss ? 'Boss rule' : 'Special rule')); tw.appendChild(el('span', null, ruleText(c.twist.text))); sh.appendChild(tw); }
+    var sl = el('ul', 'gxc-slist');
+    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
+    sh.appendChild(sl);
+    var row = el('div', 'gxc-row');
+    var x = btn('gxc-btn ghost', 'Close', close); x.setAttribute('data-gxc-esc', ''); row.appendChild(x);
+    if (st.losses >= 2 && !st.beaten) row.appendChild(btn('gxc-btn ghost', 'Make it a bit easier', function () { GXC.play(c.id, { easy: true }); }));
+    var go = btn('gxc-btn go', st.beaten ? 'Play again' : 'Play', function () { GXC.play(c.id); }); row.appendChild(go);
+    sh.appendChild(row);
+    if (st.losses >= 2 && !st.beaten) sh.appendChild(el('p', 'gxc-dim gxc-small', 'Easier: ' + easierText(c) + ' (up to 2 stars).'));
+    o.appendChild(sh); go.focus();
+  }
+
+  // ------------------------------------------------------------------ story scene (2-4 lines, always skippable)
+  GXC.scene = function (lines, opts) {
+    opts = opts || {};
+    return new Promise(function (done) {
+      lines = (lines || []).filter(function (l) { return lineText(l); });
+      if (!lines.length || !doc) return done();
+      var s = screen('gxc-scene-on'), i = 0, def = opts.def;
+      var box = el('div', 'gxc-scene');
+      if (opts.title) box.appendChild(el('div', 'gxc-sc-title', opts.title));
+      var who = el('div', 'gxc-sc-who'), name = el('div', 'gxc-sc-name'), txt = el('p', 'gxc-sc-text');
+      txt.setAttribute('aria-live', 'polite');
+      var dots = el('div', 'gxc-dots');
+      lines.forEach(function () { dots.appendChild(el('i')); });
+      var row = el('div', 'gxc-row');
+      var finish = function () { done(); };
+      var skip = btn('gxc-btn ghost', 'Skip', finish); skip.setAttribute('data-gxc-esc', '');
+      var next = btn('gxc-btn go', 'Next', function () { i++; if (i >= lines.length) finish(); else show(); });
+      row.appendChild(skip); row.appendChild(next);
+      box.appendChild(who); box.appendChild(name); box.appendChild(txt); box.appendChild(dots); box.appendChild(row);
+      s.appendChild(box);
+      txt.addEventListener('click', function () { next.click(); });
+      function show() {
+        var l = lines[i], w = typeof l === 'string' ? (opts.who || 'narrator') : (l.who || 'narrator'), c = castOf(w, def);
+        who.innerHTML = ''; who.appendChild(portrait(w, 112, def));
+        name.textContent = c.name || '';
+        txt.textContent = lineText(l);
+        for (var k = 0; k < dots.children.length; k++) dots.children[k].className = k === i ? 'on' : k < i ? 'was' : '';
+        next.textContent = i === lines.length - 1 ? (opts.last || 'Continue') : 'Next';
+        txt.classList.remove('in'); void txt.offsetWidth; txt.classList.add('in');
+        next.focus();
+      }
+      show();
+    });
+  };
+
+  // ------------------------------------------------------------------ boss intro card
+  GXC.bossCard = function (def) {
+    return new Promise(function (done) {
+      if (!doc) return done(true);
+      var s = screen('gxc-boss-on a' + def.act), op = def.opponent, card = el('div', 'gxc-boss');
+      card.appendChild(el('div', 'gxc-boss-tag', def.boss ? 'Boss' : 'Rival'));
+      card.appendChild(portrait(op.cast || 'opponent', 148, def));
+      card.appendChild(el('h2', null, op.name));
+      card.appendChild(el('p', 'gxc-boss-pers', op.personality));
+      if (def.twist && def.twist.text) {
+        var tw = el('div', 'gxc-twist big');
+        tw.appendChild(el('b', null, def.boss ? 'Boss rule' : 'Special rule'));
+        tw.appendChild(el('span', null, ruleText(def.twist.text)));
+        card.appendChild(tw);
+      }
+      var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Your goal')); g.appendChild(el('span', null, def.goal.text)); card.appendChild(g);
+      var lv = el('div', 'gxc-dim gxc-small', 'Computer: ' + op.aiLevel + (op.aiStyle ? ' · ' + op.aiStyle : '') + (def.easy ? ' · made easier' : ''));
+      card.appendChild(lv);
+      var row = el('div', 'gxc-row');
+      var back = btn('gxc-btn ghost', 'Back', function () { done(false); }); back.setAttribute('data-gxc-esc', '');
+      var go = btn('gxc-btn go', 'Fight', function () { done(true); });
+      row.appendChild(back); row.appendChild(go); card.appendChild(row);
+      s.appendChild(card); go.focus();
+    });
+  };
+
+  // ------------------------------------------------------------------ play a chapter
+  GXC.play = function (id, opt) {
+    if (BUSY) return;
+    var c = byId(id); if (!c || !isOpen(c)) return;
+    BUSY = true;
+    var def = resolve(c, opt && opt.easy);
+    var st = rec(c.id); st.tries++; P.last = c.id; save();
+    GXC.scene(c.intro, { def: def, title: c.title, last: c.boss || def.twist ? 'Meet ' + (c.boss ? 'the boss' : 'your rival') : 'Start' }).then(function () {
+      return c.boss || def.twist ? GXC.bossCard(def) : true;
+    }).then(function (go) {
+      BUSY = false;
+      if (!go) { GXC.open(); return; }
+      CUR = def; GXC.close();
+      try { O.startChapter(def); } catch (e) { CUR = null; GXC.open(); throw e; }
+    }, function () { BUSY = false; });
+  };
+
+  // ------------------------------------------------------------------ stars and game over
+  function testOne(t, m) {
+    if (!t || !m) return false;
+    var v = m[t.k], op = t.op || (t.v == null ? 'truthy' : '>=');
+    switch (op) {
+      case '>=': return v >= t.v; case '>': return v > t.v; case '<=': return v <= t.v; case '<': return v < t.v;
+      case '==': case '=': return v === t.v; case '!=': return v !== t.v; default: return !!v;
+    }
+  }
+  GXC.testStar = testOne;
+  function countStars(G, def, won) {
+    if (!won) return 0;
+    var n = 0;
+    if (O.starsEarned) { try { n = O.starsEarned(G, def) | 0; } catch (e) { n = 1; } }
+    else {
+      var m = {}; try { m = O.metrics ? O.metrics(G) || {} : {}; } catch (e) { }
+      if (m.won == null) m.won = won;
+      n = 1; // the first star is the chapter's goal, already met by winning
+      for (var i = 1; i < def.stars.length; i++) if (testOne(def.stars[i].test, m)) n++;
+    }
+    return Math.max(1, Math.min(n, def.maxStars || 3, 3));
+  }
+
+  // over: optional {won, stars} to override the game's callbacks (e.g. a resign counts as a loss)
+  GXC.finish = function (G, over) {
+    var def = CUR; if (!def) return Promise.resolve(null);
+    over = over || {};
+    var won = over.won != null ? !!over.won : (function () { try { return !!O.isWon(G, def); } catch (e) { return false; } })();
+    var stars = over.stars != null ? Math.min(over.stars, def.maxStars || 3) : countStars(G, def, won);
+    var st = rec(def.id), first = won && !st.beaten;
+    if (won) { st.beaten = true; st.stars = Math.max(st.stars || 0, stars); if (def.easy) st.easy = true; st.losses = 0; }
+    else st.losses = (st.losses || 0) + 1;
+    var unl = first ? (byId(def.id).unlock || []) : [];
+    unl.forEach(function (u) { var k = u.type + ':' + (u.id || u.text); if (P.unlocked.indexOf(k) < 0) P.unlocked.push(k); });
+    var list = chapters(), i = list.indexOf(byId(def.id)), nxt = list[i + 1];
+    if (first && nxt && nxt.act !== def.act) unl = unl.concat([{ type: 'act', text: 'Act ' + nxt.act + ' opens' }]);
+    save();
+    if (root.GNS && root.GNS.result) {
+      try {
+        root.GNS.result({ game: O.game, mode: 'campaign', level: def.opponent.aiLevel, won: won, winner: won ? 0 : 1,
+          seats: O.seats ? O.seats(G) : [{ name: 'You', me: true }, { name: def.opponent.name, ai: def.opponent.aiLevel }],
+          scores: O.scores ? O.scores(G) : null, turns: over.turns || 0, ms: over.ms || 0,
+          extra: { chapter: def.id, stars: won ? stars : 0, easy: !!def.easy, boss: !!def.boss } });
+      } catch (e) { }
+    }
+    CUR = null;
+    var res = { won: won, stars: won ? stars : 0, def: def, unlocks: unl, losses: st.losses, best: st.stars, first: first };
+    return GXC.result(res).then(function (pick) {
+      if (pick === 'retry') { GXC.play(def.id); return res; }
+      if (pick === 'easier') { GXC.play(def.id, { easy: true }); return res; }
+      if (pick === 'next' && nxt) { GXC.play(nxt.id); return res; }
+      return (won ? GXC.scene(def.outro, { def: def, title: def.title, last: 'Back to the map' }) : Promise.resolve()).then(function () { GXC.open(); return res; });
+    });
+  };
+
+  // result screen: stars, the boss's taunt or praise, unlocks, and the easier offer after 2 losses
+  GXC.result = function (r) {
+    return new Promise(function (done) {
+      if (!doc) return done('map');
+      var def = r.def, s = screen('gxc-res-on ' + (r.won ? 'won' : 'lost')), box = el('div', 'gxc-res');
+      box.appendChild(el('div', 'gxc-res-k', def.title));
+      box.appendChild(el('h2', null, r.won ? (def.boss ? 'Boss defeated!' : 'Chapter won!') : (def.goal.type === 'mission' || def.goal.type === 'survive' ? 'Mission failed' : 'Not this time')));
+      var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
+      if (r.won && def.easy) box.appendChild(el('div', 'gxc-dim gxc-small', 'Easier mode: up to ' + def.maxStars + ' stars. Play it normally for 3.'));
+      var sl = el('ul', 'gxc-slist');
+      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
+      box.appendChild(sl);
+      var op = def.opponent, line = r.won ? op.praise : op.taunt;
+      if (line) {
+        var q = el('div', 'gxc-quote');
+        q.appendChild(portrait(op.cast || 'opponent', 52, def));
+        var qt = el('div'); qt.appendChild(el('b', null, op.name)); qt.appendChild(el('p', null, '“' + line + '”')); q.appendChild(qt);
+        box.appendChild(q);
+      }
+      if (r.unlocks && r.unlocks.length) {
+        var ul = el('div', 'gxc-unl'); ul.appendChild(el('b', null, 'Unlocked'));
+        r.unlocks.forEach(function (u) { var x = el('div', 'gxc-unl-i'); x.appendChild(el('span', 'gxc-tag', u.type)); x.appendChild(el('span', null, u.text)); ul.appendChild(x); });
+        box.appendChild(ul);
+      }
+      var row = el('div', 'gxc-row wrap');
+      var m = btn('gxc-btn ghost', 'Map', function () { done('map'); }); m.setAttribute('data-gxc-esc', ''); row.appendChild(m);
+      row.appendChild(btn('gxc-btn ' + (r.won ? 'ghost' : 'go'), r.won ? 'Replay' : 'Try again', function () { done('retry'); }));
+      if (!r.won && r.losses >= 2) row.appendChild(btn('gxc-btn soft', 'Make it a bit easier', function () { done('easier'); }));
+      if (r.won) row.appendChild(btn('gxc-btn go', 'Continue', function () { done('continue'); }));
+      box.appendChild(row);
+      if (!r.won && r.losses >= 2) box.appendChild(el('p', 'gxc-dim gxc-small', 'Easier: ' + easierText(def) + ' (up to 2 stars).'));
+      s.appendChild(box);
+      var f = row.querySelector('.go') || m; f.focus();
+    });
+  };
+
+  // ------------------------------------------------------------------ init
+  GXC.init = function (opts) {
+    O = opts || {}; D = O.data || null; P = load();
+    if (!O.startChapter) O.startChapter = function () { };
+    if (!O.isWon) O.isWon = function () { return false; };
+    return GXC;
+  };
+  GXC.data = function () { return D; };
+
+  if (root && root.document) root.GXC = GXC;
+  if (typeof module !== 'undefined' && module.exports) module.exports = GXC;
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+window.CAMPAIGN = {"game":"hollowbough","title":"The Long Winter of Hollowbough","version":1,"cast":{"hazel":{"name":"Hazel Quickpaw","portrait":"camp-hazel.webp","emoji":"🐇","color":"#7a9a4a"},"bramble":{"name":"Bramble","portrait":"camp-bramble.webp","emoji":"🦔","color":"#a0673a"},"fern":{"name":"Fern","portrait":"camp-fern.webp","emoji":"🐭","color":"#4f8a5b"},"quill":{"name":"Quill","portrait":"camp-quill.webp","emoji":"🐦‍⬛","color":"#3d4a6b"},"thistle":{"name":"Thistle","portrait":"camp-thistle.webp","emoji":"🐿️","color":"#8a3f6e"},"grim":{"name":"Old Grimbeard","portrait":"camp-grimbeard.webp","emoji":"🦡","color":"#5b5048"}},"acts":[{"act":1,"title":"Thaw","blurb":"Found your city and learn the woods."},{"act":2,"title":"Midsummer","blurb":"Sharper neighbours, fewer clearings, a proud regent."},{"act":3,"title":"First Frost","blurb":"Hard rivals and Thistle's gate before the winter."}],"twists":[{"id":"thin-forest","where":"setup","how":"After HB.newGame returns, set G.forest = G.forest.slice(0, param) so only param forest locations are open to every seat."},{"id":"boss-extra-hand","where":"setup","how":"After HB.newGame returns, the boss seat draws param extra cards from the deck into hand (never above the hand limit of 8)."},{"id":"boss-pantry","where":"setup","how":"After HB.newGame returns, add param to the boss seat's res.twig, res.resin and res.berry (pebbles unchanged)."}],"chapters":[{"id":"c1","act":1,"title":"First Roots","boss":false,"intro":[{"who":"hazel","text":"Welcome to Hollowbough. The snow is melting and the valley needs a new city."},{"who":"hazel","text":"On your turn, place a worker on a spot to gather twigs, resin, berries or pebbles."},{"who":"bramble","text":"I'm Bramble! I'll build next door. Don't worry, I mostly grab whatever's shiny."}],"outro":[{"who":"hazel","text":"Workers gather, cards build. That's the whole heart of it."},{"who":"bramble","text":"You beat me fair and square. Neighbours?"}],"opponent":{"name":"Bramble","portrait":"camp-bramble.webp","emoji":"🦔","cast":"bramble","personality":"Cheerful and scatterbrained; grabs whatever is closest.","aiLevel":"easy","aiStyle":null},"setup":{"mode":"vs","np":2,"level":"easy","seed":null},"twist":null,"goal":{"type":"win","value":null,"text":"Win the game against Bramble."},"hints":true,"stars":[{"text":"Win the game","test":{"k":"won"}},{"text":"Build 8 or more cards in your city","test":{"k":"city","op":">=","v":8}},{"text":"Score 30 or more","test":{"k":"score","op":">=","v":30}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Bramble plays even more gently and the tips stay on."},"unlock":[{"type":"portrait","id":"bramble","text":"Bramble's portrait"}]},{"id":"c2","act":1,"title":"Room for a Lodger","boss":false,"intro":[{"who":"hazel","text":"Every critter names a building it loves. Build that first, and the critter moves in free."},{"who":"hazel","text":"Look for the little link on each card. A free card is a whole turn of gathering saved."},{"who":"fern","text":"I'm Fern. I count every twig twice. Let's see who settles more lodgers."}],"outro":[{"who":"hazel","text":"Free lodgers are how a small city grows fast."},{"who":"fern","text":"Hm. I'll pair my buildings better next time."}],"opponent":{"name":"Fern","portrait":"camp-fern.webp","emoji":"🐭","cast":"fern","personality":"Careful and thrifty; never wastes a resource, rarely takes risks.","aiLevel":"easy","aiStyle":null},"setup":{"mode":"vs","np":2,"level":"easy","seed":null},"twist":null,"goal":{"type":"custom","value":2,"text":"Win with at least 2 critters moved in for free."},"hints":true,"stars":[{"text":"Win with 2+ free critters","test":{"k":"occupied","op":">=","v":2}},{"text":"Move in 3 or more free critters","test":{"k":"occupied","op":">=","v":3}},{"text":"Win by 10 or more","test":{"k":"margin","op":">=","v":10}}],"easier":{"aiLevel":"easy","twist":null,"setup":{},"maxStars":2,"text":"Only 1 free critter is needed and Fern plays gently."},"unlock":[{"type":"portrait","id":"fern","text":"Fern's portrait"}]},{"id":"c3","act":1,"title":"The Spring Harvest","boss":false,"intro":[{"who":"hazel","text":"Green cards are farms and mills. They pay out when played, and again each spring and autumn."},{"who":"hazel","text":"Plant them early and Prepare for Season will fill your larder for you."},{"who":"bramble","text":"Fern and I are both here this time. Three cities, one meadow!"},{"who":"fern","text":"Try not to trample my berry patch."}],"outro":[{"who":"hazel","text":"An early green engine feeds you all year."},{"who":"bramble","text":"Your city hums like a beehive."}],"opponent":{"name":"Bramble","portrait":"camp-bramble.webp","emoji":"🦔","cast":"bramble","personality":"Bramble and Fern together: one grabby, one careful.","aiLevel":"easy","aiStyle":null},"setup":{"mode":"vs","np":3,"level":"easy","seed":null},"twist":null,"goal":{"type":"custom","value":3,"text":"Win with at least 3 green Production cards in your city."},"hints":true,"stars":[{"text":"Win with 3+ green cards","test":{"k":"green","op":">=","v":3}},{"text":"Have 5 or more green cards","test":{"k":"green","op":">=","v":5}},{"text":"Score 40 or more","test":{"k":"score","op":">=","v":40}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"np":2},"maxStars":2,"text":"Only Bramble plays, so the meadow is less crowded."},"unlock":[{"type":"cardback","id":"sprout","text":"Sprout card back"}]},{"id":"c4","act":1,"title":"The Grumbling Hill","boss":true,"intro":[{"who":"hazel","text":"Old Grimbeard has grumbled on the hill for longer than the oak has stood."},{"who":"grim","text":"New cities. Noisy. I'll take the best cards before you've woken up."},{"who":"hazel","text":"He follows a fixed routine and rolls for meadow cards. Beat his total by even 1 point."},{"who":"hazel","text":"Events help: four basic ones sit open on the board for whoever meets them first."}],"outro":[{"who":"grim","text":"Hmph. Fine city. Too many lanterns."},{"who":"hazel","text":"The valley has noticed you. Summer brings sharper neighbours."}],"opponent":{"name":"Old Grimbeard","portrait":"camp-grimbeard.webp","emoji":"🦡","cast":"grim","personality":"Grumpy, set in his ways; follows his routine and rolls for the meadow.","aiLevel":"Grumpy","aiStyle":"solo-rival","taunt":"Too slow. Come back when your roots go deeper.","praise":"Hmph. You may stay on my hill. For now."},"setup":{"mode":"solo","solo":1,"seed":null},"twist":null,"goal":{"type":"win","value":null,"text":"Beat Old Grimbeard on Grumpy by at least 1 point."},"hints":true,"stars":[{"text":"Beat Old Grimbeard","test":{"k":"won"}},{"text":"Claim 2 or more events","test":{"k":"events","op":">=","v":2}},{"text":"Win by 8 or more","test":{"k":"margin","op":">=","v":8}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"mode":"vs","np":2,"level":"easy"},"maxStars":2,"text":"Grimbeard sends an easy computer player to sit in for him."},"unlock":[{"type":"portrait","id":"grim","text":"Old Grimbeard's portrait"},{"type":"act","id":"act2","text":"Act 2: Midsummer"}]},{"id":"c5","act":2,"title":"A Stranger in the Meadow","boss":false,"intro":[{"who":"hazel","text":"Summer. Quill has flown in from the far ridge, and Quill doesn't play gently."},{"who":"quill","text":"Ooh, what a lovely meadow. Shame if someone took the best card from it."},{"who":"hazel","text":"Watch the meadow: whatever you leave there, Quill will snatch."}],"outro":[{"who":"quill","text":"Lucky draw. Next time I'll pick cleaner."},{"who":"hazel","text":"You held your ground against a real player."}],"opponent":{"name":"Quill","portrait":"camp-quill.webp","emoji":"🐦‍⬛","cast":"quill","personality":"Sly and quick; snatches the best meadow cards before you can.","aiLevel":"normal","aiStyle":null},"setup":{"mode":"vs","np":2,"level":"normal","seed":null},"twist":null,"goal":{"type":"win","value":null,"text":"Win the game against Quill."},"hints":false,"stars":[{"text":"Win the game","test":{"k":"won"}},{"text":"Score 45 or more","test":{"k":"score","op":">=","v":45}},{"text":"Win by 10 or more","test":{"k":"margin","op":">=","v":10}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"level":"easy"},"maxStars":2,"text":"Quill plays at the easy level."},"unlock":[{"type":"portrait","id":"quill","text":"Quill's portrait"}]},{"id":"c6","act":2,"title":"The Thin Woods","boss":false,"intro":[{"who":"hazel","text":"A late frost closed part of the forest. Fewer clearings, and everyone wants them."},{"who":"fern","text":"Quill and I both heard about the events. First to qualify claims each one."},{"who":"hazel","text":"Plan your colours: each event wants a certain mix of cards in your city."}],"outro":[{"who":"hazel","text":"Events are points nobody can take back."},{"who":"fern","text":"You read the board better than I did."}],"opponent":{"name":"Fern","portrait":"camp-fern.webp","emoji":"🐭","cast":"fern","personality":"Fern and Quill together: one patient, one greedy.","aiLevel":"normal","aiStyle":null},"setup":{"mode":"vs","np":3,"level":"normal","seed":null},"twist":{"id":"thin-forest","param":2,"text":"Chapter rule: only 2 forest clearings are open this game, for everyone."},"goal":{"type":"custom","value":2,"text":"Win and claim at least 2 events."},"hints":false,"stars":[{"text":"Win with 2+ events","test":{"k":"events","op":">=","v":2}},{"text":"Claim 3 or more events","test":{"k":"events","op":">=","v":3}},{"text":"Score 50 or more","test":{"k":"score","op":">=","v":50}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"level":"easy"},"maxStars":2,"text":"Both rivals play easy and the full forest is open."},"unlock":[{"type":"table","id":"frostwood","text":"Frostwood table"}]},{"id":"c7","act":2,"title":"The Regent's Visit","boss":true,"intro":[{"who":"thistle","text":"I am Thistle, and every road in this valley ends at my gate."},{"who":"thistle","text":"I bring a full satchel of plans. You bring... a sketch."},{"who":"hazel","text":"Thistle builds big and scores at the end. Close off the events before her city fills."},{"who":"hazel","text":"Reach 40 points and win. Take the Long Road in autumn if your hand is heavy."}],"outro":[{"who":"thistle","text":"Impressive. Enjoy the summer, settler. Frost comes for all of us."},{"who":"hazel","text":"She'll be back. And she won't come alone."}],"opponent":{"name":"Thistle","portrait":"camp-thistle.webp","emoji":"🐿️","cast":"thistle","personality":"Proud and patient; hoards cards and plans for a huge final score.","aiLevel":"normal","aiStyle":null,"taunt":"A sketch, as I said. My gate stays shut.","praise":"Well built. I shall remember your name."},"setup":{"mode":"vs","np":2,"level":"normal","seed":null},"twist":{"id":"boss-extra-hand","param":2,"text":"Boss rule: Thistle starts with 2 extra cards in hand."},"goal":{"type":"score","value":40,"text":"Win with at least 40 points."},"hints":false,"stars":[{"text":"Win with 40+ points","test":{"k":"score","op":">=","v":40}},{"text":"Score 5+ points on the Long Road","test":{"k":"journey","op":">=","v":5}},{"text":"Win by 10 or more","test":{"k":"margin","op":">=","v":10}}],"easier":{"aiLevel":"easy","twist":null,"setup":{"level":"easy"},"maxStars":2,"text":"Thistle plays easy and starts with a normal hand."},"unlock":[{"type":"portrait","id":"thistle","text":"Thistle's portrait"},{"type":"act","id":"act3","text":"Act 3: First Frost"}]},{"id":"c8","act":3,"title":"Frost on the Bough","boss":false,"intro":[{"who":"hazel","text":"Autumn. Fern has stopped being careful and started being clever."},{"who":"fern","text":"I've studied every game we played. I won't waste a single turn now."},{"who":"hazel","text":"No tricks this time. Just a sharp rival and a fair board."}],"outro":[{"who":"fern","text":"You out-planned me. I didn't think anyone could."},{"who":"hazel","text":"Now the hill, and then the gate."}],"opponent":{"name":"Fern","portrait":"camp-fern.webp","emoji":"🐭","cast":"fern","personality":"Methodical; looks two moves ahead and never wastes a worker.","aiLevel":"hard","aiStyle":null},"setup":{"mode":"vs","np":2,"level":"hard","seed":null},"twist":null,"goal":{"type":"win","value":null,"text":"Win the game against Fern at the hard level."},"hints":false,"stars":[{"text":"Win the game","test":{"k":"won"}},{"text":"Score 55 or more","test":{"k":"score","op":">=","v":55}},{"text":"Claim 3 or more events","test":{"k":"events","op":">=","v":3}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"level":"normal"},"maxStars":2,"text":"Fern plays at the normal level."},"unlock":[{"type":"cardback","id":"frost","text":"Frost card back"}]},{"id":"c9","act":3,"title":"Grimbeard Grows Gruff","boss":false,"intro":[{"who":"grim","text":"You again. I've been practising. Rolled a lot of dice this summer."},{"who":"hazel","text":"Each special event nobody claims is worth 6 points to him now. Claim them first."},{"who":"hazel","text":"Beat his total by at least 1 point."}],"outro":[{"who":"grim","text":"...Gruff, they call me. Gruffly, I say: well played."},{"who":"hazel","text":"Only Thistle's gate is left."}],"opponent":{"name":"Old Grimbeard","portrait":"camp-grimbeard.webp","emoji":"🦡","cast":"grim","personality":"Gruff and relentless; scores heavily for every special event left unclaimed.","aiLevel":"Gruff","aiStyle":"solo-rival"},"setup":{"mode":"solo","solo":2,"seed":null},"twist":null,"goal":{"type":"win","value":null,"text":"Beat Old Grimbeard on Gruff by at least 1 point."},"hints":false,"stars":[{"text":"Beat Old Grimbeard","test":{"k":"won"}},{"text":"Claim 2 or more special events","test":{"k":"specialEvents","op":">=","v":2}},{"text":"Win by 5 or more","test":{"k":"margin","op":">=","v":5}}],"easier":{"aiLevel":"Grumpy","twist":null,"setup":{"solo":1},"maxStars":2,"text":"Grimbeard plays as his Grumpy self."},"unlock":[{"type":"title","id":"beard-trimmer","text":"Title: Beard Trimmer"}]},{"id":"c10","act":3,"title":"The Gate of Thistle","boss":true,"intro":[{"who":"thistle","text":"Winter is coming, and my larder is full. Quill flies for me now."},{"who":"quill","text":"Nothing personal. She pays in berries."},{"who":"hazel","text":"Thistle starts with a stocked pantry. Two hard rivals, one meadow. Build fast and claim early."},{"who":"hazel","text":"Win this and the valley is yours."}],"outro":[{"who":"thistle","text":"The gate is open. Hollowbough is yours to keep."},{"who":"quill","text":"I always did like the winning side."},{"who":"hazel","text":"Rest now. The oak will wake again in spring."}],"opponent":{"name":"Thistle","portrait":"camp-thistle.webp","emoji":"🐿️","cast":"thistle","personality":"Proud and patient, now ruthless; plays hard with Quill as her ally.","aiLevel":"hard","aiStyle":null,"taunt":"My pantry, my valley, my winter. Go home, settler.","praise":"You've built something I never could. The valley chose well."},"setup":{"mode":"vs","np":3,"level":"hard","seed":null},"twist":{"id":"boss-pantry","param":2,"text":"Boss rule: Thistle starts with 2 extra twigs, resin and berries."},"goal":{"type":"win","value":null,"text":"Win against Thistle and Quill at the hard level."},"hints":false,"stars":[{"text":"Win the game","test":{"k":"won"}},{"text":"Score 60 or more","test":{"k":"score","op":">=","v":60}},{"text":"Win by 8 or more","test":{"k":"margin","op":">=","v":8}}],"easier":{"aiLevel":"normal","twist":null,"setup":{"level":"normal"},"maxStars":2,"text":"Both rivals play normal and Thistle starts with no extra pantry."},"unlock":[{"type":"title","id":"warden","text":"Title: Warden of Hollowbough"},{"type":"table","id":"elderheart","text":"Elderheart table"}]}]};
 </script>
 <script>
 // ---------- PerfHUD: one speed tool for every game on the shelf ----------
@@ -4434,7 +5048,9 @@ function newGame(mode, o) {
   else if (mode === 'net') { players = o.players; }
   else if (mode === 'ai') { players = []; for (let i = 0; i < cfg.np; i++) players.push({ name: PNAMES[i], ai: cfg.level }); if (cfg.np < 2) players.push({ name: PNAMES[1], ai: cfg.level }); }
   else { players = [{ name: 'You', ai: null }]; for (let i = 1; i < cfg.np; i++) players.push({ name: PNAMES[i - 1], ai: (o.levels && o.levels[i - 1]) || cfg.level }); }
+  if (o.camp && mode === 'vs') { const cn = o.camp.names || []; players.forEach((p, i) => { if (i > 0 && cn[i - 1]) p.name = cn[i - 1]; }); }
   G = HB.newGame({ players, solo, seed: UI.seed != null ? UI.seed : undefined });
+  if (o.camp) campTwist(o.camp);
   UI.seed = null;
   UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
   UI.holder = hotSeat() ? -1 : -1;
@@ -4549,7 +5165,7 @@ function queueOver() {
   UI.cards.push({
     kind: 'over', title: G.grim ? (ov.win ? 'You beat ' + D.soloName + '!' : D.soloName + ' wins this time') : (ov.tie ? 'A tie at the top' : G.players[ov.winner].name + (G.players[ov.winner].name === 'You' ? ' win!' : ' wins!')), sub: 'The game is over',
     body: () => { const t = h('div.score'); order.forEach((s, k) => t.appendChild(h('div.kv' + (k === 0 && !G.grim ? '.tot' : ''), h('span', (k + 1) + '. ', pawn(s, 16), ' ' + G.players[s].name), h('b', ov.scores[s].total + ' pts')))); if (G.grim) t.appendChild(h('div.kv', h('span', D.soloName), h('b', ov.grim.total + ' pts'))); if (ov.tie) t.appendChild(h('p.sm', 'Tie-breaks (events, then leftover resources) could not separate them.')); if (UI.earned && UI.earned.length) t.appendChild(h('p.achv', '★ New achievement' + (UI.earned.length > 1 ? 's' : '') + ': ' + UI.earned.join(', '))); return t; },
-    buttons: NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
+    buttons: NET.on ? netOverButtons() : campOn() ? [{ label: 'Continue the story', a: 'campfin' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }] : [{ label: 'Play again', a: 'again' }, { label: 'Look at the board', a: 'cont', cls: 'alt' }, { label: 'Main menu', a: 'menu', cls: 'alt' }]
   });
   clearSave(); render();
 }
@@ -4646,6 +5262,7 @@ function renderStart() {
     h('h1', h('span', { html: ICO.tree }), 'Hollowbough'),
     h('p.tag', 'Build a woodland city. Place workers, play cards, outlast the winter.'),
     h('button.sbtn.big', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and one gentle computer player; tips appear one at a time.')),
+    window.CAMPAIGN ? h('button.sbtn.big.story', { 'data-start': 'story', 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story: The Long Winter'), h('span', campLine())) : null,
     h('div.opts', seg('Players', 'np', [2, 3, 4]), seg('Computer level', 'level', ['easy', 'normal', 'hard']), seg('Solo rival', 'solo', [1, 2, 3], v => D.soloLevels[v - 1] + (v > 1 ? '*' : ''))),
     h('p.sm', '*Gruff and Ghastly are very hard.'),
     h('div.sgrid',
@@ -4680,8 +5297,10 @@ document.addEventListener('click', ev => {
     case 'q': choose(+d.i); break;
     case 'cont': nextCard(); break;
     case 'take': takeDevice(); break;
-    case 'again': { const m = UI.mode, c = UI.cfg || {}; UI.cards = []; newGame(m, { np: c.np, level: c.level, solo: c.solo }); break; }
-    case 'menu': showStart(); break;
+    case 'again': { if (campOn()) { const dd = UI.camp; UI.cards = []; GXC.play(dd.id); break; } const m = UI.mode, c = UI.cfg || {}; UI.cards = []; newGame(m, { np: c.np, level: c.level, solo: c.solo }); break; }
+    case 'menu': UI.camp = null; showStart(); break;
+    case 'story': campOpen(); break;
+    case 'campfin': campFinish(); break;
     case 'start': newGame(d.m); break;
     case 'guided': newGame('guided'); break;
     case 'opt': { UI.opt = UI.opt || Object.assign({}, DEF); UI.opt[d.k] = isNaN(+d.v) ? d.v : +d.v; renderStart(); break; }
@@ -4696,15 +5315,14 @@ document.addEventListener('click', ev => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.pop) closePop(); });
 // ---- phone mode
 function applyPhone() {
-  const q = /[?&]phone=(\d)/.exec(location.search); const w = innerWidth, hh = innerHeight, short = Math.min(w, hh);
+  const q = /[?&]phone=(\d)/.exec(location.search); const vm = (window.GXV ? GXV.now() : { w: innerWidth, h: innerHeight }), w = vm.w, hh = vm.h, short = Math.min(w, hh);
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
   r.toggle('ph', ph); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); }
 }
-let rzT = 0;
-function onResize() { clearTimeout(rzT); rzT = setTimeout(() => { applyPhone(); if (G && UI.started) { renderBoard(); placePop(); } }, 60); }
+function onResize() { applyPhone(); if (G && UI.started) { renderBoard(); placePop(); } }
 // ---- boot
 function boot() {
   GX.init({ key: 'hb' });
@@ -4714,7 +5332,7 @@ function boot() {
   GX.onShow = id => { renderDrawers(); };
   kitBoot();
   applyPhone();
-  addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
+  if (window.GXV) GXV.watch(onResize); else { addEventListener('resize', onResize); addEventListener('orientationchange', onResize); }
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { renderBoard(); placePop(); } }).observe(bd);
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'hb' }); GX.applyPrefs(); }; } catch (e) { }
   try { if (window.PerfHUD && PerfHUD.register) PerfHUD.register({ game: 'Hollowbough' }); } catch (e) { }
@@ -4817,7 +5435,7 @@ function kitRecap() { GX.recap.attach('#dockbody', { before: true, title: 'Since
 function recapSeats() { GX.recap.clear(); const hs = humans(); GX.recap.seats(hs.length ? hs : [0]); }
 // ---- results, statistics, achievements
 function kitResult() {
-  if (!G || !G.over || UI.resultDone) return; UI.resultDone = true;
+  if (!G || !G.over || UI.resultDone) return; UI.resultDone = true; if (UI.camp) return; // story chapters report through GXC.finish
   const hs = humans(); if (!hs.length) return; // watching computers: not your game
   const ov = G.over, me = NET.on ? NET.mySeat : hs.length === 1 ? hs[0] : -1;
   const seats = G.players.map((p, i) => ({ name: p.name, ai: p.ai || null, me: i === me }));
@@ -4846,6 +5464,61 @@ document.addEventListener('click', ev => {
   else if (a === 'refcard') { closePop(); GX.refOpen(refCardId(+t.dataset.id)); }
 });
 document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !GX.open && GX.undo.can()) { e.preventDefault(); doUndo(); } });
+// ===================== part 9: Story mode (campaign.json + the shared chapter kit gx-campaign.js) =====================
+// Twists exist only here; the normal rules never change. The boss seat is seat 1.
+UI.camp = null;
+function campTwist(def) {
+  const t = def && def.twist; if (!t || !G) return; const n = t.param || 0;
+  if (t.id === 'thin-forest') G.forest = G.forest.slice(0, n);
+  else if (t.id === 'boss-extra-hand' && G.players[1]) { const p = G.players[1]; let k = 0; while (k < n && p.hand.length < HB.HAND && G.deck.length) { p.hand.push(G.deck.pop()); k++; } }
+  else if (t.id === 'boss-pantry' && G.players[1]) { const r = G.players[1].res; r.twig += n; r.resin += n; r.berry += n; }
+}
+function campMetrics(g) {
+  const ov = g.over; if (!ov) return { won: false };
+  const me = ov.scores[0], won = g.grim ? !!ov.win : (ov.winner === 0 && !ov.tie);
+  let best = 0; if (g.grim) best = ov.grim.total; else ov.scores.forEach((s, i) => { if (i) best = Math.max(best, s.total); });
+  const evs = g.bev.filter(e => e.o === 0).length + g.sev.filter(e => e.o === 0).length;
+  const p = g.players[0];
+  return { won, score: me.total, margin: me.total - best, city: HB.cityCount(g, 0), events: evs, specialEvents: g.sev.filter(e => e.o === 0).length,
+    occupied: p.city.filter(e => e.occ).length, green: p.city.filter(e => HB.cardOf(e.id).color === 'green').length, journey: me.journey, left: me.left };
+}
+function campIsWon(g, def) {
+  const m = campMetrics(g); if (!m.won) return false; const gl = def.goal || {};
+  if (gl.type === 'custom' || gl.type === 'score') { const need = gl.value || 0, id = def.id;
+    if (id === 'c2') return m.occupied >= need; if (id === 'c3') return m.green >= need; if (id === 'c6') return m.events >= need; if (id === 'c9') return m.specialEvents >= need;
+    if (gl.type === 'score') return m.score >= need; }
+  return true;
+}
+function campStart(def) {
+  const s = def.setup || {}, names = [def.opponent.name];
+  if (def.id === 'c10') names.push('Quill'); else names.push('Bramble');
+  UI.coach = { level: def.hints ? 'full' : 'off', seen: {} };
+  const o = { camp: Object.assign({}, def, { names }), np: s.np || 2, level: s.level || 'normal', solo: s.solo || 1 };
+  UI.seed = s.seed != null ? s.seed : null;
+  newGame(s.mode === 'solo' ? 'solo' : 'vs', o);
+  UI.camp = def; UI.coach.level = def.hints ? 'full' : 'off';
+  try { toast('Goal: ' + def.goal.text); } catch (e) { }
+}
+function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
+function campOpen() { if (typeof GXC === 'undefined') return; try { GX.close(); } catch (e) { } GXC.open(); }
+function campOn() { return !!(UI.camp && typeof GXC !== 'undefined' && GXC.active()); }
+{ const _ng = newGame; newGame = function (mode, o) { if (!(o && o.camp)) UI.camp = null; return _ng.apply(this, arguments); }; }
+function campLine() {
+  try {
+    if (typeof GXC === 'undefined' || !window.CAMPAIGN) return '';
+    const p = GXC.progress(), ch = window.CAMPAIGN.chapters, n = ch.filter(c => p.ch[c.id] && p.ch[c.id].beaten).length;
+    return n ? n + ' of ' + ch.length + ' chapters done' : 'Ten chapters, three bosses';
+  } catch (e) { return ''; }
+}
+function campInit() {
+  if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
+  GXC.init({
+    game: 'hollowbough', data: window.CAMPAIGN, startChapter: campStart, isWon: campIsWon, metrics: campMetrics,
+    onExit: () => { UI.camp = null; showStart(); },
+    scores: g => g.over ? g.over.scores.map(s => s.total) : [], seats: g => g.players.map((p, i) => ({ name: p.name, me: i === 0, ai: p.ai || undefined }))
+  });
+}
+campInit();
 
 </script>
 </body>
