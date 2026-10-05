@@ -77,7 +77,7 @@ function playEvents(first) {
         case 'draw': if (e.how !== 'side') snd('draw'); break;
         case 'place': if (typeof bfEvent === 'function') bfEvent(e); { const dl = typeof PX !== 'undefined' && e.chip && typeof PX.flyIds[e.chip.i] === 'number' ? PX.flyIds[e.chip.i] : 0; const rb = e.ruby; setTimeout(() => snd(rb ? 'ruby' : 'plop'), dl); setTimeout(() => snd('splash'), 120 + dl); } if (typeof pxEvent === 'function') pxEvent(e); break;
         case 'side': if (typeof pxEvent === 'function') pxEvent(e); break;
-        case 'boom': snd('boom'); if (typeof bfEvent === 'function') bfEvent(e); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !(typeof bfAnim === 'function' && bfAnim())) { const bp = G.players[e.seat]; toast((e.prot ? 'Boom! But safe harbour saves your points. ' : 'Your cauldron exploded! ') + 'White total ' + CF.whiteSum(bp) + ' is over the limit of ' + CF.limitOf(G, bp) + '.'); } break;
+        case 'boom': if (!(typeof bfAnim === 'function' && bfAnim() && (isMine(e.seat) || e.seat === focusSeat()))) snd('boom'); if (typeof bfEvent === 'function') bfEvent(e); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !(typeof bfAnim === 'function' && bfAnim())) { const bp = G.players[e.seat]; toast((e.prot ? 'Boom! But safe harbour saves your points. ' : 'Your cauldron exploded! ') + 'White total ' + CF.whiteSum(bp) + ' is over the limit of ' + CF.limitOf(G, bp) + '.'); } break;
         case 'flask': snd('flask'); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !e.free) toast('Flask used: the white chip went back into your bag. Rubies can refill the flask after the day.'); break;
         case 'restart': snd('page'); if (typeof pxEvent === 'function') pxEvent(e); break;
         case 'die': snd('die'); break;
@@ -101,7 +101,7 @@ function schedule() {
     if (UI.rsOpen && G.phase !== 'eval' && !UI.sim) continue;               // hold the next day until the report is closed
     if (UI.mode === 'guided' && (UI.tip && UI.tip.block) && !UI.sim) continue;
     if (UI.sim) { aiStep(s); continue; }
-    let d = AIDELAY * (0.55 + Math.random() * 0.9); if (G.phase === 'brew' && p.st === 'draw' && p.pot.length === 0) d *= 0.7; if (G.phase !== 'brew') d *= 0.6;
+    let d = AIDELAY * (0.55 + Math.random() * 0.9); if (G.phase === 'brew' && p.st === 'draw' && p.pot.length === 0) d *= 0.7; if (G.phase !== 'brew') d *= 0.6; if (UI.fastAI && G.phase === 'brew') d = 110;
     const seq = UI.seq; UI.tm[s] = setTimeout(() => { UI.tm[s] = 0; if (seq !== UI.seq) return; aiStep(s); }, d);
   }
 }

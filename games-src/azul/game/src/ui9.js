@@ -31,6 +31,8 @@ html.bf-land .bf-side{justify-content:center;padding:4px 8px}
 .bf-say>span{overflow:hidden;text-overflow:ellipsis}
 .bf-tipl{color:#ffe08a;font-size:15px;white-space:normal;line-height:1.1;animation:bfTipIn .3s}
 .bf-n{display:inline-flex;align-items:center;gap:2px;flex:none}.bf-n svg{width:24px;height:24px}.bf-n b{font-size:15px;color:#ffd66b}
+.bf-bossb{flex:none;height:30px;padding:0 9px;border-radius:15px;border:0;font:800 12px var(--ff);color:#3a2410;background:linear-gradient(#ffd66b,#e9a93a);box-shadow:0 0 0 2px #7a4a20;cursor:pointer}
+.bf-bosscard{display:flex;flex-direction:column;gap:10px;font-size:17px;text-align:center}
 .bf-bulb{width:44px;height:44px;border-radius:22px;background:rgba(255,214,107,.16);box-shadow:inset 0 0 0 2px rgba(255,214,107,.45)}
 .bf-pz{height:34px;min-width:52px;border-radius:17px;border:2px solid #b9a8dc;background:rgba(255,255,255,.1);color:#fff;display:flex;align-items:center;gap:2px;padding:0 6px;font:800 15px var(--ff)}
 .bf-pz svg{width:22px;height:22px}.bf-pz.on{background:rgba(185,168,220,.35)}
@@ -96,6 +98,8 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-table .bf-t{transition:transform .22s cubic-bezier(.3,1.6,.5,1),opacity .2s,filter .2s}
 .bf-table .bf-t.up{transform:translateY(-16%) scale(1.2);z-index:4;filter:drop-shadow(0 0 6px #fff7b0) drop-shadow(0 6px 4px rgba(0,0,0,.5))}
 .bf-table .bf-t.nud{transform:translate(var(--nx),var(--ny)) scale(.9);opacity:.6}
+.bf-k.allno{opacity:.45;filter:grayscale(.5)}
+.bf-k.allno.can{box-shadow:0 0 0 3px #e7b660,0 0 0 5px #7a4a20,0 5px 12px rgba(0,0,0,.55)}
 .bf-t.nofit>svg{opacity:.5;filter:grayscale(.6)}
 .bf-t.nofit::after{content:'✗';position:absolute;right:4%;top:4%;width:38%;height:38%;border-radius:50%;background:#c0392b;color:#fff;font:900 11px/1 var(--ff);display:grid;place-items:center;box-shadow:0 0 0 1.5px #fff}
 .bf-t.adv{outline:3px solid #ffd24a;outline-offset:1px;border-radius:4px;animation:bfReady 1.2s ease-in-out infinite}
@@ -108,6 +112,7 @@ html.gray .bf-wall .bf-c{background:#bdb5a8}
 .bf-pop{position:fixed;z-index:62;pointer-events:none;font:900 24px var(--ff);color:#ffe36b;text-shadow:0 2px 0 #7a3d14,0 0 10px rgba(0,0,0,.9);white-space:nowrap;transform:translate(-50%,-50%)}
 .bf-pop.big{font-size:34px}.bf-pop.cnt{font-size:16px}.bf-pop.chip{font-size:18px}.bf-pop.bad{color:#ff8a7a;text-shadow:0 2px 0 #5a0e08,0 0 10px rgba(0,0,0,.9)}.bf-pop.good{color:#b8ffb0;text-shadow:0 2px 0 #14501f,0 0 10px rgba(0,0,0,.9)}
 .bf-rvw{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:15;width:min(62%,220px);padding:8px;border-radius:14px;background:linear-gradient(#fcf6e8,#f1e3c4);color:#3a2410;box-shadow:0 0 0 2px #c99a3e,0 12px 30px rgba(0,0,0,.55)}
+.bf-rvs{font-style:normal;margin-left:6px;color:#1d7a3a;font-weight:800}
 .bf-rvw svg{width:100%;height:auto;display:block}.bf-rvw .bf-ph{font-size:15px;margin-bottom:4px}
 .bf-ban{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);z-index:20;text-align:center;pointer-events:none}
 .bf-ban b{display:inline-block;padding:6px 22px;border-radius:14px;background:rgba(10,20,50,.78);font:700 34px var(--ff-h);color:#ffe3a0;box-shadow:0 0 0 2px #c99a3e,0 8px 24px rgba(0,0,0,.5)}
@@ -247,7 +252,7 @@ async function bfTake(x){const S=BF.disp;const a=x.src<0?S.ctr:S.fac[x.src];if(!
       const fr=bfR(bfQ('.bf-fl'));if(pen)bfPop(String(pen).replace('-','−'),fr,'bad',true);const me=bfQ('.bf-me');if(me&&brk.length){me.classList.remove('shake');void me.offsetWidth;me.classList.add('shake')}}
     else if(pen)bfChipPop(x.p,String(pen).replace('-','−'),'bad');
     if(brk.length)sfx('floor');if(hadSun){sfx('sun');if(focus)bfPop('☀ you start next round',bfR(bfSlot(sunKey)),'good');if(focus&&pl&&pl.human)bfTip('sun')}if(brk.length&&focus&&pl&&pl.human)bfTip('floor');await bfWait(brk.length?820:420)}
-  else if(!focus){bfChipPop(x.p,x.line<5?'row '+(x.line+1):'',x.line<5?'':'bad');await bfWait(260)}
+  else if(!focus){bfChipPop(x.p,x.line<5?'row '+(x.line+1)+(p.lines[x.line].length===cap(x.line)?' full':''):'',x.line<5?'':'bad');await bfWait(260)}
   if(focus&&pl&&pl.human)BF.seen.took=1}
 // end of round: each full rack sends one tile to the wall; the lines it joins light up and the points pop
 function bfRun1(w,r,c){const o=[[r,c]];for(let x=c-1;x>=0&&w[r][x]>=0;x--)o.push([r,x]);for(let x=c+1;x<5&&w[r][x]>=0;x++)o.push([r,x]);
@@ -256,7 +261,9 @@ async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L|
   const focus=x.p===bfFocus();const lc=lineColour(L);const k=L.indexOf(PRISM);const v=k>=0?(lc>=0?10+lc:S.ex.gray?15:10+WALLC(x.r,x.c)):lc;const mc=v<5?v:PRISM;
   const from=[];for(let i=0;i<L.length;i++)from.push({t:L[i],r:bfR(bfEl(`l${x.p}_${x.r}_${i}`))});
   p.wall[x.r][x.c]=v;p.lines[x.r]=[];const wk=`w${x.p}_${x.r}_${x.c}`;BF.say=focus?`Row ${x.r+1}: +${x.pts}`:`${p.nm} tiles row ${x.r+1}`;
-  if(!focus){bfDraw();BF.rv=BF.rv&&BF.rv.p===x.p?BF.rv:{p:x.p,marks:[]};BF.rv.marks.push({r:x.r,c:x.c,pts:x.pts});bfRival();bfChipPop(x.p,'+'+x.pts,'good');p.score+=x.pts;bfScore(x.p,p.score);sfx('wall',Math.min(3,x.pts));await bfWait(650);return}
+  if(!focus){bfDraw();BF.rv=BF.rv&&BF.rv.p===x.p?BF.rv:{p:x.p,marks:[]};BF.rv.marks.push({r:x.r,c:x.c,pts:x.pts});p.score+=x.pts;bfScore(x.p,p.score);bfRival();sfx('wall',Math.min(3,x.pts));await bfWait(300);
+    const sv=BF.tbl&&BF.tbl.querySelector('.bf-rvw svg');if(sv){const b=sv.getBoundingClientRect(),k=b.width/512;bfPop('+'+x.pts,{left:b.left+(x.c*100+6)*k,top:b.top+(x.r*100+6)*k,width:100*k,height:100*k},'good',true)}
+    bfChipPop(x.p,'+'+x.pts,'good');await bfWait(950);return}
   BF.rv=null;BF.hide=new Set([wk]);bfDraw();
   const mover=from[0],others=from.slice(1);
   const fl=[bfFly(mc,mover.r,bfR(bfSlot(wk)),{dur:620,lift:28})];others.forEach((o,i)=>fl.push(bfDrop(o.t,o.r,{delay:240+i*60})));
@@ -268,7 +275,7 @@ async function bfWall(x){const S=BF.disp,p=S.pl[x.p];const L=p.lines[x.r];if(!L|
   await bfWait(700);p.score+=x.pts;bfScore(x.p,p.score);bfChipPop(x.p,'+'+x.pts,'good');await bfWait(520);
   for(const [r,c] of run){const el=bfSlot(`w${x.p}_${r}_${c}`);if(el)el.classList.remove('lit')}}
 function bfRival(){const tb=BF.tbl;if(!tb||!BF.rv)return;let el=tb.querySelector('.bf-rvw');if(!el){el=document.createElement('div');el.className='bf-rvw';tb.appendChild(el)}const p=BF.disp.pl[BF.rv.p];
-  el.innerHTML=`<div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>★${p.score}</span></div>${phWallSVG(p,{marks:BF.rv.marks})}`}
+  const sum=BF.rv.marks.reduce((a,m)=>a+m.pts,0);el.innerHTML=`<div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${esc(p.nm)}</b><span>★${p.score}</span><em class="bf-rvs">+${sum}</em></div>${phWallSVG(p,{marks:BF.rv.marks})}`}
 async function bfFloors(){BF.rv=null;const S=BF.disp;BF.say='Broken tiles cost points';
   const ls=S.pl.filter(p=>p.floor.length).map(p=>({p,l:Math.min(p.score,-floorPenalty(p.floor.length))})).filter(o=>o.l);
 
@@ -306,7 +313,7 @@ function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R
   const nofit=new Set();if(can)for(let c=0;c<NC;c++){let ok=false;for(let r=0;r<5;r++)if(lineOk(G,hp,r,c))ok=true;if(!ok)nofit.add(c)}const nf=t=>nofit.has(t)?' nofit':'';
   let h=`<div class="bf-pool${can&&S.ctr.length?' can':''}" data-bfsrc="-1" style="left:${R.cx-R.pw/2}px;top:${R.cy-R.ph/2}px;width:${R.pw}px;height:${R.ph}px"></div>`;
   S.fac.forEach((a,i)=>{const K=R.K[i];const dx=R.cx-K.x,dy=R.cy-K.y,dl=Math.hypot(dx,dy)||1;
-    h+=`<div class="bf-k${can&&a.length?' can':''}${a.length?'':' empty'}" data-bfsrc="${i}" style="left:${K.x-R.ks/2}px;top:${K.y-R.ks/2}px;width:${R.ks}px;height:${R.ks}px">`;
+    h+=`<div class="bf-k${can&&a.length?' can':''}${a.length?'':' empty'}${can&&a.length&&a.every(t=>nofit.has(t))?' allno':''}" data-bfsrc="${i}" style="left:${K.x-R.ks/2}px;top:${K.y-R.ks/2}px;width:${R.ks}px;height:${R.ks}px">`;
     a.forEach((t,k)=>{const key=`f${i}_${k}`;const x=(k%2?.56:-.56)*ts,y=(k<2?-.56:.56)*ts;const up=sel&&sel.src===i&&(t===sel.c||(t===PRISM&&sel.j));const nud=sel&&sel.src===i&&!up;
       h+=`<i class="bf-t${up?' up':''}${nud?' nud':''}${nf(t)}${isAdv(i,t)?' adv':''}${o.deal?' deal':''}${BF.hide.has(key)?' hid':''}" data-k="${key}" role="button" aria-label="${TNAME[t]}" style="left:${R.ks/2+x-ts/2}px;top:${R.ks/2+y-ts/2}px;width:${ts}px;height:${ts}px;--nx:${dx/dl*ts*.3}px;--ny:${dy/dl*ts*.3}px;${o.deal?`animation-delay:${(i*4+k)*45}ms;`:''}">${bfUse(t)}</i>`});
     h+='</div>'});
@@ -317,7 +324,7 @@ function bfTableHTML(S,hp,o){const R=bfRing(BF.tw,BF.th,S.fac.length);const ts=R
   return h}
 function bfBoardHTML(S,p,hp){const pi=p.i,live=!BF.busy;const sel=live&&hp&&hp.i===pi&&G.phase==='offer'?UI.sel:null;const ok={};
   if(sel)for(const m of movesFor(sel)){try{ok[m.line]={m,X:phNow(m,pi)}}catch(e){ok[m.line]={m,X:null}}}
-  let rec=-1;if(sel&&UI.coach){try{const ms=movesFor(sel);if(ms.length>1){const a=bfAdvice(hp);if(a&&a.act==='take'&&a.src===sel.src&&a.c===sel.c&&ms.some(m=>m.line===a.line))rec=a.line;else{const R=phRec(ms,pi);if(R)rec=R.m.line}}}catch(e){}}
+  let rec=-1;if(sel&&UI.coach){try{const ms=movesFor(sel);if(ms.length>1){const a=bfAdvice(hp);if(a&&a.act==='take'&&a.src===sel.src&&a.c===sel.c&&(!!a.j)===(!!sel.j)&&ms.some(m=>m.line===a.line))rec=a.line}}catch(e){}}
   const wq=live&&hp&&hp.i===pi&&G.phase==='wall'&&G.wt&&G.wt.q&&G.wt.q.p===pi?G.wt.q:null;let h='';
   for(let r=0;r<5;r++){const o=ok[r],X=o&&o.X;let rk='';
     for(let col=0;col<5;col++){const k=4-col;if(k>=cap(r)){rk+='<b class="bf-c no"></b>';continue}const key=`l${pi}_${r}_${k}`;const t=p.lines[r][k];let inner='';
@@ -349,11 +356,12 @@ function bfHintHTML(S,hp){let say='',chip='',tg='';const live=!BF.busy;
   else if(hp&&G.phase==='wall')say='Tap a glowing wall space';
   else if(hp&&UI.sel){const a=UI.sel.src<0?G.ctr:G.fac[UI.sel.src]||[];const n=a.filter(t=>t===UI.sel.c||(t===PRISM&&UI.sel.j)).length;chip=`<span class="bf-n">${bfUse(UI.sel.c)}<b>×${n}</b></span>`;say=movesFor(UI.sel).every(m=>m.line===5)?'No room: tap the floor':'Tap a glowing row';
     const nj=a.filter(t=>t===PRISM).length;if(UI.sel.c<NC&&nj)tg=`<button class="bf-pz${UI.sel.j?' on':''}" data-bf="prism" aria-pressed="${!!UI.sel.j}" aria-label="Also take the prism tiles">${bfUse(PRISM)}${UI.sel.j?'✓':'✗'}</button>`}
-  else if(hp){const allBad=BF.tbl&&!BF.tbl.querySelector('.bf-t[role=button]:not(.nofit)');say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(allBad?'No fit: take the fewest':BF.seen.took?'Your turn: tap a colour':'Tap a colour to grab every tile');}
+  else if(hp){const allBad=BF.tbl&&!BF.tbl.querySelector('.bf-t[role=button]:not(.nofit)');say=(G.pl.filter(q=>q.human).length>1&&!NET.on?hp.nm+': ':'')+(allBad?'Nothing fits: tap the floor':BF.seen.took?'Your turn: tap a colour':'Tap a colour to grab every tile');}
   else{const s=sideToAct();say=s>=0?(NET.on&&P(s).human?'Waiting for '+P(s).nm+'…':P(s).nm+' is choosing…'):''}
   if(BF.tip){say=BF.tip;chip='';tg=''}
-  return `<span class="bf-say${BF.tip?' bf-tipl':''}">${chip}<span>${esc(say)}</span></span>${tg}${live&&hp&&!G.over?`<button class="bf-ib bf-bulb" data-bf="hint" aria-label="Show me a good move">${IC('bulb')}</button>`:''}${live&&G.over&&BF.resHide?`<button class="bf-b" data-bf="res">Result</button>`:''}`}
+  return `<span class="bf-say${BF.tip?' bf-tipl':''}">${chip}<span>${esc(say)}</span></span>${tg}${UI.cmp&&UI.cmp.twist&&!G.over?`<button class="bf-bossb" data-bf="boss" aria-label="Read the rule">${/^Rival/.test(UI.cmp.twist.text||'')?'Rival':'Boss'} rule ⓘ</button>`:''}${live&&hp&&!G.over?`<button class="bf-ib bf-bulb" data-bf="hint" aria-label="Show me a good move">${IC('bulb')}</button>`:''}${live&&G.over&&BF.resHide?`<button class="bf-b" data-bf="res">Result</button>`:''}`}
 function bfOvHTML(){if(BF.busy||!G)return '';
+  if(BF.boss&&UI.cmp&&UI.cmp.twist)return `<div class="bf-card bf-bosscard" role="dialog" aria-label="Rule"><b>${esc(UI.cmp.twist.text||'')}</b><button class="bf-go" data-bf="close">Got it</button></div>`;
   if(BF.menu){const nh=!human();const b=(ic,lab,attr)=>`<button class="bf-mi" ${attr}>${IC(ic)}<span>${lab}</span></button>`;
     return `<div class="bf-card bf-menu" role="dialog" aria-label="Menu">${b('rules','How to play','data-gx="rulesd"')}${b('guide','Guide: '+(UI.coach?'on':'off'),'data-a="coach"')}${b(SND.on?'snd':'mute','Sound: '+(SND.on?'on':'off'),'data-a="snd"')}${b(SND.music?'music':'nomusic','Music: '+(SND.music?'on':'off'),'data-a="mus"')}${b('speed','Speed: '+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal'),'data-a="speed"')}${nh?b(UI.pause?'play':'pause',UI.pause?'Resume':'Pause','data-a="pause"'):''}${b('log','Every move','data-gx="logd"')}${b('tiles','Tile list','data-gx="refd"')}${b('new','New game','data-a="new"')}</div>`}
   if(BF.peek!=null&&P(BF.peek)){const p=P(BF.peek);return `<div class="bf-card bf-peek" role="dialog" aria-label="${esc(p.nm)}'s board"><div class="bf-ph" style="--pc:${PCOL[p.i]}"><i></i><b>${isYou(p.i)?'You':esc(p.nm)}</b><span>★${p.score}</span>${G.markerIn===p.i?'<em>☀</em>':''}<button class="bf-ib" data-bf="close" aria-label="Close">✕</button></div>${phBoardSVG(p)}${phBonus(p)?`<div class="bf-pn">End bonus so far +${phBonus(p)}</div>`:''}</div>`}
@@ -372,9 +380,9 @@ function bfDraw(o){o=o||{};if(!BF.on)return;bfEnsure();if(!G||!BF.disp){BF.root.
 // ---------- the ghost finger: first move of the guided game, the bulb, or after a long pause ----------
 function bfAdvice(hp){const k=G.logN+':'+G.phase+':'+hp.i;if(BF.advK===k)return BF.adv;BF.advK=k;BF.adv=null;if(isClient())return null;try{const a=adviceFor(hp.i);BF.adv=a?a.m:null}catch(e){}return BF.adv}
 function bfFingerTarget(hp){const m=bfAdvice(hp);
-  if(G.phase==='wall'){const q=G.wt&&G.wt.q;if(!q)return null;const c=m&&m.act==='wall'?m.c:q.cells[0];return bfSlot(`w${hp.i}_${q.r}_${c}`)}
+  if(G.phase==='wall'){const q=G.wt&&G.wt.q;if(!q)return null;if(!m||m.act!=='wall')return null;const c=m.c;return bfSlot(`w${hp.i}_${q.r}_${c}`)}
   if(!UI.sel){if(!m||m.act!=='take')return null;const a=m.src<0?G.ctr:G.fac[m.src];const k=a.findIndex(t=>t===m.c||(m.c===PRISM&&t===PRISM));return k<0?null:bfEl((m.src<0?'c':'f'+m.src)+'_'+k)}
-  const ms=movesFor(UI.sel);let line=null;if(m&&m.act==='take'&&UI.sel.src===m.src&&UI.sel.c===m.c&&ms.some(x=>x.line===m.line))line=m.line;else{try{const R=phRec(ms,hp.i);if(R)line=R.m.line}catch(e){}}
+  const ms=movesFor(UI.sel);let line=null;if(m&&m.act==='take'&&UI.sel.src===m.src&&UI.sel.c===m.c&&ms.some(x=>x.line===m.line))line=m.line;
   if(line==null)return null;return line<5?bfQ(`[data-bfrow="${line}"] .bf-rack`):bfQ('.bf-fl')}
 function bfFinger(el){const f=bfQ('.bf-fing');if(!f)return;const r=bfR(el);if(!r){f.hidden=true;return}f.hidden=false;const s=Math.max(.8,Math.min(1.2,BF.cs/34));
   f.style.width=48*s+'px';f.style.height=56*s+'px';f.style.left=(r.left+r.width/2-18*s)+'px';f.style.top=(r.top+r.height/2-4*s)+'px'}
@@ -389,7 +397,7 @@ function bfShake(el){if(!el)return;el.classList.remove('no');void el.offsetWidth
 function bfClick(e){const t=e.target;const a=t.closest('[data-bf]');if(a){e.preventDefault();return bfAct(a.dataset.bf)}
   if(t.closest('[data-a],[data-gx],[data-ui]')){if(BF.menu){BF.menu=false;setTimeout(()=>{if(!BF.busy)bfDraw()},0)}return}
   if(BF.busy){bfSpeedUp();return}
-  if(BF.menu||BF.peek!=null){BF.menu=false;BF.peek=null;bfDraw();return}
+  if(BF.menu||BF.peek!=null||BF.boss){BF.menu=false;BF.peek=null;BF.boss=false;bfDraw();return}
   if(t.closest('.bf-ov')){if(G&&G.over){BF.resHide=true;bfDraw()}return}
   const chip=t.closest('[data-bfchip]');if(chip){BF.peek=+chip.dataset.bfchip;sfx('click');bfDraw();return}
   if(!G||G.over)return;const hp=me();if(!hp)return;BF.fingerOn=false;
@@ -409,9 +417,10 @@ function bfClick(e){const t=e.target;const a=t.closest('[data-bf]');if(a){e.prev
   if(UI.sel){UI.sel=null;UI.tgt=null;UI.adv=null;upd()}}
 function bfAct(a){switch(a){
   case 'menu':BF.menu=!BF.menu;BF.peek=null;sfx('click');bfDraw();return;
-  case 'close':BF.menu=false;BF.peek=null;if(G&&G.over)BF.resHide=true;bfDraw();return;
+  case 'boss':BF.boss=!BF.boss;BF.menu=false;BF.peek=null;sfx('click');bfDraw();return;
+  case 'close':BF.menu=false;BF.peek=null;BF.boss=false;if(G&&G.over)BF.resHide=true;bfDraw();return;
   case 'res':BF.resHide=false;bfDraw();return;
-  case 'hint':if(isClient()&&G.phase==='offer'){advise()}BF.fingerOn=true;sfx('select');bfDraw();return;
+  case 'hint':if(isClient()&&G.phase==='offer'){advise()}BF.fingerOn=true;sfx('select');bfDraw();try{const hp=me();if(hp&&!isClient()&&!bfAdvice(hp)){BF.tip='No clear best move: your call';bfHintSet();clearTimeout(BF.tipT);BF.tipT=setTimeout(()=>{BF.tip=null;bfHintSet()},3000)}}catch(e){}return;
   case 'prism':uiAct('prism');return}}
 // ---------- wiring into the rest of the page ----------
 function bfApply(){const on=PHN.on&&bfWanted();const was=BF.on;BF.on=on;document.documentElement.classList.toggle('bf',on);if(on){bfEnsure();if(G&&!BF.busy){bfSync();BF.disp=bfClone(G)}bfDraw()}else if(was&&BF.root)BF.root.hidden=true;if(on&&BF.root)BF.root.hidden=false}

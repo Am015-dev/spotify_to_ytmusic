@@ -160,7 +160,13 @@ function toast(t){if(!t)return;const el=$('#dockmsg');if(!el)return;el.textConte
 function advise(){const p=me();if(!p)return;if(isClient()){if(!UI.advWait){UI.advWait=true;netSend({act:'advise'})}return}const a=adviceFor(p.i);if(a)showAdvice(a)}
 function showAdvice(a){const m=a.m;if(m.act==='take'){UI.sel={src:m.src,c:m.c,j:m.j};UI.tgt=m.line}UI.adv={m,why:esc(a.why)};upd()}
 // the advice for a seat (the host computes it for its online players too)
-function adviceFor(seat){const p=P(seat);const lv=p.lv;p.lv='normal';let m;try{m=aiMove(p.i)}finally{p.lv=lv}if(!m)return null;let why='';
+// the one best take by immediate net points (the same numbers as the +N/-N row badges); null when it is not clear-cut
+function bestNetTake(seat,teach){const ms=legalTakes(G,seat);if(!ms.length)return null;const R=ms.map(m=>{const x=phNow(m,seat);return {m,net:x.net,full:x.pv.full?1:0,kept:x.pv.info.line,sun:x.pv.info.sun?1:0}});
+  R.sort((a,b)=>b.net-a.net);const top=R[0];if(top.net<0)return null;
+  if(!teach&&R.length>1&&R[1].net>=top.net-1)return null;
+  return R.filter(x=>x.net===top.net).sort((a,b)=>b.full-a.full||a.sun-b.sun||b.kept-a.kept)[0].m}
+function bestWallCell(seat){const q=G.wt&&G.wt.q;if(!q)return null;const p=P(seat);const V=q.cells.map(c=>({c,v:adjPts2(p.wall,q.r,c)})).sort((a,b)=>b.v-a.v);if(V.length>1&&V[0].v-V[1].v<2)return null;return {act:'wall',r:q.r,c:V[0].c}}
+function adviceFor(seat){const p=P(seat);let m;if(G.phase==='wall')m=bestWallCell(seat);else m=bestNetTake(seat,typeof BF!=='undefined'&&!(BF.seen&&BF.seen.took));if(!m)return null;let why='';
   if(m.act==='wall'){why=`Put it in column ${m.c+1}: it scores +${adjPts2(p.wall,m.r,m.c)} now${G.ex.gray?' and keeps your other racks placeable':''}.`}
   else{const a=m.src<0?G.ctr:G.fac[m.src];const n=a.filter(t=>t===m.c).length,nj=a.filter(t=>t===PRISM).length;const pv=preview(m,p.i);
     const what=m.c===PRISM?`the ${nj} prism${nj>1?'s':''}`:`the ${n} ${TNAME[m.c]}${m.j&&nj?` and ${nj} prism${nj>1?'s':''}`:''}`;
@@ -193,7 +199,7 @@ document.addEventListener('keydown',e=>{if(GX.open||UI.modal||!me())return;if(e.
 function openStart(){UI.modal='start';render()}
 function beginGame(){const o=UI.setup;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.lastHuman=null;const seats=o.seats.slice(0,o.np);
   UI.modal=null;newGame({np:o.np,seats,lv:o.lv.slice(0,o.np),ex:Object.assign({},o.ex),mode:seats.every(s=>s==='ai')?'ai':'x'});UI.modal='story';resetScene();refresh()}
-function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh()}catch(e){openStart()}}
+function loadSaved(){try{const g=JSON.parse(localStorage.getItem(SAVE));if(!g||!g.v)throw 0;G=g;UI.modal=null;UI.recap=[];resetScene();refresh();if(g.campId&&typeof campResume==='function')campResume()}catch(e){openStart()}}
 function resetScene(){if(!V3.on)return;for(const k in V3.tiles)V3.scene.remove(V3.tiles[k].m);V3.tiles={};V3.lkey='';relayout()}
 // ---------- the computer ----------
 let aiTimer=null;function schedule(){if(aiTimer||!G||G.over||UI.pause||(UI.modal&&!NET.on)||phHold()||isClient())return;const s=sideToAct();if(s<0||P(s).human)return;const wait=G.phase==='offer'&&G.fac.every(a=>a.length===PER_FACTORY)?2.6:1.4;

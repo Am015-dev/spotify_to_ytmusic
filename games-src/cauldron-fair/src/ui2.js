@@ -71,13 +71,21 @@ function potOpts(p, mini) {
   return { pot: p.pot, droplet: p.droplet, rat: p.rat > 0 && p.rat > p.droplet ? p.rat : 0, space: shown && (p.pot.length || !mini) ? CF.spaceOf(p) : null, boom: p.boom, mini: !!mini, uid: p.seat, label: p.name + '\'s cauldron' };
 }
 // ---------- board ----------
+// a computer's brew, draw by draw: its chips as little coins, the newest one pops in
+UI.potN = UI.potN || {};
+function liveChips(p) {
+  const prev = UI.potN[p.seat + ':' + G.round] || 0; UI.potN[p.seat + ':' + G.round] = p.pot.length;
+  const row = h('span.lchips', { 'aria-label': p.name + ' has drawn ' + plural(p.pot.length, 'chip') + ', white ' + CF.whiteSum(p) });
+  p.pot.slice(-6).forEach((c, i, a) => { if (!c || !c.c) return; const d = h('i.lc' + (p.pot.length > prev && i === a.length - 1 ? '.pop' : ''), { html: chipHTML(c.c + c.v, 15) }); row.appendChild(d); });
+  return row;
+}
 function renderOthers() {
   const o = $('#others'); if (!o) return; const f = focusSeat(); o.innerHTML = '';
   for (const p of G.players) {
     if (p.seat === f) continue;
     const t = h('button.th' + (seatCls(p) ? '.' + seatCls(p) : ''), { 'data-a': 'focus', 'data-seat': p.seat, type: 'button', 'aria-label': p.name + ': ' + p.vp + ' points, ' + stateLabel(p) + '. Tap to look at this cauldron.' });
     t.append(h('span.av', { html: avHTML(p.seat, 26) }), h('span.tp', { html: KIT.potSVG(potOpts(p, true)).replace(/width="\d+" height="\d+"/, '') }),
-      h('span.ti', h('b', p.name), h('span.tv', h('span', { html: ico('vp', 15) }), p.vp, h('span', { html: ico('ruby', 15) }), p.rubies), h('span.ts', stateLabel(p) + (p.pot.length && seatState(p) === 'draw' ? ' · ' + plural(p.pot.length, 'chip') : ''))));
+      h('span.ti', h('b', p.name), h('span.tv', h('span', { html: ico('vp', 15) }), p.vp, h('span', { html: ico('ruby', 15) }), p.rubies), h('span.ts', seatState(p) === 'draw' && p.pot.length ? liveChips(p) : stateLabel(p))));
     o.appendChild(t);
   }
   o.style.display = G.np > 1 && o.children.length ? '' : 'none';
@@ -151,7 +159,7 @@ function renderActs() {
   const p = G.players[v]; const legal = mvList(v); UI.legal[v] = legal;
   if (typeof NET !== 'undefined' && NET.on && NET.pend && Date.now() - NET.pendT < 700) { /* a move is in flight */ }
   if (p.q && !EVAL_Q[p.q.h]) { renderQ(p, legal, qb); return; }
-  if (focusSeat() !== v) { a.appendChild(h('button.btn.go.backb', { 'data-a': 'focus', 'data-seat': v, type: 'button' }, 'Back to your cauldron')); return; }
+  if (focusSeat() !== v) { const fp = G.players[focusSeat()]; if (G.phase === 'brew' && fp && fp.ai && fp.st === 'draw' && !fp.boom) a.appendChild(h('div.bline.watch', fp.name + ' draws… tap to hurry')); a.appendChild(h('button.btn.go.backb', { 'data-a': 'focus', 'data-seat': v, type: 'button' }, 'Back to your cauldron')); return; }
   if (G.phase !== 'brew' || p.st !== 'draw' || p.q) return;
   a.appendChild(brewDeck(p, v, legal));
 }
@@ -174,10 +182,16 @@ function renderBar() {
   const dt = document.querySelector('.gx-dt'); if (dt) { const v = viewSeat(); dt.textContent = G.phase === 'over' ? 'Game over' : (v >= 0 && (G.phase === 'brew' ? G.players[v].st === 'draw' : !!G.players[v].q)) ? 'Your turn' : 'Waiting'; }
 }
 let rndT = 0;
+function autoWatch() {   // once I have stopped, watch the computer that is still drawing; go back to my own pot when the day ends
+  const v = viewSeat(); if (v < 0 || hotSeat() || !bfAnim()) return; const me = G.players[v];
+  if (UI.autoF && (G.phase !== 'brew' || UI.autoF !== G.round)) { if (UI.focus !== v && UI.autoF) UI.focus = v; UI.autoF = 0; UI.fastAI = false; return; }
+  if (!UI.autoF && G.phase === 'brew' && (me.lock || me.st === 'done') && UI.focus === v) { const c = G.players.find(q => q.ai && q.st === 'draw' && !q.boom && q.seat !== v); if (c) { UI.focus = c.seat; UI.autoF = G.round; } }
+  if (UI.autoF && UI.focus !== v) { const c = G.players[UI.focus]; if (c && c.st !== 'draw') { const n = G.players.find(q => q.ai && q.st === 'draw' && !q.boom && q.seat !== v); if (n) UI.focus = n.seat; } }
+}
 function render() {
   if (!G || !UI.started) return;
   try {
-    focusSeat(); placePrompt();
+    autoWatch(); focusSeat(); placePrompt();
     renderBar(); renderOthers(); renderMe(); renderStage(); renderActs(); renderRisk(); renderFort(); renderRoster();
     const pi = promptInfo(), pr = $('#prompt'); if (pr) { pr.textContent = pi.text; pr.className = pi.mine ? 'mine' : ''; }
     renderHint(); renderLegend(); renderBlg(); renderDrawers(); renderNetBadge && renderNetBadge();

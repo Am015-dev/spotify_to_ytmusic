@@ -383,7 +383,7 @@ function playEvents(first) {
         case 'draw': if (e.how !== 'side') snd('draw'); break;
         case 'place': if (typeof bfEvent === 'function') bfEvent(e); { const dl = typeof PX !== 'undefined' && e.chip && typeof PX.flyIds[e.chip.i] === 'number' ? PX.flyIds[e.chip.i] : 0; const rb = e.ruby; setTimeout(() => snd(rb ? 'ruby' : 'plop'), dl); setTimeout(() => snd('splash'), 120 + dl); } if (typeof pxEvent === 'function') pxEvent(e); break;
         case 'side': if (typeof pxEvent === 'function') pxEvent(e); break;
-        case 'boom': snd('boom'); if (typeof bfEvent === 'function') bfEvent(e); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !(typeof bfAnim === 'function' && bfAnim())) { const bp = G.players[e.seat]; toast((e.prot ? 'Boom! But safe harbour saves your points. ' : 'Your cauldron exploded! ') + 'White total ' + CF.whiteSum(bp) + ' is over the limit of ' + CF.limitOf(G, bp) + '.'); } break;
+        case 'boom': if (!(typeof bfAnim === 'function' && bfAnim() && (isMine(e.seat) || e.seat === focusSeat()))) snd('boom'); if (typeof bfEvent === 'function') bfEvent(e); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !(typeof bfAnim === 'function' && bfAnim())) { const bp = G.players[e.seat]; toast((e.prot ? 'Boom! But safe harbour saves your points. ' : 'Your cauldron exploded! ') + 'White total ' + CF.whiteSum(bp) + ' is over the limit of ' + CF.limitOf(G, bp) + '.'); } break;
         case 'flask': snd('flask'); if (typeof pxEvent === 'function') pxEvent(e); if (isMine(e.seat) && !UI.sim && !e.free) toast('Flask used: the white chip went back into your bag. Rubies can refill the flask after the day.'); break;
         case 'restart': snd('page'); if (typeof pxEvent === 'function') pxEvent(e); break;
         case 'die': snd('die'); break;
@@ -1009,12 +1009,27 @@ function bfHeat() {
 // ---------- the explosion ----------
 function bfBoom(e) {
   if (!bfAnim()) return; const mine = isMine(e.seat), f = focusSeat(); if (e.seat !== f && !mine) return;
-  BF.fxUntil = Date.now() + 1700;
-  const o = h('div.boomfx' + (e.prot ? '.prot' : ''), { 'aria-hidden': 'true' }, h('div.bflash'), h('div.bword', e.prot ? 'BOOM… safe!' : 'BOOM!'), h('div.bsub', 'White ' + CF.whiteSum(G.players[e.seat]) + ' > ' + CF.limitOf(G, G.players[e.seat])));
-  for (let i = 0; i < 14; i++) { const s = h('i.shard'); const a = Math.random() * Math.PI * 2, d = 120 + Math.random() * 160; s.style.setProperty('--dx', Math.round(Math.cos(a) * d) + 'px'); s.style.setProperty('--dy', Math.round(Math.sin(a) * d) + 'px'); s.style.animationDelay = Math.round(Math.random() * 120) + 'ms'; o.appendChild(s); }
-  document.body.appendChild(o); setTimeout(() => o.remove(), 1700);
-  const app = document.querySelector('.gx-app'); if (app) { app.classList.remove('quake'); void app.offsetWidth; app.classList.add('quake'); setTimeout(() => app.classList.remove('quake'), 900); }
-  try { if (navigator.vibrate) navigator.vibrate([90, 40, 160]); } catch (x) { }
+  const big = mine, T = big ? 460 : 220, TOT = big ? 1600 : 1000;           // a tension beat on the deciding draw, then the bang, then the result
+  BF.fxUntil = Date.now() + TOT + 40; clearTimeout(BF.repT);
+  const o = h('div.boomfx' + (e.prot ? '.prot' : '') + (big ? '' : '.small'), { 'aria-hidden': 'true' }, h('div.btense'), h('div.bflash'), h('div.bword', e.prot ? 'BOOM… safe!' : 'BOOM!'), h('div.bsub', 'White ' + CF.whiteSum(G.players[e.seat]) + ' > ' + CF.limitOf(G, G.players[e.seat])));
+  o.style.setProperty('--T', T + 'ms'); o.style.setProperty('--S', big ? 1 : .6);
+  const cols = ['#f8f2e0', '#ff8a2a', '#7fd65a', '#ffd23a', '#8a5cf0'], n = big ? 30 : 16;
+  for (let i = 0; i < n; i++) {
+    const w = i % 5 === 0 ? h('i.shard.chipy') : h('i.shard'); const a = -Math.PI / 2 + (Math.random() - .5) * 2.6, d = (big ? 140 : 90) + Math.random() * (big ? 260 : 150);
+    w.style.setProperty('--dx', Math.round(Math.cos(a) * d) + 'px'); w.style.setProperty('--dy', Math.round(Math.sin(a) * d * 1.2 + d * .5) + 'px'); w.style.setProperty('--c', cols[i % cols.length]);
+    w.style.animationDelay = (T + Math.round(Math.random() * 140)) + 'ms'; o.appendChild(w);
+  }
+  document.body.appendChild(o);
+  const cw = $('#cwrap'), app = document.querySelector('.gx-app'); let done = false;
+  const end = skip => { if (done) return; done = true; o.remove(); if (cw) cw.classList.remove('tense'); if (app) app.classList.remove('quake'); if (skip) { BF.fxUntil = 0; if (typeof checkReport === 'function') checkReport(); } };
+  o.addEventListener('click', () => end(true)); o.style.pointerEvents = 'auto';  // a tap skips it
+  if (cw) cw.classList.add('tense'); snd('tick'); setTimeout(() => { if (!done) snd('tick'); }, T * .55);
+  setTimeout(() => {
+    if (done) return; if (cw) cw.classList.remove('tense'); snd('boom'); o.classList.add('bang');
+    if (app) { app.classList.remove('quake'); void app.offsetWidth; app.classList.add('quake'); }
+    try { if (navigator.vibrate) navigator.vibrate([90, 40, 160]); } catch (x) { }
+  }, T);
+  setTimeout(() => end(false), TOT);
 }
 // ---------- events: called from playEvents ----------
 function bfEvent(e) {
