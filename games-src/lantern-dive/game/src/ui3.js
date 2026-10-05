@@ -112,7 +112,7 @@ function afterApply(evs) {
 // ---------- human actions ----------
 function doMove(mv) {
   const v = viewSeat(); if (v < 0) return false;
-  if (UI.tip) { markSeen(UI.tip.id); UI.tip = null; renderTip(); } // acting answers the tip
+  fingerDone();
   if (isClient()) { netAct(mv); UI.sel = -1; UI.pingSel = false; UI.giveSel = -1; UI.job = -1; render(); return true; }
   return commit(v, mv);
 }
@@ -120,28 +120,39 @@ function pickMove(pred) { return myMoves().find(pred); }
 function tapHand(id) {
   if (!canAct()) { if (G && !isOver()) toast(UI.busy ? 'One moment…' : 'Wait for your turn.'); return; }
   const v = viewSeat(), ph = G.phase;
-  if (UI.pingSel) { const ok = LD.pingMoves(G, v).some(m => m.c === id); if (!ok) { snd('error'); toast('That card cannot be shown: pick your highest, lowest or only card of a colour.'); return; } UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
-  if (ph === 'pass') { const ok = myMoves().some(m => m.t === 'give' && m.c === id); if (!ok) { snd('error'); toast('Lanterns cannot be passed.'); return; } UI.giveSel = UI.giveSel === id ? -1 : id; snd('click'); render(); return; }
+  if (UI.pingSel) { const ok = LD.pingMoves(G, v).some(m => m.c === id); if (!ok) { snd('error'); toast('Pick your highest, lowest or only card.'); return; } UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
+  if (ph === 'pass') { const m = myMoves().find(x => x.t === 'give' && x.c === id); if (!m) { snd('error'); toast('Lanterns cannot be passed.'); return; } UI.giveSel = id; doMove(m); return; }
   if (ph === 'play') {
     const T = G.trick, turn = T.turn;
-    if (ctlSeat(turn) !== v || G.players[turn].helper) { toast(G.players[turn].helper ? 'Tap the drone\'s cards to play for it.' : 'Wait for ' + pname(turn) + '.'); return; }
-    const legal = LD.playable(G, turn); if (!legal.includes(id)) { snd('error'); const ls = T.ls; toast(T.plays.length ? 'You must follow ' + (ls === 4 ? 'the Lantern lead' : D.suits[ls].name) + ' if you can.' : 'That card cannot lead now.'); return; }
-    if (tutOnly() >= 0 && id !== tutOnly()) { snd('error'); toast('Mara: lead the glowing ' + cname(tutOnly()) + ' this time.'); return; }
-    if (UI.sel === id) { playSel(); return; }
-    UI.sel = id; UI.hint = null; snd('click', { vol: .4 }); render(); return;
+    if (ctlSeat(turn) !== v || G.players[turn].helper) { toast(G.players[turn].helper ? 'Tap the drone\'s cards.' : 'Wait for ' + pname(turn) + '.'); return; }
+    const legal = LD.playable(G, turn); if (!legal.includes(id)) { snd('error'); const ls = T.ls; toast(T.plays.length ? 'Follow ' + (ls === 4 ? 'the Lantern' : D.suits[ls].name) + ' if you can.' : 'That card cannot lead now.'); return; }
+    if (tutOnly() >= 0 && id !== tutOnly()) { snd('error'); toast('Play the glowing card.'); return; }
+    UI.sel = id; UI.hint = null; playSel(); return;
   }
-  toast('You cannot play a card right now.');
+  toast('Not your turn yet.');
 }
 function tapDrone(id) {
   if (!canAct() || G.phase !== 'play') return; const T = G.trick, turn = T.turn, v = viewSeat();
-  if (!G.players[turn].helper || ctlSeat(turn) !== v) { toast('It is not the drone\'s turn.'); return; }
-  if (!LD.playable(G, turn).includes(id)) { snd('error'); toast('The drone must follow ' + (T.ls === 4 ? 'the Lantern lead' : D.suits[T.ls].name) + '.'); return; }
-  if (UI.sel === id) { playSel(); return; } UI.sel = id; snd('click', { vol: .4 }); render();
+  if (!G.players[turn].helper || ctlSeat(turn) !== v) { toast('Not the drone\'s turn.'); return; }
+  if (!LD.playable(G, turn).includes(id)) { snd('error'); toast('The drone must follow ' + (T.ls === 4 ? 'the Lantern' : D.suits[T.ls].name) + '.'); return; }
+  UI.sel = id; playSel();
 }
 function playSel() {
   if (!canAct() || UI.sel < 0 || G.phase !== 'play') return; const v = viewSeat(), turn = G.trick.turn;
   const m = myMoves().find(x => x.t === 'play' && x.c === UI.sel); if (!m) { snd('error'); return; }
   doMove(m);
+}
+// tap a job card on the table: it flies to your seat
+function tapJob(i) {
+  if (!canAct() || G.phase !== 'assign') return; const m = myMoves().find(x => x.t === 'take' && x.i === i);
+  if (!m) { snd('error'); toast(iMustAct() ? (!TASKS[G.tasks[i].id].cap && actorSeat() === G.cap ? 'Not for the Commander.' : 'You cannot take that one.') : 'Wait for your turn.'); return; }
+  doMove(m);
+}
+// tap a ping spot on a card of your hand
+function tapPing(id) {
+  if (!canAct()) return; const m = myMoves().find(x => x.t === 'ping' && x.c === id);
+  if (!m) { snd('error'); toast('That card cannot be shown.'); return; }
+  UI.pxPing = viewSeat(); doMove(m);
 }
 function doHint() {
   const v = viewSeat(); if (!canAct() || !iMustAct()) return;
@@ -152,8 +163,8 @@ function doHint() {
     if (col.length) { UI.hint = { c: col[0].c, why: 'Lesson first: play a low colour card and watch how the trick is won. Keep your Lanterns for your job.' }; UI.sel = col[0].c; render(); return; }
   }
   if (m.t === 'play') { let why = ''; try { why = LD.AI.why(G, v, m.c); } catch (e) { } UI.hint = { c: m.c, why }; UI.sel = m.c; render(); }
-  else if (m.t === 'take') { UI.job = m.i; render(); toast('A good job for you: ' + jobShort(m.i)); }
-  else { toast('Suggested: ' + (m.t === 'ping' ? 'signal ' + cname(m.c) : m.t)); }
+  else if (m.t === 'take') { UI.job = m.i; render(); toast('Try: ' + jobShort(m.i)); }
+  else if (m.t === 'ping') { toast('Try signalling ' + cname(m.c)); }
 }
 // ---------- hot-seat ----------
 function hotNext() {
@@ -199,26 +210,54 @@ function newsFrom(evs) {
   if (out.length) UI.news = (UI.news || []).concat([out.join(' ')]).slice(-3); // one sentence per moment
 }
 function drainQ() { if (UI.rq.length && !UI.busy) { const q = UI.rq.shift(); playEvs(q); } }
+// a +1 (or any short word) that rises from a seat
+function floatAt(seat, text, cls) {
+  try {
+    const bd = $('#bd'), el = document.querySelector('[data-key="seat' + seat + '"]'); if (!bd || !el) return;
+    const B = bd.getBoundingClientRect(), r = el.getBoundingClientRect(), f = h('div.fl' + (cls ? '.' + cls : ''), text);
+    f.style.left = Math.round(r.left - B.left + r.width / 2) + 'px'; f.style.top = Math.round(r.top - B.top + r.height / 2) + 'px'; bd.appendChild(f); setTimeout(() => f.remove(), 1500);
+  } catch (e) { }
+}
+// a job card taken from the table flies to the seat that took it
+function flyJobs(list) {
+  if (!ANIM || !document.body.animate) return;
+  for (const f of list) {
+    try {
+      const to = document.querySelector('[data-job="' + f.i + '"]'); const tr = to ? to.getBoundingClientRect() : null;
+      const seatEl2 = document.querySelector('[data-key="seat' + f.seat + '"]'); const sr = seatEl2 ? seatEl2.getBoundingClientRect() : null;
+      const dst = tr && tr.width > 4 ? { x: tr.left + tr.width / 2, y: tr.top + tr.height / 2, s: Math.max(.3, tr.width / f.r.width) } : sr ? { x: sr.left + sr.width / 2, y: sr.top + sr.height / 2, s: .3 } : null; if (!dst) continue;
+      const el = f.node; el.className = 'jcard jfly'; el.style.cssText = 'position:fixed;z-index:40;pointer-events:none;margin:0;left:' + f.r.left + 'px;top:' + f.r.top + 'px;width:' + f.r.width + 'px;height:' + f.r.height + 'px'; document.body.appendChild(el);
+      const dx = dst.x - (f.r.left + f.r.width / 2), dy = dst.y - (f.r.top + f.r.height / 2), d = 520 * Math.max(.6, AIDELAY / 650);
+      const an = el.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + dst.s + ')', opacity: .85 }], { duration: d, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' });
+      an.onfinish = () => el.remove(); setTimeout(() => el.remove(), d + 400);
+    } catch (e) { }
+  }
+}
 async function playEvs(evs) {
   if (UI.busy) { UI.rq.push(evs); return; }
   const tok = UI.seq; UI.busy = true; closePop();
   try {
-    const tr = evs.find(e => e.t === 'trick'), pls = evs.filter(e => e.t === 'play'), sw = evs.find(e => e.t === 'swap'), take = evs.filter(e => e.t === 'take'), pg = evs.filter(e => e.t === 'ping');
+    const tr = evs.find(e => e.t === 'trick'), pls = evs.filter(e => e.t === 'play'), sw = evs.find(e => e.t === 'swap'), take = evs.filter(e => e.t === 'take'), pg = evs.filter(e => e.t === 'ping'), jb = evs.filter(e => e.t === 'job');
     try { newsFrom(evs); } catch (e) { console.error(e); }
+    // job cards still lying on the table: remember where they are, so they can fly to the seat that takes them
+    const flights = []; for (const e of take) { const el = document.querySelector('[data-key="job' + e.i + '"]'); if (el) flights.push({ i: e.i, seat: e.seat, r: el.getBoundingClientRect(), node: el.cloneNode(true) }); }
     if (pls.length) snd('play');
-    if (pg.length) snd('ping');
+    if (pg.length) { snd('ping'); UI.pxPing = pg[0].seat; }
     if (sw) { snd('pass'); try { animatePass(); } catch (e) { } }
     if (take.length) snd('take');
     if (tr) {
+      UI.holdJobs = new Set(jb.map(j => j.i));      // the stamps land only after the cards have been swept
       UI.fz = { plays: tr.plays.map(p => ({ s: p.s, c: p.c })), winner: tr.w, win: false };
-      render(); await wait(ANIM ? 1000 : 0); if (tok !== UI.seq) return;
-      UI.fz.win = true; render(); snd('trick'); await wait(ANIM ? 1100 : 0); if (tok !== UI.seq) return;
-      UI.pxExit = { seat: tr.w }; UI.fz = null; render(); await wait(520); if (tok !== UI.seq) return;
-      for (const j of evs.filter(e => e.t === 'job')) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); }
-    } else { render(); await wait(pls.length ? 420 : (take.length ? 380 : 220)); if (tok !== UI.seq) return; }
-    if (evs.some(e => e.t === 'start') ) { /* nothing */ }
+      render(); await wait(ANIM ? 750 : 0); if (tok !== UI.seq) return;
+      UI.fz.win = true; render(); snd('trick'); await wait(ANIM ? 900 : 0); if (tok !== UI.seq) return;
+      UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1', 'plus'); await wait(520); if (tok !== UI.seq) return;
+      UI.holdJobs = null; if (jb.length) { render(); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(700); if (tok !== UI.seq) return; }
+    } else {
+      render(); flyJobs(flights); await wait(pls.length ? 420 : (take.length ? 460 : 220)); if (tok !== UI.seq) return;
+      if (jb.length) { for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(500); if (tok !== UI.seq) return; }
+    }
   } catch (e) { console.error(e); UI.fz = null; }
-  UI.busy = false; UI.fz = null;
+  UI.busy = false; UI.fz = null; UI.holdJobs = null;
   try { render(); } catch (e) { console.error(e); }
   if (G && G.phase === 'over') { schedule(); drainQ(); return; }
   schedule(); drainQ(); if (NET.on && isHost()) netPush(true);

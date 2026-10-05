@@ -148,15 +148,15 @@ function pxSync() {
     const key = el.dataset.pk, R = pxRect(el, B), id = +el.dataset.id; seen.add(key);
     const isTrick = key[0] === 't', isHand = key[0] === 'h';
     let o = PX.objs.get(key), fresh = false;
-    if (!o && isTrick) { const old = PX.objs.get('h:' + id); if (old && !seen.has('h:' + id)) { PX.objs.delete('h:' + id); old.key = key; old.detached = false; old.c.parent && old.c.parent.removeChild(old.c); PX.L.trick.addChild(old.c); old.layer = 'trick'; PX.objs.set(key, old); o = old; PX.nPlay++; } }
+    if (!o && isTrick) { const old = PX.objs.get('h:' + id); if (old && !seen.has('h:' + id)) { PX.objs.delete('h:' + id); old.key = key; old.detached = false; old.c.parent && old.c.parent.removeChild(old.c); PX.L.trick.addChild(old.c); old.layer = 'trick'; PX.objs.set(key, old); o = old; PX.nPlay++; if (ANIM) pxTween(o, { x: R.x, y: R.y, w: R.w, a: 1 }, 440, 'out'); } }
     if (!o) { o = pxCardObj(key, isTrick ? 'trick' : 'hand'); fresh = true; }
-    o.id = id; o.sel = el.classList.contains('sel'); o.dim = el.classList.contains('dim'); o.pk = el.classList.contains('pk'); o.pinged = el.classList.contains('pinged');
+    o.id = id; o.sel = el.classList.contains('sel'); o.dim = el.classList.contains('dim'); o.pk = el.classList.contains('pk'); o.pinged = el.classList.contains('pinged'); o.gw = el.classList.contains('glow');
     o.tx = R.x; o.ty = R.y; o.tw = R.w; o.seatOf = +(el.dataset.seat || -1); o.drone = el.classList.contains('dc');
     if (isHand) { o.z = ++hi; o.c.zIndex = o.z; } else o.c.zIndex = 50 + (o.idx || 0);
     if (fresh) {
       if (isTrick) {
         const sr = o.seatOf >= 0 ? pxSeatRect(o.seatOf, B) : null;
-        if (sr && ANIM) { o.x = sr.x + sr.w / 2 - R.w * .3; o.y = sr.y + sr.h / 2 - R.w * .4; o.w = R.w * .6; o.a = 0; PX.nPlay++; } else { o.x = R.x; o.y = R.y; o.w = R.w; }
+        if (sr && ANIM) { o.x = sr.x + sr.w / 2 - R.w * .3; o.y = sr.y + sr.h / 2 - R.w * .4; o.w = R.w * .6; o.a = 0; PX.nPlay++; pxTween(o, { x: R.x, y: R.y, w: R.w, a: 1 }, 500, 'out'); } else { o.x = R.x; o.y = R.y; o.w = R.w; }
       } else if (ANIM && ent === 'deal' && !o.drone) { o.x = PX.w / 2 - R.w / 2; o.y = -R.w * 1.6; o.w = R.w * .7; o.delay = now + hi * 32; o.rot = -.4 + hi * .06; o.flip = 1; o.flipUntil = now + 1100 + hi * 40; }
       else { o.x = R.x; o.y = R.y; o.w = R.w; }
     }
@@ -268,9 +268,9 @@ function pxFrame(ts) {
     o.sp.tint = o.dim && !o.detached && o.layer === 'hand' ? 0xa9b8d0 : 0xffffff;
     o.sh.width = w * 1.25; o.sh.height = h * 1.18; o.sh.x = 3 + o.lift * 4; o.sh.y = 5 + o.lift * 8; o.sh.alpha = tex ? .55 + o.lift * .2 : 0;
     const lan = o.id >= 36, pulse = .8 + .2 * Math.sin(PX.t * 3 + o.id);
-    o.gl.width = w * (o.pk ? 1.14 : 1.5); o.gl.height = h * (o.pk ? 1.1 : 1.35); o.gl.tint = o.pk ? 0x35c27b : 0xffffff; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .55 : 0)) * pulse : 0;
+    o.gl.width = w * (o.pk ? 1.14 : 1.5); o.gl.height = h * (o.pk ? 1.1 : 1.35); o.gl.tint = o.pk ? 0x35c27b : 0xffffff; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .55 : 0) + (o.gw && !o.detached && o.layer === 'hand' ? .5 : 0)) * pulse : 0;
     o.lg.width = w * 1.9; o.lg.height = w * 1.9; o.lg.alpha = lan && q.fx && !o.dim ? .28 * pulse : 0;
-    if (o.lift > .01 && o.lift < .99) moving = true; if (o.pk || (lan && q.fx)) moving = true;
+    if (o.lift > .01 && o.lift < .99) moving = true; if (o.pk || o.gw || (lan && q.fx)) moving = true;
   }
   PX.moving = moving;
   if (moving || PX.dirty || PerfHUDtesting()) { PX.dirty = false; try { PX.app.renderer.render(PX.app.stage); PX.frames = (PX.frames || 0) + 1; } catch (e) { pxOff('render: ' + (e && e.message)); } }

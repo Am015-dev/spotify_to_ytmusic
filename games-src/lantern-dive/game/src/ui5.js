@@ -190,7 +190,8 @@ document.addEventListener('click', ev => {
     case 'noping': UI.pingSel = false; UI.sel = -1; render(); break;
     case 'doping': { const m = myMoves().find(x => x.t === 'ping' && x.c === UI.sel); if (m && canAct()) doMove(m); break; }
     case 'nosig': { const m = myMoves().find(x => x.t === 'nosig'); if (m && canAct()) doMove(m); break; }
-    case 'pool': { if (!canAct()) break; UI.job = UI.job === +d.i ? -1 : +d.i; snd('click', { vol: .4 }); render(); break; }
+    case 'pool': tapJob(+d.i); break;
+    case 'pingc': tapPing(+d.id); break;
     case 'take': { const m = myMoves().find(x => x.t === 'take' && x.i === num(d.i)); if (m && canAct()) doMove(m); else toast('You cannot take that job.'); break; }
     case 'pass': case 'done': case 'keep': case 'offer': case 'accept': case 'decline': case 'yes': case 'no': { const m = myMoves().find(x => x.t === a); if (m && canAct()) doMove(m); break; }
     case 'vote': { const m = myMoves().find(x => x.t === 'vote' && x.f === num(d.f)); if (m && canAct()) doMove(m); break; }
@@ -198,7 +199,7 @@ document.addEventListener('click', ev => {
     case 'give': { const m = myMoves().find(x => x.t === 'give' && x.c === UI.giveSel); if (m && canAct()) doMove(m); break; }
     case 'predict': { const m = myMoves().find(x => x.t === 'predict' && x.n === num(d.n)); if (m && canAct()) doMove(m); break; }
     case 'job': openJob(+d.i); break;
-    case 'seat': openSeat(+d.seat); break;
+    case 'seat': { const vm = canAct() && G && G.phase === 'assign' && myMoves().find(x => x.t === 'vote' && x.f === +d.seat); if (vm) doMove(vm); else openSeat(+d.seat); break; }
     case 'last': openLast(); break;
     case 'popx': closePop(); break;
     case 'tipok': tipOk(); break;
@@ -249,7 +250,7 @@ function applyPhone() {
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(108, Math.min(128, Math.round(hh * .15))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  r.toggle('ph', ph); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !NET.on && UI.sv === 'setup') renderStart(); }
 }
 function relayout() { applyPhone(); if (G && UI.started) render(); if (typeof pxResize === 'function') { try { pxResize(true); } catch (e) { } } }

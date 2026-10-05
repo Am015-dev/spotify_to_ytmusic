@@ -34,12 +34,12 @@ function coachCheck() {
 }
 function tipOk() { if (!UI.tip) return; markSeen(UI.tip.id); UI.tip = null; renderTip(); schedule(); coachCheck(); }
 // ---------- pop-ups inside the dock ----------
-function closePop() { UI.pop = null; document.documentElement.classList.remove('popon'); const p = $('#ppop'); if (p) { p.hidden = true; p.innerHTML = ''; } }
+function closePop() { UI.pop = null; document.documentElement.classList.remove('popon'); const p = $('#ppop'); if (p) { p.hidden = true; p.innerHTML = ''; p.removeAttribute('aria-modal'); } }
 function openPop(title, sub, body) {
   const p = $('#ppop'); if (!p) return; UI.pop = { title }; document.documentElement.classList.add('popon');
   p.innerHTML = ''; p.hidden = false;
   p.append(h('div.ph-head', h('div.ph-t', h('b', title), sub ? h('span', sub) : null), h('button.px', { 'data-a': 'popx', type: 'button', 'aria-label': 'Close' }, '×')), h('div.ph-body', body));
-  if (document.documentElement.classList.contains('ph-p')) { const fe = $('#felt'); if (fe) { const fr = fe.getBoundingClientRect(); p.style.height = Math.round(Math.max(200, Math.min(innerHeight * .55, innerHeight - fr.bottom))) + 'px'; } } else p.style.height = '';
+  p.setAttribute('aria-modal', 'true'); clearTimeout(UI.popT); UI.popT = setTimeout(closePop, 7000);
 }
 function openJob(i) {
   if (!G || !G.tasks[i]) return; const t = G.tasks[i], d = TASKS[t.id], st = jobSt(i);

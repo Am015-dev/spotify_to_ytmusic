@@ -159,7 +159,7 @@ function storyCheck() {
 }
 // ---------- the boss bar on the table ----------
 function bossBar() {
-  const fe = $('#felt'); if (!fe) return; let bb = $('#bossbar');
+  const fe = $('#table'); if (!fe) return; let bb = $('#bossbar');
   if (!isBoss() || G.phase === 'assign') { if (bb) bb.remove(); fe.classList.remove('bosson'); return; }
   if (!bb) { bb = h('div#bossbar'); fe.prepend(bb); }
   fe.classList.add('bosson');
@@ -181,6 +181,7 @@ function tutOnly() {
   return G.players[viewSeat()].hand.includes(want) ? want : -1;
 }
 function tutCheck(once) {
+  return false;   // the training dive teaches with glow and a ghost finger, no dialogs
   const v = viewSeat(), myTurn = G.phase === 'play' && G.trick.turn === v;
   if (G.phase === 'assign' && G.tricks.length === 0) {
     if (once('t0', { who: 'mara', title: 'Welcome, diver!', body: 'Whole crew wins or loses together.', btn: 'Show me' })) return true;

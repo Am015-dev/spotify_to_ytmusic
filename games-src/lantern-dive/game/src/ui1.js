@@ -2,7 +2,7 @@
 var ANIM = 1, AIDELAY = 650;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, seq: 0, over: null, overShown: false,
-  coach: { level: 'full', seen: {}, keep: false }, prefs: { sound: true, music: true, gfx: 'auto', guide: 'full', timer: false, speed: 650 }, enter: '', tm: null, rq: [], chefs: null, hint: null, why: '', predN: -1, evN: 0, timerAt: 0 };
+  coach: { level: 'full', seen: {}, keep: false }, prefs: { sound: true, music: true, gfx: 'auto', guide: 'full', timer: false, speed: 650 }, enter: '', tm: null, rq: [], chefs: null, hint: null, why: '', predN: -1, evN: 0, timerAt: 0, fingerOn: false, holdJobs: null, stampSeen: {}, geo: null };
 const D = LD.DATA, TASKS = D.tasks, KIT = LDKit;
 const suitOf = D.suitOf, valOf = D.valOf;
 // painted art: LD_ART (data URIs made by build.py) -> blob URLs so the card <svg>s carry short links. Without blob URLs (jsdom) the kit keeps its own vector drawings.
@@ -60,9 +60,9 @@ const jobDef = i => TASKS[G.tasks[i].id];
 const jobShort = i => TASKS[G.tasks[i].id].s;
 const jobText = i => TASKS[G.tasks[i].id].t;
 const jobDiff = i => TASKS[G.tasks[i].id].d[G.np - 3];
-function jobSt(i) { if (!G) return 0; if (G.phase === 'over' && G.result) return G.result.tasks[i]; return LD.jobStatus(G, i); }
+function jobSt(i) { if (!G) return 0; if (UI.holdJobs && UI.holdJobs.has(i)) return 0; if (G.phase === 'over' && G.result) return G.result.tasks[i]; return LD.jobStatus(G, i); }
 // tricks won per seat (public)
-function tricksWon() { const a = new Array(G.np).fill(0); for (const k of G.tricks) a[k.w]++; return a; }
+function tricksWon() { const a = new Array(G.np).fill(0); for (const k of G.tricks) a[k.w]++; if (UI.fz && UI.fz.winner != null && a[UI.fz.winner] > 0) a[UI.fz.winner]--; return a; }
 // the cards a seat has shown with the ping and not yet played
 function shownBy(s) { return G.pings.filter(p => p.seat === s && !G.pl[p.c]); }
 function seatsClockwise(from) { const o = []; for (let k = 1; k < G.np; k++) o.push((from + k) % G.np); return o; }
