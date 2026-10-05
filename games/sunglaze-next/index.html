@@ -310,6 +310,153 @@ html.ph #ph-card .ph-coach{flex:1 1 auto;min-height:0;overflow:auto}
 .story ul.win{margin:6px 0 10px;padding-left:20px;text-align:left;line-height:1.4}.story ul.win li{margin:2px 0}html.ph .ph-bn{font-size:13px;color:#2f7d46;font-weight:700}
 html.ph .ph-goal .wq .gl,html.ph .ph-goal .wq .gs{display:none}
 html.ph .ph-sum .ph-sl{align-self:stretch;max-height:100%;justify-content:flex-start}
+
+/* story mode */
+.acts .bigb{flex:1 1 130px;min-height:52px;font-size:1.1rem;font-weight:700}
+.btn.story-btn{background:linear-gradient(180deg,#3b66b8,#1c3a78);border-color:#12285a}.btn.story-btn:hover{background:linear-gradient(180deg,#4a76cc,#244a94)}
+.cmp-line{margin:0;font-size:.9rem;color:#5a3a1a}
+.gxc{font-size:16px}
+</style>
+<style>
+/* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
+:root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
+  --gxc-go:#c9662a;--gxc-go-ink:#fff8ec;--gxc-gold:#f2b93b;--gxc-a1:#4f8a4b;--gxc-a2:#c07a2c;--gxc-a3:#8e3b46;--gxc-road:#b98a52;--gxc-radius:16px;
+  --gxc-font:inherit;--gxc-head:inherit}
+.gxc{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;color:var(--gxc-ink);font-family:var(--gxc-font);
+  background:radial-gradient(120% 70% at 50% 0%,#3a2a1c 0%,var(--gxc-bg) 70%);overflow:hidden;
+  padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.gxc[hidden]{display:none}
+.gxc *{box-sizing:border-box}
+.gxc button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.gxc button:focus-visible{outline:3px solid var(--gxc-gold);outline-offset:2px}
+.gxc-screen{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;width:100%;max-width:560px;margin:0 auto}
+.gxc-map-on .gxc-screen{justify-content:flex-start;padding:0;max-width:640px}
+.gxc-dim{color:var(--gxc-dim)}
+.gxc-small{font-size:13px;margin:6px 0 0;text-align:center}
+.gxc-row{display:flex;gap:8px;justify-content:center;margin-top:14px;width:100%}
+.gxc-row.wrap{flex-wrap:wrap}
+.gxc-btn{min-height:46px;min-width:88px;padding:8px 18px;border-radius:12px;border:2px solid var(--gxc-line);background:rgba(255,255,255,.35);color:var(--gxc-ink);font-weight:700;letter-spacing:.01em}
+.gxc-btn.go{background:linear-gradient(#dc7a3a,var(--gxc-go));border-color:#8f4317;color:var(--gxc-go-ink);box-shadow:0 3px 0 #7a3712,0 6px 14px rgba(0,0,0,.25);flex:1 1 auto;max-width:220px}
+.gxc-btn.go:active{transform:translateY(2px);box-shadow:0 1px 0 #7a3712}
+.gxc-btn.soft{background:#f7e7b8;border-color:#c9a14a}
+.gxc-btn.ghost{background:rgba(255,255,255,.22)}
+.gxc-ib{min-height:44px;min-width:44px;padding:4px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fbefd6;font-weight:600;white-space:nowrap}
+.gxc-tag{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:99px;background:rgba(60,38,14,.12);margin-right:6px;font-weight:700}
+/* portraits: image or emoji badge in a painted ring */
+.gxc-pt{--gxc-pt:64px;--gxc-ptc:#6b4a2b;width:var(--gxc-pt);height:var(--gxc-pt);flex:0 0 var(--gxc-pt);border-radius:50%;overflow:hidden;display:grid;place-items:center;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.45),transparent 55%),var(--gxc-ptc);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.5),0 6px 16px rgba(0,0,0,.3)}
+.gxc-pt img{width:100%;height:100%;object-fit:cover;display:block}
+.gxc-pt-e{font-size:calc(var(--gxc-pt) * .52);line-height:1;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
+/* ---- map ---- */
+.gxc-head{display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;flex:0 0 auto;color:#fbefd6}
+.gxc-htitle{flex:1 1 auto;min-width:0;text-align:center;font-family:var(--gxc-head);font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 4px rgba(0,0,0,.5)}
+.gxc-score{color:var(--gxc-gold)}
+.gxc-map{flex:1 1 auto;min-height:0;width:100%;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;
+  background:
+    radial-gradient(60% 40% at 20% 15%,rgba(110,150,80,.28),transparent 70%),
+    radial-gradient(50% 35% at 85% 55%,rgba(200,140,60,.22),transparent 70%),
+    radial-gradient(70% 40% at 30% 92%,rgba(150,60,70,.22),transparent 70%),
+    repeating-radial-gradient(circle at 70% 30%,rgba(120,80,30,.035) 0 2px,transparent 2px 9px),
+    linear-gradient(#f1e3c2,var(--gxc-paper2));box-shadow:inset 0 0 40px rgba(90,55,20,.45)}
+.gxc-path{position:relative;width:100%;margin:0 auto;max-width:560px}
+.gxc-road{position:absolute;left:0;top:0;width:100%;pointer-events:none;overflow:visible}
+.gxc-road path{fill:none;stroke-linecap:round}
+.gxc-road-edge{stroke:rgba(90,58,24,.45);stroke-width:26px}
+.gxc-road-fill{stroke:var(--gxc-road);stroke-width:20px}
+.gxc-road-dash{stroke:#f6e6c2;stroke-width:3px;stroke-dasharray:2 10;opacity:.85}
+.gxc-act{position:absolute;left:12px;right:12px;height:38px;margin-top:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:linear-gradient(90deg,transparent,rgba(60,38,14,.82) 15%,rgba(60,38,14,.82) 85%,transparent);color:#fbefd6;z-index:2;text-align:center;line-height:1.1}
+.gxc-act b{font-size:14px;letter-spacing:.04em}
+.gxc-act small{font-size:11.5px;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;padding:0 18px}
+.gxc-node{position:absolute;transform:translateX(-50%);width:64px;height:64px;padding:0;border:0;background:none;z-index:3;display:flex;flex-direction:column;align-items:center}
+.gxc-disc{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:22px;color:#fff8ec;
+  background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%),var(--gxc-a1);border:3px solid #f6e6c2;box-shadow:0 0 0 2px rgba(60,38,14,.55),0 5px 10px rgba(0,0,0,.3);text-shadow:0 1px 2px rgba(0,0,0,.5)}
+.gxc-node.a2 .gxc-disc{background-color:var(--gxc-a2);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%)}
+.gxc-node.a3 .gxc-disc{background-color:var(--gxc-a3);background-image:radial-gradient(circle at 35% 30%,rgba(255,255,255,.4),transparent 55%)}
+.gxc-node.boss .gxc-disc{width:62px;height:62px;margin-top:-3px;border-color:var(--gxc-gold);box-shadow:0 0 0 2px #6b3c10,0 0 0 6px rgba(242,185,59,.35),0 6px 12px rgba(0,0,0,.35)}
+.gxc-node.boss .gxc-disc .gxc-pt{border:0;box-shadow:none;background:transparent}
+.gxc-node.boss .gxc-disc::after{content:'♛';position:absolute;top:-15px;left:50%;transform:translateX(-50%);font-size:17px;color:var(--gxc-gold);text-shadow:0 1px 2px #000}
+.gxc-node.locked .gxc-disc{filter:grayscale(.85) brightness(.85);opacity:.75}
+.gxc-lock{position:absolute;right:-6px;bottom:-4px;font-style:normal;font-size:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+.gxc-node.won .gxc-disc{border-color:var(--gxc-gold)}
+.gxc-node.next .gxc-disc{animation:gxc-pulse 1.6s ease-in-out infinite}
+@keyframes gxc-pulse{0%,100%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 0 rgba(242,185,59,.7)}50%{box-shadow:0 0 0 2px rgba(60,38,14,.55),0 0 0 10px rgba(242,185,59,0)}}
+.gxc-node .gxc-stars{position:absolute;top:50px;left:50%;transform:translateX(-50%);gap:0;padding:0 4px;border-radius:99px;background:rgba(60,38,14,.75)}
+.gxc-node .gxc-st{font-size:12px}
+.gxc-lab{position:absolute;left:66px;top:14px;width:max-content;max-width:min(150px,38vw);text-align:left;font-size:13.5px;font-weight:700;line-height:1.15;color:var(--gxc-ink);
+  background:rgba(246,230,194,.88);padding:3px 8px;border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.gxc-node.lab-l .gxc-lab{left:auto;right:66px;text-align:right}
+.gxc-node.locked .gxc-lab{opacity:.65}
+.gxc-stars{display:inline-flex;gap:2px;justify-content:center}
+.gxc-st{font-style:normal;color:rgba(255,255,255,.35);font-size:16px;line-height:1}
+.gxc-st.on{color:var(--gxc-gold);text-shadow:0 0 6px rgba(242,185,59,.6)}
+.gxc-st.cap{opacity:.3}
+.gxc-stars.big .gxc-st{font-size:44px;color:rgba(60,38,14,.2)}
+.gxc-stars.big .gxc-st.on{color:var(--gxc-gold);text-shadow:0 2px 0 #9c6a12,0 0 14px rgba(242,185,59,.7);animation:gxc-pop .4s cubic-bezier(.3,1.6,.5,1) both}
+.gxc-stars.big .gxc-st.on:nth-child(2){animation-delay:.25s}.gxc-stars.big .gxc-st.on:nth-child(3){animation-delay:.5s}
+@keyframes gxc-pop{from{transform:scale(0) rotate(-30deg);opacity:0}to{transform:none;opacity:1}}
+/* sheets and toasts sit over the map */
+.gxc-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;max-width:560px;max-height:88%;overflow-y:auto;z-index:5;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));border-radius:var(--gxc-radius) var(--gxc-radius) 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.5);animation:gxc-up .22s ease-out}
+@keyframes gxc-up{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
+.gxc-sheet h3{margin:0 0 4px;font-family:var(--gxc-head);font-size:21px;line-height:1.15}
+.gxc-sh-top{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.gxc-sh-t{min-width:0}.gxc-sh-t small{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--gxc-dim);font-weight:700}
+.gxc-goal,.gxc-twist{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:12px;margin:6px 0;text-align:left;width:100%;font-size:15px;line-height:1.3}
+.gxc-goal{background:rgba(79,138,75,.16);border:1px solid rgba(79,138,75,.45)}
+.gxc-twist{background:rgba(142,59,70,.12);border:1px solid rgba(142,59,70,.5)}
+.gxc-goal b,.gxc-twist b{font-size:12px;text-transform:uppercase;letter-spacing:.07em}
+.gxc-twist b{color:var(--gxc-a3)}
+.gxc-twist.big{font-size:16px;border-width:2px}
+.gxc-slist{list-style:none;margin:8px 0 0;padding:0;width:100%;text-align:left;font-size:14.5px}
+.gxc-slist li{display:flex;gap:8px;align-items:center;padding:4px 0}
+.gxc-slist i{font-style:normal;font-size:18px;color:rgba(60,38,14,.25)}
+.gxc-slist li.on i{color:var(--gxc-gold);text-shadow:0 1px 0 #9c6a12}
+.gxc-rw{list-style:none;padding:0;margin:8px 0}.gxc-rw li{padding:6px 0;border-bottom:1px solid var(--gxc-line)}
+.gxc-toast{position:absolute;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:9;background:rgba(30,20,10,.92);color:#fbefd6;padding:10px 16px;border-radius:12px;font-weight:600;max-width:calc(100% - 32px);text-align:center}
+/* ---- story scene ---- */
+.gxc-scene,.gxc-boss,.gxc-res{width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;border-radius:var(--gxc-radius);
+  background:linear-gradient(#f6e9cb,var(--gxc-paper));box-shadow:0 18px 50px rgba(0,0,0,.55),inset 0 0 30px rgba(140,95,40,.25);max-height:100%;overflow-y:auto}
+.gxc-sc-title{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700;margin-bottom:12px}
+.gxc-sc-who{margin-bottom:8px}
+.gxc-sc-name{font-family:var(--gxc-head);font-weight:800;font-size:18px;min-height:1.2em}
+.gxc-sc-text{font-size:18px;line-height:1.4;margin:10px 0 12px;min-height:3.2em;max-width:30em;cursor:pointer}
+.gxc-sc-text.in{animation:gxc-in .3s ease-out}
+@keyframes gxc-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.gxc-dots{display:flex;gap:6px}.gxc-dots i{width:8px;height:8px;border-radius:50%;background:rgba(60,38,14,.2)}.gxc-dots i.was{background:rgba(60,38,14,.45)}.gxc-dots i.on{background:var(--gxc-go)}
+/* ---- boss card ---- */
+.gxc-boss-on{background:radial-gradient(100% 60% at 50% 30%,#5a2230 0%,#1a0d10 75%)}
+.gxc-boss-on.a1{background:radial-gradient(100% 60% at 50% 30%,#2d5a2c 0%,#0f1a0e 75%)}
+.gxc-boss-on.a2{background:radial-gradient(100% 60% at 50% 30%,#6a4318 0%,#1a120a 75%)}
+.gxc-boss{border:3px solid var(--gxc-gold);position:relative;padding-top:14px}
+.gxc-boss-tag{margin-bottom:10px;background:linear-gradient(#f6c552,#c98d17);color:#3a2205;font-weight:900;text-transform:uppercase;letter-spacing:.16em;font-size:13px;padding:5px 18px;border-radius:99px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.gxc-boss .gxc-pt{border-color:var(--gxc-gold)}
+.gxc-boss h2{margin:12px 0 2px;font-family:var(--gxc-head);font-size:26px;line-height:1.1}
+.gxc-boss-pers{margin:4px 0 8px;font-style:italic;font-size:16px;color:var(--gxc-dim)}
+/* ---- result ---- */
+.gxc-res-on.won{background:radial-gradient(100% 60% at 50% 25%,#6b5320 0%,var(--gxc-bg) 75%)}
+.gxc-res-k{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--gxc-dim);font-weight:700}
+.gxc-res h2{margin:4px 0 6px;font-family:var(--gxc-head);font-size:28px}
+.gxc-quote{display:flex;gap:10px;align-items:center;text-align:left;width:100%;margin:12px 0 4px;padding:10px;border-radius:12px;background:rgba(60,38,14,.08)}
+.gxc-quote b{font-size:13px}.gxc-quote p{margin:2px 0 0;font-style:italic;font-size:15px;line-height:1.3}
+.gxc-unl{width:100%;margin-top:10px;text-align:left;padding:10px 12px;border-radius:12px;border:2px dashed #c9a14a;background:rgba(242,185,59,.14)}
+.gxc-unl>b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px}
+.gxc-unl-i{padding:3px 0;font-size:15px}
+/* short phones (375x553): tighter scene, smaller portraits */
+@media (max-height:600px){
+  .gxc-screen{padding:8px 12px}
+  .gxc-scene,.gxc-boss,.gxc-res{padding:14px 12px}
+  .gxc-sc-who .gxc-pt{--gxc-pt:84px!important}
+  .gxc-boss .gxc-pt{--gxc-pt:104px!important}
+  .gxc-boss{padding-top:10px}.gxc-boss-tag{margin-bottom:6px}.gxc-boss h2{font-size:22px;margin-top:8px}
+  .gxc-sc-text{font-size:16.5px;margin:6px 0 8px}
+  .gxc-stars.big .gxc-st{font-size:36px}
+  .gxc-res h2{font-size:23px}
+}
+html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -397,6 +544,767 @@ const GX={key:'gx',open:null,
       d.innerHTML=`<div class="gx-drawer-head"><h2></h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"></div>`;document.body.appendChild(d)}
     d.querySelector('h2').textContent=title;if(bodyEl){const b=d.querySelector('.gx-drawer-body');if(bodyEl.parentNode!==b){b.innerHTML='';b.appendChild(bodyEl)}}return d}};
 
+</script>
+<script>
+// ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
+// A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
+//   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   GXC.open()            the chapter map (the title's "Story" button)
+//   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
+//   GXC.finish(G, over)   on game over: store stars, GNS.result({mode:'campaign'}), result screen, outro, back to the map
+//   GXC.scene / bossCard / result      the single screens (Promises), used by the flow and by the demo
+//   GXC.active() · progress() · unlocked() · reset() · close() · validate(data)
+// Progress lives in localStorage['gns-campaign-<game>'] and every access is wrapped in try/catch.
+(function (root) {
+  'use strict';
+  var GXC = {};
+  var doc = root && root.document;
+  var LS = {
+    json: function (k, d) { try { var v = JSON.parse(root.localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+    put: function (k, v) { try { root.localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+    del: function (k) { try { root.localStorage.removeItem(k); } catch (e) { } }
+  };
+  var LEVELS = ['easy', 'normal', 'hard'];
+  var O = null, D = null, P = null, CUR = null, OV = null, BUSY = false;
+
+  // ------------------------------------------------------------------ validation (node-safe)
+  var GOALS = ['win', 'score', 'margin', 'before-round', 'survive', 'mission', 'custom'];
+  var UNLOCKS = ['portrait', 'cardback', 'title', 'act', 'table', 'chapter'];
+  function lineText(l) { return typeof l === 'string' ? l : l && l.text; }
+  GXC.validate = function (data) {
+    var bad = [], add = function (m) { bad.push(m); };
+    if (!data || typeof data !== 'object') return ['no data'];
+    ['game', 'title'].forEach(function (k) { if (!data[k]) add('missing ' + k); });
+    var cast = data.cast || {}, twists = {}, ids = {};
+    (data.twists || []).forEach(function (t) { if (!t.id || !t.how) add('twist without id/how'); twists[t.id] = t; });
+    if (!data.acts || data.acts.length !== 3) add('needs 3 acts');
+    var ch = data.chapters || [];
+    if (ch.length < 9 || ch.length > 10) add('needs 9 or 10 chapters (has ' + ch.length + ')');
+    ch.forEach(function (c, i) {
+      var at = 'chapter ' + (c.id || i) + ': ';
+      if (!c.id) add(at + 'no id'); else if (ids[c.id]) add(at + 'duplicate id'); ids[c.id] = 1;
+      if ([1, 2, 3].indexOf(c.act) < 0) add(at + 'act must be 1-3');
+      if (i && c.act < ch[i - 1].act) add(at + 'acts out of order');
+      if (!c.title) add(at + 'no title');
+      var intro = c.intro || [], outro = c.outro || [];
+      if (intro.length < 2 || intro.length > 4) add(at + 'intro needs 2-4 lines');
+      if (outro.length < 1 || outro.length > 3) add(at + 'outro needs 1-3 lines');
+      intro.concat(outro).forEach(function (l) {
+        var t = lineText(l); if (!t) add(at + 'empty line'); else if (t.length > 110) add(at + 'line over 110 chars: ' + t.slice(0, 30) + '…');
+        if (l && l.who && l.who !== 'opponent' && l.who !== 'narrator' && !cast[l.who]) add(at + 'unknown speaker ' + l.who);
+      });
+      var op = c.opponent || {};
+      ['name', 'personality', 'aiLevel'].forEach(function (k) { if (op[k] == null || op[k] === '') add(at + 'opponent.' + k + ' missing'); });
+      if (c.boss && (!op.taunt || !op.praise)) add(at + 'boss needs taunt and praise');
+      if (!c.goal || GOALS.indexOf(c.goal.type) < 0 || !c.goal.text) add(at + 'goal needs a known type and text');
+      if (!c.stars || c.stars.length !== 3) add(at + 'needs exactly 3 stars');
+      else c.stars.forEach(function (s) { if (!s.text || !s.test) add(at + 'star needs text and test'); });
+      if (c.twist) { if (!twists[c.twist.id]) add(at + 'twist ' + c.twist.id + ' not in the twists menu'); if (!c.twist.text) add(at + 'twist needs text'); }
+      if (c.act === 3 && c.boss && !c.twist) add(at + 'act 3 boss needs a twist');
+      if (c.act === 1 && c.hints !== true) add(at + 'act 1 needs hints:true');
+      if (!c.easier) add(at + 'no easier block');
+      (c.unlock || []).forEach(function (u) { if (UNLOCKS.indexOf(u.type) < 0) add(at + 'unknown unlock type ' + u.type); if (!u.text) add(at + 'unlock needs text'); });
+      if (!c.setup || typeof c.setup !== 'object') add(at + 'setup must be an object');
+    });
+    [1, 2, 3].forEach(function (a) {
+      var inAct = ch.filter(function (c) { return c.act === a; });
+      if (!inAct.length) return add('act ' + a + ' has no chapters');
+      if (!inAct[inAct.length - 1].boss) add('act ' + a + ' must end with a boss');
+      if (inAct[0].boss) add('act ' + a + ' starts with a boss');
+    });
+    try { JSON.parse(JSON.stringify(data)); } catch (e) { add('not JSON-safe'); }
+    return bad;
+  };
+
+  // ------------------------------------------------------------------ progress
+  function key() { return 'gns-campaign-' + (O && O.game || 'game'); }
+  function load() { var p = LS.json(key(), null); if (!p || p.v !== 1) p = { v: 1, ch: {}, unlocked: [], last: null }; p.ch = p.ch || {}; p.unlocked = p.unlocked || []; return p; }
+  function save() { LS.put(key(), P); }
+  function rec(id) { return P.ch[id] || (P.ch[id] = { beaten: false, stars: 0, best: null, tries: 0, losses: 0, easy: false }); }
+  function chapters() { return (D && D.chapters) || []; }
+  function byId(id) { var c = chapters(); for (var i = 0; i < c.length; i++) if (c[i].id === id) return c[i]; return null; }
+  function isOpen(c) {
+    var list = chapters(), i = list.indexOf(c);
+    if (c.requires && c.requires.length) return c.requires.every(function (r) { return P.ch[r] && P.ch[r].beaten; });
+    return i <= 0 || !!(P.ch[list[i - 1].id] && P.ch[list[i - 1].id].beaten);
+  }
+  GXC.progress = function () { return JSON.parse(JSON.stringify(P || load())); };
+  GXC.unlocked = function () {
+    var out = [];
+    chapters().forEach(function (c) { if (P.ch[c.id] && P.ch[c.id].beaten) (c.unlock || []).forEach(function (u) { out.push({ type: u.type, id: u.id, text: u.text, from: c.id }); }); });
+    return out;
+  };
+  GXC.reset = function () { LS.del(key()); P = load(); if (OV) GXC.open(); };
+  GXC.active = function () { return CUR; };
+
+  // effective chapter: the "make it a bit easier" offer drops one AI level and the twist, at most 2 stars
+  function resolve(c, easy) {
+    var d = JSON.parse(JSON.stringify(c));
+    d.easy = !!easy; d.maxStars = 3;
+    if (easy) {
+      var e = c.easier || {}, lv = LEVELS.indexOf(c.opponent.aiLevel);
+      d.opponent.aiLevel = e.aiLevel || (lv > 0 ? LEVELS[lv - 1] : c.opponent.aiLevel);
+      d.twist = 'twist' in e ? e.twist : null;
+      if (e.setup) for (var k in e.setup) d.setup[k] = e.setup[k];
+      if (e.hints != null) d.hints = e.hints; else d.hints = true;
+      d.maxStars = e.maxStars || 2;
+    }
+    return d;
+  }
+  GXC.resolve = resolve;
+
+  // ------------------------------------------------------------------ small DOM helpers
+  function el(tag, cls, txt) { var e = doc.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+  function btn(cls, txt, on) { var b = el('button', cls, txt); b.type = 'button'; if (on) b.addEventListener('click', on); return b; }
+  function overlay() {
+    if (!OV) {
+      OV = el('div', 'gxc'); OV.setAttribute('role', 'dialog'); OV.setAttribute('aria-modal', 'true');
+      doc.body.appendChild(OV);
+      doc.addEventListener('keydown', function (e) { if (OV && OV.parentNode && e.key === 'Escape') { var x = OV.querySelector('[data-gxc-esc]'); if (x) x.click(); } });
+    }
+    OV.hidden = false;
+    return OV;
+  }
+  function screen(cls) { var o = overlay(); o.innerHTML = ''; o.className = 'gxc ' + (cls || ''); var s = el('div', 'gxc-screen'); o.appendChild(s); return s; }
+  GXC.close = function () { if (OV) { OV.hidden = true; OV.innerHTML = ''; } };
+  function castOf(who, def) {
+    if (who === 'opponent' && def) return { name: def.opponent.name, portrait: def.opponent.portrait, emoji: def.opponent.emoji, color: def.opponent.color };
+    if (who && D && D.cast && D.cast[who]) return D.cast[who];
+    if (def && def.opponent && def.opponent.cast === who) return { name: def.opponent.name, portrait: def.opponent.portrait, emoji: def.opponent.emoji };
+    return { name: who === 'narrator' || !who ? '' : who, emoji: '📜' };
+  }
+  // portrait: the game's own hook first, then <img> from artBase (falls back to the emoji), then the emoji badge
+  function portrait(who, size, def) {
+    var c = castOf(who, def), box = el('div', 'gxc-pt');
+    box.style.setProperty('--gxc-pt', size + 'px');
+    if (c.color) box.style.setProperty('--gxc-ptc', c.color);
+    var emo = function () { box.innerHTML = ''; box.appendChild(el('span', 'gxc-pt-e', c.emoji || (c.name ? c.name.charAt(0) : '?'))); };
+    var got = null;
+    try { if (O && O.portrait) got = O.portrait(who, size, c); } catch (e) { got = null; }
+    if (got && got.nodeType) { box.appendChild(got); return box; }
+    var src = typeof got === 'string' ? got : (O && O.artBase && c.portrait ? O.artBase + c.portrait : null);
+    if (src) { var im = el('img'); im.alt = ''; im.src = src; im.onerror = emo; box.appendChild(im); } else emo();
+    return box;
+  }
+  function starRow(n, max, total) {
+    var r = el('div', 'gxc-stars'); r.setAttribute('aria-label', n + ' of ' + (total || 3) + ' stars');
+    for (var i = 0; i < (total || 3); i++) r.appendChild(el('i', 'gxc-st' + (i < n ? ' on' : '') + (max != null && i >= max ? ' cap' : ''), '★'));
+    return r;
+  }
+  // twist text without its 'Boss rule:' prefix (the label shows it), first letter upper-case
+  function ruleText(t) { t = String(t || '').replace(/^(Boss|Special) rule:\s*/i, ''); return t.charAt(0).toUpperCase() + t.slice(1); }
+  function easierText(def) { return ((def.easier && def.easier.text) || 'the computer plays one level gentler and any special rule is off').replace(/[.\s]+$/, ''); }
+  function toast(t) {
+    var o = overlay(), x = el('div', 'gxc-toast', t); o.appendChild(x);
+    setTimeout(function () { if (x.parentNode) x.parentNode.removeChild(x); }, 2200);
+  }
+
+  // ------------------------------------------------------------------ the chapter map
+  GXC.open = function () {
+    if (!D) return;
+    P = load(); CUR = null;
+    var s = screen('gxc-map-on'), list = chapters();
+    var head = el('div', 'gxc-head');
+    var back = btn('gxc-ib', '‹ Back', function () { GXC.close(); if (O.onExit) O.onExit(); }); back.setAttribute('data-gxc-esc', '');
+    head.appendChild(back);
+    var tt = el('div', 'gxc-htitle'); tt.appendChild(el('b', null, D.title || 'Story')); head.appendChild(tt);
+    var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
+    var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
+    sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
+    s.appendChild(head);
+    var map = el('div', 'gxc-map'), path = el('div', 'gxc-path');
+    map.appendChild(path); s.appendChild(map);
+    // nodes zigzag down a winding road; each act gets a banner and its own tint
+    var X = [50, 78, 50, 22], rows = [], y = 0, ROW = 74, BAN = 46, nextOpen = null;
+    list.forEach(function (c, i) {
+      if (!i || c.act !== list[i - 1].act) {
+        var a = (D.acts || []).filter(function (x) { return x.act === c.act; })[0] || { title: 'Act ' + c.act };
+        rows.push({ banner: a, y: y }); y += BAN;
+      }
+      rows.push({ c: c, y: y, x: X[i % 4] }); y += ROW;
+      if (!nextOpen && isOpen(c) && !(P.ch[c.id] && P.ch[c.id].beaten)) nextOpen = c;
+    });
+    var H = y + 20; path.style.height = H + 'px';
+    var pts = rows.filter(function (r) { return r.c; });
+    // the painted road: an SVG in percent units for x, px for y (viewBox stretched horizontally only)
+    var svgNS = 'http://www.w3.org/2000/svg', svg = doc.createElementNS(svgNS, 'svg');
+    svg.setAttribute('class', 'gxc-road'); svg.setAttribute('viewBox', '0 0 100 ' + H); svg.setAttribute('preserveAspectRatio', 'none');
+    svg.style.height = H + 'px';
+    var d = '';
+    pts.forEach(function (p, i) {
+      var cy = p.y + 30;
+      if (!i) d = 'M' + p.x + ' ' + cy; else { var q = pts[i - 1], qy = q.y + 30, my = (qy + cy) / 2; d += ' C' + q.x + ' ' + my + ' ' + p.x + ' ' + my + ' ' + p.x + ' ' + cy; }
+    });
+    ['gxc-road-edge', 'gxc-road-fill', 'gxc-road-dash'].forEach(function (k) { var pa = doc.createElementNS(svgNS, 'path'); pa.setAttribute('d', d); pa.setAttribute('class', k); pa.setAttribute('vector-effect', 'non-scaling-stroke'); svg.appendChild(pa); });
+    path.appendChild(svg);
+    rows.forEach(function (r) {
+      if (r.banner) {
+        var b = el('div', 'gxc-act'); b.style.top = r.y + 'px';
+        b.appendChild(el('b', null, 'Act ' + (r.banner.act || '') + ' · ' + (r.banner.title || '')));
+        if (r.banner.blurb) b.appendChild(el('small', null, r.banner.blurb));
+        path.appendChild(b); return;
+      }
+      var c = r.c, st = P.ch[c.id] || {}, open = isOpen(c), beaten = !!st.beaten;
+      var n = btn('gxc-node a' + c.act + (c.boss ? ' boss' : '') + (beaten ? ' won' : open ? ' open' : ' locked') + (c === nextOpen ? ' next' : ''), null, function () { sheet(c); });
+      n.style.top = r.y + 'px'; n.style.left = r.x + '%';
+      n.setAttribute('aria-label', 'Chapter ' + (list.indexOf(c) + 1) + ': ' + c.title + (c.boss ? ' (boss)' : '') + (beaten ? ', beaten, ' + (st.stars || 0) + ' stars' : open ? ', open' : ', locked'));
+      var disc = el('span', 'gxc-disc', c.boss ? '' : String(list.indexOf(c) + 1));
+      if (c.boss) disc.appendChild(portrait(c.opponent.cast || 'opponent', 40, c));
+      if (!open) disc.appendChild(el('i', 'gxc-lock', '🔒'));
+      n.appendChild(disc);
+      if (beaten) n.appendChild(starRow(st.stars || 0, null, 3));
+      var lab = el('span', 'gxc-lab', c.title); n.appendChild(lab);
+      if (r.x > 60) n.classList.add('lab-l');
+      path.appendChild(n);
+    });
+    // bring the next open chapter into view
+    if (nextOpen) setTimeout(function () { var t = rows.filter(function (r) { return r.c === nextOpen; })[0]; if (t) map.scrollTop = Math.max(0, t.y - map.clientHeight / 2 + 40); }, 0);
+  };
+
+  function rewards() {
+    var o = overlay(), sh = el('div', 'gxc-sheet'), u = GXC.unlocked();
+    var close = function () { if (sh.parentNode) sh.parentNode.removeChild(sh); };
+    sh.appendChild(el('h3', null, 'Rewards'));
+    if (!u.length) sh.appendChild(el('p', 'gxc-dim', 'Beat chapters to unlock portraits, card backs, titles and new acts.'));
+    var ul = el('ul', 'gxc-rw');
+    u.forEach(function (x) { var li = el('li'); li.appendChild(el('span', 'gxc-tag', x.type)); li.appendChild(el('span', null, x.text)); ul.appendChild(li); });
+    sh.appendChild(ul);
+    var b = btn('gxc-btn', 'Close', close); b.setAttribute('data-gxc-esc', ''); sh.appendChild(b);
+    o.appendChild(sh); b.focus();
+  }
+
+  // the chapter's detail sheet: goal, opponent, stars, Play (and the easier offer after 2 losses)
+  function sheet(c) {
+    var o = overlay(), old = o.querySelector('.gxc-sheet'); if (old) old.parentNode.removeChild(old);
+    if (!isOpen(c)) { var i = chapters().indexOf(c); toast('Beat chapter ' + i + ' first.'); return; }
+    var st = rec(c.id), sh = el('div', 'gxc-sheet a' + c.act);
+    var close = function () { if (sh.parentNode) sh.parentNode.removeChild(sh); };
+    var top = el('div', 'gxc-sh-top');
+    top.appendChild(portrait(c.opponent.cast || 'opponent', 64, c));
+    var t = el('div', 'gxc-sh-t');
+    t.appendChild(el('small', null, 'Act ' + c.act + ' · Chapter ' + (chapters().indexOf(c) + 1) + (c.boss ? ' · Boss' : '')));
+    t.appendChild(el('h3', null, c.title));
+    t.appendChild(el('div', 'gxc-dim', (c.boss ? 'Boss: ' : 'Opponent: ') + c.opponent.name));
+    top.appendChild(t); sh.appendChild(top);
+    var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Goal')); g.appendChild(el('span', null, c.goal.text)); sh.appendChild(g);
+    if (c.twist) { var tw = el('div', 'gxc-twist'); tw.appendChild(el('b', null, c.boss ? 'Boss rule' : 'Special rule')); tw.appendChild(el('span', null, ruleText(c.twist.text))); sh.appendChild(tw); }
+    var sl = el('ul', 'gxc-slist');
+    c.stars.forEach(function (s, i) { var li = el('li', i < (st.stars || 0) ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, s.text)); sl.appendChild(li); });
+    sh.appendChild(sl);
+    var row = el('div', 'gxc-row');
+    var x = btn('gxc-btn ghost', 'Close', close); x.setAttribute('data-gxc-esc', ''); row.appendChild(x);
+    if (st.losses >= 2 && !st.beaten) row.appendChild(btn('gxc-btn ghost', 'Make it a bit easier', function () { GXC.play(c.id, { easy: true }); }));
+    var go = btn('gxc-btn go', st.beaten ? 'Play again' : 'Play', function () { GXC.play(c.id); }); row.appendChild(go);
+    sh.appendChild(row);
+    if (st.losses >= 2 && !st.beaten) sh.appendChild(el('p', 'gxc-dim gxc-small', 'Easier: ' + easierText(c) + ' (up to 2 stars).'));
+    o.appendChild(sh); go.focus();
+  }
+
+  // ------------------------------------------------------------------ story scene (2-4 lines, always skippable)
+  GXC.scene = function (lines, opts) {
+    opts = opts || {};
+    return new Promise(function (done) {
+      lines = (lines || []).filter(function (l) { return lineText(l); });
+      if (!lines.length || !doc) return done();
+      var s = screen('gxc-scene-on'), i = 0, def = opts.def;
+      var box = el('div', 'gxc-scene');
+      if (opts.title) box.appendChild(el('div', 'gxc-sc-title', opts.title));
+      var who = el('div', 'gxc-sc-who'), name = el('div', 'gxc-sc-name'), txt = el('p', 'gxc-sc-text');
+      txt.setAttribute('aria-live', 'polite');
+      var dots = el('div', 'gxc-dots');
+      lines.forEach(function () { dots.appendChild(el('i')); });
+      var row = el('div', 'gxc-row');
+      var finish = function () { done(); };
+      var skip = btn('gxc-btn ghost', 'Skip', finish); skip.setAttribute('data-gxc-esc', '');
+      var next = btn('gxc-btn go', 'Next', function () { i++; if (i >= lines.length) finish(); else show(); });
+      row.appendChild(skip); row.appendChild(next);
+      box.appendChild(who); box.appendChild(name); box.appendChild(txt); box.appendChild(dots); box.appendChild(row);
+      s.appendChild(box);
+      txt.addEventListener('click', function () { next.click(); });
+      function show() {
+        var l = lines[i], w = typeof l === 'string' ? (opts.who || 'narrator') : (l.who || 'narrator'), c = castOf(w, def);
+        who.innerHTML = ''; who.appendChild(portrait(w, 112, def));
+        name.textContent = c.name || '';
+        txt.textContent = lineText(l);
+        for (var k = 0; k < dots.children.length; k++) dots.children[k].className = k === i ? 'on' : k < i ? 'was' : '';
+        next.textContent = i === lines.length - 1 ? (opts.last || 'Continue') : 'Next';
+        txt.classList.remove('in'); void txt.offsetWidth; txt.classList.add('in');
+        next.focus();
+      }
+      show();
+    });
+  };
+
+  // ------------------------------------------------------------------ boss intro card
+  GXC.bossCard = function (def) {
+    return new Promise(function (done) {
+      if (!doc) return done(true);
+      var s = screen('gxc-boss-on a' + def.act), op = def.opponent, card = el('div', 'gxc-boss');
+      card.appendChild(el('div', 'gxc-boss-tag', def.boss ? 'Boss' : 'Rival'));
+      card.appendChild(portrait(op.cast || 'opponent', 148, def));
+      card.appendChild(el('h2', null, op.name));
+      card.appendChild(el('p', 'gxc-boss-pers', op.personality));
+      if (def.twist && def.twist.text) {
+        var tw = el('div', 'gxc-twist big');
+        tw.appendChild(el('b', null, def.boss ? 'Boss rule' : 'Special rule'));
+        tw.appendChild(el('span', null, ruleText(def.twist.text)));
+        card.appendChild(tw);
+      }
+      var g = el('div', 'gxc-goal'); g.appendChild(el('b', null, 'Your goal')); g.appendChild(el('span', null, def.goal.text)); card.appendChild(g);
+      var lv = el('div', 'gxc-dim gxc-small', 'Computer: ' + op.aiLevel + (op.aiStyle ? ' · ' + op.aiStyle : '') + (def.easy ? ' · made easier' : ''));
+      card.appendChild(lv);
+      var row = el('div', 'gxc-row');
+      var back = btn('gxc-btn ghost', 'Back', function () { done(false); }); back.setAttribute('data-gxc-esc', '');
+      var go = btn('gxc-btn go', 'Fight', function () { done(true); });
+      row.appendChild(back); row.appendChild(go); card.appendChild(row);
+      s.appendChild(card); go.focus();
+    });
+  };
+
+  // ------------------------------------------------------------------ play a chapter
+  GXC.play = function (id, opt) {
+    if (BUSY) return;
+    var c = byId(id); if (!c || !isOpen(c)) return;
+    BUSY = true;
+    var def = resolve(c, opt && opt.easy);
+    var st = rec(c.id); st.tries++; P.last = c.id; save();
+    GXC.scene(c.intro, { def: def, title: c.title, last: c.boss || def.twist ? 'Meet ' + (c.boss ? 'the boss' : 'your rival') : 'Start' }).then(function () {
+      return c.boss || def.twist ? GXC.bossCard(def) : true;
+    }).then(function (go) {
+      BUSY = false;
+      if (!go) { GXC.open(); return; }
+      CUR = def; GXC.close();
+      try { O.startChapter(def); } catch (e) { CUR = null; GXC.open(); throw e; }
+    }, function () { BUSY = false; });
+  };
+
+  // ------------------------------------------------------------------ stars and game over
+  function testOne(t, m) {
+    if (!t || !m) return false;
+    var v = m[t.k], op = t.op || (t.v == null ? 'truthy' : '>=');
+    switch (op) {
+      case '>=': return v >= t.v; case '>': return v > t.v; case '<=': return v <= t.v; case '<': return v < t.v;
+      case '==': case '=': return v === t.v; case '!=': return v !== t.v; default: return !!v;
+    }
+  }
+  GXC.testStar = testOne;
+  function countStars(G, def, won) {
+    if (!won) return 0;
+    var n = 0;
+    if (O.starsEarned) { try { n = O.starsEarned(G, def) | 0; } catch (e) { n = 1; } }
+    else {
+      var m = {}; try { m = O.metrics ? O.metrics(G) || {} : {}; } catch (e) { }
+      if (m.won == null) m.won = won;
+      n = 1; // the first star is the chapter's goal, already met by winning
+      for (var i = 1; i < def.stars.length; i++) if (testOne(def.stars[i].test, m)) n++;
+    }
+    return Math.max(1, Math.min(n, def.maxStars || 3, 3));
+  }
+
+  // over: optional {won, stars} to override the game's callbacks (e.g. a resign counts as a loss)
+  GXC.finish = function (G, over) {
+    var def = CUR; if (!def) return Promise.resolve(null);
+    over = over || {};
+    var won = over.won != null ? !!over.won : (function () { try { return !!O.isWon(G, def); } catch (e) { return false; } })();
+    var stars = over.stars != null ? Math.min(over.stars, def.maxStars || 3) : countStars(G, def, won);
+    var st = rec(def.id), first = won && !st.beaten;
+    if (won) { st.beaten = true; st.stars = Math.max(st.stars || 0, stars); if (def.easy) st.easy = true; st.losses = 0; }
+    else st.losses = (st.losses || 0) + 1;
+    var unl = first ? (byId(def.id).unlock || []) : [];
+    unl.forEach(function (u) { var k = u.type + ':' + (u.id || u.text); if (P.unlocked.indexOf(k) < 0) P.unlocked.push(k); });
+    var list = chapters(), i = list.indexOf(byId(def.id)), nxt = list[i + 1];
+    if (first && nxt && nxt.act !== def.act) unl = unl.concat([{ type: 'act', text: 'Act ' + nxt.act + ' opens' }]);
+    save();
+    if (root.GNS && root.GNS.result) {
+      try {
+        root.GNS.result({ game: O.game, mode: 'campaign', level: def.opponent.aiLevel, won: won, winner: won ? 0 : 1,
+          seats: O.seats ? O.seats(G) : [{ name: 'You', me: true }, { name: def.opponent.name, ai: def.opponent.aiLevel }],
+          scores: O.scores ? O.scores(G) : null, turns: over.turns || 0, ms: over.ms || 0,
+          extra: { chapter: def.id, stars: won ? stars : 0, easy: !!def.easy, boss: !!def.boss } });
+      } catch (e) { }
+    }
+    CUR = null;
+    var res = { won: won, stars: won ? stars : 0, def: def, unlocks: unl, losses: st.losses, best: st.stars, first: first };
+    return GXC.result(res).then(function (pick) {
+      if (pick === 'retry') { GXC.play(def.id); return res; }
+      if (pick === 'easier') { GXC.play(def.id, { easy: true }); return res; }
+      if (pick === 'next' && nxt) { GXC.play(nxt.id); return res; }
+      return (won ? GXC.scene(def.outro, { def: def, title: def.title, last: 'Back to the map' }) : Promise.resolve()).then(function () { GXC.open(); return res; });
+    });
+  };
+
+  // result screen: stars, the boss's taunt or praise, unlocks, and the easier offer after 2 losses
+  GXC.result = function (r) {
+    return new Promise(function (done) {
+      if (!doc) return done('map');
+      var def = r.def, s = screen('gxc-res-on ' + (r.won ? 'won' : 'lost')), box = el('div', 'gxc-res');
+      box.appendChild(el('div', 'gxc-res-k', def.title));
+      box.appendChild(el('h2', null, r.won ? (def.boss ? 'Boss defeated!' : 'Chapter won!') : (def.goal.type === 'mission' || def.goal.type === 'survive' ? 'Mission failed' : 'Not this time')));
+      var sr = starRow(r.stars, def.maxStars, 3); sr.classList.add('big'); box.appendChild(sr);
+      if (r.won && def.easy) box.appendChild(el('div', 'gxc-dim gxc-small', 'Easier mode: up to ' + def.maxStars + ' stars. Play it normally for 3.'));
+      var sl = el('ul', 'gxc-slist');
+      def.stars.forEach(function (st, i) { var li = el('li', i < r.stars ? 'on' : ''); li.appendChild(el('i', null, '★')); li.appendChild(el('span', null, st.text)); sl.appendChild(li); });
+      box.appendChild(sl);
+      var op = def.opponent, line = r.won ? op.praise : op.taunt;
+      if (line) {
+        var q = el('div', 'gxc-quote');
+        q.appendChild(portrait(op.cast || 'opponent', 52, def));
+        var qt = el('div'); qt.appendChild(el('b', null, op.name)); qt.appendChild(el('p', null, '“' + line + '”')); q.appendChild(qt);
+        box.appendChild(q);
+      }
+      if (r.unlocks && r.unlocks.length) {
+        var ul = el('div', 'gxc-unl'); ul.appendChild(el('b', null, 'Unlocked'));
+        r.unlocks.forEach(function (u) { var x = el('div', 'gxc-unl-i'); x.appendChild(el('span', 'gxc-tag', u.type)); x.appendChild(el('span', null, u.text)); ul.appendChild(x); });
+        box.appendChild(ul);
+      }
+      var row = el('div', 'gxc-row wrap');
+      var m = btn('gxc-btn ghost', 'Map', function () { done('map'); }); m.setAttribute('data-gxc-esc', ''); row.appendChild(m);
+      row.appendChild(btn('gxc-btn ' + (r.won ? 'ghost' : 'go'), r.won ? 'Replay' : 'Try again', function () { done('retry'); }));
+      if (!r.won && r.losses >= 2) row.appendChild(btn('gxc-btn soft', 'Make it a bit easier', function () { done('easier'); }));
+      if (r.won) row.appendChild(btn('gxc-btn go', 'Continue', function () { done('continue'); }));
+      box.appendChild(row);
+      if (!r.won && r.losses >= 2) box.appendChild(el('p', 'gxc-dim gxc-small', 'Easier: ' + easierText(def) + ' (up to 2 stars).'));
+      s.appendChild(box);
+      var f = row.querySelector('.go') || m; f.focus();
+    });
+  };
+
+  // ------------------------------------------------------------------ init
+  GXC.init = function (opts) {
+    O = opts || {}; D = O.data || null; P = load();
+    if (!O.startChapter) O.startChapter = function () { };
+    if (!O.isWon) O.isWon = function () { return false; };
+    return GXC;
+  };
+  GXC.data = function () { return D; };
+
+  if (root && root.document) root.GXC = GXC;
+  if (typeof module !== 'undefined' && module.exports) module.exports = GXC;
+})(typeof window !== 'undefined' ? window : this);
+
+</script>
+<script>
+window.CAMPAIGN={
+  "game": "sunglaze",
+  "title": "The Sun Palace Mosaics",
+  "version": 1,
+  "cast": {
+    "guide":   { "name": "Mother Ochre", "portrait": "camp-ochre.webp", "emoji": "🧓", "color": "#c27a3a" },
+    "tamsin":  { "name": "Tamsin Reed", "portrait": "camp-tamsin.webp", "emoji": "🧑‍🎨", "color": "#6f8f2e" },
+    "bram":    { "name": "Bram Kettle", "portrait": "camp-bram.webp", "emoji": "🔥", "color": "#b5451b" },
+    "saffra":  { "name": "Saffra Vell, Keeper of the Courtyard", "portrait": "camp-saffra.webp", "emoji": "☀️", "color": "#f0b429" },
+    "cobb":    { "name": "Cobb the Sorter", "portrait": "camp-cobb.webp", "emoji": "📦", "color": "#8a6d4b" },
+    "iris":    { "name": "Iris Prismwright", "portrait": "camp-iris.webp", "emoji": "💎", "color": "#7b5bc4" },
+    "garnet":  { "name": "Master Garnet Hale", "portrait": "camp-garnet.webp", "emoji": "🏺", "color": "#c2362f" },
+    "nell":    { "name": "Nell Frost", "portrait": "camp-nell.webp", "emoji": "❄️", "color": "#1d6f84" },
+    "twins":   { "name": "The Lumen Twins", "portrait": "camp-twins.webp", "emoji": "👯", "color": "#3d5bb8" },
+    "vesper":  { "name": "Vesper Ash", "portrait": "camp-vesper.webp", "emoji": "🌒", "color": "#5a5f6b" },
+    "umbra":   { "name": "Lady Umbra of the Black Kiln", "portrait": "camp-umbra.webp", "emoji": "🖤", "color": "#23252b" }
+  },
+  "acts": [
+    { "act": 1, "title": "Wet Clay", "blurb": "An apprentice at the town atelier. Learn the kilns, the racks and the mosaic." },
+    { "act": 2, "title": "The Guild Kilns", "blurb": "Glaziers of the guild test you: columns, prism tiles and a master's head start." },
+    { "act": 3, "title": "The Sun Palace", "blurb": "The palace mosaic goes to the best glazier alive. The Black Kiln wants it too." }
+  ],
+  "twists": [
+    { "id": "boss-sun", "where": "setup", "how": "After newGame(), set G.first and G.cur to the boss seat so the boss holds the Sun token and makes the first take of round 1." },
+    { "id": "boss-head-start", "where": "setup", "how": "After newGame(), set the boss seat's score to param (P(boss).score = param) before the first take; the param is shown on the boss card." },
+    { "id": "boss-glazed-start", "where": "setup", "how": "After newGame(), for rows 1..param pull one Cobalt tile out of G.bag and set it on the boss mosaic at wall[r][WALLCOL(0,r)] (the Cobalt diagonal, legal on both mosaics)." },
+    { "id": "boss-column-bonus", "where": "scoring", "how": "In finish(), right after endBonus(), add param extra points to the boss for each complete mosaic column, logged as its own 'Boss rule' line." },
+    { "id": "boss-deep-sight", "where": "ai", "how": "While the chapter runs, set LVL.hard.roll = param and LVL.hard.K = 14 so the boss rolls out more futures per take, and restore {K:10, roll:2} on exit." }
+  ],
+  "chapters": [
+    {
+      "id": "c1", "act": 1, "title": "The First Kiln",
+      "boss": false,
+      "intro": [
+        { "who": "guide", "text": "Welcome to the atelier, apprentice. Five kilns, five glazes, one mosaic each." },
+        { "who": "guide", "text": "On your turn, take every tile of ONE glaze from one kiln. The rest slides to the courtyard." },
+        { "who": "tamsin", "text": "I'm new too! Let's just fill some racks and see what happens." }
+      ],
+      "outro": [
+        { "who": "guide", "text": "Every full rack set one tile on your mosaic. That is the whole heartbeat of the craft." }
+      ],
+      "opponent": { "name": "Tamsin Reed", "portrait": "camp-tamsin.webp", "emoji": "🧑‍🎨", "cast": "tamsin",
+        "personality": "Cheerful fellow apprentice who grabs the biggest pile she sees and often slips.",
+        "aiLevel": "easy", "aiStyle": "greedy" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": true,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 15 or more", "test": { "k": "score", "op": ">=", "v": 15 } },
+        { "text": "Lose 6 or fewer points to breakage", "test": { "k": "breakage", "op": "<=", "v": 6 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Tamsin slows down; the coach suggests every take." },
+      "unlock": [ { "type": "portrait", "id": "tamsin", "text": "Tamsin's portrait" } ]
+    },
+    {
+      "id": "c2", "act": 1, "title": "Side by Side",
+      "boss": false,
+      "intro": [
+        { "who": "guide", "text": "A lone tile on the mosaic scores 1. A tile touching others scores the whole line it joins." },
+        { "who": "guide", "text": "Build your tiles next to each other, in rows and down columns." },
+        { "who": "bram", "text": "I stoke the kilns all day. Scoring? I just set tiles wherever they land." }
+      ],
+      "outro": [
+        { "who": "guide", "text": "See how the points grew as your tiles joined up? Neighbours pay." }
+      ],
+      "opponent": { "name": "Bram Kettle", "portrait": "camp-bram.webp", "emoji": "🔥", "cast": "bram",
+        "personality": "Big-handed kiln stoker; takes the largest pile and ignores where it goes.",
+        "aiLevel": "easy", "aiStyle": "greedy" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "score", "value": 20, "text": "Win with at least 20 points." },
+      "hints": true,
+      "stars": [
+        { "text": "Win with at least 20 points", "test": { "k": "score", "op": ">=", "v": 20 } },
+        { "text": "Score 30 or more", "test": { "k": "score", "op": ">=", "v": 30 } },
+        { "text": "Win by 8 or more", "test": { "k": "margin", "op": ">=", "v": 8 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Bram plays gently and the coach points out the best space." },
+      "unlock": [ { "type": "portrait", "id": "bram", "text": "Bram's portrait" } ]
+    },
+    {
+      "id": "c3", "act": 1, "title": "The Courtyard Keeper",
+      "boss": true,
+      "intro": [
+        { "who": "guide", "text": "Tiles that do not fit your racks fall to the breakage line, and each one costs points." },
+        { "who": "saffra", "text": "The Sun token is mine, child. I start every round, and you clean up my leftovers." },
+        { "who": "guide", "text": "Take only what fits. A small take is often better than a big spill." }
+      ],
+      "outro": [
+        { "who": "saffra", "text": "Hm. You waste nothing. The guild will want to see you." },
+        { "who": "guide", "text": "Pack your brushes. The guild kilns are next." }
+      ],
+      "opponent": { "name": "Saffra Vell", "portrait": "camp-saffra.webp", "emoji": "☀️", "cast": "saffra",
+        "personality": "Proud keeper of the courtyard; loves the Sun token and the first pick.",
+        "aiLevel": "easy", "aiStyle": "greedy",
+        "taunt": "The courtyard always favours the one who holds the sun.",
+        "praise": "Fine. Keep the courtyard tidy for me, glazier." },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": { "id": "boss-sun", "param": null, "text": "Boss rule: Saffra holds the Sun token and makes the first take of round 1." },
+      "goal": { "type": "custom", "value": 8, "text": "Win, losing no more than 8 points to breakage." },
+      "hints": true,
+      "stars": [
+        { "text": "Win with 8 or fewer breakage points", "test": { "k": "breakage", "op": "<=", "v": 8 } },
+        { "text": "Score 25 or more", "test": { "k": "score", "op": ">=", "v": 25 } },
+        { "text": "Lose 3 or fewer points to breakage", "test": { "k": "breakage", "op": "<=", "v": 3 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "The boss rule is off: the Sun token starts at random." },
+      "unlock": [
+        { "type": "portrait", "id": "saffra", "text": "Saffra's portrait" },
+        { "type": "act", "id": "2", "text": "Act 2: The Guild Kilns" }
+      ]
+    },
+    {
+      "id": "c4", "act": 2, "title": "Columns of the Guild",
+      "boss": false,
+      "intro": [
+        { "who": "cobb", "text": "Guild rules, apprentice: a full column at the end is worth 7. A row only 2." },
+        { "who": "guide", "text": "The game ends when someone finishes a row. Build down, not across, if you can." },
+        { "who": "cobb", "text": "I sort tiles all day. I also keep an eye on what YOU need." }
+      ],
+      "outro": [
+        { "who": "cobb", "text": "Seven for a column. You were listening." }
+      ],
+      "opponent": { "name": "Cobb the Sorter", "portrait": "camp-cobb.webp", "emoji": "📦", "cast": "cobb",
+        "personality": "Careful guild sorter; weighs his gain against what he leaves you.",
+        "aiLevel": "normal", "aiStyle": "denying" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Complete at least 1 mosaic column", "test": { "k": "cols", "op": ">=", "v": 1 } },
+        { "text": "Score 35 or more", "test": { "k": "score", "op": ">=", "v": 35 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Cobb stops watching your racks." },
+      "unlock": [
+        { "type": "portrait", "id": "cobb", "text": "Cobb's portrait" },
+        { "type": "cardback", "id": "guild-seal", "text": "Guild seal tile backs" }
+      ]
+    },
+    {
+      "id": "c5", "act": 2, "title": "The Prismwright",
+      "boss": false,
+      "intro": [
+        { "who": "iris", "text": "Prism tiles are wild: they join any glaze on a rack. I already set one on my mosaic." },
+        { "who": "guide", "text": "Take prisms with a glaze to finish a rack early. But a prism never counts for a full glaze." }
+      ],
+      "outro": [
+        { "who": "iris", "text": "You bend the light better than I thought. Take this prism as a keepsake." }
+      ],
+      "opponent": { "name": "Iris Prismwright", "portrait": "camp-iris.webp", "emoji": "💎", "cast": "iris",
+        "personality": "Dreamy glass artist; hoards prisms and finishes racks in one go.",
+        "aiLevel": "normal", "aiStyle": "denying" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": true } },
+      "twist": { "id": "boss-glazed-start", "param": 1, "text": "Rival rule: Iris starts with one Cobalt tile already set in mosaic row 1." },
+      "goal": { "type": "score", "value": 30, "text": "Win with at least 30 points." },
+      "hints": false,
+      "stars": [
+        { "text": "Win with at least 30 points", "test": { "k": "score", "op": ">=", "v": 30 } },
+        { "text": "Win by 5 or more", "test": { "k": "margin", "op": ">=", "v": 5 } },
+        { "text": "Lose 4 or fewer points to breakage", "test": { "k": "breakage", "op": "<=", "v": 4 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Iris plays gently and starts with an empty mosaic." },
+      "unlock": [
+        { "type": "portrait", "id": "iris", "text": "Iris's portrait" },
+        { "type": "table", "id": "prism-light", "text": "Prism-light table" }
+      ]
+    },
+    {
+      "id": "c6", "act": 2, "title": "The Master's Head Start",
+      "boss": true,
+      "intro": [
+        { "who": "garnet", "text": "I have glazed for forty summers. I will give you a contest, not a lesson." },
+        { "who": "garnet", "text": "And I begin with points in hand. The guild calls it respect." },
+        { "who": "guide", "text": "Then out-build him. Columns and full glazes pay at the end; he can't hold them all." }
+      ],
+      "outro": [
+        { "who": "garnet", "text": "Forty summers, and an apprentice beats me fairly. The palace needs you." },
+        { "who": "guide", "text": "A letter came, sealed in black. Someone else wants the Sun Palace mosaic." }
+      ],
+      "opponent": { "name": "Master Garnet Hale", "portrait": "camp-garnet.webp", "emoji": "🏺", "cast": "garnet",
+        "personality": "Stern guild master; never wastes a tile and starves your best racks.",
+        "aiLevel": "normal", "aiStyle": "denying",
+        "taunt": "Respect the head start, apprentice. Forty summers are hard to catch.",
+        "praise": "You caught me. Take my seal to the palace gates." },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": { "id": "boss-head-start", "param": 6, "text": "Boss rule: Master Garnet starts the game with 6 points." },
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 45 or more", "test": { "k": "score", "op": ">=", "v": 45 } },
+        { "text": "Earn a full glaze bonus (all 5 of one colour)", "test": { "k": "colours", "op": ">=", "v": 1 } }
+      ],
+      "easier": { "aiLevel": "easy", "twist": null, "setup": {}, "maxStars": 2, "text": "Garnet plays gently and starts at 0 points." },
+      "unlock": [
+        { "type": "portrait", "id": "garnet", "text": "Master Garnet's portrait" },
+        { "type": "title", "id": "journeyman", "text": "Title: Guild Glazier" },
+        { "type": "act", "id": "3", "text": "Act 3: The Sun Palace" }
+      ]
+    },
+    {
+      "id": "c7", "act": 3, "title": "Frost at the Gate",
+      "boss": false,
+      "intro": [
+        { "who": "nell", "text": "The palace gate is mine to guard. Only glaziers who think ahead get through." },
+        { "who": "guide", "text": "Nell reads several turns ahead. Watch what your take leaves in the courtyard." }
+      ],
+      "outro": [
+        { "who": "nell", "text": "Clean work. The gate is open; mind the halls." }
+      ],
+      "opponent": { "name": "Nell Frost", "portrait": "camp-nell.webp", "emoji": "❄️", "cast": "nell",
+        "personality": "Cool, patient gatekeeper; plays out the rest of the round before every take.",
+        "aiLevel": "hard", "aiStyle": "lookahead" },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 50 or more", "test": { "k": "score", "op": ">=", "v": 50 } },
+        { "text": "Win by 5 or more", "test": { "k": "margin", "op": ">=", "v": 5 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Nell looks only one take ahead." },
+      "unlock": [ { "type": "portrait", "id": "nell", "text": "Nell's portrait" } ]
+    },
+    {
+      "id": "c8", "act": 3, "title": "Hall of Two Lights",
+      "boss": false,
+      "intro": [
+        { "who": "twins", "text": "Two of us, one of you. Three mosaics, seven kilns, and the courtyard fills fast." },
+        { "who": "guide", "text": "With three at the table, the tile you skip may never come back. Plan for it." }
+      ],
+      "outro": [
+        { "who": "twins", "text": "Both of us beaten! We'll tell the halls about you." }
+      ],
+      "opponent": { "name": "The Lumen Twins", "portrait": "camp-twins.webp", "emoji": "👯", "cast": "twins",
+        "personality": "Two playful lamp-lighters who each chase their own mosaic, hard and fast.",
+        "aiLevel": "hard", "aiStyle": "lookahead" },
+      "setup": { "np": 3, "ex": { "gray": false, "prism": false } },
+      "twist": null,
+      "goal": { "type": "win", "value": null, "text": "Win the 3-player game (beat both twins)." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 45 or more", "test": { "k": "score", "op": ">=", "v": 45 } },
+        { "text": "Complete 2 or more mosaic columns", "test": { "k": "cols", "op": ">=", "v": 2 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": { "np": 2 }, "maxStars": 2, "text": "Only one twin plays, at normal strength." },
+      "unlock": [
+        { "type": "portrait", "id": "twins", "text": "The Lumen Twins' portrait" },
+        { "type": "cardback", "id": "lamplight", "text": "Lamplight tile backs" }
+      ]
+    },
+    {
+      "id": "c9", "act": 3, "title": "The Unmarked Wall",
+      "boss": false,
+      "intro": [
+        { "who": "vesper", "text": "This wall has no painted colours. You choose each space, so no glaze repeats in a row or column." },
+        { "who": "vesper", "text": "And my columns are blessed by the Black Kiln. Each one pays me extra." },
+        { "who": "guide", "text": "Vesper serves Lady Umbra. Finish the game before his columns fill." }
+      ],
+      "outro": [
+        { "who": "vesper", "text": "My lady will not be pleased. She waits in the throne hall." }
+      ],
+      "opponent": { "name": "Vesper Ash", "portrait": "camp-vesper.webp", "emoji": "🌒", "cast": "vesper",
+        "personality": "Quiet, precise servant of the Black Kiln; builds columns and nothing else.",
+        "aiLevel": "hard", "aiStyle": "lookahead" },
+      "setup": { "np": 2, "ex": { "gray": true, "prism": false } },
+      "twist": { "id": "boss-column-bonus", "param": 3, "text": "Rival rule: Vesper scores 3 extra points for each complete column at the end." },
+      "goal": { "type": "win", "value": null, "text": "Win on the unmarked mosaic." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Win in 6 rounds or fewer", "test": { "k": "rounds", "op": "<=", "v": 6 } },
+        { "text": "Score 45 or more", "test": { "k": "score", "op": ">=", "v": 45 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Vesper plays at normal strength with no column blessing." },
+      "unlock": [
+        { "type": "portrait", "id": "vesper", "text": "Vesper's portrait" },
+        { "type": "table", "id": "unmarked-slate", "text": "Unmarked slate table" }
+      ]
+    },
+    {
+      "id": "c10", "act": 3, "title": "The Black Kiln",
+      "boss": true,
+      "intro": [
+        { "who": "umbra", "text": "The Sun Palace mosaic will be glazed in black. My kiln sees every future." },
+        { "who": "umbra", "text": "I play each take out to the end of the round, again and again. You only guess." },
+        { "who": "guide", "text": "She weighs every pile. Give her none worth taking, and keep your breakage clean." }
+      ],
+      "outro": [
+        { "who": "umbra", "text": "The sun... in my own kiln. Very well. Glaze your palace." },
+        { "who": "guide", "text": "The mosaic is yours, master glazier. The whole town will see it at noon." }
+      ],
+      "opponent": { "name": "Lady Umbra", "portrait": "camp-umbra.webp", "emoji": "🖤", "cast": "umbra",
+        "personality": "Cold mistress of the Black Kiln; deepest look-ahead, denies your best glaze.",
+        "aiLevel": "hard", "aiStyle": "lookahead",
+        "taunt": "Black glaze sets forever. Come back when you can see further.",
+        "praise": "You out-saw the Black Kiln. The palace is yours, Sun Glazier." },
+      "setup": { "np": 2, "ex": { "gray": false, "prism": false } },
+      "twist": { "id": "boss-deep-sight", "param": 4, "text": "Boss rule: Lady Umbra studies twice as many futures before every take." },
+      "goal": { "type": "win", "value": null, "text": "Win the game." },
+      "hints": false,
+      "stars": [
+        { "text": "Win", "test": { "k": "won" } },
+        { "text": "Score 60 or more", "test": { "k": "score", "op": ">=", "v": 60 } },
+        { "text": "Win by 10 or more", "test": { "k": "margin", "op": ">=", "v": 10 } }
+      ],
+      "easier": { "aiLevel": "normal", "twist": null, "setup": {}, "maxStars": 2, "text": "Lady Umbra plays at normal strength and her deep sight is off." },
+      "unlock": [
+        { "type": "portrait", "id": "umbra", "text": "Lady Umbra's portrait" },
+        { "type": "title", "id": "sun-glazier", "text": "Title: Sun Glazier" },
+        { "type": "table", "id": "sun-palace", "text": "Sun Palace table" }
+      ]
+    }
+  ]
+};
 </script>
 <script>
 // ---------- PerfHUD: one speed tool for every game on the shelf ----------
@@ -2171,7 +3079,7 @@ function startHtml(){const o=UI.setup;let saved=null;try{saved=localStorage.getI
    <h3>Variants</h3><div class="exs"><label class="chk"><input type="checkbox" data-ex="gray" ${o.ex.gray?'checked':''}> <b>Unmarked mosaic</b> <small>choose where each tile goes; no glaze twice in a row or column</small></label>
    <label class="chk"><input type="checkbox" data-ex="prism" ${o.ex.prism?'checked':''}> <b>Prism tiles</b> <small>wild tiles (promo): ${o.np===2?5:10} in the game</small></label>
    <label class="chk"><input type="checkbox" data-coach="1" ${UI.coach?'checked':''}> <b>Guided game</b> <small>the panel explains each step</small></label></div>
-   ${onlineBlock()}<div class="acts">${NET.on?'<button class="btn go" data-a="netopen">Back to the online lobby</button>':'<button class="btn go" data-ui="start">Begin ▶</button>'}<button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div></div>`}
+   ${onlineBlock()}${NET.on||typeof campLine!=='function'?'':campLine()}<div class="acts">${NET.on?'<button class="btn go" data-a="netopen">Back to the online lobby</button>':'<button class="btn go bigb" data-ui="start">Begin ▶</button>'+(typeof campOpen==='function'&&window.CAMPAIGN?'<button class="btn go bigb story-btn" data-ui="story-map">★ Story</button>':'')}<button class="btn" data-gx="rulesd">How to play</button><button class="btn" data-gx="refd">Tile list</button></div></div>`}
 function storyPic(){const tiles=[];for(let i=0;i<14;i++)tiles.push(tileSVG(i%5,40+i*38,152,32));const arch=(x)=>`<path d="M${x} 300V210a55 55 0 0 1 110 0V300Z" fill="#5a3a2a" opacity=".85"/><path d="M${x+8} 300V212a47 47 0 0 1 94 0V300Z" fill="url(#shade)"/>`;
   return `<svg viewBox="0 0 600 330" role="img" aria-label="A palace courtyard at sunrise with tiled arches"><defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7c77c"/><stop offset="1" stop-color="#fde9c4"/></linearGradient><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3f6e"/><stop offset="1" stop-color="#6e4b3a"/></linearGradient></defs>
   <rect width="600" height="330" fill="url(#sky)"/><circle cx="470" cy="70" r="40" fill="#fff1b8"/><circle cx="470" cy="70" r="28" fill="#ffd66b"/><rect x="0" y="120" width="600" height="190" fill="#e9c99a"/><rect x="0" y="120" width="600" height="14" fill="#c98e5a"/>
@@ -2231,7 +3139,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-slo
   switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':openStart();return;case 'coach':setCoach(!UI.coach);if(G)render();return;case 'gfx':gfxCycle();return}});
 function gfxBtn(){const b=$('#gfxbtn');if(!b)return;const h=IC('gfx')+'<span>'+(typeof gfxLabel==='function'?gfxLabel():'Graphics')+'</span>';if(b.dataset.h!==h){b.innerHTML=h;b.dataset.h=h}b.title='Graphics quality: '+(typeof gfxLabel==='function'?gfxLabel():'')+' (Auto picks by device and steps down if frames stutter)'}
 function setCoach(v){UI.coach=!!v;try{localStorage.setItem('sgz_coach',v?'1':'0')}catch(e){}const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach)}
-function uiAct(a){switch(a){case 'start':beginGame();return;case 'continue':loadSaved();return;case 'new':if(NET.on){UI.modal='lobby';render();return}openStart();return;case 'story-ok':UI.modal=null;render();schedule();return;
+function uiAct(a){switch(a){case 'start':beginGame();return;case 'story-map':campOpen();return;case 'continue':loadSaved();return;case 'new':if(NET.on){UI.modal='lobby';render();return}openStart();return;case 'story-ok':UI.modal=null;render();schedule();return;
   case 'unsel':UI.sel=null;UI.tgt=null;UI.adv=null;upd();return;case 'prism':if(UI.sel){UI.sel={src:UI.sel.src,c:UI.sel.c,j:UI.sel.j?0:1};const ms=movesFor(UI.sel);if(!ms.some(m=>m.line===UI.tgt))UI.tgt=null;upd()}return;
   case 'advise':advise();return;case 'noadv':UI.adv=null;upd();return}}
 document.addEventListener('keydown',e=>{if(GX.open||UI.modal||!me())return;if(e.key==='Escape'&&UI.sel){UI.sel=null;UI.tgt=null;upd()}else if(e.key==='Enter'&&UI.sel&&UI.tgt!=null){const m=movesFor(UI.sel).find(m=>m.line===UI.tgt);if(m){e.preventDefault();go(m)}}});
@@ -2891,6 +3799,57 @@ function bfRender(){if(!BF.on)return;bfEnsure();if(!G){BF.disp=null;bfDraw();ret
   if(BF.q.length&&!BF.busy&&!UI.modal){bfRun();return}
   if(!BF.busy){BF.disp=bfClone(G);bfDraw(fresh&&G.turn===0?{deal:true}:{})}}
 addEventListener('resize',()=>{try{const was=BF.on;bfApply();if(was&&!BF.on&&G)render()}catch(e){}});
+
+</script>
+<script>
+// ---------- story mode: the shared chapter map (gx-campaign.js) wired to Sunglaze. Data: campaign.json ----------
+// A chapter is a normal game with its own setup, computer level and (at most) one twist. Twists exist only here.
+UI.cmp=null;var CMP_LVL0={alpha:LVL.hard.alpha,K:LVL.hard.K,roll:LVL.hard.roll};var CMP_FIN=null,CMP_OVER=0;
+var CMP_SLIP0=LVL.easy.slip,CMP_SLIP={c1:.8,c2:.6,c3:.45};// act 1 rivals blunder more often (measured: a sensible beginner wins about 8 in 10 of chapter 1)
+var CMP_NAMES={c8:['Lumen','Lux']};
+function campLvlReset(){LVL.easy.slip=CMP_SLIP0;LVL.hard.K=CMP_LVL0.K;LVL.hard.roll=CMP_LVL0.roll;LVL.hard.alpha=CMP_LVL0.alpha}
+function campBossSeat(){return 1}
+function campMetrics(g){const p=g.pl[0];const b=endBonus(p);const rivals=g.pl.slice(1).map(q=>q.score);
+  return {won:!!(g.over&&g.over.win.includes(0)),score:p.score,margin:p.score-Math.max.apply(null,rivals),rounds:g.round,breakage:-p.st.floor,cols:b.cols,colours:b.colours,rows:b.rows}}
+function campIsWon(g,def){const m=campMetrics(g);if(!m.won)return false;const gl=def.goal||{};
+  if(gl.type==='score'&&m.score<gl.value)return false;if(gl.type==='custom'&&gl.value!=null&&m.breakage>gl.value)return false;return true}
+// ---- twists (setup and scoring hooks) ----
+function campApplyTwist(def){const t=def.twist;campLvlReset();if(!t)return;const B=campBossSeat();const nm=def.opponent.name;
+  if(t.id==='boss-sun'){G.first=G.cur=B;lg(`Boss rule: ${nm} holds the Sun token and takes first.`,'big')}
+  else if(t.id==='boss-head-start'){P(B).score=t.param;lg(`Boss rule: ${nm} starts with ${t.param} points.`,'big')}
+  else if(t.id==='boss-glazed-start'){let n=0;for(let r=0;r<t.param;r++){const k=G.bag.indexOf(0);if(k<0)break;G.bag.splice(k,1);P(B).wall[r][WALLCOL(0,r)]=0;n++}
+    lg(`Rival rule: ${nm} starts with ${n} Cobalt tile${n===1?'':'s'} already set.`,'big')}
+  else if(t.id==='boss-column-bonus'){G.camp={colBonus:t.param,seat:B}}
+  else if(t.id==='boss-deep-sight'){LVL.hard.roll=t.param;LVL.hard.K=14;lg(`Boss rule: ${nm} studies every take twice as deep.`,'big')}}
+// scoring twist: after the normal ending, the boss earns extra points per complete column, then the winner is worked out again
+var _campFinish=finish;finish=function(){const had=!!G.over;_campFinish.apply(this,arguments);
+  if(had||!G.over||!G.camp||!G.camp.colBonus)return;const p=P(G.camp.seat);const b=endBonus(p);const extra=b.cols*G.camp.colBonus;if(!extra)return;
+  p.score+=extra;p.st.cols+=extra;lg(`Boss rule: ${p.nm} earns ${extra} extra for ${b.cols} complete column${b.cols===1?'':'s'}.`,'good');
+  const sc=G.pl.slice().sort((a,b)=>b.score-a.score||b.fr-a.fr);const top=sc[0];const winners=sc.filter(q=>q.score===top.score&&q.fr===top.fr);
+  G.over={scores:sc.map(q=>({p:q.i,s:Object.assign({total:q.score,fr:q.fr},q.st)})),win:winners.map(w=>w.i),tie:sc.filter(q=>q.score===top.score).length>1};G.winner=winners.map(w=>w.nm).join(' & ');
+  G.winText=`${G.winner} ${winners.length>1?'share the win':'wins'} with ${top.score} points.`;lg('🏆 '+G.winText,'big')};
+// ---- starting a chapter ----
+function campStart(def){const s=def.setup||{};const np=Math.max(2,Math.min(4,s.np||2));const ex=Object.assign({gray:false,prism:false},s.ex||{});
+  const lv=['normal'];for(let i=1;i<np;i++)lv.push(def.opponent.aiLevel||'normal');const names=['You'].concat(CMP_NAMES[def.id]||(np===2?[def.opponent.name]:[def.opponent.name+' 1',def.opponent.name+' 2']));
+  UI.cmp=def;CMP_OVER=0;UI.guideNote=null;UI.fx.length=0;UI.fxSeen=0;UI.recap=[];UI.sel=null;UI.tgt=null;UI.adv=null;UI.lastHuman=null;
+  UI.coach=!!def.hints;const cb=$('#coachbtn');if(cb)cb.classList.toggle('on',UI.coach);
+  UI.modal=null;const seats=['human'];for(let i=1;i<np;i++)seats.push('ai');
+  newGame({np,seats,lv,names,ex,mode:'x'});campApplyTwist(def);if(def.opponent.aiLevel==='easy'&&CMP_SLIP[def.id]!=null)LVL.easy.slip=Math.min(.9,CMP_SLIP[def.id]+(def.easy?.15:0));
+  try{localStorage.removeItem(SAVE)}catch(e){}resetScene();refresh();clearInterval(CMP_FIN);CMP_FIN=setInterval(campWatch,400)}
+function campWatch(){if(!UI.cmp||!G)return;if(!G.over){CMP_OVER=0;return}
+  if(typeof BF!=='undefined'&&BF.busy){CMP_OVER=0;return}
+  if(!CMP_OVER){CMP_OVER=Date.now();return}if(Date.now()-CMP_OVER<(window.CMP_WAIT!=null?window.CMP_WAIT:1800))return;
+  clearInterval(CMP_FIN);const g=G;UI.cmp=null;campLvlReset();try{if(typeof BF!=='undefined')BF.resHide=true;if(BF.on)bfDraw()}catch(e){}
+  if(GXC.active())GXC.finish(g)}
+function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
+  GXC.init({game:'sunglaze',data:window.CAMPAIGN,startChapter:campStart,isWon:campIsWon,metrics:campMetrics,
+    onExit(){openStart()},scores:g=>g.pl.map(p=>p.score),seats:g=>g.pl.map((p,i)=>({name:p.nm,me:i===0,ai:i?p.lv:undefined}))})}
+function campOpen(){if(typeof GXC==='undefined')return;UI.modal=null;const m=$('#modal');if(m){m.hidden=true;m.innerHTML='';m.dataset.h=''}GXC.open()}
+// a normal game (Begin) leaves story mode and restores the player's own guide setting
+{const _bg=beginGame;beginGame=function(){if(UI.cmp){UI.cmp=null;clearInterval(CMP_FIN);try{UI.coach=localStorage.getItem('sgz_coach')!=='0'}catch(e){UI.coach=true}}campLvlReset();if(G)delete G.camp;return _bg.apply(this,arguments)}}
+function campLine(){try{const p=GXC.progress();const ch=window.CAMPAIGN.chapters;const n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;
+  if(!n)return '';const nx=ch.find(c=>!(p.ch[c.id]&&p.ch[c.id].beaten));return `<p class="cmp-line"><b>Story: ${n} of ${ch.length} chapters done${nx?`, next: “${esc(nx.title)}”`:''}.</b></p>`}catch(e){return ''}}
+campInit();
 
 </script>
 </body>
