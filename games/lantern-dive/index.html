@@ -72,46 +72,11 @@ svg{display:block}
 #barstat .tm{font-variant-numeric:tabular-nums;background:rgba(255,216,115,.18);border:1px solid var(--gold);border-radius:10px;padding:0 8px}
 #barstat .tm.low{background:#8a2a1c;border-color:#ff9c7a;color:#fff}
 #barprompt{flex:1;min-width:0;display:none}
-#prompt{font-size:15px;line-height:1.25;font-weight:800}
 .gx-board{background:#06142b}
 #bd{position:absolute;inset:0;display:flex;flex-direction:column;min-width:0;min-height:0;background:#07203f var(--tableimg,none) center/cover no-repeat}
 #pxc{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:0;display:block}
 #bd>*:not(#pxc){position:relative;z-index:1}
-/* ---- other divers ---- */
-#opp{flex:0 0 auto;display:flex;gap:4px;padding:5px 5px 2px;align-items:stretch;justify-content:center;flex-wrap:wrap}
-.op{flex:1 1 0;min-width:0;max-width:260px;position:relative;display:flex;flex-direction:column;align-items:stretch;gap:1px;padding:3px 3px 4px;border-radius:12px;background:rgba(7,28,58,.62);border:2px solid rgba(160,205,255,.25);color:inherit;font:inherit;text-align:left;cursor:pointer;min-height:44px}
-.op.act{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,216,115,.45),0 0 14px rgba(255,216,115,.5)}
-.op .top{display:flex;align-items:center;gap:5px;min-width:0}
-.op .av{position:relative;flex:0 0 auto;width:var(--av,38px);height:var(--av,38px)}
-.op .av svg{width:100%;height:100%}
-.op .av .cm{position:absolute;right:-5px;bottom:-4px;width:19px;height:19px}
-.op .av .cm svg{width:100%;height:100%}
-.op .who{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.1}
-.op .nm{font-size:13px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.op .cnt{display:flex;flex-direction:column;align-items:flex-start;gap:0;font-size:13px;font-weight:800;color:var(--ink2);white-space:nowrap}
-.op .cnt b{color:var(--ink)}
-.op .pg{flex:0 0 auto;display:flex;align-items:center;gap:3px;min-height:22px}
-.op .pg .tok{width:22px;height:22px}
-.op .shown{position:relative;width:30px;height:42px;flex:0 0 auto}
-.op .shown svg.card{width:100%;height:100%}
-.op .shown .mk{position:absolute;right:-6px;top:-5px;width:19px;height:19px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
-.op .shown .mk svg{width:100%;height:100%}
-.op .jobs{display:flex;flex-direction:column;gap:2px;margin-top:2px;min-height:0}
 .jc{display:flex;align-items:center;gap:4px;min-height:22px;border-radius:7px;padding:0 5px 0 4px;font-size:13px;font-weight:800;line-height:1.1;background:#fbf3dd;color:#2b2a22;border:2px solid #0b1f3a;white-space:nowrap;overflow:hidden;cursor:pointer;font-family:inherit;text-align:left;width:100%}
-.jc .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.op .jc{white-space:normal;min-height:28px;padding:1px 4px;line-height:1.05;cursor:inherit;overflow-wrap:anywhere}
-.op .jobs{min-height:calc(var(--jr,1)*31px)}
-.jc.opp .sm{width:14px;height:14px}.jc.opp .sm svg{width:9px;height:9px}
-#jobsum{display:flex;flex-direction:column;gap:5px}
-.jsh{font-size:13px;font-weight:900;color:var(--ink2);text-transform:uppercase;letter-spacing:.05em}
-.jsr{appearance:none;display:flex;align-items:center;gap:8px;text-align:left;background:rgba(255,255,255,.06);border:2px solid var(--line);border-radius:12px;padding:5px 8px;min-height:44px;color:inherit;font:inherit;cursor:pointer}
-.jsr.ok{border-color:var(--ok);background:rgba(53,194,123,.14)}.jsr.bad{border-color:var(--bad);background:rgba(224,88,60,.16)}
-.jsr .jav{flex:0 0 32px;width:32px;height:32px}.jsr .jav svg{width:100%;height:100%}
-.jsr .jtx{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}.jsr .jtx b{font-size:13px}.jsr .jtx span{font-size:14px}
-.jsr .jst{flex:0 0 22px;width:22px;height:22px;color:var(--ink)}
-#dockpile{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-#dockpile #pile,#dockpile #lead{position:static}
-.op .jc .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;text-overflow:clip}
 .jc .sm{flex:0 0 auto;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1;font-weight:900;color:#fff;background:var(--gold2);border:1.5px solid #0b1f3a}
 .jc .sm svg{width:11px;height:11px;stroke:#fff;stroke-width:3.4}
 .jc.ok{background:#dff3e4}.jc.ok .sm{background:var(--ok)}
@@ -120,50 +85,12 @@ svg{display:block}
 .jc .df{flex:0 0 auto;display:flex;gap:2px}.jc .df i{width:6px;height:6px;border-radius:50%;background:var(--gold2);border:1px solid #0b1f3a}
 .jc.more{background:rgba(7,28,58,.55);color:var(--ink);border-color:var(--line);justify-content:center}
 /* the drone's double row (two divers) */
-.op.drone{flex:1 1 100%;max-width:none}
 .drow{display:flex;gap:4px;justify-content:center;padding:2px 2px 0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
 .drow::-webkit-scrollbar{display:none}
 .dstack{position:relative;flex:0 0 auto;width:var(--dw);height:calc(var(--dw)*1.4 + 10px)}
 .dstack .dbk{position:absolute;left:0;bottom:0;width:100%;height:calc(100% - 9px);border-radius:6px;background:#1a3f77;border:2px solid #0b1f3a;opacity:.9}
 .dstack .dbk.none{opacity:0}
-.dstack .dc{position:absolute;left:0;top:0;width:100%;height:calc(var(--dw)*1.4);border:0;background:transparent;padding:0;cursor:default;border-radius:6px}
-.dstack .dc.can{cursor:pointer}
-.dstack .dc.dim{opacity:.5}
-.dstack .dc.sel{transform:translateY(-6px)}
 .dstack .dc svg.card,.hc svg.card{width:100%;height:100%}
-/* ---- the felt: trick slots in the middle ---- */
-#felt{flex:1 1 auto;min-height:100px;position:relative}
-.tslot{position:absolute;width:var(--cw);height:calc(var(--cw)*1.4);transform:translate(-50%,-50%);border-radius:9px;border:2px dashed rgba(160,205,255,.3);display:flex;align-items:center;justify-content:center}
-.tslot.turn{border-color:var(--gold);box-shadow:0 0 14px 2px rgba(255,216,115,.5);animation:ldpulse 1.6s ease-in-out infinite}
-.tslot .tc{position:absolute;inset:0;border:0;padding:0;background:transparent;margin:0;cursor:default}
-.tslot .tc svg.card{width:100%;height:100%}
-.tslot .tn{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:1px;font-size:12px;font-weight:800;white-space:nowrap;color:var(--ink2);text-shadow:0 1px 2px #000;pointer-events:none;display:none}
-.tslot.win{box-shadow:0 0 16px 4px rgba(255,216,115,.85)}
-#felttxt{position:absolute;left:8px;right:8px;top:6px;text-align:center;pointer-events:none;font-size:13px;font-weight:800;color:var(--ink2);text-shadow:0 1px 2px #000}
-#pile{position:absolute;right:6px;bottom:4px;display:flex;gap:6px;align-items:center}
-.pbtn{appearance:none;border:2px solid var(--line);background:rgba(7,28,58,.7);color:var(--ink);border-radius:12px;min-height:44px;min-width:44px;padding:2px 10px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px}
-#lead{position:absolute;left:6px;bottom:4px;display:flex;gap:6px;align-items:center;font-size:13px;font-weight:800;color:var(--ink2)}
-/* the pool of jobs on the table while they are being handed out */
-#pool{position:absolute;inset:4px 6px;display:flex;flex-wrap:wrap;gap:6px 8px;justify-content:center;align-content:center;align-content:safe center;overflow-y:auto;overscroll-behavior:contain}
-.jcard{appearance:none;position:relative;width:min(48%,168px);min-height:64px;border-radius:12px;background:#fbf3dd;color:#27261f;border:3px solid #0b1f3a;padding:6px 8px 6px 12px;text-align:left;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:3px;box-shadow:0 4px 10px rgba(0,0,0,.45)}
-.jcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:7px;border-radius:9px 0 0 9px;background:var(--gold2)}
-.jcard b{font-size:14px;line-height:1.2;font-weight:900}
-.jcard span{font-size:13px;line-height:1.25;font-weight:600;opacity:.92}
-.jcard .dd{display:flex;gap:3px;align-items:center;font-size:13px;font-weight:800}.jcard .dd i{width:9px;height:9px;border-radius:50%;background:var(--gold2);border:1.5px solid #0b1f3a}
-.jcard.sel{outline:4px solid var(--gold);outline-offset:1px;transform:translateY(-3px)}
-.jcard.off{opacity:.6;cursor:default}
-.jcard.bad{background:#f6d9d4}
-/* ---- my seat and hand ---- */
-#mine{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:2px 6px 0;min-height:44px}
-#mine .me{flex:0 0 auto;display:flex;align-items:center;gap:5px;cursor:pointer;background:rgba(7,28,58,.62);border:2px solid rgba(160,205,255,.25);border-radius:12px;padding:2px 6px 2px 3px;min-height:44px;min-width:44px;color:inherit;font:inherit}
-#mine .me.act{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,216,115,.45),0 0 14px rgba(255,216,115,.5)}
-#mine .me .av{position:relative;width:36px;height:36px}#mine .me .av svg{width:100%;height:100%}
-#mine .me .av .cm{position:absolute;right:-5px;bottom:-4px;width:18px;height:18px}#mine .me .av .cm svg{width:100%;height:100%}
-#mine .me .who{display:flex;flex-direction:column;line-height:1.1;min-width:0}#mine .nm{font-size:13px;font-weight:900}#mine .cnt{font-size:13px;font-weight:800;color:var(--ink2)}
-#mine .mjobs{flex:1;min-width:0;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;align-items:center}
-#mine .mjobs::-webkit-scrollbar{display:none}
-#mine .mjobs .jc{flex:0 1 auto;width:auto;max-width:100%;min-width:0;min-height:34px;padding:0 8px 0 5px;white-space:normal;line-height:1.15}
-#mine .tok{width:30px;height:30px;flex:0 0 auto}
 #handz{flex:0 0 auto;position:relative;background:linear-gradient(180deg,rgba(2,10,24,0),rgba(2,10,24,.55) 30%)}
 #hand{position:relative;overflow:visible;min-height:calc(var(--hw)*1.4 + 24px)}
 .hc{position:absolute;border:0;background:transparent;padding:0;margin:0;cursor:pointer;font:inherit;width:var(--hw);height:calc(var(--hw)*1.4);border-radius:8px}
@@ -178,31 +105,6 @@ svg{display:block}
 #hand.two .hc:not(.r2).pk::after,#hand.two .hc:not(.r2).pinged::after{bottom:auto;height:calc(var(--rs) - 2px);border-bottom:0;border-radius:8px 8px 0 0}
 .hc.pk::after{content:'';position:absolute;inset:0;border-radius:8px;border:4px solid var(--ok);box-shadow:inset 0 0 0 2px rgba(255,255,255,.6);pointer-events:none}
 .handnote{color:var(--ink2);font-size:14px;font-weight:700;padding:14px 10px;text-align:center;align-self:center;width:100%}
-@keyframes ldpulse{50%{transform:scale(1.06)}}
-.tslot.turn{animation:none}
-/* ---- dock ---- */
-.gx-dock{background:var(--panel);color:var(--ink);border-left:3px solid #1d4f8c}
-.gx-dock-head{background:var(--panel2);border-bottom:1px solid var(--line)}
-.gx-dock-body{display:flex;flex-direction:column;gap:7px;padding:8px;min-height:0}
-.gx-dock .gx-ibtn{color:var(--ink);background:rgba(255,255,255,.08);border-color:var(--line)}
-#dockbody>*{flex-shrink:0}
-.gx-dock-body{overflow:hidden}
-#dockscroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:7px;overscroll-behavior:contain}
-#dockscroll>*{flex-shrink:0}
-#acts{flex:0 0 auto}
-#promptDock{min-height:2.7em}
-#prompt{font-size:16px;line-height:1.3;font-weight:800}
-#prompt small{display:block;font-size:13px;font-weight:600;color:var(--ink2);margin-top:2px}
-#prompt.mine{color:var(--gold)}
-#info{font-size:13.5px;line-height:1.35;color:var(--ink2);background:rgba(255,255,255,.05);border-radius:10px;padding:6px 8px}
-#info b{color:var(--ink)}
-#info.why{border-left:4px solid var(--gold);background:rgba(255,216,115,.1)}
-#acts{display:flex;gap:6px;flex-wrap:wrap}
-#acts .btn{flex:1 1 96px}
-#felt.roston #pool{top:78px}
-#roster{z-index:3;position:absolute;left:8px;right:8px;top:34px;display:flex;flex-wrap:wrap;gap:5px;justify-content:center;pointer-events:none}
-.rchip{display:flex;align-items:center;gap:5px;min-height:34px;border-radius:12px;padding:2px 8px 2px 3px;background:rgba(255,255,255,.07);border:2px solid var(--line);font-size:13px;font-weight:800}
-.rchip svg{width:26px;height:26px}.rchip.w{border-color:var(--gold)}.rchip.r{border-color:var(--ok)}
 .btn{appearance:none;border:2px solid #0b1f3a;background:linear-gradient(180deg,#ffe28a,#e0a31c);color:#2a1d04;font-weight:900;font-size:15px;min-height:44px;min-width:44px;padding:4px 14px;border-radius:12px;cursor:pointer;line-height:1.15}
 .btn.alt{background:linear-gradient(180deg,#27578f,#173f70);color:var(--ink);border-color:#0b1f3a;box-shadow:inset 0 0 0 1px var(--line)}
 .btn.go{background:linear-gradient(180deg,#58d28c,#2a9a5c);color:#04230f}
@@ -220,12 +122,6 @@ svg{display:block}
 .ph-body p{margin:0;font-size:14px;line-height:1.4}.sm{font-size:13px;opacity:.9;line-height:1.3}
 .kv{display:flex;justify-content:space-between;gap:10px;font-size:14px;padding:3px 0;border-bottom:1px dotted var(--line);align-items:center}.kv b{text-align:right}
 .cbtns{display:flex;gap:8px;flex-wrap:wrap}.cbtns .btn{flex:1 1 120px}
-#news{display:flex;flex-direction:column;gap:2px;font-size:13px;line-height:1.3;color:#b9d2ee}#news .nw1{color:#fff;font-weight:700}#news[hidden]{display:none}
-.tipcard{background:rgba(255,216,115,.14);border:2px solid var(--gold);border-radius:12px;padding:7px 9px;display:flex;flex-direction:column;gap:5px}
-.tipcard b{font-size:15px;color:var(--gold)}.tipcard p{margin:0;font-size:14px;line-height:1.35;white-space:pre-line}
-.tipcard .tr{display:flex;gap:6px;justify-content:flex-end}
-.tipcard .th{display:flex;align-items:center;justify-content:space-between;gap:8px}.tipcard .th .btn{flex:0 0 auto;min-height:44px;padding:0 14px}
-html.ph-short .tipcard p{font-size:13px;line-height:1.25}html.ph-short .tipcard{padding:4px 8px;gap:2px}
 .rules h3{margin:12px 0 4px;font-size:1.08rem;color:var(--gold)}.rules p,.rules li{font-size:14.5px;line-height:1.45}.rules ul,.rules ol{padding-left:20px;margin:4px 0}
 .logl .ll{font-size:14px;padding:3px 0;border-bottom:1px dotted var(--line)}.lt{display:inline-block;min-width:30px;opacity:.6;font-size:13px}
 .mrow{margin:0 0 12px}.mrow .lbl{font-weight:800;margin-bottom:4px}.mbt{display:flex;gap:6px;flex-wrap:wrap}
@@ -334,55 +230,17 @@ html.ph .setup .sgo{position:static;margin:0;padding:0;background:none}
 .muted{opacity:.75}
 .emo{position:absolute;z-index:6;font-size:26px;pointer-events:none;animation:emo 2.2s ease-out forwards;text-shadow:0 2px 4px #000}
 @keyframes emo{0%{opacity:0;transform:translateY(8px) scale(.6)}15%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-22px)}}
-@media (max-width:999px){html:not(.ph) .gx-dock{max-height:43dvh}}
-html:not(.ph) .jc{font-size:14.5px}html:not(.ph) .op .jc{min-height:30px}html:not(.ph) .op .nm,html:not(.ph) .op .cnt{font-size:14px}
-html:not(.ph) .jcard b{font-size:16px}html:not(.ph) .jcard span{font-size:14.5px}html:not(.ph) .jcard{width:min(31%,230px)}
 /* ================= PHONE (html.ph) ================= */
 html.ph{--gx-bar-h:44px;--gx-dock-w:0px;--dockh:120px;--rail:clamp(236px,31vw,292px);font-size:14px}
 html.ph .gx-bar{min-height:44px;height:44px;padding:0 6px;padding-top:env(safe-area-inset-top,0px);box-sizing:content-box;gap:4px}
 html.ph .gx-bar h1,html.ph .gx-ibtn span{display:none}
 html.ph .gx-ibtn{min-width:44px;min-height:44px;padding:0;border-radius:10px}
-html.ph .gx-dock-head,html.ph .gx-reopen{display:none!important}
 html.ph .pcard{position:fixed;left:0;right:0;top:auto;bottom:0;max-height:62dvh;height:auto;border-radius:14px 14px 0 0;z-index:50}
-html.ph.ph-l .ppop{position:fixed;z-index:50}
 html.ph .ppop .ph-body{max-height:calc(62dvh - 60px)}
-html.ph.ph-l .ppop{left:auto;right:0;width:var(--rail);top:calc(44px + env(safe-area-inset-top,0px));bottom:0;max-height:none;border-radius:0}
-html.ph .gx-dock{position:relative}
 /* a pop-up on a portrait phone is a sheet over the hand and the dock (never over the felt, so no played card is hidden); it scrolls inside */
-html.ph.ph-p .ppop{position:fixed;left:0;right:0;top:auto;bottom:0;height:min(44dvh,340px);max-height:none;border-radius:14px 14px 0 0;z-index:50}
-html.ph.ph-p .ppop .ph-body{max-height:none;flex:1 1 auto;min-height:0;overflow:auto}
 html.ph .ppop .kv{padding:2px 0;font-size:13.5px}
 html.ph .ppop p{margin:2px 0}
-html.ph .gx-dock{border-left:0;border-top:3px solid #1d4f8c;max-height:none;padding-bottom:env(safe-area-inset-bottom,0px)}
-html.ph .gx-dock-body{padding:5px 6px 0;gap:5px;overflow:hidden}
-html.ph #dockscroll{gap:5px}
-html.ph #acts{padding:3px 0 5px}
-html.ph #acts .btn{font-size:14px}
-html.ph #acts.many .btn{flex:1 1 calc(16% - 6px);min-height:44px;padding:0}
-html.ph.tipon #psub,html.ph.tipon #news div:not(.nw1){display:none}
-html.ph.ph-p.tipon .gx-main{grid-template-rows:minmax(0,1fr) auto}
-html.ph.ph-p.tipon .gx-dock{max-height:min(330px,46dvh)}
-html.ph.ph-p.tipon .gx-dock-body{overflow:auto}
 html.ph .ph-body{padding:6px 8px}
-html.ph.ph-p .gx-app{grid-template-rows:calc(44px + env(safe-area-inset-top,0px)) minmax(0,1fr)}
-html.ph.ph-p .gx-main{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) calc(var(--dockh) + env(safe-area-inset-bottom,0px))}
-html.ph.ph-p .gx-dock{max-height:none;height:auto}
-html.ph.ph-p #barprompt{display:block}
-html.ph.ph-p #prompt{font-size:13px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-html.ph.ph-p #promptDock{display:none}
-#psub{font-size:13.5px;line-height:1.3;font-weight:600;color:var(--ink2);padding:2px 2px 4px}
-html.ph #mine .mjobs .jc{min-height:44px}
-html.ph.ph-p .gx-bar .gx-sp,html.ph.ph-p #barstat{display:none}
-html.ph.ph-l .gx-app{grid-template-columns:minmax(0,1fr) var(--rail);grid-template-rows:calc(44px + env(safe-area-inset-top,0px)) minmax(0,1fr)}
-html.ph.ph-l .gx-main{display:contents}
-html.ph.ph-l .gx-board{grid-column:1;grid-row:1/3}
-html.ph.ph-l .gx-bar{grid-column:2;grid-row:1;justify-content:flex-end}
-html.ph.ph-l .gx-dock{grid-column:2;grid-row:2;max-height:none;border-top:0;border-left:3px solid #1d4f8c;padding-bottom:0}
-html.ph.ph-l .gx-dock-body{gap:4px}
-html.ph.ph-l #promptDock{min-height:0;height:34px;overflow:hidden}
-html.ph.ph-l #prompt{font-size:13px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-html.ph.ph-l .gx-bar .gx-sp,html.ph.ph-l #barstat{display:none}
-html.ph.ph-l .gx-drawer{top:0;bottom:0;right:0;left:auto;width:min(420px,100vw);height:auto;max-height:none;border-radius:0}
 html.ph .gx-x{min-width:44px;min-height:44px}
 html.ph .gx-drawer-body{padding:8px 10px}
 html.ph #start{padding:6px}
@@ -402,13 +260,10 @@ html.ph .cfgfoot{position:sticky;bottom:0;background:var(--panel);padding:6px 0 
 html.ph .dgrid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px}
 html.ph .dcard{padding:8px;gap:6px}html.ph .dimg{width:60px;height:60px}
 html.ph.ph-l .setup.scard{width:min(820px,100%)}
-html.ph .op{padding:2px 2px 3px;border-width:2px}
-html.ph-short .jcard{padding:4px 6px 4px 11px;min-height:0;gap:1px}html.ph-short .jcard b{font-size:13.5px;line-height:1.15}html.ph-short .jcard span{font-size:13px;line-height:1.2}html.ph-short #pool{gap:5px 6px}html.ph-short #pile{top:0;bottom:auto;right:2px}html.ph-short #lead{top:3px;bottom:auto;left:6px;max-width:34%;line-height:1.1}html.ph-short .pbtn{min-height:44px;padding:2px 8px}html.ph-short .op .pg{position:absolute;right:3px;top:3px;min-height:0;gap:1px;flex-direction:column;align-items:flex-end}html.ph-short .op .pg .tok{width:17px;height:17px}html.ph-short .op .top{padding-right:0}.spill{display:inline-block;min-width:28px;height:20px;border-radius:10px;border:2px solid #0b1f3a;font-size:13px;font-weight:900;line-height:16px;text-align:center;padding:0 3px}html.ph-short .op .jobs{min-height:calc(var(--jr,1)*29px)}html.ph-short .op .jc{min-height:26px}html.ph-short #felttxt{font-size:13px;top:3px}html.ph-short #mine{min-height:44px;padding-top:0}
-html.ph .op .nm{font-size:13px}
-html.ph.ph-l #opp{padding:3px 3px 0}
 .cfghead,.cfgfoot{display:none}
 html.ph .cfghead,html.ph .cfgfoot{display:flex}
 @media (prefers-reduced-motion:reduce){.tslot.turn,.hc.pk{animation:none}.emo{animation:none;opacity:1}}
+html.ldpx .hc.dim::before{display:none}
 html.ldpx #bd .hc svg.card,html.ldpx #bd .tc svg.card,html.ldpx #bd .dc svg.card{visibility:hidden}
 html.ldpx #bd{background-image:none}
 html.ldpx .hc{transition:none!important}
@@ -447,6 +302,152 @@ html.ph-short #bossbar{padding:1px 6px}html.ph-short #bossbar .bpt svg{width:26p
 .bdef{display:flex;gap:12px;align-items:center;background:linear-gradient(90deg,rgba(80,200,120,.25),rgba(255,216,115,.2));border:2px solid var(--ok);border-radius:14px;padding:8px 10px;margin-bottom:6px;animation:dlgin .4s ease-out}.bdef b{display:block;font-size:19px;color:var(--gold)}.bdef span{font-size:14px}
 .say{display:flex;gap:10px;align-items:center;margin:6px 0}.say p{margin:0;font-size:14.5px;line-height:1.35}
 @media (prefers-reduced-motion:reduce){.dbox,.dbox.curse,#bossbar.hit{animation:none}}
+
+/* ================= THE DEEP-SEA TABLE (board-first: seats around the table, the trick in the middle, your hand along the bottom) ================= */
+.gx-main{display:grid;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important}
+html.ph .gx-app{grid-template-rows:calc(44px + env(safe-area-inset-top,0px)) minmax(0,1fr)}
+html.ph .gx-bar .gx-sp{display:none}
+html.ph.ph-p #barstat>span:first-child{display:none}
+#barprompt{display:block;flex:1;min-width:0}
+#prompt{font-size:15px;line-height:1.15;font-weight:800;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#prompt.mine{color:var(--gold)}#prompt.warn{color:#ffab8c}
+html.ph #prompt{font-size:14px}
+.jc .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+#table{flex:1 1 auto;min-height:120px;position:relative;overflow:hidden}
+#felt{position:absolute;inset:0}
+#opp{position:absolute;inset:0;pointer-events:none}
+#opp>*{pointer-events:auto;position:absolute}
+/* seats */
+.seat{display:flex;flex-direction:column;align-items:stretch;gap:2px;padding:3px 3px 4px;border-radius:14px;background:rgba(6,24,52,.6);border:2px solid rgba(160,205,255,.22);color:inherit;font:inherit;text-align:left;cursor:pointer;min-width:0;min-height:44px}
+.seat.act{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,216,115,.4),0 0 16px rgba(255,216,115,.55)}
+.seat.glow,.me.glow{border-color:var(--gold);animation:seatglow 1.3s ease-in-out infinite}
+.seat.pend{border-color:rgba(255,216,115,.7);border-style:dashed}.seat.rdy,.me.rdy{border-color:var(--ok)}.me.pend{border-style:dashed;border-color:rgba(255,216,115,.7)}
+.seat .top{display:flex;align-items:center;gap:5px;min-width:0}
+.seat .top .nm{flex:1;min-width:0}
+.seat .av .pk{position:absolute;left:-6px;bottom:-5px;width:18px;height:18px;display:block}.seat .av .pk svg{width:100%;height:100%}
+.seat .av,.me .av{position:relative;flex:0 0 auto;width:var(--av,36px);height:var(--av,36px)}
+.seat .av svg,.me .av svg{width:100%;height:100%}
+.seat .av .cm,.me .av .cm{position:absolute;right:-6px;bottom:-5px;width:17px;height:17px}.seat .av .cm svg,.me .av .cm svg{width:100%;height:100%}
+.seat .who,.me .who{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;line-height:1.05}
+.seat .nm,.me .nm{font-size:11.5px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bdgs{display:flex;gap:4px;flex-wrap:nowrap;justify-content:center}
+.bdg{display:inline-flex;align-items:center;gap:2px;background:rgba(0,0,0,.38);border-radius:9px;padding:0 5px 0 4px;flex:0 1 auto;font-size:12px;font-weight:900;height:17px;line-height:17px;color:var(--ink)}
+.bdg svg{width:10px;height:12px;fill:none;stroke:#cfe6ff;stroke-width:1.6;flex:0 0 auto}.bdg.t svg{fill:#ffd873;stroke:#8a5a05;width:12px;height:12px}
+.seat .pg{display:flex;align-items:center;gap:3px;min-height:20px}.seat .pg .tok{width:20px;height:20px}
+.spill{display:inline-block;min-width:24px;height:20px;line-height:20px;border-radius:10px;padding:0 6px;font-size:12px;font-weight:900;text-align:center;border:2px solid #0b1f3a}
+.seat .jobs{display:flex;flex-direction:column;gap:2px;min-height:0}
+.seat .jc{min-height:21px;font-size:11.5px;padding:0 4px 0 3px;gap:3px;cursor:inherit}
+.seat .jc .sm{width:13px;height:13px}.seat .jc .sm svg{width:8px;height:8px}
+.seat .jc.more{justify-content:center}
+.seat.drone{background:rgba(6,24,52,.45);padding:3px 4px 4px}
+.dhead{display:flex;align-items:center;gap:6px}
+.dseat{appearance:none;background:transparent;border:0;padding:0;margin:0;color:inherit;font:inherit;cursor:pointer;flex:0 0 auto;text-align:left}
+.seat .jobs.dj{flex:1;min-width:0;flex-direction:row;flex-wrap:wrap}.seat .jobs.dj .jc{width:auto;max-width:100%}
+.drow{display:flex;gap:4px;justify-content:center;padding:3px 2px 0;flex-wrap:nowrap}
+.dstack{position:relative;flex:0 0 auto;width:var(--dw);height:calc(var(--dw)*1.4 + 10px)}
+.dstack .dbk{position:absolute;left:0;bottom:0;width:100%;height:calc(100% - 9px);border-radius:6px;background:#1a3f77;border:2px solid #0b1f3a;opacity:.9}.dstack .dbk.none{opacity:0}
+.dstack .dc{position:absolute;left:0;top:0;width:100%;height:calc(var(--dw)*1.4);border:0;background:transparent;padding:0;cursor:default;border-radius:6px;touch-action:none}
+.dstack .dc.can{cursor:pointer}.dstack .dc.dim{opacity:.5}.dstack .dc.sel{transform:translateY(-6px)}
+.dc.glow::after{content:'';position:absolute;inset:-2px;border-radius:7px;border:3px solid var(--gold);box-shadow:0 0 12px rgba(255,216,115,.85);pointer-events:none;animation:glowp 1.3s ease-in-out infinite}
+/* job tokens: the stamp lands on the token when the job is done or lost */
+.jc{position:relative}
+.stamp{position:absolute;right:-5px;top:-9px;width:24px;height:24px;border-radius:50%;border:3px solid;background:#fff;display:flex;align-items:center;justify-content:center;transform:rotate(-14deg);box-shadow:0 2px 5px rgba(0,0,0,.5);pointer-events:none;z-index:2}
+.stamp svg{width:14px;height:14px;stroke:currentColor;stroke-width:4;fill:none}
+.stamp.ok{border-color:var(--ok);color:#16824a}.stamp.bad{border-color:var(--bad);color:#c23a20}
+.stamp.new{animation:stampin .55s cubic-bezier(.2,1.5,.4,1)}
+@keyframes stampin{0%{transform:scale(3.2) rotate(-50deg);opacity:0}60%{opacity:1}100%{transform:scale(1) rotate(-14deg)}}
+/* the trick */
+.tslot{position:absolute;transform:translate(-50%,-50%);border-radius:9px;border:2px dashed rgba(160,205,255,.28);display:flex;align-items:center;justify-content:center}
+.tslot.turn{border-color:var(--gold);box-shadow:0 0 14px 2px rgba(255,216,115,.5);animation:glowp 1.4s ease-in-out infinite}
+.tslot .tc{position:absolute;inset:0;border:0;padding:0;background:transparent;margin:0;cursor:default}
+.tslot .tc svg.card{width:100%;height:100%}
+.tslot.winner{box-shadow:0 0 18px 5px rgba(255,216,115,.85)}
+.wtag{position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);white-space:nowrap;background:var(--gold);color:#2a1d04;font-weight:900;font-size:13px;padding:1px 9px;border-radius:12px;border:2px solid #0b1f3a;animation:popin .3s cubic-bezier(.2,1.5,.4,1);z-index:4;pointer-events:none}
+.wtag i{font-style:normal;margin-left:4px}
+@keyframes popin{from{transform:translateX(-50%) scale(.3);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
+#lead{position:absolute;transform:translate(-50%,-50%);display:none;flex-direction:column;align-items:center;gap:1px;font-size:12px;font-weight:800;color:var(--ink2);pointer-events:none;text-shadow:0 1px 2px #000}
+#lead.on{display:flex}
+#cenmark{position:absolute;transform:translate(-50%,-50%);pointer-events:none;opacity:.9;animation:glowp 1.8s ease-in-out infinite}#cenmark svg{display:block}
+.fl{z-index:30;pointer-events:none;font-weight:900;font-size:28px;color:#fff3b0;text-shadow:0 2px 0 #0b1f3a,0 0 14px #ffb400;animation:rise 1.3s ease-out forwards}
+#bd>.fl:not(#pxc){position:absolute}
+@keyframes rise{0%{opacity:0;transform:translate(-50%,-30%) scale(.5)}20%{opacity:1;transform:translate(-50%,-70%) scale(1.25)}100%{opacity:0;transform:translate(-50%,-190%) scale(1)}}
+/* the job cards on the table while they are handed out */
+#pool{position:absolute;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-content:center;align-content:safe center;overflow-y:auto;overscroll-behavior:contain;padding:2px}
+.jcard{appearance:none;position:relative;min-height:62px;border-radius:12px;background:#fbf3dd;color:#27261f;border:3px solid #0b1f3a;padding:6px 8px 6px 14px;text-align:left;cursor:pointer;font:inherit;display:flex;flex-direction:column;justify-content:center;gap:5px;box-shadow:0 4px 10px rgba(0,0,0,.45)}
+.jcard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:7px;border-radius:8px 0 0 8px;background:var(--gold2)}
+.jcard{min-width:0;overflow:hidden}
+.jcard b{font-size:14px;line-height:1.15;font-weight:900;overflow-wrap:anywhere}
+.jcard .dd{display:flex;gap:3px;align-items:center}.jcard .dd i{width:9px;height:9px;border-radius:50%;background:var(--gold2);border:1.5px solid #0b1f3a}
+.jcard.glow{box-shadow:0 0 0 4px var(--gold),0 0 20px rgba(255,216,115,.8);animation:jgl 1.3s ease-in-out infinite}
+@keyframes jgl{50%{transform:scale(1.045)}}
+.jfly{animation:none!important}
+.jcard.no{opacity:.5;cursor:default}.jcard.off{opacity:.9;cursor:default}
+.jcard .nocap{position:absolute;right:4px;top:4px;width:20px;height:20px;color:#a33}.jcard .nocap svg{width:100%;height:100%;stroke:currentColor;fill:none}
+/* buttons and bulbs on the table */
+#acts{position:absolute;left:58px;right:58px;bottom:6px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;z-index:6;pointer-events:none}
+#acts.wide{left:8px;right:8px}
+#acts .btn{pointer-events:auto;min-height:48px;padding:4px 14px;font-size:16px;box-shadow:0 4px 12px rgba(0,0,0,.55)}
+#acts.many .btn{min-width:48px;padding:4px 10px}
+.hintb{position:absolute;left:8px;bottom:6px;width:46px;height:46px;border-radius:50%;border:2px solid #0b1f3a;background:linear-gradient(180deg,#ffe28a,#e0a31c);color:#2a1d04;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:6;padding:0;box-shadow:0 4px 10px rgba(0,0,0,.5)}
+.hintb svg{width:26px;height:26px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#pile{position:absolute;right:8px;bottom:6px;z-index:6;display:flex}
+.pbtn{appearance:none;border:2px solid var(--line);background:rgba(7,28,58,.78);color:var(--ink);border-radius:23px;min-height:46px;min-width:46px;padding:2px 10px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:5px}
+.pbtn.pool{cursor:default}
+.pbtn svg{width:20px;height:20px}
+#table.drop{box-shadow:inset 0 0 0 3px rgba(255,216,115,.65),inset 0 0 30px rgba(255,216,115,.35)}
+/* my seat, along the bottom */
+#mine{flex:0 0 auto;display:flex;align-items:center;gap:6px;padding:3px 6px 0;min-height:48px}
+#mine .me{flex:0 0 auto;display:flex;align-items:center;gap:6px;cursor:pointer;background:rgba(6,24,52,.6);border:2px solid rgba(160,205,255,.25);border-radius:14px;padding:2px 8px 2px 4px;min-height:46px;min-width:46px;color:inherit;font:inherit}
+#mine .me.act{border-color:var(--gold);box-shadow:0 0 0 2px rgba(255,216,115,.4),0 0 14px rgba(255,216,115,.5)}
+#mine .me .av{width:36px;height:36px}
+#mine .tok{width:30px;height:30px;flex:0 0 auto}
+#mine .mjobs{flex:1;min-width:0;display:flex;gap:6px;overflow-x:auto;overflow-y:visible;scrollbar-width:none;align-items:center;padding:13px 10px 3px 2px}
+#mine .mjobs::-webkit-scrollbar{display:none}
+#mine .mjobs .jc{flex:0 1 auto;width:auto;max-width:78%;min-width:0;min-height:34px;padding:0 8px 0 5px;white-space:normal;line-height:1.1;font-size:12.5px}
+#mine .mjobs .jc .t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal}
+#mine .dnl{width:16px;height:16px;flex:0 0 auto;display:inline-block}
+html.ph #mine .mjobs .jc{min-height:40px}
+/* the hand */
+#handz{touch-action:none}
+.hc{touch-action:none;-webkit-user-select:none;user-select:none}
+.hc.dim::before{content:'';position:absolute;inset:0;border-radius:8px;background:rgba(2,10,28,.5);z-index:2;pointer-events:none}
+.hc.glow::after{content:'';position:absolute;inset:-1px;border-radius:9px;border:3px solid rgba(255,216,115,.95);box-shadow:0 0 12px rgba(255,216,115,.85);pointer-events:none;animation:glowp 1.3s ease-in-out infinite}
+.hc.drag{transition:none!important;z-index:100!important}
+.pspot{position:absolute;left:3px;top:-25px;width:clamp(22px,calc(var(--hw)*.5),30px);height:clamp(22px,calc(var(--hw)*.5),30px);z-index:5;cursor:pointer;filter:drop-shadow(0 0 5px rgba(60,220,140,.95));animation:glowp 1.2s ease-in-out infinite}
+.pspot svg{width:100%;height:100%;pointer-events:none}
+.hc.r2 .pspot{top:auto;bottom:2px;left:2px}
+@keyframes glowp{50%{filter:brightness(1.25) drop-shadow(0 0 7px rgba(255,216,115,.9))}}
+@keyframes seatglow{50%{box-shadow:0 0 0 3px rgba(255,216,115,.6),0 0 18px rgba(255,216,115,.75)}}
+/* ghost finger */
+#finger{position:fixed;left:0;top:0;z-index:60;pointer-events:none;width:34px;height:46px;margin:-5px 0 0 -13px;opacity:0}
+#finger svg{width:100%;height:100%;filter:drop-shadow(0 3px 4px rgba(0,0,0,.55))}
+#finger .fring{position:absolute;left:-3px;top:-12px;width:28px;height:28px;border-radius:50%;border:3px solid rgba(255,255,255,.9);opacity:0}
+#finger.tap.go{animation:fgtap 1.8s ease-in-out infinite}
+#finger.tap.go .fring{animation:fgring 1.8s ease-out infinite}
+#finger.drag.go{animation:fgdrag 2.2s ease-in-out infinite}
+@keyframes fgtap{0%{opacity:0;transform:translate(0,14px)}15%{opacity:1;transform:translate(0,14px)}35%{transform:translate(0,0) scale(.92)}50%{transform:translate(0,0) scale(1)}85%{opacity:1}100%{opacity:0;transform:translate(0,0)}}
+@keyframes fgring{0%,33%{opacity:0;transform:scale(.4)}40%{opacity:.9}80%{opacity:0;transform:scale(1.6)}100%{opacity:0}}
+@keyframes fgdrag{0%{opacity:0;transform:translate(0,10px)}12%{opacity:1;transform:translate(0,0)}22%{transform:translate(0,0) scale(.92)}68%{opacity:1;transform:translate(0,calc(var(--dist,100px)*-1)) scale(.92)}84%{opacity:0;transform:translate(0,calc(var(--dist,100px)*-1)) scale(1)}100%{opacity:0}}
+/* sheets (details the player asks for) */
+.ppop,.pcard{position:fixed;left:8px;right:8px;margin:0 auto;max-width:400px;top:calc(52px + env(safe-area-inset-top,0px));bottom:auto;height:auto;max-height:min(46dvh,340px);z-index:50;border-radius:14px;background:var(--panel);display:flex;flex-direction:column;box-shadow:0 8px 28px rgba(0,0,0,.6);border:2px solid #1d4f8c;overflow:hidden}
+.ppop{pointer-events:none}.ppop .px{pointer-events:auto}
+.ppop .ph-body{max-height:none;flex:1 1 auto;min-height:0;overflow:auto}
+html.ph.ph-l .ppop{left:auto;right:8px;margin:0;width:min(340px,46vw);top:calc(48px + env(safe-area-inset-top,0px))}
+html.ph.ph-l .gx-drawer{top:0;bottom:0;right:0;left:auto;width:min(420px,100vw);height:auto;max-height:none;border-radius:0}
+/* wide tables (landscape phones, desktops): seats in columns at the sides, my seat bottom left next to the hand */
+#bd.side #mine{position:absolute;left:6px;bottom:4px;width:200px;flex-wrap:wrap;gap:3px;z-index:7;pointer-events:none;padding:0}
+#bd.side #mine>*{pointer-events:auto}
+#bd.side #mine .mjobs{flex:1 1 100%;flex-wrap:wrap;padding:0}
+#bd.side #mine .mjobs .jc{max-width:100%}
+#bd.side #handz{padding-left:206px}
+#bd.side .seat .pg{position:absolute;right:3px;top:3px;min-height:0}
+#bd.side #acts .btn{min-height:44px}
+#bd.side #acts{bottom:4px}
+#bd.side .hintb,#bd.side #pile{bottom:4px}
+#bd.side .hintb{left:auto;right:64px}
+#bd.side #pile{right:6px}
+html.ph-short .seat .pg{min-height:18px}
+@media (prefers-reduced-motion:reduce){.seat.glow,.jcard.glow,.hc.glow::after,.pspot,.tslot.turn,#finger{animation:none!important}#finger{opacity:1}}
 </style><style>
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -595,7 +596,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
   <h1><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="#0e2146" stroke="#ffd873" stroke-width="1.4"/><circle cx="13" cy="9" r="4.4" fill="#ffe9a6" stroke="#0b1f3a" stroke-width="1"/><path d="M13 13.4C13 16 10 16 8 19" fill="none" stroke="#ffd873" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="tt">Lantern Dive</span></h1>
   <span id="barstat"></span>
   <button id="netst" type="button" data-a="netopen" hidden></button>
-  <div id="barprompt"></div>
+  <div id="barprompt"><div id="prompt" aria-live="polite"></div></div>
   <span class="gx-sp"></span>
   <button class="gx-ibtn" data-gx="jobd" aria-expanded="false" aria-label="All jobs" title="All jobs"><svg viewBox="0 0 24 24"><path d="M6 3H17A2 2 0 0 1 19 5V19A2 2 0 0 1 17 21H6ZM6 3V21M10 8H16M10 12H16M10 16H14"/></svg><span>Jobs</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-expanded="false" aria-label="Log" title="Log"><svg viewBox="0 0 24 24"><path d="M4 5C7 4 10 4 12 6C14 4 17 4 20 5V19C17 18 14 18 12 20C10 18 7 18 4 19ZM12 6V20"/></svg><span>Log</span></button>
@@ -604,31 +605,22 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
 </header>
 <div class="gx-main">
   <main class="gx-board" id="board" aria-label="The dive table"><div id="bd">
-    <div id="opp"></div>
-    <div id="felt"><div id="felttxt"></div><div id="roster"></div><div id="pool"></div><div id="slots"></div><div id="lead"></div><div id="pile"></div></div>
+    <div id="table" data-board>
+      <div id="felt"><div id="pool"></div><div id="slots"></div><div id="lead"></div><div id="cenmark" hidden></div></div>
+      <div id="opp"></div>
+      <button id="hintb" class="hintb" type="button" data-a="hint" aria-label="Hint" hidden><svg viewBox="0 0 24 24"><path d="M9 18H15M10 21H14M12 3A6 6 0 0 0 8 14C9 15 9 16 9 18H15C15 16 15 15 16 14A6 6 0 0 0 12 3Z"/></svg></button>
+      <div id="pile"></div>
+      <div id="acts"></div>
+    </div>
     <div id="mine"></div>
     <div id="handz"><div id="hand" role="group" aria-label="Your cards"></div></div>
   </div></main>
-  <aside class="gx-dock" id="dock" aria-label="What to do now">
-    <div class="gx-dock-head"><span class="gx-dt">Your turn</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">&#8677;</button></div>
-    <div class="gx-dock-body" id="dockbody">
-      <div id="dockscroll">
-        <div id="tip"></div>
-        <div id="promptDock"><div id="prompt" aria-live="polite"></div></div>
-        <div id="psub" hidden></div>
-        <div id="news" aria-live="polite"></div>
-        <div id="info"></div>
-        <div id="jobsum"></div>
-        <div id="dockpile"></div>
-      </div>
-      <div id="acts"></div>
-    </div>
-    <div class="ppop" id="ppop" hidden role="dialog" aria-label="Details"></div>
-    <div class="pcard" id="pc" hidden role="dialog" aria-label="Message"></div>
-  </aside>
-  <button class="gx-ibtn gx-reopen" data-gx="dock">&#9776; Panel</button>
+  <div class="ppop" id="ppop" hidden role="dialog" aria-label="Details"></div>
+  <div class="pcard" id="pc" hidden role="dialog" aria-label="Message"></div>
+  <div id="stash" hidden><div id="tip"></div><div id="promptDock"></div><div id="psub"></div><div id="news"></div><div id="info"></div><div id="jobsum"></div><div id="dockpile"></div><div id="roster"></div></div>
 </div>
 </div>
+<div id="finger" hidden aria-hidden="true"><svg viewBox="0 0 48 64"><path d="M20 4C20 1.8 22 .5 24 .5S28 1.8 28 4V30L35 28C38 27.4 40 29.4 40 32L41 46C41 55 36 62 26 62H22C14 62 8 56 6 49L2 37C1 34 4 32 6.500 34L14 40V4Z" fill="#fff" stroke="#0b1f3a" stroke-width="2.600" stroke-linejoin="round"/></svg><i class="fring"></i></div>
 <div id="start" hidden></div>
 <div id="dlg" hidden></div>
 <div id="rs" hidden></div>
@@ -5995,7 +5987,7 @@ const GA_DATA={sfx:{
 var ANIM = 1, AIDELAY = 650;
 var G = null;
 var UI = { started: false, mode: 'vs', cfg: null, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, seq: 0, over: null, overShown: false,
-  coach: { level: 'full', seen: {}, keep: false }, prefs: { sound: true, music: true, gfx: 'auto', guide: 'full', timer: false, speed: 650 }, enter: '', tm: null, rq: [], chefs: null, hint: null, why: '', predN: -1, evN: 0, timerAt: 0 };
+  coach: { level: 'full', seen: {}, keep: false }, prefs: { sound: true, music: true, gfx: 'auto', guide: 'full', timer: false, speed: 650 }, enter: '', tm: null, rq: [], chefs: null, hint: null, why: '', predN: -1, evN: 0, timerAt: 0, fingerOn: false, holdJobs: null, stampSeen: {}, geo: null };
 const D = LD.DATA, TASKS = D.tasks, KIT = LDKit;
 const suitOf = D.suitOf, valOf = D.valOf;
 // painted art: LD_ART (data URIs made by build.py) -> blob URLs so the card <svg>s carry short links. Without blob URLs (jsdom) the kit keeps its own vector drawings.
@@ -6053,9 +6045,9 @@ const jobDef = i => TASKS[G.tasks[i].id];
 const jobShort = i => TASKS[G.tasks[i].id].s;
 const jobText = i => TASKS[G.tasks[i].id].t;
 const jobDiff = i => TASKS[G.tasks[i].id].d[G.np - 3];
-function jobSt(i) { if (!G) return 0; if (G.phase === 'over' && G.result) return G.result.tasks[i]; return LD.jobStatus(G, i); }
+function jobSt(i) { if (!G) return 0; if (UI.holdJobs && UI.holdJobs.has(i)) return 0; if (G.phase === 'over' && G.result) return G.result.tasks[i]; return LD.jobStatus(G, i); }
 // tricks won per seat (public)
-function tricksWon() { const a = new Array(G.np).fill(0); for (const k of G.tricks) a[k.w]++; return a; }
+function tricksWon() { const a = new Array(G.np).fill(0); for (const k of G.tricks) a[k.w]++; if (UI.fz && UI.fz.winner != null && a[UI.fz.winner] > 0) a[UI.fz.winner]--; return a; }
 // the cards a seat has shown with the ping and not yet played
 function shownBy(s) { return G.pings.filter(p => p.seat === s && !G.pl[p.c]); }
 function seatsClockwise(from) { const o = []; for (let k = 1; k < G.np; k++) o.push((from + k) % G.np); return o; }
@@ -6093,7 +6085,78 @@ const Prog = {
   },
   reset() { this.d = null; try { localStorage.removeItem('ld_prog'); } catch (e) { } this.load(); }
 };
-// ===================== part 2: render (bar, other divers, felt, my seat, hand, dock) =====================
+// ===================== part 10: the ghost finger (first move, and every move of the training dive) and dragging a card onto the table =====================
+let _fing = '';
+function fingerDone() {
+  if (UI.fingerOn) { UI.fingerOn = false; try { lsSet('ld_finger', String((+lsGet('ld_finger') || 0) + 1)); } catch (e) { } }
+  const f = $('#finger'); if (f) { f.hidden = true; _fing = ''; }
+}
+function fingerTarget() {
+  if (!G || !UI.started || UI.busy || UI.fz || UI.dlg || UI.cards.length || UI.pop || G.phase === 'over' || viewSeat() < 0 || !iMustAct()) return null;
+  const train = UI.mode === 'guided'; if (!train && !UI.fingerOn) return null;
+  const v = viewSeat(), ph = G.phase;
+  if (ph === 'assign') {
+    if (!myMoves().some(m => m.t === 'take')) return null;
+    let m = null; try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { }
+    const sel = m && m.t === 'take' ? '#pool [data-key="job' + m.i + '"]' : '#pool .jcard.glow';
+    return { sel, kind: 'tap' };
+  }
+  if (!train) { if (ph !== 'play') return null; }
+  if (ph === 'distress') return { sel: '#acts [data-a=dist][data-on=false]', kind: 'tap' };
+  if (ph === 'signal') return { sel: '#acts [data-a=nosig]', kind: 'tap' };
+  if (ph === 'play') {
+    const T = G.trick, turn = T.turn; if (ctlSeat(turn) !== v) return null;
+    if (G.players[turn].helper) return { sel: '#opp .dc.can', kind: 'tap' };
+    let c = tutOnly();
+    if (c < 0) { let m = null; try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { } if (m && m.t === 'play') c = m.c; }
+    if (c >= 0) return { sel: '#hand .hc[data-id="' + c + '"]', kind: 'drag' };
+  }
+  return null;
+}
+function placeFinger() {
+  const f = $('#finger'); if (!f) return;
+  const t = fingerTarget(); if (!t) { f.hidden = true; _fing = ''; return; }
+  const el = document.querySelector(t.sel); if (!el) { f.hidden = true; return; }
+  const r = el.getBoundingClientRect(); if (r.width < 4) { f.hidden = true; return; }
+  const dist = t.kind === 'drag' ? Math.max(60, Math.min(170, r.top - ($('#table').getBoundingClientRect().top + 90))) : 0;
+  f.hidden = false; f.className = t.kind === 'drag' ? 'drag' : 'tap';
+  f.style.left = Math.round(r.left + r.width / 2) + 'px'; f.style.top = Math.round(r.top + r.height * (t.kind === 'drag' ? .45 : .5)) + 'px'; f.style.setProperty('--dist', Math.round(dist) + 'px');
+  const k = t.sel + '|' + Math.round(r.left) + '|' + Math.round(r.top); if (k !== _fing) { _fing = k; f.classList.remove('go'); void f.offsetWidth; }
+  f.classList.add('go');
+}
+// a detail callout (seat, job, last trick) never blocks the table: any touch elsewhere closes it and goes through
+document.addEventListener('pointerdown', e => { if (UI.pop && e.target.closest && !e.target.closest('#ppop')) closePop(); }, true);
+// ---- drag a card from the hand onto the table to play it ----
+(function () {
+  let Dg = null;
+  const overTable = e => { const hz = $('#handz'), t = $('#table'); if (!hz || !t) return false; const tr = t.getBoundingClientRect(); return e.clientY < hz.getBoundingClientRect().top + 6 && e.clientY > tr.top - 10; };
+  document.addEventListener('pointerdown', e => {
+    if (e.button > 0 || !e.target.closest) return;
+    const el = e.target.closest('#hand .hc, #opp .dc.can'); if (!el || e.target.closest('.pspot') || el.classList.contains('dim')) return;
+    if (!G || !canAct() || G.phase !== 'play') return;
+    Dg = { el, id: +el.dataset.id, drone: el.classList.contains('dc'), x0: e.clientX, y0: e.clientY, moved: false };
+  }, true);
+  document.addEventListener('pointermove', e => {
+    if (!Dg) return; const dx = e.clientX - Dg.x0, dy = e.clientY - Dg.y0;
+    if (!Dg.moved && Math.hypot(dx, dy) < 12) return;
+    if (!Dg.moved) { Dg.moved = true; Dg.el.classList.add('drag'); const f = $('#finger'); if (f) f.hidden = true; }
+    Dg.el.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(1.1)'; Dg.el.style.zIndex = '100';
+    const t = $('#table'); if (t) t.classList.toggle('drop', overTable(e));
+    try { pxDirty(); } catch (er) { }
+  }, true);
+  const end = e => {
+    if (!Dg) return; const d = Dg; Dg = null; const t = $('#table'); if (t) t.classList.remove('drop');
+    if (!d.moved) return;
+    UI.noClickUntil = Date.now() + 120;
+    d.el.classList.remove('drag'); d.el.style.transform = ''; d.el.style.zIndex = '';
+    if (e.type === 'pointerup' && overTable(e)) { if (d.drone) tapDrone(d.id); else tapHand(d.id); } else { render(); }
+  };
+  document.addEventListener('pointerup', end, true); document.addEventListener('pointercancel', end, true);
+  window.addEventListener('click', e => { if (UI.noClickUntil && Date.now() < UI.noClickUntil) { e.stopPropagation(); e.preventDefault(); } }, true);
+})();
+// ===================== part 2: the deep-sea table (seats, trick, job pool, hand, action tray) =====================
+// Play happens on the table: divers sit around it with their job tokens, the trick lies in the middle, your hand is along the bottom.
+// There is no text panel: one short status line (8 words or fewer) in the top bar, glows on what can be tapped, badges on the seats.
 const isPh = () => document.documentElement.classList.contains('ph');
 function actorSeat() {
   if (!G || G.phase === 'over') return -1;
@@ -6106,19 +6169,16 @@ function actorSeat() {
   }
   return -1;
 }
-// ---- sizes: hand card width, trick card width, drone card width, portrait size (CSS variables) ----
+// ---- sizes: hand card width (CSS variable); the table's own geometry comes from tableGeo() once the hand has its height ----
 function layoutVars() {
-  const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), land = ph && GXV.now().w > GXV.now().h;
-  let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(60, Math.round(H * .092)))) : Math.max(60, Math.min(104, Math.round(H * .125)));
-  const np = G ? G.np : 4, opp = np - 1;
-  let cw = ph ? Math.max(40, Math.min(56, Math.round(hw * .95))) : Math.max(60, Math.min(124, Math.round(Math.min(H * .165, W * .1))));
-  const dw = ph ? Math.max(40, Math.min(46, Math.floor((W - 16) / 7) - 4)) : Math.max(46, Math.min(60, Math.floor((W - 40) / 7) - 6));
-  const short = ph && !land && GXV.now().h < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
-  const av = ph ? (land || short ? 30 : 34) : 44;
-  const r = document.documentElement.style; r.setProperty('--hw', hw + 'px'); r.setProperty('--cw', cw + 'px'); r.setProperty('--dw', dw + 'px'); r.setProperty('--av', av + 'px');
-  if (KIT.ART.table && !document.documentElement.style.getPropertyValue('--tableimg')) r.setProperty('--tableimg', 'url("' + KIT.ART.table + '")');
+  const bd = $('#bd'); if (!bd) return; const W = bd.clientWidth || 360, H = bd.clientHeight || 600, ph = isPh(), vw = GXV.now(), land = ph && vw.w > vw.h;
+  let hw = ph ? (land ? Math.max(44, Math.min(48, Math.round(H * .13))) : Math.max(48, Math.min(62, Math.round(H * .092)))) : Math.max(60, Math.min(104, Math.round(H * .125)));
+  const short = ph && !land && vw.h < 640; document.documentElement.classList.toggle('ph-short', short); if (short) hw = 44;
+  bd.classList.toggle('side', W > H * 1.45);
+  document.documentElement.style.setProperty('--hw', hw + 'px');
+  if (KIT.ART.table && !document.documentElement.style.getPropertyValue('--tableimg')) document.documentElement.style.setProperty('--tableimg', 'url("' + KIT.ART.table + '")');
 }
-// ---- the bar ----
+// ---- the bar: dive name, flare, clock; the status line sits next to it ----
 function renderBar() {
   const bs = $('#barstat'); if (!bs) return; bs.innerHTML = '';
   if (G && UI.started) {
@@ -6126,31 +6186,28 @@ function renderBar() {
     if (G.distress) bs.append(h('span', { html: KIT.flareSVG({ size: 20, on: true }), title: 'Distress flare is lit' }));
     if (G.clock) { const t = h('span.tm' + (UI.clockLeft != null && UI.clockLeft < 20 ? '.low' : ''), clockText()); t.id = 'clk'; bs.append(t); }
   }
-  placePrompt(); placePile();
+  placePrompt();
 }
 function clockText() { const s = Math.max(0, Math.round(UI.clockLeft != null ? UI.clockLeft : (G ? G.clock : 0))); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
-function placePrompt() {
-  const bp = $('#barprompt'), pr = $('#prompt'); if (!bp || !pr) return;
-  if (document.documentElement.classList.contains('ph-p')) { if (pr.parentNode !== bp) bp.appendChild(pr); } else { const pd = $('#promptDock'); if (pd && pr.parentNode !== pd) pd.appendChild(pr); }
-}
-// Last trick / Won buttons and the "Follow ..." line live in the felt's bottom strip; on a landscape phone they move into the dock so they can never cover a card
-function placePile() {
-  const pile = $('#pile'), lead = $('#lead'), felt = $('#felt'), dp = $('#dockpile'); if (!pile || !lead || !felt || !dp) return;
-  const into = document.documentElement.classList.contains('ph-l') ? dp : felt;
-  if (pile.parentNode !== into) { into.appendChild(lead); into.appendChild(pile); }
-}
-// ---- job chips ----
+function placePrompt() { const bp = $('#barprompt'), pr = $('#prompt'); if (bp && pr && pr.parentNode !== bp) bp.appendChild(pr); }
+// ---- job tokens ----
+const TICK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5L9.5 18L20 6"/></svg>', CROSS_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>';
 function jobChip(i, o) {
   o = o || {}; const st = jobSt(i), d = jobDef(i);
-  // chips on another diver's panel are plain text (the panel itself is the tap target and opens that diver's jobs); only your own chips are buttons
+  // chips on another diver's seat are plain tokens (the seat is the tap target); only your own chips are buttons
   const cls = '.jc' + (st > 0 ? '.ok' : st < 0 ? '.bad' : '') + (o.me ? '.me' : '') + (o.opp ? '.opp' : '');
-  const b = o.opp ? h('span' + cls, { 'aria-label': jobShort(i) + (st > 0 ? ', done' : st < 0 ? ', failed' : ', open') }) : h('button' + cls, { type: 'button', 'data-a': 'job', 'data-i': i, 'aria-label': jobShort(i) + (st > 0 ? ', done' : st < 0 ? ', failed' : ', open') });
-  const sm = h('span.sm'); if (st > 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5L9.5 18L20 6"/></svg>'; else if (st < 0) sm.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-linecap="round"><path d="M6 6L18 18M18 6L6 18"/></svg>'; else sm.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="none"/></svg>';
+  const lab = { 'aria-label': jobShort(i) + (st > 0 ? ', done' : st < 0 ? ', failed' : ', open'), 'data-job': i };
+  const b = o.opp ? h('span' + cls, lab) : h('button' + cls, Object.assign({ type: 'button', 'data-a': 'job', 'data-i': i }, lab));
+  const sm = h('span.sm'); if (st > 0) sm.innerHTML = TICK_SVG; else if (st < 0) sm.innerHTML = CROSS_SVG; else sm.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4" fill="#fff" stroke="none"/></svg>';
   b.append(sm, h('span.t', d.s));
   if (o.me) { const df = h('span.df'); for (let k = 0; k < jobDiff(i); k++) df.append(h('i')); b.append(df); }
+  if (st !== 0) {   // a stamp lands on the token the first time it shows
+    UI.stampSeen = UI.stampSeen || {}; const k = G.seed + ':' + G.att + ':' + i + ':' + st, nw = !UI.stampSeen[k]; UI.stampSeen[k] = 1;
+    b.append(h('span.stamp' + (st > 0 ? '.ok' : '.bad') + (nw ? '.new' : ''), { html: st > 0 ? TICK_SVG : CROSS_SVG, 'aria-hidden': 'true' }));
+  }
   return b;
 }
-// ---- the other divers (and the drone) ----
+// ---- the divers (and the drone) ----
 function pingTok(s, size) {
   const p = G.players[s]; if (p.helper) return null;
   if (G.comm === 'none') return h('span.tok', { html: KIT.pingSVG({ size, spent: true }), title: 'No signalling in this dive' });
@@ -6159,38 +6216,41 @@ function pingTok(s, size) {
 }
 function shownEl(s) {
   const sh = shownBy(s); if (!sh.length) return null;
-  if (document.documentElement.classList.contains('ph-short')) {   // small phones: a colour pill ("3 low") instead of a mini card
-    const w = h('span.shownw', { style: 'display:flex;gap:3px' });
-    sh.slice(0, 2).forEach(p => w.append(h('span.spill', { style: 'background:' + D.suits[suitOf(p.c)].c + ';color:' + (suitOf(p.c) === 3 || suitOf(p.c) === 4 ? '#1b1405' : '#fff'), title: cname(p.c) }, String(valOf(p.c)) + (p.k === 'high' ? '\u25B2' : p.k === 'low' ? '\u25BD' : p.k === 'only' ? '\u25CF' : ''))));
-    return w;
-  }
-  const wrap = h('span.shownw', { style: 'display:flex;gap:3px' });
-  sh.slice(0, 3).forEach(p => { const e = h('span.shown', { title: cname(p.c) + (p.k === 'high' ? ' (their highest)' : p.k === 'low' ? ' (their lowest)' : p.k === 'only' ? ' (their only one)' : '') }); e.append(cardN(p.c, 30)); if (p.k) e.append(h('span.mk', { html: KIT.pingSVG({ size: 19, k: p.k }) })); wrap.append(e); });
-  return wrap;
+  const w = h('span.shownw', { style: 'display:flex;gap:3px' });
+  sh.slice(0, 2).forEach(p => w.append(h('span.spill', { style: 'background:' + D.suits[suitOf(p.c)].c + ';color:' + (suitOf(p.c) === 3 || suitOf(p.c) === 4 ? '#1b1405' : '#fff'), title: cname(p.c) + (p.k === 'high' ? ' (their highest)' : p.k === 'low' ? ' (their lowest)' : p.k === 'only' ? ' (their only one)' : '') }, String(valOf(p.c)) + (p.k === 'high' ? '\u25B2' : p.k === 'low' ? '\u25BD' : p.k === 'only' ? '\u25CF' : ''))));
+  return w;
 }
-function oppEl(s, act) {
-  const p = G.players[s], won = tricksWon()[s], cm = s === G.cap;
-  if (p.helper) return droneEl(s, act);
-  const b = h('button.op' + (act === s ? '.act' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'data-key': 'seat' + s, 'aria-label': p.name + (cm ? ', Commander' : '') + ', ' + p.hand.length + ' cards' });
-  const av = h('span.av', { html: avatarS(s, 80) }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 19 }), title: 'Commander' }));
-  const top = h('span.top', av, h('span.who', h('span.nm', p.name), h('span.cnt', h('span', h('b', p.hand.length), p.hand.length === 1 ? ' card' : ' cards'), h('span', h('b', won), won === 1 ? ' trick' : ' tricks'))));
-  b.append(top);
-  const pg = h('span.pg'); const t = pingTok(s, 22); if (t) pg.append(t); const sh = shownEl(s); if (sh) pg.append(sh);
-  if (pg.childNodes.length) b.append(pg);
-  const js = jobs(s); const jb = h('span.jobs');
-  const shown = js.slice(0, 2); shown.forEach(i => jb.append(jobChip(i, { opp: 1 }))); if (js.length > 2) jb.append(h('span.jc.more', '+' + (js.length - 2) + ' more'));
+const CARD_ICO = '<svg viewBox="0 0 12 16" aria-hidden="true"><rect x="1" y="1" width="10" height="14" rx="2.2"/><path d="M4 5.5h4M4 8.5h4"/></svg>', TRICK_ICO = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.2l2 4.4 4.8.5-3.6 3.2 1 4.7L8 11.6l-4.2 2.4 1-4.7L1.2 6.1 6 5.6z"/></svg>';
+// who may be voted for / is still deciding, shown on the seats instead of a roster
+function seatMarks() {
+  const m = { vote: new Set(), pend: new Set(), ready: new Set() };
+  if (!G || G.phase === 'over') return m;
+  const v = viewSeat();
+  if (G.phase === 'assign' && G.as.mode === 'vote' && iMustAct() && !UI.busy) myMoves().forEach(x => { if (x.t === 'vote') m.vote.add(x.f); });
+  if (G.phase === 'pass') { const pend = new Set(LD.pending(G)); G.players.forEach(p => { if (p.helper) return; (pend.has(p.seat) ? m.pend : m.ready).add(p.seat); }); }
+  return m;
+}
+function seatEl(s, act, mk) {
+  const p = G.players[s]; if (p.helper) return droneEl(s, act, mk);
+  const won = tricksWon()[s], cm = s === G.cap, vote = mk.vote.has(s);
+  const b = h('button.seat' + (act === s ? '.act' : '') + (vote ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (cm ? ', Commander' : '') + ', ' + p.hand.length + ' cards' });
+  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 17 }), title: 'Commander' }));
+  const t = pingTok(s, 18); if (t) { t.classList.add('pk'); av.append(t); }
+  b.append(h('span.top', av, h('span.nm', p.name)), h('span.bdgs', h('span.bdg.n', { html: CARD_ICO + '<b>' + p.hand.length + '</b>', title: p.hand.length + ' cards left' }), h('span.bdg.t', { html: TRICK_ICO + '<b>' + won + '</b>', title: won + ' tricks won' })));
+  const sh = shownEl(s); if (sh) b.append(h('span.pg', sh));
+  const js = jobs(s), jb = h('span.jobs'); js.slice(0, 2).forEach(i => jb.append(jobChip(i, { opp: 1 }))); if (js.length > 2) jb.append(h('span.jc.more', '+' + (js.length - 2)));
   b.append(jb);
   return b;
 }
-function droneEl(s, act) {
+function droneEl(s, act, mk) {
   const p = G.players[s], v = viewSeat();
-  const b = h('div.op.drone' + (act === s ? '.act' : ''), { 'data-seat': s, 'data-key': 'seat' + s });
-  const av = h('span.av', { html: avatarS(s, 80) });
-  const top = h('span.top', av, h('span.who', h('span.nm', p.name + ' (drone)'), h('span.cnt', h('span', h('b', p.hand.length), ' cards'), h('span', h('b', tricksWon()[s]), tricksWon()[s] === 1 ? ' trick' : ' tricks'))));
-  const js = jobs(s); const jb = h('span.jobs', { style: 'flex:1;min-width:0;flex-direction:row;flex-wrap:wrap;gap:3px;margin-left:6px' });
-  js.slice(0, 3).forEach(i => { const c = jobChip(i); c.style.width = 'auto'; jb.append(c); }); if (js.length > 3) jb.append(h('span.jc.more', '+' + (js.length - 3)));
-  const head = h('div', { style: 'display:flex;align-items:center;gap:4px' }, h('button.op', { type: 'button', 'data-a': 'seat', 'data-seat': s, style: 'flex:0 0 auto;max-width:none;background:transparent;border-color:transparent;padding:0', 'aria-label': 'Drone ' + p.name }, top), jb);
-  b.append(head);
+  const b = h('div.seat.drone' + (act === s ? '.act' : ''), { 'data-seat': s });
+  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s });
+  const won = tricksWon()[s];
+  const top = h('span.top', av, h('span.who', h('span.nm', p.name), h('span.bdgs', h('span.bdg.n', { html: CARD_ICO + '<b>' + p.hand.length + '</b>' }), h('span.bdg.t', { html: TRICK_ICO + '<b>' + won + '</b>' }))));
+  const js = jobs(s); const jb = h('span.jobs.dj');
+  js.slice(0, 3).forEach(i => jb.append(jobChip(i, { opp: 1 }))); if (js.length > 3) jb.append(h('span.jc.more', '+' + (js.length - 3)));
+  b.append(h('div.dhead', h('button.dseat', { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': 'Drone ' + p.name }, top), jb));
   const row = h('div.drow');
   const myTurn = G.phase === 'play' && G.trick.turn === s && G.cap === v && !UI.fz;
   const legal = myTurn ? LD.playable(G, s) : [];
@@ -6199,85 +6259,135 @@ function droneEl(s, act) {
     const w = h('div.dstack', h('div.dbk' + (hasBot ? '' : '.none')));
     if (top2 >= 0) {
       const can = legal.includes(top2);
-      const c = h('button.dc' + (can ? '.can' : (myTurn ? '.dim' : '')) + (UI.sel === top2 ? '.sel' : ''), { type: 'button', 'data-a': 'dcard', 'data-id': top2, 'data-px': 'card', 'data-pk': 'h:' + top2, 'aria-label': cname(top2) + (can ? ', playable' : '') });
+      const c = h('button.dc' + (can ? '.can.glow' : (myTurn ? '.dim' : '')) + (UI.sel === top2 ? '.sel' : ''), { type: 'button', 'data-a': 'dcard', 'data-id': top2, 'data-px': 'card', 'data-pk': 'h:' + top2, 'aria-label': cname(top2) + (can ? ', playable' : '') });
       c.append(cardN(top2, 46)); w.append(c);
     }
     row.append(w);
   });
   b.append(row); return b;
 }
+// ---- the table's geometry: where each seat sits and where each diver's card lies in the trick ----
+function tableGeo() {
+  const T = $('#table'), bd = $('#bd'); if (!T) return null;
+  const W = T.clientWidth || 360, H = T.clientHeight || 400, n = G.np, k = n - 1, ph = isPh();
+  const side = !!(bd && bd.classList.contains('side')), small = !side && H < 420, boss = !!(G.boss && G.phase !== 'assign');
+  const drone = G.players.findIndex(p => p.helper);
+  const compact = side || small;
+  const av = side ? 28 : (small ? 28 : 32), jr = Math.min(2, Math.max(1, Math.ceil(G.tasks.length / Math.max(1, G.np))));
+  const seatW = side ? 132 : Math.round(Math.min(90, W * .23)), seatH = side ? 76 : (small ? 100 : 116);
+  const y0 = 4 + (boss ? (small || side ? 34 : 40) : 0), bottom = side ? 52 : 54;
+  const geo = { W, H, k, side, small, compact, seatW, seatH, av, jr, boss, seats: [], slots: [] };
+  const dw = Math.max(30, Math.min(small ? 38 : (ph ? 46 : 58), Math.floor((side ? Math.min(W * .4, 340) : W - 16) / 7) - 4)), droneW = side ? Math.min(W * .42, 340) : W - 8;
+  geo.dw = dw; geo.droneW = droneW; geo.dh = 44 + Math.round(dw * 1.4) + 14;
+  // trick area
+  let top, zl = 0, zr = W;
+  if (side) { top = y0; zl = seatW + 12; zr = W - seatW - 12; if (drone >= 0) zr = W - droneW - 12; } else top = y0 + (drone >= 0 ? Math.max(seatH, geo.dh) : seatH) + 4;
+  const zoneH = Math.max(80, H - top - bottom), cy = top + zoneH / 2, cx = side ? (zl + zr) / 2 : W / 2;
+  let cw = Math.floor(zoneH / (side ? 3.8 : 4.4)); const cwMax = ph ? 70 : 112;
+  if (!side && k >= 3) cw = Math.min(cw, Math.floor((W / 2 - seatW - 8) / 1.5));
+  if (side) cw = Math.min(cw, Math.floor((zr - zl) / 4.6));
+  cw = Math.max(30, Math.min(cwMax, cw)); const ch = Math.round(cw * 1.4);
+  geo.pl = side ? zl : ((k >= 3 || drone >= 0) ? seatW + 8 : 6); geo.pr = side ? zr : ((k >= 3 || drone >= 0) ? W - seatW - 8 : W - 6);
+  geo.cw = cw; geo.ch = ch; geo.cx = cx; geo.cy = cy; geo.top = top; geo.zoneH = zoneH;
+  const rx = Math.round(cw * (side ? 1.5 : 1.05)), ry = Math.round(ch * (side ? .86 : 1.0));
+  for (let rel = 0; rel < n; rel++) { const th = rel * 2 * Math.PI / n; geo.slots.push([Math.round(cx - Math.sin(th) * rx), Math.round(cy + Math.cos(th) * ry)]); }
+  // seats: i = 1..k clockwise from you (left side first, then the top, then the right side)
+  const L = seatW / 2 + 5, R = W - seatW / 2 - 5, mid = cy - seatH / 2 + 8;
+  geo.L = L; geo.R = R; geo.mid = mid; geo.y0 = y0;
+  return geo;
+}
+// seat anchors for the seat list (clockwise from `from`)
+function seatSpots(geo, list) {
+  const { W, k, side, seatW, seatH, cy, y0, L, R, mid } = geo, out = [], droneIdx = list.findIndex(s => G.players[s].helper);
+  const sp = (x, y, w) => ({ x: Math.round(x), y: Math.round(y), w: w || seatW });
+  if (side) {
+    const dW = geo.droneW; const colL = [], colR = [];
+    if (droneIdx >= 0) { list.forEach((s, i) => { if (i === droneIdx) colR.push(s); else colL.push(s); }); }
+    else { const half = Math.ceil(list.length / 2); list.forEach((s, i) => { if (i < half) colL.push(s); else colR.push(s); }); }
+    const put = (col, x, w, up) => { const m = col.length, order = up ? col.slice().reverse() : col; order.forEach((s, j) => { const h0 = G.players[s].helper ? geo.dh : seatH, gap = 6; const tot = m * h0 + (m - 1) * gap, y = cy - tot / 2 + j * (h0 + gap); out[list.indexOf(s)] = sp(x, Math.max(2, Math.min(geo.H - h0 - 2, y)), w); }); };
+    put(colL, seatW / 2 + 3, seatW, true);   // bottom to top: the seat next to you (clockwise) is the lowest
+    put(colR, geo.W - (droneIdx >= 0 ? dW / 2 + 4 : seatW / 2 + 3), droneIdx >= 0 ? dW : seatW, false);
+    return out;
+  }
+  const kk = list.length;
+  if (droneIdx >= 0) {
+    list.forEach((s, i) => { if (i === droneIdx) out[i] = sp(W / 2, y0, W - 8); else out[i] = sp(i < droneIdx ? L : R, mid, seatW); });
+    return out;
+  }
+  if (kk === 2) { out[0] = sp(W * .24, y0); out[1] = sp(W * .76, y0); }
+  else if (kk === 3) { out[0] = sp(L, mid); out[1] = sp(W / 2, y0); out[2] = sp(R, mid); }
+  else { out[0] = sp(L, mid + 18); out[1] = sp(W * .31, y0); out[2] = sp(W * .69, y0); out[3] = sp(R, mid + 18); }
+  return out;
+}
 function renderOpp(v) {
   const box = $('#opp'); box.innerHTML = ''; if (!G) return;
-  box.style.setProperty('--jr', String(Math.min(2, Math.max(1, Math.ceil(G.tasks.length / Math.max(1, G.np))))));
-  const act = G.phase === 'play' && G.trick ? G.trick.turn : actorSeat();
-  const from = v >= 0 ? v : 0;
-  for (const s of seatsClockwise(from)) box.append(oppEl(s, act));
+  const geo = UI.geo; if (!geo) return;
+  const act = G.phase === 'play' && G.trick ? G.trick.turn : actorSeat(), mk = seatMarks();
+  const from = v >= 0 ? v : 0, list = seatsClockwise(from), spots = seatSpots(geo, list);
+  list.forEach((s, i) => {
+    const el = seatEl(s, act, mk), sp = spots[i]; if (!sp) return;
+    el.style.left = (sp.x - sp.w / 2) + 'px'; el.style.top = sp.y + 'px'; el.style.width = sp.w + 'px';
+    box.append(el);
+  });
 }
-// ---- the felt: trick slots, the pool of jobs, status lines ----
-function slotPos(rel, n, W, H, ch) {
-  // rel 0 = the bottom seat (me); seats go clockwise (to the left first). Returns centre in px.
-  const th = rel * 2 * Math.PI / n, rx = Math.max(40, W * (n > 4 ? .36 : .31)), ry = Math.max(20, Math.min(H * .27, ch ? (H - ch) / 2 : 999));
-  return [W / 2 - Math.sin(th) * rx, H / 2 + (n > 2 ? Math.cos(th) * ry : Math.cos(th) * ry)];
-}
+// ---- the felt: trick slots in the middle, the job cards while they are handed out ----
 function playsShown() { if (UI.fz && UI.fz.plays) return UI.fz.plays; return G && G.phase === 'play' && G.trick ? G.trick.plays : (G && G.phase === 'over' && G.trick ? G.trick.plays : []); }
 function renderFelt(v) {
-  const felt = $('#felt'), slots = $('#slots'), pool = $('#pool'), txt = $('#felttxt'), lead = $('#lead'), pile = $('#pile'); if (!felt) return;
+  const felt = $('#felt'), slots = $('#slots'), pool = $('#pool'), lead = $('#lead'), pile = $('#pile'); if (!felt) return;
   slots.innerHTML = ''; pool.innerHTML = ''; lead.innerHTML = ''; pile.innerHTML = '';
+  const geo = UI.geo; if (!geo) return;
   const from = v >= 0 ? v : 0;
-  const assign = G.phase === 'assign' || (G.phase === 'distress' && false);
-  pool.hidden = !assign || !G.tasks.some(t => t.owner < 0); slots.hidden = assign && !pool.hidden;
-  // status line
-  let line = '';
-  if (assign) { const n = G.tasks.filter(t => t.owner < 0).length; line = n + ' job' + (n === 1 ? '' : 's') + ' left to hand out · every job must be done'; }
-  else if (G.phase === 'play' || G.phase === 'signal') { const nd = G.tasks.filter((t, i) => jobSt(i) > 0).length; line = 'Trick ' + Math.min(G.ntr, G.tricks.length + 1) + ' of ' + G.ntr + ' · jobs done ' + nd + ' of ' + G.tasks.length + (G.phase === 'signal' ? ' · signal round' : ''); }
-  else if (G.phase === 'distress') line = 'The jobs are taken. Before the dive: the distress flare';
-  else if (G.phase === 'pass') line = 'Everyone passes one card';
-  else if (G.phase === 'predict') line = 'Predictions';
-  else if (G.phase === 'over') line = G.result && G.result.ok ? 'Dive complete' : 'Dive failed';
-  txt.textContent = line;
+  const assign = G.phase === 'assign';
+  pool.hidden = !assign || !G.tasks.some(t => t.owner < 0); slots.hidden = !(G.phase === 'play' || G.phase === 'over' || UI.fz);
+  { const cm = $('#cenmark'); if (cm) { cm.innerHTML = ''; cm.hidden = G.phase !== 'distress'; if (!cm.hidden) { cm.style.left = geo.cx + 'px'; cm.style.top = geo.cy + 'px'; cm.innerHTML = KIT.flareSVG({ size: Math.min(110, geo.zoneH * .5), on: !!G.distress }); } } }
   if (!pool.hidden) {
+    const mv = myMoves(), mineTurn = iMustAct() && assign && !UI.busy, free = G.tasks.filter(t => t.owner < 0).length;
+    const pw = Math.max(120, geo.pr - geo.pl);
+    pool.style.left = geo.pl + 'px'; pool.style.right = 'auto'; pool.style.width = pw + 'px'; pool.style.top = geo.top + 'px'; pool.style.height = geo.zoneH + 'px';
+    const cols = free <= 1 ? 1 : (pw < 260 ? 2 : (free <= 4 ? 2 : 3)), tw = Math.max(86, Math.min(150, Math.floor((pw - 4 - 8 * (cols - 1)) / cols)));
     G.tasks.forEach((t, i) => {
-      if (t.owner >= 0) return; const d = TASKS[t.id], mineTurn = iMustAct() && G.phase === 'assign';
-      const c = h('button.jcard' + (UI.job === i ? '.sel' : '') + (mineTurn ? '' : '.off'), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, 'aria-pressed': UI.job === i ? 'true' : 'false' });
-      const dd = h('span.dd', { title: 'How hard the job is (dots). The jobs on the table add up to the dive\'s difficulty.' }, 'Difficulty ', ...Array.from({ length: jobDiff(i) }, () => h('i')));
-      c.append(h('b', d.s), h('span', d.t), dd);
-      if (!d.cap) c.append(h('span', { style: 'font-weight:800;color:#8a3a10' }, 'Not for the Commander'));
+      if (t.owner >= 0) return; const d = TASKS[t.id], can = mineTurn && mv.some(m => m.t === 'take' && m.i === i);
+      const c = h('button.jcard' + (can ? '.glow' : (mineTurn && mv.some(m => m.t === 'take') ? '.no' : '.off')), { type: 'button', 'data-a': 'pool', 'data-i': i, 'data-key': 'job' + i, style: 'width:' + tw + 'px', 'aria-label': d.s + ', difficulty ' + jobDiff(i) + (can ? '' : ', not available') });
+      const dd = h('span.dd', ...Array.from({ length: jobDiff(i) }, () => h('i')));
+      c.append(h('b', d.s), dd);
+      if (!d.cap) c.append(h('span.nocap', { title: 'Not for the Commander', html: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke-width="2.4"/><path d="M6 6L18 18" stroke-width="2.4"/></svg>' }));
       pool.append(c);
     });
     return renderLead(lead, pile, v);
   }
-  const W = felt.clientWidth || 300, H = felt.clientHeight || 160, n = G.np;
-  const shown = playsShown(), act = G.phase === 'play' && G.trick && !UI.fz ? G.trick.turn : -1;
+  const n = G.np, shown = playsShown(), act = G.phase === 'play' && G.trick && !UI.fz ? G.trick.turn : -1;
   const winS = UI.fz && UI.fz.winner != null && UI.fz.win ? UI.fz.winner : -1;
-  const small = document.documentElement.classList.contains('ph-short'), strip = (isPh() && GXV.now().w > GXV.now().h) || small ? 0 : 46, top = (small ? 26 : 20) + (G.boss && G.phase !== 'assign' ? 46 : 0);   // a boss bar takes the felt's top band   // small phones: Last trick sits in the felt's top corner, not in a bottom strip   // the bottom strip holds Last trick / Won (never over a played card)
+  felt.style.setProperty('--cw', geo.cw + 'px');
   for (let rel = 0; rel < n; rel++) {
-    const s = (from + rel) % n; const [x, y0] = slotPos(rel, n, W, Math.max(60, H - strip - top), (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--cw')) || 56) * 1.4 + 4), y = y0 + top;
-    const slot = h('div.tslot' + (act === s ? '.turn' : '') + (winS === s ? '.win' : ''), { 'data-seat': s, style: 'left:' + x + 'px;top:' + y + 'px' });
+    const s = (from + rel) % n, [x, y] = geo.slots[rel];
+    const slot = h('div.tslot' + (act === s ? '.turn' : '') + (winS === s ? '.winner' : ''), { 'data-seat': s, style: 'left:' + x + 'px;top:' + y + 'px;width:' + geo.cw + 'px;height:' + geo.ch + 'px' });
     const pl = shown.find(p => p.s === s);
     if (pl) { const tc = h('div.tc', { 'data-px': 'card', 'data-id': pl.c, 'data-pk': 't:' + pl.c, 'data-seat': s, role: 'img', 'aria-label': pname(s) + ' played ' + cname(pl.c) }); tc.append(cardN(pl.c, 80)); slot.append(tc); }
+    if (winS === s) { const lan = UI.fz.plays.some(p => p.s === s && suitOf(p.c) === 4); slot.append(h('span.wtag', pname(s) === 'You' ? 'You win!' : pname(s) + ' wins', lan ? h('i', '★') : null)); }
     slots.append(slot);
   }
   renderLead(lead, pile, v);
 }
 function renderLead(lead, pile, v) {
-  if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 22) }), h('span', ls === 4 ? 'Lanterns led: follow with a Lantern' : 'Follow ' + D.suits[ls].name)); }
-  else if (G.phase === 'play' && G.trick) { lead.append(h('span', pname(G.trick.turn) === 'You' ? 'You lead' : pname(G.trick.turn) + ' leads')); }
-  if (G.tricks.length) pile.append(h('button.pbtn', { type: 'button', 'data-a': 'last' }, 'Last trick'));
+  const geo = UI.geo;
+  lead.style.left = (geo ? geo.cx : 0) + 'px'; lead.style.top = (geo ? geo.cy : 0) + 'px';
+  if (G.phase === 'play' && G.trick && G.trick.plays.length) { const ls = G.trick.ls; lead.append(h('span', { html: KIT.emblemSVG(ls, 26) }), h('span', ls === 4 ? 'Lanterns' : D.suits[ls].name)); lead.classList.add('on'); }
+  else lead.classList.remove('on');
+  if (G.tricks.length) pile.append(h('button.pbtn', { type: 'button', 'data-a': 'last', 'aria-label': 'Last trick' }, h('span', { html: KIT.iconSVG('book', 20) }), h('span', 'Last')));
 }
 // ---- my seat and my jobs ----
 function renderMine(v) {
   const box = $('#mine'); box.innerHTML = ''; if (!G) return;
-  const s = v >= 0 ? v : 0, p = G.players[s], act = (G.phase === 'play' && G.trick ? G.trick.turn : actorSeat()), cm = s === G.cap;
-  const me = h('button.me' + (act === s ? '.act' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'data-key': 'seat' + s, 'aria-label': 'Your seat' });
-  const av = h('span.av', { html: avatarS(s, 80) }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 18 }) }));
-  me.append(av, h('span.who', h('span.nm', v >= 0 && (UI.mode !== 'hot' && !NET.on) ? 'You' : p.name), h('span.cnt', tricksWon()[s] + (tricksWon()[s] === 1 ? ' trick' : ' tricks'))));
+  const s = v >= 0 ? v : 0, p = G.players[s], act = (G.phase === 'play' && G.trick ? G.trick.turn : actorSeat()), cm = s === G.cap, mk = seatMarks();
+  const me = h('button.me' + (act === s ? '.act' : '') + (mk.vote.has(s) ? '.glow' : '') + (mk.pend.has(s) ? '.pend' : '') + (mk.ready.has(s) && G.phase === 'pass' ? '.rdy' : ''), { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': 'Your seat' });
+  const av = h('span.av', { html: avatarS(s, 80), 'data-key': 'seat' + s }); if (cm) av.append(h('span.cm', { html: KIT.cmdSVG({ size: 18 }) }));
+  me.append(av, h('span.who', h('span.nm', v >= 0 && (UI.mode !== 'hot' && !NET.on) ? 'You' : p.name), h('span.bdgs', h('span.bdg.t', { html: TRICK_ICO + '<b>' + tricksWon()[s] + '</b>', title: tricksWon()[s] + ' tricks won' }))));
   box.append(me);
   const t = pingTok(s, 30); if (t) box.append(t);
-  if (G.comm === 'narc') box.append(h('span.pbtn', { style: 'cursor:default' }, 'Pool ' + G.pool));
+  if (G.comm === 'narc') box.append(h('span.pbtn.pool', { html: KIT.pingSVG({ size: 22 }) + '<b>' + G.pool + '</b>' }));
   const mj = h('div.mjobs'); const js = jobs(s);
-  if (!js.length && G.phase !== 'assign') mj.append(h('span.sm', 'No jobs for you: help the others.'));
   js.forEach(i => mj.append(jobChip(i, { me: true })));
-  if (G.two && G.cap === s) { const hj = jobs(G.helper); hj.forEach(i => { const c = jobChip(i, { me: true }); c.prepend(h('span', { style: 'font-size:12px;opacity:.75' }, 'Drone:')); mj.append(c); }); }
+  if (G.two && G.cap === s) { const hj = jobs(G.helper); hj.forEach(i => { const c = jobChip(i, { me: true }); c.prepend(h('span.dnl', { html: KIT.droneSVG({ size: 16 }) })); mj.append(c); }); }
   box.append(mj);
 }
 // ---- my hand ----
@@ -6290,27 +6400,35 @@ function legalCards(v) {
   return null;
 }
 const ctlSeat = s => G.players[s].helper ? G.cap : s;
+// the cards of my hand that carry a ping spot right now (a signal round, or between tricks when it is my turn to lead)
+function pingSpots(v) {
+  const m = new Map(); if (v < 0 || !G || UI.busy || UI.mode === 'guided' || G.phase === 'over' || !iMustAct()) return m;
+  if (G.phase === 'signal' || (G.phase === 'play' && G.trick && G.trick.plays.length === 0)) myMoves().forEach(x => { if (x.t === 'ping') m.set(x.c, x.k); });
+  return m;
+}
 function renderHand(v) {
   const box = $('#hand'); box.innerHTML = ''; box.style.height = ''; box.style.minHeight = ''; box.classList.remove('two'); if (!G) return;
-  if (v < 0 || (hotSeat() && UI.holder < 0)) { box.append(h('div.handnote', G.phase === 'over' ? 'The dive is over.' : (watching() ? 'Watching the computer divers.' : 'Waiting for the next diver to take the device.'))); return; }
-  const hand = G.players[v].hand; if (!hand.length) { box.append(h('div.handnote', G.phase === 'over' ? '' : 'No cards left.')); return; }
+  if (v < 0 || (hotSeat() && UI.holder < 0)) { box.append(h('div.handnote', G.phase === 'over' ? '' : (watching() ? 'Watching the divers.' : 'Take the device.'))); return; }
+  const hand = G.players[v].hand; if (!hand.length) { box.append(h('div.handnote', '')); return; }
   const legal = legalCards(v), pinged = new Set(G.pings.filter(p => p.seat === v && !G.pl[p.c]).map(p => p.c)); const pk = new Map(G.pings.filter(p => p.seat === v).map(p => [p.c, p.k]));
+  const spots = pingSpots(v);
   // the card(s) that came to me in the distress pass: the difference between my hand while passing and my hand afterwards
   if (G.phase === 'pass') UI.passSnap = { key: G.seed + ':' + G.att + ':' + v, hand: hand.slice() };
   let got = new Set(); if (UI.passSnap && UI.passSnap.key === G.seed + ':' + G.att + ':' + v && G.phase !== 'pass' && G.phase !== 'assign' && G.phase !== 'distress' && !G.tricks.length && !(G.trick && G.trick.plays.some(p => p.s === v))) got = new Set(hand.filter(c => !UI.passSnap.hand.includes(c)));
   const btns = [];
   hand.forEach((c, i) => {
-    const dim = legal && !legal.has(c);
-    const cls = 'hc' + (UI.sel === c ? '.sel' : '') + (dim ? '.dim' : '') + (pinged.has(c) ? '.pinged' : '') + (UI.pingSel && legal && legal.has(c) ? '.pk' : '') + (UI.giveSel === c ? '.sel' : '') + (got.has(c) ? '.got' : '');
+    const dim = legal && !legal.has(c), glow = legal && legal.has(c);
+    const cls = 'hc' + (UI.sel === c ? '.sel' : '') + (dim ? '.dim' : '') + (glow ? '.glow' : '') + (pinged.has(c) ? '.pinged' : '') + (UI.pingSel && glow ? '.pk' : '') + (UI.giveSel === c ? '.sel' : '') + (got.has(c) ? '.got' : '');
     const b = h('button.' + cls.split('.').filter(Boolean).join('.'), { type: 'button', 'data-a': 'hcard', 'data-id': c, 'data-px': 'card', 'data-pk': 'h:' + c, 'aria-label': cname(c) + (dim ? ', not allowed now' : '') + (pinged.has(c) ? ', shown to the team' : '') + (got.has(c) ? ', you got this card in the flare pass' : ''), 'aria-pressed': UI.sel === c ? 'true' : 'false' });
     b.append(cardN(c, 84));
     if (pinged.has(c)) b.append(h('span.rm', { html: KIT.pingSVG({ size: 26, k: pk.get(c) }), title: 'You showed this card' }));
+    if (spots.has(c)) b.append(h('span.pspot', { 'data-a': 'pingc', 'data-id': c, role: 'button', 'aria-label': 'Show ' + cname(c) + ' to the team', html: KIT.pingSVG({ size: 30, k: spots.get(c) }) }));
     if (got.has(c)) b.append(h('span.gotb', 'New'));
     btns.push(b);
   });
   // Layout (absolute): one row when every card keeps >= 44 px (and >= 55 % of its width) visible, else two rows. A tap in the middle of a card always lands on that card.
   const hw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--hw')) || 60, W = Math.max(200, box.clientWidth - 12), n = hand.length, ch = hw * 1.4;
-  const need = Math.max(44, hw * .55), maxP = hw * 1.04;
+  const short = document.documentElement.classList.contains('ph-short') || (box.parentNode.parentNode.classList.contains('side')), need = short ? 32 : Math.max(44, hw * .55), maxP = hw * 1.04;
   const pitchFor = m => m > 1 ? Math.min(maxP, (W - hw) / (m - 1)) : 0;
   const rows = n > 1 && pitchFor(n) < need && n >= 7 ? 2 : 1, per = rows === 2 ? Math.ceil(n / 2) : n, pitch = pitchFor(per);
   const rowStep = Math.round(ch * .64), padTop = document.documentElement.classList.contains('ph-short') ? 14 : 20;
@@ -6324,131 +6442,96 @@ function renderHand(v) {
   box.dataset.rows = rows; box.dataset.pitch = Math.round(pitch);
   if (UI.sel >= 0) { const sb = box.querySelector('.hc.sel'); if (sb) sb.style.zIndex = '40'; }
 }
-// ---- the dock: what to do now ----
-function dockModel(v) {
-  const ph = G.phase, mv = v >= 0 ? LD.moves(G, v) : [], must = iMustAct(), M = { p: '', sub: '', info: '', acts: [], cls: '' };
+// ---- what to do now: one short line (8 words or fewer) and, for real yes/no decisions only, a few buttons ----
+function actModel(v) {
+  const ph = G.phase, mv = v >= 0 ? LD.moves(G, v) : [], must = iMustAct(), M = { p: '', acts: [], cls: '', warn: 0 };
   const act = actorSeat(), who = act >= 0 ? pname(act) : '';
   const btn = (label, a, o) => M.acts.push(Object.assign({ label, a }, o || {}));
   if (!G) return M;
-  if (ph === 'over') { M.p = G.result && G.result.ok ? 'Dive complete!' : 'The dive failed.'; M.sub = G.result ? G.result.why : ''; btn('Result', 'result'); return M; }
-  if (UI.busy) { M.p = 'The cards move…'; return M; }
-  if (hotSeat() && UI.holder < 0 && G.phase !== 'distress') { M.p = 'Pass the device on.'; return M; }
+  if (ph === 'over') { M.p = G.result && G.result.ok ? 'Dive complete!' : 'The dive failed.'; btn('Result', 'result'); return M; }
+  if (hotSeat() && UI.holder < 0 && ph !== 'distress') { M.p = 'Pass the device on.'; return M; }
   switch (ph) {
     case 'assign': {
-      const A = G.as; const left = G.tasks.filter(t => t.owner < 0).length;
-      if (A.mode === 'vote') {
-        if (must && mv.length) { M.p = 'Vote: which diver takes every job?'; M.sub = 'No talk about cards. A tie goes to the Commander\'s vote.'; M.cls = 'mine'; G.players.filter(p => !p.helper).forEach(p => btn(p.seat === v && p.name !== 'You' ? p.name + ' (you)' : p.name, 'vote', { f: p.seat })); }
-        else { M.p = 'Waiting for the other votes…'; }
-        return M;
-      }
-      if (!must || !mv.length) { M.p = who ? who + (A.mode === 'cmd' && A.stage === 'ask' ? ' is deciding whether to take every job…' : ' is choosing…') : 'Handing out the jobs…'; M.sub = left + ' job' + (left === 1 ? '' : 's') + ' left'; return M; }
+      const A = G.as;
+      if (A.mode === 'vote') { M.cls = must && mv.length ? 'mine' : ''; M.p = must && mv.length ? 'Tap who takes every job.' : 'Waiting for the votes…'; return M; }
+      if (!must || !mv.length) { M.p = who ? who + (A.mode === 'cmd' && A.stage === 'ask' ? ' decides…' : ' is choosing…') : 'Handing out the jobs…'; return M; }
       M.cls = 'mine';
       if (A.mode === 'cmd') {
-        if (A.stage === 'keep') { M.p = 'Commander\'s call: keep every job, or offer them?'; M.sub = 'If you offer them, a willing diver takes all of them and all signalling happens before the first trick.'; if (mv.some(m => m.t === 'keep')) btn('Keep every job', 'keep', { cls: 'go' }); btn('Offer them to the team', 'offer'); }
-        else { M.p = 'Will you take every job?'; btn('Yes, I take them', 'accept', { cls: 'go' }); btn('No', 'decline', { cls: 'alt' }); }
+        if (A.stage === 'keep') { M.p = 'Keep every job, or offer?'; if (mv.some(m => m.t === 'keep')) btn('Keep every job', 'keep', { cls: 'go' }); btn('Offer them', 'offer'); }
+        else { M.p = 'Take every job?'; btn('Yes', 'accept', { cls: 'go' }); btn('No', 'decline', { cls: 'alt' }); }
         return M;
       }
-      if (A.mode === 'vol') { M.p = A.need === 1 ? 'Will you take every job? Answer yes or no only.' : 'Will you volunteer to take the jobs with another diver? Yes or no only.'; btn('Yes', 'yes', { cls: 'go' }); if (mv.some(m => m.t === 'no')) btn('No', 'no', { cls: 'alt' }); else M.sub = 'You are the last one: you have to say yes.'; return M; }
-      if (A.mode === 'free') { M.p = 'Open briefing: take the jobs you want, then press Done.'; M.sub = 'Talk about jobs, never about cards.'; }
-      else if (A.mode === 'hardfirst') { M.p = 'The Commander takes the most difficult job first.'; }
-      else if (A.mode === 'split') { M.p = 'Share the jobs with your partner (at least one each).'; }
-      else { M.p = act === v || (G.players[act] && G.players[act].helper) ? (G.players[act].helper ? 'Pick a job for the drone.' : 'Your turn: pick a job.') : 'Pick a job.'; M.sub = left + ' job' + (left === 1 ? '' : 's') + ' left. Tap a job card on the table.'; }
-      const sel = UI.job >= 0 && G.tasks[UI.job] && G.tasks[UI.job].owner < 0 ? UI.job : -1;
-      if (sel >= 0) { const ok = mv.find(m => m.t === 'take' && m.i === sel); M.info = '<b>' + esc(jobShort(sel)) + '</b>: ' + esc(jobText(sel)) + ' Difficulty ' + jobDiff(sel) + '.' + (ok ? '' : !TASKS[G.tasks[sel].id].cap && act === G.cap ? ' The Commander may not take this job.' : ' You cannot take this one.'); btn('Take this job', 'take', { i: sel, cls: 'go', dis: !ok }); }
-      else if (mv.some(m => m.t === 'take')) btn('Take this job', 'take', { dis: true, cls: 'go' });
+      if (A.mode === 'vol') { M.p = A.need === 1 ? 'Take every job? Yes or no.' : 'Volunteer with a partner?'; btn('Yes', 'yes', { cls: 'go' }); if (mv.some(m => m.t === 'no')) btn('No', 'no', { cls: 'alt' }); return M; }
+      if (A.mode === 'free') M.p = 'Take your jobs, then Done.';
+      else if (A.mode === 'hardfirst') M.p = 'Take the hardest job first.';
+      else if (A.mode === 'split') M.p = 'Share the jobs fairly.';
+      else M.p = G.players[act] && G.players[act].helper ? 'Tap a job for the drone.' : 'Tap a job to take it.';
       if (mv.some(m => m.t === 'pass')) btn('Pass', 'pass', { cls: 'alt' });
-      if (mv.some(m => m.t === 'done')) btn('Done', 'done', { cls: 'alt' });
+      if (mv.some(m => m.t === 'done')) btn('Done', 'done', { cls: 'go' });
       return M;
     }
     case 'distress': {
-      if (!must) { M.p = (who === 'You' ? 'You' : 'The Commander, ' + who) + ' decides about the flare…'; M.sub = 'If it is lit, every diver passes one card. Nobody else has to choose yet.'; return M; }
+      if (!must) { M.p = who === 'You' ? 'Decide about the flare…' : who + ' decides on the flare…'; return M; }
       M.cls = 'mine'; const lit = G.distress;
-      M.p = lit ? 'Pass cards again this attempt?' : 'Light the distress flare?'; M.sub = lit ? 'The flare stays lit until the dive is won.' : 'Every diver passes one card (not a Lantern). The dive then counts one extra attempt.';
+      M.p = lit ? 'Pass cards again?' : 'Light the distress flare?';
       btn(lit ? 'No passing' : 'No flare', 'dist', { on: false, cls: 'alt' });
-      M.eq = 1;
-      const two = G.hn === 2; if (two) btn(lit ? 'Pass a card' : 'Light the flare', 'dist', { on: true, dir: 1, cls: 'alt' });
+      const two = G.hn === 2; if (two) btn(lit ? 'Pass a card' : 'Light it', 'dist', { on: true, dir: 1, cls: 'alt' });
       else { btn('Pass left', 'dist', { on: true, dir: 1, cls: 'alt' }); btn('Pass right', 'dist', { on: true, dir: -1, cls: 'alt' }); }
       return M;
     }
     case 'pass': {
-      if (!must || !mv.length) { M.p = 'Waiting for the others to pass a card…'; return M; }
-      M.cls = 'mine'; const dir = G.pass.dir; M.p = 'Pick a card to pass ' + (G.hn === 2 ? 'to your partner.' : (dir > 0 ? 'to your left.' : 'to your right.')); M.sub = 'Lanterns cannot be passed.';
-      const sel = UI.giveSel >= 0 && mv.some(m => m.c === UI.giveSel) ? UI.giveSel : -1;
-      btn(sel >= 0 ? 'Pass ' + cname(sel) : 'Pass the card', 'give', { c: sel, dis: sel < 0, cls: 'go' }); return M;
+      if (!must || !mv.length) { M.p = 'Waiting for the others…'; return M; }
+      M.cls = 'mine'; M.p = 'Tap a card to pass it.'; return M;
     }
     case 'predict': {
-      if (!must || !mv.length) { M.p = who + ' is predicting their tricks…'; return M; }
-      M.cls = 'mine'; const o = G.tasks[mv[0].i], open = TASKS[o.id].open; M.p = (G.players[o.owner].helper ? 'Predict the drone\'s tricks' : 'How many tricks will you win?'); M.sub = open ? 'Everybody will see your number.' : 'Your number stays secret until the end.';
+      if (!must || !mv.length) { M.p = who + ' is predicting…'; return M; }
+      M.cls = 'mine'; const o = G.tasks[mv[0].i]; M.p = G.players[o.owner].helper ? 'How many tricks for the drone?' : 'How many tricks will you win?';
       mv.forEach(m => btn(String(m.n), 'predict', { n: m.n, i: m.i, cls: UI.predN === m.n ? 'go' : 'alt' })); return M;
     }
     case 'signal': {
-      if (!must) { M.p = who + ' may signal…'; M.sub = 'Signal round: each diver can show a card or skip.'; return M; }
-      M.cls = 'mine'; { const again = G.sig && G.pings.some(p => p.n === G.tricks.length && p.seat !== v); M.p = again ? 'Someone just signalled. Signal now, or skip again?' : 'Signal: show a card, or skip.'; M.sub = again ? 'The signal round goes on until everyone skips in a row.' : 'Show your highest, lowest or only card of a colour. Once per dive.'; }
-      const pm = mv.filter(m => m.t === 'ping');
-      if (UI.pingSel) { const sel = UI.sel >= 0 ? pm.find(m => m.c === UI.sel) : null; M.p = sel ? 'Show ' + cname(sel.c) + (sel.k === 'high' ? ' as your highest?' : sel.k === 'low' ? ' as your lowest?' : sel.k === 'only' ? ' as your only one?' : '?') : 'Tap the card you want to show.'; M.sub = 'The green-ringed cards can be shown.'; btn(sel ? 'Show it' : 'Show the card', 'doping', { dis: !sel, cls: 'go' }); btn('Cancel', 'noping', { cls: 'alt' }); }
-      else { if (pm.length) btn('Signal…', 'signal', { cls: 'go' }); btn('No signal', 'nosig', { cls: pm.length ? 'alt' : 'go' }); }
+      if (!must) { M.p = who + ' may signal…'; return M; }
+      M.cls = 'mine'; const pm = mv.filter(m => m.t === 'ping');
+      M.p = pm.length ? 'Tap a ping spot, or skip.' : 'Nothing to signal.';
+      btn('No signal', 'nosig', { cls: pm.length ? 'alt' : 'go' });
       return M;
     }
     case 'play': {
       const T = G.trick, turn = T.turn, helper = G.players[turn].helper, ctl2 = ctlSeat(turn);
       const myTurn = v >= 0 && ctl2 === v;
-      const pm = mv.filter(m => m.t === 'ping');
-      if (UI.pingSel && pm.length) { const sel = UI.sel >= 0 ? pm.find(m => m.c === UI.sel) : null; M.cls = 'mine'; M.p = sel ? 'Show ' + cname(sel.c) + (sel.k === 'high' ? ' as your highest?' : sel.k === 'low' ? ' as your lowest?' : sel.k === 'only' ? ' as your only one?' : '?') : 'Tap the card you want to show.'; M.sub = 'Signals happen between tricks. The green-ringed cards can be shown.'; btn(sel ? 'Show it' : 'Show the card', 'doping', { dis: !sel, cls: 'go' }); btn('Cancel', 'noping', { cls: 'alt' }); return M; }
       if (myTurn) {
         M.cls = 'mine';
-        const sel = UI.sel >= 0 ? UI.sel : -1; const legal = helper ? new Set(LD.playable(G, turn)) : new Set(LD.playable(G, turn));
-        M.p = helper ? 'Tap a face-up card of ' + pname(turn) : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play any card.');
-        M.sub = T.plays.length ? (T.ls === 4 ? 'Follow with a Lantern if you can.' : 'Follow ' + D.suits[T.ls].name + ' if you can. With no ' + D.suits[T.ls].name + ' left you may play anything, and a Lantern would win.') : '';
+        M.p = helper ? 'Tap a drone card.' : (T.plays.length ? 'Your turn: play a card.' : 'You lead: play a card.');
         { const k = G.seed + ':' + G.logN + ':' + G.att + ':' + G.tricks.length + ':' + T.plays.length + ':' + v; if (UI.abk !== k) { UI.abk = k; let r = null; try { r = LD.AI.allBreak(G, v); } catch (e) { } UI.ab = r; }
-          if (UI.ab) { const j = UI.ab.job; M.p = 'Every card breaks ' + (j >= 0 ? 'a job.' : 'the rule.'); M.sub = j >= 0 ? 'Whatever you play, \u201c' + TASKS[G.tasks[j].id].t.replace(/\.$/, '') + '\u201d will fail. Try Hint to see the least bad card.' : 'Whatever you play, the dive rule is broken.'; M.warn = 1; } }
-        if (UI.hint && UI.hint.c != null) M.info = '<b>Suggestion: ' + esc(cname(UI.hint.c)) + '.</b> ' + esc(UI.hint.why || '');
-        btn(sel >= 0 && legal.has(sel) ? 'Play ' + cname(sel) : 'Play the card', 'playcard', { c: sel, dis: !(sel >= 0 && legal.has(sel)), cls: 'go' });
-        if (pm.length) btn('Signal…', 'signal', { cls: 'alt' });
-        btn('Hint', 'hint', { cls: 'alt' });
-      } else {
-        M.p = who ? who + (G.players[turn].ai ? ' is thinking…' : ' to play.') : ''; M.sub = T.plays.length ? 'Following ' + (T.ls === 4 ? 'Lanterns' : D.suits[T.ls].name) + '.' : '';
-        if (pm.length) btn('Signal…', 'signal', { cls: 'alt' });
-      }
+          if (UI.ab) { M.p = 'Every card breaks a ' + (UI.ab.job >= 0 ? 'job.' : 'rule.'); M.warn = 1; } }
+      } else M.p = who ? who + (G.players[turn].ai ? ' is thinking…' : ' to play.') : '';
       return M;
     }
   }
   return M;
 }
-function renderDock(v) {
-  const pr = $('#prompt'), ac = $('#acts'), inf = $('#info'), ro = $('#roster'); if (!pr) return;
-  const M = dockModel(v); pr.className = M.cls || '';
-  pr.innerHTML = ''; pr.append(M.p || ''); const ps = $('#psub'), phn = isPh(); if (M.sub && !phn) void 0; if (ps) { ps.innerHTML = ''; ps.hidden = true; }
-  { const nw = $('#news'); if (nw) { const L = (UI.news || []).slice(isPh() ? -1 : -3); nw.innerHTML = ''; nw.hidden = !L.length || G.phase === 'over' || (isPh() && !!(UI.hint && UI.hint.c != null && G.phase === 'play' && iMustAct())); L.forEach((t, k) => nw.append(h('div' + (k === L.length - 1 ? '.nw1' : ''), t))); } }
-  inf.hidden = true; inf.className = ''; inf.innerHTML = '';
-  ac.classList.toggle('many', M.acts.length > 6); ac.innerHTML = ''; M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
-  // who is still deciding (simultaneous phases)
-  ro.innerHTML = ''; if (G.phase === 'pass' || (G.phase === 'assign' && G.as.mode === 'vote')) { const pend = new Set(LD.pending(G)); G.players.filter(p => !p.helper).forEach(p => ro.append(h('span.rchip' + (pend.has(p.seat) ? '.w' : '.r'), { html: avatarS(p.seat, 48) }, p.name + (pend.has(p.seat) ? ' …' : ' ✓')))); }
-  { const fe = $('#felt'); if (fe) fe.classList.toggle('roston', ro.childNodes.length > 0); }
-  // desktop: the dock lists every job (who has it, done / failed / open) instead of sitting empty
-  const js = $('#jobsum'); if (js) { js.innerHTML = ''; js.hidden = isPh() || !G.tasks.length; if (!js.hidden) {
-    js.append(h('div.jsh', 'All jobs' + (G.mission.d ? ' · difficulty ' + G.mission.d : '')));
-    G.tasks.forEach((t, i) => { const st = jobSt(i), own = t.owner; js.append(h('button.jsr' + (st > 0 ? '.ok' : st < 0 ? '.bad' : ''), { type: 'button', 'data-a': 'job', 'data-i': i, 'aria-label': jobShort(i) },
-      h('span.jav', { html: own >= 0 ? avatarS(own, 48) : '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="#b9d2ee" stroke-width="2" stroke-dasharray="3 3"/></svg>' }),
-      h('span.jtx', h('b', own >= 0 ? pname(own) : 'On the table'), h('span', TASKS[t.id].t)),
-      h('span.jst', { html: st > 0 ? KIT.iconSVG('tick', 22) : st < 0 ? KIT.iconSVG('cross', 22) : '' }))); }); } }
-  const dt = document.querySelector('.gx-dt'); if (dt) dt.textContent = M.cls === 'mine' ? 'Your turn' : 'What is happening';
-  const bp = $('#barprompt'); if (bp && !bp.contains(pr)) { /* desktop: prompt stays in the dock */ }
-  renderTip();
+function renderActs(v) {
+  const pr = $('#prompt'), ac = $('#acts'); if (!pr || !ac) return;
+  const M = actModel(v); pr.className = (M.cls || '') + (M.warn ? ' warn' : '');
+  pr.textContent = M.p || '';
+  const tr = $('#table'); if (tr) tr.classList.toggle('myturn', M.cls === 'mine');
+  { const pl = $('#pile'); ac.classList.toggle('wide', !(G.phase === 'play' && iMustAct() && !UI.busy && UI.mode !== 'guided') && !(pl && pl.childNodes.length)); }
+  ac.classList.toggle('many', M.acts.length > 5); ac.innerHTML = '';
+  M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
+  // the hint bulb: only while it is my turn to play a card (never in the training dive, which teaches with glow and finger)
+  const hb = $('#hintb'); if (hb) hb.hidden = !(G.phase === 'play' && iMustAct() && !UI.busy && UI.mode !== 'guided' && !G.players[G.trick.turn].helper);
 }
-function renderTip() {
-  const t = $('#tip'); if (!t) return; t.innerHTML = ''; document.documentElement.classList.toggle('tipon', !!UI.tip);
-  if (!UI.tip) return;
-  const c = h('div.tipcard', h('div.th', h('b', UI.tip.title), h('button.btn.small', { type: 'button', 'data-a': 'tipok' }, UI.tip.btn || 'Got it')), h('p', UI.tip.body));
-  t.append(c);
-}
+function renderTip() { }   // no tip cards: play happens on the table
 function render() {
   if (!G || !UI.started) return;
   layoutVars();
   const v = viewSeat();
-  renderBar(); renderOpp(v); renderFelt(v); try { bossBar(); } catch (e) { console.error(e); } renderMine(v); renderHand(v); renderDock(v);
+  renderBar(); renderMine(v); renderHand(v);
+  UI.geo = tableGeo(); if (UI.geo) { const r = document.documentElement.style; r.setProperty('--cw', UI.geo.cw + 'px'); r.setProperty('--dw', UI.geo.dw + 'px'); r.setProperty('--av', UI.geo.av + 'px'); r.setProperty('--seatw', UI.geo.seatW + 'px'); r.setProperty('--ch', UI.geo.ch + 'px'); }
+  renderOpp(v); renderFelt(v); try { bossBar(); } catch (e) { console.error(e); }
+  renderActs(v);
+  try { placeFinger(); } catch (e) { console.error(e); }
   try { netRenderHook(); } catch (e) { }
   try { pxDirty(); } catch (e) { }
-  const rg = $('#start'); if (rg && !rg.hidden && UI.started && !NET.on) { /* start screen closes in newGame */ }
 }
 // ===================== part 3: game flow (new game, AI driver, human actions, event sequences, hot-seat, save) =====================
 function lvAt(opt, k) { const a = opt.lv || DEF.lv; return a[Math.max(0, Math.min(3, k))] || opt.level || 'normal'; }
@@ -6467,7 +6550,7 @@ function missionFrom(opt) {
 }
 function resetUI(mode, cfg) {
   clearTimeout(UI.tm); UI.seq++; UI.rq = [];
-  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0 });
+  Object.assign(UI, { started: true, mode, cfg, holder: -1, sel: -1, job: -1, pingSel: false, giveSel: -1, pop: null, cards: [], fz: null, busy: false, over: null, overShown: false, enter: 'deal', hint: null, why: '', predN: -1, tip: null, evN: G.evN, clockLeft: G.clock || null, timerAt: 0, fingerOn: mode !== 'ai' && (+lsGet('ld_finger') || 0) < 3, holdJobs: null });
   const st = $('#start'); if (st) st.hidden = true; const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } const pa = $('#pass'); if (pa) { pa.hidden = true; pa.innerHTML = ''; }
   try { GX.close(); } catch (e) { } closePop(); const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; }
 }
@@ -6564,7 +6647,7 @@ function afterApply(evs) {
 // ---------- human actions ----------
 function doMove(mv) {
   const v = viewSeat(); if (v < 0) return false;
-  if (UI.tip) { markSeen(UI.tip.id); UI.tip = null; renderTip(); } // acting answers the tip
+  fingerDone();
   if (isClient()) { netAct(mv); UI.sel = -1; UI.pingSel = false; UI.giveSel = -1; UI.job = -1; render(); return true; }
   return commit(v, mv);
 }
@@ -6572,28 +6655,39 @@ function pickMove(pred) { return myMoves().find(pred); }
 function tapHand(id) {
   if (!canAct()) { if (G && !isOver()) toast(UI.busy ? 'One moment…' : 'Wait for your turn.'); return; }
   const v = viewSeat(), ph = G.phase;
-  if (UI.pingSel) { const ok = LD.pingMoves(G, v).some(m => m.c === id); if (!ok) { snd('error'); toast('That card cannot be shown: pick your highest, lowest or only card of a colour.'); return; } UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
-  if (ph === 'pass') { const ok = myMoves().some(m => m.t === 'give' && m.c === id); if (!ok) { snd('error'); toast('Lanterns cannot be passed.'); return; } UI.giveSel = UI.giveSel === id ? -1 : id; snd('click'); render(); return; }
+  if (UI.pingSel) { const ok = LD.pingMoves(G, v).some(m => m.c === id); if (!ok) { snd('error'); toast('Pick your highest, lowest or only card.'); return; } UI.sel = UI.sel === id ? -1 : id; snd('click'); render(); return; }
+  if (ph === 'pass') { const m = myMoves().find(x => x.t === 'give' && x.c === id); if (!m) { snd('error'); toast('Lanterns cannot be passed.'); return; } UI.giveSel = id; doMove(m); return; }
   if (ph === 'play') {
     const T = G.trick, turn = T.turn;
-    if (ctlSeat(turn) !== v || G.players[turn].helper) { toast(G.players[turn].helper ? 'Tap the drone\'s cards to play for it.' : 'Wait for ' + pname(turn) + '.'); return; }
-    const legal = LD.playable(G, turn); if (!legal.includes(id)) { snd('error'); const ls = T.ls; toast(T.plays.length ? 'You must follow ' + (ls === 4 ? 'the Lantern lead' : D.suits[ls].name) + ' if you can.' : 'That card cannot lead now.'); return; }
-    if (tutOnly() >= 0 && id !== tutOnly()) { snd('error'); toast('Mara: lead the glowing ' + cname(tutOnly()) + ' this time.'); return; }
-    if (UI.sel === id) { playSel(); return; }
-    UI.sel = id; UI.hint = null; snd('click', { vol: .4 }); render(); return;
+    if (ctlSeat(turn) !== v || G.players[turn].helper) { toast(G.players[turn].helper ? 'Tap the drone\'s cards.' : 'Wait for ' + pname(turn) + '.'); return; }
+    const legal = LD.playable(G, turn); if (!legal.includes(id)) { snd('error'); const ls = T.ls; toast(T.plays.length ? 'Follow ' + (ls === 4 ? 'the Lantern' : D.suits[ls].name) + ' if you can.' : 'That card cannot lead now.'); return; }
+    if (tutOnly() >= 0 && id !== tutOnly()) { snd('error'); toast('Play the glowing card.'); return; }
+    UI.sel = id; UI.hint = null; playSel(); return;
   }
-  toast('You cannot play a card right now.');
+  toast('Not your turn yet.');
 }
 function tapDrone(id) {
   if (!canAct() || G.phase !== 'play') return; const T = G.trick, turn = T.turn, v = viewSeat();
-  if (!G.players[turn].helper || ctlSeat(turn) !== v) { toast('It is not the drone\'s turn.'); return; }
-  if (!LD.playable(G, turn).includes(id)) { snd('error'); toast('The drone must follow ' + (T.ls === 4 ? 'the Lantern lead' : D.suits[T.ls].name) + '.'); return; }
-  if (UI.sel === id) { playSel(); return; } UI.sel = id; snd('click', { vol: .4 }); render();
+  if (!G.players[turn].helper || ctlSeat(turn) !== v) { toast('Not the drone\'s turn.'); return; }
+  if (!LD.playable(G, turn).includes(id)) { snd('error'); toast('The drone must follow ' + (T.ls === 4 ? 'the Lantern' : D.suits[T.ls].name) + '.'); return; }
+  UI.sel = id; playSel();
 }
 function playSel() {
   if (!canAct() || UI.sel < 0 || G.phase !== 'play') return; const v = viewSeat(), turn = G.trick.turn;
   const m = myMoves().find(x => x.t === 'play' && x.c === UI.sel); if (!m) { snd('error'); return; }
   doMove(m);
+}
+// tap a job card on the table: it flies to your seat
+function tapJob(i) {
+  if (!canAct() || G.phase !== 'assign') return; const m = myMoves().find(x => x.t === 'take' && x.i === i);
+  if (!m) { snd('error'); toast(iMustAct() ? (!TASKS[G.tasks[i].id].cap && actorSeat() === G.cap ? 'Not for the Commander.' : 'You cannot take that one.') : 'Wait for your turn.'); return; }
+  doMove(m);
+}
+// tap a ping spot on a card of your hand
+function tapPing(id) {
+  if (!canAct()) return; const m = myMoves().find(x => x.t === 'ping' && x.c === id);
+  if (!m) { snd('error'); toast('That card cannot be shown.'); return; }
+  UI.pxPing = viewSeat(); doMove(m);
 }
 function doHint() {
   const v = viewSeat(); if (!canAct() || !iMustAct()) return;
@@ -6604,8 +6698,8 @@ function doHint() {
     if (col.length) { UI.hint = { c: col[0].c, why: 'Lesson first: play a low colour card and watch how the trick is won. Keep your Lanterns for your job.' }; UI.sel = col[0].c; render(); return; }
   }
   if (m.t === 'play') { let why = ''; try { why = LD.AI.why(G, v, m.c); } catch (e) { } UI.hint = { c: m.c, why }; UI.sel = m.c; render(); }
-  else if (m.t === 'take') { UI.job = m.i; render(); toast('A good job for you: ' + jobShort(m.i)); }
-  else { toast('Suggested: ' + (m.t === 'ping' ? 'signal ' + cname(m.c) : m.t)); }
+  else if (m.t === 'take') { UI.job = m.i; render(); toast('Try: ' + jobShort(m.i)); }
+  else if (m.t === 'ping') { toast('Try signalling ' + cname(m.c)); }
 }
 // ---------- hot-seat ----------
 function hotNext() {
@@ -6651,26 +6745,54 @@ function newsFrom(evs) {
   if (out.length) UI.news = (UI.news || []).concat([out.join(' ')]).slice(-3); // one sentence per moment
 }
 function drainQ() { if (UI.rq.length && !UI.busy) { const q = UI.rq.shift(); playEvs(q); } }
+// a +1 (or any short word) that rises from a seat
+function floatAt(seat, text, cls) {
+  try {
+    const bd = $('#bd'), el = document.querySelector('[data-key="seat' + seat + '"]'); if (!bd || !el) return;
+    const B = bd.getBoundingClientRect(), r = el.getBoundingClientRect(), f = h('div.fl' + (cls ? '.' + cls : ''), text);
+    f.style.left = Math.round(r.left - B.left + r.width / 2) + 'px'; f.style.top = Math.round(r.top - B.top + r.height / 2) + 'px'; bd.appendChild(f); setTimeout(() => f.remove(), 1500);
+  } catch (e) { }
+}
+// a job card taken from the table flies to the seat that took it
+function flyJobs(list) {
+  if (!ANIM || !document.body.animate) return;
+  for (const f of list) {
+    try {
+      const to = document.querySelector('[data-job="' + f.i + '"]'); const tr = to ? to.getBoundingClientRect() : null;
+      const seatEl2 = document.querySelector('[data-key="seat' + f.seat + '"]'); const sr = seatEl2 ? seatEl2.getBoundingClientRect() : null;
+      const dst = tr && tr.width > 4 ? { x: tr.left + tr.width / 2, y: tr.top + tr.height / 2, s: Math.max(.3, tr.width / f.r.width) } : sr ? { x: sr.left + sr.width / 2, y: sr.top + sr.height / 2, s: .3 } : null; if (!dst) continue;
+      const el = f.node; el.className = 'jcard jfly'; el.style.cssText = 'position:fixed;z-index:40;pointer-events:none;margin:0;left:' + f.r.left + 'px;top:' + f.r.top + 'px;width:' + f.r.width + 'px;height:' + f.r.height + 'px'; document.body.appendChild(el);
+      const dx = dst.x - (f.r.left + f.r.width / 2), dy = dst.y - (f.r.top + f.r.height / 2), d = 520 * Math.max(.6, AIDELAY / 650);
+      const an = el.animate([{ transform: 'translate(0,0) scale(1)', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + dst.s + ')', opacity: .85 }], { duration: d, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' });
+      an.onfinish = () => el.remove(); setTimeout(() => el.remove(), d + 400);
+    } catch (e) { }
+  }
+}
 async function playEvs(evs) {
   if (UI.busy) { UI.rq.push(evs); return; }
   const tok = UI.seq; UI.busy = true; closePop();
   try {
-    const tr = evs.find(e => e.t === 'trick'), pls = evs.filter(e => e.t === 'play'), sw = evs.find(e => e.t === 'swap'), take = evs.filter(e => e.t === 'take'), pg = evs.filter(e => e.t === 'ping');
+    const tr = evs.find(e => e.t === 'trick'), pls = evs.filter(e => e.t === 'play'), sw = evs.find(e => e.t === 'swap'), take = evs.filter(e => e.t === 'take'), pg = evs.filter(e => e.t === 'ping'), jb = evs.filter(e => e.t === 'job');
     try { newsFrom(evs); } catch (e) { console.error(e); }
+    // job cards still lying on the table: remember where they are, so they can fly to the seat that takes them
+    const flights = []; for (const e of take) { const el = document.querySelector('[data-key="job' + e.i + '"]'); if (el) flights.push({ i: e.i, seat: e.seat, r: el.getBoundingClientRect(), node: el.cloneNode(true) }); }
     if (pls.length) snd('play');
-    if (pg.length) snd('ping');
+    if (pg.length) { snd('ping'); UI.pxPing = pg[0].seat; }
     if (sw) { snd('pass'); try { animatePass(); } catch (e) { } }
     if (take.length) snd('take');
     if (tr) {
+      UI.holdJobs = new Set(jb.map(j => j.i));      // the stamps land only after the cards have been swept
       UI.fz = { plays: tr.plays.map(p => ({ s: p.s, c: p.c })), winner: tr.w, win: false };
-      render(); await wait(ANIM ? 1000 : 0); if (tok !== UI.seq) return;
-      UI.fz.win = true; render(); snd('trick'); await wait(ANIM ? 1100 : 0); if (tok !== UI.seq) return;
-      UI.pxExit = { seat: tr.w }; UI.fz = null; render(); await wait(520); if (tok !== UI.seq) return;
-      for (const j of evs.filter(e => e.t === 'job')) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); }
-    } else { render(); await wait(pls.length ? 420 : (take.length ? 380 : 220)); if (tok !== UI.seq) return; }
-    if (evs.some(e => e.t === 'start') ) { /* nothing */ }
+      render(); await wait(ANIM ? 750 : 0); if (tok !== UI.seq) return;
+      UI.fz.win = true; render(); snd('trick'); await wait(ANIM ? 900 : 0); if (tok !== UI.seq) return;
+      UI.pxExit = { seat: tr.w }; UI.fz = null; render(); floatAt(tr.w, '+1', 'plus'); await wait(520); if (tok !== UI.seq) return;
+      UI.holdJobs = null; if (jb.length) { render(); for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(700); if (tok !== UI.seq) return; }
+    } else {
+      render(); flyJobs(flights); await wait(pls.length ? 420 : (take.length ? 460 : 220)); if (tok !== UI.seq) return;
+      if (jb.length) { for (const j of jb) { if (j.st > 0) snd('done'); else if (j.st < 0) snd('fail'); } await wait(500); if (tok !== UI.seq) return; }
+    }
   } catch (e) { console.error(e); UI.fz = null; }
-  UI.busy = false; UI.fz = null;
+  UI.busy = false; UI.fz = null; UI.holdJobs = null;
   try { render(); } catch (e) { console.error(e); }
   if (G && G.phase === 'over') { schedule(); drainQ(); return; }
   schedule(); drainQ(); if (NET.on && isHost()) netPush(true);
@@ -6752,12 +6874,12 @@ function coachCheck() {
 }
 function tipOk() { if (!UI.tip) return; markSeen(UI.tip.id); UI.tip = null; renderTip(); schedule(); coachCheck(); }
 // ---------- pop-ups inside the dock ----------
-function closePop() { UI.pop = null; document.documentElement.classList.remove('popon'); const p = $('#ppop'); if (p) { p.hidden = true; p.innerHTML = ''; } }
+function closePop() { UI.pop = null; document.documentElement.classList.remove('popon'); const p = $('#ppop'); if (p) { p.hidden = true; p.innerHTML = ''; p.removeAttribute('aria-modal'); } }
 function openPop(title, sub, body) {
   const p = $('#ppop'); if (!p) return; UI.pop = { title }; document.documentElement.classList.add('popon');
   p.innerHTML = ''; p.hidden = false;
   p.append(h('div.ph-head', h('div.ph-t', h('b', title), sub ? h('span', sub) : null), h('button.px', { 'data-a': 'popx', type: 'button', 'aria-label': 'Close' }, '×')), h('div.ph-body', body));
-  if (document.documentElement.classList.contains('ph-p')) { const fe = $('#felt'); if (fe) { const fr = fe.getBoundingClientRect(); p.style.height = Math.round(Math.max(200, Math.min(innerHeight * .55, innerHeight - fr.bottom))) + 'px'; } } else p.style.height = '';
+  p.setAttribute('aria-modal', 'true'); clearTimeout(UI.popT); UI.popT = setTimeout(closePop, 7000);
 }
 function openJob(i) {
   if (!G || !G.tasks[i]) return; const t = G.tasks[i], d = TASKS[t.id], st = jobSt(i);
@@ -7052,7 +7174,8 @@ document.addEventListener('click', ev => {
     case 'noping': UI.pingSel = false; UI.sel = -1; render(); break;
     case 'doping': { const m = myMoves().find(x => x.t === 'ping' && x.c === UI.sel); if (m && canAct()) doMove(m); break; }
     case 'nosig': { const m = myMoves().find(x => x.t === 'nosig'); if (m && canAct()) doMove(m); break; }
-    case 'pool': { if (!canAct()) break; UI.job = UI.job === +d.i ? -1 : +d.i; snd('click', { vol: .4 }); render(); break; }
+    case 'pool': tapJob(+d.i); break;
+    case 'pingc': tapPing(+d.id); break;
     case 'take': { const m = myMoves().find(x => x.t === 'take' && x.i === num(d.i)); if (m && canAct()) doMove(m); else toast('You cannot take that job.'); break; }
     case 'pass': case 'done': case 'keep': case 'offer': case 'accept': case 'decline': case 'yes': case 'no': { const m = myMoves().find(x => x.t === a); if (m && canAct()) doMove(m); break; }
     case 'vote': { const m = myMoves().find(x => x.t === 'vote' && x.f === num(d.f)); if (m && canAct()) doMove(m); break; }
@@ -7060,7 +7183,7 @@ document.addEventListener('click', ev => {
     case 'give': { const m = myMoves().find(x => x.t === 'give' && x.c === UI.giveSel); if (m && canAct()) doMove(m); break; }
     case 'predict': { const m = myMoves().find(x => x.t === 'predict' && x.n === num(d.n)); if (m && canAct()) doMove(m); break; }
     case 'job': openJob(+d.i); break;
-    case 'seat': openSeat(+d.seat); break;
+    case 'seat': { const vm = canAct() && G && G.phase === 'assign' && myMoves().find(x => x.t === 'vote' && x.f === +d.seat); if (vm) doMove(vm); else openSeat(+d.seat); break; }
     case 'last': openLast(); break;
     case 'popx': closePop(); break;
     case 'tipok': tipOk(); break;
@@ -7111,7 +7234,7 @@ function applyPhone() {
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', Math.max(108, Math.min(128, Math.round(hh * .15))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  r.toggle('ph', ph); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !NET.on && UI.sv === 'setup') renderStart(); }
 }
 function relayout() { applyPhone(); if (G && UI.started) render(); if (typeof pxResize === 'function') { try { pxResize(true); } catch (e) { } } }
@@ -7315,15 +7438,15 @@ function pxSync() {
     const key = el.dataset.pk, R = pxRect(el, B), id = +el.dataset.id; seen.add(key);
     const isTrick = key[0] === 't', isHand = key[0] === 'h';
     let o = PX.objs.get(key), fresh = false;
-    if (!o && isTrick) { const old = PX.objs.get('h:' + id); if (old && !seen.has('h:' + id)) { PX.objs.delete('h:' + id); old.key = key; old.detached = false; old.c.parent && old.c.parent.removeChild(old.c); PX.L.trick.addChild(old.c); old.layer = 'trick'; PX.objs.set(key, old); o = old; PX.nPlay++; } }
+    if (!o && isTrick) { const old = PX.objs.get('h:' + id); if (old && !seen.has('h:' + id)) { PX.objs.delete('h:' + id); old.key = key; old.detached = false; old.c.parent && old.c.parent.removeChild(old.c); PX.L.trick.addChild(old.c); old.layer = 'trick'; PX.objs.set(key, old); o = old; PX.nPlay++; if (ANIM) pxTween(o, { x: R.x, y: R.y, w: R.w, a: 1 }, 440, 'out'); } }
     if (!o) { o = pxCardObj(key, isTrick ? 'trick' : 'hand'); fresh = true; }
-    o.id = id; o.sel = el.classList.contains('sel'); o.dim = el.classList.contains('dim'); o.pk = el.classList.contains('pk'); o.pinged = el.classList.contains('pinged');
+    o.id = id; o.sel = el.classList.contains('sel'); o.dim = el.classList.contains('dim'); o.pk = el.classList.contains('pk'); o.pinged = el.classList.contains('pinged'); o.gw = el.classList.contains('glow');
     o.tx = R.x; o.ty = R.y; o.tw = R.w; o.seatOf = +(el.dataset.seat || -1); o.drone = el.classList.contains('dc');
     if (isHand) { o.z = ++hi; o.c.zIndex = o.z; } else o.c.zIndex = 50 + (o.idx || 0);
     if (fresh) {
       if (isTrick) {
         const sr = o.seatOf >= 0 ? pxSeatRect(o.seatOf, B) : null;
-        if (sr && ANIM) { o.x = sr.x + sr.w / 2 - R.w * .3; o.y = sr.y + sr.h / 2 - R.w * .4; o.w = R.w * .6; o.a = 0; PX.nPlay++; } else { o.x = R.x; o.y = R.y; o.w = R.w; }
+        if (sr && ANIM) { o.x = sr.x + sr.w / 2 - R.w * .3; o.y = sr.y + sr.h / 2 - R.w * .4; o.w = R.w * .6; o.a = 0; PX.nPlay++; pxTween(o, { x: R.x, y: R.y, w: R.w, a: 1 }, 500, 'out'); } else { o.x = R.x; o.y = R.y; o.w = R.w; }
       } else if (ANIM && ent === 'deal' && !o.drone) { o.x = PX.w / 2 - R.w / 2; o.y = -R.w * 1.6; o.w = R.w * .7; o.delay = now + hi * 32; o.rot = -.4 + hi * .06; o.flip = 1; o.flipUntil = now + 1100 + hi * 40; }
       else { o.x = R.x; o.y = R.y; o.w = R.w; }
     }
@@ -7435,9 +7558,9 @@ function pxFrame(ts) {
     o.sp.tint = o.dim && !o.detached && o.layer === 'hand' ? 0xa9b8d0 : 0xffffff;
     o.sh.width = w * 1.25; o.sh.height = h * 1.18; o.sh.x = 3 + o.lift * 4; o.sh.y = 5 + o.lift * 8; o.sh.alpha = tex ? .55 + o.lift * .2 : 0;
     const lan = o.id >= 36, pulse = .8 + .2 * Math.sin(PX.t * 3 + o.id);
-    o.gl.width = w * (o.pk ? 1.14 : 1.5); o.gl.height = h * (o.pk ? 1.1 : 1.35); o.gl.tint = o.pk ? 0x35c27b : 0xffffff; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .55 : 0)) * pulse : 0;
+    o.gl.width = w * (o.pk ? 1.14 : 1.5); o.gl.height = h * (o.pk ? 1.1 : 1.35); o.gl.tint = o.pk ? 0x35c27b : 0xffffff; o.gl.alpha = tex ? (o.lift * (q.fx ? .9 : .6) + (o.pk ? .55 : 0) + (o.gw && !o.detached && o.layer === 'hand' ? .5 : 0)) * pulse : 0;
     o.lg.width = w * 1.9; o.lg.height = w * 1.9; o.lg.alpha = lan && q.fx && !o.dim ? .28 * pulse : 0;
-    if (o.lift > .01 && o.lift < .99) moving = true; if (o.pk || (lan && q.fx)) moving = true;
+    if (o.lift > .01 && o.lift < .99) moving = true; if (o.pk || o.gw || (lan && q.fx)) moving = true;
   }
   PX.moving = moving;
   if (moving || PX.dirty || PerfHUDtesting()) { PX.dirty = false; try { PX.app.renderer.render(PX.app.stage); PX.frames = (PX.frames || 0) + 1; } catch (e) { pxOff('render: ' + (e && e.message)); } }
@@ -7620,7 +7743,7 @@ function storyCheck() {
 }
 // ---------- the boss bar on the table ----------
 function bossBar() {
-  const fe = $('#felt'); if (!fe) return; let bb = $('#bossbar');
+  const fe = $('#table'); if (!fe) return; let bb = $('#bossbar');
   if (!isBoss() || G.phase === 'assign') { if (bb) bb.remove(); fe.classList.remove('bosson'); return; }
   if (!bb) { bb = h('div#bossbar'); fe.prepend(bb); }
   fe.classList.add('bosson');
@@ -7642,6 +7765,7 @@ function tutOnly() {
   return G.players[viewSeat()].hand.includes(want) ? want : -1;
 }
 function tutCheck(once) {
+  return false;   // the training dive teaches with glow and a ghost finger, no dialogs
   const v = viewSeat(), myTurn = G.phase === 'play' && G.trick.turn === v;
   if (G.phase === 'assign' && G.tricks.length === 0) {
     if (once('t0', { who: 'mara', title: 'Welcome, diver!', body: 'Whole crew wins or loses together.', btn: 'Show me' })) return true;
