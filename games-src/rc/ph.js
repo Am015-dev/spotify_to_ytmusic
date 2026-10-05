@@ -21,7 +21,7 @@ PHO.apply=function(){const R=document.documentElement;const was=PHO.on,wasL=PHO.
   let bw,bh,rail=0;
   if(PHO.land){rail=w>=800?300:280;bw=aw-rail;bh=h-I.t-I.b}else{bw=aw;bh=Math.round(Math.max(aw*.75,Math.min(aw*.95,h-I.t-I.b-BAR-VIEW-296)))}
   R.classList.toggle('ph-l',PHO.land);R.classList.toggle('ph-p',!PHO.land);
-  const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--bhs',Math.max(170,Math.min(Math.floor(bh),Math.round(aw*.56))));set('--rail',rail);set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
+  const set=(k,v)=>R.style.setProperty(k,v+'px');set('--bw',Math.floor(bw));set('--bh',Math.max(200,Math.floor(bh)));set('--bhs',Math.max(170,Math.min(Math.floor(bh),Math.round(aw*.56))));set('--rail',rail);set('--bhb',PHO.land?Math.floor(bh):Math.max(Math.round(aw*.9),Math.min(Math.round(aw*1.3),h-I.t-I.b-BAR-46-150)));set('--sat',I.t);set('--sar',I.r);set('--sab',I.b);set('--sal',I.l);
   if(app)app.classList.remove('gx-dock-min','gx-sheet-full');
   // the chip sits in the bar (portrait) or in the view row under the bar (landscape rail)
   const chip=q('#phchip'),bar=q('.gx-bar'),pv=q('#phview');
@@ -43,7 +43,7 @@ function goalShort(){const cp=typeof campParts==='function'&&G.cmp?campParts():n
   const s=G.sc||{};switch(G.scen){case 'marooned':return `fire ${has('fire')?'✓':'✗'} · pile ${s.pile||0}/15`;case 'hexed':return `crosses ${(s.crosses||[]).length}/5`;
   case 'stranded':return `raft ${has('jraft')?'✓':'✗'} · Ada ${s.rescued?'safe':'waiting'} · boat ${has('lifeboat')?'✓':'✗'}`;case 'settlers':return `home ${[hasShelter(),G.camp.roof>=1,G.camp.pal>=1,G.weapon>=1].filter(Boolean).length}/4 · tools ${(s.goals||[]).filter(has).length}/${(s.goals||[]).length}`}return ''}
 function phaseLabel(){let t='';withView(()=>{const f=flowNow();const ph=f&&PHI(f.k)>=0?PH7[PHI(f.k)].n:'';t=`🎯 ${goalShort()}`});return t}
-PHO.sync=function(){if(!PHO.on)return;const dock=q('.gx-dock'),app=q('.gx-app');if(!dock)return;const st=state();PHO.st=st;dock.dataset.phs=st;if(app){app.dataset.phs=st;app.dataset.dec=(st==='plan'||st==='plan2'||PHO.pop&&PHO.pop.k!=='status'||st==='story'&&typeof humanQ==='function'&&humanQ()&&storyIdx()>=UI.beats.length-1)?'1':''}
+PHO.sync=function(){if(!PHO.on){if(typeof BF!=='undefined')BF.pre();return}const dock=q('.gx-dock'),app=q('.gx-app');if(!dock)return;if(typeof BF!=='undefined')BF.pre();const st=state();PHO.st=st;dock.dataset.phs=st;if(app){app.dataset.phs=st;app.dataset.dec=(st==='plan'||st==='plan2'||PHO.pop&&PHO.pop.k!=='status'||st==='story'&&typeof humanQ==='function'&&humanQ()&&storyIdx()>=UI.beats.length-1)?'1':''}
   const pv=q('#phview'),chip=q('#phchip');const show=!!G&&st!=='none'&&st!=='start';if(pv)pv.hidden=!show;if(chip)chip.hidden=!show;
   if(show){try{const c=chipHtml();if(chip.dataset.h!==c.h){chip.dataset.h=c.h;chip.innerHTML=c.h}chip.setAttribute('aria-label',c.a);chip.classList.toggle('warn',c.warn);
     const lb=q('#phlabel');if(lb)lb.textContent=phaseLabel();const cm=q('#phcamp');if(cm){const on=typeof V3!=='undefined'&&V3.phMode==='camp';cm.setAttribute('aria-label',on?'Show the whole island':'Centre on camp');cm.setAttribute('aria-pressed',on?'true':'false')}}catch(e){console.error(e)}}
@@ -52,10 +52,11 @@ PHO.sync=function(){if(!PHO.on)return;const dock=q('.gx-dock'),app=q('.gx-app');
   buildStrip();
   if(PHO.pop){if((PHO.pop.k==='pawn'||PHO.pop.k==='tile')&&(st!=='plan2'||PHO.popSig!==planSig()))PHO.closePop(true);else if(PHO.pop.k==='status'&&(st==='none'||st==='start'))PHO.closePop(true)}
   renderPop();
+  if(typeof BF!=='undefined')BF.post(st);
   // a new plan step / a new card starts at the top
   const key=st+':'+(st==='plan'?pstep():'')+':'+(st==='story'?UI.beats.length+':'+(UI.seenBeat||''):'');if(PHO.key!==key){PHO.key=key;const b=q('.gx-dock-body');if(b)b.scrollTop=0}};
 // ---------- the strip: the pawns of the plan (step 2), one row of big buttons ----------
-function buildStrip(){const ps=q('#ps');if(!ps)return;if(PHO.st!=='plan2'){ps.hidden=true;if(ps.innerHTML){ps.innerHTML='';ps.dataset.h=''}return}
+function buildStrip(){const ps=q('#ps');if(!ps)return;if(typeof BF!=='undefined'&&BF.on){ps.hidden=true;return}if(PHO.st!=='plan2'){ps.hidden=true;if(ps.innerHTML){ps.innerHTML='';ps.dataset.h=''}return}
   const wz=q('#panel .wz');if(!wz){ps.hidden=true;return}
   const row=wz.querySelector('.pawnrow'),done=wz.querySelector('.alldone'),net=wz.querySelector('.netbar,.netturn,.netwait');const cur=curPawn();
   const plan=G.plan.acts.length?`<div class="plan">${G.plan.acts.map(a=>planLine(a)).join('')}</div>`:'';
@@ -78,7 +79,7 @@ function popContent(){const p=PHO.pop;if(!p||!G)return null;
   if(p.k==='status')return {title:'Camp status',cls:'st'};
   if(p.k==='pawn'){const wz=q('#panel .wz');if(!wz)return null;const c=wz.cloneNode(true);for(const s of['.gtip','.wz-steps','.wz-t','.pawnrow','.sofar','.alldone','.hint','.netbar','.netturn','.netwait'])c.querySelectorAll(s).forEach(e=>e.remove());
     const cur=curPawn();return {title:cur?'A job for '+pawnNice(cur):'Jobs',html:c.innerHTML,cls:'pawn'}}
-  if(p.k==='tile'){const id=p.id;let h=tileInfo(id);const plan=PHO.st==='plan2';
+  if(p.k==='tile'){const id=p.id;if(typeof BF!=='undefined'&&BF.on&&PHO.st==='plan2'){const c=BF.tilePop(id);if(c)return c}let h=tileInfo(id);const plan=PHO.st==='plan2';
     if(plan){const cur=curPawn();const rec=cur?recPlan().map[cur.id]:null;const rows=tileRows(id);const ok=rows.filter(r=>!r.why),no=rows.filter(r=>r.why);
       h+=`<div class="tp-for">${cur?'Tap <b>+</b> to give <b>'+E(pawnNice(cur))+'</b> a job here:':'Every pawn has a job. Tap a pawn below to change its job.'}</div>`;
       h+=ok.length?`<div class="tjobs">${ok.map(r=>jobLine(r,rec)).join('')}</div>`:`<p class="muted">No job possible here right now.</p>`;
@@ -86,6 +87,7 @@ function popContent(){const p=PHO.pop;if(!p||!G)return null;
       if(no.length)h+=`<details class="later"><summary>Not possible yet (${no.length})</summary>${no.map(r=>jobLine(r,rec)).join('')}</details>`}
     const t=tileAt(id);return {title:t?`Place ${id+1} · ${t.terr}`:`Place ${id+1}`,html:h,cls:'tile'}}
   return null}
+PHO.tileRows=tileRows;
 PHO.openPop=function(p){PHO.pop=p;PHO.popSig=G?planSig():'';PHO.popOpen=true;renderPop();const b=q('#ppop .pp-b');if(b)b.scrollTop=0};
 PHO.closePop=function(quiet){const was=PHO.pop;PHO.pop=null;const hud=q('#hud');if(hud&&hud.parentNode&&hud.parentNode.classList.contains('pp-b')){const body=q('.gx-dock-body');if(body)body.insertBefore(hud,body.firstChild)}
   if(typeof V3!=='undefined')V3.hover=null;const pp=q('#ppop');if(pp){pp.hidden=true;pp.innerHTML='';pp.dataset.h=''}if(was&&was.k==='tile'&&!quiet){UI.tileSel=null;if(typeof render==='function')render()}};
@@ -101,6 +103,7 @@ function renderPop(){const pp=q('#ppop');if(!pp)return;if(!PHO.pop){if(!pp.hidde
 // a tile was tapped on the island
 PHO.tile=function(id){if(!PHO.on)return;if(id==null){if(PHO.pop&&(PHO.pop.k==='tile'||PHO.pop.k==='pawn'))PHO.closePop();return}
   if(!G||PHO.st==='none'||PHO.st==='start')return;
+  if(typeof BF!=='undefined'&&BF.tile(id))return;
   PHO.openPop({k:'tile',id});if(typeof V3!=='undefined')V3.hover=id};
 // ---------- view buttons, pop-up buttons, enlarged cards ----------
 function closeZoom(){PHO.zoom=false;const z=q('#pzoom');if(z){z.hidden=true;z.innerHTML=''}}
@@ -117,7 +120,7 @@ function onClick(e){if(!PHO.on)return;const t=e.target;if(!t.closest)return;
     if(a==='close'){PHO.closePop();return}
     if(a==='zclose'){closeZoom();return}return}
   if(PHO.zoom){if(t.closest('#pzoom button,#pzoom input')){setTimeout(closeZoom,0);return}if(!t.closest('.zc')){closeZoom();return}return}
-  if(PHO._pawn&&PHO.st==='plan2'){if(!PHO.pop||PHO.pop.k==='status')PHO.openPop({k:'pawn'});else if(PHO.pop.k==='pawn'||PHO.pop.k==='tile'){PHO.popSig=planSig()}return}
+  if(PHO._pawn&&PHO.st==='plan2'&&!(typeof BF!=='undefined'&&BF.on)){if(!PHO.pop||PHO.pop.k==='status')PHO.openPop({k:'pawn'});else if(PHO.pop.k==='pawn'||PHO.pop.k==='tile'){PHO.popSig=planSig()}return}
   if(t.closest('[data-gx]')&&PHO.pop&&PHO.pop.k==='status'){PHO.closePop();return}
   if(t.closest('button,input,summary,a,label,select'))return;
   const card=t.closest('#ppop .job,#campbody .row:not(.empty),#panel .thr,#panel .prio,#cardsbody .card,#panel .rv,#story .card');if(card)openZoom(card)}

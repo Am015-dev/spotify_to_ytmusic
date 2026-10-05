@@ -184,7 +184,7 @@ function renderMap2D(){const el=$('#map2d');if(!el||V3.on){if(el)el.hidden=true;
   const col={beach:'#e8d29a',river:'#6dbf7a',plains:'#9ccf62',hills:'#7fae55',mountains:'#9a9486'};
   el.innerHTML=`<svg viewBox="-10 -10 ${W*5+20} ${R*1.5*4+R+20}" role="img" aria-label="Island map">${MAP.map(m=>{const x=m.q*W+W/2,y=m.r*R*1.5+R;const t=tileAt(m.id);const g=G.map[m.id];
     const pts=Array.from({length:6},(_,i)=>{const a=Math.PI/3*i+Math.PI/6;return (x+Math.cos(a)*R*.98).toFixed(1)+','+(y+Math.sin(a)*R*.98).toFixed(1)}).join(' ');
-    return `<g data-tile="${m.id}" class="hx ${UI.tileSel===m.id?'sel':''} ${UI.hoverPos===m.id?'pulse':''}"><polygon points="${pts}" fill="${t?col[t.terr]:g.down?'#333':'#24364a'}" stroke="#0b1520" stroke-width="2"/><text x="${x}" y="${y-6}" text-anchor="middle">${t?(m.id+1)+' '+t.terr.slice(0,5):'❔'+(m.id+1)}</text><text x="${x}" y="${y+12}" text-anchor="middle">${m.id===G.camp.pos?'🏕':''}${g.fog?'🌫':''}${G.sc.crosses&&G.sc.crosses.includes(m.id)?'✝':''}${t?t.src.map((s,i)=>g.exh[i]?'▪':s==='wood'?'🪵':'🐟').join(''):''}</text></g>`}).join('')}</svg>`}
+    return `<g data-tile="${m.id}" class="hx ${UI.tileSel===m.id?'sel':''} ${UI.hoverPos===m.id?'pulse':''} ${UI.pick&&UI.pick.includes(m.id)?'pick':''}"><polygon points="${pts}" fill="${t?col[t.terr]:g.down?'#333':'#24364a'}" stroke="#0b1520" stroke-width="2"/><text x="${x}" y="${y-6}" text-anchor="middle">${t?(m.id+1)+' '+t.terr.slice(0,5):'❔'+(m.id+1)}</text><text x="${x}" y="${y+12}" text-anchor="middle">${m.id===G.camp.pos?'🏕':''}${g.fog?'🌫':''}${G.sc.crosses&&G.sc.crosses.includes(m.id)?'✝':''}${t?t.src.map((s,i)=>g.exh[i]?'▪':s==='wood'?'🪵':'🐟').join(''):''}</text></g>`}).join('')}</svg>`}
 // ---------- input ----------
 function on3DTile(id){if(storyActive())return;if(planOpen()&&!allAI()&&pstep()!==2){setPStep(2);UI.ps.pick=true}UI.tileSel=id;UI.tab='plan';tutAdvance(3);const t=tileAt(id);if(!t&&G.map[id].tile==null)UI.cat=null;render();const f=document.querySelector('.tfocus');if(f&&f.scrollIntoView)f.scrollIntoView({block:'nearest',behavior:'smooth'})}
 {const t0=on3DTile;on3DTile=function(id){t0(id);if(typeof PHO!=='undefined'&&PHO.on)PHO.tile(id)}}
@@ -199,7 +199,7 @@ function toast(t,ms,keep){const el=$('#dockmsg');if(!el)return;el.textContent=t;
 function msgCheck(){const el=$('#dockmsg');if(!el||el.hidden||!G)return;if(UI.msgSig!==planSig()&&!UI.msgKeep)el.hidden=true;if(UI.confirmSig&&UI.confirmSig!==planSig())UI.confirm=null}
 // Start the day: first ask when a red priority is still open
 function wizPlaced(){if(planOpen()&&!allAI()&&pstep()===2&&!curPawn())setPStep(3)}
-function tryStart(force){if(!planOpen())return;if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();renderStep();GX.showDock();return}}
+function tryStart(force){if(!planOpen())return;if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();render();GX.showDock();return}}
   UI.confirm=null;const r=startActions();if(r)toast(r);else{sfx('click');if(UI.tut<99)tutDone()}}
 function pulsePos(p){if(UI.hoverPos===p)return;UI.hoverPos=p;try{if(V3.lab)for(const id in V3.lab)V3.lab[id].classList.toggle('pulse',+id===p);if(!V3.on)withView(()=>renderMap2D())}catch(e){}}
 document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closest('.gx-dock [data-pos]');if(pr){pulsePos(+pr.dataset.pos);clearTimeout(UI.pt);UI.pt=setTimeout(()=>pulsePos(null),2500)}

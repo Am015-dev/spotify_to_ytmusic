@@ -579,5 +579,86 @@ html.ph #ps .pawnrow{grid-template-columns:repeat(auto-fill,minmax(104px,1fr));g
 html.ph #ps .pw{min-height:44px;padding:3px 6px;gap:5px}html.ph #ps .pw span{font-size:13.5px}html.ph #ps .pw i{width:16px;height:16px}
 @media (max-height:640px){html.ph-p #story .sctl{display:contents}html.ph-p #story .sctl .btn{margin-top:6px}html.ph-p #story .sctl .btn.go{position:sticky;bottom:4px;z-index:2;box-shadow:0 0 0 5px #f1e4c0,0 2px 0 #7a4a0a}}
 @media (max-height:640px){html.ph-p #ppop .curp{display:none}html.ph-p #ppop .rec .rb{order:-1}}
+
+/* ===== board-first phone play (html.bf): the island, one status line, one big button, your pawns ===== */
+#bf,#bfzoom,#bfgh{display:none}
+html.bf #bf{display:flex;flex-direction:column;gap:8px;justify-content:center;min-height:0;overflow:auto;padding:8px 10px calc(8px + var(--sab,0px));background:linear-gradient(var(--paper),var(--paper2));border-top:2px solid #b99f67;color:#2a2014;position:relative;z-index:3}
+html.bf .gx-dock,html.bf .gx-reopen{display:none!important}
+html.ph.bf.ph-p .gx-app,html.ph.bf.ph-p .gx-app[data-dec="1"]{grid-template-rows:44px var(--bhb,var(--bh)) 46px minmax(0,1fr)}
+html.ph.bf.ph-p #bf{grid-row:4;grid-column:1}
+html.ph.bf.ph-l #bf{grid-row:3;grid-column:2;border-left:1px solid #b99f67;border-top:0}
+html.bf #phview:not([hidden]){min-height:46px;padding:0 4px 0 12px;gap:6px;background:#0b1620}
+html.bf #phview #phlabel{flex:1;min-width:0;padding:0;font:700 17px/1.15 var(--sans);color:#fff4d8;white-space:normal;overflow:hidden;text-overflow:clip;display:flex;align-items:center;max-height:46px}
+html.ph.bf.ph-l #phview #phlabel{display:flex}
+html.bf #phview .bf-i{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;border-color:var(--line);background:var(--slate);color:var(--ink);flex:0 0 auto}
+html.bf #phview .bf-i svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
+html.bf #bfzoom:not([hidden]){display:flex;flex-direction:column;gap:6px;position:absolute;right:6px;bottom:6px;z-index:5}
+html.bf #bfzoom .gx-ibtn{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(8,17,26,.72);color:var(--ink);backdrop-filter:blur(3px)}
+html.bf #bfzoom .gx-ibtn svg.ic{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round}
+html.bf #bfzoom .gx-ibtn[aria-pressed="true"]{background:var(--amber);color:#2b1a05}
+html.bf .gx-board{position:relative}
+/* tray contents */
+.bf-main{display:flex;gap:8px;align-items:stretch;flex:0 0 auto}
+.bf-main .btn{min-height:56px;font-size:1.15rem;flex:1 1 auto;white-space:normal;line-height:1.1}
+.bf-main .btn.go{flex:2 1 auto}
+.bf-main .btn.ghost{background:#fffaf0;border-color:#b99f67;color:#2a2014}
+html.bf .gx-ibtn.bf-s{width:56px;min-width:56px;height:56px;min-height:56px;padding:0;font-size:1.4rem;background:#fffaf0;border:1px solid #b99f67;color:#2a2014;flex:0 0 auto;box-shadow:inset 0 1px 0 #fff,0 1px 2px rgba(90,60,20,.25)}
+html.bf .gx-ibtn.bf-s.on{background:#5a4320;color:#fff4d8}
+.bf-opts{display:grid;gap:6px;grid-template-columns:minmax(0,1fr);flex:0 0 auto}
+.bf-opts.n3,.bf-opts.n4,.bf-opts.n5,.bf-opts.n6{grid-template-columns:repeat(2,minmax(0,1fr))}
+.bf-opts .btn{min-height:48px;white-space:normal;line-height:1.15;font-size:15px;background:#fffaf0;border:1px solid #b99f67;color:#2a2014;font-weight:700;padding:6px 8px}
+.bf-opts .btn:active{background:#f6c46e}
+.pawnrow.bf-pw{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;flex:0 0 auto}
+.bfpw{position:relative;width:48px;height:48px;min-width:48px;border-radius:50%;border:3px solid var(--pc);background:#fffaf0;color:#2a2014;font:700 14px var(--sans);display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.bfpw sub{font-size:10px;position:absolute;right:5px;bottom:4px}
+.bfpw.on{box-shadow:0 0 0 4px #f6c46e;transform:scale(1.1)}
+.bfpw.set{background:var(--pc);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.bfpw.set.on{background:#fffaf0;color:#2a2014;text-shadow:none}
+.bfpw u{position:absolute;right:-5px;top:-7px;font-size:17px;text-decoration:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
+/* the island overlay: job chips, scores, dice */
+#bfov{position:absolute;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+#bfchips{position:absolute;inset:0;pointer-events:none}
+.bfg{position:absolute;left:0;top:0;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:156px;pointer-events:none}
+.bfa{pointer-events:auto;min-width:44px;min-height:44px;border-radius:14px;background:rgba(20,14,6,.84);border:2px solid #f6c46e;color:#fff4d8;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:2px 7px;font:700 15px var(--sans);animation:bfIn .4s var(--d,0ms) both;box-shadow:0 3px 8px rgba(0,0,0,.45)}
+button.bfa{cursor:pointer;appearance:none}
+.bfa s{text-decoration:none;font-size:19px}
+.bfa .dots{display:inline-flex;gap:2px}.bfa .dots i{display:block;width:13px;height:13px;border-radius:50%;background:var(--pc);border:1.5px solid #fff}
+.bfa em{font-style:normal;font-size:13px}
+.bfa.warn{border-color:#ff7a66;background:rgba(80,18,10,.88)}
+.bfa.sure{border-color:#9df0a6}
+.bfa.cur{box-shadow:0 0 0 4px rgba(246,196,110,.6),0 3px 8px rgba(0,0,0,.45);transform:scale(1.15)}
+.bfa.done{opacity:.55}
+@keyframes bfIn{from{opacity:0;transform:translateY(-14px) scale(.6)}to{opacity:1;transform:none}}
+.bfpop{position:absolute;z-index:6;transform:translate(-50%,-50%);font:800 22px/1 var(--sans);padding:5px 11px;border-radius:99px;background:rgba(10,18,28,.88);color:#fff;border:2px solid #fff;opacity:0;animation:bfPop 2s var(--d,0ms) ease-out both;white-space:nowrap;text-shadow:0 1px 2px #000;pointer-events:none;display:inline-flex;align-items:center;gap:5px}
+.bfpop i{display:inline-block;width:12px;height:12px;border-radius:50%;border:1.5px solid #fff}
+.bfpop.good{color:#9df0a6;border-color:#9df0a6}.bfpop.bad{color:#ff9b8f;border-color:#ff9b8f}.bfpop.big{font-size:30px;padding:6px 12px}.bfpop.dice{animation-name:bfDice}
+@keyframes bfPop{0%{opacity:0;transform:translate(-50%,-20%) scale(.5)}10%{opacity:1;transform:translate(-50%,-60%) scale(1.3)}22%{transform:translate(-50%,-80%) scale(1)}78%{opacity:1}100%{opacity:0;transform:translate(-50%,-200%) scale(1)}}
+@keyframes bfDice{0%{opacity:0;transform:translate(-50%,-160%) rotate(-240deg) scale(.4)}25%{opacity:1;transform:translate(-50%,-60%) rotate(20deg) scale(1.2)}40%{transform:translate(-50%,-60%) rotate(-10deg)}60%{opacity:1}100%{opacity:0;transform:translate(-50%,-70%) scale(1)}}
+#phchip.bump{animation:bfBump .55s}
+@keyframes bfBump{30%{transform:scale(1.12);background:#5a4320}}
+/* glowing places on the flat map too */
+#map2d g.hx.pick polygon{stroke:#f6c46e;stroke-width:4;animation:bfGlow 1.2s infinite}
+@keyframes bfGlow{50%{stroke-width:7;opacity:.75}}
+/* ghost finger */
+html.bf #bfgh:not([hidden]){display:block;position:fixed;z-index:70;width:44px;height:48px;pointer-events:none}
+#bfgh .f{position:relative;font-size:42px;line-height:1;animation:bfTap 1.5s ease-in-out infinite;filter:drop-shadow(0 3px 3px rgba(0,0,0,.55));transform-origin:20% 10%}
+#bfgh .rg{position:absolute;left:-2px;top:-8px;width:34px;height:34px;border-radius:50%;border:4px solid #f6c46e;animation:bfRing 1.5s ease-out infinite}
+@keyframes bfTap{0%,100%{transform:translate(10px,14px)}45%{transform:translate(2px,2px) scale(.88)}60%{transform:translate(2px,2px) scale(.88)}}
+@keyframes bfRing{0%,35%{opacity:0;transform:scale(.4)}50%{opacity:1}100%{opacity:0;transform:scale(1.7)}}
+/* the pop-up for a place lies over the island, away from that place */
+html.bf #ppop:not([hidden]){inset:auto 8px 8px 8px;max-height:min(52%,300px);border-radius:14px;border:2px solid #b99f67;box-shadow:0 10px 30px rgba(0,0,0,.55);overflow:hidden}
+html.bf #ppop.top:not([hidden]){inset:8px 8px auto 8px}
+html.bf #ppop.st:not([hidden]){inset:6px;max-height:none}
+html.bf #ppop .pp-h{min-height:44px}
+.bfrows{display:flex;flex-direction:column;gap:6px}
+.bfr{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:48px;padding:6px 12px;border-radius:12px;border:1px solid #b99f67;background:#fffaf0;color:#2a2014;font:700 16px var(--sans);text-align:left;cursor:pointer;width:100%}
+.bfr .t{flex:1;min-width:0}.bfr .b{flex:0 0 auto;font-size:14px;color:#5a4320}
+.bfr.rec{background:#fff1cf;outline:2px solid #d98a1e}.bfr.has{border-color:#6aa86a}.bfr.no{opacity:.6}
+.bfr:active{background:#f6c46e}
+.detscene{font-size:16px;line-height:1.4}.detscene h2{font:1.3rem var(--title);margin:4px 0}
+@media (max-height:640px){.bf-main .btn,html.bf .gx-ibtn.bf-s{min-height:52px;height:52px}}
+#bfglow{position:absolute;inset:0;pointer-events:none}
+.bfgl{position:absolute;left:0;top:0;width:52px;height:52px;border-radius:50%;border:4px solid #ffd37a;background:radial-gradient(circle,rgba(255,211,122,.45),rgba(255,211,122,0) 70%);box-shadow:0 0 14px 4px rgba(255,200,90,.7);animation:bfGl 1.1s ease-in-out infinite;pointer-events:none}
+@keyframes bfGl{50%{transform:scale(1.18);opacity:.65}}
 </style>
 </head>
