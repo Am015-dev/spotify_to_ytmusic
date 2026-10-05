@@ -12,7 +12,7 @@ function plain(t){const n=myName();if(!n||!t)return t;let subj=false;
 // ---------------------------------------------------------------- "what's happening": the newest public event, in plain words
 const PHASEN={spring:'Spring',summer:'Day',autumn:'Autumn'};
 function aiFallback(s,q,mv){const N=G.pl[s].name;const k=q.kind;
-  if(k==='bid')return N+' chooses a secret bid.';if(k==='place'&&mv.r!=null)return N+' hides a card next to '+REG[mv.r]+'.';
+  if(k==='bid')return N+' bids.';if(k==='place'&&mv.r!=null)return N+' hides a card next to '+REG[mv.r]+'.';
   if(q.t==='menu'&&mv.t==='done')return null;   // trivia: not narrated
   if(k==='edict')return mv.yes?N+' plays a Tactic.':null;if(k==='statue'||k==='harvest')return N+' decides about a card.';
   return null}
@@ -100,7 +100,7 @@ function gloss(text){if(text==null)return '';text=String(text);const hits=[];con
   for(const h of hits){if(h.i<p)continue;out+=esc(text.slice(p,h.i));const nw=!(UI.glSeen&&UI.glSeen[h.k]);out+='<button type="button" class="gl'+(nw?' new':'')+'" data-a="gloss" data-t="'+esc(h.k)+'" aria-label="'+esc(text.substr(h.i,h.n))+': what does it mean?">'+esc(text.substr(h.i,h.n))+'</button>';p=h.i+h.n}
   return out+esc(text.slice(p))}
 function showGloss(k){const g=GL[k];const el=$('#gdef');if(!g||!el)return;UI.glSeen=UI.glSeen||{};UI.glSeen[k]=1;
-  el.innerHTML='<p><b>'+esc(g[2])+'</b>: '+esc(g[3])+'</p><button class="pp-x" data-a="gclose" aria-label="Close">'+ico('x')+'</button>';el.hidden=false;if(typeof sfx==='function')sfx('tap')}
+  el.innerHTML='<p><b>'+esc(g[2])+'</b>: '+esc(g[3])+'</p><button class="pp-x" data-a="gclose" aria-label="Close">'+ico('x')+'</button>';el.hidden=false;el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');if(typeof sfx==='function')sfx('tap')}
 function hideGloss(){const el=$('#gdef');if(el){el.hidden=true;el.innerHTML=''}}
 document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.dataset.more)UI.moreOpen=d.open},true);
 // ---------------------------------------------------------------- the guided first game: fixed deal, one thing per step
@@ -115,7 +115,7 @@ const COACH_INFO=[
  {id:'own',when:()=>G.round===2&&G.q,title:'Round 2: two new things',text:()=>'Card abilities: some of your cards can Flank, Ambush, Retreat or Rally (the card says when). Autumn: after the Clashes you may send a card on a Journey for Lore, and Lore buys stronger cards. The ★ suggestion still shows a good move and why.',btn:'Play on'},
  {id:'r3',when:()=>G.round===3&&G.q,title:'Round 3: the full game',text:()=>'Now everything is in play: your faction\'s Tactics, the Kingdom\'s Favour, and Govern (a card with votes goes into a Council for a lasting power). Each one is explained the first time you can use it.',btn:'Play on'}];
 function coachGate(){if(!G||!G.q||UI.coachInfo)return !!UI.coachInfo;if(!isGuided())return false;UI.coachDone=UI.coachDone||{};
-  const st=COACH_INFO.find(c=>!UI.coachDone[c.id]&&c.when());if(st){UI.coachInfo={id:st.id,title:st.title,text:st.text(),btn:st.btn,hl:st.hl,hlLocs:st.locs};return true}
+  const st=COACH_INFO.find(c=>!UI.coachDone[c.id]&&c.when());if(st){UI.coachDone[st.id]=1}
   // the guided game skips a season for you when nothing you have learnt yet can be used in it
   const s=viewSeatForQ();if(s!=null&&G.q.t==='menu'&&G.round<3&&menuPhase(G.q)!=='Day'){const mv=legal(s);if(!visibleActs(mv).some(m=>m.t==='act')){const d=mv.find(m=>m.t==='done');if(d){if(!UI._skipT)UI._skipT=setTimeout(()=>{UI._skipT=0;humanMove(d.k)},0);return true}}}
   return false}
@@ -164,7 +164,7 @@ function coachFor(s,mv,rm){UI._coachShown=null;if(!isGuided()||!G.q)return null;
   if(q.t==='menu'){const L=visibleActs(mv).filter(m=>m.t==='act');for(const K of ['cmd','lore','tactic','favour','govern','council','kc']){if(UI.coachDone['new_'+K])continue;if(L.some(m=>actKind(m.a)===K)){UI._coachShown='new_'+K;return {title:'New: '+NEWK[K][0],text:NEWK[K][1]}}}}
   if(k==='siteBuy'&&!UI.coachDone.new_site){UI._coachShown='new_site';return {title:'New: spend Lore',text:'Lore buys your Site of Power cards. A card with a Strength goes to your hand; an HQ card is a permanent power that stays in front of you. Keep the Lore if nothing fits yet.'}}
   return null}
-function coachEvent(ev){if(!isGuided())return '';UI.coachDone=UI.coachDone||{};const k='ev_'+ev.t;
+function coachEvent(ev){return '';if(!isGuided())return '';UI.coachDone=UI.coachDone||{};const k='ev_'+ev.t;
   if(ev.t==='bids'&&G.round===1)return 'Both bids are revealed. The higher bid chooses first; a tie goes to whoever is higher on the Order Track.';
   if(ev.t==='clash'&&G.round===1&&!UI.coachDone[k+ev.r]){return ev.idx===0?'The hidden cards are flipped. Each side adds the Strength of its cards and +1 per Supporter (the list under the cards). The higher total wins the region.':''}
   if(ev.t==='summary'&&ev.round===1){const me=humans()[0];const a=ev.inf1[me],b=Math.max(...ev.inf1.filter((_,i)=>i!==me));return 'Scoring: you have '+a+' Influence, the Court has '+b+'. '+(a>b?'You lead!':a===b?'Level.':'Keep going.')+' The leader acts first next round. '+(G.rounds-1)+' rounds to go.'}

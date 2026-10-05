@@ -47,7 +47,7 @@ function placePop() {
   p.style.top = top + 'px'; p.style.bottom = bottom + 'px';
 }
 function setPop(o, build) {
-  UI.pop = o; const p = $('#ppop'); p.hidden = false; p.innerHTML = ''; p.setAttribute('data-pop', o.kind);
+  UI.pop = o; const p = $('#ppop'); p.hidden = false; p.innerHTML = ''; p.setAttribute('data-pop', o.kind); p.setAttribute('role', 'dialog'); p.setAttribute('aria-modal', 'true');
   build(p); placePop();
   const bd = p.querySelector('.ph-body'); if (bd) bd.scrollTop = 0;
 }
@@ -55,7 +55,7 @@ function moveBtn(m, inner, cls) {
   UI.pm = UI.pm || []; const i = UI.pm.push(m) - 1; const rec = UI.rec && UI.rec.m && sameM(UI.rec.m, m);
   return h('button.btn.go' + (rec ? '.rec' : '') + (cls ? '.' + cls : ''), { 'data-a': 'do', 'data-mi': i, type: 'button' }, inner, rec ? h('span.star', '★ suggested') : null);
 }
-function reasonBox(t) { return h('div.why', t); }
+function reasonBox(t) { return document.createComment(''); }
 // ---- reasons a worker can't go somewhere
 function whyNotWorker(kind, i) {
   const a = HB.actor(G), p = G.players[viewSeat() >= 0 ? viewSeat() : 0];
@@ -108,7 +108,7 @@ function openTile(kind, i) {
       }
       const ws = (kind === 'basic' || kind === 'forest' || kind === 'haven') ? workersAt(kind, i) : [];
       if (ws.length) body.appendChild(h('div.occ', 'Workers here: ', ws.map(s => pawn(s, 18)), ' ', ws.map(pname).join(', ')));
-      if (kind === 'basic' || kind === 'forest' || kind === 'haven') body.appendChild(h('p.sm', info.shared ? 'Shared place: any number of workers can use it.' : 'Only one worker fits here.'));
+      if (kind === 'basic' || kind === 'forest' || kind === 'haven') body.appendChild(h('p.sm', info.shared ? 'Any number of workers fit.' : 'One worker fits here.'));
       if (m) {
         body.appendChild(moveBtn(m, isEv ? 'Claim it (use a worker)' : 'Place worker'));
         if (UI.rec && sameM(UI.rec.m, m)) body.appendChild(reasonBox(why(m, v)));

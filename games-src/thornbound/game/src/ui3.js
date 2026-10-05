@@ -115,19 +115,19 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el)return;const q=G.q
   let h='';
   h+='<div class="step" data-q="'+q.kind+'"><h3 class="st">'+esc(co&&co.title||(q.t==='menu'?menuTitle(q):KIND_NAME[q.kind]||titleOf(q)))+'</h3>';
   const dayMenu=q.t==='menu'&&menuPhase(q)==='Day';if(dayMenu)h+=previewHTML(preview(),'');
-  h+=co?'<p class="coach">'+gloss(co.text)+'</p>':'<p class="pr">'+gloss(promptText(q,s))+'</p>';
-  if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Everyone decides at the same time. Still to choose: '+esc(oth.map(seatWho).join(', '))+'.</p>'}
+  h+='<p class="pr">'+gloss(promptText(q,s))+'</p>';
+  if(NET.on&&q.simul){const oth=q.seats.filter(x=>x!==s);if(oth.length)h+='<p class="hint dec">Waiting: '+esc(shortT(oth.map(seatWho).join(', ')))+'</p>'}
   if(G.clash&&q.t!=='menu'&&(['location','castle','wilderness','harvest','shrine','ossuary','tie'].includes(q.kind)))h+=recapHTML();
-  if(rm&&(!co||!co.noRec))h+=recLine(s,rm);
+  
   const pulse=!!(co&&co.pulse);const hl=[];
   const hintBtn=!shown&&rec&&UI.guide!=='off'?'<button class="btn" data-a="hint">Suggest a move</button>':'';
   switch(q.kind){
-   case 'bid':{h+='<p class="hint">Tap a card in your hand to read it and bid with it. <button class="lk" data-a="road4">See the Kingdom Cards</button></p>';if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
+   case 'bid':{if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
    case 'bidRes':{h+=bidResHTML(s,mv);if(rm)foot=rm.t==='steal'?'<button class="btn pri'+(pulse?' pulse':'')+'" data-a="confirm" data-k="'+esc(rm.k)+'">'+esc(recBtnText(rm))+'</button>':pbtn(rm,recBtnText(rm),pulse);break}
-   case 'herald':{h+='<div class="locgrid">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="loc" data-l="'+m.loc+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' · '+esc(REG[m.loc>>1].replace('The ',''))+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';h+='<p class="hint">Tap a location to read its reward first.</p>';mv.forEach(m=>hl.push(m.loc));if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
-   case 'place':{const rs=[...new Set(mv.map(m=>m.r))];rs.forEach(r=>{hl.push(2*r,2*r+1)});h+='<p class="hint">Tap a hand card to choose it yourself'+(rs.length>1?' (then pick the region)':'')+'.</p>';if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
-   case 'tie':{h+='<p class="hint">Or tap a hand card to play it face-down into the tied Clash.</p>';const ps=mv.find(m=>m.pass);foot=(ps&&!(rm&&rm.pass)?'<button class="btn" data-a="mv" data-k="'+esc(ps.k)+'">Pass</button>':'')+(rm?pbtn(rm,recBtnText(rm),pulse):'');break}
-   case 'location':{h+='<div class="locgrid two">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' Influence'+(DD.LOCS[m.loc][3]?', '+esc(lcFirst(DD.LOCS[m.loc][3])):'')+(G.pl[s].herald===m.loc?' · your Herald: +1 more':'')+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';mv.forEach(m=>hl.push(m.loc));if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
+   case 'herald':{h+='<div class="locgrid">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="loc" data-l="'+m.loc+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' · '+esc(REG[m.loc>>1].replace('The ',''))+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';mv.forEach(m=>hl.push(m.loc));if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
+   case 'place':{const rs=[...new Set(mv.map(m=>m.r))];rs.forEach(r=>{hl.push(2*r,2*r+1)});if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
+   case 'tie':{const ps=mv.find(m=>m.pass);foot=(ps&&!(rm&&rm.pass)?'<button class="btn" data-a="mv" data-k="'+esc(ps.k)+'">Pass</button>':'')+(rm?pbtn(rm,recBtnText(rm),pulse):'');break}
+   case 'location':{h+='<div class="locgrid two">'+mv.map(m=>'<button class="lbtn'+(recK()===m.k?' rec':'')+'" data-a="mv" data-k="'+esc(m.k)+'"><b>'+esc(LOCN[m.loc])+'</b><small>+'+DD.LOCS[m.loc][2]+' Influence'+(DD.LOCS[m.loc][3]?', bonus':'')+(G.pl[s].herald===m.loc?' · your Herald: +1 more':'')+'</small>'+heraldDots(m.loc)+'</button>').join('')+'</div>';mv.forEach(m=>hl.push(m.loc));if(rm)foot=pbtn(rm,recBtnText(rm),pulse);break}
    case 'clashOrder':{h+='<div class="opts">'+mv.slice().sort((a,b)=>(recK()===b.k)-(recK()===a.k)).map(m=>optBtn(m,'ord',orderChips(m.order))).join('')+'</div>';if(rm)foot=pbtn(rm,'Use the suggested order',pulse);break}
    default:{
      if(q.t==='menu'){const r=menuHTML(s,mv,rm,pulse);h+=r.h;foot=r.f}
@@ -141,15 +141,16 @@ function menuTitle(q){const ph=menuPhase(q);if(ph==='Day')return G.clash?'Before
 const QNAME={discardPick:'Discard a card',discardDown:'Too many cards',applause:'Set the turn order',flank:'Flank',castle:'Govern',wilderness:'Journey',siteBuy:'Spend Lore',ossuary:'Ossuary bonus',shrine:'Moss Altar bonus',harvest:'The Favour',rally:'Rally',retreat:'Retreat',ambushCard:'Ambush',occupier:'Choose the occupier',slot:'Choose a slot',placeRegion:'Choose a region',placeLoc:'Choose a location',journeyDest:'Journey',brine:'Brine-Hardened',edict:'A Tactic',relics:'Council of Coin',order:'Turn order'};
 function titleOf(q){if(q.t==='menu'){const ph=menuPhase(q);return ph?ph+' actions':'Your actions'}if(QNAME[q.kind])return QNAME[q.kind];const t=(q.title||'').replace(/^[^:]*:\s*/,'');return t.length>28?'Your choice':t}
 function promptText(q,s){const t=q.title||'';
-  switch(q.kind){case 'bid':return 'Pick one hand card as a secret bid. The highest bid chooses a Kingdom Card first; the card you bid is tucked under it.';
-    case 'herald':return 'Put your Herald on a location. Everyone sees it. If you win that region and claim this location, you gain +1 Influence.';
-    case 'place':return t.indexOf('fewer')>=0?t:'Hide one card face-down next to each region ('+placeProgress()+'). The strongest total in a region wins its Clash.';
-    case 'bidRes':return 'Your turn to use your bid: take a Kingdom Card, steal one, or take your card back.';
-    case 'location':return 'You won the Clash. Claim one of the two locations of '+(G.clash?REG[G.clash.r]:'this region')+'.';
-    case 'discardPick':{const t2=G.log.slice().reverse().find(e=>e.m&&e.m.k==='tac');return plain(t)+(t2?' This is because '+plain(t2.t).replace(/\.$/,'')+'.':'')}
-    case 'applause':return 'Herald of Applause lets you set the turn order for this round. First place wins bid ties and acts first; last place chooses the Clash order.';
-    case 'clashOrder':return G.rm&&G.rm.tempests===s?'Your Doctrine of Tempests lets you choose the order of the three Clashes this round.':'You are last in turn order'+(G.round>1?' (the least Influence)':'')+', so you choose the order of the three Clashes.';
-    default:if(q.t==='menu'){const ph=menuPhase(q);return ph==='Day'?'The cards here are face up. Use a Day power now, or tap Done and the Clash is fought.':(ph||'These')+' options are optional. Use any of them, then tap Done.'}return plain(t)}}
+  switch(q.kind){case 'bid':return 'Pick a secret bid';
+    case 'herald':return 'Place your Herald';
+    case 'place':return t.indexOf('fewer')>=0&&t.split(' ').length<=8?t:'Hide a card: '+placeProgress();
+    case 'bidRes':return 'Take a Kingdom Card';
+    case 'location':return 'Claim a location';
+    case 'discardPick':return 'Discard a card';
+    case 'applause':return 'Set the turn order';
+    case 'clashOrder':return 'Choose the Clash order';
+    default:if(q.t==='menu'){const ph=menuPhase(q);return ph==='Day'?'Use a power, or tap Done':'Use a power, or tap Done'}return shortT(plain(t))}}
+function shortT(x){const w=String(x||'').split(/\s+/).filter(Boolean);return w.length<=8?w.join(' '):w.slice(0,7).join(' ').replace(/[,:;.]$/,'')+'...'}
 function placeProgress(){const me=vs();let n=0;for(const R of UI.V.reg)for(const id of R.down)if(id>=0&&ownerOf(id)===me)n++;
   const mv=me>=0?legal(me):[];const rs=[...new Set(mv.map(m=>m.r))];return 'card '+Math.min(3,n+1)+' of 3'+(rs.length===1?', for '+REG[rs[0]]:'')}
 function recLine(s,rm){if(!rm)return '';return '<p class="rec-l">'+ico('star')+'<span><b>Suggested:</b> '+esc(shortRec(rm))+' <span class="why2">'+gloss(UI._recWhy||'')+'</span></span></p>'}
@@ -160,8 +161,8 @@ function orderChips(o){return '<span class="oc">'+o.map((r,i)=>'<i>'+['I','II','
 function bidResHTML(s,mv){let h='<div class="offers">';
   const take=mv.filter(m=>m.t==='take'),steal=mv.filter(m=>m.t==='steal'),ret=mv.filter(m=>m.t==='return');
   for(const m of take.concat(steal).sort((a,b)=>(recK()===b.k)-(recK()===a.k))){const k=TB.kingdomInfo(m.kc);const rec=recK()===m.k;
-    h+='<div class="offer'+(rec?' rec':'')+'"><button class="kcth" data-a="kc" data-n="'+m.kc+'" aria-label="Read '+esc(k.name)+'">'+kcEl(m.kc,52).outerHTML+'</button><div class="ob"><b>'+esc(k.name)+'</b> <em>'+SUIT_N[k.suit]+'</em>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+'<p>'+gloss(k.text)+'</p>'+(m.t==='steal'?'<p class="st-n">'+stealPreview(s,m)+'</p>':'')+'<button class="btn" data-a="'+(m.t==='steal'?'confirm':'mv')+'" data-k="'+esc(m.k)+'">'+(m.t==='steal'?'Steal':'Take')+'</button></div></div>'}
-  for(const m of ret){const rec=recK()===m.k;h+='<div class="offer ret'+(rec?' rec':'')+'"><div class="ob"><b>Keep your card</b><p>Take your bid card back into your hand and take nothing.</p><button class="btn" data-a="mv" data-k="'+esc(m.k)+'">Take it back</button></div></div>'}
+    h+='<div class="offer'+(rec?' rec':'')+'"><button class="kcth" data-a="kc" data-n="'+m.kc+'" aria-label="Read '+esc(k.name)+'">'+kcEl(m.kc,52).outerHTML+'</button><div class="ob"><b>'+esc(k.name)+'</b> <em>'+SUIT_N[k.suit]+'</em>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+(m.t==='steal'?'<p class="st-n">'+shortT(stealPreview(s,m).replace(/<[^>]*>/g,''))+'</p>':'')+'<button class="btn" data-a="'+(m.t==='steal'?'confirm':'mv')+'" data-k="'+esc(m.k)+'">'+(m.t==='steal'?'Steal':'Take')+'</button></div></div>'}
+  for(const m of ret){const rec=recK()===m.k;h+='<div class="offer ret'+(rec?' rec':'')+'"><div class="ob"><b>Keep your card</b><p>Take nothing</p><button class="btn" data-a="mv" data-k="'+esc(m.k)+'">Take it back</button></div></div>'}
   return h+'</div>'}
 // Action menus (Spring / Day / Autumn): one screen per season. Every option is a row (what it costs, what it does, what you gain), all visible,
 // the list scrolls above the pinned action row, and one Done button ends the season.
@@ -177,7 +178,7 @@ function rowInfo(s,m){const a=m.a||'',lab=m.label||'';const i=lab.indexOf(':');l
 function rowHTML(s,m,day){const I=rowInfo(s,m);const rec=recK()===m.k;let g=I.gain;
   if(day){const r=simCached(m);if(r&&r.P)g='then: '+youFirst(Object.keys(r.P.tot).map(Number)).map(x=>(x===s?'you ':sideName(x)+' ')+r.P.tot[x]).join(' vs ')}
   const conf=m.a==='t:cln_t3';
-  return '<div class="orow'+(rec?' rec':'')+'"><div class="ob"><b>'+gloss(I.title)+'</b>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+(I.eff?'<span class="oe">'+gloss(I.eff)+'</span>':'')+((I.cost||g)?'<small class="oc2">'+(I.cost?'<em>Cost:</em> '+esc(I.cost):'')+(I.cost&&g?' · ':'')+(g?'<em>Gain:</em> '+esc(g):'')+'</small>':'')+'</div><button class="btn sm" data-a="'+(conf?'confirm':'mv')+'" data-k="'+esc(m.k)+'">Use</button></div>'}
+  return '<div class="orow'+(rec?' rec':'')+'"><div class="ob"><b>'+gloss(I.title)+'</b>'+(rec?' <span class="rtag">'+ico('star')+'Suggested</span>':'')+(I.eff&&I.eff.split(/\s+/).length<=8?'<span class="oe">'+gloss(I.eff)+'</span>':'')+((I.cost||g)?'<small class="oc2">'+(I.cost?'<em>Cost:</em> '+esc(shortT(I.cost)):'')+(I.cost&&g?' · ':'')+(g?'<em>Gain:</em> '+esc(shortT(g)):'')+'</small>':'')+'</div><button class="btn sm" data-a="'+(conf?'confirm':'mv')+'" data-k="'+esc(m.k)+'">Use</button></div>'}
 function simCached(m){const key=G.logN+'|'+m.k;UI._simc=UI._simc||{};if(UI._simc.n!==G.logN)UI._simc={n:G.logN};if(!(key in UI._simc)){let r=null;try{r=simDay(m)}catch(e){}UI._simc[key]=r}return UI._simc[key]}
 function menuHTML(s,mv,rm,pulse){let h='';const ph=menuPhase(G.q),day=ph==='Day';const acts=visibleActs(mv).filter(m=>m.t==='act'),done=mv.find(m=>m.t==='done');let f='';
   const byG={};for(const m of acts){(byG[mgroup(m.a)]=byG[mgroup(m.a)]||[]).push(m)}

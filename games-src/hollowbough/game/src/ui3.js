@@ -4,16 +4,16 @@ function focusSeat() { const v = viewSeat(); if (v >= 0) return v; if (UI.focus 
 function stripW() { return isPh() ? 46 : 58; }
 function promptText() {
   if (!G) return '';
-  if (G.phase === 'over') return 'The game is over.';
+  if (G.phase === 'over') return 'Game over.';
   const a = HB.actor(G), p = G.players[a];
-  if (UI.cards.length) return 'Read the card, then Continue.';
+  if (UI.cards.length) return 'Read, then Continue.';
   if (NET.on && !p.ai && a !== viewSeat()) return p.name + ' is deciding…';
   if (hotSeat() && UI.holder !== a && !p.ai) return 'Pass the device to ' + p.name + '.';
   if (p.ai) { const l = G.log.length ? G.log[G.log.length - 1].t : ''; return p.name + ' is playing… ' + (UI.lastAi || ''); }
   if (G.q) return G.q.title;
   const n = availW(p);
   const pre = NET.on ? 'Your turn. ' : hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
-  return pre + (n > 0 ? 'Tap a place for a worker (' + n + ' free) or a card to play.' : 'No workers left: play a card, Prepare for ' + (p.season < 3 ? SEASN[p.season + 1] : 'the end') + ', or Pass.');
+  return pre + (n > 0 ? 'Tap a place (' + n + ' free).' : 'Play a card, Prepare or Pass.');
 }
 function chipEl(s) {
   const grim = s === 'G', p = grim ? null : G.players[s];

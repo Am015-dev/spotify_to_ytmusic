@@ -247,16 +247,16 @@ function focusSeat() { const v = viewSeat(); if (v >= 0) return v; if (UI.focus 
 function stripW() { return isPh() ? 46 : 58; }
 function promptText() {
   if (!G) return '';
-  if (G.phase === 'over') return 'The game is over.';
+  if (G.phase === 'over') return 'Game over.';
   const a = HB.actor(G), p = G.players[a];
-  if (UI.cards.length) return 'Read the card, then Continue.';
+  if (UI.cards.length) return 'Read, then Continue.';
   if (NET.on && !p.ai && a !== viewSeat()) return p.name + ' is deciding…';
   if (hotSeat() && UI.holder !== a && !p.ai) return 'Pass the device to ' + p.name + '.';
   if (p.ai) { const l = G.log.length ? G.log[G.log.length - 1].t : ''; return p.name + ' is playing… ' + (UI.lastAi || ''); }
   if (G.q) return G.q.title;
   const n = availW(p);
   const pre = NET.on ? 'Your turn. ' : hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
-  return pre + (n > 0 ? 'Tap a place for a worker (' + n + ' free) or a card to play.' : 'No workers left: play a card, Prepare for ' + (p.season < 3 ? SEASN[p.season + 1] : 'the end') + ', or Pass.');
+  return pre + (n > 0 ? 'Tap a place (' + n + ' free).' : 'Play a card, Prepare or Pass.');
 }
 function chipEl(s) {
   const grim = s === 'G', p = grim ? null : G.players[s];
@@ -379,7 +379,7 @@ function placePop() {
   p.style.top = top + 'px'; p.style.bottom = bottom + 'px';
 }
 function setPop(o, build) {
-  UI.pop = o; const p = $('#ppop'); p.hidden = false; p.innerHTML = ''; p.setAttribute('data-pop', o.kind);
+  UI.pop = o; const p = $('#ppop'); p.hidden = false; p.innerHTML = ''; p.setAttribute('data-pop', o.kind); p.setAttribute('role', 'dialog'); p.setAttribute('aria-modal', 'true');
   build(p); placePop();
   const bd = p.querySelector('.ph-body'); if (bd) bd.scrollTop = 0;
 }
@@ -387,7 +387,7 @@ function moveBtn(m, inner, cls) {
   UI.pm = UI.pm || []; const i = UI.pm.push(m) - 1; const rec = UI.rec && UI.rec.m && sameM(UI.rec.m, m);
   return h('button.btn.go' + (rec ? '.rec' : '') + (cls ? '.' + cls : ''), { 'data-a': 'do', 'data-mi': i, type: 'button' }, inner, rec ? h('span.star', '★ suggested') : null);
 }
-function reasonBox(t) { return h('div.why', t); }
+function reasonBox(t) { return document.createComment(''); }
 // ---- reasons a worker can't go somewhere
 function whyNotWorker(kind, i) {
   const a = HB.actor(G), p = G.players[viewSeat() >= 0 ? viewSeat() : 0];
@@ -440,7 +440,7 @@ function openTile(kind, i) {
       }
       const ws = (kind === 'basic' || kind === 'forest' || kind === 'haven') ? workersAt(kind, i) : [];
       if (ws.length) body.appendChild(h('div.occ', 'Workers here: ', ws.map(s => pawn(s, 18)), ' ', ws.map(pname).join(', ')));
-      if (kind === 'basic' || kind === 'forest' || kind === 'haven') body.appendChild(h('p.sm', info.shared ? 'Shared place: any number of workers can use it.' : 'Only one worker fits here.'));
+      if (kind === 'basic' || kind === 'forest' || kind === 'haven') body.appendChild(h('p.sm', info.shared ? 'Any number of workers fit.' : 'One worker fits here.'));
       if (m) {
         body.appendChild(moveBtn(m, isEv ? 'Claim it (use a worker)' : 'Place worker'));
         if (UI.rec && sameM(UI.rec.m, m)) body.appendChild(reasonBox(why(m, v)));
@@ -764,6 +764,7 @@ const COACH = [
   { id: 'pass', light: 1, t: 'Passing', x: 'When you have nothing worthwhile left, press Pass. Your city is scored when everybody has passed. Your Hint button always shows a good move and why.', when: (p) => p.season >= 3 && availW(p) === 0 }
 ];
 function coachCheck() {
+  return false; // no advice cards during play (owner's rule)
   const lv = UI.coach.level; if (lv === 'off') return false;
   const v = viewSeat(); if (v < 0 || HB.actor(G) !== v) return false;
   const p = G.players[v]; if (G.q) { if (!UI.coach.seen.decision && lv === 'full') { UI.coach.seen.decision = 1; pushCard({ kind: 'coach', title: 'A choice for you', sub: 'Guide', body: h('p', 'Some cards and places ask you to choose. A decision appears here one at a time. The star marks what the computer helper would pick.') }); return true; } return false; }
@@ -828,7 +829,7 @@ function renderStart() {
   const card = h('div.scard',
     h('h1', h('span', { html: ICO.tree }), 'Hollowbough'),
     h('p.tag', 'Build a woodland city. Place workers, play cards, outlast the winter.'),
-    h('button.sbtn.big', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and one gentle computer player; tips appear one at a time.')),
+    h('button.sbtn.big', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and one gentle computer player.')),
     window.CAMPAIGN ? h('button.sbtn.big.story', { 'data-start': 'story', 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story: The Long Winter'), h('span', campLine())) : null,
     h('div.opts', seg('Players', 'np', [2, 3, 4]), seg('Computer level', 'level', ['easy', 'normal', 'hard']), seg('Solo rival', 'solo', [1, 2, 3], v => D.soloLevels[v - 1] + (v > 1 ? '*' : ''))),
     h('p.sm', '*Gruff and Ghastly are very hard.'),

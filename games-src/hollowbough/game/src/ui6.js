@@ -12,6 +12,7 @@ const COACH = [
   { id: 'pass', light: 1, t: 'Passing', x: 'When you have nothing worthwhile left, press Pass. Your city is scored when everybody has passed. Your Hint button always shows a good move and why.', when: (p) => p.season >= 3 && availW(p) === 0 }
 ];
 function coachCheck() {
+  return false; // no advice cards during play (owner's rule)
   const lv = UI.coach.level; if (lv === 'off') return false;
   const v = viewSeat(); if (v < 0 || HB.actor(G) !== v) return false;
   const p = G.players[v]; if (G.q) { if (!UI.coach.seen.decision && lv === 'full') { UI.coach.seen.decision = 1; pushCard({ kind: 'coach', title: 'A choice for you', sub: 'Guide', body: h('p', 'Some cards and places ask you to choose. A decision appears here one at a time. The star marks what the computer helper would pick.') }); return true; } return false; }
@@ -76,7 +77,7 @@ function renderStart() {
   const card = h('div.scard',
     h('h1', h('span', { html: ICO.tree }), 'Hollowbough'),
     h('p.tag', 'Build a woodland city. Place workers, play cards, outlast the winter.'),
-    h('button.sbtn.big', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and one gentle computer player; tips appear one at a time.')),
+    h('button.sbtn.big', { 'data-start': 'guided', 'data-a': 'guided', type: 'button' }, h('b', 'Guided first game'), h('span', 'You and one gentle computer player.')),
     window.CAMPAIGN ? h('button.sbtn.big.story', { 'data-start': 'story', 'data-a': 'story', type: 'button' }, h('b', '\u2728 Story: The Long Winter'), h('span', campLine())) : null,
     h('div.opts', seg('Players', 'np', [2, 3, 4]), seg('Computer level', 'level', ['easy', 'normal', 'hard']), seg('Solo rival', 'solo', [1, 2, 3], v => D.soloLevels[v - 1] + (v > 1 ? '*' : ''))),
     h('p.sm', '*Gruff and Ghastly are very hard.'),
