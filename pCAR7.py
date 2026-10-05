@@ -19,15 +19,19 @@ function CR_npcVeh(geo,col){let A;if(geo==='truck')A=CR_tow(col);else if(geo==='
  const G=GB_geo(br,null),g=new THREE.Group(),h=new THREE.Group();g.add(h);const mk=(geo2,mat)=>{const o=new THREE.Mesh(geo2,mat);o.castShadow=true;h.add(o);return o};
  if(G.m)mk(G.m,GB_MAT);if(G.l)mk(G.l,GB_LMAT);if(G.g)mk(G.g,CR_GM).renderOrder=2;for(const w of G.w||[]){const o=mk(CR_wheel(w.t),GB_MAT);o.position.copy(w.o);o.userData.r=CR_WH[w.t].r;CR_spin(o)}
  const bb=new THREE.Box3().setFromObject(h),s=(geo==='truck'?2.5:2.05)/(bb.max.x-bb.min.x);h.scale.setScalar(s);h.rotation.y=Math.PI;h.position.y=-bb.min.y*s+.03;
- g.userData.crHalf={L:(bb.max.z-bb.min.z)*s/2,W:(bb.max.x-bb.min.x)*s/2};CR_NPCS.push(g);return g}
+ g.userData.crHalf={L:(bb.max.z-bb.min.z)*s/2,W:(bb.max.x-bb.min.x)*s/2};g.rotation.order='YXZ';g.userData.crH=h;g.userData.crY=h.position.y;CR_NPCS.push(g);return g}
+// sit on all four tyres: pitch/roll to the ground under the wheels, centre height = mean of the four contacts
+function CR_npcTilt(g){const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),fz=Math.cos(h),dl=H.L*.72,dw=H.W*.8,x=g.position.x,z=g.position.z,y0=g.position.y+4,G=(a,b)=>groundAt(x+fx*a+fz*b,z+fz*a-fx*b,y0),
+ yF=(G(dl,dw)+G(dl,-dw))/2,yB=(G(-dl,dw)+G(-dl,-dw))/2,yR=(G(dl,dw)+G(-dl,dw))/2,yL=(G(dl,-dw)+G(-dl,-dw))/2,yC=groundAt(x,z,y0);
+ g.rotation.x=clamp(-Math.atan2(yF-yB,2*dl),-.25,.25);g.rotation.z=clamp(Math.atan2(yR-yL,2*dw),-.25,.25);g.userData.crH.position.y=g.userData.crY+clamp((yF+yB)/2-yC,-.5,.5)}
 // keep the player out of mission vehicles: push out of the oriented footprint and bleed speed
-function CR_npcPush(){if(typeof RO==='undefined'||!RO.on)return;for(let i=CR_NPCS.length-1;i>=0;i--){const g=CR_NPCS[i];if(!g.parent){CR_NPCS.splice(i,1);continue}if(!g.visible)continue;const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),fz=Math.cos(h),dx=RO.x-g.position.x,dz=RO.z-g.position.z;
+function CR_npcPush(){if(typeof RO==='undefined'||!RO.on)return;for(let i=CR_NPCS.length-1;i>=0;i--){const g=CR_NPCS[i];if(!g.parent){CR_NPCS.splice(i,1);continue}if(!g.visible)continue;CR_npcTilt(g);const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),fz=Math.cos(h),dx=RO.x-g.position.x,dz=RO.z-g.position.z;
  if(Math.abs(RO.y-g.position.y)>3)continue;const al=dx*fx+dz*fz,sd=dx*fz-dz*fx,pl=H.L+1.3-Math.abs(al),ps=H.W+1.05-Math.abs(sd);if(pl<=0||ps<=0)continue;
  if(ps<pl){const k=Math.sign(sd)||1;RO.x+=fz*k*ps;RO.z-=fx*k*ps}else{const k=Math.sign(al)||1;RO.x+=fx*k*pl;RO.z+=fz*k*pl}RO.v*=.6}}
 '''
 i=s.index('const GB_PRE=[')
 s=s[:i]+JS+'\n'+s[i:]
-R("function M1_car(geo,col,sc,trim){const mat=kmMat('car').clone();","function M1_car(geo,col,sc,trim){try{const g=CR_npcVeh(geo,col);RO.grp.add(g);return g}catch(e){console.warn('CR npc',e)}const mat=kmMat('car').clone();")
+R("function M1_car(geo,col,sc,trim){const mat=kmMat('car').clone();","function M1_car(geo,col,sc,trim){if(!/boat/.test(geo))try{const g=CR_npcVeh(geo,col);RO.grp.add(g);return g}catch(e){console.warn('CR npc',e)}const mat=kmMat('car').clone();")
 R("function hubTrafficStep(dt){","function hubTrafficStep(dt){CR_npcPush();")
 save()
 print('OK')
