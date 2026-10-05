@@ -47,6 +47,7 @@ function init3D(){const cv=document.getElementById('c3');if(!cv||typeof THREE===
   const u=urlGfx();V3.pinned=!!u||gfxPref()!=='auto';const p=gfxPref();setQuality(u||(p==='auto'?gfxAuto():p));
   resize3D();V3.on=true;document.body.classList.add('three');V3.clock=performance.now();gfxLabel();
   setTimeout(()=>{try{makePortraits()}catch(e){console.warn('portraits off',e)}},300);
+  setTimeout(()=>{try{warm3D()}catch(e){console.warn('warm off',e)}},700);
   perfHooks();(PH?PH.raf:requestAnimationFrame)(loop3D);return true}
 // ---- quality levels ----
 function setQuality(q){if(!['high','medium','low'].includes(q))q='high';const r=V3.r;V3.q=q;const dpr=window.devicePixelRatio||1;
@@ -636,3 +637,21 @@ function loop3D(now){(PH?PH.raf:requestAnimationFrame)(loop3D);if(!V3.on)return;
   L.sort((a,b)=>b.y-a.y);const done=[];for(const t of L){for(let g=0;g<6;g++){const q=done.find(q=>Math.abs(t.x-q.x)<(t.w+q.w)/2+2&&t.y-t.h<q.y+2&&q.y-q.h<t.y+2);if(!q)break;t.y=q.y-q.h-2}t.y=Math.max(t.h,t.y);t.el.style.top=t.y+'px';done.push(t)}
   const ct=document.getElementById('coachtag');if(ct&&ct._v)placeEl(ct,ct._v);
   document.querySelectorAll('#tags .pop').forEach(el=>el._v&&placeEl(el,el._v))}
+
+// While the title is up, build one of every material kind off-screen and compile its shaders, so the first Launch does not stall
+// on rock textures and shader compilation (about a second on slow GPUs). No game state is touched.
+function warm3D(){if(G||!V3.on||!V3.r)return;const g=new THREE.Group();
+  try{const box=new THREE.BoxGeometry(1,1,1);const mk=m=>{const o=new THREE.Mesh(box,m);o.castShadow=true;o.receiveShadow=true;g.add(o);return o};
+    mk(new THREE.MeshPhysicalMaterial({color:0x0b0c10,roughness:.28,metalness:0,clearcoat:.8,clearcoatRoughness:.15}));
+    mk(new THREE.MeshPhysicalMaterial({color:0xcfe6ff,roughness:.05,metalness:0,transparent:true,opacity:.28,clearcoat:1,envMapIntensity:2,depthWrite:false}));
+    mk(new THREE.MeshStandardMaterial({map:ringTex(),roughness:.55,metalness:0}));
+    mk(new THREE.MeshBasicMaterial({map:blobTex(),transparent:true,depthWrite:false,opacity:.8}));
+    mk(new THREE.MeshBasicMaterial({map:ringTex(),transparent:true,opacity:.55,blending:THREE.AdditiveBlending,depthWrite:false}));
+    mk(shieldMat());rockMaps();mk(rockMat()).material.vertexColors=true;
+    const im=new THREE.InstancedMesh(box,rockMat(),2);im.castShadow=true;g.add(im);
+    const fc=FACCOL[Object.keys(FACCOL)[0]];Object.keys(MODELS).forEach(k=>{try{g.add(MODELS[k](fc))}catch(e){}});
+    // guide overlays (path ribbons, base outlines, firing lanes, arc fans) use their own shaders
+    const pts=[0,1,2].map(i=>({x:10+i*8,y:10,h:0}));
+    [()=>ribbon(pts,0xffffff,.5),()=>outline({x:20,y:20,h:0},40,0xffffff,.5),()=>laneMesh(W(0,0,2),W(30,30,2),0xff5566),()=>arcFan({x:20,y:20,h:0,base:'S',type:Object.keys(SHIPS)[0]},'F',3,0xffa24f)].forEach(f=>{try{g.add(f())}catch(e){}});
+    V3.root.add(g);V3.r.compile(V3.scene,V3.camera)}catch(e){console.warn('warm',e)}
+  finally{V3.root.remove(g)}}

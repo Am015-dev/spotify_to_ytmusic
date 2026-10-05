@@ -11,7 +11,7 @@ function humanTurn(){const k=sideToAct();return k>=0&&isHuman(k)&&(typeof NET===
 function refresh(){render();schedule()}
 function render(){if(typeof netTick==='function')netTick();try{hpMark()}catch(e){}
   if(G&&G.winner&&UI.wonSnd!==G.seed){UI.wonSnd=G.seed;sfx('win');if(G.sortie!=null&&soloSide()===0&&G.winner==='P1'){const c=campaign();c.i=Math.max(c.i,Math.min(SORTIES.length,G.sortie+1));c.won++;saveCampaign(c)}if(ANIM)setTimeout(()=>{UI.stats=true;render()},2200)}
-  attackWatch();flowWatch();trackStats();if(V3.on)sync3D();else render2D();renderFlow();renderPrompt();renderShipCard();renderRoster();renderLog();renderModal();renderDock();renderCoach()}
+  attackWatch();flowWatch();trackStats();if(V3.on){/* a new battle builds its rocks and ship models (~0.1 s): show the DOM first, build the scene in the next task */if(G&&!UI.defer3&&V3.gid!==G.seed+':'+G.ships.length+':'+G.rocks.length){UI.defer3=1;setTimeout(()=>{UI.defer3=0;if(V3.on&&G)sync3D()},30)}else if(!UI.defer3)sync3D()}else render2D();renderFlow();renderPrompt();renderShipCard();renderRoster();renderLog();renderModal();renderDock();renderCoach()}
 // ---- step bar ----
 function renderSteps(){renderRoad()}
 // ---- dial picker ----
