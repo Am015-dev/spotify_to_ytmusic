@@ -256,6 +256,8 @@ button{font:inherit;color:inherit}
 .ssum .sline{flex:1;min-width:0;font-size:1rem}.ssum .sline b{color:#fff3c4}
 .sgo{display:flex;flex-direction:column;gap:8px}
 .sgrid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.setup .sgo{position:sticky;bottom:0;z-index:3;padding:8px 0 calc(6px + var(--sab));background:linear-gradient(rgba(14,8,10,0),rgba(14,8,10,.94) 18%)}
+@media (max-height:620px){.setup{gap:6px}.setup .guidebox,.setup .ssub,.setup .shead h2{display:none}.setup .sbtn{min-height:44px}.setup .sbtn.big{min-height:50px}.setup .sbtn span{font-size:.72rem}.setup .sgo{gap:5px}.setup .sgrid3{gap:5px}}
 .sbtn{appearance:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:56px;padding:4px 8px;border-radius:14px;border:2px solid #c99a35;background:rgba(36,20,25,.9);color:#f6e6b4;cursor:pointer;font:inherit;text-align:center}
 .sbtn b{font:700 1.05rem var(--fd);color:#fff3c4}.sbtn span{font-size:.85rem;opacity:.9}
 .sbtn.big{min-height:64px;background:linear-gradient(#e8c867,#b98a23);border-color:#fff0b8}.sbtn.big b,.sbtn.big span{color:#2b1808}
