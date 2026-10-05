@@ -5,6 +5,7 @@ def ART_mod(name):
     global s
     body=open(name).read();o,c='/*ART<%s>*/'%name,'/*ART</%s>*/'%name
     try:
+        if name=='art4.js': raise Exception('keep')
         old=subprocess.run(['git','show','3b8ef17:'+name],capture_output=True,text=True).stdout
         if old and old in s: s=s.replace(old+'\n','',1) if old+'\n' in s else s.replace(old,'',1)
     except Exception: pass
