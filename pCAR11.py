@@ -7,7 +7,10 @@ JS=r'''
 (()=>{const st=document.createElement('style');st.id='crToast';st.textContent=`
 html body #ogArea{left:auto!important;right:calc(12px + env(safe-area-inset-right,0px))!important;top:calc(10px + env(safe-area-inset-top,0px))!important;transform:none!important;max-width:200px!important;padding:4px 10px!important;border-radius:10px!important;text-align:right!important;font-size:12px!important}
 html body #ogArea b{font-size:13px!important;letter-spacing:.05em!important}html body #ogArea em{font-size:12px!important;display:inline!important;margin-left:6px}
-html body #ogArea .ogBar,html body #ogArea span{display:none!important}`;document.head.appendChild(st)})();
+html body #ogArea .ogBar,html body #ogArea span{display:none!important}
+html body #speedFx#speedFx{filter:opacity(.5) hue-rotate(10deg) saturate(2.2)!important;-webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 44%,transparent 54%)!important;mask-image:linear-gradient(to bottom,#000 0%,#000 44%,transparent 54%)!important}
+html body #roamPlate#roamPlate{left:auto!important;right:calc(12px + env(safe-area-inset-right,0px))!important;top:calc(44px + env(safe-area-inset-top,0px))!important;transform:none!important;max-width:230px!important;padding:3px 10px!important;border-radius:10px!important;background:rgba(20,20,19,.86)!important;text-align:right!important;min-width:0!important;width:auto!important;height:auto!important}
+html body #roamPlate#roamPlate *{font-size:12px!important;line-height:1.25!important;letter-spacing:0!important}html body #roamPlate::before,html body #roamPlate::after{display:none!important}`;document.head.appendChild(st)})();
 OG_pop=(f=>function(a,first){f(a,first);OG.popT=Math.min(OG.popT||0,2)})(OG_pop);
 '''
 import re

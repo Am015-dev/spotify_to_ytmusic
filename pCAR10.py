@@ -63,13 +63,17 @@ R("o.onBeforeRender=function(...a){CR_clamp(this);return ob.apply(this,a)}","o.o
 R("say('',want==='boat'?'BOAT':want==='4x4'?'4×4':'SHIP',.6)","say('',want==='boat'?'BOAT':want==='4x4'?'4×4':'CAR',.6)")
 # the hover ship's blue thruster fire (two glow puffs 3 m behind, 1.1 m to each side) is gone; boost = tailpipe flames (CR_fx)
 R("function LK_boost(){if(state!=='roam'","function LK_boost(){return;if(state!=='roam'")
+
+# default HOT ROD: no flame bricks on the body (read as "on fire"), rear tyres 1 stud wider so they show at the corners from behind
+R("sym('flame',-4,-2,2,Y,5);","")
+R("sym('wL',-4,3,0,K,wy('wL',.36));sym('flame',-4,3,2,Y,7);sym('flame',-3,3,2,o.acc2||'#fac80a',7);","sym('wL',-5,3,0,K,wy('wL',.36));")
 # street props right in front of the lens (bollards, posts) no longer fill the screen: roam near plane 1.2 -> 2.0 m (the car is >= 4 m away)
 R("camera.far=SET.q==='high'?3400:2600;camera.near=1.2;","camera.far=SET.q==='high'?3400:2600;camera.near=2;")
 # chase camera: rigid distance + height, yaw lag 0.15 s, look direction snaps with camSnap
 i=s.index('function roamCam(dt){');j=s.index('if(shake>0){camera.position.x+=',i)
 CAM=r'''function roamCam(dt){const C=RCAM[SET.rcam]||RCAM.chase;const sn=camSnap;camSnap=false;const k1=clamp(Math.abs(RO.v)/Math.max(30,RO.top||60),0,1.4);
   RO.camH=sn||RO.camH==null?RO.h:RO.camH+angDiff(RO.h,RO.camH)*Math.min(1,dt*(RO.dDir?3:CR_CAMK));const fw=V3(Math.sin(RO.camH),0,Math.cos(RO.camH)),p=V3(RO.x,RO.y,RO.z);
-  const bmax=C.b+C.bk*k1;let back=bmax;for(let d=2;d<=bmax;d+=1)if(roamHit(RO.x-fw.x*d,RO.z-fw.z*d,.6,RO.y+3)){back=Math.max(4,d-1.5);break}
+  const bmax=C.b+C.bk*k1;let back=bmax;for(let d=2;d<=bmax;d+=.5)if(roamHit(RO.x-fw.x*d,RO.z-fw.z*d,1.5,RO.y+2.5)){back=Math.max(3.5,d-1);break}
   RO.camB=sn||RO.camB==null||back<RO.camB?back:RO.camB+(back-RO.camB)*Math.min(1,dt*3);RO.camY=sn||RO.camY==null?RO.y:RO.camY+(RO.y-RO.camY)*Math.min(1,dt*10);
   camera.position.set(RO.x-fw.x*RO.camB,RO.camY+C.h+C.hk*k1+(pl&&pl.air?2:0),RO.z-fw.z*RO.camB);if(camera.position.y<RO.y+2)camera.position.y=RO.y+2;
   {const vt=RO.vh??RO.h;RO.camL=sn||RO.camL==null?vt:RO.camL+angDiff(vt,RO.camL)*Math.min(1,dt*CR_CAMK);RO.camR=sn?0:(RO.camR||0)+((RO.yr||0)-(RO.camR||0))*Math.min(1,dt*3)}const vf=V3(Math.sin(RO.camL),0,Math.cos(RO.camL));camera.lookAt(p.clone().addScaledVector(vf,C.l+C.lk*k1).add(V3(0,C.ly,0)));camera.rotateZ(clamp(-RO.camR*.02,-.035,.035));'''
@@ -77,6 +81,6 @@ s=s[:i]+CAM+s[j:]
 # outermost pose step for the player car
 import re
 m=re.search(r'<script type="module">(.*?)</script>',s,re.S)
-s=s[:m.end(1)]+"\nroamPose=(f=>function(s,dt){f(s,dt);try{if(s===pl&&state==='roam')CR_carPose(s,dt);else if(CR_SH&&state!=='roam')CR_SH.visible=false}catch(e){if(!CR_PS.e){CR_PS.e=1;console.warn('CR pose',e)}}})(roamPose);\n"+s[m.end(1):]
+s=s[:m.end(1)]+"\nroamPose=(f=>function(s,dt){f(s,dt);try{if(s===pl&&state==='roam'){CR_carPose(s,dt);const cp=camera.position;for(const st of RO.studs||[])if(st.alive&&st.m&&st.m.visible&&st.m.position.distanceToSquared(cp)<12.25)st.m.visible=false;for(const st of (typeof HUB!=='undefined'&&HUB.studFX)||[])if(st.alive&&st.m.visible){if(st.m.scale.x>.56)st.m.scale.setScalar(.55);if(st.m.position.distanceToSquared(cp)<20.25)st.m.visible=false}}else if(CR_SH&&state!=='roam')CR_SH.visible=false}catch(e){if(!CR_PS.e){CR_PS.e=1;console.warn('CR pose',e)}}})(roamPose);\n"+s[m.end(1):]
 save()
 print('OK')

@@ -24,7 +24,7 @@ await p.evaluate(()=>{const {scene,camera,THREE}=__dbg,GY0=__dbg.GA;let gyRef=0;
   camera.getWorldDirection(v);
   L.push({t:gt,h:RO.h,vh:RO.vh??RO.h,v:RO.v,yr:RO.yr||0,d:RO.dDir||0,st:c.steer||0,air:!!P.air,cx:camera.position.x,cz:camera.position.z,x:RO.x,z:RO.z,y:RO.y,cy:Math.atan2(v.x,v.z),W,clr:clr<1e8?clr:null,cw:cw<1e8?cw:null,bt:(P.boatK||0)>.3?1:0,nb:__dbg.NB,vm:P.vmode||'car'})};
  window.__run=n=>{for(let i=0;i<n;i++){__ju.step(1);sample()}return __dbg.RO.h};
- window.__draw=()=>{try{__dbg.composer.render()}catch(e){__dbg.renderer.render(scene,camera)}}});
+ window.__draw=()=>{__dbg.SS&&__dbg.SS();try{__dbg.composer.render()}catch(e){__dbg.renderer.render(scene,camera)}}});
 const K=p.keyboard;let si=0;
 const run=n=>p.evaluate(n=>__run(n),n);
 const shot=async()=>{await p.evaluate(()=>__draw());await p.screenshot({path:`${OUT}_f${String(si++).padStart(2,'0')}.png`})};
@@ -33,6 +33,31 @@ const seg=async(frames)=>{for(let k=0;k<frames;k+=30){await run6(Math.min(30,fra
 if(MODE==='seq'){if(!CRU)await K.down('ArrowUp');await seg(180);const h0=await run(0);await K.down('ArrowRight');
  for(let k=0;k<180;k+=6){const h=await run6(6);if(k%30===24)await shot();if(Math.abs(h-h0)>Math.PI/2)break}
  await K.up('ArrowRight');await shot();await seg(60);for(let i=0;i<6;i++){const k=i%2?'ArrowRight':'ArrowLeft';await K.down(k);await seg(42);await K.up(k)}await K.up('ArrowUp')}
+else if(MODE==='route'){
+ // a person driving a real street: follow the road graph to the next junction, turn 90 deg, then slalom down the straight
+ const info=await p.evaluate(()=>{const CS=__dbg.CS,JN=__dbg.JN;if(!CS||!JN)return{err:'no road data'};const ad=(a,b)=>Math.atan2(Math.sin(a-b),Math.cos(a-b));
+  // a real junction of two car roads (>= 10 m wide): 90 m straight approach on road A, a ~90 deg turn, 160 m straight on road B
+  const run=(S,i,dirn,len)=>{const P=[],p0=S.pts[i];let k=i;while(k>=0&&k<S.pts.length){const q=S.pts[k];if(Math.abs(q.s-p0.s)>len)break;P.push({x:q.x,z:q.z});k+=dirn}return{P,ok:Math.abs(S.pts[Math.max(0,Math.min(S.pts.length-1,k-dirn))].s-p0.s)>=len*.95}};
+  const hd=(P,k)=>Math.atan2(P[k+1].x-P[k].x,P[k+1].z-P[k].z),straight=P=>{if(P.length<3)return false;const h0=hd(P,0);for(let k=0;k<P.length-1;k++)if(Math.abs(ad(hd(P,k),h0))>.18)return false;return true};
+  for(const J of JN){const IX=J.ix||(J.ids||[]).map(id=>{const S=CS[id];let bi=0,bd=1e9;S.pts.forEach((q,k)=>{const d=Math.hypot(q.x-J.x,q.z-J.z);if(d<bd){bd=d;bi=k}});return[id,bi]});if(IX.length<2)continue;for(const[a,ia]of IX)for(const[b,ib]of IX){if(a===b)continue;const A=CS[a],B=CS[b];if(A.r.w<10||B.r.w<10||A.r.cls==='ped'||B.r.cls==='ped')continue;
+    for(const da of[1,-1])for(const db of[1,-1]){const ap=run(A,ia,-da,90),out=run(B,ib,db,160);if(!ap.ok||!out.ok||!straight(ap.P)||!straight(out.P))continue;const inH=-hd(ap.P,0),P=ap.P.slice().reverse();
+      const hin=Math.atan2(P[P.length-1].x-P[P.length-2].x,P[P.length-1].z-P[P.length-2].z),hout=hd(out.P,0),turn=ad(hout,hin);if(Math.abs(Math.abs(turn)-Math.PI/2)>.3)continue;
+      const R=P.concat(out.P.slice(1)),Jp=P.length-1;__m1.warp(R[0].x,R[0].z,Math.atan2(R[1].x-R[0].x,R[1].z-R[0].z));window.__rt={P:R,J:Jp};return{n:R.length,J:Jp,turnDeg:+(turn*57.3).toFixed(0),wA:A.r.w,wB:B.r.w,at:[J.x|0,J.z|0]}}}}
+  return{err:'no junction'}});
+ await run(30);
+console.log('route',JSON.stringify(info));if(!info||info.err){await br.close();return}
+ const steer=off=>p.evaluate(off=>{const {P,J}=__rt,RO=__dbg.RO;let bi=0,bd=1e9;for(let i=0;i<P.length-1;i++){const a=P[i],b=P[i+1],vx=b.x-a.x,vz=b.z-a.z,l2=vx*vx+vz*vz||1,u=Math.max(0,Math.min(1,((RO.x-a.x)*vx+(RO.z-a.z)*vz)/l2)),d=Math.hypot(a.x+vx*u-RO.x,a.z+vz*u-RO.z);if(d<bd){bd=d;bi=i+u}}
+  const at=s=>{let i=Math.floor(s),u=s-i;if(i>=P.length-1){i=P.length-2;u=1}const a=P[i],b=P[i+1];return{x:a.x+(b.x-a.x)*u,z:a.z+(b.z-a.z)*u,h:Math.atan2(b.x-a.x,b.z-a.z)}};
+  let s=bi,left=11;while(left>0&&s<P.length-1){const i=Math.floor(s),a=P[i],b=P[i+1],L=Math.hypot(b.x-a.x,b.z-a.z)||1,rem=(1-(s-i))*L;if(rem>=left){s+=left/L;left=0}else{left-=rem;s=i+1}}
+  const T=at(s),px=T.x+Math.cos(T.h)*off,pz=T.z-Math.sin(T.h)*off,a=Math.atan2(px-RO.x,pz-RO.z),e=Math.atan2(Math.sin(a-RO.h),Math.cos(a-RO.h));const jd=Math.hypot(P[J].x-RO.x,P[J].z-RO.z);return{e,seg:bi,jd,end:bi>=P.length-1.2,kmh:RO.v*3.6,vm:__dbg.PL.vmode||'car'}},off);
+ let key=null;const setKey=async k=>{if(k===key)return;if(key)await K.up(key);key=k;if(k)await K.down(k)};
+ let up=false,f=0,last=-99,slT=0,phase='turn',sl=0;const vms={};
+ for(let it=0;it<2400;it++){let st=await steer(0);if(phase==='slalom'){const e2=await p.evaluate(sl=>{const RO=__dbg.RO,t=RO.rdT;if(!t)return null;let a=Math.atan2(t[0],t[1]);if(Math.abs(Math.atan2(Math.sin(a-RO.h),Math.cos(a-RO.h)))>Math.PI/2)a+=Math.PI;const w=a+sl;return Math.atan2(Math.sin(w-RO.h),Math.cos(w-RO.h))},sl>0?.22:sl<0?-.22:0);if(e2!=null)st={...st,e:e2,end:false}}vms[st.vm]=(vms[st.vm]||0)+1;if(st.end&&phase==='turn'){phase='slalom';slT=0;console.log('slalom from frame',si)}if(phase==='turn'&&st.seg>info.J+.9&&st.jd>30){phase='slalom';slT=0;console.log('slalom from frame',si)}
+  if(phase==='slalom'){slT+=6;if(slT%48===0)sl=sl>0?-2.6:2.6}
+  const cru=phase==='turn'&&st.jd<45?42:58;const want=st.kmh<cru;if(want!==up){up=want;await(want?K.down('ArrowUp'):K.up('ArrowUp'))}
+  await setKey(st.e>.05?'ArrowLeft':st.e<-.05?'ArrowRight':null);await run(6);f+=6;
+  const near=phase==='turn'&&st.jd<28;if(f-last>=(near?9:30)){last=f;await shot()}if(phase==='slalom'&&slT>48*7)break}
+ console.log('vehicle modes',JSON.stringify(vms));await setKey(null);if(up)await K.up('ArrowUp')}
 else{await K.down('ArrowUp');let n=0;for(let t=0;t<7200;){const k=Math.random()<.5?'ArrowLeft':'ArrowRight',hold=Math.round(18+Math.random()*54),gap=Math.round(72+Math.random()*150);await K.down(k);await run(hold);await K.up(k);await run(gap);t+=hold+gap;if(n++%8===0)await shot()}await K.up('ArrowUp')}
 const L=await p.evaluate(()=>window.__dl);
 const ad=(a,b)=>{let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d},deg=r=>r*180/Math.PI;

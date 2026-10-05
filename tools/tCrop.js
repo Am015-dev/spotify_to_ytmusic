@@ -9,7 +9,7 @@ await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',
 await p.evaluate(()=>{try{__m1&&__m1.skip&&__m1.skip()}catch(e){}__mho.enterRoam()});await p.waitForFunction(()=>__mho.state==='roam');await p.evaluate(()=>__mho.storyClose&&__mho.storyClose());
 await p.waitForTimeout(2500);await p.evaluate(()=>{window.requestAnimationFrame=()=>0;__ju.autoClose(true)});
 const step=n=>p.evaluate(n=>{__ju.step(n);return __dbg.RO.v*3.6},n);
-const shot=async(tag)=>{const r=await p.evaluate(()=>{try{__dbg.composer.render()}catch(e){__dbg.renderer.render(__dbg.scene,__dbg.camera)}const {camera,THREE}=__dbg,RO=__dbg.RO,v=new THREE.Vector3(RO.x,RO.y,RO.z).project(camera);return{x:(v.x+1)/2*852,y:(1-v.y)/2*393,kmh:RO.v*3.6}});
+const shot=async(tag)=>{const r=await p.evaluate(()=>{__dbg.SS&&__dbg.SS();try{__dbg.composer.render()}catch(e){__dbg.renderer.render(__dbg.scene,__dbg.camera)}const {camera,THREE}=__dbg,RO=__dbg.RO,v=new THREE.Vector3(RO.x,RO.y,RO.z).project(camera);return{x:(v.x+1)/2*852,y:(1-v.y)/2*393,kmh:RO.v*3.6}});
  await p.screenshot({path:`${OUT}_${tag}.png`});const cx=Math.max(0,Math.min(852-240,r.x-120)),cy=Math.max(0,Math.min(393-120,r.y-80));
  await p.screenshot({path:`${OUT}_${tag}_crop.png`,clip:{x:cx,y:cy,width:240,height:120}});return r};
 await p.keyboard.down('ArrowUp');let k=0;for(let i=0;i<40;i++){k=await step(6);if(k>45)break}await p.keyboard.up('ArrowUp');
