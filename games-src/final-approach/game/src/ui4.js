@@ -32,7 +32,7 @@ function selFits(grp) { return typeof UI.sel === 'number' && UI.sel >= 0 && !G.p
 const tval = v => typeof v === 'function' ? v() : v;
 function myTurn() { const v = actSeat(); return typeof v === 'number' && v >= 0 && mayAct(v) && FA.pending(G).includes(v); }
 function coachTick() {
-  const c = UI.coach; if (!G || !UI.started || G.result || c.level === 'off') return;
+  const c = UI.coach; if (!G || !UI.started || G.result || c.level === 'off' || isPh()) return;   // phones: no tip boxes, the ghost finger shows the first moves
   if (UI.mode === 'net' || UI.mode === 'hot' && UI.holder < 0) return;
   if (c.tip && c.tipR !== G.round + ':' + G.phase) { c.seen[c.tip] = 1; c.tip = ''; c.more = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } applyHL(); }
   if (c.tip) return;
@@ -130,6 +130,17 @@ function buildRef() {
 }
 function renderCrew() {
   const b = $('#crewbody'); if (!b || !G) return; b.innerHTML = ''; const sc = scenOf(), ap = D.airports[sc.ap];
+  // phones: the long goal, the landing checklist and the briefing phrases live here, not on the board
+  if (isPh()) {
+    if (UI.camp && UI.camp.goal) b.appendChild(h('div.why', h('b', 'Chapter goal: '), UI.camp.goal.text));
+    b.appendChild(h('h3.drh', 'Goal')); b.appendChild(h('div.drgoal', goalFull()));
+    b.appendChild(h('h3.drh', 'Landing checklist')); for (const [ok, t] of landList()) b.appendChild(h('div.cr', h('span.ck' + (ok === true ? '.ok' : ok === false ? '.no' : ''), ok === true ? '✓' : ok === false ? '!' : ''), t));
+    const v = actSeat();
+    if (G.phase === 'brief' && !G.result) { b.appendChild(h('h3.drh', 'Briefing phrases')); b.appendChild(h('p.sm', 'Before the roll you may say one thing. After the roll: silence, your placed dice do the talking.'));
+      const sy = h('div.sayrow'); for (const s of [0, 1]) for (const c of G.say[s]) sy.appendChild(h('span.sbub.' + (s ? 'c' : 'p'), (who(s) === 'You' ? 'You said' : name(s) + ' says') + ': “' + SAYT[c] + '”'));
+      if (typeof v === 'number' && v >= 0 && mayAct(v)) for (const m of FA.validMoves(G, v).filter(m => m.t === 'say')) sy.appendChild(h('button.say', { type: 'button', 'data-a': 'say', 'data-c': m.c }, SAYT[m.c])); b.appendChild(sy); }
+    b.appendChild(h('h3.drh', 'The airport'));
+  }
   b.appendChild(h('div.kv', h('span', 'Airport'), h('b', ap.name))); b.appendChild(h('p', ap.blurb)); b.appendChild(h('div.kv', h('span', 'Scenario'), h('b', sc.title + ' (' + D.diffs[sc.col].name + ')'))); b.appendChild(h('p.sm', sc.text));
   b.appendChild(h('div.kv', h('span', 'Weather'), h('b', ap.wx + ', ' + ap.tod))); if (G.mods) for (const m of sc.mods) b.appendChild(h('div.why', h('b', D.mods[m].name + ': '), D.mods[m].text));
   if (G.mods.tabs) b.appendChild(h('div.why', h('b', D.mods.turns.name + ': '), D.mods.turns.text)); if (G.mods.traffic) b.appendChild(h('div.why', h('b', D.mods.traffic.name + ': '), D.mods.traffic.text));

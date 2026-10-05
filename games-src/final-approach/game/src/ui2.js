@@ -76,7 +76,7 @@ function render() {
     pz.appendChild(b);
   }
   // ---- dial, gauge, brake readout
-  { const a = G.pl.axis, dl = h('div.dial.axd', { 'aria-label': 'Axis: ' + (a === 0 ? 'level' : Math.abs(a) + ' toward the ' + (a < 0 ? 'pilot' : 'co-pilot')) }, h('i', { style: 'transform:rotate(' + (a * 24) + 'deg)' }), h('span', { style: 'position:relative;margin-top:44%' }, a === 0 ? 'level' : Math.abs(a) + (a < 0 ? ' left' : ' right'), a !== 0 ? h('small.spn', 'spin at 3') : null));
+  { const a = G.pl.axis, dl = h('div.dial.axd', { 'aria-label': 'Axis: ' + (a === 0 ? 'level' : Math.abs(a) + ' toward the ' + (a < 0 ? 'pilot' : 'co-pilot')) }, h('i', { style: 'transform:rotate(' + (a * 24) + 'deg)' + (UI.axA && Date.now() - UI.axA.t0 < 900 ? ';animation:axtilt .9s cubic-bezier(.3,1.5,.5,1) both;animation-delay:-' + (Date.now() - UI.axA.t0) + 'ms;--af:' + (UI.axA.from * 24) + 'deg;--at:' + (UI.axA.to * 24) + 'deg' : '') }), h('span', { style: 'position:relative;margin-top:44%' }, a === 0 ? 'level' : Math.abs(a) + (a < 0 ? ' left' : ' right'), a !== 0 ? h('small.spn', 'spin at 3') : null));
     pz.appendChild(css(dl, r.dial));
     // speed gauge: the blue marker (up to it the plane stays) and the orange marker (up to it one space, above it two) in their own corners, clear of the needles
     pz.appendChild(css(h('div.gau', { 'data-b': G.pl.aeroB, 'data-o': G.pl.aeroO, 'aria-label': 'Speed gauge: engine sum up to ' + G.pl.aeroB + ' stays, up to ' + G.pl.aeroO + ' moves one space, more moves two' + (G.speed >= 0 ? '; last speed ' + G.speed : '') }, h('span.mk.b', { title: 'Blue marker: a sum up to this stays put' }, '≤' + G.pl.aeroB), h('span.mk.o', { title: 'Orange marker: up to this moves 1, above moves 2' }, '≤' + G.pl.aeroO)), r.gauge));
@@ -106,7 +106,7 @@ function render() {
   if (r.hud) { const row = rows[G.round + G.row0]; pz.appendChild(css(h('div.hudc', h('b', 'Round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0) + (isPh() ? '' : ' · ' + row[0] + ' ft')), (tm => isPh() && tm ? tm : [h('span', G.result ? 'Flight over' : G.phase === 'brief' ? 'Briefing' : (G.pend ? pendLabel() : (G.turn === 0 ? 'Pilot' : 'Co-pilot') + ' places')), tm])(rtEl())), r.hud)); }   // phones: two short lines, the clock replaces the turn line (the prompt says whose turn it is)
   // the control the current guided tip talks about
   if (UI.coach && UI.coach.tip && TIPHL[UI.coach.tip]) for (const sel of TIPHL[UI.coach.tip]) pz.querySelectorAll(sel).forEach(e => e.classList.add('hl'));
-  renderDock(); renderBar();
+  renderDock(); renderBar(); phPost();
   if (typeof pxSync === 'function') pxSync();
   if (typeof netRenderHook === 'function') netRenderHook();
 }
@@ -136,10 +136,14 @@ function feedTick() {
     UI.prevSlots = ks;
     if (G.pl.pos !== UI.lastPos && ANIM && !G.result) { UI.hold = { pos: UI.lastPos, until: now + 1100 }; clearTimeout(UI.holdT); UI.holdT = setTimeout(releaseHold, 1150); }
   } else {
-    if (!G.result && ANIM) showRecap(UI.lastRound);
-    UI.prevSlots = Object.keys(G.slots); UI.hold = null;
+    if (!G.result && ANIM) {
+      const cl = G.log.filter(l => l.r === UI.lastRound + 1 && /^Concentration: a coffee/.test(l.t)).length;
+      if (G.pl.pos !== UI.lastPos) { UI.hold = { pos: UI.lastPos, until: now + 800 }; clearTimeout(UI.holdT); UI.holdT = setTimeout(releaseHold, 850); }
+      showRecap(UI.lastRound, { axis: UI.lastAxis != null ? UI.lastAxis : G.pl.axis, pos: UI.lastPos, coffee: UI.lastCoffee != null ? UI.lastCoffee : G.coffee, coffeeLines: cl, planes: UI.lastPlanes != null ? UI.lastPlanes : 0, slots: UI.prevSlots || [] });
+    }
+    UI.prevSlots = Object.keys(G.slots); if (!(G.pl.pos !== UI.lastPos && ANIM && !G.result)) UI.hold = null;
   }
-  UI.lastPos = G.pl.pos; UI.lastRound = G.round;
+  UI.lastPos = G.pl.pos; UI.lastRound = G.round; UI.lastAxis = G.pl.axis; UI.lastCoffee = G.coffee; UI.lastPlanes = FA.planesOnTrack(G);
   if (G.phase === 'place' && UI.recapR != null && UI.recapR < G.round) hideRecap();
 }
 // after the speed was announced the plane moves on: only the strip and the plane marker change (no full re-render, so buttons the player is about to tap stay put)
@@ -150,23 +154,13 @@ function releaseHold() {
   if (typeof pxSync === 'function') setTimeout(pxSync, 520);   // after the strip slid
 }
 function dispPos() { return UI.hold && UI.hold.until > Date.now() ? UI.hold.pos : G.pl.pos; }
-function showRecap(r) {
-  const el = $('#recap'); if (!el) return; const rows = altRows(), R = rows[r + G.row0], N = rows[G.round + G.row0];
-  const lines = G.log.filter(l => l.r === r + 1 && RECAP_RE.test(l.t)).map(l => feedText(l.t)).slice(-7);
-  const traffic = G.log.filter(l => l.r === G.round + 1 && /^Traffic die/.test(l.t)).map(l => l.t);
-  el.innerHTML = ''; el.hidden = false; UI.recapR = r;
-  // grouped by control: axis / speed / radio / switches / other
-  const GRP = [['Axis', /^(Axis|Wind dial|Steady Hands)/], ['Speed', /^(Speed|Landing speed|Twin Thrust)/], ['Radio', /^Radio/], ['Switches', /^(Landing gear|Flaps|Brakes|Icy runway)/], ['Other', /./]], grp = {};
-  for (const t of lines) { const g = GRP.find(x => x[1].test(t)); (grp[g[0]] = grp[g[0]] || []).push(t); }
-  const keep = UI.mode === 'guided' || !Object.keys(UI.won || {}).length;   // first flights: the card waits for a tap
-  el.appendChild(h('div.rcp', { role: 'status' }, h('b', 'Round ' + (r + 1) + ' done at ' + R[0] + ' ft'), ...(lines.length ? GRP.filter(g => grp[g[0]]).map(g => h('div.rg', h('i', g[0]), h('div', ...grp[g[0]].map(t => h('div.rl', t))))) : [h('div.rl', 'A quiet round.')]), ...traffic.map(t => h('div.rl.tr', t)),
-    N ? h('div.rn', 'Next: ' + N[0] + ' ft, ' + (who(N[1]) === 'You' ? 'you place first' : name(N[1]) + ' places first') + '.') : null, h('button.btn.alt.rx', { type: 'button', 'data-a': 'recapx' }, 'OK')));
-  clearTimeout(UI.recapT); if (!keep) UI.recapT = setTimeout(hideRecap, 6500);
-}
+// the round summary is not a card any more: the board shows it (axis tilts, plane flies, coffee pops) and one short line follows (roundFx in ui8.js)
+function showRecap(r, info) { roundFx(r, info || {}); }
 function hideRecap() { const el = $('#recap'); if (el) { el.hidden = true; el.innerHTML = ''; } UI.recapR = null; clearTimeout(UI.recapT); }
 // ---------- the dock: what to do now ----------
 function promptText() {
   if (!G) return '';
+  if (isPh()) return phPrompt();
   if (G.result) return G.result.win ? 'Landed! Well flown.' : 'The flight is over.';
   const v = actSeat(), pend = FA.pending(G), hot = UI.mode === 'hot' && UI.holder < 0;
   if (G.phase === 'brief') {
@@ -205,7 +199,7 @@ function renderDock() {
   const ro = $('#roster'); if (ro) { ro.innerHTML = ''; for (const s of [0, 1]) { const st = G.result ? (G.result.win ? 'landed' : 'flight over') : G.phase === 'brief' ? (G.ready[s] ? 'ready' : 'briefing') : (FA.pending(G).includes(s) ? 'deciding' : 'waiting'); ro.appendChild(h('div.chip.' + (s ? 'c' : 'p') + (v === s ? '.me' : '') + (st === 'deciding' || st === 'briefing' ? '.wt' : '') + (st === 'ready' ? '.rdy' : ''), h('span.cav', ART['crew-' + s] ? h('img', { src: ART['crew-' + s], alt: '' }) : ''), h('span.ct', h('b', name(s)), h('i', pname(s) + (G.ai[s] ? ' (computer)' : '') + ' · ' + FA.unusedDice(G, s).length + ' dice · ' + st)))); }
   }
   // the goal: the route and the landing conditions, always on screen (tap for the full checklist)
-  const gl = $('#goal'); if (gl) { gl.innerHTML = ''; gl.hidden = !!G.result || (isPh() && (!document.documentElement.classList.contains('ph-p') || innerHeight < 700) && (!!(UI.coach && UI.coach.tip) || (UI.sel != null && UI.sel !== -1)));   /* landscape and short phones: the tip or the die card needs the room */ if (!G.result) gl.appendChild(goalEl()); }
+  const gl = $('#goal'); if (gl) { gl.innerHTML = ''; gl.hidden = !!G.result; if (!G.result) gl.appendChild(goalEl()); }
   // selected die info
   const si = $('#selinfo'); if (si) { si.innerHTML = ''; si.className = 'idle'; si.hidden = !!G.result;
     if (typeof v === 'number' && v >= 0 && mayAct(v) && !G.result && G.phase === 'place') {
@@ -252,7 +246,8 @@ function fitDock() {
 // who spent the reroll token that is being answered now
 function rrBy(v) { const by = G.pend && G.pend.d ? G.pend.d.by : null; return by == null ? 'A reroll token was spent.' : by === v && who(v) === 'You' ? 'You spent a reroll token.' : name(by) + ' spent a reroll token.'; }
 // the route and the landing conditions as one tappable strip at the top of the dock
-function goalEl() {
+function goalEl() { return isPh() ? goalStrip() : goalFull(); }
+function goalFull() {
   const size = trackOf().sp.length, pos = G.pl.pos, left = FA.planesOnTrack(G), ax = G.pl.axis, bv = FA.brakeVal(G), last = D.rounds - G.row0;
   const gs = G.pl.sw.lg.reduce((a, x) => a + x, 0), fs = G.pl.sw.fl.reduce((a, x) => a + x, 0), fin = FA.isFinal(G);
   const moves = last - 1 - G.round - (G.slots.en0 && G.slots.en1 ? 1 : 0);   // rounds in which the engines can still move the plane (not the landing round)

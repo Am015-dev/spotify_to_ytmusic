@@ -73,6 +73,10 @@ function layout(W, H, opt) {
   const lw = LW;
   let rl = build(mode, lw, LH, opt.mods || {}, opt.me); const r = {};
   if (rl.ch > LH + .5) { LH = rl.ch; k = Math.min(k, H / LH); rl = build(mode, lw, LH, opt.mods || {}, opt.me); }
+  // portrait with spare height: open the rows up (the windows stay on top, everything below spreads) so the panel fills the screen instead of floating in it
+  if (mode === 'P' && rl.ch && LH > rl.ch + 20) {
+    const A0 = rl.alt.y + rl.alt.h + 6, f = Math.min(1.34, (LH - A0) / (rl.ch - A0)); if (f > 1.02) { for (const n of Object.keys(rl)) { const q = rl[n]; if (q && typeof q === 'object' && n !== 'appr' && n !== 'alt') { const cy = q.y + q.h / 2; q.y = A0 + (cy - A0) * f - q.h / 2; } } rl.ch = A0 + (rl.ch - A0) * f; rl.lh = rl.ch; }
+  }
   if (rl.ch) LH = Math.min(LH, rl.ch); const oy = (H - LH * k) / 2, ox = (W - lw * k) / 2;
   for (const n of Object.keys(rl)) { const q = rl[n]; if (q && typeof q === 'object') r[n] = { x: ox + q.x * k, y: oy + q.y * k, w: q.w * k, h: q.h * k }; }
   return { mode, k, ox, oy, lw, lh: LH, r, die: 72 * k, logical: rl, W, H };

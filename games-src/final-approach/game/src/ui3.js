@@ -12,12 +12,13 @@ function newGame(mode, o) {
   const names = [D.crew[0].name, D.crew[1].name];
   G = FA.newGame({ scenario: sc.id, seed, abil: mode === 'guided' ? [] : abil, names, ai });
   if (mode === 'guided') { G.script = GUIDED_SCRIPT.slice(); }
+  if (o.camp && typeof campTwist === 'function') campTwist(G, o.camp.twist);
   UI.mode = mode; UI.seat = mode === 'guided' ? 0 : cfg.role; UI.holder = mode === 'hot' ? -1 : UI.seat; UI.started = true; UI.sel = -1; UI.cof = 0; UI.hint = null; UI.over = null; UI.overShown = false; UI.rrm = [false, false, false, false];
   UI.coach = { level: o.tipsOff ? 'off' : mode === 'guided' ? 'full' : (UI.prefs.guide || 'off'), seen: {}, tip: '', queue: [] }; UI.lastPlace = null; UI.rt = G.mods.real ? { left: 60000, last: 0 } : null;
   const st = $('#start'); if (st) st.hidden = true; closeRS(); try { GX.close(); } catch (e) { } closePass(); hideRecap();
   { const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } }   // a tip left over from the last flight
   clearSave(); render(); sndMusic(); coachTick(); schedule();
-  if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false) showStory();
+  if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false && !o.camp && !isPh()) showStory();
 }
 function suggestAbil(sc) { const order = ['mastery', 'control', 'antic', 'together', 'sync', 'adapt']; return order.slice(0, sc.ab); }
 // ---- applying a move (every route goes through here: a human tap, the computer, a remote player)
@@ -148,5 +149,6 @@ setInterval(() => {
 function onEnd() {
   if (UI.overShown) return; UI.overShown = true; clearSave(); hideRecap();   // no round card over the ending picture
   const win = G.result.win; try { if (win) { UI.won[G.sid] = 1; savePrefs(); } snd(win ? 'win' : 'lose'); } catch (e) { }
-  if (typeof pxEnd === 'function' && ANIM && typeof PX !== 'undefined' && PX.on) { pxEnd(win, () => showFinal()); } else setTimeout(showFinal, ANIM ? 500 : 0);
+  const fin = () => { if (typeof campOn === 'function' && campOn()) campFinish(); else showFinal(); };
+  if (typeof pxEnd === 'function' && ANIM && typeof PX !== 'undefined' && PX.on) { pxEnd(win, fin); } else setTimeout(fin, ANIM ? 500 : 0);
 }

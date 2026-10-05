@@ -15,7 +15,7 @@ function renderStart() {
 function titleEl() {
   const bg = ART.title ? h('img.ttl-bg', { src: ART.title, alt: '' }) : h('div.ttl-bg.ttl-plain'), sv = hasSave();
   return h('div.ttl', bg, h('div.ttl-in', h('h1.logo', h('span.ic', { html: logoSVG() }), h('span', 'Final Approach')), h('p.tag', 'Two seats. Eight dice. One runway.'),
-    h('div.tbtns', h('button.tbtn.go', { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'fly with a computer crewmate')), h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with a friend, free')), sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved flight')) : null),
+    h('div.tbtns', typeof campLine === 'function' && window.CAMPAIGN ? h('button.tbtn.go.story', { 'data-a': 'camp', type: 'button' }, h('b', 'Story'), h('span', campLine())) : null, h('button.tbtn' + (window.CAMPAIGN ? '' : '.go'), { 'data-a': 'play', type: 'button' }, h('b', 'Play'), h('span', 'fly with a computer crewmate')), h('button.tbtn', { 'data-a': 'online', type: 'button' }, h('b', 'Online'), h('span', 'with a friend, free')), sv ? h('button.tbtn', { 'data-a': 'loadsave', type: 'button' }, h('b', 'Resume'), h('span', 'your saved flight')) : null),
     h('button.tlink', { 'data-a': 'rules', type: 'button' }, 'How to play')));
 }
 function roleCard(s) {
@@ -74,6 +74,8 @@ document.addEventListener('click', ev => {
     case 'again': { const c = UI.cfg || {}; const m = UI.mode, off = UI.coach && UI.coach.level === 'off'; closeRS(); if (m === 'net') { netStart(); break; } newGame(m === 'guided' ? 'vs' : m, { scenario: c.scenario, role: c.role, level: c.level, abil: c.abil, tipsOff: off }); break; }
     case 'nextsc': { const c = UI.cfg || {}, i = D.scenarios.findIndex(s => s.id === c.scenario), n = D.scenarios[(i + 1) % D.scenarios.length]; closeRS(); const m = UI.mode === 'guided' ? 'vs' : UI.mode; UI.opt = Object.assign({}, UI.opt, { scenario: n.id, abil: [] }); newGame(m, { scenario: n.id, role: c.role, level: c.level, abil: [] }); break; }
     case 'play': UI.sv = 'setup'; renderStart(); break;
+    case 'camp': campOpen(); break;
+    case 'goalopen': GX.show('crewd'); break;
     case 'online': UI.sv = 'online'; UI.onl = true; renderStart(); break;
     case 'title': UI.sv = 'title'; UI.cfgOpen = false; renderStart(); break;
     case 'cfgopen': UI.cfgOpen = true; renderStart(); break;
@@ -99,11 +101,11 @@ document.addEventListener('click', ev => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { hideRecap(); if (UI.rsOpen && G && G.result) closeRS(); else if (UI.sel !== -1 && UI.sel != null) { UI.sel = -1; UI.cof = 0; render(); } } });
 // ---------- phone mode ----------
 function applyPhone() {
-  const q = /[?&]phone=(\d)/.exec(location.search), w = innerWidth, hh = innerHeight, short = Math.min(w, hh);
+  const q = /[?&]phone=(\d)/.exec(location.search), vm = (window.GXV ? GXV.now() : { w: innerWidth, h: innerHeight }), w = vm.w, hh = vm.h, short = Math.min(w, hh);
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', (ph && w < hh ? Math.max(108, Math.min(320, Math.round(hh - 44 - FA.layoutLogical('P', 0, (G && G.mods) || {}, 0).ch * w / 800))) : Math.max(172, Math.min(212, Math.round(hh * .25)))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', (ph && w < hh ? 132 : Math.max(172, Math.min(212, Math.round(hh * .25)))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !(typeof NET !== 'undefined' && NET.on) && UI.sv === 'setup') renderStart(); }
 }
 let rzT = 0;
@@ -118,7 +120,7 @@ function boot() {
   GX.drawer('setd', 'Menu', h('div#setbody'));
   GX.onShow = id => { renderDrawers(); };
   prefs(); applyPhone();
-  addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
+  if (window.GXV) GXV.watch(() => { applyPhone(); if (G && UI.started) render(); else { const st = $('#start'); if (st && !st.hidden && UI.sv === 'setup') renderStart(); } }); else { addEventListener('resize', onResize); addEventListener('orientationchange', onResize); }
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { clearTimeout(rzT); rzT = setTimeout(() => { if (G && UI.started) render(); }, 40); } }).observe(bd);
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'fa' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); } } catch (e) { }
   if (typeof pxPerfReg === 'function') pxPerfReg();
