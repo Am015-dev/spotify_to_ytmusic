@@ -8819,5 +8819,12 @@ html body #speedFx#speedFx{filter:opacity(.5) hue-rotate(10deg) saturate(2.2)!im
 html body #roamPlate#roamPlate{left:auto!important;right:calc(12px + env(safe-area-inset-right,0px))!important;top:calc(44px + env(safe-area-inset-top,0px))!important;transform:none!important;max-width:230px!important;padding:3px 10px!important;border-radius:10px!important;background:rgba(20,20,19,.86)!important;text-align:right!important;min-width:0!important;width:auto!important;height:auto!important}
 html body #roamPlate#roamPlate *{font-size:12px!important;line-height:1.25!important;letter-spacing:0!important}html body #roamPlate::before,html body #roamPlate::after{display:none!important}`;document.head.appendChild(st)})();
 OG_pop=(f=>function(a,first){f(a,first);OG.popT=Math.min(OG.popT||0,2)})(OG_pop);
+
+(()=>{const st=document.createElement('style');st.id='crPrompt';st.textContent=`
+html body.touch #roamPrompt#roamPrompt{left:50%!important;right:auto!important;top:auto!important;bottom:calc(46px + env(safe-area-inset-bottom,0px))!important;transform:translateX(-50%)!important;max-width:min(240px,30vw)!important;padding:3px 12px!important;font-size:12px!important}
+html body #roamPrompt#roamPrompt *{font-size:12px!important;line-height:1.2!important}
+body.crMerge #roamArrow{display:none!important}`;document.head.appendChild(st)})();
+
+roamPose=(f=>function(s,dt){f(s,dt);if(s===pl&&state==='roam'&&((CR_hudS.f=(CR_hudS.f||0)+1)&1))try{CR_hud()}catch(e){}})(roamPose);
 </script>
 </body></html>
