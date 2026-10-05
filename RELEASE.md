@@ -1,13 +1,13 @@
 # v83 (scale + seamless + QA) — REBUILT, tPlay GATE RUNNING: DO NOT DEPLOY YET
 
 ```
-./reapply.sh pAU1 pAU2 pOG1 pOB1 pOB2 pOB3 pOC1 pCV1 pCV2 pRL1 pJU1 pRL2 pGB1 pDR1 pDR2 pSC1 pSC2 pSM1 pSM2 pSM3 pSM4 pSM5 pSM6 pRL4 pQA1 pQA2 pQA3 (.py)   → REAPPLY_OK
+./reapply.sh pAU1 pAU2 pOG1 pOB1 pOB2 pOB3 pOC1 pCV1 pCV2 pRL1 pJU1 pRL2 pGB1 pDR1 pDR2 pSC1 pSC2 pSM1 pSM2 pSM3 pSM4 pSM5 pSM6 pRL3 pRL4 pQA1 pQA2 pQA3 (.py)   → REAPPLY_OK
 python3 tools/split_km.py overdrive.html out83
 ```
-Deploy files: out83/overdrive.html (1,803,423 B) + out83/km.js (1,961,521 B). Unsplit 3,769,195 B.
+Deploy files: out83/overdrive.html (1,803,664 B) + out83/km.js (1,961,521 B). Unsplit 3,769,436 B. tOut on out83: OUTBOOT PASS.
 - pSC2 (od-scale): human scale, 3 m road setback, glancing wall hits slide. pQA1–3 (od-qa): round collider corners, phone HUD layout, chase-camera guard (qa.js stays the outermost roamCam wrapper), park only below 15 km/h.
 - pRL4 (integration): while an otg2 event panel or result banner shows, hide the district plate and NEXT card, and right-align the panel in portrait so it clears the minimap. It sits next to pQA2's own rule (which only hides NEXT).
-- pRL3 (otg2 placed once for seamless Athens) is NOT in: it cut the border-crossing hitch from 1,263 ms to 147 ms (×4 CPU), but tOG crashed on it ("reading 'done'"). Still open.
+- pRL3 (otg2 placed once for seamless Athens) IS in, at the coordinator's request. It cut the border-crossing hitch from 1,263 ms to 147 ms (×4 CPU). Caveat: tOG crashed once on it ("reading 'done'"), in the Frankfurt reload check, where pRL3 is inactive. It looks like a timing race in the test but is not proven. With pRL3, more otg2 spots sit near the old district borders, which are no longer gates under seamless.
 - Release gate (owner/coordinator): tools/tPlay.js (real touch/keyboard play) on the split build. It runs on v82 and v83 for comparison, plus smoke, tSC, tSM, tOG, tBA, tBF.
 - Phone comparison shots v82 vs v83: release/phone/.
 
