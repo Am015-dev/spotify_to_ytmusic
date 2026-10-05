@@ -489,7 +489,6 @@ html.ph .phc.act{outline:2px solid #ffd76a;outline-offset:1px}
 html.ph .phc.me{cursor:default;background:linear-gradient(#6a3a1c,#44230f)}
 /* table first */
 html.ph .gx-board{padding:4px;gap:4px}
-html.ph #app .opps{display:none}
 html.ph .table{perspective:none;--sw:clamp(34px,min(15cqh,12cqw),54px)}
 html.ph .felt{transform:none;padding:6px;gap:4px;border-radius:12px}
 html.ph .pile{gap:3px}html.ph .pile .lbl{font-size:13px}
@@ -757,6 +756,194 @@ html.bf-wait .mine .hand .card{filter:saturate(.7) brightness(.85)}
 .mine .hand .card.play.bf-mean{box-shadow:0 0 0 2px #ff6a5a,0 0 14px rgba(255,90,70,.75)!important}
 
 .story-btn{display:block;width:100%;min-height:56px;font-size:1.2rem!important;margin:8px 0 4px}
+
+/* ===== the dungeon table: one surface holds the rival seats, the door / fight, your hero + gear and your fanned hand ===== */
+.tbl{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:6px;position:relative}
+/* rival seats on the rim of the table: avatar, level badge, strength + gear count only */
+.opps{justify-content:center;align-items:flex-start;gap:8px;padding:2px 2px 0;overflow:visible}
+.opp.seat{flex:0 1 150px;min-width:0;min-height:0;max-width:200px;padding:3px 10px 3px 4px;border-radius:30px;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:7px;row-gap:0;align-content:center;align-items:center;position:relative;
+  translate:0 calc((1 - var(--q,0)*var(--q,0))*8px)}
+.opp.seat .sav{grid-row:1/3;grid-column:1;position:relative;width:42px;height:42px;border-radius:50%;border:2.5px solid var(--c,#ffd76a);background:#2a1208;box-shadow:0 2px 0 #000;display:block}
+.opp.seat .savi{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.opp.seat .slv{position:absolute;right:-7px;bottom:-5px;min-width:21px;height:21px;padding:0 4px;border-radius:11px;display:grid;place-items:center;font:800 14px/1 var(--title);color:#2b1405;background:radial-gradient(circle at 35% 28%,#fff6d0,#f0c35a 55%,#9a6620);box-shadow:0 0 0 1.5px #2a170b,0 1px 0 rgba(0,0,0,.5)}
+.opp.seat .sdead{position:absolute;left:-4px;top:-6px;font-style:normal;font-size:16px}
+.opp.seat .snm{grid-column:2;grid-row:1;font:700 13px/1.15 var(--title);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 0 #000;min-width:0}
+.opp.seat .sbd{grid-column:2;grid-row:2;display:flex;gap:7px;font:700 13px/1.15 var(--hand);color:var(--cream2);white-space:nowrap;min-width:0}
+.opp.seat .sw{color:#ffd76a}
+.opp.seat .sc{color:#c9b4ff}
+.opp.seat .sbd .ic{width:1em;height:1em;vertical-align:-.12em}
+.opp.seat.active{box-shadow:inset 0 0 0 3px rgba(0,0,0,.25),inset 0 0 0 4px #ffd76a,0 0 0 2px #ffd76a,0 0 14px 4px rgba(255,190,70,.5)}
+.opp.seat.dead{filter:grayscale(.6)}
+.opp.seat[data-bfl]::after{top:auto;bottom:-14px;translate:-50% 0}
+.opps.n5 .snm,.opps.n4 .snm{display:none}
+.opps.n5 .opp.seat{padding-right:6px}.opps.n5 .sbd{gap:4px}
+.opps.n5 .opp.seat,.opps.n4 .opp.seat{grid-template-rows:auto auto}
+/* hero strip: your avatar with the big strength number, level medal, gear laid out beside it */
+.mine .slots{display:flex;gap:10px;align-items:center;opacity:.4}
+.mine .slots i{font-style:normal;width:36px;height:36px;border-radius:9px;border:2px dashed rgba(245,231,200,.55);display:grid;place-items:center;color:var(--cream)}
+.mine .slots .ic{width:22px;height:22px}
+.mine .nogear{display:none}
+.fbtns{display:flex;gap:8px;width:100%;justify-content:center;align-items:stretch}
+.fbtns .btn{min-height:50px;font-size:18px;flex:1 1 0;justify-content:center;padding:6px 8px;white-space:nowrap}
+.fbtns .fightb{flex:1.35 1 0;font-size:21px}
+.fbtns .helpb{flex:0 0 auto;min-width:60px}
+.fbtns .btn.rec{box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 2px 0 #3a2213,0 0 0 3px #7fd0ff}
+.fbtns .btn.pulse{animation:tblPulse 1.1s ease-in-out infinite}
+@keyframes tblPulse{50%{transform:scale(1.04);filter:brightness(1.12)}}
+.hsav{display:block;position:relative;width:var(--hav,84px);height:var(--hav,84px)}
+.hsav .hsavi{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid #ffd76a;background:radial-gradient(#4a2412,#1a0904);box-shadow:0 6px 14px rgba(0,0,0,.6);display:block}
+.hsav .hsavi.h2{position:absolute;right:-18%;bottom:-6%;width:46%;height:46%;border-width:2px}
+.bffloat.big{font-size:44px}
+.tbfly{position:fixed;left:0;top:0;z-index:105;pointer-events:none}
+.tbfly .card{--w:54px;margin:0}
+.tbfly .tbbadge{display:grid;place-items:center;min-width:46px;height:46px;border-radius:50%;padding:0 6px;font:900 22px/1 var(--title);color:#2b1405;background:radial-gradient(circle at 35% 28%,#fff6d0,#f0c35a 55%,#9a6620);box-shadow:0 0 0 2px #2a170b,0 0 22px rgba(255,215,106,.9)}
+@media (prefers-reduced-motion:reduce){.fbtns .btn.pulse{animation:none}}
+
+/* ---- phone: the table is the screen ---- */
+html.ph .phopps{display:none!important}
+html.ph-p .gx-main{grid-row:3}
+html.ph .gx-board{padding:4px 4px 0;gap:0}
+html.ph .tbl{padding:4px 5px 0;border-radius:14px 14px 0 0;gap:4px;
+  background:radial-gradient(70% 55% at 50% 50%,rgba(255,190,110,.12),transparent 70%),var(--tex-wood),repeating-linear-gradient(0deg,#6a3f22 0 3px,#5a3520 3px 9px,#71452a 9px 14px);background-size:auto,340px 170px,auto;
+  border:1px solid #0d0603;border-bottom:0;box-shadow:inset 0 0 0 4px #2a160b,inset 0 0 0 5px rgba(226,180,87,.55),inset 0 0 40px rgba(10,4,0,.6)}
+html.baked.ph .tbl{background:var(--img-table) center/100% 100% #5a3520}
+html.ph .table{flex:1 1 auto}
+html.ph .felt{background:none;border:0;box-shadow:none;padding:12px 2px 8px;border-radius:10px}
+html.ph .felt::before,html.ph .felt::after{display:none}
+html.ph #app .tbl .opps{display:flex;flex:none}
+html.ph .opp.seat{flex:1 1 0;max-width:150px;min-height:44px;padding:3px 6px 3px 4px;column-gap:5px}
+html.ph .opp.seat .sav{width:37px;height:37px}
+html.ph .opp.seat.paper{background:radial-gradient(120% 120% at 20% 0%,rgba(255,200,140,.18),transparent 55%),linear-gradient(#4a2415,#2a1209);box-shadow:inset 0 0 0 1px rgba(226,180,87,.45),0 3px 0 rgba(0,0,0,.4)}
+html.ph .opp.seat.active{box-shadow:inset 0 0 0 2px #ffd76a,0 0 0 2px #ffd76a,0 0 14px 4px rgba(255,190,70,.5)}
+html.ph .pile .lbl{display:none}
+html.ph .pile .card.xs{--w:calc(var(--sw)*.8)}
+/* your strip: hero + gear, then the fan */
+html.ph .mine{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"top gear" "hand hand";align-items:center;gap:0 6px;padding:2px 2px 0;--hero:clamp(46px,7.2dvh,58px);background:none;border:0;box-shadow:none;border-radius:0;
+  --hw:clamp(60px,min(10.5dvh,19vw),82px)}
+html.ph .mine.paper::before{display:none}
+html.ph .mine .top{grid-area:top;position:relative;display:block;width:calc(var(--hero) + 14px);height:calc(var(--hero) + 10px);gap:0;padding:0}
+html.ph .mine .top>:not(.bfhero):not(.lv){display:none}
+html.ph .mine .bfhero{position:absolute;left:0;top:0;display:block;width:var(--hero);height:var(--hero)}
+html.ph .mine .bfhero .bfav{width:var(--hero);height:var(--hero);border-width:3px;display:block}
+html.ph .mine .bfhero .bfstr{position:absolute;left:50%;bottom:-9px;translate:-50% 0;font:900 18px/1 var(--title);color:#ffd76a;background:#2a1208;border:2px solid #ffd76a;border-radius:14px;padding:3px 8px;text-shadow:0 1px 0 #000;white-space:nowrap}
+html.ph .mine .lv{position:absolute;right:0;top:-3px;margin:0;min-width:26px;height:26px;padding:0 5px;border-radius:13px;display:grid;place-items:center;grid-auto-flow:column;gap:2px;font:800 15px/1 var(--title);color:#2b1405;background:radial-gradient(circle at 35% 28%,#fff6d0,#f0c35a 55%,#9a6620);box-shadow:0 0 0 1.5px #2a170b,0 2px 0 rgba(0,0,0,.5);text-shadow:none}
+html.ph .mine .lv small{display:none}
+html.ph .mine .gear{grid-area:gear;min-height:calc(var(--hero) + 4px)!important;padding:0 2px 0 6px!important;gap:6px;align-items:center;mask-image:none}
+html.ph .mine .gear:not(:has(.gchip)){min-height:calc(var(--hero) + 4px)!important}
+html.ph .mine .hand{grid-area:hand;display:flex;justify-content:center;align-items:flex-end;overflow:visible;gap:0;padding:calc(var(--hw)*.12 + 12px) 0 4px;height:calc(var(--hw)*1.42 + var(--hw)*.12 + 16px);box-sizing:border-box;scroll-snap-type:none;-webkit-mask-image:none;mask-image:none;position:relative}
+html.ph .mine .hand .card{--w:var(--hw);rotate:var(--rot,0deg);translate:0 calc(var(--arc,0px) - 6px);transform-origin:50% 130%;flex:none;touch-action:none}
+html.ph .mine .hand .card+.card{margin-left:var(--ov,-18px)}
+html.ph .mine .hand .card.play,html.ph .mine .hand .card.sug{translate:0 calc(var(--arc,0px) - 14px)}
+html.ph .mine .hand .card:hover{rotate:var(--rot,0deg);translate:0 calc(var(--arc,0px) - 6px)}
+html.ph .mine .hand .card.bf-picked{translate:0 -24px!important;rotate:0deg!important;z-index:8}
+html.ph .mine .hand.scrolls{justify-content:flex-start;overflow-x:auto;overflow-y:hidden}
+html.ph .mine .hand.scrolls .card{touch-action:pan-x}
+html.ph .mine .gear .gchip{touch-action:pan-x}
+html.ph .mine .hand:not(.scrolls)>.small{margin:auto}
+/* the action strip under the table: dark, one line + one row of buttons */
+html.ph .gx-dock{background:linear-gradient(#2a160b,#150a04);color:var(--cream);border-top:2px solid #6a4a22}
+html.ph .gx-dock-body{background:none}
+html.ph #prompt .bfline{color:var(--cream);text-shadow:0 1px 0 #000}
+html.ph-p{--ph-dock:calc(98px + env(safe-area-inset-bottom,0px))}
+html.ph-p #prompt{min-height:78px;justify-content:center}
+html.ph-p .gx-dock{padding-bottom:env(safe-area-inset-bottom,0px)}
+html.ph .gx-dock-body{padding:6px 10px 6px}
+/* the fight on the table: your hero on the left, the monster on the right, strengths as big numbers, buttons under them */
+html.ph .arena:has(>.vs){display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1.15fr);grid-template-rows:minmax(0,1fr) auto;column-gap:4px;row-gap:4px;align-content:center;justify-content:stretch;justify-items:center;align-items:center;overflow:visible;--hav:min(var(--cw),calc((100cqw - 2*var(--sw) - 40px)*.42),150px)}
+html.ph .arena:has(>.vs) .vs{display:contents}
+html.ph .arena:has(>.vs) .vs .score.hero{grid-column:1;grid-row:1/3;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;background:none;border:0;box-shadow:none;align-self:center;position:relative}
+html.ph .arena:has(>.vs) .vs .vsx{position:static;grid-column:2;grid-row:1/3;width:30px;height:30px;align-self:center;opacity:.95}
+html.ph .arena:has(>.vs) .vs .score.mons{grid-column:3;grid-row:2;display:flex;justify-content:center;padding:0;background:none;border:0;box-shadow:none;align-self:start}
+html.ph .arena:has(>.vs) .row.mons{grid-column:3;grid-row:1;align-self:end;flex-wrap:nowrap;justify-content:center;gap:4px}
+html.ph .arena:has(>.vs)>:not(.vs):not(.row.mons){grid-column:1/-1}
+html.ph .arena:has(>.vs) .card{--w:min(var(--cw),calc(((100cqw - 2*var(--sw) - 40px)*.52)/var(--n,1) - 6px))}
+html.ph .arena:has(>.vs) .score .sl{display:none}
+html.ph .arena:has(>.vs) .score.hero .sl{display:block;font:700 13px/1.1 var(--title);max-width:var(--hav);text-align:center;text-shadow:0 1px 0 #000}
+html.ph .arena:has(>.vs) .score .num{order:0;min-width:2.1em;height:2.1em;font-size:clamp(1.6rem,6.5vw,2.1rem);box-shadow:0 0 0 3px #2a170b,0 3px 0 rgba(0,0,0,.45),inset 0 -3px 0 rgba(90,50,10,.35)}
+html.ph .arena:has(>.vs) .score.win .num{box-shadow:0 0 0 3px #ffd76a,0 0 24px 6px rgba(255,215,106,.75)}
+html.ph .arena:has(>.vs) .score.lose .num{filter:saturate(.7) brightness(.9)}
+html.ph .arena:has(>.vs) .mon>.small.mstr{font-size:13px;line-height:1.1;text-align:center}
+html.ph .arena:has(>.vs) .mon:only-child>.small.mstr{display:none}
+html.ph .arena:has(>.vs) .fbtns{grid-row:3}
+html.ph .arena:has(>.vs)>.row.small{grid-row:3;justify-content:center}
+html.ph .arena:has(>.vs):has(>.fbtns)>.row.small{grid-row:4}
+html.ph .arena:has(>.vs)>.rollbox{grid-row:4}
+html.ph .arena:has(>.vs) .wchip{font-size:13px}
+html.ph-l .arena:has(>.vs) .vs .vsx{position:static}
+html.ph-l .fbtns .btn{min-height:44px;font-size:16px}
+html.ph-l .fbtns .fightb{font-size:18px}
+/* landscape: table + hand on the left, action strip in the right rail */
+html.ph-l .tbl{padding:3px 5px 0;gap:3px}
+html.ph-l .mine{--hero:38px;--hw:clamp(44px,14dvh,58px)}
+html.ph-l{--ph-rail:clamp(230px,28vw,250px)}
+html.ph-l .opp.seat{min-height:40px;max-width:150px}
+html.ph-l .opp.seat .sav{width:34px;height:34px}
+html.ph-l .opp.seat{translate:0 calc((1 - var(--q,0)*var(--q,0))*4px)}
+html.ph-l .mine .top{display:block}
+html.ph-l .gx-dock{background:linear-gradient(#2a160b,#150a04)}
+/* short portrait phones */
+@media (max-height:640px){
+  html.ph-p .tbl{gap:2px}
+  html.ph-p{--ph-dock:calc(88px + env(safe-area-inset-bottom,0px))}html.ph-p #prompt{min-height:70px}
+  html.ph-p .mine{--hero:40px;--hw:clamp(52px,9.6dvh,60px)}
+  html.ph-p .mine .top{position:relative!important;left:auto!important;top:auto!important}
+  html.ph-p .mine .top .bfstr{font-size:15px}
+  html.ph-p .mine .gear{padding-left:6px!important}
+  html.ph-p .opp.seat{min-height:40px}
+  html.ph-p .opp.seat .sav{width:34px;height:34px}
+  html.ph-p .opp.seat .slv{min-width:19px;height:19px;font-size:13px}
+  html.ph-p .fbtns .btn{min-height:46px}
+}
+
+html.ph .arena:has(>.vs){--res:calc(44px + var(--rb,0px) + var(--re,0px) + var(--rc,0px) + var(--rr,0px))!important}
+html.ph .arena:has(>.fbtns){--rb:54px}
+html.ph .arena:has(.mon .row){--re:46px}
+html.ph .arena:has(>.row.small){--rc:34px}
+html.ph .arena:has(>.rollbox){--rr:54px}
+.fbtns .btn.rec::after,.fbtns .btn.rec::before{content:none!important}
+html.ph-p .gx-dock-body{padding-bottom:max(6px,env(safe-area-inset-bottom,0px))}
+
+html.ph .outcome .story,html.ph #prompt .acts .small,html.ph #prompt .acts.main>.muted{display:none!important}
+html.ph .outcome{padding:6px 14px}
+
+html.ph #prompt>.tip.sellbar{display:block!important;margin:2px 0;font-size:15px}
+html.ph #prompt .winwarn{display:block;padding:5px 10px;font:700 14px/1.2 var(--title);background:linear-gradient(#ffe8a8,#f0bf4c);color:#2b1405;border-radius:9px;border:1px solid #4a2a06}
+html.ph #prompt .winwarn b{font-weight:800}
+@media (max-height:640px){
+  html.ph .arena:has(>.vs){align-content:start}
+  html.ph .arena:has(>.vs) .score .num{font-size:1.3rem;height:1.9em;min-width:1.9em}
+  html.ph .arena:has(>.vs) .hsav{display:none}
+  html.ph .arena:has(>.vs) .score.hero .num{margin-top:0}
+  html.ph .arena:has(>.vs) .score .num{font-size:1.5rem}
+  html.ph .felt{padding-top:8px}
+  html.ph .arena:has(>.vs){--hav:min(var(--cw),calc((100cqw - 2*var(--sw) - 40px)*.34),84px)}
+}
+
+/* strength numbers sit on the bottom edge of the hero and of the monster card */
+html.ph .arena:has(>.vs) .score.hero .num{margin-top:-24px;position:relative;z-index:3}
+html.ph .arena:has(>.vs) .score.hero{gap:2px}
+html.ph .arena:has(>.vs) .score.hero .sl{margin-top:0}
+html.ph .arena:has(>.vs) .vs .score.mons{grid-column:3;grid-row:1;align-self:end;justify-self:center;margin:0;position:relative;z-index:3}
+html.ph .arena:has(>.vs) .row.mons{margin-bottom:20px}
+html.ph .arena:has(>.vs) .vs .score.mons .num{margin:0}
+html.ph .arena:has(>.vs) .mon{gap:0}
+.fbtns{flex-wrap:wrap}
+.fbtns .btn{min-width:0;overflow:hidden;text-overflow:ellipsis}
+html.ph #prompt .acts.main .btn.pickchip{min-height:38px;font-size:13px;flex:1 1 30%;padding:2px 5px}
+html.ph #prompt.bfq .acts.main{gap:4px}
+html.ph-p:has(#prompt.bfq) .gx-dock,html.ph-p:has(#prompt .sellbar) .gx-dock{max-height:min(196px,35dvh)!important}
+
+/* while a question is open the hand can't be played: fold it down so the table keeps its room */
+html.ph:has(#prompt.bfq) .mine{--hw:44px;--hero:40px}
+html.ph:has(#prompt.bfq) .mine .gear{padding-left:6px}
+html.ph-l #prompt .bfline{white-space:normal;line-height:1.2}
+html.ph .mine .hand>.small{display:none}
+html.ph .opp.seat,html.ph-l .opp.seat,html.ph-p .opp.seat{min-height:44px}
+
+/* a crowded fight on a short phone: drop the extras, keep the numbers, the cards and the buttons */
+html.ph .arena.tight .hsav,html.ph .arena.tight .mon .row,html.ph .arena.tight>.row.small,html.ph .arena.tight>.rollbox .small{display:none}
+html.ph .arena.tight .score .num{margin-top:0}
+html.ph .arena.tight .row.mons{margin-bottom:6px}
 
 </style>
 <style>
@@ -3751,7 +3938,7 @@ const GFX=(function(){
 <script>
 // ---------- Doorkick Dungeon engine: all rules live here. State is G (plain JSON); every move goes through gameAct(ds, seat). ----------
 // Rule ids [R..]/[H..] refer to rules-notes.md.
-var ANIM=1, AIDELAY=700, DEFN=4, DEFEX={}, LVMIX=null, DEFSEED=null;
+var ANIM=1, AIDELAY=600, DEFN=4, DEFEX={}, LVMIX=null, DEFSEED=null;
 const R={WIN:10,HAND:5,DWARF_HAND:6,START:4,RUN:5,SELL:1000,BERSERK:3,TURN:3,TURN_B:3,FLIGHT:3,CAP:400,THEFT:4,MAXTURN:600};
 const SAVE='dkd_save2',TOUR='dkd_tour1';
 let G=null;const UI={menu:null,zoom:null,info:true,rules:false,fx:[],busy:false,pause:false,hints:true,speed:1,pass:null,lastSeat:-1,sell:null};
@@ -4967,7 +5154,7 @@ function narrate(o){const f=P(o.who),h=o.help>=0?P(o.help):null;const you=isMe(o
   return `The ${M} is gone. Nobody gets its treasure.`}
 function outcomeHead(o){const you=isMe(o.who);const f=P(o.who);const lost=(o.lost||[]).find(x=>x.i===o.who);
   if(o.won)return {cls:'win',h:you?'🎉 Victory!':`⚔ ${esc(f.nm)} wins the fight`,sub:`+${o.lv} level${plural(o.lv)} · ${o.tr} treasure${plural(o.tr)}${o.help>=0?` (${esc(P(o.help).nm)} helped)`:''}`};
-  if(o.dead&&o.dead.includes(o.who))return {cls:'bad',h:'💀 Killed!',sub:`${you?'You lose':esc(f.nm)+' loses'} every item and card (level and race stay)`};
+  if(o.dead&&o.dead.includes(o.who))return {cls:'bad',h:'💀 Killed!',sub:`${you?'You lose':esc(f.nm)+' loses'} all items and cards`};
   const mine=o.runs.filter(r=>r.w===o.who);if(mine.length){const caught=mine.some(r=>!r.ok);const d=lost&&lost.d<0?`−${-lost.d} level${plural(-lost.d)}`:'';
     return caught?{cls:'bad',h:'💥 Caught: Bad Stuff!',sub:d||'the Bad Stuff hits'}:{cls:'run',h:'🏃 Ran away',sub:d?d+' just for fleeing':'no harm done'}}
   return {cls:'run',h:'The fight is over',sub:'the monsters left: no treasure'}}
@@ -5233,7 +5420,7 @@ const ptok=i=>`<span class="ptok" style="--c:${PCOL[i]}" aria-hidden="true">${PS
 const EMO={'💡':'hint','⚠':'warn','☁':'cloud','⚔':'sword','💰':'coin','✋':'hand','💀':'skull','🏆':'trophy','✨':'spark','🎉':'party','🎒':'bag','♂':'male','♀':'female','⏸':'pause','🐢':'slow','⏩':'fast','📜':'scroll','📖':'book','🤖':'bot','💬':'chat','✓':'check','✗':'cross','🧬':'race','🎓':'cls','🪖':'helm','👢':'boot','🛡':'shield','🗡':'sword','✦':'spark','⇆':'swap','🚪':'door','🏃':'run','🙋':'help','📉':'down','💥':'star','🔊':'sound','🔇':'mute','🎵':'music','▶':'play'};
 const EMORE=new RegExp('('+Object.keys(EMO).join('|')+')\uFE0F?','gu');
 function emo(h){if(typeof ic!=='function'||!h)return h;return h.replace(/(<[^>]*>)|([^<]+)/g,(m,tag,txt)=>tag?tag:txt.replace(EMORE,(x,e)=>ic(EMO[e])))}
-UI.speed=2;try{UI.hints=localStorage.getItem('dkd_hints')!=='0';UI.speed=+(localStorage.getItem('dkd_speed3')||2)}catch(e){}
+UI.speed=1;try{UI.hints=localStorage.getItem('dkd_hints')!=='0';UI.speed=+(localStorage.getItem('dkd_speed4')||1)}catch(e){}
 const SPEEDN=v=>emo(v<1?'🐢 slow':v>1?'⏩ fast':'▶ normal');
 function refresh(){if(G&&G.mode==='net'&&typeof netWindow==='function')netWindow();if(G&&!G.winner)autoPass();if(G&&!G.winner){try{if(G.mode!=='net')localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}else{try{localStorage.removeItem(SAVE)}catch(e){}}
   render();schedule();sounds();if(G&&G.mode==='net'&&typeof netPush==='function')netPush()}
@@ -5273,7 +5460,7 @@ function render(){const root=$('#app');if(!root)return;syncMenu();if(typeof netR
   if(G.mode==='hot'&&s>=0&&P(s).human&&UI.lastSeat!==s&&!G.winner){UI.pass=s}
   const hs=(root.querySelector('.hand')||{}).scrollLeft||0,os=(root.querySelector('.opps')||{}).scrollLeft||0,gs=(root.querySelector('.gear')||{}).scrollLeft||0;
   UI.arRes=92;const ar=arenaHTML();const snapS=typeof GFX!=='undefined'?GFX.snap(root):null;
-  setHTML(root,`${oppsHTML(me)}<div class="table"><div class="felt paper">${pilesHTML()}<div class="arena" aria-label="The table" style="--res:${UI.arRes}px">${ar}</div>${pileR()}</div></div>${mineHTML(me)}`);
+  setHTML(root,`<div class="tbl" data-board>${oppsHTML(me)}<div class="table"><div class="felt paper">${pilesHTML()}<div class="arena" aria-label="The table" style="--res:${UI.arRes}px">${ar}</div>${pileR()}</div></div>${mineHTML(me)}</div>`);
   if(typeof GFX!=='undefined'){GFX.after(root,snapS);GFX.clash(root)}const hd=root.querySelector('.hand');if(hd)hd.scrollLeft=hs;const od=root.querySelector('.opps');if(od)od.scrollLeft=os;const gd=root.querySelector('.gear');if(gd)gd.scrollLeft=gs;
   const sd=$('#side'),st=sd.scrollTop;setHTML(sd,promptHTML(me)+recentHTML());sd.scrollTop=st;
   $('#docktitle').textContent=dockTitle(me);
@@ -5302,9 +5489,8 @@ function syncGfxBtn(){const g=$('#gfxbtn');if(g&&typeof GFX!=='undefined')g.inne
 function dockTitle(me){const s=sideToAct();if(G.winner)return 'Game over';if(s<0)return 'Turn '+G.turn;const p=P(s);return (s===me&&p.human?'Your move':p.human?p.nm+'’s move':p.nm+' is thinking…')+' · turn '+G.turn}
 function recentHTML(){if(!G||!G.log.length)return '';const o=G.out&&G.out.turn===G.turn&&!G.cb?G.out:null;const bk=(UI.barkLog||[]).filter(b=>G.ln-b.n<12).slice(0,2);
   return `<div class="recent"><div class="rl"><h3>Just happened</h3><button class="btn" data-gx="dkLog" style="min-height:40px;padding:2px 10px;font-size:.85rem">📜 Diary</button></div><ol>${o?`<li class="story">📖 ${narrate(o)}</li>`:''}${bk.map(b=>`<li class="quote" style="border-left-color:${PCOL[b.s]}"><b>${esc(P(b.s).nm)}:</b> “${esc(b.t)}”</li>`).join('')}${G.log.slice(0,2).map(l=>`<li${l.s>=0?` style="border-left-color:${PCOL[l.s]}"`:''}>${esc(l.t)}</li>`).join('')}</ol></div>`}
-function oppsHTML(me){return `<div class="opps" aria-label="Rivals">${G.pl.filter(p=>p.i!==me).map(p=>{const act=p.i===G.active;const bk=barkOf(p.i);const rv=me>=0&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]||null):null;
-  return `<button class="opp paper ${act?'active':''}" data-opp="${p.i}" title="${esc(heroTitle(p))}: level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play" aria-label="${esc(p.nm)}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items${act?', their turn':''}${rv&&rv.curse?`, has cursed you ${rv.curse} times`:''}. Tap for details."><span class="nm">${ptok(p.i)} ${esc(p.nm)}${p.human?'':' <span class="small muted bot">🤖</span>'}${rv&&rv.curse?` <span class="grudge">☁×${rv.curse} on you</span>`:''}</span><span class="lv" aria-hidden="true"><small>Lv</small>${p.lvl}</span>
-   <span class="st" aria-hidden="true">${bk?`<span class="bark">💬 “${esc(bk)}”</span>`:`⚔${pStr(p)}<i> str</i> ✋${p.hand.length}<i> cards</i> 🎒${p.eq.length}<i> items</i>${p.curse.length?' ☁'+p.curse.length:''}${p.dead?' 💀':''}`}</span></button>`}).join('')}</div>`}
+function oppsHTML(me){const n=G.pl.length-(me>=0?1:0);return `<div class="opps n${n}" aria-label="Rivals">${G.pl.filter(p=>p.i!==me).map((p,k,a)=>{const act=p.i===G.active;const rv=me>=0&&G.mode!=='ai'?(((G.rv||{})[me]||{})[p.i]||null):null;const q=a.length>1?(k/(a.length-1))*2-1:0;
+  return `<button class="opp seat paper ${act?'active':''}${p.dead?' dead':''}" data-opp="${p.i}" style="--c:${PCOL[p.i]};--q:${q.toFixed(2)}" title="${esc(heroTitle(p))}: level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play" aria-label="${esc(p.nm)}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items${act?', their turn':''}${rv&&rv.curse?`, has cursed you ${rv.curse} times`:''}. Hold for details."><span class="sav">${typeof bfAv==='function'?bfAv(p,'savi'):''}<b class="slv" aria-hidden="true">${p.lvl}</b>${p.dead?'<i class="sdead" aria-hidden="true">💀</i>':''}</span><span class="snm">${esc(p.nm.split(/[ ,]/)[0])}</span><span class="sbd" aria-hidden="true"><span class="sw">⚔${pStr(p)}</span><span class="sg">🪖${p.eq.length}</span>${p.curse.length?`<span class="sc">☁${p.curse.length}</span>`:''}</span></button>`}).join('')}</div>`}
 // phone only (CSS shows it instead of the mini cards): one readable row per card, tap = the big card
 function phList(p){const ids=p.race.concat(p.cls).concat(p.half!=null?[p.half]:[]).concat(p.sup!=null?[p.sup]:[]).concat(p.hire!=null?[p.hire]:[]).map(id=>({id,on:true})).concat(p.eq.map(e=>({id:e.id,on:e.on})));
   return `<ul class="phlist">${ids.map(x=>{const c=cd(x.id);const t=tagOf(c).replace(/<[^>]+>/g,'');return `<li><button class="gchip ${c.d==='door'?'door':'tr'} ${x.on?'':'eqoff'}" data-card="${x.id}" aria-label="${esc(c.n)}: ${esc(c.x||'')}${x.on?'':' (carried, not worn)'}"><b>${esc(c.n)}</b>${t?' '+esc(t):''}${x.on?'':' (not worn)'}</button></li>`}).join('')||'<li class="small muted">No items yet.</li>'}</ul>`}
@@ -5331,9 +5517,15 @@ function arenaHTML(){const cb=G.cb;
   cb.os.forEach(o=>chips.push(`<span class="chip">${esc(cname(o.id))} (${o.side==='p'?'heroes':'monsters'})</span>`));
   const wt=winThreat(cb);if(wt)chips.unshift(`<span class="chip wchip">${isMe(wt.who)?'🏆 This fight wins you the game!':'⚠ This fight wins '+esc(f.nm)+' the game!'}</span>`);
   const hn=`${nmY(f.i)}${h?' + '+nmY(h.i):''}`;const en=animOnce(cb.who+'-'+(cb.mons[0]?cb.mons[0].id:'x'),'enter');
-  return `<div class="vs clash" data-k="${G.turn}:${cb.who}" data-a="${a}" data-b="${b}" role="group" aria-label="${hn}: ${a} versus the monsters: ${b}"><span class="score hero ${win?'win':'lose'} ${en}"><b class="num">${a}</b><span class="sl">${hn}</span></span><span class="vsx ${en}" aria-hidden="true">${ic('swords')}</span><span class="score mons ${win?'lose':'win'} ${en}"><span class="sl">Monsters</span><b class="num">${b}</b></span></div>
-   <div class="row mons" style="--n:${cb.mons.length}">${cb.mons.map((m,j)=>`<div class="mon">${cardHTML(m.like!=null?m.like:m.id,{cls:animOnce(m.like!=null?m.like:m.id,'fly')})}<span class="small">${m.like!=null?'the date · ':''}strength ${mStr(m,cb)}</span>${m.enh.length?`<div class="row" style="gap:4px">${m.enh.map(e=>{const c=cd(e);return `<button class="gchip door" data-card="${e}" aria-label="${esc(c.n)}: ${esc(c.x||'')}">${esc(c.n)} <b>${c.b>0?'+':''}${c.b}</b></button>`}).join('')}</div>`:''}</div>`).join('')}</div>
-   ${chips.length?(UI.arRes+=30,`<div class="row small" style="gap:4px">${chips.join('')}</div>`):''}${rollHTML()}`}
+  return `<div class="vs clash" data-k="${G.turn}:${cb.who}" data-a="${a}" data-b="${b}" role="group" aria-label="${hn}: ${a} versus the monsters: ${b}"><span class="score hero ${win?'win':'lose'} ${en}"><span class="hsav">${typeof bfAv==='function'?bfAv(f,'hsavi')+(h?bfAv(h,'hsavi h2'):''):''}</span><b class="num">${a}</b><span class="sl">${hn}</span></span><span class="vsx ${en}" aria-hidden="true">${ic('swords')}</span><span class="score mons ${win?'lose':'win'} ${en}"><span class="sl">Monsters</span><b class="num">${b}</b></span></div>
+   <div class="row mons" style="--n:${cb.mons.length}">${cb.mons.map((m,j)=>`<div class="mon">${cardHTML(m.like!=null?m.like:m.id,{cls:animOnce(m.like!=null?m.like:m.id,'fly')})}<span class="small mstr">${m.like!=null?'the date · ':''}strength ${mStr(m,cb)}</span>${m.enh.length?`<div class="row" style="gap:4px">${m.enh.map(e=>{const c=cd(e);return `<button class="gchip door" data-card="${e}" aria-label="${esc(c.n)}: ${esc(c.x||'')}">${esc(c.n)} <b>${c.b>0?'+':''}${c.b}</b></button>`}).join('')}</div>`:''}</div>`).join('')}</div>
+   ${chips.length?(UI.arRes+=30,`<div class="row small" style="gap:4px">${chips.join('')}</div>`):''}${rollHTML()}${fightBtns(cb)}`}
+function runShort(cb,me){try{const o=runOdds(P(me),cb);return o.all===0?' (no chance)':o.all===1?' (sure)':' '+pct(o.all)}catch(e){return ''}}
+// the fight's own buttons sit on the fight: Fight!, Run, Get help (the dock no longer repeats them)
+function fightBtns(cb){const me=viewSeat();if(me<0||!P(me).human||sideToAct()!==me||G.q||G.phase!=='combat'||cb.stage!=='act')return '';const vm=validMoves(me);const by=a=>vm.find(m=>m.act===a);
+  const co=coach(me);const recK=UI.hints&&co.rec?mvKey(co.rec):null;const win=winning(cb);const mv=(m,cl,t)=>`<button class="btn ${cl}${recK&&mvKey(m)===recK?' rec':''}" data-mv='${esc(JSON.stringify(m))}'>${t}</button>`;
+  const askRec=UI.hints&&co.rec&&co.rec.act==='ask';
+  UI.arRes+=document.documentElement.classList.contains('ph')?56:110;return `<div class="fbtns">${by('fight')?mv({act:'fight'},'primary fightb'+(win?' pulse':''),'⚔ Fight!'):''}${by('run')?mv({act:'run'},'runb'+(co.rec&&co.rec.act==='run'?' primary':''),'🏃 Run'+runShort(cb,me)):''}${vm.some(m=>m.act==='ask')?`<button class="btn helpb${askRec?' rec primary':''}" data-a="askmenu">🙋 Help</button>`:''}</div>`}
 // entry animations play once per card per turn, not on every re-render (opening a popup re-renders the table)
 function animOnce(id,c){const k=c+id+':'+G.turn;UI.anim1=UI.anim1||{};if(UI.anim1[k])return '';UI.anim1[k]=1;return c}
 function fightNote(cb){const f=P(cb.who),h=cb.help>=0?P(cb.help):null,win=winning(cb);return `<div class="fightnote">${nmY(f.i)} ${win?'is winning.':'is losing.'}${fighters(cb).some(x=>isCls(x,'warrior'))?' A Warrior is fighting, so a tie counts as a win.':''}${special(cb,'lvlonly')?' <b class="warn">Levels only in this fight!</b>':''}${special(cb,'bonusonly')?' <b class="warn">Bonuses only: levels don’t count!</b>':''} Strength is level + worn items + one-shots${h?' + the helper':''}.</div>`}
@@ -5350,10 +5542,10 @@ function mineHTML(me){if(me<0||!G.pl[me])return `<div class="mine paper box"><di
   const lim=handLimit(p),over=p.hand.length-lim;
   return `<section class="mine paper" aria-label="You"><div class="top"><span class="who">${ptok(p.i)} ${esc(p.nm)}${G.mode!=='ai'?' <span class="you">(you)</span>':''} <span class="small muted">${p.sex==='m'?'♂':'♀'}${races(p).concat(classes(p)).map(r=>' · '+(TRAITNAME[r]||r)).join('')}</span></span>
     <span class="str">⚔ <b>${pStr(p)}</b> strength <span class="muted">(level ${p.lvl} + items ${itemBonus(p)}${p.sexPen?' − 5 next fight':''})</span> · ✋ ${p.hand.length} card${plural(p.hand.length)} <span class="${over>0?'warn':'muted'}">(limit ${lim}${over>0?`: give away ${over} at end of turn`:''})</span>${p.hire!=null?' · Porter':''}${p.dead?' · 💀 dead until next turn':''}</span><span class="swipe" aria-hidden="true">${p.hand.length>3?'⇆ swipe':''}</span><span class="lv"><small>Lv</small> ${p.lvl}</span></div>
-    <div class="gear" aria-label="In play: tap to wear, take off or sell"><span class="gl">In play:</span>${gear||'<span class="small muted">nothing yet: items you play from your hand appear here.</span>'}</div>
+    <div class="gear" aria-label="In play: tap to wear, take off or sell"><span class="gl">In play:</span>${gear||'<span class="slots" aria-hidden="true"><i>🪖</i><i>🛡</i><i>🗡</i><i>👢</i></span><span class="small muted nogear">nothing yet: items you play from your hand appear here.</span>'}</div>
     <div class="hand${p.hand.length>3?' many':''}" aria-label="Your hand, ${p.hand.length} cards${p.hand.length>3?', scroll sideways for more':''}">${p.hand.map((id,i)=>{const n=p.hand.length,q=i-(n-1)/2;const fan=`style="--rot:${Math.max(-6,Math.min(6,q*1.7)).toFixed(1)}deg;--arc:${Math.min(10,q*q*.9).toFixed(1)}px"`;if(sellSet)return cardHTML(id,{cls:selc(id),attr:fan});const pl=playable.has(id);const rk=pl&&UI.hints?riskyCard(me,id):'';
       return cardHTML(id,{cls:(pl?(rk?'play risky ':'play '):''),badge:sug===id?badge:'',risk:rk,attr:fan})}).join('')||'<span class="small muted">No cards.</span>'}</div></section>`}
-function sellBar(p){const ids=UI.sell;const v=sellValue(p,ids);const lv=Math.min(R.WIN-1-p.lvl,Math.floor(v/R.SELL));return `<div class="tip sellbar"><b>Selling:</b> tap cards in your hand or in play to pick them.<br> ${ids.length} card${ids.length===1?'':'s'}, ${v} gold${isRace(p,'halfling')&&!p.halfT?' (Halfling double on the priciest)':''}. ${v>=R.SELL?`That buys ${lv} level${lv===1?'':'s'}.`:`Need ${R.SELL}.`}<div class="acts"><button class="btn primary" data-mv='${esc(JSON.stringify({act:'sell',cards:ids.join(',')}))}' ${v>=R.SELL?'':'disabled'}>Sell</button><button class="btn" data-a="sellx">Cancel</button></div></div>`}
+function sellBar(p){const ids=UI.sell;const v=sellValue(p,ids);const lv=Math.min(R.WIN-1-p.lvl,Math.floor(v/R.SELL));return `<div class="tip sellbar"><b>Sell:</b> ${ids.length} card${ids.length===1?'':'s'}, ${v} gold${isRace(p,'halfling')&&!p.halfT?' (Halfling x2)':''}. ${v>=R.SELL?`Buys ${lv} level${lv===1?'':'s'}.`:`Need ${R.SELL}.`}<div class="acts"><button class="btn primary" data-mv='${esc(JSON.stringify({act:'sell',cards:ids.join(',')}))}' ${v>=R.SELL?'':'disabled'}>Sell</button><button class="btn" data-a="sellx">Cancel</button></div></div>`}
 function myMoves(me){if(!G||me<0)return[];if(!P(me).human)return[];return validMoves(me)}
 const STEPS=[['main','Get ready'],['kick','Kick the door'],['combat','Fight or flee'],['after','Trouble or loot'],['post','Tidy up'],['charity','Charity']];
 function stepIdx(){const ph=G.phase;return ph==='setup'||ph==='window'||ph==='main'?0:ph==='combat'?2:ph==='after'?3:ph==='post'?4:ph==='charity'?5:0}
@@ -5373,7 +5565,7 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
   if(G.q){const q=G.q;
     if(q.kind==='help'){const f=P(q.from);say=`${esc(f.nm)} asks you to help against ${cb.mons.map(m=>esc(cname(m.id))).join(' and ')}, offering ${q.n} treasure${q.n===1?'':'s'}.`;tip=`With you: ${sideStr(cb)+pStr(P(me))} vs ${monStr(cb)}. If you lose, you both run away.`;acts=btn({act:'opt',opt:'yes'},'Help','good')+btn({act:'opt',opt:'no'},'Refuse')}
     if(q.kind==='rescue'){say='Caught! You can still get away.';ol=['Use an escape card, or take the Bad Stuff.'];acts=by('use').map(m=>btn(m,'Use '+esc(cname(m.card)),'good')).join('')+btn({act:'opt',opt:'no'},'Take the Bad Stuff','danger')}
-    if(q.kind==='pick'){say=q.text||'Choose one.';acts=q.opts.map((v,i)=>v==='hand'?btn({act:'pick',opt:i},'A random card from their hand'):v==='lvl'?btn({act:'pick',opt:i},'Lose the levels'):typeof v==='number'?`<button class="btn opt${recK&&mvKey({act:'pick',opt:i})===recK?' rec':''}" data-mv='${esc(JSON.stringify({act:'pick',opt:i}))}' style="padding:2px">${cardHTML(v,{size:'xs',attr:'tabindex="-1"',notitle:1}).replace('<button','<span').replace(' data-card=',' data-pcard=').replace(/<\/button>$/,'</span>')}</button>`:btn({act:'pick',opt:i},v==='hand'?'Discard my hand':esc(v))).join('');if(q.why==='handOr')acts=btn({act:'pick',opt:0},'Discard my whole hand')+btn({act:'pick',opt:1},'Lose '+q.cont.n+' levels')}
+    if(q.kind==='pick'){say=q.text||'Choose one.';acts=q.opts.map((v,i)=>v==='hand'?btn({act:'pick',opt:i},'A random card from their hand'):v==='lvl'?btn({act:'pick',opt:i},'Lose the levels'):typeof v==='number'&&document.documentElement.classList.contains('ph')?btn({act:'pick',opt:i},esc(cname(v))+(cd(v).b?` ${cd(v).b>0?'+':''}${cd(v).b}`:''),'pickchip'):typeof v==='number'?`<button class="btn opt${recK&&mvKey({act:'pick',opt:i})===recK?' rec':''}" data-mv='${esc(JSON.stringify({act:'pick',opt:i}))}' style="padding:2px">${cardHTML(v,{size:'xs',attr:'tabindex="-1"',notitle:1}).replace('<button','<span').replace(' data-card=',' data-pcard=').replace(/<\/button>$/,'</span>')}</button>`:btn({act:'pick',opt:i},v==='hand'?'Discard my hand':esc(v))).join('');if(q.why==='handOr')acts=btn({act:'pick',opt:0},'Discard my whole hand')+btn({act:'pick',opt:1},'Lose '+q.cont.n+' levels')}
     if(q.kind==='ward'){say=`A curse is coming: ${esc(cname(q.curse))}. ${esc(cd(q.curse).x)}`;ol=['Cancel it with your '+esc(cname(q.ring))+'?'];acts=btn({act:'opt',opt:'yes'},'Cancel the curse','good')+btn({act:'opt',opt:'no'},'Let it happen')}
     if(q.kind==='glue'){const r=G.cb.runs[q.run];say=`${esc(P(r.w).nm)} got away from ${esc(mdef(runMon(r)).n)}. Make them roll again with your Sticky Paste?`;acts=btn({act:'opt',opt:'yes'},'Stick them!','danger')+btn({act:'opt',opt:'no'},'Let them go')}
     if(q.kind==='lawyer'){say='The lizards won’t sue a Thief. Swap 2 treasures from your hand for 2 new ones?';acts=btn({act:'opt',opt:'yes'},'Swap','good')+btn({act:'opt',opt:'no'},'Keep them')}
@@ -5382,7 +5574,7 @@ function promptHTML(me){const s=sideToAct();const p=s>=0?P(s):null;const mine=me
   case 'setup':say='Set up your hero before the first door.';ol=['Play a race or class card from your hand (tap it).','Play items: they go on automatically if you can use them.','Press Ready when done.'];acts=autoBtn(me,co)+btn({act:'ready'},'Ready',autoN(me,co)?'':'primary pulse');break;
   case 'window':say=`Before ${esc(curPl().nm)} kicks the door, you may play a curse or a level-up (tap it in your hand).`;acts=btn({act:'pass'},`Let ${esc(curPl().nm)} go on`,'primary');break;
   case 'main':say='Get ready, then kick open the door.';ol=['Play races, classes and items; wear your best gear.','Sell items worth 1,000 gold for a level.','Kick open the door!'];acts=autoBtn(me,co)+btn({act:'kick'},'🚪 Kick open the door',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);tip=`Your combat strength is ${pStr(P(me))}.`+(by('resurrect').length?' As a Cleric you can instead take the top door discard: tap a card to discard for it.':'');break;
-  case 'after':say='No monster behind the door.';ol=['Look for trouble: fight a monster from your hand, or','Loot the room: draw a face-down door card.'];acts=btn({act:'loot'},'Loot the room (free card)','primary')+by('trouble').filter(m=>!riskyCard(me,m.card)).slice(0,1).map(m=>btn(m,`⚔ Fight ${esc(cname(m.card))} from your hand (level ${cd(m.card).lvl}): you’d win`,'good')).join('')+sellBtn(vm,me);extra.push(co.low);break;
+  case 'after':say='No monster behind the door.';ol=['Look for trouble: fight a monster from your hand, or','Loot the room: draw a face-down door card.'];acts=btn({act:'loot'},'Loot the room (free card)','primary')+by('trouble').filter(m=>!riskyCard(me,m.card)).slice(0,1).map(m=>btn(m,`⚔ Fight ${esc(cname(m.card))} (Lv ${cd(m.card).lvl})`,'good')).join('')+sellBtn(vm,me);extra.push(co.low);break;
   case 'post':{const over=P(me).hand.length-handLimit(P(me));say='Tidy up, then end your turn.';ol=['Play or wear new items, sell for levels.',over>0?`End your turn: you hold ${over} card${plural(over)} too many and will give ${over===1?'it':'them'} away.`:'End your turn.'];acts=autoBtn(me,co)+btn({act:'end'},'End turn',autoN(me,co)?'':'primary pulse')+sellBtn(vm,me);break}
   case 'charity':{const t=charityTargets(P(me));const ex=P(me).hand.length-handLimit(P(me));say=`You hold ${P(me).hand.length} cards but may keep only ${handLimit(P(me))}. ${t.length?`Tap ${ex} card${plural(ex)} to give to ${t.map(i=>esc(P(i).nm)).join(' or ')}: extra cards go to the lowest-level hero.`:`You are the lowest level, so tap ${ex} card${plural(ex)} to discard.`} Then your turn ends.`;acts=co.card!=null&&UI.hints?`<button class="btn primary pulse" data-a="autocharity">✨ Give away the suggested card${ex>1?'s':''} (${ex})</button>`:'';break}
   case 'combat':{const win=winning(cb);
@@ -5469,12 +5661,12 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='load'){try{G=JSON.parse(localStorage.getItem(SAVE));UI.pass=null;UI.lastSeat=-1;refresh()}catch(e){G=null;render()}return}
   if(a==='gfx'&&typeof GFX!=='undefined'){GFX.cycle();syncGfxBtn();return}
   if(a==='pause'){UI.pause=!UI.pause;$('#pausebtn').innerHTML=ic(UI.pause?'play':'pause');syncMenu();if(!UI.pause)schedule();return}
-  if(a==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed3',UI.speed)}catch(e){};$('#speedbtn').innerHTML=SPEEDN(UI.speed);syncMenu();return}
+  if(a==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed4',UI.speed)}catch(e){};$('#speedbtn').innerHTML=SPEEDN(UI.speed);syncMenu();return}
   if(a==='hints'){UI.hints=!UI.hints;try{localStorage.setItem('dkd_hints',UI.hints?'1':'0')}catch(e){};$('#hintbtn').innerHTML=ic('hint')+' '+(UI.hints?'On':'Off');syncMenu();render();return}
   if(a==='snd'&&typeof toggleSound==='function'){toggleSound();syncMenu();return}
   if(a==='mus'&&typeof toggleMusic==='function'){toggleMusic();syncMenu();return}
   if(t.dataset.set){const k=t.dataset.set,v=t.dataset.v;if(k==='n')UI.n=+v;else if(k==='mode')UI.mode=v;else if(k==='lvl')UI.lvl=v;else if(k==='ex'){DEFEX[v]=!DEFEX[v];try{localStorage.setItem('dkd_ex',JSON.stringify(DEFEX))}catch(e){}}render();return}
-  if(t.dataset.opp!=null&&t.dataset.card===undefined){UI.oppView=+t.dataset.opp;render();GX.show('dkOpp');const d=$('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0;return}
+  if(t.dataset.opp!=null&&t.dataset.card===undefined){if(document.documentElement.classList.contains('ph'))return;UI.oppView=+t.dataset.opp;render();GX.show('dkOpp');const d=$('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0;return}
   if(t.dataset.start){UI.pass=null;UI.lastSeat=-1;newGame(t.dataset.start,UI.n||DEFN);if(G){G.learn=UI.learn===true&&t.dataset.start!=='ai';render()}return}
   if(t.dataset.card!==undefined&&G){const id=+t.dataset.card;const me=viewSeat();
     if(t.closest('.dlg')||t.closest('#dkCard')){return}
@@ -5517,7 +5709,7 @@ const PH={on:false,
     this.metrics()},
   metrics(){const h=document.documentElement;if(!this.on){h.style.removeProperty('--ph-tb');return}
     const t=document.querySelector('.table');if(t){const r=t.getBoundingClientRect();h.style.setProperty('--ph-tb',Math.round(r.bottom+4)+'px')}},
-  chips(){if(typeof G==='undefined'||!G||!G.pl)return '';const me=viewSeat();
+  chips(){return '';/* the rival seats are on the table now (ui.js oppsHTML) */const me=viewSeat();
     const chip=(p,mine)=>{const act=p.i===G.active;const nm=esc(p.nm);
       const lab=`${p.nm}${mine?' (you)':''}, level ${p.lvl}, strength ${pStr(p)}, ${p.hand.length} cards in hand, ${p.eq.length} items in play${act?', their turn':''}`;
       const inner=`<span class="n">${ptok(p.i)}<b>${mine?'You':nm}</b></span><span class="s" aria-hidden="true"><i class="l">Lv ${p.lvl}</i> ⚔${pStr(p)}<span class="hc"> ✋${p.hand.length}</span>${p.curse&&p.curse.length?' ☁'+p.curse.length:''}${p.dead?' 💀':''}</span>`;
@@ -5571,6 +5763,7 @@ function bfEls(z){const q=s=>[...document.querySelectorAll(s)];
   if(z[0]==='m')return q(`.arena .row.mons .mon:nth-child(${+z.slice(1)+1})`);
   if(z[0]==='p')return q(`#phopps [data-opp="${z.slice(1)}"],#app .opps [data-opp="${z.slice(1)}"]`);
   if(z==='door')return q('.pile.pl,.bfdoor,.arena:not(:has(.vs))');if(z==='disc')return q('.pile.pr');return []}
+const bfCap=(t,n)=>{const w=String(t).split(/\s+/);return w.length>n?w.slice(0,n-1).join(' ')+'…':String(t)};
 const bfShort=t=>{t=String(t).replace(/<[^>]+>/g,'').replace(/ \(.*\)$/,'');return t.length>26?t.slice(0,25)+'…':t};
 function bfMark(){document.querySelectorAll('[data-bfz]').forEach(e=>{e.removeAttribute('data-bfz');e.removeAttribute('data-bfl');e.classList.remove('bf-tgt','bf-over')});
   document.querySelectorAll('.bf-picked').forEach(e=>e.classList.remove('bf-picked'));document.documentElement.classList.remove('bf-holding');
@@ -5610,7 +5803,7 @@ function bfReveal(id,who){const c=cd(id);const me=viewSeat();const mine=who===me
 // ---- cause and effect: cards fly from the rival who played them, numbers float up where they changed ----
 function bfFly(id,fr,to,quick){if(!BF.motion())return;const e=document.createElement('div');e.className='bffly';e.innerHTML=cardHTML(id,{attr:'tabindex="-1"',notitle:1});document.body.appendChild(e);
   const w=64,sx=fr.left+fr.width/2-w/2,sy=fr.top+fr.height/2-45,tx=to.left+to.width/2-w/2,ty=to.top+to.height/2-45;
-  const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(${quick?1:.6}) rotate(-8deg)`,opacity:1},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-60}px) scale(1.15) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.5)`,opacity:0}],{duration:quick?380:900,easing:'cubic-bezier(.3,.7,.3,1)'});a.onfinish=()=>e.remove()}
+  const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(${quick?1:.6}) rotate(-8deg)`,opacity:1},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-60}px) scale(1.15) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.5)`,opacity:0}],{duration:quick?380:620,easing:'cubic-bezier(.3,.7,.3,1)'});a.onfinish=()=>e.remove()}
 function bfFloat(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const f=document.createElement('div');f.className='bffloat '+(cls||'');f.textContent=txt;f.style.left=(r.left+r.width/2)+'px';f.style.top=(r.top+r.height/3)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1500)}
 function bfBubble(s,txt){const el=document.querySelector(`#phopps [data-opp="${s}"],#app .opps [data-opp="${s}"]`);if(!el||!BF.motion())return;const r=el.getBoundingClientRect();const b=document.createElement('div');b.className='bfbub';b.style.setProperty('--c',PCOL[s]);b.textContent=txt;b.style.left=Math.max(8,Math.min(innerWidth-208,r.left))+'px';b.style.top=(r.bottom+4)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),2600)}
 function bfNote(el,txt,cls){if(!el||!BF.motion())return;const r=el.getBoundingClientRect();if(!r.width)return;const b=document.createElement('div');b.className='bfbub note '+(cls||'');b.style.setProperty('--c',cls==='bad'?'#c0392b':'#2e9e5b');b.textContent=txt;const tb=document.querySelector('.table');const t=tb?tb.getBoundingClientRect():r;b.style.left='50%';b.style.translate='-50% 0';b.style.top=(t.top+6)+'px';document.body.appendChild(b);setTimeout(()=>b.remove(),3600)}
@@ -5621,8 +5814,8 @@ function bfDiff(S,N){if(!S||!N||S.gid!==N.gid)return;const me=viewSeat();const a
   if(N.kick!=null&&(N.kick!==S.kick||N.turn!==S.turn)&&BF.motion()){bfReveal(N.kick,G.active);BF.mine=0}
   N.lvl.forEach((l,i)=>{const d=l-S.lvl[i];if(!d)return;const el=i===me?document.querySelector('.mine .bfhero')||document.querySelector('.mine .lv'):chip(i);bfFloat(el,(d>0?'+':'')+d+' Lv',d>0?'up':'down')});
   if(me>=0&&N.me===S.me){const hero=document.querySelector('.mine .bfhero');const was=new Map(S.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));const now=new Map(N.eq.map(x=>x.split(':')).map(([i,o])=>[+i,o==='1']));
-    const lost=[...was.keys()].filter(i=>!now.has(i));if(lost.length)bfNote(hero,'Lost: '+lost.map(cname).join(', '),'bad');
-    const off=[...now.keys()].filter(i=>!now.get(i)&&(!was.has(i)||was.get(i)));if(off.length){const p=P(me);const w=equipWhy(p,off[0])||bigWhy(p,off[0])||'';bfNote(hero,`Carried, not worn: ${w||'no free slot'}`,'bad')}}
+    const lost=[...was.keys()].filter(i=>!now.has(i));if(lost.length)bfNote(hero,bfCap('Lost: '+lost.map(cname).join(', '),7),'bad');
+    const off=[...now.keys()].filter(i=>!now.get(i)&&(!was.has(i)||was.get(i)));if(off.length){const p=P(me);const w=equipWhy(p,off[0])||bigWhy(p,off[0])||'';bfNote(hero,bfCap(`Not worn: ${w||'no free slot'}`,8),'bad')}}
   if(me>=0&&!N.cb&&N.str[me]!==S.str[me]&&N.lvl[me]===S.lvl[me]){const d=N.str[me]-S.str[me];bfFloat(document.querySelector('.mine .bfhero'),(d>0?'+':'')+d+' ⚔',d>0?'up':'down')}
   const a=S.cb,b=N.cb;if(!a||!b||a.k!==b.k)return;const cb=G.cb;
   b.enh.forEach((n,j)=>{if(n>(a.enh[j]||0)&&j<a.n){const id=cb.mons[j].enh[n-1];const to=document.querySelector(`.arena .row.mons .mon:nth-child(${j+1})`);const fr=fromRect(actor);if(fr&&to)bfFly(id,fr,to.getBoundingClientRect());if(actor>=0&&actor!==me)bfBubble(actor,cd(id).b>0?'Boost the monster!':'Weaken it!')}});
@@ -5667,14 +5860,15 @@ function bfAv(p,cls){const kind=classes(p)[0]||(races(p)[0]==='halfling'?'half':
   const _arena=arenaHTML;arenaHTML=function(){const me=viewSeat();
     if(G&&!G.cb&&G.phase==='main'&&me>=0&&sideToAct()===me&&G.active===me&&P(me).human&&validMoves(me).some(m=>m.act==='kick')){UI.arRes=40;
       return `<button class="bfdoor" data-a="bfkick" aria-label="Kick open the door"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span><span class="bfkick">KICK!</span><span class="bfboot" aria-hidden="true">🥾</span></button>`}
-    if(G&&!G.cb&&G.phase==='setup'&&me>=0&&P(me).human){const p=P(me);UI.arRes=40;return `<div class="bfstage"><div class="bfbig" style="--c:${PCOL[p.i]}">${bfAv(p,'bfbav')}<b class="bfbstr">⚔ ${pStr(p)}</b><span class="bfblv">Lv ${p.lvl}</span></div><div class="bfcap">Gear up your hero!</div></div>`}
-    if(G&&!G.cb&&G.kicked!=null&&G.phase!=='main'&&!(G.out&&G.out.turn===G.turn&&['after','post','charity'].includes(G.phase))){const c=cd(G.kicked);const a=curPl();const y=isMe(a.i);UI.arRes=60;
+    if(G&&!G.cb&&G.phase==='setup'&&(me>=0&&P(me).human||G.mode==='ai'||me<0||curPl().i!==me)){const mineS=me>=0&&P(me).human&&sideToAct()===me;const p=mineS?P(me):curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfbig" style="--c:${PCOL[p.i]}">${bfAv(p,'bfbav')}<b class="bfbstr">⚔ ${pStr(p)}</b><span class="bfblv">Lv ${p.lvl}</span></div><div class="bfcap">${mineS?'Gear up your hero!':esc(p.nm.split(/[ ,]/)[0])+' gears up…'}</div></div>`}
+    if(G&&!G.cb&&G.kicked!=null&&G.phase!=='main'&&!(G.out&&G.out.turn===G.turn&&['after','post','charity'].includes(G.phase))){const c=cd(G.kicked);const a=curPl();const y=isMe(a.i);UI.arRes=132;
       return `<div class="bfstage"><div class="bfcap">${y?'You':esc(a.nm)} found:</div><div class="row">${cardHTML(G.kicked,{})}</div><div class="bfcap sm">${c.t==='curse'?'A curse! It hit '+(y?'you':esc(a.nm)):'It went into '+(y?'your':esc(a.nm)+'’s')+' hand'}</div></div>${rollHTML()}`}
     if(G&&!G.cb&&(G.phase==='main'||G.phase==='window')&&G.kicked==null){const a=curPl();UI.arRes=40;return `<div class="bfstage"><div class="bfdoor small" aria-hidden="true"><span class="bfdi">${typeof cardBack==='function'?cardBack('door'):''}</span></div><div class="bfcap">${isMe(a.i)?'Your':esc(a.nm)+'’s'} door</div></div>${rollHTML()}`}
     return _arena.apply(this,arguments)};
   const _mine=mineHTML;mineHTML=function(me){const h=_mine(me);if(me<0||!G.pl[me])return h;const p=P(me);const av=bfAv(p,'bfav');
     return h.replace('<div class="top">',`<div class="top"><span class="bfhero" style="--c:${PCOL[p.i]}">${av}<b class="bfstr" aria-label="strength">⚔${pStr(p)}</b></span>`)};
   const _prompt=promptHTML;promptHTML=function(me){let h=_prompt(me);const line=bfLine(me);
+    if(G&&G.cb&&G.phase==='combat'&&G.cb.stage==='act'&&!G.q&&me>=0&&sideToAct()===me&&P(me).human){h=h.replace(/<button class="btn[^"]*" data-mv='\{&quot;act&quot;:&quot;(?:fight|run)&quot;\}'>.*?<\/button>/g,'').replace(/<button class="btn[^"]*" data-a="askmenu">.*?<\/button>/g,'').replace(/<div class="acts main">\s*<\/div>/,'')}
     h=h.replace('<div id="prompt">',`<div id="prompt" class="${G&&G.q?'bfq':''}">`+(/autonote/.test(h)?'':autoNoteHTML()));
     h=h.replace(/✨ Play suggested cards? \((\d+)\)/,'✨ Auto ($1)').replace(/🏃 Run away \((?:need \d\+: )?([^)]*)\)/,'🏃 Run ($1)').replace('🏃 Run (this monster can’t be escaped)','🏃 Run (no chance)').replace('🙋 Ask for help','🙋 Get help').replace('🚪 Kick open the door','🚪 Kick!').replace('💰 Sell items','💰 Sell');
     const i=h.indexOf('<p class="say">');const tag=`<p class="bfline">${esc(line)}</p>`;
@@ -5702,7 +5896,7 @@ document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();
 document.addEventListener('pointerdown',e=>{if(BF.revClose){BF.revClose();BF.revClose=null}if(!G||e.button>0)return;const c=e.target.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell)return;const id=+c.dataset.card;
   if(!bfMoves(viewSeat(),id).length)return;BF.down={id,x:e.clientX,y:e.clientY,el:c,pid:e.pointerId}},{passive:true});
 document.addEventListener('pointermove',e=>{const d=BF.down;if(!d||d.pid!==e.pointerId)return;const dx=e.clientX-d.x,dy=e.clientY-d.y;
-  if(!BF.drag){if(Math.hypot(dx,dy)<10)return;if(e.pointerType==='touch'&&Math.abs(dx)>Math.abs(dy)*1.2&&d.el.closest('.hand,.gear')){BF.down=null;return}
+  if(!BF.drag){if(Math.hypot(dx,dy)<10)return;if(e.pointerType==='touch'&&Math.abs(dx)>Math.abs(dy)*1.2&&(d.el.closest('.gear')||d.el.closest('.hand.scrolls'))){BF.down=null;return}
     const r=d.el.getBoundingClientRect();const g=d.el.cloneNode(true);g.className+=' bfghost';g.removeAttribute('data-card');g.style.width=r.width+'px';document.body.appendChild(g);
     BF.drag={id:d.id,g,ox:d.x-r.left,oy:d.y-r.top,w:r.width,h:r.height};BF.pick=null;bfFinger(null);bfMark();d.el.classList.add('bf-lift')}
   const D=BF.drag;D.g.style.transform=`translate(${e.clientX-D.w/2}px,${e.clientY-D.h*.75}px) scale(1.12) rotate(${Math.max(-10,Math.min(10,dx/12))}deg)`;
@@ -5732,6 +5926,83 @@ autoNoteHTML=function(){const a=UI.autoNote;if(!a||!G)return '';if(!a.at)a.at=Da
 (function(){const _dt=dockTitle;dockTitle=function(me){const cb=G&&G.cb;const s=G?sideToAct():-1;if(cb&&!G.winner&&s===me&&me>=0&&cb.who!==me&&cb.help!==me)return P(cb.who).nm+'’s fight: meddle?';if(G&&!G.winner&&G.phase==='window'&&s===me&&G.active!==me)return curPl().nm+'’s door: curse?';return _dt(me)}})();
 // the first game with "teach me" starts against Easy computers (still changeable on the start screen)
 (function(){if(UI.lvl||/jsdom/i.test(navigator.userAgent||''))return;let first=true;try{first=!localStorage.getItem('dkd_learned')&&!localStorage.getItem('dkd_bf')}catch(e){}if(first){UI.lvl='easy';if(!G)render()}})();
+
+</script>
+<script>
+// ---------- the dungeon table: fan the hand, hold a seat for rival details, cards fly from the decks and from the seats ----------
+// Rules, engine and AI are untouched. Everything here is looks and touch; the moves still come from validMoves() through uiAct().
+const TB={lp:null,lpAt:0,fan:0};
+// the hand is a fan: overlap so every card shows a slice and nothing scrolls (scroll only when ~10+ cards would be too thin)
+function tbFan(){const hd=document.querySelector('.mine .hand');if(!hd)return;const cs=[...hd.querySelectorAll(':scope>.card')];hd.style.removeProperty('--hw');if(!cs.length){hd.classList.remove('scrolls');return}
+  const ph=document.documentElement.classList.contains('ph');if(!ph){hd.classList.remove('scrolls');hd.style.removeProperty('--ov');return}
+  const w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0)return;
+  // keep every card's visible slice >= 44 px (a finger): shrink the cards a little when the hand is big, scroll when it still does not fit
+  let w=w0;if(n>1){const fit=avail-44*(n-1);w=Math.max(Math.min(w0,fit),Math.min(w0,56))}
+  const need=n>1?(avail-w)/(n-1):w,sc=n>1&&need<44,step=sc?44:Math.min(w*.8,need);
+  if(w!==w0){hd.style.setProperty('--hw',w.toFixed(1)+'px')}
+  hd.style.setProperty('--ov',(step-w).toFixed(1)+'px');
+  hd.classList.toggle('scrolls',sc)}
+// press and hold a rival seat: their gear and cards (tap is for dropping a card on them)
+function tbSeatDown(e){const s=e.target.closest&&e.target.closest('.opps .opp[data-opp]');if(!s||e.button>0)return;clearTimeout(TB.lp);const i=+s.dataset.opp,x=e.clientX,y=e.clientY;
+  TB.lp={i,x,y,t:setTimeout(()=>{TB.lp=null;TB.lpAt=Date.now();try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}UI.oppView=i;render();GX.show('dkOpp');const d=document.querySelector('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0},480)}}
+function tbSeatCancel(e){if(!TB.lp)return;if(e&&e.type==='pointermove'&&Math.hypot(e.clientX-TB.lp.x,e.clientY-TB.lp.y)<12)return;clearTimeout(TB.lp.t);TB.lp=null}
+document.addEventListener('pointerdown',tbSeatDown,{passive:true});document.addEventListener('pointermove',tbSeatCancel,{passive:true});document.addEventListener('pointerup',tbSeatCancel,{passive:true});document.addEventListener('pointercancel',tbSeatCancel,{passive:true});
+// a long press must not also count as a tap on the seat
+document.addEventListener('click',e=>{if(Date.now()-TB.lpAt<700&&e.target.closest&&e.target.closest('.opps .opp')){e.stopPropagation();e.preventDefault()}},true);
+document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('.opps .opp'))e.preventDefault()});
+function tbFly(html,fr,to,ms,delay){if(!BF.motion()||!fr||!to)return;const e=document.createElement('div');e.className='tbfly';e.innerHTML=html;document.body.appendChild(e);
+  const w=e.firstElementChild?e.firstElementChild.getBoundingClientRect().width||54:54,h=e.firstElementChild?e.firstElementChild.getBoundingClientRect().height||54:54;
+  const sx=fr.left+fr.width/2-w/2,sy=fr.top+fr.height/2-h/2,tx=to.left+to.width/2-w/2,ty=to.top+to.height/2-h/2;
+  const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(.8) rotate(-10deg)`,opacity:0},{transform:`translate(${sx}px,${sy}px) scale(1) rotate(-6deg)`,opacity:1,offset:.12},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-34}px) scale(1.12) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.55)`,opacity:0}],{duration:ms||620,delay:delay||0,easing:'cubic-bezier(.3,.7,.3,1)',fill:'both'});a.onfinish=()=>e.remove()}
+// the fight must fit inside the table: shrink the cards (never the buttons) until nothing pokes out of it
+function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySelector('.table');if(!ar||!tb||!document.documentElement.classList.contains('ph'))return;ar.style.removeProperty('--cw');
+  if(!ar.querySelector(':scope>.vs'))return;const out=()=>{const t=tb.getBoundingClientRect();for(const e of ar.querySelectorAll('.fbtns,.score .num,.row.mons .card,.hsav,.rollbox,.row.small')){const r=e.getBoundingClientRect();if(r.width&&(r.top<t.top-0.5||r.bottom>t.bottom+0.5))return true}return false};
+  let cw=0;const c=ar.querySelector('.row.mons .card');if(c)cw=c.getBoundingClientRect().width;
+  ar.classList.remove('tight');for(let k=0;k<8&&out()&&cw>44;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px');if(k===2&&out())ar.classList.add('tight')}
+  if(out()){ar.classList.add('tight');for(let k=0;k<6&&out()&&cw>36;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px')}}}
+(function(){
+  const _snap=bfSnap;bfSnap=function(){const r=_snap();if(r){r.hc=G.pl.map(p=>p.hand.length);r.trn=G.tr.length;r.drn=G.door.length;r.lvlMe=r.me>=0&&G.pl[r.me]?G.pl[r.me].lvl:0}return r};
+  const _diff=bfDiff;bfDiff=function(S,N){_diff(S,N);try{tbDiff(S,N)}catch(e){UI.lastErr='tb '+e}};
+  const _r=render;render=function(){const x=_r.apply(this,arguments);try{tbFan();tbFit()}catch(e){UI.lastErr='tbfan '+e}return x}})();
+function tbDiff(S,N){if(!S||!N||S.gid!==N.gid||!S.hc||!N.hc||!BF.motion())return;const me=viewSeat();
+  const seat=s=>s===me?document.querySelector('.mine .hand .card:last-child')||document.querySelector('.mine .hand'):document.querySelector(`#app .opps [data-opp="${s}"]`);
+  const deck=(S.trn>N.trn)?'.pile.pr .stack':(S.drn>N.drn)?'.pile.pl .stack':'';
+  const dk=deck?document.querySelector(deck):null,dr=dk?dk.getBoundingClientRect():null;
+  const back=deck&&deck.includes('pr')?'tr':'door';
+  N.hc.forEach((h,i)=>{const d=h-S.hc[i];if(d<=0||!dr)return;const to=seat(i);if(!to)return;const r=to.getBoundingClientRect();
+    for(let k=0;k<Math.min(d,4);k++)tbFly(`<div style="width:44px;height:62px;border-radius:5px;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,.6)">${cardBack(back)}</div>`,dr,r,560,k*130)});
+  // level-up: a gold medal flies from the fight to the hero
+  if(me>=0&&N.me===S.me&&N.lvl[me]>S.lvl[me]){const from=document.querySelector('.arena .score.hero')||document.querySelector('.arena');const to=document.querySelector('.mine .bfhero')||document.querySelector('.mine .lv');
+    if(from&&to){tbFly(`<div class="tbbadge">+${N.lvl[me]-S.lvl[me]}</div>`,from.getBoundingClientRect(),to.getBoundingClientRect(),700)}}}
+let _tbR=0;addEventListener('resize',()=>{clearTimeout(_tbR);_tbR=setTimeout(()=>{try{tbFan();tbFit()}catch(e){}},120);setTimeout(()=>{try{tbFan();tbFit()}catch(e){}},460)});
+try{if(window.visualViewport)visualViewport.addEventListener('resize',()=>{clearTimeout(_tbR);_tbR=setTimeout(()=>{try{tbFan()}catch(e){}},120)})}catch(e){}
+
+// ---- short words on the phone: the toast, questions and the dock keep to a few words ----
+const tbPh=()=>document.documentElement.classList.contains('ph');
+(function(){
+  const _t=toastHTML;toastHTML=function(){if(!tbPh())return _t();const t=UI.toast;if(!t||t.until<Date.now())return '';const fresh=UI.toastSeen!==t;UI.toastSeen=t;
+    const first=String(t.t).replace(/\([^)]*\)/g,'').split(/(?<=[.!?:;])\s|:\s|\.\s/)[0].replace(/[.:;]+$/,'');
+    return `<div class="toast${fresh?' fresh':''}" role="alert" title="${esc(t.t)}"><b>💥 Ouch!</b> ${esc(bfCap(first,6))}</div>`};
+  const _p=promptHTML;promptHTML=function(me){let h=_p(me);if(!tbPh()||!G||!G.q||me<0||sideToAct()!==me||!P(me).human)return h;const q=G.q;let s='';
+    if(q.kind==='help')s=`${P(q.from).nm.split(/[ ,]/)[0]} offers ${q.n} treasure${q.n===1?'':'s'}. Help?`;
+    else if(q.kind==='rescue')s='Caught! Escape, or take Bad Stuff?';
+    else if(q.kind==='pick')s=bfCap(String(q.text||'Choose one.').replace(/<[^>]+>/g,''),8);
+    else if(q.kind==='ward')s='A curse is coming! Cancel it?';
+    else if(q.kind==='glue')s='Make them roll again?';
+    else if(q.kind==='lawyer')s='Swap 2 treasures for 2 new?';
+    else if(q.kind==='fetch')s='Throw it to escape?';
+    return s?h.replace(/<p class="say">.*?<\/p>/,`<p class="say">${esc(s)}</p>`):h}})();
+
+// a rival one fight from winning: one short banner; the best counter is a button in the dock
+(function(){
+  const _ww=winWarnHTML;winWarnHTML=function(me){if(!tbPh())return _ww(me);const cb=G.cb;const th=cb&&winThreat(cb);if(!th)return '';const f=P(th.who);const nm=esc(f.nm.split(/[ ,]/)[0]);
+    return isMe(th.who)?`<div class="winwarn me" role="status"><b>🏆 Win this fight, win the game!</b></div>`:`<div class="winwarn" role="alert"><b>⚠ ${nm} wins the game with this fight!</b></div>`};
+  const _p2=promptHTML;promptHTML=function(me){let h=_p2(me);if(!tbPh()||!G||!G.cb||me<0||!P(me).human)return h;const cb=G.cb;
+    // short labels on the ability buttons (charm, shoo, bribe ...)
+    h=h.replace(/(<button class="btn[^"]*" data-mv='[^']*'>)([^<]*)(<\/button>)/g,(m,a,x,z)=>a+bfCap(x.replace(/\s+/g,' ').trim(),6)+z);
+    const th=winThreat(cb);if(th&&!isMe(th.who)&&sideToAct()===me&&cb.stage==='others'&&!G.q){const c=coach(me).counter;const m=c&&(c.one||(c.two&&c.two[0]));
+      if(m&&m.card!=null)h=h.replace('<div class="acts main">',`<div class="acts main"><button class="btn primary rec" data-mv='${esc(JSON.stringify(m))}'>${esc(bfCap('Stop: '+moveLabel(m).replace(/<[^>]+>/g,''),6))}</button>`)}
+    return h}})();
 
 </script>
 <script>

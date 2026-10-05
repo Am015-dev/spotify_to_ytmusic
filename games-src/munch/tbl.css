@@ -115,7 +115,8 @@ html.ph-l .fbtns .btn{min-height:44px;font-size:16px}
 html.ph-l .fbtns .fightb{font-size:18px}
 /* landscape: table + hand on the left, action strip in the right rail */
 html.ph-l .tbl{padding:3px 5px 0;gap:3px}
-html.ph-l .mine{--hero:44px;--hw:clamp(46px,16dvh,64px)}
+html.ph-l .mine{--hero:38px;--hw:clamp(44px,14dvh,58px)}
+html.ph-l{--ph-rail:clamp(230px,28vw,250px)}
 html.ph-l .opp.seat{min-height:40px;max-width:150px}
 html.ph-l .opp.seat .sav{width:34px;height:34px}
 html.ph-l .opp.seat{translate:0 calc((1 - var(--q,0)*var(--q,0))*4px)}
@@ -135,8 +136,8 @@ html.ph-l .gx-dock{background:linear-gradient(#2a160b,#150a04)}
   html.ph-p .fbtns .btn{min-height:46px}
 }
 
-html.ph .arena:has(>.vs){--res:calc(56px + var(--rb,0px) + var(--re,0px) + var(--rc,0px) + var(--rr,0px))!important}
-html.ph .arena:has(>.fbtns){--rb:64px}
+html.ph .arena:has(>.vs){--res:calc(44px + var(--rb,0px) + var(--re,0px) + var(--rc,0px) + var(--rr,0px))!important}
+html.ph .arena:has(>.fbtns){--rb:54px}
 html.ph .arena:has(.mon .row){--re:46px}
 html.ph .arena:has(>.row.small){--rc:34px}
 html.ph .arena:has(>.rollbox){--rr:54px}
@@ -152,20 +153,35 @@ html.ph #prompt .winwarn b{font-weight:800}
 @media (max-height:640px){
   html.ph .arena:has(>.vs){align-content:start}
   html.ph .arena:has(>.vs) .score .num{font-size:1.3rem;height:1.9em;min-width:1.9em}
-  html.ph .arena:has(>.vs) .vs .score.hero{gap:3px}
+  html.ph .arena:has(>.vs) .hsav{display:none}
+  html.ph .arena:has(>.vs) .score.hero .num{margin-top:0}
+  html.ph .arena:has(>.vs) .score .num{font-size:1.5rem}
   html.ph .felt{padding-top:8px}
   html.ph .arena:has(>.vs){--hav:min(var(--cw),calc((100cqw - 2*var(--sw) - 40px)*.34),84px)}
 }
 
-/* strength numbers sit on the bottom edge of the hero and the monster card */
-html.ph .arena:has(>.vs) .score.hero .num,html.ph .arena:has(>.vs) .score.mons .num{margin-top:-26px;position:relative;z-index:3}
-html.ph .arena:has(>.vs) .score.hero .sl{margin-top:-2px}
+/* strength numbers sit on the bottom edge of the hero and of the monster card */
+html.ph .arena:has(>.vs) .score.hero .num{margin-top:-24px;position:relative;z-index:3}
+html.ph .arena:has(>.vs) .score.hero{gap:2px}
+html.ph .arena:has(>.vs) .score.hero .sl{margin-top:0}
+html.ph .arena:has(>.vs) .vs .score.mons{grid-column:3;grid-row:1;align-self:end;justify-self:center;margin:0;position:relative;z-index:3}
+html.ph .arena:has(>.vs) .row.mons{margin-bottom:20px}
+html.ph .arena:has(>.vs) .vs .score.mons .num{margin:0}
 html.ph .arena:has(>.vs) .mon{gap:0}
 .fbtns{flex-wrap:wrap}
 .fbtns .btn{min-width:0;overflow:hidden;text-overflow:ellipsis}
-html.ph #prompt .acts.main .btn.pickchip{min-height:42px;font-size:13px;flex:1 1 30%;padding:4px 6px}
+html.ph #prompt .acts.main .btn.pickchip{min-height:38px;font-size:13px;flex:1 1 30%;padding:2px 5px}
+html.ph #prompt.bfq .acts.main{gap:4px}
 html.ph-p:has(#prompt.bfq) .gx-dock,html.ph-p:has(#prompt .sellbar) .gx-dock{max-height:min(196px,35dvh)!important}
 
 /* while a question is open the hand can't be played: fold it down so the table keeps its room */
 html.ph:has(#prompt.bfq) .mine{--hw:44px;--hero:40px}
 html.ph:has(#prompt.bfq) .mine .gear{padding-left:6px}
+html.ph-l #prompt .bfline{white-space:normal;line-height:1.2}
+html.ph .mine .hand>.small{display:none}
+html.ph .opp.seat,html.ph-l .opp.seat,html.ph-p .opp.seat{min-height:44px}
+
+/* a crowded fight on a short phone: drop the extras, keep the numbers, the cards and the buttons */
+html.ph .arena.tight .hsav,html.ph .arena.tight .mon .row,html.ph .arena.tight>.row.small,html.ph .arena.tight>.rollbox .small{display:none}
+html.ph .arena.tight .score .num{margin-top:0}
+html.ph .arena.tight .row.mons{margin-bottom:6px}

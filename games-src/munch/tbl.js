@@ -2,11 +2,15 @@
 // Rules, engine and AI are untouched. Everything here is looks and touch; the moves still come from validMoves() through uiAct().
 const TB={lp:null,lpAt:0,fan:0};
 // the hand is a fan: overlap so every card shows a slice and nothing scrolls (scroll only when ~10+ cards would be too thin)
-function tbFan(){const hd=document.querySelector('.mine .hand');if(!hd)return;const cs=[...hd.querySelectorAll(':scope>.card')];if(!cs.length){hd.classList.remove('scrolls');return}
+function tbFan(){const hd=document.querySelector('.mine .hand');if(!hd)return;const cs=[...hd.querySelectorAll(':scope>.card')];hd.style.removeProperty('--hw');if(!cs.length){hd.classList.remove('scrolls');return}
   const ph=document.documentElement.classList.contains('ph');if(!ph){hd.classList.remove('scrolls');hd.style.removeProperty('--ov');return}
-  const w=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w)return;
-  const need=n>1?(avail-w)/(n-1):w,step=Math.max(28,Math.min(w*.78,need));hd.style.setProperty('--ov',(step-w).toFixed(1)+'px');
-  hd.classList.toggle('scrolls',n>1&&need<28)}
+  const w0=cs[0].offsetWidth||64,avail=hd.clientWidth-18,n=cs.length;if(!avail||!w0)return;
+  // keep every card's visible slice >= 44 px (a finger): shrink the cards a little when the hand is big, scroll when it still does not fit
+  let w=w0;if(n>1){const fit=avail-44*(n-1);w=Math.max(Math.min(w0,fit),Math.min(w0,56))}
+  const need=n>1?(avail-w)/(n-1):w,sc=n>1&&need<44,step=sc?44:Math.min(w*.8,need);
+  if(w!==w0){hd.style.setProperty('--hw',w.toFixed(1)+'px')}
+  hd.style.setProperty('--ov',(step-w).toFixed(1)+'px');
+  hd.classList.toggle('scrolls',sc)}
 // press and hold a rival seat: their gear and cards (tap is for dropping a card on them)
 function tbSeatDown(e){const s=e.target.closest&&e.target.closest('.opps .opp[data-opp]');if(!s||e.button>0)return;clearTimeout(TB.lp);const i=+s.dataset.opp,x=e.clientX,y=e.clientY;
   TB.lp={i,x,y,t:setTimeout(()=>{TB.lp=null;TB.lpAt=Date.now();try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}UI.oppView=i;render();GX.show('dkOpp');const d=document.querySelector('#dkOpp .gx-drawer-body');if(d)d.scrollTop=0},480)}}
@@ -19,10 +23,16 @@ function tbFly(html,fr,to,ms,delay){if(!BF.motion()||!fr||!to)return;const e=doc
   const w=e.firstElementChild?e.firstElementChild.getBoundingClientRect().width||54:54,h=e.firstElementChild?e.firstElementChild.getBoundingClientRect().height||54:54;
   const sx=fr.left+fr.width/2-w/2,sy=fr.top+fr.height/2-h/2,tx=to.left+to.width/2-w/2,ty=to.top+to.height/2-h/2;
   const a=e.animate([{transform:`translate(${sx}px,${sy}px) scale(.8) rotate(-10deg)`,opacity:0},{transform:`translate(${sx}px,${sy}px) scale(1) rotate(-6deg)`,opacity:1,offset:.12},{transform:`translate(${(sx+tx)/2}px,${Math.min(sy,ty)-34}px) scale(1.12) rotate(4deg)`,opacity:1,offset:.55},{transform:`translate(${tx}px,${ty}px) scale(.55)`,opacity:0}],{duration:ms||620,delay:delay||0,easing:'cubic-bezier(.3,.7,.3,1)',fill:'both'});a.onfinish=()=>e.remove()}
+// the fight must fit inside the table: shrink the cards (never the buttons) until nothing pokes out of it
+function tbFit(){const ar=document.querySelector('.arena'),tb=document.querySelector('.table');if(!ar||!tb||!document.documentElement.classList.contains('ph'))return;ar.style.removeProperty('--cw');
+  if(!ar.querySelector(':scope>.vs'))return;const out=()=>{const t=tb.getBoundingClientRect();for(const e of ar.querySelectorAll('.fbtns,.score .num,.row.mons .card,.hsav,.rollbox,.row.small')){const r=e.getBoundingClientRect();if(r.width&&(r.top<t.top-0.5||r.bottom>t.bottom+0.5))return true}return false};
+  let cw=0;const c=ar.querySelector('.row.mons .card');if(c)cw=c.getBoundingClientRect().width;
+  ar.classList.remove('tight');for(let k=0;k<8&&out()&&cw>44;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px');if(k===2&&out())ar.classList.add('tight')}
+  if(out()){ar.classList.add('tight');for(let k=0;k<6&&out()&&cw>36;k++){cw*=.9;ar.style.setProperty('--cw',cw.toFixed(1)+'px')}}}
 (function(){
   const _snap=bfSnap;bfSnap=function(){const r=_snap();if(r){r.hc=G.pl.map(p=>p.hand.length);r.trn=G.tr.length;r.drn=G.door.length;r.lvlMe=r.me>=0&&G.pl[r.me]?G.pl[r.me].lvl:0}return r};
   const _diff=bfDiff;bfDiff=function(S,N){_diff(S,N);try{tbDiff(S,N)}catch(e){UI.lastErr='tb '+e}};
-  const _r=render;render=function(){const x=_r.apply(this,arguments);try{tbFan()}catch(e){UI.lastErr='tbfan '+e}return x}})();
+  const _r=render;render=function(){const x=_r.apply(this,arguments);try{tbFan();tbFit()}catch(e){UI.lastErr='tbfan '+e}return x}})();
 function tbDiff(S,N){if(!S||!N||S.gid!==N.gid||!S.hc||!N.hc||!BF.motion())return;const me=viewSeat();
   const seat=s=>s===me?document.querySelector('.mine .hand .card:last-child')||document.querySelector('.mine .hand'):document.querySelector(`#app .opps [data-opp="${s}"]`);
   const deck=(S.trn>N.trn)?'.pile.pr .stack':(S.drn>N.drn)?'.pile.pl .stack':'';
@@ -33,7 +43,7 @@ function tbDiff(S,N){if(!S||!N||S.gid!==N.gid||!S.hc||!N.hc||!BF.motion())return
   // level-up: a gold medal flies from the fight to the hero
   if(me>=0&&N.me===S.me&&N.lvl[me]>S.lvl[me]){const from=document.querySelector('.arena .score.hero')||document.querySelector('.arena');const to=document.querySelector('.mine .bfhero')||document.querySelector('.mine .lv');
     if(from&&to){tbFly(`<div class="tbbadge">+${N.lvl[me]-S.lvl[me]}</div>`,from.getBoundingClientRect(),to.getBoundingClientRect(),700)}}}
-let _tbR=0;addEventListener('resize',()=>{clearTimeout(_tbR);_tbR=setTimeout(()=>{try{tbFan()}catch(e){}},120);setTimeout(()=>{try{tbFan()}catch(e){}},460)});
+let _tbR=0;addEventListener('resize',()=>{clearTimeout(_tbR);_tbR=setTimeout(()=>{try{tbFan();tbFit()}catch(e){}},120);setTimeout(()=>{try{tbFan();tbFit()}catch(e){}},460)});
 try{if(window.visualViewport)visualViewport.addEventListener('resize',()=>{clearTimeout(_tbR);_tbR=setTimeout(()=>{try{tbFan()}catch(e){}},120)})}catch(e){}
 
 // ---- short words on the phone: the toast, questions and the dock keep to a few words ----

@@ -10,7 +10,7 @@ function run(mode,anim,maxTurn){return new Promise(res=>{const dom=new JSDOM(htm
     if(!md.hidden||dr){const bs=[...m.querySelectorAll('button[data-mv],button[data-a]:not([data-a="new"])')];const h=m.querySelector('h2');if(h)seen.add('modal:'+h.textContent.replace(/\d+/g,'#').slice(0,24));
       const mv=bs.filter(b=>b.dataset.mv);if(mv.length&&Math.random()<.8){const b=rnd(mv);seen.add('mv:'+JSON.parse(b.dataset.mv).act);click(b);return}if(bs.length){click(rnd(bs));return}}
     else{const tg=[...d.querySelectorAll('[data-bfz]')];if(tg.length&&Math.random()<.6){const z=rnd(tg);seen.add('drop:'+z.dataset.bfz.replace(/\d+$/,''));click(z);return}  // board-first: a picked card / ask mode lights targets
-      const acts=[...d.querySelectorAll('#prompt [data-mv]:not(:disabled),#prompt [data-a]:not(:disabled)')];const cards=[...d.querySelectorAll('.mine [data-card].play')];
+      const acts=[...d.querySelectorAll('#prompt [data-mv]:not(:disabled),#prompt [data-a]:not(:disabled),.fbtns [data-mv]:not(:disabled),.fbtns [data-a]:not(:disabled)')];const cards=[...d.querySelectorAll('.mine [data-card].play')];
       if(cards.length&&Math.random()<.5){seen.add('card');click(rnd(cards));return}
       if(acts.length){const b=rnd(acts);seen.add('btn:'+(b.dataset.mv?JSON.parse(b.dataset.mv).act:b.dataset.a));click(b);return}}
     const sig=JSON.stringify([G.turn,G.active,G.phase,G.log.length,G.q&&G.q.kind]);if(sig===last)stall++;else{stall=0;last=sig}

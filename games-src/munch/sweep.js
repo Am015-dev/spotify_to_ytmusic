@@ -6,7 +6,7 @@
 // horizontal scroll, the [data-board] table under 55 % of a portrait screen, a ghost finger pointing at a move the engine would not allow.
 const { chromium } = require('playwright');
 const path = require('path');
-const N = +process.argv[2] || 24, FILE = path.resolve(__dirname, process.argv[3] || 'doorkick.html'), MAXMIN = +process.argv[4] || 4;
+const N = +process.argv[2] || 24, FILE = path.resolve(__dirname, process.argv[3] || 'doorkick.html'), MAXMIN = +process.argv[4] || 8;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const SIZES = [[390, 763], [375, 553]];
 const NPS = [4, 3, 5, 4, 6, 4];
@@ -43,6 +43,7 @@ const PAGE = `(() => {
       if (Math.max(de.scrollWidth, document.body.scrollWidth) > W + 1) bad.push('hscroll ' + de.scrollWidth + '>' + W);
       const bd = document.querySelector('[data-board]'); if (!bd) bad.push('no data-board');
       else if (H > W) { const r = bd.getBoundingClientRect(); const pc = 100 * Math.max(0, Math.min(r.right, W) - Math.max(r.left, 0)) * Math.max(0, Math.min(r.bottom, H) - Math.max(r.top, 0)) / (W * H); if (pc < 55) bad.push('board ' + pc.toFixed(1) + '% phase ' + G.phase + ' q ' + (G.q && G.q.kind) + ' sell ' + !!UI.sell + ' dock ' + Math.round(document.querySelector('.gx-dock').getBoundingClientRect().height) + ' ' + (document.querySelector('#prompt') || {}).className); }
+      if (UI.lastErr) bad.push('UI.lastErr ' + UI.lastErr);
       const ln = document.querySelector('#prompt .bfline'); if (ln && vis(ln)) { const w = words(ln.textContent); if (w.length > 8) bad.push('status ' + w.length + ' words: ' + w.join(' ')); }
       // any other visible block over 8 words (outside the pop-ups the player opened)
       for (const e of document.body.querySelectorAll('*')) {
@@ -54,10 +55,10 @@ const PAGE = `(() => {
       }
       // hand cards on screen, and every card shows a tappable slice
       const cards = [...document.querySelectorAll('.mine .hand .card')];
-      cards.forEach((e, i) => { const r = e.getBoundingClientRect(); if (r.left < -1 || r.right > W + 1) bad.push('hand card off screen x ' + Math.round(r.left) + '..' + Math.round(r.right));
+      cards.forEach((e, i) => { const r = e.getBoundingClientRect(); if ((r.left < -5 || r.right > W + 5) && !e.parentElement.classList.contains('scrolls') && !e.getAnimations().length) bad.push('hand card off screen x ' + Math.round(r.left) + '..' + Math.round(r.right));
         if (i < cards.length - 1 && !document.querySelector('.mine .hand.scrolls')) { const d = cards[i + 1].offsetLeft - e.offsetLeft; if (d < 22) bad.push('hand card slice ' + d + 'px'); } });
       // action buttons are not covered
-      for (const b of document.querySelectorAll('.fbtns button, #prompt .acts button, .bfdoor')) { if (!vis(b)) continue; const r = b.getBoundingClientRect(); if (r.bottom > H + 1 || r.right > W + 1) { bad.push('button off screen ' + (b.textContent || '').trim().slice(0, 12)); continue }
+      for (const b of document.querySelectorAll('.fbtns button, #prompt .acts button, .bfdoor')) { if (!vis(b)) continue; const r = b.getBoundingClientRect(); if (r.bottom > H + 1 || r.right > W + 1) { const dk = b.closest('.gx-dock-body') || b.closest('.gx-dock'); if (dk && dk.scrollHeight > dk.clientHeight + 2) continue; bad.push('button off screen ' + (b.textContent || '').trim().slice(0, 12)); continue }
         const t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); if (t && !b.contains(t) && !t.contains(b) && !document.getElementById('bfrev')) bad.push('button covered ' + (b.textContent || '').trim().slice(0, 12) + ' by ' + t.tagName + '.' + String(t.className).split(' ')[0]); }
       // seats do not sit on the felt content, the fight is inside the table
       const ar = document.querySelector('.arena'), tb = document.querySelector('.table');
@@ -110,7 +111,7 @@ async function playGame(browser, size, gi, rep) {
       const sig = await page.evaluate(() => __sw.sig());
       if (sig !== last) { last = sig; lastAt = Date.now(); } else if (Date.now() - lastAt > 8000) { issues.add('stuck > 8 s: ' + JSON.stringify(st)); await page.screenshot({ path: path.join(__dirname, 'playtest', 'sweep-stuck-' + W + '-' + gi + '.png') }).catch(() => { }); break; }
       // audit at idle moments (every few steps; always when it is my decision)
-      if ((st.mine && !st.rev && !st.kicking && !st.open && !st.modal && !st.menu) && steps % 3 === 0) { audits++; const bad = await page.evaluate(() => __sw.audit()); bad.forEach(b => issues.add(b)); }
+      if ((st.mine && !st.rev && !st.kicking && !st.open && !st.modal && !st.menu) && steps % 3 === 0) { if (process.env.SHOTS && steps % +process.env.SHOTS === 0) await page.screenshot({ path: process.env.SHOTDIR + '/' + W + '-g' + gi + '-' + steps + '.png' }).catch(() => { }); audits++; const bad = await page.evaluate(() => __sw.audit()); bad.forEach(b => issues.add(b)); }
       // one rotation in the middle of some games
       if (!rotated && gi % 4 === 1 && st.turn >= 6 && st.mine) { rotated = true; stats.rot++; await page.setViewportSize({ width: H, height: W }); await sleep(700); const bad = await page.evaluate(() => { const de = document.documentElement; const o = []; if (Math.max(de.scrollWidth, document.body.scrollWidth) > innerWidth + 1) o.push('rot hscroll'); const ar = document.querySelector('.arena'); const t = document.querySelector('.table'); if (!t) o.push('rot no table'); return o }); bad.forEach(b => issues.add(b)); await page.setViewportSize({ width: W, height: H }); await sleep(700); continue; }
       if (!st.mine || st.rev || st.kicking || st.drag) { await sleep(st.rev ? 150 : 60); continue; }

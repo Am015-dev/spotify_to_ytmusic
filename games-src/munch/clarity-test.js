@@ -21,11 +21,11 @@ T('recap names a lost item and the curse that took it',`wear(0,'stompy');G.turn=
 T('recap explains a rival level change',`G.turn=5;render();G.active=1;G.turn=6;const c=give(1,'l1');act({act:'play',card:c,tgt:1},1);
   G.active=0;G.turn=9;G.phase='main';render();const t=dock();return new RegExp(P(1).nm+': level 1 → 2').test(t)&&/up a level/.test(t)||t`);
 T('no recap when nothing changed',`G.turn=5;render();G.active=1;G.turn=6;render();G.active=0;G.turn=9;render();return !/While you waited/.test(dock())||dock()`);
-T('a lesson shows once in a teaching game, never in a normal one',`try{localStorage.removeItem('dkd_learned')}catch(e){}G.learn=false;render();if(/Your turn:/.test(dock()))return 'lesson without learn';
-  G.learn=true;render();if(!/Your turn:/.test(dock()))return 'no lesson';document.querySelector('[data-a=learned]').click();return !/Your turn:/.test(dock())`);
+T('a lesson shows once in a teaching game, never in a normal one',`try{localStorage.removeItem('dkd_learned')}catch(e){}G.learn=false;render();if(document.querySelector('.lesson'))return 'lesson without learn';
+  G.learn=true;render();if(!document.querySelector('.lesson'))return 'no lesson';document.querySelector('[data-a=learned]').click();return !document.querySelector('.lesson')`);
 T('play suggested cards says what it played and the new strength',`const a=give(0,'warrior');give(0,'stompy');render();const b=document.querySelector('[data-a=autoplay]');if(!b)return dock();
   const s0=pStr(P(0));b.click();const t=dock();return P(0).cls.length===1&&pStr(P(0))>s0&&/You played:/.test(t)&&new RegExp('Strength '+s0+' → '+pStr(P(0))).test(t)||t`);
-T('run button shows the odds',`G.active=0;const id=inst('rattle');startCombat(0,id,'kick');G.cb.stage='act';P(0).lvl=1;render();const b=[...document.querySelectorAll('#prompt button')].find(x=>/Run/.test(x.textContent));return !!b&&/\\d+%|sure|no chance/.test(b.textContent)||(b&&b.textContent)||dock()`);
+T('run button shows the odds',`G.active=0;const id=inst('rattle');startCombat(0,id,'kick');G.cb.stage='act';P(0).lvl=1;render();const b=[...document.querySelectorAll('#prompt button,.fbtns button')].find(x=>/Run/.test(x.textContent));return !!b&&/\\d+%|sure|no chance/.test(b.textContent)||(b&&b.textContent)||dock()`);
 T('one tap gives away the extra cards and says where they went',`for(const k of ['rattle','hellmouse','l1','stompy','warrior','wizard','thief','cleric'])give(0,k);P(0).lvl=1;P(1).lvl=1;P(2).lvl=3;P(3).lvl=3;P(0).lvl=2;G.phase='post';act({act:'end'},0);if(G.phase!=='charity')return G.phase;render();
   const b=document.querySelector('[data-a=autocharity]');if(!b)return dock();b.click();return G.phase!=='charity'&&P(0).hand.length<=5&&/You gave away:/.test(document.querySelector('#side').textContent)||[G.phase,P(0).hand.length]`);
 // before: the Easy computer's random pick could be a bare "sell" with no cards, which the engine rejects (board-first gauntlet, 68 rejections)
