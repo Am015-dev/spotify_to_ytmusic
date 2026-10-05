@@ -1,34 +1,50 @@
 <!doctype html>
 <html lang="en"><head><!-- Copyright (c) 2026 Am015-dev. All rights reserved. Not licensed for copying, modification or redistribution; see LICENSE in the source repository. --><meta name="copyright" content="&copy; 2026 Am015-dev. All rights reserved."><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Try the new versions</title>
+<title>Game status</title>
 <style>
-:root{--bg:#1d1712;--card:#2a221b;--fg:#f3e9da;--mut:#bba98f;--acc:#f0b04a;--ok:#7fd39a;--wip:#e8c86a;--line:#3d3227}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:calc(16px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom))}
-h1{font-size:1.5rem;margin:0 0 4px}p{margin:0 0 14px;color:var(--mut)}
-a.g{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0;color:var(--fg);text-decoration:none;min-height:64px}
-a.g b{font-size:1.08rem;flex:1}a.g span{font-size:.78rem;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}
-.new{background:#28452f;color:var(--ok)}.wip{background:#463b1c;color:var(--wip)}.ch{color:var(--acc);font-size:1.3rem}
-small{display:block;color:var(--mut);font-size:.82rem;font-weight:400;margin-top:2px}
+:root{--bg:#1d1712;--card:#2a221b;--fg:#f3e9da;--mut:#bba98f;--acc:#f0b04a;--ok:#7fd39a;--wip:#e8c86a;--blu:#8fc3f0;--red:#f09a8a;--line:#3d3227}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;padding:calc(16px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));max-width:720px;margin:0 auto}
+h1{font-size:1.5rem;margin:0 0 4px}p{margin:0 0 12px;color:var(--mut)}
+.sum{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 14px}
+.sum div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center}
+.sum b{display:block;font-size:1.4rem}.sum span{font-size:.75rem;color:var(--mut)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px;align-items:center}.row>em{font-style:normal;font-size:.8rem;color:var(--mut);width:52px}
+button.f{font:inherit;font-size:.85rem;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:99px;padding:7px 13px;min-height:36px;cursor:pointer}
+button.f[aria-pressed=true]{background:var(--acc);color:#1d1712;border-color:var(--acc);font-weight:700}
+a.g{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0;color:var(--fg);text-decoration:none;min-height:64px}
+a.g b{font-size:1.05rem;flex:1;min-width:0}small{display:block;color:var(--mut);font-size:.82rem;font-weight:400;margin-top:2px}
+.tags{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.tags span{font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.done{background:#28452f;color:var(--ok)}.testing{background:#463b1c;color:var(--wip)}.progress{background:#1e3446;color:var(--blu)}.todo{background:#47261f;color:var(--red)}
+.story{background:#3a2c4a;color:#d5b8f5}.nostory{background:#332a22;color:var(--mut)}
+.ch{color:var(--acc);font-size:1.3rem}.none{text-align:center;padding:24px;color:var(--mut)}
 .foot{margin-top:18px;font-size:.85rem}
 </style></head><body>
-<h1>Try the new versions</h1>
-<p>These are the improved games. The shelf still opens the old versions until you say they're good. Updated 4 Oct, 18:35 UTC.</p>
-
-<a class="g" href="./sunglaze-next/"><b>Sunglaze<small>Grab a colour, watch the rest slide, chain combos on the wall</small></b><span class="new">Board-first</span><i class="ch">›</i></a>
-<a class="g" href="./cauldron-fair-next/"><b>Cauldron Fair<small>Pull chips from the bag and dare the boom; best picks glow</small></b><span class="new">Board-first</span><i class="ch">›</i></a>
-<a class="g" href="./doorkick-dungeon-next/"><b>Doorkick Dungeon<small>Kick the door, drag cards onto the fight</small></b><span class="new">Board-first</span><i class="ch">›</i></a>
-<a class="g" href="./shipwreck-isle-next/"><b>Shipwreck Isle<small>Clearer turns + a 10-chapter Story mode</small></b><span class="new">Story mode</span><i class="ch">›</i></a>
-<a class="g" href="./thornbound-new/"><b>Thornbound<small>Every change explained, fights show the totals</small></b><span class="new">Redesigned</span><i class="ch">›</i></a>
-<a class="g" href="./lantern-dive/"><b>Lantern Dive<small>Clearer missions (new game)</small></b><span class="wip">Board-first coming</span><i class="ch">›</i></a>
-<a class="g" href="./final-approach/"><b>Final Approach<small>Clearer cockpit (new game)</small></b><span class="wip">Board-first coming</span><i class="ch">›</i></a>
-<a class="g" href="./kaiten-kitchen-next/"><b>Kaiten Kitchen</b><span class="wip">Board-first coming</span><i class="ch">›</i></a>
-<a class="g" href="./short-fuse-next/"><b>Short Fuse</b><span class="wip">Board-first coming</span><i class="ch">›</i></a>
-<a class="g" href="./nebula-aces-next/"><b>Nebula Aces</b><span class="wip">Board-first coming</span><i class="ch">›</i></a>
-<a class="g" href="./crown-city-smash-next/"><b>Crown City Smash</b><span class="wip">Board-first coming</span><i class="ch">›</i></a>
-<a class="g" href="./tidewake-next/"><b>Tidewake</b><span class="wip">Board-first coming</span><i class="ch">›</i></a>
-<a class="g" href="./rampart-and-vine-next/"><b>Rampart and Vine<small>Clearer turns</small></b><span class="wip">Board-first coming</span><i class="ch">›</i></a>
-<a class="g" href="./hollowbough-next/"><b>Hollowbough</b><span class="wip">Being improved</span><i class="ch">›</i></a>
-
-<p class="foot">Still being made: Sands of Qamar. When a game gets a newer version, this page shows it. Reload once if you see an old version (offline copy).</p>
+<h1>Game status</h1>
+<p>Every shelf game, where it stands. Tap a game to play the live version. Updated 5 Oct 2026.</p>
+<div class="sum" id="sum"></div>
+<div class="row" data-k="k"><em>Status</em>
+<button class="f" data-v="all" aria-pressed="true">All</button><button class="f" data-v="done">Completed</button><button class="f" data-v="testing">Under testing</button><button class="f" data-v="progress">In progress</button><button class="f" data-v="todo">Not started</button></div>
+<div class="row" data-k="st"><em>Story</em>
+<button class="f" data-v="all" aria-pressed="true">All</button><button class="f" data-v="1">Has story mode</button><button class="f" data-v="0">No story yet</button></div>
+<div id="list"></div>
+<p class="foot"><b style="color:var(--ok)">Completed</b>: story mode + phone check passed (portrait, landscape, rotation). <b style="color:var(--wip)">Under testing</b>: live, a known issue is being fixed. <b style="color:var(--blu)">In progress</b>: being built now.</p>
 <p class="foot"><a href="./" style="color:var(--acc)">‹ Back to the shelf</a></p>
+<script>
+var G=[{"s": "sunglaze", "n": "Sunglaze", "st": 1, "ph": 1, "k": "done", "t": "Grab a colour, chain combos on the wall"}, {"s": "cauldron-fair", "n": "Cauldron Fair", "st": 1, "ph": 1, "k": "done", "t": "Pull chips from the bag and dare the boom"}, {"s": "doorkick-dungeon", "n": "Doorkick Dungeon", "st": 1, "ph": 1, "k": "done", "t": "Kick the door, drag cards onto the fight"}, {"s": "thornbound", "n": "Thornbound", "st": 1, "ph": 1, "k": "done", "t": "Redesigned board, fights show the totals"}, {"s": "lantern-dive", "n": "Lantern Dive", "st": 1, "ph": 1, "k": "done", "t": "Dive, grab treasure, share the air"}, {"s": "hollowbough", "n": "Hollowbough", "st": 1, "ph": 1, "k": "done", "t": "Story mode + phone rotation fixed"}, {"s": "tidewake", "n": "Tidewake", "st": 1, "ph": 1, "k": "done", "t": "Story mode; skip-to-my-turn responds at once"}, {"s": "kaiten-kitchen", "n": "Kaiten Kitchen", "st": 1, "ph": 1, "k": "testing", "t": "Story live; board-first version still to merge"}, {"s": "final-approach", "n": "Final Approach", "st": 1, "ph": 1, "k": "testing", "t": "Readable rework live; some labels overlap badges"}, {"s": "shipwreck-isle", "n": "Shipwreck Isle", "st": 1, "ph": 1, "k": "testing", "t": "Story live; board still old text style, rework next"}, {"s": "crown-city-smash", "n": "Crown City Smash", "st": 0, "ph": 0, "k": "progress", "t": "Board-first merge + story being built now"}, {"s": "nebula-aces", "n": "Nebula Aces", "st": 0, "ph": 0, "k": "progress", "t": "Story + portrait start fix being built now"}, {"s": "short-fuse", "n": "Short Fuse", "st": 0, "ph": 0, "k": "todo", "t": "Needs story mode + phone fixes"}, {"s": "rampart-and-vine", "n": "Rampart and Vine", "st": 0, "ph": 0, "k": "todo", "t": "Needs story mode"}, {"s": "sands-of-qamar", "n": "Sands of Qamar", "st": 0, "ph": 0, "k": "todo", "t": "Needs story mode + phone fixes"}];
+var L={done:"Completed",testing:"Under testing",progress:"In progress",todo:"Not started"},F={k:"all",st:"all"};
+function q(k){try{return new URLSearchParams(location.search).get(k)}catch(e){return null}}
+function draw(){
+ var h="",n=0;G.forEach(function(g){
+  if(F.k!="all"&&g.k!=F.k)return;if(F.st!="all"&&String(g.st)!=F.st)return;n++;
+  h+='<a class="g" href="./'+g.s+'/"><b>'+g.n+'<small>'+g.t+'</small></b><span class="tags"><span class="'+g.k+'">'+L[g.k]+'</span>'+(g.st?'<span class="story">Story mode</span>':'<span class="nostory">No story</span>')+'</span><i class="ch">›</i></a>';
+ });
+ document.getElementById("list").innerHTML=h||'<p class="none">No games match these filters.</p>';
+ document.querySelectorAll(".row").forEach(function(r){var k=r.dataset.k;r.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.v==F[k])})});
+}
+var c={};G.forEach(function(g){c[g.k]=(c[g.k]||0)+1});var s=G.filter(function(g){return g.st}).length;
+document.getElementById("sum").innerHTML=[["Completed",c.done||0],["Testing",c.testing||0],["To do",(c.progress||0)+(c.todo||0)],["Story",s+"/"+G.length]].map(function(x){return"<div><b>"+x[1]+"</b><span>"+x[0]+"</span></div>"}).join("");
+document.querySelectorAll(".row").forEach(function(r){r.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;F[r.dataset.k]=b.dataset.v;draw()})});
+if(q("status"))F.k=q("status");if(q("story"))F.st=q("story");draw();
+</script>
 </body></html>
