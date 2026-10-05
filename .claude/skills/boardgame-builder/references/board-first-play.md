@@ -17,6 +17,12 @@ Hard lesson (Oct 2026): 15 games passed newcomer reviews, and then the owner pla
 
 This replaces the dock-heavy "guided steps, advisor and wizard" approach in `newcomer-ux.md` wherever they conflict.
 
+## Bugs: scripted sweeps first (Oct 2026)
+AI blind testers missed bugs the owner found in seconds. Each game needs `sweep.js` and `rotate-test.js` that play
+the real page with touch taps (40+ games, both phone sizes, rotations) and assert: no page errors, glowing targets
+respond, hint = best move and hint text = finger, on-screen scores = engine, nothing stuck, nothing covered, no
+horizontal scroll. Run before every deploy. Use the blind testers below only to rate fun/clarity, once, at the end.
+
 ## Human-like blind testers (the gate for "done")
 Use `scripts/drive-serve.js`. It drives an HTTP-controlled phone page:
 - endpoints `/open?url=`, `/shot`, `/tap?text=`, `/tap?x=&y=`, `/wait?ms=` and `/quit`;

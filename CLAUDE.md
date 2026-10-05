@@ -24,22 +24,27 @@ Full method: the project skill `.claude/skills/boardgame-builder/` (loads automa
   - scores pop up where they're earned, and the computer's moves animate.
   - Portrait phone first (390×763, 375×553).
   - Hints must be right or absent.
-- **AI reviews passed games that humans failed.** "Done" = 3 human-like blind testers via
-  `games-src/scripts/drive-serve.js`:
-  - they read 8 words at most and decide in 2 seconds;
-  - ≤2 lost moments and ≤3 dead taps after the first minute;
-  - fun ≥4/5;
-  - each names an exciting moment and the goal.
-  - Take a baseline first, then up to 3 rounds.
+- **AI testers miss bugs the owner finds in seconds.** Scripts find bugs, not AI eyes:
+  - each game has `sweep.js` (40+ full games through the real page with touch taps at 390×763 and 375×553, plus
+    rotations) and `rotate-test.js`. They fail on page errors, a glowing target that doesn't respond, a wrong hint
+    or hint text ≠ finger, on-screen scores ≠ engine, anything stuck >8 s, covered buttons, horizontal scroll.
+    Run them before every deploy; a failing sweep blocks the deploy.
+  - The owner's bug reports go first into the fixer's brief, then into the sweep.
+  - AI blind testers (`drive-serve.js`) only rate fun/clarity: one, once, at the end (~100k tokens each).
+  - Phone rotation: iOS reports the old size right after rotating. Use one debounced relayout fed by resize,
+    orientationchange, visualViewport and ResizeObserver, re-measured after ~400 ms.
 - **"No story mode":** chapters with bosses and a difficulty curve (`games-src/shell/CAMPAIGN.md`).
 
 ## Cost rules (about $4,000 was spent, mostly waste)
 - **Always set the model on every helper and cloud session.** The default is the most expensive model; all 45 earlier
-  cloud sessions ran on it by accident. Main model: plan, decide, review. Sonnet: build, fix, audits, blind testers.
+  cloud sessions ran on it by accident. Main model: plan, decide, review only (no hands-on screenshots). Sonnet: build, fix, sweeps.
   Haiku: downloads, copying, simple loops.
+- One fixer per game, one round, one deploy: the brief names exact functions/lines (grep first) and every known
+  bug; the fixer fixes until the sweep is clean and reports in under 150 words. No AI-tester rework loops.
 - One session, at most 2 subagents, 1–2 games finished per session. No new cloud sessions.
+- Answer each helper report once; ignore duplicate notifications. Commit work in progress as you go.
 - No PR subscriptions, polling or scheduled wake-ups unless the owner asks.
 - Prove the approach on one game before touching others. Clarity before features.
 - Keep context small: hand off to a new session with an updated `games-src/HANDOFF.md`.
-- Merge your own work. Never ask the owner to review PRs.
+- Merge your own work. Never ask the owner to review PRs. Deploying to preview paths is pre-approved by the owner.
 - Update `games/previews.html`, and end with ONE link plus 5 lines (before → after numbers, what's weak).
