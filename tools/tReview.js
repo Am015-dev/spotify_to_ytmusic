@@ -17,9 +17,9 @@ const setup=()=>p.evaluate(()=>{const {scene,camera,THREE}=__dbg;const W={};wind
   const cp=new THREE.Vector3();car.getWorldPosition(cp);const fw=new THREE.Vector3();camera.getWorldDirection(fw);fw.y=0;fw.normalize();const sd=new THREE.Vector3(-fw.z,0,fw.x),gy=W.ground(L,cp)??cp.y;
   W.cam(cp.clone().addScaledVector(sd,6.5).setY(gy+.3),new THREE.Vector3(cp.x,gy+.5,cp.z));return out};
  W.traffic=()=>{const L=W.list(),M=new THREE.Matrix4(),P=new THREE.Vector3(),C=[];scene.traverse(o=>{if(o.isInstancedMesh&&o.userData.w){const w=o.userData.w;w.geometry.computeBoundingBox();for(let j=0;j<o.count;j++){w.getMatrixAt(j,M);if(M.elements[0]===0&&M.elements[5]===0)continue;P.setFromMatrixPosition(M);C.push({w,j,p:P.clone(),mb:w.geometry.boundingBox.min.y,d:P.distanceTo(camera.position)})}}});
-  C.sort((a,b)=>a.d-b.d);const top=C.slice(0,5),gaps=top.map(c=>{const g=W.ground(L,c.p);return g==null?null:+(c.p.y+c.mb-g).toFixed(3)});const T=top[0],Q=new THREE.Vector3();
+  C.sort((a,b)=>a.d-b.d);const top=C.slice(0,5),gaps=top.map(c=>{const g=W.ground(L,c.p);const gy=__dbg.GY(c.p.x,c.p.z);return {ray:g==null?null:+(c.p.y+c.mb-g).toFixed(3),road:+(c.p.y+c.mb-gy).toFixed(3)}});const T=top[0],Q=new THREE.Vector3();
   scene.onBeforeRender=()=>{T.w.getMatrixAt(T.j,M);Q.setFromMatrixPosition(M);const rt=new THREE.Vector3(M.elements[0],0,M.elements[2]).normalize(),f=new THREE.Vector3(M.elements[8],0,M.elements[10]).normalize(),gy=Q.y;
-   camera.position.copy(Q).addScaledVector(rt,6.5).addScaledVector(f,1);camera.position.y=gy+.3;camera.lookAt(Q.x,gy+.5,Q.z);camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert()};
+   camera.position.copy(Q).addScaledVector(rt,10);camera.position.y=gy+.35;camera.lookAt(Q.x,gy+.5,Q.z);camera.updateMatrixWorld();camera.matrixWorldInverse.copy(camera.matrixWorld).invert()};
   return {gaps,n:C.length}}});
 await p.goto('http://127.0.0.1:8766/local_dbg.html');await boot('fra');await p.waitForTimeout(1500);await p.screenshot({path:OUT+'_1start.png'});
 await roam();await setup();await p.keyboard.down('ArrowUp');await p.waitForTimeout(6000);R.fraKmh=await kmh();await p.screenshot({path:OUT+'_2fra_drive.png'});await p.keyboard.up('ArrowUp');await p.waitForTimeout(3500);
@@ -28,5 +28,5 @@ R.traffic=await p.evaluate(()=>__rv.traffic());await p.waitForTimeout(1200);awai
 await p.evaluate(()=>document.querySelector('#roamPause [data-p="garage"]')?.click()||__mho.pause?.());await p.waitForTimeout(600);
 await p.waitForFunction(()=>!document.querySelector('#gbx').hidden,null,{timeout:8000}).catch(async()=>{await p.keyboard.press('Escape');await p.waitForTimeout(500);await p.evaluate(()=>document.querySelector('#roamPause [data-p="garage"]').click());await p.waitForFunction(()=>!document.querySelector('#gbx').hidden)});
 await p.waitForTimeout(1200);await p.screenshot({path:OUT+'_5garage.png'});
-await boot('ath');await roam();await p.keyboard.down('ArrowUp');await p.waitForTimeout(6000);R.athKmh=await kmh();await p.screenshot({path:OUT+'_6ath_drive.png'});await p.keyboard.up('ArrowUp');
+await boot('ath');await roam();await p.keyboard.down('ArrowUp');await p.waitForTimeout(6000);R.athKmh=await kmh();await p.screenshot({path:OUT+'_6ath_drive.png'});await p.keyboard.up('ArrowUp');await p.waitForTimeout(3000);await setup();R.athTraffic=await p.evaluate(()=>__rv.traffic());await p.waitForTimeout(1200);await p.screenshot({path:OUT+'_7ath_traffic_side.png'});await p.evaluate(()=>__rv.free());
 console.log(JSON.stringify(R));console.log('errs',JSON.stringify(errs));await br.close()})();
