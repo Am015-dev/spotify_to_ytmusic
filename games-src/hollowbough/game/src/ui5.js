@@ -18,12 +18,12 @@ function newGame(mode, o) {
   G = HB.newGame({ players, solo, seed: UI.seed != null ? UI.seed : undefined });
   if (o.camp) campTwist(o.camp);
   UI.seed = null;
-  UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
+  UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.sel = null; UI.fingerSeen = false; UI.passArm = 0; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
   UI.holder = hotSeat() ? -1 : -1;
   UI.coach = { level: UI.coach && UI.coach.level || 'full', seen: {} };
   if (mode !== 'guided') UI.coachOn = false; else UI.coachOn = true;
   const st = $('#start'); if (st) st.hidden = true;
-  closePop(); try { GX.close(); } catch (e) { }
+  closePop(); fxClear(); try { GX.close(); } catch (e) { }
   kitNewGame();
   render(); schedule();
   return G;
@@ -33,23 +33,15 @@ function render() {
   if (!G || !UI.started) return;
   { const v = viewSeat(); if (v >= 0) GX.recap.view(v); }
   try { if (window.PerfHUD) PerfHUD.wake(); } catch (e) { }
-  renderBoard(); renderDock(); renderQ(); renderCard(); placePop(); markSel(); renderDrawers();
+  UI.mmc = null; renderBoard(); renderCard(); renderDrawers();
   if (NET.on) netRenderHook();
-}
-function markSel() {
-  $$('.sel').forEach(x => x.classList.remove('sel')); const p = UI.pop; if (!p) return;
-  let e = null;
-  if (p.kind === 'tile') e = $(`.tile[data-k="${p.k}"][data-i="${p.i}"]`);
-  else if (p.kind === 'card' && p.src === 'meadow') e = $$('.mc').find(x => G.meadow[+x.dataset.i] === p.id);
-  else if (p.kind === 'card') e = $(`.sc[data-id="${p.id}"]`);
-  if (e) e.classList.add('sel');
 }
 // ---- one-card-at-a-time queue
 function pushCard(c) { UI.cards.push(c); closePop(); render(); }
 function renderCard() {
-  const pc = $('#pc');
-  if (!UI.cards.length) { if (!(G && G.q && !G.players[G.q.who].ai && G.q.who === viewSeat() && G.phase !== 'over')) { pc.hidden = true; pc.innerHTML = ''; pc.removeAttribute('data-card'); } return; }
-  const c = UI.cards[0]; pc.hidden = false; pc.innerHTML = ''; pc.setAttribute('data-card', c.kind); pc.removeAttribute('data-kind');
+  const pc = $('#pc'); if (!pc) return;
+  if (!UI.cards.length) { pc.hidden = true; pc.innerHTML = ''; pc.removeAttribute('data-card'); return; }
+  const c = UI.cards[0]; pc.hidden = false; pc.innerHTML = ''; pc.setAttribute('data-card', c.kind);
   pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', c.title), c.sub ? h('span', c.sub) : null)));
   const body = h('div.ph-body'); const b = typeof c.body === 'function' ? c.body() : c.body; add(body, b);
   const btns = h('div.cbtns');
@@ -64,8 +56,7 @@ function schedule() {
   if (!G || !UI.started || (UI.cards.length && !NET.on)) return;
   if (G.phase === 'over') { if (!UI.overShown) { UI.overShown = true; queueOver(); const w = G.over; snd(G.grim ? (w.win ? 'fanfare' : 'lose') : 'fanfare', { duck: true }); sndMusic(); } return; }
   const a = HB.actor(G), p = G.players[a], hs = humans();
-  if (UI.after.length && hs.length && !(G.q && !G.players[G.q.who].ai)) { if (flushAfter()) return; }
-  if (p.ai) { if (!isClient()) UI.tm = setTimeout(aiStep, ANIM ? AIDELAY : 0); return; }
+  if (p.ai) { if (!isClient()) UI.tm = setTimeout(aiStep, ANIM ? Math.round(AIDELAY * .4) : 0); return; }
   if (hotSeat() && UI.holder !== a) {
     UI.holder = -1; closePop(); render();
     pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', p.name + ', take the device. Nobody else should look at the screen. Your hand and resources appear when you tap the button.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
@@ -73,45 +64,57 @@ function schedule() {
   }
   if (UI.coachOn && coachCheck()) return;
   if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
-  if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
+  if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) placeFinger(); }, 40);
 }
 function aiStep() {
   UI.tm = 0; if (isClient() || !G || G.phase === 'over' || (UI.cards.length && !NET.on)) return;
   const a = HB.actor(G); if (a < 0) return; const p = G.players[a]; if (!p.ai) { schedule(); return; }
-  const n0 = G.logN; let m;
+  let m;
   try { m = HB.AI.choose(G, a); } catch (e) { m = HB.moves(G, a)[0]; console.error('AI error', e); }
-  const pre = sndPre();
+  const tok = UI.animTok = (UI.animTok || 0) + 1;
+  const go = src => { if (tok !== UI.animTok) return; UI.animBusy = false; aiApply(m, a, src); };
+  if (!ANIM) { go(null); return; }
+  UI.animBusy = true; aiFly(m, a, go);
+}
+// the computer's move: a worker flies to its place, a card flies to its city (about 0.6 s), then the move happens
+function aiFly(m, a, done) {
+  const chip = seatRect(a); if (!chip || !UI.lay) { done(null); return; }
+  let from = chip, to = null, node = null, src = chip;
+  if (m.type === 'worker' && m.k !== 'dest') {
+    const kind = m.k === 'event' ? (m.e === 'b' ? 'bev' : 'sev') : m.k;
+    to = UI.tr[kind + ':' + (m.k === 'haven' || m.k === 'journey' ? 0 : m.i)]; node = pawn(a, 28); src = to;
+  } else if (m.type === 'play') {
+    const mr = m.from === 'meadow' ? UI.cr['m' + m.card] : null;
+    from = mr || { x: UI.lay.W / 2 - 24, y: UI.lay.H * .55, w: 48, h: 64 }; to = chip; node = cardEl(m.card, 48); src = mr || chip;
+  }
+  if (!to || !node || !from) { done(src); return; }
+  fxFly(node, from, to, Math.max(140, Math.min(600, Math.round(AIDELAY * .9))), () => done(src));
+}
+function aiApply(m, a, src) {
+  const n0 = G.logN, pre = sndPre(), fpre = fxPre(a);
   let r = HB.apply(G, m);
   if (r.ok) sndPost(pre, m, a);
-  if (!r.ok) { const ms = HB.moves(G, a); r = HB.apply(G, ms[0]); }
+  if (!r.ok) { const ms = HB.moves(G, a); m = ms[0]; r = HB.apply(G, m); }
   const ls = logSince(n0); UI.lastAi = ls.length ? ls[0].replace(/^[^ ]+ /, '') : '';
   GX.recap.push(ls, a);
   afterMove();
+  try { fxPost(fpre, m, src); fxLand(m, a, src, seatRect(a)); } catch (e) { console.error(e); }
 }
 function afterMove() { save(); render(); sndMusic(); schedule(); if (NET.on) netPush(); }
 function act(m) {
   if (!G || !m) return; const a = HB.actor(G);
   if (isClient()) { netAct(m); return; }
   if (NET.on && a !== NET.mySeat) return;
-  const n0 = G.logN;
-  if (m.type === 'prepare' && !NET.on) UI.after.push({ kind: 'season', seat: a, from: n0 });
-  const pre = sndPre();
+  const n0 = G.logN, src = UI.fxSrc; UI.fxSrc = null;
+  const pre = sndPre(), fpre = fxPre(a), chip0 = seatRect(a);
   if (!G.players[a].ai) GX.undo.snap(m.label || m.type);
   const r = HB.apply(G, m);
   closePop(); UI.rec = null;
   if (r.ok) sndPost(pre, m, a);
-  if (!r.ok) { snd('error'); UI.after.pop(); GX.undo.drop(); toast(r.error || 'That move is not allowed.'); render(); return; }
+  if (!r.ok) { snd('error'); GX.undo.drop(); toast(r.error || 'That move is not allowed.'); render(); return; }
   GX.undo.check(revealed); GX.recap.mark(a); GX.recap.push(logSince(n0), a);
   UI.lastAi = ''; afterMove();
-}
-function choose(i) { const a = HB.actor(G); const m = movesFor(a).find(x => x.type === 'choose' && x.i === i); if (m) act(m); }
-function flushAfter() {
-  const e = UI.after.shift(); if (!e) return false;
-  const lines = G.log.filter(x => x.i > e.from).map(x => x.t).slice(-14);
-  const p = G.players[e.seat];
-  const s = p.season;
-  pushCard({ kind: 'season', title: SEASN[s] + ' has come', sub: p.name + ' prepared for ' + SEASN[s], body: () => h('div', h('div.seasonrow', HBKit.season(SEAS[s], 56)), h('ul.need', lines.map(t => h('li', t)))), });
-  return true;
+  try { fxPost(fpre, m, src); fxLand(m, a, src, chip0); } catch (e) { console.error(e); }
 }
 // ---- end of game: one card per player, then the result
 function queueOver() {

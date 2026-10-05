@@ -2,9 +2,8 @@
 <div class="gx-app">
 <header class="gx-bar">
   <h1><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="9" r="7.5" fill="#7fae62" stroke="#f6ecd6" stroke-width="1.4"/><path d="M10.5 22V14h3v8Z" fill="#c99a63" stroke="#f6ecd6" stroke-width="1.2"/></svg></span><span class="tt">Hollowbough</span></h1>
-  <span id="barstat"></span>
   <button id="netst" type="button" data-a="netopen" hidden></button>
-  <div id="barprompt"></div>
+  <div id="barprompt"><div id="prompt" aria-live="polite"></div></div>
   <span class="gx-sp"></span>
   <button class="gx-ibtn" data-gx="rivald" aria-expanded="false" aria-label="Cities and players" title="Cities and players"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-4 3-6 6-6s6 2 6 6M15 14c3 0 6 1.5 6 5"/></svg><span>Players</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-expanded="false" aria-label="Log" title="Log"><svg viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/></svg><span>Log</span></button>
@@ -12,21 +11,9 @@
   <button class="gx-ibtn" data-gx="setd" aria-expanded="false" aria-label="Menu" title="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span>Menu</span></button>
 </header>
 <div class="gx-main">
-  <main class="gx-board" id="board" aria-label="The Elderheart board"><div id="bd"></div></main>
-  <aside class="gx-dock" id="dock" aria-label="What to do now">
-    <div class="gx-dock-head"><span class="gx-dt">Your turn</span><button class="gx-ibtn" data-gx="dock" aria-label="Hide panel">&#8677;</button></div>
-    <div class="gx-dock-body" id="dockbody">
-      <div id="promptDock"><div id="prompt" aria-live="polite"></div></div>
-      <section class="strip" id="cityS"><div class="slab" id="cityLab">City</div><div class="srow" id="cityRow"></div></section>
-      <div id="chips"></div>
-      <div id="res"></div>
-      <div id="acts"></div>
-      <section class="strip" id="handS"><div class="slab" id="handLab">Hand</div><div class="srow" id="handRow"></div></section>
-    </div>
-    <div class="ppop" id="ppop" hidden role="dialog" aria-label="Details"></div>
-    <div class="pcard" id="pc" hidden role="dialog" aria-label="Message"></div>
-  </aside>
-  <button class="gx-ibtn gx-reopen" data-gx="dock">&#9776; Panel</button>
+  <main class="gx-board" id="board" data-board aria-label="The Elderheart board"><div id="bd"></div><div id="fx" aria-hidden="true"></div></main>
+  <div class="pcard" id="pc" hidden role="dialog" aria-label="Message"></div>
+  <div id="zoom" hidden role="dialog" aria-label="Details"></div>
 </div>
 </div>
 <div id="start" hidden></div>

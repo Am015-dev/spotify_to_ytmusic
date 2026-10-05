@@ -93,24 +93,20 @@ function renderStart() {
 function showStart() { try { GX.close(); } catch (e) { } closePop(); UI.cards = []; clearTimeout(UI.tm); renderStart(); }
 // ---- events
 document.addEventListener('click', ev => {
-  const t = ev.target.closest('[data-a],[data-start]'); const pop = $('#ppop');
-  if (!t) { if (UI.pop && pop && !pop.contains(ev.target) && !ev.target.closest('#pc,.gx-drawer')) closePop(); return; }
+  if (UI.zoomAt && Date.now() - UI.zoomAt < 450) { ev.preventDefault(); return; }
+  const z = $('#zoom'); if (z && !z.hidden) { closeZoom(); return; }
+  if (UI.lp) { UI.lp = false; return; }
+  const t = ev.target.closest('[data-a],[data-start]');
+  if (!t) { if (UI.sel) { UI.sel = null; render(); } return; }
   const a = t.dataset.a, d = t.dataset;
   if (netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
-    case 'tile': openTile(d.k, d.i); break;
-    case 'mcard': { const id = G.meadow[+d.i]; if (id >= 0) openCard('meadow', id, null, +d.i); break; }
-    case 'hcard': openCard('hand', +d.id); break;
-    case 'ccard': openCard('city', +d.id, +d.seat === +d.seat ? +d.seat : d.seat); break;
+    case 't': onTarget(d.t, t); break;
+    case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { UI.sel = null; actFrom(m, t); } break; }
+    case 'selx': UI.sel = null; render(); break;
     case 'chip': UI.rseat = d.seat === 'G' ? 'G' : +d.seat; GX.show('rivald'); renderRival(UI.rseat); break;
     case 'rtab': renderRival(d.seat === 'G' ? 'G' : +d.seat); break;
-    case 'prep': openPrep(); break;
-    case 'pass': openPass(); break;
-    case 'hint': openHint(); break;
-    case 'popx': closePop(); break;
-    case 'do': { const m = UI.pm && UI.pm[+d.mi]; if (m) act(m); break; }
-    case 'q': choose(+d.i); break;
     case 'cont': nextCard(); break;
     case 'take': takeDevice(); break;
     case 'again': { if (campOn()) { const dd = UI.camp; UI.cards = []; GXC.play(dd.id); break; } const m = UI.mode, c = UI.cfg || {}; UI.cards = []; newGame(m, { np: c.np, level: c.level, solo: c.solo }); break; }
@@ -128,7 +124,18 @@ document.addEventListener('click', ev => {
     case 'sound': UI.sound = UI.sound === false; try { if (window.GA) { GA.setSfx(UI.sound); GA.setMusic(UI.sound); } } catch (e) { } GX.renderSettings(); break;
   }
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.pop) closePop(); });
+// long-press on a card or a place: a big view with the details (the only place the details are written)
+{ let lpT = 0, lpS = null;
+  document.addEventListener('pointerdown', e => {
+    const z = e.target.closest('[data-zoom]'); if (!z || (e.button != null && e.button > 0)) return;
+    UI.lp = false; lpS = { x: e.clientX, y: e.clientY }; clearTimeout(lpT);
+    lpT = setTimeout(() => { UI.lp = true; openZoom(z.dataset.zoom); try { navigator.vibrate && navigator.vibrate(12); } catch (x) { } }, 430);
+  });
+  document.addEventListener('pointermove', e => { if (lpS && Math.hypot(e.clientX - lpS.x, e.clientY - lpS.y) > 12) clearTimeout(lpT); });
+  ['pointerup', 'pointercancel'].forEach(n => document.addEventListener(n, () => { clearTimeout(lpT); lpS = null; }));
+  document.addEventListener('contextmenu', e => { if (e.target.closest('[data-zoom]')) e.preventDefault(); });
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.sel) { UI.sel = null; render(); } closeZoom(); } });
 // ---- phone mode
 function applyPhone() {
   const q = /[?&]phone=(\d)/.exec(location.search); const vm = (window.GXV ? GXV.now() : { w: innerWidth, h: innerHeight }), w = vm.w, hh = vm.h, short = Math.min(w, hh);
@@ -138,7 +145,7 @@ function applyPhone() {
   r.toggle('ph', ph); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); }
 }
-function onResize() { applyPhone(); if (G && UI.started) { renderBoard(); placePop(); } }
+function onResize() { applyPhone(); if (G && UI.started) renderBoard(); }
 // ---- boot
 function boot() {
   GX.init({ key: 'hb' });
@@ -149,7 +156,7 @@ function boot() {
   kitBoot();
   applyPhone();
   if (window.GXV) GXV.watch(onResize); else { addEventListener('resize', onResize); addEventListener('orientationchange', onResize); }
-  const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { renderBoard(); placePop(); } }).observe(bd);
+  const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) renderBoard(); }).observe(bd);
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'hb' }); GX.applyPrefs(); }; } catch (e) { }
   try { if (window.PerfHUD && PerfHUD.register) PerfHUD.register({ game: 'Hollowbough' }); } catch (e) { }
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
