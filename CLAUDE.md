@@ -29,7 +29,7 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 7. **LOOK at the screen; scripts can't judge fun.** Alex scored v83 "horrible, uncontrollable": a 15-item HUD covered 40% of the phone, the world was washed-out with no visible road, and steering was twitchy, while every script metric improved. Every build is judged on screenshots someone actually looks at, plus feel. The phone HUD is minimap + speed + one objective line; at most 5 buttons.
 
 ## Cost and speed rules (99.8% of the tokens were context re-reads)
-- Set `model` on EVERY cloud session: `claude-sonnet-5-5` to build, fix, test and integrate; Opus only for hard design calls.
+- Set `model` on EVERY cloud session. Alex (2026-10-05): use `claude-opus-5-5` for tough issues (bugs Sonnet failed to reproduce or fix, visual/feel design, anything that already failed once). `claude-sonnet-5-5` only for routine, well-specified edits. The coordinator stays on Opus.
 - Run at most one fix worker plus one integrator at a time. Parallel workers on one 3.7 MB file caused rebuild loops.
 - Use a fresh session per task and write a handoff before ~150k context. Never keep going in a 400k+ context.
 - Run a test once in the background and wait for its notification. No `sleep`/`grep` polling loops and no scheduled check-ins.
