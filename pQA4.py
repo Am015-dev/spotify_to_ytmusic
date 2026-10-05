@@ -18,4 +18,9 @@ R("if((pv>13||(RO.boosting&&pv>5))&&g.hcd<=0)","if((pv>(g.kind==='thief'?8:13)||
 R('window.__mho={','''// QA4: 30 % more time on every timed story / quest stage
 qvEnter=(f=>function(ch,i){const r=f.apply(this,arguments);try{const V=ch&&ch.v2,S=V&&V.L.st[V.si];if(S&&S.T&&V.left>0&&!S.qaT){S.qaT=1;V.left*=1.3}}catch(e){}return r})(qvEnter);
 window.__mho={''')
+# Drift-zone stages (Hot Drop "Drift home" 420 pts / 24 s failed at 4/420 for the human-like driver): a drift now starts from 50 km/h
+# (was 79 km/h — hard to reach between corners on a phone), drift points accrue 1.5× and the window is 30 % longer.
+R("const hbOk=c.hb&&!air&&sp>22&&!busy;","const hbOk=c.hb&&!air&&sp>14&&!busy;")
+R("else if(S.t==='driftzone'){S.n=0;S.el=0}","else if(S.t==='driftzone'){S.n=0;S.el=0;if(!S.qaW){S.qaW=1;S.win=Math.round(S.win*1.3)}}")
+R("if(S.t==='driftzone'){S.el+=dt;if(RO.dDir){const tr=RO.dT>2?3:RO.dT>1.1?2:RO.dT>.5?1:0;S.n+=dt*Math.abs(RO.v)*1.2*(1+.5*tr)}","if(S.t==='driftzone'){S.el+=dt;if(RO.dDir){const tr=RO.dT>2?3:RO.dT>1.1?2:RO.dT>.5?1:0;S.n+=dt*Math.abs(RO.v)*1.8*(1+.5*tr)}")
 save()
