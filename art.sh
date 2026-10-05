@@ -1,6 +1,8 @@
 #!/bin/bash
-# Art build: v85j (base85.html) + art patches in order. ./art.sh pART1.py pART2.py ...
-cd "$(dirname "$0")"; [ -f base85.html ] || git show a8fbd90:overdrive.html > base85.html; cp base85.html overdrive.html
-for p in "$@"; do python3 $p || exit 1; done
-[ $# -eq 0 ] && python3 -c "exec(open('P.py').read());save()"
+# Art build on top of the CURRENT live page body (base_live.html + km.js from alex/brave-carson-rbpmlk).
+# ./art.sh [live-commit]   → overdrive.html (+ local pages) = live body + pART1-4 + pCAR1 (idempotent)
+cd "$(dirname "$0")"; C=${1:-origin/live}; git fetch -q origin alex/brave-carson-rbpmlk:refs/remotes/origin/live 2>/dev/null
+git show $C:games/mainhattan-overdrive/index.html | python3 -c "import sys;s=sys.stdin.read();j=s.find('>',s.find('<body'))+1;k=s.rfind('</body></html>');open('base_live.html','w').write(s[j:k])"
+git show $C:games/mainhattan-overdrive/km.js > km.js; cp base_live.html overdrive.html
+for p in pART1.py pART2.py pART3.py pART4.py pCAR1.py; do python3 $p >/dev/null || { echo "FAIL $p"; exit 1; }; done
 node --check chk.mjs && echo REAPPLY_OK

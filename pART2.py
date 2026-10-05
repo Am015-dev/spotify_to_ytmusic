@@ -1,5 +1,7 @@
 # pART2 · LEGO look step 2: brick trees (Frankfurt props + Athens street trees), studs on roofs/tops, plastic rim (module art2.js)
 exec(open('P.py').read())
+if 'ART step 2' in s:
+    print('already');save();raise SystemExit
 R('window.__mho={',open('art2.js').read()+'\nwindow.__mho={')
 R("hboat:K('boat-house-a',3.2,5,10,.75,['#e8c090','#6b4a2a'])});","hboat:K('boat-house-a',3.2,5,10,.75,['#e8c090','#6b4a2a'])});ART_trees(D);")
 R("const athTreeGeo=()=>{const P=","const athTreeGeo=()=>ART_athTree();const athTreeGeo0=()=>{const P=")
