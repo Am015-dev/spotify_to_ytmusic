@@ -1,8 +1,8 @@
 /* ===== QA · human-play fixes (module qa.js, inserted before window.__mho; every global is QA_*) =====
    1) Touch players see keyboard hints in NPC lines ("Hold DRIFT (X)", "(SHIFT)", "(SPACE)"): strip them on touch. */
-const QA_KEYS=/\s*\((?:SHIFT|Shift|X|SPACE|Space|Esc|ESC|M|T|R)\)/g;
-function QA_untouchKeys(el){if(!el||!document.body.classList.contains('touch'))return;for(const n of el.querySelectorAll('p,small,span'))if(QA_KEYS.test(n.innerHTML)){QA_KEYS.lastIndex=0;n.innerHTML=n.innerHTML.replace(QA_KEYS,'')}}
-{const ns=document.getElementById('npcSay');if(ns&&window.MutationObserver)new MutationObserver(()=>QA_untouchKeys(ns)).observe(ns,{childList:true,subtree:true,characterData:true})}
+const QA_KEYS=/\s*\((?:SHIFT|Shift|X|Y|SPACE|Space|Esc|ESC|M|T|R)\)/g;
+function QA_untouchKeys(el){if(!el||!document.body.classList.contains('touch'))return;const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode())){const t=n.nodeValue;if(t.indexOf('(')<0)continue;const u=t.replace(QA_KEYS,'');if(u!==t)n.nodeValue=u}}
+setInterval(()=>{for(const id of['npcSay','ogHud','qTrk','roamPrompt','roamTut'])QA_untouchKeys(document.getElementById(id))},400);
 /* 2) Chase camera inside buildings. The bug-sweep guard (BF) only runs in Frankfurt and runs BEFORE the juice camera offsets
       (drop / pull-in / kick), which are added afterwards and can push the camera back into a wall. tPlay measured the camera inside
       a building collider in 40.9 % of Athens frames. This guard is the outermost roamCam wrapper, runs in every city, and slides the

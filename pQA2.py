@@ -8,6 +8,7 @@ css='''
 body #roam #npcSay{left:calc(124px + env(safe-area-inset-left,0px))!important;max-width:min(430px,calc(50vw - 300px))!important}
 #roam:has(#npcSay:not([hidden])) #roamPlate{visibility:hidden}
 #roam:has(#chRes:not([hidden])) #m1Next,#roam:has(#chRes:not([hidden])) #roamPop{visibility:hidden}
+body:has(#ogHud:not([hidden])) #m1Next{visibility:hidden}
 @media (orientation:landscape) and (max-height:500px){body #roam #npcSay{left:auto!important;right:calc(200px + env(safe-area-inset-right,0px))!important;top:calc(92px + env(safe-area-inset-top,0px))!important;max-width:min(270px,32vw)!important}
  body #roam #npcSay p{font-size:12px!important;line-height:1.25!important}
  /* pause menu ran off the top and bottom of a 393 px screen (title and QUIT TO TITLE cut off) */
