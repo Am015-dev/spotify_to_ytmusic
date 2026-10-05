@@ -1,3 +1,20 @@
+# STANDING RULES FROM ALEX (read first, never ask about these again)
+- **Deploy is ALWAYS allowed.** When a build passes the gate, the coordinator deploys it to `alex/brave-carson-rbpmlk`
+  and republishes the beta artifact. Never ask Alex for permission to deploy.
+- **The gate is `tools/tPlay.js` (branch alex/od-qa) on the SPLIT build**: real touch/keyboard input, human-like steering,
+  no warps or force-clicks. It fails on any of these: hits > 1/min, stuck > 3%, any console error, Athens loading screens,
+  a humanoid > 2.2 m, more than 3 rings on screen while roaming, HUD over touch controls, controls dead after rotation.
+  The old tests (tBA/tBF/smoke) passed while the game was unplayable (2/10), so they are only sanity checks.
+- **Feature freeze.** Only fixes until tPlay passes and Alex scores the game 6/10 or higher. Never self-score fun.
+- **Cost (the 2026-10-04 run cost about $120 in 13 h, 99.8% of it context re-reads):**
+  - Every cloud session sets `model`: Sonnet (claude-sonnet-5-5) for build/fix/test/integrate; Opus only for hard design calls.
+  - Run one fix worker plus one integrator, not 5–7 in parallel.
+  - Use a fresh session per task and hand off before ~150k context.
+  - Workers wait for a test once (in the background), never in a sleep/grep polling loop.
+  - The coordinator does no scheduled check-ins unless something is running, and never runs list_sessions without a filter.
+- Read the skill `fun-game-design` (Phase 6: real-input testing; Phase 7: be terse, no inflated scores).
+- Keep `ALL_OPEN=true`, the credits "Made with ❤ by Alex", English UI, gas default on touch, and no model names in files or commits.
+
 # Mainhattan Overdrive: coordinator handoff (written 2026-10-04 ~15:30 UTC)
 
 You are the new **coordinator** for this game. The previous coordinator session grew to about 560k tokens of context and cost about 90% of the project spend, so stay lean.
