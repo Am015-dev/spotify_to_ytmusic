@@ -1,0 +1,5 @@
+# pART4 · cars on the road (no hover), nose up on throttle, steering front wheels, tyre shadows; boats in the water with bow rise + foam (module art4.js)
+exec(open('P.py').read())
+R("s.pitch=(s.pitch||0)+(clamp(-acc*.006,-.14,.14)+wP-(s.pitch||0))","s.pitch=(s.pitch||0)+(clamp(acc*.004,-.09,.09)+wP-(s.pitch||0))")
+R('window.__mho={',open('art4.js').read()+'\nwindow.__mho={')
+save()
