@@ -108,41 +108,99 @@ function items(list, px) {
   return w;
 }
 function basicItems(i) { const b = D.basic[i], l = []; for (const r of RESK) if (b.gain[r]) l.push([r, b.gain[r]]); if (b.draw) l.push(['card', b.draw]); if (b.pts) l.push(['point', b.pts]); return l; }
-// ---- layout: returns rects for every board item
+// ---- layout: one absolute rect for every item. #bd fills the whole play area (bar excluded).
+// Portrait: scores strip, 3 rows of places, the meadow, my city, my stock, my hand, the action row.
+// Wide (landscape / desktop): places + meadow on the left, a rail on the right with the same things stacked.
+const CARD_AR = 1.406;
+// how many cards of what size fit a strip of W x H (cards may overlap sideways; more rows only when the strip is tall)
+function fitStrip(n, W, H, baseW) {
+  n = Math.max(1, n);
+  for (let cw = Math.min(baseW, Math.floor(H / CARD_AR)); cw >= 30; cw -= 2) {
+    const ch = Math.round(cw * CARD_AR);
+    for (let rows = 1; rows <= 4; rows++) {
+      if (rows * ch + (rows - 1) * 2 > H) break;
+      const per = Math.ceil(n / rows);
+      let step = per > 1 ? (W - cw) / (per - 1) : 0;
+      if (step > cw + 4) step = cw + 4;
+      if (per === 1 || step >= cw * 0.42) return { cw, ch, rows, per, step };
+    }
+  }
+  const cw = 30, ch = 42, st = cw * 0.42, per = Math.max(1, Math.floor((W - cw) / st) + 1);
+  return { cw, ch, rows: Math.ceil(n / per), per, step: st };
+}
 function boardLayout(W, H) {
-  const nf = G.forest.length, g = 2, tall = W < H * 1.0 || (document.documentElement.classList.contains('ph-p') && H >= 270);
+  const wide = W >= H * 1.0 || (document.documentElement.classList.contains('ph-l'));
+  const tall = !wide, g = 2, pad = 4;
   const R = { W, H, tall, tiles: [], meadow: [], g };
   const tl = (kind, i, x, y, w, hh) => R.tiles.push({ kind, i, x, y, w, h: hh });
-  const extra = [['haven', 0], ['journey', 0], ['deck', 0], ['tree', 0]];
-  const rowB = []; for (let i = 0; i < nf; i++) rowB.push(['forest', i]); extra.forEach(e => rowB.push(e)); if (nf === 3) rowB.push(['disc', 0]);
+  const nf = G.forest.length;
+  const rowB = []; for (let i = 0; i < nf; i++) rowB.push(['forest', i]);
+  [['haven', 0], ['journey', 0], ['deck', 0], ['tree', 0]].forEach(e => rowB.push(e)); if (nf === 3) rowB.push(['disc', 0]);
   const evs = []; G.bev.forEach((e, i) => evs.push(['bev', i])); G.sev.forEach((e, i) => evs.push(['sev', i]));
+  const nCity = Math.max(1, G.players[Math.max(0, focusSeat())].city.length + visitList().length);
+  const nHand = Math.max(1, (viewSeat() >= 0 ? G.players[viewSeat()].hand.length : 5));
   if (tall) {
-    const gx = 6, tw = (W - 7 * 1) / 8; let tr = 46;
-    let cw = Math.min((W - 3 * gx) / 4, 130), avail = H - 3 * tr - 3 * g - 4;
-    let ch = Math.min(avail / 2 - 3, cw * 1.406); cw = ch / 1.406;
-    const left = H - (3 * tr + 3 * g + 2 * ch + 4 + 3); if (left > 0) tr += Math.min(10, left / 3);
-    let y = 0;
-    for (let i = 0; i < 8; i++) tl('basic', i, i * (tw + 1), y, tw, tr); y += tr + g;
-    rowB.forEach((e, i) => tl(e[0], e[1], i * (tw + 1), y, tw, tr)); y += tr + g;
-    evs.forEach((e, i) => tl(e[0], e[1], i * (tw + 1), y, tw, tr)); y += tr + g + 2;
-    const rest = H - y, tot = 2 * ch + 4; const y0 = y + Math.max(0, (rest - tot) / 2), x0 = (W - (4 * cw + 3 * gx)) / 2;
-    for (let s = 0; s < 8; s++) R.meadow.push({ i: s, x: x0 + (s % 4) * (cw + gx), y: y0 + Math.floor(s / 4) * (ch + 4), w: cw, h: ch });
+    const small = H < 520;
+    const chipH = small ? 32 : 36, actH = small ? 42 : 46, resH = small ? 28 : 32;
+    let tr = small ? 36 : 44, er = small ? 32 : 38, sh = small ? 58 : 70;
+    const gm = 6, cwMax = Math.min(120, (W - 2 * pad - 3 * gm) / 4), chMax = cwMax * CARD_AR;
+    const calc = () => {
+      const top = chipH + 7 + 2 * tr + er + 3 * 3 + 4;
+      const bottom = actH + resH + 2 * sh + 4 * g + pad;
+      return { top, bottom, avail: H - top - bottom };
+    };
+    let c = calc(), chAv = (c.avail - 4 - 4) / 2;
+    if (chAv > chMax) {
+      let spare = 2 * (chAv - chMax);
+      const dS = Math.min(28, spare * .3); sh += dS; spare -= 2 * dS;
+      const dT = Math.min(8, spare / 3); tr += dT; er += dT;
+      c = calc(); chAv = (c.avail - 4 - 4) / 2;
+    }
+    const ch = Math.max(40, Math.min(chMax, chAv)), cw = Math.min(cwMax, ch / CARD_AR), chh = cw * CARD_AR;
+    // places
+    const tg = 3, tw = (W - 2 * pad - 7 * tg) / 8; let y = 0;
+    R.chips = { x: pad, y: 3, w: W - 2 * pad, h: chipH }; y = chipH + 3 + 4;
+    for (let i = 0; i < 8; i++) tl('basic', i, pad + i * (tw + tg), y, tw, tr); y += tr + tg;
+    rowB.forEach((e, i) => tl(e[0], e[1], pad + i * (tw + tg), y, tw, tr)); y += tr + tg;
+    evs.forEach((e, i) => tl(e[0], e[1], pad + i * (tw + tg), y, tw, er)); y += er + tg + 2;
+    // bottom stack, laid from the bottom edge up so the hand and the buttons sit under the thumb
+    let yb = H - pad;
+    R.acts = { x: pad, y: yb - actH, w: W - 2 * pad, h: actH }; yb -= actH + g;
+    R.hand = { x: pad, y: yb - sh, w: W - 2 * pad, h: sh }; yb -= sh + g;
+    R.res = { x: pad, y: yb - resH, w: W - 2 * pad, h: resH }; yb -= resH + g;
+    R.city = { x: pad, y: yb - sh, w: W - 2 * pad, h: sh }; yb -= sh + g;
+    // meadow: two rows of cards centred in what is left
+    const mtop = y, mh = yb - mtop, tot = 2 * chh + 4, my0 = mtop + Math.max(0, (mh - tot) / 2), mgm = Math.min(gm, (W - 2 * pad - 4 * cw) / 3), mx = (W - (4 * cw + 3 * mgm)) / 2;
+    for (let s = 0; s < 8; s++) R.meadow.push({ i: s, x: mx + (s % 4) * (cw + mgm), y: my0 + Math.floor(s / 4) * (chh + 4), w: cw, h: chh });
+    R.strip = { hand: fitStrip(nHand, R.hand.w - 4, R.hand.h - 2, 66), city: fitStrip(nCity, R.city.w - 4, R.city.h - 2, 66) };
   } else {
-    const gp = Math.max(6, Math.round(W * .012)); const Lw = Math.round(W * .40), tw = (Lw - 3 * g) / 4;
+    const rail = Math.round(Math.max(236, Math.min(340, W * .32))), LW = W - rail - pad;
+    const chipH = 34, actH = 44, resH = 30;
+    const gp = Math.max(6, Math.round(LW * .012)), Lw = Math.round(LW * .40), tw = (Lw - 3 * g) / 4;
     const th = Math.min(tw * 1.3, (H - 3 * g - 8) / 4);
     for (let i = 0; i < 8; i++) tl('basic', i, (i % 4) * (tw + g), Math.floor(i / 4) * (th + g), tw, th);
     const y2 = 2 * (th + g) + 6;
     rowB.forEach((e, i) => tl(e[0], e[1], (i % 4) * (tw + g), y2 + Math.floor(i / 4) * (th + g), tw, th));
-    const x0 = Lw + gp * 2, Rw = W - x0; let cw = Math.min((Rw - 3 * g * 2) / 4, 170);
-    const evh = Math.max(44, Math.min(th * .9, 70));
-    let ch = cw * 1.406; const maxch = (H - 2 * evh - 4 * g - 10) / 2; if (ch > maxch) { ch = maxch; cw = ch / 1.406; }
+    const x0 = Lw + gp * 2, Rw = LW - x0; let cw = Math.min((Rw - 3 * g * 2) / 4, 170);
+    const evh = Math.max(40, Math.min(th * .9, 70));
+    let ch = cw * CARD_AR; const maxch = (H - 2 * evh - 4 * g - 10) / 2; if (ch > maxch) { ch = maxch; cw = ch / CARD_AR; }
     const gm = Math.min(g * 3, (Rw - 4 * cw) / 3);
     const mx = x0 + (Rw - (4 * cw + 3 * gm)) / 2;
     for (let s = 0; s < 8; s++) R.meadow.push({ i: s, x: mx + (s % 4) * (cw + gm), y: Math.floor(s / 4) * (ch + g * 2), w: cw, h: ch });
     const ey = 2 * ch + g * 4 + 8, etw = (Rw - 3 * g) / 4;
     evs.forEach((e, i) => tl(e[0], e[1], x0 + (i % 4) * (etw + g), ey + Math.floor(i / 4) * (evh + g), etw, evh));
+    let mxy = 0; R.tiles.forEach(t => mxy = Math.max(mxy, t.y + t.h)); R.meadow.forEach(t => mxy = Math.max(mxy, t.y + t.h));
+    const off = Math.max(0, Math.min(80, (H - mxy) / 2)); if (off > 1) { R.tiles.forEach(t => t.y += off); R.meadow.forEach(t => t.y += off); }
+    // the rail
+    const rx = LW + pad, rw = rail - pad - 2;
+    R.chips = { x: rx, y: 3, w: rw, h: chipH };
+    let yb = H - 2; R.acts = { x: rx, y: yb - actH, w: rw, h: actH }; yb -= actH + g;
+    const left = yb - (chipH + g + resH + g + g), hh = Math.max(60, Math.min(left * .56, 260)), hc = Math.max(60, left - hh);
+    R.res = { x: rx, y: chipH + g + 3, w: rw, h: resH };
+    R.city = { x: rx, y: chipH + g + resH + g + 3, w: rw, h: hc };
+    R.hand = { x: rx, y: R.city.y + hc + g, w: rw, h: yb - (R.city.y + hc + g) };
+    R.strip = { hand: fitStrip(nHand, R.hand.w - 4, R.hand.h - 2, 74), city: fitStrip(nCity, R.city.w - 4, R.city.h - 2, 74) };
   }
-  if (!tall) { let mx = 0; R.tiles.forEach(t => mx = Math.max(mx, t.y + t.h)); R.meadow.forEach(t => mx = Math.max(mx, t.y + t.h)); const off = Math.max(0, Math.min(80, (H - mx) / 2)); if (off > 1) { R.tiles.forEach(t => t.y += off); R.meadow.forEach(t => t.y += off); } }
   return R;
 }
 // who stands where
@@ -166,8 +224,9 @@ function wmoveKey(m) { return m.k + ':' + (m.k === 'dest' ? m.c : m.k === 'event
 function myMoves() {
   if (!G || G.phase === 'over') return [];
   const a = HB.actor(G), p = G.players[a];
-  if (!p || p.ai || a !== viewSeat() || G.q) return [];
-  return movesFor(a);
+  if (!p || p.ai || a !== viewSeat() || UI.cards.length) return [];
+  if (UI.mmc && UI.mmc.k === G.logN + ':' + a) return UI.mmc.v;
+  const v = movesFor(a); UI.mmc = { k: G.logN + ':' + a, v }; return v;
 }
 function tileInfo(kind, i) {
   switch (kind) {
@@ -196,409 +255,408 @@ function tileFace(t, big) {
   if (big) { const nm = t.kind === 'deck' ? 'Draw pile' : t.kind === 'disc' ? 'Discards' : t.kind === 'tree' ? 'Seasons' : (tileInfo(t.kind, t.i).name || ''); f.appendChild(h('div.nm', nm)); }
   return f;
 }
+// ---- targets: every tappable thing on the board has a key; a move belongs to exactly one key
+function tgOf(m) {
+  if (!m) return '';
+  if (m.type === 'worker') {
+    if (m.k === 'basic' || m.k === 'forest') return 'w:' + m.k + ':' + m.i;
+    if (m.k === 'haven') return 'w:haven';
+    if (m.k === 'journey') return 'w:journey';
+    if (m.k === 'event') return 'w:' + (m.e === 'b' ? 'bev' : 'sev') + ':' + m.i;
+    if (m.k === 'dest') return 'd:' + m.c;
+  }
+  if (m.type === 'play') return 'p:' + m.from + ':' + m.card;
+  if (m.type === 'prepare') return 'prep';
+  if (m.type === 'pass') return 'pass';
+  if (m.type === 'choose') return 'q:' + m.i;
+  return '';
+}
+function tileTg(kind, i) { return kind === 'basic' || kind === 'forest' ? 'w:' + kind + ':' + i : kind === 'haven' ? 'w:haven' : kind === 'journey' ? 'w:journey' : kind === 'bev' || kind === 'sev' ? 'w:' + kind + ':' + i : ''; }
+// open destinations in rival cities that I may visit
+function visitList() {
+  const v = viewSeat(); if (v < 0) return [];
+  return myMoves().filter(m => m.type === 'worker' && m.k === 'dest' && m.o !== v).map(m => ({ id: m.c, o: m.o }));
+}
+function frameRect(el) {
+  const b = $('#board'); if (!el || !b) return null;
+  const r = el.getBoundingClientRect(), br = b.getBoundingClientRect();
+  return { x: r.left - br.left, y: r.top - br.top, w: r.width, h: r.height };
+}
+function wordsCap(s, n) { const w = String(s || '').replace(/\s*\([^)]*\)/g, '').replace(/[:?].*$/, '').trim().split(/\s+/); return w.slice(0, n || 8).join(' '); }
+function posStripCard(box, fit, n, i) {
+  const rowsUsed = Math.ceil(n / fit.per), row = Math.floor(i / fit.per), inRow = Math.min(fit.per, n - row * fit.per);
+  const rowW = fit.cw + fit.step * (inRow - 1), x = (box.w - 4 - rowW) / 2 + 2 + (i % fit.per) * fit.step;
+  const totH = rowsUsed * fit.ch + (rowsUsed - 1) * 2, y = Math.max(1, (box.h - totH) / 2) + row * (fit.ch + 2);
+  return { x, y };
+}
+function placeBox(e, b) { e.style.cssText += `;left:${b.x}px;top:${b.y}px;width:${b.w}px;height:${b.h}px`; return e; }
 function renderBoard() {
   const host = $('#board'), bd = $('#bd'); if (!host || !G) return;
   const W = host.clientWidth || 390, H = host.clientHeight || 470;
   const R = boardLayout(W, H); UI.lay = R;
   bd.innerHTML = ''; bd.style.width = W + 'px'; bd.style.height = H + 'px';
   bd.className = R.tall ? 'tall' : 'wide';
-  const mm = myMoves(), ok = new Set(mm.filter(m => m.type === 'worker').map(wmoveKey)), mine = mm.length > 0;
-  const rec = UI.rec && UI.rec.m;
+  UI.tgEls = {}; UI.cr = {}; UI.tiles = {};
+  const mm = myMoves(), mine = mm.length > 0, v = viewSeat();
+  const okw = new Set(mm.filter(m => m.type === 'worker').map(tgOf));
+  const okp = new Set(mm.filter(m => m.type === 'play').map(tgOf));
+  const qm = G.q && mine ? mm.filter(m => m.type === 'choose') : [];
+  const qCard = new Map(); qm.forEach(m => { if (m.card !== undefined && !qCard.has(m.card)) qCard.set(m.card, m.i); });
+  const qShown = new Set(), qLoc = new Map();
+  if (qm.length) G.q.opts.forEach((o, i) => { let loc = o.d && o.d.loc; if (!loc && o.d && o.d.j != null && o.d.seat != null && G.players[o.d.seat] && (o.h === 'rangerTo' || o.h === 'recallGo')) loc = G.players[o.d.seat].dep[o.d.j]; const tg = loc ? tgOf(Object.assign({ type: 'worker' }, loc)) : ''; if (tg && !qLoc.has(tg)) qLoc.set(tg, i); });
   const big = !R.tall && R.tiles.some(t => t.kind === 'basic' && t.w >= 84 && t.h >= 70);
   bd.classList.toggle('big', big);
+  if (UI.sel && (UI.sel.logN !== G.logN || !UI.sel.ms.every(m => mm.some(x => sameM(x, m))))) UI.sel = null;
+  const regTg = (tg, e) => { if (tg) { e.setAttribute('data-t', tg); e.setAttribute('data-a', 't'); UI.tgEls[tg] = e; } };
+  // ---- places
   for (const t of R.tiles) {
-    const info = tileInfo(t.kind, t.i);
-    const e = h('button.tile.t-' + t.kind, { 'data-a': 'tile', 'data-k': t.kind, 'data-i': t.i, type: 'button', 'aria-label': info.name || (t.kind === 'deck' ? 'Draw pile' : t.kind === 'disc' ? 'Discard pile' : 'Seasons') });
+    const info = tileInfo(t.kind, t.i), tg = tileTg(t.kind, t.i);
+    const e = h('button.tile.t-' + t.kind, { 'data-zoom': 'tile:' + t.kind + ':' + t.i, 'data-k': t.kind, 'data-i': t.i, type: 'button', 'aria-label': info.name || (t.kind === 'deck' ? 'Draw pile' : t.kind === 'disc' ? 'Discard pile' : 'Seasons') });
     e.style.cssText = `left:${t.x}px;top:${t.y}px;width:${t.w}px;height:${t.h}px`;
     e.appendChild(tileFace(t, big));
-    let legal = false;
-    if (t.kind === 'basic' || t.kind === 'forest') legal = ok.has(t.kind + ':' + t.i);
-    else if (t.kind === 'haven') legal = ok.has('haven:');
-    else if (t.kind === 'journey') legal = [0, 1, 2, 3].some(i => ok.has('journey:' + i));
-    else if (t.kind === 'bev') legal = ok.has('event:b' + t.i);
-    else if (t.kind === 'sev') legal = ok.has('event:s' + t.i);
-    if (mine && legal) e.classList.add('ok'); else if (mine && !/deck|disc|tree/.test(t.kind)) e.classList.add('no');
-    if (rec && rec.type === 'worker' && legal && (rec.k === t.kind || (rec.k === 'event' && ((rec.e === 'b' && t.kind === 'bev' && rec.i === t.i) || (rec.e === 's' && t.kind === 'sev' && rec.i === t.i)))) && (rec.k === 'event' || rec.k === 'haven' || rec.k === 'journey' || rec.i === t.i)) e.classList.add('rec');
-    // workers
+    UI.tiles[t.kind + ':' + t.i] = { x: t.x, y: t.y, w: t.w, h: t.h };
+    const legal = tg && okw.has(tg);
+    if (legal) { e.classList.add('glow'); regTg(tg, e); }
+    else if (tg && qLoc.has(tg)) { e.classList.add('glow'); regTg('q:' + qLoc.get(tg), e); qShown.add(qLoc.get(tg)); }
+    else if (tg) { e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'x:' + tg); if (mine) e.classList.add('no'); }
+    if (UI.sel && UI.sel.tg === tg) e.classList.add('sel');
     if (t.kind === 'bev' || t.kind === 'sev') {
       const ev = (t.kind === 'bev' ? G.bev : G.sev)[t.i];
-      if (ev.o !== -1 && ev.o != null) { e.classList.add('done'); e.appendChild(h('div.pw', pawn(ev.o, 16))); }
+      if (ev.o !== -1 && ev.o != null) { e.classList.add('done'); e.appendChild(h('div.pw', pawn(ev.o, 18))); }
     } else if (/basic|forest|haven|journey/.test(t.kind)) {
       const ws = workersAt(t.kind, t.i);
-      if (ws.length) { const pw = h('div.pw'); ws.slice(0, 4).forEach(s => pw.appendChild(pawn(s, 16))); e.appendChild(pw); if (!info.shared && t.kind !== 'journey' && t.kind !== 'haven') e.classList.add('taken'); }
+      if (ws.length) { const pw = h('div.pw'); ws.slice(0, 4).forEach(s => pw.appendChild(pawn(s, t.h < 40 ? 18 : 22))); e.appendChild(pw); if (!info.shared && t.kind !== 'journey' && t.kind !== 'haven') e.classList.add('taken'); }
     }
     bd.appendChild(e);
   }
-  const mset = new Set(mm.filter(m => m.type === 'play' && m.from === 'meadow').map(m => m.card));
+  // ---- meadow
   const blocked = G.grim ? G.grim.mb : [];
   for (const m of R.meadow) {
-    const id = G.meadow[m.i];
-    const e = h('button.mc', { 'data-a': 'mcard', 'data-i': m.i, type: 'button', 'aria-label': id >= 0 ? 'Meadow card: ' + cname(id) : 'Empty meadow space' });
+    const id = G.meadow[m.i], e = h('button.mc', { type: 'button', 'aria-label': id >= 0 ? 'Meadow card: ' + cname(id) : 'Empty meadow space' });
     e.style.cssText = `left:${m.x}px;top:${m.y}px;width:${m.w}px;height:${m.h}px`;
-    if (id >= 0) { e.appendChild(cardEl(id, Math.round(m.w))); if (mine && mset.has(id)) e.classList.add('ok'); if (rec && rec.type === 'play' && rec.from === 'meadow' && rec.card === id) e.classList.add('rec'); }
-    else e.classList.add('empty');
+    if (id >= 0) {
+      e.setAttribute('data-zoom', 'card:' + id); e.setAttribute('data-id', id);
+      e.appendChild(cardEl(id, Math.round(m.w)));
+      UI.cr['m' + id] = { x: m.x, y: m.y, w: m.w, h: m.h };
+      const ptg = 'p:meadow:' + id;
+      if (okp.has(ptg)) { e.classList.add('glow'); regTg(ptg, e); }
+      else if (qCard.has(id)) { e.classList.add('glow'); regTg('q:' + qCard.get(id), e); qShown.add(qCard.get(id)); }
+      else { e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'x:m' + id); }
+      if (UI.sel && UI.sel.tg === ptg) e.classList.add('sel');
+    } else e.classList.add('empty');
     if (blocked.indexOf(m.i) >= 0) { e.classList.add('blocked'); e.appendChild(h('span.lock', '⛔')); }
     bd.appendChild(e);
   }
+  // ---- scores strip (tap = look at that player's city)
+  { const c = placeBox(h('div.chips'), R.chips), n = G.np + (G.grim ? 1 : 0); c.setAttribute('data-n', n);
+    for (let s = 0; s < G.np; s++) c.appendChild(chipEl(s, n));
+    if (G.grim) c.appendChild(chipEl('G', n));
+    bd.appendChild(c); }
+  // ---- my city (and rival open destinations I may visit)
+  const fs = focusSeat(), me = G.players[fs], cityBox = R.city, vis = visitList();
+  { const strip = placeBox(h('div.strip.city'), cityBox); bd.appendChild(strip);
+    const list = me.city.map(e => ({ id: e.id, e, own: true })).concat(vis.map(x => ({ id: x.id, o: x.o })));
+    const fit = R.strip.city, n = list.length;
+    strip.appendChild(h('span.scount', (me.city.length) + '/15'));
+    if (!n) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.haven }));
+    list.forEach((it, i) => {
+      const p = posStripCard(cityBox, fit, n, i), tg = 'd:' + it.id;
+      const b = h('button.sc', { 'data-zoom': 'card:' + it.id, 'data-id': it.id, type: 'button', 'aria-label': cname(it.id) }, cardEl(it.id, fit.cw, { entry: it.e }));
+      if (it.o != null) b.appendChild(h('span.vb', pawn(it.o, 16)));
+      b.style.cssText = `left:${cityBox.x + p.x}px;top:${cityBox.y + p.y}px;width:${fit.cw}px;height:${fit.ch}px;z-index:${i + 2}`;
+      UI.cr['c' + it.id] = { x: cityBox.x + p.x, y: cityBox.y + p.y, w: fit.cw, h: fit.ch };
+      if (okw.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
+      else if (qLoc.has(tg)) { b.classList.add('glow'); regTg('q:' + qLoc.get(tg), b); qShown.add(qLoc.get(tg)); }
+      else if (qCard.has(it.id)) { b.classList.add('glow'); regTg('q:' + qCard.get(it.id), b); qShown.add(qCard.get(it.id)); }
+      else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:c' + it.id); }
+      bd.appendChild(b);
+    }); }
+  // ---- my stock
+  { const r = placeBox(h('div.resrow'), R.res), show = v >= 0 || watching();
+    const rp = R.res.w < 380 ? 19 : 22;
+    for (const k of RESK) r.appendChild(h('span.rs', { 'data-res': k }, ic(k, rp), h('b', show ? me.res[k] : '?')));
+    r.appendChild(h('span.rs.pt', { 'data-res': 'point' }, ic('point', rp), h('b', me.pts)));
+    r.appendChild(h('span.rs.wk', { 'data-res': 'worker' }, pawn(fs, rp - 2), h('b', availW(me) + '/' + me.workers)));
+    bd.appendChild(r); }
+  // ---- my hand
+  { const handBox = R.hand, strip = placeBox(h('div.strip.hand'), handBox); bd.appendChild(strip);
+    const hand = v >= 0 ? G.players[v].hand : [], fit = R.strip.hand, n = hand.length;
+    strip.appendChild(h('span.scount', v >= 0 ? n + '/8' : ''));
+    if (v < 0) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
+    else if (!n) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.card }));
+    hand.forEach((id, i) => {
+      const p = posStripCard(handBox, fit, n, i), tg = 'p:hand:' + id;
+      const b = h('button.sc', { 'data-zoom': 'card:' + id, 'data-id': id, type: 'button', 'aria-label': cname(id) }, cardEl(id, fit.cw));
+      b.style.cssText = `left:${handBox.x + p.x}px;top:${handBox.y + p.y}px;width:${fit.cw}px;height:${fit.ch}px;z-index:${i + 2}`;
+      UI.cr['h' + id] = { x: handBox.x + p.x, y: handBox.y + p.y, w: fit.cw, h: fit.ch };
+      if (okp.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
+      else if (qCard.has(id)) { b.classList.add('glow'); regTg('q:' + qCard.get(id), b); qShown.add(qCard.get(id)); }
+      else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:h' + id); }
+      if (UI.sel && UI.sel.tg === tg) b.classList.add('sel');
+      bd.appendChild(b);
+    }); }
+  // ---- action row / tray
+  renderActs(mm, qm, qShown);
+  if (UI.sel) bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow'));
+  renderPrompt();
+  renderBar();
+  placeFinger();
 }
-// ===================== part 3: the dock (chips, resources, city and hand strips, prompt) =====================
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) return v; if (UI.focus != null && UI.focus < G.np) return UI.focus; return Math.max(0, G.phase === 'over' ? 0 : Math.min(G.np - 1, G.cur)); }
-function stripW() { return isPh() ? 46 : 58; }
+function chipEl(s, n) {
+  const grim = s === 'G', p = grim ? null : G.players[s];
+  const pts = grim ? HB.grimScore(G).total : score(s).total;
+  const cards = grim ? G.grim.city.length : HB.cityCount(G, s);
+  const turn = G.phase !== 'over' && !grim && HB.actor(G) === s;
+  const e = h('button.chip' + (turn ? '.turn' : '') + (s === viewSeat() ? '.me' : ''), { 'data-a': 'chip', 'data-seat': s, type: 'button', 'aria-label': pname(s) + ': ' + pts + ' points, ' + cards + ' cards in city' + (grim ? '' : ', ' + availW(p) + ' workers free') });
+  e.style.borderColor = pcolor(s).c;
+  const nm = pname(s), short = n >= 4 ? '' : n === 3 ? nm.slice(0, 5) : nm.slice(0, 8);
+  e.appendChild(h('span.cn', pawn(s, 18), short ? h('b', short) : null, p && p.passed ? h('i', 'out') : null, p ? h('span.cs', HBKit.season(SEAS[p.season], 16)) : null));
+  e.appendChild(h('span.cl', h('span.cp', '★' + pts), h('span', '▢' + cards), (p && n <= 3) ? h('span', '⚑' + availW(p)) : null));
+  return e;
+}
+// ---- action row: Prepare / Pass / Undo, or (when something needs choosing) the choices as chips
+function trayChip(m, i, tg) {
+  let inner;
+  if (m.type === 'play') {
+    const c = cdef(m.card);
+    if (m.how === 'pay') inner = [costEl(c.cost, 20)];
+    else if (m.how === 'occupy') inner = [h('b', 'free'), cardEl(m.via, 26)];
+    else inner = [h('b', ({ innkeeper: 'Inn −3', crane: 'Crane −3', dungeon: 'Cells −3', judge: 'Swap' })[m.how] || 'Play'), m.via != null ? cardEl(m.via, 26) : null];
+  } else if (m.type === 'worker' && m.k === 'journey') inner = [ic('road', 22), h('b', D.journey[m.i].points)];
+  else if (m.type === 'choose') {
+    if (m.card !== undefined) inner = [cardEl(m.card, 44)];
+    else if (m.res !== undefined) inner = [ic(m.res, 26)];
+    else inner = [h('b', wordsCap(m.label, 6) || 'OK')];
+  } else inner = [h('b', wordsCap(m.label, 5))];
+  const b = h('button.tchip.glow' + (m.type === 'choose' && m.card !== undefined ? '.tcard' : ''), { 'data-a': 'tm', 'data-mi': i, type: 'button', title: m.label || '' }, inner);
+  if (m.label) b.setAttribute('aria-label', m.label);
+  UI.tgEls[tg] = b; return b;
+}
+function renderActs(mm, qm, qShown) {
+  const R = UI.lay; if (!R || !G) return;
+  const old = $('#acts'); if (old) old.remove();
+  const box = R.acts, a = placeBox(h('div#acts'), box); $('#bd').appendChild(a);
+  if (G.phase === 'over') return;
+  mm = mm || myMoves(); qm = qm || []; qShown = qShown || new Set();
+  const act = HB.actor(G), p = G.players[act], mine = mm.length > 0;
+  // choices (a question, or a card / place with several ways to use it)
+  let chips = [];
+  UI.tm2 = [];
+  if (UI.sel) UI.sel.ms.forEach(m => { const i = UI.tm2.push(m) - 1; chips.push(trayChip(m, i, 'o:' + i)); });
+  else if (qm.length) qm.forEach(m => { if (!qShown.has(m.i)) { const i = UI.tm2.push(m) - 1; chips.push(trayChip(m, i, 'q:' + m.i)); } });
+  if (chips.length) {
+    a.classList.add('tray');
+    const nCards = chips.filter(c => c.classList.contains('tcard')).length, hasCard = nCards > 0, many = chips.length > 3 && !hasCard && qShown.size === 0;
+    if (hasCard || many) {
+      let rows;
+      if (hasCard) { const per = Math.max(1, Math.floor((box.w - 12) / 52)); rows = Math.min(3, Math.ceil(chips.length / per)); } else rows = Math.min(3, Math.ceil(chips.length * 92 / Math.max(120, box.w)));
+      const hh = hasCard ? rows * 66 + 10 : Math.max(box.h, rows * 50 + 6);
+      a.style.top = (box.y + box.h - hh) + 'px'; a.style.height = hh + 'px'; a.classList.add('tall', 'wrap');
+    }
+    chips.forEach(c => a.appendChild(c));
+    if (UI.sel) a.appendChild(h('button.tchip.tx', { 'data-a': 'selx', type: 'button', 'aria-label': 'Cancel' }, '×'));
+    return;
+  }
+  if (!mine && !(GX.undo.can())) { return; }
+  const prep = mm.find(m => m.type === 'prepare'), pass = mm.find(m => m.type === 'pass');
+  if (GX.undo.can() && !(NET.on)) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶'));
+  if (mine) {
+    if (prep) { const e = h('button.btn.prep.glow', { type: 'button', 'aria-label': 'Prepare for ' + SEASN[p.season + 1] }, HBKit.season(SEAS[p.season + 1], 22), h('span', 'Prepare')); UI.tgEls.prep = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'prep'); a.appendChild(e); }
+    else a.appendChild(h('button.btn.prep.dis', { type: 'button', disabled: true, 'aria-label': 'Prepare (workers still out)' }, HBKit.season(SEAS[Math.min(3, p.season + 1)], 22), h('span', 'Prepare')));
+    if (pass) { const armed = UI.passArm && Date.now() - UI.passArm < 2600; const e = h('button.btn.pass' + (armed ? '.armed' : ''), { type: 'button' }, armed ? 'Sure?' : 'Pass'); UI.tgEls.pass = e; e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'pass'); a.appendChild(e); }
+  }
+}
+function renderPrompt() {
+  const pr = $('#prompt'); if (!pr || !G) return;
+  pr.textContent = promptText();
+  pr.classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai && (!NET.on || HB.actor(G) === viewSeat())));
+}
+function renderBar() { }
+function renderDock() { renderPrompt(); }
+function placePrompt() { }
 function promptText() {
   if (!G) return '';
   if (G.phase === 'over') return 'Game over.';
   const a = HB.actor(G), p = G.players[a];
-  if (UI.cards.length) return 'Read, then Continue.';
+  if (UI.cards.length) return '';
   if (NET.on && !p.ai && a !== viewSeat()) return p.name + ' is deciding…';
   if (hotSeat() && UI.holder !== a && !p.ai) return 'Pass the device to ' + p.name + '.';
-  if (p.ai) { const l = G.log.length ? G.log[G.log.length - 1].t : ''; return p.name + ' is playing… ' + (UI.lastAi || ''); }
-  if (G.q) return G.q.title;
+  if (p.ai) return p.name + ' is playing…';
+  if (G.q) return qShort(G.q);
   const n = availW(p);
-  const pre = NET.on ? 'Your turn. ' : hotSeat() || humans().length > 1 ? p.name + ', ' : 'Your turn. ';
-  return pre + (n > 0 ? 'Tap a place (' + n + ' free).' : 'Play a card, Prepare or Pass.');
+  const pre = hotSeat() || humans().length > 1 ? p.name + ': ' : 'Your turn: ';
+  return pre + (n > 0 ? 'tap a glowing spot.' : 'play a card, Prepare or Pass.');
 }
-function chipEl(s) {
-  const grim = s === 'G', p = grim ? null : G.players[s];
-  const pts = grim ? HB.grimScore(G).total : score(s).total;
-  const cards = grim ? G.grim.city.length : HB.cityCount(G, s);
-  const wk = grim ? '—' : availW(p) + '/' + p.workers;
-  const turn = G.phase !== 'over' && !grim && HB.actor(G) === s;
-  const e = h('button.chip' + (turn ? '.turn' : '') + (s === viewSeat() ? '.me' : ''), { 'data-a': 'chip', 'data-seat': s, type: 'button', 'aria-label': pname(s) + ': ' + pts + ' points, ' + cards + ' cards in city' + (grim ? '' : ', ' + wk + ' workers free') });
-  e.style.borderColor = pcolor(s).c;
-  e.appendChild(h('span.cn', pawn(s, 15), h('b', pname(s)), p ? h('span.cs', HBKit.season(SEAS[p.season], 16)) : null, p && p.passed ? h('i', 'out') : null));
-  e.appendChild(h('span.cl', h('span', '★' + pts), h('span', '▢' + cards), p ? h('span', '⚑' + wk) : h('span', 'solo')));
-  return e;
+// the short line for a pending decision (8 words at most; the long wording stays in the log)
+function qShort(q) {
+  const m = ({ discard: 'Tap cards to discard, then Done.', resource: 'Pick a resource.', meadow: 'Tap a meadow card.', production: 'Tap a card to activate next.', ruins: 'Tap a building to raze.', recipient: 'Pick a rival.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Tap the effect to resolve first.', queen: 'Tap a card to play free.', inn: 'Tap a meadow card to play.', university: 'Tap a card to disband.', cemetery: 'Tap a card, or choose.', copy: 'Pick a place to copy.', prisoner: 'Tap a critter to lock up.', clear: 'Tap a meadow card to clear.', recall: 'Tap a worker to recall.', ranger: 'Pick a worker or a place.', tuck: 'Tap a critter to tuck.', cityDisc: 'Tap a city card to discard.', banish: 'Tap a card to remove.', teach: 'Tap the card to keep.', pigeon: 'Play a revealed card?', waive: 'Choose what to cut.', judge: 'Choose which resource to swap.', spend: 'Spend for point tokens?', trade: 'Trade resources?', bazaar: 'Play one for 1 less?', scroll: 'Keep it or tuck it?', clock: 'Repeat a place?', mole: 'Pick a card to mimic.', chip: 'Pick a card to re-run.', stock: 'Pick a stack to add.' })[q.kind];
+  return m || wordsCap(q.title, 8);
 }
-function renderChips() {
-  const c = $('#chips'); c.innerHTML = '';
-  for (let s = 0; s < G.np; s++) c.appendChild(chipEl(s));
-  if (G.grim) c.appendChild(chipEl('G'));
+// ===================== part 3: doing things on the board (tap, long-press zoom, flying pieces, floating gains, ghost finger) =====================
+// ---- shake: "not here"
+function shake(el) { if (!el) return; el.classList.remove('shk'); void el.offsetWidth; el.classList.add('shk'); setTimeout(() => el.classList.remove('shk'), 420); snd('error', { vol: .3 }); }
+// ---- tap on a board target
+function onTarget(tg, el) {
+  if (!G || UI.cards.length) return;
+  if (/^x:/.test(tg) || UI.animBusy) { UI.sel = null; shake(el); return; }
+  const mm = myMoves();
+  if (tg === 'pass') {
+    const m = mm.find(x => x.type === 'pass'); if (!m) return;
+    if (UI.passArm && Date.now() - UI.passArm < 2600) { UI.passArm = 0; actFrom(m, el); return; }
+    UI.passArm = Date.now(); renderActs(); setTimeout(() => { if (G && !UI.cards.length) renderActs(); }, 2700); return;
+  }
+  UI.passArm = 0;
+  const ms = mm.filter(m => tgOf(m) === tg);
+  if (!ms.length) { shake(el); return; }
+  if (ms.length === 1) { UI.sel = null; actFrom(ms[0], el); return; }
+  UI.sel = { tg, ms, logN: G.logN }; snd('click', { vol: .5 }); render();
 }
-function renderRes() {
-  const r = $('#res'); r.innerHTML = ''; const s = focusSeat(), p = G.players[s];
-  const show = viewSeat() >= 0 || watching();
-  for (const k of RESK) r.appendChild(h('span.rs', { title: k }, ic(k, 20), h('b', show ? p.res[k] : '?')));
-  r.appendChild(h('span.rs.pt', ic('point', 20), h('b', p.pts)));
-  const wr = h('span.rs.wk', { title: 'free workers' }, pawn(s, 18), h('b', availW(p) + '/' + p.workers));
-  r.appendChild(wr);
+function actFrom(m, el) {
+  UI.fingerSeen = true; UI.fxSrc = el ? frameRect(el) : null;
+  act(m);
 }
-function renderActs() {
-  const a = $('#acts'); a.innerHTML = '';
-  if (!G || G.phase === 'over') return;
-  const act = HB.actor(G), p = G.players[act], mine = !p.ai && act === viewSeat() && !G.q && !UI.cards.length;
-  const ms = mine ? movesFor(act) : [];
-  const prep = ms.find(m => m.type === 'prepare'), pass = ms.find(m => m.type === 'pass');
-  const rec = UI.rec && UI.rec.m;
-  a.appendChild(h('button.btn' + (prep ? '' : '.dis') + (rec && rec.type === 'prepare' ? '.rec' : ''), { 'data-a': 'prep', type: 'button', disabled: prep ? null : true }, prep ? 'Prepare: ' + SEASN[p.season + 1] : (mine && p.season >= 3 ? 'Last season' : 'Prepare')));
-  a.appendChild(h('button.btn' + (pass ? '' : '.dis') + (rec && rec.type === 'pass' ? '.rec' : ''), { 'data-a': 'pass', type: 'button', disabled: pass ? null : true }, 'Pass'));
-  a.appendChild(h('button.btn.alt' + (mine ? '' : '.dis'), { 'data-a': 'hint', type: 'button', disabled: mine ? null : true }, 'Hint'));
-  if (GX.undo.can() && !p.ai && act === viewSeat()) a.appendChild(h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶ Undo'));
+// ---- long-press zoom (card or place details; nothing else explains itself in text)
+function openZoom(spec) {
+  const z = $('#zoom'); if (!z || !G) return;
+  const [kind, a, b] = String(spec).split(':'); z.innerHTML = '';
+  const box = h('div.zbox');
+  if (kind === 'card') {
+    const id = +a, c = cdef(id), w = Math.min(190, Math.round(Math.min(innerWidth, innerHeight) * .46));
+    box.appendChild(cardEl(id, w));
+    box.appendChild(h('div.zinfo', h('b', c.name), h('div.zcost', costEl(c.cost, 20), h('b', ' \u00B7 ' + c.pts + ' pt')), h('p', c.text), h('p.sm', TYPEN[c.type] + (c.unique ? ' \u00B7 unique' : ''))));
+  } else if (kind === 'tile') {
+    const k = a, i = +b, info = tileInfo(k, i);
+    if (/deck|disc|tree/.test(k)) {
+      const t = h('div.ztile.tile.t-' + k, tileFace({ kind: k, i }, true)); box.appendChild(t);
+      box.appendChild(h('div.zinfo', k === 'deck' ? [h('b', 'Draw pile'), h('p', G.deck.length + ' cards')] : k === 'disc' ? [h('b', 'Discards'), h('p', G.discard.length + ' cards')] : [h('b', 'Seasons'), h('p', 'Prepare to move on.')]));
+    } else {
+      const t = h('div.ztile.tile.t-' + k, tileFace({ kind: k, i }, true)); box.appendChild(t);
+      box.appendChild(h('div.zinfo', h('b', info.name || ''), h('p', (info.text || '').replace(/ Shared\.$/, '')), h('p.sm', info.shared ? 'Any number of workers.' : 'One worker.')));
+    }
+  }
+  z.appendChild(box); z.hidden = false; UI.zoomAt = Date.now();
 }
-function renderStrips() {
-  const s = focusSeat(), p = G.players[s], w = stripW();
-  const cr = $('#cityRow'); cr.innerHTML = '';
-  const mm = myMoves(), cityOk = new Set(mm.filter(m => m.type === 'worker' && m.k === 'dest' && m.o === s).map(m => m.c));
-  p.city.forEach(e => { const b = h('button.sc', { 'data-a': 'ccard', 'data-seat': s, 'data-id': e.id, type: 'button', 'aria-label': cname(e.id) }, cardEl(e.id, w, { entry: e })); if (cityOk.has(e.id)) b.classList.add('ok'); const rec = UI.rec && UI.rec.m; if (rec && rec.type === 'worker' && rec.k === 'dest' && rec.c === e.id) b.classList.add('rec'); cr.appendChild(b); });
-  if (!p.city.length) cr.appendChild(h('span.empty', 'No cards in the city yet.'));
-  $('#cityLab').textContent = (s === viewSeat() ? 'City' : p.name) + ' ' + HB.cityCount(G, s) + '/15';
-  const hr = $('#handRow'); hr.innerHTML = ''; const v = viewSeat();
-  const hand = v >= 0 ? G.players[v].hand : [];
-  const pset = new Set(mm.filter(m => m.type === 'play' && m.from === 'hand').map(m => m.card));
-  const rec = UI.rec && UI.rec.m;
-  if (v >= 0) {
-    hr.setAttribute('data-owner', v);
-    hand.forEach(id => { const b = h('button.sc', { 'data-a': 'hcard', 'data-id': id, 'data-owner': v, 'data-up': '1', type: 'button', 'aria-label': cname(id) }, cardEl(id, w)); if (pset.has(id)) b.classList.add('ok'); if (rec && rec.type === 'play' && rec.from === 'hand' && rec.card === id) b.classList.add('rec'); hr.appendChild(b); });
-    if (!hand.length) hr.appendChild(h('span.empty', 'Your hand is empty.'));
-    $('#handLab').textContent = 'Hand ' + hand.length + '/8';
-  } else {
-    hr.removeAttribute('data-owner');
-    hr.appendChild(h('span.empty', watching() ? 'Watching the computers play.' : NET.on ? 'You are watching this game.' : 'Hand hidden until the device is passed.'));
-    $('#handLab').textContent = 'Hand';
+function closeZoom() { const z = $('#zoom'); if (z && !z.hidden) { z.hidden = true; z.innerHTML = ''; } }
+function closePop() { UI.pop = null; UI.sel = null; closeZoom(); }
+// ---- flying and floating
+function fxLayer() { return $('#fx'); }
+function fxClear() { const f = fxLayer(); if (f) f.innerHTML = ''; UI.animBusy = false; UI.animTok = (UI.animTok || 0) + 1; }
+function animate(el, frames, opt) { try { if (el.animate) return el.animate(frames, opt); } catch (e) { } return null; }
+function ctr(r) { return { x: r.x + r.w / 2, y: r.y + r.h / 2 }; }
+// a piece flies from one rect to another, then calls done
+function fxFly(node, from, to, ms, done) {
+  const L = fxLayer(); if (!L || !ANIM || !from || !to) { if (done) done(); return; }
+  const a = ctr(from), b = ctr(to); node.classList.add('fxfly'); L.appendChild(node);
+  const f = [{ transform: `translate(${a.x}px,${a.y}px) translate(-50%,-50%) scale(.9)` }, { transform: `translate(${(a.x + b.x) / 2}px,${Math.min(a.y, b.y) - 24}px) translate(-50%,-50%) scale(1.25)`, offset: .5 }, { transform: `translate(${b.x}px,${b.y}px) translate(-50%,-50%) scale(1)` }];
+  const an = animate(node, f, { duration: ms, easing: 'ease-in-out', fill: 'forwards' });
+  let fin = false; const end = () => { if (fin) return; fin = true; node.remove(); if (done) done(); };
+  if (an) { an.onfinish = end; an.oncancel = end; setTimeout(end, ms + 250); } else end();
+}
+// a number and an icon pop up where something was earned, then fly to the place that holds it
+function fxFloat(from, kind, txt, to, o) {
+  o = o || {}; const L = fxLayer(); if (!L || !ANIM || !from) return;
+  const e = h('div.fxp' + (o.neg ? '.neg' : ''), kind ? ic(kind, 22) : null, h('b', txt)); L.appendChild(e);
+  const a = ctr(from), jx = (o.slot || 0) * 22 - (o.n || 1) * 11 + 11, sx = a.x + jx, b = to ? ctr(to) : { x: sx, y: a.y - 70 };
+  const up = o.neg ? 22 : -26;
+  const f = [{ transform: `translate(${sx}px,${a.y}px) translate(-50%,-50%) scale(.5)`, opacity: 0 },
+    { transform: `translate(${sx}px,${a.y + up}px) translate(-50%,-50%) scale(1.3)`, opacity: 1, offset: .25 },
+    { transform: `translate(${sx}px,${a.y + up}px) translate(-50%,-50%) scale(1.2)`, opacity: 1, offset: .5 },
+    { transform: `translate(${o.neg ? sx : b.x}px,${o.neg ? a.y + up + 24 : b.y}px) translate(-50%,-50%) scale(${o.neg ? 1 : .7})`, opacity: o.neg ? 0 : .2 }];
+  const an = animate(e, f, { duration: 950, delay: (o.slot || 0) * 110, easing: 'ease-in-out', fill: 'both' });
+  const end = () => { e.remove(); if (to && !o.neg && o.bump) o.bump(); };
+  if (an) { an.onfinish = end; an.oncancel = () => e.remove(); setTimeout(() => e.remove(), 2600); } else end();
+}
+function bump(sel) { const e = $(sel); if (!e) return; e.classList.remove('bmp'); void e.offsetWidth; e.classList.add('bmp'); setTimeout(() => e.classList.remove('bmp'), 500); }
+// FLIP: a freshly drawn element slides in from where it was before
+function flipFrom(el, from, ms) {
+  if (!el || !from || !ANIM) return; const to = frameRect(el); if (!to) return;
+  const a = ctr(from), b = ctr(to), s = Math.max(.5, Math.min(2.2, from.w / (to.w || 1)));
+  el.style.zIndex = 60;
+  const an = animate(el, [{ transform: `translate(${a.x - b.x}px,${a.y - b.y}px) scale(${s})` }, { transform: 'none' }], { duration: ms || 480, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  if (an) an.onfinish = () => { el.style.zIndex = ''; };
+}
+function seatRect(seat) { const e = $('.chip[data-seat="' + seat + '"]'); return e ? frameRect(e) : null; }
+// what changed for a seat; shown right after a move
+function fxPre(seat) {
+  if (!G || seat == null || seat === 'G' || !G.players[seat]) return null;
+  const p = G.players[seat]; return { seat, res: Object.assign({}, p.res), tot: score(seat).total, hand: p.hand.length, season: p.season, city: HB.cityCount(G, seat) };
+}
+function fxPost(pre, m, src) {
+  if (!pre || !G || !ANIM) return;
+  const p = G.players[pre.seat]; if (!p) return;
+  const mine = pre.seat === viewSeat(), chip = seatRect(pre.seat);
+  if (!src) src = chip || ctr0();
+  const items = [];
+  for (const k of RESK) { const d = p.res[k] - pre.res[k]; if (d !== 0) items.push({ kind: k, d }); }
+  const dt = score(pre.seat).total - pre.tot; if (dt !== 0) items.push({ kind: 'point', d: dt, pts: true });
+  const dh = p.hand.length - pre.hand; if (dh > 0) items.push({ kind: 'card', d: dh });
+  let slot = 0; const n = items.filter(x => x.d > 0).length;
+  for (const it of items) {
+    if (it.d > 0) {
+      const to = mine ? (it.kind === 'card' ? (UI.lay && UI.lay.hand) : frameRect($('.rs[data-res="' + it.kind + '"]'))) : chip;
+      fxFloat(src, it.kind, '+' + it.d, to, { slot: slot++, n, bump: mine ? () => bump('.rs[data-res="' + it.kind + '"]') : null });
+    } else if (mine && it.kind !== 'point') {
+      const at = frameRect($('.rs[data-res="' + it.kind + '"]')); fxFloat(at, it.kind, '\u2212' + (-it.d), null, { neg: true });
+    }
+  }
+  if (m && m.type === 'prepare' && p.season !== pre.season) fxSeason(p.season, mine);
+}
+function ctr0() { const R = UI.lay; return R ? { x: R.W / 2 - 10, y: R.H / 2 - 10, w: 20, h: 20 } : null; }
+function fxSeason(s, mine) {
+  const L = fxLayer(); if (!L || !ANIM || !mine) return;
+  const e = h('div.fxseason', HBKit.season(SEAS[s], 110), h('b', SEASN[s])); L.appendChild(e);
+  const an = animate(e, [{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 }, { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 1, offset: .3 }, { transform: 'translate(-50%,-50%) scale(1)', opacity: 1, offset: .75 }, { transform: 'translate(-50%,-50%) scale(1.3)', opacity: 0 }], { duration: 1100, fill: 'both' });
+  if (an) an.onfinish = () => e.remove(); else e.remove();
+  setTimeout(() => e.remove(), 1500);
+}
+// after a move was applied and drawn: pieces land where they went
+function fxLand(m, seat, src, preChip) {
+  if (!ANIM || !m) return;
+  const mine = seat === viewSeat();
+  if (m.type === 'play' && mine) { const el = $('.sc[data-id="' + m.card + '"]'); if (el && src) flipFrom(el, src, 520); }
+  else if (m.type === 'worker') {
+    const sel = m.k === 'dest' ? null : '.tile[data-k="' + (m.k === 'event' ? (m.e === 'b' ? 'bev' : 'sev') : m.k) + '"]' + (m.k === 'haven' || m.k === 'journey' ? '' : '[data-i="' + m.i + '"]');
+    const t = sel && $(sel); const pw = t && t.querySelectorAll('.pawnw'); const from = preChip || seatRect(seat);
+    if (pw && pw.length && from) flipFrom(pw[pw.length - 1], from, 520);
   }
 }
-function renderDock() {
-  if (!G) return;
-  $('#prompt').textContent = promptText();
-  $('#prompt').classList.toggle('mine', !!(G.phase !== 'over' && !G.players[HB.actor(G)].ai && (!NET.on || HB.actor(G) === viewSeat())));
-  renderChips(); renderRes(); renderActs(); renderStrips();
-  const t = $('#barstat'); if (t) { const p = G.players[Math.max(0, focusSeat())]; t.innerHTML = ''; t.appendChild(HBKit.season(SEAS[p.season], 22)); t.appendChild(h('span', SEASN[p.season] + (G.phase === 'over' ? ' · over' : ''))); }
+// ---- ghost finger: shows the first move (every move in the guided game)
+function fingerWanted() {
+  if (UI.noRec || !G || G.phase === 'over' || UI.cards.length || UI.animBusy) return false;
+  if (UI.mode === 'guided') return true;
+  if (UI.camp && UI.coach && UI.coach.level !== 'off' && UI.camp.hints) return true;
+  return !UI.fingerSeen && UI.mode !== 'net' && UI.mode !== 'ai';
 }
-// place the prompt: in the bar on phones, in the dock otherwise
-function placePrompt() {
-  const pr = $('#prompt'), bar = $('#barprompt'), dockTop = $('#promptDock');
-  const want = document.documentElement.classList.contains('ph-p') ? bar : dockTop;
-  if (pr.parentNode !== want) want.appendChild(pr);
+function placeFinger() {
+  let f = $('#finger'); if (!f) { f = h('div#finger', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 40 48"><rect x="13" y="2" width="13" height="30" rx="6.500" fill="#fff8e6" stroke="#3b2f2a" stroke-width="2.200"/><rect x="7" y="22" width="27" height="25" rx="11" fill="#fff8e6" stroke="#3b2f2a" stroke-width="2.200"/></svg>' }); $('#board').appendChild(f); }
+  f.hidden = true;
+  if (!fingerWanted() || !UI.rec || !UI.rec.m || !myMoves().length) return;
+  let tg = tgOf(UI.rec.m);
+  if (UI.sel) { const i = UI.sel.ms.findIndex(x => sameM(x, UI.rec.m)); if (i >= 0) tg = 'o:' + i; else return; }
+  let el = UI.tgEls && UI.tgEls[tg];
+  if (!el && G.q) { const i = UI.rec.m.i; el = UI.tgEls['q:' + i]; }
+  if (!el) return;
+  const r = frameRect(el); if (!r || r.w < 4) return;
+  const c = ctr(r); f.style.left = (c.x - 19) + 'px'; f.style.top = (c.y - 4) + 'px'; f.hidden = false;
+  f.classList.remove('go'); void f.offsetWidth; f.classList.add('go');
 }
-// ===================== part 4: pop-ups (location, card, event), recommendation, pending decisions =====================
-// ---- recommendation (the normal AI's pick for the human seat) and a plain-words reason
+// ===================== part 4: the computer helper's pick (drives the ghost finger) and pending decisions =====================
+// The pick comes from the normal computer player. It is only ever shown as the ghost finger on a target that is glowing.
 function computeRec(force) {
   if (!G || G.phase === 'over') { UI.rec = null; return; }
   const a = HB.actor(G), p = G.players[a];
   if (p.ai || a !== viewSeat() || (UI.noRec && !force)) { UI.rec = null; return; }
+  if (!force && !fingerWanted()) { UI.rec = null; return; }
   const key = G.logN + ':' + G.turn + ':' + (G.q ? G.q.kind + G.q.opts.length : '');
   if (UI.recKey === key && UI.rec) return;
   try { UI.rec = { m: HB.AI.choose(G, a, 'normal') }; } catch (e) { UI.rec = null; }
   UI.recKey = key;
 }
-function why(m, seat) {
-  if (!m) return '';
-  const p = G.players[seat];
-  if (m.type === 'prepare') return 'All your workers are out. Preparing brings them home' + (p.season === 0 ? ', gives you a new worker and runs your production cards.' : p.season === 1 ? ', gives you a new worker and lets you take 2 cards from the meadow.' : ', gives you 2 new workers and runs your production cards.');
-  if (m.type === 'pass') return 'There is little left worth doing, so ending your game now is reasonable.';
-  if (m.type === 'worker') {
-    if (m.k === 'basic') { const b = D.basic[m.i]; return 'A solid, simple gain: ' + b.text.replace(/ Shared\.$/, '').toLowerCase() + (b.shared ? ' (it never fills up).' : ' (only one worker fits, so it may be gone next turn).'); }
-    if (m.k === 'forest') return D.forest[G.forest[m.i]].text + ' This forest place is only open to one worker.';
-    if (m.k === 'haven') return 'You can turn spare cards into the resources you are missing.';
-    if (m.k === 'journey') return 'Autumn only: the worker scores ' + D.journey[m.i].points + ' points at the end of the game.';
-    if (m.k === 'event') { const e = m.e === 'b' ? D.basicEvents[G.bev[m.i].k] : D.specialEvents[G.sev[m.i].k]; return 'You can claim ' + e.name + ' right now, and nobody else can then.'; }
-    if (m.k === 'dest') return cname(m.c) + ' is ready: ' + cdef(m.c).text;
-  }
-  if (m.type === 'play') {
-    const c = cdef(m.card); let s = c.name + ' is worth ' + c.pts + ' point' + (c.pts === 1 ? '' : 's') + '. ';
-    if (m.how === 'occupy') s += 'It is free: it takes the empty slot on ' + cname(m.via) + ', so you keep your resources. ';
-    else if (m.how === 'pay') s += 'You can pay for it now. ';
-    else s += 'This way costs you less than paying in full. ';
-    if (c.type === 'production') s += 'Production cards pay you every Spring and Autumn.';
-    else if (c.type === 'prosperity') s += 'It also scores bonus points at the end.';
-    else if (c.type === 'governance') s += 'It helps you for the rest of the game.';
-    return s;
-  }
-  if (m.type === 'choose' && G.q) return 'The computer helper would pick this one.';
-  return '';
-}
-// ---- popup shell
-function popHead(title, sub) { return h('div.ph-head', h('div.ph-t', h('b', title), sub ? h('span', sub) : null), h('button.px', { 'data-a': 'popx', type: 'button', 'aria-label': 'Close' }, '×')); }
-function closePop() { UI.pop = null; const p = $('#ppop'); if (p) { p.hidden = true; p.innerHTML = ''; } const b = $$('.sel'); b.forEach(x => x.classList.remove('sel')); }
-function placePop() {
-  const p = $('#ppop'), dock = $('#dock'); if (!p || p.hidden) return;
-  const dr = dock.getBoundingClientRect(); let top = 0, bottom = 0;
-  const t = UI.pop && UI.pop.trig;
-  if (t === 'hand') { const r = $('#handS').getBoundingClientRect(); bottom = Math.max(0, dr.bottom - r.top); }
-  else if (t === 'city') { const r = $('#cityS').getBoundingClientRect(); top = Math.max(0, r.bottom - dr.top); }
-  p.style.top = top + 'px'; p.style.bottom = bottom + 'px';
-}
-function setPop(o, build) {
-  UI.pop = o; const p = $('#ppop'); p.hidden = false; p.innerHTML = ''; p.setAttribute('data-pop', o.kind); p.setAttribute('role', 'dialog'); p.setAttribute('aria-modal', 'true');
-  build(p); placePop();
-  const bd = p.querySelector('.ph-body'); if (bd) bd.scrollTop = 0;
-}
-function moveBtn(m, inner, cls) {
-  UI.pm = UI.pm || []; const i = UI.pm.push(m) - 1; const rec = UI.rec && UI.rec.m && sameM(UI.rec.m, m);
-  return h('button.btn.go' + (rec ? '.rec' : '') + (cls ? '.' + cls : ''), { 'data-a': 'do', 'data-mi': i, type: 'button' }, inner, rec ? h('span.star', '★ suggested') : null);
-}
-function reasonBox(t) { return document.createComment(''); }
-// ---- reasons a worker can't go somewhere
-function whyNotWorker(kind, i) {
-  const a = HB.actor(G), p = G.players[viewSeat() >= 0 ? viewSeat() : 0];
-  if (viewSeat() < 0) return 'Only the player holding the device can place workers.';
-  if (a !== viewSeat() || G.players[a].ai) return 'It is not your turn yet.';
-  if (G.q) return 'Finish the current choice first.';
-  if (availW(p) <= 0) return 'All your workers are already out. Prepare for the next season to bring them home.';
-  const ws = workersAt(kind, i);
-  if (kind === 'basic' && !D.basic[i].shared && ws.length) return 'Taken by ' + pname(ws[0]) + ' (only one worker fits here).';
-  if (kind === 'forest' && ws.length >= (G.np === 4 ? 2 : 1)) return 'Full: ' + pname(ws[0]) + ' is already here.';
-  if (kind === 'forest' && ws.indexOf(viewSeat()) >= 0) return 'You already have a worker here.';
-  if (kind === 'haven' && p.hand.length < 2) return 'You need at least 2 cards in your hand to use this.';
-  if (kind === 'journey' && p.season < 3) return 'The Long Road only opens in Autumn (your last season).';
-  return 'Not available right now.';
-}
-function openTile(kind, i) {
-  kind = String(kind); i = +i;
-  if (/deck|disc/.test(kind)) return openInfo('deck');
-  if (kind === 'tree') return openInfo('seasons');
-  const v = viewSeat(), mm = myMoves().filter(m => m.type === 'worker');
-  UI.pm = [];
-  const info = tileInfo(kind, i);
-  setPop({ kind: 'tile', k: kind, i, trig: 'board' }, p => {
-    const body = h('div.ph-body');
-    if (kind === 'journey') {
-      p.appendChild(popHead('Place a worker on the Long Road?', 'Autumn only'));
-      body.appendChild(h('p', 'Discard cards from your hand equal to the spot number. The worker stays for the rest of the game and scores that many points at the end. A spot with a pawn is taken.'));
-      for (let j = 0; j < 4; j++) {
-        const jj = D.journey[j], m = mm.find(x => x.k === 'journey' && x.i === j), ws = workersAt('journey', j).length;
-        const ws2 = G.players.some(pl => pl.dep.some(d => d.k === 'journey' && d.i === j)) || (G.grim && G.grim.ji === j);
-        const lab = h('span', h('b', 'Spot ' + jj.points), ' · discard ' + jj.discard + ' · scores ' + jj.points + (jj.shared ? ' (shared)' : ''));
-        if (m) body.appendChild(moveBtn(m, lab));
-        else body.appendChild(h('button.btn.go.dis', { disabled: true, type: 'button' }, lab, h('span.sm', ws2 && !jj.shared ? 'taken' : (v >= 0 && G.players[v].season < 3 ? 'autumn only' : 'not enough cards'))));
-      }
-    } else {
-      const nm = info.name;
-      const m = mm.find(x => (kind === 'haven' && x.k === 'haven') || ((kind === 'basic' || kind === 'forest') && x.k === kind && x.i === i) || (kind === 'bev' && x.k === 'event' && x.e === 'b' && x.i === i) || (kind === 'sev' && x.k === 'event' && x.e === 's' && x.i === i));
-      const isEv = kind === 'bev' || kind === 'sev';
-      const evo = isEv ? (kind === 'bev' ? G.bev : G.sev)[i] : null;
-      p.appendChild(popHead(isEv ? nm : 'Place a worker here?', isEv ? 'Event' : nm));
-      if (!isEv) body.appendChild(h('div.gain', h('b', 'You gain: '), info.text.replace(/ Shared\.$/, '')));
-      else {
-        body.appendChild(h('p', info.text));
-        const need = h('ul.need');
-        if (kind === 'bev') { const nd = D.basicEvents[G.bev[i].k].need; for (const c in nd) { const have = v >= 0 ? G.players[v].city.filter(e => cdef(e.id).type === c).length : 0; need.appendChild(h('li' + (have >= nd[c] ? '.y' : '.n'), (have >= nd[c] ? '✓ ' : '✗ ') + nd[c] + ' ' + (HBKit.TYPES[c] ? HBKit.TYPES[c].label : c) + ' cards in your city (you have ' + have + ')')); } }
-        else { const sp = D.specialEvents[G.sev[i].k]; for (const k of sp.req) { const has = v >= 0 && G.players[v].city.some(e => cdef(e.id).key === k); need.appendChild(h('li' + (has ? '.y' : '.n'), (has ? '✓ ' : '✗ ') + 'In your city: ' + D.cards.find(c => c.key === k).name)); } if (sp.colors) for (const c in sp.colors) need.appendChild(h('li', 'Needs ' + sp.colors[c] + ' ' + c + ' cards')); }
-        body.appendChild(need);
-        if (evo.o !== -1 && evo.o != null) body.appendChild(reasonBox('Already claimed by ' + pname(evo.o) + '.'));
-        if (kind === 'sev') { const sc = D.specialEvents[G.sev[i].k].score; body.appendChild(h('p.sm', 'Scores at the end of the game. Claiming also costs a free worker.')); }
-      }
-      const ws = (kind === 'basic' || kind === 'forest' || kind === 'haven') ? workersAt(kind, i) : [];
-      if (ws.length) body.appendChild(h('div.occ', 'Workers here: ', ws.map(s => pawn(s, 18)), ' ', ws.map(pname).join(', ')));
-      if (kind === 'basic' || kind === 'forest' || kind === 'haven') body.appendChild(h('p.sm', info.shared ? 'Any number of workers fit.' : 'One worker fits here.'));
-      if (m) {
-        body.appendChild(moveBtn(m, isEv ? 'Claim it (use a worker)' : 'Place worker'));
-        if (UI.rec && sameM(UI.rec.m, m)) body.appendChild(reasonBox(why(m, v)));
-      } else if (!(isEv && evo.o !== -1)) body.appendChild(reasonBox(isEv ? (v < 0 ? 'Only the device holder can claim events.' : (G.players[v].dep.length >= G.players[v].workers ? 'You have no free workers.' : 'You do not meet the requirements yet.')) : whyNotWorker(kind, i)));
-    }
-    p.appendChild(body); body.appendChild(h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Cancel'));
-  });
-}
-function openInfo(which) {
-  setPop({ kind: 'info', trig: 'board' }, p => {
-    const body = h('div.ph-body');
-    if (which === 'deck') {
-      p.appendChild(popHead('Draw pile and discards'));
-      body.appendChild(h('div.kv', h('span', 'Draw pile'), h('b', G.deck.length + ' cards')));
-      body.appendChild(h('div.kv', h('span', 'Discard pile'), h('b', G.discard.length + ' cards')));
-      body.appendChild(h('div.kv', h('span', 'Hand limit'), h('b', '8 cards')));
-      body.appendChild(h('div.kv', h('span', 'City limit'), h('b', '15 cards')));
-      body.appendChild(h('p.sm', 'Cards you draw come from the pile. When it runs out the discards are shuffled into a new pile.'));
-    } else {
-      p.appendChild(popHead('Seasons'));
-      body.appendChild(h('p.sm', 'Each player moves through the seasons on their own. You may Prepare for the next season only when all your workers are placed.'));
-      G.players.forEach((pl, s) => { const nx = pl.season < 3 ? SEASN[pl.season + 1] : null; body.appendChild(h('div.kv', h('span', pawn(s, 16), ' ' + pl.name), h('b', HBKit.season(SEAS[pl.season], 20), ' ' + SEASN[pl.season] + ' · ' + pl.workers + ' workers'))); });
-      body.appendChild(h('div.tree', HBKit.elderheart({ w: 150, season: SEAS[Math.max(0, focusSeat() >= 0 ? G.players[focusSeat()].season : 0)] })));
-    }
-    p.appendChild(body); body.appendChild(h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Close'));
-  });
-}
-// ---- card pop-up: src = 'meadow' | 'hand' | 'city'
-function missingText(cost, res) { const a = []; for (const r of RESK) { const d = (cost[r] || 0) - res[r]; if (d > 0) a.push(d + ' more ' + rname(r, d)); } return a.join(', '); }
-function whyNotPlay(id, from) {
-  const v = viewSeat(); if (v < 0) return 'Only the player holding the device can play cards.';
-  const p = G.players[v], c = cdef(id);
-  if (HB.actor(G) !== v || G.players[HB.actor(G)].ai) return 'It is not your turn yet.';
-  if (G.q) return 'Finish the current choice first.';
-  if (c.unique && p.city.some(e => cdef(e.id).key === c.key)) return 'You already have this unique card in your city.';
-  if (HB.cityCount(G, v) >= 15 && c.key !== 'wanderer') return 'Your city is full (15 cards).';
-  if (c.key === 'ruins') return 'Old ruins need a construction in your city to raze.';
-  const miss = missingText(c.cost, p.res);
-  if (miss) return 'You cannot pay yet: you need ' + miss + '.' + (c.kind === 'critter' ? ' (A free occupy needs your ' + (D.cards.find(x => x.key === c.linked) || { name: 'matching construction' }).name + ' with no token on it.)' : '');
-  return 'You cannot play this right now.';
-}
-function howLabel(m) {
-  switch (m.how) {
-    case 'pay': return [h('b', 'Pay'), costEl(cdef(m.card).cost, 18)];
-    case 'occupy': return [h('b', 'Play it free'), h('span.sm', 'occupies ' + cname(m.via))];
-    case 'innkeeper': return [h('b', 'Send away ' + cname(m.via)), h('span.sm', 'cuts 3 berries off the price')];
-    case 'crane': return [h('b', 'Dismantle ' + cname(m.via)), h('span.sm', 'cuts 3 resources off the price')];
-    case 'dungeon': return [h('b', 'Use ' + (D.cards.find(x => x.key === 'dungeon') || { name: 'the cells' }).name), h('span.sm', 'lock a critter below it, cut 3 resources')];
-    case 'judge': return [h('b', 'Swap one resource'), h('span.sm', 'the Gavel Marten lets you pay with another kind')];
-  }
-  return [h('b', 'Play')];
-}
-function openCard(src, id, seat, slot, trig) {
-  id = +id; const v = viewSeat(); UI.pm = [];
-  const c = cdef(id);
-  setPop({ kind: 'card', src, id, trig: trig || (src === 'meadow' ? 'board' : src === 'hand' ? 'hand' : 'city') }, p => {
-    p.appendChild(popHead(c.name, TYPEN[c.type] + ' · ' + (c.kind === 'critter' ? 'Critter' : 'Construction') + ' · ' + (c.unique ? 'Unique' : 'Common')));
-    const body = h('div.ph-body');
-    const w = isPh() ? 104 : 150;
-    const ent = src === 'city' ? G.players[seat].city.find(e => e.id === id) : null;
-    const left = h('div.cardbox', cardEl(id, w, { entry: ent }));
-    const right = h('div.cinfo', h('div.cc', h('b', 'Cost '), costEl(c.cost, 16), h('b', ' · ' + c.pts + ' pt')), h('p.ct', c.text), h('p.sm', TYPEHELP[c.type]));
-    if (c.kind === 'critter') { const lk = D.cards.find(x => x.key === c.linked); right.appendChild(h('p.sm', 'Free if you own ' + (c.linked === 'any' ? 'the Elderheart Oak' : lk ? lk.name : '?') + ' with no token on it.')); }
-    if (ent) { const l = []; if (ent.occ) l.push('occupied'); if (ent.tok) l.push(ent.tok + ' point token(s)'); if (ent.pris && ent.pris.length) l.push(ent.pris.length + ' prisoner(s)'); if (ent.w) l.push(ent.w + ' worker(s) inside'); if (ent.stock) l.push('stock ' + costText(ent.stock)); if (l.length) right.appendChild(h('p.sm', l.join(', '))); }
-    const cw = h('div.cwrap', left, right);
-    const acts = h('div.pacts');
-    if (src === 'city') {
-      const mm = myMoves().filter(m => m.type === 'worker' && m.k === 'dest' && m.c === id);
-      if (cdef(id).color === 'red' || cdef(id).key === 'storehouse') {
-        if (mm.length) { acts.appendChild(moveBtn(mm[0], seat === v ? 'Place a worker here' : 'Visit with a worker')); if (UI.rec && sameM(UI.rec.m, mm[0])) acts.appendChild(reasonBox(why(mm[0], v))); }
-        else acts.appendChild(reasonBox(seat === v ? (HB.actor(G) !== v ? 'Not your turn.' : 'A worker cannot go here now (it may be full, or its condition is not met).') : 'Only Open destinations can be visited in a rival city.'));
-      } else acts.appendChild(h('p.sm', 'This card works by itself; no worker is needed.'));
-    } else {
-      const mm = myMoves().filter(m => m.type === 'play' && m.card === id && m.from === src);
-      if (mm.length) { mm.forEach(m => acts.appendChild(moveBtn(m, howLabel(m)))); const rm = UI.rec && UI.rec.m; if (rm && mm.some(m => sameM(m, rm))) acts.appendChild(reasonBox(why(rm, v))); }
-      else acts.appendChild(reasonBox(whyNotPlay(id, src)));
-    }
-    body.appendChild(acts); body.appendChild(cw); body.appendChild(h('div.pacts2', h('button.btn.alt', { 'data-a': 'refcard', 'data-id': id, type: 'button' }, 'Read it big'), h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Close')));
-    p.appendChild(body);
-  });
-}
-// ---- prepare / pass / hint
-function openPrep() {
-  const v = viewSeat(), m = movesFor(v).find(x => x.type === 'prepare'); if (!m) return; UI.pm = [];
-  const p = G.players[v], nx = p.season + 1;
-  setPop({ kind: 'prep', trig: 'other' }, pp => {
-    pp.appendChild(popHead('Prepare for ' + SEASN[nx], 'Season change'));
-    const body = h('div.ph-body');
-    body.appendChild(h('div.seasonrow', HBKit.season(SEAS[p.season], 34), h('span', '→'), HBKit.season(SEAS[nx], 44)));
-    const ul = h('ul.need');
-    ul.appendChild(h('li', 'Your ' + p.dep.filter(d => !d.perm).length + ' placed workers come home (workers on the Long Road, Abbey and Rest stay).'));
-    ul.appendChild(h('li', 'You get ' + [1, 1, 2][p.season] + ' new worker' + ([1, 1, 2][p.season] > 1 ? 's' : '') + ' (' + (p.workers + [1, 1, 2][p.season]) + ' in total).'));
-    ul.appendChild(h('li', nx === 2 ? 'Take up to 2 cards from the meadow.' : 'All your green Production cards gather their goods, in any order you like.'));
-    if (nx === 3) ul.appendChild(h('li', 'Autumn is the last season. The Long Road opens.'));
-    body.appendChild(ul); body.appendChild(moveBtn(m, 'Prepare for ' + SEASN[nx]));
-    if (UI.rec && sameM(UI.rec.m, m)) body.appendChild(reasonBox(why(m, v)));
-    body.appendChild(h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Not yet'));
-    pp.appendChild(body);
-  });
-}
-function openPass() {
-  const v = viewSeat(), m = movesFor(v).find(x => x.type === 'pass'); if (!m) return; UI.pm = [];
-  setPop({ kind: 'pass', trig: 'other' }, pp => {
-    pp.appendChild(popHead('Pass for the rest of the game?'));
-    const body = h('div.ph-body');
-    body.appendChild(h('p', 'You will take no more turns. Your workers stay where they are and your city is scored when everyone has passed. ' + (G.players[v].season < 3 ? 'You have not reached Autumn yet: you may be giving up turns you could use.' : '')));
-    body.appendChild(moveBtn(m, 'Yes, I am done'));
-    if (UI.rec && sameM(UI.rec.m, m)) body.appendChild(reasonBox(why(m, v)));
-    body.appendChild(h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Keep playing'));
-    pp.appendChild(body);
-  });
-}
-function openHint() {
-  const v = viewSeat(); computeRec(true); const m = UI.rec && UI.rec.m; UI.pm = [];
-  setPop({ kind: 'hint', trig: 'other' }, pp => {
-    pp.appendChild(popHead('Suggestion'));
-    const body = h('div.ph-body');
-    if (!m) body.appendChild(h('p', 'No suggestion right now.'));
-    else {
-      body.appendChild(h('div.gain', h('b', m.label || 'Move')));
-      body.appendChild(reasonBox(why(m, v)));
-      body.appendChild(moveBtn(m, 'Do it'));
-      // highlight on the board
-      renderBoard(); renderDock();
-    }
-    body.appendChild(h('button.btn.alt.cancel', { 'data-a': 'popx', type: 'button' }, 'Close'));
-    pp.appendChild(body);
-  });
-}
-// ---- pending decision card (one at a time)
-function qHint(k) {
-  return ({ discard: 'Tap a card to discard it. Tap Done when you have finished.', resource: 'Pick the resource you want.', meadow: 'Tap a card to take it.', production: 'Production cards run one after another. Pick the next one.', ruins: 'The razed card goes away and you get its cost back.', recipient: 'Pick which rival receives it.', give: 'Pick what to give.', stack: 'How many to place?', trigger: 'Several effects fired at once. Choose the order.', queen: 'The Queen plays a cheap card for free.', inn: 'The Inn plays a meadow card for 3 fewer resources.', university: 'The University disbands one of your cards and refunds it.', cemetery: 'Reveal cards from the pile, then play one for free.', copy: 'Pick which location to copy.' })[k] || '';
-}
-function renderQ() {
-  const pc = $('#pc');
-  if (!G || G.phase === 'over' || !G.q || UI.cards.length) { if (!UI.cards.length) { pc.hidden = true; pc.innerHTML = ''; } return; }
-  const q = G.q, v = viewSeat();
-  if (q.who !== v || G.players[q.who].ai) { pc.hidden = true; return; }
-  closePop();
-  pc.hidden = false; pc.innerHTML = ''; pc.setAttribute('data-card', 'q'); pc.setAttribute('data-kind', q.kind);
-  pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', q.title), h('span', qHint(q.kind) || 'Your choice')), GX.undo.can() ? h('button.btn.alt.undo', { 'data-a': 'undo', type: 'button', 'aria-label': 'Undo my last step' }, '↶ Undo') : null));
-  const body = h('div.ph-body.qbody');
-  const rm = UI.rec && UI.rec.m && UI.rec.m.type === 'choose' ? UI.rec.m : null;
-  const hasCards = q.opts.some(o => o.card !== undefined), hasRes = q.opts.some(o => o.res !== undefined);
-  const grid = h('div.qgrid' + (hasCards ? '.cards' : '') + (hasRes ? '.res' : ''));
-  q.opts.forEach((o, i) => {
-    let b;
-    const star = rm && rm.i === i;
-    if (o.card !== undefined) b = h('button.qo.qcard' + (star ? '.rec' : ''), { 'data-a': 'q', 'data-i': i, type: 'button' }, cardEl(o.card, isPh() ? 56 : 70), h('span.ql', o.label));
-    else if (o.res !== undefined) b = h('button.qo.qres' + (star ? '.rec' : ''), { 'data-a': 'q', 'data-i': i, type: 'button' }, ic(o.res, 30), h('span.ql', o.label));
-    else b = h('button.qo.qtext' + (star ? '.rec' : ''), { 'data-a': 'q', 'data-i': i, type: 'button' }, h('span.ql', o.label));
-    if (star) b.appendChild(h('span.star', '★'));
-    grid.appendChild(b);
-  });
-  body.appendChild(grid);
-  if (rm) body.appendChild(h('p.sm', '★ = what the computer helper would choose.'));
-  pc.appendChild(body);
-}
+// choosing: a question's options are shown on the board (cards glow where they lie, the rest are chips in the action row)
+function choose(i) { const a = HB.actor(G); const m = movesFor(a).find(x => x.type === 'choose' && x.i === i); if (m) act(m); }
+function renderQ() { }
 // ===================== part 5: game flow (new game, turn driver, AI, one-card-at-a-time queue, save/load) =====================
 const SAVEKEY = 'hb_save1';
 function toast(t) { const e = $('#toast'); if (!e) return; e.textContent = t; e.classList.add('on'); clearTimeout(UI.tt); UI.tt = setTimeout(() => e.classList.remove('on'), 2600); }
@@ -619,12 +677,12 @@ function newGame(mode, o) {
   G = HB.newGame({ players, solo, seed: UI.seed != null ? UI.seed : undefined });
   if (o.camp) campTwist(o.camp);
   UI.seed = null;
-  UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
+  UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.sel = null; UI.fingerSeen = false; UI.passArm = 0; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
   UI.holder = hotSeat() ? -1 : -1;
   UI.coach = { level: UI.coach && UI.coach.level || 'full', seen: {} };
   if (mode !== 'guided') UI.coachOn = false; else UI.coachOn = true;
   const st = $('#start'); if (st) st.hidden = true;
-  closePop(); try { GX.close(); } catch (e) { }
+  closePop(); fxClear(); try { GX.close(); } catch (e) { }
   kitNewGame();
   render(); schedule();
   return G;
@@ -634,23 +692,15 @@ function render() {
   if (!G || !UI.started) return;
   { const v = viewSeat(); if (v >= 0) GX.recap.view(v); }
   try { if (window.PerfHUD) PerfHUD.wake(); } catch (e) { }
-  renderBoard(); renderDock(); renderQ(); renderCard(); placePop(); markSel(); renderDrawers();
+  UI.mmc = null; renderBoard(); renderCard(); renderDrawers();
   if (NET.on) netRenderHook();
-}
-function markSel() {
-  $$('.sel').forEach(x => x.classList.remove('sel')); const p = UI.pop; if (!p) return;
-  let e = null;
-  if (p.kind === 'tile') e = $(`.tile[data-k="${p.k}"][data-i="${p.i}"]`);
-  else if (p.kind === 'card' && p.src === 'meadow') e = $$('.mc').find(x => G.meadow[+x.dataset.i] === p.id);
-  else if (p.kind === 'card') e = $(`.sc[data-id="${p.id}"]`);
-  if (e) e.classList.add('sel');
 }
 // ---- one-card-at-a-time queue
 function pushCard(c) { UI.cards.push(c); closePop(); render(); }
 function renderCard() {
-  const pc = $('#pc');
-  if (!UI.cards.length) { if (!(G && G.q && !G.players[G.q.who].ai && G.q.who === viewSeat() && G.phase !== 'over')) { pc.hidden = true; pc.innerHTML = ''; pc.removeAttribute('data-card'); } return; }
-  const c = UI.cards[0]; pc.hidden = false; pc.innerHTML = ''; pc.setAttribute('data-card', c.kind); pc.removeAttribute('data-kind');
+  const pc = $('#pc'); if (!pc) return;
+  if (!UI.cards.length) { pc.hidden = true; pc.innerHTML = ''; pc.removeAttribute('data-card'); return; }
+  const c = UI.cards[0]; pc.hidden = false; pc.innerHTML = ''; pc.setAttribute('data-card', c.kind);
   pc.appendChild(h('div.ph-head', h('div.ph-t', h('b', c.title), c.sub ? h('span', c.sub) : null)));
   const body = h('div.ph-body'); const b = typeof c.body === 'function' ? c.body() : c.body; add(body, b);
   const btns = h('div.cbtns');
@@ -665,54 +715,65 @@ function schedule() {
   if (!G || !UI.started || (UI.cards.length && !NET.on)) return;
   if (G.phase === 'over') { if (!UI.overShown) { UI.overShown = true; queueOver(); const w = G.over; snd(G.grim ? (w.win ? 'fanfare' : 'lose') : 'fanfare', { duck: true }); sndMusic(); } return; }
   const a = HB.actor(G), p = G.players[a], hs = humans();
-  if (UI.after.length && hs.length && !(G.q && !G.players[G.q.who].ai)) { if (flushAfter()) return; }
-  if (p.ai) { if (!isClient()) UI.tm = setTimeout(aiStep, ANIM ? AIDELAY : 0); return; }
+  if (p.ai) { if (!isClient()) UI.tm = setTimeout(aiStep, ANIM ? Math.round(AIDELAY * .4) : 0); return; }
   if (hotSeat() && UI.holder !== a) {
     UI.holder = -1; closePop(); render();
-    pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', p.name + ', take the device. Nobody else should look at the screen. Your hand and resources appear when you tap the button.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
+    pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', 'Your hand stays hidden until you tap.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
     return;
   }
   if (UI.coachOn && coachCheck()) return;
   if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
-  if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) { renderBoard(); renderDock(); if (G.q) renderQ(); markSel(); } }, 40);
+  if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) placeFinger(); }, 40);
 }
 function aiStep() {
   UI.tm = 0; if (isClient() || !G || G.phase === 'over' || (UI.cards.length && !NET.on)) return;
   const a = HB.actor(G); if (a < 0) return; const p = G.players[a]; if (!p.ai) { schedule(); return; }
-  const n0 = G.logN; let m;
+  let m;
   try { m = HB.AI.choose(G, a); } catch (e) { m = HB.moves(G, a)[0]; console.error('AI error', e); }
-  const pre = sndPre();
+  const tok = UI.animTok = (UI.animTok || 0) + 1;
+  const go = src => { if (tok !== UI.animTok) return; UI.animBusy = false; aiApply(m, a, src); };
+  if (!ANIM) { go(null); return; }
+  UI.animBusy = true; aiFly(m, a, go);
+}
+// the computer's move: a worker flies to its place, a card flies to its city (about 0.6 s), then the move happens
+function aiFly(m, a, done) {
+  const chip = seatRect(a); if (!chip || !UI.lay) { done(null); return; }
+  let from = chip, to = null, node = null, src = chip;
+  if (m.type === 'worker' && m.k !== 'dest') {
+    const kind = m.k === 'event' ? (m.e === 'b' ? 'bev' : 'sev') : m.k;
+    to = UI.tiles[kind + ':' + (m.k === 'haven' || m.k === 'journey' ? 0 : m.i)]; node = pawn(a, 28); src = to;
+  } else if (m.type === 'play') {
+    const mr = m.from === 'meadow' ? UI.cr['m' + m.card] : null;
+    from = mr || { x: UI.lay.W / 2 - 24, y: UI.lay.H * .55, w: 48, h: 64 }; to = chip; node = cardEl(m.card, 48); src = mr || chip;
+  }
+  if (!to || !node || !from) { done(src); return; }
+  fxFly(node, from, to, Math.max(140, Math.min(600, Math.round(AIDELAY * .9))), () => done(src));
+}
+function aiApply(m, a, src) {
+  const n0 = G.logN, pre = sndPre(), fpre = fxPre(a);
   let r = HB.apply(G, m);
   if (r.ok) sndPost(pre, m, a);
-  if (!r.ok) { const ms = HB.moves(G, a); r = HB.apply(G, ms[0]); }
+  if (!r.ok) { const ms = HB.moves(G, a); m = ms[0]; r = HB.apply(G, m); }
   const ls = logSince(n0); UI.lastAi = ls.length ? ls[0].replace(/^[^ ]+ /, '') : '';
   GX.recap.push(ls, a);
   afterMove();
+  try { fxPost(fpre, m, src); fxLand(m, a, src, seatRect(a)); } catch (e) { console.error(e); }
 }
 function afterMove() { save(); render(); sndMusic(); schedule(); if (NET.on) netPush(); }
 function act(m) {
   if (!G || !m) return; const a = HB.actor(G);
   if (isClient()) { netAct(m); return; }
   if (NET.on && a !== NET.mySeat) return;
-  const n0 = G.logN;
-  if (m.type === 'prepare' && !NET.on) UI.after.push({ kind: 'season', seat: a, from: n0 });
-  const pre = sndPre();
+  const n0 = G.logN, src = UI.fxSrc; UI.fxSrc = null;
+  const pre = sndPre(), fpre = fxPre(a), chip0 = seatRect(a);
   if (!G.players[a].ai) GX.undo.snap(m.label || m.type);
   const r = HB.apply(G, m);
   closePop(); UI.rec = null;
   if (r.ok) sndPost(pre, m, a);
-  if (!r.ok) { snd('error'); UI.after.pop(); GX.undo.drop(); toast(r.error || 'That move is not allowed.'); render(); return; }
+  if (!r.ok) { snd('error'); GX.undo.drop(); toast(r.error || 'That move is not allowed.'); render(); return; }
   GX.undo.check(revealed); GX.recap.mark(a); GX.recap.push(logSince(n0), a);
   UI.lastAi = ''; afterMove();
-}
-function choose(i) { const a = HB.actor(G); const m = movesFor(a).find(x => x.type === 'choose' && x.i === i); if (m) act(m); }
-function flushAfter() {
-  const e = UI.after.shift(); if (!e) return false;
-  const lines = G.log.filter(x => x.i > e.from).map(x => x.t).slice(-14);
-  const p = G.players[e.seat];
-  const s = p.season;
-  pushCard({ kind: 'season', title: SEASN[s] + ' has come', sub: p.name + ' prepared for ' + SEASN[s], body: () => h('div', h('div.seasonrow', HBKit.season(SEAS[s], 56)), h('ul.need', lines.map(t => h('li', t)))), });
-  return true;
+  try { fxPost(fpre, m, src); fxLand(m, a, src, chip0); } catch (e) { console.error(e); }
 }
 // ---- end of game: one card per player, then the result
 function queueOver() {
@@ -845,24 +906,20 @@ function renderStart() {
 function showStart() { try { GX.close(); } catch (e) { } closePop(); UI.cards = []; clearTimeout(UI.tm); renderStart(); }
 // ---- events
 document.addEventListener('click', ev => {
-  const t = ev.target.closest('[data-a],[data-start]'); const pop = $('#ppop');
-  if (!t) { if (UI.pop && pop && !pop.contains(ev.target) && !ev.target.closest('#pc,.gx-drawer')) closePop(); return; }
+  if (UI.zoomAt && Date.now() - UI.zoomAt < 450) { ev.preventDefault(); return; }
+  const z = $('#zoom'); if (z && !z.hidden) { closeZoom(); return; }
+  if (UI.lp) { UI.lp = false; return; }
+  const t = ev.target.closest('[data-a],[data-start]');
+  if (!t) { if (UI.sel) { UI.sel = null; render(); } return; }
   const a = t.dataset.a, d = t.dataset;
   if (netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
   switch (a) {
-    case 'tile': openTile(d.k, d.i); break;
-    case 'mcard': { const id = G.meadow[+d.i]; if (id >= 0) openCard('meadow', id, null, +d.i); break; }
-    case 'hcard': openCard('hand', +d.id); break;
-    case 'ccard': openCard('city', +d.id, +d.seat === +d.seat ? +d.seat : d.seat); break;
+    case 't': onTarget(d.t, t); break;
+    case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { UI.sel = null; actFrom(m, t); } break; }
+    case 'selx': UI.sel = null; render(); break;
     case 'chip': UI.rseat = d.seat === 'G' ? 'G' : +d.seat; GX.show('rivald'); renderRival(UI.rseat); break;
     case 'rtab': renderRival(d.seat === 'G' ? 'G' : +d.seat); break;
-    case 'prep': openPrep(); break;
-    case 'pass': openPass(); break;
-    case 'hint': openHint(); break;
-    case 'popx': closePop(); break;
-    case 'do': { const m = UI.pm && UI.pm[+d.mi]; if (m) act(m); break; }
-    case 'q': choose(+d.i); break;
     case 'cont': nextCard(); break;
     case 'take': takeDevice(); break;
     case 'again': { if (campOn()) { const dd = UI.camp; UI.cards = []; GXC.play(dd.id); break; } const m = UI.mode, c = UI.cfg || {}; UI.cards = []; newGame(m, { np: c.np, level: c.level, solo: c.solo }); break; }
@@ -880,7 +937,18 @@ document.addEventListener('click', ev => {
     case 'sound': UI.sound = UI.sound === false; try { if (window.GA) { GA.setSfx(UI.sound); GA.setMusic(UI.sound); } } catch (e) { } GX.renderSettings(); break;
   }
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && UI.pop) closePop(); });
+// long-press on a card or a place: a big view with the details (the only place the details are written)
+{ let lpT = 0, lpS = null;
+  document.addEventListener('pointerdown', e => {
+    const z = e.target.closest('[data-zoom]'); if (!z || (e.button != null && e.button > 0)) return;
+    UI.lp = false; lpS = { x: e.clientX, y: e.clientY }; clearTimeout(lpT);
+    lpT = setTimeout(() => { UI.lp = true; openZoom(z.dataset.zoom); try { navigator.vibrate && navigator.vibrate(12); } catch (x) { } }, 430);
+  });
+  document.addEventListener('pointermove', e => { if (lpS && Math.hypot(e.clientX - lpS.x, e.clientY - lpS.y) > 12) clearTimeout(lpT); });
+  ['pointerup', 'pointercancel'].forEach(n => document.addEventListener(n, () => { clearTimeout(lpT); lpS = null; }));
+  document.addEventListener('contextmenu', e => { if (e.target.closest('[data-zoom]')) e.preventDefault(); });
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.sel) { UI.sel = null; render(); } closeZoom(); } });
 // ---- phone mode
 function applyPhone() {
   const q = /[?&]phone=(\d)/.exec(location.search); const vm = (window.GXV ? GXV.now() : { w: innerWidth, h: innerHeight }), w = vm.w, hh = vm.h, short = Math.min(w, hh);
@@ -890,7 +958,7 @@ function applyPhone() {
   r.toggle('ph', ph); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   placePrompt(); if (was !== ph) { if (G && UI.started) render(); }
 }
-function onResize() { applyPhone(); if (G && UI.started) { renderBoard(); placePop(); } }
+function onResize() { applyPhone(); if (G && UI.started) renderBoard(); }
 // ---- boot
 function boot() {
   GX.init({ key: 'hb' });
@@ -901,7 +969,7 @@ function boot() {
   kitBoot();
   applyPhone();
   if (window.GXV) GXV.watch(onResize); else { addEventListener('resize', onResize); addEventListener('orientationchange', onResize); }
-  const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) { renderBoard(); placePop(); } }).observe(bd);
+  const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) renderBoard(); }).observe(bd);
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'hb' }); GX.applyPrefs(); }; } catch (e) { }
   try { if (window.PerfHUD && PerfHUD.register) PerfHUD.register({ game: 'Hollowbough' }); } catch (e) { }
   if (/[?&]seed=(\d+)/.test(location.search)) UI.seed = +RegExp.$1;
@@ -992,14 +1060,14 @@ function refCardId(id) { return 'c' + D.cards.indexOf(cdef(id)); }
 function revealed(a, b) { return !a || a.deck.length !== b.deck.length || a.rng !== b.rng || a.discard.length > b.discard.length || JSON.stringify(a.limbo) !== JSON.stringify(b.limbo) || a.phase !== b.phase; }
 function kitUndo() {
   GX.undo.config({
-    get: () => G, owner: g => g && g.phase !== 'over' ? HB.actor(g) : null, online: () => NET.on,
-    set: s => { G = s; UI.rec = null; UI.recKey = ''; UI.after = UI.after.filter(e => e.from < G.logN); closePop(); UI.lastAi = ''; save(); render(); schedule(); toast('Step undone.'); },
-    onChange: can => { if (can !== UI.undoCan) { UI.undoCan = can; if (G && UI.started) renderActs(); } }
+    get: () => G, owner: g => g && g.phase !== 'over' ? (humans().length === 1 ? humans()[0] : HB.actor(g)) : null, online: () => NET.on,
+    set: s => { G = s; UI.rec = null; UI.recKey = ''; UI.after = []; UI.mmc = null; fxClear(); closePop(); UI.lastAi = ''; save(); render(); schedule(); toast('Step undone.'); },
+    onChange: can => { if (can !== UI.undoCan) { UI.undoCan = can; if (G && UI.started && UI.lay) renderActs(); } }
   });
 }
 function doUndo() { if (GX.undo.undo()) snd('click'); }
 // ---- "since your last turn" strip in the dock
-function kitRecap() { GX.recap.attach('#dockbody', { before: true, title: 'Since your turn' }); }
+function kitRecap() { }
 function recapSeats() { GX.recap.clear(); const hs = humans(); GX.recap.seats(hs.length ? hs : [0]); }
 // ---- results, statistics, achievements
 function kitResult() {

@@ -3,8 +3,8 @@
 function shake(el) { if (!el) return; el.classList.remove('shk'); void el.offsetWidth; el.classList.add('shk'); setTimeout(() => el.classList.remove('shk'), 420); snd('error', { vol: .3 }); }
 // ---- tap on a board target
 function onTarget(tg, el) {
-  if (!G || UI.cards.length || UI.animBusy) return;
-  if (/^x:/.test(tg)) { UI.sel = null; shake(el); return; }
+  if (!G || UI.cards.length) return;
+  if (/^x:/.test(tg) || UI.animBusy) { UI.sel = null; shake(el); return; }
   const mm = myMoves();
   if (tg === 'pass') {
     const m = mm.find(x => x.type === 'pass'); if (!m) return;

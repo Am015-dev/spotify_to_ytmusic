@@ -116,7 +116,8 @@ svg{display:block}
 .chipb{appearance:none;border:2px solid var(--ink);background:#fff8e6;border-radius:18px;min-height:44px;min-width:44px;padding:4px 12px;cursor:pointer;font-size:14px}.chipb.on{background:var(--gold);font-weight:700}
 .srow2{display:flex;gap:8px;flex-wrap:wrap}
 /* ================= the table: everything lives on the board ================= */
-.gx-main{display:block;position:relative;min-height:0}
+.gx-bar{grid-row:1}
+.gx-main{display:block;position:relative;min-height:0;grid-row:2}
 .gx-board{position:absolute;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 25%,#86a96f,#678a54 55%,#4f7040);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .gx-dock{display:none}
 #barprompt{display:block;flex:1;min-width:0}
@@ -158,9 +159,9 @@ svg{display:block}
 .chip .cn{display:flex;align-items:center;gap:3px;min-width:0}.chip .cn b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.chip .cn i{font-size:12px;opacity:.7}.chip .cn .cs{margin-left:auto;flex:none}
 .chip .cl{display:flex;gap:7px;font-size:13px;white-space:nowrap;font-weight:700}.chip .cp{font-size:14px}
 .chips[data-n="4"] .chip .cl,.chips[data-n="5"] .chip .cl{gap:4px;font-size:12px}
-.resrow{position:absolute;display:flex;align-items:center;justify-content:space-between;gap:2px;padding:0 6px;background:rgba(58,40,20,.5);border-radius:10px;color:#fff8e6}
+.resrow{position:absolute;display:flex;align-items:center;justify-content:space-around;gap:0;padding:0 4px;box-sizing:border-box;overflow:hidden;background:rgba(58,40,20,.5);border-radius:10px;color:#fff8e6}
 .rs{display:inline-flex;align-items:center;gap:2px}.rs b{font-size:15px;min-width:14px;text-shadow:0 1px 2px #2a1f19}
-#acts{position:absolute;display:flex;gap:6px;align-items:stretch}
+#acts{position:absolute;z-index:45;display:flex;gap:6px;align-items:stretch}
 #acts.tray{justify-content:center;align-items:center;background:rgba(58,40,20,.6);border-radius:12px;padding:3px 6px;box-sizing:border-box;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden}
 #acts.tray .tchip{flex:1 1 0;min-width:44px;padding:2px 4px}
 #acts.tray .tchip.tcard{flex:0 0 auto}
@@ -175,6 +176,8 @@ svg{display:block}
 .tchip.tcard{padding:2px 4px;border-radius:8px}
 .tchip.tx{background:rgba(255,255,255,.85);font-size:24px;padding:0 8px;min-width:44px;animation:none}
 #acts.tall{align-items:center}
+#acts.tray.wrap{flex-wrap:wrap;overflow-y:auto;align-content:center}
+#acts.tray.wrap .tchip{flex:0 1 auto;font-size:13px}
 #zoom{position:absolute;inset:0;z-index:50;background:rgba(18,28,14,.6);display:flex;align-items:center;justify-content:center;padding:12px}
 #zoom[hidden]{display:none}
 .zbox{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:100%;max-height:100%;overflow:auto;box-shadow:0 14px 40px rgba(0,0,0,.55)}

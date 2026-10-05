@@ -20,7 +20,7 @@ async function playGame(browser, W, H, gi, mode) {
   await p.goto('https://gns.test/'); await sleep(500);
   await p.evaluate(([m, s]) => { try { localStorage.clear(); } catch (e) { } UI.seed = s; AIDELAY = 50; UI.opt = { np: 2 + (s % 3), level: 'normal', solo: 1 }; newGame(m); }, [mode, 11 + gi * 3]);
   await sleep(400);
-  const sig = () => p.evaluate(() => G ? G.logN + ':' + G.turn + ':' + (G.q ? G.q.kind + G.q.opts.length : '') + ':' + G.players.map(p => p.hand.length + '.' + p.dep.length).join(',') + ':' + G.phase + ':' + (UI.sel ? 'sel' : '') + ':' + UI.cards.length : 'x');
+  const sig = () => p.evaluate(() => G ? G.logN + ':' + G.turn + ':' + (G.q ? G.q.kind + G.q.opts.length : '') + ':' + G.players.map(p => p.hand.length + '.' + p.dep.length).join(',') + ':' + JSON.stringify(G.players.map(p => [p.res, p.pts])) + ':' + G.phase + ':' + (UI.sel ? 'sel' : '') + ':' + UI.cards.length : 'x');
   let lastSig = '', lastT = Date.now(), steps = 0, passTaps = 0, shots = 0, dead = 0;
   for (; steps < 900; steps++) {
     const st = await p.evaluate(() => ({ over: G.phase === 'over', cards: UI.cards.length, busy: !!UI.animBusy, mine: (() => { const a = HB.actor(G); return a >= 0 && !G.players[a].ai; })(), q: G.q ? G.q.kind : '', logN: G.logN }));
@@ -40,7 +40,7 @@ async function playGame(browser, W, H, gi, mode) {
       // glowing targets: visible, on screen, not covered; finger on a glowing target
       const gl = [...document.querySelectorAll('.glow')].filter(e => { const r = e.getBoundingClientRect(); return r.width > 4 && r.height > 4; });
       gl.forEach(e => { const r = e.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2; if (cx < 0 || cy < 0 || cx > W || cy > H) { out.push('glow off screen ' + (e.dataset.t || e.className)); return; } const t = document.elementFromPoint(cx, cy); if (!t || !(e === t || e.contains(t) || t.contains(e))) { /* overlapped strip cards: any point of the element must be hittable */ let ok = false; for (const [fx, fy] of [[.15, .5], [.85, .5], [.5, .2], [.5, .8]]) { const q = document.elementFromPoint(r.left + r.width * fx, r.top + r.height * fy); if (q && (e === q || e.contains(q))) ok = true; } if (!ok) out.push('glow covered ' + (e.dataset.t || e.className)); } });
-      const f = document.querySelector('#finger'); if (f && !f.hidden && gl.length) { const fr = f.getBoundingClientRect(), tipx = fr.left + 19, tipy = fr.top + 4; const hit = gl.some(e => { const r = e.getBoundingClientRect(); return tipx >= r.left - 6 && tipx <= r.right + 6 && tipy >= r.top - 6 && tipy <= r.bottom + 6; }); if (!hit) out.push('finger not on a glowing target'); }
+      const f = document.querySelector('#finger'); if (f && !f.hidden && gl.length) { const br0 = document.querySelector('#board').getBoundingClientRect(), tipx = br0.left + parseFloat(f.style.left) + 19, tipy = br0.top + parseFloat(f.style.top) + 4; const hit = gl.some(e => { const r = e.getBoundingClientRect(); return tipx >= r.left - 6 && tipx <= r.right + 6 && tipy >= r.top - 6 && tipy <= r.bottom + 6; }); if (!hit) out.push('finger not on a glowing target'); }
       return out;
     });
     chk.forEach(c => fail(tag, c));

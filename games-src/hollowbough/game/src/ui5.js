@@ -59,7 +59,7 @@ function schedule() {
   if (p.ai) { if (!isClient()) UI.tm = setTimeout(aiStep, ANIM ? Math.round(AIDELAY * .4) : 0); return; }
   if (hotSeat() && UI.holder !== a) {
     UI.holder = -1; closePop(); render();
-    pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', p.name + ', take the device. Nobody else should look at the screen. Your hand and resources appear when you tap the button.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
+    pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', 'Your hand stays hidden until you tap.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
     return;
   }
   if (UI.coachOn && coachCheck()) return;
@@ -82,7 +82,7 @@ function aiFly(m, a, done) {
   let from = chip, to = null, node = null, src = chip;
   if (m.type === 'worker' && m.k !== 'dest') {
     const kind = m.k === 'event' ? (m.e === 'b' ? 'bev' : 'sev') : m.k;
-    to = UI.tr[kind + ':' + (m.k === 'haven' || m.k === 'journey' ? 0 : m.i)]; node = pawn(a, 28); src = to;
+    to = UI.tiles[kind + ':' + (m.k === 'haven' || m.k === 'journey' ? 0 : m.i)]; node = pawn(a, 28); src = to;
   } else if (m.type === 'play') {
     const mr = m.from === 'meadow' ? UI.cr['m' + m.card] : null;
     from = mr || { x: UI.lay.W / 2 - 24, y: UI.lay.H * .55, w: 48, h: 64 }; to = chip; node = cardEl(m.card, 48); src = mr || chip;

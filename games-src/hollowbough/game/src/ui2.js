@@ -97,11 +97,11 @@ function boardLayout(W, H) {
     const off = Math.max(0, Math.min(80, (H - mxy) / 2)); if (off > 1) { R.tiles.forEach(t => t.y += off); R.meadow.forEach(t => t.y += off); }
     // the rail
     const rx = LW + pad, rw = rail - pad - 2;
-    R.chips = { x: rx, y: 0, w: rw, h: chipH };
+    R.chips = { x: rx, y: 3, w: rw, h: chipH };
     let yb = H - 2; R.acts = { x: rx, y: yb - actH, w: rw, h: actH }; yb -= actH + g;
     const left = yb - (chipH + g + resH + g + g), hh = Math.max(60, Math.min(left * .56, 260)), hc = Math.max(60, left - hh);
-    R.res = { x: rx, y: chipH + g, w: rw, h: resH };
-    R.city = { x: rx, y: chipH + g + resH + g, w: rw, h: hc };
+    R.res = { x: rx, y: chipH + g + 3, w: rw, h: resH };
+    R.city = { x: rx, y: chipH + g + resH + g + 3, w: rw, h: hc };
     R.hand = { x: rx, y: R.city.y + hc + g, w: rw, h: yb - (R.city.y + hc + g) };
     R.strip = { hand: fitStrip(nHand, R.hand.w - 4, R.hand.h - 2, 74), city: fitStrip(nCity, R.city.w - 4, R.city.h - 2, 74) };
   }
@@ -200,13 +200,14 @@ function renderBoard() {
   const R = boardLayout(W, H); UI.lay = R;
   bd.innerHTML = ''; bd.style.width = W + 'px'; bd.style.height = H + 'px';
   bd.className = R.tall ? 'tall' : 'wide';
-  UI.tgEls = {}; UI.cr = {}; UI.tr = {};
+  UI.tgEls = {}; UI.cr = {}; UI.tiles = {};
   const mm = myMoves(), mine = mm.length > 0, v = viewSeat();
   const okw = new Set(mm.filter(m => m.type === 'worker').map(tgOf));
   const okp = new Set(mm.filter(m => m.type === 'play').map(tgOf));
   const qm = G.q && mine ? mm.filter(m => m.type === 'choose') : [];
   const qCard = new Map(); qm.forEach(m => { if (m.card !== undefined && !qCard.has(m.card)) qCard.set(m.card, m.i); });
-  const qShown = new Set();
+  const qShown = new Set(), qLoc = new Map();
+  if (qm.length) G.q.opts.forEach((o, i) => { let loc = o.d && o.d.loc; if (!loc && o.d && o.d.j != null && o.d.seat != null && G.players[o.d.seat] && (o.h === 'rangerTo' || o.h === 'recallGo')) loc = G.players[o.d.seat].dep[o.d.j]; const tg = loc ? tgOf(Object.assign({ type: 'worker' }, loc)) : ''; if (tg && !qLoc.has(tg)) qLoc.set(tg, i); });
   const big = !R.tall && R.tiles.some(t => t.kind === 'basic' && t.w >= 84 && t.h >= 70);
   bd.classList.toggle('big', big);
   if (UI.sel && (UI.sel.logN !== G.logN || !UI.sel.ms.every(m => mm.some(x => sameM(x, m))))) UI.sel = null;
@@ -217,9 +218,10 @@ function renderBoard() {
     const e = h('button.tile.t-' + t.kind, { 'data-zoom': 'tile:' + t.kind + ':' + t.i, 'data-k': t.kind, 'data-i': t.i, type: 'button', 'aria-label': info.name || (t.kind === 'deck' ? 'Draw pile' : t.kind === 'disc' ? 'Discard pile' : 'Seasons') });
     e.style.cssText = `left:${t.x}px;top:${t.y}px;width:${t.w}px;height:${t.h}px`;
     e.appendChild(tileFace(t, big));
-    UI.tr[t.kind + ':' + t.i] = { x: t.x, y: t.y, w: t.w, h: t.h };
+    UI.tiles[t.kind + ':' + t.i] = { x: t.x, y: t.y, w: t.w, h: t.h };
     const legal = tg && okw.has(tg);
     if (legal) { e.classList.add('glow'); regTg(tg, e); }
+    else if (tg && qLoc.has(tg)) { e.classList.add('glow'); regTg('q:' + qLoc.get(tg), e); qShown.add(qLoc.get(tg)); }
     else if (tg) { e.setAttribute('data-a', 't'); e.setAttribute('data-t', 'x:' + tg); if (mine) e.classList.add('no'); }
     if (UI.sel && UI.sel.tg === tg) e.classList.add('sel');
     if (t.kind === 'bev' || t.kind === 'sev') {
@@ -268,15 +270,17 @@ function renderBoard() {
       b.style.cssText = `left:${cityBox.x + p.x}px;top:${cityBox.y + p.y}px;width:${fit.cw}px;height:${fit.ch}px;z-index:${i + 2}`;
       UI.cr['c' + it.id] = { x: cityBox.x + p.x, y: cityBox.y + p.y, w: fit.cw, h: fit.ch };
       if (okw.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
+      else if (qLoc.has(tg)) { b.classList.add('glow'); regTg('q:' + qLoc.get(tg), b); qShown.add(qLoc.get(tg)); }
       else if (qCard.has(it.id)) { b.classList.add('glow'); regTg('q:' + qCard.get(it.id), b); qShown.add(qCard.get(it.id)); }
       else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:c' + it.id); }
       bd.appendChild(b);
     }); }
   // ---- my stock
   { const r = placeBox(h('div.resrow'), R.res), show = v >= 0 || watching();
-    for (const k of RESK) r.appendChild(h('span.rs', { 'data-res': k }, ic(k, 22), h('b', show ? me.res[k] : '?')));
-    r.appendChild(h('span.rs.pt', { 'data-res': 'point' }, ic('point', 22), h('b', me.pts)));
-    r.appendChild(h('span.rs.wk', { 'data-res': 'worker' }, pawn(fs, 20), h('b', availW(me) + '/' + me.workers)));
+    const rp = R.res.w < 380 ? 19 : 22;
+    for (const k of RESK) r.appendChild(h('span.rs', { 'data-res': k }, ic(k, rp), h('b', show ? me.res[k] : '?')));
+    r.appendChild(h('span.rs.pt', { 'data-res': 'point' }, ic('point', rp), h('b', me.pts)));
+    r.appendChild(h('span.rs.wk', { 'data-res': 'worker' }, pawn(fs, rp - 2), h('b', availW(me) + '/' + me.workers)));
     bd.appendChild(r); }
   // ---- my hand
   { const handBox = R.hand, strip = placeBox(h('div.strip.hand'), handBox); bd.appendChild(strip);
@@ -297,6 +301,7 @@ function renderBoard() {
     }); }
   // ---- action row / tray
   renderActs(mm, qm, qShown);
+  if (UI.sel) bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow'));
   renderPrompt();
   renderBar();
   placeFinger();
@@ -347,7 +352,13 @@ function renderActs(mm, qm, qShown) {
   else if (qm.length) qm.forEach(m => { if (!qShown.has(m.i)) { const i = UI.tm2.push(m) - 1; chips.push(trayChip(m, i, 'q:' + m.i)); } });
   if (chips.length) {
     a.classList.add('tray');
-    if (chips.some(c => c.classList.contains('tcard'))) { const hh = 84, b2 = { x: box.x, y: box.y + box.h - hh, w: box.w, h: hh }; a.style.top = b2.y + 'px'; a.style.height = hh + 'px'; a.classList.add('tall'); }
+    const nCards = chips.filter(c => c.classList.contains('tcard')).length, hasCard = nCards > 0, many = chips.length > 3 && !hasCard && qShown.size === 0;
+    if (hasCard || many) {
+      let rows;
+      if (hasCard) { const per = Math.max(1, Math.floor((box.w - 12) / 52)); rows = Math.min(3, Math.ceil(chips.length / per)); } else rows = Math.min(3, Math.ceil(chips.length * 92 / Math.max(120, box.w)));
+      const hh = hasCard ? rows * 66 + 10 : Math.max(box.h, rows * 50 + 6);
+      a.style.top = (box.y + box.h - hh) + 'px'; a.style.height = hh + 'px'; a.classList.add('tall', 'wrap');
+    }
     chips.forEach(c => a.appendChild(c));
     if (UI.sel) a.appendChild(h('button.tchip.tx', { 'data-a': 'selx', type: 'button', 'aria-label': 'Cancel' }, '×'));
     return;
