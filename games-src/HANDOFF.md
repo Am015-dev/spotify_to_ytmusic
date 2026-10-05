@@ -11,19 +11,31 @@ published from `games/` at https://am015-dev.github.io/spotify_to_ytmusic/. Priv
 - Don't edit the Mainhattan / Overdrive games; other sessions own them. Ticket to Ride is on hold.
 - Read the root `CLAUDE.md` (lessons learnt + cost rules), then `games-src/BRIEF-2d-games.md`.
 
-## NOW (5 Oct) — start here
-Read `games-src/PLAYBOOK.md` (recipes A new game, B improvement for all games, C bug fix). Finished games go LIVE
-(owner's decision; no previews). Goal: every shelf game has story mode and works in portrait, landscape and rotation.
-- Live with story mode + phone fixes: Sunglaze, Cauldron Fair, Doorkick Dungeon, Thornbound (redesign).
-- In progress: Lantern Dive (also creates the shared `shell/gx-viewport.js`).
-- Next, in order:
-  1. Migration (playbook "One-off migration"): port munch's newer `shell.js` (drawer inert fix) into `games-src/shell/`,
-     then switch the 7 games on stale copies to inline the shared files. After this, recipe B reaches every game.
-  2. Recipe B: add `gx-viewport.js` to every game via the shared kit; `build-all.py --deploy`.
-  3. Story mode for the 10 games without it (one Sonnet worker each, 2 at a time; adapter templates
-     `azul/game/src/campaign.js`, `cauldron-fair/src/ui8.js`); games with no `campaign.json` get one written first.
-  4. Phone-check failures to fix: nebula-aces (portrait start), short-fuse, sands-of-qamar, kaiten-kitchen (rotation).
-- `phone-check.js` is sometimes flaky at game start ("couldn't start"): rerun once before treating it as a failure.
+## NOW (5 Oct, end of day) — start here
+Start a FRESH session on **Sonnet** with this prompt (typed by the owner):
+> Owner authorisation: commit, merge and push to `alex/brave-carson-rbpmlk` and deploy games that pass their checks live.
+> Follow games-src/HANDOFF.md and games-src/PLAYBOOK.md. Finish the pending games, two workers at a time, all on Sonnet.
+
+Finished games go LIVE once `phone-check.js <slug>` passes 6/6 (rerun once if it fails; a repeat failure is real).
+- **Live with story mode + phone fixes:** sunglaze, cauldron-fair, doorkick-dungeon (incl. its board-first branch),
+  thornbound (redesign), lantern-dive, kaiten-kitchen, final-approach (readable rework), shipwreck-isle, hollowbough.
+- **Pending, in order:**
+  1. tidewake: story mode + GXV done in source (`games-src/tidewake/game/tidewake.html`), but taps are ~1 s slow after
+     rotation (phone-check fails twice). Fix the slow relayout, then deploy.
+  2. kaiten-kitchen: merge `origin/board/kaiten-kitchen` (board-first work never merged; conflicts in game/src/ui8.js,
+     ui.js with the story-mode ui8.js: rename one), rebuild, deploy.
+  3. crown-city-smash: merge `origin/board/crown-city-smash` (conflict in games-src/kot/build.py with the shared-shell
+     migration), then story mode.
+  4. nebula-aces: board-first branch is merged now; add story mode, fix "portrait start" phone failure.
+  5. shipwreck-isle: owner says it still has the old narrative-text style. Board-first rework like final-approach
+     (board ≥60% of portrait, one 8-word line, no text panels, round results animated on the board).
+  6. short-fuse, rampart-and-vine, sands-of-qamar: story mode (+ phone fixes for short-fuse, sands-of-qamar).
+  7. Faster loading for every game (recipe B): show the board first, lazy-load three.js, audio and portraits.
+  8. final-approach: some slot labels overlap their P/C badges.
+- 14 stale local shell.js/shell.css copies (kot, xw, ft, carc, rc, azul, munch) are unused; deleting them was blocked
+  for sessions, the owner can delete them.
+- The owner should add the allow rules listed in the last session's runbook to `.claude/settings.json` (sessions
+  can't); then deploys never stall.
 
 ## Where things stand (4 Oct 2026)
 - **Thornbound** is the quality pilot. It has blind playtests (`games-src/thornbound/playtest-1/`) and the spec
