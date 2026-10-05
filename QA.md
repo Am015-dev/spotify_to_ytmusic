@@ -114,3 +114,11 @@ It fails on any of these:
 - any visible HUD element on a touch control (phone)
 - any collider on the paved road
 - the chase camera inside a building in more than 2 % of frames
+
+## Final build check (v83 + pQA1–3, split with tools/split_km.py: page 1,797,344 B + km.js 1,961,521 B)
+- `node smoke.js` on the split pages: **SMOKE PASS 12/12**, 0 console errors (`qa/smoke_sheet_final_split.png`).
+- `tPlay` phone, 2.5 game-minutes per city: **FAIL 1**.
+  - Frankfurt: 0.39 wall hits/min, 0 % stuck, no HUD on controls, camera never inside a building.
+  - Athens: **7.6 wall hits/min** (31 big speed drops), the only failing gate. 0 % stuck, 0 loading screens, 0 reloads, no HUD on controls, camera 0 %.
+  - 0 console errors (`qa/tPlay_final_phone.json`).
+- The remaining failure is Athens wall contact. It belongs to od-scale (pSC2: setback and forgiving glancing hits) and should be re-run through tPlay once pSC2 lands.

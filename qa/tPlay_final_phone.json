@@ -1,0 +1,348 @@
+[
+ {
+  "mode": "phone",
+  "cities": {
+   "fra": {
+    "min": 2.53,
+    "hits": 17,
+    "kinds": {
+     "other": 14,
+     "ped": 2,
+     "wall": 1
+    },
+    "wallHits": 1,
+    "wallPerMin": 0.39,
+    "hitsPerMin": 6.71,
+    "bigDrop": 5,
+    "stuckPct": 0,
+    "avgKmh": 96,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 9.1,
+    "traffic120m": 2.1,
+    "missions": [
+     {
+      "f": 1,
+      "start": "Hot Drop"
+     },
+     {
+      "f": 6685,
+      "end": "HOT DROP★★★A GETAWAY CAR ESCAPEDNo stars this time · try aga"
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "GO!",
+      "f": 5524,
+      "v0": 45,
+      "v1": 6,
+      "drop": 0.87,
+      "kind": "ped",
+      "x": 421,
+      "z": -417,
+      "dy": 0
+     },
+     {
+      "ctx": "⛓ GATE CRASHER",
+      "f": 9338,
+      "v0": 37,
+      "v1": 9,
+      "drop": 0.76,
+      "kind": "other",
+      "x": 364,
+      "z": -305,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 6259,
+      "v0": 37,
+      "v1": 11,
+      "drop": 0.7,
+      "kind": "other",
+      "x": 191,
+      "z": -796,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 3854,
+      "v0": 42,
+      "v1": 16,
+      "drop": 0.62,
+      "kind": "other",
+      "x": 1081,
+      "z": -409,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 6517,
+      "v0": 43,
+      "v1": 17,
+      "drop": 0.6,
+      "kind": "other",
+      "x": 122,
+      "z": -872,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "scale": {
+     "pedH": 1.91,
+     "carL": 4.9,
+     "carH": 1.95,
+     "player": {
+      "h": 1.33,
+      "l": 5,
+      "w": 2.29
+     },
+     "pedRel": 0.97,
+     "pedVsPlayer": 0.95,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 898,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 970,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#roamPlate×#ogArea",
+     "#ogArea×#ogHud",
+     "#roamPlate×#ogHud"
+    ],
+    "tiny": [
+     "SMALL:8px:KM/H",
+     "SMALL:9px:Chapter 1 · New in Mainh",
+     "SMALL:9px:16.0 s",
+     "B:9px:NEXT",
+     "SMALL:9px:11.0 s",
+     "SMALL:9px:6.0 s",
+     "SMALL:9px:1.0 s",
+     "SPAN:9px:TAP TO OPEN"
+    ],
+    "extra": {
+     "map": {
+      "opened": true,
+      "drag": true,
+      "pinch": true,
+      "covers": [],
+      "closed": true
+     },
+     "pause": {
+      "tP_settings": true,
+      "opts": [
+       "Master80",
+       "Music60",
+       "Effects90"
+      ],
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": true,
+      "btn": false,
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [
+     "next@8322",
+     "next@8928"
+    ],
+    "perf": {
+     "calls": 564,
+     "tris": 1967462,
+     "jsMs": 18.7,
+     "geoms": 488,
+     "tex": 108
+    },
+    "wallSec": 804
+   },
+   "ath": {
+    "min": 2.51,
+    "hits": 45,
+    "kinds": {
+     "wall": 19,
+     "ped": 2,
+     "other": 24
+    },
+    "wallHits": 19,
+    "wallPerMin": 7.58,
+    "hitsPerMin": 17.95,
+    "bigDrop": 31,
+    "stuckPct": 0,
+    "avgKmh": 70.5,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 16,
+    "traffic120m": 3.8,
+    "missions": [
+     {
+      "f": 5490,
+      "start": "Demolition Job"
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "AKROPOLIS CUP",
+      "f": 1964,
+      "v0": 163,
+      "v1": 32,
+      "drop": 0.8,
+      "kind": "wall",
+      "x": 1551,
+      "z": -1773,
+      "dy": 0
+     },
+     {
+      "ctx": "AKROPOLIS CUP",
+      "f": 345,
+      "v0": 185,
+      "v1": 42,
+      "drop": 0.77,
+      "kind": "wall",
+      "x": 936,
+      "z": -1867,
+      "dy": 0.1
+     },
+     {
+      "ctx": "WRECKED!",
+      "f": 9294,
+      "v0": 43,
+      "v1": 10,
+      "drop": 0.77,
+      "kind": "other",
+      "x": 1824,
+      "z": -1970,
+      "dy": 0
+     },
+     {
+      "ctx": "AKROPOLIS CUP",
+      "f": 872,
+      "v0": 175,
+      "v1": 41,
+      "drop": 0.76,
+      "kind": "wall",
+      "x": 1181,
+      "z": -1862,
+      "dy": -0.1
+     },
+     {
+      "ctx": "DRIFT KING",
+      "f": 3772,
+      "v0": 149,
+      "v1": 36,
+      "drop": 0.76,
+      "kind": "wall",
+      "x": 1286,
+      "z": -1835,
+      "dy": 0.1
+     }
+    ],
+    "monErr": null,
+    "scale": {
+     "pedH": 1.9,
+     "carL": 4.84,
+     "carH": 1.6,
+     "player": {
+      "h": 12.18,
+      "l": 27.36,
+      "w": 20.52
+     },
+     "pedRel": 0.98,
+     "pedVsPlayer": 0.17,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 556,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 482,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#roamPlate×#ogArea"
+    ],
+    "tiny": [
+     "SMALL:8px:KM/H",
+     "SMALL:9px:Chapter 1 · Welcome to A",
+     "B:9px:NEXT",
+     "SMALL:9px:23.6 s",
+     "SMALL:9px:18.6 s",
+     "SMALL:9px:13.6 s",
+     "SMALL:9px:8.2 s",
+     "SMALL:9px:3.5 s",
+     "SPAN:9px:TAP TO OPEN"
+    ],
+    "extra": {
+     "map": {
+      "opened": true,
+      "drag": true,
+      "pinch": true,
+      "covers": [],
+      "closed": true
+     },
+     "pause": {
+      "tP_settings": true,
+      "opts": [
+       "Master80",
+       "Music60",
+       "Effects90"
+      ],
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": true,
+      "btn": false,
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [
+     "next@0",
+     "next@3408",
+     "next@4014",
+     "next@4620"
+    ],
+    "perf": {
+     "calls": 295,
+     "tris": 1290194,
+     "jsMs": 32.5,
+     "geoms": 1188,
+     "tex": 139
+    },
+    "wallSec": 825
+   }
+  },
+  "errs": [],
+  "warns": []
+ }
+]
