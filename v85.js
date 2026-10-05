@@ -8,9 +8,13 @@ body.v85 #roamGauge{background:rgba(10,14,28,.55);border-radius:16px;padding:2px
 body.v85 #roamArrow{display:flex;align-items:center;gap:6px;font-size:15px!important;font-weight:800;color:#fff;background:rgba(10,14,28,.62);border-radius:14px;padding:4px 14px;max-width:60vw!important;text-shadow:0 1px 2px #000}
 body.v85 #roamArrow i{font-size:15px}
 #touch,#btnZone,.tbtn{touch-action:none}
+#roamFT{z-index:40;pointer-events:auto;bottom:auto;top:calc(10px + env(safe-area-inset-top,0px))}
+body:not([data-mode=roam]) #ogHud,body:not([data-mode=roam]) #ogArea{display:none!important}
+#itemBox{right:auto!important;left:calc(50% - clamp(24px,5.5vh,32px))!important;top:calc(60px + env(safe-area-inset-top,0px))!important}
+
 body.v85 #roamPop{top:calc(64px + env(safe-area-inset-top,0px));min-width:0;padding:3px 12px;border-radius:14px;background:rgba(10,14,28,.62);box-shadow:none}body.v85 #roamPop h5{display:inline;font-size:12px;margin-right:6px}body.v85 #roamPop span{display:inline;font-size:12px}body.v85 #roamPop div,body.v85 #roamPop small{display:none}
 body.v85 #tL{left:max(28px,calc(16px + env(safe-area-inset-left,0px)))!important}body.v85 #tR{left:calc(max(28px,16px + env(safe-area-inset-left,0px)) + 14px + clamp(68px,24vh,96px))!important}
-body.v85 #tG,body.v85 #tN{right:max(28px,calc(14px + env(safe-area-inset-right,0px)))!important}body.v85 #tB{right:max(40px,calc(28px + env(safe-area-inset-right,0px)))!important}body.v85 #tP{left:max(28px,calc(10px + env(safe-area-inset-left,0px)))!important}
+body.v85 #tG,body.v85 #tN{right:max(28px,calc(14px + env(safe-area-inset-right,0px)))!important}body.v85 #tP{left:max(28px,calc(10px + env(safe-area-inset-left,0px)))!important}
 `;
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);document.body.classList.add('v85');
 // verbs for the one objective line
@@ -39,4 +43,10 @@ function v85Road(ch){try{const q=ch&&ch.v2;if(!q||q._v85)return;q._v85=1;const s
  if(Math.hypot(RO.x-P[0][0],RO.z-P[0][1])<40&&Math.abs(RO.v)<6){RO.h=RO.vh=a0;RO.yr=0;RO.v=13;camSnap=true;RO.v85w=4}
  V.road={n:pts.length,a0,L}}catch(e){V.err=String(e&&e.stack||e)}}
 roamStep=(f=>function(dt){f(dt);v85tick(dt)})(roamStep);
+// rings: free roam shows only the nearest event ring, plus golden/collect rings within 70 m
+OG_draw=(f=>function(){if(!OG.ev&&OG.vis&&state==='roam'){let best=null,bd=1e9;for(const sp of OG.vis)if(sp.k==='ev'){const d=Math.hypot(sp.x-RO.x,sp.z-RO.z);if(d<bd){bd=d;best=sp}}const keep=OG.vis;OG.vis=keep.filter(sp=>sp.k==='ev'?sp===best:Math.hypot(sp.x-RO.x,sp.z-RO.z)<70);try{return f.apply(this,arguments)}finally{OG.vis=keep}}return f.apply(this,arguments)})(OG_draw);
+// a roam event must not survive into a race or the menu (stale GHOST RACE panel + RETRY)
+exitRoam=(f=>function(){try{if(OG.ev)OG_end(null,1)}catch(e){}return f.apply(this,arguments)})(exitRoam);
+setupRace=(f=>function(cfg){try{if(cfg&&cfg.type!=='roam'&&OG.ev)OG_end(null,1)}catch(e){}return f.apply(this,arguments)})(setupRace);
+
 })();
