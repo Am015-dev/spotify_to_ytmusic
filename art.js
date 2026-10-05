@@ -43,6 +43,5 @@ function ART_light(){if(!RO.on||!MOOD)return;const n=typeof FL!=='undefined'&&FL
 {const _am=applyMood;applyMood=function(){const r=_am.apply(this,arguments);ART_light();return r}}
 {const _fa=FL_apply;FL_apply=function(){const r=_fa.apply(this,arguments);ART_light();return r}}
 {const _he=hubEnter;hubEnter=function(){const r=_he.apply(this,arguments);ART_hub();ART_light();return r}}
-{const _rc=roamCam;roamCam=function(dt){const r=_rc.apply(this,arguments);try{if(RO.on&&!RO.mapOpen){const c=camera.position,dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz),M=8;if(d>M){const k=M/d;c.x=RO.x+dx*k;c.z=RO.z+dz*k;camera.updateMatrixWorld()}}}catch(e){}return r}}
 roamStep=(f=>function(dt){f(dt);if(flash>1)flash=1;if(hitFx>1)hitFx=1;if(CLOUDS&&CLOUDS.userData.art)CLOUDS.position.set(camera.position.x,0,camera.position.z);if(!ART.done||HUB.M&&HUB.M.artDone!==CID){ART.done=1;ART_hub();ART_light()}})(roamStep);
 window.__art={get pl(){return pl},gAt:(x,z,y)=>groundAt(x,z,y),gY:(x,z)=>groundY(x,z),get CITY_S(){return typeof CITY_S!=="undefined"?CITY_S:null},hubRoads:()=>hubRoads(),ART,ART_hub,ART_light,get HUB(){return HUB},get MOOD(){return MOOD},get FL(){return FL},SKYU,hemi,moonL,scene,renderer,THREE,get RO(){return RO},get CID(){return CID},LK,get bloom(){return bloom}};
