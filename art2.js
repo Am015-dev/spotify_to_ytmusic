@@ -4,7 +4,7 @@ function ART_brickGeo(layers,trunk,stud){const P=[],u=.8;const add=(g,c)=>{const
   const sg=new THREE.CylinderGeometry(.24,.24,.2,6,1,false);sg.deleteAttribute('uv');
   layers.forEach((L,i)=>{const[w,h,y,ox=0,oz=0,col='#ffffff']=L;add(new THREE.BoxGeometry(w-.04,h,w-.04).translate(ox,y+h/2,oz),col);
     const nx=Math.round(w/u),nu=layers[i+1];for(let a=0;a<nx;a++)for(let b=0;b<nx;b++){const x=ox+(a-(nx-1)/2)*u,z=oz+(b-(nx-1)/2)*u;
-      if(nu&&Math.abs(x-(nu[3]||0))<nu[0]/2&&Math.abs(z-(nu[4]||0))<nu[0]/2)continue;if(stud&&(a+b)%stud)continue;add(sg.clone().translate(x,y+h+.1,z),col)}});
+      if(nu&&Math.abs(x-(nu[3]||0))<nu[0]/2&&Math.abs(z-(nu[4]||0))<nu[0]/2)continue;if(!stud||(a+b)%stud)continue;add(sg.clone().translate(x,y+h+.1,z),col)}});
   const g=mergeGeometries(P);g.computeVertexNormals();g.computeBoundingBox();g.computeBoundingSphere();return g}
 const ART_TREES={
  tree:()=>ART_brickGeo([[4.8,1.2,3.2],[6.4,1.6,4.4],[4.8,1.2,6.0],[3.2,1.0,7.2]],[1.6,3.4,'#8a5a32'],0),

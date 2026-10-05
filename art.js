@@ -6,10 +6,10 @@ function ART_tex(w,h,draw,rep){const c=document.createElement('canvas');c.width=
 // green baseplate: 8×8 studs per tile with a light rim and soft shadow; mipmaps fade them to flat green in the distance
 function ART_plate(base,lit,dark){return ART_tex(256,256,(g,W)=>{g.fillStyle=base;g.fillRect(0,0,W,W);let r=11;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;
   for(let i=0;i<600;i++){g.fillStyle=`rgba(${rnd()<.5?'255,255,200':'0,40,0'},.05)`;g.fillRect(rnd()*W,rnd()*W,6,6)}
-  const s=W/8;for(let y=0;y<8;y++)for(let x=0;x<8;x++){const cx=x*s+s/2,cy=y*s+s/2,R=s*.3;
-   g.fillStyle='rgba(0,30,0,.28)';g.beginPath();g.arc(cx+2.5,cy+3,R+1,0,7);g.fill();
+  const s=W/16;for(let y=0;y<16;y++)for(let x=0;x<16;x++){const cx=x*s+s/2,cy=y*s+s/2,R=s*.3;
+   g.fillStyle='rgba(0,30,0,.28)';g.beginPath();g.arc(cx+1.5,cy+2,R+1,0,7);g.fill();
    g.fillStyle=dark;g.beginPath();g.arc(cx,cy,R,0,7);g.fill();
-   const gr=g.createLinearGradient(cx-R,cy-R,cx+R,cy+R);gr.addColorStop(0,lit);gr.addColorStop(1,base);g.fillStyle=gr;g.beginPath();g.arc(cx-.8,cy-.8,R-1.6,0,7);g.fill()}})}
+   const gr=g.createLinearGradient(cx-R,cy-R,cx+R,cy+R);gr.addColorStop(0,lit);gr.addColorStop(1,base);g.fillStyle=gr;g.beginPath();g.arc(cx-.5,cy-.5,R-1.2,0,7);g.fill()}})}
 // asphalt: mid grey, light kerbs, white edge lines, double yellow centre line
 function ART_road(){return ART_tex(256,512,(g,W,H)=>{g.fillStyle='#55585f';g.fillRect(0,0,W,H);let r=91;const rnd=()=>(r=(r*16807)%2147483647)/2147483647;
   for(let i=0;i<4000;i++){const v=70+rnd()*40|0;g.fillStyle=`rgba(${v},${v+2},${v+6},.45)`;g.fillRect(rnd()*W,rnd()*H,2,2)}

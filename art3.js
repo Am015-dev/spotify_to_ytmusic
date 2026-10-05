@@ -15,7 +15,6 @@ function ART_step(dt){if(!RO.on){if(ART3.pl)ART3.pl.visible=ART3.tr.visible=fals
 roamStep=(f=>function(dt){f(dt);try{ART_step(dt)}catch(e){}})(roamStep);
 // HUD skin: minimap N marker, purple NPC card with yellow header + round portrait, thin boost bar bottom-centre, bold italic headings
 {const st=document.createElement('style');st.id='artHud';st.textContent=`
-#roamMini::before{content:'N';position:absolute;z-index:3;top:1px;left:50%;transform:translateX(-50%);font:900 12px/16px system-ui;color:#141413;background:#ffd400;border-radius:8px;padding:0 5px;pointer-events:none}
 body #npcSay{background:linear-gradient(180deg,#6a35b8,#4a2290)!important;color:#fff!important;border:3px solid #ffd400;border-radius:14px!important;box-shadow:0 6px 0 rgba(0,0,0,.25),0 8px 20px rgba(0,0,0,.35)!important;padding:6px 12px 6px 6px!important}
 body #npcSay img{width:46px;height:46px;border-radius:50%;border:3px solid #ffd400;background:#ffe9a8;object-fit:cover;flex:none}
 body #npcSay b{display:inline-block;background:#ffd400;color:#141413;font:italic 900 12px/1.3 system-ui;text-transform:uppercase;padding:1px 8px;border-radius:6px;transform:skewX(-8deg);margin-bottom:3px}
