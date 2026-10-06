@@ -101,8 +101,6 @@ const icoEl = grp => h('i.ic', { 'aria-hidden': 'true', html: '<svg viewBox="0 0
 // mandatory spaces of seat a that are still empty, and how many dice it has left: warn before a missing Axis / Engine die loses the flight
 function mandInfo(a) { if (!G || typeof a !== 'number' || a < 0 || G.phase !== 'place' || G.result) return null; const need = ['ax' + a, 'en' + a].filter(k => !G.slots[k]), left = FA.unusedDice(G, a).length; return { need, left, tight: need.length > 0 && left > 0 && left <= need.length, lost: need.length > left }; }
 const needNames = need => need.map(k => FA.SLOT[k].grp === 'axis' ? 'Axis' : 'Engines').join(' and ');
-// which control a guided tip is about: those elements get a pulsing ring while the tip is up
-const TIPHL = { axis: ['.slot[data-slot^=ax]', '.dial.axd'], engines: ['.slot[data-slot^=en]', '.gau'], track: ['.w.appr'], radio: ['.slot[data-slot^=ra]'], alt: ['.w.altw'], gear: ['.slot[data-slot^=lg]', '.gau'], flaps: ['.slot[data-slot^=fl]', '.gau'], brakes: ['.slot[data-slot^=br]', '.slot[data-slot^=it]', '.slot[data-slot^=ib]', '.badge.brk'], conc: ['.slot[data-slot^=co]', '.chipr'], rr: ['.badge.rrb'], dice: ['.tray'], 'n-dice': ['.tray'], 'n-mand': ['.slot[data-slot^=ax]', '.slot[data-slot^=en]'], hint: [], welcome: [], brief: [] };
 const SLOTLAB = k => { const S = FA.SLOT[k]; if (S.grp === 'gear' || S.grp === 'flaps') return S.vals.join('-'); if (S.grp === 'brakes' || S.grp === 'ice') return String(S.vals[0]); return ''; };
 function selectedLegal() {
   const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v)) return [];
@@ -196,8 +194,6 @@ function render() {
   }
   // ---- hud
   if (r.hud) { const row = rows[G.round + G.row0]; pz.appendChild(css(h('div.hudc', h('b', 'Round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0) + (isPh() ? '' : ' · ' + row[0] + ' ft')), (tm => isPh() && tm ? tm : [h('span', G.result ? 'Flight over' : G.phase === 'brief' ? 'Briefing' : (G.pend ? pendLabel() : (G.turn === 0 ? 'Pilot' : 'Co-pilot') + ' places')), tm])(rtEl())), r.hud)); }   // phones: two short lines, the clock replaces the turn line (the prompt says whose turn it is)
-  // the control the current guided tip talks about
-  if (UI.coach && UI.coach.tip && TIPHL[UI.coach.tip]) for (const sel of TIPHL[UI.coach.tip]) pz.querySelectorAll(sel).forEach(e => e.classList.add('hl'));
   renderDock(); renderBar(); phPost();
   if (typeof pxSync === 'function') pxSync();
   if (typeof netRenderHook === 'function') netRenderHook();
@@ -373,7 +369,6 @@ function actions(v) {
   if (G.turn !== v) return f;
   if (has('antic').length && selD) b('Second look: reroll this die', 'antic', 'alt');
   if (has('toss').length && selD) b('No space fits: put it aside', 'toss', 'alt');
-  b('Hint', 'hint', 'alt', { title: 'What the computer would do with your dice, and why' });
   return f;
 }
 // the landing conditions as [ok (true / false / null = not yet), text]
@@ -414,6 +409,7 @@ function newGame(mode, o) {
   UI.coach = { level: o.tipsOff ? 'off' : mode === 'guided' ? 'full' : (UI.prefs.guide || 'off'), seen: {}, tip: '', queue: [] }; UI.lastPlace = null; UI.rt = G.mods.real ? { left: 60000, last: 0 } : null;
   const st = $('#start'); if (st) st.hidden = true; closeRS(); try { GX.close(); } catch (e) { } closePass(); hideRecap();
   { const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } }   // a tip left over from the last flight
+  if (mode === 'guided' && typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { GXH.setEnabled(true); GXH.reset(); } }   // the guided flight: every bubble on, again
   $$('#fx .endb').forEach(e => e.remove()); UI.rfx = null; clearSave(); render(); sndMusic(); coachTick(); schedule();
   if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false && !o.camp && !isPh()) showStory();
 }
@@ -489,39 +485,7 @@ function doAction(a, t) {
     case 'rrpick': sendMove(v, { t: 'rrpick', m: UI.rrm.slice() }); break;
     case 'antic': case 'adapt': case 'wt': case 'toss': if (typeof UI.sel === 'number' && UI.sel >= 0) sendMove(v, { t: a, d: UI.sel }); break;
     case 'cof': UI.cof = +t.dataset.c; render(); break;
-    case 'hint': showHint(); break;
   }
-}
-function showHint() {
-  const v = actSeat(); if (typeof v !== 'number' || !mayAct(v)) return;
-  try {
-    const m = FA.AI.move(G, v, 'normal', { noMC: true }); if (!m) { toast('No suggestion.'); return; }
-    let why = whyMove(m, v), d = m.d;
-    UI.hint = { d: m.t === 'place' || m.t === 'toss' ? d : null, why: '' };
-    if (m.t === 'place') { UI.sel = d; UI.cof = m.c || 0; }   // the reason shows in the dock under the die, never as a toast over the buttons
-  } catch (e) { console.error(e); }
-  render();
-}
-function whyMove(m, v) {
-  if (m.t === 'ready') return 'Roll when you have finished the briefing.';
-  if (m.t === 'rr') return 'Spend a reroll token: your hand does not fit the jobs that are waiting.';
-  if (m.t === 'toss') return 'Nothing takes this die, so put it aside.';
-  if (m.t !== 'place') return m.t + ' looks useful here.';
-  const val = (m.d === 'p' ? G.pend.d.val : G.dice[v][m.d].v) + (m.c || 0), S = FA.SLOT[m.to], pre = m.c ? 'With a coffee making it ' + val + ', ' : 'A ' + val + ' ';
-  switch (S.grp) {
-    case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0, sp = at === G.planes.length ? 'the airport' : 'space ' + at; return n ? pre + 'on the radio clears a plane on ' + sp + '.' : pre + 'on the radio would clear nothing; it only gets rid of a spare die.'; }
-    case 'axis': { const o = G.slots['ax' + (1 - v)]; if (o) { const nx = G.pl.axis + (v === 0 ? o.v - val : val - o.v); return pre + 'on the axis against ' + name(1 - v) + '’s ' + o.v + ' leaves the plane ' + (nx === 0 ? 'level' : 'tilted ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right')) + ' (3 is a spin).'; }
-      return pre + 'on the axis goes first. ' + name(1 - v) + ' cannot see it coming and will answer with what their dice allow; a middle value leaves the most room.'; }
-    case 'engines': { const o = G.slots['en' + (1 - v)]; if (o) { const sm = val + o.v + FA.windMod(G), adv = FA.isFinal(G) ? -1 : sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return pre + 'on the engines makes ' + sm + (adv < 0 ? ' for the landing (brakes ' + FA.brakeVal(G) + ').' : ': the plane ' + (adv ? 'moves ' + adv + ' space' + (adv > 1 ? 's' : '') + '.' : 'stays put.')); }
-      return pre + 'on the engines sets half of the speed; ' + name(1 - v) + ' adds the other half (up to ' + G.pl.aeroB + ' stays, up to ' + G.pl.aeroO + ' moves 1, more moves 2).'; }
-    case 'gear': return pre + 'lowers a landing gear (needed to land); the blue marker moves up.';
-    case 'flaps': return pre + 'extends a flap (needed to land); the orange marker moves up.';
-    case 'brakes': case 'ice': return pre + 'sets a brake: the last-round speed must be no more than the brake value.';
-    case 'conc': return pre + 'on Coffee earns a coffee token: later, either of you can bend a die by one with it.';
-    case 'kero': return pre + 'on the fuel space burns ' + val + '; skipping it would burn 6.';
-    case 'intern': return pre + 'trains the trainee: take the next token and place it too.';
-  }
-  return 'Good use of this die.';
 }
 // ---- pass-the-device screens (hot-seat)
 function showPass(seat) {
@@ -549,60 +513,16 @@ function onEnd() {
   const fin = () => { if (typeof campOn === 'function' && campOn()) campFinish(); else showEndBoard(); };
   if (typeof pxEnd === 'function' && ANIM && typeof PX !== 'undefined' && PX.on) { pxEnd(win, fin); } else setTimeout(fin, ANIM ? 500 : 0);
 }
-// ===================== part 4: guided first flight (tips), end card, drawers =====================
+// ===================== part 4: guided first flight script, end card, drawers =====================
 var GUIDED_SCRIPT = [[[6,4,6,3],[4,3,4,4]],[[1,5,2,3],[4,1,5,5]],[[4,2,1,6],[3,1,2,4]],[[2,4,2,4],[2,5,4,1]],[[6,5,2,2],[6,2,1,4]],[[1,1,5,5],[2,6,6,2]],[[4,2,4,3],[5,6,4,6]]];   // found by guided-search.js: each control has a die to teach with, and two computer crews win 80% of 60 flights
-// Each tip has a short line (s) shown as a banner in the dock (never over the dice tray, Roll or the briefing phrases) and a full text (x) behind "More".
-// While a tip is up, the control it talks about pulses on the panel (TIPHL in part 2).
-const TIPS = [
-  { id: 'welcome', g: 1, when: () => G.phase === 'brief' && G.round === 0, t: 'Welcome aboard', s: 'You are Ines, the Pilot (blue). Ravi flies orange. Reach the airport in 6 rounds, land in round 7.', x: 'You are Captain Ines Marlow, the Pilot (blue). Your co-pilot, Ravi, plays the orange side. Land the plane in seven rounds, one altitude row per round. This first flight is Port Alder, the friendliest airport. I will introduce one control at a time, and the control I talk about pulses on the panel.' },
-  { id: 'brief', g: 1, when: () => G.phase === 'brief' && G.round === 0, t: 'The briefing', s: 'Tap a phrase to share a plan (never dice values), then Roll.', x: 'Before each roll you may talk strategy: "we need to clear traffic", "let us move two spaces". You never say dice values. Tap a phrase to tell Ravi your plan, then press Roll. After the roll both of you stay silent: the dice you place are your only words.' },
-  { id: 'alt', g: 1, when: () => G.phase === 'brief' && G.round === 0, t: 'The altitude strip', s: 'One row per round. Its colour shows who places first.', x: 'Every round the plane sinks one row: seven rows, seven rounds, no waiting. The colour of each row (and the name next to it) says who places the first die that round: blue is the Pilot, orange the Co-pilot. A purple dot means a reroll token comes aboard at that altitude.' },
-  { id: 'dice', g: 1, when: () => G.phase === 'place' && G.round === 0 && myTurn(), t: 'Your dice', s: 'Your blue dice: only you see them. Tap a die, then a glowing space.', x: 'Your four blue dice sit behind your screen at the bottom: only you can see them. Ravi’s orange dice are hidden from you. Players alternate: tap a die, then tap a glowing space on the panel. You must place every die.' },
-  { id: 'axis', g: 1, ctl: 1, when: () => myTurn() && selFits('axis'), t: 'Control 1: the Axis', s: 'Both crew fill the Axis every round. It tilts toward the higher die.', x: 'Each round both crew must put one die on the Axis (the two spaces beside the round dial). The plane tilts toward the higher die by the difference (5 against 3 tilts 2). Equal dice keep it level. A tilt of 3 is a spin: you lose at once. The tilt carries over, and the plane must be level when it lands.' },
-  { id: 'engines', g: 1, ctl: 1, when: () => myTurn() && selFits('engines'), t: 'Control 2: the Engines', s: 'Both crew fill the Engines too: the sum moves the plane 0, 1 or 2.', x: 'Both crew also put one die on the Engines (beside the speed gauge). Add them: up to the blue marker the plane stays put, up to the orange marker it moves one space, above it moves two. Leaving a space that still holds a plane is a collision, and moving past the airport is an overshoot. An empty Axis or Engines space at the end of a round loses the flight.' },
-  { id: 'track', g: 1, ctl: 1, when: () => G.phase === 'place' && myPlaced() >= 1 && myTurn(), t: 'The approach strip', s: 'Your route: clear the planes on a space before you leave it.', x: 'The strip at the top is your route. Your plane is the glowing space. Planes in your way must be cleared before you leave their space. The airport is the last space: you must be there when the last altitude starts.' },
-  { id: 'radio', g: 1, ctl: 1, when: () => myTurn() && selFits('radio'), t: 'Control 3: the Radio', s: 'Radio: clears a plane that many spaces ahead (your space is 1).', x: 'A die on the Radio, any value, clears one plane. Count from your own space as 1: a 3 clears the plane on the space two ahead of you. The pilot has one radio space, the co-pilot has two.' },
-  { id: 'rr', g: 1, ctl: 1, when: () => G.rrHand > 0 && G.phase === 'place' && myTurn() && !G.pend && myPlaced() >= 2, t: 'The Reroll button', s: 'Reroll: either of you, any time. Both reroll any unplaced dice.', x: 'A reroll token lets both crew reroll any of their unplaced dice, once, behind their screens. Tokens come from the altitude strip. Either crew may spend one at any time while dice are left, also during the partner’s turn. Use it when your hand does not fit the jobs that are waiting.' },
-  { id: 'hint', g: 1, ctl: 1, when: () => G.round >= 1 && G.phase === 'place' && myTurn(), t: 'The Hint button', s: 'Hint shows what the computer would do, and why. Guess first!', x: 'Not sure? Press Hint: it picks the die and the space the computer crew would choose and explains why, under your die in this panel. It is a suggestion, not a rule. You learn faster if you guess first and then compare.' },
-  { id: 'gear', g: 1, ctl: 1, when: () => G.round >= 1 && myTurn() && selFits('gear'), t: 'Control 4: Landing gear', s: 'Pilot: three gears (1-2, 3-4, 5-6). Each raises the blue marker.', x: 'The pilot lowers the landing gear: any of the three spaces, a 1-2, a 3-4 and a 5-6. All three must be down to land. Each gear raises the blue engine marker, so slow speeds become easier and one-space moves harder.' },
-  { id: 'flaps', g: 1, when: () => G.round === 2 && G.phase === 'place', t: 'Control 5: Flaps', s: 'Ravi: four flaps, in order. Each raises the orange marker.', x: 'The co-pilot extends the flaps, in order from the top: 1-2, then 2-3, then 4-5, then 5-6. All four must be out to land. Each flap raises the orange marker, so a two-space move needs a bigger sum. Ravi handles these; watch how the markers move.' },
-  { id: 'brakes', g: 1, when: () => G.round === 3 && G.phase === 'place' && myTurn(), t: 'Control 6: Brakes', s: 'Brakes: exactly 2, then 4, then 6. They count in the last round.', x: 'The brakes only matter in the last round, but they need exact values in order: a 2, then a 4, then a 6. In the final round your engine total must be no more than the brake value. Set them early.' },
-  { id: 'conc', g: 1, when: () => G.round === 4 && G.phase === 'place' && myTurn(), t: 'Control 7: Concentration', s: 'A spare die on Coffee earns a token: ±1 on any later die.', x: 'A die you cannot use anywhere can go on Concentration (the Coffee spaces) for a coffee token. Spend tokens on any later die to add or subtract 1 (never wrapping 1 to 6): pick a die, then use the − and + buttons under it. The die in your tray shows the new value.' },
-  { id: 'final', g: 1, when: () => G.round === 6 && G.phase === 'brief', t: 'The landing round', s: 'Last round: no move. Speed must be no more than the brakes.', x: 'This is the last round. The plane does not move: your engine total is compared with the brakes. To win by the end of the round: no planes left, all gear and flaps down, the axis exactly level, and the speed no greater than the brakes.' },
-  // normal flights with Guide "Full": a short set written for the seat you actually fly (the g:1 set above is the guided Pilot flight at Port Alder)
-  { id: 'n-welcome', g: 2, when: () => G.phase === 'brief' && G.round === 0, t: 'Your seat', s: () => 'You are ' + name(UI.seat) + ', the ' + SEATN[UI.seat] + ' (' + (UI.seat ? 'orange' : 'blue') + '). ' + name(1 - UI.seat) + ' flies ' + (UI.seat ? 'blue' : 'orange') + '. Land in ' + (D.rounds - G.row0) + ' rounds.', x: () => 'You fly the ' + SEATN[UI.seat] + ' seat (' + (UI.seat ? 'orange' : 'blue') + ' dice, the ' + (UI.seat ? 'right' : 'left') + ' side of the panel). Your crewmate ' + name(1 - UI.seat) + ' flies the ' + SEATN[1 - UI.seat] + ' seat. Talk plans in the briefing, never dice values; after the roll your placed dice are your only words.' },
-  { id: 'n-dice', g: 2, when: () => G.phase === 'place' && myTurn(), t: 'Your dice', s: () => 'Your ' + (UI.seat ? 'orange' : 'blue') + ' dice: only you see them. Tap a die, then a glowing space.', x: () => 'Your four ' + (UI.seat ? 'orange' : 'blue') + ' dice are behind your screen; ' + name(1 - UI.seat) + '’s dice are hidden from you. Players alternate until all eight dice are placed. Spaces marked ' + (UI.seat ? 'C' : 'P') + ' are yours; grey spaces take either crew.' },
-  { id: 'n-mand', g: 2, ctl: 1, when: () => myTurn() && (selFits('axis') || selFits('engines')), t: 'Axis and Engines', s: 'Both crew must fill the Axis and the Engines every round.', x: 'Each round both crew put one die on the Axis (the plane tilts toward the higher die; a tilt of 3 is a spin) and one on the Engines (the sum against the blue and orange markers moves the plane 0, 1 or 2 spaces). An empty Axis or Engines space at the end of a round loses the flight.' },
-  { id: 'n-role', g: 2, ctl: 1, when: () => myTurn() && myPlaced() >= 1, t: () => 'The ' + SEATN[UI.seat] + '’s jobs', s: () => UI.seat ? 'You extend the flaps in order and have two radio spaces.' : 'You lower the landing gear and set the brakes: 2, then 4, then 6.', x: () => UI.seat ? 'The Co-pilot extends the four flaps strictly in order (1-2, 2-3, 4-5, 5-6); each raises the orange marker. You have two radio spaces to clear planes ahead.' : 'The Pilot lowers the three landing gears (1-2, 3-4, 5-6, any order; each raises the blue marker) and sets the brakes with exactly 2, then 4, then 6. The brakes only count in the last round. You have one radio space.' },
-  { id: 'n-hint', g: 2, ctl: 1, when: () => myTurn() && myPlaced() >= 2, t: 'Hint', s: 'Stuck? Hint shows what the computer would do, and why.', x: 'Hint picks the die and space the computer crew would choose and explains why, under your die. Guess first, then compare.' },
-  { id: 'welcome2', g: 0, when: () => G.phase === 'brief' && G.round === 0, t: 'Briefing and silence', s: 'Talk plans before the roll, never dice values. Then silence.', x: 'Talk strategy before you roll, never dice values. After the roll stay silent: your placements are your words.' }
-];
+// (the old tip cards are gone: the help kit in ui10.js gives the coach bubbles, the lightbulb and the rules cards)
 // one control tip per die you place: the next one waits until you have placed a die, and control tips come when the die you picked fits that control
 function myPlaced() { const v = actSeat(); return typeof v === 'number' && v >= 0 ? Object.values(G.slots).filter(d => d.s === v && d.k !== 'i' && d.k !== 'x').length : 0; }
 function selFits(grp) { return typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && selectedLegal().some(k => FA.SLOT[k].grp === grp); }
 const tval = v => typeof v === 'function' ? v() : v;
 function myTurn() { const v = actSeat(); return typeof v === 'number' && v >= 0 && mayAct(v) && FA.pending(G).includes(v); }
-function coachTick() {
-  return;   // no tip or advice cards in any mode: the ghost finger and the glowing spaces teach
-  const c = UI.coach; if (!G || !UI.started || G.result || c.level === 'off' || isPh()) return;   // phones: no tip boxes, the ghost finger shows the first moves
-  if (UI.mode === 'net' || UI.mode === 'hot' && UI.holder < 0) return;
-  if (c.tip && c.tipR !== G.round + ':' + G.phase) { c.seen[c.tip] = 1; c.tip = ''; c.more = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } applyHL(); }
-  if (c.tip) return;
-  const gate = G.round + ':' + myPlaced();
-  for (const t of TIPS) { if (c.seen[t.id]) continue; const on = t.g === 0 ? c.level === 'light' && UI.mode !== 'guided' : t.g === 1 ? UI.mode === 'guided' : c.level === 'full' && UI.mode === 'vs'; if (!on) continue;   // g:2, the role-aware set, speaks to one person at one seat
-    if (t.ctl && c.gate === gate) continue; let ok = false; try { ok = t.when(); } catch (e) { } if (ok) { if (t.ctl) c.gate = gate; c.tip = t.id; c.tipR = G.round + ':' + G.phase; c.more = false; showTip(t); return; } }
-}
-function showTip(t) {
-  const pc = $('#pc'); if (!pc) return; pc.hidden = false; pc.innerHTML = ''; const c = UI.coach;
-  const ids = TIPS.filter(x => x.g === t.g).map(x => x.id), n = ids.indexOf(t.id) + 1;
-  pc.append(h('div.tbr', h('div.tbt', h('div.tbh', h('b', tval(t.t)), h('span', t.g === 1 ? 'Guided flight' : 'Tip')), h('p', tval(c.more ? t.x : t.s))), h('button.btn.go', { type: 'button', 'data-a': 'tipok' }, 'Got it')),
-    h('div.cbtns', c.more ? null : h('button.btn.alt', { type: 'button', 'data-a': 'tipmore', 'aria-expanded': 'false' }, 'More'), h('button.btn.alt', { type: 'button', 'data-a': 'tipoff' }, 'No more tips')));
-  if (typeof renderDock === 'function' && G) renderDock();
-  applyHL();
-}
-function tipMore() { const c = UI.coach; c.more = true; const t = TIPS.find(x => x.id === c.tip); if (t) showTip(t); }
-function applyHL() { const pz = $('#pz'); if (!pz) return; pz.querySelectorAll('.hl').forEach(e => e.classList.remove('hl')); const id = UI.coach && UI.coach.tip; if (id && TIPHL[id]) for (const sel of TIPHL[id]) pz.querySelectorAll(sel).forEach(e => e.classList.add('hl')); }
-function tipOk() { const c = UI.coach, pc = $('#pc'); if (c.tip) c.seen[c.tip] = 1; c.tip = ''; c.more = false; if (pc) { pc.hidden = true; pc.innerHTML = ''; } applyHL(); if (G && UI.started) renderDock(); setTimeout(coachTick, 150); }
+function coachTick() { }   // kept so older call sites stay valid; see ui10.js
+function applyHL() { }
 // ---------- end card ----------
 // ---- the story card at the start of a flight (airport, what is special today, how the colours work)
 function showStory() {
@@ -704,7 +624,8 @@ function renderMenu() {
   const tog = (n, on, label) => h('button.btn' + (on ? '' : '.alt'), { 'data-a': n, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, label + ': ' + (on ? 'On' : 'Off'));
   if (typeof NET !== 'undefined' && NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, typeof isHost === 'function' && isHost() ? 'Close the room' : 'Leave the room'));
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New flight'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
-  if (!(typeof NET !== 'undefined' && NET.on)) { row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n))); row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + ((UI.coach.level || UI.prefs.guide) === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1)))); row('Flight story card', ...[[true, 'On'], [false, 'Off']].map(([v, n]) => h('button.btn' + ((UI.prefs.story !== false) === v ? '' : '.alt'), { 'data-a': 'story', 'data-v': v ? '1' : '0', type: 'button' }, n))); }
+  if (!(typeof NET !== 'undefined' && NET.on)) { row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n))); row('Flight story card', ...[[true, 'On'], [false, 'Off']].map(([v, n]) => h('button.btn' + ((UI.prefs.story !== false) === v ? '' : '.alt'), { 'data-a': 'story', 'data-v': v ? '1' : '0', type: 'button' }, n))); }
+  if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { const w = document.createElement('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); while (w.firstChild) b.appendChild(w.firstChild); } }
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const g = UI.prefs.gfx || 'auto'; row('Graphics' + (typeof PX !== 'undefined' && PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
@@ -772,8 +693,7 @@ document.addEventListener('click', ev => {
   switch (a) {
     case 'die': dieTap(+d.s, d.d === 'p' ? 'p' : +d.d); break;
     case 'slot': slotTap(d.slot); break;
-    case 'ready': case 'say': case 'rr': case 'rrpick': case 'antic': case 'adapt': case 'wt': case 'toss': case 'cof': case 'hint': doAction(a, t); break;
-    case 'tipmore': tipMore(); break;
+    case 'ready': case 'say': case 'rr': case 'rrpick': case 'antic': case 'adapt': case 'wt': case 'toss': case 'cof': doAction(a, t); break;
     case 'unsel': UI.sel = -1; UI.cof = 0; UI.warnK = null; render(); break;
     case 'debrief': showFinal(); break;
     case 'lookpanel': lookPanel(); break;
@@ -783,8 +703,6 @@ document.addEventListener('click', ev => {
     case 'altinfo': { const R = altRows()[G.round + G.row0]; toast(R[0] + ' ft · round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0)); break; }
     case 'space': { const i = +d.i, s = trackOf().sp[i]; toast((i === trackOf().sp.length - 1 ? 'Airport' : 'Space ' + (i + 1)) + ': ' + G.planes[i] + ' plane' + (G.planes[i] === 1 ? '' : 's')); break; }
     case 'take': takeDevice(+d.s); break;
-    case 'tipok': tipOk(); break;
-    case 'tipoff': UI.coach.level = 'off'; tipOk(); UI.prefs.guide = 'off'; savePrefs(); break;
     case 'rsclose': closeRS(); break;
     case 'again': { const c = UI.cfg || {}; const m = UI.mode, off = UI.coach && UI.coach.level === 'off'; closeRS(); if (m === 'net') { netStart(); break; } newGame(m === 'guided' ? 'vs' : m, { scenario: c.scenario, role: c.role, level: c.level, abil: c.abil, tipsOff: off }); break; }
     case 'nextsc': { const c = UI.cfg || {}, i = D.scenarios.findIndex(s => s.id === c.scenario), n = D.scenarios[(i + 1) % D.scenarios.length]; closeRS(); const m = UI.mode === 'guided' ? 'vs' : UI.mode; UI.opt = Object.assign({}, UI.opt, { scenario: n.id, abil: [] }); newGame(m, { scenario: n.id, role: c.role, level: c.level, abil: [] }); break; }
@@ -807,7 +725,6 @@ document.addEventListener('click', ev => {
     case 'loadsave': if (!loadSave()) toast('No saved flight.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
     case 'story': UI.prefs.story = d.v === '1'; savePrefs(); renderMenu(); break;
-    case 'guide': UI.coach.level = d.v; UI.prefs.guide = d.v; savePrefs(); renderMenu(); coachTick(); break;
     case 'gfx': if (typeof setGfx === 'function') setGfx(d.v); UI.prefs.gfx = d.v; savePrefs(); renderMenu(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
     case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
@@ -1245,6 +1162,7 @@ function phPost() {
   if (isPh() && ac && si) { const cof = si.querySelector('.cof'); if (cof) ac.insertBefore(cof, ac.firstChild); }
   if (GX && (GX.open === 'crewd' || GX.open === 'logd')) { try { renderDrawers(); } catch (e) { } }
   R.toggle('fabrief', G.phase === 'brief' && !G.result);
+  try { hlpAfter(); } catch (e) { console.error(e); }
 }
 
 // ---------- the ending, on the board: the picture plus at most 8 words; tap the banner to look at the panel ----------
@@ -1303,3 +1221,138 @@ function campInit() {
   });
 }
 campInit();
+// ===================== part 10: help (gx-help kit): coach bubbles the first time, the lightbulb on demand, rules cards =====================
+// Bubbles: once per phase, short, pointing at the panel. The bulb: the computer crew's own move (FA.AI.move, the same one the ghost finger uses) + a short why + rules cards.
+// ---------------------------------------------------------------- pictures for the rules cards (inline SVG in the cockpit's colours)
+const hB = '#2f6fd0', hO = '#e8821f', hK = '#14202c', hG = '#f2b92c', hC = '#fff4dc';
+const HP = {
+  plane: () => '<svg viewBox="0 0 64 64"><path d="M32 6l5 20 21 12v6l-21-4 0 12 6 5v4l-11-3-11 3v-4l6-5V40l-21 4v-6l21-12z" fill="#e8f0f6" stroke="' + hK + '" stroke-width="2.5" stroke-linejoin="round"/></svg>',
+  strip: () => '<svg viewBox="0 0 64 64"><rect x="3" y="20" width="58" height="24" rx="5" fill="#2c3e4c" stroke="' + hK + '" stroke-width="2.5"/><path d="M22 20v24M42 20v24" stroke="#8f9daa" stroke-width="2"/><path d="M10 32l5-2v4zM29 28l3 4-3 4-3-4zM48 28l3 4-3 4-3-4z" fill="' + hC + '"/><rect x="47" y="14" width="12" height="6" rx="2" fill="' + hG + '"/></svg>',
+  air: () => '<svg viewBox="0 0 64 64"><rect x="4" y="38" width="56" height="14" rx="3" fill="#44525e" stroke="' + hK + '" stroke-width="2.5"/><path d="M12 45h8M28 45h8M44 45h8" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M26 12l3 10 11 6v3l-11-2v6l3 2v2l-6-1.500-6 1.500v-2l3-2v-6l-11 2v-3l11-6z" fill="#e8f0f6" stroke="' + hK + '" stroke-width="2" stroke-linejoin="round" transform="translate(4 0) scale(.9)"/></svg>',
+  die: (n, c) => '<svg viewBox="0 0 64 64"><rect x="10" y="10" width="44" height="44" rx="9" fill="' + (c === 'o' ? hO : hB) + '" stroke="' + hK + '" stroke-width="3"/><text x="32" y="43" text-anchor="middle" font-size="30" font-weight="800" fill="#fff" font-family="Arial,sans-serif">' + (n == null ? '?' : n) + '</text></svg>',
+  dice2: () => '<svg viewBox="0 0 64 64"><rect x="4" y="16" width="30" height="30" rx="7" fill="' + hB + '" stroke="' + hK + '" stroke-width="2.5"/><rect x="32" y="22" width="28" height="28" rx="7" fill="' + hO + '" stroke="' + hK + '" stroke-width="2.5"/><circle cx="14" cy="26" r="2.500" fill="#fff"/><circle cx="24" cy="36" r="2.500" fill="#fff"/><circle cx="42" cy="32" r="2.500" fill="#fff"/><circle cx="50" cy="40" r="2.500" fill="#fff"/><circle cx="50" cy="32" r="2.500" fill="#fff"/><circle cx="42" cy="40" r="2.500" fill="#fff"/></svg>',
+  speech: () => '<svg viewBox="0 0 64 64"><path d="M8 12h48a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H30l-12 12V44H8a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z" fill="' + hC + '" stroke="' + hK + '" stroke-width="3" stroke-linejoin="round"/><path d="M14 24h36M14 33h22" stroke="' + hB + '" stroke-width="4" stroke-linecap="round"/></svg>',
+  mute: () => '<svg viewBox="0 0 64 64"><path d="M8 12h48a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H30l-12 12V44H8a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z" fill="' + hC + '" stroke="' + hK + '" stroke-width="3" stroke-linejoin="round"/><path d="M16 38L48 18M16 18l32 20" stroke="#d8402c" stroke-width="5" stroke-linecap="round"/></svg>',
+  seatP: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="' + hB + '" stroke="#fff" stroke-width="3"/><text x="32" y="43" text-anchor="middle" font-size="30" font-weight="800" fill="#fff" font-family="Arial,sans-serif">P</text></svg>',
+  seatC: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="' + hO + '" stroke="#fff" stroke-width="3"/><text x="32" y="43" text-anchor="middle" font-size="30" font-weight="800" fill="#fff" font-family="Arial,sans-serif">C</text></svg>',
+  alt: () => '<svg viewBox="0 0 64 64"><rect x="6" y="6" width="52" height="11" rx="4" fill="' + hB + '"/><rect x="6" y="20" width="52" height="11" rx="4" fill="' + hO + '"/><rect x="6" y="34" width="52" height="11" rx="4" fill="' + hB + '"/><circle cx="50" cy="26" r="4" fill="#9a4fe0" stroke="#fff" stroke-width="1.500"/><path d="M12 52h40" stroke="' + hG + '" stroke-width="3" stroke-dasharray="4 4"/><path d="M32 60l-5-6h10z" fill="' + hG + '"/></svg>',
+  axis: (tilt) => '<svg viewBox="0 0 64 64"><g transform="rotate(' + (tilt || 0) + ' 32 24)"><path d="M6 24h52" stroke="' + hK + '" stroke-width="4" stroke-linecap="round"/><path d="M6 24l-4 18h16zM58 24l-4 18h-16z" fill="#8f9daa" stroke="' + hK + '" stroke-width="2.500" stroke-linejoin="round"/></g><circle cx="32" cy="24" r="5" fill="' + hG + '" stroke="' + hK + '" stroke-width="2"/><path d="M32 29v24M20 56h24" stroke="' + hK + '" stroke-width="4" stroke-linecap="round"/></svg>',
+  prop: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#2c3e4c" stroke="' + hK + '" stroke-width="2.500"/><path d="M32 32C26 22 28 10 32 8c4 2 6 14 0 24zM32 32c10-6 22-4 24 0-2 4-14 6-24 0zM32 32c6 10 4 22 0 24-4-2-6-14 0-24zM32 32c-10 6-22 4-24 0 2-4 14-6 24 0z" fill="#dbe3ea" stroke="' + hK + '" stroke-width="1.500"/><circle cx="32" cy="32" r="4" fill="' + hG + '"/></svg>',
+  gauge: () => '<svg viewBox="0 0 64 64"><path d="M6 46a26 26 0 0 1 52 0z" fill="#1c2c38" stroke="' + hK + '" stroke-width="2.500"/><path d="M13 44a20 20 0 0 1 8-15" stroke="' + hB + '" stroke-width="5" fill="none"/><path d="M51 44a20 20 0 0 0-8-15" stroke="' + hO + '" stroke-width="5" fill="none"/><path d="M32 46L44 24" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="46" r="4" fill="' + hG + '"/><text x="14" y="58" font-size="11" font-weight="800" fill="' + hB + '" font-family="Arial,sans-serif">≤4</text><text x="40" y="58" font-size="11" font-weight="800" fill="' + hO + '" font-family="Arial,sans-serif">≤8</text></svg>',
+  radio: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="38" r="5" fill="' + hG + '" stroke="' + hK + '" stroke-width="2"/><path d="M20 28a17 17 0 0 0 0 20M44 28a17 17 0 0 1 0 20M12 20a29 29 0 0 0 0 36M52 20a29 29 0 0 1 0 36" stroke="#fff" stroke-width="3.500" stroke-linecap="round" fill="none"/><path d="M32 43v14" stroke="#fff" stroke-width="3.500" stroke-linecap="round"/></svg>',
+  gear: () => '<svg viewBox="0 0 64 64"><path d="M32 6v30M20 36h24" stroke="#8f9daa" stroke-width="5" stroke-linecap="round"/><circle cx="20" cy="46" r="9" fill="#2c3e4c" stroke="#e8f0f6" stroke-width="3"/><circle cx="44" cy="46" r="9" fill="#2c3e4c" stroke="#e8f0f6" stroke-width="3"/><circle cx="20" cy="46" r="3" fill="#8f9daa"/><circle cx="44" cy="46" r="3" fill="#8f9daa"/></svg>',
+  flap: () => '<svg viewBox="0 0 64 64"><path d="M4 22L60 10v12L4 34z" fill="#e8f0f6" stroke="' + hK + '" stroke-width="2.500" stroke-linejoin="round"/><path d="M4 34L60 22v8L40 44 4 44z" fill="' + hO + '" stroke="' + hK + '" stroke-width="2.500" stroke-linejoin="round"/><path d="M10 52h44" stroke="' + hK + '" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 5"/></svg>',
+  brake: (n) => '<svg viewBox="0 0 64 64"><rect x="6" y="14" width="52" height="36" rx="9" fill="#5a2a22" stroke="#e8f0f6" stroke-width="3"/><text x="32" y="40" text-anchor="middle" font-size="26" font-weight="800" fill="#fff" font-family="Arial,sans-serif">' + (n == null ? '2' : n) + '</text></svg>',
+  cup: () => '<svg viewBox="0 0 64 64"><path d="M12 22h34v18a14 14 0 0 1-14 14h-6a14 14 0 0 1-14-14z" fill="#e8f0f6" stroke="' + hK + '" stroke-width="3" stroke-linejoin="round"/><path d="M46 28h4a7 7 0 0 1 0 14h-6" fill="none" stroke="' + hK + '" stroke-width="3"/><path d="M22 6c-3 4 3 6 0 10M32 6c-3 4 3 6 0 10" stroke="#8f9daa" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M16 30h26" stroke="#6b4a2a" stroke-width="5"/></svg>',
+  plus: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#6b4a2a" stroke="#fff" stroke-width="3"/><path d="M32 20v24M20 32h24" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>',
+  reroll: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#8a4fd8" stroke="#fff" stroke-width="3"/><path d="M20 30a12 12 0 0 1 21-6M44 34a12 12 0 0 1-21 6" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M42 16v10H32zM22 48V38h10z" fill="#fff"/></svg>',
+  tap: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="18" fill="rgba(242,185,44,.2)" stroke="' + hG + '" stroke-width="4"/><path d="M30 14v26l-6-5-4 4 14 14h14l4-20-8-2-4-4-4 1-2-4z" fill="#fff" stroke="' + hK + '" stroke-width="2.500" stroke-linejoin="round"/></svg>',
+  aside: () => '<svg viewBox="0 0 64 64"><rect x="8" y="14" width="30" height="30" rx="7" fill="' + hB + '" stroke="' + hK + '" stroke-width="2.500"/><path d="M42 40l16 12M58 40L42 52" stroke="#d8402c" stroke-width="5" stroke-linecap="round"/><text x="23" y="36" text-anchor="middle" font-size="20" font-weight="800" fill="#fff" font-family="Arial,sans-serif">?</text></svg>',
+  stop: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#d8402c" stroke="#fff" stroke-width="3"/><path d="M21 21l22 22M43 21L21 43" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>',
+  star: () => '<svg viewBox="0 0 64 64"><path d="M32 6l7.500 17 18.500 1.600-14 12 4.400 18.400L32 45l-16.400 10 4.400-18.400-14-12L24.500 23z" fill="' + hG + '" stroke="#8a6a1a" stroke-width="3" stroke-linejoin="round"/></svg>',
+  token: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#2f9a4a" stroke="#fff" stroke-width="3"/><text x="32" y="41" text-anchor="middle" font-size="26" font-weight="800" fill="#fff" font-family="Arial,sans-serif">4</text></svg>',
+  swap: () => '<svg viewBox="0 0 64 64"><rect x="4" y="20" width="22" height="22" rx="6" fill="' + hB + '" stroke="' + hK + '" stroke-width="2.500"/><rect x="38" y="20" width="22" height="22" rx="6" fill="' + hO + '" stroke="' + hK + '" stroke-width="2.500"/><path d="M28 26h8M32 22l4 4-4 4M36 38h-8M32 34l-4 4 4 4" stroke="' + hK + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>'
+};
+function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it === '>' ? '<span class="gxh-ar">&rarr;</span>' : '<figure>' + (HP[it[0]] ? HP[it[0]](it[2], it[3]) : '') + (it[1] ? '<figcaption>' + it[1] + '</figcaption>' : '') + '</figure>').join('') + '</div>'; }
+// ---------------------------------------------------------------- where each bubble points
+const hq = s => () => document.querySelector(s);
+const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
+const hmine = () => document.querySelector('#pz .tray.' + (actSeat() === 1 ? 'c' : 'p'));
+const HLP_STEPS = {
+  brief: { target: hfirst('#says .say', '#acts [data-a=ready]'), title: 'Share a plan, then roll', text: 'Tap a phrase to tell your partner a plan, never dice values. Then tap Roll.', pic: () => HP.speech() },
+  die: { target: hfirst('#pz .tray.p .die.can', '#pz .tray.c .die.can', '#pz .tray'), title: 'Pick a die', text: 'Only you see these dice. Tap one, then a glowing space on the panel.', pic: () => HP.dice2() },
+  space: { target: hfirst('#pz .slot.legal'), title: 'Tap a glowing space', text: 'Glowing spaces take this die. Tap one to place it, or tap the die again to put it back.', pic: () => HP.tap() },
+  rr: { target: hfirst('#acts [data-a=rrpick]', '#pz .tray .die.can'), title: 'Choose dice to reroll', text: 'Tap the dice you want to roll again, then tap the green button. None is fine.', pic: () => HP.reroll() },
+  token: { target: hfirst('#pz .die[data-d=p]', '#pz .tray'), title: 'Place the extra die', text: 'This die must be placed too. Tap it, then a glowing space.', pic: () => HP.token() },
+  swap: { target: hfirst('#pz .tray.p .die.can', '#pz .tray.c .die.can', '#pz .tray'), title: 'Hand-over swap', text: 'Your partner offered a die. Pick one of yours to swap with it.', pic: () => HP.swap() }
+};
+// ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each): every cockpit slot, in plain words
+const HLP_RULES = [
+  { title: 'How to win', text: 'Land together in the last round: clear all planes, lower gear and flaps, level the axis, slow down.', pic: () => hpics([['plane', 'Both crew'], '>', ['air', 'Land']]) },
+  { title: 'One round', text: 'Share a plan, roll, then take turns placing one die each. You never say dice values.', pic: () => hpics([['speech', 'Plan'], '>', ['dice2', 'Roll'], '>', ['tap', 'Place']]) },
+  { title: 'Win or lose together', text: 'A spin, a crash, an empty Axis or Engines space, or a failed landing loses for both.', pic: () => hpics([['stop', 'Any one']]) },
+  { phase: 'brief', title: 'Talk plans, not dice', text: 'Tap a phrase to share a plan. Never say the values of your dice. Then tap Roll my dice.', pic: () => hpics([['speech', 'Plan'], '>', ['dice2', 'Roll']]) },
+  { phase: 'brief', title: 'Then stay silent', text: 'After the roll your placed dice are your only words. Watch where your partner puts theirs.', pic: () => hpics([['mute', 'Silence'], '>', ['die', 'Your word', 4]]) },
+  { phase: 'brief', title: 'Blue and orange', text: 'Pilot is blue, Co-pilot orange. Spaces marked P or C belong to that seat. Grey spaces take either.', pic: () => hpics([['seatP', 'Pilot'], ['seatC', 'Co-pilot']]) },
+  { phase: 'brief', title: 'The altitude strip', text: 'One row per round. Its colour says who places first. A purple dot adds a reroll token.', pic: () => hpics([['alt', 'One per round'], ['reroll', 'Reroll']]) },
+  { phase: 'die', title: 'Axis: every round', text: 'Both crew put a die on the Axis. The plane tilts toward the higher die. Tilt of 3 loses.', pic: () => hpics([['axis', 'Higher side', 12], ['axis', 'Equal: level', 0]]) },
+  { phase: 'die', title: 'Engines: every round', text: 'Both fill the Engines. Sum: up to blue marker stays, up to orange moves 1, above moves 2.', pic: () => hpics([['prop', 'Two dice'], '>', ['gauge', 'Speed']]) },
+  { phase: 'die', title: 'Radio clears planes', text: 'A die on the Radio clears one plane that many spaces ahead. Your own space counts as 1.', pic: () => hpics([['radio', 'Radio'], '>', ['strip', 'Clear a plane']]) },
+  { phase: 'die', title: 'Rerolls and Coffee', text: 'A reroll token rerolls all unplaced dice, for both crew. Spare dice earn Coffee tokens.', pic: () => hpics([['reroll', 'Reroll'], ['cup', 'Coffee']]) },
+  { phase: 'space', title: 'Gear and flaps', text: 'Pilot lowers three gears: 1-2, 3-4, 5-6. Co-pilot extends four flaps in order. All must be done to land.', pic: () => hpics([['gear', 'Pilot: gear'], ['flap', 'Co-pilot: flaps']]) },
+  { phase: 'space', title: 'Brakes: 2, then 4, then 6', text: 'Set the brakes in order, exact values. In the last round your engine total must stay within them.', pic: () => hpics([['brake', 'First', 2], ['brake', 'Then', 4], ['brake', 'Last', 6]]) },
+  { phase: 'space', title: 'Coffee tokens', text: 'A die on a Coffee space earns a token. Spend tokens to change a later die by 1.', pic: () => hpics([['die', 'Spare', 2], '>', ['cup', 'Coffee'], '>', ['plus', '+1 / -1']]) },
+  { phase: 'space', title: 'Nothing fits?', text: 'If no space takes the die, tap Put it aside. Coffee can change its value by one first.', pic: () => hpics([['aside', 'Put aside']]) },
+  { phase: 'rr', title: 'Reroll tokens', text: 'Spending a token lets both crew reroll any unplaced dice, once. Either crew can spend one any time.', pic: () => hpics([['reroll', 'Token'], '>', ['dice2', 'New dice']]) },
+  { phase: 'rr', title: 'Pick the odd ones', text: 'Tap only the dice that do not fit the open jobs. Tap the green button to confirm.', pic: () => hpics([['die', 'Keep', 3], ['die', 'Reroll', 1]]) },
+  { phase: 'token', title: 'Extra die', text: 'Some twists give a die you must place right away. Tap it, then a glowing space.', pic: () => hpics([['token', 'Extra die'], '>', ['tap', 'Place it']]) },
+  { phase: 'token', title: 'Same spaces as always', text: 'It goes on the same spaces as your other dice, with the same rules. Coffee can bend it.', pic: () => hpics([['token', 'Extra'], ['cup', 'Coffee']]) },
+  { phase: 'swap', title: 'Hand-over', text: 'Both crew swap one die, without saying the values. Pick which of yours to give.', pic: () => hpics([['swap', 'Swap']]) },
+  { phase: 'swap', title: 'Pick a spare', text: 'Give the die that fits your open jobs least. You still must place every die.', pic: () => hpics([['die', 'Give', 5], '>', ['die', 'Get', '?', 'o']]) }
+];
+// ---------------------------------------------------------------- phases: null when the player has nothing to decide
+function hlpPhase() {
+  try {
+    if (!G || !UI.started || G.result) return null;
+    const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v) || !myTurn()) return null;
+    if (G.phase === 'brief') return 'brief';
+    if (G.phase !== 'place') return null;
+    if (G.pend) return G.pend.h === 'rr' ? 'rr' : G.pend.h === 'wt' ? 'swap' : 'token';
+    if (G.turn !== v) return null;
+    return typeof UI.sel === 'number' && UI.sel >= 0 ? 'space' : 'die';
+  } catch (e) { return null; }
+}
+// ---------------------------------------------------------------- the advice: the computer crew's move, in a few words
+function capW(t, n) { const w = String(t || '').replace(/\s+/g, ' ').trim().split(' '); return w.length <= n ? w.join(' ') : ''; }
+function hlpWhy(m, v) {
+  if (m.t === 'say') return 'A short plan helps your partner. Never say dice values.';
+  if (m.t === 'ready') return 'Plans are shared. Roll your dice.';
+  if (m.t === 'rr') return 'Your hand does not fit the open jobs: spend a reroll.';
+  if (m.t === 'toss') return 'Nothing takes this die: put it aside.';
+  if (m.t !== 'place') return '';
+  const val = m.d === 'p' ? G.pend.d.val : G.dice[v][m.d].v, S = FA.SLOT[m.to], o = 1 - v;
+  switch (S.grp) {
+    case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; return n ? 'A ' + val + ' on the radio clears the plane on ' + (at === G.planes.length ? 'the airport' : 'space ' + at) + '.' : 'The radio clears nothing here: this just uses up a spare die.'; }
+    case 'axis': { const x = G.slots['ax' + o]; if (x) { const nx = G.pl.axis + (v === 0 ? x.v - val : val - x.v); return 'Axis ' + val + ' against ' + x.v + ': the plane ends ' + (nx === 0 ? 'level' : 'tilted ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right')) + '.'; } return 'The Axis goes first: a middle value leaves the most room.'; }
+    case 'engines': { const x = G.slots['en' + o]; if (x) { const sm = val + x.v + FA.windMod(G); if (FA.isFinal(G)) return 'Landing speed ' + sm + ' against brakes ' + FA.brakeVal(G) + '.'; const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Engines total ' + sm + ': the plane ' + (adv ? 'moves ' + adv + (adv > 1 ? ' spaces' : ' space') : 'stays put') + '.'; } return 'Engines: you set half the speed, your partner adds the rest.'; }
+    case 'gear': return 'Lowers a landing gear. All three must be down to land.';
+    case 'flaps': return 'Extends a flap. All four must be out to land.';
+    case 'brakes': case 'ice': return 'Sets a brake. The last-round speed must stay within it.';
+    case 'conc': return 'A spare die on Coffee earns a token to bend a later die by one.';
+    case 'kero': return 'Fuel space: this burns ' + val + ', skipping it burns ' + D.keroSkip + '.';
+    case 'intern': return 'This trains the trainee: place the next token too.';
+  }
+  return '';
+}
+const hlpDie = (v, d) => document.querySelector(d === 'p' ? '#pz .die[data-d="p"]' : '#pz .die[data-s="' + v + '"][data-d="' + d + '"]');
+// one plan for the glow, the finger and the bulb: { to: element getter, from: element getter | null, why }
+function hlpPlan() {
+  if (!G || G.result || UI.dragging) return null;
+  const v = actSeat(); if (typeof v !== 'number' || v < 0 || !myTurn()) return null;
+  let m = null; try { m = FA.AI.move(G, v, 'normal', { noMC: true }); } catch (e) { return null; }
+  if (!m) return null;
+  const why = capW(hlpWhy(m, v), 15); if (!why) return null;
+  const sel = typeof UI.sel === 'number' ? UI.sel : -1;
+  if (m.t === 'say') { const q = '#says [data-a=say][data-c="' + m.c + '"]'; return document.querySelector(q) ? { m, why, to: () => document.querySelector(q), from: null } : null; }
+  if (m.t === 'ready') return { m, why, to: () => document.querySelector('#acts [data-a=ready]'), from: null };
+  if (m.t === 'rr') return G.pend ? null : { m, why, to: () => document.querySelector('#acts [data-a=rr]'), from: null };
+  if (m.t === 'toss') { if (!hlpDie(v, m.d)) return null; return sel === m.d && document.querySelector('#acts [data-a=toss]') ? { m, why, to: () => document.querySelector('#acts [data-a=toss]'), from: null } : { m, why, to: () => hlpDie(v, m.d), from: null }; }
+  if (m.t !== 'place' || m.c || typeof m.d === 'undefined') return null;   // a coffee move needs two taps the finger cannot show: rules cards only
+  if (!hlpDie(v, m.d) || !document.querySelector('#pz .slot[data-slot="' + m.to + '"]')) return null;
+  return { m, why, to: () => document.querySelector('#pz .slot[data-slot="' + m.to + '"]'), from: sel === m.d ? null : () => hlpDie(v, m.d) };
+}
+function hlpSuggest() { const p = hlpPlan(); return p && p.to() ? { why: p.why, key: p.m.t + ':' + (p.m.to || p.m.c || p.m.d), target: p.to, from: p.from } : null; }
+// ---------------------------------------------------------------- wiring
+let _hlpInit = false;
+function hlpInit() {
+  if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
+  GXH.init({ game: 'final-approach', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '#pz .slot.legal,#pz .die.can,#pz .die.sel,#pz .die[data-d=p],#acts .btn,#says .say.rec' });
+  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: () => hlpPhase() });
+}
+function hlpAfter() {
+  hlpInit(); if (typeof GXH === 'undefined') return;
+  const vis = id => { const e = document.getElementById(id); return !!(e && !e.hidden); };
+  const busy = !G || !UI.started || G.result || UI.rsOpen || UI.dragging || UI.busy || UI.hold || vis('start') || vis('pass') || vis('rs') || vis('netbox') || (typeof GX !== 'undefined' && GX.open);
+  GXH.phase(busy ? null : hlpPhase());
+}
+setInterval(() => { try { hlpAfter(); } catch (e) { } }, 500);
