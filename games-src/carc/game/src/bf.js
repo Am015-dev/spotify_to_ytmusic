@@ -73,15 +73,15 @@ function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.c
   placeOverlay()}
 // ---------- ghost finger (first game, and chapters that give hints): points at the move the computer would pick ----------
 function hintOn(){return !!(UI.camp?UI.camp.hints:(UI.first&&UI.humanTurns<2))}
-function showGhost(wx,wy,sx,sy){const old=$('#ghost');if(old)old.remove();if(wx==null&&sx==null)return;
+function showGhost(wx,wy,sx,sy,dx){const old=$('#ghost');if(old)old.remove();if(wx==null&&sx==null)return;
   const g=document.createElement('div');g.id='ghost';g.innerHTML='<svg viewBox="0 0 48 48" width="44" height="44"><path d="M19 4c2 0 3.5 1.4 3.5 3.3V19l1.8-.8c1.3-.5 2.8.2 3.2 1.5l.3.9 2.2-.7c1.4-.4 2.8.4 3.2 1.8l.4 1.1c1.8-.4 3.4.7 3.7 2.4.8 4.4.5 8.4-1.1 11.6-1.5 3-4.2 5-8.3 5H24c-3.3 0-5.600-1.3-7.600-4.200L10.200 28c-.7-1.200-.3-2.800.9-3.500 1.100-.600 2.500-.4 3.300.600l1.100 1.300V7.300C15.500 5.400 17 4 19 4z" fill="#fff" stroke="#3a2610" stroke-width="2.200" stroke-linejoin="round"/></svg>';
-  if(sx!=null){g.style.transform=`translate(${sx}px,${sy}px)`;$('#ov').appendChild(g)}else addOv(g,wx,wy,{dx:10,dy:16});placeOverlay()}
+  if(sx!=null){g.style.transform=`translate(${sx}px,${sy}px)`;$('#ov').appendChild(g)}else addOv(g,wx,wy,{dx:10+(dx||0),dy:16});placeOverlay()}
 function updateGhost(){const old=$('#ghost');if(old)old.remove();if(!hintOn()||!G||G.over||!myTurn())return;
   if(G.step==='place'&&UI.hint){if(UI.rot===UI.hint.r)showGhost(UI.hint.x*100+50,UI.hint.y*100+50);else{const r=$('#htile').getBoundingClientRect(),b=boardEl().getBoundingClientRect();
       // finger on the tile itself (turn it): hand is outside the board, so keep it in the board's coordinate space
       showGhost(null,null,r.left-b.left+r.width/2+10,r.top-b.top+r.height/2+10)}}
   else if(G.step==='fig'&&UI.hintFig){if(UI.hintFig.act==='skip'){const r=$('#hskip');if(r){const rb=r.getBoundingClientRect(),b=boardEl().getBoundingClientRect();r.classList.add('hintspot');showGhost(null,null,rb.left-b.left+rb.width/2+10,rb.top-b.top+rb.height/2+10)}}
-    else{const [wx,wy]=spotWorld(G.cur.k,UI.hintFig.l);const b=UI.figs.find(q=>q._m.k===UI.hintFig.k&&q._m.l===UI.hintFig.l);if(b)b.classList.add('hintspot');showGhost(wx,wy)}}}
+    else{const [wx,wy]=spotWorld(G.cur.k,UI.hintFig.l);const b=UI.figs.find(q=>q._m.k===UI.hintFig.k&&q._m.l===UI.hintFig.l);if(b)b.classList.add('hintspot');showGhost(wx,wy,null,null,b?b._o.dx:0)}}}
 // ---------- top strip, hand, status ----------
 function renderTop(){const el=$('#seats');el.innerHTML=G.pl.map(p=>{const s=p.sup,cur=!G.over&&sideToAct()===p.i;
     return `<div class="seat${cur?' cur':''}" style="--c:${PCOL[p.i]}" data-i="${p.i}"><i class="dot">${p.human?'':'&#9881;'}</i><span class="nm">${esc(seatName(p))}</span><b>${p.score}</b><span class="fl" title="followers left">${ico('meeple')}${s.f}${G.ex.ic&&G.figTotal[p.i].big?`${ico('champ')}${s.big}`:''}${G.ex.tb?`${ico('mason')}${s.bld}${ico('hog')}${s.pig}`:''}</span>${G.ex.tb?`<span class="fl" title="wine, grain, cloth">${ico('wine')}${p.goods.wine+p.goods.grain+p.goods.cloth}</span>`:''}</div>`}).join('');
