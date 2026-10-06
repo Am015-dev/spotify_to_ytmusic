@@ -55,8 +55,8 @@ function poseReport(s,m){const p=finalPose(s,B(s),m);const b=B(s);const bits=[];
 // the goal and the race, always on top of the dock: who has how many ships and how much hull + shields left
 function raceHTML(){if(!G||G.round<1||G.winner)return '';const me=soloSide();const k0=me>=0?me:0;
   const side=k=>{const a=G.ships.filter(s=>s.side===k&&s.alive);const h=a.reduce((x,s)=>x+Math.max(0,s.hull-hullDmg(s)),0),sh=a.reduce((x,s)=>x+s.sh,0);
-    return `<b>${me>=0?(k===me?'You':'Enemy'):esc(sideName(k))}</b> ${a.length} ship${a.length===1?'':'s'} <span class="h">♥${h}</span>${sh?` <span class="sh">◈${sh}</span>`:''}`};
-  return `<p class="race" title="♥ hull left · ◈ shields left (shields go first)">🎯 Destroy every enemy ship · ${side(k0)} vs ${side(1-k0)}</p>`}
+    return `<b>${me>=0?(k===me?'You':'Enemy'):esc(sideName(k))}</b> 🛩${a.length} <span class="h">♥${h}</span>${sh?` <span class="sh">◈${sh}</span>`:''}`};
+  return `<p class="race" title="Destroy every enemy ship. ♥ hull left · ◈ shields left (shields go first)" data-full="Destroy every enemy ship. 🛩 ships left · ♥ hull left · ◈ shields left (shields go first).">🎯 ${side(k0)} · ${side(1-k0)}</p>`}
 function renderPrompt(){const el=$('prompt');if(!el)return;if(!G){el.innerHTML='';return}
   if(G.winner){el.innerHTML=`<h2>${esc(winLine())}</h2><div class="acts"><button class="btn primary" data-a="stats">Debrief</button>${nextSortieBtn()}<button class="btn" data-a="new">New battle</button></div>`;return}
   if(sumPending()){el.innerHTML=raceHTML()+summaryHTML();return}

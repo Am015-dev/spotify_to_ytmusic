@@ -111,3 +111,6 @@ html.bf #tags .tag .tgl{display:none}
 .bfleg .g{color:#46f08a}.bfleg .r{color:#ff5a5a}.bfleg .rk{background:#ff5a5a;color:#fff;border-radius:50%;padding:0 4px}
 #bfdice .dice .die:nth-child(2){animation-delay:.12s;animation-fill-mode:backwards}#bfdice .dice .die:nth-child(3){animation-delay:.24s;animation-fill-mode:backwards}#bfdice .dice .die:nth-child(4){animation-delay:.36s;animation-fill-mode:backwards}#bfdice .dice .die:nth-child(5){animation-delay:.48s;animation-fill-mode:backwards}
 .bfm.danger{opacity:.6;border-style:dashed}
+/* long-press popup with the full text of a shortened line (brief.js) */
+#fulltip{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:80;max-width:min(86vw,420px);background:rgba(8,6,24,.96);border:2px solid #ffc86b;border-radius:14px;padding:14px 16px;color:#fff;font:600 15px/1.4 "Exo 2",sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.7);pointer-events:none}
+.tl{cursor:help}.brief .bico{font-weight:800;font-size:17px;margin:4px 0}.brief .bico2{margin:2px 0;font-size:15px}.brief .bico2 .hold{opacity:.65;font-size:12px;margin-left:8px}

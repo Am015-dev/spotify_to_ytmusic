@@ -52,7 +52,9 @@ function briefingHTML(){const me=soloSide()>=0?soloSide():0,fo=1-me;const mine=G
   t+=mine.length===1?`${esc(lead.name)}, ${pilotBio(lead)}, is the only fighter between ${groupText(foe)} and the convoy. `:`${mine.map(s=>esc(s.name)).join(', ')} stand between ${groupText(foe)} and the convoy. `;
   t+=`${esc(boss.name)} leads them: ${pilotBio(boss)}.`;
   if(so&&so.text)t+=' '+so.text;
-  return `<div class="brief"><h3>📡 Mission briefing${so?` · Sortie ${G.sortie+1}: ${esc(so.title)}`:''}</h3><p>${t}</p><p class="small"><b>Win:</b> destroy every enemy ship. You fly ${mine.length===1?'1 ship':mine.length+' ships'} (orange tags at the bottom edge); the enemy starts at the top.</p></div>`}
+  const full=t.replace(/<[^>]+>/g,'')+' Win: destroy every enemy ship. You fly '+(mine.length===1?'1 ship':mine.length+' ships')+' (orange tags at the bottom edge); the enemy starts at the top.';
+  // phone: one short line plus icons; the whole story is a long-press away (data-full)
+  return `<div class="brief" data-full="${esc(full)}"><h3>📡 ${so?`Sortie ${G.sortie+1}: ${esc(so.title)}`:'Skirmish'}</h3><p class="bico">🎯 Destroy ${foe.length===1?'the enemy ship':'all '+foe.length+' enemy ships'}</p><p class="bico2"><span title="your ships">🛩 ${mine.length}</span> <span title="their ships">👾 ${foe.length}</span> <span class="hold">☝ hold: story</span></p></div>`}
 // ---- radio chatter for the key beats (shown in the dock, never in the battle log) ----
 const CHAT={
   fire:[[`Got you in my sights, {t}!`,`Steady… steady…`,`Lining up… firing!`,`{t}, you're mine.`],[`Got you in my sights, {t}!`,`Target acquired. Firing.`,`For the Armada!`,`Hold still, {t}.`],[`Nothing personal, {t}.`,`Payday!`]],
