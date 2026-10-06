@@ -17,6 +17,6 @@ const {chromium,devices}=require('/opt/node22/lib/node_modules/playwright');
  await tap('#hfUpd');r.openFromTitle=await p.evaluate(()=>!document.getElementById('odUpd').hidden);await p.screenshot({path:pre+'_title.png'});await tap('#odUpdX');
  await p.evaluate(()=>{try{__m1.skip()}catch(e){}__mho.enterRoam()});await p.waitForFunction(()=>__mho.state==='roam',null,{timeout:300000});await p.evaluate(()=>{__mho.storyClose&&__mho.storyClose()});await p.waitForTimeout(3000);
  await p.screenshot({path:pre+'_drive.png'});r.toastInDrive=await p.evaluate(()=>{const t=document.getElementById('odNew');return !!(t&&!t.hidden)});
- await p.evaluate(()=>{const b=[...document.querySelectorAll('button')].find(b=>/❚❚|II/.test(b.textContent)&&b.getClientRects().length);if(b)b.click();else document.getElementById('roamPause').hidden=false});await p.waitForTimeout(800);
+ await p.touchscreen.tap(51,27);await p.waitForTimeout(800);
  await p.screenshot({path:pre+'_pause.png'});await tap('#roamPause [data-p="upd"]');r.openFromPause=await p.evaluate(()=>!document.getElementById('odUpd').hidden);await p.screenshot({path:pre+'_pauseopen.png'});
  console.log(JSON.stringify(r),'errs',JSON.stringify(errs));await b.close()})();

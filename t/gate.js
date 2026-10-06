@@ -7,7 +7,7 @@ const {chromium,devices}=require('/opt/node22/lib/node_modules/playwright');
  await p.evaluate(()=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_athpre','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}))});
  await p.reload({timeout:600000});await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:300000});
  await p.evaluate(()=>{try{__m1.skip()}catch(e){}__mho.enterRoam()});await p.waitForFunction(()=>__mho.state==='roam',null,{timeout:300000});
- await p.evaluate(()=>{__mho.storyClose&&__mho.storyClose();__mho.roamSim(20);__gar.cheat(99999,40);window.__home=__dbg.PL.mesh.position.clone();window.__homeH=__dbg.PL.mesh.rotation.y;__ju.autoClose(true)});
+ await p.evaluate(()=>{__mho.storyClose&&__mho.storyClose();__mho.roamSim(20);__gar.cheat(99999,40);window.__home={x:__dbg.RO.x,z:__dbg.RO.z};window.__homeH=__dbg.RO.h;__ju.autoClose(true)});
  const tap=async sel=>{const c=await p.evaluate(s=>{const e=document.querySelector(s);if(!e)return null;e.scrollIntoView({block:'center'});const r=e.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}},sel);if(!c)throw new Error('no '+sel);await p.touchscreen.tap(c.x,c.y);await p.waitForTimeout(400)};
  const R={};
  const garOpen=async()=>{await p.evaluate(()=>{window.requestAnimationFrame=window.__raf||window.requestAnimationFrame;if(window.__fastR)__dbg.composer.render=window.__fastR});await p.evaluate(()=>document.querySelector('#roamPause [data-p="garage"]').click());await p.waitForFunction(()=>!document.querySelector('#gbx').hidden);await p.waitForTimeout(800);await tap('#gbx .gbTabs [data-t="veh"]')};
@@ -18,9 +18,9 @@ const {chromium,devices}=require('/opt/node22/lib/node_modules/playwright');
  const cam=async(n,v,t)=>{await p.evaluate(([v,t])=>{const m=__dbg.PL.mesh;m.updateMatrixWorld(true);const c=__dbg.camera,T=new __dbg.THREE.Vector3(...t),P=new __dbg.THREE.Vector3(...v);m.localToWorld(P);m.localToWorld(T);c.position.copy(P);c.lookAt(T);c.fov=40;c.updateProjectionMatrix();window.__fastR.call(__dbg.composer)},[v,t]);await p.screenshot({path:`${pre}_${n}.png`})};
  const world=async tag=>{const out={};for(const [f,spot] of [['car',null],['4x4',SP.offroad],['boat',SP.boat]]){
    if(f!=='car'&&!spot){out[f]='nospot';continue}
-   out[f]=await p.evaluate(([f,spot])=>{if(spot)__m1.warp(spot[0],spot[1],0,true);else __m1.warp(__home.x,__home.z,__homeH);__dbg.RO.v=0;for(let i=0;i<40;i++){__ju.step(3);if((__dbg.PL.vmode||'car')===f&&i>10)break}return __dbg.PL.vmode||'car'},[f,spot]);
+   out[f]=await p.evaluate(([f,spot])=>{const R=__dbg.RO;if(spot)__mho.warp(spot[0],spot[1],0,true);else __mho.warp(__home.x,__home.z,__homeH,true);R.vsel={car:'ship','4x4':'offroad',boat:'boat'}[f];R.v=0;for(let i=0;i<12;i++){R.v=0;__ju.step(10)}R.vsel='auto';return (__dbg.PL.vmode||'car')+'/'+R.terr},[f,spot]);
    await cam(`w_${tag}_${f==='4x4'?'off':f}`,[4.8,2.4,-4.4],[0,.9,0]);if(f==='car')await cam(`w_${tag}_side`,[.3,1.0,-6.8],[0,.8,0])}
-  await p.evaluate(()=>{__m1.warp(__home.x,__home.z,__homeH);__dbg.RO.v=0;__ju.step(30)});return out};
+  await p.evaluate(()=>{const R=__dbg.RO;__mho.warp(__home.x,__home.z,__homeH,true);R.vsel='ship';for(let i=0;i<6;i++){R.v=0;__ju.step(10)}R.vsel='auto'});return out};
  for(const id of SETS){R[id]={};await garOpen();await tap(`[data-gset="${id}"]`);R[id].sel=await p.evaluate(()=>__gar.get().sel);R[id].tab=await p.evaluate(()=>document.querySelector('[data-gset].on')?.dataset.gset);
   await forms(`${id}_stock`);await drive();R[id].wStock=await world(`${id}_stock`);
   await garOpen();for(const k of['sp','ex','wh','bo'])for(let i=0;i<3;i++)await tap(`[data-gup="${k}"]`);R[id].ups=await p.evaluate(()=>__gar.ups());
