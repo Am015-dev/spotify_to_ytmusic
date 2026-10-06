@@ -384,7 +384,7 @@ function trayChip(m, i, tg) {
     else inner = [h('b', ({ innkeeper: 'Inn −3', crane: 'Crane −3', dungeon: 'Cells −3', judge: 'Swap' })[m.how] || 'Play'), m.via != null ? cardEl(m.via, 26) : null];
   } else if (m.type === 'worker' && m.k === 'journey') inner = [ic('road', 22), h('b', D.journey[m.i].points)];
   else if (m.type === 'choose') {
-    if (m.card !== undefined) inner = [cardEl(m.card, 44)];
+    if (m.card !== undefined) inner = [cardEl(m.card, UI.trayCw || 44)];
     else if (m.res !== undefined) inner = [ic(m.res, 26)];
     else inner = [h('b', wordsCap(m.label, 6) || 'OK')];
   } else inner = [h('b', wordsCap(m.label, 5))];
@@ -402,6 +402,9 @@ function renderActs(mm, qm, qShown) {
   // choices (a question, or a card / place with several ways to use it)
   let chips = [];
   UI.tm2 = [];
+  // many card choices: shrink the cards until every one fits above the buttons (no scrolling inside the tray)
+  { const trayMs = UI.sel ? UI.sel.ms : qm.filter(m => !qShown.has(m.i)), nc = trayMs.filter(m => m.type === 'choose' && m.card !== undefined).length; UI.trayCw = 44;
+    if (nc && trayMs.length > 5) { const availH = Math.max(120, Math.min(R.H * .5, box.y + box.h - 150)); for (const c of [44, 38, 34, 30, 26, 22]) { const per = Math.max(1, Math.floor((box.w - 8) / (c + 12 + 6))), rows = Math.ceil(trayMs.length / per); UI.trayCw = c; if (rows * (Math.round(c * CARD_AR) + 14) + 10 <= availH) break; } } }
   if (UI.sel) UI.sel.ms.forEach(m => { const i = UI.tm2.push(m) - 1; chips.push(trayChip(m, i, 'o:' + i)); });
   else if (qm.length) qm.forEach(m => { if (!qShown.has(m.i)) { const i = UI.tm2.push(m) - 1; chips.push(trayChip(m, i, 'q:' + m.i)); } });
   if (chips.length) {
@@ -409,8 +412,8 @@ function renderActs(mm, qm, qShown) {
     const nCards = chips.filter(c => c.classList.contains('tcard')).length, hasCard = nCards > 0, many = chips.length > 3 && !hasCard && qShown.size === 0;
     if (hasCard || many) {
       let rows;
-      if (hasCard) { const per = Math.max(1, Math.floor((box.w - 12) / 52)); rows = Math.min(3, Math.ceil(chips.length / per)); } else rows = Math.min(3, Math.ceil(chips.length * 92 / Math.max(120, box.w)));
-      const hh = hasCard ? rows * 66 + 10 : Math.max(box.h, rows * 50 + 6);
+      if (hasCard) { const per = Math.max(1, Math.floor((box.w - 8) / (UI.trayCw + 12 + 6))); rows = Math.ceil(chips.length / per); } else rows = Math.min(3, Math.ceil(chips.length * 92 / Math.max(120, box.w)));
+      const hh = hasCard ? rows * (Math.round(UI.trayCw * CARD_AR) + 14) + 10 : Math.max(box.h, rows * 50 + 6);
       a.style.top = (box.y + box.h - hh) + 'px'; a.style.height = hh + 'px'; a.classList.add('tall', 'wrap');
     }
     chips.forEach(c => a.appendChild(c));

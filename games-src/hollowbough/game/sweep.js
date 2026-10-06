@@ -55,11 +55,11 @@ async function playGame(browser, W, H, gi, mode) {
     const trays = tg.filter(x => x.tray); const pool = trays.length ? trays : tg;
     // the compact city strip opens full screen: 15 slots, nothing changes in the game, a glowing destination in it can be used, Done closes it
     if (R() < .06) {
-      const cb = await p.$('.cityopen');
-      if (cb) {
-        const l0 = await p.evaluate(() => G.logN); await cb.tap().catch(() => { }); await sleep(250);
+      const cb = await p.$('#acts:not(.tray) ~ .cityopen, .cityopen'); const trayUp = await p.$('#acts.tray');
+      if (cb && !trayUp) {
+        const l0 = await p.evaluate(() => G.logN); { const br = await cb.boundingBox(); await p.touchscreen.tap(br.x + br.width - 16, br.y + br.height - 8); } await sleep(250);
         const o = await p.evaluate(() => { const e = document.querySelector('#cityov'); if (!e) return null; const cells = e.querySelectorAll('.cvcell').length; const gl = [...e.querySelectorAll('.cvc.glow')].map(x => { const r = x.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }); const other = document.querySelectorAll('#bd .glow:not(#cityov .glow):not(.tchip)').length; const de = document.documentElement; return { cells, gl, other, hs: de.scrollWidth > innerWidth + 1, logN: G.logN }; });
-        if (!o) fail(tag, 'tap on the city strip did not open the city');
+        if (!o) { const hit = await p.evaluate(() => { const b = document.querySelector('.cityopen'); if (!b) return 'no strip'; const r = b.getBoundingClientRect(), e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return (e ? (e.id ? '#' + e.id : '') + '.' + String(e.className && e.className.baseVal === undefined ? e.className : 'svg') : 'none') + ' busy=' + !!UI.animBusy + ' cards=' + UI.cards.length + ' mine=' + (myMoves().length > 0); }); fail(tag, 'tap on the city strip did not open the city (' + hit + ')'); }
         else {
           if (o.cells < 15) fail(tag, 'city view shows ' + o.cells + ' slots');
           if (o.other) fail(tag, 'glow outside the open city view: ' + o.other);
