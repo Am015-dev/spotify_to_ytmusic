@@ -10,7 +10,7 @@ function run(def,plv,seed){const X=mk(),s=def.setup,np=s.np||s.players||s.seats.
   X.setSeed(seed);X.UI.sim=0;const lv=s.seats.slice(0,np).map((x,i)=>i===0?plv:op.aiLevel);
   X.newGame({np,seats:s.seats.slice(0,np).map(()=>'ai'),lv,names:s.names,ex:Object.assign({artisans:false,sultan:false,thieves:false,promos:false},s.ex||{}),mode:'ai'});X.applyTwist(def);
   let n=0;while(!X.G.over&&n++<6000){const side=X.sideToAct();if(side<0)break;const m=X.aiMove(side);if(!m)break;const r=X.performMove(m,side);if(!r.success)break}
-  const G=X.G;if(!G.over)return null;const sc=G.over.scores.map(r=>r.s.total);return {won:G.over.win.includes(0)&&G.over.win.length===1,score:sc[0],opp:Math.max(...sc.slice(1)),round:G.round}}
+  const G=X.G;if(!G.over)return null;const sc=[];for(const r of G.over.scores)sc[r.p]=r.s.total;return {won:G.over.win.includes(0)&&G.over.win.length===1,score:sc[0],opp:Math.max(...sc.slice(1)),round:G.round}}
 for(const def of camp.chapters){if(only.length&&!only.includes(def.id))continue;
   for(const plv of levels){let w=0,t=0,sc=0,rd=0;for(let g=0;g<N;g++){const r=run(def,plv,7000+g*13+def.id.length);if(!r)continue;t++;if(r.won)w++;sc+=r.score;rd+=r.round}
     console.log(`${def.id} ${def.boss?'BOSS':'    '} ${def.opponent.name.padEnd(10)} opp ${def.opponent.aiLevel.padEnd(6)} you ${plv.padEnd(6)} win ${(100*w/t).toFixed(0).padStart(3)}% of ${t}  avg score ${(sc/t).toFixed(0)}  rounds ${(rd/t).toFixed(1)}  [${def.goal.text}]`)}}

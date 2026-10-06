@@ -267,4 +267,5 @@ function applyTwist(def){const tw=def&&def.twist&&def.twist.id,par=def&&def.twis
   else if(tw==='boss-goods'){for(let k=0;k<par&&G.rdeck.length;k++){const r=G.rdeck.shift();if(r==='fakir')boss.fk++;else boss.res.push(r)}refillMarket()}
   else if(tw==='boss-djinn'){let i=G.djDeck.indexOf(par);if(i>=0)G.djDeck.splice(i,1);else{i=G.djRow.indexOf(par);if(i>=0){G.djRow.splice(i,1);refillDjinns()}}boss.dj.push(par)}
   else if(tw==='short-road'){for(const p of G.pl)p.camels=Math.max(4,p.camels-par)}
-  else if(tw==='boss-favour')G.boss={seat:1,favour:par}}
+  else if(tw==='boss-favour')G.boss={seat:1,favour:par};
+  if(def.twist.coins)boss.coins+=def.twist.coins}

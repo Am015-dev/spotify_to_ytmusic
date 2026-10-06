@@ -1,6 +1,6 @@
 // ---------- computer players: plan the whole move (start, path, colour), then play it step by step ----------
 let AIPLAN=null;
-const LVL={easy:{noise:.9,depth:3000},normal:{noise:.25,depth:20000},hard:{noise:0,depth:60000}};
+const LVL={easy:{noise:4,depth:3000},normal:{noise:.25,depth:20000},hard:{noise:0,depth:60000}};
 function aiNoise(p){return (LVL[p.lv]||LVL.normal).noise}
 // every legal outcome of picking up tile s: {s,e,c,n,path}
 function outcomes(s,cap){const t=G.board[s];const hand=t.m.slice();const saved=t.m;t.m=[];const hc=handCounts(hand);const L=hand.length;const res={};let nodes=0;

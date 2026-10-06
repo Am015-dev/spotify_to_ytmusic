@@ -39,7 +39,7 @@ const PAGE = `(() => {
     audit() {
       const bad = [], W = innerWidth, H = innerHeight, de = document.documentElement;
       if (Math.max(de.scrollWidth, document.body.scrollWidth) > W + 1) bad.push('hscroll ' + de.scrollWidth + '>' + W);
-      const bd = document.querySelector('[data-board]'); if (bd && H > W) { const r = bd.getBoundingClientRect(); const pct = 100 * Math.max(0, Math.min(r.right, W) - Math.max(r.left, 0)) * Math.max(0, Math.min(r.bottom, H) - Math.max(r.top, 0)) / (W * H); if (pct < 55) bad.push('board ' + pct.toFixed(1) + '%'); }
+      const bd = document.querySelector('[data-board]'); if (bd && H > W) { const r = bd.getBoundingClientRect(); const pct = 100 * Math.max(0, Math.min(r.right, W) - Math.max(r.left, 0)) * Math.max(0, Math.min(r.bottom, H) - Math.max(r.top, 0)) / (W * H); if (pct < 55) bad.push('board ' + pct.toFixed(1) + '% seats ' + Math.round(document.getElementById('seats').offsetHeight) + ' line ' + Math.round(document.getElementById('line').offsetHeight) + ' acts ' + Math.round(document.getElementById('acts').offsetHeight) + ' mine ' + document.getElementById('mine').offsetHeight + ' step ' + (G && G.step) + ' phase ' + (G && G.phase) + ' bar ' + Math.round(document.querySelector('.gx-bar').offsetHeight)); }
       if (!G) return bad;
       const gr = document.getElementById('grid').getBoundingClientRect(); if (gr.right > W + 1 || gr.left < -1 || gr.bottom > H + 1) bad.push('grid off screen');
       const ln = document.getElementById('line').textContent.replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(w => /[a-z][a-z]/i.test(w)); if (ln.length > 8) bad.push('line ' + ln.length + ' words: ' + ln.join(' '));
@@ -64,6 +64,7 @@ async function play(browser, job) {
   const issue = s => { if (res.issues.size < 12) res.issues.add(s); };
   const t0 = Date.now();
   try {
+    if (story) { const n = +story.slice(1); const ch = {}; for (let k = 1; k < n; k++) ch['c' + k] = { beaten: true, stars: 1, best: null, tries: 1, losses: 0, easy: false }; await ctx.addInitScript(p => { try { localStorage.setItem('gns-campaign-sands', JSON.stringify({ v: 1, ch: p, unlocked: [], last: null })); } catch (e) { } }, ch); }
     await page.goto('file://' + FILE, { waitUntil: 'load', timeout: 30000 }); await sleep(500); await page.evaluate(PAGE);
     if (story) {
       await page.evaluate(id => { setSeed(1000 + (+id.slice(1))); GXC.play(id); }, story); await sleep(400);
@@ -114,7 +115,7 @@ async function play(browser, job) {
 (async () => {
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   const jobs = []; for (let i = 0; i < N; i++) jobs.push({ idx: i, size: SIZES[i % 2], mode: MODES[i % MODES.length], seed: 100 + i });
-  for (let k = 0; k < STORY; k++) jobs.push({ idx: N + k, size: SIZES[k % 2], mode: { np: 2 }, seed: 500 + k, story: ['c1', 'c4', 'c2'][k % 3] });
+  for (let k = 0; k < STORY; k++) jobs.push({ idx: N + k, size: SIZES[k % 2], mode: { np: 2 }, seed: 500 + k, story: ['c1', 'c4', 'c10', 'c5'][k % 4] });
   const out = [], q = (process.env.ONLY ? jobs.filter(j => process.env.ONLY.split(',').includes(String(j.idx))) : jobs).slice(); let fail = 0;
   await Promise.all(Array.from({ length: Math.min(JOBS, jobs.length) }, async () => { while (q.length) { const j = q.shift(); const r = await play(browser, j); out.push(r);
     const bad = r.issues.size || r.errors.length; if (bad) fail++;
