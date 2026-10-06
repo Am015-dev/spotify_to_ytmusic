@@ -1,0 +1,9 @@
+# pART8 · roads always on top of the grass (refined road strips + polygonOffset), coarser grass away from roads (fps), crisp car-shaped
+# sun shadows for every car (module art8.js; art7.js quadtree tolerance by road distance)
+exec(open('P.py').read());exec(open('artlib.py').read())
+RR("function abStrip(P,i0,i1,oa,ob,ya,yb,uvL){const pos=[],uvs=[],idx=[];for","function abStrip_v86(P,i0,i1,oa,ob,ya,yb,uvL){const pos=[],uvs=[],idx=[];for")
+ART_mod('art8.js')
+# stencil for the one-silhouette-per-car shadows (main framebuffer + the composer's render targets)
+RR("renderer=new THREE.WebGLRenderer({canvas,antialias:false,powerPreference:'high-performance'})","renderer=new THREE.WebGLRenderer({canvas,antialias:false,stencil:true,powerPreference:'high-performance'})")
+RR("new THREE.WebGLRenderTarget(16,16,{type:THREE.HalfFloatType,samples:","new THREE.WebGLRenderTarget(16,16,{type:THREE.HalfFloatType,stencilBuffer:true,samples:")
+save()
