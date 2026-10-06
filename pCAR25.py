@@ -1,7 +1,7 @@
 # CAR25 (coordinator scope for Alex): (1) race tracks at a car's scale: 22-60 m (built for 7 m hover ships) -> 14-20 m (0.38 x,
 #        clamped); every lateral offset (grid, lanes, pads, chicanes, tram, wall item, AI hold lines) scales with it; car contact box 2.5 m.
 #        (2) double-tap left/right (touch, A/D, arrows) = sideways SMASH lunge (upright, no barrel roll, 1 s cooldown), in races and the city.
-#        (3) BOOST is plain boost again; plain contact is only ever a bump. 3 SMASH hits wreck a rival, 1 wrecks traffic.
+#        (3) BOOST is plain boost again; race contact is only a bump; city traffic wrecks on a lunge or an impact above 150 km/h. 3 SMASH hits wreck a rival, 1 wrecks traffic.
 #        (4) rival health bars with name + class; (5) form swap under 0.3 s; (6) camera clamped inside the race walls, crash cam rarer.
 exec(open('P.py').read())
 if 'CR_trackW' in s:
@@ -42,9 +42,9 @@ R("if(s.nitro||s.shield>0||s.rollT>0||s.turbo>0||s.boost>0||s.v>CR_SMASHV){wreck
   "if(s.shield>0||s.rollT>0){wreckTraffic(c,s,1.2);if(s.isPlayer)CR_smashHit();s.v*=.97;award(")
 R("const rel=Math.max(0,s.v-c.v);if(s.v>CR_SMASHV){wreckTraffic(c,s,.8);","const rel=Math.max(0,s.v-c.v);if(0){wreckTraffic(c,s,.8);")
 R("const crSm=!!(pl&&(pl.nitro||RO.boosting||RO.turbo>0));if(!crSm&&Math.abs(RO.v)<=CR_SMASHV){if(Math.abs(RO.v)>4&&(c.crB||0)<=0){c.crB=.5;const rx=RO.x-x,rz=RO.z-z,rl=Math.hypot(rx,rz)||1;RO.x+=rx/rl*.6;RO.z+=rz/rl*.6;RO.v*=.7;",
-  "const crSm=(RO.crLg||0)>0;if(!crSm){if((c.crB||0)<=0){c.crB=.4;const rx=RO.x-x,rz=RO.z-z,rl=Math.hypot(rx,rz)||1;RO.x+=rx/rl*.9;RO.z+=rz/rl*.9;RO.v=Math.sign(RO.v)*Math.min(Math.abs(RO.v)*.6,(c.cv||8)+4);")
+  "const crLg=(RO.crLg||0)>0,crSm=crLg||Math.abs(RO.v)>CR_SMASHV;if(!crSm){if((c.crB||0)<=0){c.crB=.4;const rx=RO.x-x,rz=RO.z-z,rl=Math.hypot(rx,rz)||1;RO.x+=rx/rl*.9;RO.z+=rz/rl*.9;RO.v=Math.sign(RO.v)*Math.min(Math.abs(RO.v)*.6,(c.cv||8)+4);")
 R("}}else if(crSm||Math.abs(RO.v)>10){c.dead=25;","}}else if(1){c.dead=25;")
-R("if(pl&&pl.nitro)roamHeal(3);else roamDamage(ho?12:5);","if(pl&&pl.nitro)roamHeal(3);else if(!crSm)roamDamage(ho?12:5);")
+R("if(pl&&pl.nitro)roamHeal(3);else roamDamage(ho?12:5);","if(pl&&pl.nitro)roamHeal(3);else if(!crLg)roamDamage(ho?12:5);")
 # BOOST button: plain BOOST label again
 R("""if(!b.querySelector('.crSm')){const t=b.textContent.trim();if(t==='BOOST'){b.innerHTML='BOOST<span class="crSm">SMASH</span>'}}""","""if(b.querySelector('.crSm'))b.textContent='BOOST';""")
 # (5) form swap: surface hold 0.35 -> 0.1 s, morph 0.38 -> 0.15 s, hover/float blend 3x faster
