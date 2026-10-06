@@ -21,7 +21,7 @@ const open=async(mode,race)=>{const ctx=await br.newContext({viewport:{width:852
  return{ctx,p,F,cdp,ctr,tap,shot}};
 for(const mode of (process.env.MODES||'top,iframe').split(',')){
  // ================= ROAM =================
- if(!process.env.SKIPROAM){const {ctx,p,F,tap,shot}=await open(mode,false);
+ if(!process.env.SKIPROAM){const {ctx,p,F,tap,shot,ctr}=await open(mode,false);
  await F.evaluate(()=>{__mho.enterRoam()});await F.waitForFunction(()=>__mho.state==='roam',null,{polling:500});await F.evaluate(()=>__mho.storyClose&&__mho.storyClose());await p.waitForTimeout(2500);
  await F.evaluate(()=>{for(const id of['m1Next','m1Skip']){const b=document.getElementById(id);if(b&&b.getClientRects().length)b.click()}});await p.waitForTimeout(1500);
  await F.evaluate(()=>{window.requestAnimationFrame=()=>0;__ju.autoClose(true)});lg(mode+' roam ready');
