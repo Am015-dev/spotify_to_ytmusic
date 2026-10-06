@@ -11,7 +11,7 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 - **The gate = screenshots you LOOK at (852×393 phone: start, mid-drive, Athens) + tPlay (`tools/tPlay.js`, alex/od-qa) on the SPLIT build.** It uses real touch and keyboard, human-like steering, no warps or
   force-clicks. smoke and tOut are sanity checks only. Never deploy an unsplit build (3.6 MB cap).
 - **Feature freeze:** only fixes until Alex scores the game 6/10 or higher, EXCEPT what Alex asks for himself (art direction, LEGO cars). Never self-score fun.
-- Keep `ALL_OPEN=true`, the credits "Made with ❤ by Alex", English UI, gas default on touch, and no model names in files or commits.
+- Keep `ALL_OPEN=true`, the credits "Made with ❤ by Alex" and "3D models by Alex" (Alex, 2026-10-06), English UI, gas default on touch, and no model names in files or commits.
 - Read the `fun-game-design` skill (real-input testing; terse reporting).
 
 ## Lessons learnt (2026-10-04/05: about $150 and 14 h on v82–v83; Alex scored v82 2/10)
