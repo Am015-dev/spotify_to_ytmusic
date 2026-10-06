@@ -19,7 +19,7 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
  // ---- help kit checks
  const seenPh=new Set();let bulbN=0;
  const wc=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' ').filter(Boolean).length;
- const NEUTRAL=[384,110];   // open water at the top right of the island: a tap there does nothing
+ const NEUTRAL=[W-8,100];   // open water at the top right of the island: a tap there does nothing
  const ctr=sel=>p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;const r=e.getBoundingClientRect();if(!r.width)return null;return [r.left+r.width/2,r.top+r.height/2]},sel);
  const rulesCheck=async(ph)=>{HELP.rules++;
   const R=await p.evaluate(()=>{const e=document.querySelector('.gxh-rules');if(!e)return null;const out=[];const n=+e.dataset.count;const card=e.querySelector('.gxh-card');
@@ -76,6 +76,7 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
     if(!r.why||wc(r.why)>15)prob('bulb why '+wc(r.why)+' words: '+r.why);if(!r.link)prob('bulb bubble has no "How does this work?" ('+pre.ph+')');
     if(Math.random()<.5&&r.link){const lk=await ctr('.gxh-bub .gxh-link');if(lk){await p.touchscreen.tap(...lk);await p.waitForTimeout(250);await rulesCheck(pre.ph)}}
     else{await p.touchscreen.tap(...NEUTRAL);await p.waitForTimeout(150)}}
+   else if(!pre.ph){HELP.bulbNull++;if(r.rules){HELP.beatBulbs++;await rulesCheck('scene')}}   // a scene is playing: the game moves on by itself, so only the cards are checked
    else{HELP.bulbNull++;if(r.f)prob('bulb with no suggestion still pointed a finger ('+pre.ph+')');if(!r.rules)prob('bulb with no suggestion did not open the rules ('+pre.ph+')');else{if(!pre.ph)HELP.beatBulbs++;await rulesCheck(pre.ph||'scene')}}
    await p.evaluate(()=>GXH.hide());
    const a=await p.evaluate(()=>({g:!!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'),sig:[G.round,G.logN,UI.shown,G.plan.acts.map(a=>a.pw.length).join(''),!!G.q].join('|')}));
