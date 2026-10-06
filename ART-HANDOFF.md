@@ -13,6 +13,11 @@ Open (not blocking):
 2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
 
+## P0 (coordinator 21:56 UTC, Alex 3/10 "roads switch to green terrain while I drive"): ship pART8 as pART8a within the hour
+The fix is pART8 at 180f067 (grass dips 10 cm under road footprints + road polygonOffset + draped junctions; 0 pokes both cities). Rebuild on CURRENT live (v87a or newer), take a MOVING chase-cam strip in both cities, quick REVIEW.
+NEW RULE (CLAUDE.md 99ccb36): workers never run deploy.sh. After PASS: rebuild on live HEAD, add the OD_CHANGELOG entry, push out/<ver>/ (overdrive.html+km.js) to alex/od-art, send the coordinator "DEPLOY <branch> <commit> out/<ver> <msg>" + 3 bullets + shot paths.
+Queue after that: boxy traffic pickup (reviewer: shots25/r_4traffic_side.png on alex/od-cars), far-LOD traffic truck = striped teal blob (find the root mesh), then pART10. Cars workers (session_01PwUpSCA1dTKvDjL9SN6p2L, session_016fYfshnaT9fYnhpkcfA5WB) touch race track width, glass materials, physics, and body pitch/roll on car meshes; ping them if the car mesh hierarchy or shadows change. Garage (session_01LEhhDZWZUb5KQF9GsjoFVJ): CR_attachV re-adds 4x4/boat groups under U.carG||U.m; the 500 ms twin pass must re-twin them.
+
 ## pART8 IN PROGRESS, part 2 (art session session_01W6yiubKvmPYdJJoxW8Vqu4, 2026-10-06 ~19:30 UTC)
 Build: `./art.sh 99f6baf` (live v86y) → REAPPLY_OK. Debug page with raycastable Athens: local_dbg_keep.html = local_dbg.html with SM3's `rel` made a no-op (python one-liner, see below).
 Fixed this session (art7.js, art8.js, pART8.py):
