@@ -115,9 +115,12 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   await tap('#hcStory');await tick(10);await tap('#slotList .go');
   for(let i=0;i<120;i++){try{if(await p.evaluate(()=>window.__mho&&__mho.state==='roam'))break;await p.waitForTimeout(2000)}catch(e){await p.waitForTimeout(2000)}}await p.evaluate(()=>{window.__auto=false});
   for(let i=0;i<30;i++){await tick(30);if(!(await tapThrough()))break}
-  if(process.env.GSET){const [gid,gu]=process.env.GSET.split(':');console.log('GSET',await p.evaluate(async([gid,gu])=>{const w=t=>new Promise(r=>setTimeout(r,t));__gar.cheat(99999,40);document.querySelector('#roamPause [data-p="garage"]').click();await w(800);document.querySelector('#gbx .gbTabs [data-t="veh"]').click();await w(300);document.querySelector('[data-gset="'+gid+'"]').click();await w(300);
-   for(const[i,k]of['sp','ex','wh','bo'].entries())for(let n=0;n<+gu[i];n++){document.querySelector('[data-gup="'+k+'"]').click();await w(150)}
-   [...document.querySelectorAll('#gbx button')].find(b=>/SAVE/.test(b.textContent)).click();await w(1500);return JSON.stringify({sel:__gar.get().sel,u:__gar.ups(),st:__mho.state})},[gid,gu]))}
+  if(process.env.GSET){const [gid,gu]=process.env.GSET.split(':');const ck=async c=>{await p.evaluate(c=>{const e=document.querySelector(c);if(!e)throw new Error('GSET no '+c+' tab='+(window.GB?GB.tab:'?')+' gbx='+!document.querySelector('#gbx').hidden);e.click()},c);await tick(20)};
+   await p.evaluate(()=>__gar.cheat(99999,40));await ck('#roamPause [data-p="garage"]');for(let k=0;k<40&&await p.evaluate(()=>document.querySelector('#gbx').hidden);k++)await tick(15);await tick(30);
+   await ck('#gbx .gbTabs [data-t="veh"]');try{await p.waitForSelector('[data-gset="'+gid+'"]',{state:'attached',timeout:8000})}catch(e){await p.screenshot({path:OUT+'/gset_fail.png'});console.log('GSETFAIL',await p.evaluate(()=>JSON.stringify({tab:typeof GB!=='undefined'?GB.tab:'?',tabs:[...document.querySelectorAll('#gbx .gbTabs button')].map(b=>b.dataset.t+(b.classList.contains('on')?'*':'')),body:document.querySelector('#gbBody').innerHTML.slice(0,400)})));throw e}await ck('[data-gset="'+gid+'"]');
+   for(const[i,k]of['sp','ex','wh','bo'].entries())for(let n=0;n<+gu[i];n++)await ck('[data-gup="'+k+'"]');
+   await p.evaluate(()=>[...document.querySelectorAll('#gbx button')].find(b=>/SAVE/.test(b.textContent)).click());await tick(90);
+   console.log('GSET',await p.evaluate(()=>JSON.stringify({sel:__gar.get().sel,u:__gar.ups(),st:__mho.state,gbx:!document.querySelector('#gbx').hidden})))}
   await p.evaluate(MON);
   // scale + layout at the start
   const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny),hudAll=new Set(lay.hud);await shot(city+'_start');let rotR=null;if(phone&&city===CITIES[0])rotR=await rotTrip();
