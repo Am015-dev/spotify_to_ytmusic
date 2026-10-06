@@ -88,7 +88,7 @@ function boardLayout(W, H) {
     R.slots = true; R.fan = true;
     const cw0 = Math.min(40, Math.floor((m.city - 6) / CARD_AR)), nSl = Math.max(15, nCity), stp = Math.min(cw0 + 2, (R.city.w - 10 - cw0 - 40) / (nSl - 1));
     R.fanDrop = tight ? 7 : 11;
-    R.strip = { hand: fitStrip(nHand, R.hand.w - 4, R.hand.h - R.fanDrop - 3, 66), city: { cw: cw0, ch: Math.round(cw0 * CARD_AR), rows: 1, per: nSl, step: stp, x0: 5, n: nSl } };
+    R.strip = { hand: fitStrip(nHand, R.hand.w - 22, R.hand.h - R.fanDrop - 3, 66), city: { cw: cw0, ch: Math.round(cw0 * CARD_AR), rows: 1, per: nSl, step: stp, x0: 5, n: nSl } };
   } else {
     const rail = Math.round(Math.max(236, Math.min(340, W * .32))), LW = W - rail - pad;
     const chipH = 34, actH = 44, resH = 30;
