@@ -5,3 +5,11 @@ chk.mjs
 __pycache__/
 *.log
 smoke/*.jpg
+dev/
+km.js
+live.html
+qa_*/
+repro/
+shots/*.png
+tools/cars/
+tools/tPlay.js
