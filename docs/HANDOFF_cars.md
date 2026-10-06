@@ -61,3 +61,32 @@ Problems found:
    - boat sections and tunnels;
    - per-track lap-time balance on all tracks;
    - the 2-player split.
+
+## 2026-10-06 evening (session_012oDcg1MhwXUU7Y9ufgfS4k)
+**Live = v86y 99f6baf (garage pGAR1, low-seat driver drvL/drvLR). pCAR24b is NOT live.**
+
+### pCAR24b — steering after a crash (reviewer PASS on 56a8c34, built on v86x)
+- Bug (Alex): "after a crash off-road I can't turn left/right, it sticks".
+- Root cause: `CR_yaw` (roam) is a pure bicycle model, yaw = v/CR_WB·tan(dl), so at v≈0 (after a wall hit, wreck rebuild or grass stop) ◀/▶ gave 0 yaw.
+- Fix (`pCAR24b.py`, 2 replaces):
+  - a low-speed pivot `-st*1.15*pv²*dS` (pv = 1−sp/9) that follows travel/reverse intent;
+  - the pinned logic backs off with UNSTUCK after 2 s when no open direction is found.
+- **To ship:**
+  1. re-extract base.html from live v86y;
+  2. `./reapply.sh pCAR24b.py` (anchors are in CR_yaw / roamStep pinned block; pGAR1 doesn't touch them, but verify COUNT);
+  3. rerun `tools/cars/g24b.js`, reviewer, `tools/deploy.sh`.
+- **The deploy from this session was refused by the session permission guard**, so the next session must have deploy permission.
+- Gate tool `tools/cars/g24b.js <base url dir> <outdir>` (env `MODES=top,iframe`):
+  - real CDP touch on #tL #tR #tG #tB; release = touchEnd [] then re-touchStart the rest after 440 ms (tPlay pattern);
+  - wall finder uses `__tr.hit` with a solid 12 m block;
+  - wreck = hp 1 + drop 45 m.
+- Results, turn within 0.5 s from rest, v86x → fix: grass 1°→23°, wall 6°→21°, wreck 0°→24°. Strips are in `shots24b/`.
+- tPlay phone fails (FRA stuck 6.4 %, rotation check) also fail on unpatched v86x, so they are pre-existing.
+
+### Queue (from the coordinator)
+1. Ship pCAR24b on v86y (above).
+2. Respawn camera (reviewer): after a roam wreck rebuild (`roamWreckStep`, W.t>=2) the car blinks (RO.inv=2) and the chase cam isn't framing it for ~1 s, then the 4×4 pops in at the bottom edge. Snap the camera behind the car on the rebuild frame and keep the car visible before input. Check v86x first.
+3. Rival coupé glass: CR_car windscreen/roof are fully transparent; traffic got trans-black in pCAR6. Make them tinted semi-opaque with the driver visible (see devkit docs/shots/v86y/7_rival_coupe_low_seat.jpg). Garage wraps CR_car (drv→drvL) and CR_rivB (drvL→drvLR).
+4. pCAR25, the full coordinator scope: narrow tracks 14–20 m (prototype pCAR25.py), double-tap ◀/▶ SMASH lunge (no roll, ~1 s cooldown), BOOST is plain boost again, rival health bars + name/class (3 SMASH = wreck; traffic 1), form swap <0.3 s, BOOST button solid + tip vs zone toast. Gate: 10/10 double-taps with zero false triggers, in an iframe.
+- Garage balance done: gold+max is 3.3 % faster than rod (131.8 vs 136.3 s), both P1, reported to session_01LEhhDZWZUb5KQF9GsjoFVJ.
+- Other workers: garage session_01LEhhDZWZUb5KQF9GsjoFVJ (gar2.js before window.__mho), art session_01W6yiubKvmPYdJJoxW8Vqu4 (ground, roads, shadows, lighting; tell it if road geometry changes).
