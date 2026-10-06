@@ -17,12 +17,15 @@ Commits carry NO attribution lines. If `/dev/null` is a symlink (`ls -la /dev/nu
 
 - **Live this session:** kaiten-kitchen (board-first merged with story mode), tidewake (story mode; "Skip to my turn" instant).
 - **Pending, in order:**
-  1. nebula-aces: live page is ROLLED BACK to the pre-board-first build (owner: new build loads slowly on iPhone). Source now
-     has board-first + story mode + `warm3D()` limited to software GL (the likely slow start). Rebuild, phone-check, deploy,
-     ask the owner to time the load on iPhone.
-  2. crown-city-smash: board-first merged + story mode wired (`kot/campaign.js`, board-test 21/21). Phone-check fails: L>P
-     rotation leaves the full-screen advice card (UI.adv, small X) over the dice; full run takes ~189 s vs 180 s limit
-     (reported as "stuck 8s"), slowness unexplained. Fix both, then deploy.
+  1. DONE 6 Oct: nebula-aces live with story mode. iPhone start failure: the 3D scene was built and `warm3D()` compiled a dozen
+     shader programs plus one full render synchronously in the `load` handler, so a real GPU stalled before the first paint (and
+     any throw there left the page without a battle). Now `boot3D()` (ui.js) runs after the first paint, a throw, a missing GPU or
+     a lost WebGL context drops to the flat 2D board; `boot-test.js` emulates 7 GPU failure modes (WebKit itself is not installed
+     here, so an owner check on a real iPhone is still wanted). `sweep.js` (20 battles + 4 story sorties, both phone sizes) is green.
+     Text diet: `brief.js` cuts any block over 8 words to 7 words (long-press shows the full text).
+  2. DONE 6 Oct: crown-city-smash live with story mode (`kot/campaign.js`). Same 3D start fix, `brief.js`, `sweep.js`,
+     `boot-test.js`, `campsim.js` (chapter win rate by simulation: chapter 1 is 62% for an easy-level stand-in and 88% for a
+     normal-level one). Short phones get a slightly lower tray so the board stays above 55%.
   3. shipwreck-isle: board-first rework done in source (`rc/bf.js`, `bf-test.js`; board 66% / 61% of portrait). Needs
      phone-check, then deploy. Weak: 375x553 camp job list covers the board; landscape unchecked; online keeps old layout.
   4. short-fuse, rampart-and-vine, sands-of-qamar: story mode (+ phone fixes for short-fuse, sands-of-qamar).

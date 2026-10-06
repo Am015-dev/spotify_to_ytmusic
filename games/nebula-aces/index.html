@@ -5046,12 +5046,12 @@ function cut(text,n){const toks=text.trim().split(/\s+/);let out=[],c=0;for(cons
 function clamp(){if(!R.classList.contains('ph'))return;
   const roots=document.querySelectorAll('.gx-dock,#bf,#notice,#coach,.gxbanner,#banner');
   for(const root of roots){for(const e of root.querySelectorAll('*')){
-    if(e.dataset&&e.dataset.tl)continue;if(e.matches(SKIP)||e.closest(SKIP.replace(',.gx-dock-head,.roadmap','')))continue;
+    if(e.dataset&&e.dataset.tl&&e.textContent===e.dataset.tl)continue;if(e.matches(SKIP)||e.closest('svg,canvas,.die'))continue;
     if(![...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim()))continue;
     if(e.querySelector(SKIP))continue;
     const full=(e.innerText||e.textContent||'').trim();if(words(full).length<=MAXW)continue;
-    if(!e.dataset.full)e.dataset.full=e.dataset.full||full;
-    e.textContent=cut(full,KEEP);e.dataset.tl='1';e.classList.add('tl')}}}
+    e.dataset.full=full;
+    const cutT=cut(full,KEEP);e.textContent=cutT;e.dataset.tl=cutT;e.classList.add('tl')}}}
 let busy=false,mo=null;
 function run(){if(busy)return;busy=true;try{clamp()}catch(e){console.warn('brief',e)}finally{busy=false;if(mo)mo.takeRecords()}}
 // a MutationObserver callback is a microtask: the text is cut before the browser paints or a test looks at it
