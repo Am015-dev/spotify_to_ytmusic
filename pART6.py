@@ -11,4 +11,6 @@ RR("{id:'main',name:'MAIN',kind:'river',xmin:0,xmax:9e9,","{id:'main',name:'MAIN
 RR("if(a>=0)J.push({...js,s0:a*ds,s1:bb*ds,floor:-6.5})","if(a>=0){let s0=a*ds,s1=bb*ds;if(js.jw&&s1-s0>js.jw){const c=(s0+s1)/2;s0=c-js.jw/2;s1=c+js.jw/2}J.push({...js,s0,s1,floor:-6.5})}")
 # race traffic contact patch: the car footprint ×1.1/×1.05 instead of a 1.45×1.2 blob
 RR("_s2.set(c.wid*1.45,1,c.len*1.2)","_s2.set(c.wid*1.1,1,c.len*1.05)")
+# grass sits 4 cm (was 10 cm) under the physics ground: tyres touch the grass (±0.05 m); draped streets (+4.5 cm) still show (cell error ≤ 5 cm)
+RR("{...o,hilly:TR_res,y0:(o.y0||0)-.1}","{...o,hilly:TR_res,y0:(o.y0||0)-.04}")
 save()

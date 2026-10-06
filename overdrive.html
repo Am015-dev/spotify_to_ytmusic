@@ -6954,7 +6954,7 @@ window.__SP={S:SP_S,open:SP_open,go:SP_go,start:(o={})=>{Object.assign(SP_S,{m:o
 function TR_res(a,b,c,d){const N=6,h00=tH(a,c),h10=tH(b,c),h01=tH(a,d),h11=tH(b,d);let e=0;
   for(let i=1;i<N;i++)for(let j=1;j<N;j++){const u=i/N,v=j/N,l=(h00*(1-u)+h10*u)*(1-v)+(h01*(1-u)+h11*u)*v;e=Math.max(e,Math.abs(tH(a+(b-a)*u,c+(d-c)*v)-l))}
   if(e<.05)return false;const n=Math.min(Math.ceil((b-a)/8),Math.ceil(Math.sqrt(e/.05)));return n<=1?false:(b-a)/n}
-{const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{const out=_g(grp,x0,x1,z0,z1,{...o,hilly:TR_res,y0:(o.y0||0)-.1});for(const m of out)m.userData.trG=1;return out}}
+{const _g=gndBuild;gndBuild=(grp,x0,x1,z0,z1,o)=>{const out=_g(grp,x0,x1,z0,z1,{...o,hilly:TR_res,y0:(o.y0||0)-.04});for(const m of out)m.userData.trG=1;return out}}
 // buildings: most city builders place bodies at y=0. Right after the city merge (first hubGrid) every collider footprint gets its ground
 // (min/max over corners, edges, centre). Bodies that start below their ground are lifted to max(lowest corner, highest corner - 0.8 m)
 // (vertices of merged meshes and instance origins inside the footprint, + 1.6 m for balconies/eaves); a stone plinth fills down to the
