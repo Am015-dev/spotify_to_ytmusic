@@ -36,15 +36,8 @@ if(SHOTS){fs.mkdirSync(SHOTS,{recursive:true});for(const [w,h] of [[1366,768],[3
   console.log('lobby close/reopen',JSON.stringify(esc))}
 const tS=Date.now();await H.p.evaluate(()=>setTimeout(()=>document.querySelector('[data-net=start]').click(),0));
 await H.p.waitForFunction(()=>!!G&&NET.gno>0,null,{timeout:600000});for(const x of C)await x.p.waitForFunction(()=>!!G,null,{timeout:600000});console.log('game on every page after',Date.now()-tS,'ms');
-const tick=()=>{const rnd=a=>a[Math.floor(Math.random()*a.length)];if(!G||G.over||UI.modal||!me()||NET.wait||UI.autoPlan)return {k:0};const r=Math.random();const q=s=>[...document.querySelectorAll(s)];
-  const tileAt=()=>{const i=rnd(UI.pick);const v=tileScreen(i);const R=V3.r.domElement.getBoundingClientRect();return {k:0,tile:{x:R.left+v.x,y:R.top+v.y-12}}};
-  if(r<.25){const pd=q('#dockbody [data-plando]');if(pd.length){rnd(pd).click();return {k:1,w:'plan'}}}
-  if(r<.3){const s=q('#dockbody [data-dc]:not([disabled]),#dockbody [data-sell]');if(s.length){rnd(s).click();return {k:1,w:'ui'}}}
-  if(r<.33){const u=q('#dockbody [data-ui=undodrop]');if(u.length){u[0].click();return {k:1,w:'undodrop'}}}
-  if(r<.35){const s=q('#dockbody [data-pw]');if(s.length){rnd(s).click();if(UI.pick.length)return tileAt();q('[data-ui=cancelpw]').forEach(b=>b.click());return {k:1,w:'pw'}}}
-  if(UI.pick.length&&r<.65&&V3.on)return tileAt();
-  const bs=q('#dockbody button[data-mv]:not([disabled])').filter(b=>!b.dataset.mv.includes('"ui"'));if(bs.length){rnd(bs).click();return {k:1,w:'btn'}}
-  if(UI.pick.length&&V3.on)return tileAt();return {k:0}};
+const tick=()=>{if(!G||G.over||UI.modal||!me()||NET.wait)return {k:0};const q=s=>[...document.querySelectorAll(s)].filter(e=>!e.closest('[hidden]')&&!e.disabled&&e.getBoundingClientRect().width>3);const rnd=a=>a[Math.floor(Math.random()*a.length)];
+  const ch=q('#chz button');const gl=ch.length?ch:[...q('.glow'),...q('#acts button:not(.ghost)'),...q('#mine button')];if(!gl.length)return {k:0};const r=rnd(gl).getBoundingClientRect();return {k:0,tile:{x:r.left+r.width/2,y:r.top+r.height/2}}};
 let clicks=0,remote=0,tiles=0,live=P.slice(),left=null,rejoined=null,badDone=false,shotMid=false,hostKilled=false;const why={};t0=Date.now();
 const hostOf=async()=>{for(const x of live){if(await x.p.evaluate(()=>isHost()).catch(()=>false))return x}return null};
 while(Date.now()-t0<SECS*1000){const el=(Date.now()-t0)/1000;

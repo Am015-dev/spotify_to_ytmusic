@@ -71,12 +71,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-spd]');if(
 function campStart(def){const s=def.setup||{},op=def.opponent||{};const np=s.np||s.players||(s.seats?s.seats.length:2);const seats=(s.seats||['human','ai']).slice(0,np);
   const lv=seats.map((x,i)=>i===0?'normal':(op.aiLevel||(s.lv&&s.lv[i])||'normal'));const ex=Object.assign({artisans:false,sultan:false,thieves:false,promos:false},s.ex||{});
   UI.fx.length=0;UI.fxSeen=0;resetScene();UI.modal=null;UI.camp=def;if(s.seed!=null)setSeed(s.seed);
-  newGame({np,seats,lv,names:s.names,ex,mode:'x'});const tw=def.twist&&def.twist.id;const par=def.twist&&def.twist.param;const boss=G.pl[1];
-  if(tw==='head-start')G.pl[0].coins+=par;else if(tw==='boss-purse')boss.coins+=par;
-  else if(tw==='boss-goods'){for(let k=0;k<par&&G.rdeck.length;k++){const r=G.rdeck.shift();if(r==='fakir')boss.fk++;else boss.res.push(r)}refillMarket()}
-  else if(tw==='boss-djinn'){let i=G.djDeck.indexOf(par);if(i>=0)G.djDeck.splice(i,1);else{i=G.djRow.indexOf(par);if(i>=0){G.djRow.splice(i,1);refillDjinns()}}boss.dj.push(par)}
-  else if(tw==='short-road'){for(const p of G.pl)p.camels=Math.max(4,p.camels-par)}
-  else if(tw==='boss-favour')G.boss={seat:1,favour:par};
+  newGame({np,seats,lv,names:s.names,ex,mode:'x'});applyTwist(def);
   UI.setup.np=np;refresh()}
 function campMetrics(g){const p=g.pl[0],s=scoreOf(p);const rivals=g.pl.slice(1).map(q=>scoreOf(q).total);const best=Math.max(...rivals);const won=!!g.over&&g.over.win.includes(0);
   return {won,score:s.total,margin:s.total-best,coins:p.coins,goods:s.goods,tiles:g.board.filter(t=>owner(t)===0).length,djinns:p.dj.length,advisors:p.vz,cities:g.board.filter(t=>t.k==='city'&&owner(t)===0).length,palaces:s.palaces,rounds:g.round}}

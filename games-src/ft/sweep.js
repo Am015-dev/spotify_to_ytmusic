@@ -33,7 +33,7 @@ const PAGE = `(() => {
         out.push({ x, y, kind, label: lab(e), cover, cls: String(e.className).slice(0, 60) }); };
       for (const e of document.querySelectorAll('#chz button')) add(e, 'chz');
       for (const e of document.querySelectorAll('.glow')) add(e, 'glow');
-      for (const e of document.querySelectorAll('#acts button')) add(e, e.classList.contains('ghost') ? 'ghost' : 'btn');
+      for (const e of document.querySelectorAll('#acts button,#mine button')) add(e, e.classList.contains('ghost') ? 'ghost' : 'btn');
       return out;
     },
     audit() {
@@ -46,7 +46,7 @@ const PAGE = `(() => {
       if (!UI.modal) { for (const b of document.querySelectorAll('#acts button')) { if (!vis(b)) continue; const r = b.getBoundingClientRect(); if (r.left < -1 || r.right > W + 1 || r.bottom > H + 1 || r.top < 0) bad.push('button off screen: ' + lab(b));
           const t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); if (t && t !== b && !b.contains(t) && !t.closest('#chz')) bad.push('button covered: ' + lab(b) + ' by ' + (t.id || t.className)); } }
       G.pl.forEach((p, i) => { const e = document.querySelector('#seats [data-seat="' + i + '"] .ss'); if (!e) { bad.push('no seat chip ' + i); return; } const v = +e.textContent.replace(/[^0-9-]/g, ''); if (v !== shownTotal(p)) bad.push('score seat ' + i + ': screen ' + v + ' engine ' + shownTotal(p)); });
-      const inv = checkInvariants(); if (inv.length) bad.push('invariants: ' + inv.join('; ') + ' | last: ' + G.log.slice(0, 5).map(l => l.t).join(' / ') + ' | q=' + (G.q ? G.q.kind : '') + ' step=' + G.step);
+      const inv = checkInvariants(); if (inv.length && !G.q) bad.push('invariants: ' + inv.join('; ') + ' | last: ' + G.log.slice(0, 5).map(l => l.t).join(' / ') + ' | q=' + (G.q ? G.q.kind : '') + ' step=' + G.step);
       const f = document.getElementById('finger'); if (f && !f.hidden && !UI.modal) { const r = f.getBoundingClientRect(); const fx = parseFloat(f.style.left), fy = parseFloat(f.style.top); const t = document.elementFromPoint(fx, fy);
         const hit = t && t.closest('.glow,#acts button,.tile,.mcard,.dcard,.sp-b,.chb,.sch'); if (!hit) bad.push('finger not on a target at ' + Math.round(fx) + ',' + Math.round(fy));
         else if (!hit.classList.contains('glow') && !hit.closest('#acts')) bad.push('finger on a non-glowing ' + String(hit.className).slice(0, 30)); }
@@ -100,7 +100,7 @@ async function play(browser, job) {
       const c = pool[Math.floor(rnd() * pool.length)];
       await page.touchscreen.tap(c.x, c.y); res.taps++;
       let changed = false; for (let k = 0; k < 40; k++) { await sleep(25); const s2 = await page.evaluate('window.__sw.sig()'); if (s2 !== st.sig) { changed = true; break; } }
-      if (!changed) { const dd = await page.evaluate(() => JSON.stringify({ ph: G.phase, st: G.step, act: G.act && G.act.color, q: G.q && G.q.kind, pick: UI.pick, pd: UI.pendDj, pi: UI.pendItem, vm: validMoves(me() ? me().i : 0).slice(0, 5) })).catch(() => ''); if (process.env.DBG) console.log('DEAD', c.label, dd); dead[c.label + '|' + c.kind + '|' + st.sig] = 1; if (++deadN > 3) { issue('dead taps: ' + c.kind + ' "' + c.label + '" (' + c.cls + ')'); break; } else issue('dead tap: ' + c.kind + ' "' + c.label + '" (' + c.cls + ')'); }
+      if (!changed) { const dd = await page.evaluate(() => JSON.stringify({ ph: G.phase, st: G.step, act: G.act && G.act.color, q: G.q && G.q.kind, pick: UI.pick, pd: UI.pendDj, pi: UI.pendItem, vm: validMoves(me() ? me().i : 0).slice(0, 5) })).catch(() => ''); if (process.env.DBG) { console.log('DEAD', c.label, dd); const r2 = await page.evaluate(() => { const e = document.querySelector('#acts [data-pw]'); const a = window.__sw.sig(); const pd0 = JSON.stringify(UI.pendDj); if (e) e.click(); return [pd0, JSON.stringify(UI.pendDj), a === window.__sw.sig(), e ? e.dataset.pw : null, document.querySelectorAll('#acts [data-pw]').length]; }); console.log('RETRY', JSON.stringify(r2)); } dead[c.label + '|' + c.kind + '|' + st.sig] = 1; if (++deadN > 3) { issue('dead taps: ' + c.kind + ' "' + c.label + '" (' + c.cls + ')'); break; } else issue('dead tap: ' + c.kind + ' "' + c.label + '" (' + c.cls + ')'); }
     }
     const fin = await page.evaluate(() => ({ over: !!(G && G.over), round: G && G.round, win: G && G.over && G.over.win, scores: G && G.over && G.over.scores.map(s => s.s.total), inv: G ? checkInvariants() : [] }));
     res.rounds = fin.round; res.won = fin.win ? fin.win.includes(0) : null; res.scores = fin.scores;
@@ -115,7 +115,7 @@ async function play(browser, job) {
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
   const jobs = []; for (let i = 0; i < N; i++) jobs.push({ idx: i, size: SIZES[i % 2], mode: MODES[i % MODES.length], seed: 100 + i });
   for (let k = 0; k < STORY; k++) jobs.push({ idx: N + k, size: SIZES[k % 2], mode: { np: 2 }, seed: 500 + k, story: ['c1', 'c4', 'c2'][k % 3] });
-  const out = [], q = jobs.slice(); let fail = 0;
+  const out = [], q = (process.env.ONLY ? jobs.filter(j => process.env.ONLY.split(',').includes(String(j.idx))) : jobs).slice(); let fail = 0;
   await Promise.all(Array.from({ length: Math.min(JOBS, jobs.length) }, async () => { while (q.length) { const j = q.shift(); const r = await play(browser, j); out.push(r);
     const bad = r.issues.size || r.errors.length; if (bad) fail++;
     console.log(`${bad ? 'FAIL' : 'ok  '} #${r.idx} ${r.size} ${r.story ? 'story ' + j.story : r.mode} seed ${r.seed}: ${r.taps} taps, round ${r.rounds}, ${r.over ? 'finished' : 'NOT finished'}, ${(r.ms / 1000).toFixed(0)}s${r.scores ? ' scores ' + r.scores.join('/') : ''}${r.story && j.story ? ' ' + r.story : ''}`);

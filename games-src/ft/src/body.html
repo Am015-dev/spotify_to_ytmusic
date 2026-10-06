@@ -4,28 +4,29 @@
   <h1>Sands of Qamar</h1>
   <span id="pchip" class="pchip" role="status"></span>
   <span class="gx-sp"></span>
-  <button class="gx-ibtn nar-hide" data-gx="plrd" aria-expanded="false"><i data-ic="camel"></i><span>Players</span></button>
-  <button class="gx-ibtn" data-gx="djd" aria-expanded="false" aria-label="Djinns"><i data-ic="lamp"></i><span>Djinns</span></button>
+  <button class="gx-ibtn nar-hide" data-gx="plrd" aria-expanded="false" aria-label="Players score list"><i data-ic="camel"></i><span>Players</span></button>
+  <button class="gx-ibtn" data-gx="djd" aria-expanded="false" aria-label="Djinns (help)"><i data-ic="lamp"></i><span>Djinns</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-expanded="false" aria-label="Log"><i data-ic="scroll"></i><span>Log</span></button>
-  <button class="gx-ibtn nar-hide" data-gx="refd" aria-expanded="false"><i data-ic="cards"></i><span>Card list</span></button>
-  <button class="gx-ibtn nar-hide" data-gx="rulesd" aria-expanded="false"><i data-ic="book"></i><span>Rules</span></button>
+  <button class="gx-ibtn nar-hide" data-gx="refd" aria-expanded="false" aria-label="Card list help"><i data-ic="cards"></i><span>Card list</span></button>
+  <button class="gx-ibtn nar-hide" data-gx="rulesd" aria-expanded="false" aria-label="Rules"><i data-ic="book"></i><span>Rules</span></button>
   <button class="gx-ibtn nar-hide" data-a="snd" id="sndbtn" aria-label="Sound"></button>
   <button class="gx-ibtn nar-hide" data-a="mus" id="musbtn" aria-label="Music"></button>
-  <button class="gx-ibtn nar-hide" data-a="speed" id="speedbtn" title="How fast the computer plays"><i data-ic="fast"></i><span>normal</span></button>
+  <button class="gx-ibtn nar-hide" data-a="speed" id="speedbtn" aria-label="Computer speed option" title="How fast the computer plays"><i data-ic="fast"></i><span>normal</span></button>
   <button class="gx-ibtn nar-hide" data-gx="setd" aria-expanded="false" aria-label="Settings"><i data-ic="gear"></i></button>
   <button class="gx-ibtn" data-gx="menud" aria-label="Menu"><i data-ic="menu"></i></button>
-  <button class="gx-ibtn nar-hide" data-a="new"><i data-ic="plus"></i><span>New game</span></button>
+  <button class="gx-ibtn nar-hide" data-a="new" aria-label="New game"><i data-ic="plus"></i><span>New game</span></button>
 </header>
 <div class="gx-main">
   <main class="gx-board" id="bd">
     <div id="seats"></div>
     <div id="line" role="status" aria-live="polite"></div>
-    <div id="table" data-board><div id="gw"><div id="grid"></div><div id="chz" hidden></div></div><div id="mkt"></div></div>
+    <div id="table" data-board><div id="gw"><div id="grid"></div><div id="chz" hidden></div></div><div id="mkt"></div><div id="mine"></div></div>
     <div id="acts"></div>
   </main>
 </div>
 </div>
 <div id="fx" aria-hidden="true"></div>
+<div id="tip" class="reftip" hidden role="note"></div>
 <div id="finger" hidden aria-hidden="true"><svg viewBox="0 0 48 64"><path d="M20 4C20 1.8 22 .5 24 .5S28 1.8 28 4V30L35 28C38 27.4 40 29.4 40 32L41 46C41 55 36 62 26 62H22C14 62 8 56 6 49L2 37C1 34 4 32 6.500 34L14 40V4Z" fill="#fff" stroke="#0b1f3a" stroke-width="2.600" stroke-linejoin="round"/></svg><i class="fring"></i></div>
 <section class="gx-drawer wide" id="plrd" role="dialog" aria-label="Players"><div class="gx-drawer-head"><h2><i data-ic="camel"></i> Players</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="plrbody"></div></section>
 <section class="gx-drawer wide" id="djd" role="dialog" aria-label="Djinns"><div class="gx-drawer-head"><h2><i data-ic="lamp"></i> Djinns in this game</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="djbody"></div></section>

@@ -2,7 +2,10 @@
 function fit(){const gw=$('#gw'),g=$('#grid');if(!gw||!g||!G)return;const W=G.W,H=G.H,gap=3;const bw=gw.clientWidth,bh=gw.clientHeight;if(bw<20||bh<20)return;
   let cw=Math.floor((bw-(W-1)*gap)/W),ch=Math.floor((bh-(H-1)*gap)/H);ch=Math.min(ch,Math.round(cw*1.55));cw=Math.min(cw,Math.round(ch*1.6));
   g.style.width=(cw*W+(W-1)*gap)+'px';g.style.height=(ch*H+(H-1)*gap)+'px';
-  const ms=Math.max(11,Math.min(26,Math.round(Math.min(cw*.28,ch*.3))));g.style.setProperty('--ms',ms+'px');g.style.setProperty('--cw',cw+'px');g.style.setProperty('--ch',ch+'px')}
+  const ms=Math.max(10,Math.min(26,Math.round(Math.min(cw*.27,(ch-27)/2.36))));g.style.setProperty('--ms',ms+'px');g.style.setProperty('--cw',cw+'px');g.style.setProperty('--ch',ch+'px');
+  // how many people fit on a tile in two rows: past that they are drawn smaller
+  const cap=Math.max(1,Math.floor((cw-10)/(ms+2)))*Math.max(1,Math.floor((ch-27)/(ms*1.18+2)));
+  for(const e of g.querySelectorAll('.tile[data-n]')){const n=+e.dataset.n;e.classList.toggle('m7',n>cap&&n<=cap*1.7);e.classList.toggle('m10',n>cap*1.7)}}
 function relayout(sz){const R=document.documentElement;R.classList.toggle('land',sz.w>sz.h&&sz.w>=520);R.classList.toggle('short',sz.h<=600);if(G){fit();placeChz();placeFinger()}}
 if(typeof GXV!=='undefined')GXV.watch(relayout);else addEventListener('resize',()=>relayout({w:innerWidth,h:innerHeight}));
 // ---------- flights ----------
@@ -68,3 +71,6 @@ function placeFinger(){const f=$('#finger');if(!f)return;let el=null;try{el=fing
   const r=el.getBoundingClientRect();if(r.width<4||r.bottom<0||r.top>innerHeight){f.hidden=true;return}
   f.hidden=false;f.style.left=Math.round(r.left+r.width/2)+'px';f.style.top=Math.round(r.top+r.height*.55)+'px';f.dataset.on=el.dataset.tile!=null?'tile':'btn';
   if(f.dataset.k!==FING.key){f.dataset.k=FING.key;f.classList.remove('go');void f.offsetWidth}f.classList.add('go')}
+// a small note next to a card the player touched (not a panel: any other touch closes it and goes through)
+function showTip(anchor,html){const el=document.getElementById('tip');if(!el||!anchor)return;el.innerHTML=html;el.hidden=false;const r=anchor.getBoundingClientRect(),w=el.offsetWidth,h=el.offsetHeight;
+  let x=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2));let y=r.top-h-8;if(y<44)y=r.bottom+8;el.style.left=x+'px';el.style.top=y+'px';clearTimeout(UI.tipT);UI.tipT=setTimeout(()=>{el.hidden=true},4500)}

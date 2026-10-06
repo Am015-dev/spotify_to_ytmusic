@@ -47,7 +47,7 @@ function lineText(){if(!G)return '';if(G.over)return `${G.winner.split(' & ').sl
 // ---------- seats (the score race) ----------
 function pip(c,n){return n?`<span class="pp" title="${esc(MPLUR[c])}"><i class="mp sm" data-c="${c}"></i>${n}</span>`:''}
 function seatHtml(p){const a=sideToAct()===p.i&&!G.over;const kill=UI.pickSeat.includes(p.i);const nm=seatName(p);
-  return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" role="button" tabindex="0" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, ${shownTotal(p)} points">
+  return `<div class="sch ${a?'actnow':''} ${kill?'glow':''}" data-seat="${p.i}" style="--pc:${PCOL[p.i]}" aria-label="${esc(nm)}, score ${shownTotal(p)}">
    <b class="sn">${esc(nm)}${!p.human?'<small>cpu</small>':''}</b><b class="ss">★${shownTotal(p)}</b>
    <span class="s2"><span class="st">🪙${p.coins}</span><span class="st">🐪${p.camels}</span>${p.tent?'<span class="st">⛺</span>':''}</span>
    <span class="s3">${pip('vizier',p.vz)}${pip('elder',p.el)}${G.ex.artisans?pip('artisan',p.art):''}${p.fk?`<span class="pp">🔮${p.fk}</span>`:''}${p.res.length?`<span class="pp">🧺${p.res.length}</span>`:''}${p.dj.length?`<span class="pp">🧞${p.dj.length}</span>`:''}</span></div>`}
@@ -57,11 +57,11 @@ function mpHtml(c,h){return `<i class="mp${h?' h':''}" data-c="${c}"></i>`}
 function tileHtml(t){const d=TILEDEF[t.k],i=t.i;
   if(t.block)return `<div class="tile blk k-${t.k}" data-tile="${i}" aria-label="${esc(d.n)}"><i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span></div>`;
   const mv=G.move,cur=!!mv&&mv.at===i,glow=UI.pick.includes(i),own=owner(t);const hand=cur?mv.hand:[];const n=t.m.length+hand.length;
-  const cls=['tile',t.blue?'blue':'red','k-'+t.k,glow?'glow':'',cur?'cur':'',n>9?'m10':n>6?'m7':'',own!=null?'owned':''].filter(Boolean).join(' ');
-  return `<div class="${cls}" data-tile="${i}" role="button" style="${own!=null?'--oc:'+PCOL[own]:''}" aria-label="${esc(tileName(t))}">
+  const cls=['tile',t.blue?'blue':'red','k-'+t.k,glow?'glow':'',cur?'cur':'',own!=null?'owned':''].filter(Boolean).join(' ');
+  return `<div class="${cls}" data-tile="${i}" data-n="${n}" role="button" style="${own!=null?'--oc:'+PCOL[own]:''}" aria-label="${esc(tileName(t))}">
    <i class="ti">${TICON[t.k]}</i><span class="tn">${TSHORT[t.k]}</span>${t.v?`<b class="tv">${t.v}</b>`:''}<i class="tc">${tileCoord(i)}</i>
    <div class="ms">${t.m.map(c=>mpHtml(c)).join('')}${hand.map(c=>mpHtml(c,1)).join('')}</div>
-   <div class="tk">${own!=null?`<b class="own" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':ICON('camel')}</b>`:''}${t.palm?`<span class="tok">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
+   <div class="tk">${own!=null?`<b class="own" style="--pc:${PCOL[own]}">${t.tent!=null?'⛺':'🐪'}</b>`:''}${t.palm?`<span class="tok">🌴${t.palm>1?'<small>×'+t.palm+'</small>':''}</span>`:''}${t.pal?`<span class="tok">🏰${t.pal>1?'<small>×'+t.pal+'</small>':''}</span>`:''}</div></div>`}
 function renderGrid(){const g=$('#grid');if(!g)return;g.style.setProperty('--W',G.W);g.style.setProperty('--H',G.H);g.classList.toggle('dim',UI.pick.length>0);g.innerHTML=G.board.map(tileHtml).join('')}
 function renderMarket(){const el=$('#mkt');if(!el)return;const tk=G.step==='tribe'&&G.act&&G.act.color==='merchant'&&G.phase==='turn'?G.act.n:0;
   let h='<div class="mrow" aria-label="Goods market">';for(let j=0;j<9;j++){const r=G.market[j];
@@ -104,17 +104,20 @@ function buildActs(){UI.autoMove=null;const hp=me();if(!G||G.over||!hp||UI.modal
     break}
   case 'sell':{const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));const end=by('end')[0];
     if(!kinds.length&&!vm.filter(m=>m.act!=='end').length&&end){UI.autoMove=end;break}
-    main=kinds.map(k=>`<button class="ab gchip ${UI.sellSel.includes(k)?'on':''}" data-sell="${k}">${RICON[k]}${hp.res.filter(x=>x===k).length>1?'<small>×'+hp.res.filter(x=>x===k).length+'</small>':''}</button>`).join('');
     if(UI.sellSel.length)main+=abtn({act:'sell',kinds:UI.sellSel.slice().sort()},`Sell +${sellValue(UI.sellSel.length)}🪙`,'');
     main+=abtn(end,'End turn ▶','go');break}}
   if(main)h+=`<div class="arow">${main}</div>`;return h+pw}
 function renderActs(){const el=$('#acts');if(!el)return;const h=buildActs();if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}el.classList.toggle('empty',!h)}
+function renderMine(){const el=$('#mine');if(!el)return;const hp=me();let h='';
+  if(G&&!G.over&&hp&&!UI.modal&&!G.q&&G.phase==='turn'&&G.step==='sell'){const kinds=[...new Set(hp.res)];UI.sellSel=UI.sellSel.filter(k=>kinds.includes(k));
+    h=kinds.map(k=>`<button class="gchip ${UI.sellSel.includes(k)?'on':''}" data-sell="${k}" aria-label="${esc(RNAME[k])}">${RICON[k]}${hp.res.filter(x=>x===k).length>1?'<small>×'+hp.res.filter(x=>x===k).length+'</small>':''}</button>`).join('')}
+  if(el.dataset.h!==h){el.innerHTML=h;el.dataset.h=h}el.hidden=!h}
 function renderLine(){const el=$('#line');if(!el)return;const t=lineText();if(el.textContent!==t)el.textContent=t;const hp=me();el.classList.toggle('mine',!!hp&&!G.over)}
 function renderChrome(){const c=$('#pchip');if(c&&G){const s=sideToAct();const t=G.over?'Game over':`Round ${G.round}`+(online()?' · online':'');if(c.textContent!==t)c.textContent=t}
   const sb=$('#speedbtn');if(sb)sb.innerHTML=ICON('fast')+'<span>'+({0.5:'slow',1:'normal',3:'fast'}[UI.speed]||'normal')+'</span>'}
 function render(){if(!G){renderModal();return}
   const prev=UI.snap&&UI.snap.seed===G.seed?UI.snap:null;if(me())UI.hurry=false;
-  computePick();renderSeats();renderGrid();renderMarket();renderActs();renderLine();renderChrome();renderPopups();renderModal();
+  computePick();renderSeats();renderGrid();renderMarket();renderMine();renderActs();renderLine();renderChrome();renderPopups();renderModal();
   if(typeof fit==='function')fit();if(typeof animate==='function')animate(prev);UI.snap=snapState();
   autoStep();if(typeof placeChz==='function')placeChz();if(typeof placeFinger==='function')placeFinger();overCheck()}
 function snapState(){return {seed:G.seed,tiles:G.board.map(t=>({m:t.m.slice(),hand:G.move&&G.move.at===t.i?G.move.hand.slice():[],camel:t.camel,tent:t.tent,palm:t.palm,pal:t.pal})),market:G.market.slice(),djRow:G.djRow.slice(),thRow:(G.thRow||[]).slice(),
@@ -147,14 +150,14 @@ function mdotHtml(c){return `<i class="mp lg" data-c="${c}"></i>`}
 function killChip(k){return mdotHtml(k.c)+(k.c2?mdotHtml(k.c2):'')+(k.fk?`<small>+${k.fk}🔮</small>`:'')}
 function onSeat(i){const p=me();if(UI.chz&&UI.chz.anchor.seat===i){UI.chz=null;return render()}if(p&&UI.pickSeat.includes(i)){const ks=validMoves(p.i).filter(m=>m.act==='tribe'&&m.kill&&m.kill.pl===i);if(ks.length===1)return go(ks[0]);if(ks.length)return pickChoose({seat:i},ks.map(m=>({html:killChip(m.kill),m})))}
   UI.chz=null;GX.show('plrd');renderPopups()}
-function onMarket(j){const p=me();if(!p||G.step!=='tile'||G.q)return;const tm=validMoves(p.i).filter(m=>m.act==='tile'&&m.take);if(!tm.length)return;
+function onMarket(j){const p=me();const el=document.querySelector(`[data-mk="${j}"]`);const tm=p&&G.step==='tile'&&!G.q?validMoves(p.i).filter(m=>m.act==='tile'&&m.take):[];if(!tm.length){const r=G.market[j];return showTip(el,`<b>${RICON[r]} ${esc(RNAME[r])}</b>${r==='fakir'?'<br>Mystic: extra power':'<br>Different goods make sets'}`)}
   const one=tm.filter(m=>m.take.length===1&&m.take[0]===j);if(one.length)return go(one[0]);
   if(UI.mkSel.includes(j)){UI.mkSel=[];return render()}
   if(!UI.mkSel.length){if(tm.some(m=>m.take.includes(j))){UI.mkSel=[j];return render()}return}
   const a=UI.mkSel[0];const m=tm.find(m=>m.take.length===2&&m.take.includes(a)&&m.take.includes(j));UI.mkSel=[];if(m)return go(m);render()}
 function onDjinn(k,th){const p=me();const ak=th?'t:'+k:k;if(UI.chz&&UI.chz.anchor.dj===ak){UI.chz=null;return render()}if(p&&G.step==='tile'&&!G.q){const tm=validMoves(p.i).filter(m=>m.act==='tile'&&(th?m.thief===k:m.dj===k));
     if(tm.length===1)return go(tm[0]);if(tm.length>1){UI.chz={anchor:{dj:ak},opts:tm.map(m=>({html:`<span class="paychip">${m.pay.el}● ${m.pay.fk?'+ 🔮':''}</span>`,m}))};return render()}}
-  GX.show('djd');renderDjPop()}
+  const d=DJ[k];showTip(document.querySelector(th?`[data-th="${k}"]`:`[data-dj="${k}"]`),th?`<b>${esc(THIEVES[k].n)}</b><br>${esc(THIEVES[k].x)}`:`<b>${esc(d.n)}</b> · ${d.vp} points<br>${esc(d.x)}`)}
 function go(m){UI.chz=null;UI.mkSel=[];UI.pendDj=null;UI.pendItem=null;clearTimeout(UI.autoT);if(online()&&isClient()){netSend(m);return}const s=sideToAct();const hu=s>=0&&P(s).human;const mine=!online()||s===NET.mySeat;
   if(hu&&m.act==='start'){UI.moveSnap=JSON.stringify(G);UI.moveSteps=[m]}else if(hu&&m.act==='step'&&UI.moveSteps)UI.moveSteps.push(m);else if(m.act!=='djinn'&&m.act!=='item')UI.moveSnap=null;
   if(hu&&mine&&typeof fingerUsed==='function')fingerUsed(m);
@@ -178,6 +181,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('button,[data-til
   switch(d.a){case 'snd':toggleSound();return;case 'mus':toggleMusic();return;case 'speed':UI.speed=UI.speed===1?3:UI.speed===3?.5:1;render();return;case 'pause':UI.pause=!UI.pause;render();schedule();return;case 'new':if(online()){UI.modal='lobby';render();return}openStart();return}});
 // a tap anywhere that is not a button, while the computer plays, hurries it along
 document.addEventListener('pointerdown',e=>{if(G&&!G.over&&!me()&&!UI.modal&&e.target.closest&&e.target.closest('#bd'))UI.hurry=true},true);
+document.addEventListener('pointerdown',e=>{const tp=document.getElementById('tip');if(tp&&!tp.hidden&&!(e.target.closest&&e.target.closest('#tip')))tp.hidden=true},true);
 document.addEventListener('pointerdown',e=>{if(UI.chz&&!(e.target.closest&&e.target.closest('#chz,[data-tile],[data-seat],[data-dj],[data-th]'))){UI.chz=null;if(G)render()}},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(UI.pendDj||UI.pendItem||UI.chz)){UI.pendDj=UI.pendItem=UI.chz=null;render()}});
 function uiAct(a){if(online()){if(a==='new'||a==='start'){UI.modal='lobby';render();return}if(a==='undodrop'&&isClient()){netSend({act:'undodrop'});return}if(a==='continue')return}
