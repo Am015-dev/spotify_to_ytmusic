@@ -42,7 +42,7 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
      const t=HLP_STEPS[ph].target();let T=null;if(t){if(t.getBoundingClientRect)T=rc(t.getBoundingClientRect());else if(t.left!=null)T={left:t.left,top:t.top,right:t.left+(t.width||0),bottom:t.top+(t.height||0)}}
      const glows=[...document.querySelectorAll('.bfgl')].filter(g=>g.offsetParent!==null&&g.style.visibility!=='hidden').map(g=>{const r=g.getBoundingClientRect();return {cx:r.left+r.width/2,cy:r.top+r.height/2}});
      const r=e.getBoundingClientRect();return {id:e.dataset.phase,title:e.querySelector('.gxh-tt').textContent,text:e.querySelector('.gxh-tx').textContent,arrow:!!e.querySelector('.gxh-arr'),ok:!!e.querySelector('.gxh-ok'),r:rc(r),T,glows,sw:document.documentElement.scrollWidth>innerWidth+1}},hs.ph).catch(()=>null);if(b)break;await p.waitForTimeout(80)}
-   if(!b)prob('no coach bubble for phase '+hs.ph);
+   if(!b)prob('no coach bubble for phase '+hs.ph+' '+await p.evaluate(()=>JSON.stringify({st:GXH.state(),busy:hlpBusy(),pop:PHO.pop,t:(()=>{try{return HLP_STEPS[hlpPhase()].target()}catch(e){return String(e)}})()})));
    else{HELP.bubbles[hs.ph]=(HELP.bubbles[hs.ph]||0)+1;
     if(b.id!==hs.ph)prob('bubble for '+b.id+' shown in phase '+hs.ph);
     if(wc(b.title)>4)prob('bubble title over 4 words: '+b.title);if(wc(b.text)>20)prob('bubble text over 20 words ('+wc(b.text)+'): '+b.text);
@@ -91,7 +91,7 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
    return {st:PHO.st,over:!!G.over,sig:[G.round,G.logN,UI.shown,G.plan&&G.plan.acts.map(a=>a.pw.length).join(''),PHO.st,!!G.q,UI.confirm?1:0].join('|'),words:lb?lb.textContent.trim().split(/\s+/).filter(Boolean).length:0,lb:lb&&lb.textContent,chip:chip?chip.textContent:'',eng,cov,pct:bd.height/innerHeight*100,sw:document.documentElement.scrollWidth>innerWidth+1,hasPawn:!!curPawn(),pick:UI.pick||[],ans:!!document.querySelector('#bf [data-ans]'),posq:BF.posQ()?UI.pick:null}});
   if(s.over||s.st==='over')break;minPct=Math.min(minPct,s.pct);
   if(await helpFlow()){lastT=Date.now();continue}
-  if(s.words>8)prob('status >8 words: '+s.lb);if(s.sw)prob('horizontal scroll');if(s.cov)prob('big button covered at '+s.st);
+  if(s.words>8)prob('status >8 words: '+s.lb);if(s.sw)prob('horizontal scroll');if(s.cov)prob('big button covered at '+s.st+' by '+await p.evaluate(()=>{const b=document.querySelector('#bf .btn.go');const r=b.getBoundingClientRect();const e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return (e&&(e.tagName+'.'+String(e.className).slice(0,50)))+' help='+JSON.stringify(GXH.state().cur)+' btn='+[r.left,r.top,r.width,r.height].map(Math.round)}));
   if(s.eng){const m=/🍖(\d+)🪵(\d+)/.exec(s.chip);resChecks++;if(!m||+m[1]!==s.eng.f||+m[2]!==s.eng.w)prob(`resources on screen "${s.chip}" != engine food ${s.eng.f} wood ${s.eng.w}`)}
   if(s.sig!==last){last=s.sig;lastT=Date.now();same=0}else same++;s.stuckish=same;if(false){}else if(Date.now()-lastT>8000){prob('stuck >8s at '+s.st+' '+s.lb+' '+JSON.stringify(await p.evaluate(()=>({tray:document.querySelector('#bf').innerText.replace(/\n/g,'|'),pb:planProblems(),conf:UI.confirm,acts:G.plan.acts.map(a=>a.type+':'+a.pw.join('+')),cur:!!curPawn(),pick:UI.pick,cls:[...document.querySelectorAll('#bf .bfpw')].map(e=>e.className).join('/'),ids:G.plan.acts.map(a=>a.id).join(),q:!!G.q,over:!!G.over}))));break}
   if(s.st==='plan2'||s.st==='plan'){
