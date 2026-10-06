@@ -1,14 +1,16 @@
-import re,os
+import re,os,json
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-h=open('head.html').read().replace('/*SHELLCSS*/',open('../../../shell/shell.css').read());b=open('body.html').read()
-T='../../../node_modules/three/build/three.min.js'
-SRC={'shell.js':'../../../shell/shell.js','perfhud.js':'../../../perf/perfhud.js','gameaudio.js':'../../../audio/gameaudio.js','audio-data.js':'../../../audio/rampart/audio-data.js','trystero.min.js':'../../../net/trystero.min.js','netroom.js':'../../../net/netroom.js'}
-for f in ['shell.js','trystero.min.js','netroom.js','perfhud.js','gameaudio.js','audio-data.js','three.min.js','data.js','geo.js','engine.js','ai.js','rules-html.js','three3d.js','sound.js','net.js','phone.js','ui.js']:
+SP=os.path.abspath('../../..')   # games-src
+rd=lambda p:open(p,encoding='utf-8').read()
+h=rd('head.html').replace('/*GXCCSS*/',rd(SP+'/shell/gx-campaign.css'));b=rd('body.html')
+SRC={'gx-viewport.js':SP+'/shell/gx-viewport.js','gx-campaign.js':SP+'/shell/gx-campaign.js','perfhud.js':SP+'/perf/perfhud.js','gameaudio.js':SP+'/audio/gameaudio.js','audio-data.js':SP+'/audio/rampart/audio-data.js'}
+for f in ['gx-viewport.js','gx-campaign.js','campaign-data.js','perfhud.js','gameaudio.js','audio-data.js','data.js','geo.js','engine.js','ai.js','icons.js','sound.js','bf.js','camp.js']:
     tag=f'<script src="{f}"></script>';assert tag in b,f
-    src=(lambda t:'!'+t[t.index('),')+2:])(open(T).read()) if f=='three.min.js' else open(SRC.get(f,f)).read()
-    b=b.replace(tag,'<script>\n'+src+'\n</script>')
+    if f=='campaign-data.js':src='window.CAMPAIGN = '+json.dumps(json.load(open('../../campaign.json',encoding='utf-8')),separators=(',',':'),ensure_ascii=False)+';'
+    else:src=rd(SRC.get(f,f))
+    b=b.replace(tag,'<script>\n'+src.replace('</script','<\\/script')+'\n</script>')
 out=h+b
-open('../rampart.html','w').write(out)
-js='\n'.join(x for x in re.findall(r'<script>(.*?)</script>',out,re.S) if not x.startswith('\n!'))
-open('x.js','w').write(js)
+open('../rampart.html','w',encoding='utf-8').write(out)
+js='\n'.join(re.findall(r'<script>(.*?)</script>',out,re.S))
+open('x.js','w',encoding='utf-8').write(js)
 print(len(out))

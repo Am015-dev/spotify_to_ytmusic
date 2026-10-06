@@ -112,7 +112,7 @@
     {
       "id": "boss-djinn",
       "where": "setup",
-      "how": "Right after newGame(), take the djinn key param out of G.djDeck (or out of G.djRow, then refillDjinns()) and push it to the boss seat's p.dj."
+      "how": "Right after newGame(), take the djinn key param out of G.djDeck (or out of G.djRow, then refillDjinns()) and push it to the boss seat's p.dj. If the twist has a coins field, the boss seat also gets that many coins."
     },
     {
       "id": "short-road",
@@ -130,8 +130,8 @@
       "boss": false,
       "twist": {
         "id": "head-start",
-        "param": 40,
-        "text": "Gift: Old Hadiya lends you 40 extra coins to start, and coins are points."
+        "param": 25,
+        "text": "Gift: Old Hadiya lends you 25 extra coins to start, and coins are points."
       },
       "hints": true,
       "id": "c1",
@@ -606,9 +606,9 @@
     {
       "boss": false,
       "twist": {
-        "id": "boss-purse",
+        "id": "head-start",
         "param": 10,
-        "text": "Rival rule: Sabah starts with 10 extra coins."
+        "text": "Gift: Old Hadiya lends you 10 extra coins against two rivals."
       },
       "hints": false,
       "id": "c5",
@@ -845,8 +845,8 @@
       "boss": false,
       "twist": {
         "id": "head-start",
-        "param": 20,
-        "text": "Gift: Old Hadiya gives you 20 extra coins for the hard road ahead."
+        "param": 10,
+        "text": "Gift: Old Hadiya gives you 10 extra coins for the hard road ahead."
       },
       "hints": false,
       "id": "c7",
@@ -961,7 +961,11 @@
     },
     {
       "boss": false,
-      "twist": null,
+      "twist": {
+        "id": "head-start",
+        "param": 15,
+        "text": "Gift: Old Hadiya slips you 15 extra coins against the two brothers."
+      },
       "hints": false,
       "id": "c8",
       "act": 3,
@@ -1201,7 +1205,8 @@
       "twist": {
         "id": "boss-djinn",
         "param": "hikma",
-        "text": "Boss rule: Qadira starts with the djinn Hikma, so her Sages score 4 each."
+        "coins": 50,
+        "text": "Boss rule: Qadira starts with the djinn Hikma (her Sages score 4 each) and 50 extra coins."
       },
       "hints": false,
       "id": "c10",

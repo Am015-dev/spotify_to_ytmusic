@@ -259,3 +259,13 @@ function checkInvariants(){const v=[];if(!G)return v;let n=G.bag.length;for(cons
   if(!G.over&&sideToAct()<0)v.push('stuck in '+G.phase+'/'+G.step);if(!G.over&&!G.q&&!validMoves().length)v.push('no legal move in '+G.phase+'/'+G.step);return v}
 function render_game_to_text(){if(!G)return '{}';return JSON.stringify({round:G.round,phase:G.phase,step:G.step,cur:G.cur,q:G.q&&G.q.title,move:G.move&&{at:G.move.at,hand:G.move.hand},act:G.act,pl:G.pl.map(p=>({nm:p.nm,coins:p.coins,camels:p.camels,vz:p.vz,el:p.el,dj:p.dj,res:p.res.length,fk:p.fk})),log:G.log.slice(0,5).map(l=>l.t)})}
 QH.ruya=d=>{gainDjinn(P(d.p),d.k);G.djDisc.push(...d.top.filter(x=>x!==d.k))};
+
+// ---------- campaign twists: applied right after newGame(); the normal rules never change ----------
+function applyTwist(def){const tw=def&&def.twist&&def.twist.id,par=def&&def.twist&&def.twist.param;if(!tw)return;const boss=G.pl[1];
+  if(tw==='head-start')G.pl[0].coins+=par;
+  else if(tw==='boss-purse')boss.coins+=par;
+  else if(tw==='boss-goods'){for(let k=0;k<par&&G.rdeck.length;k++){const r=G.rdeck.shift();if(r==='fakir')boss.fk++;else boss.res.push(r)}refillMarket()}
+  else if(tw==='boss-djinn'){let i=G.djDeck.indexOf(par);if(i>=0)G.djDeck.splice(i,1);else{i=G.djRow.indexOf(par);if(i>=0){G.djRow.splice(i,1);refillDjinns()}}boss.dj.push(par)}
+  else if(tw==='short-road'){for(const p of G.pl)p.camels=Math.max(4,p.camels-par)}
+  else if(tw==='boss-favour')G.boss={seat:1,favour:par};
+  if(def.twist.coins)boss.coins+=def.twist.coins}

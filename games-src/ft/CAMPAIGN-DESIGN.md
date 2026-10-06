@@ -65,3 +65,25 @@ and before the first `refresh()`/`schedule()`. The boss seat is seat 1, the firs
 (`P(0).coins`), `goods`, `palaces`, `cities` (count of Wonder City tiles owned), and `advisors` (`P(0).vz`).
 Every goal other than a plain win uses `{"k":"goal"}` as its first star: `goal` is `won` and the goal's
 condition (`custom`: `goal.test` on metrics; `score`: score ≥ value; `margin`: margin ≥ value; `before-round`: rounds < value).
+
+
+## Calibration (6 Oct 2026, after the board-first rework; `node camp-sim.js 60 normal` and `node camp-sim.js 100 easy c1`)
+The computer plays the player's seat (so "easy" stands in for a newcomer and "normal" for a regular player). "Win" = the game itself.
+The `easy` computer is now clearly weaker (evaluation noise 4, was 0.9: normal beats it about 72% of the time instead of about 50%);
+`normal` and `hard` are close in strength (hard wins about 55% against normal), so act 3 gets its difficulty from three-seat tables,
+expansions and the final boss's rule rather than from the level alone.
+
+| Ch | rival | gift / boss rule | win rate (normal player) |
+|---|---|---|---|
+| 1 | Farid (easy) | you +25 coins | 90% (newcomer level: 66%) |
+| 2 | Layla (easy) | none | 73% |
+| 3 boss | Yusra (easy) | she starts with 2 goods | 58% |
+| 4 | Tahir (normal) | Crafters | 48% |
+| 5 | Sabah + Nimr (normal) | you +10 coins | 43% |
+| 6 boss | Marwan (normal) | prefers Advisors | 50% |
+| 7 | Zubaida (hard) | you +10 coins | 66% |
+| 8 | Qays + Kamil (hard) | you +15 coins | 40% |
+| 9 | Nimr (hard) | 3 fewer camels each | 45% |
+| 10 boss | Qadira (hard) | Hikma + 50 coins | 32% |
+
+`applyTwist(def)` in `src/engine.js` applies every twist (and an optional `coins` field on `boss-djinn`); the page's `campStart` and `camp-sim.js` both call it.

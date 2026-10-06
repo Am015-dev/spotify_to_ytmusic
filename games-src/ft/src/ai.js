@@ -1,6 +1,6 @@
 // ---------- computer players: plan the whole move (start, path, colour), then play it step by step ----------
 let AIPLAN=null;
-const LVL={easy:{noise:.9,depth:3000},normal:{noise:.25,depth:20000},hard:{noise:0,depth:60000}};
+const LVL={easy:{noise:4,depth:3000},normal:{noise:.25,depth:20000},hard:{noise:0,depth:60000}};
 function aiNoise(p){return (LVL[p.lv]||LVL.normal).noise}
 // every legal outcome of picking up tile s: {s,e,c,n,path}
 function outcomes(s,cap){const t=G.board[s];const hand=t.m.slice();const saved=t.m;t.m=[];const hc=handCounts(hand);const L=hand.length;const res={};let nodes=0;
@@ -31,6 +31,7 @@ function evalOutcome(p,o){const t=G.board[o.e];let v=0;
     case 'large':if(p.coins>=6){const f=G.market.slice(0,6);let b=0;for(let x=0;x<f.length;x++)for(let y=x+1;y<f.length;y++)b=Math.max(b,goodsGain(p,[f[x],f[y]]));v+=Math.max(0,b-6)}break;
     case 'exchange':if(p.coins>=4)v+=Math.max(0,Math.max(0,...G.market.map(r=>goodsGain(p,[r])))-4);break;
     case 'workshop':if(G.items.length&&(p.art||p.fk>=2))v+=3;break}
+  if(G.boss&&G.boss.seat===p.i&&o.c===G.boss.favour)v+=6;// campaign boss rule: this boss prefers one tribe
   return v+(Math.random()-.5)*aiNoise(p)*6}
 function aiAhead(p){const s=scoreOf(p).total;return G.pl.every(q=>q.i===p.i||scoreOf(q).total<=s)}
 function planTurn(p){const cap=(LVL[p.lv]||LVL.normal).depth;let best=null,bv=-1e9;for(const s of legalStarts())for(const o of outcomes(s,cap)){const v=evalOutcome(p,o);if(v>bv){bv=v;best=o}}return best&&Object.assign(best,{v:bv})}

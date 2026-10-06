@@ -36,16 +36,8 @@ if(SHOTS){fs.mkdirSync(SHOTS,{recursive:true});for(const [w,h] of [[1366,768],[3
   console.log('lobby close/reopen',JSON.stringify(esc))}
 const tS=Date.now();await H.p.evaluate(()=>setTimeout(()=>document.querySelector('[data-net=start]').click(),0));
 await H.p.waitForFunction(()=>!!G&&NET.gno>0,null,{timeout:600000});for(const x of C)await x.p.waitForFunction(()=>!!G,null,{timeout:600000});console.log('game on every page after',Date.now()-tS,'ms');
-const tick=()=>{const rnd=a=>a[Math.floor(Math.random()*a.length)];if(!G||G.over||UI.modal||!me()||NET.wait||UI.autoPlan)return {k:0};const r=Math.random();const q=s=>[...document.querySelectorAll(s)].filter(e=>!e.closest('[hidden]')&&!e.disabled);
-  if(!document.documentElement.classList.contains('ph')){console.error('no ph class');return {k:0}}
-  const tileAt=()=>{const i=rnd(UI.pick);const R=V3.r.domElement.getBoundingClientRect();V3.cam.updateMatrixWorld();const p=tilePos(i);const v=new THREE.Vector3(p.x,TH,p.z).project(V3.cam);return {k:0,tile:{x:R.left+(v.x+1)/2*R.width,y:R.top+(1-v.y)/2*R.height}}};
-  const card=q('#pc button').filter(b=>!/"new"/.test(b.dataset.mv||''));if(card.length){rnd(card).click();return {k:1,w:'card'}}
-  if(r<.04){const k=q('#ps [data-ph=open]');if(k.length){rnd(k).click();return {k:1,w:'chip'}}}
-  if(r<.06){const x=q('#ppop [data-ph=close]');if(x.length){x[0].click();return {k:1,w:'close'}}}
-  if(r<.1){const pd=q('[data-plando]');if(pd.length){rnd(pd).click();return {k:1,w:'plan'}}}
-  if(UI.pick.length&&r<.55&&V3.on)return tileAt();
-  const bs=q('#ppop button').filter(b=>!/"new"/.test(b.dataset.mv||'')&&b.dataset.ph!=='close'&&!b.dataset.ui);if(bs.length){rnd(bs).click();return {k:1,w:'popbtn'}}
-  if(UI.pick.length&&V3.on)return tileAt();return {k:0}};
+const tick=()=>{if(!G||G.over||UI.modal||!me()||NET.wait)return {k:0};const q=s=>[...document.querySelectorAll(s)].filter(e=>!e.closest('[hidden]')&&!e.disabled&&e.getBoundingClientRect().width>3);const rnd=a=>a[Math.floor(Math.random()*a.length)];
+  const ch=q('#chz button');const gl=ch.length?ch:[...q('.glow'),...q('#acts button:not(.ghost)'),...q('#mine button')];if(!gl.length)return {k:0};const r=rnd(gl).getBoundingClientRect();return {k:0,tile:{x:r.left+r.width/2,y:r.top+r.height/2}}};
 let clicks=0,remote=0,tiles=0,live=P.slice(),left=null,rejoined=null,badDone=false,shotMid=false,hostKilled=false;const why={};t0=Date.now();
 const hostOf=async()=>{for(const x of live){if(await x.p.evaluate(()=>isHost()).catch(()=>false))return x}return null};
 while(Date.now()-t0<SECS*1000){const el=(Date.now()-t0)/1000;
