@@ -143,3 +143,10 @@ Alex (v87 on iPhone): "unrealistic driving, races too; traffic blocking; smash d
 - Test gotchas: test spots can sit on a challenge start (chStep countdown brakes the car ×(1−6dt)) → g26drv clears RO.ch each frame. edgeStep slows cars heading to the world edge.
 - Next once PASS: rebuild on CURRENT live (v87a garage?) → re-extract base.html, `./reapply.sh pCAR26a.py pCAR26.py`, prepend OD_CHANGELOG entry (v87b/v88), split, tools/deploy.sh; if refused push out/<ver> and tell the coordinator.
 - Open: player tyre gap one wheel 0.053 m (v87 0.049) — pose variance; quick-race traffic toggle is now a no-op; Junction text still says "jam".
+
+### Update (same session, later): v87b PASS → DEPLOY sent
+- Reviewer FAILed d0e8320 only for a stale base (v87 instead of live v87a). Rebuilt on live 10ebde6 (v87a) with `./reapply.sh pCAR26a.py pCAR26.py pCAR26c.py`. pCAR26c = OD_CHANGELOG v87b entry + touch race timer moved right of ❚❚ (`body.v85.touch #hTime`).
+- **a4ae4b2: re-review PASS.** out/v87b (overdrive.html + km.js, force-added; out/ is gitignored). DEPLOY sent to the coordinator. **New rule (Alex, CLAUDE.md 99ccb36): workers never run deploy.sh.** After a PASS, push out/<ver> and send the coordinator "DEPLOY <branch> <commit> out/<ver> <msg>" + 3 bullets + shots.
+- Live moved to 93a3a6a afterwards, but that commit doesn't touch games/mainhattan-overdrive.
+- **Next (reviewer follow-up b):** the player car looks hazy/pinkish in races (shots26/rev87b/v87b_top_race_01_smash_pop.png). Check body material opacity/depthWrite in races and the fog density near the car; send before/after race shots.
+- Ask the coordinator for an iPhone screen recording of the double-tap after deploy.
