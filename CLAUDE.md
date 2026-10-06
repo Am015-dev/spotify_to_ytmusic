@@ -43,7 +43,7 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
   Haiku: downloads, copying, simple loops.
 - One fixer per game, one round, one deploy: the brief names exact functions/lines (grep first) and every known
   bug; the fixer fixes until the sweep is clean and reports in under 150 words. No AI-tester rework loops.
-- One session, at most 2 subagents, 1–2 games finished per session. No new cloud sessions.
+- Cloud sessions allowed (owner, 6 Oct 2026): one per game, at most 4 at a time, model set to Sonnet on every one; the orchestrator session only starts them, reviews one mid-game screenshot each and updates the shelf. In-session: at most 2 subagents.
 - Answer each helper report once; ignore duplicate notifications. Commit work in progress as you go.
 - No PR subscriptions, polling or scheduled wake-ups unless the owner asks.
 - Prove the approach on one game before touching others. Clarity before features.
