@@ -133,3 +133,13 @@ Problems found:
    - glass a bit darker (~70% look; try color .32,.37,.44).
 2. OD_CHANGELOG: when garage v87a is live, make sure a v87 entry exists (garage was asked to add it).
 3. Not ours: the traffic pickup is boxy (traffic art).
+
+## 2026-10-06 late (session_016fYfshnaT9fYnhpkcfA5WB) — pCAR26a + pCAR26, in review
+**Commit d0e8320 on alex/od-cars = live v87 base.html + `./reapply.sh pCAR26a.py pCAR26.py`. REVIEW sent to session_01Y6FYerWwxv43FuKUcaUT4v. Not deployed.**
+Alex (v87 on iPhone): "unrealistic driving, races too; traffic blocking; smash double left/right does not run".
+- **pCAR26a (SMASH + race traffic):** `CRSM_tap` = 2nd touchstart on the same arrow within 350 ms (e.timeStamp), every changedTouch, buffered 0.45 s through cooldown/air/lunge; arrow flash + side "SMASH! ▶▶" pop; "TAP TAP = SMASH" chip until 2 smashes (`mho_smHint`); touch-action manipulation html/body, none on controls; dblclick/gesture blocked. Races spawn 0 civilian cars (`setupTraffic(cfg.type==='junction'?min(3,..):0)`; junction cars parked at the edge). Gate `tools/cars/g26a.js <urldir> <out> <label>` (38/38 top+iframe; v87 15/25 at 150–340 ms).
+- **pCAR26 (car model):** `C26` tunables (window.__cr26.C26; `C26.on=0` restores the old model). City: ramps `C26_ramp`, `C26_yawCap` (front mu/v through slip curve `C26_F`), yaw inertia, `C26_vhStep` (rear mu/v, load transfer), align >0.1 rad, scrub, body lean `C26_body`+`C26_lean` (body bricks only). Race: same functions in physPlayer; physAI → `C26_aiDrive` (controller → same model). muCity road 15 / dirt 9 / water 5.5; muRace 30·han·cls.mul (AI corner speed uses 0.9× that). Later wrapper `CR_acc` still caps city accel 7.5 and brake 11 m/s².
+- Measure: `tools/cars/g26drv.js <page> <out> <tag>` (env KMH) — step response, brake strip (side cam), brake-into-turn strip. Baseline build kept in /home/user/odc26/b87 (not committed). raceBal3 now prints aiGap.
+- Test gotchas: test spots can sit on a challenge start (chStep countdown brakes the car ×(1−6dt)) → g26drv clears RO.ch each frame. edgeStep slows cars heading to the world edge.
+- Next once PASS: rebuild on CURRENT live (v87a garage?) → re-extract base.html, `./reapply.sh pCAR26a.py pCAR26.py`, prepend OD_CHANGELOG entry (v87b/v88), split, tools/deploy.sh; if refused push out/<ver> and tell the coordinator.
+- Open: player tyre gap one wheel 0.053 m (v87 0.049) — pose variance; quick-race traffic toggle is now a no-op; Junction text still says "jam".
