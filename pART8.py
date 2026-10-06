@@ -19,3 +19,9 @@ RR("[lx+a*sx,o.y0+tH(lx+a*sx,lz+b*sz),lz+b*sz,0]","[lx+a*sx,o.y0+tH(lx+a*sx,lz+b
 RR("for(const J of JUNC){const g=new THREE.CircleGeometry(J.r,24);g.rotateX(-Math.PI/2);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*J.r/8,uv.getY(i)*J.r/8);g.translate(J.x,groundY(J.x,J.z)+.056,J.z);bt.add(g,jm)}",
    "for(const J of JUNC){const g=new THREE.RingGeometry(.01,J.r,24,Math.max(2,Math.ceil(J.r/2)));g.rotateX(-Math.PI/2);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*J.r/8,uv.getY(i)*J.r/8);g.translate(J.x,0,J.z);const ps=g.attributes.position;for(let i=0;i<ps.count;i++)ps.setY(i,groundY(ps.getX(i),ps.getZ(i))+.056);g.computeVertexNormals();bt.add(g,jm)}")
 save()
+# river cells: 25 m blocks; only blocks at the water keep the bank-snapped uniform grid (ART7_res), the rest use the quadtree
+# (one road-side bank spot used to force a 3 m grid over the whole 200 m cell: ~70k triangles in view on the hill route)
+RR("if(o.hilly){const m=ART7_res(ax,ax+dx,az,az+dz);if(m>n){n=m;f=dx/n}}}else if(o.hilly){Q=[];ART7_quad(ax,az,dx,dz,Q)}","if(o.hilly)Q=ART8_riv(ax,az,dx,dz,n)}else if(o.hilly){Q=[];ART7_quad(ax,az,dx,dz,Q)}")
+RR("for(const[lx,lz,lw,lh]of Q||[[ax,az,dx,dz]]){if(Q){n=1;f=lw}","for(const[lx,lz,lw,lh,ln,sn]of Q||[[ax,az,dx,dz]]){if(Q){n=ln||1;f=lw/n}")
+RR("V.push(n>1?gndVert(lx+a*sx,lz+b*sz,o.y0,f):[lx+a*sx,","V.push(n>1||sn?gndVert(lx+a*sx,lz+b*sz,o.y0,f):[lx+a*sx,")
+save()

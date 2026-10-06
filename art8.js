@@ -3,7 +3,7 @@
 // (through the tyre contact points, normal = the car's up axis). One flat dark silhouette per car: the stencil stops overlapping
 // parts (body, wheels, glass) and neighbouring cars from darkening twice. Only cars within ~70 m of the camera draw one.
 // The ART6 tyre patches stay on top as contact darkening.
-const ART8={L:{value:new THREE.Vector3(.45,-.75,.35).normalize()},op:.6,far:70,cars:new Set(),ims:[]};
+const ART8={tri:{ab:0,ps:0},L:{value:new THREE.Vector3(.45,-.75,.35).normalize()},op:.6,far:70,cars:new Set(),ims:[]};
 const ART8_VS=`uniform vec3 uL;uniform vec3 uP0;uniform vec3 uN;uniform float uGy;uniform float uFar;
 void main(){mat4 M=modelMatrix;vec3 n=uN,p0=uP0;
 #ifdef USE_INSTANCING
@@ -57,18 +57,20 @@ renderer.render=(f=>function(sc,cam){if(sc===scene)try{ART8_step()}catch(e){}ret
 // the asphalt chord sagged under the (now exact) grass. Strips are refined where the ground is not linear: ≤ 2.5 m along, ≤ 4 m across.
 function ART8_err(ax,az,bx,bz){return Math.abs(groundY((ax+bx)/2,(az+bz)/2)-(groundY(ax,az)+groundY(bx,bz))/2)}
 function ART8_lin(ax,az,bx,bz){return ART8_err(ax,az,bx,bz)<.006}
-// chord sag shrinks with the square of the step: split into the fewest pieces that keep it ≤ 1 cm (the asphalt rides 3.5-7 cm above the ground)
-const ART8_n=e=>e<.01?1:Math.ceil(Math.sqrt(e/.01));
+// chord sag shrinks with the square of the step: split into the fewest pieces that keep it ≤ 4 cm (the asphalt rides 3.5-7 cm above the ground
+// and the grass under a road dips 10 cm, ART8_dip)
+const ART8_tol=.04,ART8_n=e=>e<ART8_tol?1:Math.ceil(Math.sqrt(e/ART8_tol));
 function abStrip(P,i0,i1,oa,ob,ya,yb,uvL){const pos=[],uvs=[],idx=[],Q=[];let nc=1;const W=ob-oa;
   for(let i=i0;i<=i1;i++){const p=P[i],rx=p.tz,rz=-p.tx;if(Math.abs(W)>3)nc=Math.max(nc,Math.min(Math.ceil(Math.abs(W)/2),ART8_n(ART8_err(p.x+rx*oa,p.z+rz*oa,p.x+rx*ob,p.z+rz*ob))));
     Q.push([p.x,p.z,p.tx,p.tz,p.s]);if(i<i1){const q=P[i+1],L=Math.hypot(q.x-p.x,q.z-p.z);if(L>2){const rq=q.tz,rzq=-q.tx;let e=0;for(const o of[oa,(oa+ob)/2,ob])e=Math.max(e,ART8_err(p.x+rx*o,p.z+rz*o,q.x+rq*o,q.z+rzq*o));
-      const n=Math.min(Math.ceil(L/1.5),ART8_n(e));for(let k=1;k<n;k++){const t=k/n;let tx=p.tx+(q.tx-p.tx)*t,tz=p.tz+(q.tz-p.tz)*t;const l=Math.hypot(tx,tz)||1;Q.push([p.x+(q.x-p.x)*t,p.z+(q.z-p.z)*t,tx/l,tz/l,p.s+(q.s-p.s)*t])}}}}
+      const n=Math.min(Math.ceil(L/3),ART8_n(e));for(let k=1;k<n;k++){const t=k/n;let tx=p.tx+(q.tx-p.tx)*t,tz=p.tz+(q.tz-p.tz)*t;const l=Math.hypot(tx,tz)||1;Q.push([p.x+(q.x-p.x)*t,p.z+(q.z-p.z)*t,tx/l,tz/l,p.s+(q.s-p.s)*t])}}}}
   const C=nc+1;for(let i=0;i<Q.length;i++){const[px,pz,tx,tz,ps]=Q[i],rx=tz,rz=-tx;for(let c=0;c<=nc;c++){const u=c/nc,o=oa+W*u,x=px+rx*o,z=pz+rz*o;pos.push(x,groundY(x,z)+ya+(yb-ya)*u,z);uvs.push(u,ps/uvL)}
     if(i<Q.length-1)for(let c=0;c<nc;c++){const k=i*C+c;idx.push(k,k+C,k+1,k+1,k+C,k+C+1)}}
-  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.setIndex(idx);g.computeVertexNormals();return g}
-window.__a8={ART8,rc:(x,z)=>rivClear(x,z),get HUB(){return HUB},tH:(x,z)=>tH(x,z),gy:(x,z)=>groundY(x,z),rd:(x,z)=>ART7_rd(x,z)};
+  ART8.tri.ab+=idx.length/3;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.setIndex(idx);g.computeVertexNormals();return g}
+window.__a8={ART8,rc:(x,z)=>rivClear(x,z),get HUB(){return HUB},tH:(x,z)=>tH(x,z),gy:(x,z)=>groundY(x,z),rd:(x,z)=>ART7_rd(x,z),far:(...a)=>ART7_far(...a),near:(...a)=>ART7_near(...a),flat:(...a)=>ART7_flat(...a)};
 // filler streets / crossing squares (pART5 drape): 4 m segments only where the ground under them is not linear (pART7 split every street
 // 4 m both ways, ~400k extra vertices on flat ground); flat stretches keep 24 m segments
 function ART8_ps(x0,z0,ux,uz,w,L){const vx=uz,vz=-ux;let ac=1,bend=false;for(let t=0;t<=L;t+=4){const x=x0+ux*t,z=z0+uz*t;if(w>3)ac=Math.max(ac,Math.min(Math.ceil(w/2),ART8_n(ART8_err(x-vx*w/2,z-vz*w/2,x+vx*w/2,z+vz*w/2))));
-    }const nl=Math.max(1,Math.ceil(L/24)),sl=L/nl;for(let k=0;k<nl&&!bend;k++)for(const o of[-w/2,0,w/2]){const x=x0+ux*sl*k+vx*o,z=z0+uz*sl*k+vz*o;if(ART8_err(x,z,x+ux*sl,z+uz*sl)>=.01){bend=true;break}}return[ac,bend?Math.max(1,Math.ceil(L/4)):nl]}
-function ART8_pq(cx,cz,wa,wb){const a=wa/2,b=wb/2;let e=0;for(const t of[-1,-.5,0,.5,1]){e=Math.max(e,ART8_err(cx-a,cz+b*t,cx+a,cz+b*t),ART8_err(cx+a*t,cz-b,cx+a*t,cz+b))}return e>=.01?[Math.max(1,Math.ceil(wa/4)),Math.max(1,Math.ceil(wb/4))]:[1,1]}
+    }const nl=Math.max(1,Math.ceil(L/24)),sl=L/nl;let m=1;for(let k=0;k<nl;k++)for(const o of[-w/2,0,w/2]){const x=x0+ux*sl*k+vx*o,z=z0+uz*sl*k+vz*o;m=Math.max(m,ART8_n(ART8_err(x,z,x+ux*sl,z+uz*sl)))}
+  const r=[ac,Math.min(Math.max(1,Math.ceil(L/4)),nl*m)];ART8.tri.ps+=2*r[0]*r[1];return r}
+function ART8_pq(cx,cz,wa,wb){const a=wa/2,b=wb/2;let e=0;for(const t of[-1,-.5,0,.5,1]){e=Math.max(e,ART8_err(cx-a,cz+b*t,cx+a,cz+b*t),ART8_err(cx+a*t,cz-b,cx+a*t,cz+b))}return e>=ART8_tol?[Math.max(1,Math.ceil(wa/4)),Math.max(1,Math.ceil(wb/4))]:[1,1]}
