@@ -9128,14 +9128,16 @@ const CR_HB={el:null,pool:[],v:V3()};
 function CR_hbStep(){let E=CR_HB.el;if(!E){E=CR_HB.el=document.createElement('div');E.id='crHB';document.body.appendChild(E)}
  const on=state==='race'&&pl&&!CC&&!paused;if(!on){if(E.childElementCount)for(const d of CR_HB.pool)d.style.display='none';return}
  const L=[];for(const s of ships){if(s===pl||s.dead>0||s.eliminated||s.finished)continue;const dd=s.dist-pl.dist;if(dd<-12||dd>90)continue;L.push([Math.abs(dd),s])}L.sort((a,b)=>a[0]-b[0]);
- let k=0;for(const[,s]of L.slice(0,4)){const v=CR_HB.v.copy(s.mesh.position).add(s.mesh.userData.m.position);v.y+=2.4;v.project(camera);if(v.z>1||Math.abs(v.x)>1.05||Math.abs(v.y)>1.05)continue;
+ let k=0;const P=[];for(const[,s]of L.slice(0,4)){const v=CR_HB.v.copy(s.mesh.position).add(s.mesh.userData.m.position);v.y+=2.4;v.project(camera);if(v.z>1||Math.abs(v.x)>.6||v.y<-.3||v.y>.75)continue;
+  const sx=(v.x+1)/2*innerWidth,sy=(1-v.y)/2*innerHeight;if(P.some(q=>Math.abs(q[0]-sx)<84&&Math.abs(q[1]-sy)<40))continue;P.push([sx,sy]);
   let d=CR_HB.pool[k];if(!d){d=document.createElement('div');d.className='hb';d.innerHTML='<span></span><small></small><i><b></b></i>';E.appendChild(d);CR_HB.pool.push(d)}k++;
   const h=clamp(s.hull,0,100),b=d.lastChild.firstChild,cl=(CR_LOAD[s.vmode||'car']||CR_LOAD.car).k;if(d._n!==s.name+cl){d._n=s.name+cl;d.firstChild.textContent=s.name;d.children[1].textContent=cl}
   b.style.width=h+'%';b.className=h>66?'':h>33?'md':'lo';d.style.display='';d.style.left=((v.x+1)/2*innerWidth).toFixed(0)+'px';d.style.top=((1-v.y)/2*innerHeight).toFixed(0)+'px'}
  for(let i=k;i<CR_HB.pool.length;i++)CR_HB.pool[i].style.display='none'}
 // ---- CAR25: race camera never leaves the track box (walls at +-HALF)
-const _cr25F=mkF(),CR_CAMX={pre:0,n:0};
-window.__cr25={get cars(){return HUB.cars},get ships(){return ships},get traffic(){return traffic},get W(){return W},get HALF(){return HALF},get MARGIN(){return MARGIN},get CC(){return !!CC},cam:CR_CAMX,get LS(){return CR_LS}};
+const _cr25F=mkF(),CR_CAMX={pre:0,n:0},CR_WL=[];
+wreckTraffic=(f=>function(c,by,pw){CR_WL.push({pl:!!(by&&by.isPlayer),ch:!!(by&&by.chain),rt:by&&by.isPlayer?+(by.rollT||0).toFixed(2):null});if(CR_WL.length>20)CR_WL.shift();return f.apply(this,arguments)})(wreckTraffic);
+window.__cr25={get cars(){return HUB.cars},get ships(){return ships},get traffic(){return traffic},get W(){return W},get HALF(){return HALF},get MARGIN(){return MARGIN},get CC(){return !!CC},cam:CR_CAMX,wl:CR_WL,get LS(){return CR_LS}};
 updateCam=(f=>function(dt,snap){f(dt,snap);try{CR_hbStep()}catch(e){}try{if((state!=='race'&&state!=='countdown'&&state!=='finished')||!TD)return;const s=CC&&CC.s?CC.s:pl;if(!s)return;
  frameAt(TD,s.dist,F2);const c=camera.position,al=(c.x-F2.p.x)*F2.t.x+(c.y-F2.p.y)*F2.t.y+(c.z-F2.p.z)*F2.t.z;frameAt(TD,s.dist+al,_cr25F);const F=_cr25F;
  const rx=c.x-F.p.x,ry=c.y-F.p.y,rz=c.z-F.p.z,l=rx*F.r.x+ry*F.r.y+rz*F.r.z,lim=HALF-.9;CR_CAMX.pre=Math.max(CR_CAMX.pre,Math.abs(l)/HALF);if(Math.abs(l)<=lim)return;CR_CAMX.n++;const dl=Math.sign(l)*lim-l;c.addScaledVector(F.r,dl);

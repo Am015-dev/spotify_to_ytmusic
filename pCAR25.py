@@ -87,7 +87,7 @@ const CR_HB={el:null,pool:[],v:V3()};
 function CR_hbStep(){let E=CR_HB.el;if(!E){E=CR_HB.el=document.createElement('div');E.id='crHB';document.body.appendChild(E)}
  const on=state==='race'&&pl&&!CC&&!paused;if(!on){if(E.childElementCount)for(const d of CR_HB.pool)d.style.display='none';return}
  const L=[];for(const s of ships){if(s===pl||s.dead>0||s.eliminated||s.finished)continue;const dd=s.dist-pl.dist;if(dd<-12||dd>90)continue;L.push([Math.abs(dd),s])}L.sort((a,b)=>a[0]-b[0]);
- let k=0;const P=[];for(const[,s]of L.slice(0,4)){const v=CR_HB.v.copy(s.mesh.position).add(s.mesh.userData.m.position);v.y+=2.4;v.project(camera);if(v.z>1||Math.abs(v.x)>1.05||Math.abs(v.y)>1.05)continue;
+ let k=0;const P=[];for(const[,s]of L.slice(0,4)){const v=CR_HB.v.copy(s.mesh.position).add(s.mesh.userData.m.position);v.y+=2.4;v.project(camera);if(v.z>1||Math.abs(v.x)>.6||v.y<-.3||v.y>.75)continue;
   const sx=(v.x+1)/2*innerWidth,sy=(1-v.y)/2*innerHeight;if(P.some(q=>Math.abs(q[0]-sx)<84&&Math.abs(q[1]-sy)<40))continue;P.push([sx,sy]);
   let d=CR_HB.pool[k];if(!d){d=document.createElement('div');d.className='hb';d.innerHTML='<span></span><small></small><i><b></b></i>';E.appendChild(d);CR_HB.pool.push(d)}k++;
   const h=clamp(s.hull,0,100),b=d.lastChild.firstChild,cl=(CR_LOAD[s.vmode||'car']||CR_LOAD.car).k;if(d._n!==s.name+cl){d._n=s.name+cl;d.firstChild.textContent=s.name;d.children[1].textContent=cl}
