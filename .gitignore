@@ -12,3 +12,5 @@ local_dbg2.html
 outART/
 km.js
 base_live.html
+dbg_live.html
+local_dbg_keep*.html
