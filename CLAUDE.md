@@ -8,6 +8,8 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 - **Reviewer gate (Alex, 2026-10-05):** no deploy without a PASS from the reviewer session (session_01Y6FYerWwxv43FuKUcaUT4v). Send it "REVIEW <branch> <commit> <852×393 shot paths>" (start, Frankfurt drive, Athens drive, low side view of the player car and a traffic car, garage, boat if changed) plus the measured tyre-to-road gap (≤ 0.05 m). Always rebuild from the CURRENT live index.html right before deploy.sh.
 - **In-game changelog (Alex, 2026-10-06):** every deploy prepends an entry to `OD_CHANGELOG` in the game (version, date, 2–4 plain-English lines tagged FIXED/NEW/CHANGED) so Alex can check what changed while playing. No entry, no deploy.
 - **The coordinator deploys (Alex, 2026-10-06: "the idea is for orchestrator").** Workers do NOT run deploy.sh. After a reviewer PASS: rebuild on CURRENT live HEAD, add the OD_CHANGELOG entry, push `out/<ver>/` (overdrive.html + km.js) to your branch, then send the coordinator "DEPLOY <branch> <commit> out/<ver> <commit msg>" plus 3 bullets for Alex and shot paths. The coordinator deploys at once and reports to Alex. Workers still republish the beta artifact when the coordinator asks.
+- **Quick review for tiny fixes (Alex, 2026-10-06):** text, popup positions, colours and opacity get a QUICK review: one 852×393 shot of the change plus a no-console-errors check. The full shot set and tPlay are only for driving, physics, world or performance changes.
+- **Model choice (Alex, 2026-10-06):** small, well-specified fixes (UI nits, text, colours) run on `claude-sonnet-5-5`. Driving feel, graphics, and anything that failed once run on `claude-opus-5-5`.
 - **The gate = screenshots you LOOK at (852×393 phone: start, mid-drive, Athens) + tPlay (`tools/tPlay.js`, alex/od-qa) on the SPLIT build.** It uses real touch and keyboard, human-like steering, no warps or
   force-clicks. smoke and tOut are sanity checks only. Never deploy an unsplit build (3.6 MB cap).
 - **Feature freeze:** only fixes until Alex scores the game 6/10 or higher, EXCEPT what Alex asks for himself (art direction, LEGO cars). Never self-score fun.
@@ -40,6 +42,7 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 ## Cost and speed rules (99.8% of the tokens were context re-reads)
 - Set `model` on EVERY cloud session. Alex (2026-10-05): use `claude-opus-5-5` for tough issues (bugs Sonnet failed to reproduce or fix, visual/feel design, anything that already failed once). `claude-sonnet-5-5` only for routine, well-specified edits. The coordinator stays on Opus. Subagents inherit this: an Opus session must not spawn Sonnet subagents (set `model: "opus"` on Agent calls).
 - Run at most one fix worker plus one integrator at a time. Parallel workers on one 3.7 MB file caused rebuild loops.
+- Write a handoff at ~120k context (not later). Small fixes go to an already-running worker, not a new session.
 - Use a fresh session per task and write a handoff before ~150k context. Never keep going in a 400k+ context.
 - Run a test once in the background and wait for its notification. No `sleep`/`grep` polling loops and no scheduled check-ins.
 - Release candidates: build with `reapply.sh` in the RELEASE.md order, split, run tPlay once, deploy. No 22-run matrices.
