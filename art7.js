@@ -13,5 +13,5 @@ function ART7_quad(x,z,w,h,out){const far=ART7_far(x,z,w,h);if(w/2<(far?12:4)||(
 // river-bank cells keep one uniform n×n grid (gndVert snaps it to the banks): the step is verified on the cell's own land triangles (pART8: water and
 // bank sub-cells skipped; they used to force the 3 m maximum over every 200 m river cell) and grown to the road/far fit (≥ 3 m)
 function ART7_res(a,b,c,d){const L=b-a,W=d-c,nMax=Math.max(1,Math.ceil(L/3));let n=1;
-  for(;;){const sx=L/n,sz=W/n;let ok=true;for(let i=0;i<n&&ok;i++)for(let j=0;j<n;j++){const x=a+i*sx,z=c+j*sz,r=Math.hypot(sx,sz)/2;if(rivClear(x+sx/2,z+sz/2)<r+2)continue;const far=ART7_far(x,z,sx,sz);if(!ART7_flat(x,z,sx,sz,far?.2:.025,far?.2:.05)){ok=false;break}}
+  for(;;){const sx=L/n,sz=W/n;let ok=true;for(let i=0;i<n&&ok;i++)for(let j=0;j<n;j++){const x=a+i*sx,z=c+j*sz,r=Math.hypot(sx,sz)/2;if(rivClear(x+sx/2,z+sz/2)<r+2&&ART7_rd(x+sx/2,z+sz/2)>r+4)continue;const far=ART7_far(x,z,sx,sz);if(!ART7_flat(x,z,sx,sz,far?.2:.025,far?.2:.05)){ok=false;break}}
     if(ok||n>=nMax)return n;n=Math.min(nMax,Math.ceil(n*1.5))}}

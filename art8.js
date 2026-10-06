@@ -66,7 +66,7 @@ function abStrip(P,i0,i1,oa,ob,ya,yb,uvL){const pos=[],uvs=[],idx=[],Q=[];let nc
   const C=nc+1;for(let i=0;i<Q.length;i++){const[px,pz,tx,tz,ps]=Q[i],rx=tz,rz=-tx;for(let c=0;c<=nc;c++){const u=c/nc,o=oa+W*u,x=px+rx*o,z=pz+rz*o;pos.push(x,groundY(x,z)+ya+(yb-ya)*u,z);uvs.push(u,ps/uvL)}
     if(i<Q.length-1)for(let c=0;c<nc;c++){const k=i*C+c;idx.push(k,k+C,k+1,k+1,k+C,k+C+1)}}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.setIndex(idx);g.computeVertexNormals();return g}
-window.__a8={ART8,get HUB(){return HUB},tH:(x,z)=>tH(x,z),gy:(x,z)=>groundY(x,z),rd:(x,z)=>ART7_rd(x,z)};
+window.__a8={ART8,rc:(x,z)=>rivClear(x,z),get HUB(){return HUB},tH:(x,z)=>tH(x,z),gy:(x,z)=>groundY(x,z),rd:(x,z)=>ART7_rd(x,z)};
 // filler streets / crossing squares (pART5 drape): 4 m segments only where the ground under them is not linear (pART7 split every street
 // 4 m both ways, ~400k extra vertices on flat ground); flat stretches keep 24 m segments
 function ART8_ps(x0,z0,ux,uz,w,L){const vx=uz,vz=-ux;let ac=1,bend=false;for(let t=0;t<=L;t+=4){const x=x0+ux*t,z=z0+uz*t;if(w>3)ac=Math.max(ac,Math.min(Math.ceil(w/2),ART8_n(ART8_err(x-vx*w/2,z-vz*w/2,x+vx*w/2,z+vz*w/2))));
