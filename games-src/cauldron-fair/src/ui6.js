@@ -152,15 +152,6 @@ function rubyOpts(p) { const mx = Math.floor(p.rubies / D.rubySpend), out = []; 
 function rubyBest(p) { try { const g = JSON.parse(JSON.stringify(G)); g.players[p.seat].q = { h: 'ruby', d: {} }; const m = CF.AI.choose(g, p.seat, 'normal'); if (m && m.t === 'ruby') return { drop: m.drop, flask: !!m.flask }; } catch (e) { } return { drop: 0, flask: false }; }
 const rubyKey = o => o.drop + (o.flask ? 'f' : '');
 function rubyPick(p) { if (UI.rubyFor !== p.seat + ':' + G.round) { UI.rubyFor = p.seat + ':' + G.round; UI.rubySel = rubyBest(p); UI.rubyBest = rubyKey(UI.rubySel); } return UI.rubySel; }
-function rubyUI(p) {
-  const sel = rubyPick(p), w = h('div.rubyp', h('div.rl', h('span', { html: ico('ruby', 20) }), h('b', p.rubies), ' rubies: '), h('div.rtiles'));
-  const row = w.querySelector('.rtiles');
-  rubyOpts(p).forEach(o => { const cost = (o.drop + (o.flask ? 1 : 0)) * D.rubySpend, on = rubyKey(o) === rubyKey(sel);
-    row.appendChild(h('button.rt' + (on ? '.on' : '') + (rubyKey(o) === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': rubyKey(o), type: 'button', 'aria-pressed': on ? 'true' : 'false', 'aria-label': cost ? 'Spend ' + cost + ' rubies' : 'Keep my rubies' },
-      cost ? [h('span', { html: ico('ruby', 14) }), '−' + cost, o.drop ? h('span', { html: ico('drop', 18) }) : null, o.drop ? '+' + o.drop : null, o.flask ? h('span', { html: ico('flask', 18, true) }) : null] : 'Keep'));
-  });
-  return w;
-}
 function rubySelect(k) { const p = mineP(); if (!p) return; const o = rubyOpts(p).find(x => rubyKey(x) === k); if (o) { UI.rubySel = o; snd('click'); renderReport(); bfGhost(); } }
 // the one confirm button: buys the picked chips, spends the picked rubies, and starts the next day
 function rubyGo() { const p = mineP(); if (!p) return; UI.rubyAuto = Object.assign({}, rubyPick(p)); UI.advFor = G.rep ? G.rep.round : 0; autoDecisions(); }
@@ -171,33 +162,7 @@ function autoDecisions() {
     UI.rubyAuto = null; const sq = UI.seq; UI.advT = setTimeout(() => { UI.advT = 0; UI.advFor = 0; if (sq === UI.seq && UI.rsOpen && UI.rsMode === 'report') repContinue(); }, 80);
   }
 }
-// ---------- the shop: tap a chip, it drops into your bag ----------
-function shopUI(p, q, legal) {
-  const wrap = h('div.shop'); const coins = q.d.coins, sel = UI.shopSel = (UI.shopSel || []).filter(k => G.supply[k] > 0);
-  const cost = sel.reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
-  wrap.appendChild(h('div.purse', h('span', { html: ico('coin', 30) }), h('b', coins - cost), h('span.pl', sel.length ? ' left' : ' coins to spend')));
-  const stalls = h('div.stalls');
-  for (const c of D.SHOP_COLORS) {
-    const out = CF.bookOut(G, c), bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
-    const st = h('div.stall' + (out ? '' : '.locked'));
-    st.appendChild(h('details.sth', h('summary', { 'aria-label': D.COLORS[c].name + ': how it works' }, h('b', D.COLORS[c].name), h('span.bi', { 'aria-hidden': 'true' }, out ? 'i' : 'day ' + D.BOOK_ROUND[c])), h('div.bx', bk.title + ': ' + bk.text.split(/\s+/).slice(0, Math.max(2, 7 - bk.title.split(/\s+/).length)).join(' '))));
-    const row = h('div.toks');
-    D.COLORS[c].vals.forEach(val => {
-      if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
-      const on = sel.indexOf(key) >= 0; const others = sel.filter(k => k[0] !== c).reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
-      const dis = !out || left < 1 || price + others > coins;
-      row.appendChild(h('button.tok' + (on ? '.on' : ''), { 'data-a': 'shopsel', 'data-k': key, type: 'button', disabled: dis && !on ? true : null, 'aria-pressed': on ? 'true' : 'false', 'aria-label': keyName(key) + ' for ' + price + ' coins' + (left < 1 ? ', sold out' : '') },
-        chipN(key, 40), h('span.pc', h('span', { html: ico('coin', 12) }), left < 1 ? '—' : price)));
-    });
-    st.appendChild(row); stalls.appendChild(st);
-  }
-  wrap.appendChild(stalls);
-  const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
-  const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', 'Tap chips to drop them in')));
-  if (p.rubies >= D.rubySpend && G.round < D.rounds) { rubyPick(p); wrap.appendChild(rubyUI(p)); UI.rubyShown = true; } else UI.rubyShown = false;
-  UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go.confirm', { 'data-a': 'shopbuy', type: 'button' }, (sel.length ? 'Buy ' + sel.length + ' · ' : '') + nextLabel()))];
-  return wrap;
-}
+// ---------- the shop (the market stall itself is built in part 9): tap a chip, it drops into your bag ----------
 function bfFly(fromR, toEl, key, size) {
   if (!bfAnim() || !fromR || !toEl) return; const to = toEl.getBoundingClientRect(); if (to.width < 4) return;
   const e = h('div.bfchip', { html: chipHTML(key, size || 40), 'aria-hidden': 'true' }); e.style.left = fromR.left + 'px'; e.style.top = fromR.top + 'px'; document.body.appendChild(e);

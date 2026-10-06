@@ -193,6 +193,7 @@ document.addEventListener('click', ev => {
     case 'blgx': UI.prefs.blgSeen = true; savePrefs(); renderBlg(); break;
     case 'tipmore': UI.tipOpen = !UI.tipOpen; renderTip(); break;
     case 'fort': t.classList.toggle('open'); break;
+    case 'fortchip': lpShow(t); break;
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
     case 'rscont': repContinue(); break;
     case 'shopsel': shopToggle(d.k); break;
@@ -260,7 +261,7 @@ let rzT = 0, rzT2 = 0, rzSig = '';
 function relayout(force) {
   const bd = $('#board'), sig = innerWidth + 'x' + innerHeight + '|' + (bd ? bd.clientWidth + 'x' + bd.clientHeight : '');
   if (!force && sig === rzSig) return; rzSig = sig;
-  applyPhone(); if (G && UI.started) { UI.potSig = ''; render(); }
+  applyPhone(); if (G && UI.started) { UI.potSig = ''; render(); if (UI.rsOpen && UI.rsMode === 'report') renderReport(); }
   if (typeof pxResize === 'function') { try { pxResize(true); } catch (e) { } }
 }
 function onResize() { clearTimeout(rzT); clearTimeout(rzT2); rzT = setTimeout(() => relayout(), 60); rzT2 = setTimeout(() => relayout(), 420); }   // iOS reports the old size for a moment after orientationchange
@@ -277,6 +278,7 @@ function boot() {
   addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) onResize(); }).observe(bd);
   if (window.visualViewport) visualViewport.addEventListener('resize', onResize);
+  if (window.GXV) GXV.watch(() => relayout(true));   // one debounced relayout for every size change (iOS reports the old size right after a rotation)
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'cf' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); } } catch (e) { }
   if (typeof pxPerfReg === 'function') pxPerfReg();
   if (typeof pxInit === 'function') pxInit().then(ok => { if (ok) { pxPerfReg(); if (G && UI.started) render(); } });

@@ -141,8 +141,10 @@ function renderRisk() {
 }
 function renderFort() {
   const e = $('#fort'); if (!e) return; const c = D.FORTUNE.find(x => x.id === G.fcard);
-  if (!c || G.phase === 'over') { e.hidden = true; return; } e.hidden = false; e.className = c.kind;
-  e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', c.text.split(/\s+/).slice(0, Math.max(2, 6 - c.name.split(/\s+/).length)).join(' ') + '…')));
+  let fc = $('#fortchip'); if (!fc) { const bd = $('#bd'); if (bd) { fc = h('button#fortchip', { type: 'button', 'data-a': 'fortchip', 'data-lp': 'fort' }); bd.appendChild(fc); } }
+  if (!c || G.phase === 'over') { e.hidden = true; if (fc) fc.hidden = true; return; } e.hidden = false; e.className = c.kind; e.setAttribute('data-lp', 'fort');
+  e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', fortShort(c))));
+  if (fc) { fc.hidden = false; fc.className = c.kind; fc.setAttribute('aria-label', 'Fortune card ' + c.name + ': ' + fortShort(c)); fc.innerHTML = ''; fc.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('b', c.name)); }
 }
 function renderRoster() {
   const r = $('#roster'); if (!r) return; r.innerHTML = '';

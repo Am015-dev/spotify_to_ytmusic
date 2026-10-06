@@ -1,5 +1,5 @@
 // ===================== part 4: the day report (and its decisions), the shop, the pass card, the final screen, the guided tips =====================
-function closeRS(quiet) { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; UI.rsMode = ''; if (!quiet && typeof schedule === 'function') schedule(); }
+function closeRS(quiet) { stgAbort(); const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; rs.classList.remove('stg'); rs.style.top = ''; } UI.rsOpen = false; UI.rsMode = ''; if (!quiet && typeof schedule === 'function') schedule(); }
 function checkReport() {
   if (!G || !UI.started) return;
   if (typeof autoDecisions === 'function') autoDecisions();
@@ -9,7 +9,7 @@ function checkReport() {
   if (UI.rsMode === 'final') return;
   const R = G.rep;
   const v0 = viewSeat(), needs = G.phase === 'eval' && v0 >= 0 && G.players[v0].q && EVAL_Q[G.players[v0].q.h];   // a decision of mine is waiting: its report must be open (hot-seat: after the pass card, online: after a rejoin)
-  if (R && ((UI.repSeen !== R.round && (G.phase === 'eval' || G.round > R.round || G.phase === 'over')) || (needs && !UI.rsOpen))) { UI.repSeen = R.round; UI.rsOpen = true; UI.rsMode = 'report'; }
+  if (R && ((UI.repSeen !== R.round && (G.phase === 'eval' || G.round > R.round || G.phase === 'over')) || (needs && !UI.rsOpen))) { UI.repSeen = R.round; UI.rsOpen = true; UI.rsMode = 'report'; UI.stgPlay = true; }
   if (UI.rsOpen && UI.rsMode === 'report') renderReport();
 }
 function checkFinal() {
@@ -23,53 +23,20 @@ function dayRow(p, R) {
   return { space: hh.space, boom: hh.boom, prot: hh.prot, mode: hh.mode, bought: hh.bought, die: hh.die, chips: hh.chips, white: hh.white, gain: hh.gain };
 }
 function renderReport() {
-  const rs = $('#rs'); if (!rs || !G || !G.rep) return; const R = G.rep; rs.hidden = false;
+  const rs = $('#rs'); if (!rs || !G || !G.rep) return; const R = G.rep;
+  if (STG.run && STG.round === R.round) { STG.dirty = true; return; }       // the day-end sequence is playing: it re-draws itself when it ends
   const v = viewSeat(), me = v >= 0 ? G.players[v] : null, myq = me && me.q && EVAL_Q[me.q.h] ? me.q : null;
   const oldBody = rs.querySelector('.rsbody'), keepTop = oldBody ? oldBody.scrollTop : 0;
   const hotShared = hotSeat() && G.phase === 'eval' && UI.hotShared !== R.round, hotPriv = hotSeat() && !!myq && !hotShared;   // hot-seat: the table is shown once to everybody, then each maker decides in private
-  const box = h('div.rsbox.fix', { role: 'dialog', 'aria-label': 'Day ' + R.round + ' report' }); UI.rsFoot = null;
-  box.appendChild(h('h2', h('span', { html: ico('coin', 30) }), hotPriv ? 'Day ' + R.round + ': ' + me.name : 'Day ' + R.round));
-  box.appendChild(h('div#rstip.tipb', { hidden: true }));
-  const body = h('div.rsbody');
-  const tab = h('table.rt-tab'); tab.appendChild(h('tr', h('th', 'Cauldron'), h('th', 'Score space'), h('th', 'Result'), h('th', 'Points today'), h('th', 'Total')));
-  const sumParts = [], cards = h('div.dcards');
-  for (const p of G.players) {
-    const r = dayRow(p, R); if (!r) continue; const sp = r.space;
-    const gain = (r.live ? p.vp : (G.hist.find(x => x.round === R.round && x.seat === p.seat) || {}).after || p.vp) - dayStart(p.seat, R.round), gTxt = gain >= 0 ? '+' + gain : '' + gain, why = dayWhy(p, R.round);
-    const res = r.boom ? (r.prot ? [h('span.ok', 'exploded, safe')] : [h('span.bad', 'exploded'), h('div.sm', (r.mode === 'buy' ? 'went shopping' : r.mode === 'vp' ? 'took points' : 'choosing') + ' (white ' + r.white + ' was over the limit)')]) : [h('span.ok', 'stopped'), r.die && r.die.length ? h('div.sm.dieb' + (r.live ? '.roll' : ''), { title: 'Bonus die' }, r.die.map(f => h('span', { html: KIT.ICON.die(24, f) }))) : null];
-    tab.appendChild(h('tr' + (p.seat === v ? '.me' : ''), h('td', h('span.nm', h('span', { html: avHTML(p.seat, 28) }), p.seat === v ? 'You' : p.name)),
-      h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', gTxt), why.length ? h('div.sm.why', why[0].split(/\s+/).slice(0, 7).join(' ')) : null), h('td', h('b', p.vp))));
-    sumParts.push((p.seat === v ? 'You' : p.name) + ' ' + gTxt);
-    cards.appendChild(h('div.dc' + (p.seat === v ? '.me' : '') + (r.boom && !r.prot ? '.bm' : ''), h('span.dav', { html: avHTML(p.seat, 44) }), h('b.dn', p.seat === v ? 'You' : p.name),
-      h('span.dg', { html: ico('vp', 18) + ' ' + esc(gTxt) }), h('span.dr', r.boom ? (r.prot ? 'boom, safe' : 'boom! ★ or 🪙, not both') : 'stopped'), h('span.dt', 'total ' + p.vp)));
-  }
-  if (G.players.some(p => { const r = dayRow(p, R); return r && r.die && r.die.length; })) tab.appendChild(h('tr', h('td.sm', { colspan: '5' }, 'Boxed number: bonus die')));
-  const lines = hotPriv ? [] : G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo) && !/ has decided\.$|^Stir!/.test(l.t)); let ev = null;
-  if (lines.length) { ev = h('div.evlog', { role: 'log', 'aria-label': 'What happened' }); lines.forEach(l => ev.appendChild(h('div', youText(l.t)))); setTimeout(() => { ev.scrollTop = ev.scrollHeight; }, 0); }
-  const fold = !!myq && !hotShared;   // a choice is waiting: put it first and fold today's results into one line
-  if (fold) {
-    body.appendChild(decisionBox(me, myq));
-    if (!hotPriv) { const d = h('details.rsum', h('summary', h('b', 'Today: '), sumParts.join(' · '), h('span.sm', ' (tap for details)')), tab); if (ev) d.appendChild(ev); body.appendChild(d); }
-  } else {
-    if (!hotPriv) { body.appendChild(cards); const d = h('details.rsum', h('summary', 'Details'), tab); if (ev) d.appendChild(ev); body.appendChild(d); }
-    if (hotShared) body.appendChild(h('p.sm', 'Next: private choices. Others look away.'));
-    else if (G.phase === 'eval') { const w = G.players.filter(p => p.q && p.seat !== v).map(p => p.name); body.appendChild(h('p.sm', w.length ? 'Waiting for ' + nameList(w) + '...' : 'Counting up...')); }
-  }
-  const done = G.phase !== 'eval' && !myq && !hotShared;
-  const next = G.phase === 'over' ? 'See the final scores' : 'On to day ' + G.round;
-  box.appendChild(body);
-  const foot = h('div.rsfoot');
-  if (UI.rsFoot) UI.rsFoot.forEach(e => foot.appendChild(e));
-  else if (hotShared) foot.appendChild(h('div.cbtns', h('button.btn.go', { 'data-a': 'hotgo', type: 'button' }, 'Next: private choices')));
-  else { const btns = h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' });
-    const adv = done && UI.advFor === R.round && !hotSeat() && !(typeof NET !== 'undefined' && NET.on);
-    btns.appendChild(h('button.btn.go' + (done && !adv ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done && !adv ? null : true }, adv ? next + '…' : done ? next : (myq ? 'Choose above first' : 'Waiting…')));
-    if (typeof NET !== 'undefined' && NET.on && done) btns.appendChild(h('span.sm', 'Closes by itself in a moment.'));
-    foot.appendChild(btns); }
-  box.appendChild(foot);
-  rs.innerHTML = ''; rs.appendChild(box);
+  const play = !!UI.stgPlay && !hotPriv && bfAnim() && G.players.some(p => dayRow(p, R)); UI.stgPlay = false;
+  const bar = document.querySelector('.gx-bar'), top = bar ? Math.round(bar.getBoundingClientRect().bottom) : 46;
+  rs.hidden = false; rs.classList.add('stg'); rs.style.top = Math.max(0, top) + 'px';
+  const sc = stgScreen(R, v, me, myq, hotShared, hotPriv, play);
+  rs.innerHTML = ''; rs.appendChild(sc.box);
   if (keepTop) { const nb = rs.querySelector('.rsbody'); if (nb) nb.scrollTop = keepTop; }
+  if (play) { sc.box.addEventListener('pointerdown', () => stgFinish()); stgPlay(sc.box, sc.ds, R); }
   tipCheck();
+  const done = G.phase !== 'eval' && !myq && !hotShared;
   if (typeof NET !== 'undefined' && NET.on && done && !UI.repAuto) { UI.repAuto = setTimeout(() => { UI.repAuto = 0; if (UI.rsMode === 'report' && G.phase !== 'eval') repContinue(); }, 30000); }
 }
 function repContinue() {
@@ -98,25 +65,23 @@ function decisionBox0(p, q) {
   const info = QINFO[q.h], legal = mvList(p.seat); UI.legal[p.seat] = legal;
   const short = DEC_SHORT[q.h];
   const box = h('div.dec.dec-' + q.h, h('h3', short || info[0]), short ? null : h('div.sm', info[1](p, q.d)));
-  if (q.h === 'shop') { box.appendChild(shopUI(p, q, legal)); return box; }
   if (q.h === 'de') {
     const row = h('div.tiles');
     legal.forEach(m => row.appendChild(m.o === 'vp' ? tileBtn(m, p, '+' + q.d.vp, 'points', ico('vp', 40)) : tileBtn(m, p, q.d.coins, 'coins to shop', ico('coin', 40))));
     box.appendChild(row); return box;
   }
-  if (q.h === 'ruby') { box.appendChild(rubyUI(p)); UI.rsFoot = [h('div.shopfoot', h('button.btn.go.confirm', { 'data-a': 'rubygo', type: 'button' }, nextLabel()))]; return box; }
   const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p))); box.appendChild(row); return box;
 }
 // ---------- pass the device (hot-seat) ----------
 function showPass(seat) {
-  const rs = $('#rs'); if (!rs) return; rs.hidden = false; UI.rsMode = 'pass'; UI.rsOpen = true;
+  const rs = $('#rs'); if (!rs) return; rs.hidden = false; rs.classList.remove('stg'); rs.style.top = ''; UI.rsMode = 'pass'; UI.rsOpen = true;
   const p = G.players[seat]; const what = G.phase === 'eval' ? 'to make your decisions' : G.phase === 'prep' ? 'to choose' : 'to brew';
   rs.innerHTML = ''; rs.appendChild(h('div.passc', { role: 'dialog', 'aria-label': 'Pass the device' }, h('span.av', { html: avHTML(seat, 96) }), h('h2', 'Pass the device to ' + p.name), h('p', 'Only ' + p.name + ' should look ' + what + '. Your bag stays hidden from the others.'),
     h('button.btn.go', { 'data-a': 'take', type: 'button', style: 'min-width:200px;font-size:18px' }, 'I am ' + p.name + ': take the device')));
 }
 // ---------- the final screen ----------
 function showFinal() {
-  const rs = $('#rs'); if (!rs || !G) return; rs.hidden = false; UI.rsMode = 'final'; UI.rsOpen = true;
+  const rs = $('#rs'); if (!rs || !G) return; stgAbort(); rs.hidden = false; rs.classList.remove('stg'); rs.style.top = ''; UI.rsMode = 'final'; UI.rsOpen = true;
   const order = G.players.slice().sort((a, b) => b.vp - a.vp || b.last9 - a.last9);
   const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Final scores' });
   const body = h('div.rsbody'); const wn = G.winners.map(s => pname(s));

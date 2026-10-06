@@ -260,8 +260,10 @@ function renderRisk() {
 }
 function renderFort() {
   const e = $('#fort'); if (!e) return; const c = D.FORTUNE.find(x => x.id === G.fcard);
-  if (!c || G.phase === 'over') { e.hidden = true; return; } e.hidden = false; e.className = c.kind;
-  e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', c.text.split(/\s+/).slice(0, Math.max(2, 6 - c.name.split(/\s+/).length)).join(' ') + '…')));
+  let fc = $('#fortchip'); if (!fc) { const bd = $('#bd'); if (bd) { fc = h('button#fortchip', { type: 'button', 'data-a': 'fortchip', 'data-lp': 'fort' }); bd.appendChild(fc); } }
+  if (!c || G.phase === 'over') { e.hidden = true; if (fc) fc.hidden = true; return; } e.hidden = false; e.className = c.kind; e.setAttribute('data-lp', 'fort');
+  e.innerHTML = ''; e.setAttribute('data-a', 'fort'); e.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('div', h('b', 'Fortune: ' + c.name + ' '), h('span.fx', fortShort(c))));
+  if (fc) { fc.hidden = false; fc.className = c.kind; fc.setAttribute('aria-label', 'Fortune card ' + c.name + ': ' + fortShort(c)); fc.innerHTML = ''; fc.append(h('span.fk', c.kind === 'blue' ? 'ALL DAY' : 'NOW'), h('b', c.name)); }
 }
 function renderRoster() {
   const r = $('#roster'); if (!r) return; r.innerHTML = '';
@@ -457,7 +459,7 @@ function loadSave() {
   } catch (e) { console.error(e); return false; }
 }
 // ===================== part 4: the day report (and its decisions), the shop, the pass card, the final screen, the guided tips =====================
-function closeRS(quiet) { const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; } UI.rsOpen = false; UI.rsMode = ''; if (!quiet && typeof schedule === 'function') schedule(); }
+function closeRS(quiet) { stgAbort(); const rs = $('#rs'); if (rs) { rs.hidden = true; rs.innerHTML = ''; rs.classList.remove('stg'); rs.style.top = ''; } UI.rsOpen = false; UI.rsMode = ''; if (!quiet && typeof schedule === 'function') schedule(); }
 function checkReport() {
   if (!G || !UI.started) return;
   if (typeof autoDecisions === 'function') autoDecisions();
@@ -467,7 +469,7 @@ function checkReport() {
   if (UI.rsMode === 'final') return;
   const R = G.rep;
   const v0 = viewSeat(), needs = G.phase === 'eval' && v0 >= 0 && G.players[v0].q && EVAL_Q[G.players[v0].q.h];   // a decision of mine is waiting: its report must be open (hot-seat: after the pass card, online: after a rejoin)
-  if (R && ((UI.repSeen !== R.round && (G.phase === 'eval' || G.round > R.round || G.phase === 'over')) || (needs && !UI.rsOpen))) { UI.repSeen = R.round; UI.rsOpen = true; UI.rsMode = 'report'; }
+  if (R && ((UI.repSeen !== R.round && (G.phase === 'eval' || G.round > R.round || G.phase === 'over')) || (needs && !UI.rsOpen))) { UI.repSeen = R.round; UI.rsOpen = true; UI.rsMode = 'report'; UI.stgPlay = true; }
   if (UI.rsOpen && UI.rsMode === 'report') renderReport();
 }
 function checkFinal() {
@@ -481,53 +483,20 @@ function dayRow(p, R) {
   return { space: hh.space, boom: hh.boom, prot: hh.prot, mode: hh.mode, bought: hh.bought, die: hh.die, chips: hh.chips, white: hh.white, gain: hh.gain };
 }
 function renderReport() {
-  const rs = $('#rs'); if (!rs || !G || !G.rep) return; const R = G.rep; rs.hidden = false;
+  const rs = $('#rs'); if (!rs || !G || !G.rep) return; const R = G.rep;
+  if (STG.run && STG.round === R.round) { STG.dirty = true; return; }       // the day-end sequence is playing: it re-draws itself when it ends
   const v = viewSeat(), me = v >= 0 ? G.players[v] : null, myq = me && me.q && EVAL_Q[me.q.h] ? me.q : null;
   const oldBody = rs.querySelector('.rsbody'), keepTop = oldBody ? oldBody.scrollTop : 0;
   const hotShared = hotSeat() && G.phase === 'eval' && UI.hotShared !== R.round, hotPriv = hotSeat() && !!myq && !hotShared;   // hot-seat: the table is shown once to everybody, then each maker decides in private
-  const box = h('div.rsbox.fix', { role: 'dialog', 'aria-label': 'Day ' + R.round + ' report' }); UI.rsFoot = null;
-  box.appendChild(h('h2', h('span', { html: ico('coin', 30) }), hotPriv ? 'Day ' + R.round + ': ' + me.name : 'Day ' + R.round));
-  box.appendChild(h('div#rstip.tipb', { hidden: true }));
-  const body = h('div.rsbody');
-  const tab = h('table.rt-tab'); tab.appendChild(h('tr', h('th', 'Cauldron'), h('th', 'Score space'), h('th', 'Result'), h('th', 'Points today'), h('th', 'Total')));
-  const sumParts = [], cards = h('div.dcards');
-  for (const p of G.players) {
-    const r = dayRow(p, R); if (!r) continue; const sp = r.space;
-    const gain = (r.live ? p.vp : (G.hist.find(x => x.round === R.round && x.seat === p.seat) || {}).after || p.vp) - dayStart(p.seat, R.round), gTxt = gain >= 0 ? '+' + gain : '' + gain, why = dayWhy(p, R.round);
-    const res = r.boom ? (r.prot ? [h('span.ok', 'exploded, safe')] : [h('span.bad', 'exploded'), h('div.sm', (r.mode === 'buy' ? 'went shopping' : r.mode === 'vp' ? 'took points' : 'choosing') + ' (white ' + r.white + ' was over the limit)')]) : [h('span.ok', 'stopped'), r.die && r.die.length ? h('div.sm.dieb' + (r.live ? '.roll' : ''), { title: 'Bonus die' }, r.die.map(f => h('span', { html: KIT.ICON.die(24, f) }))) : null];
-    tab.appendChild(h('tr' + (p.seat === v ? '.me' : ''), h('td', h('span.nm', h('span', { html: avHTML(p.seat, 28) }), p.seat === v ? 'You' : p.name)),
-      h('td', h('b', D.COINS[sp]), h('span', { html: ico('coin', 14) }), h('div.sm', D.VP[sp] + ' VP' + (D.RUBY[sp] ? ' + ruby' : ''))), h('td', res), h('td', h('b', gTxt), why.length ? h('div.sm.why', why[0].split(/\s+/).slice(0, 7).join(' ')) : null), h('td', h('b', p.vp))));
-    sumParts.push((p.seat === v ? 'You' : p.name) + ' ' + gTxt);
-    cards.appendChild(h('div.dc' + (p.seat === v ? '.me' : '') + (r.boom && !r.prot ? '.bm' : ''), h('span.dav', { html: avHTML(p.seat, 44) }), h('b.dn', p.seat === v ? 'You' : p.name),
-      h('span.dg', { html: ico('vp', 18) + ' ' + esc(gTxt) }), h('span.dr', r.boom ? (r.prot ? 'boom, safe' : 'boom! ★ or 🪙, not both') : 'stopped'), h('span.dt', 'total ' + p.vp)));
-  }
-  if (G.players.some(p => { const r = dayRow(p, R); return r && r.die && r.die.length; })) tab.appendChild(h('tr', h('td.sm', { colspan: '5' }, 'Boxed number: bonus die')));
-  const lines = hotPriv ? [] : G.log.filter(l => l.i > R.logFrom && (!R.logTo || l.i <= R.logTo) && !/ has decided\.$|^Stir!/.test(l.t)); let ev = null;
-  if (lines.length) { ev = h('div.evlog', { role: 'log', 'aria-label': 'What happened' }); lines.forEach(l => ev.appendChild(h('div', youText(l.t)))); setTimeout(() => { ev.scrollTop = ev.scrollHeight; }, 0); }
-  const fold = !!myq && !hotShared;   // a choice is waiting: put it first and fold today's results into one line
-  if (fold) {
-    body.appendChild(decisionBox(me, myq));
-    if (!hotPriv) { const d = h('details.rsum', h('summary', h('b', 'Today: '), sumParts.join(' · '), h('span.sm', ' (tap for details)')), tab); if (ev) d.appendChild(ev); body.appendChild(d); }
-  } else {
-    if (!hotPriv) { body.appendChild(cards); const d = h('details.rsum', h('summary', 'Details'), tab); if (ev) d.appendChild(ev); body.appendChild(d); }
-    if (hotShared) body.appendChild(h('p.sm', 'Next: private choices. Others look away.'));
-    else if (G.phase === 'eval') { const w = G.players.filter(p => p.q && p.seat !== v).map(p => p.name); body.appendChild(h('p.sm', w.length ? 'Waiting for ' + nameList(w) + '...' : 'Counting up...')); }
-  }
-  const done = G.phase !== 'eval' && !myq && !hotShared;
-  const next = G.phase === 'over' ? 'See the final scores' : 'On to day ' + G.round;
-  box.appendChild(body);
-  const foot = h('div.rsfoot');
-  if (UI.rsFoot) UI.rsFoot.forEach(e => foot.appendChild(e));
-  else if (hotShared) foot.appendChild(h('div.cbtns', h('button.btn.go', { 'data-a': 'hotgo', type: 'button' }, 'Next: private choices')));
-  else { const btns = h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' });
-    const adv = done && UI.advFor === R.round && !hotSeat() && !(typeof NET !== 'undefined' && NET.on);
-    btns.appendChild(h('button.btn.go' + (done && !adv ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done && !adv ? null : true }, adv ? next + '…' : done ? next : (myq ? 'Choose above first' : 'Waiting…')));
-    if (typeof NET !== 'undefined' && NET.on && done) btns.appendChild(h('span.sm', 'Closes by itself in a moment.'));
-    foot.appendChild(btns); }
-  box.appendChild(foot);
-  rs.innerHTML = ''; rs.appendChild(box);
+  const play = !!UI.stgPlay && !hotPriv && bfAnim() && G.players.some(p => dayRow(p, R)); UI.stgPlay = false;
+  const bar = document.querySelector('.gx-bar'), top = bar ? Math.round(bar.getBoundingClientRect().bottom) : 46;
+  rs.hidden = false; rs.classList.add('stg'); rs.style.top = Math.max(0, top) + 'px';
+  const sc = stgScreen(R, v, me, myq, hotShared, hotPriv, play);
+  rs.innerHTML = ''; rs.appendChild(sc.box);
   if (keepTop) { const nb = rs.querySelector('.rsbody'); if (nb) nb.scrollTop = keepTop; }
+  if (play) { sc.box.addEventListener('pointerdown', () => stgFinish()); stgPlay(sc.box, sc.ds, R); }
   tipCheck();
+  const done = G.phase !== 'eval' && !myq && !hotShared;
   if (typeof NET !== 'undefined' && NET.on && done && !UI.repAuto) { UI.repAuto = setTimeout(() => { UI.repAuto = 0; if (UI.rsMode === 'report' && G.phase !== 'eval') repContinue(); }, 30000); }
 }
 function repContinue() {
@@ -556,25 +525,23 @@ function decisionBox0(p, q) {
   const info = QINFO[q.h], legal = mvList(p.seat); UI.legal[p.seat] = legal;
   const short = DEC_SHORT[q.h];
   const box = h('div.dec.dec-' + q.h, h('h3', short || info[0]), short ? null : h('div.sm', info[1](p, q.d)));
-  if (q.h === 'shop') { box.appendChild(shopUI(p, q, legal)); return box; }
   if (q.h === 'de') {
     const row = h('div.tiles');
     legal.forEach(m => row.appendChild(m.o === 'vp' ? tileBtn(m, p, '+' + q.d.vp, 'points', ico('vp', 40)) : tileBtn(m, p, q.d.coins, 'coins to shop', ico('coin', 40))));
     box.appendChild(row); return box;
   }
-  if (q.h === 'ruby') { box.appendChild(rubyUI(p)); UI.rsFoot = [h('div.shopfoot', h('button.btn.go.confirm', { 'data-a': 'rubygo', type: 'button' }, nextLabel()))]; return box; }
   const row = h('div.opts', { style: 'display:flex;flex-direction:column;gap:5px' }); legal.forEach(m => row.appendChild(moveBtn(m, p))); box.appendChild(row); return box;
 }
 // ---------- pass the device (hot-seat) ----------
 function showPass(seat) {
-  const rs = $('#rs'); if (!rs) return; rs.hidden = false; UI.rsMode = 'pass'; UI.rsOpen = true;
+  const rs = $('#rs'); if (!rs) return; rs.hidden = false; rs.classList.remove('stg'); rs.style.top = ''; UI.rsMode = 'pass'; UI.rsOpen = true;
   const p = G.players[seat]; const what = G.phase === 'eval' ? 'to make your decisions' : G.phase === 'prep' ? 'to choose' : 'to brew';
   rs.innerHTML = ''; rs.appendChild(h('div.passc', { role: 'dialog', 'aria-label': 'Pass the device' }, h('span.av', { html: avHTML(seat, 96) }), h('h2', 'Pass the device to ' + p.name), h('p', 'Only ' + p.name + ' should look ' + what + '. Your bag stays hidden from the others.'),
     h('button.btn.go', { 'data-a': 'take', type: 'button', style: 'min-width:200px;font-size:18px' }, 'I am ' + p.name + ': take the device')));
 }
 // ---------- the final screen ----------
 function showFinal() {
-  const rs = $('#rs'); if (!rs || !G) return; rs.hidden = false; UI.rsMode = 'final'; UI.rsOpen = true;
+  const rs = $('#rs'); if (!rs || !G) return; stgAbort(); rs.hidden = false; rs.classList.remove('stg'); rs.style.top = ''; UI.rsMode = 'final'; UI.rsOpen = true;
   const order = G.players.slice().sort((a, b) => b.vp - a.vp || b.last9 - a.last9);
   const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Final scores' });
   const body = h('div.rsbody'); const wn = G.winners.map(s => pname(s));
@@ -837,6 +804,7 @@ document.addEventListener('click', ev => {
     case 'blgx': UI.prefs.blgSeen = true; savePrefs(); renderBlg(); break;
     case 'tipmore': UI.tipOpen = !UI.tipOpen; renderTip(); break;
     case 'fort': t.classList.toggle('open'); break;
+    case 'fortchip': lpShow(t); break;
     case 'focus': UI.focus = +d.seat; UI.potSig = ''; render(); break;
     case 'rscont': repContinue(); break;
     case 'shopsel': shopToggle(d.k); break;
@@ -904,7 +872,7 @@ let rzT = 0, rzT2 = 0, rzSig = '';
 function relayout(force) {
   const bd = $('#board'), sig = innerWidth + 'x' + innerHeight + '|' + (bd ? bd.clientWidth + 'x' + bd.clientHeight : '');
   if (!force && sig === rzSig) return; rzSig = sig;
-  applyPhone(); if (G && UI.started) { UI.potSig = ''; render(); }
+  applyPhone(); if (G && UI.started) { UI.potSig = ''; render(); if (UI.rsOpen && UI.rsMode === 'report') renderReport(); }
   if (typeof pxResize === 'function') { try { pxResize(true); } catch (e) { } }
 }
 function onResize() { clearTimeout(rzT); clearTimeout(rzT2); rzT = setTimeout(() => relayout(), 60); rzT2 = setTimeout(() => relayout(), 420); }   // iOS reports the old size for a moment after orientationchange
@@ -921,6 +889,7 @@ function boot() {
   addEventListener('resize', onResize); addEventListener('orientationchange', onResize);
   const bd = $('#board'); if (window.ResizeObserver) new ResizeObserver(() => { if (G && UI.started) onResize(); }).observe(bd);
   if (window.visualViewport) visualViewport.addEventListener('resize', onResize);
+  if (window.GXV) GXV.watch(() => relayout(true));   // one debounced relayout for every size change (iOS reports the old size right after a rotation)
   try { if (window.GA) { const A = typeof GA_DATA !== 'undefined' ? GA_DATA : {}; GA.init({ sfx: A.sfx || {}, music: A.music || {}, key: 'cf' }); GA.setSfx(UI.prefs.sound); GA.setMusic(UI.prefs.music); } } catch (e) { }
   if (typeof pxPerfReg === 'function') pxPerfReg();
   if (typeof pxInit === 'function') pxInit().then(ok => { if (ok) { pxPerfReg(); if (G && UI.started) render(); } });
@@ -1083,15 +1052,6 @@ function rubyOpts(p) { const mx = Math.floor(p.rubies / D.rubySpend), out = []; 
 function rubyBest(p) { try { const g = JSON.parse(JSON.stringify(G)); g.players[p.seat].q = { h: 'ruby', d: {} }; const m = CF.AI.choose(g, p.seat, 'normal'); if (m && m.t === 'ruby') return { drop: m.drop, flask: !!m.flask }; } catch (e) { } return { drop: 0, flask: false }; }
 const rubyKey = o => o.drop + (o.flask ? 'f' : '');
 function rubyPick(p) { if (UI.rubyFor !== p.seat + ':' + G.round) { UI.rubyFor = p.seat + ':' + G.round; UI.rubySel = rubyBest(p); UI.rubyBest = rubyKey(UI.rubySel); } return UI.rubySel; }
-function rubyUI(p) {
-  const sel = rubyPick(p), w = h('div.rubyp', h('div.rl', h('span', { html: ico('ruby', 20) }), h('b', p.rubies), ' rubies: '), h('div.rtiles'));
-  const row = w.querySelector('.rtiles');
-  rubyOpts(p).forEach(o => { const cost = (o.drop + (o.flask ? 1 : 0)) * D.rubySpend, on = rubyKey(o) === rubyKey(sel);
-    row.appendChild(h('button.rt' + (on ? '.on' : '') + (rubyKey(o) === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': rubyKey(o), type: 'button', 'aria-pressed': on ? 'true' : 'false', 'aria-label': cost ? 'Spend ' + cost + ' rubies' : 'Keep my rubies' },
-      cost ? [h('span', { html: ico('ruby', 14) }), '−' + cost, o.drop ? h('span', { html: ico('drop', 18) }) : null, o.drop ? '+' + o.drop : null, o.flask ? h('span', { html: ico('flask', 18, true) }) : null] : 'Keep'));
-  });
-  return w;
-}
 function rubySelect(k) { const p = mineP(); if (!p) return; const o = rubyOpts(p).find(x => rubyKey(x) === k); if (o) { UI.rubySel = o; snd('click'); renderReport(); bfGhost(); } }
 // the one confirm button: buys the picked chips, spends the picked rubies, and starts the next day
 function rubyGo() { const p = mineP(); if (!p) return; UI.rubyAuto = Object.assign({}, rubyPick(p)); UI.advFor = G.rep ? G.rep.round : 0; autoDecisions(); }
@@ -1102,33 +1062,7 @@ function autoDecisions() {
     UI.rubyAuto = null; const sq = UI.seq; UI.advT = setTimeout(() => { UI.advT = 0; UI.advFor = 0; if (sq === UI.seq && UI.rsOpen && UI.rsMode === 'report') repContinue(); }, 80);
   }
 }
-// ---------- the shop: tap a chip, it drops into your bag ----------
-function shopUI(p, q, legal) {
-  const wrap = h('div.shop'); const coins = q.d.coins, sel = UI.shopSel = (UI.shopSel || []).filter(k => G.supply[k] > 0);
-  const cost = sel.reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
-  wrap.appendChild(h('div.purse', h('span', { html: ico('coin', 30) }), h('b', coins - cost), h('span.pl', sel.length ? ' left' : ' coins to spend')));
-  const stalls = h('div.stalls');
-  for (const c of D.SHOP_COLORS) {
-    const out = CF.bookOut(G, c), bk = c === 'O' ? D.BOOKS.O[0] : c === 'K' ? D.BOOKS.K[0] : D.BOOKS[c][G.sets[c]];
-    const st = h('div.stall' + (out ? '' : '.locked'));
-    st.appendChild(h('details.sth', h('summary', { 'aria-label': D.COLORS[c].name + ': how it works' }, h('b', D.COLORS[c].name), h('span.bi', { 'aria-hidden': 'true' }, out ? 'i' : 'day ' + D.BOOK_ROUND[c])), h('div.bx', bk.title + ': ' + bk.text.split(/\s+/).slice(0, Math.max(2, 7 - bk.title.split(/\s+/).length)).join(' '))));
-    const row = h('div.toks');
-    D.COLORS[c].vals.forEach(val => {
-      if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
-      const on = sel.indexOf(key) >= 0; const others = sel.filter(k => k[0] !== c).reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
-      const dis = !out || left < 1 || price + others > coins;
-      row.appendChild(h('button.tok' + (on ? '.on' : ''), { 'data-a': 'shopsel', 'data-k': key, type: 'button', disabled: dis && !on ? true : null, 'aria-pressed': on ? 'true' : 'false', 'aria-label': keyName(key) + ' for ' + price + ' coins' + (left < 1 ? ', sold out' : '') },
-        chipN(key, 40), h('span.pc', h('span', { html: ico('coin', 12) }), left < 1 ? '—' : price)));
-    });
-    st.appendChild(row); stalls.appendChild(st);
-  }
-  wrap.appendChild(stalls);
-  const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
-  const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', 'Tap chips to drop them in')));
-  if (p.rubies >= D.rubySpend && G.round < D.rounds) { rubyPick(p); wrap.appendChild(rubyUI(p)); UI.rubyShown = true; } else UI.rubyShown = false;
-  UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go.confirm', { 'data-a': 'shopbuy', type: 'button' }, (sel.length ? 'Buy ' + sel.length + ' · ' : '') + nextLabel()))];
-  return wrap;
-}
+// ---------- the shop (the market stall itself is built in part 9): tap a chip, it drops into your bag ----------
 function bfFly(fromR, toEl, key, size) {
   if (!bfAnim() || !fromR || !toEl) return; const to = toEl.getBoundingClientRect(); if (to.width < 4) return;
   const e = h('div.bfchip', { html: chipHTML(key, size || 40), 'aria-hidden': 'true' }); e.style.left = fromR.left + 'px'; e.style.top = fromR.top + 'px'; document.body.appendChild(e);
@@ -1503,3 +1437,240 @@ function campInit() {
   });
 }
 campInit();
+// ===================== part 9: the day end on the table: tally, market stall, ruby board, short texts, long-press =====================
+// The end of a day is a short sequence ON the table, not a report: every cauldron's scoring space lights up in turn, its points fly to the
+// maker's chip, rubies drop, the bonus die rolls. Tap anywhere to speed it up. Then the market stall (tap a chip: it flies into your bag)
+// or the ruby board (tap the droplet's next space, tap the flask). Nothing here changes the rules: it shows the same engine numbers
+// and sends the same moves (act() with CF.moves()).
+const STG = { run: false, round: 0, tm: [], iv: [], dirty: false };
+const FORT_SHORT = {
+  lucky7: 'Exactly 7 white: droplet moves one.', spilled: 'If you boom, left rival takes a 2-chip.', doover: 'After chip 5: restart once.', twice: 'Bonus die rolls twice today.',
+  thick: 'White limit is 9 today.', marrowfair: 'Orange chips move one extra today.', peek: 'Stop safely: draw 5, place one.', glint: 'Ruby space scores 2 points, even boomed.',
+  spring: 'Flasks refill free tonight.', froth: 'First white chip may go back.', spark: 'Ruby space gives one extra ruby.', pick: 'Take a black chip, a 2-chip, or 3 rubies.',
+  slide: 'Droplet moves one space.', swap: 'Trade 1 ruby for a 1-chip.', alms: 'Fewest rubies take 1 ruby.', underdog: 'Fewest points take a green 1.',
+  clear: 'Score 4 points, or drop a white 1.', swarm: 'Rat stone moves by your rat tails.', dip: 'Draw 5: lowest gets blue 2.', bribe: 'Rat back 1 to 3 spaces for rubies.',
+  bounty: 'Take a 4-chip, or points per tail.', fork: 'Droplet +2, or take a purple chip.', dice: 'Everyone rolls the bonus die once.', haggle: 'Draw 4: swap one for a bigger chip.'
+};
+const BOOK_SHORT = {
+  O: 'No power. Cheap filler.', K: 'Most black chips: droplet moves, maybe ruby.',
+  G: { 1: 'Last two chips green: 1 ruby each.', 2: 'Last-two greens give free chips.', 3: 'White exactly 7: greens push you on.', 4: 'Last-two greens: 1 ruby moves droplet.' },
+  B: { 1: 'On landing, peek chips, place one.', 2: 'Keeps your points if you boom.', 3: 'On a ruby space: take 1 ruby.', 4: 'On a ruby space: points equal its number.' },
+  R: { 1: 'Slides extra for oranges in your pot.', 2: 'Set aside, add after your last chip.', 3: 'Adds the white chip before it.', 4: 'Later white 1s move 2 spaces.' },
+  Y: { 1: 'After a white: put that white back.', 2: 'Next chip moves twice as far.', 3: 'White limit grows to 8 or 9.', 4: 'Each yellow moves extra: 1, 2, 3.' },
+  P: { 1: 'After brewing: purples give points, rubies.', 2: 'Hand in purples for chips and rewards.', 3: 'Purples score by how far they sit.', 4: 'Purples upgrade a pot chip.' }
+};
+function chipShort(key) { const c = key[0], b = BOOK_SHORT[c]; return typeof b === 'string' ? b : (b && G ? b[G.sets[c]] : '') || ''; }
+function fortShort(c) { return FORT_SHORT[c.id] || c.text.split(/\s+/).slice(0, 8).join(' '); }
+// ---------- long-press: an icon and a few words about the thing under the finger ----------
+const LP = { t: 0, fired: 0, el: null, x: 0, y: 0, hide: 0 };
+function lpHide() { const b = $('#lpb'); if (b) b.remove(); clearTimeout(LP.hide); }
+function lpShow(el) {
+  const k = el.dataset.lp || ''; let icon = '', title = '', text = '', full = false;
+  if (k.indexOf('chip:') === 0) { const key = k.slice(5); icon = chipHTML(key, 40); title = D.COLORS[key[0]].name; text = chipShort(key); }
+  else if (k === 'fort') { const c = D.FORTUNE.find(x => x.id === (G && G.fcard)); if (!c) return; icon = '<span class="lpk ' + c.kind + '">' + (c.kind === 'blue' ? 'DAY' : 'NOW') + '</span>'; title = c.name; text = fortShort(c); full = c.text; }
+  else return;
+  lpHide(); const b = h('div#lpb', { role: 'dialog', 'aria-modal': 'true', 'aria-label': title }, h('span.lpi', { html: icon }), h('div.lpt', h('b', title), h('div', text), full && full !== text ? h('div.lpfull', full) : null));
+  document.body.appendChild(b);
+  const r = el.getBoundingClientRect(), bw = b.offsetWidth, bh = b.offsetHeight; let x = r.left + r.width / 2 - bw / 2, y = r.top - bh - 8; if (y < 6) y = r.bottom + 8;
+  x = Math.max(8, Math.min(innerWidth - bw - 8, x)); y = Math.max(6, Math.min(innerHeight - bh - 6, y)); b.style.left = x + 'px'; b.style.top = y + 'px';
+  LP.hide = setTimeout(lpHide, 5000);
+}
+(function () {
+  const clr = () => { clearTimeout(LP.t); LP.t = 0; };
+  document.addEventListener('pointerdown', e => {
+    const t = e.target.closest && e.target.closest('[data-lp]'); const inB = e.target.closest && e.target.closest('#lpb'); if (!inB) lpHide();
+    clr(); if (!t) return; LP.el = t; LP.x = e.clientX; LP.y = e.clientY;
+    LP.t = setTimeout(() => { LP.t = 0; LP.fired = Date.now(); snd('click'); lpShow(t); }, 420);
+  }, true);
+  document.addEventListener('pointermove', e => { if (LP.t && Math.hypot(e.clientX - LP.x, e.clientY - LP.y) > 12) clr(); }, true);
+  ['pointerup', 'pointercancel', 'scroll'].forEach(n => document.addEventListener(n, clr, true));
+  document.addEventListener('contextmenu', e => { if (e.target.closest && e.target.closest('[data-lp]')) e.preventDefault(); }, true);
+  document.addEventListener('click', e => { if (LP.fired && Date.now() - LP.fired < 900) { LP.fired = 0; e.stopPropagation(); e.preventDefault(); } }, true);   // the press that opened the bubble is not a tap
+})();
+// ---------- the numbers one cauldron brings to the end of the day ----------
+function stgData(p, R) {
+  const r = dayRow(p, R); if (!r) return null; const live = !!r.live, sp = r.space, hh = live ? null : G.hist.find(x => x.round === R.round && x.seat === p.seat) || {};
+  const start = dayStart(p.seat, R.round), after = live ? p.vp : (hh.after != null ? hh.after : p.vp), rg = live ? (p.res ? p.rubies - p.res.ru0 : 0) : (hh.rgain || 0);
+  return { p, r, live, sp, coins: D.COINS[sp] || 0, vp: D.VP[sp] || 0, start, after, gain: after - start, rg: Math.max(0, rg), boom: !!r.boom, prot: !!r.prot, mode: r.mode, die: (r.die || []).slice(), bought: (r.bought || []).slice() };
+}
+function stgPot(d, ring) {
+  const p = d.p, o = potOpts(p, true); o.pot = d.live ? p.pot : []; o.space = ring ? d.sp : null; o.boom = d.boom && !d.prot; o.droplet = p.droplet;
+  return KIT.potSVG(o).replace(/width="\d+" height="\d+"/, '');
+}
+function stgRow(d, v, anim) {
+  const p = d.p, me = p.seat === v, q = !anim && me && p.q && p.q.h === 'de' ? p.q : null, lose = d.boom && !d.prot;
+  const row = h('div.ds' + (me ? '.me' : '') + (lose ? '.bm' : '') + (anim ? '.pre' : '.lit'), { 'data-seat': p.seat });
+  const tot = h('b.tn', anim ? d.start : d.after);
+  row.appendChild(h('div.dchip', h('span.dav', { html: avHTML(p.seat, 42) }), h('b.dn', me ? 'You' : p.name), h('span.dtot', { html: ico('vp', 17) }, tot), h('span.drb', { html: ico('ruby', 14) }, h('b', p.rubies))));
+  row.appendChild(h('div.dpot', { html: stgPot(d, !anim) }));
+  const tile = h('div.dtile');
+  if (q) {
+    const legal = mvList(p.seat); UI.legal[p.seat] = legal; const dec = h('div.dec.dec-de');
+    legal.forEach(m => dec.appendChild(h('button.dpick.pickglow' + (m.o === 'vp' ? '.dpv' : '.dpc'), { 'data-a': 'mv', 'data-i': legal.indexOf(m), type: 'button', 'aria-label': m.o === 'vp' ? 'Take ' + q.d.vp + ' points' : 'Shop with ' + q.d.coins + ' coins' }, h('span', { html: ico(m.o === 'vp' ? 'vp' : 'coin', 34) }), h('b', m.o === 'vp' ? '+' + q.d.vp : q.d.coins))));
+    tile.appendChild(dec); try { sugMark(dec, p, q, legal); } catch (e) { }
+  } else {
+    const dimC = lose && d.mode === 'vp', dimV = lose && d.mode === 'buy';
+    tile.appendChild(h('span.dp.dpc' + (dimC ? '.dim' : ''), { html: ico('coin', 22) }, h('b', d.coins)));
+    if (d.vp > 0) tile.appendChild(h('span.dp.dpv' + (dimV ? '.dim' : ''), { html: ico('vp', 22) }, h('b', d.vp)));
+    if (D.RUBY[d.sp]) tile.appendChild(h('span.dp.dpr', { html: ico('ruby', 22) }));
+  }
+  row.appendChild(tile);
+  const out = h('div.dout');
+  if (lose) out.appendChild(h('span.dboom', { html: ico('boom', 30), title: 'Exploded' }));
+  else if (d.boom) out.appendChild(h('span.dboom.safe', { html: ico('check', 26), title: 'Boom, but safe' }));
+  if (d.die.length) out.appendChild(h('span.ddie' + (anim ? '.pend' : ''), { 'aria-label': 'Bonus die' }, d.die.map(f => h('i', { html: KIT.ICON.die(30, anim ? null : f) }))));
+  if (d.bought.length && !anim) out.appendChild(h('span.dbag', { html: ico('bag', 20) }, d.bought.slice(0, 2).map(k => chipN(k, 24))));
+  row.appendChild(out);
+  return row;
+}
+// ---------- the sequence ----------
+function stgAbort() { STG.run = false; STG.tm.forEach(clearTimeout); STG.iv.forEach(clearInterval); STG.tm = []; STG.iv = []; $$('.dfly').forEach(e => e.remove()); }
+function stgFinish() {
+  if (!STG.run) return; stgAbort(); STG.dirty = false; renderReport();
+}
+function stgFlyTo(fromEl, toEl, html, cls, ms, delay, after) {
+  const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect(); const e = h('div.dfly' + (cls ? '.' + cls : ''), { html, 'aria-hidden': 'true' }); document.body.appendChild(e);
+  const w = e.offsetWidth, hh = e.offsetHeight, x0 = a.left + a.width / 2 - w / 2, y0 = a.top + a.height / 2 - hh / 2, x1 = b.left + b.width / 2 - w / 2, y1 = b.top + b.height / 2 - hh / 2;
+  e.style.left = x0 + 'px'; e.style.top = y0 + 'px'; e.style.opacity = '0';
+  try { const an = e.animate([{ transform: 'translate(0,0) scale(.5)', opacity: 0 }, { transform: 'translate(' + (x1 - x0) * .3 + 'px,' + ((y1 - y0) * .3 - 36) + 'px) scale(1.25)', opacity: 1, offset: .35 }, { transform: 'translate(' + (x1 - x0) + 'px,' + (y1 - y0) + 'px) scale(.8)', opacity: 1 }], { duration: ms, delay: delay || 0, easing: 'ease-in-out', fill: 'both' }); an.onfinish = () => { e.remove(); if (after) after(); }; }
+  catch (x) { e.remove(); if (after) after(); }
+}
+function stgCount(el, from, to, ms) {
+  if (from === to) { el.textContent = to; return; } const t0 = Date.now(), n = Math.abs(to - from), iv = setInterval(() => { const u = Math.min(1, (Date.now() - t0) / ms); el.textContent = Math.round(from + (to - from) * u); if (u >= 1) { clearInterval(iv); } }, Math.max(30, Math.round(ms / n)));
+  STG.iv.push(iv);
+}
+function stgPlay(box, ds, R) {
+  STG.run = true; STG.round = R.round; STG.tm = []; STG.iv = []; STG.dirty = false;
+  const rows = [...box.querySelectorAll('.ds')], n = rows.length, step = Math.max(440, Math.min(700, Math.round(1500 / Math.max(1, n))));
+  const at = (ms, fn) => STG.tm.push(setTimeout(() => { if (STG.run && STG.round === R.round) { try { fn(); } catch (e) { console.error(e); } } }, ms));
+  const FACES = ['vp1', 'vp2', 'ruby', 'drop', 'orange', 'vp1'];
+  let t = 200, last = 0;
+  rows.forEach((row, i) => {
+    const d = ds[i]; const T0 = t; const potEl = row.querySelector('.dpot'), tile = row.querySelector('.dtile'), tn = row.querySelector('.tn'), chip = row.querySelector('.dtot'), drb = row.querySelector('.drb');
+    at(T0, () => { row.classList.remove('pre'); row.classList.add('lit', 'in'); potEl.innerHTML = stgPot(d, true); snd('plop'); });
+    let tt = T0 + 300;
+    if (d.die.length) {
+      const dd = row.querySelector('.ddie');
+      at(tt, () => { dd.classList.add('roll'); snd('click'); let k = 0; const iv = setInterval(() => { [...dd.children].forEach((c, j) => { c.innerHTML = KIT.ICON.die(30, FACES[(k + j * 2) % FACES.length]); }); k++; }, 75); STG.iv.push(iv); setTimeout(() => clearInterval(iv), 440); });
+      at(tt + 480, () => { dd.classList.remove('roll', 'pend'); [...dd.children].forEach((c, j) => { c.innerHTML = KIT.ICON.die(30, d.die[j]); }); snd('coin'); });
+      tt += 560;
+    }
+    at(tt, () => {
+      if (d.gain !== 0 && tile) stgFlyTo(tile, chip, ico('vp', 22) + '<b>' + (d.gain > 0 ? '+' : '') + d.gain + '</b>', 'dfv', 420, 0, () => { chip.classList.add('pop'); snd('coin'); stgCount(tn, d.start, d.after, 320); });
+      else tn.textContent = d.after;
+      if (d.rg > 0 && tile) for (let k = 0; k < Math.min(3, d.rg); k++) stgFlyTo(tile, drb, ico('ruby', 20), 'dfr', 460, 120 + k * 90, k === 0 ? () => { drb.classList.add('pop'); snd('ruby'); } : null);
+      if (d.boom && !d.prot) row.classList.add('shake');
+    });
+    last = tt + 480; t += (d.die.length ? step + 300 : step);
+  });
+  at(Math.max(last, t) + 160, () => { stgFinish(); });
+}
+// ---------- the day end screen ----------
+function stgSeats(v) {   // thin chips of every maker (the same chips the points flew into)
+  return h('div.dseats', G.players.map(p => h('span.dsc' + (p.seat === v ? '.me' : ''), { html: avHTML(p.seat, 26), title: p.name }, h('span', { html: ico('vp', 15) }), h('b', p.vp))));
+}
+function stageDecision(me, myq, R, hotPriv) {   // -> { body, kind }
+  const legal = mvList(me.seat); UI.legal[me.seat] = legal;
+  if (myq.h === 'de' && !hotPriv) return { body: null, kind: 'tally' };      // the two choices sit on your own scoring tile
+  if (myq.h === 'shop') { const m = marketEl(me, myq); return { body: m, kind: 'market' }; }
+  if (myq.h === 'ruby') { const el = rubyBoard(me); UI.rsFoot = [h('div.shopfoot', h('button.btn.go.confirm', { 'data-a': 'rubygo', type: 'button' }, nextLabel()))]; return { body: el, kind: 'ruby' }; }
+  return { body: decisionBox(me, myq), kind: 'sheet' };
+}
+function stgScreen(R, v, me, myq, hotShared, hotPriv, play) {
+  const ds = hotPriv ? [] : G.players.map(p => stgData(p, R)).filter(Boolean);
+  const dec = !!myq && !hotShared && !play;      // while the sequence plays the choices wait
+  UI.rsFoot = null;
+  const sd = dec ? stageDecision(me, myq, R, hotPriv) : null, kind = sd ? sd.kind : 'tally';
+  const box = h('div.rsbox.fix.stg.stg-' + kind, { role: 'dialog', 'aria-label': 'Day ' + R.round });
+  const head = h('div.sthead', h('h2', { html: ico('coin', 24) }, hotPriv ? 'Day ' + R.round + ': ' + me.name : 'Day ' + R.round), kind === 'tally' || kind === 'sheet' ? null : stgSeats(v));
+  box.appendChild(head); box.appendChild(h('div#rstip.tipb', { hidden: true }));
+  const body = h('div.rsbody'); box.appendChild(body);
+  if (kind === 'market' || kind === 'ruby') body.appendChild(sd.body);
+  else {
+    if (!hotPriv) { const tab = h('div.dtable'); ds.forEach(d => tab.appendChild(stgRow(d, v, play))); body.appendChild(tab); }
+    if (kind === 'sheet') { const sh = h('div.dsheet'); sh.appendChild(sd.body); body.appendChild(sh); }
+    if (hotShared) body.appendChild(h('div.dwait', 'Next: private choices'));
+  }
+  const foot = h('div.rsfoot');
+  const done = G.phase !== 'eval' && !myq && !hotShared;
+  const next = G.phase === 'over' ? 'See the final scores' : 'On to day ' + G.round;
+  if (play) { foot.hidden = true; }
+  else if (UI.rsFoot) UI.rsFoot.forEach(e => foot.appendChild(e));
+  else if (hotShared) foot.appendChild(h('div.cbtns', h('button.btn.go', { 'data-a': 'hotgo', type: 'button' }, 'Next: private choices')));
+  else {
+    const btns = h('div.cbtns', { style: 'display:flex;gap:8px;flex-wrap:wrap;align-items:center' });
+    const adv = done && UI.advFor === R.round && !hotSeat() && !(typeof NET !== 'undefined' && NET.on);
+    const w = G.players.filter(p => p.q && p.seat !== v).map(p => p.name);
+    btns.appendChild(h('button.btn.go' + (done && !adv ? '' : '.off'), { 'data-a': 'rscont', type: 'button', disabled: done && !adv ? null : true }, adv ? next + '…' : done ? next : (myq ? 'Choose above first' : (w.length ? 'Waiting for ' + w[0] + '…' : 'Counting up…'))));
+    foot.appendChild(btns);
+  }
+  box.appendChild(foot);
+  return { box, ds, kind };
+}
+// ---------- the market stall ----------
+function marketEl(p, q) {
+  const wrap = h('div.mkt'); const coins = q.d.coins, sel = UI.shopSel = (UI.shopSel || []).filter(k => G.supply[k] > 0);
+  const cost = sel.reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
+  wrap.appendChild(h('div.awn', h('span.pur', { html: ico('coin', 30) }, h('b', coins - cost))));
+  const stalls = h('div.stalls');
+  for (const c of D.SHOP_COLORS) {
+    const out = CF.bookOut(G, c), st = h('div.stall.c' + c + (out ? '' : '.locked'), { 'data-lp': 'chip:' + c + D.COLORS[c].vals[0] });
+    st.appendChild(h('div.sth', h('b', D.COLORS[c].name), out ? null : h('span.slock', 'day ' + D.BOOK_ROUND[c])));
+    const row = h('div.toks');
+    D.COLORS[c].vals.forEach(val => {
+      if (c === 'W' || (c === 'O' && val !== 1)) return; const key = c + val, price = CF.price(G, c, val), left = G.supply[key];
+      const on = sel.indexOf(key) >= 0; const others = sel.filter(k => k[0] !== c).reduce((a, k) => a + CF.price(G, k[0], +k.slice(1)), 0);
+      const dis = !out || left < 1 || price + others > coins;
+      row.appendChild(h('div.tokw', { 'data-lp': 'chip:' + key }, h('button.tok' + (on ? '.on' : '') + (dis && !on ? '' : '.tglow'), { 'data-a': 'shopsel', 'data-k': key, type: 'button', disabled: dis && !on ? true : null, 'aria-pressed': on ? 'true' : 'false', 'aria-label': keyName(key) + ' for ' + price + ' coins' + (left < 1 ? ', sold out' : '') },
+        chipN(key, 44), h('span.pc', h('span', { html: ico('coin', 13) }), left < 1 ? '—' : price))));
+    });
+    st.appendChild(row); stalls.appendChild(st);
+  }
+  if (p.rubies >= D.rubySpend && G.round < D.rounds) { rubyPick(p); stalls.appendChild(rubyBar(p)); UI.rubyShown = true; } else UI.rubyShown = false;
+  wrap.appendChild(stalls);
+  const bagArt = KIT.ART.bag ? h('img.sbimg', { src: KIT.ART.bag, alt: '' }) : h('span.sbimg', { html: ico('bag', 56) });
+  const bagz = h('div.shopbag', { 'aria-label': 'Your bag' }, bagArt, h('div.sbin', sel.length ? sel.map(k => h('button.sbc', { 'data-a': 'shopsel', 'data-k': k, type: 'button', 'aria-label': 'Take ' + keyName(k) + ' out again' }, chipN(k, 40))) : h('span.sbe', { html: ico('bag', 22) })));
+  UI.rsFoot = [h('div.shopfoot', bagz, h('button.btn.go.confirm', { 'data-a': 'shopbuy', type: 'button' }, nextLabel()))];
+  try { sugMark(wrap, p, q, []); } catch (e) { }
+  return wrap;
+}
+// ---------- rubies: tap the droplet's next space, tap the flask ----------
+function rubyState(p) {
+  const sel = rubyPick(p), mx = Math.floor(p.rubies / D.rubySpend), opts = rubyOpts(p), has = o => opts.some(x => rubyKey(x) === rubyKey(o));
+  const keyFor = (drop, flask) => { let o = { drop, flask: !!flask }; if (!has(o)) o = { drop, flask: false }; return has(o) ? rubyKey(o) : null; };
+  const nextDrop = () => { let o = { drop: sel.drop + 1, flask: sel.flask }; if (has(o)) return rubyKey(o); o = { drop: 0, flask: sel.flask }; return has(o) ? rubyKey(o) : rubyKey({ drop: 0, flask: false }); };
+  const flaskKey = () => { if (p.flask) return null; let o = { drop: sel.drop, flask: !sel.flask }; if (has(o)) return rubyKey(o); o = { drop: sel.drop - 1, flask: !sel.flask }; return o.drop >= 0 && has(o) ? rubyKey(o) : null; };
+  return { sel, mx, keyFor, nextDrop, flaskKey, cost: (sel.drop + (sel.flask ? 1 : 0)) * D.rubySpend };
+}
+function rubyGems(p, cost) {
+  const n = p.rubies, out = h('span.rgems', { 'aria-label': n + ' rubies' }); const show = Math.min(n, 10);
+  for (let i = 0; i < show; i++) out.appendChild(h('i' + (i >= n - cost ? '.spent' : ''), { html: ico('ruby', 20) }));
+  if (n > show) out.appendChild(h('b', '+' + (n - show)));
+  return out;
+}
+function rubyBar(p) {   // the small ruby corner of the market
+  const S = rubyState(p), el = h('div.rbar.rubyp', rubyGems(p, S.cost));
+  const dk = S.nextDrop(), fk = S.flaskKey();
+  el.appendChild(h('button.rbt.rdrop' + (S.sel.drop ? '.on' : '') + '.tglow', { 'data-a': 'rubysel', 'data-k': dk, type: 'button', 'aria-label': 'Droplet: start further on, ' + D.rubySpend + ' rubies a step' }, h('span', { html: ico('drop', 28) }), h('b', '+' + S.sel.drop)));
+  el.appendChild(h('button.rbt.rflask' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 28, p.flask || S.sel.flask) })));
+  const best = el.querySelector('[data-k="' + UI.rubyBest + '"]'); if (best) best.classList.add('sug');
+  return el;
+}
+function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the droplet, its next spaces, the flask
+  const S = rubyState(p), pts = KIT.GEO.pts, R = KIT.GEO.R, i0 = p.droplet, i1 = Math.min(D.TRACK_LEN - 1, p.droplet + S.mx);
+  let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; for (let i = i0; i <= i1; i++) { x0 = Math.min(x0, pts[i].x); x1 = Math.max(x1, pts[i].x); y0 = Math.min(y0, pts[i].y); y1 = Math.max(y1, pts[i].y); }
+  const sz = Math.max(7, Math.max(x1 - x0, y1 - y0) + 3.4), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, vx = cx - sz / 2, vy = cy - sz / 2;
+  const svg = KIT.potSVG({ pot: [], droplet: p.droplet + S.sel.drop, rat: 0, space: null, boom: false, mini: false, uid: 'rb', label: 'Your cauldron', size: 400 }).replace(/viewBox="[^"]*" width="\d+" height="\d+"/, 'viewBox="' + vx.toFixed(2) + ' ' + vy.toFixed(2) + ' ' + sz.toFixed(2) + ' ' + sz.toFixed(2) + '"');
+  const wrap = h('div.rboard'); wrap.appendChild(h('div.rtop', rubyGems(p, S.cost), h('b.rcost', S.cost ? '−' + S.cost : '')));
+  const pot = h('div.rpot', { html: svg });
+  for (let k = 0; k <= S.mx; k++) {
+    const q = pts[p.droplet + k]; if (!q) break; const key = S.keyFor(k, S.sel.flask); if (!key) continue; const here = k === S.sel.drop;
+    pot.appendChild(h('button.rtg.tglow' + (here ? '.here' : '') + (key === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': key, type: 'button', 'aria-label': k ? 'Start ' + k + ' further on' : 'Keep the droplet here', style: 'left:' + ((q.x - vx) / sz * 100).toFixed(2) + '%;top:' + ((q.y - vy) / sz * 100).toFixed(2) + '%;width:' + (1.15 / sz * 100).toFixed(2) + '%;height:' + (1.15 / sz * 100).toFixed(2) + '%' },
+      k ? h('i', '−' + k * D.rubySpend) : null));
+  }
+  wrap.appendChild(pot);
+  const fk = S.flaskKey();
+  wrap.appendChild(h('div.rside', h('button.rbt.rflask.big' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : '') + (fk && fk === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 54, p.flask || S.sel.flask) }), p.flask ? null : h('i', '−' + D.rubySpend)),
+    h('span.rdp', { html: ico('drop', 22) }, h('b', p.droplet + S.sel.drop))));
+  return wrap;
+}
