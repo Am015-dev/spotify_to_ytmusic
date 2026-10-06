@@ -8839,9 +8839,10 @@ function ART6_wheels(geo){const P=geo.attributes.position,out=[];for(const sd of
 function ART6_step(){const T=ART6_pool();let n=0;const put=m=>{if(n<640)T.setMatrixAt(n++,m)};
   // player + race cars: one patch under each wheel mesh, at its lowest point, along the car's heading
   for(const s of[pl,...ships]){if(!s||!s.mesh||!s.mesh.visible||!s.art6w||s.air||(s.boatK||0)>.5)continue;if(state==='roam'&&(s!==pl||RO.vy!==0))continue;s.mesh.getWorldQuaternion(ART6_Q);
-    for(const w of s.art6w){let v=true;for(let a=w;a;a=a.parent)if(!a.visible){v=false;break}if(!v)continue;if(!w.geometry.boundingBox)w.geometry.computeBoundingBox();ART6_B.copy(w.geometry.boundingBox).applyMatrix4(w.matrixWorld);
-      const wx=ART6_B.max.x-ART6_B.min.x,wz=ART6_B.max.z-ART6_B.min.z,d=Math.max(wx,wz),t=Math.min(wx,wz);ART6_B.getCenter(ART6_V);ART6_V.y=ART6_B.min.y+.015;
-      ART6_M.compose(ART6_V,ART6_Q,ART6_S.set(t*1.25,1,d*.55));put(ART6_M)}}
+    for(const w of s.art6w){let v=true;for(let a=w;a;a=a.parent)if(!a.visible){v=false;break}if(!v)continue;const g=w.geometry;if(!g.boundingBox)g.computeBoundingBox();const lb=g.boundingBox;
+      // spinning wheel: centre and radius from the local box (rotation-invariant), not the world AABB of the rotated box
+      w.getWorldScale(ART6_S);lb.getCenter(ART6_V).applyMatrix4(w.matrixWorld);const r=Math.max(lb.max.y-lb.min.y,lb.max.z-lb.min.z)/2*ART6_S.y,t=(lb.max.x-lb.min.x)*ART6_S.x;
+      ART6_V.y-=r-.015;ART6_M.compose(ART6_V,ART6_Q,ART6_S.set(t*1.25,1,r*1.1));put(ART6_M)}}
   // city traffic: wheel clusters of each model's wheel mesh × the car's instance matrix
   if(state==='roam'&&RO.on&&HUB.cars&&HUB.cim)for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z;if(dx*dx+dz*dz>120*120)continue;const im=HUB.cim[c.k],wm=im&&im.userData.w;if(!wm)continue;
     const W=ART6_wl[c.k]||(ART6_wl[c.k]=ART6_wheels(wm.geometry));wm.getMatrixAt(c.j,ART6_M);
