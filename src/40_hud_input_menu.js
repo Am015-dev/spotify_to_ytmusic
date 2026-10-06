@@ -76,7 +76,7 @@ const BZ=$('#btnZone'),TL=$('#tL'),TR=$('#tR');
 function bzSide(t){const r=TR.getBoundingClientRect(),l=TL.getBoundingClientRect();return t.clientX<(l.right+r.left)/2?-1:1}
 function bzSet(d){if(d&&d!==TOUCH.dir&&SET.touch==='buttons')TOUCH.kick=d;TOUCH.dir=d;TL.classList.toggle('down',d<0);TR.classList.toggle('down',d>0)}
 BZ.addEventListener('touchstart',e=>{e.preventDefault();AU.init();TOUCH.on=TOUCH.used=true;const t=e.changedTouches[0];if(TOUCH.bz!=null)return;TOUCH.bz=t.identifier;const d=bzSide(t);
-  if(e.timeStamp-TOUCH.lastTap.t<260&&TOUCH.lastTap.d===d)pressed.roll=d;TOUCH.lastTap={t:e.timeStamp,d};bzSet(d)},{passive:false});
+  TOUCH.lastTap={t:e.timeStamp,d};bzSet(d)},{passive:false});
 BZ.addEventListener('touchmove',e=>{e.preventDefault();for(const t of e.changedTouches)if(t.identifier===TOUCH.bz)bzSet(bzSide(t))},{passive:false});
 const bzEnd=e=>{for(const t of e.changedTouches)if(t.identifier===TOUCH.bz){TOUCH.bz=null;bzSet(0)}};BZ.addEventListener('touchend',bzEnd);BZ.addEventListener('touchcancel',bzEnd);
 {let bp=null;const pe=e=>{if(bp===e.pointerId){bp=null;if(TOUCH.bz==null)bzSet(0)}};BZ.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'||bp!=null)return;bp=e.pointerId;try{BZ.setPointerCapture(e.pointerId)}catch(_){}AU.init();TOUCH.on=TOUCH.used=true;bzSet(bzSide(e))});BZ.addEventListener('pointermove',e=>{if(e.pointerId===bp)bzSet(bzSide(e))});BZ.addEventListener('pointerup',pe);BZ.addEventListener('pointercancel',pe);BZ.addEventListener('lostpointercapture',pe)}

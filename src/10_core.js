@@ -1,5 +1,6 @@
 // ---------- OD_CHANGELOG: newest first. EVERY deploy prepends one entry {v, date, items:[{t:'FIXED'|'NEW'|'CHANGED', s:'plain English'}]} (2-4 items).
 const OD_CHANGELOG=[
+ {v:'v87b',date:'6 Oct 2026',items:[{t:'FIXED',s:'Double-tap ◀ or ▶ to SMASH works with a normal thumb double-tap, flashes the arrow and shows SMASH! even when nothing is hit.'},{t:'CHANGED',s:'Races have no civilian traffic blocking the track any more; rivals stay.'},{t:'CHANGED',s:'Cars drive like real cars: they lean in corners and dip under braking, grip runs out gradually, and they slide a little if you brake hard into a turn. Rivals use the same physics.'}]},
  {v:'v87a',date:'6 Oct 2026',items:[{t:'NEW',s:'This UPDATES screen: open it from the title screen or the pause menu to see what changed in each version.'},{t:'NEW',s:'A small "What\'s new" note appears once after each update.'},{t:'CHANGED',s:'Credits now say "Base assets: Kenney (CC0)" next to "3D models by Alex".'}]},
  {v:'v87',date:'6 Oct 2026',items:[{t:'CHANGED',s:'Race tracks are narrower and double-tap ◀/▶ does a sideways SMASH lunge.'},{t:'NEW',s:'Rival health bars: 3 SMASH hits wreck a rival.'},{t:'CHANGED',s:'BOOST is plain boost again; touching cars is just a bump.'},{t:'FIXED',s:'Car shows right after a wreck; faster road/off-road swap; tinted coupé glass.'}]},
  {v:'v86z',date:'6 Oct 2026',items:[{t:'FIXED',s:'Steering works after a crash: the car turns from a standstill and frees itself if wedged.'}]},
@@ -388,10 +389,10 @@ const ICON={};function itemIcon(k){if(ICON[k])return ICON[k];const[c,g]=cv(96,96
   return ICON[k]=c.toDataURL()}
 let itemSpinUntil=0,itemShown='';
 const EVENTS=[
- {id:'e1',mood:'night',name:'After Hours',sub:'Rookie · 3 laps · light traffic',type:'race',cls:'rookie',laps:3,traffic:16,items:true,aggr:0,
-  goal:'Your first night shift. Win the race. Weave past commuters for <b>near misses</b> to fill the boost bar, then hold <b>Shift</b>. Keep speed up for the two jumps.',med:'place',m:[1,3,5]},
- {id:'e2',mood:'dawn',name:'Rush Hour',sub:'Pro · 2 laps · heavy traffic',type:'race',cls:'pro',laps:2,traffic:46,items:false,aggr:0,
-  goal:'The skyway is packed and there are no weapons. Boost comes only from <b>near misses</b>, drifts and air. Boosting smashes traffic out of the way.',med:'place',m:[1,2,4]},
+ {id:'e1',mood:'night',name:'After Hours',sub:'Rookie · 3 laps',type:'race',cls:'rookie',laps:3,traffic:16,items:true,aggr:0,
+  goal:'Your first night shift. Win the race. Boost refills as you drive (drifts and air fill it faster), then hold <b>Shift</b>. Keep speed up for the two jumps.',med:'place',m:[1,3,5]},
+ {id:'e2',mood:'dawn',name:'Rush Hour',sub:'Pro · 2 laps · no weapons',type:'race',cls:'pro',laps:2,traffic:46,items:false,aggr:0,
+  goal:'No weapons on this run. Boost refills as you drive; drifts and air fill it faster. SMASH rivals into the walls.',med:'place',m:[1,2,4]},
  {id:'e3',mood:'fog',name:'Bridge Closed',sub:'Pro · time attack · 1 lap',type:'tt',cls:'pro',laps:1,traffic:10,items:false,aggr:0,
   goal:'The Flößerbrücke is down. Jump the Main, then the rail yard. Beat the clock: <b>gold 1:03 · silver 1:07 · bronze 1:12</b>.',med:'time',m:[63,67,72]},
  {id:'e4',mood:'storm',name:'Last Train',sub:'Pro · eliminator',type:'elim',cls:'pro',laps:99,traffic:12,items:true,aggr:.2,

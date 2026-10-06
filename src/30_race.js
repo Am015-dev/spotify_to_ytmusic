@@ -277,7 +277,7 @@ function setupRace(cfg){if(cfg.type!=='roam')hubLeave();endCrashCam();ccCool=0;c
     if(p.type==='item'){const col=new THREE.Mesh(new THREE.CylinderGeometry(2.6,2.6,16,12,1,true),beamMat);col.position.y=8;g.add(col)}
     placeOnTrack(g,f,p.x,.1);scene.add(g);padMeshes.push(g);p.mesh=g}
   MAT.boostTex=boostTex;
-  setupTraffic(Math.min(TMAX,Math.round((cfg.traffic||0)*(TRK.traf||1))));setupProps();athHazReset();if(cfg.type==='junction'&&pl)setupJunction();
+  setupTraffic(cfg.type==='junction'?Math.min(3,cfg.traffic||0):0);setupProps();athHazReset();if(cfg.type==='junction'&&pl)setupJunction();
   ghost=cfg.type==='tt'&&!cfg.ev&&!cfg.daily?store.get(ghostKey(),null):null;ghostRec=[];duelRec=[];duelGhost=cfg.type==='duel'?store.get(duelKey(),null):null;if(duelGhost)ghost=null;
   if(ghost||duelGhost){ghostShip=shipMesh(TEAMS[(ghost||duelGhost).team]||TEAMS[0]);ghostShip.traverse(o=>{if(o.material&&!o.material.isShaderMaterial){o.material=o.material.clone();o.material.transparent=true;o.material.opacity=.35;o.material.depthWrite=false}});scene.add(ghostShip)}
   raceT=0;cdT=attract?0:4.2;finishT=0;elimT=30;thrPressT=null;slowmo=0;lastLit=-1;state=attract?'menu':'countdown';$('#ghRow').hidden=!(ghost||duelGhost);feedClear();
@@ -306,8 +306,26 @@ function ctlPlayer(dtR){const pad=navigator.getGamepads?[...navigator.getGamepad
   if(TOUCH.on&&TOUCH.used&&brk&&Math.abs(steer)>.25&&state==='roam'&&RO.v>24&&!TOUCH.park){hb=1;brk=0}
   return{steer,thr,brk,abL,abR,boost,hb,park:!!TOUCH.park}}
 function award(s,label,boost,pts,col='#4ceaff'){if(!s.isPlayer)return;s.bm=Math.min(100,s.bm+boost);s.style+=pts;feed(label,pts,col)}
+const C26={on:1,muCity:{road:15,dirt:9,water:5.5},muOff:1.18,muRace:30,brkCity:13,thUp:3.2,thDn:8,bkUp:4,bkDn:10,kF:.18,kR:.38,kT:.08,fall:.14,align:2.2,scrub:1.4,pK:.0036,rK:.0034,pMax:.065,rMax:.07,w:11,z:.42,aiMu:.9};
+function C26_F(x){const a=Math.abs(x);return a/Math.pow(1+Math.pow(a,6),1/6)*(1-C26.fall*clamp((a-1.1)/1.2,0,1))}
+function C26_ramp(o,c,dt){const t=clamp(c.thr||0,0,1),b=clamp(c.brk||0,0,1);o.thA=(o.thA||0)+clamp(t-(o.thA||0),-dt*C26.thDn,dt*C26.thUp);o.bkA=(o.bkA||0)+clamp(b-(o.bkA||0),-dt*C26.bkDn,dt*C26.bkUp);o.c26b=o.bkA*(1-.5*o.thA);o.c26t=o.thA*(1-o.bkA)}
+// demanded yaw rate -> what the front tyres can deliver at this speed
+function C26_yawCap(o,r,sp,mu){if(!C26.on||sp<3)return r;const muF=mu*(1+C26.kF*(o.c26b||0)-C26.kT*(o.c26t||0)),cap=muF/sp,x=Math.abs(r)/cap;o.c26x=x;return x<.6?r:Math.sign(r)*cap*C26_F(x)}
+// velocity heading step limited by rear grip; returns the step (rad) and stores lateral accel for the body lean
+function C26_vhStep(o,d,k,dt,sp,mu,free){let st=d*Math.min(1,dt*k);if(C26.on&&!free&&sp>3){const muR=mu*(1-C26.kR*(o.c26b||0)+C26.kT*.5*(o.c26t||0)),cap=muR/sp*dt;st=clamp(st,-cap,cap)}o.c26lat=dt>0?st/dt*sp:0;return st}
+// spring-damper body pitch / roll (rad) from longitudinal / lateral accel
+function C26_body(o,aL,aY,dt,snap){const tp=clamp(aL*C26.pK,-C26.pMax,C26.pMax*.55),tr=clamp(aY*C26.rK,-C26.rMax,C26.rMax);if(snap||o.c26p==null){o.c26p=tp;o.c26r=tr;o.c26pv=0;o.c26rv=0;return}
+ const n=Math.max(1,Math.ceil(dt/.02)),h=dt/n,w2=C26.w*C26.w,c=2*C26.z*C26.w;for(let i=0;i<n;i++){o.c26pv+=(w2*(tp-o.c26p)-c*o.c26pv)*h;o.c26p+=o.c26pv*h;o.c26rv+=(w2*(tr-o.c26r)-c*o.c26rv)*h;o.c26r+=o.c26rv*h}
+ o.c26p=clamp(o.c26p,-.09,.06);o.c26r=clamp(o.c26r,-.1,.1)}
+// rotate only the body bricks about the car origin; wheels (userData.r) are left where they are
+const _c26Q=new THREE.Quaternion(),_c26E=new THREE.Euler();
+function C26_lean(ud,p,r){_c26Q.setFromEuler(_c26E.set(p,0,r));ud.m.traverse(o=>{if(!o.isMesh||o.userData.r||!o.userData.gb)return;const u=o.userData;if(!u.crP0){u.crP0=o.position.clone();u.crQ0=o.quaternion.clone()}o.position.copy(u.crP0).applyQuaternion(_c26Q);o.quaternion.copy(_c26Q).multiply(u.crQ0)})}
+const C26_muRace=s=>C26.muRace*(s.stats.han||1)*cls.mul*(s.boatMode?.7:s.dirtMode?.8:1);
+// race: shared yaw / slip / position step for the player and the AI
+function C26_raceYaw(s,target,H){if(s.air||s.hbDir)return target;const sp=Math.max(1,s.v);let t=C26_yawCap(s,target,sp,C26_muRace(s));const b=s.yaw-s.beta;if(C26.on)t-=C26.align*(b-clamp(b,-.1,.1))*Math.min(1,sp/20);return t}
+function C26_raceBeta(s,g,H,free){const d=s.yaw-s.beta,st=C26_vhStep(s,d,g,H,Math.max(1,s.v),C26_muRace(s),free||s.air);s.beta+=st}
 function physPlayer(s,c){const st=s.stats;frameAt(TD,s.dist,F);const k=F.k;
-  s.aab=0;if(SET.assist!=='off'&&TOUCH.used&&!s.air&&state==='race'){let kA=0;for(let d=15;d<=135;d+=20)kA=Math.max(kA,Math.abs(kAt(TD,s.dist+d)));const vr0=Math.min(1,s.v/st.top0),Rm=(1.32-.52*vr0)*st.han*{low:.85,normal:1,high:1.15}[SET.steer],need=kA*s.v,kL=kAt(TD,s.dist+12),cap=Rm+(s.v>st.top0*.3?.5*st.han:0);
+  s.aab=0;if(SET.assist!=='off'&&TOUCH.used&&!s.air&&state==='race'){let kA=0;for(let d=15;d<=135;d+=20)kA=Math.max(kA,Math.abs(kAt(TD,s.dist+d)));const vr0=Math.min(1,s.v/st.top0),Rm=(1.32-.52*vr0)*st.han*{low:.85,normal:1,high:1.15}[SET.steer],need=kA*s.v,kL=kAt(TD,s.dist+12),cap=Math.min(Rm+(s.v>st.top0*.3?.5*st.han:0),C26.on?C26_muRace(s)*.95/Math.max(1,s.v):9);
     if(Math.abs(kL)*s.v>Rm*.72&&s.v>st.top0*.3&&!c.hb)s.aab=Math.sign(kL);if(need>cap*.8){c.thr=0;c.boost=0}if(need>cap*.98)c.brk=Math.max(c.brk,.7)}
   if(c.boost&&!s.bPrev){if(raceT-(s.bT??-9)<.32&&PK.has('_lock')&&state==='race'){s.spLock=!s.spLock;feed(s.spLock?'BOOST LOCK ON':'BOOST LOCK OFF',0,'#ffd12c');AU.sfx('pick')}s.bT=raceT}s.bPrev=!!c.boost;if(s.spLock){if(c.brk>0||s.dead>0)s.spLock=false;else c.thr=1}
   s.nitro=!!c.boost&&s.bm>.5&&!s.air&&state==='race';if(s.nitro){if(!s.wasNitro){AU.sfx('nitro');fovKick=Math.max(fovKick,8)}s.bm=Math.max(0,s.bm-24*H)}s.wasNitro=s.nitro;
@@ -322,12 +340,12 @@ function physPlayer(s,c){const st=s.stats;frameAt(TD,s.dist,F);const k=F.k;
   if(s.hbDir&&!hbOk){const tr=s.hbT>2.1?3:s.hbT>1.2?2:s.hbT>.55?1:0;if(tr){s.boost=Math.max(s.boost,[0,.7,1.2,1.8][tr]);award(s,['','MINI-TURBO','SUPER TURBO','ULTRA TURBO'][tr],8*tr,250*tr*tr,['','#4ceaff','#ff9a3c','#c46bff'][tr]);AU.sfx('boost');fovKick=Math.max(fovKick,5+3*tr)}s.hbDir=0;s.hbT=0}
   let target=c.steer*Rmax+(s.air?0:(c.abR-c.abL)*.62*st.han);
   if(s.hbDir){const into=clamp(c.steer*s.hbDir,-1,1);target=s.hbDir*Rmax*(.95+.45*into);s.hbT+=H*(1+.8*Math.max(0,into))*(PK.has('drift')?1.35:1);s.bm=Math.min(100,s.bm+6*H);
-    const tr=s.hbT>2.1?3:s.hbT>1.2?2:s.hbT>.55?1:0;if(R()<.8){const col=[new THREE.Color(1.4,1.4,1.4),new THREE.Color(.6,1.6,2.6),new THREE.Color(2.6,1.2,.3),new THREE.Color(1.8,.6,2.6)][tr];for(const sd of[-1,1]){const at=V3().copy(F.p).addScaledVector(F.r,s.x+sd*2.2).addScaledVector(F.u,.3).addScaledVector(F.t,-3.2);emit(SPARK,at,V3(rr(-2,2),rr(1,4),rr(-2,2)).addScaledVector(F.t,-s.v*.2),.25,col)}}}s.yawRate+=(target-s.yawRate)*Math.min(1,H*(s.hbDir?10:s.asst?30:20));
+    const tr=s.hbT>2.1?3:s.hbT>1.2?2:s.hbT>.55?1:0;if(R()<.8){const col=[new THREE.Color(1.4,1.4,1.4),new THREE.Color(.6,1.6,2.6),new THREE.Color(2.6,1.2,.3),new THREE.Color(1.8,.6,2.6)][tr];for(const sd of[-1,1]){const at=V3().copy(F.p).addScaledVector(F.r,s.x+sd*2.2).addScaledVector(F.u,.3).addScaledVector(F.t,-3.2);emit(SPARK,at,V3(rr(-2,2),rr(1,4),rr(-2,2)).addScaledVector(F.t,-s.v*.2),.25,col)}}}target=C26_raceYaw(s,target,H);s.yawRate+=(target-s.yawRate)*Math.min(1,H*(s.hbDir?10:s.asst?(C26.on?18:30):(C26.on?11:20)));
   const ab=c.abL+c.abR;
-  let a=0;if(!s.air){if(c.thr>0)a+=st.acc*c.thr*Math.max(0,1-Math.pow(s.v/top,3));if(s.v>top)a-=(s.v-top)*1.2;if(c.brk>0)a-=st.brake*c.brk;
+  C26_ramp(s,C26.on?c:{thr:c.thr,brk:c.brk},C26.on?H:1);let a=0;if(!s.air){if(s.thA>0)a+=st.acc*s.thA*Math.max(0,1-Math.pow(s.v/top,3));if(s.v>top)a-=(s.v-top)*1.2;if(s.bkA>0)a-=st.brake*s.bkA;
     if(s.turbo>0)a+=4.5*cls.mul;if(s.boost>0)a+=6.5*cls.mul;if(s.nitro)a+=9*cls.mul;a-=ab*6*vr*cls.mul+(s.hbDir?2*cls.mul:0);a-=.01*s.v}else a=-.004*s.v;
   s.v=Math.max(0,s.v+a*H);s.maxSpeed=Math.max(s.maxSpeed,s.v);
-  s.yaw+=s.yawRate*H;const grip=(s.hbDir||ab>0?8:12)*st.han*(ab>0?1.2:1)*(s.hbDir?.28:1);s.beta+=(s.yaw-s.beta)*Math.min(1,grip*(s.boatMode?.62:s.dirtMode?.75:1)*H);
+  s.yaw+=s.yawRate*H;const grip=(s.hbDir||ab>0?8:12)*st.han*(ab>0?1.2:1)*(s.hbDir?.28:1);C26_raceBeta(s,grip*(s.boatMode?.62:s.dirtMode?.75:1),H,!!s.hbDir||ab>0);
   const sl=Math.sin(s.yaw-s.beta);s.v-=s.v*sl*sl*(s.hbDir?.5:3)*H;
   const px=s.x;const ds=s.v*Math.cos(s.beta)*H/Math.max(.35,1-k*s.x);s.x+=s.v*Math.sin(s.beta)*H;s.dist+=ds;s.yaw-=k*ds;s.beta-=k*ds;
   s.yaw=clamp(s.yaw,-1.5,1.5);s.beta=clamp(s.beta,-1.5,1.5);if(s.hbDir){s.yaw=clamp(s.yaw,-.85,.85);if(Math.abs(s.yaw)>=.85&&Math.sign(s.yawRate)===Math.sign(s.yaw))s.yawRate*=.5}
@@ -363,20 +381,30 @@ function crashJump(s){const j=s.air.j;const at=s.mesh.position.clone();if(j.kind
 function zoneUp(){const Z=RC.zone;Z.k++;Z.next+=ZLEN;const m=Math.min(1.55,.72+.055*(Z.k-1));Z.mul=m;const t=pl.team;pl.stats.top=BASE_TOP*m*t.top;pl.stats.top0=BASE_TOP*m;pl.stats.acc=8.4*m*t.acc;pl.stats.brake=8+m;
   pl.hull=Math.min(100,pl.hull+12);AU.sfx('lap');fovKick=Math.max(fovKick,8);say('ZONE '+Z.k,m.toFixed(2)+'× SPEED · +12 HULL',1.3);feed('ZONE '+Z.k,Z.k*500,'#5dffb0');pl.style+=Z.k*500}
 const AI_LAT=90,AI_BRK=14;
+// AI on the shared model: throttle/brake toward the corner speed, steering toward the line; same ramps, grip and slip
+function C26_aiDrive(s,k,vmax,xt,sk){const st=s.stats,px=s.x;if(s.crXT==null||Math.abs(s.crXT-s.x)>20)s.crXT=s.x;s.crXT+=(xt-s.crXT)*Math.min(1,H*(s.attackT>0?8:3));
+  const c={thr:s.v<vmax-.4?1:s.v<vmax?.4:0,brk:s.v>vmax+.6?clamp((s.v-vmax)/3,.25,1):0};C26_ramp(s,c,H);
+  if(!s.air){const top=st.top*1.05;let a=s.thA*(st.acc*sk*Math.max(.15,1-s.v/top)+(s.boost>0?5:0)+(s.nitro?7.5*cls.mul:0))-s.bkA*Math.max(st.brake,AI_BRK*cls.mul);if(s.v>top)a-=(s.v-top)*1.2;s.v=Math.max(0,s.v+a*H)}else s.v-=.004*s.v*H;
+  const sp=Math.max(4,s.v),vr=Math.min(1,s.v/st.top0),Rmax=(1.32-.52*vr)*st.han,desB=clamp(Math.atan2((s.crXT-s.x)*(s.attackT>0?2.2:1.5),sp),-.22,.22);
+  let target=clamp(k*s.v+(desB-s.beta)*5.5,-Rmax,Rmax);target=C26_raceYaw(s,target,H);s.yawRate+=(target-s.yawRate)*Math.min(1,H*11);
+  s.yaw+=s.yawRate*H;C26_raceBeta(s,12*st.han*(s.boatMode?.62:s.dirtMode?.75:1),H,false);const sl=Math.sin(s.yaw-s.beta);s.v-=s.v*sl*sl*3*H;
+  const ds=s.v*Math.cos(s.beta)*H/Math.max(.35,1-k*s.x);s.x+=s.v*Math.sin(s.beta)*H;s.dist+=ds;s.yaw-=k*ds;s.beta-=k*ds;s.yaw=clamp(s.yaw,-1.2,1.2);s.beta=clamp(s.beta,-1.2,1.2);
+  if(Math.abs(s.x)>MARGIN){const sg=Math.sign(s.x);s.x=sg*MARGIN;if(Math.sin(s.beta)*sg>0){s.v*=1-Math.min(.5,Math.abs(Math.sin(s.beta))*1.5);s.beta*=.3;s.yaw*=.4;s.yawRate*=.3}}
+  s.latV=(s.x-px)/H}
 function physAI(s){const st=s.stats,sk=s.skill*s.rubber;frameAt(TD,s.dist,F);const k=F.k;
   s.aiN=(s.aiN||0)-H;s.aiNcd=(s.aiNcd??rr(4,9))-H;if(s.aiNcd<=0&&Math.abs(kAt(TD,s.dist+80))<1/600&&RC.type!=='attract'){s.aiN=rr(1.8,3);s.aiNcd=rr(5,10)*(1.15-sk*.2)}
   s.nitro=s.aiN>0;
   let vmax=st.top*sk*(s.turbo>0?1.2:1)*(s.boost>0?1.12:1)*(s.nitro?1.26:1);const look=Math.max(80,s.v*1.8);
-  for(let d=10;d<look;d+=12){const kk=Math.abs(kAt(TD,s.dist+d));const vc=Math.sqrt(AI_LAT*sk*st.han*cls.mul/Math.max(kk,1e-5));vmax=Math.min(vmax,Math.sqrt(vc*vc+2*AI_BRK*cls.mul*Math.max(0,d-10)))}
+  const aiLat=C26.on?C26_muRace(s)*C26.aiMu*(.9+.1*sk):AI_LAT*sk*st.han*cls.mul;for(let d=10;d<look;d+=12){const kk=Math.abs(kAt(TD,s.dist+d));const vc=Math.sqrt(aiLat/Math.max(kk,1e-5));vmax=Math.min(vmax,Math.sqrt(vc*vc+2*AI_BRK*cls.mul*Math.max(0,d-10)))}
   let ka=0;for(let d=30;d<=150;d+=20)ka+=kAt(TD,s.dist+d);ka/=7;let xt=clamp(ka*3200+s.laneBias,-MARGIN+1.2,MARGIN-1.2);
   for(const o of ships){if(o===s||o.dead||o.eliminated)continue;const dd=o.dist-s.dist;if(dd>0&&dd<26&&Math.abs(o.x-s.x)<4)xt=clamp(o.x+CR_dodge(s,o)*6,-MARGIN+1,MARGIN-1)}
   for(const m of mines){const dd=m.dist-s.dist;if(dd>0&&dd<60&&Math.abs(m.x-s.x)<4)xt=clamp(m.x+(m.x>0?-4:4),-MARGIN+1,MARGIN-1)}
   for(const c of traffic){if(c.wreck)continue;const dd=tdd(c.dist,s.dist);if(dd>0&&dd<(s.v-c.v)*1.6+25&&Math.abs(c.x-xt)<c.wid/2+3){const l=c.x-c.wid/2-3.4,r=c.x+c.wid/2+3.4;xt=((Math.abs(l-s.x)<Math.abs(r-s.x)&&l>-MARGIN)||r>MARGIN)?l:r;xt=clamp(xt,-MARGIN+.5,MARGIN-.5);if(dd<12&&Math.abs(c.x-s.x)<c.wid/2+2.2)vmax=Math.min(vmax,c.v)}}
   const ag=(RC.aggr||0)+(s.aggrB||0);if(ag>0&&pl&&!pl.dead&&!pl.eliminated&&state==='race'){s.aggrCd-=H;const dd=pl.dist-s.dist;if(s.attackT<=0&&s.aggrCd<=0&&Math.abs(dd)<9&&Math.abs(pl.x-s.x)<9&&R()<ag*H*3){s.attackT=1.3;s.aggrCd=rr(5,9)}
     if(s.attackT>0){s.attackT-=H;xt=clamp(pl.x+(pl.x>s.x?1.5:-1.5),-MARGIN,MARGIN)}}
-  if(s.v<vmax)s.v+=st.acc*sk*Math.max(.15,1-s.v/(st.top*1.05))*H+(s.boost>0?5*H:0)+(s.nitro?7.5*cls.mul*H:0);else s.v=Math.max(vmax,s.v-AI_BRK*cls.mul*H);
+  if(!C26.on){if(s.v<vmax)s.v+=st.acc*sk*Math.max(.15,1-s.v/(st.top*1.05))*H+(s.boost>0?5*H:0)+(s.nitro?7.5*cls.mul*H:0);else s.v=Math.max(vmax,s.v-AI_BRK*cls.mul*H);
   const px=s.x,lat=(s.attackT>0?14:9)*cls.mul;if(s.crXT==null||Math.abs(s.crXT-s.x)>20){s.crXT=s.x;s.crLV=0}s.crXT+=(xt-s.crXT)*Math.min(1,H*(s.attackT>0?8:3));const dvx=clamp((s.crXT-s.x)*2.5,-lat,lat);s.crLV=(s.crLV||0)+clamp(dvx-(s.crLV||0),-30*H,30*H);s.x=clamp(s.x+s.crLV*H,-MARGIN,MARGIN);
-  const ds=s.v*H/Math.max(.35,1-k*s.x);s.dist+=ds;s.latV=(s.x-px)/H;s.yaw=Math.atan2(s.latV,Math.max(1,s.v));s.beta=s.yaw;
+  const ds=s.v*H/Math.max(.35,1-k*s.x);s.dist+=ds;s.latV=(s.x-px)/H;s.yaw=Math.atan2(s.latV,Math.max(1,s.v));s.beta=s.yaw}else C26_aiDrive(s,k,vmax,xt,sk);
   waterStep(s);airStep(s)}
 function damage(s,d){if(s.shield>0||s.inv>0||s.dead>0||(s.rollT>ROLL_T-.3&&d>3)||(s.finished&&s.isPlayer))return false;if(s.isPlayer)d*=RC.dmgK||1;s.hull-=d;s.lastHit=raceT;if(s.hull<=0)explode(s);return true}
 function explode(s,msg,imp){wreckStart(s,imp);s.dead=2.2;s.hull=0;s.v=0;s.item=null;if(s.isPlayer&&PK.has('empwreck')&&state==='race'){itemSpinUntil=0;s.item='emp';useItem(s)}s.air=null;if(RC.type==='arena')s.lives--;
