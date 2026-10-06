@@ -43,7 +43,7 @@ function openZoom(spec) {
   z.appendChild(box); z.hidden = false; UI.zoomAt = Date.now();
 }
 function closeZoom() { const z = $('#zoom'); if (z && !z.hidden) { z.hidden = true; z.innerHTML = ''; } }
-function closePop() { UI.pop = null; UI.sel = null; closeZoom(); }
+function closePop() { UI.pop = null; UI.sel = null; UI.cityOpen = null; closeZoom(); }
 // ---- flying and floating
 function fxLayer() { return $('#fx'); }
 function fxClear() { const f = fxLayer(); if (f) f.innerHTML = ''; UI.animBusy = false; UI.animTok = (UI.animTok || 0) + 1; }

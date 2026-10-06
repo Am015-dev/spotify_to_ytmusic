@@ -20,7 +20,7 @@ async function playGame(browser, W, H, gi, mode) {
   await p.goto('https://gns.test/'); await sleep(500);
   await p.evaluate(([m, s]) => { try { localStorage.clear(); } catch (e) { } UI.seed = s; AIDELAY = 50; UI.opt = { np: 2 + (s % 3), level: 'normal', solo: 1 }; newGame(m); }, [mode, 11 + gi * 3]);
   await sleep(400);
-  const sig = () => p.evaluate(() => G ? G.logN + ':' + G.turn + ':' + (G.q ? G.q.kind + G.q.opts.length : '') + ':' + G.players.map(p => p.hand.length + '.' + p.dep.length).join(',') + ':' + JSON.stringify(G.players.map(p => [p.res, p.pts])) + ':' + G.phase + ':' + (UI.sel ? 'sel' : '') + ':' + UI.cards.length : 'x');
+  const sig = () => p.evaluate(() => G ? G.logN + ':' + G.turn + ':' + (G.q ? G.q.kind + G.q.opts.length + G.q.opts.map(o => o.label).join('|') : '') + ':' + G.players.map(p => p.hand.length + '.' + p.dep.length).join(',') + ':' + JSON.stringify(G.players.map(p => [p.res, p.pts])) + ':' + G.phase + ':' + (UI.sel ? 'sel' : '') + ':' + UI.cards.length : 'x');
   let lastSig = '', lastT = Date.now(), steps = 0, passTaps = 0, shots = 0, dead = 0;
   for (; steps < 900; steps++) {
     const st = await p.evaluate(() => ({ over: G.phase === 'over', cards: UI.cards.length, busy: !!UI.animBusy, mine: (() => { const a = HB.actor(G); return a >= 0 && !G.players[a].ai; })(), q: G.q ? G.q.kind : '', logN: G.logN }));
@@ -53,13 +53,32 @@ async function playGame(browser, W, H, gi, mode) {
       passTaps++; await pb.tap().catch(() => { }); await sleep(120); const pb2 = await p.$('#acts .pass'); if (pb2) await pb2.tap().catch(() => { }); await sleep(250); continue;
     }
     const trays = tg.filter(x => x.tray); const pool = trays.length ? trays : tg;
+    // the compact city strip opens full screen: 15 slots, nothing changes in the game, a glowing destination in it can be used, Done closes it
+    if (R() < .06) {
+      const cb = await p.$('.cityopen');
+      if (cb) {
+        const l0 = await p.evaluate(() => G.logN); await cb.tap().catch(() => { }); await sleep(250);
+        const o = await p.evaluate(() => { const e = document.querySelector('#cityov'); if (!e) return null; const cells = e.querySelectorAll('.cvcell').length; const gl = [...e.querySelectorAll('.cvc.glow')].map(x => { const r = x.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }); const other = document.querySelectorAll('#bd .glow:not(#cityov .glow):not(.tchip)').length; const de = document.documentElement; return { cells, gl, other, hs: de.scrollWidth > innerWidth + 1, logN: G.logN }; });
+        if (!o) fail(tag, 'tap on the city strip did not open the city');
+        else {
+          if (o.cells < 15) fail(tag, 'city view shows ' + o.cells + ' slots');
+          if (o.other) fail(tag, 'glow outside the open city view: ' + o.other);
+          if (o.hs) fail(tag, 'hscroll in city view');
+          if (o.logN !== l0) fail(tag, 'opening the city changed the game');
+          if (o.gl.length && R() < .6) { await p.touchscreen.tap(o.gl[0].x, o.gl[0].y); await sleep(500); const gone = await p.evaluate(() => !document.querySelector('#cityov')); if (!gone) { fail(tag, 'city view stayed open after using a destination'); } if (await p.$('#cityov')) { const x = await p.$('#cityov .cvx'); if (x) await x.tap().catch(() => { }); } continue; }
+          const x = await p.$('#cityov .cvx'); if (x) await x.tap().catch(() => { }); await sleep(200);
+          if (await p.$('#cityov')) fail(tag, 'Done did not close the city view');
+        }
+        continue;
+      }
+    }
     // sometimes explore a non-glowing card (must not act): a dead-looking tap must not change the game
-    if (R() < .04) { const n = await p.evaluate(() => { const e = document.querySelector('.sc:not(.glow),.mc:not(.glow):not(.empty)'); if (!e) return null; const r = e.getBoundingClientRect(); const c = [r.left + r.width / 2, r.top + r.height / 2]; const hit = document.elementFromPoint(c[0], c[1]); return { c, logN: G.logN, ok: !!hit }; }); if (n && n.ok) { await p.touchscreen.tap(n.c[0], n.c[1]); await sleep(200); const l2 = await p.evaluate(() => G.logN); if (l2 !== n.logN) fail(tag, 'tap on a non-glowing card changed the game'); } }
+    if (R() < .04) { const n = await p.evaluate(() => { const e = document.querySelector('.sc:not(.glow),.mc:not(.glow):not(.empty)'); if (!e) return null; const r = e.getBoundingClientRect(); const c = [r.left + r.width / 2, r.top + r.height / 2]; const hit = document.elementFromPoint(c[0], c[1]); return { c, logN: G.logN, ok: !!hit }; }); if (n && n.ok) { await p.touchscreen.tap(n.c[0], n.c[1]); await sleep(200); const l2 = await p.evaluate(() => G.logN); if (l2 !== n.logN) fail(tag, 'tap on a non-glowing card changed the game'); const cv = await p.$('#cityov .cvx'); if (cv) { await cv.tap().catch(() => { }); await sleep(150); } } }
     const pick = pool[Math.floor(R() * pool.length)];
     const before = await sig();
     await p.touchscreen.tap(pick.x, pick.y);
     let changed = false; for (let k = 0; k < 15; k++) { await sleep(100); if ((await sig()) !== before) { changed = true; break; } }
-    if (!changed) { await p.screenshot({ path: path.join(__dirname, 'shots', 'dead_' + W + '_' + gi + '.png') }).catch(() => { }); console.log('  q:', await p.evaluate(() => G.q ? JSON.stringify({ kind: G.q.kind, title: G.q.title, opts: G.q.opts.map(o => o.label), sel: !!UI.sel }) : 'none')); dead++; fail(tag, 'glowing target did not respond: ' + pick.t + ' at ' + Math.round(pick.x) + ',' + Math.round(pick.y)); if (dead > 3) break; }
+    if (!changed) { await p.screenshot({ path: path.join(__dirname, 'shots', 'dead_' + W + '_' + gi + '.png') }).catch(() => { }); console.log('  q:', await p.evaluate(() => G.q ? JSON.stringify({ kind: G.q.kind, title: G.q.title, opts: G.q.opts.map(o => o.label), sel: !!UI.sel }) : 'none')); dead++; const hit = await p.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return e ? (e.id ? '#' + e.id : '') + '.' + String(e.className && e.className.baseVal === undefined ? e.className : 'svg') + ' in ' + ((e.closest('[data-a]') || {}).className || '?') : 'none'; }, [pick.x, pick.y]); fail(tag, 'glowing target did not respond (top element ' + hit + '): ' + pick.t + ' at ' + Math.round(pick.x) + ',' + Math.round(pick.y)); if (dead > 3) break; }
     if (steps === 40 && shots < 1 && gi === 0) { shots++; await p.screenshot({ path: path.join(__dirname, 'shots', 'sweep_mid_' + W + 'x' + H + '.png') }).catch(() => { }); }
   }
   const fin = await p.evaluate(() => G && G.phase === 'over' ? G.over.scores.map(s => s.total) : null);

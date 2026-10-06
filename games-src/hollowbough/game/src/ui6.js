@@ -105,6 +105,9 @@ document.addEventListener('click', ev => {
     case 't': onTarget(d.t, t); break;
     case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { UI.sel = null; actFrom(m, t); } break; }
     case 'selx': UI.sel = null; render(); break;
+    case 'city': if (!UI.animBusy) { UI.sel = null; UI.cityOpen = { logN: G.logN }; snd('click', { vol: .4 }); render(); } break;
+    case 'cityx': UI.cityOpen = null; render(); break;
+    case 'noop': break;
     case 'chip': UI.rseat = d.seat === 'G' ? 'G' : +d.seat; GX.show('rivald'); renderRival(UI.rseat); break;
     case 'rtab': renderRival(d.seat === 'G' ? 'G' : +d.seat); break;
     case 'cont': nextCard(); break;

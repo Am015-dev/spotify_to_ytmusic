@@ -8,7 +8,8 @@ const FIC = {
 const EVT = { production: 'production', destination: 'destination', governance: 'governance', traveler: 'traveler' };
 function items(list, px) {
   const w = h('div.its' + (list.length > 2 ? '.its3' : ''));
-  for (const [k, n] of list) w.appendChild(h('span.it', ic(k, px), (n !== '' && n !== 1) ? h('b', (/^\d+$/.test(String(n)) ? '×' : '') + n) : null));
+  const p = list.length > 2 ? Math.round(px * .78) : list.length === 1 ? Math.min(px + 6, Math.round(px * 1.2)) : px;
+  for (const [k, n] of list) { const num = (n !== '' && n !== 1) ? (/^\d+$/.test(String(n)) ? '×' : '') + n : null; w.appendChild(h('span.it', ic(k, p), num ? h('b.bd', num) : null)); }
   return w;
 }
 function basicItems(i) { const b = D.basic[i], l = []; for (const r of RESK) if (b.gain[r]) l.push([r, b.gain[r]]); if (b.draw) l.push(['card', b.draw]); if (b.pts) l.push(['point', b.pts]); return l; }
@@ -35,56 +36,68 @@ function fitStrip(n, W, H, baseW) {
 function boardLayout(W, H) {
   const wide = W >= H * 1.0 || (document.documentElement.classList.contains('ph-l'));
   const tall = !wide, g = 2, pad = 4;
-  const R = { W, H, tall, tiles: [], meadow: [], g };
-  const tl = (kind, i, x, y, w, hh) => R.tiles.push({ kind, i, x, y, w, h: hh });
+  const R = { W, H, tall, tiles: [], meadow: [], g, slots: false };
+  const tl = (kind, i, x, y, w, hh, ex) => { const t = { kind, i, x, y, w, h: hh }; if (ex) Object.assign(t, ex); R.tiles.push(t); return t; };
   const nf = G.forest.length;
-  const rowB = []; for (let i = 0; i < nf; i++) rowB.push(['forest', i]);
-  [['haven', 0], ['journey', 0], ['deck', 0], ['tree', 0]].forEach(e => rowB.push(e)); if (nf === 3) rowB.push(['disc', 0]);
+  const r3 = []; for (let i = 0; i < nf; i++) r3.push(['forest', i]); r3.push(['haven', 0], ['journey', 0]);
+  const sup = [['deck', 0], ['tree', 0]]; if (nf === 3) sup.push(['disc', 0]);
   const evs = []; G.bev.forEach((e, i) => evs.push(['bev', i])); G.sev.forEach((e, i) => evs.push(['sev', i]));
   const nCity = Math.max(1, G.players[Math.max(0, focusSeat())].city.length + visitList().length);
   const nHand = Math.max(1, (viewSeat() >= 0 ? G.players[viewSeat()].hand.length : 5));
   if (tall) {
-    const small = H < 520;
-    const chipH = small ? 32 : 36, actH = small ? 42 : 46, resH = small ? 28 : 32;
-    let tr = small ? 36 : 44, er = small ? 32 : 38, sh = small ? 58 : 70;
-    const gm = 6, cwMax = Math.min(120, (W - 2 * pad - 3 * gm) / 4), chMax = cwMax * CARD_AR;
-    const calc = () => {
-      const top = chipH + 7 + 2 * tr + er + 3 * 3 + 4;
-      const bottom = actH + resH + 2 * sh + 4 * g + pad;
-      return { top, bottom, avail: H - top - bottom };
+    // bands from the top: scores, event pennants, 2 rows of basic places (1 row when short), forest/haven/road, the meadow bench, my stock; the
+    // table under the picture: my city strip, my fanned hand, the action row. Every band shrinks until the meadow cards are readable.
+    const meas = (mode, t) => {
+      const L = (a, b) => Math.round(b + (a - b) * t), tight = mode === 'tight';
+      const m = { mode, t, chip: L(36, 30), ev: L(46, 30), br: tight ? L(46, 36) : L(58, 42), r3: L(60, 40), res: L(34, 26), hand: L(88, 60), city: L(46, 32), acts: L(46, 40), rg: tight ? 0 : 7, sg: tight ? 3 : 5, rows: tight ? 1 : 2 };
+      let y = 3 + m.chip + m.sg; m.evY = y; y += m.ev + m.sg; m.bY = y; y += m.rows * m.br + (m.rows - 1) * m.rg + m.sg; m.r3Y = y; y += m.r3 + m.sg + 3; m.mTop = y;
+      let yb = H - pad; m.actsY = yb - m.acts; yb = m.actsY - 3; m.handY = yb - m.hand; yb = m.handY - 3; m.cityY = yb - m.city; m.sceneB = m.cityY - 3;
+      m.resY = m.sceneB - 3 - m.res; m.mBot = m.resY - 3;
+      const bp = 5, avail = m.mBot - m.mTop - 2 * bp - 4; m.ch = avail / 2; m.cw = Math.min(104, m.ch / CARD_AR, (W - 2 * pad - 2 * bp - 3 * 6) / 4);
+      return m;
     };
-    let c = calc(), chAv = (c.avail - 4 - 4) / 2;
-    if (chAv > chMax) {
-      let spare = 2 * (chAv - chMax);
-      const dS = Math.min(28, spare * .3); sh += dS; spare -= 2 * dS;
-      const dT = Math.min(8, spare / 3); tr += dT; er += dT;
-      c = calc(); chAv = (c.avail - 4 - 4) / 2;
-    }
-    const ch = Math.max(40, Math.min(chMax, chAv)), cw = Math.min(cwMax, ch / CARD_AR), chh = cw * CARD_AR;
-    // places
-    const tg = 3, tw = (W - 2 * pad - 7 * tg) / 8; let y = 0;
-    R.chips = { x: pad, y: 3, w: W - 2 * pad, h: chipH }; y = chipH + 3 + 4;
-    for (let i = 0; i < 8; i++) tl('basic', i, pad + i * (tw + tg), y, tw, tr); y += tr + tg;
-    rowB.forEach((e, i) => tl(e[0], e[1], pad + i * (tw + tg), y, tw, tr)); y += tr + tg;
-    evs.forEach((e, i) => tl(e[0], e[1], pad + i * (tw + tg), y, tw, er)); y += er + tg + 2;
-    // bottom stack, laid from the bottom edge up so the hand and the buttons sit under the thumb
-    let yb = H - pad;
-    R.acts = { x: pad, y: yb - actH, w: W - 2 * pad, h: actH }; yb -= actH + g;
-    R.hand = { x: pad, y: yb - sh, w: W - 2 * pad, h: sh }; yb -= sh + g;
-    R.res = { x: pad, y: yb - resH, w: W - 2 * pad, h: resH }; yb -= resH + g;
-    R.city = { x: pad, y: yb - sh, w: W - 2 * pad, h: sh }; yb -= sh + g;
-    // meadow: two rows of cards centred in what is left
-    const mtop = y, mh = yb - mtop, tot = 2 * chh + 4, my0 = mtop + Math.max(0, (mh - tot) / 2), mgm = Math.min(gm, (W - 2 * pad - 4 * cw) / 3), mx = (W - (4 * cw + 3 * mgm)) / 2;
-    for (let s = 0; s < 8; s++) R.meadow.push({ i: s, x: mx + (s % 4) * (cw + mgm), y: my0 + Math.floor(s / 4) * (chh + 4), w: cw, h: chh });
-    R.strip = { hand: fitStrip(nHand, R.hand.w - 4, R.hand.h - 2, 66), city: fitStrip(nCity, R.city.w - 4, R.city.h - 2, 66) };
+    const pick = mode => { let b = null; for (let t = 1; t > -0.001; t -= .1) { b = meas(mode, Math.max(0, t)); if (b.cw >= 80) return b; } return b; };
+    let m = H >= 600 ? pick('roomy') : null; if (!m || m.cw < 62) { const m2 = pick('tight'); if (!m || m2.cw > m.cw) m = m2; }
+    const tight = m.mode === 'tight'; R.mode = m.mode;
+    R.chips = { x: pad, y: 3, w: W - 2 * pad, h: m.chip };
+    // event pennants on a rope
+    const ne = Math.max(1, evs.length), ew = (W - 2 * pad - 14) / ne, ewd = Math.min(ew - 2, 52), evX = [];
+    evs.forEach((e, i) => { const cx = pad + 7 + ew * (i + .5); evX.push(cx); tl(e[0], e[1], cx - ewd / 2, m.evY, ewd, m.ev, { ip: 20, ps: 18 }); });
+    R.rope = { y: m.evY + 3, xs: evX, h: m.ev };
+    // basic places
+    const rowsArr = [], cg = tight ? 3 : 8, cols = tight ? 8 : 4, bw = (W - 2 * pad - (cols - 1) * cg) / cols;
+    const ipB = tight ? Math.max(16, Math.min(22, Math.floor((bw - 5) / 2))) : Math.min(32, Math.floor(m.br * .6));
+    for (let r = 0; r < m.rows; r++) rowsArr.push([]);
+    for (let i = 0; i < 8; i++) { const row = Math.floor(i / cols); rowsArr[row].push(tl('basic', i, pad + (i % cols) * (bw + cg), m.bY + row * (m.br + m.rg), bw, m.br, { ip: ipB, ps: Math.round(Math.min(28, m.br * .56)) })); }
+    // forest places, the haven and the road
+    const n3 = r3.length, w3 = Math.min(78, (W - 2 * pad - (n3 - 1) * cg) / n3), x3 = (W - (n3 * w3 + (n3 - 1) * cg)) / 2, row3 = [];
+    r3.forEach((e, k) => row3.push(tl(e[0], e[1], x3 + k * (w3 + cg), m.r3Y, w3, m.r3, { ip: Math.min(28, Math.floor((w3 - 4) / 2)), ps: Math.round(Math.min(26, m.r3 * .52)) })));
+    rowsArr.push(row3);
+    // draw pile, seasons and discards sit at the end of the stock row
+    const stw = Math.min(40, m.res + 6), nS = sup.length, tilesW = nS * stw + (nS - 1) * 3;
+    R.res = { x: pad, y: m.resY, w: W - 2 * pad - tilesW - 4, h: m.res };
+    sup.forEach((e, k) => tl(e[0], e[1], W - pad - tilesW + k * (stw + 3), m.resY, stw, m.res, { ip: Math.max(14, Math.min(20, m.res - 10)) }));
+    // the meadow bench
+    const bp = 5, cw = m.cw, chh = cw * CARD_AR, gm = 6, totW = 4 * cw + 3 * gm, mx = (W - totW) / 2, tot = 2 * chh + 4, avail = m.mBot - m.mTop, my0 = m.mTop + Math.max(bp, (avail - tot) / 2);
+    for (let s = 0; s < 8; s++) R.meadow.push({ i: s, x: mx + (s % 4) * (cw + gm), y: my0 + Math.floor(s / 4) * (chh + 4), w: cw, h: chh });
+    R.bench = { x: mx - bp - 2, y: my0 - bp, w: totW + 2 * bp + 4, h: tot + 2 * bp };
+    R.stream = { h: true, y: m.r3Y + m.r3 + (m.sg + 3) / 2 };
+    R.path = []; rowsArr.forEach((row, k) => (k % 2 ? row.slice().reverse() : row).forEach(t => R.path.push({ x: t.x + t.w / 2, y: t.y + t.h / 2 })));
+    R.scene = { x: 0, y: 0, w: W, h: m.sceneB }; R.tbl = { x: 0, y: m.sceneB, w: W, h: H - m.sceneB };
+    R.city = { x: pad, y: m.cityY, w: W - 2 * pad, h: m.city }; R.hand = { x: pad, y: m.handY, w: W - 2 * pad, h: m.hand }; R.acts = { x: pad, y: m.actsY, w: W - 2 * pad, h: m.acts };
+    R.slots = true; R.fan = true;
+    const cw0 = Math.min(40, Math.floor((m.city - 6) / CARD_AR)), nSl = Math.max(15, nCity), stp = Math.min(cw0 + 2, (R.city.w - 10 - cw0 - 40) / (nSl - 1));
+    R.fanDrop = tight ? 7 : 11;
+    R.strip = { hand: fitStrip(nHand, R.hand.w - 4, R.hand.h - R.fanDrop - 3, 66), city: { cw: cw0, ch: Math.round(cw0 * CARD_AR), rows: 1, per: nSl, step: stp, x0: 5, n: nSl } };
   } else {
     const rail = Math.round(Math.max(236, Math.min(340, W * .32))), LW = W - rail - pad;
     const chipH = 34, actH = 44, resH = 30;
     const gp = Math.max(6, Math.round(LW * .012)), Lw = Math.round(LW * .40), tw = (Lw - 3 * g) / 4;
-    const th = Math.min(tw * 1.3, (H - 3 * g - 8) / 4);
-    for (let i = 0; i < 8; i++) tl('basic', i, (i % 4) * (tw + g), Math.floor(i / 4) * (th + g), tw, th);
-    const y2 = 2 * (th + g) + 6;
-    rowB.forEach((e, i) => tl(e[0], e[1], (i % 4) * (tw + g), y2 + Math.floor(i / 4) * (th + g), tw, th));
+    const th = Math.min(tw * 1.3, (H - 3 * g - 8) / 4), ipw = Math.max(18, Math.min(34, Math.floor(Math.min(tw * .4, th * .46)))), psw = Math.round(Math.max(20, Math.min(30, th * .4)));
+    const rowsArr = [[], [], []];
+    for (let i = 0; i < 8; i++) rowsArr[Math.floor(i / 4)].push(tl('basic', i, (i % 4) * (tw + g), Math.floor(i / 4) * (th + g), tw, th, { ip: ipw, ps: psw }));
+    const y2 = 2 * (th + g) + 6, rowB = r3.concat(sup);
+    rowB.forEach((e, i) => { const t = tl(e[0], e[1], (i % 4) * (tw + g), y2 + Math.floor(i / 4) * (th + g), tw, th, { ip: ipw, ps: psw }); if (i < 4) rowsArr[2].push(t); });
     const x0 = Lw + gp * 2, Rw = LW - x0; let cw = Math.min((Rw - 3 * g * 2) / 4, 170);
     const evh = Math.max(40, Math.min(th * .9, 70));
     let ch = cw * CARD_AR; const maxch = (H - 2 * evh - 4 * g - 10) / 2; if (ch > maxch) { ch = maxch; cw = ch / CARD_AR; }
@@ -92,7 +105,7 @@ function boardLayout(W, H) {
     const mx = x0 + (Rw - (4 * cw + 3 * gm)) / 2;
     for (let s = 0; s < 8; s++) R.meadow.push({ i: s, x: mx + (s % 4) * (cw + gm), y: Math.floor(s / 4) * (ch + g * 2), w: cw, h: ch });
     const ey = 2 * ch + g * 4 + 8, etw = (Rw - 3 * g) / 4;
-    evs.forEach((e, i) => tl(e[0], e[1], x0 + (i % 4) * (etw + g), ey + Math.floor(i / 4) * (evh + g), etw, evh));
+    evs.forEach((e, i) => tl(e[0], e[1], x0 + (i % 4) * (etw + g), ey + Math.floor(i / 4) * (evh + g), etw, evh, { ip: 20, ps: 18 }));
     let mxy = 0; R.tiles.forEach(t => mxy = Math.max(mxy, t.y + t.h)); R.meadow.forEach(t => mxy = Math.max(mxy, t.y + t.h));
     const off = Math.max(0, Math.min(80, (H - mxy) / 2)); if (off > 1) { R.tiles.forEach(t => t.y += off); R.meadow.forEach(t => t.y += off); }
     // the rail
@@ -104,6 +117,10 @@ function boardLayout(W, H) {
     R.city = { x: rx, y: chipH + g + resH + g + 3, w: rw, h: hc };
     R.hand = { x: rx, y: R.city.y + hc + g, w: rw, h: yb - (R.city.y + hc + g) };
     R.strip = { hand: fitStrip(nHand, R.hand.w - 4, R.hand.h - 2, 74), city: fitStrip(nCity, R.city.w - 4, R.city.h - 2, 74) };
+    R.scene = { x: 0, y: 0, w: rx - 2, h: H }; R.tbl = { x: rx - 2, y: 0, w: W - rx + 2, h: H };
+    const bp = 6; R.bench = { x: mx - bp, y: R.meadow[0].y - bp, w: 4 * cw + 3 * gm + 2 * bp, h: 2 * ch + g * 2 + 2 * bp };
+    R.stream = { h: false, x: Lw + gp };
+    R.path = []; rowsArr.forEach((row, k) => (k % 2 ? row.slice().reverse() : row).forEach(t => R.path.push({ x: t.x + t.w / 2, y: t.y + t.h / 2 })));
   }
   return R;
 }
@@ -144,7 +161,9 @@ function tileInfo(kind, i) {
   return {};
 }
 function tileFace(t, big) {
-  const px = big ? 28 : 20; let f = h('div.face');
+  const px = big ? 28 : (t.ip || 20); let f = h('div.face');
+  const key = t.kind === 'basic' ? D.basic[t.i].key : t.kind === 'forest' ? D.forest[G.forest[t.i]].key : '';
+  f.innerHTML = spotArt(t.kind, key, t.i);
   switch (t.kind) {
     case 'basic': f.appendChild(items(basicItems(t.i), px)); break;
     case 'forest': f.appendChild(items(FIC[D.forest[G.forest[t.i]].key] || [['any', '']], px)); break;
@@ -153,8 +172,8 @@ function tileFace(t, big) {
     case 'deck': f.appendChild(h('div.its', h('span.it', ic('deck', px), h('b', G.deck.length)))); break;
     case 'disc': f.appendChild(h('div.its', h('span.it', ic('discard', px), h('b', G.discard.length)))); break;
     case 'tree': { const s = G.players[Math.max(0, viewSeat() >= 0 ? viewSeat() : (G.phase === 'over' ? 0 : HB.actor(G)))]; f.appendChild(h('div.its', h('span.it', HBKit.season(SEAS[s ? s.season : 0], px + 4)))); break; }
-    case 'bev': { const e = G.bev[t.i], dd = D.basicEvents[e.k], need = Object.keys(dd.need)[0]; const col = HBKit.TYPES[need] ? HBKit.TYPES[need].c : '#888'; f.style.setProperty('--ec', col); f.appendChild(h('div.its', h('span.it', ic('flag', px), h('b', dd.pts)))); break; }
-    case 'sev': { const e = G.sev[t.i], dd = D.specialEvents[e.k]; f.style.setProperty('--ec', '#7f5496'); f.appendChild(h('div.its', h('span.it', ic('star', px), dd.pts ? h('b', dd.pts) : h('b', '?')))); break; }
+    case 'bev': { const e = G.bev[t.i], dd = D.basicEvents[e.k], need = Object.keys(dd.need)[0]; const col = HBKit.TYPES[need] ? HBKit.TYPES[need].c : '#888'; f.style.setProperty('--ec', col); f.appendChild(h('div.its', h('span.it', ic('flag', px), h('b.bd', dd.pts)))); break; }
+    case 'sev': { const e = G.sev[t.i], dd = D.specialEvents[e.k]; f.style.setProperty('--ec', '#7f5496'); f.appendChild(h('div.its', h('span.it', ic('star', px), h('b.bd', dd.pts ? dd.pts : '?')))); break; }
   }
   if (big) { const nm = t.kind === 'deck' ? 'Draw pile' : t.kind === 'disc' ? 'Discards' : t.kind === 'tree' ? 'Seasons' : (tileInfo(t.kind, t.i).name || ''); f.appendChild(h('div.nm', nm)); }
   return f;
@@ -199,7 +218,7 @@ function renderBoard() {
   const W = host.clientWidth || 390, H = host.clientHeight || 470;
   const R = boardLayout(W, H); UI.lay = R;
   bd.innerHTML = ''; bd.style.width = W + 'px'; bd.style.height = H + 'px';
-  bd.className = R.tall ? 'tall' : 'wide';
+  bd.className = (R.tall ? 'tall ' : 'wide ') + (R.mode || '');
   UI.tgEls = {}; UI.cr = {}; UI.tiles = {};
   const mm = myMoves(), mine = mm.length > 0, v = viewSeat();
   const okw = new Set(mm.filter(m => m.type === 'worker').map(tgOf));
@@ -211,7 +230,10 @@ function renderBoard() {
   const big = !R.tall && R.tiles.some(t => t.kind === 'basic' && t.w >= 84 && t.h >= 70);
   bd.classList.toggle('big', big);
   if (UI.sel && (UI.sel.logN !== G.logN || !UI.sel.ms.every(m => mm.some(x => sameM(x, m))))) UI.sel = null;
+  if (UI.cityOpen && UI.cityOpen.logN !== G.logN) UI.cityOpen = null;
+  const ov = !!UI.cityOpen;
   const regTg = (tg, e) => { if (tg) { e.setAttribute('data-t', tg); e.setAttribute('data-a', 't'); UI.tgEls[tg] = e; } };
+  bd.appendChild(sceneEls(R));
   // ---- places
   for (const t of R.tiles) {
     const info = tileInfo(t.kind, t.i), tg = tileTg(t.kind, t.i);
@@ -226,10 +248,10 @@ function renderBoard() {
     if (UI.sel && UI.sel.tg === tg) e.classList.add('sel');
     if (t.kind === 'bev' || t.kind === 'sev') {
       const ev = (t.kind === 'bev' ? G.bev : G.sev)[t.i];
-      if (ev.o !== -1 && ev.o != null) { e.classList.add('done'); e.appendChild(h('div.pw', pawn(ev.o, 18))); }
+      if (ev.o !== -1 && ev.o != null) { e.classList.add('done'); e.appendChild(h('div.pw', pawn(ev.o, t.ps || 18))); }
     } else if (/basic|forest|haven|journey/.test(t.kind)) {
       const ws = workersAt(t.kind, t.i);
-      if (ws.length) { const pw = h('div.pw'); ws.slice(0, 4).forEach(s => pw.appendChild(pawn(s, t.h < 40 ? 18 : 22))); e.appendChild(pw); if (!info.shared && t.kind !== 'journey' && t.kind !== 'haven') e.classList.add('taken'); }
+      if (ws.length) { const pw = h('div.pw'); ws.slice(0, 4).forEach(s => pw.appendChild(pawn(s, t.ps || 22))); e.appendChild(pw); if (!info.shared && t.kind !== 'journey' && t.kind !== 'haven') e.classList.add('taken'); }
     }
     bd.appendChild(e);
   }
@@ -256,33 +278,39 @@ function renderBoard() {
     for (let s = 0; s < G.np; s++) c.appendChild(chipEl(s, n));
     if (G.grim) c.appendChild(chipEl('G', n));
     bd.appendChild(c); }
-  // ---- my city (and rival open destinations I may visit)
+  // ---- my city (and rival open destinations I may visit): a compact strip of 15 slots; a tap opens it full screen
   const fs = focusSeat(), me = G.players[fs], cityBox = R.city, vis = visitList();
+  const cityList = me.city.map(e => ({ id: e.id, e, own: true })).concat(vis.map(x => ({ id: x.id, o: x.o })));
+  // one glow rule for a city card, in the strip or in the full-screen view
+  const cityCard = (b, it, live, plain) => {
+    const tg = 'd:' + it.id;
+    if (live && okw.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
+    else if (live && qLoc.has(tg)) { b.classList.add('glow'); regTg('q:' + qLoc.get(tg), b); qShown.add(qLoc.get(tg)); }
+    else if (live && qCard.has(it.id)) { b.classList.add('glow'); regTg('q:' + qCard.get(it.id), b); qShown.add(qCard.get(it.id)); }
+    else if (!plain) { b.setAttribute('data-a', 'city'); b.setAttribute('data-t', 'x:c' + it.id); }
+  };
   { const strip = placeBox(h('div.strip.city'), cityBox); bd.appendChild(strip);
-    const list = me.city.map(e => ({ id: e.id, e, own: true })).concat(vis.map(x => ({ id: x.id, o: x.o })));
-    const fit = R.strip.city, n = list.length;
+    const fit = R.strip.city, n = cityList.length;
+    if (R.slots) for (let i = 0; i < fit.n; i++) { const sl = h('i.slot'); sl.style.cssText = `left:${fit.x0 + i * fit.step}px;top:${Math.max(1, (cityBox.h - fit.ch) / 2)}px;width:${fit.cw}px;height:${fit.ch}px`; strip.appendChild(sl); }
     strip.appendChild(h('span.scount', (me.city.length) + '/15'));
-    if (!n) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.haven }));
-    list.forEach((it, i) => {
-      const p = posStripCard(cityBox, fit, n, i), tg = 'd:' + it.id;
+    const open = h('button.cityopen', { 'data-a': 'city', type: 'button', 'aria-label': 'Open my city' }); placeBox(open, cityBox); open.appendChild(h('span.cx', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg>' })); bd.appendChild(open);
+    cityList.forEach((it, i) => {
+      const p = R.slots ? { x: fit.x0 + i * fit.step, y: Math.max(1, (cityBox.h - fit.ch) / 2) } : posStripCard(cityBox, fit, n, i);
       const b = h('button.sc', { 'data-zoom': 'card:' + it.id, 'data-id': it.id, type: 'button', 'aria-label': cname(it.id) }, cardEl(it.id, fit.cw, { entry: it.e }));
       if (it.o != null) b.appendChild(h('span.vb', pawn(it.o, 16)));
       b.style.cssText = `left:${cityBox.x + p.x}px;top:${cityBox.y + p.y}px;width:${fit.cw}px;height:${fit.ch}px;z-index:${i + 2}`;
       UI.cr['c' + it.id] = { x: cityBox.x + p.x, y: cityBox.y + p.y, w: fit.cw, h: fit.ch };
-      if (okw.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
-      else if (qLoc.has(tg)) { b.classList.add('glow'); regTg('q:' + qLoc.get(tg), b); qShown.add(qLoc.get(tg)); }
-      else if (qCard.has(it.id)) { b.classList.add('glow'); regTg('q:' + qCard.get(it.id), b); qShown.add(qCard.get(it.id)); }
-      else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:c' + it.id); }
+      cityCard(b, it, !ov, false);
       bd.appendChild(b);
     }); }
   // ---- my stock
   { const r = placeBox(h('div.resrow'), R.res), show = v >= 0 || watching();
-    const rp = R.res.w < 380 ? 19 : 22;
+    const rp = R.res.w < 300 ? 18 : R.res.w < 380 ? 19 : 22;
     for (const k of RESK) r.appendChild(h('span.rs', { 'data-res': k }, ic(k, rp), h('b', show ? me.res[k] : '?')));
     r.appendChild(h('span.rs.pt', { 'data-res': 'point' }, ic('point', rp), h('b', me.pts)));
     r.appendChild(h('span.rs.wk', { 'data-res': 'worker' }, pawn(fs, rp - 2), h('b', availW(me) + '/' + me.workers)));
     bd.appendChild(r); }
-  // ---- my hand
+  // ---- my hand (a fan at the bottom)
   { const handBox = R.hand, strip = placeBox(h('div.strip.hand'), handBox); bd.appendChild(strip);
     const hand = v >= 0 ? G.players[v].hand : [], fit = R.strip.hand, n = hand.length;
     strip.appendChild(h('span.scount', v >= 0 ? n + '/8' : ''));
@@ -291,8 +319,10 @@ function renderBoard() {
     hand.forEach((id, i) => {
       const p = posStripCard(handBox, fit, n, i), tg = 'p:hand:' + id;
       const b = h('button.sc', { 'data-zoom': 'card:' + id, 'data-id': id, type: 'button', 'aria-label': cname(id) }, cardEl(id, fit.cw));
-      b.style.cssText = `left:${handBox.x + p.x}px;top:${handBox.y + p.y}px;width:${fit.cw}px;height:${fit.ch}px;z-index:${i + 2}`;
-      UI.cr['h' + id] = { x: handBox.x + p.x, y: handBox.y + p.y, w: fit.cw, h: fit.ch };
+      let top = handBox.y + p.y;
+      if (R.fan && n > 1) { const mid = (n - 1) / 2, d = i - mid, rot = Math.max(-5, Math.min(5, d * Math.min(4.5, 26 / (n - 1)))), dy = Math.round(d * d * Math.min(1.5, R.fanDrop / (mid * mid + 1))); top = handBox.y + Math.min(handBox.h - fit.ch - 1, 3 + dy); b.style.setProperty('--rot', rot.toFixed(1) + 'deg'); b.classList.add('fan'); }
+      b.style.cssText += `;left:${handBox.x + p.x}px;top:${top}px;width:${fit.cw}px;height:${fit.ch}px;z-index:${i + 2}`;
+      UI.cr['h' + id] = { x: handBox.x + p.x, y: top, w: fit.cw, h: fit.ch };
       if (okp.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
       else if (qCard.has(id)) { b.classList.add('glow'); regTg('q:' + qCard.get(id), b); qShown.add(qCard.get(id)); }
       else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:h' + id); }
@@ -302,9 +332,33 @@ function renderBoard() {
   // ---- action row / tray
   renderActs(mm, qm, qShown);
   if (UI.sel) bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow'));
+  if (ov) { bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow')); cityOverlay(me, cityList, cityCard); }
   renderPrompt();
   renderBar();
   placeFinger();
+}
+// the whole city, full screen: 15 slots in a grid. Usable destinations glow here just as in the strip; tap outside to close.
+function cityOverlay(me, list, cityCard) {
+  const bd = $('#bd'), W = UI.lay.W, H = UI.lay.H, o = h('div#cityov', { role: 'dialog', 'aria-label': 'My city' });
+  o.appendChild(h('div.cvscrim', { 'data-a': 'cityx' }));
+  const nSl = Math.max(15, list.length), cols = 5, rows = Math.ceil(nSl / cols), gp = 6, top = 46;
+  const cw = Math.max(40, Math.min(112, Math.floor(Math.min((W - 24 - (cols - 1) * gp) / cols, (H - top - 70 - (rows - 1) * gp) / rows / CARD_AR)))), ch = Math.round(cw * CARD_AR);
+  const pn = h('div.cvpanel', { 'data-a': 'noop' }); o.appendChild(pn);
+  pn.appendChild(h('div.cvhead', h('b', 'My city'), h('span', me.city.length + '/15')));
+  const grid = h('div.cvgrid'); grid.style.cssText = `grid-template-columns:repeat(${cols},${cw}px);gap:${gp}px`;
+  for (let i = 0; i < nSl; i++) {
+    const it = list[i], cell = h('div.cvcell'); cell.style.cssText = `width:${cw}px;height:${ch}px`;
+    if (it) {
+      const b = h('button.cvc', { 'data-zoom': 'card:' + it.id, 'data-id': it.id, type: 'button', 'aria-label': cname(it.id) }, cardEl(it.id, cw, { entry: it.e }));
+      b.style.cssText = `width:${cw}px;height:${ch}px`;
+      if (it.o != null) b.appendChild(h('span.vb', pawn(it.o, 18)));
+      cityCard(b, it, true, true); cell.appendChild(b);
+    }
+    grid.appendChild(cell);
+  }
+  pn.appendChild(grid);
+  pn.appendChild(h('button.btn.cvx', { 'data-a': 'cityx', type: 'button', 'aria-label': 'Close my city' }, 'Done'));
+  bd.appendChild(o);
 }
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) return v; if (UI.focus != null && UI.focus < G.np) return UI.focus; return Math.max(0, G.phase === 'over' ? 0 : Math.min(G.np - 1, G.cur)); }

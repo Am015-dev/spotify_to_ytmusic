@@ -39,7 +39,7 @@ svg{display:block}
 .its3 .it svg{width:16px;height:16px}
 .nm{font-size:13px;font-weight:700;margin-top:2px;text-align:center;line-height:1.05;color:#2a1f19;text-shadow:0 0 3px #fff;padding:0 3px}
 .tile.ok .face{box-shadow:0 0 0 3px var(--gold),0 0 12px 3px rgba(255,214,90,.9)}
-.tile.no .face{opacity:.55;filter:saturate(.6)}
+.tile.no .face{opacity:.8;filter:saturate(.7)}
 .tile.taken .face{filter:grayscale(.5) brightness(.85)}
 .tile.rec .face{box-shadow:0 0 0 3px #fff,0 0 0 6px #d8452c,0 0 14px 4px rgba(255,255,255,.8)}
 .tile.sel .face,.mc.sel .cd,.sc.sel .cd{outline:3px solid #fff;outline-offset:1px}
@@ -183,6 +183,53 @@ svg{display:block}
 .zbox{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:100%;max-height:100%;overflow:auto;box-shadow:0 14px 40px rgba(0,0,0,.55)}
 .zinfo{display:flex;flex-direction:column;gap:3px;min-width:140px;max-width:260px}.zinfo b{font-size:17px}.zinfo p{margin:2px 0;font-size:14px;line-height:1.35}.zcost{display:flex;align-items:center;gap:4px}
 .ztile.tile{position:relative;width:136px;height:104px;cursor:default}
+/* ---- the picture board: places are little drawings on a woodland clearing; a wooden table under it holds my city, my hand and the buttons ---- */
+.scn{position:absolute;pointer-events:none;overflow:hidden}.scn .scsvg{display:block}
+.tbl{position:absolute;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(0,0,0,.07) 0 2px,transparent 2px 11px),linear-gradient(180deg,#8f6338,#6b4626);box-shadow:inset 0 6px 8px -3px rgba(0,0,0,.55)}
+.tile .face{background:none!important;border:0!important;box-shadow:none!important;overflow:visible;border-radius:0;inset:0}
+.tile .art{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none;filter:drop-shadow(0 2px 1.5px rgba(0,0,0,.35))}
+.tile .its{position:relative;z-index:1;flex-direction:row;gap:7px;align-items:center;justify-content:center}
+.t-forest .its,.t-haven .its,.t-journey .its{gap:3px}
+.tight .t-basic .its{gap:2px}
+.tile .its3{flex-wrap:wrap;width:86%;justify-content:center;gap:0 2px}
+.tile .it{position:relative}
+.it b.bd{position:absolute;right:-7px;bottom:-5px;font-size:13px;line-height:1;font-weight:800;color:#fff;text-shadow:-1px -1px 0 #2a1f19,1px -1px 0 #2a1f19,-1px 1px 0 #2a1f19,1px 1px 0 #2a1f19,0 2px 3px rgba(0,0,0,.5);pointer-events:none}
+.t-journey .it b.bd{right:-3px}.t-forest .its3 .it b.bd{font-size:12px}
+.t-bev .it b.bd,.t-sev .it b.bd{right:-5px;bottom:-4px;font-size:14px}
+.tile .face::after{content:'';position:absolute;inset:1%;border-radius:50%;pointer-events:none}
+.t-bev .face::after,.t-sev .face::after{border-radius:10px;inset:0}
+.t-deck .face::after,.t-disc .face::after,.t-tree .face::after{display:none}
+.tile.glow .face{animation:none}
+.tile.glow .face::after{animation:glowp 1.3s ease-in-out infinite}
+.tile.sel .face{outline:0}.tile.sel .face::after{outline:3px solid #fff;outline-offset:1px}
+.t-deck .face,.t-disc .face,.t-tree .face{background:radial-gradient(circle at 35% 30%,#fff8e6,#e2d0a4)!important;border:2px solid var(--ink)!important;border-radius:11px;inset:1px;box-shadow:0 2px 3px rgba(0,0,0,.4)!important;display:flex;align-items:center;justify-content:center}
+.t-deck .its,.t-disc .its,.t-tree .its{flex-direction:row;gap:1px}
+.t-deck .it b,.t-disc .it b{font-size:13px;color:#2a1f19;text-shadow:none}
+.ztile.tile{width:150px;height:110px}
+.ztile .its{gap:12px}
+.tile .pw{left:50%;right:auto;bottom:-8px;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 2px 1px rgba(0,0,0,.65))}
+.tile .pw .pawnw{margin:0 -3px}
+.t-bev .pw,.t-sev .pw{bottom:-10px}
+.mc .cd{filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+.mc.empty{border:2px dashed rgba(60,35,12,.5)}
+.strip.city{background:rgba(25,15,6,.4)}.strip.hand{background:rgba(25,15,6,.22)}
+.strip.city .scount{left:auto;right:7px;top:3px;font-size:13px}
+.slot{position:absolute;border:1.5px dashed rgba(246,236,214,.38);border-radius:4px;background:rgba(0,0,0,.14);pointer-events:none;box-sizing:border-box}
+.cityopen{position:absolute;margin:0;padding:0;border:0;background:transparent;cursor:pointer;z-index:1}
+.cityopen .cx{position:absolute;right:9px;bottom:3px;width:18px;height:18px;color:#f6ecd6;opacity:.9;pointer-events:none}.cityopen .cx svg{width:100%;height:100%}
+.sc.fan{transform:rotate(var(--rot,0deg));transform-origin:50% 140%}
+.resrow{background:linear-gradient(180deg,#8f6338,#6b4626);border:2px solid #3b2a1a;box-shadow:0 2px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.2)}
+.chip{box-shadow:0 2px 3px rgba(0,0,0,.35)}
+#cityov{position:absolute;inset:0;z-index:46}
+.cvscrim{position:absolute;inset:0;background:rgba(20,14,8,.82)}
+.cvpanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px}
+.cvhead{display:flex;gap:10px;align-items:baseline;color:#f6ecd6;font-size:18px}.cvhead span{font-size:15px;opacity:.85}
+.cvgrid{display:grid;justify-content:center}
+.cvcell{position:relative;outline:2px dashed rgba(246,236,214,.35);outline-offset:-2px;border-radius:8px;background:rgba(0,0,0,.22)}
+.cvc{position:absolute;left:0;top:0;margin:0;padding:0;border:0;background:none;display:block}
+.cvc .cd{position:absolute;left:0;top:0}
+.cvc.glow{z-index:3}.cvc.glow .cd{border-radius:6px;animation:glowp 1.3s ease-in-out infinite}
+.cvx{min-width:120px}
 .pcard{top:0;bottom:0;border-top:0}
 .gx-bar .gx-ibtn{flex:0 0 auto}
 /* phones */
