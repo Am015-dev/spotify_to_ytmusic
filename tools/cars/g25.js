@@ -64,7 +64,7 @@ for(const mode of (process.env.MODES||'top,iframe').split(',')){
   ok(lat.length===4&&lat.every(x=>x<.3),`${mode} form swap under 0.3 s (${lat.map(x=>x.toFixed(2)).join(',')||'no road/dirt spot'})`)}
  await ctx.close()}
  // ================= RACE =================
- {const {ctx,p,F,tap,shot}=await open(mode,true);const tick=n=>F.evaluate(n=>__tick(n),n);
+ if(!process.env.SKIPRACE){const {ctx,p,F,tap,shot}=await open(mode,true);const tick=n=>F.evaluate(n=>__tick(n),n);
  await F.evaluate(()=>__dbg.RS('quick'));lg(mode+' race start');
  const R0=await F.evaluate(()=>({W:__cr25.W,M:__cr25.MARGIN,LS:__cr25.LS,n:__cr25.ships.length,xs:__cr25.ships.map(s=>+s.x.toFixed(1))}));console.log('  track',JSON.stringify(R0));ok(R0.W>=14&&R0.W<=20,`${mode} race track width ${R0.W.toFixed(1)} m`);
  await p.keyboard.down('ArrowUp');for(let i=0;i<20;i++)await tick(30);await shot('race_go',1);
