@@ -565,7 +565,7 @@ const GAMES=[
    blurb:'Draw a tile, lay it where it fits and grow a sunlit Provence valley of walled towns, roads, rivers and priories. Place followers to claim them, and farmers to profit from the fields.',
    stats:[['2–6','players'],['45','minutes'],['7+','ages'],['138','tiles']],
    chips:['Vs computer · 3 levels','Hot-seat','Online with friends','Guided first game','The Riverlands','Taverns & Basilicas','Merchants & Masons']},
-  {id:'shortfuse',cover:'covers/short-fuse.jpg',name:'Short Fuse (preview)',src:'short-fuse/index.html',ribbon:'Co-op deduction',ref:false,
+  {id:'shortfuse',cover:'covers/short-fuse.jpg',name:'Short Fuse',src:'short-fuse/index.html',ribbon:'Co-op deduction',ref:false,
    blurb:'A cartoon demolition crew defuses rigged charges together. Everyone sees only their own wires: point at a teammate\'s wire, call a number and cut as a pair. One red wire and it all goes bang. Play with computer teammates, pass one device around, or online with friends. Preview: the hardest jobs are still being tuned.',
    stats:[['2–5','players'],['30','minutes'],['10+','ages'],['66','jobs']],
    chips:['Preview','Co-op','Computer teammates · 3 levels','Hot-seat','Online with friends','Guided first game','All 66 jobs','Gear & crew powers']},
@@ -619,7 +619,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const clean=n=>n.replace(/\s*\(preview\)\s*$/,'');
 /* build status for the shelf filter: k = done | testing | progress | todo, st = has story mode */
 const STATUS={sunglaze:['done',1],cauldron:['done',1],doorkick:['done',1],thornbound:['done',1],lantern:['done',1],hollowbough:['done',1],tidewake:['done',1],
- kaiten:['done',1],approach:['done',1],shipwreck:['testing',1],crown:['progress',0],nebula:['progress',0],shortfuse:['todo',0],rampart:['todo',0],sands:['todo',0]};
+ kaiten:['done',1],approach:['done',1],shipwreck:['testing',1],crown:['progress',0],nebula:['progress',0],shortfuse:['done',1],rampart:['todo',0],sands:['todo',0]};
 const stOf=g=>{const x=STATUS[g.id];return x?{k:x[0],st:!!x[1]}:null};
 const ST_LABEL={done:'Completed',testing:'Under testing',progress:'Being rebuilt',todo:'Story mode coming'};
 const isPrev=g=>{const x=stOf(g);return !!x&&x.k!=='done'};
