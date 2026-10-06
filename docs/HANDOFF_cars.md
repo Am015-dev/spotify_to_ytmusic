@@ -42,3 +42,22 @@ How to run them:
 - Headless rendering is under 1 fps, so never sample on wall-clock time; step frames instead.
 - Measure with `Box3.setFromObject(o, true)`. The geometry box times `matrixWorld` overstates spinning wheels by r·(√2−1).
 - A GLOWP glow point is 6 units wide. Keep it more than 14 m from the camera AND more than 8 m from the player.
+
+## pCAR25 prototype (pCAR25.py, WIP, not reviewed)
+`W = CR_trackW(def.w) = clamp(0.38·w, 14, 20)`, applied on top of pCAR24.
+
+Results from one quick race (jit3.js):
+- The track builds and races with no errors.
+- The narrow track reads much faster.
+
+Problems found:
+1. **Too many takedowns.** pCAR24 makes any contact above 150 km/h a takedown, and in the tight pack the player takes down a rival every few seconds, each with a crash cam. Fix: keep a cooldown on the crash cam, or require boost for AI takedowns on narrow tracks.
+2. **Camera in the wall.** One frame showed the camera inside a wall. The camera's lateral lead and wall clearance need clamping to `HALF`.
+3. **Not yet checked:**
+   - the starting grid of 8 across 14–20 m;
+   - the AI dodge (6 m) and `MARGIN` 3.2;
+   - traffic lanes and props/mines `x`;
+   - jump widths (`jw`);
+   - boat sections and tunnels;
+   - per-track lap-time balance on all tracks;
+   - the 2-player split.
