@@ -619,7 +619,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const clean=n=>n.replace(/\s*\(preview\)\s*$/,'');
 /* build status for the shelf filter: k = done | testing | progress | todo, st = has story mode */
 const STATUS={sunglaze:['done',1],cauldron:['done',1],doorkick:['done',1],thornbound:['done',1],lantern:['done',1],hollowbough:['done',1],tidewake:['done',1],
- kaiten:['done',1],approach:['testing',1],shipwreck:['testing',1],crown:['progress',0],nebula:['progress',0],shortfuse:['todo',0],rampart:['todo',0],sands:['todo',0]};
+ kaiten:['done',1],approach:['done',1],shipwreck:['testing',1],crown:['progress',0],nebula:['progress',0],shortfuse:['todo',0],rampart:['todo',0],sands:['todo',0]};
 const stOf=g=>{const x=STATUS[g.id];return x?{k:x[0],st:!!x[1]}:null};
 const ST_LABEL={done:'Completed',testing:'Under testing',progress:'Being rebuilt',todo:'Story mode coming'};
 const isPrev=g=>{const x=stOf(g);return !!x&&x.k!=='done'};
