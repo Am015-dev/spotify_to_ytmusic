@@ -88,8 +88,8 @@ for(const mode of (process.env.MODES||'top,iframe').split(',')){
  // traffic: lunge wrecks, plain contact bumps
  {const t1=await F.evaluate(()=>{const P=__dbg.PL,T=__cr25.traffic;const c=T.find(c=>!c.wreck);if(!c)return -1;c.dist=P.dist+.3;c.x=P.x+(P.x>0?-2.8:2.8);c.v=P.v;P.rollCd=0;P.nitro=false;P.boost=0;return T.indexOf(c)});
   if(t1>=0){const side=await F.evaluate(i=>Math.sign(__cr25.traffic[i].x-__dbg.PL.x)*(__dbg.RC.mirror?-1:1),t1);await tap(side>0?'tR':'tL');await p.waitForTimeout(110);await tap(side>0?'tR':'tL');let wr=false;for(let f=0;f<20&&!wr;f++){await F.evaluate(i=>{const P=__dbg.PL,c=__cr25.traffic[i];if(!c.wreck){c.dist=P.dist+.3;c.v=P.v}},t1);await tick(1);wr=await F.evaluate(i=>!!__cr25.traffic[i].wreck,t1)}ok(wr,`${mode} race lunge wrecks traffic`)}
-  await tick(80);const t2=await F.evaluate(()=>{const P=__dbg.PL,T=__cr25.traffic;const c=T.find(c=>!c.wreck);if(!c)return -1;c.dist=P.dist+9;c.x=P.x;c.v=P.v*.5;return T.indexOf(c)});
-  if(t2>=0){let wr=false;for(let f=0;f<60;f++){await tick(1);wr=wr||await F.evaluate(i=>!!__cr25.traffic[i].wreck,t2)}ok(!wr,`${mode} race plain contact with traffic = bump`)}}
+  await tick(260);await F.evaluate(()=>{__cr25.wl.length=0});const t2=await F.evaluate(()=>{const P=__dbg.PL,T=__cr25.traffic;const c=T.find(c=>!c.wreck);if(!c)return -1;c.dist=P.dist+9;c.x=P.x;c.v=P.v*.5;return T.indexOf(c)});
+  if(t2>=0){let wr=false;for(let f=0;f<60;f++){await tick(1);wr=wr||await F.evaluate(i=>!!__cr25.traffic[i].wreck,t2)}ok(!wr,`${mode} race plain contact with traffic = bump ${JSON.stringify(await F.evaluate(()=>__cr25.wl))}`)}}
  // play on 10 s with real steering-free driving, then camera report
  for(let i=0;i<20;i++)await tick(30);await shot('race_late',1);
  const cam=await F.evaluate(()=>__cr25.cam);console.log('  cam',JSON.stringify(cam));ok(true,`${mode} race camera clamped ${cam.n} frames (max pre-clamp |l|/HALF ${cam.pre.toFixed(2)})`);
