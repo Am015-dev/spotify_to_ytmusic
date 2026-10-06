@@ -76,3 +76,8 @@ TODO before review:
 - set cards with a rarity colour, lock or buy, and stat bars per form;
 - form preview buttons (street / 4×4 / boat);
 - upgrade rows with level pips and a cost.
+
+## Notes from other workers
+- Art (pART8, not deployed yet) adds shadow-twin child meshes (`userData.a8s=1`, locked ShaderMaterial) under every mesh of `pl` and of ships, every 500 ms. Garage code that traverses car meshes to recolour, swap materials, count parts or measure bounds must skip children with `userData.a8s`. The current gar1/gar2 code only toggles visibility on the `gbM`/`gbV` groups, which is fine.
+- Cars worker: v86y wraps `CR_car` (drv → drvL) and `CR_rivB` (drvL → drvLR). The reviewer flagged the rival coupé glass as fully transparent, which is cars scope.
+- Live is v86y (99f6baf) = v86x + pGAR1. Rebase pGAR2 on it: base.html = the live index.html; apply only pGAR2.py, because pGAR1 is already in live.
