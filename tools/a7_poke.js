@@ -1,0 +1,6 @@
+(()=>{const M=__mho,D=__dbg,T=D.THREE;const rc=new T.Raycaster();rc.far=6;const safe=[],grass=[];D.scene.traverse(o=>{if(!o.isMesh||!o.visible)return;for(let a=o;a;a=a.parent)if(!a.visible)return;const g=o.geometry;if(!g||!g.attributes.position||!g.attributes.position.array||(g.index&&!g.index.array))return;if(o.material&&o.material.transparent)return;safe.push(o);if(o.userData.trG)grass.push(o)});
+const B=new T.Box3();for(const o of grass)B.union(new T.Box3().setFromObject(o));let seed=11;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+// sample only inside the city box around the drivable hub (±2.5 km)
+let n=0,road=0,poke=0;const ex=[];for(let i=0;i<40000&&n<6000;i++){const x=-2500+rnd()*5000,z=-2500+rnd()*5000;const g=M.gnd(x,z,80);rc.set(new T.Vector3(x,g+2,z),new T.Vector3(0,-1,0));const r=rc.intersectObjects(safe,false);if(r.length<2)continue;n++;
+ const top=r[0],nx=r.find(q=>!q.object.userData.trG);if(!nx)continue;const gr=r.find(q=>q.object.userData.trG);if(!gr)continue;if(Math.abs(nx.point.y-gr.point.y)>.15)continue;road++;if(top.object.userData.trG){poke++;if(ex.length<6)ex.push([x|0,z|0,+(gr.point.y-nx.point.y).toFixed(3)])}}
+return JSON.stringify({samples:n,overlaps:road,poke,pct:+(100*poke/Math.max(1,road)).toFixed(2),ex})})()

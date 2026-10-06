@@ -1,4 +1,4 @@
-# ART handoff (branch alex/od-art) — last deploy v86i = live 594ccf7 (reviewer PASS b0119e9); beta artifact v79
+# ART handoff (branch alex/od-art) — last deploy v86w = live a23e93e (reviewer PASS 3c3e325); beta artifact v90
 Build ALWAYS on the current live page: `./art.sh` fetches alex/brave-carson-rbpmlk, takes games/mainhattan-overdrive/index.html body + km.js, applies pART1-5 → overdrive.html. Split = copy overdrive.html + km.js into outART/; `node tools/tOut.js http://127.0.0.1:8798/overdrive.html` must print OUTBOOT PASS. Re-check live HEAD right before tools/deploy.sh. No deploy without a PASS from the reviewer session (session_01Y6FYerWwxv43FuKUcaUT4v).
 Modules sit between /*ART<name>*/ … /*ART</name>*/ markers (artlib.py swaps them in place; anchor edits use RR, which skips edits already applied).
 - art.js (pART1): deep-blue sky + brick-cloud ring, true-scale subtle studded grass (walk/yard/park), grey asphalt with a double yellow line (road, street, resSt, Athens cobble), midday light, day reflection env without neon boxes (no pink water), flash/hitFx clamp ≤ 1.
@@ -13,11 +13,18 @@ Open (not blocking):
 2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
 
-## pART7 IN REVIEW (2026-10-06, art session session_01SjRvRbQzJBAQ18L9ojf9Kb) — candidate 3c3e325 = live v86v 810a5fb + pART7, split in outART/, tOut PASS; REVIEW sent to session_01Y6FYerWwxv43FuKUcaUT4v
-- art7.js + pART7.py (in art.sh): gndBuild non-river cells = adaptive quadtree (ART7_quad/ART7_flat: leaf triangles within 3 cm of tH at 25 points, leaves ≥ 3 m, vertices shared per mesh); river-bank cells: verified step ART7_res (was 25 m, no hill check); outer land y0 −.25 → −.01 + tm polygonOffset; ground y0 offset −.015 → −.005; pART5 draped streets/crossings 4 m segments both ways.
-- Measured (scratchpad grass.js: raycast visible grass vs __mho.gnd at 40 random points per trG tile): live v86v 65 % outside ±5 cm (p01 −0.31) → 0 % (−0.047..+0.014). Grass-over-road (poke.js) 19.8 % → 2.6 %. Terrain 292k → 598k verts / 912k tris. Menu load unchanged (~5.5 s).
-- Tools: local_dbg.html needs node_modules in the served dir (`ln -s $PWD/node_modules outART/`); curl /eval with --data-binary for multi-line files; kill dev.js by explicit PID with -9 (SIGTERM leaves port 9333 busy).
-- On PASS: `./art.sh <live commit>` (check `git log -1 origin/alex/brave-carson-rbpmlk -- games/mainhattan-overdrive/`), cp overdrive.html km.js outART/, tOut, `bash tools/deploy.sh outART "Mainhattan Overdrive v86w: …"`, republish beta, report to coordinator with shots in devkit docs/shots/v86w/.
+## NEXT: pART8 for a FRESH art session (coordinator brief 2026-10-06 11:52 UTC; Alex scored v86v 2/10)
+1. Roads: ZERO grass/terrain poking through any road surface in Frankfurt AND Athens ("terrain merges with the road with random blobs"); roads always on top, no z-fighting at road edges. Verify with 852×393 shots along whole roads in both cities.
+   - Measure: tools/a7_poke.js (eval in dev.js on local_dbg.html; curl --data-binary): live v86v 19.8 % of road-over-grass samples had grass on top, v86w 2.6 %. Remaining examples on v86w: (813,497) +0.118, (793,-1088) +0.056, (918,-573) +0.053 (also on live).
+   - Causes found: road strips follow groundY only at their vertices (abStrip at path points; pART5 filler streets now 4 m segments) so chords sag under the exact grass on humps. Options: densify/drape every road strip type to ≤ 4 m, give road materials polygonOffset (factor −2, units −4) against the ground, and/or lower ground vertices under road footprints.
+   - Athens: ground meshes free their index buffers after upload (318 meshes), so raycasts throw there; measure in a debug build that keeps the arrays (find the onUpload/dispose hook) or by rendering a top-down depth/colour check.
+2. Shadows: Alex now WANTS car shadows (overrides "no shadows"; he hated the big blurry blob). Every car (player, AI, traffic) gets a crisp car-shaped sun shadow on the ground, LEGO 2K Drive style; keep the tyre patches (art6.js). Cheap: a shadow map limited to cars near the camera (small frustum following the player, cars castShadow only within ~40 m, ground receiveShadow), or projected silhouettes if too slow. art6.js currently forces castShadow=false on car meshes (ART6_noCast) — undo that for the shadow pass.
+   Gate: low side + chase shots in both cities, fps vs live (tools/fpsCmp.js), reviewer PASS, deploy, report.
+
+## pART7 DONE — live v86w a23e93e (reviewer PASS 3c3e325), beta artifact v90
+- art7.js + pART7.py (in art.sh): gndBuild non-river cells = adaptive quadtree (ART7_quad/ART7_flat: leaf triangles within 3 cm of tH at 25 points, leaves ≥ 3 m, shared vertices); river-bank cells: verified step ART7_res (was 25 m with no hill check); outer land y0 −.25 → −.01 + tm polygonOffset; ground offset −.015 → −.005; pART5 draped streets/crossings 4 m segments both ways.
+- Grass vs physics (tools/a7_grass.js): live 65 % outside ±5 cm → 0 % (−0.047..+0.014). Terrain 292k → 598k verts / 912k tris. Frame time, software GL (tools/fpsCmp.js, median ms): park 1056→1092 (+3 %), hill 1061→1175 (+11 %), city 1068→1175 (+10 %); software rendering overstates vertex cost, iPhone not measurable here. If Alex reports slowdown: coarser leaves away from roads/camera.
+- Tools: local_dbg.html needs node_modules in the served dir (`ln -s $PWD/node_modules outART/`); kill dev.js by explicit PID with -9 (SIGTERM leaves port 9333 busy); the beta artifact page = its own inner shell (title "Overdrive Beta") + split body + km.js in files.
 
 ## pART6 DONE — reviewer PASS ccc8ab3; deploy candidate v86v = outART/ at d7b5ee7 (live v86u + pART1-6); deploy was refused by session permissions → handed to the coordinator 09:50 UTC
 ### (history) pART6 IN PROGRESS (handoff 2026-10-06 ~08:40 UTC; previous art session session_01FmQ73V8iH1VEUuWjWpM751 is over its context budget)
