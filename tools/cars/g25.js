@@ -70,7 +70,7 @@ for(const mode of (process.env.MODES||'top,iframe').split(',')){
  await p.keyboard.down('ArrowUp');for(let i=0;i<20;i++)await tick(30);await shot('race_go',1);
  const ps=()=>F.evaluate(()=>{const P=__dbg.PL;return{x:P.x,rc:P.rollCd,rt:P.rollT,kmh:+(P.v*3.6).toFixed(0),air:!!P.air}});
  // lunge 10/10 by touch (mirror-safe: compare against the sign of the tap)
- let lh=0,dx=[];for(let k=0;k<10;k++){const id=k%2?'tL':'tR';let a=await ps();for(let g=0;g<20&&(a.air||a.rc>0);g++){await tick(10);a=await ps()}await tap(id);await p.waitForTimeout(110);await tap(id);await tick(30);const b=await ps();dx.push(+(b.x-a.x).toFixed(1));if(Math.abs(b.x-a.x)>2&&b.rc>0)lh++;await tick(40)}
+ let lh=0,dx=[];for(let k=0;k<10;k++){const id=k%2?'tL':'tR';let a=await ps();for(let g=0;g<20&&(a.air||a.rc>0);g++){await tick(10);a=await ps()}await tap(id);await p.waitForTimeout(110);await tap(id);await tick(30);const b=await ps();dx.push(+(b.x-a.x).toFixed(1));const M=await F.evaluate(()=>__cr25.MARGIN);if(b.rc>0&&Math.sign(b.x-a.x)===(k%2?-1:1)*(await F.evaluate(()=>__dbg.RC.mirror?-1:1))&&(Math.abs(b.x-a.x)>2||Math.abs(b.x)>=M-.15))lh++;await tick(40)}
  ok(lh===10,`${mode} race touch lunge ${lh}/10 (dx ${dx.join(',')})`);
  // 3 SMASH hits on a rival -> takedown; health bar visible before
  const rv=await F.evaluate(()=>{const P=__dbg.PL;const O=__cr25.ships.find(s=>!s.isPlayer&&s.dead<=0);return __cr25.ships.indexOf(O)});

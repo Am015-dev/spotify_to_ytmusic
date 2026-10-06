@@ -99,7 +99,7 @@ wreckTraffic=(f=>function(c,by,pw){CR_WL.push({pl:!!(by&&by.isPlayer),ch:!!(by&&
 window.__cr25={get cars(){return HUB.cars},get ships(){return ships},get traffic(){return traffic},get W(){return W},get HALF(){return HALF},get MARGIN(){return MARGIN},get CC(){return !!CC},cam:CR_CAMX,wl:CR_WL,get LS(){return CR_LS},demo(x,y,z,h){const g=CR_grp(CR_car({body:'#d01712',acc:'#fac80a',wing:'#fac80a'}),'cr25demo');const b=new THREE.Box3().setFromObject(g),k=2.05/(b.max.x-b.min.x);g.scale.setScalar(k);g.position.set(x,y-b.min.y*k+.03,z);g.rotation.y=h;scene.add(g);return g}};
 updateCam=(f=>function(dt,snap){f(dt,snap);try{CR_hbStep()}catch(e){}try{if((state!=='race'&&state!=='countdown'&&state!=='finished')||!TD)return;const s=CC&&CC.s?CC.s:pl;if(!s)return;
  frameAt(TD,s.dist,F2);const c=camera.position,al=(c.x-F2.p.x)*F2.t.x+(c.y-F2.p.y)*F2.t.y+(c.z-F2.p.z)*F2.t.z;frameAt(TD,s.dist+al,_cr25F);const F=_cr25F;
- const rx=c.x-F.p.x,ry=c.y-F.p.y,rz=c.z-F.p.z,l=rx*F.r.x+ry*F.r.y+rz*F.r.z,lim=HALF-.9;CR_CAMX.pre=Math.max(CR_CAMX.pre,Math.abs(l)/HALF);if(Math.abs(l)<=lim)return;CR_CAMX.n++;const dl=Math.sign(l)*lim-l;c.addScaledVector(F.r,dl);
+ const rx=c.x-F.p.x,ry=c.y-F.p.y,rz=c.z-F.p.z,l=rx*F.r.x+ry*F.r.y+rz*F.r.z,lim=HALF-.9;if(Math.abs(l)>HALF*4||Math.abs(al)>80)return;CR_CAMX.pre=Math.max(CR_CAMX.pre,Math.abs(l)/HALF);if(Math.abs(l)<=lim)return;CR_CAMX.n++;const dl=Math.sign(l)*lim-l;c.addScaledVector(F.r,dl);
  if(CC&&CC.s){const w=CC.s;camera.lookAt(w.mesh.position.clone().add(w.mesh.userData.m.position))}else camera.lookAt(camLook)}catch(e){}})(updateCam);
 '''
 import re
