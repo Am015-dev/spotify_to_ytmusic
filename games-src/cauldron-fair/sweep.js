@@ -99,7 +99,9 @@ const RSCOVER = () => {
 const pageErrs = p => p.errs.splice(0);
 // ---------------- one tap, checked ----------------
 async function tapCtl(p, tag, c) {
-  const before = await p.evaluate(PROBE); await p.touchscreen.tap(c.x, c.y);
+  const before = await p.evaluate(PROBE);
+  if (!before.ctl.some(z => z.a === c.a && z.k === c.k && z.t === c.t && z.cls === c.cls)) return true;   // the screen changed under the finger (the day report opened): choose again, don't tap what is no longer there
+  await p.touchscreen.tap(c.x, c.y);
   if (before.boom || before.pulling || c.a === 'mv' && /Draw/.test(c.t) && before.pulling) { await sleep(120); return true; }
   const t0 = Date.now(); let moved = false;
   while (Date.now() - t0 < 1600) { await sleep(70); const s = await p.evaluate(PROBE).catch(() => null); if (!s) { moved = true; break; } if (s.sig !== before.sig) { moved = true; break; } }
