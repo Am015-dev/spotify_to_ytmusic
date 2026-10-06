@@ -24,7 +24,7 @@
 | baseline Frankfurt + Athens, serial | **16.5 min** |
 | FAST=1 serial (before synthetic touch) | 5.3 min |
 | FAST=1 serial (synthetic touch clock) | 4.2 min |
-| `tools/tplay_fast.sh` (cities in parallel) | **3.1 min** (188 s) |
+| `tools/tplay_fast.sh` (cities in parallel) | **3.1 min** (188 s); results within noise, not identical (see below) |
 | FAST=1 Frankfurt only | ~2.2 min |
 Floor: Athens world build = ~90 s of CPU with no throttle, the same with or without ?fast=1. 44 % of it is `athShelfY` (>16M distinct calls; a memo does not help).
 Perf lead for the game itself (not touched here): the Athens load is CPU-bound in gndBuild → TR_Y → athShelfY.
@@ -34,7 +34,10 @@ Perf lead for the game itself (not touched here): the Athens load is CPU-bound i
   (Frankfurt 1→2 hits, 66.4→66.8 km/h), because wall-clock timers, time-sliced loading and menu-attract random draws shift the run.
 - Fast mode, frame clock, Frankfurt at THROTTLE=1 vs THROTTLE=4 (4× speed difference): hits 0/0, stuck 12.8/12.8 %, 65.9/65.9 km/h, smash 2.6/2.6 per min, identical.
   Remaining diff before the auto-tick fix: start-up ambient traffic only (traffic120m 1.5/1.2).
-- Final contended check (1 solo + 4 parallel Frankfurt runs): see the table at the end.
+- Contended check, final build (1 solo run, then 4 Frankfurt runs in parallel): hits 2/1/0/0/0, stuck 12.8 % in all 5, km/h 63.1/63.1/67.1/67.1/67.1,
+  smash/min 0.9/6.1/9.6/9.6/9.6. Three of the parallel runs match exactly; the solo run differs. So fast mode is NOT fully deterministic under CPU contention yet:
+  some wall-clock input remains (likely event delivery order vs frames in tPlay's touch path). Parallel results are within noise, not identical.
+  Next step if needed: log per-frame RO.x/z in solo vs contended and find the first diverging frame.
 - Fast vs baseline: within the baseline's own cross-speed spread for Frankfurt (0–3 hits, 61–67 km/h, stuck 12.1–12.8 %). Athens diverges more (a chaotic route: 2 wall hits at 25 km/h vs 0 walls at 57–64 km/h);
   pre-existing failures are unchanged in both (Frankfurt stuck 12 %, DRIFT hidden after rotation).
 - Synthetic touch timing changes the tap gaps (game-time based instead of wall), so its numbers are a new deterministic baseline, not the old run replayed.
