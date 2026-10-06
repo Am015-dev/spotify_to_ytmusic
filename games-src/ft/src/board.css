@@ -101,9 +101,9 @@ html.land .gx-bar .gx-ibtn>span{display:none}
 #modal{padding:8px}.mbox{box-sizing:border-box;max-height:calc(100dvh - 16px)}
 .mbox .acts{position:sticky;bottom:0}
 /* wide screens: the table on the left, the scores, the line and the buttons in a rail on the right */
-html.land .gx-board{display:grid;grid-template-columns:minmax(0,1fr) 250px;grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"table seats" "table line" "table ." "table acts";column-gap:6px}
-html.land #table{grid-area:table;flex-direction:row}html.land #seats{grid-area:seats;flex-direction:column}html.land #line{grid-area:line;white-space:normal;line-height:1.2;padding:4px 0}html.land #acts{grid-area:acts}
-html.land #mkt{flex:0 0 150px;justify-content:flex-start}
+html.land .gx-board{display:grid;grid-template-columns:minmax(0,1fr) 150px 250px;grid-template-rows:auto auto minmax(0,1fr) auto;grid-template-areas:"gw mkt seats" "gw mkt line" "gw mkt ." "gw mine acts";column-gap:6px}
+html.land #table{display:contents}html.land #gw{grid-area:gw}html.land #mkt{grid-area:mkt;align-self:start}html.land #mine{grid-area:mine;align-self:end}html.land #acts{grid-area:acts}
+html.land #seats{grid-area:seats;flex-direction:column}html.land #line{grid-area:line;white-space:normal;line-height:1.2;padding:4px 0}
 html.land .mrow{grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}html.land .mcard{height:38px}html.land .drow{flex-direction:column}html.land .dcard{flex:0 0 auto;height:32px}
 html.land .sch{padding:2px 8px 3px;flex:0 0 auto}
 html.land .bidt{grid-auto-flow:row;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-columns:auto}
@@ -112,3 +112,8 @@ html.short:not(.land) .ab{min-height:38px;padding:2px 12px;font-size:15px}html.s
 @media (prefers-reduced-motion:reduce){.glow,.mp.h,.popin,.newc,#finger.go{animation:none!important}}
 
 .reftip{position:fixed;z-index:50;max-width:min(260px,calc(100vw - 12px));padding:7px 10px;border-radius:12px;background:#2b1a10;color:#ffeccb;font-size:14px;line-height:1.3;box-shadow:0 6px 18px rgba(0,0,0,.5);pointer-events:none}.reftip b{color:#ffd35a}
+.ab.pw.on{background:#ffe9a8;border-color:#b8532b;box-shadow:0 0 0 2px #ffcf5a}
+html.land #gw{min-height:0;min-width:0}
+html.land #seats[data-n="4"],html.land #seats[data-n="5"]{display:grid;grid-template-columns:1fr 1fr}
+html.land #seats[data-n="4"] .sch .s3,html.land #seats[data-n="5"] .sch .s3{display:none}
+html.land .gx-board{overflow:hidden}
