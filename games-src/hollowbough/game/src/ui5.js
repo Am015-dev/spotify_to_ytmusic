@@ -21,7 +21,8 @@ function newGame(mode, o) {
   UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.sel = null; UI.fingerSeen = false; UI.passArm = 0; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
   UI.holder = hotSeat() ? -1 : -1;
   UI.coach = { level: UI.coach && UI.coach.level || 'full', seen: {} };
-  if (mode !== 'guided') UI.coachOn = false; else UI.coachOn = true;
+  UI.coachOn = false;
+  if (mode === 'guided' && typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { GXH.reset(); GXH.setEnabled(true); } }   // the guided game: every first-time bubble on
   const st = $('#start'); if (st) st.hidden = true;
   closePop(); fxClear(); try { GX.close(); } catch (e) { }
   kitNewGame();
@@ -35,6 +36,7 @@ function render() {
   try { if (window.PerfHUD) PerfHUD.wake(); } catch (e) { }
   UI.mmc = null; renderBoard(); renderCard(); renderDrawers();
   if (NET.on) netRenderHook();
+  if (typeof hlpAfter === 'function') hlpAfter();
 }
 // ---- one-card-at-a-time queue
 function pushCard(c) { UI.cards.push(c); closePop(); render(); }
@@ -62,7 +64,6 @@ function schedule() {
     pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', 'Your hand stays hidden until you tap.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
     return;
   }
-  if (UI.coachOn && coachCheck()) return;
   if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
   if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) placeFinger(); }, 40);
 }

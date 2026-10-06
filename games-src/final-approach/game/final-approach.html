@@ -6982,9 +6982,9 @@ const hq = s => () => document.querySelector(s);
 const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
 const hmine = () => document.querySelector('#pz .tray.' + (actSeat() === 1 ? 'c' : 'p'));
 const HLP_STEPS = {
-  brief: { target: hfirst('#says .say', '#acts [data-a=ready]'), title: 'Share a plan, then roll', text: 'Tap a phrase to tell your partner a plan, never dice values. Then tap Roll.', pic: () => HP.speech() },
-  die: { target: hfirst('#pz .tray.p .die.can', '#pz .tray.c .die.can', '#pz .tray'), title: 'Pick a die', text: 'Only you see these dice. Tap one, then a glowing space on the panel.', pic: () => HP.dice2() },
-  space: { target: hfirst('#pz .slot.legal'), title: 'Tap a glowing space', text: 'Glowing spaces take this die. Tap one to place it, or tap the die again to put it back.', pic: () => HP.tap() },
+  brief: { target: hfirst('#says .say', '#acts [data-a=ready]'), title: 'Plan, then roll', text: 'Tap a phrase to tell your partner a plan, never dice values. Then tap Roll.', pic: () => HP.speech() },
+  die: { target: hfirst('#pz .tray.p .die.can', '#pz .tray.c .die.can', '#pz .tray'), title: 'Pick a die', text: 'Only you see these dice. Tap one, then a glowing space.', pic: () => HP.dice2() },
+  space: { target: hfirst('#pz .slot.legal'), title: 'Tap a glowing space', text: 'Tap a glowing space to place it. Tap the die again to undo.', pic: () => HP.tap() },
   rr: { target: hfirst('#acts [data-a=rrpick]', '#pz .tray .die.can'), title: 'Choose dice to reroll', text: 'Tap the dice you want to roll again, then tap the green button. None is fine.', pic: () => HP.reroll() },
   token: { target: hfirst('#pz .die[data-d=p]', '#pz .tray'), title: 'Place the extra die', text: 'This die must be placed too. Tap it, then a glowing space.', pic: () => HP.token() },
   swap: { target: hfirst('#pz .tray.p .die.can', '#pz .tray.c .die.can', '#pz .tray'), title: 'Hand-over swap', text: 'Your partner offered a die. Pick one of yours to swap with it.', pic: () => HP.swap() }
@@ -7002,7 +7002,7 @@ const HLP_RULES = [
   { phase: 'die', title: 'Engines: every round', text: 'Both fill the Engines. Sum: up to blue marker stays, up to orange moves 1, above moves 2.', pic: () => hpics([['prop', 'Two dice'], '>', ['gauge', 'Speed']]) },
   { phase: 'die', title: 'Radio clears planes', text: 'A die on the Radio clears one plane that many spaces ahead. Your own space counts as 1.', pic: () => hpics([['radio', 'Radio'], '>', ['strip', 'Clear a plane']]) },
   { phase: 'die', title: 'Rerolls and Coffee', text: 'A reroll token rerolls all unplaced dice, for both crew. Spare dice earn Coffee tokens.', pic: () => hpics([['reroll', 'Reroll'], ['cup', 'Coffee']]) },
-  { phase: 'space', title: 'Gear and flaps', text: 'Pilot lowers three gears: 1-2, 3-4, 5-6. Co-pilot extends four flaps in order. All must be done to land.', pic: () => hpics([['gear', 'Pilot: gear'], ['flap', 'Co-pilot: flaps']]) },
+  { phase: 'space', title: 'Gear and flaps', text: 'Pilot lowers three gears, Co-pilot extends four flaps in order. All must be done to land.', pic: () => hpics([['gear', 'Pilot: gear'], ['flap', 'Co-pilot: flaps']]) },
   { phase: 'space', title: 'Brakes: 2, then 4, then 6', text: 'Set the brakes in order, exact values. In the last round your engine total must stay within them.', pic: () => hpics([['brake', 'First', 2], ['brake', 'Then', 4], ['brake', 'Last', 6]]) },
   { phase: 'space', title: 'Coffee tokens', text: 'A die on a Coffee space earns a token. Spend tokens to change a later die by 1.', pic: () => hpics([['die', 'Spare', 2], '>', ['cup', 'Coffee'], '>', ['plus', '+1 / -1']]) },
   { phase: 'space', title: 'Nothing fits?', text: 'If no space takes the die, tap Put it aside. Coffee can change its value by one first.', pic: () => hpics([['aside', 'Put aside']]) },
@@ -7056,7 +7056,7 @@ function hlpPlan() {
   if (!m) return null;
   const why = capW(hlpWhy(m, v), 15); if (!why) return null;
   const sel = typeof UI.sel === 'number' ? UI.sel : -1;
-  if (m.t === 'say') { const q = '#says [data-a=say][data-c="' + m.c + '"]'; return document.querySelector(q) ? { m, why, to: () => document.querySelector(q), from: null } : null; }
+  if (m.t === 'say') { const q = '#says [data-a=say][data-c="' + m.c + '"]'; return (e => e && e.getBoundingClientRect().width > 0)(document.querySelector(q)) ? { m, why, to: () => document.querySelector(q), from: null } : null; }
   if (m.t === 'ready') return { m, why, to: () => document.querySelector('#acts [data-a=ready]'), from: null };
   if (m.t === 'rr') return G.pend ? null : { m, why, to: () => document.querySelector('#acts [data-a=rr]'), from: null };
   if (m.t === 'toss') { if (!hlpDie(v, m.d)) return null; return sel === m.d && document.querySelector('#acts [data-a=toss]') ? { m, why, to: () => document.querySelector('#acts [data-a=toss]'), from: null } : { m, why, to: () => hlpDie(v, m.d), from: null }; }
