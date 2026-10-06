@@ -47,6 +47,9 @@ R("}}else if(crSm||Math.abs(RO.v)>10){c.dead=25;","}}else if(1){c.dead=25;")
 R("if(pl&&pl.nitro)roamHeal(3);else roamDamage(ho?12:5);","if(pl&&pl.nitro)roamHeal(3);else if(!crLg)roamDamage(ho?12:5);")
 # BOOST button: plain BOOST label again
 R("""if(!b.querySelector('.crSm')){const t=b.textContent.trim();if(t==='BOOST'){b.innerHTML='BOOST<span class="crSm">SMASH</span>'}}""","""if(b.querySelector('.crSm'))b.textContent='BOOST';""")
+# empty-BOOST tip goes LEFT of the button (the zone plate / toasts live top-right), and the BOOST button is solid
+R("d.style.left=Math.max(8,Math.min(innerWidth-d.offsetWidth-8,r.left+r.width/2-d.offsetWidth/2))+'px';d.style.top=Math.max(8,r.top-d.offsetHeight-10)+'px';",
+  "d.style.left=Math.max(8,r.left-d.offsetWidth-12)+'px';d.style.top=Math.max(8,Math.min(innerHeight-d.offsetHeight-8,r.top+r.height/2-d.offsetHeight/2))+'px';")
 # (5) form swap: surface hold 0.35 -> 0.1 s, morph 0.38 -> 0.15 s, hover/float blend 3x faster
 R("FL_HOLD=.35","FL_HOLD=.1")
 R("const rt=dt*2.6;s.bt=","const rt=dt*6.5;s.bt=")
@@ -73,6 +76,9 @@ BZ.addEventListener('touchstart',e=>{if(state!=='roam')return;const t=e.changedT
 // the lunge moves the car sideways (screen left/right) for 0.3 s; it stops at walls
 roamStep=(f=>function(dt){if(state==='roam')pressed.roll=0;const r=f(dt);try{if(state==='roam'&&pl&&!RO.wk){RO.crLgCd=Math.max(0,(RO.crLgCd||0)-dt);
  if(RO.crLg>0){RO.crLg-=dt;const k=CR_LGV*dt*RO.crLgD,nx=RO.x-Math.cos(RO.h)*k,nz=RO.z+Math.sin(RO.h)*k;if(!roamHit(nx,nz,1.2,RO.y)){RO.x=nx;RO.z=nz}else RO.crLg=0}}}catch(e){}return r})(roamStep);
+// ---- CAR25: solid BOOST button (dark when empty, filled cyan when there is boost to use)
+(()=>{const st=document.createElement('style');st.textContent=`html body #tN{background:#08324a!important;opacity:1!important;color:#7ff3ff!important;font-weight:900}html body #tN.crOn{background:radial-gradient(circle at 50% 35%,#8ff7ff,#16b4d6 70%)!important;color:#022331!important;border-color:#d6fbff!important;box-shadow:0 0 14px rgba(76,234,255,.6)}`;document.head.appendChild(st)})();
+setInterval(()=>{try{const b=document.getElementById('tN');if(b&&pl)b.classList.toggle('crOn',(pl.bm||0)>(state==='race'?.5:1))}catch(e){}},120);
 // ---- CAR25: rival health bars (name + class) over the nearest rivals ----------------------------------------------------
 (()=>{const st=document.createElement('style');st.textContent=`#crHB{position:fixed;inset:0;pointer-events:none;z-index:6}#crHB .hb{position:absolute;transform:translate(-50%,-100%);text-align:center;white-space:nowrap;font:800 12px/1.1 system-ui;color:#fff;text-shadow:0 1px 2px #000}#crHB .hb small{display:block;font-weight:700;font-size:12px;color:#ffd12c}#crHB .hb i{display:block;width:64px;height:6px;margin:3px auto 0;border-radius:3px;background:rgba(0,0,0,.55);box-shadow:0 0 0 1px rgba(255,255,255,.5);overflow:hidden}#crHB .hb i b{display:block;height:100%;background:#4cff7a}#crHB .hb i b.md{background:#ffd12c}#crHB .hb i b.lo{background:#ff3b55}body.cine #crHB{display:none}`;document.head.appendChild(st)})();
 const CR_HB={el:null,pool:[],v:V3()};
