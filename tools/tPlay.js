@@ -13,7 +13,9 @@ const MODE=process.env.MODE||'both',MIN=+(process.env.MIN||4),CITIES=(process.en
 const results=[];let fails=0;const ok=(c,m,i)=>{console.log((c?'PASS ':'FAIL ')+m+(i!==undefined?' · '+JSON.stringify(i):''));if(!c)fails++};
 // ---- in-page: test-driven rAF clock + per-frame monitor
 const INIT=`(()=>{const q=[];let t=0;window.__auto=true;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};
- window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}if(window.__mon)try{window.__mon()}catch(e){window.__monErr=String(e)}}return t};
+ window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}if(window.__mon)try{window.__mon()}catch(e){window.__monErr=String(e)}
+  if(window.__auto&&window.__fast&&window.__mho&&__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on)){window.__auto=false;break}}return t};  // FAST: auto-ticking ends on the exact frame roam is ready (no wall-clock-dependent idle frames)
+
  setInterval(()=>{if(window.__dbg&&!window.__fastR&&!window.__shooting){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}if(window.__auto)window.__tick(1)},16)})();`;
 // monitor: hits (speed loss not from the brake), stuck, speed, loading screens, smashes, camera inside a building
 const MON=()=>{const M=__mho,R=M.RO;window.__Q={f:0,drive:0,vSum:0,hits:[],stuck:0,stEp:0,ld:0,ldOn:false,ldT:[],camIn:0,smash:0,traf:0,trafN:0,hist:[],lastHit:-99,pos:[],ev:[],ch:null,yh:[],bh:[],y0:0,camS:[]};
@@ -80,6 +82,10 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
  const ctx=await b.newContext(phone?{viewport:vp,deviceScaleFactor:3,isMobile:true,hasTouch:true}:{viewport:vp});const p=await ctx.newPage();p.setDefaultTimeout(900000);
  const errs=[],warns=[];p.on('pageerror',e=>errs.push(e.message.slice(0,200)));p.on('console',m=>{const t=m.text().slice(0,200);if(m.type()==='error')errs.push('console: '+t);else if(m.type()==='warning'&&!/GL Driver|GPU stall|WebGL-/.test(t))warns.push(t)});
  await p.addInitScript(INIT);const cdp=await ctx.newCDPSession(p);if(THR>1)await cdp.send('Emulation.setCPUThrottlingRate',{rate:THR});
+ // FAST=1: touch events carry a synthetic timestamp (e.timeStamp follows it): start + game frames/60 + gesture gaps, so the real
+ // 440/450 ms finger gaps and the BRAKE spacing cost no wall time and tap timing is deterministic. Without FAST: real time, as before.
+ let SYN=Date.now()/1000;const clk=()=>FASTM?SYN*1000:Date.now();const gap=ms=>FASTM?(SYN+=ms/1000,Promise.resolve()):p.waitForTimeout(ms);
+ if(FASTM){const s0=cdp.send.bind(cdp);cdp.send=(m,o)=>s0(m,m==='Input.dispatchTouchEvent'?{...o,timestamp:SYN}:o)}
  const shot=async name=>{if(!SHOTS)return;await p.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}__tick(1)});await p.screenshot({path:path.join(OUT,`${mode}_${name}.jpg`),type:'jpeg',quality:62,timeout:900000});await p.evaluate(()=>{window.__shooting=0;if(!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}})};
  // ---- input: touch fingers (CDP multi-touch) or keys
  const F={};const pts=()=>Object.values(F).map(f=>({x:f.x,y:f.y,id:f.id,radiusX:6,radiusY:6,force:1}));
@@ -87,14 +93,16 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
  const down=async(name,xy)=>{if(!xy)return false;if(F[name])await up(name);let id=0;while(Object.values(F).some(o=>o.id===id))id++;F[name]={x:xy[0],y:xy[1],id};await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:pts()});return true};
  const move=async(name,xy)=>{if(!F[name]||!xy)return;F[name].x=xy[0];F[name].y=xy[1];await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:pts()})};
  // CDP does not release a finger that is just missing from a touchMove, so lift all and put the others back down (game time is frozen meanwhile)
- const up=async name=>{if(!F[name])return;delete F[name];const P=pts();await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});if(P.length){await p.waitForTimeout(440);if(F.brake)brkReal=Date.now();await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:P})}};  // 440 ms real: not a double-tap (roll / park)
+ const up=async name=>{if(!F[name])return;delete F[name];const P=pts();await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});if(P.length){await gap(440);if(F.brake)brkReal=clk();await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:P})}};  // 440 ms real: not a double-tap (roll / park)
  const tap=async(sel)=>{const xy=await center(sel);if(!xy)return false;if(phone){await down('tap',xy);await tick(4);await up('tap')}else{await p.mouse.click(xy[0],xy[1])}await tick(4);return true};
- const tick=n=>p.evaluate(n=>__tick(n),n);const KD={};const key=async(k,on)=>{if(!!KD[k]===on)return;KD[k]=on;on?await p.keyboard.down(k):await p.keyboard.up(k)};
+ const TT={wait:0,nw:0,tick:0,ev:0};if(process.env.TT){const w0=p.waitForTimeout.bind(p);p.waitForTimeout=async ms=>{const t=Date.now();await w0(ms);TT.wait+=Date.now()-t;TT.nw++};const e0=p.evaluate.bind(p);p.evaluate=async(...a)=>{const t=Date.now();try{return await e0(...a)}finally{TT.ev+=Date.now()-t}}}
+ const ttl=m=>{if(process.env.TT)console.log('TT',m,JSON.stringify(TT))};
+ const tick=n=>{if(FASTM)SYN+=n/60;return p.evaluate(n=>__tick(n),n)};const KD={};const key=async(k,on)=>{if(!!KD[k]===on)return;KD[k]=on;on?await p.keyboard.down(k):await p.keyboard.up(k)};
  const ctl={steer:0,gas:false,brake:false,drift:false,boost:false};let brkReal=0;  // a person never taps BRAKE twice within 420 ms (that is the PARK gesture)
  async function apply(c){if(phone){
    if(c.gas!==ctl.gas){c.gas?await down('gas',await center('#tG')):await up('gas')}
    if(c.steer!==ctl.steer){if(!c.steer)await up('st');else{const xy=await center(c.steer<0?'#tL':'#tR');if(F.st)await move('st',xy);else await down('st',xy)}}
-   for(const [k,s] of [['brake','#tB'],['drift','#tD'],['boost','#tN']])if(c[k]!==ctl[k]){if(c[k]&&k==='brake'){const w=420-(Date.now()-brkReal);if(w>0)await p.waitForTimeout(w);brkReal=Date.now()}c[k]?await down(k,await center(s)):await up(k)}}
+   for(const [k,s] of [['brake','#tB'],['drift','#tD'],['boost','#tN']])if(c[k]!==ctl[k]){if(c[k]&&k==='brake'){const w=420-(clk()-brkReal);if(w>0)await gap(w);brkReal=clk()}c[k]?await down(k,await center(s)):await up(k)}}
   else{await key('ArrowUp',c.gas);await key('ArrowDown',c.brake);await key('ArrowLeft',c.steer<0);await key('ArrowRight',c.steer>0);await key('KeyX',c.drift);await key('Shift',c.boost)}
   Object.assign(ctl,c)}
  const releaseAll=async()=>{await apply({steer:0,gas:false,brake:false,drift:false,boost:false})};
@@ -112,7 +120,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   await tap('#hcStory');await tick(10);await tap('#slotList .go');
   for(let i=0;i<120;i++){try{if(await p.evaluate(()=>window.__mho&&__mho.state==='roam'))break;await p.waitForTimeout(2000)}catch(e){await p.waitForTimeout(2000)}}await p.evaluate(()=>{window.__auto=false});
   for(let i=0;i<30;i++){await tick(30);if(!(await tapThrough()))break}
-  await p.evaluate(MON);
+  await p.evaluate(MON);ttl(city+' in roam');
   // scale + layout at the start
   const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny),hudAll=new Set(lay.hud);await shot(city+'_start');let rotR=null;if(phone&&city===CITIES[0])rotR=await rotTrip();
   // ---- the drive: human driver
@@ -164,9 +172,9 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
     reloads++;events.push('RELOAD@'+f);if(snap)parts.push(snap);snap=null;for(const k in F)delete F[k];Object.assign(ctl,{steer:0,gas:false,brake:false,drift:false,boost:false});
     for(let i=0;i<90;i++){try{await p.waitForTimeout(2000);const st2=await p.evaluate(()=>window.__mho&&__mho.state);if(st2==='roam')break;if(st2==='menu'){await tap('#hcStory');await tick(10);await tap('#slotList .go')}}catch(_){}}
     await p.evaluate(()=>{window.__auto=false});await shot(`${city}_reload${reloads}`);await p.evaluate(MON);lastSnap=f;f+=60;continue}}
-  await releaseAll();await tick(30);let st=await p.evaluate(STAT);parts.push(st);st=merge(parts,reloads);delete st.raw;delete st.allHits;const roadEnd=await p.evaluate(ROADPROBE);await shot(city+'_end');
+  ttl(city+' drive done');await releaseAll();await tick(30);let st=await p.evaluate(STAT);parts.push(st);st=merge(parts,reloads);delete st.raw;delete st.allHits;const roadEnd=await p.evaluate(ROADPROBE);await shot(city+'_end');
   const perf=await p.evaluate(()=>{const r=__dbg.renderer;window.__shooting=1;__dbg.composer.render=window.__fastR||__dbg.composer.render;window.__fastR=null;r.info.autoReset=false;r.info.reset();__tick(1);r.info.autoReset=true;window.__shooting=0;const i=r.info.render;const o={calls:i.calls,tris:i.triangles,jsMs:+__mho.PERF.js.toFixed(1),geoms:r.info.memory.geometries,tex:r.info.memory.textures};window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{};return o});
-  cityRes[city]={...st,rot:rotR,scale:sc,road,roadEnd,overlap:[...ovAll],hudOverlap:[...hudAll],tiny:[...tinyAll],extra,events:events.slice(0,12),perf,wallSec:Math.round((Date.now()-T0)/1000)};
+  ttl(city+' end');cityRes[city]={...st,rot:rotR,scale:sc,road,roadEnd,overlap:[...ovAll],hudOverlap:[...hudAll],tiny:[...tinyAll],extra,events:events.slice(0,12),perf,wallSec:Math.round((Date.now()-T0)/1000)};
   console.log(mode,city,JSON.stringify(cityRes[city]));
  }
  // ---- side trips (all through visible UI)
@@ -181,7 +189,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   await p.evaluate(()=>{const T=__mho.touch;T.bz=7;T.sid=8});await tick(2);
   const probe=async(sel,read)=>{const xy=await center(sel);if(!xy)return'hidden';const cov=await p.evaluate(([x,y,s])=>{const e=document.querySelector(s),t=document.elementFromPoint(x,y);return t===e||e.contains(t)||(t&&t.id==='btnZone'&&/tL|tR/.test(s))?'':'covered by '+(t&&(t.id||t.className||t.tagName))},[xy[0],xy[1],sel]);
    await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:xy[0],y:xy[1],id:3}]});await tick(1);const on=await p.evaluate(read);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await tick(2);
-   await p.waitForTimeout(450);return cov||(on?'ok':'NO RESPONSE')};
+   await gap(450);return cov||(on?'ok':'NO RESPONSE')};
   r.ctl={'◀':await probe('#tL',()=>__mho.touch.dir===-1),'▶':await probe('#tR',()=>__mho.touch.dir===1),GAS:await probe('#tG',()=>!!__mho.touch.gas),BRAKE:await probe('#tB',()=>!!__mho.touch.brake||!!__mho.touch.park),BOOST:await probe('#tN',()=>!!__mho.touch.boost),DRIFT:await probe('#tD',()=>!!__mho.touch.hb)};
   r.stuck=await p.evaluate(()=>{const T=__mho.touch;return['gas','brake','boost','hb'].filter(k=>T[k]).concat(T.dir?['dir']:[],T.bz!=null&&T.bz!==7?['bz']:[])});
   r.vp=await p.evaluate(()=>[innerWidth,innerHeight,__dbg.renderer.domElement.width,__dbg.renderer.domElement.height]);await shot('after_rotation');return r}

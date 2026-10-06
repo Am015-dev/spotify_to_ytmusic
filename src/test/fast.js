@@ -26,10 +26,22 @@ if(FAST){
     const run=()=>{pend=false;const c=q.splice(0);t+=1000/60;FAST.f++;for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}if(q.length)kick()};
     const kick=()=>{if(!pend){pend=true;(FAST.f%4===3?setTimeout(run,0):mc.port2.postMessage(0))}};mc.port1.onmessage=run;   // a macrotask every 4th frame lets input/timers in
     window.requestAnimationFrame=cb=>{q.push(cb);kick();return q.length};window.cancelAnimationFrame=()=>{}}
-  // 4) loading screen: the loaders yield one frame per 12 ms of performance.now(); while LD.on that clock runs 25× slower, so the same
-  //    generators finish in ~25× fewer frames (yield points only; what gets built is identical). Outside loading it is the real clock.
-  {const pn=performance.now.bind(performance);let real0=pn(),virt=real0,was=false;
-   performance.now=()=>{const r=pn();if(LD.on){if(!was){was=true}virt+=(r-real0)/25}else{if(was)was=false;virt+=r-real0}real0=r;return virt}}
-  if(!ownClock){const _f=frame;frame=now=>{FAST.f++;_f(now)}}   // external clock (tPlay/g25 __tick): only count frames
+  // 4) deterministic game time: after the first frame, performance.now(), Date.now(), setTimeout/setInterval follow the frame clock
+  //    (the rAF timestamp, +1000/60 per frame), and Math.random is a seeded PRNG reset when free roam is entered. Results then
+  //    depend only on the inputs per frame, not on machine speed or CPU throttle. Time-budget loops (≤ 12 ms slices) see frozen
+  //    time within a frame and simply finish their queue (a phone with unlimited CPU).
+  {const pn=performance.now.bind(performance),dn=Date.now,rST=setTimeout,rCT=clearTimeout,rSI=setInterval,rCI=clearInterval;
+   let VT=null,d0=0,tid=1e7;const T=new Map();FAST.vt=()=>VT;
+   performance.now=()=>VT==null?pn():VT;Date.now=()=>VT==null?dn():d0+VT;
+   const add=(fn,ms,args,rep)=>{const id=++tid;T.set(id,{fn,args,due:VT+Math.max(0,+ms||0),ms:Math.max(1,+ms||0),rep});return id};
+   window.setTimeout=(fn,ms,...a)=>VT==null||typeof fn!=='function'?rST(fn,ms,...a):add(fn,ms,a,false);
+   window.setInterval=(fn,ms,...a)=>VT==null||typeof fn!=='function'?rSI(fn,ms,...a):add(fn,ms,a,true);
+   window.clearTimeout=id=>{if(!T.delete(id))rCT(id)};window.clearInterval=id=>{if(!T.delete(id))rCI(id)};
+   const fire=()=>{for(let k=0;k<1000;k++){let best=null,bi=0;for(const[i,t]of T)if(t.due<=VT&&(!best||t.due<best.due||t.due===best.due&&i<bi)){best=t;bi=i}
+      if(!best)break;if(best.rep)best.due+=best.ms;else T.delete(bi);try{best.fn(...best.args)}catch(e){rST(()=>{throw e})}}};
+   let seed=1;const rnd=()=>{seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+   const reseed=k=>{seed=k|0};reseed(20261006);Math.random=rnd;FAST.reseed=reseed;
+   const _er=enterRoam;enterRoam=(...a)=>{reseed(20261006);return _er(...a)};
+   const _f=frame;frame=now=>{if(VT==null){d0=dn()-now}VT=now;if(!ownClock)FAST.f++;fire();_f(now)}}
 
 }

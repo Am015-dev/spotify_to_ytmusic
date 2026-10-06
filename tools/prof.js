@@ -6,11 +6,11 @@ const INIT=`(()=>{const q=[];let t=0;window.requestAnimationFrame=cb=>{q.push(cb
  window.__auto=true;setInterval(()=>{if(window.__dbg&&!window.__fastR&&!window.__keepR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}if(window.__auto)window.__tick(1)},16)})();`;
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(900000);
- await p.addInitScript(INIT);const cdp=await ctx.newCDPSession(p);if(THR>1)await cdp.send('Emulation.setCPUThrottlingRate',{rate:THR});
+ await p.addInitScript(INIT);if(process.env.CITY)await p.addInitScript('window.__CITY='+JSON.stringify(process.env.CITY));const cdp=await ctx.newCDPSession(p);if(THR>1)await cdp.send('Emulation.setCPUThrottlingRate',{rate:THR});
  p.on('pageerror',e=>console.log('ERR',e.message.slice(0,150)));
  let T=Date.now();const lg=m=>{console.log(((Date.now()-T)/1000).toFixed(1)+'s '+m);T=Date.now()};
  await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});lg('menu');
- await p.evaluate(()=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}))});await p.reload();
+ await p.evaluate(()=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}));if(window.__CITY==='ath'){localStorage.setItem('mho_city@1','ath');localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}});await p.reload();
  await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});lg('menu2');
  if(process.env.PROFLOAD){await cdp.send('Profiler.enable');await cdp.send('Profiler.start')}
  await p.evaluate(()=>{window.__ldlog=[];const t0=performance.now();const o=$=>0;window.__ldT0=Date.now();const iv=setInterval(()=>{const s=document.querySelector('#ldStep'),b=document.querySelector('#ldPct');__ldlog.push([Date.now()-__ldT0,(b&&b.textContent)+' '+(s&&s.textContent)]);if(__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on))clearInterval(iv)},1000)});
