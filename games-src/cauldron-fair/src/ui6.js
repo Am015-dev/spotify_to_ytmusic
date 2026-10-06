@@ -67,6 +67,7 @@ function bfMeter(p, v, fm, legal) {
   return m;
 }
 function brewDeck(p, v, legal) {
+  renderRat(p, legal);
   const dm = legal.find(x => x.t === 'draw'), sm = legal.find(x => x.t === 'stop'), fm = legal.find(x => x.t === 'flask');
   const r = CF.risk(G, v), sp = CF.spaceOf(p), heat = heatOf(p);
   const deck = h('div.bdeck' + (heat > .7 ? '.hot' : ''));
@@ -74,8 +75,6 @@ function brewDeck(p, v, legal) {
   deck.appendChild(bfMeter(p, v, p.lock ? null : fm, legal));
   const extras = [legal.find(x => x.t === 'froth') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'froth')), type: 'button' }, '↩ White chip back, free') : null,
     legal.find(x => x.t === 'restart') ? h('button.btn.alt.sec', { 'data-a': 'mv', 'data-i': legal.indexOf(legal.find(x => x.t === 'restart')), type: 'button' }, 'Do-over: tip the chips back, once') : null].filter(Boolean);
-  const rat = legal.filter(x => x.t === 'ratset');
-  if (rat.length) { const k = p.rat - p.droplet; const d = h('details.ratd', h('summary', h('span', { html: ico('rat', 18) }), 'Head start +' + k)); const row = h('div.ratrow'); rat.forEach(x => row.appendChild(h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(x), type: 'button' }, x.n ? 'Only +' + x.n : 'None'))); d.appendChild(row); extras.push(d); }
   const bagArt = KIT.ART.bag ? h('img.bagimg', { src: KIT.ART.bag, alt: '' }) : h('span.bagimg', { html: ico('bag', 80) });
   const bag = dm ? h('button.btn.drawb.bagb' + (BF.pulling ? '.pull' : ''), { 'data-a': 'mv', 'data-i': legal.indexOf(dm), type: 'button', 'aria-label': 'Draw: pull a chip from your bag (' + bagN(p) + ' chips inside)' },
     h('span.bagwrap', bagArt, h('span.hand', { html: bfHand() }), h('span.bagn', bagN(p))), h('span.bl', 'Draw'))
@@ -188,4 +187,15 @@ function shopBuy() {
   cs.forEach((c, k) => { const r = c.getBoundingClientRect(); try { c.animate([{ transform: 'none', opacity: 1 }, { transform: 'translate(' + (ir.left + ir.width / 2 - r.left - r.width / 2) + 'px,' + (ir.top + ir.height * .3 - r.top - r.height / 2 - 40) + 'px) scale(.8)', offset: .55 }, { transform: 'translate(' + (ir.left + ir.width / 2 - r.left - r.width / 2) + 'px,' + (ir.top + ir.height * .45 - r.top - r.height / 2) + 'px) scale(.2)', opacity: 0 }], { duration: 520, delay: k * 120, fill: 'forwards', easing: 'ease-in' }); } catch (x) { } });
   try { img.animate([{ transform: 'none' }, { transform: 'scale(1.12,.9)' }, { transform: 'none' }], { duration: 300, delay: 480 + (cs.length - 1) * 120 }); } catch (x) { }
   snd('buy'); setTimeout(() => { UI.buying = false; go(); }, 720 + (cs.length - 1) * 120);
+}
+
+// the rat stone's head start is a little pill on the board (never in the dock): tap it, pick how much of it to use
+function renderRat(p, legal) {
+  let c = $('#ratchip'); const rat = p && legal ? legal.filter(x => x.t === 'ratset') : [];
+  if (!rat.length) { if (c) c.remove(); return; }
+  if (UI.ratDay !== G.round) { UI.ratDay = G.round; UI.ratOpen = false; }
+  const bd = $('#bd'); if (!bd) return; if (!c) { c = h('div#ratchip'); bd.appendChild(c); }
+  const k = p.rat - p.droplet, open = !!UI.ratOpen; c.innerHTML = '';
+  if (open) c.appendChild(h('div.ratrow', rat.map(x => h('button.btn.alt', { 'data-a': 'mv', 'data-i': legal.indexOf(x), type: 'button' }, x.n ? 'Only +' + x.n : 'None'))));
+  c.appendChild(h('button.ratb' + (open ? '.on' : ''), { 'data-a': 'ratopen', type: 'button', 'aria-expanded': open ? 'true' : 'false', 'aria-label': 'Rat head start +' + k + ': tap to use less' }, h('span', { html: ico('rat', 26) }), '+' + k));
 }

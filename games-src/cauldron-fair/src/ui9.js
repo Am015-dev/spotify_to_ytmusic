@@ -7,7 +7,7 @@ const STG = { run: false, round: 0, tm: [], iv: [], dirty: false };
 const FORT_SHORT = {
   lucky7: 'Exactly 7 white: droplet moves one.', spilled: 'If you boom, left rival takes a 2-chip.', doover: 'After chip 5: restart once.', twice: 'Bonus die rolls twice today.',
   thick: 'White limit is 9 today.', marrowfair: 'Orange chips move one extra today.', peek: 'Stop safely: draw 5, place one.', glint: 'Ruby space scores 2 points, even boomed.',
-  spring: 'Flasks refill free tonight.', froth: 'First white chip may go back.', spark: 'Ruby space gives one extra ruby.', pick: 'Take a black chip, a 2-chip, or 3 rubies.',
+  spring: 'Flasks refill free tonight.', froth: 'First white chip may go back.', spark: 'Ruby space gives one extra ruby.', pick: 'Black chip, any 2-chip, or 3 rubies.',
   slide: 'Droplet moves one space.', swap: 'Trade 1 ruby for a 1-chip.', alms: 'Fewest rubies take 1 ruby.', underdog: 'Fewest points take a green 1.',
   clear: 'Score 4 points, or drop a white 1.', swarm: 'Rat stone moves by your rat tails.', dip: 'Draw 5: lowest gets blue 2.', bribe: 'Rat back 1 to 3 spaces for rubies.',
   bounty: 'Take a 4-chip, or points per tail.', fork: 'Droplet +2, or take a purple chip.', dice: 'Everyone rolls the bonus die once.', haggle: 'Draw 4: swap one for a bigger chip.'
@@ -28,7 +28,7 @@ function lpHide() { const b = $('#lpb'); if (b) b.remove(); clearTimeout(LP.hide
 function lpShow(el) {
   const k = el.dataset.lp || ''; let icon = '', title = '', text = '', full = false;
   if (k.indexOf('chip:') === 0) { const key = k.slice(5); icon = chipHTML(key, 40); title = D.COLORS[key[0]].name; text = chipShort(key); }
-  else if (k === 'fort') { const c = D.FORTUNE.find(x => x.id === (G && G.fcard)); if (!c) return; icon = '<span class="lpk ' + c.kind + '">' + (c.kind === 'blue' ? 'DAY' : 'NOW') + '</span>'; title = c.name; text = fortShort(c); full = c.text; }
+  else if (k === 'fort') { const c = D.FORTUNE.find(x => x.id === (G && G.fcard)); if (!c) return; icon = '<span class="lpk ' + c.kind + '">' + (c.kind === 'blue' ? 'ALL DAY' : 'NOW') + '</span>'; title = c.name; text = fortShort(c); full = c.text; }
   else return;
   lpHide(); const b = h('div#lpb', { role: 'dialog', 'aria-modal': 'true', 'aria-label': title }, h('span.lpi', { html: icon }), h('div.lpt', h('b', title), h('div', text), full && full !== text ? h('div.lpfull', full) : null));
   document.body.appendChild(b);
@@ -199,20 +199,21 @@ function marketEl(p, q) {
 function rubyState(p) {
   const sel = rubyPick(p), mx = Math.floor(p.rubies / D.rubySpend), opts = rubyOpts(p), has = o => opts.some(x => rubyKey(x) === rubyKey(o));
   const keyFor = (drop, flask) => { let o = { drop, flask: !!flask }; if (!has(o)) o = { drop, flask: false }; return has(o) ? rubyKey(o) : null; };
-  const nextDrop = () => { let o = { drop: sel.drop + 1, flask: sel.flask }; if (has(o)) return rubyKey(o); o = { drop: 0, flask: sel.flask }; return has(o) ? rubyKey(o) : rubyKey({ drop: 0, flask: false }); };
+  const nextDrop = () => { for (const d of [sel.drop + 1, 0]) { const o = { drop: d, flask: sel.flask }; if (has(o) && rubyKey(o) !== rubyKey(sel)) return rubyKey(o); } return null; };
   const flaskKey = () => { if (p.flask) return null; let o = { drop: sel.drop, flask: !sel.flask }; if (has(o)) return rubyKey(o); o = { drop: sel.drop - 1, flask: !sel.flask }; return o.drop >= 0 && has(o) ? rubyKey(o) : null; };
   return { sel, mx, keyFor, nextDrop, flaskKey, cost: (sel.drop + (sel.flask ? 1 : 0)) * D.rubySpend };
 }
-function rubyGems(p, cost) {
+function rubyGems(p, cost, compact) {
+  if (compact) return h('span.rgems.cmp', { 'aria-label': p.rubies + ' rubies' }, h('i', { html: ico('ruby', 22) }), h('b', '×' + p.rubies), cost ? h('b.rcs', '−' + cost) : null);
   const n = p.rubies, out = h('span.rgems', { 'aria-label': n + ' rubies' }); const show = Math.min(n, 10);
   for (let i = 0; i < show; i++) out.appendChild(h('i' + (i >= n - cost ? '.spent' : ''), { html: ico('ruby', 20) }));
   if (n > show) out.appendChild(h('b', '+' + (n - show)));
   return out;
 }
 function rubyBar(p) {   // the small ruby corner of the market
-  const S = rubyState(p), el = h('div.rbar.rubyp', rubyGems(p, S.cost));
+  const S = rubyState(p), el = h('div.rbar.rubyp', rubyGems(p, S.cost, true));
   const dk = S.nextDrop(), fk = S.flaskKey();
-  el.appendChild(h('button.rbt.rdrop' + (S.sel.drop ? '.on' : '') + '.tglow', { 'data-a': 'rubysel', 'data-k': dk, type: 'button', 'aria-label': 'Droplet: start further on, ' + D.rubySpend + ' rubies a step' }, h('span', { html: ico('drop', 28) }), h('b', '+' + S.sel.drop)));
+  el.appendChild(h('button.rbt.rdrop' + (S.sel.drop ? '.on' : '') + (dk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': dk || '', type: 'button', disabled: dk ? null : true, 'aria-label': 'Droplet: start further on, ' + D.rubySpend + ' rubies a step' }, h('span', { html: ico('drop', 28) }), h('b', '+' + S.sel.drop)));
   el.appendChild(h('button.rbt.rflask' + (S.sel.flask ? '.on' : '') + (fk ? '.tglow' : ''), { 'data-a': 'rubysel', 'data-k': fk || '', type: 'button', disabled: fk ? null : true, 'aria-label': p.flask ? 'Flask is full' : 'Refill the flask for ' + D.rubySpend + ' rubies' }, h('span', { html: ico('flask', 28, p.flask || S.sel.flask) })));
   const best = el.querySelector('[data-k="' + UI.rubyBest + '"]'); if (best) best.classList.add('sug');
   return el;
@@ -220,14 +221,14 @@ function rubyBar(p) {   // the small ruby corner of the market
 function rubyBoard(p) {   // the ruby-only screen: a zoomed cauldron, the droplet, its next spaces, the flask
   const S = rubyState(p), pts = KIT.GEO.pts, R = KIT.GEO.R, i0 = p.droplet, i1 = Math.min(D.TRACK_LEN - 1, p.droplet + S.mx);
   let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9; for (let i = i0; i <= i1; i++) { x0 = Math.min(x0, pts[i].x); x1 = Math.max(x1, pts[i].x); y0 = Math.min(y0, pts[i].y); y1 = Math.max(y1, pts[i].y); }
-  const sz = Math.max(7, Math.max(x1 - x0, y1 - y0) + 3.4), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, vx = cx - sz / 2, vy = cy - sz / 2;
+  const sz = Math.max(6, Math.max(x1 - x0, y1 - y0) + 3), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, vx = cx - sz / 2, vy = cy - sz / 2;
   const svg = KIT.potSVG({ pot: [], droplet: p.droplet + S.sel.drop, rat: 0, space: null, boom: false, mini: false, uid: 'rb', label: 'Your cauldron', size: 400 }).replace(/viewBox="[^"]*" width="\d+" height="\d+"/, 'viewBox="' + vx.toFixed(2) + ' ' + vy.toFixed(2) + ' ' + sz.toFixed(2) + ' ' + sz.toFixed(2) + '"');
-  const wrap = h('div.rboard'); wrap.appendChild(h('div.rtop', rubyGems(p, S.cost), h('b.rcost', S.cost ? '−' + S.cost : '')));
+  const wrap = h('div.rboard'); wrap.appendChild(h('div.rtop', rubyGems(p, S.cost), h('b.rcost', { html: S.cost ? ico('ruby', 20) : '' }, S.cost ? '−' + S.cost : '')));
   const pot = h('div.rpot', { html: svg });
   for (let k = 0; k <= S.mx; k++) {
     const q = pts[p.droplet + k]; if (!q) break; const key = S.keyFor(k, S.sel.flask); if (!key) continue; const here = k === S.sel.drop;
-    pot.appendChild(h('button.rtg.tglow' + (here ? '.here' : '') + (key === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': key, type: 'button', 'aria-label': k ? 'Start ' + k + ' further on' : 'Keep the droplet here', style: 'left:' + ((q.x - vx) / sz * 100).toFixed(2) + '%;top:' + ((q.y - vy) / sz * 100).toFixed(2) + '%;width:' + (1.15 / sz * 100).toFixed(2) + '%;height:' + (1.15 / sz * 100).toFixed(2) + '%' },
-      k ? h('i', '−' + k * D.rubySpend) : null));
+    pot.appendChild(h('button.rtg.tglow' + (here ? '.here' : '') + (key === UI.rubyBest ? '.sug' : ''), { 'data-a': 'rubysel', 'data-k': key, type: 'button', 'aria-pressed': here ? 'true' : 'false', 'aria-label': k ? 'Start ' + k + ' further on' : 'Keep the droplet here', style: 'left:' + ((q.x - vx) / sz * 100).toFixed(2) + '%;top:' + ((q.y - vy) / sz * 100).toFixed(2) + '%;width:' + (1.15 / sz * 100).toFixed(2) + '%;height:' + (1.15 / sz * 100).toFixed(2) + '%' },
+      here ? null : h('span.rgh', { html: ico('drop', 26) }), k ? h('i', { html: ico('ruby', 12) }, k * D.rubySpend) : null));
   }
   wrap.appendChild(pot);
   const fk = S.flaskKey();

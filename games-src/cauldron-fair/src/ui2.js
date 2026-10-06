@@ -79,11 +79,13 @@ function liveChips(p) {
   p.pot.slice(-6).forEach((c, i, a) => { if (!c || !c.c) return; const d = h('i.lc' + (p.pot.length > prev && i === a.length - 1 ? '.pop' : ''), { html: chipHTML(c.c + c.v, 15) }); row.appendChild(d); });
   return row;
 }
+UI.thN = UI.thN || {};
 function renderOthers() {
   const o = $('#others'); if (!o) return; const f = focusSeat(); o.innerHTML = '';
   for (const p of G.players) {
     if (p.seat === f) continue;
-    const t = h('button.th' + (seatCls(p) ? '.' + seatCls(p) : ''), { 'data-a': 'focus', 'data-seat': p.seat, type: 'button', 'aria-label': p.name + ': ' + p.vp + ' points, ' + stateLabel(p) + '. Tap to look at this cauldron.' });
+    const kN = p.seat + ':' + G.round, pulled = G.phase === 'brew' && UI.thN[kN] != null && p.pot.length > UI.thN[kN]; UI.thN[kN] = p.pot.length;   // a computer's pull pops its little cauldron
+    const t = h('button.th' + (seatCls(p) ? '.' + seatCls(p) : '') + (pulled ? '.pulled' : ''), { 'data-a': 'focus', 'data-seat': p.seat, type: 'button', 'aria-label': p.name + ': ' + p.vp + ' points, ' + stateLabel(p) + '. Tap to look at this cauldron.' });
     t.append(h('span.av', { html: avHTML(p.seat, 26) }), h('span.tp', { html: KIT.potSVG(potOpts(p, true)).replace(/width="\d+" height="\d+"/, '') }),
       h('span.ti', h('b', p.name), h('span.tv', h('span', { html: ico('vp', 15) }), p.vp, h('span', { html: ico('ruby', 15) }), p.rubies), h('span.ts', seatState(p) === 'draw' && p.pot.length ? liveChips(p) : stateLabel(p))));
     o.appendChild(t);
@@ -155,7 +157,7 @@ function renderRoster() {
   }
 }
 function renderActs() {
-  const a = $('#acts'), qb = $('#qbox'); if (!a || !qb) return; a.innerHTML = ''; qb.innerHTML = ''; qb.hidden = true;
+  const a = $('#acts'), qb = $('#qbox'); if (!a || !qb) return; a.innerHTML = ''; qb.innerHTML = ''; qb.hidden = true; renderRat(null);
   const v = viewSeat(); if (v < 0 || !G || G.phase === 'over') return;
   if (hotSeat() && UI.holder < 0) return;
   const p = G.players[v]; const legal = mvList(v); UI.legal[v] = legal;
