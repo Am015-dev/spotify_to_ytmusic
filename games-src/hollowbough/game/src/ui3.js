@@ -9,7 +9,7 @@ function onTarget(tg, el) {
   if (tg === 'pass') {
     const m = mm.find(x => x.type === 'pass'); if (!m) return;
     if (UI.passArm && Date.now() - UI.passArm < 2600) { UI.passArm = 0; actFrom(m, el); return; }
-    UI.passArm = Date.now(); renderActs(); setTimeout(() => { if (G && !UI.cards.length) renderActs(); }, 2700); return;
+    UI.passArm = Date.now(); renderBoard(); setTimeout(() => { if (G && !UI.cards.length) renderBoard(); }, 2700); return;
   }
   UI.passArm = 0;
   const ms = mm.filter(m => tgOf(m) === tg);
