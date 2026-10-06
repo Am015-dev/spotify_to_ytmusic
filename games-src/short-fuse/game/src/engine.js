@@ -53,7 +53,10 @@ function newGame(o){o=o||{};const seed=o.seed!=null?o.seed>>>0:DEFSEED!=null?DEF
     G.seats.push({i,nm:(o.names&&o.names[i])||SEAT_NAMES[i],human:!!h,lv:(o.lv&&o.lv[i])||o.level||'normal',ch:null,chUsed:0,chDown:0,noItem:0,role:null,con:null,conDown:0,ox:0,cards:[],out:0})}
   lg(`Job ${n}: ${M.nm}. ${np} crew, ${SP(G.captain).nm} is the foreman.`,'big');
   setupWires(M);setupChars(M,o);setupEquip(M);
+  const TW=o.twist&&o.twist.id?o.twist:null;G.twist=TW?{id:TW.id,param:TW.param||1}:null;
+  if(TW&&TW.id==='lean-kit'){const k=Math.min(TW.param||1,G.eq.length);for(let i=0;i<k;i++){const e=G.eq.pop();G.eqPool.unshift(e.id)}}
   G.dial=M.dial==='players'?np:M.dial==='players+1'?Math.min(DIAL_MAX,np+1):M.dial;
+  if(TW&&TW.id==='short-fuse'&&G.dial!=null)G.dial=Math.max(1,G.dial-(TW.param||1));
   for(const r of M.rules)if(RH[r.k].setup)RH[r.k].setup(r);
   // setup steps: rule pre-steps, the opening tokens, rule post-steps, then play
   for(const r of M.rules)if(RH[r.k].pre)RH[r.k].pre(r);
@@ -137,6 +140,7 @@ function infoSetup(M){let mode=M.info;const two=G.np===2&&M.two;
     if(mode==='neg'){later('infoNeg',{seat,left:2});continue}
     if(mode==='false2'){later('infoFalse',{seat,left:2,red:1});continue}
     if(SP(seat).role==='liar'){later('infoFalse',{seat,left:2,red:0});continue}
+    if(G.twist&&G.twist.id==='quiet-start'&&!SP(seat).human)continue;
     later('infoStd',{seat,memory:mode==='memory'})}}
 // ---------- info tokens ----------
 // token kinds on a wire: n (true number) y (yellow) p (even/odd) c (count on stand) f (false: "NOT v"). Beside a stand: {t:'n'|'y',v,mean:'has'|'none'}

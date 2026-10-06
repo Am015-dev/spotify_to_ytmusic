@@ -13,8 +13,8 @@ const netAvail=()=>!!NET.lobby;
 const cleanName=s=>String(s||'').replace(/[<>&"'`]/g,'').trim().slice(0,24);
 function netInit(){try{if(typeof NetRoom!=='undefined'&&NetRoom.available()){NET.lobby=NetRoom.lobby('shortfuse');NET.uid=NetRoom.uid();NET.myName=NetRoom.name();
   const lc=NetRoom.linkCode();if(lc){UI.joinCode=lc;UI.onl=true}}}catch(e){console.error(e)}NET.ready=true}
-function netIdle(){clearTimeout(UI.aiT);UI.aiT=null;G=null;UI.started=false;UI.sel=null;UI.res=null;UI.prev=null;UI.pause=false;UI.dockSig=null;kitReset();
-  try{$('#dockt').textContent='Short Fuse online'}catch(e){}}
+function netIdle(){clearTimeout(UI.aiT);UI.aiT=null;G=null;UI.started=false;UI.sel=null;UI.prev=null;UI.pause=false;kitReset();
+  try{renderIdle()}catch(e){}}
 async function netJoin(role,code){if(NET.busy||!NET.lobby)return;NET.err='';code=NetRoom.cleanCode(code);
   if(!code){NET.err='Type the invite code first.';netRender();return}
   NET.busy=true;netRender();let room;
@@ -28,7 +28,7 @@ async function netJoin(role,code){if(NET.busy||!NET.lobby)return;NET.err='';code
   if(GX.open)GX.close();UI.netOpen=true;netRender();if(role==='host')netPush(true)}
 async function netLeave(){const r=NET.room;const was=NET.on;Object.assign(NET,{on:false,role:null,room:null,mySeat:-1,hostPeer:null,err:'',hostGone:false,peers:[],gid:null,opt:null,seatPeer:[],seatUid:[]});
   try{if(r)await r.leave()}catch(e){}if(!was)return;UI.netOpen=false;netIdle();showStart();netRender()}
-function idleDock(){const m=$('#main');if(m)m.innerHTML='<div class="card wait"><h3>Waiting for the host…</h3><p class="hint">The host picks the job and starts it. Your seat and your wires appear here.</p></div>'}
+function idleDock(){try{renderIdle()}catch(e){}}
 function onNetPeers(ch){NET.peers=ch.peers||[];
   if(isClient()){const h=NET.peers.find(p=>!p.isMe&&p.presence&&p.presence.role==='host');if(h)NET.hostPeer=h.peer;
     if(NET.hostPeer&&(ch.left||[]).some(p=>p.peer===NET.hostPeer)){NET.hostGone=true;NET.err=G?'The host left. The game is over.':'The host closed the room.';UI.netOpen=true}}
@@ -85,7 +85,7 @@ function applyNet(o){
   if(o.lobby||!o.g){NET.opt=o.opt&&typeof o.opt==='object'?o.opt:NET.opt;if(G||UI.started){netIdle();hideStart();idleDock()}NET.gid=null;netRender();return}
   if(!validState(o.g))return;const g=o.g;const fresh=g.gid!==NET.gid;NET.opt=o.opt&&typeof o.opt==='object'?o.opt:NET.opt;
   G=g;NET.mySeat=Number.isInteger(o.seat)&&o.seat>=0&&o.seat<g.seats.length?o.seat:-1;UI.pause=!!o.pz;
-  if(fresh){NET.gid=g.gid;clearTimeout(UI.aiT);UI.aiT=null;UI.rt=realtimeJob(g.mission);UI.help=g.mission<=3;UI.tut=null;UI.sel=null;UI.res=null;UI.holdUntil=0;UI.wwk=null;UI.lastPrompt=null;UI.dockSig=null;UI.campDone=0;UI.lastNeed=null;
+  if(fresh){NET.gid=g.gid;clearTimeout(UI.aiT);UI.aiT=null;UI.rt=realtimeJob(g.mission);UI.sel=null;UI.holdUntil=0;UI.wwk=null;UI.lastPrompt=null;UI.campDone=0;UI.lastNeed=null;
     kitReset();UI.started=true;hideStart();UI.netOpen=false;UI.prev=snap();if(SND.gesture)musicStart();else SND.wantMusic=1}
   NET.pend=-1;netRender();refresh()}
 // ---- client -> host ----
@@ -113,7 +113,7 @@ function netStatus(){const n=NET.peers.length;
   if(n<=1)return 'Looking for players…';return `${n} players connected`}
 function netDock(){const el=$('#netst');if(!el)return;if(!NET.on||!G){el.hidden=true;return}el.hidden=false;
   const q=NET.mySeat>=0?G.seats[NET.mySeat]:null;
-  el.innerHTML=`<span>🌐 Room <b>${esc(NET.code)}</b>${q?` · you are <b>${esc(q.nm)}</b>`:' · watching'}${isHost()?' · you host':''} · <span class="nst">${netStatus()}</span></span><button class="btn small" data-a="netopen">Lobby</button><button class="btn small" data-a="netleave">Leave</button>`}
+  el.innerHTML=`<span>🌐 <b>${esc(NET.code)}</b>${q?' · '+esc(q.nm):' · watching'} · <span class="nst">${netStatus()}</span></span><button class="btn small" data-a="netopen">Lobby</button><button class="btn small" data-a="netleave">Leave</button>`}
 function lobbyHTML(){const host=isHost();const ps=lobbyPlayers();const o=host?lobbyOpt():(NET.opt||null);
   const rows=ps.map((p,i)=>`<li><i style="background:${SEATC[(p.seat>=0?p.seat:i)%5]}"></i><b>${esc(p.nm||'Player')}</b>${p.me?' (you)':''}${p.host?' · host':''}${G&&p.seat<0?' · watching':''}</li>`).join('')||'<li class="muted">Connecting…</li>';
   let opts='';if(o&&o.job){const hum=Math.min(ps.length,o.np||ps.length);const ai=Math.max(0,(o.np||0)-hum);
