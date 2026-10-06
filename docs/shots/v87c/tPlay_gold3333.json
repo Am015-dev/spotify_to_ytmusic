@@ -1,0 +1,168 @@
+[
+ {
+  "mode": "phone",
+  "cities": {
+   "ath": {
+    "min": 1.02,
+    "hits": 11,
+    "kinds": {
+     "wall": 1,
+     "traffic": 8,
+     "other": 2
+    },
+    "wallHits": 1,
+    "wallPerMin": 0.98,
+    "hitsPerMin": 10.8,
+    "bigDrop": 2,
+    "stuckPct": 0,
+    "avgKmh": 59.1,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 9.8,
+    "traffic120m": 3.8,
+    "ringsMax": 3,
+    "ringsAvg": 1.8,
+    "missions": [
+     {
+      "f": 1283,
+      "start": "Koulouri Rush"
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "GO!",
+      "f": 2690,
+      "v0": 79,
+      "v1": 34,
+      "drop": 0.56,
+      "kind": "traffic",
+      "x": 1735,
+      "z": -1404,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 2508,
+      "v0": 93,
+      "v1": 44,
+      "drop": 0.52,
+      "kind": "traffic",
+      "x": 1749,
+      "z": -1446,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 2730,
+      "v0": 44,
+      "v1": 24,
+      "drop": 0.45,
+      "kind": "traffic",
+      "x": 1733,
+      "z": -1395,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 2934,
+      "v0": 78,
+      "v1": 43,
+      "drop": 0.45,
+      "kind": "other",
+      "x": 1723,
+      "z": -1342,
+      "dy": 0
+     },
+     {
+      "ctx": "AKROPOLIS CUP",
+      "f": 1275,
+      "v0": 37,
+      "v1": 21,
+      "drop": 0.44,
+      "kind": "traffic",
+      "x": 1810,
+      "z": -1684,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "humans": {
+     "heights": {
+      "pavement pedestrian": 1.84,
+      "garage driver (seated, standing height)": 1.55,
+      "moped goon rider": 1.86
+     },
+     "fixed": 0
+    },
+    "rot": null,
+    "scale": {
+     "pedH": 1.77,
+     "carL": 4.45,
+     "carH": 1.29,
+     "player": {
+      "h": 1.87,
+      "l": 4.56,
+      "w": 2.61
+     },
+     "pedRel": 0.99,
+     "pedVsPlayer": 0.97,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 450,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 590,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [],
+    "tiny": [],
+    "extra": {
+     "map": {
+      "opened": false,
+      "drag": null,
+      "pinch": null
+     },
+     "pause": {
+      "tP_settings": false,
+      "opts": [],
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": false,
+      "btn": false,
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [
+     "next@0",
+     "next@750"
+    ],
+    "perf": {
+     "calls": 296,
+     "tris": 3058800,
+     "jsMs": 23.3,
+     "geoms": 1069,
+     "tex": 117
+    },
+    "wallSec": 888
+   }
+  },
+  "errs": [],
+  "warns": []
+ }
+]
