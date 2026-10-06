@@ -51,7 +51,7 @@ function renderGlows(){const w=$('#world');for(const e of w.querySelectorAll('.g
     b.addEventListener('click',()=>onGlow(g.x,g.y));w.appendChild(b)}}
 // ---------- overlay: followers on the map, follower spots, ghost finger, pops (screen-sized items that follow the map) ----------
 function addOv(el,wx,wy,o){o=o||{};el._o={wx,wy,dx:o.dx||0,dy:o.dy||0};$('#ov').appendChild(el);return el}
-function placeOverlay(){const m=measure(),pad=14;const cell=UI.view.s*100;const ms=Math.max(16,Math.min(34,cell*.3));$('#ov').style.setProperty('--ms',ms+'px');
+function placeOverlay(){placeGhost();const m=measure(),pad=14;const cell=UI.view.s*100;const ms=Math.max(16,Math.min(34,cell*.3));$('#ov').style.setProperty('--ms',ms+'px');
   for(const el of $('#ov').children){const o=el._o;if(!o)continue;const [sx,sy]=toScreen(o.wx,o.wy);el.style.transform=`translate(${sx+o.dx}px,${sy+o.dy}px) translate(-50%,-50%)`;
     if(o.cull){const r=o.r||0;const vis=sx>pad+r&&sx<m.W-pad-r&&sy>pad+r+28&&sy<m.H-pad-r;el.style.visibility=vis?'':'hidden'}}
   // glows must lie fully inside the board so none is half cut off or under the bars
@@ -63,7 +63,7 @@ function renderMeeples(){const live={};
     addOv(e,wx,wy,{dx:f.k==='bld'||f.k==='pig'?10:0,dy:f.k==='bld'||f.k==='pig'?-8:0});UI.mp[id]=e}
   for(const id in UI.mp)if(!live[id]){const e=UI.mp[id];delete UI.mp[id];e.classList.add('gone');setTimeout(()=>e.remove(),520)}
   placeOverlay()}
-function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.contains('fglow')||e.id==='ghost')e.remove();
+function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.contains('fglow'))e.remove();
   UI.figs=[];if(!myTurn('fig'))return;const p=sideToAct(),T=G.tiles[G.cur.k],moves=figMoves(p).filter(m=>m.act==='fig');
   const byL={};for(const m of moves)(byL[m.l]=byL[m.l]||[]).push(m);
   for(const l in byL){const [wx,wy]=spotWorld(G.cur.k,+l),ms=byL[l];
@@ -73,14 +73,17 @@ function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.c
   placeOverlay()}
 // ---------- ghost finger (first game, and chapters that give hints): points at the move the computer would pick ----------
 function hintOn(){return !!(UI.camp?UI.camp.hints:(UI.first&&UI.humanTurns<2))}
-function showGhost(wx,wy,sx,sy,dx){const old=$('#ghost');if(old)old.remove();if(wx==null&&sx==null)return;
-  const g=document.createElement('div');g.id='ghost';g.innerHTML='<svg viewBox="0 0 48 48" width="44" height="44"><path d="M19 4c2 0 3.5 1.4 3.5 3.3V19l1.8-.8c1.3-.5 2.8.2 3.2 1.5l.3.9 2.2-.7c1.4-.4 2.8.4 3.2 1.8l.4 1.1c1.8-.4 3.4.7 3.7 2.4.8 4.4.5 8.4-1.1 11.6-1.5 3-4.2 5-8.3 5H24c-3.3 0-5.600-1.3-7.600-4.200L10.200 28c-.7-1.200-.3-2.800.9-3.500 1.100-.600 2.500-.4 3.300.600l1.100 1.300V7.300C15.500 5.400 17 4 19 4z" fill="#fff" stroke="#3a2610" stroke-width="2.200" stroke-linejoin="round"/></svg>';
-  if(sx!=null){g.style.transform=`translate(${sx}px,${sy}px)`;$('#ov').appendChild(g)}else addOv(g,wx,wy,{dx:10+(dx||0),dy:16});placeOverlay()}
+function showGhost(wx,wy,vx,vy,dx){const old=$('#ghost');if(old)old.remove();if(wx==null&&vx==null)return;
+  const g=document.createElement('div');g.id='ghost';g.innerHTML='<svg viewBox="0 0 48 48" width="44" height="44"><path d="M19 4c2 0 3.5 1.4 3.5 3.3V19l1.8-.8c1.3-.5 2.8.2 3.2 1.5l.3.9 2.2-.7c1.4-.4 2.8.4 3.2 1.8l.4 1.1c1.8-.4 3.4.7 3.7 2.4.8 4.4.5 8.4-1.1 11.6-1.5 3-4.2 5-8.3 5H24c-3.3 0-5.6-1.3-7.6-4.2L10.2 28c-.7-1.2-.3-2.8.9-3.5 1.1-.6 2.5-.4 3.3.6l1.1 1.3V7.3C15.5 5.4 17 4 19 4z" fill="#fff" stroke="#3a2610" stroke-width="2.2" stroke-linejoin="round"/></svg>';
+  g.style.cssText='position:fixed;left:0;top:0;z-index:20;pointer-events:none';
+  if(vx!=null)g.style.transform=`translate(${vx}px,${vy}px)`;else g._w={wx,wy,dx:10+(dx||0),dy:16};
+  document.body.appendChild(g);placeGhost()}
+function placeGhost(){const g=$('#ghost');if(!g||!g._w)return;const b=boardEl().getBoundingClientRect(),[sx,sy]=toScreen(g._w.wx,g._w.wy);g.style.transform=`translate(${b.left+sx+g._w.dx}px,${b.top+sy+g._w.dy}px) translate(-50%,-50%)`}
 function updateGhost(){const old=$('#ghost');if(old)old.remove();if(!hintOn()||!G||G.over||!myTurn())return;
   if(G.step==='place'&&UI.hint){if(UI.rot===UI.hint.r)showGhost(UI.hint.x*100+50,UI.hint.y*100+50);else{const r=$('#htile').getBoundingClientRect(),b=boardEl().getBoundingClientRect();
       // finger on the tile itself (turn it): hand is outside the board, so keep it in the board's coordinate space
-      showGhost(null,null,r.left-b.left+r.width/2+10,r.top-b.top+r.height/2+10)}}
-  else if(G.step==='fig'&&UI.hintFig){if(UI.hintFig.act==='skip'){const r=$('#hskip');if(r){const rb=r.getBoundingClientRect(),b=boardEl().getBoundingClientRect();r.classList.add('hintspot');showGhost(null,null,rb.left-b.left+rb.width/2+10,rb.top-b.top+rb.height/2+10)}}
+      showGhost(null,null,r.left+r.width/2+10,r.top+r.height/2+10)}}
+  else if(G.step==='fig'&&UI.hintFig){if(UI.hintFig.act==='skip'){const r=$('#hskip');if(r){const rb=r.getBoundingClientRect(),b=boardEl().getBoundingClientRect();r.classList.add('hintspot');showGhost(null,null,rb.left+rb.width/2+10,rb.top+rb.height/2+10)}}
     else{const [wx,wy]=spotWorld(G.cur.k,UI.hintFig.l);const b=UI.figs.find(q=>q._m.k===UI.hintFig.k&&q._m.l===UI.hintFig.l);if(b)b.classList.add('hintspot');showGhost(wx,wy,null,null,b?b._o.dx:0)}}}
 // ---------- top strip, hand, status ----------
 function renderTop(){const el=$('#seats');el.innerHTML=G.pl.map(p=>{const s=p.sup,cur=!G.over&&sideToAct()===p.i;
