@@ -59,11 +59,10 @@ for(const mode of (process.env.MODES||'top,iframe').split(',')){
  const ov=await F.evaluate(()=>{const a=document.getElementById('crNeed'),b=document.getElementById('roamPlate'),n=document.getElementById('tN');const r=e=>e&&e.getBoundingClientRect();const A=r(a),B=r(b),cs=getComputedStyle(n);
   const inter=!A||!A.width||getComputedStyle(a).opacity==='0'?'notip':B&&B.width>0&&!(A.right<B.left||B.right<A.left||A.bottom<B.top||B.bottom<A.top);return{inter,tip:A&&[A.left,A.top,A.width,A.height].map(Math.round),toast:B&&[B.left,B.top,B.width,B.height].map(Math.round),bg:cs.backgroundColor,op:cs.opacity,txt:n.textContent.trim()}});
  console.log('  boost',JSON.stringify(ov));ok(ov.inter===false,`${mode} NEED BOOST tip shown and clear of the zone plate (${ov.inter})`);ok(ov.txt==='BOOST',`${mode} BOOST label is plain BOOST`);
- // --- form swap latency (drive off the road onto grass with real touch, gas + right)
- {await F.evaluate(()=>{__dbg.RO.v=0});const c=await ctr('tG'),d=await ctr('tR');const cdp=await ctx.newCDPSession(p);await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:c[0],y:c[1],id:1}]});
-  let prev=await st(1),tChange=null,lat=[];for(let i=0;i<400&&lat.length<2;i++){if(i===40)await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:c[0],y:c[1],id:1},{x:d[0],y:d[1],id:2}]});
-   const s=await st(1);const want={road:'ship',dirt:'offroad',water:'boat'}[s.terr];if(s.terr!==prev.terr)tChange={i,want};if(tChange&&s.veh===tChange.want){lat.push((i-tChange.i)/60);tChange=null}prev=s}
-  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});console.log('  form swaps',JSON.stringify(lat));ok(lat.length>0&&lat.every(x=>x<.3),`${mode} form swap under 0.3 s (${lat.map(x=>x.toFixed(2)).join(',')||'none seen'})`)}
+ // --- form swap latency: alternate the car between a road spot and an off-road spot (2 rounds), count frames until the form matches
+ {const pts=await F.evaluate(()=>{const R=__dbg.RO;let road=null,dirt=null;for(let r=10;r<400&&!(road&&dirt);r+=6)for(let a=0;a<6.28&&!(road&&dirt);a+=.3){const x=R.x+Math.cos(a)*r,z=R.z+Math.sin(a)*r;if(__tr.hit(x,z))continue;const d=__mho.roadD(x,z);if(!road&&d<2)road={x,z};if(!dirt&&d>25)dirt={x,z}}return{road,dirt}});
+  const lat=[];if(pts.road&&pts.dirt)for(const P of[pts.road,pts.dirt,pts.road,pts.dirt]){await F.evaluate(P=>{const R=__dbg.RO;R.x=P.x;R.z=P.z;R.y=__dbg.GY(P.x,P.z);R.v=0;R.vy=0},P);let n=0,s;for(;n<60;n++){s=await st(1);if(s.veh==={road:'ship',dirt:'offroad',water:'boat'}[s.terr])break}lat.push(n/60);console.log('  swap',s.terr,s.veh,n);await st(30)}
+  ok(lat.length===4&&lat.every(x=>x<.3),`${mode} form swap under 0.3 s (${lat.map(x=>x.toFixed(2)).join(',')||'no road/dirt spot'})`)}
  await ctx.close()}
  // ================= RACE =================
  {const {ctx,p,F,tap,shot}=await open(mode,true);const tick=n=>F.evaluate(n=>__tick(n),n);
