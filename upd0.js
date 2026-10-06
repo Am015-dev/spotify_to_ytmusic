@@ -1,6 +1,7 @@
 // ---------- OD_CHANGELOG: newest first. EVERY deploy prepends one entry {v, date, items:[{t:'FIXED'|'NEW'|'CHANGED', s:'plain English'}]} (2-4 items).
 const OD_CHANGELOG=[
- {v:'v86z',date:'6 Oct 2026',items:[{t:'NEW',s:'This UPDATES screen: open it from the title screen or the pause menu to see what changed in each version.'},{t:'NEW',s:'A small "What\'s new" note appears once after each update.'},{t:'CHANGED',s:'Credits now say "Base assets: Kenney (CC0)" next to "3D models by Alex".'}]},
+ {v:'v87a',date:'6 Oct 2026',items:[{t:'NEW',s:'This UPDATES screen: open it from the title screen or the pause menu to see what changed in each version.'},{t:'NEW',s:'A small "What\'s new" note appears once after each update.'},{t:'CHANGED',s:'Credits now say "Base assets: Kenney (CC0)" next to "3D models by Alex".'}]},
+ {v:'v86z',date:'6 Oct 2026',items:[{t:'FIXED',s:'Steering works after a crash: the car turns from a standstill on grass, at walls and after a wreck.'}]},
  {v:'v86y',date:'6 Oct 2026',items:[{t:'NEW',s:'Your driver is a real LEGO minifig: open-face helmet with a face, hands on its own steering wheel.'},{t:'NEW',s:'8 driver presets plus new faces and hair in the garage DRIVER tab.'},{t:'CHANGED',s:'Credits: 3D models by Alex.'}]},
  {v:'v86x',date:'6 Oct 2026',items:[{t:'FIXED',s:'No more screen shaking at speed; AI cars steer smoothly.'},{t:'CHANGED',s:'Camera sits closer and lower, wider view and speed lines when fast.'},{t:'CHANGED',s:'BOOST is SMASH: it always wrecks what you hit, and refills faster.'}]},
  {v:'v86w',date:'6 Oct 2026',items:[{t:'FIXED',s:'Hill and park grass sits exactly on the ground (was up to 30 cm off).'},{t:'FIXED',s:'Fewer grass patches poking through roads.'}]},
