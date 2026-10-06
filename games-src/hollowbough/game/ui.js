@@ -737,7 +737,8 @@ function newGame(mode, o) {
   UI.mode = mode; UI.cfg = cfg; UI.cards = []; UI.after = []; UI.rec = null; UI.recKey = ''; UI.pop = null; UI.sel = null; UI.fingerSeen = false; UI.passArm = 0; UI.over = null; UI.overShown = false; UI.lastAi = ''; UI.started = true; UI.focus = 0;
   UI.holder = hotSeat() ? -1 : -1;
   UI.coach = { level: UI.coach && UI.coach.level || 'full', seen: {} };
-  if (mode !== 'guided') UI.coachOn = false; else UI.coachOn = true;
+  UI.coachOn = false;
+  if (mode === 'guided' && typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { GXH.reset(); GXH.setEnabled(true); } }   // the guided game: every first-time bubble on
   const st = $('#start'); if (st) st.hidden = true;
   closePop(); fxClear(); try { GX.close(); } catch (e) { }
   kitNewGame();
@@ -751,6 +752,7 @@ function render() {
   try { if (window.PerfHUD) PerfHUD.wake(); } catch (e) { }
   UI.mmc = null; renderBoard(); renderCard(); renderDrawers();
   if (NET.on) netRenderHook();
+  if (typeof hlpAfter === 'function') hlpAfter();
 }
 // ---- one-card-at-a-time queue
 function pushCard(c) { UI.cards.push(c); closePop(); render(); }
@@ -778,7 +780,6 @@ function schedule() {
     pushCard({ kind: 'pass', seat: a, title: 'Pass the device to ' + p.name, sub: 'Hidden information', body: h('p', 'Your hand stays hidden until you tap.'), buttons: [{ label: "I am " + p.name, a: 'take' }] });
     return;
   }
-  if (UI.coachOn && coachCheck()) return;
   if (UI.turnSnd !== G.turn + ':' + a && (!NET.on || a === viewSeat())) { UI.turnSnd = G.turn + ':' + a; snd('turn', { vol: .6 }); GX.buzz(15); }
   if (!UI.noRec) UI.tr = setTimeout(() => { if (!G || G.phase === 'over') return; const had = UI.rec; computeRec(); if (UI.rec !== had) placeFinger(); }, 40);
 }
@@ -869,32 +870,7 @@ function loadSave() {
   } catch (e) { return false; }
 }
 // ===================== part 6: coach, drawers (log, rules, menu, rivals), start screen, events, phone mode, boot =====================
-const COACH = [
-  { id: 'welcome', light: 1, t: 'Welcome to Hollowbough', x: 'You lead a small band of woodland creatures. Over the game you build a city of up to 15 cards and send workers out to gather. When everyone has finished, the city with the most points wins.' },
-  { id: 'turn', light: 1, t: 'One thing per turn', x: 'On your turn you do exactly one thing: place a worker on a location, play a card, or Prepare for the next season. You start with 2 workers.' },
-  { id: 'board', t: 'The shared board', x: 'The glowing places are open to you. Tap one to see what it gives, then place a worker. Most places hold only one worker, so the good ones can be taken before your next turn.', when: (p, v) => myMoves().some(m => m.type === 'worker') },
-  { id: 'cards', t: 'Cards', x: 'Tap a card in your hand, or one of the eight in the meadow on the board, to see its price. Pay with resources, or play a critter free when you already own its matching building (it is named on the card).', when: (p) => p.dep.length > 0 && p.hand.length > 0 },
-  { id: 'occupy', t: 'A free card', x: 'One of your critters can be played for free: it moves into its matching building and uses up that building’s one free slot. Look for the button that says "Play it free".', when: (p, v) => myMoves().some(m => m.type === 'play' && m.how === 'occupy') },
-  { id: 'prepare', light: 1, t: 'Out of workers? Prepare', x: 'When all your workers are out, Prepare for the next season: they come home, you gain new workers, and green Production cards gather goods. Each player moves through the seasons on their own.', when: (p, v) => myMoves().some(m => m.type === 'prepare') },
-  { id: 'season', t: 'Production time', x: 'In Spring and Autumn all your green Production cards pay out. That is why building them early pays off.', when: (p) => p.season >= 1 },
-  { id: 'autumn', t: 'Autumn: the last season', x: 'After Autumn there are no more seasons. Use the rest of your workers and cards, and try for events or the Long Road. Pass when nothing useful remains.', when: (p) => p.season >= 3 },
-  { id: 'event', t: 'Events', x: 'The small flags and stars are events. Meet the requirement with the cards in your city and a worker claims it for bonus points. Each event can only be claimed once.', when: (p, v) => myMoves().some(m => m.type === 'worker' && m.k === 'event') },
-  { id: 'pass', light: 1, t: 'Passing', x: 'When you have nothing worthwhile left, press Pass. Your city is scored when everybody has passed. Your Hint button always shows a good move and why.', when: (p) => p.season >= 3 && availW(p) === 0 }
-];
-function coachCheck() {
-  return false; // no advice cards during play (owner's rule)
-  const lv = UI.coach.level; if (lv === 'off') return false;
-  const v = viewSeat(); if (v < 0 || HB.actor(G) !== v) return false;
-  const p = G.players[v]; if (G.q) { if (!UI.coach.seen.decision && lv === 'full') { UI.coach.seen.decision = 1; pushCard({ kind: 'coach', title: 'A choice for you', sub: 'Guide', body: h('p', 'Some cards and places ask you to choose. A decision appears here one at a time. The star marks what the computer helper would pick.') }); return true; } return false; }
-  for (const c of COACH) {
-    if (UI.coach.seen[c.id]) continue; if (lv === 'light' && !c.light) continue;
-    if (c.when && !c.when(p, v)) continue;
-    UI.coach.seen[c.id] = 1;
-    pushCard({ kind: 'coach', title: c.t, sub: 'Guide', body: h('p', c.x), buttons: [{ label: 'Got it', a: 'cont' }] });
-    return true;
-  }
-  return false;
-}
+// (the old guided-game advice cards are gone: first-time help is the gx-help kit, see ui11.js)
 // ---- drawers
 const RULES = `<h3>The goal</h3><p>Build the best woodland city. Each player has a city of up to 15 cards and a few workers. When every player has passed, you add up points from cards, point tokens, bonuses, events and the Long Road. The highest total wins.</p>
 <h3>How a turn goes</h3><p>On your turn do exactly <b>one</b> of these:</p><ul><li><b>Place a worker</b> on an open place and use it at once.</li><li><b>Play a card</b> from your hand or from the meadow by paying its price.</li><li><b>Prepare for the next season</b> (only when all your workers are out).</li></ul><p>When you cannot or do not want to do anything useful, <b>Pass</b>. You take no more turns, but your city still scores.</p>
@@ -904,7 +880,7 @@ const RULES = `<h3>The goal</h3><p>Build the best woodland city. Each player has
 <h3>Seasons</h3><p>Everyone starts in Winter with 2 workers. Preparing for <b>Spring</b> gives +1 worker and runs your production. <b>Summer</b> gives +1 worker and lets you take 2 meadow cards. <b>Autumn</b> gives +2 workers and runs production again. Every player moves through the seasons at their own pace.</p>
 <h3>Scoring</h3><p>Printed points on your cards, point tokens you hold, purple card bonuses, events and Long Road workers. Ties go to the player with more events, then more leftover resources.</p>
 <h3>Solo play</h3><p>You play against Old Grimbeard. He takes places and cards by dice and a fixed routine. You win if you end with strictly more points than he does. Choose Grumpy, Gruff or Ghastly for the difficulty.</p>
-<h3>Tips</h3><ul><li>Build production early; it pays every Spring and Autumn.</li><li>Keep cards in hand cheap to play. Watch the meadow too.</li><li>Press Hint any time to see a good move and the reason for it.</li></ul>`;
+<h3>Tips</h3><ul><li>Build production early; it pays every Spring and Autumn.</li><li>Keep cards in hand cheap to play. Watch the meadow too.</li><li>Tap the lightbulb any time to see a good move and the reason for it.</li></ul>`;
 function logHTML() { const e = h('div.logl'); for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 150); i--) e.appendChild(h('div.ll', h('span.lt', G.log[i].turn), ' ' + G.log[i].t)); return e; }
 function renderRival(seat) {
   const b = $('#rivalbody'); if (!b || !G) return; b.innerHTML = ''; seat = seat == null ? (UI.rseat != null ? UI.rseat : 0) : seat; UI.rseat = seat;
@@ -993,7 +969,6 @@ document.addEventListener('click', ev => {
     case 'save': save(); toast('Game saved.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; break;
-    case 'guide': UI.coach.level = d.v; GX.renderSettings(); break;
     case 'sound': UI.sound = UI.sound === false; try { if (window.GA) { GA.setSfx(UI.sound); GA.setMusic(UI.sound); } } catch (e) { } GX.renderSettings(); break;
   }
 });
@@ -1082,7 +1057,7 @@ function kitSettings() {
     sound: S => { S.appendChild(GX.row('Sound', GX.onoff(UI.sound !== false, v => { UI.sound = v; try { if (window.GA) { GA.setSfx(v); GA.setMusic(v); } } catch (e) { } sndMusic(); }, 'Sound and music'))); },
     help: S => {
       S.appendChild(GX.row('Read', [h('button.gx-sb', { 'data-a': 'rules', type: 'button' }, 'How to play'), h('button.gx-sb', { 'data-a': 'refopen', type: 'button' }, 'Cards & places')]));
-      S.appendChild(GX.row('Guide', GX.seg([['full', 'Full'], ['light', 'Light'], ['off', 'Off']], UI.coach.level, v => { UI.coach.level = v; }, 'Guide level'), 'Tips that appear one at a time'));
+      if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') S.appendChild(GXH.settingsRow({ rowClass: 'gx-row', btnClass: 'gx-sb' })); }
     },
     about: { name: 'Hollowbough', version: 'preview', text: 'An original woodland city-building game. Names, texts and pictures are our own; the pictures are drawn in code. Sounds and music are CC0 recordings (Kenney, OpenGameArt).' }
   });
@@ -1306,4 +1281,132 @@ function sceneEls(R) {
   if (R.tbl) f.appendChild(placeBox(h('div.tbl'), R.tbl));
   const s = placeBox(h('div#scene.scn', { 'data-board': '', 'aria-hidden': 'true' }), R.scene); s.innerHTML = sceneSVG(R); f.appendChild(s);
   return f;
+}
+// ===================== part 11: help (gx-help kit): coach bubbles the first time, the lightbulb on demand =====================
+// Bubbles: once per phase, short, pointing at the board. The bulb: the computer helper's own move (HB.AI.choose, the same one the ghost finger uses),
+// the element it points at comes from UI.tgEls (the glowing thing), and a short "why" built from the move's real facts. Rules cards for every phase.
+// ---------------------------------------------------------------- pictures for the rules cards (the game's own art)
+const HPX = 46;
+const HP = {
+  res: r => ic(r, HPX), worker: () => pawn(0, HPX - 6), back: () => backEl(34), point: () => ic('point', HPX), road: () => ic('road', HPX),
+  flag: () => ic('flag', HPX), star: () => ic('star', HPX), haven: () => ic('haven', HPX), deck: () => ic('deck', HPX), tree: () => ic('tree', HPX),
+  season: i => HBKit.season(SEAS[i], HPX + 4),
+  cost: () => costEl({ twig: 2, berry: 1 }, 24),
+  card: () => cardEl(firstCardId(), 40)
+};
+function firstCardId() { try { for (let i = 0; i < HB.NCARDS; i++) if (HB.cardKey(i) === 'architect') return i; } catch (e) { } return 0; }
+function hnode(x) { try { const n = typeof x === 'function' ? x() : x; return n && n.outerHTML ? n.outerHTML : String(n || ''); } catch (e) { return ''; } }
+function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it === '>' ? '<span class="gxh-ar">&rarr;</span>' : '<figure>' + hnode(it[0]) + (it[1] ? '<figcaption>' + it[1] + '</figcaption>' : '') + '</figure>').join('') + '</div>'; }
+// ---------------------------------------------------------------- where each bubble points
+const hq = s => () => document.querySelector(s);
+const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
+const HLP_STEPS = {
+  turn: { target: () => { try { const m = UI.rec && UI.rec.m, e = m && hlpEl(m); if (e && e.getBoundingClientRect().width) return e; } catch (x) { } return hfirst('#bd .tile.glow', '#bd .glow:not(.tchip)', '#acts .btn')(); }, title: 'Your turn', text: 'Tap a glowing spot to send a worker there. Or tap a glowing card to play it.', pic: () => hnode(HP.worker) },
+  prepare: { target: hfirst('#acts .prep'), title: 'Prepare for next season', text: 'All your workers are out. Tap Prepare: they come home and you gain more workers.', pic: () => hnode(() => HP.season(1)) },
+  lastCall: { target: hfirst('#acts .pass', '#acts .btn'), title: 'Nothing left to do?', text: 'Play a card if you can. Otherwise tap Pass twice: your city still scores.', pic: () => hnode(HP.tree) },
+  how: { target: hfirst('#acts .tchip'), title: 'Choose how', text: 'This can be done in several ways. Tap the option you want.', pic: () => hnode(HP.cost) },
+  pickCard: { target: hfirst('#bd .glow:not(.tchip)', '#acts .tchip'), title: 'Pick a card', text: 'The power needs a card. Tap one that glows.', pic: () => hnode(HP.card) },
+  pickRes: { target: hfirst('#acts .tchip'), title: 'Pick a resource', text: 'Tap the resource you want, in the row below the board.', pic: () => hnode(() => HP.res('berry')) },
+  pickPlace: { target: hfirst('#bd .tile.glow', '#bd .glow:not(.tchip)', '#acts .tchip'), title: 'Pick a place', text: 'Tap the glowing place or worker the power should use.', pic: () => hnode(HP.haven) },
+  pickOption: { target: hfirst('#acts .tchip', '#bd .glow'), title: 'Make a choice', text: 'The power gives you options. Tap the one you want.', pic: () => hnode(HP.star) }
+};
+// ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
+const HLP_RULES = [
+  { title: 'The goal', text: 'Build the best woodland city. When everyone has passed, the highest total of points wins.', pic: () => hpics([[HP.tree, 'City'], '>', [HP.point, 'Points']]) },
+  { title: 'Your turn', text: 'Place a worker, play a card, or Prepare for the next season. Then the next player goes.', pic: () => hpics([[HP.worker, 'Worker'], [HP.back, 'Card'], [() => HP.season(1), 'Prepare']]) },
+  { phase: 'turn', title: 'Place a worker', text: 'Tap a glowing spot. Your worker goes there and its effect happens at once.', pic: () => hpics([[HP.worker, 'Worker'], '>', [() => HP.res('twig'), 'Goods']]) },
+  { phase: 'turn', title: 'Or play a card', text: 'Tap a glowing card in your hand or the meadow, then pay its price in resources.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.cost, 'Price']]) },
+  { phase: 'turn', title: 'Spots fill up', text: 'Most spots hold only one worker, so good ones go fast. Spots marked Shared hold more.', pic: () => hpics([[HP.worker, 'Taken'], [() => HP.res('resin'), 'Shared']]) },
+  { phase: 'turn', title: 'Events and the Long Road', text: 'Flags and stars are events: claim one when your city meets its need. The Long Road opens in Autumn.', pic: () => hpics([[HP.flag, 'Event'], [HP.road, 'Long Road']]) },
+  { phase: 'prepare', title: 'Prepare', text: 'When all your workers are out, tap Prepare. They come home and you gain more workers.', pic: () => hpics([[HP.worker, 'Home'], '>', [() => HP.season(1), 'Spring']]) },
+  { phase: 'prepare', title: 'Production pays', text: 'In Spring and Autumn every green Production card in your city gathers goods again.', pic: () => hpics([[() => HP.res('twig'), 'Twigs'], [() => HP.res('berry'), 'Berries'], [() => HP.res('resin'), 'Resin']]) },
+  { phase: 'prepare', title: 'Your own seasons', text: 'Each player moves through Winter, Spring, Summer and Autumn at their own pace.', pic: () => hpics([[() => HP.season(0)], '>', [() => HP.season(1)], '>', [() => HP.season(2)], '>', [() => HP.season(3)]]) },
+  { phase: 'lastCall', title: 'Nothing left? Pass', text: 'When you have no workers or plays left, tap Pass twice. You take no more turns.', pic: () => hpics([[HP.worker, 'All out'], '>', [HP.tree, 'Done']]) },
+  { phase: 'lastCall', title: 'Your city still scores', text: 'When everyone has passed, your cards, point tokens, events and Long Road workers are scored.', pic: () => hpics([[HP.back, 'Cards'], [HP.point, 'Tokens'], [HP.flag, 'Events']]) },
+  { phase: 'lastCall', title: 'Highest total wins', text: 'The highest total wins. A tie goes to the player with more events claimed.', pic: () => hpics([[HP.point, 'Points'], '>', [HP.star, 'Winner']]) },
+  { phase: 'how', title: 'Several ways', text: 'This card or spot can be used in more than one way. Tap the option you want.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.cost, 'Pay']]) },
+  { phase: 'how', title: 'Pay or play free', text: 'Pay the price, or play a critter free into its matching building when that building is open.', pic: () => hpics([[HP.cost, 'Pay'], [HP.star, 'Or free']]) },
+  { phase: 'how', title: 'Cheaper plays', text: 'Some cards you own make a play cheaper. They show up as extra buttons.', pic: () => hpics([[HP.back, 'Card'], '>', [() => HP.res('pebble'), 'Fewer']]) },
+  { phase: 'how', title: 'The Long Road', text: 'In Autumn, discard 5, 4, 3 or 2 cards. Your worker stays and scores that many points.', pic: () => hpics([[HP.back, 'Discard'], '>', [HP.road, 'Road'], '>', [HP.point, 'Points']]) },
+  { phase: 'pickCard', title: 'Pick a card', text: 'The power needs a card. Tap one that glows: it may be in your hand, the meadow or your city.', pic: () => hpics([[HP.back, 'Card'], '>', [HP.star, 'Power']]) },
+  { phase: 'pickCard', title: 'Read it first', text: 'Press and hold any card to read it big before you choose.', pic: () => hpics([[HP.back, 'Hold'], '>', [HP.card, 'Read']]) },
+  { phase: 'pickRes', title: 'Pick a resource', text: 'A power asks for a resource. Tap one of the icons in the row below the board.', pic: () => hpics([[() => HP.res('twig')], [() => HP.res('resin')], [() => HP.res('pebble')], [() => HP.res('berry')]]) },
+  { phase: 'pickRes', title: 'Four resources', text: 'Twigs, resin, pebbles and berries pay for cards. The row under your city shows your stock.', pic: () => hpics([[HP.cost, 'Prices'], '>', [HP.back, 'Cards']]) },
+  { phase: 'pickPlace', title: 'Pick a place', text: 'Tap the glowing place or worker the power should use.', pic: () => hpics([[HP.haven, 'Place'], '>', [HP.worker, 'Worker']]) },
+  { phase: 'pickPlace', title: 'Read before you tap', text: 'Press and hold a place to read what it gives.', pic: () => hpics([[HP.haven, 'Hold'], '>', [HP.star, 'Read']]) },
+  { phase: 'pickOption', title: 'Make a choice', text: 'The power gives you options. Tap the one you want in the row below the board.', pic: () => hpics([[HP.star, 'Power'], '>', [HP.cost, 'Options']]) },
+  { phase: 'pickOption', title: 'Read each button', text: 'Each button says what it does. Pick the one that helps your city most.', pic: () => hpics([[HP.back, 'Option'], [HP.back, 'Option']]) }
+];
+// ---------------------------------------------------------------- phases
+// the moment the player is deciding in (null when there is nothing to decide on the board)
+function hlpPhase() {
+  try {
+    if (!G || !UI.started || G.phase === 'over' || UI.cards.length || UI.pop || UI.cityOpen || UI.animBusy) return null;
+    const a = HB.actor(G); if (a < 0 || G.players[a].ai || a !== viewSeat()) return null;
+    const mm = myMoves(); if (!mm.length) return null;
+    if (UI.sel) return 'how';
+    if (G.q) {
+      const qm = mm.filter(m => m.type === 'choose');
+      if (qm.some(m => { const e = UI.tgEls && UI.tgEls['q:' + m.i]; return e && e.classList.contains('tile'); })) return 'pickPlace';
+      if (qm.some(m => m.card !== undefined)) return 'pickCard';
+      if (qm.some(m => m.res !== undefined)) return 'pickRes';
+      return 'pickOption';
+    }
+    const p = G.players[a];
+    if (mm.some(m => m.type === 'prepare')) return 'prepare';
+    if (availW(p) > 0) return 'turn';
+    return mm.some(m => m.type === 'pass') ? 'lastCall' : null;
+  } catch (e) { return null; }
+}
+// ---------------------------------------------------------------- the bulb: the helper's move, where it is on the board, and why (<= 15 words)
+function capW(t, n) { const w = String(t || '').replace(/\s+/g, ' ').trim().split(' ').filter(Boolean); return w.length <= n ? w.join(' ') : ''; }
+function hlpWhy(m, a) {
+  const p = G.players[a]; let t = '';
+  if (m.type === 'worker') {
+    if (m.k === 'basic') { const b = D.basic[m.i]; t = b.name + ': ' + b.text.replace(/\s*Shared\.?$/, ''); }
+    else if (m.k === 'forest') { const f = D.forest[G.forest[m.i]]; t = f.name + ': ' + f.text; }
+    else if (m.k === 'haven') t = 'Barter Burrow turns spare cards into resources: 1 for every 2.';
+    else if (m.k === 'journey') t = 'The Long Road: discard cards, and this worker stays and scores ' + D.journey[m.i].points + ' points.';
+    else if (m.k === 'event') { const e = m.e === 'b' ? D.basicEvents[G.bev[m.i].k] : D.specialEvents[G.sev[m.i].k]; t = 'Your city meets this event: claim it for ' + (e.pts || 'bonus') + ' points.'; }
+    else if (m.k === 'dest') t = (m.o === a ? 'Use ' + cname(m.c) + ' in your city.' : 'Visit ' + cname(m.c) + ': you use its power, its owner gets a point token.');
+  } else if (m.type === 'play') {
+    const nm = cname(m.card), pts = cdef(m.card).pts;
+    if (m.how === 'pay') t = 'Build ' + nm + ': you can afford it' + (pts ? ', and it scores ' + pts + (pts === 1 ? ' point.' : ' points.') : '.');
+    else if (m.how === 'occupy') t = 'Play ' + nm + ' free into its matching building.';
+    else t = 'Play ' + nm + ' the cheaper way.';
+  } else if (m.type === 'prepare') t = 'All workers are out: Prepare for ' + SEASN[Math.min(3, p.season + 1)] + '. They come home.';
+  else if (m.type === 'pass') t = 'Nothing worthwhile is left to do. Passing keeps your city for scoring.';
+  else if (m.type === 'choose') t = m.label || '';
+  t = capW(t, 15);
+  if (!t && m.type === 'choose') t = capW('Best choice here: ' + capW(m.label, 8), 15);
+  return t || 'The computer helper picks this one.';
+}
+// the element the move is tapped on right now (the glowing thing), or null
+function hlpEl(m) {
+  if (!m || !UI.tgEls) return null;
+  let tg = tgOf(m);
+  if (UI.sel) { const i = UI.sel.ms.findIndex(x => sameM(x, m)); if (i < 0) return null; tg = 'o:' + i; }
+  let el = UI.tgEls[tg];
+  if (!el && G.q && m.type === 'choose') el = UI.tgEls['q:' + m.i];
+  return el && el.isConnected ? el : null;
+}
+function hlpSuggest() {
+  if (!hlpPhase()) return null;
+  const a = HB.actor(G);
+  try { computeRec(true); } catch (e) { return null; }
+  const m = UI.rec && UI.rec.m; if (!m || !hlpEl(m)) return null;
+  const mk = m.type === 'choose' ? 'q' + m.i : tgOf(m);
+  return { why: hlpWhy(m, a), key: mk, m, target: () => { const e = hlpEl(m); return hlpEl(m); } };
+}
+// ---------------------------------------------------------------- wiring
+let _hlpInit = false;
+function hlpInit() {
+  if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
+  GXH.init({ game: 'hollowbough', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '.glow,#acts .btn' });
+  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
+}
+function hlpAfter() {
+  hlpInit(); if (typeof GXH === 'undefined') return;
+  const st = $('#start'), nb = $('#netbox');
+  GXH.phase(!G || !UI.started || (st && !st.hidden) || (nb && !nb.hidden) ? null : hlpPhase());
 }
