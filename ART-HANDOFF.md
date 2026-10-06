@@ -13,7 +13,14 @@ Open (not blocking):
 2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
 
-## NEXT: pART8 for a FRESH art session (coordinator brief 2026-10-06 11:52 UTC; Alex scored v86v 2/10)
+## pART8 IN PROGRESS (art session session_019gi2haGf8EZyFCu7h3KCZa, 2026-10-06)
+Build: `./art.sh a23e93e` (pART8.py added to art.sh; pART5/pART6 anchors made tolerant of pART7's later edits; the build reproduces live v86w byte-for-byte before pART8).
+- Roads on top: art8.js replaces abStrip (live's renamed abStrip_v86): road strips refined where the ground is not linear (≤2.5 m along, ≤4 m across, check 6 mm); HUB.M.road/dirt get polygonOffset −1/−2 (city streets had −2/−4). tools/a7_poke.js Frankfurt: 2.6 % → 0 % (0/2265).
+- Shadows: art8.js projected silhouettes (shadow twin per car mesh = child sharing geometry; traffic = 16-slot InstancedMesh per pool filled with cars ≤80 m from the camera), plane through the visible wheel bottoms (ART8_whl: exact radius from vertices), lift 7 cm, polygonOffset −4/−16, stencil (renderer stencil:true + composer rt stencilBuffer:true) → one flat silhouette at 60 %. Sun = moonL direction clamped to y ≤ −0.88. Hidden while airborne/boat (like ART6).
+- fps: art7 quadtree uses an 8 cm fit with ≥16 m leaves for cells ≤64 m that are >14 m from every road edge (ART7_rd); ground tiles 500 m (city box) / 1000 m (outer). Terrain verts 3.31 M → ~1.9 M. Software-GL frame time is noisy (±4 %): live v86w park/hill/city 1061-1090/1155-1169/1155-1210 ms; candidate 1075-1096/1132-1179/1089-1116.
+- Athens raycasts: SM3 frees vertex arrays (`rel` → this.array=null); for poke tests make a debug copy with that line removed.
+
+## (brief) pART8 (coordinator brief 2026-10-06 11:52 UTC; Alex scored v86v 2/10)
 1. Roads: ZERO grass/terrain poking through any road surface in Frankfurt AND Athens ("terrain merges with the road with random blobs"); roads always on top, no z-fighting at road edges. Verify with 852×393 shots along whole roads in both cities.
    - Measure: tools/a7_poke.js (eval in dev.js on local_dbg.html; curl --data-binary): live v86v 19.8 % of road-over-grass samples had grass on top, v86w 2.6 %. Remaining examples on v86w: (813,497) +0.118, (793,-1088) +0.056, (918,-573) +0.053 (also on live).
    - Causes found: road strips follow groundY only at their vertices (abStrip at path points; pART5 filler streets now 4 m segments) so chords sag under the exact grass on humps. Options: densify/drape every road strip type to ≤ 4 m, give road materials polygonOffset (factor −2, units −4) against the ground, and/or lower ground vertices under road footprints.
