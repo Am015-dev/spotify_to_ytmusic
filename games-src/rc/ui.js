@@ -57,7 +57,7 @@ function stepText(){if(G.over)return G.over.win?`🏆 ${G.over.why}`:`☠ ${G.ov
   return 'The day unfolds…'}
 function wizSync(){if(planOpen()&&!allAI()){pstep();if(UI.ps.step!==2&&UI.sel&&!UI.tileSel)UI.sel=null}}
 function stepFoot(){const st=pstep();const cur=st===2?curPawn():null;const list=st===2?wizPawns():[];const red=st===4?uncoveredRed():[];const pb=planProblems();
-  const sug=`<button class="btn ghost" data-a="suggest" title="Give every pawn a job following today’s needs (H). You can change anything.">💡 Plan for me</button>`;
+  const sug=`<button class="btn ghost" data-a="suggest" title="Give every pawn a job following today’s needs (H). You can change anything.">✨ Plan for me</button>`;
   const back=st>1?`<button class="btn ghost" data-a="pback">◀ Back</button>`:`<button class="btn ghost" data-a="clear" title="Take all your pawns off their jobs">Clear</button>`;
   const txt=st===1?'Planning 1 of 4: read what today needs, then give out jobs.':st===2?(cur?`Planning 2 of 4 · Pawn ${list.findIndex(p=>p.id===cur.id)+1} of ${list.length}: ${pawnNice(cur)}. Take the recommended job or choose another.`:'Planning 2 of 4: every pawn has a job.'):st===3?'Planning 3 of 4: check the risk of each job.':pb.length?`Planning 4 of 4: not ready yet. ${pb[0]}`:red.length?'Planning 4 of 4: something urgent is not covered.':'Planning 4 of 4: all set. Start the day!';
   const next=st===1?`<button class="btn go" data-a="pnext" title="Step 2: give each pawn a job">Next: jobs ▶</button>`:st===2?`<button class="btn go ${cur&&cur.c!=null?'dim':''}" data-a="pnext" title="Step 3: check the risk of each job">Next: check ▶</button>`:st===3?`<button class="btn go ${pb.length?'dim':''}" data-a="pnext" title="Step 4: start the day">Next: start ▶</button>`:
@@ -65,7 +65,7 @@ function stepFoot(){const st=pstep();const cur=st===2?curPawn():null;const list=
   return `<div class="st-t" id="steptext">${esc(typeof netOn==='function'&&netOn()&&st===4&&!pb.length?netStepText(red):txt)}</div><div class="st-b">${back}${sug}${next}</div>`}
 function renderStep(){const el=$('#step');if(!el)return;const st=storyActive();el.hidden=st;if(st)return;
   const cf=UI.confirm&&planOpen()&&!allAI();
-  el.innerHTML=cf?`<div class="st-t confirm" id="steptext" role="alert">${esc(UI.confirm)} Start anyway?</div><div class="st-b"><button class="btn ghost" data-a="suggest" title="Fill the priorities for me">💡 Plan it for me</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`:
+  el.innerHTML=cf?`<div class="st-t confirm" id="steptext" role="alert">${esc(UI.confirm)} Start anyway?</div><div class="st-b"><button class="btn ghost" data-a="suggest" title="Fill the priorities for me">✨ Plan it for me</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`:
   planOpen()&&!allAI()?stepFoot():`<div class="st-t" id="steptext">${esc(stepText())}</div>${G.over?`<div class="st-b"><button class="btn go" data-a="new">New game</button></div>`:''}`}
 // ---------- side panel ----------
 function renderPanel(){const el=$('#panel');if(!el)return;el.innerHTML=`<div class="pbody">${planHtml()}</div>`;if(UI.toTop&&!storyActive()){UI.toTop=0;const bd=document.querySelector('.gx-dock-body');if(bd)bd.scrollTop=0}
@@ -236,7 +236,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'goback':UI.confirm=null;render();return;
   case 'next':storyNext();return;case 'skip':storySkip();return;
   case 'auto':UI.auto=!UI.auto;try{localStorage.setItem('swi_auto',UI.auto?'1':'0')}catch(e){}render();return;
-  case 'suggest':{const m=suggestPlan();setPStep(3);toast(m?'💡 Every pawn has a job now. Check the risk of each one below, and change anything you like.':'💡 Nothing to add.',6000);render();return}
+  case 'suggest':{const m=suggestPlan();setPStep(3);toast(m?'✨ Every pawn has a job now. Check the risk of each one below, and change anything you like.':'✨ Nothing to add.',6000);render();return}
   case 'pnext':setPStep(pstep()+1);render();return;case 'pback':setPStep(pstep()-1);render();return;
   case 'pick':UI.ps.pick=!UI.ps.pick;render();return;
   case 'pskip':{const c=curPawn();if(c&&c.c==null)UI.ps.skip.push(c.id);UI.sel=null;wizPlaced();render();return}
