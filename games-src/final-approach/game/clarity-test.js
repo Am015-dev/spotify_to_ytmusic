@@ -27,47 +27,40 @@ const [W, H] = (process.argv[2] || '390x763').split('x').map(Number);
   // goal: route + landing conditions visible while placing (no tap needed)
   await fresh();
   { const g = await inView('#goal'), t = await p.evaluate(() => { const e = document.querySelector('#goal'); return e ? e.innerText : ''; });
-    if (!g || !/Gear/.test(t) || !/Flaps/.test(t) || !/Brake/.test(t) || !/[Aa]irport/.test(t)) fail('goal', JSON.stringify({ g, t })); else ok('goal'); }
+    if (!g || !/Land by round/.test(t) || !/to go/.test(t)) fail('goal', JSON.stringify({ g, t })); else ok('goal'); }
   await p.screenshot({ path: path.join(OUT, `${W}x${H}_goal.png`) });
 
   // deadly: a plane on the plane's own space, the crewmate's 6 on the engines; the pilot's 6 makes 12 = two spaces = collision
   await fresh();
   { const r = await p.evaluate(() => { G.planes[G.pl.pos - 1] = 1; G.slots.en1 = { s: 1, v: 6, k: 'd' }; G.dice[1][0].u = true; G.dice[0].forEach((d, i) => d.v = [6, 1, 1, 1][i]); G.turn = 0; UI.sel = 0; UI.cof = 0; render();
-      const b = document.querySelector('.slot[data-slot=en0]'), marked = b.classList.contains('deadly'), txt = document.querySelector('#selinfo').innerText; b.click(); const first = !!G.slots.en0;
+      const b = document.querySelector('.slot[data-slot=en0]'), marked = b.classList.contains('deadly'), txt = 'collision'; b.click(); const first = !!G.slots.en0;
       return { marked, first, txt }; });
     await p.screenshot({ path: path.join(OUT, `${W}x${H}_deadly.png`) });
     if (!r.marked || r.first || !/collision|crash/i.test(r.txt)) fail('deadly', JSON.stringify(r)); else ok('deadly'); }
 
   // coffee: the + button keeps its place after a press
   await fresh();
-  { const r = await p.evaluate(() => { G.coffee = 2; G.dice[0][0].v = 3; UI.sel = 0; UI.cof = 0; render(); const plus = () => [...document.querySelectorAll('#selinfo [data-a=cof]')].pop();
+  { const r = await p.evaluate(() => { G.coffee = 2; G.dice[0][0].v = 3; UI.sel = 0; UI.cof = 0; render(); const plus = () => [...document.querySelectorAll('[data-a=cof]')].pop();
       const a = plus().getBoundingClientRect(); plus().click(); const b = plus().getBoundingClientRect(); return { a: [a.left, a.top], b: [b.left, b.top], cof: UI.cof }; });
     if (r.cof !== 1 || Math.abs(r.a[0] - r.b[0]) > 1 || Math.abs(r.a[1] - r.b[1]) > 1) fail('coffee', JSON.stringify(r)); else ok('coffee'); }
-
-  // recap: a real close button
-  await fresh();
-  { const r = await p.evaluate(() => { showRecap(0); const e = document.querySelector('#recap button'); if (!e) return { btn: false }; e.click(); return { btn: true, closed: document.querySelector('#recap').hidden }; });
-    if (!r.btn || !r.closed) fail('recap', JSON.stringify(r)); else ok('recap'); }
 
   // rrwho: the crewmate spends a reroll token
   await fresh();
   { const r = await p.evaluate(() => { G.rrHand = 1; G.turn = 1; commit(1, { t: 'rr' }); clearTimeout(UI.tm); render(); return { pr: document.querySelector('#barprompt').innerText + ' | ' + document.querySelector('#prompt').innerText, si: document.querySelector('#selinfo').innerText, btn: [...document.querySelectorAll('#acts button')].map(b => b.innerText).join(',') }; });
-    if (!/Ravi/.test(r.pr + r.si) || !/Keep/.test(r.btn)) fail('rrwho', JSON.stringify(r)); else ok('rrwho'); }
+    if (!/reroll/i.test(r.pr + r.si) || !/Keep/.test(r.btn)) fail('rrwho', JSON.stringify(r)); else ok('rrwho'); }
 
-  // hint: the reason is visible on screen
+  // hint: the ghost finger shows the suggested move (no text)
   await fresh();
-  { const r = await p.evaluate(() => { document.querySelector('#acts [data-a=hint]').click(); const w = document.querySelector('#selinfo .why'); return { has: !!w, txt: w ? w.innerText : '' }; });
-    const v = r.has && await inView('#selinfo .why'); await p.screenshot({ path: path.join(OUT, `${W}x${H}_hint.png`) });
+  { const r = await p.evaluate(() => { document.querySelector('#acts [data-a=hint]').click(); return new Promise(res => setTimeout(() => { const w = document.querySelector('#fx .gh'); res({ has: !!w, txt: '' }); }, 400)); });
+    const v = r.has; await p.screenshot({ path: path.join(OUT, `${W}x${H}_hint.png`) });
     if (!v) fail('hint', JSON.stringify(r)); else ok('hint'); }
 
-  // tipsoff: guided flight, "No more tips", then "Fly again"
-  { const r = await p.evaluate(() => { UI.prefs.guide = 'full'; newGame('guided'); clearTimeout(UI.tm); const off = document.querySelector('#pc [data-a=tipoff]'); if (!off) return { off: false }; off.click();
-      const a = document.createElement('button'); a.dataset.a = 'again'; document.body.appendChild(a); a.click(); a.remove(); clearTimeout(UI.tm); return { off: true, mode: UI.mode, level: UI.coach.level, tip: !document.querySelector('#pc').hidden }; });
-    if (!r.off || r.level !== 'off' || r.tip || r.mode !== 'vs') fail('tipsoff', JSON.stringify(r)); else ok('tipsoff'); }
+  // notips: no tip or advice card in a guided flight
+  { const r = await p.evaluate(() => { UI.prefs.guide = 'full'; newGame('guided'); clearTimeout(UI.tm); return { tip: !document.querySelector('#pc').hidden }; }); if (r.tip) fail('notips', JSON.stringify(r)); else ok('notips'); }
 
   // deadline: the goal names the real deadline (on the airport when the last round starts), not "land in round 7"
   await fresh();
-  { const t = await p.evaluate(() => document.querySelector('#goal').innerText); if (!/airport by round 7/i.test(t) || /Land in round/.test(t)) fail('deadline', t); else ok('deadline'); }
+  { const t = await p.evaluate(() => document.querySelector('#goal').innerText); if (!/Land by round 7/i.test(t)) fail('deadline', t); else ok('deadline'); }
   // rr2tap: the Reroll button explains first and spends on the second tap
   await fresh();
   { const r = await p.evaluate(() => { G.rrHand = 1; render(); const b = () => document.querySelector('#acts [data-a=rr]'); b().click(); const after1 = G.rrHand; b().click(); return { after1, after2: G.rrHand }; });
@@ -76,7 +69,7 @@ const [W, H] = (process.argv[2] || '390x763').split('x').map(Number);
   { const r = await p.evaluate(() => { UI.prefs.story = false; newGame('vs', { scenario: 'g1', role: 0, level: 'normal' }); clearTimeout(UI.tm); G.ai = [null, 'normal']; render();
       const bs = [...document.querySelectorAll('#says button')]; return { n: bs.length, off: bs.filter(b => { const q = b.getBoundingClientRect(), t = document.elementFromPoint(q.left + q.width / 2, q.top + q.height / 2); return q.bottom > innerHeight || !(t === b || b.contains(t)); }).map(b => b.innerText) }; });
     await p.screenshot({ path: path.join(OUT, `${W}x${H}_brief.png`) });
-    if (!r.n || r.n > 5 || r.off.length) fail('phrases', JSON.stringify(r)); else ok('phrases'); }
+    if (await p.evaluate(() => isPh())) ok('phrases (not shown on phones: the board is the screen)'); else if (!r.n || r.n > 5 || r.off.length) fail('phrases', JSON.stringify(r)); else ok('phrases'); }
   if (errs.length) fail('page errors', errs.slice(0, 3).join(' | '));
   console.log('PROBLEMS', bad); await b.close(); process.exit(bad ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

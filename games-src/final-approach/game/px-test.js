@@ -33,10 +33,10 @@ let bad = 0; const fail = (c, d) => { bad++; console.log('FAIL', c, d || ''); };
     { const reg = await p.evaluate(() => !!(window.PerfHUD && PerfHUD.register)); ok('PerfHUD present', String(reg)); }
     // ending animation
     await p.evaluate(() => { G.ai = [true, true]; AIDELAY = 0; schedule(); });
-    let sawEnd = false; for (let i = 0; i < 300; i++) { const st = await p.evaluate(() => ({ e: PX.state().ending, f: !!(G.result && UI.overShown && !document.querySelector('#rs').hidden) })); if (st.e) sawEnd = true; if (st.f) break; await p.waitForTimeout(200); }
-    if (!sawEnd) fail('ending animation never ran'); else ok('ending animation ran'); const fin = await p.evaluate(() => !!(G.result && !document.querySelector('#rs').hidden)); if (!fin) fail('final card did not follow the ending'); else ok('final card follows the ending');
+    let sawEnd = false; for (let i = 0; i < 300; i++) { const st = await p.evaluate(() => ({ e: PX.state().ending, f: !!(G.result && UI.overShown && document.querySelector('#fx .endb')) })); if (st.e) sawEnd = true; if (st.f) break; await p.waitForTimeout(200); }
+    if (!sawEnd) fail('ending animation never ran'); else ok('ending animation ran'); const fin = await p.evaluate(() => !!(G.result && document.querySelector('#fx .endb') && document.querySelector('#acts [data-a=again]'))); if (!fin) fail('end banner and Fly again did not follow the ending'); else ok('end banner follows the ending');
     // new flight after the ending clears the overlay
-    await p.click('#rs [data-a=again]'); await p.waitForTimeout(900); const ce = await p.evaluate(() => ({ cls: document.querySelector('#bd').classList.contains('ending'), e: PX.state().ending })); if (ce.cls || ce.e) fail('ending overlay still on after Again', JSON.stringify(ce)); else ok('Again clears the ending overlay');
+    await p.click('#acts [data-a=again]'); await p.waitForTimeout(900); const ce = await p.evaluate(() => ({ cls: document.querySelector('#bd').classList.contains('ending'), e: PX.state().ending })); if (ce.cls || ce.e) fail('ending overlay still on after Again', JSON.stringify(ce)); else ok('Again clears the ending overlay');
     // context loss -> DOM view, still playable
     await p.evaluate(() => { PX.cv.dispatchEvent(new Event('webglcontextlost', { cancelable: true })); }); await p.waitForTimeout(500); const off = await p.evaluate(() => ({ on: PX.on, cls: document.documentElement.classList.contains('fapx'), die: document.querySelectorAll('#pz .die').length })); if (off.on || off.cls) fail('context loss did not drop to the DOM view', JSON.stringify(off)); else ok('context loss -> DOM view', JSON.stringify(off));
     if (p.errs.length) fail('console errors', JSON.stringify(p.errs.slice(0, 3))); await p.context().close(); }

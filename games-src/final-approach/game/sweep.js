@@ -137,7 +137,7 @@ async function playGame(browser, size, gi) {
           const dice = by('die');
           if (dice.length && gi % 5 === 3 && Math.random() < .08 && by('rr').length && stats.rr < 3) { stats.rr++; pick = by('rr')[0]; }
           else if (dice.length && Math.random() < .05 && by('hint').length && stats.hints < 4) { stats.hints++; pick = by('hint')[0]; }
-          else if (dice.length && drag && all.m && all.to && Math.random() < .7) { const dd = dice.find(d => +d.d === all.m.d); if (dd) { pick = { kind: 'dragdie', x: dd.x, y: dd.y, tx: all.to.x, ty: all.to.y, t: 'die ' + dd.d }; } }
+          else if (dice.length && drag && all.m && !all.m.c && all.to && Math.random() < .7) { const dd = dice.find(d => +d.d === all.m.d); if (dd) { pick = { kind: 'dragdie', x: dd.x, y: dd.y, tx: all.to.x, ty: all.to.y, t: 'die ' + dd.d }; } }
           if (!pick && dice.length) { const m = all.m; const pd = m && Math.random() < .96 ? dice.find(d => +d.d === m.d) : null; pick = pd || dice[Math.floor(Math.random() * dice.length)]; }
         } else {
           const slots = by('slot'), m = all.m;

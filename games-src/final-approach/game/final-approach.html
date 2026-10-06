@@ -455,7 +455,7 @@ html.ph{font-size:15px}
 html.ph #feed,html.ph #rt,html.ph #says,html.ph #roster,html.ph #cheat,html.ph #pc,html.ph #selinfo,html.ph #barprompt,html.ph #recap,html.ph #cheat.open{display:none!important}
 html.ph .gx-dock-body{padding:0;gap:0;overflow:hidden}
 html.ph .gx-dock-body>:first-child:not([hidden]){margin-top:0}
-html.ph #goal .goalb{width:100%;min-height:36px}
+html.ph #goal .goalb{width:100%;min-height:44px}
 html.ph #promptDock{display:block!important;min-height:0;height:32px;padding:0 10px;display:flex;align-items:center}
 html.ph #prompt{display:block!important;font-size:17px;line-height:32px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-line-clamp:unset}
 html.ph #acts{display:flex!important;flex-wrap:nowrap;align-items:center;gap:6px;min-height:54px;padding:4px 8px 5px;overflow:hidden}
@@ -490,7 +490,7 @@ html.ph.ph-l .goalb .gr,html.ph.ph-l .gstrip{font-size:15px}
 .slot .ic{display:block;width:calc(var(--u)*.46);height:calc(var(--u)*.46);flex:0 0 auto;pointer-events:none}
 .slot.nov .ic{width:calc(var(--u)*.6);height:calc(var(--u)*.6)}
 .slot .ic svg{display:block;width:100%;height:100%;fill:none;stroke:#fff;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 1px 1px #000)}
-.slot .seat{position:static;flex:0 0 auto;display:block;box-sizing:border-box;width:calc(var(--u)*.36);height:calc(var(--u)*.36);border-radius:50%;border:1.5px solid rgba(255,255,255,.9);color:#fff;font-size:calc(var(--u)*.26);font-style:normal;font-weight:900;line-height:calc(var(--u)*.33);text-align:center;pointer-events:none}
+.slot .seat{position:static;flex:0 0 auto;display:block;box-sizing:border-box;width:calc(var(--u)*.36);height:calc(var(--u)*.36);border-radius:50%;border:1.5px solid rgba(255,255,255,.9);color:#fff;font-size:max(13px,calc(var(--u)*.28));font-style:normal;font-weight:900;line-height:1;display:flex;align-items:center;justify-content:center;text-align:center;pointer-events:none}
 .slot .seat.p{background:#2f6fd0}.slot .seat.c{background:#c8650f}
 .slot .sl{display:block;position:static;font-size:max(15px,calc(var(--u)*.3));font-weight:900;line-height:1;white-space:nowrap;text-align:center;color:#fff;text-shadow:0 1px 2px #000,0 0 3px #000;pointer-events:none}
 .slot .sw{right:auto;left:50%;top:-4px;margin-left:-5px;width:10px;height:10px;z-index:3}
@@ -505,7 +505,9 @@ html.ph.ph-l .goalb .gr,html.ph.ph-l .gstrip{font-size:15px}
 #bd.ending #fx .endb{display:block}
 #feed,#rt,#roster,#cheat,#pc,#says .srule{display:none!important}
 html.ph.ph-l #acts .btn,html.ph.ph-l #acts .btn.go{flex:1 1 100%}
-html.ph.ph-l .hudc span{display:none}.hudc{overflow:hidden}
+html.ph.ph-l .hudc span:not(.rtleft){display:none}.hudc{overflow:hidden}
+@media (max-height:650px){html.ph.ph-p #promptDock{height:28px}html.ph.ph-p #prompt{line-height:28px}}
+html.ph.ph-p .gx-dock-body{gap:0!important;padding-top:0!important;padding-bottom:0!important}
 </style><style>
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -5567,7 +5569,7 @@ function render() {
       const R = rows[G.round + G.row0];
       w.classList.add('altc');
       const tm = rtEl();
-      w.appendChild(h('div.altnow', h('b', R[0] + ' ft'), tm, h('span.fp.' + (R[1] ? 'c' : 'p'), fw(R[1]) + (tm ? ' first' : fw(R[1]) === 'You' ? ' go first' : ' goes first'))));
+      w.appendChild(h('div.altnow', h('b', R[0] + ' ft'), tm, h('span.fp.' + (R[1] ? 'c' : 'p'), fw(R[1]) + ' first')));
       // one dot per round: colour and letter (P = Pilot, C = Co-pilot) say who places first, so colour is never the only cue
       const dots = h('div.altdots', { title: 'Round ' + (G.round + 1) + ' of ' + n }); for (let i = 0; i < n; i++) { const Q = rows[i + G.row0]; dots.appendChild(h('i.ad.' + (Q[1] ? 'c' : 'p') + (i === G.round ? '.cur' : i < G.round ? '.past' : '') + (Q[2] ? '.rr' : ''), Q[1] ? 'C' : 'P')); } w.appendChild(dots);
     } else {
@@ -6241,7 +6243,7 @@ function applyPhone() {
   let ph = short <= 500 || (window.matchMedia && matchMedia('(pointer:coarse)').matches && short <= 600);
   if (q) ph = q[1] === '1';
   const r = document.documentElement.classList, was = r.contains('ph');
-  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', (ph && w < hh ? 132 : Math.max(172, Math.min(212, Math.round(hh * .25)))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
+  r.toggle('ph', ph); document.documentElement.style.setProperty('--dockh', (ph && w < hh ? (hh < 650 ? 132 : 136) : Math.max(172, Math.min(212, Math.round(hh * .25)))) + 'px'); r.toggle('ph-p', ph && w < hh); r.toggle('ph-l', ph && w >= hh);
   if (was !== ph) { if (G && UI.started) render(); const st = $('#start'); if (st && !st.hidden && !(typeof NET !== 'undefined' && NET.on) && UI.sv === 'setup') renderStart(); }
 }
 let rzT = 0;
