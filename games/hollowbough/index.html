@@ -311,7 +311,7 @@ svg{display:block}
 .its3 .it svg{width:16px;height:16px}
 .nm{font-size:13px;font-weight:700;margin-top:2px;text-align:center;line-height:1.05;color:#2a1f19;text-shadow:0 0 3px #fff;padding:0 3px}
 .tile.ok .face{box-shadow:0 0 0 3px var(--gold),0 0 12px 3px rgba(255,214,90,.9)}
-.tile.no .face{opacity:.55;filter:saturate(.6)}
+.tile.no .face{opacity:.8;filter:saturate(.7)}
 .tile.taken .face{filter:grayscale(.5) brightness(.85)}
 .tile.rec .face{box-shadow:0 0 0 3px #fff,0 0 0 6px #d8452c,0 0 14px 4px rgba(255,255,255,.8)}
 .tile.sel .face,.mc.sel .cd,.sc.sel .cd{outline:3px solid #fff;outline-offset:1px}
@@ -436,7 +436,7 @@ svg{display:block}
 #acts{position:absolute;z-index:45;display:flex;gap:6px;align-items:stretch}
 #acts.tray{justify-content:center;align-items:center;background:rgba(58,40,20,.6);border-radius:12px;padding:3px 6px;box-sizing:border-box;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden}
 #acts.tray .tchip{flex:1 1 0;min-width:44px;padding:2px 4px}
-#acts.tray .tchip.tcard{flex:0 0 auto}
+#acts.tray .tchip.tcard{flex:0 0 auto;min-width:0;min-height:0}
 #acts .btn{flex:1 1 0;padding:2px 6px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:15px}
 #acts .btn.undo{flex:0 0 54px;font-size:24px;padding:0}
 #acts .btn.dis{opacity:.4}
@@ -445,7 +445,7 @@ svg{display:block}
 #acts .btn.pass.armed{background:linear-gradient(180deg,#e3b02e,#c58f14);color:#2a1f19;text-shadow:none}
 .tchip{appearance:none;border:2px solid var(--ink);background:linear-gradient(180deg,#fff8e6,#ecdcba);border-radius:12px;min-height:44px;min-width:44px;padding:2px 10px;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;font-size:14px;font-weight:700;color:var(--ink);max-width:100%}
 .tchip.glow{animation:glowp 1.3s ease-in-out infinite}
-.tchip.tcard{padding:2px 4px;border-radius:8px}
+.tchip.tcard{padding:2px 4px;border-radius:8px;min-width:0;min-height:0}
 .tchip.tx{background:rgba(255,255,255,.85);font-size:24px;padding:0 8px;min-width:44px;animation:none}
 #acts.tall{align-items:center}
 #acts.tray.wrap{flex-wrap:wrap;overflow-y:auto;align-content:center}
@@ -455,6 +455,53 @@ svg{display:block}
 .zbox{background:var(--paper);border:3px solid var(--ink);border-radius:14px;padding:12px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap;max-width:100%;max-height:100%;overflow:auto;box-shadow:0 14px 40px rgba(0,0,0,.55)}
 .zinfo{display:flex;flex-direction:column;gap:3px;min-width:140px;max-width:260px}.zinfo b{font-size:17px}.zinfo p{margin:2px 0;font-size:14px;line-height:1.35}.zcost{display:flex;align-items:center;gap:4px}
 .ztile.tile{position:relative;width:136px;height:104px;cursor:default}
+/* ---- the picture board: places are little drawings on a woodland clearing; a wooden table under it holds my city, my hand and the buttons ---- */
+.scn{position:absolute;pointer-events:none;overflow:hidden}.scn .scsvg{display:block}
+.tbl{position:absolute;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(0,0,0,.07) 0 2px,transparent 2px 11px),linear-gradient(180deg,#8f6338,#6b4626);box-shadow:inset 0 6px 8px -3px rgba(0,0,0,.55)}
+.tile .face{background:none!important;border:0!important;box-shadow:none!important;overflow:visible;border-radius:0;inset:0}
+.tile .art{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none;filter:drop-shadow(0 2px 1.5px rgba(0,0,0,.35))}
+.tile .its{position:relative;z-index:1;flex-direction:row;gap:7px;align-items:center;justify-content:center}
+.t-forest .its,.t-haven .its,.t-journey .its{gap:3px}
+.tight .t-basic .its{gap:2px}
+.tile .its3{flex-wrap:wrap;width:86%;justify-content:center;gap:0 2px}
+.tile .it{position:relative}
+.it b.bd{position:absolute;right:-7px;bottom:-5px;font-size:13px;line-height:1;font-weight:800;color:#fff;text-shadow:-1px -1px 0 #2a1f19,1px -1px 0 #2a1f19,-1px 1px 0 #2a1f19,1px 1px 0 #2a1f19,0 2px 3px rgba(0,0,0,.5);pointer-events:none}
+.t-journey .it b.bd{right:-3px}.t-forest .its3 .it b.bd{font-size:12px}
+.t-bev .it b.bd,.t-sev .it b.bd{right:-5px;bottom:-4px;font-size:14px}
+.tile .face::after{content:'';position:absolute;inset:1%;border-radius:50%;pointer-events:none}
+.t-bev .face::after,.t-sev .face::after{border-radius:10px;inset:0}
+.t-deck .face::after,.t-disc .face::after,.t-tree .face::after{display:none}
+.tile.glow .face{animation:none}
+.tile.glow .face::after{animation:glowp 1.3s ease-in-out infinite}
+.tile.sel .face{outline:0}.tile.sel .face::after{outline:3px solid #fff;outline-offset:1px}
+.t-deck .face,.t-disc .face,.t-tree .face{background:radial-gradient(circle at 35% 30%,#fff8e6,#e2d0a4)!important;border:2px solid var(--ink)!important;border-radius:11px;inset:1px;box-shadow:0 2px 3px rgba(0,0,0,.4)!important;display:flex;align-items:center;justify-content:center}
+.t-deck .its,.t-disc .its,.t-tree .its{flex-direction:row;gap:1px}
+.t-deck .it b,.t-disc .it b{font-size:13px;color:#2a1f19;text-shadow:none}
+.ztile.tile{width:150px;height:110px}
+.ztile .its{gap:12px}
+.tile .pw{left:50%;right:auto;bottom:-8px;transform:translateX(-50%);z-index:3;filter:drop-shadow(0 2px 1px rgba(0,0,0,.65))}
+.tile .pw .pawnw{margin:0 -3px}
+.t-bev .pw,.t-sev .pw{bottom:-10px}
+.mc .cd{filter:drop-shadow(0 2px 2px rgba(0,0,0,.45))}
+.mc.empty{border:2px dashed rgba(60,35,12,.5)}
+.strip.city{background:rgba(25,15,6,.4)}.strip.hand{background:rgba(25,15,6,.22)}
+.strip.city .scount{left:auto;right:7px;top:3px;font-size:13px}
+.slot{position:absolute;border:1.5px dashed rgba(246,236,214,.38);border-radius:4px;background:rgba(0,0,0,.14);pointer-events:none;box-sizing:border-box}
+.cityopen{position:absolute;margin:0;padding:0;border:0;background:transparent;cursor:pointer;z-index:1}
+.cityopen .cx{position:absolute;right:9px;bottom:3px;width:18px;height:18px;color:#f6ecd6;opacity:.9;pointer-events:none}.cityopen .cx svg{width:100%;height:100%}
+.sc.fan{transform:rotate(var(--rot,0deg));transform-origin:50% 140%}
+.resrow{background:linear-gradient(180deg,#8f6338,#6b4626);border:2px solid #3b2a1a;box-shadow:0 2px 3px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.2)}
+.chip{box-shadow:0 2px 3px rgba(0,0,0,.35)}
+#cityov{position:absolute;inset:0;z-index:46}
+.cvscrim{position:absolute;inset:0;background:rgba(20,14,8,.9)}
+.cvpanel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:100%;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 8px;background:linear-gradient(180deg,#8f6338,#6b4626);border:3px solid #3b2a1a;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+.cvhead{display:flex;gap:10px;align-items:baseline;color:#f6ecd6;font-size:18px}.cvhead span{font-size:15px;opacity:.85}
+.cvgrid{display:grid;justify-content:center}
+.cvcell{position:relative;outline:2px dashed rgba(246,236,214,.35);outline-offset:-2px;border-radius:8px;background:rgba(25,15,6,.35)}
+.cvc{position:absolute;left:0;top:0;margin:0;padding:0;border:0;background:none;display:block}
+.cvc .cd{position:absolute;left:0;top:0}
+.cvc.glow{z-index:3}.cvc.glow .cd{border-radius:6px;animation:glowp 1.3s ease-in-out infinite}
+.cvx{min-width:120px}
 .pcard{top:0;bottom:0;border-top:0}
 .gx-bar .gx-ibtn{flex:0 0 auto}
 /* phones */
@@ -515,7 +562,7 @@ html.cb .pawnw .gx-cbm{display:block}
 <body>
 <div class="gx-app">
 <div class="gx-main">
-  <main class="gx-board" id="board" data-board aria-label="The Elderheart board"><div id="bd"></div><div id="fx" aria-hidden="true"></div></main>
+  <main class="gx-board" id="board" aria-label="The Elderheart board"><div id="bd"></div><div id="fx" aria-hidden="true"></div></main>
   <div class="pcard" id="pc" hidden role="dialog" aria-label="Message"></div>
   <div id="zoom" hidden role="dialog" aria-label="Details"></div>
 </div>
@@ -4529,7 +4576,8 @@ const FIC = {
 const EVT = { production: 'production', destination: 'destination', governance: 'governance', traveler: 'traveler' };
 function items(list, px) {
   const w = h('div.its' + (list.length > 2 ? '.its3' : ''));
-  for (const [k, n] of list) w.appendChild(h('span.it', ic(k, px), (n !== '' && n !== 1) ? h('b', (/^\d+$/.test(String(n)) ? '×' : '') + n) : null));
+  const p = list.length > 2 ? Math.round(px * .78) : list.length === 1 ? Math.min(px + 6, Math.round(px * 1.2)) : px;
+  for (const [k, n] of list) { const num = (n !== '' && n !== 1) ? (/^\d+$/.test(String(n)) ? '×' : '') + n : null; w.appendChild(h('span.it', ic(k, p), num ? h('b.bd', num) : null)); }
   return w;
 }
 function basicItems(i) { const b = D.basic[i], l = []; for (const r of RESK) if (b.gain[r]) l.push([r, b.gain[r]]); if (b.draw) l.push(['card', b.draw]); if (b.pts) l.push(['point', b.pts]); return l; }
@@ -4556,56 +4604,68 @@ function fitStrip(n, W, H, baseW) {
 function boardLayout(W, H) {
   const wide = W >= H * 1.0 || (document.documentElement.classList.contains('ph-l'));
   const tall = !wide, g = 2, pad = 4;
-  const R = { W, H, tall, tiles: [], meadow: [], g };
-  const tl = (kind, i, x, y, w, hh) => R.tiles.push({ kind, i, x, y, w, h: hh });
+  const R = { W, H, tall, tiles: [], meadow: [], g, slots: false };
+  const tl = (kind, i, x, y, w, hh, ex) => { const t = { kind, i, x, y, w, h: hh }; if (ex) Object.assign(t, ex); R.tiles.push(t); return t; };
   const nf = G.forest.length;
-  const rowB = []; for (let i = 0; i < nf; i++) rowB.push(['forest', i]);
-  [['haven', 0], ['journey', 0], ['deck', 0], ['tree', 0]].forEach(e => rowB.push(e)); if (nf === 3) rowB.push(['disc', 0]);
+  const r3 = []; for (let i = 0; i < nf; i++) r3.push(['forest', i]); r3.push(['haven', 0], ['journey', 0]);
+  const sup = [['deck', 0], ['tree', 0]]; if (nf === 3) sup.push(['disc', 0]);
   const evs = []; G.bev.forEach((e, i) => evs.push(['bev', i])); G.sev.forEach((e, i) => evs.push(['sev', i]));
   const nCity = Math.max(1, G.players[Math.max(0, focusSeat())].city.length + visitList().length);
   const nHand = Math.max(1, (viewSeat() >= 0 ? G.players[viewSeat()].hand.length : 5));
   if (tall) {
-    const small = H < 520;
-    const chipH = small ? 32 : 36, actH = small ? 42 : 46, resH = small ? 28 : 32;
-    let tr = small ? 36 : 44, er = small ? 32 : 38, sh = small ? 58 : 70;
-    const gm = 6, cwMax = Math.min(120, (W - 2 * pad - 3 * gm) / 4), chMax = cwMax * CARD_AR;
-    const calc = () => {
-      const top = chipH + 7 + 2 * tr + er + 3 * 3 + 4;
-      const bottom = actH + resH + 2 * sh + 4 * g + pad;
-      return { top, bottom, avail: H - top - bottom };
+    // bands from the top: scores, event pennants, 2 rows of basic places (1 row when short), forest/haven/road, the meadow bench, my stock; the
+    // table under the picture: my city strip, my fanned hand, the action row. Every band shrinks until the meadow cards are readable.
+    const meas = (mode, t) => {
+      const L = (a, b) => Math.round(b + (a - b) * t), tight = mode === 'tight';
+      const m = { mode, t, chip: L(36, 30), ev: L(46, 30), br: tight ? L(46, 36) : L(58, 42), r3: L(60, 40), res: L(34, 26), hand: L(88, 60), city: L(46, 32), acts: L(46, 40), rg: tight ? 0 : 7, sg: tight ? 3 : 5, rows: tight ? 1 : 2 };
+      let y = 3 + m.chip + m.sg; m.evY = y; y += m.ev + m.sg; m.bY = y; y += m.rows * m.br + (m.rows - 1) * m.rg + m.sg; m.r3Y = y; y += m.r3 + m.sg + 3; m.mTop = y;
+      let yb = H - pad; m.actsY = yb - m.acts; yb = m.actsY - 3; m.handY = yb - m.hand; yb = m.handY - 3; m.cityY = yb - m.city; m.sceneB = m.cityY - 3;
+      m.resY = m.sceneB - 3 - m.res; m.mBot = m.resY - 3;
+      const bp = 5, avail = m.mBot - m.mTop - 2 * bp - 4; m.ch = avail / 2; m.cw = Math.min(104, m.ch / CARD_AR, (W - 2 * pad - 2 * bp - 3 * 6) / 4);
+      return m;
     };
-    let c = calc(), chAv = (c.avail - 4 - 4) / 2;
-    if (chAv > chMax) {
-      let spare = 2 * (chAv - chMax);
-      const dS = Math.min(28, spare * .3); sh += dS; spare -= 2 * dS;
-      const dT = Math.min(8, spare / 3); tr += dT; er += dT;
-      c = calc(); chAv = (c.avail - 4 - 4) / 2;
-    }
-    const ch = Math.max(40, Math.min(chMax, chAv)), cw = Math.min(cwMax, ch / CARD_AR), chh = cw * CARD_AR;
-    // places
-    const tg = 3, tw = (W - 2 * pad - 7 * tg) / 8; let y = 0;
-    R.chips = { x: pad, y: 3, w: W - 2 * pad, h: chipH }; y = chipH + 3 + 4;
-    for (let i = 0; i < 8; i++) tl('basic', i, pad + i * (tw + tg), y, tw, tr); y += tr + tg;
-    rowB.forEach((e, i) => tl(e[0], e[1], pad + i * (tw + tg), y, tw, tr)); y += tr + tg;
-    evs.forEach((e, i) => tl(e[0], e[1], pad + i * (tw + tg), y, tw, er)); y += er + tg + 2;
-    // bottom stack, laid from the bottom edge up so the hand and the buttons sit under the thumb
-    let yb = H - pad;
-    R.acts = { x: pad, y: yb - actH, w: W - 2 * pad, h: actH }; yb -= actH + g;
-    R.hand = { x: pad, y: yb - sh, w: W - 2 * pad, h: sh }; yb -= sh + g;
-    R.res = { x: pad, y: yb - resH, w: W - 2 * pad, h: resH }; yb -= resH + g;
-    R.city = { x: pad, y: yb - sh, w: W - 2 * pad, h: sh }; yb -= sh + g;
-    // meadow: two rows of cards centred in what is left
-    const mtop = y, mh = yb - mtop, tot = 2 * chh + 4, my0 = mtop + Math.max(0, (mh - tot) / 2), mgm = Math.min(gm, (W - 2 * pad - 4 * cw) / 3), mx = (W - (4 * cw + 3 * mgm)) / 2;
-    for (let s = 0; s < 8; s++) R.meadow.push({ i: s, x: mx + (s % 4) * (cw + mgm), y: my0 + Math.floor(s / 4) * (chh + 4), w: cw, h: chh });
-    R.strip = { hand: fitStrip(nHand, R.hand.w - 4, R.hand.h - 2, 66), city: fitStrip(nCity, R.city.w - 4, R.city.h - 2, 66) };
+    const pick = mode => { let b = null; for (let t = 1; t > -0.001; t -= .1) { b = meas(mode, Math.max(0, t)); if (b.cw >= 80) return b; } return b; };
+    let m = H >= 600 ? pick('roomy') : null; if (!m || m.cw < 62) { const m2 = pick('tight'); if (!m || m2.cw > m.cw) m = m2; }
+    const tight = m.mode === 'tight'; R.mode = m.mode;
+    R.chips = { x: pad, y: 3, w: W - 2 * pad, h: m.chip };
+    // event pennants on a rope
+    const ne = Math.max(1, evs.length), ew = (W - 2 * pad - 14) / ne, ewd = Math.min(ew - 2, 52), evX = [];
+    evs.forEach((e, i) => { const cx = pad + 7 + ew * (i + .5); evX.push(cx); tl(e[0], e[1], cx - ewd / 2, m.evY, ewd, m.ev, { ip: 20, ps: 18 }); });
+    R.rope = { y: m.evY + 3, xs: evX, h: m.ev };
+    // basic places
+    const rowsArr = [], cg = tight ? 3 : 8, cols = tight ? 8 : 4, bw = (W - 2 * pad - (cols - 1) * cg) / cols;
+    const ipB = tight ? Math.max(16, Math.min(22, Math.floor((bw - 5) / 2))) : Math.min(32, Math.floor(m.br * .6));
+    for (let r = 0; r < m.rows; r++) rowsArr.push([]);
+    for (let i = 0; i < 8; i++) { const row = Math.floor(i / cols); rowsArr[row].push(tl('basic', i, pad + (i % cols) * (bw + cg), m.bY + row * (m.br + m.rg), bw, m.br, { ip: ipB, ps: Math.round(Math.min(28, m.br * .56)) })); }
+    // forest places, the haven and the road
+    const n3 = r3.length, w3 = Math.min(78, (W - 2 * pad - (n3 - 1) * cg) / n3), x3 = (W - (n3 * w3 + (n3 - 1) * cg)) / 2, row3 = [];
+    r3.forEach((e, k) => row3.push(tl(e[0], e[1], x3 + k * (w3 + cg), m.r3Y, w3, m.r3, { ip: Math.min(28, Math.floor((w3 - 4) / 2)), ps: Math.round(Math.min(26, m.r3 * .52)) })));
+    rowsArr.push(row3);
+    // draw pile, seasons and discards sit at the end of the stock row
+    const stw = Math.min(40, m.res + 6), nS = sup.length, tilesW = nS * stw + (nS - 1) * 3;
+    R.res = { x: pad, y: m.resY, w: W - 2 * pad - tilesW - 4, h: m.res };
+    sup.forEach((e, k) => tl(e[0], e[1], W - pad - tilesW + k * (stw + 3), m.resY, stw, m.res, { ip: Math.max(14, Math.min(20, m.res - 10)) }));
+    // the meadow bench
+    const bp = 5, cw = m.cw, chh = cw * CARD_AR, gm = 6, totW = 4 * cw + 3 * gm, mx = (W - totW) / 2, tot = 2 * chh + 4, avail = m.mBot - m.mTop, my0 = m.mTop + Math.max(bp, (avail - tot) / 2);
+    for (let s = 0; s < 8; s++) R.meadow.push({ i: s, x: mx + (s % 4) * (cw + gm), y: my0 + Math.floor(s / 4) * (chh + 4), w: cw, h: chh });
+    R.bench = { x: mx - bp - 2, y: my0 - bp, w: totW + 2 * bp + 4, h: tot + 2 * bp };
+    R.stream = { h: true, y: m.r3Y + m.r3 + (m.sg + 3) / 2 };
+    R.path = []; rowsArr.forEach((row, k) => (k % 2 ? row.slice().reverse() : row).forEach(t => R.path.push({ x: t.x + t.w / 2, y: t.y + t.h / 2 })));
+    R.scene = { x: 0, y: 0, w: W, h: m.sceneB }; R.tbl = { x: 0, y: m.sceneB, w: W, h: H - m.sceneB };
+    R.city = { x: pad, y: m.cityY, w: W - 2 * pad, h: m.city }; R.hand = { x: pad, y: m.handY, w: W - 2 * pad, h: m.hand }; R.acts = { x: pad, y: m.actsY, w: W - 2 * pad, h: m.acts };
+    R.slots = true; R.fan = true;
+    const cw0 = Math.min(40, Math.floor((m.city - 6) / CARD_AR)), nSl = Math.max(15, nCity), stp = Math.min(cw0 + 2, (R.city.w - 10 - cw0 - 40) / (nSl - 1));
+    R.fanDrop = tight ? 7 : 11;
+    R.strip = { hand: fitStrip(nHand, R.hand.w - 22, R.hand.h - R.fanDrop - 3, 66), city: { cw: cw0, ch: Math.round(cw0 * CARD_AR), rows: 1, per: nSl, step: stp, x0: 5, n: nSl } };
   } else {
     const rail = Math.round(Math.max(236, Math.min(340, W * .32))), LW = W - rail - pad;
     const chipH = 34, actH = 44, resH = 30;
     const gp = Math.max(6, Math.round(LW * .012)), Lw = Math.round(LW * .40), tw = (Lw - 3 * g) / 4;
-    const th = Math.min(tw * 1.3, (H - 3 * g - 8) / 4);
-    for (let i = 0; i < 8; i++) tl('basic', i, (i % 4) * (tw + g), Math.floor(i / 4) * (th + g), tw, th);
-    const y2 = 2 * (th + g) + 6;
-    rowB.forEach((e, i) => tl(e[0], e[1], (i % 4) * (tw + g), y2 + Math.floor(i / 4) * (th + g), tw, th));
+    const th = Math.min(tw * 1.3, (H - 3 * g - 8) / 4), ipw = Math.max(18, Math.min(34, Math.floor(Math.min(tw * .4, th * .46)))), psw = Math.round(Math.max(20, Math.min(30, th * .4)));
+    const rowsArr = [[], [], []];
+    for (let i = 0; i < 8; i++) rowsArr[Math.floor(i / 4)].push(tl('basic', i, (i % 4) * (tw + g), Math.floor(i / 4) * (th + g), tw, th, { ip: ipw, ps: psw }));
+    const y2 = 2 * (th + g) + 6, rowB = r3.concat(sup);
+    rowB.forEach((e, i) => { const t = tl(e[0], e[1], (i % 4) * (tw + g), y2 + Math.floor(i / 4) * (th + g), tw, th, { ip: ipw, ps: psw }); if (i < 4) rowsArr[2].push(t); });
     const x0 = Lw + gp * 2, Rw = LW - x0; let cw = Math.min((Rw - 3 * g * 2) / 4, 170);
     const evh = Math.max(40, Math.min(th * .9, 70));
     let ch = cw * CARD_AR; const maxch = (H - 2 * evh - 4 * g - 10) / 2; if (ch > maxch) { ch = maxch; cw = ch / CARD_AR; }
@@ -4613,7 +4673,7 @@ function boardLayout(W, H) {
     const mx = x0 + (Rw - (4 * cw + 3 * gm)) / 2;
     for (let s = 0; s < 8; s++) R.meadow.push({ i: s, x: mx + (s % 4) * (cw + gm), y: Math.floor(s / 4) * (ch + g * 2), w: cw, h: ch });
     const ey = 2 * ch + g * 4 + 8, etw = (Rw - 3 * g) / 4;
-    evs.forEach((e, i) => tl(e[0], e[1], x0 + (i % 4) * (etw + g), ey + Math.floor(i / 4) * (evh + g), etw, evh));
+    evs.forEach((e, i) => tl(e[0], e[1], x0 + (i % 4) * (etw + g), ey + Math.floor(i / 4) * (evh + g), etw, evh, { ip: 20, ps: 18 }));
     let mxy = 0; R.tiles.forEach(t => mxy = Math.max(mxy, t.y + t.h)); R.meadow.forEach(t => mxy = Math.max(mxy, t.y + t.h));
     const off = Math.max(0, Math.min(80, (H - mxy) / 2)); if (off > 1) { R.tiles.forEach(t => t.y += off); R.meadow.forEach(t => t.y += off); }
     // the rail
@@ -4625,6 +4685,10 @@ function boardLayout(W, H) {
     R.city = { x: rx, y: chipH + g + resH + g + 3, w: rw, h: hc };
     R.hand = { x: rx, y: R.city.y + hc + g, w: rw, h: yb - (R.city.y + hc + g) };
     R.strip = { hand: fitStrip(nHand, R.hand.w - 4, R.hand.h - 2, 74), city: fitStrip(nCity, R.city.w - 4, R.city.h - 2, 74) };
+    R.scene = { x: 0, y: 0, w: rx - 2, h: H }; R.tbl = { x: rx - 2, y: 0, w: W - rx + 2, h: H };
+    const bp = 6; R.bench = { x: mx - bp, y: R.meadow[0].y - bp, w: 4 * cw + 3 * gm + 2 * bp, h: 2 * ch + g * 2 + 2 * bp };
+    R.stream = { h: false, x: Lw + gp };
+    R.path = []; rowsArr.forEach((row, k) => (k % 2 ? row.slice().reverse() : row).forEach(t => R.path.push({ x: t.x + t.w / 2, y: t.y + t.h / 2 })));
   }
   return R;
 }
@@ -4665,7 +4729,9 @@ function tileInfo(kind, i) {
   return {};
 }
 function tileFace(t, big) {
-  const px = big ? 28 : 20; let f = h('div.face');
+  const px = big ? 28 : (t.ip || 20); let f = h('div.face');
+  const key = t.kind === 'basic' ? D.basic[t.i].key : t.kind === 'forest' ? D.forest[G.forest[t.i]].key : '';
+  f.innerHTML = spotArt(t.kind, key, t.i);
   switch (t.kind) {
     case 'basic': f.appendChild(items(basicItems(t.i), px)); break;
     case 'forest': f.appendChild(items(FIC[D.forest[G.forest[t.i]].key] || [['any', '']], px)); break;
@@ -4674,8 +4740,8 @@ function tileFace(t, big) {
     case 'deck': f.appendChild(h('div.its', h('span.it', ic('deck', px), h('b', G.deck.length)))); break;
     case 'disc': f.appendChild(h('div.its', h('span.it', ic('discard', px), h('b', G.discard.length)))); break;
     case 'tree': { const s = G.players[Math.max(0, viewSeat() >= 0 ? viewSeat() : (G.phase === 'over' ? 0 : HB.actor(G)))]; f.appendChild(h('div.its', h('span.it', HBKit.season(SEAS[s ? s.season : 0], px + 4)))); break; }
-    case 'bev': { const e = G.bev[t.i], dd = D.basicEvents[e.k], need = Object.keys(dd.need)[0]; const col = HBKit.TYPES[need] ? HBKit.TYPES[need].c : '#888'; f.style.setProperty('--ec', col); f.appendChild(h('div.its', h('span.it', ic('flag', px), h('b', dd.pts)))); break; }
-    case 'sev': { const e = G.sev[t.i], dd = D.specialEvents[e.k]; f.style.setProperty('--ec', '#7f5496'); f.appendChild(h('div.its', h('span.it', ic('star', px), dd.pts ? h('b', dd.pts) : h('b', '?')))); break; }
+    case 'bev': { const e = G.bev[t.i], dd = D.basicEvents[e.k], need = Object.keys(dd.need)[0]; const col = HBKit.TYPES[need] ? HBKit.TYPES[need].c : '#888'; f.style.setProperty('--ec', col); f.appendChild(h('div.its', h('span.it', ic('flag', px), h('b.bd', dd.pts)))); break; }
+    case 'sev': { const e = G.sev[t.i], dd = D.specialEvents[e.k]; f.style.setProperty('--ec', '#7f5496'); f.appendChild(h('div.its', h('span.it', ic('star', px), h('b.bd', dd.pts ? dd.pts : '?')))); break; }
   }
   if (big) { const nm = t.kind === 'deck' ? 'Draw pile' : t.kind === 'disc' ? 'Discards' : t.kind === 'tree' ? 'Seasons' : (tileInfo(t.kind, t.i).name || ''); f.appendChild(h('div.nm', nm)); }
   return f;
@@ -4720,7 +4786,7 @@ function renderBoard() {
   const W = host.clientWidth || 390, H = host.clientHeight || 470;
   const R = boardLayout(W, H); UI.lay = R;
   bd.innerHTML = ''; bd.style.width = W + 'px'; bd.style.height = H + 'px';
-  bd.className = R.tall ? 'tall' : 'wide';
+  bd.className = (R.tall ? 'tall ' : 'wide ') + (R.mode || '');
   UI.tgEls = {}; UI.cr = {}; UI.tiles = {};
   const mm = myMoves(), mine = mm.length > 0, v = viewSeat();
   const okw = new Set(mm.filter(m => m.type === 'worker').map(tgOf));
@@ -4732,7 +4798,10 @@ function renderBoard() {
   const big = !R.tall && R.tiles.some(t => t.kind === 'basic' && t.w >= 84 && t.h >= 70);
   bd.classList.toggle('big', big);
   if (UI.sel && (UI.sel.logN !== G.logN || !UI.sel.ms.every(m => mm.some(x => sameM(x, m))))) UI.sel = null;
+  if (UI.cityOpen && UI.cityOpen.logN !== G.logN) UI.cityOpen = null;
+  const ov = !!UI.cityOpen;
   const regTg = (tg, e) => { if (tg) { e.setAttribute('data-t', tg); e.setAttribute('data-a', 't'); UI.tgEls[tg] = e; } };
+  bd.appendChild(sceneEls(R));
   // ---- places
   for (const t of R.tiles) {
     const info = tileInfo(t.kind, t.i), tg = tileTg(t.kind, t.i);
@@ -4747,10 +4816,10 @@ function renderBoard() {
     if (UI.sel && UI.sel.tg === tg) e.classList.add('sel');
     if (t.kind === 'bev' || t.kind === 'sev') {
       const ev = (t.kind === 'bev' ? G.bev : G.sev)[t.i];
-      if (ev.o !== -1 && ev.o != null) { e.classList.add('done'); e.appendChild(h('div.pw', pawn(ev.o, 18))); }
+      if (ev.o !== -1 && ev.o != null) { e.classList.add('done'); e.appendChild(h('div.pw', pawn(ev.o, t.ps || 18))); }
     } else if (/basic|forest|haven|journey/.test(t.kind)) {
       const ws = workersAt(t.kind, t.i);
-      if (ws.length) { const pw = h('div.pw'); ws.slice(0, 4).forEach(s => pw.appendChild(pawn(s, t.h < 40 ? 18 : 22))); e.appendChild(pw); if (!info.shared && t.kind !== 'journey' && t.kind !== 'haven') e.classList.add('taken'); }
+      if (ws.length) { const pw = h('div.pw'); ws.slice(0, 4).forEach(s => pw.appendChild(pawn(s, t.ps || 22))); e.appendChild(pw); if (!info.shared && t.kind !== 'journey' && t.kind !== 'haven') e.classList.add('taken'); }
     }
     bd.appendChild(e);
   }
@@ -4777,33 +4846,39 @@ function renderBoard() {
     for (let s = 0; s < G.np; s++) c.appendChild(chipEl(s, n));
     if (G.grim) c.appendChild(chipEl('G', n));
     bd.appendChild(c); }
-  // ---- my city (and rival open destinations I may visit)
+  // ---- my city (and rival open destinations I may visit): a compact strip of 15 slots; a tap opens it full screen
   const fs = focusSeat(), me = G.players[fs], cityBox = R.city, vis = visitList();
+  const cityList = me.city.map(e => ({ id: e.id, e, own: true })).concat(vis.map(x => ({ id: x.id, o: x.o })));
+  // one glow rule for a city card, in the strip or in the full-screen view
+  const cityCard = (b, it, live, plain) => {
+    const tg = 'd:' + it.id;
+    if (live && okw.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
+    else if (live && qLoc.has(tg)) { b.classList.add('glow'); regTg('q:' + qLoc.get(tg), b); qShown.add(qLoc.get(tg)); }
+    else if (live && qCard.has(it.id)) { b.classList.add('glow'); regTg('q:' + qCard.get(it.id), b); qShown.add(qCard.get(it.id)); }
+    else if (!plain) { b.setAttribute('data-a', 'city'); b.setAttribute('data-t', 'x:c' + it.id); }
+  };
   { const strip = placeBox(h('div.strip.city'), cityBox); bd.appendChild(strip);
-    const list = me.city.map(e => ({ id: e.id, e, own: true })).concat(vis.map(x => ({ id: x.id, o: x.o })));
-    const fit = R.strip.city, n = list.length;
+    const fit = R.strip.city, n = cityList.length;
+    if (R.slots) for (let i = 0; i < fit.n; i++) { const sl = h('i.slot'); sl.style.cssText = `left:${fit.x0 + i * fit.step}px;top:${Math.max(1, (cityBox.h - fit.ch) / 2)}px;width:${fit.cw}px;height:${fit.ch}px`; strip.appendChild(sl); }
     strip.appendChild(h('span.scount', (me.city.length) + '/15'));
-    if (!n) strip.appendChild(h('span.sempty', { 'aria-hidden': 'true', html: ICO.haven }));
-    list.forEach((it, i) => {
-      const p = posStripCard(cityBox, fit, n, i), tg = 'd:' + it.id;
+    const open = h('button.cityopen', { 'data-a': 'city', type: 'button', 'aria-label': 'Open my city' }); placeBox(open, cityBox); open.appendChild(h('span.cx', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round"/></svg>' })); bd.appendChild(open);
+    cityList.forEach((it, i) => {
+      const p = R.slots ? { x: fit.x0 + i * fit.step, y: Math.max(1, (cityBox.h - fit.ch) / 2) } : posStripCard(cityBox, fit, n, i);
       const b = h('button.sc', { 'data-zoom': 'card:' + it.id, 'data-id': it.id, type: 'button', 'aria-label': cname(it.id) }, cardEl(it.id, fit.cw, { entry: it.e }));
       if (it.o != null) b.appendChild(h('span.vb', pawn(it.o, 16)));
       b.style.cssText = `left:${cityBox.x + p.x}px;top:${cityBox.y + p.y}px;width:${fit.cw}px;height:${fit.ch}px;z-index:${i + 2}`;
       UI.cr['c' + it.id] = { x: cityBox.x + p.x, y: cityBox.y + p.y, w: fit.cw, h: fit.ch };
-      if (okw.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
-      else if (qLoc.has(tg)) { b.classList.add('glow'); regTg('q:' + qLoc.get(tg), b); qShown.add(qLoc.get(tg)); }
-      else if (qCard.has(it.id)) { b.classList.add('glow'); regTg('q:' + qCard.get(it.id), b); qShown.add(qCard.get(it.id)); }
-      else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:c' + it.id); }
+      cityCard(b, it, !ov, false);
       bd.appendChild(b);
     }); }
   // ---- my stock
   { const r = placeBox(h('div.resrow'), R.res), show = v >= 0 || watching();
-    const rp = R.res.w < 380 ? 19 : 22;
+    const rp = R.res.w < 300 ? 18 : R.res.w < 380 ? 19 : 22;
     for (const k of RESK) r.appendChild(h('span.rs', { 'data-res': k }, ic(k, rp), h('b', show ? me.res[k] : '?')));
     r.appendChild(h('span.rs.pt', { 'data-res': 'point' }, ic('point', rp), h('b', me.pts)));
     r.appendChild(h('span.rs.wk', { 'data-res': 'worker' }, pawn(fs, rp - 2), h('b', availW(me) + '/' + me.workers)));
     bd.appendChild(r); }
-  // ---- my hand
+  // ---- my hand (a fan at the bottom)
   { const handBox = R.hand, strip = placeBox(h('div.strip.hand'), handBox); bd.appendChild(strip);
     const hand = v >= 0 ? G.players[v].hand : [], fit = R.strip.hand, n = hand.length;
     strip.appendChild(h('span.scount', v >= 0 ? n + '/8' : ''));
@@ -4812,8 +4887,10 @@ function renderBoard() {
     hand.forEach((id, i) => {
       const p = posStripCard(handBox, fit, n, i), tg = 'p:hand:' + id;
       const b = h('button.sc', { 'data-zoom': 'card:' + id, 'data-id': id, type: 'button', 'aria-label': cname(id) }, cardEl(id, fit.cw));
-      b.style.cssText = `left:${handBox.x + p.x}px;top:${handBox.y + p.y}px;width:${fit.cw}px;height:${fit.ch}px;z-index:${i + 2}`;
-      UI.cr['h' + id] = { x: handBox.x + p.x, y: handBox.y + p.y, w: fit.cw, h: fit.ch };
+      let top = handBox.y + p.y;
+      if (R.fan && n > 1) { const mid = (n - 1) / 2, d = i - mid, rot = Math.max(-5, Math.min(5, d * Math.min(4.5, 26 / (n - 1)))), dy = Math.round(d * d * Math.min(1.5, R.fanDrop / (mid * mid + 1))); top = handBox.y + Math.min(handBox.h - fit.ch - 1, 3 + dy); b.style.setProperty('--rot', rot.toFixed(1) + 'deg'); b.classList.add('fan'); }
+      b.style.cssText += `;left:${handBox.x + p.x}px;top:${top}px;width:${fit.cw}px;height:${fit.ch}px;z-index:${i + 2}`;
+      UI.cr['h' + id] = { x: handBox.x + p.x, y: top, w: fit.cw, h: fit.ch };
       if (okp.has(tg)) { b.classList.add('glow'); regTg(tg, b); }
       else if (qCard.has(id)) { b.classList.add('glow'); regTg('q:' + qCard.get(id), b); qShown.add(qCard.get(id)); }
       else { b.setAttribute('data-a', 't'); b.setAttribute('data-t', 'x:h' + id); }
@@ -4823,9 +4900,33 @@ function renderBoard() {
   // ---- action row / tray
   renderActs(mm, qm, qShown);
   if (UI.sel) bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow'));
+  if (ov) { bd.querySelectorAll('.glow:not(.tchip)').forEach(e => e.classList.remove('glow')); cityOverlay(me, cityList, cityCard); }
   renderPrompt();
   renderBar();
   placeFinger();
+}
+// the whole city, full screen: 15 slots in a grid. Usable destinations glow here just as in the strip; tap outside to close.
+function cityOverlay(me, list, cityCard) {
+  const bd = $('#bd'), W = UI.lay.W, H = UI.lay.H, o = h('div#cityov', { role: 'dialog', 'aria-label': 'My city' });
+  o.appendChild(h('div.cvscrim', { 'data-a': 'cityx' }));
+  const nSl = Math.max(15, list.length), cols = 5, rows = Math.ceil(nSl / cols), gp = 6, top = 46;
+  const cw = Math.max(40, Math.min(112, Math.floor(Math.min((W - 24 - (cols - 1) * gp) / cols, (H - top - 70 - (rows - 1) * gp) / rows / CARD_AR)))), ch = Math.round(cw * CARD_AR);
+  const pn = h('div.cvpanel', { 'data-a': 'noop' }); o.appendChild(pn);
+  pn.appendChild(h('div.cvhead', h('b', 'My city'), h('span', me.city.length + '/15')));
+  const grid = h('div.cvgrid'); grid.style.cssText = `grid-template-columns:repeat(${cols},${cw}px);gap:${gp}px`;
+  for (let i = 0; i < nSl; i++) {
+    const it = list[i], cell = h('div.cvcell'); cell.style.cssText = `width:${cw}px;height:${ch}px`;
+    if (it) {
+      const b = h('button.cvc', { 'data-zoom': 'card:' + it.id, 'data-id': it.id, type: 'button', 'aria-label': cname(it.id) }, cardEl(it.id, cw, { entry: it.e }));
+      b.style.cssText = `width:${cw}px;height:${ch}px`;
+      if (it.o != null) b.appendChild(h('span.vb', pawn(it.o, 18)));
+      cityCard(b, it, true, true); cell.appendChild(b);
+    }
+    grid.appendChild(cell);
+  }
+  pn.appendChild(grid);
+  pn.appendChild(h('button.btn.cvx', { 'data-a': 'cityx', type: 'button', 'aria-label': 'Close my city' }, 'Done'));
+  bd.appendChild(o);
 }
 const isPh = () => document.documentElement.classList.contains('ph');
 function focusSeat() { const v = viewSeat(); if (v >= 0) return v; if (UI.focus != null && UI.focus < G.np) return UI.focus; return Math.max(0, G.phase === 'over' ? 0 : Math.min(G.np - 1, G.cur)); }
@@ -4851,7 +4952,7 @@ function trayChip(m, i, tg) {
     else inner = [h('b', ({ innkeeper: 'Inn −3', crane: 'Crane −3', dungeon: 'Cells −3', judge: 'Swap' })[m.how] || 'Play'), m.via != null ? cardEl(m.via, 26) : null];
   } else if (m.type === 'worker' && m.k === 'journey') inner = [ic('road', 22), h('b', D.journey[m.i].points)];
   else if (m.type === 'choose') {
-    if (m.card !== undefined) inner = [cardEl(m.card, 44)];
+    if (m.card !== undefined) inner = [cardEl(m.card, UI.trayCw || 44)];
     else if (m.res !== undefined) inner = [ic(m.res, 26)];
     else inner = [h('b', wordsCap(m.label, 6) || 'OK')];
   } else inner = [h('b', wordsCap(m.label, 5))];
@@ -4869,6 +4970,9 @@ function renderActs(mm, qm, qShown) {
   // choices (a question, or a card / place with several ways to use it)
   let chips = [];
   UI.tm2 = [];
+  // many card choices: shrink the cards until every one fits above the buttons (no scrolling inside the tray)
+  { const trayMs = UI.sel ? UI.sel.ms : qm.filter(m => !qShown.has(m.i)), nc = trayMs.filter(m => m.type === 'choose' && m.card !== undefined).length; UI.trayCw = 44;
+    if (nc && trayMs.length > 5) { const availH = Math.max(120, Math.min(R.H * .6, box.y + box.h - 120)); for (const c of [44, 38, 34, 30, 26, 22]) { const per = Math.max(1, Math.floor((box.w - 8) / (c + 12 + 6))), rows = Math.ceil(trayMs.length / per); UI.trayCw = c; if (rows * (Math.round(c * CARD_AR) + 14) + 10 <= availH) break; } } }
   if (UI.sel) UI.sel.ms.forEach(m => { const i = UI.tm2.push(m) - 1; chips.push(trayChip(m, i, 'o:' + i)); });
   else if (qm.length) qm.forEach(m => { if (!qShown.has(m.i)) { const i = UI.tm2.push(m) - 1; chips.push(trayChip(m, i, 'q:' + m.i)); } });
   if (chips.length) {
@@ -4876,8 +4980,8 @@ function renderActs(mm, qm, qShown) {
     const nCards = chips.filter(c => c.classList.contains('tcard')).length, hasCard = nCards > 0, many = chips.length > 3 && !hasCard && qShown.size === 0;
     if (hasCard || many) {
       let rows;
-      if (hasCard) { const per = Math.max(1, Math.floor((box.w - 12) / 52)); rows = Math.min(3, Math.ceil(chips.length / per)); } else rows = Math.min(3, Math.ceil(chips.length * 92 / Math.max(120, box.w)));
-      const hh = hasCard ? rows * 66 + 10 : Math.max(box.h, rows * 50 + 6);
+      if (hasCard) { const per = Math.max(1, Math.floor((box.w - 8) / (UI.trayCw + 12 + 6))); rows = Math.ceil(chips.length / per); } else rows = Math.min(3, Math.ceil(chips.length * 92 / Math.max(120, box.w)));
+      const hh = hasCard ? rows * (Math.round(UI.trayCw * CARD_AR) + 14) + 10 : Math.max(box.h, rows * 50 + 6);
       a.style.top = (box.y + box.h - hh) + 'px'; a.style.height = hh + 'px'; a.classList.add('tall', 'wrap');
     }
     chips.forEach(c => a.appendChild(c));
@@ -4930,7 +5034,7 @@ function onTarget(tg, el) {
   if (tg === 'pass') {
     const m = mm.find(x => x.type === 'pass'); if (!m) return;
     if (UI.passArm && Date.now() - UI.passArm < 2600) { UI.passArm = 0; actFrom(m, el); return; }
-    UI.passArm = Date.now(); renderActs(); setTimeout(() => { if (G && !UI.cards.length) renderActs(); }, 2700); return;
+    UI.passArm = Date.now(); renderBoard(); setTimeout(() => { if (G && !UI.cards.length) renderBoard(); }, 2700); return;
   }
   UI.passArm = 0;
   const ms = mm.filter(m => tgOf(m) === tg);
@@ -4964,7 +5068,7 @@ function openZoom(spec) {
   z.appendChild(box); z.hidden = false; UI.zoomAt = Date.now();
 }
 function closeZoom() { const z = $('#zoom'); if (z && !z.hidden) { z.hidden = true; z.innerHTML = ''; } }
-function closePop() { UI.pop = null; UI.sel = null; closeZoom(); }
+function closePop() { UI.pop = null; UI.sel = null; UI.cityOpen = null; closeZoom(); }
 // ---- flying and floating
 function fxLayer() { return $('#fx'); }
 function fxClear() { const f = fxLayer(); if (f) f.innerHTML = ''; UI.animBusy = false; UI.animTok = (UI.animTok || 0) + 1; }
@@ -5343,6 +5447,9 @@ document.addEventListener('click', ev => {
     case 't': onTarget(d.t, t); break;
     case 'tm': { const m = UI.tm2 && UI.tm2[+d.mi]; if (m) { UI.sel = null; actFrom(m, t); } break; }
     case 'selx': UI.sel = null; render(); break;
+    case 'city': if (!UI.animBusy) { UI.sel = null; UI.cityOpen = { logN: G.logN }; snd('click', { vol: .4 }); render(); } break;
+    case 'cityx': UI.cityOpen = null; render(); break;
+    case 'noop': break;
     case 'chip': UI.rseat = d.seat === 'G' ? 'G' : +d.seat; GX.show('rivald'); renderRival(UI.rseat); break;
     case 'rtab': renderRival(d.seat === 'G' ? 'G' : +d.seat); break;
     case 'cont': nextCard(); break;
@@ -5487,7 +5594,7 @@ function kitUndo() {
   GX.undo.config({
     get: () => G, owner: g => g && g.phase !== 'over' ? (humans().length === 1 ? humans()[0] : HB.actor(g)) : null, online: () => NET.on,
     set: s => { G = s; UI.rec = null; UI.recKey = ''; UI.after = []; UI.mmc = null; fxClear(); closePop(); UI.lastAi = ''; save(); render(); schedule(); toast('Step undone.'); },
-    onChange: can => { if (can !== UI.undoCan) { UI.undoCan = can; if (G && UI.started && UI.lay) renderActs(); } }
+    onChange: can => { if (can !== UI.undoCan) { UI.undoCan = can; if (G && UI.started && UI.lay) renderBoard(); } }
   });
 }
 function doUndo() { if (GX.undo.undo()) snd('click'); }
@@ -5580,6 +5687,98 @@ function campInit() {
   });
 }
 campInit();
+// ===================== part 10: the picture board (a woodland clearing drawn as SVG) =====================
+// Every worker place is a little drawing (stump, bush, pond, canopy, burrow, road); a dirt path winds through them,
+// a stream runs along the meadow bench, and the events hang as pennants from a rope. All of it is decoration:
+// the places themselves are the buttons drawn in renderBoard.
+const SVGH = (vb, body) => '<svg class="art" viewBox="' + vb + '" preserveAspectRatio="none" aria-hidden="true" focusable="false">' + body + '</svg>';
+const K_INK = '#3b2a1a';
+const STUMP = (ex) => '<ellipse cx="50" cy="37" rx="46" ry="25" fill="#6a4727" stroke="' + K_INK + '" stroke-width="2.5"/><ellipse cx="50" cy="30" rx="46" ry="25" fill="#dcab6c" stroke="' + K_INK + '" stroke-width="2.5"/><ellipse cx="50" cy="30" rx="37" ry="19.500" fill="none" stroke="#c0904f" stroke-width="1.600"/><ellipse cx="50" cy="30" rx="27" ry="14" fill="none" stroke="#c9985a" stroke-width="1.400"/><ellipse cx="50" cy="30" rx="16" ry="8" fill="none" stroke="#c0904f" stroke-width="1.300"/>' + (ex || '');
+const BUSH = (c1, c2, bc, bs) => '<ellipse cx="50" cy="56" rx="42" ry="6" fill="rgba(0,0,0,.2)"/><g fill="' + c1 + '" stroke="' + c2 + '" stroke-width="2.500"><circle cx="18" cy="34" r="16"/><circle cx="82" cy="34" r="16"/><circle cx="36" cy="24" r="19"/><circle cx="64" cy="24" r="19"/><circle cx="50" cy="38" r="21"/></g><g fill="#fff" opacity=".18"><circle cx="34" cy="16" r="8"/><circle cx="62" cy="15" r="7"/></g><g fill="' + bc + '" stroke="' + bs + '" stroke-width="1.200"><circle cx="12" cy="28" r="3.600"/><circle cx="24" cy="48" r="3.600"/><circle cx="76" cy="49" r="3.600"/><circle cx="90" cy="30" r="3.600"/><circle cx="48" cy="9" r="3.600"/><circle cx="73" cy="12" r="3.600"/><circle cx="27" cy="12" r="3.600"/><circle cx="50" cy="55" r="3.600"/></g>';
+const MUSH = (x, y, s) => '<g transform="translate(' + x + ' ' + y + ') scale(' + s + ')"><rect x="-3" y="0" width="6" height="9" rx="2" fill="#f3e6c8" stroke="' + K_INK + '" stroke-width="1.400"/><path d="M-10 1Q-10-10 0-10Q10-10 10 1Z" fill="#d23a4a" stroke="' + K_INK + '" stroke-width="1.600"/><circle cx="-4" cy="-4" r="1.800" fill="#fff"/><circle cx="3" cy="-6" r="1.600" fill="#fff"/><circle cx="5" cy="-1" r="1.300" fill="#fff"/></g>';
+const ART_BASIC = {
+  basic_berry_patch: () => BUSH('#5aa043', '#2b5a25', '#d23a4a', '#7a1a26'),
+  basic_dewberry_nook: () => BUSH('#3f8a62', '#1f4f3a', '#7a6be0', '#2f2a80'),
+  basic_amber_weep: () => STUMP('<path d="M14 42q-3 9 2 12q5-3 2-12Z" fill="#e8a523" stroke="#7a4a0a" stroke-width="1.600"/><path d="M80 44q-3 9 2 11q5-3 2-11Z" fill="#e8a523" stroke="#7a4a0a" stroke-width="1.600"/><ellipse cx="26" cy="22" rx="10" ry="5" fill="#e8a523" stroke="#7a4a0a" stroke-width="1.400"/><ellipse cx="76" cy="36" rx="8" ry="4" fill="#e8a523" stroke="#7a4a0a" stroke-width="1.400"/>'),
+  basic_pebble_bank: () => '<ellipse cx="50" cy="34" rx="46" ry="26" fill="#9db9bf" stroke="#4d6a72" stroke-width="2.500"/><g fill="#c8cdd0" stroke="#5d6a70" stroke-width="2"><ellipse cx="20" cy="36" rx="13" ry="9"/><ellipse cx="80" cy="38" rx="14" ry="10"/><ellipse cx="50" cy="54" rx="17" ry="7"/><ellipse cx="62" cy="12" rx="13" ry="7"/><ellipse cx="28" cy="14" rx="11" ry="6"/></g><g fill="#fff" opacity=".4"><ellipse cx="17" cy="33" rx="5" ry="2.500"/><ellipse cx="77" cy="35" rx="5" ry="2.500"/></g>',
+  basic_twig_heap: () => '<ellipse cx="50" cy="36" rx="46" ry="25" fill="#7a5632" stroke="' + K_INK + '" stroke-width="2.500"/><ellipse cx="50" cy="30" rx="46" ry="25" fill="#a98355" stroke="' + K_INK + '" stroke-width="2.500"/><g stroke="#4a2f14" stroke-width="5.500" stroke-linecap="round"><path d="M8 40L34 14"/><path d="M92 38L66 10"/><path d="M14 22L42 52"/><path d="M88 24L58 54"/><path d="M30 8L74 52"/></g><g stroke="#c28d4e" stroke-width="2" stroke-linecap="round"><path d="M10 38L33 16"/><path d="M90 36L67 12"/><path d="M16 24L41 50"/><path d="M86 26L59 52"/></g>',
+  basic_gossip_glade: () => '<ellipse cx="50" cy="34" rx="46" ry="26" fill="#a4d476" stroke="#3f7d2c" stroke-width="2.500"/><ellipse cx="50" cy="30" rx="36" ry="19" fill="#b9e08c"/>' + MUSH(14, 36, .85) + MUSH(86, 34, .8) + MUSH(52, 49, .75) + '<g fill="#fff" stroke="#c08a2a"><circle cx="26" cy="14" r="2.600"/><circle cx="74" cy="12" r="2.600"/></g>',
+  basic_resin_pool: () => '<ellipse cx="50" cy="37" rx="46" ry="25" fill="#5a3d20" stroke="' + K_INK + '" stroke-width="2.500"/><ellipse cx="50" cy="30" rx="46" ry="25" fill="#9a7140" stroke="' + K_INK + '" stroke-width="2.500"/><ellipse cx="50" cy="31" rx="36" ry="18" fill="#6bb4cc" stroke="#2f6f86" stroke-width="2"/><path d="M24 26Q34 21 44 26" fill="none" stroke="#e8f8ff" stroke-width="2" stroke-linecap="round"/><path d="M60 38Q70 33 78 38" fill="none" stroke="#e8f8ff" stroke-width="2" stroke-linecap="round"/><g fill="#5a9a3a" stroke="#2c5a1a" stroke-width="1.200"><path d="M10 40q-2-14 3-18q2 8 0 18Z"/><path d="M92 38q2-14-3-18q-2 8 0 18Z"/></g>',
+  basic_kindling_glen: () => '<ellipse cx="50" cy="54" rx="40" ry="6" fill="rgba(0,0,0,.22)"/><g stroke="' + K_INK + '" stroke-width="2.500"><circle cx="27" cy="38" r="19" fill="#dcab6c"/><circle cx="73" cy="38" r="19" fill="#d4a062"/><circle cx="50" cy="22" r="19" fill="#e2b374"/></g><g fill="none" stroke="#b9854a" stroke-width="1.500"><circle cx="27" cy="38" r="12"/><circle cx="27" cy="38" r="5"/><circle cx="73" cy="38" r="12"/><circle cx="73" cy="38" r="5"/><circle cx="50" cy="22" r="12"/><circle cx="50" cy="22" r="5"/></g>'
+};
+const CANOPY = [['#72b653', '#376f2f'], ['#5faa72', '#2c6e47'], ['#8cc058', '#4a7a2c'], ['#5aa593', '#2a6a60']];
+function canopyArt(i) {
+  const c = CANOPY[i % CANOPY.length];
+  return '<ellipse cx="32" cy="57" rx="22" ry="5" fill="rgba(0,0,0,.22)"/><rect x="27" y="46" width="10" height="12" rx="2" fill="#7a5632" stroke="' + K_INK + '" stroke-width="2"/><g fill="' + c[0] + '" stroke="' + c[1] + '" stroke-width="2.500"><circle cx="17" cy="38" r="14"/><circle cx="47" cy="38" r="14"/><circle cx="32" cy="22" r="18"/><circle cx="32" cy="38" r="17"/></g><g fill="#fff" opacity=".2"><circle cx="24" cy="18" r="7"/><circle cx="40" cy="26" r="4"/></g>';
+}
+const ART_HAVEN = '<ellipse cx="32" cy="57" rx="27" ry="5" fill="rgba(0,0,0,.22)"/><path d="M4 56Q4 14 32 12Q60 14 60 56Z" fill="#cda26c" stroke="' + K_INK + '" stroke-width="2.500"/><path d="M7 36Q10 14 32 12Q54 14 57 36Q44 26 32 28Q20 26 7 36Z" fill="#7fb862" stroke="#2f5a25" stroke-width="2"/><path d="M23 56V45Q23 36 32 36Q41 36 41 45V56Z" fill="#5b3b20" stroke="' + K_INK + '" stroke-width="2"/><circle cx="14" cy="46" r="2.500" fill="#f6e1a8"/><circle cx="50" cy="46" r="2.500" fill="#f6e1a8"/>';
+const ART_JOURNEY = '<ellipse cx="32" cy="57" rx="27" ry="5" fill="rgba(0,0,0,.22)"/><ellipse cx="32" cy="32" rx="29" ry="27" fill="#e6a85a" stroke="#7a4a1c" stroke-width="2.500"/><path d="M24 58L29 8H35L40 58Z" fill="#f3d9a0" stroke="#8a6a3a" stroke-width="1.600"/><g stroke="#fff" stroke-width="2.500" stroke-linecap="round" opacity=".85"><path d="M32 14V20"/><path d="M32 28V34"/><path d="M32 42V48"/></g>';
+function pennantArt(special) {
+  const f = special ? '#ecdff3' : '#f8efd8';
+  return SVGH('0 0 48 48', '<path d="M3 3H45V33Q45 37 41 39L24 46L7 39Q3 37 3 33Z" fill="' + f + '" stroke="var(--ec,#888)" stroke-width="3" stroke-linejoin="round"/><rect x="3" y="3" width="42" height="7" fill="var(--ec,#888)"/><circle cx="12" cy="3" r="2" fill="' + K_INK + '"/><circle cx="36" cy="3" r="2" fill="' + K_INK + '"/>');
+}
+// the drawing under a place's icons
+function spotArt(kind, key, i) {
+  switch (kind) {
+    case 'basic': return SVGH('0 0 100 64', (ART_BASIC[key] || ART_BASIC.basic_twig_heap)());
+    case 'forest': return SVGH('0 0 64 64', canopyArt(i));
+    case 'haven': return SVGH('0 0 64 64', ART_HAVEN);
+    case 'journey': return SVGH('0 0 64 64', ART_JOURNEY);
+    case 'bev': return pennantArt(false);
+    case 'sev': return pennantArt(true);
+  }
+  return '';
+}
+// ---- the scene: grass, a stream, a dirt path through the places, the meadow bench, the rope for the pennants
+function hrng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function sceneSVG(R) {
+  const S = R.scene, w = Math.round(S.w), hh = Math.round(S.h), rnd = hrng(w * 31 + hh), o = [];
+  o.push('<defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a9d07f"/><stop offset=".55" stop-color="#88b866"/><stop offset="1" stop-color="#6d9e54"/></linearGradient><radialGradient id="vg" cx=".5" cy=".5" r=".75"><stop offset=".6" stop-color="#1c3a14" stop-opacity="0"/><stop offset="1" stop-color="#1c3a14" stop-opacity=".38"/></radialGradient></defs>');
+  o.push('<rect width="' + w + '" height="' + hh + '" fill="url(#gr)"/>');
+  // grass tufts and flowers
+  for (let k = 0; k < 46; k++) { const x = rnd() * w, y = rnd() * hh; o.push('<path d="M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'l-2.500-6M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'l0-7M' + x.toFixed(1) + ' ' + y.toFixed(1) + 'l2.500-6" stroke="#4f8a3a" stroke-width="1.600" stroke-linecap="round" fill="none" opacity=".55"/>'); }
+  const FL = ['#fff6d6', '#ffd75a', '#f9a6c0', '#ffffff'];
+  for (let k = 0; k < 26; k++) { const x = rnd() * w, y = rnd() * hh, c = FL[k % 4]; o.push('<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3" fill="' + c + '" stroke="#5b7a3a" stroke-width=".8"/><circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="1" fill="#e9a31c"/>'); }
+  // the forest edge behind the score chips
+  if (R.tall) {
+    const eh = R.chips.y + R.chips.h + 3; o.push('<rect x="0" y="0" width="' + w + '" height="' + eh + '" fill="#3f7236"/>');
+    for (let x = -6; x < w + 20; x += 22) o.push('<circle cx="' + x + '" cy="' + (eh - 2) + '" r="13" fill="#4d8740" stroke="#2c5a28" stroke-width="2"/>');
+    for (let x = 6; x < w + 20; x += 22) o.push('<circle cx="' + x + '" cy="' + (eh - 8) + '" r="10" fill="#5a9a4a" opacity=".55"/>');
+  }
+  // the stream along the meadow bench
+  const sp = R.stream;
+  if (sp) {
+    let d = '', n = 0;
+    if (sp.h) { for (let x = 0; x <= w + 18; x += 18, n++) d += (n ? 'T' : 'M') + x + ' ' + (sp.y + (n % 2 ? 5 : -5)); }
+    else { for (let y = 0; y <= hh + 18; y += 18, n++) d += (n ? 'T' : 'M') + (sp.x + (n % 2 ? 5 : -5)) + ' ' + y; }
+    o.push('<path d="' + d + '" fill="none" stroke="#2f6f86" stroke-width="13" stroke-linecap="round"/><path d="' + d + '" fill="none" stroke="#5fb0d2" stroke-width="9" stroke-linecap="round"/><path d="' + d + '" fill="none" stroke="#bfe8f6" stroke-width="2.500" stroke-linecap="round" stroke-dasharray="7 11"/>');
+  }
+  // the dirt path winding through the places
+  if (R.path && R.path.length > 1) {
+    const P = R.path; let d = 'M' + P[0].x.toFixed(1) + ' ' + P[0].y.toFixed(1);
+    for (let k = 1; k < P.length; k++) { const a = P[k - 1], b = P[k], mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2; d += 'Q' + (a.x + (b.x - a.x) * .15).toFixed(1) + ' ' + (b.y).toFixed(1) + ' ' + mx.toFixed(1) + ' ' + my.toFixed(1); }
+    const l = P[P.length - 1]; d += 'T' + l.x.toFixed(1) + ' ' + l.y.toFixed(1);
+    o.push('<path d="' + d + '" fill="none" stroke="#8a6a3a" stroke-width="19" stroke-linecap="round" stroke-linejoin="round"/><path d="' + d + '" fill="none" stroke="#d9b87a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><path d="' + d + '" fill="none" stroke="#f0d9a2" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 9" opacity=".8"/>');
+  }
+  // the meadow bench
+  if (R.bench) { const b = R.bench; o.push('<rect x="' + (b.x + 2) + '" y="' + (b.y + 4) + '" width="' + b.w + '" height="' + b.h + '" rx="12" fill="rgba(0,0,0,.28)"/><rect x="' + b.x + '" y="' + b.y + '" width="' + b.w + '" height="' + b.h + '" rx="12" fill="#b98650" stroke="#5a3b1d" stroke-width="3"/>'); for (let y = b.y + 14; y < b.y + b.h - 4; y += 15) o.push('<path d="M' + (b.x + 6) + ' ' + y + 'H' + (b.x + b.w - 6) + '" stroke="#8a5f30" stroke-width="1.500" opacity=".55"/>'); }
+  // the rope the event pennants hang from, between two posts
+  if (R.rope) {
+    const rp = R.rope, y = rp.y; let d = 'M6 ' + y;
+    rp.xs.forEach((x, k) => { const px = k ? rp.xs[k - 1] : 6; d += 'Q' + ((px + x) / 2).toFixed(1) + ' ' + (y + 4) + ' ' + x.toFixed(1) + ' ' + y; });
+    d += 'Q' + ((rp.xs[rp.xs.length - 1] + w - 6) / 2).toFixed(1) + ' ' + (y + 4) + ' ' + (w - 6) + ' ' + y;
+    o.push('<rect x="1" y="' + (y - 6) + '" width="7" height="' + (rp.h + 10) + '" rx="3" fill="#7a5632" stroke="' + K_INK + '" stroke-width="2"/><rect x="' + (w - 8) + '" y="' + (y - 6) + '" width="7" height="' + (rp.h + 10) + '" rx="3" fill="#7a5632" stroke="' + K_INK + '" stroke-width="2"/><path d="' + d + '" fill="none" stroke="#5a3b1d" stroke-width="3" stroke-linecap="round"/>');
+  }
+  o.push('<rect width="' + w + '" height="' + hh + '" fill="url(#vg)"/>');
+  return '<svg class="scsvg" viewBox="0 0 ' + w + ' ' + hh + '" width="' + w + '" height="' + hh + '" aria-hidden="true" focusable="false">' + o.join('') + '</svg>';
+}
+// the scene (data-board) and the wooden table under it
+function sceneEls(R) {
+  const f = document.createDocumentFragment();
+  if (R.tbl) f.appendChild(placeBox(h('div.tbl'), R.tbl));
+  const s = placeBox(h('div#scene.scn', { 'data-board': '', 'aria-hidden': 'true' }), R.scene); s.innerHTML = sceneSVG(R); f.appendChild(s);
+  return f;
+}
 
 </script>
 </body>
