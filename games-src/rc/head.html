@@ -611,6 +611,7 @@ html.bf .gx-ibtn.bf-s.on{background:#5a4320;color:#fff4d8}
 .pawnrow.bf-pw{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;flex:0 0 auto}
 .bfpw{position:relative;width:48px;height:48px;min-width:48px;border-radius:50%;border:3px solid var(--pc);background:#fffaf0;color:#2a2014;font:700 14px var(--sans);display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer;transition:transform .12s,box-shadow .12s}
 .bfpw sub{font-size:10px;position:absolute;right:5px;bottom:4px}
+.bfpw.bad{animation:bfWarn 1s ease-in-out infinite;border-color:#ff7a66}
 .bfpw.on{box-shadow:0 0 0 4px #f6c46e;transform:scale(1.1)}
 .bfpw.set{background:var(--pc);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
 .bfpw.set.on{background:#fffaf0;color:#2a2014;text-shadow:none}
@@ -621,6 +622,8 @@ html.bf .gx-ibtn.bf-s.on{background:#5a4320;color:#fff4d8}
 .bfg{position:absolute;left:0;top:0;display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:156px;pointer-events:none}
 .bfa{pointer-events:none;min-width:44px;min-height:44px;border-radius:14px;background:rgba(20,14,6,.84);border:2px solid #f6c46e;color:#fff4d8;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:2px 7px;font:700 15px var(--sans);animation:bfIn .4s var(--d,0ms) both;box-shadow:0 3px 8px rgba(0,0,0,.45)}
 button.bfa{cursor:pointer;appearance:none}
+button.bfa.warn{pointer-events:auto;animation:bfIn .4s var(--d,0ms) both,bfWarn 1s 0.5s ease-in-out infinite}
+@keyframes bfWarn{50%{box-shadow:0 0 0 5px rgba(255,122,102,.75),0 3px 8px rgba(0,0,0,.45)}}
 .bfa s{text-decoration:none;font-size:19px}
 .bfa .dots{display:inline-flex;gap:2px}.bfa .dots i{display:block;width:13px;height:13px;border-radius:50%;background:var(--pc);border:1.5px solid #fff}
 .bfa em{font-style:normal;font-size:13px}
@@ -660,5 +663,19 @@ html.bf #ppop .pp-h{min-height:44px}
 #bfglow{position:absolute;inset:0;pointer-events:none}
 .bfgl{position:absolute;left:0;top:0;width:52px;height:52px;border-radius:50%;border:4px solid #ffd37a;background:radial-gradient(circle,rgba(255,211,122,.45),rgba(255,211,122,0) 70%);box-shadow:0 0 14px 4px rgba(255,200,90,.7);animation:bfGl 1.1s ease-in-out infinite;pointer-events:none}
 @keyframes bfGl{50%{transform:scale(1.18);opacity:.65}}
+/* event card flip, rain, flying gains */
+.bfcard{position:absolute;left:10px;top:52px;width:168px;height:104px;z-index:8;pointer-events:auto;perspective:700px;cursor:pointer;touch-action:manipulation;-webkit-touch-callout:none;user-select:none}
+.bfcard .in{width:100%;height:100%;animation:bfFlip .75s cubic-bezier(.2,.8,.3,1) both;transform-style:preserve-3d}
+.bfcard .fr{position:absolute;inset:0;border-radius:14px;background:linear-gradient(#fff4d8,#f1d9a2);border:3px solid #b8863a;box-shadow:0 8px 22px rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:6px 8px;text-align:center;color:#2a2014}
+.bfcard .bfic{font-size:34px;line-height:1;letter-spacing:2px}.bfcard .bftt{font:800 15px/1.1 var(--sans)}
+.bfcard.weather .fr{background:linear-gradient(#e6f0f7,#b7cfe0);border-color:#4f7a99}.bfcard.threat .fr,.bfcard.fight .fr{background:linear-gradient(#ffe3dc,#f0a79a);border-color:#a13a28}.bfcard.storm .fr{background:linear-gradient(#cfd6df,#7e8795)}
+@keyframes bfFlip{0%{opacity:0;transform:translateY(-30px) rotateY(180deg) scale(.6)}60%{opacity:1;transform:translateY(0) rotateY(-12deg) scale(1.06)}100%{opacity:1;transform:none}}
+.bfrain{position:absolute;width:120px;height:140px;pointer-events:none;z-index:7;overflow:hidden}
+.bfrain i{position:absolute;top:-20px;font-style:normal;font-size:16px;opacity:0;animation:bfDrop .8s linear 2 both}
+.bfrain b{position:absolute;left:44px;top:10px;font-size:48px;animation:bfFlash 1.2s both}
+@keyframes bfDrop{0%{opacity:0;transform:translateY(0)}15%{opacity:.95}100%{opacity:.9;transform:translateY(150px)}}
+@keyframes bfFlash{0%,100%{opacity:0}20%,60%{opacity:1}}
+.bffly{position:fixed;left:0;top:0;z-index:80;font-size:26px;line-height:1;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));opacity:0}
+@media (prefers-reduced-motion:reduce){.bfcard .in{animation:none}.bfrain i{animation-duration:.01s}}
 </style>
 </head>
