@@ -17,7 +17,7 @@ The personality in each chapter's text matches how that level actually plays.
 | 1 | Hob the Carter | easy | friendly and careless, near-random placements |
 | 2 | Wren Ashlar | easy | proud apprentice, starts towns, rarely closes them |
 | 3 | Mabry Furrow | easy | slow farmer (easy AI ignores fields, `ai.js:42`) |
-| 4 **boss** | Brother Quill | easy | calm and patient, likes priories |
+| 4 **boss** | Brother Quill | easy | calm and patient, likes priories; twist: 6-point head start |
 | 5 | Ferro the Boatman | normal | steady and greedy for points |
 | 6 | Dulcie Tapwell | normal | gambler, likes basilica towns and her champion |
 | 7 **boss** | Reeve Ostrand | normal | cold bookkeeper, chases goods; twist: moves first |
@@ -43,10 +43,9 @@ The normal and hard AIs average about 105–115. The hard AI's edge is small but
 |---|---|---|
 | head-start | setup | after `engine.js:newGame`, set `G.pl[boss].score = N`. Log it so the score breakdown adds up |
 | boss-extra-follower | setup | after `newGame`, add N to `G.pl[boss].sup.f` and `G.figTotal[boss].f` |
-| lean-purse | setup | after `newGame`, subtract N from the player's `sup.f` and `figTotal.f` (in the menu, not used yet) |
-| short-valley | setup | after `newGame`, apply `G.stack.splice(-N)` and `G.total -= N` (in the menu, not used yet) |
+| lean-purse | setup | after `newGame`, subtract N from the player's `sup.f` and `figTotal.f` (implemented in `game/src/camp.js`, not used yet) |
+| short-valley | setup | after `newGame`, apply `G.stack.splice(-N)` and `G.total -= N` (implemented, not used yet) |
 | boss-opens | setup | call `newGame({seats:['ai','human'], ...})`. Metrics read the seat with `p.human` |
-| town-tithe | scoring | in `engine.js:complete()`, when `F.ty==='C'` and the boss is in `win`, add N more to the boss's score (in the menu, not used yet) |
 
 `complete()` also returns all figures, so the `figTotal` sanity check in `checkInvariants` must use the raised totals.
 
