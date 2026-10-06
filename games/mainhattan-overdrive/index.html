@@ -8903,5 +8903,10 @@ posShip=(f=>function(s,dt,snap){f(s,dt,snap);try{if(!s||!s.mesh||state==='roam'|
 roamPose=(f=>function(s,dt){try{const ud=s&&s.mesh&&s.mesh.userData;if(ud&&ud.crBody){ud.crBody=0;ud.m.traverse(o=>{const u=o.userData;if(u&&u.crP0){o.position.copy(u.crP0);o.quaternion.copy(u.crQ0)}if(u&&u.crY0!=null){o.position.y=u.crY0;u.crY0=null}})}}catch(e){}return f(s,dt)})(roamPose);
 // the key light that lit the old hover ship from behind made a bright white cone on the glossy race track: lift it above the car, softer
 
+
+// ---- race: opponents never fill the lens
+const CR_camHide=[],_crCF=new THREE.Vector3(),_crCD=new THREE.Vector3();
+composer.render=(f=>function(...a){try{if(state!=='roam'&&state!=='menu'&&typeof ships!=='undefined'){const cp=camera.position;camera.getWorldDirection(_crCF);for(const s of ships){if(s.isPlayer||!s.mesh||!s.mesh.visible)continue;_crCD.copy(s.mesh.position).sub(cp);const dz=_crCD.dot(_crCF);if(_crCD.lengthSq()<3.8*3.8||(dz>-2&&dz<5.5&&_crCD.lengthSq()<8*8)){s.mesh.visible=false;CR_camHide.push(s.mesh)}}}}catch(e){}
+ try{return f.apply(this,a)}finally{for(const m of CR_camHide)m.visible=true;CR_camHide.length=0}})(composer.render);
 </script>
 </body></html>
