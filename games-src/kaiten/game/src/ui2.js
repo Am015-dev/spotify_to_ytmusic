@@ -21,6 +21,7 @@ function bankedOf(s) {
   return list.reduce((a, r) => a + r[s].total, 0);
 }
 function totalOf(s, info) {
+  if (UI.fz && UI.fz.tally) return bankedOf(s) + UI.fz.tally[s];   // the round-end count: chips climb as each set scores
   if (G.phase === 'over' && !(UI.fz && UI.fz.tables)) return G.final.totals[s];
   return bankedOf(s) + (G.phase === 'over' && !(UI.fz && UI.fz.tables) ? 0 : info.rs[s].total);
 }
@@ -58,12 +59,15 @@ function renderTable() {
     const ctrW = cw - shw - sl - 25;
     // plates on the counter: one row, or two rows of bigger plates when the seat is tall enough (nothing clipped, labels readable)
     // (a layout that fits wins over bigger plates that overflow past the edge)
-    const ng = groupsOf(s, tab, info).list.length + (pcs[s] || !isPh() ? 1 : 0), cap = isMe ? 84 : 68, slotW = p => Math.max(p + 12, 78);   // a group is never narrower than its tag ("need 2 more")
-    const fit = (rows, hgt) => { const k = Math.ceil(ng / rows); let p = Math.max(24, Math.min(hgt, cap)); if (k * slotW(p) > ctrW) p = Math.max(24, (ctrW / k) - 12); return { p, ok: slotW(p) * k <= ctrW + 4 && hgt >= 24 }; };
+    const ng = groupsOf(s, tab, info).list.length + (pcs[s] || !isPh() ? 1 : 0), cap = isMe ? 84 : 68, slotW = p => Math.max(p + 18, 58);   // a group is never narrower than its tag ("need 2 more")
+    let tight = false;
+    const sw = p => tight ? Math.max(p + 12, 48) : slotW(p), gp = () => tight ? 12 : 18;
+    const fit = (rows, hgt) => { const k = Math.ceil(ng / rows); let p = Math.max(24, Math.min(hgt, cap)); if (k * sw(p) > ctrW) p = Math.max(24, (ctrW / k) - gp()); return { p, ok: sw(p) * k <= ctrW + 4 && hgt >= 24 }; };
     const f1 = fit(1, rowH - (isMe ? 34 : 32)), f2 = ng > 2 ? fit(2, (rowH - 12) / 2 - 30) : { p: 0, ok: false };
     const wrap = f2.ok && (!f1.ok || f2.p > f1.p + 4);
-    let pd = Math.max(24, Math.round(wrap ? f2.p : f1.p));
-    const dm = { av, shw, sl, pd, cmp, wrap };
+    let pd = Math.max(24, Math.round(wrap ? f2.p : f1.p)), wrapF = wrap;
+    if (!wrap && !f1.ok && ng >= 4) { tight = true; const g1 = fit(1, rowH - (isMe ? 34 : 32)), g2 = ng > 2 ? fit(2, (rowH - 12) / 2 - 30) : { p: 0, ok: false }; if (g2.ok && (!g1.ok || g2.p > g1.p + 4)) { wrapF = true; pd = Math.max(24, Math.round(g2.p)); } else { wrapF = false; pd = Math.max(24, Math.round(g1.p)); } }
+    const dm = { av, shw, sl, pd, cmp, wrap: wrapF, tight };
     const sg = seatSig(s, tab, info, pcs, isMe, dm) + '|' + sigAll;
     const old = oldSeats[s];
     if (old && old.dataset.sg === sg) { els.push(old); continue; }
@@ -78,21 +82,24 @@ function renderTable() {
 function seatSig(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots, sl = fz ? JSON.stringify(fz[s]) : (G.phase === 'pick' ? (p.picked ? 'p' : 'w') : 'x');
   const lnd = UI.land ? [...UI.land].filter(x => x.startsWith(s + '|')).join(',') : '';
-  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs.join('/'), sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, dm.wrap ? 1 : 0, newsSig(s), p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' + (twinReady() ? 't' + (UI.twin ? 1 : 0) : '') : '', G.phase].join('|');
+  return [s, isMe ? 1 : 0, totalOf(s, info), info.rs.map(r => r.icons).join('/'), tab[s].map(e => e.id + ':' + e.w).join(','), pcs.join('/'), sl, lnd, dm.av, dm.shw, dm.sl, dm.pd, dm.cmp ? 1 : 0, dm.wrap ? 1 : 0, dm.tight ? 1 : 0, newsSig(s), G.phase === 'over' && (G.winners || []).indexOf(s) >= 0 && (UI.overShown || (UI.fz && UI.fz.crown)) ? 'W' : '', p.name, p.ai || '', G.phase === 'pick' && !p.picked && !UI.fz ? 'c' : '', s === viewSeat() ? 'v' + (twinReady() ? 't' + (UI.twin ? 1 : 0) : '') : '', G.phase].join('|');
 }
 function seatEl(s, tab, info, pcs, isMe, dm) {
   const p = G.players[s], col = pcol(s), picking = G.phase === 'pick' && !p.picked && !UI.fz;
   const gs = groupsOf(s, tab, info), total = totalOf(s, info);
-  const el = h('section.seat' + (isMe ? '.me' : '') + (picking ? '.choose' : '') + (dm.wrap ? '.wrap' : ''), { 'data-seat': s, 'aria-label': p.name + (p.ai ? ', computer' : '') + ', ' + total + ' points' });
+  const el = h('section.seat' + (isMe ? '.me' : '') + (picking ? '.choose' : '') + (dm.wrap ? '.wrap' : '') + (dm.tight ? '.tight' : ''), { 'data-seat': s, 'aria-label': p.name + (p.ai ? ', computer' : '') + ', ' + total + ' points' });
   el.style.setProperty('--pd', dm.pd + 'px'); el.style.setProperty('--shw', dm.shw + 'px'); el.style.setProperty('--av', dm.av + 'px'); el.style.setProperty('--sl', dm.sl + 'px'); el.style.setProperty('--ctr', counterURL(s));
-  const av = h('div.av' + (picking ? '.act' : '')); av.appendChild(avN(s, 96));
+  const crowned = G.phase === 'over' && (G.winners || []).indexOf(s) >= 0 && (UI.overShown || (UI.fz && UI.fz.crown));
+  const av = h('div.av' + (picking ? '.act' : '') + (crowned ? '.win' : '')); av.appendChild(avN(s, 96));
   av.appendChild(h('span.sc', String(total)));
+  if (crowned) av.appendChild(h('span.crown', { html: KIT.iconSVG('crown', { size: 26 }) }));
   { const nd = newsDelta(s); if (nd) av.appendChild(h('span.dl' + (nd > 0 ? '' : '.neg'), (nd > 0 ? '+' : '−') + Math.abs(nd))); }
   const sh = h('button.sh', { type: 'button', 'data-a': 'seat', 'data-seat': s, 'aria-label': p.name + (p.ai ? ' (computer ' + p.ai + ')' : '') + ': ' + total + ' points. Open details.' }, av, h('span.nm', p.name));
   el.appendChild(sh);
   const ctr = h('div.ctr');
   const land = UI.land || new Set();
-  for (const g of gs.list) ctr.appendChild(grpEl(g, dm.pd, land.has(s + '|' + g.k)));
+  const gl = gs.list.slice(); if (isMe && twinReady()) gl.sort((x, y) => (y.k === 'chop') - (x.k === 'chop'));   // the glowing Twin Sticks come first, never scrolled out of the tray
+  for (const g of gl) ctr.appendChild(grpEl(g, dm.pd, land.has(s + '|' + g.k)));
   if (pcs[s] || !isPh()) ctr.appendChild(shelfEl(s, pcs[s], dm.pd, land.has(s + '|pud')));   // phones: the custard spot appears with the first cup (the dock lists custard)
   if (!gs.list.length && !pcs[s]) ctr.insertBefore(h('span.none', G.phase === 'pick' ? 'Nothing served yet' : ''), ctr.firstChild);
   el.appendChild(ctr);
@@ -121,10 +128,10 @@ function shelfEl(s, n, pd, landing) {
 // the custard race as it stands now (scored at the end of the game): most +6, fewest −6
 function pudStand(s) {
   const pc = pudCounts(), mx = Math.max(...pc), mn = Math.min(...pc), n = pc[s];
-  if (mx === mn) return 'custard';
-  if (n === mx) return '+6 at end';
-  if (n === mn && G.np > 2) return '−6 at end';
-  return 'custard';
+  if (mx === mn) return 'dessert';
+  if (n === mx) return '+6';
+  if (n === mn && G.np > 2) return '−6';
+  return 'dessert';
 }
 function slotEl(s, sl, cmp) {
   const p = G.players[s], fz = UI.fz && UI.fz.slots;
@@ -158,10 +165,10 @@ function renderBelt() {
   const sl = belt.scrollLeft;
   const hand = v >= 0 ? dispHand() : (G.phase === 'over' ? [] : new Array(UI.fz && UI.fz.backN != null ? UI.fz.backN : G.players[f].hand.length).fill(-1));
   const hidden = v < 0;
-  const m = Math.max(G.hand, 1), avail = beltWidth() - 20;
+  const m = Math.max(hand.length, 1), avail = beltWidth() - 20;
   const land = ph && boardSize().w >= boardSize().h; const hwMax = ph ? (land ? 74 : 84) : Math.max(84, Math.min(118, Math.floor((boardSize().h * .3 - 34) / 1.4))); let hw = Math.max(ph ? (land || innerHeight < 700 ? 54 : 60) : 62, Math.min(hwMax, Math.floor((avail - (m - 1) * 6) / m)));
   // a tall phone: two rows of plates instead of a belt that scrolls sideways and hides plates off the edge
-  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 56 && boardSize().h >= 440 && m > 5 && G.phase !== 'over';   // sized for a full hand all round: the belt and the dishes never jump between turns
+  const one = Math.floor((avail - (m - 1) * 6) / m), two = ph && !land && one < 72 && boardSize().h >= 440 && m > 4 && G.phase !== 'over';   // sized for a full hand all round: the belt and the dishes never jump between turns
   if (two) { const k = Math.ceil(m / 2); hw = Math.max(54, Math.min(boardSize().h < 500 ? 62 : 80, Math.floor((avail - (k - 1) * 6) / k))); }
   else if (ph && hand.length && land) { const fitN = Math.floor((avail - (hand.length - 1) * 6) / hand.length); if (fitN < hw) hw = Math.max(44, fitN); }   // shrink a little rather than hide plates past the edge
   // the belt never takes more than about half the board: the counters stay readable on short phones
@@ -189,13 +196,13 @@ function renderBelt() {
     b.dataset.rk = key; b.dataset.sg = sg;
     frag.push(b);
   });
-  if (!hand.length) frag.push(h('div.beltnote', G.phase === 'over' ? 'The meal is over.' : (v >= 0 ? 'The belt is empty: new plates are coming.' : 'Watching the belt.')));
+  if (!hand.length && !(UI.fz && (UI.fz.roundEnd || UI.fz.tally))) frag.push(h('div.beltnote', G.phase === 'over' ? 'The meal is over.' : (v >= 0 ? 'The belt is empty: new plates are coming.' : 'Watching the belt.')));
   { let same = belt.children.length === frag.length; if (same) for (let i = 0; i < frag.length; i++) if (belt.children[i] !== frag[i]) { same = false; break; } if (!same) belt.replaceChildren(...frag); }
   belt.dataset.hidden = hidden ? '1' : '0';
   if (enter) UI.pxEnter = enter;
   UI.enter = '';
   belt.scrollLeft = sl;
-  try { const s = belt.querySelector('.hc.sel'); if (s) { const bl = belt.getBoundingClientRect(), sr = s.getBoundingClientRect(); if (sr.left < bl.left) belt.scrollLeft += sr.left - bl.left - 8; else if (sr.right > bl.right) belt.scrollLeft += sr.right - bl.right + 8; } } catch (e) { }
+  try { const s = belt.querySelector('.hc.sel') || belt.querySelector('.hc.rec'); if (s) { const bl = belt.getBoundingClientRect(), sr = s.getBoundingClientRect(); if (sr.left < bl.left) belt.scrollLeft += sr.left - bl.left - 8; else if (sr.right > bl.right) belt.scrollLeft += sr.right - bl.right + 8; } } catch (e) { }
 }
 // would one more custard put this diner alone in front (worth +6 at the end of the game)?
 function pudLead(v) { const pc = pudCounts(); return pc.every((n, i) => i === v || n < pc[v] + 1) && !pc.every((n, i) => i === v || n < pc[v]); }
@@ -214,7 +221,8 @@ function zeroTag(v, ty) {
 function promptText() {
   // one short line (8 words at most): the board shows the rest
   if (!G) return '';
-  if (G.phase === 'over') return isPh() ? 'The meal is over.' : (G.winText || 'The meal is over.');
+  if (UI.fz && UI.fz.msg) return UI.fz.msg;
+  if (G.phase === 'over' && (!UI.fz || UI.fz.crown)) return winLine();
   const v = viewSeat();
   if (UI.fz && UI.fz.say) return UI.fz.slots ? (UI.fz.slots[0] && UI.fz.slots[0].mode === 'faces' ? 'Reveal!' : 'Everyone has chosen…') : UI.fz.roundEnd ? 'Round over!' : 'Hands pass along the belt';
   if (UI.cards.length && UI.cards[0].kind === 'pass') return 'Pass the device to ' + pname(UI.cards[0].seat) + '.';
@@ -254,46 +262,16 @@ function renderDock() {
         (() => { const e = h('span.cav'); e.appendChild(avN(s, 96)); return e; })(), h('span.ct', h('b', p.name + (s === v && p.name !== 'You' ? ' (you)' : '')), h('i', (rdy ? '✓ ' : '') + (ph ? tot + (G.np <= 2 ? ' pts' : '') : tot + ' pts' + (rdy ? ' · ready' : G.phase === 'pick' && !busyFz ? ' · choosing' : '')))));
       ro.appendChild(ch);
     }
-    const pc = pudCounts(); if (pc.some(x => x > 0)) ro.appendChild(h('div.pudl', { title: 'Custard Cups are counted at the end of the game: most +6' + (G.np > 2 ? ', fewest −6' : '') + '.' }, 'Custard, scored at the end (most +6' + (G.np > 2 ? ', fewest −6' : '') + '): ' + G.players.map((q, i) => q.name + ' ' + pc[i]).join(', ')));
     }
   }
   renderSel(); renderActs(); renderCheat();
 }
-function renderCheat() {
-  const c = $('#cheat'); if (!c || c.firstChild || isPh()) return;
-  c.appendChild(h('b', 'Scoring at a glance'));
-  [['pair', 'tempura', 'Two Crispy Prawns = 5'], ['set', 'sashimi', 'Three Fish Slices = 10'], ['ladder', 'dumpling', 'Steam Buns: 1, 3, 6, 10, 15'], ['most', 'roll1', 'Rolls: most icons 6, second 3'], ['v2', 'salmon', 'Nigiri 1, 2 or 3 (triple on Fire Paste)'], ['x3', 'wasabi', 'Fire Paste: next nigiri x3'], ['swap', 'chop', 'Twin Sticks: serve two plates later'], ['dessert', 'pudding', 'Custard at the end: most +6, fewest -6']].forEach(r => c.appendChild(h('div.cr', { html: iconS(r[0], 26, r[1]) }, r[2])));
-}
+function renderCheat() { const c = $('#cheat'); if (c) c.replaceChildren(); }   // no scoring cheat sheet: the trays show what scores
 function renderSel() {
+  // no text panel: what a dish scores is on the dish itself (+N badge); press and hold a dish for two words more
   const el = $('#selinfo'); if (!el) return;
-  const rl = document.documentElement.classList; rl.toggle('kk-sel', UI.sel.length > 0 && canPick()); rl.toggle('kk-short', innerHeight < 700); el.innerHTML = ''; el.className = '';
-  const v = viewSeat(); const ph = isPh();
-  if (G.phase === 'over') { el.className = 'idle'; el.appendChild(h('div.si', h('span', G.winText))); return; }
-  if (v >= 0 && canPick() && UI.sel.length) {
-    const hand = G.players[v].hand, ids = UI.sel.map(i => hand[i]).filter(x => x != null);
-    if (ids.length) {
-      const cw = ph ? 56 : 92; const box = h('div.sc1'); const rows = h('div.si');
-      if (ids.length === 1) { box.appendChild(cardNode(tkey(ids[0]), cw)); const ty = tkey(ids[0]); const g = gainOf(v, ids); add(rows, [h('b', TY[ty].name), h('span', TY[ty].ruleText), h('span.sm', g > 0 ? 'Scores +' + g + ' for you right now.' : 'Scores nothing yet.'), ph && !UI.rec ? null : h('span.why', (UI.rec ? 'Hint: ' : '') + whyPick(ids))]); }
-      else { const two = h('div'); two.style.cssText = 'display:flex;gap:2px'; ids.forEach(id => two.appendChild(cardNode(tkey(id), Math.round(cw * .7)))); box.appendChild(two); const g = gainOf(v, ids); add(rows, [h('b', 'Twin Sticks: ' + ids.map(i => TY[tkey(i)].l[0]).join(' + ')), h('span.sm', g > 0 ? 'Both together score +' + g + ' for you right now.' : 'Both together score nothing yet.'), ph && !UI.rec ? null : h('span.why', (UI.rec ? 'Hint: ' : '') + whyPick(ids))]); }
-      el.append(box, rows); return;
-    }
-  }
-  el.className = 'idle';
-  // a newcomer's dock: the tip for this turn, then what happened last turn (cause -> effect), then the goal on the first turn
-  if (v >= 0 && G.phase === 'pick' && !(UI.cards.length && UI.cards[0].kind === 'pass') && (UI.tip || UI.news || (G.round === 1 && G.turn <= 2))) {
-    el.className = 'idle feed';
-    const tp = null;
-    const ne = newsEl(); if (ne && !(UI.fz && UI.fz.slots)) el.appendChild(ne);
-    if (!tp && !ne) el.appendChild(h('div.si', h('span', h('b', 'Goal: '), 'the most points after 3 rounds wins. Tap a dish to grab it; everyone reveals together, then the hands pass along the belt.')));
-    return;
-  }
-  let t;
-  if (UI.cards.length && UI.cards[0].kind === 'pass') t = 'The hands are hidden until the device is passed.';
-  else if (watching()) t = 'Sit back: the computers play all three rounds. Hands slide to the left every turn.';
-  else if (v >= 0 && G.players[v].picked) t = 'Your plate is on its way to your seat under a cover. Everyone reveals together.';
-  else if (v >= 0 && canPick()) t = UI.twin ? 'Tap two dishes on the belt.' : UI.prefs.grab1 === false ? 'Tap a dish on your belt to lift it' + (UI.prefs.tap2 ? ', then tap it again to serve it.' : ', then press Serve.') : 'Tap a dish on the belt to grab it. Hold a dish to read it.';
-  else t = 'Revealing the plates…';
-  el.appendChild(h('div.si', h('span', t)));
+  const rl = document.documentElement.classList; rl.toggle('kk-sel', UI.sel.length > 0 && canPick()); rl.toggle('kk-short', innerHeight < 700);
+  el.replaceChildren(); el.className = 'idle';
 }
 function renderActs() {
   const a = $('#acts'); if (!a) return; a.innerHTML = '';
@@ -303,24 +281,23 @@ function renderActs() {
     const p = G.players[v], chop = KK._.hasChop(p) && p.hand.length >= 2;
     const n = UI.sel.length;
     if (n && (UI.prefs.grab1 === false || n === 2)) { const ids = UI.sel.map(i => p.hand[i]); const g = gainOf(v, ids); a.appendChild(h('button.btn.go', { 'data-a': 'serve', type: 'button' }, n === 2 ? 'Serve both' + (g > 0 ? ' (+' + g + ')' : '') : 'Serve' + (g > 0 ? ' (+' + g + ')' : ''))); }
-    if (chop) a.appendChild(h('button.btn' + (UI.twin ? '.on' : '.alt'), { 'data-a': 'twin', type: 'button', 'aria-pressed': UI.twin ? 'true' : 'false' }, UI.twin ? 'Twin Sticks: pick 2' : 'Use Twin Sticks (serve 2)'));
     if (!(n === 0 && document.documentElement.classList.contains('ph-p'))) a.appendChild(h('button.btn.alt', { 'data-a': 'hint', type: 'button' }, 'Hint'));
     if (n) a.appendChild(h('button.btn.alt', { 'data-a': 'unsel', type: 'button', 'aria-label': 'Put the plate back' }, 'Cancel'));
   }
 }
 // ---------- pop-up beside the board: details of one group of plates ----------
 function openGroup(seat, k) {
+  // tap a pile on a tray: its dish and one short line (what it scores now)
   const tab = tables(), info = seatScoreInfo(tab), gs = groupsOf(seat, tab, info).list, g = gs.find(x => x.k === k);
   const p = G.players[seat];
-  let type, title, tip, ids = [];
-  if (k === 'pud') { type = 'pudding'; title = 'Custard Cups'; const n = pudCounts()[seat]; tip = n + ' kept' + (n === 1 ? '' : '') + '. ' + TY.pudding.ruleText + '. Custard stays on the table for all three rounds.'; }
-  else if (g) { type = g.k === 'roll' ? 'roll2' : g.type; title = g.k === 'roll' ? 'Seaweed Rolls' : g.on ? 'Fire Paste + ' + TY[g.on].name : TY[g.type].name + (g.n > 1 ? 's' : ''); tip = g.tip; }
+  let type, title, line;
+  if (k === 'pud') { type = 'pudding'; title = 'Custard Cups'; line = 'End: most +6, fewest −6'; }
+  else if (g) { type = g.k === 'roll' ? 'roll2' : g.type; title = g.k === 'roll' ? 'Seaweed Rolls' : g.on ? 'Fire Paste + ' + TY[g.on].name : TY[g.type].name + (g.n > 1 ? 's' : ''); line = /^= /.test(g.hint) ? 'Scores ' + g.hint.slice(2) + ' now' : g.hint.charAt(0).toUpperCase() + g.hint.slice(1); if (g.k === 'wasabi') line = 'Next nigiri scores triple'; if (g.k === 'chop') line = 'Later: grab two dishes'; }
   else return;
-  UI.pop = { kind: 'group', seat, k };
+  UI.pop = { kind: 'group', seat, k }; clearTimeout(UI.popT); UI.popT = setTimeout(() => { if (UI.pop && UI.pop.k === k) closePop(); }, 3500);
   const pp = $('#ppop'); pp.hidden = false; pp.innerHTML = '';
-  const cw = isPh() ? 80 : 120;
-  const body = h('div.ph-body', h('div.cwrap', h('div.cardbox', cardDiv(type, cw, g && g.on)), h('div.cinfo', h('p', tip), h('p.sm', TY[type].ruleText))));
-  if (g && g.k === 'roll') { const mk = info.mk; body.appendChild(h('div.kv', h('span', 'Icons per diner'), h('b', G.players.map((q, i) => q.name + ' ' + info.rs[i].icons).join(' · ')))); }
+  const cw = isPh() ? 64 : 96;
+  const body = h('div.ph-body', h('div.cwrap', h('div.cardbox', cardDiv(type, cw, g && g.on)), h('div.cinfo', h('p', line))));
   pp.append(h('div.ph-head', h('div.ph-t', h('b', title), h('span', p.name)), h('button.px', { 'data-a': 'popx', type: 'button', 'aria-label': 'Close' }, '×')), body);
 }
 function closePop() { UI.pop = null; const pp = $('#ppop'); if (pp) { pp.hidden = true; pp.innerHTML = ''; } }

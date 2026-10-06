@@ -1,5 +1,5 @@
 // Round-end score test (Playwright).   PW=<path>/playwright node score-flash-test.js [games=2]
-// While a round's last reveal is still on screen, no seat's displayed score may count that round twice and the bar may not show the next round.
+// While a round's last reveal is still on screen, no seat's displayed score may count that round twice (it may only climb during the on-tray count) and the bar may not show the next round.
 // Samples the seat scores, the diner chips and the bar every 25 ms through whole guided and 3-diner games.
 const PW = require(process.env.PW || (require('child_process').execSync('npm root -g').toString().trim() + '/playwright'));
 const path = require('path'); const N = +process.argv[2] || 2;
@@ -16,7 +16,8 @@ const path = require('path'); const N = +process.argv[2] || 2;
         const tabs = UI.fz.tables || G.players.map(q => q.table), live = KK.roundScores({ players: tabs.map(t => ({ table: t })) });
         const want = G.players.map((q, s) => G.rs.slice(0, -1).reduce((a, r) => a + r[s].total, 0) + live[s].total);
         const seats = [...document.querySelectorAll('#tbl .seat')].map(e => [+e.dataset.seat, +e.querySelector('.sh .sc').textContent]);
-        for (const [s, v] of seats) if (v !== want[s]) __bad.push('seat ' + s + ' shows ' + v + ', expected ' + want[s] + ' after ' + G.rs.length + ' scored round(s)');
+        const base = G.players.map((q, s) => G.rs.slice(0, -1).reduce((a, r) => a + r[s].total, 0)), fin = G.phase === 'over' ? G.final.totals : want;   // the count climbs from the banked total to the new one; never past it
+        for (const [s, v] of seats) if (v > Math.max(fin[s], want[s]) || v < Math.min(base[s], fin[s]) || (UI.rsInfo && UI.rsInfo.done && UI.rsInfo.sc.round === G.rs.length && v !== fin[s])) __bad.push('seat ' + s + ' shows ' + v + ', expected ' + want[s] + ' after ' + G.rs.length + ' scored round(s)');
         const bar = document.getElementById('barstat').textContent, m = /Round (\d)/.exec(bar);
         if (m && G.rs.length && +m[1] > G.rs.length && UI.fz.tables && G.phase !== 'over') __bad.push('bar shows "' + bar + '" during the round-' + G.rs.length + ' reveal');
       }, 25); }, [g]);

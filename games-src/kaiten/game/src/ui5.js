@@ -159,7 +159,8 @@ function showStart() { try { GX.close(); } catch (e) { } closePop(); UI.cards = 
 // ---------- events ----------
 document.addEventListener('click', ev => {
   const t = ev.target.closest('[data-a],[data-start]'); const pop = $('#ppop');
-  if (!t) { if (UI.pop && pop && !pop.contains(ev.target) && !ev.target.closest('#pc,.gx-drawer,#rs')) closePop(); return; }
+  if (UI.pop && pop && !pop.hidden && !ev.target.closest('[data-a=grp],#pc,.gx-drawer,#rs')) { closePop(); if (pop.contains(ev.target)) return; }   // a pile's note goes away on any tap (it never stays over the belt)
+  if (!t) return;
   const a = t.dataset.a, d = t.dataset;
   if (netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
@@ -169,8 +170,9 @@ document.addEventListener('click', ev => {
     case 'twin': toggleTwin(); break;
     case 'hint': hint(); break;
     case 'unsel': UI.sel = []; UI.rec = null; render(); break;
-    case 'grp': openGroup(+d.seat, d.k); break;
-    case 'seat': case 'chip': UI.rseat = +d.seat; GX.show('rivald'); renderRival(UI.rseat); break;
+    case 'grp': if (!UI.busy) openGroup(+d.seat, d.k); break;   // while plates are moving a tap on the table only hurries them
+    case 'seat': case 'chip': if (UI.busy) break; UI.rseat = +d.seat;   // while plates move, a tap on the table only hurries them
+      GX.show('rivald'); renderRival(UI.rseat); break;
     case 'rtab': renderRival(+d.seat); break;
     case 'popx': closePop(); break;
     case 'cont': nextCard(); break;
@@ -204,7 +206,7 @@ document.addEventListener('click', ev => {
     case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
   }
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop) closePop(); else if (UI.rsOpen && UI.mode && G && G.phase === 'over' && UI.overShown) closeRS(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { if (UI.pop) closePop(); } });
 // ---------- phone mode ----------
 function applyPhone() {
   const q = /[?&]phone=(\d)/.exec(location.search); const vm = GXV.now(), w = vm.w, hh = vm.h, short = Math.min(w, hh);

@@ -24,7 +24,7 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
     await p.goto('https://gns.test/'); await p.waitForTimeout(900); await scroll('start'); await shot('0start');
     // title: Play and Online, Resume only with a save; the three buttons sit inside the screen and are not covered
     { const t = await p.evaluate(() => { const bs = [...document.querySelectorAll('#start .tbtns button')]; return { n: bs.length, acts: bs.map(b => b.dataset.a), bad: bs.filter(b => { const r = b.getBoundingClientRect(); const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.bottom > innerHeight + 1 || r.top < 0 || r.height < 44 || !b.contains(h); }).map(b => b.dataset.a), art: !!document.querySelector('#start img.ttl-bg') }; });
-      if (t.acts.join() !== 'play,online') fail('title buttons', JSON.stringify(t)); if (t.bad.length) fail('title button off screen or covered', JSON.stringify(t.bad)); if (!t.art) fail('no title painting'); }
+      if (t.acts.join() !== 'play,story,online') fail('title buttons', JSON.stringify(t)); if (t.bad.length) fail('title button off screen or covered', JSON.stringify(t.bad)); if (!t.art) fail('no title painting'); }
     // the title's How to play must open the rules ON TOP of the title (it used to open behind it), and close again
     { const tap = async s => { try { await p.tap(s); } catch (e) { await p.click(s); } };
       await tap('#start .tlink[data-a=rules]'); await p.waitForTimeout(450);
@@ -48,7 +48,7 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
     { const pr = await p.evaluate(() => document.querySelector('#prompt').textContent.trim().split(/\s+/).length); if (pr > 8) fail('prompt longer than 8 words', pr); }
     await p.evaluate(() => { UI.prefs.grab1 = false; });
     await p.click('#belt .hc[data-up="1"] >> nth=1'); await p.waitForTimeout(250);
-    if (!(await p.$('#acts [data-a=serve]'))) fail('no Serve button after lifting a plate'); if (!(await p.evaluate(() => document.querySelector('#selinfo').textContent.length > 10))) fail('selinfo empty'); await reach('lifted'); await shot('2lifted');
+    if (!(await p.$('#acts [data-a=serve]'))) fail('no Serve button after lifting a plate'); await reach('lifted'); await shot('2lifted');
     // table group pop-up beside the board
     await p.evaluate(() => { const g = [...document.querySelectorAll('#tbl .grp')].find(e => e.dataset.k !== 'pud'); (g || document.querySelector('#tbl .grp')).click(); }); await p.waitForTimeout(250);
     if (await p.evaluate(() => document.querySelector('#ppop').hidden)) fail('group pop-up did not open');
@@ -73,7 +73,7 @@ const SIZES = (process.argv[2] || '1366x768,1920x1080,768x1024,1100x700').split(
       if (st.pk) await p.click('#belt .hc[data-up="1"] >> nth=0'); await p.waitForTimeout(40);
     }
     await p.waitForTimeout(400); await scroll('final'); await shot('9final'); { const rr = await rect('.rsbox'); if (!rr) fail('no final result'); else if (rr[0] < 0 || rr[1] < 0 || rr[2] > W + 1 || rr[3] > H + 1) fail('final box does not fit', JSON.stringify(rr)); }
-    await p.click('#rs [data-a=rsclose]'); await p.waitForTimeout(200); await scroll('after final'); await shot('10after');
+    await p.waitForTimeout(200); await scroll('after final'); await shot('10after');
     // hot-seat pass card
     await p.evaluate(() => { showStart(); }); await p.waitForTimeout(200); await p.click('[data-a=play]'); await p.click('[data-a=opt][data-k=np][data-v="3"]'); await p.click('[data-start=hot]'); await p.waitForTimeout(500);
     if (await p.evaluate(() => document.querySelector('#pc').hidden || !document.querySelector('#pc [data-a=take]'))) fail('no pass-the-device card'); else { const pr = await rect('#pc'), br = await rect('#bd'); if (ov(pr, br)) fail('pass card over the board'); await shot('11pass'); if (await p.evaluate(() => document.querySelectorAll('#belt [data-up="1"]').length)) fail('hand visible before the pass card was taken'); }

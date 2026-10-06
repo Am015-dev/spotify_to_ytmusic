@@ -51,20 +51,7 @@ function tipTarget(tp) {
   const same = k => k === tp.type || (ICONS[k] && ICONS[tp.type]);
   return [...document.querySelectorAll('#belt .hc[data-id]')].find(b => same(tkey(+b.dataset.id))) || null;
 }
-function placeTip() {
-  let b = $('#tipb'); const tp = UI.tip;
-  const show = tp && G && UI.started && tp.turn === curTurn() && !(tp.t0 && Date.now() - tp.t0 > 6000) && canPick() && !UI.drag && !UI.cards.length && !UI.rsOpen && UI.coach.level !== 'off';
-  if (!show) { if (b) b.hidden = true; return; }
-  if (!b) { b = h('div#tipb', { role: 'status', 'data-a': 'tipx' }); document.body.appendChild(b); }
-  const key = tp.key + tp.turn; if (b.dataset.k !== key) { b.dataset.k = key; b.replaceChildren(h('b', tp.title), ' ', tp.text); }
-  const tg = tipTarget(tp), bd = $('#bd').getBoundingClientRect(); b.hidden = false; b.classList.toggle('free', !tg);
-  const bw = b.offsetWidth, bh = b.offsetHeight, W = innerWidth;
-  if (tg) {
-    const r = tg.getBoundingClientRect(), bz = tg.closest('#belt') ? $('#beltz').getBoundingClientRect().top + 6 : r.top; const cx = r.left + r.width / 2; let x = Math.max(8, Math.min(W - bw - 8, cx - bw / 2)), y = Math.min(r.top, bz) - bh - 12;   // above the belt, never over its dishes
-    const below = y < bd.top + 4; if (below) y = r.bottom + 12;
-    b.style.left = Math.round(x) + 'px'; b.style.top = Math.round(y) + 'px'; b.style.setProperty('--ax', Math.round(Math.max(14, Math.min(bw - 14, cx - x))) + 'px'); b.classList.toggle('below', below);
-  } else { b.style.left = Math.round(Math.max(8, bd.left + (bd.width - bw) / 2)) + 'px'; b.style.top = Math.round(bd.top + 6) + 'px'; b.classList.remove('below'); }
-}
+function placeTip() { const b = $('#tipb'); if (b) b.hidden = true; }   // no tip bubbles: the board and a ghost finger do the teaching
 // ---- press and hold a dish: read it (two short lines); drag it up onto the table: grab it
 const SHORT = { tempura: 'Pairs: two = 5', sashimi: 'Sets of three = 10', dumpling: 'More buns, more points', roll1: 'Roll race: 1 icon', roll2: 'Roll race: 2 icons', roll3: 'Roll race: 3 icons', salmon: 'Nigiri: 2 (×3 on paste)', squid: 'Nigiri: 3 (×3 on paste)', egg: 'Nigiri: 1 (×3 on paste)', wasabi: 'Next nigiri ×3', chop: 'Later: grab two dishes', pudding: 'End: most +6, fewest −6' };
 function peekShow(b) {

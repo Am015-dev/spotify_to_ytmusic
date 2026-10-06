@@ -10,136 +10,138 @@ function drawCard() {
   pc.append(h('div.ph-head', h('div.ph-t', h('b', c.title), h('span', c.sub || '')), c.kind === 'pass' ? null : h('button.px', { 'data-a': 'cont', type: 'button', 'aria-label': 'Close' }, '×')), h('div.ph-body', c.body, h('div.cbtns', bs)));
   if (c.kind === 'pass') { try { const b = pc.querySelector('[data-a=take]'); if (b) b.focus({ preventScroll: true }); } catch (e) { } }
 }
-// ---- guide: short tips that explain each card the first time it appears
-const TIP_EXTRA = {
-  tempura: 'Two make a pair: 5 points.',
-  sashimi: 'Three make a set: 10 points.',
-  dumpling: 'Each bun scores more: 1, 3, 6, 10, 15.',
-  roll1: 'Most roll icons this round: 6. Second: 3.',
-  roll2: 'Most roll icons this round: 6. Second: 3.',
-  roll3: 'Most roll icons this round: 6. Second: 3.',
-  salmon: '2 points now. Triple on Fire Paste.',
-  squid: '3 points now. Triple on Fire Paste.',
-  egg: '1 point now. Triple on Fire Paste.',
-  wasabi: 'Your next nigiri on it scores triple.',
-  chop: 'Later, tap them to grab two dishes.',
-  pudding: 'Kept to the end: most +6, fewest −6.'
-};
-// tips sit on the board beside the dish they explain (ui8: two short lines, no "Got it"); a ghost finger shows the first grab
-function coachTip(key, title, text, type) {
+// ---- guide: no tip cards in any mode. The only nudge left is a ghost finger on the glowing Twin Sticks (ui8).
+function coachTip(key) {
   UI.coach.seen[key] = 1; UI.coach.turn = G.round + '.' + G.turn;
-  UI.tip = { key, title, text, type, turn: UI.coach.turn, t0: Date.now() }; render();
-  clearTimeout(UI.tipT); UI.tipT = setTimeout(() => { try { boardFX(); } catch (e) { } }, 6100);   // a tip fades on its own after 6 s
+  if (key === 'twinReady') UI.tip = { key, turn: UI.coach.turn };
+  render();
 }
 function coachCheck() {
   const lv = UI.coach.level; if (lv === 'off' || !G || G.phase !== 'pick') return false;
   const v = viewSeat(); if (v < 0 || !canPick() || UI.cards.length) return false;
   const turn = G.round + '.' + G.turn; if (UI.coach.turn === turn) return false;
-  const seen = UI.coach.seen, p = G.players[v];
-  if (!seen.welcome && lv === 'full') { coachTip('welcome', 'Grab dishes that score.', 'Most points after 3 rounds wins.'); return true; }
-  const PRI = ['wasabi', 'chop', 'pudding']; const types = Array.from(new Set(p.hand.map(tkey))).sort((a, b) => (PRI.indexOf(b) - PRI.indexOf(a)) || (ORDER.indexOf(a) - ORDER.indexOf(b)));
-  const c = KK.tableCounts(p.table);
-  if (!seen.twinReady && c.chop && p.hand.length >= 2) { coachTip('twinReady', 'Twin Sticks ready!', 'Tap them, then two dishes.', 'chop'); return true; }
-  if (!seen.pasteReady && c.wasabiUnused && p.hand.some(id => NIG[tkey(id)])) { coachTip('pasteReady', 'Fire Paste waiting:', 'a nigiri now scores triple.', p.hand.map(tkey).find(k => NIG[k])); return true; }
-  if (lv === 'full' || lv === 'light') {
-    for (const t of types) { const tk = ICONS[t] ? 'roll' : t; if (seen[tk]) continue; if (lv === 'light' && !['wasabi', 'chop', 'pudding'].includes(t)) continue; coachTip(tk, TY[t].name + ':', TIP_EXTRA[t] || '', t); return true; }
-  }
-  if (!seen.endRound && G.turn >= G.hand && lv === 'full') { coachTip('endRound', 'Last dish this round.', 'Then the round is scored.'); return true; }
+  const seen = UI.coach.seen, p = G.players[v], c = KK.tableCounts(p.table);
+  if (!seen.twinReady && c.chop && p.hand.length >= 2) { coachTip('twinReady'); return true; }
   return false;
 }
-// ---- round score pad
-const CATROWS = [
-  { k: 'maki', l: 'Seaweed rolls', ic: ['most', 'roll1'], sub: s => s.icons + ' icon' + (s.icons === 1 ? '' : 's'), tip: 'Roll race: most roll icons scores 6, second most 3.' },
-  { k: 'tempura', l: 'Crispy Prawns', ic: ['pair', 'tempura'], sub: null, tip: '5 points for every pair.' },
-  { k: 'sashimi', l: 'Fish Slices', ic: ['set', 'sashimi'], sub: null, tip: '10 points for every set of three.' },
-  { k: 'dumpling', l: 'Steam Buns', ic: ['ladder', 'dumpling'], sub: null, tip: '1, 3, 6, 10, 15 points for 1 to 5 or more buns.' },
-  { k: 'nigiri', l: 'Nigiri', ic: ['v2', 'salmon'], sub: null, tip: 'Sunset 2, Moon 3, Sun 1 point each.' },
-  { k: 'wasabi', l: 'Fire Paste bonus', ic: ['x3', 'wasabi'], sub: null, tip: 'The extra points a nigiri scored by landing on Fire Paste (triple).' }];
-function padRows(upToRound, withPud) {
-  const bank = G.players.map((p, i) => G.rs.map(r => r[i].total));
-  return G.players.map((p, i) => ({ i: chefOf(i), name: p.name, rounds: [0, 1, 2].map(r => r < upToRound ? bank[i][r] : null), dessert: withPud ? G.final.puddingPts[i] : null, total: bank[i].slice(0, upToRound).reduce((a, b) => a + b, 0) + (withPud ? G.final.puddingPts[i] : 0), you: i === viewSeat() }));
+// ---- round end: the count happens ON the trays. Each kind of set lights up on every tray, its points pop out of it and
+// fly into the diner's score chip, which climbs. Tap the table to hurry. Then one big button. No tables, no sentences.
+const winLine = () => {
+  const ws = G.winners || [], v = viewSeat();
+  if (ws.length > 1) return ws.indexOf(v) >= 0 ? 'A tie, and you share it!' : 'It is a tie!';
+  return ws[0] === v ? 'You win!' : pname(ws[0]) + ' wins!';
+};
+const tw = ms => ANIM ? new Promise(r => setTimeout(r, ms * (UI.fast ? .25 : 1))) : Promise.resolve();
+const seatBox = s => document.querySelector('#tbl .seat[data-seat="' + s + '"]');
+const chipOf = s => { const b = seatBox(s); return b ? b.querySelector('.av .sc') : null; };
+const ctrC = e => { if (!e) return null; const r = e.getBoundingClientRect(); return r.width || r.height ? { x: r.left + r.width / 2, y: r.top + r.height / 2 } : null; };
+function tallyPop(txt, from, to, cls) {
+  if (!ANIM || !document.body.animate || pxRM()) return Promise.resolve();
+  const a = ctrC(from), b = ctrC(to); if (!a) return Promise.resolve();
+  const el = h('div.tpop' + (cls ? '.' + cls : ''), txt); el.style.left = Math.round(a.x) + 'px'; el.style.top = Math.round(a.y) + 'px'; document.body.appendChild(el);
+  const dx = b ? b.x - a.x : 0, dy = b ? b.y - a.y : -26, f = UI.fast ? .35 : 1;
+  const an = el.animate([{ transform: 'translate(-50%,-50%) scale(.4)', opacity: 0 }, { transform: 'translate(-50%,-80%) scale(1.3)', opacity: 1, offset: .28 }, { transform: 'translate(-50%,-60%) scale(1.05)', opacity: 1, offset: .5 },
+    { transform: 'translate(calc(-50% + ' + dx + 'px),calc(-50% + ' + dy + 'px)) scale(' + (b ? .55 : 1) + ')', opacity: b ? .95 : 0 }], { duration: 700 * f, easing: 'ease-in-out' });
+  return new Promise(res => { const done = () => { el.remove(); res(); }; an.onfinish = done; an.oncancel = done; setTimeout(done, 1500); });
 }
-function makiText(sc) {
-  const s = sc.seats; const max = Math.max(...s.map(x => x.icons));
-  if (max <= 0) return 'Nobody served a roll this round: no roll points.';
-  const parts = s.filter(x => x.icons > 0).sort((a, b) => b.icons - a.icons).map(x => pname(x.seat) + ' ' + x.icons + ' icon' + (x.icons === 1 ? '' : 's') + (x.maki ? ' (+' + x.maki + ')' : ' (no points)'));
-  const top = s.filter(x => x.icons === max).length;
-  return 'Roll race: ' + parts.join(', ') + (top > 1 ? '. The most is tied, so 6 is split and nobody gets second place.' : '.');
+// one tray element per (seat, kind of pile); a seat whose pile is not drawn (small tray) falls back to its counter
+function trayEl(s, k) { const b = seatBox(s); return b ? (b.querySelector('.grp[data-k="' + k + '"]') || b.querySelector('.ctr') || b) : null; }
+const TSTEPS = ['maki', 'tempura', 'sashimi', 'dumpling', 'nigiri', 'wasabi'];
+function tallyParts(s, step, val) {
+  // -> [{k, v, z}] piles of seat s that score `val` in this step
+  const b = seatBox(s); const have = k => !!(b && b.querySelector('.grp[data-k="' + k + '"]'));
+  if (step === 'maki') return have('roll') ? [{ k: 'roll', v: val }] : [];
+  if (step === 'tempura' || step === 'sashimi' || step === 'dumpling') return have(step) ? [{ k: step, v: val }] : [];
+  const parts = []; let sum = 0;
+  if (b) for (const g of b.querySelectorAll('.grp[data-k^="n-"],.grp[data-k^="pn-"]')) {
+    const k = g.dataset.k, kk = k.replace(/^p?n-/, ''), on = k[0] === 'p', n = +g.dataset.n, base = NIG[kk] * n;
+    if (step === 'nigiri') { parts.push({ k, v: base }); sum += base; } else if (on) { parts.push({ k, v: 2 * base }); sum += 2 * base; }
+  }
+  if (step === 'wasabi' && have('wasabi')) parts.push({ k: 'wasabi', v: 0, z: true });
+  if (sum !== val) return val ? [{ k: parts.length ? parts[0].k : 'ctr', v: val }] : parts.filter(x => x.z);   // never lose a point: one pop for the seat
+  return parts.filter(x => x.v || x.z);
+}
+async function runTally(sc, last, tok) {
+  const np = G.np, F = UI.fz, flights = [];
+  UI.news = null; UI.fast = false; F.tally = new Array(np).fill(0); F.msg = 'Counting round ' + sc.round; render();
+  const ok = () => tok === UI.seq && UI.rsOpen && UI.fz === F;
+  const bump = s => { const c = chipOf(s); if (!c) return; c.textContent = String(bankedOf(s) + F.tally[s]); if (ANIM && c.animate && !pxRM()) c.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.6)' }, { transform: 'scale(1)' }], { duration: 300 }); snd('coin', { vol: .45 }); };
+  const give = (s, el, v, z) => {
+    z = z || !v;
+    if (el && el.classList) el.classList.add(z ? 'tl0' : 'tl');
+    if (z) { flights.push(tallyPop('0', el, null, 'z')); return; }
+    flights.push(tallyPop((v > 0 ? '+' : '−') + Math.abs(v), el, chipOf(s), v < 0 ? 'neg' : '').then(() => { if (!ok()) return; F.tally[s] += v; bump(s); }));
+  };
+  if (ANIM) { snd('round', { duck: true }); await tw(350); }
+  for (const step of TSTEPS) {
+    if (!ok()) return;
+    let any = false;
+    for (let s = 0; s < np; s++) {
+      const val = sc.seats[s][step] || 0;
+      for (const p of tallyParts(s, step, val)) { any = true; give(s, trayEl(s, p.k), p.v, p.z); }
+      if (!tallyParts(s, step, val).length && val) { any = true; give(s, trayEl(s, 'ctr'), val); }
+    }
+    if (any) await tw(430);
+  }
+  await Promise.all(flights); flights.length = 0; if (!ok()) return;
+  await tw(150);
+  for (let s = 0; s < np; s++) if (F.tally[s] !== sc.seats[s].total) { console.error('tally mismatch seat ' + s + ': ' + F.tally[s] + ' vs ' + sc.seats[s].total); F.tally[s] = sc.seats[s].total; bump(s); }
+  if (last) {
+    // dessert: the custard cups light up, the most scores, the fewest loses
+    F.msg = 'Custard cups count'; renderDock(); await tw(350);
+    const fin = G.final;
+    for (let s = 0; s < np; s++) { const el = trayEl(s, 'pud'); if (fin.pudding[s] > 0 && el && el.classList) el.classList.add('tl'); }
+    await tw(450);
+    for (let s = 0; s < np; s++) { const pts = fin.puddingPts[s]; if (pts) give(s, trayEl(s, 'pud'), pts); }
+    await Promise.all(flights); flights.length = 0; if (!ok()) return;
+    for (let s = 0; s < np; s++) if (bankedOf(s) + F.tally[s] !== fin.totals[s]) { console.error('final mismatch seat ' + s + ': ' + (bankedOf(s) + F.tally[s]) + ' vs ' + fin.totals[s]); F.tally[s] = fin.totals[s] - bankedOf(s); bump(s); }
+    await tw(300);
+  }
+  return true;
+}
+function rsBar(btns) {
+  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false;
+  rs.replaceChildren(h('div.rsbox.bar', { role: 'group', 'aria-label': 'Next' }, btns.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a }, b.label))));
 }
 function showRound(sc, ge) {
   const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false; rs.innerHTML = '';
-  const last = G.phase === 'over';
-  const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Round ' + sc.round + ' scores' });
-  box.appendChild(h('h2', h('span', { html: KIT.roundMarkerSVG(sc.round, 'done', { size: 34 }) }), 'Round ' + sc.round + ' scores'));
-  const tb = h('table.cat');
-  const hr = h('tr', h('th', ''));
-  sc.seats.forEach(s => { const th = h('th'); th.appendChild(h('div', { html: avatarS(s.seat, 64) })); th.appendChild(h('span.sub', pname(s.seat))); hr.appendChild(th); });
-  tb.appendChild(hr);
-  const cells = [];
-  CATROWS.forEach(r => {
-    const tr = h('tr', { title: r.tip }); tr.appendChild(h('td', h('div.lc', { html: iconS(r.ic[0], 26, r.ic[1]) }, r.l)));
-    sc.seats.forEach(s => { const td = h('td.n.z', { 'data-v': s[r.k] }, '·'); if (r.sub) td.appendChild(h('span.sub', r.sub(s))); tr.appendChild(td); cells.push(td); });
-    tb.appendChild(tr);
-  });
-  const tt = h('tr.tot'); tt.appendChild(h('td', 'Round total')); sc.seats.forEach(s => { const td = h('td.n.z', { 'data-v': s.total }, '·'); tt.appendChild(td); cells.push(td); }); tb.appendChild(tt);
-  box.appendChild(tb);
-  box.appendChild(h('div.maki', makiText(sc)));
-  const padHost = h('div.padw'); box.appendChild(padHost);
-  const btns = h('div.cbtns', h('button.btn.alt#rsskip', { type: 'button', 'data-a': 'rsskip' }, 'Skip counting'), h('button.btn.go', { type: 'button', 'data-a': 'rsnext' }, last ? 'See the final result' : 'Next round'));
-  box.appendChild(btns); rs.appendChild(box);
-  UI.rsInfo = { sc, ge, skip: !ANIM, done: false };
-  const showPad = () => { const w = Math.min(380, Math.max(260, (box.clientWidth || 340) - 24)); padHost.innerHTML = KIT.scorePadSVG({ w, round: sc.round, rows: padRows(sc.round, false) }); const sk = $('#rsskip'); if (sk) sk.hidden = true; UI.rsInfo.done = true; };
-  const rows = []; for (let k = 0; k < cells.length; k += sc.seats.length) rows.push(cells.slice(k, k + sc.seats.length));
-  const tok = UI.seq, info = UI.rsInfo;
+  const last = G.phase === 'over', tok = UI.seq, F = UI.fz;
+  UI.rsInfo = { sc, ge, skip: !ANIM, done: false, last };
+  if (!(F && F.tables)) {   // online: the next round is already dealt, so there is no frozen table to count on
+    rsBar([{ label: last ? 'Result' : 'Next round', a: 'rsnext', cls: 'go' }]);
+    clearTimeout(UI.rsT); const info = UI.rsInfo; UI.rsT = setTimeout(() => { if (UI.rsOpen && UI.rsInfo === info) afterRound(ge); }, NET.on ? 30000 : 6000);
+    return;
+  }
   (async () => {
-    if (ANIM) { snd('round', { duck: true }); await new Promise(r => setTimeout(r, 450)); }
-    for (let ri = 0; ri < rows.length; ri++) {
-      for (const td of rows[ri]) { const v = +td.dataset.v; const lead = td.firstChild; const sub = td.querySelector('.sub');
-        const setN = n => { td.firstChild && td.firstChild.nodeType === 3 ? td.firstChild.nodeValue = String(n) : td.insertBefore(document.createTextNode(String(n)), td.firstChild); };
-        if (!info.skip && v > 0) { const steps = Math.min(v, 12); for (let k = 1; k <= steps && !info.skip; k++) { setN(Math.round(v * k / steps)); snd('tick', { rate: .9 + k * .05, vol: .4 }); await new Promise(r => setTimeout(r, 32)); if (tok !== UI.seq) return; } }
-        setN(v); td.classList.toggle('z', v === 0);
-        if (v > 0 && !info.skip) snd('coin', { vol: .6 });
-      }
-      rows[ri].forEach(td => td.parentNode.classList.add('cur'));
-      if (!info.skip) { await new Promise(r => setTimeout(r, 260)); if (tok !== UI.seq) return; }
-      rows[ri].forEach(td => td.parentNode.classList.remove('cur'));
+    let done = false; try { done = await runTally(sc, last, tok); } catch (e) { console.error(e); done = true; }
+    if (!done || tok !== UI.seq || !UI.rsOpen) return;
+    UI.rsInfo.done = true; F.msg = null;
+    if (last) {
+      F.crown = true; markWinners();
+      if (campOn()) { renderDock(); await tw(1500); if (tok === UI.seq && UI.rsOpen) afterRound(ge); }
+      else showFinal();
+      return;
     }
-    if (tok !== UI.seq || !UI.rsOpen) return;
-    showPad();
+    F.msg = 'Round ' + sc.round + ' scored'; renderDock();
+    rsBar([{ label: 'Next round', a: 'rsnext', cls: 'go' }]);
+    try { document.querySelector('#rs [data-a=rsnext]').focus({ preventScroll: true }); } catch (e) { }
   })();
-  if (NET.on) { clearTimeout(UI.rsT); UI.rsT = setTimeout(() => { if (UI.rsOpen && UI.rsInfo === info) afterRound(ge); }, 30000); }
-  try { box.querySelector('[data-a=rsnext]').focus({ preventScroll: true }); } catch (e) { }
 }
-function skipCount() { if (UI.rsInfo) { UI.rsInfo.skip = true; } }
+function skipCount() { UI.fast = true; }
+// winners get a crown and a glow on their seat
+function markWinners() {
+  if (!G || G.phase !== 'over') return;
+  for (const s of G.winners || []) { const av = document.querySelector('#tbl .seat[data-seat="' + s + '"] .av'); if (av && !av.classList.contains('win')) { av.classList.add('win'); av.appendChild(h('span.crown', { html: KIT.iconSVG('crown', { size: 26 }) })); } }
+}
 function showFinal() {
-  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false; rs.innerHTML = '';
-  const F = G.final, np = G.np;
-  const box = h('div.rsbox', { role: 'dialog', 'aria-label': 'Final result' });
-  const ws = G.winners || [];
-  const me = viewSeat(), iWin = me >= 0 && ws.includes(me);
-  box.appendChild(h('h2', h('span', { html: KIT.iconSVG('crown', { size: 32 }) }), 'The meal is over'));
-  const wn = h('div.win', h('span', { html: avatarS(ws[0] != null ? ws[0] : 0, 96) }), h('div', G.winText));
-  box.appendChild(wn);
-  // custard resolved
-  const tb = h('table.cat'); const hr = h('tr', h('th', ''));
-  for (let s = 0; s < np; s++) { const th = h('th'); th.appendChild(h('div', { html: avatarS(s, 64) })); th.appendChild(h('span.sub', pname(s))); hr.appendChild(th); }
-  tb.appendChild(hr);
-  const addRow = (label, vals, cls) => { const tr = h('tr' + (cls ? '.' + cls : ''), h('td', label)); vals.forEach(v => tr.appendChild(h('td.n', String(v)))); tb.appendChild(tr); };
-  for (let r = 0; r < D.rounds; r++) addRow('Round ' + (r + 1), G.rs[r].map(x => x.total));
-  addRow('Custard cups', F.pudding.map(String));
-  addRow('Custard points', F.puddingPts.map(x => (x > 0 ? '+' : '') + x));
-  addRow('Total', F.totals, 'tot');
-  box.appendChild(tb);
-  const best = Math.max(...F.pudding), worst = Math.min(...F.pudding);
-  box.appendChild(h('div.maki', best === worst ? 'Everyone has the same number of custards, so nobody scores or loses for them.' : 'Custard: most (' + best + ') scores 6' + (np > 2 ? ', fewest (' + worst + ') loses 6' : ' (no penalty with two players)') + '; ties split the points, rounded down.'));
-  const padHost = h('div.padw', { html: KIT.scorePadSVG({ w: Math.min(380, Math.max(260, (window.innerWidth || 380) - 48)), round: 4, rows: padRows(D.rounds, true) }) }); box.appendChild(padHost);
-  const bs = NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again' }, { label: 'Look at the table', a: 'cont', cls: 'alt' }, { label: 'Menu', a: 'menu', cls: 'alt' }];
-  box.appendChild(h('div.cbtns', bs.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a === 'cont' ? 'rsclose' : b.a }, b.label))));
-  rs.appendChild(box);
-  // confetti only when a person at this device won (or shares the win); otherwise a softer line
+  const rs = $('#rs'); UI.rsOpen = true; rs.hidden = false;
+  const ws = G.winners || [], me = viewSeat(), iWin = me >= 0 && ws.includes(me);
+  if (UI.fz) UI.fz.crown = true; UI.overShown = true; renderDock(); markWinners();
+  const bs = NET.on ? netOverButtons() : [{ label: 'Play again', a: 'again', cls: 'go' }, { label: 'Menu', a: 'menu', cls: 'alt' }];
+  rs.replaceChildren(h('div.rsbox.bar', { role: 'group', 'aria-label': 'Result' }, bs.map(b => h('button.btn' + (b.cls ? '.' + b.cls : ''), { type: 'button', 'data-a': b.a === 'cont' ? 'rsclose' : b.a }, b.label))));
   const humanWin = NET.on ? iWin : ws.some(s => G.players[s] && !G.players[s].ai);
-  if (humanWin) { snd('win', { duck: true }); celebrate(box); } else { snd('round', { duck: true }); if (humans().length || NET.on) wn.after(h('p.wp', 'Well played! Another meal?')); }
-  UI.overShown = true; if (humans().length || NET.on) lsSet('kk_done', '1');
+  if (humanWin) { snd('win', { duck: true }); celebrate($('#rs')); } else snd('round', { duck: true });
+  if (humans().length || NET.on) lsSet('kk_done', '1');
   if (UI.mode !== 'net') lsSet('kk_save', '');
 }
 function celebrate(box) {

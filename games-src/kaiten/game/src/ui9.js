@@ -27,7 +27,7 @@ function campStart(def) {
   newGame('vs', { camp: def, np: s.np, seats: s.seats, level: s.level, lv: s.lv, twist: t });
   UI.camp = def;
   UI.coach.level = def.hints ? 'full' : 'off'; UI.coach.keep = !!def.hints; UI.coach.userOff = !def.hints; UI.tip = null; render();
-  try { toast('Goal: ' + def.goal.text); } catch (e) { }
+  try { const sg = { c2: 'Win with 10+ Fish Slice points.', c3: 'Win the roll prize twice.', c9: 'Win against all four diners.', c10: 'Win, champion bonus and all.' }; toast(sg[def.id] || def.goal.text); } catch (e) { }
 }
 function campFinish() { try { GXC.finish(G); } catch (e) { console.error(e); } }
 function campOpen() { if (typeof GXC === 'undefined') return; closeRS(); GXC.open(); }

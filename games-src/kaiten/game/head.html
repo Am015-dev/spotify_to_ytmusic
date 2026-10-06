@@ -450,4 +450,20 @@ html.ph.ph-p #belt{padding-top:14px}
 .hc .gn{white-space:nowrap}
 .grp.shelf .hn.pos{background:#ffe9a6;border-color:#c98a10;color:#5b3a05}
 .grp.shelf .hn.neg{background:#ffd9cf;border-color:#b5361c;color:#8a2410}
+/* ---- round-end count on the trays, final strip ---- */
+.seat.tight .grp{min-width:44px;padding:0}.seat.tight .grp .hn{padding:0 2px;margin-top:1px}.seat.tight .ctr{gap:3px 3px;padding:4px 4px}.seat.tight .grp .bg{min-width:20px;height:20px;font-size:13px;line-height:16px}
+.ppop{pointer-events:none}   /* a pile's note never blocks the belt: taps go through to the dishes */
+#rs,html.ph.ph-l #rs{position:fixed;left:0;right:0;bottom:0;top:auto!important;background:none;pointer-events:none;z-index:55;padding:0 10px calc(14px + env(safe-area-inset-bottom,0px));align-items:flex-end}
+#rs .rsbox.bar{background:none;border:0;box-shadow:none;padding:0;max-height:none;overflow:visible;flex-direction:row;gap:12px;width:auto;justify-content:center}
+#rs .rsbox.bar .btn{pointer-events:auto;min-height:58px;min-width:150px;font-size:20px;font-weight:900;border-radius:18px;box-shadow:0 5px 0 rgba(0,0,0,.35),0 10px 20px rgba(0,0,0,.35);animation:rsIn .35s cubic-bezier(.2,.9,.3,1.3) both}
+@keyframes rsIn{from{opacity:0;transform:translateY(16px) scale(.8)}to{opacity:1;transform:none}}
+.grp.tl{animation:none!important;outline:3px solid #ffd23a;outline-offset:1px;border-radius:10px;box-shadow:0 0 0 4px rgba(255,210,58,.5),0 0 16px 5px rgba(255,210,58,.85);transform:scale(1.1);position:relative;z-index:3;transition:transform .18s}
+.grp.tl0{opacity:.55;filter:grayscale(.7)}
+.tpop{position:fixed;z-index:62;pointer-events:none;font-weight:900;font-size:24px;color:#fff3b0;-webkit-text-stroke:1.2px #5b3221;text-shadow:0 2px 0 #5b3221;white-space:nowrap}
+.tpop.z{color:#f3e0bd;font-size:17px}.tpop.neg{color:#ffb3a3}
+.sh .av.win{box-shadow:0 0 0 4px #ffd23a,0 0 20px 8px rgba(255,210,58,.9);border-radius:50%}
+.sh .av .crown{position:absolute;left:50%;top:-20px;transform:translateX(-50%);width:26px;height:26px;z-index:4;pointer-events:none;animation:crownIn .5s cubic-bezier(.2,.9,.3,1.5) both}
+.sh .av .crown svg{width:100%;height:100%}
+@keyframes crownIn{from{opacity:0;transform:translate(-50%,-14px) scale(.3)}to{opacity:1;transform:translate(-50%,0)}}
+@media (prefers-reduced-motion:reduce){#rs .rsbox.bar .btn,.sh .av .crown{animation:none}}
 </style></head>

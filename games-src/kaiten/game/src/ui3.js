@@ -53,7 +53,19 @@ function aiPick(seat) {
   if (!G || UI.busy || G.phase !== 'pick') return;
   const p = G.players[seat]; if (!p || p.picked || !p.ai) { schedule(); return; }
   let mv; try { mv = KK.AI.choose(G, seat, undefined, UI.camp && UI.camp.twist && UI.camp.twist.id === 'long-think' ? { units: UI.camp.twist.param || 250 } : undefined); } catch (e) { console.error(e); mv = KK.moves(G, seat)[0]; }
-  commit(seat, mv);
+  flyAI(seat); commit(seat, mv);
+}
+// a computer's pick: a covered plate hops from its diner to its seat (about half a second), then the cover lands
+function flyAI(seat) {
+  try {
+    if (!ANIM || !document.body.animate || pxRM() || seat === viewSeat()) return;
+    const sh = document.querySelector('.seat[data-seat="' + seat + '"] .sh'), sl = document.querySelector('.seat[data-seat="' + seat + '"] .slot .sbox'); if (!sh || !sl) return;
+    const a = sh.getBoundingClientRect(), b = sl.getBoundingClientRect(); if (!a.width || !b.width) return;
+    const c = h('div.flyc'); c.style.cssText = 'left:' + (a.left + a.width / 2 - 16) + 'px;top:' + (a.top + a.height / 2 - 22) + 'px;width:32px;height:45px'; c.innerHTML = KIT.backSVG({ w: 32 }); document.body.appendChild(c);
+    const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2);
+    const an = c.animate([{ transform: 'translate(0,0) scale(.8)', opacity: .2 }, { transform: 'translate(' + dx * .5 + 'px,' + (dy * .5 - 18) + 'px) scale(1.1)', opacity: 1, offset: .5 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.9)', opacity: .9 }], { duration: Math.round(480 * Math.max(.5, Math.min(1.6, AIDELAY / 650))), easing: 'ease-in-out' });
+    const done = () => c.remove(); an.onfinish = done; setTimeout(done, 1200);
+  } catch (e) { }
 }
 function commit(seat, mv) {
   if (!G || G.phase !== 'pick') return false;
@@ -127,8 +139,6 @@ function hint() {
   UI.rec = { ids: mv.ids.slice(), pick: mv.pick.slice(), turn: G.round + '.' + G.turn };
   // one tap grabs: the hint only glows the dish (a ghost finger points at it); otherwise it lifts it as before
   UI.twin = mv.pick.length === 2; UI.sel = UI.prefs.grab1 === false ? mv.pick.slice() : []; render();
-  const pp = $('#prompt'); const why = whyPick(mv.ids);
-  if (!isPh()) toast('A good pick: ' + mv.ids.map(cname).join(' + ') + '. ' + why);   // phones: the reason shows in the panel, not over the buttons
 }
 // ---------- hot-seat ----------
 function hotNext() {
@@ -137,7 +147,7 @@ function hotNext() {
   const pend = KK.pending(G).filter(s => !G.players[s].ai);
   if (!pend.length) return;
   UI.holder = -1; UI.sel = []; UI.twin = false; UI.rec = null;
-  pushCard({ kind: 'pass', seat: pend[0], title: 'Pass the device to ' + pname(pend[0]), sub: 'Hands are hidden', body: h('p', 'Hand the device to ' + pname(pend[0]) + '. The plates on their belt stay hidden until they press the button.'), buttons: [{ label: pname(pend[0]) + ' is ready', a: 'take' }] });
+  pushCard({ kind: 'pass', seat: pend[0], title: 'Pass to ' + pname(pend[0]), sub: '', body: h('span'), buttons: [{ label: pname(pend[0]) + ' is ready', a: 'take' }] });
   render();
 }
 function takeDevice() {
