@@ -21,9 +21,15 @@ if(FAST){
   composer.render=(...a)=>{if(FAST.force||(FAST.f%FAST.every)===0){FAST.force=0;return fastRender(...a)}};
   window.__fastDraw=()=>{FAST.force=1;composer.render()};
   // 3) frame clock: frames run back to back, each with now += 1000/60 (the game's dt is exactly 1/60 s, as on a 60 Hz phone)
-  if(FAST.clock&&!window.__tick){const q=[];let t=performance.now();const mc=new MessageChannel();let pend=false;
+  const ownClock=FAST.clock&&!window.__tick;
+  if(ownClock){const q=[];let t=performance.now();const mc=new MessageChannel();let pend=false;
     const run=()=>{pend=false;const c=q.splice(0);t+=1000/60;FAST.f++;for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}if(q.length)kick()};
     const kick=()=>{if(!pend){pend=true;(FAST.f%4===3?setTimeout(run,0):mc.port2.postMessage(0))}};mc.port1.onmessage=run;   // a macrotask every 4th frame lets input/timers in
     window.requestAnimationFrame=cb=>{q.push(cb);kick();return q.length};window.cancelAnimationFrame=()=>{}}
-  else{const _f=frame;frame=now=>{FAST.f++;_f(now)}}   // external clock (tPlay/g25 __tick): only count frames
+  // 4) loading screen: the loaders yield one frame per 12 ms of performance.now(); while LD.on that clock runs 25× slower, so the same
+  //    generators finish in ~25× fewer frames (yield points only; what gets built is identical). Outside loading it is the real clock.
+  {const pn=performance.now.bind(performance);let real0=pn(),virt=real0,was=false;
+   performance.now=()=>{const r=pn();if(LD.on){if(!was){was=true}virt+=(r-real0)/25}else{if(was)was=false;virt+=r-real0}real0=r;return virt}}
+  if(!ownClock){const _f=frame;frame=now=>{FAST.f++;_f(now)}}   // external clock (tPlay/g25 __tick): only count frames
+
 }
