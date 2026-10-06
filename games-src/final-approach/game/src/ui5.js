@@ -62,11 +62,12 @@ document.addEventListener('click', ev => {
     case 'tipmore': tipMore(); break;
     case 'unsel': UI.sel = -1; UI.cof = 0; UI.warnK = null; render(); break;
     case 'debrief': showFinal(); break;
+    case 'lookpanel': lookPanel(); break;
     case 'ckopen': UI.ckOpen = !UI.ckOpen; render(); break;
     case 'saymore': UI.sayAll = true; render(); break;
     case 'recapx': hideRecap(); break;
-    case 'altinfo': { const R = altRows()[G.round + G.row0]; toast('Altitude ' + R[0] + ' ft, round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0) + '. Blue rows: ' + name(0) + ' (Pilot) places first; orange rows: ' + name(1) + ' (Co-pilot). A purple dot brings a reroll token.'); break; }
-    case 'space': { const i = +d.i, s = trackOf().sp[i]; toast('Space ' + (i + 1) + (i === trackOf().sp.length - 1 ? ' (airport)' : '') + ': ' + G.planes[i] + ' plane' + (G.planes[i] === 1 ? '' : 's') + (s[1] ? ', ' + s[1] + ' traffic die roll' + (s[1] > 1 ? 's' : '') + ' when a round starts here' : '') + (s[2] && G.mods.tabs ? ', corridor: axis must be ' + tabText(s[2]) + ' to leave' : '')); break; }
+    case 'altinfo': { const R = altRows()[G.round + G.row0]; toast(R[0] + ' ft · round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0)); break; }
+    case 'space': { const i = +d.i, s = trackOf().sp[i]; toast((i === trackOf().sp.length - 1 ? 'Airport' : 'Space ' + (i + 1)) + ': ' + G.planes[i] + ' plane' + (G.planes[i] === 1 ? '' : 's')); break; }
     case 'take': takeDevice(+d.s); break;
     case 'tipok': tipOk(); break;
     case 'tipoff': UI.coach.level = 'off'; tipOk(); UI.prefs.guide = 'off'; savePrefs(); break;

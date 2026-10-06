@@ -6,7 +6,20 @@ function rtEl() { if (!UI.rt || !G.mods.real || G.result) return null; const s =
 function css(el, r) { el.style.left = r.x + 'px'; el.style.top = r.y + 'px'; el.style.width = r.w + 'px'; el.style.height = r.h + 'px'; return el; }
 // the plain look of a die: a number in a rounded square
 function dvEl(v, cls) { return h('span.dv' + (cls ? '.' + cls.trim().replace(/ +/g, '.') : ''), String(v)); }
-const SLOTCAP = { axis: 'Axis', engines: 'Engine', radio: 'Radio', gear: 'Gear', flaps: 'Flap', brakes: 'Brake', conc: 'Coffee', kero: 'Fuel', intern: 'Train', ice: 'Ice' };
+// slot faces: one line icon per control (the name is in the aria-label); gear / flaps / brakes also show the dice values they take
+const ICO = {
+  axis: '<path d="M12 4v15M7 19h10M4 8l8-2 8 2M4 8l-2.5 6a3.2 3.2 0 0 0 5 0zM20 8l-2.5 6a3.2 3.2 0 0 0 5 0z"/>',
+  engines: '<circle cx="12" cy="12" r="1.8"/><path d="M12 10.2C11.5 6 13 3.5 15.5 3.5c.5 3-1 5.5-3.5 6.7zM13.8 12c4.2-.5 6.7 1 6.7 3.5-3 .5-5.500-1-6.700-3.500zM12 13.8c.5 4.200-1 6.700-3.500 6.700-.500-3 1-5.500 3.500-6.700zM10.200 12C6 12.500 3.500 11 3.500 8.500c3-.500 5.500 1 6.700 3.500z"/>',
+  radio: '<path d="M12 11v9M9 20h6"/><circle cx="12" cy="9" r="1.6"/><path d="M8.300 5.700a5.200 5.200 0 0 0 0 6.600M15.700 5.700a5.200 5.200 0 0 1 0 6.600M5.400 3a9.200 9.200 0 0 0 0 12M18.600 3a9.200 9.200 0 0 1 0 12"/>',
+  gear: '<circle cx="12" cy="15" r="6"/><circle cx="12" cy="15" r="2"/><path d="M12 3v6"/>',
+  flaps: '<path d="M2.500 9.500c6-2.500 13-2.500 19-.5l-1 3.500H5z"/><path d="M7 15.500l-2 4.500M13 15.500l-1 5M19 13.500l1.500 5.500"/>',
+  brakes: '<circle cx="12" cy="12" r="8.500"/><circle cx="12" cy="12" r="3"/><path d="M12 3.500v3M12 17.500v3M3.500 12h3M17.500 12h3"/>',
+  conc: '<path d="M4.500 9h11v6a4 4 0 0 1-4 4h-3a4 4 0 0 1-4-4zM15.500 11h2a2.200 2.200 0 0 1 0 4.400h-2M8 3c0 2 2 2 2 4M12 3c0 2 2 2 2 4"/>',
+  kero: '<path d="M12 3c4 5 6.500 8 6.500 11a6.500 6.500 0 0 1-13 0c0-3 2.500-6 6.500-11z"/>',
+  intern: '<path d="M12 4l9.500 4.500L12 13 2.500 8.500zM6.500 11v5c3.500 2.500 7.500 2.500 11 0v-5"/>',
+  ice: '<path d="M12 3v18M4.200 7.500l15.600 9M19.800 7.500l-15.600 9"/>'
+};
+const icoEl = grp => h('i.ic', { 'aria-hidden': 'true', html: '<svg viewBox="0 0 24 24">' + (ICO[grp] || '') + '</svg>' });
 // mandatory spaces of seat a that are still empty, and how many dice it has left: warn before a missing Axis / Engine die loses the flight
 function mandInfo(a) { if (!G || typeof a !== 'number' || a < 0 || G.phase !== 'place' || G.result) return null; const need = ['ax' + a, 'en' + a].filter(k => !G.slots[k]), left = FA.unusedDice(G, a).length; return { need, left, tight: need.length > 0 && left > 0 && left <= need.length, lost: need.length > left }; }
 const needNames = need => need.map(k => FA.SLOT[k].grp === 'axis' ? 'Axis' : 'Engines').join(' and ');
@@ -31,6 +44,7 @@ function render() {
   feedTick();
   const pos = dispPos();
   const LY = UI.LY = FA.layout(W, Hh, { mods: G.mods, me }); UI.W = W;
+  resultFx(LY.r);
   const legal = selectedLegal(), r = LY.r, rows = altRows(), tr = trackOf(), size = tr.sp.length;
   pz.innerHTML = '';
   const dieSz = Math.max(30, Math.min(LY.k * 72, 80));
@@ -69,17 +83,17 @@ function render() {
     const isNeed = mi && mi.need.includes(k), dim = mi && mi.tight && legal.includes(k) && !isNeed;
     const cls = 'slot ' + (S.s === 0 ? 'p' : S.s === 1 ? 'c' : 'n') + (d ? ' full' : '') + (legal.includes(k) ? ' legal' : '') + (dim ? ' dim' : '') + (isNeed && mi.left <= mi.need.length + 1 ? ' need' : '') + (just === k ? ' just' : '') + (dead[k] ? ' deadly' : '');
     const b = css(h('button.' + cls.replace(/ /g, '.'), { type: 'button', 'data-a': 'slot', 'data-slot': k, 'aria-label': slotName(k) + (dead[k] ? ' (this die here ends the flight)' : '') + ', ' + (d ? 'holds a ' + d.v : slotNeed(k) + (S.s === 0 ? ', pilot' : S.s === 1 ? ', co-pilot' : ', either crew')) }), q);
-    if (d) b.appendChild(dvEl(d.v, d.k === 'i' ? 't' : d.k === 'x' ? 'k' : (d.s === 0 ? 'b' : 'o'))); else { const lab = SLOTLAB(k); b.appendChild(h('span.cap' + (lab ? '' : '.mid'), SLOTCAP[S.grp] || '')); if (lab) b.appendChild(h('span.sl', lab)); }
+    b.style.setProperty('--u', Math.round(q.w) + 'px');
+    if (d) b.appendChild(dvEl(d.v, d.k === 'i' ? 't' : d.k === 'x' ? 'k' : (d.s === 0 ? 'b' : 'o'))); else { const lab = SLOTLAB(k); b.classList.add(lab ? 'hasv' : 'nov'); b.appendChild(h('span.r1', (S.s === 0 || S.s === 1) ? h('i.seat.' + (S.s ? 'c' : 'p'), { 'aria-hidden': 'true' }, S.s ? 'C' : 'P') : null, icoEl(S.grp))); if (lab) b.appendChild(h('span.sl', lab)); }
     const swOn = S.grp === 'gear' && G.pl.sw.lg[S.ix] || S.grp === 'flaps' && G.pl.sw.fl[S.ix] || S.grp === 'brakes' && G.pl.sw.br[S.ix];
     if (swOn) { b.appendChild(h('i.sw.on')); if (!d) { b.classList.add('done'); b.appendChild(h('i.dn', { 'aria-hidden': 'true' }, '✓')); b.setAttribute('aria-label', b.getAttribute('aria-label') + ', done'); } } else if (['gear', 'flaps', 'brakes'].includes(S.grp)) b.appendChild(h('i.sw'));
-    if (!d && (S.s === 0 || S.s === 1)) { const sl = b.querySelector('.sl'); b.insertBefore(h('i.seat.' + (S.s ? 'c' : 'p'), { 'aria-hidden': 'true' }, S.s ? 'C' : 'P'), sl || null); }
     pz.appendChild(b);
   }
   // ---- dial, gauge, brake readout
   { const a = G.pl.axis, dl = h('div.dial.axd', { 'aria-label': 'Axis: ' + (a === 0 ? 'level' : Math.abs(a) + ' toward the ' + (a < 0 ? 'pilot' : 'co-pilot')) }, h('i', { style: 'transform:rotate(' + (a * 24) + 'deg)' + (UI.axA && Date.now() - UI.axA.t0 < 900 ? ';animation:axtilt .9s cubic-bezier(.3,1.5,.5,1) both;animation-delay:-' + (Date.now() - UI.axA.t0) + 'ms;--af:' + (UI.axA.from * 24) + 'deg;--at:' + (UI.axA.to * 24) + 'deg' : '') }), h('span', { style: 'position:relative;margin-top:44%' }, a === 0 ? 'level' : Math.abs(a) + (a < 0 ? ' left' : ' right'), a !== 0 ? h('small.spn', 'spin at 3') : null));
     pz.appendChild(css(dl, r.dial));
     // speed gauge: the blue marker (up to it the plane stays) and the orange marker (up to it one space, above it two) in their own corners, clear of the needles
-    pz.appendChild(css(h('div.gau', { 'data-b': G.pl.aeroB, 'data-o': G.pl.aeroO, 'aria-label': 'Speed gauge: engine sum up to ' + G.pl.aeroB + ' stays, up to ' + G.pl.aeroO + ' moves one space, more moves two' + (G.speed >= 0 ? '; last speed ' + G.speed : '') }, h('span.mk.b', { title: 'Blue marker: a sum up to this stays put' }, '≤' + G.pl.aeroB), h('span.mk.o', { title: 'Orange marker: up to this moves 1, above moves 2' }, '≤' + G.pl.aeroO)), r.gauge));
+    pz.appendChild(css(h('div.gau', { 'data-b': G.pl.aeroB, 'data-o': G.pl.aeroO, 'data-s': UI.gSpd || 0, 'aria-label': 'Speed gauge: engine sum up to ' + G.pl.aeroB + ' stays, up to ' + G.pl.aeroO + ' moves one space, more moves two' + (G.speed >= 0 ? '; last speed ' + G.speed : '') }, h('span.mk.b', { title: 'Blue marker: a sum up to this stays put' }, '≤' + G.pl.aeroB), h('span.mk.o', { title: 'Orange marker: up to this moves 1, above moves 2' }, '≤' + G.pl.aeroO)), r.gauge));
     const bv = FA.brakeVal(G);
     if (r.brk) pz.appendChild(css(h('div.badge.brk', { 'aria-label': 'Brake value ' + bv + ': the last-round speed must be no more than this' }, h('span', 'Brakes'), h('b', String(bv))), r.brk));
   }
@@ -96,7 +110,7 @@ function render() {
     const rrmode = G.pend && G.pend.h === 'rr' && me === s && mayAct(s) && !G.pend.d.m[s];
     for (let i = 0; i < 4; i++) {
       const d = G.dice[s][i], used = d.u || G.phase !== 'place', sel = UI.sel === i && me === s, cv = sel && UI.cof ? d.v + UI.cof : d.v;   // coffee changes the face shown
-      const b = h('button.die' + (used ? '.used' : '') + (show && !used && mayAct(s) ? '' : '.cover') + (sel ? '.sel' : '') + (rrmode && UI.rrm[i] ? '.rrm' : ''), { type: 'button', 'data-a': 'die', 'data-s': s, 'data-d': i, style: 'width:' + ds + 'px;height:' + ds + 'px', 'aria-label': used ? 'used' : (show ? pname(s) + ' die showing ' + cv + (cv !== d.v ? ' (with coffee, rolled ' + d.v + ')' : '') : pname(s) + ' die, hidden'), disabled: (used || !(show && mayAct(s))) ? true : null });
+      const b = h('button.die' + (used ? '.used' : '') + (show && !used && mayAct(s) ? '' : '.cover') + (sel ? '.sel' : '') + (show && !used && !sel && mayAct(s) && !G.result && FA.pending(G).includes(s) && G.phase === 'place' && (!G.pend || G.pend.h === 'rr') ? '.can' : '') + (rrmode && UI.rrm[i] ? '.rrm' : ''), { type: 'button', 'data-a': 'die', 'data-s': s, 'data-d': i, style: 'width:' + ds + 'px;height:' + ds + 'px', 'aria-label': used ? 'used' : (show ? pname(s) + ' die showing ' + cv + (cv !== d.v ? ' (with coffee, rolled ' + d.v + ')' : '') : pname(s) + ' die, hidden'), disabled: (used || !(show && mayAct(s))) ? true : null });
       b.appendChild(dvEl(show ? cv : '?', (s === 0 ? 'b' : 'o') + (show ? '' : ' q') + (show && cv !== d.v ? ' cof' : ''))); tr2.appendChild(b);
     }
     if (G.pend && (G.pend.h === 'intern' && G.pend.d.seat === s || G.pend.h === 'sync' && s === 1) && (show || sharedSeat() === s)) { const val = G.pend.d.val + (UI.sel === 'p' && G.pend.h === 'sync' ? UI.cof : 0); tr2.appendChild(h('button.die' + (UI.sel === 'p' ? '.sel' : ''), { type: 'button', 'data-a': 'die', 'data-s': s, 'data-d': 'p', style: 'width:' + ds + 'px;height:' + ds + 'px', 'aria-label': (G.pend.h === 'intern' ? 'Trainee token ' : 'Traffic die ') + val }, dvEl(val, (G.pend.h === 'intern' ? 't' : 'k') + (val !== G.pend.d.val ? ' cof' : '')))); }
@@ -158,26 +172,7 @@ function dispPos() { return UI.hold && UI.hold.until > Date.now() ? UI.hold.pos 
 function showRecap(r, info) { roundFx(r, info || {}); }
 function hideRecap() { const el = $('#recap'); if (el) { el.hidden = true; el.innerHTML = ''; } UI.recapR = null; clearTimeout(UI.recapT); }
 // ---------- the dock: what to do now ----------
-function promptText() {
-  if (!G) return '';
-  if (isPh()) return phPrompt();
-  if (G.result) return G.result.win ? 'Landed! Well flown.' : 'The flight is over.';
-  const v = actSeat(), pend = FA.pending(G), hot = UI.mode === 'hot' && UI.holder < 0;
-  if (G.phase === 'brief') {
-    if (typeof v === 'number' && v >= 0 && mayAct(v)) return hot ? name(v) + ': talk strategy (no dice values), then Roll.' : G.ready[v] ? 'Waiting for your crewmate to be ready.' : 'Talk strategy, no dice values. Then Roll.';
-    return G.ready.every(Boolean) ? 'Rolling...' : 'Briefing: ' + pend.map(name).join(' and ') + ' getting ready.';
-  }
-  if (G.pend) {
-    const p = G.pend, me = typeof v === 'number' && v >= 0 && mayAct(v);
-    if (p.h === 'rr') return me && !p.d.m[v] ? rrBy(v) + ' Tap dice to reroll them, or keep yours.' : 'Reroll: waiting for ' + pend.map(name).join(' and ') + '.';
-    if (p.h === 'intern') return me && v === p.d.seat ? (hot ? name(v) + ': place' : 'Place') + ' trainee token ' + p.d.val + ': tap it, then a space.' : name(p.d.seat) + ' is placing the trainee token.';
-    if (p.h === 'sync') return me && v === 1 ? (hot ? name(1) + ': place' : 'Place') + ' the cross-check die (' + p.d.val + ') on any empty space.' : name(1) + ' is placing the cross-check die.';
-    if (p.h === 'wt') return me && v === 1 - p.d.a ? 'Hand-over: pick one of your dice to swap.' : 'Hand-over: waiting for ' + name(1 - p.d.a) + '.';
-  }
-  if (typeof v === 'number' && v >= 0 && mayAct(v) && G.turn === v) { const mi = mandInfo(v); if (mi && mi.lost) return 'Too few dice left for the ' + needNames(mi.need) + '!'; if (mi && mi.tight) return 'Keep your last ' + (mi.left > 1 ? mi.left + ' dice' : 'die') + ' for the ' + needNames(mi.need) + '.'; return (UI.sel === -1 || UI.sel == null ? 'Your turn: tap one of your dice.' : 'Tap a glowing space to place the die.'); }
-  if (v === 'all') return name(G.turn) + ' is placing.';
-  return 'Waiting for ' + name(G.turn) + '...';
-}
+function promptText() { return phPrompt(); }
 function renderDock() {
   const v = actSeat(), pr = promptText(), mine = typeof v === 'number' && v >= 0 && mayAct(v) && FA.pending(G).includes(v);
   const p = $('#prompt'); if (p) { p.textContent = pr; p.className = mine ? 'mine' : ''; } const bp = $('#barprompt'); if (bp) { bp.textContent = pr; }
@@ -200,29 +195,15 @@ function renderDock() {
   }
   // the goal: the route and the landing conditions, always on screen (tap for the full checklist)
   const gl = $('#goal'); if (gl) { gl.innerHTML = ''; gl.hidden = !!G.result; if (!G.result) gl.appendChild(goalEl()); }
-  // selected die info
-  const si = $('#selinfo'); if (si) { si.innerHTML = ''; si.className = 'idle'; si.hidden = !!G.result;
+  // selected die: only the coffee stepper (no advice text; the board glows, the status line says what to do)
+  const si = $('#selinfo'); if (si) { si.innerHTML = ''; si.className = 'idle'; si.hidden = true;
     if (typeof v === 'number' && v >= 0 && mayAct(v) && !G.result && G.phase === 'place') {
-      const sel = UI.sel, pend = G.pend, mi = mandInfo(v);
-      if (pend && pend.h === 'rr' && !pend.d.m[v]) { si.className = ''; si.append(h('b', rrBy(v)), h('span', 'Both of you may now reroll any unplaced dice, once. Tap the dice you want to reroll (they turn purple), then Reroll. Happy with your dice? Keep them.')); }
-      else if (sel === 'p' || (typeof sel === 'number' && sel >= 0 && !pend)) {
-        si.className = ''; const val = sel === 'p' ? pend.d.val : G.dice[v][sel].v; const lg = selectedLegal();
-        const php = isPh();   // phones: the coffee stepper shares the title row
-        const shd = h('div.shd', h('b', (sel === 'p' ? (pend.h === 'intern' ? 'Trainee token ' : 'Traffic die ') : 'Die ') + val), sel !== 'p' ? h('button.btn.alt', { type: 'button', 'data-a': 'unsel' }, 'Change die') : null); si.append(shd);
-        if (mi && mi.tight && !mi.lost && sel !== 'p') si.append(h('div.warn', 'Keep this die for the ' + needNames(mi.need) + ': ' + (mi.left === 1 ? 'it is your last one' : 'you have ' + mi.left + ' dice left') + ', and an empty Axis or Engines space at the end of the round loses the flight.'));
-        if (mi && mi.lost) si.append(h('div.warn', 'Too few dice left: your ' + needNames(mi.need) + ' cannot all be filled. The flight will be lost at the end of the round.'));
-        // coffee: one row, minus / value / plus
-        if ((sel !== 'p' || pend.h === 'sync') && G.coffee > 0) { const lo = -Math.min(G.coffee, val - 1), hi = Math.min(G.coffee, 6 - val);
-          const cofEl = h('div.cof', h('span.lab', php ? { 'aria-label': G.coffee + ' coffee tokens', title: 'Coffee tokens' } : {}, php ? '☕' + G.coffee : 'Coffee (' + G.coffee + ')'), h('button.chipb', { type: 'button', 'data-a': 'cof', 'data-c': Math.max(lo, UI.cof - 1), disabled: UI.cof <= lo ? true : null, 'aria-label': 'One less' }, '−'), h('span.cv', String(val + UI.cof)), h('button.chipb', { type: 'button', 'data-a': 'cof', 'data-c': Math.min(hi, UI.cof + 1), disabled: UI.cof >= hi ? true : null, 'aria-label': 'One more' }, '+')); if (php) shd.insertBefore(cofEl, shd.querySelector('[data-a=unsel]')); else si.append(cofEl); }
-        if ((sel !== 'p' || pend.h === 'sync') && G.coffee > 0) si.append(h('span.eff.cofl', UI.cof ? 'Coffee: ' + val + ' → ' + (val + UI.cof) + ', uses ' + Math.abs(UI.cof) + ' of ' + G.coffee + ' shared tokens.' : 'Coffee: − / + change it by 1 per shared token.'));   // always one line, so the stepper never moves
-        if (UI.hint && UI.hint.d === sel) si.append(h('div.why', UI.hint.why));
-        const dk = Object.keys(UI.dead || {}); if (dk.length) si.append(h('div.warn.dead', 'Red space' + (dk.length > 1 ? 's' : '') + ' (' + dk.map(slotName).filter((x, i, a) => a.indexOf(x) === i).join(', ') + '): ' + UI.dead[dk[0]]));
-        if (lg.length && sel !== 'p') { const eff = effectLine(v, val + UI.cof); if (eff) si.append(h('span.eff', eff)); }
-        si.append(h('span.fits', lg.length ? 'Fits: ' + lg.map(slotName).filter((x, i, a) => a.indexOf(x) === i).join(', ') + '.' : 'No space takes this value right now. Try coffee or another die.'));
-      } else if (G.turn === v && !pend) { if (mi && (mi.tight || mi.lost)) si.className = ''; if (mi && mi.lost) si.append(h('div.warn', 'Too few dice left: your ' + needNames(mi.need) + ' cannot all be filled this round.')); if (mi && mi.tight && !mi.lost) si.append(h('div.warn', 'Only ' + mi.left + ' ' + (mi.left > 1 ? 'dice' : 'die') + ' left and the ' + needNames(mi.need) + ' still empty: those spaces glow red. Fill them first.')); si.append(h('span', 'Tap one of your dice. Hint shows what the computer would do.')); if (UI.hint) si.append(h('div.why', UI.hint.why)); }
-      else si.append(h('span', 'Not your move yet. You may still spend a reroll token or an ability below.'));
-    } else if (G.phase === 'brief') si.append(h('span', 'Silence rule: from the roll to the end of the round you do not talk. Placing a die is how you talk now.'));
-    else si.append(h('span', G.result ? '' : 'Watch the panel.'));
+      const sel = UI.sel, pend = G.pend;
+      if ((sel === 'p' || (typeof sel === 'number' && sel >= 0 && !pend)) && (sel !== 'p' || pend.h === 'sync') && G.coffee > 0) {
+        si.className = ''; si.hidden = false; const val = sel === 'p' ? pend.d.val : G.dice[v][sel].v, lo = -Math.min(G.coffee, val - 1), hi = Math.min(G.coffee, 6 - val);
+        si.append(h('div.cof', h('span.lab', { 'aria-label': G.coffee + ' coffee tokens', title: 'Coffee tokens' }, '☕' + G.coffee), h('button.chipb', { type: 'button', 'data-a': 'cof', 'data-c': Math.max(lo, UI.cof - 1), disabled: UI.cof <= lo ? true : null, 'aria-label': 'One less' }, '−'), h('span.cv', String(val + UI.cof)), h('button.chipb', { type: 'button', 'data-a': 'cof', 'data-c': Math.min(hi, UI.cof + 1), disabled: UI.cof >= hi ? true : null, 'aria-label': 'One more' }, '+')));
+      }
+    }
   }
   // actions
   const ac = $('#acts'); if (ac) { ac.innerHTML = ''; ac.appendChild(actions(v));
@@ -246,7 +227,7 @@ function fitDock() {
 // who spent the reroll token that is being answered now
 function rrBy(v) { const by = G.pend && G.pend.d ? G.pend.d.by : null; return by == null ? 'A reroll token was spent.' : by === v && who(v) === 'You' ? 'You spent a reroll token.' : name(by) + ' spent a reroll token.'; }
 // the route and the landing conditions as one tappable strip at the top of the dock
-function goalEl() { return isPh() ? goalStrip() : goalFull(); }
+function goalEl() { return goalStrip(); }
 function goalFull() {
   const size = trackOf().sp.length, pos = G.pl.pos, left = FA.planesOnTrack(G), ax = G.pl.axis, bv = FA.brakeVal(G), last = D.rounds - G.row0;
   const gs = G.pl.sw.lg.reduce((a, x) => a + x, 0), fs = G.pl.sw.fl.reduce((a, x) => a + x, 0), fin = FA.isFinal(G);
@@ -299,7 +280,7 @@ const legalHas = (v, val, grp) => selectedLegal().some(k => FA.SLOT[k].grp === g
 function actions(v) {
   const f = document.createDocumentFragment();
   if (G.result && UI.overShown && !UI.rsOpen) { const b = (txt, a, cls) => f.appendChild(h('button.btn' + (cls ? '.' + cls : ''), { type: 'button', 'data-a': a }, txt));
-    if (UI.mode !== 'net' || (typeof isHost === 'function' && isHost())) b('Fly again', 'again', 'go'); if (UI.mode !== 'net' && G.result.win) b('Next airport', 'nextsc'); b('Debrief', 'debrief', 'alt'); return f; }
+    if (UI.mode !== 'net' || (typeof isHost === 'function' && isHost())) b('Fly again', 'again', 'go'); if (UI.mode !== 'net' && G.result.win) b('Next airport', 'nextsc'); return f; }
   if (G.result || typeof v !== 'number' || v < 0 || !mayAct(v)) return f;
   const mv = FA.validMoves(G, v), has = t => mv.filter(m => m.t === t);
   const b = (txt, a, cls, extra) => f.appendChild(h('button.btn' + (cls ? '.' + cls : ''), Object.assign({ type: 'button', 'data-a': a }, extra || {}), txt));

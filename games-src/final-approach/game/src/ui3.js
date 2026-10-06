@@ -17,7 +17,7 @@ function newGame(mode, o) {
   UI.coach = { level: o.tipsOff ? 'off' : mode === 'guided' ? 'full' : (UI.prefs.guide || 'off'), seen: {}, tip: '', queue: [] }; UI.lastPlace = null; UI.rt = G.mods.real ? { left: 60000, last: 0 } : null;
   const st = $('#start'); if (st) st.hidden = true; closeRS(); try { GX.close(); } catch (e) { } closePass(); hideRecap();
   { const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } }   // a tip left over from the last flight
-  clearSave(); render(); sndMusic(); coachTick(); schedule();
+  $$('#fx .endb').forEach(e => e.remove()); UI.rfx = null; clearSave(); render(); sndMusic(); coachTick(); schedule();
   if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false && !o.camp && !isPh()) showStory();
 }
 function suggestAbil(sc) { const order = ['mastery', 'control', 'antic', 'together', 'sync', 'adapt']; return order.slice(0, sc.ab); }
@@ -66,14 +66,14 @@ function dieTap(s, d) {
 }
 function slotTap(k) {
   const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v)) { if (G && !G.result) toast('Wait for your turn.'); return; }
-  if (G.slots[k]) { toast(slotName(k) + ' is taken this round.'); return; }
+  if (G.slots[k]) { toast(slotName(k) + ' is taken.'); return; }
   if (UI.sel === -1 || UI.sel == null) { toast('Pick a die first.'); return; }
   const m = { t: 'place', d: UI.sel, to: k, c: UI.cof };
   if (FA.validMoves(G, v).some(x => x.t === 'place' && x.d === m.d && x.to === k && (x.c || 0) === m.c)) {
     // the last dice are needed on the empty Axis / Engines: a second tap on the same space places anyway
-    const mi = mandInfo(v); if (UI.sel !== 'p' && mi && mi.tight && !mi.lost && !mi.need.includes(k) && UI.warnK !== k) { UI.warnK = k; snd('error'); toast('Careful: the ' + needNames(mi.need) + ' would stay empty and the flight is lost at the end of the round. Tap again to place it anyway.'); return; }
+    const mi = mandInfo(v); if (UI.sel !== 'p' && mi && mi.tight && !mi.lost && !mi.need.includes(k) && UI.warnK !== k) { UI.warnK = k; snd('error'); toast(needNames(mi.need) + ' still empty. Tap again.'); return; }
     // this die here ends the flight at once: the first tap only explains, a second tap places it
-    if (UI.dead && UI.dead[k] && UI.warnK !== k) { UI.warnK = k; snd('error'); toast('Careful: ' + UI.dead[k]); return; }
+    if (UI.dead && UI.dead[k] && UI.warnK !== k) { UI.warnK = k; snd('error'); toast('This ends the flight. Tap again.'); return; }
     UI.warnK = null; sendMove(v, m); return; }
   const val = (UI.sel === 'p' ? G.pend.d.val : G.dice[v][UI.sel].v) + UI.cof; const S = FA.SLOT[k];
   const why = S.s !== null && S.s !== v ? 'That space belongs to the ' + (S.s === 0 ? 'pilot' : 'co-pilot') + '.' : (S.grp === 'flaps' && S.ix > 0 && !G.pl.sw.fl[S.ix - 1]) ? 'Flaps go in order: use the one above first.' : (S.grp === 'brakes' && S.ix > 0 && !G.pl.sw.br[S.ix - 1]) ? 'Brakes go in order: 2, then 4, then 6.' : (S.grp === 'ice' && S.ix !== G.pl.ice) ? 'Only the next icy-runway column can be used.' : (S.grp === 'intern' && G.intern.length && val === (v === 0 ? G.intern[0] : G.intern[G.intern.length - 1])) ? 'The die must differ from the next trainee token.' : S.vals ? slotName(k) + ' ' + slotNeed(k) + ' (your die shows ' + val + ').' : 'That does not fit.';
@@ -87,7 +87,7 @@ function doAction(a, t) {
   switch (a) {
     case 'ready': sendMove(v, { t: 'ready' }); break;
     case 'say': sendMove(v, { t: 'say', c: t.dataset.c }); break;
-    case 'rr': if (!UI.rrAsk) { UI.rrAsk = true; render(); toast('A reroll token lets both of you reroll any unplaced dice once. Tap again to spend it.'); clearTimeout(UI.rrAskT); UI.rrAskT = setTimeout(() => { UI.rrAsk = false; if (G && UI.started) render(); }, 5000); break; }
+    case 'rr': if (!UI.rrAsk) { UI.rrAsk = true; render(); toast('Spend a token? Tap again.'); clearTimeout(UI.rrAskT); UI.rrAskT = setTimeout(() => { UI.rrAsk = false; if (G && UI.started) render(); }, 5000); break; }
       UI.rrAsk = false; sendMove(v, { t: 'rr' }); break;
     case 'rrpick': sendMove(v, { t: 'rrpick', m: UI.rrm.slice() }); break;
     case 'antic': case 'adapt': case 'wt': case 'toss': if (typeof UI.sel === 'number' && UI.sel >= 0) sendMove(v, { t: a, d: UI.sel }); break;
@@ -100,7 +100,7 @@ function showHint() {
   try {
     const m = FA.AI.move(G, v, 'normal', { noMC: true }); if (!m) { toast('No suggestion.'); return; }
     let why = whyMove(m, v), d = m.d;
-    UI.hint = { d: m.t === 'place' || m.t === 'toss' ? d : null, why: 'Hint: ' + why };
+    UI.hint = { d: m.t === 'place' || m.t === 'toss' ? d : null, why: '' };
     if (m.t === 'place') { UI.sel = d; UI.cof = m.c || 0; }   // the reason shows in the dock under the die, never as a toast over the buttons
   } catch (e) { console.error(e); }
   render();
@@ -143,12 +143,12 @@ setInterval(() => {
   UI.rt.left -= dt; const sec = Math.max(0, Math.ceil(UI.rt.left / 1000));
   for (const e of $$('.rtleft')) { e.textContent = '⏱ ' + sec + ' s'; e.classList.toggle('low', sec <= 10); e.setAttribute('aria-label', sec + ' seconds left this round'); }
   if (sec <= 10 && sec !== UI.rtBeep) { UI.rtBeep = sec; try { snd('click'); } catch (e) { } }
-  if (UI.rt.left <= 0) { UI.rt = null; toast('Time is up: unplaced dice are ignored.'); commit(seats[0], { t: 'timeout' }); }
+  if (UI.rt.left <= 0) { UI.rt = null; toast('Time is up!'); commit(seats[0], { t: 'timeout' }); }
 }, 250);
 // ---- the end
 function onEnd() {
   if (UI.overShown) return; UI.overShown = true; clearSave(); hideRecap();   // no round card over the ending picture
   const win = G.result.win; try { if (win) { UI.won[G.sid] = 1; savePrefs(); } snd(win ? 'win' : 'lose'); } catch (e) { }
-  const fin = () => { if (typeof campOn === 'function' && campOn()) campFinish(); else showFinal(); };
+  const fin = () => { if (typeof campOn === 'function' && campOn()) campFinish(); else showEndBoard(); };
   if (typeof pxEnd === 'function' && ANIM && typeof PX !== 'undefined' && PX.on) { pxEnd(win, fin); } else setTimeout(fin, ANIM ? 500 : 0);
 }

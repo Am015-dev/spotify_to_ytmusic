@@ -39,7 +39,7 @@ function build(mode, LW, LH, mods, me) {
     r.appr = { x: 14, y: 8, w: LW - 28, h: wh }; r.alt = { x: 14, y: wh + 10, w: LW - 28, h: 58 };
     const A = wh + 10 + 58 + 10 + 48, B = A + 104;
     slot('ax0', 230, A); slot('ax1', 570, A); r.dial = R(400, A, 120, 120);
-    slot('en0', 230, B); slot('en1', 570, B); r.gauge = R(400, B + 8, 230, 108);
+    slot('en0', 230, B); slot('en1', 570, B); r.gauge = R(400, B + 4, 230, 96);
     // pilot column (left) / co-pilot column (right): eight slots across the 800 wide panel, kept 9 units in from the edges so a glow is never cut off
     const P1 = B + 104, P2 = P1 + 100, X = i => 57 + 98 * i;
     slot('ra0', X(0), P1); slot('lg0', X(1), P1); slot('lg1', X(2), P1); slot('lg2', X(3), P1);

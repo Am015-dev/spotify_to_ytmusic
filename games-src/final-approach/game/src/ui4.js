@@ -32,6 +32,7 @@ function selFits(grp) { return typeof UI.sel === 'number' && UI.sel >= 0 && !G.p
 const tval = v => typeof v === 'function' ? v() : v;
 function myTurn() { const v = actSeat(); return typeof v === 'number' && v >= 0 && mayAct(v) && FA.pending(G).includes(v); }
 function coachTick() {
+  return;   // no tip or advice cards in any mode: the ghost finger and the glowing spaces teach
   const c = UI.coach; if (!G || !UI.started || G.result || c.level === 'off' || isPh()) return;   // phones: no tip boxes, the ghost finger shows the first moves
   if (UI.mode === 'net' || UI.mode === 'hot' && UI.holder < 0) return;
   if (c.tip && c.tipR !== G.round + ':' + G.phase) { c.seen[c.tip] = 1; c.tip = ''; c.more = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } applyHL(); }

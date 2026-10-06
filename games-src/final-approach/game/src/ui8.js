@@ -2,7 +2,7 @@
 // The board is the screen. The dock holds a thin goal strip, ONE line of at most 8 words, and one row of buttons. Explanations, the log and the phrases live in the drawers.
 function phPrompt() {
   if (!G) return '';
-  if (G.result) return G.result.win ? 'Landed! Well flown.' : 'The flight is over.';
+  if (G.result) return endWords();
   const v = actSeat(), pend = FA.pending(G), mine = typeof v === 'number' && v >= 0 && mayAct(v);
   if (G.phase === 'brief') return mine ? (G.ready[v] ? 'Waiting for your crewmate.' : 'Tap Roll to start.') : 'Crew getting ready.';
   if (G.pend) {
@@ -37,19 +37,36 @@ function fxPlane(a, b) {
   const e = h('div.fxplane', { style: 'left:' + Math.round(ax) + 'px;top:' + Math.round(y) + 'px;--dx:' + Math.round(bx - ax) + 'px', html: PLANE_SVG.replace('width="12" height="12"', 'width="34" height="34"') });
   f.appendChild(e); setTimeout(() => { try { e.remove(); } catch (er) { } }, 1500);
 }
-// the round just ended: tilt the axis, fly the plane, pop the coffee where it was earned, then one short line
+// ---------- results on the board: every change shows where it happens (needle, tilt, plane, coffee, altitude); no report card ----------
+const LOSS_S = { mandatory: 'Empty Axis or Engines', spin: 'Spin! The tilt was too big', collision: 'Collided with a plane', overshoot: 'Overshot the airport', corridor: 'Axis outside the corridor', fuel: 'Out of fuel', short: 'Missed the airport', timeout: 'Out of time' };
+const CHK_S = { speed: 'Too fast to stop', planes: 'Planes still on the track', gear: 'Landing gear still up', flaps: 'Flaps not out', axis: 'Not level at landing', intern: 'Trainee not trained', ice: 'Icy brakes unfinished' };
+function endWords() {
+  const R = G.result; if (!R) return ''; if (R.win) return 'Landed! Well flown.';
+  if (R.why === 'checks' || R.why === 'speed') { const bad = Object.keys(R.checks || {}).filter(k => !R.checks[k]); if (bad.length) return CHK_S[bad[0]] || 'The landing failed'; }
+  return LOSS_S[R.why] || 'The flight is over';
+}
+function engineEv() { if (!G || !G.events) return null; for (let i = G.events.length - 1; i >= 0; i--) if (G.events[i].t === 'engine') return G.events[i]; return null; }
+// called from render(): compares the engine's numbers with the last picture and pops what changed on the part that changed
+function resultFx(r) {
+  const e = engineEv(), k = G.sid + ':' + G.seed + ':' + (UI.mode || ''), cur = { k, axis: G.pl.axis, n: e ? e.n : 0, planes: FA.planesOnTrack(G) };
+  UI.gSpd = e ? e.s : 0; const was = UI.rfx; UI.rfx = cur;
+  if (!was || was.k !== k || !ANIM || !r) return;
+  if (cur.axis !== was.axis && r.dial) fxPop(r.dial.x + r.dial.w / 2, r.dial.y + r.dial.h * .08, cur.axis === 0 ? 'level' : 'tilt ' + Math.abs(cur.axis) + (cur.axis < 0 ? ' left' : ' right'), 'tilt', 80);
+  if (e && cur.n !== was.n && r.gauge) fxPop(r.gauge.x + r.gauge.w / 2, r.gauge.y - 6, e.final ? 'landing speed ' + e.s : 'speed ' + e.s + (e.adv ? ' · +' + e.adv : ' · hold'), 'spd', 200);
+  if (cur.planes < was.planes && r.appr) fxPop(r.appr.x + r.appr.w * .5, r.appr.y + r.appr.h * .3, cur.planes === 0 ? 'track clear' : '− plane', 'rad', 150);
+}
+// the round just ended: the plane flies, coffee pops where it was earned, the altitude window announces the new height
 function roundFx(r, info) {
   if (!G || G.result || !ANIM) return;
   const rows = altRows(), N = rows[G.round + G.row0], cr = UI.LY && UI.LY.r;
   if (info.axis !== G.pl.axis) { UI.axA = { from: info.axis, to: G.pl.axis, t0: Date.now() }; setTimeout(() => { if (UI.axA && Date.now() - UI.axA.t0 >= 900) UI.axA = null; }, 1000); }
-  if (info.axis !== G.pl.axis && cr && cr.dial) fxPop(cr.dial.x + cr.dial.w / 2, cr.dial.y + cr.dial.h * .1, G.pl.axis === 0 ? 'level' : 'tilt ' + Math.abs(G.pl.axis) + (G.pl.axis < 0 ? ' left' : ' right'), 'tilt', 100);
   if (info.pos !== G.pl.pos) setTimeout(() => fxPlane(info.pos, G.pl.pos), 350);
-  if (info.coffee < G.coffee || info.coffeeLines) { const n = Math.max(1, info.coffeeLines || (G.coffee - info.coffee)), ks = (info.slots || []).filter(k => /^co/.test(k)); for (let i = 0; i < n; i++) { const q = ks.length && cr && cr[ks[Math.min(i, ks.length - 1)]] ? cr[ks[Math.min(i, ks.length - 1)]] : (cr && cr.coffee); if (q) fxPop(q.x + q.w / 2 + (ks.length ? 0 : (i - (n - 1) / 2) * 40), q.y + q.h * .3, '+1 ☕', 'cof', 650 + i * 220); } }
-  if (info.planes > FA.planesOnTrack(G) && cr && cr.appr) fxPop(cr.appr.x + cr.appr.w * .5, cr.appr.y + cr.appr.h * .25, '− plane', 'rad', 500);
-  setTimeout(() => { if (G && !G.result && UI.started) toast('Round ' + (r + 1) + ' done · ' + (N ? N[0] + ' ft' : 'landing')); }, 1100);
+  if (info.coffee < G.coffee || info.coffeeLines) { const n = Math.max(1, info.coffeeLines || (G.coffee - info.coffee)), ks = (info.slots || []).filter(k => /^co/.test(k)); for (let i = 0; i < n; i++) { const q = ks.length && cr && cr[ks[Math.min(i, ks.length - 1)]] ? cr[ks[Math.min(i, ks.length - 1)]] : (cr && cr.coffee); if (q) fxPop(q.x + q.w / 2 + (ks.length ? 0 : (i - (n - 1) / 2) * 40), q.y - 4, '+1 ☕', 'cof', 150 + i * 200); } }
+  if (N && cr && cr.alt) fxPop(cr.alt.x + cr.alt.w * .5, cr.alt.y + 2, N[0] + ' ft', 'alt', 900);
 }
 // ---------- ghost finger: one hand shows the first move (die, then the space) while hints are on ----------
-function hintsOn() { return !!G && !G.result && (!!UI.hint || UI.mode === 'guided' || (UI.camp ? !!UI.camp.hints : (UI.coach && UI.coach.level !== 'off' && UI.mode === 'vs') || !Object.keys(UI.won || {}).length && G.round < 2)); }
+// the ghost finger shows the move on the first round of a first flight (and on the guided flight), later only after the Hint button
+function hintsOn() { return !!G && !G.result && (!!UI.hint || UI.mode === 'guided' || (UI.camp ? !!UI.camp.hints : !Object.keys(UI.won || {}).length && G.round < 1)); }
 function ghostPlan() {
   const v = actSeat(); if (!hintsOn() || typeof v !== 'number' || v < 0 || !mayAct(v) || G.phase !== 'place' || G.pend || G.turn !== v || UI.dragging) return null;
   const key = G.sid + ':' + G.seed + ':' + G.round + ':' + Object.keys(G.slots).length + ':' + (UI.mode || '');
@@ -102,3 +119,11 @@ function phPost() {
   if (GX && (GX.open === 'crewd' || GX.open === 'logd')) { try { renderDrawers(); } catch (e) { } }
   R.toggle('fabrief', G.phase === 'brief' && !G.result);
 }
+
+// ---------- the ending, on the board: the picture plus at most 8 words; tap the banner to look at the panel ----------
+function showEndBoard() {
+  const f = fxLayer(); if (!f || !G || !G.result) return; try { render(); } catch (e) { }   // the Fly again / Next airport buttons come with the banner
+  $$('#fx .endb').forEach(e => e.remove());
+  f.appendChild(h('button.endb.' + (G.result.win ? 'win' : 'lose'), { type: 'button', 'data-a': 'lookpanel', 'aria-label': endWords() + '. Tap to look at the panel.' }, h('b', endWords())));
+}
+function lookPanel() { if (typeof pxClearEnd === 'function') pxClearEnd(); const b = $('#fx .endb'); if (b) b.classList.add('small'); render(); }

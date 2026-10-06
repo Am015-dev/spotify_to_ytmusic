@@ -76,13 +76,13 @@ function pxDie(key, dv, rect, ctx) {
   const o = pxObj(key, 'die', () => { const c = new PIXI.Container(), sh = new PIXI.Sprite(tx('shadow')), gl = new PIXI.Sprite(tx('glow')), sp = new PIXI.Sprite(PIXI.Texture.EMPTY); sh.anchor.set(.5); gl.anchor.set(.5); sp.anchor.set(.5); c.addChild(sh, gl, sp); PX.L.dice.addChild(c); return { c, sh, gl, sp, x: 0, y: 0, s: 1, rot: 0, sq: 0, lift: 0, a: 1 }; });
   const name = dieTexName(dv), cx = rect.x + rect.w / 2, cy = rect.y + rect.h / 2, size = Math.max(rect.w, rect.h) * (ctx.slot ? 1.0 : 1.22);
   const changed = o.name && o.name !== name && !o.fresh;
-  o.name = name; o.sp.texture = tx(name); o.tx = cx; o.ty = cy; o.size = size; o.sel = ctx.sel; o.rrm = ctx.rrm; o.cof = ctx.cof; o.seat = ctx.seat; o.val = dv.textContent.trim(); o.col = dv.classList.contains('b') ? 'b' : dv.classList.contains('o') ? 'o' : dv.classList.contains('t') ? 't' : 'k';
+  o.name = name; o.sp.texture = tx(name); o.tx = cx; o.ty = cy; o.size = size; o.sel = ctx.sel; o.can = ctx.can; o.rrm = ctx.rrm; o.cof = ctx.cof; o.seat = ctx.seat; o.val = dv.textContent.trim(); o.col = dv.classList.contains('b') ? 'b' : dv.classList.contains('o') ? 'o' : dv.classList.contains('t') ? 't' : 'k';
   if (o.fresh) {
     o.x = cx; o.y = cy;
     if (ctx.slot) {
       // the die that left a tray flies to the slot; the partner's hidden die ('?') flies too, so their placements are seen, not just appear
       let vi = PX.vanished.findIndex(v => v.col === o.col && v.val === o.val); if (vi < 0) vi = PX.vanished.findIndex(v => v.col === o.col && v.val === '?'); const from = vi >= 0 ? PX.vanished.splice(vi, 1)[0] : null;
-      if (from && ANIM && !pxRM()) { o.x = from.x; o.y = from.y; o.size0 = from.size; pxTween(o, { x: [from.x, cx], y: [from.y, cy], rot: [0, (from.x < cx ? 1 : -1) * .35 * 0], s: [1.25, 1] }, 360, 0, () => { o.sq = 1; pxLanded(o); }, true); }
+      if (from && ANIM && !pxRM()) { o.x = from.x; o.y = from.y; o.size0 = from.size; pxTween(o, { x: [from.x, cx], y: [from.y, cy], rot: [0, (from.x < cx ? 1 : -1) * .35 * 0], s: [1.25, 1] }, 480, 0, () => { o.sq = 1; pxLanded(o); }, true); }
       else if (ANIM) { o.sq = 0; }
     } else if (ANIM && !pxRM() && ctx.roll) {
       o.x = cx + (ctx.seat === 0 ? -1 : 1) * 40; o.y = -60 - (PX.seqRoll++ % 4) * 30; const dly = (ctx.i || 0) * 70 + (ctx.seat || 0) * 40;
@@ -93,6 +93,7 @@ function pxDie(key, dv, rect, ctx) {
 }
 PX.seqRoll = 0;
 function pxLanded(o) { PX.nLand++; if (PXQ[PX.q].fx) { for (let i = 0; i < 6; i++) pxPuff(o.tx, o.ty, i); } PX.dirty = true; }
+function pxPuffs(x, y) { if (PXQ[PX.q].fx) for (let i = 0; i < 6; i++) pxPuff(x, y, i); }
 function pxPuff(x, y, i) { const s = new PIXI.Sprite(tx('puff')); s.anchor.set(.5); s.x = x; s.y = y; s.alpha = .8; s.width = s.height = 16; PX.L.fx.addChild(s); const a = i / 6 * Math.PI * 2 + Math.random(); PX.parts.push({ s, vx: Math.cos(a) * 60, vy: Math.sin(a) * 60 - 20, life: .5, t: 0 }); }
 function pxTween(o, props, dur, delay, done, fly) { PX.tw = PX.tw.filter(t => t.o !== o); o.fly = !!fly; PX.tw.push({ o, props, dur, delay: delay || 0, t: 0, done }); }
 const ease = t => 1 - Math.pow(1 - t, 3);
@@ -130,7 +131,7 @@ function pxSync() {
     o.tx = o.x = r.x + r.w / 2; o.ty = o.y = r.y + r.h / 2; o.size = r.w; o.w.width = o.w.height = r.w; o.legal = b.classList.contains('legal') && !b.classList.contains('dim') && !b.classList.contains('deadly') && !b.classList.contains('done'); o.g.width = o.g.height = r.w * 1.45;
     o.c.x = o.x; o.c.y = o.y;
     const sw = b.querySelector('.sw');
-    if (sw) { const rr = pxRect(sw), on = sw.classList.contains('on'); const so = pxObj('sw:' + k, 'sw', () => { const s = new PIXI.Sprite(tx('tokens:swoff')); s.anchor.set(.5); PX.L.mark.addChild(s); return { c: s, s0: s, x: 0, y: 0, a: 1, s: 1, rot: 0, on }; }); so.tx = so.x = rr.x + rr.w / 2; so.ty = so.y = rr.y + rr.h / 2; so.size = Math.max(22, rr.w); so.s0.texture = tx(on ? 'tokens:swon' : 'tokens:swoff'); if (!so.fresh && so.on !== on && ANIM) pxTween(so, { s: [1.5, 1] }, 260, 0, null, false); so.on = on; }
+    if (sw) { const rr = pxRect(sw), on = sw.classList.contains('on'); const so = pxObj('sw:' + k, 'sw', () => { const s = new PIXI.Sprite(tx('tokens:swoff')); s.anchor.set(.5); PX.L.mark.addChild(s); return { c: s, s0: s, x: 0, y: 0, a: 1, s: 1, rot: 0, on }; }); so.tx = so.x = rr.x + rr.w / 2; so.ty = so.y = rr.y + rr.h / 2; so.size = Math.max(16, rr.w + 4); so.s0.texture = tx(on ? 'tokens:swon' : 'tokens:swoff'); if (!so.fresh && so.on !== on && ANIM) pxTween(so, { s: [1.5, 1] }, 260, 0, null, false); so.on = on; }
     const dv = b.querySelector('.dv');
     if (dv && b.classList.contains('full')) slotDice.push([k, dv, r]);
   });
@@ -143,7 +144,7 @@ function pxSync() {
     pz.querySelectorAll('.die').forEach(b => {
       const s = +b.dataset.s, d = b.dataset.d, dv = b.querySelector('.dv'); if (!dv || b.classList.contains('used')) return;
       const key = 'die:' + s + ':' + d; const roll = !PX.objs.has(key) && !!(G && G.phase === 'place' && PX.rollRound !== G.round + ':' + G.sid);
-      pxDie(key, dv, pxRect(b), { seat: s, i: +d || 0, sel: b.classList.contains('sel'), rrm: b.classList.contains('rrm'), cof: dv.classList.contains('cof'), roll: roll });
+      pxDie(key, dv, pxRect(b), { seat: s, i: +d || 0, can: b.classList.contains('can'), sel: b.classList.contains('sel'), rrm: b.classList.contains('rrm'), cof: dv.classList.contains('cof'), roll: roll });
     });
     if (G && G.phase === 'place' && [...PX.objs.keys()].some(k => /^die:/.test(k))) PX.rollRound = G.round + ':' + G.sid; }
   for (const k of prevKeys) { const o = PX.objs.get(k); if (o && o.seen !== PX.seq && /^die:/.test(k)) { PX.vanished.push({ col: o.col, val: o.val, x: o.x, y: o.y, size: o.size }); pxKill(k, o); } }
@@ -154,14 +155,16 @@ function pxSync() {
     if (nd) { const o = pxObj('dial', 'dial', () => { const c = new PIXI.Container(), f = pxSprite(c, 'dial'), n = new PIXI.Graphics(); c.addChild(n); PX.L.mark.addChild(c); return { c, f, n, ang: 0, x: 0, y: 0 }; }); o.tx = o.x = r.x + r.w / 2; o.ty = o.y = r.y + r.h / 2; o.size = r.w; o.f.width = o.f.height = r.w * 1.06; o.c.x = o.x; o.c.y = o.y; const m = /rotate\((-?[\d.]+)deg/.exec(nd.style.transform || ''); o.want = m ? +m[1] : 0; if (o.fresh) o.ang = o.want; }
     else { const o = pxObj('wind', 'tok', () => { const s = new PIXI.Sprite(tx('tokens:wind')); s.anchor.set(.5); PX.L.mark.addChild(s); return { c: s, s0: s, x: 0, y: 0, a: 1, s: 1, rot: 0 }; }); o.tx = o.x = r.x + r.w / 2; o.ty = o.y = r.y + r.h / 2; o.size = r.w * 1.05; }
   });
-  { const g = pz.querySelector('.gau'); if (g) { const r = pxRect(g), o = pxObj('gauge', 'gauge', () => { const c = new PIXI.Container(), f = pxSprite(c, 'gauge', 0), n = new PIXI.Graphics(); c.addChild(n); PX.L.mark.addChild(c); return { c, f, n }; }); o.c.x = r.x; o.c.y = r.y; o.f.width = r.w; o.f.height = r.h; o.f.x = 0; o.f.y = 0; o.r = r;
-    o.b = +g.dataset.b || 4; o.o = +g.dataset.o || 8; o.dirty = 1; } }
+  { const g = pz.querySelector('.gau'); if (g) { const r = pxRect(g), o = pxObj('gauge', 'gauge', () => { const c = new PIXI.Container(), f = pxSprite(c, 'gauge', 0), n = new PIXI.Graphics(), n2 = new PIXI.Graphics(); c.addChild(n, n2); PX.L.mark.addChild(c); return { c, f, n, n2, spv: 0, spw: 0, spd: -1 }; }); o.c.x = r.x; o.c.y = r.y; o.f.width = r.w; o.f.height = r.h; o.f.x = 0; o.f.y = 0; o.r = r;
+    o.b = +g.dataset.b || 4; o.o = +g.dataset.o || 8; o.dirty = 1; const sp = +g.dataset.s || 0; if (sp !== o.spw) { o.spw = sp; if (ANIM && !pxRM() && !o.fresh) o.spv = 0; else o.spv = sp; } } }
   { const b = pz.querySelector('.bar'); if (b) { const r = pxRect(b), i = b.querySelector('i'), f = i ? parseFloat(i.style.width) / 100 : 0; const o = pxObj('fuel', 'bar', () => { const c = new PIXI.Container(), g = new PIXI.Graphics(), fr = new PIXI.NineSliceSprite({ texture: tx('pillbar'), leftWidth: 20, rightWidth: 20, topHeight: 12, bottomHeight: 12 }); c.addChild(g, fr); PX.L.mark.addChild(c); return { c, g, fr }; }); o.c.x = r.x; o.c.y = r.y; o.fr.width = r.w; o.fr.height = r.h; o.g.clear(); o.g.roundRect(5, 4, Math.max(2, (r.w - 10) * f), r.h - 8, (r.h - 8) / 2).fill(f < .3 ? 0xe8553a : 0x2fc4b2); } }
   pz.querySelectorAll('.chipr .tk').forEach((e, i) => { const r = pxRect(e), off = e.classList.contains('off'); const o = pxObj('cf' + i, 'tok', () => { const s = new PIXI.Sprite(tx('tokens:coffee')); s.anchor.set(.5); PX.L.mark.addChild(s); return { c: s, s0: s, x: 0, y: 0, a: 1, s: 1, rot: 0 }; }); o.tx = o.x = r.x + r.w / 2; o.ty = o.y = r.y + r.h / 2; o.size = Math.max(26, r.w * 1.5); o.a = off ? .28 : 1; });
   { const e = pz.querySelector('.badge .tk.rr'); if (e) { const r = pxRect(e); const o = pxObj('rr', 'tok', () => { const s = new PIXI.Sprite(tx('tokens:reroll')); s.anchor.set(.5); PX.L.mark.addChild(s); return { c: s, s0: s, x: 0, y: 0, a: 1, s: 1, rot: 0 }; }); o.tx = o.x = r.x + r.w / 2; o.ty = o.y = r.y + r.h / 2; o.size = Math.max(28, r.w * 1.4); } }
   pz.querySelectorAll('.tokrow .ch').forEach((e, i) => { const r = pxRect(e), v = +e.textContent || 1; const o = pxObj('tr' + i + ':' + v, 'tok', () => { const s = new PIXI.Sprite(tx('dice:t' + v)); s.anchor.set(.5); PX.L.mark.addChild(s); return { c: s, s0: s, x: 0, y: 0, a: 1, s: 1, rot: 0 }; }); o.tx = o.x = r.x + r.w / 2; o.ty = o.y = r.y + r.h / 2; o.size = Math.max(26, r.h); });
   // sweep objects not seen this sync; trays dice that vanished become fly-in candidates
-  for (const k of prevKeys) { const o = PX.objs.get(k); if (!o || o.seen === PX.seq) continue; pxKill(k, o); }
+  for (const k of prevKeys) { const o = PX.objs.get(k); if (!o || o.seen === PX.seq || o.dying) continue;
+    if (/^pl:/.test(k) && ANIM && !pxRM() && !PX.endA) { o.dying = 1; o.seen = PX.seq; o.tx = o.x; o.ty = o.y; pxPuffs(o.x, o.y); pxTween(o, { a: [1, 0], s: [1, 2.2], rot: [0, .9] }, 650, 0, () => pxKill(k, o), false); PX.dirty = true; continue; }   // a cleared plane swells and fades out
+    pxKill(k, o); }
   PX.dirty = true;
 }
 function pxKill(k, o) { try { o.c.destroy({ children: true }); } catch (e) { } if (o.fr && o.fr !== o.c) try { o.fr.destroy(); } catch (e) { } PX.tw = PX.tw.filter(t => t.o !== o); PX.objs.delete(k); }
@@ -169,7 +172,7 @@ function pxKill(k, o) { try { o.c.destroy({ children: true }); } catch (e) { } i
 function pxLoop() {
   const step = ts => { PX.raf = requestAnimationFrame(step); const dt = Math.min(.25, (ts - (PX.last || ts)) / 1000); PX.last = ts; if (PX.on) pxTick(dt); }; PX.raf = requestAnimationFrame(step);
 }
-function pxMoving() { return PX.tw.length > 0 || PX.parts.length > 0 || !!PX.endA || [...PX.objs.values()].some(o => o.legal || o.bob || (o.size && o.tx != null && (Math.abs((o.x || 0) - o.tx) > .4 || Math.abs((o.y || 0) - o.ty) > .4)) || (o.want != null && Math.abs(o.ang - o.want) > .2)); }
+function pxMoving() { return PX.tw.length > 0 || PX.parts.length > 0 || !!PX.endA || [...PX.objs.values()].some(o => o.legal || o.can || o.bob || (o.size && o.tx != null && (Math.abs((o.x || 0) - o.tx) > .4 || Math.abs((o.y || 0) - o.ty) > .4)) || (o.want != null && Math.abs(o.ang - o.want) > .2)); }
 function pxTick(dt) {
   PX.t += dt; const q = PXQ[PX.q], kf = 1 - Math.pow(.0005, dt), snap = !ANIM || pxRM();
   // tweens
@@ -190,7 +193,7 @@ function pxTick(dt) {
       const sc = (o.s || 1) * (1 + o.lift * .1), sz = o.size * sc;
       o.sp.width = sz * (1 + o.sq * .18); o.sp.height = sz * (1 - o.sq * .16); o.sp.y = -o.lift * o.size * .12;
       o.sh.width = sz * 1.2; o.sh.height = sz * 1.0; o.sh.x = 2; o.sh.y = sz * .14 + o.lift * 6; o.sh.alpha = .55;
-      o.gl.width = o.gl.height = sz * 1.35; o.gl.texture = o.rrm ? tx('violet') : tx('glow'); o.gl.alpha = (o.sel || o.rrm) ? (.4 + (q.fx ? .2 * Math.sin(PX.t * 5) : 0)) : (o.cof ? .3 : 0); if (o.sel || o.rrm) any = true;
+      o.gl.width = o.gl.height = sz * 1.35; o.gl.texture = o.rrm ? tx('violet') : tx('glow'); o.gl.alpha = (o.sel || o.rrm) ? (.4 + (q.fx ? .2 * Math.sin(PX.t * 5) : 0)) : o.can ? (.28 + (q.fx ? .22 * Math.sin(PX.t * 4) : 0)) : (o.cof ? .3 : 0); if (o.sel || o.rrm || o.can) any = true;
     } else if (o.kind === 'well') {
       o.g.alpha = o.legal ? (q.fx ? .55 + .3 * Math.sin(PX.t * 5) : .65) : 0; if (o.legal) any = true;
     } else if (o.kind === 'tok' || o.kind === 'sw') {
@@ -202,7 +205,10 @@ function pxTick(dt) {
       const r = o.size * .4, a = (o.ang - 90) * Math.PI / 180; o.n.clear(); o.n.moveTo(0, 0).lineTo(Math.cos(a) * r, Math.sin(a) * r).stroke({ width: Math.max(3, o.size * .03), color: 0xffe08a, cap: 'round' }); o.n.circle(0, 0, o.size * .04).fill(0xffe08a);
       // horizon tilt: rotate the whole face a little so the art shows the bank
       o.f.rotation = o.ang * Math.PI / 180 * .5;
-    } else if (o.kind === 'gauge' && o.dirty) {
+    } else if (o.kind === 'gauge') {
+      if (Math.abs(o.spw - o.spv) > .02) { o.spv += (o.spw - o.spv) * (snap ? 1 : kf * .32); any = true; } else o.spv = o.spw;
+      if (o.spd !== o.spv && o.r) { o.spd = o.spv; const r = o.r, cx = r.w / 2, cy = r.h - 8, R = Math.min(r.w * .46, r.h * .9), a = Math.PI * (1 - Math.max(0, Math.min(12, o.spv)) / 12); o.n2.clear(); if (o.spw > 0) { o.n2.moveTo(cx, cy).lineTo(cx + Math.cos(a) * R * .96, cy - Math.sin(a) * R * .96).stroke({ width: 4, color: 0xffffff, cap: 'round' }); o.n2.circle(cx, cy, 4).fill(0xffffff); } }
+      if (!o.dirty) continue;
       o.dirty = 0; const r = o.r, cx = r.w / 2, cy = r.h - 8, R = Math.min(r.w * .46, r.h * .9); o.n.clear();
       const ang = v => Math.PI * (1 - Math.max(0, Math.min(12, v)) / 12);
       for (let v = 0; v <= 12; v++) { const a = ang(v), l = v % 4 === 0 ? .14 : .08; o.n.moveTo(cx + Math.cos(a) * R * (1 - l), cy - Math.sin(a) * R * (1 - l)).lineTo(cx + Math.cos(a) * R, cy - Math.sin(a) * R).stroke({ width: 2, color: 0xcfd8e0, alpha: .8 }); }

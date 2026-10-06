@@ -70,7 +70,11 @@ function run(cf, seed) {
               }
               const cl = d.querySelector('#rs [data-a=rsclose]'); if (cl && !G.result) click(cl); return;
             }
-            if (G.result) { if (!overSince) overSince = Date.now(); if (!w.eval('UI.busy') && Date.now() - overSince > 4000) { errs.push('over but no final modal: overShown=' + w.eval('UI.overShown') + ' rsOpen=' + w.eval('UI.rsOpen') + ' rsHidden=' + d.querySelector('#rs').hidden + ' rsClass=' + d.querySelector('#rs').className + ' mode=' + w.eval('UI.mode') + ' started=' + w.eval('UI.started') + ' why=' + (G.result && G.result.why)); fin({}); } return; }
+            if (G.result) {   // the ending is on the board now: a banner of at most 8 words and the Fly again button (no report panel)
+              const ag = d.querySelector('#acts [data-a=again]'), bn = d.querySelector('#fx .endb');
+              if (w.eval('UI.overShown') && ag && bn) { if (bn.textContent.trim().split(/\s+/).length > 8) errs.push('end banner over 8 words'); seen.add('final'); if (!replayed && R() < .25 && cf.start !== 'ai') { replayed = 1; click(ag); seen.add('again'); if (w.eval('!!G.result')) errs.push('again did not start'); return; } return fin({ over: w.eval('({win:G.result.win,why:G.result.why,round:G.round})') }); }
+            }
+            if (G.result) { if (!overSince) overSince = Date.now(); if (!w.eval('UI.busy') && Date.now() - overSince > 4000) { errs.push('over but no end banner or Fly again: overShown=' + w.eval('UI.overShown') + ' rsOpen=' + w.eval('UI.rsOpen') + ' rsHidden=' + d.querySelector('#rs').hidden + ' rsClass=' + d.querySelector('#rs').className + ' mode=' + w.eval('UI.mode') + ' started=' + w.eval('UI.started') + ' why=' + (G.result && G.result.why)); fin({}); } return; }
             const pass = q('#pass [data-a=take]'); if (pass.length) { click(pass[0]); seen.add('pass card'); clicks++; return; }
             const tip = q('#pc [data-a=tipok],#pc [data-a=tipoff]'); if (tip.length) { click(R() < .8 ? tip[0] : tip[tip.length - 1]); seen.add('tip'); clicks++; return; }
             const seats = w.eval('FA.pending(G).filter(s => !G.ai[s])');
