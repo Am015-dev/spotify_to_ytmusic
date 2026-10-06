@@ -199,8 +199,8 @@ function toast(t,ms,keep){const el=$('#dockmsg');if(!el)return;el.textContent=t;
 function msgCheck(){const el=$('#dockmsg');if(!el||el.hidden||!G)return;if(UI.msgSig!==planSig()&&!UI.msgKeep)el.hidden=true;if(UI.confirmSig&&UI.confirmSig!==planSig())UI.confirm=null}
 // Start the day: first ask when a red priority is still open
 function wizPlaced(){if(planOpen()&&!allAI()&&pstep()===2&&!curPawn())setPStep(3)}
-function tryStart(force){if(!planOpen())return;if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();render();GX.showDock();return}}
-  UI.confirm=null;const r=startActions();if(r)toast(r);else{sfx('click');if(UI.tut<99)tutDone()}}
+function tryStart(force){if(!planOpen())return;if(typeof BF!=='undefined'&&BF.on){const pb=planProblems();if(pb.length){UI.confirm=null;toast(pb[0]);render();return}}if(!force){const red=uncoveredRed();if(red.length){UI.confirm=red.map(p=>p.confirm||('⚠ '+p.title+' is not covered.')).join(' ');UI.confirmSig=planSig();render();GX.showDock();return}}
+  UI.confirm=null;const r=startActions();if(r){toast(r);render()}else{sfx('click');if(UI.tut<99)tutDone()}}
 function pulsePos(p){if(UI.hoverPos===p)return;UI.hoverPos=p;try{if(V3.lab)for(const id in V3.lab)V3.lab[id].classList.toggle('pulse',+id===p);if(!V3.on)withView(()=>renderMap2D())}catch(e){}}
 document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closest('.gx-dock [data-pos]');if(pr){pulsePos(+pr.dataset.pos);clearTimeout(UI.pt);UI.pt=setTimeout(()=>pulsePos(null),2500)}
   if(!e.target.closest('#moremenu,[data-a=menu]'))closeMenu();

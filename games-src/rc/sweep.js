@@ -12,16 +12,16 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
  await p.goto('https://swi.test/');await p.waitForTimeout(900);
  await p.evaluate(([s,sc])=>{try{localStorage.clear()}catch(e){}setSeed(s);AIDELAY=0;UI.speed=8;UI.setup.scen=sc;render()},[seed,SC[seed%4]]);
  await p.tap('[data-a=start]');await p.waitForTimeout(1200);
- let same=0,last='',lastT=Date.now(),steps=0,glow=0,resChecks=0,minPct=100;
+ let badTaps=0,same=0,last='',lastT=Date.now(),steps=0,glow=0,resChecks=0,minPct=100;
  while(steps++<(+process.env.MAXSTEPS||3000)){
   const s=await p.evaluate(()=>{const vis=e=>e&&e.offsetParent!==null;const lb=document.querySelector('#phlabel');const chip=document.querySelector('#phchip');const bd=document.querySelector('.gx-board').getBoundingClientRect();
    let eng=null;try{if(PHO.st==='plan2'||PHO.st==='plan'){eng={f:food(),w:G.res.wood}}}catch(e){}
    const btn=document.querySelector('#bf .btn.go');let cov=false;if(btn){const r=btn.getBoundingClientRect();const e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);cov=!(e&&(e===btn||btn.contains(e)))}
-   return {st:PHO.st,over:!!G.over,sig:[G.round,G.logN,UI.shown,G.plan&&G.plan.acts.map(a=>a.pw.length).join(''),PHO.st,!!G.q,UI.confirm?1:0].join('|'),words:lb?lb.textContent.trim().split(/\s+/).filter(Boolean).length:0,lb:lb&&lb.textContent,chip:chip?chip.textContent:'',eng,cov,pct:bd.height/innerHeight*100,sw:document.documentElement.scrollWidth>innerWidth+1,hasPawn:!!curPawn(),pick:UI.pick||[],ans:!!document.querySelector('#bf [data-ans]')}});
+   return {st:PHO.st,over:!!G.over,sig:[G.round,G.logN,UI.shown,G.plan&&G.plan.acts.map(a=>a.pw.length).join(''),PHO.st,!!G.q,UI.confirm?1:0].join('|'),words:lb?lb.textContent.trim().split(/\s+/).filter(Boolean).length:0,lb:lb&&lb.textContent,chip:chip?chip.textContent:'',eng,cov,pct:bd.height/innerHeight*100,sw:document.documentElement.scrollWidth>innerWidth+1,hasPawn:!!curPawn(),pick:UI.pick||[],ans:!!document.querySelector('#bf [data-ans]'),posq:BF.posQ()?UI.pick:null}});
   if(s.over||s.st==='over')break;minPct=Math.min(minPct,s.pct);
   if(s.words>8)prob('status >8 words: '+s.lb);if(s.sw)prob('horizontal scroll');if(s.cov)prob('big button covered at '+s.st);
   if(s.eng){const m=/🍖(\d+)🪵(\d+)/.exec(s.chip);resChecks++;if(!m||+m[1]!==s.eng.f||+m[2]!==s.eng.w)prob(`resources on screen "${s.chip}" != engine food ${s.eng.f} wood ${s.eng.w}`)}
-  if(s.sig!==last){last=s.sig;lastT=Date.now();same=0}else same++;s.stuckish=same;if(false){}else if(Date.now()-lastT>8000){prob('stuck >8s at '+s.st+' '+s.lb+' '+JSON.stringify(await p.evaluate(()=>({tray:document.querySelector('#bf').innerText.replace(/\n/g,'|'),pb:planProblems(),conf:UI.confirm,acts:G.plan.acts.map(a=>a.type+':'+a.pw.join('+')),cur:!!curPawn(),pick:UI.pick,q:!!G.q,over:!!G.over}))));break}
+  if(s.sig!==last){last=s.sig;lastT=Date.now();same=0}else same++;s.stuckish=same;if(false){}else if(Date.now()-lastT>8000){prob('stuck >8s at '+s.st+' '+s.lb+' '+JSON.stringify(await p.evaluate(()=>({tray:document.querySelector('#bf').innerText.replace(/\n/g,'|'),pb:planProblems(),conf:UI.confirm,acts:G.plan.acts.map(a=>a.type+':'+a.pw.join('+')),cur:!!curPawn(),pick:UI.pick,cls:[...document.querySelectorAll('#bf .bfpw')].map(e=>e.className).join('/'),ids:G.plan.acts.map(a=>a.id).join(),q:!!G.q,over:!!G.over}))));break}
   if(s.st==='plan2'||s.st==='plan'){
    if(await p.$('#bf [data-a=go][data-force]')){await tapSel(p,'#bf [data-a=go][data-force]');await p.waitForTimeout(200);continue}
    if(s.hasPawn&&s.pick.length){const id=s.pick[(Math.random()*s.pick.length)|0];const pt=await p.evaluate(i=>{const t=BF.tilePt(i);return t&&{x:t.ox+t.x,y:t.oy+t.y}},id);
@@ -30,9 +30,11 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
       const r=await p.evaluate(a0=>({a1:G.plan.acts.reduce((n,a)=>n+a.pw.length,0),pop:!!PHO.pop,msg:document.querySelector('#phlabel').textContent}),a0);
       if(r.a1===a0&&!r.pop&&!/can't|Nothing|Too far/.test(r.msg))prob('glowing place '+id+' did not respond: '+r.msg);await p.evaluate(()=>PHO.closePop(true));continue}}
    if(s.hasPawn){await tapSel(p,'#bf [data-a=suggest]');await p.waitForTimeout(200);continue}
+   if(!s.hasPawn&&s.stuckish>1&&(++badTaps%3===0)){await tapSel(p,'#bf [data-a=suggest]');await p.waitForTimeout(250);continue}
    if(!s.hasPawn&&s.stuckish>1&&await tapSel(p,'#bf .bfpw.bad')){await p.waitForTimeout(250);continue}
    if(!s.hasPawn&&s.stuckish>1){const pt=await p.evaluate(()=>{const e=document.querySelector('#bfchips .bfa.warn[data-rm]');if(!e)return null;const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}});if(pt){await p.touchscreen.tap(pt.x,pt.y);await p.waitForTimeout(250);continue}}
    const g=(await p.$('#bf [data-a=go][data-force]'))?'#bf [data-a=go][data-force]':'#bf [data-a=go]';if(await tapSel(p,g)){await p.waitForTimeout(200);continue}}
+  if(s.posq&&s.posq.length){const id=s.posq[(Math.random()*s.posq.length)|0];const pt=await p.evaluate(i=>{const t=BF.tilePt(i);return t&&{x:t.ox+t.x,y:t.oy+t.y}},id);if(pt){await p.touchscreen.tap(pt.x,pt.y);await p.waitForTimeout(250);continue}}
   if(s.ans){const n=await p.$$eval('#bf [data-ans]',e=>e.length);await tapSel(p,`#bf [data-ans="${(Math.random()*n)|0}"]`);await p.waitForTimeout(150);continue}
   if(Math.random()<.5&&await tapSel(p,'#bf [data-a=next]')){await p.waitForTimeout(100);continue}
   await p.waitForTimeout(250)}

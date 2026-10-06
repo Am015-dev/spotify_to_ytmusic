@@ -41,6 +41,9 @@ function legalTiles(cur){if(!cur)return [];const k=planSig()+'|'+cur.id+'|'+G.lo
 BF.legal=legalTiles;window.legalRowsDbg=id=>{const c=curPawn();return legalRows(id,c).map(r=>r.title)};
 function recTile(cur){if(!cur)return null;const rec=recPlan().map[cur.id];if(!rec||placeWhy(cur.id,rec.type,rec.tgt,rec.alt))return null;
   const same=r=>r.type===rec.type&&JSON.stringify(r.tgt)===JSON.stringify(rec.tgt)&&(r.alt||0)===(rec.alt||0);for(const m of MAP)if(legalRows(m.id,cur).some(same))return {id:m.id,rec};return null}
+// a choice that is a place on the island (where the fog goes): the places glow and you tap one
+function posQ(){if(!G||!G.q||!humanQ())return null;const o=G.q.opts;if(!o||!o.length||!o.every(x=>x.pos!=null&&MAP[x.pos]))return null;const i=storyIdx();if(i<0||i<UI.beats.length-1)return null;return o}
+BF.posQ=posQ;
 // ---------- the status line ----------
 function capFor(i){const b=UI.beats[i];if(!b)return '';const d=b.data||{};const S=SCENARIOS[G.scen];const F=typeof FLAVOR!=='undefined'?FLAVOR:{};const fs=((F.scen)||{})[G.scen]||{};const nm=c=>c&&c.nm?c.nm:'Friday';
   switch(b.kind){
@@ -66,7 +69,7 @@ function planCap(st){const cur=curPawn();const pb=planProblems();
   if(cur){const n=pawnLabel(cur).split(' ')[0];const lt=legalTiles(cur);if(!lt.length)return `No job for ${n} now`;return pb.length||cur.c!=null?`${n}: tap a glowing place`:`${n}: tap a place, or start`}
   if(pb.length)return badActs().size?'Tap a pulsing pawn to fix it':brief(pb[0]);return 'All set. Start the day!'}
 BF.status=function(){if(BF.msg&&Date.now()<BF.msg.until)return BF.msg.t;BF.msg=null;
-  const st=PHO.st;if(st==='story'){const i=storyIdx();if(i<0)return '';const last=i>=UI.beats.length-1;if(last&&humanQ())return brief(G.q.title);return w8(capFor(i))}
+  const st=PHO.st;if(st==='story'){const i=storyIdx();if(i<0)return '';const last=i>=UI.beats.length-1;if(last&&humanQ())return posQ()?'Tap a glowing space':brief(G.q.title);return w8(capFor(i))}
   if(st==='plan'||st==='plan2')return w8(planCap(st));if(st==='over')return G.over&&G.over.win?'Rescued!':'Lost on the island';
   if(allAI())return UI.pause?'Paused':'The computer is playing';return 'The castaways are working'};
 BF.say=function(t,ms){BF.msg={t:w8(t),until:Date.now()+(ms||3000)};BF.paint();clearTimeout(BF.msgT);BF.msgT=setTimeout(()=>{BF.msg=null;BF.paint()},(ms||3000)+30)};
@@ -77,7 +80,7 @@ function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));con
   return `<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"><b>${E(nm.slice(0,2))}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${ACT_ICON[a.type]||'•'}</u>`:''}</button>`}
 function trayHtml(st){
   if(st==='story'){const i=storyIdx();if(i<0)return '';const b=UI.beats[i];const last=i>=UI.beats.length-1;const qq=last&&humanQ()?G.q:null;
-    if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${E(o.l)}</button>`).join('')}</div>`}
+    if(qq&&posQ())return '';if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${E(o.l)}</button>`).join('')}</div>`}
     const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';
     return `<div class="bf-main"><button class="gx-ibtn bf-s ${UI.auto?'on':''}" data-a="auto" aria-pressed="${!!UI.auto}" aria-label="Play by itself">⏩</button><button class="btn go" data-a="next">${nextL}</button>${i<UI.beats.length-2?'<button class="gx-ibtn bf-s" data-a="skip" aria-label="Skip ahead">⏭</button>':''}</div>`}
   if(st==='plan'||st==='plan2'){const cur=curPawn();const pb=planProblems();
@@ -179,7 +182,7 @@ BF.tilePop=function(id){const cur=curPawn();if(!cur)return null;const rec=recPla
       return `<button class="bfr ${isRec(r)?'rec':''} ${a?'has':''}" data-place="${key}" ${isRec(r)?'data-rec="1"':''}><span class="t">${isRec(r)?'⭐ ':''}${E(r.title)}</span><span class="b">${cost?E(cost)+' · ':''}${badge}</span></button>`}).join('');
   if(!h)return null;const t=tileAt(id);return {title:`${pawnLabel(cur).split(' ')[0]} → place ${id+1}${t?' · '+t.terr:''}`,html:`<div class="bfrows">${h}</div>`,cls:'tile bf'}};
 // a tap on a place while planning (the old tile handler has already selected it)
-BF.tile=function(id){if(!BF.on||!(PHO.st==='plan2'||PHO.st==='plan'))return false;const cur=curPawn();
+BF.tile=function(id){if(BF.on&&PHO.st==='story'){const o=posQ();if(o){const j=o.findIndex(x=>x.pos===id);if(j>=0){sfx('click');answer(j);return true}BF.say('Tap a glowing space');return true}return false}if(!BF.on||!(PHO.st==='plan2'||PHO.st==='plan'))return false;const cur=curPawn();
   if(!cur){BF.say('Tap a pawn to change its job');PHO.closePop(true);UI.tileSel=null;return true}
   const rows=legalRows(id,cur);const camp=id===G.camp.pos;const n=pawnLabel(cur).split(' ')[0];
   if(!rows.length&&!camp){const t=tileAt(id);BF.say(!t&&G.map[id].tile==null?(MAP[id].adj.some(p=>tileAt(p))?`${n} can't explore there`:'Too far to explore yet'):`Nothing for ${n} to do there`);PHO.closePop(true);UI.tileSel=null;return true}
@@ -188,11 +191,11 @@ BF.tile=function(id){if(!BF.on||!(PHO.st==='plan2'||PHO.st==='plan'))return fals
 // ---------- the sync: called at the end of every PHO.sync ----------
 BF.pre=function(){const on=!!(PHO.on&&G&&typeof UI!=='undefined'&&UI.modal!=='start'&&!netOn());if(on!==BF.on){BF.on=on;R.classList.toggle('bf',on)}
   if(on){init();if(planOpen()&&!allAI()&&pstep()!==2)setPStep(2)}};
-BF.post=function(st){init();const tray=q('#bf');if(!tray)return;
+BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}catch(e){}
   if(!BF.on){UI.pick=null;return}
   if(BF._st!==st){BF._st=st;BF.msg=null}
   // glowing places: where the pawn in hand can work
-  if(st==='plan2'&&!UI.confirm){const cur=curPawn();UI.pick=legalTiles(cur)}else UI.pick=null;
+  if(st==='plan2'&&!UI.confirm){const cur=curPawn();UI.pick=legalTiles(cur)}else if(st==='story'&&posQ())UI.pick=posQ().map(x=>x.pos);else UI.pick=null;
   { // the glow under each place the pawn in hand can work
     const gl=q('#bfglow');if(gl){const ids=UI.pick||[];const sig=ids.join(',');if(gl.dataset.s!==sig){gl.dataset.s=sig;gl.innerHTML=ids.map(i=>`<i class="bfgl" data-t="${i}"></i>`).join('');BF.place()}}}
   // the tray
