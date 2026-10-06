@@ -12,3 +12,14 @@ Open (not blocking):
 1. (done in v86i) beacons are registered at creation via an Object3D.add hook. Athens: 70 pedestrians, spawn ≥ 30 m.
 2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
+
+## Next task for a FRESH art session: pART6 (coordinator brief 2026-10-06 06:28 UTC; this session is over its context budget)
+Base: live v86k (90babcf, or later). Note: brave-carson HEAD can be a "Shelf:" commit; take the latest commit that touched games/mainhattan-overdrive/ (`git log -1 origin/live -- games/mainhattan-overdrive/`). `./art.sh <commit>` builds on it.
+Do not touch driving, collision, missions, barrel roll or speed feel (cars session pCAR15). Tell session_01Xfbyypd9bgKDJZnBFoDfnm once which regions pART6 touches.
+A. Remove all car shadows (player, AI, traffic; races and city). Where they come from:
+   - art3.js `ART_shadows`/`ART_step` (player blob ART3.pl + traffic InstancedMesh ART3.tr): delete it in art3.js, BUT keep `ART_blobTex` if live code still calls it (grep first).
+   - live's v86 vehicle block (inside /*no marker*/ "ART step 5", untouched by pART4): `ART4_tyres` = per-tyre dark blobs → hide (`ART4.ty.visible=false`), don't remove the block (it holds ground contact).
+   - the hovercraft-era `ud.shadow` plane on every ship/AI (8 refs) → `visible=false`; also check race-mode shadows (`trShadow`) and any cars-session shadow.
+   Verify the tyre/road gap stays ≤0.05 m and take a low side shot (camera 4 m out, 0.5 m up).
+B. Jump gaps: ramps are in `RO.ramps` (city, 39 refs, 14 `ramps.push`) and track `jumps:[…]` in track data (10). Measure each with real input (hold GAS from ~150 m, Rookie car, no boost): log the landing vs gap-end distance, then scale ramp hgt/len or the gap width (level data/geometry only) until margin ≥ 3 m at v86k top speed. Report a per-jump margin table.
+Gate: reviewer session_01Y6FYerWwxv43FuKUcaUT4v (shots: jump mid-air, city car with no shadow, low side view). Shots go to docs/shots/<ver>/ on the devkit branch per the coordinator.
