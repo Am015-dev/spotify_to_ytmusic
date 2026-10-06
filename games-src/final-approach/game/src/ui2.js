@@ -23,8 +23,6 @@ const icoEl = grp => h('i.ic', { 'aria-hidden': 'true', html: '<svg viewBox="0 0
 // mandatory spaces of seat a that are still empty, and how many dice it has left: warn before a missing Axis / Engine die loses the flight
 function mandInfo(a) { if (!G || typeof a !== 'number' || a < 0 || G.phase !== 'place' || G.result) return null; const need = ['ax' + a, 'en' + a].filter(k => !G.slots[k]), left = FA.unusedDice(G, a).length; return { need, left, tight: need.length > 0 && left > 0 && left <= need.length, lost: need.length > left }; }
 const needNames = need => need.map(k => FA.SLOT[k].grp === 'axis' ? 'Axis' : 'Engines').join(' and ');
-// which control a guided tip is about: those elements get a pulsing ring while the tip is up
-const TIPHL = { axis: ['.slot[data-slot^=ax]', '.dial.axd'], engines: ['.slot[data-slot^=en]', '.gau'], track: ['.w.appr'], radio: ['.slot[data-slot^=ra]'], alt: ['.w.altw'], gear: ['.slot[data-slot^=lg]', '.gau'], flaps: ['.slot[data-slot^=fl]', '.gau'], brakes: ['.slot[data-slot^=br]', '.slot[data-slot^=it]', '.slot[data-slot^=ib]', '.badge.brk'], conc: ['.slot[data-slot^=co]', '.chipr'], rr: ['.badge.rrb'], dice: ['.tray'], 'n-dice': ['.tray'], 'n-mand': ['.slot[data-slot^=ax]', '.slot[data-slot^=en]'], hint: [], welcome: [], brief: [] };
 const SLOTLAB = k => { const S = FA.SLOT[k]; if (S.grp === 'gear' || S.grp === 'flaps') return S.vals.join('-'); if (S.grp === 'brakes' || S.grp === 'ice') return String(S.vals[0]); return ''; };
 function selectedLegal() {
   const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v)) return [];
@@ -118,8 +116,6 @@ function render() {
   }
   // ---- hud
   if (r.hud) { const row = rows[G.round + G.row0]; pz.appendChild(css(h('div.hudc', h('b', 'Round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0) + (isPh() ? '' : ' · ' + row[0] + ' ft')), (tm => isPh() && tm ? tm : [h('span', G.result ? 'Flight over' : G.phase === 'brief' ? 'Briefing' : (G.pend ? pendLabel() : (G.turn === 0 ? 'Pilot' : 'Co-pilot') + ' places')), tm])(rtEl())), r.hud)); }   // phones: two short lines, the clock replaces the turn line (the prompt says whose turn it is)
-  // the control the current guided tip talks about
-  if (UI.coach && UI.coach.tip && TIPHL[UI.coach.tip]) for (const sel of TIPHL[UI.coach.tip]) pz.querySelectorAll(sel).forEach(e => e.classList.add('hl'));
   renderDock(); renderBar(); phPost();
   if (typeof pxSync === 'function') pxSync();
   if (typeof netRenderHook === 'function') netRenderHook();
@@ -295,7 +291,6 @@ function actions(v) {
   if (G.turn !== v) return f;
   if (has('antic').length && selD) b('Second look: reroll this die', 'antic', 'alt');
   if (has('toss').length && selD) b('No space fits: put it aside', 'toss', 'alt');
-  b('Hint', 'hint', 'alt', { title: 'What the computer would do with your dice, and why' });
   return f;
 }
 // the landing conditions as [ok (true / false / null = not yet), text]
