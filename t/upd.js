@@ -1,0 +1,22 @@
+// UPDATES screen check at 852x393 by real taps: toast on title, title button, pause button. node t/upd.js <prefix> [page]
+const {chromium,devices}=require('/opt/node22/lib/node_modules/playwright');
+(async()=>{const pre=process.argv[2]||'shots/UP',page=process.argv[3]||'dev1/local_dbg.html';const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const ctx=await b.newContext({...devices['iPhone 13'],viewport:{width:852,height:393},deviceScaleFactor:1});const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error')errs.push(m.text().slice(0,200))});
+ await p.goto('http://127.0.0.1:8766/'+page);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:300000});
+ await p.evaluate(()=>{localStorage.clear();localStorage.setItem('mho_slot','1');localStorage.setItem('mho_athpre','1');localStorage.setItem('mho_roam@1',JSON.stringify({tut:1,otg:{}}))});
+ await p.reload({timeout:600000});await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:300000});await p.waitForTimeout(2500);
+ const tap=async sel=>{const c=await p.evaluate(s=>{const e=document.querySelector(s);if(!e||!e.getClientRects().length)return null;const r=e.getBoundingClientRect();return{x:r.x+r.width/2,y:r.y+r.height/2}},sel);if(!c)throw new Error('no '+sel);await p.touchscreen.tap(c.x,c.y);await p.waitForTimeout(600)};
+ const r={};r.toast=await p.evaluate(()=>{const t=document.getElementById('odNew');return t&&!t.hidden&&t.textContent});await p.screenshot({path:pre+'_toast.png'});
+ await tap('#odNewGo');r.openFromToast=await p.evaluate(()=>!document.getElementById('odUpd').hidden);await p.screenshot({path:pre+'_screen.png'});
+ r.minFont=await p.evaluate(()=>Math.min(...[...document.querySelectorAll('#odUpd *')].filter(e=>e.childNodes[0]&&e.childNodes[0].nodeType===3&&e.textContent.trim()).map(e=>parseFloat(getComputedStyle(e).fontSize))));
+ r.versions=await p.evaluate(()=>document.querySelectorAll('#odUpd .uv').length);
+ await p.evaluate(()=>{const e=document.querySelector('#odUpd .ub');e.scrollTop=e.scrollHeight});await p.waitForTimeout(400);await p.screenshot({path:pre+'_scrolled.png'});
+ await tap('#odUpdX');r.closed=await p.evaluate(()=>document.getElementById('odUpd').hidden);
+ await p.reload({timeout:600000});await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{timeout:300000});await p.waitForTimeout(2000);
+ r.toastAfterSeen=await p.evaluate(()=>{const t=document.getElementById('odNew');return !!(t&&!t.hidden)});
+ await tap('#hfUpd');r.openFromTitle=await p.evaluate(()=>!document.getElementById('odUpd').hidden);await p.screenshot({path:pre+'_title.png'});await tap('#odUpdX');
+ await p.evaluate(()=>{try{__m1.skip()}catch(e){}__mho.enterRoam()});await p.waitForFunction(()=>__mho.state==='roam',null,{timeout:300000});await p.evaluate(()=>{__mho.storyClose&&__mho.storyClose()});await p.waitForTimeout(3000);
+ await p.screenshot({path:pre+'_drive.png'});r.toastInDrive=await p.evaluate(()=>{const t=document.getElementById('odNew');return !!(t&&!t.hidden)});
+ await p.evaluate(()=>{const b=[...document.querySelectorAll('button')].find(b=>/❚❚|II/.test(b.textContent)&&b.getClientRects().length);if(b)b.click();else document.getElementById('roamPause').hidden=false});await p.waitForTimeout(800);
+ await p.screenshot({path:pre+'_pause.png'});await tap('#roamPause [data-p="upd"]');r.openFromPause=await p.evaluate(()=>!document.getElementById('odUpd').hidden);await p.screenshot({path:pre+'_pauseopen.png'});
+ console.log(JSON.stringify(r),'errs',JSON.stringify(errs));await b.close()})();

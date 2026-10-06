@@ -1,0 +1,22 @@
+// ---------- UPDATES screen (title + pause menu) and a one-time "What's new" toast per version; data: OD_CHANGELOG at the top
+{const TC={FIXED:'#3ddc84',NEW:'#4ceaff',CHANGED:'#ffd12c'},esc=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
+ const st=document.createElement('style');st.textContent=`#odUpd{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(10,14,30,.6);padding:10px;box-sizing:border-box}#odUpd[hidden],#odNew[hidden]{display:none}
+#odUpd .uc{width:min(640px,100%);max-height:100%;display:flex;flex-direction:column;background:#0b1626;border:3px solid #4ceaff;border-radius:16px;color:#e8f2fa;font:600 13px system-ui;box-shadow:0 8px 0 rgba(0,0,0,.35)}
+#odUpd .uh{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:2px solid #1d3550}#odUpd .uh b{font:italic 900 22px var(--hud,system-ui);letter-spacing:.04em}#odUpd .uh small{color:#9fb3c8;font-size:12px}#odUpd .uh button{margin-left:auto;font:900 16px system-ui;min-width:44px;min-height:40px;border-radius:10px;border:2px solid #4ceaff;background:#12304a;color:#fff}
+#odUpd .ub{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:6px 14px 12px}#odUpd .uv{margin:8px 0 2px;font:900 15px system-ui;color:#fff}#odUpd .uv span{font-weight:600;font-size:12px;color:#9fb3c8;margin-left:6px}#odUpd .uv.cur{color:#4ceaff}
+#odUpd ul{list-style:none;margin:2px 0;padding:0}#odUpd li{display:flex;gap:8px;align-items:baseline;margin:3px 0;line-height:1.35}#odUpd li em{font:900 12px system-ui;letter-spacing:.08em;font-style:normal;padding:2px 6px;border-radius:6px;color:#0b1626;flex:none;min-width:58px;text-align:center}
+#odNew{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:8999;display:flex;gap:8px;align-items:center;background:#0b1626;border:3px solid #4ceaff;border-radius:999px;padding:4px 6px 4px 14px;color:#fff;font:800 13px system-ui;box-shadow:0 4px 0 rgba(0,0,0,.35)}#odNew button{font:900 13px system-ui;min-height:36px;border-radius:999px;border:2px solid #4ceaff;background:#12304a;color:#fff;padding:0 12px}`;document.head.appendChild(st);
+ const ov=document.createElement('div');ov.id='odUpd';ov.hidden=true;document.body.appendChild(ov);
+ window.odUpdOpen=()=>{const c=OD_CHANGELOG[0];let h=`<div class="uc"><div class="uh"><b>UPDATES</b><small>${esc(c.v)} · ${esc(c.date)}</small><button id="odUpdX">✕</button></div><div class="ub">`;
+  OD_CHANGELOG.slice(0,15).forEach((e,i)=>{h+=`<div class="uv ${i?'':'cur'}">${esc(e.v)}<span>${esc(e.date)}${i?'':' · current'}</span></div><ul>${e.items.map(it=>`<li><em style="background:${TC[it.t]||'#ccc'}">${esc(it.t)}</em><span>${esc(it.s)}</span></li>`).join('')}</ul>`});
+  ov.innerHTML=h+'</div></div>';ov.hidden=false;try{localStorage.setItem('mho_seenVer',OD_VER)}catch(e){}const t=document.getElementById('odNew');if(t)t.hidden=true;ov.querySelector('#odUpdX').onclick=()=>{ov.hidden=true;try{AU.sfx('pick')}catch(e){}}};
+ ov.addEventListener('pointerdown',e=>{if(e.target===ov)ov.hidden=true});
+ // title screen: a footer button; pause menu: a row button (the pause handler ignores unknown data-p)
+ {const f=document.querySelector('#home .hfoot');if(f){const b=document.createElement('button');b.id='hfUpd';b.textContent='📰 UPDATES';b.onclick=()=>{try{AU.sfx('pick')}catch(e){}odUpdOpen()};f.appendChild(b)}}
+ {const g=document.querySelector('#roamPause .pg'),q=g&&g.querySelector('[data-p="quit"]');if(g){const b=document.createElement('button');b.dataset.p='upd';b.textContent='📰 UPDATES';b.addEventListener('click',()=>odUpdOpen());g.insertBefore(b,q)}}
+ // one-time toast on the title screen after a new version (never during driving)
+ let seen=null;try{seen=localStorage.getItem('mho_seenVer')}catch(e){}
+ if(seen!==OD_VER){const t=document.createElement('div');t.id='odNew';t.hidden=true;t.innerHTML=`<span>What's new in ${esc(OD_VER)}</span><button id="odNewGo">SEE</button><button id="odNewX">✕</button>`;document.body.appendChild(t);
+  t.querySelector('#odNewGo').onclick=()=>odUpdOpen();t.querySelector('#odNewX').onclick=()=>{t.hidden=true;try{localStorage.setItem('mho_seenVer',OD_VER)}catch(e){}};
+  const chk=()=>{const m=document.getElementById('menu'),on=m&&!m.hidden&&window.__mho&&__mho.state==='menu';if(!document.getElementById('odNew'))return;t.hidden=!on||(localStorage.getItem('mho_seenVer')===OD_VER);setTimeout(chk,700)};setTimeout(chk,700)}
+ window.__upd={open:()=>odUpdOpen(),ver:OD_VER,log:OD_CHANGELOG}}
