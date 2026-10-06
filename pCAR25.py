@@ -70,10 +70,10 @@ function CR_lgHit(P,O,tw){O.x=clamp(O.x+tw*2.2,-MARGIN,MARGIN);O.v*=.88;O.yawRat
  if(O.hull<=0){O.hull=0;takedown(O)}else{const n=Math.round((100-O.hull)/34);award(P,'SMASH '+n+'/3 · '+O.name,10,300,'#ffd12c');AU.sfx('crash');try{rivalHit(O,'hurt')}catch(e){}}}
 const CR_LG={d:0,t:0};
 function CR_lgTap(d){const n=performance.now();if(CR_LG.d===d&&n-CR_LG.t<300){CR_LG.t=0;CR_lgGo(d)}else{CR_LG.d=d;CR_LG.t=n}}
-function CR_lgGo(d){if(state!=='roam'||!pl||RO.wk||RO.frozen||RO.card||RO.mapOpen||RO.story||pl.air||(RO.crLgCd||0)>0||(RO.crLg||0)>0)return;
+function CR_lgGo(d){if(state==='race'){if(!paused&&pl&&!pl.finished)pressed.roll=d;return}if(state!=='roam'||!pl||RO.wk||RO.frozen||RO.card||RO.mapOpen||RO.story||pl.air||(RO.crLgCd||0)>0||(RO.crLg||0)>0)return;
  RO.crLg=.3;RO.crLgD=d;RO.crLgCd=1;RO.crLgN=(RO.crLgN||0)+1;AU.sfx('roll');CR_lgFx(pl)}
-addEventListener('keydown',e=>{if(e.repeat||state!=='roam')return;const d={ArrowLeft:-1,KeyA:-1,ArrowRight:1,KeyD:1}[e.code];if(d)CR_lgTap(d)});
-BZ.addEventListener('touchstart',e=>{if(state!=='roam')return;const t=e.changedTouches[0];if(t)CR_lgTap(bzSide(t))},{passive:true});
+addEventListener('keydown',e=>{if(e.repeat||(state!=='roam'&&state!=='race'))return;const d={ArrowLeft:-1,KeyA:-1,ArrowRight:1,KeyD:1}[e.code];if(d)CR_lgTap(d)});
+BZ.addEventListener('touchstart',e=>{if(state!=='roam'&&state!=='race')return;const t=e.changedTouches[0];if(t)CR_lgTap(bzSide(t))},{passive:true});
 // the lunge moves the car sideways (screen left/right) for 0.3 s; it stops at walls
 roamStep=(f=>function(dt){if(state==='roam')pressed.roll=0;const r=f(dt);try{if(state==='roam'&&pl&&!RO.wk){RO.crLgCd=Math.max(0,(RO.crLgCd||0)-dt);
  if(RO.crLg>0){RO.crLg-=dt;const k=CR_LGV*dt*RO.crLgD,nx=RO.x-Math.cos(RO.h)*k,nz=RO.z+Math.sin(RO.h)*k;if(!roamHit(nx,nz,1.2,RO.y)){RO.x=nx;RO.z=nz}else RO.crLg=0}}}catch(e){}return r})(roamStep);
