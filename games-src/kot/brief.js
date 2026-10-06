@@ -10,7 +10,7 @@ function cut(text,n){const toks=text.trim().split(/\s+/);let out=[],c=0;for(cons
 function clamp(){if(!R.classList.contains('ph'))return;
   const roots=document.querySelectorAll('.gx-dock,#bfx,#btip,#bmarks,#moment,#advice,#choice,#coach,#news,#banner,#preview,.tip,#pmsg');
   for(const root of roots){for(const e of root.querySelectorAll('*')){
-    if(e.dataset&&e.dataset.tl&&e.textContent===e.dataset.tl)continue;if(e.matches(SKIP)||e.closest(SKIP.replace(',.gx-dock-head,.pchip','').replace('svg,','')))continue;
+    if(e.dataset&&e.dataset.tl&&e.textContent===e.dataset.tl)continue;if(e.matches(SKIP)||e.closest('svg,canvas,.die'))continue;
     if(![...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim()))continue;
     if(e.querySelector(SKIP.replace('svg,','')))continue;
     const full=(e.innerText||e.textContent||'').trim();if(words(full).length<=MAXW)continue;

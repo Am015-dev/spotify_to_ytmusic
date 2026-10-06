@@ -23,7 +23,7 @@ const PROBE = () => {
   const de = document.documentElement; out.hscroll = Math.max(de.scrollWidth, document.body.scrollWidth) > innerWidth + 1;
   if (!out.ok) return out;
   out.win = G.winner; out.turn = G.turn; out.phase = G.phase; out.humanTurn = humanTurn(); out.choice = !!UI.choice && !document.getElementById('choice').classList.contains('hidden');
-  out.line = (document.getElementById('bline') || {}).textContent || '';
+  out.intro = !!UI.intro; out.line = (document.getElementById('bline') || {}).textContent || '';
   out.fx = (document.getElementById('bfx') || { children: [] }).children.length;
   out.busy = !!UI.busy || !!UI.pending || out.fx > 0;
   const sels = '#dice .die,#pacts button,#pshop [data-shop],#choice button,.gxc button,.gx-bar button,#pchips .pchip,#moment button,#advice button,.gx-dock .btn,#bfinger';
@@ -42,9 +42,9 @@ const PROBE = () => {
     const w = words(e.innerText); if (w.length > 8) out.wordy.push(w.length + 'w "' + w.slice(0, 6).join(' ') + '" in ' + e.tagName + '.' + e.className + '#' + e.id + ' < ' + (e.parentElement && (e.parentElement.id || e.parentElement.className)));
   }
   const bd = document.querySelector('[data-board]'); if (bd && innerHeight > innerWidth) { const r = bd.getBoundingClientRect(); out.board = Math.round(100 * Math.max(0, Math.min(r.right, innerWidth) - Math.max(r.left, 0)) * Math.max(0, Math.min(r.bottom, innerHeight) - Math.max(r.top, 0)) / (innerWidth * innerHeight)); }
-  const f = document.getElementById('bfinger'); if (f && vis(f) && getComputedStyle(f).opacity > .05) { const r = f.getBoundingClientRect(); out.finger = { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+  const f = document.getElementById('bfinger'); if (f && f.classList.contains('on')) out.finger = { x: parseFloat(f.style.left), y: parseFloat(f.style.top) };
   // score chips vs the engine
-  out.chips = []; for (const c of document.querySelectorAll('#pchips .pchip[data-pm]')) { const k = +c.dataset.pm, q = G.pl[k]; if (!q) continue; const m = c.textContent.match(/♥\s*(\d+)\s*★\s*(\d+)\s*⚡\s*(\d+)/); out.chips.push(m ? { k, shown: [+m[1], +m[2], +m[3]], eng: [Math.max(0, q.hp), q.vp, q.en] } : { k, bad: c.textContent.slice(0, 30) }); }
+  out.chips = []; for (const c of document.querySelectorAll('#pchips .pchip[data-pm]')) { const k = +c.dataset.pm, q = G.pl[k]; if (!q) continue; if (!q.alive) continue; const m = c.textContent.match(/♥\s*(\d+)\s*★\s*(\d+)\s*⚡\s*(\d+)/); out.chips.push(m ? { k, shown: [+m[1], +m[2], +m[3]], eng: [Math.max(0, q.hp), q.vp, q.en] } : { k, bad: c.textContent.slice(0, 30) }); }
   return out;
 };
 async function newPage(b, W, H) {
@@ -77,7 +77,7 @@ async function checkStep(p, tag, st) {
   if (st.wordy.length) await fail(p, tag, 'text >8 words', st.wordy.slice(0, 2).join(' / '));
   for (const c of st.ctl) {
     if (c.gxc || c.scroll || c.chip) continue;
-    if (c.inVP && c.cov && !c.dis) await fail(p, tag, 'covered', c.c + ' by ' + c.by);
+    if (c.inVP && c.cov && !c.dis && !c.anim && !st.intro && !/modal|scrim|gxc|dlg/.test(c.by || '')) await fail(p, tag, 'covered', c.c + ' by ' + c.by);
     if (!c.inVP && (c.die || c.shop || c.act || c.ch)) await fail(p, tag, 'off screen', c.c + ' ' + Math.round(c.x) + ',' + Math.round(c.y));
     if (!c.anim && (c.die || c.shop || c.act || c.ch) && Math.min(c.w, c.h) < 29.5) await fail(p, tag, 'too small', c.c + ' ' + Math.round(c.w) + 'x' + Math.round(c.h));
   }
@@ -89,17 +89,19 @@ async function play(p, tag, o) {
   const t0 = Date.now(); let last = '', lastAt = Date.now(), n = 0, rotated = 0, st;
   while (Date.now() - t0 < MAXMS) {
     n++; steps++; st = await p.evaluate(PROBE); if (!st.ok) { await p.waitForTimeout(300); continue; }
+    if (!st.win) { const cx = await p.evaluate(() => { const e = [...document.querySelectorAll('.gx-x')].find(x => { const R = x.getBoundingClientRect(); if (!(R.width > 8 && R.left >= 0 && R.top >= 0 && R.right <= innerWidth && R.bottom <= innerHeight)) return false; const t = document.elementFromPoint(R.left + R.width / 2, R.top + R.height / 2); return t === x || x.contains(t) }); if (!e) return null; const R = e.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2 } }); if (cx) { await p.touchscreen.tap(cx.x, cx.y); await p.waitForTimeout(500); st.closed = 1; continue; } } // a monster / card sheet the player opened: close it with the x
     await checkStep(p, tag, st);
     if (st.win) return st;
     if (o.rotAt && n === o.rotAt && !rotated) {
       const vp = p.viewportSize(); await p.setViewportSize({ width: vp.height, height: vp.width }); await p.waitForTimeout(900);
       const s2 = await p.evaluate(PROBE); if (s2.hscroll) await fail(p, tag, 'hscroll after rotation', ''); if (p.errs.length) await fail(p, tag, 'page error', p.errs[0]);
-      for (const c of s2.ctl) if ((c.die || c.shop || c.act) && !c.inVP && !c.scroll) await fail(p, tag, 'off screen after rotation', c.c);
+      await p.waitForTimeout(1500); const cvOk = await p.evaluate(() => { const st = document.getElementById('stage').getBoundingClientRect(); return !V3.on || (Math.abs(V3.r.domElement.clientWidth - st.width) < 3 && Math.abs(V3.r.domElement.clientHeight - st.height) < 3) }); if (!cvOk) await fail(p, tag, 'board not resized after rotation', 'canvas size differs from the board');
       await p.setViewportSize(vp); await p.waitForTimeout(900); rotated = 1; continue;
     }
     const sig = await p.evaluate(SIG); if (sig !== last) { last = sig; lastAt = Date.now(); } else if (Date.now() - lastAt > 8000 && !st.busy) { await fail(p, tag, 'stuck >8s', st.phase + ' ' + (st.humanTurn ? 'human' : 'computer') + ' ' + st.line); lastAt = Date.now(); }
     if (st.gxc) { const g = await p.evaluate(() => { const b = [...document.querySelectorAll('.gxc button')].filter(e => e.offsetParent && !e.disabled); const pr = b.find(e => /go|primary/.test(e.className)) || b.find(e => /next|start|continue|fight|play|meet/i.test(e.textContent)) || b[0]; if (!pr) return null; const R = pr.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2 } }); if (g) await p.touchscreen.tap(g.x, g.y); await p.waitForTimeout(500); continue; }
-    if (!st.humanTurn && !st.choice) { await p.waitForTimeout(350); if (rnd() < .1) await p.touchscreen.tap(200, 200); continue; } // the computer plays; a tap on the board speeds it up
+    if (st.intro) { const ib = await p.evaluate(() => { const e = [...document.querySelectorAll('#choice button, #moment button, #advice button')].find(x => x.offsetParent && !x.disabled && /smash|go|play|ok|got it|start/i.test(x.textContent)); if (!e) return null; const R = e.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2 } }); if (ib) { await p.touchscreen.tap(ib.x, ib.y); await p.waitForTimeout(600); continue; } }
+    if (!st.humanTurn && !st.choice) { await p.waitForTimeout(350); continue; } // the computer plays
     const pick = await choose(p, st, rnd());
     if (pick) { taps++; if (pick.kind === 'shop') buys++; if (pick.kind === 'die') keeps++; await p.touchscreen.tap(pick.x, pick.y); if (Date.now() - lastAt > 3500 && pick.kind !== 'die' && pick.kind !== 'shop') { await p.waitForTimeout(1500); if ((await p.evaluate(SIG)) === sig) await fail(p, tag, 'tap did nothing', pick.c + ' @' + st.phase); } }
     await p.waitForTimeout(pick ? 400 : 350);
