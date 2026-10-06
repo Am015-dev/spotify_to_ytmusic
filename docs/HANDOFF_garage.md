@@ -91,3 +91,15 @@ TODO before review:
 - Baseline plain v87 tPlay also FAILs 4 (fra stuck 3.4 %, DRIFT hidden after rotation, 10 px "· 2 goons" text, wall hits) — `docs/shots/v87a/tPlay_v87_baseline.json`.
 - Queued after pGAR2 (coordinator): SMASH! popup must not cover the tutorial card; coupé glass ≈70 % opacity.
 - Pending replies I could not send (session_send blocked by permission policy): cars worker session_016fYfshnaT9fYnhpkcfA5WB asked whether garage wraps the car mesh root — answer: no, pGAR2 only changes brick lists (gbTeam / player-only CR_attachV) and rim geometry; it multiplies t.top/acc/han/hull ≤ +6 % per upgrade stat.
+
+## pGAR2 bug — isolated (2026-10-06 21:30, session_01LEhhDZWZUb5KQF9GsjoFVJ, stopping at coordinator's request)
+v87a is LIVE (fe8c354, beta v93 by coordinator). pGAR2 = v87b still blocked by this bug:
+- **Symptom:** Athens tPlay with Goldrausch + max upgrades (GSET=gold:3333): the player's **street car meshes are ~15× too big** while in a race (tPlay ctx "AKROPOLIS CUP"). BBOX dump (`qa_g4`, `BBOX=1` in `t/tPlayG.js`): `pl/0/0/24` merged body MeshPhysical 60×49×71 m, `pl/0/0/25` 53×19×63 m, wheels (`ud r,by`) 9.6×23×11.7 m. That explains the "empty field / camera upside-down" shots and the 153 m / 40 m bboxes (size varies run to run).
+- **Not the cause:** gold:0000 and rod:0000 in the same flow → PASS, car 4.5–4.7 m. Gold+max parked in roam (`t/bbox.js gold 3333`) → 4.6 m. Rocket/jet parts are cosmetic (no physics hooks).
+- **Lead (check first):** `CR_raceBox(s,ud)` scales the race car to fit a target size; its cache key is `(ud.gbM?ud.gbM.length:0)+'|'+(s.vmode…)`. Upgrades change the brick list (gbTeam wrapper adds parts and appends `g<levels>` to t.id). Likely the box is measured when the upgraded gb meshes are not yet built, are hidden, or are mixed with the 4×4/boat groups, giving a tiny box → huge scale; or the key collides with the stock layout. Read CR_raceBox, log the box and scale for gold:3333 vs gold:0000, and fix it in gar2.js (e.g. a wrapper that measures only visible street gbM meshes, or bake upgrades before raceBox runs). Don't edit CR_raceBox in place: the cars worker owns race code. Tell them if a change there is needed.
+- **Repro, about 15 min:** `BBOX=1 MIN=0.3 NOROT=1 CITIES=ath GSET=gold:3333 MODE=phone node t/tPlayG.js http://127.0.0.1:8766/dev2/local_dbg.html qa_x`. dev2 is built with `./reapply.sh pGAR1b.py pGAR2.py` on live. Rebuild base.html from live fe8c354 first: v87a is live, so pGAR1b is already in base. Apply **only pGAR2.py**, and change its changelog anchor/entry if needed.
+- **After the fix:**
+  - rerun gold:3333 tPlay (Athens) and tyreG;
+  - rerun `t/gate.js` on the stacked build (spots `{"offroad":[-389.5,481.4],"boat":[-417.9,-226.9]}`);
+  - REVIEW, then send the coordinator "DEPLOY alex/od-garage <commit> out/v87b <msg>" (workers never run deploy.sh).
+- **Then the 2 nits from the coordinator:** the SMASH! popup must not cover the tutorial card; coupé glass at about 70 % opacity.
