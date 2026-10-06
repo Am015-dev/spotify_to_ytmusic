@@ -107,10 +107,11 @@ async function playGame(b, W, H, variant, tag, opt) {
 async function playChapter(b, W, H, id, tag) {
   const p = await newPage(b, W, H);
   try {
-    await p.evaluate(() => { UI.speed = 30; try { localStorage.clear(); } catch (e) { } });
+    await p.evaluate(i => { const ch = {}; for (const c of window.CAMPAIGN.chapters) { if (c.id === i) break; ch[c.id] = { beaten: true, stars: 1, best: null, tries: 1, losses: 0, easy: false }; } localStorage.setItem('gns-campaign-rampart', JSON.stringify({ v: 1, ch, unlocked: [], last: null })); }, id);
+    await p.reload(); await sleep(400); await p.evaluate(() => { UI.speed = 30; });
     await p.evaluate(i => { showStart(); GXC.open(); setTimeout(() => GXC.play(i), 50); }, id); await sleep(500);
     // skip scenes and boss cards until the board is up
-    for (let i = 0; i < 12; i++) { const hasG = await p.evaluate(() => typeof G !== 'undefined' && !!G && !!G.cur && !document.querySelector('.gxc.on,.gxc[class*=on]') ); if (hasG && await p.evaluate(() => !document.querySelector('.gxc'))) break; const t = await p.evaluate(() => { const bs = [...document.querySelectorAll('.gxc button')].filter(e => e.offsetWidth > 0); const r = bs.find(e => /^(skip|play|let.?s go|start|go|begin|next|continue|ok)/i.test(e.textContent.trim())) || bs.find(e => e.classList.contains('go')); if (!r) return null; const q = r.getBoundingClientRect(); return { x: q.left + q.width / 2, y: q.top + q.height / 2, t: r.textContent }; }); if (!t) { await sleep(300); continue; } await tapAt(p, t.x, t.y); await sleep(450); }
+    for (let i = 0; i < 12; i++) { const hasG = await p.evaluate(() => typeof G !== 'undefined' && !!G && !!G.cur && !document.querySelector('.gxc.on,.gxc[class*=on]') ); if (hasG && await p.evaluate(() => !document.querySelector('.gxc'))) break; const t = await p.evaluate(() => { const bs = [...document.querySelectorAll('.gxc button')].filter(e => e.offsetWidth > 0); const r = bs.find(e => e.classList.contains('go')) || bs.find(e => /^(skip|play|let.?s go|start|go|begin|next|continue|ok|meet|face|fight|accept)/i.test(e.textContent.trim())) || bs.find(e => /skip/i.test(e.textContent)); if (!r) return null; const q = r.getBoundingClientRect(); return { x: q.left + q.width / 2, y: q.top + q.height / 2, t: r.textContent }; }); if (!t) { await sleep(300); continue; } await tapAt(p, t.x, t.y); await sleep(450); }
     const info = await p.evaluate(() => ({ camp: UI.camp && UI.camp.id, np: G.pl.length, lv: G.pl.map(q => q.lv), sc: G.pl.map(q => q.score), sup: G.pl.map(q => q.sup.f), first: G.cur.p, hints: UI.camp && UI.camp.hints, human: G.pl.map(q => q.human) }));
     console.log('  chapter', id, JSON.stringify(info));
     let lastSig = '', lastT = Date.now();
@@ -140,13 +141,13 @@ async function winRates(b) {
       for (let g = 0; g < n; g++) {
         DEFSEED = 1000 + g; newGame({ np: 2, seats: ['human', 'ai'], lv: ['normal', camp.opponent.aiLevel], ex: camp.setup.ex }); DEFSEED = null;
         let guard = 0; while (!G.over && guard++ < 400) { const s = sideToAct(), me = P(s).human; let mv;
-          if (!me) mv = aiMove(s); else { const lvl = style === 'hint' ? (rnd(100) < 50 ? 'normal' : 'easy') : style; if (G.step === 'place') { const pl = aiPlan(s, lvl); AIPLAN = { turn: G.turn, p: s, plan: pl }; mv = pl.place; } else mv = (AIPLAN && AIPLAN.turn === G.turn && AIPLAN.p === s) ? AIPLAN.plan.fig : bestFigNow(s, lvl); }
+          if (!me) mv = aiMove(s); else { const lvl = rnd(100) < style * 100 ? 'normal' : 'easy'; if (G.step === 'place') { const pl = aiPlan(s, lvl); AIPLAN = { turn: G.turn, p: s, plan: pl }; mv = pl.place; } else mv = (AIPLAN && AIPLAN.turn === G.turn && AIPLAN.p === s) ? AIPLAN.plan.fig : bestFigNow(s, lvl); }
           if (!mv || !performMove(mv, s).success) break; }
         if (G.over) { const w = G.over.win; if (w.length === 1 && w[0] === 0) wins++; else if (w.length > 1) ties++; sc[0] += G.pl[0].score; sc[1] += G.pl[1].score; } }
       return { wins: wins / n, ties: ties / n, avg: sc.map(x => Math.round(x / n)) }; };
-    for (const st of ['hint', 'normal', 'easy']) out[st] = run(st);
+    for (const st of (window.__P || [0, .15, .3, .5, 1])) out['follows hint ' + Math.round(st * 100) + '%'] = run(st);
     return out; }, C1N);
-  console.log('Chapter 1 simulated win rates (' + C1N + ' games each; hint = half normal / half easy, normal, easy):', JSON.stringify(r));
+  console.log('Chapter 1 simulated win rates (' + C1N + ' games each; a newcomer who follows the ghost finger X% of turns and otherwise plays like the easy computer):', JSON.stringify(r));
   await p.context().close(); return r;
 }
 (async () => {

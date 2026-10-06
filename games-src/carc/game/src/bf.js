@@ -39,8 +39,8 @@ function renderTiles(){const w=$('#world');
   for(const k in UI.tl)if(!G.tiles[k]){UI.tl[k].remove();delete UI.tl[k]}
   const lastK=G.step==='fig'&&G.cur?G.cur.k:G.order[G.order.length-1];
   for(const k of G.order){const T=G.tiles[k];let e=UI.tl[k];const [x,y]=unkey(k);
-    if(!e){e=document.createElement('div');e.className='tl';e.style.left=x*100+'px';e.style.top=y*100+'px';e.innerHTML=tileSvg(T.t,T.r);if(UI.seenInit)e.classList.add('drop');w.appendChild(e);UI.tl[k]=e}
-    e.classList.toggle('last',k===lastK&&G.order.length>1);if(k===lastK){const who=G.cur?G.cur.p:0;e.style.setProperty('--pc',PCOL[who])}}
+    if(!e){e=document.createElement('div');e.className='tl';e.style.left=x*100+'px';e.style.top=y*100+'px';e.innerHTML=tileSvg(T.t,T.r);if(G.order.length>1&&G.cur)e.style.setProperty('--pc',PCOL[G.cur.p]);if(UI.seenInit)e.classList.add('drop');w.appendChild(e);UI.tl[k]=e}
+    e.classList.toggle('last',k===lastK&&G.order.length>1)}
   UI.seenInit=true}
 function renderGlows(){const w=$('#world');for(const e of w.querySelectorAll('.glow'))e.remove();
   document.getElementById('gp').innerHTML='';
