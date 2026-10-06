@@ -9,4 +9,6 @@ for k,h in [("id:'gleis',name:'GLEISFELD',kind:'pit',at:[-1110,300],half:",40),(
     if k+'32,' not in s: RR(k+'%d,'%h,k+'32,')
 RR("{id:'main',name:'MAIN',kind:'river',xmin:0,xmax:9e9,","{id:'main',name:'MAIN',kind:'river',xmin:0,xmax:9e9,jw:70,")
 RR("if(a>=0)J.push({...js,s0:a*ds,s1:bb*ds,floor:-6.5})","if(a>=0){let s0=a*ds,s1=bb*ds;if(js.jw&&s1-s0>js.jw){const c=(s0+s1)/2;s0=c-js.jw/2;s1=c+js.jw/2}J.push({...js,s0,s1,floor:-6.5})}")
+# race traffic contact patch: the car footprint ×1.1/×1.05 instead of a 1.45×1.2 blob
+RR("_s2.set(c.wid*1.45,1,c.len*1.2)","_s2.set(c.wid*1.1,1,c.len*1.05)")
 save()
