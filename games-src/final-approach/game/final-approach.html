@@ -508,6 +508,8 @@ html.ph.ph-l #acts .btn,html.ph.ph-l #acts .btn.go{flex:1 1 100%}
 html.ph.ph-l .hudc span:not(.rtleft){display:none}.hudc{overflow:hidden}
 @media (max-height:650px){html.ph.ph-p #promptDock{height:28px}html.ph.ph-p #prompt{line-height:28px}}
 html.ph.ph-p .gx-dock-body{gap:0!important;padding-top:0!important;padding-bottom:0!important}
+/* help kit: the coach bubbles of the busiest phases keep their Got it beside the text, so they stay short enough to fit between the glowing spaces */
+.gxh-bub[data-phase=space],.gxh-bub[data-phase=die],.gxh-bub[data-phase=token]{display:flex;align-items:center;gap:8px}.gxh-bub[data-phase=space] .gxh-row2,.gxh-bub[data-phase=die] .gxh-row2,.gxh-bub[data-phase=token] .gxh-row2{margin:0}
 </style><style>
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
