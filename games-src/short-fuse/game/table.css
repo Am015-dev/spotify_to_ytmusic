@@ -19,7 +19,7 @@
 .fz{display:flex;align-items:center;gap:5px;height:30px}
 .fz .lit{display:grid;place-items:center;color:#ffc928;width:18px;height:18px;flex:none}
 .fz .lit svg{width:18px;height:18px}
-.rp{position:relative;flex:1;display:flex;gap:3px;height:13px;min-width:0}
+.rp{position:relative;flex:1;display:flex;gap:3px;height:15px;min-width:0}
 .rp i{flex:1;height:100%;border-radius:5px;background:repeating-linear-gradient(60deg,#d99a5b 0 3px,#a8652b 3px 6px);border:1.5px solid #4a2a14;box-sizing:border-box;transition:background .4s}
 .rp i.ash{background:#2b2630;border-color:#15121a;opacity:.9}
 .rp i.next{box-shadow:0 0 6px 1px rgba(255,160,40,.6)}
@@ -32,7 +32,7 @@
 @keyframes flick{from{transform:scale(.8) rotate(-8deg)}to{transform:scale(1.15) rotate(8deg)}}
 @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
 @keyframes burn{0%{background:#fff;transform:scaleY(1.7)}100%{transform:none}}
-.trk{display:flex;gap:2px;flex:none}
+.trk{display:grid;grid-template-columns:repeat(6,13px);grid-auto-rows:13px;gap:2px;flex:none}
 .cn12{width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.35);font:700 7px/10px var(--fb);color:#d9e8f2;text-align:center;box-sizing:border-box;font-style:normal;display:block}
 .cn12.done{background:#52c23a;border-color:#1b6a15;color:#fff}
 .cn12.flipc{animation:flipc .8s}
@@ -50,7 +50,7 @@
 #gear:empty{display:none}
 .eqk{position:relative;width:54px;height:58px;border-radius:9px;border:2px solid #14163a;background:linear-gradient(#4a50a6,#2b2f63);color:#fff;display:flex;align-items:flex-end;justify-content:center;padding:2px 2px 3px;box-sizing:border-box;cursor:pointer;font:inherit;box-shadow:0 2px 0 rgba(0,0,0,.45)}
 .eqk b{position:absolute;left:-5px;top:-6px;width:22px;height:22px;border-radius:50%;background:#ff8a1f;border:2px solid #14163a;font:.85rem/18px var(--fd);text-align:center;color:#fff;text-shadow:0 1px 0 #14163a}
-.eqk .en{font:800 9.5px/1.05 var(--fb);text-align:center;max-height:2.2em;overflow:hidden}
+.eqk .en{font:800 9px/1.05 var(--fb);letter-spacing:-.2px;text-align:center;max-height:2.2em;overflow:hidden;max-width:100%}
 .eqk.locked{filter:saturate(.45) brightness(.8)}
 .eqk.locked .en{opacity:.85;margin-bottom:11px}
 .eqk .lkc{position:absolute;right:2px;top:2px;opacity:.9}.eqk .lkc svg{width:13px;height:13px}
@@ -127,7 +127,7 @@ button.plate{cursor:pointer;font-family:inherit}
 .eqk.glow{box-shadow:0 0 0 3px #7be8ff,0 0 14px 4px rgba(123,232,255,.85)}
 @keyframes gl{from{filter:brightness(1)}to{filter:brightness(1.22)}}
 /* the tray: answers that are not wires */
-#tray{flex:none;display:none;flex-wrap:wrap;justify-content:center;gap:8px;padding:6px 8px;background:rgba(10,20,30,.55);border-top:2px solid rgba(255,255,255,.12)}
+#tray{flex:none;max-height:34vh;overflow-y:auto;display:none;flex-wrap:wrap;justify-content:center;gap:8px;padding:6px 8px;background:rgba(10,20,30,.55);border-top:2px solid rgba(255,255,255,.12)}
 #tray.on{display:flex}
 .chip{appearance:none;-webkit-appearance:none;min-height:44px;padding:4px 14px;border-radius:14px;border:2.5px solid #14163a;background:linear-gradient(#fff,#ffe9b8);color:#14163a;font:800 .95rem var(--fb);box-shadow:0 3px 0 #14163a;cursor:pointer;max-width:100%}
 .chip.x{min-width:44px;padding:4px 10px;background:#ffd9d4}
@@ -211,7 +211,7 @@ button.plate{cursor:pointer;font-family:inherit}
 #tb.land #mine{--tw:44px}
 
 #mine .mh{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:nowrap}
-.chip.sm{min-height:34px;padding:2px 10px;font-size:.82rem;border-radius:11px;border-width:2px;box-shadow:0 2px 0 #14163a}
+.chip.sm{min-height:36px;padding:2px 11px;font-size:.88rem;border-radius:11px;border-width:2px;box-shadow:0 2px 0 #14163a}
 
 html.short #strip{height:36px;padding:2px 8px}
 html.short .fz{height:24px}
@@ -223,3 +223,13 @@ html.short .eqk b{width:19px;height:19px;font-size:.75rem;line-height:15px}
 html.short .jc{min-height:28px}
 html.short .nc{height:24px;min-width:18px}
 #crew{overflow-y:auto;overflow-x:hidden;scrollbar-width:none}
+
+#gear.mini{gap:4px}
+#gear.mini .eqk{width:34px;height:34px;padding:0;align-items:center}
+#gear.mini .eqk .en,#gear.mini .eqk .nd{display:none}
+#gear.mini .eqk b{position:static;border:0;background:none;width:auto;height:auto;font-size:1.05rem;line-height:1;color:#ffe066}
+#gear.mini .eqk.ready b{color:#fff}
+#gear.mini .eqk .lkc{right:1px;top:1px}#gear.mini .eqk .lkc svg{width:10px;height:10px}
+#gear.mini .jc{min-height:24px;padding:0 4px}
+#gear.mini .nc{height:22px;min-width:16px}
+#gear.mini .mkr{padding:0 3px;font-size:.7rem}

@@ -1,4 +1,4 @@
-// PHONE version (390x844 touch pages, ?2d&phone=1; humans act only through the strip / pop-up / cards / 2D board tiles). Real WebRTC test for Short Fuse: host + clients in separate Chromium contexts, local Nostr relay (port 17731). Pages use the kit's 2D board (?2d).
+// Table version (390x844 touch pages; humans act only through glowing tiles, plates, cards and chips). Real WebRTC test for Short Fuse: host + clients in separate Chromium contexts, local Nostr relay (port 17731). Pages use the kit's 2D board (?2d).
 // PW=$(npm root -g)/playwright node p2p-sf-phone.js shortfuse.html SCENARIO
 //   SCENARIO: full1 (host+1, 2 jobs) | full2 (host+2) | leave (host+2: bad actions, leave, rejoin) | hostleft | claim (job 10) | shots
 const {chromium}=require(process.env.PW);const fs=require('fs');const {spawn}=require('child_process');
@@ -7,7 +7,7 @@ const SHOTS=__dirname+'/shots/ph';try{fs.mkdirSync(SHOTS,{recursive:true})}catch
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));let b,relay;
 async function page(ctx,label,hash){const p=await ctx.newPage();p.setDefaultTimeout(150000);const errs=[];p.on('pageerror',e=>errs.push(label+' pageerror: '+e.message));
   p.on('console',m=>{if(m.type()==='error'&&!/Failed to load resource/.test(m.text()))errs.push(label+' console: '+m.text())});
-  await p.goto('https://gns.test/?2d&phone=1'+(hash||''),{waitUntil:'domcontentloaded',timeout:120000});
+  await p.goto('https://gns.test/'+(hash||''),{waitUntil:'domcontentloaded',timeout:120000});
   await p.waitForFunction(()=>typeof NET!=='undefined'&&NET.ready&&typeof UI!=='undefined'&&UI.setup,null,{timeout:120000,polling:300});return {p,ctx,label,errs}}
 async function ctxNew(w,h){const c=await b.newContext({viewport:{width:w||390,height:h||844},isMobile:true,hasTouch:true});
   await c.addInitScript(port=>{window.NETROOM_RELAYS=['ws://127.0.0.1:'+port];window.NETROOM_ICE=[];window.NET_TRACE=1;try{localStorage.setItem('sf_gfx','low')}catch(e){}},PORT);
@@ -21,21 +21,14 @@ async function setup(ncl,opt){const H=await page(await ctxNew(),'host');const C=
   await sleep(1500);const lobby=await H.p.evaluate(()=>lobbyPlayers().map(p=>p.nm));const cl=await Promise.all(C.map(c=>c.p.evaluate(()=>({open:UI.netOpen,pl:lobbyPlayers().map(p=>p.nm),opt:!!NET.opt,hostPeer:!!NET.hostPeer}))));
   console.log('lobby after',Date.now()-t0,'ms host sees',JSON.stringify(lobby),'clients see',JSON.stringify(cl));return {H,C,code}}
 const startHost=H=>H.p.evaluate(()=>document.querySelector('[data-a=netstart]').click());
-// one random touch-style click through the PHONE UI only: strip (#ps), pop-up (#ppop), cards (#pc) and the 2D board tiles
-const tick=()=>{if(!G||G.over||!UI.started)return 0;const d=document,rnd=a=>a[Math.floor(Math.random()*a.length)],R=Math.random,q=s=>[...d.querySelectorAll(s)].filter(b=>!b.disabled&&!b.closest('[hidden]'));const click=el=>{el.dispatchEvent(new MouseEvent('click',{bubbles:true}));return 1};
-  const kind=PX.card&&PX.card.kind;
-  if(kind){if(kind==='brief'){const b=q('#pc [data-a=briefok]');if(b.length)return click(b[0])}
-    if(kind==='q'){const qs=q('#pc [data-a=q]');const tiles=[...d.querySelectorAll('#fb .sf2d-hl')];if(tiles.length&&R()<.5)return click(rnd(tiles));if(qs.length)return click(rnd(qs))}
-    if(kind==='res'){const b=q('#pc [data-ph=resok]');if(b.length)return click(b[0])}
-    if(kind==='coach'){const b=q('#pc [data-a=coach]');if(b.length)return click(b[0])}
-    if(kind==='over')return 0}
-  const pop=d.querySelector('#ppop:not([hidden])');const tiles=[...d.querySelectorAll('#fb .sf2d-hl')];
-  if(pop){const par=q('#ppop [data-a=param],#ppop [data-a=pickmove]');if(par.length)return click(rnd(par));const ch=q('#ppop [data-a=choose]');if(ch.length)return click(ch[0]);const dm=q('#ppop [data-a=domulti]');if(dm.length)return click(dm[0]);
-    if(pop.querySelector('.ph-v')){const go=q('#ppop [data-a=dual]');if(go.length&&R()<.85)return click(go[0]);const vb=q('#ppop [data-a=v],#ppop [data-a=v2]');if(vb.length&&R()<.75)return click(rnd(vb));
-      const oth=q('#ppop [data-a=grp],#ppop [data-a=tool],#ppop [data-a=solo]');if(oth.length&&R()<.2)return click(rnd(oth));if(tiles.length)return click(rnd(tiles));const x=q('#ppop [data-ph=pclose]');if(x.length&&R()<.3)return click(x[0]);return 0}
-    const x=q('#ppop [data-ph=pclose]');if(x.length)return click(x[0]);return 0}
-  const acts=q('#ps .ps-acts [data-a]');const off=acts.filter(b=>b.dataset.a==='off');if(off.length&&R()<.6)return click(rnd(off));
-  if(UI.V&&UI.V.seat>=0&&decider()===UI.V.seat&&UI.V.legal&&!G.q){if(acts.length&&R()<.3)return click(rnd(acts));if(tiles.length)return click(rnd(tiles));const sg=q('#ps [data-a=sugg]');if(sg.length)return click(sg[0])}
+// one random click through the table UI only: glowing tiles, plates, cards and chips, the briefing and pass buttons
+const tick=()=>{if(!G||G.over||!UI.started)return 0;const d=document,rnd=a=>a[Math.floor(Math.random()*a.length)],R=Math.random,q=s=>[...d.querySelectorAll(s)].filter(b=>!b.disabled&&!b.closest('[hidden]'));const click=el=>{el.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));return 1};
+  const cv=q('#cover [data-a]');if(cv.length)return click(cv[0]);
+  const V=UI.V;const mine=V&&V.seat>=0&&(decider()===V.seat||(UI.sel&&UI.sel.off));
+  const glow=q('#tb .tile.glow,#tb .plate.glow,#tb .chip.glow,#tb .eqk.glow');
+  if(mine&&glow.length){const m=aiMove(V.seat);if(m&&R()<.8&&!legal(m,V.seat)){const t=m.a==='dual'&&!m.tool?(UI.sel&&UI.sel.tg&&UI.sel.tg.length?glow.find(e=>e.classList.contains('mine')&&+e.dataset.u&&V.stands.some(s=>s.mine&&s.slots.some(x=>x.u===+e.dataset.u&&x.v===m.v))):glow.find(e=>+e.dataset.u===G.st[m.st].w[m.ks[0]].u)):null;if(t)return click(t)}
+    return click(rnd(glow))}
+  const off=q('#tb .chip.glow');if(off.length&&R()<.3)return click(rnd(off));
   return 0};
 // hidden-information check of ONE page against the host's real state: returns a list of violations
 const hostTruth=()=>({st:G.st.map(s=>({pos:s.pos,w:s.w.map(x=>({id:x.id,cut:x.cut,flip:x.flip}))})),pos:G.pos,box:G.box.slice(),pile:G.pile.slice(),aside:G.aside.slice(),robot:G.robot?G.robot.w.slice():[],rng:G.rng,seed:G.seed,mission:G.mission,gid:G.gid});
@@ -48,11 +41,11 @@ const pageCheck=T=>{const v=NET.role==='host'?NET.mySeat:NET.mySeat;const out=[]
       for(const [si,s] of T.st.entries())if(g.st[si]&&g.st[si].w.length===s.w.length)for(const [k,sl] of s.w.entries()){const seat=o.seat;const own=seat>=0&&g.pos[seat]===g.st[si].pos;const seen=g.st[si].w[k].cut||(seat>=0&&((own&&!g.st[si].w[k].flip)||(!own&&g.st[si].w[k].flip)));if(!seen&&g.st[si].w[k].id!==0)out.push('trace: hidden id in a packet (seat '+o.seat+' st '+si+' w '+k+' id '+g.st[si].w[k].id+' cut '+g.st[si].w[k].cut+' flip '+g.st[si].w[k].flip+' job '+g.mission+' red '+(typeof WIRES!=='undefined'&&WIRES[g.st[si].w[k].id]?WIRES[g.st[si].w[k].id].c:'?')+')')}
       if(g.q&&g.q.who!==o.seat&&g.q.opts&&g.q.opts.length)out.push('trace: other seat question options');if(o.seat>=0&&g.ag&&g.ag.length)out.push('trace: agenda queue')}}
   // the DOM board: no uncut wire the viewer may not see is drawn face up (host and clients)
-  for(const el of document.querySelectorAll('#fb .sf2d-t')){const p=JSON.parse(el.getAttribute('data-sf'));const u=+String(p.id).replace(/^.*u/,'');const f=findU(u);if(!f||f.sl.cut)continue;const own=ownerOf(f.s);const may=v>=0&&((own===v&&!f.sl.flip)||(own!==v&&f.sl.flip));if(!may&&(!el.classList.contains('back')||p.value!=null))out.push('dom: wire of seat '+own+' shown')}
+  for(const el of document.querySelectorAll('#tb .tile')){const u=+el.dataset.u;const f=findU(u);if(!f||f.sl.cut)continue;const own=ownerOf(f.s);const may=v>=0&&((own===v&&!f.sl.flip)||(own!==v&&f.sl.flip));if(!may&&(!el.classList.contains('back')||(el.querySelector('.f')||{}).textContent))out.push('dom: wire of seat '+own+' shown')}
   if(NET.role==='client'&&NET.trace&&NET.trace.length>40)NET.trace=NET.trace.slice(-20);return out};
 async function play(P,H,secs,hook){let clicks=0,remoteClicks=0,checks=0;const viol=[];const t0=Date.now();let n=0,lastK='',lastT=Date.now();
   while(Date.now()-t0<secs*1000){const g=await H.p.evaluate(()=>G&&{over:!!G.over,turn:G.turn,k:G.logN+'/'+G.phase+'/'+sideToAct()+'/'+G.clock}).catch(()=>null);if(!g||g.over)break;
-    if(g.k!==lastK){lastK=g.k;lastT=Date.now()}else if(Date.now()-lastT>40000){lastT=Date.now();const v=await Promise.all(P.filter(x=>!x.dead).map(x=>x.p.evaluate(()=>({seat:NET.mySeat,k:G&&G.logN+'/'+sideToAct(),main:document.getElementById('main').textContent.slice(0,80),rx:NET.rx,bad:NET.bad,badE:NET.badE,rej:NET.rejected,hp:NET.hostPeer,peers:NET.peers.length})).catch(e=>String(e))));console.log('STALL?',JSON.stringify(g),JSON.stringify(v))}
+    if(g.k!==lastK){lastK=g.k;lastT=Date.now()}else if(Date.now()-lastT>40000){lastT=Date.now();const v=await Promise.all(P.filter(x=>!x.dead).map(x=>x.p.evaluate(()=>({seat:NET.mySeat,k:G&&G.logN+'/'+sideToAct(),main:document.getElementById('say').textContent,rx:NET.rx,bad:NET.bad,badE:NET.badE,rej:NET.rejected,hp:NET.hostPeer,peers:NET.peers.length})).catch(e=>String(e))));console.log('STALL?',JSON.stringify(g),JSON.stringify(v))}
     for(const x of P){if(x.dead||global.FREEZE)continue;const k=await x.p.evaluate(tick).catch(e=>{x.errs.push(x.label+' tick '+e.message);return 0});clicks+=k;if(x!==H)remoteClicks+=k}
     if(++n%6===0){const T=await H.p.evaluate(hostTruth).catch(()=>null);if(T)for(const x of P){if(x.dead)continue;const o=await x.p.evaluate(pageCheck,T).catch(()=>[]);checks++;if(o.length&&viol.length<8)viol.push(x.label+': '+o.slice(0,3).join('; '))}}
     if(hook)await hook(g,n);await sleep(global.DELAY||40)}
@@ -118,7 +111,7 @@ else if(SC==='shots'){const {H,C}=await setup(2,{job:4,np:3});
   await H.p.evaluate(()=>netClose());await sleep(500);for(const [w,h] of [[1366,768],[390,844]]){await H.p.setViewportSize({width:w,height:h});await sleep(500);await H.p.screenshot({path:`${SHOTS}/net_start_inroom_${w}x${h}.png`})}
   await H.p.evaluate(()=>{UI.netOpen=true;netRender()});const P=[H,...C];await startHost(H);let shot=0;
   await play(P,H,200,async(g,n)=>{if(shot<2&&g.turn>=3&&n%10===0){for(const [w,h] of [[1366,768],[390,844]]){await C[0].p.setViewportSize({width:w,height:h});await sleep(1200);
-        const lay=await C[0].p.evaluate(()=>({sh:document.documentElement.scrollHeight,vh:innerHeight,sw:document.documentElement.scrollWidth,vw:innerWidth,seat:NET.mySeat,cur:sideToAct(),dockt:document.getElementById('dockt').textContent}));console.log('client layout',w,JSON.stringify(lay));
+        const lay=await C[0].p.evaluate(()=>({sh:document.documentElement.scrollHeight,vh:innerHeight,sw:document.documentElement.scrollWidth,vw:innerWidth,seat:NET.mySeat,cur:sideToAct(),say:document.getElementById('say').textContent}));console.log('client layout',w,JSON.stringify(lay));
         await C[0].p.screenshot({path:`${SHOTS}/net_client_${w}x${h}_${shot}.png`})}shot++}});
   console.log('errors',JSON.stringify([H,...C].flatMap(x=>x.errs).slice(0,10)))}
 }catch(e){console.log('HARNESS ERROR',e&&e.stack||e)}

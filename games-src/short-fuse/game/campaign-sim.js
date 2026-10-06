@@ -4,7 +4,7 @@
 const {load}=require('./tools/load');const C=require('../campaign.json');
 const A=process.argv.slice(2);const seeds=+A[0]||60,hl=A[1]||"easy";const TL=process.env.TL||null,NZ=+(process.env.NZ||.12);const only=A.slice(2);
 const X=load(['data.js','engine.js','ai.js']);
-function play(def,easy,g){const s=Object.assign({},def.setup,easy&&def.easier?def.easier.setup:{});const np=s.players;const seed=977*def.setup.mission+g*7919+(easy?13:0);
+function play(def,easy,g){const s=Object.assign({},def.setup,easy&&def.easier?def.easier.setup:{});const np=process.env.PL&&!easy?+process.env.PL:(process.env.EPL&&easy?+process.env.EPL:s.players);if(easy&&process.env.EL)s.level=process.env.EL;const seed=977*def.setup.mission+g*7919+(easy?13:0);
   X.setSeed(seed);X.ai.setAiSeed(seed^0x5bd1);const lv=[];for(let i=0;i<np;i++)lv[i]=i===0?hl:(TL||s.level||"normal");
   X.newGame({np,mission:s.mission,mode:'ai',level:s.level||'normal',lv,twist:easy?null:def.twist,captain:g%np});
   let k=0,a=seed>>>0;const rnd=()=>{a=(a+0x6D2B79F5)|0;let t=Math.imul(a^a>>>15,a|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296};

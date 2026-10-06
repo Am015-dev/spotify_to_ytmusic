@@ -15,7 +15,7 @@ function glowInfo(V){const g={u:new Map(),plates:new Set()};
     for(const o of q.opts){const d=o.d||{};if(d.u!=null)add(d.u,'opt');else if(d.st!=null&&d.k!=null)addSK(d.st,d.k,'opt')}return g}
   if(sel&&sel.mode==='choose'){const step=nextStep(sel);if(step&&step.board){for(const m of selRemaining(sel))addSK(m[step.board[0]],m[step.board[1]],'tgt')}
     else if(step&&(step.key==='who'||step.key==='to'||step.key==='next')){for(const m of selRemaining(sel)){const v=m[step.key];(Array.isArray(v)?v:[v]).forEach(s=>g.plates.add(s))}}
-    for(const t of sel.picked||[])addSK(t.s,t.k,'tgt');return g}
+    for(const t of sel.picked||[]){const sl=G.st[t.s]&&G.st[t.s].w[t.k];if(sl)g.u.set(sl.u,'sel')}return g}
   if(sel&&sel.mode==='multi'){for(const st of V.stands)st.slots.forEach(x=>{if(!x.cut)add(x.u,'tgt')});return g}
   if(!L)return g;
   const own=V.stands.filter(st=>st.mine);const mineSlots=[];own.forEach(st=>st.slots.forEach((x,k)=>mineSlots.push({st:st.i,k,x})));
@@ -89,7 +89,7 @@ function gearHTML(V){let h='';
   return h}
 // ---------- the tray: answers that are not wires ----------
 function shortOpt(l){let s=String(l||'');s=s.replace(/^Take /,'').replace(/ - .*$/,'').replace(/\s*\(.*\)\s*$/,'');const w=s.split(/\s+/);return w.length>6?w.slice(0,6).join(' ')+'…':s}
-function chipLabelOpt(o,q){const d=o.d||{};if(q.kind==='draftCon'&&d.c&&CONSTRAINTS[d.c])return d.c+' '+CONSTRAINTS[d.c].n;return shortOpt(nice(o.l,UI.V))}
+function chipLabelOpt(o,q){const d=o.d||{};let m=/hold no (\w+)/.exec(o.l||'');if(m)return 'No '+m[1];m=/^Give token (\w+) to (.+)$/.exec(o.l||'');if(m)return m[1]+' to '+m[2];m=/^(?:Token|Take|Lay a token for|Place)\s+(\w+)$/.exec(o.l||'');if(m)return m[1];if(q.kind==='draftCon'&&d.c&&CONSTRAINTS[d.c])return d.c+' '+CONSTRAINTS[d.c].n;return shortOpt(nice(o.l,UI.V))}
 function trayItems(V){const items=[];const me=V.seat;if(me<0||G.over||UI.brief||passTo()>=0)return items;const sel=UI.sel;const L=V.legal;
   const grp=(moves,off)=>{const gs={};for(const m of moves){const k=moveKey(m);(gs[k]=gs[k]||[]).push(m)}return Object.keys(gs).map(k=>({k,ms:gs[k],off}))};
   if(V.q&&V.q.who===me&&V.q.opts){const q=V.q;if(q.kind==='designate')return items;
@@ -97,9 +97,9 @@ function trayItems(V){const items=[];const me=V.seat;if(me<0||G.over||UI.brief||
   if(sel&&sel.mode==='choose'){const step=nextStep(sel);const rem=selRemaining(sel);const m0=sel.opts[0];
     if(step&&step.key&&!(step.key==='who'||step.key==='to'||step.key==='next')){const vals=[...new Set(rem.map(m=>JSON.stringify(m[step.key])))].map(x=>JSON.parse(x));vals.forEach(v=>items.push({t:'param',key:step.key,v,label:paramLabel(step.key,v,m0,V)}))}
     else if(!step&&rem.length>1)rem.forEach((m,i)=>items.push({t:'pick',i,label:shortOpt(nice(describeMove(m),V))}));
-    items.push({t:'cancel',label:'✕'});return items}
-  if(sel&&sel.mode==='multi'){items.push({t:'cancel',label:'✕'});return items}
-  if(sel&&sel.mode==='flipown'){items.push({t:'cancel',label:'✕'});return items}
+    items.push({t:'cancel',label:'✕',mine:1});return items}
+  if(sel&&sel.mode==='multi'){items.push({t:'cancel',label:'✕',mine:1});return items}
+  if(sel&&sel.mode==='flipown'){items.push({t:'cancel',label:'✕',mine:1});return items}
   if(L&&decider()===me){
     for(const m of L.special)items.push({t:'multi',kind:m.kind,n:m.tg.length,label:multiName(m.kind)});
     for(const g of grp(L.other.filter(m=>m.a!=='reveal'&&m.a!=='eq'&&!(noGear()&&m.a==='item')),false))items.push({t:'grp',k:g.k,label:keyName(g.ms[0])});
@@ -112,7 +112,7 @@ function trayItems(V){const items=[];const me=V.seat;if(me<0||G.over||UI.brief||
   if(!L||decider()!==me){let any=[];try{any=validMoves(me).filter(m=>m.a==='item')}catch(e){}for(const g of grp(any,true))if(!noGear())items.push({t:'grp',k:g.k,off:true,label:keyName(g.ms[0])})}
   else{let any=[];try{any=L.other.filter(m=>m.a==='item')}catch(e){}}
   return items}
-function trayHTML(V,items,mineSide){return items.map((it,n)=>{if(!!it.mine!==!!mineSide)return '';const cls='chip'+(mineSide?' sm':'')+(it.t==='cancel'?' x':'')+(it.on?' on':'')+(it.go?' go':'')+(it.t==='q'||it.t==='param'||it.t==='pick'||it.t==='off'||it.t==='grp'||it.t==='multi'?' glow g-chip':'');
+function trayHTML(V,items,mineSide){return items.map((it,n)=>{if(!!it.mine!==!!mineSide)return '';const cls='chip'+(mineSide||items.filter(i=>!i.mine).length>3?' sm':'')+(it.t==='cancel'?' x':'')+(it.on?' on':'')+(it.go?' go':'')+(it.t==='q'||it.t==='param'||it.t==='pick'||it.t==='off'||it.t==='grp'||it.t==='multi'?' glow g-chip':'');
   return `<button class="${cls}" data-chip="${n}">${esc(it.label)}</button>`}).join('')}
 // ---------- the status line (8 words or fewer) ----------
 function sayText(V){if(!G)return '';if(G.over)return G.over.win?'Defused!':'BOOM!';if(UI.brief)return 'Ready?';const p=passTo();if(p>=0)return 'Pass the phone';
@@ -156,7 +156,7 @@ function renderTable(V){if(!G)return;const tb=document.getElementById('tb');if(!
 function fitSize(counts,W,H,o){const g=o.gap;const ratio=o.ratio;let best=null;
   for(let tw=o.max;tw>=o.min;tw--){const cols=Math.max(1,Math.floor((W+g)/(tw+g)));const th=Math.round(tw*ratio);let h=0,rows=0;
     for(const grp of counts){h+=o.plate+o.seatGap;for(const n of grp){const r=Math.ceil(Math.max(1,n)/cols);rows+=r;h+=r*(th+g)}}
-    if(h<=H+1&&(!best||rows<best.rows))best={tw,rows}}
+    if(h>H+1)continue;if(!best)best={tw,rows};else if(tw>=best.tw-4&&rows<best.rows)best={tw,rows}}
   return best?best.tw:o.min}
 function balance(root,tw,g){root.querySelectorAll('.stand').forEach(st=>{const n=st.querySelectorAll('.tile').length;const side=st.querySelector('.side');const W=st.parentNode.clientWidth||st.clientWidth;const maxc=Math.max(1,Math.floor((W+g)/(tw+g)));const rows=Math.ceil(n/maxc);const cols=Math.max(1,Math.ceil(n/Math.max(1,rows)));st.style.maxWidth=(cols*(tw+g)+(side?44:0))+'px'})}
 function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;const W=tb.clientWidth,H=tb.clientHeight;if(W<50||H<50)return;
@@ -180,6 +180,8 @@ function layoutTable(){const tb=document.getElementById('tb');if(!tb||!G)return;
   const used=used0+(ms.length?mine.offsetHeight:0);
   const ch=Math.max(40,H-used-gh);t1=crewFit(ch);
   for(let i=0;i<24;i++){crew.style.setProperty('--tw',t1+'px');crew.style.setProperty('--th',Math.round(t1*1.3)+'px');balance(crew,t1,3);if(crew.scrollHeight<=crew.clientHeight+1||t1<=22)break;t1-=1}
+  if(t1<30&&!gear.classList.contains('mini')&&gear.offsetHeight>30&&!TBL.relaid){TBL.relaid=1;gear.classList.add('mini');layoutTable();TBL.relaid=0;return}
+  if(t1>=34&&gear.classList.contains('mini')&&!TBL.relaid&&!window.TBL_FORCEMINI){TBL.relaid=1;gear.classList.remove('mini');layoutTable();TBL.relaid=0;return}
   crew.classList.toggle('tn',t1<30);mine.classList.toggle('tn',tm<30);
   TBL.lay={W,H,tw:t1,tm};
   placeGhost(UI.V)}
@@ -268,7 +270,8 @@ function onMine(si,k){const V=UI.V;const sl=G.st[si].w[k];const me=V.seat;
   const ok=L.plain.some(m=>m.v===v);if(!ok){toast('Nobody to point at');return}
   UI.sel=Object.assign(sel&&sel.mode==='dual'?sel:{mode:'dual',tool:null,tg:[],v:null,v2:null,two:null,fu:null},{v});sfx('select');refresh()}
 // the crew wires: onTile (ui.js) sets the target; a number picked first fires here
-function afterTile(){const V=UI.V;if(UI.sel&&UI.sel.mode==='dual')autoFire();else if(UI.sel&&UI.sel.mode==='choose'&&V&&!nextStep(UI.sel)){const rem=selRemaining(UI.sel);if(rem.length===1)act(rem[0],V.seat)}}
+function afterTile(){const V=UI.V;if(UI.sel&&UI.sel.mode==='multi'&&UI.sel.tg.length===UI.sel.n){const m={a:'multi',kind:UI.sel.kind,tg:UI.sel.tg};const err=legal(m,V.seat);if(err){toast(err);UI.sel.tg.pop();refresh();return}act(m,V.seat);return}
+  if(UI.sel&&UI.sel.mode==='dual')autoFire();else if(UI.sel&&UI.sel.mode==='choose'&&V&&!nextStep(UI.sel)){const rem=selRemaining(UI.sel);if(rem.length===1)act(rem[0],V.seat)}}
 document.addEventListener('click',e=>{const t=e.target.closest('#tb .tile.glow,#tb .tile.sel,#tb .plate.glow,#tb .chip,#tb .eqk.glow');if(!t){const tb=e.target.closest('#tb');if(tb&&UI.sel&&!e.target.closest('.tile,.chip,.plate,.eqk,button')&&G&&!G.over&&UI.sel.mode!=='choose'){UI.sel=null;refresh()}return}
   if(TBL.dragEnded&&Date.now()-TBL.dragEnded<300){return}
   if(t.classList.contains('tile')){const si=+t.dataset.s,k=+t.dataset.k;if(UI.sel&&UI.sel.mode==='dual'&&!UI.sel.v&&t.classList.contains('sel')&&t.classList.contains('crew')&&UI.sel.tg.length===1&&!UI.sel.tool){UI.sel=null;refresh();return}tapTile(si,k);afterTile();return}

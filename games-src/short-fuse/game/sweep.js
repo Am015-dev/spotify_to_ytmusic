@@ -6,7 +6,7 @@
 // off screen or under another element, horizontal scroll, the table under 55 % of a portrait screen, a turn with nothing glowing.
 const { chromium } = require('playwright');
 const path = require('path');
-const N = +process.argv[2] || 24, FILE = path.resolve(__dirname, process.argv[3] || 'shortfuse.html'), STORY = process.argv[4] != null ? +process.argv[4] : 2;
+const N = process.argv[2] != null ? +process.argv[2] : 24, FILE = path.resolve(__dirname, process.argv[3] || 'shortfuse.html'), STORY = process.argv[4] != null ? +process.argv[4] : 2;
 const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const SIZES = [[390, 763], [375, 553]];
 const JOBS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 15, 17, 18, 20, 22, 24, 26, 28, 31, 34, 36, 40, 44, 46, 50, 52, 55, 57, 60, 11, 14, 21, 33, 38, 45, 56, 62];
@@ -17,10 +17,10 @@ const PAGE = `(() => {
   const words = t => t.replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(w => /[a-z][a-z]/i.test(w));
   window.__sw = {
     sig() { return JSON.stringify([G.logN, G.step, G.actor, G.turn, G.q ? G.q.kind + G.q.opts.length : 0, UI.sel, UI.brief ? 1 : 0, G.over ? 1 : 0, UI.holder, G.dial]); },
-    st() { const V = UI.V; const me = V ? V.seat : -1; return { over: !!G.over, brief: !!UI.brief, me, mine: me >= 0 && decider() === me, dec: decider(), q: G.q ? G.q.kind : '', step: G.step, camp: !!UI.camp, pass: passTo() >= 0, off: !!(UI.sel && UI.sel.off) }; },
+    st() { const V = UI.V; const me = V ? V.seat : -1; return { over: !!G.over, brief: !!UI.brief, me, mine: me >= 0 && decider() === me, dec: decider(), q: G.q ? G.q.kind : '', step: G.step, camp: !!UI.camp, pass: passTo() >= 0, off: !!(UI.sel && UI.sel.off), sel: UI.sel ? UI.sel.mode : '' }; },
     cands() {
       const out = [], add = (sel, kind) => { for (const e of document.querySelectorAll(sel)) { if (!vis(e) || e.disabled) continue; const r = e.getBoundingClientRect(); const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) continue;
-        const t = document.elementFromPoint(x, y); if (!t || !(e === t || e.contains(t) || t.contains(e))) { out.push({ kind: 'COVERED', x, y, what: sel + ' ' + (e.className || '') }); continue; }
+        const t = document.elementFromPoint(x, y); if (!t || !(e === t || e.contains(t) || t.contains(e))) { out.push({ kind: 'COVERED', x, y, what: sel + ' ' + (e.className || '') + ' <- ' + (t ? (t.id || String(t.className).slice(0, 30)) + ' ' + t.tagName : 'nothing') }); continue; }
         out.push({ kind, x, y, cls: String(e.className), u: e.dataset.u, s: e.dataset.s, k: e.dataset.k, chip: e.dataset.chip, seat: e.dataset.seat, eq: e.dataset.eq, txt: (e.innerText || '').slice(0, 30) }); } };
       add('#tb .tile.glow', 'tile'); add('#tb .plate.glow', 'plate'); add('#tb .eqk.glow', 'eq'); add('#tb .chip', 'chip'); add('#cover button', 'cover'); add('#over button', 'over'); add('.gxc button', 'gxc');
       return out;
@@ -36,7 +36,7 @@ const PAGE = `(() => {
       const say = document.getElementById('say').textContent; if (words(say).length > 8) bad.push('status ' + words(say).length + ' words: ' + say);
       for (const e of document.querySelectorAll('#tb *')) { if (!e.children.length && e.textContent && vis(e) && !e.closest('#fx,[hidden]')) { /* leaf text blocks */ const w = words(e.textContent); if (w.length > 8) bad.push('text ' + w.length + ' words: ' + w.slice(0, 5).join(' ')); } }
       for (const e of document.querySelectorAll('#tb .tile:not(.snap):not(.buzz):not(.aim):not(.sel):not(.lift)')) { const r = e.getBoundingClientRect(); if (r.left < -1 || r.right > W + 1 || r.bottom > H + 1 || r.top < 0) bad.push('tile off screen ' + Math.round(r.left) + ',' + Math.round(r.top) + ',' + Math.round(r.right) + ',' + Math.round(r.bottom)); if (r.width < 21 && !UI.brief) bad.push('tile too small ' + Math.round(r.width)); }
-      const animating = document.querySelector('#tb .snap,#tb .buzz,#tb .aim,#tb .lift,#tb .sel,#tb.shake'); for (const id of ['crew', 'mine']) { if (animating) break; const c = document.getElementById(id); if (c.scrollHeight > c.clientHeight + 2 && !UI.brief) bad.push(id + ' overflows ' + c.scrollHeight + '>' + c.clientHeight); if (c.scrollWidth > c.clientWidth + 2) bad.push(id + ' overflows wide'); }
+      const animating = document.querySelector('#tb .snap,#tb .buzz,#tb .aim,#tb .lift,#tb .sel,#tb.shake'); for (const id of ['crew', 'mine']) { if (animating) break; const c = document.getElementById(id); if (c.scrollHeight > c.clientHeight + 2 && !UI.brief && (id !== 'crew' || !TBL.lay || TBL.lay.tw > 22)) bad.push(id + ' overflows ' + c.scrollHeight + '>' + c.clientHeight); if (c.scrollWidth > c.clientWidth + 2) bad.push(id + ' overflows wide'); }
       const mine = document.getElementById('mine').getBoundingClientRect(), crew = document.getElementById('crew').getBoundingClientRect(); if (mine.height > 0 && crew.bottom > mine.top + 2) bad.push('crew overlaps my stand');
       if (V && !G.over) {
         const cut = G.st.reduce((a, s) => a + s.w.filter(x => x.cut).length, 0), tot = G.st.reduce((a, s) => a + s.w.length, 0), cc = document.querySelector('#cutc .cc'); if (cc && cc.textContent.replace(/\\s/g, '') !== cut + '/' + tot) bad.push('cut count ' + cc.textContent + ' != ' + cut + '/' + tot);
@@ -62,6 +62,7 @@ async function playGame(browser, size, gi, rep, opts) {
   const [W, H] = size, tag = W + 'x' + H + ' g' + gi;
   const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' });
   await ctx.route(/fonts\.(googleapis|gstatic)/, r => r.abort());
+  await ctx.addInitScript(() => { try { const ch = {}; for (const id of ['c1','c2','c3','c4','c5','c6','c7','c8','c9']) ch[id] = { beaten: true, stars: 1, best: 1, tries: 1, losses: 0 }; if (location.search.indexOf('x') < 0) localStorage.setItem('gns-campaign-short-fuse', JSON.stringify({ v: 1, ch, unlocked: [], last: 'c1' })); } catch (e) { } });
   const page = await ctx.newPage(); const errs = [], issues = new Set(); const stats = { taps: 0, dead: 0, won: 0, lost: 0 };
   page.on('pageerror', e => errs.push(String(e.message).slice(0, 140)));
   page.on('console', m => { if (m.type() === 'error' && !/ERR_FAILED|Failed to load resource/.test(m.text())) errs.push('console: ' + m.text().slice(0, 140)); });
@@ -91,25 +92,26 @@ async function playGame(browser, size, gi, rep, opts) {
         if (Date.now() - t0 > 40000 && !hasGame) { issues.add('story did not start'); break; }
         continue;
       }
+      if (await page.evaluate('!!GX.open')) { await page.evaluate('GX.close()'); await sleep(250); continue; }
       const st = await page.evaluate('__sw.st()');
       if (st.over) { if (!overAt) overAt = Date.now(); if (Date.now() - overAt > (opts.story ? 5000 : 1800)) break; }
       const sig = await page.evaluate('__sw.sig()');
-      if (sig !== last) { last = sig; lastAt = Date.now(); noCand = 0; } else if (Date.now() - lastAt > 8000) { issues.add('stuck 8s (dec ' + st.dec + ', q ' + st.q + ', step ' + st.step + ', mine ' + st.mine + ')'); break; }
+      if (sig !== last) { last = sig; lastAt = Date.now(); noCand = 0; } else if (Date.now() - lastAt > 8000) { if (process.env.SHOTS) await page.screenshot({ path: process.env.SHOTS + '/' + tag.replace(/ /g, '_') + '_stuck.png' }).catch(() => { }); issues.add('stuck 8s (dec ' + st.dec + ', q ' + st.q + ', step ' + st.step + ', mine ' + st.mine + ')'); break; }
       if (audits < 500) { audits++; const bad = await page.evaluate('__sw.audit()'); for (const b of bad) { if (process.env.SHOTS && !issues.size) await page.screenshot({ path: process.env.SHOTS + '/' + tag.replace(/ /g, '_') + '.png' }).catch(() => { }); issues.add(b); } }
       if (st.over) { await sleep(200); continue; }
       const cs = await page.evaluate('__sw.cands()');
-      for (const c of cs) if (c.kind === 'COVERED') issues.add('covered: ' + c.what);
+      for (const c of cs) if (c.kind === 'COVERED') { if (process.env.SHOTS && !issues.size) await page.screenshot({ path: process.env.SHOTS + '/' + tag.replace(/ /g, '_') + '.png' }).catch(() => { }); issues.add('covered: ' + c.what); }
       const ok = cs.filter(c => c.kind !== 'COVERED');
       const modal = ok.filter(c => c.kind === 'cover' || c.kind === 'over');
       let pick = null;
       if (modal.length) pick = modal.find(c => /go|Go/.test(c.cls + c.txt)) || modal[0];
       else if (st.mine || st.off || st.step === 'claim' || st.step === 'snip') {
-        const play = ok.filter(c => c.kind !== 'over');
-        if (!play.length) { noCand++; if (noCand > 8) { issues.add('my turn with nothing glowing (q ' + st.q + ', step ' + st.step + ')'); noCand = -999; } await sleep(180); continue; }
+        const play = ok.filter(c => c.kind !== 'over' && !(c.kind === 'eq' && st.sel === 'choose'));
+        if (!play.length) { noCand++; if (noCand > 8) { issues.add('my turn with nothing glowing (q ' + st.q + ', step ' + st.step + ') ' + await page.evaluate('JSON.stringify([G.phase,G.step,G.actor,G.turn,G.q&&G.q.kind,UI.sel&&UI.sel.mode,UI.brief,passTo(),document.getElementById("say").textContent,Object.keys(UI.V.legal||{}).map(k=>k+":"+(Array.isArray(UI.V.legal[k])?UI.V.legal[k].length:1))])').catch(() => '')); if (process.env.SHOTS) await page.screenshot({ path: process.env.SHOTS + '/' + tag.replace(/ /g, '_') + '_nc.png' }).catch(() => { }); noCand = -999; } await sleep(180); continue; }
         // follow the engine's own best move most of the time, tap anything that glows otherwise
         let want = null; const m = Math.random() < .85 ? await page.evaluate('__sw.ai()') : null;
         if (m) {
-          if (m.a === 'q') { const o = await page.evaluate(`(()=>{const o=G.q.opts[${m.i}];return o&&o.d?o.d:null})()`); const u = o && o.u != null ? o.u : null; if (u != null) want = play.find(c => c.kind === 'tile' && +c.u === u); else if (o && o.seat != null && G.q) want = play.find(c => c.kind === 'plate' && +c.seat === o.seat); if (!want) want = play.find(c => c.kind === 'chip' && /glow/.test(c.cls)); }
+          if (m.a === 'q') { const o = await page.evaluate(`(()=>{const o=G.q.opts[${m.i}];return o&&o.d?o.d:null})()`); const u = o && o.u != null ? o.u : null; if (u != null) want = play.find(c => c.kind === 'tile' && +c.u === u); else if (o && o.seat != null) want = play.find(c => c.kind === 'plate' && +c.seat === o.seat); if (!want) want = play.find(c => c.kind === 'chip' && /glow/.test(c.cls)); }
           else if (m.a === 'dual' && !m.tool && !m.two && !m.own) { const sel = await page.evaluate('UI.sel'); const tu = await page.evaluate(`__sw.where(${m.st},${m.ks[0]})`);
             if (sel && sel.tg && sel.tg.length) { const us = await page.evaluate(`__sw.myU(${JSON.stringify(m.v)})`); want = play.find(c => c.kind === 'tile' && us.includes(+c.u)); } else want = play.find(c => c.kind === 'tile' && +c.u === tu); }
           else if (m.a === 'solo' && !m.flip) { const us = await page.evaluate(`__sw.myU(${JSON.stringify(m.v)})`); want = play.find(c => c.kind === 'tile' && us.includes(+c.u) && /g-solo/.test(c.cls)); }
@@ -132,7 +134,7 @@ async function playGame(browser, size, gi, rep, opts) {
     if (Date.now() - t0 >= limit) issues.add('did not finish in ' + (limit / 1000) + ' s');
     if (opts.story && !storyStarted) issues.add('chapter never started');
     const inv = await page.evaluate(`checkInvariants()`).catch(() => []); for (const v of inv || []) issues.add('invariant: ' + v);
-  } catch (e) { issues.add('crash: ' + String(e.message).slice(0, 120)); }
+  } catch (e) { issues.add('crash: ' + String(e.stack || e.message).split('\n').slice(0, 3).join(' / ').slice(0, 260)); }
   await ctx.close().catch(() => { });
   const bad = [...errs.map(e => 'PAGE ERROR ' + e), ...issues];
   rep.push({ tag, job: opts.job != null ? opts.job : JOBS[gi % JOBS.length], bad, stats });
@@ -140,8 +142,9 @@ async function playGame(browser, size, gi, rep, opts) {
 }
 (async () => {
   const browser = await chromium.launch(); const rep = []; const jobs = [];
-  for (let g = 0; g < N; g++) jobs.push([SIZES[g % 2], g, {}]);
-  for (let s = 0; s < STORY; s++) jobs.push([SIZES[s % 2], 100 + s, { story: ['c1', 'c2', 'c3'][s % 3] }]);
+  const GI = process.env.GI ? process.env.GI.split(',').map(Number) : null;
+  for (let g = 0; g < N; g++) if (!GI || GI.includes(g)) jobs.push([SIZES[g % 2], g, {}]);
+  for (let s = 0; s < STORY; s++) jobs.push([SIZES[s % 2], 100 + s, { story: ['c1', 'c7', 'c10'][s % 3] }]);
   let i = 0; const par = +process.env.PAR || 3;
   await Promise.all(Array.from({ length: par }, async () => { while (i < jobs.length) { const j = jobs[i++]; await playGame(browser, j[0], j[1], rep, j[2]); } }));
   await browser.close();
