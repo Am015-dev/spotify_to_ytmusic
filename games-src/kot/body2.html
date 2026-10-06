@@ -11,7 +11,7 @@
   <button class="gx-ibtn btn" data-gx="dr-menu" title="Rules, tips, sound, speed, new game" aria-label="Menu"><svg class="ico" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/><path d="M10 2.5v2.2M10 15.3v2.2M2.5 10h2.2M15.3 10h2.2M4.7 4.7l1.6 1.6M13.7 13.7l1.6 1.6M4.7 15.3l1.6-1.6M13.7 6.3l1.6-1.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/></svg></button>
 </header>
 <div class="gx-main">
-  <main class="gx-board" aria-label="The city arena">
+  <main class="gx-board" aria-label="The city arena" data-board>
     <div id="stage" class="stage"><canvas id="c3"></canvas><div id="tags"></div><div id="hud"></div></div>
     <svg id="map" viewBox="0 0 1000 640" role="img" aria-label="The city arena and the monsters"></svg>
   </main>
@@ -84,6 +84,7 @@ const MONS=[
 <script src="ui.js"></script>
 <script src="ui-ph.js"></script>
 <script src="board.js"></script>
+<script src="brief.js"></script>
 <script src="campaign.js"></script>
 </body>
 </html>

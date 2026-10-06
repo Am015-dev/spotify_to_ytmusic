@@ -136,3 +136,6 @@ html.ph .ptile.bcard.sel,html.ph .ptile.bcard:has(.go){transform:translateY(-8px
 html.ph .pchip.hot{animation:hotPulse 1s ease-in-out infinite}
 html.ph .pchip.hot em.v{color:#e63946}
 @keyframes hotPulse{0%,100%{box-shadow:0 0 0 0 rgba(230,57,70,0)}50%{box-shadow:0 0 0 3px #e63946}}
+/* long-press popup with the full text of a shortened line (brief.js) */
+#fulltip{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:80;max-width:min(86vw,420px);background:rgba(20,10,40,.97);border:2px solid #ffd35a;border-radius:14px;padding:14px 16px;color:#fff;font:600 15px/1.4 system-ui,sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.7);pointer-events:none}
+.tl{cursor:help}

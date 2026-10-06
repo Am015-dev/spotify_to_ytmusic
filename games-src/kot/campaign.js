@@ -9,7 +9,8 @@ function campMyIdx(){const m=campMe();return m?m.i:0}
 function campSetup(){const d=UI.camp;if(!d||!G||G.mode!=='solo')return;const rv=d.setup.rival;
   let boss=G.pl.find(p=>p.m===rv&&!p.human);
   if(!boss){const ai=G.pl.filter(p=>!p.human);boss=ai[rnd(ai.length)];boss.m=rv;boss.edeck=shuffle(evoDeckOf(rv))}
-  boss.lvl=d.opponent.aiLevel;G.pl.forEach(p=>{if(!p.human)p.lvl=d.opponent.aiLevel});
+  boss.lvl=d.opponent.aiLevel;if(d.setup.rivalHp)boss.hp=d.setup.rivalHp;/* a gentler rival for the first chapters */
+  {const me=G.pl.find(p=>p.human);if(me){if(d.setup.youVp)me.vp=d.setup.youVp;if(d.setup.youEn)me.en=d.setup.youEn}}G.pl.forEach(p=>{if(!p.human)p.lvl=d.opponent.aiLevel});
   G.bossSeat=boss.i;G.camp=d.id;const t=d.twist;G.twist=t?{id:t.id,param:t.param}:null;
   if(t){if(t.id==='boss-energy')boss.en=t.param;else if(t.id==='boss-stars')boss.vp=t.param;else if(t.id==='boss-in-city')G.city=boss.i;
     else if(t.id==='extra-brainjack'&&G.xp!=='base')boss.mb+=t.param;

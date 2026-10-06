@@ -224,7 +224,17 @@ document.getElementById('rulesbody').innerHTML=rulesHTML();
 // reading the rules pauses the computer, as the old rules dialog did
 GX.onShow=id=>{const was=UI.rules;UI.rules=id==='dr-rules';if(was&&!UI.rules&&typeof schedule==='function')schedule()};
 GX.onClose=id=>{if(id==='dr-rules'){UI.rules=false;if(typeof schedule==='function')schedule()}};
-try{init3D()}catch(e){console.warn('3D off',e);V3.on=false;document.body.classList.remove('three')}
+// ---- 3D start-up that can never block the menu (iPhone: a slow or failing GPU must not stop the game) ----
+// The menu is drawn first; 3D starts after the first paint (or at once when a game starts). If it throws, is missing or the
+// GPU is lost later, the game drops to the flat 2D board and goes on.
+const BOOT3={done:false};
+function flat3(why){try{if(V3.r){try{V3.r.dispose()}catch(_){}try{V3.r.forceContextLoss()}catch(_){}}}catch(_){}V3.on=false;document.body.classList.remove('three');document.body.classList.add('flat3');console.warn('3D off, flat board:',why);try{gfxLabel()}catch(_){}try{render()}catch(e){console.error(e)}}
+function boot3D(){if(BOOT3.done)return;BOOT3.done=true;let ok=false;
+  try{ok=init3D()}catch(e){console.warn('3D init failed',e);flat3('init failed');return}
+  if(ok){const cv3=document.getElementById('c3');if(cv3)cv3.addEventListener('webglcontextlost',e=>{e.preventDefault();flat3('context lost')},false)}
+  try{if(typeof gfxLabel==='function')gfxLabel()}catch(_){}try{render()}catch(e){console.error(e)}}
+{const _ng=newGame;newGame=function(){try{boot3D()}catch(e){}return _ng.apply(this,arguments)}}
 if(typeof soundBtns==='function')soundBtns();if(typeof gfxLabel==='function')gfxLabel();
 {const b=document.getElementById('speedbtn');if(b&&!/Speed/.test(b.textContent))b.innerHTML='⏩ Speed: '+SPEEDS[UI.speed][0][0].toUpperCase()+SPEEDS[UI.speed][0].slice(1)+'<small>How fast the computer plays (tap to change)</small>';const h=document.getElementById('hintbtn');if(h)h.innerHTML='💡 Dice hints: '+(UI.hints?'on':'off')+'<small>Blue dashed outlines on the dice worth keeping</small>'}
 renderLegend();render();
+{const go=()=>setTimeout(boot3D,40);if(window.requestAnimationFrame)requestAnimationFrame(go);else go();setTimeout(boot3D,2500);window.addEventListener('load',()=>boot3D())}

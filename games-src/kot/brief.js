@@ -5,14 +5,14 @@
 (function(){
 const R=document.documentElement,MAXW=8,KEEP=7;
 const words=t=>(t||'').replace(/[^a-zA-Z0-9'’]+/g,' ').trim().split(' ').filter(w=>/[a-z][a-z]/i.test(w));
-const SKIP='button,a,input,select,textarea,svg,.die,[data-a],[data-act],[data-ph],[data-ship],[data-start],[data-mode],canvas,.gx-dock-head,.roadmap';
+const SKIP='button,a,input,select,textarea,svg,.die,[data-act],[data-opt],[data-shop],[data-start],[data-mode],[data-camp],canvas,.gx-dock-head,.pchip';
 function cut(text,n){const toks=text.trim().split(/\s+/);let out=[],c=0;for(const t of toks){if(/[a-z][a-z]/i.test(t.replace(/[^a-zA-Z]/g,'')))c++;if(c>n)break;out.push(t)}return out.join(' ').replace(/[·,;:\-–—]+$/,'')+'…'}
 function clamp(){if(!R.classList.contains('ph'))return;
-  const roots=document.querySelectorAll('.gx-dock,#bf,#notice,#coach,.gxbanner,#banner');
+  const roots=document.querySelectorAll('.gx-dock,#bfx,#btip,#bmarks,#moment,#advice,#choice,#coach,#news,#banner,#preview,.tip,#pmsg');
   for(const root of roots){for(const e of root.querySelectorAll('*')){
-    if(e.dataset&&e.dataset.tl&&e.textContent===e.dataset.tl)continue;if(e.matches(SKIP)||e.closest(SKIP.replace(',.gx-dock-head,.roadmap','')))continue;
+    if(e.dataset&&e.dataset.tl&&e.textContent===e.dataset.tl)continue;if(e.matches(SKIP)||e.closest(SKIP.replace(',.gx-dock-head,.pchip','').replace('svg,','')))continue;
     if(![...e.childNodes].some(n=>n.nodeType===3&&n.textContent.trim()))continue;
-    if(e.querySelector(SKIP))continue;
+    if(e.querySelector(SKIP.replace('svg,','')))continue;
     const full=(e.innerText||e.textContent||'').trim();if(words(full).length<=MAXW)continue;
     e.dataset.full=full;
     const cutT=cut(full,KEEP);e.textContent=cutT;e.dataset.tl=cutT;e.classList.add('tl')}}}
