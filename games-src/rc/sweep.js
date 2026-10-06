@@ -10,10 +10,11 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
  await ctx.route('**/*',r=>new URL(r.request().url()).host==='swi.test'?r.fulfill({status:200,contentType:'text/html',body:html}):r.abort());
  const p=await ctx.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));const tag=`${W}x${H} seed ${seed}`;const prob=m=>{bad++;console.log(tag,'PROBLEM',m)};
  await p.goto('https://swi.test/');await p.waitForTimeout(900);
- await p.evaluate(([s,sc])=>{try{localStorage.clear()}catch(e){}setSeed(s);AIDELAY=0;UI.speed=8;UI.setup.scen=sc;render()},[seed,SC[seed%4]]);
+ await p.evaluate(([s,sc])=>{try{localStorage.clear()}catch(e){}setSeed(s);AIDELAY=0;UI.speed=8;try{setGfx('low')}catch(e){}UI.setup.scen=sc;render()},[seed,SC[seed%4]]);
  await p.tap('[data-a=start]');await p.waitForTimeout(1200);
- let badTaps=0,same=0,last='',lastT=Date.now(),steps=0,glow=0,resChecks=0,minPct=100;
+ let noPick=0,badTaps=0,same=0,last='',lastT=Date.now(),steps=0,glow=0,resChecks=0,minPct=100;
  while(steps++<(+process.env.MAXSTEPS||3000)){
+  if(steps%50===0&&process.env.HB)console.log(tag,'hb',steps,JSON.stringify(await p.evaluate(()=>({st:PHO.st,lb:document.querySelector('#phlabel').textContent,r:G.round,tray:document.querySelector('#bf').innerText.replace(/\n/g,'|').slice(0,80),acts:G.plan.acts.map(a=>a.type+':'+a.pw.join('+')).join(' '),pb:planProblems().slice(0,2),shown:UI.shown,n:UI.beats.length,cur:!!curPawn(),pick:(UI.pick||[]).length,bad:(()=>{const e=document.querySelector('#bf .bfpw.bad');if(!e)return null;const r=e.getBoundingClientRect();const t=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return [Math.round(r.left),Math.round(r.top),Math.round(r.width),t&&(t.className||t.tagName)]})(),cls:[...document.querySelectorAll('#bf .bfpw')].map(e=>e.className.replace('bfpw','').trim()).join('/')}))));
   const s=await p.evaluate(()=>{const vis=e=>e&&e.offsetParent!==null;const lb=document.querySelector('#phlabel');const chip=document.querySelector('#phchip');const bd=document.querySelector('.gx-board').getBoundingClientRect();
    let eng=null;try{if(PHO.st==='plan2'||PHO.st==='plan'){eng={f:food(),w:G.res.wood}}}catch(e){}
    const btn=document.querySelector('#bf .btn.go');let cov=false;if(btn){const r=btn.getBoundingClientRect();const e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);cov=!(e&&(e===btn||btn.contains(e)))}
@@ -28,13 +29,13 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
      if(pt){const a0=await p.evaluate(()=>G.plan.acts.reduce((n,a)=>n+a.pw.length,0));await p.touchscreen.tap(pt.x,pt.y);await p.waitForTimeout(250);glow++;
       if(await p.$('#ppop:not([hidden]) .bfr[data-place]')){await tapSel(p,'#ppop .bfr[data-place]');await p.waitForTimeout(250)}
       const r=await p.evaluate(a0=>({a1:G.plan.acts.reduce((n,a)=>n+a.pw.length,0),pop:!!PHO.pop,msg:document.querySelector('#phlabel').textContent}),a0);
-      if(r.a1===a0&&!r.pop&&!/can't|Nothing|Too far/.test(r.msg))prob('glowing place '+id+' did not respond: '+r.msg);await p.evaluate(()=>PHO.closePop(true));continue}}
-   if(s.hasPawn){await tapSel(p,'#bf [data-a=suggest]');await p.waitForTimeout(200);continue}
+      if(r.a1===a0&&!r.pop&&!/can't|Nothing|Too far/.test(r.msg))prob('glowing place '+id+' did not respond: '+r.msg+' '+JSON.stringify(await p.evaluate(([x,y])=>{const e=document.elementFromPoint(x,y);const b=document.querySelector('.gx-board').getBoundingClientRect();return {x:Math.round(x),y:Math.round(y),el:e&&(e.id||e.className||e.tagName),board:[b.top,b.bottom,innerWidth],pop:PHO.pop&&PHO.pop.k}},[pt.x,pt.y])));await p.evaluate(()=>PHO.closePop(true));continue}}
+   if(s.hasPawn&&(++noPick%2)){await tapSel(p,'#bf [data-a=suggest]');await p.waitForTimeout(200);continue}
    if(!s.hasPawn&&s.stuckish>1&&(++badTaps%3===0)){await tapSel(p,'#bf [data-a=suggest]');await p.waitForTimeout(250);continue}
    if(!s.hasPawn&&s.stuckish>1&&await tapSel(p,'#bf .bfpw.bad')){await p.waitForTimeout(250);continue}
    if(!s.hasPawn&&s.stuckish>1){const pt=await p.evaluate(()=>{const e=document.querySelector('#bfchips .bfa.warn[data-rm]');if(!e)return null;const r=e.getBoundingClientRect();return {x:r.left+r.width/2,y:r.top+r.height/2}});if(pt){await p.touchscreen.tap(pt.x,pt.y);await p.waitForTimeout(250);continue}}
    const g=(await p.$('#bf [data-a=go][data-force]'))?'#bf [data-a=go][data-force]':'#bf [data-a=go]';if(await tapSel(p,g)){await p.waitForTimeout(200);continue}}
-  if(s.posq&&s.posq.length){const id=s.posq[(Math.random()*s.posq.length)|0];const pt=await p.evaluate(i=>{const t=BF.tilePt(i);return t&&{x:t.ox+t.x,y:t.oy+t.y}},id);if(pt){await p.touchscreen.tap(pt.x,pt.y);await p.waitForTimeout(250);continue}}
+  if(s.posq&&s.posq.length){const id=s.posq[(Math.random()*s.posq.length)|0];const pt=await p.evaluate(i=>{const t=BF.tilePt(i);return t&&{x:t.ox+t.x,y:t.oy+t.y}},id);if(pt){const q0=await p.evaluate(()=>G.q&&G.q.title);await p.touchscreen.tap(pt.x,pt.y);await p.waitForTimeout(250);const q1=await p.evaluate(()=>G.q&&G.q.title);if(q0&&q0===q1&&same>3)console.log(tag,'posQ tap no response',JSON.stringify(await p.evaluate(([x,y])=>{const e=document.elementFromPoint(x,y);const b=document.querySelector('.gx-board').getBoundingClientRect();return {x:Math.round(x),y:Math.round(y),el:e&&(e.id||e.className||e.tagName),board:[b.top,b.bottom,innerWidth]}},[pt.x,pt.y])));continue}}
   if(s.ans){const n=await p.$$eval('#bf [data-ans]',e=>e.length);await tapSel(p,`#bf [data-ans="${(Math.random()*n)|0}"]`);await p.waitForTimeout(150);continue}
   if(Math.random()<.5&&await tapSel(p,'#bf [data-a=next]')){await p.waitForTimeout(100);continue}
   await p.waitForTimeout(250)}
