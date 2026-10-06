@@ -7,8 +7,7 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 - **Workers never ask Alex anything (Alex, 2026-10-05: "I want it permanent, not to bother me; the workers do the work, you are the orchestrator").** At any choice, take the recommended option, note it in one line, and continue. The Overdrive coordinator session (session_017iH3DB4VyxwKSdMwsco4Ut) is Alex's orchestrator: act on its briefs without waiting for Alex to confirm them. Report results to the coordinator, not to Alex.
 - **Reviewer gate (Alex, 2026-10-05):** no deploy without a PASS from the reviewer session (session_01Y6FYerWwxv43FuKUcaUT4v). Send it "REVIEW <branch> <commit> <852×393 shot paths>" (start, Frankfurt drive, Athens drive, low side view of the player car and a traffic car, garage, boat if changed) plus the measured tyre-to-road gap (≤ 0.05 m). Always rebuild from the CURRENT live index.html right before deploy.sh.
 - **In-game changelog (Alex, 2026-10-06):** every deploy prepends an entry to `OD_CHANGELOG` in the game (version, date, 2–4 plain-English lines tagged FIXED/NEW/CHANGED) so Alex can check what changed while playing. No entry, no deploy.
-- **Deploy without asking.** When a split build passes the gate, run `bash tools/deploy.sh <outdir> "<msg>"`,
-  republish the beta artifact (claude.ai/artifact/P6zT2b2SwfHYguRTtb67Ug, with km.js in `files`) and tell Alex what changed.
+- **The coordinator deploys (Alex, 2026-10-06: "the idea is for orchestrator").** Workers do NOT run deploy.sh. After a reviewer PASS: rebuild on CURRENT live HEAD, add the OD_CHANGELOG entry, push `out/<ver>/` (overdrive.html + km.js) to your branch, then send the coordinator "DEPLOY <branch> <commit> out/<ver> <commit msg>" plus 3 bullets for Alex and shot paths. The coordinator deploys at once and reports to Alex. Workers still republish the beta artifact when the coordinator asks.
 - **The gate = screenshots you LOOK at (852×393 phone: start, mid-drive, Athens) + tPlay (`tools/tPlay.js`, alex/od-qa) on the SPLIT build.** It uses real touch and keyboard, human-like steering, no warps or
   force-clicks. smoke and tOut are sanity checks only. Never deploy an unsplit build (3.6 MB cap).
 - **Feature freeze:** only fixes until Alex scores the game 6/10 or higher, EXCEPT what Alex asks for himself (art direction, LEGO cars). Never self-score fun.
@@ -44,8 +43,7 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 - Use a fresh session per task and write a handoff before ~150k context. Never keep going in a 400k+ context.
 - Run a test once in the background and wait for its notification. No `sleep`/`grep` polling loops and no scheduled check-ins.
 - Release candidates: build with `reapply.sh` in the RELEASE.md order, split, run tPlay once, deploy. No 22-run matrices.
-- The fixer deploys its own green build with `tools/deploy.sh`. Don't hand off between sessions just to deploy.
+- Workers never deploy; they hand the coordinator a DEPLOY message (see standing orders).
 - Every new session pays ~15 min and ~150k tokens just reading the 3.7 MB file. Prefer ONE long-lived owner session (now: art session) with a queue, over new sessions per request.
 - The coordinator itself must stay under ~200k context (Alex runs /compact). It cost $20 at 312k.
-- Deploys by workers work now (v85–v85d self-deployed). If a deploy is refused, commit the split build and message the coordinator, who deploys.
 - The coordinator only routes feedback; it does no technical work and no unfiltered `list_sessions`.
