@@ -23,6 +23,31 @@ Test scripts (in t/):
 - The DRIVER tab gets 8 presets.
 - `GAR_figSet` invalidates `CR_VC.off` and `CR_VC.boat` so the 4×4 and boat get the new driver.
 
+## pGAR2 state (2026-10-06): prototype works in dev/, NOT gated
+`gar2.js` + `pGAR2.py`. Apply after pGAR1: `./reapply.sh pGAR1.py pGAR2.py`.
+- `GAR_gt(o)`: new 8-wide supercar builder (curved hood with stripes, raked screen, `drvL` low driver; `bubble`/`big` wing options).
+- `GAR_SETS`: rod (COMMON, owned), ebbel (RARE, 3000 studs), posei (EPIC, 15 ★), gold (LEGENDARY, 30 ★). Each has `car`/`off`/`boat` builders and `load` (CR_LOAD names, stats and perks).
+- Selecting a set (`GAR_select`):
+  - saves the old set's street bricks to `mho_gar.br[old]`;
+  - loads the new set's bricks into GB.d and `mho_build`;
+  - calls `GAR_load()`, which copies the set's stats into `CR_LOAD`.
+- `CR_attachV` is wrapped for the player (no team): the 4×4 and boat come from the selected set, with upgrades, cached under key `gar|form|set+ups+fig`.
+- Upgrades (`mho_gar.up[set]={sp,ex,wh,bo}`, levels 0–3, 600/1200/2400 studs):
+  - `GAR_apply(bricks,u,form)` adds parts using a heightmap (`GAR_hm`).
+  - Wheels become `wLc`/`wLg`/`wLr` (same radius, recoloured rims via the `CR_wheel` wrapper).
+  - `gbTeam` wrapper: the street car gets the parts outside builder mode, plus the stat multipliers.
+- Garage tab `RIDES` (first tab): set cards with rarity colours and buy/lock, form preview buttons with stat bars, and upgrade rows with ●○○ pips.
+- Tests: `t/veh.js` (real taps: buy, select, 7 upgrades, previews, save & drive, world shots); `t/rv.js ucar|ufo|ubo|gt1|gt2` (max-upgrade close-ups).
+
+Last check: zero errors. Shots looked right: all upgrades visible on street, 4×4 and boat. Red L3 rims are not yet re-checked after the last edit.
+
+TODO before review:
+1. Re-run `t/veh.js` and `t/rv.js` after the last edits (rims red, rockets x0-1, GAR_UPC fix).
+2. Measure the tyre gap with `tools/cars/tyre3.js` on Poseidon GT and the upgraded rims.
+3. Run tPlay on the split build with a non-default set selected (seed `mho_gar` + `mho_build`).
+4. Check that race balance isn't broken: tiers give at most +8 % top on top of upgrades of up to +6 %. Ask the cars worker (session_012oDcg1MhwXUU7Y9ufgfS4k) to run `raceBal3.js` with gold + max upgrades.
+5. Make sure the phone garage tabs fit (6 tabs, "RIDES" is short).
+
 ## pGAR2 plan (vehicles + visible upgrades)
 **Vehicle sets** (each = street + off-road + boat, swapped by terrain like 2K Drive). Stored in the per-slot `mho_gar`: `{sel, own:[], up:{id:{sp,ex,wh,bo}}, bricks:{id:[...]}}`.
 - COMMON `rod`: the existing HOT ROD / GUACAMONSTER / AEGEAN. Owned.

@@ -34,7 +34,7 @@ const GAR_get=()=>Object.assign({sel:'rod',own:['rod'],up:{},br:{}},store.get('m
 const GAR_set=id=>GAR_SETS.find(s=>s.id===(id||GAR_get().sel))||GAR_SETS[0];
 const GAR_owned=s=>!s.req||GAR_get().own.includes(s.id)||(!s.req.cost&&gbReq(s.req,'veh_'+s.id));
 // ---- upgrades: 4 slots × 3 levels, visible parts on every form + small stat perks
-const GAR_UP=[['sp','SPOILER','han','Handling'],['ex','EXHAUSTS','acc','Acceleration'],['wh','WHEELS','hull','Health'],['bo','BOOSTER','top','Top speed']] // rims: chrome → gold → red,GAR_UPC=[600,1200,2400];
+const GAR_UP=[['sp','SPOILER','han','Handling'],['ex','EXHAUSTS','acc','Acceleration'],['wh','WHEELS','hull','Health'],['bo','BOOSTER','top','Top speed']],GAR_UPC=[600,1200,2400]; // rims: chrome → gold → red
 const GAR_ups=id=>Object.assign({sp:0,ex:0,wh:0,bo:0},GAR_get().up[id||GAR_get().sel]||{});
 const GAR_upMul=(u,stat)=>{let m=1;for(const[k,,s]of GAR_UP)if(s===stat)m*=1+(k==='wh'?.03:.02)*(u[k]||0);return m};
 // wheel rims: same tyre size (tyre gap unchanged), recoloured rims: c chrome, g gold, r red
