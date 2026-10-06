@@ -13,6 +13,20 @@ Open (not blocking):
 2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
 
+## pART6 IN PROGRESS (handoff 2026-10-06 ~08:40 UTC; previous art session session_01FmQ73V8iH1VEUuWjWpM751 is over its context budget)
+State: built on live v86q 5583b1f (`./art.sh 5583b1f`, pART6.py in art.sh). Review #1 FAILed (e0fcede): jump gaps PASS; shadows/tyre gap/shots failed.
+Coordinator decisions (08:10): remove every blob and body-sized shadow; keep ONE small soft patch under EACH TYRE (not car-shaped). Fix sinking to ±0.05 m (player, AI, traffic). City ramps → cars session (leave).
+Done in pART6 (art6.js + pART6.py):
+- Hidden for good: ART3 blobs (removed from art3.js), ART4.ty, race ud.shadow, trShadow, trGlow, CR_SH; car meshes castShadow=false.
+- Per-tyre patches: one InstancedMesh (640, ART_blobTex, 45 %), filled right before each scene render (renderer.render wrapper): player + race cars from wheel meshes (userData.r) at their lowest point; city traffic from wheel clusters of HUB.cim[k].userData.w × instance matrix; race traffic: 4 corner patches from trShadow's matrix (pART6 RR: trShadow scale wid*1.1/len*1.05).
+- Jumps (level data): pits half → 32 (64 m), Main river `jw:70` (buildTrackData river branch). Verified on v86l, real keyboard, Rookie, no boost, launch 149 km/h: main +23.9, gleis +33.5, a5 +22.4, turm(72, unchanged) +43.2, gleis2 +41.1, isap +42.0, metro +45.4, ymit +42.1, athinas +39.5 (tools/tJump.js).
+Tyre gap (tools/a6_eval.js → __A6.tyres(): ray from 0.6 m above each tyre to visible meshes):
+- Wheel meshes sit 0.06–0.14 m BELOW RO.y at rest (cars session suspension crSim). Asked cars session (08:40) to rest wheels at RO.y±0.02.
+- Asphalt (x2400 z576): road mesh +0.03 above groundAt → gaps −0.10..−0.14 (FAIL until cars fix). Park grass (x2280 z600): grass mesh −0.07..−0.10 below groundAt → gaps −0.04..+0.05 (pass now, but will hover ~+0.08 once wheels are fixed → raise grass visual ~0.07 on the ART side, pART1 grass).
+Shots so far (dev.js + a6_eval.js cams, 852x393): docs/shots/v86r/ (4 asphalt, 4b grass, 5 traffic side, 7 city car). Still needed: jump strip ≥6 frames in a clean TT (tools/tJumpStrip.js url outdir grand main; was running at handoff, slow ~30 min), Athens.
+Next: (1) wait for the cars session's commit; rebuild on the newest live; (2) re-measure __A6.tyres() asphalt + grass, plus AI (race) and traffic; adjust grass if needed; (3) shots + strip; (4) REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v with tyre gaps; (5) on PASS: rebuild on current live → split → tOut → tools/deploy.sh → republish beta → report to coordinator (version line, 3 bullets, shots to devkit docs/shots/<ver>/).
+Dev tips: `pkill -f` kills your own shell (exit 144) — kill by PID. dev.js: /boot reloads the build; eval tools/a6_eval.js first.
+
 ## Next task for a FRESH art session: pART6 (coordinator brief 2026-10-06 06:28 UTC; this session is over its context budget)
 Base: live v86k (90babcf, or later). Note: brave-carson HEAD can be a "Shelf:" commit; take the latest commit that touched games/mainhattan-overdrive/ (`git log -1 origin/live -- games/mainhattan-overdrive/`). `./art.sh <commit>` builds on it.
 Do not touch driving, collision, missions, barrel roll or speed feel (cars session pCAR15). Tell session_01Xfbyypd9bgKDJZnBFoDfnm once which regions pART6 touches.
