@@ -214,7 +214,7 @@ function netClick(b,d,e){
   case 'skip':return act({t:'skip'});
   case 'auto':return isClient();
   case 'quick':if(isClient()){e.preventDefault();toast('The host chooses whether to skip the automatic steps.');return true}setQuick(b.checked);render();netPush(true);return true;
-  case 'suggest':act({t:'suggest'});setPStep(3);toast('💡 Your castaway’s pawns have jobs now. Check them below and change anything you like.',5000);render();return true;
+  case 'suggest':act({t:'suggest'});setPStep(3);toast('✨ Your castaway’s pawns have jobs now. Check them below and change anything you like.',5000);render();return true;
   case 'rec':{const c=curPawn();const r=c&&recPlan().map[c.id];if(!r){toast('No job to recommend: choose one below.');UI.ps.pick=true;render();return true}if(r.why)UI.sugWhy[JSON.stringify([r.type,r.tgt])]=r.why;UI.sel=null;sfx('place');return act({t:'place',pid:c.id,type:r.type,tgt:r.tgt,alt:r.alt||0})}
   case 'clear':return act({t:'clear'});
   case 'pile':return act({t:'pile',n:1});case 'pilemax':return act({t:'pile',n:SCEN.marooned.pileRoom()});
