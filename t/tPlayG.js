@@ -110,20 +110,21 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   await p.evaluate(([c])=>{localStorage.clear();localStorage.setItem('mho_slot','1');if(c==='ath'){localStorage.setItem('mho_city@1',c);localStorage.setItem('mho_athd@1','A');localStorage.setItem('mho_roam.ath@1','{"otg":{}}');localStorage.setItem('mho_story.ath@1','{"seen":1}')}},[city]);
   await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
   if(mode==='phone'&&city===CITIES[0])await shot('menu');
+  if(process.env.GSET){const [gid,gu]=process.env.GSET.split(':');const ck=async c=>{await p.evaluate(c=>{const e=document.querySelector(c);if(!e)throw new Error('GSET no '+c+' tab='+(window.GB?GB.tab:'?')+' gbx='+!document.querySelector('#gbx').hidden);e.click()},c);await tick(20)};
+   await p.evaluate(()=>__gar.cheat(99999,40));await ck('#gbMenuBtn');for(let k=0;k<40&&await p.evaluate(()=>document.querySelector('#gbx').hidden);k++)await tick(15);await tick(30);
+   await ck('#gbx .gbTabs [data-t="veh"]');try{await p.waitForSelector('[data-gset="'+gid+'"]',{state:'attached',timeout:8000})}catch(e){await p.screenshot({path:OUT+'/gset_fail.png'});console.log('GSETFAIL',await p.evaluate(()=>JSON.stringify({tab:typeof GB!=='undefined'?GB.tab:'?',tabs:[...document.querySelectorAll('#gbx .gbTabs button')].map(b=>b.dataset.t+(b.classList.contains('on')?'*':'')),body:document.querySelector('#gbBody').innerHTML.slice(0,400)})));throw e}await ck('[data-gset="'+gid+'"]');
+   for(const[i,k]of['sp','ex','wh','bo'].entries())for(let n=0;n<+gu[i];n++)await ck('[data-gup="'+k+'"]');
+   await p.evaluate(()=>[...document.querySelectorAll('#gbx button')].find(b=>/SAVE/.test(b.textContent)).click());await tick(90);
+   console.log('GSET',await p.evaluate(()=>JSON.stringify({sel:__gar.get().sel,u:__gar.ups(),st:__mho.state,gbx:!document.querySelector('#gbx').hidden})))}
+
   // a person taps STORY; the loading screen plays; then intro cards are tapped away
   // fra: a brand-new player (STORY → Slot 1 NEW GAME); ath: an existing Athens save (STORY → CONTINUE, the page reloads into Athens)
   await tap('#hcStory');await tick(10);await tap('#slotList .go');
   for(let i=0;i<120;i++){try{if(await p.evaluate(()=>window.__mho&&__mho.state==='roam'))break;await p.waitForTimeout(2000)}catch(e){await p.waitForTimeout(2000)}}await p.evaluate(()=>{window.__auto=false});
   for(let i=0;i<30;i++){await tick(30);if(!(await tapThrough()))break}
-  if(process.env.GSET){const [gid,gu]=process.env.GSET.split(':');const ck=async c=>{await p.evaluate(c=>{const e=document.querySelector(c);if(!e)throw new Error('GSET no '+c+' tab='+(window.GB?GB.tab:'?')+' gbx='+!document.querySelector('#gbx').hidden);e.click()},c);await tick(20)};
-   await p.evaluate(()=>__gar.cheat(99999,40));await ck('#roamPause [data-p="garage"]');for(let k=0;k<40&&await p.evaluate(()=>document.querySelector('#gbx').hidden);k++)await tick(15);await tick(30);
-   await ck('#gbx .gbTabs [data-t="veh"]');try{await p.waitForSelector('[data-gset="'+gid+'"]',{state:'attached',timeout:8000})}catch(e){await p.screenshot({path:OUT+'/gset_fail.png'});console.log('GSETFAIL',await p.evaluate(()=>JSON.stringify({tab:typeof GB!=='undefined'?GB.tab:'?',tabs:[...document.querySelectorAll('#gbx .gbTabs button')].map(b=>b.dataset.t+(b.classList.contains('on')?'*':'')),body:document.querySelector('#gbBody').innerHTML.slice(0,400)})));throw e}await ck('[data-gset="'+gid+'"]');
-   for(const[i,k]of['sp','ex','wh','bo'].entries())for(let n=0;n<+gu[i];n++)await ck('[data-gup="'+k+'"]');
-   await p.evaluate(()=>[...document.querySelectorAll('#gbx button')].find(b=>/SAVE/.test(b.textContent)).click());await tick(90);
-   console.log('GSET',await p.evaluate(()=>JSON.stringify({sel:__gar.get().sel,u:__gar.ups(),st:__mho.state,gbx:!document.querySelector('#gbx').hidden})))}
   await p.evaluate(MON);
   // scale + layout at the start
-  const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny),hudAll=new Set(lay.hud);await shot(city+'_start');let rotR=null;if(phone&&city===CITIES[0])rotR=await rotTrip();
+  const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny),hudAll=new Set(lay.hud);await shot(city+'_start');let rotR=null;if(phone&&city===CITIES[0]&&!process.env.NOROT)rotR=await rotTrip();
   // ---- the drive: human driver
   const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(city==='fra'?11:23);let seenHits=0,hitShots=0,brakeUntil=-1,wob=0,route=null,routeT=-1e9,dest=null,destKind='',lastBrake=-1e9,boostT=0,driftT=0,stuckT=0,revT=0,lastNext=-1e9,events=[],lagged=[];
   const frames=MIN*3600;let f=0,lastLay=0,shotN=0,nextShot=frames/4;let extra={map:null,pause:null,garage:null,otg:null};
