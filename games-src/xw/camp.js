@@ -7,6 +7,7 @@ function campMetrics(g){const me=g.ships.filter(s=>s.side===0);const def=UI.camp
   return {won:campIsWon(g,def),rounds:g.round,lost:me.filter(s=>!s.alive).length,dmgTaken:me.reduce((a,s)=>a+hullDmg(s)+Math.max(0,s.shMax-s.sh),0),rockHits:g.campRock||0,
     score:g.pts?g.pts[0]:0,margin:0}}
 function campStart(def){
+  try{boot3D()}catch(e){}
   if(typeof NET!=='undefined'&&NET.on)netLeave(true);
   const s=def.setup||{};UI.camp=def;UI.mode='solo';UI.hints=!!def.hints;UI.info=false;UI.stats=false;UI.draft={};UI.pass=null;UI.sel=null;UI.sugCache=null;UI.autoSetup=false;UI.advOpen=false;
   newGame({fac:(s.fac||[0,1]).slice(),players:[{human:true},{human:false,lvl:def.opponent.aiLevel||'normal'}],sizeK:s.sizeK,squads:s.squads?s.squads.map(q=>q.map(e=>({p:e.p,u:e.u.slice()}))):null,ex:Object.assign({},s.ex),seed:s.seed});

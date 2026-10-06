@@ -254,7 +254,7 @@ document.addEventListener('keydown',e=>{if(e.target&&/INPUT|SELECT|TEXTAREA/.tes
   if(!G||G.winner||!humanTurn())return;const click=sel=>{const b=document.querySelector(sel);if(b&&!b.disabled){b.click();e.preventDefault()}};
   if(e.key==='Enter')click('#prompt .btn.primary');else if(e.key==='s'||e.key==='S')click('#prompt [data-a2="skip"],#prompt [data-w="skip"]');
   else if(/^[1-9]$/.test(e.key))click(`#prompt .acts button:nth-of-type(${e.key})`)});
-function startGame(mode,sortie){if(typeof NET!=='undefined'&&NET.on)netLeave(true);UI.info=false;UI.stats=false;UI.draft={};UI.pass=null;UI.sel=null;UI.sugCache=null;UI.autoSetup=false;UI.advOpen=false;
+function startGame(mode,sortie){try{boot3D()}catch(e){}if(typeof NET!=='undefined'&&NET.on)netLeave(true);UI.info=false;UI.stats=false;UI.draft={};UI.pass=null;UI.sel=null;UI.sugCache=null;UI.autoSetup=false;UI.advOpen=false;
   if(mode==='load'){const g=load();if(g){G=g;if(!['plan','over'].includes(G.phase)){G.phase='plan';G.step=1;alive().forEach(s=>s.dial=null);G.atk=null}refresh();return}}
   UI.mode=mode;const players=mode==='solo'?[{human:true},{human:false,lvl:UI.lvl}]:mode==='hot'?[{human:true},{human:true}]:[{human:false,lvl:UI.lvl},{human:false,lvl:UI.lvl}];
   const squads=customSquads();
@@ -287,4 +287,18 @@ const _refresh=refresh;refresh=function(){_refresh();save()};
 if(typeof GX!=='undefined'){GX.init({key:'na'});GX.drawer('d-squads','Squads',$('roster'),true);GX.drawer('d-log','Battle log',$('log'));GX.drawer('d-build','Squad builder',$('bbody'),true);
   GX.onClose=id=>{if(id==='d-build'&&UI.build!=null){UI.build=null;render()}}}
 render();
-window.addEventListener('load',()=>{soundBtns();if(!init3D())document.body.classList.add('flat');if(typeof gfxLabel==='function')gfxLabel();render()});
+// ---- 3D start-up that can never block the menu (iPhone: a failing/slow GPU must not stop the game) ----
+// The menu is already drawn by render() above. 3D starts after the first paint; if it throws, is missing or the GPU is lost,
+// the game switches to the flat 2D board and keeps going (state is kept, the menu or battle just redraws).
+const BOOT={done:false,tries:0};
+function flatMode(why){try{if(V3.r){try{V3.r.dispose()}catch(e){}try{V3.r.forceContextLoss()}catch(e){}}}catch(e){}
+  V3.on=false;V3.r=null;document.body.classList.remove('three');document.body.classList.add('flat');console.warn('3D off, flat board:',why);
+  try{if(typeof gfxLabel==='function')gfxLabel()}catch(e){}try{render()}catch(e){console.error(e)}}
+function boot3D(){if(BOOT.done)return;BOOT.done=true;let ok=false;
+  try{ok=init3D()}catch(e){console.warn('3D init failed',e);flatMode('init failed');return}
+  if(!ok){document.body.classList.add('flat');try{V3.on=false}catch(e){}}
+  else{const cv=document.getElementById('c3');if(cv){cv.addEventListener('webglcontextlost',e=>{e.preventDefault();flatMode('context lost')},false)}}
+  try{if(typeof gfxLabel==='function')gfxLabel()}catch(e){}try{render()}catch(e){console.error(e)}}
+window.addEventListener('load',()=>{try{soundBtns()}catch(e){}boot3D()});
+{// first paint (the menu) first, then 3D; do not wait for the page 'load' (web fonts can hold it back); Launch also starts 3D (startGame)
+  const go=()=>setTimeout(boot3D,40);if(window.requestAnimationFrame)requestAnimationFrame(go);else go();setTimeout(boot3D,2500)}
