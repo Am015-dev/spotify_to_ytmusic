@@ -150,3 +150,4 @@ Alex (v87 on iPhone): "unrealistic driving, races too; traffic blocking; smash d
 - Live moved to 93a3a6a afterwards, but that commit doesn't touch games/mainhattan-overdrive.
 - **Next (reviewer follow-up b):** the player car looks hazy/pinkish in races (shots26/rev87b/v87b_top_race_01_smash_pop.png). Check body material opacity/depthWrite in races and the fog density near the car; send before/after race shots.
 - Ask the coordinator for an iPhone screen recording of the double-tap after deploy.
+- **v87b is LIVE (752b225, deployed by the coordinator).** Next brief (coordinator): root-cause and fix the hazy/washed-out player car in races (suspects: fog, bloom over the car, speed-line overlay), quick review, then DEPLOY to the coordinator. Rebuild on whatever is live (the art worker session_01MNPu65Kc2CuGWijasGadGf is shipping a road flicker fix). Hand off at ~120k context.
