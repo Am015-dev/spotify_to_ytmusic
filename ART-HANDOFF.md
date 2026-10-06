@@ -13,7 +13,8 @@ Open (not blocking):
 2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
 
-## pART6 IN PROGRESS (handoff 2026-10-06 ~08:40 UTC; previous art session session_01FmQ73V8iH1VEUuWjWpM751 is over its context budget)
+## pART6 DONE — reviewer PASS ccc8ab3; deploy candidate v86v = outART/ at d7b5ee7 (live v86u + pART1-6); deploy was refused by session permissions → handed to the coordinator 09:50 UTC
+### (history) pART6 IN PROGRESS (handoff 2026-10-06 ~08:40 UTC; previous art session session_01FmQ73V8iH1VEUuWjWpM751 is over its context budget)
 State: built on live v86q 5583b1f (`./art.sh 5583b1f`, pART6.py in art.sh). Review #1 FAILed (e0fcede): jump gaps PASS; shadows/tyre gap/shots failed.
 Coordinator decisions (08:10): remove every blob and body-sized shadow; keep ONE small soft patch under EACH TYRE (not car-shaped). Fix sinking to ±0.05 m (player, AI, traffic). City ramps → cars session (leave).
 Done in pART6 (art6.js + pART6.py):
