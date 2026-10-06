@@ -3,6 +3,12 @@
 The game is LEGO-2K-Drive-style, set in Frankfurt and Athens. The live page is `games/mainhattan-overdrive/` on `alex/brave-carson-rbpmlk`.
 Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be terse with him.
 
+## How to build (since v87a: src/ modules on alex/od-src)
+- Source = `src/` (27 modules, ≤ 200 KB). Read `src/MAP.md`, then ONLY your modules. Steps: `HOW-TO-WORK.md`.
+- `tools/build.sh <ver> [--local]` → `out/<ver>/overdrive.html + km.js` (the split deploy pair; deploy.sh unchanged). `tools/verify_live.sh` = src builds live byte for byte.
+- Old pXXX.py anchor patches: `python3 tools/patch_to_src.py pXXX.py` lands each anchor in its module. reapply.sh/base.html are legacy.
+- `OD_CHANGELOG` is at the top of `src/10_core.js`. Tests: add `?fast=1` for the fast test mode.
+
 ## Standing orders from Alex
 - **Workers never ask Alex anything (Alex, 2026-10-05: "I want it permanent, not to bother me; the workers do the work, you are the orchestrator").** At any choice, take the recommended option, note it in one line, and continue. The Overdrive coordinator session (session_017iH3DB4VyxwKSdMwsco4Ut) is Alex's orchestrator: act on its briefs without waiting for Alex to confirm them. Report results to the coordinator, not to Alex.
 - **Reviewer gate (Alex, 2026-10-05):** no deploy without a PASS from the reviewer session (session_01Y6FYerWwxv43FuKUcaUT4v). Send it "REVIEW <branch> <commit> <852×393 shot paths>" (start, Frankfurt drive, Athens drive, low side view of the player car and a traffic car, garage, boat if changed) plus the measured tyre-to-road gap (≤ 0.05 m). Always rebuild from the CURRENT live index.html right before deploy.sh.
@@ -45,7 +51,7 @@ Details: `docs/HANDOFF.md`. The owner is Alex (iPhone 16 landscape and PC); be t
 - Write a handoff at ~120k context (not later). Small fixes go to an already-running worker, not a new session.
 - Use a fresh session per task and write a handoff before ~150k context. Never keep going in a 400k+ context.
 - Run a test once in the background and wait for its notification. No `sleep`/`grep` polling loops and no scheduled check-ins.
-- Release candidates: build with `reapply.sh` in the RELEASE.md order, split, run tPlay once, deploy. No 22-run matrices.
+- Release candidates: `tools/build.sh <ver>` from src/ (old patches via `tools/patch_to_src.py`), run tPlay once, deploy. No 22-run matrices.
 - Workers never deploy; they hand the coordinator a DEPLOY message (see standing orders).
 - Every new session pays ~15 min and ~150k tokens just reading the 3.7 MB file. Prefer ONE long-lived owner session (now: art session) with a queue, over new sessions per request.
 - The coordinator itself must stay under ~200k context (Alex runs /compact). It cost $20 at 312k.
