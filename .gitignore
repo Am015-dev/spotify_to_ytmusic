@@ -14,3 +14,6 @@ shots/*.png
 tools/cars/
 tools/tPlay.js
 tools/
+dev2/
+dev3/
+qa_*
