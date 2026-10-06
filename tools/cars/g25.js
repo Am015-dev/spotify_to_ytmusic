@@ -61,7 +61,7 @@ for(const mode of (process.env.MODES||'top,iframe').split(',')){
  console.log('  boost',JSON.stringify(ov));ok(ov.inter===false,`${mode} NEED BOOST tip shown and clear of the zone plate (${ov.inter})`);ok(ov.txt==='BOOST',`${mode} BOOST label is plain BOOST`);
  // --- form swap latency: alternate the car between a road spot and an off-road spot (2 rounds), count frames until the form matches
  {const pts=await F.evaluate(()=>{const R=__dbg.RO;let road=null,dirt=null;for(let r=10;r<400&&!(road&&dirt);r+=6)for(let a=0;a<6.28&&!(road&&dirt);a+=.3){const x=R.x+Math.cos(a)*r,z=R.z+Math.sin(a)*r;if(__tr.hit(x,z))continue;const d=__mho.roadD(x,z);if(!road&&d<2)road={x,z};if(!dirt&&d>25)dirt={x,z}}return{road,dirt}});
-  const lat=[];if(pts.road&&pts.dirt)for(const P of[pts.road,pts.dirt,pts.road,pts.dirt]){await F.evaluate(P=>{const R=__dbg.RO;R.x=P.x;R.z=P.z;R.y=__dbg.GY(P.x,P.z);R.v=0;R.vy=0},P);let n=0,s;for(;n<60;n++){s=await st(1);if(s.veh==={road:'ship',dirt:'offroad',water:'boat'}[s.terr])break}lat.push(n/60);console.log('  swap',s.terr,s.veh,n);await st(30)}
+  const lat=[];if(pts.road&&pts.dirt)for(const P of[pts.road,pts.dirt,pts.road,pts.dirt]){await F.evaluate(P=>{const R=__dbg.RO;R.x=P.x;R.z=P.z;R.y=__dbg.GY(P.x,P.z);R.v=12;R.vh=R.h;R.vy=0},P);let n=0,s;for(;n<60;n++){s=await st(1);if(s.veh==={road:'ship',dirt:'offroad',water:'boat'}[s.terr])break}lat.push(n/60);console.log('  swap',s.terr,s.veh,n);await F.evaluate(()=>{__dbg.RO.v=0});await st(80)}
   ok(lat.length===4&&lat.every(x=>x<.3),`${mode} form swap under 0.3 s (${lat.map(x=>x.toFixed(2)).join(',')||'no road/dirt spot'})`)}
  await ctx.close()}
  // ================= RACE =================

@@ -53,6 +53,7 @@ R("d.style.left=Math.max(8,Math.min(innerWidth-d.offsetWidth-8,r.left+r.width/2-
 # (5) form swap: surface hold 0.35 -> 0.1 s, morph 0.38 -> 0.15 s, hover/float blend 3x faster
 R("FL_HOLD=.35","FL_HOLD=.1")
 R("FL_MINHOLD=.8","FL_MINHOLD=.45")
+R("const OB_LEAVE=14,OB_HOLD=.9,OB_DIST=12,OB_MINHOLD=3;","const OB_LEAVE=14,OB_HOLD=.15,OB_DIST=3,OB_MINHOLD=1.2;")
 R("const rt=dt*2.6;s.bt=","const rt=dt*6.5;s.bt=")
 R("const bk=s.boatK=(s.boatK||0)+((s.boatMode?1:0)-(s.boatK||0))*Math.min(1,dt*5),hover","const bk=s.boatK=(s.boatK||0)+((s.boatMode?1:0)-(s.boatK||0))*Math.min(1,dt*14),hover")
 R("const bk=s.boatK=(s.boatK||0)+((s.boatMode?1:0)-(s.boatK||0))*Math.min(1,dt*5),dk=s.dirtK=(s.dirtK||0)+((s.dirtMode?1:0)-(s.dirtK||0))*Math.min(1,dt*6);",
