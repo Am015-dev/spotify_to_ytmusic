@@ -14,3 +14,8 @@ save()
 RR("const g=new THREE.PlaneGeometry(w,L,Math.max(1,Math.ceil(w/4)),Math.max(1,Math.ceil(L/4)));","const g=new THREE.PlaneGeometry(w,L,...ART8_ps(x0,z0,ux,uz,w,L));")
 RR("const g=new THREE.PlaneGeometry(X.wa,X.wb,Math.max(1,Math.ceil(X.wa/4)),Math.max(1,Math.ceil(X.wb/4)));","const g=new THREE.PlaneGeometry(X.wa,X.wb,...ART8_pq(X.x,X.z,X.wa,X.wb));")
 save()
+# grass under roads dips (quadtree leaves); junction discs drape over the ground (flat discs sank up to 14 cm on Athens slopes)
+RR("[lx+a*sx,o.y0+tH(lx+a*sx,lz+b*sz),lz+b*sz,0]","[lx+a*sx,o.y0+tH(lx+a*sx,lz+b*sz)-ART8_dip(lx+a*sx,lz+b*sz),lz+b*sz,0]")
+RR("for(const J of JUNC){const g=new THREE.CircleGeometry(J.r,24);g.rotateX(-Math.PI/2);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*J.r/8,uv.getY(i)*J.r/8);g.translate(J.x,groundY(J.x,J.z)+.056,J.z);bt.add(g,jm)}",
+   "for(const J of JUNC){const g=new THREE.RingGeometry(.01,J.r,24,Math.max(2,Math.ceil(J.r/2)));g.rotateX(-Math.PI/2);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,uv.getX(i)*J.r/8,uv.getY(i)*J.r/8);g.translate(J.x,0,J.z);const ps=g.attributes.position;for(let i=0;i<ps.count;i++)ps.setY(i,groundY(ps.getX(i),ps.getZ(i))+.056);g.computeVertexNormals();bt.add(g,jm)}")
+save()

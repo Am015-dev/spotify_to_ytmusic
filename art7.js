@@ -8,7 +8,11 @@ function ART7_flat(x,z,w,h,tol,dn){tol=tol||.03;dn=dn||tol;const A=tH(x,z),Bv=tH
 function ART7_rd(x,z){try{let b=1e9;const q=cityAt(x,z);if(q)b=Math.min(b,q.d-q.road.w/2);const f=fillAt(x,z);if(f)b=Math.min(b,f.d-f.r.w/2);const a=abAt(x,z);if(a)b=Math.min(b,a.d-a.road.w/2);
   return Math.min(b,trailDist(x,z)-7,mtnDist(x,z)-12,lzRoadD(x,z))}catch(e){return 0}}
 function ART7_far(x,z,w,h){if(w>64||ART7_rd(x+w/2,z+h/2)<=Math.hypot(w,h)/2+4)return false;for(let i=0;i<=4;i++)for(let j=0;j<=4;j++)if(ART7_rd(x+w*i/4,z+h*j/4)<10)return false;return true}
-function ART7_quad(x,z,w,h,out){const far=ART7_far(x,z,w,h);if(w/2<(far?12:4)||(far?ART7_flat(x,z,w,h,.2):ART7_flat(x,z,w,h,.025,.08))){out.push([x,z,w,h]);return}const w2=w/2,h2=h/2;
+// pART8: leaves that overlap a road keep splitting down to ~1.5 m until they fit (a 6 m leaf on a cambered street poked 7 cm through it)
+function ART7_near(x,z,w,h){const r=Math.hypot(w,h)/4+1;for(let i=0;i<3;i++)for(let j=0;j<3;j++)if(ART7_rd(x+w*(2*i+1)/6,z+h*(2*j+1)/6)<r)return true;return false}
+// grass vertices under a road sink up to 10 cm (some street strips run a few cm below the ground; the road covers the dip)
+function ART8_dip(x,z){const r=ART7_rd(x,z);return r<-.6?.1:r<.4?.1*(.4-r):0}
+function ART7_quad(x,z,w,h,out){const far=ART7_far(x,z,w,h);if(w/2<(far?12:ART7_near(x,z,w,h)?1:4)||(far?ART7_flat(x,z,w,h,.2):ART7_flat(x,z,w,h,.025,.08))){out.push([x,z,w,h]);return}const w2=w/2,h2=h/2;
   ART7_quad(x,z,w2,h2,out);ART7_quad(x+w2,z,w2,h2,out);ART7_quad(x,z+h2,w2,h2,out);ART7_quad(x+w2,z+h2,w2,h2,out)}
 // river-bank cells keep one uniform n×n grid (gndVert snaps it to the banks): the step is verified on the cell's own land triangles (pART8: water and
 // bank sub-cells skipped; they used to force the 3 m maximum over every 200 m river cell) and grown to the road/far fit (≥ 3 m)
