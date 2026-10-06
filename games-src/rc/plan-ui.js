@@ -77,7 +77,7 @@ function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=cur
 function planSoFar(){if(!G.plan.acts.length)return '';return `<details class="sofar" ${UI.ps.sofar?'open':''}><summary data-a="sofar">The plan so far (${G.plan.acts.length} job${G.plan.acts.length>1?'s':''})</summary><div class="plan">${G.plan.acts.map(a=>planLine(a)).join('')}</div></details>`}
 // ---------- step 3: every job with its risk ----------
 function wzReview(){let h=`<p class="wz-p">Each job shows its risk. <b>Certain</b> jobs always work. Jobs that <b>roll the dice</b> can fail or cost a wound. Tap a pawn’s name to take it off a job.</p>`;
-  if(!G.plan.acts.length)return h+`<p class="muted">Nothing planned yet. Go back to step 2, or press 💡 Plan it for me.</p>`;
+  if(!G.plan.acts.length)return h+`<p class="muted">Nothing planned yet. Go back to step 2, or press ✨ Plan it for me.</p>`;
   const W=UI.sugWhy||{};
   h+=`<div class="review">${G.plan.acts.slice().sort((x,y)=>ORDER_T.indexOf(x.type)-ORDER_T.indexOf(y.type)).map((a,k)=>{const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v} ${RNAME[r]}`).join(' + ');const why=W[JSON.stringify([a.type,a.tgt])];
     const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?` <button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">pay with ${a.pay==='fur'?'fur':'wood'}</button>`:'';
@@ -92,7 +92,7 @@ function wzConfirm(){const acts=G.plan.acts;const roll=acts.filter(a=>{const n=a
   let h=`<p class="wz-p">${acts.length} job${acts.length===1?'':'s'}: ${acts.length-roll} certain, ${roll} roll${roll===1?'s':''} the dice.</p>`;
   h+=`<ul class="checks">${pr.map(p=>`<li class="${p.done?'ok':p.red?'bad':'meh'}">${p.done?'✓':p.red?'✗':'–'} ${esc(p.title)}</li>`).join('')}</ul>`;
   if(pb.length)h+=`<div class="probs">${pb.slice(0,3).map(x=>`<div>• ${esc(x)}</div>`).join('')}<div>Go back to step 2 to fix this.</div></div>`;
-  if(red.length)h+=`<div class="probs warn2">${red.map(p=>esc(p.confirm||('⚠ '+p.title+' is not covered.'))).join('<br>')}<div>You can still start, or press 💡 Plan it for me.</div></div>`;
+  if(red.length)h+=`<div class="probs warn2">${red.map(p=>esc(p.confirm||('⚠ '+p.title+' is not covered.'))).join('<br>')}<div>You can still start, or press ✨ Plan it for me.</div></div>`;
   h+=`<p class="wz-p">When you start, the day plays out one step at a time: <b>Actions</b> (job by job), then <b>Weather</b>, then <b>Night</b>. The plan can’t be changed after that.</p>`;
   return h}
 function posOf(act){if(!act)return null;if(act.type==='gather')return act.tgt.pos;if(act.type==='explore')return act.tgt;if(act.type==='build'&&act.tgt&&act.tgt.cross!=null)return act.tgt.cross;return null}
