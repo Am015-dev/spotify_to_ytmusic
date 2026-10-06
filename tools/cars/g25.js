@@ -6,7 +6,7 @@
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');
 const [BASE,OUT]=process.argv.slice(2);fs.mkdirSync(OUT,{recursive:true});
 const INIT=`(()=>{if(!location.search.includes('race'))return;const q=[];let t=0;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};
- window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){window.__err=String(e)}}if(window.__mon)window.__mon()}return t}})();`;
+ window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){window.__err=String(e)}}if(window.__mon)window.__mon()}return t};setInterval(()=>{if(window.__dbg&&!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}},50)})();`;
 (async()=>{const br=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});let fails=0;const ok=(c,m)=>{console.log((c?'PASS ':'FAIL ')+m);if(!c)fails++};const T0=Date.now(),lg=m=>console.log(((Date.now()-T0)/1000).toFixed(0)+'s '+m);
 const open=async(mode,race)=>{const ctx=await br.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});await ctx.addInitScript(INIT);const p=await ctx.newPage();p.setDefaultTimeout(900000);
  p.on('pageerror',e=>{console.log('ERR',e.message.slice(0,200));fails++});const q=race?'?race':'';

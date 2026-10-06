@@ -7299,7 +7299,7 @@ window.__ob=Object.assign(window.__ob||{},{halfW:(x,z)=>{const q=cityAt(x,z);ret
 // ---- fix 1 · auto vehicle switch: wide hysteresis band so road ↔ pavement ↔ grass verge never flips the vehicle.
 // leave the road only ≥ OB_LEAVE m past the road edge (pavement, verges, kerbs stay "road"); re-enter at ≤ 2.5 m;
 // the new surface must hold for OB_HOLD s AND ≥ OB_DIST m of travel; at least OB_MINHOLD s between switches; never mid-air.
-const OB_LEAVE=14,OB_HOLD=.9,OB_DIST=12,OB_MINHOLD=3;
+const OB_LEAVE=14,OB_HOLD=.15,OB_DIST=3,OB_MINHOLD=1.2;
 const OB_raw0=FL_raw,OB_terr0=FL_terr;
 if(!OB.off)FL_raw=function(T0,ground){if(T0.deck)return'road';if(ground<-1.5)return'water';return FL_road(RO.x,RO.z,FL.s==='road'?OB_LEAVE:2.5)?'road':'dirt'};
 if(!OB.off)FL_terr=function(T0,ground,dt=1/60){const raw=FL_raw(T0,ground),air=RO.y>ground+.5;FL.lastSurf=raw;FL.hold=Math.max(0,FL.hold-dt);
