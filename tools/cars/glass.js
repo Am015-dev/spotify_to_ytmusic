@@ -1,0 +1,10 @@
+// glass.js <url> <out.png>: race start, low side close-up of a rival coupe (windscreen tint + driver), phone 852x393
+const {chromium}=require('/opt/node22/lib/node_modules/playwright');
+const INIT=`(()=>{const q=[];let t=0;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){}}}return t};setInterval(()=>{if(window.__dbg&&!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}},50)})();`;
+(async()=>{const [URL,OUT]=process.argv.slice(2);const br=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});const ctx=await br.newContext({viewport:{width:852,height:393},deviceScaleFactor:2,isMobile:true,hasTouch:true});await ctx.addInitScript(INIT);const p=await ctx.newPage();p.setDefaultTimeout(600000);
+await p.goto(URL);await p.evaluate(()=>{localStorage.clear();localStorage.setItem('mho_slot','1')});await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
+await p.evaluate(()=>__dbg.RS('quick'));for(let i=0;i<10;i++)await p.evaluate(()=>__tick(60));await p.evaluate(()=>{try{__dbg.FX.uniforms.uSpeed.value=0;__dbg.FX.uniforms.uBoost.value=0}catch(e){}});
+const n=await p.evaluate(()=>__cr25.ships.filter(s=>!s.isPlayer).length);
+for(let k=0;k<Math.min(n,3);k++){await p.evaluate(k=>{const s=__cr25.ships.filter(s=>!s.isPlayer)[k],c=__dbg.camera,T=__dbg.THREE;s.mesh.updateMatrixWorld(true);const ctr=new T.Vector3();(s.mesh.userData.m||s.mesh).getWorldPosition(ctr);const fw=(s._fw||new T.Vector3(0,0,1)).clone().setY(0).normalize(),rt=new T.Vector3().crossVectors(fw,new T.Vector3(0,1,0)).normalize();
+ c.position.copy(ctr).addScaledVector(rt,3.4).addScaledVector(fw,2.2);c.position.y=ctr.y+.9;c.lookAt(ctr.clone().add(new T.Vector3(0,.25,0)));c.fov=50;c.updateProjectionMatrix();document.getElementById('hud').hidden=true;__dbg.SS();window.__fastR.call(__dbg.composer)},k);
+ await p.screenshot({path:OUT.replace('.png','_'+k+'.png')})}await br.close()})();

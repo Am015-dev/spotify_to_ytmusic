@@ -1,0 +1,76 @@
+{
+ "top_roam_iv": {
+  "150": "5/5",
+  "220": "5/5",
+  "280": "5/5",
+  "320": "5/5",
+  "340": "5/5"
+ },
+ "top_roam_held": "5/5",
+ "top_roam_buf": {
+  "cooldown": "5/5",
+  "landing": "5/5",
+  "land_s": [
+   "0.32",
+   "0.32",
+   "0.32",
+   "0.32",
+   "0.32"
+  ]
+ },
+ "top_roam_false": 0,
+ "top_race_traffic": 0,
+ "top_race_iv": {
+  "150": "5/5",
+  "220": "5/5",
+  "280": "5/5",
+  "320": "5/5",
+  "340": "5/5"
+ },
+ "top_race_held": "5/5",
+ "top_race_buf": "5/5",
+ "top_race_false": 0,
+ "top_race60": {
+  "err": null,
+  "n": 0,
+  "st": "race",
+  "d": 2480
+ },
+ "iframe_roam_iv": {
+  "150": "5/5",
+  "220": "5/5",
+  "280": "5/5",
+  "320": "5/5",
+  "340": "5/5"
+ },
+ "iframe_roam_held": "5/5",
+ "iframe_roam_buf": {
+  "cooldown": "5/5",
+  "landing": "5/5",
+  "land_s": [
+   "0.32",
+   "0.32",
+   "0.32",
+   "0.32",
+   "0.32"
+  ]
+ },
+ "iframe_roam_false": 0,
+ "iframe_race_traffic": 0,
+ "iframe_race_iv": {
+  "150": "5/5",
+  "220": "5/5",
+  "280": "5/5",
+  "320": "5/5",
+  "340": "5/5"
+ },
+ "iframe_race_held": "5/5",
+ "iframe_race_buf": "5/5",
+ "iframe_race_false": 0,
+ "iframe_race60": {
+  "err": null,
+  "n": 0,
+  "st": "race",
+  "d": 2499
+ }
+}
