@@ -20,6 +20,7 @@ const PAGE = `(() => {
   const hit = (a, b, m) => a.left < b.right - m && a.right > b.left + m && a.top < b.bottom - m && a.bottom > b.top + m;
   window.__sw = {
     sig() { return JSON.stringify([G.phase, G.round, Object.keys(G.slots).length, G.turn, UI.sel, UI.cof, UI.busy ? 1 : 0, G.pend && G.pend.h, G.rrHand, UI.rrAsk ? 1 : 0, UI.warnK, (UI.rrm || []).join(''), G.ready.join(''), G.say.map(s => s.length).join(''), !!G.result, G.dice.map(d => d.map(x => x.u ? 1 : 0).join('')).join('/')]); },
+    own() { return JSON.stringify([G.phase, G.round, Object.keys(G.slots).length, UI.sel, UI.cof, G.pend && G.pend.h, G.rrHand, G.ready[actSeat()], G.say[actSeat()] && G.say[actSeat()].length]); },
     st() { const v = actSeat(); return { ph: G.phase, over: !!G.result, must: typeof v === 'number' && v >= 0 && mayAct(v) && FA.pending(G).includes(v), sel: UI.sel, pend: G.pend && G.pend.h, round: G.round, placed: Object.keys(G.slots).length, rs: !document.getElementById('rs').hidden, hold: !!(UI.hold && UI.hold.until > Date.now()), ending: document.getElementById('bd').classList.contains('ending') }; },
     // the AI's choice (the same one the ghost finger and Hint use)
     all() { const st = this.st(); return { st, warn: UI.warnK, need: (() => { const v = actSeat(); try { const mi = mandInfo(v); return mi && mi.tight ? mi.need : []; } catch (e) { return []; } })(), sig: this.sig(), cs: this.cands(), m: st.must && st.ph === 'place' && !st.pend && !st.hold ? this.aim() : null, to: (() => { try { const m = st.must && st.ph === 'place' && !st.pend && !st.hold ? this.aim() : null; if (!m) return null; const e = document.querySelector('#pz .slot[data-slot="' + m.to + '"]'); return e ? ctr(e) : null; } catch (e) { return null; } })() }; },
@@ -154,7 +155,7 @@ async function playGame(browser, size, gi) {
       if ((!seenPh.has('bulb:' + hs.ph) || Math.random() < .2) && bulbN < 12) { seenPh.add('bulb:' + hs.ph); bulbN++; stats.bulbs++;
         const pre = await page.evaluate(() => { const p = hlpPlan(); const v = actSeat(); const rc = f => { const e = f && f(); if (!e) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
           let legal = null; if (p) { const mv = FA.validMoves(G, v); legal = mv.some(x => x.t === p.m.t && (p.m.t !== 'place' || (x.to === p.m.to && x.d === p.m.d && !!x.c === !!p.m.c)) && (p.m.t !== 'say' || x.c === p.m.c) && (p.m.t !== 'toss' || x.d === p.m.d)); }
-          return { has: !!p, to: p && rc(p.to), from: p && rc(p.from), why: p && p.why, legal, t: p && p.m.t, sig: __sw.sig() }; });
+          return { has: !!p, to: p && rc(p.to), from: p && rc(p.from), why: p && p.why, legal, t: p && p.m.t, sig: __sw.own() }; });
         const bb = await ctrOf('#bulbbtn'); if (!bb) { issues.add('no bulb button'); return false; }
         await page.touchscreen.tap(...bb); await sleep(380);
         const r = await page.evaluate(() => { const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'), ru = document.querySelector('.gxh-rules');
@@ -170,7 +171,7 @@ async function playGame(browser, size, gi) {
           if (Math.random() < .5 && r.link) { const lk = await ctrOf('.gxh-bub .gxh-link'); if (lk) { await page.touchscreen.tap(...lk); await sleep(250); await rulesCheck(hs.ph); } } else { await page.touchscreen.tap(...NEUTRAL); await sleep(150); }
         } else { stats.bulbNull++; if (r.f) issues.add('bulb with no suggestion still pointed a finger (' + hs.ph + ')'); if (!r.rules) issues.add('bulb with no suggestion did not open the rules (' + hs.ph + ')'); else await rulesCheck(hs.ph); }
         await page.evaluate('GXH.hide()');
-        const a = await page.evaluate(() => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), sig: __sw.sig() }));
+        const a = await page.evaluate(() => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), sig: __sw.own() }));
         if (a.g) issues.add('help still on screen after a tap (' + hs.ph + ')'); if (a.sig !== pre.sig) issues.add('tapping the bulb changed the game (' + hs.ph + ')');
         return true; }
       return false; };

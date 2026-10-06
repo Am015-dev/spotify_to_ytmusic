@@ -508,6 +508,8 @@ html.ph.ph-l #acts .btn,html.ph.ph-l #acts .btn.go{flex:1 1 100%}
 html.ph.ph-l .hudc span:not(.rtleft){display:none}.hudc{overflow:hidden}
 @media (max-height:650px){html.ph.ph-p #promptDock{height:28px}html.ph.ph-p #prompt{line-height:28px}}
 html.ph.ph-p .gx-dock-body{gap:0!important;padding-top:0!important;padding-bottom:0!important}
+/* help kit: the coach bubbles of the busiest phases keep their Got it beside the text, so they stay short enough to fit between the glowing spaces */
+.gxh-bub[data-phase=space],.gxh-bub[data-phase=die],.gxh-bub[data-phase=token]{display:flex;align-items:center;gap:8px}.gxh-bub[data-phase=space] .gxh-row2,.gxh-bub[data-phase=die] .gxh-row2,.gxh-bub[data-phase=token] .gxh-row2{margin:0}
 </style><style>
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -6984,7 +6986,7 @@ const hmine = () => document.querySelector('#pz .tray.' + (actSeat() === 1 ? 'c'
 const HLP_STEPS = {
   brief: { target: hfirst('#says .say', '#acts [data-a=ready]'), title: 'Plan, then roll', text: 'Tap a phrase to tell your partner a plan, never dice values. Then tap Roll.', pic: () => HP.speech() },
   die: { target: hfirst('#pz .tray.p .die.can', '#pz .tray.c .die.can', '#pz .tray'), title: 'Pick a die', text: 'Only you see these dice. Tap one, then a glowing space.', pic: () => HP.dice2() },
-  space: { target: hfirst('#pz .slot.legal'), title: 'Tap a glowing space', text: 'Tap a glowing space to place it. Tap the die again to undo.', pic: () => HP.tap() },
+  space: { target: hfirst('#pz .slot.legal'), title: 'Tap a glowing space', text: 'Tap a glowing space to place it. Tap the die again to undo.' },
   rr: { target: hfirst('#acts [data-a=rrpick]', '#pz .tray .die.can'), title: 'Choose dice to reroll', text: 'Tap the dice you want to roll again, then tap the green button. None is fine.', pic: () => HP.reroll() },
   token: { target: hfirst('#pz .die[data-d=p]', '#pz .tray'), title: 'Place the extra die', text: 'This die must be placed too. Tap it, then a glowing space.', pic: () => HP.token() },
   swap: { target: hfirst('#pz .tray.p .die.can', '#pz .tray.c .die.can', '#pz .tray'), title: 'Hand-over swap', text: 'Your partner offered a die. Pick one of yours to swap with it.', pic: () => HP.swap() }
