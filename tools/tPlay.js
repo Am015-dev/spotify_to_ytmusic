@@ -3,12 +3,13 @@
 // No warps, no enterRoam(), no clicks on hidden UI. Time: requestAnimationFrame is driven by the test (exactly 60 frames per game second)
 // so the real game loop (frame → roamStep, loading screens, HUD, camera) runs at full fidelity on a slow software-GL box.
 // usage: node tools/tPlay.js <url-of-local_dbg.html> [outdir]
-//   env MODE=phone|desk|both (default both) · MIN=minutes per city (default 4) · CITIES=fra,ath · THROTTLE=4 · SHOTS=1
+//   env FAST=1 (fast test mode: ?fast=1 + THROTTLE=1) · MODE=phone|desk|both (default both) · MIN=minutes per city (default 4) · CITIES=fra,ath · THROTTLE=4 · SHOTS=1
 // Fails when (per city): wall/building hits > 1 per minute · stuck > 3 % · any console error · any loading screen in Athens ·
 //   pedestrian > 1.2× adult scale relative to a car · any visible HUD element overlapping a touch control.
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs');const path=require('path');
-const URL=process.argv[2]||'http://127.0.0.1:8766/local_dbg.html',OUT=process.argv[3]||'qa';fs.mkdirSync(OUT,{recursive:true});
-const MODE=process.env.MODE||'both',MIN=+(process.env.MIN||4),CITIES=(process.env.CITIES||'fra,ath').split(','),THR=+(process.env.THROTTLE||4),SHOTS=process.env.SHOTS!=='0';
+const URL0=process.argv[2]||'http://127.0.0.1:8766/local_dbg.html',URL=process.env.FAST==='1'&&!/[?&]fast=1/.test(URL0)?URL0+(URL0.includes('?')?'&':'?')+'fast=1':URL0,OUT=process.argv[3]||'qa';fs.mkdirSync(OUT,{recursive:true});
+const FASTM=process.env.FAST==='1';  // FAST=1: game URL gets ?fast=1 (src/test/fast.js) and no CPU throttle (results are frame-stepped, so throttle only changes wall time)
+const MODE=process.env.MODE||'both',MIN=+(process.env.MIN||4),CITIES=(process.env.CITIES||'fra,ath').split(','),THR=+(process.env.THROTTLE||(FASTM?1:4)),SHOTS=process.env.SHOTS!=='0';
 const results=[];let fails=0;const ok=(c,m,i)=>{console.log((c?'PASS ':'FAIL ')+m+(i!==undefined?' · '+JSON.stringify(i):''));if(!c)fails++};
 // ---- in-page: test-driven rAF clock + per-frame monitor
 const INIT=`(()=>{const q=[];let t=0;window.__auto=true;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};
