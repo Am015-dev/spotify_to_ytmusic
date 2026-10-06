@@ -5,3 +5,5 @@ chk.mjs
 __pycache__/
 *.log
 smoke/*.jpg
+out/
+km.js
