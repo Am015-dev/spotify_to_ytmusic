@@ -13,6 +13,20 @@ Open (not blocking):
 2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
 
+## pART8 IN PROGRESS, part 2 (art session session_01W6yiubKvmPYdJJoxW8Vqu4, 2026-10-06 ~19:30 UTC)
+Build: `./art.sh 99f6baf` (live v86y) → REAPPLY_OK. Debug page with raycastable Athens: local_dbg_keep.html = local_dbg.html with SM3's `rel` made a no-op (python one-liner, see below).
+Fixed this session (art7.js, art8.js, pART8.py):
+- Road pokes: FRA 0 road pokes / 2306 overlaps, ATH 0/848 (tools/a8/poke.js = a7_poke with a ±30 cm overlap window; the 2 FRA hits (564,423),(1386,-169) are grass inside big km building footprints, not roads).
+  Causes: 6 m grass leaves on cambered streets (leaf min size), Athens junction discs were FLAT at groundY(centre) on slopes (sank up to 14 cm), Athens street strips running 4.6 cm under tH.
+  Fixes: ART7_near (3×3 road-distance test) → road leaves split to ≥2 m at 2.5 cm; ART8_dip: grass vertices under roads sink up to 10 cm (rd<−0.6 m full, ramps to 0 at rd 0.4 m); JUNC discs = RingGeometry draped on groundY (+.056).
+- fps/geometry: river cells = 25 m blocks (ART8_riv): bank-snapped grid only for blocks at the water, quadtree elsewhere (one road-side bank spot forced 3 m over a 200 m cell). Roads: chord-sag tolerance 1 → 4 cm (ART8_tol; safe because the grass dips 10 cm), along ≤3 m; ART8_ps per-segment counts. Off-road leaves tol 4.5→6 cm, min 6 m.
+  FRA terrain 780k → 501k verts (v86v 292k), ATH 1.34M → 1.04M. Triangles drawn (renderer.info, all passes) park/hill/city: v86v 2.19/2.35/1.81 M, live 2.64/3.09/2.29 M, candidate 2.25/2.41/1.82 M.
+- fpsCmp (median ms, software GL, same machine state): v86v 624/681/629, live 711/743/712, candidate c9 723/691/696, c9 without stencil 738/741/721 (stencil free; shadow twins A/B free).
+  NOTE: per-tick series after a warp: ~19 cheap ticks (fade), then ~10 ticks of warm-up (first upload of newly visible buffers; candidate ~1300 ms vs v86v ~800), then steady ~750-850 both. fpsCmp mixes warm-up in. Steady-state script: /tmp/claude-0/w/steady.js (skip 45 ticks after warp).
+Biggest remaining frame cost (not art's): traffic pools HUB.cim = 23k-tri MeshPhysicalMaterial cars × 8-9 instances, frustumCulled=false (~600k tris/frame), same in v86v.
+Measurement kit (container-local, recreate if lost): servers `python3 -m http.server 8798` (repo root) and 8811 in /tmp/claude-0/fp (dirs v86v, live, c9 = overdrive.html+km.js, dbg.html = __dbg variant); dev.js ports 9333 fra / 9334 ath on local_dbg_keep.html; scripts in /tmp/claude-0/w (info.js renderer.info per route, mesh2.js per-material, tri.js/tri2.js terrain triangle classes, probe*.js poke spot probes).
+NEXT: steady-state fps result → shots both cities (tools/a8/shots.sh 9333/9334 + at.sh) → REVIEW → deploy → report; then pART10.
+
 ## pART8 IN PROGRESS (art session session_019gi2haGf8EZyFCu7h3KCZa, 2026-10-06; handoff ~16:30 UTC)
 Build: `./art.sh a23e93e` (pART8.py in art.sh; pART5/pART6 anchors tolerate pART7's later edits; without pART8 the build = live v86w byte-for-byte).
 Done (art8.js + art7.js + pART8.py), committed on alex/od-art:
