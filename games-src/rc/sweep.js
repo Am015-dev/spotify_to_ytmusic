@@ -42,6 +42,8 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
  if(steps>=(+process.env.MAXSTEPS||3000))prob('game did not finish in 3000 steps');
  if(errs.length){bad+=errs.length;console.log(tag,'PAGE ERRORS',errs.slice(0,3))}
  games++;console.log(tag,'scen',SC[seed%4],'steps',steps,'glowTaps',glow,'resChecks',resChecks,'board%',minPct.toFixed(0));await ctx.close()}
-(async()=>{const b=await PW.chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
- await Promise.all([[390,763],[375,553]].map(async([W,H])=>{for(let i=0;i<N;i++)await one(b,W,H,SEED0+i)}));
- console.log(bad?`FAIL ${bad} problems`:`PASS ${games} games`);await b.close();process.exit(bad?1:0)})()
+const LAUNCH={args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']};
+// one fresh browser per game; a browser killed from outside (shared machine) is retried, not counted as a game bug
+async function game(W,H,seed){for(let a=0;a<3;a++){let b;try{b=await PW.chromium.launch(LAUNCH);await one(b,W,H,seed);return}catch(e){console.log(`${W}x${H} seed ${seed} retry (${String(e.message).split('\n')[0].slice(0,70)})`)}finally{if(b)await b.close().catch(()=>{})}}bad++;console.log(`${W}x${H} seed ${seed} PROBLEM could not finish after 3 tries`)}
+(async()=>{await Promise.all([[390,763],[375,553]].map(async([W,H])=>{for(let i=0;i<N;i++)await game(W,H,SEED0+i)}));
+ console.log(bad?`FAIL ${bad} problems`:`PASS ${games} games`);process.exit(bad?1:0)})()
