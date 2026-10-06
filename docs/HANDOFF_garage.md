@@ -103,3 +103,11 @@ v87a is LIVE (fe8c354, beta v93 by coordinator). pGAR2 = v87b still blocked by t
   - rerun `t/gate.js` on the stacked build (spots `{"offroad":[-389.5,481.4],"boat":[-417.9,-226.9]}`);
   - REVIEW, then send the coordinator "DEPLOY alex/od-garage <commit> out/v87b <msg>" (workers never run deploy.sh).
 - **Then the 2 nits from the coordinator:** the SMASH! popup must not cover the tutorial card; coupé glass at about 70 % opacity.
+
+## State 2026-10-06 22:50 (session_01E3CnmsrDZjx1pRM5uEN9x2)
+- Live is **v87b 752b225** (cars worker: SMASH double-tap, no traffic in races, new handling). pGAR2 is rebased on it and versioned **v87c**: `./reapply.sh pGAR2.py pNIT.py` on base.html = live 752b225 (already in the repo). Split build: `out/v87c/` (overdrive.html fragment + unchanged live km.js).
+- **Max-upgrade "giant car" bug: not reproducible.** tPlay Athens gold:3333 PASSED on clean builds (fe8c354 + pGAR2, and 752b225 + pGAR2 + pNIT): car 4.56 m, BBOX dump empty, 0 errors (`docs/shots/v87c/tPlay_gold3333.json`). CR_raceBox only measures and offsets the car and never scales it. Most likely cause: the old stale dev2 build (pGAR1b + pGAR2 on v87 0e043bc). If it ever comes back: `t/rbox.js <set> <ups>` starts a menu race via `__dbg.RS` and samples the per-mesh scale chain (headless gets stuck in the countdown, so it's only useful for the countdown pose). tPlayG `BBOX=1` now also prints node scales.
+- Nits: (1) pop-up guard `nit1.js` (pNIT.py): #hitPop/#juPop move above or below a visible #roamTut if they would overlap. The repro (`t/nit.js`, DESK=1 for PC) showed no overlap on phone or PC, and v87b's own SMASH pop (#crSmPop) already hides the tutorial card. (2) Coupé glass: already tinted .7 since v87 (CR_GM), no change.
+- Tyre gap gold/posei max: 0.018–0.029 m. Gate shots: `shots/g3/` (not committed), selection in `docs/shots/v87c/`.
+- Harness: don't run more than one tPlayG/gate at a time (parallel runs starve swiftshader and tPlayG gets stuck at the title). `pkill -f tPlayG.js` kills your own shell.
+- REVIEW sent to the reviewer (699cc47). Next: on PASS, commit out/v87c and send the coordinator DEPLOY.
