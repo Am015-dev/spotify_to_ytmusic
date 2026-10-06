@@ -4,6 +4,7 @@
   <h1>Doorkick <span>Dungeon</span></h1>
   <span class="ph-chip" id="phchip" aria-live="off"></span>
   <span class="gx-sp"></span>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?" title="Hint"></button>
   <button class="gx-ibtn" data-gx="dkLog" aria-label="Dungeon diary"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-scroll"/></svg> <span class="gx-lbl">Diary</span></button>
   <button class="gx-ibtn" data-gx="dkOpp" aria-label="Rivals: their gear and cards"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-rivals"/></svg> <span class="gx-lbl">Rivals</span></button>
   <button class="gx-ibtn" data-gx="dkRules" aria-label="How to play"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-book"/></svg> <span class="gx-lbl">Rules</span></button>
@@ -11,7 +12,6 @@
   <button class="gx-ibtn dk-wide" data-a="mus" id="musbtn" aria-label="Music"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-music"/></svg> On</button>
   <button class="gx-ibtn dk-wide" data-a="speed" id="speedbtn" title="How fast the computer plays"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-slow"/></svg> slow</button>
   <button class="gx-ibtn dk-wide" data-a="pause" id="pausebtn" title="Pause the computer" aria-label="Pause the computer"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-pause"/></svg></button>
-  <button class="gx-ibtn dk-wide" data-a="hints" id="hintbtn" title="Suggested moves"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-hint"/></svg> On</button>
   <button class="gx-ibtn dk-wide" data-a="gfx" id="gfxbtn" title="Graphics quality (High / Medium / Low)" aria-label="Graphics quality"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-gem"/></svg> High</button>
   <button class="gx-ibtn dk-wide" data-a="new">New game</button>
   <button class="gx-ibtn dk-menub" data-gx="dkMenu" aria-label="Menu: sound, speed, hints, graphics, speed test, new game" title="Menu (and Show speed / Test speed)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg></button>
@@ -34,6 +34,8 @@
 <script src="trystero.min.js"></script>
 <script src="netroom.js"></script>
 <script src="shell.js"></script>
+<script src="gx-viewport.js"></script>
+<script src="gx-help.js"></script>
 <script src="gx-campaign.js"></script>
 <script src="campaign-data.js"></script>
 <script src="perfhud.js"></script>
@@ -52,6 +54,7 @@
 <script src="ph.js"></script>
 <script src="bf.js"></script>
 <script src="tbl.js"></script>
+<script src="hlp.js"></script>
 <script src="campaign.js"></script>
 </body>
 </html>
