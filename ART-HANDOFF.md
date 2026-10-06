@@ -13,6 +13,12 @@ Open (not blocking):
 2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
 
+## pART7 IN REVIEW (2026-10-06, art session session_01SjRvRbQzJBAQ18L9ojf9Kb) — candidate 3c3e325 = live v86v 810a5fb + pART7, split in outART/, tOut PASS; REVIEW sent to session_01Y6FYerWwxv43FuKUcaUT4v
+- art7.js + pART7.py (in art.sh): gndBuild non-river cells = adaptive quadtree (ART7_quad/ART7_flat: leaf triangles within 3 cm of tH at 25 points, leaves ≥ 3 m, vertices shared per mesh); river-bank cells: verified step ART7_res (was 25 m, no hill check); outer land y0 −.25 → −.01 + tm polygonOffset; ground y0 offset −.015 → −.005; pART5 draped streets/crossings 4 m segments both ways.
+- Measured (scratchpad grass.js: raycast visible grass vs __mho.gnd at 40 random points per trG tile): live v86v 65 % outside ±5 cm (p01 −0.31) → 0 % (−0.047..+0.014). Grass-over-road (poke.js) 19.8 % → 2.6 %. Terrain 292k → 598k verts / 912k tris. Menu load unchanged (~5.5 s).
+- Tools: local_dbg.html needs node_modules in the served dir (`ln -s $PWD/node_modules outART/`); curl /eval with --data-binary for multi-line files; kill dev.js by explicit PID with -9 (SIGTERM leaves port 9333 busy).
+- On PASS: `./art.sh <live commit>` (check `git log -1 origin/alex/brave-carson-rbpmlk -- games/mainhattan-overdrive/`), cp overdrive.html km.js outART/, tOut, `bash tools/deploy.sh outART "Mainhattan Overdrive v86w: …"`, republish beta, report to coordinator with shots in devkit docs/shots/v86w/.
+
 ## pART6 DONE — reviewer PASS ccc8ab3; deploy candidate v86v = outART/ at d7b5ee7 (live v86u + pART1-6); deploy was refused by session permissions → handed to the coordinator 09:50 UTC
 ### (history) pART6 IN PROGRESS (handoff 2026-10-06 ~08:40 UTC; previous art session session_01FmQ73V8iH1VEUuWjWpM751 is over its context budget)
 State: built on live v86q 5583b1f (`./art.sh 5583b1f`, pART6.py in art.sh). Review #1 FAILed (e0fcede): jump gaps PASS; shadows/tyre gap/shots failed.
