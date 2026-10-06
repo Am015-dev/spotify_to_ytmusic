@@ -24,7 +24,7 @@ Narrow the race tracks from 48 m to ~14–18 m (`W=def.w||48`, `HALF`, `MARGIN=H
 
 Gate it with frame strips and a lap-time balance check (`raceBal3.js`).
 
-## Test tools (`/tmp/claude-0/sp`, not in git; copy what you need)
+## Test tools (copies in `tools/cars/` on this branch, commit 690bf52; run them from a working dir; playwright is at /opt/node22/lib/node_modules/playwright)
 - `jit.js` / `jit3.js`: per-frame jitter probe.
 - `ramps2/3.js`: every city ramp (BACK env).
 - `ram.js` / `ramRace.js`: SMASH 10/10 tests.
