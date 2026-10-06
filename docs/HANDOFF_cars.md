@@ -90,3 +90,46 @@ Problems found:
 4. pCAR25, the full coordinator scope: narrow tracks 14–20 m (prototype pCAR25.py), double-tap ◀/▶ SMASH lunge (no roll, ~1 s cooldown), BOOST is plain boost again, rival health bars + name/class (3 SMASH = wreck; traffic 1), form swap <0.3 s, BOOST button solid + tip vs zone toast. Gate: 10/10 double-taps with zero false triggers, in an iframe.
 - Garage balance done: gold+max is 3.3 % faster than rod (131.8 vs 136.3 s), both P1, reported to session_01LEhhDZWZUb5KQF9GsjoFVJ.
 - Other workers: garage session_01LEhhDZWZUb5KQF9GsjoFVJ (gar2.js before window.__mho), art session_01W6yiubKvmPYdJJoxW8Vqu4 (ground, roads, shadows, lighting; tell it if road geometry changes).
+
+## 2026-10-06 night (session_01PwUpSCA1dTKvDjL9SN6p2L)
+**v87 = live v86z (d064c12) + pCAR25a + pCAR25. Reviewer PASS on 4161c59. Built at out/v87 (b9a493c). The deploy was refused by this session's permission guard, so the coordinator deploys.**
+- Check that live has v87 before the next build. Then re-extract base.html and run `./reapply.sh pCAR25a.py pCAR25.py <next>`.
+- `km.js` must sit next to local_dbg.html when testing roam. Copy it from live; it's gitignored.
+
+### pCAR25a
+- Respawn: on the rebuild frame, `camSnap=true` and the cam state is reset. The 2 s invulnerability blink is removed; the car was hidden every other 0.1 s.
+- Glass: `CR_GM` color (.42,.48,.56), opacity .7.
+
+### pCAR25
+- **Track width:** `CR_trackW` = 0.38·w clamped to 14–20 m; `MARGIN=HALF-1.5`; `CR_LS=W/w0`. These all scale with it:
+  - grid x, laneBias, LANES (×CR_LS in placeTraffic), pads, chicane cones/bars, tram;
+  - wall item, holdX/edge, mine dodge.
+  - Ship contact box is 5.4×2.5.
+- **Lunge:** the old barrel roll (pressed.roll, which had been zeroed) is now an upright lunge: CR_LGV=12 m/s for 0.32 s, cooldown 1 s, ground only, and holdX follows the car.
+  - Input: `CR_lgTap` (300 ms window) on the BZ touchstart and on keydown, in both roam and race. Race sets pressed.roll; roam uses RO.crLg/crLgD/crLgCd, moving the car sideways, stopped by roamHit.
+- **Contact:**
+  - Race: player contact is a bump only. `CR_lgHit` does hull −34, so 3 hits → takedown. Traffic wrecks only on lunge or shield.
+  - City (coordinator rule): traffic wrecks on a lunge OR on |v| > CR_SMASHV (150 km/h); otherwise bump.
+- **HUD:**
+  - Health bars `#crHB`: nearest 4, central screen only, no overlap, hidden in crash cam.
+  - BOOST button is solid (filled cyan `.crOn` when there's charge); the SMASH label is removed.
+  - NEED BOOST tip sits left of the button.
+- **Form swap:**
+  - OB hysteresis cut from 0.9 s/12 m/3 s to 0.15 s/3 m/1.2 s (OB_LEAVE 14 kept).
+  - FL_HOLD .1; race morph rt dt*6.5; boatK lerp dt*14.
+- **Race cam:** `updateCam` wrapper clamps lateral to HALF−0.9 and skips off-track cameras. ccCool is d+7.
+- **Test accessors:** `window.__cr25` (cars, ships, traffic, W/HALF/MARGIN, cam stats, wreck log, `demo()` coupe).
+
+### Gate: tools/cars/g25.js <base> <out>
+- Env: MODES=top,iframe; SKIPROAM / SKIPRACE.
+- Uses real CDP touch.
+- The race harness must stub composer.render during ticks. Without it, software rendering starves touch events and double-taps arrive tens of seconds apart.
+- Don't run other browsers at the same time; CPU contention breaks the 300 ms double-tap window.
+- Other tools: tools/cars/coupe.js (glass shots), tools/tReview.js (reviewer set + tyre gaps). Shots are in shots25/.
+
+### Queue
+1. Reviewer follow-ups:
+   - the SMASH! hitPop covers the centre tutorial card → hide the card while hitPop shows, or move the card down;
+   - glass a bit darker (~70% look; try color .32,.37,.44).
+2. OD_CHANGELOG: when garage v87a is live, make sure a v87 entry exists (garage was asked to add it).
+3. Not ours: the traffic pickup is boxy (traffic art).
