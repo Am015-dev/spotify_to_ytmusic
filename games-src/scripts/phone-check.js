@@ -79,7 +79,7 @@ const PAGE_LIB = `(() => {
         if (getComputedStyle(e).display.startsWith('inline')) continue;
         if (![...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
         const r = e.getBoundingClientRect(); if (r.bottom < 0 || r.top > H || r.right < 0 || r.left > W) continue;
-        if (e.closest('[class*=drawer],[class*=Drawer],[class*=rules],[class*=ref],[class*=menu],[class*=gamelog],[class*=-log],[id$=log],[class*=settings],[aria-modal=true]')) continue; // opened on purpose by the player
+        if (e.closest('[class*=drawer],[class*=Drawer],[class*=rules],[class*=ref],[class*=menu],[class*=gamelog],[class*=-log],[id$=log],[class*=settings],[aria-modal=true],[data-help]')) continue; // opened on purpose by the player, or help (lightbulb, first-time coach bubble)
         const words = (e.innerText || '').replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(w => /[a-z][a-z]/i.test(w));
         if (words.length > 8) wordy.push(words.length + 'w "' + words.slice(0, 6).join(' ') + '…"');
       }
