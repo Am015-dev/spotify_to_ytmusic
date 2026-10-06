@@ -13,6 +13,15 @@ Open (not blocking):
 2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
 
+## v87d SHIPPED (live 2783bbf, 2026-10-06 23:33 UTC; art session session_01MNPu65Kc2CuGWijasGadGf) - reviewer PASS d85de1e
+- v87d = pART8 + pV87d.py (OD_CHANGELOG entry), built with `./art.sh 1bc1f9f`. art.sh now runs pV87d.py last; for the next release, copy it to pV87e.py with new text and swap it in art.sh.
+- Deploy files go in out/<ver>/ and must be force-added (`git add -f`), because .gitignore matches overdrive.html and km.js. The coordinator says out/ held a stale file, so always check `git show origin/alex/od-art:out/<ver>/overdrive.html`.
+- Flicker probe tools/a8/zf.js `__ZF(save,d16)`: per frame, road pixels covered by grass, using the real polygonOffsets, at 24-bit or 16-bit (phone-like) depth. Occlusion behind hills (>0.5 m) is excluded. strip.sh drives with gas + optional autopilot (tools/a8/ap.js; its nearest-NODE steering wedged the car in Athens, so use `__APstep=()=>0` on straight roads). Debug pages: local_dbg.html with SM3 `rel` made a no-op (local_dbg_keep*.html, gitignored).
+- Result: live v87a had 0-15 px per frame of grass on the road in Frankfurt (42-92 at 16-bit) and bursts up to 3166 px in Athens; v87d has 0 in both. Numbers in shots/v87d/README.md.
+- The Athens straight used: (984.3,-1593) h 0.588 (Koulouri Rush route). The Frankfurt one: (1920,-79) h pi.
+- The reviewer has no real iPhone, so Alex should confirm on his phone.
+NEXT (coordinator 23:33): (1) the brown box on an Athens road (Koulouri Rush route): find the mesh and the root cause; the reviewer was asked for the shot path. It is not visible in the shots/v87d/ath strips. (2) The hazy/pink player car in races (alex/od-cars shots26/rev87b/v87b_top_race_01_smash_pop.png; suspect fog, bloom or the speed-line overlay). (3) The boxy traffic pickup, the teal far-LOD truck. (4) pART10. Next version = v87e on live 2783bbf.
+
 ## P0 (coordinator 21:56 UTC, Alex 3/10 "roads switch to green terrain while I drive"): ship pART8 as pART8a within the hour
 The fix is pART8 at 180f067 (grass dips 10 cm under road footprints + road polygonOffset + draped junctions; 0 pokes both cities). Rebuild on CURRENT live (v87a or newer), take a MOVING chase-cam strip in both cities, quick REVIEW.
 NEW RULE (CLAUDE.md 99ccb36): workers never run deploy.sh. After PASS: rebuild on live HEAD, add the OD_CHANGELOG entry, push out/<ver>/ (overdrive.html+km.js) to alex/od-art, send the coordinator "DEPLOY <branch> <commit> out/<ver> <msg>" + 3 bullets + shot paths.
