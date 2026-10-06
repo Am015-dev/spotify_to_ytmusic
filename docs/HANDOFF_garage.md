@@ -111,3 +111,4 @@ v87a is LIVE (fe8c354, beta v93 by coordinator). pGAR2 = v87b still blocked by t
 - Tyre gap gold/posei max: 0.018–0.029 m. Gate shots: `shots/g3/` (not committed), selection in `docs/shots/v87c/`.
 - Harness: don't run more than one tPlayG/gate at a time (parallel runs starve swiftshader and tPlayG gets stuck at the title). `pkill -f tPlayG.js` kills your own shell.
 - REVIEW sent to the reviewer (699cc47). Next: on PASS, commit out/v87c and send the coordinator DEPLOY.
+- **v87c: reviewer PASS 699cc47; DEPLOY sent to the coordinator (01bfe72, out/v87c).** Reviewer follow-ups that don't block, for the next garage round: (1) boat sits 5–8 cm high, so sink the set boats until the waterline crosses the hull; (2) send a real shot of a hit/SMASH pop-up moved off a visible #roamTut (10_pc_popup_guard.png showed the intro dialogue instead); (3) GAS looks dimmed in 02_ath_drive: UNVERIFIED whether that's live auto-gas styling, so check it against a plain v87b tPlay shot.
