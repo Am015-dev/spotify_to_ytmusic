@@ -1,10 +1,10 @@
 # CAR19: the city box truck (truck / delivery / garbage truck) gets LEGO detail: dark cab side windows, a grille, ribs every
 #        3 studs and a top rail on the cargo box (light-grey bricks, so the paint tint shows them as a darker shade), and
-#        dark mudguards over every wheel. Needs pCAR18.
+#        dark mudguards over every wheel. Needs pCAR17.
 exec(open('P.py').read())
 if 'CR_boxWall' in s:
     print('OK');raise SystemExit
-assert 'CR_fadeA' in s, 'apply pCAR18 first'
+assert 'CR_camHide' in s, 'apply pCAR17 first'
 R(" add('T8x32',-4,-16,0,K,0);for(const z of[-15,5,10])sym('arch',-4,z,0,K,0),sym('wL',-4,z,0,K,wy);",
   " add('T8x32',-4,-16,0,K,0);for(const z of[-15,5,10])sym('arch',-5,z,0,K,1),sym('wL',-4,z,0,K,wy);")
 R("add('ws6',-3,-16,0,B,7);sym('B1x3',-4,-16,0,B,7);",
