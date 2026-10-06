@@ -1,5 +1,5 @@
 # CAR20: no glow ball around the car: the glow points that ride along with sparks (wall scrapes, bumps, swaps) are only spawned
-#        more than 14 m from the camera (near the lens one 6-unit point covered the whole car). Needs pCAR19.
+#        more than 14 m from the camera (near the lens one 6-unit point covered the whole car). Needs pCAR19 (pCAR18 dropped).
 exec(open('P.py').read())
 if 'CR_glowFar' in s:
     print('OK');raise SystemExit
