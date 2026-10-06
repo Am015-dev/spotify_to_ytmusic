@@ -16,8 +16,10 @@ function clamp(){if(!R.classList.contains('ph'))return;
     const full=(e.innerText||e.textContent||'').trim();if(words(full).length<=MAXW)continue;
     if(!e.dataset.full)e.dataset.full=e.dataset.full||full;
     e.textContent=cut(full,KEEP);e.dataset.tl='1';e.classList.add('tl')}}}
-let q=0;const sched=()=>{if(q)return;q=requestAnimationFrame(()=>{q=0;try{clamp()}catch(e){console.warn('brief',e)}})};
-function start(){try{const mo=new MutationObserver(sched);mo.observe(document.body,{childList:true,subtree:true,characterData:true})}catch(e){}sched()}
+let busy=false,mo=null;
+function run(){if(busy)return;busy=true;try{clamp()}catch(e){console.warn('brief',e)}finally{busy=false;if(mo)mo.takeRecords()}}
+// a MutationObserver callback is a microtask: the text is cut before the browser paints or a test looks at it
+function start(){try{mo=new MutationObserver(run);mo.observe(document.body,{childList:true,subtree:true,characterData:true})}catch(e){}run()}
 // ---- long-press popup ----
 let tip=null,timer=0,shown=0;
 function hide(){if(tip){tip.remove();tip=null}}
@@ -27,6 +29,6 @@ document.addEventListener('pointerdown',e=>{clearTimeout(timer);if(tip&&Date.now
 ['pointerup','pointercancel','pointermove','scroll'].forEach(k=>document.addEventListener(k,e=>{if(k==='pointermove'&&e.pointerType==='mouse')return;clearTimeout(timer)},true));
 document.addEventListener('contextmenu',e=>{if(e.target.closest&&e.target.closest('[data-full]'))e.preventDefault()},true);
 document.addEventListener('click',e=>{if(tip&&Date.now()-shown>300){hide();e.stopPropagation()}},true);
-window.BRIEF={clamp,show,hide,words};
+window.BRIEF={clamp:run,show,hide,words};
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();

@@ -29,8 +29,8 @@ function shipR(s){V3.camera.updateMatrixWorld();const a=px(s.x,s.y),f=fwd(s.h),b
 function shownXY(s){const m=V3.ships[s.id];if(!m)return {x:s.x,y:s.y};return {x:m.position.x*10,y:MAT-m.position.z*10}}
 // ---- camera: frame the points that matter, inside the part of the board that is not under the bars ----
 function rayGround(sx,sy){const c=V3.r.domElement;const v=new THREE.Vector2(sx/c.clientWidth*2-1,-(sy/c.clientHeight)*2+1);const rc=new THREE.Raycaster();rc.setFromCamera(v,V3.camera);const p=new THREE.Vector3();return rc.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0,1,0),0),p)?p:null}
-function fit(pts,minW){if(!v3()||!pts.length)return;const C=V3.cam,cam=V3.camera,from=Object.assign({},C);const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
-  const tp=46,bt=(bar?bar.offsetHeight:70)+10,sd=12;minW=minW||230;
+function fit(pts,minW,side,topPad){if(!v3()||!pts.length)return;const C=V3.cam,cam=V3.camera,from=Object.assign({},C);const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
+  const tp=topPad||46,bt=(bar?bar.offsetHeight:70)+10,sd=side||12;minW=minW||230;
   let a=1e9,b=-1e9,d=1e9,e=-1e9;for(const p of pts){a=Math.min(a,p.x);b=Math.max(b,p.x);d=Math.min(d,p.y);e=Math.max(e,p.y)}
   if(b-a<minW){const m=(a+b)/2;a=m-minW/2;b=m+minW/2}if(e-d<minW){const m=(d+e)/2;d=m-minW/2;e=m+minW/2}
   const box=[{x:a,y:d},{x:b,y:d},{x:a,y:e},{x:b,y:e}];C.tx=S3((a+b)/2);C.tz=S3(MAT-(d+e)/2);
@@ -42,7 +42,7 @@ function fit(pts,minW){if(!v3()||!pts.length)return;const C=V3.cam,cam=V3.camera
 const XY=s=>({x:s.x,y:s.y});
 function around(s,r){r=r||B(s)*1.2;return [{x:s.x-r,y:s.y-r},{x:s.x+r,y:s.y+r}]}
 function framePts(k){const all=alive();const pts=[];const add=a=>{for(const p of a)pts.push(p)};
-  if(k==='plan'&&BF.sel){const s=ship(BF.sel);add(around(s,B(s)*.9));dialOf(s).forEach(m=>{const p=finalPose(s,B(s),m);add(around(p,B(s)*.75))});return {pts,min:200}}
+  if(k==='plan'&&BF.sel){const s=ship(BF.sel);add(around(s,B(s)*.9));dialOf(s).forEach(m=>{const p=finalPose(s,B(s),m);add(around(p,B(s)*.75))});return {pts,min:200,sd:30,tp:104}}
   if(k==='action'||k==='sub'){const s=ship(G.cur);add(around(s,B(s)*1.6));if(k==='sub'&&BF.sub){if(BF.sub.opts)BF.sub.opts.forEach(o=>o.p&&add(around(o.p,B(s)*.8)));if(BF.sub.targets)BF.sub.targets.forEach(id=>add(around(ship(id))))}return {pts,min:400}}
   if(k==='target'){const s=ship(G.cur);add(around(s));for(const w of weaponsFor(s))for(const t of w.targets)add(around(ship(t.id)));return {pts,min:380}}
   if(k==='dice'&&G.atk){add(around(ship(G.atk.a)));add(around(ship(G.atk.d)));all.forEach(s=>add(around(s)));return {pts,min:380}}
@@ -88,7 +88,7 @@ function chips(list,ms){for(const c of list){const s=ship(c.id);if(!s)continue;c
     const it={el,ship:s.id,dy:-1.25,tmp:true};BF.items.push(it);setTimeout(()=>{el.remove();BF.items=BF.items.filter(x=>x!==it)},ms+400)}}
 // ---- render: rebuild the overlay when the situation changes ----
 function legend(h){const el=document.createElement('div');el.className='bfleg';el.innerHTML=h;ov.appendChild(el);BF.leg=el}
-function clear(){if(BF.leg){BF.leg.remove();BF.leg=null}BF.items=BF.items.filter(it=>{if(it.tmp)return true;it.el.remove();return false});svg.innerHTML='';BF.paths=[];setBtns('')}
+function clear(){if(BF.leg){BF.leg.remove();BF.leg=null}BF.items=BF.items.filter(it=>{if(it.tmp)return true;it.el.remove();return false});svg.innerHTML='';BF.paths=[];BF.fing=null;if(fing)fing.hidden=true;setBtns('')}
 function setBtns(h){if(btns&&btns._h!==h){btns._h=h;btns.innerHTML=h}}
 function item(html,cls,o){const el=document.createElement(o&&o.tag||'button');if(el.tagName==='BUTTON')el.type='button';el.className=cls;el.innerHTML=html;for(const k in (o&&o.data)||{})el.dataset[k]=o.data[k];if(o&&o.label)el.setAttribute('aria-label',o.label);el.style.visibility='hidden';lay.appendChild(el);const it=Object.assign({el},o||{});BF.items.push(it);return it}
 function pathW(pts,cls,h){const p=document.createElementNS('http://www.w3.org/2000/svg','path');p.setAttribute('class',cls);svg.appendChild(p);BF.paths.push({el:p,pts,h:h||.4});return p}
@@ -107,7 +107,7 @@ function bfRender(){const on=want();if(on!==BF.on){BF.on=on;R.classList.toggle('
   const key=[k,G.round,G.phase,G.cur,G.q&&G.q.kid,BF.sel,BF.sub&&BF.sub.a,k==='plan'?JSON.stringify(UI.draft):'',G.atk&&[G.atk.step,(G.atk.dice||[]).join(),(G.atk.def||[]).join(),G.atk.rr&&JSON.stringify(G.atk.rr)].join('/'),UI.hold&&UI.hold.kind,alive().length,PHN.pop&&PHN.pop.kind].join('|');
   const sheet=k==='ask'||(!!PHN.pop&&PHN.pop.kind==='info');R.classList.toggle('bf-sheet',sheet);
   topLine(k);
-  const fk=[k,BF.sel,G.cur,G.round,BF.sub&&BF.sub.a,G.atk&&G.atk.a+G.atk.d].join('|');if(fk!==BF.fkey&&k!=='fly'&&k!=='res'&&k!=='note'){BF.fkey=fk;const f=framePts(k==='sub'?'sub':k);requestAnimationFrame(()=>fit(f.pts,f.min))}
+  const fk=[k,BF.sel,G.cur,G.round,BF.sub&&BF.sub.a,G.atk&&G.atk.a+G.atk.d].join('|');if(fk!==BF.fkey&&k!=='fly'&&k!=='res'&&k!=='note'){BF.fkey=fk;const f=framePts(k==='sub'?'sub':k);requestAnimationFrame(()=>fit(f.pts,f.min,f.sd,f.tp))}
   if(key===BF.key)return;BF.key=key;clear();dice.hidden=true;
   BF.fingT=null;
   if(k==='brief')briefUI();else if(k==='setup')setupUI();else if(k==='plan')planUI();else if(k==='action'||k==='sub')actionUI(s);else if(k==='target')targetUI(s);
@@ -196,7 +196,7 @@ function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq
   if(ds.bf==='stats'){BF.wantStats=true;UI.stats=true;render();return}
   if(ds.bf==='back'){BF.sub=null;render();return}
   if(ds.bfship!=null){selShip(ds.bfship);return}
-  if(ds.bfm!=null){const s=ship(BF.sel);if(!s)return;UI.draft[s.id]=+ds.bfm;UI.sel=s.id;sfx('token');const my=alive().filter(x=>x.side===s.side);const nx=my.find(x=>UI.draft[x.id]==null);BF.sel=nx?nx.id:null;render();return}
+  if(ds.bfm!=null){const s=ship(BF.sel);if(!s)return;UI.draft[s.id]=+ds.bfm;UI.sel=s.id;BF.selAt=performance.now();sfx('token');const my=alive().filter(x=>x.side===s.side);const nx=my.find(x=>UI.draft[x.id]==null);BF.sel=nx?nx.id:null;render();return}
   if(ds.bfa!=null){const s=ship(G.cur);if(!s)return;if(ds.bfa==='skip'){uiAct({act:'action',a2:'skip'});return}const a=actionsFor(s).find(x=>x.a===ds.bfa);if(!a)return;
     if(a.targets&&a.targets.length===1){uiAct({act:'action',a2:a.a,arg:a.targets[0]});return}
     if(a.targets||a.opts){BF.sub={a:a.a,targets:a.targets,opts:a.opts};BF.key='';render();return}
@@ -205,7 +205,7 @@ function onClick(e){if(e.target.closest('#bfdice')&&!e.target.closest('[data-bfq
   if(ds.bfw!=null){uiAct({act:'fire',w:ds.bfw,t:ds.bft});return}
   if(ds.bfq!=null){uiAct({act:'ask',k:ds.bfq});return}}
 function lockIn(){const ps=planSide();const dials={};alive().filter(s=>s.side===ps).forEach(s=>dials[s.id]=UI.draft[s.id]);UI.pass=null;sfx('token');uiAct({act:'dials',dials});if(G&&G.phase==='plan'&&planSide()>=0)UI.pass=ps;render()}
-function selShip(id){const s=ship(id);if(!s||!s.alive||G.phase!=='plan'||planSide()<0||s.side!==planSide())return;BF.sel=BF.sel===id&&UI.draft[id]!=null?null:id;UI.sel=id;sfx('click');render()}
+function selShip(id){const s=ship(id);if(!s||!s.alive||G.phase!=='plan'||planSide()<0||s.side!==planSide())return;BF.selAt=performance.now();BF.sel=BF.sel===id&&UI.draft[id]!=null?null:id;UI.sel=id;sfx('click');render()}
 // a tap on the board itself (a ship, or empty space)
 PHN.tapBF=function(e){if(!BF.on||!G)return false;const r=V3.r.domElement.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
   if(UI.hold){if(BF.holdT){clearTimeout(BF.holdT);BF.holdT=0}releaseHold();return true}
@@ -216,10 +216,10 @@ PHN.tapBF=function(e){if(!BF.on||!G)return false;const r=V3.r.domElement.getBoun
     if(k==='sub'&&BF.sub&&BF.sub.targets&&BF.sub.targets.includes(best.id)){const a=BF.sub;BF.sub=null;uiAct({act:'action',a2:a.a,arg:best.id});return true}
     PHN.openPop('info',best.id);return true}
   if(PHN.pop){PHN.closePop();return true}
-  if(k==='plan'&&BF.sel){BF.sel=null;render();return true}
+  if(k==='plan'&&BF.sel){/* the camera eases after a pick: markers move, so a tap that just missed one must not drop the pick */if((typeof V3!=='undefined'&&V3.ez)||performance.now()-(BF.selAt||0)<650)return true;BF.sel=null;render();return true}
   return false};
 // ---- every frame: keep the overlay glued to the board as the camera and ships move ----
-function relaxItems(list,Wd,Ht){for(let it=0;it<24;it++){for(const a of list){const m=a.hw||24;a.sx=Math.max(m,Math.min(Wd-m,a.sx));a.sy=Math.max(70,Math.min(Ht-(bar?bar.offsetHeight:90)-22,a.sy))}for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];let dx=b.sx-a.sx,dy=b.sy-a.sy;if(Math.hypot(dx,dy)<.5){dx=Math.cos(j*2.4);dy=Math.sin(j*2.4)}const d=Math.hypot(dx,dy);const min=(a.r+b.r)*.95;if(d<min){const p=(min-d)/2,ux=dx/d,uy=dy/d;a.sx-=ux*p;a.sy-=uy*p;b.sx+=ux*p;b.sy+=uy*p}}}}
+function relaxItems(list,Wd,Ht){const top=document.querySelector('.bfleg')?104:70;for(let it=0;it<30;it++){for(const a of list){const m=a.hw||24;a.sx=Math.max(m,Math.min(Wd-m,a.sx));a.sy=Math.max(top,Math.min(Ht-(bar?bar.offsetHeight:90)-22,a.sy))}for(let i=0;i<list.length;i++)for(let j=i+1;j<list.length;j++){const a=list[i],b=list[j];let dx=b.sx-a.sx,dy=b.sy-a.sy;if(Math.hypot(dx,dy)<.5){dx=Math.cos(j*2.4);dy=Math.sin(j*2.4)}const d=Math.hypot(dx,dy);const min=(a.r+b.r)*.95;if(d<min){const p=(min-d)/2,ux=dx/d,uy=dy/d;a.sx-=ux*p;a.sy-=uy*p;b.sx+=ux*p;b.sy+=uy*p}}}}
 function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G)return;V3.camera.updateMatrixWorld();const c=V3.r.domElement,Wd=c.clientWidth,Ht=c.clientHeight;
   const rel=[];for(const it of BF.items){let x,y,r=0;if(it.ship){const s=ship(it.ship);if(!s||!s.alive){it.el.style.display='none';continue}const p=shownXY(s);const q=px(p.x,p.y,1);r=shipR(s);x=q[0];y=q[1];
       if(it.ring){const d=Math.round(r*2.6);it.el.style.width=it.el.style.height=d+'px'}
@@ -228,7 +228,7 @@ function loop(){requestAnimationFrame(loop);if(!BF.on||!ov||ov.hidden||!v3()||!G
     else{const q=px(it.x,it.y,.5);x=q[0];y=q[1]}
     it.sx=x;it.sy=y;const cl=it.el.className;it.r=it.relax?23:/bftgt/.test(cl)?32:/bfact/.test(cl)?(/skip/.test(cl)?24:37):0;it.hw=/bfact/.test(cl)?(/skip/.test(cl)?22:34):/bftgt/.test(cl)?32:0;if(it.relax||it.r)rel.push(it)}
   relaxItems(rel,Wd,Ht);
-  for(const it of BF.items){if(it.sx==null)continue;const hw=it.hw||22,x=Math.max(hw,Math.min(Wd-hw,it.sx)),y=Math.max(22,Math.min(Ht-22,it.sy));it.el.style.display='';it.el.style.visibility='';it.el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,-50%)`}
+  for(const it of BF.items){if(it.sx==null)continue;const hw=it.hw||22,x=Math.max(hw,Math.min(Wd-hw,it.sx)),y=Math.max(22,Math.min(/bfm/.test(it.el.className)?Ht-(bar?bar.offsetHeight:90)-20:Ht-22,it.sy));it.el.style.display='';it.el.style.visibility='';it.el.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,-50%)`}
   svg.setAttribute('viewBox',`0 0 ${Wd} ${Ht}`);for(const p of BF.paths){const d=p.pts.map((q,i)=>{const v=px(q.x,q.y,p.h);return (i?'L':'M')+v[0].toFixed(1)+' '+v[1].toFixed(1)}).join('');if(p.el._d!==d){p.el._d=d;p.el.setAttribute('d',d)}}
   // the dice sit in the half of the board away from the two ships
   if(!dice.hidden&&G.atk||!dice.hidden&&UI.hold&&UI.hold.R){const A=G.atk||UI.hold.R;const a=ship(A.a),d=ship(A.d);if(a&&d){const ya=px(a.x,a.y)[1],yd=px(d.x,d.y)[1];const m=(ya+yd)/2;const want=m<Ht*.48?Math.min(Ht-dice.offsetHeight/2-110,Math.max(ya,yd)+dice.offsetHeight/2+40):Math.max(dice.offsetHeight/2+46,Math.min(ya,yd)-dice.offsetHeight/2-40);dice.style.top=Math.round(Math.max(dice.offsetHeight/2+40,Math.min(Ht-dice.offsetHeight/2-100,want)))+'px'}}

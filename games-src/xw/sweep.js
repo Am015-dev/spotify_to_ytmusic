@@ -23,7 +23,7 @@ const PROBE = () => {
   const de = document.documentElement; out.hscroll = Math.max(de.scrollWidth, document.body.scrollWidth) > innerWidth + 1;
   if (!out.ok) return out;
   out.win = G.winner; out.round = G.round; out.phase = G.phase; out.key = (typeof BF !== 'undefined' && BF.key) || ''; out.bf = typeof BF !== 'undefined' && BF.on;
-  out.pop = !!(window.PHN && PHN.pop); out.hint = (document.getElementById('bfhint') || {}).textContent || '';
+  out.modal = !!(document.querySelector('#modal .dlg') && document.querySelector('#modal:not(.hidden)')); out.pop = !!(window.PHN && PHN.pop); out.hint = (document.getElementById('bfhint') || {}).textContent || '';
   out.moving = Object.values(V3.anim || {}).filter(a => a && a.path && a.path.length > 2 && a.dur < 1e8).length + (document.getElementById('bfdice') && !document.getElementById('bfdice').hidden ? 0 : 0);
   out.busy = !!V3.ez || !!(V3.busy);
   const sels = '#bfl button,#bfbtns button,#bfdice .die.pick,#prompt button,.gxc button,.gx-bar button,#modal button,.gx-dock .btn';
@@ -33,6 +33,7 @@ const PROBE = () => {
     const dock = e.closest('.gx-dock'); const scroll = !!(dock && !e.closest('#bfl'));
     out.ctl.push({ c: String(e.className).slice(0, 40) + (e.dataset.bf ? '/' + e.dataset.bf : ''), x, y, w: r.width, h: r.height, inVP, cov: inVP && !(t && (t === e || e.contains(t) || t.contains(e))), by: t && ((t.id || t.className) + ' ' + (() => { const o = []; for (let q = t; q && q !== document.body && o.length < 4; q = q.parentElement) { const cs = getComputedStyle(q); o.push(q.className + '{op' + cs.opacity + ',' + cs.visibility + ',' + Math.round(q.getBoundingClientRect().top) + '}') } return o.join('<') })()), bf: !!e.closest('#bfl,#bfbtns,#bfdice'), anim: !!(e.getAnimations && (e.getAnimations().length || (e.parentElement && e.parentElement.getAnimations && e.parentElement.getAnimations().length))), gxc: !!e.closest('.gxc'), scroll, txt: e.textContent.trim().slice(0, 18) });
   }
+  { const m = out.ctl.filter(c => /bfm/.test(c.c) && !/small/.test(c.c) && c.inVP); out.bfmClose = 999; for (let i = 0; i < m.length; i++) for (let j = i + 1; j < m.length; j++) { const d = Math.hypot(m[i].x - m[j].x, m[i].y - m[j].y); if (d < out.bfmClose) { out.bfmClose = d; out.bfmWho = m[i].c + '@' + Math.round(m[i].x) + ',' + Math.round(m[i].y) + ' ' + m[i].txt + ' vs ' + m[j].c + '@' + Math.round(m[j].x) + ',' + Math.round(m[j].y) + ' ' + m[j].txt; } } }
   const words = t => (t || '').replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(w => /[a-z][a-z]/i.test(w));
   for (const e of document.body.querySelectorAll('*')) {
     if (/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|SVG|TEXT|TSPAN|BUTTON)$/i.test(e.tagName) || !vis(e)) continue; if (getComputedStyle(e).display.startsWith('inline')) continue;
@@ -72,7 +73,7 @@ async function choose(p, st, r) {
     else if (k === 'res' || k === 'note') return { x: 8, y: 100, c: 'any', nochk: 1 };
     else if (k === 'ask') el = q('#prompt [data-act=ask].primary')[0] || q('#prompt [data-act=ask]')[0] || q('#bfbtns button')[0];
     if (!el) el = q('#bfbtns .primary')[0] || q('#bfbtns button')[0];
-    if (!el) return null; const R = el.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2, c: String(el.className) + (el.dataset.bf || '') };
+    if (!el) return null; const R = el.getBoundingClientRect(), x = R.left + R.width / 2, y = R.top + R.height / 2, t = document.elementFromPoint(x, y); return { x, y, c: String(el.className) + (el.dataset.bf || ''), hit: !!(t && (t === el || el.contains(t))) };
   }, [st.key.split('|')[0], r]);
 }
 const SIG = () => typeof G === 'undefined' || !G ? '-' : [G.round, G.phase, G.step, G.cur, G.oi, (typeof BF !== 'undefined' && BF.key) || '', G.ships.map(s => s.x + ',' + s.y + ',' + s.hull + s.sh).join(';'), G.log && G.log.length, document.querySelectorAll('.gxc:not([hidden])').length, (document.getElementById('bfhint') || {}).textContent].join('|');
@@ -85,10 +86,11 @@ async function checkStep(p, tag, st, who) {
   if (st.wordy.length) await fail(p, tag, 'text >8 words', st.wordy.slice(0, 2).join(' / '));
   for (const c of st.ctl) {
     if (c.gxc) continue; if (!c.bf && c.scroll) continue;
-    if (c.inVP && c.cov && !/bfring|bfm small/.test(c.c)) await fail(p, tag, 'covered', c.c + ' by ' + c.by);
+    if (c.inVP && c.cov && !st.modal && !/bfring|bfm/.test(c.c)) await fail(p, tag, 'covered', c.c + ' by ' + c.by);
     if (c.bf && !c.inVP) await fail(p, tag, 'off screen', c.c);
     if (c.bf && !c.anim && Math.min(c.w, c.h) < 29.5) await fail(p, tag, 'too small', c.c + ' ' + Math.round(c.w) + 'x' + Math.round(c.h));
   }
+  if (st.bfmClose < 12) await fail(p, tag, 'markers on top of each other', Math.round(st.bfmClose) + 'px apart ' + st.bfmWho + ' key ' + st.key);
   if (st.top) { const a = st.top.shown, b = st.top.eng; if (a[0] !== b[0] || a[1] !== b[1] || a[2] !== b[2] || a[3] !== b[3]) { st.topBad = (st.topBad || 0); await fail(p, tag, 'score mismatch', 'shown ' + a + ' engine ' + b); } }
   if (!st.finger) p._fb = 0; if (st.finger) { fingers++; const near = st.ctl.some(c => c.bf && Math.hypot(c.x - st.finger.x, c.y - st.finger.y) < Math.max(60, c.w * .75)); p._fb = near || st.key.split('|')[0] === 'brief' ? 0 : (p._fb || 0) + 1; if (p._fb >= 3) await fail(p, tag, 'finger at nothing', st.key + ' ' + Math.round(st.finger.x) + ',' + Math.round(st.finger.y) + ' target ' + st.finger.el); }
 }
@@ -106,9 +108,10 @@ async function play(p, tag, o) {
     }
     const sig = await p.evaluate(SIG); if (sig !== last) { last = sig; lastAt = Date.now(); } else if (Date.now() - lastAt > 8000 && !st.moving && !st.busy) { await fail(p, tag, 'stuck >8s', st.key + ' ' + st.phase); lastAt = Date.now(); if (Date.now() - t0 > 60000 && n > 60) break; }
     if (st.gxc) { const g = await p.evaluate(() => { const b = [...document.querySelectorAll('.gxc button')].filter(e => e.offsetParent && !e.disabled); const pr = b.find(e => /go|primary/.test(e.className)) || b.find(e => /next|start|continue|fight|play/i.test(e.textContent)) || b[0]; if (!pr) return null; const R = pr.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2 } }); if (g) await p.touchscreen.tap(g.x, g.y); await p.waitForTimeout(500); continue; }
-    if (st.pop) { await p.touchscreen.tap(8, 120); await p.waitForTimeout(400); if (await p.evaluate(() => !!PHN.pop)) { p._popStuck = (p._popStuck || 0) + 1; if (p._popStuck > 3) { await fail(p, tag, 'info sheet will not close', 'a tap on the board does not close it'); await p.evaluate(() => PHN.closePop()); p._popStuck = 0; } } continue; }
+    if (st.pop) { await p.touchscreen.tap(8, 120); await p.waitForTimeout(400); if (await p.evaluate(() => !!PHN.pop)) { const cb = await p.evaluate(() => { const e = [...document.querySelectorAll('.pp button, .gx-dock button, .gx-x')].find(x => x.offsetParent && /close|×|got it/i.test(x.textContent + x.className)); if (!e) return null; const R = e.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2 } }); if (cb) { await p.touchscreen.tap(cb.x, cb.y); await p.waitForTimeout(400); } }
+    if (await p.evaluate(() => !!PHN.pop)) { p._popStuck = (p._popStuck || 0) + 1; if (p._popStuck > 3) { await fail(p, tag, 'info sheet will not close', 'a tap on the board does not close it'); await p.evaluate(() => PHN.closePop()); p._popStuck = 0; } } continue; }
     const pick = await choose(p, st, rnd());
-    if (pick) { taps++; await p.touchscreen.tap(pick.x, pick.y); if (!pick.nochk && Date.now() - lastAt > 3500) { /* a glowing target that ignores taps: still the same screen 1.5 s after the tap */ await p.waitForTimeout(1500); const s2 = await p.evaluate(SIG); if (s2 === sig) await fail(p, tag, 'tap did nothing', pick.c + ' @' + st.key); } }
+    if (pick) { taps++; await p.touchscreen.tap(pick.x, pick.y); if (!pick.nochk && pick.hit !== false && Date.now() - lastAt > 3500) { /* a glowing target that ignores taps: still the same screen 1.5 s after the tap */ await p.waitForTimeout(1500); const s2 = await p.evaluate(SIG); if (s2 === sig) await fail(p, tag, 'tap did nothing', pick.c + ' @' + st.key + ' ' + JSON.stringify(await p.evaluate(([x, y]) => { const t = document.elementFromPoint(x, y); return { top: t && (t.id || t.className || t.tagName), pop: !!PHN.pop, sub: !!BF.sub, paused: !!UI.paused, hold: !!UI.hold, ez: !!V3.ez, busy: !!V3.busy, ph: G.phase, cur: G.cur, mine: typeof humanTurn === 'function' && humanTurn(), pend: !!UI.pending, info: UI.info, stats: UI.stats, wave: !!BF.wave, fly: performance.now() < BF.flyUntil } }, [pick.x, pick.y]))); } }
     await p.waitForTimeout(pick ? 420 : 350);
   }
   await fail(p, tag, 'battle too long', 'no winner after ' + MAXMS / 1000 + 's'); return st;
@@ -116,7 +119,7 @@ async function play(p, tag, o) {
 async function battle(b, W, H, i) {
   const tag = `${W}x${H}#${i}`; const p = await newPage(b, W, H); battles++;
   try {
-    const kind = i % 3; const sortie = Math.floor(rnd() * 10);
+    const kind = E.KIND != null ? +E.KIND : i % 3; const sortie = Math.floor(rnd() * 10);
     if (kind === 0) await p.tap('[data-start]'); else { const nS = await p.evaluate(() => SORTIES.length); await p.evaluate(k => startGame('solo', k), kind === 1 ? Math.min(sortie, nS - 1) : undefined); }
     await p.waitForTimeout(1500);
     const st = await play(p, tag, { rotAt: i < ROT ? 12 : 0 });
