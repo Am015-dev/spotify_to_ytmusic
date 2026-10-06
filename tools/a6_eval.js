@@ -7,7 +7,7 @@ window.__A6={
    // cluster the lowest meshes into tyres by position
    const cl=[];for(const m of low){const c=m.b.getCenter(new T.Vector3());let k=cl.find(q=>Math.hypot(q.x-c.x,q.z-c.z)<.6);if(!k){k={x:c.x,z:c.z,y:m.b.min.y,n:0};cl.push(k)}k.y=Math.min(k.y,m.b.min.y);k.n++}
    const rc=new T.Raycaster();rc.far=3;const objs=[];D.scene.traverse(o=>{if(o.isMesh&&o.visible&&!o.material.transparent){let c=false;for(let a=o;a;a=a.parent)if(a===s.mesh){c=true;break}if(!c)objs.push(o)}});
-   return cl.map(k=>{rc.set(new T.Vector3(k.x,k.y+.6,k.z),new T.Vector3(0,-1,0));const h=rc.intersectObjects(objs,false)[0];return{x:+k.x.toFixed(2),z:+k.z.toFixed(2),tyreY:+k.y.toFixed(3),roadY:h?+h.point.y.toFixed(3):null,gap:h?+(k.y-h.point.y).toFixed(3):null,hit:h?(h.object.name||h.object.type):null}})},
+   return cl.map(k=>{rc.set(new T.Vector3(k.x,k.y+.6,k.z),new T.Vector3(0,-1,0));let h=null;for(const o of objs){let r;try{r=rc.intersectObject(o,false)}catch(e){continue}if(r[0]&&(!h||r[0].distance<h.distance))h=r[0]}return{x:+k.x.toFixed(2),z:+k.z.toFixed(2),tyreY:+k.y.toFixed(3),roadY:h?+h.point.y.toFixed(3):null,gap:h?+(k.y-h.point.y).toFixed(3):null,hit:h?(h.object.name||h.object.type):null}})},
  cam(mode){if(!D.__or){D.__or=D.composer.render.bind(D.composer);D.composer.render=function(){const c=window.__cam;if(c){const P=c();D.camera.position.set(P[0],P[1],P[2]);D.camera.lookAt(P[3],P[4],P[5]);D.camera.updateMatrixWorld()}return D.__or.apply(this,arguments)}}
    const gy=(x,z)=>M.gnd(x,z,R.y+2);
    if(mode==='player')window.__cam=()=>{const s=Math.sin(R.h),c=Math.cos(R.h),x=R.x+c*4,z=R.z-s*4;return[x,gy(x,z)+.5,z,R.x,R.y+.45,R.z]};
