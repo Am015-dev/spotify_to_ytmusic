@@ -171,6 +171,42 @@ Inline `shell/gx-viewport.js` before the game script, then replace every resize 
 not innerWidth/innerHeight; fn runs only when the key changes, debounced at 40/120/420 ms, and once at once on `watch`.
 Read sizes in the layout function from `GXV.now()`. `GXV.poke()` forces a relayout. Never add a second resize listener.
 
+## 9. Help kit (`gx-help.js` + `gx-help.css`): coach bubbles, lightbulb, rules cards
+Help is **on demand** (the bulb) or **first time only** (a coach bubble), short, pointing at the board, and easy to switch off. Never an
+advice card that appears on its own twice. Needs `gx-viewport.js` (relayout on rotation goes through `GXV.watch`; without it the kit
+falls back to resize listeners). Everything the kit draws has `data-help` (phone-check skips those for the 8-word rule).
+
+```js
+GXH.init({ game: 'slug', defaultOn: true,                       // tips remembered per game: localStorage 'gxh-<slug>' {on, seen}
+  steps: { bid: { target: () => document.querySelector('#hand'), title: 'Make a secret bid',      // title <= 4 words
+                  text: 'Tap a card, then the glowing spot.', pic: () => svgString } },           // text <= 20 words, pic optional
+  rules: [ { phase: 'bid', title: 'Bid in secret', text: '<= 20 words', pic: () => svgString }, // 2-4 cards per phase; no phase = general
+           { title: 'The goal', text: '...', pic: () => '...' } ],
+  avoid: '.glow,.rec,#act .btn' });                              // bubbles never cover the core (56px) of these, nor the target
+GXH.phase(phaseId | null);        // call at the end of every render; first time a phase is reached its bubble shows (arrow + soft ring on the target,
+                                  // title, one sentence, "Got it"); a tap anywhere dismisses (and still reaches what was tapped); one bubble at a time
+GXH.bulb({ el: '#bulbbtn',        // an existing button (an SVG bulb is injected) or omit it for a floating bottom-right bulb
+  suggest: () => ({ target: () => rect|el, from: () => rect|el /*card to pick up first*/, why: '<= 15 words' }) /* or null */,
+  rulesFor: () => phaseId });     // tap: glowing ring + ghost finger (from -> target) + bubble with the why and "How does this work?" (rules cards)
+GXH.setEnabled(bool); GXH.enabled(); GXH.reset(); GXH.rules(phaseId?); GXH.hide(); GXH.state();
+GXH.settingsHTML({rowClass:'mrow', btnClass:'btn'})  // "Tips On/Off" + "Reset tips" rows (string); GXH.settingsRow() returns a node. Clicks are handled by the kit.
+```
+- A target is an element, a function returning one, `{left,top,width,height}` or `{x,y}`. A function is re-evaluated on every relayout.
+- If `suggest()` returns null (no safe advice) the bulb shows only the rules cards: never a wrong hint. The suggestion must come from the
+  game's real advice function; keep one `planFor(move)` that gives the target rect and use it for the ghost finger, the glow and the bulb.
+- Bubble placement scans the screen for the free spot nearest the target that covers neither the target nor the core of any `avoid` element.
+
+Add it to a game (about an hour):
+1. `build.py`: `SRC['gx-viewport.js']`, `SRC['gx-help.js']` from `shell/`, inline the css after `shell.css` (`head.replace('</style>', rd(shell/gx-help.css)+'</style>', 1)`),
+   and `<script src="gx-viewport.js"></script><script src="gx-help.js"></script>` in the body right after `shell.js`.
+2. Add a bulb button to the top bar (`<button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>`).
+3. Write `hlp.js`: `phaseId()` (null when the player has nothing to decide), `steps` (one per phase, targets = the glowing things), `rules` (2-4 cards per phase,
+   pictures from the game's art or small SVG), `suggest()` from the advice function, then `GXH.init(...)`, `GXH.bulb(...)` once and `GXH.phase(phaseId())` after every render.
+4. Add `GXH.settingsHTML()` to the menu. Remove any old Hint button and auto advice cards.
+5. Sweep: copy the "help kit checks" block of `thornbound/game/sweep.js` (bubble per phase appears once, never covers target/glow, dismisses on tap; bulb finger = advice
+   function, why <= 15 words, rules 2-4 cards <= 20 words with a picture; tips-off game shows nothing) and the bubble geometry check in `checks()`.
+Pilot: Thornbound (`thornbound/game/src/ui11.js`).
+
 ## Checklist per game
 1. build.py + head + body (section 0).
 2. `GX.settings({...})` replaces the old menu; delete Speed tool buttons; `AIDELAY = GX.aiDelay(base)`.
@@ -180,4 +216,5 @@ Read sizes in the layout function from `GXV.now()`. `GXV.poke()` forces a relayo
 6. Recap: push in the AI step, mark in `act()`.
 7. `GNS.achievements` at boot, `GNS.result` on game over, `GNS.saved` in save/clear.
 8. `GX.offline()` at boot.
-9. Run the game's click / layout tests and `kit-test.js`; look at the screenshots.
+9. Help kit (section 9): bulb, first-time bubbles, Tips switch.
+10. Run the game's click / layout tests and `kit-test.js`; look at the screenshots.

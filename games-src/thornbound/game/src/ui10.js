@@ -168,27 +168,30 @@ function lsGetJ(k){try{return JSON.parse(localStorage.getItem(k)||'{}')||{}}catc
 function fingerWanted(kind){if(isGuided()||UI.camp)return true;return !(lsGetJ('tb_fl')[kind]>=1)}
 (function(){const o=humanMove;humanMove=function(k){const kind=learnKey();const r=o(k);if(r&&kind){try{const L=lsGetJ('tb_fl');L[kind]=(L[kind]||0)+1;localStorage.setItem('tb_fl',JSON.stringify(L))}catch(e){}}return r}})();
 function ctr(r){return r?{x:r.left+r.width/2,y:r.top+r.height/2}:null}
-function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.dragging||!fingerWanted(learnKey()))return null;
-  let from=null,to=null;const el=sel=>{const e=document.querySelector(sel);return e?e.getBoundingClientRect():null};const K=rm.k;
+// planFor(M,rm): where the move rm is made on the board: {from,to} points (from = the card to pick up first), fromR/toR rects, key. Used by the ghost finger and by the lightbulb.
+function planFor(M,rm,o){o=o||{};if(!M||!M.kind||!rm)return null;
+  let from=null,to=null,fromR=null,toR=null;const el=sel=>{const e=document.querySelector(sel);return e?e.getBoundingClientRect():null};const K=rm.k;
+  const T=r=>{toR=r;return ctr(r)},F=r=>{fromR=r;return ctr(r)};
   try{
-    if(UI.pop){if(UI.pop==='confirm')to=ctr(el('#ppop [data-a=mv]'));else return null}
+    if(UI.pop){if(UI.pop==='confirm')to=T(el('#ppop [data-a=mv]'));else return null}
     else switch(M.kind){
-    case 'bid':{to=ctr(el('#spots .bspot'));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));break}
-    case 'place':case 'tie':{if(rm.pass){to=ctr(el('#act [data-k="'+K+'"]'));break}const r=rm.r!=null?rm.r:(G.clash?G.clash.r:null);if(r!=null)to=ctr(regionRect(r));if(UI.hand==null)from=ctr(el('#handw .hc[data-id="'+rm.id+'"]'));break}
-    case 'herald':case 'location':{const R=locRect(rm.loc);to=ctr(R);break}
-    case 'bidRes':{to=ctr(el('#handw [data-k="'+K+'"]')||el('#act [data-k="'+K+'"]'));break}
-    case 'clashOrder':{const nx=rm.order&&rm.order[(UI.ord||[]).length];if(nx!=null)to=ctr(regionRect(nx));break}
-    case 'menu':{if(rm.a==='supp'&&rm.p)to=ctr(regionRect(rm.p.r));else if(UI.sheetOpen)to=ctr(el('#main [data-k="'+K+'"]'));else to=ctr(el('#act [data-k="'+K+'"]')||el('#act .btn.pri'));break}
-    default:{to=ctr(el('#act [data-k="'+K+'"]')||el('#main [data-k="'+K+'"]'));break}
+    case 'bid':{to=T(el('#spots .bspot'));if(UI.hand==null||o.full)from=F(el('#handw .hc[data-id="'+rm.id+'"]'));break}
+    case 'place':case 'tie':{if(rm.pass){to=T(el('#act [data-k="'+K+'"]'));break}const r=rm.r!=null?rm.r:(G.clash?G.clash.r:null);if(r!=null)to=T(regionRect(r));if(UI.hand==null||o.full)from=F(el('#handw .hc[data-id="'+rm.id+'"]'));break}
+    case 'herald':case 'location':{to=T(locRect(rm.loc));break}
+    case 'bidRes':{to=T(el('#handw [data-k="'+K+'"]')||el('#act [data-k="'+K+'"]'));break}
+    case 'clashOrder':{const nx=rm.order&&rm.order[(UI.ord||[]).length];if(nx!=null)to=T(regionRect(nx));break}
+    case 'menu':{if(rm.a==='supp'&&rm.p)to=T(regionRect(rm.p.r));else if(UI.sheetOpen)to=T(el('#main [data-k="'+K+'"]'));else to=T(el('#act [data-k="'+K+'"]')||(rm.t==='act'&&rm.a!=='supp'?el('#act [data-a=powers]'):el('#act .btn.pri')));break}
+    default:{to=T(el('#act [data-k="'+K+'"]')||el('#main [data-k="'+K+'"]'));break}
   }}catch(e){return null}
-  return to?{from,to,key:M.kind+'|'+(K||'')+'|'+(UI.hand==null?0:1)+'|'+(UI.pop||'')+'|'+(UI.sheetOpen?1:0)+'|'+Math.round(to.x)+','+Math.round(to.y)}:null}
+  return to?{from,to,fromR,toR,key:M.kind+'|'+(K||'')+'|'+(UI.hand==null?0:1)+'|'+(UI.pop||'')+'|'+(UI.sheetOpen?1:0)+'|'+Math.round(to.x)+','+Math.round(to.y)}:null}
+function fingerPlan(){const M=UI.bf,rm=M&&M.rec;if(!M||!M.kind||!rm||UI.card||UI.dragging||!fingerWanted(learnKey()))return null;return planFor(M,rm)}
 function bfFinger(){const f=$('#finger');if(!f)return;const p=ANIM&&!UI.reduce?fingerPlan():null;
   if(!p){if(!f.hidden){f.hidden=true;try{f._a&&f._a.cancel()}catch(e){}f._k=''}return}
   if(f._k===p.key&&!f.hidden)return;f._k=p.key;f.hidden=false;try{f._a&&f._a.cancel()}catch(e){}
   const a=p.from||p.to,b=p.to;const kf=p.from?[{transform:'translate('+a.x+'px,'+a.y+'px) scale(1.25)',opacity:0},{transform:'translate('+a.x+'px,'+a.y+'px) scale(1)',opacity:1,offset:.14},{transform:'translate('+a.x+'px,'+a.y+'px) scale(.9)',opacity:1,offset:.28},{transform:'translate('+b.x+'px,'+b.y+'px) scale(.9)',opacity:1,offset:.72},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.2)',opacity:.9,offset:.86},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.4)',opacity:0}]
     :[{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.3)',opacity:0},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1)',opacity:1,offset:.3},{transform:'translate('+b.x+'px,'+b.y+'px) scale(.85)',opacity:1,offset:.55},{transform:'translate('+b.x+'px,'+b.y+'px) scale(1.35)',opacity:0}];
   try{f._a=f.animate(kf,{duration:p.from?2300:1500,iterations:Infinity,easing:'ease-in-out'})}catch(e){f.style.transform='translate('+b.x+'px,'+b.y+'px)'}}
-function bfAfter(){bfFinger()}
+function bfAfter(){bfFinger();if(typeof hlpAfter==='function')hlpAfter()}
 // the computer acts at a watchable pace (about 0.6 s per move; tap to skip narration)
 function autoSkip(h){if(NET.on||hotSeat()||!G||!G.q||G.q.t!=='menu')return false;
   const mv=legal(h);const acts=visibleActs(mv).filter(m=>m.t==='act');const d=mv.find(m=>m.t==='done');if(!d||acts.length)return false;

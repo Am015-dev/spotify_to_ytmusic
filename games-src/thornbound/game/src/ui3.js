@@ -137,8 +137,8 @@ function renderMain(){const el=$('#main'),ft=$('#act');if(!el||!ft)return;const 
   if(!q||s==null){set('',UI.mode==='watch'?watchControls():'');setHl([]);return}
   const mv=legal(s);const rec=getRec(s,mv);const shown=!!rec&&hintsShown(s,mv);UI._recShown=shown;const rm=shown?mv.find(m=>m.k===rec.k):null;
   const co=typeof coachFor==='function'?coachFor(s,mv,rm):null;UI._coachOn=!!co;UI._coachTitle=co&&/^New/.test(co.title||'')?co.title:'';
-  const M=bfModel(s,mv,rm);UI.bf=M;const pulse=!!(co&&co.pulse);
-  const hintBtn=!shown&&rec&&UI.guide!=='off'?'<button class="btn chipb hintb" data-a="hint" aria-label="Show a hint">'+ico('star')+'<span>Hint</span></button>':'';
+  const M=bfModel(s,mv,rm);UI.bf=M;M.sug=rec?(mv.find(m=>m.k===rec.k)||null):null;const pulse=!!(co&&co.pulse);
+  const hintBtn='';   // the lightbulb in the top bar (gx-help) replaces the old Hint button
   let h='',f='',sheet=false;const hl=[],hr=[],recT={};
   const pass=mv.find(m=>m.pass);
   switch(M.kind){

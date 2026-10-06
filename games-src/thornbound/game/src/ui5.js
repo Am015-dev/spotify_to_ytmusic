@@ -84,6 +84,7 @@ function renderMenu(){const el=$('#setbody');if(!el)return;
   const seg=(a,cur,opts)=>'<div class="seg">'+opts.map(([v,l])=>'<button class="'+(String(cur)===String(v)?'on':'')+'" data-a="'+a+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
   el.innerHTML=(NET.on?'<div class="mrow"><button class="btn pri" data-a="netopen">Online lobby</button>'+(isHost()?'<button class="btn" data-a="newgame">Change setup</button>':'')+'<button class="btn" data-a="netleave">Leave the room</button></div>':'<div class="mrow"><button class="btn pri" data-a="newgame">New game / main menu</button><button class="btn" data-a="savenow">Save now</button></div>')+
    '<div class="mrow"><span>Guide</span>'+seg('gdset',UI.guide,[['full','Full tips'],['light','Light'],['off','Off']])+'</div>'+
+   (typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):'')+
    '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
    '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button></div>'+
    '<div class="mrow"><span>Graphics</span><button class="btn" data-a="gfx" aria-pressed="'+!!UI.lowGfx+'">'+(UI.lowGfx?'Low (fast)':'High')+'</button>'+(window.PerfHUD?PerfHUD.buttonsHTML('btn'):'')+'</div>'+
