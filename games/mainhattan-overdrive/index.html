@@ -728,6 +728,7 @@ body.touch #roamPlate small{white-space:nowrap}
 <script type="module">
 // ---------- OD_CHANGELOG: newest first. EVERY deploy prepends one entry {v, date, items:[{t:'FIXED'|'NEW'|'CHANGED', s:'plain English'}]} (2-4 items).
 const OD_CHANGELOG=[
+ {v:'v87m',date:'7 Oct 2026',items:[{t:'FIXED',s:'Cars on the Autobahn sit on the road again: the motorway surface was drawn 25-60 cm too high, so tyres looked sunk into it.'},{t:'FIXED',s:'Red cars are LEGO red again instead of pink. Blue and yellow paint are cleaner too (less pale sky sheen).'}]},
  {v:'v87l',date:'7 Oct 2026',items:[{t:'NEW',s:'NEW BUILD: in the garage tap BUILD YOUR OWN, pick a Speed Champion or Hot Rod chassis, and snap real LEGO parts onto it.'},{t:'NEW',s:'Your build becomes the vehicle "My Build" in RIDES and drives in the city. A build-limit bar shows your parts and weight class.'},{t:'FIXED',s:'Builder: mudguards snap over their tyre, the windscreen no longer doubles, and the car sits higher so taps no longer hit the parts panel.'}]},
  {v:'v87k',date:'7 Oct 2026',items:[{t:'FIXED',s:'Braking to a stop no longer twitches the car sideways or kicks it forward again.'},{t:'FIXED',s:'Bumping a traffic car is softer: no more jumping back. The car gets pushed and brakes to a stop, and you lose only the speed you gave away.'},{t:'CHANGED',s:'The horn now makes nearby cars stop for a moment instead of hopping back.'}]},
  {v:'v87j',date:'7 Oct 2026',items:[{t:'FIXED',s:'Phone garage: the PERKS slots now sit at the top of RIDES, so you see them without scrolling.'},{t:'FIXED',s:'PROFILE shows your perks and the next perk unlock at the top, above your vehicles.'}]},
@@ -3680,6 +3681,9 @@ const AB_R=350,ABW=L=>L.map(p=>WP(p[0],p[1])),AB=CID!=='fra'?[]:[{id:'A5',name:'
 // interchanges: [name, road a, road b, real point along a (towards the ring inside), real point along b]; the connector is a curve between
 // the two carriageways ~420 m from the crossing (filled in by abSamples, so the curve follows the real road shapes)
 const AB_K=CID!=='fra'?[]:[['Frankfurter Kreuz','A5','A3',[-6146,265],[5422,-3493]],['Offenbacher Kreuz','A661','A3',[4134,-508],[-6082,-6257]],['Nordwestkreuz','A5','A66w',[-6146,265],[-9800,3000]],['Bad Homburger Kreuz','A5','A661',[-6212,5019],[3774,3803]]];
+// W12: asphalt height above groundY (the physics ground). Was r.y*2.5 = 0.25-0.6 m, so tyres sank into the ribbon; now 4-5.5 cm like city
+// streets (grass under roads dips 10 cm, ART8_dip). The small per-road step plus polygonOffset keeps overlapping ribbons apart.
+const AB_RY=r=>.03+r.y*.1;
 const AB_C=[],AB_X=[];
 // feeders from the outer end of a real radial to the nearest Autobahn
 const AB_FEED=CID!=='fra'?[]:[['mainzer','A5','Feeder road A5 · Mainzer Landstraße'],['heuss','A5','Feeder road A648 · Westkreuz'],['esch','A661','Feeder road A661 · Eschersheimer Landstraße'],['friedberger','A661','Feeder road A661 · Friedberger Landstraße'],['hanauer','A661','Feeder road A661 · Hanauer Landstraße'],['darm','A3','Feeder road A3 · Darmstädter Landstraße']];
@@ -3964,9 +3968,26 @@ function abStrip_v86(P,i0,i1,oa,ob,ya,yb,uvL){const pos=[],uvs=[],idx=[];for(let
 function abTex(w,lanes){const[c,g]=cv(256,512),k=256/w,r=mul(w*7),X=m=>128+m*k;g.fillStyle='#454950';g.fillRect(0,0,256,512);for(let i=0;i<2600;i++){const v=58+r()*36|0;g.fillStyle=`rgba(${v},${v+2},${v+6},.55)`;g.fillRect(r()*256,r()*512,2,2)}
   g.fillStyle='#8f8f88';g.fillRect(X(-1.1),0,2.2*k,512);g.fillStyle='#f4f4f0';const ln=(m,dash)=>{if(dash)g.fillRect(X(m)-1,0,2,512/3);else g.fillRect(X(m)-1.5,0,3,512)};for(const sd of[-1,1]){ln(sd*1.5);ln(sd*(1.6+lanes*3.8));for(let j=1;j<lanes;j++)ln(sd*(1.6+j*3.8),1)}const t=tex(c);t.wrapS=THREE.ClampToEdgeWrapping;t.wrapT=THREE.RepeatWrapping;t.anisotropy=8;KEEP_TEX.add(t);return t}
 const AB_SGN={};function abSign(a,b){const key=a+'|'+b;if(AB_SGN[key])return AB_SGN[key];const[c,g]=cv(512,192);g.fillStyle='#1f4fa8';g.fillRect(0,0,512,192);g.strokeStyle='#fff';g.lineWidth=7;g.strokeRect(8,8,496,176);g.fillStyle='#fff';g.font='bold 34px sans-serif';g.textBaseline='middle';const w=g.measureText(a).width+24;g.fillRect(26,30,w,52);g.fillStyle='#1f4fa8';g.fillText(a,38,57);g.fillStyle='#fff';g.font='bold 40px sans-serif';g.fillText(b,30,132);const t=tex(c,false);KEEP_TEX.add(t);return AB_SGN[key]=new THREE.MeshBasicMaterial({map:t})}
+// W12: the asphalt surface is flat between its vertices while groundY (where the tyres sit) is not. ART8's strip checks only the midpoints of
+// each 10 m step and of the full width, so on the Autobahn a cell could be 10 m × 38 m with the ground 7-13 cm off its plane under the wheels.
+// This strip measures the real error of each triangle on a 2 m grid and adds columns / rows until the asphalt is within 2.5 cm of groundY.
+const W12_TOL=.025,W12_ST={t:0,tri:0};
+function W12_abStrip(P,i0,i1,w,y,uvL){const T0=performance.now(),oa=-w/2,G=(p,o)=>groundY(p.x+p.tz*o,p.z-p.tx*o),off=(nc,c)=>oa+w*c/nc;
+  // columns: lateral chord error at the path points (2 m steps)
+  let nc=Math.max(1,Math.ceil(w/12));for(;nc<Math.ceil(w/2);nc++){let e=0;for(let i=i0;i<=i1&&e<=W12_TOL;i+=1){const p=P[i];for(let c=0;c<nc&&e<=W12_TOL;c++){const o0=off(nc,c),o1=off(nc,c+1),g0=G(p,o0),g1=G(p,o1),m=Math.max(1,Math.round((o1-o0)/2));for(let k=1;k<m;k++){const u=k/m;e=Math.max(e,Math.abs(G(p,o0+(o1-o0)*u)-(g0+(g1-g0)*u)))}}}if(e<=W12_TOL)break}
+  const mid=(a,b)=>{let tx=a.tx+b.tx,tz=a.tz+b.tz;const l=Math.hypot(tx,tz)||1;return{x:(a.x+b.x)/2,z:(a.z+b.z)/2,tx:tx/l,tz:tz/l,s:(a.s+b.s)/2}};
+  // error of the two triangles of every cell between rows a and b (same split as the index below: A,C,B and B,C,D)
+  const E=(a,b)=>{const L=Math.hypot(b.x-a.x,b.z-a.z),nt=Math.max(1,Math.round(L/2));let e=0;for(let c=0;c<nc;c++){const o0=off(nc,c),o1=off(nc,c+1),A=G(a,o0),B=G(a,o1),C=G(b,o0),D=G(b,o1),nu=Math.max(1,Math.round((o1-o0)/2));
+    for(let i=0;i<=nt;i++)for(let k=0;k<=nu;k++){const t=i/nt,u=k/nu;if((i===0||i===nt)&&(k===0||k===nu))continue;const h=t+u<=1?A+t*(C-A)+u*(B-A):D+(1-t)*(B-D)+(1-u)*(C-D);
+     const px=a.x+(b.x-a.x)*t,pz=a.z+(b.z-a.z)*t,tx=a.tx+(b.tx-a.tx)*t,tz=a.tz+(b.tz-a.tz)*t,tl=Math.hypot(tx,tz)||1,o=o0+(o1-o0)*u;e=Math.max(e,Math.abs(groundY(px+tz/tl*o,pz-tx/tl*o)-h));if(e>W12_TOL)return e}}return e};
+  const Q=[],rec=(a,b,d)=>{if(d<4&&Math.hypot(b.x-a.x,b.z-a.z)>1.2&&E(a,b)>W12_TOL){const m=mid(a,b);rec(a,m,d+1);Q.push(m);rec(m,b,d+1)}};
+  for(let i=i0;i<=i1;i++){Q.push(P[i]);if(i<i1)rec(P[i],P[i+1],0)}
+  const pos=[],uvs=[],idx=[],C=nc+1;for(let i=0;i<Q.length;i++){const p=Q[i];for(let c=0;c<=nc;c++){const o=off(nc,c),x=p.x+p.tz*o,z=p.z-p.tx*o;pos.push(x,groundY(x,z)+y,z);uvs.push(c/nc,p.s/uvL)}
+    if(i<Q.length-1)for(let c=0;c<nc;c++){const k=i*C+c;idx.push(k,k+C,k+1,k+1,k+C,k+C+1)}}
+  W12_ST.tri+=idx.length/3;W12_ST.t+=performance.now()-T0;const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.setIndex(idx);g.computeVertexNormals();return g}
 function abBuild(grp,bt,BM,M){const MT={},TX={};let rk=0;const mat=r=>{const t=r.w+'/'+(r.w>=38?3:2),k=t+'/'+r.id+'/'+(r.c?1:0)+'/'+r.y;if(!TX[t])TX[t]=abTex(r.w,r.w>=38?3:2);if(!MT[k]){rk++;MT[k]=new THREE.MeshStandardMaterial({map:TX[t],roughness:.8,metalness:0,polygonOffset:true,polygonOffsetFactor:-1-rk*.25,polygonOffsetUnits:-2-rk*2})}return MT[k]};
   // asphalt ribbons in 400 m pieces (tile-batched); stretches over an oriented deck are drawn as the deck instead
-  for(const S of abSamples()){const P=S.pts,r=S.r,mt=r.ab?mat(r):M.road,uL=r.ab?18:32;let a=0;const fl=(i0,i1)=>{if(i1>i0)bt.add(abStrip(P,i0,i1,-r.w/2,r.w/2,r.y*2.5,r.y*2.5,uL),mt)};for(let i=0;i<P.length-1;i++){const mx=(P[i].x+P[i+1].x)/2,mz=(P[i].z+P[i+1].z)/2;if(AB_BRIDGES.some(b=>{if(Math.abs(P[i].tx*b.ux+P[i].tz*b.uz)<.9)return false;const[da,dc]=deckLocal(b,mx,mz);return Math.abs(da)<b.half&&Math.abs(dc)<b.w/2+2})){fl(a,i);a=i+1;continue}if(i+1-a>=40){fl(a,i+1);a=i+1}}fl(a,P.length-1)}
+  for(const S of abSamples()){const P=S.pts,r=S.r,mt=r.ab?mat(r):M.road,uL=r.ab?18:32;let a=0;const fl=(i0,i1)=>{if(i1>i0)bt.add(W12_abStrip(P,i0,i1,r.w,AB_RY(r),uL),mt)};for(let i=0;i<P.length-1;i++){const mx=(P[i].x+P[i+1].x)/2,mz=(P[i].z+P[i+1].z)/2;if(AB_BRIDGES.some(b=>{if(Math.abs(P[i].tx*b.ux+P[i].tz*b.uz)<.9)return false;const[da,dc]=deckLocal(b,mx,mz);return Math.abs(da)<b.half&&Math.abs(dc)<b.w/2+2})){fl(a,i);a=i+1;continue}if(i+1-a>=40){fl(a,i+1);a=i+1}}fl(a,P.length-1)}
   for(const b of AB_BRIDGES)deckBuild(b,bt,BM,mat(b.road),18,'#6a6f7a','#dfe3ea');
   // gantry signs every 2 km, reflector posts every 50 m
   const RP=new TInst(mergeG([cbox(.2,1.1,.2,0,.55,0,'#f4f4f0'),cbox(.22,.2,.22,0,.85,0,'#1a1a1a')]),new THREE.MeshStandardMaterial({vertexColors:true,roughness:.6}),1000);
@@ -4992,7 +5013,7 @@ function buildRoam(){const grp=new THREE.Group();HUB.grp.add(grp);RO.grp=grp;RO.
   RO.sim=[];bs.forEach(s=>s.big=1);for(const[L,mt]of[[gs,sm],[bs,sb]]){const q={};for(const s of L){const k=hubTile(s.x,s.z);(q[k]=q[k]||[]).push(s)}for(const k in q){const part=q[k],im=new THREE.InstancedMesh(sg,mt,part.length);part.forEach((s,i)=>{s.im=im;s.i=i});RO.sim.push(im);grp.add(im)}}studSync();for(const im of RO.sim){im.computeBoundingSphere();im.boundingSphere.radius+=40}}
 const _sq=new THREE.Quaternion(),_se=new THREE.Euler();function studSync(){if(!RO.sim)return;for(const s of RO.studs){const m=s.m;if(m.visible){_se.set(0,0,m.rotation.z);_sq.setFromEuler(_se);_m.compose(m.position,_sq,_ts.setScalar(s.big?1.5:1))}else _m.makeScale(0,0,0);s.im.setMatrixAt(s.i,_m)}for(const im of RO.sim)im.instanceMatrix.needsUpdate=true}
 const rr2s=(r,a,b)=>a+r()*(b-a);
-function abPads(grp,pm){for(const S of abSamples()){const r=S.r,P=S.pts,step=S.L/(P.length-1);const pad=(p,o,dir)=>{const x=p.x-p.tz*o,z=p.z+p.tx*o,m=new THREE.Mesh(new THREE.PlaneGeometry(7,14),pm);m.rotation.set(-Math.PI/2,0,0);m.rotateZ(Math.atan2(-p.tx*dir,-p.tz*dir));m.position.set(x,groundY(x,z)+r.y+.08,z);};
+function abPads(grp,pm){for(const S of abSamples()){const r=S.r,P=S.pts,step=S.L/(P.length-1);const pad=(p,o,dir)=>{const x=p.x-p.tz*o,z=p.z+p.tx*o,m=new THREE.Mesh(new THREE.PlaneGeometry(7,14),pm);m.rotation.set(-Math.PI/2,0,0);m.rotateZ(Math.atan2(-p.tx*dir,-p.tz*dir));m.position.set(x,groundY(x,z)+AB_RY(r)+.03,z);};
   if(!r.ab){pad(P[Math.max(0,P.length-5)],0,1);continue}if(r.c)continue;const lo=7.3;let k=0;for(let s=400;s<S.L-200;s+=1200,k++){const p=P[Math.round(s/step)];if(abSkip(p.x,p.z))continue;const dir=k%2?-1:1;pad(p,dir*lo,dir)}}}
 function abRoam(put){for(const S of abSamples()){const r=S.r,P=S.pts,step=S.L/(P.length-1);if(!r.ab||r.c)continue;const lo=3.5;let k=0;for(let s=1000;s<S.L-200;s+=1200,k++){const p=P[Math.round(s/step)];if(abSkip(p.x,p.z,40))continue;const dir=k%2?1:-1,o=dir*lo;
     if(k%3===1){const so=dir*(r.w/2-4.5),x=p.x-p.tz*so,z=p.z+p.tx*so,h=Math.atan2(p.tx*dir,p.tz*dir);addRamp(x,z,h,24,6,7,0xff5a1c);const q=RO.ramps[RO.ramps.length-1];for(let j=1;j<=8;j++){const d=q.len/2+j*8;put(q.x+Math.sin(h)*d,q.z+Math.cos(h)*d,q.y0+q.hgt+Math.sin(j/9*Math.PI)*10,j===4?100:10)}}
@@ -7842,6 +7863,22 @@ window.__ju={get JU(){return JU},C:JU_C,on:b=>{JU.on=!!b;if(!JU.on&&pl)pl.mesh.s
   aimTraffic:(v=38)=>{let b=null,bd=1e9;for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<bd&&d>30){bd=d;b=c}}if(!b)return null;const N=HUB.nodes,A=N[b.a],B=N[b.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L;
     RO.x=b.x-dx*26;RO.z=b.z-dz*26;RO.y=groundAt(RO.x,RO.z,b.y+3);RO.vy=0;RO.h=RO.vh=Math.atan2(dx,dz);RO.yr=0;RO.v=v;camSnap=true;return{x:b.x,z:b.z}}};
 
+// ---- W12 · car paint reads as LEGO colours (Bright Red read pink-magenta, blue lavender, yellow pale). Two causes, measured on a side view:
+// 1) the player's glossy paint mirrored the sky environment at envMapIntensity 1.2 (traffic is capped at .6): base specular + clearcoat add
+//    a blue-white veil, which in sRGB lifts the near-zero channels of a saturated paint (red 208,23,18 → 245,51,69). Env off → 224,6,6.
+// 2) the OutputPass Neutral tone map desaturates every pixel whose brightest channel passes ~0.76 toward white; sunlit paint gets there.
+// Fix, car materials only (world look unchanged): player paint env capped at .6 like traffic, and a hue-preserving soft knee before the tone
+// map keeps a saturated paint's brightest channel under 0.76; white/grey highlights (low saturation) are left to the tone map as before.
+const W12P={t:0,K:.55,M:.76,env:.6};
+function W12_paint(m){if(!m||m.userData.w12||!(m.isMeshStandardMaterial))return;m.userData.w12=1;const ob=m.onBeforeCompile,pk=m.customProgramCacheKey;
+  m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);sh.fragmentShader=sh.fragmentShader.replace('#include <opaque_fragment>',
+   `#include <opaque_fragment>\n{vec3 w12c=gl_FragColor.rgb;float w12p=max(w12c.r,max(w12c.g,w12c.b));if(w12p>${W12P.K.toFixed(3)}){float w12d=${(W12P.M-W12P.K).toFixed(3)},w12s=clamp((w12p-min(w12c.r,min(w12c.g,w12c.b)))/w12p*1.4,0.,1.);
+     gl_FragColor.rgb=w12c*mix(1.,(${W12P.K.toFixed(3)}+w12d*(1.-exp(-(w12p-${W12P.K.toFixed(3)})/w12d)))/w12p,w12s);}}`)};
+  m.customProgramCacheKey=function(){const cur=this.onBeforeCompile;this.onBeforeCompile=ob;const k=pk.call(this);this.onBeforeCompile=cur;return k+'|w12'};m.needsUpdate=true}
+function W12_cars(){try{if(typeof ART10!=='undefined')ART10.mats.forEach(W12_paint)}catch(e){}
+  if(typeof pl!=='undefined'&&pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material)){W12_paint(m);if(W12P.env&&m&&m.vertexColors&&!m.transparent&&m.roughness>=.1&&m.userData.a10e!==undefined&&m.userData.a10e>W12P.env){m.userData.a10e=W12P.env;m.envMapIntensity=Math.min(m.envMapIntensity,W12P.env)}}});
+  if(HUB&&HUB.cim)for(const k in HUB.cim){const im=HUB.cim[k];if(!im)continue;for(const m of[].concat(im.material))W12_paint(m);const u=im.userData||{};for(const q of[u.w,u.g])if(q)for(const m of[].concat(q.material))W12_paint(m)}}
+roamStep=(f=>function(dt){f(dt);const t=performance.now();if(t-W12P.t>500){W12P.t=t;W12_cars()}})(roamStep);
 // ===== GB: LEGO brick builder + driver minifigure (extends the garage #gbx). All globals GB_*. =====
 // Bricks live in the ship's local frame (m, before SHIP_K): stud pitch GB_U, plate height GB_PH. A brick = {t,x,z,y,r,m,c}
 // (type, min cell x/z, bottom in plates, rotation 0-3, mirrored, colour index). The whole build + the driver merge into
