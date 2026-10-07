@@ -12,3 +12,8 @@ function ART9_crate(){if(!ART9.g){const w=1.8,h=1.3;ART9.m=new THREE.MeshStandar
   ART9.sg=new THREE.CylinderGeometry(.24,.24,.16,12).translate(0,h+.08,0)}
  const o=new THREE.Group(),b=new THREE.Mesh(ART9.g,ART9.m);o.add(b);
  for(const[a,c]of[[-.45,-.45],[.45,-.45],[-.45,.45],[.45,.45]]){const s=new THREE.Mesh(ART9.sg,ART9.ms);s.position.set(a,0,c);o.add(s)}return o}
+// Race haze: the bloom pass (threshold 1.0, strength .95, radius .6) bloomed the large over-bright neon track surfaces
+// (cyan wall chevrons, floor hexes, horizon glow) into a screen-wide cyan wash that sat over the player car (pink, see-through look);
+// worst in the SMASH frame, when the lunge swings the view toward the bright wall. In races only real light sources bloom now
+// (threshold 1.5: neon signs, lamps, pillars); the city keeps threshold 1.0.
+composer.render=(f=>function(...a){try{bloom.threshold=RO.on?1:1.5}catch(e){}return f.apply(this,a)})(composer.render);
