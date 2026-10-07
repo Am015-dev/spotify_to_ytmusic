@@ -22,7 +22,7 @@ function bfZone(m,me){const c=m.card!=null?cd(m.card):null;const cb=G.cb;const i
 // self-harm moves (curse yourself, boost your own monster) never glow; they stay in the card's details pop-up
 const bfHarm=m=>/yourself!|against yourself|helps a rival/.test(moveLabel(m));
 const BFSIDE=['berserk','turn','flight','toss','drop'];
-function bfMoves(me,id){if(me<0||!G||G.winner)return [];return cardMoves(me,id).filter(m=>m.act!=='sell'&&!bfHarm(m)).map(m=>({m,z:bfZone(m,me)})).filter(x=>x.z).sort((a,b)=>BFSIDE.includes(a.m.act)-BFSIDE.includes(b.m.act))}
+function bfMoves(me,id){if(me<0||!G||G.winner)return [];return cardMoves(me,id).filter(m=>m.act!=='sell'&&!bfHarm(m)).map(m=>({m,z:bfZone(m,me)})).filter(x=>x.z&&!(x.z[0]==='p'&&+x.z.slice(1)>=G.pl.length)).sort((a,b)=>BFSIDE.includes(a.m.act)-BFSIDE.includes(b.m.act))}
 function bfEls(z){const q=s=>[...document.querySelectorAll(s)];
   if(z==='hero')return q('.bfbig,.mine .top,.mine .gear');if(z==='fh'){const me=viewSeat();const cb=G.cb;return q('.arena .score.hero'+(cb&&(cb.who===me||cb.help===me)?',.mine .top,.mine .gear':''))}if(z==='ms')return q('.arena .score.mons,.arena .row.mons .mon');
   if(z[0]==='m')return q(`.arena .row.mons .mon:nth-child(${+z.slice(1)+1})`);
@@ -41,7 +41,7 @@ function bfMark(){document.querySelectorAll('[data-bfz]').forEach(e=>{e.removeAt
   document.documentElement.classList.add('bf-holding');document.querySelectorAll(`.mine [data-card="${id}"]`).forEach(e=>e.classList.add('bf-picked'));
   const seen={};for(const x of ms){if(seen[x.z])continue;seen[x.z]=1;const lab=ms.filter(y=>y.z===x.z).length>1?bfShort(moveLabel(x.m)).replace(/ .*/,'')+'…':bfShort(moveLabel(x.m));
     bfEls(x.z).forEach((e,k)=>{if(e.dataset.bfz)return;e.dataset.bfz=x.z;e.classList.add('bf-tgt');if(!k)e.dataset.bfl=lab})}
-  const l0=bfShort(moveLabel(ms[0].m));bfSay(BF.drag?l0+': drop on the glow':l0+': tap the glow')}
+  const l0=bfShort(moveLabel(ms[0].m));bfSay(BF.drag?bfCap(l0,4)+': drop on the glow':bfCap(l0,5)+': tap the glow')}
 function bfSay(t){const l=document.querySelector('#prompt .bfline');if(l)l.textContent=t}
 // run the move for a drop on zone z; several moves on one spot (e.g. which item to borrow) open the card's own choice pop-up
 function bfDrop(id,z,at){const me=viewSeat();const ms=bfMoves(me,id).filter(x=>x.z===z);BF.pick=null;BF.drag=null;
@@ -99,7 +99,7 @@ function bfFinger(spec){const old=document.getElementById('bffing');const key=sp
   const fr=B&&B.width&&spec.eb!==spec.ea?[{transform:`translate(${ax}px,${ay}px) scale(1)`,opacity:0},{transform:`translate(${ax}px,${ay}px) scale(.85)`,opacity:1,offset:.15},{transform:`translate(${bx}px,${by}px) scale(.85)`,opacity:1,offset:.7},{transform:`translate(${bx}px,${by}px) scale(1)`,opacity:0}]
     :[{transform:`translate(${ax}px,${ay+30}px) scale(1)`,opacity:0},{transform:`translate(${ax}px,${ay}px) scale(1)`,opacity:1,offset:.4},{transform:`translate(${ax}px,${ay}px) scale(.8)`,opacity:1,offset:.55},{transform:`translate(${ax}px,${ay}px) scale(1)`,opacity:0}];
   f.animate(fr,{duration:2200,iterations:Infinity,delay:400})}
-function bfTeach(me){if(!G||!G.learn||me<0||G.winner||sideToAct()!==me||G.q||BF.pick!=null||BF.drag||UI.menu||UI.pass!=null){bfFinger(null);return}
+function bfTeach(me){bfFinger(null);return;if(!G||!G.learn||me<0||G.winner||sideToAct()!==me||G.q||BF.pick!=null||BF.drag||UI.menu||UI.pass!=null){bfFinger(null);return}
   const L=bfLearned();const q=s=>document.querySelector(s);
   if(G.phase==='main'&&!L.has('kick')&&!(['setup','post'].includes(G.phase))){const d=q('.bfdoor');if(d){const co=coach(me);if(!autoN(me,co)){bfFinger({k:'kick',a:'d',b:'d',ea:d,eb:d});return}}}
   if(!L.has('drag')){const co=coach(me);const id=co.card;if(id!=null&&!co.disc){const ms=bfMoves(me,id);if(ms.length){const ea=q(`.mine .hand [data-card="${id}"]`),eb=bfEls(ms[0].z)[0];if(ea&&eb){bfFinger({k:'drag',a:id,b:ms[0].z,ea,eb});return}}}}
@@ -148,11 +148,11 @@ function bfAfter(S){if(!G){BF.snap=null;BF.pick=null;bfFinger(null);return}
 document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();e.preventDefault();return}
   const t=e.target;if(!G)return;const k=t.closest('[data-a="bfkick"]')||(()=>{const b=t.closest('[data-mv]');try{return b&&JSON.parse(b.dataset.mv).act==='kick'?b:null}catch(x){return null}})();
   if(k){e.stopPropagation();e.preventDefault();BF.pick=null;bfKick();return}
-  if(BF.ask){const z=t.closest('[data-bfz^="ask"]');e.stopPropagation();e.preventDefault();BF.ask=null;
+  if(BF.ask&&!t.closest('#bulbbtn')){const z=t.closest('[data-bfz^="ask"]');e.stopPropagation();e.preventDefault();BF.ask=null;
     if(z){const i=+z.dataset.bfz.slice(3);const n=BF.askN&&BF.askN[i];if(n!=null){uiAct({act:'ask',tgt:i,opt:n});return}}bfMark();return}
   const am=t.closest('[data-a="askmenu"]');if(am){const me=viewSeat();const asks=me>=0?validMoves(me).filter(m=>m.act==='ask'):[];
     if(asks.length&&!asks.some(m=>P(m.tgt).human)){e.stopPropagation();e.preventDefault();BF.pick=null;BF.ask=true;bfFinger(null);bfMark();return}}
-  if(BF.pick!=null){const z=t.closest('[data-bfz]');if(z){e.stopPropagation();e.preventDefault();bfDrop(BF.pick,z.dataset.bfz,null);return}
+  if(BF.pick!=null&&!t.closest('#bulbbtn')){const z=t.closest('[data-bfz]');if(z){e.stopPropagation();e.preventDefault();bfDrop(BF.pick,z.dataset.bfz,null);return}
     const c=t.closest('.mine [data-card]');if(c&&+c.dataset.card===BF.pick){BF.pick=null;bfMark();return}  // second tap: details / choices pop-up (ui.js)
     if(!c){BF.pick=null;bfMark();if(!t.closest('button,[data-a],[data-mv],[data-opp]')){e.stopPropagation();return}}}
   const c=t.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell||t.closest('.dlg'))return;const id=+c.dataset.card;const me=viewSeat();

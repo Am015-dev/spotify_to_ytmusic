@@ -627,6 +627,10 @@ html.ph-p .phc .hc{display:none}
 html.ph #prompt>.sellbar{order:-5;margin:2px 0}
 html.ph #prompt:has(>.sellbar)>:is(.acts.main,.hint,.since,.lesson,.say){display:none}
 html.ph #prompt>.sellbar .acts{display:flex;gap:8px;margin-top:6px}html.ph #prompt>.sellbar .btn{flex:1 1 0;min-height:48px}
+.mrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}.mrow>span:first-child{flex:1 0 90px;font-weight:700}.mrow .btn{min-height:40px;padding:2px 12px}.mrow .btn[aria-pressed=true]{background:#d3f9d8;color:#1b4332}
+/* help kit: compact coach bubbles (no picture, button beside the title): the table is crowded with glowing cards and spots */
+.gxh-bub[data-phase] .gxh-sp{display:none}.gxh-bub[data-phase] .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}
+.gxh-bub[data-phase] .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub[data-phase] .gxh-ok{min-height:28px;padding:0 12px}
 
 /* ===== board-first: drag/tap targets, the big door kick, the reveal, flying cards, floating numbers ===== */
 .bfline{display:none}
@@ -1086,6 +1090,69 @@ html.ph .arena.tight .row.mons{margin-bottom:6px}
 html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
 
+/* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
+   Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
+:root{--gxh-bg:#f3e6bf;--gxh-ink:#231a10;--gxh-accent:#c99a35;--gxh-glow:#ffe08a;--gxh-btn:#7a1f31;--gxh-btn-ink:#fff6dc;--gxh-z:80;--gxh-font:inherit}
+.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(292px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
+.gxh-bub.on{visibility:visible}
+.gxh-bub *{box-sizing:border-box}
+.gxh-bub .gxh-tt{font-weight:800;font-size:14.5px;margin:0 0 2px}
+.gxh-bub .gxh-tx{font-weight:600;font-size:13.5px}
+.gxh-bub .gxh-bd{display:flex;gap:8px;align-items:flex-start}
+.gxh-bub .gxh-sp{flex:0 0 36px;width:36px;height:36px}
+.gxh-bub .gxh-sp svg{width:100%;height:100%}
+.gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
+.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
+.gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
+.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
+.gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
+.gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
+.gxh-a-bottom .gxh-arr{bottom:-8px;border-left:0;border-top:0}
+.gxh-a-left .gxh-arr{left:-8px;border-top:0;border-right:0}
+.gxh-a-right .gxh-arr{right:-8px;border-bottom:0;border-left:0}
+.gxh-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) - 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow);animation:gxh-pulse 1.1s ease-in-out infinite}
+.gxh-ring.round{border-radius:50%}
+.gxh-ring.soft{border-width:2px;box-shadow:0 0 12px 2px var(--gxh-glow);opacity:.9}
+.gxh-ring.from{border-style:dashed;animation:none;box-shadow:0 0 10px 1px var(--gxh-glow)}
+.gxh-finger{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) + 1);pointer-events:none;width:0;height:0}
+.gxh-finger i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
+.gxh-finger b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.gxh-bulb{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.gxh-bulb svg{width:24px;height:24px;display:block;fill:#ffd95a;stroke:#6b4a00;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,217,90,.7))}
+.gxh-bulb.gxh-float{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:calc(var(--gxh-z) - 2);width:44px;height:44px;border-radius:50%;border:2px solid var(--gxh-accent);background:#2a1820}
+.gxh-bulb.lit svg{filter:drop-shadow(0 0 8px #ffd95a)}
+.gxh-rules{position:fixed;inset:0;z-index:calc(var(--gxh-z) + 10);display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(5,3,6,.72);overscroll-behavior:contain;touch-action:pan-y}
+.gxh-rules .gxh-card{position:relative;box-sizing:border-box;width:min(360px,100%);max-height:calc(100% - 8px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:12px 14px 12px;border-radius:16px;background:var(--gxh-bg);color:var(--gxh-ink);border:3px solid var(--gxh-accent);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font)}
+.gxh-rules .gxh-x{position:absolute;right:6px;top:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-pic{display:flex;align-items:center;justify-content:center;min-height:120px;max-height:34dvh;padding:6px 0;background:rgba(0,0,0,.06);border-radius:12px;margin-top:22px}
+.gxh-rules .gxh-pic svg{max-width:100%;max-height:30dvh;height:auto}
+.gxh-rules .gxh-rt{font-weight:800;font-size:19px;line-height:1.15;padding-right:30px}
+.gxh-rules .gxh-rx{font-weight:600;font-size:16px}
+.gxh-rules .gxh-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
+.gxh-rules .gxh-nav button{min-height:44px;min-width:76px;padding:0 14px;border-radius:22px;border:2px solid var(--gxh-btn);background:transparent;color:var(--gxh-btn);font:800 15px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-nav button.gxh-next{background:var(--gxh-btn);color:var(--gxh-btn-ink)}
+.gxh-rules .gxh-nav button[disabled]{opacity:.3}
+.gxh-rules .gxh-dots{display:flex;gap:6px}
+.gxh-rules .gxh-dots i{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.25)}
+.gxh-rules .gxh-dots i.on{background:var(--gxh-btn)}
+.gxh-pics{display:flex;align-items:flex-end;justify-content:center;gap:8px;flex-wrap:nowrap}
+.gxh-pics figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.gxh-pics svg{width:64px;height:64px}
+.gxh-pics figcaption{font:800 12px/1.1 var(--gxh-font);text-align:center;max-width:76px}
+.gxh-pics .gxh-ar{font:800 24px/1 var(--gxh-font);align-self:center;color:var(--gxh-btn)}
+.gxh-set{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0}
+.gxh-set>span{flex:1 0 90px;font-weight:700}
+.gxh-set button{min-height:38px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
+.gxh-set button[aria-pressed=true]{background:var(--gxh-accent);color:#1b1208}
+@keyframes gxh-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes gxh-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.75}}
+@media (prefers-reduced-motion:reduce){.gxh-bub,.gxh-ring{animation:none}}
+@media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
+/* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
+@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
+
 </style>
 </head>
 <body>
@@ -1094,6 +1161,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
   <h1>Doorkick <span>Dungeon</span></h1>
   <span class="ph-chip" id="phchip" aria-live="off"></span>
   <span class="gx-sp"></span>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?" title="Hint"></button>
   <button class="gx-ibtn" data-gx="dkLog" aria-label="Dungeon diary"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-scroll"/></svg> <span class="gx-lbl">Diary</span></button>
   <button class="gx-ibtn" data-gx="dkOpp" aria-label="Rivals: their gear and cards"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-rivals"/></svg> <span class="gx-lbl">Rivals</span></button>
   <button class="gx-ibtn" data-gx="dkRules" aria-label="How to play"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-book"/></svg> <span class="gx-lbl">Rules</span></button>
@@ -1101,7 +1169,6 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
   <button class="gx-ibtn dk-wide" data-a="mus" id="musbtn" aria-label="Music"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-music"/></svg> On</button>
   <button class="gx-ibtn dk-wide" data-a="speed" id="speedbtn" title="How fast the computer plays"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-slow"/></svg> slow</button>
   <button class="gx-ibtn dk-wide" data-a="pause" id="pausebtn" title="Pause the computer" aria-label="Pause the computer"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-pause"/></svg></button>
-  <button class="gx-ibtn dk-wide" data-a="hints" id="hintbtn" title="Suggested moves"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-hint"/></svg> On</button>
   <button class="gx-ibtn dk-wide" data-a="gfx" id="gfxbtn" title="Graphics quality (High / Medium / Low)" aria-label="Graphics quality"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-gem"/></svg> High</button>
   <button class="gx-ibtn dk-wide" data-a="new">New game</button>
   <button class="gx-ibtn dk-menub" data-gx="dkMenu" aria-label="Menu: sound, speed, hints, graphics, speed test, new game" title="Menu (and Show speed / Test speed)"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-menu"/></svg></button>
@@ -1232,6 +1299,277 @@ const GX={key:'gx',open:null,
   drawer(id,title,bodyEl,wide){let d=document.getElementById(id);if(!d){d=document.createElement('section');d.id=id;d.className='gx-drawer'+(wide?' wide':'');d.setAttribute('role','dialog');d.setAttribute('aria-label',title);
       d.innerHTML=`<div class="gx-drawer-head"><h2></h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"></div>`;document.body.appendChild(d)}
     d.querySelector('h2').textContent=title;if(bodyEl){const b=d.querySelector('.gx-drawer-body');if(bodyEl.parentNode!==b){b.innerHTML='';b.appendChild(bodyEl)}}return d}};
+
+</script>
+<script>
+// gx-viewport.js: one debounced relayout for every game. GXV.watch(fn) calls fn(size) when the visible size or safe-area key changes.
+// Fed by resize, orientationchange, visualViewport resize, ResizeObserver(documentElement) and pageshow; re-measures at 120 and 420 ms
+// (iOS reports the old size for a moment after a rotation). Size comes from a fixed full-screen probe, not innerWidth/innerHeight.
+(function () {
+  var fns = [], key = '', t1 = 0, t2 = 0, t3 = 0, probe = null;
+  function mk() {
+    if (probe || !document.body) return probe;
+    probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100%;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:border-box;z-index:-1';
+    document.body.appendChild(probe); return probe;
+  }
+  function measure() {
+    var p = mk(), w = innerWidth, h = innerHeight, s = '';
+    if (p) { w = p.offsetWidth || w; h = p.offsetHeight || h; var cs = getComputedStyle(p); s = cs.paddingTop + cs.paddingRight + cs.paddingBottom + cs.paddingLeft; }
+    return { w: w, h: h, safe: s, key: w + 'x' + h + '|' + s };
+  }
+  function run(force) {
+    var m = measure(); if (!force && m.key === key) return; key = m.key;
+    fns.forEach(function (f) { try { f(m); } catch (e) { console.error(e); } });
+  }
+  function kick() { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); t1 = setTimeout(function () { run(); }, 40); t2 = setTimeout(function () { run(); }, 120); t3 = setTimeout(function () { run(); }, 420); }
+  var wired = false;
+  function wire() {
+    if (wired) return; wired = true;
+    addEventListener('resize', kick); addEventListener('orientationchange', kick); addEventListener('pageshow', kick);
+    if (window.visualViewport) visualViewport.addEventListener('resize', kick);
+    if (window.ResizeObserver) new ResizeObserver(kick).observe(document.documentElement);
+  }
+  window.GXV = { watch: function (fn) { fns.push(fn); wire(); run(true); return fn; }, now: measure, poke: function () { run(true); } };
+})();
+
+</script>
+<script>
+// gx-help.js: on-demand and first-time help for any game. Coach bubbles (once per phase), a lightbulb (suggested move + rules cards), a tips switch.
+// Needs gx-help.css. Uses GXV.watch (gx-viewport.js) for relayout when it is loaded, else its own resize listeners. See GX-KIT.md section 9.
+//   GXH.init({game:'slug', steps:{phaseId:{target:()=>el, title:'<=4 words', text:'<=20 words', pic?:svg}}, rules:[{phase?, title, text, pic}], avoid:'css selector', defaultOn:true})
+//   GXH.phase(phaseId|null)   call after every render; shows the phase's bubble the first time only
+//   GXH.bulb({el?, suggest:()=>({target, from?, why})|null, rulesFor:()=>phaseId})
+//   GXH.setEnabled(bool) GXH.enabled() GXH.reset() GXH.rules(phaseId?) GXH.hide() GXH.settingsRow() GXH.settingsHTML()
+// Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
+(function () {
+  'use strict';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
+  function load() {
+    var raw = null; try { raw = localStorage.getItem(key()); } catch (e) { raw = mem || null; }
+    var o = null; try { o = raw ? JSON.parse(raw) : null; } catch (e) { o = null; }
+    st = { on: o && typeof o.on === 'boolean' ? o.on : cfg.defaultOn !== false, seen: (o && o.seen && typeof o.seen === 'object') ? o.seen : {} };
+  }
+  function save() { var s = JSON.stringify(st); mem = s; try { localStorage.setItem(key(), s); } catch (e) {} }
+  function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
+  function norm(r) { var o = { left: r.left, top: r.top, width: r.width, height: r.height }; o.right = o.left + o.width; o.bottom = o.top + o.height; o.cx = o.left + o.width / 2; o.cy = o.top + o.height / 2; return o; }
+  function toRect(t) {
+    try {
+      if (typeof t === 'function') t = t(); if (!t) return null;
+      if (t.getBoundingClientRect) { if (t.closest && t.closest('[hidden]')) return null; var r = t.getBoundingClientRect(); if (!r.width && !r.height) return null; return norm(r); }
+      if (t.left != null && t.top != null) return norm({ left: t.left, top: t.top, width: t.width || 0, height: t.height || 0 });
+      if (t.x != null && t.y != null) return norm({ left: t.x - 22, top: t.y - 22, width: 44, height: 44 });
+    } catch (e) {}
+    return null;
+  }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function inter(a, b) { return Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)); }
+  function infl(r, p) { return { left: r.left - p, top: r.top - p, right: r.right + p, bottom: r.bottom + p }; }
+  // what a bubble must not cover: the core (the tap spot) of every glowing or recommended thing, so a big glowing region keeps its middle free
+  var CORE = 56;   // 56px around the middle of a big glowing thing; when the screen is too cramped for that, 32px (the tap spot itself)
+  function core(r, k) { var w = r.width, h = r.height, cx = r.left + w / 2, cy = r.top + h / 2; k = k || CORE; if (w > k + 24) w = k; if (h > k + 24) h = k; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; }
+  function avoidRects(k) {
+    var out = [], v = vp(), sel = (cfg && cfg.avoid) || '.glow,.rglow,.rec,.rrec,.pri';
+    var list; try { list = D.querySelectorAll(sel + ',[data-gxh-avoid]'); } catch (e) { list = []; }
+    for (var i = 0; i < list.length; i++) {
+      var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
+      var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+    }
+    return out;
+  }
+  function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
+  function place(b, tr) {
+    var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
+    var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
+    var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
+    var ks = [CORE, 32];
+    for (var ki = 0; ki < ks.length && !best; ki++) {
+      var av = avoidRects(ks[ki]);
+      for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
+        var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
+        if (hit(c, T)) continue;
+        var ov = 0; for (var k = 0; k < av.length; k++) if (hit(c, av[k])) ov += inter(c, av[k]) || 1;
+        var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
+        if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
+      }
+    }
+    var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
+    b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
+    var side = c2.bottom <= tr.top + 2 ? 'bottom' : c2.top >= tr.bottom - 2 ? 'top' : c2.right <= tr.left + 2 ? 'right' : 'left';
+    b.className = b.className.replace(/\bgxh-a-\w+/g, '').trim() + ' gxh-a-' + side;
+    var arr = b.querySelector('.gxh-arr');
+    if (arr) {
+      arr.style.left = arr.style.top = '';
+      if (side === 'top' || side === 'bottom') arr.style.left = Math.round(Math.max(14, Math.min(w - 26, tr.cx - c2.left - 6))) + 'px';
+      else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
+    }
+    b.classList.add('on');
+    return c2;
+  }
+  function ringAt(r, cls) {
+    var e = mk('div', 'gxh-ring' + (cls ? ' ' + cls : '')), p = 4;
+    e.style.cssText = 'left:' + Math.round(r.left - p) + 'px;top:' + Math.round(r.top - p) + 'px;width:' + Math.round(r.width + 2 * p) + 'px;height:' + Math.round(r.height + 2 * p) + 'px';
+    if (Math.abs(r.width - r.height) < 6 && r.width < 80) e.classList.add('round');
+    D.body.appendChild(e); return e;
+  }
+  function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  function fingerAt(fr, tr) {
+    var f = mk('div', 'gxh-finger', '<i></i><b></b>'); D.body.appendChild(f);
+    f.setAttribute('aria-hidden', 'true'); f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy);
+    if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
+    var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
+    var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
+      : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
+    f.style.transform = T(b, 1);
+    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    return f;
+  }
+  function picHTML(p) { try { if (typeof p === 'function') p = p(); if (p == null) return ''; return typeof p === 'string' ? p : (p.outerHTML || ''); } catch (e) { return ''; } }
+  // ------------------------------------------------------------------ the one current help element
+  function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
+  function hide() {
+    if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
+    cur = null; D.removeEventListener('pointerdown', onDown, true);
+  }
+  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
+  function onDown(e) {
+    if (rulesEl || !cur) return;
+    var t = e.target;
+    if (t && t.closest) {
+      if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
+      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+    }
+    hide();   // the tap is not swallowed: it still reaches whatever was tapped
+  }
+  function draw() {   // (re)build the visible pieces for cur at the current layout
+    if (!cur) return;
+    clearEls();
+    var tr = toRect(cur.target); if (!tr) { hide(); return; }
+    var fr = cur.from ? toRect(cur.from) : null, els = [];
+    if (cur.kind === 'bulb') { if (fr) els.push(ringAt(fr, 'from')); els.push(ringAt(tr)); els.push(fingerAt(fr, tr)); }
+    else els.push(ringAt(tr, 'soft'));
+    var b = cur.mkBubble(); D.body.appendChild(b); els.push(b); cur.els = els; cur.bub = b;
+    place(b, tr);
+  }
+  // ------------------------------------------------------------------ coach bubbles
+  function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function tryShow(id, n) {
+    pend = null;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var tr = toRect(step.target);
+    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    st.seen[id] = 1; save(); shown.push(id);
+    cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd">' + (step.pic ? '<div class="gxh-sp">' + picHTML(step.pic) + '</div>' : '') + '<div><div class="gxh-tt">' + esc(step.title) + '</div><div class="gxh-tx">' + esc(step.text) + '</div></div></div><div class="gxh-row2"><button type="button" class="gxh-ok">Got it</button></div>';
+      b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
+      return b;
+    } };
+    draw(); arm();
+  }
+  function phase(id) {
+    if (!cfg) return;
+    if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (pend) { if (pend.id === id) return; cancelPend(); }
+    if (!st.on || st.seen[id] || !cfg.steps[id]) return;
+    pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
+  }
+  // ------------------------------------------------------------------ the lightbulb
+  var BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg>';
+  function bulbOpen() {
+    if (!bulbOpts || Date.now() < skipUntil) return;
+    hide(); cancelPend();
+    var s = null, ph = null;
+    try { s = bulbOpts.suggest ? bulbOpts.suggest() : null; } catch (e) { console.warn('gxh suggest', e); }
+    try { ph = bulbOpts.rulesFor ? bulbOpts.rulesFor() : null; } catch (e) {}
+    if (!s || !s.target || !toRect(s.target)) { rules(ph); return; }
+    cur = { kind: 'bulb', phase: ph, target: s.target, from: s.from, sug: s, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub gxh-bulbb'); b.setAttribute('role', 'status');
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">' + esc(s.why || '') + '</div><div class="gxh-row2"><button type="button" class="gxh-link">How does this work?</button></div>';
+      b.querySelector('.gxh-link').addEventListener('click', function () { rules(ph); });
+      return b;
+    } };
+    if (bulbEl) bulbEl.classList.add('lit');
+    draw(); arm();
+  }
+  function bulb(o) {
+    if (!cfg) return; bulbOpts = o || {};
+    var e = o && o.el; if (typeof e === 'string') e = D.querySelector(e);
+    if (!e) { e = mk('button', 'gxh-bulb gxh-float'); e.type = 'button'; D.body.appendChild(e); }
+    if (bulbEl && bulbEl !== e) bulbEl.removeEventListener('click', bulbOpen);
+    bulbEl = e; e.classList.add('gxh-bulb'); e.setAttribute('data-help', ''); if (!e.getAttribute('aria-label')) e.setAttribute('aria-label', 'Help: suggest a move');
+    if (!e.querySelector('svg')) e.insertAdjacentHTML('afterbegin', BULB);
+    e.removeEventListener('click', bulbOpen); e.addEventListener('click', bulbOpen);
+    return e;
+  }
+  // ------------------------------------------------------------------ rules cards
+  function rulesList(ph) {
+    var all = cfg.rules || [], m = function (r) { return r.phase === ph || (Array.isArray(r.phase) && r.phase.indexOf(ph) >= 0); };
+    var l = ph != null ? all.filter(m) : []; if (!l.length) l = all.filter(function (r) { return r.phase == null; }); if (!l.length) l = all.slice();
+    return l;
+  }
+  function closeRules() { if (rulesEl) { if (rulesEl.parentNode) rulesEl.parentNode.removeChild(rulesEl); rulesEl = null; D.removeEventListener('keydown', onKey, true); } }
+  function onKey(e) { if (!rulesEl) return; if (e.key === 'Escape') closeRules(); else if (e.key === 'ArrowRight') rulesEl._go(1); else if (e.key === 'ArrowLeft') rulesEl._go(-1); }
+  function rules(ph) {
+    if (!cfg) return; var list = rulesList(ph); hide(); cancelPend(); closeRules(); if (!list.length) return;
+    var R = rulesEl = mk('div', 'gxh-rules'); R.setAttribute('role', 'dialog'); R.setAttribute('aria-modal', 'true'); R.setAttribute('aria-label', 'How this works');
+    R.innerHTML = '<div class="gxh-card" data-help><button type="button" class="gxh-x" aria-label="Close">×</button><div class="gxh-pic"></div><div class="gxh-rt"></div><div class="gxh-rx"></div><div class="gxh-nav"><button type="button" class="gxh-prev">Back</button><span class="gxh-dots"></span><button type="button" class="gxh-next">Next</button></div></div>';
+    var i = 0, q = function (s) { return R.querySelector(s); };
+    function show() {
+      var c = list[i]; q('.gxh-pic').innerHTML = picHTML(c.pic); q('.gxh-rt').textContent = c.title || ''; q('.gxh-rx').textContent = c.text || '';
+      q('.gxh-dots').innerHTML = list.length > 1 ? list.map(function (_, k) { return '<i' + (k === i ? ' class="on"' : '') + '></i>'; }).join('') : '';
+      q('.gxh-prev').disabled = i === 0; q('.gxh-prev').style.visibility = list.length > 1 ? 'visible' : 'hidden'; q('.gxh-next').textContent = i === list.length - 1 ? 'Done' : 'Next';
+      R.dataset.card = i; R.dataset.count = list.length;
+    }
+    R._go = function (d) { var n = i + d; if (n >= list.length) { closeRules(); return; } if (n < 0) return; i = n; show(); };
+    q('.gxh-x').addEventListener('click', closeRules); q('.gxh-prev').addEventListener('click', function () { R._go(-1); }); q('.gxh-next').addEventListener('click', function () { R._go(1); });
+    R.addEventListener('click', function (e) { if (e.target === R) closeRules(); });
+    var x0 = null; R.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    R.addEventListener('touchend', function (e) { if (x0 == null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 45) R._go(dx < 0 ? 1 : -1); }, { passive: true });
+    D.addEventListener('keydown', onKey, true);
+    show(); D.body.appendChild(R);
+  }
+  // ------------------------------------------------------------------ settings: Tips on/off + Reset tips
+  function settingsHTML(o) {
+    o = o || {}; var rc = o.rowClass || 'gxh-set', sc = o.segClass || '', bc = o.btnClass || '';
+    var b = function (a, v, label, pr) { return '<button type="button" class="' + bc + '" data-gxh="' + a + '"' + (v != null ? ' data-v="' + v + '"' : '') + (pr != null ? ' aria-pressed="' + pr + '"' : '') + '>' + label + '</button>'; };
+    return '<div class="' + rc + ' gxh-set" data-help><span>Tips</span><span class="' + sc + '" style="display:inline-flex;gap:6px;flex:0 0 auto">' + b('tips', 1, 'On', st.on) + b('tips', 0, 'Off', !st.on) + '</span></div>' +
+      '<div class="' + rc + ' gxh-set" data-help><span>Show tips again</span>' + b('reset', null, 'Reset tips') + '</div>';
+  }
+  function settingsRow(o) { var d = D.createElement('div'); d.setAttribute('data-help', ''); d.innerHTML = settingsHTML(o); return d; }
+  function syncSettings() {
+    var l = D.querySelectorAll('[data-gxh=tips]');
+    for (var i = 0; i < l.length; i++) l[i].setAttribute('aria-pressed', String((l[i].dataset.v === '1') === st.on));
+  }
+  function onClick(e) {
+    var t = e.target && e.target.closest && e.target.closest('[data-gxh]'); if (!t || !cfg) return;
+    if (t.dataset.gxh === 'tips') setEnabled(t.dataset.v === '1');
+    else if (t.dataset.gxh === 'reset') { reset(); var o = t.textContent; t.textContent = 'Done'; setTimeout(function () { t.textContent = o; }, 1400); }
+  }
+  function setEnabled(v) { if (!cfg) return; st.on = !!v; save(); if (!st.on) { cancelPend(); if (cur && cur.kind === 'coach') hide(); } syncSettings(); }
+  function reset() { if (!cfg) return; st.seen = {}; shown.length = 0; save(); }
+  // ------------------------------------------------------------------ relayout
+  function relayout() { if (!cfg || !cur || rulesEl) return; draw(); }
+  function init(o) {
+    cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
+    if (wired) return GXH; wired = true;
+    D.addEventListener('click', onClick, true);
+    if (window.GXV) GXV.watch(relayout);
+    else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
+    return GXH;
+  }
+  var GXH = window.GXH = {
+    version: 1, init: init, phase: phase, bulb: bulb, rules: rules, hide: hide, relayout: relayout, setEnabled: setEnabled, reset: reset,
+    enabled: function () { return !!st.on; }, seen: function (id) { return !!st.seen[id]; }, settingsHTML: settingsHTML, settingsRow: settingsRow,
+    state: function () { return { on: st.on, seen: Object.keys(st.seen), shown: shown.slice(), cur: cur ? { kind: cur.kind, id: cur.id || null, phase: cur.phase } : null, rules: !!rulesEl, pending: pend ? pend.id : null }; }
+  };
+})();
 
 </script>
 <script>
@@ -5207,7 +5545,7 @@ const LESSONS={
   window:'<b>Curse a rival,</b> or let them go.'};
 function learnSet(){try{return new Set(JSON.parse(localStorage.getItem('dkd_learned')||'[]'))}catch(e){return new Set(UI.learnedMem||[])}}
 function learnDone(k){const s=learnSet();s.add(k);UI.learnedMem=[...s];try{localStorage.setItem('dkd_learned',JSON.stringify([...s]))}catch(e){}}
-function lessonKey(me){if(!G||!G.learn||me<0||sideToAct()!==me||G.q)return null;const cb=G.cb;
+function lessonKey(me){return null;if(!G||!G.learn||me<0||sideToAct()!==me||G.q)return null;const cb=G.cb;
   if(G.phase==='combat'&&cb)return cb.stage==='act'&&cb.who===me?(winning(cb)?'win':'lose'):cb.stage!=='act'?'meddle':null;
   return {setup:'setup',main:'main',after:'after',post:'post',charity:'charity',window:'window'}[G.phase]||null}
 function lessonHTML(me){const k=lessonKey(me);UI.lessonNow=null;if(!k||learnSet().has(k))return '';UI.lessonNow=k;
@@ -5420,7 +5758,7 @@ const ptok=i=>`<span class="ptok" style="--c:${PCOL[i]}" aria-hidden="true">${PS
 const EMO={'💡':'hint','⚠':'warn','☁':'cloud','⚔':'sword','💰':'coin','✋':'hand','💀':'skull','🏆':'trophy','✨':'spark','🎉':'party','🎒':'bag','♂':'male','♀':'female','⏸':'pause','🐢':'slow','⏩':'fast','📜':'scroll','📖':'book','🤖':'bot','💬':'chat','✓':'check','✗':'cross','🧬':'race','🎓':'cls','🪖':'helm','👢':'boot','🛡':'shield','🗡':'sword','✦':'spark','⇆':'swap','🚪':'door','🏃':'run','🙋':'help','📉':'down','💥':'star','🔊':'sound','🔇':'mute','🎵':'music','▶':'play'};
 const EMORE=new RegExp('('+Object.keys(EMO).join('|')+')\uFE0F?','gu');
 function emo(h){if(typeof ic!=='function'||!h)return h;return h.replace(/(<[^>]*>)|([^<]+)/g,(m,tag,txt)=>tag?tag:txt.replace(EMORE,(x,e)=>ic(EMO[e])))}
-UI.speed=1;try{UI.hints=localStorage.getItem('dkd_hints')!=='0';UI.speed=+(localStorage.getItem('dkd_speed4')||1)}catch(e){}
+UI.speed=1;try{UI.hints=false;UI.speed=+(localStorage.getItem('dkd_speed4')||1)}catch(e){}
 const SPEEDN=v=>emo(v<1?'🐢 slow':v>1?'⏩ fast':'▶ normal');
 function refresh(){if(G&&G.mode==='net'&&typeof netWindow==='function')netWindow();if(G&&!G.winner)autoPass();if(G&&!G.winner){try{if(G.mode!=='net')localStorage.setItem(SAVE,JSON.stringify(G))}catch(e){}}else{try{localStorage.removeItem(SAVE)}catch(e){}}
   render();schedule();sounds();if(G&&G.mode==='net'&&typeof netPush==='function')netPush()}
@@ -5484,7 +5822,7 @@ function expireFx(){if(!G)return;const now=Date.now();if(UI.toast&&UI.toast.unti
 // only touch the DOM when the markup really changed (a click in flight keeps its button)
 function setHTML(el,h){if(!el)return;h=emo(h);if(el._h===h)return;el._h=h;el.innerHTML=h}
 function syncMenu(){const b=$('#dkMenuBody');if(!b)return;const so=typeof SND!=='undefined'?SND.on:true,mu=typeof SND!=='undefined'?SND.music:true;const sp=UI.speed<1?'slow':UI.speed>1?'fast':'normal';
-  b.innerHTML=`<div class="menu"><button class="btn" data-a="snd">${ic(so?'sound':'mute')} Sound effects: ${so?'on':'off'}</button><button class="btn" data-a="mus">${ic('music')} Music: ${mu?'on':'off'}</button><button class="btn" data-a="speed">${ic(sp)} Computer speed: ${sp}</button><button class="btn" data-a="pause">${ic(UI.pause?'play':'pause')} ${UI.pause?'Resume':'Pause'} the computer</button><button class="btn" data-a="hints">${ic('hint')} Hints: ${UI.hints?'on':'off'}</button><button class="btn" data-a="gfx">${ic('gem')} Graphics: ${typeof GFX!=='undefined'?GFX.name():'High'}</button>${typeof PerfHUD!=='undefined'?PerfHUD.buttonsHTML('btn'):''}<button class="btn primary" data-a="new">New game</button></div>`}
+  b.innerHTML=`<div class="menu"><button class="btn" data-a="snd">${ic(so?'sound':'mute')} Sound effects: ${so?'on':'off'}</button><button class="btn" data-a="mus">${ic('music')} Music: ${mu?'on':'off'}</button><button class="btn" data-a="speed">${ic(sp)} Computer speed: ${sp}</button><button class="btn" data-a="pause">${ic(UI.pause?'play':'pause')} ${UI.pause?'Resume':'Pause'} the computer</button>${typeof GXH!=='undefined'?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):''}<button class="btn" data-a="gfx">${ic('gem')} Graphics: ${typeof GFX!=='undefined'?GFX.name():'High'}</button>${typeof PerfHUD!=='undefined'?PerfHUD.buttonsHTML('btn'):''}<button class="btn primary" data-a="new">New game</button></div>`}
 function syncGfxBtn(){const g=$('#gfxbtn');if(g&&typeof GFX!=='undefined')g.innerHTML=`${ic('gem')} ${GFX.name()}`;syncMenu()}
 function dockTitle(me){const s=sideToAct();if(G.winner)return 'Game over';if(s<0)return 'Turn '+G.turn;const p=P(s);return (s===me&&p.human?'Your move':p.human?p.nm+'’s move':p.nm+' is thinking…')+' · turn '+G.turn}
 function recentHTML(){if(!G||!G.log.length)return '';const o=G.out&&G.out.turn===G.turn&&!G.cb?G.out:null;const bk=(UI.barkLog||[]).filter(b=>G.ln-b.n<12).slice(0,2);
@@ -5662,7 +6000,6 @@ document.addEventListener('click',e=>{const t=e.target.closest('[data-mv],[data-
   if(a==='gfx'&&typeof GFX!=='undefined'){GFX.cycle();syncGfxBtn();return}
   if(a==='pause'){UI.pause=!UI.pause;$('#pausebtn').innerHTML=ic(UI.pause?'play':'pause');syncMenu();if(!UI.pause)schedule();return}
   if(a==='speed'){UI.speed=UI.speed>=2?0.5:UI.speed*2;try{localStorage.setItem('dkd_speed4',UI.speed)}catch(e){};$('#speedbtn').innerHTML=SPEEDN(UI.speed);syncMenu();return}
-  if(a==='hints'){UI.hints=!UI.hints;try{localStorage.setItem('dkd_hints',UI.hints?'1':'0')}catch(e){};$('#hintbtn').innerHTML=ic('hint')+' '+(UI.hints?'On':'Off');syncMenu();render();return}
   if(a==='snd'&&typeof toggleSound==='function'){toggleSound();syncMenu();return}
   if(a==='mus'&&typeof toggleMusic==='function'){toggleMusic();syncMenu();return}
   if(t.dataset.set){const k=t.dataset.set,v=t.dataset.v;if(k==='n')UI.n=+v;else if(k==='mode')UI.mode=v;else if(k==='lvl')UI.lvl=v;else if(k==='ex'){DEFEX[v]=!DEFEX[v];try{localStorage.setItem('dkd_ex',JSON.stringify(DEFEX))}catch(e){}}render();return}
@@ -5691,7 +6028,7 @@ GX.drawer('dkCard','Card',$('#dkCardBody'));
 GX.drawer('dkRules','How to play',$('#dkRulesBody'),true);$('#dkRulesBody').innerHTML=rulesHTML();
 GX.drawer('dkMenu','Menu',$('#dkMenuBody'));
 GX.drawer('dkNet','🌐 Online game',$('#dkNetBody'));
-$('#speedbtn').innerHTML=SPEEDN(UI.speed);$('#hintbtn').innerHTML=ic('hint')+' '+(UI.hints?'On':'Off');if(typeof GFX!=='undefined'){GFX.init();syncGfxBtn()}
+$('#speedbtn').innerHTML=SPEEDN(UI.speed);if(typeof GFX!=='undefined'){GFX.init();syncGfxBtn()}
 GX.onClose=id=>{if(id==='dkCard'&&((UI.menu&&UI.menu.card!=null)||UI.zoom!=null)){UI.menu=null;UI.zoom=null;if(G)render()}};
 render();
 
@@ -5757,7 +6094,7 @@ function bfZone(m,me){const c=m.card!=null?cd(m.card):null;const cb=G.cb;const i
 // self-harm moves (curse yourself, boost your own monster) never glow; they stay in the card's details pop-up
 const bfHarm=m=>/yourself!|against yourself|helps a rival/.test(moveLabel(m));
 const BFSIDE=['berserk','turn','flight','toss','drop'];
-function bfMoves(me,id){if(me<0||!G||G.winner)return [];return cardMoves(me,id).filter(m=>m.act!=='sell'&&!bfHarm(m)).map(m=>({m,z:bfZone(m,me)})).filter(x=>x.z).sort((a,b)=>BFSIDE.includes(a.m.act)-BFSIDE.includes(b.m.act))}
+function bfMoves(me,id){if(me<0||!G||G.winner)return [];return cardMoves(me,id).filter(m=>m.act!=='sell'&&!bfHarm(m)).map(m=>({m,z:bfZone(m,me)})).filter(x=>x.z&&!(x.z[0]==='p'&&+x.z.slice(1)>=G.pl.length)).sort((a,b)=>BFSIDE.includes(a.m.act)-BFSIDE.includes(b.m.act))}
 function bfEls(z){const q=s=>[...document.querySelectorAll(s)];
   if(z==='hero')return q('.bfbig,.mine .top,.mine .gear');if(z==='fh'){const me=viewSeat();const cb=G.cb;return q('.arena .score.hero'+(cb&&(cb.who===me||cb.help===me)?',.mine .top,.mine .gear':''))}if(z==='ms')return q('.arena .score.mons,.arena .row.mons .mon');
   if(z[0]==='m')return q(`.arena .row.mons .mon:nth-child(${+z.slice(1)+1})`);
@@ -5776,7 +6113,7 @@ function bfMark(){document.querySelectorAll('[data-bfz]').forEach(e=>{e.removeAt
   document.documentElement.classList.add('bf-holding');document.querySelectorAll(`.mine [data-card="${id}"]`).forEach(e=>e.classList.add('bf-picked'));
   const seen={};for(const x of ms){if(seen[x.z])continue;seen[x.z]=1;const lab=ms.filter(y=>y.z===x.z).length>1?bfShort(moveLabel(x.m)).replace(/ .*/,'')+'…':bfShort(moveLabel(x.m));
     bfEls(x.z).forEach((e,k)=>{if(e.dataset.bfz)return;e.dataset.bfz=x.z;e.classList.add('bf-tgt');if(!k)e.dataset.bfl=lab})}
-  const l0=bfShort(moveLabel(ms[0].m));bfSay(BF.drag?l0+': drop on the glow':l0+': tap the glow')}
+  const l0=bfShort(moveLabel(ms[0].m));bfSay(BF.drag?bfCap(l0,4)+': drop on the glow':bfCap(l0,5)+': tap the glow')}
 function bfSay(t){const l=document.querySelector('#prompt .bfline');if(l)l.textContent=t}
 // run the move for a drop on zone z; several moves on one spot (e.g. which item to borrow) open the card's own choice pop-up
 function bfDrop(id,z,at){const me=viewSeat();const ms=bfMoves(me,id).filter(x=>x.z===z);BF.pick=null;BF.drag=null;
@@ -5834,7 +6171,7 @@ function bfFinger(spec){const old=document.getElementById('bffing');const key=sp
   const fr=B&&B.width&&spec.eb!==spec.ea?[{transform:`translate(${ax}px,${ay}px) scale(1)`,opacity:0},{transform:`translate(${ax}px,${ay}px) scale(.85)`,opacity:1,offset:.15},{transform:`translate(${bx}px,${by}px) scale(.85)`,opacity:1,offset:.7},{transform:`translate(${bx}px,${by}px) scale(1)`,opacity:0}]
     :[{transform:`translate(${ax}px,${ay+30}px) scale(1)`,opacity:0},{transform:`translate(${ax}px,${ay}px) scale(1)`,opacity:1,offset:.4},{transform:`translate(${ax}px,${ay}px) scale(.8)`,opacity:1,offset:.55},{transform:`translate(${ax}px,${ay}px) scale(1)`,opacity:0}];
   f.animate(fr,{duration:2200,iterations:Infinity,delay:400})}
-function bfTeach(me){if(!G||!G.learn||me<0||G.winner||sideToAct()!==me||G.q||BF.pick!=null||BF.drag||UI.menu||UI.pass!=null){bfFinger(null);return}
+function bfTeach(me){bfFinger(null);return;if(!G||!G.learn||me<0||G.winner||sideToAct()!==me||G.q||BF.pick!=null||BF.drag||UI.menu||UI.pass!=null){bfFinger(null);return}
   const L=bfLearned();const q=s=>document.querySelector(s);
   if(G.phase==='main'&&!L.has('kick')&&!(['setup','post'].includes(G.phase))){const d=q('.bfdoor');if(d){const co=coach(me);if(!autoN(me,co)){bfFinger({k:'kick',a:'d',b:'d',ea:d,eb:d});return}}}
   if(!L.has('drag')){const co=coach(me);const id=co.card;if(id!=null&&!co.disc){const ms=bfMoves(me,id);if(ms.length){const ea=q(`.mine .hand [data-card="${id}"]`),eb=bfEls(ms[0].z)[0];if(ea&&eb){bfFinger({k:'drag',a:id,b:ms[0].z,ea,eb});return}}}}
@@ -5883,11 +6220,11 @@ function bfAfter(S){if(!G){BF.snap=null;BF.pick=null;bfFinger(null);return}
 document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();e.preventDefault();return}
   const t=e.target;if(!G)return;const k=t.closest('[data-a="bfkick"]')||(()=>{const b=t.closest('[data-mv]');try{return b&&JSON.parse(b.dataset.mv).act==='kick'?b:null}catch(x){return null}})();
   if(k){e.stopPropagation();e.preventDefault();BF.pick=null;bfKick();return}
-  if(BF.ask){const z=t.closest('[data-bfz^="ask"]');e.stopPropagation();e.preventDefault();BF.ask=null;
+  if(BF.ask&&!t.closest('#bulbbtn')){const z=t.closest('[data-bfz^="ask"]');e.stopPropagation();e.preventDefault();BF.ask=null;
     if(z){const i=+z.dataset.bfz.slice(3);const n=BF.askN&&BF.askN[i];if(n!=null){uiAct({act:'ask',tgt:i,opt:n});return}}bfMark();return}
   const am=t.closest('[data-a="askmenu"]');if(am){const me=viewSeat();const asks=me>=0?validMoves(me).filter(m=>m.act==='ask'):[];
     if(asks.length&&!asks.some(m=>P(m.tgt).human)){e.stopPropagation();e.preventDefault();BF.pick=null;BF.ask=true;bfFinger(null);bfMark();return}}
-  if(BF.pick!=null){const z=t.closest('[data-bfz]');if(z){e.stopPropagation();e.preventDefault();bfDrop(BF.pick,z.dataset.bfz,null);return}
+  if(BF.pick!=null&&!t.closest('#bulbbtn')){const z=t.closest('[data-bfz]');if(z){e.stopPropagation();e.preventDefault();bfDrop(BF.pick,z.dataset.bfz,null);return}
     const c=t.closest('.mine [data-card]');if(c&&+c.dataset.card===BF.pick){BF.pick=null;bfMark();return}  // second tap: details / choices pop-up (ui.js)
     if(!c){BF.pick=null;bfMark();if(!t.closest('button,[data-a],[data-mv],[data-opp]')){e.stopPropagation();return}}}
   const c=t.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell||t.closest('.dlg'))return;const id=+c.dataset.card;const me=viewSeat();
@@ -6006,6 +6343,184 @@ const tbPh=()=>document.documentElement.classList.contains('ph');
 
 </script>
 <script>
+// ===================== help (gx-help kit): coach bubbles the first time, the lightbulb on demand =====================
+// Bubbles: once per phase, short, pointing at the board. The bulb: the advisor's own move (coach(me).rec, the move the old glowing suggestion used)
+// + a short why + the rules cards. Nothing here ever plays a card or changes the game.
+// ---------------------------------------------------------------- pictures (inline SVG in the game's colours)
+const HP={
+ card:(n,c)=>'<svg viewBox="0 0 64 64"><rect x="14" y="5" width="36" height="54" rx="5" fill="#fbf1d2" stroke="'+(c||'#7a1f31')+'" stroke-width="3"/><text x="32" y="40" text-anchor="middle" font-size="26" font-weight="800" fill="'+(c||'#7a1f31')+'" font-family="Georgia,serif">'+(n==null?'':n)+'</text></svg>',
+ back:()=>'<svg viewBox="0 0 64 64"><rect x="14" y="5" width="36" height="54" rx="5" fill="#7a1f31" stroke="#c99a35" stroke-width="3"/><path d="M32 16l11 16-11 16-11-16z" fill="none" stroke="#e8c867" stroke-width="3"/></svg>',
+ door:()=>'<svg viewBox="0 0 64 64"><path d="M14 58V22Q14 6 32 6t18 16v36z" fill="#8a5a2a" stroke="#4a2f14" stroke-width="3" stroke-linejoin="round"/><path d="M32 8v50M14 32h36" stroke="#4a2f14" stroke-width="2"/><circle cx="42" cy="38" r="3.2" fill="#e8c867" stroke="#8a6a1a" stroke-width="1.5"/></svg>',
+ boot:()=>'<svg viewBox="0 0 64 64"><path d="M20 8h16v22l16 8q6 3 6 10v8H16V8z" fill="#6b4a2a" stroke="#33220f" stroke-width="3" stroke-linejoin="round"/><path d="M16 50h42" stroke="#33220f" stroke-width="3"/></svg>',
+ swords:()=>'<svg viewBox="0 0 64 64"><path d="M12 12l36 36M52 12L16 48" stroke="#55412a" stroke-width="5" stroke-linecap="round"/><path d="M10 52l8-8M54 52l-8-8" stroke="#c99a35" stroke-width="6" stroke-linecap="round"/><path d="M20 38l6 6M44 38l-6 6" stroke="#c99a35" stroke-width="4" stroke-linecap="round"/></svg>',
+ monster:(n)=>'<svg viewBox="0 0 64 64"><path d="M10 54V30Q10 10 32 10t22 20v24l-8-6-7 6-7-6-7 6-7-6z" fill="#5fa04a" stroke="#27471c" stroke-width="3" stroke-linejoin="round"/><circle cx="24" cy="30" r="5" fill="#fff" stroke="#27471c" stroke-width="2"/><circle cx="40" cy="30" r="5" fill="#fff" stroke="#27471c" stroke-width="2"/><circle cx="25" cy="31" r="2" fill="#27471c"/><circle cx="41" cy="31" r="2" fill="#27471c"/><path d="M22 42h20" stroke="#27471c" stroke-width="3"/><path d="M14 14l5 8M50 14l-5 8" stroke="#27471c" stroke-width="3" stroke-linecap="round"/>'+(n!=null?'<text x="32" y="60" text-anchor="middle" font-size="14" font-weight="800" fill="#7a1f31" font-family="Georgia,serif">'+n+'</text>':'')+'</svg>',
+ hero:(n)=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="18" r="10" fill="#f0c9a0" stroke="#7a1f31" stroke-width="3"/><path d="M12 58Q14 32 32 32t20 26z" fill="#2f7a9a" stroke="#12384a" stroke-width="3" stroke-linejoin="round"/>'+(n!=null?'<text x="32" y="54" text-anchor="middle" font-size="16" font-weight="800" fill="#fff" font-family="Georgia,serif">'+n+'</text>':'')+'</svg>',
+ level:()=>'<svg viewBox="0 0 64 64"><path d="M32 6l7.5 17 18.5 1.6-14 12 4.4 18.4L32 45l-16.4 10 4.4-18.4-14-12L24.5 23z" fill="#e8c867" stroke="#8a6a1a" stroke-width="3" stroke-linejoin="round"/><text x="32" y="36" text-anchor="middle" font-size="16" font-weight="800" fill="#7a1f31" font-family="Georgia,serif">+1</text></svg>',
+ coin:(t)=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#e8c867" stroke="#8a6a1a" stroke-width="3"/>'+(t?'<text x="32" y="38" text-anchor="middle" font-size="16" font-weight="800" fill="#7a1f31" font-family="Georgia,serif">'+t+'</text>':'<circle cx="32" cy="32" r="13" fill="none" stroke="#8a6a1a" stroke-width="2.5"/>')+'</svg>',
+ chest:()=>'<svg viewBox="0 0 64 64"><rect x="8" y="26" width="48" height="28" rx="4" fill="#8a5a2a" stroke="#4a2f14" stroke-width="3"/><path d="M8 34Q8 14 32 14t24 20z" fill="#a8742f" stroke="#4a2f14" stroke-width="3"/><rect x="28" y="30" width="8" height="10" rx="2" fill="#e8c867" stroke="#8a6a1a" stroke-width="2"/></svg>',
+ curse:()=>'<svg viewBox="0 0 64 64"><path d="M18 44Q6 44 8 33t14-8Q24 12 38 14t14 14q10 2 6 12t-14 4z" fill="#8e6bbf" stroke="#3d2466" stroke-width="3" stroke-linejoin="round"/><path d="M26 30q6 4 12 0M28 38q4 3 8 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>',
+ ward:()=>'<svg viewBox="0 0 64 64"><path d="M32 6l20 8v16q0 18-20 26Q12 48 12 30V14z" fill="#9fc5e8" stroke="#1f4e79" stroke-width="3" stroke-linejoin="round"/><path d="M22 30l8 8 14-16" stroke="#1f4e79" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ help:()=>'<svg viewBox="0 0 64 64"><circle cx="20" cy="20" r="8" fill="#f0c9a0" stroke="#7a1f31" stroke-width="3"/><circle cx="44" cy="20" r="8" fill="#f0c9a0" stroke="#7a1f31" stroke-width="3"/><path d="M6 56Q8 32 20 32t14 24zM30 56Q32 32 44 32t14 24z" fill="#2f9e44" stroke="#14501f" stroke-width="3" stroke-linejoin="round"/></svg>',
+ run:()=>'<svg viewBox="0 0 64 64"><circle cx="38" cy="12" r="7" fill="#f0c9a0" stroke="#7a1f31" stroke-width="3"/><path d="M36 22l-10 14 10 6-4 14M26 36l-12-4M38 24l12 8" stroke="#7a1f31" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M4 22h10M2 32h8M6 42h8" stroke="#aaa" stroke-width="3" stroke-linecap="round"/></svg>',
+ die:(n)=>'<svg viewBox="0 0 64 64"><rect x="10" y="10" width="44" height="44" rx="9" fill="#fff" stroke="#7a1f31" stroke-width="3"/><text x="32" y="43" text-anchor="middle" font-size="30" font-weight="800" fill="#7a1f31" font-family="Georgia,serif">'+(n||5)+'</text></svg>',
+ pass:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="none" stroke="#7a1f31" stroke-width="5"/><path d="M16 48L48 16" stroke="#7a1f31" stroke-width="5"/></svg>',
+ hand:()=>'<svg viewBox="0 0 64 64"><rect x="8" y="22" width="14" height="30" rx="3" transform="rotate(-18 15 37)" fill="#fbf1d2" stroke="#7a1f31" stroke-width="2.5"/><rect x="25" y="14" width="14" height="34" rx="3" fill="#fbf1d2" stroke="#7a1f31" stroke-width="2.5"/><rect x="42" y="22" width="14" height="30" rx="3" transform="rotate(18 49 37)" fill="#fbf1d2" stroke="#7a1f31" stroke-width="2.5"/></svg>',
+ gift:()=>'<svg viewBox="0 0 64 64"><rect x="10" y="26" width="44" height="30" rx="3" fill="#d6336c" stroke="#7a1f31" stroke-width="3"/><rect x="6" y="18" width="52" height="10" rx="3" fill="#f06595" stroke="#7a1f31" stroke-width="3"/><path d="M32 18v38" stroke="#fff" stroke-width="5"/><path d="M32 18q-12-12-14-2t14 2q12-12 14-2t-14 2" fill="none" stroke="#7a1f31" stroke-width="3"/></svg>',
+ tap:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="18" fill="rgba(122,31,49,.15)" stroke="#7a1f31" stroke-width="4"/><path d="M30 14v26l-6-5-4 4 14 14h14l4-20-8-2-4-4-4 1-2-4z" fill="#fff" stroke="#231a10" stroke-width="2.5" stroke-linejoin="round"/></svg>',
+ glow:()=>'<svg viewBox="0 0 64 64"><rect x="12" y="10" width="40" height="44" rx="8" fill="rgba(255,224,138,.35)" stroke="#e0a800" stroke-width="4" stroke-dasharray="6 4"/><path d="M32 22v20M24 34l8 8 8-8" stroke="#7a1f31" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+};
+function hpics(items){return '<div class="gxh-pics">'+items.map(it=>it==='>'?'<span class="gxh-ar">&rarr;</span>':'<figure>'+(HP[it[0]]?HP[it[0]](it[2],it[3]):'')+(it[1]?'<figcaption>'+it[1]+'</figcaption>':'')+'</figure>').join('')+'</div>'}
+// ---------------------------------------------------------------- where each bubble points
+const hvis=e=>{if(!e||e.closest('[hidden]'))return false;const r=e.getBoundingClientRect();return r.width>3&&r.height>3};
+const hfirst=(...sels)=>()=>{for(const s of sels){for(const e of document.querySelectorAll(s)){if(hvis(e))return e}}return null};
+const hmv=act=>`#prompt [data-mv*='"act":"${act}"'],.fbtns [data-mv*='"act":"${act}"']`;
+const HLP_STEPS={
+ setup:{target:hfirst('.mine .hand .card.play','#prompt [data-mv*=\'"act":"ready"\']','.mine .hand'),title:'Gear up your hero',text:'Tap a glowing card, then the glowing spot. Tap Ready when you are done.',pic:()=>HP.hero()},
+ main:{target:hfirst('.bfdoor','.pile.pl'),title:'Kick the door',text:'Play cards to gear up, then tap the door.',pic:()=>HP.door()},
+ after:{target:hfirst(hmv('loot'),'#prompt .acts button'),title:'An empty room',text:'No monster this time. Tap Loot for a free card, or fight a monster from your hand.',pic:()=>HP.back()},
+ post:{target:hfirst(hmv('end'),'#prompt .acts button'),title:'Tidy up',text:'Wear new items and sell spares for a level. Then tap End turn.',pic:()=>HP.coin('+1')},
+ charity:{target:hfirst('.mine .hand .card.play','.mine .hand'),title:'Too many cards',text:'You hold more cards than the limit. Tap a glowing card and give it away.',pic:()=>HP.hand()},
+ window:{target:hfirst('#prompt .acts button','.arena'),title:'A rival’s door',text:'They are about to kick. Curse them with a glowing card, or let them go on.',pic:()=>HP.curse()},
+ fight:{target:hfirst('.fbtns .fightb','.fbtns button','.arena .vs'),title:'The fight',text:'The bigger number wins. Tap Fight if you lead. Otherwise add cards, get help or run.',pic:()=>HP.swords()},
+ meddle:{target:hfirst('.arena .vs','#prompt .acts button'),title:'A rival fights',text:'You may play a glowing card to change their fight, or tap Let it be.',pic:()=>HP.monster()},
+ qHelp:{target:hfirst('#prompt .acts button'),title:'Asked for help',text:'A rival offers treasure to team up. Tap Help to join, or Refuse.',pic:()=>HP.help()},
+ qWard:{target:hfirst('#prompt .acts button'),title:'A curse is coming',text:'Your ring can cancel it. Tap Cancel the curse, or let it happen.',pic:()=>HP.ward()},
+ qRescue:{target:hfirst('#prompt .acts button'),title:'Caught!',text:'Use an escape card to dodge the Bad Stuff, or take it.',pic:()=>HP.run()},
+ qPick:{target:hfirst('#prompt .acts button','#prompt .opt'),title:'Make a choice',text:'Tap one of the options to choose it.',pic:()=>HP.tap()},
+ qOffer:{target:hfirst('#prompt .acts button'),title:'A special power',text:'Read the buttons: one uses the power, the other skips it.',pic:()=>HP.tap()},
+ drop:{target:hfirst('[data-bfz]'),title:'Pick a spot',text:'Tap a glowing spot to play it there.',pic:()=>HP.glow()},
+ ask:{target:hfirst('[data-bfz]'),title:'Who helps?',text:'Tap a rival to ask for help.',pic:()=>HP.help()},
+ sell:{target:hfirst('.sellbar .btn.primary','.sellbar .btn'),title:'Sell for a level',text:'Tap items to sell. Every 1,000 gold buys a level. Then tap the green button.',pic:()=>HP.coin('1000')}
+};
+// ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
+const HLP_RULES=[
+ {title:'The goal',text:'Be first to reach level 10. The last level can only come from killing a monster.',pic:()=>hpics([['hero','You'],'>',['level','Level 10']])},
+ {title:'Your turn',text:'Gear up, kick open a door, fight or loot, tidy up, then end your turn.',pic:()=>hpics([['door','Kick'],'>',['swords','Fight'],'>',['chest','Loot']])},
+ {phase:'setup',title:'Set up your hero',text:'Play race, class and item cards from your hand. Items go on if you can use them.',pic:()=>hpics([['card','Race'],['card','Item'],'>',['hero','Hero']])},
+ {phase:'setup',title:'Strength is your power',text:'Your strength is your level plus your items. Bigger strength beats bigger monsters.',pic:()=>hpics([['hero','Level 1',1],['coin','+ items','+3'],'>',['swords','Strength 4']])},
+ {phase:'main',title:'Kick open the door',text:'Draw a door card face up. A monster starts a fight. A curse hits you at once.',pic:()=>hpics([['door','Kick'],'>',['monster','Fight'],['curse','Curse']])},
+ {phase:'main',title:'Gear up first',text:'Before kicking, play items, races and classes, or sell spares: 1,000 gold buys a level.',pic:()=>hpics([['card','Gear'],'>',['coin','1000'],'>',['level','Level']])},
+ {phase:'main',title:'Nothing behind it?',text:'Any other card goes to your hand. Then you may loot the room or fight from your hand.',pic:()=>hpics([['door','Door'],'>',['hand','Your hand']])},
+ {phase:'after',title:'Loot the room',text:'With no monster to fight, draw a free face-down door card into your hand.',pic:()=>hpics([['back','Draw'],'>',['hand','Hand']])},
+ {phase:'after',title:'Look for trouble',text:'Or play a monster from your hand and fight it. Only do this if you can win.',pic:()=>hpics([['hand','Hand'],'>',['monster','Fight']])},
+ {phase:'post',title:'Tidy up',text:'Wear new items, sell spares, then tap End turn. Your turn passes to the next hero.',pic:()=>hpics([['card','Wear'],['coin','Sell'],'>',['pass','End']])},
+ {phase:'post',title:'Selling for levels',text:'Items worth 1,000 gold sell for one level. You can never sell your way to level 10.',pic:()=>hpics([['coin','1000'],'>',['level','Level']])},
+ {phase:'charity',title:'The hand limit',text:'You may keep only five cards at the end of your turn. Dwarves keep six.',pic:()=>hpics([['hand','Max 5'],'>',['pass','Extras go']])},
+ {phase:'charity',title:'Charity',text:'Give extra cards to the lowest-level hero. If that is you, discard them.',pic:()=>hpics([['card','Extra'],'>',['gift','Lowest level']])},
+ {phase:'window',title:'Before a rival kicks',text:'Everyone may play curses or level-ups, on anyone, before the door opens.',pic:()=>hpics([['door','Their door'],['curse','Curse']])},
+ {phase:'window',title:'Why curse them?',text:'Curses cost a rival levels or gear. Hit the hero who is ahead of you.',pic:()=>hpics([['curse','Curse'],'>',['hero','Leader']])},
+ {phase:'fight',title:'The bigger number wins',text:'Your strength against the monster. If you are higher, or tie as a Warrior, you win.',pic:()=>hpics([['hero','You',7],['swords','vs'],['monster','Monster',5]])},
+ {phase:'fight',title:'Win the fight',text:'You gain levels and draw the monster’s treasure. Rivals get one last chance to boost it.',pic:()=>hpics([['monster','Beaten'],'>',['level','Level'],['chest','Treasure']])},
+ {phase:'fight',title:'Losing? Three ways out',text:'Play a one-shot card, ask a rival for help, or run away.',pic:()=>hpics([['card','Card'],['help','Help'],['run','Run']])},
+ {phase:'fight',title:'Running away',text:'Roll a die for each monster: 5 or more escapes. Fail and the Bad Stuff happens.',pic:()=>hpics([['run','Run'],'>',['die','5+',5]])},
+ {phase:'meddle',title:'Meddle in a fight',text:'Any hero may add a monster boost, a one-shot or a curse while a fight is on.',pic:()=>hpics([['card','Card'],'>',['monster','Monster']])},
+ {phase:'meddle',title:'Stop a winner',text:'If this fight would win the game, spend anything to stop it. Otherwise let it be.',pic:()=>hpics([['hero','Winning'],'>',['pass','Stop it']])},
+ {phase:'qHelp',title:'Help a rival?',text:'Join the fight and your strengths add up. If you win together, you share the treasure.',pic:()=>hpics([['hero','Rival'],['help','+'],['hero','You']])},
+ {phase:'qHelp',title:'Careful',text:'Only the fighter gains levels. Never help a rival who is one level from winning.',pic:()=>hpics([['level','Level 9'],'>',['pass','Refuse']])},
+ {phase:'qWard',title:'Cancel the curse',text:'Your ring is used up when it cancels a curse. Save it for a nasty one.',pic:()=>hpics([['curse','Curse'],'>',['ward','Cancelled']])},
+ {phase:'qWard',title:'Or take it',text:'A mild curse may be cheaper than losing your ring. The choice is yours.',pic:()=>hpics([['curse','Mild curse'],'>',['ward','Keep ring']])},
+ {phase:'qRescue',title:'Caught by the monster',text:'You failed to run. Its Bad Stuff happens, such as losing a level or gear.',pic:()=>hpics([['monster','Caught'],'>',['curse','Bad Stuff']])},
+ {phase:'qRescue',title:'An escape card',text:'Some cards let you slip away. Use one if the Bad Stuff is worse than losing the card.',pic:()=>hpics([['card','Escape'],'>',['run','Free']])},
+ {phase:'qPick',title:'Choose one',text:'The effect needs a choice. Tap the card or button you want.',pic:()=>hpics([['card','A'],['card','B'],'>',['tap','Tap']])},
+ {phase:'qPick',title:'You decide',text:'No other player or hint decides this for you. Read each option before you tap.',pic:()=>hpics([['hero','You'],'>',['tap','Choose']])},
+ {phase:'qOffer',title:'A special power',text:'Some cards trigger a power at a set moment. Read the question, then pick a button.',pic:()=>hpics([['card','Power'],'>',['tap','Choose']])},
+ {phase:'qOffer',title:'Skipping is fine',text:'You can always decline. Declining keeps your cards just as they are.',pic:()=>hpics([['pass','Skip'],'>',['hand','Keep cards']])},
+ {phase:'drop',title:'Play the card',text:'Tap a glowing spot to play the held card there. Dragging a card works too.',pic:()=>hpics([['card','Held'],'>',['glow','Spot']])},
+ {phase:'drop',title:'Changed your mind?',text:'Tap the held card again, or tap empty space. Nothing is played until you tap a spot.',pic:()=>hpics([['card','Held'],'>',['hand','Back']])},
+ {phase:'ask',title:'Ask for help',text:'A helper adds their strength to yours. They usually want treasure in return.',pic:()=>hpics([['hero','You'],['help','+'],['hero','Helper']])},
+ {phase:'ask',title:'Read the numbers',text:'Each rival shows what they add, and whether they will say yes.',pic:()=>hpics([['hero','Rival'],'>',['swords','+4']])},
+ {phase:'sell',title:'Sell items',text:'Tap the items you want to sell. Their gold values add up on screen.',pic:()=>hpics([['card','Items'],'>',['coin','1000']])},
+ {phase:'sell',title:'1,000 gold, one level',text:'Every full 1,000 gold buys a level, up to level 9. The cards are then discarded.',pic:()=>hpics([['coin','1000'],'>',['level','+1']])}
+];
+// ---------------------------------------------------------------- phases
+const QPHASE={help:'qHelp',ward:'qWard',rescue:'qRescue',pick:'qPick'};
+// the phase the player is deciding in (null when it is somebody else's move, or something else is on screen)
+function hlpPhase(){try{
+  if(!G||G.winner||UI.pass!=null)return null;const me=viewSeat();if(me<0||!P(me)||!P(me).human||G.mode==='ai')return null;
+  if(sideToAct()!==me)return null;if(BF.kicking||document.getElementById('bfrev')||BF.drag)return null;
+  if(UI.menu||UI.zoom!=null||GX.open)return null;const md=document.getElementById('modal');if(md&&!md.hidden)return null;
+  if(BF.ask)return 'ask';if(BF.pick!=null)return 'drop';if(UI.sell)return 'sell';
+  if(G.q)return QPHASE[G.q.kind]||'qOffer';
+  const cb=G.cb;
+  switch(G.phase){case 'setup':return 'setup';case 'window':return 'window';case 'main':return 'main';case 'after':return 'after';case 'post':return 'post';case 'charity':return 'charity';
+    case 'combat':return cb&&cb.stage==='act'&&cb.who===me?'fight':cb&&cb.stage==='others'?'meddle':null}
+  return null}catch(e){return null}}
+// ---------------------------------------------------------------- the bulb: the advisor's move -> the board elements
+const strip=s=>String(s||'').replace(/<[^>]+>/g,'').replace(/&quot;/g,'"').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&').replace(/\s+/g,' ').trim();
+const capW=(t,n)=>{const w=strip(t).split(' ').filter(Boolean);return w.length&&w.length<=n&&!/…|\.\.\./.test(w.join(' '))?w.join(' '):''};
+const sentences=t=>strip(t).split(/(?<=[.!?:;])\s+/).map(x=>x.replace(/[:;]$/,'.'));
+function hlpBtn(m){const k=mvKey(m);for(const b of document.querySelectorAll('#prompt [data-mv],.fbtns [data-mv]')){if(!hvis(b))continue;try{if(mvKey(JSON.parse(b.dataset.mv))===k)return b}catch(e){}}return null}
+function hlpCardEl(id){return document.querySelector(`.mine .hand [data-card="${id}"]`)||document.querySelector(`.mine .gear [data-card="${id}"]`)}
+// where the finger goes for a move: {toE, fromE} (elements on the board) or null when the move has no clear place on screen
+const hrect=e=>{const r=e.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height}};
+// the part of a fanned hand card that is not under its neighbour: that is where a finger can touch it
+function hslice(e){const r=e.getBoundingClientRect();let right=r.right;
+  if(e.closest('.mine .hand')){for(const o of e.closest('.mine .hand').querySelectorAll('.card')){if(o===e)continue;const q=o.getBoundingClientRect();if(q.left>r.left+4&&q.left<right)right=q.left}}
+  return {left:r.left,top:r.top,width:Math.max(24,right-r.left),height:r.height}}
+function hlpPlan(m,me){const p=hlpPlan0(m,me);if(!p)return null;p.toR=hrect(p.toE);if(p.fromE)p.fromR=hslice(p.fromE);return p}
+function hlpPlan0(m,me){if(!m||me<0)return null;
+  if(m.act==='kick'){const d=document.querySelector('.bfdoor')||hlpBtn(m);return hvis(d)?{toE:d}:null}
+  if(m.act==='ask'){const am=document.querySelector('.fbtns [data-a="askmenu"]');if(!hvis(am))return null;
+    const asks=validMoves(me).filter(x=>x.act==='ask');if(asks.some(x=>P(x.tgt).human))return {toE:am};
+    const o=document.querySelector(`#phopps [data-opp="${m.tgt}"],#app .opps [data-opp="${m.tgt}"]`);return hvis(o)?{toE:o,fromE:am}:{toE:am}}
+  if(m.act==='sell'){const b=document.querySelector('#prompt [data-a="sellmode"]');return hvis(b)?{toE:b}:null}
+  const b=hlpBtn(m);if(b)return {toE:b};
+  if(m.card!=null){const f=hlpCardEl(m.card);if(!hvis(f))return null;const mv=bfMoves(me,m.card).find(x=>mvKey(x.m)===mvKey(m));if(!mv)return null;
+    const to=bfEls(mv.z).find(hvis);if(!to)return null;
+    const r=f.getBoundingClientRect();if(r.left<0||r.right>innerWidth){try{f.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}}
+    return {toE:to,fromE:f}}
+  return null}
+// a short reason (<= 15 words) from the advisor's own text; '' when there is no honest short reason
+function hlpWhy(m,co,me){const cb=G.cb;let c=[];const tail=(co.why?sentences(co.why):[]);
+  const nm=i=>strip(P(i).nm);
+  switch(m.act){
+    case 'kick':c.push('Nothing more to play: kick open the door.');break;
+    case 'loot':c.push('No monster to fight: loot the room for a free card.');break;
+    case 'end':c.push('Nothing useful left to play: end your turn.');break;
+    case 'ready':c.push('Your hero is set: tap Ready.');break;
+    case 'fight':if(cb)c.push(winning(cb)?`You lead ${sideStr(cb)} to ${monStr(cb)}: fight now.`:'');break;
+    case 'run':if(cb)c.push(`You lose ${sideStr(cb)} to ${monStr(cb)} and no card wins it: run.`);break;
+    case 'ask':c.push(`Ask ${nm(m.tgt)}: they would help, and together you win.`);break;
+    case 'give':case 'toss':{const w=strip(discardWhy(m.card,me));c.push(`Your weakest card: ${w}.`);break}
+    case 'pass':if(G.phase==='window')c.push(`Nothing worth playing now: let ${nm(G.active)} go on.`);else c.push('Nothing worth a card: let it be.');break;
+    case 'opt':case 'use':c.push(capW(tail[0],15),capW(tail[1],15));break;
+    case 'play':case 'equip':case 'unequip':{const cc=m.card!=null?cd(m.card):null;const x=co.plan&&co.plan[0];const mine=x&&x.m&&mvKey(x.m)===mvKey(m);const w=mine?strip(x.why):'';
+      if(m.act==='unequip')c.push('Take it off: it makes room for something better.');
+      else if(cc&&(cc.t==='race'||cc.t==='class'))c.push(`Playing ${cname(m.card)} gives your hero its powers.`);
+      else if(cc&&(cc.t==='item'||m.act==='equip')&&/^\+\d+ strength$/.test(w))c.push(`${cname(m.card)}: ${w} for your hero.`);
+      else if(cc&&cc.t==='item'&&/^carried/.test(w))c.push('No free slot: carry it now and sell it later.');
+      else if(cc&&cc.t==='level'&&m.tgt===me)c.push('A free level for you: play it.');
+      else if(cc&&cc.t==='curse'&&/^hurts/.test(w))c.push(`Curse ${nm(m.tgt)}, who leads: it slows them down.`);
+      else if(mine)c.push(capW(strip(x.label)+(w?': '+w:''),15));
+      else c.push(capW(tail[1],15),capW(tail[0],15));
+      break}
+    default:break}
+  return c.map(x=>capW(x,15)).find(Boolean)||''}
+// the bulb's suggestion: the move the advisor would make now, legal, with a place on the board and a short honest reason; else null (rules cards only)
+function hlpSuggest(){try{
+  const me=viewSeat();if(!G||G.winner||me<0||sideToAct()!==me||!P(me).human||UI.sell||BF.ask||BF.pick!=null||BF.drag||UI.menu||UI.zoom!=null)return null;
+  if(G.q&&['pick','glue','lawyer','fetch'].includes(G.q.kind))return null;   // no reason that is surely right: show the rules instead
+  const co=coach(me);const m=co&&co.rec;if(!m||!validMoves(me).some(x=>mvKey(x)===mvKey(m)))return null;
+  const p0=hlpPlan(m,me);if(!p0)return null;const why=hlpWhy(m,co,me);if(!why)return null;
+  return {why,key:mvKey(m),target:()=>{const q=hlpPlan(m,me);return (q&&q.toR)||p0.toR},from:p0.fromR?()=>{const q=hlpPlan(m,me);const e=q&&q.fromE;if(e){document.querySelectorAll('[data-gxh-avoid]').forEach(x=>{if(x!==e)x.removeAttribute('data-gxh-avoid')});e.setAttribute('data-gxh-avoid','')}return (q&&q.fromR)||p0.fromR}:null}}catch(e){console.warn('hlpSuggest '+e);return null}}
+// ---------------------------------------------------------------- wiring
+let _hlpInit=false;
+function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
+  GXH.init({game:'doorkick-dungeon',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.mine .hand .card.play,[data-bfz],.bfdoor,.fbtns button,#prompt .acts button,.rec,.pulse,.bf-tgt'});
+  GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});if(typeof syncMenu==='function')syncMenu()}
+function hlpClean(){try{const c=GXH.state().cur;if(!(c&&c.kind==='bulb'))document.querySelectorAll('[data-gxh-avoid]').forEach(x=>x.removeAttribute('data-gxh-avoid'))}catch(e){}}
+function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;hlpClean();
+  // a guided game ("Teach me as I play", or a story chapter with hints): every bubble shows again
+  if(G&&G.learn&&UI.hlpLearn!==G.gid){UI.hlpLearn=G.gid;GXH.reset();GXH.setEnabled(true)}
+  GXH.phase(hlpPhase())}
+(function(){const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter()}catch(e){UI.lastErr='hlp '+e}return r}})();
+// pick-ups, asks and overlays change the phase without a render: look again now and then (cheap, idempotent)
+(function(){const _m=bfMark;bfMark=function(){const r=_m.apply(this,arguments);try{if(typeof GXH!=='undefined'&&_hlpInit)GXH.phase(hlpPhase())}catch(e){}return r}})();
+setInterval(()=>{try{if(_hlpInit&&G){hlpClean();GXH.phase(hlpPhase())}}catch(e){}},400);
+hlpAfter();
+
+</script>
+<script>
 // ---------- story mode: the shared chapter map (gx-campaign.js) wired to Doorkick Dungeon. Data: campaign.json ----------
 // A chapter is a normal game with its own table, computer levels and (at most) one twist. Twists exist only here; the rules never change.
 UI.cmp=null;UI.hintsUser=null;var CMP_FIN=null,CMP_OVER=0,CMP_GO=false;
@@ -6037,7 +6552,7 @@ function campStart(def){const s=def.setup||{};const n=Math.max(3,Math.min(6,s.n|
   if(UI.hintsUser==null)UI.hintsUser=UI.hints;
   const kNames=UI.names,kLvl=UI.lvl;UI.names=names;if(s.lvl)UI.lvl=s.lvl;LVMIX=lv;CMP_GO=true;UI.pass=null;UI.lastSeat=-1;UI.mode='F';
   try{newGame('F',n)}finally{UI.names=kNames;UI.lvl=kLvl;LVMIX=null;CMP_GO=false}
-  G.campId=def.id;G.camp={sold:0,helped:0};G.learn=!!def.hints;UI.cmp=def;CMP_OVER=0;UI.hints=!!def.hints;
+  G.campId=def.id;G.camp={sold:0,helped:0};G.learn=!!def.hints;UI.cmp=def;CMP_OVER=0;UI.hints=false;
   campApplyTwist(def);G.ex=Object.assign({},DEFEX);render();clearInterval(CMP_FIN);CMP_FIN=setInterval(campWatch,400)}
 // a normal game leaves story mode and gives the player their own hints setting back
 {const _ng=newGame;newGame=function(){if(!CMP_GO){if(UI.cmp||UI.hintsUser!=null){UI.cmp=null;clearInterval(CMP_FIN);if(UI.hintsUser!=null)UI.hints=UI.hintsUser;UI.hintsUser=null}LVMIX=null}return _ng.apply(this,arguments)}}

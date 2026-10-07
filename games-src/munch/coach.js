@@ -208,7 +208,7 @@ const LESSONS={
   window:'<b>Curse a rival,</b> or let them go.'};
 function learnSet(){try{return new Set(JSON.parse(localStorage.getItem('dkd_learned')||'[]'))}catch(e){return new Set(UI.learnedMem||[])}}
 function learnDone(k){const s=learnSet();s.add(k);UI.learnedMem=[...s];try{localStorage.setItem('dkd_learned',JSON.stringify([...s]))}catch(e){}}
-function lessonKey(me){if(!G||!G.learn||me<0||sideToAct()!==me||G.q)return null;const cb=G.cb;
+function lessonKey(me){return null;if(!G||!G.learn||me<0||sideToAct()!==me||G.q)return null;const cb=G.cb;
   if(G.phase==='combat'&&cb)return cb.stage==='act'&&cb.who===me?(winning(cb)?'win':'lose'):cb.stage!=='act'?'meddle':null;
   return {setup:'setup',main:'main',after:'after',post:'post',charity:'charity',window:'window'}[G.phase]||null}
 function lessonHTML(me){const k=lessonKey(me);UI.lessonNow=null;if(!k||learnSet().has(k))return '';UI.lessonNow=k;

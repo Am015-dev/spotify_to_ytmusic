@@ -33,6 +33,7 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
   if(await p.evaluate(()=>!!document.querySelector('.gxh-rules')))prob('rules cards did not close')};
  const helpFlow=async()=>{
   const hs=await p.evaluate(()=>({ph:hlpPhase(),busy:hlpBusy(),step:!!HLP_STEPS[hlpPhase()],st:GXH.state(),tl:window.innerWidth}));
+  if(await p.evaluate(()=>{let n=0;if(GX.open){GX.close();n=1}if(PHO.pop&&PHO.pop.k==='status'){PHO.closePop();n=1}return n}))HELP.stray=(HELP.stray||0)+1;   // a tap that landed on the camp chip or the i button: counted, closed
   if(hs.st.rules){prob('rules overlay stuck open');await p.evaluate(()=>{const x=document.querySelector('.gxh-rules .gxh-x');if(x)x.click()});return false}
   if(!tipsOn){if(hs.st.shown.length||hs.st.cur){prob('tips are off but a bubble appeared: '+JSON.stringify(hs.st))}return false}
   // 1) the first-time bubble of this phase
@@ -51,7 +52,7 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
     if(b.T&&b.r.left<b.T.right&&b.r.right>b.T.left&&b.r.top<b.T.bottom&&b.r.bottom>b.T.top)prob('bubble covers its target ('+hs.ph+')');
     for(const g of b.glows)if(g.cx>b.r.left-12&&g.cx<b.r.right+12&&g.cy>b.r.top-12&&g.cy<b.r.bottom+12)prob('bubble covers a glowing place ('+hs.ph+') at '+Math.round(g.cx)+','+Math.round(g.cy));
     if(b.r.left<0||b.r.right>innerWidthOf(W)||b.sw)prob('bubble outside the screen ('+hs.ph+')');
-    if(Math.random()<.5){await p.touchscreen.tap(...NEUTRAL)}else{const ok=await ctr('.gxh-bub .gxh-ok');if(ok)await p.touchscreen.tap(...ok)}
+    if(Math.random()<.5){await p.touchscreen.tap(...NEUTRAL)}else{await p.evaluate(()=>{const o=document.querySelector('.gxh-bub .gxh-ok');if(o)o.click()})}
     await p.waitForTimeout(150);
     if(await p.evaluate(()=>!!document.querySelector('.gxh-bub')))prob('bubble did not dismiss on a tap ('+hs.ph+')');
     return true}}
