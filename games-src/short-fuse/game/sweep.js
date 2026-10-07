@@ -67,7 +67,7 @@ const GEO = `(() => { const W = innerWidth, Hh = innerHeight, bad = [];
   const hb = [...document.querySelectorAll('.gxh-bub.on')];
   if (!GXH.enabled() && hb.some(b => b.dataset.phase)) bad.push('a coach bubble with tips off');
   const dense = document.querySelectorAll('#crew .tile.glow').length >= 12;   // every crew wire is a legal target: on a packed table the bubble may sit over some of them (never over the target, my wires, buttons or cards)
-  const cores = [...document.querySelectorAll('.glow,.sel,#tray .chip,#mine .chip,#over .big,#cover .big')].filter(e => !e.closest('[data-help]') && !e.closest('[hidden]') && !(dense && e.closest('#crew'))).map(e => e.getBoundingClientRect()).filter(q => q.width && q.height && q.right > 0 && q.bottom > 0 && q.left < W && q.top < Hh).map(q => { let w = q.width, h = q.height; const cx = q.left + w / 2, cy = q.top + h / 2; if (w > 56) w = 32; if (h > 56) h = 32; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; });
+  const cores = [...document.querySelectorAll('.glow,.sel,#tray .chip,#mine .chip,#over .big,#cover .big')].filter(e => !e.closest('[data-help]') && !e.closest('[hidden]') && !(dense && e.closest('#crew,#gear'))).map(e => e.getBoundingClientRect()).filter(q => q.width && q.height && q.right > 0 && q.bottom > 0 && q.left < W && q.top < Hh).map(q => { let w = q.width, h = q.height; const cx = q.left + w / 2, cy = q.top + h / 2; if (w > 56) w = 32; if (h > 56) h = 32; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; });
   for (const b of hb) { const r = b.getBoundingClientRect(); if (r.left < -1 || r.top < -1 || r.right > W + 1 || r.bottom > Hh + 1) bad.push('help bubble outside the screen');
     for (const c of cores) if (r.left < c.right && r.right > c.left && r.top < c.bottom && r.bottom > c.top) { bad.push('help bubble covers a glowing target or button'); break; } }
   return bad; })()`;
@@ -100,7 +100,7 @@ async function helpFlow(page, note, seenPh, bulbN) {
     if (wc(b.title) > 4) note('bubble title over 4 words: ' + b.title); if (wc(b.text) > 20) note('bubble text over 20 words (' + wc(b.text) + '): ' + b.text);
     if (!b.arrow || !b.ok) note('bubble without arrow or Got it (' + hs.ph + ')');
     if (b.T) { const [l, t, r, bt] = b.r; if (l < b.T.right && r > b.T.left && t < b.T.bottom && bt > b.T.top) note('bubble covers its target (' + hs.ph + ')'); }
-    for (const x of await page.evaluate(GEO)) note(x + ' (' + hs.ph + ')');
+    for (const x of await page.evaluate(GEO)) { note(x + ' (' + hs.ph + ')'); if (process.env.SHOTS) await page.screenshot({ path: process.env.SHOTS + '/coachgeo_' + Date.now() + '.png' }).catch(() => { }); }
     await page.touchscreen.tap(...NEUTRAL); await sleep(160);
     if (await page.evaluate(() => !!document.querySelector('.gxh-bub'))) note('bubble did not dismiss on a tap (' + hs.ph + ')');
     return true;
