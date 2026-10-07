@@ -31,6 +31,5 @@ Hard brake: stack grand 226→0 in 183 m (hit from behind mid-way), akro 211→0
 Benches: qa_race/live17b, qa_race/r17a (gitignored scratch; review copies go to docs/shots/race17/).
 
 ## State / next
-- REVIEW sent to the reviewer for ace0c539 (shots docs/shots/race17/, numbers docs/shots/race17/bench/). Waiting for PASS/FAIL.
-- Bench stack.txt was run before the last cosmetic fixes (sign side/arrow, web overlay, shield shader); physics unchanged since.
-- After PASS: fetch live (`git fetch origin alex/brave-carson-rbpmlk`); if live moved past 528b4ab, merge its src. Add the OD_CHANGELOG entry at the top of src/10_core.js, run `tools/build.sh <next free ver>`, `git add -f out/<ver>`, push, then send the coordinator `DEPLOY alex/od-race15 <commit> out/<ver> <msg>` with 3 bullets and shot paths.
+- Reviewer PASS (b1c4b9f0 shots, game code ace0c539). DEPLOY sent to the coordinator: alex/od-race15 91885d6f out/v87s (on live v87r 528b4ab, unchanged at send time).
+- Open, not blocking (reviewer): rival name tags overlap when cars bunch up; fade tags beyond 2 cars or offset them.
