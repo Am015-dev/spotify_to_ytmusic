@@ -9,7 +9,8 @@ Work on branch `alex/brave-carson-rbpmlk`; never merge to main. Next steps: `gam
   files, commits or PRs. Research and publisher material only in the private repo `Am015-dev/game-night-private`.
 - **Publish live** (owner's decision, 5 Oct 2026): a finished game goes straight to `games/<slug>/index.html` once its
   sweep/phone-check passes. No more preview step; `-next` folders are retired.
-- Don't edit the Mainhattan / Overdrive games (other sessions own them). Ticket to Ride is on hold.
+- Don't edit Mainhattan Overdrive (other sessions own it). Mainhattan Nightrun belongs to the Game Night orchestrator
+  and its workers (owner's decision, 7 Oct 2026). Ticket to Ride is on hold.
 - Run `games-src/scripts/stamp-copyright.py` on deployed files. Before pushing, run
   `git fetch origin alex/brave-carson-rbpmlk && git merge`; never force-push.
 - If a command is blocked, stop and tell the owner; don't work around it.

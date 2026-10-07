@@ -18,12 +18,12 @@ function campTwist(g, t) {
 function campWon(g) { return !!(g && g.result && g.result.win); }
 function campMetrics(g) {
   const u = g.used || {};
-  return { won: campWon(g), coffee: g.coffee, rerolls: g.rrHand, fuel: g.pl.kero, coffeeSpent: u.coffeeSpend || 0, radio: u.radioClear || 0, brakeMargin: g.landSpeed >= 0 ? FA.brakeVal(g) - g.landSpeed : 0 };
+  return { won: campWon(g), maxTilt: u.maxTilt || 0, levelRounds: u.levelRounds || 0, spare: u.spare || 0, coffee: g.coffee, rerolls: g.rrHand, fuel: g.pl.kero, coffeeSpent: u.coffeeSpend || 0, radio: u.radioClear || 0, brakeMargin: g.landSpeed >= 0 ? FA.brakeVal(g) - g.landSpeed : 0 };
 }
 function campStart(def) {
   const s = def.setup || {}; UI.seed = s.seed != null ? s.seed : null;
   closeRS(); try { GX.close(); } catch (e) { }
-  newGame('vs', { scenario: s.scenario || 'g1', role: s.role || 0, level: (def.opponent && def.opponent.aiLevel) || 'normal', abil: [], camp: def, tipsOff: !def.hints });
+  newGame('vs', { scenario: s.scenario || 'g1', role: s.role || 0, level: (def.opponent && def.opponent.aiLevel) || 'normal', abil: [], camp: def, tipsOff: !def.hints, lad: s.lad || 0 });
   UI.camp = def; UI.coach.level = def.hints ? 'full' : 'off';
   try { toast(def.goal.text.length > 70 ? def.goal.text.slice(0, 67) + '...' : def.goal.text); } catch (e) { }
 }
@@ -33,10 +33,10 @@ function campOn() { return !!(UI.camp && typeof GXC !== 'undefined' && GXC.activ
 { const _ng = newGame; newGame = function (mode, o) { if (!(o && o.camp)) UI.camp = null; return _ng.apply(this, arguments); }; }
 function campLine() {
   try {
-    if (typeof GXC === 'undefined' || !window.CAMPAIGN) return 'Ten airports, three bosses';
+    if (typeof GXC === 'undefined' || !window.CAMPAIGN) return 'Learn to fly, then four bosses';
     const p = GXC.progress(), ch = window.CAMPAIGN.chapters, n = ch.filter(c => p.ch[c.id] && p.ch[c.id].beaten).length;
-    return n ? n + ' of ' + ch.length + ' airports done' : 'Ten airports, three bosses';
-  } catch (e) { return 'Ten airports, three bosses'; }
+    return n ? n + ' of ' + ch.length + ' airports done' : 'Learn to fly, then four bosses';
+  } catch (e) { return 'Learn to fly, then four bosses'; }
 }
 function campInit() {
   if (typeof GXC === 'undefined' || !window.CAMPAIGN) return;
@@ -47,3 +47,6 @@ function campInit() {
   });
 }
 campInit();
+
+// a new player's first Play goes straight to chapter 1 of the flight school: one control at a time
+function newPlayer() { try { if (typeof GXC === 'undefined' || !window.CAMPAIGN) return false; const p = GXC.progress(); return !Object.keys(p.ch).some(k => p.ch[k].beaten || p.ch[k].tries) && !Object.keys(UI.won || {}).length; } catch (e) { return false; } }

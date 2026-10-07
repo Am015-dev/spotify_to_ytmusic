@@ -108,7 +108,7 @@ function pxSync() {
   if (wa) {
     const r = pxRect(wa), o = pxObj('win', 'win', () => { const c = new PIXI.Container(), sky = new PIXI.TilingSprite({ texture: tx(skyId), width: 10, height: 10 }), ter = new PIXI.TilingSprite({ texture: tx(terId), width: 10, height: 10 }), m = new PIXI.Graphics(), fr = new PIXI.NineSliceSprite({ texture: tx('frame'), leftWidth: 16, rightWidth: 16, topHeight: 16, bottomHeight: 16 }); c.addChild(sky, ter, fr); c.addChild(m); c.mask = m; fr.mask = null; PX.L.win.addChild(c); return { c, sky, ter, m, fr }; });
     if (o.skyId !== skyId) { o.skyId = skyId; o.sky.texture = tx(skyId); } if (o.terId !== terId) { o.terId = terId; o.ter.texture = tx(terId); }
-    o.c.x = r.x; o.c.y = r.y; o.sky.width = r.w; o.sky.height = r.h; o.sky.tileScale.set(r.h / 192); o.ter.width = r.w; o.ter.height = r.h * .38; o.ter.y = r.h * .62; o.ter.tileScale.set(o.ter.height / 96);
+    o.c.x = r.x; o.c.y = r.y; o.sky.width = r.w; o.sky.height = r.h; o.sky.tileScale.set(r.h / 192); { const hz = Math.max(.3, Math.min(.8, +wa.dataset.hz || .62)); o.ter.width = r.w; o.ter.height = r.h * (1 - hz); o.ter.y = r.h * hz; o.ter.tileScale.set(Math.min(o.ter.height, r.h * .38) / 96); }
     o.fr.width = r.w; o.fr.height = r.h; o.m.clear(); o.m.roundRect(0, 0, r.w, r.h, 14).fill(0xffffff); o.r = r; o.off = UI.stripOff || 0; o.dirty = 1; PX.pm.clear(); PX.pm.roundRect(r.x + 4, r.y + 4, r.w - 8, r.h - 8, 12).fill(0xffffff);
   }
   if (wl) { const r = pxRect(wl), o = pxObj('winalt', 'win2', () => { const fr = new PIXI.NineSliceSprite({ texture: tx('frame'), leftWidth: 16, rightWidth: 16, topHeight: 16, bottomHeight: 16 }); PX.L.win.addChild(fr); return { fr, c: fr }; }); o.fr.x = r.x; o.fr.y = r.y; o.fr.width = r.w; o.fr.height = r.h; }
@@ -122,7 +122,7 @@ function pxSync() {
   });
   // traffic-die icons on the approach strip (the DOM keeps the "×n" count)
   pz.querySelectorAll('.sp .tfd').forEach((e, i) => { const r = pxRect(e), sz = Math.max(14, Math.min(22, r.h + 2)); const o = pxObj('tf:' + i, 'tok', () => { const sp = new PIXI.Sprite(tx('dice:k5')); sp.anchor.set(.5); PX.L.plane.addChild(sp); return { c: sp, s0: sp, x: 0, y: 0, a: 1, s: 1, rot: 0 }; }); o.tx = r.x + r.w / 2; o.ty = r.y + r.h / 2; o.size = sz; if (o.fresh) { o.x = o.tx; o.y = o.ty; } });
-  if (youEl) { const r = pxRect(youEl), sz = Math.min(r.w * .9, 58), cx = r.x + r.w / 2, cy = r.y + r.h * .5; const o = pxObj('you', 'tok', () => { const s = new PIXI.Sprite(tx('tokens:you')); s.anchor.set(.5); PX.L.plane.addChild(s); return { c: s, s0: s, x: cx, y: cy, size: sz, a: 1, s: 1, rot: 0 }; }); o.tx = cx; o.ty = cy; o.size = sz; if (o.fresh) { o.x = cx; o.y = cy; } o.bob = 1; }
+  if (youEl) { const r = pxRect(youEl), sz = Math.min(r.w * .9, 58), cx = r.x + r.w / 2, cy = r.y + r.h * .5; const o = pxObj('you', 'tok', () => { const s = new PIXI.Sprite(tx('tokens:you')); s.anchor.set(.5); PX.L.plane.addChild(s); return { c: s, s0: s, x: cx, y: cy, size: sz, a: 1, s: 1, rot: 0 }; }); o.tx = cx; o.ty = cy; o.size = sz; if (o.fresh) { o.x = cx; o.y = cy; } o.bob = 1; o.rot = G.pl.axis * 10 * Math.PI / 180 * (youEl.closest('.scene') ? 0 : 1); }
   // wells under every slot, gold ring on the legal ones, switches
   const slotDice = [];
   pz.querySelectorAll('.slot').forEach(b => {

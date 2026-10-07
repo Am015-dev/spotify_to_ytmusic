@@ -13,7 +13,7 @@ FA.DATA = {
     "red": {"name":"Elite pilots only","c":"#d8402c"},
     "black": {"name":"Heroic landing","c":"#2c2c34"}
   },
-  alt: {"gy":[[6000,0,1],[5000,1,0],[4000,0,0],[3000,1,0],[2000,0,1],[1000,1,0],[0,0,0]],"rb":[[6000,0,1],[5000,1,0],[4000,0,0],[3000,1,0],[2000,0,0],[1000,1,0],[0,0,0]]},
+  alt: {"tu":[[6000,0,0],[5000,1,0],[4000,0,0],[3000,1,0],[2000,0,0],[1000,1,0],[0,0,0]],"gy":[[6000,0,1],[5000,1,0],[4000,0,0],[3000,1,0],[2000,0,1],[1000,1,0],[0,0,0]],"rb":[[6000,0,1],[5000,1,0],[4000,0,0],[3000,1,0],[2000,0,0],[1000,1,0],[0,0,0]]},
   speedFaces: [2,3,3,4,4,5],
   rerollTotal: 3,
   coffeeMax: 3,
@@ -27,6 +27,8 @@ FA.DATA = {
   brakes: [2,4,6],
   iceBrakes: [2,3,4,5],
   tracks: {
+    "tut-a": {"size":5,"sp":[[0,0,null],[0,0,null],[0,0,null],[0,0,null],[0,0,null]]},
+    "tut-b": {"size":6,"sp":[[0,0,null],[0,0,null],[1,0,null],[0,0,null],[1,0,null],[0,0,null]]},
     "pad-g": {"size":7,"sp":[[0,0,null],[0,0,null],[1,0,null],[2,0,null],[1,0,null],[3,0,null],[2,0,null]]},
     "fox-g": {"size":6,"sp":[[0,1,null],[1,0,null],[1,1,null],[2,0,null],[2,1,null],[2,0,null]]},
     "sea-g": {"size":8,"sp":[[0,2,null],[1,0,null],[1,0,[-1,0]],[2,0,null],[1,0,[-2,-1]],[0,0,[-2,-1,0]],[2,0,null],[1,0,null]]},
@@ -49,6 +51,13 @@ FA.DATA = {
     "tws-b": {"size":8,"sp":[[0,3,null],[0,0,[0,1]],[1,1,null],[0,0,[-2]],[1,0,[-1,0]],[1,1,[0,1]],[1,0,[1,2]],[1,0,null]]},
     "cls-b": {"size":6,"sp":[[1,3,null],[0,0,null],[1,1,[-2,-1]],[1,1,[-2,-1]],[1,1,[2]],[1,0,null]]}
   },
+  tutorials: [
+    {"id":"t1","lad":1,"ap":"pad","col":"green","trk":"tut-a","alt":"tu","mods":[],"ab":0,"title":"Keep it level","text":"Only one control today: the axis. Land with the plane level."},
+    {"id":"t2","lad":2,"ap":"pad","col":"green","trk":"tut-a","alt":"tu","mods":[],"ab":0,"title":"Speed and the runway","text":"Add the engines: fly the approach and stop on the airport."},
+    {"id":"t3","lad":3,"ap":"pad","col":"green","trk":"tut-b","alt":"tu","mods":[],"ab":0,"title":"Clear the way","text":"Add the radio: send planes away before you reach them."},
+    {"id":"t4","lad":4,"ap":"pad","col":"green","trk":"tut-b","alt":"tu","mods":[],"ab":0,"title":"Wheels and flaps","text":"Add landing gear and flaps: both must be down to land."},
+    {"id":"t5","lad":5,"ap":"pad","col":"green","trk":"tut-b","alt":"tu","mods":[],"ab":0,"title":"Brakes","text":"Add the brakes: they set how fast you may touch down."}
+  ],
   airports: {
     "pad": {"code":"PAD","name":"Port Alder","city":"Port Alder","tod":"dawn","wx":"snow","ter":"water","blurb":"A wide river, a snowy shore and a pink sunrise. The friendliest runway on the map."},
     "fox": {"code":"FXM","name":"Foxmere","city":"Foxmere","tod":"night","wx":"fog","ter":"city","blurb":"A black river cuts through a lit-up old city. Traffic queues along the approach."},

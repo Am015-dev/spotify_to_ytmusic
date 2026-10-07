@@ -339,5 +339,27 @@ t('a full scripted flight on the starter airport can be won', () => {
   T.inv(G);
 });
 
+// ---------- the learning ladder (story chapters 1-6) ----------
+t('ladder: each chapter brings in one system; slots not in play are not in G.keys; dice are open and rolled at once', () => {
+  const want = { 1: ['ax0', 'ax1'], 2: ['ax0', 'ax1', 'en0', 'en1'] };
+  for (const l of [1, 2, 3, 4, 5, 6]) { const G = FA.newGame({ lad: l, seed: 5 }); T.inv(G); eq(G.phase, 'place', 'no briefing'); ok(G.open); if (want[l]) eq(G.keys, want[l]);
+    ok(l >= 3 || !G.keys.includes('ra0')); ok(l >= 4 || !G.keys.includes('lg0')); ok(l >= 5 || !G.keys.includes('br0')); ok(l >= 6 || !G.keys.includes('co0')); ok(l < 6 || G.keys.includes('co0')); }
+  eq(FA.newGame({ lad: 5, seed: 5 }).pl.sw.br, [1, 0, 0]);
+});
+t('ladder 1: only the axis matters; spare dice go back in the box by themselves; level at the end wins', () => {
+  const G = FA.newGame({ lad: 1, seed: 9 }); eq(FA.checklist(G).map(x => x.k), ['axis']);
+  for (let r = 0; r < 7 && !G.result; r++) { const a = FA.unusedDice(G, G.first)[0]; const s0 = G.first, s1 = 1 - s0;
+    T.mv(G, s0, FA.validMoves(G, s0).find(m => m.t === 'place')); eq(FA.unusedDice(G, s0).length, 0, 'spare dice set aside');
+    const mv = FA.validMoves(G, s1).filter(m => m.t === 'place'); ok(mv.length); T.mv(G, s1, mv[0]); }
+  ok(G.result); eq(G.result.win, G.pl.axis === 0 || G.result.why === 'spin' ? G.result.win : false);
+});
+t('ladder 2-4: checklist items grow, speed uses auto-brakes 6 before chapter 5', () => {
+  eq(FA.checklist(FA.newGame({ lad: 2, seed: 1 })).map(x => x.k), ['axis', 'air', 'speed']); eq(FA.newGame({ lad: 2, seed: 1 }).autoBrake, 6);
+  eq(FA.checklist(FA.newGame({ lad: 3, seed: 1 })).map(x => x.k), ['axis', 'air', 'speed', 'planes']);
+  eq(FA.checklist(FA.newGame({ lad: 4, seed: 1 })).map(x => x.k), ['axis', 'air', 'speed', 'planes', 'gear', 'flaps']); eq(FA.newGame({ lad: 5, seed: 1 }).autoBrake, 0);
+});
+t('ladder: checklist matches the engine fields', () => { const G = FA.newGame({ lad: 4, seed: 3 }); G.pl.axis = 1; G.pl.sw.lg = [1, 1, 1]; const c = Object.fromEntries(FA.checklist(G).map(x => [x.k, x])); eq(c.axis.ok, false); eq(c.gear.ok, true); eq(c.gear.n, 3); eq(c.flaps.ok, false); eq(c.planes.n, FA.planesOnTrack(G)); });
+t('ladder: the real game is untouched (no lad): keys, dice, briefing', () => { const G = FA.newGame({ scenario: 'g1', seed: 2 }); eq(G.lad, 0); eq(G.phase, 'brief'); ok(!G.open); eq(G.keys.length, FA.slotKeys(G.mods).length); });
+
 console.log('rules-test: ' + pass + ' passed, ' + fail + ' failed');
 if (fail) { console.log(failed.join('\n')); process.exit(1); }
