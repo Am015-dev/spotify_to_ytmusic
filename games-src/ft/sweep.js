@@ -55,6 +55,89 @@ const PAGE = `(() => {
   };
 })()`;
 
+
+// ---- help kit checks (GX-KIT.md section 9): a fresh profile gets each coach bubble once; it never covers a glowing target, dismisses on a tap and the game still
+// completes; the bulb's finger is on the computer player's own move (hlpAdvice), why <= 15 words, rules 2-4 cards <= 20 words with a picture; tips off = no bubbles.
+const HT = { bubbles: {}, bulbs: 0, bulbNull: 0, rules: 0, followed: 0, tipsOffGames: 0, nullWhy: {} };
+const NEUTRAL = [60, 22];   // the game title in the top bar: a tap there does nothing else
+const wc = t => String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length;
+const GEOM = `(() => { const W = innerWidth, Hh = innerHeight; const r = document.querySelector('.gxh-bub.on'); if (!r) return null; const q = r.getBoundingClientRect(); const bad = [];
+  const cores = [...document.querySelectorAll('.glow,#acts .ab,#acts .sp-b,#mine .gchip')].filter(e => !e.closest('[data-help]') && !e.closest('[hidden]')).map(e => e.getBoundingClientRect()).filter(b => b.width && b.height && b.right > 0 && b.bottom > 0 && b.left < W && b.top < Hh).map(b => { let w = b.width, h = b.height; const cx = b.left + w / 2, cy = b.top + h / 2; if (w > 56) w = 32; if (h > 56) h = 32; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; });
+  for (const c of cores) if (q.left < c.right && q.right > c.left && q.top < c.bottom && q.bottom > c.top) { bad.push('help bubble covers a glowing target or button'); break; }
+  if (q.left < -1 || q.right > W + 1 || q.top < -1 || q.bottom > Hh + 1) bad.push('help bubble off screen');
+  const bar = document.querySelector('.gx-bar'); if (bar && q.top < bar.getBoundingClientRect().bottom - 1) bad.push('help bubble over the top bar');
+  return bad; })()`;
+async function helpStatic(page, issue) {
+  const r = await page.evaluate(() => { const out = []; const w = t => String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length;
+    for (const [k, s] of Object.entries(HLP_STEPS)) { if (w(s.title) > 4) out.push('step title > 4 words: ' + k); if (w(s.text) > 20) out.push('step text > 20 words: ' + k); if (!s.target) out.push('step without target: ' + k);
+      const rs = HLP_RULES.filter(c => c.phase === k); if (rs.length < 2 || rs.length > 4) out.push('rules for ' + k + ': ' + rs.length + ' cards (want 2-4)'); }
+    for (const c of HLP_RULES) { if (w(c.text) > 20) out.push('rules card > 20 words: ' + c.title); if (w(c.title) > 5) out.push('rules title > 5 words: ' + c.title); if (!c.pic || !/<svg/.test(c.pic())) out.push('rules card without a picture: ' + c.title); if (c.phase && !HLP_STEPS[c.phase]) out.push('rules card for unknown phase ' + c.phase); }
+    if (HLP_RULES.filter(c => c.phase == null).length < 2) out.push('need 2+ general rules cards'); return out; });
+  for (const x of r) issue('help: ' + x);
+}
+async function helpFlow(page, H, issue, ctr, tap, responded, rnd) {
+  const hs = await page.evaluate(() => { const ph = hlpPhase(); return { ph, step: !!(ph && HLP_STEPS[ph]), st: GXH.state() }; });
+  if (hs.st.rules) { issue('rules overlay stuck open'); await page.evaluate(() => GXH.hide()); return false; }
+  if (!hs.ph) return false;
+  // 1) the first-time bubble of this phase
+  if (H.tipsOn && hs.step && !H.seen.has(hs.ph)) { H.seen.add(hs.ph);
+    let b = null; const t1 = Date.now();
+    while (Date.now() - t1 < 2500) { b = await page.evaluate(ph => { const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(); const tq = te && te.getBoundingClientRect(); const T = tq && { left: tq.left, top: tq.top, right: tq.right, bottom: tq.bottom }; const r = e.getBoundingClientRect();
+        return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: [r.left, r.top, r.right, r.bottom], T }; }, hs.ph).catch(() => null); if (b) break; await new Promise(r => setTimeout(r, 80)); }
+    if (!b) issue('no coach bubble for phase ' + hs.ph);
+    else { HT.bubbles[hs.ph] = (HT.bubbles[hs.ph] || 0) + 1;
+      if (b.id !== hs.ph) issue('bubble for ' + b.id + ' shown in phase ' + hs.ph);
+      if (wc(b.title) > 4) issue('bubble title over 4 words: ' + b.title); if (wc(b.text) > 20) issue('bubble text over 20 words (' + wc(b.text) + '): ' + b.text);
+      if (!b.arrow || !b.ok) issue('bubble without arrow or Got it (' + hs.ph + ')');
+      if (b.T) { const [l, t, r, bt] = b.r; if (l < b.T.right && r > b.T.left && t < b.T.bottom && bt > b.T.top) issue('bubble covers its target (' + hs.ph + ')'); }
+      for (const x of (await page.evaluate(GEOM)) || []) { issue(x + ' (' + hs.ph + ')'); if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT + '/help_' + hs.ph + '_' + Date.now() + '.png' }).catch(() => { }); }
+      await tap(...NEUTRAL); await new Promise(r => setTimeout(r, 140));
+      if (await page.evaluate(() => !!document.querySelector('.gxh-bub'))) issue('bubble did not dismiss on a tap (' + hs.ph + ')');
+      return true; } }
+  // 2) the lightbulb: the first time in every phase, then now and then
+  if ((!H.seen.has('bulb:' + hs.ph) || rnd() < .25) && H.bulbN < 14) { H.seen.add('bulb:' + hs.ph); H.bulbN++; HT.bulbs++;
+    const pre = await page.evaluate(() => { const hp = me(); const m = hlpAdvice(); const sg = hlpSuggest(); let tr = null; if (sg) { const e = sg.target(); if (e) { const r = e.getBoundingClientRect(); tr = { x: r.left + r.width / 2, y: r.top + r.height / 2 }; } }
+      return { m, sg: !!sg, why: sg && sg.why, tr, legal: !!(m && validMoves(hp.i).some(x => same(x, m))), sig: window.__sw.sig(), gs: [G.logN, G.step, G.phase, G.move ? G.move.path.join('-') : '', G.q ? G.q.kind : '', UI.pendDj ? 1 : 0, UI.pendItem ? 1 : 0].join('|') }; });
+    const bb = await ctr('#bulbbtn'); if (!bb) { issue('no bulb button'); return false; }
+    await tap(...bb); await new Promise(r => setTimeout(r, 380));
+    const r = await page.evaluate(() => { const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'), ru = document.querySelector('.gxh-rules');
+      return { f: f && { ...f.dataset }, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!ru, sig: window.__sw.sig() }; });
+    let followed = false;
+    if (pre.sg) {
+      if (!pre.legal) issue('bulb suggestion not legal ' + JSON.stringify(pre.m));
+      if (!r.f) issue('bulb tapped, no finger (' + hs.ph + ') ' + JSON.stringify(pre.m));
+      else if (pre.tr && (Math.abs(+r.f.tx - pre.tr.x) > 2 || Math.abs(+r.f.ty - pre.tr.y) > 2)) issue('bulb finger ' + r.f.tx + ',' + r.f.ty + ' != suggestion ' + Math.round(pre.tr.x) + ',' + Math.round(pre.tr.y) + ' (' + hs.ph + ')');
+      if (!r.ring) issue('bulb: nothing glows at the suggestion (' + hs.ph + ')');
+      if (!r.why || wc(r.why) > 15) issue('bulb why ' + wc(r.why) + ' words: ' + r.why); else if (r.why !== pre.why) issue('bulb why differs from suggestion: ' + r.why);
+      if (!r.link) issue('bulb bubble has no "How does this work?"');
+      for (const x of (await page.evaluate(GEOM)) || []) issue(x + ' (bulb ' + hs.ph + ')');
+      if (r.f && rnd() < .4) { followed = true; HT.followed++; await tap(+r.f.tx, +r.f.ty); if (!(await responded(pre.sig))) issue('tapping the bulb finger target did nothing (' + hs.ph + ') ' + JSON.stringify(pre.m)); }
+      else if (r.link && rnd() < .5) { const lk = await ctr('.gxh-bub .gxh-link'); if (lk) { await tap(...lk); await new Promise(r => setTimeout(r, 250)); await helpRules(page, hs.ph, issue); } }
+      else { await tap(...NEUTRAL); await new Promise(r => setTimeout(r, 150)); }
+    } else {
+      HT.bulbNull++; HT.nullWhy[hs.ph] = (HT.nullWhy[hs.ph] || 0) + 1;
+      if (r.f) issue('bulb with no suggestion still pointed a finger (' + hs.ph + ')');
+      if (!r.rules) issue('bulb with no suggestion did not open the rules (' + hs.ph + ')'); else await helpRules(page, hs.ph, issue);
+    }
+    await page.evaluate(() => GXH.hide());
+    const a = await page.evaluate(() => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), gs: [G.logN, G.step, G.phase, G.move ? G.move.path.join('-') : '', G.q ? G.q.kind : '', UI.pendDj ? 1 : 0, UI.pendItem ? 1 : 0].join('|') }));
+    if (a.g) issue('help still on screen after a tap (' + hs.ph + ')');
+    if (!followed && a.gs !== pre.gs) issue('tapping the bulb changed the game (' + hs.ph + ': ' + pre.gs + ' -> ' + a.gs + ')');
+    return true; }
+  return false;
+}
+async function helpRules(page, ph, issue) { HT.rules++;
+  const R = await page.evaluate(() => { const e = document.querySelector('.gxh-rules'); if (!e) return null; const out = []; const n = +e.dataset.count; const card = e.querySelector('.gxh-card');
+    for (let i = 0; i < n; i++) { out.push({ t: e.querySelector('.gxh-rt').textContent, x: e.querySelector('.gxh-rx').textContent, pic: !!e.querySelector('.gxh-pic svg') }); if (i < n - 1) e.querySelector('.gxh-next').click(); }
+    const r = card.getBoundingClientRect(); return { n, cards: out, inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; });
+  if (!R) { issue('rules cards did not open (' + ph + ')'); return; }
+  if (R.n < 2 || R.n > 4) issue('rules for ' + ph + ' have ' + R.n + ' cards (want 2-4)');
+  R.cards.forEach(c => { if (wc(c.x) > 20) issue('rules card over 20 words (' + ph + '): ' + c.x); if (!c.pic) issue('rules card without a picture (' + ph + '): ' + c.t); });
+  if (!R.inside) issue('rules card outside the screen (' + ph + ')');
+  await page.evaluate(() => document.querySelector('.gxh-rules .gxh-x').click()); await new Promise(r => setTimeout(r, 100));
+  if (await page.evaluate(() => !!document.querySelector('.gxh-rules'))) issue('rules cards did not close');
+}
+
 async function play(browser, job) {
   const { idx, size, mode, seed, story } = job; const rnd = rng(seed * 7919 + idx);
   const ctx = await browser.newContext({ viewport: { width: size[0], height: size[1] }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, userAgent: UA, serviceWorkers: 'block' });
@@ -63,9 +146,11 @@ async function play(browser, job) {
   page.on('console', m => { if (m.type() === 'error') res.errors.push('console: ' + m.text().slice(0, 140)); });
   const issue = s => { if (res.issues.size < 12) res.issues.add(s); };
   const t0 = Date.now();
+  const H = { tipsOn: idx % 4 !== 3, seen: new Set(), bulbN: 0 };
+  if (!H.tipsOn) await ctx.addInitScript(() => { try { localStorage.setItem('gxh-sands-of-qamar', JSON.stringify({ on: false, seen: {} })); } catch (e) { } });
   try {
     if (story) { const n = +story.slice(1); const ch = {}; for (let k = 1; k < n; k++) ch['c' + k] = { beaten: true, stars: 1, best: null, tries: 1, losses: 0, easy: false }; await ctx.addInitScript(p => { try { localStorage.setItem('gns-campaign-sands', JSON.stringify({ v: 1, ch: p, unlocked: [], last: null })); } catch (e) { } }, ch); }
-    await page.goto('file://' + FILE, { waitUntil: 'load', timeout: 30000 }); await sleep(500); await page.evaluate(PAGE);
+    await page.goto('file://' + FILE, { waitUntil: 'load', timeout: 30000 }); await sleep(500); await page.evaluate(PAGE); if (idx === 0) await helpStatic(page, issue);
     if (story) {
       await page.evaluate(id => { setSeed(1000 + (+id.slice(1))); GXC.play(id); }, story); await sleep(400);
       for (let k = 0; k < 14; k++) { // intro, boss card, goal: tap the kit's own buttons until the game starts
@@ -93,6 +178,7 @@ async function play(browser, job) {
       if (st.modal && st.modal !== 'over' && !story) { await sleep(100); continue; }
       if (step % 3 === 0 || st.me) { const a = await page.evaluate('window.__sw.audit()'); for (const x of a) issue(x); auditN++; }
       if (!st.me) { await sleep(40); continue; }
+      if (await helpFlow(page, H, issue, async sel => page.evaluate(sel => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null; }, sel), async (x, y) => { await page.touchscreen.tap(x, y); res.taps++; }, async sig => { const t = Date.now(); while (Date.now() - t < 1500) { await sleep(60); if ((await page.evaluate('window.__sw.sig()')) !== sig) return true; } return false; }, rnd)) { lastChange = Date.now(); continue; }
       let cands = (await page.evaluate('window.__sw.cands()')).filter(c => !c.cover && !(dead[c.label + '|' + c.kind + '|' + st.sig] >= 1));
       if (!cands.length) { await sleep(60); continue; }
       const glow = cands.filter(c => c.kind === 'glow' || c.kind === 'chz'), btn = cands.filter(c => c.kind === 'btn'), ghost = cands.filter(c => c.kind === 'ghost');
@@ -103,6 +189,7 @@ async function play(browser, job) {
       let changed = false; for (let k = 0; k < 40; k++) { await sleep(25); const s2 = await page.evaluate('window.__sw.sig()'); if (s2 !== st.sig) { changed = true; break; } }
       if (!changed) { const dd = await page.evaluate(() => JSON.stringify({ ph: G.phase, st: G.step, act: G.act && G.act.color, q: G.q && G.q.kind, pick: UI.pick, pd: UI.pendDj, pi: UI.pendItem, vm: validMoves(me() ? me().i : 0).slice(0, 5) })).catch(() => ''); if (process.env.DBG) { console.log('DEAD', c.label, dd); const r2 = await page.evaluate(() => { const e = document.querySelector('#acts [data-pw]'); const a = window.__sw.sig(); const pd0 = JSON.stringify(UI.pendDj); if (e) e.click(); return [pd0, JSON.stringify(UI.pendDj), a === window.__sw.sig(), e ? e.dataset.pw : null, document.querySelectorAll('#acts [data-pw]').length]; }); console.log('RETRY', JSON.stringify(r2)); } dead[c.label + '|' + c.kind + '|' + st.sig] = 1; if (++deadN > 3) { issue('dead taps: ' + c.kind + ' "' + c.label + '" (' + c.cls + ')'); break; } else issue('dead tap: ' + c.kind + ' "' + c.label + '" (' + c.cls + ')'); }
     }
+    { const hst = await page.evaluate(() => GXH.state()); const dup = hst.shown.filter((x, i) => hst.shown.indexOf(x) !== i); if (dup.length) issue('bubble shown twice: ' + dup.join()); if (!H.tipsOn) { HT.tipsOffGames++; if (hst.shown.length) issue('tips off but bubbles shown: ' + hst.shown.join()); } }
     const fin = await page.evaluate(() => ({ over: !!(G && G.over), round: G && G.round, win: G && G.over && G.over.win, scores: G && G.over && G.over.scores.map(s => s.s.total), inv: G ? checkInvariants() : [] }));
     res.rounds = fin.round; res.won = fin.win ? fin.win.includes(0) : null; res.scores = fin.scores;
     if (!fin.over) issue('game did not finish within ' + STEP_CAP + ' steps / 8 s'); if (fin.inv.length) issue('final invariants: ' + fin.inv.join('; '));
@@ -123,6 +210,7 @@ async function play(browser, job) {
     for (const i of r.issues) console.log('     - ' + i); for (const e of [...new Set(r.errors)].slice(0, 4)) console.log('     ! ' + e); } }));
   await browser.close();
   const win = out.filter(r => !r.story && r.won != null), w = win.filter(r => r.won).length;
+  console.log('help kit: bubbles per phase ' + JSON.stringify(HT.bubbles) + '; bulbs ' + HT.bulbs + ' (rules only ' + HT.bulbNull + ' ' + JSON.stringify(HT.nullWhy) + '), finger followed ' + HT.followed + ', rules opened ' + HT.rules + ', tips-off games ' + HT.tipsOffGames);
   console.log(`\n${out.length - fail}/${out.length} runs clean; ${out.filter(r => r.over).length} finished; random-tap player won ${w}/${win.length}`);
   process.exit(fail ? 1 : 0);
 })();

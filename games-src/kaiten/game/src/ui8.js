@@ -11,13 +11,13 @@ function renderLabActs() {
   if (la.dataset.sg === sig) return; la.dataset.sg = sig; la.replaceChildren();
   if (!can) return;
   if (n && (UI.prefs.grab1 === false || n === 2)) la.appendChild(h('button.lbtn.go', { 'data-a': 'serve', type: 'button' }, n === 2 ? 'Serve both' : 'Serve'));
-  else if (!n) la.appendChild(h('button.lbtn.bulb', { 'data-a': 'hint', type: 'button', 'aria-label': 'Hint: show a good dish', title: 'Hint', html: bulbSVG }));
 }
 // ---- after every render: place the ghost finger and the tip bubble on the board
 let fxQ = 0;
 function boardFX() { if (fxQ) return; fxQ = requestAnimationFrame(() => { fxQ = 0; try { placeGhost(); placeTip(); } catch (e) { console.error(e); } }); }
 function curTurn() { return G ? G.round + '.' + G.turn : ''; }
 function ghostTarget() {
+  return null;   // the help kit draws the finger (the bulb), and only on request
   if (!G || !UI.started || UI.cards.length || UI.drag || UI.busy || G.phase !== 'pick' || UI.rsOpen) return null;
   const v = viewSeat(); if (v < 0 || !canPick()) return null;
   const t = curTurn();
