@@ -16,7 +16,7 @@ const URL=process.argv[2]||'http://127.0.0.1:8766/local_dbg.html',OUT=process.ar
  await tap('#gbx .gbTabs button[data-t="veh"]');for(const k of['4x4','boat']){await tap(`#gbBody [data-gpv="${k}"]`);await shot('04_pv_'+k)}
  await tap('#gbSave');console.log('pa',await p.evaluate(()=>JSON.stringify(__gp.pa())),'rank',await p.evaluate(()=>JSON.stringify(__gp.build())));
  await p.reload();await ready();await tap('#gbMenuBtn');await tap('#gbx .gbTabs button[data-t="paint"]');await shot('05_after_reload');await tap('#gbSave');
- const st=p.getByText('STORY',{exact:true}).first();await tapEl(st);
- for(let i=0;i<40;i++){await p.waitForTimeout(3000);const s=await p.evaluate(()=>__mho.state+'|'+!!(__mho.LD&&__mho.LD.on));if(s==='roam|false')break;if(i%5==0)console.log('wait',s)}
- await p.waitForTimeout(4000);await shot('06_world');
+ await tap('#hcStory');
+ for(let i=0;i<40;i++){await p.waitForTimeout(3000);const s=await p.evaluate(()=>__mho.state+'|'+!!(__mho.LD&&__mho.LD.on));if(s==='roam|false')break;for(const q of['#slotList .go','#m1Next']){const e=await p.$(q);if(e&&await e.isVisible())await tapEl(e)}if(i%5==0)console.log('wait',s)}
+ for(let i=0;i<6;i++){const e=await p.$('#m1Next');if(e&&await e.isVisible())await tapEl(e);await p.waitForTimeout(1500)}await shot('06_world');
  console.log('ERR',errs.slice(0,8));await b.close()})();
