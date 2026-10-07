@@ -11,4 +11,5 @@ const URL=process.argv[2]||'http://127.0.0.1:8766/local_dbg.html',OUT=process.ar
  console.log('TEAMS2',JSON.stringify(await p.evaluate(()=>{const r=document.querySelector('#teams').getBoundingClientRect();return[r.x,r.y,r.width,r.height]})));
  await p.evaluate(()=>document.querySelector('#teams').scrollIntoView({block:'center'}));await p.waitForTimeout(1500);
  await p.screenshot({path:path.join(OUT,(process.env.TAG||'')+'teams.jpg'),type:'jpeg',quality:80});
+ await p.tap('#gbMenuBtn');await p.waitForTimeout(4000);await p.screenshot({path:path.join(OUT,(process.env.TAG||'')+'garage.jpg'),type:'jpeg',quality:80});
  console.log('ERRS',JSON.stringify(errs));await b.close()})();
