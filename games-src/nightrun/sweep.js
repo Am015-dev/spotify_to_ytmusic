@@ -19,6 +19,7 @@ const UA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mobile/15E148 Safari/60
 const CFGS = [
   { name: '390x763', w: 390, h: 763, touch: true }, { name: '375x553', w: 375, h: 553, touch: true },
   { name: '844x390', w: 844, h: 390, touch: true }, { name: '1280x800', w: 1280, h: 800, touch: false }];
+const PT_CAP = 150;                                     // calm visuals: most particles allowed on screen at once
 const fails = [], seen = new Set(), stats = { runs: 0, ticks: 0, perfect: 0, kills: 0, bosses: 0, fps: [], maxDistrict: 0 }; let shotN = 0;
 let URL_BASE = '';
 
@@ -38,6 +39,7 @@ async function startServer() {
 // ---------------- page side helpers ----------------
 const INIT = () => {
   window.__spy = { starts: [], onsets: [] };
+  setInterval(() => { const m = window.__mnr; if (window.__noPW && m && m.G && m.G.live) m.PW.st().cnt = 1e9; }, 30);   // tests that need a steady tempo get no glowing enemies
   const os = AudioBufferSourceNode.prototype.start;
   AudioBufferSourceNode.prototype.start = function (when) { try { if (this.buffer && this.buffer.duration > 3) window.__spy.starts.push({ at: this.context.currentTime, when: when || 0, dur: this.buffer.duration }); } catch (e) { } return os.apply(this, arguments); };
   window.__bot = {
@@ -83,7 +85,7 @@ const INIT = () => {
       if (m.running && !m.paused && !G.dead && !document.getElementById('touch').hidden === false && out.touchUI) out.bad.push('touch buttons hidden while playing');
       if (G && P) {
         const fin = v => Number.isFinite(v); out.nan = !(fin(P.x) && fin(P.y) && fin(P.hp) && fin(P.heat) && fin(G.score) && fin(G.mult) && G.eb.every(b => fin(b.x) && fin(b.y)) && G.en.every(e => fin(e.x) && fin(e.y) && fin(e.hp)));
-        out.G = { t: G.t, score: G.score, kills: G.kills, di: G.di, loop: G.loop, dt: G.dt, en: G.en.length, eb: G.eb.length, dead: G.dead, bc: G.bc, bossDone: G.bossDone, transT: G.transT, banner: G.banner.t, daily: G.daily, perf: G.perf };
+        out.G = { t: G.t, score: G.score, kills: G.kills, di: G.di, loop: G.loop, dt: G.dt, en: G.en.length, eb: G.eb.length, dead: G.dead, bc: G.bc, bossDone: G.bossDone, transT: G.transT, banner: G.banner.t, daily: G.daily, perf: G.perf, pt: G.pt.length, calm: m.SET.calm };
         const b = G.boss; out.boss = b ? { x: b.x, y: b.y, hp: b.hp, max: b.max, ph: b.ph, bt: b.bt, r: b.r } : null;
         out.P = { x: P.x, y: P.y, hp: P.hp, heat: P.heat, emp: P.emp, dashCd: P.dashCd, dashT: P.dashT, inv: P.inv, wl: P.wl };
         out.hud = Object.assign({}, m.HUD); out.C = m.C.n; out.J = m.J.n; out.Jok = m.J.ok; out.bt = { mode: m.BT.mode, bpm: m.BT.bpm, stage: m.BT.stage }; out.fps = m.FPS.t ? m.FPS.n / m.FPS.t * 1000 : 0; out.bp = m.bpos();
@@ -101,6 +103,7 @@ async function newPage(browser, cfg, o = {}) {
   await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
   if (o.route) await o.route(p);
   if (o.init) await p.addInitScript(o.init);
+  if (!o.pw) await p.addInitScript(() => { window.__noPW = 1; });
   await p.addInitScript(INIT);
   const cdp = cfg.touch ? await ctx.newCDPSession(p) : null;
   await p.goto(URL_BASE + 'index.html' + (o.query || ''), { waitUntil: 'domcontentloaded' });
@@ -127,7 +130,7 @@ async function startGame(p, cfg, T, how) {
 
 // ---------------- bot run ----------------
 async function playRun(browser, cfg, i, kind) {
-  const tag = `${cfg.name}#${i}${kind ? '/' + kind : ''}`, { p, cdp, T } = await newPage(browser, cfg, { reduce: kind === 'reduce' });
+  const tag = `${cfg.name}#${i}${kind ? '/' + kind : ''}`, { p, cdp, T } = await newPage(browser, cfg, { reduce: kind === 'reduce', pw: true });
   stats.runs++; const t0 = Date.now(), maxMs = SECS * 1000 * (kind === 'boss' ? 4 : 1);
   try {
     if (!await startGame(p, cfg, T, kind === 'daily' ? 'daily' : 'start')) { await fail(p, tag, 'start', 'game did not start'); return; }
@@ -146,6 +149,7 @@ async function playRun(browser, cfg, i, kind) {
       if (s.paused) { await fail(p, tag, 'unexpected-pause', 'game paused by itself'); break; }
       if (s.actx !== 'running' && Date.now() - t0 > 3000) { await fail(p, tag, 'audio', 'AudioContext is ' + s.actx + ' while playing'); }
       stats.maxDistrict = Math.max(stats.maxDistrict, s.G.di + 4 * s.G.loop);
+      if (s.G.calm) { stats.maxPt = Math.max(stats.maxPt || 0, s.G.pt); if (s.G.pt > PT_CAP) await fail(p, tag, 'particles', s.G.pt + ' particles on screen (cap ' + PT_CAP + ') in calm mode'); }
       // HUD text equals the engine state
       if (s.hud.frame > 0 && s.hud.frame !== lastHudFrame && !s.G.dead) {
         lastHudFrame = s.hud.frame; const h = s.hud;
@@ -513,6 +517,151 @@ async function webkitTests() {
   } catch (err) { await fail(null, tag, 'script', err.message.split('\n')[0]); }
   await wk.close();
 }
+
+// ---------------- music power-ups: each triggers and ends on time (in bars), tempo changes keep the beat clock aligned, particles stay under the cap ----------------
+const TRACKS_ROUTE = wav => async p => {
+  await p.route('**/music/tracks.json', r => r.fulfill({ contentType: 'application/json', body: JSON.stringify({ tracks: [{ file: 'test120.wav', stage: 'stage1', bpm: 120, offsetMs: 0, title: 'Test Beat' }, { file: 'nothere.mp3', stage: 'boss', bpm: 140, offsetMs: 0 }] }) }));
+  await p.route('**/music/test120.wav', r => r.fulfill({ contentType: 'audio/wav', body: wav }));
+};
+async function powerTests(browser, synth) {
+  const tag = 'power/' + (synth ? 'synth' : 'file'), cfg = CFGS[0], wav = makeWav(120, 16);
+  const { p, T } = await newPage(browser, cfg, synth ? { query: '?nomusic=1', pw: true } : { route: TRACKS_ROUTE(wav), pw: true });
+  let maxPt = 0; const samplePt = async () => { const n = await ev(p, () => __mnr.G.pt.length); maxPt = Math.max(maxPt, n); };
+  try {
+    await T.tap(p, '#startBtn'); if (!await waitFor(p, () => __mnr.running, null, 4000)) return fail(p, tag, 'start', 'no start');
+    await ev(p, () => {
+      const m = window.__mnr; m.god = true; setInterval(() => { if (!m.G.boss) m.G.dt = 0; }, 400);   // stay in this district: a boss would swap the song
+      m.PW.st().cnt = 1e9;                                  // no glowing enemies: only the power-ups this test hands out
+      window.__pw = { blasts: [], kicks: [] }; let last = 0; m.NR.on('tick', () => { if (m.PW.stat.blast !== last) { last = m.PW.stat.blast; window.__pw.blasts.push({ b: m.bpos(), eb: m.G.eb.length, bc: m.G.bc }); } });
+      const o = m.AU.osc; m.AU.osc = function (t, type, f) { if (type === 'sine' && f === 150) window.__pw.kicks.push(t); return o.apply(this, arguments); };   // base synth kick, to see where the synth plays
+    });
+    if (synth) await sleep(1500); else if (!await waitFor(p, () => __mnr.BT.mode === 'file' && __mnr.BT.stage === 'stage1' && !__mnr.BT.pend, null, 12000)) return fail(p, tag, 'beat', 'test song never became the beat clock');
+    await sleep(500);
+    const base = await ev(p, () => ({ bpm: __mnr.BT.bpm, spb: __mnr.BT.spb }));
+    if (!(base.bpm > 100 && base.bpm < 140)) await fail(p, tag, 'power', 'unexpected base bpm ' + base.bpm);
+    const collect = (k, on) => ev(p, async ([k, on]) => {        // push the pickup onto the ship exactly on the beat (on) or half a beat away (off)
+      const m = window.__mnr, f = () => ((m.bpos() % 1) + 1) % 1; const t0 = performance.now();
+      while (performance.now() - t0 < 3000 && (on ? !(f() > .955 && f() < .99) : !(f() > .45 && f() < .55))) await new Promise(r => setTimeout(r, 3));
+      const n0 = m.PW.stat.given; m.G.pk.push({ t: 'pw', k, x: m.P.x + 2, y: m.P.y, vx: 0, vy: 0, bob: 0 });
+      for (let i = 0; i < 40 && m.PW.stat.given === n0; i++) await new Promise(r => setTimeout(r, 16));
+      return { given: m.PW.stat.given - n0, bc: m.G.bc };
+    }, [k, on]);
+    // click detector on the file bus: ms the audible clicks are off the game's current beat grid
+    const gridErr = async secs => {
+      if (synth) {                                          // synth: where did the kicks get scheduled relative to the grid
+        const r = await ev(p, secs => new Promise(res => { const m = window.__mnr, w = window.__pw; w.kicks.length = 0; setTimeout(() => { const b = m.BT; res(w.kicks.map(t => { const x = (t - b.t0 - b.off) / b.spb; return (x - Math.round(x)) * b.spb * 1000; })); }, secs * 1000); }), secs);
+        return r;
+      }
+      return ev(p, async secs => {
+        const m = window.__mnr, a = m.AU.a, an = a.createAnalyser(); an.fftSize = 256; m.AU.fb.connect(an); const buf = new Float32Array(256), out = []; let prev = 0; const until = performance.now() + secs * 1000;
+        await new Promise(res => { const iv = setInterval(() => { an.getFloatTimeDomainData(buf); let mx = 0; for (const v of buf) mx = Math.max(mx, Math.abs(v)); if (mx > .25 && prev <= .25) out.push(a.currentTime); prev = mx; if (performance.now() > until) { clearInterval(iv); res(); } }, 1); });
+        m.AU.fb.disconnect(an); const b = m.BT; return out.map(t => { const x = (t - b.t0 - b.off) / b.spb; return (x - Math.round(x)) * b.spb * 1000; });
+      }, secs);
+    };
+    const checkAlign = async (what, secs) => {
+      const e = await gridErr(secs); await samplePt();
+      if (e.length < 4) { await fail(p, tag, 'beat', what + ': only ' + e.length + ' audio events heard'); return; }
+      const worst = Math.max(...e.map(Math.abs)); console.log(`  ${tag} ${what}: ${e.length} events, worst ${worst.toFixed(1)} ms off the beat grid`);
+      if (worst > 40) await fail(p, tag, 'beat', `${what}: audio is ${worst.toFixed(1)} ms off the beat clock (limit 40); offsets ${e.map(x => Math.round(x)).join(',')} bt ${JSON.stringify(await ev(p, () => ({ rate: __mnr.BT.rate, spb: __mnr.BT.spb, rp: __mnr.BT.rp, rev: __mnr.BT.rev, mode: __mnr.BT.mode })))}`);
+    };
+    const waitEnd = async (k, maxS) => { const t0 = Date.now(); while (Date.now() - t0 < maxS * 1000) { await samplePt(); if (!await ev(p, k => __mnr.PW.on(k), k)) return true; await sleep(100); } return false; };
+    const lastLog = k => ev(p, k => { const l = __mnr.PW.log.filter(x => x.k === k); return l[l.length - 1] || null; }, k);
+    const timing = async (k, wantD, log) => {
+      if (!log) return fail(p, tag, 'power', k + ' never ended');
+      if (log.d !== wantD) await fail(p, tag, 'power', `${k}: planned ${log.d} beats, wanted ${wantD}`);
+      if (log.beats < wantD - .01 || log.beats > wantD + .7) await fail(p, tag, 'power', `${k} lasted ${log.beats.toFixed(2)} beats, wanted ${wantD} (${wantD / 4} bars)`);
+      const wall = wantD * log.spb * 1000; if (Math.abs(log.ms - wall) > 600) await fail(p, tag, 'power', `${k} lasted ${log.ms.toFixed(0)} ms, ${wantD} beats should be ${wall.toFixed(0)} ms`);
+    };
+
+    // 1) DRUM BURST, collected on the beat: 8 bars +50% = 12 bars, auto-shot on every beat, on-beat presses fire double, drum layer plays
+    let c = await collect('drum', true); if (c.given !== 1) await fail(p, tag, 'power', 'DRUM BURST pickup was not collected');
+    const d0 = await ev(p, () => ({ auto: __mnr.PW.stat.auto, d: __mnr.G.pw.act.find(a => a.k === 'drum') }));
+    if (!d0.d || d0.d.d !== 48 || !d0.d.ob) await fail(p, tag, 'power', 'on-beat DRUM BURST should last 48 beats, got ' + JSON.stringify(d0.d));
+    await ev(p, () => { window.__pw.drumKicks = 0; const o = __mnr.AU.osc; __mnr.AU.osc = function (t, type, f) { if (type === 'sine' && f === 165) window.__pw.drumKicks++; return o.apply(this, arguments); }; });
+    const dbl = await ev(p, async () => { const m = window.__mnr; window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Space', bubbles: true })); const iv = setInterval(() => { m.P.pfT = m.G.t; }, 30); await new Promise(r => setTimeout(r, 450)); clearInterval(iv); window.dispatchEvent(new KeyboardEvent('keyup', { code: 'Space', bubbles: true })); return m.PW.stat.dbl; });
+    if (!(dbl > 0)) await fail(p, tag, 'power', 'on-beat presses did not fire double during DRUM BURST');
+    await sleep(4000); await samplePt();
+    const d1 = await ev(p, () => ({ auto: __mnr.PW.stat.auto, kicks: window.__pw.drumKicks, bc: __mnr.G.bc }));
+    const beats = d1.bc - c.bc; if (d1.auto - d0.auto < beats - 3) await fail(p, tag, 'power', `DRUM BURST auto-fired ${d1.auto - d0.auto} times in ${beats} beats`);
+    if (!synth || true) { const au = await ev(p, () => __mnr.AU.a && __mnr.AU.a.state); if (au === 'running' && d1.kicks < beats - 4) await fail(p, tag, 'power', `drum layer played ${d1.kicks} kicks in ${beats} beats`); }
+    if (!await waitEnd('drum', 30)) await fail(p, tag, 'power', 'DRUM BURST did not end within 30 s');
+    await timing('drum', 48, await lastLog('drum'));
+    if (await ev(p, () => __mnr.G.pw.act.length)) await fail(p, tag, 'power', 'power-ups still active after DRUM BURST ended');
+
+    // 2) TEMPO UP, collected off the beat: 8 bars, music x1.25, score x2, beat clock stays aligned while the speed changes and when it ends
+    c = await collect('tempo', false); await sleep(2200);
+    let st = await ev(p, () => ({ rate: __mnr.BT.rate, bpm: __mnr.BT.bpm, pr: __mnr.AU.cur && __mnr.AU.cur.src ? __mnr.AU.cur.src.playbackRate.value : null, d: (__mnr.G.pw.act.find(a => a.k === 'tempo') || {}).d, bc: __mnr.G.bc }));
+    if (st.rate !== 1.25 || Math.abs(st.bpm - base.bpm * 1.25) > .01) await fail(p, tag, 'power', `TEMPO UP: rate ${st.rate} bpm ${st.bpm}, wanted x1.25 of ${base.bpm}`);
+    if (!synth && Math.abs(st.pr - 1.25) > .001) await fail(p, tag, 'power', 'TEMPO UP: the song source plays at ' + st.pr);
+    if (st.d !== 32) await fail(p, tag, 'power', 'off-beat TEMPO UP should last 32 beats, got ' + st.d);
+    const sc = await ev(p, async () => { const m = window.__mnr, a = m.G.score; m.G.score += 100; await new Promise(r => setTimeout(r, 120)); return m.G.score - a; });
+    if (sc < 200) await fail(p, tag, 'power', 'TEMPO UP: +100 points counted as ' + sc + ' (score x2)');
+    await checkAlign('tempo x1.25', 3.5);
+    if (!await waitEnd('tempo', 30)) await fail(p, tag, 'power', 'TEMPO UP did not end within 30 s');
+    await timing('tempo', 32, await lastLog('tempo'));
+    await sleep(1500); st = await ev(p, () => ({ rate: __mnr.BT.rate, bpm: __mnr.BT.bpm, pr: __mnr.AU.cur && __mnr.AU.cur.src ? __mnr.AU.cur.src.playbackRate.value : null }));
+    if (st.rate !== 1 || Math.abs(st.bpm - base.bpm) > .01 || (!synth && Math.abs(st.pr - 1) > .001)) await fail(p, tag, 'power', 'after TEMPO UP the music did not return to normal speed ' + JSON.stringify(st));
+    await checkAlign('after tempo ends', 3.5);
+
+    // 3) SLOW GROOVE, off the beat: music x0.75, enemy bullets slower (also the ones already flying), all back to normal at the end
+    await ev(p, () => { __mnr.eb(900, 40, Math.PI / 2, 1); __mnr.G.eb[__mnr.G.eb.length - 1].tag = 1; });   // a bullet that crawls at speed 1: it is still flying when the power-up ends
+    const sp = () => ev(p, () => { const b = __mnr.G.eb.find(b => b.tag); return b ? Math.hypot(b.vx, b.vy) : -1; });
+    const sp0 = await sp(); c = await collect('slow', false); await sleep(1500);
+    st = await ev(p, () => ({ rate: __mnr.BT.rate, bpm: __mnr.BT.bpm, pr: __mnr.AU.cur && __mnr.AU.cur.src ? __mnr.AU.cur.src.playbackRate.value : null, d: (__mnr.G.pw.act.find(a => a.k === 'slow') || {}).d }));
+    if (st.rate !== .75 || Math.abs(st.bpm - base.bpm * .75) > .01) await fail(p, tag, 'power', `SLOW GROOVE: rate ${st.rate} bpm ${st.bpm}, wanted x0.75 of ${base.bpm}`);
+    if (!synth && Math.abs(st.pr - .75) > .001) await fail(p, tag, 'power', 'SLOW GROOVE: the song source plays at ' + st.pr);
+    const nb = await ev(p, () => { const n = __mnr.G.eb.length; __mnr.eb(900, 40, Math.PI / 2, 100); const b = __mnr.G.eb[__mnr.G.eb.length - 1]; return Math.hypot(b.vx, b.vy); });
+    if (Math.abs(nb - 60) > .5) await fail(p, tag, 'power', 'SLOW GROOVE: a new enemy bullet of speed 100 flies at ' + nb.toFixed(1) + ' (want 60)');
+    if (sp0 > 0 && Math.abs((await sp()) - sp0 * .6) > .05) await fail(p, tag, 'power', 'SLOW GROOVE did not slow a bullet that was already flying');
+    await checkAlign('tempo x0.75', 3.5);
+    if (!await waitEnd('slow', 40)) await fail(p, tag, 'power', 'SLOW GROOVE did not end within 40 s');
+    await timing('slow', 32, await lastLog('slow'));
+    const back = await ev(p, () => ({ bs: __mnr.PW.bs, bad: __mnr.G.eb.filter(b => b.sl).length, rate: __mnr.BT.rate }));
+    if (back.bs !== 1 || back.bad) await fail(p, tag, 'power', 'bullets stay slowed after SLOW GROOVE ended ' + JSON.stringify(back));
+    await sleep(1500); await checkAlign('after slow ends', 3);
+
+    // 4) DROP: the music cuts for one bar, then a blast on the next downbeat clears the bullets
+    await ev(p, () => { for (let i = 0; i < 6; i++) __mnr.eb(300 + i * 40, 480, Math.PI / 2, 1); window.__pw.blasts.length = 0; window.__pw.t0 = performance.now(); });
+    c = await collect('drop', false);
+    const cutSeen = await ev(p, async () => { const m = window.__mnr, g = m.AU.cutg && m.AU.cutg.gain; let cut0 = 0, cut1 = 0; const t0 = performance.now();
+      while (performance.now() - t0 < 14000 && !(window.__pw.blasts.length && g && g.value > .9)) { if (g && g.value < .05) { if (!cut0) cut0 = performance.now(); cut1 = performance.now(); } await new Promise(r => setTimeout(r, 15)); }
+      return { cut0, cut1, blasts: window.__pw.blasts, drop: !!m.G.pw.drop, gain: g ? g.value : null, aud: m.AU.a ? m.AU.a.state : 'none' }; });
+    if (cutSeen.blasts.length !== 1) await fail(p, tag, 'power', 'DROP fired ' + cutSeen.blasts.length + ' blasts');
+    else { const b = cutSeen.blasts[0], m4 = ((b.b % 4) + 4) % 4; if (Math.min(m4, 4 - m4) > .2) await fail(p, tag, 'power', 'DROP blast is not on a downbeat (beat ' + b.b.toFixed(2) + ')'); if (b.eb !== 0) await fail(p, tag, 'power', 'DROP blast left ' + b.eb + ' enemy bullets'); }
+    if (cutSeen.aud === 'running') { const len = cutSeen.cut0 ? (cutSeen.cut1 - cutSeen.cut0) / 1000 : 0, bar = 4 * base.spb; if (Math.abs(len - bar) > .5) await fail(p, tag, 'power', `DROP: the music was cut for ${len.toFixed(2)} s, one bar is ${bar.toFixed(2)} s`); }
+    if (cutSeen.drop || (cutSeen.gain !== null && cutSeen.gain < .9)) await fail(p, tag, 'power', 'DROP did not finish / the music did not come back ' + JSON.stringify(cutSeen));
+    await samplePt(); if (maxPt > PT_CAP) await fail(p, tag, 'particles', maxPt + ' particles (cap ' + PT_CAP + ')');
+    const msgs = await ev(p, () => __mnr.MSGS.slice()); for (const m of msgs) if (m.trim().split(/\s+/).length > 8) await fail(p, tag, 'message-too-long', m);
+    console.log(`  ${tag}: all four power-ups triggered and ended, max particles ${maxPt}`);
+    if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
+  } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
+  await p.context().close();
+}
+async function powerShots(browser) {                      // portrait screenshots with a power-up running (look at them: calm and readable?)
+  const cfg = CFGS[0], { p } = await newPage(browser, cfg, { pw: true }); const T = new Touch(await p.context().newCDPSession(p));
+  try {
+    await T.tap(p, '#startBtn'); await ev(p, () => { window.__mnr.god = true; window.__mnr.skipTo(1); }); await T.down(1, cfg.w / 2, cfg.h / 2);
+    for (const k of ['drum', 'tempo', 'slow', 'drop']) {
+      await ev(p, k => { const m = window.__mnr; m.G.pw && (m.G.pw.act = []); m.PW.off('slow'); m.PW.give(k, k === 'drum'); }, k);
+      for (let i = 0; i < 24; i++) { if (k === 'drop' && i >= 6 && await ev(p, () => { const d = __mnr.G.pw && __mnr.G.pw.drop; return !!d && __mnr.bpos() > d.cutB + 1.5; })) break;   // the Drop shot is taken in the middle of the silent bar
+        const s = await ev(p, () => window.__bot.step()); if (s.d) { const [sx, sy] = await ev(p, ([dx, dy]) => window.__bot.scr(dx, dy), [(s.d.bx - s.P.x) / 1.5 * .7, (s.d.by - s.P.y) / 1.5 * .7]); await T.move(1, cfg.w / 2 + Math.max(-90, Math.min(90, sx * 3)), cfg.h / 2 + Math.max(-90, Math.min(90, sy * 3))); } await sleep(150); }
+      await p.screenshot({ path: path.join(OUT, 'powerups-' + k + '.png') });
+    }
+    await T.up(1); if (p.errs.length) await fail(p, 'pshots', 'page-error', p.errs[0]);
+  } catch (err) { await fail(p, 'pshots', 'script', err.message.split('\n')[0]); }
+  await p.context().close();
+}
+async function powerFps(browser) {                        // 390x763 with DRUM BURST + TEMPO UP running: the game must stay smooth
+  const cfg = CFGS[0], { p, T } = await newPage(browser, cfg, { pw: true });
+  try {
+    await T.tap(p, '#startBtn'); await ev(p, () => { const m = window.__mnr; m.god = true; m.skipTo(2); m.PW.give('drum', false); m.PW.give('tempo', false); });
+    await T.down(1, cfg.w / 2, cfg.h / 2); await sleep(1200); await ev(p, () => { const f = window.__mnr.FPS; f.n = 0; f.t = 0; });
+    for (let k = 0; k < 40; k++) { await T.move(1, cfg.w / 2 + 60 * Math.sin(k / 3), cfg.h / 2 + 80 * Math.cos(k / 5)); await sleep(250); }
+    await T.up(1); const r = await ev(p, () => ({ fps: window.__mnr.FPS.n / window.__mnr.FPS.t * 1000, act: window.__mnr.G.pw.act.length, pt: window.__mnr.G.pt.length }));
+    console.log('  power-up FPS (390x763, DRUM BURST + TEMPO UP, 10 s):', r.fps.toFixed(1)); stats.fps.push(r.fps); if (r.fps < 55) await fail(p, 'power-fps', 'FPS', 'fps with power-ups ' + r.fps.toFixed(1) + ' (need 55)');
+  } catch (err) { await fail(p, 'power-fps', 'script', err.message.split('\n')[0]); }
+  await p.context().close();
+}
 async function shots(browser) {                          // portrait screenshots mid-run and on a boss
   const cfg = CFGS[0], { p } = await newPage(browser, cfg); const T = new Touch(await p.context().newCDPSession(p));
   try {
@@ -533,23 +682,28 @@ async function shots(browser) {                          // portrait screenshots
     if (want('runs')) { const kinds = ['', 'late', '', 'boss', '', 'reduce', 'daily', '', 'bossN', '', 'late']; for (let i = 0; i < RUNS; i++) { const cfg = CFGS[i % 4]; jobs.push(() => playRun(browser, cfg, i, kinds[i % kinds.length])); } }
     const pre = [];
     if (want('input')) for (const c of CFGS) pre.push(() => inputTests(browser, c));
-    if (want('pause')) for (const c of [CFGS[0], CFGS[3]]) for (const sy of [false, true]) pre.push(() => pauseTests(browser, c, sy));
+    const solo = [];                                       // tests that time the audio to a few ms run one at a time: another busy page makes the clock readings jitter
+    if (want('pause')) for (const c of [CFGS[0], CFGS[3]]) for (const sy of [false, true]) solo.push(() => pauseTests(browser, c, sy));
     if (want('rotate')) for (const c of CFGS) pre.push(() => rotationTest(browser, c));
     if (want('title')) for (const c of CFGS) pre.push(() => titleTests(browser, c));
-    if (want('beat')) pre.push(() => beatTests(browser));
-    if (want('synth')) pre.push(() => synthFallbackTests(browser));
-    if (want('songs')) ['stage1', 'stage2', 'stage3'].forEach((st, i) => pre.push(() => songTests(browser, st, i)));
-    if (want('ios')) pre.push(() => iosTests(browser));
+    if (want('beat')) solo.push(() => beatTests(browser));
+    if (want('synth')) solo.push(() => synthFallbackTests(browser));
+    if (want('songs')) ['stage1', 'stage2', 'stage3'].forEach((st, i) => solo.push(() => songTests(browser, st, i)));
+    if (want('ios')) solo.push(() => iosTests(browser));
+    for (const j of solo) await j();
     const all = pre.concat(jobs); let next = 0;
     await Promise.all(Array.from({ length: PAR }, async () => { while (next < all.length) { const j = all[next++]; await j(); } }));
     if (want('webkit')) await webkitTests();
+    if (want('power')) for (const sy of [false, true]) await powerTests(browser, sy);   // alone on the machine: they listen to the audio and time things to a few ms
+    if (want('pshots')) await powerShots(browser);
+    if (want('powerfps')) await powerFps(browser);
     if (want('shots') && (process.env.SHOTS || ONLY.includes('shots'))) await shots(browser);
     // FPS: a dedicated page alone on the machine
     if (want('fps')) { const cfg = CFGS[0], { p, T } = await newPage(browser, cfg); await T.tap(p, '#startBtn'); await ev(p, () => { window.__mnr.god = true; }); await T.down(1, cfg.w / 2, cfg.h / 2); for (let k = 0; k < 40; k++) { await T.move(1, cfg.w / 2 + 60 * Math.sin(k / 3), cfg.h / 2 + 80 * Math.cos(k / 5)); await sleep(250); } await T.up(1);
       const f = await ev(p, () => window.__mnr.FPS.n / window.__mnr.FPS.t * 1000); console.log('  solo FPS (390x763, rotated, god mode, 10 s of full action):', f.toFixed(1)); stats.fps.push(f); if (f < 45) await fail(p, 'fps', 'FPS', 'solo fps ' + f.toFixed(1)); await p.context().close(); }
   } finally { await browser.close(); srv.kill(); }
   const avg = stats.fps.length ? stats.fps.reduce((a, b) => a + b, 0) / stats.fps.length : 0;
-  console.log(`\nruns ${stats.runs}, ticks ${stats.ticks}, avg FPS ${avg.toFixed(1)} (${stats.fps.length} runs), perfects ${stats.perfect}, kills ${stats.kills}, bosses reached ${stats.bosses}, furthest district index ${stats.maxDistrict}, ${((Date.now() - t0) / 1000).toFixed(0)} s`);
+  console.log(`\nruns ${stats.runs}, ticks ${stats.ticks}, avg FPS ${avg.toFixed(1)} (${stats.fps.length} runs), perfects ${stats.perfect}, kills ${stats.kills}, bosses reached ${stats.bosses}, furthest district index ${stats.maxDistrict}, max particles (calm) ${stats.maxPt || 0}, ${((Date.now() - t0) / 1000).toFixed(0)} s`);
   if (stats.fps.length && avg < 45) fails.push({ tag: 'all', kind: 'FPS', detail: 'average FPS ' + avg.toFixed(1) });
   fs.writeFileSync(path.join(OUT, 'sweep-result.json'), JSON.stringify({ fails, stats, avg }, null, 1));
   if (fails.length) { console.log('\nFAILED:', fails.length); for (const f of fails) console.log(' -', f.tag, f.kind, f.detail, f.shot); process.exit(1); }

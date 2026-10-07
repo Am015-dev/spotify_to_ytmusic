@@ -7,6 +7,7 @@ const cv=$('game'),ctx=cv.getContext('2d'),frame=$('frame'),stage=$('stage');
 let S=1,rotMode=false,touchUI=false;
 try{touchUI=matchMedia('(pointer:coarse)').matches;}catch(e){}
 
+const BULLET='#c6ff00';                                 // every enemy bullet: one high-contrast colour no background uses
 const rnd=(a,b)=>a+Math.random()*(b-a);                 // looks only (particles, rain)
 const clamp=(v,a,b)=>v<a?a:v>b?b:v;
 function mul(seed){return()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
@@ -30,7 +31,8 @@ let best=load('mnr_best',{score:0,dist:''});
 const todayN=()=>{const d=new Date();return d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();};
 let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBest={n:todayN(),score:0};
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
-const SET=Object.assign({music:.8,sfx:.8,reduce:RM,guide:true,sync:0,mute:load('mnr_mute',false)},load('mnr_set',{}));
+let SMALL=false;try{SMALL=Math.min(screen.width,screen.height)<=500;}catch(e){}   // small phone: calm visuals are on by default
+const SET=Object.assign({music:.8,sfx:.8,reduce:RM,guide:true,calm:SMALL,sync:0,mute:load('mnr_mute',false)},load('mnr_set',{}));
 const saveSet=()=>{save('mnr_set',SET);save('mnr_mute',SET.mute);};
 if(!SET.mv2){SET.music=.45;SET.mv2=1;saveSet();}      // music sits well under the effects by default (older saved settings were louder)
 const NOMUSIC=/[?&]nomusic=1/.test(location.search);   // test switch: no song files, synth only
@@ -43,7 +45,7 @@ const FX=()=>SET.reduce?.25:1;                          // strength of flashes a
 const DEF_BPM={menu:100,stage1:120,stage2:128,stage3:128,boss:140,endless:132};
 const distLen=()=>24*4*BT.spb;                            // a district is 24 bars of the current song
 const barQ=s=>Math.max(1,Math.round(s/(4*BT.spb)))*4*BT.spb*.97;   // seconds -> whole bars
-const BT={bpm:100,spb:.6,t0:0,off:0,stage:'',mode:'none',rev:0,src:0,lastRaw:0,pend:null,title:''};
+const BT={bpm:100,spb:.6,t0:0,off:0,stage:'',mode:'none',rev:0,src:0,lastRaw:0,pend:null,title:'',rate:1,rp:null};   // rate/rp: music speed power-ups (NR.music.setRate); rp = a pending speed change
 let fbT=0;
 const CK={h:[],d:0,at:0,has:0};                          // clock smoothing: currentTime only moves in hardware-buffer steps and never runs ahead,
 function ckReset(){CK.h.length=0;CK.d=0;CK.at=0;CK.has=0;}  // so the largest (currentTime - wall clock) seen over 1.5 s is the exact mapping.
@@ -56,10 +58,11 @@ let ckRun=0;
 // A frozen context keeps its currentTime and its sources keep their position, so pause/resume never shifts the grid.
 function mnow(){const a=AU.a,run=a&&a.state==='running'?1:0;if(run)AU.ran=true;
   const dom=run||(a&&AU.ran&&(AU.hold||performance.now()<AU.rUntil))?1:0,raw=dom?a.currentTime:fbT;
-  if(dom!==BT.src){const d=raw-BT.lastRaw;BT.t0+=d;if(BT.pend){BT.pend.at+=d;BT.pend.v.t0+=d;}BT.src=dom;}
+  if(dom!==BT.src){const d=raw-BT.lastRaw;BT.t0+=d;if(BT.pend){BT.pend.at+=d;BT.pend.v.t0+=d;}if(BT.rp)BT.rp.at+=d;BT.src=dom;}
   if(run!==ckRun){ckRun=run;ckReset();}
   if(run)ckPush(a);
-  BT.lastRaw=raw;if(BT.pend&&raw>=BT.pend.at){Object.assign(BT,BT.pend.v);BT.rev++;BT.pend=null;AU.step=0;if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'\u266a '+BT.title};}
+  BT.lastRaw=raw;if(BT.rp&&raw>=BT.rp.at){const r=BT.rp;BT.rp=null;rateApply(r.x,r.at);}
+  if(BT.pend&&raw>=BT.pend.at){Object.assign(BT,BT.pend.v);BT.rev++;BT.pend=null;AU.step=0;if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'\u266a '+BT.title};}
   return raw;}
 function audible(ts){                                    // music-clock seconds that the player hears at wall time ts (default: now)
   const a=AU.a;mnow();const p=ts>0?ts:performance.now();
@@ -68,6 +71,19 @@ function audible(ts){                                    // music-clock seconds 
 const bpos=ts=>(audible(ts)-BT.t0-BT.off)/BT.spb;       // beats since beat 0
 function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:Math.abs(dt)<=80&&p>-.3,dt,beat:n};}
 const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beats at the current tempo
+/* ---------- hook API for effects and power-ups (parts/fx.js, parts/power.js) ---------- */
+// NR.on(event, fn): 'beat'(n) 'bar'(n) 'perfect'({kind,j,x,y}) 'kill'(enemy) 'districtEnd'(boss) 'runStart' 'runEnd' + 'spawn'(enemy) 'fire'({x,y,pf}) 'pickup'(pickup) 'tick'(dt)
+// NR.music.setRate(x): plays the song (or the synth) at x times the speed from 0.15 s ahead; the beat clock follows exactly. Returns false while a song swap is pending (ask again).
+const NR=window.NR={h:{},on(e,f){(this.h[e]||(this.h[e]=[])).push(f);return f;},
+  emit(e,a){const l=this.h[e];if(l)for(const f of l){try{f(a);}catch(err){setTimeout(()=>{throw err;});}}},
+  music:{get rate(){return BT.rp?BT.rp.x:BT.rate;},
+    setRate(x){x=clamp(+x||1,.5,2);if(x===this.rate)return true;if(BT.pend||!BT.stage)return false;
+      const a=AU.a,raw=mnow(),at=raw+.15;BT.rp={at,x};
+      if(a&&AU.cur&&AU.cur.src){try{const pr=AU.cur.src.playbackRate,t=a.currentTime;pr.cancelScheduledValues(t);pr.setValueAtTime(pr.value,t);pr.setValueAtTime(x,t+(at-raw));}catch(e){}}
+      return true;}}};
+function rateApply(x,at){const k=x/BT.rate,b0=(at-BT.t0-BT.off)/BT.spb;      // the beat position stays continuous across the change
+  BT.bpm*=k;BT.spb/=k;BT.off/=k;BT.rate=x;BT.t0=at-BT.off-b0*BT.spb;
+  if(BT.mode==='synth'&&AU.a)AU.step=Math.max(0,Math.ceil((at-BT.t0)/(BT.spb/4)));}
 
 /* ---------- tracks (lazy) ---------- */
 const TR={by:{},bufs:{},busy:{},bad:{},list:[]};
@@ -88,7 +104,8 @@ async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.f
 const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
   init(){if(this.a)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
     this.m=a.createGain();this.m.connect(a.destination);
-    this.duck=a.createGain();this.duck.connect(this.m);                                     // music dips briefly under big effects
+    this.cutg=a.createGain();this.cutg.connect(this.m);                                     // the Drop power-up cuts the music here
+    this.duck=a.createGain();this.duck.connect(this.cutg);                                     // music dips briefly under big effects
     this.musv=a.createGain();this.musv.connect(this.duck);
     this.mus=a.createGain();this.mus.gain.value=.34;this.mus.connect(this.musv);          // synth soundtrack
     this.fb=a.createGain();this.fb.gain.value=.9;this.fb.connect(this.musv);               // music files
@@ -112,17 +129,17 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
   resume(){this.hold=false;this.rUntil=performance.now()+700;const a=this.a;if(a&&a.state!=='running')a.resume().catch(()=>{});},
   f(n){return 440*Math.pow(2,(n-69)/12);},
   menuMusic(){if(TR.by.menu){if(BT.stage!=='menu')this.startStage('menu');loadTrack('menu');}else if(BT.stage!==''&&BT.stage!=='menu')this.startStage('menu');},
-  trackReady(stage){const info=TR.by[stage];if(!info||!this.a)return;
+  trackReady(stage){const info=TR.by[stage];if(!info||!this.a||BT.rate!==1||BT.rp)return;   // a speed power-up is running: the song starts with the next stage change instead
     if(BT.stage===stage&&BT.mode!=='file'){const spb4=BT.spb*4,now=mnow();let at=now+.1;
       if(BT.mode==='synth')at=BT.t0+Math.ceil((now+.15-BT.t0)/spb4)*spb4;this.startStage(stage,at);}},
   // switch to the music of a stage: the track file if it is loaded, otherwise the built-in synth at that stage's tempo
   startStage(stage,at){const a=this.a,info=TR.by[stage],buf=a&&info&&TR.bufs[info.file];
-    if(!a){const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(BT,{stage,mode:stage==='menu'?'none':'synth',bpm,spb:60/bpm,off:0,t0:fbT+.08,title:'',pend:null});BT.rev++;return;}   // no audio at all: the beat still runs, silently
+    if(!a){const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(BT,{stage,mode:stage==='menu'?'none':'synth',bpm,spb:60/bpm,off:0,t0:fbT+.08,title:'',pend:null,rate:1,rp:null});BT.rev++;return;}   // no audio at all: the beat still runs, silently
     if(info)loadTrack(stage);
     const now=mnow(),t=at||now+.08,ctxT=a.currentTime+(t-now);
     if(this.cur&&this.cur.src){const c=this.cur;try{c.g.gain.setTargetAtTime(0,Math.max(a.currentTime,ctxT-.05),.12);c.src.stop(ctxT+1);}catch(e){}}
     this.cur=null;
-    const v={stage};
+    const v={stage,rate:1,rp:null};
     if(buf){const src=a.createBufferSource();src.buffer=buf;src.loop=true;const g=a.createGain();g.gain.setValueAtTime(0,ctxT);g.gain.linearRampToValueAtTime(1,ctxT+.25);
       src.connect(g);g.connect(this.fb);src.start(ctxT);this.cur={src,g,stage};
       Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm,off:info.offsetMs/1000,t0:t,title:info.title});}
@@ -139,8 +156,9 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     f.type=type;f.frequency.value=freq;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(dest);s.start(t);s.stop(t+dur+.02);},
   // the synth soundtrack: one 16th-note step is scheduled on the beat grid BT.t0 + n*spb/4
   sched(){const a=this.a;if(!a||a.state!=='running'||!running||paused||BT.mode!=='synth')return;
-    const s16=BT.spb/4,now=a.currentTime;if(BT.t0+this.step*s16<now-.02)this.step=Math.ceil((now-BT.t0)/s16);
-    while(BT.t0+this.step*s16<now+.12){this.play(this.step,BT.t0+this.step*s16,s16);this.step++;}},
+    if(BT.rp)mnow();
+    const s16=BT.spb/4,now=a.currentTime,lim=BT.rp?BT.rp.at:1e9;if(BT.t0+this.step*s16<now-.02)this.step=Math.ceil((now-BT.t0)/s16);
+    while(BT.t0+this.step*s16<now+.12&&BT.t0+this.step*s16<lim){this.play(this.step,BT.t0+this.step*s16,s16);this.step++;}},
   play(n,t,spb){const s=n%16,bar=Math.floor(n/16)%4,r=this.root+[0,0,-2,-4][bar];
     if(s%4===0)this.osc(t,'sine',150,.28,.9,this.mus,38);
     if(s===4||s===12){if(this.boss)this.noise(t,.16,.5,1200,this.mus,'bandpass');else if(BT.stage!=='stage1')this.noise(t,.1,.22,2500,this.mus,'bandpass');}
