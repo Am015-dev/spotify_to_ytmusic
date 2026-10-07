@@ -57,7 +57,7 @@ async function game(b, gi, [W, H]) {
     const tipsOn = gi % 5 !== 4, seenPh = new Set(); let bulbN = 0;
     await p.evaluate(on => { GXH.reset(); GXH.setEnabled(on); }, tipsOn);
     const wc = t => String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length;
-    const NEUTRAL = [60, 16];
+    const neutral = async () => (await p.evaluate(() => { const e = document.querySelector('#barstat'); const r = e && e.getBoundingClientRect(); return r && r.width > 8 ? [r.left + r.width / 2, r.top + r.height / 2] : [innerWidth / 2, 4]; }));
     const bubbleInfo = ph => p.evaluate(ph => { const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(), tq = te && te.getBoundingClientRect(); const r = e.getBoundingClientRect();
       const av = [...document.querySelectorAll('#belt .hc.rec,#tbl .grp.usable,#rs .btn')].filter(x => x.getBoundingClientRect().width).map(x => { const q = x.getBoundingClientRect(); return { l: q.left + q.width / 2 - 14, r: q.left + q.width / 2 + 14, t: q.top + q.height / 2 - 14, b: q.top + q.height / 2 + 14 }; });
       return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), T: tq && { l: tq.left, t: tq.top, r: tq.right, b: tq.bottom }, B: { l: r.left, t: r.top, r: r.right, b: r.bottom }, av, inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight }; }, ph);
@@ -83,13 +83,14 @@ async function game(b, gi, [W, H]) {
       const X = (a, c) => a.l < c.r && a.r > c.l && a.t < c.b && a.b > c.t;
       if (b.T && X(b.B, { l: b.T.l, r: b.T.r, t: b.T.t, b: b.T.b })) fail('bubble covers its target (' + ph + ')');
       b.av.forEach(a => { if (X(b.B, a)) fail('bubble covers a glowing thing (' + ph + ')'); });
-      await tap(...NEUTRAL); await p.waitForTimeout(140);
+      await tap(...(await neutral())); await p.waitForTimeout(140);
       if (await p.evaluate(() => !!document.querySelector('.gxh-bub'))) fail('bubble did not dismiss on a tap (' + ph + ')');
       return true;
     };
     const bulbFlow = async ph => {
       if (!ph || bulbN >= 12 || !(!seenPh.has('bulb:' + ph) || R() < .25)) return false; seenPh.add('bulb:' + ph); bulbN++; stats.bulbs = (stats.bulbs || 0) + 1;
       const pre = await p.evaluate(() => { const s = hlpSuggest(); const r = s && s.target() && s.target().getBoundingClientRect(); return { has: !!s, why: s && s.why, to: r && { x: r.left + r.width / 2, y: r.top + r.height / 2 }, sig: JSON.stringify([G.round, G.turn, G.players[0].hand.length, G.players[0].picked, UI.sel, UI.twin]) }; });
+      if (await p.evaluate(() => !!document.querySelector('.gx-drawer.on'))) { await p.keyboard.press('Escape'); await p.waitForTimeout(250); }
       const bb = await ev(`__sw.btn('#bulbbtn')`); if (!bb) { fail('no bulb button'); return false; }
       await tap(bb.x, bb.y); await p.waitForTimeout(350);
       if (pre.has && !(await p.evaluate(() => !!document.querySelector('.gxh-finger')))) { await p.waitForTimeout(500); await tap(bb.x, bb.y); await p.waitForTimeout(400); }
@@ -99,7 +100,7 @@ async function game(b, gi, [W, H]) {
         else if (Math.abs(+r.f.tx - pre.to.x) > 2 || Math.abs(+r.f.ty - pre.to.y) > 2) fail('bulb finger ' + r.f.tx + ',' + r.f.ty + ' != suggestion ' + Math.round(pre.to.x) + ',' + Math.round(pre.to.y) + ' (' + ph + ')');
         if (!r.ring) fail('bulb: nothing glows at the suggestion'); if (!r.why || wc(r.why) > 15) fail('bulb why ' + wc(r.why) + ' words: ' + r.why); if (!r.link) fail('bulb bubble has no "How does this work?"');
         const a1 = await __chk('bulb ' + ph);
-        if (R() < .5 && r.link) { const lk = await ev(`__sw.btn('.gxh-bub .gxh-link')`); if (lk) { await tap(lk.x, lk.y); await p.waitForTimeout(250); await rulesCheck(ph); } } else { await tap(...NEUTRAL); await p.waitForTimeout(150); }
+        if (R() < .5 && r.link) { const lk = await ev(`__sw.btn('.gxh-bub .gxh-link')`); if (lk) { await tap(lk.x, lk.y); await p.waitForTimeout(250); await rulesCheck(ph); } } else { await tap(...(await neutral())); await p.waitForTimeout(150); }
       } else { stats.bulbNull = (stats.bulbNull || 0) + 1; if (r.f) fail('bulb with no suggestion still pointed a finger'); if (!r.rules) fail('bulb with no suggestion did not open the rules'); else await rulesCheck(ph); }
       await p.evaluate(() => GXH.hide());
       const a = await p.evaluate(() => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), sig: JSON.stringify([G.round, G.turn, G.players[0].hand.length, G.players[0].picked, UI.sel, UI.twin]) }));
