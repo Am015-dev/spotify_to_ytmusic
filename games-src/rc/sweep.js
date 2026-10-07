@@ -19,7 +19,7 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
  // ---- help kit checks
  const seenPh=new Set();let bulbN=0;
  const wc=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' ').filter(Boolean).length;
- const NEUTRAL=[384,110];   // open water at the top right of the island: a tap there does nothing
+ const NEUTRAL=[W-8,100];   // open water at the top right of the island: a tap there does nothing
  const ctr=sel=>p.evaluate(sel=>{const e=document.querySelector(sel);if(!e)return null;const r=e.getBoundingClientRect();if(!r.width)return null;return [r.left+r.width/2,r.top+r.height/2]},sel);
  const rulesCheck=async(ph)=>{HELP.rules++;
   const R=await p.evaluate(()=>{const e=document.querySelector('.gxh-rules');if(!e)return null;const out=[];const n=+e.dataset.count;const card=e.querySelector('.gxh-card');
@@ -37,12 +37,13 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
   if(!tipsOn){if(hs.st.shown.length||hs.st.cur){prob('tips are off but a bubble appeared: '+JSON.stringify(hs.st))}return false}
   // 1) the first-time bubble of this phase
   if(hs.ph&&hs.step&&!hs.busy&&!seenPh.has(hs.ph)){seenPh.add(hs.ph);
+   if(hs.st.seen.includes(hs.ph)&&!hs.st.cur)return false;   // its bubble was shown and tapped away by the play loop before this check
    let b=null;const t1=Date.now();
    while(Date.now()-t1<2500){b=await p.evaluate(ph=>{const e=document.querySelector('.gxh-bub.on[data-phase]');if(!e)return null;const rc=r=>({left:r.left,top:r.top,right:r.right,bottom:r.bottom});
      const t=HLP_STEPS[ph].target();let T=null;if(t){if(t.getBoundingClientRect)T=rc(t.getBoundingClientRect());else if(t.left!=null)T={left:t.left,top:t.top,right:t.left+(t.width||0),bottom:t.top+(t.height||0)}}
      const glows=[...document.querySelectorAll('.bfgl')].filter(g=>g.offsetParent!==null&&g.style.visibility!=='hidden').map(g=>{const r=g.getBoundingClientRect();return {cx:r.left+r.width/2,cy:r.top+r.height/2}});
      const r=e.getBoundingClientRect();return {id:e.dataset.phase,title:e.querySelector('.gxh-tt').textContent,text:e.querySelector('.gxh-tx').textContent,arrow:!!e.querySelector('.gxh-arr'),ok:!!e.querySelector('.gxh-ok'),r:rc(r),T,glows,sw:document.documentElement.scrollWidth>innerWidth+1}},hs.ph).catch(()=>null);if(b)break;await p.waitForTimeout(80)}
-   if(!b)prob('no coach bubble for phase '+hs.ph);
+   if(!b)prob('no coach bubble for phase '+hs.ph+' '+await p.evaluate(()=>JSON.stringify({st:GXH.state(),busy:hlpBusy(),pop:PHO.pop,t:(()=>{try{return HLP_STEPS[hlpPhase()].target()}catch(e){return String(e)}})()})));
    else{HELP.bubbles[hs.ph]=(HELP.bubbles[hs.ph]||0)+1;
     if(b.id!==hs.ph)prob('bubble for '+b.id+' shown in phase '+hs.ph);
     if(wc(b.title)>4)prob('bubble title over 4 words: '+b.title);if(wc(b.text)>20)prob('bubble text over 20 words ('+wc(b.text)+'): '+b.text);
@@ -75,6 +76,7 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
     if(!r.why||wc(r.why)>15)prob('bulb why '+wc(r.why)+' words: '+r.why);if(!r.link)prob('bulb bubble has no "How does this work?" ('+pre.ph+')');
     if(Math.random()<.5&&r.link){const lk=await ctr('.gxh-bub .gxh-link');if(lk){await p.touchscreen.tap(...lk);await p.waitForTimeout(250);await rulesCheck(pre.ph)}}
     else{await p.touchscreen.tap(...NEUTRAL);await p.waitForTimeout(150)}}
+   else if(!pre.ph){HELP.bulbNull++;if(r.rules){HELP.beatBulbs++;await rulesCheck('scene')}}   // a scene is playing: the game moves on by itself, so only the cards are checked
    else{HELP.bulbNull++;if(r.f)prob('bulb with no suggestion still pointed a finger ('+pre.ph+')');if(!r.rules)prob('bulb with no suggestion did not open the rules ('+pre.ph+')');else{if(!pre.ph)HELP.beatBulbs++;await rulesCheck(pre.ph||'scene')}}
    await p.evaluate(()=>GXH.hide());
    const a=await p.evaluate(()=>({g:!!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'),sig:[G.round,G.logN,UI.shown,G.plan.acts.map(a=>a.pw.length).join(''),!!G.q].join('|')}));
@@ -91,7 +93,7 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
    return {st:PHO.st,over:!!G.over,sig:[G.round,G.logN,UI.shown,G.plan&&G.plan.acts.map(a=>a.pw.length).join(''),PHO.st,!!G.q,UI.confirm?1:0].join('|'),words:lb?lb.textContent.trim().split(/\s+/).filter(Boolean).length:0,lb:lb&&lb.textContent,chip:chip?chip.textContent:'',eng,cov,pct:bd.height/innerHeight*100,sw:document.documentElement.scrollWidth>innerWidth+1,hasPawn:!!curPawn(),pick:UI.pick||[],ans:!!document.querySelector('#bf [data-ans]'),posq:BF.posQ()?UI.pick:null}});
   if(s.over||s.st==='over')break;minPct=Math.min(minPct,s.pct);
   if(await helpFlow()){lastT=Date.now();continue}
-  if(s.words>8)prob('status >8 words: '+s.lb);if(s.sw)prob('horizontal scroll');if(s.cov)prob('big button covered at '+s.st);
+  if(s.words>8)prob('status >8 words: '+s.lb);if(s.sw)prob('horizontal scroll');if(s.cov&&!global.__shot){global.__shot=1;await p.screenshot({path:'/tmp/claude-0/cov.png'})}if(s.cov)prob('big button covered at '+s.st+' by '+await p.evaluate(()=>{const b=document.querySelector('#bf .btn.go');const r=b.getBoundingClientRect();const e=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return (e&&(e.tagName+'.'+String(e.className).slice(0,50)))+' help='+JSON.stringify(GXH.state().cur)+' btn='+[r.left,r.top,r.width,r.height].map(Math.round)}));
   if(s.eng){const m=/🍖(\d+)🪵(\d+)/.exec(s.chip);resChecks++;if(!m||+m[1]!==s.eng.f||+m[2]!==s.eng.w)prob(`resources on screen "${s.chip}" != engine food ${s.eng.f} wood ${s.eng.w}`)}
   if(s.sig!==last){last=s.sig;lastT=Date.now();same=0}else same++;s.stuckish=same;if(false){}else if(Date.now()-lastT>8000){prob('stuck >8s at '+s.st+' '+s.lb+' '+JSON.stringify(await p.evaluate(()=>({tray:document.querySelector('#bf').innerText.replace(/\n/g,'|'),pb:planProblems(),conf:UI.confirm,acts:G.plan.acts.map(a=>a.type+':'+a.pw.join('+')),cur:!!curPawn(),pick:UI.pick,cls:[...document.querySelectorAll('#bf .bfpw')].map(e=>e.className).join('/'),ids:G.plan.acts.map(a=>a.id).join(),q:!!G.q,over:!!G.over}))));break}
   if(s.st==='plan2'||s.st==='plan'){
