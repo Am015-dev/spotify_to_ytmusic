@@ -54,7 +54,7 @@ async function newPage(b, W, H) {
   const p = await ctx.newPage(); p.setDefaultTimeout(90000); p.errs = [];
   p.on('pageerror', e => p.errs.push('pageerror ' + e.message)); p.on('console', m => { if (m.type() === 'error' && !/net::|Failed to load|favicon|fonts\.g/.test(m.text())) p.errs.push('console ' + m.text()); });
   await p.goto('file://' + FILE + '?phone=1'); await p.waitForSelector('[data-start]', { timeout: 60000 }); await p.waitForTimeout(1500);
-  await p.evaluate(() => { AIDELAY = 120; try { localStorage.clear() } catch (e) { } }); return p;
+  await p.evaluate(() => { AIDELAY = 120; try { localStorage.clear() } catch (e) { } window.__log = []; const ua = uiAct; uiAct = function (d) { __log.push('act ' + JSON.stringify(d) + ' help=' + JSON.stringify(GXH.state().cur) + ' rules=' + GXH.state().rules); return ua.apply(this, arguments) }; document.addEventListener('click', e => { const t = e.target; __log.push('click ' + t.tagName + '#' + t.id + '.' + String(t.className).slice(0, 25) + (t.closest && t.closest('[data-shop]') ? ' shop' + t.closest('[data-shop]').dataset.shop : '')); if (__log.length > 12) __log.shift() }, true); }); return p;
 }
 const SIG = () => typeof G === 'undefined' || !G ? '-' : [G.turn, G.phase, G.step, G.active, G.rolls, G.dice.map(d => d.f + (d.k ? 'k' : '')).join(''), G.pl.map(q => q.hp + ',' + q.vp + ',' + q.en + ',' + q.cards.length).join(';'), G.market.join(','), G.log && G.log.length, !!UI.choice, (document.getElementById('bline') || {}).textContent, document.querySelectorAll('.gxc:not([hidden])').length, UI.intro, UI.coach].join('|');
 async function choose(p, st, r) {
@@ -178,7 +178,7 @@ async function helpFlow(p, tag, st) {
     await p.evaluate(() => GXH.hide());
     const after = await p.evaluate(AFTER);
     if (after.g) await fail(p, tag, 'help bulb', 'help still on screen after dismissing (' + hs.ph + ')');
-    if (hs.ph !== 'watch' && hs.ph !== 'intro' && after.sig !== pre.sig && st.humanTurn) await fail(p, tag, 'help bulb', 'tapping the bulb changed the game (' + pre.sig + ' -> ' + after.sig + ') last neutral tap on ' + p._nt + ' last tap ' + p._lt);
+    if (hs.ph !== 'watch' && hs.ph !== 'intro' && after.sig !== pre.sig && st.humanTurn) await fail(p, tag, 'help bulb', 'tapping the bulb changed the game (' + pre.sig + ' -> ' + after.sig + ') last neutral tap on ' + p._nt + ' last tap ' + p._lt + ' LOG ' + JSON.stringify(await p.evaluate(() => window.__log.slice(-8))));
     return true;
   }
   return false;
