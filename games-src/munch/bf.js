@@ -99,7 +99,7 @@ function bfFinger(spec){const old=document.getElementById('bffing');const key=sp
   const fr=B&&B.width&&spec.eb!==spec.ea?[{transform:`translate(${ax}px,${ay}px) scale(1)`,opacity:0},{transform:`translate(${ax}px,${ay}px) scale(.85)`,opacity:1,offset:.15},{transform:`translate(${bx}px,${by}px) scale(.85)`,opacity:1,offset:.7},{transform:`translate(${bx}px,${by}px) scale(1)`,opacity:0}]
     :[{transform:`translate(${ax}px,${ay+30}px) scale(1)`,opacity:0},{transform:`translate(${ax}px,${ay}px) scale(1)`,opacity:1,offset:.4},{transform:`translate(${ax}px,${ay}px) scale(.8)`,opacity:1,offset:.55},{transform:`translate(${ax}px,${ay}px) scale(1)`,opacity:0}];
   f.animate(fr,{duration:2200,iterations:Infinity,delay:400})}
-function bfTeach(me){if(!G||!G.learn||me<0||G.winner||sideToAct()!==me||G.q||BF.pick!=null||BF.drag||UI.menu||UI.pass!=null){bfFinger(null);return}
+function bfTeach(me){bfFinger(null);return;if(!G||!G.learn||me<0||G.winner||sideToAct()!==me||G.q||BF.pick!=null||BF.drag||UI.menu||UI.pass!=null){bfFinger(null);return}
   const L=bfLearned();const q=s=>document.querySelector(s);
   if(G.phase==='main'&&!L.has('kick')&&!(['setup','post'].includes(G.phase))){const d=q('.bfdoor');if(d){const co=coach(me);if(!autoN(me,co)){bfFinger({k:'kick',a:'d',b:'d',ea:d,eb:d});return}}}
   if(!L.has('drag')){const co=coach(me);const id=co.card;if(id!=null&&!co.disc){const ms=bfMoves(me,id);if(ms.length){const ea=q(`.mine .hand [data-card="${id}"]`),eb=bfEls(ms[0].z)[0];if(ea&&eb){bfFinger({k:'drag',a:id,b:ms[0].z,ea,eb});return}}}}
@@ -148,11 +148,11 @@ function bfAfter(S){if(!G){BF.snap=null;BF.pick=null;bfFinger(null);return}
 document.addEventListener('click',e=>{if(Date.now()<BF.eat){e.stopPropagation();e.preventDefault();return}
   const t=e.target;if(!G)return;const k=t.closest('[data-a="bfkick"]')||(()=>{const b=t.closest('[data-mv]');try{return b&&JSON.parse(b.dataset.mv).act==='kick'?b:null}catch(x){return null}})();
   if(k){e.stopPropagation();e.preventDefault();BF.pick=null;bfKick();return}
-  if(BF.ask){const z=t.closest('[data-bfz^="ask"]');e.stopPropagation();e.preventDefault();BF.ask=null;
+  if(BF.ask&&!t.closest('#bulbbtn')){const z=t.closest('[data-bfz^="ask"]');e.stopPropagation();e.preventDefault();BF.ask=null;
     if(z){const i=+z.dataset.bfz.slice(3);const n=BF.askN&&BF.askN[i];if(n!=null){uiAct({act:'ask',tgt:i,opt:n});return}}bfMark();return}
   const am=t.closest('[data-a="askmenu"]');if(am){const me=viewSeat();const asks=me>=0?validMoves(me).filter(m=>m.act==='ask'):[];
     if(asks.length&&!asks.some(m=>P(m.tgt).human)){e.stopPropagation();e.preventDefault();BF.pick=null;BF.ask=true;bfFinger(null);bfMark();return}}
-  if(BF.pick!=null){const z=t.closest('[data-bfz]');if(z){e.stopPropagation();e.preventDefault();bfDrop(BF.pick,z.dataset.bfz,null);return}
+  if(BF.pick!=null&&!t.closest('#bulbbtn')){const z=t.closest('[data-bfz]');if(z){e.stopPropagation();e.preventDefault();bfDrop(BF.pick,z.dataset.bfz,null);return}
     const c=t.closest('.mine [data-card]');if(c&&+c.dataset.card===BF.pick){BF.pick=null;bfMark();return}  // second tap: details / choices pop-up (ui.js)
     if(!c){BF.pick=null;bfMark();if(!t.closest('button,[data-a],[data-mv],[data-opp]')){e.stopPropagation();return}}}
   const c=t.closest('.mine .hand [data-card],.mine .gear [data-card]');if(!c||UI.sell||t.closest('.dlg'))return;const id=+c.dataset.card;const me=viewSeat();

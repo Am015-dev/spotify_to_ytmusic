@@ -18,7 +18,7 @@ const hq = s => () => document.querySelector(s);
 const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
 const HLP_STEPS = {
   turn: { target: () => { try { const m = UI.rec && UI.rec.m, e = m && hlpEl(m); if (e && e.getBoundingClientRect().width) return e; } catch (x) { } return hfirst('#bd .tile.glow', '#bd .glow:not(.tchip)', '#acts .btn')(); }, title: 'Your turn', text: 'Tap a glowing spot to send a worker there. Or tap a glowing card to play it.', pic: () => hnode(HP.worker) },
-  prepare: { target: hfirst('#acts .prep'), title: 'Prepare for next season', text: 'All your workers are out. Tap Prepare: they come home and you gain more workers.', pic: () => hnode(() => HP.season(1)) },
+  prepare: { target: hfirst('#acts .prep'), title: 'Time to prepare', text: 'All workers are out. Tap Prepare: they come home and you gain more.', pic: () => hnode(() => HP.season(1)) },
   lastCall: { target: hfirst('#acts .pass', '#acts .btn'), title: 'Nothing left to do?', text: 'Play a card if you can. Otherwise tap Pass twice: your city still scores.', pic: () => hnode(HP.tree) },
   how: { target: hfirst('#acts .tchip'), title: 'Choose how', text: 'This can be done in several ways. Tap the option you want.', pic: () => hnode(HP.cost) },
   pickCard: { target: hfirst('#bd .glow:not(.tchip)', '#acts .tchip'), title: 'Pick a card', text: 'The power needs a card. Tap one that glows.', pic: () => hnode(HP.card) },
@@ -115,6 +115,20 @@ function hlpSuggest() {
   return { why: hlpWhy(m, a), key: mk, m, target: () => { const e = hlpEl(m); return hlpEl(m); } };
 }
 // ---------------------------------------------------------------- wiring
+// the middle of every button is a spot a bubble must not cover (the kit avoids [data-gxh-avoid]); invisible 2px markers, redrawn with the board
+function hlpMarks() {
+  document.querySelectorAll('i.gxm').forEach(e => e.remove());
+  if (!G || !UI.started) return;
+  const W = innerWidth, H = innerHeight, f = document.createDocumentFragment();
+  document.querySelectorAll('button').forEach(b => {
+    if (b.closest('[data-help],[hidden],#start,#netbox')) return;
+    const r = b.getBoundingClientRect(); if (r.width < 4 || r.height < 4) return;
+    const x = r.left + r.width / 2, y = r.top + r.height / 2; if (x < 0 || y < 0 || x > W || y > H) return;
+    const m = document.createElement('i'); m.className = 'gxm'; m.setAttribute('data-gxh-avoid', ''); m.setAttribute('aria-hidden', 'true');
+    m.style.cssText = 'position:fixed;pointer-events:none;width:2px;height:2px;left:' + Math.round(x - 1) + 'px;top:' + Math.round(y - 1) + 'px'; f.appendChild(m);
+  });
+  document.body.appendChild(f);
+}
 let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
@@ -122,7 +136,7 @@ function hlpInit() {
   GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: hlpPhase });
 }
 function hlpAfter() {
-  hlpInit(); if (typeof GXH === 'undefined') return;
+  hlpInit(); hlpMarks(); clearTimeout(UI.hmk); UI.hmk = setTimeout(hlpMarks, 200);   // again just before a bubble is placed (things may still be moving) if (typeof GXH === 'undefined') return;
   const st = $('#start'), nb = $('#netbox');
   GXH.phase(!G || !UI.started || (st && !st.hidden) || (nb && !nb.hidden) ? null : hlpPhase());
 }

@@ -29,7 +29,7 @@ function campStart(def){const s=def.setup||{};const n=Math.max(3,Math.min(6,s.n|
   if(UI.hintsUser==null)UI.hintsUser=UI.hints;
   const kNames=UI.names,kLvl=UI.lvl;UI.names=names;if(s.lvl)UI.lvl=s.lvl;LVMIX=lv;CMP_GO=true;UI.pass=null;UI.lastSeat=-1;UI.mode='F';
   try{newGame('F',n)}finally{UI.names=kNames;UI.lvl=kLvl;LVMIX=null;CMP_GO=false}
-  G.campId=def.id;G.camp={sold:0,helped:0};G.learn=!!def.hints;UI.cmp=def;CMP_OVER=0;UI.hints=!!def.hints;
+  G.campId=def.id;G.camp={sold:0,helped:0};G.learn=!!def.hints;UI.cmp=def;CMP_OVER=0;UI.hints=false;
   campApplyTwist(def);G.ex=Object.assign({},DEFEX);render();clearInterval(CMP_FIN);CMP_FIN=setInterval(campWatch,400)}
 // a normal game leaves story mode and gives the player their own hints setting back
 {const _ng=newGame;newGame=function(){if(!CMP_GO){if(UI.cmp||UI.hintsUser!=null){UI.cmp=null;clearInterval(CMP_FIN);if(UI.hintsUser!=null)UI.hints=UI.hintsUser;UI.hintsUser=null}LVMIX=null}return _ng.apply(this,arguments)}}

@@ -72,7 +72,7 @@ document.addEventListener('click', ev => {
   const z = $('#zoom'); if (z && !z.hidden) { closeZoom(); return; }
   if (UI.lp) { UI.lp = false; return; }
   const t = ev.target.closest('[data-a],[data-start]');
-  if (!t) { if (UI.sel) { UI.sel = null; render(); } return; }
+  if (!t) { if (UI.sel && !ev.target.closest('[data-help]')) { UI.sel = null; render(); } return; }   // help (bulb, bubbles, rules cards) must not cancel an open choice
   const a = t.dataset.a, d = t.dataset;
   if (netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }

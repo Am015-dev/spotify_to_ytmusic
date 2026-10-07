@@ -508,6 +508,8 @@ html.ph.ph-l #acts .btn,html.ph.ph-l #acts .btn.go{flex:1 1 100%}
 html.ph.ph-l .hudc span:not(.rtleft){display:none}.hudc{overflow:hidden}
 @media (max-height:650px){html.ph.ph-p #promptDock{height:28px}html.ph.ph-p #prompt{line-height:28px}}
 html.ph.ph-p .gx-dock-body{gap:0!important;padding-top:0!important;padding-bottom:0!important}
+/* help kit: the coach bubbles of the busiest phases keep their Got it beside the text, so they stay short enough to fit between the glowing spaces */
+.gxh-bub[data-phase=space],.gxh-bub[data-phase=die],.gxh-bub[data-phase=token]{display:flex;align-items:center;gap:8px}.gxh-bub[data-phase=space] .gxh-row2,.gxh-bub[data-phase=die] .gxh-row2,.gxh-bub[data-phase=token] .gxh-row2{margin:0}
 </style><style>
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
 :root{--gxc-bg:#1b1410;--gxc-paper:#efe0bd;--gxc-paper2:#e2cc9b;--gxc-ink:#2a1d10;--gxc-dim:rgba(42,29,16,.68);--gxc-line:rgba(60,38,14,.28);
@@ -647,6 +649,68 @@ html.ph.ph-p .gx-dock-body{gap:0!important;padding-top:0!important;padding-botto
 }
 html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+/* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
+   Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
+:root{--gxh-bg:#f3e6bf;--gxh-ink:#231a10;--gxh-accent:#c99a35;--gxh-glow:#ffe08a;--gxh-btn:#7a1f31;--gxh-btn-ink:#fff6dc;--gxh-z:80;--gxh-font:inherit}
+.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(292px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
+.gxh-bub.on{visibility:visible}
+.gxh-bub *{box-sizing:border-box}
+.gxh-bub .gxh-tt{font-weight:800;font-size:14.5px;margin:0 0 2px}
+.gxh-bub .gxh-tx{font-weight:600;font-size:13.5px}
+.gxh-bub .gxh-bd{display:flex;gap:8px;align-items:flex-start}
+.gxh-bub .gxh-sp{flex:0 0 36px;width:36px;height:36px}
+.gxh-bub .gxh-sp svg{width:100%;height:100%}
+.gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
+.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
+.gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
+.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
+.gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
+.gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
+.gxh-a-bottom .gxh-arr{bottom:-8px;border-left:0;border-top:0}
+.gxh-a-left .gxh-arr{left:-8px;border-top:0;border-right:0}
+.gxh-a-right .gxh-arr{right:-8px;border-bottom:0;border-left:0}
+.gxh-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) - 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow);animation:gxh-pulse 1.1s ease-in-out infinite}
+.gxh-ring.round{border-radius:50%}
+.gxh-ring.soft{border-width:2px;box-shadow:0 0 12px 2px var(--gxh-glow);opacity:.9}
+.gxh-ring.from{border-style:dashed;animation:none;box-shadow:0 0 10px 1px var(--gxh-glow)}
+.gxh-finger{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) + 1);pointer-events:none;width:0;height:0}
+.gxh-finger i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
+.gxh-finger b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.gxh-bulb{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.gxh-bulb svg{width:24px;height:24px;display:block;fill:#ffd95a;stroke:#6b4a00;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,217,90,.7))}
+.gxh-bulb.gxh-float{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:calc(var(--gxh-z) - 2);width:44px;height:44px;border-radius:50%;border:2px solid var(--gxh-accent);background:#2a1820}
+.gxh-bulb.lit svg{filter:drop-shadow(0 0 8px #ffd95a)}
+.gxh-rules{position:fixed;inset:0;z-index:calc(var(--gxh-z) + 10);display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(5,3,6,.72);overscroll-behavior:contain;touch-action:pan-y}
+.gxh-rules .gxh-card{position:relative;box-sizing:border-box;width:min(360px,100%);max-height:calc(100% - 8px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:12px 14px 12px;border-radius:16px;background:var(--gxh-bg);color:var(--gxh-ink);border:3px solid var(--gxh-accent);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font)}
+.gxh-rules .gxh-x{position:absolute;right:6px;top:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-pic{display:flex;align-items:center;justify-content:center;min-height:120px;max-height:34dvh;padding:6px 0;background:rgba(0,0,0,.06);border-radius:12px;margin-top:22px}
+.gxh-rules .gxh-pic svg{max-width:100%;max-height:30dvh;height:auto}
+.gxh-rules .gxh-rt{font-weight:800;font-size:19px;line-height:1.15;padding-right:30px}
+.gxh-rules .gxh-rx{font-weight:600;font-size:16px}
+.gxh-rules .gxh-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
+.gxh-rules .gxh-nav button{min-height:44px;min-width:76px;padding:0 14px;border-radius:22px;border:2px solid var(--gxh-btn);background:transparent;color:var(--gxh-btn);font:800 15px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-nav button.gxh-next{background:var(--gxh-btn);color:var(--gxh-btn-ink)}
+.gxh-rules .gxh-nav button[disabled]{opacity:.3}
+.gxh-rules .gxh-dots{display:flex;gap:6px}
+.gxh-rules .gxh-dots i{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.25)}
+.gxh-rules .gxh-dots i.on{background:var(--gxh-btn)}
+.gxh-pics{display:flex;align-items:flex-end;justify-content:center;gap:8px;flex-wrap:nowrap}
+.gxh-pics figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.gxh-pics svg{width:64px;height:64px}
+.gxh-pics figcaption{font:800 12px/1.1 var(--gxh-font);text-align:center;max-width:76px}
+.gxh-pics .gxh-ar{font:800 24px/1 var(--gxh-font);align-self:center;color:var(--gxh-btn)}
+.gxh-set{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0}
+.gxh-set>span{flex:1 0 90px;font-weight:700}
+.gxh-set button{min-height:38px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
+.gxh-set button[aria-pressed=true]{background:var(--gxh-accent);color:#1b1208}
+@keyframes gxh-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes gxh-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.75}}
+@media (prefers-reduced-motion:reduce){.gxh-bub,.gxh-ring{animation:none}}
+@media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
+/* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
+@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
 
 </style>
 </head>
@@ -658,6 +722,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
   <button id="netst" type="button" data-a="netopen" hidden></button>
   <div id="barprompt"></div>
   <span class="gx-sp"></span>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
   <button class="gx-ibtn" data-gx="crewd" aria-expanded="false" aria-label="Flight briefing" title="Flight briefing"><svg viewBox="0 0 24 24"><path d="M3 17l8-3 2-9 2 9 6 3M12 14v7"/></svg><span>Flight</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-expanded="false" aria-label="Log" title="Log"><svg viewBox="0 0 24 24"><path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6zM6 3v18M10 8h6M10 12h6M10 16h4"/></svg><span>Log</span></button>
   <button class="gx-ibtn" data-gx="rulesd" aria-expanded="false" aria-label="How to play" title="How to play"><svg viewBox="0 0 24 24"><path d="M4 5c3-1 6-1 8 1 2-2 5-2 8-1v13c-3-1-6-1-8 1-2-2-5-2-8-1z M12 6v13"/></svg><span>Rules</span></button>
@@ -3132,6 +3197,243 @@ const GX={key:'gx',open:null,
 
 </script>
 <script>
+// gx-help.js: on-demand and first-time help for any game. Coach bubbles (once per phase), a lightbulb (suggested move + rules cards), a tips switch.
+// Needs gx-help.css. Uses GXV.watch (gx-viewport.js) for relayout when it is loaded, else its own resize listeners. See GX-KIT.md section 9.
+//   GXH.init({game:'slug', steps:{phaseId:{target:()=>el, title:'<=4 words', text:'<=20 words', pic?:svg}}, rules:[{phase?, title, text, pic}], avoid:'css selector', defaultOn:true})
+//   GXH.phase(phaseId|null)   call after every render; shows the phase's bubble the first time only
+//   GXH.bulb({el?, suggest:()=>({target, from?, why})|null, rulesFor:()=>phaseId})
+//   GXH.setEnabled(bool) GXH.enabled() GXH.reset() GXH.rules(phaseId?) GXH.hide() GXH.settingsRow() GXH.settingsHTML()
+// Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
+(function () {
+  'use strict';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
+  function load() {
+    var raw = null; try { raw = localStorage.getItem(key()); } catch (e) { raw = mem || null; }
+    var o = null; try { o = raw ? JSON.parse(raw) : null; } catch (e) { o = null; }
+    st = { on: o && typeof o.on === 'boolean' ? o.on : cfg.defaultOn !== false, seen: (o && o.seen && typeof o.seen === 'object') ? o.seen : {} };
+  }
+  function save() { var s = JSON.stringify(st); mem = s; try { localStorage.setItem(key(), s); } catch (e) {} }
+  function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
+  function norm(r) { var o = { left: r.left, top: r.top, width: r.width, height: r.height }; o.right = o.left + o.width; o.bottom = o.top + o.height; o.cx = o.left + o.width / 2; o.cy = o.top + o.height / 2; return o; }
+  function toRect(t) {
+    try {
+      if (typeof t === 'function') t = t(); if (!t) return null;
+      if (t.getBoundingClientRect) { if (t.closest && t.closest('[hidden]')) return null; var r = t.getBoundingClientRect(); if (!r.width && !r.height) return null; return norm(r); }
+      if (t.left != null && t.top != null) return norm({ left: t.left, top: t.top, width: t.width || 0, height: t.height || 0 });
+      if (t.x != null && t.y != null) return norm({ left: t.x - 22, top: t.y - 22, width: 44, height: 44 });
+    } catch (e) {}
+    return null;
+  }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function inter(a, b) { return Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)); }
+  function infl(r, p) { return { left: r.left - p, top: r.top - p, right: r.right + p, bottom: r.bottom + p }; }
+  // what a bubble must not cover: the core (the tap spot) of every glowing or recommended thing, so a big glowing region keeps its middle free
+  var CORE = 56;   // 56px around the middle of a big glowing thing; when the screen is too cramped for that, 32px (the tap spot itself)
+  function core(r, k) { var w = r.width, h = r.height, cx = r.left + w / 2, cy = r.top + h / 2; k = k || CORE; if (w > k + 24) w = k; if (h > k + 24) h = k; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; }
+  function avoidRects(k) {
+    var out = [], v = vp(), sel = (cfg && cfg.avoid) || '.glow,.rglow,.rec,.rrec,.pri';
+    var list; try { list = D.querySelectorAll(sel + ',[data-gxh-avoid]'); } catch (e) { list = []; }
+    for (var i = 0; i < list.length; i++) {
+      var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
+      var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+    }
+    return out;
+  }
+  function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
+  function place(b, tr) {
+    var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
+    var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
+    var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
+    var ks = [CORE, 32];
+    for (var ki = 0; ki < ks.length && !best; ki++) {
+      var av = avoidRects(ks[ki]);
+      for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
+        var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
+        if (hit(c, T)) continue;
+        var ov = 0; for (var k = 0; k < av.length; k++) if (hit(c, av[k])) ov += inter(c, av[k]) || 1;
+        var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
+        if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
+      }
+    }
+    var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
+    b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
+    var side = c2.bottom <= tr.top + 2 ? 'bottom' : c2.top >= tr.bottom - 2 ? 'top' : c2.right <= tr.left + 2 ? 'right' : 'left';
+    b.className = b.className.replace(/\bgxh-a-\w+/g, '').trim() + ' gxh-a-' + side;
+    var arr = b.querySelector('.gxh-arr');
+    if (arr) {
+      arr.style.left = arr.style.top = '';
+      if (side === 'top' || side === 'bottom') arr.style.left = Math.round(Math.max(14, Math.min(w - 26, tr.cx - c2.left - 6))) + 'px';
+      else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
+    }
+    b.classList.add('on');
+    return c2;
+  }
+  function ringAt(r, cls) {
+    var e = mk('div', 'gxh-ring' + (cls ? ' ' + cls : '')), p = 4;
+    e.style.cssText = 'left:' + Math.round(r.left - p) + 'px;top:' + Math.round(r.top - p) + 'px;width:' + Math.round(r.width + 2 * p) + 'px;height:' + Math.round(r.height + 2 * p) + 'px';
+    if (Math.abs(r.width - r.height) < 6 && r.width < 80) e.classList.add('round');
+    D.body.appendChild(e); return e;
+  }
+  function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  function fingerAt(fr, tr) {
+    var f = mk('div', 'gxh-finger', '<i></i><b></b>'); D.body.appendChild(f);
+    f.setAttribute('aria-hidden', 'true'); f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy);
+    if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
+    var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
+    var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
+      : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
+    f.style.transform = T(b, 1);
+    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    return f;
+  }
+  function picHTML(p) { try { if (typeof p === 'function') p = p(); if (p == null) return ''; return typeof p === 'string' ? p : (p.outerHTML || ''); } catch (e) { return ''; } }
+  // ------------------------------------------------------------------ the one current help element
+  function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
+  function hide() {
+    if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
+    cur = null; D.removeEventListener('pointerdown', onDown, true);
+  }
+  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
+  function onDown(e) {
+    if (rulesEl || !cur) return;
+    var t = e.target;
+    if (t && t.closest) {
+      if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
+      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+    }
+    hide();   // the tap is not swallowed: it still reaches whatever was tapped
+  }
+  function draw() {   // (re)build the visible pieces for cur at the current layout
+    if (!cur) return;
+    clearEls();
+    var tr = toRect(cur.target); if (!tr) { hide(); return; }
+    var fr = cur.from ? toRect(cur.from) : null, els = [];
+    if (cur.kind === 'bulb') { if (fr) els.push(ringAt(fr, 'from')); els.push(ringAt(tr)); els.push(fingerAt(fr, tr)); }
+    else els.push(ringAt(tr, 'soft'));
+    var b = cur.mkBubble(); D.body.appendChild(b); els.push(b); cur.els = els; cur.bub = b;
+    place(b, tr);
+  }
+  // ------------------------------------------------------------------ coach bubbles
+  function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function tryShow(id, n) {
+    pend = null;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var tr = toRect(step.target);
+    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    st.seen[id] = 1; save(); shown.push(id);
+    cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd">' + (step.pic ? '<div class="gxh-sp">' + picHTML(step.pic) + '</div>' : '') + '<div><div class="gxh-tt">' + esc(step.title) + '</div><div class="gxh-tx">' + esc(step.text) + '</div></div></div><div class="gxh-row2"><button type="button" class="gxh-ok">Got it</button></div>';
+      b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
+      return b;
+    } };
+    draw(); arm();
+  }
+  function phase(id) {
+    if (!cfg) return;
+    if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (pend) { if (pend.id === id) return; cancelPend(); }
+    if (!st.on || st.seen[id] || !cfg.steps[id]) return;
+    pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
+  }
+  // ------------------------------------------------------------------ the lightbulb
+  var BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg>';
+  function bulbOpen() {
+    if (!bulbOpts || Date.now() < skipUntil) return;
+    hide(); cancelPend();
+    var s = null, ph = null;
+    try { s = bulbOpts.suggest ? bulbOpts.suggest() : null; } catch (e) { console.warn('gxh suggest', e); }
+    try { ph = bulbOpts.rulesFor ? bulbOpts.rulesFor() : null; } catch (e) {}
+    if (!s || !s.target || !toRect(s.target)) { rules(ph); return; }
+    cur = { kind: 'bulb', phase: ph, target: s.target, from: s.from, sug: s, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub gxh-bulbb'); b.setAttribute('role', 'status');
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">' + esc(s.why || '') + '</div><div class="gxh-row2"><button type="button" class="gxh-link">How does this work?</button></div>';
+      b.querySelector('.gxh-link').addEventListener('click', function () { rules(ph); });
+      return b;
+    } };
+    if (bulbEl) bulbEl.classList.add('lit');
+    draw(); arm();
+  }
+  function bulb(o) {
+    if (!cfg) return; bulbOpts = o || {};
+    var e = o && o.el; if (typeof e === 'string') e = D.querySelector(e);
+    if (!e) { e = mk('button', 'gxh-bulb gxh-float'); e.type = 'button'; D.body.appendChild(e); }
+    if (bulbEl && bulbEl !== e) bulbEl.removeEventListener('click', bulbOpen);
+    bulbEl = e; e.classList.add('gxh-bulb'); e.setAttribute('data-help', ''); if (!e.getAttribute('aria-label')) e.setAttribute('aria-label', 'Help: suggest a move');
+    if (!e.querySelector('svg')) e.insertAdjacentHTML('afterbegin', BULB);
+    e.removeEventListener('click', bulbOpen); e.addEventListener('click', bulbOpen);
+    return e;
+  }
+  // ------------------------------------------------------------------ rules cards
+  function rulesList(ph) {
+    var all = cfg.rules || [], m = function (r) { return r.phase === ph || (Array.isArray(r.phase) && r.phase.indexOf(ph) >= 0); };
+    var l = ph != null ? all.filter(m) : []; if (!l.length) l = all.filter(function (r) { return r.phase == null; }); if (!l.length) l = all.slice();
+    return l;
+  }
+  function closeRules() { if (rulesEl) { if (rulesEl.parentNode) rulesEl.parentNode.removeChild(rulesEl); rulesEl = null; D.removeEventListener('keydown', onKey, true); } }
+  function onKey(e) { if (!rulesEl) return; if (e.key === 'Escape') closeRules(); else if (e.key === 'ArrowRight') rulesEl._go(1); else if (e.key === 'ArrowLeft') rulesEl._go(-1); }
+  function rules(ph) {
+    if (!cfg) return; var list = rulesList(ph); hide(); cancelPend(); closeRules(); if (!list.length) return;
+    var R = rulesEl = mk('div', 'gxh-rules'); R.setAttribute('role', 'dialog'); R.setAttribute('aria-modal', 'true'); R.setAttribute('aria-label', 'How this works');
+    R.innerHTML = '<div class="gxh-card" data-help><button type="button" class="gxh-x" aria-label="Close">×</button><div class="gxh-pic"></div><div class="gxh-rt"></div><div class="gxh-rx"></div><div class="gxh-nav"><button type="button" class="gxh-prev">Back</button><span class="gxh-dots"></span><button type="button" class="gxh-next">Next</button></div></div>';
+    var i = 0, q = function (s) { return R.querySelector(s); };
+    function show() {
+      var c = list[i]; q('.gxh-pic').innerHTML = picHTML(c.pic); q('.gxh-rt').textContent = c.title || ''; q('.gxh-rx').textContent = c.text || '';
+      q('.gxh-dots').innerHTML = list.length > 1 ? list.map(function (_, k) { return '<i' + (k === i ? ' class="on"' : '') + '></i>'; }).join('') : '';
+      q('.gxh-prev').disabled = i === 0; q('.gxh-prev').style.visibility = list.length > 1 ? 'visible' : 'hidden'; q('.gxh-next').textContent = i === list.length - 1 ? 'Done' : 'Next';
+      R.dataset.card = i; R.dataset.count = list.length;
+    }
+    R._go = function (d) { var n = i + d; if (n >= list.length) { closeRules(); return; } if (n < 0) return; i = n; show(); };
+    q('.gxh-x').addEventListener('click', closeRules); q('.gxh-prev').addEventListener('click', function () { R._go(-1); }); q('.gxh-next').addEventListener('click', function () { R._go(1); });
+    R.addEventListener('click', function (e) { if (e.target === R) closeRules(); });
+    var x0 = null; R.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    R.addEventListener('touchend', function (e) { if (x0 == null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 45) R._go(dx < 0 ? 1 : -1); }, { passive: true });
+    D.addEventListener('keydown', onKey, true);
+    show(); D.body.appendChild(R);
+  }
+  // ------------------------------------------------------------------ settings: Tips on/off + Reset tips
+  function settingsHTML(o) {
+    o = o || {}; var rc = o.rowClass || 'gxh-set', sc = o.segClass || '', bc = o.btnClass || '';
+    var b = function (a, v, label, pr) { return '<button type="button" class="' + bc + '" data-gxh="' + a + '"' + (v != null ? ' data-v="' + v + '"' : '') + (pr != null ? ' aria-pressed="' + pr + '"' : '') + '>' + label + '</button>'; };
+    return '<div class="' + rc + ' gxh-set" data-help><span>Tips</span><span class="' + sc + '" style="display:inline-flex;gap:6px;flex:0 0 auto">' + b('tips', 1, 'On', st.on) + b('tips', 0, 'Off', !st.on) + '</span></div>' +
+      '<div class="' + rc + ' gxh-set" data-help><span>Show tips again</span>' + b('reset', null, 'Reset tips') + '</div>';
+  }
+  function settingsRow(o) { var d = D.createElement('div'); d.setAttribute('data-help', ''); d.innerHTML = settingsHTML(o); return d; }
+  function syncSettings() {
+    var l = D.querySelectorAll('[data-gxh=tips]');
+    for (var i = 0; i < l.length; i++) l[i].setAttribute('aria-pressed', String((l[i].dataset.v === '1') === st.on));
+  }
+  function onClick(e) {
+    var t = e.target && e.target.closest && e.target.closest('[data-gxh]'); if (!t || !cfg) return;
+    if (t.dataset.gxh === 'tips') setEnabled(t.dataset.v === '1');
+    else if (t.dataset.gxh === 'reset') { reset(); var o = t.textContent; t.textContent = 'Done'; setTimeout(function () { t.textContent = o; }, 1400); }
+  }
+  function setEnabled(v) { if (!cfg) return; st.on = !!v; save(); if (!st.on) { cancelPend(); if (cur && cur.kind === 'coach') hide(); } syncSettings(); }
+  function reset() { if (!cfg) return; st.seen = {}; shown.length = 0; save(); }
+  // ------------------------------------------------------------------ relayout
+  function relayout() { if (!cfg || !cur || rulesEl) return; draw(); }
+  function init(o) {
+    cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
+    if (wired) return GXH; wired = true;
+    D.addEventListener('click', onClick, true);
+    if (window.GXV) GXV.watch(relayout);
+    else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
+    return GXH;
+  }
+  var GXH = window.GXH = {
+    version: 1, init: init, phase: phase, bulb: bulb, rules: rules, hide: hide, relayout: relayout, setEnabled: setEnabled, reset: reset,
+    enabled: function () { return !!st.on; }, seen: function (id) { return !!st.seen[id]; }, settingsHTML: settingsHTML, settingsRow: settingsRow,
+    state: function () { return { on: st.on, seen: Object.keys(st.seen), shown: shown.slice(), cur: cur ? { kind: cur.kind, id: cur.id || null, phase: cur.phase } : null, rules: !!rulesEl, pending: pend ? pend.id : null }; }
+  };
+})();
+
+</script>
+<script>
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
 //   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
@@ -5524,8 +5826,6 @@ const icoEl = grp => h('i.ic', { 'aria-hidden': 'true', html: '<svg viewBox="0 0
 // mandatory spaces of seat a that are still empty, and how many dice it has left: warn before a missing Axis / Engine die loses the flight
 function mandInfo(a) { if (!G || typeof a !== 'number' || a < 0 || G.phase !== 'place' || G.result) return null; const need = ['ax' + a, 'en' + a].filter(k => !G.slots[k]), left = FA.unusedDice(G, a).length; return { need, left, tight: need.length > 0 && left > 0 && left <= need.length, lost: need.length > left }; }
 const needNames = need => need.map(k => FA.SLOT[k].grp === 'axis' ? 'Axis' : 'Engines').join(' and ');
-// which control a guided tip is about: those elements get a pulsing ring while the tip is up
-const TIPHL = { axis: ['.slot[data-slot^=ax]', '.dial.axd'], engines: ['.slot[data-slot^=en]', '.gau'], track: ['.w.appr'], radio: ['.slot[data-slot^=ra]'], alt: ['.w.altw'], gear: ['.slot[data-slot^=lg]', '.gau'], flaps: ['.slot[data-slot^=fl]', '.gau'], brakes: ['.slot[data-slot^=br]', '.slot[data-slot^=it]', '.slot[data-slot^=ib]', '.badge.brk'], conc: ['.slot[data-slot^=co]', '.chipr'], rr: ['.badge.rrb'], dice: ['.tray'], 'n-dice': ['.tray'], 'n-mand': ['.slot[data-slot^=ax]', '.slot[data-slot^=en]'], hint: [], welcome: [], brief: [] };
 const SLOTLAB = k => { const S = FA.SLOT[k]; if (S.grp === 'gear' || S.grp === 'flaps') return S.vals.join('-'); if (S.grp === 'brakes' || S.grp === 'ice') return String(S.vals[0]); return ''; };
 function selectedLegal() {
   const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v)) return [];
@@ -5619,8 +5919,6 @@ function render() {
   }
   // ---- hud
   if (r.hud) { const row = rows[G.round + G.row0]; pz.appendChild(css(h('div.hudc', h('b', 'Round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0) + (isPh() ? '' : ' · ' + row[0] + ' ft')), (tm => isPh() && tm ? tm : [h('span', G.result ? 'Flight over' : G.phase === 'brief' ? 'Briefing' : (G.pend ? pendLabel() : (G.turn === 0 ? 'Pilot' : 'Co-pilot') + ' places')), tm])(rtEl())), r.hud)); }   // phones: two short lines, the clock replaces the turn line (the prompt says whose turn it is)
-  // the control the current guided tip talks about
-  if (UI.coach && UI.coach.tip && TIPHL[UI.coach.tip]) for (const sel of TIPHL[UI.coach.tip]) pz.querySelectorAll(sel).forEach(e => e.classList.add('hl'));
   renderDock(); renderBar(); phPost();
   if (typeof pxSync === 'function') pxSync();
   if (typeof netRenderHook === 'function') netRenderHook();
@@ -5796,7 +6094,6 @@ function actions(v) {
   if (G.turn !== v) return f;
   if (has('antic').length && selD) b('Second look: reroll this die', 'antic', 'alt');
   if (has('toss').length && selD) b('No space fits: put it aside', 'toss', 'alt');
-  b('Hint', 'hint', 'alt', { title: 'What the computer would do with your dice, and why' });
   return f;
 }
 // the landing conditions as [ok (true / false / null = not yet), text]
@@ -5837,6 +6134,7 @@ function newGame(mode, o) {
   UI.coach = { level: o.tipsOff ? 'off' : mode === 'guided' ? 'full' : (UI.prefs.guide || 'off'), seen: {}, tip: '', queue: [] }; UI.lastPlace = null; UI.rt = G.mods.real ? { left: 60000, last: 0 } : null;
   const st = $('#start'); if (st) st.hidden = true; closeRS(); try { GX.close(); } catch (e) { } closePass(); hideRecap();
   { const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } }   // a tip left over from the last flight
+  if (mode === 'guided' && typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { GXH.setEnabled(true); GXH.reset(); } }   // the guided flight: every bubble on, again
   $$('#fx .endb').forEach(e => e.remove()); UI.rfx = null; clearSave(); render(); sndMusic(); coachTick(); schedule();
   if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false && !o.camp && !isPh()) showStory();
 }
@@ -5912,39 +6210,7 @@ function doAction(a, t) {
     case 'rrpick': sendMove(v, { t: 'rrpick', m: UI.rrm.slice() }); break;
     case 'antic': case 'adapt': case 'wt': case 'toss': if (typeof UI.sel === 'number' && UI.sel >= 0) sendMove(v, { t: a, d: UI.sel }); break;
     case 'cof': UI.cof = +t.dataset.c; render(); break;
-    case 'hint': showHint(); break;
   }
-}
-function showHint() {
-  const v = actSeat(); if (typeof v !== 'number' || !mayAct(v)) return;
-  try {
-    const m = FA.AI.move(G, v, 'normal', { noMC: true }); if (!m) { toast('No suggestion.'); return; }
-    let why = whyMove(m, v), d = m.d;
-    UI.hint = { d: m.t === 'place' || m.t === 'toss' ? d : null, why: '' };
-    if (m.t === 'place') { UI.sel = d; UI.cof = m.c || 0; }   // the reason shows in the dock under the die, never as a toast over the buttons
-  } catch (e) { console.error(e); }
-  render();
-}
-function whyMove(m, v) {
-  if (m.t === 'ready') return 'Roll when you have finished the briefing.';
-  if (m.t === 'rr') return 'Spend a reroll token: your hand does not fit the jobs that are waiting.';
-  if (m.t === 'toss') return 'Nothing takes this die, so put it aside.';
-  if (m.t !== 'place') return m.t + ' looks useful here.';
-  const val = (m.d === 'p' ? G.pend.d.val : G.dice[v][m.d].v) + (m.c || 0), S = FA.SLOT[m.to], pre = m.c ? 'With a coffee making it ' + val + ', ' : 'A ' + val + ' ';
-  switch (S.grp) {
-    case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0, sp = at === G.planes.length ? 'the airport' : 'space ' + at; return n ? pre + 'on the radio clears a plane on ' + sp + '.' : pre + 'on the radio would clear nothing; it only gets rid of a spare die.'; }
-    case 'axis': { const o = G.slots['ax' + (1 - v)]; if (o) { const nx = G.pl.axis + (v === 0 ? o.v - val : val - o.v); return pre + 'on the axis against ' + name(1 - v) + '’s ' + o.v + ' leaves the plane ' + (nx === 0 ? 'level' : 'tilted ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right')) + ' (3 is a spin).'; }
-      return pre + 'on the axis goes first. ' + name(1 - v) + ' cannot see it coming and will answer with what their dice allow; a middle value leaves the most room.'; }
-    case 'engines': { const o = G.slots['en' + (1 - v)]; if (o) { const sm = val + o.v + FA.windMod(G), adv = FA.isFinal(G) ? -1 : sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return pre + 'on the engines makes ' + sm + (adv < 0 ? ' for the landing (brakes ' + FA.brakeVal(G) + ').' : ': the plane ' + (adv ? 'moves ' + adv + ' space' + (adv > 1 ? 's' : '') + '.' : 'stays put.')); }
-      return pre + 'on the engines sets half of the speed; ' + name(1 - v) + ' adds the other half (up to ' + G.pl.aeroB + ' stays, up to ' + G.pl.aeroO + ' moves 1, more moves 2).'; }
-    case 'gear': return pre + 'lowers a landing gear (needed to land); the blue marker moves up.';
-    case 'flaps': return pre + 'extends a flap (needed to land); the orange marker moves up.';
-    case 'brakes': case 'ice': return pre + 'sets a brake: the last-round speed must be no more than the brake value.';
-    case 'conc': return pre + 'on Coffee earns a coffee token: later, either of you can bend a die by one with it.';
-    case 'kero': return pre + 'on the fuel space burns ' + val + '; skipping it would burn 6.';
-    case 'intern': return pre + 'trains the trainee: take the next token and place it too.';
-  }
-  return 'Good use of this die.';
 }
 // ---- pass-the-device screens (hot-seat)
 function showPass(seat) {
@@ -5972,60 +6238,16 @@ function onEnd() {
   const fin = () => { if (typeof campOn === 'function' && campOn()) campFinish(); else showEndBoard(); };
   if (typeof pxEnd === 'function' && ANIM && typeof PX !== 'undefined' && PX.on) { pxEnd(win, fin); } else setTimeout(fin, ANIM ? 500 : 0);
 }
-// ===================== part 4: guided first flight (tips), end card, drawers =====================
+// ===================== part 4: guided first flight script, end card, drawers =====================
 var GUIDED_SCRIPT = [[[6,4,6,3],[4,3,4,4]],[[1,5,2,3],[4,1,5,5]],[[4,2,1,6],[3,1,2,4]],[[2,4,2,4],[2,5,4,1]],[[6,5,2,2],[6,2,1,4]],[[1,1,5,5],[2,6,6,2]],[[4,2,4,3],[5,6,4,6]]];   // found by guided-search.js: each control has a die to teach with, and two computer crews win 80% of 60 flights
-// Each tip has a short line (s) shown as a banner in the dock (never over the dice tray, Roll or the briefing phrases) and a full text (x) behind "More".
-// While a tip is up, the control it talks about pulses on the panel (TIPHL in part 2).
-const TIPS = [
-  { id: 'welcome', g: 1, when: () => G.phase === 'brief' && G.round === 0, t: 'Welcome aboard', s: 'You are Ines, the Pilot (blue). Ravi flies orange. Reach the airport in 6 rounds, land in round 7.', x: 'You are Captain Ines Marlow, the Pilot (blue). Your co-pilot, Ravi, plays the orange side. Land the plane in seven rounds, one altitude row per round. This first flight is Port Alder, the friendliest airport. I will introduce one control at a time, and the control I talk about pulses on the panel.' },
-  { id: 'brief', g: 1, when: () => G.phase === 'brief' && G.round === 0, t: 'The briefing', s: 'Tap a phrase to share a plan (never dice values), then Roll.', x: 'Before each roll you may talk strategy: "we need to clear traffic", "let us move two spaces". You never say dice values. Tap a phrase to tell Ravi your plan, then press Roll. After the roll both of you stay silent: the dice you place are your only words.' },
-  { id: 'alt', g: 1, when: () => G.phase === 'brief' && G.round === 0, t: 'The altitude strip', s: 'One row per round. Its colour shows who places first.', x: 'Every round the plane sinks one row: seven rows, seven rounds, no waiting. The colour of each row (and the name next to it) says who places the first die that round: blue is the Pilot, orange the Co-pilot. A purple dot means a reroll token comes aboard at that altitude.' },
-  { id: 'dice', g: 1, when: () => G.phase === 'place' && G.round === 0 && myTurn(), t: 'Your dice', s: 'Your blue dice: only you see them. Tap a die, then a glowing space.', x: 'Your four blue dice sit behind your screen at the bottom: only you can see them. Ravi’s orange dice are hidden from you. Players alternate: tap a die, then tap a glowing space on the panel. You must place every die.' },
-  { id: 'axis', g: 1, ctl: 1, when: () => myTurn() && selFits('axis'), t: 'Control 1: the Axis', s: 'Both crew fill the Axis every round. It tilts toward the higher die.', x: 'Each round both crew must put one die on the Axis (the two spaces beside the round dial). The plane tilts toward the higher die by the difference (5 against 3 tilts 2). Equal dice keep it level. A tilt of 3 is a spin: you lose at once. The tilt carries over, and the plane must be level when it lands.' },
-  { id: 'engines', g: 1, ctl: 1, when: () => myTurn() && selFits('engines'), t: 'Control 2: the Engines', s: 'Both crew fill the Engines too: the sum moves the plane 0, 1 or 2.', x: 'Both crew also put one die on the Engines (beside the speed gauge). Add them: up to the blue marker the plane stays put, up to the orange marker it moves one space, above it moves two. Leaving a space that still holds a plane is a collision, and moving past the airport is an overshoot. An empty Axis or Engines space at the end of a round loses the flight.' },
-  { id: 'track', g: 1, ctl: 1, when: () => G.phase === 'place' && myPlaced() >= 1 && myTurn(), t: 'The approach strip', s: 'Your route: clear the planes on a space before you leave it.', x: 'The strip at the top is your route. Your plane is the glowing space. Planes in your way must be cleared before you leave their space. The airport is the last space: you must be there when the last altitude starts.' },
-  { id: 'radio', g: 1, ctl: 1, when: () => myTurn() && selFits('radio'), t: 'Control 3: the Radio', s: 'Radio: clears a plane that many spaces ahead (your space is 1).', x: 'A die on the Radio, any value, clears one plane. Count from your own space as 1: a 3 clears the plane on the space two ahead of you. The pilot has one radio space, the co-pilot has two.' },
-  { id: 'rr', g: 1, ctl: 1, when: () => G.rrHand > 0 && G.phase === 'place' && myTurn() && !G.pend && myPlaced() >= 2, t: 'The Reroll button', s: 'Reroll: either of you, any time. Both reroll any unplaced dice.', x: 'A reroll token lets both crew reroll any of their unplaced dice, once, behind their screens. Tokens come from the altitude strip. Either crew may spend one at any time while dice are left, also during the partner’s turn. Use it when your hand does not fit the jobs that are waiting.' },
-  { id: 'hint', g: 1, ctl: 1, when: () => G.round >= 1 && G.phase === 'place' && myTurn(), t: 'The Hint button', s: 'Hint shows what the computer would do, and why. Guess first!', x: 'Not sure? Press Hint: it picks the die and the space the computer crew would choose and explains why, under your die in this panel. It is a suggestion, not a rule. You learn faster if you guess first and then compare.' },
-  { id: 'gear', g: 1, ctl: 1, when: () => G.round >= 1 && myTurn() && selFits('gear'), t: 'Control 4: Landing gear', s: 'Pilot: three gears (1-2, 3-4, 5-6). Each raises the blue marker.', x: 'The pilot lowers the landing gear: any of the three spaces, a 1-2, a 3-4 and a 5-6. All three must be down to land. Each gear raises the blue engine marker, so slow speeds become easier and one-space moves harder.' },
-  { id: 'flaps', g: 1, when: () => G.round === 2 && G.phase === 'place', t: 'Control 5: Flaps', s: 'Ravi: four flaps, in order. Each raises the orange marker.', x: 'The co-pilot extends the flaps, in order from the top: 1-2, then 2-3, then 4-5, then 5-6. All four must be out to land. Each flap raises the orange marker, so a two-space move needs a bigger sum. Ravi handles these; watch how the markers move.' },
-  { id: 'brakes', g: 1, when: () => G.round === 3 && G.phase === 'place' && myTurn(), t: 'Control 6: Brakes', s: 'Brakes: exactly 2, then 4, then 6. They count in the last round.', x: 'The brakes only matter in the last round, but they need exact values in order: a 2, then a 4, then a 6. In the final round your engine total must be no more than the brake value. Set them early.' },
-  { id: 'conc', g: 1, when: () => G.round === 4 && G.phase === 'place' && myTurn(), t: 'Control 7: Concentration', s: 'A spare die on Coffee earns a token: ±1 on any later die.', x: 'A die you cannot use anywhere can go on Concentration (the Coffee spaces) for a coffee token. Spend tokens on any later die to add or subtract 1 (never wrapping 1 to 6): pick a die, then use the − and + buttons under it. The die in your tray shows the new value.' },
-  { id: 'final', g: 1, when: () => G.round === 6 && G.phase === 'brief', t: 'The landing round', s: 'Last round: no move. Speed must be no more than the brakes.', x: 'This is the last round. The plane does not move: your engine total is compared with the brakes. To win by the end of the round: no planes left, all gear and flaps down, the axis exactly level, and the speed no greater than the brakes.' },
-  // normal flights with Guide "Full": a short set written for the seat you actually fly (the g:1 set above is the guided Pilot flight at Port Alder)
-  { id: 'n-welcome', g: 2, when: () => G.phase === 'brief' && G.round === 0, t: 'Your seat', s: () => 'You are ' + name(UI.seat) + ', the ' + SEATN[UI.seat] + ' (' + (UI.seat ? 'orange' : 'blue') + '). ' + name(1 - UI.seat) + ' flies ' + (UI.seat ? 'blue' : 'orange') + '. Land in ' + (D.rounds - G.row0) + ' rounds.', x: () => 'You fly the ' + SEATN[UI.seat] + ' seat (' + (UI.seat ? 'orange' : 'blue') + ' dice, the ' + (UI.seat ? 'right' : 'left') + ' side of the panel). Your crewmate ' + name(1 - UI.seat) + ' flies the ' + SEATN[1 - UI.seat] + ' seat. Talk plans in the briefing, never dice values; after the roll your placed dice are your only words.' },
-  { id: 'n-dice', g: 2, when: () => G.phase === 'place' && myTurn(), t: 'Your dice', s: () => 'Your ' + (UI.seat ? 'orange' : 'blue') + ' dice: only you see them. Tap a die, then a glowing space.', x: () => 'Your four ' + (UI.seat ? 'orange' : 'blue') + ' dice are behind your screen; ' + name(1 - UI.seat) + '’s dice are hidden from you. Players alternate until all eight dice are placed. Spaces marked ' + (UI.seat ? 'C' : 'P') + ' are yours; grey spaces take either crew.' },
-  { id: 'n-mand', g: 2, ctl: 1, when: () => myTurn() && (selFits('axis') || selFits('engines')), t: 'Axis and Engines', s: 'Both crew must fill the Axis and the Engines every round.', x: 'Each round both crew put one die on the Axis (the plane tilts toward the higher die; a tilt of 3 is a spin) and one on the Engines (the sum against the blue and orange markers moves the plane 0, 1 or 2 spaces). An empty Axis or Engines space at the end of a round loses the flight.' },
-  { id: 'n-role', g: 2, ctl: 1, when: () => myTurn() && myPlaced() >= 1, t: () => 'The ' + SEATN[UI.seat] + '’s jobs', s: () => UI.seat ? 'You extend the flaps in order and have two radio spaces.' : 'You lower the landing gear and set the brakes: 2, then 4, then 6.', x: () => UI.seat ? 'The Co-pilot extends the four flaps strictly in order (1-2, 2-3, 4-5, 5-6); each raises the orange marker. You have two radio spaces to clear planes ahead.' : 'The Pilot lowers the three landing gears (1-2, 3-4, 5-6, any order; each raises the blue marker) and sets the brakes with exactly 2, then 4, then 6. The brakes only count in the last round. You have one radio space.' },
-  { id: 'n-hint', g: 2, ctl: 1, when: () => myTurn() && myPlaced() >= 2, t: 'Hint', s: 'Stuck? Hint shows what the computer would do, and why.', x: 'Hint picks the die and space the computer crew would choose and explains why, under your die. Guess first, then compare.' },
-  { id: 'welcome2', g: 0, when: () => G.phase === 'brief' && G.round === 0, t: 'Briefing and silence', s: 'Talk plans before the roll, never dice values. Then silence.', x: 'Talk strategy before you roll, never dice values. After the roll stay silent: your placements are your words.' }
-];
+// (the old tip cards are gone: the help kit in ui10.js gives the coach bubbles, the lightbulb and the rules cards)
 // one control tip per die you place: the next one waits until you have placed a die, and control tips come when the die you picked fits that control
 function myPlaced() { const v = actSeat(); return typeof v === 'number' && v >= 0 ? Object.values(G.slots).filter(d => d.s === v && d.k !== 'i' && d.k !== 'x').length : 0; }
 function selFits(grp) { return typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && selectedLegal().some(k => FA.SLOT[k].grp === grp); }
 const tval = v => typeof v === 'function' ? v() : v;
 function myTurn() { const v = actSeat(); return typeof v === 'number' && v >= 0 && mayAct(v) && FA.pending(G).includes(v); }
-function coachTick() {
-  return;   // no tip or advice cards in any mode: the ghost finger and the glowing spaces teach
-  const c = UI.coach; if (!G || !UI.started || G.result || c.level === 'off' || isPh()) return;   // phones: no tip boxes, the ghost finger shows the first moves
-  if (UI.mode === 'net' || UI.mode === 'hot' && UI.holder < 0) return;
-  if (c.tip && c.tipR !== G.round + ':' + G.phase) { c.seen[c.tip] = 1; c.tip = ''; c.more = false; const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } applyHL(); }
-  if (c.tip) return;
-  const gate = G.round + ':' + myPlaced();
-  for (const t of TIPS) { if (c.seen[t.id]) continue; const on = t.g === 0 ? c.level === 'light' && UI.mode !== 'guided' : t.g === 1 ? UI.mode === 'guided' : c.level === 'full' && UI.mode === 'vs'; if (!on) continue;   // g:2, the role-aware set, speaks to one person at one seat
-    if (t.ctl && c.gate === gate) continue; let ok = false; try { ok = t.when(); } catch (e) { } if (ok) { if (t.ctl) c.gate = gate; c.tip = t.id; c.tipR = G.round + ':' + G.phase; c.more = false; showTip(t); return; } }
-}
-function showTip(t) {
-  const pc = $('#pc'); if (!pc) return; pc.hidden = false; pc.innerHTML = ''; const c = UI.coach;
-  const ids = TIPS.filter(x => x.g === t.g).map(x => x.id), n = ids.indexOf(t.id) + 1;
-  pc.append(h('div.tbr', h('div.tbt', h('div.tbh', h('b', tval(t.t)), h('span', t.g === 1 ? 'Guided flight' : 'Tip')), h('p', tval(c.more ? t.x : t.s))), h('button.btn.go', { type: 'button', 'data-a': 'tipok' }, 'Got it')),
-    h('div.cbtns', c.more ? null : h('button.btn.alt', { type: 'button', 'data-a': 'tipmore', 'aria-expanded': 'false' }, 'More'), h('button.btn.alt', { type: 'button', 'data-a': 'tipoff' }, 'No more tips')));
-  if (typeof renderDock === 'function' && G) renderDock();
-  applyHL();
-}
-function tipMore() { const c = UI.coach; c.more = true; const t = TIPS.find(x => x.id === c.tip); if (t) showTip(t); }
-function applyHL() { const pz = $('#pz'); if (!pz) return; pz.querySelectorAll('.hl').forEach(e => e.classList.remove('hl')); const id = UI.coach && UI.coach.tip; if (id && TIPHL[id]) for (const sel of TIPHL[id]) pz.querySelectorAll(sel).forEach(e => e.classList.add('hl')); }
-function tipOk() { const c = UI.coach, pc = $('#pc'); if (c.tip) c.seen[c.tip] = 1; c.tip = ''; c.more = false; if (pc) { pc.hidden = true; pc.innerHTML = ''; } applyHL(); if (G && UI.started) renderDock(); setTimeout(coachTick, 150); }
+function coachTick() { }   // kept so older call sites stay valid; see ui10.js
+function applyHL() { }
 // ---------- end card ----------
 // ---- the story card at the start of a flight (airport, what is special today, how the colours work)
 function showStory() {
@@ -6127,7 +6349,8 @@ function renderMenu() {
   const tog = (n, on, label) => h('button.btn' + (on ? '' : '.alt'), { 'data-a': n, type: 'button', 'aria-pressed': on ? 'true' : 'false' }, label + ': ' + (on ? 'On' : 'Off'));
   if (typeof NET !== 'undefined' && NET.on) row('Online', h('button.btn', { 'data-a': 'netopen', type: 'button' }, 'Lobby'), h('button.btn.alt', { 'data-a': 'netleave', type: 'button' }, typeof isHost === 'function' && isHost() ? 'Close the room' : 'Leave the room'));
   else row('Game', h('button.btn', { 'data-a': 'menu', type: 'button' }, 'New flight'), h('button.btn.alt', { 'data-a': 'save', type: 'button' }, 'Save'), h('button.btn.alt' + (hasSave() ? '' : '.dis'), { 'data-a': 'loadsave', type: 'button', disabled: hasSave() ? null : true }, 'Load'));
-  if (!(typeof NET !== 'undefined' && NET.on)) { row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n))); row('Guide', ...['full', 'light', 'off'].map(n => h('button.btn' + ((UI.coach.level || UI.prefs.guide) === n ? '' : '.alt'), { 'data-a': 'guide', 'data-v': n, type: 'button' }, n[0].toUpperCase() + n.slice(1)))); row('Flight story card', ...[[true, 'On'], [false, 'Off']].map(([v, n]) => h('button.btn' + ((UI.prefs.story !== false) === v ? '' : '.alt'), { 'data-a': 'story', 'data-v': v ? '1' : '0', type: 'button' }, n))); }
+  if (!(typeof NET !== 'undefined' && NET.on)) { row('Computer speed', ...[['Fast', 150], ['Normal', 650], ['Slow', 1300]].map(([n, v]) => h('button.btn' + (AIDELAY === v ? '' : '.alt'), { 'data-a': 'speed', 'data-v': v, type: 'button' }, n))); row('Flight story card', ...[[true, 'On'], [false, 'Off']].map(([v, n]) => h('button.btn' + ((UI.prefs.story !== false) === v ? '' : '.alt'), { 'data-a': 'story', 'data-v': v ? '1' : '0', type: 'button' }, n))); }
+  if (typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { const w = document.createElement('div'); w.innerHTML = GXH.settingsHTML({ rowClass: 'mrow', btnClass: 'btn' }); while (w.firstChild) b.appendChild(w.firstChild); } }
   row('Sound', tog('sound', UI.prefs.sound, 'Sound effects'), tog('music', UI.prefs.music, 'Music'));
   { const g = UI.prefs.gfx || 'auto'; row('Graphics' + (typeof PX !== 'undefined' && PX.on ? (g === 'auto' ? ' (now ' + PX.q + ')' : '') : ' (simple view)'), ...[['auto', 'Auto'], ['high', 'High'], ['medium', 'Medium'], ['low', 'Low']].map(([v, n]) => h('button.btn' + (g === v ? '' : '.alt'), { 'data-a': 'gfx', 'data-v': v, type: 'button', 'aria-pressed': g === v ? 'true' : 'false' }, n))); }
   let sp = ''; try { sp = window.PerfHUD && PerfHUD.buttonsHTML ? PerfHUD.buttonsHTML('btn alt') : ''; } catch (e) { }
@@ -6195,8 +6418,7 @@ document.addEventListener('click', ev => {
   switch (a) {
     case 'die': dieTap(+d.s, d.d === 'p' ? 'p' : +d.d); break;
     case 'slot': slotTap(d.slot); break;
-    case 'ready': case 'say': case 'rr': case 'rrpick': case 'antic': case 'adapt': case 'wt': case 'toss': case 'cof': case 'hint': doAction(a, t); break;
-    case 'tipmore': tipMore(); break;
+    case 'ready': case 'say': case 'rr': case 'rrpick': case 'antic': case 'adapt': case 'wt': case 'toss': case 'cof': doAction(a, t); break;
     case 'unsel': UI.sel = -1; UI.cof = 0; UI.warnK = null; render(); break;
     case 'debrief': showFinal(); break;
     case 'lookpanel': lookPanel(); break;
@@ -6206,8 +6428,6 @@ document.addEventListener('click', ev => {
     case 'altinfo': { const R = altRows()[G.round + G.row0]; toast(R[0] + ' ft · round ' + (G.round + 1) + ' of ' + (D.rounds - G.row0)); break; }
     case 'space': { const i = +d.i, s = trackOf().sp[i]; toast((i === trackOf().sp.length - 1 ? 'Airport' : 'Space ' + (i + 1)) + ': ' + G.planes[i] + ' plane' + (G.planes[i] === 1 ? '' : 's')); break; }
     case 'take': takeDevice(+d.s); break;
-    case 'tipok': tipOk(); break;
-    case 'tipoff': UI.coach.level = 'off'; tipOk(); UI.prefs.guide = 'off'; savePrefs(); break;
     case 'rsclose': closeRS(); break;
     case 'again': { const c = UI.cfg || {}; const m = UI.mode, off = UI.coach && UI.coach.level === 'off'; closeRS(); if (m === 'net') { netStart(); break; } newGame(m === 'guided' ? 'vs' : m, { scenario: c.scenario, role: c.role, level: c.level, abil: c.abil, tipsOff: off }); break; }
     case 'nextsc': { const c = UI.cfg || {}, i = D.scenarios.findIndex(s => s.id === c.scenario), n = D.scenarios[(i + 1) % D.scenarios.length]; closeRS(); const m = UI.mode === 'guided' ? 'vs' : UI.mode; UI.opt = Object.assign({}, UI.opt, { scenario: n.id, abil: [] }); newGame(m, { scenario: n.id, role: c.role, level: c.level, abil: [] }); break; }
@@ -6230,7 +6450,6 @@ document.addEventListener('click', ev => {
     case 'loadsave': if (!loadSave()) toast('No saved flight.'); break;
     case 'speed': AIDELAY = +d.v; savePrefs(); renderMenu(); break;
     case 'story': UI.prefs.story = d.v === '1'; savePrefs(); renderMenu(); break;
-    case 'guide': UI.coach.level = d.v; UI.prefs.guide = d.v; savePrefs(); renderMenu(); coachTick(); break;
     case 'gfx': if (typeof setGfx === 'function') setGfx(d.v); UI.prefs.gfx = d.v; savePrefs(); renderMenu(); break;
     case 'sound': UI.prefs.sound = !UI.prefs.sound; savePrefs(); try { if (window.GA) GA.setSfx(UI.prefs.sound); } catch (e) { } renderMenu(); break;
     case 'music': UI.prefs.music = !UI.prefs.music; savePrefs(); try { if (window.GA) GA.setMusic(UI.prefs.music); } catch (e) { } sndMusic(); renderMenu(); break;
@@ -6668,6 +6887,7 @@ function phPost() {
   if (isPh() && ac && si) { const cof = si.querySelector('.cof'); if (cof) ac.insertBefore(cof, ac.firstChild); }
   if (GX && (GX.open === 'crewd' || GX.open === 'logd')) { try { renderDrawers(); } catch (e) { } }
   R.toggle('fabrief', G.phase === 'brief' && !G.result);
+  try { hlpAfter(); } catch (e) { console.error(e); }
 }
 
 // ---------- the ending, on the board: the picture plus at most 8 words; tap the banner to look at the panel ----------
@@ -6726,6 +6946,141 @@ function campInit() {
   });
 }
 campInit();
+// ===================== part 10: help (gx-help kit): coach bubbles the first time, the lightbulb on demand, rules cards =====================
+// Bubbles: once per phase, short, pointing at the panel. The bulb: the computer crew's own move (FA.AI.move, the same one the ghost finger uses) + a short why + rules cards.
+// ---------------------------------------------------------------- pictures for the rules cards (inline SVG in the cockpit's colours)
+const hB = '#2f6fd0', hO = '#e8821f', hK = '#14202c', hG = '#f2b92c', hC = '#fff4dc';
+const HP = {
+  plane: () => '<svg viewBox="0 0 64 64"><path d="M32 6l5 20 21 12v6l-21-4 0 12 6 5v4l-11-3-11 3v-4l6-5V40l-21 4v-6l21-12z" fill="#e8f0f6" stroke="' + hK + '" stroke-width="2.5" stroke-linejoin="round"/></svg>',
+  strip: () => '<svg viewBox="0 0 64 64"><rect x="3" y="20" width="58" height="24" rx="5" fill="#2c3e4c" stroke="' + hK + '" stroke-width="2.5"/><path d="M22 20v24M42 20v24" stroke="#8f9daa" stroke-width="2"/><path d="M10 32l5-2v4zM29 28l3 4-3 4-3-4zM48 28l3 4-3 4-3-4z" fill="' + hC + '"/><rect x="47" y="14" width="12" height="6" rx="2" fill="' + hG + '"/></svg>',
+  air: () => '<svg viewBox="0 0 64 64"><rect x="4" y="38" width="56" height="14" rx="3" fill="#44525e" stroke="' + hK + '" stroke-width="2.5"/><path d="M12 45h8M28 45h8M44 45h8" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M26 12l3 10 11 6v3l-11-2v6l3 2v2l-6-1.500-6 1.500v-2l3-2v-6l-11 2v-3l11-6z" fill="#e8f0f6" stroke="' + hK + '" stroke-width="2" stroke-linejoin="round" transform="translate(4 0) scale(.9)"/></svg>',
+  die: (n, c) => '<svg viewBox="0 0 64 64"><rect x="10" y="10" width="44" height="44" rx="9" fill="' + (c === 'o' ? hO : hB) + '" stroke="' + hK + '" stroke-width="3"/><text x="32" y="43" text-anchor="middle" font-size="30" font-weight="800" fill="#fff" font-family="Arial,sans-serif">' + (n == null ? '?' : n) + '</text></svg>',
+  dice2: () => '<svg viewBox="0 0 64 64"><rect x="4" y="16" width="30" height="30" rx="7" fill="' + hB + '" stroke="' + hK + '" stroke-width="2.5"/><rect x="32" y="22" width="28" height="28" rx="7" fill="' + hO + '" stroke="' + hK + '" stroke-width="2.5"/><circle cx="14" cy="26" r="2.500" fill="#fff"/><circle cx="24" cy="36" r="2.500" fill="#fff"/><circle cx="42" cy="32" r="2.500" fill="#fff"/><circle cx="50" cy="40" r="2.500" fill="#fff"/><circle cx="50" cy="32" r="2.500" fill="#fff"/><circle cx="42" cy="40" r="2.500" fill="#fff"/></svg>',
+  speech: () => '<svg viewBox="0 0 64 64"><path d="M8 12h48a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H30l-12 12V44H8a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z" fill="' + hC + '" stroke="' + hK + '" stroke-width="3" stroke-linejoin="round"/><path d="M14 24h36M14 33h22" stroke="' + hB + '" stroke-width="4" stroke-linecap="round"/></svg>',
+  mute: () => '<svg viewBox="0 0 64 64"><path d="M8 12h48a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H30l-12 12V44H8a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z" fill="' + hC + '" stroke="' + hK + '" stroke-width="3" stroke-linejoin="round"/><path d="M16 38L48 18M16 18l32 20" stroke="#d8402c" stroke-width="5" stroke-linecap="round"/></svg>',
+  seatP: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="' + hB + '" stroke="#fff" stroke-width="3"/><text x="32" y="43" text-anchor="middle" font-size="30" font-weight="800" fill="#fff" font-family="Arial,sans-serif">P</text></svg>',
+  seatC: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="' + hO + '" stroke="#fff" stroke-width="3"/><text x="32" y="43" text-anchor="middle" font-size="30" font-weight="800" fill="#fff" font-family="Arial,sans-serif">C</text></svg>',
+  alt: () => '<svg viewBox="0 0 64 64"><rect x="6" y="6" width="52" height="11" rx="4" fill="' + hB + '"/><rect x="6" y="20" width="52" height="11" rx="4" fill="' + hO + '"/><rect x="6" y="34" width="52" height="11" rx="4" fill="' + hB + '"/><circle cx="50" cy="26" r="4" fill="#9a4fe0" stroke="#fff" stroke-width="1.500"/><path d="M12 52h40" stroke="' + hG + '" stroke-width="3" stroke-dasharray="4 4"/><path d="M32 60l-5-6h10z" fill="' + hG + '"/></svg>',
+  axis: (tilt) => '<svg viewBox="0 0 64 64"><g transform="rotate(' + (tilt || 0) + ' 32 24)"><path d="M6 24h52" stroke="' + hK + '" stroke-width="4" stroke-linecap="round"/><path d="M6 24l-4 18h16zM58 24l-4 18h-16z" fill="#8f9daa" stroke="' + hK + '" stroke-width="2.500" stroke-linejoin="round"/></g><circle cx="32" cy="24" r="5" fill="' + hG + '" stroke="' + hK + '" stroke-width="2"/><path d="M32 29v24M20 56h24" stroke="' + hK + '" stroke-width="4" stroke-linecap="round"/></svg>',
+  prop: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="#2c3e4c" stroke="' + hK + '" stroke-width="2.500"/><path d="M32 32C26 22 28 10 32 8c4 2 6 14 0 24zM32 32c10-6 22-4 24 0-2 4-14 6-24 0zM32 32c6 10 4 22 0 24-4-2-6-14 0-24zM32 32c-10 6-22 4-24 0 2-4 14-6 24 0z" fill="#dbe3ea" stroke="' + hK + '" stroke-width="1.500"/><circle cx="32" cy="32" r="4" fill="' + hG + '"/></svg>',
+  gauge: () => '<svg viewBox="0 0 64 64"><path d="M6 46a26 26 0 0 1 52 0z" fill="#1c2c38" stroke="' + hK + '" stroke-width="2.500"/><path d="M13 44a20 20 0 0 1 8-15" stroke="' + hB + '" stroke-width="5" fill="none"/><path d="M51 44a20 20 0 0 0-8-15" stroke="' + hO + '" stroke-width="5" fill="none"/><path d="M32 46L44 24" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="46" r="4" fill="' + hG + '"/><text x="14" y="58" font-size="11" font-weight="800" fill="' + hB + '" font-family="Arial,sans-serif">≤4</text><text x="40" y="58" font-size="11" font-weight="800" fill="' + hO + '" font-family="Arial,sans-serif">≤8</text></svg>',
+  radio: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="38" r="5" fill="' + hG + '" stroke="' + hK + '" stroke-width="2"/><path d="M20 28a17 17 0 0 0 0 20M44 28a17 17 0 0 1 0 20M12 20a29 29 0 0 0 0 36M52 20a29 29 0 0 1 0 36" stroke="#fff" stroke-width="3.500" stroke-linecap="round" fill="none"/><path d="M32 43v14" stroke="#fff" stroke-width="3.500" stroke-linecap="round"/></svg>',
+  gear: () => '<svg viewBox="0 0 64 64"><path d="M32 6v30M20 36h24" stroke="#8f9daa" stroke-width="5" stroke-linecap="round"/><circle cx="20" cy="46" r="9" fill="#2c3e4c" stroke="#e8f0f6" stroke-width="3"/><circle cx="44" cy="46" r="9" fill="#2c3e4c" stroke="#e8f0f6" stroke-width="3"/><circle cx="20" cy="46" r="3" fill="#8f9daa"/><circle cx="44" cy="46" r="3" fill="#8f9daa"/></svg>',
+  flap: () => '<svg viewBox="0 0 64 64"><path d="M4 22L60 10v12L4 34z" fill="#e8f0f6" stroke="' + hK + '" stroke-width="2.500" stroke-linejoin="round"/><path d="M4 34L60 22v8L40 44 4 44z" fill="' + hO + '" stroke="' + hK + '" stroke-width="2.500" stroke-linejoin="round"/><path d="M10 52h44" stroke="' + hK + '" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 5"/></svg>',
+  brake: (n) => '<svg viewBox="0 0 64 64"><rect x="6" y="14" width="52" height="36" rx="9" fill="#5a2a22" stroke="#e8f0f6" stroke-width="3"/><text x="32" y="40" text-anchor="middle" font-size="26" font-weight="800" fill="#fff" font-family="Arial,sans-serif">' + (n == null ? '2' : n) + '</text></svg>',
+  cup: () => '<svg viewBox="0 0 64 64"><path d="M12 22h34v18a14 14 0 0 1-14 14h-6a14 14 0 0 1-14-14z" fill="#e8f0f6" stroke="' + hK + '" stroke-width="3" stroke-linejoin="round"/><path d="M46 28h4a7 7 0 0 1 0 14h-6" fill="none" stroke="' + hK + '" stroke-width="3"/><path d="M22 6c-3 4 3 6 0 10M32 6c-3 4 3 6 0 10" stroke="#8f9daa" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M16 30h26" stroke="#6b4a2a" stroke-width="5"/></svg>',
+  plus: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#6b4a2a" stroke="#fff" stroke-width="3"/><path d="M32 20v24M20 32h24" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>',
+  reroll: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#8a4fd8" stroke="#fff" stroke-width="3"/><path d="M20 30a12 12 0 0 1 21-6M44 34a12 12 0 0 1-21 6" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M42 16v10H32zM22 48V38h10z" fill="#fff"/></svg>',
+  tap: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="18" fill="rgba(242,185,44,.2)" stroke="' + hG + '" stroke-width="4"/><path d="M30 14v26l-6-5-4 4 14 14h14l4-20-8-2-4-4-4 1-2-4z" fill="#fff" stroke="' + hK + '" stroke-width="2.500" stroke-linejoin="round"/></svg>',
+  aside: () => '<svg viewBox="0 0 64 64"><rect x="8" y="14" width="30" height="30" rx="7" fill="' + hB + '" stroke="' + hK + '" stroke-width="2.500"/><path d="M42 40l16 12M58 40L42 52" stroke="#d8402c" stroke-width="5" stroke-linecap="round"/><text x="23" y="36" text-anchor="middle" font-size="20" font-weight="800" fill="#fff" font-family="Arial,sans-serif">?</text></svg>',
+  stop: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#d8402c" stroke="#fff" stroke-width="3"/><path d="M21 21l22 22M43 21L21 43" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>',
+  star: () => '<svg viewBox="0 0 64 64"><path d="M32 6l7.500 17 18.500 1.600-14 12 4.400 18.400L32 45l-16.400 10 4.400-18.400-14-12L24.500 23z" fill="' + hG + '" stroke="#8a6a1a" stroke-width="3" stroke-linejoin="round"/></svg>',
+  token: () => '<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#2f9a4a" stroke="#fff" stroke-width="3"/><text x="32" y="41" text-anchor="middle" font-size="26" font-weight="800" fill="#fff" font-family="Arial,sans-serif">4</text></svg>',
+  swap: () => '<svg viewBox="0 0 64 64"><rect x="4" y="20" width="22" height="22" rx="6" fill="' + hB + '" stroke="' + hK + '" stroke-width="2.500"/><rect x="38" y="20" width="22" height="22" rx="6" fill="' + hO + '" stroke="' + hK + '" stroke-width="2.500"/><path d="M28 26h8M32 22l4 4-4 4M36 38h-8M32 34l-4 4 4 4" stroke="' + hK + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>'
+};
+function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it === '>' ? '<span class="gxh-ar">&rarr;</span>' : '<figure>' + (HP[it[0]] ? HP[it[0]](it[2], it[3]) : '') + (it[1] ? '<figcaption>' + it[1] + '</figcaption>' : '') + '</figure>').join('') + '</div>'; }
+// ---------------------------------------------------------------- where each bubble points
+const hq = s => () => document.querySelector(s);
+const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
+const hmine = () => document.querySelector('#pz .tray.' + (actSeat() === 1 ? 'c' : 'p'));
+const HLP_STEPS = {
+  brief: { target: hfirst('#says .say', '#acts [data-a=ready]'), title: 'Plan, then roll', text: 'Tap a phrase to tell your partner a plan, never dice values. Then tap Roll.', pic: () => HP.speech() },
+  die: { target: hfirst('#pz .tray.p .die.can', '#pz .tray.c .die.can', '#pz .tray'), title: 'Pick a die', text: 'Only you see these dice. Tap one, then a glowing space.', pic: () => HP.dice2() },
+  space: { target: hfirst('#pz .slot.legal'), title: 'Tap a glowing space', text: 'Tap a glowing space to place it. Tap the die again to undo.' },
+  rr: { target: hfirst('#acts [data-a=rrpick]', '#pz .tray .die.can'), title: 'Choose dice to reroll', text: 'Tap the dice you want to roll again, then tap the green button. None is fine.', pic: () => HP.reroll() },
+  token: { target: hfirst('#pz .die[data-d=p]', '#pz .tray'), title: 'Place the extra die', text: 'This die must be placed too. Tap it, then a glowing space.', pic: () => HP.token() },
+  swap: { target: hfirst('#pz .tray.p .die.can', '#pz .tray.c .die.can', '#pz .tray'), title: 'Hand-over swap', text: 'Your partner offered a die. Pick one of yours to swap with it.', pic: () => HP.swap() }
+};
+// ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each): every cockpit slot, in plain words
+const HLP_RULES = [
+  { title: 'How to win', text: 'Land together in the last round: clear all planes, lower gear and flaps, level the axis, slow down.', pic: () => hpics([['plane', 'Both crew'], '>', ['air', 'Land']]) },
+  { title: 'One round', text: 'Share a plan, roll, then take turns placing one die each. You never say dice values.', pic: () => hpics([['speech', 'Plan'], '>', ['dice2', 'Roll'], '>', ['tap', 'Place']]) },
+  { title: 'Win or lose together', text: 'A spin, a crash, an empty Axis or Engines space, or a failed landing loses for both.', pic: () => hpics([['stop', 'Any one']]) },
+  { phase: 'brief', title: 'Talk plans, not dice', text: 'Tap a phrase to share a plan. Never say the values of your dice. Then tap Roll my dice.', pic: () => hpics([['speech', 'Plan'], '>', ['dice2', 'Roll']]) },
+  { phase: 'brief', title: 'Then stay silent', text: 'After the roll your placed dice are your only words. Watch where your partner puts theirs.', pic: () => hpics([['mute', 'Silence'], '>', ['die', 'Your word', 4]]) },
+  { phase: 'brief', title: 'Blue and orange', text: 'Pilot is blue, Co-pilot orange. Spaces marked P or C belong to that seat. Grey spaces take either.', pic: () => hpics([['seatP', 'Pilot'], ['seatC', 'Co-pilot']]) },
+  { phase: 'brief', title: 'The altitude strip', text: 'One row per round. Its colour says who places first. A purple dot adds a reroll token.', pic: () => hpics([['alt', 'One per round'], ['reroll', 'Reroll']]) },
+  { phase: 'die', title: 'Axis: every round', text: 'Both crew put a die on the Axis. The plane tilts toward the higher die. Tilt of 3 loses.', pic: () => hpics([['axis', 'Higher side', 12], ['axis', 'Equal: level', 0]]) },
+  { phase: 'die', title: 'Engines: every round', text: 'Both fill the Engines. Sum: up to blue marker stays, up to orange moves 1, above moves 2.', pic: () => hpics([['prop', 'Two dice'], '>', ['gauge', 'Speed']]) },
+  { phase: 'die', title: 'Radio clears planes', text: 'A die on the Radio clears one plane that many spaces ahead. Your own space counts as 1.', pic: () => hpics([['radio', 'Radio'], '>', ['strip', 'Clear a plane']]) },
+  { phase: 'die', title: 'Rerolls and Coffee', text: 'A reroll token rerolls all unplaced dice, for both crew. Spare dice earn Coffee tokens.', pic: () => hpics([['reroll', 'Reroll'], ['cup', 'Coffee']]) },
+  { phase: 'space', title: 'Gear and flaps', text: 'Pilot lowers three gears, Co-pilot extends four flaps in order. All must be done to land.', pic: () => hpics([['gear', 'Pilot: gear'], ['flap', 'Co-pilot: flaps']]) },
+  { phase: 'space', title: 'Brakes: 2, then 4, then 6', text: 'Set the brakes in order, exact values. In the last round your engine total must stay within them.', pic: () => hpics([['brake', 'First', 2], ['brake', 'Then', 4], ['brake', 'Last', 6]]) },
+  { phase: 'space', title: 'Coffee tokens', text: 'A die on a Coffee space earns a token. Spend tokens to change a later die by 1.', pic: () => hpics([['die', 'Spare', 2], '>', ['cup', 'Coffee'], '>', ['plus', '+1 / -1']]) },
+  { phase: 'space', title: 'Nothing fits?', text: 'If no space takes the die, tap Put it aside. Coffee can change its value by one first.', pic: () => hpics([['aside', 'Put aside']]) },
+  { phase: 'rr', title: 'Reroll tokens', text: 'Spending a token lets both crew reroll any unplaced dice, once. Either crew can spend one any time.', pic: () => hpics([['reroll', 'Token'], '>', ['dice2', 'New dice']]) },
+  { phase: 'rr', title: 'Pick the odd ones', text: 'Tap only the dice that do not fit the open jobs. Tap the green button to confirm.', pic: () => hpics([['die', 'Keep', 3], ['die', 'Reroll', 1]]) },
+  { phase: 'token', title: 'Extra die', text: 'Some twists give a die you must place right away. Tap it, then a glowing space.', pic: () => hpics([['token', 'Extra die'], '>', ['tap', 'Place it']]) },
+  { phase: 'token', title: 'Same spaces as always', text: 'It goes on the same spaces as your other dice, with the same rules. Coffee can bend it.', pic: () => hpics([['token', 'Extra'], ['cup', 'Coffee']]) },
+  { phase: 'swap', title: 'Hand-over', text: 'Both crew swap one die, without saying the values. Pick which of yours to give.', pic: () => hpics([['swap', 'Swap']]) },
+  { phase: 'swap', title: 'Pick a spare', text: 'Give the die that fits your open jobs least. You still must place every die.', pic: () => hpics([['die', 'Give', 5], '>', ['die', 'Get', '?', 'o']]) }
+];
+// ---------------------------------------------------------------- phases: null when the player has nothing to decide
+function hlpPhase() {
+  try {
+    if (!G || !UI.started || G.result) return null;
+    const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v) || !myTurn()) return null;
+    if (G.phase === 'brief') return 'brief';
+    if (G.phase !== 'place') return null;
+    if (G.pend) return G.pend.h === 'rr' ? 'rr' : G.pend.h === 'wt' ? 'swap' : 'token';
+    if (G.turn !== v) return null;
+    return typeof UI.sel === 'number' && UI.sel >= 0 ? 'space' : 'die';
+  } catch (e) { return null; }
+}
+// ---------------------------------------------------------------- the advice: the computer crew's move, in a few words
+function capW(t, n) { const w = String(t || '').replace(/\s+/g, ' ').trim().split(' '); return w.length <= n ? w.join(' ') : ''; }
+function hlpWhy(m, v) {
+  if (m.t === 'say') return 'A short plan helps your partner. Never say dice values.';
+  if (m.t === 'ready') return 'Plans are shared. Roll your dice.';
+  if (m.t === 'rr') return 'Your hand does not fit the open jobs: spend a reroll.';
+  if (m.t === 'toss') return 'Nothing takes this die: put it aside.';
+  if (m.t !== 'place') return '';
+  const val = m.d === 'p' ? G.pend.d.val : G.dice[v][m.d].v, S = FA.SLOT[m.to], o = 1 - v;
+  switch (S.grp) {
+    case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0; return n ? 'A ' + val + ' on the radio clears the plane on ' + (at === G.planes.length ? 'the airport' : 'space ' + at) + '.' : 'The radio clears nothing here: this just uses up a spare die.'; }
+    case 'axis': { const x = G.slots['ax' + o]; if (x) { const nx = G.pl.axis + (v === 0 ? x.v - val : val - x.v); return 'Axis ' + val + ' against ' + x.v + ': the plane ends ' + (nx === 0 ? 'level' : 'tilted ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right')) + '.'; } return 'The Axis goes first: a middle value leaves the most room.'; }
+    case 'engines': { const x = G.slots['en' + o]; if (x) { const sm = val + x.v + FA.windMod(G); if (FA.isFinal(G)) return 'Landing speed ' + sm + ' against brakes ' + FA.brakeVal(G) + '.'; const adv = sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return 'Engines total ' + sm + ': the plane ' + (adv ? 'moves ' + adv + (adv > 1 ? ' spaces' : ' space') : 'stays put') + '.'; } return 'Engines: you set half the speed, your partner adds the rest.'; }
+    case 'gear': return 'Lowers a landing gear. All three must be down to land.';
+    case 'flaps': return 'Extends a flap. All four must be out to land.';
+    case 'brakes': case 'ice': return 'Sets a brake. The last-round speed must stay within it.';
+    case 'conc': return 'A spare die on Coffee earns a token to bend a later die by one.';
+    case 'kero': return 'Fuel space: this burns ' + val + ', skipping it burns ' + D.keroSkip + '.';
+    case 'intern': return 'This trains the trainee: place the next token too.';
+  }
+  return '';
+}
+const hlpDie = (v, d) => document.querySelector(d === 'p' ? '#pz .die[data-d="p"]' : '#pz .die[data-s="' + v + '"][data-d="' + d + '"]');
+// one plan for the glow, the finger and the bulb: { to: element getter, from: element getter | null, why }
+function hlpPlan() {
+  if (!G || G.result || UI.dragging) return null;
+  const v = actSeat(); if (typeof v !== 'number' || v < 0 || !myTurn()) return null;
+  let m = null; try { m = FA.AI.move(G, v, 'normal', { noMC: true }); } catch (e) { return null; }
+  if (!m) return null;
+  const why = capW(hlpWhy(m, v), 15); if (!why) return null;
+  const sel = typeof UI.sel === 'number' ? UI.sel : -1;
+  if (m.t === 'say') { const q = '#says [data-a=say][data-c="' + m.c + '"]'; return (e => e && e.getBoundingClientRect().width > 0)(document.querySelector(q)) ? { m, why, to: () => document.querySelector(q), from: null } : null; }
+  if (m.t === 'ready') return { m, why, to: () => document.querySelector('#acts [data-a=ready]'), from: null };
+  if (m.t === 'rr') return G.pend ? null : { m, why, to: () => document.querySelector('#acts [data-a=rr]'), from: null };
+  if (m.t === 'toss') { if (!hlpDie(v, m.d)) return null; return sel === m.d && document.querySelector('#acts [data-a=toss]') ? { m, why, to: () => document.querySelector('#acts [data-a=toss]'), from: null } : { m, why, to: () => hlpDie(v, m.d), from: null }; }
+  if (m.t !== 'place' || m.c || typeof m.d === 'undefined') return null;   // a coffee move needs two taps the finger cannot show: rules cards only
+  if (!hlpDie(v, m.d) || !document.querySelector('#pz .slot[data-slot="' + m.to + '"]')) return null;
+  return { m, why, to: () => document.querySelector('#pz .slot[data-slot="' + m.to + '"]'), from: sel === m.d ? null : () => hlpDie(v, m.d) };
+}
+function hlpSuggest() { const p = hlpPlan(); return p && p.to() ? { why: p.why, key: p.m.t + ':' + (p.m.to || p.m.c || p.m.d), target: p.to, from: p.from } : null; }
+// ---------------------------------------------------------------- wiring
+let _hlpInit = false;
+function hlpInit() {
+  if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
+  GXH.init({ game: 'final-approach', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '#pz .slot.legal,#pz .die.can,#pz .die.sel,#pz .die[data-d=p],#acts .btn,#says .say.rec' });
+  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: () => hlpPhase() });
+}
+function hlpAfter() {
+  hlpInit(); if (typeof GXH === 'undefined') return;
+  const vis = id => { const e = document.getElementById(id); return !!(e && !e.hidden); };
+  const busy = !G || !UI.started || G.result || UI.rsOpen || UI.dragging || UI.busy || UI.hold || vis('start') || vis('pass') || vis('rs') || vis('netbox') || (typeof GX !== 'undefined' && GX.open);
+  GXH.phase(busy ? null : hlpPhase());
+}
+setInterval(() => { try { hlpAfter(); } catch (e) { } }, 500);
 
 </script>
 </body>
