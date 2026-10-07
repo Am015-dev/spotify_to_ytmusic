@@ -1,11 +1,11 @@
 // tTune.js (tune20): TUNE drawer + defaults A/B. Real touch (CDP) on the phone layout 852×393, keyboard for the scripted A/B drive.
 // usage: node tools/tTune.js <url> <outdir> <mode>   mode: ab (scripted drive, prints numbers) · ui (drawer shots, slider→turn rate, fake-db save/load) · plain (no ?tune: drawer must not exist)
 const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=require('fs'),path=require('path');
-const URL=process.argv[2],OUT=process.argv[3]||'qa20',MODE=process.argv[4]||'ab';fs.mkdirSync(OUT,{recursive:true});
+const T0=Date.now();const URL=process.argv[2],OUT=process.argv[3]||'qa20',MODE=process.argv[4]||'ab';fs.mkdirSync(OUT,{recursive:true});
 // test-driven rAF (60 frames per game second) + seeded Math.random, so two builds see the same world and traffic
 const INIT=`(()=>{let s=12345;Math.random=()=>(s=(s*16807)%2147483647)/2147483647;const q=[];let t=0;window.__auto=true;window.requestAnimationFrame=cb=>{q.push(cb);return q.length};window.cancelAnimationFrame=()=>{};
  window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}}return t};
- setInterval(()=>{if(window.__auto)window.__tick(1)},16)})();`;
+ setInterval(()=>{if(window.__dbg&&!window.__fastR&&!window.__shooting){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}if(window.__auto)window.__tick(1)},16)})();`;
 // in-memory artifact db (same call shapes as the db capability), kept in sessionStorage so it survives a reload
 const FAKEDB=`(()=>{const K='__fakedb',ld=()=>JSON.parse(sessionStorage.getItem(K)||'{}'),sv=o=>sessionStorage.setItem(K,JSON.stringify(o));window.__dbW=0;
  const snap=(p,d)=>({id:p.split('/').pop(),exists:d!==undefined,data:()=>d===undefined?undefined:JSON.parse(JSON.stringify(d)),metadata:{fromCache:false,hasPendingWrites:false}});
@@ -15,11 +15,11 @@ const FAKEDB=`(()=>{const K='__fakedb',ld=()=>JSON.parse(sessionStorage.getItem(
    if(ord)ds.sort((a,b)=>(a.data()[ord[0]]-b.data()[ord[0]])*(ord[1]==='desc'?-1:1));if(lim)ds=ds.slice(0,lim);return{docs:ds,size:ds.length,empty:!ds.length}}});
  const db={doc,collection:p=>col(p)};window.claude={use:n=>new Promise(r=>setTimeout(()=>r(n==='db'?db:null),300))}})();`;
 (async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']});
- const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:2,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(600000);
+ const ctx=await b.newContext({viewport:{width:852,height:393},deviceScaleFactor:1,isMobile:true,hasTouch:true});const p=await ctx.newPage();p.setDefaultTimeout(600000);
  const errs=[];p.on('pageerror',e=>errs.push(e.message.slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});
  await p.addInitScript(INIT);if(MODE==='ui')await p.addInitScript(FAKEDB);const cdp=await ctx.newCDPSession(p);
  const tick=n=>p.evaluate(n=>__tick(n),n);
- const shot=async n=>{await tick(1);await p.screenshot({path:path.join(OUT,n+'.jpg'),type:'jpeg',quality:70})};
+ const shot=async n=>{await p.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}__tick(1)});await p.screenshot({path:path.join(OUT,n+'.jpg'),type:'jpeg',quality:70});await p.evaluate(()=>{window.__shooting=0});console.log('shot',n,Date.now()-T0)};
  const rect=sel=>p.evaluate(s=>{const e=document.querySelector(s);if(!e)return null;const r=e.getBoundingClientRect();if(r.width<2)return null;for(let a=e;a;a=a.parentElement)if(a.hidden)return null;return{x:r.left,y:r.top,w:r.width,h:r.height}},sel);
  const touch=async(x,y)=>{await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,id:1}]});await tick(3);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await tick(3)};
  const tap=async sel=>{const r=await rect(sel);if(!r)return false;await touch(r.x+r.w/2,r.y+r.h/2);return true};
@@ -29,7 +29,7 @@ const FAKEDB=`(()=>{const K='__fakedb',ld=()=>JSON.parse(sessionStorage.getItem(
   if(clear){await p.evaluate(()=>{localStorage.clear();localStorage.setItem('mho_slot','1')});await p.reload();await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500})}
   await tap('#hcStory');await tick(10);await tap('#slotList .go');
   for(let i=0;i<150;i++){if(await p.evaluate(()=>window.__mho&&__mho.state==='roam'&&!(__mho.LD&&__mho.LD.on)))break;await p.waitForTimeout(1000)}
-  await p.evaluate(()=>{window.__auto=false});for(let i=0;i<30;i++){await tick(30);if(!(await through()))break}await tick(60)}
+  console.log('roam',Date.now()-T0);await p.evaluate(()=>{window.__auto=false});for(let i=0;i<30;i++){await tick(30);if(!(await through()))break}await tick(60)}
  const key=async(k,on)=>on?p.keyboard.down(k):p.keyboard.up(k);
  const S=()=>p.evaluate(()=>{const R=__mho.RO;const d=Math.atan2(Math.sin(R.h-(R.vh??R.h)),Math.cos(R.h-(R.vh??R.h)));return{v:R.v,h:R.h,slip:d,x:R.x,z:R.z,bm:__mho.pl.bm,top:R.top}});
  // scripted drive: [frames, keys]
