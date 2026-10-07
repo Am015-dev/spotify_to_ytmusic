@@ -1,0 +1,29 @@
+visible parts 20 [{"i":4,"t":"bump","x":-4,"z":-9,"y":1,"n":9,"pt":[516,196]},{"i":10,"t":"eng","x":-2,"z":-6,"y":6,"n":8,"pt":[474,154]},{"i":39,"t":"wing","x":-4,"z":6,"y":7,"n":8,"pt":[376,98]},{"i":18,"t":"B1x5","x":3,"z":-2,"y":2,"n":5,"pt":[376,168]},{"i":8,"t":"C4x2","x":-2,"z":-8,"y":4,"n":4,"pt":[516,168]},{"i":19,"t":"drv","x":-1,"z":-1,"y":3,"n":4,"pt":[418,140]}]
+select bump → [4]
+shot 01_selected
+carry {"x":-4,"z":-9,"y":1,"bad":false,"n":1}
+carry@ {"x":-4,"z":5,"y":7,"bad":false,"n":1}
+shot 02_move_ghost
+MOVE count 45 → 45 moved {"t":"bump","x":-4,"z":-9,"y":1,"r":0,"c":"#d8dde4","g":0} → {"t":"bump","x":-4,"z":5,"y":7,"r":0,"c":"#d8dde4","g":0}
+shot 03_moved
+cluster base {"i":0,"pt":[530,182],"on":3}
+SELECT UP 1 → 6
+shot 04_select_up
+cluster carry null
+shot 05_cluster_ghost
+NO #gsBar [data-g="place"]
+CLUSTER MOVE count 45 → 45 changed true sel 0
+shot 06_cluster_moved
+NO #slBar [data-s="grp"]
+NO #slBar [data-s="none"]
+GROUP no visible member
+NO #slBar [data-s="dup"]
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+cdpSession.send: Target page, context or browser has been closed
+    at tapXY (/home/user/spotify_to_ytmusic/t4/g8sel.js:7:100)
+    at /home/user/spotify_to_ytmusic/t4/g8sel.js:34:179
+
+Node.js v22.22.0
