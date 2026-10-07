@@ -23,7 +23,7 @@ function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.
   const fit=Math.max(.87,{ship:{road:1,dirt:.72,water:.78},boat:{road:.42,dirt:.38,water:1},offroad:{road:.93,dirt:1,water:.35}}[veh][terr]);
   if(((RO.abF=(RO.abF||0)+1)&3)===1){const a=abAt(RO.x,RO.z);RO.onAB=!!a&&!!a.road.ab&&Math.abs(a.lat)<a.road.w/2+1&&RO.y<groundY(RO.x,RO.z)+14;RO.abRoad=RO.onAB?a.road.name:null;const q=RO.onAB?null:cityAt(RO.x,RO.z);RO.inCity=!RO.onAB&&(RO.x>HX0&&RO.x<HX1&&RO.z>HZS&&RO.z<HZN||!!q&&q.d<q.road.w/2+30);const rq=RO.onAB?a:q&&q.d<q.road.w/2+2?q:null;RO.rdT=rq?[rq.p.tx,rq.p.tz]:null}
   const lvl=carStat();const top=s.stats.top*.8*lvl.top,boost=c.boost&&s.bm>1&&!busy;RO.boosting=boost||RO.turbo>0;RO.turbo=Math.max(0,(RO.turbo||0)-dt);
-  if(boost){RO.boostT=(RO.boostT||0)+dt;if(!RO.wasB){AU.sfx('nitro');fovKick=Math.max(fovKick,9)}s.bm=Math.max(0,s.bm-TUNE.bDrain*dt);RO.bIdle=0}else{RO.bIdle=(RO.bIdle||0)+dt;if(RO.bIdle>.5)s.bm=Math.min(100,s.bm+FL_RECH*dt)}RO.wasB=boost;s.nitro=boost||RO.turbo>0;RO.top=top;
+  if(boost){RO.boostT=(RO.boostT||0)+dt;if(!RO.wasB){AU.sfx('nitro');fovKick=Math.max(fovKick,9*TUNE.fxFov)}s.bm=Math.max(0,s.bm-TUNE.bDrain*dt);RO.bIdle=0}else{RO.bIdle=(RO.bIdle||0)+dt;if(RO.bIdle>.5)s.bm=Math.min(100,s.bm+FL_RECH*dt)}RO.wasB=boost;s.nitro=boost||RO.turbo>0;RO.top=top;
   // hop: Space / HOP button
   if(pressed.fire){pressed.fire=false;if(!busy&&!air&&RO.vy<=0){RO.tutHop=true;RO.vy=TUNE.hop;RO.y+=.05;AU.sfx('launch');fovKick=Math.max(fovKick,4)}}
   if(air)RO.airT=(RO.airT||0)+dt;

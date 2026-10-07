@@ -118,7 +118,7 @@ const ART_m=new THREE.Matrix4(),ART_q=new THREE.Quaternion(),ART_s=new THREE.Vec
 function ART_blobTex(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,4,32,32,31);r.addColorStop(0,'rgba(0,0,0,1)');r.addColorStop(.55,'rgba(0,0,0,.75)');r.addColorStop(1,'rgba(0,0,0,0)');g.fillStyle=r;g.fillRect(0,0,64,64);const t=new THREE.CanvasTexture(c);if(typeof KEEP_TEX!=='undefined')KEEP_TEX.add(t);return t}
 function ART_step(dt){if(!RO.on)return;
   // boost: blue speed lines + FOV kick
-  const b=!!(pl&&pl.nitro);document.body.classList.toggle('artBoost',b);if(b)fovKick=Math.max(fovKick,7);
+  const b=!!(pl&&pl.nitro);document.body.classList.toggle('artBoost',b);if(b)fovKick=Math.max(fovKick,7*TUNE.fxFov);if(ART3.fxL!==TUNE.fxLines){ART3.fxL=TUNE.fxLines;document.body.style.setProperty('--fxL',TUNE.fxLines)}
   const bar=ART3.bar||(ART3.bar=document.getElementById('artBoost'));if(bar&&pl){const v=Math.max(0,Math.min(100,pl.bm||0));if(ART3.bv!==(v|0)){ART3.bv=v|0;bar.firstChild.style.width=v+'%'}bar.classList.toggle('full',v>=99)}}
 
 // sky light columns: 140 m mission/garage beacons become 1.5 m glowing ground rings; 1600 m searchlight beams are hidden
@@ -140,7 +140,7 @@ body.touch #npcSay{left:calc(112px + env(safe-area-inset-left,0px))!important;to
 #artBoost i{display:block;height:100%;width:0;background:linear-gradient(90deg,#3aa8ff,#7ae0ff);transition:width .15s}
 #artBoost.full i{background:linear-gradient(90deg,#3aa8ff,#bdf3ff);box-shadow:0 0 8px #7ae0ff}
 body[data-mode=roam] #artBoost{display:block}
-body.artBoost #speedFx{opacity:.55!important;filter:hue-rotate(10deg) saturate(2.2) drop-shadow(0 0 2px #3aa8ff)}
+body.artBoost #speedFx{opacity:calc(.55*var(--fxL,1))!important;filter:hue-rotate(10deg) saturate(2.2) drop-shadow(0 0 2px #3aa8ff)}
 .hcard h3,.hcard b,#home h2,#home h1{font-style:italic;font-weight:900;letter-spacing:.01em}`;document.head.appendChild(st);
  const b=document.createElement('div');b.id='artBoost';b.innerHTML='<i></i>';(document.getElementById('hud')||document.body).appendChild(b)}
 /*ART</art3.js>*/

@@ -331,7 +331,7 @@ function physPlayer(s,c){const st=s.stats;frameAt(TD,s.dist,F);const k=F.k;
   s.aab=0;if(SET.assist!=='off'&&TOUCH.used&&!s.air&&state==='race'){let kA=0;for(let d=15;d<=135;d+=20){const kd=kAt(TD,s.dist+d);kA=Math.max(kA,Math.abs(kd)/Math.max(.35,1-kd*s.x))}const vr0=Math.min(1,s.v/st.top0),Rm=(1.32-.52*vr0)*st.han*{low:.85,normal:1,high:1.15}[SET.steer],need=kA*s.v,kL=kAt(TD,s.dist+12),cap=Math.min(Rm+(s.v>st.top0*.3?.5*st.han:0),C26.on?C26_muRace(s)*.95/Math.max(1,s.v):9);
     if(Math.abs(kL)*s.v>Rm*.72&&s.v>st.top0*.3&&!c.hb)s.aab=Math.sign(kL);if(need>cap*.8){c.thr=0;c.boost=0}if(need>cap*.98)c.brk=Math.max(c.brk,.7)}
   if(c.boost&&!s.bPrev){if(raceT-(s.bT??-9)<.32&&PK.has('_lock')&&state==='race'){s.spLock=!s.spLock;feed(s.spLock?'BOOST LOCK ON':'BOOST LOCK OFF',0,'#ffd12c');AU.sfx('pick')}s.bT=raceT}s.bPrev=!!c.boost;if(s.spLock){if(c.brk>0||s.dead>0)s.spLock=false;else c.thr=1}
-  s.nitro=!!c.boost&&s.bm>.5&&!s.air&&state==='race';if(s.nitro){if(!s.wasNitro){AU.sfx('nitro');fovKick=Math.max(fovKick,R15_on()?14:8);if(R15_on())R15_boostFx(s)}s.bm=Math.max(0,s.bm-24*H)}s.wasNitro=s.nitro;
+  s.nitro=!!c.boost&&s.bm>.5&&!s.air&&state==='race';if(s.nitro){if(!s.wasNitro){AU.sfx('nitro');fovKick=Math.max(fovKick,(R15_on()?10:8)*TUNE.fxFov);if(R15_on())R15_boostFx(s)}s.bm=Math.max(0,s.bm-24*H)}s.wasNitro=s.nitro;
   const top=st.top*(s.turbo>0?1.2:1)*(s.boost>0?1.12:1)*(s.nitro?1.3:1)*(s.spLock?1.06:1)*(s.r15k||1);
   const vr=Math.min(1,s.v/st.top0),Rmax=(1.32-.52*vr)*st.han*(s.air?.85:1)*{low:.85,normal:1,high:1.15}[SET.steer];
   if(SET.assist!=='off'&&TOUCH.used&&state==='race'){const u=c.steer,au=Math.abs(u);const R15B=R15_b(s,s.x),R15m=3.5*CR_LS;if(au>=.06||s.holdX==null)s.holdX=clamp(s.x+s.v*Math.sin(s.beta)*.17,R15B[0]+R15m,R15B[1]-R15m);else if(R15_on())s.holdX+=(R15_line(s)-s.holdX)*Math.min(1,H*.6);s.holdX=R15_hold(s,clamp(s.holdX,Math.min(R15B[0]+R15m,R15B[1]),Math.max(R15B[1]-R15m,R15B[0])));if(s.aab>0)c.abR=Math.max(c.abR,1);else if(s.aab<0)c.abL=Math.max(c.abL,1);
@@ -688,9 +688,9 @@ function updateCam(dt,snap){let s=pl;
   camLook.lerp(look,snap?1:1-Math.exp(-dt*16));camUp.lerp(up,snap?1:1-Math.exp(-dt*5)).normalize();if(snap){camPos.copy(want);camLook.copy(look)}
   {const al=camPos.clone().sub(F2.p).dot(F2.t),CF=updateCam.f||(updateCam.f=mkF());frameAt(TD,s.dist+al,CF);if(CF.p.y<-12){const rel=camPos.clone().sub(CF.p),l=rel.dot(CF.r),u=rel.dot(CF.u),R0=HALF+6,lc=clamp(l,-(R0-3),R0-3),ce=Math.pow(Math.max(.02,Math.sqrt(1-(lc/R0)**2)),.22)*20-3;if(u>ce||l!==lc)camPos.copy(CF.p).addScaledVector(CF.t,rel.dot(CF.t)).addScaledVector(CF.r,lc).addScaledVector(CF.u,Math.min(u,ce))}}const jit=Math.max(0,shake-.3)*1.6*fxK();camera.position.copy(camPos);if(jit>0){camera.position.x+=rr(-.5,.5)*jit;camera.position.y+=rr(-.5,.5)*jit}camera.up.copy(camUp);camera.lookAt(camLook);
   if(kind===0&&state!=='menu')camera.rotateZ(-(s.roll||0)*.16);
-  fovKick*=Math.exp(-9*dt);const fov=(kind===3?74:{narrow:56,normal:62,wide:70}[SET.fov])+26*Math.pow(clamp(spd,0,1.25),1.2)+(s.nitro||s.turbo>0?7:0)+fovKick;camera.fov+=(pFov(fov)-camera.fov)*Math.min(1,(dt||.016)*3);camera.updateProjectionMatrix();
-  FX.uniforms.uSpeed.value=lerp(FX.uniforms.uSpeed.value,(state==='menu'?.2:0)*fxK(),Math.min(1,dt*4));FX.uniforms.uBoost.value=lerp(FX.uniforms.uBoost.value,(s.nitro&&state!=='menu'?.6:(s.turbo>0?.4:0))*fxK(),Math.min(1,dt*6));
-  speedLines.mesh.material.opacity=state==='menu'?0:(clamp((spd-.45)*.7,0,.32)+(s.nitro?.25:0))*fxK()}
+  fovKick*=Math.exp(-9*dt);const fov=(kind===3?74:{narrow:56,normal:62,wide:70}[SET.fov])+26*Math.pow(clamp(spd,0,1.25),1.2)+(s.nitro||s.turbo>0?7*TUNE.fxFov:0)+fovKick;camera.fov+=(pFov(fov)-camera.fov)*Math.min(1,(dt||.016)*3);camera.updateProjectionMatrix();
+  FX.uniforms.uSpeed.value=lerp(FX.uniforms.uSpeed.value,(state==='menu'?.2:0)*fxK(),Math.min(1,dt*4));FX.uniforms.uBoost.value=lerp(FX.uniforms.uBoost.value,(s.nitro&&state!=='menu'?.3:(s.turbo>0?.3:0))*fxK()*TUNE.fxGlow,Math.min(1,dt*6));
+  speedLines.mesh.material.opacity=state==='menu'?0:(clamp((spd-.45)*.7,0,.32)+(s.nitro?.12*TUNE.fxLines:0))*fxK()}
 function cycleCam(){camMode=(camMode+1)%2}
 
 let winT=0;
@@ -718,7 +718,9 @@ function updWorld(dt,t){skyMat.uniforms.uT.value=t;
 
 
 // R15: boost burst: turbine flash + blue/white sparks out of the back and a short shake when BOOST kicks in
-function R15_boostFx(s){try{if(!s.mesh)return;frameAt(TD,s.dist,F2);const at=s.mesh.position.clone().add(s.mesh.userData.m.position).addScaledVector(F2.t,-2.6).addScaledVector(F2.u,.8);
- burst(SPARK,at,34,18,.45,new THREE.Color(.7,1.6,2.6),F2.t.clone().negate());burst(SPARK,at,14,10,.3,new THREE.Color(2.4,2.4,2.2));shake=Math.max(shake,.42);FX.uniforms.uBoost.value=Math.max(FX.uniforms.uBoost.value,.9*fxK())}catch(e){}}
+// fix21: was 48 sparks at 10-18 m/s in every direction (they flew at the camera as long white streaks); now a few short, slow ones out of the exhaust
+function R15_boostFx(s){try{if(!s.mesh)return;frameAt(TD,s.dist,F2);const at=s.mesh.position.clone().add(s.mesh.userData.m.position).addScaledVector(F2.t,-2.2).addScaledVector(F2.u,.5),n=Math.round(B2K_spk(10)),S=TUNE.fxSpkS;
+ for(let i=0;i<n;i++)emit(SPARK,at.clone().addScaledVector(F2.r,rr(-.8,.8)),V3(rr(-1.2,1.2)*S,rr(0,1.5)*S,rr(-1.2,1.2)*S).addScaledVector(F2.t,-rr(2,5)*S),rr(.1,.2),new THREE.Color(.7,1.6,2.6));
+ shake=Math.max(shake,.3*TUNE.fxShake);FX.uniforms.uBoost.value=Math.max(FX.uniforms.uBoost.value,.45*fxK()*TUNE.fxGlow)}catch(e){}}
 // R15: the racing line the AI uses (inside of the bends ahead); the touch assist drifts toward it when the player is not steering
 function R15_line(s){const q=R15_inLane(s);if(q)return R15_lane(s,q);const qm=R15_mouth(s);if(qm&&s.x*qm.sd>MARGIN-2)return R15_lane(s,qm);let ka=0;for(let d=30;d<=150;d+=20)ka+=kAt(TD,s.dist+d);ka/=7;const m=MARGIN-3.5*CR_LS;return clamp(ka*3200,-m,m)}

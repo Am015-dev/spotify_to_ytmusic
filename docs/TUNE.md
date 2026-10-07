@@ -6,7 +6,8 @@ Nothing changes for normal players unless a tuning is published.
 ## Alex: how to use it
 1. Open the **beta artifact** in the Claude app, or any build with `?tune=1` added to the URL.
 2. Tap the small **⚙** at the top centre of the screen. A drawer slides out on the left. It stops above GAS/BRAKE/◀▶, so you can keep driving.
-3. Pick a tab: **Steer · Grip · Engine · Boost · Camera · Body · Race**. Move a slider and it applies at once.
+3. Pick a tab: **Steer · Grip · Engine · Boost · Camera · Body · Race · FX**. Move a slider and it applies at once.
+   FX (since fix21) = boost visuals in roam and races: flame size/length/brightness, sparkles ON/OFF + count + size, speed lines, screen glow/blur, FOV kick, shake (all ×, 1 = default).
    The number next to a slider turns **pink** when it differs from the default.
 4. **RESET STEER** (or another tab) puts that group back to the defaults.
 5. **SAVE…** opens the Saves tab. Type a short note (e.g. "tighter steering") and tap **SAVE**. That stores a new version vN.
