@@ -1,0 +1,1 @@
+"track":"hafen "raceSec":75.9 "wallPerMin":0 "track":"hafen "raceSec":80.7 "wallPerMin":0 "track":"hafen "raceSec":77.5 "wallPerMin":0 "track":"hafen "raceSec":78.4 "wallPerMin":0
