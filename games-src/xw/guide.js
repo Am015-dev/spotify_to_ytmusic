@@ -79,9 +79,7 @@ function coachKey(){if(tourOff()||!G||G.winner||UI.info)return null;if(G.phase==
   if(G.phase==='action')return 'action';if(G.phase==='target')return 'attack';return null}
 function coachStep(){const k=coachKey();if(UI.coachOn&&UI.coachOn!==k){UI.coachDone[UI.coachOn]=1;LS.set('na_coach',JSON.stringify(UI.coachDone));if(['dial','action','attack','end'].every(x=>UI.coachDone[x]))LS.set('na_tour','1')}
   UI.coachOn=k&&!UI.coachDone[k]?k:null;return UI.coachOn}
-function coachTag(){let el=document.getElementById('coachtag');const on=typeof guided==='function'&&guided()&&G&&G.phase==='target'&&humanTurn()&&typeof V3!=='undefined'&&V3.on&&G.cur&&ship(G.cur);
-  if(!on){if(el)el.remove();return}const s=ship(G.cur);if(!el){el=document.createElement('div');el.id='coachtag';el.className='tag coach';const t=$('tags');if(!t)return;t.appendChild(el)}
-  el.innerHTML='your arc ▼<br><small>shoot only inside this wedge</small>';const f=fwd(s.h);el._v=W(s.x+f.x*RANGE*1.7,s.y+f.y*RANGE*1.7,1);placeEl(el,el._v)}
+function coachTag(){const el=document.getElementById('coachtag');if(el)el.remove()}   // the old on-board arc tag is replaced by the help kit's coach bubbles (hlp.js)
 // ---- end-of-round recap ----
 function recapItems(R){const me=soloSide()>=0?soloSide():planSide();const ev=UI.ev[R]||[];const out=[];const isMine=n=>G.ships.some(s=>s.name===n&&s.side===me);
   for(const e of ev){let m;const t=e.t;
