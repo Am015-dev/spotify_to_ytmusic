@@ -165,7 +165,7 @@ async function playGame(browser, size, gi, rep) {
           if (!r.why || wc(r.why) > 15 || /…/.test(r.why)) issues.add('bulb why ' + wc(r.why) + ' words: ' + r.why); if (!r.link) issues.add('bulb bubble has no "How does this work?"');
           await audit(); TOT.shots.bulb || await shotOnce('bulb', 'suggestion');
           if (Math.random() < .5 && r.link) { const lk = await ctr('.gxh-bub .gxh-link'); if (lk) { await tapAt(page, ...lk); await sleep(250); await rulesCheck(hs.ph); } } else { await tapAt(page, ...NEUTRAL); await sleep(150); }
-        } else { TOT.bulbNull++; if (r.f) issues.add('bulb with no suggestion still pointed a finger (' + hs.ph + ')'); if (!r.rules) issues.add('bulb with no suggestion did not open the rules (' + hs.ph + ')'); else { TOT.shots.rules || await shotOnce('rules', 'card'); await rulesCheck(hs.ph); } }
+        } else { TOT.bulbNull++; if (r.f) issues.add('bulb with no suggestion still pointed a finger (' + hs.ph + ')'); if (!r.rules) issues.add('bulb with no suggestion did not open the rules (' + hs.ph + ')'); else { TOT.shots.rules || !['main', 'fight', 'after', 'post'].includes(hs.ph) || await shotOnce('rules', 'card'); await rulesCheck(hs.ph); } }
         await page.evaluate(() => GXH.hide());
         const a = await page.evaluate(() => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), sig: G.ln + '|' + (G.q && G.q.kind) + '|' + G.phase + '|' + (UI.sell ? 1 : 0) }));
         if (a.g) issues.add('help still on screen after a tap (' + hs.ph + ')');
