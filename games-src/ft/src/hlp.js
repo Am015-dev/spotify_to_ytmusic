@@ -21,10 +21,11 @@ function hpics(items){return '<div class="gxh-pics">'+items.map(it=>it==='>'?'<s
 // ---------------------------------------------------------------- where each bubble points
 const hq=s=>()=>document.querySelector(s);
 const hfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&e.getBoundingClientRect().width)return e}return null};
+const hadv=(...sels)=>()=>{try{const e=hlpEl(hlpAdvice());if(e&&e.getBoundingClientRect().width)return e}catch(x){}return hfirst(...sels)()};   // the advised tile when there is one
 const HLP_STEPS={
  bid:{target:hfirst('#acts .sp-b.glow'),title:'Buy turn order',text:'Tap a glowing spot. Dearer spots play earlier; free spots cost nothing.',pic:()=>HP.spot('3🪙')},
- lift:{target:hfirst('#grid .tile.glow'),title:'Lift a group',text:'Tap a glowing tile to pick up everyone standing on it.',pic:()=>HP.meeple('merchant')},
- drop:{target:hfirst('#grid .tile.glow'),title:'Drop one by one',text:'Tap a glowing neighbour to drop one person there. The last must match a colour.',pic:()=>HP.meeple('builder')},
+ lift:{target:hadv('#grid .tile.glow'),title:'Lift a group',text:'Tap a glowing tile to pick up everyone standing on it.',pic:()=>HP.meeple('merchant')},
+ drop:{target:hadv('#grid .tile.glow'),title:'Drop one by one',text:'Tap a glowing neighbour to drop one person there. The last must match a colour.',pic:()=>HP.meeple('builder')},
  collect:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Use your tribe',text:'Tap Collect. The power chips below are optional extras.',pic:()=>HP.meeple('vizier')},
  mason:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Choose your pay',text:'Masons earn coins for blue tiles around you. A Mystic adds one Mason.',pic:()=>HP.coin('+')},
  shadow:{target:hfirst('#grid .tile.glow','#seats .sch.glow','#acts .ab.go'),title:'Remove a person',text:'Tap a glowing tile or rival to remove someone there.',pic:()=>HP.meeple('assassin')},

@@ -389,7 +389,7 @@ body.touch #roamArrow{font-size:11px;max-width:40vw;white-space:nowrap;overflow:
 #rotateHint{display:none}
 #tG{display:none;width:clamp(64px,21vh,86px);height:clamp(64px,21vh,86px);right:calc(14px + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));border-color:#5dffb0;color:#5dffb0;font-size:13px}body[data-thr=pedal] #tG{display:grid}body[data-thr=pedal] #tN{width:clamp(48px,15vh,60px);height:clamp(48px,15vh,60px);right:calc(26px + env(safe-area-inset-right,0px));bottom:calc(24px + clamp(64px,21vh,86px) + env(safe-area-inset-bottom,0px));font-size:10px}body[data-thr=pedal] #tB{width:clamp(50px,16vh,66px);height:clamp(50px,16vh,66px);right:calc(26px + clamp(64px,21vh,86px) + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));font-size:10px}body[data-thr=pedal] #tF{right:calc(34px + clamp(64px,21vh,86px) + env(safe-area-inset-right,0px));bottom:calc(30px + clamp(50px,16vh,66px) + env(safe-area-inset-bottom,0px))}body[data-thr=pedal] #tD{right:calc(40px + clamp(64px,21vh,86px) + clamp(50px,16vh,66px) + env(safe-area-inset-right,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px))}@media (orientation:portrait){body[data-thr=pedal] #tD{right:calc(34px + clamp(64px,21vh,86px) + env(safe-area-inset-right,0px));bottom:calc(44px + clamp(50px,16vh,66px) + clamp(48px,15vh,62px) + env(safe-area-inset-bottom,0px))}}
 .tbtn::after{content:'';position:absolute;inset:-9px;border-radius:50%}@media (orientation:landscape){body.touch #tL,body.touch #tR,body.touch #tN,body.touch #tF,body.touch #tB,body.touch #tD,body.touch #tG{margin-bottom:max(14px,calc(env(safe-area-inset-bottom,0px)*.6))}body.touch #tL{margin-left:10px}body.touch #tN,body.touch #tG{margin-right:8px}body[data-thr=pedal] #tG{width:clamp(72px,24vh,96px);height:clamp(72px,24vh,96px);right:calc(20px + env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px))}body[data-thr=pedal] #tB{width:clamp(56px,18vh,70px);height:clamp(56px,18vh,70px);right:calc(40px + clamp(72px,24vh,96px) + env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px))}body[data-thr=pedal] #tN{width:clamp(56px,18vh,70px);height:clamp(56px,18vh,70px);right:calc(32px + env(safe-area-inset-right,0px));bottom:calc(40px + clamp(72px,24vh,96px) + env(safe-area-inset-bottom,0px))}body[data-thr=pedal] #tD{width:clamp(52px,17vh,64px);height:clamp(52px,17vh,64px);right:calc(46px + clamp(72px,24vh,96px) + env(safe-area-inset-right,0px));bottom:calc(36px + clamp(56px,18vh,70px) + env(safe-area-inset-bottom,0px))}body[data-thr=pedal] #tF{width:clamp(50px,16vh,62px);height:clamp(50px,16vh,62px);right:calc(58px + clamp(56px,18vh,70px) + env(safe-area-inset-right,0px));bottom:calc(52px + clamp(72px,24vh,96px) + clamp(30px,8vh,40px) + env(safe-area-inset-bottom,0px))}}
-#tG.down{background:rgba(93,255,176,.35)}
+#tG.down{background:rgba(93,255,176,.92);color:#05301c;border-color:#c8ffe4}
 
 @keyframes hintOut{to{opacity:0;visibility:hidden}}
 #roamPark{position:absolute;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));padding:6px 14px;border-radius:999px;background:rgba(20,20,19,.82);border:3px solid #5dffb0;color:#fff;font:italic 900 13px var(--hud,system-ui);letter-spacing:.04em;white-space:nowrap}#roamPark b{color:#5dffb0}@media (orientation:portrait){#roamPark{top:calc(215px + env(safe-area-inset-top,0px));font-size:12px}}
@@ -728,6 +728,7 @@ body.touch #roamPlate small{white-space:nowrap}
 <script type="module">
 // ---------- OD_CHANGELOG: newest first. EVERY deploy prepends one entry {v, date, items:[{t:'FIXED'|'NEW'|'CHANGED', s:'plain English'}]} (2-4 items).
 const OD_CHANGELOG=[
+ {v:'v87f',date:'7 Oct 2026',items:[{t:'CHANGED',s:'City SUVs are proper chunky LEGO SUVs now: rounded nose, grille, wheel arches, big windows and roof rails.'},{t:'FIXED',s:'Your boat sits in the water instead of floating above the waves, for every garage set.'},{t:'FIXED',s:'The GAS button lights up clearly while you hold it.'}]},
  {v:'v87e',date:'7 Oct 2026',items:[{t:'FIXED',s:'The crates the getaway van drops are real LEGO crates now, not a big brown box on the road.'},{t:'FIXED',s:'Your car stays crisp and solid in races; the cyan glow no longer washes over it when you SMASH.'},{t:'CHANGED',s:'City trucks keep white cargo boxes and cars keep black windows and trim; only the body is coloured.'}]},
  {v:'v87d',date:'6 Oct 2026',items:[{t:'FIXED',s:'Roads no longer flicker to grass while you drive.'},{t:'CHANGED',s:'Cars cast crisp, car-shaped shadows on the ground.'}]},
  {v:'v87c',date:'6 Oct 2026',items:[{t:'NEW',s:'RIDES tab in the garage: three new vehicle sets, each a street car, an off-road truck and a boat that swap automatically.'},{t:'NEW',s:'Ebbelwoi Express (RARE, 3.000 studs), Poseidon GT (EPIC, 15 stars) and Goldrausch (LEGENDARY, 30 stars).'},{t:'NEW',s:'Upgrades (spoiler, exhausts, wheels, booster) in 3 levels, visible on all three forms in the garage and while driving.'},{t:'FIXED',s:'SMASH! and other hit pop-ups no longer cover the tutorial card.'}]},
@@ -8111,6 +8112,27 @@ function CR_car(o){const A=[],B=o.body,K=CR_K,S=o.acc||B,add=(t,x,z,r,c,y)=>A.pu
  sym('tl',-4,7,2,B,1);sym('B1x1',-3,7,0,B,1);add('B4x1',-2,7,0,K,1);add('C8x1',-4,7,2,B,4);
  if(!o.noWing)add('spoiler',-3,5,0,o.wing||K,6);sym('mir',-4,-3,0,B,6);add('pipes',-1,8,0,K,1);add('lp',-1,-9,0,K,1);add('lp',-1,8,2,K,3);
  for(const e of o.x||[])add(...e);return A}
+// W8 SUV (v87f): 8-wide Speed-Champions-style SUV from real part types: raised hood with curved nose, chrome grille, chunky grey bumpers,
+// mudguard arches, raked 3x6 windscreen, tall greenhouse (side windows split by pillars), flat roof with dark roof rails, tailgate window
+function CR_suv(o){const A=[],B=o.body,K=CR_K,D='#1d2630',G='#3a4048',CH='#d8dde4',add=(t,x,z,r,c,y)=>{CR_reg(t);A.push([t,x,z,r,c,y])},
+ sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},wy=(.12-CR_WH.wL.r)/GB_PH;
+ add('T6x16',-3,-8,0,K,0);sym('T1x6',-4,-3,0,K,0);sym('T1x1',-4,-8,0,K,0);sym('T1x1',-4,7,0,K,0);
+ for(const z of[-7,3]){sym('arch',-4,z,0,B,0);sym('wL',-4,z,0,K,wy)}
+ // front: grey bumper, headlights + chrome grille, raised hood with a curved lip
+ add('P8x1',-4,-9,0,G,1);add('T8x1',-4,-9,0,G,2);add('B8x1',-4,-8,0,B,0);add('B8x1',-4,-8,0,B,3);add('B4x4',-2,-7,0,K,1);add('B4x4',-2,-7,0,B,3);
+ sym('hl',-4,-9,0,B,3);for(const y of[3,4,5]){sym('rp',-3,-9,0,B,y);for(const x of[-2,0])add('grl',x,-9,1,CH,y)}
+ add('C8x1',-4,-9,0,B,6);add('P8x5',-4,-8,0,B,6);add('T8x4',-4,-8,0,B,7);add('T8x1',-4,-4,0,B,7);
+ // sides: doors between the arches, grey rocker, belt line
+ sym('P1x6',-4,-3,0,G,1);sym('B1x6',-4,-3,0,B,2);sym('P1x6',-4,-3,0,B,5);sym('P1x6',-4,-3,0,o.acc||B,6);sym('P1x11',-4,-3,0,B,7);add('B4x6',-2,-3,0,K,1);add('P4x6',-2,-3,0,K,4);
+ // rear: deck over the rear arches, taillights, tailgate, grey bumper
+ add('B4x4',-2,3,0,B,3);add('P8x5',-4,3,0,B,6);add('B8x1',-4,7,0,B,0);sym('tl',-4,7,2,B,3);add('B6x1',-3,7,0,B,3);add('P8x1',-4,8,0,G,1);add('T8x1',-4,8,0,G,2);
+ // greenhouse: raked screen, A/B/D pillars, dark side + rear windows, cabin filler
+ add('ws6',-3,-4,0,B,8);sym('C1x2',-4,-4,0,B,8);sym('B1x1',-4,-2,0,B,8);sym('P1x1',-4,-2,0,B,11);
+ for(const y of[8,11]){const P=y===8?'B':'P';sym(P+'1x3',-4,-1,0,D,y);sym(P+'1x1',-4,2,0,B,y);sym(P+'1x3',-4,3,0,D,y);sym(P+'1x1',-4,6,0,B,y);add(P+'6x1',-3,7,0,D,y);sym(P+'1x1',-4,7,0,B,y)}
+ add('B6x8',-3,-1,0,K,8);add('P6x8',-3,-1,0,K,11);
+ // roof: body plate, inset roof tile, dark roof rails, rear lip
+ sym('T1x1',-4,-2,0,B,12);add('P8x9',-4,-1,0,B,12);add('T6x8',-3,-1,0,B,13);sym('T1x7',-4,0,0,K,13);add('C8x1',-4,7,2,B,13);
+ for(const e of o.x||[])add(...e);return A}
 function CR_rod(o={}){const A=[],R=o.body||'#d01712',Y=o.acc||'#fe8a18',K=CR_K,CH='#d8dde4',add=(t,x,z,r,c,y)=>A.push([t,x,z,r,c,y]),
  sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},wy=(t,ax)=>(ax-GB_PC[t].h*GB_PH/2)/GB_PH;
  add('T4x9',-2,-8,0,K,2);add('T8x7',-4,1,0,K,1);
@@ -8215,10 +8237,10 @@ function CR_cityGeo(nm){if(!nm||nm[0]==='#')return null;if(CR_CG[nm]!==undefined
  try{switch(nm){case'sedan':A=CR_car({body:W,acc:W,noWing:1});break;case'sedan-sports':A=CR_car({body:W,acc:K,wing:K});break;
   case'taxi':A=CR_car({body:ath?'#f5d000':W,acc:ath?'#f5d000':K,noWing:1,x:[['sign',-1,-1,0,ath?'#f4f4f4':'#ffd12c',13]]});break;
   case'police':A=CR_car({body:'#f4f4f4',acc:'#0055bf',noWing:1,x:[['bar',-2,-1,0,K,13]]});break;
-  case'suv':A=CR_car({body:W,acc:K,noWing:1,x:[['T6x4',-3,-2,0,K,13]]});wid=2.15;break;
+  case'suv':A=CR_suv({body:W,acc:W});wid=2.15;break;
   case'van':A=CR_van({body:W});wid=2.2;break;case'delivery':A=CR_truck({body:W});wid=2.4;break;case'truck':A=CR_truck({body:W});wid=2.55;break;
   case'garbage-truck':A=CR_truck({body:'#2c8a5a'});wid=2.6;break;default:return CR_CG[nm]=null}
-  if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A=CR_cab(A);if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A.push(['T1x6',-4,-3,0,K,-1],['T1x6',3,-3,0,K,-1],['T8x1',-4,-8,0,K,-1],['T8x1',-4,7,0,K,-1]);
+  if(['sedan','sedan-sports','taxi','police'].includes(nm))A=CR_cab(A);if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A.push(['T1x6',-4,-3,0,K,-1],['T1x6',3,-3,0,K,-1],['T8x1',-4,-8,0,K,-1],['T8x1',-4,7,0,K,-1]);
   const br=A.map(([t,x,z,r,c,y])=>({t,x,z,y,r:r%4,m:0,c})).filter(b=>!['drv','drvR','stw','mir','lp','pipes','flag'].includes(b.t));CR_LO=2;CR_G=[];CR_W=[];const M=[],L=[];for(const b of br)GB_brickGeo(b,M,L);
   const Wg=CR_W.map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return g});const MD=M.filter(CR_isDark),MB=M.filter(g=>!CR_isDark(g));const body=mergeGeometries(MB.concat(L)),wheels=mergeGeometries(Wg),glass=(CR_G.length||MD.length)?mergeGeometries(CR_G.concat(MD)):null;
   const box=new THREE.Box3().setFromBufferAttribute(body.attributes.position),bw=new THREE.Box3().setFromBufferAttribute(wheels.attributes.position),s=wid/(box.max.x-box.min.x),y0=Math.min(box.min.y,bw.min.y);
@@ -8767,9 +8789,20 @@ function ART4_base(s,ud,boat){const host=ud.m;const key=host.uuid+'|'+(ud.gbM?ud
   o=boat?-(B.min.y-y0)-Math.min(.7,h*.3):-(B.min.y-y0);ART4.off.set(key,o);if(ART4.off.size>40)ART4.off.delete(ART4.off.keys().next().value);return o}
 function ART4_tyres(){if(ART4.ty)return ART4.ty;const im=new THREE.InstancedMesh(new THREE.PlaneGeometry(1,1).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({map:ART_blobTex(),color:0,transparent:true,opacity:.7,depthWrite:false,fog:false,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}),8);im.count=0;im.frustumCulled=false;im.renderOrder=1;im.userData.keep=1;scene.add(im);return ART4.ty=im}
 function ART4_foam(){if(ART4.fm)return ART4.fm;const im=new THREE.InstancedMesh(new THREE.CircleGeometry(1,12).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.75,depthWrite:false,fog:false}),90);im.count=90;im.frustumCulled=false;im.userData.keep=1;ART4.fp=[];for(let i=0;i<90;i++){ART4.fp.push({x:0,y:-999,z:0,a:0,s:0});im.setMatrixAt(i,new THREE.Matrix4().makeScale(0,0,0))}ART4.fi=0;ART4.ft=0;scene.add(im);return ART4.fm=im}
+// W8 (v87f): boats sit IN the water. Boat mode kept the street car's ride-height offset (0 to 0.58 m depending on the garage set), so set
+// boats rode high. Now the hull bottom sits W8B.sink below the local wave surface every frame (world metres, through the live transform chain).
+const W8B={bb:new Map(),sink:.22,v:new THREE.Vector3(),q:new THREE.Quaternion(),sc:new THREE.Vector3(),M:new THREE.Matrix4(),T:new THREE.Matrix4()};
+function W8_boatY(s,ud){const g=ud.gbV&&ud.gbV.boat,host=ud.m,P=host.parent;if(!g||!P)return host.position.y;let n=0;g.traverse(m=>{if(m.isMesh&&m.geometry.attributes.position)n+=m.geometry.attributes.position.count});
+  const key=g.uuid+'|'+n;let B=W8B.bb.get(key);P.updateWorldMatrix(true,false);const y0=host.position.y;host.position.y=0;host.updateMatrixWorld(true);
+  if(!B){B=new THREE.Box3();W8B.M.copy(g.matrixWorld).invert();g.traverse(m=>{if(!m.isMesh||m.userData.a8s||m.material&&m.material.transparent&&m.material.opacity<.6)return;const pa=m.geometry.attributes.position;if(!pa)return;
+    W8B.T.multiplyMatrices(W8B.M,m.matrixWorld);for(let i=0;i<pa.count;i++)B.expandByPoint(W8B.v.fromBufferAttribute(pa,i).applyMatrix4(W8B.T))});
+   if(B.isEmpty()){host.position.y=y0;return y0}W8B.bb.set(key,B);if(W8B.bb.size>20)W8B.bb.delete(W8B.bb.keys().next().value)}
+  let lo=1e9;for(let i=0;i<8;i++){W8B.v.set(i&1?B.max.x:B.min.x,i&2?B.max.y:B.min.y,i&4?B.max.z:B.min.z).applyMatrix4(g.matrixWorld);if(W8B.v.y<lo)lo=W8B.v.y}
+  P.matrixWorld.decompose(W8B.v,W8B.q,W8B.sc);const sy=W8B.sc.y||1,water=RO.y+waveH(RO.x,RO.z,T)*Math.min(1,s.boatK||0)+Math.sin((s.bob||0)*.55)*.05;
+  host.position.y=y0;return(water-W8B.sink-lo)/sy}
 roamPose=(f=>function(s,dt){f(s,dt);try{const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m||s!==pl)return;const boat=(s.boatK||0)>.5;
   if(s.air){if(ART4.ty)ART4.ty.count=0;return}
-  if(!boat){const base=ART4_base(s,ud,false);const land=(RO.landK||0);ud.m.position.y=base-land*.18}
+  if(!boat){const base=ART4_base(s,ud,false);const land=(RO.landK||0);ud.m.position.y=base-land*.18}else ud.m.position.y=W8_boatY(s,ud);
   // front wheels steer (front = -z), spin order keeps the steer axis vertical
   const st=-(CTL.steer||0)*.42;let n=0;const T=ART4_tyres();
   for(const w of ud.gbM||[]){if(!w.userData.r||!ART4_vis(w))continue;if(w.position.z<-.2){w.rotation.order='YXZ';w.rotation.y=st}
