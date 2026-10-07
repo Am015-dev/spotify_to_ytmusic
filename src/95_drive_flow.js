@@ -60,7 +60,7 @@ if(DR.on){
    const fl=Math.max(Math.abs(v0)*.95,DR.vref*.85);if(Math.abs(RO.v)<fl)RO.v=Math.sign(v0)*fl}}}
  {const _bt=buildHubTraffic;buildHubTraffic=()=>{_bt();try{DR_traffic()}catch(e){console.warn('DR traffic',e)}}}
  {const _ht=hubTrafficStep;hubTrafficStep=dt=>{_ht(dt);try{DR_unjam(dt)}catch(e){}}}}
-function DR_traffic(){const C=HUB.cars;if(!C||!C.length)return;const n0=C.length,keep=C.filter((c,i)=>c.tr||i%2===0);for(const c of C)if(!keep.includes(c)){_m.makeScale(0,0,0);HUB.cim[c.k].setMatrixAt(c.j,_m)}
+function DR_traffic(){const C=HUB.cars;if(!C||!C.length)return;const n0=C.length,keep=C.filter((c,i)=>c.tr||i%2===0&&(TUNE.traf>=1||DR_h(i,7)<TUNE.traf)||i%2===1&&TUNE.traf>1&&DR_h(i,7)<TUNE.traf-1);for(const c of C)if(!keep.includes(c)){_m.makeScale(0,0,0);HUB.cim[c.k].setMatrixAt(c.j,_m)}
   const per={};for(const c of keep.slice().sort((a,b)=>a.k-b.k||a.j-b.j)){c.j=per[c.k]=(per[c.k]??-1)+1;c.lane=.36}
   HUB.cim.forEach((im,k)=>{im.count=(per[k]??-1)+1;im.instanceMatrix.needsUpdate=true});C.length=0;C.push(...keep);DR.st.cars=[n0,C.length]}
 // a car stopped for 8 s that the player cannot see (behind or > 60 m) is recycled: queues never grow into walls

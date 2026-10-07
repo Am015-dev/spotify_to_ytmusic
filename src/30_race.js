@@ -249,7 +249,7 @@ const dailyLabel=c=>{const t=TRACK_DEFS.find(x=>x.id===c.track),m=MOODS.find(x=>
 const medalPts=()=>Object.values(career()).reduce((a,m)=>a+m,0);
 // R15: races are faster for everyone (top +20 %, acceleration +35 %); free roam keeps its own physics
 const R15_SPD=1.2,R15_ACC=1.35;const R15_on=()=>RC&&RC.type!=='roam';
-function makeShip(team,isPlayer,name,skill){const mesh=shipMesh(team);scene.add(mesh);const rk=R15_on()?R15_SPD:1,top=BASE_TOP*cls.mul*team.top*rk;
+function makeShip(team,isPlayer,name,skill){const mesh=shipMesh(team);scene.add(mesh);const rk=R15_on()?TUNE.rSpd:1,top=BASE_TOP*cls.mul*team.top*rk;
   return{team,isPlayer,name,skill,mesh,dist:0,x:0,yaw:0,beta:0,yawRate:0,v:0,hull:100,item:null,
     stats:{top,top0:BASE_TOP*cls.mul*rk,acc:8.4*cls.mul*team.acc*(R15_on()?R15_ACC:1),brake:8+cls.mul,han:team.han,hull:team.hull},
     lap:-1,lapStart:0,best:Infinity,laps:[],finished:false,finishTime:0,dead:0,shield:0,turbo:0,boost:0,inv:0,roll:0,rollV:0,laneBias:rr(-4,4)*CR_LS,rubber:1,wall:0,wrong:0,place:1,bob:R()*6,aiFire:0,lastHit:-9,
@@ -301,7 +301,7 @@ function ctlPlayer(dtR){const pad=navigator.getGamepads?[...navigator.getGamepad
     if(pad.buttons[0]?.pressed&&!PAD.b0)pressed.fire=true;if(pad.buttons[2]?.pressed&&!PAD.b2&&Math.abs(ax)>.4)pressed.roll=Math.sign(ax);if(pad.buttons[3]?.pressed&&!PAD.b3)cycleCam();if(pad.buttons[9]?.pressed&&!PAD.b9)togglePause();
     PAD.b0=pad.buttons[0]?.pressed;PAD.b2=pad.buttons[2]?.pressed;PAD.b3=pad.buttons[3]?.pressed;PAD.b9=pad.buttons[9]?.pressed}
   if(document.body.dataset.tc!==SET.touch)document.body.dataset.tc=SET.touch;{const te=thrEff();if(document.body.dataset.thr!==te)document.body.dataset.thr=te}
-  if(TOUCH.on&&TOUCH.used){if(TOUCH.park&&(state!=='roam'||TOUCH.boost))parkSet(false);thr=TOUCH.brake||TOUCH.park||thrEff()==='pedal'&&!TOUCH.gas?0:1;brk=TOUCH.brake?1:0;if(SET.touch==='buttons'){TOUCH.target=TOUCH.dir;const up=TOUCH.dir&&Math.sign(TOUCH.dir)===Math.sign(TOUCH.steer||TOUCH.dir);const rp=SENS().ramp;if(state==='roam'){const dd=Math.min(dtR||H,.05),r1=rp*.8;TOUCH.kick=0;if(up){if(TOUCH.steer*TOUCH.dir<W14_ST.k0)TOUCH.steer=TOUCH.dir*W14_ST.k0;TOUCH.steer+=clamp(TOUCH.dir-TOUCH.steer,-r1*W14_ST.rk*dd,r1*W14_ST.rk*dd)}else{const rb=TOUCH.dir?14:7;TOUCH.steer+=clamp(TOUCH.dir-TOUCH.steer,-rb*dd,rb*dd)}}else{if(TOUCH.kick){const k0=[.42,.5,.58,.66,.75][clamp((SET.sens|0)-1,0,4)];if(TOUCH.steer*TOUCH.kick<k0)TOUCH.steer=TOUCH.kick*k0;TOUCH.kick=0}TOUCH.steer+=clamp(TOUCH.dir-TOUCH.steer,-(up?rp*1.8:16)*H,(up?rp*1.8:16)*H)}}else if(SET.touch==='tilt'){TOUCH.target=TILT.v;TOUCH.steer+=(TILT.v-TOUCH.steer)*Math.min(1,H*8)}else TOUCH.steer+=((TOUCH.target||0)-TOUCH.steer)*Math.min(1,H*(TOUCH.sid!=null?9:14));if(Math.abs(TOUCH.steer)<.004)TOUCH.steer=0;if(TOUCH.sid!=null||TOUCH.steer||TOUCH.dir)steer=TOUCH.steer;boost=Math.max(boost,TOUCH.boost?1:0);
+  if(TOUCH.on&&TOUCH.used){if(TOUCH.park&&(state!=='roam'||TOUCH.boost))parkSet(false);thr=TOUCH.brake||TOUCH.park||thrEff()==='pedal'&&!TOUCH.gas?0:1;brk=TOUCH.brake?1:0;if(SET.touch==='buttons'){TOUCH.target=TOUCH.dir;const up=TOUCH.dir&&Math.sign(TOUCH.dir)===Math.sign(TOUCH.steer||TOUCH.dir);const rp=SENS().ramp;if(state==='roam'){const dd=Math.min(dtR||H,.05),r1=rp*.8;TOUCH.kick=0;if(up){if(TOUCH.steer*TOUCH.dir<W14_ST.k0)TOUCH.steer=TOUCH.dir*W14_ST.k0;TOUCH.steer+=clamp(TOUCH.dir-TOUCH.steer,-r1*W14_ST.rk*dd,r1*W14_ST.rk*dd)}else{const rb=TOUCH.dir?TUNE.tRet:7;TOUCH.steer+=clamp(TOUCH.dir-TOUCH.steer,-rb*dd,rb*dd)}}else{if(TOUCH.kick){const k0=[.42,.5,.58,.66,.75][clamp((SET.sens|0)-1,0,4)];if(TOUCH.steer*TOUCH.kick<k0)TOUCH.steer=TOUCH.kick*k0;TOUCH.kick=0}TOUCH.steer+=clamp(TOUCH.dir-TOUCH.steer,-(up?rp*1.8:16)*H,(up?rp*1.8:16)*H)}}else if(SET.touch==='tilt'){TOUCH.target=TILT.v;TOUCH.steer+=(TILT.v-TOUCH.steer)*Math.min(1,H*8)}else TOUCH.steer+=((TOUCH.target||0)-TOUCH.steer)*Math.min(1,H*(TOUCH.sid!=null?9:14));if(Math.abs(TOUCH.steer)<.004)TOUCH.steer=0;if(TOUCH.sid!=null||TOUCH.steer||TOUCH.dir)steer=TOUCH.steer;boost=Math.max(boost,TOUCH.boost?1:0);
     // holding full lock opens the airbrake on that side: a drift
     if(SET.touch==='drag'&&Math.abs(TOUCH.steer)>.93){TOUCH.lock+=H;if(TOUCH.lock>.45){if(TOUCH.steer<0)abL=1;else abR=1}}else TOUCH.lock=0}
   if(mirror){steer=-steer;const t=abL;abL=abR;abR=t}
@@ -397,7 +397,7 @@ function C26_aiDrive(s,k,vmax,xt,sk){const st=s.stats,px=s.x;if(s.crXT==null||Ma
   const ds=s.v*Math.cos(s.beta)*H/Math.max(.35,1-k*s.x);s.x+=s.v*Math.sin(s.beta)*H;s.dist+=ds;s.yaw-=k*ds;s.beta-=k*ds;s.yaw=clamp(s.yaw,-1.2,1.2);s.beta=clamp(s.beta,-1.2,1.2);
   {const B=R15_b(s,px);if(s.x>B[1]||s.x<B[0]){const sg=s.x>B[1]?1:-1;s.x=sg>0?B[1]:B[0];if(Math.sin(s.beta)*sg>0){s.v*=1-Math.min(.5,Math.abs(Math.sin(s.beta))*1.5);s.beta*=.3;s.yaw*=.4;s.yawRate*=.3}}}
   s.latV=(s.x-px)/H}
-function physAI(s){const st=s.stats,sk=s.skill*s.rubber;frameAt(TD,s.dist,F);const k=F.k;
+function physAI(s){const st=s.stats,sk=s.skill*(TUNE.rub===1?s.rubber:1+(s.rubber-1)*TUNE.rub);frameAt(TD,s.dist,F);const k=F.k;
   s.aiN=(s.aiN||0)-H;s.aiNcd=(s.aiNcd??rr(4,9))-H;if(s.aiNcd<=0&&Math.abs(kAt(TD,s.dist+80))<1/600&&RC.type!=='attract'){s.aiN=rr(1.8,3);s.aiNcd=rr(5,10)*(1.15-sk*.2)}
   s.nitro=s.aiN>0;
   let vmax=st.top*sk*(s.turbo>0?1.2:1)*(s.boost>0?1.12:1)*(s.nitro?1.26:1)*(s.r15k||1);const look=Math.max(80,s.v*1.8);

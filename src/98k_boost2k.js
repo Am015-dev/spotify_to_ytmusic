@@ -54,7 +54,7 @@ window.B2K_RDMIN=16.7; // m/s
   const m=document.createElement('div');m.id='b2kM';m.innerHTML='<div id="b2kT">BRICKBASH!</div><div class="b"><i></i><u></u></div>';document.body.appendChild(m);B2K.el=m})();
 function B2K_pop(txt,col){const m=B2K.el;if(!m)return;const p=document.createElement('div');p.className='b2kPop';p.textContent=txt;p.style.color=col;p.style.left=(m.childElementCount%2?'72%':'4%');m.appendChild(p);setTimeout(()=>p.remove(),1150)}
 function B2K_hud(bm){const m=B2K.el;if(!m)return;const vis=(state==='roam'&&!RO.mapOpen&&!RO.card&&!RO.story&&!RO.frozen||state==='race')&&!!pl;m.classList.toggle('on',vis);if(!vis)return;
-  B2K.dmS+=(B2K.dm-B2K.dmS)*.35;const bb=m.children[1],b0=clamp(bm,0,100);bb.children[0].style.width=b0.toFixed(1)+'%';bb.children[1].style.left=b0.toFixed(1)+'%';bb.children[1].style.width=Math.min(B2K.dmS*B2K_CONV,100-b0).toFixed(1)+'%'; // one bar: cyan = meter, pink = what the drift will add
+  B2K.dmS+=(B2K.dm-B2K.dmS)*.35;const bb=m.children[1],b0=clamp(bm,0,100);bb.children[0].style.width=b0.toFixed(1)+'%';bb.children[1].style.left=b0.toFixed(1)+'%';bb.children[1].style.width=Math.min(B2K.dmS*TUNE.drConv,100-b0).toFixed(1)+'%'; // one bar: cyan = meter, pink = what the drift will add
   m.classList.toggle('full',bm>=99);m.classList.toggle('dr',B2K.dm>1);m.classList.toggle('bash',B2K.bash);m.children[0].classList.toggle('on',B2K.bash);
   if((++B2K.fr&15)===0){const q=document.getElementById('roamPrompt');let ov=false;if(q&&!q.hidden&&q.offsetWidth){const a=m.getBoundingClientRect(),b=q.getBoundingClientRect();ov=Math.min(a.right,b.right)-Math.max(a.left,b.left)>6&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>6}m.classList.toggle('dim',ov)}
   if(B2K.pulse>0){B2K.pulse=0;m.classList.remove('pulse');void m.offsetWidth;m.classList.add('pulse')}}
@@ -104,13 +104,13 @@ function B2K_trail(s,on,dt){if(!s||!s.mesh)return;const par=s.mesh.parent||scene
     for(let i=L.length;i<T.N;i++){const o=((sd*T.N+i)*2)*3,l=L[L.length-1];if(l){pos[o]=pos[o+3]=l.p.x;pos[o+1]=pos[o+4]=l.p.y;pos[o+2]=pos[o+5]=l.p.z}}}
   T.g.attributes.position.needsUpdate=true;T.g.attributes.color.needsUpdate=true;T.m.visible=T.pts[0].length+T.pts[1].length>0}
 // ---- shared per-frame logic (roam + race): drift bar, conversion, burst, Brickbash, FX, HUD
-function B2K_drift(s,on,slip,sp,dt){if(on){const r=24*clamp(sp/22,.5,1.3)*(.55+Math.min(1,slip/.45)*.65);B2K.dm=Math.min(100,B2K.dm+r*dt);B2K.dT+=dt;B2K.slS+=slip;B2K.slN++;B2K.slMax=Math.max(B2K.slMax,slip)}}
-function B2K_driftEnd(s){if(B2K.dT<=0)return;const b0=s.bm;s.bm=Math.min(100,s.bm+B2K.dm*B2K_CONV);const g=s.bm-b0;
+function B2K_drift(s,on,slip,sp,dt){if(on){const r=TUNE.drFill*clamp(sp/22,.5,1.3)*(.55+Math.min(1,slip/.45)*.65);B2K.dm=Math.min(100,B2K.dm+r*dt);B2K.dT+=dt;B2K.slS+=slip;B2K.slN++;B2K.slMax=Math.max(B2K.slMax,slip)}}
+function B2K_driftEnd(s){if(B2K.dT<=0)return;const b0=s.bm;s.bm=Math.min(100,s.bm+B2K.dm*TUNE.drConv);const g=s.bm-b0;
   B2K.log.drift.push({s:+B2K.dT.toFixed(2),bar:+B2K.dm.toFixed(1),boost:+g.toFixed(1),slipAvg:+(B2K.slS/Math.max(1,B2K.slN)*57.3).toFixed(1),slipMax:+(B2K.slMax*57.3).toFixed(1)});if(B2K.log.drift.length>40)B2K.log.drift.shift();
   if(g>=1){B2K_pop('+'+Math.round(g)+' BOOST','#ff8ad0');B2K.pulse=1}B2K.dm=0;B2K.dT=0;B2K.slS=0;B2K.slN=0;B2K.slMax=0}
 function B2K_boost(s,boosting,bm0,dt,roam){if(boosting&&!B2K.wasB&&bm0>=99){B2K.log.burst++;fovKick=Math.max(fovKick,15);shake=Math.max(shake,.25);try{AU.sfx('boost')}catch(e){}B2K_pop('FULL BOOST!','#7ff3ff');
     if(roam)RO.bRamp=1;else s.boost=Math.max(s.boost||0,.25)}
-  B2K.bt=boosting?B2K.bt+dt:0;const bash=boosting&&B2K.bt>=B2K_BASHT;if(bash&&!B2K.bash){B2K.log.bash++;try{AU.sfx('finish')}catch(e){}fovKick=Math.max(fovKick,12);shake=Math.max(shake,.3)}B2K.bash=bash;
+  B2K.bt=boosting?B2K.bt+dt:0;const bash=boosting&&B2K.bt>=TUNE.bashT;if(bash&&!B2K.bash){B2K.log.bash++;try{AU.sfx('finish')}catch(e){}fovKick=Math.max(fovKick,12);shake=Math.max(shake,.3)}B2K.bash=bash;
   if(bash){s.bm=Math.min(100,s.bm+8*dt);if(roam){RO.turbo=Math.max(RO.turbo||0,.12);RO.inv=Math.max(RO.inv||0,.15)}else s.boost=Math.max(s.boost||0,.12)}B2K.wasB=boosting}
 // Brickbash in roam: traffic within reach is knocked aside (tumble + debris) instead of stopping the car
 function B2K_bashPush(){if(!B2K.bash||!HUB||!HUB.cars)return;const fx=Math.sin(RO.h),fz=Math.cos(RO.h);for(const c of HUB.cars){if(c.dead||c.x==null)continue;const dx=c.x-RO.x,dz=c.z-RO.z,d=Math.hypot(dx,dz);
@@ -122,8 +122,8 @@ function B2K_bashPush(){if(!B2K.bash||!HUB||!HUB.cars)return;const fx=Math.sin(R
   B2K_bashPush();const bm0=s.bm,d0=RO.dDir,t0=RO.dT||0;{const L=B2K.log;L.stk=L.stk||[];if(Math.abs(RO.v)<1.4&&!RO.card&&!RO.story){B2K.stT=(B2K.stT||0)+dt;if(B2K.stT>2&&!B2K.stOn){B2K.stOn=1;if(L.stk.length<20)L.stk.push({x:Math.round(RO.x),z:Math.round(RO.z),lastDrift:+(B2K.tD||0).toFixed(1),bash:B2K.bash,boostT:+(B2K.tB0||0).toFixed(1),hp:Math.round(RO.hp??100),wk:!!RO.wk})}}else{B2K.stT=0;B2K.stOn=0}B2K.tD=RO.dDir?0:(B2K.tD||0)+dt;B2K.tB0=CTL&&CTL.boost?0:(B2K.tB0||0)+dt}const r=f0.apply(this,arguments);try{
   const boosting=!!(CTL&&CTL.boost)&&bm0>1&&!RO.card&&!RO.mapOpen&&!RO.story;
   // take back the old drift trickle (8/s) and end bonus (6 per tier): the drift bar pays out instead
-  let take=(RO.dDir?8*dt:0)+(d0&&!RO.dDir?6*(t0>2?3:t0>1.1?2:t0>.5?1:0):0);if(take>0){const base=boosting?Math.max(0,bm0-22*dt):Math.min(100,bm0+((RO.bIdle||0)>.5?FL_RECH*dt:0));s.bm-=Math.min(take,Math.max(0,s.bm-base))}
-  if(!boosting&&!RO.dDir&&(RO.bIdle||0)>.5&&s.bm<100)s.bm=Math.max(bm0,s.bm-(FL_RECH-B2K_REGEN)*dt);
+  let take=(RO.dDir?8*dt:0)+(d0&&!RO.dDir?6*(t0>2?3:t0>1.1?2:t0>.5?1:0):0);if(take>0){const base=boosting?Math.max(0,bm0-TUNE.bDrain*dt):Math.min(100,bm0+((RO.bIdle||0)>.5?FL_RECH*dt:0));s.bm-=Math.min(take,Math.max(0,s.bm-base))}
+  if(!boosting&&!RO.dDir&&(RO.bIdle||0)>.5&&s.bm<100)s.bm=Math.max(bm0,s.bm-(FL_RECH-TUNE.bRegen)*dt);
   const sp=Math.abs(RO.v),slip=Math.abs(angDiff(RO.h,RO.vh??RO.h));B2K_drift(s,!!RO.dDir,slip,sp,dt);if(d0&&!RO.dDir)B2K_driftEnd(s);
   B2K_boost(s,boosting,bm0,dt,true);B2K_turbines(s,boosting||B2K.bash,dt);B2K_trail(s,!!RO.dDir&&!(s.air),dt);
   if(B2K.bash&&R()<.5)emit(SPARK,V3(RO.x+rr(-2,2),RO.y+rr(.5,2),RO.z+rr(-2,2)),V3(rr(-3,3),rr(1,4),rr(-3,3)),.3,new THREE.Color(2.6,1.8,.4))}catch(e){B2K.err=String(e)}B2K_hud(s.bm);return r}}
