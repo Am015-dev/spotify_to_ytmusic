@@ -102,7 +102,7 @@ function hlpFaceNote(p,f,m){const nm=f,occ=G.city>=0?P(G.city):null,c=G.dice.fil
   if(f==='H')return 'Hearts heal you outside Downtown.';
   return 'It is part of the best set.'}
 // dice still flying or spinning: a finger would point at the middle of the air
-function hlpBusy(){return !!(BF.spin&&bfNow()<BF.spin.end)||[...document.querySelectorAll('#dice .die')].some(d=>d.getAnimations&&d.getAnimations().length>0)}
+function hlpBusy(){return !!(BF.spin&&bfNow()<BF.spin.end)||!!document.querySelector('#dice .die.spin')}
 function hlpSuggest(){
   const ph=hlpPhase();if(!ph||ph==='watch'||!G)return null;const p=cur();let a;try{a=advise()}catch(e){return null}
   if(ph==='intro')return {target:()=>HLP_Q('#choice [data-a="story"]'),why:'Read the card, then start your turn.'};
