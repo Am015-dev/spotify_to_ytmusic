@@ -13,7 +13,7 @@ function campTwist(def){const t=def.twist;if(!t||!G)return;const b=campBoss(),h=
 function campStart(def){const s=def.setup||{},op=def.opponent||{},opens=def.twist&&def.twist.id==='boss-opens';
   const seats=opens?['ai','human']:['human','ai'],lv=seats.map(x=>x==='ai'?(op.aiLevel||'normal'):'normal');const names=seats.map(x=>x==='ai'?(op.name||'Rival'):undefined);
   UI.camp=def;UI.lastOpts={camp:def,np:2,seats,lv,names,ex:s.ex||{},seed:s.seed};
-  beginGame(UI.lastOpts);campTwist(def);refresh();UI.stepKey='';render()}
+  beginGame(UI.lastOpts);if(def.hints&&typeof GXH!=='undefined'){GXH.setEnabled(true);GXH.reset()}campTwist(def);refresh();UI.stepKey='';render()}
 function campFinish(){try{const c=UI.camp;const p=GXC.finish(G);UI.camp=null;return p}catch(e){console.error(e);UI.camp=null}}
 function campOpen(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;GXC.open()}
 (function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;

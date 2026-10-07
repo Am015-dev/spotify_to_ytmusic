@@ -29,7 +29,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .seat.bump b{animation:bump .6s}
 @keyframes bump{30%{transform:scale(1.5);color:#ffd99a}}
 #left{flex:0 0 auto;font-size:.9rem;display:flex;align-items:center;gap:3px;opacity:.95}
-#menubtn{flex:0 0 auto;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,220,160,.35);background:rgba(255,230,190,.1);color:#fbecd2;font-size:22px;line-height:1;padding:0;display:grid;place-items:center}
+#menubtn,#bulbbtn{flex:0 0 auto;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,220,160,.35);background:rgba(255,230,190,.1);color:#fbecd2;font-size:22px;line-height:1;padding:0;display:grid;place-items:center}
 /* ---- board ---- */
 #main{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
 #board{position:relative;flex:1 1 auto;min-height:0;overflow:hidden;touch-action:none;cursor:grab;background:radial-gradient(ellipse at 50% 40%,#c9b682,#a8935c 80%)}
@@ -92,6 +92,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .menu{position:fixed;right:calc(8px + env(safe-area-inset-right));top:calc(52px + env(safe-area-inset-top));z-index:31;background:var(--paper);border:3px solid var(--gold);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.5);padding:6px;display:flex;flex-direction:column;min-width:210px}
 .menu button{border:0;background:none;text-align:left;padding:11px 12px;font-weight:700;font-size:1rem;border-radius:9px}
 .menu button:active{background:var(--paper2)}
+.menu{max-height:calc(100dvh - 60px);overflow:auto}
+.menu .gxh-set{padding:4px 8px;margin:2px 0;font-weight:700;font-size:1rem}
 .drawer ul{margin:0;padding-left:20px;text-align:left;line-height:1.4}
 .drawer li{margin:5px 0}
 .rescore{display:flex;gap:14px;justify-content:center;font:800 1.9rem var(--ff)}

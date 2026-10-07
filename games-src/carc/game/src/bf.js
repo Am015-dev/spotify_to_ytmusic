@@ -72,7 +72,7 @@ function renderFigSpots(){for(const e of [...$('#ov').children])if(e.classList.c
       addOv(b,wx,wy,{dx:ms.length>1?(i-(ms.length-1)/2)*50:0});b._m=m;UI.figs.push(b)})}
   placeOverlay()}
 // ---------- ghost finger (first game, and chapters that give hints): points at the move the computer would pick ----------
-function hintOn(){return !!(UI.camp?UI.camp.hints:(UI.first&&UI.humanTurns<2))}
+function hintOn(){return false}   // no advice on its own: the lightbulb (hlp.js) gives it on demand, coach bubbles only the first time
 function showGhost(wx,wy,vx,vy,dx){const old=$('#ghost');if(old)old.remove();if(wx==null&&vx==null)return;
   const g=document.createElement('div');g.id='ghost';g.innerHTML='<svg viewBox="0 0 48 48" width="44" height="44"><path d="M19 4c2 0 3.5 1.4 3.5 3.3V19l1.8-.8c1.3-.5 2.8.2 3.2 1.5l.3.9 2.2-.7c1.4-.4 2.8.4 3.2 1.8l.4 1.1c1.8-.4 3.4.7 3.7 2.4.8 4.4.5 8.4-1.1 11.6-1.5 3-4.2 5-8.3 5H24c-3.3 0-5.6-1.3-7.6-4.2L10.2 28c-.7-1.2-.3-2.8.9-3.5 1.1-.6 2.5-.4 3.3.6l1.1 1.3V7.3C15.5 5.4 17 4 19 4z" fill="#fff" stroke="#3a2610" stroke-width="2.2" stroke-linejoin="round"/></svg>';
   g.style.cssText='position:fixed;left:0;top:0;z-index:20;pointer-events:none';
@@ -115,7 +115,7 @@ function syncTurn(){if(!G||G.over||!G.cur)return;const key=G.turn+':'+G.step;if(
   else if(myTurn('fig')){UI.legal=[];UI.hintFig=hintOn()?bestFigNow(G.cur.p,'normal'):null;if(!UI.user)zoomTile(G.cur.k,true)}
   else{UI.legal=[];UI.hint=null;UI.hintFig=null;if(G.step==='place'){UI.user=false;refit(true)}}}
 // ---------- the main render ----------
-function render(){if(!G)return;syncTurn();renderTop();renderTiles();renderGlows();renderMeeples();renderFigSpots();renderHand();renderStatus();updateGhost();placeOverlay();ensureGlowVisible();setTimeout(ensureGlowVisible,500)}
+function render(){if(!G)return;syncTurn();renderTop();renderTiles();renderGlows();renderMeeples();renderFigSpots();renderHand();renderStatus();updateGhost();placeOverlay();ensureGlowVisible();setTimeout(ensureGlowVisible,500);hlpAfter()}
 function save(){try{if(G&&!G.over&&G.pl.some(p=>p.human)&&!UI.camp)localStorage.setItem(SAVE,JSON.stringify(G));else localStorage.removeItem(SAVE)}catch(e){}}
 function refresh(){if(UI.sim||!G)return;render();save();playFx();if(G.over)finishUp();else schedAI()}
 // ---------- actions ----------
@@ -164,13 +164,13 @@ function showStart(){closeMenu();UI.endShown=false;const o=UI.setup,sv=savedGame
   m.querySelector('[data-a=play]').onclick=()=>beginGame();m.querySelector('[data-a=story]').onclick=()=>{if(typeof campOpen==='function')campOpen()};
   const c=m.querySelector('[data-a=cont]');if(c)c.onclick=loadSaved}
 function openMenu(){if($('#menu'))return closeMenu();const d=document.createElement('div');d.id='menu';d.className='menu';d.setAttribute('role','dialog');
-  d.innerHTML=`<button data-a="fit">Show the whole valley</button><button data-a="rules">How to play</button><button data-a="snd">Sound: ${SND.on?'on':'off'}</button><button data-a="mus">Music: ${SND.music?'on':'off'}</button><button data-a="spd">Computer speed: ${UI.speed>1?'fast':'normal'}</button><button data-a="story">Story</button><button data-a="new">New game</button>`;
-  document.body.appendChild(d);d.onclick=e=>{const b=e.target.closest('button');if(!b)return;const a=b.dataset.a;closeMenu();
+  d.innerHTML=`<button data-a="fit">Show the whole valley</button><button data-a="rules">How to play</button><button data-a="snd">Sound: ${SND.on?'on':'off'}</button><button data-a="mus">Music: ${SND.music?'on':'off'}</button><button data-a="spd">Computer speed: ${UI.speed>1?'fast':'normal'}</button><button data-a="story">Story</button><button data-a="new">New game</button>${typeof GXH!=='undefined'?GXH.settingsHTML():''}`;
+  document.body.appendChild(d);d.onclick=e=>{const b=e.target.closest('button');if(!b||b.dataset.gxh)return;const a=b.dataset.a;closeMenu();
     if(a==='fit')refit(true);else if(a==='rules')showRules();else if(a==='snd')toggleSound();else if(a==='mus')toggleMusic();else if(a==='spd'){UI.speed=UI.speed>1?1:3;try{localStorage.setItem('rv_fast',UI.speed>1?'1':'0')}catch(e){}}
     else if(a==='story'&&typeof campOpen==='function')campOpen();else if(a==='new'){UI.camp=null;showStart()}};
   setTimeout(()=>document.addEventListener('pointerdown',menuAway,true),0)}
 function menuAway(e){if(!e.target.closest('#menu,#menubtn'))closeMenu()}
-function closeMenu(){const d=$('#menu');if(d)d.remove();document.removeEventListener('pointerdown',menuAway,true)}
+function closeMenu(){const d=$('#menu');if(d)d.remove();document.removeEventListener('pointerdown',menuAway,true);if(d)hlpAfter()}
 function showRules(){$('#modal').innerHTML=`<div class="scrim"><div class="card drawer" role="dialog" aria-label="How to play"><h2>How to play</h2><ul><li>Draw a tile. Turn it, then lay it so every edge matches.</li><li>Then stand a follower on a road, town, priory or field, or skip.</li><li>Finish a road or town: its owner scores, the follower comes home.</li><li>A priory ringed by eight tiles scores 9.</li><li>At the end, farmers score 3 for each finished town beside their field.</li><li>Most points wins.</li></ul><button class="btn" data-a="x">Got it</button></div></div>`;$('#modal [data-a=x]').onclick=()=>{$('#modal').innerHTML=''}}
 // ---------- new game / continue ----------
 function beginGame(o){UI.camp=o&&o.camp?o.camp:null;if(o&&!o.camp||!o)o=o||setupOpts();UI.lastOpts=o;resetUI();DEFSEED=o.seed!=null?o.seed:null;newGame(o);$('#modal').innerHTML='';UI.humanTurns=0;refit(false)}
