@@ -18,5 +18,6 @@ const URL=process.argv[2]||'http://127.0.0.1:8766/local_dbg.html',OUT=process.ar
  await p.reload();await ready();await tap('#gbMenuBtn');await tap('#gbx .gbTabs button[data-t="paint"]');await shot('05_after_reload');await tap('#gbSave');
  await tap('#hcStory');
  for(let i=0;i<40;i++){await p.waitForTimeout(3000);const s=await p.evaluate(()=>__mho.state+'|'+!!(__mho.LD&&__mho.LD.on));if(s==='roam|false')break;for(const q of['#slotList .go','#m1Next']){const e=await p.$(q);if(e&&await e.isVisible())await tapEl(e)}if(i%5==0)console.log('wait',s)}
- for(let i=0;i<6;i++){const e=await p.$('#m1Next');if(e&&await e.isVisible())await tapEl(e);await p.waitForTimeout(1500)}await shot('06_world');
+ for(let i=0;i<14;i++){let hit=0;for(const l of[p.getByText('SKIP',{exact:false}),p.getByText('TAP TO CONTINUE'),p.locator('#m1Next')]){const e=l.first();if(await e.count()&&await e.isVisible()){await tapEl(await e.elementHandle());hit=1;break}}if(!hit&&i>3)break;await p.waitForTimeout(1500)}
+ await p.waitForTimeout(3000);await shot('06_world');if(process.env.CLOSE){await p.evaluate(()=>{const c=__dbg.camera,R=__mho.RO;window.__shooting=1});}
  console.log('ERR',errs.slice(0,8));await b.close()})();
