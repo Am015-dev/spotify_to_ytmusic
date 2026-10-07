@@ -8,7 +8,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
 const src=fs.readFileSync(path.join(__dirname,'tPlay.js'),'utf8');const INIT=eval('`'+/const INIT=`([\s\S]*?)`;/.exec(src)[1]+'`');
 const FASTM=process.env.FAST==='1',URL0=process.argv[2]||'http://127.0.0.1:8766/local_dbg.html',URL=FASTM&&!/fast=1/.test(URL0)?URL0+(URL0.includes('?')?'&':'?')+'fast=1':URL0;
 const OUT=process.argv[3]||'qa_w10';fs.mkdirSync(OUT,{recursive:true});const MODE=process.env.MODE||'phone',TEST=process.env.TEST||'both',SHOTS=process.env.SHOTS==='1';
-(async()=>{const b=await chromium.launch({executablePath:'/opt/pw-browsers/chromium',args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
+(async()=>{const b=await chromium.launch({args:['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
  const phone=MODE==='phone';const ctx=await b.newContext(phone?{viewport:{width:852,height:393},deviceScaleFactor:3,isMobile:true,hasTouch:true}:{viewport:{width:1440,height:900}});
  const p=await ctx.newPage();p.setDefaultTimeout(900000);const errs=[];p.on('pageerror',e=>errs.push(e.message.slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});
  await p.addInitScript(INIT);const cdp=await ctx.newCDPSession(p);let SYN=Date.now()/1000;if(FASTM){const s0=cdp.send.bind(cdp);cdp.send=(m,o)=>s0(m,m==='Input.dispatchTouchEvent'?{...o,timestamp:SYN}:o)}
@@ -84,7 +84,6 @@ const OUT=process.argv[3]||'qa_w10';fs.mkdirSync(OUT,{recursive:true});const MOD
    tTrace:A.filter((q,i)=>i%3===0).slice(0,25).map(q=>q.tc&&[+(((q.tc.x-c0.x)*fx+(q.tc.z-c0.z)*fz)).toFixed(2),+(q.v*3.6).toFixed(0),+(((q.x-c0.x)*fx+(q.z-c0.z)*fz)).toFixed(2)])})}
  if(TEST==='shots'){
   // low side view of the player car + a traffic car, and tyre-to-road gaps (player wheels, traffic wheel instances)
-  await p.evaluate(()=>{const D=__dbg;if(!D.__ovr){D.__ovr=1;const f=D.composer.render.bind(D.composer);const wrap=(...a)=>{const o=window.__camOv;if(o){D.camera.position.set(o[0],o[1],o[2]);D.camera.lookAt(o[3],o[4],o[5]);D.camera.updateMatrixWorld()}return f(...a)};D.composer.render=wrap;if(window.__fastR)window.__fastR=wrap}});
   const GAP=()=>{const M=__mho,R=M.RO,T=__dbg.THREE,B=new T.Box3(),m4=new T.Matrix4();const out={};
    if(M.pl&&M.pl.mesh){M.pl.mesh.updateMatrixWorld(true);let lo=1e9;M.pl.mesh.traverseVisible(o=>{if(o.isMesh&&o.userData&&o.userData.r&&o.geometry){if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();B.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);lo=Math.min(lo,B.min.y)}});out.player=lo<1e8?+(lo-M.gnd(R.x,R.z,R.y+.3)).toFixed(3):null}
    const c=M.HUB.cars[window.__tc];if(c){const im=M.HUB.cim[c.k],w=im&&im.userData.w;if(w){if(!w.geometry.boundingBox)w.geometry.computeBoundingBox();w.getMatrixAt(c.j,m4);B.copy(w.geometry.boundingBox).applyMatrix4(m4);out.traffic=+(B.min.y-M.gnd(c.x,c.z,c.y+.3)).toFixed(3)}}return out};
@@ -96,9 +95,11 @@ const OUT=process.argv[3]||'qa_w10';fs.mkdirSync(OUT,{recursive:true});const MOD
    if(!sel){sides.push({where,err:'no car'});continue}
    await place(sel.x-Math.sin(sel.h)*8,sel.z-Math.cos(sel.h)*8,sel.h);await tick(20);
    const gap=await p.evaluate(GAP);
+   if(where==='city'){await p.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}__tick(1)});await p.screenshot({path:path.join(OUT,`${MODE}_plain_${where}.jpg`),type:'jpeg',quality:70});await p.evaluate(()=>{window.__shooting=0;if(!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}})}
+   const camInfo=await p.evaluate(()=>{const c=__dbg.camera;return{p:c.position.toArray().map(v=>+v.toFixed(1)),near:c.near,far:c.far,R:[__mho.RO.x,__mho.RO.y,__mho.RO.z].map(v=>+v.toFixed(1))}});
    await p.evaluate(([x,z,h])=>{const M=__mho,R=M.RO,mx=(R.x+x)/2,mz=(R.z+z)/2,g=M.gnd(mx,mz,R.y+.3),sx=Math.cos(h),sz=-Math.sin(h);window.__camOv=[mx+sx*11,g+.9,mz+sz*11,mx,g+.7,mz]},[sel.x,sel.z,sel.h]);
-   const old=SHOTS;await (async()=>{await p.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}__tick(1)});await p.screenshot({path:path.join(OUT,`${MODE}_side_${where}.jpg`),type:'jpeg',quality:80});await p.evaluate(()=>{window.__shooting=0;window.__camOv=null;if(!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}})})();
-   sides.push({where,gap})}
+   const old=SHOTS;await (async()=>{await p.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}__tick(1);const o=window.__camOv,D=__dbg;D.camera.position.set(o[0],o[1],o[2]);D.camera.lookAt(o[3],o[4],o[5]);D.camera.updateMatrixWorld();D.composer.render()});await p.screenshot({path:path.join(OUT,`${MODE}_side_${where}.jpg`),type:'jpeg',quality:80});await p.evaluate(()=>{window.__shooting=0;window.__camOv=null;if(!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}})})();
+   sides.push({where,gap,camInfo})}
   res.sides=sides}
  res.errs=errs;fs.writeFileSync(path.join(OUT,`w10_${MODE}.json`),JSON.stringify(res,null,1));
  console.log(JSON.stringify({mode:MODE,sides:res.sides,brake:res.brake.map(({trace,...r})=>r),traffic:res.traffic.map(({tTrace,...r})=>r),errs:errs.slice(0,5)},null,0));await b.close()})().catch(e=>{console.error('ERR',e);process.exit(1)});
