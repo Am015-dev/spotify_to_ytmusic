@@ -90,7 +90,7 @@ async function helpFlow(page, H, issue, ctr, tap, responded, rnd) {
       if (wc(b.title) > 4) issue('bubble title over 4 words: ' + b.title); if (wc(b.text) > 20) issue('bubble text over 20 words (' + wc(b.text) + '): ' + b.text);
       if (!b.arrow || !b.ok) issue('bubble without arrow or Got it (' + hs.ph + ')');
       if (b.T) { const [l, t, r, bt] = b.r; if (l < b.T.right && r > b.T.left && t < b.T.bottom && bt > b.T.top) issue('bubble covers its target (' + hs.ph + ')'); }
-      for (const x of (await page.evaluate(GEOM)) || []) issue(x + ' (' + hs.ph + ')');
+      for (const x of (await page.evaluate(GEOM)) || []) { issue(x + ' (' + hs.ph + ')'); if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT + '/help_' + hs.ph + '_' + Date.now() + '.png' }).catch(() => { }); }
       await tap(...NEUTRAL); await new Promise(r => setTimeout(r, 140));
       if (await page.evaluate(() => !!document.querySelector('.gxh-bub'))) issue('bubble did not dismiss on a tap (' + hs.ph + ')');
       return true; } }

@@ -23,7 +23,7 @@ const hq=s=>()=>document.querySelector(s);
 const hfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&e.getBoundingClientRect().width)return e}return null};
 const HLP_STEPS={
  bid:{target:hfirst('#acts .sp-b.glow'),title:'Buy turn order',text:'Tap a glowing spot. Dearer spots play earlier; free spots cost nothing.',pic:()=>HP.spot('3🪙')},
- lift:{target:hfirst('#grid .tile.glow'),title:'Lift a group',text:'Tap a glowing tile to pick up everyone standing on it.',pic:()=>hpics([['tile','small'],'>',['meeple','merchant']])},
+ lift:{target:hfirst('#grid .tile.glow'),title:'Lift a group',text:'Tap a glowing tile to pick up everyone standing on it.',pic:()=>HP.meeple('merchant')},
  drop:{target:hfirst('#grid .tile.glow'),title:'Drop one by one',text:'Tap a glowing neighbour to drop one person there. The last must match a colour.',pic:()=>HP.meeple('builder')},
  collect:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Use your tribe',text:'Tap Collect. The power chips below are optional extras.',pic:()=>HP.meeple('vizier')},
  mason:{target:hfirst('#acts .ab.go','#acts .ab'),title:'Choose your pay',text:'Masons earn coins for blue tiles around you. A Mystic adds one Mason.',pic:()=>HP.coin('+')},
@@ -130,6 +130,7 @@ function hlpEl(m){if(!m)return null;const mv=s=>[...document.querySelectorAll('[
   if(m.act==='djinn')return [...document.querySelectorAll('[data-pw]')].find(b=>b.dataset.pw===JSON.stringify({k:m.k,pay:m.pay}))||mv(JSON.stringify(m));
   if(m.act==='item'){if(m.k==='flute'||m.k==='talisman')return document.querySelector('[data-pi="'+m.k+'"]');return mv(JSON.stringify(m))}
   if(m.act==='thief')return mv(JSON.stringify(m));
+  if(m.act==='tribe'&&m.kill){const k=m.kill;if(k.tile!=null)return tileEl(k.tile);if(k.pl!=null)return document.querySelector('#seats [data-seat="'+k.pl+'"]');return null}
   return fingerEl(m)}
 // why (<= 15 words), from what the move really does
 function capW(t,n){const w=String(t||'').replace(/\s+/g,' ').trim().split(' ');return w.length<=n?w.join(' '):''}
