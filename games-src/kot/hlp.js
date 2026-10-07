@@ -11,6 +11,7 @@ function hlpFit(t,alt){t=String(t||'').replace(/\s+/g,' ').trim();if(hlpWords(t)
 function hlpChoiceOn(){const c=UI.choice;const el=document.getElementById('choice');return c&&el&&!el.classList.contains('hidden')&&!UI.intro?c:null}
 function hlpPhase(){
   if(!G||G.winner||UI.info)return null;
+  if(document.querySelector('.gx-dock[data-bf="resolving"]'))return null;   // the dice are being resolved: nothing to decide, buttons hidden
   if(UI.intro)return 'intro';
   const c=hlpChoiceOn();
   if(c)return /secret power|^Evolution!/.test(c.title)?'power':/^Stay or yield/.test(c.title)?'yield':'choice';
@@ -119,5 +120,6 @@ function hlpSuggest(){
   GXH.init({game:'crown-city-smash',defaultOn:true,steps:HLP_STEPS,rules:HLP_ALL,avoid:'.sugg,.rec,#pacts .btn.primary,#choice .btn.primary,#pshop .ptile.ok'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
   const set=document.getElementById('gxhset');if(set)set.innerHTML=GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'});
+  const _pr=phRender;phRender=function(){const r=_pr.apply(this,arguments);try{if(G)GXH.phase(GX&&GX.open?null:hlpPhase())}catch(e){console.error(e)}return r};
   const _r=render;render=function(){const r=_r.apply(this,arguments);try{GXH.phase(GX&&GX.open?null:hlpPhase())}catch(e){console.error(e)}return r};
 }
