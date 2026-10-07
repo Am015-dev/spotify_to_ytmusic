@@ -1,6 +1,7 @@
 # Worker 9 handoff (branch alex/od-w9, from alex/od-w8 + live v87f; 2026-10-07)
 
-## Done: pART10 (v87g candidate), REVIEW sent to the reviewer at de443d8
+## Done: pART10 = v87g. Reviewer PASS on de443d8; DEPLOY sent to the coordinator at b64dc03 (out/v87g, built on live 5495c05)
+Reviewer follow-ups (not blocking): (1) the player car paint reads pink-magenta, not LEGO Bright Red #C91A09; A/B it with the 1.2 env cap. (2) Match the pose in Athens side-view A/Bs. (3) A white wake blob shows bottom-right in boat shots.
 - Only `src/97_art.js` (ART10 block at the end + the cloudsOn constants). Root causes:
   1. Pale lime grass + cyan facades = sky env sheen at grazing angles (grass rough .55, Kenney kits .55/metal .05). Now grass .95, kits .8 with metal 0 (`ART10_world`, run from the ART_hub wrapper).
   2. The env's lower half was sky blue (`ART.gnd`), so everything picked up blue from below. Now `[.24,.25,.27]`. (A green-grey value turned yellow traffic olive.)
