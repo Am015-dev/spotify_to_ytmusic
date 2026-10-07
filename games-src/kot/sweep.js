@@ -133,7 +133,7 @@ async function helpFlow(p, tag, st) {
         const R4 = [r.left, r.top, r.right, r.bottom], hit = (a, c) => a[0] < c.r && a[2] > c.l && a[1] < c.b && a[3] > c.t;
         return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: R4, T: tq && { l: tq.left, t: tq.top, r: tq.right, b: tq.bottom }, glow: cores.some(c => hit(R4, c)), inside: r.left >= -1 && r.top >= -1 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1 } }, hs.ph).catch(() => null);
       if (b) break; await p.waitForTimeout(80) }
-    if (!b && (await p.evaluate(ph => GXH.state().shown.includes(ph), hs.ph))) { helpTot.bubbles[hs.ph] = (helpTot.bubbles[hs.ph] || 0) + 1; return true } // shown, then a phase flicker took it down
+    if (!b && (await p.evaluate(ph => GXH.state().shown.includes(ph), hs.ph))) { helpTot.bubbles[hs.ph] = (helpTot.bubbles[hs.ph] || 0) + 1; { p._hp = 1; return true } } // shown, then a phase flicker took it down
     if (!b) { if ((await p.evaluate(() => hlpPhase())) !== hs.ph) seen.delete(hs.ph); else await fail(p, tag, 'help bubble', 'no coach bubble for phase ' + hs.ph + ' ' + JSON.stringify(await p.evaluate(() => ({ st: GXH.state(), t: !!HLP_STEPS[hlpPhase()].target() })))); }
     else {
       helpTot.bubbles[hs.ph] = (helpTot.bubbles[hs.ph] || 0) + 1;
@@ -146,13 +146,13 @@ async function helpFlow(p, tag, st) {
       if (Math.random() < .5) { if (!(await neutralTap(p))) await helpTap(p, '.gxh-bub .gxh-ok') } else await helpTap(p, '.gxh-bub .gxh-ok');
       await p.waitForTimeout(150);
       if (await p.evaluate(() => !!document.querySelector('.gxh-bub'))) await fail(p, tag, 'help bubble', 'did not dismiss on a tap (' + hs.ph + ')');
-      return true;
+      { p._hp = 2; return true }
     }
   }
   // 2) the lightbulb: the first time in every phase, then now and then
   if (hs.ph && (!seen.has('bulb:' + hs.ph) || Math.random() < .12) && (p._bulbN || 0) < 16) {
     seen.add('bulb:' + hs.ph); p._bulbN = (p._bulbN || 0) + 1; helpTot.bulbs++;
-    if (hs.ph === 'watch') { await p.evaluate(() => GXH.rules('watch')); await p.waitForTimeout(150); await rulesCheck(p, tag, 'watch'); return true } // the computer's turn has no advice: rules cards only
+    if (hs.ph === 'watch') { await p.evaluate(() => GXH.rules('watch')); await p.waitForTimeout(150); await rulesCheck(p, tag, 'watch'); { p._hp = 3; return true } } // the computer's turn has no advice: rules cards only
     for (let w = 0; w < 25 && (await p.evaluate(() => hlpBusy() || !!document.querySelector('#dice .die.spin,.gx-dock[data-bf="resolving"]'))); w++) await p.waitForTimeout(100); // let the dice settle
     const pre = await p.evaluate(PRE);
     if (!(await helpTap(p, '#bulbbtn'))) { await fail(p, tag, 'help bulb', 'no bulb button on screen'); return false }
@@ -183,7 +183,7 @@ async function helpFlow(p, tag, st) {
     if (after.g) await fail(p, tag, 'help bulb', 'help still on screen after dismissing (' + hs.ph + ')');
     if (hs.ph !== 'watch' && hs.ph !== 'intro' && after.sig !== pre.sig && st.humanTurn) console.log('DBGLOG', JSON.stringify(await p.evaluate(() => window.__log)));
     if (hs.ph !== 'watch' && hs.ph !== 'intro' && after.sig !== pre.sig && st.humanTurn) await fail(p, tag, 'help bulb', 'tapping the bulb changed the game (' + pre.sig + ' -> ' + after.sig + ') last neutral tap on ' + p._nt + ' last tap ' + p._lt + ' LOG ' + JSON.stringify(await p.evaluate(() => window.__log.slice(-8))));
-    return true;
+    { p._hp = 4; return true }
   }
   return false;
 }
@@ -201,7 +201,7 @@ async function play(p, tag, o) {
       await p.waitForTimeout(1500); const cvOk = await p.evaluate(() => { const st = document.getElementById('stage').getBoundingClientRect(); return !V3.on || (Math.abs(V3.r.domElement.clientWidth - st.width) < 3 && Math.abs(V3.r.domElement.clientHeight - st.height) < 3) }); if (!cvOk) await fail(p, tag, 'board not resized after rotation', 'canvas size differs from the board');
       await p.setViewportSize(vp); await p.waitForTimeout(900); rotated = 1; continue;
     }
-    const sig = await p.evaluate(SIG); if (sig !== last) { last = sig; lastAt = Date.now(); } else if (Date.now() - lastAt > 8000 && !st.busy) { await fail(p, tag, 'stuck >8s', JSON.stringify(await p.evaluate(() => { const e = document.querySelector('#pacts [data-act=end]'); if (!e) return 'no end btn'; const q = e.getBoundingClientRect(), h = document.elementFromPoint(q.left + q.width / 2, q.top + q.height / 2); return [Math.round(q.top), Math.round(q.height), h && (h.tagName + '.' + String(h.className).slice(0, 25) + '#' + h.id), getComputedStyle(e).visibility, e.disabled, document.querySelector('.gx-dock').dataset.bf] })) + ' ' + st.phase + ' ' + (st.humanTurn ? 'human' : 'computer') + ' ' + st.line + ' | br ' + p._br + ' picks ' + JSON.stringify(p._pks) + ' now@' + (Date.now() - t0) + ' | lastpick ' + JSON.stringify(p._pk) + ' | ' + await p.evaluate(() => JSON.stringify(GXH.state().cur) + ' sel=' + BF.sel + ' pop=' + PHN.pop + ' gx=' + (GX && GX.open))); lastAt = Date.now(); }
+    const sig = await p.evaluate(SIG); if (sig !== last) { last = sig; lastAt = Date.now(); } else if (Date.now() - lastAt > 8000 && !st.busy) { await fail(p, tag, 'stuck >8s', JSON.stringify(await p.evaluate(() => { const e = document.querySelector('#pacts [data-act=end]'); if (!e) return 'no end btn'; const q = e.getBoundingClientRect(), h = document.elementFromPoint(q.left + q.width / 2, q.top + q.height / 2); return [Math.round(q.top), Math.round(q.height), h && (h.tagName + '.' + String(h.className).slice(0, 25) + '#' + h.id), getComputedStyle(e).visibility, e.disabled, document.querySelector('.gx-dock').dataset.bf] })) + ' ' + st.phase + ' ' + (st.humanTurn ? 'human' : 'computer') + ' ' + st.line + ' | br ' + p._br + '/' + p._hp + ' picks ' + JSON.stringify(p._pks) + ' now@' + (Date.now() - t0) + ' | lastpick ' + JSON.stringify(p._pk) + ' | ' + await p.evaluate(() => JSON.stringify(GXH.state().cur) + ' sel=' + BF.sel + ' pop=' + PHN.pop + ' gx=' + (GX && GX.open))); lastAt = Date.now(); }
     if (st.gxc) { const g = await p.evaluate(() => { const b = [...document.querySelectorAll('.gxc button')].filter(e => e.offsetParent && !e.disabled); const pr = b.find(e => /go|primary/.test(e.className)) || b.find(e => /next|start|continue|fight|play|meet/i.test(e.textContent)) || b[0]; if (!pr) return null; const R = pr.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2 } }); if (g) await p.touchscreen.tap(g.x, g.y); await p.waitForTimeout(500); continue; }
     if (st.intro) { const ib = await p.evaluate(() => { const e = [...document.querySelectorAll('#choice button, #moment button, #advice button')].find(x => x.offsetParent && !x.disabled && /smash|go|play|ok|got it|start/i.test(x.textContent)); if (!e) return null; const R = e.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2 } }); if (ib) { await p.touchscreen.tap(ib.x, ib.y); await p.waitForTimeout(600); continue; } }
     if (!st.humanTurn && !st.choice) { p._br = 'comp'; await p.waitForTimeout(350); continue; } // the computer plays
