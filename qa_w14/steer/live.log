@@ -1,0 +1,7 @@
+EVA true
+QUEST false
+TSIDE {"side":-1,"n":21,"sum":-21,"lats":[-7.9,-7.9,-7.9,-7.9,-7.9,-7.9,-6.5,-7.2,-7.2,-7.9,-7.9,-7.2,-6.5,-7.9,-7.9,-7.9,-7.9,-7.9,-7.9,-7.9,-5]}
+RUNS {"city":{"L":1309.3684926678493,"x":1356.2173966738123,"z":-15.763086153303076,"h":2.068056445167728,"w":28},"ab":{"L":2458.854456651077,"x":4007.710525461848,"z":-5124.608131453624,"h":0.05457670211914671,"w":16}}
+START {"L":1309.3684926678493,"x":1408.950966803151,"z":-44.384242339140926,"h":2.068056445167728,"w":28,"s":80}
+ST {"kmh":30,"nm":"tap","vStart":30,"peakYr":0.15,"t63":0.08333333333333333,"overshootYr":0.004,"overPct":3,"signFlipsAfterRelease":0,"maxYawAccel":1.6,"maxDhDeg":0.14,"drift":false,"pinned":false,"airPct":0,"slipMaxDeg":0.1,"headingNetDeg":1.6}
+ST {"kmh":30,"nm":"hold","vStart":30,"peakYr":1.1,"t63":0.3333333333333333,"overshootYr":0,"overPct":0,"signFlipsAfterRelease":0,"maxYawAccel":5.5,"maxDhDeg":1.05,"drift":false,"pinned":false,"airPct":0,"slipMaxDeg":0.5,"headingNetDeg":-43.9}

@@ -1,0 +1,19 @@
+{
+ "60_hold": {
+  "kmh": 60,
+  "nm": "hold",
+  "vStart": 63,
+  "peakYr": 0.46,
+  "t63": 0.3,
+  "overshootYr": 0,
+  "overPct": 0,
+  "signFlipsAfterRelease": 0,
+  "maxYawAccel": 1.9,
+  "maxDhDeg": 0.44,
+  "drift": false,
+  "pinned": false,
+  "airPct": 100,
+  "slipMaxDeg": 14,
+  "headingNetDeg": -19.3
+ }
+}

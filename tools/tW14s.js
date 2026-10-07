@@ -55,14 +55,16 @@ const OUT=process.argv[3]||'qa_w13';fs.mkdirSync(OUT,{recursive:true});const TES
      const k=A.ab?'ab':'city';if(k==='city'){const ok=t=>{const c=__oc.ev('cityAt')(A.x+dx*t,A.z+dz*t);return c&&c.d<c.road.w/2};if(!(ok(5)&&ok(Math.min(tot,500)*.5)&&ok(Math.min(tot,500)-5)))continue}if(!out[k]||Math.min(tot,900)>Math.min(out[k].L,900))out[k]={L:tot,x:A.x,z:A.z,h:Math.atan2(dx,dz),w:(A.w||16)}}return out});
  res.runs=runs;console.log('RUNS',JSON.stringify(runs));
  // per-frame steering log
- await p.evaluate(()=>{const gc=__oc.ev('()=>CTL');window.__mon=()=>{if(!window.__logOn)return;const R=__mho.RO;const c=gc()||{};__L.push({t:performance.now(),st:+(c.steer||0).toFixed(3),yr:R.yr||0,h:R.h,vh:R.vh??R.h,v:R.v,x:R.x,z:R.z,dd:R.dDir||0,sk:R.stkT||0,cr:R.crTurn!=null?1:0,dl:R.dl||0,x26:R.c26x||0,hit:R.lastHit||0})}});
- const out={};const q=runs.city;const seqs={tap:[['L',.1]],hold:[['R',.8]],quick:[['L',.15],[null,.1],['R',.15],[null,.1],['L',.15]],lane:[['L',.35],[null,.05],['R',.35]]};
- for(const kmh of [30,60,90])for(const [nm,seq] of Object.entries(seqs)){
+ await p.evaluate(()=>{const gc=__oc.ev('()=>CTL'),rt=__oc.ev('roamTerr');window.__mon=()=>{if(!window.__logOn)return;const R=__mho.RO;const c=gc()||{};__L.push({t:performance.now(),st:+(c.steer||0).toFixed(3),yr:R.yr||0,h:R.h,vh:R.vh??R.h,v:R.v,x:R.x,z:R.z,dd:R.dDir||0,sk:R.stkT||0,cr:R.crTurn!=null?1:0,dl:R.dl||0,x26:R.c26x||0,hit:R.lastHit||0,y:R.y,g:rt(R.x,R.z,R.y+.3).g,vy:R.vy||0})}});
+ const out={};const q0=runs.city;const q=await p.evaluate(q=>{const R=__mho.RO,obs=[...(R.ramps||[]),...(R.pads||[])];const sx=Math.sin(q.h),sz=Math.cos(q.h);
+  for(let s=20;s<Math.min(q.L,1300)-260;s+=20){let ok=true;for(const o of obs){const dx=o.x-q.x,dz=o.z-q.z,a=dx*sx+dz*sz,l=Math.abs(dx*sz-dz*sx);if(a>s-30&&a<s+300&&l<25){ok=false;break}}
+   if(ok)return{...q,x:q.x+sx*(s-20),z:q.z+sz*(s-20),s}}return{...q,s:-1}},q0);console.log('START',JSON.stringify(q));const seqs={tap:[['L',.1]],hold:[['R',.8]],quick:[['L',.15],[null,.1],['R',.15],[null,.1],['L',.15]],lane:[['L',.35],[null,.05],['R',.35]]};
+ for(const kmh of (process.env.KMH||'30,60,90').split(',').map(Number))for(const [nm,seq] of Object.entries(seqs)){if(process.env.SEQS&&!process.env.SEQS.split(',').includes(nm))continue;
   const lane=await laneStart(q.x+Math.sin(q.h)*20,q.z+Math.cos(q.h)*20,q.h,3.2);await place(lane[0],lane[1],q.h);await apply({gas:true});
   let f=0;for(;f<60*15&&(await p.evaluate(()=>__mho.RO.v*3.6))<kmh;f+=2)await tick(2);
   // hold speed: gas pulses by speed during the manoeuvre
   await log(true);const ev=[];let fr=0;const step=async n=>{for(let g=0;g<n;g+=2){const v=await p.evaluate(()=>__mho.RO.v*3.6);await apply({gas:v<kmh});await tick(2);fr+=2}};
-  await step(10);for(const [k,t] of seq){if(k){ev.push(['dn',k,fr]);await apply({[k]:true})}await step(Math.round(t*60));if(k){ev.push(['up',k,fr]);await apply({[k]:false})}}await step(90);
+  await step(10);if(await p.evaluate(()=>__mho.RO.y>__oc.ev('roamTerr')(__mho.RO.x,__mho.RO.z,__mho.RO.y+.3).g+.5))console.log('WARN airborne at start');for(const [k,t] of seq){if(k){ev.push(['dn',k,fr]);await apply({[k]:true})}await step(Math.round(t*60));if(k){ev.push(['up',k,fr]);await apply({[k]:false})}}await step(90);
   const L=await log(false);
   // metrics
   const yr=L.map(o=>o.yr),dh=L.map((o,i)=>i?Math.abs(ad(o.h,L[i-1].h)):0);const peak=Math.max(...yr.map(Math.abs));const i0=ev[0][2]>>0;
@@ -70,6 +72,6 @@ const OUT=process.argv[3]||'qa_w13';fs.mkdirSync(OUT,{recursive:true});const TES
   const iu=ev.filter(e=>e[0]==='up').pop()[2];const s0=Math.sign(yr[iu-1]||yr[iu]||0);let over=0;for(let i=iu;i<L.length;i++)if(Math.sign(yr[i])===-s0)over=Math.max(over,Math.abs(yr[i]));
   let flips=0;for(let i=iu+1;i<L.length;i++)if(Math.abs(yr[i])>.03&&Math.abs(yr[i-1])>.03&&Math.sign(yr[i])!==Math.sign(yr[i-1]))flips++;
   const jerk=Math.max(...L.map((o,i)=>i?Math.abs(o.yr-L[i-1].yr)*60:0));
-  const r={kmh,nm,vStart:+(L[0].v*3.6).toFixed(0),peakYr:+peak.toFixed(2),t63:t63,overshootYr:+over.toFixed(3),overPct:+(100*over/Math.max(peak,1e-3)).toFixed(0),signFlipsAfterRelease:flips,maxYawAccel:+jerk.toFixed(1),maxDhDeg:+(Math.max(...dh)*D).toFixed(2),drift:L.some(o=>o.dd),pinned:L.some(o=>o.cr||o.sk>.3),slipMaxDeg:+Math.max(...L.map(o=>Math.abs(ad(o.h,o.vh))*D)).toFixed(1),headingNetDeg:+(ad(L[L.length-1].h,L[0].h)*D).toFixed(1)};
+  const r={kmh,nm,vStart:+(L[0].v*3.6).toFixed(0),peakYr:+peak.toFixed(2),t63:t63,overshootYr:+over.toFixed(3),overPct:+(100*over/Math.max(peak,1e-3)).toFixed(0),signFlipsAfterRelease:flips,maxYawAccel:+jerk.toFixed(1),maxDhDeg:+(Math.max(...dh)*D).toFixed(2),drift:L.some(o=>o.dd),pinned:L.some(o=>o.cr||o.sk>.3),airPct:+(100*L.filter(o=>o.y>o.g+.5).length/L.length).toFixed(0),slipMaxDeg:+Math.max(...L.map(o=>Math.abs(ad(o.h,o.vh))*D)).toFixed(1),headingNetDeg:+(ad(L[L.length-1].h,L[0].h)*D).toFixed(1)};
   out[kmh+'_'+nm]=r;console.log('ST',JSON.stringify(r));fs.writeFileSync(path.join(OUT,'st_'+TAG+'_'+kmh+'_'+nm+'.json'),JSON.stringify({ev,L}))}
  fs.writeFileSync(path.join(OUT,'steer_'+TAG+'.json'),JSON.stringify(out,null,1));console.log('ERRS',JSON.stringify(errs.slice(0,5)));await b.close()})().catch(e=>{console.error('ERR',e);process.exit(1)});
