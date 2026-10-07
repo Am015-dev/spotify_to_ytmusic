@@ -13,7 +13,8 @@ Open (not blocking):
 2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
 
-## v87e IN PROGRESS (art worker 7, 2026-10-07; pART9 = art9.js + pART9.py, pV87e.py)
+## v87e READY TO DEPLOY (art worker 7, 2026-10-07; reviewer PASS on 97d180e; out/v87e at 9eaede2; pART9 = art9.js + pART9.py, pV87e.py)
+NEXT: boxy suv/pickup geometry (CR_car + CR_cab + T6x4, shots/v87e/10), then pART10. For v87f: copy pV87e.py to pV87f.py and swap it in art.sh's short list.
 Build: `./art.sh 2783bbf` (live v87d). art.sh now detects live bodies that already carry pART1-8 (marker `function abStrip_v86(`) and applies ONLY `pART9.py pV87e.py`; older bases still run the full list.
 Root causes found + fixed (all in art9.js):
 1. Brown box on the road (Athens Koulouri Rush P1 "Deliver", Frankfurt Hot Drop P2): NOT world art. qvStep chase stage (`S.t==='chase'`, the fleeing van) drops an obstacle every 3.6 s: `new THREE.Mesh(QV.cg=BoxGeometry(1.6,1,1.6), QV.cm=MeshStandardMaterial 0x9a6a3a)` scaled 2.2 = flat 3.5x2.2x3.5 m brown box. Now `ART9_crate()` = 1.8x1.3x1.8 LEGO crate (plank canvas texture, frame + cross brace, 4 studs), base at ground, yaw = van heading +-0.25; hit radius 4.2 -> 3.2 m (matches the smaller crate). Shots shots/v87e/01_*,02_* (same pose x1695.32 z-1216.70 h-0.529, crate at 1691.32,-1206.30).
