@@ -492,3 +492,19 @@ window.__ju={get JU(){return JU},C:JU_C,on:b=>{JU.on=!!b;if(!JU.on&&pl)pl.mesh.s
   aimTraffic:(v=38)=>{let b=null,bd=1e9;for(const c of HUB.cars){if(c.dead>0||c.x==null)continue;const d=Math.hypot(c.x-RO.x,c.z-RO.z);if(d<bd&&d>30){bd=d;b=c}}if(!b)return null;const N=HUB.nodes,A=N[b.a],B=N[b.b],L=Math.hypot(B.x-A.x,B.z-A.z)||1,dx=(B.x-A.x)/L,dz=(B.z-A.z)/L;
     RO.x=b.x-dx*26;RO.z=b.z-dz*26;RO.y=groundAt(RO.x,RO.z,b.y+3);RO.vy=0;RO.h=RO.vh=Math.atan2(dx,dz);RO.yr=0;RO.v=v;camSnap=true;return{x:b.x,z:b.z}}};
 
+// ---- W12 · car paint reads as LEGO colours (Bright Red read pink-magenta, blue lavender, yellow pale). Two causes, measured on a side view:
+// 1) the player's glossy paint mirrored the sky environment at envMapIntensity 1.2 (traffic is capped at .6): base specular + clearcoat add
+//    a blue-white veil, which in sRGB lifts the near-zero channels of a saturated paint (red 208,23,18 → 245,51,69). Env off → 224,6,6.
+// 2) the OutputPass Neutral tone map desaturates every pixel whose brightest channel passes ~0.76 toward white; sunlit paint gets there.
+// Fix, car materials only (world look unchanged): player paint env capped at .6 like traffic, and a hue-preserving soft knee before the tone
+// map keeps a saturated paint's brightest channel under 0.76; white/grey highlights (low saturation) are left to the tone map as before.
+const W12P={t:0,K:.55,M:.76,env:.6};
+function W12_paint(m){if(!m||m.userData.w12||!(m.isMeshStandardMaterial))return;m.userData.w12=1;const ob=m.onBeforeCompile,pk=m.customProgramCacheKey;
+  m.onBeforeCompile=function(sh,r){if(ob)ob.call(this,sh,r);sh.fragmentShader=sh.fragmentShader.replace('#include <opaque_fragment>',
+   `#include <opaque_fragment>\n{vec3 w12c=gl_FragColor.rgb;float w12p=max(w12c.r,max(w12c.g,w12c.b));if(w12p>${W12P.K.toFixed(3)}){float w12d=${(W12P.M-W12P.K).toFixed(3)},w12s=clamp((w12p-min(w12c.r,min(w12c.g,w12c.b)))/w12p*1.4,0.,1.);
+     gl_FragColor.rgb=w12c*mix(1.,(${W12P.K.toFixed(3)}+w12d*(1.-exp(-(w12p-${W12P.K.toFixed(3)})/w12d)))/w12p,w12s);}}`)};
+  m.customProgramCacheKey=function(){const cur=this.onBeforeCompile;this.onBeforeCompile=ob;const k=pk.call(this);this.onBeforeCompile=cur;return k+'|w12'};m.needsUpdate=true}
+function W12_cars(){try{if(typeof ART10!=='undefined')ART10.mats.forEach(W12_paint)}catch(e){}
+  if(typeof pl!=='undefined'&&pl&&pl.mesh)pl.mesh.traverse(o=>{if(o.isMesh)for(const m of[].concat(o.material)){W12_paint(m);if(W12P.env&&m&&m.vertexColors&&!m.transparent&&m.roughness>=.1&&m.userData.a10e!==undefined&&m.userData.a10e>W12P.env){m.userData.a10e=W12P.env;m.envMapIntensity=Math.min(m.envMapIntensity,W12P.env)}}});
+  if(HUB&&HUB.cim)for(const k in HUB.cim){const im=HUB.cim[k];if(!im)continue;for(const m of[].concat(im.material))W12_paint(m);const u=im.userData||{};for(const q of[u.w,u.g])if(q)for(const m of[].concat(q.material))W12_paint(m)}}
+roamStep=(f=>function(dt){f(dt);const t=performance.now();if(t-W12P.t>500){W12P.t=t;W12_cars()}})(roamStep);
