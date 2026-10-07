@@ -2,6 +2,7 @@
 """Crown City Smash media helper (no AI).
   media-tools.py grid  cast-grid.png          split a 3x3 character sheet into 9 square 512px webp portraits
   media-tools.py video clip.mp4 crown-ch4-boss  compress to H.264 720x1280, <=1.5 MB, no audio, into media/
+  media-tools.py cutouts                       make transparent cut-<name>.webp board figures from the camp portraits
   media-tools.py manifest                      rewrite media.json from the files that exist
 Outputs go to games/crown-city-smash/ (portraits) and games/crown-city-smash/media/ (clips)."""
 import json, subprocess, sys, shutil
@@ -56,6 +57,35 @@ def split_grid(path):
             sq.resize((512, 512), Image.LANCZOS).save(OUT / name, "WEBP", quality=82, method=6); made.append(name)
     print("wrote", ", ".join(made)); write_manifest()
 
+RES = 16
+
+def cutout(src, out):
+    """remove the flat background (flood fill from the edges, soft edge) and trim -> transparent webp"""
+    from PIL import ImageFilter
+    im = Image.open(src).convert("RGB"); a = np.asarray(im).astype(int); h, w = a.shape[:2]
+    edge = np.concatenate([a[0], a[-1], a[:, 0], a[:, -1]]); bg = np.median(edge, axis=0)
+    k = (a @ bg) / (bg @ bg)  # how bright, along the background colour
+    resid = np.sqrt(((a - k[..., None] * bg) ** 2).sum(axis=2))  # how far from 'the background colour, only darker/lighter'
+    near = (resid < RES) & (k > 0.3) & (k < 1.25)  # background and its soft floor shadow
+    seen = np.zeros((h, w), bool); st = [(0, x) for x in range(w)] + [(h - 1, x) for x in range(w)] + [(y, 0) for y in range(h)] + [(y, w - 1) for y in range(h)]
+    st = [p for p in st if near[p]]
+    while st:
+        y, x = st.pop()
+        if seen[y, x] or not near[y, x]: continue
+        seen[y, x] = True
+        for yy, xx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+            if 0 <= yy < h and 0 <= xx < w and not seen[yy, xx] and near[yy, xx]: st.append((yy, xx))
+    alpha = Image.fromarray(np.where(seen, 0, 255).astype("uint8"))
+    alpha = alpha.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(1.1))  # eat the halo, soften the edge
+    rgba = im.convert("RGBA"); rgba.putalpha(alpha); box = alpha.point(lambda v: 255 if v > 40 else 0).getbbox()
+    rgba = rgba.crop(box); rgba.save(out, "WEBP", quality=88, method=6); return rgba.size
+
+def make_cutouts():
+    for n in CAST:
+        f = OUT / f"camp-{n}.webp"
+        if f.exists(): print(n, cutout(f, OUT / f"cut-{n}.webp"))
+    write_manifest()
+
 def compress(src, key):
     if not shutil.which("ffmpeg"): sys.exit("ffmpeg is missing; install it or send a smaller MP4 (720x1280, under 1.5 MB)")
     MEDIA.mkdir(parents=True, exist_ok=True); dst = MEDIA / (key + ".mp4")
@@ -71,13 +101,16 @@ def compress(src, key):
 def write_manifest():
     MEDIA.mkdir(parents=True, exist_ok=True)
     clips = [k for k in CLIPS if (MEDIA / (k + ".mp4")).exists()]
+    try: cuts = json.loads((MEDIA / "media.json").read_text()).get("cutouts", [])  # kept as is: board figures from pictures are switched on/off by hand in media.json
+    except Exception: cuts = []
     pics = [f"camp-{n}.webp" for n in CAST if (OUT / f"camp-{n}.webp").exists()]
-    (MEDIA / "media.json").write_text(json.dumps({"clips": clips, "portraits": pics}) + "\n")
+    (MEDIA / "media.json").write_text(json.dumps({"clips": clips, "portraits": pics, "cutouts": cuts}) + "\n")
     print("media.json:", len(clips), "clips,", len(pics), "portraits")
 
 if __name__ == "__main__":
     a = sys.argv[1:]
     if a[:1] == ["grid"] and len(a) == 2: split_grid(a[1])
     elif a[:1] == ["video"] and len(a) == 3: compress(a[1], a[2])
+    elif a[:1] == ["cutouts"]: make_cutouts()
     elif a[:1] == ["manifest"]: write_manifest()
     else: sys.exit(__doc__)

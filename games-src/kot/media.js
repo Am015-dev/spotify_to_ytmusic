@@ -32,8 +32,10 @@
     });
   }
   const chapKey=(def,suffix)=>'crown-'+(suffix?'ch'+String(def.id).replace(/\D/g,'')+'-'+suffix:'ch'+String(def.id).replace(/\D/g,'')+'-intro');
+  const CUT=['voltusk','squidrik','magmaw','shroomhulk','boltbox','glacyx','cortexa','clampede','bramblebat']; // MONS order
   window.CCMedia={
     has,play,
+    cutout:m=>{const f='cut-'+CUT[m]+'.webp';return (M.cutouts||[]).indexOf(f)>=0?f:null}, // transparent board figure, or null => the built model
     portrait:c=>{const f=c&&c.portrait;return f&&pics.indexOf(f)>=0?f:null}, // file next to index.html; null => emoji
     install(){
       if(typeof GXC==='undefined'||this.done)return;this.done=true;

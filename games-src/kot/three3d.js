@@ -426,6 +426,20 @@ function eyes(g,xs,y,z,r,look){const W=vinyl(0xfffaf2,{roughness:.18,clearcoat:1
   const p=mesh(new THREE.SphereGeometry(r*.5,20,14),Pm,0,0,r*.8,e);p.scale.z=.45;
   const hl=mesh(new THREE.SphereGeometry(r*.15,10,8),new THREE.MeshBasicMaterial({color:new THREE.Color(1.15,1.15,1.15)}),r*.18,r*.2,r*.42,p,true);if(look)e.rotation.y=look})}
 function brow(g,x,y,z,rot){const b=capsuleH(.055,.3,vinyl(0x241a2c,{roughness:.35}),x,y,z,g,rot)}
+// picture + silhouette -> a closed, inflated mesh (height 1, feet at y=0): the front shows the picture, the back shows it mirrored through
+function puffGeo(img){const GW=84,GH=Math.max(24,Math.round(GW*img.height/img.width)),A=img.width/img.height;
+  const cv=document.createElement('canvas');cv.width=GW;cv.height=GH;const cx=cv.getContext('2d');cx.drawImage(img,0,0,GW,GH);const px=cx.getImageData(0,0,GW,GH).data;
+  const N=GW*GH,inn=new Uint8Array(N),d=new Float32Array(N);for(let k=0;k<N;k++)inn[k]=px[k*4+3]>128?1:0;
+  const edge=k=>{const x=k%GW,y=(k/GW)|0;return x===0||y===0||x===GW-1||y===GH-1||!inn[k-1]||!inn[k+1]||!inn[k-GW]||!inn[k+GW]};
+  for(let k=0;k<N;k++)d[k]=inn[k]?(edge(k)?0:1e3):0;
+  for(let y=0;y<GH;y++)for(let x=0;x<GW;x++){const k=y*GW+x;if(!inn[k])continue;if(x>0)d[k]=Math.min(d[k],d[k-1]+1);if(y>0)d[k]=Math.min(d[k],d[k-GW]+1)}
+  for(let y=GH-1;y>=0;y--)for(let x=GW-1;x>=0;x--){const k=y*GW+x;if(!inn[k])continue;if(x<GW-1)d[k]=Math.min(d[k],d[k+1]+1);if(y<GH-1)d[k]=Math.min(d[k],d[k+GW]+1)}
+  const Hm=.2*Math.min(1,A+.25),Dm=Math.max(4,Math.min(GW,GH)*.16),pos=[],uv=[],idx=[],mapF=new Int32Array(N).fill(-1),mapB=new Int32Array(N).fill(-1);
+  for(let k=0;k<N;k++)if(inn[k]){const x=k%GW,y=(k/GW)|0,h=Hm*Math.pow(Math.min(1,d[k]/Dm),.6),X=(x/(GW-1)-.5)*A,Y=1-y/(GH-1),u=x/(GW-1),v=1-y/(GH-1);
+    mapF[k]=pos.length/3;pos.push(X,Y,h);uv.push(u,v);mapB[k]=pos.length/3;pos.push(X,Y,-h);uv.push(u,v)}
+  for(let y=0;y<GH-1;y++)for(let x=0;x<GW-1;x++){const a=y*GW+x,b=a+1,c=a+GW,e=c+1;if(!(inn[a]&&inn[b]&&inn[c]&&inn[e]))continue;
+    idx.push(mapF[a],mapF[c],mapF[b],mapF[b],mapF[c],mapF[e]);idx.push(mapB[a],mapB[b],mapB[c],mapB[b],mapB[e],mapB[c])}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();return g}
 function buildMonster(m){const g=new THREE.Group();const C=new THREE.Color(MONS[m].c);const body=vinyl(C);const belly=vinyl(C.clone().offsetHSL(0,-.1,.14));const dark=vinyl(0x241a2c,{roughness:.35});const white=vinyl(0xfff6e8,{roughness:.3,clearcoat:.8});const anim={};
   switch(m){
   case 0:{mesh(new THREE.SphereGeometry(1,48,36),body,0,1.2,0,g).scale.set(1.15,.95,1.2);
@@ -497,6 +511,12 @@ function buildMonster(m){const g=new THREE.Group();const C=new THREE.Color(MONS[
   }
   airbrush(g);
   // the display base (glossy black lacquer, a coloured rim and a brass bezel)
+  const cutF=window.CCMedia&&CCMedia.cutout(m);
+  if(cutF){ // the character's own picture, inflated into a puffy 3D toy on the pedestal (replaces the built model once it has loaded)
+    const old=g.children.slice();
+    const tex=new THREE.TextureLoader().load(cutF,t=>{try{const w=t.image.width,h=t.image.height,H=4.2,A=w/h,K=Math.min(1,2.9/(H*A));pl.geometry=puffGeo(t.image);pl.scale.setScalar(H*K);pl.visible=true;old.forEach(x=>x.visible=false)}catch(e){console.warn('puff',cutF,e)}});tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=4;
+    const pm=new THREE.MeshStandardMaterial({map:tex,emissiveMap:tex,emissive:0xffffff,emissiveIntensity:.3,roughness:.55,metalness:0});
+    const pl=new THREE.Mesh(new THREE.BufferGeometry(),pm);pl.visible=false;pl.castShadow=true;pl.userData.standee=1;g.add(pl)}
   const R=new THREE.Group();const base=new THREE.Group();R.add(base);g.position.y=.14;R.add(g);
   mesh(lathe([[0,0],[1.18,0],[1.24,.03],[1.26,.08],[1.22,.13],[1.14,.155],[0,.155]],64),new THREE.MeshPhysicalMaterial({color:0x17111e,roughness:.25,clearcoat:1,clearcoatRoughness:.1}),0,0,0,base);
   mesh(new THREE.TorusGeometry(1.255,.022,8,80),new THREE.MeshStandardMaterial({color:C,emissive:C,emissiveIntensity:.9,roughness:.3}),0,.08,0,base,true).rotation.x=Math.PI/2;
@@ -628,6 +648,7 @@ function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);V3.frames=(V3.frames
     const b=Math.sin(t*2.2+o.phase),S=MS;const bob=(act?Math.abs(Math.sin(t*6))*.05:0);g.scale.set(S*(1+sq*.6),S,S*(1+sq*.6));o.fig.scale.set(1-b*.02+sq*.3,1+b*.035+bob-sq,1-b*.02+sq*.3);
     if(o.ko!==undefined){o.ko=Math.min(1,o.ko+dt*1.5);const e=1-Math.pow(1-o.ko,3);o.fig.rotation.z=e*Math.PI/2*.92;o.fig.position.y=.14+e*.45;g.position.y=Math.max(.2,g.position.y);o.mats.forEach(m=>m.color.lerp(_ko,.05))}
     else{const tgt=V3.cam.position;const want=Math.atan2(tgt.x-g.position.x,tgt.z-g.position.z)*.8;g.rotation.y+=(want-g.rotation.y)*.1}
+    {const st=o.fig.children[o.fig.children.length-1],cp=V3.cam.position;if(st&&st.userData.standee){const dx=cp.x-g.position.x,dz=cp.z-g.position.z,e=Math.atan2(cp.y-g.position.y,Math.hypot(dx,dz));st.rotation.x=-Math.max(0,Math.min(1.2,e*.9))}}
     if(o.shakeT>0){o.shakeT-=dt;g.position.x+=Math.sin(t*60)*.03}
     if(o.flash>0){o.flash-=dt*2;const f=Math.max(0,o.flash);o.mats.forEach(m=>m.emissive.copy(m.userData.e0).lerp(_red,f))}
     else if(o.berserk){const r=.25+Math.sin(t*8)*.2;o.mats.forEach(m=>m.emissive.setRGB(r,0,0));o.wasB=1}else if(o.wasB||o.flash!==undefined){o.wasB=0;o.flash=undefined;o.mats.forEach(m=>m.emissive.copy(m.userData.e0))}
@@ -672,7 +693,7 @@ function animWorld(dt,t){
   V3.clouds.forEach((c,k)=>{c.position.x+=dt*(.4+k*.05);if(c.position.x>90)c.position.x=-90})}
 // ---- 3D portraits of the vinyl figures for the monster picker (the SVG art stays as the fallback) ----
 const MONPIC={};
-function monPic(k){return MONPIC[k]?`<img class="mp3" src="${MONPIC[k]}" alt="" draggable="false">`:`<svg viewBox="-66 -70 132 136">${monArt(k)}</svg>`}
+function monPic(k){const cf=window.CCMedia&&CCMedia.cutout(k);if(cf)return `<img class="mp3" src="${cf}" alt="" draggable="false">`;return MONPIC[k]?`<img class="mp3" src="${MONPIC[k]}" alt="" draggable="false">`:`<svg viewBox="-66 -70 132 136">${monArt(k)}</svg>`}
 function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=true;const S=192;const r=V3.r;let rt;
   try{rt=new THREE.WebGLRenderTarget(S,S,{type:THREE.FloatType,samples:r.capabilities.isWebGL2?4:0})}catch(e){return}
   const ps=new THREE.Scene();ps.add(new THREE.HemisphereLight(0x9a90ff,0x2a1430,.9));const key=new THREE.DirectionalLight(0xffc9a0,2.6);key.position.set(-4,6,6);ps.add(key);
