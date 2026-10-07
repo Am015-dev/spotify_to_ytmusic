@@ -130,7 +130,7 @@ window.__gar.grp=(id,i)=>id==='off'?CR_grp(CR_OFF,'off'):id==='boat'?CR_grp(CR_B
  let seen=null;try{seen=localStorage.getItem('mho_seenVer')}catch(e){}
  if(seen!==OD_VER){const t=document.createElement('div');t.id='odNew';t.hidden=true;t.innerHTML=`<span>New in ${esc(OD_VER)}</span><button id="odNewGo">SEE</button><button id="odNewX">✕</button>`;document.body.appendChild(t);
   t.querySelector('#odNewGo').onclick=()=>odUpdOpen();t.querySelector('#odNewX').onclick=()=>{t.hidden=true;try{localStorage.setItem('mho_seenVer',OD_VER)}catch(e){}};
-  const chk=()=>{const m=document.getElementById('menu'),on=m&&!m.hidden&&window.__mho&&__mho.state==='menu';if(!document.getElementById('odNew'))return;t.hidden=!on||(localStorage.getItem('mho_seenVer')===OD_VER);setTimeout(chk,700)};setTimeout(chk,700)}
+  const chk=()=>{const m=document.getElementById('menu'),on=m&&!m.hidden&&m.classList.contains('home')&&window.__mho&&__mho.state==='menu';if(!document.getElementById('odNew'))return;t.hidden=!on||(localStorage.getItem('mho_seenVer')===OD_VER);setTimeout(chk,700)};setTimeout(chk,700)}
  window.__upd={open:()=>odUpdOpen(),ver:OD_VER,log:OD_CHANGELOG}}
 
 roamPose=(f=>function(s,dt){f(s,dt);try{if(!C26.on||s!==pl||state!=='roam')return;const ud=s.mesh&&s.mesh.userData;if(!ud||!ud.m||!ud.gbM)return;
