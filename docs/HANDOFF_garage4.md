@@ -41,3 +41,6 @@ Code to read: `92_garage_builder.js` (GB_PC, GB_scanBase, bp) and `94_garage_ui.
   - The #gbBkN counter becomes a build-limit bar plus the 2K weight class.
   - To activate: move the file to src/, add it to ORDER after 98q_profile.js, run `node t4/nb.js <url> <out>` (DRIVE=1 for the drive shot plus the tyre gap), and look at the shots. Placement taps in nb.js are guesses; fix them first.
 - Servers: :8766 serves the repo dir (alex/od-garage4); :8767 serves the worktree /home/user/odg4s2.
+- **07:15: v87i got PASS; DEPLOY sent** (alex/od-garage4-s2 0dc6cb1, out/v87i).
+  - Reviewer follow-ups that don't block: (1) PERKS slots in RIDES and the PROFILE "Next" line are below the fold on the phone, so add a scroll hint or move PERKS above the vehicle cards; (2) ask the cars worker to run raceBal3 with Glass Cannon.
+  - Next session: those follow-ups, then slice 4.
