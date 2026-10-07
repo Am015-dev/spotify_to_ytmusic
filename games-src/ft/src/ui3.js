@@ -65,7 +65,7 @@ function overHtml(){const mp=viewP();const win=G.over.win;const won=mp&&win.incl
   return `<div class="mbox over"><h2>${mp?(won?(win.length>1?'You share the win':'You win!'):'You lose'):esc(G.winText)}</h2>${scoreTable()}<div class="acts"><button class="btn go" data-ui="again">Play again</button><button class="btn" data-ui="closeover">View the board</button></div></div>`}
 function renderSettings(){const el=$('#setbody');if(!el)return;const seg=(attr,cur,opts)=>`<div class="seg">${opts.map(([v,l])=>`<button ${attr}="${v}" class="${String(cur)===String(v)?'on':''}">${l}</button>`).join('')}</div>`;
   el.innerHTML=`<div class="setrow"><h4>Sound</h4><div class="seg"><button data-a="snd" class="${typeof SND==='undefined'||SND.on?'on':''}">${ICON('snd')} Effects</button><button data-a="mus" class="${typeof SND!=='undefined'&&SND.music?'on':''}">${ICON('mus')} Music</button></div></div>
-   <div class="setrow"><h4>Computer speed</h4>${seg('data-spd',UI.speed||1,[[.5,'Slow'],[1,'Normal'],[3,'Fast']])}</div>`}
+   <div class="setrow"><h4>Computer speed</h4>${seg('data-spd',UI.speed||1,[[.5,'Slow'],[1,'Normal'],[3,'Fast']])}</div>`+(typeof GXH!=='undefined'?`<div class="setrow"><h4>Help</h4>${GXH.settingsHTML({rowClass:'',btnClass:''})}</div>`:'')}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-spd]');if(!b)return;UI.speed=+b.dataset.spd;if(G)render();renderSettings()});
 // ---------- story mode (the shared campaign kit): ten chapters in three acts, bosses with a rule of their own ----------
 function campStart(def){const s=def.setup||{},op=def.opponent||{};const np=s.np||s.players||(s.seats?s.seats.length:2);const seats=(s.seats||['human','ai']).slice(0,np);

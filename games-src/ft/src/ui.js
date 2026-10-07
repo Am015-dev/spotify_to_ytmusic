@@ -119,7 +119,7 @@ function render(){if(!G){renderModal();return}
   const prev=UI.snap&&UI.snap.seed===G.seed?UI.snap:null;if(me())UI.hurry=false;
   computePick();renderSeats();renderGrid();renderMarket();renderMine();renderActs();renderLine();renderChrome();renderPopups();renderModal();
   if(typeof fit==='function')fit();if(typeof animate==='function')animate(prev);UI.snap=snapState();
-  autoStep();if(typeof placeChz==='function')placeChz();if(typeof placeFinger==='function')placeFinger();overCheck()}
+  autoStep();if(typeof placeChz==='function')placeChz();if(typeof placeFinger==='function')placeFinger();overCheck();if(typeof hlpAfter==='function')hlpAfter()}
 function snapState(){return {seed:G.seed,tiles:G.board.map(t=>({m:t.m.slice(),hand:G.move&&G.move.at===t.i?G.move.hand.slice():[],camel:t.camel,tent:t.tent,palm:t.palm,pal:t.pal})),market:G.market.slice(),djRow:G.djRow.slice(),thRow:(G.thRow||[]).slice(),
   tot:G.pl.map(p=>shownTotal(p)),coins:G.pl.map(p=>p.coins),cur:G.cur,act:G.act?{color:G.act.color,tile:G.act.tile}:null,step:G.step,logN:G.logN}}
 // steps that need no decision run by themselves after a short beat, so the player sees what happened

@@ -4,6 +4,7 @@
   <h1>Sands of Qamar</h1>
   <span id="pchip" class="pchip" role="status"></span>
   <span class="gx-sp"></span>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint"></button>
   <button class="gx-ibtn nar-hide" data-gx="plrd" aria-expanded="false" aria-label="Players score list"><i data-ic="camel"></i><span>Players</span></button>
   <button class="gx-ibtn" data-gx="djd" aria-expanded="false" aria-label="Djinns (help)"><i data-ic="lamp"></i><span>Djinns</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-expanded="false" aria-label="Log"><i data-ic="scroll"></i><span>Log</span></button>
@@ -34,11 +35,12 @@
 <section class="gx-drawer wide" id="rulesd" role="dialog" aria-label="Rules"><div class="gx-drawer-head"><h2><i data-ic="book"></i> How to play</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="rulesbody"></div></section>
 <section class="gx-drawer" id="menud" role="dialog" aria-label="Menu"><div class="gx-drawer-head"><h2><i data-ic="menu"></i> Menu</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body menu">
   <button class="btn" data-gx="plrd">🐪 Players and scores</button><button class="btn" data-gx="djd">🧞 Djinns</button><button class="btn" data-gx="refd">🃏 Card list</button><button class="btn" data-gx="rulesd">📖 How to play</button>
-  <button class="btn" data-a="snd">🔊 Sound on/off</button><button class="btn" data-a="mus">🎶 Music on/off</button><button class="btn" data-a="speed">⏩ Computer speed</button><button class="btn" data-gx="setd">⚙ Settings</button><button class="btn" data-ui="story">📜 Story mode</button><button class="btn" data-a="new">✚ New game</button></div></section>
+  <button class="btn" data-a="snd">🔊 Sound on/off</button><button class="btn" data-a="mus">🎶 Music on/off</button><button class="btn" data-a="speed">⏩ Computer speed</button><button class="btn" data-gx="setd">⚙ Settings</button><button class="btn" data-ui="story">📜 Story mode</button><button class="btn" data-a="new">✚ New game</button><div id="gxhmenu"></div></div></section>
 <section class="gx-drawer" id="setd" role="dialog" aria-label="Settings"><div class="gx-drawer-head"><h2><i data-ic="gear"></i> Settings</h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body" id="setbody"></div></section>
 <div id="modal" hidden></div>
 <script src="shell.js"></script>
 <script src="gx-viewport.js"></script>
+<script src="gx-help.js"></script>
 <script src="gx-campaign.js"></script>
 <script src="campaign-data.js"></script>
 <script src="gameaudio.js"></script>
@@ -56,5 +58,6 @@
 <script src="ui.js"></script>
 <script src="ui2.js"></script>
 <script src="ui3.js"></script>
+<script src="hlp.js"></script>
 </body>
 </html>
