@@ -1,5 +1,8 @@
 // ---------- OD_CHANGELOG: newest first. EVERY deploy prepends one entry {v, date, items:[{t:'FIXED'|'NEW'|'CHANGED', s:'plain English'}]} (2-4 items).
 const OD_CHANGELOG=[
+ {v:'v87e',date:'7 Oct 2026',items:[{t:'FIXED',s:'The crates the getaway van drops are real LEGO crates now, not a big brown box on the road.'},{t:'FIXED',s:'Your car stays crisp and solid in races; the cyan glow no longer washes over it when you SMASH.'},{t:'CHANGED',s:'City trucks keep white cargo boxes and cars keep black windows and trim; only the body is coloured.'}]},
+ {v:'v87d',date:'6 Oct 2026',items:[{t:'FIXED',s:'Roads no longer flicker to grass while you drive.'},{t:'CHANGED',s:'Cars cast crisp, car-shaped shadows on the ground.'}]},
+ {v:'v87c',date:'6 Oct 2026',items:[{t:'NEW',s:'RIDES tab in the garage: three new vehicle sets, each a street car, an off-road truck and a boat that swap automatically.'},{t:'NEW',s:'Ebbelwoi Express (RARE, 3.000 studs), Poseidon GT (EPIC, 15 stars) and Goldrausch (LEGENDARY, 30 stars).'},{t:'NEW',s:'Upgrades (spoiler, exhausts, wheels, booster) in 3 levels, visible on all three forms in the garage and while driving.'},{t:'FIXED',s:'SMASH! and other hit pop-ups no longer cover the tutorial card.'}]},
  {v:'v87b',date:'6 Oct 2026',items:[{t:'FIXED',s:'Double-tap ◀ or ▶ to SMASH works with a normal thumb double-tap, flashes the arrow and shows SMASH! even when nothing is hit.'},{t:'CHANGED',s:'Races have no civilian traffic blocking the track any more; rivals stay.'},{t:'CHANGED',s:'Cars drive like real cars: they lean in corners and dip under braking, grip runs out gradually, and they slide a little if you brake hard into a turn. Rivals use the same physics.'}]},
  {v:'v87a',date:'6 Oct 2026',items:[{t:'NEW',s:'This UPDATES screen: open it from the title screen or the pause menu to see what changed in each version.'},{t:'NEW',s:'A small "What\'s new" note appears once after each update.'},{t:'CHANGED',s:'Credits now say "Base assets: Kenney (CC0)" next to "3D models by Alex".'}]},
  {v:'v87',date:'6 Oct 2026',items:[{t:'CHANGED',s:'Race tracks are narrower and double-tap ◀/▶ does a sideways SMASH lunge.'},{t:'NEW',s:'Rival health bars: 3 SMASH hits wreck a rival.'},{t:'CHANGED',s:'BOOST is plain boost again; touching cars is just a bump.'},{t:'FIXED',s:'Car shows right after a wreck; faster road/off-road swap; tinted coupé glass.'}]},
@@ -405,7 +408,7 @@ const EVENTS=[
 /* ============================================================ 2 · renderer & post */
 const canvas=$('#c');
 let renderer;
-try{renderer=new THREE.WebGLRenderer({canvas,antialias:false,powerPreference:'high-performance'})}catch(e){$('#loading').textContent='THIS BROWSER CANNOT RUN WEBGL';throw e}
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:false,stencil:true,powerPreference:'high-performance'})}catch(e){$('#loading').textContent='THIS BROWSER CANNOT RUN WEBGL';throw e}
 renderer.debug.checkShaderErrors=false;renderer.toneMapping=THREE.NeutralToneMapping;renderer.toneMappingExposure=1.12;
 const scene=new THREE.Scene();
 const FOGC=new THREE.Color('#1c1030');scene.fog=new THREE.FogExp2(FOGC,0.00042);
@@ -417,7 +420,7 @@ function adaptAfter(place,n,margin){if(n<2)return;let d=place===1?(margin>4?.3:.
 const SET_DEF={cc:'full',perf:false,dres:lowGfx?'on':'off',res:lowGfx?'sharp':'auto',thr:'city',q:lowGfx?'med':'high',fx:'full',fov:'normal',camd:'normal',vol:.8,mus:.6,sfx:.9,diff:'normal',adapt:'on',rcam:'chase',steer:'normal',units:'kph',touch:'buttons',assist:'on',tiltInv:'off',sens:3};
 const SET=Object.assign({},SET_DEF,store.get('mho_set',{}));if(!SET.thrV){SET.thr='city';SET.thrV=1}SET.touch='buttons';const thrEff=()=>SET.thr==='city'?(state==='roam'?'pedal':'auto'):SET.thr;const saveSet=()=>store.set('mho_set',SET);
 const fxK=()=>({full:1,reduced:.4,off:0})[SET.fx];let rainScale=1;
-const rt=new THREE.WebGLRenderTarget(16,16,{type:THREE.HalfFloatType,samples:SET.q==='high'?4:0});
+const rt=new THREE.WebGLRenderTarget(16,16,{type:THREE.HalfFloatType,stencilBuffer:true,samples:SET.q==='high'?4:0});
 const composer=new EffectComposer(renderer,rt);
 composer.addPass(new RenderPass(scene,camera));
 const SCRUB=new ShaderPass({uniforms:{tDiffuse:{value:null}},vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
