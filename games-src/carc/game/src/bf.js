@@ -18,7 +18,7 @@ function setView(v){UI.view=v;applyView()}
 function applyView(){const v=UI.view,w=$('#world');w.style.transform=`translate(${v.x}px,${v.y}px) scale(${v.s})`;boardEl().style.setProperty('--sc',v.s);placeOverlay()}
 function toScreen(wx,wy){return [wx*UI.view.s+UI.view.x,wy*UI.view.s+UI.view.y]}
 function tweenView(to,ms){cancelAnimationFrame(UI.tween);UI.tw=false;const a=Object.assign({},UI.view);if(!ms||UI.reduce){setView(to);return}UI.tw=true;const t0=performance.now();
-  const step=t=>{const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);setView({s:a.s+(to.s-a.s)*e,x:a.x+(to.x-a.x)*e,y:a.y+(to.y-a.y)*e});if(k<1)UI.tween=requestAnimationFrame(step);else UI.tw=false};UI.tween=requestAnimationFrame(step)}
+  const step=t=>{const k=Math.min(1,(t-t0)/ms),e=1-Math.pow(1-k,3);setView({s:a.s+(to.s-a.s)*e,x:a.x+(to.x-a.x)*e,y:a.y+(to.y-a.y)*e});if(k<1)UI.tween=requestAnimationFrame(step);else{UI.tw=false;ensureGlowVisible()}};UI.tween=requestAnimationFrame(step)}
 function focusView(cx,cy,cell){const m=measure(),s=cell/100;return {s,x:m.W/2-cx*100*s,y:m.H/2+16-cy*100*s}}
 function fitCells(cells,m){let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const [x,y] of cells){x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y)}
   const w=x1-x0+1,h=y1-y0+1,aw=m.W-14,ah=m.H-52,c0=Math.min(aw/w,ah/h);return {c:Math.max(MINC,Math.min(MAXC,c0)),fits:c0>=MINC,cx:(x0+x1+1)/2,cy:(y0+y1+1)/2}}
