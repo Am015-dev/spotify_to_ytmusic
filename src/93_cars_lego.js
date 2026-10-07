@@ -163,6 +163,27 @@ function CR_car(o){const A=[],B=o.body,K=CR_K,S=o.acc||B,add=(t,x,z,r,c,y)=>A.pu
  sym('tl',-4,7,2,B,1);sym('B1x1',-3,7,0,B,1);add('B4x1',-2,7,0,K,1);add('C8x1',-4,7,2,B,4);
  if(!o.noWing)add('spoiler',-3,5,0,o.wing||K,6);sym('mir',-4,-3,0,B,6);add('pipes',-1,8,0,K,1);add('lp',-1,-9,0,K,1);add('lp',-1,8,2,K,3);
  for(const e of o.x||[])add(...e);return A}
+// W8 SUV (v87f): 8-wide Speed-Champions-style SUV from real part types: raised hood with curved nose, chrome grille, chunky grey bumpers,
+// mudguard arches, raked 3x6 windscreen, tall greenhouse (side windows split by pillars), flat roof with dark roof rails, tailgate window
+function CR_suv(o){const A=[],B=o.body,K=CR_K,D='#1d2630',G='#3a4048',CH='#d8dde4',add=(t,x,z,r,c,y)=>{CR_reg(t);A.push([t,x,z,r,c,y])},
+ sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},wy=(.12-CR_WH.wL.r)/GB_PH;
+ add('T6x16',-3,-8,0,K,0);sym('T1x6',-4,-3,0,K,0);sym('T1x1',-4,-8,0,K,0);sym('T1x1',-4,7,0,K,0);
+ for(const z of[-7,3]){sym('arch',-4,z,0,B,0);sym('wL',-4,z,0,K,wy)}
+ // front: grey bumper, headlights + chrome grille, raised hood with a curved lip
+ add('P8x1',-4,-9,0,G,1);add('T8x1',-4,-9,0,G,2);add('B8x1',-4,-8,0,B,0);add('B8x1',-4,-8,0,B,3);add('B4x4',-2,-7,0,K,1);add('B4x4',-2,-7,0,B,3);
+ sym('hl',-4,-9,0,B,3);for(const y of[3,4,5]){sym('rp',-3,-9,0,B,y);for(const x of[-2,0])add('grl',x,-9,1,CH,y)}
+ add('C8x1',-4,-9,0,B,6);add('P8x5',-4,-8,0,B,6);add('T8x4',-4,-8,0,B,7);add('T8x1',-4,-4,0,B,7);
+ // sides: doors between the arches, grey rocker, belt line
+ sym('P1x6',-4,-3,0,G,1);sym('B1x6',-4,-3,0,B,2);sym('P1x6',-4,-3,0,B,5);sym('P1x6',-4,-3,0,o.acc||B,6);sym('P1x11',-4,-3,0,B,7);add('B4x6',-2,-3,0,K,1);add('P4x6',-2,-3,0,K,4);
+ // rear: deck over the rear arches, taillights, tailgate, grey bumper
+ add('B4x4',-2,3,0,B,3);add('P8x5',-4,3,0,B,6);add('B8x1',-4,7,0,B,0);sym('tl',-4,7,2,B,3);add('B6x1',-3,7,0,B,3);add('P8x1',-4,8,0,G,1);add('T8x1',-4,8,0,G,2);
+ // greenhouse: raked screen, A/B/D pillars, dark side + rear windows, cabin filler
+ add('ws6',-3,-4,0,B,8);sym('C1x2',-4,-4,0,B,8);sym('B1x1',-4,-2,0,B,8);sym('P1x1',-4,-2,0,B,11);
+ for(const y of[8,11]){const P=y===8?'B':'P';sym(P+'1x3',-4,-1,0,D,y);sym(P+'1x1',-4,2,0,B,y);sym(P+'1x3',-4,3,0,D,y);sym(P+'1x1',-4,6,0,B,y);add(P+'6x1',-3,7,0,D,y);sym(P+'1x1',-4,7,0,B,y)}
+ add('B6x8',-3,-1,0,K,8);add('P6x8',-3,-1,0,K,11);
+ // roof: body plate, inset roof tile, dark roof rails, rear lip
+ sym('T1x1',-4,-2,0,B,12);add('P8x9',-4,-1,0,B,12);add('T6x8',-3,-1,0,B,13);sym('T1x7',-4,0,0,K,13);add('C8x1',-4,7,2,B,13);
+ for(const e of o.x||[])add(...e);return A}
 function CR_rod(o={}){const A=[],R=o.body||'#d01712',Y=o.acc||'#fe8a18',K=CR_K,CH='#d8dde4',add=(t,x,z,r,c,y)=>A.push([t,x,z,r,c,y]),
  sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},wy=(t,ax)=>(ax-GB_PC[t].h*GB_PH/2)/GB_PH;
  add('T4x9',-2,-8,0,K,2);add('T8x7',-4,1,0,K,1);
@@ -267,10 +288,10 @@ function CR_cityGeo(nm){if(!nm||nm[0]==='#')return null;if(CR_CG[nm]!==undefined
  try{switch(nm){case'sedan':A=CR_car({body:W,acc:W,noWing:1});break;case'sedan-sports':A=CR_car({body:W,acc:K,wing:K});break;
   case'taxi':A=CR_car({body:ath?'#f5d000':W,acc:ath?'#f5d000':K,noWing:1,x:[['sign',-1,-1,0,ath?'#f4f4f4':'#ffd12c',13]]});break;
   case'police':A=CR_car({body:'#f4f4f4',acc:'#0055bf',noWing:1,x:[['bar',-2,-1,0,K,13]]});break;
-  case'suv':A=CR_car({body:W,acc:K,noWing:1,x:[['T6x4',-3,-2,0,K,13]]});wid=2.15;break;
+  case'suv':A=CR_suv({body:W,acc:W});wid=2.15;break;
   case'van':A=CR_van({body:W});wid=2.2;break;case'delivery':A=CR_truck({body:W});wid=2.4;break;case'truck':A=CR_truck({body:W});wid=2.55;break;
   case'garbage-truck':A=CR_truck({body:'#2c8a5a'});wid=2.6;break;default:return CR_CG[nm]=null}
-  if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A=CR_cab(A);if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A.push(['T1x6',-4,-3,0,K,-1],['T1x6',3,-3,0,K,-1],['T8x1',-4,-8,0,K,-1],['T8x1',-4,7,0,K,-1]);
+  if(['sedan','sedan-sports','taxi','police'].includes(nm))A=CR_cab(A);if(['sedan','sedan-sports','taxi','police','suv'].includes(nm))A.push(['T1x6',-4,-3,0,K,-1],['T1x6',3,-3,0,K,-1],['T8x1',-4,-8,0,K,-1],['T8x1',-4,7,0,K,-1]);
   const br=A.map(([t,x,z,r,c,y])=>({t,x,z,y,r:r%4,m:0,c})).filter(b=>!['drv','drvR','stw','mir','lp','pipes','flag'].includes(b.t));CR_LO=2;CR_G=[];CR_W=[];const M=[],L=[];for(const b of br)GB_brickGeo(b,M,L);
   const Wg=CR_W.map(w=>{const g=CR_wheel(w.t).clone();g.translate(w.o.x,w.o.y,w.o.z);return g});const MD=M.filter(CR_isDark),MB=M.filter(g=>!CR_isDark(g));const body=mergeGeometries(MB.concat(L)),wheels=mergeGeometries(Wg),glass=(CR_G.length||MD.length)?mergeGeometries(CR_G.concat(MD)):null;
   const box=new THREE.Box3().setFromBufferAttribute(body.attributes.position),bw=new THREE.Box3().setFromBufferAttribute(wheels.attributes.position),s=wid/(box.max.x-box.min.x),y0=Math.min(box.min.y,bw.min.y);

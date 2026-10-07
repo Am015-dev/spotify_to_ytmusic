@@ -135,6 +135,9 @@ const AB_R=350,ABW=L=>L.map(p=>WP(p[0],p[1])),AB=CID!=='fra'?[]:[{id:'A5',name:'
 // interchanges: [name, road a, road b, real point along a (towards the ring inside), real point along b]; the connector is a curve between
 // the two carriageways ~420 m from the crossing (filled in by abSamples, so the curve follows the real road shapes)
 const AB_K=CID!=='fra'?[]:[['Frankfurter Kreuz','A5','A3',[-6146,265],[5422,-3493]],['Offenbacher Kreuz','A661','A3',[4134,-508],[-6082,-6257]],['Nordwestkreuz','A5','A66w',[-6146,265],[-9800,3000]],['Bad Homburger Kreuz','A5','A661',[-6212,5019],[3774,3803]]];
+// W12: asphalt height above groundY (the physics ground). Was r.y*2.5 = 0.25-0.6 m, so tyres sank into the ribbon; now 4-5.5 cm like city
+// streets (grass under roads dips 10 cm, ART8_dip). The small per-road step plus polygonOffset keeps overlapping ribbons apart.
+const AB_RY=r=>.03+r.y*.1;
 const AB_C=[],AB_X=[];
 // feeders from the outer end of a real radial to the nearest Autobahn
 const AB_FEED=CID!=='fra'?[]:[['mainzer','A5','Feeder road A5 · Mainzer Landstraße'],['heuss','A5','Feeder road A648 · Westkreuz'],['esch','A661','Feeder road A661 · Eschersheimer Landstraße'],['friedberger','A661','Feeder road A661 · Friedberger Landstraße'],['hanauer','A661','Feeder road A661 · Hanauer Landstraße'],['darm','A3','Feeder road A3 · Darmstädter Landstraße']];
