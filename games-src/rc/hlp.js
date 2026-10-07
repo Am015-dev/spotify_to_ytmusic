@@ -148,3 +148,5 @@ function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||!G)return;
   if(UI.guide&&UI.guide.on&&!UI.guide.kit){UI.guide.kit=1;GXH.setEnabled(true);GXH.reset()}   // the guided game: every bubble again
   GXH.phase(hlpBusy()?null:hlpPhase())}
 {const s0=PHO.sync;PHO.sync=function(){const r=s0.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r}}
+// a bubble whose target was not on screen yet (the island still turning) is tried again a moment later
+setInterval(()=>{try{if(typeof G!=='undefined'&&G&&!document.hidden)hlpAfter()}catch(e){}},800);
