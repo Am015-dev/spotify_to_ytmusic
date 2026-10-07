@@ -40,8 +40,9 @@ const FAKEDB=`(()=>{const K='__fakedb',ld=()=>JSON.parse(sessionStorage.getItem(
   for(const k of held)await key(k,false);const s1=await S();
   return{tag,maxKmh:+(maxV*3.6).toFixed(2),slipAvgDeg:+(slipSum/n*57.3).toFixed(3),slipMaxDeg:+(slipMax*57.3).toFixed(2),stuckPct:+(100*stuck/n).toFixed(1),dist:+Math.hypot(s1.x-s0.x,s1.z-s0.z).toFixed(2),endKmh:+(s1.v*3.6).toFixed(2),bm:+s1.bm.toFixed(2),log}}
  // turn rate: hold GAS 3 s, then GAS+RIGHT 1 s; yaw rate deg/s over the steer second
- async function turnRate(){await key('ArrowUp',true);await tick(180);const a=await S();await key('ArrowRight',true);await tick(60);const c=await S();await key('ArrowRight',false);await key('ArrowUp',false);await key('ArrowDown',true);await tick(120);await key('ArrowDown',false);
-  let d=c.h-a.h;d=Math.atan2(Math.sin(d),Math.cos(d));return{kmh:+(a.v*3.6).toFixed(1),yawDegS:+Math.abs(d*57.3).toFixed(1)}}
+ async function turnRate(){await key('ArrowDown',true);for(let i=0;i<40;i++){await tick(10);if(Math.abs((await S()).v)<.5)break}await key('ArrowDown',false);
+  await key('ArrowUp',true);await tick(75);const a=await S();await key('ArrowRight',true);await tick(30);const c=await S();await key('ArrowRight',false);await key('ArrowUp',false);
+  let d=c.h-a.h;d=Math.atan2(Math.sin(d),Math.cos(d));return{kmh:+(a.v*3.6).toFixed(1),kmhEnd:+(c.v*3.6).toFixed(1),yawDegS:+Math.abs(d*57.3*2).toFixed(1)}}
  const R={mode:MODE,url:URL};
  if(MODE==='ab'){await toRoam(true);R.ab=await drive('A');await shot('ab_end')}
  if(MODE==='plain'){await toRoam(true);R.gear=await rect('#tuG');R.drawer=await p.evaluate(()=>!!document.querySelector('#tuD'));R.tune=await p.evaluate(()=>window.__tune?__tune.TU.show:null);await shot('plain_roam')}

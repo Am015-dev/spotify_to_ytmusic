@@ -2,8 +2,8 @@
  "mode": "ui",
  "url": "http://127.0.0.1:8766/local_dbg.html",
  "gear": {
-  "x": 409,
-  "y": 4,
+  "x": 810,
+  "y": 6,
   "w": 34,
   "h": 34
  },
@@ -58,41 +58,39 @@
   "yawDegS": 40.9
  },
  "drawer": {
-  "x": 6,
+  "x": 236.625,
   "y": 6,
-  "w": 362,
-  "h": 152
+  "w": 407.0625,
+  "h": 383
  },
- "drawerOverlap": [
-  "tP"
- ],
- "stAng": 0.55,
+ "drawerOverlap": [],
+ "stAng": 1.01,
  "turnChanged": {
   "kmh": 72.3,
-  "yawDegS": 32.1
+  "yawDegS": 32.5
  },
- "camB": 5.63,
+ "camB": 18.7,
  "list": [
   {
    "v": 2,
    "note": "default steer",
    "stAng": 0.55,
-   "camB": 5.63
+   "camB": 18.7
   },
   {
    "v": 1,
    "note": "far cam + sharp steer",
-   "stAng": 0.55,
-   "camB": 5.63
+   "stAng": 1.01,
+   "camB": 18.7
   }
  ],
- "cur": null,
+ "cur": 1,
  "afterLoad2": 0.55,
- "exportLen": 1236,
+ "exportLen": 1233,
  "reload": {
-  "src": "defaults",
-  "stAng": 0.55,
-  "camB": 5.63,
+  "src": "v1",
+  "stAng": 1.01,
+  "camB": 18.7,
   "writesOnLoad": 0
  },
  "errors": []
