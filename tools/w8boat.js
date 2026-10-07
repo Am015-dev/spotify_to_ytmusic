@@ -10,5 +10,5 @@ const {chromium}=require('playwright');const fs=require('fs');
  await p.evaluate(()=>{__mho.storyClose&&__mho.storyClose();__mho.roamSim(20);__ju.autoClose(true)});
  const save=(n,r)=>{if(r&&r.png)fs.writeFileSync(`${OUT}/${n}.png`,Buffer.from(r.png.split(',')[1],'base64'))};
  for(const id of SETS.split(',')){const sel=await p.evaluate(id=>__w8.sel(id),id);const r=await p.evaluate(s=>__w8.boatRun(s),SPOT);console.log(id,sel,JSON.stringify(r));
-  save(`${id}_side`,await p.evaluate(()=>__w8.cam(1.5708,7,.25)));save(`${id}_34`,await p.evaluate(()=>__w8.cam(.9,8,1.6)))}
+  save(`${id}_side`,await p.evaluate(()=>__w8.cam(1.5708,7,.8)));save(`${id}_34`,await p.evaluate(()=>__w8.cam(.9,8,1.6)))}
  console.log('ERRORS',errs.length,errs.slice(0,5).join(' | '));await b.close()})();
