@@ -157,10 +157,9 @@ function handStrip(vs,interactive,sel,rot){if(vs<0||!G.ships[vs].alive&&!G.hands
   return `<div class="hand" data-hand="${vs}">${hd.map((c,t)=>cardBtn(c,t,{up:true,owner:vs,sel:interactive&&sel&&sel.t===t,rot})).join('')}</div>`}
 function startHTML(d){const info=startInfo(d),K=knowledge(d),adv=startAdvice(K,d,info);const by={};for(const o of info)(by[o.edge+o.idx]=by[o.edge+o.idx]||[]).push(o);
   let g='';for(const ed of EDGES){const hor=ed==='top'||ed==='bottom';g+=`<span>${ed[0].toUpperCase()+ed.slice(1)}</span>`;for(let i=1;i<=6;i++){const l=by[ed+i]||[];
-    g+=`<span style="display:flex;gap:2px">${[0,1].map(k=>{const o=l[k],lab=i+(hor?'LR':'UD')[k];return o?`<button class="btn small${adv&&adv.o===o?' on':''}" style="min-width:0;flex:1" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}" aria-label="${ed} ${i}, ${o.sideWord} mark">${lab}</button>`:`<button class="btn small" style="min-width:0;flex:1" disabled>${lab}</button>`}).join('')}</span>`}}
+    g+=`<span style="display:flex;gap:2px">${[0,1].map(k=>{const o=l[k],lab=i+(hor?'LR':'UD')[k];return o?`<button class="btn small" style="min-width:0;flex:1" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}" aria-label="${ed} ${i}, ${o.sideWord} mark">${lab}</button>`:`<button class="btn small" style="min-width:0;flex:1" disabled>${lab}</button>`}).join('')}</span>`}}
   const you=d===viewSeat()||humans().length===1;
   return `<div class="prompt"><h4>${you?'Choose your start':esc(nm(d))+': choose a start'}</h4><p>Tap one of the big pulsing gold marks on the edge of the board. Each number from 1 to 6 has two marks (<b>L</b> left and <b>R</b> right of the number; on the side edges <b>U</b> upper and <b>D</b> lower).</p>
-  ${adv?`<div class="rec"><b>Good start:</b> ${esc(adv.why)} <button class="btn small" data-a="startmark" data-x="${adv.o.m.x}" data-y="${adv.o.m.y}" data-e="${adv.o.m.e}">Start here</button></div>`:''}
   <p class="tiny">Tip: a mark in the middle of an edge is safest. Next to a corner you may run out of room. The dice come later: they only decide when the leviathans (the sea monsters already on the board) move.</p>
   <details><summary class="tiny">All marks as a list</summary><div class="startpick" style="grid-template-columns:auto repeat(6,1fr)">${g}</div></details></div>`}
 function questionHTML(d,K){const q=G.q;let extra='';const you=d===viewSeat()||humans().length===1;
@@ -189,7 +188,7 @@ function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='plac
   UI.pinH=`<div class="pinbox"><div class="hl"><b>${multi?esc(nm(d))+"'s":'Your'} ${nT} tile${nT===1?'':'s'}</b> <span class="tiny">${pl.length?'tap a tile, turn it, then Place':'choose what to do'}</span></div><div class="hand" data-hand="${d}">${hand.map((c,t)=>cardBtn(c,t,{up:true,owner:d,sel:sel&&sel.t===t,rot:sel&&sel.r})).join('')}${rot}</div><div class="row">${btn}${pas?`<button class="btn" data-a="pass">Nothing to play: pass</button>`:''}</div></div>`;
   let h=`<div class="prompt"><h4>${multi?esc(nm(d))+': lay a current':'Your turn: lay a current'}</h4>${fr}`;
   if(outcome)h+=`<p style="margin:6px 0 4px">${outcome}</p>`;if(thr)h+=`<p style="margin:2px 0">${thr}</p>`;
-  if(err&&A&&A.bad)h+=`<p class="warn-l" style="margin:4px 0">Not allowed: another tile is safer. The rule: you may not pick a placement that sinks you while any other placement does not. <button class="btn small" data-a="sugg">Show me the safest move</button></p>`;
+  if(err&&A&&A.bad)h+=`<p class="warn-l" style="margin:4px 0">Not allowed: another tile is safer. The rule: you may not pick a placement that sinks you while any other placement does not. Tap the bulb for the safest move.</p>`;
   const cm={};for(const c of cns){const k=c.m+':'+c.s;if(!cm[k])cm[k]=c}const nc=hand.filter(isCannon).length;
   if(Object.keys(cm).length)h+=`<div class="optrow"><div class="tiny"><b>Deck Cannon</b> (optional, instead of laying a tile; you hold ${nc}):</div><div class="row">${Object.values(cm).map(c=>`<button class="btn warn" data-a="cannon" data-t="${c.t}" data-m="${c.m}" data-s="${c.s}">Fire at ${esc(levName(c.m))}${nc>1?' (x'+nc+' held)':''}</button>`).join('')}</div></div>`;
   else if(nc&&full)h+=`<p class="tiny">You hold a Deck Cannon. It can be fired when a leviathan is next to your front square or about to sink you.</p>`;
@@ -197,8 +196,6 @@ function placeHTML(d,K){const mv=validMoves(d);const pl=mv.filter(m=>m.a==='plac
   const gseen={};const gb=gts.filter(g=>!(pl.length&&isGate(hand[sel.t])&&g.t===sel.t)).filter(g=>{const k=g.t+':'+g.s;if(gseen[k])return false;gseen[k]=1;return true});
   if(gb.length)h+=`<div class="optrow"><div class="tiny"><b>Rift Gate</b> (optional):</div><div class="row">${gb.map(g=>`<button class="btn" data-a="gate" data-t="${g.t}" data-s="${g.s}">Play Rift Gate${g.s!==d?' for '+esc(nm(g.s)):''}</button>`).join('')}</div></div>`;
   h+=`</div>`;
-  if(pl.length){if(full||UI.hint)h+=recHTML(K,d,pl,true);else h+=`<div class="row"><button class="btn small" data-a="hint">Show me the safest move</button></div>`}
-  else if(cns.length||gts.length||pas)h+=full||UI.hint?recHTML(K,d,pl,true):'';
   return h}
 function passHTML(d){return `<div class="prompt passbox"><div class="big">${dot(d)} Pass the device to ${esc(nm(d))}</div><p>Hands are hidden until ${esc(nm(d))} takes the device.${G.q&&G.q.who===d?' '+esc(nm(d))+' must make a quick decision.':''}</p><button class="btn pri" data-a="take" data-seat="${d}">I am ${esc(nm(d))}</button></div>`}
 function overHTML(){const o=G.over,w=o.win||[];const me=viewSeat();const hs=humans();const solo=G.variant==='solo'||G.variant==='easysolo';
@@ -212,7 +209,7 @@ function overHTML(){const o=G.over,w=o.win||[];const me=viewSeat();const hs=huma
   h+=`<p>${w.length?(solo?'':(w.length>1?'Winners: ':'Winner: ')+names):'Nobody survived.'}</p>`;
   if(G.np>1||solo)h+=`<ul class="crews">${G.order.map(i=>{const s=G.ships[i];return `<li>${dot(i)} ${esc(nm(i))}${G.team?' (team '+'AB'[G.team[i]]+')':''}: ${s.alive?'afloat':'sunk ('+({edge:'sailed off the edge',collision:'head-on collision',wave:'capsized by the Rogue Wave',maelstrom:'swallowed by the Maelstrom',block:'blocked in by a leviathan',mon:'ran into a leviathan',crush:'crushed by a leviathan',rift:'lost in the rift'}[causeOf(s.out).k]||'sunk')+')'}</li>`}).join('')}</ul>`;
   h+=`<p class="tiny">${G.turn} turns, ${G.ships.filter(s=>s.alive).length} junk(s) afloat, ${G.stats.levMove||0} leviathan moves.</p>`;
-  if(!meWin&&!watch&&!multi&&UI.guided)h+=`<p class="tiny">Next time: keep your junk off the edges and corners, and press <b>Show me the safest move</b> before each Place.</p>`;
+  if(!meWin&&!watch&&!multi&&UI.guided)h+=`<p class="tiny">Next time: keep your junk off the edges and corners, and tap the <b>bulb</b> when you are unsure.</p>`;
   if(isClient())h+=`<p class="tiny">Waiting for the host to start another game.</p><div class="row"><button class="btn" data-a="netleave">Leave</button><button class="btn" data-gx="rulesd">Rules</button></div>`;
   else h+=`<div class="row">${!meWin&&!watch&&!multi&&UI.snap&&!NET.on?'<button class="btn pri" data-a="rewind">Rewind to my last move</button>':''}${UI.guided&&!meWin&&!watch?'<button class="btn" data-a="guided">Try the guided game again</button>':''}<button class="btn${meWin||watch||multi||!UI.snap?' pri':''}" data-a="again">Play again</button><button class="btn" data-a="newgame">New game</button><button class="btn" data-gx="rulesd">Rules</button></div>`;
   return h+'</div>'}
@@ -242,7 +239,7 @@ function renderRoad(){const el=$('#road');if(!el||!G)return;const cur=UI.busy&&U
   el.innerHTML=G.order.map(i=>{const s=G.ships[i];const me=viewSeat()===i;return `<span class="rs${i===cur&&!G.over?' cur':''}${s.alive?'':' dead'}${me?' me':''}" title="${esc(G.seats[i].human?'Human':'Computer ('+G.seats[i].lv+')')}">${dot(i)}${esc(nm(i))}${G.team?` <small>${'AB'[G.team[i]]}</small>`:''}${s.alive&&G.phase==='play'?` <small>${G.hands[i].length}t</small>`:''}</span>`}).join('')}
 function renderSteps(){const el=$('#stepsw');if(!el||!G)return;if(G.phase==='setup'||G.over){el.innerHTML='';el.hidden=true;return}el.hidden=false;
   const st=UI.busy?(UI.stepNow!=null?UI.stepNow:0):(G.step==='act'?1:0);const names=['1 Roll','2 Place','3 Sail','4 Draw'];
-  el.innerHTML=names.map((n,i)=>`<span class="${i===st?'on':i<st?'done':''}">${n}</span>`).join('')+(UI.guide==='full'?`<small class="tiny stephint">You only act in step 2. Roll, Sail and Draw happen by themselves.</small>`:'')}
+  el.innerHTML=names.map((n,i)=>`<span class="${i===st?'on':i<st?'done':''}">${n}</span>`).join('')}
 function renderRes(){const el=$('#res');if(!el)return;let h='';
   if(UI.mph)h+=mphHTML();
   if(UI.res)h+=`<div class="res ${UI.res.cls}">${esc(UI.res.text)}</div>`;el.innerHTML=h;el.hidden=!h}
@@ -363,7 +360,7 @@ function renderSettings(){const g=(()=>{try{return TWKit.getQuality()}catch(e){r
   <div><div class="lbl">Sound</div><div class="row"><button class="btn${SND.on?' on':''}" data-a="snd">Sound ${SND.on?'on':'off'}</button><button class="btn${SND.music?' on':''}" data-a="mus">Music ${SND.music?'on':'off'}</button></div></div>
   <div><div class="lbl">Computer captains' speed</div><div class="row">${sp.map(([v,l])=>`<button class="btn small${UI.speed===v?' on':''}" data-a="speed" data-v="${v}">${l}</button>`).join('')}<button class="btn small${UI.anim?' on':''}" data-a="animtog">Animations ${UI.anim?'on':'off'}</button></div></div>
   <div><div class="lbl">Graphics ${on3?`(now: ${esc(g.active)})`:'(2D chart: no WebGL here)'}</div><div class="row">${['auto','high','medium','low'].map(q=>`<button class="btn small${g.pref===q?' on':''}" data-a="gfx" data-v="${q}" ${on3?'':'disabled'}>${q[0].toUpperCase()+q.slice(1)}</button>`).join('')}</div><p class="tiny">Auto picks Low on a software graphics driver and steps down by itself if frames drop.</p><div id="perfslot" class="row">${window.PerfHUD&&PerfHUD.buttonsHTML?PerfHUD.buttonsHTML('btn small'):''}</div></div>
-  <div><div class="lbl">Guide</div><div class="row"><button class="swt${UI.guide==='full'?' on':''}" role="switch" aria-checked="${UI.guide==='full'}" data-a="guidemenu"><i></i>Guide: ${UI.guide==='full'?'Full lessons':'Light (warnings only)'}</button></div></div>
+  <div><div class="lbl">Help</div>${typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'row',btnClass:'btn small'}):''}</div>
   <div><div class="lbl">Game</div><div class="row">${isClient()?'<button class="btn small" data-a="netleave">Leave the online game</button>':''}${isClient()?'':G&&UI.started?'<button class="btn small" data-a="restart">Restart this setup</button>':''}${isClient()?'':'<button class="btn small" data-a="tonew">New game...</button>'}<button class="btn small" data-gx="credd">Credits</button></div></div></div>`}
 function saveSettings(){lsSet('tw_set',{speed:UI.speed,guide:UI.guide,anim:UI.anim})}
 function saveAll(){try{if(!NET.on&&G&&!G.over){saveGame();lsSet('tw_ui1',{cols:UI.cols,guide:UI.guide,seen:UI.seen,trig:UI.trig,guided:UI.guided,setup:UI.lastSetup})}}catch(e){}}
@@ -417,7 +414,7 @@ document.addEventListener('change',e=>{const t=e.target;if(!t.dataset||!t.datase
   else if(t.dataset.a==='lv'){s.seats[+t.dataset.i].lv=t.value}
   else if(t.dataset.a==='exp'){s.exp[t.dataset.k]=t.checked?1:0}
   else if(t.dataset.a==='nomon'){s.noMon=t.checked}});
-function startGuided(){const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};UI.setup=s;startGame(JSON.parse(JSON.stringify(s)),{guided:true})}
+function startGuided(){try{hlpInit();GXH.reset();GXH.setEnabled(true)}catch(e){}const s=defaultSetup();s.mode='me';s.np=2;s.variant=null;s.noMon=false;s.exp={rift:0,wave:0,maelstrom:0,cannon:0};s.seats[0]={h:true,lv:'normal',col:0};s.seats[1]={h:false,lv:'easy',col:3};UI.setup=s;startGame(JSON.parse(JSON.stringify(s)),{guided:true})}
 function startGame(s,o){o=o||{};if(isClient())return;let plan=null;if(isHost()){plan=netPlan(s);if(plan.err){NET.err=plan.err;UI.netOpen=true;netRender();return}NET.err='';s.np=plan.np;s.seats.forEach((x,i)=>{x.h=i<plan.hum.length});o.guided=false}
   UI.gen++;clearTimeout(UI.tm);kitReset();
   const solo=s.variant==='solo'||s.variant==='easysolo';let np=solo?1:teamN(s);const seats=s.seats.slice(0,np);
@@ -594,7 +591,7 @@ function ovUpdate(){if(!G||!UI.started||!kitOk()){ovApply([]);return}const D=[];
   if(!busy)for(const s of G.ships){const p=shipPos(s);if(!p)continue;const w=p.port!=null?pw(p.c,p.r,p.port):sqW(p.c,p.r);const mine=s.i===me&&me>=0;
     if(!(mine&&UI.route))D.push({k:'tag',id:'s'+s.i,wx:w[0],wy:.5,wz:w[1],t:mine?'You':nm(s.i),cls:'ship'+(mine?' me':'')+(myTurn&&s.i===d?' act':''),sail:colOf(s.i).sail});
     if(mine&&myTurn&&G.phase==='play')D.push({k:'ring',id:'r'+s.i,wx:w[0],wz:w[1]})}
-  if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);const adv=startAdvice(knowledge(d),d,info);for(const o of info)D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e,wx:o.w[0],wz:o.w[1],t:o.lab,best:!!(adv&&adv.o===o)})}
+  if(myTurn&&G.phase==='setup'&&!G.q){const info=startInfo(d);for(const o of info)D.push({k:'pip',id:'p'+o.m.x+o.m.y+o.m.e,wx:o.w[0],wz:o.w[1],t:o.lab})}
   if(UI.route&&!busy)D.push({k:'route',id:'rt',pts:UI.route.pts,bad:UI.route.bad,stop:UI.route.stop,label:UI.route.label});
   if(UI.arrow)D.push({k:'arrow',id:'ar',a:UI.arrow.a,b:UI.arrow.b});
   for(const m of UI.marks||[])D.push({k:'mark',id:'mk'+m.id+m.seat,wx:m.at[0],wz:m.at[1],t:nm(m.seat)+' sunk'});
@@ -690,7 +687,7 @@ function phStripHTML(){if(!G||!UI.started)return '';const d=sideToAct(),zb=phZoo
   if(dh&&mustPass(d))return `<div class="ps-main"><div class="ps-msg">Pass the device to <b>${esc(nm(d))}</b></div><div class="ps-ctl">${zb}</div></div>`;
   if(!dh)return `<div class="ps-main"><div class="ps-msg">${dot(d)} ${phWhose(d)} <small>(computer)</small></div><div class="ps-ctl">${UI.pause||!humans().length?`<button class="pb" data-a="pause">${UI.pause?'Resume':'Pause'}</button>`:''}${zb}</div></div><div class="ps-hint">${phHint()}</div>`;
   if(G.q)return `<div class="ps-main"><div class="ps-msg">${dot(d)} <b>Decide</b> in the card</div><div class="ps-ctl">${zb}</div></div>`;
-  if(G.phase==='setup'){let best='';try{const info=startInfo(d),adv=startAdvice(knowledge(d),d,info);if(adv)best=`<button class="pb pri" data-a="startmark" data-x="${adv.o.m.x}" data-y="${adv.o.m.y}" data-e="${adv.o.m.e}" title="${esc(adv.why)}">Best start</button>`}catch(e){}
+  if(G.phase==='setup'){const best='';
     return `<div class="ps-main"><div class="ps-msg">${hotSeat()?'<b>'+esc(nm(d))+',</b> choose':dot(d)+' <b>Choose</b>'} your start mark.</div><div class="ps-ctl">${best}${zb}</div></div>`}
   const c=phPlaceCtx();if(!c)return `<div class="ps-main"><div class="ps-ctl">${zb}</div></div>`;
   const {d:dd,K,hand,sel,pl}=c,can=pl.length>0&&!!sel;let tiles='';
@@ -742,7 +739,7 @@ function phTilesHTML(c){const {d,K,hand,sel,pl}=c;if(!pl.length||!sel)return '';
   <div class="ph-ctl"><button class="pb" data-a="rot" data-d="-1" aria-label="Turn left" title="Turn left (Q)">${PH_ICO.rl}</button><span class="ph-rot" style="touch-action:pan-y">turned ${(sel.r||0)*90}&deg; <small>(swipe or tap)</small></span><button class="pb" data-a="rot" data-d="1" aria-label="Turn right" title="Turn right (R)">${PH_ICO.rr}</button>
   ${cur?`<button class="pb pri" data-a="place"${err?' disabled':''}>Place</button>`:(()=>{const g=(UI.moves||[]).find(x=>x.a==='gate'&&x.t===sel.t&&x.s===sel.s);return g?`<button class="pb pri" data-a="gate" data-t="${g.t}" data-s="${g.s}">Play Gate</button>`:''})()}</div>
   ${phTargets(c)}
-  <p class="ph-out">${cur&&selA?outcomeHTML(K,d,m,selA):'This tile cannot be laid on a current.'}${err&&selA&&selA.bad?' <span class="warn-l">Not allowed: another tile is safer.</span> <button class="pb small" data-a="sugg">Safest move</button>':''}</p>
+  <p class="ph-out">${cur&&selA?outcomeHTML(K,d,m,selA):'This tile cannot be laid on a current.'}${err&&selA&&selA.bad?' <span class="warn-l">Not allowed: another tile is safer.</span>':''}</p>
   <div class="ps-x">${phExtras(c)}</div>`}
 const phFace=['north','north-east','east','south-east','south','south-west','west','north-west'];
 function phMonInfo(m){const L=LEV[m.id];const d=sideToAct(),vs=viewSeat();const S=vs>=0?G.ships[vs]:null;
@@ -759,8 +756,7 @@ function phInfoData(pd){if(!G||!pd)return null;
   if(pd.k==='wave'){const w=G.wave;if(!w)return null;return {t:'Rogue Wave',at:[w.x,w.y],h:`<p><b>A rogue wave</b> sweeping ${(w.r&1)?'column '+(w.x+1):'row '+(w.y+1)}, heading ${DNAME[w.r]}, strength ${waveStr()}. Any junk in that band rolls a die and capsizes if it does not reach ${waveStr()}.</p>`}}
   return null}
 function phInfoHTML(){const I=phInfoData(PH.pd);if(!I)return null;return `<div class="ph-head"><b>${esc(I.t)}</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div><div class="ph-body">${I.h}</div>`}
-function phStartHTML(){const d=sideToAct();const pd=PH.pd;let info=[];try{info=startInfo(d).filter(o=>o.m.x===pd.x&&o.m.y===pd.y)}catch(e){}if(!info.length)return null;let adv=null;try{adv=startAdvice(knowledge(d),d,startInfo(d))}catch(e){}
-  return `<div class="ph-head"><b>Start here?</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div><div class="ph-body"><p class="tiny">Pick a gold mark on this square. A mark in the middle of an edge is safest; next to a corner you may run out of room.</p><div class="ph-marks">${info.map(o=>`<button class="pb big${adv&&adv.o===o?' pri':''}" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}">${o.edge[0].toUpperCase()+o.edge.slice(1)} ${o.idx}, ${o.sideWord} mark${adv&&adv.o===o?' (best)':''}</button>`).join('')}</div></div>`}
+function phStartHTML(){const d=sideToAct();const pd=PH.pd;let info=[];try{info=startInfo(d).filter(o=>o.m.x===pd.x&&o.m.y===pd.y)}catch(e){}if(!info.length)return null;  return `<div class="ph-head"><b>Start here?</b><button class="ph-x" data-ph="pclose" aria-label="Close">&times;</button></div><div class="ph-body"><p class="tiny">Pick a gold mark on this square. A mark in the middle of an edge is safest; next to a corner you may run out of room.</p><div class="ph-marks">${info.map(o=>`<button class="pb big" data-a="startmark" data-x="${o.m.x}" data-y="${o.m.y}" data-e="${o.m.e}">${o.edge[0].toUpperCase()+o.edge.slice(1)} ${o.idx}, ${o.sideWord} mark</button>`).join('')}</div></div>`}
 function phPopup(){const el=$('#ppop');if(!el)return;let h=null;
   if(PH.on&&G&&UI.started&&!(PH.cur&&PH.cur.block&&PH.pop!=='info')){
     if(PH.pop==='tiles'){const c=phPlaceCtx();h=c?phTilesHTML(c):null}
@@ -878,3 +874,121 @@ function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
     onExit:()=>{UI.camp=null;showStart()},
     scores:g=>g.ships.map(s=>s.alive?1:0),seats:g=>g.seats.map((x,i)=>({name:i===0?'You':x.nm,me:i===0,ai:x.human?undefined:x.lv}))})}
 campInit();
+// ===================== part 9: help (gx-help kit): coach bubbles the first time, the lightbulb on demand =====================
+// Bubbles: once per phase, short, pointing at the board or the tiles. The bulb: the game's own advisor (startAdvice / recMove / aiMove, the same ones the
+// computer's "best advice" uses) with a short why, plus rules cards. No hint buttons, no advice cards of their own.
+const HLP={quiet:false};
+// ---------------------------------------------------------------- pictures for the rules cards (inline SVG in the game's colours)
+const HP={
+ tile:()=>'<svg viewBox="0 0 64 64"><rect x="8" y="8" width="48" height="48" rx="8" fill="#1d7c83" stroke="#14232b" stroke-width="3"/><path d="M24 8Q24 30 8 38M40 8Q40 22 56 26M8 22Q30 24 36 56" fill="none" stroke="#c9f2ea" stroke-width="3.5" stroke-linecap="round"/></svg>',
+ rot:()=>'<svg viewBox="0 0 64 64"><rect x="14" y="14" width="36" height="36" rx="7" fill="#1d7c83" stroke="#14232b" stroke-width="3"/><path d="M26 14Q26 30 14 36M38 14Q38 24 50 28" fill="none" stroke="#c9f2ea" stroke-width="3" stroke-linecap="round"/><path d="M52 12a22 22 0 0 1 4 18M52 12l-9 1M52 12l1 9" fill="none" stroke="#e3b24b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ junk:(c)=>'<svg viewBox="0 0 64 64"><path d="M8 42h48l-9 13H17z" fill="#8a5a2a" stroke="#14232b" stroke-width="3" stroke-linejoin="round"/><path d="M32 6v36M32 8l18 25H32z" fill="'+(c||'#e8d9a8')+'" stroke="#14232b" stroke-width="3" stroke-linejoin="round"/></svg>',
+ mark:()=>'<svg viewBox="0 0 64 64"><rect x="4" y="44" width="56" height="16" rx="5" fill="#1d7c83" stroke="#14232b" stroke-width="3"/><circle cx="32" cy="36" r="9" fill="#e3b24b" stroke="#14232b" stroke-width="3"/><path d="M32 22V6M32 6l-7 8M32 6l7 8" fill="none" stroke="#e3b24b" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ crown:()=>'<svg viewBox="0 0 64 64"><path d="M8 48h48l-4-28-13 12-7-19-7 19-13-12z" fill="#e3b24b" stroke="#8a6a1a" stroke-width="3" stroke-linejoin="round"/><rect x="8" y="48" width="48" height="7" rx="2" fill="#c99a35" stroke="#8a6a1a" stroke-width="2"/></svg>',
+ line:()=>'<svg viewBox="0 0 64 64"><rect x="4" y="4" width="56" height="56" rx="8" fill="#1d7c83" stroke="#14232b" stroke-width="3"/><path d="M12 54Q12 32 32 32T52 10" fill="none" stroke="#14232b" stroke-width="10" stroke-linecap="round"/><path d="M12 54Q12 32 32 32T52 10" fill="none" stroke="#ffd24a" stroke-width="5.5" stroke-linecap="round"/><circle cx="12" cy="54" r="6" fill="#fff" stroke="#14232b" stroke-width="3"/></svg>',
+ edge:()=>'<svg viewBox="0 0 64 64"><rect x="4" y="30" width="40" height="30" rx="6" fill="#1d7c83" stroke="#14232b" stroke-width="3"/><path d="M14 52Q30 52 30 40T56 20" fill="none" stroke="#ffd24a" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 9"/><path d="M48 8l12 12M60 8L48 20" stroke="#d8432f" stroke-width="5" stroke-linecap="round"/></svg>',
+ crash:()=>'<svg viewBox="0 0 64 64"><path d="M6 44h24l-5 10H11z" fill="#8a5a2a" stroke="#14232b" stroke-width="3" stroke-linejoin="round"/><path d="M58 44H34l5 10h14z" fill="#8a5a2a" stroke="#14232b" stroke-width="3" stroke-linejoin="round"/><path d="M32 8l4 10 10-2-7 8 8 6-11-1-2 11-3-10-10 3 6-9-8-6 11 1z" fill="#d8432f" stroke="#14232b" stroke-width="2" stroke-linejoin="round"/></svg>',
+ lev:()=>'<svg viewBox="0 0 64 64"><path d="M6 50C10 28 22 40 28 26S44 16 52 24" fill="none" stroke="#14232b" stroke-width="12" stroke-linecap="round"/><path d="M6 50C10 28 22 40 28 26S44 16 52 24" fill="none" stroke="#3a9a6a" stroke-width="7" stroke-linecap="round"/><circle cx="54" cy="22" r="8" fill="#3a9a6a" stroke="#14232b" stroke-width="3"/><circle cx="56" cy="20" r="2.2" fill="#fff"/><path d="M60 26l4 4" stroke="#14232b" stroke-width="3" stroke-linecap="round"/></svg>',
+ wave:()=>'<svg viewBox="0 0 64 64"><path d="M4 22q7-8 14 0t14 0 14 0 14 0M4 36q7-8 14 0t14 0 14 0 14 0M4 50q7-8 14 0t14 0 14 0 14 0" fill="none" stroke="#2d9ba5" stroke-width="5" stroke-linecap="round"/><circle cx="32" cy="32" r="13" fill="#fff" stroke="#14232b" stroke-width="3"/><text x="32" y="39" text-anchor="middle" font-size="20" font-weight="800" fill="#14232b" font-family="Georgia,serif">2+</text></svg>',
+ dice:()=>'<svg viewBox="0 0 64 64"><rect x="8" y="12" width="32" height="32" rx="7" fill="#fff" stroke="#14232b" stroke-width="3" transform="rotate(-8 24 28)"/><circle cx="18" cy="22" r="3" fill="#14232b"/><circle cx="30" cy="34" r="3" fill="#14232b"/><circle cx="24" cy="28" r="3" fill="#14232b"/><rect x="30" y="26" width="26" height="26" rx="6" fill="#fff" stroke="#14232b" stroke-width="3" transform="rotate(10 43 39)"/><circle cx="38" cy="34" r="3" fill="#14232b"/><circle cx="48" cy="44" r="3" fill="#14232b"/></svg>',
+ cannon:()=>'<svg viewBox="0 0 64 64"><rect x="8" y="28" width="38" height="16" rx="7" fill="#4a4f57" stroke="#14232b" stroke-width="3" transform="rotate(-18 27 36)"/><circle cx="20" cy="48" r="8" fill="#8a5a2a" stroke="#14232b" stroke-width="3"/><circle cx="54" cy="16" r="5" fill="#d8432f" stroke="#14232b" stroke-width="2"/></svg>',
+ gate:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="#3b2a6e" stroke="#14232b" stroke-width="3"/><path d="M32 12a20 20 0 1 1-18 12M32 20a12 12 0 1 1-10 8" fill="none" stroke="#c9a8ff" stroke-width="4" stroke-linecap="round"/></svg>',
+ swap:()=>'<svg viewBox="0 0 64 64"><rect x="6" y="10" width="22" height="30" rx="4" fill="#1d7c83" stroke="#14232b" stroke-width="3"/><rect x="36" y="24" width="22" height="30" rx="4" fill="#2d9ba5" stroke="#14232b" stroke-width="3"/><path d="M14 50h18M32 50l-6-5M32 50l-6 5M50 16H32M32 16l6-5M32 16l6 5" fill="none" stroke="#e3b24b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ pass:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="none" stroke="#d8432f" stroke-width="5"/><path d="M16 48L48 16" stroke="#d8432f" stroke-width="5"/></svg>',
+ tap:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="18" fill="rgba(227,178,75,.25)" stroke="#e3b24b" stroke-width="4"/><path d="M30 14v26l-6-5-4 4 14 14h14l4-20-8-2-4-4-4 1-2-4z" fill="#fff" stroke="#14232b" stroke-width="2.5" stroke-linejoin="round"/></svg>'
+};
+function hpics(items){return '<div class="gxh-pics">'+items.map(it=>it==='>'?'<span class="gxh-ar">&rarr;</span>':'<figure>'+(HP[it[0]]?HP[it[0]](it[2]):'')+(it[1]?'<figcaption>'+it[1]+'</figcaption>':'')+'</figure>').join('')+'</div>'}
+// ---------------------------------------------------------------- where things are (the first one on screen that nothing covers)
+const hq=(...sels)=>()=>{for(const s of sels){for(const e of document.querySelectorAll(s)){if(e.closest('[hidden]'))continue;const r=e.getBoundingClientRect();if(!r.width||!r.height)continue;
+  const x=r.left+r.width/2,y=r.top+r.height/2;if(x<0||y<0||x>innerWidth||y>innerHeight)continue;const h=document.elementFromPoint(x,y);if(h&&(e===h||e.contains(h)))return e}}return null};
+// like hq, but scrolls the element into view first when it sits outside the screen (a long question card)
+const hqv=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(!e||e.closest('[hidden]'))continue;let r=e.getBoundingClientRect();if(!r.width||!r.height)continue;
+  if(r.top<0||r.bottom>innerHeight){try{e.scrollIntoView({block:'nearest'})}catch(x){}r=e.getBoundingClientRect()}
+  const x=r.left+r.width/2,y=r.top+r.height/2;if(x<0||y<0||x>innerWidth||y>innerHeight)continue;const h=document.elementFromPoint(x,y);if(h&&(e===h||e.contains(h)))return e}return null};
+// a world point on the board -> screen position (the same projection the gold marks and the route use)
+function hproj(wx,wz,wy){try{const P=ovMakeProj();const bd=$('#board');if(!P||!bd)return null;const B=bd.getBoundingClientRect();const p=P(wx,wy==null?.05:wy,wz);return p?{x:B.left+p[0],y:B.top+p[1]}:null}catch(e){return null}}
+// the start mark nearest the bottom middle of the screen (an example for the first bubble, not advice)
+function hlpPipExample(){try{const d=sideToAct();const info=startInfo(d);let best=null,bd=1e9;
+  for(const o of info){const p=hproj(o.w[0],o.w[1]);if(!p)continue;const dd=Math.abs(p.x-innerWidth/2)*.6+Math.abs(p.y-innerHeight*.55);if(dd<bd){bd=dd;best=p}}return best}catch(e){return null}}
+const HLP_STEPS={
+ start:{target:()=>hlpPipExample(),title:'Pick a start mark',text:'Tap a gold mark on the board\'s edge. The middle of an edge is safest; corners are cramped.',pic:()=>HP.mark()},
+ lay:{target:hq('#ppop .ph-tiles','#ps .ps-tiles','#pin .hand'),title:'Lay a current',text:'Pick a tile, turn it, then tap Place. Your junk sails along the new line.',pic:()=>HP.tile()},
+ nolay:{target:hq('#ps .ps-x .pb','#ps .ps-ctl .pb','#pin .row .btn','#main .row .btn'),title:'Nothing to lay',text:'No tile fits. Tap Pass, or use a Rift Gate or Deck Cannon if you have one.',pic:()=>HP.pass()},
+ doom:{target:hq('#pc [data-a=q]','#main [data-qkind] [data-a=q]'),title:'Junk in danger',text:'A leviathan is about to sink you. Pick a rescue below, or Accept.',pic:()=>HP.lev()},
+ cannon:{target:hq('#pc [data-a=q]','#main [data-qkind] [data-a=q]'),title:'A Deck Cannon',text:'Keep it to shoot a leviathan later, or discard it and draw a different tile.',pic:()=>HP.cannon()},
+ bonus:{target:hq('#pc [data-a=q]','#main [data-qkind] [data-a=q]'),title:'Sunken crews\' tiles',text:'Swap one of your tiles for a sunken crew\'s tile, or keep your hand.',pic:()=>HP.swap()},
+ gate:{target:hq('#pc [data-a=q]','#main [data-qkind] [data-a=q]'),title:'Rift Gate landing',text:'Tap an option below to choose where the Rift Gate puts you.',pic:()=>HP.gate()}
+};
+// ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
+const HLP_RULES=[
+ {title:'The goal',text:'Steer your junk with current tiles and stay afloat. The last junk afloat wins.',pic:()=>hpics([['junk','Stay afloat'],'>',['crown','Last one wins']])},
+ {title:'One turn',text:'Dice may wake leviathans, you lay a tile, your junk sails the new line, then you draw.',pic:()=>hpics([['dice','Dice'],'>',['tile','Lay'],'>',['line','Sail']])},
+ {phase:'start',title:'Last junk afloat wins',text:'Every junk starts on a gold mark. Stay afloat longer than every rival.',pic:()=>hpics([['junk','Stay afloat'],'>',['crown','Winner']])},
+ {phase:'start',title:'Choose a start mark',text:'Tap a gold mark on the board\'s edge. Your junk will sail inward from it.',pic:()=>hpics([['mark','Start mark'],'>',['junk','Your junk']])},
+ {phase:'start',title:'Corners are cramped',text:'A middle mark leaves room to turn. Near a corner you may run out of sea.',pic:()=>hpics([['edge','Edge = sunk'],['mark','Middle = room']])},
+ {phase:'lay',title:'Lay and turn a tile',text:'Tap a tile, turn it with the arrows or a swipe, then tap Place. It joins your junk\'s line.',pic:()=>hpics([['tile','Pick'],'>',['rot','Turn'],'>',['tap','Place']])},
+ {phase:'lay',title:'Your junk sails',text:'After you place, your junk sails along every connected current until the line ends. Rivals sail the same way.',pic:()=>hpics([['junk','Your junk'],'>',['line','Follows the line']])},
+ {phase:'lay',title:'Edges and crashes sink',text:'Sail off the board, into a leviathan, or onto another junk\'s wake, and you sink. Check the red cross.',pic:()=>hpics([['edge','Edge'],['lev','Leviathan'],['crash','Crash']])},
+ {phase:'lay',title:'Leviathans and waves',text:'Dice wake leviathans each turn; one that reaches you sinks you. A rogue wave capsizes junks that roll low.',pic:()=>hpics([['lev','Leviathan'],['wave','Rogue wave']])},
+ {phase:'nolay',title:'No tile fits',text:'If you cannot lay a tile, you may pass. A Rift Gate or Deck Cannon can still help.',pic:()=>hpics([['tile','No tile'],'>',['pass','Pass']])},
+ {phase:'nolay',title:'Rift Gate',text:'A Rift Gate throws a junk to a rolled square. Use it to escape danger.',pic:()=>hpics([['gate','Rift Gate']])},
+ {phase:'nolay',title:'Deck Cannon',text:'Fire a Deck Cannon at a leviathan next to your junk. It is removed from the board.',pic:()=>hpics([['cannon','Fire'],'>',['lev','Gone']])},
+ {phase:'doom',title:'Sinking soon',text:'A leviathan is about to reach your junk. You get one chance to react before it happens.',pic:()=>hpics([['lev','Leviathan'],'>',['junk','Your junk']])},
+ {phase:'doom',title:'Rescue options',text:'Fire a Deck Cannon, jump through a Rift Gate, or move to a safer square. Tap one.',pic:()=>hpics([['cannon','Cannon'],['gate','Gate']])},
+ {phase:'doom',title:'Or accept',text:'If nothing helps, tap Accept. Your junk sinks, but a rival must still outlast the others.',pic:()=>hpics([['crash','Accept'],'>',['crown','Others race on']])},
+ {phase:'cannon',title:'A Deck Cannon',text:'Hold up to two. Fire one at a leviathan next to your junk, even on a rival\'s turn.',pic:()=>hpics([['cannon','Fire'],'>',['lev','Gone']])},
+ {phase:'cannon',title:'Keep or discard',text:'Keep it for later, or show it and discard it to draw a different tile.',pic:()=>hpics([['cannon','Keep'],['swap','Redraw']])},
+ {phase:'bonus',title:'Elimination bonus',text:'When a junk sinks, its tiles go to a pool. You may swap yours for better ones.',pic:()=>hpics([['crash','Sunk'],'>',['swap','Swap']])},
+ {phase:'bonus',title:'Keep your hand',text:'Tap Keep your hand if your tiles are already good. Swapping is optional.',pic:()=>hpics([['tile','Your tiles'],['pass','No swap']])},
+ {phase:'gate',title:'Rift Gate',text:'A rift throws a junk to a rolled square, and it lands on a tile you place.',pic:()=>hpics([['gate','Rift'],'>',['junk','New spot']])},
+ {phase:'gate',title:'Choose the landing',text:'Pick a landing far from the edges and from leviathans, so your junk has room to sail.',pic:()=>hpics([['edge','Near edge'],['junk','Open sea']])}
+];
+// ---------------------------------------------------------------- phases
+// who may decide on the board right now (a seat), or null when the sea is moving, a card is up, or it is not your turn
+function hlpSeat(){if(!G||!UI.started||G.over||UI.busy)return null;const st=$('#start');if(st&&!st.hidden)return null;if(GX.open)return null;
+  const d=sideToAct();if(d<0||!G.seats[d].human||mustPass(d))return null;if(NET.on&&d!==NET.mySeat)return null;
+  if(!G.q&&UI.sunk&&UI.sunk.length)return null;if(PH.on&&PH.cur&&PH.cur.block&&PH.cur.kind!=='q')return null;return d}
+const HLP_Q={doom:'doom',cannonDraw:'cannon',bonus:'bonus',gateSq:'gate',gatePlace:'gate',gateWake:'gate'};
+function hlpPhaseRaw(){const d=hlpSeat();if(d==null)return null;
+  if(G.q)return HLP_Q[G.q.kind]||null;
+  if(G.phase==='setup')return 'start';
+  if(G.phase==='play'&&G.step==='act')return UI.canPlace?'lay':'nolay';
+  return null}
+const hlpPhase=()=>{try{return hlpPhaseRaw()}catch(e){return null}};
+// ---------------------------------------------------------------- the bulb: one plan per move, used for the finger, the glow and the sentence
+function capW(t,n){const w=String(t||'').replace(/\s+/g,' ').trim().split(' ');return w.length<=n?w.join(' '):''}
+function hlpQWhy(q,o){const h=o&&o.h;
+  return h==='dCannon'?'Fire the cannon: it removes the leviathan.':h==='dGate'?'The Rift Gate throws your junk clear.':h==='dReloc'?'This square is the safest place to move to.':h==='dAccept'?'Nothing saves you here, so accept.':
+   h==='cKeep'?'A cannon can save your junk later.':h==='cDiscard'?'Discard it and draw a different tile.':h==='bSwap'?'Their tile is more useful than yours.':h==='bDone'?'Your tiles are already good. Keep them.':
+   q.kind==='gateSq'?'Far from the edges and from leviathans.':q.kind==='gatePlace'?'The tile that gives your junk the best landing.':q.kind==='gateWake'?'The wake that leaves your junk safest.':'The best choice right now.'}
+function hlpPlan(){const d=hlpSeat();if(d==null)return null;const ph=hlpPhaseRaw();if(!ph)return null;let K;try{K=knowledge(d)}catch(e){return null}
+  if(ph==='start'){const info=startInfo(d),adv=startAdvice(K,d,info);if(!adv)return null;const m=adv.o.m;const corner=(m.x===0||m.x===BW-1)&&(m.y===0||m.y===BW-1);
+    const dm=distMon(K,[m.x,m.y]);const hasL=K.mons.some(q=>q.k==='L');
+    let why=capW((corner?'A corner, but the best left.':'Away from the corners, so you have room to turn.')+(hasL?' Nearest leviathan: '+dm+' away.':''),15)||capW(corner?'A corner, but the best left.':'Away from the corners, so you have room to turn.',15);
+    return {ph,why,key:'start:'+m.x+','+m.y+','+m.e,to:()=>hproj(adv.o.w[0],adv.o.w[1]),from:null}}
+  if(G.q){const q=G.q;let r=null;try{r=aiMove(d,'hard')}catch(e){}if(!r||r.a!=='q'||!q.opts[r.i])return null;const i=r.i;
+    const why=capW(hlpQWhy(q,q.opts[i]),15);if(!why)return null;
+    return {ph,why,key:'q:'+q.kind+':'+i,to:hqv('[data-a=q][data-i="'+i+'"]'),from:null}}
+  const m=recMove(d);if(!m)return null;
+  if(m.a==='place'){const A=analyse(K,d,m);
+    const why=capW(A.st==='ok'?'Safest tile: sails '+A.n+' current'+(A.n>1?'s':'')+', stops at column '+(A.end[0]+1)+', row '+(A.end[1]+1)+'.':A.st==='gate'?'It leads into the Rift Gate.':'Every tile is risky; this one is the least bad.',15);if(!why)return null;
+    const apply=()=>{const s=UI.sel;if(!s||s.t!==m.t||s.r!==m.r||s.s!==m.s){UI.sel={t:m.t,r:m.r,s:m.s};HLP.quiet=true;try{render()}finally{HLP.quiet=false}}};
+    return {ph,why,key:'place:'+m.t+':'+m.r+':'+m.s,apply,from:hq('#ppop .ph-t[data-t="'+m.t+'"]','#ps .pt[data-t="'+m.t+'"]','#pin .hc[data-t="'+m.t+'"]'),to:hq('#ppop [data-a=place]','#ps [data-a=place]','#pin [data-a=place]')}}
+  if(m.a==='cannon')return {ph,why:'It removes a leviathan that is next to you.',key:'cannon:'+m.m,from:null,to:hq('[data-a=cannon][data-m="'+m.m+'"][data-s="'+m.s+'"]')};
+  if(m.a==='gate')return {ph,why:'It moves you away from danger.',key:'gate:'+m.t,from:null,to:hq('[data-a=gate][data-t="'+m.t+'"][data-s="'+m.s+'"]','[data-a=gate][data-t="'+m.t+'"]')};
+  if(m.a==='pass')return {ph,why:'You have nothing to play.',key:'pass',from:null,to:hq('[data-a=pass]')};
+  return null}
+function hlpSuggest(){let p=null;try{p=hlpPlan()}catch(e){console.error(e)}if(!p)return null;
+  if(p.apply)p.apply();
+  const to=p.to();if(!to)return null;
+  return {why:p.why,key:p.key,target:p.to,from:p.from&&p.from()?p.from:null}}
+// ---------------------------------------------------------------- wiring
+let _hlpInit=false;
+function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
+  GXH.init({game:'tidewake',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.opip,.oring,#ps .pt,#ps .pb,#ppop .pb,#ppop .ph-t,#pc .btn,#pin .hc,#pin .btn,#dockbody .btn'});
+  GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
+  const b=$('#bulbbtn');if(b)b.addEventListener('click',()=>{try{const c=GXH.state().cur;if(c&&c.kind==='bulb'&&G&&UI.started)UI.campHints=(UI.campHints||0)+1}catch(e){}})}
+function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||HLP.quiet)return;GXH.phase(hlpPhase())}
+{const _r=render;render=function(){const r=_r.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r};
+ const _pa=phAfter;phAfter=function(){const r=_pa.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r}}
+hlpInit();
