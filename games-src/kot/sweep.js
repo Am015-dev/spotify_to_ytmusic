@@ -108,7 +108,7 @@ const PRE = () => { // what the game's own advisors pick (computed here, apart f
   return { adv, has: !!s, at, sig } };
 const AFTER = () => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), sig: typeof G === 'undefined' || !G ? '-' : [G.turn, G.phase, G.active, G.rolls, G.dice.map(d => d.f + (d.k ? 'k' : '')).join(''), G.pl.map(q => q.hp + ',' + q.vp + ',' + q.en).join(';'), G.log && G.log.length].join('|') });
 async function helpTap(p, sel) { const c = await p.evaluate(sel => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null }, sel); if (!c) return false; await p.touchscreen.tap(c[0], c[1]); return true }
-async function neutralTap(p) { const n = await p.evaluate(NEUTRAL); if (!n) return false; await p.touchscreen.tap(n[0], n[1]); return true }
+async function neutralTap(p) { const n = await p.evaluate(NEUTRAL); if (!n) return false; p._nt = await p.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return e ? e.tagName + '#' + e.id + '.' + String(e.className).slice(0, 30) : 'none' }, n); await p.touchscreen.tap(n[0], n[1]); return true }
 async function rulesCheck(p, tag, ph) {
   helpTot.rules++;
   const R = await p.evaluate(() => { const e = document.querySelector('.gxh-rules'); if (!e) return null; const out = [], n = +e.dataset.count; for (let i = 0; i < n; i++) { out.push({ t: e.querySelector('.gxh-rt').textContent, x: e.querySelector('.gxh-rx').textContent, pic: !!e.querySelector('.gxh-pic svg') }); if (i < n - 1) e.querySelector('.gxh-next').click() } const r = e.querySelector('.gxh-card').getBoundingClientRect(); return { n, cards: out, inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight } });
@@ -133,7 +133,7 @@ async function helpFlow(p, tag, st) {
         const R4 = [r.left, r.top, r.right, r.bottom], hit = (a, c) => a[0] < c.r && a[2] > c.l && a[1] < c.b && a[3] > c.t;
         return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: R4, T: tq && { l: tq.left, t: tq.top, r: tq.right, b: tq.bottom }, glow: cores.some(c => hit(R4, c)), inside: r.left >= -1 && r.top >= -1 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1 } }, hs.ph).catch(() => null);
       if (b) break; await p.waitForTimeout(80) }
-    if (!b) await fail(p, tag, 'help bubble', 'no coach bubble for phase ' + hs.ph);
+    if (!b) { if ((await p.evaluate(() => hlpPhase())) !== hs.ph) seen.delete(hs.ph); else await fail(p, tag, 'help bubble', 'no coach bubble for phase ' + hs.ph + ' ' + JSON.stringify(await p.evaluate(() => ({ st: GXH.state(), t: !!HLP_STEPS[hlpPhase()].target() })))); }
     else {
       helpTot.bubbles[hs.ph] = (helpTot.bubbles[hs.ph] || 0) + 1;
       if (b.id !== hs.ph) await fail(p, tag, 'help bubble', 'bubble for ' + b.id + ' shown in phase ' + hs.ph);
@@ -151,17 +151,19 @@ async function helpFlow(p, tag, st) {
   // 2) the lightbulb: the first time in every phase, then now and then
   if (hs.ph && (!seen.has('bulb:' + hs.ph) || rnd() < .12) && (p._bulbN || 0) < 16) {
     seen.add('bulb:' + hs.ph); p._bulbN = (p._bulbN || 0) + 1; helpTot.bulbs++;
+    if (hs.ph === 'watch') { await p.evaluate(() => GXH.rules('watch')); await p.waitForTimeout(150); await rulesCheck(p, tag, 'watch'); return true } // the computer's turn has no advice: rules cards only
     const pre = await p.evaluate(PRE);
     if (!(await helpTap(p, '#bulbbtn'))) { await fail(p, tag, 'help bulb', 'no bulb button on screen'); return false }
     await p.waitForTimeout(380);
     const r = await p.evaluate(() => {
+      const s0 = hlpSuggest(), e0 = s0 && s0.target && s0.target(), q0 = e0 && e0.getBoundingClientRect(), now = q0 && q0.width ? { x: q0.left + q0.width / 2, y: q0.top + q0.height / 2 } : null;
       const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'), ru = document.querySelector('.gxh-rules'); let hit = null;
       if (f) { const e = document.elementFromPoint(+f.dataset.tx, +f.dataset.ty), d = x => e && e.closest(x); hit = e && { die: d('[data-die]') && d('[data-die]').dataset.die, shop: d('[data-shop]') && d('[data-shop]').dataset.shop, opt: d('[data-opt]') && d('[data-opt]').dataset.opt, act: d('[data-act]') && d('[data-act]').dataset.act, story: !!d('[data-a="story"]') } }
-      return { f: f && { tx: +f.dataset.tx, ty: +f.dataset.ty }, hit, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!ru } });
+      return { now, f: f && { tx: +f.dataset.tx, ty: +f.dataset.ty }, hit, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!ru } });
     if (pre.has && pre.at) {
       if (!r.f) await fail(p, tag, 'help bulb', 'tapped, no finger (' + hs.ph + ')');
       else {
-        if (Math.hypot(r.f.tx - pre.at.x, r.f.ty - pre.at.y) > 3) await fail(p, tag, 'help bulb', 'finger ' + Math.round(r.f.tx) + ',' + Math.round(r.f.ty) + ' != target ' + Math.round(pre.at.x) + ',' + Math.round(pre.at.y) + ' (' + hs.ph + ')');
+        if (r.now && Math.hypot(r.f.tx - r.now.x, r.f.ty - r.now.y) > 3) await fail(p, tag, 'help bulb', 'finger ' + Math.round(r.f.tx) + ',' + Math.round(r.f.ty) + ' != target ' + Math.round(pre.at.x) + ',' + Math.round(pre.at.y) + ' (' + hs.ph + ')');
         const a = pre.adv || {}, h = r.hit || {};
         const okAdv = (a.opt !== undefined && h.opt === a.opt) || (a.die !== undefined && h.die === String(a.die)) || (a.shop !== undefined && h.shop === String(a.shop)) || (a.act && h.act === a.act) || (a.story && h.story);
         if (!okAdv) await fail(p, tag, 'help bulb', 'finger is not on the advisor pick ' + JSON.stringify(a) + ' but on ' + JSON.stringify(h) + ' (' + hs.ph + ')');
@@ -176,7 +178,7 @@ async function helpFlow(p, tag, st) {
     await p.evaluate(() => GXH.hide());
     const after = await p.evaluate(AFTER);
     if (after.g) await fail(p, tag, 'help bulb', 'help still on screen after dismissing (' + hs.ph + ')');
-    if (hs.ph !== 'watch' && hs.ph !== 'intro' && after.sig !== pre.sig && st.humanTurn) await fail(p, tag, 'help bulb', 'tapping the bulb changed the game (' + pre.sig + ' -> ' + after.sig + ')');
+    if (hs.ph !== 'watch' && hs.ph !== 'intro' && after.sig !== pre.sig && st.humanTurn) await fail(p, tag, 'help bulb', 'tapping the bulb changed the game (' + pre.sig + ' -> ' + after.sig + ') last neutral tap on ' + p._nt);
     return true;
   }
   return false;
