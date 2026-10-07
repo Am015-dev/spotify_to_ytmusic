@@ -336,6 +336,7 @@ function renderBoard() {
   renderPrompt();
   renderBar();
   placeFinger();
+  if (typeof hlpMarks === 'function' && G.phase !== 'over') hlpMarks();
 }
 // the whole city, full screen: 15 slots in a grid. Usable destinations glow here just as in the strip; tap outside to close.
 function cityOverlay(me, list, cityCard) {

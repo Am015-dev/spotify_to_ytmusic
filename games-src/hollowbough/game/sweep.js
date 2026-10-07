@@ -89,7 +89,7 @@ async function playGame(browser, W, H, gi, mode) {
           if (!r.why || wc(r.why) > 15) fail(tag, 'bulb why ' + wc(r.why) + ' words: ' + r.why); if (!r.link) fail(tag, 'bulb bubble has no "How does this work?"');
           { const bad = await p.evaluate(() => { const W = innerWidth, Hh = innerHeight, b = document.querySelector('.gxh-bub.on'); if (!b) return []; const r = b.getBoundingClientRect(); return (r.left < -1 || r.top < -1 || r.right > W + 1 || r.bottom > Hh + 1) ? ['bulb bubble outside the screen'] : []; }); bad.forEach(x => fail(tag, x)); }
           if (R() < .5 && r.link) { const lk = await p.$('.gxh-bub .gxh-link'); const lb = lk && await lk.boundingBox(); if (lb) { await p.touchscreen.tap(lb.x + lb.width / 2, lb.y + lb.height / 2); await sleep(250); await rulesCheck(hs.ph); } }
-          else { await p.touchscreen.tap(...NEUTRAL); await sleep(150); }
+          else if (!(await p.evaluate(() => !!UI.sel))) { await p.touchscreen.tap(...NEUTRAL); await sleep(150); }
         } else { HT.nul++; if (r.f) fail(tag, 'bulb with no suggestion still pointed a finger (' + hs.ph + ')'); if (!r.rules) fail(tag, 'bulb with no suggestion did not open the rules (' + hs.ph + ')'); else await rulesCheck(hs.ph); }
         await p.evaluate(() => GXH.hide());
         const a = await p.evaluate(() => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), sig: G.logN + '|' + (UI.sel ? 's' : '') + '|' + (G.q ? G.q.kind : '') }));
