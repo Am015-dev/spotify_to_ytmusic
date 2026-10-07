@@ -38,7 +38,7 @@ const OUT=process.argv[3]||'qa_w10';fs.mkdirSync(OUT,{recursive:true});const MOD
  async function clear(){for(let i=0;i<10;i++){if(!(await busy()))return;let t=null;for(const s of CONT)if(await tap(s)){t=s;break}await tick(20)}}
  // setup: straight stretch (pick the longest straight run of an Autobahn sample)
  const ST=await p.evaluate(()=>{const M=__mho;let best=null;M.abS().forEach((S,k)=>{if(!S.ab)return;for(let i=0;i+40<S.n;i+=4){const a=M.abPt(k,i),c=M.abPt(k,i+40);const d=Math.abs(Math.atan2(a.tx,a.tz)-Math.atan2(c.tx,c.tz));if(d<.02&&(!best||d<best.d))best={k,i,d,x:a.x,z:a.z,h:Math.atan2(a.tx,a.tz)}}});return best});
- const place=async(x,z,h)=>{await p.evaluate(([x,z,h])=>{const M=__mho,R=M.RO;M.warp(x,z,h,performance.now());R.x=x;R.z=z;R.y=M.gnd(x,z,R.y+30);R.v=0;R.yr=0;R.vh=h;R.h=h;R.stkT=0;R.crTurn=null},[x,z,h]);await tick(30);await clear();await p.evaluate(([x,z,h])=>{const R=__mho.RO;R.x=x;R.z=z;R.h=R.vh=h;R.v=0},[x,z,h]);await tick(2)};
+ const place=async(x,z,h)=>{await p.evaluate(([x,z,h])=>{const M=__mho,R=M.RO;M.warp(x,z,h,performance.now());R.x=x;R.z=z;R.y=M.gnd(x,z,R.y+30);R.v=0;R.yr=0;R.vh=h;R.h=h;R.stkT=0;R.crTurn=null},[x,z,h]);await tick(30);await clear();await p.evaluate(([x,z,h,sv])=>{const R=__mho.RO;R.x=x;R.z=z;R.h=R.vh=h;R.v=sv},[x,z,h,+(process.env.START_V||0)]);await tick(2)};
  // warm-up: a few seconds of driving first (the first drive after the intro is slow)
  await apply({gas:true,brake:false});await tick(240);await apply({gas:false,brake:false});await tick(60);
  const res={mode:MODE,straight:ST,brake:[],traffic:[],errs};
@@ -58,7 +58,7 @@ const OUT=process.argv[3]||'qa_w10';fs.mkdirSync(OUT,{recursive:true});const MOD
  if(TEST!=='brake')for(const kmh of(process.env.KMH||'20,60,120,160').split(',').map(Number)){
   // setup only: a stopped city traffic car on a straight segment (as at a red light); the player is placed behind it in its lane.
   // then real input: GAS (+BOOST for 160) until the target speed, then off the gas and coast into it.
-  const runway=Math.max(45,(kmh/3.6)**2/(2*3.2)+30);await place(ST.x,ST.z,ST.h);
+  const runway=Math.max(45,(kmh/3.6)**2/(2*2.2)+30);await place(ST.x,ST.z,ST.h);
   // setup only: re-route one traffic car onto this Autobahn lane, stopped, runway metres ahead of the player
   const sel=await p.evaluate(([runway])=>{const M=__mho,R=M.RO,H=M.HUB,N=H.nodes,fx=Math.sin(R.h),fz=Math.cos(R.h),tx=R.x+fx*runway,tz=R.z+fz*runway;let best=null;
    for(let i=0;i<N.length;i++){const A=N[i];if(!A||!A.ab)continue;for(const k of A.nb||[]){const B=N[k];if(!B||!B.ab)continue;const L=Math.hypot(B.x-A.x,B.z-A.z)||1,ux=(B.x-A.x)/L,uz=(B.z-A.z)/L;if(ux*fx+uz*fz<.995)continue;
