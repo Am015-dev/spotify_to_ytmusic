@@ -497,6 +497,12 @@ function buildMonster(m){const g=new THREE.Group();const C=new THREE.Color(MONS[
   }
   airbrush(g);
   // the display base (glossy black lacquer, a coloured rim and a brass bezel)
+  const cutF=window.CCMedia&&CCMedia.cutout(m);
+  if(cutF){ // the character's own picture stands on the pedestal as a cut-out figure (replaces the built model)
+    const old=g.children.slice();
+    const tex=new THREE.TextureLoader().load(cutF,t=>{const w=t.image.width,h=t.image.height,H=4.2,A=w/h,K=Math.min(1,2.9/(H*A));pl.scale.set(H*A*K,H*K,1);pl.visible=true;old.forEach(x=>x.visible=false)});tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=4;
+    const pm=new THREE.MeshStandardMaterial({map:tex,emissiveMap:tex,emissive:0xffffff,emissiveIntensity:.5,roughness:.7,metalness:0,alphaTest:.5,side:THREE.DoubleSide});pm.alphaToCoverage=true;
+    const pg=new THREE.PlaneGeometry(1,1);pg.translate(0,.5,0);const pl=new THREE.Mesh(pg,pm);pl.visible=false;pl.userData.standee=1;g.add(pl)}
   const R=new THREE.Group();const base=new THREE.Group();R.add(base);g.position.y=.14;R.add(g);
   mesh(lathe([[0,0],[1.18,0],[1.24,.03],[1.26,.08],[1.22,.13],[1.14,.155],[0,.155]],64),new THREE.MeshPhysicalMaterial({color:0x17111e,roughness:.25,clearcoat:1,clearcoatRoughness:.1}),0,0,0,base);
   mesh(new THREE.TorusGeometry(1.255,.022,8,80),new THREE.MeshStandardMaterial({color:C,emissive:C,emissiveIntensity:.9,roughness:.3}),0,.08,0,base,true).rotation.x=Math.PI/2;
@@ -628,6 +634,7 @@ function loop3D(){(PH?PH.raf:requestAnimationFrame)(loop3D);V3.frames=(V3.frames
     const b=Math.sin(t*2.2+o.phase),S=MS;const bob=(act?Math.abs(Math.sin(t*6))*.05:0);g.scale.set(S*(1+sq*.6),S,S*(1+sq*.6));o.fig.scale.set(1-b*.02+sq*.3,1+b*.035+bob-sq,1-b*.02+sq*.3);
     if(o.ko!==undefined){o.ko=Math.min(1,o.ko+dt*1.5);const e=1-Math.pow(1-o.ko,3);o.fig.rotation.z=e*Math.PI/2*.92;o.fig.position.y=.14+e*.45;g.position.y=Math.max(.2,g.position.y);o.mats.forEach(m=>m.color.lerp(_ko,.05))}
     else{const tgt=V3.cam.position;const want=Math.atan2(tgt.x-g.position.x,tgt.z-g.position.z)*.8;g.rotation.y+=(want-g.rotation.y)*.1}
+    {const st=o.fig.children[o.fig.children.length-1],cp=V3.cam.position;if(st&&st.userData.standee){const dx=cp.x-g.position.x,dz=cp.z-g.position.z,e=Math.atan2(cp.y-g.position.y,Math.hypot(dx,dz));st.rotation.x=-Math.max(0,Math.min(1.2,e*.9))}}
     if(o.shakeT>0){o.shakeT-=dt;g.position.x+=Math.sin(t*60)*.03}
     if(o.flash>0){o.flash-=dt*2;const f=Math.max(0,o.flash);o.mats.forEach(m=>m.emissive.copy(m.userData.e0).lerp(_red,f))}
     else if(o.berserk){const r=.25+Math.sin(t*8)*.2;o.mats.forEach(m=>m.emissive.setRGB(r,0,0));o.wasB=1}else if(o.wasB||o.flash!==undefined){o.wasB=0;o.flash=undefined;o.mats.forEach(m=>m.emissive.copy(m.userData.e0))}
@@ -672,7 +679,7 @@ function animWorld(dt,t){
   V3.clouds.forEach((c,k)=>{c.position.x+=dt*(.4+k*.05);if(c.position.x>90)c.position.x=-90})}
 // ---- 3D portraits of the vinyl figures for the monster picker (the SVG art stays as the fallback) ----
 const MONPIC={};
-function monPic(k){return MONPIC[k]?`<img class="mp3" src="${MONPIC[k]}" alt="" draggable="false">`:`<svg viewBox="-66 -70 132 136">${monArt(k)}</svg>`}
+function monPic(k){const cf=window.CCMedia&&CCMedia.cutout(k);if(cf)return `<img class="mp3" src="${cf}" alt="" draggable="false">`;return MONPIC[k]?`<img class="mp3" src="${MONPIC[k]}" alt="" draggable="false">`:`<svg viewBox="-66 -70 132 136">${monArt(k)}</svg>`}
 function makePortraits(){if(!V3.on||V3.portraitsDone)return;V3.portraitsDone=true;const S=192;const r=V3.r;let rt;
   try{rt=new THREE.WebGLRenderTarget(S,S,{type:THREE.FloatType,samples:r.capabilities.isWebGL2?4:0})}catch(e){return}
   const ps=new THREE.Scene();ps.add(new THREE.HemisphereLight(0x9a90ff,0x2a1430,.9));const key=new THREE.DirectionalLight(0xffc9a0,2.6);key.position.set(-4,6,6);ps.add(key);
