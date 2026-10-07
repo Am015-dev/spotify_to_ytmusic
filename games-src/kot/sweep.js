@@ -129,7 +129,7 @@ async function helpFlow(p, tag, st) {
     while (Date.now() - t1 < 2600) {
       b = await p.evaluate(ph => {
         const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(), tq = te && te.getBoundingClientRect(), r = e.getBoundingClientRect();
-        const cores = [...document.querySelectorAll('.sugg,.rec,#pacts .btn.primary,#choice .btn.primary,#pshop .ptile.ok')].filter(x => !x.closest('[data-help]') && x.getClientRects().length).map(x => { const q = x.getBoundingClientRect(), w = Math.min(q.width, 56), h = Math.min(q.height, 56), cx = q.left + q.width / 2, cy = q.top + q.height / 2; return { l: cx - w / 2, t: cy - h / 2, r: cx + w / 2, b: cy + h / 2 } });
+        const cores = [...document.querySelectorAll(['intro', 'power', 'yield', 'choice'].includes(ph) ? '#choice .btn.primary,#choice .rec' : '.sugg,.rec,#pacts .btn.primary,#pshop .ptile.ok')].filter(x => !x.closest('[data-help]') && x.getClientRects().length).map(x => { const q = x.getBoundingClientRect(), w = Math.min(q.width, 56), h = Math.min(q.height, 56), cx = q.left + q.width / 2, cy = q.top + q.height / 2; return { l: cx - w / 2, t: cy - h / 2, r: cx + w / 2, b: cy + h / 2 } });
         const R4 = [r.left, r.top, r.right, r.bottom], hit = (a, c) => a[0] < c.r && a[2] > c.l && a[1] < c.b && a[3] > c.t;
         return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: R4, T: tq && { l: tq.left, t: tq.top, r: tq.right, b: tq.bottom }, glow: cores.some(c => hit(R4, c)), inside: r.left >= -1 && r.top >= -1 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1 } }, hs.ph).catch(() => null);
       if (b) break; await p.waitForTimeout(80) }
@@ -143,14 +143,14 @@ async function helpFlow(p, tag, st) {
       if (!b.inside) await fail(p, tag, 'help bubble', 'outside the screen (' + hs.ph + ')');
       if (b.T) { const [l, t, r, bt] = b.r; if (l < b.T.r && r > b.T.l && t < b.T.b && bt > b.T.t) await fail(p, tag, 'help bubble', 'covers its target (' + hs.ph + ')'); }
       if (b.glow) await fail(p, tag, 'help bubble', 'covers a glowing control (' + hs.ph + ')');
-      if (rnd() < .5) { if (!(await neutralTap(p))) await helpTap(p, '.gxh-bub .gxh-ok') } else await helpTap(p, '.gxh-bub .gxh-ok');
+      if (Math.random() < .5) { if (!(await neutralTap(p))) await helpTap(p, '.gxh-bub .gxh-ok') } else await helpTap(p, '.gxh-bub .gxh-ok');
       await p.waitForTimeout(150);
       if (await p.evaluate(() => !!document.querySelector('.gxh-bub'))) await fail(p, tag, 'help bubble', 'did not dismiss on a tap (' + hs.ph + ')');
       return true;
     }
   }
   // 2) the lightbulb: the first time in every phase, then now and then
-  if (hs.ph && (!seen.has('bulb:' + hs.ph) || rnd() < .12) && (p._bulbN || 0) < 16) {
+  if (hs.ph && (!seen.has('bulb:' + hs.ph) || Math.random() < .12) && (p._bulbN || 0) < 16) {
     seen.add('bulb:' + hs.ph); p._bulbN = (p._bulbN || 0) + 1; helpTot.bulbs++;
     if (hs.ph === 'watch') { await p.evaluate(() => GXH.rules('watch')); await p.waitForTimeout(150); await rulesCheck(p, tag, 'watch'); return true } // the computer's turn has no advice: rules cards only
     for (let w = 0; w < 25 && (await p.evaluate(() => !!document.querySelector('#dice .die.spin,.gx-dock[data-bf="resolving"]'))); w++) await p.waitForTimeout(100); // let the dice settle
@@ -172,7 +172,7 @@ async function helpFlow(p, tag, st) {
       }
       if (!r.ring) await fail(p, tag, 'help bulb', 'nothing glows at the suggestion (' + hs.ph + ')');
       if (!r.why || wc(r.why) > 15) await fail(p, tag, 'help bulb', 'why ' + wc(r.why) + ' words: ' + r.why); if (!r.link) await fail(p, tag, 'help bulb', 'no "How does this work?" (' + hs.ph + ')');
-      if (rnd() < .5 && r.link) { await helpTap(p, '.gxh-bub .gxh-link'); await p.waitForTimeout(250); await rulesCheck(p, tag, hs.ph) } else { await neutralTap(p); await p.waitForTimeout(150) }
+      if (Math.random() < .5 && r.link) { await helpTap(p, '.gxh-bub .gxh-link'); await p.waitForTimeout(250); await rulesCheck(p, tag, hs.ph) } else { await neutralTap(p); await p.waitForTimeout(150) }
     } else {
       helpTot.bulbNull++;
       if (!r.f) { if (!r.rules) await fail(p, tag, 'help bulb', 'no suggestion and no rules cards (' + hs.ph + ')'); else await rulesCheck(p, tag, hs.ph); if (pre.adv && !pre.adv.none) await fail(p, tag, 'help bulb', 'advisor has a pick ' + JSON.stringify(pre.adv) + ' but the bulb gave none (' + hs.ph + ')'); }
