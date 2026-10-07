@@ -741,6 +741,7 @@ body.touch #roamPlate small{white-space:nowrap}
 // in the city above 125 km/h (was 86 km/h, which the faster city car reaches on every street).
 const W14_ST={k0:.25,rk:1.5,hbCity:34.7},W14_PIV=1.6;
 const OD_CHANGELOG=[
+  {v:'v87w',date:'7 Oct 2026',items:[{t:'FIXED',s:'Hot Drop: Oma Hilde\'s tow truck no longer jumps onto your car at the start (the big orange block over the screen); it waits up the road and drives off.'},{t:'FIXED',s:'Races: rival name tags no longer pile up; only the 3 nearest show, stacked neatly.'},{t:'FIXED',s:'City traffic sits on all four tyres (no more floating wheels on sloped roads).'},{t:'CHANGED',s:'Garage: the "drag to rotate" tip no longer covers the GARAGE sign and goes away once you have dragged.'}]},
   {v:'v87v',date:'7 Oct 2026',items:[{t:'NEW',s:'Garage COLLECTION: your cars sorted into Street, Off-road and Water tabs with rarity colours, sort, filter and favourites; tap a card to drive it.'},{t:'NEW',s:'9 ready-made cars inspired by real LEGO sets (wedge supercar, roadster, police car, F1 car, monster truck and more); tap BUILD to open and edit any of them.'}]},
  {v:'v87u',date:'7 Oct 2026',items:[{t:'NEW',s:'Drift to boost: hold GAS and press BRAKE while steering to drift with a pink trail; the drift fills your boost (in races, BRAKE + steer above 60 km/h).'},{t:'NEW',s:'Full boost bar = a big burst and small LEGO thrusters; hold BOOST 2 s for BRICKBASH, which knocks traffic aside. Smashing things adds boost.'},{t:'NEW',s:'Swipe up on GAS to hop (works on water too).'},{t:'FIXED',s:'Plain BRAKE + steer in the city always brakes and never starts a drift.'}]},
  {v:'v87t',date:'7 Oct 2026',items:[{t:'FIXED',s:'Garage builder: you can stack parts much higher (up to 48 plates); a tip tells you when you hit the height limit, and the camera follows tall builds.'},{t:'NEW',s:'SELECT tool: tap a part to move, rotate, recolour, copy or delete it.'},{t:'FIXED',s:'Placed tiles get a yellow outline so you can see them, and taps between studs no longer do nothing.'},{t:'FIXED',s:'No more brick shower over the chassis picker when you start a new build.'}]},
@@ -6082,8 +6083,11 @@ const M1_SC={
 function M1_warp(x,z,h){const c=RO.ch,s=RO.sp;RO.ch=null;RO.sp=null;const ok=roamWarp(x,z,h);RO.ch=c;RO.sp=s;if(!ok){RO.x=x;RO.z=z;RO.y=groundAt(x,z,99);if(h!=null)RO.h=RO.vh=h;RO.v=0;camSnap=true}}
 // ---------- stage setup / step for the M1 stage types
 const M1_STD=new Set(['go','dpts','chain','push','chase']);
+// FX19: Hilde's tow truck waits 40 m up the route (S.s used to start at 0, so on the first tick it snapped back onto the player, around the chase camera)
+// and parked 3.5 m to the right of the lane; it pulls back onto the route over its first 30 m
+function FX19_side(S,a){const k=clamp(1-(S.s-(S.s0||0))/30,0,1);if(k<=0)return;const o=3.5*k,x=a.x-Math.cos(a.h)*o,z=a.z+Math.sin(a.h)*o;M1_put(S.m,x,z,a.h)}
 function M1_setup(ch,S,i){const V=ch.v2;
-  if(S.t==='follow'||S.t==='tail'){const pts=S.t==='follow'?S.pts:[{x:RO.x+Math.sin(RO.h)*70,z:RO.z+Math.cos(RO.h)*70},...(S.via||[]),S.to];const R=M1_path(pts.map(p=>M1_P(p.x,p.z)));S.R=R;S.s=0;S.away=0;S.m=S.t==='follow'?M1_hilde():(M1.kaiser&&M1.kaiser.parent?M1.kaiser:M1_obj({m:M1_car('sedan-sports','#101014',3,'#ffd12c')}).m);if(S.t==='tail')M1.kaiser=S.m;const a=qvAt(R.P,R.C,S.t==='follow'?40:0);M1_put(S.m,a.x,a.z,a.h);S.vx=a.x;S.vz=a.z;if(S.t==='follow'){const p0=qvAt(R.P,R.C,0);M1_warp(p0.x,p0.z,p0.h);S.h0=p0.h}}
+  if(S.t==='follow'||S.t==='tail'){const pts=S.t==='follow'?S.pts:[{x:RO.x+Math.sin(RO.h)*70,z:RO.z+Math.cos(RO.h)*70},...(S.via||[]),S.to];const R=M1_path(pts.map(p=>M1_P(p.x,p.z)));S.R=R;S.s=0;S.away=0;S.m=S.t==='follow'?M1_hilde():(M1.kaiser&&M1.kaiser.parent?M1.kaiser:M1_obj({m:M1_car('sedan-sports','#101014',3,'#ffd12c')}).m);if(S.t==='tail')M1.kaiser=S.m;const a=qvAt(R.P,R.C,S.t==='follow'?40:0);M1_put(S.m,a.x,a.z,a.h);S.vx=a.x;S.vz=a.z;if(S.t==='follow'){S.s=S.s0=40;FX19_side(S,a);const p0=qvAt(R.P,R.C,0);M1_warp(p0.x,p0.z,p0.h);S.h0=p0.h}}
   else if(S.t==='thieves'){S.th=[];const from0=S.split&&ch.vanAt?ch.vanAt:null,a0=Math.random()*6.28;S.list.forEach((q,k)=>{const f=from0||q.from||{x:RO.x,z:RO.z};let to=q.to,P=null;{const G=qvGraph();for(let tr=0;tr<14;tr++){if(tr>0||from0){const an=a0+k*2.09+(tr?(tr%2?1:-1)*Math.ceil(tr/2)*.35:0),r=[1100,900,1300,700][tr%4],i=qvNear(f.x+Math.sin(an)*r,f.z+Math.cos(an)*r,300);if(i<0)continue;to={x:G.X[i],z:G.Z[i]}}const Q=qvPath(f.x,f.z,to.x,to.z),Cq=qvCum(Q);if(Q.length>2&&Cq[Cq.length-1]>=650){P=Q;break}if(!P||Cq[Cq.length-1]>qvCum(P).slice(-1)[0])P=Q}}const g=M1_goon('thief',f.x+(Math.random()-.5)*8,f.z+(Math.random()-.5)*8,{S,hp:q.rams,P,drop:q.drop});g.s=0;{const Cg=qvCum(P);if(Cg[Cg.length-1]<650)g.noEsc=1}S.th.push(g)});if(S.split){slowmo=Math.max(slowmo,.5);say('SPLIT!','THREE VANS · RAM THEM ALL',1.8)}}
   else if(S.t==='booths'){S.it=S.items.map(([x,z,h])=>{const g=new THREE.Group(),Mb=new THREE.MeshStandardMaterial({color:0x22232a,roughness:.6}),Mg=new THREE.MeshStandardMaterial({color:0xffd12c,roughness:.5,emissive:new THREE.Color('#5a4300')});box(g,Mb,5,5,4,0,2.5,0);box(g,Mg,5.4,.8,4.4,0,5.4,0);box(g,Mg,9,.6,.6,5,2.6,0);g.position.set(x,groundAt(x,z,40),z);g.rotation.y=h;RO.grp.add(g);M1_obj({m:g});return{x,z,m:g,done:false}});S.n=0;S.x=S.it[0].x;S.z=S.it[0].z;M1_spawn(S,'rammer',S.guards||0,{x:S.x,z:S.z},90,160)}
   else if(S.t==='goons'){S.kill=0;for(const[k,n]of S.wave){const at=S.at==='romer'?M1_L('romer'):null;M1_spawn(S,k,n,at,at?40:150,at?120:240)}say(S.wave.some(w=>w[0]==='lt')?'LIEUTENANT!':'GOONS!',S.txt.toUpperCase(),1.6)}
@@ -6094,7 +6098,7 @@ function M1_setup(ch,S,i){const V=ch.v2;
   else if(S.t==='jumpR'){const b=M1_bridge(S.bridge);let rx,rz,rh;if(b){const[x,z]=deckPt(b,-b.half-24);rx=x;rz=z;rh=Math.atan2(b.ux,b.uz)}else{rx=S.ax;rz=S.az+60;rh=0}S.r=M1_ramp(rx,rz,rh,20,5.5,12,null);S.rh=rh;S.x=rx-Math.sin(rh)*90;S.z=rz-Math.cos(rh)*90;S.ax=S.x;S.az=S.z;
     if(b){for(const sd of[-1,1]){const[x,z]=deckPt(b,-8*sd);const pn=new THREE.Mesh(new THREE.BoxGeometry(b.w-4,1.2,22),new THREE.MeshStandardMaterial({color:0x6b6f78,roughness:.6}));pn.position.set(x,deckY(b,0)+7,z);pn.rotation.set(sd*.5,Math.atan2(b.ux,b.uz),0,'YXZ');RO.grp.add(pn);M1_obj({m:pn})}}}}
 function M1_stage(ch,S,dt){const V=ch.v2,kmh=Math.abs(RO.v)*3.6;
-  if(S.t==='follow'||S.t==='tail'){const R=S.R,L=R.L,dP=Math.hypot(S.vx-RO.x,S.vz-RO.z);let v;if(S.t==='follow')v=dP<35?44:dP<80?34:dP<150?20:6;else v=dP<50?54:dP<120?44:dP<170?32:24;S.s+=v*dt;const a=qvAt(R.P,R.C,S.s);S.vx=a.x;S.vz=a.z;M1_put(S.m,a.x,a.z,a.h);
+  if(S.t==='follow'||S.t==='tail'){const R=S.R,L=R.L,dP=Math.hypot(S.vx-RO.x,S.vz-RO.z);let v;if(S.t==='follow')v=dP<35?44:dP<80?34:dP<150?20:6;else v=dP<50?54:dP<120?44:dP<170?32:24;S.s+=v*dt;const a=qvAt(R.P,R.C,S.s);S.vx=a.x;S.vz=a.z;M1_put(S.m,a.x,a.z,a.h);if(S.t==='follow')FX19_side(S,a);
     if(S.t==='tail'){if(dP>S.max){S.away+=dt;if(S.away>8)return qvFail(ch,'KAISER GOT AWAY')}else S.away=0}
     if(S.t==='follow'){S.lt=(S.lt||0)+dt;const tips=[[8,'Hold <b>BOOST</b> (SHIFT) on the straight. Smashing bins refills it!'],[20,'Corner coming! Hold <b>DRIFT</b> (X) and steer, release for a mini-turbo.'],[34,'Traffic? <b>HOP</b> over it (SPACE). Show-off.']];for(const[t,txt]of tips)if(S.lt>=t&&(S.tip||0)<t){S.tip=t;M1_radio('HILDE',txt)}if(S.s>=L-3||S.lt>75)return qvNext(ch)}else if(S.s>=L-3)return qvNext(ch);return}
   if(S.t==='thieves'){for(const g of S.th)if(!g.dead&&g.esc)return qvFail(ch,'A GETAWAY CAR ESCAPED');if(S.hunter&&!S.hOn&&S.th.some(g=>g.dead)){S.hOn=1;M1_spawn(S,'rammer',1,null,120,200);M1_radio('HILDE','Another goon behind you! He rams, you lose ❤. Ram him back!')}if(S.th.every(g=>g.dead))return qvNext(ch);return}
@@ -8460,7 +8464,14 @@ function CR_cityPost(im,nm,k,n){const G=CR_cityGeo(nm);if(!G)return;const w=new 
  const cc=new THREE.Color();for(let j=0;j<n;j++){cc.set(HCOL[(j*3+k)%HCOL.length]).lerp(new THREE.Color('#ffffff'),.08);im.setColorAt(j,cc)}im.instanceColor&&(im.instanceColor.needsUpdate=true);
  im.material=ART9_cabMat();if(nm==='police'||nm==='garbage-truck'||(nm==='taxi'&&CID!=='fra')){const c=new THREE.Color('#ffffff');for(let j=0;j<n;j++)im.setColorAt(j,c);im.instanceColor&&(im.instanceColor.needsUpdate=true)}}
 const _crM=new THREE.Matrix4(),_crR=new THREE.Matrix4(),_crE=new THREE.Euler(),_crT1=new THREE.Matrix4().makeTranslation(0,.45,0),_crT2=new THREE.Matrix4().makeTranslation(0,-.45,0);
-function CR_susp(c,dx,dz,dt,im,M){const w=im.userData.w;if(!w){im.setMatrixAt(c.j,M);return}w.setMatrixAt(c.j,M);const h=Math.atan2(dx,dz);if(c.hh==null)c.hh=h;let dh=h-c.hh;dh=Math.atan2(Math.sin(dh),Math.cos(dh));c.hh=h;const d=Math.max(dt,1e-3),v=c.cv||0,ac=(v-(c.pv??v))/d;c.pv=v;
+// FX19: seat traffic on all four tyres (as the player car): pitch/roll to the ground under the wheel contacts, height = their mean
+let FX19_R=260;const _fxA=new THREE.Vector3(),_fxR=new THREE.Matrix4(),_fxE=new THREE.Euler();
+function FX19_seat(c,dx,dz,im,M){const w=im.userData.w;if(!w||!w.geometry)return;let B=im.userData.fxWB;if(!B){w.geometry.computeBoundingBox();const b=w.geometry.boundingBox,r=(b.max.y-b.min.y)/2;B=im.userData.fxWB={l:Math.max(.3,(b.max.z-b.min.z)/2-r),w:(b.max.x-b.min.x)/2*.85,cz:(b.max.z+b.min.z)/2,by:b.min.y}}
+ _fxA.setFromMatrixPosition(M);const x=_fxA.x,z=_fxA.z;if(Math.abs(x-camera.position.x)+Math.abs(z-camera.position.z)>FX19_R)return;const y0=c.y+2.5,G=(a,b)=>groundAt(x+dx*(a+B.cz)+dz*b,z+dz*(a+B.cz)-dx*b,y0),
+  fl=G(B.l,B.w),fr=G(B.l,-B.w),bl=G(-B.l,B.w),br=G(-B.l,-B.w);if(Math.max(fl,fr,bl,br)-Math.min(fl,fr,bl,br)>1.2)return;
+ // local +x is (dz,0,-dx): b>0 is the right side
+ const pt=-Math.atan2((fl+fr-bl-br)/2,2*B.l),rl=Math.atan2((fl+bl-fr-br)/2,2*B.w);M.multiply(_fxR.makeRotationFromEuler(_fxE.set(pt,0,rl)));M.elements[13]=(fl+fr+bl+br)/4-B.by+CR_TYRE_Y}
+function CR_susp(c,dx,dz,dt,im,M){const w=im.userData.w;if(!w){im.setMatrixAt(c.j,M);return}try{FX19_seat(c,dx,dz,im,M)}catch(e){}w.setMatrixAt(c.j,M);const h=Math.atan2(dx,dz);if(c.hh==null)c.hh=h;let dh=h-c.hh;dh=Math.atan2(Math.sin(dh),Math.cos(dh));c.hh=h;const d=Math.max(dt,1e-3),v=c.cv||0,ac=(v-(c.pv??v))/d;c.pv=v;
  const tr=clamp(dh/d*v*.012,-.06,.06),tp=clamp(-ac*.015,-.045,.045),k=Math.min(1,dt*5);c.rl=(c.rl||0)+(tr-(c.rl||0))*k;c.pt=(c.pt||0)+(tp-(c.pt||0))*k;
  _crR.makeRotationFromEuler(_crE.set(c.pt,0,c.rl));_crM.copy(M).multiply(_crT1).multiply(_crR).multiply(_crT2);im.setMatrixAt(c.j,_crM);if(im.userData.g)im.userData.g.setMatrixAt(c.j,_crM)}
 
@@ -8521,7 +8532,10 @@ function CR_npcTilt(g){const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),f
  yF=(G(dl,dw)+G(dl,-dw))/2,yB=(G(-dl,dw)+G(-dl,-dw))/2,yR=(G(dl,dw)+G(-dl,dw))/2,yL=(G(dl,-dw)+G(-dl,-dw))/2,yC=groundAt(x,z,y0);
  g.rotation.x=clamp(-Math.atan2(yF-yB,2*dl),-.25,.25);g.rotation.z=clamp(Math.atan2(yR-yL,2*dw),-.25,.25);g.userData.crH.position.y=g.userData.crY+clamp((yF+yB)/2-yC,-.5,.5)}
 // keep the player out of mission vehicles: push out of the oriented footprint and bleed speed
-function CR_npcPush(){if(typeof RO==='undefined'||!RO.on)return;for(let i=CR_NPCS.length-1;i>=0;i--){const g=CR_NPCS[i];if(!g.parent){CR_NPCS.splice(i,1);continue}if(!g.visible)continue;CR_npcTilt(g);const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),fz=Math.cos(h),dx=RO.x-g.position.x,dz=RO.z-g.position.z;
+// FX19: never draw a story vehicle the chase camera is inside (was a translucent orange wall over the screen); hide its body until the camera is out
+function FX19_camIn(g,H,fx,fz){const b=g.userData.crH;if(!b)return;const c=camera.position,cx=c.x-g.position.x,cz=c.z-g.position.z,al=cx*fx+cz*fz,sd=cx*fz-cz*fx,m=.9;
+ b.visible=!(Math.abs(al)<H.L+m&&Math.abs(sd)<H.W+m&&c.y<g.position.y+4.5)}
+function CR_npcPush(){if(typeof RO==='undefined'||!RO.on)return;for(let i=CR_NPCS.length-1;i>=0;i--){const g=CR_NPCS[i];if(!g.parent){CR_NPCS.splice(i,1);continue}if(!g.visible)continue;CR_npcTilt(g);const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),fz=Math.cos(h),dx=RO.x-g.position.x,dz=RO.z-g.position.z;FX19_camIn(g,H,fx,fz);
  if(Math.abs(RO.y-g.position.y)>3)continue;const al=dx*fx+dz*fz,sd=dx*fz-dz*fx,pl=H.L+1.3-Math.abs(al),ps=H.W+1.05-Math.abs(sd);if(pl<=0||ps<=0)continue;
  if(ps<pl){const k=Math.sign(sd)||1;RO.x+=fz*k*ps;RO.z-=fx*k*ps}else{const k=Math.sign(al)||1;RO.x+=fx*k*pl;RO.z+=fz*k*pl}RO.v*=.6}}
 
@@ -8667,6 +8681,13 @@ window.__cr={RIVS:CR_RIVS,rivB:CR_rivB};window.__gb={mesh:()=>GB.mesh,refresh:()
  scr:(i,j)=>{const t=GB_top(i,j,GB_list());if(t<-1e8)return null;const m=GB.mesh.userData.m;GB.mesh.updateMatrixWorld(true);GB_cam();const p=m.localToWorld(V3((i+.5)*GB_U,t*GB_PH+.02,(j+.5)*GB_U)).project(GB.cam),r=$('#gbC').getBoundingClientRect();return{x:r.left+(p.x+1)/2*r.width,y:r.top+(1-p.y)/2*r.height}},
  calls:()=>{const o=pl&&pl.mesh;if(!o)return null;let n=0,list=[];o.traverse(x=>{if(x.userData&&x.userData.gb){list.push(x);if(x.visible)n++}});return{n,tris:list.map(x=>x.geometry.attributes.position.count/3)}}};
 
+// FX19: the "drag to rotate" hint sat on the GARAGE sign of the 3D hall. It now sits mid-right on the hall floor (the stats card covers the bottom), shows
+// until the player's first real drag of the view (>20 px), then fades out and never comes back.
+(()=>{const st=document.createElement('style');st.textContent='#gbx .gbHint{top:46%!important;right:10px!important;opacity:.85;transition:opacity .6s;background:rgba(3,14,26,.55);border-radius:8px;padding:2px 8px;pointer-events:none}#gbx .gbHint.fxOff{opacity:0!important}';document.head.appendChild(st);
+ const box=document.getElementById('gbx'),h=box&&box.querySelector('.gbHint'),c=document.getElementById('gbC');if(!box||!h)return;let tm=0;
+ const off=()=>{h.classList.add('fxOff');clearTimeout(tm)},show=()=>{if(store.get('fx19_drag',0)){off();return}h.classList.remove('fxOff')};
+ let d0=null;if(c){c.addEventListener('pointerdown',e=>{d0=[e.clientX,e.clientY]},{passive:true});c.addEventListener('pointermove',e=>{if(d0&&Math.hypot(e.clientX-d0[0],e.clientY-d0[1])>20){d0=null;store.set('fx19_drag',1);off()}},{passive:true});addEventListener('pointerup',()=>{d0=null},{passive:true})}
+ new MutationObserver(()=>{if(!box.hidden)show()}).observe(box,{attributes:true,attributeFilter:['hidden']});if(!box.hidden)show()})();
 // DR probe (measurement only, changes nothing): window.__dr.* used by tDR.js for before/after numbers
 function DR_edge(x,z){let e=1e9;const q=cityAt(x,z);if(q){e=q.d-q.road.w/2;if(e<6&&e>-.5)e=Math.min(e,CE_roadE(x,z))}const f=fillAt(x,z);if(f)e=Math.min(e,f.d-f.r.w/2);
   if(CID!=='fra'){try{const a=abAt(x,z);if(a)e=Math.min(e,a.d-a.road.w/2)}catch(_){}}try{e=Math.min(e,lzRoadD(x,z))}catch(_){}return e}
@@ -10493,11 +10514,14 @@ const CR_HB={el:null,pool:[],v:V3()};
 function CR_hbStep(){let E=CR_HB.el;if(!E){E=CR_HB.el=document.createElement('div');E.id='crHB';document.body.appendChild(E)}
  const on=state==='race'&&pl&&!CC&&!paused;if(!on){if(E.childElementCount)for(const d of CR_HB.pool)d.style.display='none';return}
  const L=[];for(const s of ships){if(s===pl||s.dead>0||s.eliminated||s.finished)continue;const dd=s.dist-pl.dist;if(dd<-12||dd>90)continue;L.push([Math.abs(dd),s])}L.sort((a,b)=>a[0]-b[0]);
- let k=0;const P=[];for(const[,s]of L.slice(0,4)){const v=CR_HB.v.copy(s.mesh.position).add(s.mesh.userData.m.position);v.y+=2.4;v.project(camera);if(v.z>1||Math.abs(v.x)>.6||v.y<-.3||v.y>.75)continue;
-  const sx=(v.x+1)/2*innerWidth,sy=(1-v.y)/2*innerHeight;if(P.some(q=>Math.abs(q[0]-sx)<84&&Math.abs(q[1]-sy)<40))continue;P.push([sx,sy]);
-  let d=CR_HB.pool[k];if(!d){d=document.createElement('div');d.className='hb';d.innerHTML='<span></span><small></small><i><b></b></i>';E.appendChild(d);CR_HB.pool.push(d)}k++;
-  const h=clamp(s.hull,0,100),b=d.lastChild.firstChild,cl=(CR_LOAD[s.vmode||'car']||CR_LOAD.car).k;if(d._n!==s.name+cl){d._n=s.name+cl;d.firstChild.textContent=s.name;d.children[1].textContent=cl}
-  b.style.width=h+'%';b.className=h>66?'':h>33?'md':'lo';d.style.display='';d.style.left=((v.x+1)/2*innerWidth).toFixed(0)+'px';d.style.top=((1-v.y)/2*innerHeight).toFixed(0)+'px'}
+ // FX19: only the nearest 3 rivals get a tag (3rd one faded); a tag that would overlap one already placed is stacked above it, else hidden
+ let k=0;const P=[];for(const[,s]of L.slice(0,3)){const v=CR_HB.v.copy(s.mesh.position).add(s.mesh.userData.m.position);v.y+=2.4;v.project(camera);if(v.z>1||Math.abs(v.x)>.6||v.y<-.3||v.y>.75)continue;
+  let d=CR_HB.pool[k];if(!d){d=document.createElement('div');d.className='hb';d.innerHTML='<span></span><small></small><i><b></b></i>';E.appendChild(d);CR_HB.pool.push(d)}
+  const h=clamp(s.hull,0,100),b=d.lastChild.firstChild,cl=(CR_LOAD[s.vmode||'car']||CR_LOAD.car).k;if(d._n!==s.name+cl){d._n=s.name+cl;d.firstChild.textContent=s.name;d.children[1].textContent=cl;d._w=0}
+  if(d.style.display==='none'){d.style.visibility='hidden';d.style.display=''}if(!d._w){d._w=d.offsetWidth||90;d._h=d.offsetHeight||40}
+  const sx=(v.x+1)/2*innerWidth,w=d._w+8,th=d._h+4,hit=y=>P.some(q=>Math.abs(q[0]-sx)<(q[2]+w)/2&&Math.abs(q[1]-y)<(q[3]+th)/2);let sy=(1-v.y)/2*innerHeight;
+  for(let t=0;t<2&&hit(sy);t++)sy-=th;if(hit(sy)||sy-th<34){d.style.display='none';d.style.visibility='';continue}P.push([sx,sy,w,th]);k++;
+  b.style.width=h+'%';b.className=h>66?'':h>33?'md':'lo';d.style.visibility='';d.style.display='';d.style.opacity=k>2?'.45':'1';d.style.left=sx.toFixed(0)+'px';d.style.top=sy.toFixed(0)+'px'}
  for(let i=k;i<CR_HB.pool.length;i++)CR_HB.pool[i].style.display='none'}
 // ---- CAR25: race camera never leaves the track box (walls at +-HALF)
 const _cr25F=mkF(),CR_CAMX={pre:0,n:0},CR_WL=[];
