@@ -107,7 +107,7 @@ const PRE = () => { // what the game's own advisors pick (computed here, apart f
   const s = hlpSuggest(); let at = null; if (s && s.target) { const e = s.target(), q = e && e.getBoundingClientRect(); if (q && q.width) at = { x: q.left + q.width / 2, y: q.top + q.height / 2 } }
   return { adv, has: !!s, at, sig } };
 const AFTER = () => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), sig: typeof G === 'undefined' || !G ? '-' : [G.turn, G.phase, G.active, G.rolls, G.dice.map(d => d.f + (d.k ? 'k' : '')).join(''), G.pl.map(q => q.hp + ',' + q.vp + ',' + q.en).join(';'), G.log && G.log.length].join('|') });
-async function helpTap(p, sel) { const c = await p.evaluate(sel => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null }, sel); if (!c) return false; await p.touchscreen.tap(c[0], c[1]); return true }
+async function helpTap(p, sel) { const c = await p.evaluate(sel => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null }, sel); if (!c) return false; p._lt = sel + ' @' + Math.round(c[0]) + ',' + Math.round(c[1]) + ' hit ' + await p.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return e ? e.tagName + '#' + e.id + '.' + String(e.className).slice(0, 30) + (e.closest('[data-shop]') ? ' shop' + e.closest('[data-shop]').dataset.shop : '') : 'none' }, c); await p.touchscreen.tap(c[0], c[1]); return true }
 async function neutralTap(p) { const n = await p.evaluate(NEUTRAL); if (!n) return false; p._nt = await p.evaluate(([x, y]) => { const e = document.elementFromPoint(x, y); return e ? e.tagName + '#' + e.id + '.' + String(e.className).slice(0, 30) : 'none' }, n); await p.touchscreen.tap(n[0], n[1]); return true }
 async function rulesCheck(p, tag, ph) {
   helpTot.rules++;
@@ -158,7 +158,7 @@ async function helpFlow(p, tag, st) {
     const r = await p.evaluate(() => {
       const s0 = hlpSuggest(), e0 = s0 && s0.target && s0.target(), q0 = e0 && e0.getBoundingClientRect(), now = q0 && q0.width ? { x: q0.left + q0.width / 2, y: q0.top + q0.height / 2 } : null;
       const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'), ru = document.querySelector('.gxh-rules'); let hit = null;
-      if (f) { const e = document.elementFromPoint(+f.dataset.tx, +f.dataset.ty), d = x => e && e.closest(x); hit = e && { die: d('[data-die]') && d('[data-die]').dataset.die, shop: d('[data-shop]') && d('[data-shop]').dataset.shop, opt: d('[data-opt]') && d('[data-opt]').dataset.opt, act: d('[data-act]') && d('[data-act]').dataset.act, story: !!d('[data-a="story"]') } }
+      if (f) { const e = document.elementFromPoint(+f.dataset.tx, +f.dataset.ty), d = x => e && e.closest(x); hit = e && { el: e.tagName + '#' + e.id + '.' + String(e.className).slice(0, 30), die: d('[data-die]') && d('[data-die]').dataset.die, shop: d('[data-shop]') && d('[data-shop]').dataset.shop, opt: d('[data-opt]') && d('[data-opt]').dataset.opt, act: d('[data-act]') && d('[data-act]').dataset.act, story: !!d('[data-a="story"]') } }
       return { now, f: f && { tx: +f.dataset.tx, ty: +f.dataset.ty }, hit, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!ru } });
     if (pre.has && pre.at) {
       if (!r.f) await fail(p, tag, 'help bulb', 'tapped, no finger (' + hs.ph + ')');
@@ -178,7 +178,7 @@ async function helpFlow(p, tag, st) {
     await p.evaluate(() => GXH.hide());
     const after = await p.evaluate(AFTER);
     if (after.g) await fail(p, tag, 'help bulb', 'help still on screen after dismissing (' + hs.ph + ')');
-    if (hs.ph !== 'watch' && hs.ph !== 'intro' && after.sig !== pre.sig && st.humanTurn) await fail(p, tag, 'help bulb', 'tapping the bulb changed the game (' + pre.sig + ' -> ' + after.sig + ') last neutral tap on ' + p._nt);
+    if (hs.ph !== 'watch' && hs.ph !== 'intro' && after.sig !== pre.sig && st.humanTurn) await fail(p, tag, 'help bulb', 'tapping the bulb changed the game (' + pre.sig + ' -> ' + after.sig + ') last neutral tap on ' + p._nt + ' last tap ' + p._lt);
     return true;
   }
   return false;
