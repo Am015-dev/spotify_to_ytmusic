@@ -270,7 +270,7 @@ function setupRace(cfg){if(cfg.type!=='roam')hubLeave();endCrashCam();ccCool=0;c
     ships.push(s);if(isP)pl=s}
   if(attract)pl=null;
   for(const s of ships)s.lives=cfg.type==='arena'?3:1;RC.zone={k:1,next:ZLEN,mul:cls.mul};RC.time=cfg.type==='arena'?(cfg.derby?150:180):0;RC.dmgK=cfg.type==='zone'?1.5:cfg.type==='arena'?.7:1;
-  const L=TD.L;if(cfg.items){const nk=Math.max(2,Math.round(L/1000*(cfg.type==='arena'?1.7:1)));for(let k=0;k<nk;k++){let s=L*(k+.45)/nk;while(yAt(TD,s)<-10||jumpAt(TD,s)||jumpAt(TD,s+80))s+=60;for(const x of[-14,0,14])pads.push({s,x:x*CR_LS,type:'item'})}}
+  const L=TD.L;if(cfg.items){const nk=Math.max(2,Math.round(L/(R15_on()&&cfg.type!=='arena'?650:1000)*(cfg.type==='arena'?1.7:1)));for(let k=0;k<nk;k++){let s=L*(k+.45)/nk;while(yAt(TD,s)<-10||jumpAt(TD,s)||jumpAt(TD,s+80)||R15_at(s))s+=60;for(const x of(R15_on()?[-.6,-.2,.2,.6].map(f=>f*MARGIN/CR_LS):[-14,0,14]))pads.push({s,x:x*CR_LS,type:'item'})}}
   let placed=0;for(let s=220;s<L-200&&placed<9;s+=40){let ok=!jumpAt(TD,s);for(let d=-60;d<=120;d+=20)if(Math.abs(kAt(TD,s+d))>1/700)ok=false;if(ok){pads.push({s,x:[-12,0,12][placed%3]*CR_LS,type:'boost'});placed++;s+=520}}
   for(const j of TD.jumps)pads.push({s:j.s0-140,x:0,type:'boost'});if(TRK.id==='akro'){let s0=-1;for(let s=0;s<L;s+=10)if(TD.SEC[Math.floor(s/TD.ds)%TD.N]==='PLAKA'){s0=s;break}if(s0>=0){const sd=Math.sign(kAt(TD,s0+60))||1;for(let q=0;q<4;q++)pads.push({s:s0+20+q*28,x:sd*(MARGIN-5*CR_LS),type:'boost'})}}
   R15_pads();
@@ -493,11 +493,11 @@ function stepSim(){const racing=state==='race'||state==='menu'||state==='finishe
     else{if(pl&&!pl.finished&&RC.type!=='tt'){const gap=pl.dist-s.dist;s.rubber=1+(gap>0?Math.min(.06,gap/400*.06):-Math.min(.03,Math.max(0,-gap-150)/600*.03))}else s.rubber=1;physAI(s);
       if(s.item){s.aiFire-=H;if(s.aiFire<=0){let use=false;const it=s.item;
         if(it==='turbo')use=Math.abs(kAt(TD,s.dist+100))<1/900;else if(it==='shield')use=raceT-s.lastHit<.5||R()<.002;else if(it==='mines'||it==='wall'||it==='oil')use=ships.some(o=>o!==s&&s.dist-o.dist>10&&s.dist-o.dist<150);else if(it==='magnet')use=ships.some(o=>o!==s&&!o.dead&&o.dist-s.dist>30&&o.dist-s.dist<300);else if(it==='storm')use=ships.some(o=>o!==s&&!o.dead&&o.dist>s.dist+10);
-        else use=ships.some(o=>o!==s&&!o.dead&&!o.eliminated&&o.dist-s.dist>15&&o.dist-s.dist<(it==='missile'||it==='tornado'?500:160)&&(it==='missile'||it==='tornado'||Math.abs(o.x-s.x)<5));
+        else use=ships.some(o=>o!==s&&!o.dead&&!o.eliminated&&o.dist-s.dist>15&&o.dist-s.dist<(it==='missile'||it==='tornado'||it==='web'?500:160)&&(it==='missile'||it==='tornado'||it==='web'||Math.abs(o.x-s.x)<5));
         if(use)useItem(s);s.aiFire=.3}}}
     if(!s.air)for(const p of pads){const dd=mod(s.dist-p.s+10,TD.L)-10;if(dd>=0&&dd<s.v*H+.01&&Math.abs(s.x-p.x)<(p.type==='boost'?5:4)){
       if(p.type==='boost'){s.boost=1.3;if(s.isPlayer){AU.sfx('boost');fovKick=Math.max(fovKick,6);award(s,'BOOST PAD',15,50,'#ffd12c')}}
-      else if(!s.item){s.item=pickItem(s);s.aiFire=rr(.6,2.5)*(s.style==='gunner'?.6:1);if(s.isPlayer){AU.sfx('pick');itemSpinUntil=performance.now()+950;if(PK.has('refill'))s.bm=Math.min(100,s.bm+35)}}}}}
+      else if(!s.item&&!(p.cd>0)){if(R15I.im)R15_pop(p,s);s.item=pickItem(s);s.aiFire=rr(.6,2.5)*(s.style==='gunner'?.6:1);if(s.isPlayer){AU.sfx('pick');itemSpinUntil=performance.now()+950;if(PK.has('refill'))s.bm=Math.min(100,s.bm+35)}}}}}
   if(racing){stepTraffic();stepProps()}
   for(let i=0;i<ships.length;i++)for(let j=i+1;j<ships.length;j++){const a=ships[i],b=ships[j];if(a.dead||b.dead||a.eliminated||b.eliminated||a.air||b.air)continue;const dd=b.dist-a.dist,dx=b.x-a.x;
     if(Math.abs(dd)<5.4&&Math.abs(dx)<2.5){if(a.isPlayer)b.pushT=raceT;if(b.isPlayer)a.pushT=raceT;const push=(2.5-Math.abs(dx))*.5*(dx>=0?1:-1);a.x-=push;b.x+=push;const back=dd>0?a:b,front=dd>0?b:a;if(back.v>front.v){const dv=back.v-front.v;back.v-=dv*.6;front.v+=dv*.3}
