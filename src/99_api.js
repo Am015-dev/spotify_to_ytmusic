@@ -47,7 +47,7 @@ posShip=(f=>function(s,dt,snap){f(s,dt,snap);try{if(!s||!s.mesh||(s.wreck&&s.dea
 const CR_VMAX=174/3.6,CR_VBOOST=224/3.6;
 const CR_acc=(v,vm,b)=>Math.max(0,(b?14:7.5)*(1-Math.pow(Math.max(0,v)/vm,2)));
 roamStep=(f=>function(dt){if(state!=='roam'||!pl||RO.wk||RO.frozen||!dt)return f(dt);const v0=RO.v||0,nb0=typeof SC_S!=='undefined'?SC_S.nb:0,air0=!!pl.air,c=CTL||{};
- if(RO.crTurn!=null){const e=angDiff(RO.crTurn,RO.h),k=Math.min(Math.abs(e),5*dt)*Math.sign(e);RO.h+=k;RO.vh=RO.h;if(Math.abs(e)<.02)RO.crTurn=null}
+ if(RO.crTurn!=null&&Math.abs(c.steer||0)>.3)RO.crTurn=null;if(RO.crTurn!=null){const e=angDiff(RO.crTurn,RO.h),k=Math.min(Math.abs(e),W14_PIV*dt)*Math.sign(e);RO.h+=k;RO.vh=RO.h;if(Math.abs(e)<.02)RO.crTurn=null}
  const r=f(dt);if(RO.wk||!pl)return r;const bumped=(typeof SC_S!=='undefined'?SC_S.nb:0)!==nb0;
  if(!bumped&&!air0&&!pl.air){const boost=!!(RO.boosting||RO.turbo>0),vm=boost?CR_VBOOST:CR_VMAX;
   if(RO.v>v0&&RO.v>0)RO.v=Math.min(RO.v,v0+CR_acc(v0,vm,boost)*dt);
@@ -191,6 +191,6 @@ placeTraffic=(f=>function(c,a,b){f(c,a,b);try{if(RC&&RC.type==='junction'){c.x=c
 window.__cr25={get cars(){return HUB.cars},get ships(){return ships},get traffic(){return traffic},get W(){return W},get HALF(){return HALF},get MARGIN(){return MARGIN},get CC(){return !!CC},cam:CR_CAMX,wl:CR_WL,get LS(){return CR_LS},demo(x,y,z,h){const g=CR_grp(CR_car({body:'#d01712',acc:'#fac80a',wing:'#fac80a'}),'cr25demo');const b=new THREE.Box3().setFromObject(g),k=2.05/(b.max.x-b.min.x);g.scale.setScalar(k);g.position.set(x,y-b.min.y*k+.03,z);g.rotation.y=h;scene.add(g);return g}};
 updateCam=(f=>function(dt,snap){f(dt,snap);try{CR_hbStep()}catch(e){}try{if((state!=='race'&&state!=='countdown'&&state!=='finished')||!TD)return;const s=CC&&CC.s?CC.s:pl;if(!s)return;
  frameAt(TD,s.dist,F2);const c=camera.position,al=(c.x-F2.p.x)*F2.t.x+(c.y-F2.p.y)*F2.t.y+(c.z-F2.p.z)*F2.t.z;frameAt(TD,s.dist+al,_cr25F);const F=_cr25F;
- const rx=c.x-F.p.x,ry=c.y-F.p.y,rz=c.z-F.p.z,l=rx*F.r.x+ry*F.r.y+rz*F.r.z,lim=HALF-.9;if(Math.abs(l)>HALF*4||Math.abs(al)>80)return;CR_CAMX.pre=Math.max(CR_CAMX.pre,Math.abs(l)/HALF);if(Math.abs(l)<=lim)return;CR_CAMX.n++;const dl=Math.sign(l)*lim-l;c.addScaledVector(F.r,dl);
+ const rx=c.x-F.p.x,ry=c.y-F.p.y,rz=c.z-F.p.z,l=rx*F.r.x+ry*F.r.y+rz*F.r.z,lim=HALF-.9;if(Math.abs(l)>HALF*4||Math.abs(al)>80)return;CR_CAMX.pre=Math.max(CR_CAMX.pre,Math.abs(l)/HALF);const CB=typeof R15_camB==='function'?R15_camB(s.dist+al):null,lo=CB?CB[0]:-lim,hi=CB?CB[1]:lim;if(l>=lo&&l<=hi)return;CR_CAMX.n++;const dl=(l>hi?hi:lo)-l;c.addScaledVector(F.r,dl);
  if(CC&&CC.s){const w=CC.s;camera.lookAt(w.mesh.position.clone().add(w.mesh.userData.m.position))}else camera.lookAt(camLook)}catch(e){}})(updateCam);
 </script>
