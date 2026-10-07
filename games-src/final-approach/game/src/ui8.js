@@ -118,6 +118,7 @@ function phPost() {
   if (isPh() && ac && si) { const cof = si.querySelector('.cof'); if (cof) ac.insertBefore(cof, ac.firstChild); }
   if (GX && (GX.open === 'crewd' || GX.open === 'logd')) { try { renderDrawers(); } catch (e) { } }
   R.toggle('fabrief', G.phase === 'brief' && !G.result);
+  try { hlpAfter(); } catch (e) { console.error(e); }
 }
 
 // ---------- the ending, on the board: the picture plus at most 8 words; tap the banner to look at the panel ----------

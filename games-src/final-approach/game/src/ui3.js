@@ -17,6 +17,7 @@ function newGame(mode, o) {
   UI.coach = { level: o.tipsOff ? 'off' : mode === 'guided' ? 'full' : (UI.prefs.guide || 'off'), seen: {}, tip: '', queue: [] }; UI.lastPlace = null; UI.rt = G.mods.real ? { left: 60000, last: 0 } : null;
   const st = $('#start'); if (st) st.hidden = true; closeRS(); try { GX.close(); } catch (e) { } closePass(); hideRecap();
   { const pc = $('#pc'); if (pc) { pc.hidden = true; pc.innerHTML = ''; } }   // a tip left over from the last flight
+  if (mode === 'guided' && typeof hlpInit === 'function') { hlpInit(); if (typeof GXH !== 'undefined') { GXH.setEnabled(true); GXH.reset(); } }   // the guided flight: every bubble on, again
   $$('#fx .endb').forEach(e => e.remove()); UI.rfx = null; clearSave(); render(); sndMusic(); coachTick(); schedule();
   if (mode !== 'guided' && mode !== 'watch' && UI.prefs.story !== false && !o.camp && !isPh()) showStory();
 }
@@ -92,39 +93,7 @@ function doAction(a, t) {
     case 'rrpick': sendMove(v, { t: 'rrpick', m: UI.rrm.slice() }); break;
     case 'antic': case 'adapt': case 'wt': case 'toss': if (typeof UI.sel === 'number' && UI.sel >= 0) sendMove(v, { t: a, d: UI.sel }); break;
     case 'cof': UI.cof = +t.dataset.c; render(); break;
-    case 'hint': showHint(); break;
   }
-}
-function showHint() {
-  const v = actSeat(); if (typeof v !== 'number' || !mayAct(v)) return;
-  try {
-    const m = FA.AI.move(G, v, 'normal', { noMC: true }); if (!m) { toast('No suggestion.'); return; }
-    let why = whyMove(m, v), d = m.d;
-    UI.hint = { d: m.t === 'place' || m.t === 'toss' ? d : null, why: '' };
-    if (m.t === 'place') { UI.sel = d; UI.cof = m.c || 0; }   // the reason shows in the dock under the die, never as a toast over the buttons
-  } catch (e) { console.error(e); }
-  render();
-}
-function whyMove(m, v) {
-  if (m.t === 'ready') return 'Roll when you have finished the briefing.';
-  if (m.t === 'rr') return 'Spend a reroll token: your hand does not fit the jobs that are waiting.';
-  if (m.t === 'toss') return 'Nothing takes this die, so put it aside.';
-  if (m.t !== 'place') return m.t + ' looks useful here.';
-  const val = (m.d === 'p' ? G.pend.d.val : G.dice[v][m.d].v) + (m.c || 0), S = FA.SLOT[m.to], pre = m.c ? 'With a coffee making it ' + val + ', ' : 'A ' + val + ' ';
-  switch (S.grp) {
-    case 'radio': { const at = G.pl.pos + val - 1, n = at >= 1 && at <= G.planes.length ? G.planes[at - 1] : 0, sp = at === G.planes.length ? 'the airport' : 'space ' + at; return n ? pre + 'on the radio clears a plane on ' + sp + '.' : pre + 'on the radio would clear nothing; it only gets rid of a spare die.'; }
-    case 'axis': { const o = G.slots['ax' + (1 - v)]; if (o) { const nx = G.pl.axis + (v === 0 ? o.v - val : val - o.v); return pre + 'on the axis against ' + name(1 - v) + '’s ' + o.v + ' leaves the plane ' + (nx === 0 ? 'level' : 'tilted ' + Math.abs(nx) + (nx < 0 ? ' left' : ' right')) + ' (3 is a spin).'; }
-      return pre + 'on the axis goes first. ' + name(1 - v) + ' cannot see it coming and will answer with what their dice allow; a middle value leaves the most room.'; }
-    case 'engines': { const o = G.slots['en' + (1 - v)]; if (o) { const sm = val + o.v + FA.windMod(G), adv = FA.isFinal(G) ? -1 : sm <= G.pl.aeroB ? 0 : sm <= G.pl.aeroO ? 1 : 2; return pre + 'on the engines makes ' + sm + (adv < 0 ? ' for the landing (brakes ' + FA.brakeVal(G) + ').' : ': the plane ' + (adv ? 'moves ' + adv + ' space' + (adv > 1 ? 's' : '') + '.' : 'stays put.')); }
-      return pre + 'on the engines sets half of the speed; ' + name(1 - v) + ' adds the other half (up to ' + G.pl.aeroB + ' stays, up to ' + G.pl.aeroO + ' moves 1, more moves 2).'; }
-    case 'gear': return pre + 'lowers a landing gear (needed to land); the blue marker moves up.';
-    case 'flaps': return pre + 'extends a flap (needed to land); the orange marker moves up.';
-    case 'brakes': case 'ice': return pre + 'sets a brake: the last-round speed must be no more than the brake value.';
-    case 'conc': return pre + 'on Coffee earns a coffee token: later, either of you can bend a die by one with it.';
-    case 'kero': return pre + 'on the fuel space burns ' + val + '; skipping it would burn 6.';
-    case 'intern': return pre + 'trains the trainee: take the next token and place it too.';
-  }
-  return 'Good use of this die.';
 }
 // ---- pass-the-device screens (hot-seat)
 function showPass(seat) {

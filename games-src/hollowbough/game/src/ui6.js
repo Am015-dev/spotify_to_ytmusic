@@ -1,30 +1,5 @@
 // ===================== part 6: coach, drawers (log, rules, menu, rivals), start screen, events, phone mode, boot =====================
-const COACH = [
-  { id: 'welcome', light: 1, t: 'Welcome to Hollowbough', x: 'You lead a small band of woodland creatures. Over the game you build a city of up to 15 cards and send workers out to gather. When everyone has finished, the city with the most points wins.' },
-  { id: 'turn', light: 1, t: 'One thing per turn', x: 'On your turn you do exactly one thing: place a worker on a location, play a card, or Prepare for the next season. You start with 2 workers.' },
-  { id: 'board', t: 'The shared board', x: 'The glowing places are open to you. Tap one to see what it gives, then place a worker. Most places hold only one worker, so the good ones can be taken before your next turn.', when: (p, v) => myMoves().some(m => m.type === 'worker') },
-  { id: 'cards', t: 'Cards', x: 'Tap a card in your hand, or one of the eight in the meadow on the board, to see its price. Pay with resources, or play a critter free when you already own its matching building (it is named on the card).', when: (p) => p.dep.length > 0 && p.hand.length > 0 },
-  { id: 'occupy', t: 'A free card', x: 'One of your critters can be played for free: it moves into its matching building and uses up that building’s one free slot. Look for the button that says "Play it free".', when: (p, v) => myMoves().some(m => m.type === 'play' && m.how === 'occupy') },
-  { id: 'prepare', light: 1, t: 'Out of workers? Prepare', x: 'When all your workers are out, Prepare for the next season: they come home, you gain new workers, and green Production cards gather goods. Each player moves through the seasons on their own.', when: (p, v) => myMoves().some(m => m.type === 'prepare') },
-  { id: 'season', t: 'Production time', x: 'In Spring and Autumn all your green Production cards pay out. That is why building them early pays off.', when: (p) => p.season >= 1 },
-  { id: 'autumn', t: 'Autumn: the last season', x: 'After Autumn there are no more seasons. Use the rest of your workers and cards, and try for events or the Long Road. Pass when nothing useful remains.', when: (p) => p.season >= 3 },
-  { id: 'event', t: 'Events', x: 'The small flags and stars are events. Meet the requirement with the cards in your city and a worker claims it for bonus points. Each event can only be claimed once.', when: (p, v) => myMoves().some(m => m.type === 'worker' && m.k === 'event') },
-  { id: 'pass', light: 1, t: 'Passing', x: 'When you have nothing worthwhile left, press Pass. Your city is scored when everybody has passed. Your Hint button always shows a good move and why.', when: (p) => p.season >= 3 && availW(p) === 0 }
-];
-function coachCheck() {
-  return false; // no advice cards during play (owner's rule)
-  const lv = UI.coach.level; if (lv === 'off') return false;
-  const v = viewSeat(); if (v < 0 || HB.actor(G) !== v) return false;
-  const p = G.players[v]; if (G.q) { if (!UI.coach.seen.decision && lv === 'full') { UI.coach.seen.decision = 1; pushCard({ kind: 'coach', title: 'A choice for you', sub: 'Guide', body: h('p', 'Some cards and places ask you to choose. A decision appears here one at a time. The star marks what the computer helper would pick.') }); return true; } return false; }
-  for (const c of COACH) {
-    if (UI.coach.seen[c.id]) continue; if (lv === 'light' && !c.light) continue;
-    if (c.when && !c.when(p, v)) continue;
-    UI.coach.seen[c.id] = 1;
-    pushCard({ kind: 'coach', title: c.t, sub: 'Guide', body: h('p', c.x), buttons: [{ label: 'Got it', a: 'cont' }] });
-    return true;
-  }
-  return false;
-}
+// (the old guided-game advice cards are gone: first-time help is the gx-help kit, see ui11.js)
 // ---- drawers
 const RULES = `<h3>The goal</h3><p>Build the best woodland city. Each player has a city of up to 15 cards and a few workers. When every player has passed, you add up points from cards, point tokens, bonuses, events and the Long Road. The highest total wins.</p>
 <h3>How a turn goes</h3><p>On your turn do exactly <b>one</b> of these:</p><ul><li><b>Place a worker</b> on an open place and use it at once.</li><li><b>Play a card</b> from your hand or from the meadow by paying its price.</li><li><b>Prepare for the next season</b> (only when all your workers are out).</li></ul><p>When you cannot or do not want to do anything useful, <b>Pass</b>. You take no more turns, but your city still scores.</p>
@@ -34,7 +9,7 @@ const RULES = `<h3>The goal</h3><p>Build the best woodland city. Each player has
 <h3>Seasons</h3><p>Everyone starts in Winter with 2 workers. Preparing for <b>Spring</b> gives +1 worker and runs your production. <b>Summer</b> gives +1 worker and lets you take 2 meadow cards. <b>Autumn</b> gives +2 workers and runs production again. Every player moves through the seasons at their own pace.</p>
 <h3>Scoring</h3><p>Printed points on your cards, point tokens you hold, purple card bonuses, events and Long Road workers. Ties go to the player with more events, then more leftover resources.</p>
 <h3>Solo play</h3><p>You play against Old Grimbeard. He takes places and cards by dice and a fixed routine. You win if you end with strictly more points than he does. Choose Grumpy, Gruff or Ghastly for the difficulty.</p>
-<h3>Tips</h3><ul><li>Build production early; it pays every Spring and Autumn.</li><li>Keep cards in hand cheap to play. Watch the meadow too.</li><li>Press Hint any time to see a good move and the reason for it.</li></ul>`;
+<h3>Tips</h3><ul><li>Build production early; it pays every Spring and Autumn.</li><li>Keep cards in hand cheap to play. Watch the meadow too.</li><li>Tap the lightbulb any time to see a good move and the reason for it.</li></ul>`;
 function logHTML() { const e = h('div.logl'); for (let i = G.log.length - 1; i >= Math.max(0, G.log.length - 150); i--) e.appendChild(h('div.ll', h('span.lt', G.log[i].turn), ' ' + G.log[i].t)); return e; }
 function renderRival(seat) {
   const b = $('#rivalbody'); if (!b || !G) return; b.innerHTML = ''; seat = seat == null ? (UI.rseat != null ? UI.rseat : 0) : seat; UI.rseat = seat;
@@ -97,7 +72,7 @@ document.addEventListener('click', ev => {
   const z = $('#zoom'); if (z && !z.hidden) { closeZoom(); return; }
   if (UI.lp) { UI.lp = false; return; }
   const t = ev.target.closest('[data-a],[data-start]');
-  if (!t) { if (UI.sel) { UI.sel = null; render(); } return; }
+  if (!t) { if (UI.sel && !ev.target.closest('[data-help]')) { UI.sel = null; render(); } return; }   // help (bulb, bubbles, rules cards) must not cancel an open choice
   const a = t.dataset.a, d = t.dataset;
   if (netClick(a, t)) return;
   if (d.start && !a) { newGame(d.start); return; }
@@ -123,7 +98,6 @@ document.addEventListener('click', ev => {
     case 'save': save(); toast('Game saved.'); break;
     case 'loadsave': if (!loadSave()) toast('No saved game.'); break;
     case 'speed': AIDELAY = +d.v; break;
-    case 'guide': UI.coach.level = d.v; GX.renderSettings(); break;
     case 'sound': UI.sound = UI.sound === false; try { if (window.GA) { GA.setSfx(UI.sound); GA.setMusic(UI.sound); } } catch (e) { } GX.renderSettings(); break;
   }
 });

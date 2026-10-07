@@ -140,7 +140,7 @@ function goalSteps(){const o=[];const inv=(k,w,why)=>{const m=missingTerrain(k);
   return o}
 // the red priorities that are still open and could be fixed: Start the day asks first
 function uncoveredRed(){return priorities().filter(p=>p.red&&!p.done&&(p.can||p.move))}
-// ---------- 💡 Suggest: the priorities in order, then the computer's best plan for the pawns left ----------
+// ---------- ✨ Suggest: the priorities in order, then the computer's best plan for the pawns left ----------
 // keep: plan only the free pawns (the recommendation in plan step 2); otherwise start from an empty human plan
 function suggestCore(keep){const hs=G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i);if(!keep)clearPlan(hs);const lines=[];const whyBy={};
   const who=id=>{const p=pawnInfo(id);return p?pawnLabel(p):'?'};
@@ -170,29 +170,10 @@ function recPlan(){if(!planOpen())return {map:{}};if(recValid(UI.rec))return UI.
   UI.rec={round:G.round,res:res0,logN:log0,bkey,map};return UI.rec}
 // ---------- first-game walkthrough ----------
 UI.tut=0;try{UI.tut=localStorage.getItem('swi_tut')==='done'?99:0}catch(e){}
-function tutHtml(){if(UI.tut>=99||!G||G.round>1||!planOpen()||allAI())return '';
-  const steps=['<b>Each day has two halves.</b> First you plan: every castaway has 2 pawns to give jobs to. Then the day plays out as a story.',
-    '<b>Start with Today’s priorities.</b> They say what matters most right now, most urgent first. Tap <b>Do it</b> on the first one.',
-    '<b>Pawns and dice.</b> One pawn on a job rolls the dice (it may fail or hurt); one more pawn makes it a sure thing. Places 2 steps from camp need +1 pawn.',
-    '<b>The island is yours to read.</b> Every place has a number (❔3 is unexplored place 3). Tap one to see what you can do there.',
-    '<b>Give every pawn a job</b> (or tap 💡 Suggest for a full plan), then press <b>Start the day</b>.'];
-  const s=Math.min(UI.tut,steps.length-1);return `<div class="coach"><div class="cn">Tip ${s+1} of ${steps.length}</div><p>${steps[s]}</p><div class="cb">${s<steps.length-1?`<button class="btn xs" data-tut="next">Got it</button>`:''}<button class="btn xs ghost" data-tut="off">Hide tips</button></div></div>`}
+// the first-game walkthrough and the guided-game tips are now the help kit's coach bubbles (hlp.js)
+function tutHtml(){return ''}
 // ---------- the guided first game: one idea per screen, each shown once ----------
 UI.guide={on:false,seen:{}};
-const GUIDE={
-  plan1:'<b>How a day works.</b> Every day you <b>plan</b> first, then <b>watch the day play out</b>. This page shows what the camp needs tonight: <b>red rows are trouble</b>. Your goal is in the bar under the island (🎯). In the top bar, ♥ is the life of your most hurt castaway. Press <b>Next</b>.',
-  plan2:'<b>Give every pawn a job.</b> Each castaway has 2 pawns (workers); Friday and the dog are helpers. The <b>recommended job</b> comes with a reason: tap ✔ if you agree.',
-  plan3:'<b>Risks.</b> One pawn on a job rolls the dice (it can fail or hurt). Two pawns make it <b>certain</b>. Anything red is not covered today.',
-  plan4:'<b>Start the day.</b> The plan is fixed after this, and the day plays out scene by scene.',
-  event:'<b>An event card</b> comes every morning. Its <b>threat</b> sits in a slot and strikes later unless you send pawns to deal with it.',
-  act:'<b>Your jobs play out one by one.</b> Food and wood you win arrive in the evening, after every job is done.',
-  dice:'<b>Dice:</b> ✔ or ✖ says whether the job worked, 🩸 is a wound, ❓ draws an adventure card. Two pawns on a job means no dice.',
-  choice:'<b>Your choice.</b> Pick one of the buttons. The card text under it explains what each one does.',
-  weather:'<b>Weather.</b> Each cloud above your roof ruins 1 food and 1 wood. Snow also needs 1 wood each to keep warm.',
-  night:'<b>Night.</b> Everyone eats 1 food; anyone hungry takes 2 wounds. Without a shelter, everyone takes 1 wound.',
-  morning:'<b>Morale.</b> Each morning the first player (★) gains or loses <b>✊ determination</b>, the points you spend on skills. Low morale costs ✊; anyone who can’t pay takes a wound.',
-  prod:'<b>Production.</b> Your camp’s place gives its food and wood every morning, for free.',
-  daysum:'<b>End of the day:</b> what changed and why, and the one thing to do first tomorrow. <b>If any castaway dies, you all lose.</b>'};
-function guideTip(k){if(!UI.guide.on||UI.guide.seen[k]||!GUIDE[k]||!G||G.round>3)return '';return `<div class="coach gtip" role="note"><div class="cn">Tip</div><p>${GUIDE[k]}</p><div class="cb"><button class="btn xs" data-gtip="${k}">Got it</button><button class="btn xs ghost" data-gtip="off">No more tips</button></div></div>`}
+function guideTip(k){return ''}
 function tutAdvance(to){if(UI.tut<99)UI.tut=Math.max(UI.tut,to)}
 function tutDone(){UI.tut=99;try{localStorage.setItem('swi_tut','done')}catch(e){}}

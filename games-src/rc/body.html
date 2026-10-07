@@ -5,6 +5,7 @@
   <span id="netst" class="netst" role="status" hidden></span>
   <span class="gx-sp"></span>
   <button class="gx-ibtn" id="phchip" data-ph="status" aria-label="Camp status" hidden></button>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?" title="Hint"></button>
   <button class="gx-ibtn" data-gx="campd" aria-expanded="false" data-ico="tent" aria-label="Camp: castaways, items, skills"><span>Camp</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-expanded="false" data-ico="scroll" aria-label="Log"><span>Log</span></button>
   <button class="gx-ibtn" data-gx="cardsd" aria-expanded="false" data-ico="cards" aria-label="Card list"><span>Cards</span></button>
@@ -16,6 +17,7 @@
   <button class="gx-ibtn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ normal</button>
   <button class="gx-ibtn" data-a="gfx" id="gfxbtn" title="Graphics quality and speed" aria-haspopup="dialog" aria-controls="gfxpop" aria-expanded="false">Graphics</button>
   <button class="gx-ibtn" data-a="pause" id="pausebtn" hidden>⏸ Pause</button>
+  <div id="hlpset" class="hlpset"></div>
   <button class="gx-ibtn" data-a="new" data-ico="plus"><span>New game</span></button>
   </div>
 </header>
@@ -41,6 +43,8 @@
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="modal" hidden></div>
 <script src="shell.js"></script>
+<script src="gx-viewport.js"></script>
+<script src="gx-help.js"></script>
 <script src="gx-campaign.js"></script>
 <script src="campaign-data.js"></script>
 <script src="perfhud.js"></script>
@@ -71,6 +75,7 @@
 <script src="ph.js"></script>
 <script src="ui.js"></script>
 <script src="bf.js"></script>
+<script src="hlp.js"></script>
 <script src="campaign.js"></script>
 </body>
 </html>
