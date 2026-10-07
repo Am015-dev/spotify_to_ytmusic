@@ -29,7 +29,7 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   if(!first||!first.gxt||!/New here/.test(first.t))note(tag,'first menu option is not "New here? Learn in 5 minutes": '+JSON.stringify(first));
   if(first&&wc(first.t)>0&&!/Learn in 5 minutes/.test(first.t))note(tag,'label: '+first.t);
   // start it with a finger, from the menu
-  const tb=await p.evaluate(()=>{const b=document.querySelector('#start [data-gxt-open]');const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});
+  const tb=await p.evaluate(mode=>{const b=document.querySelector(mode==='story'?'#start .tbtn.story':'#start [data-gxt-open]');const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]},mode);
   await p.touchscreen.tap(tb[0],tb[1]);await sleep(500);
   await p.evaluate(()=>{UI.speed=4});
   const state=()=>p.evaluate(()=>GXT.state());
@@ -131,6 +131,24 @@ async function run(browser,W,H,mode){const tag=W+'x'+H+' '+mode;const t0=Date.no
   // ---- the end
   const fin=await state();
   if(!fin.active||fin.phase!=='end')note(tag,'the tutorial did not reach the end card ('+JSON.stringify({a:fin.active,ph:fin.phase,i:fin.i,id:fin.id})+') seen '+seenIds.join(','));
+  else if(mode==='story'){
+    await sleep(300);
+    const e=await p.evaluate(()=>{const c=document.querySelector('.gxt-end');return c&&[...c.querySelectorAll('[data-gxt-end]')].map(b=>({t:b.textContent,k:b.dataset.gxtEnd,r:(()=>{const q=b.getBoundingClientRect();return [q.left,q.top,q.right,q.bottom]})()}))});
+    if(!e||e.length!==1||e[0].k!=='chapter'||!/Start chapter 1/.test(e[0].t))note(tag,'story prologue end card buttons: '+JSON.stringify(e));
+    else{await p.touchscreen.tap((e[0].r[0]+e[0].r[2])/2,(e[0].r[1]+e[0].r[3])/2);await sleep(900);
+      const sc=await p.evaluate(()=>({scene:!!document.querySelector('.gxc-scene-on'),skip:(()=>{const b=document.querySelector('.gxc-btn.ghost');if(!b)return null;const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]})()}));
+      if(!sc.scene)note(tag,'chapter 1 intro did not start after the tutorial');
+      else{for(let k=0;k<8;k++){const q=await p.evaluate(()=>({camp:!!UI.camp&&!!G&&UI.started,skip:(()=>{const b=document.querySelector('.gxc-btn.ghost');if(!b)return null;const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]})(),go:(()=>{const b=document.querySelector('.gxc-btn.go');if(!b)return null;const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]})()}));
+        if(q.camp)break;const t=q.skip||q.go;if(t)await p.touchscreen.tap(t[0],t[1]);await sleep(500)}
+        const ok=await p.evaluate(()=>!!UI.camp&&!!G&&UI.started&&!G.over&&G.round===1&&!(UI.cfg&&UI.cfg.tutorial));
+        if(!ok)note(tag,'chapter 1 did not start after its intro')}}
+    const st2=await p.evaluate(()=>JSON.parse(localStorage.getItem('gxt-thornbound')||'{}'));if(!st2.done)note(tag,'prologue not remembered as done');
+    // second time: Story goes straight to the chapter map; the chapter list has a Tutorial button
+    await p.evaluate(()=>{GXC.close();showStart()});await sleep(200);
+    const sb=await p.evaluate(()=>{const b=document.querySelector('#start .tbtn.story');const r=b.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]});await p.touchscreen.tap(sb[0],sb[1]);await sleep(500);
+    const m=await p.evaluate(()=>({run:GXT.running(),map:!!document.querySelector('.gxc-map-on'),rep:[...document.querySelectorAll('.gxc-head button')].some(b=>/Tutorial/.test(b.textContent))}));
+    if(m.run)note(tag,'a finished player was sent through the tutorial again');if(!m.map)note(tag,'Story did not open the chapter map after the tutorial');if(!m.rep)note(tag,'no "Tutorial" (replay) button in the chapter list');
+  }
   else{
     await sleep(300);
     const e=await p.evaluate(()=>{const c=document.querySelector('.gxt-end');if(!c)return null;const r=c.querySelector('.gxt-endc').getBoundingClientRect();return {t:c.querySelector('.gxt-et').textContent,btns:[...c.querySelectorAll('[data-gxt-end]')].map(b=>({t:b.textContent,k:b.dataset.gxtEnd,r:(()=>{const q=b.getBoundingClientRect();return [q.left,q.top,q.right,q.bottom,q.width,q.height]})()})),inside:r.left>=0&&r.right<=innerWidth&&r.top>=0&&r.bottom<=innerHeight}});
@@ -165,7 +183,7 @@ const once=new Set();const guardOnce=id=>{const k=id+'|'+(guardOnce.run||'');if(
 
 (async()=>{const b=await PW.chromium.launch({args:['--no-sandbox']});
   const jobs=[];for(const [W,H] of SIZES){jobs.push([W,H,'clean']);}
-  const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);
+  const [W0,H0]=SIZES[0];jobs.push([W0,H0,'rotate']);jobs.push([W0,H0,'leave']);jobs.push([W0,H0,'skip']);jobs.push([W0,H0,'story']);jobs.push([375,553,'story']);
   for(const j of jobs){guardOnce.run=j.join('x');try{await run(b,...j)}catch(e){note(j.join(' '),'CRASH '+String(e.message).split('\n')[0])}}
   await b.close();
   console.log('steps checked',totals.steps,'wrong taps',totals.wrong,'step ids',totals.ids.join(','));

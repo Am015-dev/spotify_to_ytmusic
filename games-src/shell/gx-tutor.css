@@ -11,7 +11,7 @@
 .gxh-bub.gxt-bub{z-index:calc(var(--gxt-z) + 4);animation:gxh-in .18s ease-out both}
 .gxt-bub.gxt-shake{animation:gxt-shake .38s ease-in-out both}
 .gxt-bub.gxt-nobtn .gxh-tt{padding-right:0}
-.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);height:34px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:rgba(22,11,17,.94);color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
+.gxt-top{position:fixed;left:0;right:0;top:0;z-index:calc(var(--gxt-z) + 5);height:34px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 6px 0 10px;background:#160b11;color:#f3e6bf;font:700 12px/1 var(--gxh-font,inherit);border-bottom:1px solid rgba(201,154,53,.5)}
 .gxt-prog{display:flex;align-items:center;gap:8px;min-width:0}
 .gxt-dots{display:flex;gap:3px;align-items:center;flex-wrap:nowrap}
 .gxt-dots i{display:block;width:6px;height:6px;border-radius:50%;background:rgba(243,230,191,.28);flex:0 0 auto}

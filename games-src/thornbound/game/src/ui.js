@@ -764,7 +764,7 @@ document.addEventListener('click',e=>{
    case 'gclose':hideGloss();break;
    case 'nowlog':GX.show('logd');break;
    case 'title':UI.sv='title';renderStart();break;
-   case 'story':if(typeof GXC!=='undefined')GXC.open();break;
+   case 'story':storyOpen();break;
    case 'play':UI.sv='setup';UI.cfgOpen=false;renderStart();break;
    case 'online':UI.sv='online';UI.onl=true;renderStart();break;
    case 'cfgopen':UI.cfgOpen=true;renderStart();break;
@@ -1316,7 +1316,7 @@ function campOver(){if(!UI.camp||UI.campDone||typeof GXC==='undefined'||!GXC.act
   setTimeout(()=>{if(G===g&&GXC.active()){try{clearSave()}catch(e){}GXC.finish(g)}},window.CAMP_WAIT!=null?window.CAMP_WAIT:2200)}
 function campLine(){try{const p=GXC.progress(),ch=window.CAMPAIGN.chapters,n=ch.filter(c=>p.ch[c.id]&&p.ch[c.id].beaten).length;return n?n+' of '+ch.length+' chapters done':'chapters, bosses, three acts'}catch(e){return 'chapters, bosses, three acts'}}
 function campInit(){if(typeof GXC==='undefined'||!window.CAMPAIGN)return;
-  GXC.init({game:'thornbound',data:window.CAMPAIGN,startChapter:def=>{hideStart();newGame('me',campOpts(def))},isWon:campIsWon,metrics:campMetrics,
+  GXC.init({game:'thornbound',headButtons:()=>{const b=document.createElement('button');b.type='button';b.className='gxc-ib';b.textContent='Tutorial';b.setAttribute('aria-label','Replay the tutorial');b.addEventListener('click',()=>{GXC.close();tutStart()});return [b]},data:window.CAMPAIGN,startChapter:def=>{hideStart();newGame('me',campOpts(def))},isWon:campIsWon,metrics:campMetrics,
     onExit(){showStart()},scores:g=>g.pl.map(p=>p.inf),seats:g=>g.pl.map((p,i)=>({name:p.name,me:i===0,ai:i?p.ai:undefined}))})}
 campInit();
 // ===================== part 10: board-first play =====================
@@ -1549,7 +1549,7 @@ const HLP_STEPS={
  occupier:{target:hfirst('#handw'),title:'Tuck a card under',text:'Pick the hand card that sits under your new Kingdom Card. It cannot fight.',pic:()=>HP.back()},
  herald:{target:hfirst('.tb-loc.glow.rec .tb-ring','.tb-loc.glow .tb-ring'),title:'Place your Herald',text:'Tap a glowing location. Your Herald pays off only if you win that region.',pic:()=>HP.herald()},
  place:{target:hq('#handw'),title:'Hide a card',text:'Tap a card, then tap a region. It stays hidden until the Clash.',pic:()=>HP.region()},
- tie:{target:hfirst('#handw','#act .btn'),title:'A tie!',text:'Add one more hidden card to break it, or tap Pass.',pic:()=>HP.swords()},
+ tie:{target:hfirst('#act .btn','#handw'),title:'A tie!',text:'Add one more hidden card to break it, or tap Pass.',pic:()=>HP.swords()},
  spring:{target:hfirst('.tbx-pan g.rglow rect','#act .btn'),title:'Send Supporters',text:'Tap a region to send a Supporter: +1 Strength in its first Clash. Then tap Done.',pic:()=>HP.supp()},
  day:{target:hfirst('#act .btn.pri','#act .btn'),title:'The Clash',text:'The cards are face up. Highest total Strength wins. Tap Done to fight.',pic:()=>HP.swords()},
  autumn:{target:hfirst('#act [data-a=powers]','#act .btn.pri','#act .btn'),title:'Autumn options',text:'Optional: Govern or Journey with a card. Tap Powers to look, or Done to skip.',pic:()=>HP.scroll()},
@@ -1731,11 +1731,18 @@ function tutSteps(){
   ]}
 // ---------------------------------------------------------------- the kit hooks
 function tutHold(c){if(typeof GXT==='undefined'||!GXT.active())return false;const st=GXT.current();return !!(st&&st.hold&&st.hold(c))}
-function tutStart(){if(typeof GXT==='undefined')return;
+// Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
+function storyOpen(){if(typeof GXC==='undefined')return;
+  if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
+function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:'Bid, Herald, hidden cards, Supporters, Clashes, scoring. Round 2 adds Journeys, Tactics and more: the lightbulb explains them.',
+    endTitle:'You know the rules',endText:o?'Bid, Herald, hidden cards, Supporters, Clashes, scoring. Now the Story begins.':'Bid, Herald, hidden cards, Supporters, Clashes, scoring. Round 2 adds Journeys, Tactics and more: the lightbulb explains them.',
+    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:()=>{try{GX.close()}catch(e){}hideStart();hideGloss();closePop(true);newGame('tutorial')},
-    onDone:o=>{tutLeave();if(o&&o.choice==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}else{UI.sv='setup';UI.cfgOpen=false;showStart();UI.sv='setup';renderStart()}},
+    onDone:r=>{tutLeave();const c=r&&r.choice;
+      if(c==='chapter'&&first){showStart();GXC.play(first.id)}
+      else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
+      else{UI.sv='setup';UI.cfgOpen=false;showStart();UI.sv='setup';renderStart()}},
     onExit:()=>{tutLeave();showStart()}})}
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}

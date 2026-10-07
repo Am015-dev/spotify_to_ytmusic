@@ -39,7 +39,7 @@ document.addEventListener('click',e=>{
    case 'gclose':hideGloss();break;
    case 'nowlog':GX.show('logd');break;
    case 'title':UI.sv='title';renderStart();break;
-   case 'story':if(typeof GXC!=='undefined')GXC.open();break;
+   case 'story':storyOpen();break;
    case 'play':UI.sv='setup';UI.cfgOpen=false;renderStart();break;
    case 'online':UI.sv='online';UI.onl=true;renderStart();break;
    case 'cfgopen':UI.cfgOpen=true;renderStart();break;

@@ -91,11 +91,18 @@ function tutSteps(){
   ]}
 // ---------------------------------------------------------------- the kit hooks
 function tutHold(c){if(typeof GXT==='undefined'||!GXT.active())return false;const st=GXT.current();return !!(st&&st.hold&&st.hold(c))}
-function tutStart(){if(typeof GXT==='undefined')return;
+// Story is preceded by the tutorial (Chapter 0) until it has been finished once; a finished player goes straight to the chapter map
+function storyOpen(){if(typeof GXC==='undefined')return;
+  if(typeof GXT!=='undefined'&&!GXT.isDone(TUT_GAME))tutStart({prologue:true});else GXC.open()}
+function tutStart(o){if(typeof GXT==='undefined')return;o=o&&o.prologue?o:null;const first=window.CAMPAIGN&&window.CAMPAIGN.chapters&&window.CAMPAIGN.chapters[0];
   GXT.start({game:TUT_GAME,steps:tutSteps(),story:!!(window.CAMPAIGN&&typeof GXC!=='undefined'),
-    endTitle:'You know the rules',endText:'Bid, Herald, hidden cards, Supporters, Clashes, scoring. Round 2 adds Journeys, Tactics and more: the lightbulb explains them.',
+    endTitle:'You know the rules',endText:o?'Bid, Herald, hidden cards, Supporters, Clashes, scoring. Now the Story begins.':'Bid, Herald, hidden cards, Supporters, Clashes, scoring. Round 2 adds Journeys, Tactics and more: the lightbulb explains them.',
+    endButtons:o&&first?[{id:'chapter',label:'Start chapter 1'}]:null,
     setup:()=>{try{GX.close()}catch(e){}hideStart();hideGloss();closePop(true);newGame('tutorial')},
-    onDone:o=>{tutLeave();if(o&&o.choice==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}else{UI.sv='setup';UI.cfgOpen=false;showStart();UI.sv='setup';renderStart()}},
+    onDone:r=>{tutLeave();const c=r&&r.choice;
+      if(c==='chapter'&&first){showStart();GXC.play(first.id)}
+      else if(c==='story'&&typeof GXC!=='undefined'){showStart();GXC.open()}
+      else{UI.sv='setup';UI.cfgOpen=false;showStart();UI.sv='setup';renderStart()}},
     onExit:()=>{tutLeave();showStart()}})}
 // leave the staged game: nothing of it is saved, and the board goes quiet behind the menu
 function tutLeave(){clearTimeout(_pumpT);clearTimeout(UI._evT);clearTimeout(UI._nt);UI.started=false;UI.card=null;UI.evq=[];UI.hand=null;try{GXH.hide()}catch(e){}try{const f=$('#finger');if(f)f.hidden=true}catch(e){}}

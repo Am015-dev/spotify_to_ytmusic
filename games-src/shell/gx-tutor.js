@@ -3,7 +3,7 @@
 //   GXT.start({game:'slug', setup:()=>void, steps:[{id, say:'<=20 words' | ()=>str, title?:'<=4 words', target:()=>el|rect|{x,y}, also?:()=>el|[el],
 //              wait:{type:'tap'|'drag'|'event', match:(action)=>bool, times?:n} | null /* null = a Next button */, from?:()=>el /* drag finger start */,
 //              ready?:()=>bool, onEnter?:()=>void, onNext?:()=>void, ai?:()=>void|Promise, side?:'top'|'bottom', wrong?:'text'}],
-//             onDone:({choice:'play'|'story'})=>void, onExit?:()=>void, endTitle?, endText?, story?:true})
+//             onDone:({choice:'play'|'story'|<your endButtons id>})=>void, endButtons?:[{id,label}] /* replaces Play/Story, e.g. a prologue: [{id:'chapter',label:'Start chapter 1'}] */, onExit?:()=>void, endTitle?, endText?, story?:true})
 //   GXT.act({type:'tap'|'drag'|'event', ...})   games call it from their input handlers BEFORE applying the action; false = not what this step asks (ignore it)
 //   GXT.active() GXT.current() GXT.state() GXT.skip() GXT.stop() GXT.relayout() GXT.lint(steps)
 //   GXT.status(game) GXT.menuHTML({game, first, cls, launch}) GXT.isDone(game) GXT.markDone(game) GXT.reset(game)
@@ -240,7 +240,7 @@
     var story = cfg.story !== false;
     var c = mk('div', 'gxt-end'); c.setAttribute('role', 'dialog'); c.setAttribute('aria-modal', 'true'); c.setAttribute('aria-label', 'Tutorial finished');
     c.innerHTML = '<div class="gxt-endc"><div class="gxt-ek" aria-hidden="true">&#10003;</div><div class="gxt-et">' + esc(cfg.endTitle || 'You know the rules') + '</div><div class="gxt-ex">' + esc(cfg.endText || 'You can start a real game now.') + '</div>' +
-      '<div class="gxt-eb"><button type="button" class="gxt-b pri" data-gxt-end="play">Play a real game</button>' + (story ? '<button type="button" class="gxt-b" data-gxt-end="story">Story mode</button>' : '') + '</div></div>';
+      '<div class="gxt-eb">' + (cfg.endButtons ? cfg.endButtons.map(function (b, i) { return '<button type="button" class="gxt-b' + (i ? '' : ' pri') + '" data-gxt-end="' + esc(b.id) + '">' + esc(b.label) + '</button>'; }).join('') : '<button type="button" class="gxt-b pri" data-gxt-end="play">Play a real game</button>' + (story ? '<button type="button" class="gxt-b" data-gxt-end="story">Story mode</button>' : '')) + '</div></div>';
     add(c);
     c.addEventListener('click', function (e) {
       var b = e.target.closest && e.target.closest('[data-gxt-end]'); if (!b) return;
@@ -295,7 +295,7 @@
   function menuHTML(o) {
     o = o || {}; var g = o.game; if (o.launch) launchers[g] = o.launch; wire();
     var s = status(g), first = !!o.first && !s.done && !s.open, cls = (o.cls || '') + ' gxt-menu' + (first ? ' gxt-first' : '') + (s.done ? ' gxt-ok' : '');
-    var sub = o.sub === false ? '' : '<span>' + esc(s.done ? 'Done. Tap to play it again.' : first ? '19 short steps, no reading walls' : s.open ? 'Restart or exit' : 'Learn by doing, step by step') + '</span>';
+    var sub = o.sub === false ? '' : '<span>' + esc(s.done ? 'Done. Tap to play it again.' : first ? 'Short, one tap at a time, no reading' : s.open ? 'Restart or exit' : 'Learn by doing, step by step') + '</span>';
     return '<button type="button" class="' + cls.trim() + '" data-gxt-open="' + esc(g) + '" data-help><b>' + esc(label(g, first)) + '</b>' + sub + '</button>';
   }
   function onMenuClick(e) {

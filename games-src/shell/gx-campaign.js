@@ -1,6 +1,7 @@
 // ===== GX campaign: story chapters, bosses and gradual difficulty (opt-in; see CAMPAIGN.md) =====
 // A new, self-contained module: it does not change shell.js or gx-kit.js, and works with or without them.
 //   GXC.init(opts)        wire a game: {game, data, startChapter, isWon, metrics, starsEarned, portrait, artBase, onExit, scores, seats}
+//   opts.headButtons()    optional: extra header buttons (elements) for the chapter map, e.g. "Replay tutorial"
 //   GXC.open()            the chapter map (the title's "Story" button)
 //   GXC.play(id)          intro scene -> boss card -> opts.startChapter(effective chapter)
 //   GXC.finish(G, over)   on game over: store stars, GNS.result({mode:'campaign'}), result screen, outro, back to the map
@@ -163,6 +164,7 @@
     var got = 0; list.forEach(function (c) { got += (P.ch[c.id] && P.ch[c.id].stars) || 0; });
     var sc = btn('gxc-ib gxc-score', '★ ' + got + '/' + list.length * 3, function () { rewards(); });
     sc.setAttribute('aria-label', got + ' stars of ' + list.length * 3 + '. Show rewards'); head.appendChild(sc);
+    if (O.headButtons) { try { O.headButtons().forEach(function (b) { head.insertBefore(b, sc); }); } catch (e) {} }
     s.appendChild(head);
     var map = el('div', 'gxc-map'), path = el('div', 'gxc-path');
     map.appendChild(path); s.appendChild(map);

@@ -28,7 +28,7 @@ const HLP_STEPS={
  occupier:{target:hfirst('#handw'),title:'Tuck a card under',text:'Pick the hand card that sits under your new Kingdom Card. It cannot fight.',pic:()=>HP.back()},
  herald:{target:hfirst('.tb-loc.glow.rec .tb-ring','.tb-loc.glow .tb-ring'),title:'Place your Herald',text:'Tap a glowing location. Your Herald pays off only if you win that region.',pic:()=>HP.herald()},
  place:{target:hq('#handw'),title:'Hide a card',text:'Tap a card, then tap a region. It stays hidden until the Clash.',pic:()=>HP.region()},
- tie:{target:hfirst('#handw','#act .btn'),title:'A tie!',text:'Add one more hidden card to break it, or tap Pass.',pic:()=>HP.swords()},
+ tie:{target:hfirst('#act .btn','#handw'),title:'A tie!',text:'Add one more hidden card to break it, or tap Pass.',pic:()=>HP.swords()},
  spring:{target:hfirst('.tbx-pan g.rglow rect','#act .btn'),title:'Send Supporters',text:'Tap a region to send a Supporter: +1 Strength in its first Clash. Then tap Done.',pic:()=>HP.supp()},
  day:{target:hfirst('#act .btn.pri','#act .btn'),title:'The Clash',text:'The cards are face up. Highest total Strength wins. Tap Done to fight.',pic:()=>HP.swords()},
  autumn:{target:hfirst('#act [data-a=powers]','#act .btn.pri','#act .btn'),title:'Autumn options',text:'Optional: Govern or Journey with a card. Tap Powers to look, or Done to skip.',pic:()=>HP.scroll()},
