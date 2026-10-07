@@ -1,0 +1,70 @@
+{
+ "runs": {
+  "city": {
+   "L": 1309.3684926678493,
+   "x": 1356.2173966738123,
+   "z": -15.763086153303076,
+   "h": 2.068056445167728,
+   "w": 28
+  },
+  "ab": {
+   "L": 2458.854456651077,
+   "x": 4007.710525461848,
+   "z": -5124.608131453624,
+   "h": 0.05457670211914671,
+   "w": 16
+  }
+ },
+ "turnJ": {
+  "s": 0.20217661190523867,
+  "A": [
+   720,
+   -120
+  ],
+  "n": [
+   720,
+   0
+  ],
+  "C": [
+   628,
+   0
+  ],
+  "hin": 0,
+  "hout": -1.5707963267948966,
+  "t": -1.5707963267948966,
+  "la": 120,
+  "w": 18
+ },
+ "turn_human": {
+  "mode": "human",
+  "v5": 72,
+  "d5": 62,
+  "entryKmh": 50,
+  "turnedDeg": -101,
+  "maxSlipDeg": 0.4,
+  "camLagS": 0.08,
+  "exitRoadHalfW": 14,
+  "maxOffExitCentreM": 11.2,
+  "offRoadMaxM": -2.8,
+  "onRoad": true,
+  "wallHits": 0,
+  "wrongWay": false,
+  "exitKmh": 76
+ },
+ "turn_nobrake": {
+  "mode": "nobrake",
+  "v5": 72,
+  "d5": 62,
+  "entryKmh": 71,
+  "turnedDeg": -93,
+  "maxSlipDeg": 0.3,
+  "camLagS": 0.08,
+  "exitRoadHalfW": 14,
+  "maxOffExitCentreM": 20.1,
+  "offRoadMaxM": 6.1,
+  "onRoad": false,
+  "wallHits": 0,
+  "wrongWay": false,
+  "exitKmh": 81
+ }
+}
