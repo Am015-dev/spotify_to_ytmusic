@@ -2,7 +2,7 @@
 # SERIAL seeded A/B: live v87s (base18_dbg) vs new (b2k18_dbg). usage: qa18/ab18.sh <out> [MIN] [cities] [seeds]
 cd /home/user/spotify_to_ytmusic
 OUT=${1:-qa18/ab};M=${2:-4};CS=${3:-"ath fra"};SS=${4:-"1 2 3"};mkdir -p $OUT
-for c in $CS; do for s in $SS; do for v in base18 b2k18; do
+for c in $CS; do for s in $SS; do for v in base18 ${NEW:-b2k18}; do
  SEED=$s FAST=1 MODE=phone CITIES=$c MIN=$M SHOTS=0 node t16/tPlayDbg.js "http://127.0.0.1:8766/${v}_dbg.html?fast=1" $OUT/$v-$c-$s > $OUT/$v-$c-$s.log 2>&1; echo "$v $c $s $?"
 done; done; done
 python3 - "$OUT" <<'PY'
