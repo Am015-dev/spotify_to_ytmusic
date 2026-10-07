@@ -22,9 +22,9 @@ const LIB = `(() => {
     engine() { if (G.phase === 'over' && G.final) return G.final.totals.slice(); return G.players.map((p, s) => G.rs.reduce((a, r) => a + r[s].total, 0)); },
     audit() {
       const W = innerWidth, H = innerHeight, covered = [], wordy = [];
-      for (const e of document.querySelectorAll('button,[role=button]')) { if (!vis(e) || e.matches('.hc,.grp')) continue; const r = e.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2; if (cx < 0 || cy < 0 || cx > W || cy > H) continue;
-        const t = document.elementFromPoint(cx, cy); if (t && t !== e && !e.contains(t) && !t.contains(e) && !(t.closest && t.closest('svg') && t.closest('svg').getBoundingClientRect().width < 120)) { if (e.closest('.gx-drawer,[aria-modal=true]')) continue; covered.push((e.dataset.a || e.className || e.tagName) + ' <- ' + (t.id || t.className || t.tagName)); } }
-      for (const e of document.body.querySelectorAll('*')) { if (/^(SCRIPT|STYLE|SVG|TEXT|TSPAN|PATH)$/i.test(e.tagName) || !vis(e) || getComputedStyle(e).display.startsWith('inline')) continue; if (![...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
+      for (const e of document.querySelectorAll('button,[role=button]')) { if (!vis(e) || e.matches('.hc,.grp') || e.closest('[data-help]')) continue; const r = e.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2; if (cx < 0 || cy < 0 || cx > W || cy > H) continue;
+        const t = document.elementFromPoint(cx, cy); if (t && t.closest && t.closest('[data-help]') && !e.matches('[data-help]')) continue; if (t && t !== e && !e.contains(t) && !t.contains(e) && !(t.closest && t.closest('svg') && t.closest('svg').getBoundingClientRect().width < 120)) { if (e.closest('.gx-drawer,[aria-modal=true]')) continue; covered.push((e.dataset.a || e.className || e.tagName) + ' <- ' + (t.id || t.className || t.tagName)); } }
+      for (const e of document.body.querySelectorAll('*')) { if (/^(SCRIPT|STYLE|SVG|TEXT|TSPAN|PATH)$/i.test(e.tagName) || e.closest('[data-help]') || !vis(e) || getComputedStyle(e).display.startsWith('inline')) continue; if (![...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue;
         if (e.closest('[class*=drawer],[class*=Drawer],[class*=rules],[class*=menu],[id$=log],[class*=settings],[aria-modal=true],#start,.gx-drawer,#netbox')) continue;
         const r = e.getBoundingClientRect(); if (r.bottom < 0 || r.top > H || r.right < 0 || r.left > W) continue;
         const w = (e.innerText || '').replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(x => /[a-z][a-z]/i.test(x)); if (w.length > 8) wordy.push(w.length + 'w "' + w.slice(0, 6).join(' ') + '"'); }
@@ -92,6 +92,7 @@ async function game(b, gi, [W, H]) {
       const pre = await p.evaluate(() => { const s = hlpSuggest(); const r = s && s.target() && s.target().getBoundingClientRect(); return { has: !!s, why: s && s.why, to: r && { x: r.left + r.width / 2, y: r.top + r.height / 2 }, sig: JSON.stringify([G.round, G.turn, G.players[0].hand.length, G.players[0].picked, UI.sel, UI.twin]) }; });
       const bb = await ev(`__sw.btn('#bulbbtn')`); if (!bb) { fail('no bulb button'); return false; }
       await tap(bb.x, bb.y); await p.waitForTimeout(350);
+      if (pre.has && !(await p.evaluate(() => !!document.querySelector('.gxh-finger')))) { await p.waitForTimeout(500); await tap(bb.x, bb.y); await p.waitForTimeout(400); }
       const r = await p.evaluate(() => { const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'); return { f: f && { ...f.dataset }, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!document.querySelector('.gxh-rules') }; });
       if (pre.has) {
         if (!r.f) fail('bulb tapped, no finger (' + ph + ')');

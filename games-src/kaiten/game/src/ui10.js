@@ -16,7 +16,7 @@ const HLP_STEPS = {
 };
 const HLP_RULES = [
   { phase: 'pick', title: 'Pick and pass', text: 'Everyone takes one dish at the same time. Then every hand passes to the next diner.', pic: HPIC.belt },
-  { phase: 'pick', title: 'Sets and buns', text: 'Two Crispy Prawns score 5. Three Fish Slices score 10. Steam Buns score 1, 3, 6, 10, then 15 from five.', pic: () => HPIC.row(['tempura', 'sashimi', 'dumpling']) },
+  { phase: 'pick', title: 'Sets and buns', text: 'Two Prawns score 5, three Fish Slices 10. Steam Buns score 1, 3, 6, 10, then 15.', pic: () => HPIC.row(['tempura', 'sashimi', 'dumpling']) },
   { phase: 'pick', title: 'Rolls and nigiri', text: 'Most roll icons score 6, second most 3. Nigiri score 1 to 3, tripled on Fire Paste.', pic: () => HPIC.row(['roll2', 'salmon', 'wasabi']) },
   { phase: 'pick', title: 'Custard at the end', text: 'Custard Cups score only when the game ends: most scores 6, fewest loses 6.', pic: () => HPIC.card('pudding', 64) },
   { phase: 'twin', title: 'Twin Sticks', text: 'Keep them on the table. On a later turn take two dishes from your hand at once.', pic: () => HPIC.card('chop', 64) },
