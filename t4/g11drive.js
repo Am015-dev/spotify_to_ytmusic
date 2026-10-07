@@ -29,14 +29,17 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
      const cr=fx*az-fz*ax;return Math.abs(cr)<1.5?0:(cr>0?1:-1)});
    if(st){const key=st>0?'ArrowLeft':'ArrowRight';await p.keyboard.down(key);await p.waitForTimeout(220);await p.keyboard.up(key)}
    const a=await pgap();if(Array.isArray(a)&&a.length)G.push({tag,max:Math.max(...a.map(Math.abs)),a});if(k%2===0){const t=await tgap();if(Array.isArray(t))for(const w of t)if(w.length)T.push({tag,max:Math.max(...w.map(Math.abs))})}}
+  if(process.env.BOOST&&tag!=='ath'){const n=await (await p.$('#tN')).boundingBox(),gp={x:g.x+g.width/2,y:g.y+g.height/2,id:2};console.log(tag,'meter',await p.evaluate(()=>{try{return __g9ev('JSON.stringify({m:B2K.dm,bt:B2K.bt})')}catch(e){return 'n/a'}}));
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[gp,{x:n.x+n.width/2,y:n.y+n.height/2,id:4}]});await p.waitForTimeout(1500);await p.screenshot({path:`${OUT}/${tag}_boost.png`});console.log('shot',tag+'_boost');
+   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[gp]})}
   await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});console.log(tag,'top kmh',top,'pos',await p.evaluate(()=>[Math.round(__mho.RO.x),Math.round(__mho.RO.z)]))};
  await drive(+(process.env.SEC||75),'fra');await shot('02_frankfurt_drive');
  // low side view: brake to a stop (real touch), camera ~1 m above the road, side-on, framing the player and the nearest traffic car; then a close tyre view
  const B=await (await p.$('#tB')).boundingBox();await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:B.x+B.width/2,y:B.y+B.height/2,id:3}]});
  for(let t=0;t<30&&await kmh()>1;t++)await p.waitForTimeout(1500);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
  const side=async(n,close)=>{const r=await p.evaluate(close=>{const M=__mho,R=M.RO,g=M.gnd(R.x,R.z,R.y+.3);let c=null,bd=40;for(const o of(M.HUB.cars||[])){if(o.dead>0)continue;const d=Math.hypot(o.x-R.x,o.z-R.z);if(d<bd&&d>2){bd=d;c=o}}
-   const tx=close||!c?R.x:(R.x+c.x)/2,tz=close||!c?R.z:(R.z+c.z)/2,h=close||!c?R.h:Math.atan2(c.x-R.x,c.z-R.z),sx=Math.cos(h),sz=-Math.sin(h),k=close?3.6:Math.max(8,bd*.75);
-   __gnb.cam([tx+sx*k,g+(close?.35:1),tz+sz*k,tx,g+(close?.25:.6),tz]);return{traffic:c?+bd.toFixed(1):null}},close);await p.waitForTimeout(2500);await p.screenshot({path:`${OUT}/${n}.png`});console.log('shot',n,JSON.stringify(r))};
+   const tx=close||!c?R.x:(R.x+c.x)/2,tz=close||!c?R.z:(R.z+c.z)/2,h=close||!c?R.h:Math.atan2(c.x-R.x,c.z-R.z),sx=Math.cos(h),sz=-Math.sin(h),k=close===2?7.6:close?3.6:Math.max(8,bd*.75);
+   __gnb.cam([tx+sx*k,g+(close===2?1.1:close?.35:1),tz+sz*k,tx,g+(close===2?1:close?.25:.6),tz]);return{traffic:c?+bd.toFixed(1):null}},close);await p.waitForTimeout(2500);await p.screenshot({path:`${OUT}/${n}.png`});console.log('shot',n,JSON.stringify(r))};
  if(process.env.SIDE){// screenshot aid (like nbside.js): freeze the nearest traffic car on a straight lane and stand the stopped player 7.5 m behind it
   const sel=await p.evaluate(()=>{const M=__mho,R=M.RO,H=M.HUB,N=H.nodes;let j=-1,bd=1e9;const nw=k=>{try{return __g9ev(`(()=>{const im=HUB.cim&&HUB.cim[${JSON.stringify(k)}],wm=im&&im.userData.w;return wm?(ART6_wl[${JSON.stringify(k)}]||(ART6_wl[${JSON.stringify(k)}]=ART6_wheels(wm.geometry))).length:0})()`)}catch(e){return 0}};(H.cars||[]).forEach((c,i)=>{if(c.dead>0||c.tr||nw(c.k)!==4)return;const A=N[c.a],B=N[c.b];if(!A||!B||A.ab||B.ab||A.g||B.g)return;const L=Math.hypot(B.x-A.x,B.z-A.z);if(L*(1-c.t)<20||L*c.t<14)return;const d=Math.hypot(c.x-R.x,c.z-R.z);if(d<bd){bd=d;j=i}});if(j<0)return null;
    const c=H.cars[j];c.v=0;c.cv=0;c.hv=.01;c.route=[];c.hitT=99;window.__tc=j;const A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z);return{x:c.x,z:c.z,h:Math.atan2((B.x-A.x)/L,(B.z-A.z)/L)}});console.log('traffic car',JSON.stringify(sel));
@@ -49,7 +52,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  if(process.env.OFF){// off-road form (Blue Beast) mixed in: press T (vehicle cycle, real key) until 4x4, drive, low side shot
   for(let i=0;i<4&&await p.evaluate(()=>__mho.RO.vsel)!=='offroad';i++){await p.keyboard.press('KeyT');await p.waitForTimeout(1500)}console.log('vsel',await p.evaluate(()=>__mho.RO.vsel));await p.waitForTimeout(3000);
   await drive(45,'off');await shot('07_offroad_drive');await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:B.x+B.width/2,y:B.y+B.height/2,id:3}]});for(let t=0;t<30&&await kmh()>1;t++)await p.waitForTimeout(1500);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
-  await side('08_offroad_side',1);await p.evaluate(()=>__gnb.cam(null));console.log('off_rest',JSON.stringify(await pgap()));
+  await side('08_offroad_side',2);await p.evaluate(()=>__gnb.cam(null));console.log('off_rest',JSON.stringify(await pgap()));
   for(let i=0;i<4&&await p.evaluate(()=>__mho.RO.vsel)!=='auto';i++){await p.keyboard.press('KeyT');await p.waitForTimeout(1200)}}
  if(process.env.ATH){// Athens: test placement on an Athens street lane node (Historic Centre), heading along the lane, then real driving
   const at=await p.evaluate(()=>{const M=__mho,N=M.HUB.nodes;let best=-1,bd=1e9;for(let i=0;i<N.length;i++){const n=N[i];if(n.ab||!n.nb||!n.nb.length)continue;if(n.x<-1350||n.x>-1150||n.z<760||n.z>1000)continue;const d=Math.hypot(n.x+1250,n.z-880);if(d<bd){bd=d;best=i}}
