@@ -61,11 +61,11 @@ function R15_pads(){for(const c of R15C){const L=TF.L;for(const fr of[.45]){cons
 function R15_tex(kind){const[c,g]=cv(256,256);if(kind==='water'){g.fillStyle='#1d7fd6';g.fillRect(0,0,256,256);for(let i=0;i<70;i++){g.fillStyle=`rgba(255,255,255,${.12+Math.random()*.25})`;const x=Math.random()*256,y=Math.random()*256;g.fillRect(x,y,10+Math.random()*30,3)}
   g.fillStyle='rgba(120,200,255,.35)';for(let y=0;y<256;y+=32)g.fillRect(0,y,256,6)}else{g.fillStyle='#8a5a2e';g.fillRect(0,0,256,256);for(let i=0;i<1800;i++){const v=Math.random();g.fillStyle=v<.5?`rgba(60,34,14,${.2+Math.random()*.3})`:`rgba(200,150,95,${.1+Math.random()*.25})`;g.fillRect(Math.random()*256,Math.random()*256,3+Math.random()*6,3+Math.random()*6)}
   g.fillStyle='rgba(50,28,10,.45)';for(const x of[70,180])g.fillRect(x,0,18,256)}return tex(c)}
-function R15_signTex(kind){const[c,g]=cv(1024,352);const col=kind==='water'?'#29b6ff':'#ff9a1f';g.fillStyle='#ffd12c';g.fillRect(0,0,1024,352);g.fillStyle='#0d0d10';g.fillRect(14,14,996,324);
+function R15_signTex(kind,sd){const[c,g]=cv(1024,352);const col=kind==='water'?'#29b6ff':'#ff9a1f';g.fillStyle='#ffd12c';g.fillRect(0,0,1024,352);g.fillStyle='#0d0d10';g.fillRect(14,14,996,324);
   // R17: yellow on black, one huge word + the kind in its own colour + a fat arrow (read at 230 km/h ~2 s ahead)
   g.fillStyle='#ffd12c';g.font='900 168px system-ui,sans-serif';g.textAlign='left';g.textBaseline='alphabetic';g.fillText('SHORTCUT',40,186);
   g.fillStyle=col;g.font='900 104px system-ui,sans-serif';g.fillText(kind==='water'?'≈ BOAT':'▲ DIRT',44,312);
-  g.fillStyle='#ffd12c';g.beginPath();g.moveTo(600,236);g.lineTo(830,236);g.lineTo(830,206);g.lineTo(990,272);g.lineTo(830,338);g.lineTo(830,308);g.lineTo(600,308);g.closePath();g.fill();return tex(c,false)}
+  g.fillStyle='#ffd12c';g.beginPath();const ax=x=>sd<0?1590-x:x;g.moveTo(ax(600),236);g.lineTo(ax(830),236);g.lineTo(ax(830),206);g.lineTo(ax(990),272);g.lineTo(ax(830),338);g.lineTo(ax(830),308);g.lineTo(ax(600),308);g.closePath();g.fill();return tex(c,false)}
 function R15_arrowTex(){const[c,g]=cv(128,128);g.clearRect(0,0,128,128);g.fillStyle='rgba(255,209,44,.95)';g.beginPath();g.moveTo(64,6);g.lineTo(118,62);g.lineTo(84,62);g.lineTo(84,122);g.lineTo(44,122);g.lineTo(44,62);g.lineTo(10,62);g.closePath();g.fill();return tex(c,false)}
 function R15_mesh(){if(!R15C.length)return;try{const td=TF,f=mkF(),ath=TRK.city==='ath';
   const M={water:new THREE.MeshStandardMaterial({map:R15_tex('water'),color:0xffffff,roughness:.12,metalness:.1,emissive:0x0a3a70,emissiveIntensity:ath?.15:.6,side:THREE.DoubleSide}),
@@ -90,7 +90,7 @@ function R15_mesh(){if(!R15C.length)return;try{const td=TF,f=mkF(),ath=TRK.city=
     // grass top of the island (flat strip)
     {const gp=[],gi=[];let k=0;for(let u=R15_MOUTH;u<=Lc-R15_MOUTH;u+=st){frameAt(td,c.s0+u,f);const a0=Math.min(u-R15_MOUTH,Lc-R15_MOUTH-u),g=clamp(a0/R15_NOSE,0,1),iw=R15_ISL/2*g,d=HALF+R15_ISL-iw;gp.push(...P(d-iw+.05,.92),...P(d+iw-.05,.92));if(k>0)gi.push(k-2,k,k-1,k-1,k,k+1);k+=2}ROOT.add(new THREE.Mesh(geo(gp,null,gi),M.grass))}
     // entry signs (forward races) on the road edge before the mouth + floor arrows into the mouth
-    const sm=new THREE.MeshBasicMaterial({map:R15_signTex(c.kind),toneMapped:false,side:THREE.DoubleSide}),post=new THREE.MeshStandardMaterial({color:0x2a2e40,roughness:.5});
+    const sm=new THREE.MeshBasicMaterial({map:R15_signTex(c.kind,c.sd),toneMapped:false,side:THREE.DoubleSide}),post=new THREE.MeshStandardMaterial({color:0x2a2e40,roughness:.5});
     for(const d of[-220,-120,-30]){frameAt(td,c.s0+d,f);const g=new THREE.Group();placeOnTrack(g,f,c.sd*(HALF+1.2),0);
       // R17: overhead cantilever gantry from outside the barrier: a 30×10.3 m board over the shortcut half of the road, 9 m clear
       const b=new THREE.Mesh(new THREE.PlaneGeometry(30,10.3),sm);b.position.set(-c.sd*16.2,14.2,0);g.add(b);
