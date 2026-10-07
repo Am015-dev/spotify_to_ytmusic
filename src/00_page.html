@@ -507,6 +507,15 @@ body.parked #tB{background:#5dffb0!important;color:#141413!important;border-colo
   #menu #startBtn{font-size:19px;padding:9px 20px;border-width:3px;box-shadow:0 4px 0 var(--k)}
   #menu #rec{font-size:10.5px;padding:3px 9px;border-width:2px}
 }
+/* G8 (v87q): phone landscape: START sits in its own right column, so it never covers the WEATHER/CLASS rows; menu text >= 12 px */
+@media (max-height:500px){
+  #menu .mpanel{padding-right:calc(192px + env(safe-area-inset-right,0px));padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  #menu #startRow{flex-direction:column-reverse;align-items:stretch;gap:8px;width:168px;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+  #menu #startBtn{font-size:18px;padding:12px 6px;text-align:center;white-space:normal}
+  #menu #rec,#menu #SP_btn{text-align:center;font-size:12px}
+  #menu .tabs button,#menu .mpanel .seg button,#menu .mpanel .seg span,#menu .team .lock{font-size:12px}
+  #menu #gfxNote{font-size:12px!important}
+}
 /* --- top-right buttons --- */
 #topBtns{right:max(14px,env(safe-area-inset-right,0px))}
 #topBtns button{all:unset;cursor:pointer;font:italic 900 13px var(--hud);letter-spacing:.05em;color:var(--k);background:#fff;border:3px solid var(--k);border-radius:999px;padding:5px 14px;box-shadow:0 4px 0 var(--k);white-space:nowrap}
