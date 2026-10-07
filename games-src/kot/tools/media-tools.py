@@ -104,7 +104,8 @@ def write_manifest():
     try: cuts = json.loads((MEDIA / "media.json").read_text()).get("cutouts", [])  # kept as is: board figures from pictures are switched on/off by hand in media.json
     except Exception: cuts = []
     pics = [f"camp-{n}.webp" for n in CAST if (OUT / f"camp-{n}.webp").exists()]
-    (MEDIA / "media.json").write_text(json.dumps({"clips": clips, "portraits": pics, "cutouts": cuts, "avatars": [f"cut-{n}.webp" for n in CAST if (OUT / f"cut-{n}.webp").exists()]}) + "\n")
+    (MEDIA / "media.json").write_text(json.dumps({"clips": clips, "portraits": pics, "cutouts": cuts, "avatars": [f"cut-{n}.webp" for n in CAST if (OUT / f"cut-{n}.webp").exists()],
+                                                      "models": [n for n in CAST if (OUT / "models" / f"{n}.glb").exists()]}) + "\n")
     print("media.json:", len(clips), "clips,", len(pics), "portraits")
 
 if __name__ == "__main__":
