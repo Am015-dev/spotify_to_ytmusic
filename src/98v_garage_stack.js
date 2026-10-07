@@ -24,7 +24,10 @@ gbLoop=(f=>function(){const r=f.apply(this,arguments);const now=performance.now(
   if(k>=1||!GB_.bk){o.host.remove(o.e);o.e.geometry.dispose();o.e.material.dispose();G9.ol.splice(i,1)}else o.e.material.opacity=k<.6?1:1-(k-.6)/.4}return r})(gbLoop);
 window.__g9={S:G9,ol:()=>G9.ol.length,top:()=>G9_top(),cap:GB_CAP};
 // 4) phone toolbar: SELECT pushed ✔ DONE onto a second row at 852 px; a narrower brick counter keeps the whole bar on one row
-{const st=document.createElement('style');st.textContent=`@media (max-width:760px),(max-height:500px){#gbx #gbBkT{gap:4px}#gbx #gbBkN{max-width:80px!important;width:80px;padding:0 6px}}`;document.head.appendChild(st)}
+{const st=document.createElement('style');st.textContent=`@media (max-width:760px),(max-height:500px){#gbx #gbBkT{gap:4px;flex-wrap:nowrap}#gbx #gbBkT>*{flex-shrink:0}#gbx #gbBkN{max-width:84px!important;width:auto;padding:0 6px;flex-shrink:1;min-width:0}}`;document.head.appendChild(st)}
+// reviewer: "81/120 · Sup…" was cut off. On the phone the counter shows a short weight tag (81/120 SH); the full name stays on desktop
+const G9_WS={'Super Light':'SL','Light':'L','Medium':'M','Heavy':'H','Super Heavy':'SH','Massive':'XL'};
+GB_ui=(f=>function(){const r=f.apply(this,arguments);const n=$('#gbBkN');if(n&&GB.d&&(innerWidth<=760||innerHeight<=500)){const m=/^🧱 (\d+\/\d+) · (.+)$/.exec(n.textContent);if(m)n.textContent='🧱'+m[1]+' '+(G9_WS[m[2]]||'')}return r})(GB_ui);
 // 5) SELECT tool: the counter said "3 selected" after the selection was gone; with nothing selected it now says what to do
 SL_ui=(f=>function(){const r=f.apply(this,arguments);const n=$('#gbBkN');if(n&&GB_.bk&&GB_.tool==='sel'&&!SL.sel.length&&!SL.carry)n.textContent='☝ Tap a part';return r})(SL_ui);
 // 6) BUILD YOUR OWN: the enter brick shower played over the chassis picker. It is cut when the picker opens and plays once the chassis is chosen.
