@@ -53,6 +53,25 @@ header.top h1{font:400 clamp(1.3rem,2.2vw,1.8rem)/1.1 var(--display);margin:0;te
 .tools{display:flex;gap:8px;align-items:center}
 .tbtn{font:700 .88rem var(--body);min-height:44px;min-width:44px;padding:0 12px;border-radius:6px;border:1.5px solid var(--line);background:var(--hdr);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;backdrop-filter:blur(3px)}
 .tbtn:hover{border-color:var(--brass)}
+/* header tools, filter popover */
+.tools{gap:8px}
+.tbtn{position:relative;font-size:.9rem;border-radius:10px}
+.tbtn .tl{white-space:nowrap}
+.tbtn svg{flex:none}
+.fdot{position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;background:var(--brass);box-shadow:0 0 0 2px var(--hdr)}
+.tbtn[aria-expanded=true]{border-color:var(--brass)}
+.fpop{position:fixed;z-index:45;width:min(300px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto;padding:12px;border-radius:14px;background:#241810;color:#f4ead8;border:1.5px solid var(--brass);box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.fpop h2{font:400 1rem var(--display);margin:0 0 8px;color:#f0c05a}
+.fpop .fopts{display:grid;gap:6px}
+.fpop .fo{font:700 .92rem var(--body);display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;padding:0 14px;border-radius:10px;border:1.5px solid #4a3326;background:transparent;color:#f4ead8;cursor:pointer;text-align:left}
+.fpop .fo small{font:500 .78rem var(--mono);color:#bca78c}
+.fpop .fo[aria-pressed=true]{background:#f0b04a;border-color:#f0b04a;color:#2a1a0c}
+.fpop .fo[aria-pressed=true] small{color:#5a3a16}
+.fpop .ffoot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding-top:10px;border-top:1px solid #4a3326}
+.fpop .fclear{font:700 .88rem var(--body);min-height:44px;padding:0 14px;border-radius:10px;border:1.5px solid #4a3326;background:transparent;color:#f4ead8;cursor:pointer}
+.fpop .fclear:disabled{opacity:.4;cursor:default}
+.fpop .fcl{font:600 .88rem var(--body);color:#e0c690;text-underline-offset:3px;display:inline-flex;align-items:center;min-height:44px}
+.fpop .fcount{font:500 .78rem var(--mono);color:#bca78c}
 /* painted room (desktop) */
 .roombg{position:absolute;left:0;right:0;top:0;height:calc(var(--u)*90);overflow:hidden;z-index:0;pointer-events:none}
 .roombg>*{position:absolute;left:0;right:0}
@@ -258,6 +277,7 @@ html.playing .tv-flick,html.playing .tv-roll{animation:none}
 .tvc.cat1{margin-top:46px}
 html.ph .tvc{order:3;flex:1 1 100%;margin-top:14px}
 html.ph .tvc.cat1{margin-top:46px}
+html.ph .tvc{padding:6px 8px;gap:10px}html.ph .tvc .tv-bez{width:96px;height:74px}html.ph .tvc .tv-ch{font-size:11px}html.ph .tvc-plate{display:none}html.ph .tvc-side{gap:2px}html.ph .tvc-t{font-size:1rem}html.ph .tvc-btns{gap:6px}
 @media (max-height:499px){html.ph .tvc{flex:1 1 100%;order:5}}
 /* TV guide card (inspect) */
 .fly.tvg .ins-l{padding:26px;gap:12px;grid-auto-flow:row;align-content:center;background:radial-gradient(ellipse at 50% 80%,rgba(100,255,190,.1),transparent 60%),linear-gradient(#2c1e14,#150e09)}
@@ -365,10 +385,6 @@ footer a{color:var(--brass)}
 .controw{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;max-width:min(92vw,720px);width:fit-content;box-sizing:border-box;padding:3px 3px 3px 12px;border-radius:26px;background:var(--hdr);backdrop-filter:blur(3px)}
 .controw .crb{background:transparent}
 .controw[hidden]{display:none}
-.filtrow{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-right:6px}.filtrow::-webkit-scrollbar{display:none}
-.fb{font:700 .8rem var(--body);min-height:36px;padding:0 11px;border-radius:99px;border:1.5px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;white-space:nowrap;flex:none}
-.fb[aria-pressed=true]{background:#f0b04a;border-color:#f0b04a;color:#2a1a0c}
-.fcount{font:700 .78rem var(--body);color:var(--muted);white-space:nowrap;flex:none}
 .boxbtn,#tv{transition:opacity .25s,filter .25s}.boxbtn.dim,#tv.dim{opacity:.2;filter:grayscale(1)}
 #listview li.dim{display:none}
 .stb{position:absolute;right:4%;top:4%;padding:.2em .55em;border-radius:99px;background:#3a2c4a;color:#efe0ff;font:800 .8em/1.2 var(--body);box-shadow:0 .1em .3em rgba(0,0,0,.45)}
@@ -459,6 +475,20 @@ html.ph .t-card.w{display:flex;align-items:center;min-height:54px}
 html.ph .t-card.w b{font-size:1rem}
 html.ph header.top h1{font-size:1.2rem}
 @media (max-height:499px){html.ph header.top>div:first-child{display:flex;align-items:center;gap:2px 16px;flex-wrap:wrap}html.ph header.top .sub{margin-top:0}html.ph .coffee{flex:1 1 260px}html.ph .objects{flex:0 1 auto}html.ph .obj{flex:0 0 92px}html.ph .cell{margin-top:6px}}
+/* phone header: title and tools on one row */
+html.ph header.top>div:first-child{display:contents}
+html.ph header.top h1{order:1;flex:1 1 auto;min-width:0;font-size:1.15rem;white-space:nowrap;align-self:center}
+html.ph header.top .sub{display:none}
+html.ph header.top .tools{order:2;flex:none;gap:6px}
+html.ph header.top .controw{order:3;flex:1 1 100%;max-width:none;width:auto;margin-top:0}
+html.ph header.top{flex-wrap:wrap;align-items:center;gap:6px 8px;padding-bottom:4px}
+html.ph .tbtn .tl{display:none}
+html.ph .tbtn{min-width:44px;padding:0 10px}
+html.ph .coffee:empty,html.ph .coffee[hidden]{display:none}
+html.ph .stage{padding-top:0;gap:6px}
+html.ph .obj{min-height:48px;padding:3px 2px}html.ph .cell{margin-top:42px}
+@media (max-height:499px){html.ph .cell{margin-top:6px}}
+@media (max-height:499px){html.ph header.top{flex-wrap:nowrap}html.ph header.top .controw{flex:0 1 auto}}
 html.ph footer{padding-top:8px}
 html.ph footer a{display:inline-flex;align-items:center;min-height:44px}
 html.ph{scroll-snap-type:y proximity}
@@ -496,8 +526,9 @@ html.ph header.top{scroll-snap-align:start}
 <body>
 <div class="roombg" aria-hidden="true"><div class="rb-wall"></div><div class="rb-wain"></div><div class="rb-skirt"></div><div class="rb-floor"></div><div class="rb-rug"></div><div class="rb-glow"></div><div class="rb-floorglow"></div></div>
 <header class="top">
-  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">17 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div><div class="controw" id="controw" role="group" aria-label="Continue a saved game" hidden></div><div class="controw filtrow" id="filtrow" role="group" aria-label="Filter games by status"></div></div>
-  <div class="tools"><button type="button" class="tbtn" id="sndbtn" aria-label="Sound on" aria-pressed="true">🔊</button><button type="button" class="tbtn" id="viewbtn">☰ Plain list</button></div>
+  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">17 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div><div class="controw" id="controw" role="group" aria-label="Continue a saved game" hidden></div></div>
+  <div class="tools"><button type="button" class="tbtn" id="sndbtn" aria-label="Sound on" aria-pressed="true">🔊</button><button type="button" class="tbtn" id="fltbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpop" aria-label="Filter games"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4-2v-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="tl">Filter</span><i class="fdot" hidden></i></button><button type="button" class="tbtn" id="viewbtn" aria-label="Plain list"><span class="ic" aria-hidden="true">☰</span><span class="tl">Plain list</span></button></div>
+  <div class="fpop" id="fpop" role="dialog" aria-label="Filter games" hidden></div>
 </header>
 <main>
 <div class="roomwrap" id="roomview">
@@ -623,18 +654,40 @@ const STATUS={sunglaze:['done',1],cauldron:['done',1],doorkick:['done',1],thornb
 const stOf=g=>{const x=STATUS[g.id];return x?{k:x[0],st:!!x[1]}:null};
 const ST_LABEL={done:'Completed',testing:'Under testing',progress:'Being rebuilt',todo:'Story mode coming'};
 const isPrev=g=>{const x=stOf(g);return !!x&&x.k!=='done'};
-const FILTERS=[['all','All'],['story','Story mode'],['done','Completed'],['testing','Under testing'],['soon','Coming soon']];
-let filt=(()=>{try{const v=localStorage.getItem('shelf_filter');return FILTERS.some(f=>f[0]===v)?v:'all'}catch(e){return 'all'}})();
-const fits=g=>{if(filt==='all')return true;const x=stOf(g);if(!x)return false;return filt==='story'?x.st:filt==='soon'?(x.k==='progress'||x.k==='todo'):x.k===filt};
+const hasChip=(g,re)=>(g.chips||[]).some(c=>re.test(c));
+const FDEF={story:['Story mode',g=>{const x=stOf(g);return !!x&&x.st}],coop:['Co-op',g=>hasChip(g,/^co-?op/i)],cpu:['Vs computer',g=>hasChip(g,/^vs computer/i)],online:['Online with friends',g=>hasChip(g,/^online with/i)],
+ testing:['Under testing',g=>{const x=stOf(g);return !!x&&x.k==='testing'}],soon:['Coming soon',g=>{const x=stOf(g);return !!x&&(x.k==='progress'||x.k==='todo')}]};
+/* only offer a filter when at least one board game matches it (status filters vanish once everything is finished) */
+const filterOpts=()=>[['all','All games']].concat(Object.keys(FDEF).filter(k=>BOARD().some(FDEF[k][1])).map(k=>[k,FDEF[k][0]]));
+let filt=(()=>{try{const v=localStorage.getItem('shelf_filter');return v==='all'||FDEF[v]?v:'all'}catch(e){return 'all'}})();
+const fits=g=>filt==='all'||!!(FDEF[filt]&&FDEF[filt][1](g));
 function applyFilter(){
+  if(filt!=='all'&&!filterOpts().some(o=>o[0]===filt)){filt='all';try{localStorage.setItem('shelf_filter','all')}catch(_){}}
   document.querySelectorAll('.boxbtn[data-id],#listview li[data-id]').forEach(el=>{const g=byId(el.dataset.id);el.classList.toggle('dim',!!g&&!fits(g))});
   const tv=document.getElementById('tv');if(tv)tv.classList.toggle('dim',filt!=='all');
-  const n=BOARD().filter(fits).length;
-  document.querySelectorAll('#filtrow .fb').forEach(b=>b.setAttribute('aria-pressed',b.dataset.flt===filt?'true':'false'));
-  const c=document.getElementById('fcount');if(c)c.textContent=filt==='all'?'':n+' match'}
-function renderFilters(){const r=document.getElementById('filtrow');if(!r)return;
-  r.innerHTML='<span class="cr-l">Show</span>'+FILTERS.map(f=>`<button type="button" class="fb" data-flt="${f[0]}" aria-pressed="false">${f[1]}</button>`).join('')+'<span class="fcount" id="fcount" aria-live="polite"></span>';
-  r.onclick=e=>{const b=e.target.closest('.fb');if(!b)return;e.stopPropagation();filt=b.dataset.flt;try{localStorage.setItem('shelf_filter',filt)}catch(_){}applyFilter()}}
+  const fb=document.getElementById('fltbtn');
+  if(fb){const on=filt!=='all';fb.querySelector('.fdot').hidden=!on;fb.setAttribute('aria-label',on?'Filter games (active: '+FDEF[filt][0]+')':'Filter games')}
+  if(!document.getElementById('fpop').hidden)renderFpop()}
+function renderFpop(){
+  const p=document.getElementById('fpop'),n=BOARD().filter(fits).length,total=BOARD().length,foc=document.activeElement&&document.activeElement.dataset?document.activeElement.dataset.flt:null;
+  p.innerHTML='<h2>Show games</h2><div class="fopts">'+filterOpts().map(o=>`<button type="button" class="fo" data-flt="${o[0]}" aria-pressed="${o[0]===filt}"><span>${o[1]}</span><small>${o[0]==='all'?total:BOARD().filter(FDEF[o[0]][1]).length}</small></button>`).join('')+`</div><div class="ffoot"><span class="fcount" aria-live="polite">${n} of ${total} games</span><button type="button" class="fclear" ${filt==='all'?'disabled':''}>Clear</button></div><a class="fcl" href="classic.html">Classic shelf view</a>`;
+  if(foc){const e=p.querySelector(`[data-flt="${foc}"]`);if(e)e.focus()}}
+function placeFpop(){const p=document.getElementById('fpop'),r=document.getElementById('fltbtn').getBoundingClientRect(),w=p.offsetWidth;
+  p.style.left=Math.max(12,Math.min(innerWidth-w-12,r.right-w))+'px';p.style.top=Math.min(r.bottom+8,Math.max(8,innerHeight-p.offsetHeight-8))+'px'}
+function openFpop(){const p=document.getElementById('fpop'),b=document.getElementById('fltbtn');renderFpop();p.hidden=false;b.setAttribute('aria-expanded','true');placeFpop();const f=p.querySelector('.fo[aria-pressed=true]')||p.querySelector('.fo');if(f)f.focus()}
+function closeFpop(back){const p=document.getElementById('fpop'),b=document.getElementById('fltbtn');if(p.hidden)return;p.hidden=true;b.setAttribute('aria-expanded','false');if(back)b.focus()}
+function renderFilters(){
+  const p=document.getElementById('fpop'),b=document.getElementById('fltbtn');
+  b.onclick=e=>{e.stopPropagation();p.hidden?openFpop():closeFpop(true)};
+  p.addEventListener('click',e=>{e.stopPropagation();const o=e.target.closest('.fo');
+    if(o){filt=o.dataset.flt;try{localStorage.setItem('shelf_filter',filt)}catch(_){}applyFilter();return}
+    if(e.target.closest('.fclear')){filt='all';try{localStorage.setItem('shelf_filter','all')}catch(_){}applyFilter();const f=p.querySelector('.fo');if(f)f.focus()}});
+  document.addEventListener('pointerdown',e=>{if(!p.hidden&&!p.contains(e.target)&&!b.contains(e.target))closeFpop(false)},true);
+  document.addEventListener('keydown',e=>{if(p.hidden)return;
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeFpop(true)}
+    else if(e.key==='Tab'){const f=[...p.querySelectorAll('button:not([disabled]),a[href]')];if(!f.length)return;const i=f.indexOf(document.activeElement);
+      if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&(i===f.length-1||i<0)){e.preventDefault();f[0].focus()}}},true);
+  addEventListener('resize',()=>{if(!p.hidden)placeFpop()})}
 const byId=id=>GAMES.find(g=>g.id===id);
 const VIDEO=()=>GAMES.filter(g=>g.kind==='video'),BOARD=()=>GAMES.filter(g=>g.kind!=='video');
 const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -774,10 +827,10 @@ function renderRoom(ph){
     b.setAttribute('aria-label',`Your games: statistics and achievements, ${a.got} of ${a.tot} achievements earned`);b.innerHTML=ART.trophy.collector.replace('<svg','<svg aria-hidden="true"')+(a.tot?`<span class="cnt">${a.got}/${a.tot}</span>`:'')+'<span class="lab">Stats &amp; achievements</span>';mt.append(b)}
   renderTV(ph);renderCoffee(ph);renderCont()}
 function renderCoffee(ph){
-  const c=$('#coffee'),id=store.get('shelf_last'),g=byId(id);c.innerHTML='';
+  const c=$('#coffee'),id=store.get('shelf_last'),g=byId(id);c.innerHTML='';c.hidden=false;
   if(ph){
-    c.innerHTML=g?`<div class="t-card"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><button type="button" class="btn cbtn2" data-cont="${g.id}">▶ Continue: ${esc(clean(g.name))}</button></div>`:`<div class="t-card w"><b>Pick a box from the shelf</b></div>`;
-    c.firstElementChild.classList.add('t-card');return}
+    c.hidden=!g;c.innerHTML=g?`<div class="t-card"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><button type="button" class="btn cbtn2" data-cont="${g.id}">▶ Continue: ${esc(clean(g.name))}</button></div>`:'';
+    if(c.firstElementChild)c.firstElementChild.classList.add('t-card');return}
   let h='<div class="t-top"></div><div class="t-edge"></div><i class="t-leg" style="left:3em"></i><i class="t-leg" style="right:3em"></i>';
   if(g&&g.kind==='video'){const L=LOOK[g.id];
     h+=`<div class="cart" style="--c:${L.c}"><div class="cl"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><span>${esc(clean(g.name))}</span></div></div><div class="pad">${ART.pad(L.c)}</div>`;
@@ -860,7 +913,7 @@ function render(){
   const list=view==='list';
   $('#roomview').hidden=list;$('#listview').hidden=!list;
   $('.roombg').hidden=false;
-  $('#viewbtn').textContent=list?'🏠 Room view':'☰ Plain list';
+  $('#viewbtn').innerHTML=list?'<span class="ic" aria-hidden="true">🏠</span><span class="tl">Room view</span>':'<span class="ic" aria-hidden="true">☰</span><span class="tl">Plain list</span>';$('#viewbtn').setAttribute('aria-label',list?'Room view':'Plain list');
   $('#viewbtn').setAttribute('aria-pressed',list?'true':'false');
   if(list){renderList();renderCont()}else renderRoom(ph);
   $('#tally').textContent=GAMES.length+' games on the shelf';applyFilter()}
