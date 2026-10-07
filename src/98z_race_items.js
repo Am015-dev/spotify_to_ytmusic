@@ -24,7 +24,7 @@ updWorld=(f=>function(dt){const r=f.apply(this,arguments);if(R15I.im){if(state==
 // the 2K-style item set in races (arena / derby / roam keep the full list)
 ITEMS.storm.name='LIGHTNING';ITEMS.web.name='WEB';
 pickItem=(f=>function(s){if(!R15_on()||RC.type==='arena')return f.apply(this,arguments);const act=ships.filter(o=>!o.eliminated),n=act.length||1;let p=n>1?clamp(((s.place||Math.ceil(n/2))-1)/(n-1),0,1):.5;if(s.isPlayer&&PK.has('luck'))p=Math.min(1,p+2/Math.max(1,n-1));
-  const W={turbo:.9+p*.4,shield:1.1-p*.6,mines:1-p*.6,web:.7+p*.3,missile:.4+p*.9,storm:p>.5?(p-.35)*1.4:0};let tot=0;for(const k in W)tot+=Math.max(0,W[k]);let r=R()*tot;for(const k in W){r-=Math.max(0,W[k]);if(r<=0)return k}return'turbo'})(pickItem);
+  const W={turbo:.9+p*.4,shield:1.1-p*.6,mines:1-p*.6,web:p>0?.5+p*.5:0,missile:.4+p*.9,storm:p>.5?(p-.35)*1.4:0};let tot=0;for(const k in W)tot+=Math.max(0,W[k]);let r=R()*tot;for(const k in W){r-=Math.max(0,W[k]);if(r<=0)return k}return'turbo'})(pickItem);
 // test hook (read-only): item bricks state
 window.__r15box=()=>{try{const im=R15I.im;if(!im)return null;const m=new THREE.Matrix4(),o=[];for(let i=0;i<Math.min(3,im.count);i++){im.getMatrixAt(i,m);o.push([m.elements[12],m.elements[13],m.elements[14],Math.hypot(m.elements[0],m.elements[1],m.elements[2])].map(v=>+v.toFixed(1)))}
  return{n:im.count,vis:im.visible,inScene:im.parent===scene,first:o,p0:R15I.list.slice(0,3).map(p=>[Math.round(p.s),+p.x.toFixed(1),p.cd,p.pop]),pl:pl&&pl.mesh.position.toArray().map(v=>+v.toFixed(1)),plS:pl&&Math.round(pl.dist),t:+R15I.t.toFixed(2)}}catch(e){return String(e)}};
