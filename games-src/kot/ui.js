@@ -155,6 +155,7 @@ function setSpeed(k){UI.speed=k;AIDELAY=SPEEDS[k][1];const b=document.getElement
 
 // ---------- events ----------
 document.addEventListener('click',e=>{
+  if(e.target.closest('[data-help]'))return;   // help-kit buttons (the rules overlay carries data-card) never act on the game
   const t=e.target.closest('[data-emo],[data-a],[data-act],[data-die],[data-card],[data-opt],[data-start],[data-tour],[data-n],[data-mon],[data-xp],[data-evo],[data-exk],[data-lvl],[data-preset],g.seat');if(!t)return;
   const ds=t.dataset;if(t.tagName==='BUTTON'&&!t.disabled&&!ds.a)snd('click');
   if(ds.n){UI.n=+ds.n;saveSetup();render();return}

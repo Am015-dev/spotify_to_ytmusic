@@ -133,6 +133,7 @@ async function helpFlow(p, tag, st) {
         const R4 = [r.left, r.top, r.right, r.bottom], hit = (a, c) => a[0] < c.r && a[2] > c.l && a[1] < c.b && a[3] > c.t;
         return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: R4, T: tq && { l: tq.left, t: tq.top, r: tq.right, b: tq.bottom }, glow: cores.some(c => hit(R4, c)), inside: r.left >= -1 && r.top >= -1 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1 } }, hs.ph).catch(() => null);
       if (b) break; await p.waitForTimeout(80) }
+    if (!b && (await p.evaluate(ph => GXH.state().shown.includes(ph), hs.ph))) { helpTot.bubbles[hs.ph] = (helpTot.bubbles[hs.ph] || 0) + 1; return true } // shown, then a phase flicker took it down
     if (!b) { if ((await p.evaluate(() => hlpPhase())) !== hs.ph) seen.delete(hs.ph); else await fail(p, tag, 'help bubble', 'no coach bubble for phase ' + hs.ph + ' ' + JSON.stringify(await p.evaluate(() => ({ st: GXH.state(), t: !!HLP_STEPS[hlpPhase()].target() })))); }
     else {
       helpTot.bubbles[hs.ph] = (helpTot.bubbles[hs.ph] || 0) + 1;

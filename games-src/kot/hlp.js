@@ -101,11 +101,13 @@ function hlpFaceNote(p,f,m){const nm=f,occ=G.city>=0?P(G.city):null,c=G.dice.fil
   if(f==='C')return inCity(p.i)?'Claws hit every monster outside.':occ?`Claws hit ${mname(occ)} in Downtown.`:'Claws hit rivals.';
   if(f==='H')return 'Hearts heal you outside Downtown.';
   return 'It is part of the best set.'}
+// dice still flying or spinning: a finger would point at the middle of the air
+function hlpBusy(){return !!(BF.spin&&bfNow()<BF.spin.end)||[...document.querySelectorAll('#dice .die')].some(d=>d.getAnimations&&d.getAnimations().length>0)}
 function hlpSuggest(){
   const ph=hlpPhase();if(!ph||ph==='watch'||!G)return null;const p=cur();let a;try{a=advise()}catch(e){return null}
   if(ph==='intro')return {target:()=>HLP_Q('#choice [data-a="story"]'),why:'Read the card, then start your turn.'};
   if(ph==='power'||ph==='yield'||ph==='choice'){if(a.k===undefined||a.k===null)return null;return {target:hlpOpt(a.k),why:hlpFit(a.w,'An experienced monster picks this.')}}
-  if(ph==='roll'||ph==='reroll'){let m;try{m=suggestMask(p)}catch(e){return null}if(!m)return null;
+  if(ph==='roll'||ph==='reroll'){if(hlpBusy())return null;let m;try{m=suggestMask(p)}catch(e){return null}if(!m)return null;
     const nk=G.dice.filter(d=>!d.k).length,i=G.dice.findIndex((d,k)=>!!m[k]!==!!d.k);
     if(i>=0){const d=G.dice[i];return {target:hlpDie(i),why:hlpFit(m[i]?`Keep this one. ${hlpFaceNote(p,d.f,m)}`:'Tap it to roll it again: it is not worth keeping.')}}
     if(G.rolls>0&&nk)return {target:()=>HLP_Q('#pacts [data-act="reroll"]'),why:nk===G.dice.length?'Roll all the dice again.':`Now roll the other ${nk} ${nk===1?'die':'dice'} (${G.rolls} left).`};
