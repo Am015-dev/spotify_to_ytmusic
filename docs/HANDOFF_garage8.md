@@ -48,3 +48,12 @@ Alex (iPhone v87p): "the garage builder is a bit unresponsive in several areas a
 ## Test notes
 - The software renderer runs at ~2 fps: use CDP touchStart+touchEnd back to back (as in nb.js and g8*.js). Never run two browsers at once (taps time out).
 - `DRIVE=1 node t4/nb.js <url> <out>` builds, saves, drives My Build, and gives the tyre gap (`tyre`, `tyre_rest`).
+
+## New Alex bug: "after 4 floors of tiles nothing more can be placed"
+Cause (from code, not yet reproduced): the height cap. `GB_CAP=15` (`src/92_garage_builder.js` line 5).
+`GB_fit` rejects any part whose top would be more than 15 plates above the highest chassis cell (`y+h > bmax+GB_CAP`).
+A tile is 1 plate, so 4 floors of tiles on a body that is already ~11 plates tall hits the cap. The tap then says only "No room here", with no hint that it is a height limit.
+Fix options:
+- raise GB_CAP (check the stats/collision of tall builds);
+- and/or say "Height limit reached" when the cap is the reason;
+- `G8_free`, `SL_clash` (98t/98u) use the same cap, so keep them in sync.
