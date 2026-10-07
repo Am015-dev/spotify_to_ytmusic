@@ -1,4 +1,8 @@
 // ---------- OD_CHANGELOG: newest first. EVERY deploy prepends one entry {v, date, items:[{t:'FIXED'|'NEW'|'CHANGED', s:'plain English'}]} (2-4 items).
+// W14 steering (city "buggy steering", probe tools/tW14s.js): touch ◀/▶ start at 25% lock and reach full lock in ~0.2 s (was 12% and 0.32 s, yaw t63 up to
+// 0.33 s); the unstuck pivot turns at 1.6 rad/s and stops when you steer (was 5 rad/s = 75-90° self-spins after a bump); BRAKE+steer only auto-drifts
+// in the city above 125 km/h (was 86 km/h, which the faster city car reaches on every street).
+const W14_ST={k0:.25,rk:1.5,hbCity:34.7},W14_PIV=1.6;
 const OD_CHANGELOG=[
  {v:'v87p',date:'7 Oct 2026',items:[{t:'NEW',s:'The garage is now a real LEGO workshop: a grey build platform with blue lights, roller doors, shelves, mechanics, and shadows under your car.'},{t:'NEW',s:'Placing a brick works like 2K Drive: tap to see where it goes (green frame = fits, red = no room), then PLACE, ROTATE or CANCEL. Placed bricks pop in.'},{t:'FIXED',s:'The "New in" bubble shows on the title screen only, so it no longer covers CHOOSE TRACK.'},{t:'NEW',s:'The parts list shows a 3D picture of each brick in your chosen colour.'}]},
  {v:'v87o',date:'7 Oct 2026',items:[{t:'FIXED',s:'Trucks, delivery vans and garbage trucks in the city are solid again: their windows, frame and wheels now match the body, so you no longer see through them.'},{t:'FIXED',s:'Team select shows each team\'s real LEGO race car instead of the old plane drawings.'}]},
