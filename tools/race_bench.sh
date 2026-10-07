@@ -2,7 +2,7 @@
 # race_bench.sh <label> [runs] : tRace on grand, hafen, akro (Athens) × runs on the current local build → qa_race/<label>/bench.txt
 cd "$(dirname "$0")/.."; L=$1; N=${2:-2}; mkdir -p qa_race/$L; : > qa_race/$L/bench.txt
 for t in fra:grand fra:hafen ath:akro; do for i in $(seq 1 $N); do
-  SH=$([ $i = 1 ] && echo 1 || echo 0); CITY=${t%%:*} TRACK=${t##*:} SHOTS=$SH TAG=${t##*:}_ node tools/tRace.js http://127.0.0.1:8766/local_dbg.html qa_race/$L | grep RACE_RESULT >> qa_race/$L/bench.txt
+  SH=$([ $i = 1 ] && echo 1 || echo 0); CITY=${t%%:*} TRACK=${t##*:} SHOTS=$SH TAG=${t##*:}_ node tools/tRace.js ${URL:-http://127.0.0.1:8766/local_dbg.html} qa_race/$L | grep RACE_RESULT >> qa_race/$L/bench.txt
 done; done
 python3 - qa_race/$L/bench.txt <<'P'
 import json,sys,collections
