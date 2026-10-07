@@ -56,7 +56,7 @@ const PROBE = () => {
   // help kit: a bubble stays on screen and never covers a follower spot or Skip
   for (const bb of document.querySelectorAll('.gxh-bub.on')) { const r = bb.getBoundingClientRect(); if (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1) out.bad.push('help bubble off screen');
     for (const e of document.querySelectorAll('.fglow,#hskip')) { const q = e.getBoundingClientRect(); if (!q.width) continue; const cx = q.left + q.width / 2, cy = q.top + q.height / 2; if (cx > r.left - 12 && cx < r.right + 12 && cy > r.top - 12 && cy < r.bottom + 12) out.bad.push('help bubble covers ' + (e.id || e.className)); } }
-  if (out.mine && out.step === 'place' && !out.glows.length && !out.over) out.bad.push('my turn: no glowing square (' + out.legalAtRot + ' legal at this turn)');
+  if (out.mine && out.step === 'place' && !out.glows.length && !out.over) out.bad.push('my turn: no glowing square (' + out.legalAtRot + ' legal at this turn) dbg ' + JSON.stringify({ tw: UI.tw, user: UI.user, rot: UI.rot, all: document.querySelectorAll('#world .glow').length, hid: [...document.querySelectorAll('#world .glow')].filter(e => e.style.visibility === 'hidden').length, view: UI.view, gx: UI.legal.filter(g => g.r === UI.rot).slice(0, 3), board: [bd.width, bd.height], help: GXH.state().cur }));
   if (out.mine && out.step === 'fig' && !out.fglows.length && !out.skip) out.bad.push('my turn: no follower spot and no Skip');
   if (out.words > 8) out.bad.push('status > 8 words: ' + out.status);
   // portrait: board >= 55% of the screen
@@ -96,6 +96,9 @@ async function helpFlow(p, tag, st, o) {
     let b = null; const t1 = Date.now();
     while (Date.now() - t1 < 3000) { b = await p.evaluate(ph => { const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(); const tq = te && te.getBoundingClientRect(); const T = tq && { left: tq.left, top: tq.top, right: tq.right, bottom: tq.bottom }; const r = e.getBoundingClientRect();
         return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: [r.left, r.top, r.right, r.bottom], T }; }, ph).catch(() => null); if (b) break; await sleep(80); }
+    if (b) { for (let k = 0; k < 20 && await p.evaluate(() => UI.tw); k++) await sleep(100); await sleep(700);   // let the view settle; the kit re-places the bubble when its target moved
+      b = await p.evaluate(ph => { const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(); const tq = te && te.getBoundingClientRect(); const T = tq && { left: tq.left, top: tq.top, right: tq.right, bottom: tq.bottom }; const r = e.getBoundingClientRect();
+        return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: [r.left, r.top, r.right, r.bottom], T }; }, ph).catch(() => null) || b; }
     if (!b) { await fail(p, tag, 'help', 'no coach bubble for phase ' + ph); return false; }
     hstat.bubbles[ph] = (hstat.bubbles[ph] || 0) + 1;
     if (b.id !== ph) await fail(p, tag, 'help', 'bubble for ' + b.id + ' shown in phase ' + ph);
