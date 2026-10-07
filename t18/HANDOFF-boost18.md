@@ -42,3 +42,13 @@ FAIL items: (1) turbines too big, they hid the car; (2) stale base; (3) pending:
 - Running `qa18/run2.sh` (serial): t18/strips.js (turn / brake / driftTurn: slip, camLag, 4 shots each) → s_fra2 re-shoot →
   ath A/B qa18/ab2 (base18 vs b2k18c) → water hop s_water2.
 - Lesson: `pgrep -f X` inside a waiter whose own command line contains X waits forever, and pkill -f kills your own shell. Use one serial script.
+
+## Update 18:40
+- Root bug found: in roam pl.mesh (the root group) never rotates; mesh.children[0] carries the heading (yaw = h+π, rear = local +z).
+  B2K_frame() now gives thrusters + trail that child. Before this, thrusters sat on one side and the trail used world axes.
+- Thrusters: light bluish grey, just behind the bumper (hl+.24, hh*.4, ±hw*.45). Look OK in qa18/s_fra5 (crop_boost.png).
+- Ath A/B #2 (b2k18c vs live, serial): walls 0.81 vs 1.77, stuck 7.0 vs 5.5. Serial is NOT reproducible either (live seed 2 gave 3.5 then 9.6).
+  ALL stuck episodes in both builds are at Eleni's Garage (2037,-1644): qa18/stk3/phone_ath_stuck1.jpg shows the car parked at
+  "Eleni's Garage → 2 m", road clear. tPlay counts the dwell at the objective as stuck. That is a tPlay/objective artifact, not walls.
+- Strips: t18/shots/strip_{turn,brake,driftTurn}.jpg (from b2k18c).
+- run4: race shot (b2k18d) + water hop from Athens (fra route failed twice: the car never reached the river).
