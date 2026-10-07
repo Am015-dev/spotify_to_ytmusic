@@ -1,0 +1,140 @@
+[
+ {
+  "mode": "phone",
+  "cities": {
+   "fra": {
+    "min": 2.14,
+    "hits": 2,
+    "kinds": {
+     "traffic": 1,
+     "other": 1
+    },
+    "wallHits": 0,
+    "wallPerMin": 0,
+    "hitsPerMin": 0.93,
+    "bigDrop": 1,
+    "stuckPct": 6.9,
+    "avgKmh": 66.3,
+    "loads": 0,
+    "loadsPerMin": 0,
+    "camInsidePct": 0,
+    "camInside": [],
+    "smashPerMin": 2.8,
+    "traffic120m": 2.2,
+    "missions": [
+     {
+      "f": 1,
+      "start": "Hot Drop"
+     }
+    ],
+    "worst": [
+     {
+      "ctx": "GO!",
+      "f": 1463,
+      "v0": 91,
+      "v1": 24,
+      "drop": 0.74,
+      "kind": "traffic",
+      "x": 1717,
+      "z": 10,
+      "dy": 0
+     },
+     {
+      "ctx": "GO!",
+      "f": 7821,
+      "v0": 73,
+      "v1": 39,
+      "drop": 0.46,
+      "kind": "other",
+      "x": 411,
+      "z": -424,
+      "dy": 0
+     }
+    ],
+    "monErr": null,
+    "rot": {
+     "steps": [],
+     "ctl": {
+      "◀": "ok",
+      "▶": "ok",
+      "GAS": "ok",
+      "BRAKE": "ok",
+      "BOOST": "ok",
+      "DRIFT": "hidden"
+     },
+     "stuck": [],
+     "vp": [
+      852,
+      393,
+      424,
+      196
+     ]
+    },
+    "scale": {
+     "pedH": 1.77,
+     "carL": 6.6,
+     "carH": 1.62,
+     "player": {
+      "h": 2.1,
+      "l": 4.48,
+      "w": 1.99
+     },
+     "pedRel": 0.67,
+     "pedVsPlayer": 0.99,
+     "nPed": 8,
+     "nCar": 8
+    },
+    "road": {
+     "roadPts": 898,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "roadEnd": {
+     "roadPts": 855,
+     "blocked": 0,
+     "pct": 0,
+     "colliders": 0,
+     "sample": []
+    },
+    "overlap": [],
+    "hudOverlap": [
+     "#roamArrow×#hitPop"
+    ],
+    "tiny": [],
+    "extra": {
+     "map": {
+      "opened": false,
+      "drag": null,
+      "pinch": null
+     },
+     "pause": {
+      "tP_settings": false,
+      "opts": [],
+      "opened": true,
+      "frozen": true,
+      "resumed": true
+     },
+     "garage": {
+      "pause": false,
+      "btn": false,
+      "back": true
+     },
+     "otg": null
+    },
+    "events": [],
+    "perf": {
+     "calls": 300,
+     "tris": 2472748,
+     "jsMs": 0,
+     "geoms": 378,
+     "tex": 119
+    },
+    "wallSec": 225
+   }
+  },
+  "errs": [],
+  "warns": []
+ }
+]
