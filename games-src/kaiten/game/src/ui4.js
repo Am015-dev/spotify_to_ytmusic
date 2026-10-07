@@ -17,6 +17,7 @@ function coachTip(key) {
   render();
 }
 function coachCheck() {
+  return false;   // tips are the help kit's coach bubbles now (ui10)
   const lv = UI.coach.level; if (lv === 'off' || !G || G.phase !== 'pick') return false;
   const v = viewSeat(); if (v < 0 || !canPick() || UI.cards.length) return false;
   const turn = G.round + '.' + G.turn; if (UI.coach.turn === turn) return false;

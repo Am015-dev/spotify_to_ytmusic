@@ -1,3 +1,4 @@
+// (also checks the help kit: bubbles, bulb, rules cards, Tips off; see the help kit block above play())
 // Scripted bug sweep for Crown City Smash: plays REAL games through the real page with touch taps (random choices, like a
 // careless player) at 390x763 and 375x553, rotations in some of them, and two story chapters through the story map.
 //   NODE_PATH=/opt/node-tools/node_modules node sweep.js     env: GAMES=10 (per size) PAR=2 ROT=3 STORY=2 FILE=kot2.html SEED=1 MAXMS=300000
@@ -31,16 +32,17 @@ const PROBE = () => {
     if (e.id === 'bfinger' || !vis(e)) continue; const r = e.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
     const inVP = x >= 0 && y >= 0 && x <= innerWidth && y <= innerHeight; const t = inVP ? document.elementFromPoint(x, y) : null;
     out.ctl.push({ c: String(e.className).slice(0, 30) + (e.dataset.act ? '/' + e.dataset.act : '') + (e.dataset.die != null ? '/die' + e.dataset.die : '') + (e.dataset.shop != null ? '/shop' + e.dataset.shop : ''), x, y, w: r.width, h: r.height, inVP, dis: !!e.disabled,
-      cov: inVP && !(t && (t === e || e.contains(t) || t.contains(e))), by: t && (t.id || String(t.className).slice(0, 30)), gxc: !!e.closest('.gxc'), chip: e.classList.contains('pchip'), scroll: !!e.closest('.gx-dock') && !e.closest('#dice,#pacts,#pshop'),
+      cov: inVP && !(t && (t === e || e.contains(t) || t.contains(e))), by: t && (t.id || String(t.className).slice(0, 30)), byHelp: !!(t && t.closest && t.closest('[data-help]')), gxc: !!e.closest('.gxc'), chip: e.classList.contains('pchip'), scroll: !!e.closest('.gx-dock') && !e.closest('#dice,#pacts,#pshop'),
       anim: !!(e.getAnimations && e.getAnimations().length), die: e.matches('#dice .die'), shop: e.matches('#pshop [data-shop]'), act: e.matches('#pacts button'), ch: e.matches('#choice button'), txt: e.textContent.trim().slice(0, 18) });
   }
   const words = t => (t || '').replace(/[^a-zA-Z0-9'’]+/g, ' ').trim().split(' ').filter(w => /[a-z][a-z]/i.test(w));
   for (const e of document.body.querySelectorAll('*')) {
     if (/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|SVG|TEXT|TSPAN|BUTTON)$/i.test(e.tagName) || !vis(e)) continue; if (getComputedStyle(e).display.startsWith('inline')) continue;
     if (![...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim())) continue; const r = e.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) continue;
-    if (e.closest('.gxc,[class*=drawer],[class*=Drawer],[class*=rules],[class*=menu],[class*=-log],[id$=log],[id=log],[class*=settings],[aria-modal=true],#more,.gx-more,.gx-sheet,#fulltip,#menuwrap,.gx-drawer,#dr-market,#dr-mine,#dr-mons,#dr-log,#dr-rules,.gx-scrim')) continue;
+    if (e.closest('[data-help],.gxc,[class*=drawer],[class*=Drawer],[class*=rules],[class*=menu],[class*=-log],[id$=log],[id=log],[class*=settings],[aria-modal=true],#more,.gx-more,.gx-sheet,#fulltip,#menuwrap,.gx-drawer,#dr-market,#dr-mine,#dr-mons,#dr-log,#dr-rules,.gx-scrim')) continue;
     const w = words(e.innerText); if (w.length > 8) out.wordy.push(w.length + 'w "' + w.slice(0, 6).join(' ') + '" in ' + e.tagName + '.' + e.className + '#' + e.id + ' < ' + (e.parentElement && (e.parentElement.id || e.parentElement.className)));
   }
+  out.helpBad = []; for (const b of document.querySelectorAll('.gxh-bub,.gxh-rules .gxh-card')) { const r = b.getBoundingClientRect(); if (r.width && (r.left < -1 || r.top < -1 || r.right > innerWidth + 1 || r.bottom > innerHeight + 1)) out.helpBad.push('help element outside the screen: ' + b.className); }
   const bd = document.querySelector('[data-board]'); if (bd && innerHeight > innerWidth) { const r = bd.getBoundingClientRect(); out.board = Math.round(100 * Math.max(0, Math.min(r.right, innerWidth) - Math.max(r.left, 0)) * Math.max(0, Math.min(r.bottom, innerHeight) - Math.max(r.top, 0)) / (innerWidth * innerHeight)); }
   const f = document.getElementById('bfinger'); if (f && f.classList.contains('on')) out.finger = { x: parseFloat(f.style.left), y: parseFloat(f.style.top) };
   // score chips vs the engine
@@ -72,18 +74,112 @@ async function choose(p, st, r) {
 async function checkStep(p, tag, st) {
   if (p.errs.length) await fail(p, tag, 'page error', p.errs[0]);
   if (st.hscroll) await fail(p, tag, 'hscroll', 'page scrolls sideways');
+  for (const h of st.helpBad || []) await fail(p, tag, 'help geometry', h);
   if (st.board != null) { boardMin = Math.min(boardMin, st.board); if (st.board < 55) await fail(p, tag, 'board small', st.board + '%'); }
   if (st.line && st.line.split(/\s+/).filter(Boolean).length > 8) await fail(p, tag, 'line >8 words', st.line);
   if (st.wordy.length) await fail(p, tag, 'text >8 words', st.wordy.slice(0, 2).join(' / '));
   for (const c of st.ctl) {
     if (c.gxc || c.scroll || c.chip) continue;
-    if (c.inVP && c.cov && !c.dis && !c.anim && !st.intro && !/modal|scrim|gxc|dlg/.test(c.by || '')) await fail(p, tag, 'covered', c.c + ' by ' + c.by);
+    if (c.inVP && c.cov && !c.byHelp && !c.dis && !c.anim && !st.intro && !/modal|scrim|gxc|dlg/.test(c.by || '')) await fail(p, tag, 'covered', c.c + ' by ' + c.by);
     if (!c.inVP && (c.die || c.shop || c.act || c.ch)) await fail(p, tag, 'off screen', c.c + ' ' + Math.round(c.x) + ',' + Math.round(c.y));
     if (!c.anim && (c.die || c.shop || c.act || c.ch) && Math.min(c.w, c.h) < 29.5) await fail(p, tag, 'too small', c.c + ' ' + Math.round(c.w) + 'x' + Math.round(c.h));
   }
   const bad = st.chips.filter(c => c.bad || c.shown.some((v, i) => v !== c.eng[i])); p._cb = bad.length && !st.busy ? (p._cb || 0) + 1 : 0;
   if (p._cb >= 4) { const c = bad[0]; await fail(p, tag, 'score mismatch', 'chip ' + c.k + ' ' + (c.bad || 'shows ' + c.shown + ' engine ' + c.eng)); p._cb = 0; }
   if (!st.finger) p._fb = 0; else { fingers++; const near = st.ctl.some(c => !c.chip && Math.hypot(c.x - st.finger.x, c.y - st.finger.y) < Math.max(70, c.w * .8)); p._fb = near ? 0 : (p._fb || 0) + 1; if (p._fb >= 4) await fail(p, tag, 'finger at nothing', Math.round(st.finger.x) + ',' + Math.round(st.finger.y)); }
+}
+// ---- help kit checks (gx-help): a fresh profile has tips on. Every phase's first-time bubble appears once, has an arrow and Got it, never covers its target or a
+// glowing control, and dismisses on a tap. The bulb's finger sits on what the game's own advisors pick, the why is <= 15 words, the rules are 2-4 cards, <= 20 words, each with a picture.
+const wc = t => String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length;
+const helpTot = { bubbles: {}, bulbs: 0, bulbNull: 0, rules: 0, tipsOff: 0 };
+const NEUTRAL = () => { // a spot where a tap does nothing: the empty dock background, found by probing
+  for (let y = innerHeight - 6; y > innerHeight * .55; y -= 14) for (let x = 6; x < innerWidth; x += 18) { const e = document.elementFromPoint(x, y); if (e && !e.closest('button,[data-a],[data-act],[data-die],[data-shop],[data-opt],[data-pm],[data-card],#stage,#map,canvas,[data-board],[data-help],a,input,.gx-bar,.die,#bfinger,[data-gx]')) return [x, y]; }
+  return null; };
+const PRE = () => { // what the game's own advisors pick (computed here, apart from hlp.js), and where the bulb will point
+  const sig = [G.turn, G.phase, G.active, G.rolls, G.dice.map(d => d.f + (d.k ? 'k' : '')).join(''), G.pl.map(q => q.hp + ',' + q.vp + ',' + q.en).join(';'), G.log && G.log.length].join('|');
+  const ph = hlpPhase(), p = cur(); let adv = null;
+  if (ph === 'power' || ph === 'yield' || ph === 'choice') { const a = advise(); adv = a.k === undefined ? { none: 1 } : { opt: String(a.k) } }
+  else if (ph === 'roll' || ph === 'reroll') { const m = suggestMask(p), i = G.dice.findIndex((d, k) => !!m[k] !== !!d.k), nk = G.dice.filter(d => !d.k).length; adv = i >= 0 ? { die: i } : (G.rolls > 0 && nk ? { act: 'reroll' } : { none: 1 }) }
+  else if (ph === 'done') adv = { act: 'resolve' };
+  else if (ph === 'buy') { const sg = suggestCard(p); adv = sg >= 0 ? { shop: sg } : { act: 'end' } }
+  else if (ph === 'intro') adv = { story: 1 };
+  else adv = { none: 1 };
+  const s = hlpSuggest(); let at = null; if (s && s.target) { const e = s.target(), q = e && e.getBoundingClientRect(); if (q && q.width) at = { x: q.left + q.width / 2, y: q.top + q.height / 2 } }
+  return { adv, has: !!s, at, sig } };
+const AFTER = () => ({ g: !!document.querySelector('.gxh-bub,.gxh-ring,.gxh-finger,.gxh-rules'), sig: typeof G === 'undefined' || !G ? '-' : [G.turn, G.phase, G.active, G.rolls, G.dice.map(d => d.f + (d.k ? 'k' : '')).join(''), G.pl.map(q => q.hp + ',' + q.vp + ',' + q.en).join(';'), G.log && G.log.length].join('|') });
+async function helpTap(p, sel) { const c = await p.evaluate(sel => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null }, sel); if (!c) return false; await p.touchscreen.tap(c[0], c[1]); return true }
+async function neutralTap(p) { const n = await p.evaluate(NEUTRAL); if (!n) return false; await p.touchscreen.tap(n[0], n[1]); return true }
+async function rulesCheck(p, tag, ph) {
+  helpTot.rules++;
+  const R = await p.evaluate(() => { const e = document.querySelector('.gxh-rules'); if (!e) return null; const out = [], n = +e.dataset.count; for (let i = 0; i < n; i++) { out.push({ t: e.querySelector('.gxh-rt').textContent, x: e.querySelector('.gxh-rx').textContent, pic: !!e.querySelector('.gxh-pic svg') }); if (i < n - 1) e.querySelector('.gxh-next').click() } const r = e.querySelector('.gxh-card').getBoundingClientRect(); return { n, cards: out, inside: r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight } });
+  if (!R) return fail(p, tag, 'help rules', 'rules cards did not open (' + ph + ')');
+  if (R.n < 2 || R.n > 4) await fail(p, tag, 'help rules', ph + ' has ' + R.n + ' cards (want 2-4)');
+  for (const c of R.cards) { if (wc(c.x) > 20) await fail(p, tag, 'help rules', 'card over 20 words (' + ph + '): ' + c.x); if (!c.pic) await fail(p, tag, 'help rules', 'card without a picture (' + ph + '): ' + c.t); }
+  if (!R.inside) await fail(p, tag, 'help rules', 'card outside the screen (' + ph + ')');
+  await p.evaluate(() => document.querySelector('.gxh-rules .gxh-x').click()); await p.waitForTimeout(100);
+  if (await p.evaluate(() => !!document.querySelector('.gxh-rules'))) await fail(p, tag, 'help rules', 'cards did not close');
+}
+async function helpFlow(p, tag, st) {
+  const seen = p._seen || (p._seen = new Set()), hs = await p.evaluate(() => ({ ph: hlpPhase(), step: !!HLP_STEPS[hlpPhase()], st: GXH.state(), on: GXH.enabled() }));
+  if (hs.st.rules) { await fail(p, tag, 'help rules', 'rules overlay stuck open'); await p.evaluate(() => GXH.hide()); return false }
+  if (!hs.on) { helpTot.tipsOff++; if (await p.evaluate(() => !!document.querySelector('.gxh-bub[data-phase]'))) await fail(p, tag, 'help tips off', 'a coach bubble appeared with Tips off'); return false }
+  // 1) the first-time bubble of this phase
+  if (hs.ph && hs.step && !seen.has(hs.ph)) {
+    seen.add(hs.ph); let b = null; const t1 = Date.now();
+    while (Date.now() - t1 < 2600) {
+      b = await p.evaluate(ph => {
+        const e = document.querySelector('.gxh-bub.on[data-phase]'); if (!e) return null; const te = HLP_STEPS[ph].target(), tq = te && te.getBoundingClientRect(), r = e.getBoundingClientRect();
+        const cores = [...document.querySelectorAll('.sugg,.rec,#pacts .btn.primary,#choice .btn.primary,#pshop .ptile.ok')].filter(x => !x.closest('[data-help]') && x.getClientRects().length).map(x => { const q = x.getBoundingClientRect(), w = Math.min(q.width, 56), h = Math.min(q.height, 56), cx = q.left + q.width / 2, cy = q.top + q.height / 2; return { l: cx - w / 2, t: cy - h / 2, r: cx + w / 2, b: cy + h / 2 } });
+        const R4 = [r.left, r.top, r.right, r.bottom], hit = (a, c) => a[0] < c.r && a[2] > c.l && a[1] < c.b && a[3] > c.t;
+        return { id: e.dataset.phase, title: e.querySelector('.gxh-tt').textContent, text: e.querySelector('.gxh-tx').textContent, arrow: !!e.querySelector('.gxh-arr'), ok: !!e.querySelector('.gxh-ok'), r: R4, T: tq && { l: tq.left, t: tq.top, r: tq.right, b: tq.bottom }, glow: cores.some(c => hit(R4, c)), inside: r.left >= -1 && r.top >= -1 && r.right <= innerWidth + 1 && r.bottom <= innerHeight + 1 } }, hs.ph).catch(() => null);
+      if (b) break; await p.waitForTimeout(80) }
+    if (!b) await fail(p, tag, 'help bubble', 'no coach bubble for phase ' + hs.ph);
+    else {
+      helpTot.bubbles[hs.ph] = (helpTot.bubbles[hs.ph] || 0) + 1;
+      if (b.id !== hs.ph) await fail(p, tag, 'help bubble', 'bubble for ' + b.id + ' shown in phase ' + hs.ph);
+      if (wc(b.title) > 4) await fail(p, tag, 'help bubble', 'title over 4 words: ' + b.title); if (wc(b.text) > 20) await fail(p, tag, 'help bubble', 'text over 20 words (' + wc(b.text) + '): ' + b.text);
+      if (!b.arrow || !b.ok) await fail(p, tag, 'help bubble', 'no arrow or Got it (' + hs.ph + ')');
+      if (!b.inside) await fail(p, tag, 'help bubble', 'outside the screen (' + hs.ph + ')');
+      if (b.T) { const [l, t, r, bt] = b.r; if (l < b.T.r && r > b.T.l && t < b.T.b && bt > b.T.t) await fail(p, tag, 'help bubble', 'covers its target (' + hs.ph + ')'); }
+      if (b.glow) await fail(p, tag, 'help bubble', 'covers a glowing control (' + hs.ph + ')');
+      if (rnd() < .5) { if (!(await neutralTap(p))) await helpTap(p, '.gxh-bub .gxh-ok') } else await helpTap(p, '.gxh-bub .gxh-ok');
+      await p.waitForTimeout(150);
+      if (await p.evaluate(() => !!document.querySelector('.gxh-bub'))) await fail(p, tag, 'help bubble', 'did not dismiss on a tap (' + hs.ph + ')');
+      return true;
+    }
+  }
+  // 2) the lightbulb: the first time in every phase, then now and then
+  if (hs.ph && (!seen.has('bulb:' + hs.ph) || rnd() < .12) && (p._bulbN || 0) < 16) {
+    seen.add('bulb:' + hs.ph); p._bulbN = (p._bulbN || 0) + 1; helpTot.bulbs++;
+    const pre = await p.evaluate(PRE);
+    if (!(await helpTap(p, '#bulbbtn'))) { await fail(p, tag, 'help bulb', 'no bulb button on screen'); return false }
+    await p.waitForTimeout(380);
+    const r = await p.evaluate(() => {
+      const f = document.querySelector('.gxh-finger'), b = document.querySelector('.gxh-bub.on'), ru = document.querySelector('.gxh-rules'); let hit = null;
+      if (f) { const e = document.elementFromPoint(+f.dataset.tx, +f.dataset.ty), d = x => e && e.closest(x); hit = e && { die: d('[data-die]') && d('[data-die]').dataset.die, shop: d('[data-shop]') && d('[data-shop]').dataset.shop, opt: d('[data-opt]') && d('[data-opt]').dataset.opt, act: d('[data-act]') && d('[data-act]').dataset.act, story: !!d('[data-a="story"]') } }
+      return { f: f && { tx: +f.dataset.tx, ty: +f.dataset.ty }, hit, ring: document.querySelectorAll('.gxh-ring').length, why: b && b.querySelector('.gxh-tx').textContent, link: !!(b && b.querySelector('.gxh-link')), rules: !!ru } });
+    if (pre.has && pre.at) {
+      if (!r.f) await fail(p, tag, 'help bulb', 'tapped, no finger (' + hs.ph + ')');
+      else {
+        if (Math.hypot(r.f.tx - pre.at.x, r.f.ty - pre.at.y) > 3) await fail(p, tag, 'help bulb', 'finger ' + Math.round(r.f.tx) + ',' + Math.round(r.f.ty) + ' != target ' + Math.round(pre.at.x) + ',' + Math.round(pre.at.y) + ' (' + hs.ph + ')');
+        const a = pre.adv || {}, h = r.hit || {};
+        const okAdv = (a.opt !== undefined && h.opt === a.opt) || (a.die !== undefined && h.die === String(a.die)) || (a.shop !== undefined && h.shop === String(a.shop)) || (a.act && h.act === a.act) || (a.story && h.story);
+        if (!okAdv) await fail(p, tag, 'help bulb', 'finger is not on the advisor pick ' + JSON.stringify(a) + ' but on ' + JSON.stringify(h) + ' (' + hs.ph + ')');
+      }
+      if (!r.ring) await fail(p, tag, 'help bulb', 'nothing glows at the suggestion (' + hs.ph + ')');
+      if (!r.why || wc(r.why) > 15) await fail(p, tag, 'help bulb', 'why ' + wc(r.why) + ' words: ' + r.why); if (!r.link) await fail(p, tag, 'help bulb', 'no "How does this work?" (' + hs.ph + ')');
+      if (rnd() < .5 && r.link) { await helpTap(p, '.gxh-bub .gxh-link'); await p.waitForTimeout(250); await rulesCheck(p, tag, hs.ph) } else { await neutralTap(p); await p.waitForTimeout(150) }
+    } else {
+      helpTot.bulbNull++; if (r.f) await fail(p, tag, 'help bulb', 'no suggestion but a finger pointed (' + hs.ph + ')'); if (!r.rules) await fail(p, tag, 'help bulb', 'no suggestion and no rules cards (' + hs.ph + ')'); else await rulesCheck(p, tag, hs.ph);
+      if (pre.adv && !pre.adv.none && !pre.has) await fail(p, tag, 'help bulb', 'advisor has a pick ' + JSON.stringify(pre.adv) + ' but the bulb gave none (' + hs.ph + ')');
+    }
+    await p.evaluate(() => GXH.hide());
+    const after = await p.evaluate(AFTER);
+    if (after.g) await fail(p, tag, 'help bulb', 'help still on screen after dismissing (' + hs.ph + ')');
+    if (hs.ph !== 'watch' && hs.ph !== 'intro' && after.sig !== pre.sig && st.humanTurn) await fail(p, tag, 'help bulb', 'tapping the bulb changed the game (' + pre.sig + ' -> ' + after.sig + ')');
+    return true;
+  }
+  return false;
 }
 async function play(p, tag, o) {
   const t0 = Date.now(); let last = '', lastAt = Date.now(), n = 0, rotated = 0, st;
@@ -92,6 +188,7 @@ async function play(p, tag, o) {
     if (!st.win) { const cx = await p.evaluate(() => { const e = [...document.querySelectorAll('.gx-x')].find(x => { const R = x.getBoundingClientRect(); if (!(R.width > 8 && R.left >= 0 && R.top >= 0 && R.right <= innerWidth && R.bottom <= innerHeight)) return false; const t = document.elementFromPoint(R.left + R.width / 2, R.top + R.height / 2); return t === x || x.contains(t) }); if (!e) return null; const R = e.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2 } }); if (cx) { await p.touchscreen.tap(cx.x, cx.y); await p.waitForTimeout(500); st.closed = 1; continue; } } // a monster / card sheet the player opened: close it with the x
     await checkStep(p, tag, st);
     if (st.win) return st;
+    if (!st.gxc && (await helpFlow(p, tag, st))) continue;
     if (o.rotAt && n === o.rotAt && !rotated) {
       const vp = p.viewportSize(); await p.setViewportSize({ width: vp.height, height: vp.width }); await p.waitForTimeout(900);
       const s2 = await p.evaluate(PROBE); if (s2.hscroll) await fail(p, tag, 'hscroll after rotation', ''); if (p.errs.length) await fail(p, tag, 'page error', p.errs[0]);
@@ -111,7 +208,7 @@ async function play(p, tag, o) {
 async function game(b, W, H, i) {
   const tag = `${W}x${H}#${i}`; const p = await newPage(b, W, H); battles++;
   try {
-    await p.evaluate(s => { setSeed(s); }, 500 + i * 31); await p.tap('[data-start]'); await p.waitForTimeout(1800);
+    await p.evaluate(s => { setSeed(s); }, 500 + i * 31); if (i === 1) await p.evaluate(() => GXH.setEnabled(false)); // one game per size with Tips off: no bubble may appear await p.tap('[data-start]'); await p.waitForTimeout(1800);
     const st = await play(p, tag, { rotAt: i < ROT ? 14 : 0 });
     if (st && st.win) { /^P/.test(st.win) && st.win === 'P' + (await p.evaluate(() => G.pl.findIndex(q => q.human) + 1)) ? wins++ : losses++; await p.waitForTimeout(3000); const s2 = await p.evaluate(PROBE); await checkStep(p, tag, s2); if (i === 0) await p.screenshot({ path: path.join(SHOTS, `end-${W}x${H}.png`) }); }
   } catch (e) { await fail(p, tag, 'exception', e.message.split('\n')[0]); }
@@ -139,5 +236,6 @@ async function story(b, W, H, ch) {
   for (const [W, H] of SIZES) { for (let i = 0; i < GAMES; i++) jobs.push(() => game(b, W, H, i)); for (let c = 1; c <= STORY; c++) jobs.push(() => story(b, W, H, c)); }
   let next = 0; await Promise.all([...Array(PAR)].map(async () => { while (next < jobs.length) { const j = jobs[next++]; await j() } }));
   console.log(`\nSWEEP: ${battles} games (won ${wins}, lost ${losses}), ${steps} steps, ${taps} taps (${keeps} dice, ${buys} shop), finger seen ${fingers}x, smallest board ${boardMin}%, ${fails.length} failure(s)`);
+  console.log(`help: bubbles ${JSON.stringify(helpTot.bubbles)}, bulb taps ${helpTot.bulbs} (${helpTot.bulbNull} with no suggestion), rules opened ${helpTot.rules}, tips-off probes ${helpTot.tipsOff}`);
   for (const f of fails) console.log(' -', f.tag, f.kind, f.detail); await b.close(); process.exit(fails.length ? 1 : 0);
 })();

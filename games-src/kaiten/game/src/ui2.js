@@ -7,6 +7,7 @@ function render() {
   try { renderDrawers(); } catch (e) { }
   try { netRenderHook(); } catch (e) { }
   try { boardFX(); } catch (e) { }
+  try { hlpAfter(); } catch (e) { }
   if (PX.on) pxDirty();
 }
 function renderBar() {
@@ -281,7 +282,6 @@ function renderActs() {
     const p = G.players[v], chop = KK._.hasChop(p) && p.hand.length >= 2;
     const n = UI.sel.length;
     if (n && (UI.prefs.grab1 === false || n === 2)) { const ids = UI.sel.map(i => p.hand[i]); const g = gainOf(v, ids); a.appendChild(h('button.btn.go', { 'data-a': 'serve', type: 'button' }, n === 2 ? 'Serve both' + (g > 0 ? ' (+' + g + ')' : '') : 'Serve' + (g > 0 ? ' (+' + g + ')' : ''))); }
-    if (!(n === 0 && document.documentElement.classList.contains('ph-p'))) a.appendChild(h('button.btn.alt', { 'data-a': 'hint', type: 'button' }, 'Hint'));
     if (n) a.appendChild(h('button.btn.alt', { 'data-a': 'unsel', type: 'button', 'aria-label': 'Put the plate back' }, 'Cancel'));
   }
 }

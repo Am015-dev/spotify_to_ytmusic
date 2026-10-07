@@ -132,14 +132,6 @@ function toggleTwin() {
   UI.twin = !UI.twin; if (!UI.twin && UI.sel.length > 1) UI.sel = UI.sel.slice(0, 1);
   render();
 }
-function hint() {
-  const v = viewSeat(); if (!canPick()) return;
-  let mv; try { mv = KK.AI.choose(G, v, 'normal'); } catch (e) { return; }
-  if (!mv) return;
-  UI.rec = { ids: mv.ids.slice(), pick: mv.pick.slice(), turn: G.round + '.' + G.turn };
-  // one tap grabs: the hint only glows the dish (a ghost finger points at it); otherwise it lifts it as before
-  UI.twin = mv.pick.length === 2; UI.sel = UI.prefs.grab1 === false ? mv.pick.slice() : []; render();
-}
 // ---------- hot-seat ----------
 function hotNext() {
   if (!hotSeat() || UI.cards.length || UI.busy) return;
