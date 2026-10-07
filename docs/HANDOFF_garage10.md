@@ -39,3 +39,7 @@ Read `docs/HANDOFF_garage9.md` (slice 2 section) first. Everything listed there 
   - **All roofs:** the T6x2 at y11 sits like a "hat" over ws6. Try a flush roof (T6x3 at y11 that covers the screen top) or drop it to y10.
 - Then: re-render all 9 (`t4/g9tpl.js`) → side-by-sides vs the refs → collection test `t4/g9col.js` (12 px text, ≤5 bar buttons) → drive with a template equipped (`nb.js`-style, tyre gap ≤0.05 m) and with an off-road form mixed in → REVIEW → merge the current live src → DEPLOY.
 - Worktrees (git-excluded): `wt_s2/` (slice 2), `wt_old/` (v87r, 5c23efb), `wt_live/` (od-race15 = v87s). The server at :8766 serves the repo root.
+
+## Update 17:10Z
+- Slice 1 QUICK re-review: PASS at 63937c1. DEPLOY sent to the coordinator (f736484, out/v87t).
+- Open reviewer item (not blocking): faint grey translucent columns on the platform beside a tall stack (`t4/g9/stack_v87t/stack_t22.png`, left of and under the car). Identify the mesh: shadows, or leftover ghost/preview meshes (G9 outline / GS held ghost)? Remove it next round if it's a preview.
