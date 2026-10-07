@@ -124,7 +124,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
   // scale + layout at the start
   const sc=await p.evaluate(SCALE);const road=await p.evaluate(ROADPROBE);let lay=await p.evaluate(LAYOUT);const ovAll=new Set(lay.ov),tinyAll=new Set(lay.tiny),hudAll=new Set(lay.hud);await shot(city+'_start');let rotR=null;if(phone&&city===CITIES[0])rotR=await rotTrip();
   // ---- the drive: human driver
-  const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(city==='fra'?11:23);let seenHits=0,hitShots=0,brakeUntil=-1,wob=0,route=null,routeT=-1e9,dest=null,destKind='',lastBrake=-1e9,boostT=0,driftT=0,stuckT=0,revT=0,lastNext=-1e9,events=[],lagged=[];
+  const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)((city==='fra'?11:23)+(+process.env.SEED||0)*1000);let seenHits=0,hitShots=0,brakeUntil=-1,wob=0,route=null,routeT=-1e9,dest=null,destKind='',lastBrake=-1e9,boostT=0,driftT=0,stuckT=0,revT=0,lastNext=-1e9,events=[],lagged=[];
   const frames=MIN*3600;let f=0,lastLay=0,shotN=0,nextShot=frames/4;let extra={map:null,pause:null,garage:null,otg:null};
   const parts=[];let reloads=0,snap=null,lastSnap=0;
   while(f<frames){try{

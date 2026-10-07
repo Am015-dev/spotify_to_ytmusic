@@ -18,8 +18,10 @@ function B2K_touch(e){const g=document.getElementById('tG'),b=document.getElemen
 for(const ev of['touchstart','touchmove','touchend','touchcancel'])addEventListener(ev,B2K_touch,{passive:true,capture:true});
 // swipe up on GAS = hop (keeps the thumb on the gas; no 6th button)
 {const sw=new Map();const g=()=>document.getElementById('tG');
-  addEventListener('touchstart',e=>{const G=g();if(!G)return;for(const t of e.changedTouches)if(G.contains(t.target)||t.target===G)sw.set(t.identifier,{y:t.clientY,t:e.timeStamp,done:false})},{passive:true,capture:true});
-  addEventListener('touchmove',e=>{for(const t of e.changedTouches){const s=sw.get(t.identifier);if(!s||s.done)continue;if(s.y-t.clientY>26&&e.timeStamp-s.t<500){s.done=true;B2K_hop()}}},{passive:true,capture:true});
+  addEventListener('touchstart',e=>{const G=g();if(!G)return;for(const t of e.changedTouches)if(G.contains(t.target)||t.target===G)sw.set(t.identifier,{y:t.clientY,t:e.timeStamp,ly:t.clientY,lt:e.timeStamp,done:false})},{passive:true,capture:true});
+  // the thumb may rest on GAS for minutes: a flick is measured from where it last rested (>150 ms still), not from touch-down
+  addEventListener('touchmove',e=>{const n=e.timeStamp;for(const t of e.changedTouches){const s=sw.get(t.identifier);if(!s)continue;const y=t.clientY;if(n-s.lt>150){s.y=s.ly;s.t=n}
+    if(s.done){if(y>s.y-10)s.done=false}else if(s.y-y>26&&n-s.t<500){s.done=true;B2K_hop()}s.ly=y;s.lt=n}},{passive:true,capture:true});
   const end=e=>{for(const t of e.changedTouches)sw.delete(t.identifier)};addEventListener('touchend',end,{passive:true,capture:true});addEventListener('touchcancel',end,{passive:true,capture:true})}
 function B2K_hop(){if(state==='roam')pressed.fire=true;else B2K.hopReq=true;B2K.log.hop++;const G=document.getElementById('tG');if(G){G.classList.remove('b2kHop');void G.offsetWidth;G.classList.add('b2kHop')}}
 // ctlPlayer: GAS+BRAKE+steer = drift (hb), never a brake; keyboard Up+Down+steer too
@@ -40,13 +42,13 @@ function B2K_hop(){if(state==='roam')pressed.fire=true;else B2K.hopReq=true;B2K.
 @keyframes b2kP{0%{transform:scale(1)}40%{transform:scale(1.12,1.5)}100%{transform:scale(1)}}
 #b2kT{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);font:italic 900 15px/1 system-ui,sans-serif;letter-spacing:.04em;color:#ffd12c;-webkit-text-stroke:1px #141413;text-shadow:0 2px 0 #141413;white-space:nowrap;opacity:0}
 #b2kT.on{opacity:1;animation:b2kTb .5s ease-in-out infinite alternate}@keyframes b2kTb{to{transform:translateX(-50%) scale(1.1)}}
-.b2kPop{position:absolute;bottom:4px;font:italic 900 15px/1 system-ui,sans-serif;-webkit-text-stroke:1px #141413;text-shadow:0 2px 0 #141413;white-space:nowrap;animation:b2kUp .9s ease-out forwards}
-@keyframes b2kUp{0%{transform:translateY(6px) scale(.6);opacity:0}25%{transform:translateY(-8px) scale(1.15);opacity:1}100%{transform:translateY(-30px) scale(1);opacity:0}}
+.b2kPop{position:absolute;bottom:4px;font:italic 900 17px/1 system-ui,sans-serif;-webkit-text-stroke:1px #141413;text-shadow:0 2px 0 #141413;white-space:nowrap;animation:b2kUp 1.1s ease-out forwards}
+@keyframes b2kUp{0%{transform:translateY(6px) scale(.6);opacity:0}15%{transform:translateY(-8px) scale(1.2);opacity:1}70%{transform:translateY(-16px) scale(1);opacity:1}100%{transform:translateY(-30px) scale(1);opacity:0}}
 #flPop{display:none!important}#b2kM.dim{opacity:.3}
 #tG.b2kHop{animation:b2kH .35s ease-out}@keyframes b2kH{40%{transform:scale(.78) translateY(-10px)}}
 #tG:before{content:'▲';position:absolute;top:5px;left:50%;transform:translateX(-50%);font-size:12px;opacity:.65}`;document.head.appendChild(st);
   const m=document.createElement('div');m.id='b2kM';m.innerHTML='<div id="b2kT">BRICKBASH!</div><div class="d"><i></i></div><div class="b"><i></i></div>';document.body.appendChild(m);B2K.el=m})();
-function B2K_pop(txt,col){const m=B2K.el;if(!m)return;const p=document.createElement('div');p.className='b2kPop';p.textContent=txt;p.style.color=col;p.style.left=(m.childElementCount%2?'72%':'4%');m.appendChild(p);setTimeout(()=>p.remove(),950)}
+function B2K_pop(txt,col){const m=B2K.el;if(!m)return;const p=document.createElement('div');p.className='b2kPop';p.textContent=txt;p.style.color=col;p.style.left=(m.childElementCount%2?'72%':'4%');m.appendChild(p);setTimeout(()=>p.remove(),1150)}
 function B2K_hud(bm){const m=B2K.el;if(!m)return;const vis=(state==='roam'&&!RO.mapOpen&&!RO.card&&!RO.story&&!RO.frozen||state==='race')&&!!pl;m.classList.toggle('on',vis);if(!vis)return;
   B2K.dmS+=(B2K.dm-B2K.dmS)*.35;m.children[1].firstChild.style.width=B2K.dmS.toFixed(1)+'%';m.children[2].firstChild.style.width=clamp(bm,0,100).toFixed(1)+'%';
   m.classList.toggle('full',bm>=99);m.classList.toggle('dr',B2K.dm>1);m.classList.toggle('bash',B2K.bash);m.children[0].classList.toggle('on',B2K.bash);
@@ -96,7 +98,7 @@ function B2K_driftEnd(s){if(B2K.dT<=0)return;const b0=s.bm;s.bm=Math.min(100,s.b
   B2K.log.drift.push({s:+B2K.dT.toFixed(2),bar:+B2K.dm.toFixed(1),boost:+g.toFixed(1),slipAvg:+(B2K.slS/Math.max(1,B2K.slN)*57.3).toFixed(1),slipMax:+(B2K.slMax*57.3).toFixed(1)});if(B2K.log.drift.length>40)B2K.log.drift.shift();
   if(g>=1){B2K_pop('+'+Math.round(g)+' BOOST','#ff8ad0');B2K.pulse=1}B2K.dm=0;B2K.dT=0;B2K.slS=0;B2K.slN=0;B2K.slMax=0}
 function B2K_boost(s,boosting,bm0,dt,roam){if(boosting&&!B2K.wasB&&bm0>=99){B2K.log.burst++;fovKick=Math.max(fovKick,15);shake=Math.max(shake,.25);try{AU.sfx('boost')}catch(e){}B2K_pop('FULL BOOST!','#7ff3ff');
-    if(roam)RO.turbo=Math.max(RO.turbo||0,1.1);else s.boost=Math.max(s.boost||0,1)}
+    if(roam)RO.turbo=Math.max(RO.turbo||0,.4);else s.boost=Math.max(s.boost||0,.4)}
   B2K.bt=boosting?B2K.bt+dt:0;const bash=boosting&&B2K.bt>=B2K_BASHT;if(bash&&!B2K.bash){B2K.log.bash++;try{AU.sfx('finish')}catch(e){}fovKick=Math.max(fovKick,12);shake=Math.max(shake,.3)}B2K.bash=bash;
   if(bash){s.bm=Math.min(100,s.bm+8*dt);if(roam){RO.turbo=Math.max(RO.turbo||0,.12);RO.inv=Math.max(RO.inv||0,.15)}else s.boost=Math.max(s.boost||0,.12)}B2K.wasB=boosting}
 // Brickbash in roam: traffic within reach is knocked aside (tumble + debris) instead of stopping the car
