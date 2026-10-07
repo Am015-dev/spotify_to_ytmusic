@@ -36,6 +36,7 @@ const nats = p => -Math.log(Math.max(p, 1e-3));
 // ---------- state readers ----------
 const trk = S => D.tracks[S.tk];
 const finalIdx = S => D.rounds - 1 - S.row0;
+const hasEng = S => S.keys.includes('en0'), hasGear = S => S.keys.includes('lg0'), hasFlaps = S => S.keys.includes('fl0'), hasBrakes = S => S.keys.includes('br0') || S.mods.ice;
 const enginesDone = S => !!(S.slots.en0 && S.slots.en1);
 const axisDone = S => !!(S.slots.ax0 && S.slots.ax1);
 function remAdv(S) { if (FA.isFinal(S)) return 0; return (enginesDone(S) ? 0 : 1) + Math.max(0, finalIdx(S) - 1 - S.round); }
@@ -102,8 +103,25 @@ function pairsCost(S, me, dist, out) {
     else { const r = advOutcome(S, s); tE[t] = r.ok ? schedCost(dist - r.adv, rAfter, S.pl.aeroB, S.pl.aeroO, w) : W.disaster; }
   }
   const F = { A: (p, c) => tA[c - p], E: (e0, e1) => tE[e0 + e1] };
+  if (S.open && coffee === 0) {
+    // open dice (learning chapters): both hands are face up, so the pair of crews picks the best way to fill the empty Axis / Engines spaces together
+    const need = [[], []]; for (let s = 0; s < 2; s++) { if (!S.slots['ax' + s]) need[s].push('A'); if (hasEng(S) && !S.slots['en' + s]) need[s].push('E'); }
+    if (!need[0].length && !need[1].length) return;
+    const assigns = s => { const d = FA.unusedDice(S, s).map(i => S.dice[s][i].v), n = need[s], out = [], rec = (k, used, cur) => { if (k === n.length) { out.push(cur.slice()); return; } for (let i = 0; i < d.length; i++) if (!((used >> i) & 1)) { cur.push(d[i]); rec(k + 1, used | (1 << i), cur); cur.pop(); } }; rec(0, 0, []); return out; };
+    const a0 = assigns(0), a1 = assigns(1);
+    if (a0.length && a1.length) {
+      let bs = 1e9, bA = 0, bE = 0;
+      for (const x of a0) for (const y of a1) {
+        const V = { A: [0, 0], E: [0, 0] }; [x, y].forEach((as, s) => { let k = 0; for (const kind of ['A', 'E']) { const sl = S.slots[(kind === 'A' ? 'ax' : 'en') + s]; V[kind][s] = sl ? sl.v : (need[s].includes(kind) ? as[k++] : 0); } });
+        const cA = tA[V.A[1] - V.A[0]] === undefined ? W.disaster : tA[V.A[1] - V.A[0]], cE = hasEng(S) ? (tE[V.E[0] + V.E[1]] === undefined ? 0 : tE[V.E[0] + V.E[1]]) : 0;
+        if (cA + cE < bs) { bs = cA + cE; bA = cA; bE = cE; }
+      }
+      out[final ? 'pairA_f' : 'pairA_n'] += bA; out[final ? 'pairE_f' : 'pairE_n'] += bE;
+    }
+    return;
+  }
   const f2 = (kind, vMe, vO) => me === 0 ? F[kind](vMe, vO) : F[kind](vO, vMe);
-  const needMe = { A: !val('A', me), E: !val('E', me) }, needO = { A: !val('A', o), E: !val('E', o) };
+  const needMe = { A: !val('A', me), E: hasEng(S) && !val('E', me) }, needO = { A: !val('A', o), E: hasEng(S) && !val('E', o) };
   const bothO = needO.A && needO.E;
   const kEff = kind => { let k = kp; if (needMe[kind] && needO[kind]) k = Math.max(1, kp - W.lag); if (bothO && kind === 'E') k = Math.max(1, k - 1); return k; };
   const tot = { A: 0, E: 0 };
@@ -123,11 +141,11 @@ function features(S, me) {
   const f = {}; for (const k of FN) f[k] = 0;
   const sp = trk(S).sp, size = sp.length, pos = S.pl.pos, dist = size - pos, inPlace = S.phase === 'place', final = FA.isFinal(S);
   if (inPlace) {
-    for (let s = 0; s < 2; s++) { const need = (S.slots['ax' + s] ? 0 : 1) + (S.slots['en' + s] ? 0 : 1); if (unplaced(S, s) < need) { f[final ? 'pairE_f' : 'pairE_n'] += W.disaster; } }
+    for (let s = 0; s < 2; s++) { const need = (S.slots['ax' + s] ? 0 : 1) + (hasEng(S) && !S.slots['en' + s] ? 1 : 0); if (unplaced(S, s) < need) { f[final ? 'pairE_f' : 'pairE_n'] += W.disaster; } }
     pairsCost(S, me, dist, f);
-    if (!enginesDone(S) && !final && !(S.slots.en0 || S.slots.en1)) f.sched += schedCost(dist, remAdv(S), S.pl.aeroB, S.pl.aeroO, wm(S)) * 0.7;
+    if (!hasEng(S)) { } else if (!enginesDone(S) && !final && !(S.slots.en0 || S.slots.en1)) f.sched += schedCost(dist, remAdv(S), S.pl.aeroB, S.pl.aeroO, wm(S)) * 0.7;
     else if (enginesDone(S) && !final) f.sched += schedCost(dist, remAdv(S), S.pl.aeroB, S.pl.aeroO, wm(S));
-  } else if (!final) f.sched += schedCost(dist, remAdv(S), S.pl.aeroB, S.pl.aeroO, wm(S));
+  } else if (!final && hasEng(S)) f.sched += schedCost(dist, remAdv(S), S.pl.aeroB, S.pl.aeroO, wm(S));
   const rem = D.rounds - S.row0 - S.round, idx = S.round;
   const Rf = Math.max(0, rem - (inPlace ? 0.5 : 0));
   const avgAdv = remAdv(S) > 0 ? Math.max(1, dist / remAdv(S)) : 1;
@@ -137,12 +155,13 @@ function features(S, me) {
     f.planes += n * nats(1 - Math.pow(1 - W.planeS * (q > 5 ? 0.3 : 1), avail));
     if (q <= 1) f.imminent += n;
   }
-  const gl = 3 - S.pl.sw.lg[0] - S.pl.sw.lg[1] - S.pl.sw.lg[2], fl = 4 - S.pl.sw.fl[0] - S.pl.sw.fl[1] - S.pl.sw.fl[2] - S.pl.sw.fl[3];
+  const gl = hasGear(S) ? 3 - S.pl.sw.lg[0] - S.pl.sw.lg[1] - S.pl.sw.lg[2] : 0, fl = hasFlaps(S) ? 4 - S.pl.sw.fl[0] - S.pl.sw.fl[1] - S.pl.sw.fl[2] - S.pl.sw.fl[3] : 0;
   const cb = Math.min(S.coffee, 2) * 0.04 + (S.rrHand ? 0.04 : 0);
-  if (fl > 0) f.flaps = nats(binAtLeast(Math.round(W.flapM * Rf), Math.min(0.9, W.flapQ + cb), fl));
-  if (gl > 0) f.gear = nats(gearProb(gl, Math.round(W.gearM * Rf), cb));
+  if (fl > 0 && hasFlaps(S)) f.flaps = nats(binAtLeast(Math.round(W.flapM * Rf), Math.min(0.9, W.flapQ + cb), fl));
+  if (gl > 0 && hasGear(S)) f.gear = nats(gearProb(gl, Math.round(W.gearM * Rf), cb));
   let brLeft = 0;
-  if (S.mods.ice) {
+  if (!hasBrakes(S)) { }
+  else if (S.mods.ice) {
     brLeft = 4 - S.pl.ice;
     if (brLeft > 0) {
       const P = (n, R) => n <= 0 ? 1 : binAtLeast(Math.round(R * 2), W.iceP + cb, n);
@@ -175,7 +194,7 @@ function features(S, me) {
     }
   }
   let internLeft = 0; if (S.mods.intern) { internLeft = S.intern.length; if (internLeft > 0) f.intern = nats(binAtLeast(Math.round(2 * Rf), W.internP, internLeft)); }
-  { const after = Math.max(0, rem - 1), mand = s => (S.slots['ax' + s] ? 0 : 1) + (S.slots['en' + s] ? 0 : 1);
+  { const after = Math.max(0, rem - 1), mand = s => (S.slots['ax' + s] ? 0 : 1) + (hasEng(S) && !S.slots['en' + s] ? 1 : 0);
     const free = s => Math.max(0, (inPlace ? unplaced(S, s) - mand(s) : 2) + 2 * after);
     const pF = free(0) * W.eff, cF = free(1) * W.eff, pN = gl + brLeft, cN = fl, sN = P2(S) + internLeft;
     f.overload = Math.max(0, pN - pF) + Math.max(0, cN - cF) + Math.max(0, pN + cN + sN - pF - cF);
@@ -275,9 +294,30 @@ function sayCodes(G, seat) {
   return out.filter((c, i, a) => a.indexOf(c) === i).slice(0, 2);
 }
 
+// ---------- chapter 1 (axis only, open dice): both hands are face up, so the crew plays the pair ----------
+// The first placer picks the die whose best answer from the partner leaves the plane level (or nearest); the second placer answers with the die that does it.
+function ladAxis(G, seat, level, rand) {
+  const o = 1 - seat, un = FA.unusedDice(G, seat), a = G.pl.axis, last = FA.isFinal(G), mine = un.filter(i => G.keys.some(k => FA.fits(G, seat, k, G.dice[seat][i].v, 'die')));
+  const axK = 'ax' + seat, oK = 'ax' + o, other = G.slots[oK];
+  const after = (v, w) => a + (seat === 0 ? w - v : v - w);   // v = pilot's die, w = co-pilot's
+  const tilt = (mv, ov) => seat === 0 ? after(mv, ov) : a + (mv - ov);
+  const score = t => { const x = Math.abs(t); return (x >= 3 ? 50 : x) + (last ? 0 : 0); };
+  const pool = [];
+  if (G.slots[axK]) return null;
+  for (const i of mine) {
+    const mv = G.dice[seat][i].v; let best;
+    if (other) best = score(a + (seat === 0 ? other.v - mv : mv - other.v));
+    else { best = 99; for (const j of FA.unusedDice(G, o)) { const ov = G.dice[o][j].v; best = Math.min(best, score(a + (seat === 0 ? ov - mv : mv - ov))); } }
+    pool.push({ i, best, v: mv });
+  }
+  pool.sort((x, y) => x.best - y.best || Math.abs(x.v - 3.5) - Math.abs(y.v - 3.5));
+  let pick = pool[0]; if (level === 'easy' && !last && pool.length > 1 && rand() < 0.1) { const safe = pool.filter(x => x.best <= 1); if (safe.length > 1) pick = safe[1 + Math.floor(rand() * (safe.length - 1))]; }
+  return { t: 'place', d: pick.i, to: axK, c: 0 };
+}
 // ---------- the move chooser ----------
 function move(G0, seat, level, opt) {
   level = level || 'normal'; opt = opt || {}; const rand = opt.rand || Math.random;
+  if (G0.lad === 1 && G0.phase === 'place' && !G0.pend) { const m = ladAxis(FA.stripView(G0, seat), seat, level, rand); if (m) return m; }
   const G = FA.stripView(G0, seat); G.nolog = true;               // fairness: only what this seat may know
   const all = FA.validMoves(G, seat); if (!all.length) return null;
   if (G.phase === 'brief') {
@@ -296,7 +336,12 @@ function move(G0, seat, level, opt) {
   }
   const cand = distinct(all.filter(m => m.t !== 'timeout'), G, seat);
   const base = cost(G, seat);
-  const scored = cand.filter(m => m.t === 'place' || m.t === 'toss').map(m => ({ m, s: base - cost(afterMove(G, m, seat), seat) }));
+  let cand2 = cand;
+  if (G.open) {   // learning chapters: never spend the last dice on extras while the Axis or Engines space of this seat is still empty
+    const needN = (G.slots['ax' + seat] ? 0 : 1) + (G.keys.includes('en0') && !G.slots['en' + seat] ? 1 : 0), un = FA.unusedDice(G, seat).length;
+    if (needN && un <= needN) { const keep = cand.filter(m => m.t !== 'place' || m.d === 'p' || /^(ax|en)/.test(m.to)); if (keep.length) cand2 = keep; }
+  }
+  const scored = cand2.filter(m => m.t === 'place' || m.t === 'toss').map(m => ({ m, s: base - cost(afterMove(G, m, seat), seat) }));
   scored.sort((a, b) => b.s - a.s);
   if (level !== 'easy' || rand() < 0.6) { const free = freeAction(G, seat, cand, base); if (free) return free; }
   if (opt.eps && rand() < opt.eps && scored.length > 1) return scored[Math.min(scored.length - 1, 1 + Math.floor(rand() * 2))].m;   // exploration for training data
@@ -307,7 +352,7 @@ function move(G0, seat, level, opt) {
     return pool[0].m;
   }
   const mcp = level === 'hard' ? AI.HMC : AI.NMC;
-  if ((level === 'hard' || level === 'normal') && scored.length > 1 && !opt.noMC && mcp.samples > 0) return monteCarlo(G, seat, scored, rand, Object.assign(level === 'hard' ? { top: AI.HMC.top, samples: AI.HMC.samples, ms: AI.HMC.ms } : { top: AI.NMC.top, samples: AI.NMC.samples, ms: AI.NMC.ms }, opt));
+  if ((level === 'hard' || level === 'normal') && scored.length > 1 && !opt.noMC && !G.open && mcp.samples > 0) return monteCarlo(G, seat, scored, rand, Object.assign(level === 'hard' ? { top: AI.HMC.top, samples: AI.HMC.samples, ms: AI.HMC.ms } : { top: AI.NMC.top, samples: AI.NMC.samples, ms: AI.NMC.ms }, opt));
   return scored[0].m;
 }
 function freeAction(G, seat, cand, base) {

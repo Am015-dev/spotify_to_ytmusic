@@ -1,7 +1,7 @@
 # Help kit rollout (6 Oct 2026)
 
 Pilot: Thornbound (live). Round 1 started 6 Oct 23:13 UTC as cloud sessions: doorkick-dungeon, hollowbough, final-approach, shipwreck-isle.
-Round 1 DONE (all 4 live, screenshots checked 7 Oct). Round 2 STARTED 7 Oct 04:19 UTC: sands-of-qamar, rampart-and-vine, kaiten-kitchen, crown-city-smash. Round 3: nebula-aces, short-fuse, lantern-dive, tidewake. Round 4: sunglaze, cauldron-fair.
+Round 1 DONE. Round 2 DONE (checked 7 Oct 13:40). Round 3 STARTED 7 Oct 13:42 UTC as cloud sessions. Round 2 was: sands-of-qamar, rampart-and-vine, kaiten-kitchen, crown-city-smash. Round 3: nebula-aces, short-fuse, lantern-dive, tidewake. Round 4: sunglaze, cauldron-fair.
 One Sonnet cloud session per game, max 4 at a time. Prompt template (replace __NAME__/__SLUG__):
 
 ```
@@ -26,3 +26,10 @@ Deploy: `python3 games-src/scripts/build-all.py --deploy __SLUG__`; commit only 
 
 Finish with a report under 120 words: phases/steps/rules counts, what suggest() uses, checks, deployed yes/no, commit hash, screenshot paths.
 ```
+
+## Story tutorial (Chapter 0) rollout
+Pilot: Thornbound live 7 Oct (gx-tutor.js, GX-KIT.md section 10; 19 steps, ~5 min; first Story tap runs it, then "Start chapter 1").
+Owner evaluates Thornbound first. Then one Sonnet cloud session per game (max 4): follow GX-KIT.md section 10 and Thornbound's tutor.js/tutor-test.js:
+staged never-saved mode (fixed seed, scripted computer), steps in rule order teaching EVERY rule once, GXT.act in input handlers,
+Story routes through it on first tap, menu "Tutorial" replay, tutor-test.js (390x763, 375x553, rotation, leave/return, skip, fresh Story run).
+Final Approach: its learn-by-chapters ladder is in progress; its Chapter 0 should teach the full cockpit staged.

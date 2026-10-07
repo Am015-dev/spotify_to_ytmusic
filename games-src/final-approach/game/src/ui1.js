@@ -29,7 +29,7 @@ function h(sel, at) {
 function add(e, k) { if (k == null || k === false) return; if (Array.isArray(k)) k.forEach(x => add(e, x)); else e.appendChild(k instanceof Node ? k : document.createTextNode(String(k))); }
 const isPh = () => document.documentElement.classList.contains('ph');
 const clamp8 = t => { const w = String(t).trim().split(/\s+/); return w.length > 8 ? w.slice(0, 8).join(' ').replace(/[.,:;·]+$/, '') + '…' : String(t); };
-function toast(t) { const e = $('#toast'); if (!e) return; t = clamp8(t); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 2600); }
+function toast(t) { const e = $('#toast'); if (!e) return; t = clamp8(t); e.textContent = t; e.dataset.n = String((+e.dataset.n || 0) + 1); e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), 2600); }
 // ---------- names, wording ----------
 const SEATN = ['Pilot', 'Co-pilot'], SEATC = ['#2f6fd0', '#e8821f'];
 const SAYT = { adv0: 'Hold position this round', adv1: 'Move one space', adv2: 'Move two spaces', plane: 'Clear the traffic', level: 'Level the axis', gear: 'Landing gear next', flaps: 'Flaps next', brakes: 'Brakes soon', coffee: 'We need coffee', slow: 'Keep the speed low', fuel: 'Watch the fuel', trainee: 'Train the trainee', first: 'I would like to go first', ok: 'All good here' };

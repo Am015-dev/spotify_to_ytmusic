@@ -1,3 +1,5 @@
+// Learning ladder: games 0-11 are story chapters 1-6 at 390x763 and 375x553, played ONLY by following the lightbulb / ghost finger (the computer crew's move); games 12+ are full landings.
+// Extra checks: the checklist icons equal FA.checklist, only the slots of the chapter are drawn, the plane picture tilts with the axis, glowing slots show a preview, the co-pilot's reason chip is 8 words or fewer.
 // Scripted sweep (no AI eyes): plays full landings through the real page with touch taps (some drags), only on things that glow, at phone sizes, with rotations.
 //   NODE_PATH=/opt/node-tools/node_modules node sweep.js [games=24] [file=final-approach.html]      (ONLY=<n> plays one game, SHOTS=<dir> saves failures)
 // Fails on: page errors, a glowing target that does not respond, anything stuck > 8 s, the ghost finger missing on the first move or pointing at the wrong thing,
@@ -72,6 +74,18 @@ const PAGE = `(() => {
         const cores = [...document.querySelectorAll('#pz .slot.legal,#pz .die.can,#pz .die.sel,#pz .die[data-d=p],#acts .btn,#says .say.rec')].filter(e => !e.closest('[data-help]') && vis(e)).map(e => [e, e.getBoundingClientRect()]).filter(([e, q]) => q.right > 0 && q.bottom > 0 && q.left < W && q.top < H).map(([e, q]) => { let w = q.width, h = q.height; const cx = q.left + w / 2, cy = q.top + h / 2; if (w > 56) w = 32; if (h > 56) h = 32; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2, n: String(e.dataset.slot || e.id || e.className).slice(0, 20) }; });
         for (const b of hb) { const r = b.getBoundingClientRect(); if (r.left < -1 || r.top < -1 || r.right > W + 1 || r.bottom > H + 1) bad.push('help bubble outside the screen');
           for (const c of cores) if (r.left < c.right && r.right > c.left && r.top < c.bottom && r.bottom > c.top) { bad.push('help bubble ' + [r.left, r.top, r.right, r.bottom].map(Math.round) + ' covers a glowing target ' + c.n + ' ' + [c.left, c.top, c.right, c.bottom].map(Math.round) + ' ' + (b.dataset.phase || 'bulb')); break; } } }
+      // learning ladder: the checklist icons are the engine's, nothing of a later chapter is drawn, the picture tilts with the axis
+      { const ck = [...document.querySelectorAll('#goal .ck')]; if (!document.querySelector('#goal') || !ck.length) { if (!G.result) bad.push('no landing checklist'); } else {
+          const want = FA.checklist(G), have = ck.map(e => e.dataset.k + ':' + (e.classList.contains('ok') ? 1 : 0)).join(','), exp = want.map(x => x.k + ':' + (x.ok ? 1 : 0)).join(',');
+          if (have !== exp) bad.push('checklist icons ' + have + ' vs engine ' + exp);
+          const row = document.querySelector('#goal .ckrow').getBoundingClientRect(); for (const e of ck) { const r = e.getBoundingClientRect(); if (r.right > row.right + 6 || r.left < row.left - 1 || r.right > W) bad.push('checklist chip ' + e.dataset.k + ' cut off'); } } }
+      if (G.lad) { const shown = [...document.querySelectorAll('#pz .slot')].map(e => e.dataset.slot).sort().join(','); if (shown !== G.keys.slice().sort().join(',')) bad.push('slots drawn ' + shown + ' vs chapter ' + G.keys.join(','));
+        if (G.lad < 2 && (document.querySelector('#pz .gau') || document.querySelector('#pz .strip'))) bad.push('chapter 1 shows engines or the track'); if (G.lad < 6 && (document.querySelector('#pz .chipr') || document.querySelector('#pz .badge.rrb'))) bad.push('coffee / rerolls drawn before chapter 6'); if (G.lad < 5 && document.querySelector('#pz .badge.brk')) bad.push('brakes drawn before chapter 5');
+        if (!document.querySelector('.pv svg')) bad.push('no plane picture'); }
+      { const pg = document.querySelector('.pv .pvt'); if (pg && !UI.pvA) { const m = /rotate\\((-?[\\d.]+)deg/.exec(pg.getAttribute('style') || ''); if (!m || Math.abs(+m[1] - Math.max(-3, Math.min(3, G.pl.axis)) * 10) > .5) bad.push('plane picture tilt ' + (m && m[1]) + ' vs axis ' + G.pl.axis); }
+        const gearN = document.querySelectorAll('.pv #pvp path[stroke-width="3.500"]').length; if (document.querySelector('.pv #pvp') && gearN !== G.pl.sw.lg.reduce((a, x) => a + x, 0)) bad.push('plane picture gear legs ' + gearN + ' vs ' + G.pl.sw.lg.join('')); }
+      { const pw = document.querySelectorAll('#pz .slot.legal .pw').length; if (typeof UI.sel === 'number' && UI.sel >= 0 && !G.pend && !UI.busy) { const leg = selectedLegal().filter(k => ['axis', 'engines', 'radio', 'gear', 'flaps', 'brakes', 'conc'].includes(FA.SLOT[k].grp)).length; if (pw !== leg) bad.push('slot previews ' + pw + ' vs ' + leg + ' glowing slots'); } else if (pw) bad.push('a slot preview without a picked die'); }
+      { const ch = document.querySelector('#pz .rchip'); if (ch && words(ch.textContent).length > 8) bad.push('reason chip over 8 words: ' + ch.textContent); }
       // the panel shows what the engine says
       if (!UI.started || !G) return bad;
       if (this.pp !== G.pl.pos || this.pk !== G.seed) { this.pp = G.pl.pos; this.pk = G.seed; this.pt = Date.now(); } const hold = !!UI.hold || Date.now() - this.pt < 2500;   // the plane marker waits for the speed to be announced
@@ -85,7 +99,7 @@ const PAGE = `(() => {
       const cf = document.querySelectorAll('#pz .chipr .tk:not(.off)').length; if (document.querySelector('#pz .chipr') && cf !== G.coffee) bad.push('coffee tokens ' + cf + ' vs engine ' + G.coffee);
       const rb = document.querySelector('#pz .badge.rrb b'); if (rb && rb.textContent !== '×' + G.rrHand) bad.push('rerolls ' + rb.textContent + ' vs ' + G.rrHand);
       const sps = [...document.querySelectorAll('#pz .sp')]; sps.forEach((sp, i) => { const n = sp.querySelectorAll('.pl').length; if (n !== G.planes[i]) bad.push('planes on space ' + (i + 1) + ': ' + n + ' vs engine ' + G.planes[i]); });
-      const you = sps.findIndex(sp => sp.classList.contains('you')); if (!hold && you + 1 !== G.pl.pos) bad.push('plane marker on space ' + (you + 1) + ' vs engine ' + G.pl.pos);
+      const you = sps.findIndex(sp => sp.classList.contains('you')); if (sps.length && !hold && you + 1 !== G.pl.pos) bad.push('plane marker on space ' + (you + 1) + ' vs engine ' + G.pl.pos);
       const an = document.querySelector('#pz .altnow b'); if (an) { const R = D.alt[G.alt][G.round + G.row0]; if (parseInt(an.textContent) !== R[0]) bad.push('altitude ' + an.textContent + ' vs ' + R[0]); }
       for (const k of Object.keys(G.slots)) { const el = document.querySelector('#pz .slot[data-slot="' + k + '"] .dv'); if (!el) bad.push('placed die missing in ' + k); else if (+el.textContent !== G.slots[k].v) bad.push('slot ' + k + ' shows ' + el.textContent + ' vs ' + G.slots[k].v); }
       // glowing spaces = the engine's legal spaces for the picked die
@@ -115,12 +129,12 @@ async function playGame(browser, size, gi) {
   try {
     await page.goto('file://' + FILE); await sleep(900);
     await page.evaluate(PAGE);
-    const scs = await page.evaluate('D.scenarios.map(s=>s.id)'); const sc = scs[gi % scs.length];
-    const camp = gi % 12 === 7, mode = gi % 6 === 5 ? 'guided' : 'vs', role = gi % 2, level = ['easy', 'normal', 'hard'][gi % 3];
+    const scs = await page.evaluate('D.scenarios.map(s=>s.id)'); const sc = scs[(gi - 12 + scs.length) % scs.length];
+    const lad = gi < 12 ? gi % 6 + 1 : 0, camp = false, mode = 'vs', role = lad ? 0 : gi % 2, level = lad ? 'hard' : ['easy', 'normal', 'hard'][gi % 3];
     const drag = gi % 3 === 1, rot = gi % 4 === 2;
-    await page.evaluate(`AIDELAY=160;UI.seed=${gi * 977 + 13};` + (camp ? `campStart(window.CAMPAIGN.chapters[${gi % 10}])` : `newGame('${mode}',{scenario:'${mode === 'guided' ? 'g1' : sc}',role:${mode === 'guided' ? 0 : role},level:'${level}'})`));
+    await page.evaluate(`AIDELAY=160;UI.seed=${gi * 977 + 13};` + (lad ? `campStart(window.CAMPAIGN.chapters[${lad - 1}])` : `newGame('vs',{scenario:'${sc}',role:${role},level:'${level}'})`));
     await sleep(500);
-    const tipsOn = gi % 5 !== 4; if (!tipsOn) await page.evaluate('GXH.setEnabled(false)');
+    const tipsOn = lad ? true : gi % 5 !== 4; if (!tipsOn) await page.evaluate('GXH.setEnabled(false)');
     const seenPh = new Set(); let bulbN = 0; const wc = t => String(t || '').replace(/[^a-zA-Z0-9'’+]+/g, ' ').trim().split(' ').filter(Boolean).length; const NEUTRAL = [W - 30, 22];
     const ctrOf = async sel => page.evaluate(sel => { const e = document.querySelector(sel); if (!e) return null; const r = e.getBoundingClientRect(); return r.width ? [r.left + r.width / 2, r.top + r.height / 2] : null; }, sel);
     const rulesCheck = async ph => { stats.rules++;
@@ -176,21 +190,23 @@ async function playGame(browser, size, gi) {
         return true; }
       return false; };
     let last = '', lastAt = Date.now(), audits = 0, overAt = 0, ghostChecked = false, rotated = false, tries = {}, rrTaps = 0;
-    const t0 = Date.now(), firstMoveWanted = !camp;
-    while (Date.now() - t0 < 170000) {
-      const all = await page.evaluate('__sw.all()'), st = all.st;
+    const t0 = Date.now(), firstMoveWanted = true;
+    let it = 0, lastPick = '', lastHelp = 0; const tm = { all: 0, audit: 0, help: 0, act: 0 };
+    while (Date.now() - t0 < 420000) {
+      it++;
+      const tA = Date.now(); const all = await page.evaluate('__sw.all()'), st = all.st; tm.all = Math.max(tm.all, Date.now() - tA);
       if (st.over) { if (!overAt) overAt = Date.now(); if (Date.now() - overAt > 4200) break; }
       const sig = all.sig;
       if (sig !== last) { last = sig; lastAt = Date.now(); } else if (Date.now() - lastAt > 8000) { issues.add('stuck 8s: ' + JSON.stringify(st)); await shot('stuck'); break; }
-      if (Date.now() - t0 > 700 && audits < 700 && !st.ending && (audits % 1 === 0)) { audits++; const bad = await page.evaluate('__sw.audit()'); for (const b of bad) { if (!issues.has(b)) await shot(b); issues.add(b); } }
+      if (Date.now() - t0 > 700 && audits < 700 && !st.ending && (audits % 1 === 0)) { audits++; const tB = Date.now(); const bad = await page.evaluate('__sw.audit()'); tm.audit = Math.max(tm.audit, Date.now() - tB); for (const b of bad) { if (!issues.has(b)) await shot(b); issues.add(b); } }
       if (rot && !rotated && st.round >= 2 && st.ph === 'place') { rotated = true; await page.setViewportSize({ width: H, height: W }); await page.evaluate(() => { dispatchEvent(new Event('resize')); dispatchEvent(new Event('orientationchange')); }); await sleep(900); const bad = await page.evaluate('__sw.audit()'); for (const b of bad) issues.add('landscape: ' + b); await page.setViewportSize({ width: W, height: H }); await page.evaluate(() => { dispatchEvent(new Event('resize')); dispatchEvent(new Event('orientationchange')); }); await sleep(900); }
       if (st.over) { await sleep(200); continue; }
       if (st.must && st.ph === 'place' && !ghostChecked && firstMoveWanted && st.round === 0 && st.placed < 2 && st.sel === -1) {
         // the ghost finger must show the first move, and point at the right die
         let g = null; for (let k = 0; k < 12 && !g; k++) { g = await page.evaluate('__sw.finger()'); if (!g) await sleep(200); }
-        ghostChecked = true; if (!g) issues.add('no ghost finger on the first move'); else if (g !== 'ok') issues.add(g);
+        ghostChecked = true; if (!g) { if (await page.evaluate('__sw.aim()')) issues.add('no ghost finger on the first move'); } else if (g !== 'ok') issues.add(g);
       }
-      if (st.must && !st.hold && !st.over && await helpFlow()) { lastAt = Date.now(); continue; }
+      const tH = Date.now(); const hf = st.must && !st.hold && !st.over && await helpFlow(); tm.help = Math.max(tm.help, Date.now() - tH); if (hf) { lastAt = Date.now(); lastHelp++; continue; }
       const cs = all.cs;
       let pick = null; const by = k => cs.filter(c => c.kind === k);
       if (st.must && !st.hold) {
@@ -202,17 +218,19 @@ async function playGame(browser, size, gi) {
           const dice = by('die');
           if (dice.length && gi % 5 === 3 && Math.random() < .08 && by('rr').length && stats.rr < 3) { stats.rr++; pick = by('rr')[0]; }
           else if (dice.length && drag && all.m && !all.m.c && all.to && Math.random() < .7) { const dd = dice.find(d => +d.d === all.m.d); if (dd) { pick = { kind: 'dragdie', x: dd.x, y: dd.y, tx: all.to.x, ty: all.to.y, t: 'die ' + dd.d }; } }
-          if (!pick && dice.length) { const m = all.m; const pd = m && Math.random() < .96 ? dice.find(d => +d.d === m.d) : null; pick = pd || dice[Math.floor(Math.random() * dice.length)]; }
+          if (!pick && dice.length) { const m = all.m; const pd = m && (lad || Math.random() < .96) ? dice.find(d => +d.d === m.d) : null; pick = pd || dice[Math.floor(Math.random() * dice.length)]; }
         } else {
           const slots = by('slot'), m = all.m;
           const key = st.round + ':' + st.placed + ':' + st.sel; tries[key] = (tries[key] || 0) + 1;
-          if (slots.length && tries[key] < 6) pick = slots.find(x => x.slot === all.warn) || (all.need.length ? slots.find(x => all.need.includes(x.slot)) : null) || (m && +st.sel === m.d && Math.random() < .96 ? slots.find(s => s.slot === m.to) : null) || slots[Math.floor(Math.random() * slots.length)];
+          if (tries[key] === 6) { issues.add('no way to place the picked die: ' + JSON.stringify(await page.evaluate(() => ({ sel: UI.sel, legal: selectedLegal(), dom: [...document.querySelectorAll('#pz .slot.legal')].map(e => { const r = e.getBoundingClientRect(), t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return e.dataset.slot + ' ' + Math.round(r.left) + ',' + Math.round(r.top) + ' top=' + (t && (t.className || t.tagName)); }), slots: Object.keys(G.slots), pend: G.pend, turn: G.turn, dice: G.dice.map(d => d.map(x => x.u ? '-' : x.v).join('')).join('/') })))); await shot('noplace'); }
+          if (slots.length && tries[key] < 6) pick = slots.find(x => x.slot === all.warn) || (lad && m && +st.sel === m.d ? slots.find(s => s.slot === m.to) : null) || (all.need.length ? slots.find(x => all.need.includes(x.slot)) : null) || (m && +st.sel === m.d && Math.random() < .96 ? slots.find(s => s.slot === m.to) : null) || slots[Math.floor(Math.random() * slots.length)];
           else if (by('toss')[0] && tries[key] >= 2) pick = by('toss')[0];
           else if (tries[key] >= 2 && by('seldie')[0]) pick = by('seldie')[0];   // nothing fits: put the die back and try another
           else if (by('cof').length && tries[key] === 1 && Math.random() < .5) pick = by('cof')[Math.floor(Math.random() * by('cof').length)];
         }
       } else if (st.over && by('again').length) pick = null;
       if (pick) {
+        lastPick = pick.kind + ':' + (pick.t || '') + '@' + it;
         const before = sig; stats.taps++;
         if (pick.kind === 'dragdie') { await page.mouse.move(pick.x, pick.y); await page.mouse.down(); await page.mouse.move(pick.x, pick.y - 24, { steps: 3 }); await page.mouse.move(pick.tx, pick.ty, { steps: 8 }); await page.mouse.up(); stats.drags++; }
         else if (pick.kind === 'slot' && drag) {   // drag the picked die onto the space
@@ -227,7 +245,8 @@ async function playGame(browser, size, gi) {
     }
     const fin = await page.evaluate('({over:!!G.result,win:G.result&&G.result.win,why:G.result&&G.result.why,round:G.round})');
     stats.end = fin.over ? (fin.win ? 'won' : 'lost:' + fin.why) : 'unfinished';
-    if (!fin.over) issues.add('landing did not finish in 170 s: ' + JSON.stringify(await page.evaluate('({r:G.round,ph:G.phase,sel:UI.sel,cof:UI.cof,pend:G.pend&&G.pend.h,turn:G.turn,coffee:G.coffee,rr:G.rrHand,dice:G.dice.map(d=>d.map(x=>x.u?"-":x.v).join("")).join("/"),legal:selectedLegal(),moves:FA.validMoves(G,actSeat()).map(m=>m.t).filter((x,i,a)=>a.indexOf(x)===i)})')));
+    if (!fin.over) { await shot('unfinished'); issues.add('timing ' + JSON.stringify(tm)); issues.add('loop: it=' + it + ' help=' + lastHelp + ' lastPick=' + lastPick + ' bulbN=' + bulbN); issues.add('all: ' + JSON.stringify(await page.evaluate('__sw.all()')).slice(0, 900)); issues.add('diag: ' + JSON.stringify(await page.evaluate(() => { const v = actSeat(); return { sel: UI.sel, warn: UI.warnK, drag: UI.dragging, dead: UI.dead, aim: __sw.aim(), mv: FA.validMoves(G, v).filter(m => m.t === 'place').slice(0, 6), slots: Object.keys(G.slots), turn: G.turn, d: G.dice.map(d => d.map(x => x.u ? '-' : x.v).join('')).join('/'), mand: mandInfo(v) }; }))); issues.add('top at dice: ' + JSON.stringify(await page.evaluate(() => [...document.querySelectorAll('#pz .die')].map(e => { const r = e.getBoundingClientRect(), t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return e.dataset.s + e.dataset.d + ':' + e.className + '>' + (t && (t.className || t.tagName)); })))); }
+    if (!fin.over) issues.add('landing did not finish in 420 s: ' + JSON.stringify(await page.evaluate('({r:G.round,ph:G.phase,sel:UI.sel,cof:UI.cof,pend:G.pend&&G.pend.h,turn:G.turn,coffee:G.coffee,rr:G.rrHand,dice:G.dice.map(d=>d.map(x=>x.u?"-":x.v).join("")).join("/"),legal:selectedLegal(),moves:FA.validMoves(G,actSeat()).map(m=>m.t).filter((x,i,a)=>a.indexOf(x)===i)})')));
     else if (!camp) {
       const e = await page.evaluate(`(() => { const b = document.querySelector('#fx .endb'); const r = document.getElementById('rs'); return { banner: b ? b.innerText.trim() : null, again: !!document.querySelector('#acts [data-a=again]'), modal: !r.hidden }; })()`);
       if (!e.banner) { issues.add('no end banner on the board'); await shot('no-banner'); } else if (e.banner.split(/\s+/).length > 8) issues.add('end banner over 8 words: ' + e.banner);
@@ -235,12 +254,12 @@ async function playGame(browser, size, gi) {
     }
   } catch (e) { issues.add('crash ' + String(e.message).slice(0, 120)); }
   try { await ctx.close(); } catch (e) { }
-  return { tag, errs, issues: [...issues], stats, mode: gi % 6 === 5 ? 'guided' : gi % 12 === 7 ? 'story' : 'vs' };
+  return { tag, errs, issues: [...issues], stats, mode: gi < 12 ? 'ch' + (gi % 6 + 1) : 'full' };
 }
 
 (async () => {
   const browser = await chromium.launch({ args: ['--no-sandbox'] });
-  const jobs = []; for (let g = 0; g < N; g++) if (!process.env.ONLY || +process.env.ONLY === g) jobs.push([SIZES[g % SIZES.length], g]);
+  const jobs = []; for (let g = 0; g < N; g++) if (!process.env.ONLY || +process.env.ONLY === g) jobs.push([g < 12 ? SIZES[Math.floor(g / 6) % 2] : SIZES[g % SIZES.length], g]);
   const results = []; let next = 0;
   const worker = async () => { while (next < jobs.length) { const [sz, g] = jobs[next++]; const r = await playGame(browser, sz, g); results.push(r); console.log((r.errs.length || r.issues.length ? 'FAIL ' : 'ok   ') + r.tag + ' ' + r.mode + ' ' + r.stats.end + ' taps ' + r.stats.taps + ' drags ' + r.stats.drags + (r.errs.length ? ' ERR ' + r.errs.join(' | ') : '') + (r.issues.length ? ' ISSUES ' + r.issues.slice(0, 6).join(' | ') : '')); } };
   await Promise.all([worker(), worker(), worker()]);

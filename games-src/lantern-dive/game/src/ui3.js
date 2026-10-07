@@ -24,6 +24,7 @@ function newGame(mode, o) {
   const opt = Object.assign({}, DEF, UI.opt || {}, o);
   let np = Math.max(2, Math.min(5, opt.np | 0 || 4)), names = [], ai = [];
   if (mode === 'guided') { np = 3; opt.kind = 'log'; opt.mission = 1; }
+  if (mode === 'guided') { try { hlpInit(); GXH.setEnabled(true); GXH.reset(); } catch (e) { } }   // the training dive shows every coach bubble
   if (mode === 'net') { np = opt.np; names = opt.players.map(p => p.name); ai = opt.players.map(p => p.ai || null); }
   const chefs = mode === 'net' ? null : chefsFor(np, opt);
   if (mode !== 'net') for (let i = 0; i < np; i++) {
@@ -153,18 +154,6 @@ function tapPing(id) {
   if (!canAct()) return; const m = myMoves().find(x => x.t === 'ping' && x.c === id);
   if (!m) { snd('error'); toast('That card cannot be shown.'); return; }
   UI.pxPing = viewSeat(); doMove(m);
-}
-function doHint() {
-  const v = viewSeat(); if (!canAct() || !iMustAct()) return;
-  let m; try { m = LD.AI.choose(G, v, 'normal'); } catch (e) { return; } if (!m) return;
-  // guided first dive: the lesson comes first. While fewer than 3 tricks are played, suggest a colour card so the trick rules can be seen.
-  if (UI.mode === 'guided' && G.phase === 'play' && G.tricks.length < 3 && m.t === 'play' && suitOf(m.c) === 4) {
-    const col = myMoves().filter(x => x.t === 'play' && suitOf(x.c) < 4).sort((a, b) => valOf(a.c) - valOf(b.c));
-    if (col.length) { UI.hint = { c: col[0].c, why: 'Lesson first: play a low colour card and watch how the trick is won. Keep your Lanterns for your job.' }; UI.sel = col[0].c; render(); return; }
-  }
-  if (m.t === 'play') { let why = ''; try { why = LD.AI.why(G, v, m.c); } catch (e) { } UI.hint = { c: m.c, why }; UI.sel = m.c; render(); }
-  else if (m.t === 'take') { UI.job = m.i; render(); toast('Try: ' + jobShort(m.i)); }
-  else if (m.t === 'ping') { toast('Try signalling ' + cname(m.c)); }
 }
 // ---------- hot-seat ----------
 function hotNext() {

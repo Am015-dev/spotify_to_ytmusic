@@ -48,12 +48,27 @@ function slotKeys(mods) {
   return o;
 }
 
+// ---------- the learning ladder (story chapters 1-6): simplified variants that bring ONE system in at a time ----------
+// G.lad = 0 (the real game) or 1..6. Chapter 1 axis only; 2 + engines and the approach track; 3 + radio and planes; 4 + landing gear and flaps; 5 + brakes;
+// 6 + coffee and rerolls = the real game at Port Alder. Slots that are not in play are not in G.keys (the screen does not draw them). The dice are open (both hands face up).
+const LADND = [4, 4, 4, 4, 4, 4, 4];   // dice per seat in a round (the others stay in the box)
+const LADNEW = [0, 'axis', 'engines', 'radio', 'gear', 'brakes', 'conc'];   // the system each chapter brings in
+const LADCHK = [null, ['axis'], ['axis', 'air', 'speed'], ['axis', 'air', 'speed', 'planes'], ['axis', 'air', 'speed', 'planes', 'gear', 'flaps'], ['axis', 'air', 'speed', 'planes', 'gear', 'flaps'], null];
+function ladKeys(lad, mods) {
+  if (lad >= 6) return slotKeys(mods);
+  const o = ['ax0', 'ax1'];
+  if (lad >= 2) o.push('en0', 'en1');
+  if (lad >= 3) o.push('ra0', 'ra1', 'ra2');
+  if (lad >= 4) o.push('lg0', 'lg1', 'lg2', 'fl0', 'fl1', 'fl2', 'fl3');
+  if (lad >= 5) o.push('br0', 'br1', 'br2');
+  return o;
+}
 // ---------- scenario helpers ----------
-const scen = id => D.scenarios.find(s => s.id === id);
+const scen = id => D.scenarios.find(s => s.id === id) || (D.tutorials || []).find(s => s.id === id);
 const track = G => D.tracks[G.tk];
 const altRow = G => D.alt[G.alt][G.round + G.row0];
 const isFinal = G => G.round >= D.rounds - 1 - G.row0;
-const brakeVal = G => G.mods.ice ? [0].concat(D.iceBrakes)[G.pl.ice] : (G.pl.sw.br[2] ? 6 : G.pl.sw.br[1] ? 4 : G.pl.sw.br[0] ? 2 : 0);
+const brakeVal = G => G.autoBrake ? G.autoBrake : G.mods.ice ? [0].concat(D.iceBrakes)[G.pl.ice] : (G.pl.sw.br[2] ? 6 : G.pl.sw.br[1] ? 4 : G.pl.sw.br[0] ? 2 : 0);
 const windMod = G => G.mods.wind ? D.windMod[G.pl.wind] : 0;
 const planesOnTrack = G => { let n = 0; for (const x of G.planes) n += x; return n; };
 const unusedDice = (G, s) => { const o = []; for (let i = 0; i < 4; i++) if (!G.dice[s][i].u) o.push(i); return o; };
@@ -66,18 +81,21 @@ const rrReserve = G => D.rerollTotal - G.rrHand - rrOnTrack(G);
 function cleanAbil(a, sc) { const out = []; if (Array.isArray(a)) for (const id of a) if (typeof id === 'string' && Object.prototype.hasOwnProperty.call(D.abilities, id) && !out.includes(id)) out.push(id); return out.slice(0, sc.ab || 0); }
 function newGame(o) {
   o = o || {};
-  const sc = scen(o.scenario || 'g1'); if (!sc) throw new Error('unknown scenario ' + o.scenario);
+  const lad = (o.lad | 0) >= 1 && (o.lad | 0) <= 6 ? (o.lad | 0) : 0;
+  const sc = scen(lad && lad < 6 ? 't' + lad : lad === 6 ? 'g1' : (o.scenario || 'g1')); if (!sc) throw new Error('unknown scenario ' + o.scenario);
   const seed = (o.seed === undefined ? Date.now() : o.seed) | 0;
   const mods = { kero: sc.mods.includes('kero'), leak: sc.mods.includes('leak'), wind: sc.mods.includes('wind'), intern: sc.mods.includes('intern'), ice: sc.mods.includes('ice'), real: sc.mods.includes('real') };
   mods.fuel = mods.kero || mods.leak;
   const tr = D.tracks[sc.trk];
   mods.tabs = tr.sp.some(s => s[2]); mods.traffic = tr.sp.some(s => s[1] > 0);
-  const G = { v: 1, seed, rng: seed, sid: sc.id, tk: sc.trk, alt: sc.alt, row0: 0, mods, abil: cleanAbil(o.abil, sc), names: (o.names || ['Captain Marlow', 'First Officer Okoro']).slice(0, 2), ai: o.ai ? o.ai.slice(0, 2) : [null, null],
+  const G = { v: 1, seed, rng: seed, sid: sc.id, tk: sc.trk, alt: sc.alt, row0: 0, mods, abil: lad ? [] : cleanAbil(o.abil, sc), lad, open: !!lad, nd: lad ? LADND[lad] : 4, autoBrake: lad >= 2 && lad <= 4 ? 6 : 0, names: (o.names || ['Captain Marlow', 'First Officer Okoro']).slice(0, 2), ai: o.ai ? o.ai.slice(0, 2) : [null, null],
     round: 0, phase: 'brief', first: 0, turn: 0, ready: [false, false], say: [[], []],
     pl: { axis: 0, aeroB: 4, aeroO: 8, pos: 1, kero: D.keroStart, wind: D.windStart, ice: 0, sw: { lg: [0, 0, 0], fl: [0, 0, 0, 0], br: [0, 0, 0] } },
     planes: tr.sp.map(s => s[0]), coffee: 0, rrHand: 0, rrTaken: -1,
-    dice: [[], []], slots: {}, keys: slotKeys(mods), pend: null, fl: { antic: false, sync: false, wt: false, keroUsed: false }, adaptUsed: [false, false],
+    dice: [[], []], slots: {}, keys: lad ? ladKeys(lad, mods) : slotKeys(mods), pend: null, fl: { antic: false, sync: false, wt: false, keroUsed: false }, adaptUsed: [false, false],
     intern: [], internUsed: 0, speed: -1, landSpeed: -1, result: null, log: [], logN: 0, events: [], evN: 0, used: {}, nolog: false };
+  if (lad === 5) G.pl.sw.br[0] = 1;
+  if (lad === 6) G.coffee = 2;   // the check ride starts with two coffee tokens so the new idea can be tried at once   // chapter 5 starts with the brakes at 2: you bring them up to 4 and 6 for a faster landing
   for (let s = 0; s < 2; s++) for (let i = 0; i < 4; i++) G.dice[s].push({ v: 1, u: true });
   if (mods.intern) G.intern = shuffle(G, [1, 2, 3, 4, 5, 6]);
   lg(G, 'Briefing for ' + D.airports[sc.ap].name + ': ' + sc.title + '.');
@@ -105,16 +123,28 @@ function startRound(G) {
       use(G, 'trafficRoll');
     }
   }
+  if (G.lad) { G.ready = [true, true]; rollDice(G); }   // ladder chapters: no briefing, the dice are rolled at once
 }
 function rollDice(G) {
-  for (let s = 0; s < 2; s++) for (let i = 0; i < 4; i++) { const d = G.dice[s][i]; d.v = d6(G); d.u = false; }
+  for (let s = 0; s < 2; s++) for (let i = 0; i < 4; i++) { const d = G.dice[s][i]; d.v = d6(G); d.u = i >= (G.nd || 4); }
   // guided flights use made-up hands so each lesson has a die to teach with: G.script[round] = [[pilot x4], [co-pilot x4]]
   if (G.script && G.script[G.round]) for (let s = 0; s < 2; s++) for (let i = 0; i < 4; i++) G.dice[s][i].v = G.script[G.round][s][i];
-  G.phase = 'place'; G.turn = G.first;
+  G.phase = 'place'; G.turn = G.first; ladSweep(G);
   ev(G, { t: 'roll' }); lg(G, 'Both crew roll their dice behind the screens. Silence in the cockpit.');
+}
+// ladder chapters 1-5: a die with nowhere to go is set aside by itself (no "put it aside" step while you are learning)
+function ladSweep(G) {
+  if (!G.lad || G.lad >= 6) return;
+  for (let s = 0; s < 2; s++) {
+    const un = unusedDice(G, s); if (!un.length) continue;
+    if (un.some(i => G.keys.some(k => fits(G, s, k, G.dice[s][i].v, 'die')))) continue;
+    for (const i of un) { G.dice[s][i].u = true; ev(G, { t: 'toss', seat: s, d: i, auto: true }); use(G, 'spare'); }
+    lg(G, (s === 0 ? 'Pilot' : 'Co-pilot') + ' keeps the spare dice in the box.');
+  }
 }
 function nextTurn(G, from) {
   if (G.pend || G.result) return;
+  ladSweep(G);
   const a = unusedDice(G, 0).length, b = unusedDice(G, 1).length;
   if (!a && !b) { endRound(G); return; }
   const other = 1 - from;
@@ -129,13 +159,15 @@ function landingChecks(G) {
   const c = { planes: planesOnTrack(G) === 0, gear: G.pl.sw.lg.every(x => x), flaps: G.pl.sw.fl.every(x => x), axis: G.pl.axis === 0, speed: G.landSpeed >= 0 && G.landSpeed <= brakeVal(G) && brakeVal(G) >= 2 };
   if (G.mods.intern) c.intern = G.intern.length === 0;
   if (G.mods.ice) c.ice = G.pl.ice === 4;
+  if (G.lad && LADCHK[G.lad]) for (const k of Object.keys(c)) if (!LADCHK[G.lad].includes(k)) delete c[k];
   return c;
 }
 function endRound(G) {
   G.pend = null;
-  const miss = ['ax0', 'ax1', 'en0', 'en1'].filter(k => !G.slots[k]);
+  const miss = ['ax0', 'ax1', 'en0', 'en1'].filter(k => G.keys.includes(k) && !G.slots[k]);
   if (miss.length) { lose(G, 'mandatory', 'Missing at the end of the round: ' + miss.map(k => 'the ' + (SLOT[k].s ? 'Co-pilot' : 'Pilot') + "'s " + (SLOT[k].grp === 'axis' ? 'axis' : 'engine') + ' die').join(' and ') + '.'); G.result.miss = miss; return; }
   if (G.mods.kero && !G.fl.keroUsed) { G.pl.kero -= D.keroSkip; ev(G, { t: 'kero', n: G.pl.kero, d: -D.keroSkip }); lg(G, 'Nobody used the fuel space: lose ' + D.keroSkip + ' fuel (' + G.pl.kero + ' left).'); if (G.pl.kero < 0) { lose(G, 'fuel', 'The fuel ran out.'); return; } }
+  if (G.pl.axis === 0) use(G, 'levelRounds');
   ev(G, { t: 'endround' });
   if (isFinal(G)) {
     const c = landingChecks(G), ok = Object.values(c).every(Boolean);
@@ -144,7 +176,7 @@ function endRound(G) {
     return;
   }
   G.round++;
-  if (isFinal(G) && G.pl.pos < track(G).sp.length) { lose(G, 'short', 'The plane reached the last altitude before reaching the airport.'); return; }
+  if (isFinal(G) && G.pl.pos < track(G).sp.length && G.keys.includes('en0')) { lose(G, 'short', 'The plane reached the last altitude before reaching the airport.'); return; }
   startRound(G);
 }
 
@@ -175,6 +207,7 @@ function afterAxis(G) {
   ev(G, { t: 'axis', from, to: G.pl.axis, p: a.v, c: b.v });
   lg(G, 'Axis: ' + (diff === 0 ? 'level dice, no change' : 'tilts ' + Math.abs(diff) + ' toward the ' + (diff < 0 ? 'Pilot' : 'Co-pilot')) + ' (now ' + (G.pl.axis === 0 ? 'level' : Math.abs(G.pl.axis) + ' ' + (G.pl.axis < 0 ? 'left' : 'right')) + ').');
   if (diff !== 0) use(G, 'axisMove');
+  G.used.maxTilt = Math.max(G.used.maxTilt || 0, Math.abs(G.pl.axis));
   if (diff === 0 && G.abil.includes('control') && G.coffee < D.coffeeMax && coffeeReserve(G) > 0) { G.coffee++; ev(G, { t: 'coffee', n: G.coffee, why: 'control' }); lg(G, 'Steady Hands: equal axis dice earn a coffee.'); use(G, 'abil_control'); }
   if (Math.abs(G.pl.axis) >= 3) { lose(G, 'spin', 'The plane tilted too far and went into a spin.'); return false; }
   if (G.mods.wind) { const w0 = G.pl.wind; G.pl.wind = ((G.pl.wind + G.pl.axis) % 20 + 20) % 20; ev(G, { t: 'wind', from: w0, to: G.pl.wind, mod: windMod(G) }); lg(G, 'Wind dial turns to ' + (windMod(G) >= 0 ? '+' : '') + windMod(G) + '.'); }
@@ -364,7 +397,7 @@ function same(a, b) {
 // What a seat may know: its own dice values, everything public (slots, tracks, tokens, who has dice left, who has chosen a reroll).
 function stripView(G, seat) {
   const V = clone(G); V.rng = 0; V.seed = 0; delete V.script;
-  for (let s = 0; s < 2; s++) if (s !== seat) { for (const d of V.dice[s]) d.v = 0; }
+  if (!G.open) for (let s = 0; s < 2; s++) if (s !== seat) { for (const d of V.dice[s]) d.v = 0; }
   if (V.pend && V.pend.h === 'rr') V.pend.d.m = V.pend.d.m.map((m, s) => s === seat ? m : (m ? [] : null));
   if (V.pend && V.pend.h === 'wt' && V.pend.d.a !== seat) V.pend.d.ai = -1;
   return V;
@@ -418,7 +451,22 @@ function toText(G, seat) {
   return L.join('\n');
 }
 
-Object.assign(FA, { cleanAbil, newGame, validMoves, performMove, sideToAct, pending: pendingSeats, stripView, checkInvariants, toText, clone, cloneLite, rnd, d6, shuffle, SLOT, SAYS, slotKeys, fits, scen, track, altRow, isFinal, brakeVal, windMod, planesOnTrack, unusedDice, rrReserve, landingChecks, niceSlot,
+// ---------- the landing checklist: the conditions that apply now, each true (met right now) or false. One source for the screen, the tests and the picture ----------
+function checklist(G) {
+  const size = track(G).sp.length, br = brakeVal(G), fin = isFinal(G), out = [], eng = G.keys.includes('en0');
+  out.push({ k: 'axis', ok: G.pl.axis === 0, n: G.pl.axis });
+  if (eng) out.push({ k: 'air', ok: G.pl.pos >= size, n: size - G.pl.pos });
+  if (eng) out.push({ k: 'speed', ok: br >= 2 && !(fin && G.landSpeed >= 0 && G.landSpeed > br), n: br });
+  out.push({ k: 'planes', ok: planesOnTrack(G) === 0, n: planesOnTrack(G) });
+  out.push({ k: 'gear', ok: G.pl.sw.lg.every(x => x), n: G.pl.sw.lg.reduce((a, x) => a + x, 0) });
+  out.push({ k: 'flaps', ok: G.pl.sw.fl.every(x => x), n: G.pl.sw.fl.reduce((a, x) => a + x, 0) });
+  if (G.mods.intern) out.push({ k: 'intern', ok: G.intern.length === 0, n: 6 - G.intern.length });
+  if (G.mods.ice) out.push({ k: 'ice', ok: G.pl.ice === 4, n: G.pl.ice });
+  const allow = G.lad && LADCHK[G.lad];
+  return allow ? out.filter(x => allow.includes(x.k)) : out;
+}
+
+Object.assign(FA, { checklist, LADND, LADNEW, LADCHK, ladKeys, cleanAbil, newGame, validMoves, performMove, sideToAct, pending: pendingSeats, stripView, checkInvariants, toText, clone, cloneLite, rnd, d6, shuffle, SLOT, SAYS, slotKeys, fits, scen, track, altRow, isFinal, brakeVal, windMod, planesOnTrack, unusedDice, rrReserve, landingChecks, niceSlot,
   _: { startRound, rollDice, endRound, lose, advance, applyEffect, afterAxis, afterEngines, nextTurn, removePlane, ALLKEYS } });
 if (typeof module === 'object' && module.exports) module.exports = FA;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

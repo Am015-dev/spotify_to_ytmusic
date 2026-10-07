@@ -1,5 +1,32 @@
 # Final Approach: story campaign "The Ninth Name"
 
+## Flight school (chapters 1-6): one system at a time
+Owner verdict, three times: too many systems at once. Story chapters 1-6 are now the tutorial, built on a **learning ladder** (`G.lad = 1..6` in
+`game/src/engine.js`; chapter `setup.lad` in `campaign.json`). A new player's first Play, and the title's "Flight school", start chapter 1.
+These are simplified variants; the real game (free Play, chapters 7 and later) is unchanged. Differences from the real rules, all only while `G.lad` is set:
+- **No briefing, open dice.** The dice are rolled at once each round and both hands are face up (the computer sees yours too). No phrases.
+- **Slots not in play are not drawn** (not in `G.keys`). A die with nowhere to go is set aside automatically (no "put it aside" step) in chapters 1-5.
+- **No reroll tokens** in chapters 1-5 (altitude track `tu`); coffee and rerolls arrive in chapter 6.
+- Tutorial airport strips (`tut-a`, `tut-b`) replace the real strips in chapters 1-5; chapter 6 is the real Port Alder strip (g1).
+
+| Ch | Adds | Slots | Goal / simplification |
+|---|---|---|---|
+| 1 Keep it level | axis | ax0, ax1 | Land with the plane level. No engines, no track: the runway just grows round by round. |
+| 2 Speed and the runway | engines, approach track | + en0, en1 | Reach the airport (5 empty spaces), then hold; speed at landing within automatic brakes of 6. Empty track: planes come with the radio in chapter 3. |
+| 3 Clear the way | radio, planes | + ra0-ra2 | Two planes on a 6-space track; collisions end the flight. |
+| 4 Wheels and flaps | gear, flaps | + lg0-2, fl0-3 | All gear and flaps down to land. Brakes still automatic at 6. |
+| 5 Brakes | brakes | + br0-2 | Real brakes 2/4/6 in order, but the brakes start at 2 (first brake already set) so a newcomer can finish. |
+| 6 The check ride (boss, Chief Pilot Voss) | coffee, rerolls | all (real Port Alder g1) | The real rules at Port Alder, still with open dice and no briefing. |
+
+Each new system arrives with one coach bubble (`sys-axis`, `sys-engines`, `sys-radio`, `sys-gear`, `sys-brakes`, `sys-conc` in `ui10.js`) and its own 2-3 rules cards.
+In every chapter the board shows the same two things: the **plane picture** (rear view: tilt = axis, gear and flaps drawn when set, runway grows as the airport
+nears, planes ahead on the approach, speed against brakes) and the **landing checklist** (one icon per condition that applies, green tick or red cross; `FA.checklist`).
+Win rates, two computer crews, 400 games (node game/lad-sim.js): see FIX notes in the final report; the co-pilot is `hard` (his sharpest) in all six.
+
+The chapter list is now 15 (the shared kit suggests 9-10; `GXC.validate` only flags that count, the map handles 15): c1-c6 flight school (act 1), c7-c9 the old act 1
+(Foxmere g2, Orrin g4, Seabright g3 boss), c10-c15 the old acts 2 and 3 (Bowlrock c12 is now an act-3 boss with the `tilted-start` twist).
+
+
 Shelf id `approach` (games/index.html shelf entry; the in-game GX key is `fa`), so `campaign.json` uses `"game": "approach"`.
 
 ## Story
