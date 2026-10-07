@@ -178,6 +178,7 @@ async function helpFlow(p, tag, st) {
     await p.evaluate(() => GXH.hide());
     const after = await p.evaluate(AFTER);
     if (after.g) await fail(p, tag, 'help bulb', 'help still on screen after dismissing (' + hs.ph + ')');
+    if (hs.ph !== 'watch' && hs.ph !== 'intro' && after.sig !== pre.sig && st.humanTurn) console.log('DBGLOG', JSON.stringify(await p.evaluate(() => window.__log)));
     if (hs.ph !== 'watch' && hs.ph !== 'intro' && after.sig !== pre.sig && st.humanTurn) await fail(p, tag, 'help bulb', 'tapping the bulb changed the game (' + pre.sig + ' -> ' + after.sig + ') last neutral tap on ' + p._nt + ' last tap ' + p._lt + ' LOG ' + JSON.stringify(await p.evaluate(() => window.__log.slice(-8))));
     return true;
   }
