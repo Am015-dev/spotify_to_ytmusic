@@ -376,11 +376,11 @@ function GPK_html(){const L=carStat().lvl,n=perkSlots(),e=perkEq0(),P=id=>PERKS.
  h+='</div>';if(GPK_.pk!=null&&GPK_.pk<n){h+=`<div class="gbRow">`;for(const p of[...PERKS].sort((a,b)=>perkUnlocked(b)-perkUnlocked(a))){const ok=perkUnlocked(p),on=e.includes(p.id);h+=`<button class="gbP ${on?'on':''}" ${ok?'':'disabled'} data-gpk="${p.id}"><b>${ok?'':'🔒 '}${p.icon} ${p.name}</b><small>${ok?p.d:perkReq(p)}</small></button>`}h+='</div>'}return h}
 GAR_tab=(f=>function(){f();const B=$('#gbBody');
  B.querySelectorAll('[data-gset]').forEach(b=>{const s=b.querySelector('small'),g=GPK_GRP[b.dataset.gset];if(s&&g)s.textContent=g+' · '+s.textContent});
- const d=document.createElement('div');d.innerHTML=GPK_html();const gs=B.querySelector('.garSets');if(gs)gs.after(d);else B.appendChild(d);
+ const d=document.createElement('div');d.className='gpkTop';d.innerHTML=GPK_html();const inf=B.querySelector('.gbInfo');if(inf)inf.after(d);else B.prepend(d);
  const re=()=>{const sc=B.scrollTop;gbRender();$('#gbBody').scrollTop=sc};
  d.querySelectorAll('[data-gslot]').forEach(b=>b.onclick=()=>{const i=+b.dataset.gslot;GPK_.pk=GPK_.pk===i?null:i;try{AU.sfx('pick')}catch(e){}re();const l=$('#gbBody [data-gpk]');if(l)l.parentNode.scrollIntoView({block:'nearest'})});
  d.querySelectorAll('[data-gpk]').forEach(b=>b.onclick=()=>{const id=b.dataset.gpk;if(perkEq0().includes(id))store.set('mho_perks',perkEq0().filter(x=>x!==id));else GPK_eq(GPK_.pk,id);GPK_.pk=null;try{AU.sfx('brick')}catch(e){}re();const l=$('#gbBody [data-gslot]');if(l)l.parentNode.scrollIntoView({block:'nearest'})})})(GAR_tab);
-{const st=document.createElement('style');st.textContent='#gbx .garSet em{font-size:12px!important;letter-spacing:.04em!important}#gbx .gpkS{min-width:150px}#gbx .gbP small,#gbx h5,#gbx .gbHint{font-size:12px!important}#gbx h5{letter-spacing:.06em!important}#gbStats div{font-size:12px!important;letter-spacing:.02em!important;grid-template-columns:84px 1fr 66px!important}';document.head.appendChild(st)}
+{const st=document.createElement('style');st.textContent='#gbx .garSet em{font-size:12px!important;letter-spacing:.04em!important}#gbx .gpkS{min-width:150px}#gbx .gpkTop .gpkS small{display:none}#gbx .gpkTop .gpkS{min-height:44px;min-width:0;flex:1 1 0}#gbx .gbP small,#gbx h5,#gbx .gbHint{font-size:12px!important}#gbx h5{letter-spacing:.06em!important}#gbStats div{font-size:12px!important;letter-spacing:.02em!important;grid-template-columns:84px 1fr 66px!important}';document.head.appendChild(st)}
 window.__gpk={html:GPK_html,eq:GPK_eq,cls:GPK_cls};
 // ---- GPF: 2K-style driver PROFILE (slice 3). Extends the pause-menu profile (71 profileOpen): driver portrait, VEHICLES collection with
 // Neat…Super Awesome rarity, owned/locked and upgrade pips, perk slots with what unlocks next, and a COLLECTION grid. Also opens from the title menu.
@@ -398,6 +398,9 @@ profileOpen=(f=>function(){f();const B=$('#pfBody');if(!B)return;
   if(h.startsWith('CAR ·'))c.innerHTML=`<h5>VEHICLES · ${GAR_SETS.filter(GAR_owned).length}/${GAR_SETS.length} OWNED</h5><div class="gpfVs">${GPF_veh()}</div><small class="pnote">Buy, drive and upgrade them in the garage (RIDES).</small>`;
   else if(h.startsWith('PERKS'))c.innerHTML=GPF_perks();
   else if(h.startsWith('COLLECTION'))c.innerHTML=`<h5>COLLECTION</h5><div class="gpfCs">${GPF_col()}</div>`}
+ // phone fold: the PERKS card (slots + Next unlock) goes to the top of its column, above VEHICLES
+ const pc=[...B.querySelectorAll('.pcard')].find(c=>((c.querySelector('h5')||{}).textContent||'').startsWith('PERKS')),vc=[...B.querySelectorAll('.pcard')].find(c=>((c.querySelector('h5')||{}).textContent||'').startsWith('VEHICLES'));
+ if(pc&&vc&&vc.parentNode&&pc.compareDocumentPosition(vc)&Node.DOCUMENT_POSITION_PRECEDING)vc.parentNode.insertBefore(pc,vc)
  const P=$('#profile');if(state!=='roam'){P.classList.add('gpfMenu')}else P.classList.remove('gpfMenu')})(profileOpen);
 {const P=$('#profile');document.body.appendChild(P);
  const st=document.createElement('style');st.textContent=`#profile{position:fixed!important;z-index:40!important}.gpfFig{width:64px;height:64px;border-radius:12px;border:3px solid #141413;background:#cfe8ff;flex:none}
