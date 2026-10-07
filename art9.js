@@ -21,6 +21,6 @@ composer.render=(f=>function(...a){try{bloom.threshold=RO.on?1:1.5}catch(e){}ret
 // vertex, so a truck's whole 21-stud cargo box (white walls + grey ribs) became one mint/teal striped block and the suv/pickup's
 // black windows, roof rack and trim turned the body colour (one flat blue box). Now only the pure-white body bricks (vertex colour
 // #ffffff) take the instance colour; cargo boxes (#f4f4f4), ribs (#c9ced6), black trim/windows and grey parts keep their own.
-function ART9_cabMat(){if(ART9.cab)return ART9.cab;const m=CR_CM.clone();m.onBeforeCompile=sh=>{sh.vertexShader=sh.vertexShader.replace('vColor.xyz *= instanceColor.xyz;',
- '#ifdef USE_COLOR\n vColor.xyz *= mix(vec3(1.),instanceColor.xyz,step(.99,min(color.r,min(color.g,color.b))));\n#else\n vColor.xyz *= instanceColor.xyz;\n#endif')};
+function ART9_cabMat(){if(ART9.cab)return ART9.cab;const m=CR_CM.clone();m.onBeforeCompile=sh=>{sh.vertexShader=sh.vertexShader.replace('#include <color_vertex>',
+ '#include <color_vertex>\n#if defined(USE_COLOR) && defined(USE_INSTANCING_COLOR)\n{float lo=min(color.r,min(color.g,color.b)),hi=max(color.r,max(color.g,color.b));\n if(instanceColor.r*instanceColor.g*instanceColor.b>1e-6&&(lo<.99||hi>1.01))vColor.xyz/=instanceColor.xyz;}\n#endif')};
  m.customProgramCacheKey=()=>'art9cab';return ART9.cab=m}
