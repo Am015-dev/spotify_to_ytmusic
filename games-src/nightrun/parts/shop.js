@@ -103,7 +103,7 @@ const SH={UPG,neon:0,earned:0,spent:0,got:{},order:[],active:false,cb:null,left:
     if(this.sh>0){c.save();c.fillStyle='#19e3ff';c.font='11px "Share Tech Mono",monospace';c.fillText('SHIELD'+(this.sh>1?' ×'+this.sh:''),18,H-34);c.restore();}
     HUDLOG.sh=this.sh;HUDLOG.spare=this.spare;}
 };
-NR.on('kill',e=>SH.award(e));
+NR.on('kill',d=>SH.award(d.e));
 NR.on('districtEnd',()=>{if(SH.live){SH.neon+=5;SH.earned+=5;SH.flash=.5;}});
 NR.on('runStart',()=>{SH.live=true;SH.neon=0;SH.earned=0;const sd=shipDef();if(sd.id!=='std'&&G.live)G.note={t:4,txt:sd.n+' ready'};});
 NR.on('runEnd',()=>{if(SH.active){SH.active=false;shopEl.hidden=true;}const add=SH.bankRun();const el=$('oNeon');if(el)el.innerHTML=add?'Banked '+neonI+' <strong>+'+add+'</strong> · garage '+GA.bank:'Banked nothing';gaDraw();});
