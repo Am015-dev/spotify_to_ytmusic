@@ -36,25 +36,25 @@ window.B2K_RDMIN=16.7; // m/s
 // ---- HUD: pink drift bar over a cyan boost bar, just above the speed readout
 (()=>{const st=document.createElement('style');st.id='b2kCss';st.textContent=`
 #b2kM{position:fixed;left:50%;bottom:calc(36px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:clamp(150px,22vw,200px);z-index:6;pointer-events:none;display:none}
-#b2kM.on{display:block}#b2kM .d,#b2kM .b{position:relative;border:2px solid #141413;border-radius:6px;background:rgba(20,20,19,.55);overflow:hidden}
-#b2kM .d{height:7px;margin:0 14px 3px;border-radius:5px}#b2kM .b{height:11px}
-#b2kM .d i,#b2kM .b i{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .08s linear}
-#b2kM .d i{background:linear-gradient(#ff8ad0,#ff2d95)}#b2kM .b i{background:linear-gradient(#a8fbff,#16b4d6)}
+#b2kM.on{display:block}#b2kM .b{position:relative;border:2px solid #141413;border-radius:6px;background:rgba(20,20,19,.55);overflow:hidden}
+#b2kM .b{height:10px;box-sizing:border-box}
+#b2kM .b i,#b2kM .b u{position:absolute;left:0;top:0;bottom:0;width:0;transition:width .08s linear,left .08s linear}
+#b2kM .b u{background:linear-gradient(#ff8ad0,#ff2d95)}#b2kM .b i{background:linear-gradient(#a8fbff,#16b4d6)}
 #b2kM .b:after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 calc(10% - 2px),rgba(20,20,19,.7) calc(10% - 2px) 10%)}
-#b2kM.full .b{border-color:#d6fbff;box-shadow:0 0 10px rgba(76,234,255,.9)}#b2kM.pulse .b{animation:b2kP .35s ease-out}#b2kM.dr .d{box-shadow:0 0 9px rgba(255,45,149,.9);border-color:#ffd0ec}
+#b2kM.full .b{border-color:#d6fbff;box-shadow:0 0 10px rgba(76,234,255,.9)}#b2kM.pulse .b{animation:b2kP .35s ease-out}#b2kM.dr .b{box-shadow:0 0 9px rgba(255,45,149,.9);border-color:#ffd0ec}
 #b2kM.bash .b i{background:linear-gradient(#fff3a0,#ff9a1f)}#b2kM.bash .b{border-color:#ffd12c;box-shadow:0 0 14px rgba(255,170,30,.95)}
 @keyframes b2kP{0%{transform:scale(1)}40%{transform:scale(1.12,1.5)}100%{transform:scale(1)}}
-#b2kT{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);font:italic 900 15px/1 system-ui,sans-serif;letter-spacing:.04em;color:#ffd12c;-webkit-text-stroke:1px #141413;text-shadow:0 2px 0 #141413;white-space:nowrap;opacity:0}
-#b2kT.on{opacity:1;animation:b2kTb .5s ease-in-out infinite alternate}@keyframes b2kTb{to{transform:translateX(-50%) scale(1.1)}}
+#b2kT{position:absolute;right:calc(100% + 8px);bottom:-2px;font:italic 900 14px/1 system-ui,sans-serif;letter-spacing:.04em;color:#ffd12c;-webkit-text-stroke:1px #141413;text-shadow:0 2px 0 #141413;white-space:nowrap;opacity:0}
+#b2kT.on{opacity:1;animation:b2kTb .5s ease-in-out infinite alternate}@keyframes b2kTb{to{transform:scale(1.1)}}
 .b2kPop{position:absolute;bottom:4px;font:italic 900 17px/1 system-ui,sans-serif;-webkit-text-stroke:1px #141413;text-shadow:0 2px 0 #141413;white-space:nowrap;animation:b2kUp 1.1s ease-out forwards}
 @keyframes b2kUp{0%{transform:translateY(6px) scale(.6);opacity:0}15%{transform:translateY(-8px) scale(1.2);opacity:1}70%{transform:translateY(-16px) scale(1);opacity:1}100%{transform:translateY(-30px) scale(1);opacity:0}}
 #flPop{display:none!important}#b2kM.dim{opacity:.3}
 #tG.b2kHop{animation:b2kH .35s ease-out}@keyframes b2kH{40%{transform:scale(.78) translateY(-10px)}}
 #tG:before{content:'▲';position:absolute;top:5px;left:50%;transform:translateX(-50%);font-size:12px;opacity:.65}`;document.head.appendChild(st);
-  const m=document.createElement('div');m.id='b2kM';m.innerHTML='<div id="b2kT">BRICKBASH!</div><div class="d"><i></i></div><div class="b"><i></i></div>';document.body.appendChild(m);B2K.el=m})();
+  const m=document.createElement('div');m.id='b2kM';m.innerHTML='<div id="b2kT">BRICKBASH!</div><div class="b"><i></i><u></u></div>';document.body.appendChild(m);B2K.el=m})();
 function B2K_pop(txt,col){const m=B2K.el;if(!m)return;const p=document.createElement('div');p.className='b2kPop';p.textContent=txt;p.style.color=col;p.style.left=(m.childElementCount%2?'72%':'4%');m.appendChild(p);setTimeout(()=>p.remove(),1150)}
 function B2K_hud(bm){const m=B2K.el;if(!m)return;const vis=(state==='roam'&&!RO.mapOpen&&!RO.card&&!RO.story&&!RO.frozen||state==='race')&&!!pl;m.classList.toggle('on',vis);if(!vis)return;
-  B2K.dmS+=(B2K.dm-B2K.dmS)*.35;m.children[1].firstChild.style.width=B2K.dmS.toFixed(1)+'%';m.children[2].firstChild.style.width=clamp(bm,0,100).toFixed(1)+'%';
+  B2K.dmS+=(B2K.dm-B2K.dmS)*.35;const bb=m.children[1],b0=clamp(bm,0,100);bb.children[0].style.width=b0.toFixed(1)+'%';bb.children[1].style.left=b0.toFixed(1)+'%';bb.children[1].style.width=Math.min(B2K.dmS*B2K_CONV,100-b0).toFixed(1)+'%'; // one bar: cyan = meter, pink = what the drift will add
   m.classList.toggle('full',bm>=99);m.classList.toggle('dr',B2K.dm>1);m.classList.toggle('bash',B2K.bash);m.children[0].classList.toggle('on',B2K.bash);
   if((++B2K.fr&15)===0){const q=document.getElementById('roamPrompt');let ov=false;if(q&&!q.hidden&&q.offsetWidth){const a=m.getBoundingClientRect(),b=q.getBoundingClientRect();ov=Math.min(a.right,b.right)-Math.max(a.left,b.left)>6&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>6}m.classList.toggle('dim',ov)}
   if(B2K.pulse>0){B2K.pulse=0;m.classList.remove('pulse');void m.offsetWidth;m.classList.add('pulse')}}
@@ -65,21 +65,25 @@ function B2K_box(mesh){if(B2K.tm===mesh&&B2K.tbox&&B2K.tst===state)return B2K.tb
   mesh.traverseVisible(o=>{if(o!==mesh&&o.isMesh&&o.geometry&&!(o.material&&(o.material.transparent||o.material.blending===THREE.AdditiveBlending))){if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();b.union(o.geometry.boundingBox.clone().applyMatrix4(M.multiplyMatrices(inv,o.matrixWorld)))}});
   if(tv!=null)B2K.turb.visible=tv;const rc=state==='race',r={hw:rc?clamp((b.max.x-b.min.x)/2,.8,2.6):clamp((b.max.x-b.min.x)/2,.8,1.15)||1,hl:rc?clamp((b.max.z-b.min.z)/2,1.5,4):2.2,y0:b.isEmpty()?0:b.min.y,hh:clamp(b.max.y-b.min.y,.8,2.4)||1.3,cz:0,raw:[b.min.toArray(),b.max.toArray()]};B2K.tbox=r;B2K.tm=mesh;return r}
 // ---- turbines that pop out of the car while boosting
+// LEGO thrusters (reviewer 18: small, low, behind the rear axle; car body + spoiler stay visible): dark grey 2x2 round brick, stud on the front,
+// silver rim, trans-orange flame cone. ~40% of the old turbines.
 function B2K_turbines(s,on,dt){const mesh=s&&s.mesh;if(!mesh)return;const bx=B2K_box(mesh),par=mesh.parent;if(!par)return;B2K.tCar=mesh;
   if(!B2K.turb||B2K.turb.parent!==par){if(B2K.turb&&B2K.turb.parent)B2K.turb.parent.remove(B2K.turb);if(!B2K.turbG){
-      const body=new THREE.CylinderGeometry(.42,.5,1.6,16).rotateX(Math.PI/2),ring=new THREE.TorusGeometry(.43,.11,8,18),fan=new THREE.CylinderGeometry(.37,.37,.06,10).rotateX(Math.PI/2);
-      B2K.turbG={body,ring,fan,mB:new THREE.MeshStandardMaterial({color:0x3a3f4a,metalness:.6,roughness:.35}),mR:new THREE.MeshBasicMaterial({color:0xffb347}),mF:new THREE.MeshBasicMaterial({color:0x4ceaff})}}
+      const body=new THREE.CylinderGeometry(.2,.2,.42,16).rotateX(Math.PI/2),stud=new THREE.CylinderGeometry(.12,.12,.07,12).rotateX(Math.PI/2),rim=new THREE.TorusGeometry(.19,.04,8,18),
+        flame=new THREE.ConeGeometry(.16,.5,12).rotateX(-Math.PI/2).translate(0,0,-.25);
+      B2K.turbG={body,stud,rim,flame,mB:new THREE.MeshStandardMaterial({color:0x5b5f66,roughness:.3,metalness:.05}),mR:new THREE.MeshStandardMaterial({color:0xd8dde3,metalness:.9,roughness:.25}),
+        mF:new THREE.MeshBasicMaterial({color:0xff8a1f,transparent:true,opacity:.8,depthWrite:false})}}
     // scene-level group; every part takes car.matrixWorld x its car-local matrix right before it is drawn (no frame lag, no per-car hide rules)
     const T=B2K.turbG,g=new THREE.Group();g.name='b2kTurb';g.userData.gbG=1;g.matrixAutoUpdate=false;g.units=[];
-    for(const sd of[-1,1]){const parts=[[T.body,T.mB,0],[T.ring,T.mR,-.86],[T.fan,T.mF,-.84]].map(([geo,mat,z])=>{const m=new THREE.Mesh(geo,mat);m.matrixAutoUpdate=false;m.frustumCulled=false;m.userData.gbG=1;m.userData.z=z;m.userData.L=new THREE.Matrix4();
+    for(const sd of[-1,1]){const parts=[[T.body,T.mB,0],[T.stud,T.mB,.245],[T.rim,T.mR,-.21],[T.flame,T.mF,-.21]].map(([geo,mat,z])=>{const m=new THREE.Mesh(geo,mat);m.matrixAutoUpdate=false;m.frustumCulled=false;m.userData.gbG=1;m.userData.z=z;m.userData.L=new THREE.Matrix4();
         m.onBeforeRender=function(){if(B2K.tCar){this.matrixWorld.multiplyMatrices(B2K.tCar.matrixWorld,this.userData.L)}};g.add(m);return m});g.units.push({sd,parts,spin:0})}
     B2K.turb=g;par.add(g)}
-  const tgt=on?1:0;B2K.turbS+=(tgt-B2K.turbS)*Math.min(1,dt*(on?9:6));const fz=bx.hl/2.2,k=B2K.turbS,ov=on?1+.25*Math.sin(Math.min(1,k)*Math.PI):1,sc=Math.max(.001,k*ov*fz),tx=sd=>sd*(bx.hw+(.25+.3*k)*fz),rs=B2K_rear(mesh),tz=bx.cz+rs*bx.hl*.55;
-  B2K.turb.visible=k>.02&&mesh.visible;const U=new THREE.Matrix4(),Pm=new THREE.Matrix4(),Sv=new THREE.Vector3(sc,sc,sc),Q=new THREE.Quaternion(),Pv=new THREE.Vector3();
-  for(const u of B2K.turb.units){u.spin+=dt*30;Pv.set(tx(u.sd),bx.y0+bx.hh*.6,tz);U.compose(Pv,Q.identity(),Sv);
-    for(const m of u.parts){Pm.makeTranslation(0,0,m.userData.z*-rs);if(m.geometry===B2K.turbG.fan)Pm.multiply(new THREE.Matrix4().makeRotationZ(u.spin));m.userData.L.multiplyMatrices(U,Pm)}}
-  if(on&&k>.6&&R()<.9){const pt=new THREE.Vector3(),back=new THREE.Vector3(0,0,rs).transformDirection(mesh.matrixWorld);for(const u of B2K.turb.units){pt.set(tx(u.sd),bx.y0+bx.hh*.6,tz+rs*1.0*k*fz).applyMatrix4(mesh.matrixWorld);
-    emit(SPARK,pt,back.clone().multiplyScalar(rr(6,10)).add(V3(rr(-1,1),rr(0,1.5),rr(-1,1))),.22,B2K.bash?new THREE.Color(2.6,1.4,.3):new THREE.Color(.7,1.8,2.6))}}}
+  const tgt=on?1:0;B2K.turbS+=(tgt-B2K.turbS)*Math.min(1,dt*(on?9:6));const fz=bx.hl/2.2,k=B2K.turbS,ov=on?1+.25*Math.sin(Math.min(1,k)*Math.PI):1,sc=Math.max(.001,k*ov*fz),tx=sd=>sd*bx.hw*.5,rs=B2K_rear(mesh),tz=bx.cz+rs*bx.hl*.9,ty=bx.y0+bx.hh*.3;
+  B2K.turb.visible=k>.02&&mesh.visible;const U=new THREE.Matrix4(),Pm=new THREE.Matrix4(),Sv=new THREE.Vector3(sc,sc,sc),Q=new THREE.Quaternion(),Pv=new THREE.Vector3(),Ry=new THREE.Matrix4().makeRotationY(rs>0?Math.PI:0);
+  for(const u of B2K.turb.units){u.spin+=dt;Pv.set(tx(u.sd),ty,tz);U.compose(Pv,Q.identity(),Sv);
+    for(const m of u.parts){Pm.makeTranslation(0,0,m.userData.z*-rs).multiply(Ry);if(m.geometry===B2K.turbG.flame)Pm.multiply(new THREE.Matrix4().makeScale(1,1,(B2K.bash?1.5:1)*rr(.75,1.2)));m.userData.L.multiplyMatrices(U,Pm)}}
+  if(on&&k>.6&&R()<.6){const pt=new THREE.Vector3(),back=new THREE.Vector3(0,0,rs).transformDirection(mesh.matrixWorld);for(const u of B2K.turb.units){pt.set(tx(u.sd),ty,tz+rs*.7*k*fz).applyMatrix4(mesh.matrixWorld);
+    emit(SPARK,pt,back.clone().multiplyScalar(rr(6,10)).add(V3(rr(-1,1),rr(0,1.2),rr(-1,1))),.18,B2K.bash?new THREE.Color(2.6,1.4,.3):new THREE.Color(2.6,1.2,.3))}}}
 // ---- pink drift trail (two ribbons from the rear tyres)
 function B2K_trailInit(par){const N=64,g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(N*2*2*3),3));g.setAttribute('color',new THREE.BufferAttribute(new Float32Array(N*2*2*3),3));
   const idx=[];for(let sd=0;sd<2;sd++)for(let i=0;i<N-1;i++){const a=(sd*N+i)*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}g.setIndex(idx);
