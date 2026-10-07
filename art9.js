@@ -1,0 +1,14 @@
+// ==== ART pART9 · the van-chase "dropped crate" obstacle reads as a crate (was a bare 3.5×2.2×3.5 m flat brown box,
+// BoxGeometry(1.6,1,1.6) scaled 2.2: from behind the player it looked like a brown wall on the road).
+// Now: a 1.8×1.3×1.8 m LEGO crate, plank texture with a darker frame and cross brace, four studs on top; origin at its base.
+const ART9={};
+function ART9_tex(){if(ART9.tx)return ART9.tx;const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');
+ x.fillStyle='#c98b4b';x.fillRect(0,0,128,128);for(let i=0;i<5;i++){x.fillStyle=i%2?'#bf8043':'#d29657';x.fillRect(0,i*25.6,128,25.6);x.fillStyle='#8a5526';x.fillRect(0,i*25.6,128,2)}
+ x.strokeStyle='#7a4a20';x.lineWidth=14;x.strokeRect(7,7,114,114);x.lineWidth=11;x.beginPath();x.moveTo(12,12);x.lineTo(116,116);x.stroke();
+ x.strokeStyle='#e0a868';x.lineWidth=2;x.strokeRect(14,14,100,100);
+ const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;return ART9.tx=t}
+function ART9_crate(){if(!ART9.g){const w=1.8,h=1.3;ART9.m=new THREE.MeshStandardMaterial({map:ART9_tex(),roughness:.55});
+  ART9.ms=new THREE.MeshStandardMaterial({color:0xc98b4b,roughness:.45});ART9.g=new THREE.BoxGeometry(w,h,w).translate(0,h/2,0);
+  ART9.sg=new THREE.CylinderGeometry(.24,.24,.16,12).translate(0,h+.08,0)}
+ const o=new THREE.Group(),b=new THREE.Mesh(ART9.g,ART9.m);o.add(b);
+ for(const[a,c]of[[-.45,-.45],[.45,-.45],[-.45,.45],[.45,.45]]){const s=new THREE.Mesh(ART9.sg,ART9.ms);s.position.set(a,0,c);o.add(s)}return o}
