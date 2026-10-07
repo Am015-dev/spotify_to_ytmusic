@@ -23,3 +23,7 @@ GS_pop=(f=>function(b){const r=f.apply(this,arguments);if(!b||!GB.mesh)return r;
 gbLoop=(f=>function(){const r=f.apply(this,arguments);const now=performance.now();for(let i=G9.ol.length-1;i>=0;i--){const o=G9.ol[i],k=(now-o.t0)/1600;
   if(k>=1||!GB_.bk){o.host.remove(o.e);o.e.geometry.dispose();o.e.material.dispose();G9.ol.splice(i,1)}else o.e.material.opacity=k<.6?1:1-(k-.6)/.4}return r})(gbLoop);
 window.__g9={S:G9,ol:()=>G9.ol.length,top:()=>G9_top(),cap:GB_CAP};
+// 4) phone toolbar: SELECT pushed ✔ DONE onto a second row at 852 px; a narrower brick counter keeps the whole bar on one row
+{const st=document.createElement('style');st.textContent=`@media (max-width:760px),(max-height:500px){#gbx #gbBkT{gap:4px}#gbx #gbBkN{max-width:80px!important;width:80px;padding:0 6px}}`;document.head.appendChild(st)}
+// 5) SELECT tool: the counter said "3 selected" after the selection was gone; with nothing selected it now says what to do
+SL_ui=(f=>function(){const r=f.apply(this,arguments);const n=$('#gbBkN');if(n&&GB_.bk&&GB_.tool==='sel'&&!SL.sel.length&&!SL.carry)n.textContent='☝ Tap a part';return r})(SL_ui);
