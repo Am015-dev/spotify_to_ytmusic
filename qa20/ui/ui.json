@@ -54,8 +54,9 @@
  ],
  "gearOverlap": [],
  "turnDefault": {
-  "kmh": 54.5,
-  "yawDegS": 40.9
+  "kmh": 13.7,
+  "kmhEnd": 27,
+  "yawDegS": 44.2
  },
  "drawer": {
   "x": 236.625,
@@ -66,8 +67,9 @@
  "drawerOverlap": [],
  "stAng": 1.01,
  "turnChanged": {
-  "kmh": 72.3,
-  "yawDegS": 32.5
+  "kmh": 30.3,
+  "kmhEnd": 43.1,
+  "yawDegS": 50
  },
  "camB": 18.7,
  "list": [

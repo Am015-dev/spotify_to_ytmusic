@@ -45,6 +45,9 @@ const FAKEDB=`(()=>{const K='__fakedb',ld=()=>JSON.parse(sessionStorage.getItem(
   let d=c.h-a.h;d=Math.atan2(Math.sin(d),Math.cos(d));return{kmh:+(a.v*3.6).toFixed(1),kmhEnd:+(c.v*3.6).toFixed(1),yawDegS:+Math.abs(d*57.3*2).toFixed(1)}}
  const R={mode:MODE,url:URL};
  if(MODE==='ab'){await toRoam(true);R.ab=await drive('A');await shot('ab_end')}
+ if(MODE==='yaw'){await toRoam(true);R.yaw=await p.evaluate(()=>{const M=__mho,R=M.RO,K=M.K,o={};const s0={x:R.x,z:R.z,h:R.h,vh:R.vh,y:R.y};
+  const run=v=>{Object.assign(R,s0);R.yr=0;R.dl=0;R.vh=R.h;K.ArrowUp=true;K.ArrowRight=true;const h0=R.h;for(let i=0;i<30;i++){R.v=v/3.6;M.roamSim(1)}K.ArrowUp=false;K.ArrowRight=false;let d=R.h-h0;d=Math.atan2(Math.sin(d),Math.cos(d));return +Math.abs(d*57.3*2).toFixed(1)};
+  for(const a of[.55,.8,1.01])for(const v of[20,50]){__tune.set('TUNE.stAng',a);o['stAng'+a+'@'+v+'kmh']=run(v)}__tune.set('TUNE.stAng',.55);Object.assign(R,s0);R.v=0;return o})}
  if(MODE==='plain'){await toRoam(true);R.gear=await rect('#tuG');R.drawer=await p.evaluate(()=>!!document.querySelector('#tuD'));R.tune=await p.evaluate(()=>window.__tune?__tune.TU.show:null);await shot('plain_roam')}
  if(MODE==='ui'){await toRoam(true);await p.evaluate(()=>{window.__auto=false});await tick(30);
   R.gear=await rect('#tuG');R.dbAtLoad=await p.evaluate(()=>window.__dbW);await shot('tune_closed');
