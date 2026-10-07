@@ -16,7 +16,14 @@
   - Run it on out/<ver>/index.html (split). Do not use ?fast=1: fast mode freezes the builder canvas in shots.
 - Results: 15 → 33 bricks, save 33=33, 35 km/h in Frankfurt, tyre gap 0.03 m, 0 console errors. Shots: docs/shots/garage6_newbuild/.
 
+## Done: v87n (follow-ups). Reviewer QUICK PASS on 2c42a8f; DEPLOY sent to the coordinator (alex/od-garage5 8d9f28f, out/v87n, on live v87m 55e8c4d)
+- Base: the v87m source from alex/od-w12 (files 10, 53, 60, 70, 90), ported onto this branch's split garage-module layout. verify_live gives LIVE_MATCH.
+  The od-w10 and od-w12 workers re-split live, which puts the garage modules back inside 98_garage_driver.js. Port with `git checkout origin/<their branch> -- <non-garage files>` and then run verify_live.
+- Builder text is now 12 px or larger on phones (part buttons, toolbar, limit chip). The toolbar fits on one line: the chip reads "🧱 n/120 · class" on phones, and the button reads "🆕 NEW". The check is `t4/px12.js` (lists visible texts under 12 px).
+- Side view: `t4/nbside.js` builds the car through the builder hooks, freezes a traffic car and parks My Build behind it.
+  The camera is set through the `__gnb.cam([px,py,pz,tx,ty,tz])` test hook (composer wrapper; `__gnb.cam(null)` turns it off).
+  Shots: docs/shots/garage6_v87n/.
+
 ## Follow-ups (from the reviewer)
-1. A low side view of My Build next to a traffic car.
-2. A 12 px check on the builder part-button labels at 852×393.
-3. Open: the spoiler can't be painted with a tap; the cause wasn't found (nb.js paints the door stripes instead). On phones the ✔ DONE button wraps to a second toolbar line (this was there before this work).
+1. Done in v87n: side view and 12 px.
+3. Open: the spoiler can't be painted with a tap; the cause wasn't found (nb.js paints the door stripes instead). (DONE wrapping is fixed in v87n.)
