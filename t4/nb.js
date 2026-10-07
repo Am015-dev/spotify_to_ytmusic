@@ -23,9 +23,9 @@ const URL=process.argv[2],OUT=process.argv[3]||'t4/nb',DESK=process.argv[4]==='d
  // zoom in a little with the wheel/pinch-free path: keep the default camera (phone users orbit by drag)
  for(const[pc,i,j,r]of(process.env.PARTS?JSON.parse(process.env.PARTS):[['hl',-4,-8],['tl',-4,7,2],['arch',-4,-6],['arch',-4,4],['b16',-4,-1],['ws4',-1,-4],['cs24',-2,-7],['cs24',-2,4,2],['spoiler',-1,5],['t16',-4,-1]]))await put(pc,i,j,r||0);
  await shot('04_parts');console.log('n',await p.$eval('#gbBkN',e=>e.textContent));
- // paint: white hood (a racing stripe), black spoiler; the brush paints the mirrored twin too. A slow frame can turn the tap into a long press: tap again then.
+ // paint: white hood and white door stripes; the brush paints the mirrored twin too. A slow frame can turn the tap into a long press: tap again then.
  const paint=async(c,t,i,j)=>{await tap(`#gbBkCl [data-c="${c}"]`);const q=await p.evaluate(([i,j])=>__gb.scr(i,j),[i,j]);for(let k=0;k<3;k++){await tapXY(q.x,q.y);const ok=await p.evaluate(([t,c])=>__gb.list().some(b=>b.t===t&&b.c===c),[t,c]);console.log('paint',t,c,ok);if(ok)break}};
- await tap('#gbBkT [data-a="paint"]');await paint(9,'cs24',-2,-7);await paint(11,'spoiler',-1,5);
+ await tap('#gbBkT [data-a="paint"]');await paint(9,'cs24',-2,-7);await paint(9,'t16',-4,-1);
  await shot('05_painted');console.log('cols',await p.evaluate(()=>JSON.stringify(__gb.list().filter(b=>!/^(wL|wM|T)/.test(b.t)).map(b=>b.t+':'+b.c))));
  await tap('#gbBkT [data-a="done"]');await tap('#gbx .gbTabs button[data-t="veh"]');await shot('06_rides_mine');await tap('#gbSave');
  // the selected set's live bricks are saved under mho_build (gbClose); G.br[id] only holds the sets you switched away from
