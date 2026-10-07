@@ -9,7 +9,7 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  const shot=async n=>{await pg.waitForTimeout(900);await pg.screenshot({path:`${O}/${n}.png`});console.log('shot',n)};const ev=(f,a)=>p.evaluate(f,a);
  await ev(()=>document.querySelector('#gbMenuBtn').click());await pg.waitForTimeout(1500);await ev(()=>__gb.enter());await pg.waitForTimeout(3500);
  // map visible parts to screen points
- const map=await ev(()=>{const M={};for(let y=70;y<245;y+=6)for(let x=180;x<660;x+=6){const i=__sl.pick(x,y);if(i>=0){(M[i]=M[i]||[]).push([x,y])}}const L=__sl.bricks();const out=[];for(const k in M){const P=M[k];P.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const q=P[P.length>>1];
+ const map=await ev(()=>{const M={};for(let y=70;y<245;y+=14)for(let x=180;x<660;x+=14){const i=__sl.pick(x,y);if(i>=0){(M[i]=M[i]||[]).push([x,y])}}const L=__sl.bricks();const out=[];for(const k in M){const P=M[k];P.sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const q=P[P.length>>1];
    const b=L[k];const above=L.filter(o=>o!==b&&o.y>b.y).length;out.push({i:+k,t:b.t,x:b.x,z:b.z,y:b.y,n:P.length,pt:q})}return out.sort((a,b)=>b.n-a.n)});
  console.log('visible parts',map.length,JSON.stringify(map.slice(0,6)));
  const L=()=>ev(()=>__sl.bricks());const n=async()=>(await L()).length;
@@ -21,14 +21,14 @@ const {chromium}=require('/opt/node22/lib/node_modules/playwright');const fs=req
  await tap('#gsBar [data-g="place"]');const after=await L();const moved=after.find(o=>o.t===before.t&&(o.x!==before.x||o.z!==before.z||o.y!==before.y)&&!(await0=false));console.log('MOVE count',n0,'→',after.length,'moved',JSON.stringify(before),'→',JSON.stringify(after.slice(-1)[0]));await shot('03_moved');
  // 2) SELECT UP: tap the lowest visible part that has parts resting on it
  await tap('#slBar [data-s="none"]');const C=await ev(M=>{const L=__sl.bricks(),dims=b=>{const P=__gb.PC[b.t];return b.r%2?[P.d,P.w]:[P.w,P.d]},ov=(a,b)=>{const[aw,ad]=dims(a),[bw,bd]=dims(b);return a.x<b.x+bw&&a.x+aw>b.x&&a.z<b.z+bd&&a.z+ad>b.z};
-   let best=null;for(const m of M){const b=L[m.i];if(!b)continue;const on=L.filter(o=>o.y===b.y+__gb.PC[b.t].h&&ov(o,b)).length;if(on&&(!best||on>best.on))best={...m,on}}return best},await ev(()=>{const M={};for(let y=70;y<245;y+=6)for(let x=180;x<660;x+=6){const i=__sl.pick(x,y);if(i>=0)(M[i]=M[i]||[]).push([x,y])}return Object.entries(M).map(([i,P])=>({i:+i,pt:P[P.length>>1]}))}));
+   let best=null;for(const m of M){const b=L[m.i];if(!b)continue;const on=L.filter(o=>o.y===b.y+__gb.PC[b.t].h&&ov(o,b)).length;if(on&&(!best||on>best.on))best={...m,on}}return best},await ev(()=>{const M={};for(let y=70;y<245;y+=14)for(let x=180;x<660;x+=14){const i=__sl.pick(x,y);if(i>=0)(M[i]=M[i]||[]).push([x,y])}return Object.entries(M).map(([i,P])=>({i:+i,pt:P[P.length>>1]}))}));
  console.log('cluster base',JSON.stringify(C));if(C){await tapXY(C.pt[0],C.pt[1]);const s1=(await ev(()=>__sl.sel())).length;await tap('#slBar [data-s="up"]');const s2=(await ev(()=>__sl.sel())).length;console.log('SELECT UP',s1,'→',s2);await shot('04_select_up');
   const snapA=JSON.stringify(await L());const nA=await n();await tap('#slBar [data-s="move"]');const ca=await ev(()=>__sl.carry());
   // try spots until the cluster fits (green), like a player would
   const spots=await ev(()=>{const o=[];for(let y=80;y<240;y+=24)for(let x=220;x<640;x+=30)o.push([x,y]);return o});let ok=0;for(const[x,y]of spots){await tapXY(x,y);const c=await ev(()=>__sl.carry());if(c&&!c.bad&&(c.x!==ca.x||c.z!==ca.z)){ok=1;break}}
   console.log('cluster carry',JSON.stringify(await ev(()=>__sl.carry())));await shot('05_cluster_ghost');await tap('#gsBar [data-g="place"]');console.log('CLUSTER MOVE count',nA,'→',await n(),'changed',snapA!==JSON.stringify(await L()),'sel',(await ev(()=>__sl.sel())).length);await shot('06_cluster_moved')}
  // 3) GROUP: the moved cluster is selected; GROUP, deselect, tap one → all selected
- await tap('#slBar [data-s="grp"]');const g=(await ev(()=>__sl.sel())).length;await tap('#slBar [data-s="none"]');const sp=await ev(()=>{const S=__sl.bricks();for(let y=70;y<245;y+=6)for(let x=180;x<660;x+=6){const i=__sl.pick(x,y);if(i>=0&&S[i].g)return[x,y]}return null});
+ await tap('#slBar [data-s="grp"]');const g=(await ev(()=>__sl.sel())).length;await tap('#slBar [data-s="none"]');const sp=await ev(()=>{const S=__sl.bricks();for(let y=70;y<245;y+=14)for(let x=180;x<660;x+=14){const i=__sl.pick(x,y);if(i>=0&&S[i].g)return[x,y]}return null});
  if(sp){await tapXY(sp[0],sp[1]);console.log('GROUP',g,'tap one →',(await ev(()=>__sl.sel())).length)}else console.log('GROUP no visible member');
  // 4) COPY, ROTATE, COLOUR, DELETE on the selection
  let c0=await n();await tap('#slBar [data-s="dup"]');for(const[x,y]of await ev(()=>{const o=[];for(let y=90;y<240;y+=30)for(let x=240;x<640;x+=40)o.push([x,y]);return o})){await tapXY(x,y);const c=await ev(()=>__sl.carry());if(c&&!c.bad)break}
