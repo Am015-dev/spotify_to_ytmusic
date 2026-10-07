@@ -18,7 +18,7 @@ function GS_build(){if(GS.on||!GB.sc)return;GS.on=1;const S=GB.sc,R=GB.r;
  const fl=new THREE.Mesh(new THREE.PlaneGeometry(180,180),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.55,metalness:.1,map:GS_tex(512,512,(g,w,h)=>{g.fillStyle='#2b313b';g.fillRect(0,0,w,h);g.strokeStyle='#20252d';g.lineWidth=6;for(let i=0;i<=4;i++){g.beginPath();g.moveTo(i*w/4,0);g.lineTo(i*w/4,h);g.moveTo(0,i*h/4);g.lineTo(w,i*h/4);g.stroke()}})}));
  fl.material.map.wrapS=fl.material.map.wrapT=THREE.RepeatWrapping;fl.material.map.repeat.set(22,22);fl.rotation.x=-Math.PI/2;fl.position.y=y0-.5;fl.receiveShadow=true;G.add(fl);
  // build platform: light grey tiles, dark rim, blue LED dots along the top edge, yellow front arrow (the car's nose points to -z)
- const PW=17,PL=27,pm=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.42,map:GS_tex(512,512,(g,w,h)=>{g.fillStyle='#a9afb8';g.fillRect(0,0,w,h);g.strokeStyle='#8a919c';g.lineWidth=4;for(let i=0;i<=2;i++){g.beginPath();g.moveTo(i*w/2,0);g.lineTo(i*w/2,h);g.moveTo(0,i*h/2);g.lineTo(w,i*h/2);g.stroke()}})});
+ const PW=14,PL=23,pm=new THREE.MeshStandardMaterial({color:0xffffff,roughness:.42,map:GS_tex(512,512,(g,w,h)=>{g.fillStyle='#a9afb8';g.fillRect(0,0,w,h);g.strokeStyle='#8a919c';g.lineWidth=4;for(let i=0;i<=2;i++){g.beginPath();g.moveTo(i*w/2,0);g.lineTo(i*w/2,h);g.moveTo(0,i*h/2);g.lineTo(w,i*h/2);g.stroke()}})});
  pm.map.wrapS=pm.map.wrapT=THREE.RepeatWrapping;pm.map.repeat.set(PW/6,PL/6);
  const top=new THREE.Mesh(new THREE.PlaneGeometry(PW,PL),pm);top.rotation.x=-Math.PI/2;top.position.y=y0-.004;top.receiveShadow=true;G.add(top);
  const rim=new THREE.Mesh(new THREE.BoxGeometry(PW+.3,.5,PL+.3),new THREE.MeshStandardMaterial({color:0x22262e,roughness:.6}));rim.position.y=y0-.255;rim.receiveShadow=true;G.add(rim);
@@ -52,7 +52,7 @@ function GS_build(){if(GS.on||!GB.sc)return;GS.on=1;const S=GB.sc,R=GB.r;
  // mechanic minifigs around the platform, same scale as the driver in the car (both from GB_figGeo at scale 1)
  const crew=[[{h:'grin',x:'cap',t:'plain',l:'#2b3a67',c:'#c4281c'},-11,-6,.9],[{h:'smile',x:'short',t:'hoodie',l:'#1b1d22',c:'#36d17a'},11.5,-9,-.6],[{h:'wink',x:'cap',t:'logo',l:'#2b3a67',c:'#2f7bff'},-10.5,8,2.2],[{h:'smile',x:'long',t:'plain',l:'#8a8f99',c:'#ff7a1c'},12,7,-2.4]];
  GS.crew=[];for(const[f,x,z,ry]of crew){const M=[],L=[];GB_figGeo(f,M,L,false);const o=new THREE.Group();o.add(new THREE.Mesh(mergeGeometries(M),GB_MAT));if(L.length)o.add(new THREE.Mesh(mergeGeometries(L),GB_LMAT));o.traverse(m=>{if(m.isMesh)m.castShadow=true});
-  o.position.set(x,y0,z);o.rotation.y=ry;o.userData.ph=Math.random()*6;G.add(o);GS.crew.push(o)}
+  o.position.set(x,y0-.5,z);o.rotation.y=ry;o.userData.ph=Math.random()*6;G.add(o);GS.crew.push(o)}
  // soft studio reflections for the glossy bricks
  try{const pm2=new THREE.PMREMGenerator(R),es=new THREE.Scene();es.background=new THREE.Color(0x56607a);const lm=new THREE.MeshBasicMaterial({color:0xffffff});for(let i=-2;i<=2;i++){const s=new THREE.Mesh(new THREE.BoxGeometry(2,.2,30),lm);s.position.set(i*5,8,0);es.add(s)}
   const fm=new THREE.Mesh(new THREE.PlaneGeometry(60,60),new THREE.MeshBasicMaterial({color:0x2a2f38}));fm.rotation.x=-Math.PI/2;fm.position.y=-2;es.add(fm);S.environment=pm2.fromScene(es,.04).texture;S.environmentIntensity=.55;pm2.dispose()}catch(e){}
@@ -126,3 +126,5 @@ GB_enter=(f=>function(){const r=f.apply(this,arguments);GS.lastCol=null;try{GS_t
 #gbx .gbPc.gsTh{background:linear-gradient(#2a3446,#151c28);gap:0;padding:1px 2px}#gbx .gbPc.gsTh img{width:40px;height:30px;object-fit:contain;display:block}#gbx .gbPc.gsTh i{display:none}
 @media (max-width:760px),(max-height:500px){#gbx .gbPc.gsTh{height:50px}#gbx .gbPc.gsTh img{width:38px;height:28px}}`;document.head.appendChild(st)}
 window.__gs={S:GS,GB:()=>GB,held:()=>GS.held&&{t:GS.held.t,x:GS.held.x,z:GS.held.z,bad:!!GS.held.bad},on:()=>GS.on,gy:()=>GS.gy,thumbs:()=>document.querySelectorAll('#gbBkPc .gbPc.gsTh').length,pops:()=>GS.pops.length};
+// 2K frames the build at a 3/4 view (about 35° down), so the hall shows behind the car; NEW BUILD used to look almost straight down
+GNB_new=(f=>function(){const r=f.apply(this,arguments);GB_.pit=.62;GB_.dist=12;return r})(GNB_new);
