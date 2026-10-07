@@ -33,7 +33,7 @@ function G9_f1(o){const A=[],B=o.B,K=CR_K,S=o.S||K,add=(t,x,z,r,c,y)=>{CR_reg(t)
  add('B2x4',-1,1,0,B,1);add('cs24',-1,1,2,B,4);add('B2x2',-1,5,0,K,1);add('T2x2',-1,7,0,K,0);add('wing',-4,7,0,o.W||K,1);sym('T1x2',-4,7,0,B,9);return A}
 const G9_T=[
  {id:'t_rosso',n:'Rosso V12',tier:'e',ref:'76914',k:'Front-engine V12 GT',car:()=>G9_sc({B:'#d01712',S:'#fac80a',rs:'#fac80a',wh:'wL',x:[['grl',-3,-6,0,CR_K,6],['grl',2,-6,0,CR_K,6]]}),st:{top:1.07,acc:1.05,han:1.03,hull:1}},
- {id:'t_bianco',n:'Bianco Wedge',tier:'l',ref:'76908',k:'Wedge supercar',car:()=>G9_sc({B:'#f4f4f4',S:'#f4f4f4',nose:'wedge',rear:'wing',W:'#f4f4f4',I:CR_K,wh:'wL'}),st:{top:1.08,acc:1.06,han:1.02,hull:.98}},
+ {id:'t_bianco',n:'Bianco Wedge',tier:'l',ref:'76908',k:'Wedge supercar',car:()=>G9_sc({B:'#f4f4f4',S:'#f4f4f4',nose:'wedge',rear:'wing',W:'#f4f4f4',I:CR_K,wh:'wL',x:[['wl',-4,-7,0,'#f4f4f4',6],['wr',2,-7,0,'#f4f4f4',6],['grl',-4,-2,0,CR_K,4],['grl',3,-2,0,CR_K,4]]}),st:{top:1.08,acc:1.06,han:1.02,hull:.98}},
  {id:'t_papaya',n:'Papaya F1',tier:'l',ref:'76919',k:'Formula car',car:()=>G9_f1({B:'#fe8a18',S:'#36aebf',W:'#fe8a18'}),st:{top:1.09,acc:1.07,han:1.06,hull:.92}},
  {id:'t_silver',n:'Silver Street GT',tier:'r',ref:'76917',k:'Street tuner',car:()=>G9_sc({B:'#a0a5a9',S:'#0055bf',rs:'#0055bf',rear:'wing',W:'#0055bf',L:'#1b2a34',wh:'wL'}),st:{top:1.06,acc:1.05,han:1.04,hull:1}},
  {id:'t_patrol',n:'City Patrol',tier:'c',ref:'60312',k:'Police car',car:()=>G9_sc({B:'#0055bf',S:'#f4f4f4',H:'#f4f4f4',R:'#f4f4f4',sill:'#a5ca18',wh:'wM',bump:CR_K,x:[['bar',-2,-1,0,'#36aebf',12],['scoop',-1,-6,0,'#a0a5a9',7]]}),st:{top:1.03,acc:1.04,han:1.03,hull:1.08}},
@@ -48,7 +48,7 @@ const G9_T=[
   load:{car:L('car'),'4x4':{name:'BLUE BEAST',k:'Off-road',st:{top:.98,acc:1.03,han:.99,hull:1.15},w:'Super Heavy',perk:'armor'},boat:L('boat')}});
  const M=GAR_SETS.find(s=>s.id==='mine');if(M)M.forms=['car']}
 // ---------- collection model: one entry per (vehicle set, form)
-const G9C={ry:-2.35,type:'car',sort:'rar',filt:'all',th:new Map(),q:[],busy:0};
+const G9C={ry:2.35,type:'car',sort:'rar',filt:'all',th:new Map(),q:[],busy:0};
 const G9C_TY=[['car','🚗','STREET'],['off','🛻','OFF-ROAD'],['boat','🚤','WATER']],G9C_RK={l:0,e:1,r:2,c:3};
 const G9C_key=(S,f)=>S.id+'|'+f;
 const G9C_forms=S=>S.forms||['car','off','boat'];
@@ -64,7 +64,7 @@ function G9C_bricks(S,f){if(f==='car'){const b=GAR_get().br[S.id];return(b&&b.le
 function G9C_render(S,f,W=168,Hh=104){const key=W+'|'+G9C_key(S,f)+'|'+(f==='car'?JSON.stringify(GAR_get().br[S.id]||0).length:0);if(G9C.th.has(key))return G9C.th.get(key);
  if(!GS.th)GS_thumb('b11',0);const T=GS.th;if(!T)return null;let url=null;try{const host=new THREE.Group(),g={userData:{m:host}};GB_attach(g,G9C_bricks(S,f),null,false,false);
   host.rotation.y=G9C.ry;host.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(host),ce=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());host.position.sub(ce);T.s.add(host);
-  T.r.setSize(W,Hh,false);T.cam.aspect=W/Hh;T.cam.updateProjectionMatrix();const d=Math.max(sz.x,sz.z,sz.y*1.6)*1.32;T.cam.position.set(0,d*.42,d*.9);T.cam.lookAt(0,-sz.y*.04,0);
+  T.r.setSize(W,Hh,false);T.cam.aspect=W/Hh;T.cam.updateProjectionMatrix();const d=Math.max(sz.x,sz.z,sz.y*1.6)*1.75;T.cam.position.set(0,d*.42,d*.9);T.cam.lookAt(0,-sz.y*.04,0);
   T.r.setClearColor(0,0);T.r.render(T.s,T.cam);url=T.cv.toDataURL('image/png');T.s.remove(host);host.traverse(m=>{if(m.isMesh&&!m.userData.gbc)m.geometry.dispose()})}catch(e){console.warn('G9C',e);url=null}
  finally{T.r.setSize(112,112,false);T.cam.aspect=1;T.cam.updateProjectionMatrix()}G9C.th.set(key,url);return url}
 function G9C_pump(){if(G9C.busy)return;const next=()=>{const im=document.querySelector('#g9Col img[data-k]:not([src])');if(!im||$('#gbx').hidden){G9C.busy=0;return}
