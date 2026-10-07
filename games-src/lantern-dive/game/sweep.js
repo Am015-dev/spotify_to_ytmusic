@@ -153,7 +153,7 @@ async function playGame(browser, size, gi, rep) {
       const st = await page.evaluate('__sw.st()');
       if (st.ph === 'over') { if (!overAt) overAt = Date.now(); if (Date.now() - overAt > 1800) break; }
       const sig = await page.evaluate('__sw.sig()');
-      if (sig !== last) { last = sig; lastAt = Date.now(); noCand = 0; } else if (Date.now() - lastAt > 8000) { issues.add('stuck 8s in ' + st.ph + ' (must ' + st.must + ', busy ' + st.busy + ')'); break; }
+      if (sig !== last) { last = sig; lastAt = Date.now(); noCand = 0; } else if (Date.now() - lastAt > 8000) { issues.add('stuck 8s in ' + st.ph + ' (must ' + st.must + ', busy ' + st.busy + ') ' + JSON.stringify(await page.evaluate('({sel:UI.sel,ps:UI.pingSel,gs:UI.giveSel,gx:GXH.state(),hp:hlpPhase(),cands:__sw.cands().map(c=>c.kind+c.t),dlg:!!UI.dlg,pop:!!UI.pop,toast:document.getElementById("toast").textContent,top:(document.elementFromPoint(innerWidth/2,innerHeight*.8)||{}).className})').catch(e => String(e)))); break; }
       if (Date.now() - t0 > 900 && audits < 400) { audits++; const bad = await page.evaluate('__sw.audit()'); for (const b of bad) issues.add(b); }
       if (st.ph === 'over') { await sleep(150); continue; }
       if (st.must && !st.busy && !st.dlg && (await helpFlow(page, st, ctl, tapAt, W, H))) continue;
@@ -170,7 +170,7 @@ async function playGame(browser, size, gi, rep) {
       }
       if (pick) {
         const before = await page.evaluate('__sw.sig()'); stats.taps++; stats.kinds[pick.kind] = (stats.kinds[pick.kind] || 0) + 1;
-        if (pick.kind === 'card' && gi % 4 === 1 && Math.random() < .4) {   // drag it onto the table
+        if (pick.kind === 'card' && st.ph === 'play' && gi % 4 === 1 && Math.random() < .4) {   // drag it onto the table
           await page.mouse.move(pick.x, pick.y); await page.mouse.down(); await page.mouse.move(pick.x, pick.y - 60, { steps: 4 }); await page.mouse.move(W / 2, H * .4, { steps: 6 }); await page.mouse.up(); stats.kinds.drag = (stats.kinds.drag || 0) + 1;
         } else await page.touchscreen.tap(pick.x, pick.y);
         let changed = false; for (let k = 0; k < 14; k++) { await sleep(110); if ((await page.evaluate('__sw.sig()')) !== before) { changed = true; break; } }
