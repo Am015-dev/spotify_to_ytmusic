@@ -40,7 +40,7 @@ const FX=()=>SET.reduce?.25:1;                          // strength of flashes a
 /* ---------- beat clock ---------- */
 // Everything rhythmic reads this one clock. Beat 0 sits at BT.t0+BT.off on the music clock. The clock is the AudioContext's
 // currentTime when audio runs, and a plain game-time counter (fbT) when it does not, so the game also works silent.
-const DEF_BPM={menu:100,stage1:120,stage2:128,stage3:128,boss:140,endless:132};
+const DEF_BPM={menu:100,stage1:120,stage2:128,stage3:128,boss:140,boss2:140,endless:132,endless2:132};
 const distLen=()=>24*4*BT.spb;                            // a district is 24 bars of the current song
 const barQ=s=>Math.max(1,Math.round(s/(4*BT.spb)))*4*BT.spb*.97;   // seconds -> whole bars
 const BT={bpm:100,spb:.6,t0:0,off:0,stage:'',mode:'none',rev:0,src:0,lastRaw:0,pend:null,title:''};
@@ -51,6 +51,7 @@ const NR=window.NR={_h:{},on(e,f){(this._h[e]=this._h[e]||[]).push(f);},emit(e,d
     setRate(x){x=Math.max(.5,Math.min(2,+x||1));const old=this.rate;if(x===old)return;mnow();const p=bpos();this.rate=x;
       BT.spb=BT.spb*old/x;BT.t0=audible()-BT.off-p*BT.spb;if(BT.pend)BT.pend.v.spb*=old/x;
       const a=AU.a;if(a&&AU.cur&&AU.cur.src)try{AU.cur.src.playbackRate.setValueAtTime(x,a.currentTime);}catch(e){}}}};
+NR.mod=Object.assign({win:0,mag:140,pw:1},NR.mod||{});   // tuning numbers add-ons may change (wider PERFECT window in ms, pickup pull radius, power-up duration factor)
 const CK={h:[],d:0,at:0,has:0};                          // clock smoothing: currentTime only moves in hardware-buffer steps and never runs ahead,
 function ckReset(){CK.h.length=0;CK.d=0;CK.at=0;CK.has=0;}  // so the largest (currentTime - wall clock) seen over 1.5 s is the exact mapping.
 // The mapping may only rise by 1% of elapsed time: after a resume the context first renders a burst ahead of the speakers (up to ~170 ms), which must not shift the grid.
@@ -72,7 +73,7 @@ function audible(ts){                                    // music-clock seconds 
   if(BT.src&&a){if(a.state!=='running')return a.currentTime-(a.outputLatency||0)+SET.sync/1000;return(p+CK.d)/1000-(a.outputLatency||0)+SET.sync/1000;}
   return fbT-(performance.now()-p)/1000+SET.sync/1000;}
 const bpos=ts=>(audible(ts)-BT.t0-BT.off)/BT.spb;       // beats since beat 0
-function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:Math.abs(dt)<=80&&p>-.3,dt,beat:n};}
+function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:Math.abs(dt)<=80+NR.mod.win&&p>-.3,dt,beat:n};}
 const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beats at the current tempo
 
 /* ---------- tracks (lazy) ---------- */
