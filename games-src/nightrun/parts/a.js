@@ -35,6 +35,11 @@ const saveSet=()=>{save('mnr_set',SET);save('mnr_mute',SET.mute);};
 if(!SET.mv2){SET.music=.45;SET.mv2=1;saveSet();}      // music sits well under the effects by default (older saved settings were louder)
 const NOMUSIC=/[?&]nomusic=1/.test(location.search);   // test switch: no song files, synth only
 try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch(e){}   // iOS: Web Audio ignores the silent switch only in the 'playback' session
+/* ---------- hook API for add-ons (shop, garage, effects, power-ups): NR.on(event,fn) / NR.emit(event,arg) ----------
+   events: beat(i) bar(n) perfect({kind,beat}) kill(enemy) districtEnd(district) runStart(daily) runEnd({quit}) ; NR.mod holds tuning numbers add-ons may change */
+window.NR=window.NR||{};
+if(!NR.on){const L={};NR.on=(ev,f)=>{(L[ev]||(L[ev]=[])).push(f);};NR.emit=(ev,a,b)=>{const l=L[ev];if(l)for(const f of l){try{f(a,b);}catch(e){console.error('NR '+ev,e);}}};}
+NR.mod=Object.assign({win:0,mag:140,pw:1},NR.mod||{});
 const FX=()=>SET.reduce?.25:1;                          // strength of flashes and shake
 
 /* ---------- beat clock ---------- */
@@ -66,7 +71,7 @@ function audible(ts){                                    // music-clock seconds 
   if(BT.src&&a){if(a.state!=='running')return a.currentTime-(a.outputLatency||0)+SET.sync/1000;return(p+CK.d)/1000-(a.outputLatency||0)+SET.sync/1000;}
   return fbT-(performance.now()-p)/1000+SET.sync/1000;}
 const bpos=ts=>(audible(ts)-BT.t0-BT.off)/BT.spb;       // beats since beat 0
-function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:Math.abs(dt)<=80&&p>-.3,dt,beat:n};}
+function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:Math.abs(dt)<=80+NR.mod.win&&p>-.3,dt,beat:n};}
 const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beats at the current tempo
 
 /* ---------- tracks (lazy) ---------- */
