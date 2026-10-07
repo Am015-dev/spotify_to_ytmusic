@@ -19,7 +19,7 @@ const URL=process.argv[2],OUT=process.argv[3]||'t4/nb',DESK=process.argv[4]==='d
   // v87o: a tap shows the held part (brackets + PLACE bar); PLACE puts it on
   if(await p.evaluate(()=>!!(window.__gs&&__gs.held()))){if(process.env.SHOTHELD&&!globalThis.__sh){globalThis.__sh=1;await shot('04a_held');await tap('#gsBar [data-g="place"]');await p.screenshot({path:`${OUT}/04b_pop.png`});console.log('pops',await p.evaluate(()=>__gs.pops()))}else await tap('#gsBar [data-g="place"]')}let d=(await cnt())-n0;
   // the ~2 fps software renderer can run a frame between touchStart and touchEnd (>900 ms = long press, no add): tap again like a player would
-  if(!d&&JSON.parse(dg).c){await tapXY(s.x,s.y);d=(await cnt())-n0;console.log('retap')}console.log('put',pc,i,j,'+'+d,dg);for(let r=0;r<rot;r++)await tap('#gbBkT [data-a="rot"]')};
+  if(!d&&JSON.parse(dg).c){if(!await p.evaluate(()=>!!(window.__gs&&__gs.held())))await tapXY(s.x,s.y);if(await p.evaluate(()=>!!(window.__gs&&__gs.held())))await tap('#gsBar [data-g="place"]');d=(await cnt())-n0;console.log('retap')}console.log('put',pc,i,j,'+'+d,dg);for(let r=0;r<rot;r++)await tap('#gbBkT [data-a="rot"]')};
  await tap('#gbMenuBtn');await tap('#gbx .gbTabs button[data-t="veh"]');await shot('01_rides');await tap('.gnbGo');await shot('02_picker');
  await tap(`[data-ch="${CH}"]`);await shot('03_chassis');console.log('n',await p.$eval('#gbBkN',e=>e.textContent));
  // zoom in a little with the wheel/pinch-free path: keep the default camera (phone users orbit by drag)

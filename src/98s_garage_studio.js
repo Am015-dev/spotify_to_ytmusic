@@ -9,11 +9,11 @@ function GS_tex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.h
 function GS_build(){if(GS.on||!GB.sc)return;GS.on=1;const S=GB.sc,R=GB.r;
  // hide the old navy disc and the cyan ring
  for(const o of S.children)if(o.isMesh&&o.geometry&&(o.geometry.type==='CylinderGeometry'||o.geometry.type==='TorusGeometry'))o.visible=false;
- for(const o of S.children){if(o.isHemisphereLight)o.intensity=1.1;else if(o.isDirectionalLight)o.intensity*=.55}
+ for(const o of S.children){if(o.isHemisphereLight)o.intensity=.8;else if(o.isDirectionalLight)o.intensity*=.45}
  R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;S.fog=new THREE.Fog(0x313a4c,60,140);S.background=new THREE.Color(0x313a4c);
  const y0=GS.y0,G=new THREE.Group();G.name='gsStudio';S.add(G);GS.g=G;
  // key light with shadows (from the front-right, high)
- const k=new THREE.DirectionalLight(0xfff4e0,1.3);k.position.set(7,18,9);k.castShadow=true;k.shadow.mapSize.set(1024,1024);const sc=k.shadow.camera;sc.left=-14;sc.right=14;sc.top=14;sc.bottom=-14;sc.near=2;sc.far=50;k.shadow.bias=-.0006;k.shadow.normalBias=.02;G.add(k);G.add(k.target);
+ const k=new THREE.DirectionalLight(0xfff4e0,1.8);k.position.set(7,18,9);k.castShadow=true;k.shadow.mapSize.set(1024,1024);const sc=k.shadow.camera;sc.left=-14;sc.right=14;sc.top=14;sc.bottom=-14;sc.near=2;sc.far=50;k.shadow.bias=-.0006;k.shadow.normalBias=.02;G.add(k);G.add(k.target);
  // hall floor: dark polished concrete with big tiles
  const fl=new THREE.Mesh(new THREE.PlaneGeometry(180,180),new THREE.MeshStandardMaterial({color:0xffffff,roughness:.55,metalness:.1,map:GS_tex(512,512,(g,w,h)=>{g.fillStyle='#2b313b';g.fillRect(0,0,w,h);g.strokeStyle='#20252d';g.lineWidth=6;for(let i=0;i<=4;i++){g.beginPath();g.moveTo(i*w/4,0);g.lineTo(i*w/4,h);g.moveTo(0,i*h/4);g.lineTo(w,i*h/4);g.stroke()}})}));
  fl.material.map.wrapS=fl.material.map.wrapT=THREE.RepeatWrapping;fl.material.map.repeat.set(22,22);fl.rotation.x=-Math.PI/2;fl.position.y=y0-.5;fl.receiveShadow=true;G.add(fl);
@@ -61,7 +61,8 @@ function GS_build(){if(GS.on||!GB.sc)return;GS.on=1;const S=GB.sc,R=GB.r;
 function GS_fitY(){if(!GS.g||!GB.mesh)return;GB.mesh.updateMatrixWorld(true);let y=null;const P=new THREE.Vector3(),Sc=new THREE.Vector3();
  GB.mesh.traverse(o=>{if(o.isMesh&&o.userData&&o.userData.r&&o.userData.gb){let v=1;for(let q=o;q;q=q.parent)if(!q.visible)v=0;if(!v)return;o.getWorldPosition(P);o.getWorldScale(Sc);const b=P.y-o.userData.r*Sc.y;y=y==null?b:Math.min(y,b)}});
  GS.g.position.y=y==null?0:clamp(y-GS.y0,-1,1);GS.gy=y}
-function GS_shadows(){if(!GB.mesh)return;GB.mesh.traverse(o=>{if(o.isMesh&&!o.userData.gbG&&!(o.material&&o.material.transparent))o.castShadow=true})}
+// the garage car is its own copy (gbRender builds a new mesh), so the roam no-cast lock (ART6_noCast) is lifted here only
+function GS_shadows(){if(!GB.mesh)return;GB.mesh.traverse(o=>{if(!o.isMesh||o.userData.gbG||o.isInstancedMesh)return;const m=o.material;if(!m||Array.isArray(m)||m.transparent||m.isShaderMaterial||m.isSpriteMaterial||m.blending!==THREE.NormalBlending)return;const g=o.geometry;if(!g.boundingSphere)g.computeBoundingSphere();if(g.boundingSphere&&g.boundingSphere.radius>7)return;Object.defineProperty(o,'castShadow',{value:true,writable:true,configurable:true})})}
 // ---------- held part (touch): ghost in real colours + corner brackets + PLACE / ROTATE / CANCEL
 GB_ghostSet=(f=>function(b){f(b);const g=GB_.ghost;if(!g||!b)return;g.material.dispose();g.material=new THREE.MeshStandardMaterial({vertexColors:true,transparent:true,opacity:b.bad?.45:.82,roughness:.35,depthWrite:false,emissive:b.bad?0x801010:0x103010,color:b.bad?0xff8080:0xffffff});g.renderOrder=3})(GB_ghostSet);
 function GS_ui(){let B=$('#gsBar');if(!B){const v=$('#gbx .gbv');if(!v)return;B=document.createElement('div');B.id='gsBar';B.innerHTML=`<button data-g="place" class="gsPl"><i>✔</i>PLACE</button><button data-g="rot"><i>⟳</i>ROTATE</button><button data-g="cancel"><i>✕</i>CANCEL</button>`;v.appendChild(B);
@@ -100,7 +101,7 @@ function GS_step(dt){for(let i=GS.pops.length-1;i>=0;i--){const P=GS.pops[i];P.t
  if(GS.crew)for(const o of GS.crew){o.userData.ph+=dt;o.rotation.y+=Math.sin(o.userData.ph*.7)*.004}}
 // ---------- framing: on a phone the toolbar + palette leave ~54 % of the height; pull the camera back so the whole car fits between them
 GB_cam=(f=>function(){f();if(!GB_.bk||innerHeight>500)return;const C=GB.cam,k=1.2;C.position.set(C.position.x*k,.5+(C.position.y-.5)*k,C.position.z*k);C.lookAt(0,.5,0);C.updateMatrixWorld()})(GB_cam);
-let GS_t0=0;gbLoop=(f=>function(){const now=performance.now(),dt=Math.min(.05,GS_t0?(now-GS_t0)/1000:.016);GS_t0=now;if(GB.sc&&!GS.on)GS_build();GS_step(dt);if(GB_.bk&&!$('#gbx').hidden){GS_br(GB_.ghost)}return f()})(gbLoop);
+let GS_t0=0;gbLoop=(f=>function(){const now=performance.now(),dt=Math.min(.05,GS_t0?(now-GS_t0)/1000:.016);GS_t0=now;if(GB.sc&&!GS.on)GS_build();if(GB.mesh&&GB.d&&GS.sm!==GB.mesh.uuid+GB_list().length){GS.sm=GB.mesh.uuid+GB_list().length;GS_shadows();GS_fitY()}GS_step(dt);if(GB_.bk&&!$('#gbx').hidden){GS_br(GB_.ghost)}return f()})(gbLoop);
 gbRender=(f=>function(){const r=f.apply(this,arguments);GS_fitY();GS_shadows();return r})(gbRender);
 // ---------- 3D part thumbnails: one small offscreen renderer, each part drawn once per colour, only for the open category
 function GS_thumb(t,c){const key=t+'|'+c;if(GS.thC.has(key))return GS.thC.get(key);let T=GS.th;
@@ -124,4 +125,4 @@ GB_enter=(f=>function(){const r=f.apply(this,arguments);GS.lastCol=null;try{GS_t
 #gsTip{position:absolute;left:50%;top:calc(52px + env(safe-area-inset-top,0px));transform:translateX(-50%);padding:6px 12px;border-radius:10px;background:#f2c20c;color:#141413;font:900 12px system-ui;border:2px solid #141413;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap;z-index:4}#gsTip.on{opacity:1}
 #gbx .gbPc.gsTh{background:linear-gradient(#2a3446,#151c28);gap:0;padding:1px 2px}#gbx .gbPc.gsTh img{width:40px;height:30px;object-fit:contain;display:block}#gbx .gbPc.gsTh i{display:none}
 @media (max-width:760px),(max-height:500px){#gbx .gbPc.gsTh{height:50px}#gbx .gbPc.gsTh img{width:38px;height:28px}}`;document.head.appendChild(st)}
-window.__gs={held:()=>GS.held&&{t:GS.held.t,x:GS.held.x,z:GS.held.z,bad:!!GS.held.bad},on:()=>GS.on,gy:()=>GS.gy,thumbs:()=>document.querySelectorAll('#gbBkPc .gbPc.gsTh').length,pops:()=>GS.pops.length};
+window.__gs={S:GS,GB:()=>GB,held:()=>GS.held&&{t:GS.held.t,x:GS.held.x,z:GS.held.z,bad:!!GS.held.bad},on:()=>GS.on,gy:()=>GS.gy,thumbs:()=>document.querySelectorAll('#gbBkPc .gbPc.gsTh').length,pops:()=>GS.pops.length};
