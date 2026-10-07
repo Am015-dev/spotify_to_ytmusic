@@ -24,17 +24,27 @@
       box.appendChild(v);box.appendChild(hint);
       box.addEventListener('click',end);
       v.addEventListener('ended',end);v.addEventListener('error',end);
-      v.addEventListener('playing',()=>{mark(key);box.classList.add('on')});
+      v.addEventListener('playing',()=>{mark(key);box.classList.add('on');if(!box._ban)slam(box,key,()=>fin)});
       const T=setTimeout(()=>{if(!box.classList.contains('on'))end()},6000); // never stuck if the clip cannot start
       document.body.appendChild(box);
       v.src=BASE+key+'.mp4';
       const p=v.play();if(p&&p.catch)p.catch(end);
     });
   }
+  /* boss clips only: after half a second a BOSS banner slams in with the boss's name, a flash, a shake and a hit sound */
+  function slam(box,key,isDone){
+    const m=/^crown-ch(\d+)-boss$/.exec(key);if(!m)return;box._ban=1;
+    setTimeout(()=>{if(isDone()||!box.parentNode)return;
+      let name='';try{const c=window.CAMPAIGN.chapters.find(x=>x.id==='c'+m[1]);name=(window.CAMPAIGN.cast[c.opponent.cast]||{}).name||c.opponent.name||''}catch(e){}
+      const ban=document.createElement('div');ban.className='ccclip-ban';ban.innerHTML='<i>BOSS</i><b></b>';ban.lastChild.textContent=name;
+      const fl=document.createElement('div');fl.className='ccclip-flash';box.appendChild(fl);box.appendChild(ban);box.classList.add('shake');
+      try{if(typeof sfx==='function'){sfx('smash');setTimeout(()=>sfx('roar'),180)}}catch(e){}
+      setTimeout(()=>{box.classList.remove('shake');if(fl.parentNode)fl.parentNode.removeChild(fl)},700)},500)}
   const chapKey=(def,suffix)=>'crown-'+(suffix?'ch'+String(def.id).replace(/\D/g,'')+'-'+suffix:'ch'+String(def.id).replace(/\D/g,'')+'-intro');
   const CUT=['voltusk','squidrik','magmaw','shroomhulk','boltbox','glacyx','cortexa','clampede','bramblebat']; // MONS order
   window.CCMedia={
     has,play,
+    avatar:m=>{const f='cut-'+CUT[m]+'.webp';return (M.avatars||[]).indexOf(f)>=0?f:null}, // transparent character for the player bars
     cutout:m=>{const f='cut-'+CUT[m]+'.webp';return (M.cutouts||[]).indexOf(f)>=0?f:null}, // transparent board figure, or null => the built model
     portrait:c=>{const f=c&&c.portrait;return f&&pics.indexOf(f)>=0?f:null}, // file next to index.html; null => emoji
     install(){

@@ -42,7 +42,8 @@ async function page(b, W, H, seen, progress) {
     const p = await page(b, 390, 763, null, 3); await p.evaluate(() => GXC.play('c4')); await p.waitForTimeout(1200);
     ok(!(await clipEl(p)), 'chapter 4 intro clip is not listed: skipped, story scene shown'); ok(await vis(p, '.gxc-scene'), 'scene visible');
     for (let k = 0; k < 6 && !(await clipEl(p)); k++) { await p.evaluate(() => { const g = document.querySelector('.gxc-scene .go'); if (g) g.click() }); await p.waitForTimeout(700); }
-    let c = await clipEl(p); ok(c && c.key === 'crown-ch4-boss', 'boss reveal clip plays before the boss card'); ok(!(await vis(p, '.gxc-boss')), 'boss card waits');
+    let c = await clipEl(p); ok(c && c.key === 'crown-ch4-boss', 'boss reveal clip plays before the boss card'); await p.waitForTimeout(1000);
+    ok(await p.evaluate(() => { const b = document.querySelector('.ccclip-ban'); return !!b && /BOSS/.test(b.textContent) && b.querySelector('b').textContent.length > 3 }), 'BOSS banner with the boss name slams in'); ok(await p.evaluate(() => !!document.querySelector('.ccclip-ban') && document.querySelectorAll('.ccclip-ban').length === 1), 'one banner only'); ok(!(await vis(p, '.gxc-boss')), 'boss card waits');
     await p.waitForFunction(() => !document.querySelector('.ccclip'), null, { timeout: 8000 }).catch(() => { }); ok(!(await clipEl(p)), 'clip ended by itself (2.5 s)');
     await p.waitForTimeout(400); ok(await vis(p, '.gxc-boss'), 'boss card appears after the clip');
     await p.evaluate(() => [...document.querySelectorAll('.gxc-boss .go')].forEach(x => x.click())); await p.waitForTimeout(2500);
