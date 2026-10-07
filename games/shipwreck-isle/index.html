@@ -677,6 +677,12 @@ html.bf #ppop .pp-h{min-height:44px}
 @keyframes bfFlash{0%,100%{opacity:0}20%,60%{opacity:1}}
 .bffly{position:fixed;left:0;top:0;z-index:80;font-size:26px;line-height:1;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.6));opacity:0}
 @media (prefers-reduced-motion:reduce){.bfcard .in{animation:none}.bfrain i{animation-duration:.01s}}
+.bfpw b.ico{display:flex;align-items:center;justify-content:center;line-height:0}
+.bfpw svg.role{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.hlpset{display:contents}.hlpset .gxh-set,.hlp-rules-set .gxh-set{color:#e9f0f5;margin:2px 4px}
+.hlp-rules-set{padding:2px 12px 8px;border-bottom:1px solid var(--line,#33424f)}
+html.ph .gx-bar .gxh-bulb,.gx-bar .gxh-bulb{min-width:40px}
+@media (min-width:761px){html:not(.ph) .hlpset{display:none}}
 </style>
 <style>
 /* ===== GX campaign styles: chapter map, story scenes, boss card, result. Theme with the --gxc-* variables. ===== */
@@ -817,6 +823,68 @@ html.bf #ppop .pp-h{min-height:44px}
 }
 html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){.gxc *{animation:none!important}}
+/* gx-help.css: coach bubbles, the lightbulb, the ghost finger and the rules cards (see gx-help.js and GX-KIT.md section 9).
+   Everything the kit draws carries data-help. Override the look with the --gxh-* variables on :root. */
+:root{--gxh-bg:#f3e6bf;--gxh-ink:#231a10;--gxh-accent:#c99a35;--gxh-glow:#ffe08a;--gxh-btn:#7a1f31;--gxh-btn-ink:#fff6dc;--gxh-z:80;--gxh-font:inherit}
+.gxh-bub{position:fixed;left:0;top:0;z-index:var(--gxh-z);box-sizing:border-box;width:max-content;max-width:min(292px,calc(100vw - 16px));padding:8px 10px 8px 10px;border-radius:12px;background:var(--gxh-bg);color:var(--gxh-ink);border:2px solid var(--gxh-accent);box-shadow:0 8px 22px rgba(0,0,0,.55);font:600 14px/1.28 var(--gxh-font);text-align:left;visibility:hidden;animation:gxh-in .18s ease-out both}
+.gxh-bub.on{visibility:visible}
+.gxh-bub *{box-sizing:border-box}
+.gxh-bub .gxh-tt{font-weight:800;font-size:14.5px;margin:0 0 2px}
+.gxh-bub .gxh-tx{font-weight:600;font-size:13.5px}
+.gxh-bub .gxh-bd{display:flex;gap:8px;align-items:flex-start}
+.gxh-bub .gxh-sp{flex:0 0 36px;width:36px;height:36px}
+.gxh-bub .gxh-sp svg{width:100%;height:100%}
+.gxh-bub .gxh-row2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:6px;clear:both}
+.gxh-bub .gxh-ok,.gxh-bub .gxh-link{font:800 13px/1 var(--gxh-font);min-height:32px;padding:0 12px;border-radius:16px;border:0;cursor:pointer}
+.gxh-bub .gxh-ok{background:var(--gxh-btn);color:var(--gxh-btn-ink);margin-left:auto}
+.gxh-bub .gxh-link{background:transparent;color:var(--gxh-btn);text-decoration:underline;padding:0;min-height:32px;display:inline-flex;align-items:center}
+.gxh-arr{position:absolute;width:12px;height:12px;background:var(--gxh-bg);border:2px solid var(--gxh-accent);transform:rotate(45deg)}
+.gxh-a-top .gxh-arr{top:-8px;border-right:0;border-bottom:0}
+.gxh-a-bottom .gxh-arr{bottom:-8px;border-left:0;border-top:0}
+.gxh-a-left .gxh-arr{left:-8px;border-top:0;border-right:0}
+.gxh-a-right .gxh-arr{right:-8px;border-bottom:0;border-left:0}
+.gxh-ring{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) - 1);pointer-events:none;border-radius:14px;border:3px solid var(--gxh-glow);box-shadow:0 0 0 3px rgba(255,224,138,.35),0 0 18px 4px var(--gxh-glow);animation:gxh-pulse 1.1s ease-in-out infinite}
+.gxh-ring.round{border-radius:50%}
+.gxh-ring.soft{border-width:2px;box-shadow:0 0 12px 2px var(--gxh-glow);opacity:.9}
+.gxh-ring.from{border-style:dashed;animation:none;box-shadow:0 0 10px 1px var(--gxh-glow)}
+.gxh-finger{position:fixed;left:0;top:0;z-index:calc(var(--gxh-z) + 1);pointer-events:none;width:0;height:0}
+.gxh-finger i{position:absolute;left:-22px;top:-22px;width:44px;height:44px;border-radius:50%;border:3px solid rgba(255,255,255,.95);background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.18) 66%,rgba(255,255,255,0) 74%);box-shadow:0 0 12px rgba(255,255,255,.6)}
+.gxh-finger b{position:absolute;left:-3px;top:2px;width:10px;height:26px;border-radius:5px;background:#fff;opacity:.9;transform:rotate(-24deg);box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.gxh-bulb{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+.gxh-bulb svg{width:24px;height:24px;display:block;fill:#ffd95a;stroke:#6b4a00;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(255,217,90,.7))}
+.gxh-bulb.gxh-float{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:calc(var(--gxh-z) - 2);width:44px;height:44px;border-radius:50%;border:2px solid var(--gxh-accent);background:#2a1820}
+.gxh-bulb.lit svg{filter:drop-shadow(0 0 8px #ffd95a)}
+.gxh-rules{position:fixed;inset:0;z-index:calc(var(--gxh-z) + 10);display:flex;align-items:center;justify-content:center;padding:10px;background:rgba(5,3,6,.72);overscroll-behavior:contain;touch-action:pan-y}
+.gxh-rules .gxh-card{position:relative;box-sizing:border-box;width:min(360px,100%);max-height:calc(100% - 8px);overflow:auto;display:flex;flex-direction:column;gap:8px;padding:12px 14px 12px;border-radius:16px;background:var(--gxh-bg);color:var(--gxh-ink);border:3px solid var(--gxh-accent);box-shadow:0 18px 50px rgba(0,0,0,.7);font:600 15px/1.3 var(--gxh-font)}
+.gxh-rules .gxh-x{position:absolute;right:6px;top:6px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(0,0,0,.08);color:var(--gxh-ink);font:700 22px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-pic{display:flex;align-items:center;justify-content:center;min-height:120px;max-height:34dvh;padding:6px 0;background:rgba(0,0,0,.06);border-radius:12px;margin-top:22px}
+.gxh-rules .gxh-pic svg{max-width:100%;max-height:30dvh;height:auto}
+.gxh-rules .gxh-rt{font-weight:800;font-size:19px;line-height:1.15;padding-right:30px}
+.gxh-rules .gxh-rx{font-weight:600;font-size:16px}
+.gxh-rules .gxh-nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px}
+.gxh-rules .gxh-nav button{min-height:44px;min-width:76px;padding:0 14px;border-radius:22px;border:2px solid var(--gxh-btn);background:transparent;color:var(--gxh-btn);font:800 15px/1 var(--gxh-font);cursor:pointer}
+.gxh-rules .gxh-nav button.gxh-next{background:var(--gxh-btn);color:var(--gxh-btn-ink)}
+.gxh-rules .gxh-nav button[disabled]{opacity:.3}
+.gxh-rules .gxh-dots{display:flex;gap:6px}
+.gxh-rules .gxh-dots i{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.25)}
+.gxh-rules .gxh-dots i.on{background:var(--gxh-btn)}
+.gxh-pics{display:flex;align-items:flex-end;justify-content:center;gap:8px;flex-wrap:nowrap}
+.gxh-pics figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.gxh-pics svg{width:64px;height:64px}
+.gxh-pics figcaption{font:800 12px/1.1 var(--gxh-font);text-align:center;max-width:76px}
+.gxh-pics .gxh-ar{font:800 24px/1 var(--gxh-font);align-self:center;color:var(--gxh-btn)}
+.gxh-set{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:6px 0}
+.gxh-set>span{flex:1 0 90px;font-weight:700}
+.gxh-set button{min-height:38px;padding:0 12px;border-radius:19px;border:2px solid var(--gxh-accent);background:transparent;color:inherit;font:700 14px/1 var(--gxh-font);cursor:pointer}
+.gxh-set button[aria-pressed=true]{background:var(--gxh-accent);color:#1b1208}
+@keyframes gxh-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes gxh-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.04);opacity:.75}}
+@media (prefers-reduced-motion:reduce){.gxh-bub,.gxh-ring{animation:none}}
+@media (max-height:600px){.gxh-rules .gxh-pic{min-height:84px;margin-top:20px}.gxh-pics svg{width:50px;height:50px}.gxh-rules .gxh-card{gap:6px;padding:10px 12px}}
+/* short phones (375x553 and landscape): a compact bubble, title and button on one line, no picture */
+@media (max-height:620px){.gxh-bub{max-width:min(350px,calc(100vw - 12px));padding:6px 9px}.gxh-bub .gxh-sp{display:none}.gxh-bub .gxh-tt{padding-right:84px;min-height:24px;line-height:24px;margin:0}.gxh-bub .gxh-tx{font-size:13px;line-height:1.25}
+.gxh-bub .gxh-row2{position:absolute;right:6px;top:4px;margin:0}.gxh-bub .gxh-ok{min-height:28px;padding:0 12px}.gxh-bub .gxh-bd>div{min-width:0}
+.gxh-bub.gxh-bulbb .gxh-row2{position:static;margin-top:2px}}
 
 </style>
 </head>
@@ -827,6 +895,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
   <span id="netst" class="netst" role="status" hidden></span>
   <span class="gx-sp"></span>
   <button class="gx-ibtn" id="phchip" data-ph="status" aria-label="Camp status" hidden></button>
+  <button class="gx-ibtn gxh-bulb" id="bulbbtn" data-help type="button" aria-label="Hint: what should I do?" title="Hint"></button>
   <button class="gx-ibtn" data-gx="campd" aria-expanded="false" data-ico="tent" aria-label="Camp: castaways, items, skills"><span>Camp</span></button>
   <button class="gx-ibtn" data-gx="logd" aria-expanded="false" data-ico="scroll" aria-label="Log"><span>Log</span></button>
   <button class="gx-ibtn" data-gx="cardsd" aria-expanded="false" data-ico="cards" aria-label="Card list"><span>Cards</span></button>
@@ -838,6 +907,7 @@ html.gx-reduce .gxc *,html.gx-noanim .gxc *{animation:none!important;transition:
   <button class="gx-ibtn" data-a="speed" id="speedbtn" title="How fast the computer plays">⏩ normal</button>
   <button class="gx-ibtn" data-a="gfx" id="gfxbtn" title="Graphics quality and speed" aria-haspopup="dialog" aria-controls="gfxpop" aria-expanded="false">Graphics</button>
   <button class="gx-ibtn" data-a="pause" id="pausebtn" hidden>⏸ Pause</button>
+  <div id="hlpset" class="hlpset"></div>
   <button class="gx-ibtn" data-a="new" data-ico="plus"><span>New game</span></button>
   </div>
 </header>
@@ -891,6 +961,277 @@ const GX={key:'gx',open:null,
   drawer(id,title,bodyEl,wide){let d=document.getElementById(id);if(!d){d=document.createElement('section');d.id=id;d.className='gx-drawer'+(wide?' wide':'');d.setAttribute('role','dialog');d.setAttribute('aria-label',title);
       d.innerHTML=`<div class="gx-drawer-head"><h2></h2><button class="gx-x" data-gx="close" aria-label="Close">×</button></div><div class="gx-drawer-body"></div>`;document.body.appendChild(d)}
     d.querySelector('h2').textContent=title;if(bodyEl){const b=d.querySelector('.gx-drawer-body');if(bodyEl.parentNode!==b){b.innerHTML='';b.appendChild(bodyEl)}}return d}};
+
+</script>
+<script>
+// gx-viewport.js: one debounced relayout for every game. GXV.watch(fn) calls fn(size) when the visible size or safe-area key changes.
+// Fed by resize, orientationchange, visualViewport resize, ResizeObserver(documentElement) and pageshow; re-measures at 120 and 420 ms
+// (iOS reports the old size for a moment after a rotation). Size comes from a fixed full-screen probe, not innerWidth/innerHeight.
+(function () {
+  var fns = [], key = '', t1 = 0, t2 = 0, t3 = 0, probe = null;
+  function mk() {
+    if (probe || !document.body) return probe;
+    probe = document.createElement('div');
+    probe.setAttribute('aria-hidden', 'true');
+    probe.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100%;visibility:hidden;pointer-events:none;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);box-sizing:border-box;z-index:-1';
+    document.body.appendChild(probe); return probe;
+  }
+  function measure() {
+    var p = mk(), w = innerWidth, h = innerHeight, s = '';
+    if (p) { w = p.offsetWidth || w; h = p.offsetHeight || h; var cs = getComputedStyle(p); s = cs.paddingTop + cs.paddingRight + cs.paddingBottom + cs.paddingLeft; }
+    return { w: w, h: h, safe: s, key: w + 'x' + h + '|' + s };
+  }
+  function run(force) {
+    var m = measure(); if (!force && m.key === key) return; key = m.key;
+    fns.forEach(function (f) { try { f(m); } catch (e) { console.error(e); } });
+  }
+  function kick() { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); t1 = setTimeout(function () { run(); }, 40); t2 = setTimeout(function () { run(); }, 120); t3 = setTimeout(function () { run(); }, 420); }
+  var wired = false;
+  function wire() {
+    if (wired) return; wired = true;
+    addEventListener('resize', kick); addEventListener('orientationchange', kick); addEventListener('pageshow', kick);
+    if (window.visualViewport) visualViewport.addEventListener('resize', kick);
+    if (window.ResizeObserver) new ResizeObserver(kick).observe(document.documentElement);
+  }
+  window.GXV = { watch: function (fn) { fns.push(fn); wire(); run(true); return fn; }, now: measure, poke: function () { run(true); } };
+})();
+
+</script>
+<script>
+// gx-help.js: on-demand and first-time help for any game. Coach bubbles (once per phase), a lightbulb (suggested move + rules cards), a tips switch.
+// Needs gx-help.css. Uses GXV.watch (gx-viewport.js) for relayout when it is loaded, else its own resize listeners. See GX-KIT.md section 9.
+//   GXH.init({game:'slug', steps:{phaseId:{target:()=>el, title:'<=4 words', text:'<=20 words', pic?:svg}}, rules:[{phase?, title, text, pic}], avoid:'css selector', defaultOn:true})
+//   GXH.phase(phaseId|null)   call after every render; shows the phase's bubble the first time only
+//   GXH.bulb({el?, suggest:()=>({target, from?, why})|null, rulesFor:()=>phaseId})
+//   GXH.setEnabled(bool) GXH.enabled() GXH.reset() GXH.rules(phaseId?) GXH.hide() GXH.settingsRow() GXH.settingsHTML()
+// Targets may be an element, a function returning an element or {left,top,width,height} or {x,y}. All elements the kit draws carry data-help.
+(function () {
+  'use strict';
+  var D = document, cfg = null, st = { on: true, seen: {} }, cur = null, pend = null, skipUntil = 0, bulbEl = null, bulbOpts = null, rulesEl = null, wired = false, shown = [], mem = '';
+  function mk(tag, cls, html) { var e = D.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; e.setAttribute('data-help', ''); return e; }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function key() { return 'gxh-' + (cfg && cfg.game || 'game'); }
+  function load() {
+    var raw = null; try { raw = localStorage.getItem(key()); } catch (e) { raw = mem || null; }
+    var o = null; try { o = raw ? JSON.parse(raw) : null; } catch (e) { o = null; }
+    st = { on: o && typeof o.on === 'boolean' ? o.on : cfg.defaultOn !== false, seen: (o && o.seen && typeof o.seen === 'object') ? o.seen : {} };
+  }
+  function save() { var s = JSON.stringify(st); mem = s; try { localStorage.setItem(key(), s); } catch (e) {} }
+  function vp() { if (window.GXV) { try { var m = GXV.now(); if (m && m.w) return { w: m.w, h: m.h }; } catch (e) {} } return { w: innerWidth, h: innerHeight }; }
+  function norm(r) { var o = { left: r.left, top: r.top, width: r.width, height: r.height }; o.right = o.left + o.width; o.bottom = o.top + o.height; o.cx = o.left + o.width / 2; o.cy = o.top + o.height / 2; return o; }
+  function toRect(t) {
+    try {
+      if (typeof t === 'function') t = t(); if (!t) return null;
+      if (t.getBoundingClientRect) { if (t.closest && t.closest('[hidden]')) return null; var r = t.getBoundingClientRect(); if (!r.width && !r.height) return null; return norm(r); }
+      if (t.left != null && t.top != null) return norm({ left: t.left, top: t.top, width: t.width || 0, height: t.height || 0 });
+      if (t.x != null && t.y != null) return norm({ left: t.x - 22, top: t.y - 22, width: 44, height: 44 });
+    } catch (e) {}
+    return null;
+  }
+  function hit(a, b) { return a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top; }
+  function inter(a, b) { return Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top)); }
+  function infl(r, p) { return { left: r.left - p, top: r.top - p, right: r.right + p, bottom: r.bottom + p }; }
+  // what a bubble must not cover: the core (the tap spot) of every glowing or recommended thing, so a big glowing region keeps its middle free
+  var CORE = 56;   // 56px around the middle of a big glowing thing; when the screen is too cramped for that, 32px (the tap spot itself)
+  function core(r, k) { var w = r.width, h = r.height, cx = r.left + w / 2, cy = r.top + h / 2; k = k || CORE; if (w > k + 24) w = k; if (h > k + 24) h = k; return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2 }; }
+  function avoidRects(k) {
+    var out = [], v = vp(), sel = (cfg && cfg.avoid) || '.glow,.rglow,.rec,.rrec,.pri';
+    var list; try { list = D.querySelectorAll(sel + ',[data-gxh-avoid]'); } catch (e) { list = []; }
+    for (var i = 0; i < list.length; i++) {
+      var e = list[i]; if (e.closest && (e.closest('[data-help]') || e.closest('[hidden]'))) continue;
+      var r = e.getBoundingClientRect(); if (!r.width || !r.height || r.right < 0 || r.bottom < 0 || r.left > v.w || r.top > v.h) continue;
+      out.push(infl(core(r, k), k < CORE ? 2 : 4));
+    }
+    return out;
+  }
+  function topLimit() { var b = D.querySelector('.gx-bar'); var t = 6; if (b) { var r = b.getBoundingClientRect(); if (r.bottom > 0 && r.bottom < vp().h / 2) t = Math.ceil(r.bottom) + 4; } return typeof cfg.top === 'function' ? cfg.top() : (typeof cfg.top === 'number' ? cfg.top : t); }
+  function place(b, tr) {
+    var v = vp(), pad = 6, w = b.offsetWidth, h = b.offsetHeight, top = topLimit(), bot = v.h - pad;
+    var T = infl(tr, 8), best = null, bs = 1e9, soft = null, ss = 1e9;
+    var xs = [Math.max(pad, Math.min(v.w - w - pad, tr.cx - w / 2)), pad, Math.max(pad, v.w - w - pad)];
+    var ks = [CORE, 32];
+    for (var ki = 0; ki < ks.length && !best; ki++) {
+      var av = avoidRects(ks[ki]);
+      for (var xi = 0; xi < xs.length; xi++) for (var y = top; y <= bot - h; y += 6) {
+        var c = { left: xs[xi], top: y, right: xs[xi] + w, bottom: y + h };
+        if (hit(c, T)) continue;
+        var ov = 0; for (var k = 0; k < av.length; k++) if (hit(c, av[k])) ov += inter(c, av[k]) || 1;
+        var d = Math.abs(c.left + w / 2 - tr.cx) * 0.5 + Math.abs(y + h / 2 - tr.cy);
+        if (!ov) { if (d < bs) { bs = d; best = c; } } else { var s2 = ov * 50 + d; if (s2 < ss) { ss = s2; soft = c; } }
+      }
+    }
+    var c2 = best || soft || { left: xs[0], top: top, right: xs[0] + w, bottom: top + h };
+    b.style.left = Math.round(c2.left) + 'px'; b.style.top = Math.round(c2.top) + 'px';
+    var side = c2.bottom <= tr.top + 2 ? 'bottom' : c2.top >= tr.bottom - 2 ? 'top' : c2.right <= tr.left + 2 ? 'right' : 'left';
+    b.className = b.className.replace(/\bgxh-a-\w+/g, '').trim() + ' gxh-a-' + side;
+    var arr = b.querySelector('.gxh-arr');
+    if (arr) {
+      arr.style.left = arr.style.top = '';
+      if (side === 'top' || side === 'bottom') arr.style.left = Math.round(Math.max(14, Math.min(w - 26, tr.cx - c2.left - 6))) + 'px';
+      else arr.style.top = Math.round(Math.max(14, Math.min(h - 26, tr.cy - c2.top - 6))) + 'px';
+    }
+    b.classList.add('on');
+    return c2;
+  }
+  function ringAt(r, cls) {
+    var e = mk('div', 'gxh-ring' + (cls ? ' ' + cls : '')), p = 4;
+    e.style.cssText = 'left:' + Math.round(r.left - p) + 'px;top:' + Math.round(r.top - p) + 'px;width:' + Math.round(r.width + 2 * p) + 'px;height:' + Math.round(r.height + 2 * p) + 'px';
+    if (Math.abs(r.width - r.height) < 6 && r.width < 80) e.classList.add('round');
+    D.body.appendChild(e); return e;
+  }
+  function reduced() { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } }
+  function fingerAt(fr, tr) {
+    var f = mk('div', 'gxh-finger', '<i></i><b></b>'); D.body.appendChild(f);
+    f.setAttribute('aria-hidden', 'true'); f.dataset.tx = Math.round(tr.cx); f.dataset.ty = Math.round(tr.cy);
+    if (fr) { f.dataset.fx = Math.round(fr.cx); f.dataset.fy = Math.round(fr.cy); }
+    var a = fr || tr, b = tr, T = function (p, s) { return 'translate(' + Math.round(p.cx) + 'px,' + Math.round(p.cy) + 'px) scale(' + s + ')'; };
+    var kf = fr ? [{ transform: T(a, 1.25), opacity: 0 }, { transform: T(a, 1), opacity: 1, offset: .14 }, { transform: T(a, .9), opacity: 1, offset: .28 }, { transform: T(b, .9), opacity: 1, offset: .72 }, { transform: T(b, 1.2), opacity: .9, offset: .86 }, { transform: T(b, 1.4), opacity: 0 }]
+      : [{ transform: T(b, 1.3), opacity: 0 }, { transform: T(b, 1), opacity: 1, offset: .3 }, { transform: T(b, .85), opacity: 1, offset: .55 }, { transform: T(b, 1.35), opacity: 0 }];
+    f.style.transform = T(b, 1);
+    if (!reduced()) { try { f.animate(kf, { duration: fr ? 2300 : 1500, iterations: Infinity, easing: 'ease-in-out' }); } catch (e) {} }
+    return f;
+  }
+  function picHTML(p) { try { if (typeof p === 'function') p = p(); if (p == null) return ''; return typeof p === 'string' ? p : (p.outerHTML || ''); } catch (e) { return ''; } }
+  // ------------------------------------------------------------------ the one current help element
+  function clearEls() { if (!cur) return; (cur.els || []).forEach(function (e) { if (e.parentNode) e.parentNode.removeChild(e); }); cur.els = []; }
+  function hide() {
+    if (cur) { clearEls(); if (bulbEl) bulbEl.classList.remove('lit'); }
+    cur = null; D.removeEventListener('pointerdown', onDown, true);
+  }
+  function arm() { D.removeEventListener('pointerdown', onDown, true); D.addEventListener('pointerdown', onDown, true); }
+  function onDown(e) {
+    if (rulesEl || !cur) return;
+    var t = e.target;
+    if (t && t.closest) {
+      if (cur.kind === 'bulb' && t.closest('.gxh-link')) return;
+      if (bulbEl && bulbEl.contains(t) && cur.kind === 'bulb') skipUntil = Date.now() + 450;
+    }
+    hide();   // the tap is not swallowed: it still reaches whatever was tapped
+  }
+  function draw() {   // (re)build the visible pieces for cur at the current layout
+    if (!cur) return;
+    clearEls();
+    var tr = toRect(cur.target); if (!tr) { hide(); return; }
+    var fr = cur.from ? toRect(cur.from) : null, els = [];
+    if (cur.kind === 'bulb') { if (fr) els.push(ringAt(fr, 'from')); els.push(ringAt(tr)); els.push(fingerAt(fr, tr)); }
+    else els.push(ringAt(tr, 'soft'));
+    var b = cur.mkBubble(); D.body.appendChild(b); els.push(b); cur.els = els; cur.bub = b;
+    place(b, tr);
+  }
+  // ------------------------------------------------------------------ coach bubbles
+  function cancelPend() { if (pend) { clearTimeout(pend.t); pend = null; } }
+  function tryShow(id, n) {
+    pend = null;
+    var step = cfg.steps[id]; if (!step || !st.on || st.seen[id] || cur) return;
+    var tr = toRect(step.target);
+    if (!tr) { if (n < 8) { pend = { id: id, t: setTimeout(function () { tryShow(id, n + 1); }, 200) }; } return; }
+    st.seen[id] = 1; save(); shown.push(id);
+    cur = { kind: 'coach', id: id, phase: id, target: step.target, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub'); b.setAttribute('role', 'status'); b.dataset.phase = id;
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-bd">' + (step.pic ? '<div class="gxh-sp">' + picHTML(step.pic) + '</div>' : '') + '<div><div class="gxh-tt">' + esc(step.title) + '</div><div class="gxh-tx">' + esc(step.text) + '</div></div></div><div class="gxh-row2"><button type="button" class="gxh-ok">Got it</button></div>';
+      b.querySelector('.gxh-ok').addEventListener('click', function () { hide(); });
+      return b;
+    } };
+    draw(); arm();
+  }
+  function phase(id) {
+    if (!cfg) return;
+    if (id == null) { cancelPend(); if (cur && cur.kind === 'coach') hide(); else if (cur && cur.kind === 'bulb' && cur.phase != null) hide(); return; }
+    if (cur) { if (cur.phase != null && cur.phase !== id) hide(); else { if (cur.kind === 'coach') { var tr = toRect(cur.target); if (!tr) hide(); else if (cur.bub) { var k = Math.round(tr.left) + ',' + Math.round(tr.top) + ',' + Math.round(tr.width) + ',' + Math.round(tr.height); if (k !== cur.k) { cur.k = k; draw(); } } } return; } }
+    if (pend) { if (pend.id === id) return; cancelPend(); }
+    if (!st.on || st.seen[id] || !cfg.steps[id]) return;
+    pend = { id: id, t: setTimeout(function () { tryShow(id, 0); }, 280) };
+  }
+  // ------------------------------------------------------------------ the lightbulb
+  var BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2h5c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg>';
+  function bulbOpen() {
+    if (!bulbOpts || Date.now() < skipUntil) return;
+    hide(); cancelPend();
+    var s = null, ph = null;
+    try { s = bulbOpts.suggest ? bulbOpts.suggest() : null; } catch (e) { console.warn('gxh suggest', e); }
+    try { ph = bulbOpts.rulesFor ? bulbOpts.rulesFor() : null; } catch (e) {}
+    if (!s || !s.target || !toRect(s.target)) { rules(ph); return; }
+    cur = { kind: 'bulb', phase: ph, target: s.target, from: s.from, sug: s, els: [], mkBubble: function () {
+      var b = mk('div', 'gxh-bub gxh-bulbb'); b.setAttribute('role', 'status');
+      b.innerHTML = '<i class="gxh-arr"></i><div class="gxh-tx">' + esc(s.why || '') + '</div><div class="gxh-row2"><button type="button" class="gxh-link">How does this work?</button></div>';
+      b.querySelector('.gxh-link').addEventListener('click', function () { rules(ph); });
+      return b;
+    } };
+    if (bulbEl) bulbEl.classList.add('lit');
+    draw(); arm();
+  }
+  function bulb(o) {
+    if (!cfg) return; bulbOpts = o || {};
+    var e = o && o.el; if (typeof e === 'string') e = D.querySelector(e);
+    if (!e) { e = mk('button', 'gxh-bulb gxh-float'); e.type = 'button'; D.body.appendChild(e); }
+    if (bulbEl && bulbEl !== e) bulbEl.removeEventListener('click', bulbOpen);
+    bulbEl = e; e.classList.add('gxh-bulb'); e.setAttribute('data-help', ''); if (!e.getAttribute('aria-label')) e.setAttribute('aria-label', 'Help: suggest a move');
+    if (!e.querySelector('svg')) e.insertAdjacentHTML('afterbegin', BULB);
+    e.removeEventListener('click', bulbOpen); e.addEventListener('click', bulbOpen);
+    return e;
+  }
+  // ------------------------------------------------------------------ rules cards
+  function rulesList(ph) {
+    var all = cfg.rules || [], m = function (r) { return r.phase === ph || (Array.isArray(r.phase) && r.phase.indexOf(ph) >= 0); };
+    var l = ph != null ? all.filter(m) : []; if (!l.length) l = all.filter(function (r) { return r.phase == null; }); if (!l.length) l = all.slice();
+    return l;
+  }
+  function closeRules() { if (rulesEl) { if (rulesEl.parentNode) rulesEl.parentNode.removeChild(rulesEl); rulesEl = null; D.removeEventListener('keydown', onKey, true); } }
+  function onKey(e) { if (!rulesEl) return; if (e.key === 'Escape') closeRules(); else if (e.key === 'ArrowRight') rulesEl._go(1); else if (e.key === 'ArrowLeft') rulesEl._go(-1); }
+  function rules(ph) {
+    if (!cfg) return; var list = rulesList(ph); hide(); cancelPend(); closeRules(); if (!list.length) return;
+    var R = rulesEl = mk('div', 'gxh-rules'); R.setAttribute('role', 'dialog'); R.setAttribute('aria-modal', 'true'); R.setAttribute('aria-label', 'How this works');
+    R.innerHTML = '<div class="gxh-card" data-help><button type="button" class="gxh-x" aria-label="Close">×</button><div class="gxh-pic"></div><div class="gxh-rt"></div><div class="gxh-rx"></div><div class="gxh-nav"><button type="button" class="gxh-prev">Back</button><span class="gxh-dots"></span><button type="button" class="gxh-next">Next</button></div></div>';
+    var i = 0, q = function (s) { return R.querySelector(s); };
+    function show() {
+      var c = list[i]; q('.gxh-pic').innerHTML = picHTML(c.pic); q('.gxh-rt').textContent = c.title || ''; q('.gxh-rx').textContent = c.text || '';
+      q('.gxh-dots').innerHTML = list.length > 1 ? list.map(function (_, k) { return '<i' + (k === i ? ' class="on"' : '') + '></i>'; }).join('') : '';
+      q('.gxh-prev').disabled = i === 0; q('.gxh-prev').style.visibility = list.length > 1 ? 'visible' : 'hidden'; q('.gxh-next').textContent = i === list.length - 1 ? 'Done' : 'Next';
+      R.dataset.card = i; R.dataset.count = list.length;
+    }
+    R._go = function (d) { var n = i + d; if (n >= list.length) { closeRules(); return; } if (n < 0) return; i = n; show(); };
+    q('.gxh-x').addEventListener('click', closeRules); q('.gxh-prev').addEventListener('click', function () { R._go(-1); }); q('.gxh-next').addEventListener('click', function () { R._go(1); });
+    R.addEventListener('click', function (e) { if (e.target === R) closeRules(); });
+    var x0 = null; R.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    R.addEventListener('touchend', function (e) { if (x0 == null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 45) R._go(dx < 0 ? 1 : -1); }, { passive: true });
+    D.addEventListener('keydown', onKey, true);
+    show(); D.body.appendChild(R);
+  }
+  // ------------------------------------------------------------------ settings: Tips on/off + Reset tips
+  function settingsHTML(o) {
+    o = o || {}; var rc = o.rowClass || 'gxh-set', sc = o.segClass || '', bc = o.btnClass || '';
+    var b = function (a, v, label, pr) { return '<button type="button" class="' + bc + '" data-gxh="' + a + '"' + (v != null ? ' data-v="' + v + '"' : '') + (pr != null ? ' aria-pressed="' + pr + '"' : '') + '>' + label + '</button>'; };
+    return '<div class="' + rc + ' gxh-set" data-help><span>Tips</span><span class="' + sc + '" style="display:inline-flex;gap:6px;flex:0 0 auto">' + b('tips', 1, 'On', st.on) + b('tips', 0, 'Off', !st.on) + '</span></div>' +
+      '<div class="' + rc + ' gxh-set" data-help><span>Show tips again</span>' + b('reset', null, 'Reset tips') + '</div>';
+  }
+  function settingsRow(o) { var d = D.createElement('div'); d.setAttribute('data-help', ''); d.innerHTML = settingsHTML(o); return d; }
+  function syncSettings() {
+    var l = D.querySelectorAll('[data-gxh=tips]');
+    for (var i = 0; i < l.length; i++) l[i].setAttribute('aria-pressed', String((l[i].dataset.v === '1') === st.on));
+  }
+  function onClick(e) {
+    var t = e.target && e.target.closest && e.target.closest('[data-gxh]'); if (!t || !cfg) return;
+    if (t.dataset.gxh === 'tips') setEnabled(t.dataset.v === '1');
+    else if (t.dataset.gxh === 'reset') { reset(); var o = t.textContent; t.textContent = 'Done'; setTimeout(function () { t.textContent = o; }, 1400); }
+  }
+  function setEnabled(v) { if (!cfg) return; st.on = !!v; save(); if (!st.on) { cancelPend(); if (cur && cur.kind === 'coach') hide(); } syncSettings(); }
+  function reset() { if (!cfg) return; st.seen = {}; shown.length = 0; save(); }
+  // ------------------------------------------------------------------ relayout
+  function relayout() { if (!cfg || !cur || rulesEl) return; draw(); }
+  function init(o) {
+    cfg = o || {}; cfg.steps = cfg.steps || {}; cfg.rules = cfg.rules || []; load(); hide(); cancelPend(); closeRules();
+    if (wired) return GXH; wired = true;
+    D.addEventListener('click', onClick, true);
+    if (window.GXV) GXV.watch(relayout);
+    else { var t; var f = function () { clearTimeout(t); t = setTimeout(relayout, 80); setTimeout(relayout, 420); }; addEventListener('resize', f); addEventListener('orientationchange', f); }
+    return GXH;
+  }
+  var GXH = window.GXH = {
+    version: 1, init: init, phase: phase, bulb: bulb, rules: rules, hide: hide, relayout: relayout, setEnabled: setEnabled, reset: reset,
+    enabled: function () { return !!st.on; }, seen: function (id) { return !!st.seen[id]; }, settingsHTML: settingsHTML, settingsRow: settingsRow,
+    state: function () { return { on: st.on, seen: Object.keys(st.seen), shown: shown.slice(), cur: cur ? { kind: cur.kind, id: cur.id || null, phase: cur.phase } : null, rules: !!rulesEl, pending: pend ? pend.id : null }; }
+  };
+})();
 
 </script>
 <script>
@@ -3960,7 +4301,7 @@ function goalSteps(){const o=[];const inv=(k,w,why)=>{const m=missingTerrain(k);
   return o}
 // the red priorities that are still open and could be fixed: Start the day asks first
 function uncoveredRed(){return priorities().filter(p=>p.red&&!p.done&&(p.can||p.move))}
-// ---------- 💡 Suggest: the priorities in order, then the computer's best plan for the pawns left ----------
+// ---------- ✨ Suggest: the priorities in order, then the computer's best plan for the pawns left ----------
 // keep: plan only the free pawns (the recommendation in plan step 2); otherwise start from an empty human plan
 function suggestCore(keep){const hs=G.chars.filter(c=>c.human&&!c.dead).map(c=>c.i);if(!keep)clearPlan(hs);const lines=[];const whyBy={};
   const who=id=>{const p=pawnInfo(id);return p?pawnLabel(p):'?'};
@@ -3990,30 +4331,11 @@ function recPlan(){if(!planOpen())return {map:{}};if(recValid(UI.rec))return UI.
   UI.rec={round:G.round,res:res0,logN:log0,bkey,map};return UI.rec}
 // ---------- first-game walkthrough ----------
 UI.tut=0;try{UI.tut=localStorage.getItem('swi_tut')==='done'?99:0}catch(e){}
-function tutHtml(){if(UI.tut>=99||!G||G.round>1||!planOpen()||allAI())return '';
-  const steps=['<b>Each day has two halves.</b> First you plan: every castaway has 2 pawns to give jobs to. Then the day plays out as a story.',
-    '<b>Start with Today’s priorities.</b> They say what matters most right now, most urgent first. Tap <b>Do it</b> on the first one.',
-    '<b>Pawns and dice.</b> One pawn on a job rolls the dice (it may fail or hurt); one more pawn makes it a sure thing. Places 2 steps from camp need +1 pawn.',
-    '<b>The island is yours to read.</b> Every place has a number (❔3 is unexplored place 3). Tap one to see what you can do there.',
-    '<b>Give every pawn a job</b> (or tap 💡 Suggest for a full plan), then press <b>Start the day</b>.'];
-  const s=Math.min(UI.tut,steps.length-1);return `<div class="coach"><div class="cn">Tip ${s+1} of ${steps.length}</div><p>${steps[s]}</p><div class="cb">${s<steps.length-1?`<button class="btn xs" data-tut="next">Got it</button>`:''}<button class="btn xs ghost" data-tut="off">Hide tips</button></div></div>`}
+// the first-game walkthrough and the guided-game tips are now the help kit's coach bubbles (hlp.js)
+function tutHtml(){return ''}
 // ---------- the guided first game: one idea per screen, each shown once ----------
 UI.guide={on:false,seen:{}};
-const GUIDE={
-  plan1:'<b>How a day works.</b> Every day you <b>plan</b> first, then <b>watch the day play out</b>. This page shows what the camp needs tonight: <b>red rows are trouble</b>. Your goal is in the bar under the island (🎯). In the top bar, ♥ is the life of your most hurt castaway. Press <b>Next</b>.',
-  plan2:'<b>Give every pawn a job.</b> Each castaway has 2 pawns (workers); Friday and the dog are helpers. The <b>recommended job</b> comes with a reason: tap ✔ if you agree.',
-  plan3:'<b>Risks.</b> One pawn on a job rolls the dice (it can fail or hurt). Two pawns make it <b>certain</b>. Anything red is not covered today.',
-  plan4:'<b>Start the day.</b> The plan is fixed after this, and the day plays out scene by scene.',
-  event:'<b>An event card</b> comes every morning. Its <b>threat</b> sits in a slot and strikes later unless you send pawns to deal with it.',
-  act:'<b>Your jobs play out one by one.</b> Food and wood you win arrive in the evening, after every job is done.',
-  dice:'<b>Dice:</b> ✔ or ✖ says whether the job worked, 🩸 is a wound, ❓ draws an adventure card. Two pawns on a job means no dice.',
-  choice:'<b>Your choice.</b> Pick one of the buttons. The card text under it explains what each one does.',
-  weather:'<b>Weather.</b> Each cloud above your roof ruins 1 food and 1 wood. Snow also needs 1 wood each to keep warm.',
-  night:'<b>Night.</b> Everyone eats 1 food; anyone hungry takes 2 wounds. Without a shelter, everyone takes 1 wound.',
-  morning:'<b>Morale.</b> Each morning the first player (★) gains or loses <b>✊ determination</b>, the points you spend on skills. Low morale costs ✊; anyone who can’t pay takes a wound.',
-  prod:'<b>Production.</b> Your camp’s place gives its food and wood every morning, for free.',
-  daysum:'<b>End of the day:</b> what changed and why, and the one thing to do first tomorrow. <b>If any castaway dies, you all lose.</b>'};
-function guideTip(k){if(!UI.guide.on||UI.guide.seen[k]||!GUIDE[k]||!G||G.round>3)return '';return `<div class="coach gtip" role="note"><div class="cn">Tip</div><p>${GUIDE[k]}</p><div class="cb"><button class="btn xs" data-gtip="${k}">Got it</button><button class="btn xs ghost" data-gtip="off">No more tips</button></div></div>`}
+function guideTip(k){return ''}
 function tutAdvance(to){if(UI.tut<99)UI.tut=Math.max(UI.tut,to)}
 function tutDone(){UI.tut=99;try{localStorage.setItem('swi_tut','done')}catch(e){}}
 
@@ -4098,7 +4420,7 @@ function wzAssign(){const list=wizPawns();const placed=placedIds();const cur=cur
 function planSoFar(){if(!G.plan.acts.length)return '';return `<details class="sofar" ${UI.ps.sofar?'open':''}><summary data-a="sofar">The plan so far (${G.plan.acts.length} job${G.plan.acts.length>1?'s':''})</summary><div class="plan">${G.plan.acts.map(a=>planLine(a)).join('')}</div></details>`}
 // ---------- step 3: every job with its risk ----------
 function wzReview(){let h=`<p class="wz-p">Each job shows its risk. <b>Certain</b> jobs always work. Jobs that <b>roll the dice</b> can fail or cost a wound. Tap a pawn’s name to take it off a job.</p>`;
-  if(!G.plan.acts.length)return h+`<p class="muted">Nothing planned yet. Go back to step 2, or press 💡 Plan it for me.</p>`;
+  if(!G.plan.acts.length)return h+`<p class="muted">Nothing planned yet. Go back to step 2, or press ✨ Plan it for me.</p>`;
   const W=UI.sugWhy||{};
   h+=`<div class="review">${G.plan.acts.slice().sort((x,y)=>ORDER_T.indexOf(x.type)-ORDER_T.indexOf(y.type)).map((a,k)=>{const c=actCost(a);const cost=Object.entries(c).filter(([r,v])=>v).map(([r,v])=>`${v} ${RNAME[r]}`).join(' + ');const why=W[JSON.stringify([a.type,a.tgt])];
     const payT=a.type==='build'&&['shelter','roof','pal'].includes(a.tgt.k)&&(a.pay==='fur'||G.res.fur>=SRP_COST[Math.min(4,Math.max(2,G.np))].fur)?` <button class="btn xs" data-pay="${a.id}" title="Pay with wood or fur">pay with ${a.pay==='fur'?'fur':'wood'}</button>`:'';
@@ -4113,7 +4435,7 @@ function wzConfirm(){const acts=G.plan.acts;const roll=acts.filter(a=>{const n=a
   let h=`<p class="wz-p">${acts.length} job${acts.length===1?'':'s'}: ${acts.length-roll} certain, ${roll} roll${roll===1?'s':''} the dice.</p>`;
   h+=`<ul class="checks">${pr.map(p=>`<li class="${p.done?'ok':p.red?'bad':'meh'}">${p.done?'✓':p.red?'✗':'–'} ${esc(p.title)}</li>`).join('')}</ul>`;
   if(pb.length)h+=`<div class="probs">${pb.slice(0,3).map(x=>`<div>• ${esc(x)}</div>`).join('')}<div>Go back to step 2 to fix this.</div></div>`;
-  if(red.length)h+=`<div class="probs warn2">${red.map(p=>esc(p.confirm||('⚠ '+p.title+' is not covered.'))).join('<br>')}<div>You can still start, or press 💡 Plan it for me.</div></div>`;
+  if(red.length)h+=`<div class="probs warn2">${red.map(p=>esc(p.confirm||('⚠ '+p.title+' is not covered.'))).join('<br>')}<div>You can still start, or press ✨ Plan it for me.</div></div>`;
   h+=`<p class="wz-p">When you start, the day plays out one step at a time: <b>Actions</b> (job by job), then <b>Weather</b>, then <b>Night</b>. The plan can’t be changed after that.</p>`;
   return h}
 function posOf(act){if(!act)return null;if(act.type==='gather')return act.tgt.pos;if(act.type==='explore')return act.tgt;if(act.type==='build'&&act.tgt&&act.tgt.cross!=null)return act.tgt.cross;return null}
@@ -5389,7 +5711,7 @@ function netClick(b,d,e){
   case 'skip':return act({t:'skip'});
   case 'auto':return isClient();
   case 'quick':if(isClient()){e.preventDefault();toast('The host chooses whether to skip the automatic steps.');return true}setQuick(b.checked);render();netPush(true);return true;
-  case 'suggest':act({t:'suggest'});setPStep(3);toast('💡 Your castaway’s pawns have jobs now. Check them below and change anything you like.',5000);render();return true;
+  case 'suggest':act({t:'suggest'});setPStep(3);toast('✨ Your castaway’s pawns have jobs now. Check them below and change anything you like.',5000);render();return true;
   case 'rec':{const c=curPawn();const r=c&&recPlan().map[c.id];if(!r){toast('No job to recommend: choose one below.');UI.ps.pick=true;render();return true}if(r.why)UI.sugWhy[JSON.stringify([r.type,r.tgt])]=r.why;UI.sel=null;sfx('place');return act({t:'place',pid:c.id,type:r.type,tgt:r.tgt,alt:r.alt||0})}
   case 'clear':return act({t:'clear'});
   case 'pile':return act({t:'pile',n:1});case 'pilemax':return act({t:'pile',n:SCEN.marooned.pileRoom()});
@@ -5626,7 +5948,7 @@ function stepText(){if(G.over)return G.over.win?`🏆 ${G.over.why}`:`☠ ${G.ov
   return 'The day unfolds…'}
 function wizSync(){if(planOpen()&&!allAI()){pstep();if(UI.ps.step!==2&&UI.sel&&!UI.tileSel)UI.sel=null}}
 function stepFoot(){const st=pstep();const cur=st===2?curPawn():null;const list=st===2?wizPawns():[];const red=st===4?uncoveredRed():[];const pb=planProblems();
-  const sug=`<button class="btn ghost" data-a="suggest" title="Give every pawn a job following today’s needs (H). You can change anything.">💡 Plan for me</button>`;
+  const sug=`<button class="btn ghost" data-a="suggest" title="Give every pawn a job following today’s needs (H). You can change anything.">✨ Plan for me</button>`;
   const back=st>1?`<button class="btn ghost" data-a="pback">◀ Back</button>`:`<button class="btn ghost" data-a="clear" title="Take all your pawns off their jobs">Clear</button>`;
   const txt=st===1?'Planning 1 of 4: read what today needs, then give out jobs.':st===2?(cur?`Planning 2 of 4 · Pawn ${list.findIndex(p=>p.id===cur.id)+1} of ${list.length}: ${pawnNice(cur)}. Take the recommended job or choose another.`:'Planning 2 of 4: every pawn has a job.'):st===3?'Planning 3 of 4: check the risk of each job.':pb.length?`Planning 4 of 4: not ready yet. ${pb[0]}`:red.length?'Planning 4 of 4: something urgent is not covered.':'Planning 4 of 4: all set. Start the day!';
   const next=st===1?`<button class="btn go" data-a="pnext" title="Step 2: give each pawn a job">Next: jobs ▶</button>`:st===2?`<button class="btn go ${cur&&cur.c!=null?'dim':''}" data-a="pnext" title="Step 3: check the risk of each job">Next: check ▶</button>`:st===3?`<button class="btn go ${pb.length?'dim':''}" data-a="pnext" title="Step 4: start the day">Next: start ▶</button>`:
@@ -5634,7 +5956,7 @@ function stepFoot(){const st=pstep();const cur=st===2?curPawn():null;const list=
   return `<div class="st-t" id="steptext">${esc(typeof netOn==='function'&&netOn()&&st===4&&!pb.length?netStepText(red):txt)}</div><div class="st-b">${back}${sug}${next}</div>`}
 function renderStep(){const el=$('#step');if(!el)return;const st=storyActive();el.hidden=st;if(st)return;
   const cf=UI.confirm&&planOpen()&&!allAI();
-  el.innerHTML=cf?`<div class="st-t confirm" id="steptext" role="alert">${esc(UI.confirm)} Start anyway?</div><div class="st-b"><button class="btn ghost" data-a="suggest" title="Fill the priorities for me">💡 Plan it for me</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`:
+  el.innerHTML=cf?`<div class="st-t confirm" id="steptext" role="alert">${esc(UI.confirm)} Start anyway?</div><div class="st-b"><button class="btn ghost" data-a="suggest" title="Fill the priorities for me">✨ Plan it for me</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`:
   planOpen()&&!allAI()?stepFoot():`<div class="st-t" id="steptext">${esc(stepText())}</div>${G.over?`<div class="st-b"><button class="btn go" data-a="new">New game</button></div>`:''}`}
 // ---------- side panel ----------
 function renderPanel(){const el=$('#panel');if(!el)return;el.innerHTML=`<div class="pbody">${planHtml()}</div>`;if(UI.toTop&&!storyActive()){UI.toTop=0;const bd=document.querySelector('.gx-dock-body');if(bd)bd.scrollTop=0}
@@ -5805,7 +6127,7 @@ document.addEventListener('click',e=>{const pr=e.target.closest&&e.target.closes
   case 'goback':UI.confirm=null;render();return;
   case 'next':storyNext();return;case 'skip':storySkip();return;
   case 'auto':UI.auto=!UI.auto;try{localStorage.setItem('swi_auto',UI.auto?'1':'0')}catch(e){}render();return;
-  case 'suggest':{const m=suggestPlan();setPStep(3);toast(m?'💡 Every pawn has a job now. Check the risk of each one below, and change anything you like.':'💡 Nothing to add.',6000);render();return}
+  case 'suggest':{const m=suggestPlan();setPStep(3);toast(m?'✨ Every pawn has a job now. Check the risk of each one below, and change anything you like.':'✨ Nothing to add.',6000);render();return}
   case 'pnext':setPStep(pstep()+1);render();return;case 'pback':setPStep(pstep()-1);render();return;
   case 'pick':UI.ps.pick=!UI.ps.pick;render();return;
   case 'pskip':{const c=curPawn();if(c&&c.c==null)UI.ps.skip.push(c.id);UI.sel=null;wizPlaced();render();return}
@@ -5876,7 +6198,7 @@ function init(){if(BF.ready)return;BF.ready=true;const app=q('.gx-app'),board=q(
   // the labels loop moves the chips and the finger with the camera
   if(typeof placeLabels==='function'){const pl0=placeLabels;placeLabels=function(){pl0.apply(this,arguments);if(BF.on)BF.place()}}
   // short messages go to the status line, never into the hidden dock
-  if(typeof toast==='function'){const t0=toast;toast=function(t,ms,keep){if(BF.on){const s=/^💡 Every pawn/.test(t||'')?'Plan ready. Check it, then start.':brief(t);BF.say(s,Math.min(ms||3200,3800))}else t0.apply(this,arguments)}}}
+  if(typeof toast==='function'){const t0=toast;toast=function(t,ms,keep){if(BF.on){const s=/^✨ Every pawn/.test(t||'')?'Plan ready. Check it, then start.':brief(t);BF.say(s,Math.min(ms||3200,3800))}else t0.apply(this,arguments)}}}
 // ---------- geometry ----------
 function tilePt(id){const ov=q('#bfov');if(!ov)return null;const r0=ov.getBoundingClientRect();
   if(typeof V3!=='undefined'&&V3.on&&V3.cam&&V3.r&&typeof MAP!=='undefined'&&MAP[id]){const p=hexPos(MAP[id].q,MAP[id].r);const v=new THREE.Vector3(p.x,HEXH,p.z);V3.cam.updateMatrixWorld();v.project(V3.cam);
@@ -5889,7 +6211,7 @@ function legalRows(id,cur){if(!cur)return [];let rows=[];try{rows=PHO.tileRows(i
   try{const pi=pawnInfo(cur.id);if(pi&&pi.c==null&&!pi.f)rows=rows.filter(r=>{const a=findActAny(r.type,r.tgt,r.alt);return !!a&&a.pw.some(q=>{const o=pawnInfo(q);return o&&(o.c!=null||o.f)})})}catch(e){}return rows}
 function canPay(r,cur){try{const a={type:r.type,tgt:r.tgt,alt:r.alt||0,pw:[cur.id]};if(afford(a))return true;if(r.type==='build'&&['shelter','roof','pal'].includes(r.tgt.k)){for(const pay of ['fur','wood']){a.pay=pay;if(afford(a))return true}}return false}catch(e){return true}}
 function legalTiles(cur){if(!cur)return [];const k=planSig()+'|'+cur.id+'|'+G.logN+'|'+JSON.stringify(G.res);if(BF._lk===k)return BF._lt;const out=[];for(const m of MAP)if(legalRows(m.id,cur).length)out.push(m.id);BF._lk=k;BF._lt=out;return out}
-BF.legal=legalTiles;window.legalRowsDbg=id=>{const c=curPawn();return legalRows(id,c).map(r=>r.title)};
+BF.legal=legalTiles;BF.recTile=(c)=>recTile(c);window.legalRowsDbg=id=>{const c=curPawn();return legalRows(id,c).map(r=>r.title)};
 function recTile(cur){if(!cur)return null;const rec=recPlan().map[cur.id];if(!rec||placeWhy(cur.id,rec.type,rec.tgt,rec.alt))return null;
   const same=r=>r.type===rec.type&&JSON.stringify(r.tgt)===JSON.stringify(rec.tgt)&&(r.alt||0)===(rec.alt||0);for(const m of MAP)if(legalRows(m.id,cur).some(same))return {id:m.id,rec};return null}
 // a choice that is a place on the island (where the fog goes): the places glow and you tap one
@@ -5928,15 +6250,15 @@ BF.paint=function(){const lb=q('#phlabel');if(!lb||!BF.on)return;const s=BF.stat
 // ---------- the tray: your pawns and one big button ----------
 function badActs(){const o=new Set();try{const pb=planProblems();for(const a of G.plan.acts){const l=actLabel(a);if(pb.some(m=>m.indexOf(l)===0))o.add(a.id)}}catch(e){}return o}
 function tokHtml(p,cur,bad){const a=G.plan.acts.find(x=>x.pw.includes(p.id));const nm=pawnLabel(p);
-  return `<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"><b>${E(nm.slice(0,2))}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${ACT_ICON[a.type]||'•'}</u>`:''}</button>`}
+  return `<button class="bfpw ${cur&&cur.id===p.id?'on':''} ${a?'set':''} ${a&&bad&&bad.has(a.id)?'bad':''}" style="--pc:${pcol(p.id)}" data-pawn="${p.id}" title="${E(pawnNice(p))}" aria-label="${E(pawnNice(p))}${a?': '+E(actLabel(a))+' (tap to change)':', no job yet'}"><b class="ico">${pawnIcon(p)}</b>${p.id.endsWith('_1')?'<sub>2</sub>':''}${a?`<u>${ACT_ICON[a.type]||'•'}</u>`:''}</button>`}
 function trayHtml(st){
   if(st==='story'){const i=storyIdx();if(i<0)return '';const b=UI.beats[i];const last=i>=UI.beats.length-1;const qq=last&&humanQ()?G.q:null;
     if(qq&&posQ())return '';if(qq){const n=qq.opts.length;return `<div class="bf-opts n${n}">${qq.opts.map((o,j)=>`<button class="btn opt" data-ans="${j}">${E(o.l)}</button>`).join('')}</div>`}
     const nextL=b.kind==='daysum'&&!last?`Start day ${b.data.round+1} ▶`:last?(G.over?'See how it ended ▶':'Plan the day ▶'):'Continue ▶';
     return `<div class="bf-main"><button class="gx-ibtn bf-s ${UI.auto?'on':''}" data-a="auto" aria-pressed="${!!UI.auto}" aria-label="Play by itself">⏩</button><button class="btn go" data-a="next">${nextL}</button>${i<UI.beats.length-2?'<button class="gx-ibtn bf-s" data-a="skip" aria-label="Skip ahead">⏭</button>':''}</div>`}
   if(st==='plan'||st==='plan2'){const cur=curPawn();const pb=planProblems();
-    if(UI.confirm&&planOpen())return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me">💡</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`;
-    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div><div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me">💡</button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
+    if(UI.confirm&&planOpen())return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn ghost" data-a="goback">Go back</button><button class="btn go" data-a="go" data-force="1">Start anyway ▶</button></div>`;
+    return `<div class="pawnrow bf-pw" aria-label="Your pawns">${(()=>{const bd=badActs();return wizPawns().map(p=>tokHtml(p,cur,bd)).join('')})()}</div><div class="bf-main"><button class="gx-ibtn bf-s" data-a="suggest" aria-label="Plan it for me" title="Plan it for me">✨</button><button class="btn go ${pb.length?'dim':''}" data-a="go">Start day ▶</button></div>`}
   if(allAI()&&!G.over)return `<div class="bf-main"><button class="gx-ibtn bf-s" data-a="pause" aria-label="Pause">${UI.pause?'▶':'⏸'}</button><button class="gx-ibtn bf-s" data-a="speed" aria-label="Speed">⏩</button></div>`;
   return ''}
 // ---------- chips on the island: the plan, then the day's jobs ----------
@@ -6071,6 +6393,161 @@ BF.post=function(st){init();const tray=q('#bf');if(!tray)return;try{msgCheck()}c
   if(st==='over'&&bd){const r=bd.getBoundingClientRect();const top=Math.round(r.top+r.height*.28);R.style.setProperty('--dz-t',top+'px');R.style.setProperty('--dz-l','0px');R.style.setProperty('--dz-w',innerWidth+'px');R.style.setProperty('--dz-h',(innerHeight-top)+'px')}
   BF.ghostPlace()};
 })();
+
+</script>
+<script>
+// ===================== help (gx-help kit): coach bubbles the first time, the lightbulb on demand, pawn role icons =====================
+// Bubbles: once per phase, short, pointing at the board. The bulb: the advisor's own move (recPlan for a pawn's job, aiChoose for a choice) + a short why + rules cards.
+// ---------- pawn role icons: the castaway buttons show a small picture, the name is on long-press ----------
+const ROLE_IC={
+ carpenter:'<path d="M5 20l8-8"/><path d="M10 6l3-3 8 8-3 3z"/>',
+ cook:'<path d="M5 11h14v5a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z"/><path d="M3 11h18M9 7c0-2 3-2 3-4M15 7c0-2 3-2 3-4"/>',
+ explorer:'<circle cx="12" cy="12" r="9"/><path d="M16 8l-2.2 5.8L8 16l2.2-5.8z"/>',
+ soldier:'<path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z"/><path d="M12 8v8M9 11h6"/>',
+ friday:'<circle cx="12" cy="9" r="4"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/><path d="M16 5l4-3"/>',
+ dog:'<circle cx="6.5" cy="10" r="2"/><circle cx="12" cy="6.5" r="2"/><circle cx="17.5" cy="10" r="2"/><path d="M12 12c-4 0-6 3-6 5a3 3 0 0 0 3 3c1.5 0 2-1 3-1s1.5 1 3 1a3 3 0 0 0 3-3c0-2-2-5-6-5z"/>',
+ helper:'<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>'};
+function roleOf(p){if(!p)return 'helper';if(p.c!=null){try{return P(p.c).k}catch(e){return 'helper'}}if(p.f)return 'friday';if(p.id==='dog')return 'dog';return 'helper'}
+function pawnIcon(p){const k=roleOf(p);return '<svg class="role" viewBox="0 0 24 24" aria-hidden="true">'+(ROLE_IC[k]||ROLE_IC.helper)+'</svg>'}
+// hold a pawn for half a second: its name appears on the status line
+(function(){let tm=null;const stop=()=>{clearTimeout(tm);tm=null};
+  document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest('.bfpw');if(!b||typeof G==='undefined'||!G)return;stop();
+    tm=setTimeout(()=>{tm=null;try{const p=pawnInfo(b.dataset.pawn);if(p&&typeof BF!=='undefined'&&BF.on)BF.say(pawnNice(p),2200)}catch(err){}},450)},true);
+  for(const t of['pointerup','pointercancel','pointermove'])document.addEventListener(t,stop,true)})();
+// ---------------------------------------------------------------- pictures for the rules cards (inline SVG, small and flat)
+const HP={
+ hex:t=>'<svg viewBox="0 0 64 64"><path d="M32 6l22 13v26L32 58 10 45V19z" fill="#8fb77a" stroke="#3d5a2f" stroke-width="3" stroke-linejoin="round"/>'+(t?'<text x="32" y="40" text-anchor="middle" font-size="20" font-weight="800" fill="#1d2a14" font-family="sans-serif">'+t+'</text>':'')+'</svg>',
+ pawn:c=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="20" r="11" fill="'+(c||'#4f8fe6')+'" stroke="#1d2a3a" stroke-width="3"/><path d="M14 56Q32 22 50 56z" fill="'+(c||'#4f8fe6')+'" stroke="#1d2a3a" stroke-width="3" stroke-linejoin="round"/></svg>',
+ pawn2:()=>'<svg viewBox="0 0 64 64"><circle cx="21" cy="22" r="9" fill="#4f8fe6" stroke="#1d2a3a" stroke-width="3"/><path d="M6 54Q21 26 36 54z" fill="#4f8fe6" stroke="#1d2a3a" stroke-width="3" stroke-linejoin="round"/><circle cx="44" cy="22" r="9" fill="#e0625c" stroke="#1d2a3a" stroke-width="3"/><path d="M29 54Q44 26 59 54z" fill="#e0625c" stroke="#1d2a3a" stroke-width="3" stroke-linejoin="round"/></svg>',
+ die:n=>{const d={1:[[32,32]],2:[[20,20],[44,44]],3:[[18,18],[32,32],[46,46]]}[n]||[[32,32]];return '<svg viewBox="0 0 64 64"><rect x="10" y="10" width="44" height="44" rx="9" fill="#fffaf0" stroke="#1d2a3a" stroke-width="3"/>'+d.map(p=>'<circle cx="'+p[0]+'" cy="'+p[1]+'" r="4.5" fill="#1d2a3a"/>').join('')+'</svg>'},
+ tick:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#57b36a" stroke="#1d4a2a" stroke-width="3"/><path d="M20 33l8 8 17-18" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ cross:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#e0625c" stroke="#6a1a16" stroke-width="3"/><path d="M22 22l20 20M42 22L22 42" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>',
+ drop:()=>'<svg viewBox="0 0 64 64"><path d="M32 6C22 22 14 31 14 41a18 18 0 0 0 36 0C50 31 42 22 32 6z" fill="#c0392b" stroke="#5a120c" stroke-width="3" stroke-linejoin="round"/></svg>',
+ ask:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="22" fill="#e8ad45" stroke="#6b4a00" stroke-width="3"/><text x="32" y="43" text-anchor="middle" font-size="30" font-weight="800" fill="#3b2800" font-family="sans-serif">?</text></svg>',
+ heart:()=>'<svg viewBox="0 0 64 64"><path d="M32 54C10 38 8 22 18 15c6-4 12-1 14 5 2-6 8-9 14-5 10 7 8 23-14 39z" fill="#e0625c" stroke="#6a1a16" stroke-width="3" stroke-linejoin="round"/></svg>',
+ tent:()=>'<svg viewBox="0 0 64 64"><path d="M8 54L32 10l24 44z" fill="#e8ad45" stroke="#6b4a00" stroke-width="3" stroke-linejoin="round"/><path d="M32 54L24 54 32 30 40 54z" fill="#6b4a00"/></svg>',
+ cloud:()=>'<svg viewBox="0 0 64 64"><path d="M18 42a10 10 0 0 1 2-19 14 14 0 0 1 27 3 8 8 0 0 1-1 16z" fill="#c9d6e0" stroke="#3a4a58" stroke-width="3" stroke-linejoin="round"/><path d="M22 50l-3 7M32 50l-3 7M42 50l-3 7" stroke="#4f8fe6" stroke-width="3" stroke-linecap="round"/></svg>',
+ moon:()=>'<svg viewBox="0 0 64 64"><path d="M40 8a24 24 0 1 0 16 36A20 20 0 0 1 40 8z" fill="#f3e6bf" stroke="#6b5a2a" stroke-width="3" stroke-linejoin="round"/></svg>',
+ wood:()=>'<svg viewBox="0 0 64 64"><rect x="8" y="22" width="48" height="22" rx="5" fill="#a8743a" stroke="#4a2f14" stroke-width="3"/><circle cx="50" cy="33" r="7" fill="#d9a766" stroke="#4a2f14" stroke-width="2.5"/></svg>',
+ food:()=>'<svg viewBox="0 0 64 64"><ellipse cx="30" cy="30" rx="20" ry="16" fill="#c9783a" stroke="#5a2f10" stroke-width="3"/><path d="M46 40l10 10" stroke="#f3e6bf" stroke-width="7" stroke-linecap="round"/></svg>',
+ fog:()=>'<svg viewBox="0 0 64 64"><path d="M10 26h34M18 36h38M10 46h30" stroke="#b9c4cf" stroke-width="7" stroke-linecap="round"/><path d="M32 6l18 10v14" fill="none" stroke="#5a6a78" stroke-width="3" stroke-linecap="round"/></svg>',
+ scroll:()=>'<svg viewBox="0 0 64 64"><rect x="14" y="10" width="36" height="44" rx="4" fill="#fbf1d2" stroke="#8a6a1a" stroke-width="3"/><path d="M21 22h22M21 31h22M21 40h14" stroke="#7a1f31" stroke-width="3" stroke-linecap="round"/></svg>',
+ btn:t=>'<svg viewBox="0 0 64 64"><rect x="4" y="20" width="56" height="24" rx="12" fill="#d98a1e" stroke="#7a4a08" stroke-width="3"/><text x="32" y="37" text-anchor="middle" font-size="12" font-weight="800" fill="#fff" font-family="sans-serif">'+t+'</text></svg>',
+ tap:()=>'<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="18" fill="rgba(255,211,122,.5)" stroke="#d98a1e" stroke-width="4"/><path d="M30 14v26l-6-5-4 4 14 14h14l4-20-8-2-4-4-4 1-2-4z" fill="#fff" stroke="#231a10" stroke-width="2.5" stroke-linejoin="round"/></svg>',
+ role:k=>'<svg viewBox="0 0 24 24" style="stroke:#1d2a3a;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;background:#fffaf0;border-radius:50%;border:3px solid #4f8fe6;padding:9px;box-sizing:border-box">'+ROLE_IC[k]+'</svg>'
+};
+function hpics(items){return '<div class="gxh-pics">'+items.map(it=>it==='>'?'<span class="gxh-ar">&rarr;</span>':'<figure>'+(HP[it[0]]?HP[it[0]](it[2]):'')+(it[1]?'<figcaption>'+it[1]+'</figcaption>':'')+'</figure>').join('')+'</div>'}
+// ---------------------------------------------------------------- where each bubble points
+const hq=s=>()=>document.querySelector(s);
+const hfirst=(...sels)=>()=>{for(const s of sels){const e=document.querySelector(s);if(e&&e.getBoundingClientRect().width)return e}return null};
+const hpt=p=>p?{left:p.ox+p.x-26,top:p.oy+p.y-26,width:52,height:52}:null;
+const hlpOpts=()=>{const q=G&&G.q;return q&&humanQ()?q:null};
+// the glowing place a bubble points at: the recommended one, else the first
+function hlpJobTarget(){try{const cur=curPawn();const rt=cur&&BF.recTile(cur);if(rt){const r=hpt(BF.tilePt(rt.id));if(r)return r}}catch(e){}
+  return hfirst('#bfglow .bfgl','#bf .bfpw.on')()}
+function hlpPostTarget(){try{const o=BF.posQ();if(o){const r=hpt(BF.tilePt(o[0].pos));if(r)return r}}catch(e){}return hfirst('#bfglow .bfgl')()}
+const HLP_STEPS={
+ job:{target:hlpJobTarget,title:'Give a job',text:'Tap a glowing place on the island to send this castaway to work there.',pic:()=>HP.tap()},
+ ready:{target:hfirst('#bf .btn.go'),title:'Start the day',text:'Every pawn has a job. Check the chips on the island, then tap Start day.',pic:()=>HP.btn('Start')},
+ confirm:{target:hfirst('#bf .btn.go','#bf .btn'),title:'Start anyway?',text:'Something is not covered today. Go back to fix it, or start anyway.',pic:()=>HP.cross()},
+ place:{target:hlpPostTarget,title:'Choose a place',text:'The fog has to settle somewhere. Tap a glowing place on the island.',pic:()=>HP.fog()},
+ choice:{target:hfirst('#bf .bf-opts','#story .opts'),title:'Your choice',text:'Tap one button. The card text explains what each option does.',pic:()=>HP.scroll()},
+ dice:{target:hfirst('#bf .bf-opts','#story .opts'),title:'Keep this roll?',text:'Keep the dice as they fell, or tap an option to fix a die.',pic:()=>HP.die(3)},
+ intro:{target:hfirst('#bf .btn.go','#story .sctl .btn.go'),title:'The story',text:'Read the scene, then tap Continue. Your goal is under the i button.',pic:()=>HP.scroll()},
+ daysum:{target:hfirst('#bf .btn.go','#story .sctl .btn.go'),title:'End of day',text:'See what changed today. Then tap Start day to plan the next one.',pic:()=>HP.moon()}
+};
+// ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each)
+const HLP_RULES=[
+ {title:'The goal',text:'Meet your chapter\'s goal before the last day. If any castaway dies, everyone loses.',pic:()=>hpics([['tent','Camp'],'>',['tick','Rescued']])},
+ {title:'One day',text:'Plan a job for every pawn, then watch the day play out. Night brings hunger and weather.',pic:()=>hpics([['pawn','Plan'],'>',['die','Work',2],'>',['moon','Night']])},
+ {title:'Pawns and dice',text:'One pawn on a job rolls dice and can fail. Add a second pawn to make it sure.',pic:()=>hpics([['pawn','One: dice'],['pawn2','Two: sure']])},
+ {phase:'job',title:'Give every pawn a job',text:'Tap a glowing place to send the castaway there. Tap a place with one job to place it at once.',pic:()=>hpics([['pawn','Pawn'],'>',['hex','Place']])},
+ {phase:'job',title:'Risk and sure things',text:'A lone pawn rolls dice and may fail or get hurt. Two pawns on a job never roll.',pic:()=>hpics([['die','Alone',2],'>',['cross','May fail'],['pawn2','Two'],'>',['tick','Sure']])},
+ {phase:'job',title:'Far places cost more',text:'A place two steps from camp needs one extra pawn. Explore unknown places to reveal new land.',pic:()=>hpics([['tent','Camp'],'>',['hex','Near'],'>',['hex','Far +1']])},
+ {phase:'job',title:'Hold a pawn',text:'Hold a round pawn button to see its name. A helper pawn can only join a job someone else leads.',pic:()=>hpics([['role','Castaway','carpenter'],['role','Helper','helper']])},
+ {phase:'ready',title:'Read the chips',text:'Chips on the island show each job: a tick is sure, a die rolls, red needs more pawns.',pic:()=>hpics([['tick','Sure'],['die','Dice',2],['cross','Needs +1']])},
+ {phase:'ready',title:'Change your mind',text:'Tap a chip on the island to take back its last pawn. Then give that pawn a new job.',pic:()=>hpics([['pawn','Take back'],'>',['hex','New job']])},
+ {phase:'ready',title:'Start the day',text:'Press Start day. The plan is fixed, then the day plays out as a story.',pic:()=>hpics([['btn','Start day'],'>',['scroll','Story']])},
+ {phase:'confirm',title:'Not everything is covered',text:'A warning means something may go wrong tonight, such as hunger. Go back to fix it, or start anyway.',pic:()=>hpics([['cross','Warning'],'>',['moon','Tonight']])},
+ {phase:'confirm',title:'Hunger hurts',text:'At night everyone eats 1 food. A hungry castaway takes 2 wounds. Plan food every day.',pic:()=>hpics([['food','1 food'],'>',['heart','Each night']])},
+ {phase:'place',title:'Choose a place',text:'The game asks where. Tap one of the glowing places on the island to choose it.',pic:()=>hpics([['hex','Choose'],'>',['fog','Fog']])},
+ {phase:'place',title:'What fog does',text:'A fogged place needs one extra pawn and hides its land. Pick a place you need least.',pic:()=>hpics([['fog','Fog'],'>',['pawn','+1 pawn']])},
+ {phase:'choice',title:'Your choice',text:'Tap one button. Read the card text first: it explains what each option does.',pic:()=>hpics([['scroll','Read'],'>',['tap','Tap']])},
+ {phase:'choice',title:'Wounds and life',text:'Each castaway can take wounds until their life runs out. Protect the hurt ones.',pic:()=>hpics([['heart','Life'],'>',['drop','Wounds']])},
+ {phase:'dice',title:'The three dice',text:'Tick: the job worked. Blood drop: a wound. Question mark: you draw an adventure card.',pic:()=>hpics([['tick','Worked'],['drop','Wound'],['ask','Adventure']])},
+ {phase:'dice',title:'Keep or fix',text:'You may keep the roll, or use an item or skill to roll a die again.',pic:()=>hpics([['die','Roll',3],'>',['die','Again',1]])},
+ {phase:'dice',title:'Failing helps a little',text:'A failed job gives its castaway 2 determination, which pays for skills.',pic:()=>hpics([['cross','Failed'],'>',['scroll','+2 skill points']])},
+ {phase:'intro',title:'The story',text:'Each scene sets up the day. Tap Continue to read on, or the fast-forward button to skip.',pic:()=>hpics([['scroll','Scene'],'>',['btn','Continue']])},
+ {phase:'intro',title:'Where is my goal?',text:'Tap the i button for your goal. Tap the top chip for food, wood and life.',pic:()=>hpics([['tent','Camp status'],['scroll','Goal']])},
+ {phase:'daysum',title:'End of the day',text:'This shows what changed and why. Check your food, wood and the castaways\' life.',pic:()=>hpics([['food','Food'],['wood','Wood'],['heart','Life']])},
+ {phase:'daysum',title:'Plan again',text:'Tap Start day to plan the next day. Fix whatever hurt you most today.',pic:()=>hpics([['moon','Night'],'>',['pawn','New plan']])},
+ {phase:'beatEvent',title:'Morning event',text:'An event card comes each morning. Its threat waits in a slot and strikes later unless you send pawns.',pic:()=>hpics([['scroll','Event'],'>',['cross','Threat']])},
+ {phase:'beatEvent',title:'Morale',text:'Each morning the first player gains or loses determination, which pays for skills. Low morale costs it, then wounds.',pic:()=>hpics([['heart','Morale'],'>',['scroll','Skills']])},
+ {phase:'beatEvent',title:'Camp production',text:'Your camp\'s place gives its food and wood every morning, for free.',pic:()=>hpics([['tent','Camp'],'>',['food','Food'],['wood','Wood']])},
+ {phase:'beatWork',title:'Jobs play out',text:'Jobs play one by one. The food and wood you win arrive in the evening.',pic:()=>hpics([['pawn','Work'],'>',['food','Food'],['wood','Wood']])},
+ {phase:'beatWork',title:'The dice',text:'Tick: the job worked. Blood drop: a wound. Question mark: an adventure card. Two pawns mean no dice.',pic:()=>hpics([['tick','Worked'],['drop','Wound'],['ask','Adventure']])},
+ {phase:'beatWeather',title:'Weather',text:'Each cloud above your roof ruins 1 food and 1 wood. Snow also needs 1 wood each to keep warm.',pic:()=>hpics([['cloud','Cloud'],'>',['food','-1'],['wood','-1']])},
+ {phase:'beatWeather',title:'Roof and palisade',text:'Build the roof before the rain. Build the palisade before storms: each level soaks up one hit.',pic:()=>hpics([['tent','Roof'],'>',['cloud','Soaked up']])},
+ {phase:'beatNight',title:'Night',text:'Everyone eats 1 food. Anyone hungry takes 2 wounds. Without a shelter, everyone takes 1 wound.',pic:()=>hpics([['moon','Night'],'>',['food','Eat'],['heart','Wounds']])},
+ {phase:'beatNight',title:'Build a shelter early',text:'Build a shelter on day 1 or 2. It costs 2 wood and spares everyone a wound each night.',pic:()=>hpics([['tent','Shelter'],'>',['heart','Safe']])}
+];
+// ---------------------------------------------------------------- phases
+const hnet=()=>typeof NET!=='undefined'&&NET.on;
+// the phase the player is deciding in (null when there is nothing to decide)
+function hlpPhase(){try{if(!G||typeof UI==='undefined'||UI.modal||G.over||hnet()||allAI())return null;
+  if(storyActive()){const i=storyIdx();if(i<0)return null;const b=UI.beats[i];const last=i>=UI.beats.length-1;
+    if(last&&humanQ()){if(BF.on&&typeof PHO!=='undefined'&&PHO.on&&BF.posQ())return 'place';return G.q.kind==='dice'?'dice':'choice'}
+    if(b.kind==='intro')return 'intro';if(b.kind==='daysum')return 'daysum';return null}
+  if(planOpen()&&BF.on){if(UI.confirm)return 'confirm';return curPawn()?'job':'ready'}
+  return null}catch(e){return null}}
+// the rules cards the bulb opens: the decision's own, or (while a scene plays) the scene's
+function hlpRulesPhase(){const ph=hlpPhase();if(ph)return ph;
+  try{if(!G||UI.modal||G.over||!storyActive())return null;const b=UI.beats[storyIdx()];if(!b)return null;
+    if(['dawn','event','threat','morning','prod'].includes(b.kind))return 'beatEvent';
+    if(['go','act','finds','adventure','mystery','fight'].includes(b.kind))return 'beatWork';
+    if(b.kind==='weather')return 'beatWeather';if(b.kind==='night')return 'beatNight'}catch(e){}return null}
+// ---------------------------------------------------------------- the lightbulb: what the game's own advisor would do
+const wcount=t=>String(t||'').replace(/[^a-zA-Z0-9'’+]+/g,' ').trim().split(' ').filter(Boolean).length;
+const cap15=t=>{t=String(t||'').replace(/\s+/g,' ').trim();return t&&wcount(t)<=15?t:''};
+// the plan for the pawn in hand: the same recommended job the glowing star and the ghost finger use
+function hlpPlan(){if(!BF.on||PHO.st!=='plan2'||UI.confirm)return null;const cur=curPawn();if(!cur)return null;
+  const rt=BF.recTile(cur);if(!rt)return null;const p=BF.tilePt(rt.id);if(!p)return null;
+  const fromEl=document.querySelector('#bf [data-pawn="'+cur.id+'"]');
+  const rowEl=PHO.pop&&PHO.pop.k==='tile'&&PHO.pop.id===rt.id?document.querySelector('#ppop [data-rec="1"]'):null;
+  return {id:rt.id,rec:rt.rec,cur,to:{x:p.ox+p.x,y:p.oy+p.y},fromEl,rowEl}}
+function whyJob(rec){return cap15(rec.label+(rec.why?': '+rec.why:''))||cap15(rec.why)||cap15(rec.label)||cap15('The advisor\'s best job for this pawn.')}
+// the choice the computer would make for the human's question
+function hlpChoice(){const q=hlpOpts();if(!q||!q.opts||q.opts.length<2)return null;let i=-1;try{i=aiChoose(q.title,q.opts,P(q.who),q)}catch(e){return null}
+  if(!(i>=0&&i<q.opts.length))return null;return {i,o:q.opts[i],q}}
+function whyChoice(c){const k=c.q.kind,l=String(c.o.l||'').replace(/[.]+$/,'');
+  if(k==='dice')return /success die/.test(l)?'Rolling the failed success die again can save the job.':/wound die/.test(l)?'Rolling the wound die again protects a castaway with low life.':'Keeping the roll is best here.';
+  if(k==='fog')return 'The fog hurts this place least.';
+  return cap15('The computer\'s pick: '+l)||'The computer picks this option here.'}
+const hbtn=i=>()=>document.querySelector('#bf [data-ans="'+i+'"]')||document.querySelector('#story [data-ans="'+i+'"]');
+function hlpSuggest(){try{const ph=hlpPhase();if(!ph||typeof UI==='undefined')return null;
+  if(ph==='job'){const p=hlpPlan();if(!p)return null;const why=whyJob(p.rec);if(!why)return null;
+    return {why,key:'job:'+p.cur.id+':'+p.id,target:()=>{const q=hlpPlan();return q?(q.rowEl||{x:q.to.x,y:q.to.y}):null},from:()=>{const q=hlpPlan();return q&&q.fromEl}}}
+  if(ph==='ready'){const pb=planProblems();
+    if(!pb.length)return {why:'Every pawn has a job. Start the day.',key:'ready',target:hfirst('#bf .btn.go')};
+    const bad=document.querySelector('#bf .bfpw.bad');const why=cap15(pb[0]);if(bad&&why&&badActs().size)return {why,key:'fix',target:()=>document.querySelector('#bf .bfpw.bad')};return null}
+  if(ph==='place'){const c=hlpChoice();if(!c||c.o.pos==null)return null;const t=()=>hpt(BF.tilePt(c.o.pos));if(!t())return null;return {why:whyChoice(c),key:'pos:'+c.i,target:t}}
+  if(ph==='choice'||ph==='dice'){const c=hlpChoice();if(!c)return null;return {why:whyChoice(c),key:'ans:'+c.i,target:hbtn(c.i)}}
+  return null}catch(e){console.warn('hlpSuggest',e);return null}}
+// ---------------------------------------------------------------- wiring
+let _hlpInit=false;
+function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
+  GXH.init({game:'shipwreck-isle',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.bfgl,#bf .bfpw,#bf .btn,#bf .opt,.bfa,.bfcard,#ppop .bfr,#bfzoom .gx-ibtn'});
+  GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpRulesPhase});
+  for(const [sel,pos] of [['#hlpset',null],['#rulesd .gx-drawer-head','afterend']]){const e=document.querySelector(sel);if(!e)continue;
+    if(!pos)e.innerHTML=GXH.settingsHTML();else{const d=document.createElement('div');d.className='hlp-rules-set';d.innerHTML=GXH.settingsHTML();e.insertAdjacentElement(pos,d)}}}
+// no bubble while something else is open on top of the island (a pop-up, a drawer, the start or end screen)
+const hlpBusy=()=>!!(!G||UI.modal||G.over||(typeof GX!=='undefined'&&GX.open)||(typeof PHO!=='undefined'&&(PHO.pop||PHO.zoom)));
+function hlpAfter(){hlpInit();if(typeof GXH==='undefined'||!G)return;
+  if(UI.guide&&UI.guide.on&&!UI.guide.kit){UI.guide.kit=1;GXH.setEnabled(true);GXH.reset()}   // the guided game: every bubble again
+  GXH.phase(hlpBusy()?null:hlpPhase())}
+{const s0=PHO.sync;PHO.sync=function(){const r=s0.apply(this,arguments);try{hlpAfter()}catch(e){console.error(e)}return r}}
+// a bubble whose target was not on screen yet (the island still turning) is tried again a moment later
+setInterval(()=>{try{if(typeof G!=='undefined'&&G&&!document.hidden)hlpAfter()}catch(e){}},800);
 
 </script>
 <script>
