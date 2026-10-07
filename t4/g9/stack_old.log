@@ -1,6 +1,0 @@
-start parts 45 cap 15 mir 0
-b22 {"layers":0,"why":"no hold: ","top":-1}
-p22 {"layers":0,"why":"no place","top":-1}
-t22 {"layers":3,"why":"no hold: ✔ PLACE or tap again · ⟳ to turn it","top":-1}
-stack@2,-6,y3 stack@-3,-4,y3 stack@2,-4,y3 B1x4@-3,-1,y3 B1x4@2,-1,y3 B1x5@-4,-2,y2 B1x5@3,-2,y2 drv@-1,-1,y3 roll@-3,1,y3 arch@-4,3,y1 arch@2,3,y1 wL@-5,3,y-2.5 wL@4,3,y-2.5 B4x5@-2,2,y2 P4x5@-2,2,y5 T4x5@-2,2,y6 T8x1@-4,7,y1 B2x1@-4,7,y2 B2x1@2,7,y2 tl@-4,7,y4 tl@3,7,y4 B1x1@-3,7,y4 B1x1@2,7,y4 diff@-2,7,y2 B4x1@-2,7,y4 pipes@-3,8,y2 pipes@1,8,y2 wing@-4,6,y7 fender@-4,-7,y2 fender@3,-7,y2 sidep@-5,-2,y1 sidep@4,-2,y1 nitro@-1,2,y7 t22@2,-1,y6 t22@2,-1,y7 t22@2,-2,y8
-RESULT {"b22":{"layers":0,"why":"no hold: ","top":-1},"p22":{"layers":0,"why":"no place","top":-1},"t22":{"layers":3,"why":"no hold: ✔ PLACE or tap again · ⟳ to turn it","top":-1}} ERR []
