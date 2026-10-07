@@ -39,4 +39,13 @@ const URL=process.argv[2],OUT=process.argv[3]||'t4/nb',DESK=process.argv[4]==='d
   for(let t=0;t<40&&await kmh()<25;t++){await p.waitForTimeout(3000);if(t===3){await p.keyboard.down('ArrowLeft');await p.waitForTimeout(300);await p.keyboard.up('ArrowLeft')}}
   await shot('08_drive');await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
   console.log('tyre',await p.evaluate(()=>{try{return JSON.stringify(__gnb.gap())}catch(e){return String(e)}}),'kmh',await p.evaluate(()=>{try{return Math.round(Math.abs(__mho.RO.v||__mho.RO.spd||0)*3.6)}catch(e){return 'n/a'}}))}
+ if(process.env.DRIVE){// low side view: brake to a stop (real touch), then a camera ~1 m above the road, side-on, framing My Build and the nearest traffic car
+  const kmh=()=>p.evaluate(()=>{try{return Math.round(Math.abs(__mho.RO.v||0)*3.6)}catch(e){return 0}});const B=await (await p.$('#tB')).boundingBox();await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:B.x+B.width/2,y:B.y+B.height/2,id:3}]});
+  for(let t=0;t<30&&await kmh()>1;t++)await p.waitForTimeout(1500);await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+  const side=async(n,close)=>{const r=await p.evaluate(close=>{const M=__mho,R=M.RO,D=__dbg,g=M.gnd(R.x,R.z,R.y+.3);let c=null,bd=40;for(const o of(M.HUB.cars||[])){if(o.dead>0)continue;const d=Math.hypot(o.x-R.x,o.z-R.z);if(d<bd&&d>2){bd=d;c=o}}
+    const tx=close||!c?R.x:(R.x+c.x)/2,tz=close||!c?R.z:(R.z+c.z)/2,h=close||!c?R.h:Math.atan2(c.x-R.x,c.z-R.z),sx=Math.cos(h),sz=-Math.sin(h),k=close?3.6:Math.max(8,bd*.75);
+    window.__camOv=[tx+sx*k,g+(close?.35:1),tz+sz*k,tx,g+(close?.25:.6),tz];if(!window.__r0){window.__r0=D.composer.render.bind(D.composer);D.composer.render=(...a)=>{const o=window.__camOv;if(o){D.camera.position.set(o[0],o[1],o[2]);D.camera.lookAt(o[3],o[4],o[5]);D.camera.updateMatrixWorld()}return window.__r0(...a)}}
+    return{traffic:c?+bd.toFixed(1):null}},close);await p.waitForTimeout(2500);await p.screenshot({path:`${OUT}/${n}.png`});console.log('shot',n,JSON.stringify(r))};
+  await side('09_side_traffic',0);await side('10_side_tyres',1);await p.evaluate(()=>{window.__camOv=null});
+  console.log('tyre_rest',await p.evaluate(()=>JSON.stringify(__gnb.gap())))}
  console.log('ERR',errs.slice(0,8));await b.close()})();
