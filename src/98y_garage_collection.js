@@ -8,20 +8,23 @@ function G9_sc(o){const A=[],B=o.B,S=o.S||B,H=o.H||B,R=o.R||B,K=CR_K,W=o.W||K,ad
  add('T6x16',-3,-8,0,K,0);sym('T1x6',-4,-3,0,K,0);sym('T1x1',-4,-8,0,K,0);sym('T1x1',-4,7,0,K,0);
  for(const z of[-7,3]){sym('arch',-4,z,0,o.A||B,0);sym(wh,-4,z,0,K,wy)}
  // nose
- if(o.nose==='wedge'){sym('hl',-4,-8,0,B,1);add('B6x1',-3,-8,0,K,1);add('T8x1',-4,-8,0,B,4);add('B4x4',-2,-7,0,K,1);add('T4x4',-2,-7,0,H,4)}
- else{sym('hl',-4,-8,0,o.L||B,1);sym('B1x1',-3,-8,0,K,1);add('grl',-2,-8,1,K,1);add('grl',0,-8,1,K,1);add('C8x1',-4,-8,0,o.N||B,4);
+ // wedge: knife-edge nose 2 plates high, hood of Slope 33 3x1s rising to the screen (76908-style)
+ if(o.nose==='wedge'){add('P8x1',-4,-8,0,K,1);add('T8x1',-4,-8,0,B,2);add('P4x4',-2,-7,0,K,1);add('P4x4',-2,-7,0,K,2);
+  for(let x=-2;x<2;x++)add('s31',x,-7,0,H,3);add('P4x1',-2,-4,0,H,3);add('P4x1',-2,-4,0,H,4);add('T4x1',-2,-4,0,H,5)}
+ else{if(o.tw){sym('bigl',-4,-8,0,K,1);sym('bigl',-3,-8,0,K,1)}else{sym('hl',-4,-8,0,o.L||B,1);sym('B1x1',-3,-8,0,K,1)}add('grl',-2,-8,1,K,1);add('grl',0,-8,1,K,1);add('C8x1',-4,-8,0,o.N||B,4);
   add('B4x4',-2,-7,0,K,1);sym('cs14',-2,-7,0,H,4);sym('cs14',-1,-7,0,S,4)}
  if(o.bump){add('bump',-4,-9,0,o.bump,1);add('bump',-4,8,0,o.bump,1)}
  // flanks
- sym('B1x6',-4,-3,0,B,1);sym('grl',-4,1,0,o.I||K,3);sym('T1x6',-4,-3,0,o.sill||S,4);sym('T1x6',-4,-3,0,B,5);
- // cabin
- add('T6x6',-3,-3,0,K,1);add('drvL',-1,-1,0,B,2);
- if(o.cab==='open'){add('ws4',-2,-3,0,o.G||K,6);sym('B1x3',-4,0,0,B,6)}
- else{add('ws6',-3,-3,0,R,6);add('ws6',-3,0,2,R,6);add('T6x2',-3,-1,0,R,11);if(o.rs)sym('T1x2',-1,-1,0,o.rs,12)}
- // rear deck
- if(o.eng){add('T4x4',-2,3,0,K,3);add('eng',-2,3,0,o.eng,4)}else{add('T4x4',-2,3,0,K,3);sym('cs14',-2,3,2,B,4);sym('cs14',-1,3,2,o.rs||S,4)}
+ const cy=o.low?5:6;sym('B1x6',-4,-3,0,B,1);sym('grl',-4,1,0,o.I||K,3);sym('T1x6',-4,-3,0,o.sill||S,4);if(!o.low)sym('T1x6',-4,-3,0,B,5);
+ // cabin: the roof plate sits 1 plate down into the screens' crown, flush (no "hat")
+ add('T6x6',-3,-3,0,K,1);add('drvL',-1,-1,0,B,o.low?1:2);
+ if(o.cab==='open'){add('ws4',-2,-3,0,o.G||K,cy);sym('B1x3',-4,0,0,B,cy)}
+ else{add('ws6',-3,-3,0,R,cy);add('ws6',-3,0,2,R,cy);if(o.rs){sym('T2x2',-3,-1,0,R,cy+4);add('T2x2',-1,-1,0,o.rs,cy+4)}else add('T6x2',-3,-1,0,R,cy+4)}
+ // rear deck (o.eng: grey block + V8 + scoop standing out behind an open cockpit, 31100-style)
+ if(o.eng){add('T4x4',-2,3,0,K,3);add('B4x3',-2,3,0,o.eng,4);add('eng',-2,3,0,o.eng,7);add('scoop',-1,4,0,o.eng,9);add('T4x1',-2,6,0,K,4)}
+ else{add('T4x4',-2,3,0,K,3);sym('cs14',-2,3,2,B,4);sym('cs14',-1,3,2,o.rs||S,4)}
  sym('tl',-4,7,2,B,1);sym('B1x1',-3,7,0,B,1);add('B4x1',-2,7,0,K,1);add('C8x1',-4,7,2,B,4);add('diff',-2,8,0,K,0);
- if(o.rear==='wing')add('wing',-4,5,0,W,5);else if(o.rear==='spoiler')add('spoiler',-2,o.eng?6:5,0,W,o.eng?4:6);
+ if(o.rear==='wing')add('wing',-4,o.eng?6:5,0,W,o.wy||5);else if(o.rear==='spoiler')add('spoiler',-2,o.eng?6:5,0,W,o.eng?4:6);
  for(const e of o.x||[])add(...e);return A}
 // open-wheel formula car (narrow tub, sidepods, wings, exposed wheels)
 function G9_f1(o){const A=[],B=o.B,K=CR_K,S=o.S||K,add=(t,x,z,r,c,y)=>{CR_reg(t);A.push([t,x,z,r,c,y])},sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},
@@ -31,20 +34,34 @@ function G9_f1(o){const A=[],B=o.B,K=CR_K,S=o.S||K,add=(t,x,z,r,c,y)=>{CR_reg(t)
  sym('B2x6',-3,-2,0,B,1);sym('T1x6',-3,-2,0,S,4);sym('cs14',-2,-2,0,B,4);
  add('B2x4',-1,-5,0,B,1);add('T2x4',-1,-5,0,S,4);add('drv',-1,-1,0,B,1);add('ab14',-2,-2,1,K,6);
  add('B2x4',-1,1,0,B,1);add('cs24',-1,1,2,B,4);add('B2x2',-1,5,0,K,1);add('T2x2',-1,7,0,K,0);add('wing',-4,7,0,o.W||K,1);sym('T1x2',-4,7,0,B,9);return A}
+// off-road monster truck after City 60402: XL tyres outside a raised dark-blue body, azure fenders, black roof + roll bar, yellow lights
+function G9_mt(o){const A=[],B=o.B,AZ=o.AZ,K=CR_K,Y='#fac80a',G='#a0a5a9',add=(t,x,z,r,c,y)=>{CR_reg(t);A.push([t,x,z,r,c,y])},sym=(t,x,z,r,c,y)=>{CR_reg(t);const fw=(r%2?GB_PC[t].d:GB_PC[t].w);add(t,x,z,r,c,y);if(x!==-x-fw)add(t,-x-fw,z,(4-r)%4,c,y)},
+ wy=(.36-GB_PC.wXL.h*GB_PH/2)/GB_PH,b=4;
+ // short 14-stud body on a black frame; tyres almost touch front to back like the set
+ sym('wXL',-6,-7,0,K,wy);sym('wXL',-6,2,0,K,wy);add('T6x14',-3,-7,0,K,b);sym('B1x2',-4,-6,0,G,b-1);sym('B1x2',-4,3,0,G,b-1);
+ // front: black bumper, grey grille, yellow lamps, azure fenders, hood + scoop
+ add('P8x1',-4,-8,0,K,b);add('P8x1',-4,-8,0,K,b+1);add('B4x1',-2,-7,0,K,b+1);add('grl',-2,-7,1,G,b+4);add('grl',0,-7,1,G,b+4);sym('hl',-3,-7,0,Y,b+1);sym('flame',-3,-7,0,AZ,b+4);
+ sym('B1x3',-3,-6,0,AZ,b+1);add('B4x3',-2,-6,0,B,b+1);add('T4x3',-2,-6,0,B,b+4);add('scoop',-1,-5,0,G,b+5);
+ // cab: screen, rear wall, black studded roof, flames on the doors, roll bar behind
+ add('B6x6',-3,-3,0,B,b+1);sym('T1x6',-3,-3,0,AZ,b+3);add('ws6',-3,-3,0,B,b+4);add('B6x3',-3,0,0,B,b+4);add('P6x3',-3,0,0,K,b+7);add('P6x3',-3,0,0,K,b+8);add('P6x4',-3,-1,0,K,b+9);
+ add('roll',-3,3,0,K,b+4);
+ // short bed + tail
+ sym('B1x3',-3,3,0,B,b+1);add('T4x3',-2,3,0,K,b+1);add('nitro',-1,3,0,K,b+2);sym('tl',-3,6,2,B,b+1);add('B4x1',-2,6,0,K,b+1);add('P8x1',-4,7,0,K,b);add('P8x1',-4,7,0,K,b+1);
+ for(const e of o.x||[])add(...e);return A}
 const G9_T=[
  {id:'t_rosso',n:'Rosso V12',tier:'e',ref:'76914',k:'Front-engine V12 GT',car:()=>G9_sc({B:'#d01712',S:'#fac80a',rs:'#fac80a',wh:'wL',x:[['grl',-3,-6,0,CR_K,6],['grl',2,-6,0,CR_K,6]]}),st:{top:1.07,acc:1.05,han:1.03,hull:1}},
- {id:'t_bianco',n:'Bianco Wedge',tier:'l',ref:'76908',k:'Wedge supercar',car:()=>G9_sc({B:'#f4f4f4',S:'#f4f4f4',nose:'wedge',rear:'wing',W:'#f4f4f4',I:CR_K,wh:'wL',x:[['wl',-4,-7,0,'#f4f4f4',6],['wr',2,-7,0,'#f4f4f4',6],['grl',-4,-2,0,CR_K,4],['grl',3,-2,0,CR_K,4]]}),st:{top:1.08,acc:1.06,han:1.02,hull:.98}},
+ {id:'t_bianco',n:'Bianco Wedge',tier:'l',ref:'76908',k:'Wedge supercar',car:()=>G9_sc({B:'#f4f4f4',S:'#f4f4f4',nose:'wedge',low:1,rear:'wing',W:'#f4f4f4',wy:6,I:CR_K,wh:'wL',x:[['B1x3',-4,0,0,'#f4f4f4',5],['B1x3',3,0,0,'#f4f4f4',5],['grl',-4,1,0,CR_K,8],['grl',3,1,0,CR_K,8]]}),st:{top:1.08,acc:1.06,han:1.02,hull:.98}},
  {id:'t_papaya',n:'Papaya F1',tier:'l',ref:'76919',k:'Formula car',car:()=>G9_f1({B:'#fe8a18',S:'#36aebf',W:'#fe8a18'}),st:{top:1.09,acc:1.07,han:1.06,hull:.92}},
  {id:'t_silver',n:'Silver Street GT',tier:'r',ref:'76917',k:'Street tuner',car:()=>G9_sc({B:'#a0a5a9',S:'#0055bf',rs:'#0055bf',rear:'wing',W:'#0055bf',L:'#1b2a34',wh:'wL'}),st:{top:1.06,acc:1.05,han:1.04,hull:1}},
- {id:'t_patrol',n:'City Patrol',tier:'c',ref:'60312',k:'Police car',car:()=>G9_sc({B:'#0055bf',S:'#f4f4f4',H:'#f4f4f4',R:'#f4f4f4',sill:'#a5ca18',wh:'wM',bump:CR_K,x:[['bar',-2,-1,0,'#36aebf',12],['scoop',-1,-6,0,'#a0a5a9',7]]}),st:{top:1.03,acc:1.04,han:1.03,hull:1.08}},
+ {id:'t_patrol',n:'City Patrol',tier:'c',ref:'60312',k:'Police car',car:()=>G9_sc({B:'#0055bf',S:'#f4f4f4',H:'#f4f4f4',R:'#f4f4f4',sill:'#a5ca18',wh:'wM',bump:CR_K,x:[['bar',-2,-1,0,'#36aebf',11],['scoop',-1,-6,0,'#a0a5a9',7]]}),st:{top:1.03,acc:1.04,han:1.03,hull:1.08}},
  {id:'t_viola',n:'Viola Muscle',tier:'r',ref:'60408',k:'Muscle car',car:()=>G9_sc({B:'#8a12a8',S:'#8a12a8',R:'#f4f4f4',wh:'wL',bump:'#d8dde4',x:[['scoop',-1,-6,0,CR_K,7]]}),st:{top:1.06,acc:1.07,han:.99,hull:1.03}},
  {id:'t_flame',n:'Flame Rod',tier:'r',ref:'60408',k:'Hot rod',car:()=>G9_sc({B:'#fac80a',S:CR_K,H:'#fac80a',R:CR_K,A:CR_K,wh:'wL',bump:'#d8dde4',rear:'spoiler',x:[['flame',-4,-7,0,'#fe8a18',6],['flame',3,-7,0,'#fe8a18',6]]}),st:{top:1.05,acc:1.06,han:1,hull:1.02}},
- {id:'t_racer',n:'Red Racer',tier:'c',ref:'31100',k:'Roadster',car:()=>G9_sc({B:'#d01712',S:'#f4f4f4',cab:'open',G:'#c9a66b',eng:'#a0a5a9',rear:'spoiler',W:'#f4f4f4',wh:'wM',L:'#f4f4f4'}),st:{top:1.04,acc:1.06,han:1.02,hull:1}}];
+ {id:'t_racer',n:'Red Racer',tier:'c',ref:'31100',k:'Roadster',car:()=>G9_sc({B:'#d01712',S:'#f4f4f4',sill:'#d01712',cab:'open',G:'#c9a66b',eng:'#a0a5a9',tw:1,rear:'wing',W:'#f4f4f4',wy:6,wh:'wM'}),st:{top:1.04,acc:1.06,han:1.02,hull:1}}];
 // off-road template: a blue monster truck after the City monster truck (60402)
 {const R=GAR_set('rod'),L=n=>JSON.parse(JSON.stringify(R.load[n]));
  for(const T of G9_T)GAR_SETS.push({id:T.id,n:T.n,tier:T.tier,req:null,car:T.car,off:R.off,boat:R.boat,tpl:1,ref:T.ref,forms:['car'],
   load:{car:{name:T.n.toUpperCase(),k:'Street',st:T.st,w:T.tier==='l'?'Light':'Medium',perk:T.tier==='c'?'start':'slip'},'4x4':L('4x4'),boat:L('boat')}});
- GAR_SETS.push({id:'t_beast',n:'Blue Beast',tier:'r',req:null,car:R.car,off:()=>CR_monster({body:'#0d2a6b',acc:'#36aebf'}),boat:R.boat,tpl:1,ref:'60402',forms:['off'],
+ GAR_SETS.push({id:'t_beast',n:'Blue Beast',tier:'r',req:null,car:R.car,off:()=>G9_mt({B:'#0d2a6b',AZ:'#36aebf'}),boat:R.boat,tpl:1,ref:'60402',forms:['off'],
   load:{car:L('car'),'4x4':{name:'BLUE BEAST',k:'Off-road',st:{top:.98,acc:1.03,han:.99,hull:1.15},w:'Super Heavy',perk:'armor'},boat:L('boat')}});
  const M=GAR_SETS.find(s=>s.id==='mine');if(M)M.forms=['car']}
 // ---------- collection model: one entry per (vehicle set, form)
@@ -56,12 +73,14 @@ const G9C_name=(S,f)=>{const L=S.load&&S.load[f==='off'?'4x4':f];return f==='car
 function G9C_eq(f){const G=GAR_get();return f==='car'?G.sel:(G[f]&&GAR_owned(GAR_set(G[f]))?G[f]:G.sel)}
 function G9C_list(f){const G=GAR_get(),fav=G.fav||[];let A=[];GAR_SETS.forEach((S,i)=>{if(G9C_forms(S).includes(f))A.push({S,f,i,own:GAR_owned(S),fav:fav.includes(G9C_key(S,f))})});
  const all=A.length,own=A.filter(e=>e.own).length;if(G9C.filt==='own')A=A.filter(e=>e.own);else if(G9C.filt==='fav')A=A.filter(e=>e.fav);
- const nm=e=>G9C_name(e.S,e.f);A.sort(G9C.sort==='az'?(a,b)=>nm(a).localeCompare(nm(b)):G9C.sort==='new'?(a,b)=>b.i-a.i:(a,b)=>G9C_RK[a.S.tier]-G9C_RK[b.S.tier]||a.i-b.i);return{A,all,own}}
+ const nm=e=>G9C_name(e.S,e.f);A.sort(G9C.sort==='az'?(a,b)=>nm(a).localeCompare(nm(b)):G9C.sort==='new'?(a,b)=>b.i-a.i:(a,b)=>(b.own-a.own)||G9C_RK[a.S.tier]-G9C_RK[b.S.tier]||a.i-b.i);return{A,all,own}}
 function G9C_equip(S,f){if(!GAR_owned(S)){try{AU.sfx('bump')}catch(e){}return 0}if(f==='car')GAR_select(S.id);else{const G=GAR_get();G[f]=S.id;GAR_put(G);GAR_load();try{AU.sfx('pick')}catch(e){}}gbRender();return 1}
 function G9C_favT(S,f){const G=GAR_get(),k=G9C_key(S,f),F=G.fav=G.fav||[],i=F.indexOf(k);if(i<0)F.push(k);else F.splice(i,1);GAR_put(G);try{AU.sfx('pick')}catch(e){}}
 // ---------- 3D card renders: GS's small offscreen renderer, resized to 168×104, one vehicle at a time, cached
-function G9C_bricks(S,f){if(f==='car'){const b=GAR_get().br[S.id];return(b&&b.length?b:GAR_arr(S.car())).map(o=>({...o}))}return GAR_arr(f==='off'?S.off():S.boat())}
-function G9C_render(S,f,W=168,Hh=104){const key=W+'|'+G9C_key(S,f)+'|'+(f==='car'?JSON.stringify(GAR_get().br[S.id]||0).length:0);if(G9C.th.has(key))return G9C.th.get(key);
+// the selected car's live edits are in GB.d (mho_build); other cars' edits in mho_gar.br
+const G9C_live=S=>{if(GAR_get().sel!==S.id)return null;const d=GB.d||gbBuild();return d&&d.bricks&&d.bricks.length?d.bricks:null};
+function G9C_bricks(S,f){if(f==='car'){const b=G9C_live(S)||GAR_get().br[S.id];return(b&&b.length?b:GAR_arr(S.car())).map(o=>({...o}))}return GAR_arr(f==='off'?S.off():S.boat())}
+function G9C_render(S,f,W=168,Hh=104){const key=W+'|'+G9C_key(S,f)+'|'+(f==='car'?JSON.stringify(G9C_live(S)||GAR_get().br[S.id]||0).length:0);if(G9C.th.has(key))return G9C.th.get(key);
  if(!GS.th)GS_thumb('b11',0);const T=GS.th;if(!T)return null;let url=null;try{const host=new THREE.Group(),g={userData:{m:host}};GB_attach(g,G9C_bricks(S,f),null,false,false);
   host.rotation.y=G9C.ry;host.updateMatrixWorld(true);const bb=new THREE.Box3().setFromObject(host),ce=bb.getCenter(new THREE.Vector3()),sz=bb.getSize(new THREE.Vector3());host.position.sub(ce);T.s.add(host);
   T.r.setSize(W,Hh,false);T.cam.aspect=W/Hh;T.cam.updateProjectionMatrix();const d=Math.max(sz.x,sz.z,sz.y*1.6)*1.75;T.cam.position.set(0,d*.42,d*.9);T.cam.lookAt(0,-sz.y*.04,0);
@@ -81,7 +100,7 @@ function G9C_html(){const f=G9C.type,{A,all,own}=G9C_list(f),eq=G9C_eq(f),SL={ra
  if(!A.length)h+=`<p class="g9None">${G9C.filt==='fav'?'No favourites yet · tap ☆ on a card':'Nothing here yet'}</p>`;return h+'</div></div>'}
 GAR_tab=(f=>function(){f();const B=$('#gbBody');if(!B)return;const row=B.querySelector('.garSets');if(!row)return;const h5=row.previousElementSibling,nb=row.querySelector('.gnbGo');const w=document.createElement('div');w.innerHTML=G9C_html();row.replaceWith(w.firstChild);
  if(nb&&G9C.type==='car'){nb.classList.add('g9New');const g=$('#g9Col .g9Grid');if(g)g.prepend(nb)}
- if(h5&&h5.tagName==='H5')h5.textContent='COLLECTION · tap a card to equip it';const C=$('#g9Col');
+ const C=$('#g9Col');if(h5&&h5.tagName==='H5'){h5.textContent='COLLECTION · tap a card to equip it';const inf=B.querySelector('.gbInfo');if(inf)inf.after(h5,C)}
  C.addEventListener('click',e=>{const t=e.target.closest('button,.g9Card');if(!t)return;e.stopPropagation();
   if(t.dataset.gty){G9C.type=t.dataset.gty;GAR_.pv=t.dataset.gty==='off'?'4x4':t.dataset.gty;try{AU.sfx('pick')}catch(_){}gbRender();return}
   if(t.hasAttribute('data-gso')){G9C.sort={rar:'az',az:'new',new:'rar'}[G9C.sort];gbRender();return}
