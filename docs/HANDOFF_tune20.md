@@ -34,3 +34,8 @@
    - `tools/build.sh <next ver>`;
    - `git add -f out/<ver>` (overdrive.html, km.js, tune.json);
    - send DEPLOY to the coordinator.
+
+## Status 2026-10-07 22:20
+- Reviewer PASS on 438f0ae. out/v87x was built on live (the Overdrive files are unchanged since b16476c) with the OD_CHANGELOG v87x entry, at 3efffaf.
+- DEPLOY was sent to the coordinator. The beta needs `capabilities {db:{}, user:{}}`.
+- Fixed-speed yaw probe: `node tools/tTune.js <url> <out> yaw`.
