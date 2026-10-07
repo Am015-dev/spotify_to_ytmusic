@@ -41,3 +41,39 @@ Coordinator: session_017iH3DB4VyxwKSdMwsco4Ut. Reviewer: session_01Y6FYerWwxv43F
 - `tools/race_bench.sh <label> [runs]` runs grand, hafen and akro (×runs) into `qa_race/<label>/bench.txt` and prints a summary. Set `URL=` to use another server.
 - Live and slice-a worktrees (`../wt_live`, `../wt_sa`) are served on :8767 and :8768 for A/B; the main repo is served on :8766.
 - A race is 1 lap (LAP 1/1, set in 99_api). Results vary run to run (game RNG), so compare means of ≥2 runs.
+
+## REWORK required (reviewer FAILed a and b; c content OK). ONE combined REVIEW on the final commit, rebased on live v87r (brave-carson 528b4ab)
+The coordinator (14:56) and the reviewer (14:56) need ALL of the items below. Stop adding features.
+1. **Opponents and pack.**
+   - 852×393 start-grid shot with all 7 opponents visible, Frankfurt and Athens. Note: the player starts on POLE, `setupRace` row/col. The shot is taken from the pole looking forward, so the field is behind. Use a side or high camera, or shoot at the end of the countdown from behind.
+   - Mid-race shot next to an opponent.
+   - Pack gap 1st→last at 15/30/60 s and position changes per race, live (:8767) vs stack.
+   - Add these to tRace's `ptrace`: `ships` dist max−min, and a count of place changes.
+   - If the field strings out on 38 m, raise the AI rubber band (`physAI s.rubber`, 30_race ~line 489).
+2. **Clearance.**
+   - Replace the box method with per-tyre RAYS: a raycast from 0.6 m above each wheel contact down onto the road/corridor/water meshes, for the player and 2 AI.
+   - Cover start, 200+ km/h, a corner, a water lane (boat waterline) and a dirt lane.
+   - Must be ≥0 and within ±0.05 m.
+   - The coordinator also wants the minimum car-to-wall distance per lap, new vs live.
+   - One low side view of the player beside an AI car.
+3. **Feel strips at 230 km/h, live vs stack:**
+   - tightest corner on grand and akro: 3 frames per corner, with slip and camera lag;
+   - hard brake from top speed: strip plus stopping distance;
+   - racing-line assist: show it never steers against input and lets go on touch (heading change: no input vs steering away from the line).
+4. **Ghost boat** (`akro_phone_shortcut2_water` in race15b).
+   - Root cause is very likely the GHOST item from 96_scale_qa `V85_item`. It does `s.ghostT=4.5`, clones the car materials at opacity .35, and sets `s.shield=4.5`, which draws the bubble disc.
+   - Slice c removes GHOST from the race item set, and its akro water shot is solid.
+   - Re-shoot the same frame (seeded RNG: same track, same time) on the final build and confirm.
+   - If the shield bubble still covers the car, shrink it or put it behind the car.
+5. **SHORTCUT boards** readable about 2 s ahead at 230 km/h.
+   - Currently 16×8 m at y 11, 3 boards at −220/−120/−30 m (R15_mesh in 31).
+   - Make them about 2× bigger with higher contrast (yellow on black), maybe an overhead gantry.
+   - Shoot while moving, with the wall gap and arrows in view.
+6. **WEB/LIGHTNING hit on the PLAYER**: phone shot.
+   - The 96 WEB overlay (#v85web) blinds the full screen for 4.5 s and must not cover the HUD/controls.
+   - It lives in 96 (QA module): ask the coordinator or keep it inside `98z` by overriding `V85W.style` (smaller vignette, shorter).
+   - "WEB MISS" feed text must never sit over a control.
+7. **Westhafen walls/min ≤ live 0.63** (stack had 1.10 with items).
+   - Check with DBGW where the hits are (items / web blind / tester).
+8. **Boost**: worker 16 (alex/od-boost16, `src/98k_boost2k.js`) owns the 2K boost meter (`window.B2K`). Don't build another; maybe call `B2K.add` on corridor boost pads. It isn't required.
+Then send ONE REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v with all paths and numbers. After PASS: changelog, build, DEPLOY to the coordinator.
