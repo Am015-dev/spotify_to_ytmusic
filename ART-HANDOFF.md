@@ -13,6 +13,14 @@ Open (not blocking):
 2. Alleenring "below physics" samples are overpass/ramp decks (accepted by the reviewer).
 3. Menu: no live 3D garage background; map not brick-styled.
 
+## v87e IN PROGRESS (art worker 7, 2026-10-07; pART9 = art9.js + pART9.py, pV87e.py)
+Build: `./art.sh 2783bbf` (live v87d). art.sh now detects live bodies that already carry pART1-8 (marker `function abStrip_v86(`) and applies ONLY `pART9.py pV87e.py`; older bases still run the full list.
+Root causes found + fixed (all in art9.js):
+1. Brown box on the road (Athens Koulouri Rush P1 "Deliver", Frankfurt Hot Drop P2): NOT world art. qvStep chase stage (`S.t==='chase'`, the fleeing van) drops an obstacle every 3.6 s: `new THREE.Mesh(QV.cg=BoxGeometry(1.6,1,1.6), QV.cm=MeshStandardMaterial 0x9a6a3a)` scaled 2.2 = flat 3.5x2.2x3.5 m brown box. Now `ART9_crate()` = 1.8x1.3x1.8 LEGO crate (plank canvas texture, frame + cross brace, 4 studs), base at ground, yaw = van heading +-0.25; hit radius 4.2 -> 3.2 m (matches the smaller crate). Shots shots/v87e/01_*,02_* (same pose x1695.32 z-1216.70 h-0.529, crate at 1691.32,-1206.30).
+2. Hazy/pink car in races: UnrealBloom (threshold 1.0, str .95, rad .6) blooms the big over-bright neon surfaces (cyan wall chevrons, hex floor, horizon) into a screen-wide wash over the car. Proof: same SMASH frame with bloom.enabled=false = crisp red car (05_*diag). FX uniforms / fog / camera distance (8.67 m) unchanged by SMASH; SMASH just swings the view toward the bright right wall. Fix: composer.render wrapper sets bloom.threshold = RO.on ? 1 : 1.5 (races/menu 1.5, city 1.0). Shots 03/04 before, 06/07 after.
+3. Teal truck blob + boxy one-colour pickup: CR_cityPost instance tint (HCOL) multiplied EVERY vertex of CR_cityGeo traffic (truck cargo box + ribs -> mint/teal block; suv windows/rack/trim -> body colour). ART9_cabMat (CR_CM clone, onBeforeCompile) tints only pure-white (#ffffff) body vertices; set on every CR city InstancedMesh in CR_cityPost.
+Tools: dev.js on 9334 (fra/ath), /tmp/claude-0/place.js (crate pose), /tmp/claude-0/tcam.js (__tk(kind,dist,height) side cam on a traffic car, __tplain(true) = old full-tint material for A/B). Dev boot sometimes stops at the menu: close #odNewX, click #hcStory, then '#slotList .go'.
+
 ## v87d SHIPPED (live 2783bbf, 2026-10-06 23:33 UTC; art session session_01MNPu65Kc2CuGWijasGadGf) - reviewer PASS d85de1e
 - v87d = pART8 + pV87d.py (OD_CHANGELOG entry), built with `./art.sh 1bc1f9f`. art.sh now runs pV87d.py last; for the next release, copy it to pV87e.py with new text and swap it in art.sh.
 - Deploy files go in out/<ver>/ and must be force-added (`git add -f`), because .gitignore matches overdrive.html and km.js. The coordinator says out/ held a stale file, so always check `git show origin/alex/od-art:out/<ver>/overdrive.html`.

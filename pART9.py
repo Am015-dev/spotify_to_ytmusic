@@ -6,3 +6,6 @@ RR("S.dropT=3.6;const o=new THREE.Mesh(QV.cg||(QV.cg=new THREE.BoxGeometry(1.6,1
 RR("if(Math.hypot(o.x-RO.x,o.z-RO.z)<4.2&&RO.y<groundY(o.x,o.z)+4){o.dead=1;o.m.visible=false;RO.v*=.55;",
    "if(Math.hypot(o.x-RO.x,o.z-RO.z)<3.2&&RO.y<groundY(o.x,o.z)+3){o.dead=1;o.m.visible=false;RO.v*=.55;")
 save()
+RR("if(nm==='police'||nm==='garbage-truck'||(nm==='taxi'&&CID!=='fra')){const c=new THREE.Color('#ffffff');",
+   "im.material=ART9_cabMat();if(nm==='police'||nm==='garbage-truck'||(nm==='taxi'&&CID!=='fra')){const c=new THREE.Color('#ffffff');")
+save()

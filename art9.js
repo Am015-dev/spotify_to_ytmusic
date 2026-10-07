@@ -17,3 +17,10 @@ function ART9_crate(){if(!ART9.g){const w=1.8,h=1.3;ART9.m=new THREE.MeshStandar
 // worst in the SMASH frame, when the lunge swings the view toward the bright wall. In races only real light sources bloom now
 // (threshold 1.5: neon signs, lamps, pillars); the city keeps threshold 1.0.
 composer.render=(f=>function(...a){try{bloom.threshold=RO.on?1:1.5}catch(e){}return f.apply(this,a)})(composer.render);
+// Teal truck blob + boxy one-colour pickup: city traffic built by CR_cityGeo (HUB.cim) took the per-instance HCOL tint on EVERY
+// vertex, so a truck's whole 21-stud cargo box (white walls + grey ribs) became one mint/teal striped block and the suv/pickup's
+// black windows, roof rack and trim turned the body colour (one flat blue box). Now only the pure-white body bricks (vertex colour
+// #ffffff) take the instance colour; cargo boxes (#f4f4f4), ribs (#c9ced6), black trim/windows and grey parts keep their own.
+function ART9_cabMat(){if(ART9.cab)return ART9.cab;const m=CR_CM.clone();m.onBeforeCompile=sh=>{sh.vertexShader=sh.vertexShader.replace('vColor.xyz *= instanceColor.xyz;',
+ '#ifdef USE_COLOR\n vColor.xyz *= mix(vec3(1.),instanceColor.xyz,step(.99,min(color.r,min(color.g,color.b))));\n#else\n vColor.xyz *= instanceColor.xyz;\n#endif')};
+ m.customProgramCacheKey=()=>'art9cab';return ART9.cab=m}
