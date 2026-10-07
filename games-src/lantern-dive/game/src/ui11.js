@@ -21,7 +21,7 @@ function hpics(items) { return '<div class="gxh-pics">' + items.map(it => it ===
 const hq = s => () => document.querySelector(s);
 const hfirst = (...sels) => () => { for (const s of sels) { const e = document.querySelector(s); if (e && e.getBoundingClientRect().width) return e; } return null; };
 const HLP_STEPS = {
-  jobs: { target: hfirst('#pool .jcard.glow', '#acts .btn'), title: 'Pick a job', text: 'Tap a glowing job card. Choose one your own cards can win.', pic: () => HP.job() },
+  jobs: { target: hfirst('#pool .jcard.glow', '#acts .btn'), title: 'Pick a job', text: 'Tap a glowing job card.', pic: () => HP.job() },
   jobsAsk: { target: hfirst('#acts .btn.go', '#acts .btn'), title: 'Your choice', text: 'Answer with a button below. Each button says what happens next.', pic: () => HP.job() },
   vote: { target: hfirst('.seat.glow', '.me.glow'), title: 'Vote for a diver', text: 'Tap the diver who should take every job. You may pick yourself.', pic: () => HP.vote() },
   flare: { target: hfirst('#acts [data-a=dist]'), title: 'Distress flare?', text: 'Optional. Pass cards to a neighbour, or tap the skip button.', pic: () => HP.flare() },
