@@ -32,3 +32,13 @@ Numbers + LOOK at the shots → REVIEW to session_01Y6FYerWwxv43FuKUcaUT4v → o
   ALREADY held (B2K.bG latch). Athens A/B on b2k18b: qa18/ab2 (running). tPlayDbg now logs stuck positions (stPos).
 - perf: tyre gap 0.03 m (x4). s_water stuck en route → scen_water now reverses when stuck; rerun queued (qa18/s_water2).
 - Review shots: t18/shots/. Live moved to v87t (64e3bec): rebase at DEPLOY time.
+
+## Update 17:50: reviewer FAIL (3a7478f) and fixes
+FAIL items: (1) turbines too big, they hid the car; (2) stale base; (3) pending: side view, water hop, ath A/B on the latch build, 90° turn + hard-brake strips; minor: one combined bar.
+- (1) Done: small LEGO thrusters (2x2 round brick r .2, stud, silver rim, trans-orange flame cone that flickers), at hw*.5, low (hh*.3), behind the rear axle (hl*.9).
+- Minor: done. One 10 px bar: cyan = meter, pink after it = the boost the drift will add. BRICKBASH! label to the left of the bar.
+- (2) Done: v87t src re-derived by line diff of live index.html against the v87s modules (only 10, 92, 94, 98t changed) → LIVE_MATCH cdb4266. Committed.
+- (3a) Done: t18/shots/side_*.png (gap 0.03 m).
+- Running `qa18/run2.sh` (serial): t18/strips.js (turn / brake / driftTurn: slip, camLag, 4 shots each) → s_fra2 re-shoot →
+  ath A/B qa18/ab2 (base18 vs b2k18c) → water hop s_water2.
+- Lesson: `pgrep -f X` inside a waiter whose own command line contains X waits forever, and pkill -f kills your own shell. Use one serial script.
