@@ -45,9 +45,12 @@ def split_grid(path):
         for c in range(3):
             x0, x1 = bc[c]; y0, y1 = br[r]
             cell = im.crop((x0, y0, x1, y1)); ca = np.asarray(cell).astype(int)
-            m = np.abs(ca - bg).sum(axis=2) > 60; ys, xs = np.where(m)
+            cb = np.median(np.concatenate([ca[2], ca[-3], ca[:, 2], ca[:, -3]]), axis=0)  # this cell's own panel colour
+            m = np.abs(ca - cb).sum(axis=2) > 70
+            m[:6] = m[-6:] = False; m[:, :6] = m[:, -6:] = False  # ignore rounded panel corners
+            ys, xs = np.where(m)
             if len(xs): cell = cell.crop((xs.min(), ys.min(), xs.max() + 1, ys.max() + 1))
-            s = int(max(cell.size) * 1.08); sq = Image.new("RGB", (s, s), tuple(int(v) for v in bg))
+            s = int(max(cell.size) * 1.25); sq = Image.new("RGB", (s, s), tuple(int(v) for v in cb))
             sq.paste(cell, ((s - cell.width) // 2, (s - cell.height) // 2))
             name = f"camp-{CAST[r * 3 + c]}.webp"
             sq.resize((512, 512), Image.LANCZOS).save(OUT / name, "WEBP", quality=82, method=6); made.append(name)

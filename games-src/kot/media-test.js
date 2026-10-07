@@ -54,6 +54,11 @@ async function page(b, W, H, seen, progress) {
     ok(c && c.h <= c.ih + 1 && c.w <= c.iw + 1, 'landscape: video inside the screen (' + (c && c.w + 'x' + c.h) + ' in ' + (c && c.iw + 'x' + c.ih) + ')');
     ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'no horizontal scroll');
     await p.setViewportSize({ width: 390, height: 763 }); await p.waitForTimeout(400); ok(!!(await clipEl(p)), 'still playing after rotating back'); await p.context().close(); }
+  { console.log('preview link opens every chapter and replays clips');
+    const p = await page(b, 390, 763, { 'crown-ch4-boss': 1 }); await p.goto('http://127.0.0.1:' + srv.address().port + '/?preview=1', { waitUntil: 'load' }); await p.waitForTimeout(800);
+    await p.evaluate(() => GXC.open()); await p.waitForTimeout(500);
+    ok(await p.evaluate(() => document.querySelectorAll('.gxc-node.open, .gxc-node.won').length >= 10), 'all ten chapters open');
+    ok(await p.evaluate(() => !localStorage.getItem('crown-clips-seen')), 'seen clips reset'); await p.context().close(); }
   { console.log('portraits');
     const p = await page(b, 390, 763); await p.evaluate(() => { GXC.scene([{ who: 'shroomhulk', text: 'hi' }, { who: 'squidrik', text: 'yo' }], { def: null }) }); await p.waitForTimeout(500);
     ok(await p.evaluate(() => { const i = document.querySelector('.gxc-sc-who img'); return !!i && /camp-shroomhulk\.webp$/.test(i.src) }), 'listed portrait replaces the emoji');
