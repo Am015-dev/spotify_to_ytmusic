@@ -32,7 +32,7 @@ const URL=process.argv[2],OUT=process.argv[3]||'t4/nb',DESK=process.argv[4]==='d
  await tap('#gbBkT [data-a="done"]');await tap('#gbx .gbTabs button[data-t="veh"]');await shot('06_rides_mine');await tap('#gbSave');
  // the selected set's live bricks are saved under mho_build (gbClose); G.br[id] only holds the sets you switched away from
  console.log('save',await p.evaluate(()=>JSON.stringify(__gnb.saved())));
- if(process.env.DRIVE){await tap('#hcStory');for(let i=0;i<80;i++){await p.waitForTimeout(3000);const s=await p.evaluate(()=>__mho.state+'|'+!!(__mho.LD&&__mho.LD.on));if(s==='roam|false')break;for(const q of['#slotList .go','#m1Next']){const e=await p.$(q);if(e&&await e.isVisible())await tapEl(e)}}
+ if(process.env.DRIVE){await tap('#hcStory');for(let i=0;i<240;i++){await p.waitForTimeout(3000);const s=await p.evaluate(()=>__mho.state+"|"+!!(__mho.LD&&__mho.LD.on));if(i%10==0)console.log("wait",i,s);if(s==='roam|false')break;for(const q of['#slotList .go','#m1Next']){const e=await p.$(q);if(e&&await e.isVisible())await tapEl(e)}}
   for(let i=0;i<14;i++){let hit=0;for(const l of[p.getByText('SKIP',{exact:false}),p.getByText('TAP TO CONTINUE'),p.locator('#m1Next')]){const e=l.first();if(await e.count()&&await e.isVisible()){await tapEl(await e.elementHandle());hit=1;break}}if(!hit&&i>3)break;await p.waitForTimeout(1500)}
   await shot('07_roam');
   // drive: hold the GAS button with a real touch (the software renderer runs the sim slowly, so hold until ≥25 km/h or 120 s), small keyboard steering taps like a human
