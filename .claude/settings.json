@@ -1,4 +1,33 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git fetch:*)",
+      "Bash(git merge:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git push origin alex/brave-carson-rbpmlk:*)",
+      "Bash(git push -u origin alex/brave-carson-rbpmlk:*)",
+      "Bash(git checkout -B alex/brave-carson-rbpmlk origin/alex/brave-carson-rbpmlk)",
+      "Bash(python3 games-src/scripts/build-all.py:*)",
+      "Bash(python3 games-src/scripts/stamp-copyright.py:*)",
+      "Bash(python3 build.py:*)",
+      "Bash(python3 -m http.server:*)",
+      "Bash(node:*)",
+      "Edit(games/**)",
+      "Edit(games-src/**)",
+      "Write(games/**)",
+      "Write(games-src/**)"
+    ],
+    "deny": [
+      "Edit(games/mainhattan-overdrive/**)",
+      "Write(games/mainhattan-overdrive/**)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
