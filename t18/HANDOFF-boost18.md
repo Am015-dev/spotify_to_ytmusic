@@ -52,3 +52,6 @@ FAIL items: (1) turbines too big, they hid the car; (2) stale base; (3) pending:
   "Eleni's Garage → 2 m", road clear. tPlay counts the dwell at the objective as stuck. That is a tPlay/objective artifact, not walls.
 - Strips: t18/shots/strip_{turn,brake,driftTurn}.jpg (from b2k18c).
 - run4: race shot (b2k18d) + water hop from Athens (fra route failed twice: the car never reached the river).
+
+## DONE 18:10: reviewer PASS (ff4f738) → v87u built on live v87t, OD_CHANGELOG entry, out/v87u pushed (5c1384a), DEPLOY sent to the coordinator.
+Next worker note (from the reviewer): shoot drift strips on the road in the correct direction (strip_driftTurn was WRONG WAY on grass).
