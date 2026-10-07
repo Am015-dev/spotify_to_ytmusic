@@ -100,10 +100,10 @@ async function one(b,W,H,seed){const ctx=await b.newContext({viewport:{width:W,h
   if(s.st==='plan2'||s.st==='plan'){
    if(await p.$('#bf [data-a=go][data-force]')){await tapSel(p,'#bf [data-a=go][data-force]');await p.waitForTimeout(200);continue}
    if(s.hasPawn&&s.pick.length){const id=s.pick[(Math.random()*s.pick.length)|0];const pt=await p.evaluate(i=>{const t=BF.tilePt(i);return t&&{x:t.ox+t.x,y:t.oy+t.y}},id);
-     if(pt){const a0=await p.evaluate(()=>G.plan.acts.reduce((n,a)=>n+a.pw.length,0));await p.touchscreen.tap(pt.x,pt.y);await p.waitForTimeout(250);glow++;
+     if(pt){const a0=await p.evaluate(()=>G.plan.acts.reduce((n,a)=>n+a.pw.length,0));const bubUp=await p.evaluate(()=>!!document.querySelector('.gxh-bub'));await p.touchscreen.tap(pt.x,pt.y);await p.waitForTimeout(250);glow++;
       if(await p.$('#ppop:not([hidden]) .bfr[data-place]')){await tapSel(p,'#ppop .bfr[data-place]');await p.waitForTimeout(250)}
       const r=await p.evaluate(a0=>({a1:G.plan.acts.reduce((n,a)=>n+a.pw.length,0),pop:!!PHO.pop,msg:document.querySelector('#phlabel').textContent}),a0);
-      if(r.a1===a0&&!r.pop&&!/can't|Nothing|Too far/.test(r.msg))prob('glowing place '+id+' did not respond: '+r.msg+' '+JSON.stringify(await p.evaluate(([x,y])=>{const e=document.elementFromPoint(x,y);const b=document.querySelector('.gx-board').getBoundingClientRect();return {x:Math.round(x),y:Math.round(y),el:e&&(e.id||e.className||e.tagName),board:[b.top,b.bottom,innerWidth],pop:PHO.pop&&PHO.pop.k}},[pt.x,pt.y])));await p.evaluate(()=>PHO.closePop(true));continue}}
+      if(r.a1===a0&&!r.pop&&!bubUp&&!/can't|Nothing|Too far/.test(r.msg))prob('glowing place '+id+' did not respond: '+r.msg+' '+JSON.stringify(await p.evaluate(([x,y])=>{const e=document.elementFromPoint(x,y);const b=document.querySelector('.gx-board').getBoundingClientRect();return {x:Math.round(x),y:Math.round(y),el:e&&(e.id||e.className||e.tagName),board:[b.top,b.bottom,innerWidth],pop:PHO.pop&&PHO.pop.k}},[pt.x,pt.y])));await p.evaluate(()=>PHO.closePop(true));continue}}
    if(s.hasPawn&&(++noPick%2)){await tapSel(p,'#bf [data-a=suggest]');await p.waitForTimeout(200);continue}
    if(!s.hasPawn&&s.stuckish>1&&(++badTaps%3===0)){await tapSel(p,'#bf [data-a=suggest]');await p.waitForTimeout(250);continue}
    if(!s.hasPawn&&s.stuckish>1&&await tapSel(p,'#bf .bfpw.bad')){await p.waitForTimeout(250);continue}
