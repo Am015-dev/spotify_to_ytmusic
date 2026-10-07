@@ -194,7 +194,7 @@ async function play(p, tag, o) {
     if (!st.win) { const cx = await p.evaluate(() => { const e = [...document.querySelectorAll('.gx-x')].find(x => { const R = x.getBoundingClientRect(); if (!(R.width > 8 && R.left >= 0 && R.top >= 0 && R.right <= innerWidth && R.bottom <= innerHeight)) return false; const t = document.elementFromPoint(R.left + R.width / 2, R.top + R.height / 2); return t === x || x.contains(t) }); if (!e) return null; const R = e.getBoundingClientRect(); return { x: R.left + R.width / 2, y: R.top + R.height / 2 } }); if (cx) { await p.touchscreen.tap(cx.x, cx.y); await p.waitForTimeout(500); st.closed = 1; p._br = 'close'; continue; } } // a monster / card sheet the player opened: close it with the x
     await checkStep(p, tag, st);
     if (st.win) return st;
-    if (!st.gxc && (await helpFlow(p, tag, st))) { p._br = 'help'; continue; }
+    if (!st.gxc && (await helpFlow(p, tag, st))) { p._br = 'help'; lastAt = Date.now(); continue; } // time spent in help checks is not a stall
     if (o.rotAt && n === o.rotAt && !rotated) {
       const vp = p.viewportSize(); await p.setViewportSize({ width: vp.height, height: vp.width }); await p.waitForTimeout(900);
       const s2 = await p.evaluate(PROBE); if (s2.hscroll) await fail(p, tag, 'hscroll after rotation', ''); if (p.errs.length) await fail(p, tag, 'page error', p.errs[0]);
