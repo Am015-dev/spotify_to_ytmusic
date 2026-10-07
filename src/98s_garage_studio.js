@@ -39,7 +39,7 @@ function GS_build(){if(GS.on||!GB.sc)return;GS.on=1;const S=GB.sc,R=GB.r;
  const ls=new THREE.MeshBasicMaterial({color:0xf4f8ff,toneMapped:false});for(let i=-2;i<=2;i++){const s=new THREE.Mesh(new THREE.BoxGeometry(1.5,.2,50),ls);s.position.set(i*11,y0+WH-1.2,0);G.add(s)}
  // neon GARAGE signs on two walls
  const nt=GS_tex(512,128,(g,w,h)=>{g.fillStyle='#1a1030';g.fillRect(0,0,w,h);g.font='900 92px system-ui,Arial';g.textAlign='center';g.textBaseline='middle';g.shadowColor='#c06bff';g.shadowBlur=24;g.fillStyle='#f3e6ff';g.fillText('GARAGE',w/2,h/2+4);g.lineWidth=6;g.strokeStyle='#b05cff';g.strokeRect(6,6,w-12,h-12)});
- for(const[x,z,ry]of[[0,-HW+.3,0],[-HW+.3,0,Math.PI/2]]){const s=new THREE.Mesh(new THREE.PlaneGeometry(16,4),new THREE.MeshBasicMaterial({map:nt,toneMapped:false}));s.position.set(x,y0+9,z);s.rotation.y=ry;G.add(s)}
+ const nm=new THREE.MeshBasicMaterial({map:nt,toneMapped:false}),ng=new THREE.PlaneGeometry(9,2.25);for(const o of[-14,14])for(const[x,z,ry]of[[o,-HW+.3,0],[-HW+.3,o,Math.PI/2],[o,HW-.3,Math.PI],[HW-.3,o,-Math.PI/2]]){const s=new THREE.Mesh(ng,nm);s.position.set(x,y0+2,z);s.rotation.y=ry;G.add(s)}
  // props: shelves of paint cans, tool chests, tyre stacks (merged into one mesh)
  const P=[],box=(x0,x1,y1,y2,z0,z1,c)=>P.push(GB_box(x0,x1,y0-.5+y1,y0-.5+y2,z0,z1,c)),cyl=(r,h,x,y,z,c)=>P.push(GB_cyl(r,h,x,y0-.5+y,z,c,12));
  const shelf=(x,z,rot)=>{const A=[];const b=(a,b2,c,d,e,f,col)=>A.push(GB_box(a,b2,c,d,e,f,col));b(-4,4,0,.2,-.8,.8,'#c4281c');b(-4,4,1.6,1.8,-.8,.8,'#c4281c');b(-4,4,3.2,3.4,-.8,.8,'#c4281c');for(const sx of[-4,3.8])b(sx,sx+.2,0,3.6,-.8,.8,'#8a8f99');
@@ -50,7 +50,7 @@ function GS_build(){if(GS.on||!GB.sc)return;GS.on=1;const S=GB.sc,R=GB.r;
  for(const[x,z]of[[16,-16],[-16,-24],[22,22]])for(let i=0;i<3;i++)cyl(.55,.3,x,i*.31,z,'#1b2a34');
  const pg=mergeGeometries(P),pr=new THREE.Mesh(pg,new THREE.MeshStandardMaterial({vertexColors:true,roughness:.5}));pr.castShadow=pr.receiveShadow=true;G.add(pr);
  // mechanic minifigs around the platform, same scale as the driver in the car (both from GB_figGeo at scale 1)
- const crew=[[{h:'grin',x:'cap',t:'plain',l:'#2b3a67',c:'#c4281c'},-11,-6,.9],[{h:'smile',x:'short',t:'hoodie',l:'#1b1d22',c:'#36d17a'},11.5,-9,-.6],[{h:'wink',x:'cap',t:'logo',l:'#2b3a67',c:'#2f7bff'},-10.5,8,2.2],[{h:'smile',x:'long',t:'plain',l:'#8a8f99',c:'#ff7a1c'},12,7,-2.4]];
+ const crew=[[{h:'grin',x:'cap',t:'plain',l:'#2b3a67',c:'#c4281c'},-11,-6,.9],[{h:'smile',x:'short',t:'hoodie',l:'#1b1d22',c:'#36d17a'},11.5,-9,-.6],[{h:'wink',x:'cap',t:'logo',l:'#2b3a67',c:'#2f7bff'},-10.5,8,2.2],[{h:'smile',x:'long',t:'plain',l:'#8a8f99',c:'#ff7a1c'},12,7,-2.4],[{h:'grin',x:'cap',t:'logo',l:'#1b1d22',c:'#fac80a'},-12,14,2.6],[{h:'smile',x:'short',t:'plain',l:'#2b3a67',c:'#0055bf'},-2,16,3.1]];
  GS.crew=[];for(const[f,x,z,ry]of crew){const M=[],L=[];GB_figGeo(f,M,L,false);const o=new THREE.Group();o.add(new THREE.Mesh(mergeGeometries(M),GB_MAT));if(L.length)o.add(new THREE.Mesh(mergeGeometries(L),GB_LMAT));o.traverse(m=>{if(m.isMesh)m.castShadow=true});
   o.position.set(x,y0-.5,z);o.rotation.y=ry;o.userData.ph=Math.random()*6;G.add(o);GS.crew.push(o)}
  // soft studio reflections for the glossy bricks
