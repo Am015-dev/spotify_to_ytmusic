@@ -17,7 +17,7 @@ const URL=process.argv[2],OUT=process.argv[3]||'t4/nb',DESK=process.argv[4]==='d
  const put=async(pc,i,j,rot=0)=>{await part(pc);for(let r=0;r<rot;r++)await tap('#gbBkT [data-a="rot"]');const n0=await cnt();const s=await p.evaluate(([i,j])=>__gb.scr(i,j),[i,j]);if(!s)return console.log('noscr',i,j);
   const dg=await p.evaluate(([x,y])=>__gnb.dbg(x,y),[s.x,s.y]);await tapXY(s.x,s.y);
   // v87o: a tap shows the held part (brackets + PLACE bar); PLACE puts it on
-  if(await p.evaluate(()=>!!(window.__gs&&__gs.held()))){if(process.env.SHOTHELD&&!globalThis.__sh){globalThis.__sh=1;await shot('04a_held')}await tap('#gsBar [data-g="place"]')}let d=(await cnt())-n0;
+  if(await p.evaluate(()=>!!(window.__gs&&__gs.held()))){if(process.env.SHOTHELD&&!globalThis.__sh){globalThis.__sh=1;await shot('04a_held');await tap('#gsBar [data-g="place"]');await p.screenshot({path:`${OUT}/04b_pop.png`});console.log('pops',await p.evaluate(()=>__gs.pops()))}else await tap('#gsBar [data-g="place"]')}let d=(await cnt())-n0;
   // the ~2 fps software renderer can run a frame between touchStart and touchEnd (>900 ms = long press, no add): tap again like a player would
   if(!d&&JSON.parse(dg).c){await tapXY(s.x,s.y);d=(await cnt())-n0;console.log('retap')}console.log('put',pc,i,j,'+'+d,dg);for(let r=0;r<rot;r++)await tap('#gbBkT [data-a="rot"]')};
  await tap('#gbMenuBtn');await tap('#gbx .gbTabs button[data-t="veh"]');await shot('01_rides');await tap('.gnbGo');await shot('02_picker');
