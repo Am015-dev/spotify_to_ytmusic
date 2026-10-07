@@ -1,0 +1,10 @@
+{
+  "_readme": "Put the Suno mp3 files in this folder (next to this file) with exactly these names. For each track set bpm (beats per minute) and offsetMs (milliseconds from the start of the file to the first beat; negative is not needed, trim the file instead). A file that is missing is skipped silently and the built-in synth plays at the same bpm. Trim every file to whole bars so it loops cleanly. Stage names: menu, stage1, stage2, boss, endless.",
+  "tracks": [
+    { "file": "menu.mp3",   "stage": "menu",    "bpm": 100, "offsetMs": 0, "title": "Neon Lobby" },
+    { "file": "stage1.mp3", "stage": "stage1",  "bpm": 120, "offsetMs": 0, "title": "Taunusanlage Run" },
+    { "file": "stage2.mp3", "stage": "stage2",  "bpm": 128, "offsetMs": 0, "title": "Mainufer Drift" },
+    { "file": "boss.mp3",   "stage": "boss",    "bpm": 140, "offsetMs": 0, "title": "Kronos Protocol" },
+    { "file": "endless.mp3","stage": "endless", "bpm": 132, "offsetMs": 0, "title": "Endless Shift" }
+  ]
+}
