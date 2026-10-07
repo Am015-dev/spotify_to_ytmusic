@@ -35,7 +35,6 @@ document.addEventListener('click',e=>{
    case 'take':{const s=+t.dataset.s;UI.holder=s;UI.passed=s;UI.card=null;UI._cardKey=null;UI.pop=null;pump();break}
    case 'evok':{evDone();break}
    case 'tipx':UI.tip[t.dataset.k]='x';renderAll();break;
-   case 'coachok':coachOk();break;
    case 'gloss':showGloss(t.dataset.t);break;
    case 'gclose':hideGloss();break;
    case 'nowlog':GX.show('logd');break;
@@ -74,7 +73,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&UI.pop&&!GX.open){c
 function toast(t){UI.toast=t;const l=$('#live');if(l)l.textContent=t}
 // start screens (title, setup, online): see part 7
 function startFromCfg(c){hideStart();const o={np:c.np,length:c.length,faction:c.faction,levels:c.levels,guide:c.guide,seatFactions:c.seats.map(s=>s.faction),humanSeats:c.humanSeats};
-  if(c.guided)newGame('guided',o);else newGame(c.mode==='watch'?'ai':c.mode,o)}
+  if(c.tutorial&&typeof tutStart==='function')tutStart();else if(c.guided)newGame('guided',o);else newGame(c.mode==='watch'?'ai':c.mode,o)}
 function afterStart(){closePop(true);GX.close();UI.mapReset=true;renderAll();pump()}
 // ---------------------------------------------------------------- drawers
 function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slice().reverse();let h='<p class="small">Newest first. Tap an underlined word for its meaning. <button class="btn" data-a="logall">'+(UI.logAll?'Show key events only':'Show everything')+'</button></p><ol class="log">';
@@ -83,7 +82,7 @@ function renderLog(){const el=$('#logbody');if(!el||!G)return;const L=G.log.slic
 function renderMenu(){const el=$('#setbody');if(!el)return;
   const seg=(a,cur,opts)=>'<div class="seg">'+opts.map(([v,l])=>'<button class="'+(String(cur)===String(v)?'on':'')+'" data-a="'+a+'" data-v="'+v+'">'+l+'</button>').join('')+'</div>';
   el.innerHTML=(NET.on?'<div class="mrow"><button class="btn pri" data-a="netopen">Online lobby</button>'+(isHost()?'<button class="btn" data-a="newgame">Change setup</button>':'')+'<button class="btn" data-a="netleave">Leave the room</button></div>':'<div class="mrow"><button class="btn pri" data-a="newgame">New game / main menu</button><button class="btn" data-a="savenow">Save now</button></div>')+
-   '<div class="mrow"><span>Guide</span>'+seg('gdset',UI.guide,[['full','Full tips'],['light','Light'],['off','Off']])+'</div>'+
+   (typeof tutBtn==='function'?'<div class="mrow">'+tutBtn('btn')+'</div>':'')+'<div class="mrow"><span>Guide</span>'+seg('gdset',UI.guide,[['full','Full tips'],['light','Light'],['off','Off']])+'</div>'+
    (typeof hlpInit==='function'&&(hlpInit(),typeof GXH!=='undefined')?GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'}):'')+
    '<div class="mrow"><span>Computer speed</span>'+seg('spd',UI.speed,[[1,'x1'],[2,'x2'],[4,'x4']])+'</div>'+
    '<div class="mrow"><span>Sound</span><button class="btn" data-a="snd" aria-pressed="'+UI.sound+'">'+(UI.sound?'On':'Off')+'</button><span>Music</span><button class="btn" data-a="mus" aria-pressed="'+UI.music+'">'+(UI.music?'On':'Off')+'</button></div>'+

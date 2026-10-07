@@ -16,7 +16,7 @@ function aiFallback(s,q,mv){const N=G.pl[s].name;const k=q.kind;
   if(q.t==='menu'&&mv.t==='done')return null;   // trivia: not narrated
   if(k==='edict')return mv.yes?N+' plays a Tactic.':null;if(k==='statue'||k==='harvest')return N+' decides about a card.';
   return null}
-function renderNow(){const el=$('#now');if(!el||!G)return;if(UI.coachInfo){el.innerHTML='';return}
+function renderNow(){const el=$('#now');if(!el||!G)return;
   let t=null,s=-1;const f=UI.nowT;const last=G.log[G.log.length-1];
   if(f&&f.at===G.logN){t=f.t;s=f.s}else if(last){t=last.t;s=last.s}
   if(!t){el.innerHTML='';return}
@@ -108,25 +108,16 @@ document.addEventListener('toggle',e=>{const d=e.target;if(d&&d.dataset&&d.datas
 // Cairn Field and win there with your Heir and two Supporters: the +2, the Herald's +1 and the steal all happen in round 1.
 const GUIDED={seed:23,lastNormal:0,ai:9,faction:'clans',rival:'nobility'};
 const isGuided=()=>!!(UI.cfg&&UI.cfg.guided&&!NET.on);
-const COACH_INFO=[
- {id:'goal',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'Your goal',text:()=>'Win by having the most Influence when round '+G.rounds+' ends. Influence is the score: the bar at the bottom shows you and the Gilded Court, both at 0.',hl:'#rivals'},
- {id:'map',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'The kingdom',text:()=>'The map has three regions with two locations each. Every round each region has one Clash: the strongest side wins it and claims one of its two locations, which pays Influence. The Map button at the top makes the map bigger.',locs:[0,1,2,3,4,5]},
- {id:'round',when:()=>G.round===1&&G.q&&G.q.kind==='bid',title:'One round, six steps',text:()=>'1 Bid a card for a Kingdom Card. 2 Take your Kingdom Card. 3 Place your Herald. 4 Hide one card at each region. 5 Send Supporters. 6 The three Clashes. Round 1 is only this; new powers come in rounds 2 and 3. Tap the glowing button each time.',btn:'Let\'s start'},
- {id:'own',when:()=>G.round===2&&G.q,title:'Round 2: two new things',text:()=>'Card abilities: some of your cards can Flank, Ambush, Retreat or Rally (the card says when). Autumn: after the Clashes you may send a card on a Journey for Lore, and Lore buys stronger cards. The ★ suggestion still shows a good move and why.',btn:'Play on'},
- {id:'r3',when:()=>G.round===3&&G.q,title:'Round 3: the full game',text:()=>'Now everything is in play: your faction\'s Tactics, the Kingdom\'s Favour, and Govern (a card with votes goes into a Council for a lasting power). Each one is explained the first time you can use it.',btn:'Play on'}];
-function coachGate(){if(!G||!G.q||UI.coachInfo)return !!UI.coachInfo;if(!isGuided())return false;UI.coachDone=UI.coachDone||{};
-  const st=COACH_INFO.find(c=>!UI.coachDone[c.id]&&c.when());if(st){UI.coachDone[st.id]=1}
+// the old coach pop-ups (goal / map / round) are replaced by the staged tutorial (part 12, shell/gx-tutor.js)
+function coachGate(){if(!G||!G.q)return false;if(!isGuided())return false;UI.coachDone=UI.coachDone||{};
   // the guided game skips a season for you when nothing you have learnt yet can be used in it
-  const s=viewSeatForQ();if(s!=null&&G.q.t==='menu'&&G.round<3&&menuPhase(G.q)!=='Day'){const mv=legal(s);if(!visibleActs(mv).some(m=>m.t==='act')){const d=mv.find(m=>m.t==='done');if(d){if(!UI._skipT)UI._skipT=setTimeout(()=>{UI._skipT=0;humanMove(d.k)},0);return true}}}
+  const s=viewSeatForQ();if(s!=null&&G.q.t==='menu'&&G.round<3&&menuPhase(G.q)!=='Day'){const mv=legal(s);if(!visibleActs(mv).some(m=>m.t==='act')){const d=mv.find(m=>m.t==='done');if(d){if(!UI._skipT)UI._skipT=setTimeout(()=>{UI._skipT=0;humanMoveAuto(d.k)},0);return true}}}
   return false}
-function coachOk(){const c=UI.coachInfo;if(!c)return;UI.coachDone=UI.coachDone||{};UI.coachDone[c.id]=1;UI.coachInfo=null;$$('.coachhl').forEach(e=>e.classList.remove('coachhl'));saveGame();pump()}
-function coachInfoHTML(c){setTimeout(()=>{$$('.coachhl').forEach(e=>e.classList.remove('coachhl'));if(c.hl){const e=$(c.hl);if(e)e.classList.add('coachhl')}},0);
-  const n=COACH_INFO.findIndex(x=>x.id===c.id);return '<div class="step"><h3 class="st">'+esc(c.title)+'</h3><p class="coach info">'+gloss(c.text)+'</p>'+(n>=0&&n<3?'<p class="hint">'+(n+1)+' of 3 before you play</p>':'')+'</div>'}
 const menuPhase=q=>((q.title||'').match(/(Spring|Day|Autumn)/)||[])[1]||'';
 const byLabel=(mv,txt)=>mv.find(m=>(m.label||'').indexOf(txt)>=0);
 const BONUSK=['castle','wilderness','harvest','shrine','ossuary'];
 // teaching moves for round 1 (falls back to the normal suggestion when the scripted card is not there)
-function coachRec(s,mv){if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind;
+function coachRec(s,mv){if(!isGuided()||!G.q)return null;if(UI.cfg.tutorial){const tr=tutRec(s,mv);if(tr!==undefined)return tr}const q=G.q,k=q.kind;
   if(G.round===1){
     if(k==='bid')return byLabel(mv,'Sailing Hall');
     if(k==='bidRes'){const takes=mv.filter(m=>m.t==='take');const pref=[11,13,17,5,46,51,14,39];for(const n of pref){const m=takes.find(x=>x.kc===n);if(m)return m}
@@ -147,7 +138,7 @@ const NEWK={cmd:['Card abilities','Some of your cards have a power printed on th
   council:['Councils','Your cards in a Council give you a power. Why you\'d want it: it works every round while the cards stay there.'],
   kc:['Kingdom Card powers','Some Kingdom Cards and HQ cards have a power you choose when to use. Why you\'d want it: each row says what it costs and what it gives.']};
 // the coach line that replaces the prompt in round 1 (and the first time something new appears later)
-function coachFor(s,mv,rm){UI._coachShown=null;if(!isGuided()||!G.q)return null;const q=G.q,k=q.kind,R=G.round;UI.coachDone=UI.coachDone||{};
+function coachFor(s,mv,rm){UI._coachShown=null;if(!isGuided()||!G.q||UI.cfg.tutorial)return null;const q=G.q,k=q.kind,R=G.round;UI.coachDone=UI.coachDone||{};
   const nm=id=>cinfo(id).name+' ('+cinfo(id).strength+')';
   if(R===1){
     if(k==='bid')return {title:STEPN(1,'Bid'),pulse:1,noRec:1,text:'Pick a hand card as a secret bid: the higher bid picks a Kingdom Card first, and your bid card is tucked under it.'+(rm?' '+nm(rm.id)+' is a fair bid that keeps your big cards for the Clashes.':'')};
@@ -213,7 +204,7 @@ function renderStart(){const el=$('#start');if(!el||el.hidden)return;const top=e
   const view=NET.on?'online':(UI.sv||'title');el.dataset.v=view;
   if(view==='title'){const sav=hasSave();
     el.innerHTML='<div class="ttl"><div class="ttl-art">'+titleArt()+'</div><div class="ttl-in"><h1 class="logo"><small>THE</small>Thornbound Throne</h1><p class="tag">The king is dead. Four factions reach for his crown.</p><p class="tag goal">Win by holding the most Influence when the last round ends.</p><div class="tmid"></div><div class="tbtns">'+
-      (window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="tbtn go story" data-a="story"><b>Story</b><span>'+campLine()+'</span></button>':'')+'<button class="tbtn'+(window.CAMPAIGN&&typeof GXC!=='undefined'?'':' go')+'" data-a="play"><b>Play</b><span>'+(firstTime()?'new here? a guided first game is ready':'against the computer')+'</span></button>'+
+      (firstTime()?tutBtn('tbtn go'):'')+(window.CAMPAIGN&&typeof GXC!=='undefined'?'<button class="tbtn'+(firstTime()?'':' go')+' story" data-a="story"><b>Story</b><span>'+campLine()+'</span></button>':'')+'<button class="tbtn'+(window.CAMPAIGN&&typeof GXC!=='undefined'||firstTime()?'':' go')+'" data-a="play"><b>Play</b><span>against the computer</span></button>'+(firstTime()?'':tutBtn('tbtn'))+
       '<button class="tbtn" data-a="online"><b>Online</b><span>with friends, free, no sign-up</span></button>'+
       (sav?'<button class="tbtn" data-a="cont"><b>Resume</b><span>your game, round '+Math.max(1,sav.G.round)+' of '+sav.G.rounds+'</span></button>':'')+
       '</div><button class="tlink" data-a="rules">How to play</button></div><p class="st-c">Original art and words. Fonts: Cinzel and EB Garamond (SIL OFL).</p></div>';return}
@@ -232,8 +223,8 @@ function optionsHTML(ONL,plan){return '<div class="opts2">'+(ONL?'':'<div class=
   '<div class="row"><span>Tips</span><div class="seg">'+[['full','Full'],['light','Light'],['off','Off']].map(([v,l])=>'<button class="'+(sv.guide===v?'on':'')+'" data-a="gd" data-v="'+v+'">'+l+'</button>').join('')+'</div></div>'+seatRows(ONL,plan)+'</div>'}
 function sumLine(){const n=sv.np-1,R=({short:4,standard:5,extended:6}[sv.length]);return 'You lead <b>'+esc(DD.FSHORT[sv.faction])+'</b> against '+n+' computer'+(n>1?'s':'')+' · most Influence after round '+R+' wins'}
 function setupHTML(){const ph=UI.phone;const k=TBKit.FACTIONS[FK[sv.faction]];
-  const guide='<div class="guidebox"><p><b>First time?</b> The <b>Guided first game</b> teaches one step at a time: Heathbound Clans against one computer (Easy, for learning), 4 rounds, about 15 minutes. <b>Start the game</b> is a normal game with the settings below.</p></div>';
-  const ft=firstTime();const gbtn='<button class="sbtn'+(ft?' big':'')+'" data-a="guided" data-start="guided"><b>'+(ft?'Guided first game':'Guided game')+'</b><span>'+(ft?'recommended: learn one step at a time':'learn step by step')+'</span></button>';
+  const guide='';
+  const ft=firstTime();const gbtn=tutBtn('sbtn'+(ft?' big':''));
   const go='<div class="sgo">'+(ft?gbtn:'')+'<button class="sbtn'+(ft?'':' big')+'" data-a="start" data-start="go"><b>Start the game</b><span>'+esc(DD.FSHORT[sv.faction])+' vs '+(sv.np-1)+' computer'+(sv.np>2?'s':'')+' ('+sv.levels.slice(1,sv.np).map(l=>l==='easy'?'Easy':l==='hard'?'Hard':'Normal').filter((x,i,a)=>a.indexOf(x)===i).join('/')+') · '+({short:4,standard:5,extended:6}[sv.length])+' rounds</span></button><div class="sgrid3">'+(ft?'<button class="sbtn" data-a="rules"><b>How to play</b><span>the rules in short</span></button>':gbtn)+
     '<button class="sbtn" data-a="mode" data-v="hot" data-go="1" data-start="hot"><b>Hot-seat</b><span>'+sv.np+' people, one device</span></button>'+
     '<button class="sbtn" data-a="mode" data-v="watch" data-go="1" data-start="watch"><b>Watch</b><span>the computers play</span></button></div></div>';

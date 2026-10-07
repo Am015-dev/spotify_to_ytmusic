@@ -115,5 +115,5 @@ function hlpInit(){if(_hlpInit||typeof GXH==='undefined')return;_hlpInit=true;
   GXH.init({game:'thornbound',defaultOn:true,steps:HLP_STEPS,rules:HLP_RULES,avoid:'.glow,.rglow,.rec,.rrec,#act .btn,#main .opt,#main [data-a=mv],#spots .bspot'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase})}
 function hlpAfter(){hlpInit();if(typeof GXH==='undefined')return;
-  const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.coachInfo||UI.dragging||(st&&!st.hidden)||isPassing();
+  const st=$('#start');const busy=!G||!UI.started||G.over||UI.card||UI.pop||UI.dragging||(typeof tutOn==='function'&&tutOn())||(st&&!st.hidden)||isPassing();
   GXH.phase(busy?null:hlpPhase())}

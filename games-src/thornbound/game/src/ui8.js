@@ -46,7 +46,7 @@ function showNews(first){const items=[first];if(first.big&&infK(first)){while(UI
   if(!first.big){while(UI.evq.length&&items.length<4){const n=UI.evq[0];if(n.t!=='news'||n.big)break;items.push(UI.evq.shift())}}
   const c={kind:'news',items,big:first.big,id:(UI._nid=(UI._nid||0)+1)};UI.card=c;
   const dur=newsDur(c);
-  clearTimeout(UI._nt);UI._nt=setTimeout(()=>{if(UI.card===c){UI.card=null;pump()}},dur)}
+  clearTimeout(UI._nt);UI._nt=setTimeout(()=>{if(UI.card===c&&!(typeof tutHold==='function'&&tutHold(c))){UI.card=null;pump()}},dur)}
 // how long a news card stays: short for plain computer moves, longer when it changes Influence or your Clash (a tap always skips)
 function newsDur(c){const sp=Math.max(1,Math.min(UI.speed||1,4));if(c.big)return 1800/sp;const k=c.items.some(x=>x.keep);return Math.max(k?1300:600,500+300*c.items.length)/sp}
 function newsOk(){const c=UI.card;if(!c||c.kind!=='news')return;clearTimeout(UI._nt);UI.card=null;
