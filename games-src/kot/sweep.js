@@ -208,7 +208,7 @@ async function play(p, tag, o) {
 async function game(b, W, H, i) {
   const tag = `${W}x${H}#${i}`; const p = await newPage(b, W, H); battles++;
   try {
-    await p.evaluate(s => { setSeed(s); }, 500 + i * 31); if (i === 1) await p.evaluate(() => GXH.setEnabled(false)); // one game per size with Tips off: no bubble may appear await p.tap('[data-start]'); await p.waitForTimeout(1800);
+    await p.evaluate(s => { setSeed(s); }, 500 + i * 31); if (i === 1) await p.evaluate(() => GXH.setEnabled(false)); await p.tap('[data-start]'); await p.waitForTimeout(1800);
     const st = await play(p, tag, { rotAt: i < ROT ? 14 : 0 });
     if (st && st.win) { /^P/.test(st.win) && st.win === 'P' + (await p.evaluate(() => G.pl.findIndex(q => q.human) + 1)) ? wins++ : losses++; await p.waitForTimeout(3000); const s2 = await p.evaluate(PROBE); await checkStep(p, tag, s2); if (i === 0) await p.screenshot({ path: path.join(SHOTS, `end-${W}x${H}.png`) }); }
   } catch (e) { await fail(p, tag, 'exception', e.message.split('\n')[0]); }
