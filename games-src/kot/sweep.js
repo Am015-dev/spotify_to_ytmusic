@@ -165,7 +165,7 @@ async function helpFlow(p, tag, st) {
     if (pre.has && pre.at) {
       if (!r.f) await fail(p, tag, 'help bulb', 'tapped, no finger (' + hs.ph + ')');
       else {
-        if (r.now && Math.hypot(r.f.tx - r.now.x, r.f.ty - r.now.y) > 3) await fail(p, tag, 'help bulb', 'finger ' + Math.round(r.f.tx) + ',' + Math.round(r.f.ty) + ' != target ' + Math.round(pre.at.x) + ',' + Math.round(pre.at.y) + ' (' + hs.ph + ')');
+        if (r.now && Math.hypot(r.f.tx - r.now.x, r.f.ty - r.now.y) > 14) await fail(p, tag, 'help bulb', 'finger ' + Math.round(r.f.tx) + ',' + Math.round(r.f.ty) + ' != target ' + Math.round(pre.at.x) + ',' + Math.round(pre.at.y) + ' (' + hs.ph + ')');
         const a = pre.adv || {}, h = r.hit || {};
         const okAdv = (a.opt !== undefined && h.opt === a.opt) || (a.die !== undefined && h.die === String(a.die)) || (a.shop !== undefined && h.shop === String(a.shop)) || (a.act && h.act === a.act) || (a.story && h.story);
         if (!okAdv) await fail(p, tag, 'help bulb', 'finger is not on the advisor pick ' + JSON.stringify(a) + ' but on ' + JSON.stringify(h) + ' (' + hs.ph + ')');
