@@ -1,0 +1,9 @@
+EVA true
+QUEST false
+TSIDE {"side":-1,"n":23,"sum":-23,"lats":[-7.2,-7.9,-7.9,-7.9,-7.9,-7.9,-7.9,-6.5,-7.2,-7.2,-7.9,-7.9,-7.2,-7.2,-7.9,-7.9,-7.9,-7.9,-7.9,-7.9,-7.2,-7.9,-5]}
+RUNS {"city":{"L":1309.3684926678493,"x":1356.2173966738123,"z":-15.763086153303076,"h":2.068056445167728,"w":28},"ab":{"L":2458.854456651077,"x":4007.710525461848,"z":-5124.608131453624,"h":0.05457670211914671,"w":16}}
+J {"s":0.20217662206017561,"A":[720,-120],"n":[720,0],"C":[628,0],"hin":0,"hout":-1.5707963267948966,"t":-1.5707963267948966,"la":120,"w":18}
+TURN {"mode":"nobrake","v5":98,"d5":78,"entryKmh":89,"turnedDeg":-106,"maxSlipDeg":0.4,"camLagS":0.08,"exitRoadHalfW":14,"maxOffExitCentreM":12.3,"offRoadMaxM":-1.7,"onRoad":true,"wallHits":0,"wrongWay":false,"exitKmh":88}
+SLALOM {"k":"city","target":120,"reachS":12.7,"maxSlipDeg":0.2,"headingSwingDeg":13.4,"vMin":118,"vMax":120,"wallHits":0,"offRoad":-4.23,"wrongWay":false}
+SLALOM {"k":"ab","target":160,"reachS":10.4,"maxSlipDeg":0.1,"headingSwingDeg":10.1,"vMin":143,"vMax":160,"wallHits":0,"offRoad":null,"wrongWay":false}
+ERRS []
