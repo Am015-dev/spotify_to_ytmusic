@@ -24,11 +24,14 @@ for(const ev of['touchstart','touchmove','touchend','touchcancel'])addEventListe
     if(s.done){if(y>s.y-10)s.done=false}else if(s.y-y>26&&n-s.t<500){s.done=true;B2K_hop()}s.ly=y;s.lt=n}},{passive:true,capture:true});
   const end=e=>{for(const t of e.changedTouches)sw.delete(t.identifier)};addEventListener('touchend',end,{passive:true,capture:true});addEventListener('touchcancel',end,{passive:true,capture:true})}
 function B2K_hop(){if(state==='roam')pressed.fire=true;else B2K.hopReq=true;B2K.log.hop++;const G=document.getElementById('tG');if(G){G.classList.remove('b2kHop');void G.offsetWidth;G.classList.add('b2kHop')}}
-// ctlPlayer: GAS+BRAKE+steer = drift (hb), never a brake; keyboard Up+Down+steer too
+// ctlPlayer: drift (hb), never a brake. Free roam: ONLY an explicit GAS+BRAKE+steer (two thumbs, the seam, or keys Up+Down+steer);
+// plain BRAKE+steer always brakes (auto-gas must not turn a brake tap into a drift). Races on touch (auto-gas, GAS hidden):
+// BRAKE+steer above B2K_RDMIN (60 km/h) drifts, so phone players can drift.
+window.B2K_RDMIN=16.7; // m/s
 {const f0=ctlPlayer;ctlPlayer=function(){const c=f0.apply(this,arguments);try{if(state==='roam'||state==='race'){
-  const gas=TOUCH.gas||B2K.tG||K.ArrowUp||K.KeyW,brk=TOUCH.brake||B2K.tB||K.ArrowDown||K.KeyS,auto=TOUCH.on&&TOUCH.used&&thrEff()!=='pedal';
-  const sp=state==='roam'?Math.abs(RO.v):(pl?pl.v:0),dr=state==='roam'?!!RO.dDir:!!(pl&&pl.hbDir);
-  B2K.req=brk&&(gas||auto)&&sp>window.B2K_DMIN&&(dr||Math.abs(c.steer)>.25)&&!TOUCH.park;if(B2K.req){c.hb=1;c.brk=0;c.thr=1}}}catch(e){}return c}}
+  const gas=TOUCH.gas||B2K.tG||K.ArrowUp||K.KeyW,brk=TOUCH.brake||B2K.tB||K.ArrowDown||K.KeyS,race=state==='race',tauto=race&&TOUCH.on&&TOUCH.used;
+  const sp=race?(pl?pl.v:0):Math.abs(RO.v),dr=race?!!(pl&&pl.hbDir):!!RO.dDir,st=dr||Math.abs(c.steer)>.25;
+  B2K.req=brk&&st&&!TOUCH.park&&(gas&&sp>window.B2K_DMIN||tauto&&(sp>window.B2K_RDMIN||dr&&sp>window.B2K_DMIN));if(B2K.req){c.hb=1;c.brk=0;c.thr=1}}}catch(e){}return c}}
 // ---- HUD: pink drift bar over a cyan boost bar, just above the speed readout
 (()=>{const st=document.createElement('style');st.id='b2kCss';st.textContent=`
 #b2kM{position:fixed;left:50%;bottom:calc(36px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:clamp(150px,22vw,200px);z-index:6;pointer-events:none;display:none}

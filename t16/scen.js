@@ -20,6 +20,9 @@ module.exports=({p,tick,down,up,move,tap,center,shot,st,res,F})=>{global.SCEN=as
  // 2. two-finger drift: hold GAS, steer ▶, press BRAKE for 2 s
  await steerTo(1);await tick(6);await down('brk',b);for(let i=0;i<6;i++){await tick(10);if(i===3){await L('drift-mid');await shot('drift')}}await up('brk');await tick(2);await steerTo(0);await tick(20);await L('drift1-end');
  res.drift1=await p.evaluate(()=>__b2k.log.drift.slice(-1)[0]||null);
+ // 2b. brake twitch (Alex): auto-gas, no GAS finger, steer ▶ + BRAKE 1 s at speed -> must brake, never drift
+ await drive(180,null);await up('gas');await tick(20);{const n0=await p.evaluate(()=>__b2k.log.drift.length),v0=(await st()).v;await steerTo(1);await tick(4);await down('brk',b);let df=0;for(let i=0;i<6;i++){await tick(10);if((await st()).dDir)df++;if(i===2)await shot('brake_twitch')}
+  await up('brk');await steerTo(0);await tick(4);const v1=(await st()).v;res.brakeTwitch={kmh0:v0,kmh1:v1,driftSamples:df,newDrifts:(await p.evaluate(()=>__b2k.log.drift.length))-n0}}await down('gas',g);
  await drive(240,null);
  // 3. one thumb on the seam between BRAKE and GAS (+ steer ◀): both count
  await up('gas');const seam=await p.evaluate(()=>{const G=document.querySelector('#tG').getBoundingClientRect(),B=document.querySelector('#tB').getBoundingClientRect();const gc=[G.left+G.width/2,G.top+G.height/2,G.width/2],bc=[B.left+B.width/2,B.top+B.height/2,B.width/2];const d=Math.hypot(gc[0]-bc[0],gc[1]-bc[1]);const t=(bc[2]+(d-gc[2]-bc[2])/2)/d;return[bc[0]+(gc[0]-bc[0])*t,bc[1]+(gc[1]-bc[1])*t]});
