@@ -22,3 +22,6 @@ profileOpen=(f=>function(){f();const B=$('#pfBody');if(!B)return;
 .gpfCs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.gpfC{text-align:center;border:2px solid #141413;border-radius:10px;padding:4px 2px;background:#fff7d1}.gpfC i{font-style:normal;font-size:18px;display:block}.gpfC b{display:block;font:900 14px system-ui}
 .gpfE{opacity:.6}#profile .pstats small,#profile .lvl small{font-size:12px!important}`;document.head.appendChild(st);
  const tb=$('#topBtns');if(tb){const b=document.createElement('button');b.id='gpfBtn';b.textContent='👤 PROFILE';b.onclick=()=>{try{AU.sfx('pick')}catch(e){}profileOpen()};tb.insertBefore(b,tb.firstChild)}}
+// the "New in vX" bubble (z 8999) covered the garage tabs and the profile ✕ on the phone: hide it while the garage or profile is open
+{const upd=()=>document.body.classList.toggle('gpfHideNew',!$('#gbx').hidden||!$('#profile').hidden),mo=new MutationObserver(upd);for(const s of['#gbx','#profile'])mo.observe($(s),{attributes:true,attributeFilter:['hidden']});
+ const st=document.createElement('style');st.textContent='body.gpfHideNew #odNew{display:none!important}';document.head.appendChild(st);upd()}
