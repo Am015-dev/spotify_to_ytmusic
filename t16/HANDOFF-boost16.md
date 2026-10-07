@@ -34,3 +34,16 @@ Brickbash after 1.83 s held, 55 → 183 km/h. Hop 2.4 m ground, 2.35 m water (bo
 ## tPlay (MIN=4, FAST) live vs new
 Run-to-run noise is large (the same build gave Athens walls 0.97 and 3.62). The 1.1 s full-boost turbo made tPlay 23% faster in fra (more traffic and wall hits),
 so it is now 0.4 s. Results after that are in qa16/tpG.out.
+
+## Status at stop (worker 16, context ~500k): handed to worker 18 (session_01XoTtrUqK3KuwTt7DoASFdq)
+- This branch is still on **v87p**. Worker 18 rebases it onto live v87s (`alex/od-race15`, LIVE_MATCH checked). A trial merge had exactly one
+  conflict: `src/ORDER`. Put `98k_boost2k.js` after `98z_race_items.js`, right before `99_api.js`. The diff vs v87s is then only 98k + ORDER + the 71 hook line.
+  v87s `30_race.js` already raises the old touch BRAKE+steer auto-drift to 125 km/h in the city (`W14_ST.hbCity`), from worker 14.
+- **Drift rule (coordinator decision):** roam drift = an explicit GAS+BRAKE+steer hold only (keeps the city brake-twitch fix). Races, where gas is automatic and
+  there is no GAS button on the phone: BRAKE+steer = drift. Implemented in the `ctlPlayer` wrapper: `B2K.req=brk&&(gas||state==='race')&&sp>B2K_DMIN&&…`.
+  Not yet re-tested after this change. Re-run `node t16/race.js` (drift + boost + Brickbash in a race) and `node t16/b2k.js` (roam) on the rebased build.
+- Seeded tPlay A/B (Athens, 6 seeds, 3 min): walls 1.55/min new vs 1.70 live; stuck 6.7% vs 4.1%. Fast mode is NOT reproducible under parallel
+  load (the same seed gave 4 and 10 wall hits). Stuck episodes (logged in `__b2k.log.stk`) are 1 per run at the known Athens hot spot (2065,-1639).
+  Frankfurt, 3 seeds: walls 0.00 vs 0.11, stuck 7.2 vs 6.0. Tyre gap 0.03 m (same as live). Real-clock ms/frame (no fast mode) was still measuring at stop.
+- Still to do: full shot set (start / Frankfurt drive / Athens drive / low side view `t4/nbside.js` / garage + drift trail, meter, Brickbash, hop), then REVIEW,
+  OD_CHANGELOG entry, out/<ver>, and DEPLOY to the coordinator. Draft PR creation failed twice with a GitHub 500; retry it.
