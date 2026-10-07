@@ -7,14 +7,14 @@ function roamWarp(x,z,h,now){if(!RO.on||RO.ch||RO.sp||RO.wk)return false;RO.x=cl
 function roamSavePos(){const st=store.get('mho_story',{seen:0,end:0});st.last=Date.now();store.set('mho_story',st);const o=roamSave();o.pos={x:+RO.x.toFixed(1),z:+RO.z.toFixed(1),y:+RO.y.toFixed(1),h:+RO.h.toFixed(3)};o.lay=LAYOUT_VER;roamStore(o)}
 // W13: city top speed was 62% of the car's top (≈91 km/h, 0-100 never reached): "slow like a bike". City .82 (≈120 km/h), open road 1.0,
 // and the throttle pull falls off with (v/top)² instead of v/top, so 0-100 km/h takes ≈4.5 s in the city instead of never.
-const W13S={city:.82,open:1,cp:2,scrub:14,a0:.22,a1:.22,lift:.6};
+const W13S={city:.82,open:1,cp:2,scrub:20,a0:.18,a1:.15,lift:.6};
 // cornering: with the stronger pull a car held at full lock gained speed through a junction and ran wide (w13 feel gate). W14: tyres scrub
 // speed only in a real corner: lock held one way past ~13° of rotation (slalom flicks stay below that) AND the yaw asked for exceeds the
 // tyres' grip (C26 c26x>1). Scrub fades out as the car slows to the speed that full lock can hold, so it settles near 50 km/h.
 // Not while drifting, boosting or in the air.
 function W13_corner(c,dt){const st=Math.abs(c.steer||0),sg=Math.sign(c.steer||0);if(st>=.3&&sg===RO.w13s){RO.w13h=(RO.w13h||0)+dt;RO.w13a=(RO.w13a||0)+Math.abs(RO.yr||0)*dt}else{RO.w13h=0;RO.w13a=0}RO.w13s=st>=.3?sg:0;
   if(st<.3||RO.dDir||RO.v<=0||(pl&&pl.air)||RO.boosting)return;const k=clamp(((RO.w13a||0)-W13S.a0)/W13S.a1,0,1)*clamp(((RO.c26x||0)-1)/.35,0,1);RO.w13k=k;RO.v-=W13S.scrub*k*clamp((RO.v-12)/8,0,1)*dt}
-const W13_lift=c=>1-W13S.lift*clamp((Math.abs(c.steer||0)-.3)/.7,0,1)*clamp((RO.v-10)/8,0,1)*clamp(((RO.w13h||0)-.2)/.6,0,1);
+const W13_lift=c=>1-W13S.lift*clamp((Math.abs(c.steer||0)-.3)/.7,0,1)*clamp((RO.v-10)/8,0,1)*clamp((RO.w13h||0)/.3,0,1);
 function roamStep(dt){const s=pl;if(!s)return;if(RO.wk){AU.engine(s,0,false);AU.scrape(false);roamWreckStep(dt);hubTrafficStep(dt);studFXStep(dt);roamHud();return}RO.inv=Math.max(0,(RO.inv||0)-dt);RO.lastHit=(RO.lastHit||0)+dt;if(RO.lastHit>4)roamHeal(3*dt);
   if((RO.hp??100)<35&&R()<.25)puff(s.mesh.position.clone().add(V3(0,2.4,0)),1,_tipC.setRGB(.2,.2,.22),1,4,.9,.5,1,3);if((RO.hp??100)<15&&R()<.2)burst(SPARK,s.mesh.position.clone().add(V3(0,2,0)),4,8,.3,new THREE.Color(2,1.2,.4));
   if(!s.mesh.visible&&!(typeof M1!=='undefined'&&M1.ghost>0))s.mesh.visible=true;const c=ctlPlayer(dt);CTL=c;const busy=RO.card||RO.mapOpen||RO.story;RO.hitCd=Math.max(0,(RO.hitCd||0)-dt);
