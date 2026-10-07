@@ -21,7 +21,7 @@ const URL=process.argv[2],OUT=process.argv[3]||'t4/nb',DESK=process.argv[4]==='d
  await tap('#gbMenuBtn');await tap('#gbx .gbTabs button[data-t="veh"]');await shot('01_rides');await tap('.gnbGo');await shot('02_picker');
  await tap(`[data-ch="${CH}"]`);await shot('03_chassis');console.log('n',await p.$eval('#gbBkN',e=>e.textContent));
  // zoom in a little with the wheel/pinch-free path: keep the default camera (phone users orbit by drag)
- for(const[pc,i,j,r]of(process.env.PARTS?JSON.parse(process.env.PARTS):[['hl',-4,-8],['tl',-4,7,2],['arch',-4,-6],['arch',-4,4],['b16',-4,-1],['b24',-2,-7],['cs24',-2,-7],['ws6',-1,-3],['cs24',-2,4,2],['spoiler',-1,5],['t16',-4,-1]]))await put(pc,i,j,r||0);
+ for(const[pc,i,j,r]of(process.env.PARTS?JSON.parse(process.env.PARTS):[['hl',-4,-8],['tl',-4,7,2],['arch',-4,-6],['arch',-4,4],['b16',-4,-1],['b24',-2,-7],['cs24',-2,-7],['ws4',-1,-4],['cs24',-2,4,2],['spoiler',-1,5],['t16',-4,-1]]))await put(pc,i,j,r||0);
  await shot('04_parts');console.log('n',await p.$eval('#gbBkN',e=>e.textContent));
  // paint: white hood (a racing stripe), black spoiler; the brush paints the mirrored twin too
  await tap('#gbBkCl [data-c="9"]');await tap('#gbBkT [data-a="paint"]');{const s=await p.evaluate(()=>__gb.scr(-2,-6));if(s)await tapXY(s.x,s.y)}
@@ -29,7 +29,7 @@ const URL=process.argv[2],OUT=process.argv[3]||'t4/nb',DESK=process.argv[4]==='d
  await shot('05_painted');console.log('cols',await p.evaluate(()=>JSON.stringify(__gb.list().filter(b=>!/^(wL|wM|T)/.test(b.t)).map(b=>b.t+':'+b.c))));
  await tap('#gbBkT [data-a="done"]');await tap('#gbx .gbTabs button[data-t="veh"]');await shot('06_rides_mine');await tap('#gbSave');
  // the selected set's live bricks are saved under mho_build (gbClose); G.br[id] only holds the sets you switched away from
- console.log('save',await p.evaluate(()=>JSON.stringify({sel:store.get('mho_gar',{}).sel,saved:(store.get('mho_build',{}).bricks||[]).length,live:__gb.list().length})));
+ console.log('save',await p.evaluate(()=>JSON.stringify(__gnb.saved())));
  if(process.env.DRIVE){await tap('#hcStory');for(let i=0;i<80;i++){await p.waitForTimeout(3000);const s=await p.evaluate(()=>__mho.state+'|'+!!(__mho.LD&&__mho.LD.on));if(s==='roam|false')break;for(const q of['#slotList .go','#m1Next']){const e=await p.$(q);if(e&&await e.isVisible())await tapEl(e)}}
   for(let i=0;i<14;i++){let hit=0;for(const l of[p.getByText('SKIP',{exact:false}),p.getByText('TAP TO CONTINUE'),p.locator('#m1Next')]){const e=l.first();if(await e.count()&&await e.isVisible()){await tapEl(await e.elementHandle());hit=1;break}}if(!hit&&i>3)break;await p.waitForTimeout(1500)}
   await shot('07_roam');
