@@ -43,7 +43,7 @@ const OUT=process.argv[3]||'qa_w10';fs.mkdirSync(OUT,{recursive:true});const MOD
  await apply({gas:true,brake:false});await tick(240);await apply({gas:false,brake:false});await tick(60);
  const res={mode:MODE,straight:ST,brake:[],traffic:[],errs};
  const D=180/Math.PI;const ad=(a,b)=>{let d=a-b;while(d>Math.PI)d-=2*Math.PI;while(d<-Math.PI)d+=2*Math.PI;return d};
- if(TEST!=='traffic')for(const kmh of[40,80,120]){
+ if(TEST!=='traffic'&&TEST!=='shots')for(const kmh of[40,80,120]){
   await place(ST.x,ST.z,ST.h);await p.evaluate(()=>{__L.length=0;window.__logOn=1});
   await apply({gas:true,brake:false});let reached=0;for(let f=0;f<60*20;f+=6){await tick(6);const v=await p.evaluate(()=>__mho.RO.v);if(v*3.6>=kmh){reached=v;break}}
   const n0=await p.evaluate(()=>__L.length);await apply({gas:false,brake:true});
@@ -55,7 +55,7 @@ const OUT=process.argv[3]||'qa_w10';fs.mkdirSync(OUT,{recursive:true});const MOD
   const yawAll=Math.max(...B.map(q=>Math.abs(ad(q.h,h0))));
   res.brake.push({kmh,reachedKmh:+(reached*3.6).toFixed(0),framesToStop:stopF,yawDeg:+(yaw*D).toFixed(2),yawRateDeg:+(yr*D).toFixed(2),latV:+lat.toFixed(2),afterStop:{maxFwdKmh:+(kickV*3.6).toFixed(1),unstuckTurn:!!ct,yawDegTotal:+(yawAll*D).toFixed(1)},
    trace:B.filter((q,i)=>i%6===0).map(q=>[+(q.v*3.6).toFixed(0),+(ad(q.h,h0)*D).toFixed(2),+(q.yr*D).toFixed(1),+q.st.toFixed(2)])})}
- if(TEST!=='brake')for(const kmh of(process.env.KMH||'20,60,120,160').split(',').map(Number)){
+ if(TEST!=='brake'&&TEST!=='shots')for(const kmh of(process.env.KMH||'20,60,120,160').split(',').map(Number)){
   // setup only: a stopped city traffic car on a straight segment (as at a red light); the player is placed behind it in its lane.
   // then real input: GAS (+BOOST for 160) until the target speed, then off the gas and coast into it.
   const runway=Math.max(45,(kmh/3.6)**2/(2*2.2)+30);await place(ST.x,ST.z,ST.h);
@@ -82,5 +82,23 @@ const OUT=process.argv[3]||'qa_w10';fs.mkdirSync(OUT,{recursive:true});const MOD
   const smash=(await p.evaluate(()=>__mho.HUB.smashed||0))-M0.smash;
   res.traffic.push({kmh,contactKmh:+(pv0*3.6).toFixed(0),playerKmh:A.filter((q,i)=>i%6===0).slice(0,12).map(q=>+(q.v*3.6).toFixed(0)),trafficFwdM:+maxD.toFixed(2),trafficBackStepM:+maxBackStep.toFixed(2),trafficSpringBackM:+back.toFixed(2),trafficMaxStepM:+maxStep.toFixed(2),playerMaxStepM:+pStep.toFixed(2),playerBackStepM:+pBack.toFixed(2),dead:!!(A[A.length-1].tc&&A[A.length-1].tc.dead),smash,
    tTrace:A.filter((q,i)=>i%3===0).slice(0,25).map(q=>q.tc&&[+(((q.tc.x-c0.x)*fx+(q.tc.z-c0.z)*fz)).toFixed(2),+(q.v*3.6).toFixed(0),+(((q.x-c0.x)*fx+(q.z-c0.z)*fz)).toFixed(2)])})}
+ if(TEST==='shots'){
+  // low side view of the player car + a traffic car, and tyre-to-road gaps (player wheels, traffic wheel instances)
+  await p.evaluate(()=>{const D=__dbg;if(!D.__ovr){D.__ovr=1;const f=D.composer.render.bind(D.composer);const wrap=(...a)=>{const o=window.__camOv;if(o){D.camera.position.set(o[0],o[1],o[2]);D.camera.lookAt(o[3],o[4],o[5]);D.camera.updateMatrixWorld()}return f(...a)};D.composer.render=wrap;if(window.__fastR)window.__fastR=wrap}});
+  const GAP=()=>{const M=__mho,R=M.RO,T=__dbg.THREE,B=new T.Box3(),m4=new T.Matrix4();const out={};
+   if(M.pl&&M.pl.mesh){M.pl.mesh.updateMatrixWorld(true);let lo=1e9;M.pl.mesh.traverseVisible(o=>{if(o.isMesh&&o.userData&&o.userData.r&&o.geometry){if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();B.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);lo=Math.min(lo,B.min.y)}});out.player=lo<1e8?+(lo-M.gnd(R.x,R.z,R.y+.3)).toFixed(3):null}
+   const c=M.HUB.cars[window.__tc];if(c){const im=M.HUB.cim[c.k],w=im&&im.userData.w;if(w){if(!w.geometry.boundingBox)w.geometry.computeBoundingBox();w.getMatrixAt(c.j,m4);B.copy(w.geometry.boundingBox).applyMatrix4(m4);out.traffic=+(B.min.y-M.gnd(c.x,c.z,c.y+.3)).toFixed(3)}}return out};
+  const sides=[];
+  for(const where of['autobahn','city']){
+   if(where==='autobahn'){await place(ST.x,ST.z,ST.h)}
+   const sel=await p.evaluate(([where])=>{const M=__mho,R=M.RO,H=M.HUB,N=H.nodes;let j=-1,bd=1e9;(H.cars||[]).forEach((c,i)=>{if(c.dead>0||c.tr)return;const A=N[c.a],B=N[c.b];if(!A||!B)return;if(where==='autobahn'?!(A.ab&&B.ab):(A.ab||B.ab||A.g||B.g))return;const d=Math.hypot(c.x-R.x,c.z-R.z);if(d<bd){bd=d;j=i}});if(j<0)return null;
+    const c=H.cars[j];c.v=0;c.cv=0;c.hv=.01;c.route=[];window.__tc=j;const A=N[c.a],B=N[c.b],L=Math.hypot(B.x-A.x,B.z-A.z),ux=(B.x-A.x)/L,uz=(B.z-A.z)/L;return{x:c.x,z:c.z,h:Math.atan2(ux,uz)}},[where]);
+   if(!sel){sides.push({where,err:'no car'});continue}
+   await place(sel.x-Math.sin(sel.h)*8,sel.z-Math.cos(sel.h)*8,sel.h);await tick(20);
+   const gap=await p.evaluate(GAP);
+   await p.evaluate(([x,z,h])=>{const M=__mho,R=M.RO,mx=(R.x+x)/2,mz=(R.z+z)/2,g=M.gnd(mx,mz,R.y+.3),sx=Math.cos(h),sz=-Math.sin(h);window.__camOv=[mx+sx*11,g+.9,mz+sz*11,mx,g+.7,mz]},[sel.x,sel.z,sel.h]);
+   const old=SHOTS;await (async()=>{await p.evaluate(()=>{window.__shooting=1;if(window.__fastR){__dbg.composer.render=window.__fastR;window.__fastR=null}__tick(1)});await p.screenshot({path:path.join(OUT,`${MODE}_side_${where}.jpg`),type:'jpeg',quality:80});await p.evaluate(()=>{window.__shooting=0;window.__camOv=null;if(!window.__fastR){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}})})();
+   sides.push({where,gap})}
+  res.sides=sides}
  res.errs=errs;fs.writeFileSync(path.join(OUT,`w10_${MODE}.json`),JSON.stringify(res,null,1));
- console.log(JSON.stringify({mode:MODE,brake:res.brake.map(({trace,...r})=>r),traffic:res.traffic.map(({tTrace,...r})=>r),errs:errs.slice(0,5)},null,0));await b.close()})().catch(e=>{console.error('ERR',e);process.exit(1)});
+ console.log(JSON.stringify({mode:MODE,sides:res.sides,brake:res.brake.map(({trace,...r})=>r),traffic:res.traffic.map(({tTrace,...r})=>r),errs:errs.slice(0,5)},null,0));await b.close()})().catch(e=>{console.error('ERR',e);process.exit(1)});
