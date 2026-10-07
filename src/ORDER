@@ -3,6 +3,7 @@
 10_core.js
 20_race_world.js
 30_race.js
+31_race_r15.js
 40_hud_input_menu.js
 41_career_quests.js
 50_kenney_data.js
@@ -34,4 +35,5 @@
 98t_garage_tools.js
 98u_garage_select.js
 98v_garage_stack.js
+98z_race_items.js
 99_api.js
