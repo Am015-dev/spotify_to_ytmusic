@@ -44,6 +44,7 @@ html:not(.ph)[data-tod="day"] header.top .tally,html:not(.ph)[data-tod="day"] he
 html:not(.ph)[data-tod="day"] header.top .classic:hover{color:#8a5a12}
 html:not(.ph):not([data-tod="day"]) header.top h1{color:#f6ecd9;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 html:not(.ph):not([data-tod="day"]) header.top .tally,html:not(.ph):not([data-tod="day"]) header.top .classic{color:#e2d2b3;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+header.top .controw{order:2;margin:0 auto 0 20px}header.top .tools{order:3}header.top>div:first-child{order:1}
 header.top{pointer-events:none}header.top>*{pointer-events:auto}
 header.top h1{font:400 clamp(1.3rem,2.2vw,1.8rem)/1.1 var(--display);margin:0;text-shadow:0 2px 0 rgba(0,0,0,.25)}
 .sub{display:flex;flex-wrap:wrap;gap:2px 14px;align-items:center;margin-top:2px}
@@ -167,7 +168,7 @@ html.ph .bookcase>.bc-frame{display:none}
 .note{position:absolute;left:5%;top:7%;max-width:46%;padding:.35em .5em;background:#fbf3d6;color:#3a2a14;font:italic 700 .85em/1.15 var(--body);transform:rotate(-5deg);box-shadow:0 .15em .35em rgba(0,0,0,.4);text-align:center}
 .note::before,.note::after{content:"";position:absolute;top:-.45em;width:1.6em;height:.8em;background:rgba(235,215,140,.7)}
 .note::before{left:-.5em;transform:rotate(-30deg)}.note::after{right:-.5em;transform:rotate(30deg)}
-.new{position:absolute;right:4%;top:5%;width:3.6em;height:3.6em;display:grid;place-items:center;background:#e23b2e;color:#fff6c8;font:800 .95em/1 var(--body);transform:rotate(12deg);clip-path:polygon(50% 0,61% 14%,79% 8%,80% 27%,98% 33%,88% 50%,98% 67%,80% 73%,79% 92%,61% 86%,50% 100%,39% 86%,21% 92%,20% 73%,2% 67%,12% 50%,2% 33%,20% 27%,21% 8%,39% 14%)}
+.new{position:absolute;right:3%;top:3%;width:3.5em;height:3.5em;display:grid;place-items:center;background:#e23b2e;color:#fff6c8;font:800 .82em/1 var(--body);transform:rotate(12deg);clip-path:polygon(50% 0,61% 14%,79% 8%,80% 27%,98% 33%,88% 50%,98% 67%,80% 73%,79% 92%,61% 86%,50% 100%,39% 86%,21% 92%,20% 73%,2% 67%,12% 50%,2% 33%,20% 27%,21% 8%,39% 14%)}
 .b3.flat .band,.b3.flat .note{display:none}
 /* wear */
 .wearov{position:absolute;inset:0;pointer-events:none;display:none}
@@ -382,17 +383,22 @@ footer a{color:var(--brass)}
 #tip{position:fixed;z-index:60;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);max-width:min(92vw,420px);background:#241810;color:#f6ecd9;padding:12px 16px;border-radius:8px;font:500 .95rem/1.4 var(--body);box-shadow:0 8px 28px rgba(0,0,0,.5);border:1px solid #5a3a26}
 #tip b{display:block;font:400 1.05rem var(--display);color:#f0c05a;margin-bottom:2px}
 /* continue row, your games (statistics and achievements from the games' shared kit) */
-.controw{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px;max-width:min(92vw,720px);width:fit-content;box-sizing:border-box;padding:3px 3px 3px 12px;border-radius:26px;background:var(--hdr);backdrop-filter:blur(3px)}
-.controw .crb{background:transparent}
+.controw{display:flex;flex-wrap:nowrap;align-items:center;gap:6px;min-width:0;flex:0 1 auto}
 .controw[hidden]{display:none}
 .boxbtn,#tv{transition:opacity .25s,filter .25s}.boxbtn.dim,#tv.dim{opacity:.2;filter:grayscale(1)}
 #listview li.dim{display:none}
-.stb{position:absolute;right:4%;top:4%;padding:.2em .55em;border-radius:99px;background:#3a2c4a;color:#efe0ff;font:800 .8em/1.2 var(--body);box-shadow:0 .1em .3em rgba(0,0,0,.45)}
-.b3.flat .stb{display:none}
 .cst{font-weight:800!important}.cst.done{background:#cfe9d4!important;color:#163d22!important}.cst.testing{background:#f3e3a8!important;color:#4a3608!important}.cst.progress,.cst.todo{background:#d6e4f2!important;color:#173450!important}.cst.story{background:#e4d6f3!important;color:#34204e!important}
-.controw .cr-l{font:700 .8rem var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-right:2px}
-.crb{font:700 .85rem var(--body);display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 12px 0 4px;border-radius:99px;border:1.5px solid var(--line);background:var(--hdr);color:var(--ink);cursor:pointer;backdrop-filter:blur(3px)}
-.crb img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.crb{font:700 .85rem var(--body);box-sizing:border-box;display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:0 12px 0 4px;border-radius:99px;border:1.5px solid var(--line);background:var(--hdr);color:var(--ink);cursor:pointer;backdrop-filter:blur(3px)}
+.crb img{width:36px;height:36px;border-radius:50%;object-fit:cover;flex:none}
+.controw .crb.main{min-width:0;flex:0 1 auto;max-width:300px}
+.crb .cn{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.crb.more{flex:none;padding:0 14px;min-width:44px;justify-content:center}
+.crb.more[aria-expanded=true]{border-color:var(--brass)}
+.cpop{max-width:min(320px,calc(100vw - 24px));width:max-content;min-width:min(240px,calc(100vw - 24px))}
+.cpop .fopts{max-height:min(60vh,360px);overflow:auto}
+.cpop .fo{justify-content:flex-start}
+.cpop .fo img{width:30px;height:30px;border-radius:50%;object-fit:cover;flex:none}
+.cpop .fo span{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .trophy.achbtn .cnt{position:absolute;right:-.5em;top:-.3em;font:800 .72em var(--body);background:#8a5a12;color:#fff6e0;border-radius:99px;padding:.1em .45em}
 dialog#mine{border:0;border-radius:10px;padding:0;width:min(94vw,640px);max-height:min(88dvh,720px);background:var(--paper);color:#241810;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 dialog#mine::backdrop{background:rgba(8,4,2,.7)}
@@ -451,7 +457,7 @@ html.ph .boxbtn::after{bottom:-.3em}
 html.ph .cat{width:64px;height:44px;bottom:100%}
 html.ph .band{font-size:13px;padding:14px 5px 5px}
 html.ph .note{font-size:13px;max-width:72%}
-html.ph .new{font-size:13px;width:46px;height:46px}
+html.ph .new{font-size:11px;width:40px;height:40px}
 html.ph .f.left b,html.ph .f.bot b{font-size:13px!important}
 html.ph .classic{min-height:44px}
 footer small{font-size:inherit}
@@ -480,7 +486,7 @@ html.ph header.top>div:first-child{display:contents}
 html.ph header.top h1{order:1;flex:1 1 auto;min-width:0;font-size:1.15rem;white-space:nowrap;align-self:center}
 html.ph header.top .sub{display:none}
 html.ph header.top .tools{order:2;flex:none;gap:6px}
-html.ph header.top .controw{order:3;flex:1 1 100%;max-width:none;width:auto;margin-top:0}
+html.ph header.top .controw{order:3;flex:1 1 100%;max-width:none;width:auto;margin:0}html.ph .controw .crb.main{max-width:none;flex:1 1 auto}
 html.ph header.top{flex-wrap:wrap;align-items:center;gap:6px 8px;padding-bottom:4px}
 html.ph .tbtn .tl{display:none}
 html.ph .tbtn{min-width:44px;padding:0 10px}
@@ -488,7 +494,7 @@ html.ph .coffee:empty,html.ph .coffee[hidden]{display:none}
 html.ph .stage{padding-top:0;gap:6px}
 html.ph .obj{min-height:48px;padding:3px 2px}html.ph .cell{margin-top:42px}
 @media (max-height:499px){html.ph .cell{margin-top:6px}}
-@media (max-height:499px){html.ph header.top{flex-wrap:nowrap}html.ph header.top .controw{flex:0 1 auto}}
+@media (max-height:499px){html.ph header.top{flex-wrap:nowrap}html.ph header.top .controw{flex:0 1 auto;margin-left:auto}html.ph .controw .crb.main{flex:0 1 auto;max-width:34vw}}
 html.ph footer{padding-top:8px}
 html.ph footer a{display:inline-flex;align-items:center;min-height:44px}
 html.ph{scroll-snap-type:y proximity}
@@ -526,9 +532,11 @@ html.ph header.top{scroll-snap-align:start}
 <body>
 <div class="roombg" aria-hidden="true"><div class="rb-wall"></div><div class="rb-wain"></div><div class="rb-skirt"></div><div class="rb-floor"></div><div class="rb-rug"></div><div class="rb-glow"></div><div class="rb-floorglow"></div></div>
 <header class="top">
-  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">17 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div><div class="controw" id="controw" role="group" aria-label="Continue a saved game" hidden></div></div>
+  <div><h1>Game Night Shelf</h1><div class="sub"><span class="tally" id="tally">17 games on the shelf</span><a class="classic" href="classic.html">Classic shelf</a></div></div>
+  <div class="controw" id="controw" role="group" aria-label="Continue a saved game" hidden></div>
   <div class="tools"><button type="button" class="tbtn" id="sndbtn" aria-label="Sound on" aria-pressed="true">🔊</button><button type="button" class="tbtn" id="fltbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="fpop" aria-label="Filter games"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4-2v-4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="tl">Filter</span><i class="fdot" hidden></i></button><button type="button" class="tbtn" id="viewbtn" aria-label="Plain list"><span class="ic" aria-hidden="true">☰</span><span class="tl">Plain list</span></button></div>
   <div class="fpop" id="fpop" role="dialog" aria-label="Filter games" hidden></div>
+  <div class="fpop cpop" id="cpop" role="dialog" aria-label="More saved games" hidden></div>
 </header>
 <main>
 <div class="roomwrap" id="roomview">
@@ -674,7 +682,7 @@ function renderFpop(){
   if(foc){const e=p.querySelector(`[data-flt="${foc}"]`);if(e)e.focus()}}
 function placeFpop(){const p=document.getElementById('fpop'),r=document.getElementById('fltbtn').getBoundingClientRect(),w=p.offsetWidth;
   p.style.left=Math.max(12,Math.min(innerWidth-w-12,r.right-w))+'px';p.style.top=Math.min(r.bottom+8,Math.max(8,innerHeight-p.offsetHeight-8))+'px'}
-function openFpop(){const p=document.getElementById('fpop'),b=document.getElementById('fltbtn');renderFpop();p.hidden=false;b.setAttribute('aria-expanded','true');placeFpop();const f=p.querySelector('.fo[aria-pressed=true]')||p.querySelector('.fo');if(f)f.focus()}
+function openFpop(){closeCpop(false);const p=document.getElementById('fpop'),b=document.getElementById('fltbtn');renderFpop();p.hidden=false;b.setAttribute('aria-expanded','true');placeFpop();const f=p.querySelector('.fo[aria-pressed=true]')||p.querySelector('.fo');if(f)f.focus()}
 function closeFpop(back){const p=document.getElementById('fpop'),b=document.getElementById('fltbtn');if(p.hidden)return;p.hidden=true;b.setAttribute('aria-expanded','false');if(back)b.focus()}
 function renderFilters(){
   const p=document.getElementById('fpop'),b=document.getElementById('fltbtn');
@@ -752,7 +760,7 @@ function buildBox(g,dims){
   const w=wearOf(getPlays()[g.id]|0);
   const b=document.createElement('span');b.className='b3';b.dataset.wear=w;
   b.style.cssText=`--W:${W};--H:${H};--D:${D};--c:${L.c}`;
-  b.innerHTML=`<span class="f front"><img src="${g.cover}" alt="" loading="lazy" decoding="async" draggable="false"><i class="wearov"></i><span class="band">${esc(t)}</span>${isPrev(g)?`<span class="note">${ST_LABEL[stOf(g).k]}</span>`:''}${stOf(g)&&stOf(g).st&&!g.isNew?'<span class="stb">Story</span>':''}${g.isNew?'<span class="new">New!</span>':''}</span><span class="f left"><b style="font-size:${fs}em">${esc(t)}</b></span><span class="f right"></span><span class="f top"></span><span class="f bot"><b>${esc(t)}</b></span>`;
+  b.innerHTML=`<span class="f front"><img src="${g.cover}" alt="" loading="lazy" decoding="async" draggable="false"><i class="wearov"></i><span class="band">${esc(t)}</span>${isPrev(g)?`<span class="note">${ST_LABEL[stOf(g).k]}</span>`:''}${g.isNew?'<span class="new">New!</span>':''}</span><span class="f left"><b style="font-size:${fs}em">${esc(t)}</b></span><span class="f right"></span><span class="f top"></span><span class="f bot"><b>${esc(t)}</b></span>`;
   return b}
 function boxBtn(g,pose,dims,tw){
   const L=LOOK[g.id],[W,H,D]=dims||[L.W,L.H,L.D];
@@ -847,8 +855,29 @@ function renderCoffee(ph){
 /* ---------- your games: saved games, statistics and achievements (the games write gns-* keys through the shared kit) ---------- */
 const SAVEKEYS={crown:['ccs_save2'],nebula:['na_save'],doorkick:['dkd_save2'],shipwreck:['swi_save1'],sands:['soq_save1'],sunglaze:['sgz_save1'],rampart:['rv_save1'],shortfuse:['shortfuse_save1'],tidewake:['tidewake_save1'],hollowbough:['hb_save1'],thornbound:['tb_save'],kaiten:['kk_save']};
 function savedGames(){const kit=jget('gns-saves');return GAMES.filter(g=>kit[g.id]||(SAVEKEYS[g.id]||[]).some(k=>store.get(k)))}
-function renderCont(){const r=$('#controw');if(!r)return;const L=savedGames();r.hidden=!L.length;
-  r.innerHTML=L.length?'<span class="cr-l">Continue</span>'+L.map(g=>`<button type="button" class="crb" data-cont="${g.id}" aria-label="Continue your saved game of ${esc(clean(g.name))}"><img src="${g.cover}" alt="" loading="lazy" decoding="async">${esc(clean(g.name))}</button>`).join(''):''}
+function renderCont(){const r=$('#controw');if(!r)return;closeCpop(false);let L=savedGames();r.hidden=!L.length;
+  if(!L.length){r.innerHTML='';return}
+  const last=store.get('shelf_last'),i=L.findIndex(g=>g.id===last);if(i>0)L=[L[i]].concat(L.filter((_,j)=>j!==i));
+  const g=L[0],n=L.length-1,nm=esc(clean(g.name));
+  r.innerHTML=`<button type="button" class="crb main" data-cont="${g.id}" aria-label="Continue your saved game of ${nm}"><img src="${g.cover}" alt="" loading="lazy" decoding="async"><span class="cn">▶ Continue: ${nm}</span></button>`+(n?`<button type="button" class="crb more" id="cmore" aria-haspopup="dialog" aria-expanded="false" aria-controls="cpop" aria-label="${n} more saved ${n>1?'games':'game'}">+${n}</button>`:'');
+  const p=$('#cpop');p.innerHTML='<h2>More saved games</h2><div class="fopts">'+L.slice(1).map(x=>`<button type="button" class="fo" data-cont="${x.id}" aria-label="Continue your saved game of ${esc(clean(x.name))}"><img src="${x.cover}" alt="" loading="lazy" decoding="async"><span>${esc(clean(x.name))}</span></button>`).join('')+'</div>';
+  const m=$('#cmore');if(m)m.onclick=e=>{e.stopPropagation();p.hidden?openCpop():closeCpop(true)};fitCont()}
+/* desktop: keep the Continue chip clear of the trophies row */
+function fitCont(){const r=$('#controw');if(!r||r.hidden)return;r.style.maxWidth='';if(document.documentElement.classList.contains('ph'))return;
+  const t=document.querySelector('.mantel .trophy');if(!t||!t.offsetWidth)return;const a=r.getBoundingClientRect().left,b=t.getBoundingClientRect().left;r.style.maxWidth=Math.max(150,b-a-14)+'px'}
+addEventListener('resize',()=>{requestAnimationFrame(fitCont);setTimeout(fitCont,400)});
+function placeCpop(){const p=$('#cpop'),r=$('#cmore').getBoundingClientRect(),w=p.offsetWidth;
+  p.style.left=Math.max(12,Math.min(innerWidth-w-12,r.right-w))+'px';p.style.top=Math.min(r.bottom+8,Math.max(8,innerHeight-p.offsetHeight-8))+'px'}
+function openCpop(){const p=$('#cpop'),b=$('#cmore');if(!b)return;closeFpop(false);p.hidden=false;b.setAttribute('aria-expanded','true');placeCpop();const f=p.querySelector('.fo');if(f)f.focus()}
+function closeCpop(back){const p=$('#cpop'),b=$('#cmore');if(!p||p.hidden)return;p.hidden=true;if(b){b.setAttribute('aria-expanded','false');if(back)b.focus()}}
+(function(){const p=document.getElementById('cpop');
+  p.addEventListener('click',e=>{e.stopPropagation();if(e.target.closest('[data-cont]'))closeCpop(false);const ct=e.target.closest('[data-cont]');if(ct){retFocus=ct;openGame(byId(ct.dataset.cont),true)}});
+  document.addEventListener('pointerdown',e=>{const b=$('#cmore');if(!p.hidden&&!p.contains(e.target)&&!(b&&b.contains(e.target)))closeCpop(false)},true);
+  document.addEventListener('keydown',e=>{if(p.hidden)return;
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();closeCpop(true)}
+    else if(e.key==='Tab'){const f=[...p.querySelectorAll('button:not([disabled])')];if(!f.length)return;const i=f.indexOf(document.activeElement);
+      if(e.shiftKey&&i<=0){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&(i===f.length-1||i<0)){e.preventDefault();f[0].focus()}}},true);
+  addEventListener('resize',()=>{if(!p.hidden)placeCpop()})})();
 function achCount(){const def=jget('gns-achdef'),ach=jget('gns-ach');let tot=0,got=0;for(const id in def){const L=Array.isArray(def[id])?def[id]:[];tot+=L.length;got+=L.filter(a=>ach[id]&&ach[id][a.id]).length}return {tot,got}}
 function renderMine(){
   const st=jget('gns-stats'),ach=jget('gns-ach'),def=jget('gns-achdef'),b=$('#minebody');
