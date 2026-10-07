@@ -361,8 +361,6 @@ function renderActs(v) {
   { const pl = $('#pile'); ac.classList.toggle('wide', !(G.phase === 'play' && iMustAct() && !UI.busy && UI.mode !== 'guided') && !(pl && pl.childNodes.length)); }
   ac.classList.toggle('many', M.acts.length > 5); ac.innerHTML = '';
   M.acts.forEach(a => { const b = h('button.btn' + (a.cls ? '.' + a.cls : '') + (a.dis ? '.dis' : ''), { type: 'button', 'data-a': a.a, disabled: a.dis ? true : null }, a.label); for (const k of ['c', 'i', 'n', 'f', 'on', 'dir']) if (a[k] !== undefined) b.dataset[k] = a[k]; ac.append(b); });
-  // the hint bulb: only while it is my turn to play a card (never in the training dive, which teaches with glow and finger)
-  const hb = $('#hintb'); if (hb) hb.hidden = !(G.phase === 'play' && iMustAct() && !UI.busy && UI.mode !== 'guided' && !G.players[G.trick.turn].helper);
 }
 function renderTip() { }   // no tip cards: play happens on the table
 function render() {
@@ -374,6 +372,7 @@ function render() {
   renderOpp(v); renderFelt(v); try { bossBar(); } catch (e) { console.error(e); }
   renderActs(v);
   try { placeFinger(); } catch (e) { console.error(e); }
+  try { hlpAfter(); } catch (e) { console.error(e); }
   try { netRenderHook(); } catch (e) { }
   try { pxDirty(); } catch (e) { }
 }
