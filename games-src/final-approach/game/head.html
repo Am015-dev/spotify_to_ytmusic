@@ -461,4 +461,31 @@ html.ph.ph-l .hudc span:not(.rtleft){display:none}.hudc{overflow:hidden}
 html.ph.ph-p .gx-dock-body{gap:0!important;padding-top:0!important;padding-bottom:0!important}
 /* help kit: the coach bubbles of the busiest phases keep their Got it beside the text, so they stay short enough to fit between the glowing spaces */
 .gxh-bub[data-phase=space],.gxh-bub[data-phase=die],.gxh-bub[data-phase=token]{display:flex;align-items:center;gap:8px}.gxh-bub[data-phase=space] .gxh-row2,.gxh-bub[data-phase=die] .gxh-row2,.gxh-bub[data-phase=token] .gxh-row2{margin:0}
+
+/* ---- learning ladder: plane picture, landing checklist, previews, reason chips ---- */
+.pv{position:absolute;left:0;top:0;right:0;pointer-events:none;z-index:1}.pv svg{display:block;overflow:visible}.pv.comp{bottom:0}
+.pv .pvt{transform-origin:0 0;transform-box:view-box}
+@keyframes pvtilt{from{transform:rotate(var(--af))}to{transform:rotate(var(--at))}}
+.pvs{position:absolute;left:6px;top:4px;display:flex;gap:6px}
+.pvs span{display:inline-flex;align-items:center;gap:3px;padding:1px 7px 1px 4px;border-radius:12px;background:rgba(10,22,30,.78);border:2px solid #cfd8e0;color:#fff;font-weight:900;font-size:16px;line-height:20px}
+.pvs span.bad{border-color:#ff6b55;color:#ffb3a6}.pvs .ic{display:block;width:18px;height:18px}.pvs .ic svg{display:block;width:100%;height:100%;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.w.appr.scene .strip{background:linear-gradient(180deg,rgba(8,18,24,.1),rgba(8,18,24,.62))}
+.w.appr.scene .sp{border-left-color:rgba(255,255,255,.28)}
+.w.appr.nostrip{border-color:#9db2c2}
+.sp .pls{min-height:0}
+.gstrip.chk{padding:2px 8px;gap:8px}.gstrip.chk .ckrow{display:flex;flex-wrap:wrap;gap:9px;padding:6px 6px 0 0;align-items:center;flex:1 1 auto;min-width:0;overflow:hidden}
+.ck{position:relative;display:inline-flex;align-items:center;gap:1px;height:30px;padding:0 3px;border-radius:10px;background:#1c2e3b;border:2px solid #4b6479;flex:0 0 auto}
+.ck .ic{display:block;width:17px;height:17px}.ck .ic svg{display:block;width:100%;height:100%;fill:none;stroke:#fff;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.ck .nn{font-size:13px;margin-left:1px;font-weight:900;line-height:1;color:#f4f8fb}
+.ck .mk{display:block;position:absolute;right:-5px;top:-6px;width:14px;height:14px;border-radius:50%;margin:0;border:1.5px solid #0e1c25}.ck .mk svg{display:block;width:100%;height:100%}
+.ck.ok{border-color:#3fbf63;background:#1e4a30}.ck.ok .mk{background:#2fa653}.ck.no{border-color:#b9473a;background:#3a2523}.ck.no .mk{background:#d24a3a}
+.goalb .gc .ck{height:28px}.drgoal .gc{display:flex;flex-wrap:wrap;gap:4px}
+.slot.pvw .r1,.slot.pvw .sl{visibility:hidden}
+.slot .pw{position:absolute;inset:2px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:11px;background:rgba(8,20,28,.86);color:#fff;pointer-events:none;line-height:1}
+.slot .pw b{font-size:max(22px,calc(var(--u)*.42));font-weight:900}.slot .pw small{font-size:13px;font-weight:800;margin-top:1px;letter-spacing:-.02em}
+.slot .pw.good small{color:#7ff0a0}.slot .pw.bad{background:rgba(88,16,10,.9)}.slot .pw.bad small,.slot .pw.bad b{color:#ffb3a6}
+.rchip{position:absolute;transform:translate(-50%,-100%);z-index:8;max-width:84%;padding:4px 9px;border-radius:12px;background:#fff7dc;color:#14202c;font-size:14px;font-weight:800;line-height:1.15;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.5);pointer-events:none;animation:chipin .25s ease-out both}
+.rchip::after{content:'';position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-bottom:0;border-top-color:#fff7dc}
+@keyframes chipin{from{opacity:0;transform:translate(-50%,-80%) scale(.8)}to{opacity:1;transform:translate(-50%,-100%) scale(1)}}
+html.fapx .w.appr.scene{background:transparent}
 </style></head>

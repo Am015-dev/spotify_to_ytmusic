@@ -43,8 +43,35 @@ const HLP_STEPS = {
   token: { target: hfirst('#pz .die[data-d=p]', '#pz .tray'), title: 'Place the extra die', text: 'This die must be placed too. Tap it, then a glowing space.', pic: () => HP.token() },
   swap: { target: hfirst('#pz .tray.p .die.can', '#pz .tray.c .die.can', '#pz .tray'), title: 'Hand-over swap', text: 'Your partner offered a die. Pick one of yours to swap with it.', pic: () => HP.swap() }
 };
+// the learning ladder (story chapters 1-6): one bubble the first time each system is on the panel, and its own rules cards
+const LADSYS = ['', 'axis', 'engines', 'radio', 'gear', 'brakes', 'conc'];
+Object.assign(HLP_STEPS, {
+  'sys-axis': { target: hq('#pz .dial.axd'), title: 'Keep it level', text: 'Drop a die on the axis. The plane tilts toward the higher die. Equal dice keep it level.', pic: () => HP.axis(0) },
+  'sys-engines': { target: hq('#pz .gau'), title: 'Engines set speed', text: 'The two engine dice add up to your speed. Low holds, medium moves one space, high two.', pic: () => HP.gauge() },
+  'sys-radio': { target: hfirst('#pz .slot[data-slot=ra0]'), title: 'Clear the way', text: 'The radio clears a plane ahead. A 1 clears your space, a 2 the next one, and so on.', pic: () => HP.radio() },
+  'sys-gear': { target: hfirst('#pz .slot[data-slot=lg0]'), title: 'Wheels and flaps', text: 'Gear takes 1-2, 3-4, 5-6; flaps go in order. Land with all of them down.', pic: () => HP.gear() },
+  'sys-brakes': { target: hfirst('#pz .badge.brk', '#pz .slot[data-slot=br0]'), title: 'Brakes', text: 'Brakes set how fast you may land. Place 2, then 4, then 6. Landing speed must stay within them.', pic: () => HP.brake(4) },
+  'sys-conc': { target: hfirst('#pz .slot[data-slot=co0]', '#pz .chipr'), title: 'Coffee and rerolls', text: 'A die on a coffee space earns a token to nudge a later die by one. Rerolls redo your dice.', pic: () => HP.cup() }
+});
 // ---------------------------------------------------------------- the rules cards (<= 20 words each, a picture each): every cockpit slot, in plain words
 const HLP_RULES = [
+  { phase: 'sys-axis', title: 'How to win', text: 'Land with the plane level. Seven rounds, and both crew put a die on the axis every round.', pic: () => hpics([['plane', 'Both crew'], '>', ['axis', 'Level', 0]]) },
+  { phase: 'sys-axis', title: 'Higher die wins', text: 'The plane tilts toward the higher die, by the difference. Equal dice change nothing.', pic: () => hpics([['axis', 'Higher side', 12], ['axis', 'Equal: level', 0]]) },
+  { phase: 'sys-axis', title: 'A tilt of 3 is a spin', text: 'Answer your partner’s die with a close one. A spin loses the flight at once.', pic: () => hpics([['stop', 'Tilt 3']]) },
+  { phase: 'sys-engines', title: 'Speed from two dice', text: 'Both crew put a die on the engines. Together they make your speed.', pic: () => hpics([['prop', 'Two dice'], '>', ['gauge', 'Speed']]) },
+  { phase: 'sys-engines', title: 'Blue and orange', text: 'Up to the blue marker you stay. Up to orange you move one space. Above it, two.', pic: () => hpics([['gauge', 'Markers']]) },
+  { phase: 'sys-engines', title: 'Stop on the airport', text: 'Reach the airport before the last round, then hold. Too fast overshoots the runway.', pic: () => hpics([['strip', 'Approach'], '>', ['air', 'Airport']]) },
+  { phase: 'sys-radio', title: 'Planes block you', text: 'Leaving a space with a plane in it is a collision. Clear the way first.', pic: () => hpics([['strip', 'Plane ahead']]) },
+  { phase: 'sys-radio', title: 'The radio counts ahead', text: 'A die of 1 clears your own space, 2 the next one, 3 the one after.', pic: () => hpics([['radio', 'Radio'], '>', ['strip', 'Clear it']]) },
+  { phase: 'sys-radio', title: 'Pilot one, co-pilot two', text: 'The pilot has one radio space, the co-pilot two. Any value works.', pic: () => hpics([['seatP', 'One'], ['seatC', 'Two']]) },
+  { phase: 'sys-gear', title: 'Landing gear', text: 'Three gear spaces take 1-2, 3-4 and 5-6, in any order. Only the pilot uses them.', pic: () => hpics([['gear', 'Pilot: gear']]) },
+  { phase: 'sys-gear', title: 'Flaps in order', text: 'Four flap spaces take 1-2, 2-3, 4-5, 5-6, top to bottom. Co-pilot only.', pic: () => hpics([['flap', 'Co-pilot: flaps']]) },
+  { phase: 'sys-gear', title: 'All down to land', text: 'Each gear and flap raises a speed marker. Every one must be down at the landing.', pic: () => hpics([['gear', 'Gear'], ['flap', 'Flaps'], '>', ['air', 'Land']]) },
+  { phase: 'sys-brakes', title: 'Set the brakes', text: 'Brake spaces take exactly 2, then 4, then 6, in that order. Only the pilot uses them.', pic: () => hpics([['brake', 'First', 2], ['brake', 'Then', 4], ['brake', 'Last', 6]]) },
+  { phase: 'sys-brakes', title: 'Speed within the brakes', text: 'In the last round the plane stops: the engine total must be no more than the brakes.', pic: () => hpics([['gauge', 'Speed'], '>', ['brake', 'Brakes', 4]]) },
+  { phase: 'sys-conc', title: 'Coffee tokens', text: 'A die on a coffee space earns a token. Spend one to change a die by one.', pic: () => hpics([['die', 'Spare', 2], '>', ['cup', 'Coffee'], '>', ['plus', '+1 / -1']]) },
+  { phase: 'sys-conc', title: 'Reroll tokens', text: 'A reroll token lets both crew roll their unplaced dice again, once.', pic: () => hpics([['reroll', 'Token'], '>', ['dice2', 'New dice']]) },
+  { phase: 'sys-conc', title: 'Now the full game', text: 'You know every control. Later flights hide each crew’s dice and add fuel, wind and more.', pic: () => hpics([['plane', 'Full game']]) },
   { title: 'How to win', text: 'Land together in the last round: clear all planes, lower gear and flaps, level the axis, slow down.', pic: () => hpics([['plane', 'Both crew'], '>', ['air', 'Land']]) },
   { title: 'One round', text: 'Share a plan, roll, then take turns placing one die each. You never say dice values.', pic: () => hpics([['speech', 'Plan'], '>', ['dice2', 'Roll'], '>', ['tap', 'Place']]) },
   { title: 'Win or lose together', text: 'A spin, a crash, an empty Axis or Engines space, or a failed landing loses for both.', pic: () => hpics([['stop', 'Any one']]) },
@@ -73,6 +100,7 @@ function hlpPhase() {
     if (!G || !UI.started || G.result) return null;
     const v = actSeat(); if (typeof v !== 'number' || v < 0 || !mayAct(v) || !myTurn()) return null;
     if (G.phase === 'brief') return 'brief';
+    if (G.lad && G.phase === 'place' && !G.pend && G.turn === v) return 'sys-' + LADSYS[G.lad];
     if (G.phase !== 'place') return null;
     if (G.pend) return G.pend.h === 'rr' ? 'rr' : G.pend.h === 'wt' ? 'swap' : 'token';
     if (G.turn !== v) return null;
@@ -124,7 +152,7 @@ let _hlpInit = false;
 function hlpInit() {
   if (_hlpInit || typeof GXH === 'undefined') return; _hlpInit = true;
   GXH.init({ game: 'final-approach', defaultOn: true, steps: HLP_STEPS, rules: HLP_RULES, avoid: '#pz .slot.legal,#pz .die.can,#pz .die.sel,#pz .die[data-d=p],#acts .btn,#says .say.rec' });
-  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: () => hlpPhase() });
+  GXH.bulb({ el: '#bulbbtn', suggest: hlpSuggest, rulesFor: () => G && G.lad ? 'sys-' + LADSYS[G.lad] : hlpPhase() });
 }
 function hlpAfter() {
   hlpInit(); if (typeof GXH === 'undefined') return;
