@@ -62,7 +62,7 @@ const OUT=process.argv[3]||'qa_w13';fs.mkdirSync(OUT,{recursive:true});const TES
     const s=Math.abs(Math.abs(t)-Math.PI/2)+d0/5000-la/2000;if(!best||s<best.s)best={s,A:[A.x,A.z],n:[n.x,n.z],C:[C.x,C.z],hin,hout,t,la,w:n.w||A.w||16}}}return best},[S0.x,S0.z]);
   res.turnJ=J;console.log('J',JSON.stringify(J));
   if(J){const hin=J.hin,sx=Math.sin(hin),sz=Math.cos(hin);
-   for(const mode of ['human','nobrake']){
+   for(const mode of (process.env.MODES||'human,nobrake').split(',')){
     // distance covered by 5 s of GAS from rest on this build (dry run on the approach leg)
     const st0=[J.n[0]-sx*(J.la-8),J.n[1]-sz*(J.la-8)];const lane=await laneStart(st0[0],st0[1],hin,3.2);await place(lane[0],lane[1],hin);await log(true);await apply({gas:true});await tick(300);await apply({gas:false});
     const Ld=await log(false),d5=Math.hypot(Ld[Ld.length-1].x-lane[0],Ld[Ld.length-1].z-lane[1]),v5=Math.abs(Ld[Ld.length-1].v)*3.6;
