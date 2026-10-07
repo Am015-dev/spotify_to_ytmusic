@@ -57,6 +57,10 @@ const ST=`(()=>{const E=__oc.ev;return E('(()=>{const s=pl;if(!s)return {state};
   await shotCam('grid_back',`{const f=frameAt(TD,pl.dist,mkF());const P=pl.mesh.position;camera.position.copy(P).addScaledVector(f.t,-75).addScaledVector(f.u,15);camera.lookAt(P.clone().addScaledVector(f.t,-18));camera.updateMatrixWorld()}`);
   X.apex=await p.evaluate(()=>__oc.ev('(()=>{let b=0,bs=0;for(let d=0;d<TD.L;d+=4){const k=Math.abs(kAt(TD,d));if(k>b){b=k;bs=d}}return [bs,b]})()'));X.log.push('apex '+JSON.stringify(X.apex))}
  // countdown: hold GAS from the lights (a person presses as it counts down)
+ if(process.env.TAGS){// FX19 tag check: stay on the grid for 4 s so the pack passes, then follow it with GAS; shots + count overlapping rival tags
+  const tg=()=>p.evaluate(()=>{const R=[...document.querySelectorAll('#crHB .hb')].filter(d=>d.style.display!=='none'&&d.style.visibility!=='hidden').map(d=>{const r=d.getBoundingClientRect();return[r.left,r.top,r.right,r.bottom,+(d.style.opacity||1)]});let ov=0;for(let i=0;i<R.length;i++)for(let j=i+1;j<R.length;j++){const a=R[i],b=R[j];if(a[0]<b[2]&&b[0]<a[2]&&a[1]<b[3]&&b[1]<a[3])ov++}return{n:R.length,ov,op:R.map(r=>r[4])}});
+  await apply({gas:false,steer:0,boost:false});await tick(240);await apply({gas:true,steer:0,boost:false});
+  for(let k=0;k<8;k++){await tick(k<2?20:50);console.log('TAGS',k,JSON.stringify(await tg()));await shot('tags'+k)}console.log('ERR',JSON.stringify(errs.slice(0,5)));await b.close();return}
  await apply({gas:true,steer:0,boost:false});
  const rng=(s=>()=>(s=(s*16807)%2147483647)/2147483647)(7);
  let pack={},prevOrd=null,overtakes=0,prevMe=null,plChanges=0,wallMin=[],wallAll=[],tyreR={},aiTyre=[];let f=0,frames=MAXMIN*3600,lapsDone=0,spd=[],top=0,wallHits=0,wasWall=false,terr='road',transforms=0,routes=new Set(),picked=0,used=0,lastItem=null,useAt=-1,shots={mid:0,short:0,item:0,boost:0},target=0,tgtT=0,react=[],wob=0,boostT=0,prevLap=-1,lapStart=null,lapTimes=[],raceSec=0,raceStart=null,stuck=0;

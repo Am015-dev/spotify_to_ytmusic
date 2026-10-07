@@ -301,7 +301,14 @@ function CR_cityPost(im,nm,k,n){const G=CR_cityGeo(nm);if(!G)return;const w=new 
  const cc=new THREE.Color();for(let j=0;j<n;j++){cc.set(HCOL[(j*3+k)%HCOL.length]).lerp(new THREE.Color('#ffffff'),.08);im.setColorAt(j,cc)}im.instanceColor&&(im.instanceColor.needsUpdate=true);
  im.material=ART9_cabMat();if(nm==='police'||nm==='garbage-truck'||(nm==='taxi'&&CID!=='fra')){const c=new THREE.Color('#ffffff');for(let j=0;j<n;j++)im.setColorAt(j,c);im.instanceColor&&(im.instanceColor.needsUpdate=true)}}
 const _crM=new THREE.Matrix4(),_crR=new THREE.Matrix4(),_crE=new THREE.Euler(),_crT1=new THREE.Matrix4().makeTranslation(0,.45,0),_crT2=new THREE.Matrix4().makeTranslation(0,-.45,0);
-function CR_susp(c,dx,dz,dt,im,M){const w=im.userData.w;if(!w){im.setMatrixAt(c.j,M);return}w.setMatrixAt(c.j,M);const h=Math.atan2(dx,dz);if(c.hh==null)c.hh=h;let dh=h-c.hh;dh=Math.atan2(Math.sin(dh),Math.cos(dh));c.hh=h;const d=Math.max(dt,1e-3),v=c.cv||0,ac=(v-(c.pv??v))/d;c.pv=v;
+// FX19: seat traffic on all four tyres (as the player car): pitch/roll to the ground under the wheel contacts, height = their mean
+let FX19_R=260;const _fxA=new THREE.Vector3(),_fxR=new THREE.Matrix4(),_fxE=new THREE.Euler();
+function FX19_seat(c,dx,dz,im,M){const w=im.userData.w;if(!w||!w.geometry)return;let B=im.userData.fxWB;if(!B){w.geometry.computeBoundingBox();const b=w.geometry.boundingBox,r=(b.max.y-b.min.y)/2;B=im.userData.fxWB={l:Math.max(.3,(b.max.z-b.min.z)/2-r),w:(b.max.x-b.min.x)/2*.85,cz:(b.max.z+b.min.z)/2,by:b.min.y}}
+ _fxA.setFromMatrixPosition(M);const x=_fxA.x,z=_fxA.z;if(Math.abs(x-camera.position.x)+Math.abs(z-camera.position.z)>FX19_R)return;const y0=c.y+2.5,G=(a,b)=>groundAt(x+dx*(a+B.cz)+dz*b,z+dz*(a+B.cz)-dx*b,y0),
+  fl=G(B.l,B.w),fr=G(B.l,-B.w),bl=G(-B.l,B.w),br=G(-B.l,-B.w);if(Math.max(fl,fr,bl,br)-Math.min(fl,fr,bl,br)>1.2)return;
+ // local +x is (dz,0,-dx): b>0 is the right side
+ const pt=-Math.atan2((fl+fr-bl-br)/2,2*B.l),rl=Math.atan2((fl+bl-fr-br)/2,2*B.w);M.multiply(_fxR.makeRotationFromEuler(_fxE.set(pt,0,rl)));M.elements[13]=(fl+fr+bl+br)/4-B.by+CR_TYRE_Y}
+function CR_susp(c,dx,dz,dt,im,M){const w=im.userData.w;if(!w){im.setMatrixAt(c.j,M);return}try{FX19_seat(c,dx,dz,im,M)}catch(e){}w.setMatrixAt(c.j,M);const h=Math.atan2(dx,dz);if(c.hh==null)c.hh=h;let dh=h-c.hh;dh=Math.atan2(Math.sin(dh),Math.cos(dh));c.hh=h;const d=Math.max(dt,1e-3),v=c.cv||0,ac=(v-(c.pv??v))/d;c.pv=v;
  const tr=clamp(dh/d*v*.012,-.06,.06),tp=clamp(-ac*.015,-.045,.045),k=Math.min(1,dt*5);c.rl=(c.rl||0)+(tr-(c.rl||0))*k;c.pt=(c.pt||0)+(tp-(c.pt||0))*k;
  _crR.makeRotationFromEuler(_crE.set(c.pt,0,c.rl));_crM.copy(M).multiply(_crT1).multiply(_crR).multiply(_crT2);im.setMatrixAt(c.j,_crM);if(im.userData.g)im.userData.g.setMatrixAt(c.j,_crM)}
 
@@ -362,7 +369,10 @@ function CR_npcTilt(g){const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),f
  yF=(G(dl,dw)+G(dl,-dw))/2,yB=(G(-dl,dw)+G(-dl,-dw))/2,yR=(G(dl,dw)+G(-dl,dw))/2,yL=(G(dl,-dw)+G(-dl,-dw))/2,yC=groundAt(x,z,y0);
  g.rotation.x=clamp(-Math.atan2(yF-yB,2*dl),-.25,.25);g.rotation.z=clamp(Math.atan2(yR-yL,2*dw),-.25,.25);g.userData.crH.position.y=g.userData.crY+clamp((yF+yB)/2-yC,-.5,.5)}
 // keep the player out of mission vehicles: push out of the oriented footprint and bleed speed
-function CR_npcPush(){if(typeof RO==='undefined'||!RO.on)return;for(let i=CR_NPCS.length-1;i>=0;i--){const g=CR_NPCS[i];if(!g.parent){CR_NPCS.splice(i,1);continue}if(!g.visible)continue;CR_npcTilt(g);const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),fz=Math.cos(h),dx=RO.x-g.position.x,dz=RO.z-g.position.z;
+// FX19: never draw a story vehicle the chase camera is inside (was a translucent orange wall over the screen); hide its body until the camera is out
+function FX19_camIn(g,H,fx,fz){const b=g.userData.crH;if(!b)return;const c=camera.position,cx=c.x-g.position.x,cz=c.z-g.position.z,al=cx*fx+cz*fz,sd=cx*fz-cz*fx,m=.9;
+ b.visible=!(Math.abs(al)<H.L+m&&Math.abs(sd)<H.W+m&&c.y<g.position.y+4.5)}
+function CR_npcPush(){if(typeof RO==='undefined'||!RO.on)return;for(let i=CR_NPCS.length-1;i>=0;i--){const g=CR_NPCS[i];if(!g.parent){CR_NPCS.splice(i,1);continue}if(!g.visible)continue;CR_npcTilt(g);const H=g.userData.crHalf,h=g.rotation.y,fx=Math.sin(h),fz=Math.cos(h),dx=RO.x-g.position.x,dz=RO.z-g.position.z;FX19_camIn(g,H,fx,fz);
  if(Math.abs(RO.y-g.position.y)>3)continue;const al=dx*fx+dz*fz,sd=dx*fz-dz*fx,pl=H.L+1.3-Math.abs(al),ps=H.W+1.05-Math.abs(sd);if(pl<=0||ps<=0)continue;
  if(ps<pl){const k=Math.sign(sd)||1;RO.x+=fz*k*ps;RO.z-=fx*k*ps}else{const k=Math.sign(al)||1;RO.x+=fx*k*pl;RO.z+=fz*k*pl}RO.v*=.6}}
 

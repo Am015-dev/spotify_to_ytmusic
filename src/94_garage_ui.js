@@ -80,3 +80,10 @@ window.__cr={RIVS:CR_RIVS,rivB:CR_rivB};window.__gb={mesh:()=>GB.mesh,refresh:()
  scr:(i,j)=>{const t=GB_top(i,j,GB_list());if(t<-1e8)return null;const m=GB.mesh.userData.m;GB.mesh.updateMatrixWorld(true);GB_cam();const p=m.localToWorld(V3((i+.5)*GB_U,t*GB_PH+.02,(j+.5)*GB_U)).project(GB.cam),r=$('#gbC').getBoundingClientRect();return{x:r.left+(p.x+1)/2*r.width,y:r.top+(1-p.y)/2*r.height}},
  calls:()=>{const o=pl&&pl.mesh;if(!o)return null;let n=0,list=[];o.traverse(x=>{if(x.userData&&x.userData.gb){list.push(x);if(x.visible)n++}});return{n,tris:list.map(x=>x.geometry.attributes.position.count/3)}}};
 
+// FX19: the "drag to rotate" hint sat on the GARAGE sign of the 3D hall. It now sits mid-right on the hall floor (the stats card covers the bottom), shows
+// until the player's first real drag of the view (>20 px), then fades out and never comes back.
+(()=>{const st=document.createElement('style');st.textContent='#gbx .gbHint{top:46%!important;right:10px!important;opacity:.85;transition:opacity .6s;background:rgba(3,14,26,.55);border-radius:8px;padding:2px 8px;pointer-events:none}#gbx .gbHint.fxOff{opacity:0!important}';document.head.appendChild(st);
+ const box=document.getElementById('gbx'),h=box&&box.querySelector('.gbHint'),c=document.getElementById('gbC');if(!box||!h)return;let tm=0;
+ const off=()=>{h.classList.add('fxOff');clearTimeout(tm)},show=()=>{if(store.get('fx19_drag',0)){off();return}h.classList.remove('fxOff')};
+ let d0=null;if(c){c.addEventListener('pointerdown',e=>{d0=[e.clientX,e.clientY]},{passive:true});c.addEventListener('pointermove',e=>{if(d0&&Math.hypot(e.clientX-d0[0],e.clientY-d0[1])>20){d0=null;store.set('fx19_drag',1);off()}},{passive:true});addEventListener('pointerup',()=>{d0=null},{passive:true})}
+ new MutationObserver(()=>{if(!box.hidden)show()}).observe(box,{attributes:true,attributeFilter:['hidden']});if(!box.hidden)show()})();

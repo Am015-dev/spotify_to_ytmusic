@@ -124,11 +124,14 @@ const CR_HB={el:null,pool:[],v:V3()};
 function CR_hbStep(){let E=CR_HB.el;if(!E){E=CR_HB.el=document.createElement('div');E.id='crHB';document.body.appendChild(E)}
  const on=state==='race'&&pl&&!CC&&!paused;if(!on){if(E.childElementCount)for(const d of CR_HB.pool)d.style.display='none';return}
  const L=[];for(const s of ships){if(s===pl||s.dead>0||s.eliminated||s.finished)continue;const dd=s.dist-pl.dist;if(dd<-12||dd>90)continue;L.push([Math.abs(dd),s])}L.sort((a,b)=>a[0]-b[0]);
- let k=0;const P=[];for(const[,s]of L.slice(0,4)){const v=CR_HB.v.copy(s.mesh.position).add(s.mesh.userData.m.position);v.y+=2.4;v.project(camera);if(v.z>1||Math.abs(v.x)>.6||v.y<-.3||v.y>.75)continue;
-  const sx=(v.x+1)/2*innerWidth,sy=(1-v.y)/2*innerHeight;if(P.some(q=>Math.abs(q[0]-sx)<84&&Math.abs(q[1]-sy)<40))continue;P.push([sx,sy]);
-  let d=CR_HB.pool[k];if(!d){d=document.createElement('div');d.className='hb';d.innerHTML='<span></span><small></small><i><b></b></i>';E.appendChild(d);CR_HB.pool.push(d)}k++;
-  const h=clamp(s.hull,0,100),b=d.lastChild.firstChild,cl=(CR_LOAD[s.vmode||'car']||CR_LOAD.car).k;if(d._n!==s.name+cl){d._n=s.name+cl;d.firstChild.textContent=s.name;d.children[1].textContent=cl}
-  b.style.width=h+'%';b.className=h>66?'':h>33?'md':'lo';d.style.display='';d.style.left=((v.x+1)/2*innerWidth).toFixed(0)+'px';d.style.top=((1-v.y)/2*innerHeight).toFixed(0)+'px'}
+ // FX19: only the nearest 3 rivals get a tag (3rd one faded); a tag that would overlap one already placed is stacked above it, else hidden
+ let k=0;const P=[];for(const[,s]of L.slice(0,3)){const v=CR_HB.v.copy(s.mesh.position).add(s.mesh.userData.m.position);v.y+=2.4;v.project(camera);if(v.z>1||Math.abs(v.x)>.6||v.y<-.3||v.y>.75)continue;
+  let d=CR_HB.pool[k];if(!d){d=document.createElement('div');d.className='hb';d.innerHTML='<span></span><small></small><i><b></b></i>';E.appendChild(d);CR_HB.pool.push(d)}
+  const h=clamp(s.hull,0,100),b=d.lastChild.firstChild,cl=(CR_LOAD[s.vmode||'car']||CR_LOAD.car).k;if(d._n!==s.name+cl){d._n=s.name+cl;d.firstChild.textContent=s.name;d.children[1].textContent=cl;d._w=0}
+  if(d.style.display==='none'){d.style.visibility='hidden';d.style.display=''}if(!d._w){d._w=d.offsetWidth||90;d._h=d.offsetHeight||40}
+  const sx=(v.x+1)/2*innerWidth,w=d._w+8,th=d._h+4,hit=y=>P.some(q=>Math.abs(q[0]-sx)<(q[2]+w)/2&&Math.abs(q[1]-y)<(q[3]+th)/2);let sy=(1-v.y)/2*innerHeight;
+  for(let t=0;t<2&&hit(sy);t++)sy-=th;if(hit(sy)||sy-th<34){d.style.display='none';d.style.visibility='';continue}P.push([sx,sy,w,th]);k++;
+  b.style.width=h+'%';b.className=h>66?'':h>33?'md':'lo';d.style.visibility='';d.style.display='';d.style.opacity=k>2?'.45':'1';d.style.left=sx.toFixed(0)+'px';d.style.top=sy.toFixed(0)+'px'}
  for(let i=k;i<CR_HB.pool.length;i++)CR_HB.pool[i].style.display='none'}
 // ---- CAR25: race camera never leaves the track box (walls at +-HALF)
 const _cr25F=mkF(),CR_CAMX={pre:0,n:0},CR_WL=[];
