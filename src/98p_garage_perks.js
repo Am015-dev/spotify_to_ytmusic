@@ -11,12 +11,12 @@ function GPK_eq(slot,id){let e=perkEq0().filter(x=>x!==id);if(slot<e.length)e.sp
 function GPK_html(){const L=carStat().lvl,n=perkSlots(),e=perkEq0(),P=id=>PERKS.find(p=>p.id===id)||{};
  let h=`<h5>PERKS · DRIVER LEVEL ${L} · CLASS ${GPK_cls(L)} · ${n}/3 SLOTS</h5><div class="gbRow">`;
  for(let i=0;i<3;i++){const p=e[i]&&P(e[i]);h+=i<n?`<button class="gbP gpkS ${GPK_.pk===i?'on':''}" data-gslot="${i}"><b>${p?p.icon+' '+p.name:'＋ EMPTY SLOT'}</b><small>${p?p.d:'tap to pick a perk'}</small></button>`:`<button class="gbP gpkS" disabled><b>🔒 SLOT ${i+1}</b><small>driver level ${i===1?8:16}</small></button>`}
- h+='</div>';if(GPK_.pk!=null&&GPK_.pk<n){h+=`<div class="gbRow">`;for(const p of PERKS){const ok=perkUnlocked(p),on=e.includes(p.id);h+=`<button class="gbP ${on?'on':''}" ${ok?'':'disabled'} data-gpk="${p.id}"><b>${ok?'':'🔒 '}${p.icon} ${p.name}</b><small>${ok?p.d:perkReq(p)}</small></button>`}h+='</div>'}return h}
+ h+='</div>';if(GPK_.pk!=null&&GPK_.pk<n){h+=`<div class="gbRow">`;for(const p of[...PERKS].sort((a,b)=>perkUnlocked(b)-perkUnlocked(a))){const ok=perkUnlocked(p),on=e.includes(p.id);h+=`<button class="gbP ${on?'on':''}" ${ok?'':'disabled'} data-gpk="${p.id}"><b>${ok?'':'🔒 '}${p.icon} ${p.name}</b><small>${ok?p.d:perkReq(p)}</small></button>`}h+='</div>'}return h}
 GAR_tab=(f=>function(){f();const B=$('#gbBody');
  B.querySelectorAll('[data-gset]').forEach(b=>{const s=b.querySelector('small'),g=GPK_GRP[b.dataset.gset];if(s&&g)s.textContent=g+' · '+s.textContent});
- const d=document.createElement('div');d.innerHTML=GPK_html();B.appendChild(d);
+ const d=document.createElement('div');d.innerHTML=GPK_html();const gs=B.querySelector('.garSets');if(gs)gs.after(d);else B.appendChild(d);
  const re=()=>{const sc=B.scrollTop;gbRender();$('#gbBody').scrollTop=sc};
- d.querySelectorAll('[data-gslot]').forEach(b=>b.onclick=()=>{const i=+b.dataset.gslot;GPK_.pk=GPK_.pk===i?null:i;try{AU.sfx('pick')}catch(e){}re()});
- d.querySelectorAll('[data-gpk]').forEach(b=>b.onclick=()=>{const id=b.dataset.gpk;if(perkEq0().includes(id))store.set('mho_perks',perkEq0().filter(x=>x!==id));else GPK_eq(GPK_.pk,id);GPK_.pk=null;try{AU.sfx('brick')}catch(e){}re()})})(GAR_tab);
-{const st=document.createElement('style');st.textContent='#gbx .garSet em{font-size:12px!important;letter-spacing:.04em!important}#gbx .gpkS{min-width:150px}';document.head.appendChild(st)}
+ d.querySelectorAll('[data-gslot]').forEach(b=>b.onclick=()=>{const i=+b.dataset.gslot;GPK_.pk=GPK_.pk===i?null:i;try{AU.sfx('pick')}catch(e){}re();const l=$('#gbBody [data-gpk]');if(l)l.parentNode.scrollIntoView({block:'nearest'})});
+ d.querySelectorAll('[data-gpk]').forEach(b=>b.onclick=()=>{const id=b.dataset.gpk;if(perkEq0().includes(id))store.set('mho_perks',perkEq0().filter(x=>x!==id));else GPK_eq(GPK_.pk,id);GPK_.pk=null;try{AU.sfx('brick')}catch(e){}re();const l=$('#gbBody [data-gslot]');if(l)l.parentNode.scrollIntoView({block:'nearest'})})})(GAR_tab);
+{const st=document.createElement('style');st.textContent='#gbx .garSet em{font-size:12px!important;letter-spacing:.04em!important}#gbx .gpkS{min-width:150px}#gbx .gbP small,#gbx h5,#gbx .gbHint{font-size:12px!important}#gbx h5{letter-spacing:.06em!important}#gbStats div{font-size:12px!important;letter-spacing:.02em!important;grid-template-columns:84px 1fr 66px!important}';document.head.appendChild(st)}
 window.__gpk={html:GPK_html,eq:GPK_eq,cls:GPK_cls};
