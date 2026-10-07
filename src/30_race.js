@@ -358,6 +358,9 @@ function physPlayer(s,c){const st=s.stats;frameAt(TD,s.dist,F);const k=F.k;
   if(drifting){s.driftT+=H;s.bm=Math.min(100,s.bm+14*H);if(R()<.6){const at=V3().copy(F.p).addScaledVector(F.r,s.x-Math.sign(c.steer)*2).addScaledVector(F.u,.4).addScaledVector(F.t,-3);emit(SPARK,at,V3(rr(-3,3),rr(1,5),rr(-3,3)).addScaledVector(F.t,-s.v*.3),.3,new THREE.Color(2,1.2,.5))}}
   else if(s.driftT>0){if(s.driftT>.7)award(s,'DRIFT',0,Math.round(s.driftT*300),'#ff7ac0');s.driftT=0}
   s.wall=Math.max(0,s.wall-H);
+  // R17 rail cushion (races): within ~1.5–4.5 m of a wall or island and still sliding toward it, the slip and heading ease parallel,
+  // so a fast car on the 38 m tracks slides along instead of scraping (Westhafen 1.5 walls/min vs live 0.63). Never pushes away; no effect when moving inward.
+  if(R15_on()&&!s.air&&s.v>12){const B=R15_b(s,s.x),sg=Math.sin(s.beta)>0?1:-1,room=sg>0?B[1]-s.x:s.x-B[0],D=clamp(s.v*.07,1.5,4.5);if(room<D){const q=clamp(1-room/D,0,1);s.beta*=1-Math.min(.9,q*10*H);if(Math.sign(s.yaw)===sg)s.yaw*=1-Math.min(.9,q*7*H);if(Math.sign(s.yawRate)===sg)s.yawRate*=1-Math.min(.9,q*7*H);if(Math.abs(Math.sin(s.beta))>.02)s.v*=1-Math.min(.3,q*q*1.4*H)}}
   const R15W=R15_b(s,px);if(s.x>R15W[1]||s.x<R15W[0]){const sg=s.x>R15W[1]?1:-1;s.x=sg>0?R15W[1]:R15W[0];const into=Math.sin(s.beta)*sg;
     if(into>0&&!s.air){const imp=s.v*into;s.beta=-s.beta*.3;if(Math.sign(s.yaw)===sg)s.yaw*=.35;if(Math.sign(s.yawRate)===sg)s.yawRate*=.3;
       if(imp>5){s.v=Math.max(0,s.v-imp*.75-2);damage(s,imp*.35/st.hull);if(imp>11)debris(V3().copy(F.p).addScaledVector(F.r,sg*(HALF-1)).addScaledVector(F.u,1.4),F.t.clone().multiplyScalar(s.v*.5),4,teamCols(s.team),.8,F.p.y+.2);AU.sfx('crash');shake=Math.min(1,imp/30);fovKick=Math.max(fovKick,5);
@@ -490,7 +493,9 @@ function stepSim(){const racing=state==='race'||state==='menu'||state==='finishe
     if(!racing)continue;
     if(s.isPlayer&&!s.finished){const c=ctlPlayer();if(s.stall>0){c.thr=0;s.stall-=H}physPlayer(s,c);CTL=c;if(TOUCH.used)drawStInd(TOUCH.steer);if(pressed.fire){useItem(s);pressed.fire=false}}
     else if(s.isPlayer&&s.finished){s.rubber=1;physAI(s);s.nitro=false}
-    else{if(pl&&!pl.finished&&RC.type!=='tt'){const gap=pl.dist-s.dist;s.rubber=1+(gap>0?Math.min(.06,gap/400*.06):-Math.min(.03,Math.max(0,-gap-150)/600*.03))}else s.rubber=1;physAI(s);
+    else{if(pl&&!pl.finished&&RC.type!=='tt'){const gap=pl.dist-s.dist;if(R15_on()&&RC.type!=='arena'){let ld=s.dist;for(const o of ships)if(!o.eliminated&&o.dist>ld)ld=o.dist;
+        // R17: the 38 m tracks at ×1.2 strung the field out (1st→last 630 m at 60 s vs live ~220 m): a stronger pull toward the player and toward the leader
+        s.rubber=1+(gap>0?Math.min(.13,gap/260*.13):-Math.min(.05,Math.max(0,-gap-90)/360*.05))+Math.min(.05,(ld-s.dist)/400*.05)}else s.rubber=1+(gap>0?Math.min(.06,gap/400*.06):-Math.min(.03,Math.max(0,-gap-150)/600*.03))}else s.rubber=1;physAI(s);
       if(s.item){s.aiFire-=H;if(s.aiFire<=0){let use=false;const it=s.item;
         if(it==='turbo')use=Math.abs(kAt(TD,s.dist+100))<1/900;else if(it==='shield')use=raceT-s.lastHit<.5||R()<.002;else if(it==='mines'||it==='wall'||it==='oil')use=ships.some(o=>o!==s&&s.dist-o.dist>10&&s.dist-o.dist<150);else if(it==='magnet')use=ships.some(o=>o!==s&&!o.dead&&o.dist-s.dist>30&&o.dist-s.dist<300);else if(it==='storm')use=ships.some(o=>o!==s&&!o.dead&&o.dist>s.dist+10);
         else use=ships.some(o=>o!==s&&!o.dead&&!o.eliminated&&o.dist-s.dist>15&&o.dist-s.dist<(it==='missile'||it==='tornado'||it==='web'?500:160)&&(it==='missile'||it==='tornado'||it==='web'||Math.abs(o.x-s.x)<5));
