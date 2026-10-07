@@ -33,7 +33,7 @@ const ST=`(()=>{const E=__oc.ev;return E('(()=>{const s=pl;if(!s)return {state};
    if(c.steer!==ctl.steer){if(!c.steer)await up('st');else{const xy=await center(c.steer<0?'#tL':'#tR');if(F.st)await move('st',xy);else await down('st',xy)}}
    if(c.boost!==ctl.boost){c.boost?await down('boost',await center('#tN')):await up('boost')}}
   else{await key('ArrowUp',c.gas);await key('ArrowLeft',c.steer<0);await key('ArrowRight',c.steer>0);await key('Shift',c.boost)}Object.assign(ctl,c)}
- const T0=Date.now();let gaps=[],ptrace=[],perfMid=null,perfS=[],perfNext=10;const measure=async()=>{const t0=Date.now();const o=await p.evaluate(()=>{const r=__dbg.renderer,gl=r.getContext(),px=new Uint8Array(4);window.__shooting=1;__dbg.composer.render=window.__fastR||__dbg.composer.render;window.__fastR=null;
+ const T0=Date.now();let scQ=[],gaps=[],ptrace=[],perfMid=null,perfS=[],perfNext=10;const measure=async()=>{const t0=Date.now();const o=await p.evaluate(()=>{const r=__dbg.renderer,gl=r.getContext(),px=new Uint8Array(4);window.__shooting=1;__dbg.composer.render=window.__fastR||__dbg.composer.render;window.__fastR=null;
    r.info.autoReset=false;r.info.reset();for(let i=0;i<5;i++){if(window.__fast)__fast.force=1;__tick(1)}gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,px);r.info.autoReset=true;
    const i=r.info.render;const o={calls:Math.round(i.calls/5),tris:Math.round(i.triangles/5)};window.__shooting=0;window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{};return o});SYN+=5/60;o.ms=+((Date.now()-t0)/5).toFixed(1);return o};
  await p.goto(URL);await p.waitForFunction(()=>window.__mho&&__mho.state==='menu',null,{polling:500});
@@ -64,7 +64,7 @@ const ST=`(()=>{const E=__oc.ev;return E('(()=>{const s=pl;if(!s)return {state};
   if(s.item&&useAt>0&&s.raceT>=useAt){useAt=-1;if(await tap(phone?'#tF':'#tF')||(!phone&&(await p.keyboard.press('Space'),1))){used++;if(shots.item<1){shots.item++;await tick(8);await shot('item_use')}}}
   // choose a line like a person: an item box ahead, a marked shortcut entry ahead (rts from the game's own signs), else hold
   if(s.raceT>=tgtT){tgtT=s.raceT+.35+rng()*.3;let t=null;
-   if(process.env.NOSC){}else if(s.rts&&s.rts.in&&Math.abs(s.x)>Math.abs(s.rts.want)-8)t=null;else if(s.rts&&s.rts.want!=null)t=s.rts.want;else if(!s.item&&s.pads.length&&s.pads[0][0]<90){t=s.pads[0][1]}else t=Math.max(-(s.M-3),Math.min(s.M-3,s.ka*3200))
+   if(process.env.NOSC){}else if(s.rts&&s.rts.in&&Math.abs(s.x)>Math.abs(s.rts.want)-12)t=null;else if(s.rts&&s.rts.want!=null)t=s.rts.want;else if(!s.item&&s.pads.length&&s.pads[0][0]<90){t=s.pads[0][1]}else t=Math.max(-(s.M-3),Math.min(s.M-3,s.ka*3200))
    wob=(rng()-.5)*2*Math.min(3,s.W*.08);react.push(t==null?null:t+wob)}
   const tgt=react.length>1?react.shift():react[0];
   if(process.env.DBG&&s.rts)console.log('DBG',s.raceT.toFixed(1),JSON.stringify(s.rts),'x',s.x.toFixed(1),'tgt',tgt==null?null:tgt.toFixed(1),'B',s.B&&s.B.map(v=>v.toFixed(1)),s.terr,Math.round(s.v*3.6),'yaw',s.yaw.toFixed(3),'beta',s.beta.toFixed(3),'hold',s.hold&&s.hold.toFixed(1),'k',s.k.toFixed(4));
@@ -74,7 +74,8 @@ const ST=`(()=>{const E=__oc.ev;return E('(()=>{const s=pl;if(!s)return {state};
   await apply({gas:true,steer:st,boost:bo});
   if(bo&&!shots.boost){shots.boost=1;await shot('boost')}
   if(s.rts&&s.rts.next&&s.rts.dd<110&&s.rts.dd>60&&!shots['sign_'+s.rts.next]&&!s.web){shots['sign_'+s.rts.next]=1;await shot('sign_'+s.rts.next)}
-  if(s.rts&&s.rts.in&&!shots['sc_'+s.rts.in]&&!s.web&&(s.rtsU=(s.rtsU||0))>=0){shots['sc_'+s.rts.in]=(shots['sc_'+s.rts.in]||0)+1;if(shots['sc_'+s.rts.in]===1){await tick(40);await shot('shortcut_'+s.rts.in);await tick(90);await shot('shortcut2_'+s.rts.in);if(process.env.DBGC)console.log('CAM',await p.evaluate(()=>__oc.ev('(()=>{const s=pl,f=frameAt(TD,s.dist,mkF()),sp=s.mesh.position.clone().add(s.mesh.userData.m.position);const surf=f.p.clone().addScaledVector(f.r,s.x);return JSON.stringify({x:s.x,mesh:s.mesh.position.toArray().map(v=>+v.toFixed(1)),sp:sp.toArray().map(v=>+v.toFixed(1)),surf:surf.toArray().map(v=>+v.toFixed(1)),cam:camera.position.toArray().map(v=>+v.toFixed(1)),vis:s.mesh.visible,air:!!s.air,bank:+Math.asin(f.r.y).toFixed(3)})})()')))}}
+  if(s.rts&&s.rts.in&&!shots['sc_'+s.rts.in]&&!s.web){shots['sc_'+s.rts.in]=1;scQ.push([s.raceT+.7,'shortcut_'+s.rts.in],[s.raceT+2.2,'shortcut2_'+s.rts.in])}
+  while(scQ.length&&s.raceT>=scQ[0][0]){const q=scQ.shift();await shot(q[1])}
   lapTimes=s.laps_.map(x=>+x.toFixed(2));if(lapTimes.length>=LAPS)break;
   if(s.raceT-raceStart>perfNext){perfNext+=10;ptrace.push(s.place+'@'+Math.round(kmh)+(s.terr[0])+'g'+s.gap);perfS.push(await measure());gaps.push(await p.evaluate(()=>__oc.ev('(()=>{const s=pl;if(!s||s.air||s.dead>0)return null;s.mesh.updateMatrixWorld(true);const b=new THREE.Box3(),bb=new THREE.Box3();const vis=o=>{for(let a=o;a;a=a.parent)if(!a.visible)return false;return true};s.mesh.traverse(o=>{if(o.isMesh&&vis(o)&&o.geometry&&!(o.material&&o.material.transparent)){o.geometry.computeBoundingBox();bb.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);b.union(bb)}});const f=frameAt(TD,s.dist,mkF());const c=b.getCenter(V3());const rel=c.clone().sub(f.p);const lat=rel.dot(f.r);const y=f.p.y+f.r.y*lat+f.t.y*rel.dot(f.t);return +(b.min.y-y).toFixed(3)})()')))}if(!shots.mid&&s.raceT-raceStart>40){shots.mid=1;await shot('mid')}
   raceSec=s.raceT-raceStart}

@@ -39,9 +39,11 @@ function R15_b(s,px){const q=R15_at(s.dist);if(!q)return[-MARGIN,MARGIN];const{c
   if(a0<0)b=Math.max(MARGIN,out);else if(y>R15_dvq(q)){a=HALF+R15_ISL+1.5*g;b=Math.max(a+2,out)}else b=Math.max(MARGIN,HALF+R15_ISL-(R15_ISL+1.5)*g);
   return sd>0?[a,b]:[-b,-a]}
 const R15_cx=(s,v)=>{const B=R15_b(s,s.x);return clamp(v,B[0],B[1])};
-function R15_inLane(s){const q=R15_at(s.dist);return q&&s.x*q.sd>Math.min(R15_div(),R15_dvq(q))?q:null}
+function R15_inLane(s){const q=R15_at(s.dist);return q&&s.x*q.sd>MARGIN?q:null}
+// touch-assist hold point: inside a corridor it stays near the lane line (no projected hold point on the barrier)
+function R15_hold(s,h){const q=R15_inLane(s);if(!q)return h;const c=R15_lane(s,q),w=Math.max(2,q.c.cw/2-4);return clamp(h,c-w,c+w)}
 // the line the touch assist and the AI follow: corridor lane centre while in it
-function R15_lane(s,q){const C=HALF+R15_ISL+q.c.cw/2;if(q.ud<(q.c.s1-q.c.s0)/2)return q.sd*C;const out=HALF+(R15_ISL+q.c.cw)*R15_e(q.c,q.u);return q.sd*Math.min(C,out-6)}
+function R15_lane(s,q){const C=HALF+R15_ISL+q.c.cw/2;if(q.ud<(q.c.s1-q.c.s0)/2)return q.sd*C;const la=Math.max(60,s.v*1.6),out=HALF+(R15_ISL+q.c.cw)*R15_e(q.c,q.u+(q.rev?-la:la));return q.sd*Math.max(MARGIN-3,Math.min(C,out-6))}
 // next corridor ahead within d metres (TD distance to its entry), for signs, AI and the test driver
 function R15_ahead(s,d){if(!R15C.length)return null;const L=TF.L;let best=null;for(const c of R15C){const sE=TD.rev?L-c.s1:c.s0,dd=mod(sE-s.dist,L);if(dd<d&&(!best||dd<best.dd))best={c,dd,sd:TD.rev?-c.sd:c.sd}}return best}
 // terrain in a corridor: 'water' / 'dirt' when the car is out past the road edge on the corridor side
