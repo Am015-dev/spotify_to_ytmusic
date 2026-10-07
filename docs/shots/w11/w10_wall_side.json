@@ -1,0 +1,416 @@
+{
+ "url": "http://127.0.0.1:8766/local_dbg.html",
+ "errs": [],
+ "wall": [
+  {
+   "wall": 0,
+   "angle": 0,
+   "contactKmh": 68,
+   "pinnedMaxS": 0.35,
+   "unstuckMsg": false,
+   "turnDeg": -90,
+   "movedFromContactM": 24.3,
+   "endKmh": 52,
+   "freed": true,
+   "contact": true
+  },
+  {
+   "wall": 0,
+   "angle": 25,
+   "contactKmh": 69,
+   "pinnedMaxS": 0.35,
+   "unstuckMsg": false,
+   "turnDeg": -68,
+   "movedFromContactM": 25,
+   "endKmh": 52,
+   "freed": true,
+   "contact": true
+  },
+  {
+   "wall": 1,
+   "angle": 0,
+   "contactKmh": 25,
+   "pinnedMaxS": 0.33,
+   "unstuckMsg": false,
+   "turnDeg": 49,
+   "movedFromContactM": 41.3,
+   "endKmh": 62,
+   "freed": true,
+   "contact": true
+  },
+  {
+   "wall": 1,
+   "angle": 25,
+   "contactKmh": 20,
+   "pinnedMaxS": 0,
+   "unstuckMsg": false,
+   "turnDeg": 19,
+   "movedFromContactM": 190,
+   "endKmh": 46,
+   "freed": true,
+   "contact": false
+  },
+  {
+   "wall": 2,
+   "angle": 0,
+   "contactKmh": 25,
+   "pinnedMaxS": 0.35,
+   "unstuckMsg": false,
+   "turnDeg": 45,
+   "movedFromContactM": 43.2,
+   "endKmh": 64,
+   "freed": true,
+   "contact": true
+  },
+  {
+   "wall": 2,
+   "angle": 25,
+   "contactKmh": 67,
+   "pinnedMaxS": 0.35,
+   "unstuckMsg": false,
+   "turnDeg": 68,
+   "movedFromContactM": 26.8,
+   "endKmh": 54,
+   "freed": true,
+   "contact": true
+  }
+ ],
+ "side": [
+  {
+   "where": "city",
+   "shot": "qa_w11/s_w10/side_city.jpg",
+   "closeup": "qa_w11/s_w10/tyre_city.jpg",
+   "playerTyres": {
+    "tyres": [
+     {
+      "x": 2152.72,
+      "z": -80.05,
+      "r": 0.31,
+      "gap_gnd": 0.03,
+      "gap_mesh": 0.017,
+      "hd": [
+       [
+        "Mesh",
+        0.017,
+        6696,
+        "ffffff",
+        "tex",
+        [
+         1150,
+         20.9,
+         688
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.165,
+        2311,
+        "ffffff",
+        "tex",
+        [
+         400,
+         13,
+         600
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": 2151.44,
+      "z": -80.05,
+      "r": 0.31,
+      "gap_gnd": 0.03,
+      "gap_mesh": 0.015,
+      "hd": [
+       [
+        "Mesh",
+        0.015,
+        6696,
+        "ffffff",
+        "tex",
+        [
+         1150,
+         20.9,
+         688
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.166,
+        2311,
+        "ffffff",
+        "tex",
+        [
+         400,
+         13,
+         600
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": 2152.91,
+      "z": -82.5,
+      "r": 0.367,
+      "gap_gnd": 0.03,
+      "gap_mesh": 0.005,
+      "hd": [
+       [
+        "Mesh",
+        0.005,
+        6696,
+        "ffffff",
+        "tex",
+        [
+         1150,
+         20.9,
+         688
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.167,
+        2311,
+        "ffffff",
+        "tex",
+        [
+         400,
+         13,
+         600
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": 2151.25,
+      "z": -82.5,
+      "r": 0.367,
+      "gap_gnd": 0.03,
+      "gap_mesh": 0.004,
+      "hd": [
+       [
+        "Mesh",
+        0.004,
+        6696,
+        "ffffff",
+        "tex",
+        [
+         1150,
+         20.9,
+         688
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.17,
+        2311,
+        "ffffff",
+        "tex",
+        [
+         400,
+         13,
+         600
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     }
+    ],
+    "carY": 6.808,
+    "gndCar": 0
+   },
+   "trafficWheelGap": 0.04
+  },
+  {
+   "where": "autobahn",
+   "shot": "qa_w11/s_w10/side_autobahn.jpg",
+   "closeup": "qa_w11/s_w10/tyre_autobahn.jpg",
+   "playerTyres": {
+    "tyres": [
+     {
+      "x": -7078.05,
+      "z": 2859.17,
+      "r": 0.31,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.37,
+      "hd": [
+       [
+        "Mesh",
+        -0.37,
+        1218,
+        "ffffff",
+        "tex",
+        [
+         800.2,
+         8.7,
+         49.4
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.118,
+        1585,
+        "ffffff",
+        "tex",
+        [
+         1000,
+         20.1,
+         1000
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": -7078.01,
+      "z": 2857.89,
+      "r": 0.31,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.37,
+      "hd": [
+       [
+        "Mesh",
+        -0.37,
+        1218,
+        "ffffff",
+        "tex",
+        [
+         800.2,
+         8.7,
+         49.4
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.108,
+        1585,
+        "ffffff",
+        "tex",
+        [
+         1000,
+         20.1,
+         1000
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": -7075.6,
+      "z": 2859.41,
+      "r": 0.367,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.37,
+      "hd": [
+       [
+        "Mesh",
+        -0.37,
+        1218,
+        "ffffff",
+        "tex",
+        [
+         800.2,
+         8.7,
+         49.4
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.12,
+        1585,
+        "ffffff",
+        "tex",
+        [
+         1000,
+         20.1,
+         1000
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": -7075.56,
+      "z": 2857.76,
+      "r": 0.367,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.37,
+      "hd": [
+       [
+        "Mesh",
+        -0.37,
+        1218,
+        "ffffff",
+        "tex",
+        [
+         800.2,
+         8.7,
+         49.4
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.107,
+        1585,
+        "ffffff",
+        "tex",
+        [
+         1000,
+         20.1,
+         1000
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     }
+    ],
+    "carY": 22.168,
+    "gndCar": 0
+   },
+   "trafficWheelGap": 0.04
+  }
+ ]
+}
