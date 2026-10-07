@@ -31,5 +31,6 @@ Hard brake: stack grand 226→0 in 183 m (hit from behind mid-way), akro 211→0
 Benches: qa_race/live17b, qa_race/r17a (gitignored scratch; review copies go to docs/shots/race17/).
 
 ## State / next
-- Fixes for sign mirroring and the web overlay rebuilt at 15:5x; grand HQ rerun → qa_race/r17hq/grand_* (LOOK at web_hit + sign shots).
-- Then: copy shots to docs/shots/race17/, commit, send ONE REVIEW. After PASS: rebuild on CURRENT live, OD_CHANGELOG entry, out/<next ver>, DEPLOY to the coordinator.
+- REVIEW sent to the reviewer for ace0c539 (shots docs/shots/race17/, numbers docs/shots/race17/bench/). Waiting for PASS/FAIL.
+- Bench stack.txt was run before the last cosmetic fixes (sign side/arrow, web overlay, shield shader); physics unchanged since.
+- After PASS: fetch live (`git fetch origin alex/brave-carson-rbpmlk`); if live moved past 528b4ab, merge its src. Add the OD_CHANGELOG entry at the top of src/10_core.js, run `tools/build.sh <next free ver>`, `git add -f out/<ver>`, push, then send the coordinator `DEPLOY alex/od-race15 <commit> out/<ver> <msg>` with 3 bullets and shot paths.
