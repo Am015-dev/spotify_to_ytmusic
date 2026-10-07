@@ -47,7 +47,7 @@ posShip=(f=>function(s,dt,snap){f(s,dt,snap);try{if(!s||!s.mesh||(s.wreck&&s.dea
 const CR_VMAX=174/3.6,CR_VBOOST=224/3.6;
 const CR_acc=(v,vm,b)=>Math.max(0,(b?14:7.5)*(1-Math.pow(Math.max(0,v)/vm,2)));
 roamStep=(f=>function(dt){if(state!=='roam'||!pl||RO.wk||RO.frozen||!dt)return f(dt);const v0=RO.v||0,nb0=typeof SC_S!=='undefined'?SC_S.nb:0,air0=!!pl.air,c=CTL||{};
- if(RO.crTurn!=null){const e=angDiff(RO.crTurn,RO.h),k=Math.min(Math.abs(e),5*dt)*Math.sign(e);RO.h+=k;RO.vh=RO.h;if(Math.abs(e)<.02)RO.crTurn=null}
+ if(RO.crTurn!=null&&Math.abs(c.steer||0)>.3)RO.crTurn=null;if(RO.crTurn!=null){const e=angDiff(RO.crTurn,RO.h),k=Math.min(Math.abs(e),W14_PIV*dt)*Math.sign(e);RO.h+=k;RO.vh=RO.h;if(Math.abs(e)<.02)RO.crTurn=null}
  const r=f(dt);if(RO.wk||!pl)return r;const bumped=(typeof SC_S!=='undefined'?SC_S.nb:0)!==nb0;
  if(!bumped&&!air0&&!pl.air){const boost=!!(RO.boosting||RO.turbo>0),vm=boost?CR_VBOOST:CR_VMAX;
   if(RO.v>v0&&RO.v>0)RO.v=Math.min(RO.v,v0+CR_acc(v0,vm,boost)*dt);
