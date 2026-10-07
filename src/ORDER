@@ -3,6 +3,7 @@
 10_core.js
 20_race_world.js
 30_race.js
+31_race_r15.js
 40_hud_input_menu.js
 41_career_quests.js
 50_kenney_data.js

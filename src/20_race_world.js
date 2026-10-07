@@ -16,7 +16,7 @@ function sweep(td,prof,uvAcross,tileLen,skipGap=true){// prof: [[x,y],[x,y]] lat
   const N=td.N,pos=[],uv=[],idx=[];const p=V3(),r=V3(),u=V3();
   for(let i=0;i<=N;i++){const k=i%N;p.fromArray(td.P,k*3);r.fromArray(td.R,k*3);u.fromArray(td.U,k*3);const v=i*td.ds/tileLen;
     for(let q=0;q<2;q++){const[x,y]=prof[q];pos.push(p.x+r.x*x+u.x*y,p.y+r.y*x+u.y*y,p.z+r.z*x+u.z*y);uv.push(v,uvAcross[q])}
-    if(i<N&&!(skipGap&&(inGapF(i*td.ds)||inGapF((i+1)*td.ds)))){const a=i*2;idx.push(a,a+2,a+1,a+1,a+2,a+3)}}
+    if(i<N&&!(skipGap&&(inGapF(i*td.ds)||inGapF((i+1)*td.ds)))&&!(R15_sw&&(R15_open(i*td.ds,R15_sw)||R15_open((i+1)*td.ds,R15_sw)))){const a=i*2;idx.push(a,a+2,a+1,a+1,a+2,a+3)}}
   return geo(pos,uv,idx)}
 // GPU-drawn hex road, used when canvas textures are unavailable (same layout as roadTex: one tile = W × W)
 function roadShader(){return new THREE.ShaderMaterial({fog:true,uniforms:THREE.UniformsUtils.merge([THREE.UniformsLib.fog]),
@@ -49,12 +49,12 @@ function buildRoad(){const td=TF,N=td.N,ATH=TRK.city==='ath';
   MAT.cap=new THREE.MeshStandardMaterial({color:ATH?0xe9e2d4:0x1d2346,roughness:ATH?.6:.35,metalness:ATH?.05:.7,side:THREE.DoubleSide});
   MAT.under=new THREE.MeshStandardMaterial({color:ATH?0x8a8478:0x0e0f22,roughness:.7,metalness:.3,side:THREE.DoubleSide});
   MAT.stripL=neonMat(ATH?'#1f6fd0':'#ff2d95',ATH?1.1:2.4,{side:THREE.DoubleSide});MAT.stripR=neonMat(ATH?'#ffffff':'#22e4ff',ATH?1.05:2.4,{side:THREE.DoubleSide});
-  const fh=ATH?1.05:2.8,sh=ATH?1.35:3.5,lh=ATH?1.75:4.5,ch=ATH?1.95:4.8;for(const s of[-1,1]){const x=s*HALF;const face=sweep(td,[[x,0],[x,fh]],[0,1],25),strip=sweep(td,[[x,fh],[x,sh]],[0,1],25),lean=sweep(td,[[x,sh],[x+s*.6,lh]],[0,1],25),cap=sweep(td,[[x+s*.6,lh],[x+s*2.2,ch]],[0,1],25),outer=sweep(td,[[x+s*2.2,ch],[x+s*2.6,ATH?-2.6:-1.4]],[0,1],25),belly=sweep(td,[[x+s*2.6,-1.4],[0,-1.4]],[0,1],25);
+  const fh=ATH?1.05:2.8,sh=ATH?1.35:3.5,lh=ATH?1.75:4.5,ch=ATH?1.95:4.8;for(const s of[-1,1]){R15_sw=s;const x=s*HALF;const face=sweep(td,[[x,0],[x,fh]],[0,1],25),strip=sweep(td,[[x,fh],[x,sh]],[0,1],25),lean=sweep(td,[[x,sh],[x+s*.6,lh]],[0,1],25),cap=sweep(td,[[x+s*.6,lh],[x+s*2.2,ch]],[0,1],25),outer=sweep(td,[[x+s*2.2,ch],[x+s*2.6,ATH?-2.6:-1.4]],[0,1],25),belly=sweep(td,[[x+s*2.6,-1.4],[0,-1.4]],[0,1],25);
     // face textures read right-way up from inside on both sides
-    ROOT.add(new THREE.Mesh(face,MAT.wall));ROOT.add(new THREE.Mesh(strip,s<0?MAT.stripL:MAT.stripR));for(const g of[lean,cap,outer])ROOT.add(new THREE.Mesh(g,MAT.cap));ROOT.add(new THREE.Mesh(belly,MAT.under))}
+    ROOT.add(new THREE.Mesh(face,MAT.wall));ROOT.add(new THREE.Mesh(strip,s<0?MAT.stripL:MAT.stripR));for(const g of[lean,cap,outer])ROOT.add(new THREE.Mesh(g,MAT.cap));ROOT.add(new THREE.Mesh(belly,MAT.under))}R15_sw=0;
   // light fence: soft additive curtain above the wall
   if(!ATH){const[c,g]=cv(8,128);const gr=g.createLinearGradient(0,128,0,0);gr.addColorStop(0,'rgba(255,255,255,.55)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,8,128);const ft=tex(c,false);
-   for(const s of[-1,1]){const x=s*(HALF+.6);const gft=sweep(td,[[x,4.6],[x+s*3,16]],[0,1],50);gft.attributes.uv.array.forEach((v,i,a)=>{if(i%2===0)a[i]=.5});ROOT.add(new THREE.Mesh(gft,new THREE.MeshBasicMaterial({map:ft,color:glowCol(s<0?'#ff2d95':'#22e4ff',.6),transparent:true,opacity:.16,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false})))}}
+   for(const s of[-1,1]){R15_sw=s;const x=s*(HALF+.6);const gft=sweep(td,[[x,4.6],[x+s*3,16]],[0,1],50);gft.attributes.uv.array.forEach((v,i,a)=>{if(i%2===0)a[i]=.5});ROOT.add(new THREE.Mesh(gft,new THREE.MeshBasicMaterial({map:ft,color:glowCol(s<0?'#ff2d95':'#22e4ff',.6),transparent:true,opacity:.16,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide,toneMapped:false})))}R15_sw=0}
   const bt=new Batch(),p=V3(),r=V3(),u=V3(),t=V3();
   MAT.pylon=new THREE.MeshStandardMaterial({color:ATH?0xe6dfd0:0x232a4d,roughness:ATH?.7:.4,metalness:ATH?0:.6});MAT.accent=neonMat(ATH?'#0d5eaf':'#4ceaff',ATH?1.2:2);MAT.amber=neonMat('#ffb46a',2.4);MAT.dark=new THREE.MeshStandardMaterial({color:ATH?0x24302a:0x121528,roughness:.6,metalness:ATH?.35:.5});
   for(let i=0;i<N;i+=30){p.fromArray(td.P,i*3);if((ATH&&!/FLYOVER/.test(td.SEC[i]))||p.y<5||inGapF(i*td.ds)||crossAt(p,d=>d<-6))continue;r.fromArray(td.R,i*3);const gy=(p.z>RIVER[0]&&p.z<RIVER[1])?-8:0;const h=p.y-2-gy;if(h<2)continue;
@@ -72,7 +72,7 @@ function buildRoad(){const td=TF,N=td.N,ATH=TRK.city==='ath';
   if(tr.length){const tm=new THREE.Mesh(geo(tr,null,trIdx),MAT.under);tm.name='tunTrench';ROOT.add(tm)}
   // street lamps and the light pools they cast on the road
   const poolP=[],poolU=[],poolC=[],poolI=[];let pn=0;const cA=new THREE.Color('#ffb46a'),cB=new THREE.Color(ATH?'#ffdcaa':'#22e4ff');
-  for(let s=40,k=0;s<td.L;s+=65,k++){const f=frameAt(td,s,mkF());if(f.p.y<-10||inGapF(s)||inGapF(s+30)||inGapF(s-30)||crossAt(f.p,d=>d>4&&d<40))continue;const side=k%2?1:-1,col=k%4<2?cA:cB;lampList.push({p:f.p.clone().addScaledVector(f.r,side*(HALF-4.1)),u:f.u.clone(),c:col.clone()});
+  for(let s=40,k=0;s<td.L;s+=65,k++){const f=frameAt(td,s,mkF());if(f.p.y<-10||inGapF(s)||inGapF(s+30)||inGapF(s-30)||crossAt(f.p,d=>d>4&&d<40))continue;const side=k%2?1:-1,col=k%4<2?cA:cB;if(R15_open(s,side)||R15_open(s+30,side)||R15_open(s-30,side))continue;lampList.push({p:f.p.clone().addScaledVector(f.r,side*(HALF-4.1)),u:f.u.clone(),c:col.clone()});
     const post=new THREE.CylinderGeometry(.35,.5,17,6);post.translate(0,8.5+4.8,0);bt.add(post,MAT.dark,basisM(f,side*(HALF+1.4),0));
     const arm=new THREE.BoxGeometry(6,.4,.4);arm.translate(-side*3,17+4.8,0);bt.add(arm,MAT.dark,basisM(f,side*(HALF+1.4),0));
     const head=colorize(new THREE.BoxGeometry(3,.5,1.4),col.clone().multiplyScalar(2.2));head.translate(-side*5.5,16.7+4.8,0);bt.add(head,MAT.lampHead||(MAT.lampHead=new THREE.MeshBasicMaterial({vertexColors:true,toneMapped:false})),basisM(f,side*(HALF+1.4),0));
@@ -81,7 +81,7 @@ function buildRoad(){const td=TF,N=td.N,ATH=TRK.city==='ath';
   ROOT.add(new THREE.Mesh(geo(poolP,poolU,poolI,null,poolC),MAT.pool=new THREE.MeshBasicMaterial({map:GLOW,vertexColors:true,transparent:true,opacity:.38,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false,polygonOffset:true,polygonOffsetFactor:-2})));
   // gantries with colour light bars
   const gcols=ATH?['#0d5eaf','#ffffff','#0d5eaf','#ffffff','#e2b866']:['#ff2d95','#22e4ff','#ffd12c','#8c55ff','#5dffb0'];let gk=0;MAT.bar=new THREE.MeshBasicMaterial({vertexColors:true,toneMapped:false});
-  for(let s=300;s<td.L-100;s+=560){if(inGapF(s)||yAt(td,s)<-8)continue;const f=frameAt(td,s,mkF());if(crossAt(f.p,d=>d>4&&d<45))continue;const M=basisM(f,0,0);
+  for(let s=300;s<td.L-100;s+=560){if(inGapF(s)||yAt(td,s)<-8||R15_open(s,1)||R15_open(s,-1))continue;const f=frameAt(td,s,mkF());if(crossAt(f.p,d=>d>4&&d<45))continue;const M=basisM(f,0,0);
     for(const sd of[-1,1]){const c=new THREE.BoxGeometry(2.2,30,2.2);c.translate(sd*(HALF+4),15,0);bt.add(c,MAT.pylon,M)}
     const bm=new THREE.BoxGeometry(W+10,3,3);bm.translate(0,30,0);bt.add(bm,MAT.pylon,M);
     for(let q=0;q<5;q++){const bar=colorize(new THREE.BoxGeometry(W/6,.9,.6),new THREE.Color(gcols[(gk+q)%5]).multiplyScalar(ATH?1:2.2));bar.translate((q-2)*(W/5.2),28,1.6);bt.add(bar,MAT.bar,M)}gk++}
@@ -296,9 +296,9 @@ function buildDirt(W,s0,s1,F){const td=TF,grp=W.grp;
     else{const mx=rr(-9,9),mr=rr(3.5,5.5),md=new THREE.Mesh(mudGeo,mudMat);md.scale.set(mr,1,mr*1.6);place(md,s,mx,.05);W.objs.push({kind:'mud',s,x:mx,r:mr,m:md,alive:true,t:0});
       for(let i=0;i<2;i++){const x=rr(-12,12);if(Math.abs(x-mx)<mr+2)continue;const rk=new THREE.Mesh(rockGeo,rockMat);rk.rotation.set(R()*3,R()*3,0);place(rk,s+rr(-12,12),x,.7);W.objs.push({kind:'brick',s:s,x,m:rk,alive:true,t:0,col:new THREE.Color('#8a7a6a')})}}}}
 function wPos(s){return TD.rev?TD.L-s:s}
-function waterStep(s){if(!s.isPlayer)sigTick(s);athHazStep(s);if(!WFUN||s.dead>0)return;const ter=isWater(TD,s.dist)?'water':isDirt(TD,s.dist)?'dirt':'road';
+function waterStep(s){if(!s.isPlayer)sigTick(s);athHazStep(s);if(s.dead>0)return;const ter=R15_ter(s)||(isWater(TD,s.dist)?'water':isDirt(TD,s.dist)?'dirt':'road');
   if(ter!==(s.terrain||'road')){s.terrain=ter;s.boatMode=ter==='water';s.dirtMode=ter==='dirt';const at=s.mesh.position.clone();if(s.isPlayer||near(s)){if(ter==='water')burst(WATER,at,70,22,.9,new THREE.Color(.8,1.3,2.2));else burst(SPARK,at,40,16,.5,new THREE.Color(2,1.6,.8));if(s.isPlayer){AU.sfx(ter==='water'?'splash':'land');say('',ter==='water'?'BOAT MODE':ter==='dirt'?'OFF-ROAD MODE':'HOVER MODE',.8);award(s,'TRANSFORM',6,150,'#4ceaff')}}}
-  if(ter==='road')return;const m=mod(s.dist,TD.L),pm=s.wPrev??m;s.wPrev=m;
+  if(ter==='road'||!WFUN)return;const m=mod(s.dist,TD.L),pm=s.wPrev??m;s.wPrev=m;
   if(!s.air)for(const w0 of WFUN.waves){const w=wPos(w0);if(pm<w&&m>=w&&s.v>20){s.air={y:yAt(TD,s.dist)+1.4,vy:4+s.v*.085,j:WAVEJ,t:0,fall:false,cleared:true};frameAt(TD,s.dist,F2);s.air.off=F2.p.y+F2.r.y*s.x-s.air.y;if(s.isPlayer){burst(WATER,s.mesh.position.clone(),40,20,.8,new THREE.Color(.9,1.4,2.3));award(s,s.dirtMode?'BUMP JUMP':'WAVE JUMP',8,250,'#4ceaff');AU.sfx('launch')}break}}
   for(const o of WFUN.objs){if(!o.alive){continue}const os=wPos(o.s),ox=TD.rev?-o.x:o.x;
     if(o.kind==='mud'){if(!s.air&&Math.abs(tdd(os,s.dist))<o.r*1.6&&Math.abs(ox-s.x)<o.r){s.v*=1-1.1*H;if(s.isPlayer&&!s.mudT){s.mudT=1;feed('MUD!',0,'#c08040')}if(s.isPlayer&&R()<.5)puff(s.mesh.position,1,new THREE.Color(.25,.16,.08),1.6,4,.8,.6,1.5,3)}continue}if(Math.abs(tdd(os,s.dist))>3.2||Math.abs(ox-s.x)>(o.kind==='ring'?3.2:2.6))continue;if(o.kind==='ring'&&s.air&&s.air.y>yAt(TD,s.dist)+7)continue;
@@ -362,7 +362,7 @@ function R15_trackW(def){return def.w15||38}
 function loadTrack(id){if(!KEEP_TEX.size)for(const t of[GLOW,FLARE,SHADOW,FACADE,...WINS])KEEP_TEX.add(t),KEEP_TEX.add(t.source);const def=TRACK_DEFS.find(t=>t.id===id)||TRACK_DEFS[0];if(WORLD&&TRK===def)return false;disposeWorld();TRK=def;CP=def.cp;const ath=def.city==='ath';W=R15_trackW(def);HALF=W/2;MARGIN=HALF-1.5;CR_LS=W/(def.w||48);RIVER[0]=ath?1e9:450*S;RIVER[1]=ath?1e9:750*S;if(typeof traffic3d!=='undefined'&&traffic3d)traffic3d.im.visible=traffic3d.gl.visible=!ath;
   TF=buildTrackData();TD=TF;TRACKS={fwd:TF,rev:null};indexTrack();lampList=[];LANDMARKS.length=0;searchSpots.length=0;searchlights=[];billboards=[];trains=[];beacons=null;
   WORLD=new THREE.Group();ROOT=WORLD;scene.add(WORLD);
-  if(ath){athPrep();athLandmarks();buildRoad();athGround();athCity();athDressing()}else{buildLandmarks();buildRoad();buildGround();buildCity();buildDressing()}buildTrackProps();buildWaterFun();buildMap();applyMoodMaterials();applyQuality();warmTextures(WORLD);return true}
+  if(ath){athPrep();athLandmarks();R15_find();R15_pts();buildRoad();athGround();athCity();athDressing()}else{buildLandmarks();R15_find();R15_pts();buildRoad();buildGround();buildCity();buildDressing()}buildTrackProps();R15_mesh();buildWaterFun();buildMap();applyMoodMaterials();applyQuality();warmTextures(WORLD);return true}
 function applyQuality(){const q=SET.q;INTU.value=q==='low'?0:1;const tp=lowGfx||q==='low'?5:9;if(FX.material.defines.TAPS!==tp){FX.material.defines.TAPS=tp;FX.material.needsUpdate=true}resize();bloom.enabled=q!=='low';const ns=q==='high'?4:0;for(const t of[composer.renderTarget1,composer.renderTarget2])if(t.samples!==ns){t.samples=ns;t.dispose()}
   if(waterRefl)waterRefl.visible=q==='high';if(waterPlain)waterPlain.visible=!(waterRefl&&q==='high');rainScale={low:.3,med:.6,high:1}[q];applyMoodMaterials()}
 
@@ -576,7 +576,7 @@ function athHazReset(){for(const o of AHZ){scene.remove(o.m);disposeTree(o.m)}AH
 function athHazTick(){for(const o of AHZ){if(o.kind==='tram'){o.s+=o.v*H;athHazPlace(o)}else if(!o.alive&&(o.t-=H)<=0){o.alive=true;o.m.visible=true}}}
 function athHazStep(s){if(s.tramCd>0)s.tramCd-=H;if(!AHZ.length||s.dead>0||s.air)return;for(const o of AHZ){if(!o.alive)continue;const dd=tdd(o.s,s.dist);if(Math.abs(dd)>o.hl+2||Math.abs(s.x-o.x)>o.hw+2.2)continue;
   if(o.kind==='drum'){o.alive=false;o.m.visible=false;o.t=14;s.v*=.84;if(s.isPlayer||near(s))debris(o.m.position.clone(),V3(0,6,0),8,[new THREE.Color('#efe9dc'),new THREE.Color('#d8cfbc')],.9,o.m.position.y-1.5);if(s.isPlayer){award(s,'MARBLE SMASH',4,150,'#efe9dc');AU.sfx('crash')}}
-  else if(!(s.tramCd>0)){s.tramCd=.8;s.v=Math.min(s.v,o.v+8);s.x=clamp(o.x+Math.sign(s.x-o.x||1)*(o.hw+3),-MARGIN,MARGIN);damage(s,8/s.stats.hull);if(s.isPlayer){feed('TRAM!',0,'#f2c200');AU.sfx('crash');shake=Math.max(shake,.5)}}}}
+  else if(!(s.tramCd>0)){s.tramCd=.8;s.v=Math.min(s.v,o.v+8);s.x=R15_cx(s,o.x+Math.sign(s.x-o.x||1)*(o.hw+3));damage(s,8/s.stats.hull);if(s.isPlayer){feed('TRAM!',0,'#f2c200');AU.sfx('crash');shake=Math.max(shake,.5)}}}}
 // fireworks over the Kallimarmaro on every lap of the finale, a big show at the finish
 function athFire(big){let at;if(TRK.stadium){const[x,z]=athW(TRK,...TRK.stadium);at=V3(x,athH(x,z)+55,z)}else{frameAt(TF,0,F2);at=F2.p.clone();at.y+=50}const C=['#ff3050','#ffd12c','#5dffb0','#22a0ff','#ffffff','#ff7ac0'],n=big?8:3;
   for(let k=0;k<n;k++)setTimeout(()=>{if(!TRK.fire)return;const p=at.clone().add(V3(rr(-70,70),rr(-10,30),rr(-70,70)));burst(SPARK,p,60,34,1.4,new THREE.Color(C[Math.floor(R()*C.length)]).multiplyScalar(3));burst(SPARK,p,24,16,1,new THREE.Color(3,3,2.6))},k*330)}

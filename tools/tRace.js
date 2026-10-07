@@ -12,7 +12,7 @@ const INIT=`(()=>{const q=[];let t=0;window.__auto=true;window.requestAnimationF
  window.__tick=n=>{for(let i=0;i<n;i++){t+=1000/60;const c=q.splice(0);for(const f of c){try{f(t)}catch(e){setTimeout(()=>{throw e})}}}return t};
  setInterval(()=>{if(window.__dbg&&!window.__fastR&&!window.__shooting){window.__fastR=__dbg.composer.render;__dbg.composer.render=()=>{}}if(window.__auto)window.__tick(1)},16)})();`;
 // in-page race probe (read-only)
-const ST=`(()=>{const E=__oc.ev;return E('(()=>{const s=pl;if(!s)return {state};const f=frameAt(TD,s.dist,mkF());return {state,raceT,dist:s.dist,L:TD.L,lap:s.lap,laps:RC.laps,x:s.x,M:MARGIN,W,v:s.v,top0:s.stats.top0,wall:s.wall,item:s.item,bm:s.bm,place:s.place,n:ships.length,terr:s.terrain||"road",route:s.rtId||"",fin:s.finished,laps_:s.laps.slice(),k:kAt(TD,s.dist+60),ka:[30,50,70,90,110,130,150].reduce((a,d)=>a+kAt(TD,s.dist+d),0)/7,pads:pads.filter(p=>p.type==="item"&&(!p.cd||p.cd<=0)).map(p=>[tdd(p.s,s.dist),p.x]).filter(a=>a[0]>10&&a[0]<160).slice(0,4),gap:Math.round(Math.max(...ships.filter(o=>o!==s).map(o=>o.dist))-s.dist),rts:(window.__rt15?__rt15(s):null),dead:s.dead,web:(s.webT||0)>0,cam:camera.fov}})()')})()`;
+const ST=`(()=>{const E=__oc.ev;return E('(()=>{const s=pl;if(!s)return {state};const f=frameAt(TD,s.dist,mkF());return {state,raceT,dist:s.dist,L:TD.L,lap:s.lap,laps:RC.laps,x:s.x,M:MARGIN,W,v:s.v,top0:s.stats.top0,wall:s.wall,item:s.item,bm:s.bm,place:s.place,n:ships.length,terr:s.terrain||"road",route:s.rtId||"",fin:s.finished,laps_:s.laps.slice(),k:kAt(TD,s.dist+60),ka:[30,50,70,90,110,130,150].reduce((a,d)=>a+kAt(TD,s.dist+d),0)/7,pads:pads.filter(p=>p.type==="item"&&(!p.cd||p.cd<=0)).map(p=>[tdd(p.s,s.dist),p.x]).filter(a=>a[0]>10&&a[0]<160).slice(0,4),B:(typeof R15_b==="function"?R15_b(s,s.x):null),gap:Math.round(Math.max(...ships.filter(o=>o!==s).map(o=>o.dist))-s.dist),rts:(window.__rt15?__rt15(s):null),yaw:s.yaw,beta:s.beta,hold:s.holdX,yr:s.yawRate,dead:s.dead,web:(s.webT||0)>0,cam:camera.fov}})()')})()`;
 (async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']});
  const phone=MODE==='phone';const ctx=await b.newContext(phone?{viewport:{width:852,height:393},deviceScaleFactor:2,isMobile:true,hasTouch:true}:{viewport:{width:1440,height:900}});
  const p=await ctx.newPage();p.setDefaultTimeout(900000);const errs=[];p.on('pageerror',e=>errs.push(e.message.slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push('console: '+m.text().slice(0,200))});
@@ -57,23 +57,24 @@ const ST=`(()=>{const E=__oc.ev;return E('(()=>{const s=pl;if(!s)return {state};
  while(f<frames){await tick(STEP);f+=STEP;const s=await p.evaluate(ST);if(!s||s.state==='results'||s.fin)break;if(s.state!=='race')continue;
   if(raceStart===null)raceStart=s.raceT;
   const kmh=s.v*3.6;spd.push(kmh);top=Math.max(top,kmh);if(kmh<10&&s.raceT>3)stuck+=STEP/60;
-  const w=s.wall>0;if(w&&!wasWall)wallHits++;wasWall=w;
+  const w=s.wall>0;if(w&&!wasWall){wallHits++;if(process.env.DBGW)console.log('WALL',s.raceT.toFixed(1),'x',s.x.toFixed(1),'B',s.B&&s.B.map(v=>v.toFixed(1)),JSON.stringify(s.rts),s.terr,Math.round(kmh))}wasWall=w;
   if(s.terr!==terr){transforms++;terr=s.terr}
   if(s.rts&&s.rts.in)routes.add(s.rts.in);
   if(s.item&&s.item!==lastItem){picked++;useAt=s.raceT+.5+rng()*1.5}lastItem=s.item;
   if(s.item&&useAt>0&&s.raceT>=useAt){useAt=-1;if(await tap(phone?'#tF':'#tF')||(!phone&&(await p.keyboard.press('Space'),1))){used++;if(shots.item<1){shots.item++;await tick(8);await shot('item_use')}}}
   // choose a line like a person: an item box ahead, a marked shortcut entry ahead (rts from the game's own signs), else hold
   if(s.raceT>=tgtT){tgtT=s.raceT+.35+rng()*.3;let t=null;
-   if(s.rts&&s.rts.want!=null)t=s.rts.want;else if(!s.item&&s.pads.length&&s.pads[0][0]<90){t=s.pads[0][1]}else t=Math.max(-(s.M-3),Math.min(s.M-3,s.ka*3200))
+   if(process.env.NOSC){}else if(s.rts&&s.rts.in&&Math.abs(s.x)>Math.abs(s.rts.want)-8)t=null;else if(s.rts&&s.rts.want!=null)t=s.rts.want;else if(!s.item&&s.pads.length&&s.pads[0][0]<90){t=s.pads[0][1]}else t=Math.max(-(s.M-3),Math.min(s.M-3,s.ka*3200))
    wob=(rng()-.5)*2*Math.min(3,s.W*.08);react.push(t==null?null:t+wob)}
   const tgt=react.length>1?react.shift():react[0];
+  if(process.env.DBG&&s.rts)console.log('DBG',s.raceT.toFixed(1),JSON.stringify(s.rts),'x',s.x.toFixed(1),'tgt',tgt==null?null:tgt.toFixed(1),'B',s.B&&s.B.map(v=>v.toFixed(1)),s.terr,Math.round(s.v*3.6),'yaw',s.yaw.toFixed(3),'beta',s.beta.toFixed(3),'hold',s.hold&&s.hold.toFixed(1),'k',s.k.toFixed(4));
   let st=0;if(tgt!=null){const e=tgt-s.x;if(Math.abs(e)>1.6)st=Math.sign(e)}
   // boost on a straight with >50 % meter for ~1.5 s
   let bo=false;if(s.bm>50&&Math.abs(s.k)<1/900&&s.raceT>boostT){boostT=s.raceT+6;}if(s.raceT<boostT-4.5&&s.bm>5)bo=true;
   await apply({gas:true,steer:st,boost:bo});
   if(bo&&!shots.boost){shots.boost=1;await shot('boost')}
   if(s.rts&&s.rts.next&&s.rts.dd<110&&s.rts.dd>60&&!shots['sign_'+s.rts.next]&&!s.web){shots['sign_'+s.rts.next]=1;await shot('sign_'+s.rts.next)}
-  if(s.rts&&s.rts.in&&!shots['sc_'+s.rts.in]&&!s.web&&(s.rtsU=(s.rtsU||0))>=0){shots['sc_'+s.rts.in]=(shots['sc_'+s.rts.in]||0)+1;if(shots['sc_'+s.rts.in]===1){await tick(40);await shot('shortcut_'+s.rts.in)}}
+  if(s.rts&&s.rts.in&&!shots['sc_'+s.rts.in]&&!s.web&&(s.rtsU=(s.rtsU||0))>=0){shots['sc_'+s.rts.in]=(shots['sc_'+s.rts.in]||0)+1;if(shots['sc_'+s.rts.in]===1){await tick(40);await shot('shortcut_'+s.rts.in);await tick(90);await shot('shortcut2_'+s.rts.in);if(process.env.DBGC)console.log('CAM',await p.evaluate(()=>__oc.ev('(()=>{const s=pl,f=frameAt(TD,s.dist,mkF()),sp=s.mesh.position.clone().add(s.mesh.userData.m.position);const surf=f.p.clone().addScaledVector(f.r,s.x);return JSON.stringify({x:s.x,mesh:s.mesh.position.toArray().map(v=>+v.toFixed(1)),sp:sp.toArray().map(v=>+v.toFixed(1)),surf:surf.toArray().map(v=>+v.toFixed(1)),cam:camera.position.toArray().map(v=>+v.toFixed(1)),vis:s.mesh.visible,air:!!s.air,bank:+Math.asin(f.r.y).toFixed(3)})})()')))}}
   lapTimes=s.laps_.map(x=>+x.toFixed(2));if(lapTimes.length>=LAPS)break;
   if(s.raceT-raceStart>perfNext){perfNext+=10;ptrace.push(s.place+'@'+Math.round(kmh)+(s.terr[0])+'g'+s.gap);perfS.push(await measure());gaps.push(await p.evaluate(()=>__oc.ev('(()=>{const s=pl;if(!s||s.air||s.dead>0)return null;s.mesh.updateMatrixWorld(true);const b=new THREE.Box3(),bb=new THREE.Box3();const vis=o=>{for(let a=o;a;a=a.parent)if(!a.visible)return false;return true};s.mesh.traverse(o=>{if(o.isMesh&&vis(o)&&o.geometry&&!(o.material&&o.material.transparent)){o.geometry.computeBoundingBox();bb.copy(o.geometry.boundingBox).applyMatrix4(o.matrixWorld);b.union(bb)}});const f=frameAt(TD,s.dist,mkF());const c=b.getCenter(V3());const rel=c.clone().sub(f.p);const lat=rel.dot(f.r);const y=f.p.y+f.r.y*lat+f.t.y*rel.dot(f.t);return +(b.min.y-y).toFixed(3)})()')))}if(!shots.mid&&s.raceT-raceStart>40){shots.mid=1;await shot('mid')}
   raceSec=s.raceT-raceStart}
