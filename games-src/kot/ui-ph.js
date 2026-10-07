@@ -84,7 +84,6 @@ function phActs(){if(!G)return;const pa=$ph('pacts');if(!pa)return;
     set('[data-act="resolve"]','<span class="bl">✔ Done</span><small>use these dice</small>','Done: resolve these dice');
     set('[data-act="hint"]','<span aria-hidden="true">💡</span>','Keep the suggested dice')}
   if(humanTurn()&&G.phase==='buy'){const win=!G.bug&&cur().vp>=20;set('[data-act="end"]',`<span class="bl">✔ ${G.bug?'Finish turn':'End turn'}</span>${win?`<small>you have ${cur().vp}★ (20 wins): end your turn to win</small>`:G.market.length?'<small>or tap a card above to read and buy it</small>':''}`,G.bug?'Finish the borrowed turn':win?'End your turn: you have 20 stars and win if you survive it':'End your turn')}
-  if(PHONE.land&&!pa.querySelector('[data-a="advise"]')){const ab=document.createElement('button');ab.className='btn';ab.dataset.a='advise';ab.setAttribute('aria-label','What should I do now, and why?');ab.setAttribute('aria-expanded',UI.adv?'true':'false');ab.innerHTML='<span aria-hidden="true">🧭</span>';const hb=pa.querySelector('[data-act="hint"]')||pa.querySelector('[data-act="resolve"]')||pa.querySelector('[data-act="end"]');if(hb)hb.after(ab);else pa.prepend(ab)}
   const dk=document.querySelector('.gx-dock');if(!dk)return;
   const n=G.dice.length,land=document.documentElement.classList.contains('ph-l');const railW=dk.clientWidth-16;
   let dc,dw,side=false;
