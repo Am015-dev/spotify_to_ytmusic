@@ -1,7 +1,7 @@
 # Help kit rollout (6 Oct 2026)
 
 Pilot: Thornbound (live). Round 1 started 6 Oct 23:13 UTC as cloud sessions: doorkick-dungeon, hollowbough, final-approach, shipwreck-isle.
-Round 1 DONE (all 4 live, screenshots checked 7 Oct). Round 2 STARTED 7 Oct 04:19 UTC: sands-of-qamar, rampart-and-vine, kaiten-kitchen, crown-city-smash. Round 3: nebula-aces, short-fuse, lantern-dive, tidewake. Round 4: sunglaze, cauldron-fair.
+Round 1 DONE. Round 2 DONE (checked 7 Oct 13:40). Round 3 STARTED 7 Oct 13:42 UTC as cloud sessions. Round 2 was: sands-of-qamar, rampart-and-vine, kaiten-kitchen, crown-city-smash. Round 3: nebula-aces, short-fuse, lantern-dive, tidewake. Round 4: sunglaze, cauldron-fair.
 One Sonnet cloud session per game, max 4 at a time. Prompt template (replace __NAME__/__SLUG__):
 
 ```

@@ -136,7 +136,7 @@ function refresh(){if(!G||!UI.started)return;try{if(window.PerfHUD)PerfHUD.wake(
   renderTable(V);renderOpenDrawer();audioMood(V);
   const need=humanNeeded();
   if(need&&need!==UI.lastNeed){UI.lastNeed=need;if(ANIM)sfx('turn')}if(!need)UI.lastNeed=null;
-  schedule();netAfter()}
+  schedule();netAfter();try{hlpAfter()}catch(e){console.error(e)}}
 function humanNeeded(){if(!G||G.over)return null;const p=passTo();if(p>=0)return 'pass'+p;const v=viewer();if(v<0)return null;const s=decider();if(s===v)return 'me'+G.turn+':'+(G.q?G.q.kind:G.step);return null}
 function saveNow(){if(NET.on)return;try{if(G&&!G.over&&humans().length)localStorage.setItem(SAVE,JSON.stringify({G,ui:{holder:UI.holder,rt:UI.rt,camp:UI.camp?UI.camp.id:null}}));else if(G&&G.over)localStorage.removeItem(SAVE)}catch(e){}}
 // ---------- the computer crew ----------
@@ -304,7 +304,7 @@ function renderSettings(){const sp=[[.5,'Slow'],[1,'Normal'],[2,'Fast'],[5,'Very
   <div><div class="lbl">Sound</div><div class="row"><button class="btn${SND.on?' on':''}" data-a="snd" id="sndbtn">${ico('snd')}Sound ${SND.on?'on':'off'}</button><button class="btn${SND.music?' on':''}" data-a="mus" id="musbtn">${ico('music')}Music ${SND.music?'on':'off'}</button></div></div>
   <div><div class="lbl">Computer crew speed</div><div class="row">${sp.map(([v,l])=>`<button class="btn small${UI.speed===v?' on':''}" data-a="speed" data-v="${v}">${l}</button>`).join('')}</div></div>
   <div><div class="lbl">Game</div><div class="row">${isClient()?`<button class="btn small" data-a="netleave">${ico('back')}Leave the online game</button>`:`${G&&!G.over?`<button class="btn small" data-a="pause">${ico(UI.pause?'play':'pause')}${UI.pause?'Resume':'Pause'}</button><button class="btn small" data-a="restart">${ico('flip')}Restart</button>`:''}<button class="btn small" data-a="newgame">${ico('map')}Jobs</button>`}</div></div>
-  <div><div class="lbl">More</div><div class="row"><button class="btn small" data-gx="logd">${ico('scroll')}Log</button><button class="btn small" data-gx="refd">${ico('cards')}Cards</button><button class="btn small" data-gx="credd">${ico('info')}Credits</button></div></div></div>`}
+  <div><div class="lbl">More</div><div class="row"><button class="btn small" data-gx="logd">${ico('scroll')}Log</button><button class="btn small" data-gx="refd">${ico('cards')}Cards</button><button class="btn small" data-gx="credd">${ico('info')}Credits</button></div></div></div>${typeof GXH!=='undefined'?`<div><div class="lbl">Tips</div>${GXH.settingsHTML({rowClass:"row",btnClass:"btn small"})}</div>`:''}`}
 // ---------- campaign progress ----------
 function jobProg(){if(!UI.prog)UI.prog=lsGet('sf_camp',{v:1,jobs:{}});return UI.prog}
 function unlocked(n){const c=jobProg();return n===1||!!(c.jobs[n-1]&&c.jobs[n-1].w)||!!(c.jobs[n]&&c.jobs[n].p)}
