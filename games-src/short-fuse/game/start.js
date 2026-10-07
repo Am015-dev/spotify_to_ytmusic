@@ -33,6 +33,7 @@ function startJob(s){if(isClient())return;s=Object.assign({},s);s.names=(s.names
   UI.rt=realtimeJob(s.job);UI.started=false;clearTimeout(UI.aiT);UI.aiT=null;UI.sel=null;UI.prev=null;UI.holder=-1;UI.offSeat=null;UI.campDone=0;UI.campShown=0;UI.wwk=null;UI.pause=false;
   UI.camp=s.camp||null;UI.brief=(NET.on||isHost()||s.camp)?null:{n:s.job};UI.aiNotBefore=0;UI.lastPrompt=null;
   UI.ghost=lsGet('sf_ghost',{info:1,turn:1});if(s.camp&&s.camp.hints&&!lsGet('sf_ghost_'+s.camp.id,0)){lsSet('sf_ghost_'+s.camp.id,1);UI.ghost={info:1,turn:1}}if(s.camp&&!s.camp.hints)UI.ghost={info:0,turn:0};
+  if(typeof GXH!=='undefined'){UI.ghost={info:0,turn:0};if(s.camp&&s.camp.hints)GXH.setEnabled(true)}
   const o={np:s.np,mission:s.job,seats,level:s.lv,names:s.names.slice(0,s.np),realtime:UI.rt};if(any){try{const ch=[];for(let i=0;i<s.np;i++)ch[i]=chars[i]||null;o.chars=ch}catch(e){}}
   if(s.captain!=null&&s.captain<s.np)o.captain=s.captain;if(s.seed!=null)o.seed=s.seed;if(s.twist)o.twist=s.twist;if(s.lvs)o.lv=s.lvs;
   kitReset();UI.started=true;hideStart();NET.starting=true;try{try{newGame(o)}catch(e){try{delete o.chars;newGame(o)}catch(e2){console.error(e2);UI.started=false;showStart();return}}

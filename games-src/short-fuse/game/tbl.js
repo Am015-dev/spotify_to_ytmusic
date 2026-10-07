@@ -309,6 +309,7 @@ function chipTap(n){const V=UI.V;const it=TBL.items&&TBL.items[n];if(!it||!V)ret
     if(ownerOf(si)===V.seat)return;UI.sel={mode:'dual',tool:null,tg:[{st:si,k}],v:mv.v,v2:null,two:null,fu:null};if(UI.ghost&&UI.ghost.turn)ghostDone('turn');autoFire()};
   document.addEventListener('pointerup',end,true);document.addEventListener('pointercancel',end,true)})();
 // ---------- keeping the layout right on every size change (iOS reports the old size right after a rotation) ----------
-(function(){let t=null,t2=null;const go=()=>{try{layoutTable()}catch(e){}};const deb=()=>{clearTimeout(t);clearTimeout(t2);t=setTimeout(go,60);t2=setTimeout(go,420)};
+if(window.GXV)GXV.watch(()=>{try{layoutTable()}catch(e){}});
+else (function(){let t=null,t2=null;const go=()=>{try{layoutTable()}catch(e){}};const deb=()=>{clearTimeout(t);clearTimeout(t2);t=setTimeout(go,60);t2=setTimeout(go,420)};
   window.addEventListener('resize',deb);window.addEventListener('orientationchange',deb);if(window.visualViewport)window.visualViewport.addEventListener('resize',deb);
   const init=()=>{const b=document.getElementById('tb');if(b&&window.ResizeObserver)new ResizeObserver(deb).observe(b)};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()})();
