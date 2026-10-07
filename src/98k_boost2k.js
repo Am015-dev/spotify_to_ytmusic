@@ -81,7 +81,7 @@ function B2K_turbines(s,on,dt){if(!s||!s.mesh)return;const mesh=B2K_frame(s.mesh
     for(const sd of[-1,1]){const parts=[[T.body,T.mB,0],[T.stud,T.mB,.245],[T.rim,T.mR,-.21],[T.flame,T.mF,-.21]].map(([geo,mat,z])=>{const m=new THREE.Mesh(geo,mat);m.matrixAutoUpdate=false;m.frustumCulled=false;m.userData.gbG=1;m.userData.z=z;m.userData.L=new THREE.Matrix4();
         m.onBeforeRender=function(){if(B2K.tCar){this.matrixWorld.multiplyMatrices(B2K.tCar.matrixWorld,this.userData.L)}};g.add(m);return m});g.units.push({sd,parts,spin:0})}
     B2K.turb=g;par.add(g)}
-  const tgt=on?1:0;B2K.turbS+=(tgt-B2K.turbS)*Math.min(1,dt*(on?9:6));const fz=bx.hl/2.2,k=B2K.turbS,ov=on?1+.25*Math.sin(Math.min(1,k)*Math.PI):1,sc=Math.max(.001,k*ov*fz),tx=sd=>sd*bx.hw*.45,rs=B2K_rear(mesh),tz=bx.cz+rs*(bx.hl+.24*fz),ty=bx.y0+bx.hh*.4;
+  const tgt=on?1:0;B2K.turbS+=(tgt-B2K.turbS)*Math.min(1,dt*(on?9:6));const fz=bx.hl/2.2,k=B2K.turbS,ov=on?1+.25*Math.sin(Math.min(1,k)*Math.PI):1,sc=Math.max(.001,k*ov*fz*(state==='race'?.7:1)),tx=sd=>sd*bx.hw*.4,rs=B2K_rear(mesh),tz=bx.cz+rs*(bx.hl+.24*fz),ty=bx.y0+Math.min(bx.hh*.4,.5*fz);
   B2K.turb.visible=k>.02&&s.mesh.visible;const U=new THREE.Matrix4(),Pm=new THREE.Matrix4(),Sv=new THREE.Vector3(sc,sc,sc),Q=new THREE.Quaternion(),Pv=new THREE.Vector3(),Ry=new THREE.Matrix4().makeRotationY(rs>0?Math.PI:0);
   for(const u of B2K.turb.units){u.spin+=dt;Pv.set(tx(u.sd),ty,tz);U.compose(Pv,Q.identity(),Sv);
     for(const m of u.parts){Pm.makeTranslation(0,0,m.userData.z*-rs).multiply(Ry);if(m.geometry===B2K.turbG.flame)Pm.multiply(new THREE.Matrix4().makeScale(1,1,(B2K.bash?1.5:1)*rr(.75,1.2)));m.userData.L.multiplyMatrices(U,Pm)}}
