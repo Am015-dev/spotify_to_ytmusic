@@ -41,6 +41,10 @@ const INIT = () => {
   const os = AudioBufferSourceNode.prototype.start;
   AudioBufferSourceNode.prototype.start = function (when) { try { if (this.buffer && this.buffer.duration > 3) window.__spy.starts.push({ at: this.context.currentTime, when: when || 0, dur: this.buffer.duration }); } catch (e) { } return os.apply(this, arguments); };
   window.__bot = {
+    gridErr() {                                          // ms the game's beat position is off the real audio grid (file mode): last started song + offsetMs
+      const m = window.__mnr, a = m.AU.a, sp = window.__spy.starts[window.__spy.starts.length - 1]; if (!sp || m.BT.mode !== 'file') return null;
+      const lat = a.outputLatency || 0, want = (a.currentTime - lat - (sp.when + m.BT.off)) / m.BT.spb; return (m.bpos() - want) * m.BT.spb * 1000;
+    },
     scr(dx, dy) { const r = document.getElementById('frame').getBoundingClientRect(), rot = window.__mnr.rotMode; return rot ? [-dy * r.width / 540, dx * r.height / 960] : [dx * r.width / 960, dy * r.height / 540]; },
     decide() {
       const m = window.__mnr, G = m.G, P = m.P; if (!G || !P) return null;
@@ -96,9 +100,10 @@ async function newPage(browser, cfg, o = {}) {
   p.on('console', m => { const t = m.text(); if (m.type() === 'error' && !/Failed to load resource|net::ERR|404|favicon/i.test(t)) p.errs.push('console ' + t); if (m.type() === 'warning' && /audio|decode/i.test(t)) p.errs.push('audio warning ' + t); });
   await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort());
   if (o.route) await o.route(p);
+  if (o.init) await p.addInitScript(o.init);
   await p.addInitScript(INIT);
   const cdp = cfg.touch ? await ctx.newCDPSession(p) : null;
-  await p.goto(URL_BASE + 'index.html', { waitUntil: 'domcontentloaded' });
+  await p.goto(URL_BASE + 'index.html' + (o.query || ''), { waitUntil: 'domcontentloaded' });
   await p.waitForFunction(() => window.__mnr && window.__bot);
   return { p, cdp, ctx, T: cdp ? new Touch(cdp) : null };
 }
@@ -222,15 +227,18 @@ async function inputTests(browser, cfg) {
   } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
   await p.context().close();
 }
-async function pauseTests(browser, cfg) {
-  const tag = cfg.name + '/pause', { p, T } = await newPage(browser, cfg);
+async function pauseTests(browser, cfg, synth) {
+  const tag = cfg.name + '/pause' + (synth ? '-synth' : '-file'), { p, T } = await newPage(browser, cfg, synth ? { query: '?nomusic=1' } : {});
   const key = async k => { await p.keyboard.press(k); };
   try {
     if (!await startGame(p, cfg, T)) return fail(p, tag, 'start', 'no start');
-    await ev(p, () => { window.__mnr.god = true; }); await sleep(1500);
-    const snap = () => ev(p, () => ({ t: __mnr.G.t, bp: __mnr.bpos(), a: __mnr.AU.a ? __mnr.AU.a.state : 'none', paused: __mnr.paused, pm: !document.getElementById('pausem').hidden, sc: __mnr.G.scroll, x: __mnr.P.x }));
+    await ev(p, () => { window.__mnr.god = true; });
+    if (synth) await sleep(1500); else if (!await waitFor(p, () => __mnr.BT.mode === 'file' && __mnr.BT.stage === 'stage1' && !__mnr.BT.pend, null, 12000)) return fail(p, tag, 'beat', 'stage1 song never became the beat clock ' + JSON.stringify(await ev(p, () => ({ ...__mnr.BT }))));
+    await sleep(800);
+    const snap = () => ev(p, () => ({ rev: __mnr.BT.rev, mode: __mnr.BT.mode, t: __mnr.G.t, bp: __mnr.bpos(), a: __mnr.AU.a ? __mnr.AU.a.state : 'none', paused: __mnr.paused, pm: !document.getElementById('pausem').hidden, sc: __mnr.G.scroll, x: __mnr.P.x }));
     for (const how of cfg.touch ? ['button'] : ['KeyP', 'Escape']) {
-      const a = await snap(); if (how === 'button') await T.tap(p, '#bPause'); else await key(how);
+      const a = await snap(); if (!synth) { const g = await ev(p, () => window.__bot.gridErr()); if (g === null || Math.abs(g) > 30) await fail(p, tag, 'beat', 'before pause the beat clock is ' + g + ' ms off the song'); }
+      if (how === 'button') await T.tap(p, '#bPause'); else await key(how);
       if (!await waitFor(p, () => __mnr.paused, null, 1500)) { await fail(p, tag, 'pause', how + ' did not pause'); continue; }
       await sleep(600); const b = await snap(), bad = await ev(p, () => window.__bot.probe().bad);
       for (const x of bad) await fail(p, tag, 'layout', 'pause menu ' + x);
@@ -240,8 +248,9 @@ async function pauseTests(browser, cfg) {
       if (how === 'button') await T.tap(p, '#resumeBtn'); else await key(how);
       if (!await waitFor(p, () => !__mnr.paused, null, 1500)) { await fail(p, tag, 'resume', how + ' did not resume'); continue; }
       await sleep(900); const d = await snap(); if (d.t - c.t < .5) await fail(p, tag, 'resume', 'game time did not advance after resume'); if (d.a !== 'running') await fail(p, tag, 'resume', 'audio not running after resume (' + d.a + ')');
-      const adv = d.bp - c.bp; if (adv < 0.3 || adv > 5) await fail(p, tag, 'resume', 'beat clock jumped by ' + adv.toFixed(2) + ' beats across pause');
+      const adv = d.bp - c.bp; if (d.rev !== c.rev) await fail(p, tag, 'resume', 'beat grid was restarted by pause/resume (rev ' + c.rev + '->' + d.rev + ')'); else if (adv < 0.3 || adv > 5) await fail(p, tag, 'resume', 'beat clock jumped by ' + adv.toFixed(2) + ' beats across pause');
       if (d.pm) await fail(p, tag, 'resume', 'pause menu still shown');
+      if (!synth) { await sleep(1500); const g = await ev(p, () => window.__bot.gridErr()); if (g === null || Math.abs(g) > 30) await fail(p, tag, 'resume', 'after resume the beat clock is ' + g + ' ms off the song'); }
     }
     // settings from pause, volume + reduced flashing, back
     if (cfg.touch) await T.tap(p, '#bPause'); else await key('KeyP'); await waitFor(p, () => __mnr.paused, null, 1500);
@@ -262,7 +271,8 @@ async function pauseTests(browser, cfg) {
     if (!await waitFor(p, () => __mnr.paused, null, 1000)) await fail(p, tag, 'tab-hide', 'hidden tab did not pause');
     await ev(p, () => { Object.defineProperty(document, 'hidden', { get: () => false, configurable: true }); document.dispatchEvent(new Event('visibilitychange')); }); await sleep(500);
     if (!(await snap()).paused) await fail(p, tag, 'tab-hide', 'game resumed by itself after tab came back'); else {
-      await press(p, cfg, T, '#resumeBtn'); await sleep(900); const r = await snap(); if (r.paused || r.a !== 'running') await fail(p, tag, 'tab-hide', 'resume after tab-hide failed ' + JSON.stringify(r)); }
+      await press(p, cfg, T, '#resumeBtn'); await sleep(900); const r = await snap(); if (r.paused || r.a !== 'running') await fail(p, tag, 'tab-hide', 'resume after tab-hide failed ' + JSON.stringify(r));
+      if (!synth) { const g = await ev(p, () => window.__bot.gridErr()); if (g === null || Math.abs(g) > 30) await fail(p, tag, 'tab-hide', 'after tab-hide the beat clock is ' + g + ' ms off the song'); } }
     await ev(p, () => window.dispatchEvent(new Event('blur'))); if (!await waitFor(p, () => __mnr.paused, null, 1000)) await fail(p, tag, 'tab-hide', 'window blur did not pause');
     await press(p, cfg, T, '#resumeBtn'); await sleep(300);
     // quit to title and launch again
@@ -333,7 +343,7 @@ async function beatTests(browser) {
     try {
       // lazy loading: the page is interactive and playing before any track is decoded
       await p.keyboard.press('Enter'); if (!await waitFor(p, () => __mnr.running, null, 3000)) { await fail(p, tag, 'start', 'no start'); continue; }
-      await ev(p, () => { window.__mnr.god = true; });
+      await ev(p, () => { window.__mnr.god = true; setInterval(() => { if (!__mnr.G.boss) __mnr.G.dt = 0; }, 400); });   // stay in this district: a boss would swap the song
       if (!await waitFor(p, () => window.__spy.starts.length > 0, null, 8000)) { await fail(p, tag, 'beat', 'test track never started; TR=' + JSON.stringify(await ev(p, () => ({ by: Object.keys(__mnr.TR.by), bad: __mnr.TR.bad, mode: __mnr.BT.mode })))); continue; }
       if (!await waitFor(p, () => __mnr.BT.mode === 'file', null, 5000)) { await fail(p, tag, 'beat', 'game never switched to the loaded file track ' + JSON.stringify(await ev(p, () => ({ ...__mnr.BT })))); continue; }
       await sleep(600);
@@ -381,8 +391,8 @@ async function beatTests(browser) {
     await p.context().close();
   }
 }
-async function synthFallbackTests(browser) {           // real tracks.json (files missing): the synth plays at each stage's tempo and everything pulses on the beat
-  const tag = 'synth', cfg = CFGS[3], { p } = await newPage(browser, cfg);
+async function synthFallbackTests(browser) {           // ?nomusic=1 (no song files): the synth plays at each stage's tempo and everything pulses on the beat
+  const tag = 'synth', cfg = CFGS[3], { p } = await newPage(browser, cfg, { query: '?nomusic=1' });
   try {
     await p.keyboard.press('Enter'); await waitFor(p, () => __mnr.running, null, 3000); await ev(p, () => { window.__mnr.god = true; });
     const exp = [[0, 'stage1', 120], [1, 'stage2', 128]]; await sleep(1200);
@@ -396,6 +406,112 @@ async function synthFallbackTests(browser) {           // real tracks.json (file
     if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
   } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
   await p.context().close();
+}
+
+// ---------------- the real songs: grid vs audio, clock vs file position, PERFECT judging, pause phase, spawn timing ----------------
+async function songTests(browser, stageName, si) {
+  const tag = 'song/' + stageName, cfg = CFGS[3], { p } = await newPage(browser, cfg);
+  try {
+    const info = await ev(p, async st => { const r = await fetch('music/tracks.json'); const j = await r.json(); return j.tracks.find(t => t.stage === st) || null; }, stageName);
+    if (!info) return;                                       // no file for this stage
+    await p.keyboard.press('Enter'); if (!await waitFor(p, () => __mnr.running, null, 3000)) return fail(p, tag, 'start', 'no start');
+    await ev(p, () => { window.__mnr.god = true; });
+    if (si > 0) await ev(p, i => window.__mnr.skipTo(i), si);
+    if (!await waitFor(p, st => __mnr.BT.mode === 'file' && __mnr.BT.stage === st && !__mnr.BT.pend, stageName, 20000)) return fail(p, tag, 'beat', 'song never became the beat clock ' + JSON.stringify(await ev(p, () => ({ ...__mnr.BT, TR: Object.keys(__mnr.TR.bufs), bad: __mnr.TR.bad }))));
+    await sleep(500);
+    const bt = await ev(p, () => ({ ...__mnr.BT })); if (bt.bpm !== info.bpm || Math.abs(bt.off * 1000 - info.offsetMs) > .5) await fail(p, tag, 'beat', 'game uses ' + bt.bpm + '/' + bt.off + ' not tracks.json ' + info.bpm + '/' + info.offsetMs);
+    // 1) onsets in the decoded audio vs the grid: best offset within +-40 ms of tracks.json, and the grid beats are the strong ones
+    const on = await ev(p, () => {
+      const m = window.__mnr, buf = m.TR.bufs[m.TR.by[m.BT.stage].file], sr = buf.sampleRate, ch = buf.getChannelData(0), HOP = Math.round(sr * .005), n = Math.floor(Math.min(buf.length, sr * 30) / HOP);
+      let a = 0, b = 0, prev = 0; const e = [];
+      for (let i = 0; i < n; i++) { let s = 0; for (let k = 0; k < HOP; k++) { const v = ch[i * HOP + k]; a += .3 * (v - a); b += .01 * (a - b); const h = a - b; s += h * h; } const r = Math.sqrt(s / HOP); e.push(Math.max(0, r - prev)); prev = r; }
+      const mean = e.reduce((x, y) => x + y, 0) / e.length, o = e.map(v => Math.max(0, v - mean)), spb = m.BT.spb / (HOP / sr);
+      const score = off => { let s = 0, c = 0; for (let k = 0; ; k++) { const i = Math.round(off / (HOP / sr) + k * spb); if (i >= o.length - 2) break; s += Math.max(o[i - 1] || 0, o[i], o[i + 1]); c++; } return s / c; };
+      const base = m.BT.off; let best = base, bs = -1; for (let d = -.12; d <= .12; d += .002) { const s = score(base + d); if (s > bs) { bs = s; best = base + d; } }
+      return { best: (best - base) * 1000, atGrid: score(base), best_s: bs, offBeat: score(base + m.BT.spb / 2) };
+    });
+    console.log(`  ${tag}: ${bt.bpm} bpm, onset-best offset ${on.best.toFixed(0)} ms from the game grid, grid strength ${on.atGrid.toFixed(4)} vs off-beat ${on.offBeat.toFixed(4)}`);
+    if (Math.abs(on.best) > 40) await fail(p, tag, 'grid', `audio onsets sit ${on.best.toFixed(0)} ms from the game's beat grid (tempo/offset in tracks.json is off)`);
+    // 2) beat clock vs the file position over 20 s
+    let worst = 0, over = 0; const stay = () => ev(p, () => { __mnr.G.dt = 0; __mnr.G.boss = null; });   // keep the test inside this district (a boss would switch to synth)
+    await ev(p, () => { __mnr.G.dt = 0; __mnr.G.spawnB.length = 0; });
+    for (let k = 0; k < 10; k++) { await sleep(2000); const g = await ev(p, () => window.__bot.gridErr()); if (g === null) { await fail(p, tag, 'beat', 'left file mode during the 20 s'); break; } const ab = Math.abs(g); worst = Math.max(worst, ab); if (ab > 30) over++; }
+    const sb = await ev(p, () => ({ b: window.__mnr.G.spawnB.slice(), spb: window.__mnr.BT.spb })); await stay();
+    console.log(`  ${tag}: beat clock vs file position over 20 s: worst ${worst.toFixed(1)} ms`);
+    if (worst > 45 || over > 1) await fail(p, tag, 'beat', 'beat clock drifts ' + worst.toFixed(1) + ' ms from the file position');
+    // 3) PERFECT on the beat, not 200 ms off; and after pause/resume
+    const sp = await ev(p, () => ({ ...window.__spy.starts[window.__spy.starts.length - 1] })), spb = 60 / info.bpm, grid0 = sp.when + info.offsetMs / 1000;
+    const sample = async (code, kind, delta) => {
+      const r = await ev(p, async ([code, delta, grid0, kind, spb]) => {
+        const m = window.__mnr, a = m.AU.a, lat = a.outputLatency || 0, nowT = a.currentTime - lat, k = Math.ceil((nowT - grid0) / spb) + 2, target = grid0 + k * spb + delta / 1000;
+        if (kind === 'dash') { m.P.dashCd = 0; m.P.dashT = 0; }
+        await new Promise(res => { const iv = setInterval(() => { if (a.currentTime - lat >= target) { clearInterval(iv); res(); } }, 1); });
+        const lag = (a.currentTime - lat - target) * 1000;
+        window.dispatchEvent(new KeyboardEvent('keydown', { code, bubbles: true })); window.dispatchEvent(new KeyboardEvent('keyup', { code, bubbles: true }));
+        await new Promise(res => setTimeout(res, 120)); return { J: m.J.last, lag };
+      }, [code, delta, grid0, kind, spb]);
+      await sleep(1000); const j = r.J, expected = delta + r.lag; if (!j || j.kind !== kind) return 'not judged ' + JSON.stringify(j);
+      if (Math.abs(j.dt - expected) > 25) return `pressed ${expected.toFixed(0)} ms from the true beat, game measured ${j.dt} ms`;
+      if (Math.abs(Math.abs(expected) - 80) > 15 && j.ok !== (Math.abs(expected) <= 80)) return `${expected.toFixed(0)} ms from the beat gave ok=${j.ok}`; return '';
+    };
+    const judge = async label => { for (const [code, kind] of [['ShiftLeft', 'dash'], ['KeyJ', 'fire']]) for (const delta of [0, 200]) { let bad = await sample(code, kind, delta); if (bad) bad = await sample(code, kind, delta); stats.judged = (stats.judged || 0) + 1; if (bad) await fail(p, tag, 'beat-judge', label + ' ' + kind + ' ' + delta + ': ' + bad); } };
+    await stay(); await judge('playing');
+    await p.keyboard.press('KeyP'); await waitFor(p, () => __mnr.paused, null, 1500); await sleep(1500); await p.keyboard.press('KeyP'); await waitFor(p, () => !__mnr.paused, null, 1500); await sleep(1800);   // the output-clock smoothing needs ~1.5 s of history after a resume
+    await stay(); const gp = await ev(p, () => window.__bot.gridErr()); if (gp === null || Math.abs(gp) > 30) await fail(p, tag, 'resume', 'after pause/resume the beat clock is ' + gp + ' ms off the song');
+    await stay(); await judge('after pause');
+    // 4) spawn times (collected during the 20 s above) land on the beat (+-1 frame)
+    const offs = sb.b.map(x => Math.abs(x - Math.round(x)) * sb.spb * 1000);
+    console.log(`  ${tag}: ${offs.length} enemies spawned, worst distance from a beat ${offs.length ? Math.max(...offs).toFixed(0) : '-'} ms`);
+    if (offs.some(o => o > 45)) await fail(p, tag, 'spawn', 'an enemy spawned ' + Math.max(...offs).toFixed(0) + ' ms from a beat');
+    if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
+  } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
+  await p.context().close();
+}
+// ---------------- iOS audio: context starts suspended, only a touchend/click gesture may resume it ----------------
+const IOS_INIT = () => {
+  const AC = window.AudioContext; let gest = false; const E = window.__emu = { ctxs: 0, resumeBlocked: 0, resumeOk: 0, silentStarts: 0, edges: new Map(), oscs: 0 };
+  for (const t of ['touchend', 'click', 'keydown']) addEventListener(t, () => { gest = true; setTimeout(() => { gest = false; }, 0); }, true);   // iOS only honours these as unlocking gestures
+  window.AudioContext = class extends AC { constructor() { super(); E.ctxs++; try { super.suspend(); } catch (e) { } } resume() { if (!gest) { E.resumeBlocked++; return new Promise(() => { }); } E.resumeOk++; return super.resume(); } };
+  const oc = AudioNode.prototype.connect; AudioNode.prototype.connect = function (d) { if (!E.edges.has(this)) E.edges.set(this, []); E.edges.get(this).push(d); return oc.apply(this, arguments); };
+  const os = AudioBufferSourceNode.prototype.start; AudioBufferSourceNode.prototype.start = function () { if (gest && this.buffer && this.buffer.length <= 2) E.silentStarts++; return os.apply(this, arguments); };
+  const co = AudioContext.prototype.createOscillator; AudioContext.prototype.createOscillator = function () { E.oscs++; return co.apply(this, arguments); };
+  Object.defineProperty(navigator, 'audioSession', { value: { type: 'auto' }, configurable: true });
+};
+async function iosTests(browser) {
+  const tag = 'ios-audio', cfg = CFGS[0], { p, T } = await newPage(browser, cfg, { init: IOS_INIT });
+  try {
+    await sleep(300); const s0 = await ev(p, () => ({ a: __mnr.AU.a ? __mnr.AU.a.state : 'none', as: navigator.audioSession.type }));
+    if (s0.as !== 'playback') await fail(p, tag, 'ios', 'navigator.audioSession.type is ' + s0.as + ' (the silent switch would mute the game)');
+    await T.tap(p, '#startBtn');
+    if (!await waitFor(p, () => __mnr.AU.a && __mnr.AU.a.state === 'running', null, 2000)) await fail(p, tag, 'ios', 'audio context is not running after the first tap: ' + JSON.stringify(await ev(p, () => ({ st: __mnr.AU.a && __mnr.AU.a.state, ...window.__emu, edges: 0 }))));
+    const e1 = await ev(p, () => ({ ok: window.__emu.resumeOk, blocked: window.__emu.resumeBlocked, sil: window.__emu.silentStarts }));
+    if (e1.ok < 1) await fail(p, tag, 'ios', 'resume() was never called inside the gesture'); if (e1.sil < 1) await fail(p, tag, 'ios', 'no silent buffer started inside the gesture');
+    await sleep(1200);
+    const g = await ev(p, () => {                          // every audio source reaches the speakers
+      const E = window.__emu, A = __mnr.AU, dest = A.a.destination, reach = (n, seen = new Set()) => { if (n === dest) return true; if (seen.has(n)) return false; seen.add(n); return (E.edges.get(n) || []).some(d => reach(d, seen)); };
+      return { mus: reach(A.mus), fb: reach(A.fb), fx: reach(A.fx), oscs: E.oscs, state: A.a.state };
+    });
+    if (!g.mus || !g.fb || !g.fx) await fail(p, tag, 'ios', 'audio bus not connected to the destination ' + JSON.stringify(g)); if (g.oscs < 3) await fail(p, tag, 'ios', 'synth/effects produced no audio nodes after the tap');
+    // iOS interrupts the context (call, tab switch): not resumable without a gesture, resumes on the next tap
+    await ev(p, () => { window.__emu.resumeBlocked = 0; return __mnr.AU.a.suspend(); }); await sleep(800);
+    const mid = await ev(p, () => ({ st: __mnr.AU.a.state, paused: __mnr.paused })); if (mid.st === 'running') await fail(p, tag, 'ios', 'could not interrupt the emulated context');
+    if (!mid.paused) { const [cx, cy] = [cfg.w / 2, cfg.h / 2]; await T.tapAt(cx, cy); if (!await waitFor(p, () => __mnr.AU.a.state === 'running', null, 1500)) await fail(p, tag, 'ios', 'a later tap did not bring the audio back after an interruption'); }
+    if (p.errs.length) await fail(p, tag, 'page-error', p.errs[0]);
+  } catch (err) { await fail(p, tag, 'script', err.message.split('\n')[0]); }
+  await p.context().close();
+}
+async function webkitTests() {
+  const tag = 'webkit-audio'; let wk; try { wk = await PW.webkit.launch(); } catch (e) { console.log('  webkit not available, skipped (' + String(e.message).split('\n')[0] + ')'); return; }
+  try {
+    const ctx = await wk.newContext({ viewport: { width: 390, height: 763 }, hasTouch: true, isMobile: true }), p = await ctx.newPage(), errs = []; p.on('pageerror', e => errs.push(e.message));
+    await p.route(/fonts\.(googleapis|gstatic)\.com/, r => r.abort()); await p.goto(URL_BASE + 'index.html'); await p.waitForFunction(() => window.__mnr, null, { timeout: 15000 });
+    await p.tap('#startBtn'); await sleep(1500);
+    const r = await p.evaluate(() => ({ run: __mnr.running, st: __mnr.AU.a ? __mnr.AU.a.state : 'none', mode: __mnr.BT.mode, bufs: Object.keys(__mnr.TR.bufs).length, bad: Object.keys(__mnr.TR.bad).length }));
+    console.log('  webkit: ' + JSON.stringify(r));
+    if (!r.run) await fail(null, tag, 'webkit', 'game did not start'); else if (r.st !== 'running') await fail(null, tag, 'webkit', 'audio context state ' + r.st + ' after the first tap');
+    if (errs.length) await fail(null, tag, 'webkit', 'page error ' + errs[0]);
+  } catch (err) { await fail(null, tag, 'script', err.message.split('\n')[0]); }
+  await wk.close();
 }
 async function shots(browser) {                          // portrait screenshots mid-run and on a boss
   const cfg = CFGS[0], { p } = await newPage(browser, cfg); const T = new Touch(await p.context().newCDPSession(p));
@@ -417,13 +533,16 @@ async function shots(browser) {                          // portrait screenshots
     if (want('runs')) { const kinds = ['', 'late', '', 'boss', '', 'reduce', 'daily', '', 'bossN', '', 'late']; for (let i = 0; i < RUNS; i++) { const cfg = CFGS[i % 4]; jobs.push(() => playRun(browser, cfg, i, kinds[i % kinds.length])); } }
     const pre = [];
     if (want('input')) for (const c of CFGS) pre.push(() => inputTests(browser, c));
-    if (want('pause')) for (const c of [CFGS[0], CFGS[3]]) pre.push(() => pauseTests(browser, c));
+    if (want('pause')) for (const c of [CFGS[0], CFGS[3]]) for (const sy of [false, true]) pre.push(() => pauseTests(browser, c, sy));
     if (want('rotate')) for (const c of CFGS) pre.push(() => rotationTest(browser, c));
     if (want('title')) for (const c of CFGS) pre.push(() => titleTests(browser, c));
     if (want('beat')) pre.push(() => beatTests(browser));
     if (want('synth')) pre.push(() => synthFallbackTests(browser));
+    if (want('songs')) ['stage1', 'stage2', 'stage3'].forEach((st, i) => pre.push(() => songTests(browser, st, i)));
+    if (want('ios')) pre.push(() => iosTests(browser));
     const all = pre.concat(jobs); let next = 0;
     await Promise.all(Array.from({ length: PAR }, async () => { while (next < all.length) { const j = all[next++]; await j(); } }));
+    if (want('webkit')) await webkitTests();
     if (want('shots') && (process.env.SHOTS || ONLY.includes('shots'))) await shots(browser);
     // FPS: a dedicated page alone on the machine
     if (want('fps')) { const cfg = CFGS[0], { p, T } = await newPage(browser, cfg); await T.tap(p, '#startBtn'); await ev(p, () => { window.__mnr.god = true; }); await T.down(1, cfg.w / 2, cfg.h / 2); for (let k = 0; k < 40; k++) { await T.move(1, cfg.w / 2 + 60 * Math.sin(k / 3), cfg.h / 2 + 80 * Math.cos(k / 5)); await sleep(250); } await T.up(1);
