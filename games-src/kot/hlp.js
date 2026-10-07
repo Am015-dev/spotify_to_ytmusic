@@ -119,7 +119,7 @@ function hlpSuggest(){
     return {target:()=>HLP_Q('#pacts [data-act="end"]'),why:p.en<3?'Nothing to buy yet. Save your ⚡.':'Nothing here is worth it. Save your ⚡.'}}
   return null}
 {
-  GXH.init({game:'crown-city-smash',defaultOn:true,steps:HLP_STEPS,rules:HLP_ALL,avoid:'.sugg,.rec,#pacts .btn.primary,#choice .btn.primary,#pshop .ptile.ok'});
+  GXH.init({game:'crown-city-smash',defaultOn:true,steps:HLP_STEPS,rules:HLP_ALL,avoid:'.sugg,.rec,#pacts .btn,#choice .btn.primary,#pshop .ptile,#dice .die,.pchip,.gx-bar button'});
   GXH.bulb({el:'#bulbbtn',suggest:hlpSuggest,rulesFor:hlpPhase});
   const set=document.getElementById('gxhset');if(set)set.innerHTML=GXH.settingsHTML({rowClass:'mrow',btnClass:'btn'});
   const _pr=phRender;phRender=function(){const r=_pr.apply(this,arguments);try{if(G)GXH.phase(GX&&GX.open?null:hlpPhase())}catch(e){console.error(e)}return r};
