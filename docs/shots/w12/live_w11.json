@@ -1,0 +1,342 @@
+{
+ "url": "http://127.0.0.1:8766/local_dbg.html",
+ "errs": [],
+ "side": [
+  {
+   "where": "city",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/a7ce5b46-16c3-5584-aa56-194f53363e29/scratchpad/base/side_city.jpg",
+   "closeup": "/tmp/claude-0/-home-user-spotify-to-ytmusic/a7ce5b46-16c3-5584-aa56-194f53363e29/scratchpad/base/tyre_city.jpg",
+   "playerTyres": {
+    "tyres": [
+     {
+      "x": 2152.72,
+      "z": -41.53,
+      "r": 0.31,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.039,
+      "hd": [
+       [
+        "Mesh",
+        -0.039,
+        6696,
+        "ffffff",
+        "tex",
+        [
+         1150,
+         20.9,
+         688
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.145,
+        2311,
+        "ffffff",
+        "tex",
+        [
+         400,
+         13,
+         600
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": 2151.44,
+      "z": -41.53,
+      "r": 0.31,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.041,
+      "hd": [
+       [
+        "Mesh",
+        -0.041,
+        6696,
+        "ffffff",
+        "tex",
+        [
+         1150,
+         20.9,
+         688
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.143,
+        2311,
+        "ffffff",
+        "tex",
+        [
+         400,
+         13,
+         600
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": 2152.91,
+      "z": -43.97,
+      "r": 0.367,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.039,
+      "hd": [
+       [
+        "Mesh",
+        -0.039,
+        6696,
+        "ffffff",
+        "tex",
+        [
+         1150,
+         20.9,
+         688
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.146,
+        2311,
+        "ffffff",
+        "tex",
+        [
+         400,
+         13,
+         600
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": 2151.25,
+      "z": -43.97,
+      "r": 0.367,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.027,
+      "hd": [
+       [
+        "Mesh",
+        -0.027,
+        6696,
+        "ffffff",
+        "tex",
+        [
+         1150,
+         20.9,
+         688
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.145,
+        2311,
+        "ffffff",
+        "tex",
+        [
+         400,
+         13,
+         600
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     }
+    ],
+    "carY": 7.466,
+    "gndCar": 0
+   },
+   "trafficWheelGap": 0.04
+  },
+  {
+   "where": "autobahn",
+   "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/a7ce5b46-16c3-5584-aa56-194f53363e29/scratchpad/base/side_autobahn.jpg",
+   "closeup": "/tmp/claude-0/-home-user-spotify-to-ytmusic/a7ce5b46-16c3-5584-aa56-194f53363e29/scratchpad/base/tyre_autobahn.jpg",
+   "playerTyres": {
+    "tyres": [
+     {
+      "x": -7061.25,
+      "z": 2859.58,
+      "r": 0.31,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.37,
+      "hd": [
+       [
+        "Mesh",
+        -0.37,
+        1218,
+        "ffffff",
+        "tex",
+        [
+         800.2,
+         8.7,
+         49.4
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.119,
+        1585,
+        "ffffff",
+        "tex",
+        [
+         1000,
+         20.1,
+         1000
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": -7061.22,
+      "z": 2858.3,
+      "r": 0.31,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.37,
+      "hd": [
+       [
+        "Mesh",
+        -0.37,
+        1218,
+        "ffffff",
+        "tex",
+        [
+         800.2,
+         8.7,
+         49.4
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.109,
+        1585,
+        "ffffff",
+        "tex",
+        [
+         1000,
+         20.1,
+         1000
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": -7058.81,
+      "z": 2859.82,
+      "r": 0.367,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.37,
+      "hd": [
+       [
+        "Mesh",
+        -0.37,
+        1218,
+        "ffffff",
+        "tex",
+        [
+         800.2,
+         8.7,
+         49.4
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.117,
+        1585,
+        "ffffff",
+        "tex",
+        [
+         1000,
+         20.1,
+         1000
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     },
+     {
+      "x": -7058.77,
+      "z": 2858.17,
+      "r": 0.367,
+      "gap_gnd": 0.03,
+      "gap_mesh": -0.37,
+      "hd": [
+       [
+        "Mesh",
+        -0.37,
+        1218,
+        "ffffff",
+        "tex",
+        [
+         800.2,
+         8.7,
+         49.4
+        ],
+        "Group",
+        0,
+        ""
+       ],
+       [
+        "Mesh",
+        0.104,
+        1585,
+        "ffffff",
+        "tex",
+        [
+         1000,
+         20.1,
+         1000
+        ],
+        "Group",
+        0,
+        "trG"
+       ]
+      ]
+     }
+    ],
+    "carY": 22.186,
+    "gndCar": 0
+   },
+   "trafficWheelGap": 0.04
+  }
+ ]
+}

@@ -1,0 +1,22 @@
+FAIL phone ath: no collider on the paved road (invisible walls / oversize hulls) · {"pts":1728,"start":0,"end":1,"ex":[{"x":4553,"z":-3542,"bx":4577.5,"bz":-3492.7,"hw":55,"hd":7,"h":35.397438366848704,"keys":"ry","t":null}]}
+FAIL phone ath: no loading screens while driving · {"loads":2}
+FAIL phone ath: stuck ≤ 3 % · {"stuckPct":7}
+FAIL phone ath: the page never reloads while playing · {"reloads":1,"events":["RELOAD@6636"]}
+FAIL phone ath: wall/building hits ≤ 1/min · {"wallPerMin":4.75,"bigDrop":5,"hits":13}
+FAIL phone fra: stuck ≤ 3 % · {"stuckPct":8.7}
+FAIL phone: after 3 rotations every touch control answers, nothing latched · {"steps":[],"ctl":{"◀":"ok","▶":"ok","GAS":"ok","BRAKE":"ok","BOOST":"ok","DRIFT":"hidden"},"stuck":[],"vp":[852,393,424,196]}
+PASS phone ath: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone ath: monitor ran · null
+PASS phone ath: no HUD element over a touch control · []
+PASS phone ath: no HUD text under 12 px · []
+PASS phone ath: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.77,"carL":4.45,"carH":1.33,"player":{"h":1.89,"l":4.7,"w":2.42},"pedRel":0.99,"pedVsPlayer":0.94,"nPed":8,"nCar":8}
+PASS phone fra: chase camera inside a building ≤ 2 % of frames · {"camInsidePct":0,"ex":[]}
+PASS phone fra: monitor ran · null
+PASS phone fra: no HUD element over a touch control · []
+PASS phone fra: no HUD text under 12 px · []
+PASS phone fra: no collider on the paved road (invisible walls / oversize hulls) · {"pts":1950,"start":0,"end":0,"ex":[]}
+PASS phone fra: pedestrians ≤ 1.2× adult scale vs cars · {"pedH":1.77,"carL":5.58,"carH":1.59,"player":{"h":2.1,"l":4.48,"w":1.99},"pedRel":0.79,"pedVsPlayer":0.99,"nPed":8,"nCar":8}
+PASS phone fra: the page never reloads while playing · {"reloads":0,"events":[]}
+PASS phone fra: wall/building hits ≤ 1/min · {"wallPerMin":0,"bigDrop":5,"hits":9}
+PASS phone: zero console / page errors · []
+TPLAY_FAST FAIL 7 · 372 s · qa_w13/fix5/*.log

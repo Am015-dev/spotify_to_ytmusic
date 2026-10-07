@@ -339,3 +339,111 @@ function ART9_cabMat(){if(ART9.cab)return ART9.cab;const m=CR_CM.clone();m.onBef
  '#include <color_vertex>\n#if defined(USE_COLOR) && defined(USE_INSTANCING_COLOR)\n{float lo=min(color.r,min(color.g,color.b)),hi=max(color.r,max(color.g,color.b));\n if(instanceColor.r*instanceColor.g*instanceColor.b>1e-6&&(lo<.99||hi>1.01))vColor.xyz/=instanceColor.xyz;}\n#endif')};
  m.customProgramCacheKey=()=>'art9cab';return ART9.cab=m}
 /*ART</art9.js>*/
+// ---- GP: garage PAINT tab recolours the real LEGO bricks (v87g). Root cause of "paint does not work": BODY/ACCENT/TRIM only set the
+// old ship colours d.a/b/c, but the LEGO car is drawn from per-brick colours (d.bricks[].c) and the set's 4×4/boat bricks, so nothing changed.
+// Roles: a = most-used colour, b = 2nd, c = 3rd (frame black #1b2a34 always ranks last; wheels never change). Street bricks are tagged once
+// (b.pr) and painted in place (saved in mho_build); 4×4 + boat get the same choice per set from mho_gar.pa[set] through GAR_apply.
+const GP_K='#1b2a34';
+function GP_rank(B){const n={};for(const b of B||[]){if(CR_WH[b.t]||b.t==='drvL'||b.t==='drvR'||b.t==='drvLR')continue;const c=String(GB_BC[b.c]||b.c).toLowerCase();n[c]=(n[c]||0)+1}
+ const o=Object.keys(n).filter(c=>c!==GP_K).sort((x,y)=>n[y]-n[x]);if(n[GP_K])o.push(GP_K);return o}
+const GP_pa=id=>(GAR_get().pa||{})[id||GAR_get().sel]||{};
+function GP_save(k,v){const G=GAR_get();G.pa=G.pa||{};const p=G.pa[G.sel]=G.pa[G.sel]||{};if(v==null)delete G.pa[G.sel];else p[k]=v;GAR_put(G);for(const key in CR_VC)if(key.startsWith('gar|'))delete CR_VC[key]}
+// street car: tag roles on first paint, then recolour the tagged bricks
+function GP_paintStreet(k,v){const B=GB.d&&GB.d.bricks;if(!B||!B.length)return 0;if(!B.some(b=>b.pr)){const r=GP_rank(B);for(const b of B){if(CR_WH[b.t])continue;const i=r.indexOf(String(GB_BC[b.c]||b.c).toLowerCase());if(i>=0&&i<3)b.pr='abc'[i]}}
+ let n=0;for(const b of B)if(b.pr===k){b.c=v;n++}return n}
+// 4×4 + boat: map the form's own colour ranking onto the set's paint
+GAR_apply=(f=>function(B,u,form){const r=form==='car'?null:GP_rank(B),A=f(B,u,form),p=GP_pa();if(!r||!(p.a||p.b||p.c))return A;
+ const m={};r.slice(0,3).forEach((c,i)=>{const v=p['abc'[i]];if(v)m[c]=v});return A.map(b=>{if(CR_WH[b.t])return b;const c=m[String(GB_BC[b.c]||b.c).toLowerCase()];return c?Object.assign({},b,{c}):b})})(GAR_apply);
+{const B=$('#gbBody');B.addEventListener('click',e=>{const b=e.target.closest('button[data-k]');if(!b||b.disabled||GB.tab!=='paint')return;const k=b.dataset.k;if(!'abc'.includes(k)||k.length!==1)return;GP_paintStreet(k,b.dataset.v);GP_save(k,b.dataset.v)},true)}
+// swatch highlight follows the set's saved paint; one hint line on top of the PAINT tab
+gbRender=(f=>function(){if(GB.tab==='paint'&&GB.d){const p=GP_pa();for(const k of'abc')if(p[k])GB.d[k]=p[k]}f();if(GB.tab!=='paint')return;const B=$('#gbBody'),i=document.createElement('div');i.className='gbInfo';i.textContent='Paints your car, off-road and boat';B.insertBefore(i,B.firstChild)})(gbRender);
+// STOCK LOOK also clears the set's paint
+$('#gbStock').addEventListener('click',()=>GP_save('a',null),true);
+window.__gp={rank:GP_rank,pa:GP_pa,build:()=>{const d=store.get('mho_build',null);return d&&d.bricks?GP_rank(d.bricks):null}};
+// ---- GPK: 2K-style vehicle groups + perks in the garage RIDES tab (slice 2). Rarity uses the 2K names (Neat · Cool · Awesome · Super Awesome);
+// every set card shows its group; a PERKS row shows driver level, class C/B/A and the 1–3 slots (same rules + store as the pause card: mho_perks).
+// Two 2K-style trade-off perks (race only, like Kaiser's Crown): Tank Mode and Glass Cannon.
+GAR_TIER.c[0]='NEAT';GAR_TIER.r[0]='COOL';GAR_TIER.e[0]='AWESOME';GAR_TIER.l[0]='SUPER AWESOME';
+const GPK_GRP={rod:'Hot rod',ebbel:'Street racer',posei:'Speed Champion',gold:'Hypercar'};
+PERKS.push({id:'tank',icon:'🚜',name:'Tank Mode',d:'+30% health, −3% top speed',lvl:3},{id:'glass',icon:'💎',name:'Glass Cannon',d:'+4% top speed, −20% health',lvl:14});
+setupRace=(f=>function(cfg){const r=f.apply(this,arguments);try{if(pl&&pl.stats){const s=pl.stats;if(PK.has('tank')){s.hull*=1.3;s.top*=.97;s.top0*=.97}if(PK.has('glass')){s.hull*=.8;s.top*=1.04;s.top0*=1.04}}}catch(e){}return r})(setupRace);
+const GPK_={pk:null};
+const GPK_cls=L=>L>=20?'A':L>=10?'B':'C';
+function GPK_eq(slot,id){let e=perkEq0().filter(x=>x!==id);if(slot<e.length)e.splice(slot,1,id);else e.push(id);store.set('mho_perks',e.slice(0,perkSlots()))}
+function GPK_html(){const L=carStat().lvl,n=perkSlots(),e=perkEq0(),P=id=>PERKS.find(p=>p.id===id)||{};
+ let h=`<h5>PERKS · DRIVER LEVEL ${L} · CLASS ${GPK_cls(L)} · ${n}/3 SLOTS</h5><div class="gbRow">`;
+ for(let i=0;i<3;i++){const p=e[i]&&P(e[i]);h+=i<n?`<button class="gbP gpkS ${GPK_.pk===i?'on':''}" data-gslot="${i}"><b>${p?p.icon+' '+p.name:'＋ EMPTY SLOT'}</b><small>${p?p.d:'tap to pick a perk'}</small></button>`:`<button class="gbP gpkS" disabled><b>🔒 SLOT ${i+1}</b><small>driver level ${i===1?8:16}</small></button>`}
+ h+='</div>';if(GPK_.pk!=null&&GPK_.pk<n){h+=`<div class="gbRow">`;for(const p of[...PERKS].sort((a,b)=>perkUnlocked(b)-perkUnlocked(a))){const ok=perkUnlocked(p),on=e.includes(p.id);h+=`<button class="gbP ${on?'on':''}" ${ok?'':'disabled'} data-gpk="${p.id}"><b>${ok?'':'🔒 '}${p.icon} ${p.name}</b><small>${ok?p.d:perkReq(p)}</small></button>`}h+='</div>'}return h}
+GAR_tab=(f=>function(){f();const B=$('#gbBody');
+ B.querySelectorAll('[data-gset]').forEach(b=>{const s=b.querySelector('small'),g=GPK_GRP[b.dataset.gset];if(s&&g)s.textContent=g+' · '+s.textContent});
+ const d=document.createElement('div');d.className='gpkTop';d.innerHTML=GPK_html();const inf=B.querySelector('.gbInfo');if(inf)inf.after(d);else B.prepend(d);
+ const re=()=>{const sc=B.scrollTop;gbRender();$('#gbBody').scrollTop=sc};
+ d.querySelectorAll('[data-gslot]').forEach(b=>b.onclick=()=>{const i=+b.dataset.gslot;GPK_.pk=GPK_.pk===i?null:i;try{AU.sfx('pick')}catch(e){}re();const l=$('#gbBody [data-gpk]');if(l)l.parentNode.scrollIntoView({block:'nearest'})});
+ d.querySelectorAll('[data-gpk]').forEach(b=>b.onclick=()=>{const id=b.dataset.gpk;if(perkEq0().includes(id))store.set('mho_perks',perkEq0().filter(x=>x!==id));else GPK_eq(GPK_.pk,id);GPK_.pk=null;try{AU.sfx('brick')}catch(e){}re();const l=$('#gbBody [data-gslot]');if(l)l.parentNode.scrollIntoView({block:'nearest'})})})(GAR_tab);
+{const st=document.createElement('style');st.textContent='#gbx .garSet em{font-size:12px!important;letter-spacing:.04em!important}#gbx .gpkS{min-width:150px}#gbx .gpkTop .gpkS small{display:none}#gbx .gpkTop .gpkS{min-height:44px;min-width:0;flex:1 1 0}#gbx .gbP small,#gbx h5,#gbx .gbHint{font-size:12px!important}#gbx h5{letter-spacing:.06em!important}#gbStats div{font-size:12px!important;letter-spacing:.02em!important;grid-template-columns:84px 1fr 66px!important}';document.head.appendChild(st)}
+window.__gpk={html:GPK_html,eq:GPK_eq,cls:GPK_cls};
+// ---- GPF: 2K-style driver PROFILE (slice 3). Extends the pause-menu profile (71 profileOpen): driver portrait, VEHICLES collection with
+// Neat…Super Awesome rarity, owned/locked and upgrade pips, perk slots with what unlocks next, and a COLLECTION grid. Also opens from the title menu.
+function GPF_veh(){const G=GAR_get();return GAR_SETS.map(S=>{const own=GAR_owned(S),[tn,tc]=GAR_TIER[S.tier],u=GAR_ups(S.id),lv=GAR_UP.reduce((a,[k])=>a+u[k],0);
+ return`<div class="gpfV ${own?'':'lk'}" style="--tc:${tc}"><em>${tn}</em><b>${own?'':'🔒 '}${S.n}</b><small>${(typeof GPK_GRP!=='undefined'&&GPK_GRP[S.id])||''}${S.id===G.sel?' · driving':''}</small><small>${own?'Upgrades '+'●'.repeat(Math.ceil(lv/4))+'○'.repeat(3-Math.ceil(lv/4))+' '+lv+'/12':gbReqTxt(S.req)}</small></div>`}).join('')}
+function GPF_col(){const nOwn=GAR_SETS.filter(GAR_owned).length,lv=GB_PATS.filter(([id,,r])=>gbReq(r,'pat_'+id)).length,hn=GB_HORNS.filter(([id,,r])=>gbReq(r,'horn_'+id)).length,
+ parts=Object.values(GB_PARTS).reduce((a,l)=>a+l.length,0),pOwn=Object.values(GB_PARTS).reduce((a,l)=>a+l.filter(([id,,r])=>gbReq(r,id)).length,0),pk=store.get('mho_packs',[]).length,pu=PERKS.filter(perkUnlocked).length;
+ const t=(i,n,v,m)=>`<div class="gpfC"><i>${i}</i><b>${v}/${m}</b><small>${n}</small></div>`;
+ return t('🚗','vehicles',nOwn,GAR_SETS.length)+t('🧑','drivers',GAR_PRE.length,GAR_PRE.length)+t('⭐','perks',pu,PERKS.length)+t('🎨','liveries',lv,GB_PATS.length)+t('📯','horns',hn,GB_HORNS.length)+t('🔧','parts',pOwn,parts)+t('📦','brick packs',pk,12)}
+function GPF_perks(){const L=carStat().lvl,n=perkSlots(),e=perkEq0(),nx=PERKS.filter(p=>p.lvl&&p.lvl>L).sort((a,b)=>a.lvl-b.lvl)[0];
+ return`<h5>PERKS · CLASS ${drvClass()} · ${n}/3 SLOTS</h5><div class="pperks">${[0,1,2].map(i=>{const p=e[i]&&PERKS.find(q=>q.id===e[i]);return i<n?(p?`<span><i>${p.icon}</i>${p.name}</span>`:'<span class="gpfE">＋ empty</span>'):`<span class="gpfE">🔒 level ${i===1?8:16}</span>`}).join('')}</div><small>${nx?`Next: ${nx.icon} ${nx.name} at level ${nx.lvl}. `:''}Equip perks in the garage (RIDES tab).</small>`}
+profileOpen=(f=>function(){f();const B=$('#pfBody');if(!B)return;
+ const d=B.querySelector('.pcard.drv');if(d&&!d.querySelector('.gpfFig')){const im=document.createElement('img');im.className='gpfFig';im.src=GB_portrait();d.insertBefore(im,d.firstChild)}
+ for(const c of B.querySelectorAll('.pcard')){const h=(c.querySelector('h5')||{}).textContent||'';
+  if(h.startsWith('CAR ·'))c.innerHTML=`<h5>VEHICLES · ${GAR_SETS.filter(GAR_owned).length}/${GAR_SETS.length} OWNED</h5><div class="gpfVs">${GPF_veh()}</div><small class="pnote">Buy, drive and upgrade them in the garage (RIDES).</small>`;
+  else if(h.startsWith('PERKS'))c.innerHTML=GPF_perks();
+  else if(h.startsWith('COLLECTION'))c.innerHTML=`<h5>COLLECTION</h5><div class="gpfCs">${GPF_col()}</div>`}
+ // phone fold: the PERKS card (slots + Next unlock) goes to the top of its column, above VEHICLES
+ const pc=[...B.querySelectorAll('.pcard')].find(c=>((c.querySelector('h5')||{}).textContent||'').startsWith('PERKS')),vc=[...B.querySelectorAll('.pcard')].find(c=>((c.querySelector('h5')||{}).textContent||'').startsWith('VEHICLES'));
+ if(pc&&vc&&vc.parentNode&&pc.compareDocumentPosition(vc)&Node.DOCUMENT_POSITION_PRECEDING)vc.parentNode.insertBefore(pc,vc)
+ const P=$('#profile');if(state!=='roam'){P.classList.add('gpfMenu')}else P.classList.remove('gpfMenu')})(profileOpen);
+{const P=$('#profile');document.body.appendChild(P);
+ const st=document.createElement('style');st.textContent=`#profile{position:fixed!important;z-index:40!important}.gpfFig{width:64px;height:64px;border-radius:12px;border:3px solid #141413;background:#cfe8ff;flex:none}
+.gpfVs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.gpfV{border:3px solid var(--tc);border-radius:10px;padding:4px 8px;background:#f6f4ff}.gpfV.lk{opacity:.6}
+.gpfV em{display:block;font:900 12px system-ui;font-style:normal;color:var(--tc);letter-spacing:.04em}.gpfV b{display:block;font:900 13px system-ui}
+.gpfCs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.gpfC{text-align:center;border:2px solid #141413;border-radius:10px;padding:4px 2px;background:#fff7d1}.gpfC i{font-style:normal;font-size:18px;display:block}.gpfC b{display:block;font:900 14px system-ui}
+.gpfE{opacity:.6}#profile .pstats small,#profile .lvl small{font-size:12px!important}`;document.head.appendChild(st);
+ const tb=$('#topBtns');if(tb){const b=document.createElement('button');b.id='gpfBtn';b.textContent='👤 PROFILE';b.onclick=()=>{try{AU.sfx('pick')}catch(e){}profileOpen()};tb.insertBefore(b,tb.firstChild)}}
+// the "New in vX" bubble (z 8999) covered the garage tabs and the profile ✕ on the phone: hide it while the garage or profile is open
+{const upd=()=>document.body.classList.toggle('gpfHideNew',!$('#gbx').hidden||!$('#profile').hidden),mo=new MutationObserver(upd);for(const s of['#gbx','#profile'])mo.observe($(s),{attributes:true,attributeFilter:['hidden']});
+ const st=document.createElement('style');st.textContent='body.gpfHideNew #odNew{display:none!important}';document.head.appendChild(st);upd()}
+// ---- GNB: 2K-style "build your own from a chassis" (slice 4). A 5th vehicle "My Build" (Neat) whose street car starts as a bare chassis frame:
+// a black frame plate, 4 tyres on axles, the seat with its driver and steering wheel, taken 1:1 from a real set (true 8-wide proportions, tyres already on the road).
+// NEW BUILD (builder toolbar or RIDES) → pick a chassis → snap parts on it. The part counter doubles as a build-limit bar plus the 2K weight class.
+const GNB_K='#1b2a34',GNB_fr=b=>!!CR_WH[b.t]||/^(drv|drvL|stw|diff)$/.test(b.t)||(String(b.c).toLowerCase()===GNB_K&&/^T\d/.test(b.t));
+const GNB_CH=[{id:'sc8',ic:'🏎',n:'SPEED CHAMPION',d:'8 wide · low · 4 sport tyres',src:()=>GAR_set('posei').car()},{id:'rod',ic:'🛣',n:'HOT ROD',d:'open frame · big rear tyres',src:()=>GAR_set('rod').car()}];
+const GNB_frame=id=>GAR_arr((GNB_CH.find(c=>c.id===id)||GNB_CH[0]).src()).filter(GNB_fr).map(b=>({...b}));
+{const R=GAR_set('rod');GAR_SETS.push({id:'mine',n:'My Build',tier:'c',req:null,car:()=>GNB_frame('sc8').map(b=>[b.t,b.x,b.z,b.r,b.c,b.y]),off:R.off,boat:R.boat,
+ load:Object.assign(JSON.parse(JSON.stringify(R.load)),{car:Object.assign({},R.load.car,{name:'MY BUILD',k:'Street'})})});try{GPK_GRP.mine='Built by you'}catch(e){}}
+// snap: parts never stack on a tyre (a mudguard wraps its wheel like on the real sets), and a blank base covers the whole floor plate of the chassis
+GB_top=(f=>function(i,j,list){return f(i,j,list.filter(b=>!CR_WH[b.t]))})(GB_top);
+GB_scanBase=(f=>function(){f();if(!GB.d||!GB.d.bp||!GB_.base)return;for(const b of GB_list()){if(CR_WH[b.t]||b.y>1||!/^T\d/.test(b.t))continue;const[fw,fd]=GB_dims(b);for(let i=b.x;i<b.x+fw;i++)for(let j=b.z;j<b.z+fd;j++){const k=i+','+j;if(GB_.base[k]==null&&i>=GB_N0&&i<=GB_N1&&j>=GB_N0&&j<=GB_N1)GB_.base[k]=0}}})(GB_scanBase);
+// a mudguard tapped on or next to a tyre wraps that tyre (the tap ray hits the tyre's outer edge, one stud off)
+GB_cand=(f=>function(hit){if(!hit||!/^(arch|fender)$/.test(GB_.pc))return f(hit);const L=GB_list(),P=GB_PC[GB_.pc],r=GB_.rot,[fw,fd]=r%2?[P.d,P.w]:[P.w,P.d];
+ const w=L.find(b=>{if(!CR_WH[b.t])return false;const[ww,wd]=GB_dims(b);return hit.i>=b.x-1&&hit.i<=b.x+ww&&hit.j>=b.z-1&&hit.j<=b.z+wd});if(!w)return f(hit);
+ const[ww,wd]=GB_dims(w),b={t:GB_.pc,x:w.x<0?w.x:w.x+ww-fw,z:w.z+Math.round((wd-fd)/2),y:0,r,m:0,c:GB_.col},y=GB_fit(b,L);if(y==null)return f(hit);b.y=y;b.bad=L.length>=GB_MAX;return b})(GB_cand);
+// mirror: a centred part's twin would overlap the part itself (a doubled windscreen) → skip the twin
+GB_fit=(f=>function(b,list){const o=list[list.length-1];if(o&&o!==b&&o.t===b.t&&o.y!=null){const[fw,fd]=GB_dims(b),[ow,od]=GB_dims(o);if(b.x===-o.x-ow&&b.z===o.z&&b.x<o.x+ow&&o.x<b.x+fw)return null}return f(b,list)})(GB_fit);
+// builder view: the parts panel covers the bottom third, so the car's nose sat on its buttons and a tap there hit a button. Lift the view by 12 % of the height.
+GB_cam=(f=>function(){f();const C=GB.cam,v=C.view,h=$('#gbC').clientHeight,w=$('#gbC').clientWidth,oy=GB_.bk?Math.round(h*.12):0;if(oy){if(!v||!v.enabled||v.offsetY!==oy||v.fullWidth!==w||v.fullHeight!==h)C.setViewOffset(w,h,0,oy,w,h)}else if(v&&v.enabled)C.clearViewOffset();C.updateMatrixWorld()})(GB_cam);
+const GNB_W=n=>n<20?'Super Light':n<40?'Light':n<60?'Medium':n<80?'Heavy':n<100?'Super Heavy':'Massive';
+GB_ui=(f=>function(){f();const n=$('#gbBkN');if(!n||!GB.d)return;const k=GB_list().length,p=Math.round(100*Math.min(1,k/GB_MAX));n.textContent=`🧱 ${innerWidth>760&&innerHeight>500?'BUILD LIMIT ':''}${k}/${GB_MAX} · ${GNB_W(k)}`;n.title='Build limit';n.style.background=`linear-gradient(90deg,rgba(255,209,44,.38) ${p}%,rgba(6,18,31,.9) ${p}%)`})(GB_ui);
+function GNB_pick(){let P=$('#gnbP');if(!P){P=document.createElement('div');P.id='gnbP';$('#gbx .gbv').appendChild(P)}
+ P.innerHTML=`<div class="gnbB"><b>NEW BUILD · pick a chassis</b><small>Your build becomes the vehicle "My Build" in RIDES.</small><div class="gnbR">${GNB_CH.map(c=>`<button data-ch="${c.id}"><i>${c.ic}</i><b>${c.n}</b><small>${c.d}</small></button>`).join('')}</div><button class="gnbX">CANCEL</button></div>`;P.hidden=false;
+ P.onclick=e=>{const b=e.target.closest('button');if(!b)return;try{AU.sfx('pick')}catch(_){}P.hidden=true;if(b.dataset.ch)GNB_new(b.dataset.ch)}}
+function GNB_new(id){if(GAR_get().sel!=='mine')GAR_select('mine');if(!GB_.bk)GB_enter();GB_snap();GB.d.bricks=GNB_frame(id);GB.d.bp=1;GB_scanBase();GB_gridMesh();GB_refresh();GB_.mir=1;GB_.tool='add';GB_.dist=11;GB_.pit=.95;GB_.yaw=Math.PI*.72;GB_ui();try{GB_msg('Bare chassis · tap to add parts')}catch(e){}}
+GB_enter=(f=>function(){const r=f.apply(this,arguments);const T=$('#gbBkT');if(T&&!T.querySelector('[data-a="gnb"]')){const b=document.createElement('button');b.dataset.a='gnb';b.textContent='🆕 NEW';b.title='Start from a bare chassis';b.addEventListener('click',e=>{e.stopPropagation();GNB_pick()});T.insertBefore(b,T.querySelector('[data-a="bp"]'))}return r})(GB_enter);
+GAR_tab=(f=>function(){f();const B=$('#gbBody'),gs=B.querySelector('.garSets');if(!gs)return;const b=document.createElement('button');b.className='gbP gnbGo';b.innerHTML='<b>🆕 BUILD YOUR OWN</b><small>start from a bare chassis</small>';b.onclick=()=>{try{AU.sfx('pick')}catch(e){}GB_enter();GNB_pick()};gs.appendChild(b)})(GAR_tab);
+{const st=document.createElement('style');st.textContent=`#gnbP{position:absolute;inset:0;z-index:5;display:grid;place-items:center;background:rgba(3,8,20,.6)}#gnbP[hidden]{display:none}
+.gnbB{background:#0b1626;border:2px solid #4ceaff;border-radius:16px;padding:12px 14px;max-width:96%;color:#fff;font:700 12px system-ui;display:grid;gap:8px;justify-items:center}.gnbB>b{font:900 italic 16px system-ui;color:#ffd12c}
+.gnbR{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.gnbR button{width:150px;display:grid;gap:2px;justify-items:center;padding:8px;border-radius:12px;border:2px solid rgba(76,234,255,.5);background:#12304a;color:#fff;cursor:pointer}
+.gnbR i{font-style:normal;font-size:24px}.gnbR b{font:900 13px system-ui}.gnbR small,.gnbB small{font:600 12px system-ui;color:#cfe6f5}.gnbX{border:0;background:transparent;color:#8fb3c7;font:800 12px system-ui;min-height:32px;cursor:pointer}
+#gbx .gnbGo{border-color:#ffd12c!important;min-width:118px}
+#gbx .gbPc{font-size:12px;width:64px;line-height:1}@media (max-width:760px),(max-height:500px){#gbx #gbBkT button{font-size:12px;padding:0 6px}#gbx #gbBkN{font-size:12px}#gbx .gbPc{width:60px;height:46px}#gbx .gbPc i{font-size:14px}}
+#gbx.gbBk #gbBkP{pointer-events:none}#gbx.gbBk #gbBkP button{pointer-events:auto}`;document.head.appendChild(st)}
+window.__gnb={dbg:(x,y)=>{const h=GB_pick(x,y),c=GB_cand(h);return JSON.stringify({h:h&&{i:h.i,j:h.j,b:h.brick&&h.brick.t},c,base:GB_.base[(h&&h.i)+","+(h&&h.j)]})},gap:()=>{const m=(typeof RO!=='undefined'&&RO&&RO.mesh)||(pl&&pl.mesh);if(!m)return null;m.updateMatrixWorld(true);const out=[],P=new THREE.Vector3(),S=new THREE.Vector3();m.traverse(o=>{let v=1;for(let q=o;q;q=q.parent)if(!q.visible)v=0;if(o.userData&&o.userData.r&&o.userData.gb&&v){o.getWorldPosition(P);o.getWorldScale(S);out.push(+(P.y-o.userData.r*S.y-groundAt(P.x,P.z,P.y+1)).toFixed(3))}});return out},cam:o=>{window.__gnbCam=o;if(!composer.__gnb){const r=composer.render.bind(composer);composer.render=(...a)=>{const c=window.__gnbCam;if(c){camera.position.set(c[0],c[1],c[2]);camera.lookAt(c[3],c[4],c[5]);camera.updateMatrixWorld()}return r(...a)};composer.__gnb=1}},saved:()=>({sel:GAR_get().sel,saved:(store.get('mho_build',{}).bricks||[]).length,live:GB.d?GB_list().length:null}),fit:(t,x,z,r)=>GB_fit({t,x,z,r:r||0,y:0},GB_list()),set:id=>GAR_arr(GAR_set(id).car()),frame:GNB_frame,pick:GNB_pick,nw:GNB_new,W:GNB_W};

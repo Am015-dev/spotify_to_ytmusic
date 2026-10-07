@@ -1,0 +1,54 @@
+{
+ "red": {
+  "target": [
+   208,
+   23,
+   18
+  ],
+  "n": 4186,
+  "median": [
+   245,
+   51,
+   69
+  ],
+  "hue": 354,
+  "targetHue": 2,
+  "painted": 33804,
+  "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/a7ce5b46-16c3-5584-aa56-194f53363e29/scratchpad/paint/before_red.png"
+ },
+ "blue": {
+  "target": [
+   0,
+   85,
+   191
+  ],
+  "n": 5243,
+  "median": [
+   58,
+   110,
+   246
+  ],
+  "hue": 223,
+  "targetHue": 213,
+  "painted": 33804,
+  "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/a7ce5b46-16c3-5584-aa56-194f53363e29/scratchpad/paint/before_blue.png"
+ },
+ "yellow": {
+  "target": [
+   250,
+   200,
+   10
+  ],
+  "n": 4080,
+  "median": [
+   249,
+   200,
+   80
+  ],
+  "hue": 43,
+  "targetHue": 48,
+  "painted": 34380,
+  "shot": "/tmp/claude-0/-home-user-spotify-to-ytmusic/a7ce5b46-16c3-5584-aa56-194f53363e29/scratchpad/paint/before_yellow.png"
+ },
+ "errs": []
+}
