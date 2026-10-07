@@ -27,3 +27,8 @@ window.__g9={S:G9,ol:()=>G9.ol.length,top:()=>G9_top(),cap:GB_CAP};
 {const st=document.createElement('style');st.textContent=`@media (max-width:760px),(max-height:500px){#gbx #gbBkT{gap:4px}#gbx #gbBkN{max-width:80px!important;width:80px;padding:0 6px}}`;document.head.appendChild(st)}
 // 5) SELECT tool: the counter said "3 selected" after the selection was gone; with nothing selected it now says what to do
 SL_ui=(f=>function(){const r=f.apply(this,arguments);const n=$('#gbBkN');if(n&&GB_.bk&&GB_.tool==='sel'&&!SL.sel.length&&!SL.carry)n.textContent='☝ Tap a part';return r})(SL_ui);
+// 6) BUILD YOUR OWN: the enter brick shower played over the chassis picker. It is cut when the picker opens and plays once the chassis is chosen.
+GNB_pick=(f=>function(){const S=G8.sh;if(S){S.cv.remove();G8.sh=null}return f.apply(this,arguments)})(GNB_pick);
+GNB_new=(f=>function(){const r=f.apply(this,arguments);if(!G8.sh&&GB_.bk)G8_shower(1);return r})(GNB_new);
+// 7) the "Graphics: canvas" debug line under the CHOOSE TRACK menu is hidden (the element stays for tests)
+{const st=document.createElement('style');st.textContent='#gfxNote{display:none!important}';document.head.appendChild(st)}
