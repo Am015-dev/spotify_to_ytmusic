@@ -162,7 +162,7 @@ async function play(b,mode){const phone=mode==='phone';const vp=phone?{width:852
    if(Math.abs(ae)<.08&&a2<.2&&o.v>12&&o.v<45&&f-boostT>600){boostT=f}if(f-boostT<90)c.boost=true;
    if(Math.abs(ae)>.45&&Math.abs(ae)<1.1&&o.v>23&&f-driftT>900){driftT=f}if(f-driftT<50&&Math.abs(ae)>.2)c.drift=true;
    // stuck like a person: after 1.5 s at a standstill, reverse with opposite lock for 1.2 s
-   if(Math.abs(s.v)<1.4)stuckT+=6;else stuckT=0;if(stuckT>90&&f>revT+150){revT=f;stuckT=0}
+   if(Math.abs(s.v)<1.4)stuckT+=6;else stuckT=0;if(stuckT===96&&SHOTS&&(global.stkN||0)<3){global.stkN=(global.stkN||0)+1;await shot(`${city}_stuck${global.stkN}`);console.log('STUCKAT',global.stkN,JSON.stringify(await p.evaluate(()=>{const R=__mho.RO;return{x:R.x|0,z:R.z|0,h:+R.h.toFixed(2),v:+R.v.toFixed(2),onRoad:(()=>{try{return __mho.onRoad?__mho.onRoad(R.x,R.z):null}catch(e){return null}})()}})))}if(stuckT>90&&f>revT+150){revT=f;stuckT=0}
    if(f-revT<72){c.gas=false;c.brake=true;c.boost=false;c.drift=false;c.steer=ae>0?1:-1}
    if(process.env.DEBUG&&f%120===0)console.log('dbg',f,JSON.stringify({x:Math.round(s.x),z:Math.round(s.z),v:Math.round(s.v*3.6),arr:s.arr&&[Math.round(s.arr.x),Math.round(s.arr.z),Math.round(s.arr.d)],dest:dest&&dest.map(Math.round),kind:destKind,los,rl:route&&route.length,bi,bd:Math.round(bd),ae:+ae.toFixed(2),c}));
    await apply(c);await tick(6);f+=6;

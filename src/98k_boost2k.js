@@ -59,27 +59,30 @@ function B2K_hud(bm){const m=B2K.el;if(!m)return;const vis=(state==='roam'&&!RO.
   if((++B2K.fr&15)===0){const q=document.getElementById('roamPrompt');let ov=false;if(q&&!q.hidden&&q.offsetWidth){const a=m.getBoundingClientRect(),b=q.getBoundingClientRect();ov=Math.min(a.right,b.right)-Math.max(a.left,b.left)>6&&Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top)>6}m.classList.toggle('dim',ov)}
   if(B2K.pulse>0){B2K.pulse=0;m.classList.remove('pulse');void m.offsetWidth;m.classList.add('pulse')}}
 // ---- car-local box (rear tyres, turbines)
-function B2K_rear(mesh){if(state!=="race")return -1;if(B2K.rsT===mesh&&B2K.rsS===state&&B2K.rs)return B2K.rs;const c=new THREE.Vector3().copy(camera.position);mesh.updateMatrixWorld();mesh.worldToLocal(c);if(Math.abs(c.z)>.5){B2K.rs=c.z<0?-1:1;B2K.rsT=mesh;B2K.rsS=state}return B2K.rs||-1}
+// roam: pl.mesh stays unrotated; its first child group carries the heading (yaw = h+π), so car-local work uses that child
+function B2K_frame(mesh){if(state==='roam'){const c=mesh.children[0];if(c&&c.isGroup)return c}return mesh}
+function B2K_rear(mesh){if(state==='roam')return 1; // body group yaw = h+π: local +z is the rear
+  if(B2K.rsT===mesh&&B2K.rsS===state&&B2K.rs)return B2K.rs;const c=new THREE.Vector3().copy(camera.position);mesh.updateMatrixWorld();mesh.worldToLocal(c);if(Math.abs(c.z)>.5){B2K.rs=c.z<0?-1:1;B2K.rsT=mesh;B2K.rsS=state}return B2K.rs||-1}
 function B2K_box(mesh){if(B2K.tm===mesh&&B2K.tbox&&B2K.tst===state)return B2K.tbox;B2K.tst=state;mesh.updateMatrixWorld(true);const inv=new THREE.Matrix4().copy(mesh.matrixWorld).invert(),M=new THREE.Matrix4();
   const b=new THREE.Box3();const tv=B2K.turb&&B2K.turb.parent===mesh?B2K.turb.visible:null;if(tv!=null)B2K.turb.visible=false;
   mesh.traverseVisible(o=>{if(o!==mesh&&o.isMesh&&o.geometry&&!(o.material&&(o.material.transparent||o.material.blending===THREE.AdditiveBlending))){if(!o.geometry.boundingBox)o.geometry.computeBoundingBox();b.union(o.geometry.boundingBox.clone().applyMatrix4(M.multiplyMatrices(inv,o.matrixWorld)))}});
-  if(tv!=null)B2K.turb.visible=tv;const rc=state==='race',r={hw:rc?clamp((b.max.x-b.min.x)/2,.8,2.6):clamp((b.max.x-b.min.x)/2,.8,1.15)||1,hl:rc?clamp((b.max.z-b.min.z)/2,1.5,4):2.2,y0:b.isEmpty()?0:b.min.y,hh:clamp(b.max.y-b.min.y,.8,2.4)||1.3,cz:0,raw:[b.min.toArray(),b.max.toArray()]};B2K.tbox=r;B2K.tm=mesh;return r}
+  if(tv!=null)B2K.turb.visible=tv;const r={hw:clamp((b.max.x-b.min.x)/2,.8,2.6)||1,hl:clamp((b.max.z-b.min.z)/2,1.5,4)||2.2,y0:b.isEmpty()?0:b.min.y,hh:clamp(b.max.y-b.min.y,.8,2.4)||1.3,cz:b.isEmpty()?0:(b.min.z+b.max.z)/2,raw:[b.min.toArray(),b.max.toArray()]};B2K.tbox=r;B2K.tm=mesh;return r}
 // ---- turbines that pop out of the car while boosting
-// LEGO thrusters (reviewer 18: small, low, behind the rear axle; car body + spoiler stay visible): dark grey 2x2 round brick, stud on the front,
+// LEGO thrusters (reviewer 18: small, low, behind the rear axle; car body + spoiler stay visible): light bluish grey 2x2 round brick, stud on the front,
 // silver rim, trans-orange flame cone. ~40% of the old turbines.
-function B2K_turbines(s,on,dt){const mesh=s&&s.mesh;if(!mesh)return;const bx=B2K_box(mesh),par=mesh.parent;if(!par)return;B2K.tCar=mesh;
+function B2K_turbines(s,on,dt){if(!s||!s.mesh)return;const mesh=B2K_frame(s.mesh);const bx=B2K_box(mesh),par=s.mesh.parent;if(!par)return;B2K.tCar=mesh;
   if(!B2K.turb||B2K.turb.parent!==par){if(B2K.turb&&B2K.turb.parent)B2K.turb.parent.remove(B2K.turb);if(!B2K.turbG){
       const body=new THREE.CylinderGeometry(.2,.2,.42,16).rotateX(Math.PI/2),stud=new THREE.CylinderGeometry(.12,.12,.07,12).rotateX(Math.PI/2),rim=new THREE.TorusGeometry(.19,.04,8,18),
         flame=new THREE.ConeGeometry(.16,.5,12).rotateX(-Math.PI/2).translate(0,0,-.25);
-      B2K.turbG={body,stud,rim,flame,mB:new THREE.MeshStandardMaterial({color:0x5b5f66,roughness:.3,metalness:.05}),mR:new THREE.MeshStandardMaterial({color:0xd8dde3,metalness:.9,roughness:.25}),
+      B2K.turbG={body,stud,rim,flame,mB:new THREE.MeshStandardMaterial({color:0xa3a8ad,roughness:.3,metalness:.05}),mR:new THREE.MeshStandardMaterial({color:0xd8dde3,metalness:.9,roughness:.25}),
         mF:new THREE.MeshBasicMaterial({color:0xff8a1f,transparent:true,opacity:.8,depthWrite:false})}}
     // scene-level group; every part takes car.matrixWorld x its car-local matrix right before it is drawn (no frame lag, no per-car hide rules)
     const T=B2K.turbG,g=new THREE.Group();g.name='b2kTurb';g.userData.gbG=1;g.matrixAutoUpdate=false;g.units=[];
     for(const sd of[-1,1]){const parts=[[T.body,T.mB,0],[T.stud,T.mB,.245],[T.rim,T.mR,-.21],[T.flame,T.mF,-.21]].map(([geo,mat,z])=>{const m=new THREE.Mesh(geo,mat);m.matrixAutoUpdate=false;m.frustumCulled=false;m.userData.gbG=1;m.userData.z=z;m.userData.L=new THREE.Matrix4();
         m.onBeforeRender=function(){if(B2K.tCar){this.matrixWorld.multiplyMatrices(B2K.tCar.matrixWorld,this.userData.L)}};g.add(m);return m});g.units.push({sd,parts,spin:0})}
     B2K.turb=g;par.add(g)}
-  const tgt=on?1:0;B2K.turbS+=(tgt-B2K.turbS)*Math.min(1,dt*(on?9:6));const fz=bx.hl/2.2,k=B2K.turbS,ov=on?1+.25*Math.sin(Math.min(1,k)*Math.PI):1,sc=Math.max(.001,k*ov*fz),tx=sd=>sd*bx.hw*.5,rs=B2K_rear(mesh),tz=bx.cz+rs*bx.hl*.9,ty=bx.y0+bx.hh*.3;
-  B2K.turb.visible=k>.02&&mesh.visible;const U=new THREE.Matrix4(),Pm=new THREE.Matrix4(),Sv=new THREE.Vector3(sc,sc,sc),Q=new THREE.Quaternion(),Pv=new THREE.Vector3(),Ry=new THREE.Matrix4().makeRotationY(rs>0?Math.PI:0);
+  const tgt=on?1:0;B2K.turbS+=(tgt-B2K.turbS)*Math.min(1,dt*(on?9:6));const fz=bx.hl/2.2,k=B2K.turbS,ov=on?1+.25*Math.sin(Math.min(1,k)*Math.PI):1,sc=Math.max(.001,k*ov*fz),tx=sd=>sd*bx.hw*.45,rs=B2K_rear(mesh),tz=bx.cz+rs*(bx.hl+.24*fz),ty=bx.y0+bx.hh*.4;
+  B2K.turb.visible=k>.02&&s.mesh.visible;const U=new THREE.Matrix4(),Pm=new THREE.Matrix4(),Sv=new THREE.Vector3(sc,sc,sc),Q=new THREE.Quaternion(),Pv=new THREE.Vector3(),Ry=new THREE.Matrix4().makeRotationY(rs>0?Math.PI:0);
   for(const u of B2K.turb.units){u.spin+=dt;Pv.set(tx(u.sd),ty,tz);U.compose(Pv,Q.identity(),Sv);
     for(const m of u.parts){Pm.makeTranslation(0,0,m.userData.z*-rs).multiply(Ry);if(m.geometry===B2K.turbG.flame)Pm.multiply(new THREE.Matrix4().makeScale(1,1,(B2K.bash?1.5:1)*rr(.75,1.2)));m.userData.L.multiplyMatrices(U,Pm)}}
   if(on&&k>.6&&R()<.6){const pt=new THREE.Vector3(),back=new THREE.Vector3(0,0,rs).transformDirection(mesh.matrixWorld);for(const u of B2K.turb.units){pt.set(tx(u.sd),ty,tz+rs*.7*k*fz).applyMatrix4(mesh.matrixWorld);
@@ -89,7 +92,7 @@ function B2K_trailInit(par){const N=64,g=new THREE.BufferGeometry();g.setAttribu
   const idx=[];for(let sd=0;sd<2;sd++)for(let i=0;i<N-1;i++){const a=(sd*N+i)*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}g.setIndex(idx);
   const m=new THREE.Mesh(g,new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));m.frustumCulled=false;m.renderOrder=3;par.add(m);
   B2K.trail={m,g,N,pts:[[],[]],t:0}}
-function B2K_trail(s,on,dt){if(!s||!s.mesh)return;const par=s.mesh.parent||scene;if(!B2K.trail||B2K.trail.m.parent!==par){if(B2K.trail&&B2K.trail.m.parent)B2K.trail.m.parent.remove(B2K.trail.m);B2K_trailInit(par)}const T=B2K.trail,mesh=s.mesh,bx=B2K_box(mesh);T.t+=dt;
+function B2K_trail(s,on,dt){if(!s||!s.mesh)return;const par=s.mesh.parent||scene;if(!B2K.trail||B2K.trail.m.parent!==par){if(B2K.trail&&B2K.trail.m.parent)B2K.trail.m.parent.remove(B2K.trail.m);B2K_trailInit(par)}const T=B2K.trail,mesh=B2K_frame(s.mesh),bx=B2K_box(mesh);T.t+=dt;
   const P=new THREE.Vector3(),side=new THREE.Vector3(1,0,0).transformDirection(mesh.matrixWorld);
   for(let sd=0;sd<2;sd++){const L=T.pts[sd];for(const p of L)p.a+=dt;while(L.length&&L[0].a>1.4)L.shift();
     if(on){P.set((sd?1:-1)*bx.hw*.82,Math.max(bx.y0,0)+.09,bx.cz+B2K_rear(mesh)*bx.hl*.62);mesh.localToWorld(P);const l=L[L.length-1];if(!l||l.end||P.distanceTo(l.p)>.35)L.push({p:P.clone(),s:side.clone(),a:0,brk:!l||!!l.end});if(L.length>T.N)L.shift()}
