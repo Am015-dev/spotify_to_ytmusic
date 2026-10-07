@@ -57,3 +57,9 @@ Fix options:
 - raise GB_CAP (check the stats/collision of tall builds);
 - and/or say "Height limit reached" when the cap is the reason;
 - `G8_free`, `SL_clash` (98t/98u) use the same cap, so keep them in sync.
+
+## v87r: reviewer QUICK PASS 559bc1e; DEPLOY sent (alex/od-garage8a 5c23efb, out/v87r)
+Non-blocking reviewer follow-ups for release 2:
+1. The enter brick shower (`G8_shower`, z-index 9999) plays over the "NEW BUILD · pick a chassis" dialog. Start it after the dialog closes, or put the canvas below the modal.
+2. The "Graphics: canvas" debug label (`#gfxNote`, 72_roam_map_loop_boot.js) shows on CHOOSE TRACK. Hide it outside debug.
+Release 2 must be rebased onto alex/od-garage8a (or the live head after v87r): 98t/98s/00_page are already there. Keep 98u_garage_select.js and the 94 pointer-tolerance edits.
