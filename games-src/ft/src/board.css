@@ -117,3 +117,6 @@ html.land #gw{min-height:0;min-width:0}
 html.land #seats[data-n="4"],html.land #seats[data-n="5"]{display:grid;grid-template-columns:1fr 1fr}
 html.land #seats[data-n="4"] .sch .s3,html.land #seats[data-n="5"] .sch .s3{display:none}
 html.land .gx-board{overflow:hidden}
+/* help bubbles never block the board: taps pass through them (only the bulb's link takes pointer events) */
+/* (a tap on a bubble dismisses it and goes no further: see hlpInit) */
+.gxh-bub,.gxh-bub .gxh-ok{pointer-events:none}.gxh-bub .gxh-link{pointer-events:auto}
