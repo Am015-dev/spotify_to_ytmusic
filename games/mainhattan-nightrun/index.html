@@ -138,26 +138,44 @@ let dailyBest=load('mnr_daily',{n:0,score:0});if(dailyBest.n!==todayN())dailyBes
 let RM=false;try{RM=matchMedia('(prefers-reduced-motion: reduce)').matches;}catch(e){}
 const SET=Object.assign({music:.8,sfx:.8,reduce:RM,guide:true,sync:0,mute:load('mnr_mute',false)},load('mnr_set',{}));
 const saveSet=()=>{save('mnr_set',SET);save('mnr_mute',SET.mute);};
+if(!SET.mv2){SET.music=.45;SET.mv2=1;saveSet();}      // music sits well under the effects by default (older saved settings were louder)
+const NOMUSIC=/[?&]nomusic=1/.test(location.search);   // test switch: no song files, synth only
+try{if(navigator.audioSession)navigator.audioSession.type='playback';}catch(e){}   // iOS: Web Audio ignores the silent switch only in the 'playback' session
 const FX=()=>SET.reduce?.25:1;                          // strength of flashes and shake
 
 /* ---------- beat clock ---------- */
 // Everything rhythmic reads this one clock. Beat 0 sits at BT.t0+BT.off on the music clock. The clock is the AudioContext's
 // currentTime when audio runs, and a plain game-time counter (fbT) when it does not, so the game also works silent.
 const DEF_BPM={menu:100,stage1:120,stage2:128,stage3:128,boss:140,endless:132};
+const distLen=()=>24*4*BT.spb;                            // a district is 24 bars of the current song
+const barQ=s=>Math.max(1,Math.round(s/(4*BT.spb)))*4*BT.spb*.97;   // seconds -> whole bars
 const BT={bpm:100,spb:.6,t0:0,off:0,stage:'',mode:'none',rev:0,src:0,lastRaw:0,pend:null,title:''};
 let fbT=0;
-const CK={h:[],d:0,at:0};                                // clock smoothing: currentTime only moves in hardware-buffer steps and never runs ahead,
-function ckReset(){CK.h.length=0;CK.d=0;CK.at=0;}         // so the largest (currentTime - wall clock) seen over 1.5 s is the exact mapping
-function ckPush(a){const p=performance.now();if(p-CK.at<4&&CK.h.length)return;CK.at=p;CK.h.push([p,a.currentTime*1000-p]);
-  while(CK.h.length&&CK.h[0][0]<p-1500)CK.h.shift();let m=-1e12;for(const e of CK.h)if(e[1]>m)m=e[1];CK.d=m;}
-function mnow(){const a=AU.a,src=a&&a.state==='running'?1:0,raw=src?a.currentTime:fbT;
-  if(src!==BT.src){BT.t0+=raw-BT.lastRaw;if(BT.pend)BT.pend.at+=raw-BT.lastRaw;BT.src=src;ckReset();}
-  if(src)ckPush(a);
+/* ---------- hooks for add-on parts: NR.on(evt,fn) / NR.emit(evt,data); events: beat, bar, perfect, kill, districtEnd, runEnd, runStart ---------- */
+const NR=window.NR={_h:{},on(e,f){(this._h[e]=this._h[e]||[]).push(f);},emit(e,d){const l=this._h[e];if(l)for(const f of l){try{f(d);}catch(x){}}},
+  music:{rate:1,   // tempo change: song playbackRate and the beat length scale together, the beat position stays continuous
+    setRate(x){x=Math.max(.5,Math.min(2,+x||1));const old=this.rate;if(x===old)return;mnow();const p=bpos();this.rate=x;
+      BT.spb=BT.spb*old/x;BT.t0=audible()-BT.off-p*BT.spb;if(BT.pend)BT.pend.v.spb*=old/x;
+      const a=AU.a;if(a&&AU.cur&&AU.cur.src)try{AU.cur.src.playbackRate.setValueAtTime(x,a.currentTime);}catch(e){}}}};
+const CK={h:[],d:0,at:0,has:0};                          // clock smoothing: currentTime only moves in hardware-buffer steps and never runs ahead,
+function ckReset(){CK.h.length=0;CK.d=0;CK.at=0;CK.has=0;}  // so the largest (currentTime - wall clock) seen over 1.5 s is the exact mapping.
+// The mapping may only rise by 1% of elapsed time: after a resume the context first renders a burst ahead of the speakers (up to ~170 ms), which must not shift the grid.
+function ckPush(a){const p=performance.now();if(p-CK.at<4&&CK.h.length)return;const dw=p-CK.at;CK.at=p;CK.h.push([p,a.currentTime*1000-p]);
+  while(CK.h.length&&CK.h[0][0]<p-1500)CK.h.shift();let m=-1e12;for(const e of CK.h)if(e[1]>m)m=e[1];
+  CK.d=CK.has?Math.min(m,CK.d+dw*.01):m;CK.has=1;}
+let ckRun=0;
+// Clock domains: 1 = the AudioContext clock (running, or frozen while paused / just resumed after it ran), 0 = the game-time counter fbT (silent / not yet unlocked).
+// A frozen context keeps its currentTime and its sources keep their position, so pause/resume never shifts the grid.
+function mnow(){const a=AU.a,run=a&&a.state==='running'?1:0;if(run)AU.ran=true;
+  const dom=run||(a&&AU.ran&&(AU.hold||performance.now()<AU.rUntil))?1:0,raw=dom?a.currentTime:fbT;
+  if(dom!==BT.src){const d=raw-BT.lastRaw;BT.t0+=d;if(BT.pend){BT.pend.at+=d;BT.pend.v.t0+=d;}BT.src=dom;}
+  if(run!==ckRun){ckRun=run;ckReset();}
+  if(run)ckPush(a);
   BT.lastRaw=raw;if(BT.pend&&raw>=BT.pend.at){Object.assign(BT,BT.pend.v);BT.rev++;BT.pend=null;AU.step=0;if(BT.mode==='file'&&BT.title&&G&&G.live)G.note={t:4,txt:'\u266a '+BT.title};}
   return raw;}
 function audible(ts){                                    // music-clock seconds that the player hears at wall time ts (default: now)
   const a=AU.a;mnow();const p=ts>0?ts:performance.now();
-  if(BT.src&&a)return(p+CK.d)/1000-(a.outputLatency||0)+SET.sync/1000;
+  if(BT.src&&a){if(a.state!=='running')return a.currentTime-(a.outputLatency||0)+SET.sync/1000;return(p+CK.d)/1000-(a.outputLatency||0)+SET.sync/1000;}
   return fbT-(performance.now()-p)/1000+SET.sync/1000;}
 const bpos=ts=>(audible(ts)-BT.t0-BT.off)/BT.spb;       // beats since beat 0
 function judge(ts){const p=bpos(ts),n=Math.round(p),dt=(p-n)*BT.spb*1000;return{ok:Math.abs(dt)<=80&&p>-.3,dt,beat:n};}
@@ -166,22 +184,24 @@ const fireIn=s=>Math.max(1,Math.round(s*BT.bpm/60));    // seconds -> whole beat
 /* ---------- tracks (lazy) ---------- */
 const TR={by:{},bufs:{},busy:{},bad:{},list:[]};
 function normTrack(t){if(!t||typeof t.file!=='string'||!DEF_BPM[t.stage])return null;const bpm=+t.bpm;return{file:t.file,bpm:bpm>=40&&bpm<=300?bpm:DEF_BPM[t.stage],offsetMs:+t.offsetMs||0,title:String(t.title||'').slice(0,40),stage:t.stage};}
-try{if(location.protocol!=='file:')fetch('music/tracks.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(!j)return;const arr=Array.isArray(j)?j:Array.isArray(j.tracks)?j.tracks:[];
+try{if(location.protocol!=='file:'&&!NOMUSIC)fetch('music/tracks.json',{cache:'no-cache'}).then(r=>r.ok?r.json():null).then(j=>{if(!j)return;const arr=Array.isArray(j)?j:Array.isArray(j.tracks)?j.tracks:[];
   for(const t of arr){const n=normTrack(t);if(n&&!TR.by[n.stage]){TR.by[n.stage]=n;TR.list.push(n);}}
   if(AU.a&&!running)AU.menuMusic();}).catch(()=>{});}catch(e){}
 async function loadTrack(stage){const info=TR.by[stage];if(!info||TR.bufs[info.file]||TR.busy[info.file]||TR.bad[info.file]||!AU.a)return;
   TR.busy[info.file]=1;
   try{const r=await fetch(new URL('music/'+info.file,location.href),{cache:'force-cache'});if(!r.ok)throw 0;const ab=await r.arrayBuffer();
     const buf=await new Promise((ok,no)=>{const p=AU.a.decodeAudioData(ab,ok,no);if(p&&p.catch)p.catch(no);});
+    for(const k in TR.bufs){const keep=k===info.file||(AU.cur&&TR.by[AU.cur.stage]&&TR.by[AU.cur.stage].file===k);if(!keep)delete TR.bufs[k];}   // decoded songs are big: keep the playing one and the new one only (iOS memory)
     TR.bufs[info.file]=buf;AU.trackReady(stage);}
   catch(e){TR.bad[info.file]=1;}
   TR.busy[info.file]=0;}
 
 /* ---------- audio ---------- */
-const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,
+const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root:45,boss:false,cur:null,hold:false,rUntil:0,
   init(){if(this.a)return;try{const a=this.a=new (window.AudioContext||window.webkitAudioContext)();
     this.m=a.createGain();this.m.connect(a.destination);
-    this.musv=a.createGain();this.musv.connect(this.m);
+    this.duck=a.createGain();this.duck.connect(this.m);                                     // music dips briefly under big effects
+    this.musv=a.createGain();this.musv.connect(this.duck);
     this.mus=a.createGain();this.mus.gain.value=.34;this.mus.connect(this.musv);          // synth soundtrack
     this.fb=a.createGain();this.fb.gain.value=.9;this.fb.connect(this.musv);               // music files
     this.sfxv=a.createGain();this.sfxv.connect(this.m);
@@ -191,12 +211,17 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     const len=Math.floor(a.sampleRate*.5),b=a.createBuffer(1,len,a.sampleRate),dd=b.getChannelData(0);for(let i=0;i<len;i++)dd[i]=Math.random()*2-1;this.nb=b;
     this.vol(true);setInterval(()=>this.sched(),25);
     a.addEventListener&&a.addEventListener('statechange',()=>{if(a.state==='suspended'&&!this.hold&&!document.hidden)a.resume().catch(()=>{});});}catch(e){this.a=null;}},
-  unlock(){if(!this.a)this.init();const a=this.a;if(!a)return;if(a.state!=='running'&&!this.hold&&!document.hidden)a.resume().catch(()=>{});
+  // iOS: must run inside touchend/click/keydown. Resume synchronously, start a silent buffer in the same gesture, and (without audioSession) play a silent <audio> so the ring switch does not mute us.
+  unlock(){if(!this.a)this.init();const a=this.a;if(!a)return;
+    if(a.state!=='running'&&!this.hold){try{const p=a.resume();if(p&&p.catch)p.catch(()=>{});}catch(e){}}
+    if(a.state!=='running'){try{const b=a.createBuffer(1,1,22050),s=a.createBufferSource();s.buffer=b;s.connect(a.destination);s.start(0);}catch(e){}}   // silent unlock sound inside the gesture
+    if(!navigator.audioSession&&!this.sil){try{const h=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YQAAAAA=');h.loop=true;h.volume=.01;h.setAttribute('playsinline','');this.sil=h;const q=h.play();if(q&&q.catch)q.catch(()=>{this.sil=null;});}catch(e){}}
     if(!running&&!BT.stage)this.menuMusic();},
+  duckMusic(){const a=this.a;if(!a||!this.duck)return;const t=a.currentTime,g=this.duck.gain;g.cancelScheduledValues(t);g.setTargetAtTime(.7,t,.012);g.setTargetAtTime(1,t+.3,.15);},
   vol(now){if(!this.a)return;const t=this.a.currentTime,k=now?0:.02;
     this.m.gain.setTargetAtTime(SET.mute?0:.55,t,k||.001);this.musv.gain.setTargetAtTime(SET.music,t,k||.001);this.sfxv.gain.setTargetAtTime(SET.sfx,t,k||.001);},
   suspend(){this.hold=true;const a=this.a;if(a&&a.state==='running')a.suspend().catch(()=>{});},
-  resume(){this.hold=false;const a=this.a;if(a&&a.state!=='running')a.resume().catch(()=>{});},
+  resume(){this.hold=false;this.rUntil=performance.now()+700;const a=this.a;if(a&&a.state!=='running')a.resume().catch(()=>{});},
   f(n){return 440*Math.pow(2,(n-69)/12);},
   menuMusic(){if(TR.by.menu){if(BT.stage!=='menu')this.startStage('menu');loadTrack('menu');}else if(BT.stage!==''&&BT.stage!=='menu')this.startStage('menu');},
   trackReady(stage){const info=TR.by[stage];if(!info||!this.a)return;
@@ -211,10 +236,10 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     this.cur=null;
     const v={stage};
     if(buf){const src=a.createBufferSource();src.buffer=buf;src.loop=true;const g=a.createGain();g.gain.setValueAtTime(0,ctxT);g.gain.linearRampToValueAtTime(1,ctxT+.25);
-      src.connect(g);g.connect(this.fb);src.start(ctxT);this.cur={src,g,stage};
-      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm,off:info.offsetMs/1000,t0:t,title:info.title});}
+      src.playbackRate.value=NR.music.rate;src.connect(g);g.connect(this.fb);src.start(ctxT);this.cur={src,g,stage};
+      Object.assign(v,{mode:'file',bpm:info.bpm,spb:60/info.bpm/NR.music.rate,off:info.offsetMs/1000,t0:t,title:info.title});}
     else if(stage==='menu'){Object.assign(v,{mode:'none',bpm:100,spb:.6,off:0,t0:t,title:''});}
-    else{const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(v,{mode:'synth',bpm,spb:60/bpm,off:0,t0:t,title:''});}
+    else{const bpm=info?info.bpm:DEF_BPM[stage];Object.assign(v,{mode:'synth',bpm,spb:60/bpm/NR.music.rate,off:0,t0:t,title:''});}
     if(at){BT.pend={at:t,v};}
     else{Object.assign(BT,v);BT.rev++;BT.pend=null;this.step=0;if(v.mode==='file'&&v.title&&G&&G.live)G.note={t:4,txt:'♪ '+v.title};}},
   osc(t,type,freq,dur,vol,dest,slide,cut){const a=this.a,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,t);
@@ -234,7 +259,7 @@ const AU={a:null,m:null,mus:null,fb:null,musv:null,sfxv:null,fx:null,step:0,root
     if(s%2===1)this.noise(t,.04,.18,7000,this.mus);
     const bl=[0,0,12,0,0,12,0,7,0,0,12,0,10,0,7,12][s];this.osc(t,'sawtooth',this.f(r+bl),spb*.9,.22,this.mus,0,this.boss?1800:900);
     if(s%2===0){const ar=[0,3,7,10,12,10,7,3][(s/2)%8];const g=this.osc(t,'square',this.f(r+24+ar),spb*1.6,.05,this.mus,0,3000);g.connect(this.dly);}},
-  sfx(n){const a=this.a;if(!a||a.state!=='running')return;const t=a.currentTime,F=this.fx;
+  sfx(n){const a=this.a;if(!a||a.state!=='running')return;const t=a.currentTime,F=this.fx;if(n==='boom'||n==='big'||n==='phase'||n==='emp'||n==='hurt')this.duckMusic();
     switch(n){
       case'shot':this.osc(t,'square',1400,.05,.05,F,700);break;
       case'hit':this.osc(t,'square',300,.05,.06,F,150);break;
@@ -432,7 +457,8 @@ addEventListener('keydown',e=>{const k=e.code;if(['ArrowUp','ArrowDown','ArrowLe
 addEventListener('keyup',e=>{K[e.code]=false;});
 addEventListener('blur',()=>{for(const k in K)K[k]=false;touch=null;touchFire=false;if(running&&!paused)setPause(true);});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(running&&!paused)setPause(true);}else if(!paused)AU.resume();});
-for(const ev of['pointerdown','touchend','click'])addEventListener(ev,()=>AU.unlock(),true);
+addEventListener('pageshow',()=>{if(!paused&&!document.hidden)AU.resume();});
+for(const ev of['pointerdown','touchstart','touchend','mouseup','click'])addEventListener(ev,()=>AU.unlock(),true);
 addEventListener('touchstart',()=>{if(!touchUI){touchUI=true;relayout();syncUI();}},{capture:true,passive:true});
 stage.addEventListener('touchstart',e=>{if(e.target.closest('button,.ov,input,label,#touch'))return;e.preventDefault();
   if(!running||paused||touch)return;const t=e.changedTouches[0],[x,y]=toGame(t);
@@ -457,7 +483,7 @@ function newGame(daily){
   GR=daily?mul(todayN()):Math.random;GX=daily?mul(todayN()+7919):Math.random;
   P={x:140,y:H/2,hp:5,max:5,inv:2,dashT:0,dashCd:0,dx:1,dy:0,heat:0,over:false,wl:1,emp:2,fcd:0,tilt:0,pfT:-9,dashPf:false};
   C={n:0,best:0,last:-999,lb:0};
-  G={t:0,scroll:0,di:0,loop:0,dt:0,waveT:3.5,waveWait:false,en:[],eb:[],pb:[],pk:[],pt:[],fl:[],rings:[],delayed:[],score:0,mult:1,kills:0,boss:null,bossDone:false,
+  G={spawnB:[],t:0,scroll:0,di:0,loop:0,dt:0,waveT:3.5,waveWait:false,en:[],eb:[],pb:[],pk:[],pt:[],fl:[],rings:[],delayed:[],score:0,mult:1,kills:0,boss:null,bossDone:false,
      banner:{t:0,m:3.2,a:'',b:'',warn:false},shake:0,glitch:0,flash:0,slow:1,dead:false,deadT:0,transT:-1,empT:0,
      daily:!!daily,live:false,spawns:[],perf:0,bc:0,lq:0,rev:-1,bp:0,note:{t:0,txt:''},hint:{t:0,txt:''},hint2:false,preload:false,over:false};
   enterDistrict(0);}
@@ -470,7 +496,7 @@ function enterDistrict(i){G.di=i;G.dt=0;G.boss=null;G.bossDone=false;G.waveT=3.2
 /* ---------- spawning ---------- */
 function en(type,o){const d=diff();const base={drone:{r:14,hp:2,score:100},turret:{r:20,hp:8,score:300},charger:{r:13,hp:2,score:150},
   gunship:{r:36,hp:34,score:1200},gate:{r:12,hp:16,score:600}}[type];
-  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2},base,o);e.hp=Math.round(e.hp*(1+.35*(d-1)));e.max=e.hp;e.by=e.y;G.en.push(e);if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);return e;}
+  const e=Object.assign({type,t:0,flash:0,bf:fireIn(gx(.6,1.6)),bn:0,x:W+40,y:H/2},base,o);e.hp=Math.round(e.hp*(1+.35*(d-1)));e.max=e.hp;e.by=e.y;G.en.push(e);if(G.spawnB.length<80)G.spawnB.push(bpos());if(G.spawns.length<60)G.spawns.push([type,Math.round(e.by),Math.round(e.stop||e.gy||0)]);return e;}
 const WAVES={
   droneLine(){const y=gr(80,H-150);for(let i=0;i<5;i++)en('drone',{x:W+30+i*55,y,amp:0});return 2.6;},
   droneSine(){const y=gr(130,H-170);for(let i=0;i<6;i++)en('drone',{x:W+30+i*46,y,amp:70,ph:i*.6});return 3;},
@@ -499,12 +525,12 @@ function comboK(){return 1+Math.min(C.n,20)*.05;}
 function onPerfect(kind,j,x,y){const first=C.last!==j.beat;J.ok++;
   if(first){C.n++;C.last=j.beat;C.lb=G.bc;C.best=Math.max(C.best,C.n);}
   G.perf++;G.rings.push({x,y,l:.5,m:.5,c:kind==='dash'?'#19e3ff':'#ffe14d'});
-  floater(x,y-30,'PERFECT','#ffe14d');AU.sfx('perfect');
+  floater(x,y-30,'PERFECT','#ffe14d');AU.sfx('perfect');NR.emit('perfect',{kind,x,y,combo:C.n});
   if(first&&C.n%5===0)floater(x,y-48,'COMBO '+C.n,'#ff2d95');
   try{if(navigator.vibrate)navigator.vibrate(12);}catch(e){}}
 function tryPerfect(kind,ts,x,y){const j=judge(ts);J.n++;J.last={kind,ok:j.ok,dt:Math.round(j.dt),beat:j.beat,at:performance.now()};
   if(j.ok&&(kind!=='graze'||C.last!==j.beat))onPerfect(kind,j,x,y);return j.ok;}
-function kill(e){const D=DISTRICTS[G.di];G.kills++;const m=e.pf?2:1,pts=Math.round(e.score*G.mult*comboK()*m);G.score+=pts;floater(e.x,e.y-10,'+'+pts,m>1?'#ffe14d':D.b);
+function kill(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:false});const m=e.pf?2:1,pts=Math.round(e.score*G.mult*comboK()*m);G.score+=pts;floater(e.x,e.y-10,'+'+pts,m>1?'#ffe14d':D.b);
   burst(e.x,e.y,D.a,e.type==='gunship'?50:22,e.type==='gunship'?380:260);burst(e.x,e.y,'#ffffff',8,160,.3);shake(e.type==='gunship'?12:5);AU.sfx('boom');
   const drop=(t,dx=0,dy=0)=>G.pk.push({t,x:e.x+dx,y:e.y+dy,vx:rnd(-40,20),vy:rnd(-60,60),bob:rnd(0,7)});
   if(e.type==='drone'||e.type==='charger'){if(GX()<.6)drop('shard');}
@@ -524,10 +550,10 @@ function beatPump(){const p=bpos(),q=Math.floor(p*4);G.bp=p;
   G.lq=q;}
 function onTick(i){const e=G.boss;if(e&&e.x<=790&&e.pc>=0&&e.lists[e.ph-1][e.pi%e.lists[e.ph-1].length]==='spiral'&&!G.dead){
   const sp=e.ph===3?1.1:1;e.sa+=.36;for(let j=0;j<3;j++)eb(e.x,e.y,e.sa+j*2.094,(150+10*diff())*sp,'#ff3dbb',5);}}
-function onBeat(i){G.bc++;const d=diff();
+function onBeat(i){G.bc++;const d=diff();NR.emit('beat',{i});if(i%4===0)NR.emit('bar',{i,bar:i/4});
   if(C.n>0&&G.bc-C.lb>8)C.n=0;                           // combo drops after 8 beats without a PERFECT
   if(G.waveWait&&i%4===0&&!G.dead&&!G.boss&&!G.bossDone){const D=DISTRICTS[G.di];G.waveWait=false;
-    G.waveT=WAVES[gpick(D.waves)]()/(0.8+0.2*d)*(G.loop?1:clamp(1.3-.3*G.t/180,1,1.3));}
+    G.waveT=barQ(WAVES[gpick(D.waves)]()/(0.8+0.2*d)*(G.loop?1:clamp(1.3-.3*G.t/180,1,1.3)));}
   if(G.dead)return;
   for(const e of G.en){
     if(e.type==='boss'){bossBeat(e,d);continue;}
@@ -551,7 +577,8 @@ function bossBeat(e,d){e.bt++;const bar=Math.floor(e.bt/4),ph=bar>=32?3:bar>=16?
 /* ---------- update ---------- */
 function update(dt){
   G.t+=dt;const D=DISTRICTS[G.di],d=diff();
-  const sdt=dt*G.slow;G.scroll+=(G.boss?60:95)*sdt;
+  const sdt=dt*G.slow;const spT=(G.boss?.63:1)*52*BT.bpm/60;if(!G.spd)G.spd=spT;G.spd+=(spT-G.spd)*Math.min(1,dt*3/(4*BT.spb));G.scroll+=G.spd*sdt;   // scroll = 52 px per beat, glides over a bar when the song changes
+  
   if(G.banner.t>0)G.banner.t-=dt;if(G.note.t>0)G.note.t-=dt;if(G.hint.t>0)G.hint.t-=dt;
   G.shake=Math.max(0,G.shake-40*dt);G.glitch=Math.max(0,G.glitch-dt);G.flash=Math.max(0,G.flash-dt);G.empT=Math.max(0,G.empT-dt);
   for(const x of G.delayed){x.t-=dt;if(x.t<=0){x.dead=1;x.f();}}G.delayed=G.delayed.filter(x=>!x.dead);
@@ -583,7 +610,7 @@ function update(dt){
     const firing=K.Space||K.KeyJ||touchFire;P.fcd-=sdt;
     if(pressed.Fire&&!P.over&&tryPerfect('fire',pressed.Fire,P.x+30,P.y))P.pfT=G.t;
     if(P.over){P.heat-=48*sdt;if(P.heat<=25)P.over=false;}
-    else if(firing&&P.fcd<=0){P.fcd=.11;P.heat+=1.65;const x=P.x+22,y=P.y+2,pf=G.t-P.pfT<.4?1:0;
+    else if(firing&&P.fcd<=0){P.fcd=Math.max(.09,BT.spb/6);P.heat+=1.65;const x=P.x+22,y=P.y+2,pf=G.t-P.pfT<.4?1:0;
       G.pb.push({x,y:y-5,vx:900,vy:0,dm:1,pf},{x,y:y+5,vx:900,vy:0,dm:1,pf});
       if(P.wl>=2)G.pb.push({x,y,vx:860,vy:-150,dm:1,pf},{x,y,vx:860,vy:150,dm:1,pf});
       if(P.wl>=3)G.pb.push({x,y,vx:980,vy:0,dm:2,big:1,pf});
@@ -595,10 +622,10 @@ function update(dt){
 
   /* waves & boss trigger */
   if(!G.dead&&!G.boss&&!G.bossDone){G.dt+=dt;G.waveT-=dt;
-    if(G.dt>=DIST_LEN){if(G.en.length===0||G.dt>DIST_LEN+6)spawnBoss();}
+    if(G.dt>=distLen()){if(G.en.length===0||G.dt>distLen()+6)spawnBoss();}
     else if(G.waveT<=0)G.waveWait=true;                   // the wave itself enters on the next bar
     if(!G.preload&&G.dt>10){G.preload=true;const n=(G.di+1)%DISTRICTS.length;loadTrack('boss');loadTrack(stageFor(n,false));}}
-  if(G.transT>=0){G.transT-=dt;if(G.transT<0){let n=G.di+1;if(n>=DISTRICTS.length){n=0;G.loop++;}enterDistrict(n);}}
+  if(G.transT>=0){G.transT-=dt;if(G.transT<0){NR.emit('districtEnd',{di:G.di});let n=G.di+1;if(n>=DISTRICTS.length){n=0;G.loop++;}enterDistrict(n);}}
 
   /* enemies */
   for(const e of G.en){e.t+=sdt;e.flash=Math.max(0,e.flash-dt);
@@ -659,7 +686,7 @@ function bossUpdate(e,dt,d){
   for(const l of e.lasers){l.t+=dt;if(l.t>2*BT.spb&&l.t<3.1*BT.spb&&!G.dead){const vx=Math.cos(l.a),vy=Math.sin(l.a),px=P.x-l.x,py=P.y-l.y,pr=px*vx+py*vy;
       if(pr>0&&Math.abs(px*vy-py*vx)<9)hurt();}}
   e.lasers=e.lasers.filter(l=>l.t<3.1*BT.spb);}
-function bossDown(e){const D=DISTRICTS[G.di];G.kills++;const m=e.pf?2:1,pts=Math.round(e.score*G.mult*comboK()*m);G.score+=pts;floater(e.x,e.y-40,'+'+pts,D.b);
+function bossDown(e){const D=DISTRICTS[G.di];G.kills++;NR.emit('kill',{e,boss:true});const m=e.pf?2:1,pts=Math.round(e.score*G.mult*comboK()*m);G.score+=pts;floater(e.x,e.y-40,'+'+pts,D.b);
   for(let i=0;i<5;i++){const bx=e.x,by=e.y;G.delayed.push({t:i*.16,f:()=>{burst(bx+rnd(-40,40),by+rnd(-40,40),i%2?D.a:'#ffffff',40,420,1);AU.sfx('boom');}});}
   AU.sfx('big');shake(22);G.flash=Math.max(G.flash,.4*FX());G.eb=[];G.boss=null;G.bossDone=true;AU.boss=false;
   G.pk.push({t:'hp',x:e.x,y:e.y,vx:-80,vy:-40,bob:0},{t:P.wl<3?'up':'emp',x:e.x,y:e.y,vx:-80,vy:40,bob:0});
@@ -734,7 +761,7 @@ function drawHUD(t){const D=DISTRICTS[G.di];ctx.save();
   ctx.font='16px "Share Tech Mono",monospace';ctx.fillStyle=D.b;ctx.fillText(mu,138,31);
   ctx.fillStyle='#8c86b8';ctx.font='12px "Share Tech Mono",monospace';ctx.fillText((G.daily?'DAILY ':'BEST ')+(G.daily?String(Math.max(dailyBest.score,G.score)).padStart(8,'0'):bs),18,48);
   ctx.textAlign='right';ctx.font='700 15px "Chakra Petch",sans-serif';ctx.fillStyle=D.a;ctx.fillText(D.name+(G.loop?' +'+G.loop:''),W-18,28);
-  const pw=180,px=W-18-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,36,pw,4);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,36,pw*(G.boss||G.bossDone?1:Math.min(1,G.dt/DIST_LEN)),4);
+  const pw=180,px=W-18-pw;ctx.fillStyle='#ffffff18';ctx.fillRect(px,36,pw,4);ctx.fillStyle=G.boss?'#ff3040':D.b;ctx.fillRect(px,36,pw*(G.boss||G.bossDone?1:Math.min(1,G.dt/distLen())),4);
   ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText(G.boss?'BOSS':G.bossDone?'CLEAR':'→ '+D.bossName,W-18,54);
   // bottom-left
   const by=H-20;ctx.textAlign='left';ctx.font='11px "Share Tech Mono",monospace';ctx.fillStyle='#8c86b8';ctx.fillText('HULL',18,by-14);
@@ -817,11 +844,11 @@ function setPause(on){if(!running||on===paused)return;paused=on;pauseEl.hidden=!
   if(on){AU.suspend();touch=null;touchFire=false;for(const k in K)K[k]=false;}else{AU.resume();pressed={};}
   syncUI();if(on)$('resumeBtn').focus();}
 function start(daily){if(running)return;AU.unlock();pressed={};titleEl.hidden=true;overEl.hidden=true;pauseEl.hidden=true;setEl.hidden=true;
-  newGame(daily);G.live=true;running=true;paused=false;AU.resume();AU.startStage(stageFor(0,false));
+  newGame(daily);G.live=true;running=true;paused=false;AU.resume();NR.music.rate=1;AU.startStage(stageFor(0,false));NR.emit('runStart',{daily:!!daily});
   FPS.n=0;FPS.t=0;FPS.slow=0;FPS.worst=0;syncUI();}
 function restart(){const dl=G.daily;running=false;paused=false;start(dl);}
 function quitToTitle(){running=false;paused=false;pauseEl.hidden=true;overEl.hidden=true;titleEl.hidden=false;newGame();G.banner.t=0;P.x=-200;AU.resume();AU.menuMusic();syncUI();showBest();}
-function gameOver(){if(!running)return;running=false;const D=DISTRICTS[G.di];const dist=D.name+(G.loop?' +'+G.loop:'');let eye='Signal lost';
+function gameOver(){if(!running)return;running=false;NR.emit('runEnd',{score:G.score,di:G.di,kills:G.kills});const D=DISTRICTS[G.di];const dist=D.name+(G.loop?' +'+G.loop:'');let eye='Signal lost';
   if(G.daily){if(G.score>dailyBest.score){dailyBest={n:todayN(),score:G.score};save('mnr_daily',dailyBest);eye='New daily best';}else eye='Daily run over';}
   else if(G.score>best.score){best={score:G.score,dist};save('mnr_best',best);eye='New best run';}
   $('overEyebrow').textContent=eye;
@@ -855,7 +882,7 @@ window.__mnr={get G(){return G},get P(){return P},get C(){return C},get BT(){ret
   get MSGS(){return MSGS},get FPS(){return FPS},get running(){return running},get paused(){return paused},get rotMode(){return rotMode},get touchUI(){return touchUI},
   get god(){return godMode},set god(v){godMode=!!v;},bpos,judge,mnow,audible,AU,
   skipTo(i){if(!running)return;G.loop=G.loop;G.en=[];G.eb=[];enterDistrict(i);},
-  bossNow(){if(running&&!G.boss&&!G.bossDone){G.dt=DIST_LEN;G.en=[];}}};
+  bossNow(){if(running&&!G.boss&&!G.bossDone){G.dt=distLen();G.en=[];}}};
 })();
 </script>
 
