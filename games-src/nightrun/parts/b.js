@@ -64,7 +64,7 @@ function newGame(daily){
      daily:!!daily,live:false,spawns:[],perf:0,bc:0,lq:0,rev:-1,bp:0,note:{t:0,txt:''},hint:{t:0,txt:''},hint2:false,preload:false,over:false};
   enterDistrict(0);}
 function diff(){const ease=G.loop?1:clamp(.62+.38*G.t/180,.62,1);return(1+.13*G.di+.45*G.loop)*ease;}   // gentle first three minutes
-const stageFor=(i,boss)=>boss?'boss':G.loop?'endless':(i%2?'stage2':'stage1');
+const stageFor=(i,boss)=>boss?'boss':G.loop?'endless':['stage1','stage2','stage3'][i%3];
 function enterDistrict(i){G.di=i;G.dt=0;G.boss=null;G.bossDone=false;G.waveT=3.2;G.waveWait=false;G.preload=false;const D=DISTRICTS[i];bgFor(i);
   banner(D.name,D.sub+(G.loop?`  ·  SCHICHT ${G.loop+1}`:''),false,3.2);AU.root=D.root;AU.boss=false;
   if(G.live)AU.startStage(stageFor(i,false));}

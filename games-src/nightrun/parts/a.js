@@ -37,7 +37,7 @@ const FX=()=>SET.reduce?.25:1;                          // strength of flashes a
 /* ---------- beat clock ---------- */
 // Everything rhythmic reads this one clock. Beat 0 sits at BT.t0+BT.off on the music clock. The clock is the AudioContext's
 // currentTime when audio runs, and a plain game-time counter (fbT) when it does not, so the game also works silent.
-const DEF_BPM={menu:100,stage1:120,stage2:128,boss:140,endless:132};
+const DEF_BPM={menu:100,stage1:120,stage2:128,stage3:128,boss:140,endless:132};
 const BT={bpm:100,spb:.6,t0:0,off:0,stage:'',mode:'none',rev:0,src:0,lastRaw:0,pend:null,title:''};
 let fbT=0;
 const CK={h:[],d:0,at:0};                                // clock smoothing: currentTime only moves in hardware-buffer steps and never runs ahead,

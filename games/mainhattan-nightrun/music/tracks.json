@@ -1,5 +1,5 @@
 {
-  "_readme": "Put the Suno mp3 files in this folder (next to this file) with exactly these names. For each track set bpm (beats per minute) and offsetMs (milliseconds from the start of the file to the first beat; negative is not needed, trim the file instead). A file that is missing is skipped silently and the built-in synth plays at the same bpm. Trim every file to whole bars so it loops cleanly. Stage names: menu, stage1, stage2, boss, endless.",
+  "_readme": "Put the Suno mp3 files in this folder (next to this file) with exactly these names. For each track set bpm (beats per minute) and offsetMs (milliseconds from the start of the file to the first beat; negative is not needed, trim the file instead). A file that is missing is skipped silently and the built-in synth plays at the same bpm. Trim every file to whole bars so it loops cleanly. Stage names: menu, stage1, stage2, stage3, boss, endless.",
   "tracks": [
     {
       "file": "menu.mp3",
@@ -21,6 +21,13 @@
       "bpm": 126,
       "offsetMs": 230,
       "title": "Chrome Skyway"
+    },
+    {
+      "file": "stage3.mp3",
+      "stage": "stage3",
+      "bpm": 128,
+      "offsetMs": 50,
+      "title": "Neon Pursuit"
     },
     {
       "file": "boss.mp3",
