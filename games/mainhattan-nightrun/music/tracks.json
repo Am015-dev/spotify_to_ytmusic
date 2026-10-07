@@ -11,16 +11,16 @@
     {
       "file": "stage1.mp3",
       "stage": "stage1",
-      "bpm": 120,
-      "offsetMs": 0,
-      "title": "Taunusanlage Run"
+      "bpm": 92,
+      "offsetMs": 80,
+      "title": "Midnight Circuit"
     },
     {
       "file": "stage2.mp3",
       "stage": "stage2",
-      "bpm": 128,
-      "offsetMs": 0,
-      "title": "Mainufer Drift"
+      "bpm": 126,
+      "offsetMs": 230,
+      "title": "Chrome Skyway"
     },
     {
       "file": "boss.mp3",
